@@ -14,6 +14,7 @@
 #include <AutoDeleter.h>
 #include <fs_cache.h>
 #include <fs_info.h>
+#include <NodeMonitor.h>
 #include <file_systems/DeviceOpener.h>
 #include <util/AutoLock.h>
 
@@ -39,7 +40,10 @@ struct identify_cookie {
 	NTFS_BOOT_SECTOR boot;
 };
 
+extern "C" int mkntfs_main(const char* devpath, const char* label);
+
 typedef CObjectDeleter<ntfs_inode, int, ntfs_inode_close> NtfsInodeCloser;
+typedef CObjectDeleter<ntfs_attr, void, ntfs_attr_close> NtfsAttrCloser;
 static status_t fs_access(fs_volume* _volume, fs_vnode* _node, int accessMode);
 
 
@@ -117,6 +121,31 @@ fs_free_identify_partition_cookie(partition_data* partition, void* _cookie)
 
 
 static status_t
+fs_initialize(int fd, partition_id partitionID, const char* name,
+	const char* parameterString, off_t partitionSize, disk_job_id job)
+{
+	TRACE("fs_initialize: '%s', %s\n", name, parameterString);
+
+	update_disk_device_job_progress(job, 0);
+
+	char path[B_PATH_NAME_LENGTH];
+	if (ioctl(fd, B_GET_PATH_FOR_DEVICE, path) == 0)
+		return B_BAD_VALUE;
+
+	status_t result = mkntfs_main(path, name);
+	if (result != 0)
+		return result;
+
+	result = scan_partition(partitionID);
+	if (result != B_OK)
+		return result;
+
+	update_disk_device_job_progress(job, 1);
+	return B_OK;
+}
+
+
+static status_t
 fs_mount(fs_volume* _volume, const char* device, uint32 flags,
 	const char* args, ino_t* _rootID)
 {
@@ -140,10 +169,11 @@ fs_mount(fs_volume* _volume, const char* device, uint32 flags,
 	if (volume->ntfs == NULL)
 		return errno;
 
-#if 0 // TODO!
-	if (NVolReadOnly(volume->ntfs))
-#endif
+	if (NVolReadOnly(volume->ntfs)) {
+		if ((ntfsFlags & NTFS_MNT_RDONLY) == 0)
+			ERROR("volume is hibernated, mounted as read-only\n");
 		volume->fs_info_flags |= B_FS_IS_READONLY;
+	}
 
 	if (ntfs_volume_get_free_space(volume->ntfs) != 0) {
 		ntfs_umount(volume->ntfs, true);
@@ -159,16 +189,25 @@ fs_mount(fs_volume* _volume, const char* device, uint32 flags,
 	// TODO: uid/gid mapping and real permissions
 
 	// construct lowntfs_context
+	volume->lowntfs.haiku_fs_volume = _volume;
+	volume->lowntfs.current_close_state_vnode = NULL;
+
 	volume->lowntfs.vol = volume->ntfs;
 	volume->lowntfs.abs_mnt_point = NULL;
 	volume->lowntfs.dmask = 0;
 	volume->lowntfs.fmask = S_IXUSR | S_IXGRP | S_IXOTH;
+	volume->lowntfs.dmtime = 0;
+	volume->lowntfs.special_files = NTFS_FILES_INTERIX;
 	volume->lowntfs.posix_nlink = 0;
+	volume->lowntfs.inherit = 0;
+	volume->lowntfs.windows_names = 1;
+	volume->lowntfs.latest_ghost = 0;
 
 	*_rootID = root->inode = FILE_root;
 	root->parent_inode = (u64)-1;
 	root->mode = S_IFDIR | ACCESSPERMS;
 	root->uid = root->gid = 0;
+	root->size = 0;
 
 	status_t status = publish_vnode(_volume, root->inode, root, &gNtfsVnodeOps, S_IFDIR, 0);
 	if (status != B_OK) {
@@ -221,16 +260,41 @@ fs_read_fs_info(fs_volume* _volume, struct fs_info* info)
 }
 
 
+static status_t
+fs_write_fs_info(fs_volume* _volume, const struct fs_info* info, uint32 mask)
+{
+	CALLED();
+	volume* volume = (struct volume*)_volume->private_volume;
+	MutexLocker lock(volume->lock);
+
+	if ((volume->fs_info_flags & B_FS_IS_READONLY) != 0)
+		return B_READ_ONLY_DEVICE;
+
+	status_t status = B_OK;
+
+	if ((mask & FS_WRITE_FSINFO_NAME) != 0) {
+		ntfschar* label = NULL;
+		int label_len = ntfs_mbstoucs(info->volume_name, &label);
+		if (label_len <= 0 || label == NULL)
+			return -1;
+		MemoryDeleter nameDeleter(label);
+
+		if (ntfs_volume_rename(volume->ntfs, label, label_len) != 0)
+			status = errno;
+	}
+
+	return status;
+}
+
+
 //	#pragma mark -
 
 
 static status_t
-fs_get_vnode(fs_volume* _volume, ino_t nid, fs_vnode* _node, int* _type,
-	uint32* _flags, bool reenter)
+fs_init_vnode(fs_volume* _volume, ino_t parent, ino_t nid, vnode** _vnode, bool publish = false)
 {
-	TRACE("get_vnode %" B_PRIdINO "\n", nid);
 	volume* volume = (struct volume*)_volume->private_volume;
-	MutexLocker lock(reenter ? NULL : &volume->lock);
+	ASSERT_LOCKED_MUTEX(&volume->lock);
 
 	ntfs_inode* ni = ntfs_inode_open(volume->ntfs, nid);
 	if (ni == NULL)
@@ -246,29 +310,55 @@ fs_get_vnode(fs_volume* _volume, ino_t nid, fs_vnode* _node, int* _type,
 	if (ntfs_fuse_getstat(&volume->lowntfs, NULL, ni, &statbuf) != 0)
 		return errno;
 
+	node->inode = nid;
+	node->parent_inode = parent;
 	node->uid = statbuf.st_uid;
 	node->gid = statbuf.st_gid;
 	node->mode = statbuf.st_mode;
-
-	node->inode = nid;
-	_node->private_node = node;
-	_node->ops = &gNtfsVnodeOps;
-	*_type = node->mode;
-	*_flags = 0;
+	node->size = statbuf.st_size;
 
 	// cache the node's name
 	char path[B_FILE_NAME_LENGTH];
 	if (utils_inode_get_name(ni, path, sizeof(path)) == 0)
-		return errno;
+		return B_NO_MEMORY;
 	node->name = strdup(strrchr(path, '/') + 1);
 
-	// fs_lookup will set this, if needed.
-	node->parent_inode = (u64)-1;
+	if (publish) {
+		status_t status = publish_vnode(_volume, node->inode, node, &gNtfsVnodeOps, node->mode, 0);
+		if (status != B_OK)
+			return status;
+	}
 
-	if ((node->mode & S_IFDIR) == 0)
-		node->file_cache = file_cache_create(_volume->id, nid, statbuf.st_size);
+	if ((node->mode & S_IFDIR) == 0) {
+		node->file_cache = file_cache_create(_volume->id, nid, node->size);
+		if (node->file_cache == NULL)
+			return B_NO_INIT;
+	}
 
 	vnodeDeleter.Detach();
+	*_vnode = node;
+	return B_OK;
+}
+
+
+static status_t
+fs_get_vnode(fs_volume* _volume, ino_t nid, fs_vnode* _node, int* _type,
+	uint32* _flags, bool reenter)
+{
+	TRACE("get_vnode %" B_PRIdINO "\n", nid);
+	volume* volume = (struct volume*)_volume->private_volume;
+	MutexLocker lock(reenter ? NULL : &volume->lock);
+
+	vnode* vnode;
+	status_t status = fs_init_vnode(_volume, -1 /* set by fs_lookup */, nid, &vnode);
+	if (status != B_OK)
+		return status;
+
+	_node->private_node = vnode;
+	_node->ops = &gNtfsVnodeOps;
+	*_type = vnode->mode;
+	*_flags = 0;
+
 	return B_OK;
 }
 
@@ -284,6 +374,58 @@ fs_put_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
 	file_cache_delete(node->file_cache);
 	delete node;
 	return B_OK;
+}
+
+
+static status_t
+fs_remove_vnode(fs_volume* _volume, fs_vnode* _node, bool reenter)
+{
+	CALLED();
+	volume* volume = (struct volume*)_volume->private_volume;
+	MutexLocker lock(reenter ? NULL : &volume->lock);
+	vnode* node = (vnode*)_node->private_node;
+
+	if (ntfs_fuse_release(&volume->lowntfs, node->parent_inode, node->inode,
+			node->lowntfs_close_state, node->lowntfs_ghost) != 0)
+		return errno;
+
+	file_cache_delete(node->file_cache);
+	delete node;
+	return B_OK;
+}
+
+
+int*
+ntfs_haiku_get_close_state(struct lowntfs_context *ctx, u64 ino)
+{
+	if (ctx->current_close_state_vnode != NULL)
+		panic("NTFS current_close_state_vnode should be NULL!");
+
+	vnode* node = NULL;
+	if (get_vnode((fs_volume*)ctx->haiku_fs_volume, ino, (void**)&node) != B_OK)
+		return NULL;
+	ctx->current_close_state_vnode = node;
+	return &node->lowntfs_close_state;
+}
+
+
+void
+ntfs_haiku_put_close_state(struct lowntfs_context *ctx, u64 ino, u64 ghost)
+{
+	vnode* node = (vnode*)ctx->current_close_state_vnode;
+	if (node == NULL)
+		return;
+
+	node->lowntfs_ghost = ghost;
+	if ((node->lowntfs_close_state & CLOSE_GHOST) != 0) {
+		fs_volume* _volume = (fs_volume*)ctx->haiku_fs_volume;
+		entry_cache_remove(_volume->id, node->parent_inode, node->name);
+		notify_entry_removed(_volume->id, node->parent_inode, node->name, node->inode);
+		remove_vnode(_volume, node->inode);
+	}
+
+	ctx->current_close_state_vnode = NULL;
+	put_vnode((fs_volume*)ctx->haiku_fs_volume, node->inode);
 }
 
 
@@ -327,6 +469,46 @@ fs_read_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 		bytesLeft -= read;
 
 		if (size_t(read) != ioSize)
+			return errno;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+fs_write_pages(fs_volume* _volume, fs_vnode* _node, void* _cookie,
+	off_t pos, const iovec* vecs, size_t count, size_t* _numBytes)
+{
+	volume* volume = (struct volume*)_volume->private_volume;
+	MutexLocker lock(volume->lock);
+	vnode* node = (vnode*)_node->private_node;
+
+	TRACE("write_pages inode: %" B_PRIdINO", pos: %" B_PRIdOFF "; vecs: %p; "
+		"count: %" B_PRIuSIZE "; numBytes: %" B_PRIuSIZE "\n", node->inode, pos,
+		vecs, count, *_numBytes);
+
+	ntfs_inode* ni = ntfs_inode_open(volume->ntfs, node->inode);
+	if (ni == NULL)
+		return B_FILE_ERROR;
+	NtfsInodeCloser niCloser(ni);
+
+	if (pos < 0 || pos >= ni->data_size)
+		return B_BAD_VALUE;
+
+	size_t bytesLeft = min_c(*_numBytes, size_t(ni->data_size - pos));
+	*_numBytes = 0;
+	for (size_t i = 0; i < count && bytesLeft > 0; i++) {
+		const size_t ioSize = min_c(bytesLeft, vecs[i].iov_len);
+		const int written = ntfs_fuse_write(&volume->lowntfs, ni, (char*)vecs[i].iov_base, ioSize, pos);
+		if (written < 0)
+			return errno;
+
+		pos += written;
+		*_numBytes += written;
+		bytesLeft -= written;
+
+		if (size_t(written) != ioSize)
 			return errno;
 	}
 
@@ -417,6 +599,116 @@ fs_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* stat)
 }
 
 
+static status_t
+fs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat, uint32 mask)
+{
+	CALLED();
+	volume* volume = (struct volume*)_volume->private_volume;
+	MutexLocker lock(volume->lock);
+	vnode* node = (vnode*)_node->private_node;
+
+	if ((volume->fs_info_flags & B_FS_IS_READONLY) != 0)
+		return B_READ_ONLY_DEVICE;
+
+	ntfs_inode* ni = ntfs_inode_open(volume->ntfs, node->inode);
+	if (ni == NULL)
+		return B_FILE_ERROR;
+	NtfsInodeCloser niCloser(ni);
+
+	bool updateTime = false;
+	const uid_t euid = geteuid();
+
+	const bool isOwnerOrRoot = (euid == 0 || euid == (uid_t)node->uid);
+	const bool hasWriteAccess = fs_access(_volume, _node, W_OK);
+
+	if ((mask & B_STAT_SIZE) != 0 && node->size != stat->st_size) {
+		if ((node->mode & S_IFDIR) != 0)
+			return B_IS_A_DIRECTORY;
+		if (!hasWriteAccess)
+			return B_NOT_ALLOWED;
+
+		ntfs_attr* na = ntfs_attr_open(ni, AT_DATA, AT_UNNAMED, 0);
+		if (na == NULL)
+			return errno;
+		NtfsAttrCloser naCloser(na);
+
+		if (ntfs_attr_truncate(na, stat->st_size) != 0)
+			return errno;
+		node->size = na->data_size;
+		file_cache_set_size(node->file_cache, node->size);
+
+		updateTime = true;
+	}
+
+	if ((mask & B_STAT_UID) != 0) {
+		// only root should be allowed
+		if (euid != 0)
+			return B_NOT_ALLOWED;
+
+		// We don't support this (yet.)
+		if (node->uid != stat->st_uid)
+			return B_UNSUPPORTED;
+	}
+
+	if ((mask & B_STAT_GID) != 0) {
+		// only the user or root can do that
+		if (!isOwnerOrRoot)
+			return B_NOT_ALLOWED;
+
+		// We don't support this (yet.)
+		if (node->gid != stat->st_gid)
+			return B_UNSUPPORTED;
+	}
+
+	if ((mask & B_STAT_MODE) != 0) {
+		// only the user or root can do that
+		if (!isOwnerOrRoot)
+			return B_NOT_ALLOWED;
+
+		// We don't support this (yet.)
+		if (node->mode != stat->st_mode)
+			return B_UNSUPPORTED;
+	}
+
+	if ((mask & B_STAT_CREATION_TIME) != 0) {
+		// the user or root can do that or any user with write access
+		if (!isOwnerOrRoot && !hasWriteAccess)
+			return B_NOT_ALLOWED;
+
+		ni->creation_time = timespec2ntfs(stat->st_crtim);
+	}
+
+	if ((mask & B_STAT_MODIFICATION_TIME) != 0) {
+		// the user or root can do that or any user with write access
+		if (!isOwnerOrRoot && !hasWriteAccess)
+			return B_NOT_ALLOWED;
+
+		ni->last_data_change_time = timespec2ntfs(stat->st_mtim);
+	}
+
+	if ((mask & B_STAT_CHANGE_TIME) != 0 || updateTime) {
+		// the user or root can do that or any user with write access
+		if (!isOwnerOrRoot && !hasWriteAccess)
+			return B_NOT_ALLOWED;
+
+		ni->last_mft_change_time = timespec2ntfs(stat->st_ctim);
+	}
+
+	if ((mask & B_STAT_ACCESS_TIME) != 0) {
+		// the user or root can do that or any user with write access
+		if (!isOwnerOrRoot && !hasWriteAccess)
+			return B_NOT_ALLOWED;
+
+		ni->last_access_time = timespec2ntfs(stat->st_atim);
+	}
+
+	ntfs_inode_mark_dirty(ni);
+
+	notify_stat_changed(_volume->id, node->parent_inode, node->inode, mask);
+	return B_OK;
+}
+
+
 static inline int
 open_mode_to_access(int openMode)
 {
@@ -427,6 +719,71 @@ open_mode_to_access(int openMode)
 	if ((openMode & O_RWMASK) == O_RDWR)
 		return R_OK | W_OK;
 	return 0;
+}
+
+
+static status_t
+fs_generic_create(fs_volume* _volume, vnode* directory, const char* name, int mode,
+	ino_t* _inode)
+{
+	volume* volume = (struct volume*)_volume->private_volume;
+	ASSERT_LOCKED_MUTEX(&volume->lock);
+
+	if ((directory->mode & S_IFDIR) == 0)
+		return B_BAD_TYPE;
+
+	ino_t inode = -1;
+	if (ntfs_fuse_create(&volume->lowntfs, directory->inode, name, mode & (S_IFMT | 07777),
+			0, (char*)NULL, &inode) != 0)
+		return errno;
+
+	vnode* node;
+	status_t status = fs_init_vnode(_volume, directory->inode, inode, &node, true);
+	if (status != B_OK)
+		return status;
+
+	entry_cache_add(_volume->id, directory->inode, name, inode);
+	notify_entry_created(_volume->id, directory->inode, name, inode);
+	*_inode = inode;
+	return B_OK;
+}
+
+
+static status_t
+fs_create(fs_volume* _volume, fs_vnode* _directory, const char* name,
+	int openMode, int mode, void** _cookie, ino_t* _vnodeID)
+{
+	CALLED();
+	volume* volume = (struct volume*)_volume->private_volume;
+	MutexLocker lock(volume->lock);
+	vnode* directory = (vnode*)_directory->private_node;
+
+	if ((directory->mode & S_IFDIR) == 0)
+		return B_NOT_A_DIRECTORY;
+
+	status_t status = fs_access(_volume, _directory, W_OK);
+	if (status != B_OK)
+		return status;
+
+#if 1
+	if ((openMode & O_NOCACHE) != 0)
+		return B_UNSUPPORTED;
+#endif
+
+	status = fs_generic_create(_volume, directory, name, S_IFREG | (mode & 07777), _vnodeID);
+	if (status != B_OK)
+		return status;
+
+	file_cookie* cookie = new file_cookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<file_cookie> cookieDeleter(cookie);
+
+	cookie->open_mode = openMode;
+
+	cookieDeleter.Detach();
+	*_cookie = cookie;
+	return B_OK;
 }
 
 
@@ -473,6 +830,21 @@ fs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 		return B_UNSUPPORTED;
 #endif
 
+	if ((openMode & O_TRUNC) != 0) {
+		if ((openMode & O_RWMASK) == O_RDONLY)
+			return B_NOT_ALLOWED;
+
+		ntfs_attr* na = ntfs_attr_open(ni, AT_DATA, AT_UNNAMED, 0);
+		if (na == NULL)
+			return errno;
+		NtfsAttrCloser naCloser(na);
+
+		if (ntfs_attr_truncate(na, 0) != 0)
+			return errno;
+		node->size = na->data_size;
+		file_cache_set_size(node->file_cache, node->size);
+	}
+
 	cookieDeleter.Detach();
 	*_cookie = cookie;
 	return B_OK;
@@ -496,6 +868,74 @@ fs_read(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 
 
 static status_t
+fs_write(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
+	const void* buffer, size_t* _length)
+{
+	CALLED();
+	volume* volume = (struct volume*)_volume->private_volume;
+	MutexLocker lock(volume->lock);
+	vnode* node = (vnode*)_node->private_node;
+	file_cookie* cookie = (file_cookie*)_cookie;
+
+	if ((node->mode & S_IFDIR) != 0)
+		return B_IS_A_DIRECTORY;
+
+	ASSERT((cookie->open_mode & O_WRONLY) != 0 || (cookie->open_mode & O_RDWR) != 0);
+
+	if (cookie->open_mode & O_APPEND)
+		pos = node->size;
+	if (pos < 0)
+		return B_BAD_VALUE;
+
+	if (pos + s64(*_length) > node->size) {
+		ntfs_inode* ni = ntfs_inode_open(volume->ntfs, node->inode);
+		if (ni == NULL)
+			return errno;
+		NtfsInodeCloser niCloser(ni);
+
+		ntfs_attr* na = ntfs_attr_open(ni, AT_DATA, AT_UNNAMED, 0);
+		if (na == NULL)
+			return errno;
+		NtfsAttrCloser naCloser(na);
+
+		if (ntfs_attr_truncate(na, pos + *_length) != 0)
+			return errno;
+		node->size = na->data_size;
+		file_cache_set_size(node->file_cache, node->size);
+	}
+
+	lock.Unlock();
+
+	status_t status = file_cache_write(node->file_cache, cookie, pos, buffer, _length);
+	if (status != B_OK)
+		return status;
+
+	lock.Lock();
+
+	// periodically notify if the file size has changed
+	if ((node->lowntfs_close_state & CLOSE_GHOST) == 0
+			&& cookie->last_size != node->size
+			&& system_time() > cookie->last_notification + INODE_NOTIFICATION_INTERVAL) {
+		notify_stat_changed(_volume->id, node->parent_inode, node->inode,
+			B_STAT_MODIFICATION_TIME | B_STAT_SIZE | B_STAT_INTERIM_UPDATE);
+		cookie->last_size = node->size;
+		cookie->last_notification = system_time();
+	}
+	return status;
+}
+
+
+static status_t
+fs_fsync(fs_volume* _volume, fs_vnode* _node)
+{
+	CALLED();
+	vnode* node = (vnode*)_node->private_node;
+
+	return file_cache_sync(node->file_cache);
+}
+
+
+static status_t
 fs_close(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	CALLED();
@@ -510,6 +950,84 @@ fs_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 {
 	file_cookie* cookie = (file_cookie*)_cookie;
 	delete cookie;
+	return B_OK;
+}
+
+
+static status_t
+fs_generic_unlink(fs_volume* _volume, fs_vnode* _directory, const char* name, RM_TYPES type)
+{
+	volume* volume = (struct volume*)_volume->private_volume;
+	MutexLocker lock(volume->lock);
+	vnode* directory = (vnode*)_directory->private_node;
+
+	status_t status = fs_access(_volume, _directory, W_OK);
+	if (status != B_OK)
+		return status;
+
+	if (ntfs_fuse_rm(&volume->lowntfs, directory->inode, name, type) != 0)
+		return errno;
+
+	// remove_vnode() et al. will be called by put_close_state.
+	return B_OK;
+}
+
+
+static status_t
+fs_unlink(fs_volume* _volume, fs_vnode* _directory, const char* name)
+{
+	CALLED();
+	return fs_generic_unlink(_volume, _directory, name, RM_LINK);
+}
+
+
+static status_t
+fs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
+	fs_vnode* _newDir, const char* newName)
+{
+	CALLED();
+	volume* volume = (struct volume*)_volume->private_volume;
+	MutexLocker lock(volume->lock);
+
+	vnode* old_directory = (vnode*)_oldDir->private_node;
+	vnode* new_directory = (vnode*)_newDir->private_node;
+
+	if (old_directory == new_directory && strcmp(oldName, newName) == 0)
+		return B_OK;
+
+	status_t status = fs_access(_volume, _oldDir, W_OK);
+	if (status == B_OK)
+		status = fs_access(_volume, _newDir, W_OK);
+	if (status != B_OK)
+		return status;
+
+	if (ntfs_fuse_rename(&volume->lowntfs, old_directory->inode, oldName,
+			new_directory->inode, newName) != 0)
+		return errno;
+
+	u64 ino = ntfs_fuse_inode_lookup(&volume->lowntfs, new_directory->inode, newName);
+	if (ino == (u64)-1)
+		return B_ENTRY_NOT_FOUND;
+
+	vnode* node;
+	status = get_vnode(_volume, ino, (void**)&node);
+	if (status != B_OK)
+		return status;
+
+	free(node->name);
+	node->name = strdup(newName);
+	node->parent_inode = new_directory->inode;
+
+	if ((node->mode & S_IFDIR) != 0)
+		entry_cache_add(_volume->id, ino, "..", new_directory->inode);
+
+	put_vnode(_volume, ino);
+
+	entry_cache_remove(_volume->id, old_directory->inode, oldName);
+	entry_cache_add(_volume->id, new_directory->inode, newName, ino);
+	notify_entry_moved(_volume->id, old_directory->inode, oldName,
+		new_directory->inode, newName, ino);
+
 	return B_OK;
 }
 
@@ -543,6 +1061,41 @@ fs_read_link(fs_volume* _volume, fs_vnode* _node, char* buffer, size_t* bufferSi
 
 
 //	#pragma mark - Directory functions
+
+
+static status_t
+fs_create_dir(fs_volume* _volume, fs_vnode* _directory, const char* name, int mode)
+{
+	CALLED();
+	volume* volume = (struct volume*)_volume->private_volume;
+	MutexLocker lock(volume->lock);
+	vnode* directory = (vnode*)_directory->private_node;
+
+	status_t status = fs_access(_volume, _directory, W_OK);
+	if (status != B_OK)
+		return status;
+
+	ino_t inode = -1;
+	status = fs_generic_create(_volume, directory, name, S_IFDIR | (mode & 07777), &inode);
+	if (status != B_OK)
+		return status;
+
+	return B_OK;
+}
+
+
+static status_t
+fs_remove_dir(fs_volume* _volume, fs_vnode* _directory, const char* name)
+{
+	CALLED();
+	ino_t directory_inode = ((vnode*)_directory->private_node)->inode;
+	status_t status = fs_generic_unlink(_volume, _directory, name, RM_DIR);
+	if (status != B_OK)
+		return status;
+
+	entry_cache_remove(_volume->id, directory_inode, "..");
+	return B_OK;
+}
 
 
 static status_t
@@ -710,7 +1263,7 @@ fs_free_dir_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 fs_volume_ops gNtfsVolumeOps = {
 	&fs_unmount,
 	&fs_read_fs_info,
-	NULL,	// write_fs_info()
+	&fs_write_fs_info,
 	NULL,	// fs_sync,
 	&fs_get_vnode,
 };
@@ -721,12 +1274,12 @@ fs_vnode_ops gNtfsVnodeOps = {
 	&fs_lookup,
 	&fs_get_vnode_name,
 	&fs_put_vnode,
-	NULL,	// fs_remove_vnode,
+	&fs_remove_vnode,
 
 	/* VM file access */
 	&fs_can_page,
 	&fs_read_pages,
-	NULL,	// fs_write_pages,
+	&fs_write_pages,
 
 	NULL,	// io
 	NULL,	// cancel_io
@@ -737,31 +1290,31 @@ fs_vnode_ops gNtfsVnodeOps = {
 	NULL,
 	NULL,	// fs_select
 	NULL,	// fs_deselect
-	NULL,	// fs_fsync
+	&fs_fsync,
 
 	&fs_read_link,
 	NULL,	// fs_create_symlink
 
 	NULL,	// fs_link,
-	NULL,	// fs_unlink,
-	NULL,	// fs_rename,
+	&fs_unlink,
+	&fs_rename,
 
 	&fs_access,
 	&fs_read_stat,
-	NULL,	// fs_write_stat,
+	&fs_write_stat,
 	NULL,	// fs_preallocate
 
 	/* file operations */
-	NULL,	// fs_create,
+	&fs_create,
 	&fs_open,
 	&fs_close,
 	&fs_free_cookie,
 	&fs_read,
-	NULL,	//	fs_write,
+	&fs_write,
 
 	/* directory operations */
-	NULL, 	// fs_create_dir,
-	NULL, 	// fs_remove_dir,
+	&fs_create_dir,
+	&fs_remove_dir,
 	&fs_open_dir,
 	&fs_close_dir,
 	&fs_free_dir_cookie,
@@ -798,7 +1351,13 @@ static file_system_module_info sNtfsFileSystem = {
 
 	"ntfs",							// short_name
 	"NT File System",				// pretty_name
-	0,								// DDM flags
+
+	// DDM flags
+	0
+	| B_DISK_SYSTEM_IS_FILE_SYSTEM
+	| B_DISK_SYSTEM_SUPPORTS_INITIALIZING
+	| B_DISK_SYSTEM_SUPPORTS_WRITING
+	,
 
 	// scanning
 	fs_identify_partition,
@@ -808,7 +1367,27 @@ static file_system_module_info sNtfsFileSystem = {
 
 	&fs_mount,
 
-	NULL,
+	// capability querying operations
+	NULL,	// get_supported_operations
+
+	NULL,	// validate_resize
+	NULL,	// validate_move
+	NULL,	// validate_set_content_name
+	NULL,	// validate_set_content_parameters
+	NULL,	// validate_initialize,
+
+	/* shadow partition modification */
+	NULL,	// shadow_changed
+
+	/* writing */
+	NULL,	// defragment
+	NULL,	// repair
+	NULL,	// resize
+	NULL,	// move
+	NULL,	// set_content_name
+	NULL,	// set_content_parameters
+	fs_initialize,
+	NULL	// uninitialize
 };
 
 

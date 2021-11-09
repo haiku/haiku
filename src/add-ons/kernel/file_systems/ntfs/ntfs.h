@@ -51,6 +51,10 @@ typedef struct vnode {
 	mode_t		mode;
 	uid_t		uid;
 	gid_t		gid;
+	s64			size;
+
+	int			lowntfs_close_state = 0;
+	u64			lowntfs_ghost = 0;
 
 	char*		name = NULL;
 	void*		file_cache = NULL;
@@ -59,6 +63,10 @@ typedef struct vnode {
 
 typedef struct file_cookie {
 	int			open_mode;
+
+	s64			last_size = 0;
+	bigtime_t	last_notification = 0;
+#define INODE_NOTIFICATION_INTERVAL	1000000LL
 } file_cookie;
 
 typedef struct directory_cookie {
