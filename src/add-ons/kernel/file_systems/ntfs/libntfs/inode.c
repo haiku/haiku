@@ -534,6 +534,12 @@ int ntfs_inode_close(ntfs_inode *ni)
 				item.pathname = (const char*)NULL;
 				item.varsize = 0;
 				debug_cached_inode(ni);
+#if defined(__HAIKU__)
+				if (ntfs_fetch_cache(ni->vol->nidata_cache,
+						GENERIC(&item), idata_cache_compare)) {
+					panic("ntfs_inode_close: %llu already in cache!", ni->mft_no);
+				}
+#endif
 				ntfs_enter_cache(ni->vol->nidata_cache,
 					GENERIC(&item), idata_cache_compare);
 			}
