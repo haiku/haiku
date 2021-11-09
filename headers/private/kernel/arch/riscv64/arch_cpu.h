@@ -45,7 +45,7 @@ clear_ac()
 
 
 typedef struct arch_cpu_info {
-	int null;
+	uint64 hartId;
 } arch_cpu_info;
 
 

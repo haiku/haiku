@@ -15,12 +15,15 @@
 #include <platform/sbi/sbi_syscalls.h>
 
 
+extern "C" void SVec();
+
 extern uint32 gPlatform;
 
 
 status_t
 arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 {
+	// dprintf("arch_cpu_preboot_init_percpu(%" B_PRId32 ")\n", curr_cpu);
 	return B_OK;
 }
 
@@ -28,16 +31,34 @@ arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 status_t
 arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
 {
-	//detect_cpu(curr_cpu);
+	SetStvec((uint64)SVec);
+	SstatusReg sstatus(Sstatus());
+	sstatus.ie = 0;
+	sstatus.fs = extStatusInitial; // enable FPU
+	sstatus.xs = extStatusOff;
+	SetSstatus(sstatus.val);
+	SetSie(Sie() | (1 << sTimerInt) | (1 << sSoftInt) | (1 << sExternInt));
 
-	// we only support one anyway...
-	return 0;
+	return B_OK;
 }
 
 
 status_t
 arch_cpu_init(kernel_args *args)
 {
+	for (uint32 curCpu = 0; curCpu < args->num_cpus; curCpu++) {
+		cpu_ent* cpu = &gCPU[curCpu];
+
+		cpu->arch.hartId = args->arch_args.hartIds[curCpu];
+
+		cpu->topology_id[CPU_TOPOLOGY_PACKAGE] = 0;
+		cpu->topology_id[CPU_TOPOLOGY_CORE] = curCpu;
+		cpu->topology_id[CPU_TOPOLOGY_SMT] = 0;
+
+		for (unsigned int i = 0; i < CPU_MAX_CACHE_LEVEL; i++)
+			cpu->cache_id[i] = -1;
+	}
+
 /*
 	uint64 conversionFactor
 		= (1LL << 32) * 1000000LL / args->arch_args.timerFrequency;
@@ -88,24 +109,33 @@ arch_cpu_memory_write_barrier(void)
 void
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
+	int32 numPages = end / B_PAGE_SIZE - start / B_PAGE_SIZE;
+	while (numPages-- >= 0) {
+		FlushTlbPage(start);
+		start += B_PAGE_SIZE;
+	}
 }
 
 
 void
 arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 {
+	for (int i = 0; i < num_pages; i++)
+		FlushTlbPage(pages[i]);
 }
 
 
 void
 arch_cpu_global_TLB_invalidate(void)
 {
+	FlushTlbAll();
 }
 
 
 void
 arch_cpu_user_TLB_invalidate(void)
 {
+	FlushTlbAll();
 }
 
 

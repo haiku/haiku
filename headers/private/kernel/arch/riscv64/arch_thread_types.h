@@ -14,6 +14,11 @@ namespace BKernel {
 
 
 struct iframe {
+	uint64 status;
+	uint64 cause;
+	uint64 tval;
+	uint64 align1; // structure need to be 16 byte aligned
+
 	uint64 ra;
 	uint64 t6;
 	uint64 sp;
@@ -48,6 +53,7 @@ struct iframe {
 	uint64 epc;
 };
 
+
 struct arch_context {
 	uint64 ra;    //  0
 	uint64 s[12]; // 12
@@ -60,12 +66,15 @@ struct fpu_context {
 	uint64 fcsr;
 };
 
+struct __attribute__((aligned(16))) arch_stack {
+	BKernel::Thread* thread;
+};
 
 struct arch_thread {
-	BKernel::Thread* thread;
 	arch_context context;
 	fpu_context fpuContext;
 	iframe* userFrame;
+	uint64 oldA0;
 };
 
 struct arch_team {
@@ -84,13 +93,12 @@ struct arch_fork_arg {
 extern "C" {
 #endif
 
-int arch_setjmp(arch_context* ctx);
-void arch_longjmp(arch_context* ctx, int val);
+void arch_context_switch(arch_context* from, arch_context* to);
 void save_fpu(fpu_context* ctx);
 void restore_fpu(fpu_context* ctx);
 void arch_thread_entry();
-void arch_enter_userspace(void *arg1, void *arg2, addr_t sp);
-void arch_longjmp_iframe(iframe* frame);
+void arch_load_user_iframe(arch_stack* stackHeader, iframe* frame)
+	__attribute__ ((noreturn));
 
 #ifdef __cplusplus
 }

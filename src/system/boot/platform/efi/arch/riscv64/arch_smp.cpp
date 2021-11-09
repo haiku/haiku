@@ -6,6 +6,7 @@
 
 #include "arch_smp.h"
 
+#include <algorithm>
 #include <string.h>
 
 #include <KernelExport.h>
@@ -28,13 +29,14 @@
 #endif
 
 
-extern "C" void arch_enter_kernel(uint64 satp, struct kernel_args *kernelArgs,
-        addr_t kernelEntry, addr_t kernelStackTop);
+typedef status_t (*KernelEntry) (kernel_args *bootKernelArgs, int currentCPU);
 
 
 struct CpuEntryInfo {
-	uint64 satp;
-	uint64 kernelEntry;
+	uint64 satp;		//  0
+	uint64 stackBase;	//  8
+	uint64 stackSize;	// 16
+	KernelEntry kernelEntry;// 24
 };
 
 
@@ -43,11 +45,85 @@ uint32 sCpuCount = 0;
 
 
 static void
-CpuEntry(int hartId, CpuEntryInfo* info)
+arch_cpu_dump_hart_status(uint64 status)
 {
-	arch_enter_kernel(info->satp, &gKernelArgs, info->kernelEntry,
-		gKernelArgs.cpu_kstack[hartId].start
-		+ gKernelArgs.cpu_kstack[hartId].size);
+	switch (status) {
+		case SBI_HART_STATE_STARTED:
+			dprintf("started");
+			break;
+		case SBI_HART_STATE_STOPPED:
+			dprintf("stopped");
+			break;
+		case SBI_HART_STATE_START_PENDING:
+			dprintf("startPending");
+			break;
+		case SBI_HART_STATE_STOP_PENDING:
+			dprintf("stopPending");
+			break;
+		case SBI_HART_STATE_SUSPENDED:
+			dprintf("suspended");
+			break;
+		case SBI_HART_STATE_SUSPEND_PENDING:
+			dprintf("suspendPending");
+			break;
+		case SBI_HART_STATE_RESUME_PENDING:
+			dprintf("resumePending");
+			break;
+		default:
+			dprintf("?(%" B_PRIu64 ")", status);
+	}
+}
+
+
+static void
+arch_cpu_dump_hart()
+{
+	dprintf("  hart status:\n");
+	for (uint32 i = 0; i < sCpuCount; i++) {
+		dprintf("    hart %" B_PRIu32 ": ", i);
+		sbiret res = sbi_hart_get_status(sCpus[i].id);
+		if (res.error < 0)
+			dprintf("error: %" B_PRIu64 , res.error);
+		else {
+			arch_cpu_dump_hart_status(res.value);
+		}
+		dprintf("\n");
+	}
+}
+
+
+static void __attribute__((naked))
+arch_cpu_entry(int hartId, CpuEntryInfo* info)
+{
+	// enable MMU
+	asm("ld t0, 0(a1)");   // CpuEntryInfo::satp
+	asm("csrw satp, t0");
+	asm("sfence.vma");
+
+	// setup stack
+	asm("ld sp, 8(a1)");   // CpuEntryInfo::stackBase
+	asm("ld t0, 16(a1)");  // CpuEntryInfo::stackSize
+	asm("add sp, sp, t0");
+	asm("li fp, 0");
+
+	asm("tail arch_cpu_entry2");
+}
+
+
+extern "C" void
+arch_cpu_entry2(int hartId, CpuEntryInfo* info)
+{
+	dprintf("%s(%d)\n", __func__, hartId);
+
+	uint32 cpu = 0;
+	while (cpu < sCpuCount && !(sCpus[cpu].id == (uint32)hartId))
+		cpu++;
+
+	if (!(cpu < sCpuCount))
+		panic("CPU for hart id %d not found\n", hartId);
+
+	info->kernelEntry(&gKernelArgs, cpu);
+	for (;;) {}
 }
 
 
@@ -65,6 +141,17 @@ arch_smp_register_cpu(platform_cpu_info** cpu)
 }
 
 
+platform_cpu_info*
+arch_smp_find_cpu(uint32 phandle)
+{
+	for (uint32 i = 0; i < sCpuCount; i++) {
+		if (sCpus[i].phandle == phandle)
+			return &sCpus[i];
+	}
+	return NULL;
+}
+
+
 int
 arch_smp_get_current_cpu(void)
 {
@@ -75,17 +162,24 @@ arch_smp_get_current_cpu(void)
 void
 arch_smp_init_other_cpus(void)
 {
-	// TODO: SMP code disabled for now
-	gKernelArgs.num_cpus = 1;
-	return;
+	gKernelArgs.num_cpus = sCpuCount;
+
+	// make boot CPU first as expected by kernel
+	for (uint32 i = 1; i < sCpuCount; i++) {
+		if (sCpus[i].id == gBootHart)
+			std::swap(sCpus[i], sCpus[0]);
+	}
+
+	for (uint32 i = 0; i < sCpuCount; i++) {
+		gKernelArgs.arch_args.hartIds[i] = sCpus[i].id;
+		gKernelArgs.arch_args.plicContexts[i] = sCpus[i].plicContext;
+	}
 
 	if (get_safemode_boolean(B_SAFEMODE_DISABLE_SMP, false)) {
 		// SMP has been disabled!
 		TRACE(("smp disabled per safemode setting\n"));
 		gKernelArgs.num_cpus = 1;
 	}
-
-	gKernelArgs.num_cpus = sCpuCount;
 
 	if (gKernelArgs.num_cpus < 2)
 		return;
@@ -108,35 +202,34 @@ arch_smp_init_other_cpus(void)
 void
 arch_smp_boot_other_cpus(uint64 satp, uint64 kernel_entry)
 {
-	// TODO: SMP code disabled for now
-	return;
+	dprintf("arch_smp_boot_other_cpus(%p, %p)\n", (void*)satp, (void*)kernel_entry);
 
-	dprintf("arch_smp_boot_other_cpus()\n");
+	arch_cpu_dump_hart();
 	for (uint32 i = 0; i < sCpuCount; i++) {
-		// TODO: mhartid 0 may not exist, or it may not be a core
-		// you're interested in (FU540/FU740 hart 0 is mgmt core.)
-		if (0 != sCpus[i].id) {
+		if (sCpus[i].id != gBootHart) {
 			sbiret res;
-			dprintf("starting CPU %" B_PRIu32 "\n", sCpus[i].id);
+			dprintf("  starting CPU %" B_PRIu32 "\n", sCpus[i].id);
 
-			res = sbi_hart_get_status(sCpus[i].id);
-			dprintf("[PRE] sbi_hart_get_status() -> (%ld, %ld)\n",
-				res.error, res.value);
+			dprintf("  stack: %#" B_PRIx64 " - %#" B_PRIx64 "\n",
+				gKernelArgs.cpu_kstack[i].start, gKernelArgs.cpu_kstack[i].start
+				+ gKernelArgs.cpu_kstack[i].size - 1);
 
-			CpuEntryInfo info = {.satp = satp, .kernelEntry = kernel_entry};
-			res = sbi_hart_start(sCpus[i].id, (addr_t)&CpuEntry, (addr_t)&info);
-			dprintf("sbi_hart_start() -> (%ld, %ld)\n", res.error, res.value);
+			CpuEntryInfo* info = new(std::nothrow) CpuEntryInfo{
+				.satp = satp,
+				.stackBase = gKernelArgs.cpu_kstack[i].start,
+				.stackSize = gKernelArgs.cpu_kstack[i].size,
+				.kernelEntry = (KernelEntry)kernel_entry
+			};
+			res = sbi_hart_start(sCpus[i].id, (addr_t)&arch_cpu_entry, (addr_t)info);
 
 			for (;;) {
 				res = sbi_hart_get_status(sCpus[i].id);
 				if (res.error < 0 || res.value == SBI_HART_STATE_STARTED)
 					break;
 			}
-
-			dprintf("[POST] sbi_hart_get_status() -> (%ld, %ld)\n",
-				res.error, res.value);
 		}
 	}
+	arch_cpu_dump_hart();
 }
 
 

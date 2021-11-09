@@ -4,43 +4,58 @@
  */
 
 
+#include <asm_defs.h>
 #include "arch_traps.h"
+#include "asm_offsets.h"
 
 
-.globl SVec
-.type  SVec, @function
 .align 4
-SVec:
-	PushTrapFrame
-	sd fp, 2*8(sp)
+FUNCTION(SVec):
+	PushTrapFrame IFRAME_ra
+	sd fp, IFRAME_sp(sp)
 	csrr t0, sepc
-	sd   t0, 31*8(sp)
+	sd   t0, IFRAME_epc(sp)
+
+	csrr t0, sstatus
+	sd   t0, IFRAME_status(sp)
+	csrr t0, scause
+	sd   t0, IFRAME_cause(sp)
+	csrr t0, stval
+	sd   t0, IFRAME_tval(sp)
 
 	mv a0, sp
 	call STrap
 
-	ld t0, 31*8(sp)
+FUNCTION(SVecRet):
+	ld   t0, IFRAME_status(sp)
+	csrw sstatus, t0
+
+	ld t0, IFRAME_epc(sp)
 	csrw sepc, t0
-	PopTrapFrame
+	PopTrapFrame IFRAME_ra
 	sret
-.size	SVec, .-SVec
+FUNCTION_END(SVec)
 
 
-.globl SVecU
-.type  SVecU, @function
 .align 4
-SVecU:
-	csrrw t0, sscratch, t0   # t0: &arch_thread
-	ld    tp,        0*8(t0) # tp = arch_thread.thread
-	ld    t0, (1 + 13)*8(t0) # t0 = arch_thread.context.sp
-	sd    sp,  2*8 - 256(t0) # save user SP
-	mv    sp, t0             # switch to kernel stack
-	csrr  t0, sscratch
+FUNCTION(SVecU):
+	# switch to kernel stack, SSCRATCH will hold user SP
+	csrrw sp, sscratch, sp
 
-	PushTrapFrame
-
+	PushTrapFrame IFRAME_ra
+	csrr t0, sscratch
+	sd   t0, IFRAME_sp(sp)
 	csrr t0, sepc
-	sd   t0, 31*8(sp)
+	sd   t0, IFRAME_epc(sp)
+
+	csrr t0, sstatus
+	sd   t0, IFRAME_status(sp)
+	csrr t0, scause
+	sd   t0, IFRAME_cause(sp)
+	csrr t0, stval
+	sd   t0, IFRAME_tval(sp)
+
+	ld tp, ARCH_STACK_thread(fp)
 
 	la   t0,    SVec
 	csrw stvec, t0
@@ -48,19 +63,18 @@ SVecU:
 	mv a0, sp
 	call STrap
 
-.globl SVecURet
-.type  SVecURet, @function
-SVecURet:
-	call RestoreUserRegs
-
-	csrr  t0, sscratch
-	sd    fp, (1 + 13)*8(t0) # arch_thread.context.sp = fp
+FUNCTION(SVecURet):
+	csrw sscratch, fp # save kernel SP
 
 	la   t0,    SVecU
 	csrw stvec, t0
 
-	ld t0, 31*8(sp)
+	ld   t0, IFRAME_status(sp)
+	csrw sstatus, t0
+
+	ld tp, IFRAME_tp(sp)
+	ld t0, IFRAME_epc(sp)
 	csrw sepc, t0
-	PopTrapFrame
+	PopTrapFrame IFRAME_ra
 	sret
-.size	SVecU, .-SVecU
+FUNCTION_END(SVecU)

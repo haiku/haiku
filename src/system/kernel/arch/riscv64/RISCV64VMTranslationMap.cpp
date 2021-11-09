@@ -15,12 +15,11 @@
 #include <vm/VMAddressSpace.h>
 #include <vm/VMCache.h>
 #include <slab/Slab.h>
+#include <platform/sbi/sbi_syscalls.h>
 
 #include <util/AutoLock.h>
 #include <util/ThreadAutoLock.h>
 
-
-//#define DISABLE_MODIFIED_FLAGS 1
 
 //#define DO_TRACE
 #ifdef DO_TRACE
@@ -31,6 +30,84 @@
 
 #define NOT_IMPLEMENTED_PANIC() \
 	panic("not implemented: %s\n", __PRETTY_FUNCTION__)
+
+extern uint32 gPlatform;
+
+
+static void
+WriteVmPage(vm_page* page)
+{
+	dprintf("0x%08" B_PRIxADDR " ",
+		(addr_t)(page->physical_page_number * B_PAGE_SIZE));
+	switch (page->State()) {
+		case PAGE_STATE_ACTIVE:
+			dprintf("A");
+			break;
+		case PAGE_STATE_INACTIVE:
+			dprintf("I");
+			break;
+		case PAGE_STATE_MODIFIED:
+			dprintf("M");
+			break;
+		case PAGE_STATE_CACHED:
+			dprintf("C");
+			break;
+		case PAGE_STATE_FREE:
+			dprintf("F");
+			break;
+		case PAGE_STATE_CLEAR:
+			dprintf("L");
+			break;
+		case PAGE_STATE_WIRED:
+			dprintf("W");
+			break;
+		case PAGE_STATE_UNUSED:
+			dprintf("-");
+			break;
+	}
+	dprintf(" ");
+	if (page->busy)
+		dprintf("B");
+	else
+		dprintf("-");
+
+	if (page->busy_writing)
+		dprintf("W");
+	else
+		dprintf("-");
+
+	if (page->accessed)
+		dprintf("A");
+	else
+		dprintf("-");
+
+	if (page->modified)
+		dprintf("M");
+	else
+		dprintf("-");
+
+	if (page->unused)
+		dprintf("U");
+	else
+		dprintf("-");
+
+	dprintf(" usage:%3u", page->usage_count);
+	dprintf(" wired:%5u", page->WiredCount());
+
+	bool first = true;
+	vm_page_mappings::Iterator iterator = page->mappings.GetIterator();
+	vm_page_mapping* mapping;
+	while ((mapping = iterator.Next()) != NULL) {
+		if (first) {
+			dprintf(": ");
+			first = false;
+		} else
+			dprintf(", ");
+
+		dprintf("%" B_PRId32 " (%s)", mapping->area->id, mapping->area->name);
+		mapping = mapping->page_link.next;
+	}
+}
 
 
 static void
@@ -50,6 +127,7 @@ FreePageTable(page_num_t ppn, bool isKernel, uint32 level = 2)
 		}
 	}
 	vm_page* page = vm_lookup_page(ppn);
+	DEBUG_PAGE_ACCESS_START(page);
 	vm_page_set_state(page, PAGE_STATE_FREE);
 }
 
@@ -94,6 +172,7 @@ RISCV64VMTranslationMap::LookupPte(addr_t virtAdr, bool alloc,
 		fPageTable = page->physical_page_number * B_PAGE_SIZE;
 		if (fPageTable == 0)
 			return NULL;
+		DEBUG_PAGE_ACCESS_END(page);
 		fPageTableSize++;
 		if (!fIsKernel) {
 			// Map kernel address space into user address space. Preallocated
@@ -121,6 +200,7 @@ RISCV64VMTranslationMap::LookupPte(addr_t virtAdr, bool alloc,
 			pte->ppn = page->physical_page_number;
 			if (pte->ppn == 0)
 				return NULL;
+			DEBUG_PAGE_ACCESS_END(page);
 			fPageTableSize++;
 			pte->flags |= (1 << pteValid);
 		}
@@ -147,7 +227,9 @@ RISCV64VMTranslationMap::RISCV64VMTranslationMap(bool kernel,
 	phys_addr_t pageTable):
 	fIsKernel(kernel),
 	fPageTable(pageTable),
-	fPageTableSize(GetPageTableSize(pageTable / B_PAGE_SIZE, kernel))
+	fPageTableSize(GetPageTableSize(pageTable / B_PAGE_SIZE, kernel)),
+	fInvalidPagesCount(0),
+	fInvalidCode(false)
 {
 	TRACE("+RISCV64VMTranslationMap(%p, %d, 0x%" B_PRIxADDR ")\n", this,
 		kernel, pageTable);
@@ -235,32 +317,33 @@ RISCV64VMTranslationMap::Map(addr_t virtualAddress, phys_addr_t physicalAddress,
 	if (pte == NULL)
 		panic("can't allocate page table");
 
-	pte->ppn = physicalAddress / B_PAGE_SIZE;
-	pte->flags = 0;
+	Pte newPte;
+	newPte.ppn = physicalAddress / B_PAGE_SIZE;
+	newPte.flags = (1 << pteValid);
+
 	if ((attributes & B_USER_PROTECTION) != 0) {
-		pte->flags |= (1 << pteUser);
+		newPte.flags |= (1 << pteUser);
 		if ((attributes & B_READ_AREA) != 0)
-			pte->flags |= (1 << pteRead);
+			newPte.flags |= (1 << pteRead);
 		if ((attributes & B_WRITE_AREA) != 0)
-			pte->flags |= (1 << pteWrite);
+			newPte.flags |= (1 << pteWrite);
 		if ((attributes & B_EXECUTE_AREA) != 0)
-			pte->flags |= (1 << pteExec);
+			newPte.flags |= (1 << pteExec);
 	} else {
 		if ((attributes & B_KERNEL_READ_AREA) != 0)
-			pte->flags |= (1 << pteRead);
+			newPte.flags |= (1 << pteRead);
 		if ((attributes & B_KERNEL_WRITE_AREA) != 0)
-			pte->flags |= (1 << pteWrite);
-		if ((attributes & B_KERNEL_EXECUTE_AREA) != 0)
-			pte->flags |= (1 << pteExec);
+			newPte.flags |= (1 << pteWrite);
+		if ((attributes & B_KERNEL_EXECUTE_AREA) != 0) {
+			newPte.flags |= (1 << pteExec);
+			fInvalidCode = true;
+		}
 	}
 
-	pte->flags |= (1 << pteValid)
-#ifdef DISABLE_MODIFIED_FLAGS
-		| (1 << pteAccessed) | (1 << pteDirty)
-#endif
-	;
+	*pte = newPte;
 
-	FlushTlbPage(virtualAddress);
+	// Note: We don't need to invalidate the TLB for this address, as previously
+	// the entry was not present and the TLB doesn't cache those entries.
 
 	fMapCount++;
 
@@ -280,9 +363,9 @@ RISCV64VMTranslationMap::Unmap(addr_t start, addr_t end)
 		Pte* pte = LookupPte(page, false, NULL);
 		if (pte != NULL) {
 			fMapCount--;
-			pte->flags = 0;
-			pte->ppn = 0;
-			FlushTlbPage(page);
+			Pte oldPte((uint64)atomic_get_and_set64((int64*)&pte->val, 0));
+			if ((oldPte.flags & (1 << pteAccessed)) != 0)
+				InvalidatePage(page);
 		}
 	}
 	return B_OK;
@@ -327,12 +410,14 @@ RISCV64VMTranslationMap::UnmapPage(VMArea* area, addr_t address,
 
 	RecursiveLocker locker(fLock);
 
-	Pte oldPte = *pte;
-	pte->flags = 0;
-	pte->ppn = 0;
+	Pte oldPte((uint64)atomic_get_and_set64((int64*)&pte->val, 0));
 	fMapCount--;
-	FlushTlbPage(address);
 	pinner.Unlock();
+
+	if ((oldPte.flags & (1 << pteAccessed)) != 0)
+		InvalidatePage(address);
+
+	Flush();
 
 	locker.Detach(); // PageUnmapped takes ownership
 	PageUnmapped(area, oldPte.ppn, ((1 << pteAccessed) & oldPte.flags) != 0,
@@ -349,8 +434,98 @@ RISCV64VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 		B_PRIxADDR ", 0x%" B_PRIxSIZE ", %d)\n", (addr_t)area,
 		area->name, base, size, updatePageQueue);
 
-	for (addr_t end = base + size; base < end; base += B_PAGE_SIZE)
-		UnmapPage(area, base, updatePageQueue);
+	if (size == 0)
+		return;
+
+	addr_t end = base + size - 1;
+
+	VMAreaMappings queue;
+	RecursiveLocker locker(fLock);
+	ThreadCPUPinner pinner(thread_get_current_thread());
+
+	for (addr_t start = base; start < end; start += B_PAGE_SIZE) {
+		Pte* pte = LookupPte(start, false, NULL);
+		if (pte == NULL)
+			continue;
+
+		Pte oldPte((uint64)atomic_get_and_set64((int64*)&pte->val, 0));
+		if ((oldPte.flags & (1 << pteValid)) == 0)
+			continue;
+
+		fMapCount--;
+
+		if ((oldPte.flags & (1 << pteAccessed)) != 0)
+			InvalidatePage(start);
+
+		if (area->cache_type != CACHE_TYPE_DEVICE) {
+			// get the page
+			vm_page* page = vm_lookup_page(oldPte.ppn);
+			ASSERT(page != NULL);
+			if (false) {
+				WriteVmPage(page); dprintf("\n");
+			}
+
+			DEBUG_PAGE_ACCESS_START(page);
+
+			// transfer the accessed/dirty flags to the page
+			if ((oldPte.flags & (1 << pteAccessed)) != 0)
+				page->accessed = true;
+			if ((oldPte.flags & (1 << pteDirty)) != 0)
+				page->modified = true;
+
+			// remove the mapping object/decrement the wired_count of the
+			// page
+			if (area->wiring == B_NO_LOCK) {
+				vm_page_mapping* mapping = NULL;
+				vm_page_mappings::Iterator iterator
+					= page->mappings.GetIterator();
+				while ((mapping = iterator.Next()) != NULL) {
+					if (mapping->area == area)
+						break;
+				}
+
+				ASSERT(mapping != NULL);
+
+				area->mappings.Remove(mapping);
+				page->mappings.Remove(mapping);
+				queue.Add(mapping);
+			} else
+				page->DecrementWiredCount();
+
+			if (!page->IsMapped()) {
+				atomic_add(&gMappedPagesCount, -1);
+
+				if (updatePageQueue) {
+					if (page->Cache()->temporary)
+						vm_page_set_state(page, PAGE_STATE_INACTIVE);
+					else if (page->modified)
+						vm_page_set_state(page, PAGE_STATE_MODIFIED);
+					else
+						vm_page_set_state(page, PAGE_STATE_CACHED);
+				}
+			}
+
+			DEBUG_PAGE_ACCESS_END(page);
+		}
+
+		// flush explicitly, since we directly use the lock
+		Flush();
+	}
+
+	// TODO: As in UnmapPage() we can lose page dirty flags here. ATM it's not
+	// really critical here, as in all cases this method is used, the unmapped
+	// area range is unmapped for good (resized/cut) and the pages will likely
+	// be freed.
+
+	locker.Unlock();
+
+	// free removed mappings
+	bool isKernelSpace = area->address_space == VMAddressSpace::Kernel();
+	uint32 freeFlags = CACHE_DONT_WAIT_FOR_MEMORY
+		| (isKernelSpace ? CACHE_DONT_LOCK_KERNEL_SPACE : 0);
+
+	while (vm_page_mapping* mapping = queue.RemoveHead())
+		object_cache_free(gPageMappingsObjectCache, mapping, freeFlags);
 }
 
 
@@ -404,9 +579,7 @@ RISCV64VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 				continue;
 			}
 
-			Pte oldPte = *pte;
-			pte->flags = 0;
-			pte->ppn = 0;
+			Pte oldPte((uint64)atomic_get_and_set64((int64*)&pte->val, 0));
 
 			// transfer the accessed/dirty flags to the page and
 			// invalidate the mapping, if necessary
@@ -414,13 +587,15 @@ RISCV64VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 				page->accessed = true;
 
 				if (!deletingAddressSpace)
-					FlushTlbPage(address);
+					InvalidatePage(address);
 			}
 
 			if (((1 << pteDirty) & oldPte.flags) != 0)
 				page->modified = true;
 
 			if (pageFullyUnmapped) {
+				DEBUG_PAGE_ACCESS_START(page);
+
 				if (cache->temporary) {
 					vm_page_set_state(page,
 						PAGE_STATE_INACTIVE);
@@ -431,6 +606,8 @@ RISCV64VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 					vm_page_set_state(page,
 						PAGE_STATE_CACHED);
 				}
+
+				DEBUG_PAGE_ACCESS_END(page);
 			}
 		}
 
@@ -467,29 +644,28 @@ RISCV64VMTranslationMap::Query(addr_t virtualAddress,
 	if (pte == 0)
 		return B_OK;
 
-	*_physicalAddress = pte->ppn * B_PAGE_SIZE;
+	Pte pteVal = *pte;
+	*_physicalAddress = pteVal.ppn * B_PAGE_SIZE;
 
-	if (((1 << pteValid)    & pte->flags) != 0)
+	if (((1 << pteValid)    & pteVal.flags) != 0)
 		*_flags |= PAGE_PRESENT;
-#ifndef DISABLE_MODIFIED_FLAGS
-	if (((1 << pteDirty)    & pte->flags) != 0)
+	if (((1 << pteDirty)    & pteVal.flags) != 0)
 		*_flags |= PAGE_MODIFIED;
-	if (((1 << pteAccessed) & pte->flags) != 0)
+	if (((1 << pteAccessed) & pteVal.flags) != 0)
 		*_flags |= PAGE_ACCESSED;
-#endif
-	if (((1 << pteUser) & pte->flags) != 0) {
-		if (((1 << pteRead)  & pte->flags) != 0)
+	if (((1 << pteUser) & pteVal.flags) != 0) {
+		if (((1 << pteRead)  & pteVal.flags) != 0)
 			*_flags |= B_READ_AREA;
-		if (((1 << pteWrite) & pte->flags) != 0)
+		if (((1 << pteWrite) & pteVal.flags) != 0)
 			*_flags |= B_WRITE_AREA;
-		if (((1 << pteExec)  & pte->flags) != 0)
+		if (((1 << pteExec)  & pteVal.flags) != 0)
 			*_flags |= B_EXECUTE_AREA;
 	} else {
-		if (((1 << pteRead)  & pte->flags) != 0)
+		if (((1 << pteRead)  & pteVal.flags) != 0)
 			*_flags |= B_KERNEL_READ_AREA;
-		if (((1 << pteWrite) & pte->flags) != 0)
+		if (((1 << pteWrite) & pteVal.flags) != 0)
 			*_flags |= B_KERNEL_WRITE_AREA;
-		if (((1 << pteExec)  & pte->flags) != 0)
+		if (((1 << pteExec)  & pteVal.flags) != 0)
 			*_flags |= B_KERNEL_EXECUTE_AREA;
 	}
 
@@ -522,7 +698,8 @@ status_t RISCV64VMTranslationMap::Protect(addr_t base, addr_t top,
 			continue;
 		}
 
-		Pte newPte = *pte;
+		Pte oldPte = *pte;
+		Pte newPte = oldPte;
 		newPte.flags &= (1 << pteValid)
 			| (1 << pteAccessed) | (1 << pteDirty);
 
@@ -532,19 +709,24 @@ status_t RISCV64VMTranslationMap::Protect(addr_t base, addr_t top,
 				newPte.flags |= (1 << pteRead);
 			if ((attributes & B_WRITE_AREA)   != 0)
 				newPte.flags |= (1 << pteWrite);
-			if ((attributes & B_EXECUTE_AREA) != 0)
+			if ((attributes & B_EXECUTE_AREA) != 0) {
 				newPte.flags |= (1 << pteExec);
+				fInvalidCode = true;
+			}
 		} else {
 			if ((attributes & B_KERNEL_READ_AREA)    != 0)
 				newPte.flags |= (1 << pteRead);
 			if ((attributes & B_KERNEL_WRITE_AREA)   != 0)
 				newPte.flags |= (1 << pteWrite);
-			if ((attributes & B_KERNEL_EXECUTE_AREA) != 0)
+			if ((attributes & B_KERNEL_EXECUTE_AREA) != 0) {
 				newPte.flags |= (1 << pteExec);
+				fInvalidCode = true;
+			}
 		}
 		*pte = newPte;
 
-		FlushTlbPage(page);
+		if ((oldPte.flags & (1 << pteAccessed)) != 0)
+			InvalidatePage(page);
 	}
 
 	return B_OK;
@@ -583,9 +765,7 @@ RISCV64VMTranslationMap::SetFlags(addr_t address, uint32 flags)
 	Pte* pte = LookupPte(address, false, NULL);
 	if (pte == NULL || ((1 << pteValid) & pte->flags) == 0)
 		return B_OK;
-#ifndef DISABLE_MODIFIED_FLAGS
 	pte->flags |= ConvertAccessedFlags(flags);
-#endif
 	FlushTlbPage(address);
 	return B_OK;
 }
@@ -600,11 +780,8 @@ RISCV64VMTranslationMap::ClearFlags(addr_t address, uint32 flags)
 	if (pte == NULL || ((1 << pteValid) & pte->flags) == 0)
 		return B_OK;
 
-#ifndef DISABLE_MODIFIED_FLAGS
 	pte->flags &= ~ConvertAccessedFlags(flags);
-#endif
-
-	FlushTlbPage(address);
+	InvalidatePage(address);
 	return B_OK;
 }
 
@@ -624,25 +801,32 @@ RISCV64VMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
 	if (pte == NULL || ((1 << pteValid) & pte->flags) == 0)
 		return false;
 
-	Pte oldPte = *pte;
-
-#ifndef DISABLE_MODIFIED_FLAGS
+	Pte oldPte;
 	if (unmapIfUnaccessed) {
-		if (((1 << pteAccessed) & pte->flags) != 0) {
-			pte->flags &= ~((1 << pteAccessed) | (1 << pteDirty));
-		} else {
-			pte->flags = 0;
-			pte->ppn = 0;
+		for (;;) {
+			oldPte = *pte;
+			if (((1 << pteValid) & oldPte.flags) == 0)
+				return false;
+
+			if (((1 << pteAccessed) & oldPte.flags) != 0) {
+				oldPte.val = atomic_and64((int64*)&pte->val,
+					~((1 << pteAccessed) | (1 << pteDirty)));
+				break;
+			}
+			if (atomic_test_and_set64((int64*)&pte->val, 0, oldPte.val)
+					== (int64)oldPte.val) {
+				break;
+			}
 		}
 	} else {
-		pte->flags &= ~((1 << pteAccessed) | (1 << pteDirty));
+		oldPte.val = atomic_and64((int64*)&pte->val,
+			~((1 << pteAccessed) | (1 << pteDirty)));
 	}
-#endif
 
 	pinner.Unlock();
 	_modified = ((1 << pteDirty) & oldPte.flags) != 0;
 	if (((1 << pteAccessed) & oldPte.flags) != 0) {
-		FlushTlbPage(address);
+		InvalidatePage(address);
 		Flush();
 		return true;
 	}
@@ -661,7 +845,104 @@ RISCV64VMTranslationMap::ClearAccessedAndModified(VMArea* area, addr_t address,
 void
 RISCV64VMTranslationMap::Flush()
 {
-	//NOT_IMPLEMENTED_PANIC();
+	// copy of X86VMTranslationMap::Flush
+	// TODO: move to common VMTranslationMap class
+
+	if (fInvalidPagesCount <= 0)
+		return;
+/*
+	dprintf("+Flush(%p)\n", this);
+	struct ScopeExit {
+		~ScopeExit()
+		{
+			dprintf("-Flush(%p)\n", this);
+		}
+	} scopeExit;
+*/
+	ThreadCPUPinner pinner(thread_get_current_thread());
+
+	if (fInvalidPagesCount > PAGE_INVALIDATE_CACHE_SIZE) {
+		// invalidate all pages
+		TRACE("flush_tmap: %d pages to invalidate, invalidate all\n",
+			fInvalidPagesCount);
+
+		if (fIsKernel) {
+			arch_cpu_global_TLB_invalidate();
+
+			// dprintf("+smp_send_broadcast_ici\n");
+			smp_send_broadcast_ici(SMP_MSG_GLOBAL_INVALIDATE_PAGES, 0, 0, 0,
+				NULL, SMP_MSG_FLAG_SYNC);
+			// dprintf("-smp_send_broadcast_ici\n");
+
+		} else {
+			cpu_status state = disable_interrupts();
+			arch_cpu_user_TLB_invalidate();
+			restore_interrupts(state);
+
+			int cpu = smp_get_current_cpu();
+			CPUSet cpuMask = fActiveOnCpus;
+			cpuMask.ClearBit(cpu);
+
+			if (!cpuMask.IsEmpty()) {
+				// dprintf("+smp_send_multicast_ici\n");
+				smp_send_multicast_ici(cpuMask, SMP_MSG_USER_INVALIDATE_PAGES,
+					0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
+				// dprintf("-smp_send_multicast_ici\n");
+			}
+		}
+	} else {
+		TRACE("flush_tmap: %d pages to invalidate, invalidate list\n",
+			fInvalidPagesCount);
+
+		arch_cpu_invalidate_TLB_list(fInvalidPages, fInvalidPagesCount);
+
+		if (fIsKernel) {
+			// dprintf("+smp_send_broadcast_ici\n");
+			smp_send_broadcast_ici(SMP_MSG_INVALIDATE_PAGE_LIST,
+				(addr_t)fInvalidPages, fInvalidPagesCount, 0, NULL,
+				SMP_MSG_FLAG_SYNC);
+			// dprintf("-smp_send_broadcast_ici\n");
+		} else {
+			int cpu = smp_get_current_cpu();
+			CPUSet cpuMask = fActiveOnCpus;
+			cpuMask.ClearBit(cpu);
+
+			if (!cpuMask.IsEmpty()) {
+				// dprintf("+smp_send_multicast_ici\n");
+				smp_send_multicast_ici(cpuMask, SMP_MSG_INVALIDATE_PAGE_LIST,
+					(addr_t)fInvalidPages, fInvalidPagesCount, 0, NULL,
+					SMP_MSG_FLAG_SYNC);
+				// dprintf("-smp_send_multicast_ici\n");
+			}
+		}
+	}
+	fInvalidPagesCount = 0;
+
+	if (fInvalidCode) {
+		FenceI();
+
+		int cpu = smp_get_current_cpu();
+		CPUSet cpuMask = fActiveOnCpus;
+		cpuMask.ClearBit(cpu);
+
+		if (!cpuMask.IsEmpty()) {
+			switch (gPlatform) {
+				case kPlatformSbi: {
+					uint64 hartMask = 0;
+					int32 cpuCount = smp_get_num_cpus();
+					for (int32 i = 0; i < cpuCount; i++) {
+						if (cpuMask.GetBit(i))
+							hartMask |= (uint64)1 << gCPU[i].arch.hartId;
+					}
+					// TODO: handle hart ID >= 64
+					memory_full_barrier();
+					sbi_remote_fence_i(hartMask, 0);
+					break;
+				}
+			}
+		}
+		fInvalidCode = false;
+	}
 }
 
 
@@ -883,11 +1164,7 @@ RISCV64VMPhysicalPageMapper::MemsetPhysical(phys_addr_t address, int value,
 {
 	TRACE("RISCV64VMPhysicalPageMapper::MemsetPhysical(0x%" B_PRIxADDR
 		", 0x%x, 0x%" B_PRIxADDR ")\n", address, value, length);
-	set_ac();
-	memset(VirtFromPhys(address), value, length);
-	clear_ac();
-
-	return B_OK;
+	return user_memset(VirtFromPhys(address), value, length);
 }
 
 
@@ -898,12 +1175,7 @@ RISCV64VMPhysicalPageMapper::MemcpyFromPhysical(void* to, phys_addr_t from,
 	TRACE("RISCV64VMPhysicalPageMapper::MemcpyFromPhysical(0x%" B_PRIxADDR
 		", 0x%" B_PRIxADDR ", %" B_PRIuSIZE ")\n", (addr_t)to,
 		from, length);
-
-	set_ac();
-	memcpy(to, VirtFromPhys(from), length);
-	clear_ac();
-
-	return B_OK;
+	return user_memcpy(to, VirtFromPhys(from), length);
 }
 
 
@@ -914,12 +1186,7 @@ RISCV64VMPhysicalPageMapper::MemcpyToPhysical(phys_addr_t to, const void* from,
 	TRACE("RISCV64VMPhysicalPageMapper::MemcpyToPhysical(0x%" B_PRIxADDR
 		", 0x%" B_PRIxADDR ", %" B_PRIuSIZE ")\n", to, (addr_t)from,
 		length);
-
-	set_ac();
-	memcpy(VirtFromPhys(to), from, length);
-	clear_ac();
-
-	return B_OK;
+	return user_memcpy(VirtFromPhys(to), from, length);
 }
 
 
@@ -929,8 +1196,5 @@ RISCV64VMPhysicalPageMapper::MemcpyPhysicalPage(phys_addr_t to,
 {
 	TRACE("RISCV64VMPhysicalPageMapper::MemcpyPhysicalPage(0x%" B_PRIxADDR
 		", 0x%" B_PRIxADDR ")\n", to, from);
-
-	set_ac();
-	memcpy(VirtFromPhys(to), VirtFromPhys(from), B_PAGE_SIZE);
-	clear_ac();
+	user_memcpy(VirtFromPhys(to), VirtFromPhys(from), B_PAGE_SIZE);
 }

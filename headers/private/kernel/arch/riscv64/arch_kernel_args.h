@@ -38,7 +38,6 @@ typedef struct {
 	// MNative hooks, or SBI
 	uint32 machine_platform;
 
-	uint bootHart;
 	uint64 timerFrequency; // in Hz
 
 	// All following address are virtual
@@ -50,6 +49,9 @@ typedef struct {
 	addr_range	clint;
 
 	uart_info	uart;
+
+	uint32 hartIds[SMP_MAX_CPUS];
+	uint32 plicContexts[SMP_MAX_CPUS];
 } _PACKED arch_kernel_args;
 
 #endif	/* KERNEL_ARCH_RISCV64_KERNEL_ARGS_H */

@@ -11,6 +11,12 @@
 
 #include <vm/VMTranslationMap.h>
 #include <arch_cpu_defs.h>
+#include <kernel/smp.h>
+
+
+enum {
+	PAGE_INVALIDATE_CACHE_SIZE = 64
+};
 
 
 struct RISCV64VMTranslationMap: public VMTranslationMap {
@@ -87,6 +93,9 @@ struct RISCV64VMTranslationMap: public VMTranslationMap {
 			ssize_t				StrlcpyToMap(addr_t to, const char *from,
 									size_t size);
 
+	inline	CPUSet&				ActiveOnCpus();
+	inline	void				InvalidatePage(addr_t address);
+
 private:
 			Pte*				LookupPte(addr_t virtAdr, bool alloc,
 									vm_page_reservation* reservation);
@@ -94,22 +103,46 @@ private:
 
 			bool				fIsKernel;
 			phys_addr_t			fPageTable;
-			uint64_t			fPageTableSize; // in page units
+			uint64				fPageTableSize; // in page units
+			CPUSet				fActiveOnCpus;
+			int					fInvalidPagesCount;
+			addr_t				fInvalidPages[PAGE_INVALIDATE_CACHE_SIZE];
+			bool				fInvalidCode;
 };
 
 
-inline phys_addr_t RISCV64VMTranslationMap::PageTable()
+inline phys_addr_t
+RISCV64VMTranslationMap::PageTable()
 {
 	return fPageTable;
 }
 
-inline uint64 RISCV64VMTranslationMap::Satp()
+
+inline uint64
+RISCV64VMTranslationMap::Satp()
 {
 	SatpReg satp;
 	satp.ppn = fPageTable / B_PAGE_SIZE;
 	satp.asid = 0;
 	satp.mode = satpModeSv39;
 	return satp.val;
+}
+
+
+CPUSet&
+RISCV64VMTranslationMap::ActiveOnCpus()
+{
+	return fActiveOnCpus;
+}
+
+
+void
+RISCV64VMTranslationMap::InvalidatePage(addr_t address)
+{
+	if (fInvalidPagesCount < PAGE_INVALIDATE_CACHE_SIZE)
+		fInvalidPages[fInvalidPagesCount] = address;
+
+	fInvalidPagesCount++;
 }
 
 

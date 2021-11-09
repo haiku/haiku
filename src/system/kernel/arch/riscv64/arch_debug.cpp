@@ -20,6 +20,12 @@ kernel_args *sKernelArgs;
 bool sInitCalled = false;
 
 
+extern "C" void SVecRet();
+extern "C" void SVecURet();
+
+void WriteRegisters(iframe* frame);
+
+
 static void
 WriteImage(preloaded_image* _image)
 {
@@ -120,6 +126,19 @@ FindArea(addr_t adr)
 }
 
 
+static VMArea*
+FindAreaEx(Thread* thread, addr_t adr)
+{
+	if (IS_KERNEL_ADDRESS(adr)) {
+		return VMAddressSpace::Kernel()->LookupArea(adr);
+	}
+	if (IS_USER_ADDRESS(adr)) {
+		return thread->team->address_space->LookupArea(adr);
+	}
+	return NULL;
+}
+
+
 static status_t
 lookup_symbol(Thread* thread, addr_t address, addr_t* _baseAddress,
 	const char** _symbolName, const char** _imageName, bool* _exactMatch)
@@ -172,8 +191,8 @@ WritePCBoot(addr_t pc)
 }
 
 
-void
-WritePC(addr_t pc)
+static void
+WritePCEx(Thread* thread, addr_t pc)
 {
 	dprintf("0x%" B_PRIxADDR " ", pc);
 	if (!sInitCalled) {
@@ -184,7 +203,7 @@ WritePC(addr_t pc)
 	const char* symbolName;
 	const char* imageName;
 	bool exactMatch;
-	if (lookup_symbol(thread_get_current_thread(), pc, &baseAddress,
+	if (lookup_symbol(thread, pc, &baseAddress,
 		&symbolName, &imageName, &exactMatch) >= B_OK) {
 		if (symbolName != NULL) {
 			dprintf("<%s> %s + %" B_PRIdSSIZE, imageName, symbolName,
@@ -195,7 +214,7 @@ WritePC(addr_t pc)
 		return;
 	}
 
-	VMArea* area = FindArea(pc);
+	VMArea* area = FindAreaEx(thread, pc);
 	if (area != NULL) {
 		dprintf("<%s> 0x%" B_PRIxADDR, area->name, pc - area->Base());
 		return;
@@ -205,14 +224,30 @@ WritePC(addr_t pc)
 }
 
 
+void WritePC(addr_t pc)
+{
+	WritePCEx(thread_get_current_thread(), pc);
+}
+
+
+static status_t
+arch_debug_memcpy(void* dst, const void* src, size_t size)
+{
+	if (debug_debugger_running())
+		return debug_memcpy(B_CURRENT_TEAM, dst, src, size);
+
+	return user_memcpy(dst, src, size);
+}
+
+
 static void
 DumpMemory(uint64* adr, size_t len)
 {
 	while (len > 0) {
 		if ((addr_t)adr % 0x10 == 0)
-			dprintf("%08" B_PRIxADDR " ", (addr_t)adr);
+			dprintf("  %08" B_PRIxADDR " ", (addr_t)adr);
 		uint64 val;
-		if (user_memcpy(&val, adr++, sizeof(val)) < B_OK) {
+		if (arch_debug_memcpy(&val, adr++, sizeof(val)) < B_OK) {
 			dprintf(" ????????????????");
 		} else {
 			dprintf(" %016" B_PRIx64, val);
@@ -226,37 +261,53 @@ DumpMemory(uint64* adr, size_t len)
 }
 
 
-void
-DoStackTrace(addr_t fp, addr_t pc)
+static void
+DoStackTraceEx(Thread* thread, addr_t fp, addr_t pc)
 {
 	dprintf("Stack:\n");
 	dprintf("FP: 0x%" B_PRIxADDR, fp);
 	if (pc != 0) {
-		dprintf(", PC: "); WritePC(pc);
+		dprintf(", PC: "); WritePCEx(thread, pc);
 	}
 	dprintf("\n");
 	addr_t oldFp = fp;
-	while (fp != 0) {
+	int i = 0;
+	while (fp != 0 && i < 1000) {
 		if ((pc >= (addr_t)&strcpy && pc < (addr_t)&strcpy + 32)
-				|| (pc >= (addr_t)&memset && pc < (addr_t)&memset + 34)) {
-			if (user_memcpy(&fp, (uint64*)fp - 1, sizeof(pc)) < B_OK)
+				|| (pc >= (addr_t)&memset && pc < (addr_t)&memset + 34)
+				|| (pc >= (addr_t)&memcpy && pc < (addr_t)&memcpy + 186)) {
+			if (arch_debug_memcpy(&fp, (uint64*)fp - 1, sizeof(pc)) < B_OK)
 				break;
 			pc = 0;
 		} else {
-			if (user_memcpy(&pc, (uint64*)fp - 1, sizeof(pc)) < B_OK)
+			if (arch_debug_memcpy(&pc, (uint64*)fp - 1, sizeof(pc)) < B_OK)
 				break;
-			if (user_memcpy(&fp, (uint64*)fp - 2, sizeof(pc)) < B_OK)
+			if (arch_debug_memcpy(&fp, (uint64*)fp - 2, sizeof(pc)) < B_OK)
 				break;
 		}
 		dprintf("FP: 0x%" B_PRIxADDR, fp);
-		dprintf(", PC: "); WritePC((pc == 0) ? 0 : pc - 1);
+		dprintf(", PC: "); WritePCEx(thread, pc);
 		dprintf("\n");
+
+		if (pc == (addr_t)&SVecRet || pc == (addr_t)&SVecURet) {
+			WriteTrapInfo((iframe*)fp - 1);
+		}
 /*
-		if (IS_KERNEL_ADDRESS(oldFp) && IS_KERNEL_ADDRESS(fp))
+		if (IS_KERNEL_ADDRESS(oldFp) != IS_KERNEL_ADDRESS(fp))
+			oldFp = fp;
+		else if (fp != 0)
 			DumpMemory((uint64*)oldFp, (addr_t)fp - (addr_t)oldFp);
 */
 		oldFp = fp;
+		i++;
 	}
+}
+
+
+void
+DoStackTrace(addr_t fp, addr_t pc)
+{
+	DoStackTraceEx(thread_get_current_thread(), fp, pc);
 }
 
 
@@ -272,7 +323,8 @@ stack_trace(int argc, char **argv)
 		}
 		uint64 oldSatp = Satp();
 		SetSatp(thread->arch_info.context.satp);
-		DoStackTrace(thread->arch_info.context.s[0], thread->arch_info.context.ra);
+		DebuggedThreadSetter threadSetter(thread);
+		DoStackTraceEx(thread, thread->arch_info.context.s[0], thread->arch_info.context.ra);
 		SetSatp(oldSatp);
 		return 0;
 	}

@@ -17,7 +17,8 @@ FUNCTION(MSyscall):
 FUNCTION_END(MSyscall)
 
 
-FUNCTION(arch_setjmp):
+FUNCTION(arch_context_switch):
+# save `from` context
 	sd ra,   0*8(a0)
 	sd s0,   1*8(a0)
 	sd s1,   2*8(a0)
@@ -35,34 +36,27 @@ FUNCTION(arch_setjmp):
 	csrr t0, satp
 	sd t0,  14*8(a0)
 
-	li    a0, 0
-	ret
-FUNCTION_END(arch_setjmp)
-
-
-FUNCTION(arch_longjmp):
-	ld ra,   0*8(a0)
-	ld s0,   1*8(a0)
-	ld s1,   2*8(a0)
-	ld s2,   3*8(a0)
-	ld s3,   4*8(a0)
-	ld s4,   5*8(a0)
-	ld s5,   6*8(a0)
-	ld s6,   7*8(a0)
-	ld s7,   8*8(a0)
-	ld s8,   9*8(a0)
-	ld s9,  10*8(a0)
-	ld s10, 11*8(a0)
-	ld s11, 12*8(a0)
-	ld sp,  13*8(a0)
-	ld t0,  14*8(a0)
+# load `to` context
+	ld ra,   0*8(a1)
+	ld s0,   1*8(a1)
+	ld s1,   2*8(a1)
+	ld s2,   3*8(a1)
+	ld s3,   4*8(a1)
+	ld s4,   5*8(a1)
+	ld s5,   6*8(a1)
+	ld s6,   7*8(a1)
+	ld s7,   8*8(a1)
+	ld s8,   9*8(a1)
+	ld s9,  10*8(a1)
+	ld s10, 11*8(a1)
+	ld s11, 12*8(a1)
+	ld sp,  13*8(a1)
+	ld t0,  14*8(a1)
 	csrw satp, t0
 	sfence.vma
 
-	seqz a0, a1
-	add  a0, a0, a1   # a0 = (a1 == 0) ? 1 : a1
 	ret
-FUNCTION_END(arch_longjmp)
+FUNCTION_END(arch_context_switch)
 
 
 FUNCTION(save_fpu):
@@ -147,20 +141,15 @@ FUNCTION_END(restore_fpu)
 
 FUNCTION(arch_thread_entry):
 	mv a0, s2
-	jalr s1
+	jr s1
 FUNCTION_END(arch_thread_entry)
 
 
-FUNCTION(arch_enter_userspace):
-	mv sp, a2
-	sret
-FUNCTION_END(arch_enter_userspace)
-
-
-FUNCTION(arch_longjmp_iframe):
-	mv sp, a0
-	call SVecURet
-FUNCTION_END(arch_longjmp_iframe)
+FUNCTION(arch_load_user_iframe):
+	mv fp, a0
+	mv sp, a1
+	tail SVecURet
+FUNCTION_END(arch_load_user_iframe)
 
 
 FUNCTION(arch_user_thread_exit):

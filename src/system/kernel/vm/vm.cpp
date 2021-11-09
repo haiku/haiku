@@ -4421,8 +4421,8 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isExecute,
 
 	if (status < B_OK) {
 		dprintf("vm_page_fault: vm_soft_fault returned error '%s' on fault at "
-			"0x%lx, ip 0x%lx, write %d, user %d, thread 0x%" B_PRIx32 "\n",
-			strerror(status), address, faultAddress, isWrite, isUser,
+			"0x%lx, ip 0x%lx, write %d, user %d, exec %d, thread 0x%" B_PRIx32 "\n",
+			strerror(status), address, faultAddress, isWrite, isUser, isExecute,
 			thread_get_current_thread_id());
 		if (!isUser) {
 			Thread* thread = thread_get_current_thread();

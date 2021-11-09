@@ -9,6 +9,7 @@
 
 // TODO: split arch-depending code to per-arch source
 
+#include <arch_cpu_defs.h>
 #include <arch_smp.h>
 #include <arch/generic/debug_uart_8250.h>
 #if defined(__riscv)
@@ -40,7 +41,8 @@ extern "C" {
 static void* sDtbTable = NULL;
 static uint32 sDtbSize = 0;
 
-static uint32 sBootHart = 0;
+// TODO: gBootHart is riscy, move
+uint32 gBootHart = 0;
 static uint64 sTimerFrequency = 10000000;
 
 static addr_range sPlic = {0};
@@ -422,7 +424,7 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
 	const char* name = fdt_get_name(fdt, node, NULL);
 	if (strcmp(name, "chosen") == 0) {
 		if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "boot-hartid", NULL))
-			sBootHart = fdt32_to_cpu(*prop);
+			gBootHart = fdt32_to_cpu(*prop);
 	} else if (strcmp(name, "cpus") == 0) {
 		if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "timebase-frequency", NULL))
 			sTimerFrequency = fdt32_to_cpu(*prop);
@@ -433,6 +435,9 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
 
 	if (deviceType != NULL) {
 		if (strcmp(deviceType, "cpu") == 0) {
+			// TODO: improve incompatible CPU detection
+			if (!(fdt_getprop(fdt, node, "mmu-type", NULL) != NULL))
+				return;
 			platform_cpu_info* info;
 			arch_smp_register_cpu(&info);
 			if (info == NULL)
@@ -441,6 +446,14 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
 				"reg", NULL));
 			dprintf("cpu\n");
 			dprintf("  id: %" B_PRIu32 "\n", info->id);
+
+			int subNode = fdt_subnode_offset(fdt, node, "interrupt-controller");
+			if (subNode < 0) {
+				dprintf("  [!] no interrupt controller\n");
+			} else {
+				info->phandle = fdt_get_phandle(fdt, subNode);
+				dprintf("  phandle: %" B_PRIu32 "\n", info->phandle);
+			}
 		}
 	}
 
@@ -459,6 +472,24 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
 	if (HasFdtString(compatible, compatibleLen, "riscv,plic0")
 		|| HasFdtString(compatible, compatibleLen, "sifive,plic-1.0.0")) {
 		GetReg(fdt, node, addressCells, sizeCells, 0, sPlic);
+		int propSize;
+		if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "interrupts-extended", &propSize)) {
+			dprintf("PLIC contexts\n");
+			uint32 contextId = 0;
+			for (uint32 *it = prop; (uint8_t*)it - (uint8_t*)prop < propSize; it += 2) {
+				uint32 phandle = fdt32_to_cpu(*it);
+				uint32 interrupt = fdt32_to_cpu(*(it + 1));
+				if (interrupt == sExternInt) {
+					platform_cpu_info* cpuInfo = arch_smp_find_cpu(phandle);
+					dprintf("  context %" B_PRIu32 ": %" B_PRIu32 "\n", contextId, phandle);
+					if (cpuInfo != NULL) {
+						cpuInfo->plicContext = contextId;
+						dprintf("    cpu id: %" B_PRIu32 "\n", cpuInfo->id);
+					}
+				}
+				contextId++;
+			}
+		}
 		return;
 	}
 
@@ -556,7 +587,6 @@ dtb_set_kernel_args()
 	// pack into proper location if the architecture cares
 	if (sDtbTable != NULL) {
 		#if defined(__ARM__) || defined(__riscv)
-
 		// libfdt requires 8-byte alignment
 		gKernelArgs.arch_args.fdt = (void*)(addr_t)kernel_args_malloc(sDtbSize, 8);
 
@@ -568,8 +598,7 @@ dtb_set_kernel_args()
 	}
 
 #ifdef __riscv
-	dprintf("bootHart: %" B_PRIu32 "\n", sBootHart);
-	gKernelArgs.arch_args.bootHart = sBootHart;
+	dprintf("bootHart: %" B_PRIu32 "\n", gBootHart);
 	dprintf("timerFrequency: %" B_PRIu64 "\n", sTimerFrequency);
 	gKernelArgs.arch_args.timerFrequency = sTimerFrequency;
 

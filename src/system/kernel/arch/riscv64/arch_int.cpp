@@ -26,17 +26,12 @@
 #include <algorithm>
 
 
-static uint32 sBootHartId = 0;
-static int32 sPlicContextOfs = 0;
-
-
-extern "C" void SVec();
-extern "C" void SVecU();
+static uint32 sPlicContexts[SMP_MAX_CPUS];
 
 
 //#pragma mark debug output
 
-void
+static void
 WriteMode(int mode)
 {
 	switch (mode) {
@@ -48,7 +43,7 @@ WriteMode(int mode)
 }
 
 
-void
+static void
 WriteModeSet(uint32_t val)
 {
 	bool first = true;
@@ -63,21 +58,20 @@ WriteModeSet(uint32_t val)
 }
 
 
-void
-WriteMstatus(uint64_t val)
+static void
+WriteExt(uint64_t val)
 {
-	MstatusReg status(val);
-	dprintf("(");
-	dprintf("ie: "); WriteModeSet(status.ie);
-	dprintf(", pie: "); WriteModeSet(status.pie);
-	dprintf(", spp: "); WriteMode(status.spp);
-	dprintf(", mpp: "); WriteMode(status.mpp);
-	dprintf(", sum: %d", (int)status.sum);
-	dprintf(")");
+	switch (val) {
+		case 0: dprintf("off"); break;
+		case 1: dprintf("initial"); break;
+		case 2: dprintf("clean"); break;
+		case 3: dprintf("dirty"); break;
+		default: dprintf("%" B_PRId64, val);
+	}
 }
 
 
-void
+static void
 WriteSstatus(uint64_t val)
 {
 	SstatusReg status(val);
@@ -85,12 +79,17 @@ WriteSstatus(uint64_t val)
 	dprintf("ie: "); WriteModeSet(status.ie);
 	dprintf(", pie: "); WriteModeSet(status.pie);
 	dprintf(", spp: "); WriteMode(status.spp);
+	dprintf(", fs: "); WriteExt(status.fs);
+	dprintf(", xs: "); WriteExt(status.xs);
 	dprintf(", sum: %d", (int)status.sum);
+	dprintf(", mxr: %d", (int)status.mxr);
+	dprintf(", uxl: %d", (int)status.uxl);
+	dprintf(", sd: %d", (int)status.sd);
 	dprintf(")");
 }
 
 
-void
+static void
 WriteInterrupt(uint64_t val)
 {
 	switch (val) {
@@ -108,7 +107,7 @@ WriteInterrupt(uint64_t val)
 }
 
 
-void
+static void
 WriteInterruptSet(uint64_t val)
 {
 	bool first = true;
@@ -123,7 +122,7 @@ WriteInterruptSet(uint64_t val)
 }
 
 
-void
+static void
 WriteCause(uint64_t cause)
 {
 	if ((cause & causeInterrupt) == 0) {
@@ -151,18 +150,99 @@ WriteCause(uint64_t cause)
 }
 
 
+const static char* registerNames[] = {
+	" ra", " t6", " sp", " gp",
+	" tp", " t0", " t1", " t2",
+	" t5", " s1", " a0", " a1",
+	" a2", " a3", " a4", " a5",
+	" a6", " a7", " s2", " s3",
+	" s4", " s5", " s6", " s7",
+	" s8", " s9", "s10", "s11",
+	" t3", " t4", " fp", "epc"
+};
+
+
+static void WriteRegisters(iframe* frame)
+{
+	uint64* regs = &frame->ra;
+	for (int i = 0; i < 32; i += 4) {
+		dprintf(
+			"  %s: 0x%016" B_PRIx64
+			"  %s: 0x%016" B_PRIx64
+			"  %s: 0x%016" B_PRIx64
+			"  %s: 0x%016" B_PRIx64 "\n",
+			registerNames[i + 0], regs[i + 0],
+			registerNames[i + 1], regs[i + 1],
+			registerNames[i + 2], regs[i + 2],
+			registerNames[i + 3], regs[i + 3]
+		);
+	}
+}
+
+
+static void
+DumpMemory(uint64* adr, size_t len)
+{
+	while (len > 0) {
+		if ((addr_t)adr % 0x10 == 0)
+			dprintf("%08" B_PRIxADDR " ", (addr_t)adr);
+		uint64 val;
+		if (user_memcpy(&val, adr++, sizeof(val)) < B_OK) {
+			dprintf(" ????????????????");
+		} else {
+			dprintf(" %016" B_PRIx64, val);
+		}
+		if ((addr_t)adr % 0x10 == 0)
+			dprintf("\n");
+		len -= 8;
+	}
+	if ((addr_t)adr % 0x10 != 0)
+		dprintf("\n");
+
+	dprintf("%08" B_PRIxADDR "\n\n", (addr_t)adr);
+}
+
+
 void
-WriteTrapInfo()
+WriteTrapInfo(iframe* frame)
 {
 	InterruptsLocker locker;
-	dprintf("STrap("); WriteCause(Scause()); dprintf(")\n");
-	dprintf("  sstatus: "); WriteSstatus(Sstatus()); dprintf("\n");
-	dprintf("  sie: "); WriteInterruptSet(Sie()); dprintf("\n");
-	dprintf("  sip: "); WriteInterruptSet(Sip()); dprintf("\n");
+	dprintf("STrap("); WriteCause(frame->cause); dprintf(")\n");
+	dprintf("  sstatus: "); WriteSstatus(frame->status); dprintf("\n");
+//	dprintf("  sie: "); WriteInterruptSet(Sie()); dprintf("\n");
+//	dprintf("  sip: "); WriteInterruptSet(Sip()); dprintf("\n");
 	//dprintf("  stval: "); WritePC(Stval()); dprintf("\n");
-	dprintf("  stval: 0x%" B_PRIx64 "\n", Stval());
-	dprintf("  tp: 0x%" B_PRIxADDR "(%s)\n", Tp(),
-		thread_get_current_thread()->name);
+	dprintf("  stval: 0x%" B_PRIx64 "\n", frame->tval);
+//	dprintf("  tp: 0x%" B_PRIxADDR "(%s)\n", Tp(),
+//		thread_get_current_thread()->name);
+
+	WriteRegisters(frame);
+#if 0
+	dprintf("  kernel stack: %#" B_PRIxADDR " - %#" B_PRIxADDR "\n",
+		thread_get_current_thread()->kernel_stack_base,
+		thread_get_current_thread()->kernel_stack_top - 1
+	);
+	dprintf("  user stack: %#" B_PRIxADDR " - %#" B_PRIxADDR "\n",
+		thread_get_current_thread()->user_stack_base,
+		thread_get_current_thread()->user_stack_base +
+		thread_get_current_thread()->user_stack_size - 1
+	);
+	if (thread_get_current_thread()->arch_info.userFrame != NULL) {
+		WriteRegisters(thread_get_current_thread()->arch_info.userFrame);
+
+		dprintf("Stack memory dump:\n");
+		DumpMemory(
+			(uint64*)thread_get_current_thread()->arch_info.userFrame->sp,
+			thread_get_current_thread()->user_stack_base +
+			thread_get_current_thread()->user_stack_size -
+			thread_get_current_thread()->arch_info.userFrame->sp
+		);
+//		if (true) {
+//		} else {
+//			DumpMemory((uint64*)frame->sp, thread_get_current_thread()->kernel_stack_top - frame->sp);
+//		}
+	}
+#endif
 }
 
 
@@ -176,7 +256,6 @@ SendSignal(debug_exception_type type, uint32 signalNumber, int32 signalCode,
 		struct sigaction action;
 		Thread* thread = thread_get_current_thread();
 
-		WriteTrapInfo();
 		DoStackTrace(Fp(), 0);
 
 		enable_interrupts();
@@ -193,7 +272,6 @@ SendSignal(debug_exception_type type, uint32 signalNumber, int32 signalCode,
 			send_signal_to_thread(thread, signal, 0);
 		}
 	} else {
-		WriteTrapInfo();
 		panic("Unexpected exception occurred in kernel mode!");
 	}
 }
@@ -244,6 +322,10 @@ SetAccessedFlags(addr_t addr, bool isWrite)
 	phys_addr_t physAdr;
 	uint32 pageFlags;
 	map->QueryInterrupt(addr, &physAdr, &pageFlags);
+
+	if ((PAGE_PRESENT & pageFlags) == 0)
+		return false;
+
 	if (isWrite) {
 		if (
 			((B_WRITE_AREA | B_KERNEL_WRITE_AREA) & pageFlags) != 0
@@ -269,23 +351,6 @@ SetAccessedFlags(addr_t addr, bool isWrite)
 		}
 	}
 	return false;
-}
-
-
-static void
-WriteProtection(uint32 flags)
-{
-	dprintf("kernel: {");
-	if (B_KERNEL_READ_AREA & flags) dprintf("R");
-	if (B_KERNEL_WRITE_AREA & flags) dprintf("W");
-	if (B_KERNEL_EXECUTE_AREA & flags) dprintf("X");
-	if (B_KERNEL_STACK_AREA & flags) dprintf("S");
-	dprintf("}, user: {");
-	if (B_READ_AREA & flags) dprintf("R");
-	if (B_WRITE_AREA & flags) dprintf("W");
-	if (B_EXECUTE_AREA & flags) dprintf("X");
-	if (B_STACK_AREA & flags) dprintf("S");
-	dprintf("}");
 }
 
 
@@ -328,29 +393,45 @@ STrap(iframe* frame)
 {
 	// dprintf("STrap("); WriteCause(Scause()); dprintf(")\n");
 
-	SstatusReg status(Sstatus());
-	uint64 cause = Scause();
+/*
+	iframe oldFrame = *frame;
+	const auto& frameChangeChecker = MakeScopeExit([&]() {
+			InterruptsLocker locker;
+			bool first = true;
+			for (int i = 0; i < 32; i++) {
+				uint64 oldVal = ((int64*)&oldFrame)[i];
+				uint64 newVal = ((int64*)frame)[i];
+				if (oldVal != newVal) {
+					if (first) {
+						dprintf("FrameChangeChecker, thread: %" B_PRId32 "(%s)\n", thread_get_current_thread()->id, thread_get_current_thread()->name);
+						first = false;
+					}
+					dprintf("  %s: %#" B_PRIxADDR " -> %#" B_PRIxADDR "\n", registerNames[i], oldVal, newVal);
+				}
+			}
 
-	const auto& statusRestorer = MakeScopeExit([&]() {
-		SetSstatus(status.val);
+			if (frame->epc == 0)
+				panic("FrameChangeChecker: EPC = 0");
 	});
-
-	switch (cause) {
+*/
+	switch (frame->cause) {
 		case causeExecPageFault:
 		case causeLoadPageFault:
 		case causeStorePageFault: {
-			if (SetAccessedFlags(Stval(), cause == causeStorePageFault))
+			if (SetAccessedFlags(Stval(), frame->cause == causeStorePageFault))
 				return;
 		}
 	}
 
-	if (status.spp == modeU) {
+	if (SstatusReg(frame->status).spp == modeU) {
 		thread_get_current_thread()->arch_info.userFrame = frame;
+		thread_get_current_thread()->arch_info.oldA0 = frame->a0;
 		thread_at_kernel_entry(system_time());
 	}
 	const auto& kernelExit = MakeScopeExit([&]() {
-		if (status.spp == modeU) {
+		if (SstatusReg(frame->status).spp == modeU) {
 			disable_interrupts();
+			atomic_and(&thread_get_current_thread()->flags, ~THREAD_FLAGS_SYSCALL_RESTARTED);
 			if ((thread_get_current_thread()->flags
 				& (THREAD_FLAGS_SIGNALS_PENDING
 				| THREAD_FLAGS_DEBUG_THREAD
@@ -360,11 +441,18 @@ STrap(iframe* frame)
 			} else {
 				thread_at_kernel_exit_no_signals();
 			}
+			if ((THREAD_FLAGS_RESTART_SYSCALL & thread_get_current_thread()->flags) != 0) {
+				atomic_and(&thread_get_current_thread()->flags, ~THREAD_FLAGS_RESTART_SYSCALL);
+				atomic_or(&thread_get_current_thread()->flags, THREAD_FLAGS_SYSCALL_RESTARTED);
+
+				frame->a0 = thread_get_current_thread()->arch_info.oldA0;
+				frame->epc -= 4;
+			}
 			thread_get_current_thread()->arch_info.userFrame = NULL;
 		}
 	});
 
-	switch (cause) {
+	switch (frame->cause) {
 		case causeIllegalInst: {
 			return SendSignal(B_INVALID_OPCODE_EXCEPTION, SIGILL, ILL_ILLOPC,
 				frame->epc);
@@ -393,7 +481,7 @@ STrap(iframe* frame)
 					cpu_ent* cpu = &gCPU[smp_get_current_cpu()];
 					if (cpu->fault_handler != 0) {
 						debug_set_page_fault_info(stval, frame->epc,
-							(cause == causeStorePageFault)
+							(frame->cause == causeStorePageFault)
 								? DEBUG_PAGE_FAULT_WRITE : 0);
 						frame->epc = cpu->fault_handler;
 						frame->sp = cpu->fault_handler_stack_pointer;
@@ -404,7 +492,7 @@ STrap(iframe* frame)
 						kprintf("ERROR: thread::fault_handler used in kernel "
 							"debugger!\n");
 						debug_set_page_fault_info(stval, frame->epc,
-							cause == causeStorePageFault
+							frame->cause == causeStorePageFault
 								? DEBUG_PAGE_FAULT_WRITE : 0);
 						frame->epc = (addr_t)thread->fault_handler;
 						return;
@@ -416,32 +504,49 @@ STrap(iframe* frame)
 				return;
 			}
 
-			if (status.pie == 0) {
-				WriteTrapInfo();
+			if (SstatusReg(frame->status).pie == 0) {
+				// user_memcpy() failure
+				Thread* thread = thread_get_current_thread();
+				if (thread != NULL && thread->fault_handler != 0) {
+					addr_t handler = (addr_t)(thread->fault_handler);
+					if (frame->epc != handler) {
+						frame->epc = handler;
+						return;
+					}
+				}
 				panic("page fault with interrupts disabled@!dump_virt_page %#" B_PRIx64, stval);
 			}
 
 			addr_t newIP = 0;
 			enable_interrupts();
-			vm_page_fault(stval, frame->epc, cause == causeStorePageFault,
-				cause == causeExecPageFault, status.spp == modeU, &newIP);
+
+			vm_page_fault(stval, frame->epc, frame->cause == causeStorePageFault,
+				frame->cause == causeExecPageFault,
+				SstatusReg(frame->status).spp == modeU, &newIP);
+
 			if (newIP != 0)
 				frame->epc = newIP;
 
 			return;
 		}
+		case causeInterrupt + sSoftInt: {
+			SetSip(Sip() & ~(1 << sSoftInt));
+			// dprintf("sSoftInt(%" B_PRId32 ")\n", smp_get_current_cpu());
+			smp_intercpu_int_handler(smp_get_current_cpu());
+			AfterInterrupt();
+			return;
+		}
 		case causeInterrupt + sTimerInt: {
+			// SetSie(Sie() & ~(1 << sTimerInt));
+			// dprintf("sTimerInt(%" B_PRId32 ")\n", smp_get_current_cpu());
 			timer_interrupt();
 			AfterInterrupt();
 			return;
 		}
 		case causeInterrupt + sExternInt: {
-			// TODO: get PLIC context ID mapping for HARD ID from FDT?
-			uint64 irq = gPlicRegs->contexts[modeS + 2 * sBootHartId
-				+ sPlicContextOfs].claimAndComplete;
+			uint64 irq = gPlicRegs->contexts[sPlicContexts[smp_get_current_cpu()]].claimAndComplete;
 			int_io_interrupt_handler(irq, true);
-			gPlicRegs->contexts[modeS + 2*sBootHartId
-				+ sPlicContextOfs].claimAndComplete = irq;
+			gPlicRegs->contexts[sPlicContexts[smp_get_current_cpu()]].claimAndComplete = irq;
 			AfterInterrupt();
 			return;
 		}
@@ -467,12 +572,12 @@ STrap(iframe* frame)
 			switch (syscall) {
 				case SYSCALL_READ_PORT_ETC:
 				case SYSCALL_WRITE_PORT_ETC:
-					WriteTrapInfo();
 					DoStackTrace(Fp(), 0);
 					break;
 			}
 */
 			// dprintf("syscall: %s\n", kExtendedSyscallInfos[syscall].name);
+
 			enable_interrupts();
 			uint64 returnValue = 0;
 			syscall_dispatcher(syscall, (void*)args, &returnValue);
@@ -480,7 +585,6 @@ STrap(iframe* frame)
 			return;
 		}
 	}
-	WriteTrapInfo();
 	panic("unhandled STrap");
 }
 
@@ -490,22 +594,23 @@ STrap(iframe* frame)
 status_t
 arch_int_init(kernel_args* args)
 {
-	sBootHartId = args->arch_args.bootHart;
-	sPlicContextOfs = (sBootHartId == 0) ? 0 : -1;
+	dprintf("arch_int_init()\n");
 
-	// TODO: Kernel mode FPU handling needs improved?
-	SetStvec((uint64)SVec);
-	SstatusReg sstatus(Sstatus());
-	sstatus.ie = 0;
-	sstatus.fs = extStatusInitial; // enable FPU
-	sstatus.xs = extStatusOff;
-	SetSstatus(sstatus.val);
-	SetSie(Sie() | (1 << sTimerInt) | (1 << sExternInt));
+	for (uint32 i = 0; i < args->num_cpus; i++) {
+		dprintf("  CPU %" B_PRIu32 ":\n", i);
+		dprintf("    hartId: %" B_PRIu32 "\n", args->arch_args.hartIds[i]);
+		dprintf("    plicContext: %" B_PRIu32 "\n", args->arch_args.plicContexts[i]);
+	}
+
+	for (uint32 i = 0; i < args->num_cpus; i++)
+		sPlicContexts[i] = args->arch_args.plicContexts[i];
 
 	// TODO: read from FDT
 	reserve_io_interrupt_vectors(128, 0, INTERRUPT_TYPE_IRQ);
 
-	gPlicRegs->contexts[modeS + 2*sBootHartId + sPlicContextOfs].priorityThreshold = 0;
+	for (uint32 i = 0; i < args->num_cpus; i++)
+		gPlicRegs->contexts[sPlicContexts[i]].priorityThreshold = 0;
+
 	return B_OK;
 }
 
@@ -536,7 +641,7 @@ arch_int_enable_io_interrupt(int irq)
 {
 	dprintf("arch_int_enable_io_interrupt(%d)\n", irq);
 	gPlicRegs->priority[irq] = 1;
-	gPlicRegs->enable[modeS + 2*sBootHartId + sPlicContextOfs][irq / 32] |= 1 << (irq % 32);
+	gPlicRegs->enable[sPlicContexts[0]][irq / 32] |= 1 << (irq % 32);
 }
 
 
@@ -545,7 +650,7 @@ arch_int_disable_io_interrupt(int irq)
 {
 	dprintf("arch_int_disable_io_interrupt(%d)\n", irq);
 	gPlicRegs->priority[irq] = 0;
-	gPlicRegs->enable[modeS + 2*sBootHartId + sPlicContextOfs][irq / 32] &= ~(1 << (irq % 32));
+	gPlicRegs->enable[sPlicContexts[0]][irq / 32] &= ~(1 << (irq % 32));
 }
 
 
@@ -554,4 +659,38 @@ arch_int_assign_to_cpu(int32 irq, int32 cpu)
 {
 	// Not yet supported.
 	return 0;
+}
+
+
+#undef arch_int_enable_interrupts
+#undef arch_int_disable_interrupts
+#undef arch_int_restore_interrupts
+#undef arch_int_are_interrupts_enabled
+
+
+extern "C" void
+arch_int_enable_interrupts()
+{
+	arch_int_enable_interrupts_inline();
+}
+
+
+extern "C" int
+arch_int_disable_interrupts()
+{
+	return arch_int_disable_interrupts_inline();
+}
+
+
+extern "C" void
+arch_int_restore_interrupts(int oldState)
+{
+	arch_int_restore_interrupts_inline(oldState);
+}
+
+
+extern "C" bool
+arch_int_are_interrupts_enabled()
+{
+	return arch_int_are_interrupts_enabled_inline();
 }

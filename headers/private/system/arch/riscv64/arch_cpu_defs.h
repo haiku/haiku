@@ -11,6 +11,8 @@
 #define B_ALWAYS_INLINE __attribute__((always_inline)) inline
 
 
+#ifdef __cplusplus
+
 enum {
 	modeU = 0,
 	modeS = 1,
@@ -327,6 +329,10 @@ static B_ALWAYS_INLINE void FlushTlbAllAsid(uint64 asid) {
 static B_ALWAYS_INLINE void FlushTlbPageAsid(uint64 page, uint64 asid) {
 	asm volatile("sfence.vma %0, %0" : : "r" (page), "r" (asid) : "memory");}
 
+// flush instruction cache
+static B_ALWAYS_INLINE void FenceI() {
+	asm volatile("fence.i" : : : "memory");}
+
 static B_ALWAYS_INLINE uint64 Sp() {
 	uint64 x; asm volatile("mv %0, sp" : "=r" (x)); return x;}
 static B_ALWAYS_INLINE void SetSp(uint64 x) {
@@ -351,6 +357,8 @@ static B_ALWAYS_INLINE void Wfi() {asm volatile("wfi");}
 
 static B_ALWAYS_INLINE void Mret() {asm volatile("mret");}
 static B_ALWAYS_INLINE void Sret() {asm volatile("sret");}
+
+#endif // __cplusplus
 
 
 #define SPINLOCK_PAUSE()	do {} while (false)
