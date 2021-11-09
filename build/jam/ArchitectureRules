@@ -40,6 +40,7 @@ rule ArchitectureSetup architecture
 	switch $(cpu) {
 		case ppc : archFlags += -mcpu=440fp ;
 		case arm : archFlags += -march=armv7-a -mfloat-abi=hard ;
+		case arm64 : archFlags += -march=armv8.2-a+fp16 ;
 		case x86 : archFlags += -march=pentium ;
 		case riscv64 : archFlags += -march=rv64gc ;
 	}
