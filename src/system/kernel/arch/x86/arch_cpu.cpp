@@ -755,23 +755,34 @@ get_intel_cpu_initial_x2apic_id(int /* currentCPU */)
 static inline status_t
 detect_intel_cpu_topology_x2apic(uint32 maxBasicLeaf)
 {
-	if (maxBasicLeaf < 11)
+
+	uint32 leaf = 0;
+	cpuid_info cpuid;
+	if (maxBasicLeaf >= 0x1f) {
+		get_current_cpuid(&cpuid, 0x1f, 0);
+		if (cpuid.regs.ebx != 0)
+			leaf = 0x1f;
+	}
+	if (maxBasicLeaf >= 0xb && leaf == 0) {
+		get_current_cpuid(&cpuid, 0xb, 0);
+		if (cpuid.regs.ebx != 0)
+			leaf = 0xb;
+	}
+	if (leaf == 0)
 		return B_UNSUPPORTED;
 
 	uint8 hierarchyLevels[CPU_TOPOLOGY_LEVELS] = { 0 };
 
 	int currentLevel = 0;
-	int levelType;
 	unsigned int levelsSet = 0;
-
 	do {
 		cpuid_info cpuid;
-		get_current_cpuid(&cpuid, 11, currentLevel);
-		if (currentLevel == 0 && cpuid.regs.ebx == 0)
-			return B_UNSUPPORTED;
-
-		levelType = (cpuid.regs.ecx >> 8) & 0xff;
+		get_current_cpuid(&cpuid, leaf, currentLevel++);
+		int levelType = (cpuid.regs.ecx >> 8) & 0xff;
 		int levelValue = cpuid.regs.eax & 0x1f;
+
+		if (levelType == 0)
+			break;
 
 		switch (levelType) {
 			case 1:	// SMT
@@ -784,8 +795,7 @@ detect_intel_cpu_topology_x2apic(uint32 maxBasicLeaf)
 				break;
 		}
 
-		currentLevel++;
-	} while (levelType != 0 && levelsSet != 3);
+	} while (levelsSet != 3);
 
 	sGetCPUTopologyID = get_intel_cpu_initial_x2apic_id;
 
