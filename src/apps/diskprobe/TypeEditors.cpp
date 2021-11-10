@@ -853,11 +853,10 @@ ImageView::ImageView(DataEditor &editor)
 {
 	if (editor.Type() == B_MINI_ICON_TYPE
 		|| editor.Type() == B_LARGE_ICON_TYPE
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-		|| editor.Type() == B_VECTOR_ICON_TYPE
-#endif
-		)
+		|| editor.Type() == B_VECTOR_ICON_TYPE) {
 		SetName(B_TRANSLATE("Icon view"));
+	}
+
 
 	fDescriptionView = new BStringView("",
 		B_TRANSLATE_COMMENT("Could not read image", "Image means "
@@ -979,7 +978,6 @@ ImageView::_UpdateImage()
 		fEditor.SetViewSize(viewSize);
 		return;
 	}
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	if (fBitmap != NULL && fEditor.Type() == B_VECTOR_ICON_TYPE
 		&& fScaleSlider->Value() * 8 - 1 == fBitmap->Bounds().Width()) {
 		if (BIconUtils::GetVectorIcon((const uint8 *)data,
@@ -988,7 +986,6 @@ ImageView::_UpdateImage()
 			return;
 		}
 	}
-#endif
 
 	delete fBitmap;
 	fBitmap = NULL;
@@ -1004,7 +1001,6 @@ ImageView::_UpdateImage()
 			if (fBitmap->InitCheck() == B_OK)
 				fBitmap->SetBits(data, fEditor.FileSize(), 0, B_CMAP8);
 			break;
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		case B_VECTOR_ICON_TYPE:
 			fBitmap = new BBitmap(BRect(0, 0, fScaleSlider->Value() * 8 - 1,
 				fScaleSlider->Value() * 8 - 1), B_RGB32);
@@ -1015,7 +1011,6 @@ ImageView::_UpdateImage()
 				fBitmap = NULL;
 			}
 			break;
-#endif
 		case B_PNG_FORMAT:
 		{
 			BMemoryIO stream(data, fEditor.FileSize());
@@ -1047,9 +1042,7 @@ ImageView::_UpdateImage()
 		switch (fEditor.Type()) {
 			case B_MINI_ICON_TYPE:
 			case B_LARGE_ICON_TYPE:
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			case B_VECTOR_ICON_TYPE:
-#endif
 				type = B_TRANSLATE("Icon");
 				break;
 			case B_PNG_FORMAT:
@@ -1177,9 +1170,6 @@ MessageView::SetTo(BMessage& message)
 
 	type_code type;
 	int32 count;
-#ifdef HAIKU_TARGET_PLATFORM_DANO
-	const
-#endif
 	char* name;
 	for (int32 i = 0; message.GetInfo(B_ANY_TYPE, i, &name, &type, &count)
 			== B_OK; i++) {
@@ -1327,9 +1317,7 @@ GetTypeEditorFor(BRect rect, DataEditor& editor)
 		case B_MINI_ICON_TYPE:
 		case B_LARGE_ICON_TYPE:
 		case B_PNG_FORMAT:
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		case B_VECTOR_ICON_TYPE:
-#endif
 			return new ImageView(editor);
 	}
 
