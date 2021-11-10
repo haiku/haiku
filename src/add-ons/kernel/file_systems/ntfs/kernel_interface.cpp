@@ -1001,6 +1001,30 @@ fs_rename(fs_volume* _volume, fs_vnode* _oldDir, const char* oldName,
 	if (status != B_OK)
 		return status;
 
+	// Prevent moving a directory into one of its own children.
+	if (old_directory != new_directory) {
+		u64 oldIno = ntfs_fuse_inode_lookup(&volume->lowntfs, old_directory->inode, oldName);
+		if (oldIno == (u64)-1)
+			return B_ENTRY_NOT_FOUND;
+
+		ino_t parent = new_directory->inode;
+		const ino_t root = FILE_root;
+
+		while (true) {
+			if (parent == oldIno)
+				return B_BAD_VALUE;
+			else if (parent == root || parent == old_directory->inode)
+				break;
+
+			vnode* parentNode;
+			if (get_vnode(_volume, parent, (void**)&parentNode) != B_OK)
+				return B_ERROR;
+
+			parent = parentNode->parent_inode;
+			put_vnode(_volume, parentNode->inode);
+		}
+	}
+
 	if (ntfs_fuse_rename(&volume->lowntfs, old_directory->inode, oldName,
 			new_directory->inode, newName) != 0)
 		return errno;
