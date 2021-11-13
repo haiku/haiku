@@ -97,11 +97,14 @@ fs_scan_partition(int fd, partition_data* partition, void* _cookie)
 	char path[B_PATH_NAME_LENGTH];
 	if (ioctl(fd, B_GET_PATH_FOR_DEVICE, path) != 0) {
 		ntVolume = utils_mount_volume(path, NTFS_MNT_RDONLY | NTFS_MNT_RECOVER);
-		if (ntVolume != NULL) {
-			if (ntVolume->vol_name != NULL && ntVolume->vol_name[0] != '\0')
-				partition->content_name = strdup(ntVolume->vol_name);
-			ntfs_umount(ntVolume, true);
-		}
+		if (ntVolume == NULL)
+			return errno ? errno : B_ERROR;
+
+		if (ntVolume->vol_name != NULL && ntVolume->vol_name[0] != '\0')
+			partition->content_name = strdup(ntVolume->vol_name);
+		else
+			partition->content_name = strdup("");
+		ntfs_umount(ntVolume, true);
 	}
 
 	return partition->content_name != NULL ? B_OK : B_NO_MEMORY;
