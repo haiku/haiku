@@ -307,7 +307,8 @@ enum pipe_index {
     INTEL_PIPE_ANY,
     INTEL_PIPE_A,
     INTEL_PIPE_B,
-    INTEL_PIPE_C
+    INTEL_PIPE_C,
+    INTEL_PIPE_D
 };
 
 //----------------- ioctl() interface ----------------
@@ -543,6 +544,7 @@ struct intel_free_graphics_memory {
 
 #define INTEL_DISPLAY_OFFSET			0x1000
 
+// Note: on Skylake below registers are part of the transcoder
 #define INTEL_DISPLAY_A_HTOTAL			(0x0000 | REGS_NORTH_PIPE_AND_PORT)
 #define INTEL_DISPLAY_A_HBLANK			(0x0004 | REGS_NORTH_PIPE_AND_PORT)
 #define INTEL_DISPLAY_A_HSYNC			(0x0008 | REGS_NORTH_PIPE_AND_PORT)
@@ -568,6 +570,16 @@ struct intel_free_graphics_memory {
 #define INTEL_PIPE_B_LINK_M				(0x1060 | REGS_NORTH_PLANE_CONTROL)
 #define INTEL_PIPE_A_LINK_N				(0x0064 | REGS_NORTH_PLANE_CONTROL)
 #define INTEL_PIPE_B_LINK_N				(0x1064 | REGS_NORTH_PLANE_CONTROL)
+
+//DDI port link
+#define INTEL_DDI_PIPE_A_DATA_M			(0x0030 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_B_DATA_M			(0x1030 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_A_DATA_N			(0x0034 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_B_DATA_N			(0x1034 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_A_LINK_M			(0x0040 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_B_LINK_M			(0x1040 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_A_LINK_N			(0x0044 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_B_LINK_N			(0x1044 | REGS_NORTH_PIPE_AND_PORT)
 
 // on PCH we also have to set the transcoder
 #define INTEL_TRANSCODER_A_HTOTAL		(0x0000 | REGS_SOUTH_TRANSCODER_PORT)
@@ -661,6 +673,19 @@ struct intel_free_graphics_memory {
 #define PIPE_DDI_PORT_C					2
 #define PIPE_DDI_PORT_D					3
 #define PIPE_DDI_PORT_E					4
+#define PIPE_DDI_MODESEL_SHIFT			24
+#define PIPE_DDI_MODESEL_MODE(x)		((x) << PIPE_DDI_MODESEL_SHIFT)
+#define PIPE_DDI_MODESEL_MASK			(7 << PIPE_DDI_MODESEL_SHIFT)
+#define PIPE_DDI_MODE_HDMI				0
+#define PIPE_DDI_MODE_DVI				1
+#define PIPE_DDI_MODE_DP_SST			2
+#define PIPE_DDI_MODE_DP_MST			3
+#define PIPE_DDI_DP_WIDTH_SHIFT			1
+#define PIPE_DDI_DP_WIDTH_SEL(x)		((x) << PIPE_DDI_DP_WIDTH_SHIFT)
+#define PIPE_DDI_DP_WIDTH_MASK			(7 << PIPE_DDI_DP_WIDTH_SHIFT)
+#define PIPE_DDI_DP_WIDTH_1				0
+#define PIPE_DDI_DP_WIDTH_2				1
+#define PIPE_DDI_DP_WIDTH_4				2
 
 // DP_A always @ 6xxxx, DP_B-DP_D move with PCH
 #define INTEL_DISPLAY_PORT_A			(0x4000 | REGS_NORTH_PIPE_AND_PORT)
@@ -991,6 +1016,12 @@ struct intel_free_graphics_memory {
 #define PCH_TRANS_CONF_A				0x0008
 #define PCH_TRANS_CONF_B				0x1008
 #define PCH_TRANS_CONF_C				0x2008
+
+// Transcoder - skylake DDI
+#define DDI_SKL_TRANS_CONF_A			(0x0008 | REGS_NORTH_PLANE_CONTROL)
+#define DDI_SKL_TRANS_CONF_B			(0x1008 | REGS_NORTH_PLANE_CONTROL)
+#define DDI_SKL_TRANS_CONF_C			(0x2008 | REGS_NORTH_PLANE_CONTROL)
+#define DDI_SKL_TRANS_CONF_EDP			(0xf008 | REGS_NORTH_PLANE_CONTROL)
 
 #define TRANS_ENABLE					(1 << 31)
 #define TRANS_ENABLED					(1 << 30)

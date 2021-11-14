@@ -42,6 +42,15 @@ PanelFitter::PanelFitter(pipe_index pipeIndex)
 	if (pipeIndex == INTEL_PIPE_C) {
 		fRegisterBase += 2 * PCH_PANEL_FITTER_PIPE_OFFSET;
 	}
+	TRACE("%s: requested fitter #%d\n", __func__, (int)pipeIndex);
+
+	uint32 fitCtl = read32(fRegisterBase + PCH_PANEL_FITTER_CONTROL);
+	if (fitCtl & PANEL_FITTER_ENABLED) {
+	TRACE("%s: this fitter is connected to pipe #%" B_PRIx32 "\n", __func__,
+		((fitCtl & PANEL_FITTER_PIPE_MASK) >> 29) + 1);
+	} else {
+		TRACE("%s: this fitter is not setup by the BIOS\n", __func__);
+	}
 }
 
 

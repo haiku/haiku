@@ -289,7 +289,7 @@ probe_ports()
 
 	// Digital Display Interface (for DP, HDMI and DVI)
 	if (gInfo->shared_info->device_type.HasDDI()) {
-		for (int i = INTEL_PORT_B; i <= INTEL_PORT_D; i++) {
+		for (int i = INTEL_PORT_B; i <= INTEL_PORT_E; i++) {
 			TRACE("Probing DDI %d\n", i);
 
 			Port* ddiPort
@@ -431,7 +431,7 @@ assign_pipes()
 
 		pipe_index preference = gInfo->ports[i]->PipePreference();
 		if (preference != INTEL_PIPE_ANY) {
-			int index = (preference == INTEL_PIPE_B) ? 1 : 0;
+			int index = (int)preference - 1;
 			if (assigned[index]) {
 				TRACE("Pipe %d is already assigned, it will drive multiple "
 					"displays\n", index);

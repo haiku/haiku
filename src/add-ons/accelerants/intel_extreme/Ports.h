@@ -226,6 +226,8 @@ virtual	addr_t						_DDCRegister();
 virtual addr_t						_PortRegister();
 private:
 		uint8						fMaxLanes;
+
+		status_t					_SetPortLinkGen8(display_mode* target);
 };
 
 

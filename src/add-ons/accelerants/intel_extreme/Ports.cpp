@@ -126,8 +126,24 @@ Port::SetPipe(Pipe* pipe)
 		return B_ERROR;
 	}
 
-	TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe %s\n", __func__,
-		PortName(), portRegister, (pipe->Index() == INTEL_PIPE_A) ? "A" : "B");
+	switch (pipe->Index()) {
+		case INTEL_PIPE_B:
+			TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe B\n", __func__,
+				PortName(), portRegister);
+			break;
+		case INTEL_PIPE_C:
+			TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe C\n", __func__,
+				PortName(), portRegister);
+			break;
+		case INTEL_PIPE_D:
+			TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe D\n", __func__,
+				PortName(), portRegister);
+			break;
+		default:
+			TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe A\n", __func__,
+				PortName(), portRegister);
+			break;
+	}
 
 	uint32 portState = read32(portRegister);
 
@@ -257,7 +273,38 @@ Port::PipePreference()
 	}
 
 	if (gInfo->shared_info->device_type.HasDDI()) {
-		//fixme implement detection via PIPE_DDI_FUNC_CTL_x scan..
+		// scan all our pipes to find the one connected to the current port
+		uint32 pipeState = 0;
+		for (uint32 pipeCnt = 0; pipeCnt < 4; pipeCnt++) {
+			switch (pipeCnt) {
+				case 0:
+					pipeState = read32(PIPE_DDI_FUNC_CTL_A);
+					break;
+				case 1:
+					pipeState = read32(PIPE_DDI_FUNC_CTL_B);
+					break;
+				case 2:
+					pipeState = read32(PIPE_DDI_FUNC_CTL_C);
+					break;
+				default:
+					pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
+					break;
+			}
+
+			if ((((pipeState & PIPE_DDI_SELECT_MASK) >> PIPE_DDI_SELECT_SHIFT) + 1)
+				== (uint32)PortIndex()) {
+				switch (pipeCnt) {
+					case 0:
+						return INTEL_PIPE_A;
+					case 1:
+						return INTEL_PIPE_B;
+					case 2:
+						return INTEL_PIPE_C;
+					default:
+						return INTEL_PIPE_D;
+				}
+			}
+		}
 	}
 
 	return INTEL_PIPE_ANY;
@@ -1283,11 +1330,14 @@ DigitalDisplayInterface::Power(bool enabled)
 
 	fPipe->Enable(enabled);
 
+	//nogo currently.. (kills output forever)
+#if 0
 	addr_t portRegister = _PortRegister();
 	uint32 state = read32(portRegister);
 	write32(portRegister,
 		enabled ? (state | DDI_BUF_CTL_ENABLE) : (state & ~DDI_BUF_CTL_ENABLE));
 	read32(portRegister);
+#endif
 
 	return B_OK;
 }
@@ -1334,9 +1384,119 @@ DigitalDisplayInterface::IsConnected()
 	TRACE("%s: %s Maximum Lanes: %" B_PRId8 "\n", __func__,
 		PortName(), fMaxLanes);
 
-	return HasEDID();
+	// fetch EDID but determine 'in use' later (below) so we also catch screens that fail EDID
+	HasEDID();
+
+	// scan all our pipes to find the one connected to the current port and check it's enabled
+	uint32 pipeState = 0;
+	for (uint32 pipeCnt = 0; pipeCnt < 4; pipeCnt++) {
+		switch (pipeCnt) {
+			case 0:
+				pipeState = read32(PIPE_DDI_FUNC_CTL_A);
+				break;
+			case 1:
+				pipeState = read32(PIPE_DDI_FUNC_CTL_B);
+				break;
+			case 2:
+				pipeState = read32(PIPE_DDI_FUNC_CTL_C);
+				break;
+			default:
+				pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
+				break;
+		}
+
+		if (((((pipeState & PIPE_DDI_SELECT_MASK) >> PIPE_DDI_SELECT_SHIFT) + 1) == (uint32)PortIndex())
+			&& (pipeState & PIPE_DDI_FUNC_CTL_ENABLE)) {
+				TRACE("%s: Connected\n", __func__);
+				return true;
+		}
+	}
+
+	TRACE("%s: Not connected\n", __func__);
+	return false;
 }
 
+status_t
+DigitalDisplayInterface::_SetPortLinkGen8(display_mode* target)
+{
+	// Khz / 10. ( each output octet encoded as 10 bits.
+	//uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10; //=270000 khz
+	//fixme: always so?
+	uint32 linkBandwidth = 270000; //khz
+	uint32 fPipeOffset = 0;
+	switch (fPipe->Index()) {
+		case INTEL_PIPE_B:
+			fPipeOffset = 0x1000;
+			break;
+		case INTEL_PIPE_C:
+			fPipeOffset = 0x2000;
+			break;
+		case INTEL_PIPE_D:
+			fPipeOffset = 0xf000;
+			break;
+		default:
+			break;
+	}
+
+	TRACE("%s: DDI M1 data before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_DATA_M + fPipeOffset));
+	TRACE("%s: DDI N1 data before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_DATA_N + fPipeOffset));
+	TRACE("%s: DDI M1 link before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_LINK_M + fPipeOffset));
+	TRACE("%s: DDI N1 link before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_LINK_N + fPipeOffset));
+
+	uint32 bitsPerPixel = 24;	//fixme: always so?
+	uint32 lanes = 4;
+	// Only DP modes supports less than 4 lanes: read current config
+	uint32 pipeFunc = read32(PIPE_DDI_FUNC_CTL_A + fPipeOffset);
+	if (((pipeFunc & PIPE_DDI_MODESEL_MASK) >> PIPE_DDI_MODESEL_SHIFT) >= PIPE_DDI_MODE_DP_SST) {
+		lanes = 1 << ((pipeFunc & PIPE_DDI_DP_WIDTH_MASK) >> PIPE_DDI_DP_WIDTH_SHIFT);
+		TRACE("%s: DDI in DP mode with %" B_PRIx32 " lanes in use\n", __func__, lanes);
+	} else {
+		TRACE("%s: DDI in non-DP mode with %" B_PRIx32 " lanes in use\n", __func__, lanes);
+	}
+
+	//Setup Data M/N
+	uint64 linkspeed = lanes * linkBandwidth * 8;
+	uint64 ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	uint64 ret_m = target->timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	//Set TU size bits (to default, max) before link training so that error detection works
+	write32(INTEL_DDI_PIPE_A_DATA_M + fPipeOffset, ret_m | FDI_PIPE_MN_TU_SIZE_MASK);
+	write32(INTEL_DDI_PIPE_A_DATA_N + fPipeOffset, ret_n);
+
+	//Setup Link M/N
+	linkspeed = linkBandwidth;
+	ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	ret_m = target->timing.pixel_clock * ret_n / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	write32(INTEL_DDI_PIPE_A_LINK_M + fPipeOffset, ret_m);
+	//Writing Link N triggers all four registers to be activated also (on next VBlank)
+	write32(INTEL_DDI_PIPE_A_LINK_N + fPipeOffset, ret_n);
+
+	TRACE("%s: DDI M1 data after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_DATA_M + fPipeOffset));
+	TRACE("%s: DDI N1 data after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_DATA_N + fPipeOffset));
+	TRACE("%s: DDI M1 link after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_LINK_M + fPipeOffset));
+	TRACE("%s: DDI N1 link after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_LINK_N + fPipeOffset));
+
+	return B_OK;
+}
 
 status_t
 DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
@@ -1379,6 +1539,7 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	// Program target display mode
 	fPipe->ConfigureTimings(target);
+	_SetPortLinkGen8(target);
 
 	// Set fCurrentMode to our set display mode
 	memcpy(&fCurrentMode, target, sizeof(display_mode));

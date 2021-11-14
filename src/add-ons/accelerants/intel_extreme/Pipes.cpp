@@ -69,8 +69,24 @@ Pipe::Pipe(pipe_index pipeIndex)
 	fPlaneOffset(0)
 {
 	if (pipeIndex == INTEL_PIPE_B) {
-		fPipeOffset = INTEL_DISPLAY_OFFSET;
 		fPlaneOffset = INTEL_PLANE_OFFSET;
+	}
+	switch (pipeIndex) {
+		case INTEL_PIPE_B:
+			TRACE("Pipe B.\n");
+			fPipeOffset = 0x1000;
+			break;
+		case INTEL_PIPE_C:
+			TRACE("Pipe C.\n");
+			fPipeOffset = 0x2000;
+			break;
+		case INTEL_PIPE_D:
+			TRACE("Pipe D.\n");
+			fPipeOffset = 0xf000;
+			break;
+		default:
+			TRACE("Pipe A.\n");
+			break;
 	}
 
 	// IvyBridge: Analog + Digital Ports behind FDI (on northbridge)
@@ -81,17 +97,18 @@ Pipe::Pipe(pipe_index pipeIndex)
 		TRACE("%s: Pipe %s routed through FDI\n", __func__,
 			(pipeIndex == INTEL_PIPE_A) ? "A" : "B");
 
-		fHasTranscoder = true;
-
 		// Program FDILink if PCH
 		fFDILink = new(std::nothrow) FDILink(pipeIndex);
-		// Program gen5(+) style panelfitter as well
+	}
+	if (gInfo->shared_info->pch_info != INTEL_PCH_NONE) {
+		// DDI also has transcoders
+		fHasTranscoder = true;
+		// Program gen5(+) style panelfitter as well (DDI has this as well..)
 		fPanelFitter = new(std::nothrow) PanelFitter(pipeIndex);
 	}
 
-	TRACE("Pipe %s. Pipe Base: 0x%" B_PRIxADDR
-		" Plane Base: 0x% " B_PRIxADDR "\n", (pipeIndex == INTEL_PIPE_A)
-			? "A" : "B", fPipeOffset, fPlaneOffset);
+	TRACE("Pipe Base: 0x%" B_PRIxADDR " Plane Base: 0x% " B_PRIxADDR "\n",
+			fPipeOffset, fPlaneOffset);
 }
 
 
@@ -147,34 +164,58 @@ Pipe::_ConfigureTranscoder(display_mode* target)
 
 	TRACE("%s: fPipeOffset: 0x%" B_PRIx32"\n", __func__, fPipeOffset);
 
-	// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
-	write32(INTEL_TRANSCODER_A_HTOTAL + fPipeOffset,
-		((uint32)(target->timing.h_total - 1) << 16)
-		| ((uint32)target->timing.h_display - 1));
-	write32(INTEL_TRANSCODER_A_HBLANK + fPipeOffset,
-		((uint32)(target->timing.h_total - 1) << 16)
-		| ((uint32)target->timing.h_display - 1));
-	write32(INTEL_TRANSCODER_A_HSYNC + fPipeOffset,
-		((uint32)(target->timing.h_sync_end - 1) << 16)
-		| ((uint32)target->timing.h_sync_start - 1));
+	if (gInfo->shared_info->device_type.Generation() < 9) {
+		// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
+		write32(INTEL_TRANSCODER_A_HTOTAL + fPipeOffset,
+			((uint32)(target->timing.h_total - 1) << 16)
+			| ((uint32)target->timing.h_display - 1));
+		write32(INTEL_TRANSCODER_A_HBLANK + fPipeOffset,
+			((uint32)(target->timing.h_total - 1) << 16)
+			| ((uint32)target->timing.h_display - 1));
+		write32(INTEL_TRANSCODER_A_HSYNC + fPipeOffset,
+			((uint32)(target->timing.h_sync_end - 1) << 16)
+			| ((uint32)target->timing.h_sync_start - 1));
 
-	write32(INTEL_TRANSCODER_A_VTOTAL + fPipeOffset,
-		((uint32)(target->timing.v_total - 1) << 16)
-		| ((uint32)target->timing.v_display - 1));
-	write32(INTEL_TRANSCODER_A_VBLANK + fPipeOffset,
-		((uint32)(target->timing.v_total - 1) << 16)
-		| ((uint32)target->timing.v_display - 1));
-	write32(INTEL_TRANSCODER_A_VSYNC + fPipeOffset,
-		((uint32)(target->timing.v_sync_end - 1) << 16)
-		| ((uint32)target->timing.v_sync_start - 1));
-
-	#if 0
-	// XXX: Is it ok to do these on non-digital?
-	write32(INTEL_TRANSCODER_A_POS + fPipeOffset, 0);
-	write32(INTEL_TRANSCODER_A_IMAGE_SIZE + fPipeOffset,
-		((uint32)(target->timing.h_display - 1) << 16)
+		write32(INTEL_TRANSCODER_A_VTOTAL + fPipeOffset,
+			((uint32)(target->timing.v_total - 1) << 16)
 			| ((uint32)target->timing.v_display - 1));
-	#endif
+		write32(INTEL_TRANSCODER_A_VBLANK + fPipeOffset,
+			((uint32)(target->timing.v_total - 1) << 16)
+			| ((uint32)target->timing.v_display - 1));
+		write32(INTEL_TRANSCODER_A_VSYNC + fPipeOffset,
+			((uint32)(target->timing.v_sync_end - 1) << 16)
+			| ((uint32)target->timing.v_sync_start - 1));
+
+		#if 0
+		// XXX: Is it ok to do these on non-digital?
+		write32(INTEL_TRANSCODER_A_POS + fPipeOffset, 0);
+		write32(INTEL_TRANSCODER_A_IMAGE_SIZE + fPipeOffset,
+			((uint32)(target->timing.h_display - 1) << 16)
+				| ((uint32)target->timing.v_display - 1));
+		#endif
+	} else {
+		//on Skylake timing is already done in ConfigureTimings()
+
+		TRACE("%s: trans conf reg: 0x%" B_PRIx32"\n", __func__,
+			read32(DDI_SKL_TRANS_CONF_A + fPipeOffset));
+		TRACE("%s: trans DDI func ctl reg: 0x%" B_PRIx32"\n", __func__,
+			read32(PIPE_DDI_FUNC_CTL_A + fPipeOffset));
+		switch ((read32(PIPE_DDI_FUNC_CTL_A + fPipeOffset) & PIPE_DDI_MODESEL_MASK)
+				>> PIPE_DDI_MODESEL_SHIFT) {
+			case PIPE_DDI_MODE_DVI:
+				TRACE("%s: Transcoder uses DVI mode\n", __func__);
+				break;
+			case PIPE_DDI_MODE_DP_SST:
+				TRACE("%s: Transcoder uses DP SST mode\n", __func__);
+				break;
+			case PIPE_DDI_MODE_DP_MST:
+				TRACE("%s: Transcoder uses DP MST mode\n", __func__);
+				break;
+			default:
+				TRACE("%s: Transcoder uses HDMI mode\n", __func__);
+				break;
+		}
+	}
 }
 
 
@@ -207,7 +248,8 @@ Pipe::ConfigureScalePos(display_mode* target)
 
 	// Set the plane size as well while we're at it (this is independant, we
 	// could have a larger plane and scroll through it).
-	if (gInfo->shared_info->device_type.Generation() <= 4) {
+	if ((gInfo->shared_info->device_type.Generation() <= 4)
+		|| gInfo->shared_info->device_type.HasDDI()) {
 		// This is "reserved" on G35 and GMA965, but needed on 945 (for which
 		// there is no public documentation), and I assume earlier devices as
 		// well.
@@ -240,6 +282,7 @@ Pipe::ConfigureTimings(display_mode* target, bool hardware)
 	if (!fHasTranscoder || hardware)
 	{
 		// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
+		// Note: on Skylake below registers are part of the transcoder
 		write32(INTEL_DISPLAY_A_HTOTAL + fPipeOffset,
 			((uint32)(target->timing.h_total - 1) << 16)
 			| ((uint32)target->timing.h_display - 1));
