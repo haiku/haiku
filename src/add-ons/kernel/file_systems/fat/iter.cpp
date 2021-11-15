@@ -278,7 +278,8 @@ _diri_release_current_block_(struct diri *diri)
 uint8 *
 diri_init(nspace *vol, uint32 cluster, uint32 index, struct diri *diri)
 {
-	diri->current_block = NULL;
+	if (diri->current_block != NULL)
+		_diri_release_current_block_(diri);
 
 	if (cluster >= vol->total_clusters + 2)
 		return NULL;
@@ -305,13 +306,10 @@ diri_init(nspace *vol, uint32 cluster, uint32 index, struct diri *diri)
 }
 
 
-int
-diri_free(struct diri *diri)
+diri::~diri()
 {
-	if (diri->current_block)
-		_diri_release_current_block_(diri);
-
-	return 0;
+	if (current_block != NULL)
+		_diri_release_current_block_(this);
 }
 
 

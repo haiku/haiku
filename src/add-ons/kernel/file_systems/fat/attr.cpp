@@ -27,11 +27,11 @@ int32 kBeOSTypeCookie = 0x1234;
 
 status_t set_mime_type(vnode *node, const char *filename)
 {
-	#ifdef FS_SHELL
+#ifdef FS_SHELL
 	return B_ERROR;
-	#else
+#else
 	return set_mime(&node->mime, filename);
-	#endif
+#endif
 }
 
 
@@ -44,15 +44,12 @@ dosfs_open_attrdir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 
 	DPRINTF(0, ("dosfs_open_attrdir called\n"));
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	if ((*_cookie = malloc(sizeof(uint32))) == NULL) {
-		UNLOCK_VOL(vol);
 		return ENOMEM;
 	}
 	*(int32 *)(*_cookie) = 0;
-
-	UNLOCK_VOL(vol);
 
 	return 0;
 }
@@ -67,11 +64,9 @@ dosfs_close_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 
 	DPRINTF(0, ("dosfs_close_attrdir called\n"));
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	*(int32 *)_cookie = 1;
-
-	UNLOCK_VOL(vol);
 
 	return 0;
 }
@@ -127,7 +122,7 @@ dosfs_read_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 
 	*num = 0;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	if ((*cookie == 0) && (node->mime)) {
 		*num = 1;
@@ -139,8 +134,6 @@ dosfs_read_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	}
 
 	*cookie = 1;
-
-	UNLOCK_VOL(vol);
 
 	return 0;
 }
@@ -156,14 +149,11 @@ dosfs_open_attr(fs_volume *_vol, fs_vnode *_node, const char *name,
 	if (strcmp(name, "BEOS:TYPE"))
 		return ENOENT;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	if (node->mime == NULL) {
-		UNLOCK_VOL(vol);
 		return ENOENT;
 	}
-
-	UNLOCK_VOL(vol);
 
 	*_cookie = &kBeOSTypeCookie;
 	return B_OK;
@@ -196,17 +186,15 @@ dosfs_read_attr_stat(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	if (_cookie != &kBeOSTypeCookie)
 		return ENOENT;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	if (node->mime == NULL) {
-		UNLOCK_VOL(vol);
 		return ENOENT;
 	}
 
 	stat->st_type = MIME_STRING_TYPE;
 	stat->st_size = strlen(node->mime) + 1;
 
-	UNLOCK_VOL(vol);
 	return 0;
 }
 
@@ -224,27 +212,21 @@ dosfs_read_attr(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	if (_cookie != &kBeOSTypeCookie)
 		return ENOENT;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
-	if (node->mime == NULL) {
-		UNLOCK_VOL(vol);
+	if (node->mime == NULL)
 		return ENOENT;
-	}
 
-	if ((pos < 0) || (pos > strlen(node->mime))) {
-		UNLOCK_VOL(vol);
+	if ((pos < 0) || (pos > strlen(node->mime)))
 		return EINVAL;
-	}
 
 	length = user_strlcpy((char*)buffer, node->mime + pos, *_length);
-	if (length < B_OK) {
-		UNLOCK_VOL(vol);
+	if (length < B_OK)
 		return B_BAD_ADDRESS;
-	}
+
 	if (length < *_length)
 		*_length = length + 1;
 
-	UNLOCK_VOL(vol);
 	return 0;
 }
 

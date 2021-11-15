@@ -165,12 +165,6 @@ typedef struct _nspace {
 #define FS_FLAGS_OP_SYNC		0x1
 #define FS_FLAGS_LOCK_DOOR		0x2
 
-#define LOCK_VOL(vol) \
-	if (vol == NULL) { dprintf("null vol\n"); return EINVAL; } else LOCK((vol)->vlock)
-
-#define UNLOCK_VOL(vol) \
-	UNLOCK((vol)->vlock)
-
 #define TOUCH(x) ((void)(x))
 
 extern fs_vnode_ops gFATVnodeOps;

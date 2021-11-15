@@ -157,7 +157,6 @@ _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
 				// rewind to beginning of call
 				dprintf("error: long file name too long\n");
 
-				diri_free(iter);
 				diri_init(iter->csi.vol, iter->starting_cluster, start_index,
 					iter);
 				return ENAMETOOLONG;
@@ -297,8 +296,6 @@ check_dir_empty(nspace *vol, vnode *dir)
 		result = ENOTEMPTY;
 	}
 
-	diri_free(&iter);
-
 	return result;
 }
 
@@ -405,7 +402,6 @@ findfile(nspace *vol, vnode *dir, const char *file, ino_t *vnid,
 			if (found_file && (!check_dups || (check_dups && *dups_exist)))
 				break;
 		}
-		diri_free(&diri);
 	}
 	if (found_file) {
 		if (vnid)
@@ -448,7 +444,6 @@ erase_dir_entry(nspace *vol, vnode *node)
 	}
 
 	result = _next_dirent_(&diri, &info, filename, 512);
-	diri_free(&diri);
 
 	if (result < 0)
 		return result;
@@ -466,7 +461,6 @@ erase_dir_entry(nspace *vol, vnode *node)
 		diri_make_writable(&diri);
 		buffer[0] = 0xe5; // mark entry erased
 	}
-	diri_free(&diri);
 
 	return 0;
 }
@@ -533,7 +527,6 @@ compact_directory(nspace *vol, vnode *dir)
 			break;
 		}
 	}
-	diri_free(&diri);
 
 	return error;
 }
@@ -561,8 +554,6 @@ find_short_name(nspace *vol, vnode *dir, const uchar *name)
 
 		buffer = diri_next_entry(&diri);
 	}
-
-	diri_free(&diri);
 
 	return result;
 }
@@ -653,8 +644,6 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 
 	// if at end of directory, last_entry flag will be true as it should be
 
-	diri_free(&diri);
-
 	if (error != B_OK && error != ENOENT)
 		return error;
 
@@ -723,7 +712,6 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 	ASSERT(buffer != NULL);
 	if (buffer == NULL)	{	// this should never happen...
 		DPRINTF(0, ("_create_dir_entry_: the unthinkable has occured\n"));
-		diri_free(&diri);
 		return B_ERROR;
 	}
 
@@ -765,8 +753,6 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 			memset(buffer, 0, 0x20);
 		}
 	}
-
-	diri_free(&diri);
 
 	return 0;
 }
@@ -934,7 +920,7 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 	struct diri iter;
 	char filename[512]; /* need this for setting mime type */
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	_node->private_node = NULL;
 	_node->ops = &gFATVnodeOps;
@@ -946,7 +932,7 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 		dprintf("??? dosfs_read_vnode called on root node ???\n");
 		_node->private_node = (void *)&(vol->root_vnode);
 		*_type = make_mode(vol, &vol->root_vnode);
-		goto bi;
+		return result;
 	}
 
 	if (vcache_vnid_to_loc(vol, vnid, &loc) != B_OK)
@@ -955,15 +941,13 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 	if (IS_ARTIFICIAL_VNID(loc) || IS_INVALID_VNID(loc)) {
 		DPRINTF(0, ("dosfs_read_vnode: unknown vnid %" B_PRIdINO " (loc %"
 			B_PRIdINO ")\n", vnid, loc));
-		result = ENOENT;
-		goto bi;
+		return ENOENT;
 	}
 
 	if ((dir_vnid = dlist_find(vol, DIR_OF_VNID(loc))) == -1LL) {
 		DPRINTF(0, ("dosfs_read_vnode: unknown directory at cluster %" B_PRIu32
 			"\n", DIR_OF_VNID(loc)));
-		result = ENOENT;
-		goto bi;
+		return ENOENT;
 	}
 
 	if (diri_init(vol, DIR_OF_VNID(loc),
@@ -971,8 +955,7 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 			&iter) == NULL) {
 		dprintf("dosfs_read_vnode: error initializing directory for vnid %"
 			B_PRIdINO " (loc %" B_PRIdINO ")\n", vnid, loc);
-		result = ENOENT;
-		goto bi;
+		return ENOENT;
 	}
 
 	while (1) {
@@ -980,7 +963,7 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 		if (result < 0) {
 			dprintf("dosfs_read_vnode: error finding vnid %" B_PRIdINO
 				" (loc %" B_PRIdINO ") (%s)\n", vnid, loc, strerror(result));
-			goto bi2;
+			return result;
 		}
 
 		if (IS_DIR_CLUSTER_VNID(loc)) {
@@ -991,15 +974,13 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 				break;
 			dprintf("dosfs_read_vnode: error finding vnid %" B_PRIdINO
 				" (loc %" B_PRIdINO ") (%s)\n", vnid, loc, strerror(result));
-			result = ENOENT;
-			goto bi2;
+			return ENOENT;
 		}
 	}
 
 	if ((entry = (vnode *)calloc(sizeof(struct vnode), 1)) == NULL) {
 		DPRINTF(0, ("dosfs_read_vnode: out of memory\n"));
-		result = ENOMEM;
-		goto bi2;
+		return ENOMEM;
 	}
 
 	entry->vnid = vnid;
@@ -1045,15 +1026,7 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 	_node->private_node = entry;
 	*_type = make_mode(vol, entry);
 
-bi2:
-	diri_free(&iter);
-bi:
-	UNLOCK_VOL(vol);
-
-	if (result != B_OK)
-		DPRINTF(0, ("dosfs_read_vnode (%s)\n", strerror(result)));
-
-	return result;
+	return B_OK;
 }
 
 
@@ -1067,7 +1040,7 @@ dosfs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *_vnid)
 	vnode	*vnode = NULL;
 	status_t result = ENOENT;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_walk: find %" B_PRIdINO "/%s\n", dir->vnid, file));
 
@@ -1077,8 +1050,6 @@ dosfs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *_vnid)
 	} else {
 		DPRINTF(0, ("dosfs_walk: found vnid %" B_PRIdINO "\n", *_vnid));
 	}
-
-	UNLOCK_VOL(vol);
 
 	return result;
 }
@@ -1091,7 +1062,7 @@ dosfs_access(fs_volume *_vol, fs_vnode *_node, int mode)
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_access (vnode id %" B_PRIdINO ", mode %o)\n", node->vnid,
 		mode));
@@ -1108,8 +1079,6 @@ dosfs_access(fs_volume *_vol, fs_vnode *_node, int mode)
 			result = EPERM;
 		}
 	}
-
-	UNLOCK_VOL(vol);
 
 	return result;
 }
@@ -1132,10 +1101,8 @@ dosfs_opendir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 {
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
-	dircookie *cookie = NULL;
-	int result;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_opendir (vnode id %" B_PRIdINO ")\n", node->vnid));
 
@@ -1147,29 +1114,18 @@ dosfs_opendir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 		 * with the application than with the file system, anyway
 		 */
 		DPRINTF(0, ("dosfs_opendir error: vnode not a directory\n"));
-		result = ENOTDIR;
-		goto bi;
+		return ENOTDIR;
 	}
 
-	if ((cookie = (dircookie *)malloc(sizeof(dircookie))) == NULL) {
+	dircookie *cookie = (dircookie *)malloc(sizeof(dircookie));
+	if (cookie == NULL) {
 		DPRINTF(0, ("dosfs_opendir: out of memory error\n"));
-		result = ENOMEM;
-		goto bi;
+		return ENOMEM;
 	}
 
 	cookie->current_index = 0;
-
-	result = B_NO_ERROR;
-
-bi:
 	*_cookie = (void *)cookie;
-
-	if (result != B_OK)
-		DPRINTF(0, ("dosfs_opendir (%s)\n", strerror(result)));
-
-	UNLOCK_VOL(vol);
-
-	return result;
+	return B_OK;
 }
 
 
@@ -1183,7 +1139,7 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 	dircookie* 	cookie = (dircookie *)_cookie;
 	struct		diri diri;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_readdir: vnode id %" B_PRIdINO ", index %" B_PRIu32 "\n",
 		dir->vnid, cookie->current_index));
@@ -1203,8 +1159,7 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 			*num = 1;
 			entry->d_ino = vol->root_vnode.vnid;
 			entry->d_dev = vol->id;
-			result = B_NO_ERROR;
-			goto bi;
+			return B_NO_ERROR;
 		}
 	}
 
@@ -1213,15 +1168,13 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 		// When you get to the end, don't return an error, just return 0
 		// in *num.
 		*num = 0;
-		result = B_NO_ERROR;
-		goto bi;
+		return B_NO_ERROR;
 	}
 
 	result = get_next_dirent(vol, dir, &diri, &entry->d_ino, entry->d_name,
 		bufsize - sizeof(struct dirent) - 1);
 
 	cookie->current_index = diri.current_index;
-	diri_free(&diri);
 
 	if (dir->vnid == vol->root_vnode.vnid)
 		cookie->current_index += 2;
@@ -1235,17 +1188,13 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 		// When you get to the end, don't return an error, just return 0
 		// in *num.
 		*num = 0;
-		result = B_NO_ERROR;
+		return B_OK;
 	} else {
 		dprintf("dosfs_readdir: error returned by get_next_dirent (%s)\n",
 			strerror(result));
 	}
-bi:
-	if (result != B_OK) DPRINTF(0, ("dosfs_readdir (%s)\n", strerror(result)));
 
-	UNLOCK_VOL(vol);
-
-	return result;
+	return B_OK;
 }
 
 
@@ -1256,13 +1205,11 @@ dosfs_rewinddir(fs_volume *_vol, fs_vnode *_node, void* _cookie)
 	vnode		*node = (vnode *)_node->private_node;
 	dircookie	*cookie = (dircookie *)_cookie;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_rewinddir (vnode id %" B_PRIdINO ")\n", node->vnid));
 
 	cookie->current_index = 0;
-
-	UNLOCK_VOL(vol);
 
 	return B_OK;
 }
@@ -1286,15 +1233,12 @@ dosfs_free_dircookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 	vnode *node = (vnode *)_node->private_node;
 	dircookie *cookie = (dircookie *)_cookie;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_free_dircookie (vnode id %" B_PRIdINO ")\n",
 		node->vnid));
 
 	free(cookie);
 
-	UNLOCK_VOL(vol);
-
 	return 0;
 }
-
