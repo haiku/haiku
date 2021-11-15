@@ -196,7 +196,7 @@ fs_mount(fs_volume* _volume, const char* device, uint32 flags,
 	volume->lowntfs.current_close_state_vnode = NULL;
 
 	volume->lowntfs.vol = volume->ntfs;
-	volume->lowntfs.abs_mnt_point = NULL;
+	volume->ntfs->abs_mnt_point = volume->lowntfs.abs_mnt_point = strdup("");
 	volume->lowntfs.dmask = 0;
 	volume->lowntfs.fmask = S_IXUSR | S_IXGRP | S_IXOTH;
 	volume->lowntfs.dmtime = 0;
