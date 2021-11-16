@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2021, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FEATURES_H
@@ -12,21 +12,12 @@
 	#define _DEFAULT_SOURCE
 #endif
 
-#if defined(_GNU_SOURCE)
-       #undef _ISOC11_SOURCE
-       #define _ISOC11_SOURCE
-       #undef _DEFAULT_SOURCE
-       #define _DEFAULT_SOURCE
-#endif
 
-#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) \
+		|| (defined(__cplusplus) && __cplusplus >= 201103L)
 	#undef _ISOC11_SOURCE
 	#define _ISOC11_SOURCE
 #endif
 
-#if defined(__cplusplus) && __cplusplus >= 201703L
-       #undef _ISOC11_SOURCE
-       #define _ISOC11_SOURCE
-#endif
 
 #endif // _FEATURES_H
