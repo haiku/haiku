@@ -125,7 +125,7 @@ rule ArchitectureSetup architecture
 			-Wno-error=deprecated -Wno-error=deprecated-declarations
 			-Wno-error=cpp -Wno-error=trigraphs -Wno-error=register ;
 		# These currently generate too many "false positives."
-		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=address-of-packed-member ;
+		#HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=address-of-packed-member ;
 		# But these can stay.
 		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=cast-align
 			-Wno-error=format-truncation ;
