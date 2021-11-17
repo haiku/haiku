@@ -1,4 +1,6 @@
 /*-
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1993
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -10,11 +12,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -32,6 +30,7 @@
  */
 
 
+#include <sys/cdefs.h>
 #include <err.h>
 #include <errno.h>
 #include <stdarg.h>
@@ -81,10 +80,7 @@ _err(int eval, const char *fmt, ...)
 }
 
 void
-verr(eval, fmt, ap)
-	int eval;
-	const char *fmt;
-	va_list ap;
+verr(int eval, const char *fmt, va_list ap)
 {
 	verrc(eval, errno, fmt, ap);
 }
@@ -99,14 +95,10 @@ errc(int eval, int code, const char *fmt, ...)
 }
 
 void
-verrc(eval, code, fmt, ap)
-	int eval;
-	int code;
-	const char *fmt;
-	va_list ap;
+verrc(int eval, int code, const char *fmt, va_list ap)
 {
-	if (err_file == 0)
-		err_set_file((FILE *)0);
+	if (err_file == NULL)
+		err_set_file(NULL);
 	fprintf(err_file, "%s: ", _getprogname());
 	if (fmt != NULL) {
 		vfprintf(err_file, fmt, ap);
@@ -128,13 +120,10 @@ errx(int eval, const char *fmt, ...)
 }
 
 void
-verrx(eval, fmt, ap)
-	int eval;
-	const char *fmt;
-	va_list ap;
+verrx(int eval, const char *fmt, va_list ap)
 {
-	if (err_file == 0)
-		err_set_file((FILE *)0);
+	if (err_file == NULL)
+		err_set_file(NULL);
 	fprintf(err_file, "%s: ", _getprogname());
 	if (fmt != NULL)
 		vfprintf(err_file, fmt, ap);
@@ -156,9 +145,7 @@ _warn(const char *fmt, ...)
 }
 
 void
-vwarn(fmt, ap)
-	const char *fmt;
-	va_list ap;
+vwarn(const char *fmt, va_list ap)
 {
 	vwarnc(errno, fmt, ap);
 }
@@ -173,19 +160,20 @@ warnc(int code, const char *fmt, ...)
 }
 
 void
-vwarnc(code, fmt, ap)
-	int code;
-	const char *fmt;
-	va_list ap;
+vwarnc(int code, const char *fmt, va_list ap)
 {
-	if (err_file == 0)
-		err_set_file((FILE *)0);
+	int saved_errno;
+
+	saved_errno = errno;
+	if (err_file == NULL)
+		err_set_file(NULL);
 	fprintf(err_file, "%s: ", _getprogname());
 	if (fmt != NULL) {
 		vfprintf(err_file, fmt, ap);
 		fprintf(err_file, ": ");
 	}
 	fprintf(err_file, "%s\n", strerror(code));
+	errno = saved_errno;
 }
 
 void
@@ -198,17 +186,16 @@ warnx(const char *fmt, ...)
 }
 
 void
-vwarnx(fmt, ap)
-	const char *fmt;
-	va_list ap;
+vwarnx(const char *fmt, va_list ap)
 {
-	if (err_file == 0)
-		err_set_file((FILE *)0);
+	int saved_errno;
+
+	saved_errno = errno;
+	if (err_file == NULL)
+		err_set_file(NULL);
 	fprintf(err_file, "%s: ", _getprogname());
 	if (fmt != NULL)
 		vfprintf(err_file, fmt, ap);
 	fprintf(err_file, "\n");
+	errno = saved_errno;
 }
-
-#pragma weak err=_err
-#pragma weak warn=_warn
