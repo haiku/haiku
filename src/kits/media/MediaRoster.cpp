@@ -1561,7 +1561,7 @@ BMediaRoster::PrerollNode(const media_node& node)
 	if (IS_INVALID_NODE(node))
 		return B_MEDIA_BAD_NODE;
 
-	char dummy;
+	char dummy = 0;
 	return write_port(node.port, NODE_PREROLL, &dummy, sizeof(dummy));
 }
 
