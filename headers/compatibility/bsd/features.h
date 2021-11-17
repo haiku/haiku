@@ -6,7 +6,7 @@
 #define _FEATURES_H
 
 
-#if defined(_BSD_SOURCE) \
+#if defined(_BSD_SOURCE) || defined(_GNU_SOURCE) \
 	|| (!defined(__STRICT_ANSI__) && !defined(_POSIX_C_SOURCE))
 	#undef _DEFAULT_SOURCE
 	#define _DEFAULT_SOURCE
