@@ -2967,7 +2967,7 @@ _user_debug_thread(thread_id threadID)
 void
 _user_wait_for_debugger(void)
 {
-	debug_thread_debugged message;
+	debug_thread_debugged message = {};
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_DEBUGGED, &message,
 		sizeof(message), false);
 }
