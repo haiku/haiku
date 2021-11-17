@@ -143,7 +143,7 @@ PaletteConverter::SetTo(const rgb_color *palette)
 	if (error == B_OK) {
 		fColorMap = fOwnColorMap;
 		// init color list
-		memcpy(fOwnColorMap->color_list, palette, sizeof(rgb_color) * 256);
+		memcpy((void*)fOwnColorMap->color_list, palette, sizeof(rgb_color) * 256);
 		// init index map
 // TODO: build this list takes about 2 seconds in qemu on my system
 //		(because of color_distance())
