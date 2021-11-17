@@ -22,8 +22,8 @@ const rgb_color kWhite = (rgb_color){ 255, 255, 255, 255 };
 
 /*!
 	\brief Void constructor
-	
-	The pattern is set to B_SOLID_HIGH, high color is set to black, and 
+
+	The pattern is set to B_SOLID_HIGH, high color is set to black, and
 	low color is set to white.
 */
 PatternHandler::PatternHandler(void)
@@ -34,14 +34,14 @@ PatternHandler::PatternHandler(void)
 	  fYOffset(0),
 	  fColorsWhenCached(ULONGLONG_MAX)
 {
-	memset(fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
+	memset((void*)fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 /*!
 	\brief Constructor initializes to given pattern
 	\param pat Pattern to use.
-	
-	This initializes to the given pattern or B_SOLID_HIGH if the pattern 
+
+	This initializes to the given pattern or B_SOLID_HIGH if the pattern
 	is NULL. High color is set to black, and low color is set to white.
 */
 PatternHandler::PatternHandler(const int8* pat)
@@ -52,14 +52,14 @@ PatternHandler::PatternHandler(const int8* pat)
 	  fYOffset(0),
 	  fColorsWhenCached(ULONGLONG_MAX)
 {
-	memset(fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
+	memset((void*)fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 /*!
 	\brief Constructor initializes to given pattern
 	\param pat Pattern to use.
-	
-	This initializes to the given pattern or B_SOLID_HIGH if the pattern 
+
+	This initializes to the given pattern or B_SOLID_HIGH if the pattern
 	is NULL. High color is set to black, and low color is set to white.
 */
 PatternHandler::PatternHandler(const uint64& pat)
@@ -70,13 +70,13 @@ PatternHandler::PatternHandler(const uint64& pat)
 	  fYOffset(0),
 	  fColorsWhenCached(ULONGLONG_MAX)
 {
-	memset(fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
+	memset((void*)fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 /*!
 	\brief Constructor initializes to given pattern
 	\param pat Pattern to use.
-	
+
 	This initializes to the given Pattern.
 	High color is set to black, and low color is set to white.
 */
@@ -88,13 +88,13 @@ PatternHandler::PatternHandler(const Pattern& pat)
 	  fYOffset(0),
 	  fColorsWhenCached(ULONGLONG_MAX)
 {
-	memset(fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
+	memset((void*)fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 /*!
 	\brief Constructor initializes to given PatternHandler
 	\param other PatternHandler to copy.
-	
+
 	Copy constructor.
 */
 PatternHandler::PatternHandler(const PatternHandler& other)
@@ -105,7 +105,7 @@ PatternHandler::PatternHandler(const PatternHandler& other)
 	  fYOffset(other.fYOffset),
 	  fColorsWhenCached(ULONGLONG_MAX)
 {
-	memset(fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
+	memset((void*)fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 //! Destructor does nothing
@@ -116,8 +116,8 @@ PatternHandler::~PatternHandler(void)
 /*!
 	\brief Sets the pattern for the handler to the one given
 	\param pat Pattern to use.
-	
-	This initializes to the given pattern or B_SOLID_HIGH if the pattern 
+
+	This initializes to the given pattern or B_SOLID_HIGH if the pattern
 	is NULL.
 */
 void
