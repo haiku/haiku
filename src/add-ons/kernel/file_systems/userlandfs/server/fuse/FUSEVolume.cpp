@@ -20,6 +20,8 @@
 #include "../kernel_emu.h"
 #include "../RequestThread.h"
 
+#define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
+
 
 // TODO: For remote/shared file systems (sshfs, nfs, etc.) we need to notice
 // that entries have been added/removed, so that we can (1) update our
@@ -110,7 +112,7 @@ struct FUSEVolume::DirEntryCache {
 
 		// align the size, if requested
 		if (align)
-			size = std::min(bufferSize, (size + 7) / 8 * 8);
+			size = std::min(bufferSize, ROUNDUP(size, 8));
 
 		// fill in the dirent
 		buffer->d_dev = volumeID;
@@ -254,7 +256,7 @@ struct FUSEVolume::AttrDirCookie : RWLockable {
 
 		// align the size, if requested
 		if (align)
-			size = std::min(bufferSize, (size + 7) / 8 * 8);
+			size = std::min(bufferSize, ROUNDUP(size, 8));
 
 		// fill in the dirent
 		buffer->d_dev = volumeID;
@@ -3106,7 +3108,7 @@ FUSEVolume::_AddReadDirEntry(ReadDirBuffer* buffer, const char* name, int type,
 
 		if (buffer->entriesRead + 1 < buffer->maxEntries) {
 			// align the entry length, so the next dirent will be aligned
-			entryLen = (entryLen + 7) / 8 * 8;
+			entryLen = ROUNDUP(entryLen, 8);
 			entryLen = std::min(entryLen,
 				buffer->bufferSize - buffer->usedSize);
 		}
