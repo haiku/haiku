@@ -8,6 +8,8 @@
 
 #include <SupportDefs.h>
 
+#define B_ALWAYS_INLINE __attribute__((always_inline)) inline
+
 
 enum {
 	modeU = 0,
