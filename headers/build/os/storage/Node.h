@@ -28,11 +28,7 @@ struct node_ref {
 	bool operator!=(const node_ref &ref) const;
 	node_ref& operator=(const node_ref &ref);
 
-	bool operator<(const node_ref &ref) const
-	{
-		return device < ref.device
-			|| (device == ref.device && node < ref.node);
-	}
+	bool operator<(const node_ref &ref) const;
 
 	dev_t device;
 	ino_t node;
