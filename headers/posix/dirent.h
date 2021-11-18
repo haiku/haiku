@@ -15,7 +15,11 @@ typedef struct dirent {
 	ino_t			d_ino;		/* inode number */
 	ino_t			d_pino;		/* parent inode (only for queries) */
 	unsigned short	d_reclen;	/* length of this record, not the name */
-	char			d_name[1];	/* name of the entry (null byte terminated) */
+#if __GNUC__ == 2
+	char			d_name[0];	/* name of the entry (null byte terminated) */
+#else
+	char			d_name[];	/* name of the entry (null byte terminated) */
+#endif
 } dirent_t;
 
 typedef struct __DIR DIR;
