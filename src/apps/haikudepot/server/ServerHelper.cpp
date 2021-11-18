@@ -116,20 +116,20 @@ ServerHelper::NotifyTransportError(status_t error)
 /*static*/ void
 ServerHelper::AlertTransportError(BMessage* message)
 {
-	status_t errno = B_OK;
+	status_t error = B_OK;
 	int64 errnoInt64;
 	message->FindInt64("errno", &errnoInt64);
-	errno = (status_t) errnoInt64;
+	error = (status_t) errnoInt64;
 
 	BString errorDescription("?");
 	BString alertText;
 
-	switch (errno) {
+	switch (error) {
 		case HD_NETWORK_INACCESSIBLE:
 			errorDescription = B_TRANSLATE("Network error");
 			break;
 		default:
-			errorDescription.SetTo(strerror(errno));
+			errorDescription.SetTo(strerror(error));
 			break;
 	}
 
