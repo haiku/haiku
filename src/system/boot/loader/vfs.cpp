@@ -42,8 +42,10 @@ using namespace boot;
 struct __DIR {
 	Directory*	directory;
 	void*		cookie;
-	dirent		entry;
-	char		nameBuffer[B_FILE_NAME_LENGTH - 1];
+	union {
+		dirent		entry;
+		char		nameBuffer[sizeof(dirent) + B_FILE_NAME_LENGTH - 1];
+	};
 };
 
 
