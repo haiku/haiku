@@ -14,8 +14,6 @@
 #include <fcntl.h>
 #include <string.h>
 
-#include <compat/sys/stat.h>
-
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
@@ -223,19 +221,6 @@ BDirectory::GetEntry(BEntry* entry) const
 	if (InitCheck() != B_OK)
 		return B_NO_INIT;
 	return entry->SetTo(this, ".", false);
-}
-
-
-bool
-BDirectory::IsRootDirectory() const
-{
-	// compare the directory's node ID with the ID of the root node of the FS
-	bool result = false;
-	node_ref ref;
-	fs_info info;
-	if (GetNodeRef(&ref) == B_OK && fs_stat_dev(ref.device, &info) == 0)
-		result = (ref.node == info.root);
-	return result;
 }
 
 

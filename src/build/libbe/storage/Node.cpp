@@ -16,8 +16,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <compat/sys/stat.h>
-
 #include <Directory.h>
 #include <Entry.h>
 #include <fs_attr.h>

@@ -36,8 +36,6 @@ class BDirectory : public BNode, public BEntryList {
 
 		status_t GetEntry(BEntry *entry) const;
 
-		bool IsRootDirectory() const;
-
 		status_t FindEntry(const char *path, BEntry *entry,
 			bool traverse = false) const;
 
