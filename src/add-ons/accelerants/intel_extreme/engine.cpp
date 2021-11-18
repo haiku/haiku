@@ -191,7 +191,7 @@ setup_ring_buffer(ring_buffer &ringBuffer, const char* name)
 
 /*! Return number of hardware engines */
 uint32
-intel_accelerant_engine_count(void) 
+intel_accelerant_engine_count(void)
 {
 	CALLED();
 	return 1;
