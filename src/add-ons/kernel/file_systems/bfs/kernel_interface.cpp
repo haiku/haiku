@@ -1737,7 +1737,7 @@ bfs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	while (count < maxCount && bufferSize > sizeof(struct dirent)) {
 		ino_t id;
 		uint16 length;
-		size_t nameBufferSize = bufferSize - sizeof(struct dirent) + 1;
+		size_t nameBufferSize = bufferSize - sizeof(struct dirent);
 
 		status_t status = iterator->GetNextEntry(dirent->d_name, &length,
 			nameBufferSize, &id);
@@ -1759,7 +1759,7 @@ bfs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = id;
-		dirent->d_reclen = sizeof(struct dirent) + length;
+		dirent->d_reclen = sizeof(struct dirent) + length + 1;
 
 		bufferSize -= dirent->d_reclen;
 		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
@@ -1867,7 +1867,7 @@ bfs_read_attr_dir(fs_volume* _volume, fs_vnode* node, void* _cookie,
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	dirent->d_dev = volume->ID();
-	dirent->d_reclen = sizeof(struct dirent) + length;
+	dirent->d_reclen = sizeof(struct dirent) + length + 1;
 
 	*_num = 1;
 	return B_OK;

@@ -1442,7 +1442,7 @@ ext2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 	while (count < maxCount && bufferSize > sizeof(struct dirent)) {
 
-		size_t length = bufferSize - sizeof(struct dirent) + 1;
+		size_t length = bufferSize - sizeof(struct dirent);
 		ino_t id;
 
 		status_t status = iterator->GetNext(dirent->d_name, &length, &id);
@@ -1465,7 +1465,7 @@ ext2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = id;
-		dirent->d_reclen = sizeof(struct dirent) + length;
+		dirent->d_reclen = sizeof(struct dirent) + length + 1;
 
 		bufferSize -= dirent->d_reclen;
 		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
@@ -1565,7 +1565,7 @@ ext2_read_attr_dir(fs_volume* _volume, fs_vnode* _node,
 
 	dirent->d_dev = volume->ID();
 	dirent->d_ino = inode->ID();
-	dirent->d_reclen = sizeof(struct dirent) + length;
+	dirent->d_reclen = sizeof(struct dirent) + length + 1;
 
 	*_num = 1;
 	*(int32*)_cookie = index + 1;

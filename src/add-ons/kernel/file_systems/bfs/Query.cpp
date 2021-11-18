@@ -673,7 +673,7 @@ Equation::GetNextMatching(Volume* volume, TreeIterator* iterator,
 				FATAL(("inode %" B_PRIdOFF " in query has no name!\n",
 					inode->BlockNumber()));
 			} else {
-				dirent->d_reclen += strlen(dirent->d_name);
+				dirent->d_reclen += strlen(dirent->d_name) + 1;
 			}
 		}
 

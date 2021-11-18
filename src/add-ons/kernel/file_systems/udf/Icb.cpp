@@ -30,7 +30,7 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 	if (fAtBeginning) {
 		TRACE(("DirectoryIterator::GetNextEntry: .\n"));
 		sprintf(name, ".");
-		*length = 2;
+		*length = 1;
 		*id = Parent()->Id();
 		fAtBeginning = false;
 	} else {
@@ -58,7 +58,7 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 			if (entry->is_parent()) {
 				TRACE(("DirectoryIterator::GetNextEntry: ..\n"));
 				sprintf(name, "..");
-				*length = 3;
+				*length = 2;
 			} else {
 				UdfString string(entry->id(), entry->id_length());
 				TRACE(("DirectoryIterator::GetNextEntry: UfdString id == `%s', "

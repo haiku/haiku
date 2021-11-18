@@ -1232,8 +1232,8 @@ fs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 		dirent->d_dev = _volume->id;
 		dirent->d_ino = cookie->current->inode;
-		strlcpy(dirent->d_name, cookie->current->name, length + 1);
-		dirent->d_reclen = sizeof(struct dirent) + length;
+		strlcpy(dirent->d_name, cookie->current->name, length);
+		dirent->d_reclen = sizeof(struct dirent) + length + 1;
 
 		bufferSize -= dirent->d_reclen;
 		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);

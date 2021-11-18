@@ -380,8 +380,8 @@ ufs2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	uint32 count = 0;
 
 	while (count < maxCount
-		&& (bufferSize >= sizeof(struct dirent) + B_FILE_NAME_LENGTH)) {
-		size_t length = bufferSize;
+			&& (bufferSize >= sizeof(struct dirent) + B_FILE_NAME_LENGTH)) {
+		size_t length = bufferSize - sizeof(struct dirent);
 		ino_t iNodeNo;
 
 		status_t status = iterator->GetNext(dirent->d_name, &length, &iNodeNo);
@@ -397,7 +397,7 @@ ufs2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = iNodeNo;
-		dirent->d_reclen = sizeof(struct dirent) + length;
+		dirent->d_reclen = sizeof(struct dirent) + length + 1;
 		bufferSize -= dirent->d_reclen;
 		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
 		count++;

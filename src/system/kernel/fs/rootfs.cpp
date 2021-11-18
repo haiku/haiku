@@ -790,7 +790,7 @@ rootfs_read_dir(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
 
 	dirent->d_dev = fs->id;
 	dirent->d_ino = childNode->id;
-	dirent->d_reclen = strlen(name) + sizeof(struct dirent);
+	dirent->d_reclen = strlen(name) + 1 + sizeof(struct dirent);
 
 	if (dirent->d_reclen > bufferSize)
 		return ENOBUFS;

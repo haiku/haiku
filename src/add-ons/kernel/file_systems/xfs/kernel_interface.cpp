@@ -428,7 +428,7 @@ xfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	uint32 count = 0;
 
 	while (count < maxCount && (bufferSize > sizeof(struct dirent))) {
-		size_t length = bufferSize - sizeof(struct dirent) + 1;
+		size_t length = bufferSize - sizeof(struct dirent);
 		xfs_ino_t ino;
 
 		status_t status = iterator->GetNext(buffer->d_name, &length, &ino);
@@ -444,7 +444,7 @@ xfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 		buffer->d_dev = volume->ID();
 		buffer->d_ino = ino;
-		buffer->d_reclen = sizeof(struct dirent) + length;
+		buffer->d_reclen = sizeof(struct dirent) + length + 1;
 		bufferSize -= buffer->d_reclen;
 		buffer = (struct dirent*)((uint8*)buffer + buffer->d_reclen);
 		count++;
