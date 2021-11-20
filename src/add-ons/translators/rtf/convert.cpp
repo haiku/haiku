@@ -802,7 +802,7 @@ status_t convert_styled_text_to_rtf(
 			rtfFile << " " << segment;
 		}
 
-		delete styles;
+		BTextView::FreeRunArray(styles);
 
 		rtfFile << "}";
 	} else {
