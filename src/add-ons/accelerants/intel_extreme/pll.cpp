@@ -700,8 +700,8 @@ static void hsw_wrpll_update_rnp(uint64 freq2k, unsigned int budget,
 	 */
 	a = freq2k * budget * p * r2;
 	b = freq2k * budget * best->p * best->r2;
-	diff = abs((uint64)freq2k * p * r2 - LC_FREQ_2K * n2);
-	diff_best = abs((uint64)freq2k * best->p * best->r2 -
+	diff = labs((uint64)freq2k * p * r2 - LC_FREQ_2K * n2);
+	diff_best = labs((uint64)freq2k * best->p * best->r2 -
 			     LC_FREQ_2K * best->n2);
 	c = 1000000 * diff;
 	d = 1000000 * diff_best;
@@ -812,7 +812,7 @@ static void skl_wrpll_try_divider(struct skl_wrpll_context *ctx,
 {
 	uint64 deviation;
 
-	deviation = ((uint64)10000 * abs(dco_freq - central_freq)
+	deviation = ((uint64)10000 * labs(dco_freq - central_freq)
 			      / (uint64)central_freq);
 
 	/* positive deviation */
