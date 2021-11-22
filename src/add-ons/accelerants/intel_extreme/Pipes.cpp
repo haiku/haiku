@@ -462,6 +462,17 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 }
 
 void
+Pipe::ConfigureClocksSKL(const skl_wrpll_params& wrpll_params, uint32 pixelClock,
+	uint32 extraFlags)
+{
+	CALLED();
+
+	TRACE("Skylake DPLL_CTRL1: 0x%" B_PRIx32 "\n", read32(SKL_DPLL_CTRL1));
+	TRACE("Skylake DPLL_CTRL2: 0x%" B_PRIx32 "\n", read32(SKL_DPLL_CTRL2));
+	TRACE("Skylake DPLL_STATUS: 0x%" B_PRIx32 "\n", read32(SKL_DPLL_STATUS));
+}
+
+void
 Pipe::Enable(bool enable)
 {
 	CALLED();

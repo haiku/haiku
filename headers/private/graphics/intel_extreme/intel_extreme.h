@@ -512,7 +512,7 @@ struct intel_free_graphics_memory {
 #define LVDS_18BIT_DITHER				(1UL << 25)
 #define LVDS_PORT_EN					(1UL << 31)
 
-// PLL flags
+// PLL flags (pre-DDI)
 #define DISPLAY_PLL_ENABLED				(1UL << 31)
 #define DISPLAY_PLL_2X_CLOCK			(1UL << 30)
 #define DISPLAY_PLL_SYNC_LOCK_ENABLED	(1UL << 29)
@@ -539,6 +539,17 @@ struct intel_free_graphics_memory {
 #define DISPLAY_PLL_M1_DIVISOR_SHIFT	8
 #define DISPLAY_PLL_M2_DIVISOR_SHIFT	0
 #define DISPLAY_PLL_PULSE_PHASE_SHIFT	9
+
+// Skylake PLLs
+#define SKL_DPLL1_CFGCR1				(0xc040 | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL1_CFGCR2				(0xc044 | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL2_CFGCR1				(0xc048 | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL2_CFGCR2				(0xc04c | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL3_CFGCR1				(0xc050 | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL3_CFGCR2				(0xc054 | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL_CTRL1					(0xc058 | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL_CTRL2					(0xc05c | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL_STATUS					(0xc060 | REGS_NORTH_PIPE_AND_PORT)
 
 // display
 
