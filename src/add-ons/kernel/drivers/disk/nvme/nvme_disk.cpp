@@ -155,6 +155,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 {
 	CALLED();
 	nvme_disk_driver_info* info = (nvme_disk_driver_info*)_info;
+	ASSERT(info->ctrlr == NULL);
 
 	pci_device_module_info* pci;
 	pci_device* pcidev;
@@ -838,6 +839,7 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 static status_t
 nvme_disk_flush(nvme_disk_driver_info* info)
 {
+	CALLED();
 	status_t status = EINPROGRESS;
 
 	qpair_info* qpinfo = get_qpair(info);
