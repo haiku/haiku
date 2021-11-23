@@ -854,6 +854,77 @@ nvme_disk_flush(nvme_disk_driver_info* info)
 
 
 static status_t
+nvme_disk_trim(nvme_disk_driver_info* info, fs_trim_data* trimData)
+{
+	CALLED();
+	trimData->trimmed_size = 0;
+
+	const off_t deviceSize = info->capacity * info->block_size; // in bytes
+	if (deviceSize < 0)
+		return B_BAD_VALUE;
+
+	STATIC_ASSERT(sizeof(deviceSize) <= sizeof(uint64));
+	ASSERT(deviceSize >= 0);
+
+	// Do not trim past device end.
+	for (uint32 i = 0; i < trimData->range_count; i++) {
+		uint64 offset = trimData->ranges[i].offset;
+		uint64& size = trimData->ranges[i].size;
+
+		if (offset >= (uint64)deviceSize)
+			return B_BAD_VALUE;
+		size = std::min(size, (uint64)deviceSize - offset);
+	}
+
+	// We need contiguous memory for the DSM ranges.
+	nvme_dsm_range* dsmRanges = (nvme_dsm_range*)nvme_mem_alloc_node(
+		trimData->range_count * sizeof(nvme_dsm_range), 0, 0, NULL);
+	if (dsmRanges == NULL)
+		return B_NO_MEMORY;
+	CObjectDeleter<void, void, nvme_free> dsmRangesDeleter(dsmRanges);
+
+	uint64 trimmingSize = 0;
+	for (uint32 i = 0; i < trimData->range_count; i++) {
+		uint64 offset = trimData->ranges[i].offset;
+		uint64 length = trimData->ranges[i].size;
+
+		// Round up offset and length to the block size.
+		// (Some space at the beginning and end may thus not be trimmed.)
+		offset = ROUNDUP(offset, info->block_size);
+		length -= offset - trimData->ranges[i].offset;
+		length = ROUNDDOWN(length, info->block_size);
+
+		if (length == 0)
+			continue;
+		if ((length / info->block_size) > UINT32_MAX)
+			length = uint64(UINT32_MAX) * info->block_size;
+			// TODO: Break into smaller trim ranges!
+
+		TRACE("trim %" B_PRIu64 " bytes from %" B_PRIu64 "\n", length, offset);
+
+		dsmRanges[i].attributes = 0;
+		dsmRanges[i].length = length / info->block_size;
+		dsmRanges[i].starting_lba = offset / info->block_size;
+
+		trimmingSize += dsmRanges[i].length;
+	}
+
+	status_t status = EINPROGRESS;
+	qpair_info* qpair = get_qpair(info);
+	if (nvme_ns_deallocate(info->ns, qpair->qpair, dsmRanges, trimData->range_count,
+			(nvme_cmd_cb)io_finished_callback, &status) != 0)
+		return B_IO_ERROR;
+
+	await_status(info, qpair->qpair, status);
+	if (status != B_OK)
+		return status;
+
+	trimData->trimmed_size = trimmingSize;
+	return B_OK;
+}
+
+
+static status_t
 nvme_disk_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 {
 	CALLED();
@@ -914,6 +985,10 @@ nvme_disk_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 		case B_FLUSH_DRIVE_CACHE:
 			return nvme_disk_flush(info);
+
+		case B_TRIM_DEVICE:
+			ASSERT(IS_KERNEL_ADDRESS(buffer));
+			return nvme_disk_trim(info, (fs_trim_data*)buffer);
 	}
 
 	return B_DEV_INVALID_IOCTL;
