@@ -310,7 +310,7 @@ BNode::GetNextAttrName(char* buffer)
 		return B_FILE_ERROR;
 
 	BPrivate::Storage::LongDirEntry longEntry;
-	struct dirent* entry = &longEntry.dirent;
+	struct dirent* entry = longEntry.dirent();
 	ssize_t result = _kern_read_dir(fAttrFd, entry, sizeof(longEntry), 1);
 	if (result < 0)
 		return result;

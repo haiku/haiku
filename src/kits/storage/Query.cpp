@@ -349,7 +349,7 @@ BQuery::GetNextRef(entry_ref* ref)
 		error = B_FILE_ERROR;
 	if (error == B_OK) {
 		BPrivate::Storage::LongDirEntry longEntry;
-		struct dirent* entry = &longEntry.dirent;
+		struct dirent* entry = longEntry.dirent();
 		bool next = true;
 		while (error == B_OK && next) {
 			if (GetNextDirents(entry, sizeof(longEntry), 1) != 1) {

@@ -42,10 +42,9 @@ using namespace boot;
 struct __DIR {
 	Directory*	directory;
 	void*		cookie;
-	union {
-		dirent		entry;
-		char		nameBuffer[sizeof(dirent) + B_FILE_NAME_LENGTH - 1];
-	};
+
+	char		_direntBuffer[sizeof(dirent) + B_FILE_NAME_LENGTH + 1];
+	dirent*		entry() { return (dirent*)_direntBuffer; }
 };
 
 
@@ -1260,33 +1259,33 @@ readdir(DIR* dir)
 
 	for (;;) {
 		status_t error = dir->directory->GetNextEntry(dir->cookie,
-			dir->entry.d_name, B_FILE_NAME_LENGTH);
+			dir->entry()->d_name, B_FILE_NAME_LENGTH);
 		if (error != B_OK) {
 			errno = error;
 			return NULL;
 		}
 
-		dir->entry.d_pdev = 0;
+		dir->entry()->d_pdev = 0;
 			// not supported
-		dir->entry.d_pino = dir->directory->Inode();
-		dir->entry.d_dev = dir->entry.d_pdev;
+		dir->entry()->d_pino = dir->directory->Inode();
+		dir->entry()->d_dev = dir->entry()->d_pdev;
 			// not supported
 
-		if (strcmp(dir->entry.d_name, ".") == 0
-				|| strcmp(dir->entry.d_name, "..") == 0) {
+		if (strcmp(dir->entry()->d_name, ".") == 0
+				|| strcmp(dir->entry()->d_name, "..") == 0) {
 			// Note: That's obviously not correct for "..", but we can't
 			// retrieve that information.
-			dir->entry.d_ino = dir->entry.d_pino;
+			dir->entry()->d_ino = dir->entry()->d_pino;
 		} else {
-			Node* node = dir->directory->Lookup(dir->entry.d_name, false);
+			Node* node = dir->directory->Lookup(dir->entry()->d_name, false);
 			if (node == NULL)
 				continue;
 
-			dir->entry.d_ino = node->Inode();
+			dir->entry()->d_ino = node->Inode();
 			node->Release();
 		}
 
-		return &dir->entry;
+		return dir->entry();
 	}
 }
 

@@ -209,7 +209,7 @@ VirtualDirectoryPoseView::_EntryCreated(const BMessage* message)
 			return true;
 
 		BPrivate::Storage::LongDirEntry longEntry;
-		struct dirent* entry = &longEntry.dirent;
+		struct dirent* entry = longEntry.dirent();
 		while (directory.GetNextDirents(entry, sizeof(longEntry), 1) == 1) {
 			if (strcmp(entry->d_name, ".") != 0
 				&& strcmp(entry->d_name, "..") != 0) {

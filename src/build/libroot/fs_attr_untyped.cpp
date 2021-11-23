@@ -129,10 +129,10 @@ class AttributeDirectory;
 typedef map<DIR*, AttributeDirectory*> AttrDirMap;
 static AttrDirMap sAttributeDirectories;
 
-// LongDirent
-union LongDirent {
-	struct dirent dirent;
-	char _[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+// LongDirEntry
+struct LongDirEntry {
+	char _[sizeof(struct dirent) + B_FILE_NAME_LENGTH + 1];
+	struct dirent* dirent() { return (struct dirent*)_; }
 };
 
 // AttributeHeader
@@ -260,11 +260,11 @@ public:
 			}
 
 			// prepare the dirent
-			strcpy(fDirent.dirent.d_name, name);
-			fDirent.dirent.d_ino = 0;
+			strcpy(fDirent.dirent()->d_name, name);
+			fDirent.dirent()->d_ino = 0;
 // TODO: We need the node ID!
 
-			*_entry = &fDirent.dirent;
+			*_entry = fDirent.dirent();
 			return B_OK;
 		}
 
@@ -309,7 +309,7 @@ private:
 	int			fFileFD;
 	string		fPath;
 	DIR*		fFakeDir;
-	LongDirent	fDirent;
+	LongDirEntry fDirent;
 	char*		fListing;
 	int			fListingLength;
 	int			fListingIndex;

@@ -110,7 +110,7 @@ status_t
 BMergedDirectory::GetNextRef(entry_ref* ref)
 {
 	BPrivate::Storage::LongDirEntry longEntry;
-	struct dirent* dirEntry = &longEntry.dirent;
+	struct dirent* dirEntry = longEntry.dirent();
 	int32 result = GetNextDirents(dirEntry, sizeof(longEntry), 1);
 	if (result < 0)
 		return result;

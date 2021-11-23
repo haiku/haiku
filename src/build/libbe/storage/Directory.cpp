@@ -333,7 +333,7 @@ BDirectory::GetNextRef(entry_ref* ref)
 		return B_FILE_ERROR;
 
 	BPrivate::Storage::LongDirEntry longEntry;
-	struct dirent* entry = &longEntry.dirent;
+	struct dirent* entry = longEntry.dirent();
 	bool next = true;
 	while (next) {
 		if (GetNextDirents(entry, sizeof(longEntry), 1) != 1)
@@ -377,7 +377,7 @@ BDirectory::CountEntries()
 		return error;
 	int32 count = 0;
 	BPrivate::Storage::LongDirEntry longEntry;
-	struct dirent* entry = &longEntry.dirent;
+	struct dirent* entry = longEntry.dirent();
 	while (error == B_OK) {
 		if (GetNextDirents(entry, sizeof(longEntry), 1) != 1)
 			break;
