@@ -19,8 +19,6 @@ namespace BPackageKit {
 namespace BPrivate {
 
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-
 #define DL_COMPLETE_ATTR "Meta:DownloadCompleted"
 
 
@@ -99,8 +97,6 @@ FetchUtils::_GetAttribute(const BNode& node, const char* attrName,
 	return B_OK;
 }
 
-
-#endif // HAIKU_TARGET_PLATFORM_HAIKU
 
 }	// namespace BPrivate
 
