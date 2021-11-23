@@ -34,7 +34,7 @@ FetchUtils::IsDownloadCompleted(const char* path)
 
 
 /*static*/ bool
-FetchUtils::IsDownloadCompleted(BNode& node)
+FetchUtils::IsDownloadCompleted(const BNode& node)
 {
     bool isComplete;
     status_t status = _GetAttribute(node, DL_COMPLETE_ATTR,
@@ -84,7 +84,7 @@ FetchUtils::_SetAttribute(BNode& node, const char* attrName,
 
 
 status_t
-FetchUtils::_GetAttribute(BNode& node, const char* attrName,
+FetchUtils::_GetAttribute(const BNode& node, const char* attrName,
     type_code type, void* data, size_t size)
 {
 	if (node.InitCheck() != B_OK)
