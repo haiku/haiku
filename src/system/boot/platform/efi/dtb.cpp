@@ -69,7 +69,6 @@ const struct supported_uarts {
 	{ "sifive,uart0", UART_KIND_SIFIVE, &get_uart<ArchUARTSifive> },
 #elif defined(__ARM__) || defined(__aarch64__)
 	{ "arm,pl011", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
-	{ "arm,primecell", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
 #endif
 };
 
