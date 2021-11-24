@@ -17,6 +17,9 @@
 #include <arch/generic/debug_uart.h>
 
 
+#define UART_KIND_8250_OMAP "8250-omap"
+
+
 class ArchUART8250Omap : public DebugUART8250 {
 public:
 							ArchUART8250Omap(addr_t base, int64 clock);
