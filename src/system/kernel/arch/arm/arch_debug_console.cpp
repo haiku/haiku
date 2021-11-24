@@ -10,7 +10,6 @@
  */
 
 
-//#include <arch_platform.h>
 #include <arch/debug_console.h>
 #include <arch/generic/debug_uart.h>
 #include <arch/arm/arch_uart_pl011.h>
@@ -20,9 +19,7 @@
 #include <string.h>
 
 
-// TODO: Declare this in some header
-DebugUART *gArchDebugUART;
-extern DebugUART *debug_uart_from_fdt(const void *fdt);
+static DebugUART *sArchDebugUART = NULL;
 
 
 void
@@ -63,20 +60,20 @@ arch_debug_serial_try_getchar(void)
 char
 arch_debug_serial_getchar(void)
 {
-	if (gArchDebugUART == NULL)
+	if (sArchDebugUART == NULL)
 		return NULL;
 
-	return gArchDebugUART->GetChar(false);
+	return sArchDebugUART->GetChar(false);
 }
 
 
 void
 arch_debug_serial_putchar(const char c)
 {
-	if (gArchDebugUART == NULL)
+	if (sArchDebugUART == NULL)
 		return;
 
-	gArchDebugUART->PutChar(c);
+	sArchDebugUART->PutChar(c);
 }
 
 
@@ -101,19 +98,22 @@ arch_debug_serial_early_boot_message(const char *string)
 status_t
 arch_debug_console_init(kernel_args *args)
 {
-	// first try with hints from the FDT
-	// TODO: Use UEFI somehow to get fdt
-	//gArchDebugUART = debug_uart_from_fdt(args->platform_args.fdt);
+	//TODO: add initialiation for other UART types e.g. 8250
+	if (strncmp(args->arch_args.uart.kind, UART_KIND_PL011,
+		sizeof(args->arch_args.uart.kind)) == 0) {
+		sArchDebugUART = arch_get_uart_pl011(args->arch_args.uart.regs.start,
+			args->arch_args.uart.clock);
+	}
 
 	// As a last try, lets assume qemu's pl011 at a sane address
-	if (gArchDebugUART == NULL)
-		gArchDebugUART = arch_get_uart_pl011(0x9000000, 0x16e3600);
+	if (sArchDebugUART == NULL)
+		sArchDebugUART = arch_get_uart_pl011(0x9000000, 0x16e3600);
 
 	// Oh well.
-	if (gArchDebugUART == NULL)
+	if (sArchDebugUART == NULL)
 		return B_ERROR;
 
-	gArchDebugUART->InitEarly();
+	sArchDebugUART->InitEarly();
 
 	return B_OK;
 }
