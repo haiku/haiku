@@ -591,6 +591,15 @@ refclk_activate_ilk(bool hasPanel)
 #define VCO_MIN 2400
 #define VCO_MAX 4800
 
+static uint64 AbsSubtr64(uint64 nr1, uint64 nr2)
+{
+	if (nr1 >= nr2) {
+		return nr1 - nr2;
+	} else {
+		return nr2 - nr1;
+	}
+}
+
 struct hsw_wrpll_rnp {
 	unsigned p, n2, r2;
 };
@@ -700,8 +709,8 @@ static void hsw_wrpll_update_rnp(uint64 freq2k, unsigned int budget,
 	 */
 	a = freq2k * budget * p * r2;
 	b = freq2k * budget * best->p * best->r2;
-	diff = labs((uint64)freq2k * p * r2 - LC_FREQ_2K * n2);
-	diff_best = labs((uint64)freq2k * best->p * best->r2 -
+	diff = AbsSubtr64((uint64)freq2k * p * r2, LC_FREQ_2K * n2);
+	diff_best = AbsSubtr64((uint64)freq2k * best->p * best->r2,
 			     LC_FREQ_2K * best->n2);
 	c = 1000000 * diff;
 	d = 1000000 * diff_best;
@@ -812,8 +821,8 @@ static void skl_wrpll_try_divider(struct skl_wrpll_context *ctx,
 {
 	uint64 deviation;
 
-	deviation = ((uint64)10000 * labs(dco_freq - central_freq)
-			      / (uint64)central_freq);
+	deviation = ((uint64)10000 * AbsSubtr64(dco_freq, central_freq)
+			      / central_freq);
 
 	/* positive deviation */
 	if (dco_freq >= central_freq) {
@@ -823,6 +832,11 @@ static void skl_wrpll_try_divider(struct skl_wrpll_context *ctx,
 			ctx->central_freq = central_freq;
 			ctx->dco_freq = dco_freq;
 			ctx->p = divider;
+
+			TRACE("%s: DCO central frequency %" B_PRIu64 "Hz\n", __func__, central_freq);
+			TRACE("%s: DCO frequency %" B_PRIu64 "Hz\n", __func__, dco_freq);
+			TRACE("%s: positive offset accepted, deviation %" B_PRIu64 "\n",
+				__func__, deviation);
 		}
 	/* negative deviation */
 	} else if (deviation < SKL_DCO_MAX_NDEVIATION &&
@@ -831,6 +845,11 @@ static void skl_wrpll_try_divider(struct skl_wrpll_context *ctx,
 		ctx->central_freq = central_freq;
 		ctx->dco_freq = dco_freq;
 		ctx->p = divider;
+
+		TRACE("%s: DCO central frequency %" B_PRIu64 "Hz\n", __func__, central_freq);
+		TRACE("%s: DCO frequency %" B_PRIu64 "Hz\n", __func__, dco_freq);
+		TRACE("%s: negative offset accepted, deviation %" B_PRIu64 "\n",
+			__func__, deviation);
 	}
 }
 
@@ -946,6 +965,10 @@ static void skl_wrpll_params_populate(struct skl_wrpll_params *params,
 	params->qdiv_mode = (params->qdiv_ratio == 1) ? 0 : 1;
 
 	dco_freq = p0 * p1 * p2 * afe_clock;
+	TRACE("%s: AFE frequency %" B_PRIu64 "Hz\n", __func__, afe_clock);
+	TRACE("%s: p0: %" B_PRIu32 ", p1: %" B_PRIu32 ", p2: %" B_PRIu32 "\n",
+		__func__, p0,p1,p2);
+	TRACE("%s: DCO frequency %" B_PRIu64 "Hz\n", __func__, dco_freq);
 
 	/*
 	 * Intermediate values are in Hz.
@@ -954,8 +977,11 @@ static void skl_wrpll_params_populate(struct skl_wrpll_params *params,
 	params->dco_integer = (uint64)dco_freq / ((uint64)ref_clock * 1000);
 	params->dco_fraction = (
 			(uint64)dco_freq / ((uint64)ref_clock / 1000) -
-			(uint64)params->dco_integer * 1000000 * 0x8000) /
+			(uint64)params->dco_integer * 1000000) * 0x8000 /
 			1000000;
+
+	TRACE("%s: DCO integer %" B_PRIu32 "\n", __func__, params->dco_integer);
+	TRACE("%s: DCO fraction 0x%" B_PRIx32 "\n", __func__, params->dco_fraction);
 }
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
@@ -1021,6 +1047,7 @@ skip_remaining_dividers:
 		TRACE("%s: No valid divider found for %dHz\n", __func__, clock);
 		return false;
 	}
+	TRACE("%s: Full devider (p) found is %d\n", __func__, ctx.p);
 
 	/*
 	 * gcc incorrectly analyses that these can be used without being

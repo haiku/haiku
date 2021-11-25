@@ -1527,16 +1527,6 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Program general pipe config
 	fPipe->Configure(target);
 
-	//pll_divisors divisors;
-	//compute_pll_divisors(&target->timing, &divisors, false);
-
-	//uint32 extraPLLFlags = 0;
-	//if (gInfo->shared_info->device_type.Generation() >= 3)
-	//	extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL | DISPLAY_PLL_2X_CLOCK;
-
-	// Program pipe PLL's
-	//fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
-
 	if (gInfo->shared_info->device_type.Generation() <= 8) {
 		unsigned int r2_out, n2_out, p_out;
 		hsw_ddi_calculate_wrpll(
@@ -1546,9 +1536,11 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 		skl_wrpll_params wrpll_params;
 		skl_ddi_calculate_wrpll(
 			target->timing.pixel_clock * 1000 /* in Hz */,
-			gInfo->shared_info->pll_info.reference_frequency,//fixme Hz? kHz?
+			24000,//gInfo->shared_info->pll_info.reference_frequency, //fixme
 			&wrpll_params);
-		fPipe->ConfigureClocksSKL(wrpll_params, target->timing.pixel_clock, 0);
+		fPipe->ConfigureClocksSKL(wrpll_params,
+			target->timing.pixel_clock,
+			PortIndex());
 	}
 
 	// Program target display mode

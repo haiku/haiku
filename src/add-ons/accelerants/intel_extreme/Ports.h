@@ -32,15 +32,6 @@ enum port_type {
 	INTEL_PORT_TYPE_HDMI
 };
 
-enum port_index {
-	INTEL_PORT_ANY,				// wildcard for lookup functions
-	INTEL_PORT_A,
-	INTEL_PORT_B,
-	INTEL_PORT_C,
-	INTEL_PORT_D,
-	INTEL_PORT_E
-};
-
 
 class Port {
 public:

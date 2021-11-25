@@ -212,6 +212,15 @@ struct DeviceType {
 	}
 };
 
+enum port_index {
+	INTEL_PORT_ANY,				// wildcard for lookup functions
+	INTEL_PORT_A,
+	INTEL_PORT_B,
+	INTEL_PORT_C,
+	INTEL_PORT_D,
+	INTEL_PORT_E
+};
+
 enum pch_info {
 	INTEL_PCH_NONE = 0,		// No PCH present
 	INTEL_PCH_IBX,			// Ibexpeak

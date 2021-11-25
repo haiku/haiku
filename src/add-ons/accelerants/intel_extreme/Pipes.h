@@ -50,7 +50,7 @@ public:
 		void						ConfigureClocksSKL(
 										const skl_wrpll_params& wrpll_params,
 										uint32 pixelClock,
-										uint32 extraFlags);
+										port_index pllForPort);
 
 		// access to the various parts of the pipe
 		::FDILink*					FDI()
