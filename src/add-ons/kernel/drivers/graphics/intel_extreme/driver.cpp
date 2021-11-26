@@ -105,9 +105,6 @@ const struct supported_device {
 	{0x0d26, INTEL_MODEL_HASM, "Haswell Mobile"},
 	{0x0a16, INTEL_MODEL_HASM, "Haswell Mobile"},
 
-	{0x1912, INTEL_MODEL_SKY,  "Skylake GT2"}, // testing..
-	{0x1916, INTEL_MODEL_SKYM, "Skylake GT2"}, // testing..
-
 #if 0
 	// The driver does not make any attempt to handle this modern hardware.
 	// Better let VESA/UEFI do it.
@@ -119,14 +116,15 @@ const struct supported_device {
 	{0x0157, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 
 //	{0x1616, INTEL_MODEL_BDWM, "HD Graphics 5500 (Broadwell GT2)"},
+#endif
 
 	{0x1902, INTEL_MODEL_SKY,  "Skylake GT1"},
 	{0x1906, INTEL_MODEL_SKYM, "Skylake GT1"},
 	{0x190a, INTEL_MODEL_SKYS, "Skylake GT1"},
 	{0x190b, INTEL_MODEL_SKY,  "Skylake GT1"},
 	{0x190e, INTEL_MODEL_SKYM, "Skylake GT1"},
-	{0x1912, INTEL_MODEL_SKY,  "Skylake GT2"},
-	{0x1916, INTEL_MODEL_SKYM, "Skylake GT2"},
+	{0x1912, INTEL_MODEL_SKY,  "Skylake GT2"}, //confirmed OK
+	{0x1916, INTEL_MODEL_SKYM, "Skylake GT2"}, //confirmed native mode panel OK
 	{0x191a, INTEL_MODEL_SKYS, "Skylake GT2"},
 	{0x191b, INTEL_MODEL_SKY,  "Skylake GT2"},
 	{0x191d, INTEL_MODEL_SKY,  "Skylake GT2"},
@@ -135,7 +133,6 @@ const struct supported_device {
 	{0x1926, INTEL_MODEL_SKYM, "Skylake GT3"},
 	{0x192a, INTEL_MODEL_SKYS, "Skylake GT3"},
 	{0x192b, INTEL_MODEL_SKY,  "Skylake GT3"},
-#endif
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;

@@ -453,7 +453,7 @@ intel_extreme_init(intel_info &info)
 		info.shared_info->single_head_locked = 1;
 
 	if (info.device_type.InFamily(INTEL_FAMILY_SER5)) {
-		info.shared_info->pll_info.reference_frequency = 120000;	// 120 MHz
+		info.shared_info->pll_info.reference_frequency = 120000;// 120 MHz
 		info.shared_info->pll_info.max_frequency = 350000;
 			// 350 MHz RAM DAC speed
 		info.shared_info->pll_info.min_frequency = 20000;		// 20 MHz
@@ -462,6 +462,16 @@ intel_extreme_init(intel_info &info)
 		info.shared_info->pll_info.max_frequency = 400000;
 			// 400 MHz RAM DAC speed
 		info.shared_info->pll_info.min_frequency = 20000;		// 20 MHz
+	} else if ((info.device_type.HasDDI()) && (info.device_type.Generation() <= 8)) {
+		info.shared_info->pll_info.reference_frequency = 135000;// 135 MHz
+		info.shared_info->pll_info.max_frequency = 350000;
+			// 350 MHz RAM DAC speed
+		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz
+	} else if (info.device_type.Generation() == 9) {
+		info.shared_info->pll_info.reference_frequency = 24000;	// 24 MHz
+		info.shared_info->pll_info.max_frequency = 350000;
+			// 350 MHz RAM DAC speed
+		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz
 	} else {
 		info.shared_info->pll_info.reference_frequency = 48000;	// 48 MHz
 		info.shared_info->pll_info.max_frequency = 350000;

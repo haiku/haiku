@@ -1536,7 +1536,7 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 		skl_wrpll_params wrpll_params;
 		skl_ddi_calculate_wrpll(
 			target->timing.pixel_clock * 1000 /* in Hz */,
-			24000,//gInfo->shared_info->pll_info.reference_frequency, //fixme
+			gInfo->shared_info->pll_info.reference_frequency,
 			&wrpll_params);
 		fPipe->ConfigureClocksSKL(wrpll_params,
 			target->timing.pixel_clock,
