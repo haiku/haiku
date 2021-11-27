@@ -1245,7 +1245,6 @@ EmbeddedDisplayPort::IsConnected()
 	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
 		portRegister);
 
-	// fixme: Skylake and up use eDP for a seperate active VGA converter chip sometimes.
 	if (!gInfo->shared_info->device_type.IsMobile()) {
 		TRACE("%s: skipping eDP on non-mobile GPU\n", __func__);
 		return false;
@@ -1351,7 +1350,8 @@ DigitalDisplayInterface::IsConnected()
 	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
 		portRegister);
 
-	if (portRegister == 0)
+	// Please note: Skylake and up (Desktop) use eDP for a seperate active VGA converter chip.
+	if ((portRegister == 0) && (PortIndex() != INTEL_PORT_E)) //DP protocol has no register
 		return false;
 
 	// Probe a little port info.
@@ -1405,10 +1405,17 @@ DigitalDisplayInterface::IsConnected()
 				break;
 		}
 
-		if (((((pipeState & PIPE_DDI_SELECT_MASK) >> PIPE_DDI_SELECT_SHIFT) + 1) == (uint32)PortIndex())
-			&& (pipeState & PIPE_DDI_FUNC_CTL_ENABLE)) {
+		if ((((pipeState & PIPE_DDI_SELECT_MASK) >> PIPE_DDI_SELECT_SHIFT) + 1) == (uint32)PortIndex()) {
+			// See if the BIOS enabled our output as it indicates it's in use
+			if (pipeState & PIPE_DDI_FUNC_CTL_ENABLE) {
 				TRACE("%s: Connected\n", __func__);
 				return true;
+			}
+			// On laptops we always have an internal panel.. (this is on the eDP port)
+			if ((gInfo->shared_info->device_type.IsMobile()) && (PortIndex() == INTEL_PORT_E)) {
+				TRACE("%s: Laptop. Assuming internal panel is connected here\n", __func__);
+				return true;
+			}
 		}
 	}
 

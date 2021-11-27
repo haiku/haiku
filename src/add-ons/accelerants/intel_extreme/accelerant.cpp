@@ -287,7 +287,7 @@ probe_ports()
 		}
 	}
 
-	// Digital Display Interface (for DP, HDMI and DVI)
+	// Digital Display Interface (for DP, HDMI, DVI and eDP)
 	if (gInfo->shared_info->device_type.HasDDI()) {
 		for (int i = INTEL_PORT_B; i <= INTEL_PORT_E; i++) {
 			TRACE("Probing DDI %d\n", i);
@@ -306,18 +306,19 @@ probe_ports()
 		}
 	}
 
-	// Ensure DP_A isn't already taken (or DDI)
-	// Please note that Skylake and up use eDP for a seperate active VGA converter chip.
-	TRACE("Probing eDP\n");
-	if (!has_connected_port((port_index)INTEL_PORT_A, INTEL_PORT_TYPE_ANY)) {
-		// also always try eDP, it'll also just fail if not applicable
-		Port* eDPPort = new(std::nothrow) EmbeddedDisplayPort();
-		if (eDPPort == NULL)
-			return B_NO_MEMORY;
-		if (eDPPort->IsConnected())
-			gInfo->ports[gInfo->port_count++] = eDPPort;
-		else
-			delete eDPPort;
+	if (!gInfo->shared_info->device_type.HasDDI()) {
+		// Ensure DP_A isn't already taken
+		TRACE("Probing eDP\n");
+		if (!has_connected_port((port_index)INTEL_PORT_A, INTEL_PORT_TYPE_ANY)) {
+			// also always try eDP, it'll also just fail if not applicable
+			Port* eDPPort = new(std::nothrow) EmbeddedDisplayPort();
+			if (eDPPort == NULL)
+				return B_NO_MEMORY;
+			if (eDPPort->IsConnected())
+				gInfo->ports[gInfo->port_count++] = eDPPort;
+			else
+				delete eDPPort;
+		}
 	}
 
 	if (!gInfo->shared_info->device_type.HasDDI()) {
