@@ -193,7 +193,7 @@ static uint16
 gtt_memory_config(intel_info &info)
 {
 	uint8 controlRegister = INTEL_GRAPHICS_MEMORY_CONTROL;
-	if (info.type->InGroup(INTEL_GROUP_SNB))
+	if (info.type->Generation() >= 6)
 		controlRegister = SNB_GRAPHICS_MEMORY_CONTROL;
 
 	return get_pci_config(info.bridge, controlRegister, 2);
@@ -223,7 +223,9 @@ determine_gtt_stolen(intel_info &info)
 				memorySize *= 8;
 				break;
 		}
-	} else if (info.type->InGroup(INTEL_GROUP_SNB)) {
+	} else if (info.type->InGroup(INTEL_GROUP_SNB)
+		|| info.type->InGroup(INTEL_GROUP_IVB)
+		|| info.type->InGroup(INTEL_GROUP_HAS)) {
 		switch (memoryConfig & SNB_STOLEN_MEMORY_MASK) {
 			case SNB_STOLEN_MEMORY_32MB:
 				memorySize *= 32;
@@ -274,10 +276,120 @@ determine_gtt_stolen(intel_info &info)
 				memorySize *= 512;
 				break;
 		}
+	} else if (info.type->InGroup(INTEL_GROUP_BDW)
+		|| info.type->InFamily(INTEL_FAMILY_LAKE)) {
+		switch (memoryConfig & BDW_STOLEN_MEMORY_MASK) {
+			case BDW_STOLEN_MEMORY_32MB:
+				memorySize *= 32;
+				break;
+			case BDW_STOLEN_MEMORY_64MB:
+				memorySize *= 64;
+				break;
+			case BDW_STOLEN_MEMORY_96MB:
+				memorySize *= 96;
+				break;
+			case BDW_STOLEN_MEMORY_128MB:
+				memorySize *= 128;
+				break;
+			case BDW_STOLEN_MEMORY_160MB:
+				memorySize *= 160;
+				break;
+			case BDW_STOLEN_MEMORY_192MB:
+				memorySize *= 192;
+				break;
+			case BDW_STOLEN_MEMORY_224MB:
+				memorySize *= 224;
+				break;
+			case BDW_STOLEN_MEMORY_256MB:
+				memorySize *= 256;
+				break;
+			case BDW_STOLEN_MEMORY_288MB:
+				memorySize *= 288;
+				break;
+			case BDW_STOLEN_MEMORY_320MB:
+				memorySize *= 320;
+				break;
+			case BDW_STOLEN_MEMORY_352MB:
+				memorySize *= 352;
+				break;
+			case BDW_STOLEN_MEMORY_384MB:
+				memorySize *= 384;
+				break;
+			case BDW_STOLEN_MEMORY_416MB:
+				memorySize *= 416;
+				break;
+			case BDW_STOLEN_MEMORY_448MB:
+				memorySize *= 448;
+				break;
+			case BDW_STOLEN_MEMORY_480MB:
+				memorySize *= 480;
+				break;
+			case BDW_STOLEN_MEMORY_512MB:
+				memorySize *= 512;
+				break;
+			case BDW_STOLEN_MEMORY_1024MB:
+				memorySize *= 1024;
+				break;
+			case BDW_STOLEN_MEMORY_1536MB:
+				memorySize *= 1536;
+				break;
+		}
+		if(info.type->InGroup(INTEL_GROUP_BDW)) {
+			if((memoryConfig & BDW_STOLEN_MEMORY_MASK) == BDW_STOLEN_MEMORY_2016MB) {
+				memorySize *= 2016;
+			}
+		} else if(info.type->InFamily(INTEL_FAMILY_LAKE)) {
+			switch(memoryConfig & BDW_STOLEN_MEMORY_MASK) {
+				case SKL_STOLEN_MEMORY_4MB:
+					memorySize *= 4;
+					break;
+				case SKL_STOLEN_MEMORY_8MB:
+					memorySize *= 8;
+					break;
+				case SKL_STOLEN_MEMORY_12MB:
+					memorySize *= 12;
+					break;
+				case SKL_STOLEN_MEMORY_16MB:
+					memorySize *= 16;
+					break;
+				case SKL_STOLEN_MEMORY_20MB:
+					memorySize *= 20;
+					break;
+				case SKL_STOLEN_MEMORY_24MB:
+					memorySize *= 24;
+					break;
+				case SKL_STOLEN_MEMORY_28MB:
+					memorySize *= 28;
+					break;
+				case SKL_STOLEN_MEMORY_32MB:
+					memorySize *= 32;
+					break;
+				case SKL_STOLEN_MEMORY_36MB:
+					memorySize *= 36;
+					break;
+				case SKL_STOLEN_MEMORY_40MB:
+					memorySize *= 40;
+					break;
+				case SKL_STOLEN_MEMORY_44MB:
+					memorySize *= 44;
+					break;
+				case SKL_STOLEN_MEMORY_48MB:
+					memorySize *= 48;
+					break;
+				case SKL_STOLEN_MEMORY_52MB:
+					memorySize *= 52;
+					break;
+				case SKL_STOLEN_MEMORY_56MB:
+					memorySize *= 56;
+					break;
+				case SKL_STOLEN_MEMORY_60MB:
+					memorySize *= 60;
+					break;
+			}
+		}
 	} else if (info.type->InGroup(INTEL_GROUP_85x)
 		|| info.type->InFamily(INTEL_FAMILY_9xx)
-		|| info.type->InFamily(INTEL_FAMILY_SER5)
-		|| info.type->InFamily(INTEL_FAMILY_SOC0)) {
+		|| info.type->InGroup(INTEL_GROUP_ILK)) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i855_STOLEN_MEMORY_4M:
 				memorySize *= 4;
@@ -372,7 +484,9 @@ determine_gtt_size(intel_info &info)
 				gttSize = 4 << 20;
 				break;
 		}
-	} else if (info.type->InGroup(INTEL_GROUP_SNB)) {
+	} else if (info.type->InGroup(INTEL_GROUP_SNB)
+			|| info.type->InGroup(INTEL_GROUP_IVB)
+			|| info.type->InGroup(INTEL_GROUP_HAS)) {
 		switch (memoryConfig & SNB_GTT_SIZE_MASK) {
 			case SNB_GTT_SIZE_NONE:
 				gttSize = 0;
@@ -382,6 +496,22 @@ determine_gtt_size(intel_info &info)
 				break;
 			case SNB_GTT_SIZE_2MB:
 				gttSize = 2 << 20;
+				break;
+		}
+	} else if (info.type->InGroup(INTEL_GROUP_BDW)
+			|| info.type->InFamily(INTEL_FAMILY_LAKE)) {
+		switch (memoryConfig & BDW_GTT_SIZE_MASK) {
+			case BDW_GTT_SIZE_NONE:
+				gttSize = 0;
+				break;
+			case BDW_GTT_SIZE_2MB:
+				gttSize = 2 << 20;
+				break;
+			case BDW_GTT_SIZE_4MB:
+				gttSize = 4 << 20;
+				break;
+			case BDW_GTT_SIZE_8MB:
+				gttSize = 8 << 20;
 				break;
 		}
 	} else {
