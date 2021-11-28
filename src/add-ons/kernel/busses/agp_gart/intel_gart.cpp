@@ -143,6 +143,18 @@ const struct supported_device {
 	{0x1904, 0x192a, INTEL_MODEL_SKYS, "Skylake GT3"},
 	{0x1904, 0x192b, INTEL_MODEL_SKY,  "Skylake GT3"},
 
+	{0x5904, 0x5906, INTEL_MODEL_KBY,  "Kabylake ULT GT1"},
+	{0x590f, 0x5902, INTEL_MODEL_KBY,  "Kabylake DT GT1"},
+	{0x590c, 0x5916, INTEL_MODEL_KBY,  "Kabylake ULT GT2"},
+	{0x590c, 0x591c, INTEL_MODEL_KBY,  "Kabylake ULX GT2"},
+	{0x590c, 0x591e, INTEL_MODEL_KBY,  "Kabylake ULX GT2"},
+	{0x591f, 0x5912, INTEL_MODEL_KBY,  "Kabylake DT GT2"},
+	{0x5914, 0x5917, INTEL_MODEL_KBYM, "Kabylake Mobile GT2"},
+	{0x5910, 0x591b, INTEL_MODEL_KBYM, "Kabylake Halo GT2"},
+	{0x5918, 0x591d, INTEL_MODEL_KBY,  "Kabylake WKS GT2"},
+	{0x5904, 0x5926, INTEL_MODEL_KBY,  "Kabylake ULT GT3"},
+	{0x5904, 0x5927, INTEL_MODEL_KBY,  "Kabylake ULT GT3"},
+
 	{0x3e0f, 0x3e90, INTEL_MODEL_CFL,  "CoffeeLake GT1"},
 	{0x3e0f, 0x3e93, INTEL_MODEL_CFL,  "CoffeeLake GT1"},
 	{0x3e1f, 0x3e91, INTEL_MODEL_CFL,  "CoffeeLake GT2"},
