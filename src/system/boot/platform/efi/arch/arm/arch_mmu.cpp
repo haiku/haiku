@@ -98,6 +98,30 @@ map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint32_t flags)
 
 
 static void
+map_range_to_new_area(addr_range& range, uint32_t flags)
+{
+	if (range.size == 0) {
+		range.start = 0;
+		return;
+	}
+
+	phys_addr_t phys_addr = range.start;
+	addr_t virt_addr = get_next_virtual_address(range.size);
+
+	map_range(virt_addr, phys_addr, range.size, flags);
+
+	if (gKernelArgs.arch_args.num_virtual_ranges_to_keep
+		>= MAX_VIRTUAL_RANGES_TO_KEEP)
+		panic("too many virtual ranges to keep");
+
+	range.start = virt_addr;
+
+	gKernelArgs.arch_args.virtual_ranges_to_keep[
+		gKernelArgs.arch_args.num_virtual_ranges_to_keep++] = range;
+}
+
+
+static void
 build_physical_memory_list(size_t memory_map_size,
 	efi_memory_descriptor *memory_map, size_t descriptor_size,
 	uint32_t descriptor_version)
@@ -231,6 +255,14 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 		dprintf("    0x%08x-0x%08x, length 0x%08x\n",
 			start, start + size, size);
 	}
+
+	dprintf("virt memory ranges to keep:\n");
+	for (uint32_t i = 0; i < gKernelArgs.arch_args.num_virtual_ranges_to_keep; i++) {
+		uint32_t start = (uint32_t)gKernelArgs.arch_args.virtual_ranges_to_keep[i].start;
+		uint32_t size = (uint32_t)gKernelArgs.arch_args.virtual_ranges_to_keep[i].size;
+		dprintf("    0x%08x-0x%08x, length 0x%08x\n",
+			start, start + size, size);
+	}
 }
 
 
@@ -299,8 +331,7 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 			ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
 	}
 
-	// identity mapping for the debug uart
-	map_range(0x09000000, 0x09000000, B_PAGE_SIZE, ARM_MMU_L2_FLAG_B);
+	map_range_to_new_area(gKernelArgs.arch_args.uart.regs, ARM_MMU_L2_FLAG_B);
 
 	// identity mapping for page table area
 	uint32_t page_table_area = (uint32_t)sFirstPageTable;
