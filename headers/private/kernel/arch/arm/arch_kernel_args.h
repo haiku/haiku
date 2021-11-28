@@ -16,6 +16,8 @@
 
 #define _PACKED __attribute__((packed))
 
+#define MAX_VIRTUAL_RANGES_TO_KEEP	32
+
 
 // kernel args
 typedef struct {
@@ -29,6 +31,10 @@ typedef struct {
 	uint32	phys_pgdir;
 	uint32	vir_pgdir;
 	uint32	next_pagetable;
+
+	// The virtual ranges we want to keep in the kernel.
+	uint32		num_virtual_ranges_to_keep;
+	addr_range	virtual_ranges_to_keep[MAX_VIRTUAL_RANGES_TO_KEEP];
 
 	// needed for UEFI, otherwise kernel acpi support can't find ACPI root
 	FixedWidthPointer<void> acpi_root;
