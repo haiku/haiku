@@ -322,13 +322,52 @@ GetReg(const void* fdt, int node, uint32 addressCells, uint32 sizeCells, size_t 
 
 
 static uint32
-GetInterrupt(const void* fdt, int node, uint32 interruptCells)
+GetInterruptParent(const void* fdt, int node)
 {
+	while (node >= 0) {
+		uint32* prop;
+		prop = (uint32*)fdt_getprop(fdt, node, "interrupt-parent", NULL);
+		if (prop != NULL) {
+			uint32_t phandle = fdt32_to_cpu(*prop);
+			return fdt_node_offset_by_phandle(fdt, phandle);
+		}
+
+		node = fdt_parent_offset(fdt, node);
+	}
+
+	return -1;
+}
+
+
+static uint32
+GetInterruptCells(const void* fdt, int node)
+{
+	uint32 intc_node = GetInterruptParent(fdt, node);
+	if (intc_node > 0) {
+		uint32* prop = (uint32*)fdt_getprop(fdt, intc_node, "#interrupt-cells", NULL);
+		if (prop != NULL) {
+			return fdt32_to_cpu(*prop);
+		}
+	}
+
+	return 1;
+}
+
+
+static uint32
+GetInterrupt(const void* fdt, int node)
+{
+	uint32 interruptCells = GetInterruptCells(fdt, node);
+
 	if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "interrupts-extended", NULL)) {
 		return fdt32_to_cpu(*(prop + 1));
 	}
 	if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "interrupts", NULL)) {
-		return fdt32_to_cpu(*prop);
+		if (interruptCells == 3) {
+			return fdt32_to_cpu(*(prop + 1));
+		} else {
+			return fdt32_to_cpu(*prop);
+		}
 	}
 	dprintf("[!] no interrupt field\n");
 	return 0;
@@ -363,11 +402,8 @@ GetClockFrequency(const void* fdt, int node)
 
 
 static void
-HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells,
-	uint32 interruptCells /* from parent node */)
+HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
 {
-	// TODO: handle different field sizes
-
 	const char* name = fdt_get_name(fdt, node, NULL);
 	if (strcmp(name, "chosen") == 0) {
 		if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "boot-hartid", NULL))
@@ -426,7 +462,7 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells,
 				sizeof(uart.kind));
 
 			GetReg(fdt, node, addressCells, sizeCells, 0, uart.regs);
-			uart.irq = GetInterrupt(fdt, node, interruptCells);
+			uart.irq = GetInterrupt(fdt, node);
 			uart.clock = GetClockFrequency(fdt, node);
 
 			gUART = kSupportedUarts[i].uart_driver_init(uart.regs.start,
@@ -474,7 +510,7 @@ dtb_init()
 		int node = -1;
 		int depth = -1;
 		while ((node = fdt_next_node(sDtbTable, node, &depth)) >= 0 && depth >= 0) {
-			HandleFdt(sDtbTable, node, 2, 2, 1);
+			HandleFdt(sDtbTable, node, 2, 2);
 		}
 		break;
 	}
