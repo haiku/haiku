@@ -991,7 +991,7 @@ skl_ddi_calculate_wrpll(int clock /* in Hz */,
 			int ref_clock,
 			struct skl_wrpll_params *wrpll_params)
 {
-	uint64 afe_clock = clock * 5; /* AFE Clock is 5x Pixel clock */
+	uint64 afe_clock = (uint64) clock * 5; /* AFE Clock is 5x Pixel clock */
 	uint64 dco_central_freq[3] = { 8400000000ULL,
 				    9000000000ULL,
 				    9600000000ULL };
