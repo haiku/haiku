@@ -133,6 +133,17 @@ const struct supported_device {
 	{0x1926, INTEL_MODEL_SKYM, "Skylake GT3"},
 	{0x192a, INTEL_MODEL_SKYS, "Skylake GT3"},
 	{0x192b, INTEL_MODEL_SKY,  "Skylake GT3"},
+
+	{0x3e90, INTEL_MODEL_CFL,  "CoffeeLake GT1"},
+	{0x3e93, INTEL_MODEL_CFL,  "CoffeeLake GT1"},
+	{0x3e91, INTEL_MODEL_CFL,  "CoffeeLake GT2"},
+	{0x3e92, INTEL_MODEL_CFL,  "CoffeeLake GT2"},
+	{0x3e96, INTEL_MODEL_CFL,  "CoffeeLake GT2"},
+	{0x3e98, INTEL_MODEL_CFL,  "CoffeeLake GT2"},
+	{0x3e9a, INTEL_MODEL_CFL,  "CoffeeLake GT2"},
+	{0x3eab, INTEL_MODEL_CFLM, "CoffeeLake Halo GT2"},
+	{0x3ea5, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
+	{0x3ea6, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
@@ -156,7 +167,7 @@ get_next_intel_extreme(int32* _cookie, pci_info &info, uint32 &type)
 		// check vendor
 		if (info.vendor_id != VENDOR_ID_INTEL
 			|| info.class_base != PCI_display
-			|| info.class_sub != PCI_vga)
+			|| (info.class_sub != PCI_vga && info.class_sub != PCI_display_other))
 			continue;
 
 		// check device
