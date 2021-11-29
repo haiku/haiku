@@ -181,7 +181,7 @@ virtual	addr_t						_DDCRegister();
 virtual	addr_t						_PortRegister();
 
 private:
-		status_t					_SetPortLinkGen4(display_mode* target);
+		status_t					_SetPortLinkGen4(const display_timing& timing);
 };
 
 
@@ -218,7 +218,7 @@ virtual addr_t						_PortRegister();
 private:
 		uint8						fMaxLanes;
 
-		status_t					_SetPortLinkGen8(display_mode* target);
+		status_t					_SetPortLinkGen8(const display_timing& timing);
 };
 
 

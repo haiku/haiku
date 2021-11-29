@@ -626,12 +626,15 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		if (hardwareTarget.h_display == target->timing.h_display
 				&& hardwareTarget.v_display == target->timing.v_display) {
 			// We are setting the native video mode, nothing special to do
-			TRACE("Setting LVDS to native mode\n");
+			// Note: this means refresh and timing might vary according to requested mode.
 			hardwareTarget = target->timing;
+			TRACE("%s: Setting LVDS to native resolution at %" B_PRIu32 "Hz\n", __func__,
+				hardwareTarget.pixel_clock * 1000 / (hardwareTarget.h_total * hardwareTarget.v_total));
 		} else {
 			// We need to enable the panel fitter
-			TRACE("%s: hardware mode will actually be %dx%d\n", __func__,
-				hardwareTarget.h_display, hardwareTarget.v_display);
+			TRACE("%s: Hardware mode will actually be %dx%d at %" B_PRIu32 "Hz\n", __func__,
+				hardwareTarget.h_display, hardwareTarget.v_display,
+				hardwareTarget.pixel_clock * 1000 / (hardwareTarget.h_total * hardwareTarget.v_total));
 
 			// FIXME we should also get the refresh frequency from the target
 			// mode, and then "sanitize" the resulting mode we made up.
@@ -1107,7 +1110,7 @@ DisplayPort::_PortRegister()
 
 
 status_t
-DisplayPort::_SetPortLinkGen4(display_mode* target)
+DisplayPort::_SetPortLinkGen4(const display_timing& timing)
 {
 	// Khz / 10. ( each output octet encoded as 10 bits. 
 	//uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10; //=270000 khz
@@ -1134,7 +1137,7 @@ DisplayPort::_SetPortLinkGen4(display_mode* target)
 	if (ret_n > 0x800000) {
 		ret_n = 0x800000;
 	}
-	uint64 ret_m = target->timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
+	uint64 ret_m = timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
 	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
 		ret_m >>= 1;
 		ret_n >>= 1;
@@ -1152,7 +1155,7 @@ DisplayPort::_SetPortLinkGen4(display_mode* target)
 	if (ret_n > 0x800000) {
 		ret_n = 0x800000;
 	}
-	ret_m = target->timing.pixel_clock * ret_n / linkspeed;
+	ret_m = timing.pixel_clock * ret_n / linkspeed;
 	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
 		ret_m >>= 1;
 		ret_n >>= 1;
@@ -1185,7 +1188,7 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	status_t result = B_OK;
 	if (gInfo->shared_info->device_type.Generation() <= 4) {
 		fPipe->ConfigureTimings(target);
-		result = _SetPortLinkGen4(target);
+		result = _SetPortLinkGen4(target->timing);
 	} else {
 		//fixme: doesn't work yet. For now just scale to native mode.
 #if 0
@@ -1411,11 +1414,21 @@ DigitalDisplayInterface::IsConnected()
 				TRACE("%s: Connected\n", __func__);
 				return true;
 			}
-			// On laptops we always have an internal panel.. (this is on the eDP port)
-			if ((gInfo->shared_info->device_type.IsMobile()) && (PortIndex() == INTEL_PORT_E)) {
-				TRACE("%s: Laptop. Assuming internal panel is connected here\n", __func__);
-				return true;
-			}
+		}
+	}
+
+	// On laptops we always have an internal panel.. (this is on the eDP port)
+	if (gInfo->shared_info->device_type.IsMobile() && (PortIndex() == INTEL_PORT_E)) {
+		if (gInfo->shared_info->has_vesa_edid_info) {
+			TRACE("%s: Laptop. Using VESA edid info\n", __func__);
+			memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,
+				sizeof(edid1_info));
+			fEDIDState = B_OK;
+			// HasEDID now true
+			return true;
+		} else if (gInfo->shared_info->got_vbt) {
+			TRACE("%s: Laptop. No EDID, but force enabled as we have a VBT\n", __func__);
+			return true;
 		}
 	}
 
@@ -1424,7 +1437,7 @@ DigitalDisplayInterface::IsConnected()
 }
 
 status_t
-DigitalDisplayInterface::_SetPortLinkGen8(display_mode* target)
+DigitalDisplayInterface::_SetPortLinkGen8(const display_timing& timing)
 {
 	// Khz / 10. ( each output octet encoded as 10 bits.
 	//uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10; //=270000 khz
@@ -1470,7 +1483,7 @@ DigitalDisplayInterface::_SetPortLinkGen8(display_mode* target)
 	if (ret_n > 0x800000) {
 		ret_n = 0x800000;
 	}
-	uint64 ret_m = target->timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
+	uint64 ret_m = timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
 	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
 		ret_m >>= 1;
 		ret_n >>= 1;
@@ -1488,7 +1501,7 @@ DigitalDisplayInterface::_SetPortLinkGen8(display_mode* target)
 	if (ret_n > 0x800000) {
 		ret_n = 0x800000;
 	}
-	ret_m = target->timing.pixel_clock * ret_n / linkspeed;
+	ret_m = timing.pixel_clock * ret_n / linkspeed;
 	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
 		ret_m >>= 1;
 		ret_n >>= 1;
@@ -1517,19 +1530,48 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 		return B_ERROR;
 	}
 
-	// Setup PanelFitter and Train FDI if it exists
-	PanelFitter* fitter = fPipe->PFT();
-	if (fitter != NULL)
-		fitter->Enable(target->timing);
-	// skip FDI if it doesn't exist
-	if (gInfo->shared_info->device_type.Generation() <= 8) {
-		// Skip FDI if we have a CPU connected display
-		if (PortIndex() != INTEL_PORT_A) {
-			FDILink* link = fPipe->FDI();
-			if (link != NULL)
-				link->Train(&target->timing);
+	display_timing hardwareTarget = target->timing;
+	bool needsScaling = false;
+	if ((PortIndex() == INTEL_PORT_E) && gInfo->shared_info->device_type.IsMobile()) {
+		// For internal panels, we may need to set the timings according to the panel
+		// native video mode, and let the panel fitter do the scaling.
+
+		if (gInfo->shared_info->got_vbt) {
+			// Set vbios hardware panel mode as base
+			hardwareTarget = gInfo->shared_info->panel_timing;
+
+			if (hardwareTarget.h_display == target->timing.h_display
+					&& hardwareTarget.v_display == target->timing.v_display) {
+				// We are setting the native video mode, nothing special to do
+				// Note: this means refresh and timing might vary according to requested mode.
+				hardwareTarget = target->timing;
+				TRACE("%s: Setting internal panel to native resolution at %" B_PRIu32 "Hz\n", __func__,
+					hardwareTarget.pixel_clock * 1000 / (hardwareTarget.h_total * hardwareTarget.v_total));
+			} else {
+				// We need to enable the panel fitter
+				TRACE("%s: Hardware mode will actually be %dx%d at %" B_PRIu32 "Hz\n", __func__,
+					hardwareTarget.h_display, hardwareTarget.v_display,
+					hardwareTarget.pixel_clock * 1000 / (hardwareTarget.h_total * hardwareTarget.v_total));
+
+				// FIXME we should also get the refresh frequency from the target
+				// mode, and then "sanitize" the resulting mode we made up.
+				needsScaling = true;
+			}
+		} else {
+			TRACE("%s: Setting internal panel mode without VBT info generation, scaling may not work\n",
+				__func__);
+			// We don't have VBT data, try to set the requested mode directly
+			// and hope for the best
+			hardwareTarget = target->timing;
 		}
 	}
+
+	// Setup PanelFitter
+	PanelFitter* fitter = fPipe->PFT();
+	if (fitter != NULL)
+		fitter->Enable(hardwareTarget);
+
+	// skip FDI as it never applies to DDI (on gen7 and 8 only for the real analog VGA port)
 
 	// Program general pipe config
 	fPipe->Configure(target);
@@ -1537,22 +1579,22 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (gInfo->shared_info->device_type.Generation() <= 8) {
 		unsigned int r2_out, n2_out, p_out;
 		hsw_ddi_calculate_wrpll(
-			target->timing.pixel_clock * 1000 /* in Hz */,
+			hardwareTarget.pixel_clock * 1000 /* in Hz */,
 			&r2_out, &n2_out, &p_out);
 	} else {
 		skl_wrpll_params wrpll_params;
 		skl_ddi_calculate_wrpll(
-			target->timing.pixel_clock * 1000 /* in Hz */,
+			hardwareTarget.pixel_clock * 1000 /* in Hz */,
 			gInfo->shared_info->pll_info.reference_frequency,
 			&wrpll_params);
 		fPipe->ConfigureClocksSKL(wrpll_params,
-			target->timing.pixel_clock,
+			hardwareTarget.pixel_clock,
 			PortIndex());
 	}
 
 	// Program target display mode
-	fPipe->ConfigureTimings(target);
-	_SetPortLinkGen8(target);
+	fPipe->ConfigureTimings(target, !needsScaling);
+	_SetPortLinkGen8(hardwareTarget);
 
 	// Set fCurrentMode to our set display mode
 	memcpy(&fCurrentMode, target, sizeof(display_mode));
