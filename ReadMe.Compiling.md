@@ -136,7 +136,7 @@ cd haiku/generated.x86_64
 cd haiku/generated.x86gcc2
 ../configure \
 	--cross-tools-source ../../buildtools/ \
-	--build-cross-tools x86_gcc2 
+	--build-cross-tools x86_gcc2 \
 	--build-cross-tools x86
 ```
 
@@ -244,7 +244,7 @@ Configure Haiku's build system for a bootstrap build specifying the location
 of all of the repositories above.
 ```
 ../configure -j4 \
-  --build-cross-tools myarch ../../buildtools \
+  --build-cross-tools myarch --cross-tools-source ../../buildtools \
   --bootstrap ../../haikuporter/haikuporter ../../haikuports.cross ../../haikuports
 ```
 
