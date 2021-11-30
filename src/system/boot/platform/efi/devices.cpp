@@ -137,7 +137,7 @@ device_contains_partition(EfiDevice *device, boot::Partition *partition)
 			(gpt_table_header*)malloc(blockSize);
 		ssize_t bytesRead = device->ReadAt(NULL, blockSize, deviceHeader,
 			blockSize);
-		if (bytesRead != blockSize)
+		if (bytesRead != (ssize_t)blockSize)
 			return false;
 
 		if (memcmp(deviceHeader, &header->TableHeader(),
@@ -150,7 +150,7 @@ device_contains_partition(EfiDevice *device, boot::Partition *partition)
 		gpt_partition_entry *entries = (gpt_partition_entry*)malloc(size);
 		bytesRead = device->ReadAt(NULL,
 			deviceHeader->entries_block * blockSize, entries, size);
-		if (bytesRead != size)
+		if (bytesRead != (ssize_t)size)
 			return false;
 
 		if (memcmp(&entries[index], &header->EntryAt(index),
