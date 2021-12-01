@@ -50,7 +50,9 @@ arch_int_disable_io_interrupt(int irq)
 }
 
 
-void
+int32
 arch_int_assign_to_cpu(int32 irq, int32 cpu)
 {
+	// Not yet supported.
+	return 0;
 }
