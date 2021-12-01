@@ -120,8 +120,6 @@ dosfs_release_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
 
-	TOUCH(reenter);
-
 	if (node != NULL) {
 		DPRINTF(0, ("dosfs_release_vnode (ino_t %" B_PRIdINO ")\n", node->vnid));
 

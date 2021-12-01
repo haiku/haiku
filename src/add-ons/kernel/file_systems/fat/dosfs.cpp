@@ -425,10 +425,6 @@ volume_init(int fd, uint8* buf,
 	DPRINTF(0, ("volume label [%s] (%" B_PRIu32 ")\n", vol->vol_label,
 		vol->vol_entry));
 
-	// steal a trick from bfs
-	if (!memcmp(vol->vol_label, "__RO__     ", 11))
-		vol->flags |= B_FS_IS_READONLY;
-
 	return vol;
 
 error:
@@ -453,7 +449,7 @@ volume_count_free_cluster(nspace *vol)
 	if (vol->flags & B_FS_IS_READONLY)
 		vol->free_clusters = 0;
 	else {
-		uint32 free_count, last_allocated;
+		uint32 free_count = 0, last_allocated = 0;
 		err = get_fsinfo(vol, &free_count, &last_allocated);
 		if (err >= 0) {
 			if (free_count < vol->total_clusters)
@@ -646,10 +642,6 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	DPRINTF(0, ("volume label [%s] (%" B_PRIu32 ")\n", vol->vol_label,
 		vol->vol_entry));
 
-	// steal a trick from bfs
-	if (!memcmp(vol->vol_label, "__RO__     ", 11))
-		vol->flags |= B_FS_IS_READONLY;
-
 	*newVol = vol;
 	return B_NO_ERROR;
 
@@ -819,14 +811,7 @@ dosfs_mount(fs_volume *_vol, const char *device, uint32 flags,
 		unload_driver_settings(handle);
 	}
 
-	/* args is a command line option; dosfs doesn't use any so
-	   we can ignore these arguments */
-	TOUCH(args);
-
-#if __RO__
-	// make it read-only
-	flags |= 1;
-#endif
+	/* args is a command line option; dosfs doesn't use any so we can ignore it */
 
 	// Try and mount volume as a FAT volume
 	if ((result = mount_fat_disk(device, _vol, flags, &vol, fs_flags,
@@ -1032,9 +1017,8 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 
 	DPRINTF(0, ("dosfs_write_fs_stat called\n"));
 
-	/* if it's a r/o file system and not the special hack, then don't allow
-	 * volume renaming */
-	if ((vol->flags & B_FS_IS_READONLY) && memcmp(vol->vol_label, "__RO__     ", 11))
+	/* if it's a r/o file system, then don't allow volume renaming */
+	if ((vol->flags & B_FS_IS_READONLY) == 0)
 		return EROFS;
 
 	if (mask & FS_WRITE_FSINFO_NAME) {
@@ -1310,7 +1294,7 @@ fs_vnode_ops gFATVnodeOps = {
 	NULL,	// fs_deselect
 	&dosfs_fsync,
 
-	&dosfs_readlink,
+	NULL,
 	NULL,	// fs_create_symlink,
 
 	NULL,	// fs_link,

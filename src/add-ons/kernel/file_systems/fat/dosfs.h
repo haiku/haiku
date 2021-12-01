@@ -12,10 +12,6 @@
 //#define DEBUG 1
 
 
-#define	LOCK(l)		recursive_lock_lock(&l);
-#define	UNLOCK(l)	recursive_lock_unlock(&l);
-
-
 /* Unfortunately, ino_t's are defined as signed. This causes problems with
  * programs (notably cp) that use the modulo of a ino_t as a
  * hash function to index an array. This means the high bit of every ino_t
@@ -164,8 +160,6 @@ typedef struct _nspace {
 
 #define FS_FLAGS_OP_SYNC		0x1
 #define FS_FLAGS_LOCK_DOOR		0x2
-
-#define TOUCH(x) ((void)(x))
 
 extern fs_vnode_ops gFATVnodeOps;
 extern fs_volume_ops gFATVolumeOps;

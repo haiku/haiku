@@ -40,8 +40,6 @@ dosfs_open_attrdir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 {
 	nspace *vol = (nspace *)_vol->private_volume;
 
-	TOUCH(_node);
-
 	DPRINTF(0, ("dosfs_open_attrdir called\n"));
 
 	RecursiveLocker lock(vol->vlock);
@@ -60,8 +58,6 @@ dosfs_close_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
 	nspace *vol = (nspace *)_vol->private_volume;
 
-	TOUCH(_node);
-
 	DPRINTF(0, ("dosfs_close_attrdir called\n"));
 
 	RecursiveLocker lock(vol->vlock);
@@ -75,8 +71,6 @@ dosfs_close_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 status_t
 dosfs_free_attrdir_cookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
-	TOUCH(_vol); TOUCH(_node);
-
 	DPRINTF(0, ("dosfs_free_attrcookie called\n"));
 
 	if (_cookie == NULL) {
@@ -94,8 +88,6 @@ dosfs_free_attrdir_cookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 status_t
 dosfs_rewind_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
-	TOUCH(_vol); TOUCH(_node);
-
 	DPRINTF(0, ("dosfs_rewind_attrdir called\n"));
 
 	if (_cookie == NULL) {
@@ -115,8 +107,6 @@ dosfs_read_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
 	int32 *cookie = (int32 *)_cookie;
-
-	TOUCH(bufsize);
 
 	DPRINTF(0, ("dosfs_read_attrdir called\n"));
 

@@ -1085,18 +1085,6 @@ dosfs_access(fs_volume *_vol, fs_vnode *_node, int mode)
 
 
 status_t
-dosfs_readlink(fs_volume *_vol, fs_vnode *_node, char *buf, size_t *bufsize)
-{
-	TOUCH(_vol); TOUCH(_node); TOUCH(buf); TOUCH(bufsize);
-
-	// no links in fat...
-	DPRINTF(0, ("dosfs_readlink called\n"));
-
-	return EINVAL;
-}
-
-
-status_t
 dosfs_opendir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 {
 	nspace *vol = (nspace *)_vol->private_volume;
@@ -1218,11 +1206,9 @@ dosfs_rewinddir(fs_volume *_vol, fs_vnode *_node, void* _cookie)
 status_t
 dosfs_closedir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
-	TOUCH(_vol); TOUCH(_node); TOUCH(_cookie);
-
 	DPRINTF(0, ("dosfs_closedir called\n"));
 
-	return 0;
+	return B_OK;
 }
 
 
