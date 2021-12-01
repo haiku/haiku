@@ -136,7 +136,8 @@ const struct supported_device {
 
 	{0x5906, INTEL_MODEL_KBY,  "Kabylake ULT GT1"},
 	{0x5902, INTEL_MODEL_KBY,  "Kabylake DT GT1"},
-	{0x5916, INTEL_MODEL_KBY,  "Kabylake ULT GT2"},
+	{0x5916, INTEL_MODEL_KBYM, "Kabylake ULT GT2"},
+	{0x5921, INTEL_MODEL_KBYM, "Kabylake ULT GT2F"},
 	{0x591c, INTEL_MODEL_KBY,  "Kabylake ULX GT2"},
 	{0x591e, INTEL_MODEL_KBY,  "Kabylake ULX GT2"},
 	{0x5912, INTEL_MODEL_KBY,  "Kabylake DT GT2"},
