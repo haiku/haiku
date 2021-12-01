@@ -32,7 +32,7 @@ struct memory_region {
 	size_t size;
 
 	void dprint(const char * msg) {
- 	  dprintf("%s memory_region v: %#lx p: %#lx size: %lu\n", msg, vaddr,
+ 	  dprintf("%s memory_region v: %#" B_PRIxADDR " p: %#" B_PRIxPHYSADDR " size: %lu\n", msg, vaddr,
 			paddr, size);
 	}
 

@@ -92,7 +92,7 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 
 	TRACE(("acpi: found rsdp at %p oem id: %.6s, rev %d\n",
 		rsdp, rsdp->oem_id, rsdp->revision));
-	TRACE(("acpi: rsdp points to rsdt at 0x%x\n", rsdp->rsdt_address));
+	TRACE(("acpi: rsdp points to rsdt at 0x%" B_PRIx32 "\n", rsdp->rsdt_address));
 
 	acpi_descriptor_header* rsdt = NULL;
 	if (rsdp->revision > 0) {
@@ -120,7 +120,7 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 			return B_ERROR;
 		}
 
-		TRACE(("acpi: rsdt length: %u\n", rsdt->length));
+		TRACE(("acpi: rsdt length: %" B_PRIu32 "\n", rsdt->length));
 	}
 
 	if (rsdt != NULL) {
@@ -160,7 +160,7 @@ acpi_find_table_generic(const char* signature, acpi_descriptor_header* acpiSdt)
 		return NULL;
 	}
 
-	TRACE(("acpi: searching %d entries for table '%.4s'\n", sNumEntries,
+	TRACE(("acpi: searching %" B_PRId32 " entries for table '%.4s'\n", sNumEntries,
 		signature));
 
 	PointerType* pointer = (PointerType*)((uint8*)acpiSdt
