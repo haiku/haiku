@@ -33,6 +33,7 @@ uint32 intel_accelerant_mode_count(void);
 status_t intel_get_mode_list(display_mode* dm);
 status_t intel_propose_display_mode(display_mode* target,
 	const display_mode* low, const display_mode* high);
+status_t intel_get_preferred_mode(display_mode* preferredMode);
 status_t intel_set_display_mode(display_mode* mode);
 status_t intel_get_display_mode(display_mode* currentMode);
 status_t intel_get_edid_info(void* info, size_t size, uint32* _version);

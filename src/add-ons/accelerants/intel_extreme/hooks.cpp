@@ -38,6 +38,8 @@ get_accelerant_hook(uint32 feature, void* data)
 			return (void*)intel_get_mode_list;
 		case B_PROPOSE_DISPLAY_MODE:
 			return (void*)intel_propose_display_mode;
+		case B_GET_PREFERRED_DISPLAY_MODE:
+			return (void*)intel_get_preferred_mode;
 		case B_SET_DISPLAY_MODE:
 			return (void*)intel_set_display_mode;
 		case B_GET_DISPLAY_MODE:

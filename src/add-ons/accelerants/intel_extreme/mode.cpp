@@ -527,6 +527,29 @@ intel_get_display_mode(display_mode* _currentMode)
 
 
 status_t
+intel_get_preferred_mode(display_mode* preferredMode)
+{
+	TRACE("%s\n", __func__);
+	display_mode mode;
+
+	if (gInfo->has_edid || !gInfo->shared_info->got_vbt
+			|| !gInfo->shared_info->device_type.IsMobile()) {
+		return B_ERROR;
+	}
+
+	mode.timing = gInfo->shared_info->panel_timing;
+	mode.space = B_RGB32;
+	mode.virtual_width = mode.timing.h_display;
+	mode.virtual_height = mode.timing.v_display;
+	mode.h_display_start = 0;
+	mode.v_display_start = 0;
+	mode.flags = 0;
+	memcpy(preferredMode, &mode, sizeof(mode));
+	return B_OK;
+}
+
+
+status_t
 intel_get_edid_info(void* info, size_t size, uint32* _version)
 {
 	if (!gInfo->has_edid)
