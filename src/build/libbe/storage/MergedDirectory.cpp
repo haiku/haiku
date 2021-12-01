@@ -12,6 +12,7 @@
 #include <new>
 #include <set>
 #include <string>
+#include <cstddef>
 
 #include <Directory.h>
 #include <Entry.h>
