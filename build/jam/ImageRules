@@ -1685,6 +1685,8 @@ rule BuildEfiSystemPartition image : efiLoader
 	Depends $(image) : $(fatshell) ;
 
 	switch $(TARGET_ARCH) {
+		case x86 :
+			EFINAME on $(image) = "BOOTIA32.EFI" ;
 		case x86_64 :
 			EFINAME on $(image) = "BOOTX64.EFI" ;
 		case arm :

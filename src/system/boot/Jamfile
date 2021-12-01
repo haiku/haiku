@@ -107,6 +107,8 @@ rule BuildEFILoader {
 	Depends $(efiLoader) : $(bootLoader) ;
 
 	switch $(TARGET_ARCH) {
+		case x86 :
+			OUTPUT_TARGET on $(efiLoader) = pei-i386 ;
 		case x86_64 :
 			OUTPUT_TARGET on $(efiLoader) = pei-x86-64 ;
 		case arm :
