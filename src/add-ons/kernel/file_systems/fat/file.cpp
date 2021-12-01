@@ -338,6 +338,8 @@ dosfs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	DPRINTF(0, ("dosfs_read called %" B_PRIuSIZE " bytes at %" B_PRIdOFF
 		" (vnode id %" B_PRIdINO ")\n", *len, pos, node->vnid));
 
+	lock.Unlock();
+
 	result = file_cache_read(node->cache, cookie, pos, buf, len);
 
 	if (result != B_OK) {
@@ -420,8 +422,8 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 		file_map_set_size(node->file_map, node->st_size);
 	}
 
+	lock.Unlock();
 	result = file_cache_write(node->cache, cookie, pos, buf, len);
-
 	return result;
 }
 
