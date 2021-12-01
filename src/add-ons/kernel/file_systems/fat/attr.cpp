@@ -42,8 +42,6 @@ dosfs_open_attrdir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 
 	DPRINTF(0, ("dosfs_open_attrdir called\n"));
 
-	RecursiveLocker lock(vol->vlock);
-
 	if ((*_cookie = malloc(sizeof(uint32))) == NULL) {
 		return ENOMEM;
 	}
@@ -59,8 +57,6 @@ dosfs_close_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 	nspace *vol = (nspace *)_vol->private_volume;
 
 	DPRINTF(0, ("dosfs_close_attrdir called\n"));
-
-	RecursiveLocker lock(vol->vlock);
 
 	*(int32 *)_cookie = 1;
 
