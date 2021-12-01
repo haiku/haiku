@@ -444,7 +444,7 @@ xfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 		buffer->d_dev = volume->ID();
 		buffer->d_ino = ino;
-		buffer->d_reclen = sizeof(struct dirent) + length + 1;
+		buffer->d_reclen = offsetof(struct dirent, d_name) + length + 1;
 		bufferSize -= buffer->d_reclen;
 		buffer = (struct dirent*)((uint8*)buffer + buffer->d_reclen);
 		count++;

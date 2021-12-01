@@ -463,7 +463,7 @@ udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 		return B_BAD_VALUE;
 	}
 
-	uint32 nameLength = bufferSize - sizeof(struct dirent);
+	uint32 nameLength = bufferSize - offsetof(struct dirent, d_name);
 	ino_t id;
 	status_t status = iterator->GetNextEntry(dirent->d_name, &nameLength, &id);
 	if (!status) {
@@ -471,7 +471,7 @@ udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 		*_num = 1;
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = id;
-		dirent->d_reclen = sizeof(struct dirent) + nameLength + 1;
+		dirent->d_reclen = offsetof(struct dirent, d_name) + nameLength + 1;
 	} else {
 		*_num = 0;
 		// Clear the status for end of directory

@@ -667,7 +667,7 @@ Equation::GetNextMatching(Volume* volume, TreeIterator* iterator,
 			dirent->d_ino = offset;
 			dirent->d_pdev = volume->ID();
 			dirent->d_pino = volume->ToVnode(inode->Parent());
-			dirent->d_reclen = sizeof(struct dirent);
+			dirent->d_reclen = offsetof(struct dirent, d_name);
 
 			if (inode->GetName(dirent->d_name) < B_OK) {
 				FATAL(("inode %" B_PRIdOFF " in query has no name!\n",

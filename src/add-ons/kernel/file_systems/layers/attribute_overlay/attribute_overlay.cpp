@@ -199,7 +199,7 @@ private:
 				type_code		type;
 				uint32			size;
 				uint8			name_length; // including 0 byte
-				char			name[1]; // 0 terminated, followed by data
+				char			name[]; // 0 terminated, followed by data
 			} _PACKED;
 
 			AttributeFile *		fParent;
@@ -1005,14 +1005,14 @@ AttributeEntry::SetName(const char *name)
 
 	if (!fAllocatedEntry || fEntry->name_length < nameLength) {
 		attribute_entry *newEntry = (attribute_entry *)malloc(
-			sizeof(attribute_entry) - 1 + nameLength);
+			sizeof(attribute_entry) + nameLength);
 		if (newEntry == NULL) {
 			fStatus = B_NO_MEMORY;
 			return fStatus;
 		}
 
 		if (fEntry != NULL)
-			memcpy(newEntry, fEntry, sizeof(attribute_entry) - 1);
+			memcpy(newEntry, fEntry, sizeof(attribute_entry));
 		if (fAllocatedEntry)
 			free(fEntry);
 
@@ -1033,7 +1033,7 @@ AttributeEntry::FillDirent(struct dirent *dirent, size_t bufferSize,
 	dirent->d_dev = dirent->d_pdev = fParent->VolumeID();
 	dirent->d_ino = (ino_t)this;
 	dirent->d_pino = fParent->FileInode();
-	dirent->d_reclen = sizeof(struct dirent) + fEntry->name_length;
+	dirent->d_reclen = offsetof(struct dirent, d_name) + fEntry->name_length;
 	if (bufferSize < dirent->d_reclen) {
 		*numEntries = 0;
 		return B_BAD_VALUE;

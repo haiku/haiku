@@ -201,7 +201,7 @@ int32
 BMergedDirectory::CountEntries()
 {
 	int32 count = 0;
-	char buffer[sizeof(dirent) + B_FILE_NAME_LENGTH];
+	char buffer[offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH];
 	while (GetNextDirents((dirent*)&buffer, sizeof(buffer), 1) == 1)
 		count++;
 	return count;

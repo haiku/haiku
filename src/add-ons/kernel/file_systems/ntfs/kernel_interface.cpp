@@ -1221,7 +1221,7 @@ fs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	uint32 maxCount = *_num;
 	uint32 count = 0;
 	while (count < maxCount && bufferSize > sizeof(struct dirent)) {
-		size_t length = bufferSize - sizeof(struct dirent);
+		size_t length = bufferSize - offsetof(struct dirent, d_name);
 		if (length < cookie->current->name_length) {
 			// the remaining name buffer length is too small
 			if (count == 0)
@@ -1233,7 +1233,7 @@ fs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 		dirent->d_dev = _volume->id;
 		dirent->d_ino = cookie->current->inode;
 		strlcpy(dirent->d_name, cookie->current->name, length + 1);
-		dirent->d_reclen = sizeof(struct dirent) + length + 1;
+		dirent->d_reclen = offsetof(struct dirent, d_name) + length + 1;
 
 		bufferSize -= dirent->d_reclen;
 		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);

@@ -792,12 +792,12 @@ ISOReadDirEnt(iso9660_volume *volume, dircookie *cookie, struct dirent *dirent,
 				break;
 
 			if (result == B_OK && (node.flags & ISO_IS_ASSOCIATED_FILE) == 0) {
-				size_t nameBufferSize = bufferSize - sizeof(struct dirent);
+				size_t nameBufferSize = bufferSize - offsetof(struct dirent, d_name);
 
 				dirent->d_dev = volume->id;
 				dirent->d_ino = ((ino_t)cookie->block << 30)
 					+ (cookie->pos & 0x3fffffff);
-				dirent->d_reclen = sizeof(struct dirent) + node.name_length + 1;
+				dirent->d_reclen = offsetof(struct dirent, d_name) + node.name_length + 1;
 
 				if (node.name_length <= nameBufferSize) {
 					// need to do some size checking here.

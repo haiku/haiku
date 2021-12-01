@@ -106,7 +106,7 @@ struct FUSEVolume::DirEntryCache {
 		const Entry& entry = fEntries[index];
 
 		// get and check the size
-		size_t size = sizeof(dirent) + entry.nameSize;
+		size_t size = offsetof(struct dirent, d_name) + entry.nameSize;
 		if (size > bufferSize)
 			return false;
 
@@ -250,7 +250,7 @@ struct FUSEVolume::AttrDirCookie : RWLockable {
 		size_t nameLen = strlen(name);
 
 		// get and check the size
-		size_t size = sizeof(dirent) + nameLen + 1;
+		size_t size = offsetof(struct dirent, d_name) + nameLen + 1;
 		if (size > bufferSize)
 			return false;
 
@@ -2991,7 +2991,7 @@ FUSEVolume::_AddReadDirEntry(ReadDirBuffer* buffer, const char* name, int type,
 			return 1;
 
 		// compute the entry length and check whether the entry still fits
-		entryLen = sizeof(dirent) + strlen(name) + 1;
+		entryLen = offsetof(struct dirent, d_name) + strlen(name) + 1;
 		if (buffer->usedSize + entryLen > buffer->bufferSize)
 			return 1;
 	}

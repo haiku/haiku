@@ -438,7 +438,7 @@ static status_t googlefs_readdir(fs_volume *_volume, fs_vnode *_node, void *_coo
 		buf->d_ino = parent?parent->vnid:ns->rootid;
 		buf->d_pino = (parent && parent->parent)?parent->parent->vnid:ns->rootid;
 		strcpy(buf->d_name, "..");
-		buf->d_reclen = 2*(sizeof(dev_t)+sizeof(ino_t))+sizeof(unsigned short)+strlen(buf->d_name)+1;
+		buf->d_reclen = offsetof(struct dirent, d_name)+strlen(buf->d_name)+1;
 		cookie->dir_current++;
 		*num = 1;
 	} else if (cookie->dir_current == 1) { /* . */
@@ -449,7 +449,7 @@ static status_t googlefs_readdir(fs_volume *_volume, fs_vnode *_node, void *_coo
 		buf->d_ino = node->vnid;
 		buf->d_pino = parent?parent->vnid:ns->rootid;
 		strcpy(buf->d_name, ".");
-		buf->d_reclen = 2*(sizeof(dev_t)+sizeof(ino_t))+sizeof(unsigned short)+strlen(buf->d_name)+1;
+		buf->d_reclen = offsetof(struct dirent, d_name)+strlen(buf->d_name)+1;
 		cookie->dir_current++;
 		*num = 1;
 	} else {
@@ -462,7 +462,7 @@ static status_t googlefs_readdir(fs_volume *_volume, fs_vnode *_node, void *_coo
 			buf->d_ino = n->vnid;
 			buf->d_pino = node->vnid;
 			strcpy(buf->d_name, n->name);
-			buf->d_reclen = 2*(sizeof(dev_t)+sizeof(ino_t))+sizeof(unsigned short)+strlen(buf->d_name)+1;
+			buf->d_reclen = offsetof(struct dirent, d_name)+strlen(buf->d_name)+1;
 			cookie->dir_current++;
 			*num = 1;
 		} else {
@@ -1089,7 +1089,7 @@ static status_t googlefs_read_attrdir(fs_volume *_volume, fs_vnode *_node, void 
 		buf->d_ino = node->vnid;
 		buf->d_pino = node->parent?node->parent->vnid:ns->rootid;
 		strcpy(buf->d_name, ae->name);
-		buf->d_reclen = 2*(sizeof(dev_t)+sizeof(ino_t))+sizeof(unsigned short)+strlen(buf->d_name)+1;
+		buf->d_reclen = offsetof(struct dirent, d_name)+strlen(buf->d_name)+1;
 		cookie->dir_current++;
 		*num = 1;
 	} else
@@ -1504,7 +1504,7 @@ static status_t googlefs_read_query(fs_volume *_volume, void *_cookie, struct di
 		buf->d_ino = n->vnid;
 		buf->d_pino = node->vnid;
 		strcpy(buf->d_name, n->name);
-		buf->d_reclen = 2*(sizeof(dev_t)+sizeof(ino_t))+sizeof(unsigned short)+strlen(buf->d_name)+1;
+		buf->d_reclen = offsetof(struct dirent, d_name)+strlen(buf->d_name)+1;
 		cookie->dir_current++;
 		*num = 1;
 	} else {

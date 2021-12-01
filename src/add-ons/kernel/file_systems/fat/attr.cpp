@@ -116,7 +116,7 @@ dosfs_read_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 		entry->d_ino = node->vnid;
 		entry->d_dev = vol->id;
 		strcpy(entry->d_name, "BEOS:TYPE");
-		entry->d_reclen = sizeof(struct dirent) + strlen(entry->d_name) + 1;
+		entry->d_reclen = offsetof(struct dirent, d_name) + strlen(entry->d_name) + 1;
 	}
 
 	*cookie = 1;

@@ -1139,10 +1139,10 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 		} else {
 			if (cookie->current_index++ == 0) {
 				strcpy(entry->d_name, ".");
-				entry->d_reclen = sizeof(struct dirent) + 2;
+				entry->d_reclen = offsetof(struct dirent, d_name) + 2;
 			} else {
 				strcpy(entry->d_name, "..");
-				entry->d_reclen = sizeof(struct dirent) + 3;
+				entry->d_reclen = offsetof(struct dirent, d_name) + 3;
 			}
 			*num = 1;
 			entry->d_ino = vol->root_vnode.vnid;
@@ -1160,7 +1160,7 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 	}
 
 	result = get_next_dirent(vol, dir, &diri, &entry->d_ino, entry->d_name,
-		bufsize - sizeof(struct dirent) - 1);
+		bufsize - offsetof(struct dirent, d_name) - 1);
 
 	cookie->current_index = diri.current_index;
 
@@ -1170,7 +1170,7 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 	if (result == B_NO_ERROR) {
 		*num = 1;
 		entry->d_dev = vol->id;
-		entry->d_reclen = sizeof(struct dirent) + strlen(entry->d_name) + 1;
+		entry->d_reclen = offsetof(struct dirent, d_name) + strlen(entry->d_name) + 1;
 		DPRINTF(0, ("dosfs_readdir: found file %s\n", entry->d_name));
 	} else if (result == ENOENT) {
 		// When you get to the end, don't return an error, just return 0
