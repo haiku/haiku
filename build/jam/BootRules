@@ -172,6 +172,8 @@ rule BootMergeObject
 	#				   will be added.
 	#
 
+	TARGET_PACKAGING_ARCH on $(1) = $(TARGET_KERNEL_ARCH) ;
+
 	SetupBoot $(2) : $(3) ;
 	Objects $(2) ;
 	MergeObjectFromObjects $(1) : $(2:S=$(SUFOBJ)) : $(4) ;
@@ -184,6 +186,8 @@ rule BootStaticLibrary
 	# This is designed to take a set of sources and libraries and create
 	# a file called lib<name>.a
 
+	TARGET_PACKAGING_ARCH on $(1) = $(TARGET_KERNEL_ARCH) ;
+
 	SetupBoot $(2) : $(3) : false ;
 	Library $(1) : $(2) ;
 }
@@ -193,6 +197,8 @@ rule BootStaticLibraryObjects
 	# Usage BootStaticLibrary <name> : <sources> ;
 	# This is designed to take a set of sources and libraries and create
 	# a file called <name>
+
+	TARGET_PACKAGING_ARCH on $(1) = $(TARGET_KERNEL_ARCH) ;
 
 	# Show that we depend on the libraries we need
 	SetupBoot $(2) ;
