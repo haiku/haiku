@@ -74,7 +74,7 @@ serial_putc(char ch)
 		return;
 	}
 
-	#if defined(__x86__) || defined(__x86_64__)
+	#if defined(__i386__) || defined(__x86_64__)
 	while ((in8(sSerialBasePort + SERIAL_LINE_STATUS) & 0x20) == 0)
 		asm volatile ("pause;");
 
@@ -145,7 +145,7 @@ serial_switch_to_legacy(void)
 	sSerial = NULL;
 	sSerialUsesEFI = false;
 
-#if defined(__x86__) || defined(__x86_64__)
+#if defined(__i386__) || defined(__x86_64__)
 	memset(gKernelArgs.platform_args.serial_base_ports, 0,
 		sizeof(uint16) * MAX_SERIAL_PORTS);
 
