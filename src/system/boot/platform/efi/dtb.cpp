@@ -73,6 +73,19 @@ const struct supported_uarts {
 };
 
 
+const struct supported_interrupt_controllers {
+	const char*	dtb_compat;
+	const char*	kind;
+} kSupportedInterruptControllers[] = {
+#ifdef __ARM__
+	{ "arm,cortex-a9-gic", INTC_KIND_GICV1 },
+	{ "arm,cortex-a15-gic", INTC_KIND_GICV2 },
+	{ "ti,omap3-intc", INTC_KIND_OMAP3 },
+	{ "marvell,pxa-intc", INTC_KIND_PXA },
+#endif
+};
+
+
 static void WriteStringList(const char* prop, size_t size)
 {
 	bool first = true;
@@ -449,29 +462,45 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
 
 	// TODO: We should check for the "chosen" uart and prioritize that one
 
-	uart_info &uart = gKernelArgs.arch_args.uart;
-	if (uart.kind[0] != 0)
-		return;
-
 	// check for a uart if we don't have one
-	for (uint32 i = 0; i < B_COUNT_OF(kSupportedUarts); i++) {
-		if (HasFdtString(compatible, compatibleLen,
-				kSupportedUarts[i].dtb_compat)) {
+	uart_info &uart = gKernelArgs.arch_args.uart;
+	if (uart.kind[0] == 0) {
+		for (uint32 i = 0; i < B_COUNT_OF(kSupportedUarts); i++) {
+			if (HasFdtString(compatible, compatibleLen,
+					kSupportedUarts[i].dtb_compat)) {
 
-			memcpy(uart.kind, kSupportedUarts[i].kind,
-				sizeof(uart.kind));
+				memcpy(uart.kind, kSupportedUarts[i].kind,
+					sizeof(uart.kind));
 
-			GetReg(fdt, node, addressCells, sizeCells, 0, uart.regs);
-			uart.irq = GetInterrupt(fdt, node);
-			uart.clock = GetClockFrequency(fdt, node);
+				GetReg(fdt, node, addressCells, sizeCells, 0, uart.regs);
+				uart.irq = GetInterrupt(fdt, node);
+				uart.clock = GetClockFrequency(fdt, node);
 
-			gUART = kSupportedUarts[i].uart_driver_init(uart.regs.start,
-				uart.clock);
+				gUART = kSupportedUarts[i].uart_driver_init(uart.regs.start,
+					uart.clock);
+			}
 		}
+
+		if (gUART != NULL)
+			gUART->InitEarly();
 	}
 
-	if (gUART != NULL)
-		gUART->InitEarly();
+	intc_info &interrupt_controller = gKernelArgs.arch_args.interrupt_controller;
+	if (interrupt_controller.kind[0] == 0) {
+		for (uint32 i = 0; i < B_COUNT_OF(kSupportedInterruptControllers); i++) {
+			if (HasFdtString(compatible, compatibleLen,
+				kSupportedInterruptControllers[i].dtb_compat)) {
+
+				memcpy(interrupt_controller.kind, kSupportedInterruptControllers[i].kind,
+					sizeof(interrupt_controller.kind));
+
+				GetReg(fdt, node, addressCells, sizeCells, 0,
+					interrupt_controller.regs1);
+				GetReg(fdt, node, addressCells, sizeCells, 1,
+					interrupt_controller.regs2);
+			}
+		}
+	}
 }
 
 
@@ -558,4 +587,17 @@ dtb_set_kernel_args()
 		dprintf("  clock: %" B_PRIu64 "\n", uart.clock);
 	}
 #endif
+	intc_info &interrupt_controller = gKernelArgs.arch_args.interrupt_controller;
+	dprintf("Chosen interrupt controller:\n");
+	if (interrupt_controller.kind[0] == 0) {
+		dprintf("kind: None!\n");
+	} else {
+		dprintf("  kind: %s\n", interrupt_controller.kind);
+		dprintf("  regs: %#" B_PRIx64 ", %#" B_PRIx64 "\n",
+			interrupt_controller.regs1.start,
+			interrupt_controller.regs1.size);
+		dprintf("        %#" B_PRIx64 ", %#" B_PRIx64 "\n",
+			interrupt_controller.regs2.start,
+			interrupt_controller.regs2.size);
+	}
 }

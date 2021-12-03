@@ -11,6 +11,7 @@
 
 
 #include <util/FixedWidthPointer.h>
+#include <boot/interrupt_controller.h>
 #include <boot/uart.h>
 
 
@@ -41,6 +42,7 @@ typedef struct {
 	FixedWidthPointer<void> fdt;
 
 	uart_info	uart;
+	intc_info	interrupt_controller;
 } _PACKED arch_kernel_args;
 
 #endif	/* KERNEL_ARCH_ARM_KERNEL_ARGS_H */
