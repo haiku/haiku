@@ -21,19 +21,13 @@ public:
 	}
 
 protected:
-#if 0
-	InterruptController(fdt_module_info *fdtModule, fdt_device_node node)
-		: fFDT(fdtModule), fNode(node) {
+	InterruptController()
+	{
 		if (sInstance) {
 			panic("Multiple InterruptController objects created; that is currently unsupported!");
 		}
 		sInstance = this;
 	}
-
-	// Keep our node around as we might want to grab attributes from it
-	fdt_module_info *fFDT;
-	fdt_device_node fNode;
-#endif
 
 	static InterruptController *sInstance;
 };
