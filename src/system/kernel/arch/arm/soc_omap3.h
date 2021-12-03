@@ -10,20 +10,12 @@ class OMAP3InterruptController;
 
 class OMAP3InterruptController : public InterruptController {
 public:
+	OMAP3InterruptController(uint32_t reg_base);
 	void EnableInterrupt(int irq);
 	void DisableInterrupt(int irq);
 	void HandleInterrupt();
 
-#if 0
-	static status_t Init(fdt_module_info *fdt, fdt_device_node node, void *cookie) {
-		InterruptController *ic = new(std::nothrow) OMAP3InterruptController(fdt, node);
-		// XXX implement InitCheck() functionality
-		return ic != NULL ? B_OK : B_NO_MEMORY;
-	}
-#endif
 protected:
-	//OMAP3InterruptController(fdt_module_info *fdt, fdt_device_node node);
-
 	void SoftReset();
 
 	area_id fRegArea;

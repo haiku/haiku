@@ -1,3 +1,5 @@
+#include <vm/vm.h>
+
 #include "soc_pxa.h"
 
 /* PXA Interrupt Controller Registers */
@@ -40,17 +42,18 @@ PXAInterruptController::HandleInterrupt()
 }
 
 
-#if 0
-PXAInterruptController::PXAInterruptController(fdt_module_info *fdt, fdt_device_node node)
-	: InterruptController(fdt, node) {
-	fRegArea = fFDT->map_reg_range(node, 0, (void**)&fRegBase);
+PXAInterruptController::PXAInterruptController(uint32_t reg_base)
+{
+	fRegArea = vm_map_physical_memory(B_SYSTEM_TEAM, "intc-pxa", (void**)&fRegBase,
+		B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		reg_base, false);
 	if (fRegArea < 0)
 		panic("PXAInterruptController: cannot map registers!");
 
 	fRegBase[PXA_ICMR] = 0;
 	fRegBase[PXA_ICMR2] = 0;
 }
-#endif
+
 
 #define PXA_TIMERS_INTERRUPT	7 /* OST_4_11 */
 

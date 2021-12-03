@@ -120,20 +120,6 @@ arch_int_init(kernel_args *args)
 extern "C" void arm_vector_init(void);
 
 
-#if 0
-static struct fdt_device_info intc_table[] = {
-	{
-		.compatible = "marvell,pxa-intc",
-		.init = PXAInterruptController::Init,
-	}, {
-		.compatible = "ti,omap3-intc",
-		.init = OMAP3InterruptController::Init,
-	}
-};
-static int intc_count = sizeof(intc_table) / sizeof(struct fdt_device_info);
-#endif
-
-
 status_t
 arch_int_init_post_vm(kernel_args *args)
 {
@@ -176,6 +162,18 @@ arch_int_init_post_vm(kernel_args *args)
 		InterruptController *ic = new(std::nothrow) GICv2InterruptController(
 			args->arch_args.interrupt_controller.regs1.start,
 			args->arch_args.interrupt_controller.regs2.start);
+		if (ic == NULL)
+			return B_NO_MEMORY;
+	} else if (strncmp(args->arch_args.interrupt_controller.kind, INTC_KIND_OMAP3,
+		sizeof(args->arch_args.interrupt_controller.kind)) == 0) {
+		InterruptController *ic = new(std::nothrow) OMAP3InterruptController(
+			args->arch_args.interrupt_controller.regs1.start);
+		if (ic == NULL)
+			return B_NO_MEMORY;
+	} else if (strncmp(args->arch_args.interrupt_controller.kind, INTC_KIND_PXA,
+		sizeof(args->arch_args.interrupt_controller.kind)) == 0) {
+		InterruptController *ic = new(std::nothrow) PXAInterruptController(
+			args->arch_args.interrupt_controller.regs1.start);
 		if (ic == NULL)
 			return B_NO_MEMORY;
 	} else {
