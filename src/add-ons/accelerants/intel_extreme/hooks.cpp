@@ -47,10 +47,16 @@ get_accelerant_hook(uint32 feature, void* data)
 #ifdef __HAIKU__
 		case B_GET_EDID_INFO:
 			return (void*)intel_get_edid_info;
+
+		/* laptop panel backlight */
 		case B_SET_BRIGHTNESS:
-			return (void*)intel_set_brightness;
+			if (gInfo->shared_info->device_type.IsMobile())
+				return (void*)intel_set_brightness;
 		case B_GET_BRIGHTNESS:
-			return (void*)intel_get_brightness;
+			if (gInfo->shared_info->device_type.IsMobile())
+				return (void*)intel_get_brightness;
+
+			return NULL;
 #endif
 		case B_GET_FRAME_BUFFER_CONFIG:
 			return (void*)intel_get_frame_buffer_config;
