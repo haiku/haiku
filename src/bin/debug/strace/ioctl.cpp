@@ -7,6 +7,7 @@
  */
 
 
+#include <sys/ioctl.h>
 #include <sys/sockio.h>
 #include <termios.h>
 
@@ -20,7 +21,7 @@
 
 
 struct ioctl_info {
-	int index;
+	unsigned int index;
 	const char *name;
 	TypeHandler *handler;
 };
@@ -159,7 +160,13 @@ static const ioctl_info kIOCtls[] = {
 	IOCTL_INFO_ENTRY(B_SCSI_SCAN),
 	IOCTL_INFO_ENTRY(B_SCSI_DATA_MODE),
 
-	{ -1, NULL, NULL }
+	// socket ioctls
+	IOCTL_INFO_ENTRY_TYPE(FIONBIO, int*),
+	IOCTL_INFO_ENTRY_TYPE(FIONREAD, int*),
+	IOCTL_INFO_ENTRY_TYPE(FIOSEEKDATA, off_t*),
+	IOCTL_INFO_ENTRY_TYPE(FIOSEEKHOLE, off_t*),
+
+	{ 0, NULL, NULL }
 };
 
 static EnumTypeHandler::EnumMap kIoctlNames;
