@@ -19,13 +19,15 @@ public:
 		SIMPLE_STRUCTS	= 1 << 2,
 		COMPLEX_STRUCTS	= 1 << 3,
 		POINTER_VALUES	= 1 << 4,
-		ALL		= 0xffffffff
+		INPUT_VALUES	= 1 << 5,
+		OUTPUT_VALUES	= 1 << 6,
+		ALL		= 0xffffff9f
 	};
 
 	Context(Syscall *sc, char *data, MemoryReader &reader,
-		uint32 flags, bool decimal)
+		uint32 flags, bool decimal, uint64 returnValue = 0)
 		: fSyscall(sc), fData(data), fReader(reader),
-		  fFlags(flags), fDecimal(decimal) {}
+		  fFlags(flags), fDecimal(decimal), fReturnValue(returnValue) {}
 
 	Parameter *GetSibling(int32 index) const {
 		return fSyscall->ParameterAt(index);
@@ -33,6 +35,10 @@ public:
 
 	const void *GetValue(Parameter *param) const {
 		return fData + param->Offset();
+	}
+
+	uint64 GetReturnValue() const {
+		return fReturnValue;
 	}
 
 	MemoryReader &Reader() { return fReader; }
@@ -50,6 +56,7 @@ private:
 	MemoryReader &fReader;
 	uint32 fFlags;
 	bool fDecimal;
+	uint64 fReturnValue;
 };
 
 #endif	// STRACE_CONTEXT_H

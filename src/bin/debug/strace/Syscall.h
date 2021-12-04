@@ -48,10 +48,13 @@ public:
 
 	const string &Name() const		{ return fName; }
 	int32 Offset() const			{ return fOffset; }
+	bool InOut() const				{ return fInOut; }
+	void SetInOut(bool inout)		{ fInOut = inout; }
 
 private:
 	string	fName;
 	int32	fOffset;
+	bool	fInOut;
 };
 
 // Syscall
@@ -106,10 +109,21 @@ public:
 		return NULL;
 	}
 
+	bool IsPreSyscall() const
+	{
+		return fPreSyscall;
+	}
+
+	void SetPreSyscall(bool preSyscall)
+	{
+		fPreSyscall = preSyscall;
+	}
+
 private:
 	string				fName;
 	Type				*fReturnType;
 	vector<Parameter*>	fParameters;
+	bool				fPreSyscall;
 };
 
 #endif	// STRACE_SYSCALL_H

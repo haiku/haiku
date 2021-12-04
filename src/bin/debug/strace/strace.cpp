@@ -262,6 +262,16 @@ patch_syscalls()
 	extern void patch_ioctl();
 
 	patch_ioctl();
+
+	Syscall *poll = get_syscall("_kern_poll");
+	poll->SetPreSyscall(true);
+	poll->ParameterAt(0)->SetInOut(true);
+
+	Syscall *select = get_syscall("_kern_select");
+	select->SetPreSyscall(true);
+	select->ParameterAt(1)->SetInOut(true);
+	select->ParameterAt(2)->SetInOut(true);
+	select->ParameterAt(3)->SetInOut(true);
 }
 
 
@@ -338,15 +348,15 @@ print_to_string(char **_buffer, int32 *_length, const char *format, ...)
 
 
 static void
-print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
+print_syscall(FILE *outputFile, Syscall* syscall, debug_pre_syscall &message,
 	MemoryReader &memoryReader, bool printArguments, uint32 contentsFlags,
-	bool printReturnValue, bool colorize, bool decimal)
+	bool colorize, bool decimal)
 {
 	char buffer[4096], *string = buffer;
 	int32 length = (int32)sizeof(buffer);
 
 	Context ctx(syscall, (char *)message.args, memoryReader,
-		    contentsFlags, decimal);
+		    contentsFlags | Context::INPUT_VALUES, decimal);
 
 	// print syscall name, without the "_kern_"
 	if (colorize) {
@@ -376,6 +386,50 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
 
 	print_to_string(&string, &length, ")");
 
+	print_buffer(outputFile, buffer, sizeof(buffer) - length);
+}
+
+
+static void
+print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
+	MemoryReader &memoryReader, bool printArguments, uint32 contentsFlags,
+	bool printReturnValue, bool colorize, bool decimal)
+{
+	char buffer[4096], *string = buffer;
+	int32 length = (int32)sizeof(buffer);
+
+	Context ctx(syscall, (char *)message.args, memoryReader,
+		    contentsFlags | Context::OUTPUT_VALUES, decimal, message.return_value);
+
+	if (!syscall->IsPreSyscall()) {
+		// print syscall name, without the "_kern_"
+		if (colorize) {
+			print_to_string(&string, &length, "[%6" B_PRId32 "] %s%s%s(",
+				message.origin.thread, kTerminalTextBlue,
+				syscall->Name().c_str() + 6, kTerminalTextNormal);
+		} else {
+			print_to_string(&string, &length, "[%6" B_PRId32 "] %s(",
+				message.origin.thread, syscall->Name().c_str() + 6);
+		}
+
+		// print arguments
+		if (printArguments) {
+			int32 count = syscall->CountParameters();
+			for (int32 i = 0; i < count; i++) {
+				// get the value
+				Parameter *parameter = syscall->ParameterAt(i);
+				TypeHandler *handler = parameter->Handler();
+				::string value =
+					handler->GetParameterValue(ctx, parameter,
+							ctx.GetValue(parameter));
+
+				print_to_string(&string, &length, (i > 0 ? ", %s" : "%s"),
+					value.c_str());
+			}
+		}
+
+		print_to_string(&string, &length, ")");
+	}
 	// print return value
 	if (printReturnValue) {
 		Type *returnType = syscall->ReturnType();
@@ -392,6 +446,30 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
 					&& message.return_value < 0)) {
 				print_to_string(&string, &length, " %s", strerror(message.return_value));
 			}
+		}
+	}
+
+	if (syscall->IsPreSyscall()) {
+		// print arguments
+		if (printArguments) {
+			int32 count = syscall->CountParameters();
+			int added = 0;
+			print_to_string(&string, &length, " (");
+			for (int32 i = 0; i < count; i++) {
+				// get the value
+				Parameter *parameter = syscall->ParameterAt(i);
+				if (!parameter->InOut())
+					continue;
+				TypeHandler *handler = parameter->Handler();
+				::string value =
+					handler->GetParameterValue(ctx, parameter,
+							ctx.GetValue(parameter));
+
+				print_to_string(&string, &length, (added > 0 ? ", %s" : "%s"),
+					value.c_str());
+				added++;
+			}
+			print_to_string(&string, &length, ")");
 		}
 	}
 
@@ -684,7 +762,7 @@ main(int argc, const char *const *argv)
 	if (threadID >= 0) {
 		int32 threadDebugFlags = 0;
 		if (!traceTeam) {
-			threadDebugFlags = B_THREAD_DEBUG_POST_SYSCALL
+			threadDebugFlags = B_THREAD_DEBUG_PRE_SYSCALL | B_THREAD_DEBUG_POST_SYSCALL
 				| (traceChildThreads
 					? B_THREAD_DEBUG_SYSCALL_TRACE_CHILD_THREADS : 0);
 		}
@@ -715,6 +793,31 @@ main(int argc, const char *const *argv)
 		}
 
 		switch (code) {
+			case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
+			{
+				TeamMap::iterator it = debuggedTeams.find(message.origin.team);
+				if (it == debuggedTeams.end())
+					break;
+
+				Team* team = it->second;
+				MemoryReader& memoryReader = team->GetMemoryReader();
+
+				uint32 syscallNumber = message.pre_syscall.syscall;
+				if (syscallNumber >= sSyscallVector.size()) {
+					fprintf(stderr, "%s: invalid syscall %" B_PRIu32 " attempted\n",
+						kCommandName, syscallNumber);
+					break;
+				}
+				Syscall* syscall = sSyscallVector[syscallNumber];
+
+				if (syscall->IsPreSyscall() && trace) {
+					print_syscall(outputFile, syscall, message.pre_syscall,
+						memoryReader, printArguments, contentsFlags,
+						colorize, decimalFormat);
+				}
+				break;
+			}
+
 			case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 			{
 				TeamMap::iterator it = debuggedTeams.find(message.origin.team);
@@ -755,7 +858,6 @@ main(int argc, const char *const *argv)
 			case B_DEBUGGER_MESSAGE_BREAKPOINT_HIT:
 			case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
 			case B_DEBUGGER_MESSAGE_SINGLE_STEP:
-			case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 			case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
 			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
 			case B_DEBUGGER_MESSAGE_THREAD_DELETED:
