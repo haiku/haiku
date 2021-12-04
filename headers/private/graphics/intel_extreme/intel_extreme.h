@@ -341,6 +341,40 @@ enum pipe_index {
     INTEL_PIPE_D
 };
 
+class pipes {
+public:
+	pipes() : bitmask(0) {}
+
+	bool HasPipe(pipe_index pipe)
+	{
+		if (pipe == INTEL_PIPE_ANY)
+			return bitmask != 0;
+
+		return (bitmask & (1 << pipe)) != 0;
+	}
+
+	void SetPipe(pipe_index pipe)
+	{
+		if (pipe == INTEL_PIPE_ANY) {
+			bitmask = ~1;
+				// first bit corresponds to INTEL_PIPE_ANY but it's never used,
+				// so it should be 0
+		}
+		bitmask |= (1 << pipe);
+	}
+
+	void ClearPipe(pipe_index pipe)
+	{
+		if (pipe == INTEL_PIPE_ANY)
+			bitmask = 0;
+
+		bitmask &= ~(1 << pipe);
+	}
+
+private:
+	uint8 bitmask;
+};
+
 //----------------- ioctl() interface ----------------
 
 // magic code for ioctls
@@ -553,6 +587,18 @@ struct intel_free_graphics_memory {
 #define PCH_INTERRUPT_VBLANK_PIPEA_SNB		(1 << 7)
 #define PCH_INTERRUPT_VBLANK_PIPEB_SNB		(1 << 15)
 #define PCH_INTERRUPT_GLOBAL_SNB			(1 << 31)
+
+#define PCH_MASTER_INT_CTL_BDW					0x44200
+
+#define PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(pipe)	(1 << (15 + pipe))
+#define PCH_MASTER_INT_CTL_GLOBAL_BDW				(1 << 31)
+
+#define PCH_INTERRUPT_PIPE_STATUS_BDW(pipe)		(0x44400 + (pipe - 1) * 0x10)
+#define PCH_INTERRUPT_PIPE_MASK_BDW(pipe)		(0x44404 + (pipe - 1) * 0x10)
+#define PCH_INTERRUPT_PIPE_IDENTITY_BDW(pipe)	(0x44408 + (pipe - 1) * 0x10)
+#define PCH_INTERRUPT_PIPE_ENABLED_BDW(pipe)	(0x4440c + (pipe - 1) * 0x10)
+
+#define PCH_INTERRUPT_VBLANK_BDW				(1 << 0)
 
 // graphics port control (i.e. G45)
 #define DISPLAY_MONITOR_PORT_ENABLED	(1UL << 31)
