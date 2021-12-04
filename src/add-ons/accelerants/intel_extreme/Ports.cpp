@@ -1468,7 +1468,8 @@ DigitalDisplayInterface::_SetPortLinkGen8(const display_timing& timing)
 	// Only DP modes supports less than 4 lanes: read current config
 	uint32 pipeFunc = read32(PIPE_DDI_FUNC_CTL_A + fPipeOffset);
 	if (((pipeFunc & PIPE_DDI_MODESEL_MASK) >> PIPE_DDI_MODESEL_SHIFT) >= PIPE_DDI_MODE_DP_SST) {
-		lanes = 1 << ((pipeFunc & PIPE_DDI_DP_WIDTH_MASK) >> PIPE_DDI_DP_WIDTH_SHIFT);
+		// On gen 9.5 IceLake 3x mode exists (DSI only), earlier models: reserved value.
+		lanes = ((pipeFunc & PIPE_DDI_DP_WIDTH_MASK) >> PIPE_DDI_DP_WIDTH_SHIFT) + 1;
 		TRACE("%s: DDI in DP mode with %" B_PRIx32 " lanes in use\n", __func__, lanes);
 	} else {
 		TRACE("%s: DDI in non-DP mode with %" B_PRIx32 " lanes in use\n", __func__, lanes);
