@@ -1443,6 +1443,7 @@ DigitalDisplayInterface::_SetPortLinkGen8(const display_timing& timing)
 	//uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10; //=270000 khz
 	//fixme: always so?
 	uint32 linkBandwidth = 270000; //khz
+
 	uint32 fPipeOffset = 0;
 	switch (fPipe->Index()) {
 		case INTEL_PIPE_B:
@@ -1463,10 +1464,29 @@ DigitalDisplayInterface::_SetPortLinkGen8(const display_timing& timing)
 	TRACE("%s: DDI M1 link before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_LINK_M + fPipeOffset));
 	TRACE("%s: DDI N1 link before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_LINK_N + fPipeOffset));
 
-	uint32 bitsPerPixel = 24;	//fixme: always so?
+	uint32 pipeFunc = read32(PIPE_DDI_FUNC_CTL_A + fPipeOffset);
+	uint32 bitsPerPixel = (pipeFunc & PIPE_DDI_BPC_MASK) >> PIPE_DDI_COLOR_SHIFT;
+	switch (bitsPerPixel) {
+		case PIPE_DDI_8BPC:
+			bitsPerPixel = 24;
+			break;
+		case PIPE_DDI_10BPC:
+			bitsPerPixel = 30;
+			break;
+		case PIPE_DDI_6BPC:
+			bitsPerPixel = 18;
+			break;
+		case PIPE_DDI_12BPC:
+			bitsPerPixel = 36;
+			break;
+		default:
+			ERROR("%s: DDI illegal link colordepth set.\n", __func__);
+			return B_ERROR;
+	}
+	TRACE("%s: DDI Link Colordepth: %" B_PRIu32 "\n", __func__, bitsPerPixel);
+
 	uint32 lanes = 4;
 	// Only DP modes supports less than 4 lanes: read current config
-	uint32 pipeFunc = read32(PIPE_DDI_FUNC_CTL_A + fPipeOffset);
 	if (((pipeFunc & PIPE_DDI_MODESEL_MASK) >> PIPE_DDI_MODESEL_SHIFT) >= PIPE_DDI_MODE_DP_SST) {
 		// On gen 9.5 IceLake 3x mode exists (DSI only), earlier models: reserved value.
 		lanes = ((pipeFunc & PIPE_DDI_DP_WIDTH_MASK) >> PIPE_DDI_DP_WIDTH_SHIFT) + 1;

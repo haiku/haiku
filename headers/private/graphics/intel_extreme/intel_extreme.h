@@ -755,6 +755,13 @@ struct intel_free_graphics_memory {
 #define PIPE_DDI_MODE_DVI				1
 #define PIPE_DDI_MODE_DP_SST			2
 #define PIPE_DDI_MODE_DP_MST			3
+#define PIPE_DDI_COLOR_SHIFT			20
+#define PIPE_DDI_BPC(x)					((x) << PIPE_DDI_COLOR_SHIFT)
+#define PIPE_DDI_BPC_MASK				(7 << PIPE_DDI_COLOR_SHIFT)
+#define PIPE_DDI_8BPC					0
+#define PIPE_DDI_10BPC					1
+#define PIPE_DDI_6BPC					2
+#define PIPE_DDI_12BPC					3
 #define PIPE_DDI_DP_WIDTH_SHIFT			1
 #define PIPE_DDI_DP_WIDTH_SEL(x)		((x) << PIPE_DDI_DP_WIDTH_SHIFT)
 #define PIPE_DDI_DP_WIDTH_MASK			(7 << PIPE_DDI_DP_WIDTH_SHIFT)
