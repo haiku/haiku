@@ -225,7 +225,8 @@ enum port_index {
 	INTEL_PORT_B,
 	INTEL_PORT_C,
 	INTEL_PORT_D,
-	INTEL_PORT_E
+	INTEL_PORT_E,
+	INTEL_PORT_F
 };
 
 enum pch_info {
@@ -726,6 +727,7 @@ struct intel_free_graphics_memory {
 #define DDI_BUF_CTL_C					(0x4200 | REGS_NORTH_PIPE_AND_PORT)
 #define DDI_BUF_CTL_D					(0x4300 | REGS_NORTH_PIPE_AND_PORT)
 #define DDI_BUF_CTL_E					(0x4400 | REGS_NORTH_PIPE_AND_PORT)
+#define DDI_BUF_CTL_F					(0x4500 | REGS_NORTH_PIPE_AND_PORT)
 #define DDI_BUF_CTL_ENABLE				(1 << 31)
 #define DDI_BUF_TRANS_SELECT(n)			((n) << 24)
 #define DDI_BUF_EMP_MASK				(0xf << 24)
@@ -748,6 +750,7 @@ struct intel_free_graphics_memory {
 #define PIPE_DDI_PORT_C					2
 #define PIPE_DDI_PORT_D					3
 #define PIPE_DDI_PORT_E					4
+#define PIPE_DDI_PORT_F					5
 #define PIPE_DDI_MODESEL_SHIFT			24
 #define PIPE_DDI_MODESEL_MODE(x)		((x) << PIPE_DDI_MODESEL_SHIFT)
 #define PIPE_DDI_MODESEL_MASK			(7 << PIPE_DDI_MODESEL_SHIFT)

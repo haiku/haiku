@@ -190,6 +190,7 @@ get_next_intel_extreme(int32* _cookie, pci_info &info, uint32 &type)
 			if (info.device_id == kSupportedDevices[i].device_id) {
 				type = i;
 				*_cookie = index + 1;
+				ERROR("%s: Intel gfx deviceID: 0x%04x\n", __func__, info.device_id);
 				return B_OK;
 			}
 		}
@@ -215,6 +216,7 @@ detect_intel_pch()
 
 		// check device
 		unsigned short id = info.device_id & INTEL_PCH_DEVICE_ID_MASK;
+		ERROR("%s: Intel PCH deviceID: 0x%04x\n", __func__, info.device_id);
 		switch(id) {
 			case INTEL_PCH_IBX_DEVICE_ID:
 				ERROR("%s: Found Ibex Peak PCH\n", __func__);

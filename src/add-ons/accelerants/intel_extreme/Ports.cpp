@@ -1295,6 +1295,11 @@ DigitalDisplayInterface::_PortRegister()
 			return DDI_BUF_CTL_D;
 		case INTEL_PORT_E:
 			return DDI_BUF_CTL_E;
+		case INTEL_PORT_F:
+			if ((gInfo->shared_info->device_type.Generation() > 8) &&
+				!gInfo->shared_info->device_type.InGroup(INTEL_GROUP_SKY))
+				return DDI_BUF_CTL_F;
+			return 0;
 		default:
 			return 0;
 	}
@@ -1353,9 +1358,11 @@ DigitalDisplayInterface::IsConnected()
 	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
 		portRegister);
 
-	// Please note: Skylake and up (Desktop) use eDP for a seperate active VGA converter chip.
-	if ((portRegister == 0) && (PortIndex() != INTEL_PORT_E)) //DP protocol has no register
+	// Please note: Skylake and up (Desktop) might use eDP for a seperate active VGA converter chip.
+	if (portRegister == 0) {
+		TRACE("%s: Port not implemented\n", __func__);
 		return false;
+	}
 
 	// Probe a little port info.
 	if ((read32(DDI_BUF_CTL_A) & DDI_A_4_LANES) != 0) {
