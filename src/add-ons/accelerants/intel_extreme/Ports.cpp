@@ -1364,30 +1364,35 @@ DigitalDisplayInterface::IsConnected()
 		return false;
 	}
 
-	// Probe a little port info.
-	if ((read32(DDI_BUF_CTL_A) & DDI_A_4_LANES) != 0) {
-		switch (PortIndex()) {
-			case INTEL_PORT_A:
-				fMaxLanes = 4;
-				break;
-			case INTEL_PORT_E:
-				fMaxLanes = 0;
-				break;
-			default:
-				fMaxLanes = 4;
-				break;
-		}
-	} else {
-		switch (PortIndex()) {
-			case INTEL_PORT_A:
-				fMaxLanes = 2;
-				break;
-			case INTEL_PORT_E:
-				fMaxLanes = 2;
-				break;
-			default:
-				fMaxLanes = 4;
-				break;
+	// newer chipsets support 4 lanes on all ports
+	fMaxLanes = 4;
+	if ((gInfo->shared_info->device_type.Generation() < 9) ||
+		gInfo->shared_info->device_type.InGroup(INTEL_GROUP_SKY)) {
+		// Probe a little port info.
+		if ((read32(DDI_BUF_CTL_A) & DDI_A_4_LANES) != 0) {
+			switch (PortIndex()) {
+				case INTEL_PORT_A:
+					fMaxLanes = 4;
+					break;
+				case INTEL_PORT_E:
+					fMaxLanes = 0;
+					break;
+				default:
+					fMaxLanes = 4;
+					break;
+			}
+		} else {
+			switch (PortIndex()) {
+				case INTEL_PORT_A:
+					fMaxLanes = 2;
+					break;
+				case INTEL_PORT_E:
+					fMaxLanes = 2;
+					break;
+				default:
+					fMaxLanes = 4;
+					break;
+			}
 		}
 	}
 

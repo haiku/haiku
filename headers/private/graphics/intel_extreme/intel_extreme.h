@@ -616,6 +616,14 @@ struct intel_free_graphics_memory {
 #define SKL_DPLL_CTRL2					(0xc05c | REGS_NORTH_PIPE_AND_PORT)
 #define SKL_DPLL_STATUS					(0xc060 | REGS_NORTH_PIPE_AND_PORT)
 
+// Icelake PLLs
+#define ICL_DSSM						0x51004
+#define ICL_DSSM_REF_FREQ_SHIFT			29
+#define ICL_DSSM_REF_FREQ_MASK			(7 << ICL_DSSM_REF_FREQ_SHIFT)
+#define ICL_DSSM_24000					0
+#define ICL_DSSM_19200					1
+#define ICL_DSSM_38400					2
+
 // display
 
 #define INTEL_DISPLAY_OFFSET			0x1000

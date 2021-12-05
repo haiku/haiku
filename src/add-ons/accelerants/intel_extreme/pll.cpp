@@ -980,6 +980,7 @@ static void skl_wrpll_params_populate(struct skl_wrpll_params *params,
 			(uint64)params->dco_integer * 1000000) * 0x8000 /
 			1000000;
 
+	TRACE("%s: Reference clock: %gMhz\n", __func__, ref_clock / 1000.0f);
 	TRACE("%s: DCO integer %" B_PRIu32 "\n", __func__, params->dco_integer);
 	TRACE("%s: DCO fraction 0x%" B_PRIx32 "\n", __func__, params->dco_fraction);
 }
@@ -1047,7 +1048,7 @@ skip_remaining_dividers:
 		TRACE("%s: No valid divider found for %dHz\n", __func__, clock);
 		return false;
 	}
-	TRACE("%s: Full devider (p) found is %d\n", __func__, ctx.p);
+	TRACE("%s: Full divider (p) found is %d\n", __func__, ctx.p);
 
 	/*
 	 * gcc incorrectly analyses that these can be used without being

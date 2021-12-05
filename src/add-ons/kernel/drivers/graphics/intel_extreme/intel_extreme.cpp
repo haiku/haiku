@@ -462,13 +462,35 @@ intel_extreme_init(intel_info &info)
 		info.shared_info->pll_info.max_frequency = 400000;
 			// 400 MHz RAM DAC speed
 		info.shared_info->pll_info.min_frequency = 20000;		// 20 MHz
-	} else if ((info.device_type.HasDDI()) && (info.device_type.Generation() <= 8)) {
+	} else if (info.device_type.HasDDI() && (info.device_type.Generation() <= 8)) {
 		info.shared_info->pll_info.reference_frequency = 135000;// 135 MHz
 		info.shared_info->pll_info.max_frequency = 350000;
 			// 350 MHz RAM DAC speed
 		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz
-	} else if (info.device_type.Generation() == 9) {
+	} else if ((info.device_type.Generation() == 9) &&
+				info.device_type.InGroup(INTEL_GROUP_SKY)) {
 		info.shared_info->pll_info.reference_frequency = 24000;	// 24 MHz
+		info.shared_info->pll_info.max_frequency = 350000;
+			// 350 MHz RAM DAC speed
+		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz
+	} else if (info.device_type.Generation() == 9) {
+		uint32 refInfo =
+			(read32(info, ICL_DSSM) & ICL_DSSM_REF_FREQ_MASK) >> ICL_DSSM_REF_FREQ_SHIFT;
+		switch (refInfo) {
+			case ICL_DSSM_24000:
+				info.shared_info->pll_info.reference_frequency = 24000;	// 24 MHz
+				break;
+			case ICL_DSSM_19200:
+				info.shared_info->pll_info.reference_frequency = 19200;	// 19.2 MHz
+				break;
+			case ICL_DSSM_38400:
+				info.shared_info->pll_info.reference_frequency = 38400;	// 38.4 MHz
+				break;
+			default:
+				ERROR("error: unknown ref. freq. strap, using 24Mhz! %" B_PRIx32 "\n", refInfo);
+				info.shared_info->pll_info.reference_frequency = 24000;	// 24 MHz
+				break;
+		}
 		info.shared_info->pll_info.max_frequency = 350000;
 			// 350 MHz RAM DAC speed
 		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz
