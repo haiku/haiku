@@ -229,10 +229,11 @@ detect_intel_pch()
 				return INTEL_PCH_CPT;
 			case INTEL_PCH_LPT_DEVICE_ID:
 			case INTEL_PCH_LPT_LP_DEVICE_ID:
+				ERROR("%s: Found LynxPoint PCH\n", __func__);
+				return INTEL_PCH_LPT;
 			case INTEL_PCH_WPT_DEVICE_ID:
 			case INTEL_PCH_WPT_LP_DEVICE_ID:
-				// WildcatPoint is LPT compatible
-				ERROR("%s: Found LynxPoint PCH\n", __func__);
+				ERROR("%s: Found WildcatPoint PCH\n", __func__);
 				return INTEL_PCH_LPT;
 			case INTEL_PCH_SPT_DEVICE_ID:
 			case INTEL_PCH_SPT_LP_DEVICE_ID:
@@ -240,14 +241,36 @@ detect_intel_pch()
 				return INTEL_PCH_SPT;
 			case INTEL_PCH_KBP_DEVICE_ID:
 				ERROR("%s: Found Kaby Lake PCH\n", __func__);
-				return INTEL_PCH_KBP;
+				return INTEL_PCH_SPT;
 			case INTEL_PCH_CNP_DEVICE_ID:
 			case INTEL_PCH_CNP_LP_DEVICE_ID:
 				ERROR("%s: Found Cannon Lake PCH\n", __func__);
 				return INTEL_PCH_CNP;
+			case INTEL_PCH_CMP_DEVICE_ID:
+			case INTEL_PCH_CMP2_DEVICE_ID:
+				ERROR("%s: Found Comet Lake PCH\n", __func__);
+				return INTEL_PCH_CNP;
+			case INTEL_PCH_CMP_V_DEVICE_ID:
+				ERROR("%s: Found Comet Lake V PCH\n", __func__);
+				return INTEL_PCH_SPT;
 			case INTEL_PCH_ICP_DEVICE_ID:
 				ERROR("%s: Found Ice Lake PCH\n", __func__);
 				return INTEL_PCH_ICP;
+			case INTEL_PCH_MCC_DEVICE_ID:
+				ERROR("%s: Found Mule Creek Canyon PCH\n", __func__);
+				return INTEL_PCH_MCC;
+			case INTEL_PCH_TGP_DEVICE_ID:
+			case INTEL_PCH_TGP2_DEVICE_ID:
+				ERROR("%s: Found Tiger Lake PCH\n", __func__);
+				return INTEL_PCH_TGP;
+			case INTEL_PCH_JSP_DEVICE_ID:
+			case INTEL_PCH_JSP2_DEVICE_ID:
+				ERROR("%s: Found Jasper Lake PCH\n", __func__);
+				return INTEL_PCH_JSP;
+			case INTEL_PCH_ADP_DEVICE_ID:
+			case INTEL_PCH_ADP2_DEVICE_ID:
+				ERROR("%s: Found Alder Lake PCH\n", __func__);
+				return INTEL_PCH_ADP;
 		}
 	}
 
