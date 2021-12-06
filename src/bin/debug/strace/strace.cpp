@@ -196,7 +196,8 @@ struct Team {
 		}
 
 		// set team debugging flags
-		int32 teamDebugFlags = (traceTeam ? B_TEAM_DEBUG_POST_SYSCALL : 0)
+		int32 teamDebugFlags =
+			(traceTeam ? B_TEAM_DEBUG_PRE_SYSCALL | B_TEAM_DEBUG_POST_SYSCALL : 0)
 			| (traceChildTeams ? B_TEAM_DEBUG_TEAM_CREATION : 0)
 			| (traceSignal ? B_TEAM_DEBUG_SIGNALS : 0);
 		if (set_team_debugging_flags(fNubPort, teamDebugFlags) != B_OK)
@@ -264,11 +265,9 @@ patch_syscalls()
 	patch_ioctl();
 
 	Syscall *poll = get_syscall("_kern_poll");
-	poll->SetPreSyscall(true);
 	poll->ParameterAt(0)->SetInOut(true);
 
 	Syscall *select = get_syscall("_kern_select");
-	select->SetPreSyscall(true);
 	select->ParameterAt(1)->SetInOut(true);
 	select->ParameterAt(2)->SetInOut(true);
 	select->ParameterAt(3)->SetInOut(true);
@@ -350,13 +349,19 @@ print_to_string(char **_buffer, int32 *_length, const char *format, ...)
 static void
 print_syscall(FILE *outputFile, Syscall* syscall, debug_pre_syscall &message,
 	MemoryReader &memoryReader, bool printArguments, uint32 contentsFlags,
-	bool colorize, bool decimal)
+	bool colorize, bool decimal, thread_id &currentThreadID)
 {
 	char buffer[4096], *string = buffer;
 	int32 length = (int32)sizeof(buffer);
 
 	Context ctx(syscall, (char *)message.args, memoryReader,
 		    contentsFlags | Context::INPUT_VALUES, decimal);
+
+	if (currentThreadID != message.origin.thread) {
+		if (currentThreadID != -1)
+			print_to_string(&string, &length, " <unfinished ...>\n");
+		currentThreadID = message.origin.thread;
+	}
 
 	// print syscall name, without the "_kern_"
 	if (colorize) {
@@ -393,45 +398,38 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_pre_syscall &message,
 static void
 print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
 	MemoryReader &memoryReader, bool printArguments, uint32 contentsFlags,
-	bool printReturnValue, bool colorize, bool decimal)
+	bool printReturnValue, bool colorize, bool decimal,
+	thread_id &currentThreadID)
 {
 	char buffer[4096], *string = buffer;
 	int32 length = (int32)sizeof(buffer);
+	bool threadChanged = false;
 
 	Context ctx(syscall, (char *)message.args, memoryReader,
 		    contentsFlags | Context::OUTPUT_VALUES, decimal, message.return_value);
 
-	if (!syscall->IsPreSyscall()) {
-		// print syscall name, without the "_kern_"
-		if (colorize) {
-			print_to_string(&string, &length, "[%6" B_PRId32 "] %s%s%s(",
-				message.origin.thread, kTerminalTextBlue,
-				syscall->Name().c_str() + 6, kTerminalTextNormal);
-		} else {
-			print_to_string(&string, &length, "[%6" B_PRId32 "] %s(",
-				message.origin.thread, syscall->Name().c_str() + 6);
+	if (currentThreadID != message.origin.thread) {
+		if (currentThreadID != -1) {
+			print_to_string(&string, &length, " <unfinished ...>\n");
 		}
-
-		// print arguments
-		if (printArguments) {
-			int32 count = syscall->CountParameters();
-			for (int32 i = 0; i < count; i++) {
-				// get the value
-				Parameter *parameter = syscall->ParameterAt(i);
-				TypeHandler *handler = parameter->Handler();
-				::string value =
-					handler->GetParameterValue(ctx, parameter,
-							ctx.GetValue(parameter));
-
-				print_to_string(&string, &length, (i > 0 ? ", %s" : "%s"),
-					value.c_str());
-			}
-		}
-
-		print_to_string(&string, &length, ")");
+		threadChanged = true;
 	}
+	currentThreadID = -1;
+
 	// print return value
 	if (printReturnValue) {
+		if (threadChanged) {
+			// print syscall name, without the "_kern_"
+			if (colorize) {
+				print_to_string(&string, &length, "[%6" B_PRId32 "] <... "
+					"%s%s%s resumed> ", message.origin.thread, kTerminalTextBlue,
+					syscall->Name().c_str() + 6, kTerminalTextNormal);
+			} else {
+				print_to_string(&string, &length, "[%6" B_PRId32 "] <... %s"
+					" resumed> ", message.origin.thread,
+					syscall->Name().c_str() + 6);
+			}
+		}
 		Type *returnType = syscall->ReturnType();
 		TypeHandler *handler = returnType->Handler();
 		::string value = handler->GetReturnValue(ctx, message.return_value);
@@ -449,28 +447,26 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
 		}
 	}
 
-	if (syscall->IsPreSyscall()) {
-		// print arguments
-		if (printArguments) {
-			int32 count = syscall->CountParameters();
-			int added = 0;
-			print_to_string(&string, &length, " (");
-			for (int32 i = 0; i < count; i++) {
-				// get the value
-				Parameter *parameter = syscall->ParameterAt(i);
-				if (!parameter->InOut())
-					continue;
-				TypeHandler *handler = parameter->Handler();
-				::string value =
-					handler->GetParameterValue(ctx, parameter,
-							ctx.GetValue(parameter));
+	// print arguments
+	if (printArguments) {
+		int32 count = syscall->CountParameters();
+		int added = 0;
+		print_to_string(&string, &length, " (");
+		for (int32 i = 0; i < count; i++) {
+			// get the value
+			Parameter *parameter = syscall->ParameterAt(i);
+			if (!parameter->InOut())
+				continue;
+			TypeHandler *handler = parameter->Handler();
+			::string value =
+				handler->GetParameterValue(ctx, parameter,
+						ctx.GetValue(parameter));
 
-				print_to_string(&string, &length, (added > 0 ? ", %s" : "%s"),
-					value.c_str());
-				added++;
-			}
-			print_to_string(&string, &length, ")");
+			print_to_string(&string, &length, (added > 0 ? ", %s" : "%s"),
+				value.c_str());
+			added++;
 		}
+		print_to_string(&string, &length, ")");
 	}
 
 	if (colorize) {
@@ -775,6 +771,8 @@ main(int argc, const char *const *argv)
 		resume_thread(threadID);
 	}
 
+	thread_id currentThreadID = -1;
+
 	// debug loop
 	while (true) {
 		bool quitLoop = false;
@@ -810,10 +808,10 @@ main(int argc, const char *const *argv)
 				}
 				Syscall* syscall = sSyscallVector[syscallNumber];
 
-				if (syscall->IsPreSyscall() && trace) {
+				if (trace) {
 					print_syscall(outputFile, syscall, message.pre_syscall,
 						memoryReader, printArguments, contentsFlags,
-						colorize, decimalFormat);
+						colorize, decimalFormat, currentThreadID);
 				}
 				break;
 			}
@@ -841,7 +839,8 @@ main(int argc, const char *const *argv)
 				if (trace) {
 					print_syscall(outputFile, syscall, message.post_syscall,
 						memoryReader, printArguments, contentsFlags,
-						printReturnValues, colorize, decimalFormat);
+						printReturnValues, colorize, decimalFormat,
+						currentThreadID);
 				}
 				break;
 			}

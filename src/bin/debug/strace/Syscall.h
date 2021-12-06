@@ -109,21 +109,10 @@ public:
 		return NULL;
 	}
 
-	bool IsPreSyscall() const
-	{
-		return fPreSyscall;
-	}
-
-	void SetPreSyscall(bool preSyscall)
-	{
-		fPreSyscall = preSyscall;
-	}
-
 private:
 	string				fName;
 	Type				*fReturnType;
 	vector<Parameter*>	fParameters;
-	bool				fPreSyscall;
 };
 
 #endif	// STRACE_SYSCALL_H
