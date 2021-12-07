@@ -400,23 +400,15 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 		} else {
 			const status_t waitStatus = atomic_get_and_set(&entry->fWaitStatus, result);
 
-			// Prevent the thread from changing status after we unset its fVariable,
-			// as otherwise it could become unblocked (or may already be so) and then
-			// re-block itself on something else before we call thread_unblock.
-			SpinLocker threadLocker(thread->scheduler_lock);
+			// We need not waste time trying to unblock the thread if it already unblocked.
+			if (waitStatus == STATUS_WAITING && thread_is_blocked(thread))
+				thread_unblock(thread, result);
 
 			// No matter what the thread is doing, as we were the ones to clear its
 			// fThread, so we are the ones responsible for decrementing fEntriesCount.
 			// (We may not validly access the entry once we unset its fVariable.)
 			atomic_pointer_set(&entry->fVariable, (ConditionVariable*)NULL);
 			atomic_add(&fEntriesCount, -1);
-
-			// Do this after unsetting fVariable, as in case the entry wakes up
-			// and tries to remove itself, it need not not have to wait for us.
-			// (We check thread->state here as it cannot change while we hold
-			// the scheduler lock, unlike thread_is_blocked, which can!)
-			if (waitStatus == STATUS_WAITING && thread->state == B_THREAD_WAITING)
-				thread_unblock_locked(thread, result);
 		}
 
 		if (!all)
