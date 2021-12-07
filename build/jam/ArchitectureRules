@@ -109,11 +109,11 @@ rule ArchitectureSetup architecture
 
 	# disable some Clang warnings that are not very useful
 	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
-		HAIKU_WARNING_CCFLAGS_$(architecture) += -Wno-address-of-packed-member
-			-Wno-unused-private-field -Wno-cast-align -Wno-gnu-designator
+		HAIKU_WARNING_CCFLAGS_$(architecture) +=
+			-Wno-unused-private-field -Wno-gnu-designator
 			-Wno-builtin-requires-header ;
-		HAIKU_WARNING_C++FLAGS_$(architecture) += -Wno-address-of-packed-member
-			-Wno-unused-private-field -Wno-cast-align -Wno-gnu-designator
+		HAIKU_WARNING_C++FLAGS_$(architecture) +=
+			-Wno-unused-private-field -Wno-gnu-designator
 			-Wno-builtin-requires-header ;
 	}
 
@@ -125,7 +125,8 @@ rule ArchitectureSetup architecture
 			-Wno-error=deprecated -Wno-error=deprecated-declarations
 			-Wno-error=cpp -Wno-error=trigraphs -Wno-error=register ;
 		# These currently generate too many "false positives."
-		#HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=address-of-packed-member ;
+		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=address-of-packed-member
+			-Wno-error=stringop-overread -Wno-error=array-bounds ;
 		# But these can stay.
 		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=cast-align
 			-Wno-error=format-truncation ;
