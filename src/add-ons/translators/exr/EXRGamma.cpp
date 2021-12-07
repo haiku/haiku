@@ -11,7 +11,6 @@
 #include <algorithm>
 
 using namespace std;
-using Imath::clamp;
 
 
 float
@@ -97,5 +96,5 @@ Gamma::operator() (half h)
 	// Scale and clamp
 	//
 	
-	return clamp (x * s, 0.f, 255.f);
+	return Imath::clamp (x * s, 0.f, 255.f);
 }
