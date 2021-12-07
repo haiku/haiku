@@ -529,8 +529,14 @@ resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 	void* location = NULL;
 	if (sharedSym == NULL) {
 		// symbol not found at all
-		lookupError = ERROR_NO_SYMBOL;
-		sharedImage = NULL;
+		if (sym->Bind() == STB_WEAK) {
+			// weak symbol: treat as NULL
+			lookupError = SUCCESS;
+			location = sharedImage = NULL;
+		} else {
+			lookupError = ERROR_NO_SYMBOL;
+			sharedImage = NULL;
+		}
 	} else if (sym->Type() != STT_NOTYPE
 		&& sym->Type() != sharedSym->Type()) {
 		// symbol not of the requested type
@@ -582,7 +588,8 @@ resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 		return B_MISSING_SYMBOL;
 	}
 
-	cache->SetSymbolValueAt(index, (addr_t)location, sharedImage);
+	if (location != NULL)
+		cache->SetSymbolValueAt(index, (addr_t)location, sharedImage);
 
 	if (symbolImage)
 		*symbolImage = sharedImage;
