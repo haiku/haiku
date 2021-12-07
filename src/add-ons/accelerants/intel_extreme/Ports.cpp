@@ -1477,6 +1477,7 @@ DigitalDisplayInterface::_SetPortLinkGen8(const display_timing& timing, uint32 p
 					linkBandwidth = 2160000 / 5;
 					break;
 				default:
+					linkBandwidth = 270000;
 					ERROR("%s: DDI No known DP-link reference clock selected, assuming default\n", __func__);
 					break;
 			}
