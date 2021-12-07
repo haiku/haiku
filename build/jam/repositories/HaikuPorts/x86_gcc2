@@ -5,7 +5,7 @@ RemotePackageRepository HaikuPorts
 	# architecture "any" packages
 	be_book-2008_10_26-3
 	ca_root_certificates-2021_07_05-1
-	haikuporter-1.2.4-1
+	haikuporter-1.2.5-1
 	noto-20200106-1
 	noto_sans_cjk_jp-1.004-2
 	timgmsoundfont-fixed-5
@@ -17,34 +17,33 @@ RemotePackageRepository HaikuPorts
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
 	autoconf-2.69-8
-	automake-1.16.3-1
-	bash-5.1-1
+	automake-1.16.5-1
+	bash-5.1.008-1
 	bc-1.07.1-2
 	bepdf-2.1.4-2
 	binutils-2.17_2016_07_24-4
 	bison-3.0.5-1
 	bzip2-1.0.8-1
 	bzip2_devel-1.0.8-1
-	cdrtools-3.02~a09-1
-	cdrtools_devel-3.02~a09-1
+	cdrtools-3.02~a09-2
+	cdrtools_devel-3.02~a09-2
 	ctags-5.8-5
-	coreutils-8.24-2
-	curl-7.78.0-1
-	curl_devel-7.78.0-1
+	curl-7.79.1-1
+	curl_devel-7.79.1-1
 	diffutils-3.7-1
 	expat-2.4.1-1
 	expat_devel-2.4.1-1
 	ffmpeg-4.2.2-9
 	ffmpeg_devel-4.2.2-9
-	file-5.40-1
-	file_data-5.40-1
+	file-5.41-1
+	file_data-5.41-1
 	findutils-4.6.0-1
 	flex-2.6.4-2
 	fluidlite_devel-1.0.0-3
 	fontconfig-2.13.92-1
 	fontconfig_devel-2.13.92-1
-	freetype-2.10.4-3
-	freetype_devel-2.10.4-3
+	freetype-2.11.0-2
+	freetype_devel-2.11.0-2
 	gettext_libintl-0.19.8.1-7
 	gcc-2.95.3_2017_07_20-2
 	gcc_syslibs_devel-2.95.3_2017_07_20-2
@@ -75,15 +74,15 @@ RemotePackageRepository HaikuPorts
 	libiconv-1.16-1
 	libicns-0.8.1-8
 	libicns_devel-0.8.1-8
-	libjpeg_turbo-2.1.0-1
-	libjpeg_turbo_devel-2.1.0-1
+	libjpeg_turbo-2.1.1-1
+	libjpeg_turbo_devel-2.1.1-1
 	liblayout-1.4.1-8
 	libmodplug-0.8.9.0-1
 	libogg-1.3.5-1
 	libogg_devel-1.3.5-1
 	libpcap-1.8.1-4
 	libpcap_devel-1.8.1-4
-	libpcre-8.44-1
+	libpcre-8.45-1
 	libpcre2-10.37-1
 	libpng16-1.6.37-1
 	libpng16_devel-1.6.37-1
@@ -100,8 +99,8 @@ RemotePackageRepository HaikuPorts
 	libvorbis-1.3.7-1
 	libvorbis_devel-1.3.7-1
 	libvpx-1.0.0-2
-	libwebp-1.1.0-2
-	libwebp_devel-1.1.0-2
+	libwebp-1.2.1-1
+	libwebp_devel-1.2.1-1
 	libxml2-2.9.12-1
 	libxml2_devel-2.9.12-1
 	live555-2016.06.22-5
@@ -121,9 +120,9 @@ RemotePackageRepository HaikuPorts
 	openexr_devel-2.2.1-3
 	openjpeg-2.1.2-3
 	openjpeg_devel-2.1.2-3
-	openssh-8.6p1-2
-	openssl-1.1.1k-1
-	openssl_devel-1.1.1k-1
+	openssh-8.8p1-1
+	openssl-1.1.1l-1
+	openssl_devel-1.1.1l-1
 	opus-1.3.1-1
 	opus_devel-1.3.1-1
 	patch-2.7.5-3
@@ -138,10 +137,10 @@ RemotePackageRepository HaikuPorts
 	sharutils-4.15.2-3
 	speex-1.2.0-4
 	speex_devel-1.2.0-4
-	sqlite-3.34.1.0-1
+	sqlite-3.36.0.0-1
 	taglib-1.7.2-3
 	taglib_devel-1.7.2-3
-	tcpdump-4.9.2-1
+	tcpdump-4.99.1-1
 	texinfo-6.1-7
 	tiff4-4.2.0-1
 	tiff4_devel-4.2.0-1
@@ -159,15 +158,16 @@ RemotePackageRepository HaikuPorts
 	zstd_devel-1.5.0-2
 	# secondary architecture (x86)
 	binutils_x86-2.26.1_2016_07_22-6
-	bison_x86-3.7.6-1
+	bison_x86-3.8.2-1
 	bzip2_x86-1.0.8-1
 	bzip2_x86_devel-1.0.8-1
-	cdrtools_x86-3.02~a09-1
-	cdrtools_x86_devel-3.02~a09-1
-	curl_x86-7.78.0-1
-	curl_x86_devel-7.78.0-1
-	dav1d_x86-0.9.1-1
-	dav1d_x86_devel-0.9.1-1
+	cdrtools_x86-3.02~a09-2
+	cdrtools_x86_devel-3.02~a09-2
+	coreutils_x86-9.0-6
+	curl_x86-7.79.1-1
+	curl_x86_devel-7.79.1-1
+	dav1d_x86-0.9.2-1
+	dav1d_x86_devel-0.9.2-1
 	enca_x86-1.19-2
 	enca_x86_devel-1.19-2
 	expat_x86-2.4.1-1
@@ -178,27 +178,27 @@ RemotePackageRepository HaikuPorts
 	fluidlite_x86_devel-1.0.0-3
 	fontconfig_x86-2.13.92-1
 	fontconfig_x86_devel-2.13.92-1
-	freetype_x86-2.10.4-3
-	freetype_x86_devel-2.10.4-3
-	fribidi_x86-1.0.10-1
-	fribidi_x86_devel-1.0.10-1
+	freetype_x86-2.11.0-2
+	freetype_x86_devel-2.11.0-2
+	fribidi_x86-1.0.11-1
+	fribidi_x86_devel-1.0.11-1
 	game_music_emu_x86-0.6.3-1
 	game_music_emu_x86_devel-0.6.3-1
-	gcc_x86-8.3.0_2019_05_24-10
-	gcc_x86_syslibs-8.3.0_2019_05_24-10
-	gcc_x86_syslibs_devel-8.3.0_2019_05_24-10
+	gcc_x86-11.2.0_2021_07_28-5
+	gcc_x86_syslibs-11.2.0_2021_07_28-5
+	gcc_x86_syslibs_devel-11.2.0_2021_07_28-5
 	gettext_x86-0.19.8.1-7
 	gettext_x86_libintl-0.19.8.1-7
 	giflib_x86-5.2.1-1
 	giflib_x86_devel-5.2.1-1
 	glu_x86-9.0.0-7
 	glu_x86_devel-9.0.0-7
-	gmp_x86-6.2.1-1
+	gmp_x86-6.2.1-2
 	graphite2_x86-1.3.14-1
 	graphite2_x86_devel-1.3.14-1
 	grep_x86-3.6-2
-	haikuwebkit_x86-1.8.2-2
-	haikuwebkit_x86_devel-1.8.2-2
+	haikuwebkit_x86-1.8.4-1
+	haikuwebkit_x86_devel-1.8.4-1
 	harfbuzz_x86-2.8.1-1
 	harfbuzz_x86_devel-2.8.1-1
 	icu66_x86-66.1-2
@@ -219,28 +219,28 @@ RemotePackageRepository HaikuPorts
 	libffi_x86-3.4.2-1
 	libffi_x86_devel-3.4.2-1
 	libgcrypt_x86-1.8.5-1
-	libgpg_error_x86-1.36-1
+	libgpg_error_x86-1.36-2
 	libiconv_x86-1.16-1
 	libiconv_x86_devel-1.16-1
 	libicns_x86-0.8.1-8
 	libicns_x86_devel-0.8.1-8
 	libidn2_x86-2.0.5-2
-	libjpeg_turbo_x86-2.1.0-1
-	libjpeg_turbo_x86_devel-2.1.0-1
+	libjpeg_turbo_x86-2.1.1-1
+	libjpeg_turbo_x86_devel-2.1.1-1
 	libmodplug_x86-0.8.9.0-1
 	libogg_x86-1.3.5-1
 	libogg_x86_devel-1.3.5-1
-	libopenmpt_x86-0.5.9-1
-	libopenmpt_x86_devel-0.5.9-1
-	libpcre_x86-8.44-1
-	libpcre_x86_devel-8.44-1
+	libopenmpt_x86-0.5.13-1
+	libopenmpt_x86_devel-0.5.13-1
+	libpcre_x86-8.45-1
+	libpcre_x86_devel-8.45-1
 	libpng16_x86-1.6.37-1
 	libpng16_x86_devel-1.6.37-1
 	libsolv_x86-0.3.0_haiku_2014_12_22-3
 	libsolv_x86_devel-0.3.0_haiku_2014_12_22-3
 	libssh2_x86-1.9.0-2
 	libssh2_x86_devel-1.9.0-2
-	libtasn1_x86-4.16.0-1
+	libtasn1_x86-4.17.0-1
 	libtheora_x86-1.1.1-7
 	libtheora_x86_devel-1.1.1-7
 	libtool_x86-2.4.6-2
@@ -250,18 +250,18 @@ RemotePackageRepository HaikuPorts
 	libvorbis_x86_devel-1.3.7-1
 	libvpx_x86-1.10.0-1
 	libvpx_x86_devel-1.10.0-1
-	libwebp_x86-1.1.0-2
-	libwebp_x86_devel-1.1.0-2
+	libwebp_x86-1.2.1-1
+	libwebp_x86_devel-1.2.1-1
 	libxml2_x86-2.9.12-1
 	libxml2_x86_devel-2.9.12-1
 	libxslt_x86-1.1.34-3
 	live555_x86-2016.06.22-5
 	live555_x86_devel-2016.06.22-5
 	llvm7_x86_libs-7.0.1-2
-	mesa_x86-17.1.10-6
-	mesa_x86_devel-17.1.10-6
-	mesa_x86_swpipe-17.1.10-6
-	nano_x86-5.7-1
+	mesa_x86-21.2.3-2
+	mesa_x86_devel-21.2.3-2
+	mesa_x86_swpipe-21.2.3-2
+	nano_x86-5.9-1
 	nasm_x86-2.14.02-2
 	ncurses6_x86-6.2-1
 	ncurses6_x86_devel-6.2-1
@@ -273,13 +273,13 @@ RemotePackageRepository HaikuPorts
 	openexr_x86_devel-2.4.1-1
 	openjpeg_x86-2.4.0-1
 	openjpeg_x86_devel-2.4.0-1
-	openssl_x86-1.1.1k-1
-	openssl_x86_devel-1.1.1k-1
+	openssl_x86-1.1.1l-1
+	openssl_x86_devel-1.1.1l-1
 	opus_x86-1.3.1-1
 	opus_x86_devel-1.3.1-1
 	p7zip_x86-17.04-2
 	pkgconfig_x86-0.29.2-4
-	python3_x86-3.7.10-5
+	python3_x86-3.7.12-1
 	readline_x86-8.1-1
 	sharutils_x86-4.15.2-3
 	snappy_x86-1.1.8-1
@@ -288,7 +288,7 @@ RemotePackageRepository HaikuPorts
 	soxr_x86_devel-0.1.3-1
 	speex_x86-1.2.0-4
 	speex_x86_devel-1.2.0-4
-	sqlite_x86-3.34.1.0-1
+	sqlite_x86-3.36.0.0-1
 	taglib_x86-1.12-1
 	taglib_x86_devel-1.12-1
 	tar_x86-1.34-1
@@ -316,7 +316,7 @@ RemotePackageRepository HaikuPorts
 	bzip2
 	cdrtools
 	cdrtools_x86
-	coreutils
+	coreutils_x86
 	ctags
 	curl
 	dav1d_x86
