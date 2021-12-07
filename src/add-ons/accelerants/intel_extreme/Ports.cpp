@@ -1449,12 +1449,42 @@ DigitalDisplayInterface::IsConnected()
 }
 
 status_t
-DigitalDisplayInterface::_SetPortLinkGen8(const display_timing& timing)
+DigitalDisplayInterface::_SetPortLinkGen8(const display_timing& timing, uint32 pllSel)
 {
-	// Khz / 10. ( each output octet encoded as 10 bits.
-	//uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10; //=270000 khz
-	//fixme: always so?
+	//fixme: always so on pre gen 9?
 	uint32 linkBandwidth = 270000; //khz
+
+	if (gInfo->shared_info->device_type.Generation() >= 9) {
+		if (pllSel != 0xff) {
+			linkBandwidth = (read32(SKL_DPLL_CTRL1) >> (1 + 6 * pllSel)) & SKL_DPLL_DP_LINKRATE_MASK;
+			switch (linkBandwidth) {
+				case SKL_DPLL_CTRL1_2700:
+					linkBandwidth = 2700000 / 5;
+					break;
+				case SKL_DPLL_CTRL1_1350:
+					linkBandwidth = 1350000 / 5;
+					break;
+				case SKL_DPLL_CTRL1_810:
+					linkBandwidth =  810000 / 5;
+					break;
+				case SKL_DPLL_CTRL1_1620:
+					linkBandwidth = 1620000 / 5;
+					break;
+				case SKL_DPLL_CTRL1_1080:
+					linkBandwidth = 1080000 / 5;
+					break;
+				case SKL_DPLL_CTRL1_2160:
+					linkBandwidth = 2160000 / 5;
+					break;
+				default:
+					ERROR("%s: DDI No known DP-link reference clock selected, assuming default\n", __func__);
+					break;
+			}
+		} else {
+			ERROR("%s: DDI No known PLL selected, assuming default DP-link reference\n", __func__);
+		}
+	}
+	TRACE("%s: DDI DP-link reference clock is %gMhz\n", __func__, linkBandwidth / 1000.0f);
 
 	uint32 fPipeOffset = 0;
 	switch (fPipe->Index()) {
@@ -1609,6 +1639,7 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Program general pipe config
 	fPipe->Configure(target);
 
+	uint32 pllSel = 0xff; // no PLL selected
 	if (gInfo->shared_info->device_type.Generation() <= 8) {
 		unsigned int r2_out, n2_out, p_out;
 		hsw_ddi_calculate_wrpll(
@@ -1622,12 +1653,13 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 			&wrpll_params);
 		fPipe->ConfigureClocksSKL(wrpll_params,
 			hardwareTarget.pixel_clock,
-			PortIndex());
+			PortIndex(),
+			&pllSel);
 	}
 
 	// Program target display mode
 	fPipe->ConfigureTimings(target, !needsScaling);
-	_SetPortLinkGen8(hardwareTarget);
+	_SetPortLinkGen8(hardwareTarget, pllSel);
 
 	// Set fCurrentMode to our set display mode
 	memcpy(&fCurrentMode, target, sizeof(display_mode));

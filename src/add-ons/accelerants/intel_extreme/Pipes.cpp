@@ -463,71 +463,71 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 
 void
 Pipe::ConfigureClocksSKL(const skl_wrpll_params& wrpll_params, uint32 pixelClock,
-	port_index pllForPort)
+	port_index pllForPort, uint32* pllSel)
 {
 	CALLED();
 
 	//find our PLL as set by the BIOS
 	uint32 portSel = read32(SKL_DPLL_CTRL2);
-	uint32 pllSel = 0;
+	*pllSel = 0xff;
 	switch (pllForPort) {
 	case INTEL_PORT_A:
-		pllSel = (portSel & 0x0006) >> 1;
+		*pllSel = (portSel & 0x0006) >> 1;
 		break;
 	case INTEL_PORT_B:
-		pllSel = (portSel & 0x0030) >> 4;
+		*pllSel = (portSel & 0x0030) >> 4;
 		break;
 	case INTEL_PORT_C:
-		pllSel = (portSel & 0x0180) >> 7;
+		*pllSel = (portSel & 0x0180) >> 7;
 		break;
 	case INTEL_PORT_D:
-		pllSel = (portSel & 0x0c00) >> 10;
+		*pllSel = (portSel & 0x0c00) >> 10;
 		break;
 	case INTEL_PORT_E:
-		pllSel = (portSel & 0x6000) >> 13;
+		*pllSel = (portSel & 0x6000) >> 13;
 		break;
 	default:
 		TRACE("No port selected!");
 		return;
 	}
-	TRACE("PLL selected is %" B_PRIx32 "\n", pllSel);
+	TRACE("PLL selected is %" B_PRIx32 "\n", *pllSel);
 
 	TRACE("Skylake DPLL_CFGCR1 0x%" B_PRIx32 "\n",
-		read32(SKL_DPLL1_CFGCR1 + (pllSel - 1) * 8));
+		read32(SKL_DPLL1_CFGCR1 + (*pllSel - 1) * 8));
 	TRACE("Skylake DPLL_CFGCR2 0x%" B_PRIx32 "\n",
-		read32(SKL_DPLL1_CFGCR2 + (pllSel - 1) * 8));
+		read32(SKL_DPLL1_CFGCR2 + (*pllSel - 1) * 8));
 
 	// only program PLL's that are in non-DP mode (otherwise the linkspeed sets refresh)
 	portSel = read32(SKL_DPLL_CTRL1);
-	if ((portSel & (1 << (pllSel * 6 + 5))) && pllSel) { // DPLL0 might only know DP mode
+	if ((portSel & (1 << (*pllSel * 6 + 5))) && *pllSel) { // DPLL0 might only know DP mode
 		// enable pgm on our PLL in case that's currently disabled
-		write32(SKL_DPLL_CTRL1, portSel | (1 << (pllSel * 6)));
+		write32(SKL_DPLL_CTRL1, portSel | (1 << (*pllSel * 6)));
 
-		write32(SKL_DPLL1_CFGCR1 + (pllSel - 1) * 8,
+		write32(SKL_DPLL1_CFGCR1 + (*pllSel - 1) * 8,
 			1 << 31 |
 			wrpll_params.dco_fraction << 9 |
 			wrpll_params.dco_integer);
-		write32(SKL_DPLL1_CFGCR2 + (pllSel - 1) * 8,
+		write32(SKL_DPLL1_CFGCR2 + (*pllSel - 1) * 8,
 			 wrpll_params.qdiv_ratio << 8 |
 			 wrpll_params.qdiv_mode << 7 |
 			 wrpll_params.kdiv << 5 |
 			 wrpll_params.pdiv << 2 |
 			 wrpll_params.central_freq);
-		read32(SKL_DPLL1_CFGCR1 + (pllSel - 1) * 8);
-		read32(SKL_DPLL1_CFGCR2 + (pllSel - 1) * 8);
+		read32(SKL_DPLL1_CFGCR1 + (*pllSel - 1) * 8);
+		read32(SKL_DPLL1_CFGCR2 + (*pllSel - 1) * 8);
 
 		//assuming DPLL0 and 1 are already enabled by the BIOS if in use (LCPLL1,2 regs)
 
 		spin(5);
-		if (read32(SKL_DPLL_STATUS) & (1 << (pllSel * 8))) {
+		if (read32(SKL_DPLL_STATUS) & (1 << (*pllSel * 8))) {
 			TRACE("Programmed PLL; PLL is locked\n");
 		} else {
 			TRACE("Programmed PLL; PLL did not lock\n");
 		}
 		TRACE("Skylake DPLL_CFGCR1 now: 0x%" B_PRIx32 "\n",
-			read32(SKL_DPLL1_CFGCR1 + (pllSel - 1) * 8));
+			read32(SKL_DPLL1_CFGCR1 + (*pllSel - 1) * 8));
 		TRACE("Skylake DPLL_CFGCR2 now: 0x%" B_PRIx32 "\n",
-			read32(SKL_DPLL1_CFGCR2 + (pllSel - 1) * 8));
+			read32(SKL_DPLL1_CFGCR2 + (*pllSel - 1) * 8));
 	} else {
 		TRACE("PLL programming not needed, skipping.\n");
 	}

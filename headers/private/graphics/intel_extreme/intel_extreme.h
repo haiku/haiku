@@ -612,9 +612,21 @@ struct intel_free_graphics_memory {
 #define SKL_DPLL2_CFGCR2				(0xc04c | REGS_NORTH_PIPE_AND_PORT)
 #define SKL_DPLL3_CFGCR1				(0xc050 | REGS_NORTH_PIPE_AND_PORT)
 #define SKL_DPLL3_CFGCR2				(0xc054 | REGS_NORTH_PIPE_AND_PORT)
+// These exist also still in CoffeeLake (confirmed):
 #define SKL_DPLL_CTRL1					(0xc058 | REGS_NORTH_PIPE_AND_PORT)
 #define SKL_DPLL_CTRL2					(0xc05c | REGS_NORTH_PIPE_AND_PORT)
 #define SKL_DPLL_STATUS					(0xc060 | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL0_DP_LINKRATE_SHIFT		1
+#define SKL_DPLL1_DP_LINKRATE_SHIFT		7
+#define SKL_DPLL2_DP_LINKRATE_SHIFT		13
+#define SKL_DPLL3_DP_LINKRATE_SHIFT		19
+#define SKL_DPLL_DP_LINKRATE_MASK		7
+#define SKL_DPLL_CTRL1_2700				0
+#define SKL_DPLL_CTRL1_1350				1
+#define SKL_DPLL_CTRL1_810				2
+#define SKL_DPLL_CTRL1_1620				3
+#define SKL_DPLL_CTRL1_1080				4
+#define SKL_DPLL_CTRL1_2160				5
 
 // Icelake PLLs
 #define ICL_DSSM						0x51004
