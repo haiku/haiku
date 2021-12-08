@@ -1358,22 +1358,21 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 
 	uint8 slot = XHCI_MAX_SLOTS;
 	if (EnableSlot(&slot) != B_OK) {
-		TRACE_ERROR("AllocateDevice() failed enable slot\n");
+		TRACE_ERROR("AllocateDevice: failed to enable slot\n");
 		return NULL;
 	}
 
 	if (slot == 0 || slot > fSlotCount) {
-		TRACE_ERROR("AllocateDevice() bad slot\n");
+		TRACE_ERROR("AllocateDevice: bad slot\n");
 		return NULL;
 	}
 
 	if (fDevices[slot].slot != 0) {
-		TRACE_ERROR("AllocateDevice() slot already used\n");
+		TRACE_ERROR("AllocateDevice: slot already used\n");
 		return NULL;
 	}
 
 	struct xhci_device *device = &fDevices[slot];
-	memset(device, 0, sizeof(struct xhci_device));
 	device->slot = slot;
 
 	device->input_ctx_area = fStack->AllocateArea((void **)&device->input_ctx,
@@ -1381,6 +1380,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		"XHCI input context");
 	if (device->input_ctx_area < B_OK) {
 		TRACE_ERROR("unable to create a input context area\n");
+		CleanupDevice(device);
 		return NULL;
 	}
 	if (fContextSizeShift == 1) {
@@ -1466,8 +1466,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		"XHCI device context");
 	if (device->device_ctx_area < B_OK) {
 		TRACE_ERROR("unable to create a device context area\n");
-		delete_area(device->input_ctx_area);
-		memset(device, 0, sizeof(xhci_device));
+		CleanupDevice(device);
 		return NULL;
 	}
 	memset(device->device_ctx, 0, sizeof(*device->device_ctx) << fContextSizeShift);
@@ -1477,9 +1476,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 			* XHCI_ENDPOINT_RING_SIZE, "XHCI endpoint trbs");
 	if (device->trb_area < B_OK) {
 		TRACE_ERROR("unable to create a device trbs area\n");
-		delete_area(device->input_ctx_area);
-		delete_area(device->device_ctx_area);
-		memset(device, 0, sizeof(xhci_device));
+		CleanupDevice(device);
 		return NULL;
 	}
 
@@ -1514,20 +1511,14 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	if (ConfigureEndpoint(endpoint0, slot, 0, USB_OBJECT_CONTROL_PIPE, false,
 			0, maxPacketSize, speed, 0, 0) != B_OK) {
 		TRACE_ERROR("unable to configure default control endpoint\n");
-		delete_area(device->input_ctx_area);
-		delete_area(device->device_ctx_area);
-		delete_area(device->trb_area);
-		memset(device, 0, sizeof(xhci_device));
+		CleanupDevice(device);
 		return NULL;
 	}
 
 	// device should get to addressed state (bsr = 0)
 	if (SetAddress(device->input_ctx_addr, false, slot) != B_OK) {
 		TRACE_ERROR("unable to set address\n");
-		delete_area(device->input_ctx_area);
-		delete_area(device->device_ctx_area);
-		delete_area(device->trb_area);
-		memset(device, 0, sizeof(xhci_device));
+		CleanupDevice(device);
 		return NULL;
 	}
 
@@ -1568,10 +1559,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	if (actualLength != 8) {
 		TRACE_ERROR("failed to get the device descriptor: %s\n",
 			strerror(status));
-		delete_area(device->input_ctx_area);
-		delete_area(device->device_ctx_area);
-		delete_area(device->trb_area);
-		memset(device, 0, sizeof(xhci_device));
+		CleanupDevice(device);
 		return NULL;
 	}
 
@@ -1612,10 +1600,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		if (actualLength != sizeof(usb_hub_descriptor)) {
 			TRACE_ERROR("error while getting the hub descriptor: %s\n",
 				strerror(status));
-			delete_area(device->input_ctx_area);
-			delete_area(device->device_ctx_area);
-			delete_area(device->trb_area);
-			memset(device, 0, sizeof(xhci_device));
+			CleanupDevice(device);
 			return NULL;
 		}
 
@@ -1644,10 +1629,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		} else {
 			TRACE_ERROR("device object failed to initialize\n");
 		}
-		delete_area(device->input_ctx_area);
-		delete_area(device->device_ctx_area);
-		delete_area(device->trb_area);
-		memset(device, 0, sizeof(xhci_device));
+		CleanupDevice(device);
 		return NULL;
 	}
 
@@ -1670,11 +1652,24 @@ XHCI::FreeDevice(Device *usbDevice)
 	// what we need to destroy before we tear down our internal state.
 	delete usbDevice;
 
-	DisableSlot(device->slot);
-	fDcba->baseAddress[device->slot] = 0;
-	delete_area(device->trb_area);
-	delete_area(device->input_ctx_area);
-	delete_area(device->device_ctx_area);
+	CleanupDevice(device);
+}
+
+
+void
+XHCI::CleanupDevice(xhci_device *device)
+{
+	if (device->slot != 0) {
+		DisableSlot(device->slot);
+		fDcba->baseAddress[device->slot] = 0;
+	}
+
+	if (device->trb_addr != 0)
+		delete_area(device->trb_area);
+	if (device->input_ctx_addr != 0)
+		delete_area(device->input_ctx_area);
+	if (device->device_ctx_addr != 0)
+		delete_area(device->device_ctx_area);
 
 	memset(device, 0, sizeof(xhci_device));
 }
