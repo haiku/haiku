@@ -157,7 +157,7 @@ ConditionVariableEntry::_RemoveFromVariable()
 		int32 tries = 0;
 		while (atomic_pointer_get(&fVariable) != NULL) {
 			tries++;
-			if ((tries % 10000) == 0)
+			if ((tries % 100000) == 0)
 				panic("variable pointer was not unset for a long time!");
 		}
 
