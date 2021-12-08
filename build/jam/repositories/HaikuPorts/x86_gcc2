@@ -257,7 +257,7 @@ RemotePackageRepository HaikuPorts
 	libxslt_x86-1.1.34-3
 	live555_x86-2016.06.22-5
 	live555_x86_devel-2016.06.22-5
-	llvm7_x86_libs-7.0.1-2
+	llvm9_x86_libs-9.0.1-2
 	mesa_x86-21.2.3-2
 	mesa_x86_devel-21.2.3-2
 	mesa_x86_swpipe-21.2.3-2
@@ -390,7 +390,7 @@ RemotePackageRepository HaikuPorts
 	libxml2
 	libxslt
 	live555
-	llvm7_x86
+	llvm9_x86
 	m4
 	make
 	mandoc
