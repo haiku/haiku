@@ -4,12 +4,6 @@
  */
 
 
-/*!
-	Part of DDC driver
-	Dumps EDID content
-*/
-
-
 #include "edid.h"
 #if !defined(_KERNEL_MODE) && !defined(_BOOT_MODE)
 #	include "ddc_int.h"
@@ -23,20 +17,23 @@ edid_dump(edid1_info *edid)
 {
 	int i, j;
 
-	dprintf("Vendor: %s\n", edid->vendor.manufacturer);
-	dprintf("Product ID: %d\n", (int)edid->vendor.prod_id);
-	dprintf("Serial #: %d\n", (int)edid->vendor.serial);
-	dprintf("Produced in week/year: %d/%d\n", edid->vendor.week,
+	dprintf("EDID info:\n");
+	dprintf("  Vendor: %s\n", edid->vendor.manufacturer);
+	dprintf("  Product ID: %d\n", (int)edid->vendor.prod_id);
+	dprintf("  Serial #: %d\n", (int)edid->vendor.serial);
+	dprintf("  Produced in week/year: %d/%d\n", edid->vendor.week,
 		edid->vendor.year);
 
-	dprintf("EDID version: %d.%d\n", edid->version.version,
+	dprintf("  EDID version: %d.%d\n", edid->version.version,
 		edid->version.revision);
 
-	dprintf("Type: %s\n", edid->display.input_type ? "Digital" : "Analog");
-	dprintf("Size: %d cm x %d cm\n", edid->display.h_size,
+	dprintf("  Type: %s\n", edid->display.input_type != 0 ? "Digital" : "Analog");
+	if (edid->display.input_type != 0)
+		dprintf("  Digtial Bit Depth: %d\n", edid->display.digital_params.bit_depth);
+	dprintf("  Size: %d cm x %d cm\n", edid->display.h_size,
 		edid->display.v_size);
-	dprintf("Gamma=%.3f\n", (edid->display.gamma + 100) / 100.0);
-	dprintf("White (X,Y)=(%.3f,%.3f)\n", edid->display.white_x / 1024.0,
+	dprintf("  Gamma=%.3f\n", (edid->display.gamma + 100) / 100.0);
+	dprintf("  White (X,Y)=(%.3f,%.3f)\n", edid->display.white_x / 1024.0,
 		edid->display.white_y / 1024.0);
 
 	dprintf("Supported Future Video Modes:\n");

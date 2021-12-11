@@ -61,11 +61,11 @@ typedef struct _PACKED {
 } edid1_version_raw;
 
 
-// display info
+// analog input parameters
 typedef struct _PACKED {
-	BBITFIELD8_7 ( 
-		input_type : 1,		// 1 : digital
-		input_voltage : 2,	// 0=0.7V/0.3V, 1=0.714V/0.286, 
+	BBITFIELD8_7 (
+		input_type : 1,		// 0 : analog, 1 : digital
+		input_voltage : 2,	// 0=0.7V/0.3V, 1=0.714V/0.286,
 							// 2=1V/0.4V, 3=0.7V/0V
 		setup : 1,			// true if voltage configurable
 		sep_sync : 1,
@@ -73,6 +73,26 @@ typedef struct _PACKED {
 		sync_on_green : 1,
 		sync_serr : 1
 	);
+} edid1_analog_params_raw;
+
+
+// digital input parameters
+typedef struct _PACKED {
+	BBITFIELD8_3 (
+		input_type : 1,	// 0 : analog, 1 : digital
+		bit_depth : 3,	// 0=undefined, 1=6,2=8,3=10,4=12,5=14,6=16,7=reserved
+		interface : 4	// 0=undefined, 2=HDMIa, 3=HDMIb
+						// 4=MDDI, 5=DisplayPort
+	);
+} edid1_digital_params_raw;
+
+
+// display info
+typedef struct _PACKED {
+	union {
+		edid1_analog_params_raw	analog_params;
+		edid1_digital_params_raw digital_params;
+	};
 	uint8 h_size;
 	uint8 v_size;
 	uint8 gamma;	// (x+100)/100
