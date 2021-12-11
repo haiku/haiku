@@ -81,6 +81,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			# force __cxa_pure_virtual to be linked instead of weak
 			# TODO: remove once we handle weak symbols correctly!
 			LINKFLAGS on $(libroot) += -Wl,-u,__cxa_pure_virtual ;
+			LINKFLAGS on $(librootDebug) += -Wl,-u,__cxa_pure_virtual ;
 		}
 
 		SharedLibrary $(libroot)
