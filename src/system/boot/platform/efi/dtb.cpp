@@ -7,6 +7,8 @@
  */
 
 
+// TODO: split arch-depending code to per-arch source
+
 #include <arch_smp.h>
 #include <arch/generic/debug_uart_8250.h>
 #if defined(__riscv)
@@ -73,17 +75,17 @@ const struct supported_uarts {
 };
 
 
+#ifdef __ARM__
 const struct supported_interrupt_controllers {
 	const char*	dtb_compat;
 	const char*	kind;
 } kSupportedInterruptControllers[] = {
-#ifdef __ARM__
 	{ "arm,cortex-a9-gic", INTC_KIND_GICV1 },
 	{ "arm,cortex-a15-gic", INTC_KIND_GICV2 },
 	{ "ti,omap3-intc", INTC_KIND_OMAP3 },
 	{ "marvell,pxa-intc", INTC_KIND_PXA },
-#endif
 };
+#endif
 
 
 static void WriteStringList(const char* prop, size_t size)
@@ -485,6 +487,7 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
 			gUART->InitEarly();
 	}
 
+#if defined(__ARM__)
 	intc_info &interrupt_controller = gKernelArgs.arch_args.interrupt_controller;
 	if (interrupt_controller.kind[0] == 0) {
 		for (uint32 i = 0; i < B_COUNT_OF(kSupportedInterruptControllers); i++) {
@@ -501,6 +504,7 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
 			}
 		}
 	}
+#endif
 }
 
 
@@ -587,6 +591,7 @@ dtb_set_kernel_args()
 		dprintf("  clock: %" B_PRIu64 "\n", uart.clock);
 	}
 #endif
+#if defined(__ARM__)
 	intc_info &interrupt_controller = gKernelArgs.arch_args.interrupt_controller;
 	dprintf("Chosen interrupt controller:\n");
 	if (interrupt_controller.kind[0] == 0) {
@@ -600,4 +605,5 @@ dtb_set_kernel_args()
 			interrupt_controller.regs2.start,
 			interrupt_controller.regs2.size);
 	}
+#endif
 }
