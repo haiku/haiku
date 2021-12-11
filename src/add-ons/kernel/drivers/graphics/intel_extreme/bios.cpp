@@ -19,9 +19,6 @@
 #endif
 
 
-static const off_t kVbtPointer = 0x1A;
-
-
 struct vbt_header {
 	uint8 signature[20];
 	uint16 version;
@@ -115,7 +112,7 @@ static struct vbios {
 	PROM-programmed timings info when compensation mode is off on your machine.
 */
 static bool
-get_bios(void)
+get_bios(int* vbtOffset)
 {
 	static const uint64_t kVBIOSAddress = 0xc0000;
 	static const int kVBIOSSize = 64 * 1024;
@@ -133,14 +130,22 @@ get_bios(void)
 	TRACE((DEVICE_NAME ": mapping VBIOS: 0x%" B_PRIx64 " -> %p\n",
 		kVBIOSAddress, vbios.memory));
 
-	int vbtOffset = vbios.ReadWord(kVbtPointer);
-	if ((vbtOffset + (int)sizeof(vbt_header)) >= kVBIOSSize) {
-		TRACE((DEVICE_NAME": bad VBT offset : 0x%x\n", vbtOffset));
+	// scan BIOS for VBT signature
+	*vbtOffset = kVBIOSSize;
+	for (uint32 i = 0; i + 4 < kVBIOSSize; i += 4) {
+		if (memcmp(vbios.memory + i, "$VBT", 4) == 0) {
+			*vbtOffset = i;
+			continue;
+		}
+	}
+
+	if ((*vbtOffset + (int)sizeof(vbt_header)) >= kVBIOSSize) {
+		TRACE((DEVICE_NAME": bad VBT offset : 0x%x\n", *vbtOffset));
 		delete_area(vbios.area);
 		return false;
 	}
 
-	struct vbt_header* vbt = (struct vbt_header*)(vbios.memory + vbtOffset);
+	struct vbt_header* vbt = (struct vbt_header*)(vbios.memory + *vbtOffset);
 	if (memcmp(vbt->signature, "$VBT", 4) != 0) {
 		TRACE((DEVICE_NAME": bad VBT signature: %20s\n", vbt->signature));
 		delete_area(vbios.area);
@@ -182,10 +187,10 @@ sanitize_panel_timing(display_timing& timing)
 bool
 get_lvds_mode_from_bios(display_timing* panelTiming)
 {
-	if (!get_bios())
+	int vbtOffset = 0;
+	if (!get_bios(&vbtOffset))
 		return false;
 
-	int vbtOffset = vbios.ReadWord(kVbtPointer);
 	struct vbt_header* vbt = (struct vbt_header*)(vbios.memory + vbtOffset);
 	int bdbOffset = vbtOffset + vbt->bdb_offset;
 
@@ -194,6 +199,8 @@ get_lvds_mode_from_bios(display_timing* panelTiming)
 		TRACE((DEVICE_NAME": bad BDB signature\n"));
 		delete_area(vbios.area);
 	}
+	TRACE((DEVICE_NAME ": VBT signature \"%.*s\", BDB version %d\n",
+			(int)sizeof(vbt->signature), vbt->signature, bdb->version));
 
 	int blockSize;
 	int panelType = -1;
@@ -205,7 +212,7 @@ get_lvds_mode_from_bios(display_timing* panelTiming)
 		int id = vbios.memory[start];
 		blockSize = vbios.ReadWord(start + 1) + 3;
 		switch (id) {
-			case 40: // FIXME magic numbers
+			case 40: // Item BDB_LVDS_OPTIONS
 			{
 				struct lvds_bdb1 *lvds1;
 				lvds1 = (struct lvds_bdb1 *)(vbios.memory + start);
@@ -213,7 +220,7 @@ get_lvds_mode_from_bios(display_timing* panelTiming)
 				TRACE((DEVICE_NAME ": panel type: %d\n", panelType));
 				break;
 			}
-			case 41:
+			case 41: // Item BDB_LVDS_LFP_DATA_PTRS
 			{
 				// First make sure we found block 40 and the panel type
 				if (panelType == -1)
@@ -226,20 +233,9 @@ get_lvds_mode_from_bios(display_timing* panelTiming)
 				lvds2_lfp_info = (struct lvds_bdb2_lfp_info *)
 					(vbios.memory + bdbOffset
 					+ lvds2->panels[panelType].lfp_info_offset);
-				/* check terminator */
-				if (lvds2_lfp_info->terminator != 0xffff) {
-					TRACE((DEVICE_NAME ": Incorrect LFP info terminator %x\n",
-						lvds2_lfp_info->terminator));
-#if 0
-					// FIXME the terminator is not present on my SandyBridge
-					// laptop, but the video mode is still correct. Maybe the
-					// format of the block has changed accross versions. We
-					// could check the size of the block to detect different
-					// layouts.
-					delete_area(vbios.area);
-					return false;
-#endif
-				}
+				/* Show terminator: Check not done in drm i915 driver: Assuming chk not valid. */
+				TRACE((DEVICE_NAME ": LFP info terminator %x\n", lvds2_lfp_info->terminator));
+
 				uint8_t* timing_data = vbios.memory + bdbOffset
 					+ lvds2->panels[panelType].lfp_edid_dtd_offset;
 				TRACE((DEVICE_NAME ": found LFP of size %d x %d "
