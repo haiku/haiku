@@ -39,6 +39,12 @@ struct bdb_header {
 } __attribute__((packed));
 
 
+enum bdb_block_id {
+	BDB_LVDS_OPTIONS = 40,
+	BDB_LVDS_LFP_DATA_PTRS
+};
+
+
 // FIXME the struct definition for the bdb_header is not complete, so we rely
 // on direct access with hardcoded offsets to get the timings out of it.
 #define _PIXEL_CLOCK(x) (x[0] + (x[1] << 8)) * 10000
@@ -212,17 +218,22 @@ get_lvds_mode_from_bios(display_timing* panelTiming)
 		int id = vbios.memory[start];
 		blockSize = vbios.ReadWord(start + 1) + 3;
 		switch (id) {
-			case 40: // Item BDB_LVDS_OPTIONS
+			case BDB_LVDS_OPTIONS:
 			{
 				struct lvds_bdb1 *lvds1;
 				lvds1 = (struct lvds_bdb1 *)(vbios.memory + start);
 				panelType = lvds1->panel_type;
+				if (panelType > 0xf) {
+					TRACE((DEVICE_NAME ": invalid panel type %d\n", panelType));
+					panelType = -1;
+					break;
+				}
 				TRACE((DEVICE_NAME ": panel type: %d\n", panelType));
 				break;
 			}
-			case 41: // Item BDB_LVDS_LFP_DATA_PTRS
+			case BDB_LVDS_LFP_DATA_PTRS:
 			{
-				// First make sure we found block 40 and the panel type
+				// First make sure we found block BDB_LVDS_OPTIONS and the panel type
 				if (panelType == -1)
 					break;
 
