@@ -887,6 +887,11 @@ pll_set(display_mode* mode, uint8 crtcID)
 					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_24BPP;
 					break;
 				case 10:
+					// AMD notes the atombios define is incorrect here
+					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_32BPP;
+					break;
+				case 12:
+					// AMD notes the atombios define is incorrect here
 					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_30BPP;
 					break;
 			}
