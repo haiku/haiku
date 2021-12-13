@@ -9,6 +9,7 @@ extraction:
         - texinfo
         - flex
         - bison
+        - g++
         - gawk
         - build-essential
         - unzip
