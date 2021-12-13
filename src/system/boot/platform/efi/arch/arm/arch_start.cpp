@@ -161,7 +161,7 @@ arch_start_kernel(addr_t kernelEntry)
 	// Enter the kernel!
 	dprintf("arch_enter_kernel(ttbr0: 0x%08x, kernelArgs: 0x%08x, "
 		"kernelEntry: 0x%08x, sp: 0x%08x)\n",
-		final_ttbr0, (uint32_t)&gKernelArgs, (uint32_t)&kernelEntry,
+		final_ttbr0, (uint32_t)&gKernelArgs, (uint32_t)kernelEntry,
 		(uint32_t)(gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
 
 	arch_enter_kernel(final_ttbr0, &gKernelArgs, kernelEntry,
