@@ -15,6 +15,9 @@
 extern void dtb_init();
 extern void dtb_set_kernel_args();
 
+bool dtb_get_reg(const void* fdt, int node, uint32 addressCells, uint32 sizeCells, size_t idx, addr_range& range);
+bool dtb_has_fdt_string(const char* prop, int size, const char* pattern);
+
 
 #endif /* !_ASSEMBLER */
 

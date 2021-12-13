@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src system boot platform efi arch arm ;
 
 SubDirHdrs $(HAIKU_TOP) src system boot platform efi ;
 
+UseLibraryHeaders [ FDirName libfdt ] ;
+
 UsePrivateHeaders [ FDirName kernel platform ] ;
 UsePrivateHeaders [ FDirName kernel boot platform efi ] ;
 
@@ -19,6 +21,7 @@ for platform in [ MultiBootSubDirSetup efi ] {
 		crt0-efi-$(TARGET_ARCH).S
 		entry.S
 		relocation_func.cpp
+		arch_dtb.cpp
 		arch_mmu.cpp
 		arch_smp.cpp
 		arch_start.cpp
