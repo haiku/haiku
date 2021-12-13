@@ -285,7 +285,7 @@ bool
 mmu_next_region(void** cookie, addr_t* vaddr, phys_addr_t* paddr, size_t* size)
 {
 	if (*cookie == NULL)
-		*cookie = &allocated_regions;
+		*cookie = allocated_regions;
 	else
 		*cookie = ((memory_region*)*cookie)->next;
 
