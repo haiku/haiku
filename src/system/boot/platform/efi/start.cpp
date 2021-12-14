@@ -97,7 +97,7 @@ convert_kernel_args()
 	fix_address(gKernelArgs.edid_info);
 	fix_address(gKernelArgs.debug_output);
 	fix_address(gKernelArgs.boot_splash);
-	#if defined(__x86_64__) || defined(__x86__)
+	#if defined(__x86_64__) || defined(__i386__)
 	fix_address(gKernelArgs.ucode_data);
 	fix_address(gKernelArgs.arch_args.apic);
 	fix_address(gKernelArgs.arch_args.hpet);
