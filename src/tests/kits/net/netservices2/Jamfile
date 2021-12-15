@@ -4,10 +4,12 @@ if $(TARGET_PACKAGING_ARCH) != x86_gcc2 {
 	# do not target the legacy platform
 	UsePrivateHeaders netservices2 ;
 
+	SubDirC++Flags -std=gnu++17 ;
+
 	UnitTestLib netservicekit2test.so :
 		ServicesKitTestAddon.cpp
 
-		HttpTest.cpp
+		HttpProtocolTest.cpp
 
 		: be libnetservices2.a $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB)
 		[ TargetLibstdc++ ]

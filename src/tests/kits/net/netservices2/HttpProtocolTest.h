@@ -13,9 +13,11 @@
 using BPrivate::Network::BHttpSession;
 
 
-class HttpTest: public BTestCase {
+class HttpProtocolTest: public BTestCase {
 public:
-					HttpTest(BHttpSession& session);
+					HttpProtocolTest();
+
+			void	HttpHeaderTest();
 
 	static	void	AddTests(BTestSuite& suite);
 

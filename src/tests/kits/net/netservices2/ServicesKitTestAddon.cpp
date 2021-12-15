@@ -7,7 +7,7 @@
 #include <TestSuite.h>
 #include <TestSuiteAddon.h>
 
-#include "HttpTest.h"
+#include "HttpProtocolTest.h"
 
 
 BTestSuite*
@@ -15,7 +15,7 @@ getTestSuite()
 {
 	BTestSuite* suite = new BTestSuite("NetServices2Kit");
 
-	HttpTest::AddTests(*suite);
+	HttpProtocolTest::AddTests(*suite);
 
 	return suite;
 }
