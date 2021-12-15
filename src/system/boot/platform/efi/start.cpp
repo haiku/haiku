@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 Haiku, Inc. All rights reserved.
+ * Copyright 2014-2021 Haiku, Inc. All rights reserved.
  * Copyright 2013-2014, Fredrik Holmqvist, fredrik.holmqvist@gmail.com.
  * Copyright 2014, Henry Harrington, henry.harrington@gmail.com.
  * All rights reserved.
@@ -97,11 +97,8 @@ convert_kernel_args()
 	fix_address(gKernelArgs.edid_info);
 	fix_address(gKernelArgs.debug_output);
 	fix_address(gKernelArgs.boot_splash);
-	#if defined(__x86_64__) || defined(__i386__)
-	fix_address(gKernelArgs.ucode_data);
-	fix_address(gKernelArgs.arch_args.apic);
-	fix_address(gKernelArgs.arch_args.hpet);
-	#endif
+
+	arch_convert_kernel_args();
 
 	convert_preloaded_image(static_cast<preloaded_elf64_image*>(
 		gKernelArgs.kernel_image.Pointer()));

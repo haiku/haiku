@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2021 Haiku, Inc. All rights reserved.
  * Released under the terms of the MIT License.
  */
 
@@ -32,6 +32,13 @@ extern uint64_t arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 
 
 #include <arch/riscv64/arch_uart_sifive.h>
+
+
+void
+arch_convert_kernel_args(void)
+{
+	// empty
+}
 
 
 void
