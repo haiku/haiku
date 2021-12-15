@@ -15,7 +15,7 @@
 
 #define DRIVER_NAME	"i2c_hid"
 #define DEVICE_PATH_SUFFIX	"i2c"
-
+#define DEVICE_NAME	"I2C"
 
 extern DeviceList *gDeviceList;
 

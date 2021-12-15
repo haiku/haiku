@@ -131,6 +131,13 @@ MouseProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 	size_t length)
 {
 	switch (op) {
+
+		case B_GET_DEVICE_NAME:
+		{
+			const char name[] = DEVICE_NAME" Mouse";
+			return IOGetDeviceName(name,buffer,length);
+		}
+
 		case MS_READ:
 		{
 			if (length < sizeof(mouse_movement))

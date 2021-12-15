@@ -54,6 +54,9 @@ public:
 			void				SetNextHandler(ProtocolHandler *next);
 			ProtocolHandler *	NextHandler() { return fNextHandler; };
 
+			status_t			IOGetDeviceName(const char *name, void *buffer,
+									size_t length);
+
 protected:
 			status_t			fStatus;
 

@@ -343,6 +343,12 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 	size_t length)
 {
 	switch (op) {
+		case B_GET_DEVICE_NAME:
+		{
+			const char name[] = DEVICE_NAME" Keyboard";
+			return IOGetDeviceName(name,buffer,length);
+		}
+
 		case KB_READ:
 		{
 			if (*cookie == 0) {

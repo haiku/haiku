@@ -267,6 +267,12 @@ JoystickProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 	size_t length)
 {
 	switch (op) {
+		case B_GET_DEVICE_NAME:
+		{
+			const char name[] = DEVICE_NAME" Joystick";
+			return IOGetDeviceName(name, buffer, length);
+		}
+
 		case B_JOYSTICK_SET_DEVICE_MODULE:
 		{
 			if (length < sizeof(joystick_module_info))
