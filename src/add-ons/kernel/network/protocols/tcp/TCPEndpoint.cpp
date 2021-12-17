@@ -1011,6 +1011,9 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 	TRACE("  ReadData(): %" B_PRIuSIZE " bytes kept.",
 		fReceiveQueue.Available());
 
+	if (fReceiveQueue.Available() == 0 && fState == FINISH_RECEIVED)
+		socket->receive.low_water_mark = 0;
+
 	// if we are opening the window, check if we should send an ACK
 	if (!clone)
 		SendAcknowledge(false);
@@ -1438,7 +1441,7 @@ TCPEndpoint::_ShouldReceive() const
 		return false;
 
 	return fState == ESTABLISHED || fState == FINISH_SENT
-		|| fState == FINISH_ACKNOWLEDGED;
+		|| fState == FINISH_ACKNOWLEDGED || fState == FINISH_RECEIVED;
 }
 
 

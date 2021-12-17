@@ -429,7 +429,7 @@ add_tcp_header(net_address_module_info* addressModule,
 			optionsLength);
 	}
 
-	TRACE(("add_tcp_header(): buffer %p, flags 0x%x, seq %lu, ack %lu, up %u, "
+	TRACE(("add_tcp_header(): buffer %p, flags 0x%x, seq %" B_PRIu32 ", ack %" B_PRIu32 ", up %u, "
 		"win %u\n", buffer, segment.flags, segment.sequence,
 		segment.acknowledge, segment.urgent_offset, segment.advertised_window));
 
