@@ -157,8 +157,9 @@ ConditionVariableEntry::_RemoveFromVariable()
 		int32 tries = 0;
 		while (atomic_pointer_get(&fVariable) != NULL) {
 			tries++;
-			if ((tries % 100000) == 0)
+			if ((tries % 10000) == 0)
 				panic("variable pointer was not unset for a long time!");
+			cpu_pause();
 		}
 
 		return;
@@ -396,6 +397,7 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 				tries++;
 				if ((tries % 10000) == 0)
 					panic("entries count was not decremented for a long time!");
+				cpu_pause();
 			}
 		} else {
 			status_t waitStatus = atomic_get_and_set(&entry->fWaitStatus, result);
