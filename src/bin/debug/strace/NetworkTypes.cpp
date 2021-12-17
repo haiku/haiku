@@ -134,11 +134,7 @@ format_signed_number(int32 value)
 static string
 read_pollfd(Context &context, void *data)
 {
-	nfds_t numfds = 0;
-	if (context.GetContents(Context::INPUT_VALUES))
-		numfds = get_value<nfds_t>(context.GetValue(context.GetSibling(1)));
-	else if (context.GetContents(Context::OUTPUT_VALUES))
-		numfds = context.GetReturnValue();
+	nfds_t numfds = get_value<nfds_t>(context.GetValue(context.GetSibling(1)));
 	if ((int64)numfds <= 0)
 		return string();
 
@@ -157,6 +153,10 @@ read_pollfd(Context &context, void *data)
 	r = "[";
 
 	for (nfds_t i = 0; i < numfds && added < 8; i++) {
+		if ((tmp[i].fd == -1 || tmp[i].revents == 0)
+			&& context.GetContents(Context::OUTPUT_VALUES)) {
+			continue;
+		}
 		if (added > 0)
 			r += ", ";
 		r += "{fd=" + format_signed_number(tmp[i].fd);
@@ -176,7 +176,7 @@ read_pollfd(Context &context, void *data)
 				flags++;
 			}
 		}
-		if (tmp[i].fd != -1 && context.GetContents(Context::OUTPUT_VALUES)) {
+		if (context.GetContents(Context::OUTPUT_VALUES)) {
 			r += ", revents=";
 			int flags = 0;
 			if ((tmp[i].revents & POLLIN) != 0) {
