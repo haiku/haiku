@@ -445,3 +445,66 @@ get_mode_bpp(display_mode* mode)
 		__func__);
 	return 32;
 }
+
+
+static uint32_t
+radeon_get_backlight_register()
+{
+	// R600 and up is 0x172c else its 0x0018
+	if (gInfo->shared_info->chipsetID >= RADEON_R600)
+		return 0x172c;
+	return 0x0018;
+}
+
+
+status_t
+radeon_set_brightness(float brightness)
+{
+	TRACE("%s (%f)\n", __func__, brightness);
+
+	if (brightness < 0 || brightness > 1)
+		return B_BAD_VALUE;
+
+	uint32_t backlightReg = radeon_get_backlight_register();
+	uint8_t brightnessRaw = (uint8_t)ceilf(brightness * 255);
+	uint32_t level = Read32(OUT, backlightReg);
+	TRACE("brightness level = %lx\n", level);
+	level &= ~ATOM_S2_CURRENT_BL_LEVEL_MASK;
+	level |= (( brightnessRaw << ATOM_S2_CURRENT_BL_LEVEL_SHIFT )
+					& ATOM_S2_CURRENT_BL_LEVEL_MASK);
+	TRACE("new brightness level = %lx\n", level);
+
+	Write32(OUT, backlightReg, level);
+
+	//TODO crtcID = 0: see create_mode
+	// TODO: multi-monitor?  for now we use VESA and not gDisplay edid
+	uint8 crtcID = 0;
+	//TODO : test if it is a LCD ?
+	uint32 connectorIndex = gDisplay[crtcID]->connectorIndex;
+	connector_info* connector = gConnector[connectorIndex];
+	pll_info* pll = &connector->encoder.pll;
+
+	transmitter_dig_setup(connectorIndex, pll->pixelClock,
+		0, 0, ATOM_TRANSMITTER_ACTION_BL_BRIGHTNESS_CONTROL);
+	transmitter_dig_setup(connectorIndex, pll->pixelClock,
+		0, 0, ATOM_TRANSMITTER_ACTION_LCD_BLON);
+
+	return B_OK;
+}
+
+
+status_t
+radeon_get_brightness(float* brightness)
+{
+	TRACE("%s\n", __func__);
+
+	if (brightness == NULL)
+		return B_BAD_VALUE;
+
+	uint32_t backlightReg = Read32(OUT, radeon_get_backlight_register());
+	uint8_t brightnessRaw = ((backlightReg & ATOM_S2_CURRENT_BL_LEVEL_MASK) >>
+			ATOM_S2_CURRENT_BL_LEVEL_SHIFT);
+	*brightness = (float)brightnessRaw / 255;
+
+	return B_OK;
+}
