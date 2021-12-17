@@ -121,7 +121,7 @@ struct ELF64Class {
 	{
 #if defined(_BOOT_PLATFORM_BIOS)
 		// Assume the real 64-bit base address is KERNEL_LOAD_BASE_64_BIT and
-		// the mappings in the loader address space are at KERNEL_LOAD_BASE.
+		// the mappings in the loader address space are at KERNEL_LOAD_BASE_32_BIT.
 
 		void* address = (void*)(addr_t)(*_address & 0xffffffff);
 #else
@@ -135,8 +135,7 @@ struct ELF64Class {
 
 		*_mappedAddress = address;
 #if defined(_BOOT_PLATFORM_BIOS)
-		*_address = (AddrType)(addr_t)address + KERNEL_LOAD_BASE_64_BIT
-			- KERNEL_LOAD_BASE;
+		*_address = (AddrType)(addr_t)address + KERNEL_FIXUP_FOR_LONG_MODE;
 #else
 		platform_bootloader_address_to_kernel_address(address, _address);
 #endif
@@ -147,8 +146,7 @@ struct ELF64Class {
 	Map(AddrType address)
 	{
 #ifdef _BOOT_PLATFORM_BIOS
-		return (void*)(addr_t)(address - KERNEL_LOAD_BASE_64_BIT
-			+ KERNEL_LOAD_BASE);
+		return (void*)(addr_t)(address - KERNEL_FIXUP_FOR_LONG_MODE);
 #else
 		void *result;
 		if (platform_kernel_address_to_bootloader_address(address, &result) != B_OK) {

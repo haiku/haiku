@@ -14,8 +14,7 @@
 
 
 // memory layout
-#define KERNEL_LOAD_BASE        0x80000000
-#define KERNEL_LOAD_BASE_64_BIT 0xffffffc000000000
+#define KERNEL_LOAD_BASE          0xffffffc000000000
 
 
 #if (defined(__riscv) && __riscv_xlen == 64)
