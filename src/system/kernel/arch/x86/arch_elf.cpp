@@ -184,10 +184,12 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 }
 
 
-#endif	// !__x86_64__ || defined(ELF32_COMPAT) ||  (_BOOT_MODE && _BOOT_PLATFORM != efi)
+#endif	// !defined(__x86_64__) || defined(ELF32_COMPAT) ||
+	// (defined(_BOOT_MODE) && _BOOT_PLATFORM != efi)
 
 
-#if (defined(__x86_64__) && !defined(ELF32_COMPAT)) || defined(_BOOT_MODE)
+#if (defined(__x86_64__) && !defined(ELF32_COMPAT)) || \
+	(defined(_BOOT_MODE) && defined(BOOT_SUPPORT_ELF64))
 
 
 #ifdef _BOOT_MODE
@@ -280,4 +282,5 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 }
 
 
-#endif	// (defined(__x86_64__) && !defined(ELF32_COMPAT)) || defined(_BOOT_MODE)
+#endif	// (defined(__x86_64__) && !defined(ELF32_COMPAT)) ||
+	// (defined(_BOOT_MODE) && defined(BOOT_SUPPORT_ELF64))
