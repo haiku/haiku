@@ -247,8 +247,10 @@ ExpanderThread::PipeCommand(int argc, const char** argv, int& in, int& out,
 		close(master);
 
 		setsid();
-		if (ioctl(slave, TIOCSCTTY, NULL) != 0)
+		if (ioctl(slave, TIOCSCTTY, NULL) != 0) {
+			close(slave);
 			return -1;
+		}
 
 		dup2(slave, 0);
 		close(slave);
