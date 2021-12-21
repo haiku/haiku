@@ -163,7 +163,7 @@ struct socket_timeout {
 		UpdateSocket(socket);
 	}
 
-	time_t timeout; // in micro secs
+	bigtime_t timeout; // in micro secs
 	uint8 tries;
 
 	bool Shift(int socket, bigtime_t stateMaxTime, const char* device);
@@ -448,17 +448,22 @@ socket_timeout::UpdateSocket(int socket) const
 bool
 socket_timeout::Shift(int socket, bigtime_t stateMaxTime, const char* device)
 {
+	if (tries == UINT8_MAX)
+		return false;
+
 	tries++;
-	timeout += timeout;
-	if (timeout > AS_USECS(MAX_TIMEOUT))
-		timeout = AS_USECS(MAX_TIMEOUT);
 
 	if (tries > MAX_RETRIES) {
-		if (stateMaxTime == -1)
+		bigtime_t now = system_time();
+		if (stateMaxTime == -1 || stateMaxTime < now)
 			return false;
-		bigtime_t remaining = (stateMaxTime - system_time()) / 2 + 1;
-		timeout = std::max(remaining, bigtime_t(60));
-	}
+		bigtime_t remaining = (stateMaxTime - now) / 2 + 1;
+		timeout = std::max(remaining, bigtime_t(AS_USECS(60)));
+	} else
+		timeout += timeout;
+
+	if (timeout > AS_USECS(MAX_TIMEOUT))
+		timeout = AS_USECS(MAX_TIMEOUT);
 
 	syslog(LOG_DEBUG, "%s: Timeout shift: %" B_PRIdTIME " msecs (try %" B_PRIu8 ")\n",
 		device, timeout / 1000, tries);
