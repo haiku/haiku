@@ -11,7 +11,7 @@ ai	application/postscript
 aif	audio/x-aiff
 aifc	audio/x-aiff
 aiff	audio/x-aiff
-asc	text/plain
+asc	text/plain; charset=%s
 asf	video/x-ms-asf
 asx	video/x-ms-asf
 au	audio/basic
@@ -26,7 +26,7 @@ cpt	application/mac-compactpro
 crl	application/x-pkcs7-crl
 crt	application/x-x509-ca-cert
 csh	application/x-csh
-css	text/css
+css	text/css; charset=%s
 dcr	application/x-director
 dir	application/x-director
 djv	image/vnd.djvu
@@ -34,7 +34,7 @@ djvu	image/vnd.djvu
 dll	application/octet-stream
 dms	application/octet-stream
 doc	application/msword
-dtd	text/xml
+dtd	text/xml; charset=%s
 dump	application/octet-stream
 dvi	application/x-dvi
 dxr	application/x-director
@@ -52,8 +52,8 @@ gif	image/gif
 gtar	application/x-gtar
 hdf	application/x-hdf
 hqx	application/mac-binhex40
-htm	text/html
-html	text/html
+htm	text/html; charset=%s
+html	text/html; charset=%s
 ice	x-conference/x-cooltalk
 ief	image/ief
 iges	model/iges
@@ -66,8 +66,11 @@ jpeg	image/jpeg
 jpg	image/jpeg
 js	application/x-javascript
 kar	audio/midi
+kml	application/vnd.google-earth.kml+xml
+kmz	application/vnd.google-earth.kmz
 latex	application/x-latex
 lha	application/octet-stream
+loc	application/xml-loc
 lzh	application/octet-stream
 m3u	audio/x-mpegurl
 man	application/x-troff-man
@@ -95,7 +98,7 @@ mxu	video/vnd.mpegurl
 nc	application/x-netcdf
 o	application/octet-stream
 oda	application/oda
-ogg	application/x-ogg
+ogg	application/ogg
 pac	application/x-ns-proxy-autoconfig
 pbm	image/x-portable-bitmap
 pdb	chemical/x-pdb
@@ -117,10 +120,10 @@ rm	audio/x-pn-realaudio
 roff	application/x-troff
 rpm	audio/x-pn-realaudio-plugin
 rss	application/rss+xml
-rtf	text/rtf
-rtx	text/richtext
-sgm	text/sgml
-sgml	text/sgml
+rtf	text/rtf; charset=%s
+rtx	text/richtext; charset=%s
+sgm	text/sgml; charset=%s
+sgml	text/sgml; charset=%s
 sh	application/x-sh
 shar	application/x-shar
 silo	model/mesh
@@ -160,8 +163,8 @@ tif	image/tiff
 tiff	image/tiff
 tr	application/x-troff
 tsp	application/dsptype
-tsv	text/tab-separated-values
-txt	text/plain
+tsv	text/tab-separated-values; charset=%s
+txt	text/plain; charset=%s
 ustar	application/x-ustar
 vcd	application/x-cdlink
 vrml	model/vrml
@@ -184,12 +187,12 @@ wrl	model/vrml
 wsrc	application/x-wais-source
 wvx	video/x-ms-wvx
 xbm	image/x-xbitmap
-xht	application/xhtml+xml
-xhtml	application/xhtml+xml
+xht	application/xhtml+xml; charset=%s
+xhtml	application/xhtml+xml; charset=%s
 xls	application/vnd.ms-excel
-xml	text/xml
+xml	text/xml; charset=%s
 xpm	image/x-xpixmap
-xsl	text/xml
+xsl	text/xml; charset=%s
 xwd	image/x-xwindowdump
 xyz	chemical/x-xyz
 zip	application/zip

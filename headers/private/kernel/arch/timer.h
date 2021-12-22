@@ -1,5 +1,5 @@
 /*
-** Copyright 2004, The OpenBeOS Team. All rights reserved.
+** Copyright 2004, The Haiku Team. All rights reserved.
 ** Distributed under the terms of the MIT License.
 */
 #ifndef KERNEL_ARCH_TIMER_H

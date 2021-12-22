@@ -1,6 +1,6 @@
 1	danish	x-vnd.Haiku-DriveSetup	4048496535
 Could not unmount partition %s.	MainWindow		Kunne ikke afmontere partition %s.
-Mount all	MainWindow		Monter alle
+Mount all	MainWindow		Montér alle
 Disk	MainWindow		Disk
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Er du sikker på, at du vil skrive ændringerne tilbage til disken nu?\n\nData på den valgte partition vil blive permanent slettet!
 Device	PartitionList		Enhed
@@ -14,7 +14,7 @@ Block size	PartitionList		Blokstørrelse
 The panel experienced a problem!	MainWindow		Panelet oplevede på et problem!
 Device	DiskView		Enhed
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på, at du vil formatere Intel Extended Partition? Hvis den indeholder underpartitioner, så vil de blive overskrevet, hvis du fortsætter. Du vil blive spurgt igen inden ændringerne skrives til disken.
-Unmount	MainWindow		Afmonter
+Unmount	MainWindow		Afmontér
 Failed to format the partition %s!\n	MainWindow		Kunne ikke formatere partitionen %s!\n
 Partition size	CreateParametersPanel		Partitionsstørrelse
 Validation of the given parameters failed.	MainWindow		Validering af de angivne parametre mislykkedes.
@@ -44,7 +44,7 @@ File system	PartitionList		Filsystem
 The selected partition does not contain a partitioning system.	MainWindow		Den valgte partition indeholder ikke et partitions system.
 End: %s	Support		Slutning: %s
 Partition type	PartitionList		Partitionstype
-Unable to find the selected partition by ID.	MainWindow		Kunne ikke finde den valgte partition ud fra ID.
+Unable to find the selected partition by ID.	MainWindow		Kunne ikke finde den valgte partition ud fra id.
 The currently selected partition is not empty.	MainWindow		Den valgte partition er ikke tom.
 Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Er du sikker på, at du vil formatere en rå disk? (de fleste mennesker initialiserer først disken med et partitionssystem). Du vil blive spurgt igen inden ændringerne skrives til disken.
 Wipe (not implemented)	MainWindow		Stryg (ikke implementeret)
@@ -109,4 +109,4 @@ The partition %s has been successfully formatted.\n	MainWindow		Partitionen %s b
 The partition %s is already mounted.	MainWindow		Partitionen %s er allerede monteret.
 Size	PartitionList		Størrelse
 Creation of the partition has failed.	MainWindow		Det var ikke muligt at oprette partitionen.
-Mount	MainWindow		Monter
+Mount	MainWindow		Montér

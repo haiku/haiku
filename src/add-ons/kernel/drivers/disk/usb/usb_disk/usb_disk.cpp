@@ -18,6 +18,7 @@
 
 #include <kernel.h>
 #include <fs/devfs.h>
+#include <syscall_restart.h>
 #include <util/AutoLock.h>
 
 #include "scsi_sense.h"
@@ -1794,18 +1795,24 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case B_GET_MEDIA_STATUS:
 		{
 			err_act action = err_act_ok;
+			status_t ready;
 			for (uint32 tries = 0; tries < 3; tries++) {
-				status_t ready = usb_disk_test_unit_ready(lun, &action);
+				ready = usb_disk_test_unit_ready(lun, &action);
 				if (ready == B_OK || ready == B_DEV_NO_MEDIA
 					|| (action != err_act_retry
 						&& action != err_act_many_retries)) {
-					*(status_t *)buffer = ready;
+					if (IS_USER_ADDRESS(buffer)) {
+						if (user_memcpy(buffer, &ready, sizeof(status_t)) != B_OK)
+							return B_BAD_ADDRESS;
+					} else if (is_called_via_syscall()) {
+						return B_BAD_ADDRESS;
+					} else
+						*(status_t *)buffer = ready;
 					break;
 				}
 				snooze(500000);
 			}
-			TRACE("B_GET_MEDIA_STATUS: 0x%08" B_PRIx32 "\n",
-				*(status_t *)buffer);
+			TRACE("B_GET_MEDIA_STATUS: 0x%08" B_PRIx32 "\n", ready);
 			return B_OK;
 		}
 

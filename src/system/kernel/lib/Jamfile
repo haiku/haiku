@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src system kernel lib ;
 
 UsePrivateHeaders shared ;
 UsePrivateHeaders [ FDirName libroot locale ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility gnu ] : true ;
 
 # force inclusion of kernel_lib.h
 local kernelLibHeader = [ FDirName $(SUBDIR) kernel_lib.h ] ;
@@ -9,6 +10,7 @@ CCFLAGS += -include $(kernelLibHeader) ;
 C++FLAGS += -include $(kernelLibHeader) ;
 
 
+local gnuSources = [ FDirName $(HAIKU_TOP) src libs gnu ] ;
 local librootSources = [ FDirName $(HAIKU_TOP) src system libroot ] ;
 local librootOSSources = [ FDirName $(librootSources) os ] ;
 local posixSources = [ FDirName $(librootSources) posix ] ;
@@ -43,6 +45,7 @@ SEARCH_SOURCE += [ FDirName $(posixSources) string ] ;
 SEARCH_SOURCE += [ FDirName $(posixSources) sys ] ;
 SEARCH_SOURCE += [ FDirName $(posixSources) time ] ;
 SEARCH_SOURCE += [ FDirName $(posixSources) unistd ] ;
+SEARCH_SOURCE += [ FDirName $(gnuSources) ] ;
 
 KernelMergeObject kernel_lib_posix.o :
 	# main
@@ -99,6 +102,7 @@ KernelMergeObject kernel_lib_posix.o :
 	ffs.cpp
 	memchr.c
 	memcmp.c
+	memmem.c
 	memmove.c
 	strcasecmp.c
 	strcasestr.c

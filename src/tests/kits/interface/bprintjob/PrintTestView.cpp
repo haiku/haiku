@@ -13,6 +13,6 @@ void PrintTestView::Draw(BRect updateRect)
 	font.SetShear(Bounds().Height()/10);
 	font.SetRotation(Bounds().Width()/10);
 	SetFont(&font, B_FONT_ALL);
-	DrawString("OpenBeOS", 8, BPoint(Bounds().Width()/2,Bounds().Height()/2));
+	DrawString("Haiku", 8, BPoint(Bounds().Width()/2,Bounds().Height()/2));
 }
 

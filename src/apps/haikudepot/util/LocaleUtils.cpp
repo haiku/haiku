@@ -8,6 +8,7 @@
 
 #include <Catalog.h>
 #include <Collator.h>
+#include <DateFormat.h>
 #include <DateTimeFormat.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
@@ -54,7 +55,23 @@ LocaleUtils::TimestampToDateTimeString(uint64 millis)
 	BDateTimeFormat format;
 	BString buffer;
 	if (format.Format(buffer, millis / 1000, B_SHORT_DATE_FORMAT,
-		B_SHORT_TIME_FORMAT) != B_OK)
+			B_SHORT_TIME_FORMAT) != B_OK)
+		return "!";
+
+	return buffer;
+}
+
+
+/*static*/ BString
+LocaleUtils::TimestampToDateString(uint64 millis)
+{
+	if (millis == 0)
+		return "?";
+
+	BDateFormat format;
+	BString buffer;
+	if (format.Format(buffer, millis / 1000, B_SHORT_DATE_FORMAT)
+			!= B_OK)
 		return "!";
 
 	return buffer;

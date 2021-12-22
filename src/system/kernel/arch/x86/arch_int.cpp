@@ -424,7 +424,7 @@ arch_int_are_interrupts_enabled(void)
 }
 
 
-void
+int32
 arch_int_assign_to_cpu(int32 irq, int32 cpu)
 {
 	switch (sVectorSources[irq]) {
@@ -440,6 +440,7 @@ arch_int_assign_to_cpu(int32 irq, int32 cpu)
 		default:
 			break;
 	}
+	return cpu;
 }
 
 

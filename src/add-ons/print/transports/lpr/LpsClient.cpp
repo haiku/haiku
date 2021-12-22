@@ -57,7 +57,7 @@ LpsClient::~LpsClient()
 
 
 void
-LpsClient::connect() throw(LPSException)
+LpsClient::connect()
 {
 	for (int localPort = LPS_CLIENT_PORT_S; localPort <=  LPS_CLIENT_PORT_E;
 		localPort++) {
@@ -90,7 +90,7 @@ LpsClient::close()
 
 
 void
-LpsClient::receiveJob(const char *printer) throw(LPSException)
+LpsClient::receiveJob(const char *printer)
 {
 	if (fConnected) {
 		*fOutput << LPS_PRINT_JOB << printer << '\n' << flush;
@@ -100,7 +100,7 @@ LpsClient::receiveJob(const char *printer) throw(LPSException)
 
 
 void
-LpsClient::receiveControlFile(int size, const char *name) throw(LPSException)
+LpsClient::receiveControlFile(int size, const char *name)
 {
 	if (fConnected) {
 
@@ -115,7 +115,7 @@ LpsClient::receiveControlFile(int size, const char *name) throw(LPSException)
 }
 
 void
-LpsClient::receiveDataFile(int size, const char *name) throw(LPSException)
+LpsClient::receiveDataFile(int size, const char *name)
 {
 	if (fConnected) {
 
@@ -131,7 +131,7 @@ LpsClient::receiveDataFile(int size, const char *name) throw(LPSException)
 
 
 void
-LpsClient::transferData(const char *buffer, int size) throw(LPSException)
+LpsClient::transferData(const char *buffer, int size)
 {
 	if (fConnected) {
 
@@ -148,7 +148,7 @@ LpsClient::transferData(const char *buffer, int size) throw(LPSException)
 
 
 void
-LpsClient::transferData(istream &is, int size) throw(LPSException)
+LpsClient::transferData(istream &is, int size)
 {
 	if (fConnected) {
 
@@ -171,7 +171,7 @@ LpsClient::transferData(istream &is, int size) throw(LPSException)
 
 
 void
-LpsClient::endTransfer() throw(LPSException)
+LpsClient::endTransfer()
 {
 	if (fConnected) {
 		*fOutput << LPS_END_TRANSFER << flush;
@@ -181,7 +181,7 @@ LpsClient::endTransfer() throw(LPSException)
 
 
 void
-LpsClient::checkAck() throw(LPSException)
+LpsClient::checkAck()
 {
 	if (fConnected) {
 

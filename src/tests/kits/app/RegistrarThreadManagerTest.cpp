@@ -113,7 +113,7 @@ RegistrarThreadManagerTest::setUp()
 	// Setup our application
 	fApplication = new BTestApp("application/x-vnd.obos.RegistrarThreadManagerTest");
 	if (fApplication->Init() != B_OK) {
-		fprintf(stderr, "Failed to initialize application (perhaps the obos registrar isn't running?).\n");
+		fprintf(stderr, "Failed to initialize application (perhaps the Haiku registrar isn't running?).\n");
 		delete fApplication;
 		fApplication = NULL;
 	}

@@ -5,7 +5,7 @@ TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Blok mellemlager hukommelse
 %lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
-Media nodes	DataSource		Medie noder
+Media nodes	DataSource		Medienoder
 Text clipboard	DataSource		Tekst udklipsholder
 Network send	DataSource		Netværk afsende
 Running applications	DataSource		Kørende programmer

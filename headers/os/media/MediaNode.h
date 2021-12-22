@@ -29,7 +29,7 @@ public:
 			port_id				port;
 			uint32				kind;
 
-	static	media_node			null;
+	static const media_node		null;
 
 private:
 			uint32				_reserved_[3];

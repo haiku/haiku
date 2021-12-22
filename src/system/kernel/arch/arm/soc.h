@@ -21,17 +21,13 @@ public:
 	}
 
 protected:
-	InterruptController(fdt_module_info *fdtModule, fdt_device_node node)
-		: fFDT(fdtModule), fNode(node) {
+	InterruptController()
+	{
 		if (sInstance) {
 			panic("Multiple InterruptController objects created; that is currently unsupported!");
 		}
 		sInstance = this;
 	}
-
-	// Keep our node around as we might want to grab attributes from it
-	fdt_module_info *fFDT;
-	fdt_device_node fNode;
 
 	static InterruptController *sInstance;
 };
@@ -50,6 +46,7 @@ public:
 	}
 
 protected:
+#if 0
 	HardwareTimer(fdt_module_info *fdtModule, fdt_device_node node)
 		: fFDT(fdtModule), fNode(node) {
 		if (sInstance) {
@@ -61,6 +58,7 @@ protected:
 	// Keep our node around as we might want to grab attributes from it
 	fdt_module_info *fFDT;
 	fdt_device_node fNode;
+#endif
 
 	static HardwareTimer *sInstance;
 };

@@ -281,6 +281,23 @@ Configuring openboot for serial port
 Boot from network
 -----------------
 
+The openboot bootloader supports network booting. See the
+`Network booting guide <https://www.haiku-os.org/guides/network_booting/>`_
+for general information about the general network booting process. This page
+documents the parts specific to the openboot bootloader configuration.
+
+In openboot, booting from the network is done simply by using the "net:" device
+alias in the boot command line. This lets openboot load our bootloader, which
+then uses the openboot ability to send and receive data over the network to load
+the filesystem (and kernel contained in it) over the network. The two parts are
+independent: it's also possible to load the bootloader from the network but boot
+a local filesystem, or use the local bootloader and load the filesystem from the
+network.
+
+The bootloader needs to be placed in a tftp server, I use atftpd in Debian,
+which serve files from /srv/tftp/ (so "somefile" in the example below will look
+for /srv/tftp/somefile).
+
 static ip
 *********
 
@@ -310,6 +327,11 @@ the boot file from there.
 
 (net is an alias to the network card and also sets the load address: /pci@1f,4000/network@1,1)
 
+This currently does not work completely: the server address is not forwarded to
+the bootloader, and as a result, remote filesystems will not be available. The
+bootloader needs to be updated to know where to find the address in this case
+(it is done for PowerPC, I think).
+
 dhcp
 ****
 
@@ -325,6 +347,8 @@ the file to load and boot.
 Debugging
 ---------
 
+The openboot environment provide several useful commands to assist in debugging:
+
 .. code-block:: text
 
    202000 dis (disassemble starting at 202000 until next return instruction)
@@ -333,3 +357,13 @@ Debugging
    .locals (show local/windowed registers)
    %pc dis (disassemble code being exectuted)
    ctrace (backtrace)
+
+The backtrace provides addresses and register values (allowing to know the
+function arguments), there is no symbols and function names printed.
+objdump (on the build machine) can be used to disassemble the kernel or
+bootloader and find the corresponding code:
+
+.. code-block:: text
+
+    ./cross-tools-sparc/bin/sparc64-unknown-haiku-objdump -d objects/haiku/sparc/release/system/kernel/kernel_sparc |c++filt|less
+    ./cross-tools-sparc/bin/sparc64-unknown-haiku-objdump -d objects/haiku/sparc/release/system/boot/openfirmware/boot_loader_openfirmware |c++filt|less

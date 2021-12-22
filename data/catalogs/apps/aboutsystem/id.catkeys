@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-About	511528774
+1	indonesian	x-vnd.Haiku-About	408681589
 Revision	AboutView		Revisi
 The Haikuware team and their bounty program\n	AboutView		Tim Haikuware dan Program hadiah mereka\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Hak Cipta © 1999-2007 Michael C. Ring. Hak cipta dilindungi undang-undang.
@@ -42,6 +42,7 @@ About this system	AboutWindow		Tentang sistem ini
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Hak Cipta © 1999-2010 oleh penulis Gutenprint. Hak cipta dilindungi Undang-Undang.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Hak Cipta © 1994-1997 Mark Kilgard. Hak cipta dilindungi undang-undang.
 AboutSystem	System name		AboutSystem
+Copyright © 2019 Joe Drago. All rights reserved.	AboutView		Hak Cipta © 2019 Joe Drago.Semua hak dilindungi.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Hak Cipta © 1995-2001 Lars Düning. Hak cipta dilindungi undang-undang.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Hak Cipta © 1998-2000 Thai Open Source Software Center Ltd dan Clark Cooper.
 Source Code: 	AboutView		Kode sumber: 
@@ -72,6 +73,7 @@ Memory:	AboutView		Memori:
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…dan mungkin ada lagi yang kami lupa menyebutkan (maaf!)\n\n
 BSD (2-clause)	AboutWindow		BSD (2-klausa)
 Website & marketing:\n	AboutView		Situs web & marketing:\n
+Copyright © 2018-2021, Frederic Cambus	AboutView		Hak cipta © 2018-2021, Frederic Cambus
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 oleh Andy Ritger berdasarkan formula Generalized Timing
 …and the many people making donations!\n\n	AboutView		…dan orang-orang yang ikut menyumbang!\n\n
 BSD (4-clause)	AboutWindow		BSD (4-pasal)

@@ -16,7 +16,7 @@
 
 HIDReportItem::HIDReportItem(HIDReport *report, uint32 bitOffset,
 	uint8 bitLength, bool hasData, bool isArray, bool isRelative,
-	uint32 minimum, uint32 maximum, uint32 usageMinimum, uint32 usageMaximum)
+	uint32 minimum, uint32 maximum, uint32 usage)
 	:	fReport(report),
 		fByteOffset(bitOffset / 8),
 		fShift(bitOffset % 8),
@@ -28,8 +28,7 @@ HIDReportItem::HIDReportItem(HIDReport *report, uint32 bitOffset,
 		fRelative(isRelative),
 		fMinimum(minimum),
 		fMaximum(maximum),
-		fUsageMinimum(usageMinimum),
-		fUsageMaximum(usageMaximum),
+		fUsage(usage),
 		fData(0),
 		fValid(false)
 {
@@ -40,7 +39,7 @@ uint16
 HIDReportItem::UsagePage()
 {
 	usage_value value;
-	value.u.extended = fUsageMinimum;
+	value.u.extended = fUsage;
 	return value.u.s.usage_page;
 }
 
@@ -49,7 +48,7 @@ uint16
 HIDReportItem::UsageID()
 {
 	usage_value value;
-	value.u.extended = fUsageMinimum;
+	value.u.extended = fUsage;
 	return value.u.s.usage_id;
 }
 
@@ -189,6 +188,6 @@ HIDReportItem::PrintToStream(uint32 indentLevel)
 	TRACE_ALWAYS("%s\trelative: %s\n", indent, fRelative ? "yes" : "no");
 	TRACE_ALWAYS("%s\tminimum: %" B_PRIu32 "\n", indent, fMinimum);
 	TRACE_ALWAYS("%s\tmaximum: %" B_PRIu32 "\n", indent, fMaximum);
-	TRACE_ALWAYS("%s\tusage minimum: 0x%08" B_PRIx32 "\n", indent, fUsageMinimum);
-	TRACE_ALWAYS("%s\tusage maximum: 0x%08" B_PRIx32 "\n", indent, fUsageMaximum);
+	TRACE_ALWAYS("%s\tusage : 0x%08" B_PRIx32 "\n", indent, fUsage);
+
 }

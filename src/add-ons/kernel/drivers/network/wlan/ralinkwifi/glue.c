@@ -29,10 +29,10 @@ HAIKU_FBSD_WLAN_DRIVER_GLUE(ralinkwifi, ral, pci)
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_SWI_TASKQUEUE | FBSD_WLAN);
 HAIKU_FIRMWARE_VERSION(0);
 HAIKU_FIRMWARE_NAME_MAP({
-	{"rt2561fw", "rt2561.bin"},
-	{"rt2561sfw", "rt2561s.bin"},
-	{"rt2661fw", "rt2661.bin"},
-	{"rt2860fw", "rt2860.bin"}
+	{"rt2561fw", "rt2561.ucode"},
+	{"rt2561sfw", "rt2561s.ucode"},
+	{"rt2661fw", "rt2661.ucode"},
+	{"rt2860fw", "rt2860.ucode"}
 });
 
 NO_HAIKU_FBSD_MII_DRIVER();

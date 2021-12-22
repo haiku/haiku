@@ -38,8 +38,8 @@ enum {
 };
 
 struct flavor_info {
-	char*				name;
-	char*				info;
+	const char*			name;
+	const char*			info;
 	uint64				kinds;				// node kind
 	uint32				flavor_flags;
 	int32				internal_id;		// For BMediaAddOn internal use

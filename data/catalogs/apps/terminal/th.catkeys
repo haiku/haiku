@@ -12,8 +12,8 @@ Solarized Dark	Terminal colors scheme		สีทึบ
 Copy	Terminal TermWindow		คัดลอก
 Retro	Terminal colors scheme		ย้อนยุค
 Edit tab title…	Terminal TermWindow		แก้ไขชื่อแท็บ
-Print	Terminal TermWindow		พิมพ์
 Settings	Terminal TermWindow		ตั้งค่า
+Print	Terminal TermWindow		พิมพ์
 %app% settings	Terminal PrefWindow	window title	%app% ตั้งค่า
 Use default	Terminal SetTitleWindow		ใช้ค่าเริ่มต้น
 Close tab	Terminal TermWindow		ปิดแท็ป
@@ -32,8 +32,8 @@ Defaults	Terminal PrefWindow		ค่าเริ่มต้น
 Cancel	Terminal TermView		ยกเลิก
 Revert	Terminal PrefWindow		เปลี่ยนกลับ
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	เทอร์มินอล
-Use selection	Terminal FindWindow		ใช้การเลือก
 Find next	Terminal TermWindow		ค้นหาถัดไป
+Use selection	Terminal FindWindow		ใช้การเลือก
 Copy link location	Terminal TermView		สำเนาที่ตั้งลิงค์
 Window title:	Terminal AppearancePrefView		ชื่อหน้าต่าง
 New tab	Terminal TermWindow		แท็ปใหม่
@@ -52,12 +52,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		ตัวเลือ�
 Tab title:	Terminal AppearancePrefView		ชื่อแท็ป
 Text not found.	Terminal TermWindow		ไม่พบข้อความ
 Find failed	Terminal TermWindow		ค้นหาล้มเหลว
-Match word	Terminal FindWindow		คำตรงกัน
 Color scheme:	Terminal AppearancePrefView		โทนสี:
+Match word	Terminal FindWindow		คำตรงกัน
 New Terminal	Terminal TermWindow		เทอร์มินอลใหม่
 Quit	Terminal TermWindow		ออก
-Match case	Terminal FindWindow		กรณีตรงกัน
 Find previous	Terminal TermWindow		ค้นหาก่อนหน้านี้
+Match case	Terminal FindWindow		กรณีตรงกัน
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		รูปแบบที่ระบุชื่อแท็บ ตัวยึดตำแหน่ง\nสามารถนำมาใช้:
 Close	Terminal TermWindow		ปิด
 Save to file…	Terminal PrefWindow		บันทึกไปที่ไฟล์
@@ -79,11 +79,11 @@ Window size:	Terminal AppearancePrefView		ขนาดหน้าต่าง:
 Switch Terminals	Terminal TermWindow		สลับเทอร์มินอล
 Decrease	Terminal TermWindow		ลดลง
 Settings…	Terminal TermWindow		ตั้งค่า
-Cancel	Terminal SetTitleWindow		ยกเลิก
 Blinking cursor	Terminal AppearancePrefView		เคอร์เซอร์กะพริบ
+Cancel	Terminal SetTitleWindow		ยกเลิก
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		รูปแบบที่ระบุชื่อหน้าต่าง ข้อความที่ต้องการให้แสดง \nสามารถใช้:\n
-Use text:	Terminal FindWindow		ใช้ข้อความ
 Close active tab	Terminal TermWindow		ปิดแท็ปที่ใช้งาน
+Use text:	Terminal FindWindow		ใช้ข้อความ
 Save as default	Terminal TermWindow		บันทึกเป็นค่าเริ่มต้น
 Nothing is selected.	Terminal TermWindow		ไม่มีการเลือก
 Use left Option as Meta key	Terminal AppearancePrefView		ใช้ตัวเลือกทางซ้ายเป็นการระบุคำค้นหา
@@ -111,6 +111,6 @@ Increase	Terminal TermWindow		เพิ่มขึ้น
 OK	Terminal TermWindow		ตกลง
 Close window	Terminal TermWindow		ปิดหน้าต่าง
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nลิขสิทธิ์ 2001-2019 Haiku, Inc.\nลิขสิทธิ์(C) 1999 Kazuho Okui และ Takashi Murai.\n\nการใช้งาน: %s [OPTION] [SHELL]\n
-Solarized Light	Terminal colors scheme		สีสว่าง
 Clear all	Terminal TermWindow		ลบทั้งหมด
+Solarized Light	Terminal colors scheme		สีสว่าง
 Search forward	Terminal FindWindow		ค้นหาข้างหน้า

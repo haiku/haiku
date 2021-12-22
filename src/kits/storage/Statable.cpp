@@ -85,7 +85,7 @@ status_t
 BStatable::GetNodeRef(node_ref* ref) const
 {
 	status_t result = (ref ? B_OK : B_BAD_VALUE);
-	struct stat stat;
+	struct stat stat = {};
 
 	if (result == B_OK)
 		result = GetStat(&stat);
@@ -104,7 +104,7 @@ status_t
 BStatable::GetOwner(uid_t* owner) const
 {
 	status_t result = (owner ? B_OK : B_BAD_VALUE);
-	struct stat stat;
+	struct stat stat = {};
 
 	if (result == B_OK)
 		result = GetStat(&stat);
@@ -120,7 +120,7 @@ BStatable::GetOwner(uid_t* owner) const
 status_t
 BStatable::SetOwner(uid_t owner)
 {
-	struct stat stat;
+	struct stat stat = {};
 	stat.st_uid = owner;
 
 	return set_stat(stat, B_STAT_UID);
@@ -132,7 +132,7 @@ status_t
 BStatable::GetGroup(gid_t* group) const
 {
 	status_t result = (group ? B_OK : B_BAD_VALUE);
-	struct stat stat;
+	struct stat stat = {};
 
 	if (result == B_OK)
 		result = GetStat(&stat);
@@ -148,7 +148,7 @@ BStatable::GetGroup(gid_t* group) const
 status_t
 BStatable::SetGroup(gid_t group)
 {
-	struct stat stat;
+	struct stat stat = {};
 	stat.st_gid = group;
 
 	return set_stat(stat, B_STAT_GID);
@@ -160,7 +160,7 @@ status_t
 BStatable::GetPermissions(mode_t* permissions) const
 {
 	status_t result = (permissions ? B_OK : B_BAD_VALUE);
-	struct stat stat;
+	struct stat stat = {};
 
 	if (result == B_OK)
 		result = GetStat(&stat);
@@ -176,7 +176,7 @@ BStatable::GetPermissions(mode_t* permissions) const
 status_t
 BStatable::SetPermissions(mode_t permissions)
 {
-	struct stat stat;
+	struct stat stat = {};
 	// the FS should do the correct masking -- only the S_IUMSK part is
 	// modifiable
 	stat.st_mode = permissions;
@@ -190,7 +190,7 @@ status_t
 BStatable::GetSize(off_t* size) const
 {
 	status_t result = (size ? B_OK : B_BAD_VALUE);
-	struct stat stat;
+	struct stat stat = {};
 
 	if (result == B_OK)
 		result = GetStat(&stat);
@@ -207,7 +207,7 @@ status_t
 BStatable::GetModificationTime(time_t* mtime) const
 {
 	status_t result = (mtime ? B_OK : B_BAD_VALUE);
-	struct stat stat;
+	struct stat stat = {};
 
 	if (result == B_OK)
 		result = GetStat(&stat);
@@ -223,7 +223,7 @@ BStatable::GetModificationTime(time_t* mtime) const
 status_t
 BStatable::SetModificationTime(time_t mtime)
 {
-	struct stat stat;
+	struct stat stat = {};
 	stat.st_mtime = mtime;
 
 	return set_stat(stat, B_STAT_MODIFICATION_TIME);
@@ -235,7 +235,7 @@ status_t
 BStatable::GetCreationTime(time_t* ctime) const
 {
 	status_t result = (ctime ? B_OK : B_BAD_VALUE);
-	struct stat stat;
+	struct stat stat = {};
 
 	if (result == B_OK)
 		result = GetStat(&stat);
@@ -251,7 +251,7 @@ BStatable::GetCreationTime(time_t* ctime) const
 status_t
 BStatable::SetCreationTime(time_t ctime)
 {
-	struct stat stat;
+	struct stat stat = {};
 	stat.st_crtime = ctime;
 
 	return set_stat(stat, B_STAT_CREATION_TIME);
@@ -263,7 +263,7 @@ status_t
 BStatable::GetAccessTime(time_t* atime) const
 {
 	status_t result = (atime ? B_OK : B_BAD_VALUE);
-	struct stat stat;
+	struct stat stat = {};
 
 	if (result == B_OK)
 		result = GetStat(&stat);
@@ -279,7 +279,7 @@ BStatable::GetAccessTime(time_t* atime) const
 status_t
 BStatable::SetAccessTime(time_t atime)
 {
-	struct stat stat;
+	struct stat stat = {};
 	stat.st_atime = atime;
 
 	return set_stat(stat, B_STAT_ACCESS_TIME);
@@ -291,7 +291,7 @@ status_t
 BStatable::GetVolume(BVolume* volume) const
 {
 	status_t result = (volume ? B_OK : B_BAD_VALUE);
-	struct stat stat;
+	struct stat stat = {};
 	if (result == B_OK)
 		result = GetStat(&stat);
 
@@ -311,7 +311,7 @@ _ZN9BStatable14_OhSoStatable1Ev(const BStatable* self, struct stat* stat)
 #endif
 {
 	// No Perform() method -- we have to use the old GetStat() method instead.
-	struct stat_beos oldStat;
+	struct stat_beos oldStat = {};
 	status_t result = BStatable::Private(self).GetStatBeOS(&oldStat);
 	if (result != B_OK)
 		return result;

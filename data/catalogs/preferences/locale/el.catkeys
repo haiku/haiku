@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Locale	288870027
+1	greek, modern (1453-)	x-vnd.Haiku-Locale	1081217032
 Medium format:	TimeFormatSettings		Μερική μορφή:
 Negative:	TimeFormatSettings		Αρνητικό:
 Language	Locale Preflet Window		Γλώσσα
@@ -22,6 +22,7 @@ Preferred languages	Locale Preflet Window		Προτεινόμενες γλώσσ
 Full format:	TimeFormatSettings		Πλήρη μορφή:
 Cancel	Locale Preflet Window		Άκυρο
 Revert	Locale Preflet Window		Επαναφορά
+Translate application and folder names	TimeFormatSettings		Μετάφραση ονομάτων εφαρμογών και καταλόγων
 12 hour	TimeFormatSettings		12-ωρη μορφή
 Positive:	TimeFormatSettings		Θετικό:
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Για να εφαρμοστούν οι αλλαγές, απαιτείται η επανεκκίνηση της Γραμμής Εργασιών και του Ιχνηλάτη. Θέλετε να γίνει η επανεκκίνηση τώρα;

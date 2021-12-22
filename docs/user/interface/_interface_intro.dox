@@ -9,6 +9,9 @@
 
 /*!
 	\page interface_intro Introduction to the Interface Kit
+	\ingroup interface
+
+	\section Overview
 
 	The Interface Kit holds all the classes you'll need to develop a GUI.
 	Building on the messaging facilities provided by the Application Kit,
@@ -28,4 +31,42 @@
 	take care of making sure all your GUI widgets end up where you want them,
 	with enough space to be useful. You can start learning the Layout API 
 	by reading the \link layout_intro introduction \endlink.
+
+	\section Coordinate spaces
+
+	All APIs using coordinates (such as \link BRect or \link BPoint ) refer to
+	a specific space where these coordinates are interpreted. \link BView and
+	\link BWindow provide various conversion function to translate coordinates
+	between different spaces, as needed, or provide separate methods such as
+	BView Bounds() and Frame(), returning results in different spaces as needed.
+
+	The initial coordinate space, from which all others are derived,  is the
+	screen space. Its origin is at the center of the screen's top-left pixel.
+	Coordinates can be converted between this and a specific window or view
+	space is done using the ConvertToScreen and ConvertFromScreen methods of
+	the corresponding object.
+
+	Each BWindow has its own coordinate space. Its origin is at the center of
+	the top-left pixel of the window client area (just inside the window border).
+	Root level views added to the window have their frame rectangle defined in
+	this space.
+
+	Each BView also gets its own coordinate space. The origin is initially at the
+	top left of the view, but this can be changed by scrolling the view
+	(programatically using ScrollBy or ScrollTo, or by the user acting on a scrollbar).
+
+	Additionally, each BView also has a drawing space. This is further transformed
+	from the BView coordinate space by calls to SetOrigin, SetScale, SetTransform,
+	ScaleBy, RotateBy, and TranslateBy. The effects of the first two of these
+	methods are independant from the other four, and it's not recommended to mix
+	the two types of transformations in the same BView. Note that this is the only space
+	that can be scaled and rotated, and translated by non-integer units. All other
+	coordinate spaces are only translations of the screen one and remain aligned on pixels.
+
+	All drawing operations in a BView use coordinates specified in the drawing space.
+	However, the update rect passed to the Draw method (or passed to the Invalidate
+	method) is in the BView base coordinate space. Conversion between the two can
+	be done using the affine transform returned by BView::Transform, or in case the
+	legacy transformation functions are used, by applying the scale and origin returned
+	by the Scale() and Origin() functions.
 */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2012, Haiku Inc. All rights reserved.
+ * Copyright 2003-2021, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,6 +23,7 @@
 #include <smp.h>
 #include <thread.h>
 #include <timer.h>
+#include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/kernel_cpp.h>
 #include <vm/vm.h>
@@ -31,6 +32,7 @@
 #include <string.h>
 
 #include <drivers/bus/FDT.h>
+#include "arch_int_gicv2.h"
 #include "soc.h"
 
 #include "soc_pxa.h"
@@ -54,7 +56,7 @@ static area_id sVectorPageArea;
 static void *sVectorPageAddress;
 static area_id sUserVectorPageArea;
 static void *sUserVectorPageAddress;
-static fdt_module_info *sFdtModule;
+//static fdt_module_info *sFdtModule;
 
 // An iframe stack used in the early boot process when we don't have
 // threads yet.
@@ -83,11 +85,13 @@ arch_int_disable_io_interrupt(int irq)
 
 /* arch_int_*_interrupts() and friends are in arch_asm.S */
 
-void
+int32
 arch_int_assign_to_cpu(int32 irq, int32 cpu)
 {
-	// intentionally left blank; no SMP support (yet)
+	// Not yet supported.
+	return 0;
 }
+
 
 static void
 print_iframe(const char *event, struct iframe *frame)
@@ -114,18 +118,6 @@ arch_int_init(kernel_args *args)
 
 
 extern "C" void arm_vector_init(void);
-
-
-static struct fdt_device_info intc_table[] = {
-	{
-		.compatible = "marvell,pxa-intc",
-		.init = PXAInterruptController::Init,
-	}, {
-		.compatible = "ti,omap3-intc",
-		.init = OMAP3InterruptController::Init,
-	}
-};
-static int intc_count = sizeof(intc_table) / sizeof(struct fdt_device_info);
 
 
 status_t
@@ -165,13 +157,28 @@ arch_int_init_post_vm(kernel_args *args)
 			dprintf("Enabled high vectors\n");
 	}
 
-	status_t rc = get_module(B_FDT_MODULE_NAME, (module_info**)&sFdtModule);
-	if (rc != B_OK)
-		panic("Unable to get FDT module: %08lx!\n", rc);
-
-	rc = sFdtModule->setup_devices(intc_table, intc_count, NULL);
-	if (rc != B_OK)
+	if (strncmp(args->arch_args.interrupt_controller.kind, INTC_KIND_GICV2,
+		sizeof(args->arch_args.interrupt_controller.kind)) == 0) {
+		InterruptController *ic = new(std::nothrow) GICv2InterruptController(
+			args->arch_args.interrupt_controller.regs1.start,
+			args->arch_args.interrupt_controller.regs2.start);
+		if (ic == NULL)
+			return B_NO_MEMORY;
+	} else if (strncmp(args->arch_args.interrupt_controller.kind, INTC_KIND_OMAP3,
+		sizeof(args->arch_args.interrupt_controller.kind)) == 0) {
+		InterruptController *ic = new(std::nothrow) OMAP3InterruptController(
+			args->arch_args.interrupt_controller.regs1.start);
+		if (ic == NULL)
+			return B_NO_MEMORY;
+	} else if (strncmp(args->arch_args.interrupt_controller.kind, INTC_KIND_PXA,
+		sizeof(args->arch_args.interrupt_controller.kind)) == 0) {
+		InterruptController *ic = new(std::nothrow) PXAInterruptController(
+			args->arch_args.interrupt_controller.regs1.start);
+		if (ic == NULL)
+			return B_NO_MEMORY;
+	} else {
 		panic("No interrupt controllers found!\n");
+	}
 
 	return B_OK;
 }
@@ -339,6 +346,25 @@ arch_arm_irq(struct iframe *iframe)
 	InterruptController *ic = InterruptController::Get();
 	if (ic != NULL)
 		ic->HandleInterrupt();
+
+	Thread* thread = thread_get_current_thread();
+	cpu_status state = disable_interrupts();
+	if (thread->cpu->invoke_scheduler) {
+		SpinLocker schedulerLocker(thread->scheduler_lock);
+		scheduler_reschedule(B_THREAD_READY);
+		schedulerLocker.Unlock();
+		restore_interrupts(state);
+	} else if (thread->post_interrupt_callback != NULL) {
+		void (*callback)(void*) = thread->post_interrupt_callback;
+		void* data = thread->post_interrupt_data;
+
+		thread->post_interrupt_callback = NULL;
+		thread->post_interrupt_data = NULL;
+
+		restore_interrupts(state);
+
+		callback(data);
+	}
 }
 
 

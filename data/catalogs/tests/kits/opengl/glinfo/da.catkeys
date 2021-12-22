@@ -2,7 +2,7 @@
 Maximum clipping planes	Capabilities		Maks. klipningsplaner
 Maximum evaluators equation order	Capabilities		Maks. evalueringsligningsrækkefølge
 Texture stack size	Capabilities		Stakstørrelse for struktur
-GL Info	System name		GL-info
+GL Info	System name		Information om GL
 Information	InfoView		Information
 Attributes stack size	Capabilities		Stakstørrelse for attributter
 Maximum lights	Capabilities		Maks. lys

@@ -1,7 +1,6 @@
-1	english	x-vnd.Haiku-Time	752043118
+1	english	x-vnd.Haiku-Time	1987293945
 OK	Time		确定
 Message receiving failed	Time		消息接收失败
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		时间日期，编写者：\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n版权所有 2004-2012, Haiku.
 Australia	Time		澳大利亚
 America	Time		美洲
 Reset to default server list	Time		重置为默认服务器列表
@@ -37,7 +36,6 @@ Atlantic	Time		大西洋
 Show clock in Deskbar	Time		在桌面栏显示时钟
 Display time with seconds	Time		显示秒钟
 Time	System name		时间
-about	Time		关于
 Show time zone	Time		显示时区
 Synchronize at boot	Time		启动时同步
 Indian	Time		印度洋

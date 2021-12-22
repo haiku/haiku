@@ -350,7 +350,7 @@ ArchiveVisitor::Visit(BPartition* partition, int32 level)
 
 AutoMounter::AutoMounter()
 	:
-	BServer(kMountServerSignature, true, NULL),
+	BServer(kMountServerSignature, false, NULL),
 	fNormalMode(kRestorePreviousVolumes),
 	fRemovableMode(kAllVolumes),
 	fEjectWhenUnmounting(true)
@@ -597,7 +597,7 @@ AutoMounter::_MountVolume(const BMessage* message)
 		return;
 
 	status_t status = partition->Mount(NULL, mountFlags);
-	if (status < B_OK) {
+	if (status < B_OK && InitGUIContext() == B_OK) {
 		char text[512];
 		snprintf(text, sizeof(text),
 			B_TRANSLATE("Error mounting volume:\n\n%s"), strerror(status));
@@ -612,6 +612,9 @@ AutoMounter::_MountVolume(const BMessage* message)
 bool
 AutoMounter::_SuggestForceUnmount(const char* name, status_t error)
 {
+	if (InitGUIContext() != B_OK)
+		return false;
+
 	char text[1024];
 	snprintf(text, sizeof(text),
 		B_TRANSLATE("Could not unmount disk \"%s\":\n\t%s\n\n"
@@ -633,6 +636,9 @@ AutoMounter::_SuggestForceUnmount(const char* name, status_t error)
 void
 AutoMounter::_ReportUnmountError(const char* name, status_t error)
 {
+	if (InitGUIContext() != B_OK)
+		return;
+
 	char text[512];
 	snprintf(text, sizeof(text), B_TRANSLATE("Could not unmount disk "
 		"\"%s\":\n\t%s"), name, strerror(error));
@@ -968,6 +974,12 @@ AutoMounter::_SuggestMountFlags(const BPartition* partition, uint32* _flags)
 
 	if (partition->IsReadOnly())
 		askReadOnly = false;
+
+	if (askReadOnly && ((BServer*)be_app)->InitGUIContext() != B_OK) {
+		// Mount read-only, just to be safe.
+		mountFlags |= B_MOUNT_READ_ONLY;
+		askReadOnly = false;
+	}
 
 	if (askReadOnly) {
 		// Suggest to the user to mount read-only until Haiku is more mature.

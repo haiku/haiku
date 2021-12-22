@@ -2,7 +2,7 @@
 
 PrintTransportAddOn
 
-Copyright (c) 2003, 04 OpenBeOS. 
+Copyright (c) 2003, 04 Haiku.
 
 Author:
 	Michael Pfeiffer

@@ -1,12 +1,12 @@
 Changed licence from GPL to BSD, as allowed by original authors.
-Removed multi-language support. This will need to be rebuilt to whatever system OpenBeOS uses.
+Terminal updated to use Local Kit.
 Moved Carachter Encodings menu to the "Right Place" for BeOS 5
 Started re-building the colours menu in the "Right Place"
 Silenced all build warnings on R5
 Fixed all but one build error on Dano and Zeta, and silenced all warnings
 
 
-Began removing (serious) traces of the RAD (Interface Elements) tool used to draw the GUI. This makes R1 binary and source compatiblity higher, and assists in moving stuff around the place. As the Interface Elements project file wasn't included in the first place, theres absolutely no point in leaving the cruft there.
+Removed (serious) traces of the RAD (Interface Elements) tool used to draw the GUI. This makes R1 binary and source compatiblity higher, and assists in moving stuff around the place. As the Interface Elements project file wasn't included in the first place, theres absolutely no point in leaving the cruft there.
 
 
 Stuff already done thats better than R5:

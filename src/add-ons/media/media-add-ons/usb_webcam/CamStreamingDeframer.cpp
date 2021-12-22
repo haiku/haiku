@@ -67,12 +67,16 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 		end = bufsize;
 	}
 	// whole buffer belongs to a frame, simple
-	if ((fState == ST_FRAME) && (fCurrentFrame->Position() + bufsize < fMinFrameSize)) {
-		// no residual data, and
-		fCurrentFrame->Write(buf, bufsize);
-		fInputBuff.Seek(0LL, SEEK_SET);
-		fInputBuff.SetSize(0);
-		return size;
+	if (fState == ST_FRAME) {
+		off_t position = fCurrentFrame->Position();
+		if (position + bufsize < 0
+			|| (size_t)(position + bufsize) < fMinFrameSize) {
+			// no residual data, and
+			fCurrentFrame->Write(buf, bufsize);
+			fInputBuff.Seek(0LL, SEEK_SET);
+			fInputBuff.SetSize(0);
+			return size;
+		}
 	}
 
 	// waiting for a frame...
@@ -116,10 +120,13 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 #endif
 #if 1
 		i = 0;
-		if (fCurrentFrame->Position() < fMinFrameSize) {
-			if (fCurrentFrame->Position() + bufsize >= fMinFrameSize)
+		off_t currentFramePosition = fCurrentFrame->Position();
+		if (currentFramePosition < 0
+			|| (size_t)currentFramePosition < fMinFrameSize) {
+			if (currentFramePosition + bufsize > 0
+				&& (size_t)(currentFramePosition + bufsize) >= fMinFrameSize) {
 				i = (fMinFrameSize - (size_t)fCurrentFrame->Position());
-			else
+			} else
 				i = bufsize;
 		}
 		PRINT((CH ": checking for EOF; bufsize=%d i=%d" CT, bufsize, i));
@@ -133,7 +140,9 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 				i += j;
 				PRINT((CH "| EOF[%d] at offset %d; pos %" B_PRIdOFF CT,
 					which, i, fCurrentFrame->Position()));
-				if (fCurrentFrame->Position()+i >= fMaxFrameSize) {
+				off_t position = fCurrentFrame->Position();
+				if (position + i >= 0
+					&& (size_t)(position + i) >= fMaxFrameSize) {
 					// too big: discard
 					//i = -1;
 					discard = true;
@@ -159,7 +168,9 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 		PRINT((CH ": writing %d bytes" CT, end));
 		if (end <= bufsize)
 			fCurrentFrame->Write(buf, end);
-		if (fCurrentFrame->Position() > fMaxFrameSize) {
+		off_t currentPosition = fCurrentFrame->Position();
+		if (currentPosition > 0
+			&& (size_t)currentPosition > fMaxFrameSize) {
 			fCurrentFrame->SetSize(fMaxFrameSize);
 			detach = true;
 		}

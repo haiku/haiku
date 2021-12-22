@@ -327,7 +327,7 @@ void RosterWatchingTester::WatchingTest2()
 	//   none
 	// terminate app 3
 	context.TerminateApp(team3);
-// OBOS handles app termination a bit different. At the point, when the
+// Haiku handles app termination a bit different. At the point, when the
 // application unregisters itself from the registrar, its port is still
 // valid.
 #ifdef TEST_R5

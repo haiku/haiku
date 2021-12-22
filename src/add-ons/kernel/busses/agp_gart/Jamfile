@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src add-ons kernel busses agp_gart ;
 
 SubDirC++Flags -fno-rtti ;
 
-UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ] ;
+UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 UsePrivateHeaders [ FDirName graphics intel_extreme ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders drivers graphics kernel ;
@@ -15,6 +15,6 @@ KernelAddon <agp_gart>intel :
 	;
 
 SEARCH on [ FGristFiles
-		kernel_cpp.cpp 
+		kernel_cpp.cpp
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 

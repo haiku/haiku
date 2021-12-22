@@ -5,7 +5,7 @@
  * Copyright (c) 2004-2005 Richard Russon
  * Copyright (c) 2005-2006 Yura Pakhuchiy
  * Copyright (c) 2005-2008 Szabolcs Szakacsits
- * Copyright (c) 2007 Jean-Pierre Andre
+ * Copyright (c) 2007-2021 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -388,42 +388,6 @@ static INDEX_ENTRY *ntfs_ie_dup_novcn(INDEX_ENTRY *ie)
 	return dup;
 }
 
-static int ntfs_ia_check(ntfs_index_context *icx, INDEX_BLOCK *ib, VCN vcn)
-{
-	u32 ib_size = (unsigned)le32_to_cpu(ib->index.allocated_size) + 0x18;
-	
-	ntfs_log_trace("Entering\n");
-	
-	if (!ntfs_is_indx_record(ib->magic)) {
-		
-		ntfs_log_error("Corrupt index block signature: vcn %lld inode "
-			       "%llu\n", (long long)vcn,
-			       (unsigned long long)icx->ni->mft_no);
-		return -1;
-	}
-	
-	if (sle64_to_cpu(ib->index_block_vcn) != vcn) {
-		
-		ntfs_log_error("Corrupt index block: VCN (%lld) is different "
-			       "from expected VCN (%lld) in inode %llu\n",
-			       (long long)sle64_to_cpu(ib->index_block_vcn),
-			       (long long)vcn,
-			       (unsigned long long)icx->ni->mft_no);
-		return -1;
-	}
-	
-	if (ib_size != icx->block_size) {
-		
-		ntfs_log_error("Corrupt index block : VCN (%lld) of inode %llu "
-			       "has a size (%u) differing from the index "
-			       "specified size (%u)\n", (long long)vcn, 
-			       (unsigned long long)icx->ni->mft_no, ib_size,
-			       icx->block_size);
-		return -1;
-	}
-	return 0;
-}
-
 static INDEX_ROOT *ntfs_ir_lookup(ntfs_inode *ni, ntfschar *name,
 				  u32 name_len, ntfs_attr_search_ctx **ctx)
 {
@@ -467,6 +431,133 @@ static INDEX_ROOT *ntfs_ir_lookup2(ntfs_inode *ni, ntfschar *name, u32 len)
 	if (ir)
 		ntfs_attr_put_search_ctx(ctx);
 	return ir;
+}
+
+/*
+ *		Check the consistency of an index block
+ *
+ *	Make sure the index block does not overflow from the index record.
+ *	The size of block is assumed to have been checked to be what is
+ *	defined in the index root.
+ *
+ *	Returns 0 if no error was found
+ *		-1 otherwise (with errno unchanged)
+ *
+ *      |<--->|  offsetof(INDEX_BLOCK, index)
+ *      |     |<--->|  sizeof(INDEX_HEADER)
+ *      |     |     |
+ *      |     |     | seq          index entries         unused
+ *      |=====|=====|=====|===========================|==============|
+ *      |     |           |                           |              |
+ *      |     |<--------->| entries_offset            |              |
+ *      |     |<---------------- index_length ------->|              |
+ *      |     |<--------------------- allocated_size --------------->|
+ *      |<--------------------------- block_size ------------------->|
+ *
+ *      size(INDEX_HEADER) <= ent_offset < ind_length <= alloc_size < bk_size
+ */
+
+int ntfs_index_block_inconsistent(const INDEX_BLOCK *ib, u32 block_size,
+			u64 inum, VCN vcn)
+{
+	u32 ib_size = (unsigned)le32_to_cpu(ib->index.allocated_size)
+			+ offsetof(INDEX_BLOCK, index);
+
+	if (!ntfs_is_indx_record(ib->magic)) {
+		ntfs_log_error("Corrupt index block signature: vcn %lld inode "
+			       "%llu\n", (long long)vcn,
+			       (unsigned long long)inum);
+		return -1;
+	}
+	
+	if (sle64_to_cpu(ib->index_block_vcn) != vcn) {
+		ntfs_log_error("Corrupt index block: VCN (%lld) is different "
+			       "from expected VCN (%lld) in inode %llu\n",
+			       (long long)sle64_to_cpu(ib->index_block_vcn),
+			       (long long)vcn,
+			       (unsigned long long)inum);
+		return -1;
+	}
+	
+	if (ib_size != block_size) {
+		ntfs_log_error("Corrupt index block : VCN (%lld) of inode %llu "
+			       "has a size (%u) differing from the index "
+			       "specified size (%u)\n", (long long)vcn, 
+			       (unsigned long long)inum, ib_size,
+			       (unsigned int)block_size);
+		return -1;
+	}
+	if (le32_to_cpu(ib->index.entries_offset) < sizeof(INDEX_HEADER)) {
+		ntfs_log_error("Invalid index entry offset in inode %lld\n",
+				(unsigned long long)inum);
+		return -1;
+	}
+	if (le32_to_cpu(ib->index.index_length)
+			<= le32_to_cpu(ib->index.entries_offset)) {
+		ntfs_log_error("No space for index entries in inode %lld\n",
+				(unsigned long long)inum);
+		return -1;
+	}
+	if (le32_to_cpu(ib->index.allocated_size)
+			< le32_to_cpu(ib->index.index_length)) {
+		ntfs_log_error("Index entries overflow in inode %lld\n",
+				(unsigned long long)inum);
+		return -1;
+	}
+
+	return (0);
+}
+
+
+/*
+ *		Check the consistency of an index entry
+ *
+ *	Make sure data and key do not overflow from entry.
+ *	As a side effect, an entry with zero length is rejected.
+ *	This entry must be a full one (no INDEX_ENTRY_END flag), and its
+ *	length must have been checked beforehand to not overflow from the
+ *	index record.
+ *
+ *	Returns 0 if no error was found
+ *		-1 otherwise (with errno unchanged)
+ */
+
+int ntfs_index_entry_inconsistent(const INDEX_ENTRY *ie,
+			COLLATION_RULES collation_rule, u64 inum)
+{
+	int ret;
+
+	ret = 0;
+	if (ie->key_length
+		&& ((le16_to_cpu(ie->key_length) + offsetof(INDEX_ENTRY, key))
+			    > le16_to_cpu(ie->length))) {
+		ntfs_log_error("Overflow from index entry in inode %lld\n",
+				(long long)inum);
+		ret = -1;
+
+	} else
+		if (collation_rule == COLLATION_FILE_NAME) {
+			if ((offsetof(INDEX_ENTRY, key.file_name.file_name)
+				    + ie->key.file_name.file_name_length
+						* sizeof(ntfschar))
+				> le16_to_cpu(ie->length)) {
+				ntfs_log_error("File name overflow from index"
+					" entry in inode %lld\n",
+					(long long)inum);
+				ret = -1;
+			}
+		} else {
+			if (ie->data_length
+				&& ((le16_to_cpu(ie->data_offset)
+				    + le16_to_cpu(ie->data_length))
+				    > le16_to_cpu(ie->length))) {
+				ntfs_log_error("Data overflow from index"
+					" entry in inode %lld\n",
+					(long long)inum);
+				ret = -1;
+			}
+		}
+	return (ret);
 }
 
 /** 
@@ -520,6 +611,12 @@ static int ntfs_ie_lookup(const void *key, const int key_len,
 		if (!icx->collate) {
 			ntfs_log_error("Collation function not defined\n");
 			errno = EOPNOTSUPP;
+			return STATUS_ERROR;
+		}
+			/* Make sure key and data do not overflow from entry */
+		if (ntfs_index_entry_inconsistent(ie, icx->ir->collation_rule,
+				icx->ni->mft_no)) {
+			errno = EIO;
 			return STATUS_ERROR;
 		}
 		rc = icx->collate(icx->ni->vol, key, key_len,
@@ -606,8 +703,11 @@ static int ntfs_ib_read(ntfs_index_context *icx, VCN vcn, INDEX_BLOCK *dst)
 		return -1;
 	}
 	
-	if (ntfs_ia_check(icx, dst, vcn))
+	if (ntfs_index_block_inconsistent((INDEX_BLOCK*)dst, icx->block_size,
+				icx->ia_na->ni->mft_no, vcn)) {
+		errno = EIO;
 		return -1;
+	}
 	
 	return 0;
 }
@@ -703,6 +803,7 @@ int ntfs_index_lookup(const void *key, const int key_len, ntfs_index_context *ic
 	else
 		icx->vcn_size_bits = NTFS_BLOCK_SIZE_BITS;
 			/* get the appropriate collation function */
+	icx->ir = ir;
 	icx->collate = ntfs_get_collate_function(ir->collation_rule);
 	if (!icx->collate) {
 		err = errno = EOPNOTSUPP;
@@ -712,10 +813,6 @@ int ntfs_index_lookup(const void *key, const int key_len, ntfs_index_context *ic
 	}
 	
 	old_vcn = VCN_INDEX_ROOT_PARENT;
-	/* 
-	 * FIXME: check for both ir and ib that the first index entry is
-	 * within the index block.
-	 */
 	ret = ntfs_ie_lookup(key, key_len, icx, &ir->index, &vcn, &ie);
 	if (ret == STATUS_ERROR) {
 		err = errno;
@@ -782,6 +879,10 @@ descend_into_child_node:
 err_out:
 	icx->bad_index = TRUE;	/* Force icx->* to be freed */
 err_lookup:
+	if (icx->actx) {
+		ntfs_attr_put_search_ctx(icx->actx);
+		icx->actx = NULL;
+	}
 	free(ib);
 	if (!err)
 		err = EIO;
@@ -1563,19 +1664,32 @@ static int ntfs_ih_takeout(ntfs_index_context *icx, INDEX_HEADER *ih,
 			   INDEX_ENTRY *ie, INDEX_BLOCK *ib)
 {
 	INDEX_ENTRY *ie_roam;
+	int freed_space;
+	BOOL full;
 	int ret = STATUS_ERROR;
 	
 	ntfs_log_trace("Entering\n");
 	
+	full = ih->index_length == ih->allocated_size;
 	ie_roam = ntfs_ie_dup_novcn(ie);
 	if (!ie_roam)
 		return STATUS_ERROR;
 
 	ntfs_ie_delete(ih, ie);
 
-	if (ntfs_icx_parent_vcn(icx) == VCN_INDEX_ROOT_PARENT)
+	if (ntfs_icx_parent_vcn(icx) == VCN_INDEX_ROOT_PARENT) {
+		/*
+		 * Recover the space which may have been freed
+		 * while deleting an entry from root index
+		 */
+		freed_space = le32_to_cpu(ih->allocated_size)
+				- le32_to_cpu(ih->index_length);
+		if (full && (freed_space > 0) && !(freed_space & 7)) {
+			ntfs_ir_truncate(icx, le32_to_cpu(ih->index_length));
+			/* do nothing if truncation fails */
+		}
 		ntfs_inode_mark_dirty(icx->actx->ntfs_ino);
-	else
+	} else
 		if (ntfs_ib_write(icx, ib))
 			goto out;
 	

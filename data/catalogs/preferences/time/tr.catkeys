@@ -1,11 +1,11 @@
-1	turkish	x-vnd.Haiku-Time	834234238
+1	turkish	x-vnd.Haiku-Time	3691539601
 OK	Time		Tamam
 Message receiving failed	Time		İleti alımı başarısız
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Tarih ve Saat, yazanlar:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nTelif hakkı 2004-2012, Haiku.
 Australia	Time		Avustralya
 America	Time		Amerika
 Reset to default server list	Time		Öntanımlı sunucu listesine sıfırla
 Could not resolve server address	Time		Sunucu adı çözülemedi
+Time & Date	System name		Tarih ve Saat
 Set time zone	Time		Saat dilimini ayarla
 Waiting for answer failed	Time		Yanıt bekleme başarısız
 <Other>	Time		<Diğer>
@@ -38,7 +38,6 @@ Atlantic	Time		Atlantik
 Show clock in Deskbar	Time		Saati Masaüstü Çubuğu'nda göster
 Display time with seconds	Time		Saniyeleri göster
 Time	System name		Tarih ve Saat
-about	Time		hakkında
 Show time zone	Time		Saat dilimini göster
 Synchronize at boot	Time		Önyükleme sırasında eşitle
 Indian	Time		Hint

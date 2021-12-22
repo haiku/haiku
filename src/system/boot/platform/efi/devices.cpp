@@ -137,7 +137,7 @@ device_contains_partition(EfiDevice *device, boot::Partition *partition)
 			(gpt_table_header*)malloc(blockSize);
 		ssize_t bytesRead = device->ReadAt(NULL, blockSize, deviceHeader,
 			blockSize);
-		if (bytesRead != blockSize)
+		if (bytesRead != (ssize_t)blockSize)
 			return false;
 
 		if (memcmp(deviceHeader, &header->TableHeader(),
@@ -150,7 +150,7 @@ device_contains_partition(EfiDevice *device, boot::Partition *partition)
 		gpt_partition_entry *entries = (gpt_partition_entry*)malloc(size);
 		bytesRead = device->ReadAt(NULL,
 			deviceHeader->entries_block * blockSize, entries, size);
-		if (bytesRead != size)
+		if (bytesRead != (ssize_t)size)
 			return false;
 
 		if (memcmp(&entries[index], &header->EntryAt(index),
@@ -203,7 +203,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 			panic("Cannot get block device handle!");
 
 		TRACE("%s: %p: present: %s, logical: %s, removeable: %s, "
-			"blocksize: %" B_PRIu32 ", lastblock: %" B_PRIu64 "\n",
+			"blocksize: %" PRIu32 ", lastblock: %" PRIu64 "\n",
 			__func__, blockIo,
 			blockIo->Media->MediaPresent ? "true" : "false",
 			blockIo->Media->LogicalPartition ? "true" : "false",

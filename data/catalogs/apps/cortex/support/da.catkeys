@@ -1,10 +1,14 @@
-1	danish	application/x-vnd.Cortex.support	3500984767
+1	danish	application/x-vnd.Cortex.support	4267636659
+Mono	MediaString		Mono
+MPEG1	MediaString		MPEG1
 YUV444	MediaString		YUV444
 Port	MediaString		Port
 16 bit integer	MediaString		16 bit heltal
 32 bit HSVA	MediaString		32 bit HSVA
 YCbCr411	MediaString		YCbCr411
+Offline	MediaString		Offline
 YUV422	MediaString		YUV422
+QuickTime	MediaString		QuickTime
 32 bit HLSA	MediaString		32 bit HLSA
 24 bit HSV	MediaString		24 bit HSV
 32 bit CMY	MediaString		32 bit CMY
@@ -15,8 +19,10 @@ YUV9	MediaString		YUV9
 Right	MediaString		Højre
 32 bit RGB	MediaString		32 bit RGB
 YUV420	MediaString		YUV420
+ kb/s	MediaString		 kb/s
 24 bit HSI	MediaString		24 bit HSI
 32 bit CMYA	MediaString		32 bit CMYA
+Timecode	MediaString		Tidskode
 32 bit integer	MediaString		32 bit heltal
  kHz	MediaString		 kHz
 32 bit LAB	MediaString		32 bit LAB
@@ -28,18 +34,32 @@ YCbCr444	MediaString		YCbCr444
 32 bit HSV	MediaString		32 bit HSV
 16 bit RGB	MediaString		16 bit RGB
 YCbCr422	MediaString		YCbCr422
+Raw audio	MediaString		Rå lyd
 32 bit LABA	MediaString		32 bit LABA
 24 bit HLS	MediaString		24 bit HLS
+MIDI	MediaString		MIDI
 YUV12	MediaString		YUV12
+ (NTSC)	MediaString		 (NTSC)
 YUV411	MediaString		YUV411
 32 bit HSI	MediaString		32 bit HSI
+ (PAL)	MediaString		 (PAL)
 32 bit RGBA	MediaString		32 bit RGBA
 YCbCr420	MediaString		YCbCr420
 HTML	MediaString		HTML
+Time source	MediaString		Tidskilde
 15 bit RGB	MediaString		15 bit RGB
+ProLogic LR	MediaString		ProLogic LR
+Parameters	MediaString		Parametre
+Raw data from VBL area	MediaString		Rå data fra VBL-område
+Left	MediaString		Venstre
+BeOS video	MediaString		BeOS-video
 24 bit CMY	MediaString		24 bit CMY
 32 bit UVLA	MediaString		32 bit UVLA
+Stereo	MediaString		Stereo
 32 bit UVL	MediaString		32 bit UVL
+Text	MediaString		Tekst
+Unknown media type	MediaString		Ukendt medietype
 MPEG2	MediaString		MPEG2
 24 bit RGB	MediaString		24 bit RGB
 32 bit HSIA	MediaString		32 bit HSIA
+Raw video	MediaString		Rå video

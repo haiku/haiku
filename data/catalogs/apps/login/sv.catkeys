@@ -1,17 +1,17 @@
-1	swedish	x-vnd.Haiku-Login	336867745
+1	swedish	x-vnd.Haiku-Login	3568987751
 Invalid login!	Login View		Ogiltig inloggning!
 Error	Login App		Fel
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tStarta i självediteringsläge för att skräddarsy skrivbordet.\n
+Login application for Haiku\nUsage:	Login App		Inloggningsapplikation för Haiku\nAnvändande:
+--nonmodal\tDo not make the window modal	Login App		--nonmodal\tGör inte fönstret modalt
 Welcome to Haiku	Login Window		Välkommen till Haiku
 Halt	Login View		Stoppa
-Login application for Haiku\nUsage:\n	Login App		Login applikation för Haiku\n Användning:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\t Gör inte fönstret modulär\n
 Desktop	Desktop Window		Skrivbord
 Hide password	Login View		Göm lösenordet
 Reboot	Login View		Starta om
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Du kan skräddarsy skrivbordet som visas bakom loginapplikationen genom att släppa replikanter på det \n\nStäng applikationen när du är klar (Cmd-Q).
 OK	Login View		OK
 Info	Login App		Information
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tStarta i hyllredigeringsläge för att anpassa skrivbordet.
 Login:	Login View		Användarnamn:
 Password:	Login View		Lösenord:
 Unimplemented	Login App		Ej implementerad

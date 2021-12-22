@@ -1204,16 +1204,17 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			status_t status = B_ERROR;
 
-			int32 size = 0;
+			int32 size = 0, bytesPerRow = 0;
 			BRect cursorRect;
 			color_space colorspace = B_RGBA32;
 			BPoint hotspot;
 			ServerCursor* cursor = NULL;
 
-			if (link.Read<int32>(&size) == B_OK
-				&& link.Read<BRect>(&cursorRect) == B_OK
-				&& link.Read<color_space>(&colorspace) == B_OK
+			if (link.Read<BRect>(&cursorRect) == B_OK
 				&& link.Read<BPoint>(&hotspot) == B_OK
+				&& link.Read<color_space>(&colorspace) == B_OK
+				&& link.Read<int32>(&bytesPerRow) == B_OK
+				&& link.Read<int32>(&size) == B_OK
 				&& size > 0) {
 
 				BStackOrHeapArray<uint8, 256> byteArray(size);
@@ -1225,7 +1226,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					if (cursor == NULL)
 						status = B_NO_MEMORY;
 					else
-						memcpy(cursor->Bits(), byteArray, size);
+						cursor->ImportBits(byteArray, size, bytesPerRow, colorspace);
 				}
 			}
 

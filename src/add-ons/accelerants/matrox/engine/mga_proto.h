@@ -47,7 +47,7 @@ void dump_pins(void);
 
 /*DAC functions*/
 status_t gx00_dac_mode(int,float);
-status_t gx00_dac_palette(uint8*,uint8*,uint8*);
+status_t gx00_dac_palette(uint8 r[256],uint8 g[256],uint8 b[256]);
 
 status_t gx00_dac_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
 status_t gx00_dac_set_pix_pll(display_mode target);
@@ -86,7 +86,7 @@ status_t gx00_crtc_validate_timing(
 );
 status_t gx00_crtc_set_timing(display_mode target);
 status_t gx00_crtc_depth(int mode);
-status_t gx00_crtc_set_display_start(uint32 startadd,uint8 bpp); 
+status_t gx00_crtc_set_display_start(uint32 startadd,uint8 bpp);
 status_t gx00_crtc_set_display_pitch(void);
 status_t gx00_crtc_dpms(bool display,bool h,bool v);
 status_t gx00_crtc_mem_priority(uint8);
@@ -100,8 +100,8 @@ status_t gx00_crtc_cursor_hide(void);
 /*XXX - validate_timing*/
 status_t g400_crtc2_set_timing(display_mode target);
 status_t g400_crtc2_depth(int mode);
-status_t g400_crtc2_set_display_pitch(void); 
-status_t g400_crtc2_set_display_start(uint32 startadd,uint8 bpp); 
+status_t g400_crtc2_set_display_pitch(void);
+status_t g400_crtc2_set_display_start(uint32 startadd,uint8 bpp);
 status_t g400_crtc2_dpms(bool display, bool h, bool v);
 
 /*acceleration functions*/

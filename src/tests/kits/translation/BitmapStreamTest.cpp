@@ -1,5 +1,5 @@
 /*****************************************************************************/
-// OpenBeOS Translation Kit Test
+// Haiku Translation Kit Test
 // Authors: Brian Matzon <brian@matzon.dk>, Michael Wilber
 // Version:
 //
@@ -10,7 +10,7 @@
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2002 OpenBeOS Project
+// Copyright (c) 2002 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -93,7 +93,7 @@ void
 BitmapStreamTest::ConstructorTest()
 {
 	BApplication
-		app("application/x-vnd.OpenBeOS-translationkit_bitmapstreamtest");
+		app("application/x-vnd.Haiku-translationkit_bitmapstreamtest");
 
 	//BBitmapStream with no bitmap supplied
 	NextSubTest();
@@ -135,7 +135,7 @@ void
 BitmapStreamTest::DetachBitmapTest()
 {
 	BApplication
-		app("application/x-vnd.OpenBeOS-translationkit_bitmapstreamtest");
+		app("application/x-vnd.Haiku-translationkit_bitmapstreamtest");
 	
 	NextSubTest();
 	BFile file("../src/tests/kits/translation/data/images/image.jpg",
@@ -196,7 +196,7 @@ BitmapStreamTest::ReadWriteTest()
 {
 	NextSubTest();
 	BApplication
-		app("application/x-vnd.OpenBeOS-translationkit_bitmapstreamtest");
+		app("application/x-vnd.Haiku-translationkit_bitmapstreamtest");
 	char chbuf[sizeof(TranslatorBitmap)],
 		chheader[sizeof(TranslatorBitmap)], *pch;
 	TranslatorBitmap sheader;
@@ -323,7 +323,7 @@ void
 BitmapStreamTest::SeekTest()
 {
 	BApplication
-		app("application/x-vnd.OpenBeOS-translationkit_bitmapstreamtest");
+		app("application/x-vnd.Haiku-translationkit_bitmapstreamtest");
 	
 	NextSubTest();
 	BFile file("../src/tests/kits/translation/data/images/image.jpg",
@@ -413,7 +413,7 @@ void
 BitmapStreamTest::SetSizeTest()
 {
 	BApplication
-		app("application/x-vnd.OpenBeOS-translationkit_bitmapstreamtest");
+		app("application/x-vnd.Haiku-translationkit_bitmapstreamtest");
 	
 	NextSubTest();
 	BFile file("../src/tests/kits/translation/data/images/image.jpg",

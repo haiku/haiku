@@ -1,0 +1,15 @@
+1	greek, modern (1453-)	application/x-vnd.moon-Flanger.media_addon	3644480584
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Το FlangerNode με τη μορφή προσθέτου.\nτου Eric Moon (16 Ιουνίου 1999)
+Delay	CortexAddOnsFlanger		Καθυστέρηση
+Depth	CortexAddOnsFlanger		Βάθος
+Feedback	CortexAddOnsFlanger		Απόκριση
+Sweep rate	CortexAddOnsFlanger		Ρυθμός ολίσθησης
+Mix ratio	CortexAddOnsFlanger		Αναλογία μίξης
+MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: αδύνατη η ανάκτηση πληροφοριών κόμβου (%d):\n%s\n
+MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: αδύνατη η εύρεση του κόμβου (%d):\n%s\n
+FlangerNode parameters	CortexAddOnsFlanger		Ρυθμίσεις FlangerNode
+OK	CortexAddOnsCommonMediaNodeControlApp		Εντάξει
+controls	CortexAddOnsCommonMediaNodeControlApp		χειριστήρια
+Mix output	CortexAddOnsFlanger		Μίξη εξόδου
+MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: δεν υπάρχουν ρυθμίσεις για τον κόμβο (%d):\n%s\n
+Audio input	CortexAddOnsFlanger		Είσοδος ήχου

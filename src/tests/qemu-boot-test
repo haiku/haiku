@@ -108,7 +108,7 @@ case "$ARCH" in
 	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 	echo "+++ Testing $PLATFORM boot..."
 	cp $IMAGE $TEST_FILE
-	$EMULATOR -device virtio-gpu -drive file=$TEST_FILE,format=raw,if=virtio
+	$EMULATOR -device ati-vga -drive file=$TEST_FILE,format=raw,if=virtio
 	check_logs $TEST_SERIALLOG
 	rm -f $TEST_FILE $TEST_SERIALLOG
 	;;

@@ -292,6 +292,7 @@ struct hda_audio_group {
 struct hda_codec {
 	uint16		vendor_id;
 	uint16		product_id;
+	uint32		subsystem_id;
 	uint8		major;
 	uint8		minor;
 	uint8		revision;

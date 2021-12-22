@@ -33,12 +33,13 @@
 #define KEYBOARD_HANDLER_COOKIE_FLAG_DEBUGGER	0x02
 
 
-#if KEYBOARD_SUPPORTS_KDL
+#ifdef KEYBOARD_SUPPORTS_KDL
 static bool sDebugKeyboardFound = false;
-static usb_id sDebugKeyboardPipe = 0;
 static size_t sDebugKeyboardReportSize = 0;
 static int32 sDebuggerCommandAdded = 0;
 
+#ifdef USB_KDL
+static usb_id sDebugKeyboardPipe = 0;
 
 static int
 debug_get_keyboard_config(int argc, char **argv)
@@ -47,6 +48,7 @@ debug_get_keyboard_config(int argc, char **argv)
 	set_debug_variable("_usbReportSize", (uint64)sDebugKeyboardReportSize);
 	return 0;
 }
+#endif
 #endif
 
 
@@ -72,10 +74,11 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 	fHasReader(0),
 	fHasDebugReader(false)
 {
-	mutex_init(&fLock, "usb keyboard");
+	mutex_init(&fLock, DEVICE_PATH_SUFFIX " keyboard");
 
 	// find modifiers and keys
 	bool debugUsable = false;
+
 	for (uint32 i = 0; i < inputReport.CountItems(); i++) {
 		HIDReportItem *item = inputReport.ItemAt(i);
 		if (!item->HasData())
@@ -85,36 +88,28 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 			|| item->UsagePage() == B_HID_USAGE_PAGE_CONSUMER
 			|| item->UsagePage() == B_HID_USAGE_PAGE_BUTTON) {
 			TRACE("keyboard item with usage %" B_PRIx32 "\n",
-				item->UsageMinimum());
+				item->Usage());
 
-			if (item->Array()) {
-				// normal or "consumer"/button keys handled as array items
-				if (fKeyCount < MAX_KEYS)
-					fKeys[fKeyCount++] = item;
+			debugUsable = true;
 
-				if (item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD)
-					debugUsable = true;
-			} else {
-				if (item->UsagePage() == B_HID_USAGE_PAGE_KEYBOARD
-					&& item->UsageID() >= B_HID_UID_KB_LEFT_CONTROL
-					&& item->UsageID() <= B_HID_UID_KB_RIGHT_GUI) {
-					// modifiers are generally implemented as bitmaps
-					if (fModifierCount < MAX_MODIFIERS)
-						fModifiers[fModifierCount++] = item;
-
-					debugUsable = true;
-				}
-			}
+			if (item->UsageID() >= B_HID_UID_KB_LEFT_CONTROL
+				&& item->UsageID() <= B_HID_UID_KB_RIGHT_GUI) {
+				if (fModifierCount < MAX_MODIFIERS)
+					fModifiers[fModifierCount++] = item;
+			} else if (fKeyCount < MAX_KEYS)
+						fKeys[fKeyCount++] = item;
 		}
 	}
 
-#if KEYBOARD_SUPPORTS_KDL
+#ifdef KEYBOARD_SUPPORTS_KDL
 	if (!sDebugKeyboardFound && debugUsable) {
 		// It's a keyboard, not just some additional buttons, set up the kernel
 		// debugger info here so that it is ready on panics or crashes that
 		// don't go through the emergency keys. If we also found LEDs we assume
 		// it is a full sized keyboard and discourage further setting the info.
+#ifdef USB_KDL
 		sDebugKeyboardPipe = fInputReport.Device()->InterruptPipe();
+#endif
 		sDebugKeyboardReportSize = fInputReport.Parser()->MaxReportSize();
 		if (outputReport != NULL)
 			sDebugKeyboardFound = true;
@@ -132,6 +127,8 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 		fStatus = B_NO_MEMORY;
 		return;
 	}
+
+	memset(fLastKeys, 0, fKeyCount * 2 * sizeof(uint16));
 
 	// find leds if we have an output report
 	for (uint32 i = 0; i < MAX_LEDS; i++)
@@ -161,11 +158,13 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 		}
 	}
 
-#if KEYBOARD_SUPPORTS_KDL
+#ifdef KEYBOARD_SUPPORTS_KDL
 	if (atomic_add(&sDebuggerCommandAdded, 1) == 0) {
+#ifdef USB_KDL
 		add_debugger_command("get_usb_keyboard_config",
 			&debug_get_keyboard_config,
 			"Gets the required config of the USB keyboard");
+#endif
 	}
 #endif
 }
@@ -175,10 +174,12 @@ KeyboardProtocolHandler::~KeyboardProtocolHandler()
 {
 	free(fLastKeys);
 
-#if KEYBOARD_SUPPORTS_KDL
+#ifdef KEYBOARD_SUPPORTS_KDL
 	if (atomic_add(&sDebuggerCommandAdded, -1) == 1) {
+#ifdef USB_KDL
 		remove_debugger_command("get_usb_keyboard_config",
 			&debug_get_keyboard_config);
+#endif
 	}
 #endif
 
@@ -342,6 +343,12 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 	size_t length)
 {
 	switch (op) {
+		case B_GET_DEVICE_NAME:
+		{
+			const char name[] = DEVICE_NAME" Keyboard";
+			return IOGetDeviceName(name,buffer,length);
+		}
+
 		case KB_READ:
 		{
 			if (*cookie == 0) {
@@ -450,7 +457,7 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 			return B_OK;
 
 		case KB_SET_DEBUG_READER:
-#if KEYBOARD_SUPPORTS_KDL
+#ifdef KEYBOARD_SUPPORTS_KDL
 			if (fHasDebugReader)
 				return B_BUSY;
 
@@ -538,8 +545,17 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 		if (key == NULL)
 			break;
 
-		if (key->Extract() == B_OK && key->Valid())
-			fCurrentKeys[i] = key->Data();
+		if (key->Extract() == B_OK && key->Valid()) {
+			// handle both array and bitmap based keyboard reports
+			if (key->Array()) {
+				fCurrentKeys[i] = key->Data();
+			} else {
+				if (key->Data() == 1)
+					fCurrentKeys[i] = key->UsageID();
+				else
+					fCurrentKeys[i] = 0;
+			}
+		}
 		else
 			fCurrentKeys[i] = 0;
 	}
@@ -772,9 +788,11 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 					&& current[i] >= 4 && current[i] <= 29
 					&& (fLastModifiers & ALT_KEYS) != 0) {
 					// Alt-SysReq+letter was pressed
-#if KEYBOARD_SUPPORTS_KDL
+#ifdef KEYBOARD_SUPPORTS_KDL
+#ifdef USB_KDL
 					sDebugKeyboardPipe
 						= fInputReport.Device()->InterruptPipe();
+#endif
 					sDebugKeyboardReportSize
 						= fInputReport.Parser()->MaxReportSize();
 #endif
@@ -792,7 +810,7 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 
 			if (key == 0) {
 				// unmapped normal key or consumer/button key
-				key = fKeys[i]->UsageMinimum() + current[i];
+				key = fInputReport.Usages()[0] + current[i];
 			}
 
 			_WriteKey(key, keyDown);

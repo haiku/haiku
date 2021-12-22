@@ -990,7 +990,7 @@ ResourceFile::_ReadInfoTable(resource_parse_info& parseInfo)
 	uint32 bytesLeft = (const char*)tableData + dataSize - (const char*)data;
 	if (bytesLeft != 0) {
 		throw Exception(B_IO_ERROR, "Error at the end of the resource info "
-			"table: %lu bytes are remaining.", bytesLeft);
+			"table: %" B_PRIu32 " bytes are remaining.", bytesLeft);
 	}
 	// check, if all items have been initialized
 	for (int32 i = resourceCount - 1; i >= 0; i--) {

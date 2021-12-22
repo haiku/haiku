@@ -1937,7 +1937,7 @@ CommitTransactionHandler::_GetPath(const FSUtils::Entry& entry,
 CommitTransactionHandler::_TagPackageEntriesRecursively(BDirectory& directory,
 	const BString& value, bool nonDirectoriesOnly)
 {
-	char buffer[sizeof(dirent) + B_FILE_NAME_LENGTH];
+	char buffer[offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH];
 	dirent *entry = (dirent*)buffer;
 	while (directory.GetNextDirents(entry, sizeof(buffer), 1) == 1) {
 		if (strcmp(entry->d_name, ".") == 0

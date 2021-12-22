@@ -1,11 +1,11 @@
-1	indonesian	x-vnd.Haiku-Time	834234238
+1	indonesian	x-vnd.Haiku-Time	3691539601
 OK	Time		OKE
 Message receiving failed	Time		Penerimaan pesan gagal
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Jam dan tanggal, ditulis oleh:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nHak cipta 2004-2012, Haiku.
 Australia	Time		Australia
 America	Time		Amerika
 Reset to default server list	Time		Reset ke daftar server bawaan
 Could not resolve server address	Time		Tidak dapat menemukan alamat server
+Time & Date	System name		Waktu & Tanggal
 Set time zone	Time		Set zona waktu
 Waiting for answer failed	Time		Gagal menunggu jawaban
 <Other>	Time		<Other>
@@ -38,7 +38,6 @@ Atlantic	Time		Atlantik
 Show clock in Deskbar	Time		Tampilkan jam di Deskbar
 Display time with seconds	Time		Tampilkan jam dengan detik
 Time	System name		Jam
-about	Time		tentang
 Show time zone	Time		Tampilkan zona waktu
 Synchronize at boot	Time		Sinkronisasi saat but
 Indian	Time		India

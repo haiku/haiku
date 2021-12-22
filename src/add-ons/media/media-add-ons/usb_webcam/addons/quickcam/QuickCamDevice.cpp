@@ -123,7 +123,7 @@ QuickCamDevice::GetStatusIIC()
 {
 	status_t err = B_ERROR;
 	uint8 status = 0;
-#warning WRITEME
+	// TODO: WRITEME
 	//dprintf(ID "i2c_status: error 0x%08lx, status = %02x\n", err, status);
 	if (err < 0)
 		return err;
@@ -134,7 +134,7 @@ QuickCamDevice::GetStatusIIC()
 status_t
 QuickCamDevice::WaitReadyIIC()
 {
-#warning WRITEME
+	// TODO: WRITEME
 	return EBUSY;
 }
 
@@ -142,7 +142,7 @@ QuickCamDevice::WaitReadyIIC()
 ssize_t
 QuickCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 {
-	int i;
+	size_t i;
 	uint8 buffer[0x23];
 	if (count > 16)
 		return EINVAL;

@@ -64,6 +64,18 @@ string_for_color_space(color_space format)
 {
 	const char* name = "<unkown format>";
 	switch (format) {
+		case B_RGBA64:
+			name = "B_RGBA64";
+			break;
+		case B_RGBA64_BIG:
+			name = "B_RGBA64_BIG";
+			break;
+		case B_RGB48:
+			name = "B_RGB48";
+			break;
+		case B_RGB48_BIG:
+			name = "B_RGB48_BIG";
+			break;
 		case B_RGB32:
 			name = "B_RGB32";
 			break;
@@ -393,11 +405,13 @@ CardWindow::Invalidate(const BRect& frame)
 
 ViewHWInterface::ViewHWInterface()
 	:
-	HWInterface(kDefaultDoubleBuffered),
+	HWInterface(),
 	fBackBuffer(NULL),
 	fFrontBuffer(NULL),
 	fWindow(NULL)
 {
+	SetAsyncDoubleBuffered(kDefaultDoubleBuffered);
+
 	fDisplayMode.virtual_width = 640;
 	fDisplayMode.virtual_height = 480;
 	fDisplayMode.space = B_RGBA32;
@@ -515,7 +529,7 @@ ViewHWInterface::SetMode(const display_mode& mode)
 		// TODO: Above not true anymore for single buffered mode!!!
 		// -> fall back to double buffer for fDisplayMode.space != B_RGB32
 		// as intermediate solution...
-		bool doubleBuffered = HWInterface::IsDoubleBuffered();
+		bool doubleBuffered = true;
 		if ((color_space)fDisplayMode.space != B_RGB32
 			&& (color_space)fDisplayMode.space != B_RGBA32)
 			doubleBuffered = true;
@@ -780,7 +794,7 @@ ViewHWInterface::IsDoubleBuffered() const
 	if (fFrontBuffer.IsSet())
 		return fBackBuffer.IsSet();
 
-	return HWInterface::IsDoubleBuffered();
+	return false;
 }
 
 

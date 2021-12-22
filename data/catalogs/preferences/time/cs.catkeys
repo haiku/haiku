@@ -1,11 +1,11 @@
-1	czech	x-vnd.Haiku-Time	834234238
+1	czech	x-vnd.Haiku-Time	3691539601
 OK	Time		OK
 Message receiving failed	Time		Přijetí zprávy selhalo
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Čas a datum, autoři:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Austrálie
 America	Time		Amerika
 Reset to default server list	Time		Vrátit výchozí seznam serverů
 Could not resolve server address	Time		Nepodařilo se získat adresu serveru
+Time & Date	System name		Datum a čas
 Set time zone	Time		Nastavit časové pásmo
 Waiting for answer failed	Time		Čekání na odpověď selhalo
 <Other>	Time		<Jiný>
@@ -38,7 +38,6 @@ Atlantic	Time		Atlantský oceán
 Show clock in Deskbar	Time		Zobrazit hodiny v panelu
 Display time with seconds	Time		Zobrazit čas se sekundami
 Time	System name		Čas
-about	Time		o aplikaci
 Show time zone	Time		Zobrazit časové pásmo
 Synchronize at boot	Time		Synchronizovat při spuštění počítače
 Indian	Time		Indie

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-CharacterMap	2410613018
+1	turkish	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Karışık matematik sembolleri B
 Latin extended E	UnicodeBlocks		Latin genişletilmiş E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		ÇJK birleşik ideograflar gen
 Ancient Greek musical notation	UnicodeBlocks		Antik Yunan müzik notasyonu
 Thai	UnicodeBlocks		Tayca
 Ethiopic supplement	UnicodeBlocks		Etiyopyaca ek
+Only show blocks contained in font	CharacterWindow		Yalnızca yazıtipinde içerilen blokları göster
 Chess symbols	UnicodeBlocks		Satranç sembolleri
 Yijing hexagram symbols	UnicodeBlocks		Yijing altı köşeli semboller
 Ottoman Siyaq numbers	UnicodeBlocks		Osmanlı Divan rakamları

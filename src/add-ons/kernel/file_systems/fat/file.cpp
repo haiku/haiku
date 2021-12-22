@@ -56,7 +56,6 @@ status_t write_vnode_entry(nspace *vol, vnode *node)
 	struct diri diri;
 	uint8 *buffer;
 
-
 	// TODO : is it needed ? vfs job ?
 	// don't update entries of deleted files
 	//if (is_vnode_removed(vol->id, node->vnid) > 0) return 0;
@@ -103,8 +102,6 @@ status_t write_vnode_entry(nspace *vol, vnode *node)
 		buffer[0x1f] = (node->st_size >> 24) & 0xff;
 	}
 
-	diri_free(&diri);
-
 	// TODO: figure out which stats have actually changed
 	notify_stat_changed(vol->id, -1, node->vnid, B_STAT_MODE | B_STAT_UID
 		| B_STAT_GID | B_STAT_SIZE | B_STAT_ACCESS_TIME
@@ -123,15 +120,12 @@ dosfs_release_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
 
-	TOUCH(reenter);
-
 	if (node != NULL) {
 		DPRINTF(0, ("dosfs_release_vnode (ino_t %" B_PRIdINO ")\n", node->vnid));
 
 		if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && node->dirty) {
-			LOCK_VOL(vol);
+			RecursiveLocker lock(vol->vlock);
 			_dosfs_sync(vol);
-			UNLOCK_VOL(vol);
 		}
 
 		if (node->filename) free(node->filename);
@@ -153,7 +147,7 @@ dosfs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *st)
 	nspace	*vol = (nspace*)_vol->private_volume;
 	vnode	*node = (vnode*)_node->private_node;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(1, ("dosfs_rstat (vnode id %" B_PRIdINO ")\n", node->vnid));
 
@@ -173,8 +167,6 @@ dosfs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *st)
 	st->st_atim.tv_nsec = st->st_mtim.tv_nsec = st->st_ctim.tv_nsec
 		= st->st_crtim.tv_nsec = 0;
 
-	UNLOCK_VOL(vol);
-
 	return B_NO_ERROR;
 }
 
@@ -188,19 +180,17 @@ dosfs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st,
 	vnode	*node = (vnode*)_node->private_node;
 	bool dirty = false;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_wstat (vnode id %" B_PRIdINO ")\n", node->vnid));
 
 	if (vol->flags & B_FS_IS_READONLY) {
 		dprintf("can't wstat on read-only volume\n");
-		UNLOCK_VOL(vol);
 		return EROFS;
 	}
 
 	if (node->disk_image == 2) {
 		dprintf("can't wstat disk image\n");
-		UNLOCK_VOL(vol);
 		return EPERM;
 	}
 
@@ -264,9 +254,8 @@ dosfs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st,
 		}
 	}
 
-	if (err != B_OK) DPRINTF(0, ("dosfs_wstat (%s)\n", strerror(err)));
-
-	UNLOCK_VOL(vol);
+	if (err != B_OK)
+		DPRINTF(0, ("dosfs_wstat (%s)\n", strerror(err)));
 
 	return err;
 }
@@ -278,60 +267,52 @@ dosfs_open(fs_volume *_vol, fs_vnode *_node, int omode, void **_cookie)
 	status_t	result = EINVAL;
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode* 	node = (vnode*)_node->private_node;
-	filecookie *cookie;
 
 	*_cookie = NULL;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_open: vnode id %" B_PRIdINO ", omode %o\n", node->vnid,
 		omode));
 
 	if (omode & O_CREAT) {
 		dprintf("dosfs_open called with O_CREAT. call dosfs_create instead!\n");
-		result = EINVAL;
-		goto error;
+		return EINVAL;
 	}
 
-	if ((vol->flags & B_FS_IS_READONLY) ||
-		(node->mode & FAT_READ_ONLY) ||
-		(node->disk_image != 0) ||
+	if ((vol->flags & B_FS_IS_READONLY)
+		|| (node->mode & FAT_READ_ONLY)
+		|| (node->disk_image != 0)
 		// allow opening directories for ioctl() calls
 		// and to let BVolume to work
-		(node->mode & FAT_SUBDIR)) {
+		|| (node->mode & FAT_SUBDIR)) {
 		omode = (omode & ~O_RWMASK) | O_RDONLY;
 	}
 
 	if ((omode & O_TRUNC) && ((omode & O_RWMASK) == O_RDONLY)) {
 		DPRINTF(0, ("can't open file for reading with O_TRUNC\n"));
-		result = EPERM;
-		goto error;
+		return EPERM;
 	}
 
 	if (omode & O_TRUNC) {
 		DPRINTF(0, ("dosfs_open called with O_TRUNC set\n"));
 		if ((result = set_fat_chain_length(vol, node, 0, false)) != B_OK) {
 			dprintf("dosfs_open: error truncating file\n");
-			goto error;
+			return result;
 		}
 		node->mode = 0;
 		node->st_size = 0;
 		node->iteration++;
 	}
 
-	if ((cookie = (filecookie*)calloc(sizeof(filecookie), 1)) == NULL) {
-		result = ENOMEM;
-		goto error;
-	}
+	filecookie *cookie = (filecookie*)calloc(sizeof(filecookie), 1);
+	if (cookie == NULL)
+		return ENOMEM;
 
 	cookie->mode = omode;
 	*_cookie = cookie;
 	result = B_OK;
 
-error:
-	if (result != B_OK) DPRINTF(0, ("dosfs_open (%s)\n", strerror(result)));
-
-	UNLOCK_VOL(vol);
 	return result;
 }
 
@@ -345,18 +326,19 @@ dosfs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	filecookie *cookie = (filecookie *)_cookie;
 	int result = B_OK;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	if (node->mode & FAT_SUBDIR) {
 		DPRINTF(0, ("dosfs_read called on subdirectory %" B_PRIdINO "\n",
 			node->vnid));
 		*len = 0;
-		UNLOCK_VOL(vol);
 		return EISDIR;
 	}
 
 	DPRINTF(0, ("dosfs_read called %" B_PRIuSIZE " bytes at %" B_PRIdOFF
 		" (vnode id %" B_PRIdINO ")\n", *len, pos, node->vnid));
+
+	lock.Unlock();
 
 	result = file_cache_read(node->cache, cookie, pos, buf, len);
 
@@ -365,7 +347,6 @@ dosfs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	} else {
 		DPRINTF(0, ("dosfs_read: read %" B_PRIuSIZE " bytes\n", *len));
 	}
-	UNLOCK_VOL(vol);
 
 	return result;
 }
@@ -380,20 +361,16 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	filecookie *cookie = (filecookie *)_cookie;
 	int result = B_OK;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
-	if ((vol->flags & B_FS_IS_READONLY) != 0) {
-		UNLOCK_VOL(vol);
+	if ((vol->flags & B_FS_IS_READONLY) != 0)
 		return EROFS;
-	}
 
 	if (node->mode & FAT_SUBDIR) {
 		DPRINTF(0, ("dosfs_write called on subdirectory %" B_PRIdINO "\n",
 			node->vnid));
 		*len = 0;
-		UNLOCK_VOL(vol);
 		return EISDIR;
-
 	}
 
 	DPRINTF(0, ("dosfs_write called %" B_PRIuSIZE " bytes at %" B_PRIdOFF
@@ -403,8 +380,7 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	if ((cookie->mode & O_RWMASK) == O_RDONLY) {
 		dprintf("dosfs_write: called on file opened as read-only\n");
 		*len = 0;
-		result = EPERM;
-		goto bi;
+		return EPERM;
 	}
 
 	if (pos < 0) pos = 0;
@@ -416,8 +392,7 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	if (pos >= MAX_FILE_SIZE) {
 		dprintf("dosfs_write: write position exceeds fat limits\n");
 		*len = 0;
-		result = E2BIG;
-		goto bi;
+		return E2BIG;
 	}
 
 	if (pos + *len >= MAX_FILE_SIZE) {
@@ -430,7 +405,7 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 		if (node->st_size <= (clusters - 1) * vol->sectors_per_cluster * vol->bytes_per_sector) {
 			if ((result = set_fat_chain_length(vol, node, clusters, false))
 					!= B_OK) {
-				goto bi;
+				return result;
 			}
 			node->iteration++;
 		}
@@ -447,16 +422,8 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 		file_map_set_size(node->file_map, node->st_size);
 	}
 
+	lock.Unlock();
 	result = file_cache_write(node->cache, cookie, pos, buf, len);
-
-bi:
-	if (result != B_OK) {
-		DPRINTF(0, ("dosfs_write (%s)\n", strerror(result)));
-	} else {
-		DPRINTF(0, ("dosfs_write: wrote %" B_PRIuSIZE " bytes\n", *len));
-	}
-	UNLOCK_VOL(vol);
-
 	return result;
 }
 
@@ -467,7 +434,7 @@ dosfs_close(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 	nspace	*vol = (nspace *)_vol->private_volume;
 	vnode	*node = (vnode *)_node->private_node;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_close (vnode id %" B_PRIdINO ")\n", node->vnid));
 
@@ -475,8 +442,6 @@ dosfs_close(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 		_dosfs_sync(vol);
 		node->dirty = false;
 	}
-
-	UNLOCK_VOL(vol);
 
 	return 0;
 }
@@ -488,15 +453,14 @@ dosfs_free_cookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
 	filecookie *cookie = (filecookie *)_cookie;
-	LOCK_VOL(vol);
+
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_free_cookie (vnode id %" B_PRIdINO ")\n", node->vnid));
 
 	free(cookie);
 
-	UNLOCK_VOL(vol);
-
-	return 0;
+	return B_OK;
 }
 
 
@@ -510,12 +474,11 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 	status_t result = EINVAL;
 	bool dups_exist;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	ASSERT(name != NULL);
 	if (name == NULL) {
 		dprintf("dosfs_create called with null name\n");
-		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
 
@@ -524,50 +487,44 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 
 	if (vol->flags & B_FS_IS_READONLY) {
 		dprintf("dosfs_create called on read-only volume\n");
-		UNLOCK_VOL(vol);
 		return EROFS;
 	}
 
 	// TODO : is it needed ? vfs job ?
 	/*if (is_vnode_removed(vol->id, dir->vnid) > 0) {
 		dprintf("dosfs_create() called in removed directory. disallowed.\n");
-		UNLOCK_VOL(vol);
 		return EPERM;
 	}*/
 
 	if ((omode & O_RWMASK) == O_RDONLY) {
 		dprintf("invalid permissions used in creating file\n");
-		UNLOCK_VOL(vol);
 		return EPERM;
 	}
 
 	// create file cookie; do it here to make cleaning up easier
-	if ((cookie = (filecookie *)calloc(sizeof(filecookie), 1)) == NULL) {
-		result = ENOMEM;
-		goto bi;
-	}
+	cookie = (filecookie *)calloc(sizeof(filecookie), 1);
+	MemoryDeleter cookieDeleter(cookie);
+	if (cookie == NULL)
+		return ENOMEM;
 
 	result = findfile_case_duplicates(vol, dir, name, vnid, &file, &dups_exist);
 	if (result == B_OK) {
 		if (omode & O_EXCL) {
 			dprintf("exclusive dosfs_create called on existing file %s\n", name);
 			put_vnode(_vol, file->vnid);
-			result = EEXIST;
-			goto bi;
+			return EEXIST;
 		}
 
 		if (file->mode & FAT_SUBDIR) {
 			dprintf("can't dosfs_create over an existing subdirectory\n");
 			put_vnode(_vol, file->vnid);
-			result = EPERM;
-			goto bi;
+			return EPERM;
 		}
 
 		if (file->disk_image) {
 			dprintf("can't dosfs_create over a disk image\n");
 			put_vnode(_vol, file->vnid);
-			result = EPERM;
-			goto bi;
+			return EPERM;
 		}
 
 		if (omode & O_TRUNC) {
@@ -578,8 +535,7 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 	} else if (result == ENOENT && dups_exist) {
 		// the file doesn't exist in the exact case, but another does in the
 		// non-exact case. We wont create the new file.
-		result = EEXIST;
-		goto bi;
+		return EEXIST;
 	} else if (result == ENOENT && !dups_exist) {
 		// the file doesn't already exist in any case
 		vnode dummy; /* used only to create directory entry */
@@ -594,7 +550,7 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 
 		if ((result = create_dir_entry(vol, dir, &dummy, name, &(dummy.sindex), &(dummy.eindex))) != B_OK) {
 			dprintf("dosfs_create: error creating directory entry for %s (%s)\n", name, strerror(result));
-			goto bi;
+			return result;
 		}
 		dummy.vnid = GENERATE_DIR_INDEX_VNID(dummy.dir_vnid, dummy.sindex);
 		// XXX: dangerous construct
@@ -604,7 +560,7 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 				// XXX: should remove entry on failure
 				if (vol->fs_flags & FS_FLAGS_OP_SYNC)
 					_dosfs_sync(vol);
-				goto bi;
+				return result;
 			}
 		}
 		*vnid = dummy.vnid;
@@ -613,29 +569,22 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 		if (result < B_OK) {
 			if (vol->fs_flags & FS_FLAGS_OP_SYNC)
 				_dosfs_sync(vol);
-			goto bi;
+			return result;
 		}
 	} else {
-		goto bi;
+		return result;
 	}
 
 	cookie->mode = omode;
 	*_cookie = cookie;
+	cookieDeleter.Detach();
 
 	notify_entry_created(vol->id, dir->vnid, name, *vnid);
-
-	result = 0;
 
 	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
 		_dosfs_sync(vol);
 
-bi:	if (result != B_OK) free(cookie);
-
-	UNLOCK_VOL(vol);
-
-	if (result != B_OK) DPRINTF(0, ("dosfs_create (%s)\n", strerror(result)));
-
-	return result;
+	return B_OK;
 }
 
 
@@ -649,12 +598,12 @@ dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 	uchar *buffer;
 	uint32 i;
 
-	LOCK_VOL(vol);
+	recursive_lock_lock(&vol->vlock);
 
 	// TODO : is it needed ? vfs job ?
 	/*if (is_vnode_removed(vol->id, dir->vnid) > 0) {
 		dprintf("dosfs_mkdir() called in removed directory. disallowed.\n");
-		UNLOCK_VOL(vol);
+		recursive_lock_unlock(&vol->vlock);
 		return EPERM;
 	}*/
 
@@ -664,7 +613,7 @@ dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 	if ((dir->mode & FAT_SUBDIR) == 0) {
 		dprintf("dosfs_mkdir: vnode id %" B_PRIdINO " is not a directory\n",
 			dir->vnid);
-		UNLOCK_VOL(vol);
+		recursive_lock_unlock(&vol->vlock);
 		return EINVAL;
 	}
 
@@ -673,7 +622,7 @@ dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 
 	if (vol->flags & B_FS_IS_READONLY) {
 		dprintf("mkdir called on read-only volume\n");
-		UNLOCK_VOL(vol);
+		recursive_lock_unlock(&vol->vlock);
 		return EROFS;
 	}
 
@@ -779,7 +728,7 @@ dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
 		_dosfs_sync(vol);
 
-	UNLOCK_VOL(vol);
+	recursive_lock_unlock(&vol->vlock);
 	return result;
 
 bi5:
@@ -794,7 +743,7 @@ bi2:
 	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
 		_dosfs_sync(vol);
 bi:
-	UNLOCK_VOL(vol);
+	recursive_lock_unlock(&vol->vlock);
 	if (result != B_OK) DPRINTF(0, ("dosfs_mkdir (%s)\n", strerror(result)));
 	return result;
 }
@@ -813,44 +762,38 @@ dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 	bool dups_exist;
 	bool dirty = false;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_rename called: %" B_PRIdINO "/%s->%" B_PRIdINO "/%s\n",
 		odir->vnid, oldname, ndir->vnid, newname));
 
-	if (!oldname || !(*oldname) || !newname || !(*newname)) {
-		result = EINVAL;
-		goto bi;
-	}
+	if (!oldname || !(*oldname) || !newname || !(*newname))
+		return EINVAL;
 
 	if(!is_filename_legal(newname)) {
 		dprintf("dosfs_rename called with invalid name '%s'\n", newname);
-		result = EINVAL;
-		goto bi;
+		return EINVAL;
 	}
 
 	if (vol->flags & B_FS_IS_READONLY) {
 		dprintf("rename called on read-only volume\n");
-		result = EROFS;
-		goto bi;
+		return EROFS;
 	}
 
 	if ((odir->vnid == ndir->vnid) && !strcmp(oldname, newname)) {
-		result = EPERM;
-		goto bi;
+		return EPERM;
 	}
 
 	// locate the file
 	if ((result = findfile_case(vol,odir,oldname,NULL,&file)) != B_OK) {
 		DPRINTF(0, ("dosfs_rename: can't find file %s in directory %" B_PRIdINO
 			"\n", oldname, odir->vnid));
-		goto bi;
+		return result;
 	}
 
 	if (file->disk_image) {
 		dprintf("rename called on disk image or disk image directory\n");
-		result = EPERM;
-		goto bi1;
+		return EPERM;
 	}
 
 	// don't move a directory into one of its children
@@ -991,7 +934,6 @@ dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 				buffer[0x15] = (ndir->cluster >> 24) & 0xff;
 			}
 		}
-		diri_free(&diri);
 	}
 
 	if (file->filename) free(file->filename);
@@ -1015,10 +957,8 @@ bi2:
 		put_vnode(_vol, file2->vnid);
 bi1:
 	put_vnode(_vol, file->vnid);
-bi:
 	if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && dirty)
 		_dosfs_sync(vol);
-	UNLOCK_VOL(vol);
 	if (result != B_OK) DPRINTF(0, ("dosfs_rename (%s)\n", strerror(result)));
 	return result;
 }
@@ -1030,13 +970,12 @@ dosfs_remove_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_remove_vnode (%" B_PRIdINO ")\n", node->vnid));
 
 	if (vol->flags & B_FS_IS_READONLY) {
 		dprintf("dosfs_remove_vnode: read-only volume\n");
-		UNLOCK_VOL(vol);
 		return EROFS;
 	}
 
@@ -1065,8 +1004,6 @@ dosfs_remove_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 		_dosfs_sync(vol);
 	}
 
-	UNLOCK_VOL(vol);
-
 	return B_OK;
 }
 
@@ -1086,22 +1023,20 @@ do_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name, bool is_file)
 	if (!strcmp(name, ".."))
 		return EPERM;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("do_unlink %" B_PRIdINO "/%s\n", dir->vnid, name));
 
 	if (vol->flags & B_FS_IS_READONLY) {
 		dprintf("do_unlink: read-only volume\n");
-		result = EROFS;
-		goto bi;
+		return EROFS;
 	}
 
 	// locate the file
 	if ((result = findfile_case(vol,dir,name,&vnid,&file)) != B_OK) {
 		DPRINTF(0, ("do_unlink: can't find file %s in directory %" B_PRIdINO
 			"\n", name, dir->vnid));
-		result = ENOENT;
-		goto bi;
+		return ENOENT;
 	}
 
 	if (file->disk_image) {
@@ -1168,9 +1103,6 @@ do_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name, bool is_file)
 
 bi1:
 	put_vnode(_vol, vnid);		// get 1 free
-bi:
-	UNLOCK_VOL(vol);
-
 	if (result != B_OK) DPRINTF(0, ("do_unlink (%s)\n", strerror(result)));
 
 	return result;
@@ -1215,9 +1147,9 @@ dosfs_read_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	status_t status;
 
 	if (node->cache == NULL)
-		return(B_BAD_VALUE);
+		return B_BAD_VALUE;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	while (true) {
 		struct file_io_vec fileVecs[8];
@@ -1241,8 +1173,6 @@ dosfs_read_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 		bytesLeft -= bytes;
 	}
 
-	UNLOCK_VOL(vol);
-
 	return status;
 }
 
@@ -1261,12 +1191,10 @@ dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	if (node->cache == NULL)
 		return B_BAD_VALUE;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
-	if ((vol->flags & B_FS_IS_READONLY) != 0) {
-		UNLOCK_VOL(vol);
+	if ((vol->flags & B_FS_IS_READONLY) != 0)
 		return EROFS;
-	}
 
 	while (true) {
 		struct file_io_vec fileVecs[8];
@@ -1290,8 +1218,6 @@ dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 		bytesLeft -= bytes;
 	}
 
-	UNLOCK_VOL(vol);
-
 	return status;
 }
 
@@ -1309,13 +1235,12 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t position,
 	size_t index = 0;
 	size_t max = *_count;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 	*_count = 0;
 
 	if ((node->mode & FAT_SUBDIR) != 0) {
 		DPRINTF(0, ("dosfs_get_file_map called on subdirectory %" B_PRIdINO
 			"\n", node->vnid));
-		UNLOCK_VOL(vol);
 		return EISDIR;
 	}
 
@@ -1326,8 +1251,7 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t position,
 		position = 0;
 
 	if (node->st_size == 0 || length == 0 || position >= node->st_size) {
-		result = B_OK;
-		goto bi;
+		return B_OK;
 	}
 
 	// Truncate to file size, taking overflow into account.
@@ -1338,8 +1262,7 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t position,
 	if (result != B_OK) {
 		dprintf("dosfs_get_file_map: invalid starting cluster (%" B_PRIu32
 			")\n", node->cluster);
-		result = EIO;
-		goto bi;
+		return EIO;
 	}
 
 	skipSectors = position / vol->bytes_per_sector;
@@ -1347,8 +1270,7 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t position,
 		result = iter_csi(&iter, skipSectors);
 		if (result != B_OK) {
 			dprintf("dosfs_get_file_map: end of file reached (init)\n");
-			result = EIO;
-			goto bi;
+			return EIO;
 		}
 	}
 
@@ -1366,8 +1288,7 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t position,
 			result = iter_csi(&iter, 1);
 			if (result != B_OK) {
 				dprintf("dosfs_get_file_map: end of file reached\n");
-				result = EIO;
-				goto bi;
+				return EIO;
 			}
 
 			if (block + sectors != csi_to_block(&iter)) {
@@ -1388,21 +1309,14 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t position,
 
 		if (index >= max) {
 			// we're out of file_io_vecs; let's bail out
-			result = B_BUFFER_OVERFLOW;
-			goto bi;
+			*_count = index;
+			return B_BUFFER_OVERFLOW;
 		}
 
 		offset = 0;
 	}
 
-	result = B_OK;
-bi:
 	*_count = index;
 
-	if (result != B_OK) {
-		DPRINTF(0, ("dosfs_get_file_map (%s)\n", strerror(result)));
-	}
-	UNLOCK_VOL(vol);
-
-	return result;
+	return B_OK;
 }

@@ -624,7 +624,7 @@ printf(const char *format, ...)
 	va_start(vl, format);
 	vsnprintf(buf, sizeof(buf), format, vl);
 	va_end(vl);
-	dprintf(buf);
+	dprintf("%s", buf);
 
 	return 0;
 }

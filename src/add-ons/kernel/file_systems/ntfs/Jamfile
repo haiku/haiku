@@ -1,33 +1,32 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems ntfs ;
 
+UsePrivateKernelHeaders ;
+
 SubDirHdrs [ FDirName $(SUBDIR) libntfs ] ;
 SubDirHdrs [ FDirName $(SUBDIR) utils ] ;
 
 SubDirCcFlags -DHAVE_CONFIG_H=1 ;
 SubDirC++Flags -DHAVE_CONFIG_H=1 ;
 
-UsePrivateKernelHeaders ;
-
 SEARCH_SOURCE += [ FDirName $(SUBDIR) utils ] ;
 
 KernelAddon ntfs :
-	attributes.c
-	fake_attributes.c
-	mime_ext_table.c
-	utils.c
-	ntfsdir.c
-	volume_util.c
-	fs_func.c
-	kernel_interface.c
+	kernel_interface.cpp
+	lowntfs.c
+
+	DeviceOpener.cpp
+	#mime_ext_table.c
+
 	attrdef.c
 	sd.c
 	boot.c
 	mkntfs.c
+	utils.c
 	:
 	libntfs.a
 	;
 
-SEARCH on [ FGristFiles mime_ext_table.c ]
+SEARCH on [ FGristFiles DeviceOpener.cpp mime_ext_table.c ]
 	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
 SubInclude HAIKU_TOP src add-ons kernel file_systems ntfs libntfs ;

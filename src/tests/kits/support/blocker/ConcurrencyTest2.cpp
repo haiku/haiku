@@ -5,7 +5,7 @@
 	It tests use cases "Locking 1", "Locking 2", "Unlocking", "Is Locked",
 	"Locking Thread" and "Count Locks".  It is essentially the same as Test1.cpp
 	except it makes the first LockWithTimeout inside the threads timeout.  The
-	reason for this is because the implementation of BLocker by Be and with OpenBeOS
+	reason for this is because the implementation of BLocker by Be and with Haiku
 	is such that after one timeout occurs on a benaphore style BLocker, the lock
 	effectively becomes a semaphore style BLocker.  This test tests that condition.
 	

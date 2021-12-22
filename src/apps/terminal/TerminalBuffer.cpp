@@ -229,6 +229,17 @@ TerminalBuffer::ResetColors(uint8* indexes, int32 count, bool dynamic)
 
 
 void
+TerminalBuffer::GetColor(uint8 index)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_GET_TERMINAL_COLOR);
+		message.AddUInt8("index", index);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
 TerminalBuffer::SetCursorStyle(int32 style, bool blinking)
 {
 	if (fListenerValid) {

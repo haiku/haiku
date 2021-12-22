@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaPlayer	1961774506
+1	hungarian	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Bejegyzés Szemetesbe helyezése
 Close	MediaPlayer-PlaylistWindow		Bezárás
 Volume of background clips	MediaPlayer-SettingsWindow		Háttérbeli klippek hangereje
@@ -30,6 +30,7 @@ Open file…	MediaPlayer-Main		Fájl megnyitása…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Nagyított vezérlők teljes képernyős módban
 View options	MediaPlayer-SettingsWindow		Megjelenítési beállítások
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Eszköz kiadása
 Full volume	MediaPlayer-SettingsWindow		Teljes hangerő
 <untitled>	PlaylistItem-title		<névtelen>
 Start media server	MediaPlayer-Main		Médiakiszolgáló indítása

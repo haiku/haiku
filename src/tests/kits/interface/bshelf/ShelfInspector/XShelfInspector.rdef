@@ -1,0 +1,448 @@
+
+resource(1, "PopUpMenu") #'ARCV' archive BMenuField {
+	"_name" = "TargetPopUp",
+	"_frame" = rect { 0.00000, 0.00000, 194.000, 22.0000 },
+	"_resize_mode" = 4626,
+	"_flags" = 570425344,
+	"_fname" = "Swis721 BT",
+	"_fname" = "Roman",
+	"_fflt" = 10.0000,
+	"_fflt" = -1.00000,
+	"_fflt" = -1.00000,
+	"_color" = 255,
+	"_color" = -1,
+	"_color" = -1,
+	"_views" = archive _BMCMenuBar_ {
+		"_name" = "_mc_mb_",
+		"_frame" = rect { 76.0000, 3.00000, 186.000, 19.0000 },
+		"_resize_mode" = 4626,
+		"_flags" = 603979776,
+		"_fname" = "Swis721 BT",
+		"_fname" = "Roman",
+		"_fflt" = 10.0000,
+		"_fflt" = -1.00000,
+		"_fflt" = -1.00000,
+		"_color" = 255,
+		"_color" = -656876032,
+		"_color" = -656876032,
+		"_rsize_to_fit" = true,
+		"_maxwidth" = 102.000,
+		"_items" = archive _BMCItem_ {
+			"_label" = "XContainer Window",
+			"_submenu" = archive BPopUpMenu {
+				"_name" = "Select",
+				"_frame" = rect { 0.00000, 0.00000, 0.00000, 0.00000 },
+				"_flags" = 536870912,
+				"_fname" = "Swis721 BT",
+				"_fname" = "Roman",
+				"_fflt" = 10.0000,
+				"_fflt" = -1.00000,
+				"_fflt" = -1.00000,
+				"_color" = 255,
+				"_color" = -656876032,
+				"_color" = -656876032,
+				"_layout" = 1,
+				"_rsize_to_fit" = true,
+				"_radio" = true,
+				"_dyn_label" = true,
+				"_items" = archive BMenuItem {
+					"_label" = "XContainer Window",
+					"_marked" = true,
+					"_msg" = message(17)
+				},
+				"_items" = archive BMenuItem {
+					"_label" = "Deskbar",
+					"_msg" = message(19)
+				},
+				"_items" = archive BMenuItem {
+					"_label" = "Desktop Window",
+					"_msg" = message(21)
+				}
+			}
+		},
+		"_border" = 1
+	},
+	"_label" = "Target Shelf:  ",
+	"_align" = 0,
+	"_divide" = 74.0000,
+	"ID" = 24,
+	"designfsize" = 11.9873
+};
+
+resource(0, "InfoWindow") #'ARCV' archive BWindow {
+	"_prio" = 15,
+	"_port_cap" = 100,
+	"_title" = "XShelfInspector",
+	"_wlook" = 11,
+	"_sizel" = 302.000,
+	"_sizel" = 447.000,
+	"_sizel" = 302.000,
+	"_sizel" = 447.000,
+	"ID" = 121,
+	"_flags" = 524356,
+	"_type" = 11,
+	"_wfeel" = 0,
+	"_name" = "XShelfInspector",
+	"_frame" = rect { 285.000, 93.0000, 587.000, 540.000 },
+	"minWidth" = 302.000,
+	"maxWidth" = 302.000,
+	"minHeight" = 447.000,
+	"maxHeight" = 447.000,
+	"_views" = archive BView {
+		"_name" = "InfoView",
+		"_frame" = rect { -2.00000, -1.00000, 303.000, 448.000 },
+		"_resize_mode" = 4660,
+		"_flags" = 536870912,
+		"_color" = 255,
+		"_color" = -1,
+		"_color" = -656877313,
+		"_views" = archive BBox {
+			"_name" = "MainBox",
+			"_frame" = rect { 7.00000, 30.0000, 299.000, 430.000 },
+			"_resize_mode" = 4626,
+			"_flags" = 738197504,
+			"_fname" = "Swis721 BT",
+			"_fname" = "Bold",
+			"_fflt" = 12.0000,
+			"_fflt" = -1.00000,
+			"_fflt" = -1.00000,
+			"_color" = 255,
+			"_color" = -656877313,
+			"_color" = -656877313,
+			"_ploc" = point { 81.0000, 9.77734 },
+			"_views" = archive BStringView {
+				"_name" = "",
+				"_frame" = rect { 12.0000, 24.0000, 105.000, 38.0000 },
+				"_resize_mode" = 4626,
+				"_flags" = 536870912,
+				"_fname" = "Swis721 BT",
+				"_fname" = "Roman",
+				"_fflt" = 10.0000,
+				"_fflt" = 90.0000,
+				"_fflt" = 0.00000,
+				"_color" = 255,
+				"_color" = -656877313,
+				"_color" = -656877313,
+				"_text" = "Loaded Replicants:",
+				"_align" = 0
+			},
+			"_views" = archive BScrollView {
+				"_name" = "LibraryScroll",
+				"_frame" = rect { 10.0000, 227.000, 279.000, 352.000 },
+				"_resize_mode" = 4626,
+				"_flags" = 536870912,
+				"_color" = -1734829825,
+				"_color" = -1,
+				"_color" = -1,
+				"_ploc" = point { 1.00000, 105.000 },
+				"_views" = archive BListView {
+					"_name" = "LibraryList",
+					"_frame" = rect { 2.00000, 2.00000, 251.000, 107.000 },
+					"_resize_mode" = 4660,
+					"_flags" = 637534208,
+					"_color" = 255,
+					"_color" = -1,
+					"_color" = -1,
+					"_lv_type" = 0,
+					"_msg" = message(46),
+					"_2nd_msg" = message(43)
+				},
+				"_views" = archive BScrollBar {
+					"_name" = "_VSB_",
+					"_frame" = rect { 254.000, 1.00000, 268.000, 110.000 },
+					"_resize_mode" = 5172,
+					"_flags" = 536870912,
+					"_color" = 255,
+					"_color" = -1,
+					"_color" = -1,
+					"_range" = 0.00000,
+					"_range" = 0.00000,
+					"_steps" = 1.00000,
+					"_steps" = 10.0000,
+					"_val" = 0.00000,
+					"_orient" = 1,
+					"_prop" = 1.00000
+				},
+				"_views" = archive BScrollBar {
+					"_name" = "_HSB_",
+					"_frame" = rect { 1.00000, 110.000, 254.000, 124.000 },
+					"_resize_mode" = 12852,
+					"_flags" = 536870912,
+					"_color" = 255,
+					"_color" = -1,
+					"_color" = -1,
+					"_range" = 0.00000,
+					"_range" = 0.00000,
+					"_steps" = 1.00000,
+					"_steps" = 10.0000,
+					"_val" = 0.00000,
+					"_orient" = 0,
+					"_prop" = 0.00000
+				}
+			},
+			"_views" = archive BStringView {
+				"_name" = "",
+				"_frame" = rect { 13.0000, 208.000, 99.0000, 222.000 },
+				"_resize_mode" = 4626,
+				"_flags" = 536870912,
+				"_fname" = "Swis721 BT",
+				"_fname" = "Roman",
+				"_fflt" = 10.0000,
+				"_fflt" = 90.0000,
+				"_fflt" = 0.00000,
+				"_color" = 255,
+				"_color" = -656877313,
+				"_color" = -656877313,
+				"_text" = "Loaded Libraries:",
+				"_align" = 0
+			},
+			"_views" = archive BButton {
+				"_name" = "UnloadButton",
+				"_frame" = rect { 18.0000, 363.000, 93.0000, 387.000 },
+				"_resize_mode" = 4626,
+				"_flags" = 536870912,
+				"_fname" = "Swis721 BT",
+				"_fname" = "Roman",
+				"_color" = -2139062019,
+				"_color" = -656877313,
+				"_color" = -656877313,
+				"_ploc" = point { 58.0000, 16.6353 },
+				"_msg" = message(69),
+				"_label" = "Unload ...",
+				"_disable" = true,
+				"be:wants_nav" = true
+			},
+			"_views" = archive BButton {
+				"_name" = "DeleteButton",
+				"_frame" = rect { 16.0000, 173.000, 91.0000, 197.000 },
+				"_resize_mode" = 4626,
+				"_flags" = 536870912,
+				"_fname" = "Swis721 BT",
+				"_fname" = "Roman",
+				"_color" = -2139062019,
+				"_color" = -656877313,
+				"_color" = -656877313,
+				"_ploc" = point { 53.0000, 16.6353 },
+				"_msg" = message(9),
+				"_label" = "Delete",
+				"_disable" = true,
+				"be:wants_nav" = true
+			},
+			"_views" = archive BButton {
+				"_name" = "CopyButton",
+				"_frame" = rect { 118.000, 173.000, 233.000, 197.000 },
+				"_resize_mode" = 4626,
+				"_flags" = 536870912,
+				"_fname" = "Swis721 BT",
+				"_fname" = "Roman",
+				"_color" = -2139062019,
+				"_color" = -656877313,
+				"_color" = -656877313,
+				"_ploc" = point { 105.000, 16.6353 },
+				"_msg" = message(13),
+				"_label" = "Copy to Container ...",
+				"_disable" = true,
+				"be:wants_nav" = true
+			},
+			"_views" = archive BView {
+				"_name" = "",
+				"_frame" = rect { 266.000, 337.000, 279.000, 351.000 },
+				"_resize_mode" = 4626,
+				"_flags" = 536870912,
+				"_color" = 255,
+				"_color" = -1,
+				"_color" = -656877313
+			},
+			"_views" = archive BScrollView {
+				"_name" = "ReplicantScroll",
+				"_frame" = rect { 10.0000, 39.0000, 279.000, 164.000 },
+				"_resize_mode" = 4626,
+				"_flags" = 536870912,
+				"_color" = -1734829825,
+				"_color" = -1,
+				"_color" = -1,
+				"_ploc" = point { 1.00000, 105.000 },
+				"_views" = archive BListView {
+					"_name" = "ReplicantList",
+					"_frame" = rect { 2.00000, 2.00000, 251.000, 107.000 },
+					"_resize_mode" = 4660,
+					"_flags" = 637534208,
+					"_color" = 255,
+					"_color" = -1,
+					"_color" = -1,
+					"_lv_type" = 0,
+					"_msg" = message(119),
+					"_2nd_msg" = message(116)
+				},
+				"_views" = archive BScrollBar {
+					"_name" = "_VSB_",
+					"_frame" = rect { 254.000, 1.00000, 268.000, 110.000 },
+					"_resize_mode" = 5172,
+					"_flags" = 536870912,
+					"_color" = 255,
+					"_color" = -1,
+					"_color" = -1,
+					"_range" = 0.00000,
+					"_range" = 0.00000,
+					"_steps" = 1.00000,
+					"_steps" = 10.0000,
+					"_val" = 0.00000,
+					"_orient" = 1,
+					"_prop" = 1.00000
+				},
+				"_views" = archive BScrollBar {
+					"_name" = "_HSB_",
+					"_frame" = rect { 1.00000, 110.000, 254.000, 124.000 },
+					"_resize_mode" = 12852,
+					"_flags" = 536870912,
+					"_color" = 255,
+					"_color" = -1,
+					"_color" = -1,
+					"_range" = 0.00000,
+					"_range" = 0.00000,
+					"_steps" = 1.00000,
+					"_steps" = 10.0000,
+					"_val" = 0.00000,
+					"_orient" = 0,
+					"_prop" = 0.00000
+				}
+			},
+			"_views" = archive BView {
+				"_name" = "",
+				"_frame" = rect { 265.000, 150.000, 278.000, 163.000 },
+				"_resize_mode" = 4626,
+				"_flags" = 536870912,
+				"_color" = 255,
+				"_color" = -1,
+				"_color" = -656877313
+			},
+			"_label" = "Target Shelf"
+		},
+		"_views" = archive BMenuBar {
+			"_name" = "MainBar",
+			"_frame" = rect { 0.00000, 0.00000, 306.000, 19.0000 },
+			"_resize_mode" = 4628,
+			"_flags" = 603979776,
+			"_fname" = "Swis721 BT",
+			"_fname" = "Roman",
+			"_fflt" = 12.0000,
+			"_fflt" = -1.00000,
+			"_fflt" = -1.00000,
+			"_color" = 255,
+			"_color" = -656876032,
+			"_color" = -656876032,
+			"_rsize_to_fit" = true,
+			"_items" = archive BMenuItem {
+				"_label" = "File",
+				"_submenu" = archive BMenu {
+					"_name" = "File",
+					"_frame" = rect { 0.00000, 0.00000, 0.00000, 0.00000 },
+					"_flags" = 536870912,
+					"_fname" = "Swis721 BT",
+					"_fname" = "Roman",
+					"_fflt" = 12.0000,
+					"_fflt" = -1.00000,
+					"_fflt" = -1.00000,
+					"_color" = 255,
+					"_color" = -656876032,
+					"_color" = -656876032,
+					"_layout" = 1,
+					"_rsize_to_fit" = true,
+					"_items" = archive BMenuItem {
+						"_label" = "New",
+						"_shortcut" = 78,
+						"_mods" = 2,
+						"_msg" = message(78)
+					},
+					"_items" = archive BMenuItem {
+						"_label" = "Open…",
+						"_shortcut" = 79,
+						"_mods" = 2,
+						"_msg" = message(79)
+					},
+					"_items" = archive BSeparatorItem {
+						"_label" = "",
+						"_disable" = true
+					},
+					"_items" = archive BMenuItem {
+						"_label" = "Save",
+						"_shortcut" = 83,
+						"_mods" = 2,
+						"_msg" = message(80)
+					},
+					"_items" = archive BMenuItem {
+						"_label" = "Save As…",
+						"_msg" = message(81)
+					},
+					"_items" = archive BSeparatorItem {
+						"_label" = "",
+						"_disable" = true
+					},
+					"_items" = archive BMenuItem {
+						"_label" = "About…",
+						"_shortcut" = 65,
+						"_mods" = 2,
+						"_msg" = message(82)
+					},
+					"_items" = archive BSeparatorItem {
+						"_label" = "",
+						"_disable" = true
+					},
+					"_items" = archive BMenuItem {
+						"_label" = "Quit",
+						"_shortcut" = 81,
+						"_mods" = 2,
+						"_msg" = message(83)
+					}
+				}
+			},
+			"_items" = archive BMenuItem {
+				"_label" = "Edit",
+				"_submenu" = archive BMenu {
+					"_name" = "Edit",
+					"_frame" = rect { 0.00000, 0.00000, 0.00000, 0.00000 },
+					"_flags" = 536870912,
+					"_fname" = "Swis721 BT",
+					"_fname" = "Roman",
+					"_fflt" = 12.0000,
+					"_fflt" = -1.00000,
+					"_fflt" = -1.00000,
+					"_color" = 255,
+					"_color" = -656876032,
+					"_color" = -656876032,
+					"_layout" = 1,
+					"_rsize_to_fit" = true,
+					"_items" = archive BMenuItem {
+						"_label" = "Undo",
+						"_shortcut" = 90,
+						"_mods" = 2,
+						"_msg" = message(84)
+					},
+					"_items" = archive BSeparatorItem {
+						"_label" = "",
+						"_disable" = true
+					},
+					"_items" = archive BMenuItem {
+						"_label" = "Cut",
+						"_shortcut" = 88,
+						"_mods" = 2,
+						"_msg" = message(85)
+					},
+					"_items" = archive BMenuItem {
+						"_label" = "Copy",
+						"_shortcut" = 67,
+						"_mods" = 2,
+						"_msg" = message(86)
+					},
+					"_items" = archive BMenuItem {
+						"_label" = "Paste",
+						"_shortcut" = 86,
+						"_mods" = 2,
+						"_msg" = message(87)
+					}
+				}
+			}
+		}
+	},
+	"designfsize" = 11.9873
+};

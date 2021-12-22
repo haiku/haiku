@@ -126,8 +126,24 @@ Port::SetPipe(Pipe* pipe)
 		return B_ERROR;
 	}
 
-	TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe %s\n", __func__,
-		PortName(), portRegister, (pipe->Index() == INTEL_PIPE_A) ? "A" : "B");
+	switch (pipe->Index()) {
+		case INTEL_PIPE_B:
+			TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe B\n", __func__,
+				PortName(), portRegister);
+			break;
+		case INTEL_PIPE_C:
+			TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe C\n", __func__,
+				PortName(), portRegister);
+			break;
+		case INTEL_PIPE_D:
+			TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe D\n", __func__,
+				PortName(), portRegister);
+			break;
+		default:
+			TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe A\n", __func__,
+				PortName(), portRegister);
+			break;
+	}
 
 	uint32 portState = read32(portRegister);
 
@@ -257,7 +273,38 @@ Port::PipePreference()
 	}
 
 	if (gInfo->shared_info->device_type.HasDDI()) {
-		//fixme implement detection via PIPE_DDI_FUNC_CTL_x scan..
+		// scan all our pipes to find the one connected to the current port
+		uint32 pipeState = 0;
+		for (uint32 pipeCnt = 0; pipeCnt < 4; pipeCnt++) {
+			switch (pipeCnt) {
+				case 0:
+					pipeState = read32(PIPE_DDI_FUNC_CTL_A);
+					break;
+				case 1:
+					pipeState = read32(PIPE_DDI_FUNC_CTL_B);
+					break;
+				case 2:
+					pipeState = read32(PIPE_DDI_FUNC_CTL_C);
+					break;
+				default:
+					pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
+					break;
+			}
+
+			if ((((pipeState & PIPE_DDI_SELECT_MASK) >> PIPE_DDI_SELECT_SHIFT) + 1)
+				== (uint32)PortIndex()) {
+				switch (pipeCnt) {
+					case 0:
+						return INTEL_PIPE_A;
+					case 1:
+						return INTEL_PIPE_B;
+					case 2:
+						return INTEL_PIPE_C;
+					default:
+						return INTEL_PIPE_D;
+				}
+			}
+		}
 	}
 
 	return INTEL_PIPE_ANY;
@@ -291,18 +338,22 @@ Port::_SetI2CSignals(void* cookie, int clock, int data)
 		value = read32(ioRegister) & I2C_RESERVED;
 	}
 
+	// if we send clk or data, we always send low logic level;
+	// if we want to send high level, we actually receive and let the
+	// external pullup resistors create the high level on the bus.
+	value |= I2C_DATA_VALUE_MASK;  //sets data = 0, always latch
+	value |= I2C_CLOCK_VALUE_MASK; //sets clock = 0, always latch
+
 	if (data != 0)
 		value |= I2C_DATA_DIRECTION_MASK;
 	else {
-		value |= I2C_DATA_DIRECTION_MASK | I2C_DATA_DIRECTION_OUT
-			| I2C_DATA_VALUE_MASK;
+		value |= I2C_DATA_DIRECTION_MASK | I2C_DATA_DIRECTION_OUT;
 	}
 
 	if (clock != 0)
 		value |= I2C_CLOCK_DIRECTION_MASK;
 	else {
-		value |= I2C_CLOCK_DIRECTION_MASK | I2C_CLOCK_DIRECTION_OUT
-			| I2C_CLOCK_VALUE_MASK;
+		value |= I2C_CLOCK_DIRECTION_MASK | I2C_CLOCK_DIRECTION_OUT;
 	}
 
 	write32(ioRegister, value);
@@ -352,8 +403,8 @@ status_t
 AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
 	CALLED();
-	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
-		target->virtual_height);
+	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->timing.h_display,
+		target->timing.v_display);
 
 	if (fPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
@@ -363,13 +414,13 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Setup PanelFitter and Train FDI if it exists
 	PanelFitter* fitter = fPipe->PFT();
 	if (fitter != NULL)
-		fitter->Enable(*target);
+		fitter->Enable(target->timing);
 	FDILink* link = fPipe->FDI();
 	if (link != NULL)
-		link->Train(target);
+		link->Train(&target->timing);
 
 	pll_divisors divisors;
-	compute_pll_divisors(target, &divisors, false);
+	compute_pll_divisors(&target->timing, &divisors, false);
 
 	uint32 extraPLLFlags = 0;
 	if (gInfo->shared_info->device_type.Generation() >= 3)
@@ -531,7 +582,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	}
 
 	TRACE("%s: %s-%d %dx%d\n", __func__, PortName(), PortIndex(),
-		target->virtual_width, target->virtual_height);
+		target->timing.h_display, target->timing.v_display);
 
 	if (fPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
@@ -561,7 +612,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// For LVDS panels, we may need to set the timings according to the panel
 	// native video mode, and let the panel fitter do the scaling. But the
 	// place where the scaling happens varies accross generations of devices.
-	display_mode hardwareTarget;
+	display_timing hardwareTarget;
 	bool needsScaling = false;
 
 	// TODO figure out how it's done (or if we need to configure something at
@@ -570,22 +621,23 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		&& gInfo->shared_info->device_type.Generation() >= 3
 		&& gInfo->shared_info->got_vbt) {
 		// Set vbios hardware panel mode as base
-		hardwareTarget = gInfo->shared_info->panel_mode;
+		hardwareTarget = gInfo->shared_info->panel_timing;
 
-		if (hardwareTarget.virtual_width == target->virtual_width
-				&& hardwareTarget.virtual_height == target->virtual_height) {
+		if (hardwareTarget.h_display == target->timing.h_display
+				&& hardwareTarget.v_display == target->timing.v_display) {
 			// We are setting the native video mode, nothing special to do
-			TRACE("Setting LVDS to native mode\n");
-			hardwareTarget = *target;
+			// Note: this means refresh and timing might vary according to requested mode.
+			hardwareTarget = target->timing;
+			TRACE("%s: Setting LVDS to native resolution at %" B_PRIu32 "Hz\n", __func__,
+				hardwareTarget.pixel_clock * 1000 / (hardwareTarget.h_total * hardwareTarget.v_total));
 		} else {
 			// We need to enable the panel fitter
-			TRACE("%s: hardware mode will actually be %dx%d\n", __func__,
-				hardwareTarget.virtual_width, hardwareTarget.virtual_height);
+			TRACE("%s: Hardware mode will actually be %dx%d at %" B_PRIu32 "Hz\n", __func__,
+				hardwareTarget.h_display, hardwareTarget.v_display,
+				hardwareTarget.pixel_clock * 1000 / (hardwareTarget.h_total * hardwareTarget.v_total));
 
-			hardwareTarget.space = target->space;
 			// FIXME we should also get the refresh frequency from the target
 			// mode, and then "sanitize" the resulting mode we made up.
-
 			needsScaling = true;
 		}
 	} else {
@@ -593,7 +645,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 			"generation, scaling may not work\n");
 		// We don't have VBT data, try to set the requested mode directly
 		// and hope for the best
-		hardwareTarget = *target;
+		hardwareTarget = target->timing;
 	}
 
 	// Setup PanelFitter and Train FDI if it exists
@@ -661,7 +713,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	// Program pipe PLL's (using the hardware mode timings, since that's what
 	// the PLL is used for)
-	fPipe->ConfigureClocks(divisors, hardwareTarget.timing.pixel_clock,
+	fPipe->ConfigureClocks(divisors, hardwareTarget.pixel_clock,
 		extraPLLFlags);
 
 	if (gInfo->shared_info->device_type.Generation() != 4) {
@@ -785,8 +837,8 @@ status_t
 DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
 	CALLED();
-	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
-		target->virtual_height);
+	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->timing.h_display,
+		target->timing.v_display);
 
 	if (fPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
@@ -796,13 +848,13 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Setup PanelFitter and Train FDI if it exists
 	PanelFitter* fitter = fPipe->PFT();
 	if (fitter != NULL)
-		fitter->Enable(*target);
+		fitter->Enable(target->timing);
 	FDILink* link = fPipe->FDI();
 	if (link != NULL)
-		link->Train(target);
+		link->Train(&target->timing);
 
 	pll_divisors divisors;
-	compute_pll_divisors(target, &divisors, false);
+	compute_pll_divisors(&target->timing, &divisors, false);
 
 	uint32 extraPLLFlags = 0;
 	if (gInfo->shared_info->device_type.Generation() >= 3)
@@ -1058,7 +1110,7 @@ DisplayPort::_PortRegister()
 
 
 status_t
-DisplayPort::_SetPortLinkGen4(display_mode* target)
+DisplayPort::_SetPortLinkGen4(const display_timing& timing)
 {
 	// Khz / 10. ( each output octet encoded as 10 bits. 
 	//uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10; //=270000 khz
@@ -1085,7 +1137,7 @@ DisplayPort::_SetPortLinkGen4(display_mode* target)
 	if (ret_n > 0x800000) {
 		ret_n = 0x800000;
 	}
-	uint64 ret_m = target->timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
+	uint64 ret_m = timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
 	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
 		ret_m >>= 1;
 		ret_n >>= 1;
@@ -1103,7 +1155,7 @@ DisplayPort::_SetPortLinkGen4(display_mode* target)
 	if (ret_n > 0x800000) {
 		ret_n = 0x800000;
 	}
-	ret_m = target->timing.pixel_clock * ret_n / linkspeed;
+	ret_m = timing.pixel_clock * ret_n / linkspeed;
 	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
 		ret_m >>= 1;
 		ret_n >>= 1;
@@ -1125,8 +1177,8 @@ status_t
 DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
 	CALLED();
-	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
-		target->virtual_height);
+	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->timing.h_display,
+		target->timing.v_display);
 
 	if (fPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
@@ -1136,7 +1188,7 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	status_t result = B_OK;
 	if (gInfo->shared_info->device_type.Generation() <= 4) {
 		fPipe->ConfigureTimings(target);
-		result = _SetPortLinkGen4(target);
+		result = _SetPortLinkGen4(target->timing);
 	} else {
 		//fixme: doesn't work yet. For now just scale to native mode.
 #if 0
@@ -1144,10 +1196,12 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		PanelFitter* fitter = fPipe->PFT();
 		if (fitter != NULL)
 			fitter->Enable(*target);
-		FDILink* link = fPipe->FDI();
-		if (link != NULL)
-			link->Train(target);
-
+		// skip FDI if it doesn't exist
+		if (gInfo->shared_info->device_type.Generation() <= 8) {
+			FDILink* link = fPipe->FDI();
+			if (link != NULL)
+				link->Train(target);
+		}
 		pll_divisors divisors;
 		compute_pll_divisors(target, &divisors, false);
 
@@ -1241,6 +1295,11 @@ DigitalDisplayInterface::_PortRegister()
 			return DDI_BUF_CTL_D;
 		case INTEL_PORT_E:
 			return DDI_BUF_CTL_E;
+		case INTEL_PORT_F:
+			if ((gInfo->shared_info->device_type.Generation() > 8) &&
+				!gInfo->shared_info->device_type.InGroup(INTEL_GROUP_SKY))
+				return DDI_BUF_CTL_F;
+			return 0;
 		default:
 			return 0;
 	}
@@ -1251,7 +1310,17 @@ DigitalDisplayInterface::_PortRegister()
 addr_t
 DigitalDisplayInterface::_DDCRegister()
 {
-	// TODO: No idea, does DDI have DDC?
+	switch (PortIndex()) {
+		case INTEL_PORT_B:
+			return INTEL_I2C_IO_E;
+		case INTEL_PORT_C:
+			return INTEL_I2C_IO_D;
+		case INTEL_PORT_D:
+			return INTEL_I2C_IO_F;
+		default:
+			return 0;
+	}
+
 	return 0;
 }
 
@@ -1259,16 +1328,23 @@ DigitalDisplayInterface::_DDCRegister()
 status_t
 DigitalDisplayInterface::Power(bool enabled)
 {
+	if (fPipe == NULL) {
+		ERROR("%s: Setting power without assigned pipe!\n", __func__);
+		return B_ERROR;
+	}
 	TRACE("%s: %s DDI enabled: %s\n", __func__, PortName(),
 		enabled ? "true" : "false");
 
 	fPipe->Enable(enabled);
 
+	//nogo currently.. (kills output forever)
+#if 0
 	addr_t portRegister = _PortRegister();
 	uint32 state = read32(portRegister);
 	write32(portRegister,
 		enabled ? (state | DDI_BUF_CTL_ENABLE) : (state & ~DDI_BUF_CTL_ENABLE));
 	read32(portRegister);
+#endif
 
 	return B_OK;
 }
@@ -1282,89 +1358,309 @@ DigitalDisplayInterface::IsConnected()
 	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
 		portRegister);
 
-	if (portRegister == 0)
-		return false;
-
-	if ((read32(portRegister) & DDI_INIT_DISPLAY_DETECTED) == 0) {
-		TRACE("%s: %s link not detected\n", __func__, PortName());
+	// Please note: Skylake and up (Desktop) might use eDP for a seperate active VGA converter chip.
+	if (portRegister == 0) {
+		TRACE("%s: Port not implemented\n", __func__);
 		return false;
 	}
 
-	// Probe a little port info.
-	if ((read32(DDI_BUF_CTL_A) & DDI_A_4_LANES) != 0) {
-		switch (PortIndex()) {
-			case INTEL_PORT_A:
-				fMaxLanes = 4;
-				break;
-			case INTEL_PORT_E:
-				fMaxLanes = 0;
-				break;
-			default:
-				fMaxLanes = 4;
-				break;
-		}
-	} else {
-		switch (PortIndex()) {
-			case INTEL_PORT_A:
-				fMaxLanes = 2;
-				break;
-			case INTEL_PORT_E:
-				fMaxLanes = 2;
-				break;
-			default:
-				fMaxLanes = 4;
-				break;
+	// newer chipsets support 4 lanes on all ports
+	fMaxLanes = 4;
+	if ((gInfo->shared_info->device_type.Generation() < 9) ||
+		gInfo->shared_info->device_type.InGroup(INTEL_GROUP_SKY)) {
+		// Probe a little port info.
+		if ((read32(DDI_BUF_CTL_A) & DDI_A_4_LANES) != 0) {
+			switch (PortIndex()) {
+				case INTEL_PORT_A:
+					fMaxLanes = 4;
+					break;
+				case INTEL_PORT_E:
+					fMaxLanes = 0;
+					break;
+				default:
+					fMaxLanes = 4;
+					break;
+			}
+		} else {
+			switch (PortIndex()) {
+				case INTEL_PORT_A:
+					fMaxLanes = 2;
+					break;
+				case INTEL_PORT_E:
+					fMaxLanes = 2;
+					break;
+				default:
+					fMaxLanes = 4;
+					break;
+			}
 		}
 	}
 
 	TRACE("%s: %s Maximum Lanes: %" B_PRId8 "\n", __func__,
 		PortName(), fMaxLanes);
 
-	//since EDID is not correctly implemented yet for this connection type we'll do without it for now
-	//return HasEDID();
-	TRACE("%s: %s link detected\n", __func__, PortName());
-	return true;
+	// fetch EDID but determine 'in use' later (below) so we also catch screens that fail EDID
+	HasEDID();
+
+	// scan all our pipes to find the one connected to the current port and check it's enabled
+	uint32 pipeState = 0;
+	for (uint32 pipeCnt = 0; pipeCnt < 4; pipeCnt++) {
+		switch (pipeCnt) {
+			case 0:
+				pipeState = read32(PIPE_DDI_FUNC_CTL_A);
+				break;
+			case 1:
+				pipeState = read32(PIPE_DDI_FUNC_CTL_B);
+				break;
+			case 2:
+				pipeState = read32(PIPE_DDI_FUNC_CTL_C);
+				break;
+			default:
+				pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
+				break;
+		}
+
+		if ((((pipeState & PIPE_DDI_SELECT_MASK) >> PIPE_DDI_SELECT_SHIFT) + 1) == (uint32)PortIndex()) {
+			// See if the BIOS enabled our output as it indicates it's in use
+			if (pipeState & PIPE_DDI_FUNC_CTL_ENABLE) {
+				TRACE("%s: Connected\n", __func__);
+				return true;
+			}
+		}
+	}
+
+	// On laptops we always have an internal panel.. (this is on the eDP port)
+	if (gInfo->shared_info->device_type.IsMobile() && (PortIndex() == INTEL_PORT_E)) {
+		if (gInfo->shared_info->has_vesa_edid_info) {
+			TRACE("%s: Laptop. Using VESA edid info\n", __func__);
+			memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,
+				sizeof(edid1_info));
+			fEDIDState = B_OK;
+			// HasEDID now true
+			return true;
+		} else if (gInfo->shared_info->got_vbt) {
+			TRACE("%s: Laptop. No EDID, but force enabled as we have a VBT\n", __func__);
+			return true;
+		}
+	}
+
+	TRACE("%s: Not connected\n", __func__);
+	return false;
 }
 
+status_t
+DigitalDisplayInterface::_SetPortLinkGen8(const display_timing& timing, uint32 pllSel)
+{
+	//fixme: always so on pre gen 9?
+	uint32 linkBandwidth = 270000; //khz
+
+	if (gInfo->shared_info->device_type.Generation() >= 9) {
+		if (pllSel != 0xff) {
+			linkBandwidth = (read32(SKL_DPLL_CTRL1) >> (1 + 6 * pllSel)) & SKL_DPLL_DP_LINKRATE_MASK;
+			switch (linkBandwidth) {
+				case SKL_DPLL_CTRL1_2700:
+					linkBandwidth = 2700000 / 5;
+					break;
+				case SKL_DPLL_CTRL1_1350:
+					linkBandwidth = 1350000 / 5;
+					break;
+				case SKL_DPLL_CTRL1_810:
+					linkBandwidth =  810000 / 5;
+					break;
+				case SKL_DPLL_CTRL1_1620:
+					linkBandwidth = 1620000 / 5;
+					break;
+				case SKL_DPLL_CTRL1_1080:
+					linkBandwidth = 1080000 / 5;
+					break;
+				case SKL_DPLL_CTRL1_2160:
+					linkBandwidth = 2160000 / 5;
+					break;
+				default:
+					linkBandwidth = 270000;
+					ERROR("%s: DDI No known DP-link reference clock selected, assuming default\n", __func__);
+					break;
+			}
+		} else {
+			ERROR("%s: DDI No known PLL selected, assuming default DP-link reference\n", __func__);
+		}
+	}
+	TRACE("%s: DDI DP-link reference clock is %gMhz\n", __func__, linkBandwidth / 1000.0f);
+
+	uint32 fPipeOffset = 0;
+	switch (fPipe->Index()) {
+		case INTEL_PIPE_B:
+			fPipeOffset = 0x1000;
+			break;
+		case INTEL_PIPE_C:
+			fPipeOffset = 0x2000;
+			break;
+		case INTEL_PIPE_D:
+			fPipeOffset = 0xf000;
+			break;
+		default:
+			break;
+	}
+
+	TRACE("%s: DDI M1 data before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_DATA_M + fPipeOffset));
+	TRACE("%s: DDI N1 data before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_DATA_N + fPipeOffset));
+	TRACE("%s: DDI M1 link before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_LINK_M + fPipeOffset));
+	TRACE("%s: DDI N1 link before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_LINK_N + fPipeOffset));
+
+	uint32 pipeFunc = read32(PIPE_DDI_FUNC_CTL_A + fPipeOffset);
+	uint32 bitsPerPixel = (pipeFunc & PIPE_DDI_BPC_MASK) >> PIPE_DDI_COLOR_SHIFT;
+	switch (bitsPerPixel) {
+		case PIPE_DDI_8BPC:
+			bitsPerPixel = 24;
+			break;
+		case PIPE_DDI_10BPC:
+			bitsPerPixel = 30;
+			break;
+		case PIPE_DDI_6BPC:
+			bitsPerPixel = 18;
+			break;
+		case PIPE_DDI_12BPC:
+			bitsPerPixel = 36;
+			break;
+		default:
+			ERROR("%s: DDI illegal link colordepth set.\n", __func__);
+			return B_ERROR;
+	}
+	TRACE("%s: DDI Link Colordepth: %" B_PRIu32 "\n", __func__, bitsPerPixel);
+
+	uint32 lanes = 4;
+	// Only DP modes supports less than 4 lanes: read current config
+	if (((pipeFunc & PIPE_DDI_MODESEL_MASK) >> PIPE_DDI_MODESEL_SHIFT) >= PIPE_DDI_MODE_DP_SST) {
+		// On gen 9.5 IceLake 3x mode exists (DSI only), earlier models: reserved value.
+		lanes = ((pipeFunc & PIPE_DDI_DP_WIDTH_MASK) >> PIPE_DDI_DP_WIDTH_SHIFT) + 1;
+		TRACE("%s: DDI in DP mode with %" B_PRIx32 " lanes in use\n", __func__, lanes);
+	} else {
+		TRACE("%s: DDI in non-DP mode with %" B_PRIx32 " lanes in use\n", __func__, lanes);
+	}
+
+	//Setup Data M/N
+	uint64 linkspeed = lanes * linkBandwidth * 8;
+	uint64 ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	uint64 ret_m = timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	//Set TU size bits (to default, max) before link training so that error detection works
+	write32(INTEL_DDI_PIPE_A_DATA_M + fPipeOffset, ret_m | FDI_PIPE_MN_TU_SIZE_MASK);
+	write32(INTEL_DDI_PIPE_A_DATA_N + fPipeOffset, ret_n);
+
+	//Setup Link M/N
+	linkspeed = linkBandwidth;
+	ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	ret_m = timing.pixel_clock * ret_n / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	write32(INTEL_DDI_PIPE_A_LINK_M + fPipeOffset, ret_m);
+	//Writing Link N triggers all four registers to be activated also (on next VBlank)
+	write32(INTEL_DDI_PIPE_A_LINK_N + fPipeOffset, ret_n);
+
+	TRACE("%s: DDI M1 data after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_DATA_M + fPipeOffset));
+	TRACE("%s: DDI N1 data after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_DATA_N + fPipeOffset));
+	TRACE("%s: DDI M1 link after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_LINK_M + fPipeOffset));
+	TRACE("%s: DDI N1 link after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_DDI_PIPE_A_LINK_N + fPipeOffset));
+
+	return B_OK;
+}
 
 status_t
 DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
 	CALLED();
-	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
-		target->virtual_height);
+	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->timing.h_display,
+		target->timing.v_display);
 
 	if (fPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
 		return B_ERROR;
 	}
 
-	// Setup PanelFitter and Train FDI if it exists
-	PanelFitter* fitter = fPipe->PFT();
-	if (fitter != NULL)
-		fitter->Enable(*target);
-	// Skip FDI if we have a CPU connected display
-	if (PortIndex() != INTEL_PORT_A) {
-		FDILink* link = fPipe->FDI();
-		if (link != NULL)
-			link->Train(target);
+	display_timing hardwareTarget = target->timing;
+	bool needsScaling = false;
+	if ((PortIndex() == INTEL_PORT_E) && gInfo->shared_info->device_type.IsMobile()) {
+		// For internal panels, we may need to set the timings according to the panel
+		// native video mode, and let the panel fitter do the scaling.
+
+		if (gInfo->shared_info->got_vbt) {
+			// Set vbios hardware panel mode as base
+			hardwareTarget = gInfo->shared_info->panel_timing;
+
+			if (hardwareTarget.h_display == target->timing.h_display
+					&& hardwareTarget.v_display == target->timing.v_display) {
+				// We are setting the native video mode, nothing special to do
+				// Note: this means refresh and timing might vary according to requested mode.
+				hardwareTarget = target->timing;
+				TRACE("%s: Setting internal panel to native resolution at %" B_PRIu32 "Hz\n", __func__,
+					hardwareTarget.pixel_clock * 1000 / (hardwareTarget.h_total * hardwareTarget.v_total));
+			} else {
+				// We need to enable the panel fitter
+				TRACE("%s: Hardware mode will actually be %dx%d at %" B_PRIu32 "Hz\n", __func__,
+					hardwareTarget.h_display, hardwareTarget.v_display,
+					hardwareTarget.pixel_clock * 1000 / (hardwareTarget.h_total * hardwareTarget.v_total));
+
+				// FIXME we should also get the refresh frequency from the target
+				// mode, and then "sanitize" the resulting mode we made up.
+				needsScaling = true;
+			}
+		} else {
+			TRACE("%s: Setting internal panel mode without VBT info generation, scaling may not work\n",
+				__func__);
+			// We don't have VBT data, try to set the requested mode directly
+			// and hope for the best
+			hardwareTarget = target->timing;
+		}
 	}
 
-	pll_divisors divisors;
-	compute_pll_divisors(target, &divisors, false);
+	// Setup PanelFitter
+	PanelFitter* fitter = fPipe->PFT();
+	if (fitter != NULL)
+		fitter->Enable(hardwareTarget);
 
-	uint32 extraPLLFlags = 0;
-	if (gInfo->shared_info->device_type.Generation() >= 3)
-		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL | DISPLAY_PLL_2X_CLOCK;
+	// skip FDI as it never applies to DDI (on gen7 and 8 only for the real analog VGA port)
 
 	// Program general pipe config
 	fPipe->Configure(target);
 
-	// Program pipe PLL's
-	fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
+	uint32 pllSel = 0xff; // no PLL selected
+	if (gInfo->shared_info->device_type.Generation() <= 8) {
+		unsigned int r2_out, n2_out, p_out;
+		hsw_ddi_calculate_wrpll(
+			hardwareTarget.pixel_clock * 1000 /* in Hz */,
+			&r2_out, &n2_out, &p_out);
+	} else {
+		skl_wrpll_params wrpll_params;
+		skl_ddi_calculate_wrpll(
+			hardwareTarget.pixel_clock * 1000 /* in Hz */,
+			gInfo->shared_info->pll_info.reference_frequency,
+			&wrpll_params);
+		fPipe->ConfigureClocksSKL(wrpll_params,
+			hardwareTarget.pixel_clock,
+			PortIndex(),
+			&pllSel);
+	}
 
 	// Program target display mode
-	fPipe->ConfigureTimings(target);
+	fPipe->ConfigureTimings(target, !needsScaling);
+	_SetPortLinkGen8(hardwareTarget, pllSel);
 
 	// Set fCurrentMode to our set display mode
 	memcpy(&fCurrentMode, target, sizeof(display_mode));

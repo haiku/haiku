@@ -7,6 +7,7 @@
 
 
 #include <net/if.h>
+#include <string.h>
 
 #include <NetworkAddress.h>
 
@@ -24,6 +25,18 @@ struct wireless_network {
 	uint32				cipher;
 	uint32				group_cipher;
 	uint32				key_mode;
+
+	bool operator==(const wireless_network& other) {
+		return strncmp(name, other.name, 32) == 0
+			// ignore address difference
+			&& noise_level == other.noise_level
+			&& signal_strength == other.signal_strength
+			&& flags == other.flags
+			&& authentication_mode == other.authentication_mode
+			&& cipher == other.cipher
+			&& group_cipher == other.group_cipher
+			&& key_mode == other.key_mode;
+	}
 };
 
 // flags

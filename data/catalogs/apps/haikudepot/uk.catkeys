@@ -1,14 +1,14 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	3544756144
+1	ukrainian	x-vnd.Haiku-HaikuDepot	761125591
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 Network error	ServerHelper		Помилка мережі
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
 User Created	UserLoginWindow		Користувача створено
 Check for updates…	MainWindow		Перевірити на обнови…
-Uninstall	PackageManager		Деінсталяція
 Uninstalled	PackageListView		Деінстальовані
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
 Available packages	MainWindow		Доступні пакети
 Create account	UserLoginWindow		Створити обліковий запис
+Install %PackageTitle%	PackageManager		Інсталяція %PackageTitle%
 OK	App		ОК
 The response to the captcha was incorrect.	ServerHelper		Невірна відповідь на капчу.
 Develop packages	MainWindow		Пакети розробника
@@ -17,7 +17,6 @@ Starting the package daemon failed:\n\n%Error%	App		Запуск демона п
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Ви увійшли як користувач %Nickname%.
 <no info>	PackageInfoView		<немає інформації>
 No user ratings available.	PackageInfoView		Оцінка для користувача недоступна.
-Downloading package '%name%'	WorkStatusView		Завантажується пакет '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Не вдалося витягти необхідну інформацію про капчу з даних, що надсилаються назад із сервера.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Виникла помилка мережевого транспорту при взаємодії з серверною системою: %s
 Rating	PackageListView		Оцінка
@@ -29,7 +28,6 @@ This application writes and reads some working files on your computer in order t
 Active	PackageListView		Активний
 Login or Create account	MainWindow		Авторизуватись або зареєструватись
 <Package contents not available for remote packages>	PackageContentsView		<Вміст пакету недоступний для відддалених пакетів>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 пакет для завантаження} few{# пакети для завантаження} other{# пакетів для завантаження}}
 Ratings	PackageInfoView		Оцінки
 Switch account…	MainWindow		Змінити обліковий запис…
 Preferred language:	UserLoginWindow		Мова за вподобанням:
@@ -46,8 +44,6 @@ Category	FilterView		Категорія
 User rating	RatePackageWindow		Рейтинг користувача
 Installed packages	MainWindow		Встановлені пакети
 A requested object or an object involved in the request was not found on the server.	ServerHelper		На сервері не знайдено потрібний об'єкт або об'єкт, що міститься у запиті.
-Fatal error	PackageManager		Критична помилка
-Package action failed	PackageInfoView		Невдала дія з пакетом
 No changelog available.	PackageInfoView		Історія змін недоступна
 Error	App		Помилка
 There was a puzzling response from the web service.	UserLoginWindow		Отримано загадкову відповідь від мережевого сервісу.
@@ -79,7 +75,6 @@ Stability	RatePackageWindow		Стабільність
 Send	RatePackageWindow		Надіслати
 Start package daemon	App		Запустити демон пакетів
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Пароль потрібно повторити, щоб зменшити ймовірність неправильного введення пароля.
-The package action could not be scheduled: %Error%	PackageInfoView		Дію з пакетом не вдалося запланувати: %Error%
 Cancel	SettingsWindow		Скасувати
 Cancel	RatePackageWindow		Скасувати
 Inactive	PackageListView		Неактивний
@@ -89,7 +84,6 @@ There are problems in the supplied data:	UserLoginWindow		У наданих да
 OK	MainWindow		ОК
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# об'єкт} few{# об'єкти} other{# об'єктів}}
 Usage conditions download problem	UserLoginWindow		Помилка при завантаженні Умов користування
-OK	PackageInfoView		ОК
 Downloading:	PackageInfoView		Завантаження:
 Quit	MainWindow		Вийти
 Success	UserLoginWindow		Успішно
@@ -118,7 +112,6 @@ This rating is visible to other users	RatePackageWindow		Цей рейтинг �
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Під час оновлення даних пакета виникла проблема, яка може призвести до відображення програмою недостовірних даних. Додаткові відомості про цю проблему можна отримати в журналах програми.\nІнформація про те, як переглядати журнали, доступна в розділі програми HaikuDepot посібника користувача Haiku.
 View agreed usage conditions…	MainWindow		Погоджені Умови користування…
 Cancel	MainWindow		Скасувати
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(залишилось завантажити 1)}other{(залишилось завантажити #)}}
 Refresh repositories	MainWindow		Оновити репозитарії
 Continue	App		Продовжити
 A password is required.	UserLoginWindow		Потрібен пароль.
@@ -131,6 +124,7 @@ Status	PackageListView		Стан
 The password has been incorrectly repeated.	UserLoginWindow		Пароль був повторений неправильно.
 Network transport error	ServerHelper		Помилка мережевого транспорту
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Пароль, раніше наданий для користувача [%Nickname%], наразі не дійсний. Користувачеві треба завершити сеанс з цією програмою та знову увійти в систему з оновленим паролем.
+Uninstall %PackageTitle%	PackageManager		Деінсталяція %PackageTitle%
 Update	RatePackageWindow		Оновити
 OK	ServerHelper		ОК
 Language	UserLoginWindow		Мова
@@ -145,8 +139,8 @@ Source packages	MainWindow		Пакети з вихідними текстами
 -	no package size		-
 Problem with working files	App		Проблеми з робочими файлами
 Server error	ServerHelper		Помилка серверу
-Rate package	RatePackageWindow		Оцінка пакета
 Try again	App		Спробувати знову
+Rate package	RatePackageWindow		Оцінка пакета
 Unknown	PackageListView		Невідомо
 I agree to the usage conditions	UserLoginWindow		З Умовами користування погоджуюсь
 Log in	UserLoginWindow		Авторизуватись
@@ -154,8 +148,8 @@ Sending anonymous usage data	MainWindow		Відправка анонімних �
 Logged in as %User%	MainWindow		Авторизований як %User%
 Email address:	UserLoginWindow		Адреса Email:
 Screenshot	ScreenshotWindow		Знімок екрана
-A reboot is necessary to complete the installation process.	PackageManager		Для завершення інсталяції потрібне перезавантаження.
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		Для завершення інсталяції потрібне перезавантаження.
 Yes	MainWindow		Так
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural, one{Мені # рік або більше} few{Мені # роки або більше} other{Мені # років або більше}}
 View latest usage conditions…	MainWindow		Перегляд останніх Умов користування…
@@ -172,7 +166,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Отримання
 Description	PackageListView		Опис
 Open %DeskbarLink%	PackageManager		Відкрити %DeskbarLink%
 User creation error	UserLoginWindow		Помилка створення користувача
-Install	PackageManager		Інсталяція
 Input validation	UserLoginWindow		Перевірка вхідних даних
 Log in…	MainWindow		Авторизація…
 You need to be logged into an account before you can rate packages.	MainWindow		Для оцінки пакетів спочатку необхідно авторизуватись.

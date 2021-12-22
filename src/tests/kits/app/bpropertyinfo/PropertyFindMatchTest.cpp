@@ -1,7 +1,7 @@
 /*
 	$Id: PropertyFindMatchTest.cpp 851 2002-08-22 03:15:35Z jrand $
 	
-	This file implements the FindMatch test for the OpenBeOS BPropertyInfo
+	This file implements the FindMatch test for the Haiku BPropertyInfo
 	code.  This class tests the following usecases:
 	  - Find Match
 	

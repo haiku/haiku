@@ -426,6 +426,7 @@ extern void			ktrace_vprintf(const char *format, va_list args);
 typedef struct {
 	bigtime_t	active_time;	/* usec of doing useful work since boot */
 	bool		enabled;
+	uint64		current_frequency;
 } cpu_info;
 
 typedef struct {
@@ -537,8 +538,11 @@ typedef struct {
 
 
 extern status_t		get_system_info(system_info* info);
-extern status_t		get_cpu_info(uint32 firstCPU, uint32 cpuCount,
-						cpu_info* info);
+extern status_t		_get_cpu_info_etc(uint32 firstCPU, uint32 cpuCount,
+						cpu_info* info, size_t size);
+#define get_cpu_info(firstCPU, cpuCount, info) \
+	_get_cpu_info_etc((firstCPU), (cpuCount), (info), sizeof(*(info)))
+
 extern status_t		get_cpu_topology_info(cpu_topology_node_info* topologyInfos,
 						uint32* topologyInfoCount);
 

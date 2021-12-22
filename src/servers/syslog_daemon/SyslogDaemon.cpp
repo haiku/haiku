@@ -33,7 +33,7 @@ static const int32 kQuitDaemon = 'quit';
 
 SyslogDaemon::SyslogDaemon()
 	:
-	BApplication(B_SYSTEM_LOGGER_SIGNATURE),
+	BServer(B_SYSTEM_LOGGER_SIGNATURE, false, NULL),
 	fHandlerLock("handler lock")
 {
 }

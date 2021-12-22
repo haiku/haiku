@@ -1,11 +1,8 @@
-1	belarusian	x-vnd.Haiku-Login	2683778354
+1	belarusian	x-vnd.Haiku-Login	1085637210
 Invalid login!	Login View		Няправiльны лагiн!
 Error	Login App		Памылка
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\t Запусцiце у рэдакцыоннам ражыме для прыняцця зменаў на працоўным стале.\n
 Welcome to Haiku	Login Window		Haiku вiтае Вас
 Halt	Login View		Спынiць
-Login application for Haiku\nUsage:\n	Login App		Уваход у Haiku\nВыкарастанне:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\t Не рабiць вакно мадальным\n
 Desktop	Desktop Window		Працоўны стол
 Hide password	Login View		Схаваць пароль
 Reboot	Login View		Перазагрузка

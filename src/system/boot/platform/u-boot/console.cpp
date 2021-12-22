@@ -18,23 +18,16 @@
 #include <string.h>
 
 
-class Console : public ConsoleNode {
-public:
-							Console();
-
-	virtual	ssize_t			ReadAt(void* cookie, off_t pos, void* buffer,
-								size_t bufferSize);
-	virtual	ssize_t			WriteAt(void* cookie, off_t pos,
-								const void* buffer, size_t bufferSize);
-};
-
-
 class VTConsole : public ConsoleNode {
 public:
 							VTConsole();
-			void			ClearScreen();
-			void			SetCursor(int32 x, int32 y);
-			void			SetColor(int32 foreground, int32 background);
+
+	virtual void			ClearScreen();
+	virtual int32			Width();
+	virtual int32			Height();
+	virtual void			SetCursor(int32 x, int32 y);
+	virtual void			SetCursorVisible(bool visible);
+	virtual void			SetColors(int32 foreground, int32 background);
 };
 
 
@@ -49,40 +42,12 @@ public:
 };
 
 
-static Console sInput;
-static Console sOutput;
+extern ConsoleNode* gConsoleNode;
 static SerialConsole sSerial;
 
 FILE* stdin;
 FILE* stdout;
 FILE* stderr;
-
-
-//	#pragma mark -
-
-
-Console::Console()
-	:
-	ConsoleNode()
-{
-}
-
-
-ssize_t
-Console::ReadAt(void* cookie, off_t pos, void* buffer, size_t bufferSize)
-{
-	// don't seek in character devices
-	// not implemented (and not yet? needed)
-	return B_ERROR;
-}
-
-
-ssize_t
-Console::WriteAt(void* cookie, off_t /*pos*/, const void* buffer,
-	size_t bufferSize)
-{
-	return 0;
-}
 
 
 //	#pragma mark -
@@ -102,6 +67,22 @@ VTConsole::ClearScreen()
 }
 
 
+int32
+VTConsole::Width()
+{
+	// TODO?
+	return 80;
+}
+
+
+int32
+VTConsole::Height()
+{
+	// TODO?
+	return 25;
+}
+
+
 void
 VTConsole::SetCursor(int32 x, int32 y)
 {
@@ -115,7 +96,14 @@ VTConsole::SetCursor(int32 x, int32 y)
 
 
 void
-VTConsole::SetColor(int32 foreground, int32 background)
+VTConsole::SetCursorVisible(bool visible)
+{
+	// TODO?
+}
+
+
+void
+VTConsole::SetColors(int32 foreground, int32 background)
 {
 	static const char cmap[] = {
 		0, 4, 2, 6, 1, 5, 3, 7 };
@@ -165,46 +153,6 @@ SerialConsole::WriteAt(void *cookie, off_t /*pos*/, const void *buffer,
 //     #pragma mark -
 
 
-void
-console_clear_screen(void)
-{
-	sSerial.ClearScreen();
-}
-
-
-int32
-console_width(void)
-{
-	return 80;
-}
-
-
-int32
-console_height(void)
-{
-	return 25;
-}
-
-
-void
-console_set_cursor(int32 x, int32 y)
-{
-	sSerial.SetCursor(x, y);
-}
-
-
-void
-console_show_cursor(void)
-{
-}
-
-
-void
-console_hide_cursor(void)
-{
-}
-
-
 int
 console_wait_for_key(void)
 {
@@ -214,19 +162,12 @@ console_wait_for_key(void)
 }
 
 
-void
-console_set_color(int32 foreground, int32 background)
-{
-	sSerial.SetColor(foreground, background);
-}
-
-
 status_t
 console_init(void)
 {
+	gConsoleNode = &sSerial;
 	stdin = (FILE *)&sSerial;
 	stdout = (FILE *)&sSerial;
 	stderr = (FILE *)&sSerial;
 	return B_OK;
 }
-

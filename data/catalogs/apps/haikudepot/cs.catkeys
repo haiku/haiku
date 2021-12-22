@@ -1,14 +1,14 @@
-1	czech	x-vnd.Haiku-HaikuDepot	3544756144
+1	czech	x-vnd.Haiku-HaikuDepot	761125591
 Repository update error	LocalRepositoryUpdateProcess		Chyba aktualizace repozitářů
 Network error	ServerHelper		Chyba sítě
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Nastala chyba při aktualizaci repozitáře: %error%
 User Created	UserLoginWindow		Vytvořen uživatel
 Check for updates…	MainWindow		Zkontrolovat aktualizace…
-Uninstall	PackageManager		Odinstalovat
 Uninstalled	PackageListView		Odinstalován
 It was not possible to create the new user.	UserLoginWindow		Nepodařilo se vytvořit nového uživatele.
 Available packages	MainWindow		Dostupné balíčky
 Create account	UserLoginWindow		Vytvořit účet
+Install %PackageTitle%	PackageManager		Nainstalovat %PackageTitle%
 OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		Odpověď na captchu byla chybná.
 Develop packages	MainWindow		Vývojové balíčky
@@ -17,7 +17,6 @@ Starting the package daemon failed:\n\n%Error%	App		Spuštění služby balíčk
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Úspěšně jste se přihlásil jako uživatel %Nickname%.
 <no info>	PackageInfoView		<bez informací>
 No user ratings available.	PackageInfoView		Žádná uživatelská hodnocení.
-Downloading package '%name%'	WorkStatusView		Stahuji balíček '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nebylo možné rozbalit nezbytné informace captchy z dat odeslaných zpět ze serveru.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Při komunikaci se serverem došlo k chybě přenosu: %s
 Rating	PackageListView		Hodnocení
@@ -29,7 +28,6 @@ This application writes and reads some working files on your computer in order t
 Active	PackageListView		Aktivní
 Login or Create account	MainWindow		Přihlásit se nebo vytvořit účet
 <Package contents not available for remote packages>	PackageContentsView		<Obsah balíčku není dostupný pro vzdálené balíčky>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 balíček ke stažení},few{# balíčky ke stažení},other{# balíčků ke stažení}}
 Ratings	PackageInfoView		Hodnocení
 Switch account…	MainWindow		Přepnout účet…
 Preferred language:	UserLoginWindow		Preferovaný jazyk:
@@ -46,8 +44,6 @@ Category	FilterView		Kategorie
 User rating	RatePackageWindow		Uživatelské hodnocení
 Installed packages	MainWindow		Nainstalované balíčky
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Pořadovaný objekt nebo objekt součástí požadavku nebyl na serveru nalezen.
-Fatal error	PackageManager		Fatální chyba
-Package action failed	PackageInfoView		Akce balíčku selhala
 No changelog available.	PackageInfoView		Seznam změn není k dispozici.
 Error	App		Chyba
 There was a puzzling response from the web service.	UserLoginWindow		Přišla nejasná odpověd z webové služby.
@@ -79,7 +75,6 @@ Stability	RatePackageWindow		Stabilita
 Send	RatePackageWindow		Poslat
 Start package daemon	App		Spustit službu balíčků
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Heslo je třeba zadat znovu, aby se snížila pravděpodobnost chybného zadání hesla.
-The package action could not be scheduled: %Error%	PackageInfoView		Operaci s balíčkem nebylo možné naplánovat: %Error%
 Cancel	SettingsWindow		Zrušit
 Cancel	RatePackageWindow		Zrušit
 Inactive	PackageListView		Neaktivní
@@ -89,7 +84,6 @@ There are problems in the supplied data:	UserLoginWindow		Jsou problémy s posky
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# položka} few{# položky} other{# položek}}
 Usage conditions download problem	UserLoginWindow		Problém se stažením podmínek použití
-OK	PackageInfoView		OK
 Downloading:	PackageInfoView		Stahování:
 Quit	MainWindow		Ukončit
 Success	UserLoginWindow		Úspěch
@@ -118,7 +112,6 @@ This rating is visible to other users	RatePackageWindow		Toto hodnocení je vidi
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Nastal problém během aktualizace dat balíčku, což může způsobit, že data budou stará, nebo nebudou vůbec. Více informací lze najít v protokolech aplikace.\nJak zobrazit protokoly aplikace najdete v sekci HaikuDepot uživatelské příručky Haiku.
 View agreed usage conditions…	MainWindow		Zobrazit odsouhlasené podmínky užívání…
 Cancel	MainWindow		Zrušit
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(už jen 1 ke stažení)}other{(ještě # ke stažení)}}
 Refresh repositories	MainWindow		Obnovit repozitáře
 Continue	App		Pokračovat
 A password is required.	UserLoginWindow		Heslo je vyžadováno.
@@ -131,6 +124,7 @@ Status	PackageListView		Stav
 The password has been incorrectly repeated.	UserLoginWindow		Heslo nesouhlasí s předchozím zadaným.
 Network transport error	ServerHelper		Chyba při přenosu v síti
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Heslo zadané pro uživatele [%Nickname%] už není platné. Uživatel bude odhlášen. Přihlašte se znova s novým heslem.
+Uninstall %PackageTitle%	PackageManager		Odinstalovat %PackageTitle%
 Update	RatePackageWindow		Aktualizovat
 OK	ServerHelper		OK
 Language	UserLoginWindow		Jazyk
@@ -145,8 +139,8 @@ Source packages	MainWindow		Zdrojové balíčky
 -	no package size		-
 Problem with working files	App		Problém s pracovními soubory
 Server error	ServerHelper		Chyba na serveru
-Rate package	RatePackageWindow		Hodnocení balíčku
 Try again	App		Zkusit znovu
+Rate package	RatePackageWindow		Hodnocení balíčku
 Unknown	PackageListView		Neznámý
 I agree to the usage conditions	UserLoginWindow		Souhlasím s podmínkami užívání
 Log in	UserLoginWindow		Přihlásit
@@ -154,8 +148,8 @@ Sending anonymous usage data	MainWindow		Odesílám anonymní data o užívání
 Logged in as %User%	MainWindow		Přihlášen/a jako %User%
 Email address:	UserLoginWindow		E-mailová adresa:
 Screenshot	ScreenshotWindow		Snímek obrazovky
-A reboot is necessary to complete the installation process.	PackageManager		K dokonční instalace je třeba restart.
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		K dokonční instalace je třeba restart.
 Yes	MainWindow		Ano
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Je mi alespoň jeden rok}few{Je mi alespoň # roky}other{Je mi alespoň # let}}
 View latest usage conditions…	MainWindow		Zobrazit poslední podmínky užívání…
@@ -172,7 +166,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Stahuji data vzdá
 Description	PackageListView		Popis
 Open %DeskbarLink%	PackageManager		Otevřít %DeskbarLink%
 User creation error	UserLoginWindow		Chyba vytvoření uživatele
-Install	PackageManager		Instalovat
 Input validation	UserLoginWindow		Ověření vstupu
 Log in…	MainWindow		Přihlásit…
 You need to be logged into an account before you can rate packages.	MainWindow		K hodnocení balíčků, musíte být přihlášeni k účtu.

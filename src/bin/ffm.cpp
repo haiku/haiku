@@ -1,6 +1,6 @@
 /*
  * ffm.cpp
- * (c) 2002, Carlos Hasan, for OpenBeOS.
+ * (c) 2002, Carlos Hasan, for Haiku.
  */
 
 

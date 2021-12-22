@@ -13,8 +13,8 @@ Copy	Terminal TermWindow		Copiază
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               tipărește acest ajutor\n  -t,     --title              stabilește titlul ferestrei\n  -f,     --fullscreen         pornește ecranul complet\n  -w,     --working-directory  stabilește directorul de lucru inițial
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Editează titlul filei…
-Print	Terminal TermWindow		Tipărește
 Settings	Terminal TermWindow		Configurări
+Print	Terminal TermWindow		Tipărește
 %app% settings	Terminal PrefWindow	window title	Configurări %app%
 Use default	Terminal SetTitleWindow		Utilizează implicit
 Close tab	Terminal TermWindow		Închide fila
@@ -33,8 +33,8 @@ Defaults	Terminal PrefWindow		Implicite
 Cancel	Terminal TermView		Anulează
 Revert	Terminal PrefWindow		Revenire
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
-Use selection	Terminal FindWindow		Utilizează selecția
 Find next	Terminal TermWindow		Găsește următorul
+Use selection	Terminal FindWindow		Utilizează selecția
 Copy link location	Terminal TermView		Copiază locația legăturii
 Window title:	Terminal AppearancePrefView		Titlul ferestrei:
 New tab	Terminal TermWindow		Filă nouă
@@ -53,12 +53,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Opțiune nerecunoscută
 Tab title:	Terminal AppearancePrefView		Titlul filei:
 Text not found.	Terminal TermWindow		Textul nu a fost găsit.
 Find failed	Terminal TermWindow		Găsirea a eșuat
-Match word	Terminal FindWindow		Potrivește cuvântul
 Color scheme:	Terminal AppearancePrefView		Schemă de culori:
+Match word	Terminal FindWindow		Potrivește cuvântul
 New Terminal	Terminal TermWindow		Terminal nou
 Quit	Terminal TermWindow		Ieșire
-Match case	Terminal FindWindow		Potrivește majusculele
 Find previous	Terminal TermWindow		Găsește anteriorul
+Match case	Terminal FindWindow		Potrivește majusculele
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Modelul care specifică titlurile filelor. Următorii substituenți\npot fi utilizați:
 Close	Terminal TermWindow		Închide
 Save to file…	Terminal PrefWindow		Salvează în fișier…
@@ -80,11 +80,11 @@ Window size:	Terminal AppearancePrefView		Dimensiunea ferestrei:
 Switch Terminals	Terminal TermWindow		Comută terminalele
 Decrease	Terminal TermWindow		Micșorează
 Settings…	Terminal TermWindow		Configurări…
-Cancel	Terminal SetTitleWindow		Anulează
 Blinking cursor	Terminal AppearancePrefView		Cursor clipitor
+Cancel	Terminal SetTitleWindow		Anulează
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Modelul care specifică titlul ferestrei. Următorii substituenți\npot fi utilizați:\n
-Use text:	Terminal FindWindow		Utilizează textul:
 Close active tab	Terminal TermWindow		Închide fila activă
+Use text:	Terminal FindWindow		Utilizează textul:
 Save as default	Terminal TermWindow		Salvează ca implicit
 Nothing is selected.	Terminal TermWindow		Nu este selectat nimic.
 Use left Option as Meta key	Terminal AppearancePrefView		Utilizează opțiunea stângă ca tastă meta
@@ -112,6 +112,6 @@ Increase	Terminal TermWindow		Mărește
 OK	Terminal TermWindow		OK
 Close window	Terminal TermWindow		Închide fereastra
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nDrepturi de autor 2001-2019 Haiku, Inc.\nDrepturi de autor(C) 1999 Kazuho Okui și Takashi Murai.\n\nUtilizare: %s [OPȚIUNE] [SHELL]\n
-Solarized Light	Terminal colors scheme		Lumină solarizată
 Clear all	Terminal TermWindow		Eliberează toate
+Solarized Light	Terminal colors scheme		Lumină solarizată
 Search forward	Terminal FindWindow		Caută înainte

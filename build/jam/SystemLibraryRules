@@ -103,7 +103,7 @@ rule TargetKernelLibsupc++ asPath
 			flags += path ;
 		}
 		return [
-			BuildFeatureAttribute gcc_syslibs_devel
+			BuildFeatureAttribute QUALIFIED $(TARGET_KERNEL_ARCH):gcc_syslibs_devel
 				: libsupc++-kernel.a : $(flags)
 		] ;
 	} else {
@@ -133,6 +133,12 @@ rule TargetBootLibsupc++ asPath
 		local flags ;
 		if $(asPath) = true {
 			flags += path ;
+		}
+		if $(TARGET_PACKAGING_ARCH) = arm {
+			return [
+				BuildFeatureAttribute gcc_syslibs_devel
+					: libsupc++-boot.a : $(flags)
+			] ;
 		}
 		return [
 			BuildFeatureAttribute gcc_syslibs_devel
@@ -215,7 +221,7 @@ rule TargetKernelLibgcc asPath
 			flags += path ;
 		}
 		return [
-			BuildFeatureAttribute gcc_syslibs_devel
+			BuildFeatureAttribute QUALIFIED $(TARGET_KERNEL_ARCH):gcc_syslibs_devel
 				: libgcc-kernel.a : $(flags)
 		] ;
 	} else {
@@ -224,15 +230,15 @@ rule TargetKernelLibgcc asPath
 }
 
 
-rule TargetBootLibgcc asPath
+rule TargetBootLibgcc architecture : asPath
 {
-	# TargetBootLibgcc [ <asPath> ]
+	# TargetBootLibgcc [ architecture ] : [ <asPath> ]
 	#
 	# Returns the static bootloader libgcc for the target.
 	# Invoking with <asPath> = true will return the full library path.
 
 	if $(TARGET_PLATFORM) = haiku {
-		if $(TARGET_PACKAGING_ARCH) = x86_64 {
+		if $(architecture) = x86_64 {
 			# we need to use the 32-bit libgcc.a built by the cross-compiler
 			return $(TARGET_BOOT_LIBGCC) ;
 
@@ -246,8 +252,14 @@ rule TargetBootLibgcc asPath
 		if $(asPath) = true {
 			flags += path ;
 		}
+		if $(architecture) = arm {
+			return [
+				BuildFeatureAttribute QUALIFIED $(architecture):gcc_syslibs_devel
+					: libgcc-boot.a : $(flags)
+			] ;
+		}
 		return [
-			BuildFeatureAttribute gcc_syslibs_devel
+			BuildFeatureAttribute QUALIFIED $(architecture):gcc_syslibs_devel
 				: libgcc-kernel.a : $(flags)
 		] ;
 	} else {
@@ -292,7 +304,7 @@ rule TargetKernelLibgcceh asPath
 			flags += path ;
 		}
 		return [
-			BuildFeatureAttribute gcc_syslibs_devel
+			BuildFeatureAttribute QUALIFIED $(TARGET_KERNEL_ARCH):gcc_syslibs_devel
 				: libgcc_eh-kernel.a : $(flags)
 		] ;
 	} else {

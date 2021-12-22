@@ -1,11 +1,11 @@
-1	spanish; castilian	x-vnd.Haiku-Time	834234238
+1	spanish; castilian	x-vnd.Haiku-Time	3691539601
 OK	Time		Aceptar
 Message receiving failed	Time		Fallo en la recepción del mensaje
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Fecha y hora, escrito por:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\n Copyright 2004-2012, Haiku.
 Australia	Time		Australia
 America	Time		América
 Reset to default server list	Time		Reestablecer a la lista de servidores por defecto
 Could not resolve server address	Time		No se pudo ubicar la dirección del servidor
+Time & Date	System name		Fecha y hora
 Set time zone	Time		Definir zona horaria
 Waiting for answer failed	Time		Fallo en la espera de respuesta
 <Other>	Time		<Otro>
@@ -38,7 +38,6 @@ Atlantic	Time		Atlántico
 Show clock in Deskbar	Time		Mostrar reloj en la barra de escritorio
 Display time with seconds	Time		Mostrar hora con segundos
 Time	System name		Hora
-about	Time		sobre
 Show time zone	Time		Mostrar huso horario:
 Synchronize at boot	Time		Sincronizar al inicio
 Indian	Time		Hindú

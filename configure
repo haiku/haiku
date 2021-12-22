@@ -450,7 +450,7 @@ check_native_xattrs()
 			xattr_set="setextattr"; xattr_set_args="user \$NAME \"\$VALUE\""
 			xattr_get="getextattr"; xattr_get_args="user \$NAME"
 			;;
-		linux|msys)
+		linux)
 			xattr_set="setfattr"; xattr_set_args="-n user.\$NAME -v \"\$VALUE\""
 			xattr_get="getfattr"; xattr_get_args="-n user.\$NAME"
 			;;
@@ -601,7 +601,6 @@ case "${platform}" in
 	Haiku)   HOST_PLATFORM=haiku_host ;;
 	Linux)   HOST_PLATFORM=linux ;;
 	OpenBSD) HOST_PLATFORM=openbsd ;;
-	MSYS*)   HOST_PLATFORM=msys ;;
 	*)       echo Unsupported platform: ${platform}
 	         exit 1 ;;
 esac
@@ -1040,12 +1039,9 @@ else
 			get_build_tool_path ELFEDIT_$targetArch elfedit
 		elif [ -n "$crossToolsPrefix" ]; then
 			get_build_tool_path LD_$targetArch ${crossToolsPrefix}ld
-			case `get_variable HAIKU_GCC_RAW_VERSION_$targetArch` in
-				4.*|5.*|6.*|7.*|8.*)
-					get_build_tool_path ELFEDIT_$targetArch \
-						${crossToolsPrefix}elfedit
-				;;
-			esac
+			if [ `get_variable HAIKU_CC_IS_LEGACY_GCC_$targetArch` -eq 0 ]; then
+				get_build_tool_path ELFEDIT_$targetArch ${crossToolsPrefix}elfedit
+			fi
 		fi
 		if [ -n "$crossToolsPrefix" ]; then
 			get_build_tool_path AR_$targetArch ${crossToolsPrefix}ar

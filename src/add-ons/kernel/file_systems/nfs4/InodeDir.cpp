@@ -122,7 +122,7 @@ Inode::FillDirEntry(struct dirent* de, ino_t id, const char* name, uint32 pos,
 	ASSERT(name != NULL);
 
 	uint32 nameSize = strlen(name) + 1;
-	const uint32 entSize = sizeof(struct dirent);
+	const uint32 entSize = offsetof(struct dirent, d_name);
 
 	if (pos + entSize + nameSize > size)
 		return B_BUFFER_OVERFLOW;

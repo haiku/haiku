@@ -11,27 +11,27 @@
 //   Ithamar R. Adema
 //   Michael Pfeiffer
 //
-// This application and all source files used in its construction, except 
-// where noted, are licensed under the MIT License, and have been written 
+// This application and all source files used in its construction, except
+// where noted, are licensed under the MIT License, and have been written
 // and are:
 //
-// Copyright (c) 2001, 2002 OpenBeOS Project
+// Copyright (c) 2001, 2002 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
+// the rights to use, copy, modify, merge, publish, distribute, sublicense,
+// and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included 
+// The above copyright notice and this permission notice shall be included
 // in all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 // OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
@@ -59,7 +59,7 @@ public:
 	// After construction reference count is 1
 	Object() : fRefCount(1) { }
 	// dtor should be private, but ie. ObjectList requires a public dtor!
-	virtual ~Object() { };
+	virtual ~Object();
 
 	// thread-safe as long as thread that calls Acquire has already
 	// a reference to the object
@@ -81,7 +81,7 @@ public:
 class AutoReply {
 	BMessage* fSender;
 	BMessage  fReply;
-	
+
 public:
 	AutoReply(BMessage* sender, uint32 what);
 	~AutoReply();

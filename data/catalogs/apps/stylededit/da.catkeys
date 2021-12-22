@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-StyledEdit	2796309255
+1	danish	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Dokumentets statistiker
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan ikke tilbageføre, fil ikke fundet: \"%s\".
 Cut	Menus		Klip
@@ -51,6 +51,7 @@ OK	SaveAlert		OK
 Color	Menus		Farve
 Save changes to the document \"%s\"? 	QuitAlert		Gem ændringer til dokumentet \"%s\"? 
 StyledEdit	System name		StyledEdit
+Underline	Menus		Understreget
 Find:	FindandReplaceWindow		Find:
 Undo typing	QuitAlert		Fortryd skrivning
 Error loading \"%s\":\n\t%s	LoadAlert		Fejl ved indlæsning af \"%s\":\n\t%s

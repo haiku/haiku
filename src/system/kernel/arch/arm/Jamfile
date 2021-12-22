@@ -35,6 +35,8 @@ KernelMergeObject kernel_arch_arm.o :
 	arch_atomic64.cpp
 	arch_atomic32.cpp
 
+	arch_int_gicv2.cpp
+
 	# SoC minimal kernel-required support
 	# (timers, interrupts, rtc?)
 	soc.cpp
@@ -58,5 +60,5 @@ KernelMergeObject kernel_arch_arm.o :
 	kernel_fdt.a
 ;
 
-CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp ;
+CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp : $(TARGET_KERNEL_ARCH) ;
 

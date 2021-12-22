@@ -470,6 +470,15 @@ void ntfs_xattr_free_mapping(struct XATTRMAPPING *mapping)
 
 #endif /* XATTR_MAPPINGS */
 
+/*
+ *		Get an NTFS attribute into an extended attribute
+ *
+ *	Returns the non-negative size of attribute if successful,
+ *	        or negative, with errno set, when fails
+ *	Note : the size is returned even if no buffer is provided
+ *	for returning the attribute, or if it is zero-sized.
+ */
+
 int ntfs_xattr_system_getxattr(struct SECURITY_CONTEXT *scx,
 			enum SYSTEMXATTRS attr,
 			ntfs_inode *ni, ntfs_inode *dir_ni,
@@ -483,12 +492,6 @@ int ntfs_xattr_system_getxattr(struct SECURITY_CONTEXT *scx,
 #endif
 #endif
 
-				/*
-				 * the returned value is the needed
-				 * size. If it is too small, no copy
-				 * is done, and the caller has to
-				 * issue a new call with correct size.
-				 */
 	switch (attr) {
 	case XATTR_NTFS_ACL :
 		res = ntfs_get_ntfs_acl(scx, ni, value, size);
@@ -596,6 +599,13 @@ int ntfs_xattr_system_getxattr(struct SECURITY_CONTEXT *scx,
 	return (res);
 }
 
+/*
+ *		Set an NTFS attribute from an extended attribute
+ *
+ *	Returns 0 if successful,
+ *	        non-zero, with errno set, when fails
+ */
+
 int ntfs_xattr_system_setxattr(struct SECURITY_CONTEXT *scx,
 			enum SYSTEMXATTRS attr,
 			ntfs_inode *ni, ntfs_inode *dir_ni,
@@ -669,8 +679,10 @@ int ntfs_xattr_system_setxattr(struct SECURITY_CONTEXT *scx,
 	case XATTR_NTFS_EFSINFO :
 		if (ni->vol->efs_raw)
 			res = ntfs_set_efs_info(ni, value, size, flags);
-		else
+		else {
+			errno = EPERM;
 			res = -EPERM;
+		}
 		break;
 	case XATTR_NTFS_REPARSE_DATA :
 		res = ntfs_set_ntfs_reparse_data(ni, value, size, flags);
@@ -683,8 +695,10 @@ int ntfs_xattr_system_setxattr(struct SECURITY_CONTEXT *scx,
 		/* warning : this closes both inodes */
 			res = ntfs_set_ntfs_dos_name(ni, dir_ni, value,
 						size, flags);
-		else
+		else {
+			errno = EINVAL;
 			res = -errno;
+		}
 		break;
 	case XATTR_NTFS_TIMES:
 		res = ntfs_inode_set_times(ni, value, size, flags);

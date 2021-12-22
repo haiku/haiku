@@ -24,7 +24,7 @@ Slow motion	ChartWindow		Câmera lenta
  5% (low)	ChartWindow		 5% (baixo)
 Fast motion	ChartWindow		Câmera rápida
 Special	ChartWindow		Especial
-Status	ChartWindow		Status
+Status	ChartWindow		Estado
 Star density	ChartWindow		Densidade de estrela
 600.0 f/s	ChartWindow		600.0 f/s
 Display:	ChartWindow		Exibição:

@@ -12,8 +12,8 @@ Solarized Dark	Terminal colors scheme		Solarizzato (Scuro)
 Copy	Terminal TermWindow		Copia
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Modifica titolo pannello...
-Print	Terminal TermWindow		Stampa
 Settings	Terminal TermWindow		Impostazioni
+Print	Terminal TermWindow		Stampa
 %app% settings	Terminal PrefWindow	window title	Impostazioni %app%
 Use default	Terminal SetTitleWindow		Usa predefinito
 Close tab	Terminal TermWindow		Chiudi pannello
@@ -32,8 +32,8 @@ Defaults	Terminal PrefWindow		Predefiniti
 Cancel	Terminal TermView		Annulla
 Revert	Terminal PrefWindow		Ripristina
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminale
-Use selection	Terminal FindWindow		Utilizza selezione
 Find next	Terminal TermWindow		Trova seguente
+Use selection	Terminal FindWindow		Utilizza selezione
 Copy link location	Terminal TermView		Copia posizione collegamento
 Window title:	Terminal AppearancePrefView		Titolo finestra
 New tab	Terminal TermWindow		Nuovo pannello
@@ -52,12 +52,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Opzione non riconosciut
 Tab title:	Terminal AppearancePrefView		Titolo pannello:
 Text not found.	Terminal TermWindow		Testo non trovato.
 Find failed	Terminal TermWindow		Ricerca fallita
-Match word	Terminal FindWindow		Parola intera
 Color scheme:	Terminal AppearancePrefView		Schema di colore:
+Match word	Terminal FindWindow		Parola intera
 New Terminal	Terminal TermWindow		Nuovo Terminale
 Quit	Terminal TermWindow		Esci
-Match case	Terminal FindWindow		Sensibile alle maiuscole/minuscole
 Find previous	Terminal TermWindow		Trova precedente
+Match case	Terminal FindWindow		Sensibile alle maiuscole/minuscole
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Lo schema utilizzato per specificare i titoli dei pennelli. I seguenti segnaposto\npossono essere utilizzati:
 Close	Terminal TermWindow		Chiudi
 Save to file…	Terminal PrefWindow		Salva su file…
@@ -79,11 +79,11 @@ Window size:	Terminal AppearancePrefView		Dimensioni della finestra:
 Switch Terminals	Terminal TermWindow		Scambia Terminali
 Decrease	Terminal TermWindow		Riduci
 Settings…	Terminal TermWindow		Impostazioni…
-Cancel	Terminal SetTitleWindow		Cancella
 Blinking cursor	Terminal AppearancePrefView		Cursore lampeggiante
+Cancel	Terminal SetTitleWindow		Cancella
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Lo schema utilizzato per specificare il titolo della finestra. I seguenti segnaposto \npossono essere utilizzati:\n
-Use text:	Terminal FindWindow		Utilizza testo:
 Close active tab	Terminal TermWindow		Chiudi pannello attivo
+Use text:	Terminal FindWindow		Utilizza testo:
 Save as default	Terminal TermWindow		Salva come predefinito
 Nothing is selected.	Terminal TermWindow		Nulla è selezionato.
 Use left Option as Meta key	Terminal AppearancePrefView		Usa il tasto Opzione di sinistra come tasto Meta
@@ -111,6 +111,6 @@ Increase	Terminal TermWindow		Aumenta
 OK	Terminal TermWindow		OK
 Close window	Terminal TermWindow		Chiudi finestra
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminale di HAiku\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUso: %s [OPTION] [SHELL]\n
-Solarized Light	Terminal colors scheme		Solarizzato (Chiaro)
 Clear all	Terminal TermWindow		Ripulisci tutto
+Solarized Light	Terminal colors scheme		Solarizzato (Chiaro)
 Search forward	Terminal FindWindow		Cerca avanti

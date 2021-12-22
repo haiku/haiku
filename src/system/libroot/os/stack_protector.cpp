@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <sys/cdefs.h>
 
+#include "private/system/symbol_visibility.h"
+
 
 extern "C" {
 
@@ -41,6 +43,7 @@ __init_stack_protector()
 void
 __stack_chk_fail()
 {
+	HIDDEN_FUNCTION(__stack_chk_fail_local);
 	sigset_t mask;
 	sigfillset(&mask);
 	sigdelset(&mask, SIGABRT);
@@ -51,8 +54,5 @@ __stack_chk_fail()
 
 }
 
-
-#if __GNUC__ >= 4
-extern "C" void __stack_chk_fail_local() __attribute__((visibility("hidden")));
+extern "C" void __stack_chk_fail_local() HIDDEN_FUNCTION_ATTRIBUTE;
 __weak_reference(__stack_chk_fail, __stack_chk_fail_local);
-#endif

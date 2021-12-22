@@ -3,7 +3,7 @@
  *
  *	This module is part of ntfs-3g library
  *
- * Copyright (c) 2009 Jean-Pierre Andre
+ * Copyright (c) 2009-2019 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -63,9 +63,13 @@
  *	significant byte first, and the six fields be compared individually
  *	for ordering. RFC 4122 does not define the internal representation.
  *
+ *	Windows apparently stores the first three fields in little endian
+ *	order, and the last two fields in big endian order.
+ *
  *	Here we always copy disk images with no endianness change,
  *	and, for indexing, GUIDs are compared as if they were a sequence
- *	of four unsigned 32 bit integers.
+ *	of four little-endian unsigned 32 bit integers (as Windows
+ *	does it that way.)
  *
  * --------------------- begin from RFC 4122 ----------------------
  * Consider each field of the UUID to be an unsigned integer as shown
@@ -329,7 +333,7 @@ static int update_object_id(ntfs_inode *ni, ntfs_index_context *xo,
 
 	na = ntfs_attr_open(ni, AT_OBJECT_ID, AT_UNNAMED, 0);
 	if (na) {
-
+		memset(&old_attr, 0, sizeof(OBJECT_ID_ATTR));
 			/* remove the existing index entry */
 		oldsize = remove_object_id_index(na,xo,&old_attr);
 		if (oldsize < 0)
@@ -349,10 +353,12 @@ static int update_object_id(ntfs_inode *ni, ntfs_index_context *xo,
 					res = -1;
 				}
 			}
-				/* write index part if provided */
+				/* overwrite index data with new value */
+			memcpy(&old_attr, value,
+				(size < sizeof(OBJECT_ID_ATTR)
+					? size : sizeof(OBJECT_ID_ATTR)));
 			if (!res
-			    && ((size < sizeof(OBJECT_ID_ATTR))
-				 || set_object_id_index(ni,xo,value))) {
+			    && set_object_id_index(ni,xo,&old_attr)) {
 				/*
 				 * If cannot index, try to remove the object
 				 * id and log the error. There will be an
@@ -500,9 +506,11 @@ int ntfs_get_ntfs_object_id(ntfs_inode *ni, char *value, size_t size)
 /*
  *		Set the object id from an extended attribute
  *
- *	If the size is 64, the attribute and index are set.
- *	else if the size is not less than 16 only the attribute is set.
- *	The object id index is set accordingly.
+ *	The first 16 bytes are the new object id, they can be followed
+ *	by the birth volume id, the birth object id and the domain id.
+ *	If they are not present, their previous value is kept.
+ *	Only the object id is stored into the attribute, all the fields
+ *	are stored into the index.
  *
  *	Returns 0, or -1 if there is a problem
  */
@@ -519,10 +527,12 @@ int ntfs_set_ntfs_object_id(ntfs_inode *ni,
 	if (ni && value && (size >= sizeof(GUID))) {
 		xo = open_object_id_index(ni->vol);
 		if (xo) {
-			/* make sure the GUID was not used somewhere */
+			/* make sure the GUID was not used elsewhere */
 			memcpy(&key.object_id, value, sizeof(GUID));
-			if (ntfs_index_lookup(&key,
-					sizeof(OBJECT_ID_INDEX_KEY), xo)) {
+			if ((ntfs_index_lookup(&key,
+					sizeof(OBJECT_ID_INDEX_KEY), xo))
+			    || (MREF_LE(((struct OBJECT_ID_INDEX*)xo->entry)
+					->data.file_id) == ni->mft_no)) {
 				ntfs_index_ctx_reinit(xo);
 				res = add_object_id(ni, flags);
 				if (!res) {

@@ -1,14 +1,14 @@
-1	french	x-vnd.Haiku-HaikuDepot	3763775264
+1	french	x-vnd.Haiku-HaikuDepot	761125591
 Repository update error	LocalRepositoryUpdateProcess		Erreur à l’actualisation du dépôt
 Network error	ServerHelper		Erreur réseau
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
 User Created	UserLoginWindow		Utilisateur créé
 Check for updates…	MainWindow		Vérifier les mises à jour…
-Uninstall	PackageManager		Désinstaller
 Uninstalled	PackageListView		Désinstallé
 It was not possible to create the new user.	UserLoginWindow		Impossible de créer le nouvel utilisateur.
 Available packages	MainWindow		Paquets disponibles
 Create account	UserLoginWindow		Créer un compte
+Install %PackageTitle%	PackageManager		Installer %PackageTitle%
 OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		Réponse incorrecte au Captcha.
 Develop packages	MainWindow		Paquets de développement
@@ -17,7 +17,6 @@ Starting the package daemon failed:\n\n%Error%	App		Le démarrage du serveur de 
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Vous êtes désormais authentifié en tant que %Nickname%.
 <no info>	PackageInfoView		<pas d’info>
 No user ratings available.	PackageInfoView		Aucun avis d’utilisateurs.
-Downloading package '%name%'	WorkStatusView		Téléchargement du paquet « %name% »
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Il n’a pas été possible d’extraire les informations Captcha nécessaires depuis les données renvoyées par le serveur.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Une erreur de transport réseau est survenue lors de la communication avec le serveur : %s
 Rating	PackageListView		Évaluation
@@ -29,7 +28,6 @@ This application writes and reads some working files on your computer in order t
 Active	PackageListView		Actif
 Login or Create account	MainWindow		Se connecter ou créer un compte
 <Package contents not available for remote packages>	PackageContentsView		<Contenu du paquet indisponible pour les paquets distants>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 paquet à télécharger}other{# paquets à télécharger}}
 Ratings	PackageInfoView		Évaluations
 Switch account…	MainWindow		Changer de compte…
 Preferred language:	UserLoginWindow		Langue préférée :
@@ -46,8 +44,6 @@ Category	FilterView		Catégorie
 User rating	RatePackageWindow		Avis de l’utilisateur
 Installed packages	MainWindow		Paquets installés
 A requested object or an object involved in the request was not found on the server.	ServerHelper		L’objet demandé ou l’objet associé à la requête n’a pas été trouvé sur le serveur.
-Fatal error	PackageManager		Erreur fatale
-Package action failed	PackageInfoView		L’action du paquet a échouée
 No changelog available.	PackageInfoView		La liste des modifications n’est pas disponible.
 Error	App		Erreur
 There was a puzzling response from the web service.	UserLoginWindow		La réponse du service web est incompréhensible.
@@ -79,7 +75,6 @@ Stability	RatePackageWindow		Stabilité
 Send	RatePackageWindow		Envoyer
 Start package daemon	App		Démarrer le serveur de paquets
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Le mot de passe doit être répété afin de réduire le risque d’une saisie erronée.
-The package action could not be scheduled: %Error%	PackageInfoView		L’action du paquet n’a pas pu être planifiée : %Error%
 Cancel	SettingsWindow		Annuler
 Cancel	RatePackageWindow		Annuler
 Inactive	PackageListView		Inactif
@@ -117,7 +112,6 @@ This rating is visible to other users	RatePackageWindow		Cette note est visible 
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Lors de la mise à jour des données du paquet, un problème est apparu qui peut entraîner l’affichage de données obsolètes ou manquantes dans l’application. Des détails supplémentaires concernant ce problème peuvent être obtenus à partir des journaux d’application.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide de l’utilisateur Haiku.
 View agreed usage conditions…	MainWindow		Voir les conditions d’utilisation acceptées…
 Cancel	MainWindow		Annuler
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 de plus à télécharger)}other{(# de plus à télécharger)}}
 Refresh repositories	MainWindow		Rafraîchir les dépôts
 Continue	App		Continuer
 A password is required.	UserLoginWindow		Un mot de passe est requis.
@@ -130,6 +124,7 @@ Status	PackageListView		État
 The password has been incorrectly repeated.	UserLoginWindow		Le mot de passe a été répété de manière incorrecte.
 Network transport error	ServerHelper		Erreur de transport réseau
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Le mot de passe précédemment fourni pour l’utilisateur [%Nickname%] n’est plus valable. L’utilisateur sera déconnecté de cette application et vous devrez vous reconnecter avec votre nouveau mot de passe.
+Uninstall %PackageTitle%	PackageManager		Désinstaller %PackageTitle%
 Update	RatePackageWindow		Mettre à jour
 OK	ServerHelper		OK
 Language	UserLoginWindow		Langue
@@ -144,8 +139,8 @@ Source packages	MainWindow		Paquets sources
 -	no package size		-
 Problem with working files	App		Problème avec les fichiers de travail
 Server error	ServerHelper		Erreur du serveur
-Rate package	RatePackageWindow		Évaluer le paquet
 Try again	App		Essayer à nouveau
+Rate package	RatePackageWindow		Évaluer le paquet
 Unknown	PackageListView		Inconnu
 I agree to the usage conditions	UserLoginWindow		J’accepte les conditions d’utilisation
 Log in	UserLoginWindow		Connexion
@@ -153,8 +148,8 @@ Sending anonymous usage data	MainWindow		Envoi de données d’utilisation anony
 Logged in as %User%	MainWindow		Connecté en tant que %User%
 Email address:	UserLoginWindow		Adresse e-mail :
 Screenshot	ScreenshotWindow		Capture d’écran
-A reboot is necessary to complete the installation process.	PackageManager		Un redémarrage est nécessaire pour terminer le processus d’installation.
 HaikuDepot	System name		DépôtHaiku
+A reboot is necessary to complete the installation process.	PackageManager		Un redémarrage est nécessaire pour terminer le processus d’installation.
 Yes	MainWindow		Oui
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Je suis âgé d’au moins un an}other{j’ai plus de # ans}}
 View latest usage conditions…	MainWindow		Voir les dernières conditions d’utilisation…
@@ -171,7 +166,6 @@ Fetching remote repository data	LocalRepositoryUpdateProcess		Récupération des
 Description	PackageListView		Description
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
 User creation error	UserLoginWindow		Erreur à la création de l’utilisateur
-Install	PackageManager		Installer
 Input validation	UserLoginWindow		Validation des entrées
 Log in…	MainWindow		Connexion…
 You need to be logged into an account before you can rate packages.	MainWindow		Vous devez vous authentifier pour évaluer les paquets.

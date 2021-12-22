@@ -48,10 +48,13 @@ public:
 
 	const string &Name() const		{ return fName; }
 	int32 Offset() const			{ return fOffset; }
+	bool InOut() const				{ return fInOut; }
+	void SetInOut(bool inout)		{ fInOut = inout; }
 
 private:
 	string	fName;
 	int32	fOffset;
+	bool	fInOut;
 };
 
 // Syscall

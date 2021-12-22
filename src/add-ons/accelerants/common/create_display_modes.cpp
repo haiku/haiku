@@ -18,7 +18,7 @@
 	(B_POSITIVE_HSYNC | B_POSITIVE_VSYNC)
 #define MODE_FLAGS \
 	(B_8_BIT_DAC | B_HARDWARE_CURSOR | B_PARALLEL_ACCESS | B_DPMS \
-		| B_SUPPORTS_OVERLAYS)
+		| B_SUPPORTS_OVERLAYS | B_SCROLL)
 
 // TODO: move this list into the app_server
 static const display_mode kBaseModeList[] = {

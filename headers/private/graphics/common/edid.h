@@ -25,18 +25,30 @@ typedef struct {
 	uint8 revision;
 } edid1_version;
 
+// analog input parameters
+typedef struct {
+	uint8 input_voltage;	// 0=0.7V/0.3V, 1=0.714V/0.286,
+				// 2=1V/0.4V, 3=0.7V/0V
+	bool setup;		// true if voltage configurable
+	bool sep_sync;
+	bool comp_sync;
+	bool sync_on_green;
+	bool sync_serr;
+} edid1_analog_params;
+
+
+// digital input parameters
+typedef struct {
+	uint8 bit_depth;
+	uint8 interface;
+} edid1_digital_params;
+
 // display info
 typedef struct {
-	BBITFIELD8_7 ( 
-		input_type : 1,		// 1 : digital
-		input_voltage : 2,	// 0=0.7V/0.3V, 1=0.714V/0.286, 
-							// 2=1V/0.4V, 3=0.7V/0V
-		setup : 1,			// true if voltage configurable
-		sep_sync : 1,
-		comp_sync : 1,
-		sync_on_green : 1,
-		sync_serr : 1
-	);
+	uint8 input_type;
+	edid1_analog_params analog_params;
+	edid1_digital_params digital_params;
+
 	uint8 h_size;
 	uint8 v_size;
 	uint8 gamma;	// (x+100)/100

@@ -491,6 +491,8 @@ do_next_sb:
 	 * first two checks do not detect it.
 	 */
 	if (cb == cb_end || !le16_to_cpup((le16*)cb) || dest == dest_end) {
+		if (dest_end > dest)
+			memset(dest, 0, dest_end - dest);
 		ntfs_log_debug("Completed. Returning success (0).\n");
 		return 0;
 	}
@@ -750,6 +752,12 @@ s64 ntfs_compressed_attr_pread(ntfs_attr *na, s64 pos, s64 count, void *b)
 	/* If it is a resident attribute, simply use ntfs_attr_pread(). */
 	if (!NAttrNonResident(na))
 		return ntfs_attr_pread(na, pos, count, b);
+	if (na->compression_block_size < NTFS_SB_SIZE) {
+		ntfs_log_error("Unsupported compression block size %ld\n",
+				(long)na->compression_block_size);
+		errno = EOVERFLOW;
+		return (-1);
+	}
 	total = total2 = 0;
 	/* Zero out reads beyond initialized size. */
 	if (pos + count > na->initialized_size) {
@@ -1616,7 +1624,7 @@ static int ntfs_read_append(ntfs_attr *na, const runlist_element *rl,
  */
 
 static s32 ntfs_flush(ntfs_attr *na, runlist_element *rl, s64 offs,
-			const char *outbuf, s32 count, BOOL compress,
+			char *outbuf, s32 count, BOOL compress,
 			BOOL appending, VCN *update_from)
 {
 	s32 rounded;
@@ -1637,6 +1645,8 @@ static s32 ntfs_flush(ntfs_attr *na, runlist_element *rl, s64 offs,
 	if (!compress) {
 		clsz = 1 << na->ni->vol->cluster_size_bits;
 		rounded = ((count - 1) | (clsz - 1)) + 1;
+		if (rounded > count)
+			memset(&outbuf[count], 0, rounded - count);
 		written = write_clusters(na->ni->vol, rl,
 				offs, rounded, outbuf);
 		if (written != rounded)
@@ -1696,6 +1706,12 @@ s64 ntfs_compressed_pwrite(ntfs_attr *na, runlist_element *wrl, s64 wpos,
 	if (na->unused_runs < 2) {
 		ntfs_log_error("No unused runs for compressed write\n");
 		errno = EIO;
+		return (-1);
+	}
+	if (na->compression_block_size < NTFS_SB_SIZE) {
+		ntfs_log_error("Unsupported compression block size %ld\n",
+				(long)na->compression_block_size);
+		errno = EOVERFLOW;
 		return (-1);
 	}
 	if (wrl->vcn < *update_from)
@@ -1877,6 +1893,12 @@ int ntfs_compressed_close(ntfs_attr *na, runlist_element *wrl, s64 offs,
 	if (*update_from < 0) {
 		ntfs_log_error("Bad update vcn for compressed close\n");
 		errno = EIO;
+		return (-1);
+	}
+	if (na->compression_block_size < NTFS_SB_SIZE) {
+		ntfs_log_error("Unsupported compression block size %ld\n",
+				(long)na->compression_block_size);
+		errno = EOVERFLOW;
 		return (-1);
 	}
 	if (wrl->vcn < *update_from)

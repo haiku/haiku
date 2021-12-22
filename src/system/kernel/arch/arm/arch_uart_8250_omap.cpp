@@ -8,7 +8,7 @@
 
 
 #include <arch/arm/reg.h>
-#include <arch/arm/debug_uart_8250_omap.h>
+#include <arch/arm/arch_uart_8250_omap.h>
 #include <debug.h>
 #include <omap3.h>
 #include <new>

@@ -24,7 +24,12 @@
 #ifndef IOCTL_H
 #define IOCTL_H
 
-int ntfs_ioctl(ntfs_inode *ni, int cmd, void *arg,
+/*
+ * Using an "unsigned long cmd" internally, like in <sys/ioctl.h> for Linux
+ * Note however that fuse truncates the arg to 32 bits, and that
+ * some commands (e.g. FITRIM) do not fit in a signed 32 bit field.
+ */
+int ntfs_ioctl(ntfs_inode *ni, unsigned long cmd, void *arg,
                         unsigned int flags, void *data);
 
 #endif /* IOCTL_H */

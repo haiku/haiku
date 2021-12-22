@@ -32,15 +32,6 @@ enum port_type {
 	INTEL_PORT_TYPE_HDMI
 };
 
-enum port_index {
-	INTEL_PORT_ANY,				// wildcard for lookup functions
-	INTEL_PORT_A,
-	INTEL_PORT_B,
-	INTEL_PORT_C,
-	INTEL_PORT_D,
-	INTEL_PORT_E
-};
-
 
 class Port {
 public:
@@ -190,7 +181,7 @@ virtual	addr_t						_DDCRegister();
 virtual	addr_t						_PortRegister();
 
 private:
-		status_t					_SetPortLinkGen4(display_mode* target);
+		status_t					_SetPortLinkGen4(const display_timing& timing);
 };
 
 
@@ -226,6 +217,9 @@ virtual	addr_t						_DDCRegister();
 virtual addr_t						_PortRegister();
 private:
 		uint8						fMaxLanes;
+
+		status_t					_SetPortLinkGen8(const display_timing& timing,
+										uint32 pllSel);
 };
 
 

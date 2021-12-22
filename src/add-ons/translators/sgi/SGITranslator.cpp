@@ -158,7 +158,7 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 // ---------------------------------------------------------------
 SGITranslator::SGITranslator()
 	:
-	BaseTranslator(B_TRANSLATE("SGI images"), 
+	BaseTranslator(B_TRANSLATE("SGI images"),
 		B_TRANSLATE("SGI image translator"),
 		SGI_TRANSLATOR_VERSION,
 		sInputFormats, kNumInputFormats,
@@ -421,7 +421,7 @@ SGITranslator::translate_from_bits(BPositionIO *inSource, uint32 outType,
 						ret = sgiImage->WriteRow(rows[z], y, z);
 						if (ret < B_OK) {
 							syslog(LOG_ERR,
-								"WriteRow() returned %s!\n"), strerror(ret);
+								"WriteRow() returned %s!\n", strerror(ret));
 							break;
 						}
 					}
@@ -507,7 +507,7 @@ SGITranslator::translate_from_sgi(BPositionIO *inSource, uint32 outType,
 				sizeof(TranslatorBitmap), B_SWAP_HOST_TO_BENDIAN)) < B_OK) {
 				return ret;
 			} else
-				ret = outDestination->Write(&bitsHeader, 
+				ret = outDestination->Write(&bitsHeader,
 					sizeof(TranslatorBitmap));
 		}
 		if (ret < B_OK)
@@ -748,6 +748,6 @@ SGITranslator::DerivedTranslate(BPositionIO *inSource,
 BView *
 SGITranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return new SGIView(B_TRANSLATE("SGITranslator Settings"), B_WILL_DRAW, 
+	return new SGIView(B_TRANSLATE("SGITranslator Settings"), B_WILL_DRAW,
 		settings);
 }

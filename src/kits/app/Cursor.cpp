@@ -96,20 +96,21 @@ BCursor::BCursor(const BBitmap* bitmap, const BPoint& hotspot)
 	if (bitmap == NULL)
 		return;
 
-	int32 size = bitmap->BitsLength();
 	BRect bounds = bitmap->Bounds();
 	color_space colorspace = bitmap->ColorSpace();
 	void* bits = bitmap->Bits();
+	int32 size = bitmap->BitsLength();
 	if (bits == NULL || size <= 0)
 		return;
 
 	// Send data directly to server
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_CREATE_CURSOR_BITMAP);
-	link.Attach<int32>(size);
 	link.Attach<BRect>(bounds);
-	link.Attach<color_space>(colorspace);
 	link.Attach<BPoint>(hotspot);
+	link.Attach<color_space>(colorspace);
+	link.Attach<int32>(bitmap->BytesPerRow());
+	link.Attach<int32>(size);
 	link.Attach(bits, size);
 
 	status_t status;

@@ -48,8 +48,8 @@ status_t load_settings(void)
 	sync_unlink_queries = get_driver_boolean_parameter(handle, "sync_unlink", false, true);
 
 	dprintf("googlefs: settings: server = %s\n", google_server);
-	dprintf("googlefs: settings: max_nodes = %lu\n", max_vnodes);
-	dprintf("googlefs: settings: max_results = %lu\n", max_results);
+	dprintf("googlefs: settings: max_nodes = %" B_PRIu32 "\n", max_vnodes);
+	dprintf("googlefs: settings: max_results = %" B_PRIu32 " \n", max_results);
 	dprintf("googlefs: settings: sync_unlink = %c\n", sync_unlink_queries?'t':'f');
 	unload_driver_settings(handle);
 	return B_OK;

@@ -23,7 +23,7 @@ Pipe::~Pipe()
 {
 	PutUSBID();
 
-	CancelQueuedTransfers(true);
+	Pipe::CancelQueuedTransfers(true);
 	GetBusManager()->NotifyPipeChange(this, USB_CHANGE_DESTROYED);
 }
 
@@ -68,6 +68,9 @@ Pipe::SetHubInfo(int8 address, uint8 port)
 status_t
 Pipe::SubmitTransfer(Transfer *transfer)
 {
+	if (USBID() == UINT32_MAX)
+		return B_NO_INIT;
+
 	// ToDo: keep track of all submited transfers to be able to cancel them
 	return GetBusManager()->SubmitTransfer(transfer);
 }
@@ -84,11 +87,7 @@ status_t
 Pipe::SetFeature(uint16 selector)
 {
 	TRACE("set feature %u\n", selector);
-	Device *device = (Device *)Parent();
-	if (device->InitCheck() != B_OK)
-		return B_NO_INIT;
-
-	return device->DefaultPipe()->SendRequest(
+	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
 		USB_REQUEST_SET_FEATURE,
 		selector,
@@ -104,16 +103,12 @@ Pipe::SetFeature(uint16 selector)
 status_t
 Pipe::ClearFeature(uint16 selector)
 {
-	Device *device = (Device *)Parent();
-	if (device->InitCheck() != B_OK)
-		return B_NO_INIT;
-
 	// clearing a stalled condition resets the data toggle
 	if (selector == USB_FEATURE_ENDPOINT_HALT)
 		SetDataToggle(false);
 
 	TRACE("clear feature %u\n", selector);
-	return device->DefaultPipe()->SendRequest(
+	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
 		USB_REQUEST_CLEAR_FEATURE,
 		selector,
@@ -130,11 +125,7 @@ status_t
 Pipe::GetStatus(uint16 *status)
 {
 	TRACE("get status\n");
-	Device *device = (Device *)Parent();
-	if (device->InitCheck() != B_OK)
-		return B_NO_INIT;
-
-	return device->DefaultPipe()->SendRequest(
+	return ((Device *)Parent())->DefaultPipe()->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_IN,
 		USB_REQUEST_GET_STATUS,
 		0,
@@ -346,6 +337,11 @@ ControlPipe::ControlPipe(Object *parent)
 
 ControlPipe::~ControlPipe()
 {
+	// We do this here in case a submitted request is still running.
+	PutUSBID(false);
+	ControlPipe::CancelQueuedTransfers(true);
+	WaitForUnbusy();
+
 	if (fNotifySem >= 0)
 		delete_sem(fNotifySem);
 	mutex_lock(&fSendRequestLock);
@@ -452,6 +448,9 @@ ControlPipe::QueueRequest(uint8 requestType, uint8 request, uint16 value,
 	if (dataLength > 0 && data == NULL)
 		return B_BAD_VALUE;
 
+	if (USBID() == UINT32_MAX)
+		return B_NO_INIT;
+
 	usb_request_data *requestData = new(std::nothrow) usb_request_data;
 	if (!requestData)
 		return B_NO_MEMORY;
@@ -476,4 +475,19 @@ ControlPipe::QueueRequest(uint8 requestType, uint8 request, uint16 value,
 	if (result < B_OK)
 		delete transfer;
 	return result;
+}
+
+
+status_t
+ControlPipe::CancelQueuedTransfers(bool force)
+{
+	if (force && fNotifySem >= 0) {
+		// There is likely a transfer currently running; we need to cancel it
+		// manually, as callbacks are not invoked when force-cancelling.
+		fTransferStatus = B_CANCELED;
+		fActualLength = 0;
+		release_sem_etc(fNotifySem, 1, B_RELEASE_IF_WAITING_ONLY);
+	}
+
+	return Pipe::CancelQueuedTransfers(force);
 }

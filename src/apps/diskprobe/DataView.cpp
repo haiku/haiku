@@ -398,13 +398,41 @@ DataView::Draw(BRect updateRect)
 
 	char line[255];
 	BPoint location(kHorizontalSpace, kVerticalSpace + fAscent);
+	const float kTintDarkenTouch = (B_NO_TINT + B_DARKEN_1_TINT) / 2.0f;
 
-	for (uint32 i = 0; i < fSizeInView; i += kBlockSize) {
+	for (uint32 lineNum = 0, i = 0; i < fSizeInView; lineNum++, i += kBlockSize) {
+		// Tint every 2nd line to create a striped background
+
+		float tint = (lineNum % 2 == 0) ? B_NO_TINT : kTintDarkenTouch;
+		SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR, tint);
+
+		FillRect(BRect(location.x - kHorizontalSpace,
+			kVerticalSpace + lineNum * fFontHeight,
+			location.x - kHorizontalSpace / 2 + Bounds().right,
+			kVerticalSpace + (lineNum + 1) * fFontHeight), B_SOLID_LOW);
+
 		ConvertLine(line, i, fData + i, fSizeInView - i);
 		DrawString(line, location);
 
 		location.y += fFontHeight;
 	}
+
+	// Draw first vertical line after 18 chars ("0000: xx xx xx xx")
+	// Next three vertical lines require an offset of 12 chars ("xx xx xx xx")
+
+	BPoint line_start(kHorizontalSpace + fCharWidth * 18 + fCharWidth / 2, 0);
+	BPoint line_end(line_start.x, Bounds().bottom);
+
+	rgb_color lineColor = tint_color(lineColor, B_LIGHTEN_2_TINT);
+	uint32 kDrawNumLines = 3;
+
+	BeginLineArray(kDrawNumLines);
+	for (uint32 i = 0; i < kDrawNumLines; i++) {
+		AddLine(line_start, line_end, lineColor);
+		line_start.x += fCharWidth * 12;
+		line_end.x = line_start.x;
+	}
+	EndLineArray();
 
 	DrawSelection();
 }

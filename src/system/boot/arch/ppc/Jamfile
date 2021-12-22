@@ -26,7 +26,7 @@ for platform in [ MultiBootSubDirSetup openfirmware ] {
 		;
 
 		SEARCH on [ FGristFiles arch_elf.cpp arch_uart_8250.cpp ]
-		    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
+		    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 
 		SEARCH on [ FGristFiles $(kernelGenericDriverSources) ]
 			= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;

@@ -10,7 +10,7 @@ Info:	DataTranslations		Info:
 DataTranslations - Error	DataTranslations		Dataoversættelser - Fejl
 Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Brug dette kontrolpanel til at indstille standardvalgene for oversættelserne, som bruges ved manglende angivelser af et program.
 The new translator has been installed successfully.	DataTranslations		Den nye oversætter er blevet installeret med succes.
-An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Et emne '%name' findes allerede i oversættelses-folderen! Skal oversættelsen, som findes i forvejen, overskrives?
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Et emne '%name' findes allerede i oversættelsesmappen! Skal oversættelsen, som findes i forvejen, overskrives?
 DataTranslations	System name		Dataoversættelser
 Info	DataTranslations		Info
 Overwrite	DataTranslations		Overskriv

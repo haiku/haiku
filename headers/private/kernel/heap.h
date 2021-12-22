@@ -59,10 +59,10 @@ extern "C" {
 #endif
 
 
-void* memalign_etc(size_t alignment, size_t size, uint32 flags);
+void* memalign_etc(size_t alignment, size_t size, uint32 flags) _ALIGNED_BY_ARG(1);
 void free_etc(void* address, uint32 flags);
 
-void* memalign(size_t alignment, size_t size);
+void* memalign(size_t alignment, size_t size) _ALIGNED_BY_ARG(1);
 
 void deferred_free(void* block);
 
@@ -74,7 +74,7 @@ void heap_add_area(heap_allocator* heap, area_id areaID, addr_t base,
 	size_t size);
 heap_allocator*	heap_create_allocator(const char* name, addr_t base,
 	size_t size, const heap_class* heapClass, bool allocateOnHeap);
-void* heap_memalign(heap_allocator* heap, size_t alignment, size_t size);
+void* heap_memalign(heap_allocator* heap, size_t alignment, size_t size) _ALIGNED_BY_ARG(2);
 status_t heap_free(heap_allocator* heap, void* address);
 
 #if KERNEL_HEAP_LEAK_CHECK

@@ -51,7 +51,7 @@
 
 #if __GNUC__ == 2
 #	define B_HAIKU_ABI					B_HAIKU_ABI_GCC_2_HAIKU
-#elif (__GNUC__ >= 4 && __GNUC__ <= 11) || defined(__TINYC__)
+#elif (__GNUC__ >= 4 && __GNUC__ <= 12) || defined(__TINYC__)
 #	define B_HAIKU_ABI					B_HAIKU_ABI_GCC_4
 #else
 #	error Unsupported compiler!
@@ -82,10 +82,12 @@
 #define _PACKED __attribute__((packed))
 #define _PRINTFLIKE(_format_, _args_) \
 	__attribute__((format(__printf__, _format_, _args_)))
+
 #if __GNUC__ >= 4
+# define _ALIGNED_BY_ARG(_no_) __attribute__((alloc_align(_no_)))
 # define _EXPORT __attribute__((visibility("default")))
-# define B_ALWAYS_INLINE __attribute__((always_inline)) inline
 #else
+# define _ALIGNED_BY_ARG(_no_)
 # define _EXPORT
 #endif
 #define _IMPORT

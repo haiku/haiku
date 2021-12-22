@@ -168,7 +168,7 @@ BSoftSynth::SetInstrumentsFile(const char* path)
 		return B_BAD_VALUE;
 	
 	if (!BEntry(path).Exists())
-		return B_FILE_NOT_FOUND;
+		return B_ENTRY_NOT_FOUND;
 
 	if (IsLoaded())
 		Unload();

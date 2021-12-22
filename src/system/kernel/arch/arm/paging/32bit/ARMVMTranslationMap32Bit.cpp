@@ -39,6 +39,10 @@
 #endif
 
 
+#define PAGEDIR_SIZE	ARM_MMU_L1_TABLE_SIZE
+#define PAGEDIR_ALIGN	(4 * B_PAGE_SIZE)
+
+
 ARMVMTranslationMap32Bit::ARMVMTranslationMap32Bit()
 	:
 	fPagingStructures(NULL)
@@ -97,7 +101,7 @@ ARMVMTranslationMap32Bit::Init(bool kernel)
 
 		// allocate the page directory
 		page_directory_entry* virtualPageDir = (page_directory_entry*)memalign(
-			B_PAGE_SIZE, B_PAGE_SIZE);
+			PAGEDIR_ALIGN, PAGEDIR_SIZE);
 		if (virtualPageDir == NULL)
 			return B_NO_MEMORY;
 
@@ -632,7 +636,7 @@ ARMVMTranslationMap32Bit::Query(addr_t va, phys_addr_t *_physical,
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
 	if ((entry & ARM_PTE_TYPE_MASK) != 0)
-		*_physical = (entry & ARM_PTE_ADDRESS_MASK) | VADDR_TO_PGOFF(va);
+		*_physical = (entry & ARM_PTE_ADDRESS_MASK);
 
 #if 0 //IRA
 	// read in the page state flags
@@ -680,7 +684,7 @@ ARMVMTranslationMap32Bit::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
 	if ((entry & ARM_PTE_TYPE_MASK) != 0)
-		*_physical = (entry & ARM_PTE_ADDRESS_MASK) | VADDR_TO_PGOFF(va);
+		*_physical = (entry & ARM_PTE_ADDRESS_MASK);
 
 #if 0
 	// read in the page state flags

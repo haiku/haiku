@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-StyledEdit	2796309255
+1	catalan; valencian	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Estadístiques del document
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		No es pot revertir: el fitxer no es troba: \"%s\".
 Cut	Menus		Retalla
@@ -51,6 +51,7 @@ OK	SaveAlert		D'acord
 Color	Menus		Color
 Save changes to the document \"%s\"? 	QuitAlert		Voleu desar els canvis al document \"%s\"? 
 StyledEdit	System name		Editor d'estil
+Underline	Menus		Subratllat
 Find:	FindandReplaceWindow		Troba:
 Undo typing	QuitAlert		Desfés el tecleig
 Error loading \"%s\":\n\t%s	LoadAlert		Error en carregar \"%s\":\n\t%s

@@ -88,6 +88,9 @@ init_common(int device, bool isClone)
 			return B_NO_MEMORY;
 		memset(gConnector[id], 0, sizeof(connector_info));
 
+		// Init a few things
+		gConnector[id]->router.ddcValid = false;
+		gConnector[id]->router.cdValid = false;
 		gConnector[id]->encoder.pll.id = ATOM_PPLL_INVALID;
 	}
 
@@ -113,7 +116,6 @@ init_common(int device, bool isClone)
 
 	if (ioctl(device, RADEON_GET_PRIVATE_DATA, &data,
 			sizeof(radeon_get_private_data)) != 0) {
-		free(gInfo);
 		return B_ERROR;
 	}
 

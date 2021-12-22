@@ -440,7 +440,7 @@ test_set_bits2(const set_bits_test_data &initialData,
 	CHK(memcmp(bitmap.Bits(), finalData.data, finalData.length) == 0);
 }
 
-// test for OBOS only API
+// test for Haiku only API
 #ifndef TEST_R5
 
 // test_import_bits
@@ -476,7 +476,7 @@ test_import_bits(const set_bits_test_data &initialData,
 	CHK(memcmp(bitmap.Bits(), finalData.data, finalData.length) == 0);
 }
 
-#endif	// test for OBOS only API
+#endif	// test for Haiku only API
 
 /*
 	void SetBits(const void *data, int32 length, int32 offset,
@@ -606,7 +606,7 @@ void SetBitsTester::SetBits4()
 #endif
 }
 
-// OBOS only API
+// Haiku only API
 #ifndef TEST_R5
 
 /*
@@ -694,7 +694,7 @@ Test* SetBitsTester::Suite()
 	ADD_TEST4(BBitmap, SuiteOfTests, SetBitsTester, SetBits3);
 	ADD_TEST4(BBitmap, SuiteOfTests, SetBitsTester, SetBits4);
 
-// OBOS only API
+// Haiku only API
 #ifndef TEST_R5
 	ADD_TEST4(BBitmap, SuiteOfTests, SetBitsTester, ImportBitsA1);
 	ADD_TEST4(BBitmap, SuiteOfTests, SetBitsTester, ImportBitsA2);

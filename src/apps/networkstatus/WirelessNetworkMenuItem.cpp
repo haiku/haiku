@@ -6,27 +6,29 @@
 
 #include "WirelessNetworkMenuItem.h"
 
+#include <string.h>
+
 #include <Catalog.h>
-#include <NetworkDevice.h>
 #include <String.h>
 
 #include "RadioView.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "WirelessNetworkMenuItem"
 
 
-WirelessNetworkMenuItem::WirelessNetworkMenuItem(const char* name,
-	int32 signalQuality, int32 authenticationMode, BMessage* message)
+WirelessNetworkMenuItem::WirelessNetworkMenuItem(wireless_network network,
+	BMessage* message)
 	:
-	BMenuItem(name, message),
-	fQuality(signalQuality)
+	BMenuItem(network.name, message),
+	fNetwork(network)
 {
 	// Append authentication mode to label
 	BString label = B_TRANSLATE("%name% (%authenticationMode%)");
-	label.Replace("%name%", name, 1);
+	label.Replace("%name%", network.name, 1);
 	label.Replace("%authenticationMode%",
-		AuthenticationName(authenticationMode), 1);
+		AuthenticationName(network.authentication_mode), 1);
 
 	SetLabel(label.String());
 }
@@ -34,13 +36,6 @@ WirelessNetworkMenuItem::WirelessNetworkMenuItem(const char* name,
 
 WirelessNetworkMenuItem::~WirelessNetworkMenuItem()
 {
-}
-
-
-void
-WirelessNetworkMenuItem::SetSignalQuality(int32 quality)
-{
-	fQuality = quality;
 }
 
 
@@ -99,5 +94,23 @@ WirelessNetworkMenuItem::DrawRadioIcon()
 	bounds.right -= 4;
 	bounds.bottom -= 2;
 
-	RadioView::Draw(Menu(), bounds, fQuality, RadioView::DefaultMax());
+	RadioView::Draw(Menu(), bounds, fNetwork.signal_strength,
+		RadioView::DefaultMax());
+}
+
+
+/*static*/ int
+WirelessNetworkMenuItem::CompareSignalStrength(const BMenuItem* a,
+	const BMenuItem* b)
+{
+	WirelessNetworkMenuItem* aItem = *(WirelessNetworkMenuItem**)a;
+	WirelessNetworkMenuItem* bItem = *(WirelessNetworkMenuItem**)b;
+
+	wireless_network aNetwork = aItem->Network();
+	wireless_network bNetwork = bItem->Network();
+
+	if (aNetwork.signal_strength == bNetwork.signal_strength)
+		return strncasecmp(aNetwork.name, bNetwork.name, 32);
+
+	return bNetwork.signal_strength - aNetwork.signal_strength;
 }

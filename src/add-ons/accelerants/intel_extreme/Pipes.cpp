@@ -38,12 +38,21 @@ void
 program_pipe_color_modes(uint32 colorMode)
 {
 	// All pipes get the same color mode
-	write32(INTEL_DISPLAY_A_CONTROL, (read32(INTEL_DISPLAY_A_CONTROL)
+	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_LAKE)) {
+		write32(INTEL_DISPLAY_A_CONTROL, (read32(INTEL_DISPLAY_A_CONTROL)
+			& ~(DISPLAY_CONTROL_COLOR_MASK_SKY | DISPLAY_CONTROL_GAMMA))
+			| colorMode);
+		write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
+			& ~(DISPLAY_CONTROL_COLOR_MASK_SKY | DISPLAY_CONTROL_GAMMA))
+			| colorMode);
+	} else {
+		write32(INTEL_DISPLAY_A_CONTROL, (read32(INTEL_DISPLAY_A_CONTROL)
 			& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
-        | colorMode);
-	write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
+			| colorMode);
+		write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
 			& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
-		| colorMode);
+			| colorMode);
+	}
 }
 
 
@@ -60,28 +69,46 @@ Pipe::Pipe(pipe_index pipeIndex)
 	fPlaneOffset(0)
 {
 	if (pipeIndex == INTEL_PIPE_B) {
-		fPipeOffset = INTEL_DISPLAY_OFFSET;
 		fPlaneOffset = INTEL_PLANE_OFFSET;
+	}
+	switch (pipeIndex) {
+		case INTEL_PIPE_B:
+			TRACE("Pipe B.\n");
+			fPipeOffset = 0x1000;
+			break;
+		case INTEL_PIPE_C:
+			TRACE("Pipe C.\n");
+			fPipeOffset = 0x2000;
+			break;
+		case INTEL_PIPE_D:
+			TRACE("Pipe D.\n");
+			fPipeOffset = 0xf000;
+			break;
+		default:
+			TRACE("Pipe A.\n");
+			break;
 	}
 
 	// IvyBridge: Analog + Digital Ports behind FDI (on northbridge)
 	// Haswell: Only VGA behind FDI (on northbridge)
 	// SkyLake: FDI gone. No more northbridge video.
-	if (gInfo->shared_info->pch_info != INTEL_PCH_NONE) {
+	if ((gInfo->shared_info->pch_info != INTEL_PCH_NONE) &&
+		(gInfo->shared_info->device_type.Generation() <= 8)) {
 		TRACE("%s: Pipe %s routed through FDI\n", __func__,
 			(pipeIndex == INTEL_PIPE_A) ? "A" : "B");
 
-		fHasTranscoder = true;
-
 		// Program FDILink if PCH
 		fFDILink = new(std::nothrow) FDILink(pipeIndex);
-		// Program gen5(+) style panelfitter as well
+	}
+	if (gInfo->shared_info->pch_info != INTEL_PCH_NONE) {
+		// DDI also has transcoders
+		fHasTranscoder = true;
+		// Program gen5(+) style panelfitter as well (DDI has this as well..)
 		fPanelFitter = new(std::nothrow) PanelFitter(pipeIndex);
 	}
 
-	TRACE("Pipe %s. Pipe Base: 0x%" B_PRIxADDR
-		" Plane Base: 0x% " B_PRIxADDR "\n", (pipeIndex == INTEL_PIPE_A)
-			? "A" : "B", fPipeOffset, fPlaneOffset);
+	TRACE("Pipe Base: 0x%" B_PRIxADDR " Plane Base: 0x% " B_PRIxADDR "\n",
+			fPipeOffset, fPlaneOffset);
 }
 
 
@@ -137,34 +164,58 @@ Pipe::_ConfigureTranscoder(display_mode* target)
 
 	TRACE("%s: fPipeOffset: 0x%" B_PRIx32"\n", __func__, fPipeOffset);
 
-	// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
-	write32(INTEL_TRANSCODER_A_HTOTAL + fPipeOffset,
-		((uint32)(target->timing.h_total - 1) << 16)
-		| ((uint32)target->timing.h_display - 1));
-	write32(INTEL_TRANSCODER_A_HBLANK + fPipeOffset,
-		((uint32)(target->timing.h_total - 1) << 16)
-		| ((uint32)target->timing.h_display - 1));
-	write32(INTEL_TRANSCODER_A_HSYNC + fPipeOffset,
-		((uint32)(target->timing.h_sync_end - 1) << 16)
-		| ((uint32)target->timing.h_sync_start - 1));
+	if (gInfo->shared_info->device_type.Generation() < 9) {
+		// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
+		write32(INTEL_TRANSCODER_A_HTOTAL + fPipeOffset,
+			((uint32)(target->timing.h_total - 1) << 16)
+			| ((uint32)target->timing.h_display - 1));
+		write32(INTEL_TRANSCODER_A_HBLANK + fPipeOffset,
+			((uint32)(target->timing.h_total - 1) << 16)
+			| ((uint32)target->timing.h_display - 1));
+		write32(INTEL_TRANSCODER_A_HSYNC + fPipeOffset,
+			((uint32)(target->timing.h_sync_end - 1) << 16)
+			| ((uint32)target->timing.h_sync_start - 1));
 
-	write32(INTEL_TRANSCODER_A_VTOTAL + fPipeOffset,
-		((uint32)(target->timing.v_total - 1) << 16)
-		| ((uint32)target->timing.v_display - 1));
-	write32(INTEL_TRANSCODER_A_VBLANK + fPipeOffset,
-		((uint32)(target->timing.v_total - 1) << 16)
-		| ((uint32)target->timing.v_display - 1));
-	write32(INTEL_TRANSCODER_A_VSYNC + fPipeOffset,
-		((uint32)(target->timing.v_sync_end - 1) << 16)
-		| ((uint32)target->timing.v_sync_start - 1));
+		write32(INTEL_TRANSCODER_A_VTOTAL + fPipeOffset,
+			((uint32)(target->timing.v_total - 1) << 16)
+			| ((uint32)target->timing.v_display - 1));
+		write32(INTEL_TRANSCODER_A_VBLANK + fPipeOffset,
+			((uint32)(target->timing.v_total - 1) << 16)
+			| ((uint32)target->timing.v_display - 1));
+		write32(INTEL_TRANSCODER_A_VSYNC + fPipeOffset,
+			((uint32)(target->timing.v_sync_end - 1) << 16)
+			| ((uint32)target->timing.v_sync_start - 1));
 
-	#if 0
-	// XXX: Is it ok to do these on non-digital?
-	write32(INTEL_TRANSCODER_A_POS + fPipeOffset, 0);
-	write32(INTEL_TRANSCODER_A_IMAGE_SIZE + fPipeOffset,
-		((uint32)(target->virtual_width - 1) << 16)
-			| ((uint32)target->virtual_height - 1));
-	#endif
+		#if 0
+		// XXX: Is it ok to do these on non-digital?
+		write32(INTEL_TRANSCODER_A_POS + fPipeOffset, 0);
+		write32(INTEL_TRANSCODER_A_IMAGE_SIZE + fPipeOffset,
+			((uint32)(target->timing.h_display - 1) << 16)
+				| ((uint32)target->timing.v_display - 1));
+		#endif
+	} else {
+		//on Skylake timing is already done in ConfigureTimings()
+
+		TRACE("%s: trans conf reg: 0x%" B_PRIx32"\n", __func__,
+			read32(DDI_SKL_TRANS_CONF_A + fPipeOffset));
+		TRACE("%s: trans DDI func ctl reg: 0x%" B_PRIx32"\n", __func__,
+			read32(PIPE_DDI_FUNC_CTL_A + fPipeOffset));
+		switch ((read32(PIPE_DDI_FUNC_CTL_A + fPipeOffset) & PIPE_DDI_MODESEL_MASK)
+				>> PIPE_DDI_MODESEL_SHIFT) {
+			case PIPE_DDI_MODE_DVI:
+				TRACE("%s: Transcoder uses DVI mode\n", __func__);
+				break;
+			case PIPE_DDI_MODE_DP_SST:
+				TRACE("%s: Transcoder uses DP SST mode\n", __func__);
+				break;
+			case PIPE_DDI_MODE_DP_MST:
+				TRACE("%s: Transcoder uses DP MST mode\n", __func__);
+				break;
+			default:
+				TRACE("%s: Transcoder uses HDMI mode\n", __func__);
+				break;
+		}
+	}
 }
 
 
@@ -192,19 +243,22 @@ Pipe::ConfigureScalePos(display_mode* target)
 	// The only thing that really matters: set the image size and let the
 	// panel fitter or the transcoder worry about the rest
 	write32(INTEL_DISPLAY_A_PIPE_SIZE + fPipeOffset,
-		((uint32)(target->virtual_width - 1) << 16)
-			| ((uint32)target->virtual_height - 1));
+		((uint32)(target->timing.h_display - 1) << 16)
+			| ((uint32)target->timing.v_display - 1));
 
 	// Set the plane size as well while we're at it (this is independant, we
 	// could have a larger plane and scroll through it).
-	if (gInfo->shared_info->device_type.Generation() <= 4) {
+	if ((gInfo->shared_info->device_type.Generation() <= 4)
+		|| gInfo->shared_info->device_type.HasDDI()) {
 		// This is "reserved" on G35 and GMA965, but needed on 945 (for which
 		// there is no public documentation), and I assume earlier devices as
-		// well. Note that the height and width are swapped when compared to
-		// the other registers.
+		// well.
+		//
+		// IMPORTANT WARNING: height and width are swapped when compared to the other registers!
+		// Be careful when editing this code and don't accidentally swap them!
 		write32(INTEL_DISPLAY_A_IMAGE_SIZE + fPipeOffset,
-			((uint32)(target->virtual_height - 1) << 16)
-			| ((uint32)target->virtual_width - 1));
+			((uint32)(target->timing.v_display - 1) << 16)
+			| ((uint32)target->timing.h_display - 1));
 	}
 }
 
@@ -228,6 +282,7 @@ Pipe::ConfigureTimings(display_mode* target, bool hardware)
 	if (!fHasTranscoder || hardware)
 	{
 		// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
+		// Note: on Skylake below registers are part of the transcoder
 		write32(INTEL_DISPLAY_A_HTOTAL + fPipeOffset,
 			((uint32)(target->timing.h_total - 1) << 16)
 			| ((uint32)target->timing.h_display - 1));
@@ -404,6 +459,82 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 		TRACE("New PLL selection: 0x%" B_PRIx32 "\n", pllSel);
 		write32(SNB_DPLL_SEL, pllSel);
 	}
+}
+
+void
+Pipe::ConfigureClocksSKL(const skl_wrpll_params& wrpll_params, uint32 pixelClock,
+	port_index pllForPort, uint32* pllSel)
+{
+	CALLED();
+
+	//find our PLL as set by the BIOS
+	uint32 portSel = read32(SKL_DPLL_CTRL2);
+	*pllSel = 0xff;
+	switch (pllForPort) {
+	case INTEL_PORT_A:
+		*pllSel = (portSel & 0x0006) >> 1;
+		break;
+	case INTEL_PORT_B:
+		*pllSel = (portSel & 0x0030) >> 4;
+		break;
+	case INTEL_PORT_C:
+		*pllSel = (portSel & 0x0180) >> 7;
+		break;
+	case INTEL_PORT_D:
+		*pllSel = (portSel & 0x0c00) >> 10;
+		break;
+	case INTEL_PORT_E:
+		*pllSel = (portSel & 0x6000) >> 13;
+		break;
+	default:
+		TRACE("No port selected!");
+		return;
+	}
+	TRACE("PLL selected is %" B_PRIx32 "\n", *pllSel);
+
+	TRACE("Skylake DPLL_CFGCR1 0x%" B_PRIx32 "\n",
+		read32(SKL_DPLL1_CFGCR1 + (*pllSel - 1) * 8));
+	TRACE("Skylake DPLL_CFGCR2 0x%" B_PRIx32 "\n",
+		read32(SKL_DPLL1_CFGCR2 + (*pllSel - 1) * 8));
+
+	// only program PLL's that are in non-DP mode (otherwise the linkspeed sets refresh)
+	portSel = read32(SKL_DPLL_CTRL1);
+	if ((portSel & (1 << (*pllSel * 6 + 5))) && *pllSel) { // DPLL0 might only know DP mode
+		// enable pgm on our PLL in case that's currently disabled
+		write32(SKL_DPLL_CTRL1, portSel | (1 << (*pllSel * 6)));
+
+		write32(SKL_DPLL1_CFGCR1 + (*pllSel - 1) * 8,
+			1 << 31 |
+			wrpll_params.dco_fraction << 9 |
+			wrpll_params.dco_integer);
+		write32(SKL_DPLL1_CFGCR2 + (*pllSel - 1) * 8,
+			 wrpll_params.qdiv_ratio << 8 |
+			 wrpll_params.qdiv_mode << 7 |
+			 wrpll_params.kdiv << 5 |
+			 wrpll_params.pdiv << 2 |
+			 wrpll_params.central_freq);
+		read32(SKL_DPLL1_CFGCR1 + (*pllSel - 1) * 8);
+		read32(SKL_DPLL1_CFGCR2 + (*pllSel - 1) * 8);
+
+		//assuming DPLL0 and 1 are already enabled by the BIOS if in use (LCPLL1,2 regs)
+
+		spin(5);
+		if (read32(SKL_DPLL_STATUS) & (1 << (*pllSel * 8))) {
+			TRACE("Programmed PLL; PLL is locked\n");
+		} else {
+			TRACE("Programmed PLL; PLL did not lock\n");
+		}
+		TRACE("Skylake DPLL_CFGCR1 now: 0x%" B_PRIx32 "\n",
+			read32(SKL_DPLL1_CFGCR1 + (*pllSel - 1) * 8));
+		TRACE("Skylake DPLL_CFGCR2 now: 0x%" B_PRIx32 "\n",
+			read32(SKL_DPLL1_CFGCR2 + (*pllSel - 1) * 8));
+	} else {
+		TRACE("PLL programming not needed, skipping.\n");
+	}
+
+	TRACE("Skylake DPLL_CTRL1: 0x%" B_PRIx32 "\n", read32(SKL_DPLL_CTRL1));
+	TRACE("Skylake DPLL_CTRL2: 0x%" B_PRIx32 "\n", read32(SKL_DPLL_CTRL2));
+	TRACE("Skylake DPLL_STATUS: 0x%" B_PRIx32 "\n", read32(SKL_DPLL_STATUS));
 }
 
 void

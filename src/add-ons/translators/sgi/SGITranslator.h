@@ -2,7 +2,7 @@
 // SGITranslator
 // Written by Stephan Aßmus
 // based on TIFFTranslator written mostly by
-// Michael Wilber, OBOS Translation Kit Team
+// Michael Wilber, Haiku Translation Kit Team
 //
 // SGITranslator.h
 //
@@ -10,7 +10,7 @@
 // SGI images.
 //
 //
-// Copyright (c) 2003 OpenBeOS Project
+// Copyright (c) 2003 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),

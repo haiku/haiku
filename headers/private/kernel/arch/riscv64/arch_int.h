@@ -15,6 +15,8 @@
 #define NUM_IO_VECTORS	256
 
 
+#ifdef __cplusplus
+
 static inline void
 arch_int_enable_interrupts_inline(void)
 {
@@ -68,6 +70,8 @@ enum {
 };
 
 extern "C" status_t MSyscall(uint64 op, ...);
+
+#endif
 
 
 #endif /* _KERNEL_ARCH_RISCV64_INT_H */

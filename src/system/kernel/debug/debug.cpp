@@ -941,7 +941,7 @@ kernel_debugger_loop(const char* messagePrefix, const char* message,
 
 
 static void
-enter_kernel_debugger(int32 cpu)
+enter_kernel_debugger(int32 cpu, int32& previousCPU)
 {
 	while (atomic_add(&sInDebugger, 1) > 0) {
 		atomic_add(&sInDebugger, -1);
@@ -969,6 +969,9 @@ enter_kernel_debugger(int32 cpu)
 		smp_send_broadcast_ici_interrupts_disabled(cpu, SMP_MSG_CPU_HALT, 0, 0,
 			0, NULL, SMP_MSG_FLAG_SYNC);
 	}
+
+	previousCPU = sDebuggerOnCPU;
+	sDebuggerOnCPU = cpu;
 
 	if (sBlueScreenOutput) {
 		if (blue_screen_enter(false) == B_OK)
@@ -1021,15 +1024,17 @@ kernel_debugger_internal(const char* messagePrefix, const char* message,
 	va_list args, int32 cpu)
 {
 	while (true) {
+		// If we're called recursively sDebuggerOnCPU will be != -1.
+		int32 previousCPU = -1;
+
 		if (sHandOverKDLToCPU == cpu) {
 			sHandOverKDLToCPU = -1;
 			sHandOverKDL = false;
-		} else
-			enter_kernel_debugger(cpu);
 
-		// If we're called recursively sDebuggerOnCPU will be != -1.
-		int32 previousCPU = sDebuggerOnCPU;
-		sDebuggerOnCPU = cpu;
+			previousCPU = sDebuggerOnCPU;
+			sDebuggerOnCPU = cpu;
+		} else
+			enter_kernel_debugger(cpu, previousCPU);
 
 		kernel_debugger_loop(messagePrefix, message, args, cpu);
 
@@ -1215,15 +1220,19 @@ syslog_sender(void* data)
 			if (length > (int32)SYSLOG_MAX_MESSAGE_LENGTH)
 				length = SYSLOG_MAX_MESSAGE_LENGTH;
 
-			length = ring_buffer_peek(sSyslogBuffer, sSyslogBufferOffset,
-				(uint8*)sSyslogMessage->message, length);
-			sSyslogBufferOffset += length;
+			uint8* message = (uint8*)sSyslogMessage->message;
 			if (sSyslogDropped) {
-				// Add drop marker - since parts had to be dropped, it's
-				// guaranteed that we have enough space in the buffer now.
-				ring_buffer_write(sSyslogBuffer, (uint8*)"<DROP>", 6);
+				memcpy(message, "<DROP>", 6);
+				message += 6;
+				if ((length + 6) > (int32)SYSLOG_MAX_MESSAGE_LENGTH)
+					length -= 6;
 				sSyslogDropped = false;
 			}
+
+			length = ring_buffer_peek(sSyslogBuffer, sSyslogBufferOffset,
+				message, length);
+			sSyslogBufferOffset += length;
+			length += (addr_t)message - (addr_t)sSyslogMessage->message;
 
 			release_spinlock(&sSpinlock);
 			restore_interrupts(state);
@@ -1269,8 +1278,10 @@ syslog_write(const char* text, int32 length, bool notify)
 		return;
 
 	if (length > sSyslogBuffer->size) {
-		text = "<DROP>";
-		length = 6;
+		syslog_write("<TRUNC>", 7, false);
+
+		text += length - (sSyslogBuffer->size - 7);
+		length = sSyslogBuffer->size - 7;
 	}
 
 	int32 writable = ring_buffer_writable(sSyslogBuffer);
@@ -1367,16 +1378,21 @@ syslog_init_post_vm(struct kernel_args* args)
 			status = B_NO_MEMORY;
 			goto err2;
 		}
-	} else {
-		// create an area for the debug syslog buffer
+	} else if (args->keep_debug_output_buffer) {
+		// create an area for the already-existing debug syslog buffer
 		void* base = (void*)ROUNDDOWN((addr_t)(void *)args->debug_output, B_PAGE_SIZE);
 		size_t size = ROUNDUP(args->debug_size, B_PAGE_SIZE);
 		area_id area = create_area("syslog debug", &base, B_EXACT_ADDRESS, size,
-				B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (area < 0) {
 			status = B_NO_MEMORY;
 			goto err2;
 		}
+	}
+
+	if (!args->keep_debug_output_buffer && args->debug_output != NULL) {
+		syslog_write((const char*)args->debug_output.Pointer(),
+			args->debug_size, false);
 	}
 
 	// initialize syslog message
@@ -1384,12 +1400,6 @@ syslog_init_post_vm(struct kernel_args* args)
 	sSyslogMessage->options = LOG_KERN;
 	sSyslogMessage->priority = LOG_DEBUG;
 	sSyslogMessage->ident[0] = '\0';
-	//strcpy(sSyslogMessage->ident, "KERNEL");
-
-	if (args->debug_output != NULL) {
-		syslog_write((const char*)args->debug_output.Pointer(),
-			args->debug_size, false);
-	}
 
 	// Allocate memory for the previous session's debug syslog output. In
 	// syslog_init_post_modules() we'll write it back to disk and free it.

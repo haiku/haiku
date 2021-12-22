@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-About	511528774
+1	greek, modern (1453-)	x-vnd.Haiku-About	408681589
 Revision	AboutView		Αναθεώρηση
 The Haikuware team and their bounty program\n	AboutView		Η ομάδα της Haikuware και το πρόγραμμα επιδοτήσεων της\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2007 Michael C. Ring. Με επιφύλαξη παντός δικαιώματος.
@@ -42,6 +42,7 @@ About this system	AboutWindow		Πληροφορίες συστήματος
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2010 απο τους συγγραφείς του Gutenprint. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1994-1997 Mark Kilgard. Με επιφύλαξη παντός δικαιώματος.
 AboutSystem	System name		Σχετικά
+Copyright © 2019 Joe Drago. All rights reserved.	AboutView		Copyright © 2019 Joe Drago. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1995-2001 Lars Düning. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Πνευματική ιδιοκτησία © 1998-2000 Thai Open Source Software Center Ltd και Clark Cooper.
 Source Code: 	AboutView		Πηγαίος Κώδικας: 
@@ -72,6 +73,7 @@ Memory:	AboutView		Μνήμη:
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…και μάλλον αρκετά άλλα άτομα που ξεχάσαμε να αναφέρουμε (συγγνώμη!)\n\n
 BSD (2-clause)	AboutWindow		BSD (2-όρων)
 Website & marketing:\n	AboutView		Ιστοσελίδα & μάρκετινγκ:\n
+Copyright © 2018-2021, Frederic Cambus	AboutView		Copyright © 2018-2021, Frederic Cambus
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 απο τον Andy Ritger βασισμένο στο Generalized Timing Formula
 …and the many people making donations!\n\n	AboutView		...και τους πολλούς δωρητές μας!\n\n
 BSD (4-clause)	AboutWindow		BSD (4-όρων)

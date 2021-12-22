@@ -6,6 +6,8 @@
 
 #include <KernelExport.h>
 
+#include <int.h>
+
 #include <boot/stage2.h>
 #include <arch/smp.h>
 #include <debug.h>
@@ -29,6 +31,16 @@ void
 arch_smp_send_ici(int32 target_cpu)
 {
 	panic("called arch_smp_send_ici!\n");
+}
+
+
+void
+arch_smp_send_multicast_ici(CPUSet& cpuSet)
+{
+#if KDEBUG
+        if (are_interrupts_enabled())
+                panic("arch_smp_send_multicast_ici: called with interrupts enabled");
+#endif
 }
 
 

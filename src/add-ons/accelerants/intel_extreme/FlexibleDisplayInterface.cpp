@@ -250,7 +250,7 @@ FDILink::FDILink(pipe_index pipeIndex)
 
 
 status_t
-FDILink::Train(display_mode* target)
+FDILink::Train(display_timing* target)
 {
 	CALLED();
 
@@ -284,7 +284,7 @@ FDILink::Train(display_mode* target)
 	// Khz / 10. ( each output octet encoded as 10 bits.
 	uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10;
 	//Reserving 5% bandwidth for possible spread spectrum clock use
-	uint32 bps = target->timing.pixel_clock * bitsPerPixel * 21 / 20;
+	uint32 bps = target->pixel_clock * bitsPerPixel * 21 / 20;
 
 	//use DIV_ROUND_UP:
 	uint32 lanes = (bps + (linkBandwidth * 8) - 1) / (linkBandwidth * 8);
@@ -338,7 +338,7 @@ FDILink::Train(display_mode* target)
 	if (ret_n > 0x800000) {
 		ret_n = 0x800000;
 	}
-	uint64 ret_m = target->timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
+	uint64 ret_m = target->pixel_clock * ret_n * bitsPerPixel / linkspeed;
 	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
 		ret_m >>= 1;
 		ret_n >>= 1;
@@ -356,7 +356,7 @@ FDILink::Train(display_mode* target)
 	if (ret_n > 0x800000) {
 		ret_n = 0x800000;
 	}
-	ret_m = target->timing.pixel_clock * ret_n / linkspeed;
+	ret_m = target->pixel_clock * ret_n / linkspeed;
 	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
 		ret_m >>= 1;
 		ret_n >>= 1;

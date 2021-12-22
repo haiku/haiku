@@ -36,7 +36,6 @@ HIDReport::HIDReport(HIDParser *parser, uint8 type, uint8 id)
 
 HIDReport::~HIDReport()
 {
-
 }
 
 
@@ -101,32 +100,32 @@ HIDReport::AddMainItem(global_item_state &globalState,
 	TRACE("\t\tstring_minimum: %u\n", localState.string_minimum);
 	TRACE("\t\tstring_maximum: %u\n", localState.string_maximum);
 
-	uint32 usageMinimum = 0, usageMaximum = 0;
-	if (mainData.array_variable == 0) {
-		usageMinimum = localState.usage_minimum.u.extended;
-		usageMaximum = localState.usage_maximum.u.extended;
+	for (uint32 n = 0; n <localState.usage_stack_used; n++) {
+		if (fUsages.PushBack(localState.usage_stack[n].u.extended) != B_OK) {
+			TRACE_ALWAYS("no memory allocating usages\n");
+			break;
+		}
 	}
 
-	uint32 usageRangeIndex = 0;
+	usage_value page;
+
+	if (localState.usage_stack_used > 0) {
+		page = localState.usage_stack[0];
+		page.u.s.usage_id = 0;
+	}
+
+	uint32 usage = page.u.extended;
+
 	for (uint32 i = 0; i < globalState.report_count; i++) {
 		if (mainData.array_variable == 1) {
-			usage_value usage;
 			if (i < localState.usage_stack_used)
-				usage = localState.usage_stack[i];
-			else {
-				usage = localState.usage_minimum;
-				usage.u.extended += usageRangeIndex++;
-				if (usage.u.extended > localState.usage_maximum.u.extended)
-					usage.u.extended = localState.usage_maximum.u.extended;
-			}
-
-			usageMinimum = usageMaximum = usage.u.extended;
+				usage = localState.usage_stack[i].u.extended;
 		}
 
 		HIDReportItem *item = new(std::nothrow) HIDReportItem(this,
 			fReportSize, globalState.report_size, mainData.data_constant == 0,
 			mainData.array_variable == 0, mainData.relative != 0,
-			logicalMinimum, logicalMaximum, usageMinimum, usageMaximum);
+			logicalMinimum, logicalMaximum, usage);
 		if (item == NULL)
 			TRACE_ALWAYS("no memory when creating report item\n");
 
@@ -141,6 +140,7 @@ HIDReport::AddMainItem(global_item_state &globalState,
 
 		fReportSize += globalState.report_size;
 	}
+
 }
 
 
@@ -193,7 +193,8 @@ HIDReport::SendReport()
 HIDReportItem *
 HIDReport::ItemAt(uint32 index)
 {
-	if (index >= fItems.Count())
+	int32 count = fItems.Count();
+	if (count < 0 || index >= (uint32)count)
 		return NULL;
 	return fItems[index];
 }
@@ -207,6 +208,16 @@ HIDReport::FindItem(uint16 usagePage, uint16 usageID)
 			&& fItems[i]->UsageID() == usageID)
 			return fItems[i];
 	}
+
+	return NULL;
+}
+
+
+uint32 *
+HIDReport::Usages()
+{
+	if (fUsages.Count() > 0)
+		return &fUsages[0];
 
 	return NULL;
 }

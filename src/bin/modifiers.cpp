@@ -1,7 +1,7 @@
 /*
  * modifiers - asserts (un)pressed modifier keys
  * (c) 2002, Francois Revol, revol@free.fr
- * for OpenBeOS
+ * for Haiku
  * compile with:
  * LDFLAGS=-lbe make modifiers
  */

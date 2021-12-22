@@ -51,7 +51,7 @@ void dump_pins(void);
 bool nv_dac_crt_connected(void);
 status_t nv_dac_mode(int,float);
 status_t nv_dac_dither(bool dither);
-status_t nv_dac_palette(uint8*,uint8*,uint8*);
+status_t nv_dac_palette(uint8 r[256],uint8 g[256],uint8 b[256]);
 status_t nv_dac_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
 status_t nv_dac_set_pix_pll(display_mode target);
 status_t nv_dac_sys_pll_find(float, float*, uint8*, uint8*, uint8*, uint8);
@@ -59,7 +59,7 @@ status_t nv_dac_sys_pll_find(float, float*, uint8*, uint8*, uint8*, uint8);
 /* DAC2 functions */
 bool nv_dac2_crt_connected(void);
 status_t nv_dac2_mode(int,float);
-status_t nv_dac2_palette(uint8*,uint8*,uint8*);
+status_t nv_dac2_palette(uint8 r[256],uint8 g[256],uint8 b[256]);
 status_t nv_dac2_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
 status_t nv_dac2_set_pix_pll(display_mode target);
 
@@ -78,7 +78,7 @@ status_t nv_crtc_validate_timing(
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt);
 status_t nv_crtc_set_timing(display_mode target);
 status_t nv_crtc_depth(int mode);
-status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp); 
+status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp);
 status_t nv_crtc_set_display_pitch(void);
 status_t nv_crtc_dpms(bool, bool, bool, bool);
 status_t nv_crtc_mem_priority(uint8);
@@ -98,7 +98,7 @@ status_t nv_crtc2_validate_timing(
 	uint16 *vd_e,uint16 *vs_s,uint16 *vs_e,uint16 *vt);
 status_t nv_crtc2_set_timing(display_mode target);
 status_t nv_crtc2_depth(int mode);
-status_t nv_crtc2_set_display_start(uint32 startadd,uint8 bpp); 
+status_t nv_crtc2_set_display_start(uint32 startadd,uint8 bpp);
 status_t nv_crtc2_set_display_pitch(void);
 status_t nv_crtc2_dpms(bool, bool, bool, bool);
 status_t nv_crtc2_mem_priority(uint8);

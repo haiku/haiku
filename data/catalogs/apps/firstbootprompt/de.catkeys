@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-FirstBootPrompt	3595268803
+1	german	x-vnd.Haiku-FirstBootPrompt	189132197
 Japanese	KeymapNames		Japanisch
 US	KeymapNames		US-amerikanisch
 Cancel	BootPromptWindow		Abbrechen
@@ -7,10 +7,12 @@ Belarusian	KeymapNames		Weißrussisch
 Brazilian	KeymapNames		Brasilianisch
 Dvorak	KeymapNames		Dvorak
 Polish	KeymapNames		Polnisch
+Try Haiku	BootPromptWindow		Haiku ausprobieren
 Latin-American	KeymapNames		Latein-amerikanisch
 Ukrainian	KeymapNames		Ukrainisch
 Russian (Yawert)	KeymapNames		Russisch (Yawert)
 United-Kingdom	KeymapNames		GB-englisch
+Welcome!	BootPromptWindow		Willkommen!
 Quit Haiku	System name		Haiku beenden
 Serbian (Cyrillic)	KeymapNames		Serbisch (kyrillisch)
 Turkish (Type-F)	KeymapNames		Türkisch (Typ-F)
@@ -43,8 +45,10 @@ Faeroese	KeymapNames		Färöisch
 Polish (Typewriter)	KeymapNames		Polnisch (Schreibmaschine)
 French (Mac)	KeymapNames		Französisch (Mac)
 Spanish	KeymapNames		Spanisch
+Try it out	BootPromptWindow		Ausprobieren
 Ukrainian (Mac)	KeymapNames		Ukrainisch (Mac)
 Estonian	KeymapNames		Estnisch
+Install Haiku	BootPromptWindow		Haiku installieren
 French (Bépo)	KeymapNames		Französisch (Bépo)
 Restart system	BootPromptWindow		Neustarten
 Serbian (Latin)	KeymapNames		Serbisch (Latein)
@@ -56,29 +60,29 @@ Swiss-French	KeymapNames		Schweizer Französisch
 Slovene	KeymapNames		Slovenisch
 Lithuanian	KeymapNames		Litauisch
 French (NF Z71-300)	KeymapNames		Französisch (NF Z71-300)
-Thank you for trying out %distroname%! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later when running %distroname%.\n\nDo you wish to install %distroname% now, or try it out first?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Danke für das Interesse an %distroname%!\n\nBitte Sprache und Tastaturlayout wählen. Die Einstellungen lassen sich später jederzeit im laufenden System ändern.\n\nSoll %distroname% installiert werden oder wollen Sie es erstmal ausprobieren?
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Kasachisch
 Language	BootPromptWindow		Sprache
-Welcome to %distroname%!	BootPromptWindow		Willkommen zu %distroname%!
 Lithuanian (Standard)	KeymapNames		Litauisch (Standard)
 Belgian (comma)	KeymapNames		Belgisch (Komma)
 Custom	BootPromptWindow		Benutzerdefiniert
 Norwegian	KeymapNames		Norwegisch
 Danish	KeymapNames		Dänisch
 Bulgarian (Phonetic)	KeymapNames		Bulgarisch (phonetisch)
-Try out %distroname%	BootPromptWindow		%distroname% ausprobieren
 Canadian-French	KeymapNames		Kanadisch-Französisch
+Welcome to Haiku!	BootPromptWindow		Willkommen zu Haiku!
 Russian	KeymapNames		Russisch
 Hungarian	KeymapNames		Ungarisch
+Install	BootPromptWindow		Installieren
 Irish	KeymapNames		Irisch
 Romanian	KeymapNames		Romänisch
 Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Soll dieses Fenster tatsächlich geschlossen werden? Dadurch wird das System neu gestartet!
+Thank you for trying out Haiku! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later when running Haiku.\n\nDo you wish to install Haiku now, or try it out first?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Danke für das Interesse an Haiku\n\nBitte Sprache und Tastaturlayout wählen. Die Einstellungen lassen sich später jederzeit im laufenden System ändern.\n\nSoll Haiku jetzt installiert werden oder wollen Sie es erstmal ausprobieren?
 Macedonian	KeymapNames		Mazedonisch
 Czech (Mac)	KeymapNames		Tschechisch (Mac)
 Brazilian (ABNT2)	KeymapNames		Brasilianisch (ABNT2)
 Albanian	KeymapNames		Albanisch
 Dutch	KeymapNames		Niederländisch
-Install %distroname%	BootPromptWindow		%distroname% installieren
+Thank you for trying out our operating system! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later.\n\nDo you wish to install the operating system now, or try it out first?	BootPromptWindow	This notice appears when the build of Haiku that's currently being used is unofficial, as in, not distributed by Haiku itself.For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Danke für das Interesse an unser Betriebssystem!\n\nBitte Sprache und Tastaturlayout wählen. Die Einstellungen lassen sich später jederzeit im laufenden System ändern.\n\nSoll das Betriebssystem jetzt installiert werden oder wollen Sie es erstmal ausprobieren?
 Friulian	KeymapNames		Friaulisch
 Icelandic	KeymapNames		Isländisch

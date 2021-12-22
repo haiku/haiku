@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2012, Haiku Inc. All rights reserved.
+ * Copyright 2007-2021, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,8 +32,9 @@
 #	define TRACE(x) ;
 #endif
 
-static fdt_module_info *sFdtModule;
+//static fdt_module_info *sFdtModule;
 
+#if 0
 static struct fdt_device_info intc_table[] = {
 	{
 		.compatible = "marvell,pxa-timers",	// XXX not in FDT (also not in upstream!)
@@ -44,6 +45,7 @@ static struct fdt_device_info intc_table[] = {
 	}
 };
 static int intc_count = sizeof(intc_table) / sizeof(struct fdt_device_info);
+#endif
 
 
 void
@@ -68,6 +70,7 @@ arch_init_timer(kernel_args *args)
 {
 	TRACE(("%s\n", __func__));
 
+#if 0
 	status_t rc = get_module(B_FDT_MODULE_NAME, (module_info**)&sFdtModule);
 	if (rc != B_OK)
 		panic("Unable to get FDT module: %08lx!\n", rc);
@@ -75,6 +78,7 @@ arch_init_timer(kernel_args *args)
 	rc = sFdtModule->setup_devices(intc_table, intc_count, NULL);
 	if (rc != B_OK)
 		panic("No interrupt controllers found!\n");
+#endif
 
 	return B_OK;
 }

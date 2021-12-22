@@ -11,6 +11,7 @@
 
 #include <lock.h>
 
+#include "tty_driver.h"
 #include "tty_private.h"
 
 
@@ -32,6 +33,7 @@ char *gDeviceNames[kNumTTYs * 2 + 3];
 	// terminating NULL
 
 static mutex sTTYLocks[kNumTTYs];
+static tty_settings sTTYSettings[kNumTTYs];
 
 struct mutex gGlobalTTYLock;
 struct mutex gTTYCookieLock;
@@ -89,7 +91,7 @@ init_driver(void)
 		mutex_init(&sTTYLocks[i], "tty lock");
 		reset_tty(&gMasterTTYs[i], i, &sTTYLocks[i], true);
 		reset_tty(&gSlaveTTYs[i], i, &sTTYLocks[i], false);
-		reset_tty_settings(&gTTYSettings[i], i);
+		reset_tty_settings(&sTTYSettings[i]);
 
 		if (!gDeviceNames[i] || !gDeviceNames[i + kNumTTYs]) {
 			uninit_driver();
@@ -100,8 +102,6 @@ init_driver(void)
 	gDeviceNames[2 * kNumTTYs] = (char *)"ptmx";
 	gDeviceNames[2 * kNumTTYs + 1] = (char *)"tty";
 
-	tty_add_debugger_commands();
-
 	return B_OK;
 }
 
@@ -110,8 +110,6 @@ void
 uninit_driver(void)
 {
 	TRACE((DRIVER_NAME ": uninit_driver()\n"));
-
-	tty_remove_debugger_commands();
 
 	for (int32 i = 0; i < (int32)kNumTTYs * 2; i++)
 		free(gDeviceNames[i]);
@@ -147,3 +145,32 @@ find_device(const char *name)
 	return NULL;
 }
 
+
+int32
+get_tty_index(const char* name)
+{
+	// device names follow this form: "pt/%c%x"
+	int8 digit = name[4];
+	if (digit >= 'a') {
+		// hexadecimal digits
+		digit -= 'a' - 10;
+	} else
+		digit -= '0';
+
+	return (name[3] - 'p') * 16 + digit;
+}
+
+
+void
+reset_tty(struct tty* tty, int32 index, mutex* lock, bool isMaster)
+{
+	tty->ref_count = 0;
+	tty->open_count = 0;
+	tty->opened_count = 0;
+	tty->index = index;
+	tty->lock = lock;
+	tty->settings = &sTTYSettings[index];
+	tty->select_pool = NULL;
+	tty->is_master = isMaster;
+	tty->pending_eof = 0;
+}

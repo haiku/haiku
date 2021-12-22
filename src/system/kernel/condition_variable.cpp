@@ -98,6 +98,8 @@ ConditionVariableEntry::ConditionVariableEntry()
 
 ConditionVariableEntry::~ConditionVariableEntry()
 {
+	// We can use an "unsafe" non-atomic access of fVariable here, since we only
+	// care whether it is non-NULL, not what its specific value is.
 	if (fVariable != NULL)
 		_RemoveFromVariable();
 }
@@ -132,37 +134,61 @@ ConditionVariableEntry::_AddToLockedVariable(ConditionVariable* variable)
 {
 	ASSERT(fVariable == NULL);
 
-	B_INITIALIZE_SPINLOCK(&fLock);
 	fThread = thread_get_current_thread();
 	fVariable = variable;
 	fWaitStatus = STATUS_ADDED;
 	fVariable->fEntries.Add(this);
+	atomic_add(&fVariable->fEntriesCount, 1);
 }
 
 
 void
 ConditionVariableEntry::_RemoveFromVariable()
 {
+	// This section is critical because it can race with _NotifyLocked on the
+	// variable's thread, so we must not be interrupted during it.
 	InterruptsLocker _;
-	SpinLocker entryLocker(fLock);
 
-	if (fVariable != NULL) {
-		SpinLocker conditionLocker(fVariable->fLock);
-		if (fVariable->fEntries.Contains(this)) {
-			fVariable->fEntries.Remove(this);
-		} else {
-			entryLocker.Unlock();
-			// The variable's fEntries did not contain us, but we currently
-			// have the variable's lock acquired. This must mean we are in
-			// a race with the variable's Notify. It is possible we will be
-			// destroyed immediately upon returning here, so we need to
-			// spin until our fVariable member is unset by the Notify thread
-			// and then re-acquire our own lock to avoid a use-after-free.
-			while (atomic_pointer_get(&fVariable) != NULL) {}
-			entryLocker.Lock();
+	ConditionVariable* variable = atomic_pointer_get(&fVariable);
+	if (atomic_pointer_get_and_set(&fThread, (Thread*)NULL) == NULL) {
+		// If fThread was already NULL, that means the variable is already
+		// in the process of clearing us out (or already has finished doing so.)
+		// We thus cannot access fVariable, and must spin until it is cleared.
+		int32 tries = 0;
+		while (atomic_pointer_get(&fVariable) != NULL) {
+			tries++;
+			if ((tries % 10000) == 0)
+				panic("variable pointer was not unset for a long time!");
+			cpu_pause();
 		}
-		fVariable = NULL;
+
+		return;
 	}
+
+	while (true) {
+		if (atomic_pointer_get(&fVariable) == NULL) {
+			// The variable must have cleared us out. Acknowledge this and return.
+			atomic_add(&variable->fEntriesCount, -1);
+			return;
+		}
+
+		// There is of course a small race between checking the pointer and then
+		// the try_acquire in which the variable might clear out our fVariable.
+		// However, in the case where we were the ones to clear fThread, the
+		// variable will notice that and then wait for us to acknowledge the
+		// removal by decrementing fEntriesCount, as we do above; and until
+		// we do that, we may validly use our cached pointer to the variable.
+		if (try_acquire_spinlock(&variable->fLock))
+			break;
+	}
+
+	// We now hold the variable's lock. Remove ourselves.
+	if (fVariable->fEntries.Contains(this))
+		fVariable->fEntries.Remove(this);
+
+	atomic_pointer_set(&fVariable, (ConditionVariable*)NULL);
+	atomic_add(&variable->fEntriesCount, -1);
+	release_spinlock(&variable->fLock);
 }
 
 
@@ -177,18 +203,25 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 	}
 #endif
 
+	// The race in-between get_and_set and (re)set is irrelevant, because
+	// if the status really is <= 0, we have already been or are about to
+	// be removed from the variable, and nothing else is going to set the status.
+	status_t waitStatus = atomic_get_and_set(&fWaitStatus, STATUS_WAITING);
+	if (waitStatus <= 0) {
+		fWaitStatus = waitStatus;
+		return waitStatus;
+	}
+
 	InterruptsLocker _;
-	SpinLocker entryLocker(fLock);
 
-	if (fVariable == NULL)
-		return fWaitStatus;
+	thread_prepare_to_block(thread_get_current_thread(), flags,
+		THREAD_BLOCK_TYPE_CONDITION_VARIABLE, atomic_pointer_get(&fVariable));
 
-	thread_prepare_to_block(fThread, flags,
-		THREAD_BLOCK_TYPE_CONDITION_VARIABLE, fVariable);
-
-	fWaitStatus = STATUS_WAITING;
-
-	entryLocker.Unlock();
+	waitStatus = atomic_get(&fWaitStatus);
+	if (waitStatus <= 0) {
+		// We were just woken up! Unblock ourselves immediately.
+		thread_unblock(thread_get_current_thread(), waitStatus);
+	}
 
 	status_t error;
 	if ((flags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0)
@@ -222,6 +255,7 @@ ConditionVariable::Init(const void* object, const char* objectType)
 	fObject = object;
 	fObjectType = objectType;
 	new(&fEntries) EntryList;
+	fEntriesCount = 0;
 	B_INITIALIZE_SPINLOCK(&fLock);
 
 	T_SCHEDULING_ANALYSIS(InitConditionVariable(this, object, objectType));
@@ -238,6 +272,7 @@ ConditionVariable::Publish(const void* object, const char* objectType)
 	fObject = object;
 	fObjectType = objectType;
 	new(&fEntries) EntryList;
+	fEntriesCount = 0;
 	B_INITIALIZE_SPINLOCK(&fLock);
 
 	T_SCHEDULING_ANALYSIS(InitConditionVariable(this, object, objectType));
@@ -346,30 +381,47 @@ void
 ConditionVariable::_NotifyLocked(bool all, status_t result)
 {
 	// Dequeue and wake up the blocked threads.
-	// We *cannot* hold our own lock while acquiring the Entry's lock,
-	// as this leads to a (non-theoretical!) race between the Entry
-	// entering Wait() and acquiring its own lock, and then acquiring ours.
 	while (ConditionVariableEntry* entry = fEntries.RemoveHead()) {
-		release_spinlock(&fLock);
-		acquire_spinlock(&entry->fLock);
+		Thread* thread = atomic_pointer_get_and_set(&entry->fThread, (Thread*)NULL);
+		if (thread == NULL) {
+			// The entry must be in the process of trying to remove itself from us.
+			// Clear its variable and wait for it to acknowledge this in fEntriesCount,
+			// as it is the one responsible for decrementing that.
+			const int32 oldCount = atomic_get(&fEntriesCount);
+			atomic_pointer_set(&entry->fVariable, (ConditionVariable*)NULL);
 
-		entry->fVariable = NULL;
+			// As fEntriesCount is only modified while our lock is held, nothing else
+			// will modify it while we are spinning, since we hold it at present.
+			int32 tries = 0;
+			while (atomic_get(&fEntriesCount) == oldCount) {
+				tries++;
+				if ((tries % 10000) == 0)
+					panic("entries count was not decremented for a long time!");
+				cpu_pause();
+			}
+		} else {
+			status_t waitStatus = atomic_get_and_set(&entry->fWaitStatus, result);
 
-		if (entry->fWaitStatus <= 0) {
-			release_spinlock(&entry->fLock);
-			acquire_spinlock(&fLock);
-			continue;
+			SpinLocker threadLocker(thread->scheduler_lock);
+			if (waitStatus == STATUS_WAITING && thread->state != B_THREAD_WAITING) {
+				// The thread is not in B_THREAD_WAITING state, so we must unblock it early,
+				// in case it tries to re-block itself immediately after we unset fVariable.
+				thread_unblock_locked(thread, result);
+				waitStatus = result;
+			}
+
+			// No matter what the thread is doing, as we were the ones to clear its
+			// fThread, so we are the ones responsible for decrementing fEntriesCount.
+			// (We may not validly access the entry once we unset its fVariable.)
+			atomic_pointer_set(&entry->fVariable, (ConditionVariable*)NULL);
+			atomic_add(&fEntriesCount, -1);
+
+			// If the thread was in B_THREAD_WAITING state, we unblock it after unsetting
+			// fVariable, because otherwise it will wake up before thread_unblock returns
+			// and spin while waiting for us to do so.
+			if (waitStatus == STATUS_WAITING)
+				thread_unblock_locked(thread, result);
 		}
-
-		if (entry->fWaitStatus == STATUS_WAITING) {
-			SpinLocker _(entry->fThread->scheduler_lock);
-			thread_unblock_locked(entry->fThread, result);
-		}
-
-		entry->fWaitStatus = result;
-
-		release_spinlock(&entry->fLock);
-		acquire_spinlock(&fLock);
 
 		if (!all)
 			break;

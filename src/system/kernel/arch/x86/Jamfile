@@ -107,14 +107,14 @@ local archGenericSources =
 	x86_pit.cpp
 ;
 
-KernelMergeObject kernel_arch_x86.o :
+KernelMergeObject kernel_arch_$(TARGET_KERNEL_ARCH).o :
 	$(archSpecificSources)
 	$(archGenericSources)
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
-CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp ;
+CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp : $(TARGET_KERNEL_ARCH) ;
 
 # We need to specify the dependency on the generated syscalls file explicitly.
 Includes [ FGristFiles interrupts.S arch.S signals.cpp signals_asm.S ]

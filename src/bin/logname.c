@@ -1,5 +1,5 @@
 /*
- * OBOS Command line apps
+ * Haiku Command line apps
  * logname.c
  * Larry Cow <larrycow@free.fr>
  */
@@ -24,7 +24,7 @@ Reports bugs to <larrycow@free.fr>."
 Written by Larry Cow
 
 Coded by Larry Cow 2002
-Released under the MIT license with OpenBeOS."
+Released under the MIT license with Haiku."
 
 void dispatch_args(char* av0, char* av1)
 {

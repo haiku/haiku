@@ -400,7 +400,7 @@ CommonFindAppTest9(FindAppCaller &caller)
 					with a different signature
 	@results		Should return B_OK and set the ref to refer to the
 					application's executable. Should remove the incorrect app
-					hint on the app type. (OBOS: Should set the correct app
+					hint on the app type. (Haiku: Should set the correct app
 					hint. Don't even return the wrong app?)
 */
 static
@@ -417,7 +417,7 @@ CommonFindAppTest10(FindAppCaller &caller)
 	CHK(caller(fileType1, &ref) == B_OK);
 	CHK(ref_for_path(appFile1) == ref);
 	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_ENTRY_NOT_FOUND);
-// OBOS: We set the app hint for app type 2. There's no reason not to do it.
+// Haiku: We set the app hint for app type 2. There's no reason not to do it.
 #ifdef TEST_R5
 	CHK(BMimeType(appType2).IsInstalled() == false);
 #else
@@ -548,7 +548,7 @@ CommonFindAppTest15(FindAppCaller &caller)
 					link, no app with this signature exists
 	@results		R5: Should return B_OK and set the ref to refer to the
 					link.
-					OBOS: Should return B_LAUNCH_FAILED_APP_NOT_FOUND and
+					Haiku: Should return B_LAUNCH_FAILED_APP_NOT_FOUND and
 					unset the app type's app hint.
 */
 static

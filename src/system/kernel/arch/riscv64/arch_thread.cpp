@@ -22,12 +22,6 @@
 
 extern "C" void SVecU();
 
-extern "C" void RestoreUserRegs()
-{
-	SetSscratch((addr_t)&thread_get_current_thread()->arch_info);
-	SetTp(thread_get_current_thread()->user_local_storage);
-}
-
 
 status_t
 arch_thread_init(struct kernel_args *args)
@@ -50,7 +44,6 @@ arch_team_init_team_struct(Team *team, bool kernel)
 status_t
 arch_thread_init_thread_struct(Thread *thread)
 {
-	thread->arch_info.thread = thread;
 	return B_OK;
 }
 
@@ -70,15 +63,17 @@ void
 arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 	void (*function)(void*), const void* data)
 {
-	// dprintf("arch_thread_init_kthread_stack(%p(%s))\n", thread, thread->name);
 	memset(&thread->arch_info.context, 0, sizeof(arch_context));
 	thread->arch_info.context.sp = (addr_t)_stackTop;
 	thread->arch_info.context.s[0] = 0; // fp
 	thread->arch_info.context.s[1] = (addr_t)function;
 	thread->arch_info.context.s[2] = (addr_t)data;
 	thread->arch_info.context.ra = (addr_t)arch_thread_entry;
-	VMTranslationMap* map = GetThreadAddressSpace(thread)->TranslationMap();
-	thread->arch_info.context.satp = ((RISCV64VMTranslationMap*)map)->Satp();
+	RISCV64VMTranslationMap* map = (RISCV64VMTranslationMap*)
+		thread->team->address_space->TranslationMap();
+	thread->arch_info.context.satp = map->Satp();
+
+	memset(&thread->arch_info.fpuContext, 0, sizeof(fpu_context));
 }
 
 
@@ -107,13 +102,22 @@ arch_thread_context_switch(Thread *from, Thread *to)
 	dprintf("arch_thread_context_switch(%p(%s), %p(%s))\n", from, from->name,
 		to, to->name);
 	*/
+
+	RISCV64VMTranslationMap* fromMap = (RISCV64VMTranslationMap*)from->team
+		->address_space->TranslationMap();
+
+	RISCV64VMTranslationMap* toMap = (RISCV64VMTranslationMap*)to->team
+		->address_space->TranslationMap();
+
+	int cpu = to->cpu->cpu_num;
+	toMap->ActiveOnCpus().SetBitAtomic(cpu);
+	fromMap->ActiveOnCpus().ClearBitAtomic(cpu);
+
 	// TODO: save/restore FPU only if needed
 	save_fpu(&from->arch_info.fpuContext);
-	if (arch_setjmp(&from->arch_info.context) == 0) {
-		arch_longjmp(&to->arch_info.context, 1);
-	} else {
-		restore_fpu(&from->arch_info.fpuContext);
-	}
+	restore_fpu(&to->arch_info.fpuContext);
+
+	arch_context_switch(&from->arch_info.context, &to->arch_info.context);
 }
 
 
@@ -127,22 +131,38 @@ status_t
 arch_thread_enter_userspace(Thread *thread, addr_t entry, void *arg1,
 	void *arg2)
 {
-	// dprintf("arch_thread_enter_uspace()\n");
+	//dprintf("arch_thread_enter_uspace(%" B_PRId32 "(%s))\n", thread->id, thread->name);
+
+	addr_t commpageAdr = (addr_t)thread->team->commpage_address;
+	addr_t threadExitAddr;
+	ASSERT(user_memcpy(&threadExitAddr,
+		&((addr_t*)commpageAdr)[COMMPAGE_ENTRY_RISCV64_THREAD_EXIT],
+		sizeof(threadExitAddr)) >= B_OK);
+	threadExitAddr += commpageAdr;
 
 	disable_interrupts();
-	if (arch_setjmp(&thread->arch_info.context) == 0) {
-		SstatusReg status(Sstatus());
-		status.pie = (1 << modeS); // enable interrupts when enter userspace
-		status.spp = modeU;
-		SetSstatus(status.val);
-		SetStvec((addr_t)SVecU);
-		SetSepc(entry);
-		RestoreUserRegs();
-		arch_enter_userspace(arg1, arg2,
-			thread->user_stack_base + thread->user_stack_size);
-	} else {
-		panic("return from userspace");
-	}
+
+	arch_stack* stackHeader = (arch_stack*)thread->kernel_stack_top - 1;
+	stackHeader->thread = thread;
+
+	iframe frame;
+	memset(&frame, 0, sizeof(frame));
+
+	SstatusReg status(Sstatus());
+	status.pie = (1 << modeS); // enable interrupts when enter userspace
+	status.spp = modeU;
+
+	frame.status = status.val;
+	frame.epc = entry;
+	frame.a0 = (addr_t)arg1;
+	frame.a1 = (addr_t)arg2;
+	frame.ra = threadExitAddr;
+	frame.sp = thread->user_stack_base + thread->user_stack_size;
+	frame.tp = thread->user_local_storage;
+
+	arch_load_user_iframe(stackHeader, &frame);
+
+	// never return
 	return B_ERROR;
 }
 
@@ -186,7 +206,7 @@ status_t
 arch_setup_signal_frame(Thread *thread, struct sigaction *sa,
 	struct signal_frame_data *signalFrameData)
 {
-	// dprintf("arch_setup_signal_frame()\n");
+	// dprintf("%s(%" B_PRId32 "(%s))\n", __func__, thread->id, thread->name);
 	iframe* frame = thread->arch_info.userFrame;
 
 	// fill signal context
@@ -237,6 +257,8 @@ arch_setup_signal_frame(Thread *thread, struct sigaction *sa,
 		);
 	}
 */
+	signalFrameData->syscall_restart_return_value = thread->arch_info.oldA0;
+
 	uint8* userStack = get_signal_stack(thread, frame, sa,
 		sizeof(*signalFrameData));
 	// dprintf("  user stack: 0x%" B_PRIxADDR "\n", (addr_t)userStack);
@@ -269,6 +291,9 @@ arch_restore_signal_frame(struct signal_frame_data* signalFrameData)
 {
 	// dprintf("arch_restore_signal_frame()\n");
 	iframe* frame = thread_get_current_thread()->arch_info.userFrame;
+
+	thread_get_current_thread()->arch_info.oldA0
+		= signalFrameData->syscall_restart_return_value;
 
 	frame->ra  = signalFrameData->context.uc_mcontext.x[ 0];
 	frame->sp  = signalFrameData->context.uc_mcontext.x[ 1];
@@ -346,15 +371,19 @@ arch_store_fork_frame(struct arch_fork_arg *arg)
 void
 arch_restore_fork_frame(struct arch_fork_arg *arg)
 {
-	// dprintf("arch_restore_fork_frame(%p)\n", arg);
+	//dprintf("arch_restore_fork_frame(%p)\n", arg);
+	//dprintf("  thread: %" B_PRId32 "(%s))\n", thread_get_current_thread()->id,
+	//	thread_get_current_thread()->name);
+	//dprintf("  kernel SP: %#" B_PRIxADDR "\n", thread_get_current_thread()->kernel_stack_top);
+	//dprintf("  user PC: "); WritePC(arg->frame.epc); dprintf("\n");
+
 	disable_interrupts();
-	if (arch_setjmp(&thread_get_current_thread()->arch_info.context) == 0) {
-		SstatusReg status(Sstatus());
-		status.pie = (1 << modeS); // enable interrupts when enter userspace
-		status.spp = modeU;
-		SetSstatus(status.val);
-		arch_longjmp_iframe(&arg->frame);
-	} else {
-		panic("return from userspace");
-	}
+
+	arch_stack* stackHeader = (arch_stack*)thread_get_current_thread()->kernel_stack_top - 1;
+	stackHeader->thread = thread_get_current_thread();
+	SstatusReg status(Sstatus());
+	status.pie = (1 << modeS); // enable interrupts when enter userspace
+	status.spp = modeU;
+	arg->frame.status = status.val;
+	arch_load_user_iframe(stackHeader, &arg->frame);
 }

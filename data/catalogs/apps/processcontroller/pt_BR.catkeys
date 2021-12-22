@@ -31,14 +31,14 @@ Quit application	ProcessController		Sair do aplicativo
 Info	ProcessController		Informações
 Kill this thread!	ProcessController		Matar este processo!
 This team is already gone…	ProcessController		Esta equipe já se foi…
-Gone teams…	ProcessController		Equipes terminadas…
+Gone teams…	ProcessController		Processos zumbis…
 Quit an application	ProcessController		Fechar uma aplicação
 Cancel	ProcessController		Cancelar
 Install in Deskbar	ProcessController		Instalar no Deskbar
 Debug this team!	ProcessController		Depurar esta equipe!
 ProcessController	System name		Controlador de Processo
 Lowest active priority	ProcessController		Prioridade de mais baixa atividade
-Restart Tracker	ProcessController		Reiniciar o Rastreador (Tracker)
+Restart Tracker	ProcessController		Reiniciar Tracker
 System resources & caches…	ProcessController		Recursos & caches de sistema…
 Damned!	ProcessController		Maldição!
 New Terminal	ProcessController		Novo Terminal

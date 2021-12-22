@@ -610,4 +610,16 @@ static __inline void IFDI_DEBUG(if_ctx_t _ctx)
 	((ifdi_debug_t *) _m)(_ctx);
 }
 
+extern struct kobjop_desc ifdi_needs_restart_desc;
+typedef bool ifdi_needs_restart_t(if_ctx_t _ctx, enum iflib_restart_event _event);
+
+static __inline bool IFDI_NEEDS_RESTART(if_ctx_t _ctx, enum iflib_restart_event _event)
+{
+	kobjop_t _m;
+	bool rc;
+	KOBJOPLOOKUP(((kobj_t)_ctx)->ops,ifdi_needs_restart);
+	rc = ((ifdi_needs_restart_t *) _m)(_ctx, _event);
+	return (rc);
+}
+
 #endif

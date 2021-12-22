@@ -1649,6 +1649,7 @@ rule BuildCDBootPPCImage image : hfsmaps : elfloader : coffloader : chrpscript
 actions BuildCDBootPPCImage1 bind MAPS
 {
 	$(RM) $(<)
+
 	mkdir -p $(HAIKU_OUTPUT_DIR)/cd/ppc
 	mkdir -p $(HAIKU_OUTPUT_DIR)/cd/boot
 	# CHRP Boot script
@@ -1662,9 +1663,10 @@ actions BuildCDBootPPCImage1 bind MAPS
 
 	# Xorriso doesn't have map and some other required tools
 	# to make bootable PowerPC images
-	genisoimage -v -hfsplus -map $(MAPS) \
+	genisoimage -v -hfs -map $(MAPS) \
 		-hfs-bless $(HAIKU_OUTPUT_DIR)/cd/boot -part -no-desktop \
 		-hfs-parms MAX_XTCSIZE=2656248 -hfs-volid Haiku \
+		--prep-boot boot/haikuloader.elf \
 		--chrp-boot -r -J -o $(<) $(HAIKU_OUTPUT_DIR)/cd
 
 	$(RM) -r $(HAIKU_OUTPUT_DIR)/cd
@@ -1683,6 +1685,8 @@ rule BuildEfiSystemPartition image : efiLoader
 	Depends $(image) : $(fatshell) ;
 
 	switch $(TARGET_ARCH) {
+		case x86 :
+			EFINAME on $(image) = "BOOTIA32.EFI" ;
 		case x86_64 :
 			EFINAME on $(image) = "BOOTX64.EFI" ;
 		case arm :

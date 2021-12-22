@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2009, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -15,10 +15,7 @@ strndup(const char* string, size_t size)
 	if (string == NULL)
 		return NULL;
 
-	size_t length = strlen(string);
-	if (length > size)
-		length = size;
-
+	size_t length = strnlen(string, size);
 	char* copied = (char*)malloc(length + 1);
 	if (copied == NULL)
 		return NULL;

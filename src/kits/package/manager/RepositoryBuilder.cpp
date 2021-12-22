@@ -146,7 +146,7 @@ BRepositoryBuilder::AddPackage(const char* path, BSolverPackage** _package)
 	BEntry entry(path, true);
 
 	if (!entry.Exists()) {
-		DIE_DETAILS(errorListener.Errors(), B_FILE_NOT_FOUND,
+		DIE_DETAILS(errorListener.Errors(), B_ENTRY_NOT_FOUND,
 			"the package data file does not exist at \"%s\"", path);
 	}
 

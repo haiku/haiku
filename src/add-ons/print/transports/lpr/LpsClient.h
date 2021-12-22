@@ -37,19 +37,15 @@ class LpsClient {
 public:
 					LpsClient(const char* host);
 					~LpsClient();
-	void			connect() throw(LPSException);
+	void			connect();
 	void			close();
-	void			receiveJob(const char* queue) throw(LPSException);
-	void			receiveControlFile(int cfsize, const char* cfname)
-						throw(LPSException);
-	void			receiveDataFile(int dfsize, const char* dfname)
-						throw(LPSException);
-	void			transferData(const char* buffer, int size = -1)
-						throw(LPSException);
-	void			transferData(istream& is, int size = -1)
-						throw(LPSException);
-	void			endTransfer() throw(LPSException);
-	void			checkAck() throw(LPSException);
+	void			receiveJob(const char* queue);
+	void			receiveControlFile(int cfsize, const char* cfname);
+	void			receiveDataFile(int dfsize, const char* dfname);
+	void			transferData(const char* buffer, int size = -1);
+	void			transferData(istream& is, int size = -1);
+	void			endTransfer();
+	void			checkAck();
 
 private:
 	bool		fConnected;

@@ -966,7 +966,7 @@ Equation<QueryPolicy>::GetNextMatching(Context* context,
 			dirent->d_ino = QueryPolicy::EntryGetNodeID(entry);
 			dirent->d_pdev = dirent->d_dev;
 			dirent->d_pino = QueryPolicy::EntryGetParentID(entry);
-			dirent->d_reclen = sizeof(struct dirent) + strlen(dirent->d_name);
+			dirent->d_reclen = sizeof(struct dirent) + strlen(dirent->d_name) + 1;
 		}
 
 		if (status == MATCH_OK)

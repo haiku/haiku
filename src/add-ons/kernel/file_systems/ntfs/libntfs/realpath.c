@@ -45,8 +45,8 @@ canonicalize_dm_name(const char *ptname, char *canonical)
 {
 	FILE	*f;
 	size_t	sz;
-	char	path[MAPPERNAMELTH + 24];
 	char	name[MAPPERNAMELTH + 16];
+	char	path[sizeof(name) + 16];
 	char	*res = NULL;
 
 	snprintf(path, sizeof(path), "/sys/block/%s/dm/name", ptname);

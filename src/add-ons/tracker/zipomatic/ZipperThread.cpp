@@ -418,7 +418,7 @@ ZipperThread::_SelectInTracker(int32 tryNumber)
 	BEntry entry(&fOutputEntryRef);
 
 	if (!entry.Exists())
-		return B_FILE_NOT_FOUND;
+		return B_ENTRY_NOT_FOUND;
 
 	entry.GetParent(&entry);
 	entry.GetRef(&parentRef);

@@ -1417,13 +1417,13 @@ devfs_read_dir(fs_volume* _volume, fs_vnode* _vnode, void* _cookie,
 
 	dirent->d_dev = fs->id;
 	dirent->d_ino = childNode->id;
-	dirent->d_reclen = strlen(name) + sizeof(struct dirent);
+	dirent->d_reclen = offsetof(struct dirent, d_name) + strlen(name) + 1;
 
 	if (dirent->d_reclen > bufferSize)
 		return ENOBUFS;
 
 	status = user_strlcpy(dirent->d_name, name,
-		bufferSize - sizeof(struct dirent));
+		bufferSize - offsetof(struct dirent, d_name));
 	if (status < B_OK)
 		return status;
 

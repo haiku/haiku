@@ -17,6 +17,8 @@
 #include <timer.h>
 #include <Clint.h>
 
+#include <smp.h>
+
 
 extern uint32 gPlatform;
 
@@ -24,6 +26,8 @@ extern uint32 gPlatform;
 void
 arch_timer_set_hardware_timer(bigtime_t timeout)
 {
+	// dprintf("arch_timer_set_hardware_timer(%" B_PRIu64 "), cpu: %" B_PRId32 "\n", timeout, smp_get_current_cpu());
+
 	// TODO: Read timer frequency from FDT
 	switch (gPlatform) {
 		case kPlatformMNative:
@@ -37,12 +41,16 @@ arch_timer_set_hardware_timer(bigtime_t timeout)
 		default:
 			;
 	}
+
+	// SetSie(Sie() | (1 << sTimerInt));
 }
 
 
 void
 arch_timer_clear_hardware_timer()
 {
+	// SetSie(Sie() & ~(1 << sTimerInt));
+
 	switch (gPlatform) {
 		case kPlatformMNative:
 			MSyscall(kMSyscallSetTimer, false);

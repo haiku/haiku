@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network ether usb_davicom ;
+
+UsePrivateHeaders kernel net ;
+UsePrivateKernelHeaders ;
+
+KernelAddon usb_davicom :
+	Driver.cpp
+	DavicomDevice.cpp
+	Settings.cpp
+	;

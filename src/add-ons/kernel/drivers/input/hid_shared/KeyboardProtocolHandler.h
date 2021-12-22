@@ -16,7 +16,7 @@ class HIDCollection;
 
 
 #define MAX_MODIFIERS	16
-#define MAX_KEYS		16
+#define MAX_KEYS		128
 #define MAX_LEDS		3
 
 

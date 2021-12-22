@@ -14,6 +14,7 @@
 
 #include <boot/stage2.h>
 #include <boot/platform.h>
+#include <boot/platform/generic/video.h>
 #include <efi/protocol/console-control.h>
 #include <util/kernel_cpp.h>
 
@@ -30,42 +31,51 @@
 #endif
 
 
-class Console : public ConsoleNode {
+class EFITextConsole : public ConsoleNode {
 	public:
-		Console();
+		EFITextConsole();
 
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer,
 			size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer,
 			size_t bufferSize);
+
+		virtual void	ClearScreen();
+		virtual int32	Width();
+		virtual int32	Height();
+		virtual void	SetCursor(int32 x, int32 y);
+		virtual void	SetCursorVisible(bool visible);
+		virtual void	SetColors(int32 foreground, int32 background);
+
+	public:
+		uint32 fScreenWidth, fScreenHeight;
 };
 
 
-static uint32 sScreenWidth;
-static uint32 sScreenHeight;
+extern ConsoleNode* gConsoleNode;
 static uint32 sScreenMode;
-static Console sInput, sOutput;
+static EFITextConsole sConsole;
 FILE *stdin, *stdout, *stderr;
 
 
 //	#pragma mark -
 
 
-Console::Console()
+EFITextConsole::EFITextConsole()
 	: ConsoleNode()
 {
 }
 
 
 ssize_t
-Console::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+EFITextConsole::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	return B_ERROR;
 }
 
 
 ssize_t
-Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer,
+EFITextConsole::WriteAt(void *cookie, off_t /*pos*/, const void *buffer,
 	size_t bufferSize)
 {
 	const char *string = (const char *)buffer;
@@ -100,53 +110,43 @@ Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer,
 }
 
 
-//	#pragma mark -
-
-
 void
-console_clear_screen(void)
+EFITextConsole::ClearScreen()
 {
 	kSystemTable->ConOut->ClearScreen(kSystemTable->ConOut);
 }
 
 
 int32
-console_width(void)
+EFITextConsole::Width()
 {
-	return sScreenWidth;
+	return fScreenWidth;
 }
 
 
 int32
-console_height(void)
+EFITextConsole::Height()
 {
-	return sScreenHeight;
+	return fScreenHeight;
 }
 
 
 void
-console_set_cursor(int32 x, int32 y)
+EFITextConsole::SetCursor(int32 x, int32 y)
 {
 	kSystemTable->ConOut->SetCursorPosition(kSystemTable->ConOut, x, y);
 }
 
 
 void
-console_show_cursor(void)
+EFITextConsole::SetCursorVisible(bool visible)
 {
-	kSystemTable->ConOut->EnableCursor(kSystemTable->ConOut, true);
+	kSystemTable->ConOut->EnableCursor(kSystemTable->ConOut, visible);
 }
 
 
 void
-console_hide_cursor(void)
-{
-	kSystemTable->ConOut->EnableCursor(kSystemTable->ConOut, false);
-}
-
-
-void
-console_set_color(int32 foreground, int32 background)
+EFITextConsole::SetColors(int32 foreground, int32 background)
 {
 	kSystemTable->ConOut->SetAttribute(kSystemTable->ConOut,
 		EFI_TEXT_ATTR((foreground & 0xf), (background & 0xf)));
@@ -202,8 +202,8 @@ static void update_screen_size(void)
 	for (int mode = 0; mode < ConOut->Mode->MaxMode; ++mode) {
 		if (ConOut->QueryMode(ConOut, mode, &width, &height) == EFI_SUCCESS) {
 			if (width * height > area) {
-				sScreenWidth = width;
-				sScreenHeight = height;
+				sConsole.fScreenWidth = width;
+				sConsole.fScreenHeight = height;
 				sScreenMode = mode;
 			}
 		}
@@ -216,13 +216,24 @@ static void update_screen_size(void)
 status_t
 console_init(void)
 {
+#if 1
+	gConsoleNode = &sConsole;
+
 	update_screen_size();
 	console_hide_cursor();
 	console_clear_screen();
+#else
+	// FIXME: This does not work because we cannot initialize video before VFS, as it
+	// needs to read the driver settings before setting a mode; and also because the
+	// heap does not yet exist.
+	platform_init_video();
+	platform_switch_to_logo();
+	gConsoleNode = video_text_console_init(gKernelArgs.frame_buffer.physical_buffer.start);
+#endif
 
 	// enable stdio functionality
-	stdin = (FILE *)&sInput;
-	stdout = stderr = (FILE *)&sOutput;
+	stdin = (FILE *)gConsoleNode;
+	stdout = stderr = (FILE *)gConsoleNode;
 
 	return B_OK;
 }

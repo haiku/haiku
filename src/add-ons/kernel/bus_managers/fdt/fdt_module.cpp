@@ -18,9 +18,9 @@
 #include <debug.h>
 
 extern "C" {
+#include <libfdt_env.h>
 #include <fdt.h>
 #include <libfdt.h>
-#include <libfdt_env.h>
 };
 
 
@@ -65,8 +65,14 @@ fdt_register_node(fdt_bus* bus, int node, device_node* parentDev,
 	const void* prop; int propLen;
 	device_attr attrs[8];
 	device_attr* attr = attrs;
+	int nameLen = 0;
+	const char *name = fdt_get_name(gFDT, node, &nameLen);
 
-	const char *name = fdt_get_name(gFDT, node, NULL);
+	if (name == NULL) {
+		dprintf("%s ERROR: fdt_get_name: %s\n", __func__,
+			fdt_strerror(nameLen));
+		return B_ERROR;
+	}
 
 	*attr++ = (device_attr) { B_DEVICE_BUS, B_STRING_TYPE, {string: "fdt"}};
 	*attr++ = (device_attr) { B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
@@ -181,6 +187,11 @@ static status_t
 fdt_bus_init(device_node* node, void** cookie)
 {
 	TRACE("fdt_bus_init\n");
+
+	if (gFDT == NULL) {
+		TRACE("FDT is NULL!\n");
+		return B_DEVICE_NOT_FOUND;
+	}
 
 	ObjectDeleter<fdt_bus> bus(new(std::nothrow) fdt_bus());
 	if (!bus.IsSet())

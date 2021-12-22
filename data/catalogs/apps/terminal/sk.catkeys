@@ -12,8 +12,8 @@ Solarized Dark	Terminal colors scheme		Solarizovaná tmavá
 Copy	Terminal TermWindow		Skopírovať
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Upraviť titulok karty…
-Print	Terminal TermWindow		Tlačiť
 Settings	Terminal TermWindow		Nastavenia
+Print	Terminal TermWindow		Tlačiť
 %app% settings	Terminal PrefWindow	window title	%app% - nastavenia
 Use default	Terminal SetTitleWindow		Použiť predvolené
 Close tab	Terminal TermWindow		Zatvoriť okno
@@ -32,8 +32,8 @@ Defaults	Terminal PrefWindow		Predvoľby
 Cancel	Terminal TermView		Zrušiť
 Revert	Terminal PrefWindow		Vrátiť späť
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminál
-Use selection	Terminal FindWindow		Použiť výber
 Find next	Terminal TermWindow		Nájsť ďalší
+Use selection	Terminal FindWindow		Použiť výber
 Copy link location	Terminal TermView		Kopírovať umiestnenie odkazu
 Window title:	Terminal AppearancePrefView		Titulok okna:
 New tab	Terminal TermWindow		Nová karta
@@ -52,12 +52,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Nerozpoznaná voľba �
 Tab title:	Terminal AppearancePrefView		Titulok karty:
 Text not found.	Terminal TermWindow		Text nenájdený.
 Find failed	Terminal TermWindow		Hľadanie zlyhalo
-Match word	Terminal FindWindow		Nájsť slovo
 Color scheme:	Terminal AppearancePrefView		Schéma farieb:
+Match word	Terminal FindWindow		Nájsť slovo
 New Terminal	Terminal TermWindow		Nový terminál
 Quit	Terminal TermWindow		Ukončiť
-Match case	Terminal FindWindow		Rozlišovať veľkosť písmen
 Find previous	Terminal TermWindow		Nájsť predošlý
+Match case	Terminal FindWindow		Rozlišovať veľkosť písmen
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Vzor určujúci názvy kariet. Je možné použiť nasledovné\nzástupné symboly:
 Close	Terminal TermWindow		Zatvoriť
 Save to file…	Terminal PrefWindow		Uložiť do súboru…
@@ -79,11 +79,11 @@ Window size:	Terminal AppearancePrefView		Veľkosť okna:
 Switch Terminals	Terminal TermWindow		Prepnúť terminály
 Decrease	Terminal TermWindow		Zmenšiť
 Settings…	Terminal TermWindow		Nastavenia…
-Cancel	Terminal SetTitleWindow		Zrušiť
 Blinking cursor	Terminal AppearancePrefView		Blikajúci kurzor
+Cancel	Terminal SetTitleWindow		Zrušiť
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Vzor určujúci titulky okien. Možno použiť\nnasledovné zástupné symboly:\n
-Use text:	Terminal FindWindow		Použiť text:
 Close active tab	Terminal TermWindow		Zatvoriť aktívnu kartu
+Use text:	Terminal FindWindow		Použiť text:
 Save as default	Terminal TermWindow		Uložiť ako predvolené
 Nothing is selected.	Terminal TermWindow		Nič nie je vybrané.
 Find	Terminal FindWindow		Nájsť
@@ -109,6 +109,6 @@ Set window title	Terminal TermWindow		Nastaviť titulok okna
 Increase	Terminal TermWindow		Zväčšiť
 OK	Terminal TermWindow		OK
 Close window	Terminal TermWindow		Zatvoriť okno
-Solarized Light	Terminal colors scheme		Solarizovaná svetlá
 Clear all	Terminal TermWindow		Vyčistiť všetko
+Solarized Light	Terminal colors scheme		Solarizovaná svetlá
 Search forward	Terminal FindWindow		Hľadať vpred

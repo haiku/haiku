@@ -174,12 +174,12 @@ volume_init(int fd, uint8* buf,
 	const int flags, int fs_flags,
 	device_geometry *geo)
 {
-	nspace *vol = NULL;
 	uint8 media_buf[512];
 	int i;
 	status_t err;
 
-	if ((vol = (nspace *)calloc(sizeof(nspace), 1)) == NULL) {
+	nspace* vol = (nspace *)calloc(sizeof(nspace), 1);
+	if (vol == NULL) {
 		dprintf("dosfs error: out of memory\n");
 		return NULL;
 	}
@@ -419,17 +419,11 @@ volume_init(int fd, uint8* buf,
 				break;
 			}
 		}
-
-		diri_free(&diri);
 	}
 
 	DPRINTF(0, ("root vnode id = %" B_PRIdINO "\n", vol->root_vnode.vnid));
 	DPRINTF(0, ("volume label [%s] (%" B_PRIu32 ")\n", vol->vol_label,
 		vol->vol_entry));
-
-	// steal a trick from bfs
-	if (!memcmp(vol->vol_label, "__RO__     ", 11))
-		vol->flags |= B_FS_IS_READONLY;
 
 	return vol;
 
@@ -455,7 +449,7 @@ volume_count_free_cluster(nspace *vol)
 	if (vol->flags & B_FS_IS_READONLY)
 		vol->free_clusters = 0;
 	else {
-		uint32 free_count, last_allocated;
+		uint32 free_count = 0, last_allocated = 0;
 		err = get_fsinfo(vol, &free_count, &last_allocated);
 		if (err >= 0) {
 			if (free_count < vol->total_clusters)
@@ -648,10 +642,6 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	DPRINTF(0, ("volume label [%s] (%" B_PRIu32 ")\n", vol->vol_label,
 		vol->vol_entry));
 
-	// steal a trick from bfs
-	if (!memcmp(vol->vol_label, "__RO__     ", 11))
-		vol->flags |= B_FS_IS_READONLY;
-
 	*newVol = vol;
 	return B_NO_ERROR;
 
@@ -821,14 +811,7 @@ dosfs_mount(fs_volume *_vol, const char *device, uint32 flags,
 		unload_driver_settings(handle);
 	}
 
-	/* args is a command line option; dosfs doesn't use any so
-	   we can ignore these arguments */
-	TOUCH(args);
-
-#if __RO__
-	// make it read-only
-	flags |= 1;
-#endif
+	/* args is a command line option; dosfs doesn't use any so we can ignore it */
 
 	// Try and mount volume as a FAT volume
 	if ((result = mount_fat_disk(device, _vol, flags, &vol, fs_flags,
@@ -944,7 +927,7 @@ dosfs_unmount(fs_volume *_vol)
 
 	nspace* vol = (nspace*)_vol->private_volume;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_unmount volume %" B_PRIdDEV "\n", vol->id));
 
@@ -968,6 +951,7 @@ dosfs_unmount(fs_volume *_vol)
 	uninit_vcache(vol);
 
 	result = close(vol->fd);
+	lock.Unlock();
 	recursive_lock_destroy(&(vol->vlock));
 	free(vol);
 
@@ -985,7 +969,7 @@ dosfs_read_fs_stat(fs_volume *_vol, struct fs_info * fss)
 {
 	nspace* vol = (nspace*)_vol->private_volume;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(1, ("dosfs_read_fs_stat called\n"));
 
@@ -1019,8 +1003,6 @@ dosfs_read_fs_stat(fs_volume *_vol, struct fs_info * fss)
 	// File system name
 	strcpy(fss->fsh_name, "fat");
 
-	UNLOCK_VOL(vol);
-
 	return B_OK;
 }
 
@@ -1031,16 +1013,13 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 	status_t result = B_ERROR;
 	nspace* vol = (nspace*)_vol->private_volume;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	DPRINTF(0, ("dosfs_write_fs_stat called\n"));
 
-	/* if it's a r/o file system and not the special hack, then don't allow
-	 * volume renaming */
-	if ((vol->flags & B_FS_IS_READONLY) && memcmp(vol->vol_label, "__RO__     ", 11)) {
-		UNLOCK_VOL(vol);
+	/* if it's a r/o file system, then don't allow volume renaming */
+	if ((vol->flags & B_FS_IS_READONLY) == 0)
 		return EROFS;
-	}
 
 	if (mask & FS_WRITE_FSINFO_NAME) {
 		// sanitize name
@@ -1055,10 +1034,8 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 			if (strchr(sAcceptable, c) || (c == ' '))
 				name[i++] = c;
 		}
-		if (i == 0) { // bad name, kiddo
-			result = EINVAL;
-			goto bi;
-		}
+		if (i == 0) // bad name, kiddo
+			return EINVAL;
 		DPRINTF(1, ("wfsstat: sanitized to [%11.11s]\n", name));
 
 		if (vol->vol_entry == -1) {
@@ -1067,7 +1044,7 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 			result = block_cache_get_writable_etc(vol->fBlockCache, 0,
 				0, vol->bytes_per_sector, -1, (void**)&buffer);
 			if (result != B_OK)
-				goto bi;
+				return result;
 
 			if ((vol->sectors_per_fat == 0 && (buffer[0x42] != 0x29
 					|| strncmp((const char *)buffer + 0x47, vol->vol_label, 11)
@@ -1089,22 +1066,19 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 			buffer = diri_init(vol, vol->root_vnode.cluster, vol->vol_entry, &diri);
 
 			// check if it is the same as the old volume label
-			if (buffer == NULL || strncmp((const char *)buffer, vol->vol_label,
-					11) == 0) {
+			if (buffer == NULL || strncmp((const char *)buffer, vol->vol_label, 11) == 0) {
 				dprintf("dosfs_wfsstat: label mismatch\n");
-				diri_free(&diri);
-				result = B_ERROR;
-				goto bi;
+				return B_ERROR;
 			}
 
 			diri_make_writable(&diri);
 			memcpy(buffer, name, 11);
-			diri_free(&diri);
 			result = B_OK;
 		} else {
 			uint32 index;
 			result = create_volume_label(vol, name, &index);
-			if (result == B_OK) vol->vol_entry = index;
+			if (result == B_OK)
+				vol->vol_entry = index;
 		}
 
 		if (result == B_OK) {
@@ -1115,8 +1089,6 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 
 	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
 		_dosfs_sync(vol);
-
-bi:	UNLOCK_VOL(vol);
 
 	return result;
 }
@@ -1158,8 +1130,8 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, uint32 code,
 			dump_fat_chain(vol, node->cluster);
 			break;
 
-		case 100002 :
-			{struct diri diri;
+		case 100002 : {
+			struct diri diri;
 			uint8 *buffer;
 			uint32 i;
 			for (i=0,buffer=diri_init(vol,node->cluster, 0, &diri);buffer;buffer=diri_next_entry(&diri),i++) {
@@ -1167,8 +1139,8 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, uint32 code,
 				dprintf("entry %lx:\n", i);
 				dump_directory(buffer);
 			}
-			diri_free(&diri);}
 			break;
+		}
 
 		case 100003 :
 			dprintf("vcache validation not yet implemented\n");
@@ -1215,15 +1187,11 @@ static status_t
 dosfs_sync(fs_volume *_vol)
 {
 	nspace *vol = (nspace *)_vol->private_volume;
-	status_t err;
 
 	DPRINTF(0, ("dosfs_sync called on volume %" B_PRIdDEV "\n", vol->id));
 
-	LOCK_VOL(vol);
-	err = _dosfs_sync(vol);
-	UNLOCK_VOL(vol);
-
-	return err;
+	RecursiveLocker lock(vol->vlock);
+	return _dosfs_sync(vol);
 }
 
 
@@ -1234,12 +1202,11 @@ dosfs_fsync(fs_volume *_vol, fs_vnode *_node)
 	vnode *node = (vnode *)_node->private_node;
 	status_t err = B_OK;
 
-	LOCK_VOL(vol);
+	RecursiveLocker lock(vol->vlock);
 
 	if (node->cache)
 		err = file_cache_sync(node->cache);
 
-	UNLOCK_VOL(vol);
 	return err;
 }
 
@@ -1327,7 +1294,7 @@ fs_vnode_ops gFATVnodeOps = {
 	NULL,	// fs_deselect
 	&dosfs_fsync,
 
-	&dosfs_readlink,
+	NULL,
 	NULL,	// fs_create_symlink,
 
 	NULL,	// fs_link,

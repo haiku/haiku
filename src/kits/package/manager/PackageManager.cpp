@@ -34,6 +34,7 @@
 
 #include "FetchFileJob.h"
 #include "FetchUtils.h"
+using BPackageKit::BPrivate::FetchUtils;
 #include "PackageManagerUtils.h"
 
 #undef B_TRANSLATION_CONTEXT
@@ -41,7 +42,6 @@
 
 
 using BPackageKit::BPrivate::FetchFileJob;
-using BPackageKit::BPrivate::FetchUtils;
 using BPackageKit::BPrivate::ValidateChecksumJob;
 
 
@@ -564,7 +564,7 @@ BPackageManager::_PreparePackageChanges(
 		RemoteRepository* remoteRepository
 			= dynamic_cast<RemoteRepository*>(package->Repository());
 		if (remoteRepository != NULL) {
-			bool alreadyDownloaded = false;
+			bool reusingDownload = false;
 
 			// Check for matching files in already existing transaction
 			// directories
@@ -593,33 +593,42 @@ BPackageManager::_PreparePackageChanges(
 					path.Append(fileName);
 					if (bestFile != NULL && BCopyEngine().CopyEntry(bestFile,
 						path.Path()) == B_OK) {
-						alreadyDownloaded = FetchUtils::IsDownloadCompleted(
-							path.Path());
+						reusingDownload = true;
 						printf("Re-using download '%s' from previous "
 							"transaction%s\n", bestFile,
-							alreadyDownloaded ? "" : " (partial)");
+							FetchUtils::IsDownloadCompleted(
+								path.Path()) ? "" : " (partial)");
 					}
 					globfree(&globbuf);
 				}
 			}
 
-			if (!alreadyDownloaded) {
-				// download the package (this will resume the download if the
-				// file already exists)
-				BString url = remoteRepository->Config().PackagesURL();
-				url << '/' << fileName;
+			// download the package (this will resume the download if the
+			// file already exists)
+			BString url = remoteRepository->Config().PackagesURL();
+			url << '/' << fileName;
 
-				status_t error = DownloadPackage(url, entry,
-					package->Info().Checksum());
-				if (error != B_OK) {
-					if (error == B_BAD_DATA) {
-						// B_BAD_DATA is returned when there is a checksum
-						// mismatch. Make sure this download is not re-used.
-						entry.Remove();
+			status_t error;
+retryDownload:
+			error = DownloadPackage(url, entry,
+				package->Info().Checksum());
+			if (error != B_OK) {
+				if (error == B_BAD_DATA || error == ERANGE) {
+					// B_BAD_DATA is returned when there is a checksum
+					// mismatch. Make sure this download is not re-used.
+					entry.Remove();
+
+					if (reusingDownload) {
+						// Maybe the download we reused had some problem.
+						// Try again, this time without reusing the download.
+						printf("\nPrevious download '%s' was invalid. Redownloading.\n",
+							path.Path());
+						reusingDownload = false;
+						goto retryDownload;
 					}
-					DIE(error, "Failed to download package %s",
-						package->Info().Name().String());
 				}
+				DIE(error, "Failed to download package %s",
+					package->Info().Name().String());
 			}
 		} else if (package->Repository() != &installationRepository) {
 			// clone the existing package

@@ -495,7 +495,7 @@ RatePackageWindow::_RelayServerDataToUI(BMessage& response)
 			AppUtils::MarkItemWithCodeInMenu(fStabilityCode, menu);
 		}
 		if (response.FindString("naturalLanguageCode",
-			&fCommentLanguageCode) == B_OK) {
+			&fCommentLanguageCode) == B_OK && !comment.IsEmpty()) {
 			LanguageMenuUtils::MarkLanguageInMenu(
 				fCommentLanguageCode, fCommentLanguageField->Menu());
 		}

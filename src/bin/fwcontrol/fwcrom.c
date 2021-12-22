@@ -465,15 +465,15 @@ crom_add_simple_text(struct crom_src *src, struct crom_chunk *parent,
 {
 	struct csrtext *tl;
 	uint32_t *p;
-	int len, i;
+	size_t len, i;
 	char t[MAX_TEXT];
 
 	len = strlen(buf);
 	if (len > MAX_TEXT) {
 #if defined(__DragonFly__) || __FreeBSD_version < 500000
-		printf("text(%d) truncated to %zd.\n", len, MAX_TEXT);
+		printf("text(%zu) truncated to %zu.\n", len, MAX_TEXT);
 #else
-		printf("text(%d) truncated to %zd.\n", len, MAX_TEXT);
+		printf("text(%zu) truncated to %zu.\n", len, MAX_TEXT);
 #endif
 		len = MAX_TEXT;
 	}

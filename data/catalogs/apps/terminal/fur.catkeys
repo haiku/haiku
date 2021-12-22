@@ -13,8 +13,8 @@ Copy	Terminal TermWindow		Copie
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               stampe chest jutori\n  -t,     --title              stabilìs il titul dal barcon\n  -f,     --fullscreen         invie a plen visôr\n  -w,     --working-directory  stabilìs la cartele di lavôr iniziâl
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Modifiche titul schede…
-Print	Terminal TermWindow		Stampe
 Settings	Terminal TermWindow		Impostazions
+Print	Terminal TermWindow		Stampe
 %app% settings	Terminal PrefWindow	window title	Impostazions %app%
 Use default	Terminal SetTitleWindow		Dopre predefinît
 Close tab	Terminal TermWindow		Siere schede
@@ -33,8 +33,8 @@ Defaults	Terminal PrefWindow		Predefinîts
 Cancel	Terminal TermView		Anule
 Revert	Terminal PrefWindow		Torne indaûr
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminâl
-Use selection	Terminal FindWindow		Dopre selezion
 Find next	Terminal TermWindow		Cjate prossim
+Use selection	Terminal FindWindow		Dopre selezion
 Copy link location	Terminal TermView		Copie posizion colegament
 Window title:	Terminal AppearancePrefView		Titul dal barcon:
 New tab	Terminal TermWindow		Gnove schede
@@ -53,12 +53,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Opzion \"%s\" no ricogn
 Tab title:	Terminal AppearancePrefView		Titul schede:
 Text not found.	Terminal TermWindow		Test no cjatât.
 Find failed	Terminal TermWindow		No si è rivâts a cjatâ
-Match word	Terminal FindWindow		Peraule interie
 Color scheme:	Terminal AppearancePrefView		Scheme di colôr:
+Match word	Terminal FindWindow		Peraule interie
 New Terminal	Terminal TermWindow		Gnûf terminâl
 Quit	Terminal TermWindow		Jes
-Match case	Terminal FindWindow		Coincît maiusculis/minusculis
 Find previous	Terminal TermWindow		Cjate precedent
+Match case	Terminal FindWindow		Coincît maiusculis/minusculis
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Il scheme che al specifiche i titui des schedis. A puedin jessi doprâts\nchescj segnepuest:
 Close	Terminal TermWindow		Siere
 Save to file…	Terminal PrefWindow		Salve su file…
@@ -80,11 +80,11 @@ Window size:	Terminal AppearancePrefView		Dimension barcon:
 Switch Terminals	Terminal TermWindow		Scambie terminâi
 Decrease	Terminal TermWindow		Diminuìs
 Settings…	Terminal TermWindow		Impostazions…
-Cancel	Terminal SetTitleWindow		Cancele
 Blinking cursor	Terminal AppearancePrefView		Cursôr che al cimie
+Cancel	Terminal SetTitleWindow		Cancele
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Il scheme che al specifiche il titul dal barcon. A puedin jessi doprâts\nchescj segnepuest:\n
-Use text:	Terminal FindWindow		Dopre test:
 Close active tab	Terminal TermWindow		Siere schede ative
+Use text:	Terminal FindWindow		Dopre test:
 Save as default	Terminal TermWindow		Salve come predefinît
 Nothing is selected.	Terminal TermWindow		Nol è selezionât nie.
 Use left Option as Meta key	Terminal AppearancePrefView		Dopre Opzion a çampe come tast Meta
@@ -112,6 +112,6 @@ Increase	Terminal TermWindow		Aumente
 OK	Terminal TermWindow		Va ben
 Close window	Terminal TermWindow		Siere barcon
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminâl di Haiku\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui e Takashi Murai.\n\nÛs: %s [OPZION] [SHELL]\n
-Solarized Light	Terminal colors scheme		Solarizât (Clâr)
 Clear all	Terminal TermWindow		Nete dut
+Solarized Light	Terminal colors scheme		Solarizât (Clâr)
 Search forward	Terminal FindWindow		Cîr indenant

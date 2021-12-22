@@ -3,7 +3,7 @@
  *
  * Written by S.T. Mansfield (thephantom@mac.com)
  *=--------------------------------------------------------------------------=*
- * Copyright (c) 2002, The OpenBeOS project.
+ * Copyright (c) 2002, The Haiku project.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),

@@ -84,7 +84,7 @@ BRemoveEngine::_RemoveEntry(const char* path)
 				"Failed to open directory \"%s\": %s\n", path, strerror(error));
 		}
 
-		char buffer[sizeof(dirent) + B_FILE_NAME_LENGTH];
+		char buffer[offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH];
 		dirent *entry = (dirent*)buffer;
 		while (directory.GetNextDirents(entry, sizeof(buffer), 1) == 1) {
 			if (strcmp(entry->d_name, ".") == 0

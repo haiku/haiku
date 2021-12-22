@@ -63,7 +63,8 @@ WritePteFlags(uint32 flags)
 
 
 static void
-DumpPageWrite(uint64_t virtAdr, uint64_t physAdr, size_t size, uint64 flags, uint64& firstVirt, uint64& firstPhys, uint64& firstFlags, uint64& len)
+DumpPageWrite(uint64_t virtAdr, uint64_t physAdr, size_t size, uint64 flags, uint64& firstVirt,
+	uint64& firstPhys, uint64& firstFlags, uint64& len)
 {
 	if (virtAdr == firstVirt + len && physAdr == firstPhys + len && flags == firstFlags) {
 		len += size;
@@ -71,7 +72,8 @@ DumpPageWrite(uint64_t virtAdr, uint64_t physAdr, size_t size, uint64 flags, uin
 		if (len != 0) {
 			dprintf("  0x%08" B_PRIxADDR " - 0x%08" B_PRIxADDR,
 				firstVirt, firstVirt + (len - 1));
-			dprintf(": 0x%08" B_PRIxADDR " - 0x%08" B_PRIxADDR ", %#" B_PRIxADDR ", ", firstPhys, firstPhys + (len - 1), len);
+			dprintf(": 0x%08" B_PRIxADDR " - 0x%08" B_PRIxADDR ", %#" B_PRIxADDR ", ",
+				firstPhys, firstPhys + (len - 1), len);
 			WritePteFlags(firstFlags); dprintf("\n");
 		}
 		firstVirt = virtAdr;
@@ -83,7 +85,8 @@ DumpPageWrite(uint64_t virtAdr, uint64_t physAdr, size_t size, uint64 flags, uin
 
 
 static void
-DumpPageTableInt(Pte* pte, uint64_t virtAdr, uint32_t level, uint64& firstVirt, uint64& firstPhys, uint64& firstFlags, uint64& len)
+DumpPageTableInt(Pte* pte, uint64_t virtAdr, uint32_t level, uint64& firstVirt, uint64& firstPhys,
+	uint64& firstFlags, uint64& len)
 {
 	for (uint32 i = 0; i < pteCount; i++) {
 		if (((1 << pteValid) & pte[i].flags) != 0) {

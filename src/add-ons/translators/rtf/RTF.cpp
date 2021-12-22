@@ -33,15 +33,15 @@ static const char *kDestinationControlWords[] = {
 	"rxe", "stylesheet", "subject", "tc", "title", "txe", "xe",
 };
 
-static char read_char(BDataIO &stream, bool endOfFileAllowed = false) throw (status_t);
-static int32 parse_integer(char first, BDataIO &stream, char &_last, int32 base = 10) throw (status_t);
+static char read_char(BDataIO &stream, bool endOfFileAllowed = false);
+static int32 parse_integer(char first, BDataIO &stream, char &_last, int32 base = 10);
 
 
 using namespace RTF;
 
 
 static char
-read_char(BDataIO &stream, bool endOfFileAllowed) throw (status_t)
+read_char(BDataIO &stream, bool endOfFileAllowed)
 {
 	char c;
 	ssize_t bytesRead = stream.Read(&c, 1);
@@ -58,7 +58,6 @@ read_char(BDataIO &stream, bool endOfFileAllowed) throw (status_t)
 
 static int32
 parse_integer(char first, BDataIO &stream, char &_last, int32 base)
-	throw (status_t)
 {
 	const char *kDigits = "0123456789abcdef";
 	int32 integer = 0;
@@ -292,7 +291,7 @@ Group::~Group()
 
 
 void
-Group::Parse(char first, BDataIO &stream, char &last) throw (status_t)
+Group::Parse(char first, BDataIO &stream, char &last)
 {
 	if (first == '\0')
 		first = read_char(stream);
@@ -452,7 +451,7 @@ Header::~Header()
 
 
 void
-Header::Parse(char first, BDataIO &stream, char &last) throw (status_t)
+Header::Parse(char first, BDataIO &stream, char &last)
 {
 	// The stream has been peeked into by the parser already, and
 	// only the version follows in the stream -- let's pick it up
@@ -529,7 +528,7 @@ Text::IsDefinitionDelimiter()
 
 
 void
-Text::Parse(char first, BDataIO &stream, char &last) throw (status_t)
+Text::Parse(char first, BDataIO &stream, char &last)
 {
 	char c = first;
 	if (c == '\0')
@@ -613,7 +612,7 @@ Command::~Command()
 
 
 void
-Command::Parse(char first, BDataIO &stream, char &last) throw (status_t)
+Command::Parse(char first, BDataIO &stream, char &last)
 {
 	if (first == '\0')
 		first = read_char(stream);
@@ -817,7 +816,7 @@ Worker::Dispatch(Element *element)
 
 
 void
-Worker::Work() throw (status_t)
+Worker::Work()
 {
 	Dispatch(&fStart);
 }

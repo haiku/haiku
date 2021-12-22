@@ -2554,7 +2554,7 @@ static status_t
 get_vnode_name(struct vnode* vnode, struct vnode* parent, char* name,
 	size_t nameSize, bool kernel)
 {
-	char buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+	char buffer[offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH + 1];
 	struct dirent* dirent = (struct dirent*)buffer;
 
 	status_t status = get_vnode_name(vnode, parent, dirent, sizeof(buffer),
@@ -2635,7 +2635,7 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 		}
 
 		// get the node's name
-		char nameBuffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+		char nameBuffer[offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH + 1];
 			// also used for fs_read_dir()
 		char* name = &((struct dirent*)nameBuffer)->d_name[0];
 		status = get_vnode_name(vnode, parentVnode, (struct dirent*)nameBuffer,
@@ -9294,7 +9294,7 @@ _user_open_parent_dir(int fd, char* userName, size_t nameLength)
 			return B_FILE_ERROR;
 
 		// get the vnode name
-		char _buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+		char _buffer[offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH + 1];
 		struct dirent* buffer = (struct dirent*)_buffer;
 		status_t status = get_vnode_name(dirVNode, parentVNode, buffer,
 			sizeof(_buffer), get_current_io_context(false));

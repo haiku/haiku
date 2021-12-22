@@ -570,3 +570,10 @@ ppc_set_current_cpu_exception_context(struct ppc_cpu_exception_context *context)
 	asm volatile("mtsprg0 %0" : : "r"(physicalPage + inPageOffset));
 }
 
+
+int32
+arch_int_assign_to_cpu(int32 irq, int32 cpu)
+{
+	// Not yet supported.
+	return 0;
+}

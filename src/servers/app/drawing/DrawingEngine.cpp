@@ -1563,7 +1563,8 @@ DrawingEngine::CopyRect(BRect src, int32 xOffset, int32 yOffset) const
 			uint32 width = src.IntegerWidth() + 1;
 			uint32 height = src.IntegerHeight() + 1;
 
-			_CopyRect(bits, width, height, bytesPerRow, xOffset, yOffset);
+			_CopyRect(buffer->IsGraphicsMemory(), bits, width, height, bytesPerRow,
+				xOffset, yOffset);
 
 			// offset dest again, because it is return value
 			dst.OffsetBy(xOffset, yOffset);
@@ -1581,21 +1582,12 @@ DrawingEngine::SetRendererOffset(int32 offsetX, int32 offsetY)
 
 
 void
-DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
+DrawingEngine::_CopyRect(bool isGraphicsMemory, uint8* src, uint32 width, uint32 height,
 	uint32 bytesPerRow, int32 xOffset, int32 yOffset) const
 {
 	// TODO: assumes drawing buffer is 32 bits (which it currently always is)
-	int32 xIncrement;
 	int32 yIncrement;
-
-	if (yOffset == 0 && xOffset > 0) {
-		// copy from right to left
-		xIncrement = -1;
-		src += (width - 1) * 4;
-	} else {
-		// copy from left to right
-		xIncrement = 1;
-	}
+	const bool needMemmove = (yOffset == 0 && xOffset > 0 && uint32(xOffset) <= width);
 
 	if (yOffset > 0) {
 		// copy from bottom to top
@@ -1608,34 +1600,32 @@ DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
 
 	uint8* dst = src + (ssize_t)yOffset * bytesPerRow + (ssize_t)xOffset * 4;
 
-	if (xIncrement == 1) {
-		uint8 tmpBuffer[width * 4];
-		for (uint32 y = 0; y < height; y++) {
-			// NOTE: read into temporary scanline buffer,
-			// avoid memcpy because it might be graphics card memory
-			gfxcpy32(tmpBuffer, src, width * 4);
-			// write back temporary scanline buffer
-			// NOTE: **don't read and write over the PCI bus
-			// at the same time**
-			memcpy(dst, tmpBuffer, width * 4);
-// NOTE: this (instead of the two pass copy above) might
-// speed up QEMU -> ?!? (would depend on how it emulates
-// the PCI bus...)
-// TODO: would be nice if we actually knew
-// if we're operating in graphics memory or main memory...
-//memcpy(dst, src, width * 4);
-			src += yIncrement;
-			dst += yIncrement;
+	if (!needMemmove) {
+		if (!isGraphicsMemory) {
+			// NOTE: this (instead of the two pass copy below) might
+			// speed up QEMU -> ?!? (would depend on how it emulates
+			// the PCI bus...)
+			for (uint32 y = 0; y < height; y++) {
+				memcpy(dst, src, width * 4);
+				src += yIncrement;
+				dst += yIncrement;
+			}
+		} else {
+			uint8 tmpBuffer[width * 4];
+			for (uint32 y = 0; y < height; y++) {
+				// NOTE: read into temporary scanline buffer,
+				// NOTE: **don't read and write over the PCI bus
+				// at the same time**
+				memcpy(tmpBuffer, src, width * 4);
+				// write back temporary scanline buffer
+				memcpy(dst, tmpBuffer, width * 4);
+				src += yIncrement;
+				dst += yIncrement;
+			}
 		}
 	} else {
 		for (uint32 y = 0; y < height; y++) {
-			uint32* srcHandle = (uint32*)src;
-			uint32* dstHandle = (uint32*)dst;
-			for (uint32 x = 0; x < width; x++) {
-				*dstHandle = *srcHandle;
-				srcHandle += xIncrement;
-				dstHandle += xIncrement;
-			}
+			memmove(dst, src, width * 4);
 			src += yIncrement;
 			dst += yIncrement;
 		}

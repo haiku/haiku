@@ -43,7 +43,7 @@ for platform in [ MultiBootSubDirSetup riscv ] {
 
 			: :
 			boot_platform_generic_riscv.a
-			boot_fdt.a
+			[ MultiBootGristFiles boot_fdt.a ]
 		;
 
 

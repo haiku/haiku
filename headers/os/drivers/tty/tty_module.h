@@ -46,7 +46,7 @@ typedef struct tty_module_info tty_module_info;
 struct tty_module_info {
 	module_info	mi;
 
-	struct tty *(*tty_create)(tty_service_func serviceFunction, bool isMaster);
+	struct tty *(*tty_create)(tty_service_func serviceFunction, struct tty* master);
 	void		(*tty_destroy)(struct tty *tty);
 
 	struct tty_cookie *

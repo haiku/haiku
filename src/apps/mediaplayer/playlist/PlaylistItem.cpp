@@ -45,7 +45,8 @@ static vint32 sInstanceCount = 0;
 PlaylistItem::PlaylistItem()
 	:
 	fPlaybackFailed(false),
-	fTrackSupplier(NULL)
+	fTrackSupplier(NULL),
+	fDuration(-1)
 {
 #ifdef DEBUG_INSTANCE_COUNT
 	atomic_add(&sInstanceCount, 1);
@@ -143,8 +144,14 @@ PlaylistItem::Duration()
 {
 	bigtime_t duration;
 	if (GetAttribute(ATTR_INT64_DURATION, duration) != B_OK) {
-		duration = this->_CalculateDuration();
-		SetAttribute(ATTR_INT64_DURATION, duration);
+		if (fDuration == -1) {
+			duration = this->_CalculateDuration();
+			if (SetAttribute(ATTR_INT64_DURATION, duration) != B_OK) {
+				fDuration = duration;
+			}
+		} else {
+			duration = fDuration;
+		}
 	}
 
 	return duration;

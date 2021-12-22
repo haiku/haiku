@@ -87,6 +87,20 @@ write_lo10(addr_t P, Elf64_Word value)
 }
 
 
+static inline void
+write_hh22(addr_t P, Elf64_Xword value)
+{
+	*(Elf64_Word*)P |= value >> 42;
+}
+
+
+static inline void
+write_hm10(addr_t P, Elf64_Xword value)
+{
+	*(Elf64_Word*)P |= (value >> 32) & 0x3ff;
+}
+
+
 #ifdef _BOOT_MODE
 status_t
 boot_arch_elf_relocate_rela(struct preloaded_elf64_image *image,
@@ -141,6 +155,9 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 			case R_SPARC_WDISP30:
 			case R_SPARC_HI22:
 			case R_SPARC_LO10:
+			case R_SPARC_HH22:
+			case R_SPARC_LM22:
+			case R_SPARC_HM10:
 			case R_SPARC_GLOB_DAT:
 			case R_SPARC_JMP_SLOT:
 			case R_SPARC_64:
@@ -168,6 +185,7 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 				write_hi30(P, S + A - P);
 			}
 			case R_SPARC_HI22:
+			case R_SPARC_LM22:
 			{
 				write_hi22(P, S + A);
 				break;
@@ -175,6 +193,16 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 			case R_SPARC_LO10:
 			{
 				write_lo10(P, S + A);
+				break;
+			}
+			case R_SPARC_HH22:
+			{
+				write_hh22(P, S + A);
+				break;
+			}
+			case R_SPARC_HM10:
+			{
+				write_hm10(P, S + A);
 				break;
 			}
 			case R_SPARC_GLOB_DAT:

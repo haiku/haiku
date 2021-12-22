@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-HaikuDepot	401821302
+1	thai	x-vnd.Haiku-HaikuDepot	732799617
 Repository update error	LocalRepositoryUpdateProcess		ข้อผิดพลาดการอัพเดตที่เก็บ
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		เกิดข้อผิดพลาดขณะรีเฟรชที่เก็บ: %error%
 User Created	UserLoginWindow		ผู้ใช้ถูกสร้างแล้ว
@@ -15,7 +15,6 @@ Starting the package daemon failed:\n\n%Error%	App		การสตาร์ท�
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		คุณตรวจสอบสิทธิ์เป็นผู้ใช้สำเร็จแล้ว %Nickname%
 <no info>	PackageInfoView		<no info>
 No user ratings available.	PackageInfoView		ไม่มีการให้คะแนนผู้ใช้
-Downloading package '%name%'	WorkStatusView		กำลังดาวน์โหลดแพ็คเกจ '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		ไม่สามารถดึงข้อมูล captcha ที่จำเป็นจากข้อมูลที่ส่งกลับจากเซิร์ฟเวอร์
 Rating	PackageListView		อัตรา
 Synchronizing icons	ServerIconExportUpdateProcess		การซิงโครไนซ์ไอคอน
@@ -25,7 +24,6 @@ This application writes and reads some working files on your computer in order t
 Active	PackageListView		เปิดใช้
 Login or Create account	MainWindow		เข้าสู่ระบบหรือสร้างบัญชี
 <Package contents not available for remote packages>	PackageContentsView		<เนื้อหาแพ็คเกจไม่พร้อมใช้งานสำหรับแพ็คเกจแบบรีโมต>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 package to download}อื่นๆ{# packages to download}}
 Ratings	PackageInfoView		อัตรา
 Switch account…	MainWindow		เปลี่ยนบัญชีผู้ใช้งาน
 Preferred language:	UserLoginWindow		ภาษาที่ต้องการ:
@@ -100,7 +98,6 @@ n/a	PackageInfoView		n/a
 This rating is visible to other users	RatePackageWindow		การให้คะแนนนี้จะปรากฏให้ผู้ใช้รายอื่นเห็น
 View agreed usage conditions…	MainWindow		ดูเงื่อนไขการใช้งานที่ตกลงกันไว้
 Cancel	MainWindow		ยกเลิก
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}อื่นๆ{(# more to download)}}
 Refresh repositories	MainWindow		รีเฟรชการจัดเก็บ
 Continue	App		ต่อไป
 A password is required.	UserLoginWindow		ต้องการรหัสผ่าน
@@ -124,16 +121,16 @@ The nickname is required.	UserLoginWindow		ต้องระบุชื่อ�
 Source packages	MainWindow		แพ็คเกจต้นทาง
 -	no package size		-
 Problem with working files	App		ปัญหาเกี่ยวกับไฟล์ทำงาน
-Rate package	RatePackageWindow		Rate package
 Try again	App		ลองใหม่อีกครั้ง
+Rate package	RatePackageWindow		Rate package
 Unknown	PackageListView		ไม่ทราบ
 I agree to the usage conditions	UserLoginWindow		ฉันเห็นด้วยกับเงื่อนไขการใช้งาน
 Log in	UserLoginWindow		เข้าสู่ระบบ
 Logged in as %User%	MainWindow		เข้าสู่ระบบในฐานะ %User%
 Email address:	UserLoginWindow		ที่อยู่อีเมล:
 Screenshot	ScreenshotWindow		ภาพหน้าจอ
-A reboot is necessary to complete the installation process.	PackageManager		จำเป็นต้องรีบูตเครื่องเพื่อให้กระบวนการติดตั้งเสร็จสมบูรณ์
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		จำเป็นต้องรีบูตเครื่องเพื่อให้กระบวนการติดตั้งเสร็จสมบูรณ์
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}อื่นๆ{I am # years of age or older}}
 View latest usage conditions…	MainWindow		ดูเงื่อนไขการใช้งานล่าสุด
 Quit	App		ปิด

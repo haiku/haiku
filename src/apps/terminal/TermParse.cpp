@@ -1567,9 +1567,14 @@ TermParse::_ProcessOperatingSystemControls(uchar* params)
 		// set dynamic colors (10 - 19)
 		case 10: // text foreground
 		case 11: // text background
+		case 12: // cursor back
 			{
 				int32 offset = mode - 10;
 				int32 count = 0;
+				if (strcmp((char*)params, "?") == 0) {
+					fBuffer->GetColor(mode);
+					break;
+				}
 				char* p = strtok((char*)params, ";");
 				do {
 					if (gXColorsTable.LookUpColor(p, &colors[count]) != B_OK) {
@@ -1591,6 +1596,7 @@ TermParse::_ProcessOperatingSystemControls(uchar* params)
 		// reset dynamic colors (10 - 19)
 		case 110: // text foreground
 		case 111: // text background
+		case 112: // cursor back
 			{
 				indexes[0] = mode;
 				fBuffer->ResetColors(indexes, 1, true);

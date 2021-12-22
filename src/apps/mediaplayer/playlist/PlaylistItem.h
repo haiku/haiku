@@ -127,6 +127,7 @@ private:
 			BList				fListeners;
 			bool				fPlaybackFailed;
 			TrackSupplier*		fTrackSupplier;
+			bigtime_t			fDuration;
 };
 
 typedef BReference<PlaylistItem> PlaylistItemRef;

@@ -9,9 +9,7 @@
 #include <boot/vfs.h>
 
 
-#ifdef __cplusplus
-
-class Handle : public ConsoleNode {
+class Handle : public Node {
 	public:
 		Handle(intptr_t handle, bool takeOwnership = true);
 		Handle();
@@ -28,7 +26,5 @@ class Handle : public ConsoleNode {
 		intptr_t	fHandle;
 		bool		fOwnHandle;
 };
-
-#endif	/* __cplusplus */
 
 #endif	/* HANDLE_H */

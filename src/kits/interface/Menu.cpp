@@ -1439,6 +1439,56 @@ BMenu::SetTrackingHook(menu_tracking_hook func, void* state)
 }
 
 
+// #pragma mark - Reorder item methods
+
+
+void
+BMenu::SortItems(int (*compare)(const BMenuItem*, const BMenuItem*))
+{
+	fItems.SortItems((int (*)(const void*, const void*))compare);
+	InvalidateLayout();
+	if (Window() != NULL && !Window()->IsHidden() && LockLooper()) {
+		_LayoutItems(0);
+		Invalidate();
+		UnlockLooper();
+	}
+}
+
+
+bool
+BMenu::SwapItems(int32 indexA, int32 indexB)
+{
+	bool swapped = fItems.SwapItems(indexA, indexB);
+	if (swapped) {
+		InvalidateLayout();
+		if (Window() != NULL && !Window()->IsHidden() && LockLooper()) {
+			_LayoutItems(std::min(indexA, indexB));
+			Invalidate();
+			UnlockLooper();
+		}
+	}
+
+	return swapped;
+}
+
+
+bool
+BMenu::MoveItem(int32 indexFrom, int32 indexTo)
+{
+	bool moved = fItems.MoveItem(indexFrom, indexTo);
+	if (moved) {
+		InvalidateLayout();
+		if (Window() != NULL && !Window()->IsHidden() && LockLooper()) {
+			_LayoutItems(std::min(indexFrom, indexTo));
+			Invalidate();
+			UnlockLooper();
+		}
+	}
+
+	return moved;
+}
+
+
 void BMenu::_ReservedMenu3() {}
 void BMenu::_ReservedMenu4() {}
 void BMenu::_ReservedMenu5() {}

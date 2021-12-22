@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-StyledEdit	2796309255
+1	czech	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Statistika dokumentu
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nemohu se vrátit, soubor nenalezen: \"%s\".
 Cut	Menus		Vystřihnout
@@ -51,6 +51,7 @@ OK	SaveAlert		OK
 Color	Menus		Barva
 Save changes to the document \"%s\"? 	QuitAlert		Uložit změny do dokumentu \"%s\"?
 StyledEdit	System name		Stylizovaný editor
+Underline	Menus		Podtržené
 Find:	FindandReplaceWindow		Najít:
 Undo typing	QuitAlert		Zpět psaní
 Error loading \"%s\":\n\t%s	LoadAlert		Chyba při nahrávání \"%s\":\n\t%s

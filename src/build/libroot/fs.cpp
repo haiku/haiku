@@ -117,7 +117,7 @@ utimes_helper(File& file, const struct timespec times[2])
 			timeBuffer[1] = now;
 	}
 
-	return file.SetTimes(timeBuffer);	
+	return file.SetTimes(timeBuffer);
 }
 
 #endif	// _HAIKU_BUILD_NO_FUTIMENS || _HAIKU_BUILD_NO_FUTIMENS
@@ -811,10 +811,12 @@ _kern_dup(int fd)
 		return B_FILE_ERROR;
 
 	// clone it
-	Descriptor *clone;
+	Descriptor *clone = NULL;
 	status_t error = descriptor->Dup(clone);
 	if (error != B_OK)
 		return error;
+	if (clone == NULL)
+		debugger("Dup() succeeded but descriptor is NULL");
 
 	return add_descriptor(clone);
 }

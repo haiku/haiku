@@ -8,7 +8,7 @@ Couldn't launch 	MediaReplicant		Kunne ikke begynde
 Volume	VolumeControl		Lydstyrke
 Open MediaPlayer	MediaReplicant		Åbn Medieafspiller
 %d dB	VolumeControl		%d dB
-Media preferences…	MediaReplicant		Medie-præferencer…
+Media preferences…	MediaReplicant		Præferencer for medier…
 Options	MediaReplicant		Valg
 Beep	MediaReplicant		Bip
 Open %name	DeskButton	Don't translate variable %name	Åbn %name

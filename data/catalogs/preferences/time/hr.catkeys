@@ -1,7 +1,6 @@
-1	croatian	x-vnd.Haiku-Time	1514793487
+1	croatian	x-vnd.Haiku-Time	2750044314
 OK	Time		OK
 Message receiving failed	Time		Neuspjelo primanje poruke
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Vrijeme i datum, napisali:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nAutorska prava 2004-2012, Haiku.
 Australia	Time		Australija
 America	Time		Amerika
 Set time zone	Time		Postavi vremensku zonu
@@ -33,7 +32,6 @@ Pacific	Time		Pacifik
 Atlantic	Time		Atlantik
 Display time with seconds	Time		Prikaži vrijeme sa sekundama
 Time	System name		Vrijeme
-about	Time		O
 Show time zone	Time		Pokaži vremensku zonu
 Synchronize at boot	Time		Sinkroniziraj pri podizanju sustava
 Indian	Time		Indijsko

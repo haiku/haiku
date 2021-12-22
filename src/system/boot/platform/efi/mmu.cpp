@@ -32,7 +32,7 @@ struct memory_region {
 	size_t size;
 
 	void dprint(const char * msg) {
- 	  dprintf("%s memory_region v: %#lx p: %#lx size: %lu\n", msg, vaddr,
+ 	  dprintf("%s memory_region v: %#" B_PRIxADDR " p: %#" B_PRIxPHYSADDR " size: %lu\n", msg, vaddr,
 			paddr, size);
 	}
 
@@ -285,7 +285,7 @@ bool
 mmu_next_region(void** cookie, addr_t* vaddr, phys_addr_t* paddr, size_t* size)
 {
 	if (*cookie == NULL)
-		*cookie = &allocated_regions;
+		*cookie = allocated_regions;
 	else
 		*cookie = ((memory_region*)*cookie)->next;
 

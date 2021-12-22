@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	3117643489
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	3771520812
 Close other tabs	Terminal TermWindow		Fechar outras guias
 Insert path	Terminal TermView		Inserir caminho
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal não pôde iniciar o shell. Desculpe.
@@ -13,8 +13,8 @@ Copy	Terminal TermWindow		Copiar
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               exibe esta ajuda\n  -t,     --title              define o título da janela\n  -f,     --fullscreen         inicia em tela cheia\n  -w,     --working-directory  define o diretório inicial de trabalho
 Retro	Terminal colors scheme		Retrô
 Edit tab title…	Terminal TermWindow		Editar título da aba…
-Print	Terminal TermWindow		Imprimir
 Settings	Terminal TermWindow		Configurações
+Print	Terminal TermWindow		Imprimir
 %app% settings	Terminal PrefWindow	window title	%app% configurações
 Use default	Terminal SetTitleWindow		Usar padrão
 Close tab	Terminal TermWindow		Fechar aba
@@ -32,9 +32,10 @@ Slate	Terminal colors scheme		Ardósia
 Defaults	Terminal PrefWindow		Padrões
 Cancel	Terminal TermView		Cancelar
 Revert	Terminal PrefWindow		Reverter
+Relaxed	Terminal colors scheme		Relaxado
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
-Use selection	Terminal FindWindow		Usar seleção
 Find next	Terminal TermWindow		Localizar próximo
+Use selection	Terminal FindWindow		Usar seleção
 Copy link location	Terminal TermView		Copiar a localização do vínculo
 Window title:	Terminal AppearancePrefView		Título da janela:
 New tab	Terminal TermWindow		Nova aba
@@ -53,12 +54,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Opção não reconhecid
 Tab title:	Terminal AppearancePrefView		Título da aba:
 Text not found.	Terminal TermWindow		Texto não encontrado.
 Find failed	Terminal TermWindow		Localizar falhou
-Match word	Terminal FindWindow		Palavra exata
 Color scheme:	Terminal AppearancePrefView		Esquema de cores:
+Match word	Terminal FindWindow		Palavra exata
 New Terminal	Terminal TermWindow		Novo Terminal
 Quit	Terminal TermWindow		Sair
-Match case	Terminal FindWindow		Diferenciar maiúsculas de minúsculas
 Find previous	Terminal TermWindow		Localizar anterior
+Match case	Terminal FindWindow		Diferenciar maiúsculas de minúsculas
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		O padrão especificando os títulos das abas. Os seguintes espaços reservados\npodem ser usados:
 Close	Terminal TermWindow		Fechar
 Save to file…	Terminal PrefWindow		Salvar para arquivo...
@@ -72,7 +73,7 @@ Cursor	Terminal AppearancePrefView		Cursor
 Full screen	Terminal TermWindow		Tela inteira
 Shell 	Terminal TermWindow		Shell 
 Midnight	Terminal colors scheme		Meia-noite
-\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tO caractere '%'.\n\t%<\t-\tInicia a sessão que será exibida somente se um\n\t\t\tplaceholder subsequente não for vazio.\n\t%>\t-\tInicia a sessão que será exibida somente se um\n\t\t\tplaceholder entre a sessão %< anterior e esta não for vazio.\n\t%-\t-\tEncerra uma sessão %< ou  %>.\n\nQualquer caractere não-alfanumérico entre '%' e a letra de formato irá inserir um espaço\napenas se o valor do placeholder não for vazio. Ele irá adicionar à seção %<.
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tO caractere '%'.\n\t%<\t-\tInicia a sessão que será exibida somente se um\n\t\t\tmarcador subsequente não for vazio.\n\t%>\t-\tInicia a sessão que será exibida somente se um\n\t\t\tmarcador entre a sessão %< anterior e esta não for vazio.\n\t%-\t-\tEncerra uma sessão %< ou %>.\n\nQualquer caractere não-alfanumérico entre '%' e a letra de formato irá inserir um espaço apenas\n se o valor do marcador não for vazio. Ele irá adicionar à seção %<.
 Tab title:	Terminal TermWindow		Título da aba:
 Window title:	Terminal TermWindow		Título da janela:
 Default	Terminal colors scheme		Padrão
@@ -80,11 +81,11 @@ Window size:	Terminal AppearancePrefView		Tamanho da janela:
 Switch Terminals	Terminal TermWindow		Alternar Terminais
 Decrease	Terminal TermWindow		Diminuir
 Settings…	Terminal TermWindow		Configurações...
-Cancel	Terminal SetTitleWindow		Cancelar
 Blinking cursor	Terminal AppearancePrefView		Cursor piscante
+Cancel	Terminal SetTitleWindow		Cancelar
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		O padrão especificando o título da janela. Os seguintes espaços reservados\npodem ser usados:\n
-Use text:	Terminal FindWindow		Usar texto:
 Close active tab	Terminal TermWindow		Fechar a aba ativa
+Use text:	Terminal FindWindow		Usar texto:
 Save as default	Terminal TermWindow		Salvar como padrão
 Nothing is selected.	Terminal TermWindow		Não há nada selecionado.
 Use left Option as Meta key	Terminal AppearancePrefView		Utilizar Option esquerda como tecla Meta
@@ -112,6 +113,6 @@ Increase	Terminal TermWindow		Aumentar
 OK	Terminal TermWindow		OK
 Close window	Terminal TermWindow		Fechar janela
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nDireitos autorais 2001-2019 Haiku, Inc.\nDireitos autorais (C) 1999 Kazuho Okui e Takashi Murai.\n\nUtilização: %s [OPÇÃO] [SHELL]\n
-Solarized Light	Terminal colors scheme		Solarizado Claro
 Clear all	Terminal TermWindow		Limpar tudo
+Solarized Light	Terminal colors scheme		Solarizado Claro
 Search forward	Terminal FindWindow		Procurar até o final

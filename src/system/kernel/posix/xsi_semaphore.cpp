@@ -1268,6 +1268,7 @@ _user_xsi_semop(int semaphoreID, struct sembuf *ops, size_t numOps)
 			XsiSemaphore *semaphore = semaphoreSet->Semaphore(semaphoreNumber);
 			semaphore->SetPid(getpid());
 		}
+		semaphoreSet->SetLastSemopTime();
 	}
 	return result;
 }

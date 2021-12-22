@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	3106374143
+1	finnish	x-vnd.Haiku-HaikuDepot	761125591
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 Network error	ServerHelper		Verkkovirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
@@ -8,6 +8,7 @@ Uninstalled	PackageListView		Poistetut asennukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 Create account	UserLoginWindow		Luo tili
+Install %PackageTitle%	PackageManager		Asenna %PackageTitle%
 OK	App		Valmis
 The response to the captcha was incorrect.	ServerHelper		Captcha-vastaus oli virheellinen.
 Develop packages	MainWindow		Kehityspaketit
@@ -16,7 +17,6 @@ Starting the package daemon failed:\n\n%Error%	App		Pakkaustaustaprosessin käyn
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Käyttäjän %Nickname% todentaminen onnistui.
 <no info>	PackageInfoView		<ei tietoja>
 No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
-Downloading package '%name%'	WorkStatusView		Ladataan pakkaus '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Välttämättömän captcha-tiedon poiminen takaisin palvelimelle lähetetyistä tiedoista epäonnistui.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Verkkosiirtovirhe syntyi palvelinjärjestelmäviestinnässä: %s 
 Rating	PackageListView		Arvosana
@@ -28,7 +28,6 @@ This application writes and reads some working files on your computer in order t
 Active	PackageListView		Käytössä
 Login or Create account	MainWindow		Kirjaudu tai luo tili
 <Package contents not available for remote packages>	PackageContentsView		<Etäpakkausten sisältö ei ole saatavilla>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 pakkaus ladattu}other{# pakkausta ladattu}}
 Ratings	PackageInfoView		Arvosanat
 Switch account…	MainWindow		Vaihda tiliä...
 Preferred language:	UserLoginWindow		Ensisijainen kieli:
@@ -113,7 +112,6 @@ This rating is visible to other users	RatePackageWindow		Tämä arvosana näkyy 
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Pakkaustietoja päivitettäessä ilmeni pulma, joka voi aiheuttaa tietojen olevan vanhentuneita tai niiden puuttuvan sovelluksen näytöltä. Lisätietoja koskien tätä pulmaa on saatavilla sovelluksen lokitiedostosta.\nTieto lokitiedostojen katselemista on saatavilla Haikun käyttöohjeen HaikuVarasto-osasta.
 View agreed usage conditions…	MainWindow		Katso hyväksyttyjä käyttöehtoja…
 Cancel	MainWindow		Peru
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 lisää ladattavaksi)}other{(# lisää ladattavaksi)}}
 Refresh repositories	MainWindow		Virkistä tietovarastoja
 Continue	App		Jatka
 A password is required.	UserLoginWindow		Vaaditaan salasana.
@@ -126,6 +124,7 @@ Status	PackageListView		Tila
 The password has been incorrectly repeated.	UserLoginWindow		Salasanan toistaminen epäonnistui.
 Network transport error	ServerHelper		Verkkosiirtovirhe
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Käyttäjälle [%Nickname%] aiemmin tarjottu salasana ei ole nykyään kelvollinen. Käyttäjä kirjautuu ulos tästä sovelluksesta ja sinun pitäisi kirjautua uudelleen päivitetyllä salasanallasi.
+Uninstall %PackageTitle%	PackageManager		Poista %PackageTitle% -pakkaus
 Update	RatePackageWindow		Päivitä
 OK	ServerHelper		Valmis
 Language	UserLoginWindow		Kieli
@@ -140,8 +139,8 @@ Source packages	MainWindow		Lähdekoodipakkaukset
 -	no package size		-
 Problem with working files	App		Pulma työtiedostoissa
 Server error	ServerHelper		Palvelinvirhe
-Rate package	RatePackageWindow		Anna pakkaukselle arvosana
 Try again	App		Yritä uudelleen
+Rate package	RatePackageWindow		Anna pakkaukselle arvosana
 Unknown	PackageListView		Tuntematon
 I agree to the usage conditions	UserLoginWindow		Hyväksyn käyttöehdot
 Log in	UserLoginWindow		Kirjaudu
@@ -149,8 +148,8 @@ Sending anonymous usage data	MainWindow		Nimettömien käyttötietojen lähettä
 Logged in as %User%	MainWindow		Kirjautuneena tunnuksella %User%
 Email address:	UserLoginWindow		Sähköpostiosoite:
 Screenshot	ScreenshotWindow		Kuvakaappaus
-A reboot is necessary to complete the installation process.	PackageManager		Asennusprosessin päättäminen vaatii uudelleenkäynnistämisen.
 HaikuDepot	System name		HaikuVarasto
+A reboot is necessary to complete the installation process.	PackageManager		Asennusprosessin päättäminen vaatii uudelleenkäynnistämisen.
 Yes	MainWindow		Kyllä
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Olen vähintään vuoden ikäinen}other{Olen # vuotias tai vanhempi}}
 View latest usage conditions…	MainWindow		Katso viimeisimmät käyttöehdot…

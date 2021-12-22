@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Network	3062143965
+1	indonesian	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Perangkat ethernet
 Link speed:	IntefaceView		Kecepatan jalur:
 disconnected	IntefaceView		terputus
@@ -13,6 +13,7 @@ Gateway:	IntefaceAddressView		Gateway:
 The netmask defines your local network	IntefaceAddressView		Netmask mendefinisikan jaringan lokal anda
 Your IP address	IntefaceAddressView		Alamat IP Anda
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		Alamat IP:
 Netmask:	IntefaceAddressView		Netmask:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Layanan

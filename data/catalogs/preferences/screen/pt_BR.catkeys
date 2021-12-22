@@ -12,9 +12,9 @@ Refresh rate:	Screen		Taxa de atualizão:
 Video format:	Screen		Formato de vídeo:
 Undo	Screen		Desfazer
 OK	Screen		OK
-Current workspace	Screen		Ambiente de trabalho atual
+Current workspace	Screen		Área de trabalho atual
 vertically	Screen		verticalmente
-All workspaces	Screen		Todas os ambientes de trabalho
+All workspaces	Screen		Todas as áreas de trabalho
 Use laptop panel:	Screen		Usar o painel do laptop:
 Could not write VESA mode settings file:\n\t	Screen		Não foi possível gravar o arquivo de configurações do modo VESA:\n\t
 Display info	Screen		Info da tela
@@ -33,7 +33,7 @@ Confirm changes	Screen		Confirmar alterações
 Warning	Screen		Aviso
 24 bits/pixel, 16 Million colors	Screen		24 bits/pixel, 16 milhões de cores
 Hz	Screen		Hz
-Workspaces	Screen		Ambientes de trabalho
+Workspaces	Screen		Áreas de Trabalho
 Brightness:	Screen		Brilho:
 32 bits/pixel, 16 Million colors	Screen		32 bits/pixel, 16 Milhões de cores
 Done	Screen		Pronto

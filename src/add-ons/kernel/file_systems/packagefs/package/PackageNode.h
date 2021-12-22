@@ -8,7 +8,7 @@
 
 #include <sys/stat.h>
 
-#include <Referenceable.h>
+#include <WeakReferenceable.h>
 
 #include <util/SinglyLinkedList.h>
 
@@ -28,7 +28,7 @@ public:
 								PackageNode(Package* package, mode_t mode);
 	virtual						~PackageNode();
 
-			Package*			GetPackage() const	{ return fPackage; }
+			BReference<Package>		GetPackage() const;
 									// Since PackageNode does only hold a
 									// reference to the package between
 									// VFSInit() and VFSUninit(), the caller
@@ -83,8 +83,7 @@ public:
 									// with MethodDeleter
 
 protected:
-			Package*			fPackage;
-			uint32				fPackageFlags;
+	mutable BWeakReference<Package> fPackage;
 			PackageDirectory*	fParent;
 			String				fName;
 			mode_t				fMode;

@@ -32,7 +32,7 @@ ata_trace_printf(uint32 flags, const char *format, ...)
 		ktrace_printf(sTraceBuffer);
 #endif
 		if (flags & ATA_TRACE_SYSLOG)
-			dprintf(sTraceBuffer);
+			dprintf("%s", sTraceBuffer);
 
 		sTraceBufferOffset = 0;
 	}

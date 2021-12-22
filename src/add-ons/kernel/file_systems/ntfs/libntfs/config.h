@@ -1,12 +1,35 @@
 /* Haiku-specific stuff */
 #ifdef __HAIKU__
+#define	major(x) ((int)(0x00ff & ((x) >> 8)))
+#define	minor(x) ((int)(0xffff00ff & (x)))
+#define	makedev(maj,min) ((0xff00 & ((maj)<<8)) | (0xffff00ff & (min)))
 
-/* major part of a device */
-#define major(x)    (int)((unsigned)((x)>>8)&0x7F)
-#define bmajor(x)   (int)((unsigned)((x)>>8)&0x7F)
-
-/* minor part of a device */
-#define minor(x)    (int)((x)&0xFF)
+// override bool
+#define _WINDEF_H
+#ifndef __cplusplus
+#include <stdbool.h>
+#endif
+typedef bool BOOL;
+#ifndef __cplusplus
+#ifndef FALSE
+#define FALSE 0
+#endif
+#ifndef NO
+#define NO 0
+#endif
+#ifndef ZERO
+#define ZERO 0
+#endif
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef YES
+#define YES 1
+#endif
+#ifndef ONE
+#define ONE 1
+#endif
+#endif
 #endif
 
 /* config.h.  Generated from config.h.in by configure.  */
@@ -79,7 +102,7 @@
 /* #undef HAVE_FDATASYNC */
 
 /* Define to 1 if you have the <features.h> header file. */
-/* #undef HAVE_FEATURES_H */
+#define HAVE_FEATURES_H 1
 
 /* Define to 1 if you have the `ffs' function. */
 #define HAVE_FFS 1
@@ -191,7 +214,7 @@
 #define HAVE_STDARG_H 1
 
 /* Define to 1 if stdbool.h conforms to C99. */
-/* #undef HAVE_STDBOOL_H */
+#define HAVE_STDBOOL_H 1
 
 /* Define to 1 if you have the <stddef.h> header file. */
 #define HAVE_STDDEF_H 1
@@ -321,7 +344,7 @@
 /* #undef HAVE_WINDOWS_H */
 
 /* Define to 1 if the system has the type `_Bool'. */
-/* #undef HAVE__BOOL */
+#define HAVE__BOOL 1
 
 /* Don't update /etc/mtab */
 /* #undef IGNORE_MTAB */
@@ -330,8 +353,7 @@
    slash. */
 /* #undef LSTAT_FOLLOWS_SLASHED_SYMLINK */
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
 
 /* Define to 1 if `major', `minor', and `makedev' are declared in <mkdev.h>.
@@ -395,7 +417,7 @@
 
 
 /* Version number of package */
-#define VERSION "2017.3.23"
+#define VERSION "2021.8.22"
 
 /* Define to 1 if this is a Windows OS */
 /* #undef WINDOWS */

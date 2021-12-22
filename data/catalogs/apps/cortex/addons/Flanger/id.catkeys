@@ -1,0 +1,5 @@
+1	indonesian	application/x-vnd.moon-Flanger.media_addon	86138731
+OK	CortexAddOnsCommonMediaNodeControlApp		OK
+controls	CortexAddOnsCommonMediaNodeControlApp		kendali
+Mix output	CortexAddOnsFlanger		Keluaran mix
+Audio input	CortexAddOnsFlanger		Masukan audio

@@ -698,6 +698,9 @@ TermView::SetTermColor(uint index, rgb_color color, bool dynamic)
 			fTextBackColor = color;
 			SetLowColor(fTextBackColor);
 			break;
+		case 12:
+			fCursorBackColor = color;
+			break;
 		case 110:
 			fTextForeColor = PrefHandler::Default()->getRGB(
 								PREF_TEXT_FORE_COLOR);
@@ -707,9 +710,37 @@ TermView::SetTermColor(uint index, rgb_color color, bool dynamic)
 								PREF_TEXT_BACK_COLOR);
 			SetLowColor(fTextBackColor);
 			break;
+		case 112:
+			fCursorBackColor = PrefHandler::Default()->getRGB(
+								PREF_CURSOR_BACK_COLOR);
+			break;
 		default:
 			break;
 	}
+}
+
+
+status_t
+TermView::GetTermColor(uint index, rgb_color* color)
+{
+	if (color == NULL)
+		return B_BAD_VALUE;
+
+	switch (index) {
+		case 10:
+			*color = fTextForeColor;
+			break;
+		case 11:
+			*color = fTextBackColor;
+			break;
+		case 12:
+			*color = fCursorBackColor;
+			break;
+		default:
+			return B_BAD_VALUE;
+			break;
+	}
+	return B_OK;
 }
 
 
@@ -1823,6 +1854,21 @@ TermView::MessageReceived(BMessage *message)
 
 				SetTermColor(index,
 					TermApp::DefaultPalette()[index], dynamic);
+			}
+			break;
+		}
+		case MSG_GET_TERMINAL_COLOR:
+		{
+			uint8 index = 0;
+			if (message->FindUInt8("index", &index) != B_OK)
+				break;
+			rgb_color color;
+			status_t status = GetTermColor(index, &color);
+			if (status == B_OK) {
+				BString reply;
+				reply.SetToFormat("\033]%u;rgb:%02x/%02x/%02x\033\\",
+					index, color.red, color.green, color.blue);
+				fShell->Write(reply.String(), reply.Length());
 			}
 			break;
 		}

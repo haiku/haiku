@@ -1048,9 +1048,8 @@ fs_readdir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 				buf->d_pdev = ns->nsid;
 				buf->d_ino = vnid;
 				buf->d_pino = node->vnid;
-				buf->d_reclen = 2 * (sizeof(dev_t) + sizeof(ino_t))
-					+ sizeof(unsigned short) + strlen(filename) + 1;
-				strcpy (buf->d_name,filename);
+				buf->d_reclen = offsetof(struct dirent, d_name) + strlen(filename) + 1;
+				strcpy(buf->d_name,filename);
 //				if ((ns->rootid == node->vnid))//XXX:mmu_man:test
 //					dprintf("nfs: dirent %d {d:%ld pd:%ld i:%lld pi:%lld '%s'}\n", *num, buf->d_dev, buf->d_pdev, buf->d_ino, buf->d_pino, buf->d_name);
 

@@ -345,6 +345,10 @@ public:
 			bool				Viewed() const
 									{ return fViewed; }
 
+			void				SetVersionCreateTimestamp(uint64 value);
+			uint64				VersionCreateTimestamp() const
+									{ return fVersionCreateTimestamp; }
+
 			void				SetDepotName(const BString& depotName);
 			const BString&		DepotName() const
 									{ return fDepotName; }
@@ -400,6 +404,9 @@ private:
 
 			bool				fIsCollatingChanges;
 			uint32				fCollatedChanges;
+
+			uint64				fVersionCreateTimestamp;
+				// milliseconds since epoc
 };
 
 

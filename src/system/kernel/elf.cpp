@@ -2286,6 +2286,8 @@ load_kernel_add_on(const char *path)
 			case PT_EH_FRAME:
 				// not implemented yet, but can be ignored
 				continue;
+			case PT_ARM_UNWIND:
+				continue;
 			default:
 				dprintf("%s: unhandled pheader type %#" B_PRIx32 "\n", fileName,
 					programHeaders[i].p_type);

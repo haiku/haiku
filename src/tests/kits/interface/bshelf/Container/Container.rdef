@@ -1,0 +1,209 @@
+
+resource(0, "ContainerWindow") #'ARCV' archive BWindow {
+	"_prio" = 15,
+	"_port_cap" = 100,
+	"_title" = "XContainer",
+	"_wlook" = 11,
+	"_sizel" = 380.000,
+	"_sizel" = 280.000,
+	"_sizel" = 10000.0,
+	"_sizel" = 10000.0,
+	"ID" = 199,
+	"_flags" = 524288,
+	"_type" = 11,
+	"_wfeel" = 0,
+	"_name" = "XContainer",
+	"_frame" = rect { 457.000, 288.000, 837.000, 568.000 },
+	"minWidth" = 380.000,
+	"maxWidth" = 10000.0,
+	"minHeight" = 280.000,
+	"maxHeight" = 10000.0,
+	"_views" = archive BMenuBar {
+		"_name" = "MainMenu",
+		"_frame" = rect { 0.00000, 0.00000, 381.000, 19.0000 },
+		"_resize_mode" = 4628,
+		"_flags" = 603979776,
+		"_fname" = "Swis721 BT",
+		"_fname" = "Roman",
+		"_fflt" = 12.0000,
+		"_fflt" = -1.00000,
+		"_fflt" = -1.00000,
+		"_color" = 255,
+		"_color" = -656876032,
+		"_color" = -656876032,
+		"_ploc" = point { 49.0000, 14.5547 },
+		"_rsize_to_fit" = true,
+		"_items" = archive BMenuItem {
+			"_label" = "File",
+			"_submenu" = archive BMenu {
+				"_name" = "File",
+				"_frame" = rect { 0.00000, 0.00000, 0.00000, 0.00000 },
+				"_flags" = 536870912,
+				"_fname" = "Swis721 BT",
+				"_fname" = "Roman",
+				"_fflt" = 12.0000,
+				"_fflt" = -1.00000,
+				"_fflt" = -1.00000,
+				"_color" = 255,
+				"_color" = -656876032,
+				"_color" = -656876032,
+				"_layout" = 1,
+				"_rsize_to_fit" = true,
+				"_items" = archive BMenuItem {
+					"_label" = "New",
+					"_shortcut" = 78,
+					"_mods" = 2,
+					"_msg" = message(1)
+				},
+				"_items" = archive BMenuItem {
+					"_label" = "Open…",
+					"_shortcut" = 79,
+					"_mods" = 2,
+					"_msg" = message(2)
+				},
+				"_items" = archive BSeparatorItem {
+					"_label" = "",
+					"_disable" = true
+				},
+				"_items" = archive BMenuItem {
+					"_label" = "Save",
+					"_shortcut" = 83,
+					"_mods" = 2,
+					"_msg" = message(3)
+				},
+				"_items" = archive BMenuItem {
+					"_label" = "Save As…",
+					"_msg" = message(4)
+				},
+				"_items" = archive BSeparatorItem {
+					"_label" = "",
+					"_disable" = true
+				},
+				"_items" = archive BMenuItem {
+					"_label" = "About…",
+					"_shortcut" = 65,
+					"_mods" = 2,
+					"_msg" = message(5)
+				},
+				"_items" = archive BSeparatorItem {
+					"_label" = "",
+					"_disable" = true
+				},
+				"_items" = archive BMenuItem {
+					"_label" = "Quit",
+					"_shortcut" = 81,
+					"_mods" = 2,
+					"_msg" = message(6)
+				}
+			}
+		},
+		"_items" = archive BMenuItem {
+			"_label" = "Edit",
+			"_submenu" = archive BMenu {
+				"_name" = "Edit",
+				"_frame" = rect { 0.00000, 0.00000, 0.00000, 0.00000 },
+				"_flags" = 536870912,
+				"_fname" = "Swis721 BT",
+				"_fname" = "Roman",
+				"_fflt" = 12.0000,
+				"_fflt" = -1.00000,
+				"_fflt" = -1.00000,
+				"_color" = 255,
+				"_color" = -656876032,
+				"_color" = -656876032,
+				"_layout" = 1,
+				"_rsize_to_fit" = true,
+				"_items" = archive BMenuItem {
+					"_label" = "Undo",
+					"_shortcut" = 90,
+					"_mods" = 2,
+					"_msg" = message(7)
+				},
+				"_items" = archive BSeparatorItem {
+					"_label" = "",
+					"_disable" = true
+				},
+				"_items" = archive BMenuItem {
+					"_label" = "Cut",
+					"_shortcut" = 88,
+					"_mods" = 2,
+					"_msg" = message(8)
+				},
+				"_items" = archive BMenuItem {
+					"_label" = "Copy",
+					"_shortcut" = 67,
+					"_mods" = 2,
+					"_msg" = message(9)
+				},
+				"_items" = archive BMenuItem {
+					"_label" = "Paste",
+					"_shortcut" = 86,
+					"_mods" = 2,
+					"_msg" = message(10)
+				}
+			}
+		}
+	},
+	"_views" = archive BView {
+		"_name" = "MainView",
+		"_frame" = rect { 0.00000, 20.0000, 383.000, 289.000 },
+		"_resize_mode" = 4660,
+		"_flags" = 536870912,
+		"_color" = 255,
+		"_color" = -1,
+		"_color" = -656877313,
+		"_views" = archive BBox {
+			"_name" = "MainBox",
+			"_frame" = rect { 9.00000, 11.0000, 373.000, 212.000 },
+			"_resize_mode" = 4660,
+			"_flags" = 738197504,
+			"_fname" = "Swis721 BT",
+			"_fname" = "Bold",
+			"_fflt" = 12.0000,
+			"_fflt" = -1.00000,
+			"_fflt" = -1.00000,
+			"_color" = 255,
+			"_color" = -656877313,
+			"_color" = -656877313,
+			"_ploc" = point { 40.0000, 9.77734 },
+			"_views" = archive BView {
+				"_name" = "ContainerView",
+				"_frame" = rect { 2.00000, 2.00000, 361.000, 198.000 },
+				"_resize_mode" = 4660,
+				"_flags" = 536870912,
+				"_color" = 255,
+				"_color" = -1,
+				"_color" = -656877313
+			},
+			"_label" = ""
+		},
+		"_views" = archive BButton {
+			"_name" = "TestButton",
+			"_frame" = rect { 260.000, 226.000, 360.000, 256.000 },
+			"_resize_mode" = 12336,
+			"_flags" = 570425344,
+			"_fname" = "Swis721 BT",
+			"_fname" = "Roman",
+			"_color" = 255,
+			"_color" = -656877313,
+			"_color" = -656877313,
+			"_msg" = message(73),
+			"_label" = "Test Replicants",
+			"_default" = true
+		},
+		"_views" = archive BButton {
+			"_name" = "RemoveButton",
+			"_frame" = rect { 15.0000, 229.000, 247.000, 253.000 },
+			"_resize_mode" = 12336,
+			"_flags" = 570425344,
+			"_fname" = "Swis721 BT",
+			"_fname" = "Roman",
+			"_color" = 255,
+			"_color" = -656877313,
+			"_color" = -656877313,
+			"_msg" = message(12),
+			"_label" = "Remove all Replicants and Backing Store  File"
+		}
+	},
+	"designfsize" = 11.9873
+};

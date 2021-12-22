@@ -3047,7 +3047,7 @@ TTextView::WindowActivated(bool flag)
 		// WindowActivated(false) は、IM も Inactive になり、そのまま確定される。
 		// しかしこの場合、input_server が B_INPUT_METHOD_EVENT(B_INPUT_METHOD_STOPPED)
 		// を送ってこないまま矛盾してしまうので、やむを得ずここでつじつまあわせ処理している。
-		// OpenBeOSで修正されることを願って暫定処置としている。
+		// Haikuで修正されることを願って暫定処置としている。
 		fInputMethodUndoState.active = false;
 		// fInputMethodUndoBufferに溜まっている最後のデータがK_INSERTEDなら（確定）正規のバッファへ追加
 		if (fInputMethodUndoBuffer.CountItems() > 0) {

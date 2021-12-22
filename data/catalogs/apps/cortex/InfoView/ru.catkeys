@@ -30,7 +30,7 @@ Bit rate	InfoView		Битрейт
 Input format	DormantNodeInfoView		Формат ввода
 Format	InfoView		Формат
 Version	AppNodeInfoView		Версия
-AddOn ID	DormantNodeInfoView		ID аддона
+AddOn ID	DormantNodeInfoView		ID дополнения
 Frame size	InfoView		Размер кадра
 \n- Codec:	FileNodeInfoView		\n- Кодек:
 Port	LiveNodeInfoView		Порт

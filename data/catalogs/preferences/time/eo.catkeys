@@ -1,7 +1,6 @@
-1	esperanto	x-vnd.Haiku-Time	834234238
+1	esperanto	x-vnd.Haiku-Time	2069485065
 OK	Time		Bone
 Message receiving failed	Time		Ricevo de mesaĝo malsukcesis
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Tempo kaj Dato, kodis:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nAŭtorrajto 2004-2012, Haiku.
 Australia	Time		Aŭstralia
 America	Time		Amerika
 Reset to default server list	Time		Reatribui al defaŭlta servila listo
@@ -38,7 +37,6 @@ Atlantic	Time		Atlantika
 Show clock in Deskbar	Time		Montri horloĝon Laborstrie
 Display time with seconds	Time		Montri tempon kun sekundoj
 Time	System name		Tempo
-about	Time		pri
 Show time zone	Time		Montri tempzonon
 Synchronize at boot	Time		Sinkronigi dum ŝargo
 Indian	Time		Hindia/Barata

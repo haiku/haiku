@@ -9,4 +9,4 @@ Stopping media server…	MediaDefs		Menghentikan server media…
 Waiting for media_server to quit.	MediaDefs		Menunggu media_server berhenti.
 Done shutting down.	MediaDefs		Selesai dimatikan.
 Error occurred starting media services.	MediaDefs		Terjadi kesalahan saat memulai layanan media.
-Media Service	MediaDefs		Media Service (Layanan Media)
+Media Service	MediaDefs		Layanan Media

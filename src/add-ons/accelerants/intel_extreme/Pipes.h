@@ -47,6 +47,11 @@ public:
 										const pll_divisors& divisors,
 										uint32 pixelClock,
 										uint32 extraFlags);
+		void						ConfigureClocksSKL(
+										const skl_wrpll_params& wrpll_params,
+										uint32 pixelClock,
+										port_index pllForPort,
+										uint32* pllSel);
 
 		// access to the various parts of the pipe
 		::FDILink*					FDI()

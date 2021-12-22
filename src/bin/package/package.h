@@ -5,8 +5,11 @@
 #ifndef PACKAGE_H
 #define PACKAGE_H
 
+#include <SupportDefs.h>
+
 
 void	print_usage_and_exit(bool error);
+int32	parse_compression_argument(const char* arg);
 
 int		command_add(int argc, const char* const* argv);
 int		command_checksum(int argc, const char* const* argv);

@@ -1015,13 +1015,13 @@ OverlayInode::ReadDir(void *cookie, struct dirent *buffer, size_t bufferSize,
 
 	overlay_dirent *dirent = dirents[dirCookie->index++];
 	size_t nameLength = MIN(strlen(dirent->name),
-		bufferSize - sizeof(struct dirent)) + 1;
+		bufferSize - offsetof(struct dirent, d_name)) + 1;
 
 	buffer->d_dev = SuperVolume()->id;
 	buffer->d_pdev = 0;
 	buffer->d_ino = dirent->inode_number;
 	buffer->d_pino = 0;
-	buffer->d_reclen = sizeof(struct dirent) + nameLength;
+	buffer->d_reclen = offsetof(struct dirent, d_name) + nameLength;
 	strlcpy(buffer->d_name, dirent->name, nameLength);
 
 	*num = 1;
@@ -1295,7 +1295,7 @@ OverlayInode::_PopulateDirents()
 	if (result != B_OK)
 		return B_OK;
 
-	size_t bufferSize = sizeof(struct dirent) + B_FILE_NAME_LENGTH;
+	size_t bufferSize = offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH;
 	struct dirent *buffer = (struct dirent *)malloc(bufferSize);
 	if (buffer == NULL)
 		goto close_dir;
@@ -1318,7 +1318,7 @@ OverlayInode::_PopulateDirents()
 		struct dirent *dirent = buffer;
 		for (uint32 i = 0; i < num; i++) {
 			if (strcmp(dirent->d_name, ".") != 0
-				&& strcmp(dirent->d_name, "..") != 0) {
+					&& strcmp(dirent->d_name, "..") != 0) {
 				overlay_dirent *entry = (overlay_dirent *)malloc(
 					sizeof(overlay_dirent));
 				if (entry == NULL) {
@@ -1374,7 +1374,7 @@ OverlayInode::_PopulateAttributeDirents()
 	if (result != B_OK)
 		return B_OK;
 
-	size_t bufferSize = sizeof(struct dirent) + B_FILE_NAME_LENGTH;
+	size_t bufferSize = offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH;
 	struct dirent *buffer = (struct dirent *)malloc(bufferSize);
 	if (buffer == NULL)
 		goto close_attr_dir;

@@ -446,14 +446,14 @@ intel_extreme_init(intel_info &info)
 
 	// Pull VBIOS panel mode for later use
 	info.shared_info->got_vbt = get_lvds_mode_from_bios(
-		&info.shared_info->panel_mode);
+		&info.shared_info->panel_timing);
 
 	/* at least 855gm can't drive more than one head at time */
 	if (info.device_type.InFamily(INTEL_FAMILY_8xx))
 		info.shared_info->single_head_locked = 1;
 
 	if (info.device_type.InFamily(INTEL_FAMILY_SER5)) {
-		info.shared_info->pll_info.reference_frequency = 120000;	// 120 MHz
+		info.shared_info->pll_info.reference_frequency = 120000;// 120 MHz
 		info.shared_info->pll_info.max_frequency = 350000;
 			// 350 MHz RAM DAC speed
 		info.shared_info->pll_info.min_frequency = 20000;		// 20 MHz
@@ -462,6 +462,38 @@ intel_extreme_init(intel_info &info)
 		info.shared_info->pll_info.max_frequency = 400000;
 			// 400 MHz RAM DAC speed
 		info.shared_info->pll_info.min_frequency = 20000;		// 20 MHz
+	} else if (info.device_type.HasDDI() && (info.device_type.Generation() <= 8)) {
+		info.shared_info->pll_info.reference_frequency = 135000;// 135 MHz
+		info.shared_info->pll_info.max_frequency = 350000;
+			// 350 MHz RAM DAC speed
+		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz
+	} else if ((info.device_type.Generation() == 9) &&
+				info.device_type.InGroup(INTEL_GROUP_SKY)) {
+		info.shared_info->pll_info.reference_frequency = 24000;	// 24 MHz
+		info.shared_info->pll_info.max_frequency = 350000;
+			// 350 MHz RAM DAC speed
+		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz
+	} else if (info.device_type.Generation() == 9) {
+		uint32 refInfo =
+			(read32(info, ICL_DSSM) & ICL_DSSM_REF_FREQ_MASK) >> ICL_DSSM_REF_FREQ_SHIFT;
+		switch (refInfo) {
+			case ICL_DSSM_24000:
+				info.shared_info->pll_info.reference_frequency = 24000;	// 24 MHz
+				break;
+			case ICL_DSSM_19200:
+				info.shared_info->pll_info.reference_frequency = 19200;	// 19.2 MHz
+				break;
+			case ICL_DSSM_38400:
+				info.shared_info->pll_info.reference_frequency = 38400;	// 38.4 MHz
+				break;
+			default:
+				ERROR("error: unknown ref. freq. strap, using 24Mhz! %" B_PRIx32 "\n", refInfo);
+				info.shared_info->pll_info.reference_frequency = 24000;	// 24 MHz
+				break;
+		}
+		info.shared_info->pll_info.max_frequency = 350000;
+			// 350 MHz RAM DAC speed
+		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz
 	} else {
 		info.shared_info->pll_info.reference_frequency = 48000;	// 48 MHz
 		info.shared_info->pll_info.max_frequency = 350000;

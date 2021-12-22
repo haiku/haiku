@@ -143,9 +143,15 @@ SYSTEM_NETWORK_PROTOCOLS =
 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
-	x86,x86_64,riscv64 @{
+	framebuffer.accelerant
+	x86,x86_64 @{
 		vesa.accelerant
-	}@ # x86,x86_64,riscv64
+	}@ # x86,x86_64
+	riscv64 @{
+		# ati for qemu, radeon_hd for unmatched
+		ati.accelerant
+		radeon_hd.accelerant
+	}@ # riscv64
 ] ;
 
 SYSTEM_ADD_ONS_TRANSLATORS =
@@ -171,9 +177,15 @@ SYSTEM_ADD_ONS_DRIVERS_AUDIO = ;
 SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ;
 
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
-	x86,x86_64,riscv64 @{
+	framebuffer
+	x86,x86_64 @{
 		vesa
-	}@ # x86,x86_64,riscv64
+	}@ # x86,x86_64
+	riscv64 @{
+		# ati for qemu, radeon_hd for unmatched
+		ati
+		radeon_hd
+	}@ # riscv64
 ] ;
 
 SYSTEM_ADD_ONS_DRIVERS_MIDI = ;
@@ -181,7 +193,7 @@ SYSTEM_ADD_ONS_DRIVERS_MIDI = ;
 SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 	x86,x86_64 @{
 		3com
-		atheros813x ar81xx attansic_l1 attansic_l2
+		atheros813x atheros81xx attansic_l1 attansic_l2
 		broadcom440x broadcom570x
 		dec21xxx
 		emulex_oce
@@ -256,7 +268,6 @@ local etcDir = [ FDirName $(HAIKU_TOP) data etc ] ;
 local etcFiles = inputrc profile ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = $(etcDir) ;
-etcFiles += <etc>termcap ;
 AddFilesToHaikuImage system settings etc : $(etcFiles) ;
 
 local profileFiles = [ Glob $(etcDir)/profile.d : *.sh ] ;

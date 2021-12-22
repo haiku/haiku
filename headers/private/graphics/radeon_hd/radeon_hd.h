@@ -24,6 +24,7 @@
 #include "sea_reg.h"		// DCE 8
 #include "vol_reg.h"		// DCE 10
 #include "car_reg.h"		// DCE 11
+#include "pol_reg.h"		// DCE 12
 
 #include <Accelerant.h>
 #include <Drivers.h>
@@ -122,6 +123,7 @@ enum radeon_chipset {
 	RADEON_VEGA12,		// DCE 13.0?
 	RADEON_VEGA20,		// DCE 13.0?
 	RADEON_RAVEN,		// DCE 13?
+	RADEON_NAVI,		// DCE 13.0?
 };
 
 // !! Must match chipset families above
@@ -189,6 +191,7 @@ static const char radeon_chip_name[][MAX_NAME_LENGTH] = {
 	"Vega 12",
 	"Vega 20",
 	"Raven",
+	"Navi",
 };
 
 

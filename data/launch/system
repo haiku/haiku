@@ -5,10 +5,6 @@ service x-vnd.Haiku-registrar {
 	}
 }
 
-service x-vnd.Haiku-app_server {
-	launch /system/servers/app_server
-}
-
 service x-vnd.Haiku-debug_server {
 	launch /system/servers/debug_server
 }
@@ -32,9 +28,7 @@ service x-vnd.Haiku-media_server {
 	launch /system/servers/media_server
 	no_safemode
 	legacy
-	on {
-		initial_volumes_mounted
-	}
+	on initial_volumes_mounted
 }
 
 service x-vnd.Haiku-midi_server {
@@ -73,8 +67,7 @@ job x-vnd.Haiku-cddb_lookup {
 	on volume_mounted
 }
 
-target login {
-	job x-vnd.Haiku-autologin {
-		launch /system/bin/autologin
-	}
+# target login
+job x-vnd.Haiku-autologin {
+	launch /system/bin/autologin
 }

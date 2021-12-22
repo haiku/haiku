@@ -1,5 +1,5 @@
-1	czech	x-vnd.Haiku-MediaPlayer	1961774506
-Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do Koše
+1	czech	x-vnd.Haiku-MediaPlayer	716811487
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do koše
 Close	MediaPlayer-PlaylistWindow		Zavřít
 Volume of background clips	MediaPlayer-SettingsWindow		Hlasitost klipů na pozadí
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Použít hardwareový video overlay, je-li dostupný
@@ -30,6 +30,7 @@ Open file…	MediaPlayer-Main		Otevřít soubor...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Přizpůsobit velikost ovládacích prvků v režimu celé obrazovky
 View options	MediaPlayer-SettingsWindow		Volby zobrazení
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Vysunout zařízení
 Full volume	MediaPlayer-SettingsWindow		Plná hlasitost
 <untitled>	PlaylistItem-title		<bez titulku>
 Start media server	MediaPlayer-Main		Spustit media server
@@ -79,7 +80,7 @@ Large	MediaPlayer-SettingsWindow		Veliký
 Import Entry	MediaPlayer-ImportPLItemsCmd		Importovat položku
 unknown format	MediaPlayer-InfoWin		neznámý formát
 Track %d	MediaPlayer-Main		Stopa %d
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Všechny soubory nemohly být přesunuty do Koše.
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Všechny soubory nemohly být přesunuty do koše.
 Total duration: %s	MediaPlayer-PlaylistWindow		Celková délka: %s
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Chyba při přesouvání do koše
@@ -133,14 +134,14 @@ Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Měnit veli
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Soubor '%filename' nebylo možné otevřít.\n\n
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Žádný ze souborů, které jste chtěli přehrát, nevypadá jako media soubor.
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Odstranit položku
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do Koše
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do koše
 Subtitle size:	MediaPlayer-SettingsWindow		Velikost Titulků:
 No aspect correction	MediaPlayer-Main		Bez korekce poměru stran
 raw video	MediaPlayer-InfoWin		nezpracované video
 Container	MediaPlayer-InfoWin		Kontejnér
 none	MediaPlayer-Main		žádné
 Open clips	MediaPlayer-Main		Otevřít klipy
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Některé soubory nemohly být přesunuty do Koše.
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Některé soubory nemohly být přesunuty do koše.
 <nothing to undo>	MediaPlayer-PlaylistWindow		<není co vzít zpět>
 Save as…	MediaPlayer-PlaylistWindow		Uložit jako...
 Error: 	MediaPlayer-RemovePLItemsCmd		Chyba:

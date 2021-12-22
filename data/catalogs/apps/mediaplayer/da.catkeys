@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-MediaPlayer	1961774506
+1	danish	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Fjern element til papirkurv
 Close	MediaPlayer-PlaylistWindow		Luk
 Volume of background clips	MediaPlayer-SettingsWindow		Lydstyrke for baggrundsklips
@@ -30,6 +30,7 @@ Open file…	MediaPlayer-Main		Åbn fil…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skaler styringer i fuldskærmstilstand
 View options	MediaPlayer-SettingsWindow		Visningsvalgmuligheder
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Skub enhed ud
 Full volume	MediaPlayer-SettingsWindow		Fuld lydstyrke
 <untitled>	PlaylistItem-title		<unavngivet>
 Start media server	MediaPlayer-Main		Start medieserver

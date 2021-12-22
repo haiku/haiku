@@ -49,6 +49,8 @@ AlphaMask::AlphaMask(AlphaMask* previousMask, bool inverse)
 
 	if (previousMask != NULL)
 		atomic_add(&previousMask->fNextMaskCount, 1);
+
+	_SetOutsideOpacity();
 }
 
 
@@ -75,6 +77,8 @@ AlphaMask::AlphaMask(AlphaMask* previousMask, AlphaMask* other)
 
 	if (previousMask != NULL)
 		atomic_add(&previousMask->fNextMaskCount, 1);
+
+	_SetOutsideOpacity();
 }
 
 
@@ -96,6 +100,8 @@ AlphaMask::AlphaMask(uint8 backgroundOpacity)
 	fScanline(fMask)
 {
 	recursive_lock_init(&fLock, "AlphaMask");
+
+	_SetOutsideOpacity();
 }
 
 
@@ -190,18 +196,63 @@ AlphaMask::_Generate()
 	uint32 numPixels = width * height;
 
 	if (fPreviousMask != NULL) {
-		int32 previousStartX = fBounds.left - fPreviousMask->fBounds.left;
-		int32 previousStartY = fBounds.top - fPreviousMask->fBounds.top;
-		if (previousStartX < 0)
-			previousStartX = 0;
-		if (previousStartY < 0)
-			previousStartY = 0;
+		uint8 previousOutsideOpacity = fPreviousMask->OutsideOpacity();
 
-		for (int32 y = previousStartY; y < previousStartY + height; y++) {
-			uint8* previousRow = fPreviousMask->fBuffer.row_ptr(y);
-			for (int32 x = previousStartX; x < previousStartX + width; x++) {
-				uint8 sourceAlpha = fInverse ? 255 - source[3] : source[3];
-				*destination = sourceAlpha * previousRow[x] / 255;
+		if (fPreviousMask->fBounds.Intersects(fBounds)) {
+			IntRect previousBounds(fBounds.OffsetByCopy(
+				-fPreviousMask->fBounds.left, -fPreviousMask->fBounds.top));
+			if (previousBounds.right > fPreviousMask->fBounds.Width())
+				previousBounds.right = fPreviousMask->fBounds.Width();
+			if (previousBounds.bottom > fPreviousMask->fBounds.Height())
+				previousBounds.bottom = fPreviousMask->fBounds.Height();
+
+			int32 y = previousBounds.top;
+
+			for (; y < 0; y++) {
+				for (int32 x = 0; x < width; x++) {
+					*destination = (fInverse ? 255 - source[3] : source[3])
+						* previousOutsideOpacity / 255;
+					destination++;
+					source += 4;
+				}
+			}
+
+			for (; y <= previousBounds.bottom; y++) {
+				int32 x = previousBounds.left;
+				for (; x < 0; x++) {
+					*destination = (fInverse ? 255 - source[3] : source[3])
+						* previousOutsideOpacity / 255;
+					destination++;
+					source += 4;
+				}
+				uint8* previousRow = fPreviousMask->fBuffer.row_ptr(y);
+				for (; x <= previousBounds.right; x++) {
+					uint8 sourceAlpha = fInverse ? 255 - source[3] : source[3];
+					*destination = sourceAlpha * previousRow[x] / 255;
+					destination++;
+					source += 4;
+				}
+				for (; x < previousBounds.left + width; x++) {
+					*destination = (fInverse ? 255 - source[3] : source[3])
+						* previousOutsideOpacity / 255;
+					destination++;
+					source += 4;
+				}
+			}
+
+			for (; y < previousBounds.top + height; y++) {
+				for (int32 x = 0; x < width; x++) {
+					*destination = (fInverse ? 255 - source[3] : source[3])
+						* previousOutsideOpacity / 255;
+					destination++;
+					source += 4;
+				}
+			}
+
+		} else {
+			while (numPixels--) {
+				*destination = (fInverse ? 255 - source[3] : source[3])
+					* previousOutsideOpacity / 255;
 				destination++;
 				source += 4;
 			}
@@ -239,23 +290,24 @@ AlphaMask::_PreviousMaskBounds() const
 void
 AlphaMask::_AttachMaskToBuffer()
 {
-	uint8 outsideOpacity = fInverse ? 255 - fBackgroundOpacity
-		: fBackgroundOpacity;
-
-	AlphaMask* previousMask = fPreviousMask;
-	while (previousMask != NULL && outsideOpacity != 0) {
-		uint8 previousOutsideOpacity = previousMask->fInverse
-			? 255 - previousMask->fBackgroundOpacity
-			: previousMask->fBackgroundOpacity;
-		outsideOpacity = outsideOpacity * previousOutsideOpacity / 255;
-		previousMask = previousMask->fPreviousMask;
-	}
-
 	const IntPoint maskOffset = _Offset();
 	const int32 offsetX = fBounds.left + maskOffset.x + fCanvasOrigin.x;
 	const int32 offsetY = fBounds.top + maskOffset.y + fCanvasOrigin.y;
 
-	fMask.attach(fBuffer, offsetX, offsetY, outsideOpacity);
+	fMask.attach(fBuffer, offsetX, offsetY, fOutsideOpacity);
+}
+
+
+void
+AlphaMask::_SetOutsideOpacity()
+{
+	fOutsideOpacity = fInverse ? 255 - fBackgroundOpacity
+		: fBackgroundOpacity;
+
+	if (fPreviousMask != NULL) {
+		fOutsideOpacity = fOutsideOpacity * fPreviousMask->OutsideOpacity()
+			/ 255;
+	}
 }
 
 
@@ -327,8 +379,18 @@ VectorAlphaMask<VectorMaskType>::_RenderSource(const IntRect& canvasBounds)
 	} else
 		fClippedToCanvas = false;
 
-	if (fPreviousMask != NULL)
-		fBounds = fBounds & _PreviousMaskBounds();
+	if (fPreviousMask != NULL) {
+		if (IsInverted()) {
+			if (fPreviousMask->OutsideOpacity() != 0) {
+				IntRect previousBounds = _PreviousMaskBounds();
+				if (previousBounds.IsValid())
+					fBounds = fBounds | previousBounds;
+			} else
+				fBounds = _PreviousMaskBounds();
+			fClippedToCanvas = fClippedToCanvas || fPreviousMask->IsClipped();
+		} else if (fPreviousMask->OutsideOpacity() == 0)
+			fBounds = fBounds & _PreviousMaskBounds();
+	}
 	if (!fBounds.IsValid())
 		return NULL;
 

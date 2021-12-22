@@ -37,6 +37,7 @@ public:
 									int32 count = 1, bool dynamic = false);
 			void				ResetColors(uint8* indexes,
 									int32 count = 1, bool dynamic = false);
+			void				GetColor(uint8 index);
 			void				SetCursorStyle(int32 style, bool blinking);
 			void				SetCursorBlinking(bool blinking);
 			void				SetCursorHidden(bool hidden);

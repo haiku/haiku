@@ -1,6 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku-CodyCam	40716723
+1	greek, modern (1453-)	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		αναμένεται κατάλογος προορισμού
 reply: '%s'\n	SftpClient		επανάληψη: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed>  (ο πραγματικός κωδικός θα σταλεί)
 JPEG image	CodyCam		Εικόνα JPEG
 Remote host has closed the connection.\n	FtpClient		Ο απομακρυσμένος υπολογιστής έκλεισε τη σύνδεση.\n
 image file format expected	CodyCam		αναμένεται τύπος αρχείου εικόνας

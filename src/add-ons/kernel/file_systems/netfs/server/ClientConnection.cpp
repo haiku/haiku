@@ -1979,7 +1979,7 @@ ClientConnection::VisitReadAttrDirRequest(ReadAttrDirRequest* request)
 	managerLocker.Unlock();
 
 	// read the attribute directory
-	uint8 buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+	uint8 buffer[offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH];
 	struct dirent* dirEntry = (struct dirent*)buffer;
 	int32 countRead = 0;
 	bool done = true;
@@ -2430,7 +2430,7 @@ ClientConnection::VisitReadQueryRequest(ReadQueryRequest* request)
 	ReadQueryReply reply;
 	int32 countRead = 0;
 	while (result == B_OK) {
-		uint8 buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+		uint8 buffer[offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH];
 		struct dirent* dirEntry = (struct dirent*)buffer;
 
 		result = queryHandle->ReadDir(dirEntry, 1, &countRead);

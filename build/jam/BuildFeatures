@@ -78,9 +78,12 @@ if [ IsPackageAvailable gcc_syslibs_devel ] {
 				libgcc_eh.a: $(developLibDir)/libgcc_eh.a
 				libgcc-kernel.a: $(developLibDir)/libgcc-kernel.a
 				libgcc_eh-kernel.a: $(developLibDir)/libgcc_eh.a
+				libgcc-boot.a: $(developLibDir)/libgcc-boot.a
+				libgcc_eh-boot.a: $(developLibDir)/libgcc_eh-boot.a
 				libstdc++.a: $(developLibDir)/libstdc++.a
 				libsupc++.a: $(developLibDir)/libsupc++.a
 				libsupc++-kernel.a: $(developLibDir)/libsupc++-kernel.a
+				libsupc++-boot.a: $(developLibDir)/libsupc++-boot.a
 				c++-headers: $(developHeadersDir)/c++
 				gcc-headers: $(developHeadersDir)/gcc
 			;
@@ -104,7 +107,6 @@ if [ IsPackageAvailable icu_devel ] {
 				$(developLibDir)/libicudata.so
 				$(developLibDir)/libicui18n.so
 				$(developLibDir)/libicuio.so
-				$(developLibDir)/libicutu.so
 				$(developLibDir)/libicuuc.so
 			headers: $(developHeadersDir)
 		;
@@ -120,7 +122,6 @@ if [ IsPackageAvailable icu_devel ] {
 				$(developLibDir)/libicudata.so
 				$(developLibDir)/libicui18n.so
 				$(developLibDir)/libicuio.so
-				$(developLibDir)/libicutu.so
 				$(developLibDir)/libicuuc.so
 			headers: $(developHeadersDir)
 		;
@@ -622,6 +623,23 @@ if [ IsPackageAvailable libdvdnav_devel ] {
 }
 
 
+# libraw
+if [ IsPackageAvailable libraw_devel ] {
+	ExtractBuildFeatureArchives libraw :
+		file: base libraw
+			runtime: lib
+		file: devel libraw_devel
+			depends: base
+			libraries: $(developLibDir)/libraw.so.19
+			headers: $(developHeadersDir)
+		;
+
+	EnableBuildFeatures libraw ;
+} else {
+	unavailableBuildFeatures += libraw ;
+}
+
+
 # libwebp
 if [ IsPackageAvailable libwebp_devel ] {
 	if $(HAIKU_PACKAGING_ARCH) = x86 && $(TARGET_PACKAGING_ARCH) = x86_gcc2 {
@@ -652,19 +670,15 @@ if [ IsPackageAvailable libwebp_devel ] {
 
 # libavif
 if [ IsPackageAvailable libavif_devel ] {
-	if $(HAIKU_PACKAGING_ARCH) = x86_64 {
-		ExtractBuildFeatureArchives libavif :
-			file: base libavif
-				runtime: lib
-			file: devel libavif_devel
-				depends: base
-				library: $(developLibDir)/libavif.so.12
-				headers: $(developHeadersDir) $(developHeadersDir)/avif
-			;
-		EnableBuildFeatures libavif ;
-	} else {
-		unavailableBuildFeatures += libavif ;
-	}
+	ExtractBuildFeatureArchives libavif :
+		file: base libavif
+			runtime: lib
+		file: devel libavif_devel
+			depends: base
+			library: $(developLibDir)/libavif.so.9
+			headers: $(developHeadersDir) $(developHeadersDir)/avif
+		;
+	EnableBuildFeatures libavif ;
 } else {
 	unavailableBuildFeatures += libavif ;
 }

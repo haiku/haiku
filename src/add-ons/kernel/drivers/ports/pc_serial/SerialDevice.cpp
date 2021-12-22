@@ -545,13 +545,13 @@ SerialDevice::Open(uint32 flags)
 	if (fDeviceRemoved)
 		return B_DEV_NOT_READY;
 
-	fMasterTTY = gTTYModule->tty_create(pc_serial_service, true);
+	fMasterTTY = gTTYModule->tty_create(pc_serial_service, NULL);
 	if (fMasterTTY == NULL) {
 		TRACE_ALWAYS("open: failed to init master tty\n");
 		return B_NO_MEMORY;
 	}
 
-	fSlaveTTY = gTTYModule->tty_create(pc_serial_service, false);
+	fSlaveTTY = gTTYModule->tty_create(pc_serial_service, fMasterTTY);
 	if (fSlaveTTY == NULL) {
 		TRACE_ALWAYS("open: failed to init slave tty\n");
 		gTTYModule->tty_destroy(fMasterTTY);

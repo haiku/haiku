@@ -184,9 +184,9 @@ usb_scsi_trace(bool b_force, const char *fmt, ...)
 		va_end(arg_list);
 		if(b_log_file && !b_no_port){ /* write in private log file */
 			if(B_OK != write_port_etc(pid, 0, buf, strlen(buf), B_TIMEOUT, 0))
-				dprintf(buf);
+				dprintf("%s", buf);
 		} else /* write in system log*/
-			dprintf(buf);
+			dprintf("%s", buf);
 	}
 }
 /**

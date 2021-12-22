@@ -19,13 +19,20 @@
 
 
 class Console : public ConsoleNode {
-	public:
+public:
 		Console();
 
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer,
 			size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer,
 			size_t bufferSize);
+
+		virtual void	ClearScreen();
+		virtual int32	Width();
+		virtual int32	Height();
+		virtual void	SetCursor(int32 x, int32 y);
+		virtual void	SetCursorVisible(bool visible);
+		virtual void	SetColors(int32 foreground, int32 background);
 };
 
 static uint16* sScreenBase;
@@ -36,7 +43,8 @@ static uint32 sScreenHeight = 25;
 static uint32 sScreenOffset = 0;
 static uint16 sColor = 0x0f00;
 
-static Console sInput, sOutput;
+extern ConsoleNode* gConsoleNode;
+static Console sConsole;
 FILE *stdin, *stdout, *stderr;
 
 
@@ -138,11 +146,8 @@ Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer,
 }
 
 
-//	#pragma mark -
-
-
 void
-console_clear_screen(void)
+Console::ClearScreen()
 {
 	if (gKernelArgs.frame_buffer.enabled)
 		return;
@@ -158,21 +163,21 @@ console_clear_screen(void)
 
 
 int32
-console_width(void)
+Console::Width()
 {
 	return sScreenWidth;
 }
 
 
 int32
-console_height(void)
+Console::Height()
 {
 	return sScreenHeight;
 }
 
 
 void
-console_set_cursor(int32 x, int32 y)
+Console::SetCursor(int32 x, int32 y)
 {
 	if (y >= (int32)sScreenHeight)
 		y = sScreenHeight - 1;
@@ -188,21 +193,14 @@ console_set_cursor(int32 x, int32 y)
 
 
 void
-console_show_cursor(void)
+Console::SetCursorVisible(bool)
 {
 	// TODO: implement
 }
 
 
 void
-console_hide_cursor(void)
-{
-	// TODO: implement
-}
-
-
-void
-console_set_color(int32 foreground, int32 background)
+Console::SetColors(int32 foreground, int32 background)
 {
 	sColor = (background & 0xf) << 12 | (foreground & 0xf) << 8;
 }
@@ -244,11 +242,12 @@ console_init(void)
 
 	sScreenBase = new(std::nothrow) uint16[sScreenWidth * sScreenHeight];
 
-	console_clear_screen();
+	sConsole.ClearScreen();
 
 	// enable stdio functionality
-	stdin = (FILE *)&sInput;
-	stdout = stderr = (FILE *)&sOutput;
+	gConsoleNode = &sConsole;
+	stdin = (FILE *)&sConsole;
+	stdout = stderr = (FILE *)&sConsole;
 
 	return B_OK;
 }

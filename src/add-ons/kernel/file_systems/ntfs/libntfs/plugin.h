@@ -1,7 +1,7 @@
 /*
  *		plugin.h : define interface for plugin development
  *
- * Copyright (c) 2015 Jean-Pierre Andre
+ * Copyright (c) 2015-2021 Jean-Pierre Andre
  *
  */
 
@@ -30,8 +30,9 @@
 #ifndef _NTFS_PLUGIN_H
 #define _NTFS_PLUGIN_H
 
-#include "inode.h"
 #include "layout.h"
+#include "inode.h"
+#include "dir.h"
 
 struct fuse_file_info;
 struct stat;
@@ -71,10 +72,10 @@ typedef struct plugin_operations {
 			struct fuse_file_info *fi);
 
 	/*
-	 *	Release an open file
+	 *	Release an open file or directory
 	 * This is only called if fi->fh has been set to a non-null
 	 * value while opening. It may be used to free some context
-	 * specific to the open file.
+	 * specific to the open file or directory
 	 * The returned value is zero for success or a negative errno
 	 * value for failure.
 	 */
@@ -110,7 +111,7 @@ typedef struct plugin_operations {
 	 *	Get a symbolic link
 	 * The symbolic link must be returned in an allocated buffer,
 	 * encoded in a zero terminated multibyte string compatible
-	 * which the locale mount option.
+	 * with the locale mount option.
 	 * The returned value is zero for success or a negative errno
 	 * value for failure.
 	 */
@@ -126,6 +127,58 @@ typedef struct plugin_operations {
 	 */
 	int (*truncate)(ntfs_inode *ni, const REPARSE_POINT *reparse,
 			off_t size);
+	/*
+	 *	Open a directory
+	 * The field fi->flags indicates the kind of opening.
+	 * The field fi->fh may be used to store some information which
+	 * will be available to subsequent readdir(). When used
+	 * this field must be non-null and freed in release().
+	 * The returned value is zero for success and a negative errno
+	 * value for failure.
+	 */
+	int (*opendir)(ntfs_inode *ni, const REPARSE_POINT *reparse,
+			struct fuse_file_info *fi);
+
+	/*
+	 *	Get entries from a directory
+	 *
+	 * Use the filldir() function with fillctx argument to return
+	 * the directory entries.
+	 * Names "." and ".." are expected to be returned.
+	 * The returned value is zero for success and a negative errno
+	 * value for failure.
+	 */
+	int (*readdir)(ntfs_inode *ni, const REPARSE_POINT *reparse,
+			s64 *pos, void *fillctx, ntfs_filldir_t filldir,
+			struct fuse_file_info *fi);
+	/*
+	 *	Create a new file of any type
+	 *
+	 * The returned value is a pointer to the inode created, or
+	 * NULL if failed, with errno telling why.
+	 */
+	ntfs_inode *(*create)(ntfs_inode *dir_ni, const REPARSE_POINT *reparse,
+			le32 securid, ntfschar *name, int name_len,
+			mode_t type);
+	/*
+	 *	Link a new name to a file or directory
+	 * Linking a directory is needed for renaming a directory
+	 * The returned value is zero for success or a negative errno
+	 * value for failure.
+	 * If the returned value is zero, the modified time stamp
+	 * will be updated after the call.
+	 */
+	int (*link)(ntfs_inode *dir_ni, const REPARSE_POINT *reparse,
+			ntfs_inode *ni, ntfschar *name, int name_len);
+	/*
+	 *	Unlink a name from a directory
+	 * The argument pathname may be NULL
+	 * The returned value is zero for success or a negative errno
+	 * value for failure.
+	 */
+	int (*unlink)(ntfs_inode *dir_ni, const REPARSE_POINT *reparse,
+			const char *pathname,
+			ntfs_inode *ni, ntfschar *name, int name_len);
 } plugin_operations_t;
 
 

@@ -463,7 +463,7 @@ udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 		return B_BAD_VALUE;
 	}
 
-	uint32 nameLength = bufferSize - sizeof(struct dirent) + 1;
+	uint32 nameLength = bufferSize - offsetof(struct dirent, d_name);
 	ino_t id;
 	status_t status = iterator->GetNextEntry(dirent->d_name, &nameLength, &id);
 	if (!status) {
@@ -471,7 +471,7 @@ udf_read_dir(fs_volume *_volume, fs_vnode *vnode, void *cookie,
 		*_num = 1;
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = id;
-		dirent->d_reclen = sizeof(struct dirent) + nameLength - 1;
+		dirent->d_reclen = offsetof(struct dirent, d_name) + nameLength + 1;
 	} else {
 		*_num = 0;
 		// Clear the status for end of directory
@@ -520,7 +520,7 @@ udf_rewind_dir(fs_volume *volume, fs_vnode *vnode, void *cookie)
 	      - A way to get the proper info (best)
 	      - To ignore trying to find anchor volume descriptor pointers at
 	        locations N-256 and N. (acceptable, perhaps, but not really correct)
-	      Either way we should address this problem properly for OBOS::R1.
+	      Either way we should address this problem properly for Haiku::R1.
 	\todo Looks like B_GET_GEOMETRY doesn't work on non-device files (i.e.
 	      disk images), so I need to use stat or something else for those
 	      instances.

@@ -22,6 +22,7 @@
 
 #include "BitmapView.h"
 #include "HaikuDepotConstants.h"
+#include "LocaleUtils.h"
 #include "Logger.h"
 #include "MainWindow.h"
 #include "MarkupTextView.h"
@@ -41,8 +42,9 @@
 #define X_POSITION_RATING 350.0f
 #define X_POSITION_SUMMARY 500.0f
 #define WIDTH_RATING 100.0f
-#define Y_PROPORTION_TITLE 0.4f
-#define Y_PROPORTION_PUBLISHER 0.7f
+#define Y_PROPORTION_TITLE 0.35f
+#define Y_PROPORTION_PUBLISHER 0.60f
+#define Y_PROPORTION_CHRONOLOGICAL_DATA 0.75f
 #define PADDING 8.0f
 
 
@@ -407,6 +409,7 @@ public:
 		_DrawPackageIcon(updateRect, pkg, y, selected);
 		_DrawPackageTitle(updateRect, pkg, y, selected);
 		_DrawPackagePublisher(updateRect, pkg, y, selected);
+		_DrawPackageCronologicalInfo(updateRect, pkg, y, selected);
 		_DrawPackageRating(updateRect, pkg, y, selected);
 		_DrawPackageSummary(updateRect, pkg, y, selected);
 	}
@@ -468,8 +471,8 @@ public:
 	}
 
 
-	void _DrawPackagePublisher(BRect updateRect, PackageInfoRef pkg, float y,
-		bool selected)
+	void _DrawPackageGenericTextSlug(BRect updateRect, PackageInfoRef pkg,
+		const BString& text, float y, float yProportion, bool selected)
 	{
 		static BFont* sFont = NULL;
 
@@ -488,11 +491,33 @@ public:
 		SetFont(sFont);
 
 		float maxTextWidth = (X_POSITION_RATING - HEIGHT_PACKAGE) - PADDING;
-		BString publisherName(pkg->Publisher().Name());
-		TruncateString(&publisherName, B_TRUNCATE_END, maxTextWidth);
+		BString renderedText(text);
+		TruncateString(&renderedText, B_TRUNCATE_END, maxTextWidth);
 
-		DrawString(publisherName, BPoint(HEIGHT_PACKAGE,
-			y + (HEIGHT_PACKAGE * Y_PROPORTION_PUBLISHER)));
+		DrawString(renderedText, BPoint(HEIGHT_PACKAGE,
+			y + (HEIGHT_PACKAGE * yProportion)));
+	}
+
+
+	void _DrawPackagePublisher(BRect updateRect, PackageInfoRef pkg, float y,
+		bool selected)
+	{
+		_DrawPackageGenericTextSlug(updateRect, pkg, pkg->Publisher().Name(), y,
+			Y_PROPORTION_PUBLISHER, selected);
+	}
+
+
+	void _DrawPackageCronologicalInfo(BRect updateRect, PackageInfoRef pkg,
+		float y, bool selected)
+	{
+		BString versionCreateTimestampPresentation
+			= B_TRANSLATE("%VersionCreateDate%");
+		versionCreateTimestampPresentation.ReplaceAll("%VersionCreateDate%",
+			LocaleUtils::TimestampToDateString(
+				pkg->VersionCreateTimestamp()));
+		_DrawPackageGenericTextSlug(updateRect, pkg,
+			versionCreateTimestampPresentation, y,
+			Y_PROPORTION_CHRONOLOGICAL_DATA, selected);
 	}
 
 

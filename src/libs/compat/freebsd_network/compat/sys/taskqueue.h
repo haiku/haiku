@@ -55,6 +55,7 @@ struct taskqueue *taskqueue_create_fast(const char *name, int mflags,
 
 void task_init(struct task *, int prio, task_fn_t handler, void *arg);
 #define TASK_INIT(taskp, prio, hand, arg) task_init(taskp, prio, hand, arg)
+#define NET_TASK_INIT TASK_INIT
 
 void timeout_task_init(struct taskqueue *queue, struct timeout_task *timeout_task,
 	int priority, task_fn_t func, void *context);

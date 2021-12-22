@@ -1,5 +1,31 @@
-1	greek, modern (1453-)	x-vnd.haiku-screenshot-cli	2506396191
+1	greek, modern (1453-)	x-vnd.haiku-screenshot-cli	3958461128
+Include window border	ScreenshotWindow		Περίληψη περιγράμματος παραθύρου
+Overwrite	ScreenshotWindow		Αντικατάσταση
+Save in:	ScreenshotWindow		Αποθήκευση σε:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Σφάλμα αποθήκευσης του \"%s\":\n\t%s
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Το αρχείο υπάρχει ήδη.\n  Είστε σίγουρος/η ότι θέλετε να το αντικαταστήσετε;
+OK	ScreenshotWindow		Εντάξει
+The destination path exists but is not a folder.	ScreenshotWindow		Η διεύθυνση προορισμού υπάρχει, αλλά δεν είναι κατάλογος.
+Select	ScreenshotWindow		Επιλογή
+Save as:	ScreenshotWindow		Αποθήκευση ως:
+seconds	ScreenshotWindow		δευτερόλεπτα
 New screenshot	ScreenshotWindow		Νέο στιγμιότυπο οθόνης
 Screenshot	System name		Στιγμιότυπο Οθόνης
+Desktop	ScreenshotWindow		Επιφάνεια εργασίας
+Artwork folder	ScreenshotWindow		Φάκελος τεχνημάτων
+Translator Settings	ScreenshotWindow		Ρυθμίσεις μεταφραστή
+Include mouse pointer	ScreenshotWindow		Περίληψη δείκτη ποντικιού
+overwrite	ScreenshotWindow		αντικατάσταση
+Settings…	ScreenshotWindow		Ρυθμίσεις...
+Choose folder	ScreenshotWindow		Επιλογή καταλόγου
+Name:	ScreenshotWindow		Όνομα:
+Choose folder…	ScreenshotWindow		Επιλογή καταλόγου...
+Please select	ScreenshotWindow		Παρακαλώ επιλέξτε
 Failed to save screenshot	ScreenshotWindow		Δεν ήταν δυνατή η αποθήκευση στιγμιοτύπου οθόνης
+Cancel	ScreenshotWindow		Άκυρο
+Delay:	ScreenshotWindow		Καθυστέρηση:
+Copy to clipboard	ScreenshotWindow		Αντιγραφή στο πρόχειρο
 screenshot	Screenshot	Base filename of screenshot files	στιγμιότυπο
+Home folder	ScreenshotWindow		Φάκελος χρήστη
+Save	ScreenshotWindow		Αποθήκευση
+Capture active window	ScreenshotWindow		Στιγμιότυπο ενεργού παραθύρου

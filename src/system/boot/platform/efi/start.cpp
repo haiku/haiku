@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2016 Haiku, Inc. All rights reserved.
+ * Copyright 2014-2021 Haiku, Inc. All rights reserved.
  * Copyright 2013-2014, Fredrik Holmqvist, fredrik.holmqvist@gmail.com.
  * Copyright 2014, Henry Harrington, henry.harrington@gmail.com.
  * All rights reserved.
@@ -25,6 +25,7 @@
 #include "acpi.h"
 #include "console.h"
 #include "cpu.h"
+#include "debug.h"
 #ifdef _BOOT_FDT_SUPPORT
 #include "dtb.h"
 #endif
@@ -70,9 +71,10 @@ platform_boot_options()
 }
 
 
-static void
-convert_preloaded_image(preloaded_elf64_image* image)
+template<class T> static void
+convert_preloaded_image(preloaded_image* _image)
 {
+	T* image = static_cast<T*>(_image);
 	fix_address(image->next);
 	fix_address(image->name);
 	fix_address(image->debug_string_table);
@@ -84,26 +86,23 @@ convert_preloaded_image(preloaded_elf64_image* image)
 }
 
 
-/*!	Convert all addresses in kernel_args to 64-bit addresses. */
+/*!	Convert all addresses in kernel_args to virtual addresses. */
 static void
 convert_kernel_args()
 {
-	if (gKernelArgs.kernel_image->elf_class != ELFCLASS64)
-		return;
-
 	fix_address(gKernelArgs.boot_volume);
 	fix_address(gKernelArgs.vesa_modes);
 	fix_address(gKernelArgs.edid_info);
 	fix_address(gKernelArgs.debug_output);
 	fix_address(gKernelArgs.boot_splash);
-	#if defined(__x86_64__) || defined(__x86__)
-	fix_address(gKernelArgs.ucode_data);
-	fix_address(gKernelArgs.arch_args.apic);
-	fix_address(gKernelArgs.arch_args.hpet);
-	#endif
 
-	convert_preloaded_image(static_cast<preloaded_elf64_image*>(
-		gKernelArgs.kernel_image.Pointer()));
+	arch_convert_kernel_args();
+
+	if (gKernelArgs.kernel_image->elf_class == ELFCLASS64) {
+		convert_preloaded_image<preloaded_elf64_image>(gKernelArgs.kernel_image);
+	} else {
+		convert_preloaded_image<preloaded_elf32_image>(gKernelArgs.kernel_image);
+	}
 	fix_address(gKernelArgs.kernel_image);
 
 	// Iterate over the preloaded images. Must save the next address before
@@ -112,7 +111,11 @@ convert_kernel_args()
 	fix_address(gKernelArgs.preloaded_images);
 	while (image != NULL) {
 		preloaded_image* next = image->next;
-		convert_preloaded_image(static_cast<preloaded_elf64_image*>(image));
+		if (image->elf_class == ELFCLASS64) {
+			convert_preloaded_image<preloaded_elf64_image>(image);
+		} else {
+			convert_preloaded_image<preloaded_elf32_image>(image);
+		}
 		image = next;
 	}
 
@@ -185,6 +188,8 @@ platform_start_kernel(void)
 	dprintf("  text: %#" B_PRIx64 ", %#" B_PRIx64 "\n", textRegion.start, textRegion.size);
 	dprintf("  data: %#" B_PRIx64 ", %#" B_PRIx64 "\n", dataRegion.start, dataRegion.size);
 	dprintf("  entry: %#lx\n", kernelEntry);
+
+	debug_cleanup();
 
 	arch_mmu_init();
 	convert_kernel_args();

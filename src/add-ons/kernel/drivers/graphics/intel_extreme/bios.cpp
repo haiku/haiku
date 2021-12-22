@@ -19,9 +19,6 @@
 #endif
 
 
-static const off_t kVbtPointer = 0x1A;
-
-
 struct vbt_header {
 	uint8 signature[20];
 	uint16 version;
@@ -40,6 +37,12 @@ struct bdb_header {
 	uint16 header_size;
 	uint16 bdb_size;
 } __attribute__((packed));
+
+
+enum bdb_block_id {
+	BDB_LVDS_OPTIONS = 40,
+	BDB_LVDS_LFP_DATA_PTRS
+};
 
 
 // FIXME the struct definition for the bdb_header is not complete, so we rely
@@ -102,16 +105,6 @@ struct lvds_bdb2_lfp_info {
 static struct vbios {
 	area_id			area;
 	uint8*			memory;
-	display_mode*	shared_info;
-	struct {
-		uint16		hsync_start;
-		uint16		hsync_end;
-		uint16		hsync_total;
-		uint16		vsync_start;
-		uint16		vsync_end;
-		uint16		vsync_total;
-	}				timings_common;
-
 	uint16_t ReadWord(off_t address)
 	{
 		return memory[address] | memory[address + 1] << 8;
@@ -125,7 +118,7 @@ static struct vbios {
 	PROM-programmed timings info when compensation mode is off on your machine.
 */
 static bool
-get_bios(void)
+get_bios(int* vbtOffset)
 {
 	static const uint64_t kVBIOSAddress = 0xc0000;
 	static const int kVBIOSSize = 64 * 1024;
@@ -143,14 +136,22 @@ get_bios(void)
 	TRACE((DEVICE_NAME ": mapping VBIOS: 0x%" B_PRIx64 " -> %p\n",
 		kVBIOSAddress, vbios.memory));
 
-	int vbtOffset = vbios.ReadWord(kVbtPointer);
-	if ((vbtOffset + (int)sizeof(vbt_header)) >= kVBIOSSize) {
-		TRACE((DEVICE_NAME": bad VBT offset : 0x%x\n", vbtOffset));
+	// scan BIOS for VBT signature
+	*vbtOffset = kVBIOSSize;
+	for (uint32 i = 0; i + 4 < kVBIOSSize; i += 4) {
+		if (memcmp(vbios.memory + i, "$VBT", 4) == 0) {
+			*vbtOffset = i;
+			continue;
+		}
+	}
+
+	if ((*vbtOffset + (int)sizeof(vbt_header)) >= kVBIOSSize) {
+		TRACE((DEVICE_NAME": bad VBT offset : 0x%x\n", *vbtOffset));
 		delete_area(vbios.area);
 		return false;
 	}
 
-	struct vbt_header* vbt = (struct vbt_header*)(vbios.memory + vbtOffset);
+	struct vbt_header* vbt = (struct vbt_header*)(vbios.memory + *vbtOffset);
 	if (memcmp(vbt->signature, "$VBT", 4) != 0) {
 		TRACE((DEVICE_NAME": bad VBT signature: %20s\n", vbt->signature));
 		delete_area(vbios.area);
@@ -160,62 +161,42 @@ get_bios(void)
 }
 
 
-static bool
-feed_shared_info(uint8* data)
+static void
+sanitize_panel_timing(display_timing& timing)
 {
 	bool bogus = false;
 
 	/* handle bogus h/vtotal values, if got such */
-	if (vbios.timings_common.hsync_end > vbios.timings_common.hsync_total) {
-		vbios.timings_common.hsync_total = vbios.timings_common.hsync_end + 1;
+	if (timing.h_sync_end > timing.h_total) {
+		timing.h_total = timing.h_sync_end + 1;
 		bogus = true;
 		TRACE((DEVICE_NAME": got bogus htotal. Fixing\n"));
 	}
-	if (vbios.timings_common.vsync_end > vbios.timings_common.vsync_total) {
-		vbios.timings_common.vsync_total = vbios.timings_common.vsync_end + 1;
+	if (timing.v_sync_end > timing.v_total) {
+		timing.v_total = timing.v_sync_end + 1;
 		bogus = true;
 		TRACE((DEVICE_NAME": got bogus vtotal. Fixing\n"));
 	}
 
 	if (bogus) {
-		TRACE((DEVICE_NAME": adjusted LFP modeline: x%d Hz,\t"
+		TRACE((DEVICE_NAME": adjusted LFP modeline: %" B_PRIu32 " KHz,\t"
 			"%d %d %d %d   %d %d %d %d\n",
-			_PIXEL_CLOCK(data) / ((_H_ACTIVE(data) + _H_BLANK(data))
-				* (_V_ACTIVE(data) + _V_BLANK(data))),
-			_H_ACTIVE(data), vbios.timings_common.hsync_start,
-			vbios.timings_common.hsync_end, vbios.timings_common.hsync_total,
-			_V_ACTIVE(data), vbios.timings_common.vsync_start,
-			vbios.timings_common.vsync_end, vbios.timings_common.vsync_total));
+			timing.pixel_clock / (timing.h_total * timing.v_total),
+			timing.h_display, timing.h_sync_start,
+			timing.h_sync_end, timing.h_total,
+			timing.v_display, timing.v_sync_start,
+			timing.v_sync_end, timing.v_total));
 	}
-
-	/* TODO: add retrieved info to edid info struct, not fixed mode struct */
-
-	/* struct display_timing is not packed, so we have to set elements
-	individually */
-	vbios.shared_info->timing.pixel_clock = _PIXEL_CLOCK(data) / 1000;
-	vbios.shared_info->timing.h_display = vbios.shared_info->virtual_width
-		= _H_ACTIVE(data);
-	vbios.shared_info->timing.h_sync_start = vbios.timings_common.hsync_start;
-	vbios.shared_info->timing.h_sync_end = vbios.timings_common.hsync_end;
-	vbios.shared_info->timing.h_total = vbios.timings_common.hsync_total;
-	vbios.shared_info->timing.v_display = vbios.shared_info->virtual_height
-		= _V_ACTIVE(data);
-	vbios.shared_info->timing.v_sync_start = vbios.timings_common.vsync_start;
-	vbios.shared_info->timing.v_sync_end = vbios.timings_common.vsync_end;
-	vbios.shared_info->timing.v_total = vbios.timings_common.vsync_total;
-
-	delete_area(vbios.area);
-	return true;
 }
 
 
 bool
-get_lvds_mode_from_bios(display_mode* sharedInfo)
+get_lvds_mode_from_bios(display_timing* panelTiming)
 {
-	if (!get_bios())
+	int vbtOffset = 0;
+	if (!get_bios(&vbtOffset))
 		return false;
 
-	int vbtOffset = vbios.ReadWord(kVbtPointer);
 	struct vbt_header* vbt = (struct vbt_header*)(vbios.memory + vbtOffset);
 	int bdbOffset = vbtOffset + vbt->bdb_offset;
 
@@ -224,6 +205,8 @@ get_lvds_mode_from_bios(display_mode* sharedInfo)
 		TRACE((DEVICE_NAME": bad BDB signature\n"));
 		delete_area(vbios.area);
 	}
+	TRACE((DEVICE_NAME ": VBT signature \"%.*s\", BDB version %d\n",
+			(int)sizeof(vbt->signature), vbt->signature, bdb->version));
 
 	int blockSize;
 	int panelType = -1;
@@ -235,17 +218,22 @@ get_lvds_mode_from_bios(display_mode* sharedInfo)
 		int id = vbios.memory[start];
 		blockSize = vbios.ReadWord(start + 1) + 3;
 		switch (id) {
-			case 40: // FIXME magic numbers
+			case BDB_LVDS_OPTIONS:
 			{
 				struct lvds_bdb1 *lvds1;
 				lvds1 = (struct lvds_bdb1 *)(vbios.memory + start);
 				panelType = lvds1->panel_type;
+				if (panelType > 0xf) {
+					TRACE((DEVICE_NAME ": invalid panel type %d\n", panelType));
+					panelType = -1;
+					break;
+				}
 				TRACE((DEVICE_NAME ": panel type: %d\n", panelType));
 				break;
 			}
-			case 41:
+			case BDB_LVDS_LFP_DATA_PTRS:
 			{
-				// First make sure we found block 40 and the panel type
+				// First make sure we found block BDB_LVDS_OPTIONS and the panel type
 				if (panelType == -1)
 					break;
 
@@ -256,47 +244,33 @@ get_lvds_mode_from_bios(display_mode* sharedInfo)
 				lvds2_lfp_info = (struct lvds_bdb2_lfp_info *)
 					(vbios.memory + bdbOffset
 					+ lvds2->panels[panelType].lfp_info_offset);
-				/* check terminator */
-				if (lvds2_lfp_info->terminator != 0xffff) {
-					TRACE((DEVICE_NAME ": Incorrect LFP info terminator %x\n",
-						lvds2_lfp_info->terminator));
-#if 0
-					// FIXME the terminator is not present on my SandyBridge
-					// laptop, but the video mode is still correct. Maybe the
-					// format of the block has changed accross versions. We
-					// could check the size of the block to detect different
-					// layouts.
-					delete_area(vbios.area);
-					return false;
-#endif
-				}
+				/* Show terminator: Check not done in drm i915 driver: Assuming chk not valid. */
+				TRACE((DEVICE_NAME ": LFP info terminator %x\n", lvds2_lfp_info->terminator));
+
 				uint8_t* timing_data = vbios.memory + bdbOffset
 					+ lvds2->panels[panelType].lfp_edid_dtd_offset;
 				TRACE((DEVICE_NAME ": found LFP of size %d x %d "
 					"in BIOS VBT tables\n",
 					lvds2_lfp_info->x_res, lvds2_lfp_info->y_res));
 
-				vbios.timings_common.hsync_start = _H_ACTIVE(timing_data)
-					+ _H_SYNC_OFF(timing_data);
-				vbios.timings_common.hsync_end
-					= vbios.timings_common.hsync_start
-					+ _H_SYNC_WIDTH(timing_data);
-				vbios.timings_common.hsync_total = _H_ACTIVE(timing_data)
-					+ _H_BLANK(timing_data);
-				vbios.timings_common.vsync_start = _V_ACTIVE(timing_data)
-					+ _V_SYNC_OFF(timing_data);
-				vbios.timings_common.vsync_end
-					= vbios.timings_common.vsync_start
-					+ _V_SYNC_WIDTH(timing_data);
-				vbios.timings_common.vsync_total = _V_ACTIVE(timing_data)
-					+ _V_BLANK(timing_data);
+				panelTiming->pixel_clock = _PIXEL_CLOCK(timing_data) / 1000;
+				panelTiming->h_sync_start = _H_ACTIVE(timing_data) + _H_SYNC_OFF(timing_data);
+				panelTiming->h_sync_end = panelTiming->h_sync_start + _H_SYNC_WIDTH(timing_data);
+				panelTiming->h_total = _H_ACTIVE(timing_data) + _H_BLANK(timing_data);
+				panelTiming->h_display = _H_ACTIVE(timing_data);
+				panelTiming->v_sync_start = _V_ACTIVE(timing_data) + _V_SYNC_OFF(timing_data);
+				panelTiming->v_sync_end = panelTiming->v_sync_start + _V_SYNC_WIDTH(timing_data);
+				panelTiming->v_total = _V_ACTIVE(timing_data) + _V_BLANK(timing_data);
+				panelTiming->v_display = _V_ACTIVE(timing_data);
+				panelTiming->flags = 0;
 
-				vbios.shared_info = sharedInfo;
-				return feed_shared_info(timing_data);
+				sanitize_panel_timing(*panelTiming);
+				delete_area(vbios.area);
+				return true;
 			}
 		}
 	}
 
 	delete_area(vbios.area);
-	return true;
+	return false;
 }

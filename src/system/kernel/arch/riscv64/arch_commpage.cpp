@@ -83,7 +83,7 @@ arch_commpage_init_post_cpus(void)
 		(addr_t)&arch_user_signal_handler);
 
 	register_commpage_function("arch_user_thread_exit",
-		COMMPAGE_ENTRY_RISCV64_SIGNAL_THREAD_EXIT, "commpage_thread_exit",
+		COMMPAGE_ENTRY_RISCV64_THREAD_EXIT, "commpage_thread_exit",
 		(addr_t)&arch_user_thread_exit);
 
 	return B_OK;

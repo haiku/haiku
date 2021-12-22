@@ -487,7 +487,7 @@ RawDecoder::Decode(void *buffer, int64 *frameCount,
 			media_header mh;
 			status_t err;
 			err = GetNextChunk(&fChunkBuffer, &fChunkSize, &mh);
-			if (err != B_OK || fChunkSize < fInputFrameSize) {
+			if (err != B_OK || fChunkSize < (size_t)fInputFrameSize) {
 				fChunkSize = 0;
 				break;
 			}
@@ -496,7 +496,8 @@ RawDecoder::Decode(void *buffer, int64 *frameCount,
 			fStartTime = mh.start_time;
 			continue;
 		}
-		int32 frames = min_c(fOutputBufferFrameCount - *frameCount, fChunkSize / fInputFrameSize);
+		int32 frames = min_c(fOutputBufferFrameCount - *frameCount,
+			(int64)(fChunkSize / fInputFrameSize));
 		if (frames == 0)
 			break;
 

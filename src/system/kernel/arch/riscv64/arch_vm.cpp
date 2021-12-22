@@ -94,91 +94,143 @@ WritePteFlags(uint32 flags)
 }
 
 
-static void
-DumpPageWrite(uint64_t virtAdr, uint64_t physAdr, size_t size, uint64 flags,
-	uint64& firstVirt, uint64& firstPhys, uint64& firstFlags, uint64& len)
+class PageTableDumper
 {
-	if (virtAdr == firstVirt + len && physAdr == firstPhys + len
-			&& flags == firstFlags) {
-		len += size;
-	} else {
-		if (len != 0) {
-			dprintf("  0x%08" B_PRIxADDR " - 0x%08" B_PRIxADDR,
-				firstVirt, firstVirt + (len - 1));
-			dprintf(": 0x%08" B_PRIxADDR " - 0x%08" B_PRIxADDR ",%#"
-				B_PRIxADDR ", ", firstPhys,
-				firstPhys + (len - 1), len);
-			WritePteFlags(firstFlags); dprintf("\n");
-		}
-		firstVirt = virtAdr;
-		firstPhys = physAdr;
-		firstFlags = flags;
-		len = size;
+private:
+	uint64 firstVirt;
+	uint64 firstPhys;
+	uint64 firstFlags;
+	uint64 len;
+
+public:
+	PageTableDumper()
+		:
+		firstVirt(0),
+		firstPhys(0),
+		firstFlags(0),
+		len(0)
+	{}
+ 
+	~PageTableDumper()
+	{
+		Write(0, 0, 0, 0);
 	}
-}
+
+	void Write(uint64_t virtAdr, uint64_t physAdr, size_t size, uint64 flags) {
+		if (virtAdr == firstVirt + len && physAdr == firstPhys + len && flags == firstFlags) {
+			len += size;
+		} else {
+			if (len != 0) {
+				dprintf("  0x%08" B_PRIxADDR " - 0x%08" B_PRIxADDR,
+				firstVirt, firstVirt + (len - 1));
+				dprintf(": 0x%08" B_PRIxADDR " - 0x%08" B_PRIxADDR ", %#" B_PRIxADDR ", ",
+					firstPhys, firstPhys + (len - 1), len);
+				WritePteFlags(firstFlags); dprintf("\n");
+			}
+			firstVirt = virtAdr;
+			firstPhys = physAdr;
+			firstFlags = flags;
+			len = size;
+		}
+	}
+};
 
 
 static void
-DumpPageTableInt(Pte* pte, uint64_t virtAdr, uint32_t level, uint64& firstVirt,
-	uint64& firstPhys, uint64& firstFlags, uint64& len)
+DumpPageTableInt(Pte* pte, uint64_t virtAdr, uint32_t level, PageTableDumper& dumper)
 {
 	for (uint32 i = 0; i < pteCount; i++) {
 		if (((1 << pteValid) & pte[i].flags) != 0) {
 			if ((((1 << pteRead) | (1 << pteWrite)
 					| (1 << pteExec)) & pte[i].flags) == 0) {
 
-				if (level == 0) {
-					kprintf("  internal page table on "
-						"level 0\n");
-				}
+				if (level == 0)
+					kprintf("  internal page table on level 0\n");
 
-				DumpPageTableInt(
-					(Pte*)VirtFromPhys(pageSize*pte[i].ppn),
-					virtAdr + ((uint64_t)i
-						<< (pageBits + pteIdxBits
-							* level)),
-					level - 1, firstVirt, firstPhys,
-						firstFlags, len);
+				DumpPageTableInt((Pte*)VirtFromPhys(pageSize*pte[i].ppn),
+					virtAdr + ((uint64_t)i << (pageBits + pteIdxBits * level)),
+					level - 1, dumper);
 			} else {
-				DumpPageWrite(SignExtendVirtAdr(virtAdr
-					+ ((uint64_t)i << (pageBits
-						+ pteIdxBits*level))),
-					pte[i].ppn * B_PAGE_SIZE,
-					1 << (pageBits + pteIdxBits*level),
-					pte[i].flags, firstVirt, firstPhys,
-					firstFlags, len);
+				dumper.Write(SignExtendVirtAdr(virtAdr
+						+ ((uint64_t)i << (pageBits + pteIdxBits*level))),
+					pte[i].ppn * B_PAGE_SIZE, 1 << (pageBits + pteIdxBits * level),
+					pte[i].flags);
 			}
 		}
 	}
 }
 
 
+static VMArea* LookupArea(area_id id)
+{
+	VMAreaHash::ReadLock();
+	VMArea* area = VMAreaHash::LookupLocked(id);
+	VMAreaHash::ReadUnlock();
+
+	return area;
+}
+
+
 static int
 DumpPageTable(int argc, char** argv)
 {
+	int curArg = 1;
 	SatpReg satp;
-	if (argc >= 2) {
-		team_id id = strtoul(argv[1], NULL, 0);
-		VMAddressSpace* addrSpace = VMAddressSpace::DebugGet(id);
-		if (addrSpace == NULL) {
-			kprintf("could not find team %" B_PRId32 "\n", id);
+	bool isArea = false;
+	addr_t base = 0;
+	size_t size = 0;
+
+	satp.val = Satp();
+	while (curArg < argc && argv[curArg][0] == '-') {
+		if (strcmp(argv[curArg], "-team") == 0) {
+			curArg++;
+			team_id id = strtoul(argv[curArg++], NULL, 0);
+			VMAddressSpace* addrSpace = VMAddressSpace::DebugGet(id);
+			if (addrSpace == NULL) {
+				kprintf("could not find team %" B_PRId32 "\n", id);
+				return 0;
+			}
+			satp.val = ((RISCV64VMTranslationMap*)
+				addrSpace->TranslationMap())->Satp();
+			isArea = false;
+		} else if (strcmp(argv[curArg], "-area") == 0) {
+			curArg++;
+			uint64 areaId;
+			if (!evaluate_debug_expression(argv[curArg++], &areaId, false))
+				return 0;
+			VMArea* area = LookupArea((area_id)areaId);
+			if (area == NULL) {
+				kprintf("could not find area %" B_PRId32 "\n", (area_id)areaId);
+				return 0;
+			}
+			satp.val = ((RISCV64VMTranslationMap*)
+				area->address_space->TranslationMap())->Satp();
+			base = area->Base();
+			size = area->Size();
+			kprintf("area %" B_PRId32 "(%s)\n", area->id, area->name);
+				isArea = true;
+		} else {
+			kprintf("unknown flag \"%s\"\n", argv[curArg]);
 			return 0;
 		}
-		satp.val = ((RISCV64VMTranslationMap*)
-			addrSpace->TranslationMap())->Satp();
-		dprintf("page table for team %" B_PRId32 "\n", id);
-	} else {
-		satp.val = Satp();
-		dprintf("current page table:\n");
 	}
-	Pte* root = (Pte*)VirtFromPhys(satp.ppn * B_PAGE_SIZE);
 
-	uint64 firstVirt = 0;
-	uint64 firstPhys = 0;
-	uint64 firstFlags = 0;
-	uint64 len = 0;
-	DumpPageTableInt(root, 0, 2, firstVirt, firstPhys, firstFlags, len);
-	DumpPageWrite(0, 0, 0, 0, firstVirt, firstPhys, firstFlags, len);
+	kprintf("satp: %#" B_PRIx64 "\n", satp.val);
+
+	PageTableDumper dumper;
+
+	if (!isArea) {
+		Pte* root = (Pte*)VirtFromPhys(satp.ppn * B_PAGE_SIZE);
+		DumpPageTableInt(root, 0, 2, dumper);
+	} else {
+		for (; size > 0; base += B_PAGE_SIZE, size -= B_PAGE_SIZE) {
+			Pte* pte = LookupPte(satp.ppn * B_PAGE_SIZE, base);
+			if (pte == NULL || (pte->flags & (1 << pteValid)) == 0)
+				continue;
+
+			dumper.Write(base, pte->ppn * B_PAGE_SIZE, B_PAGE_SIZE, pte->flags);
+		}
+	}
 
 	return 0;
 }
@@ -191,7 +243,7 @@ DumpVirtPage(int argc, char** argv)
 	SatpReg satp;
 
 	satp.val = Satp();
-	while (argv[curArg][0] == '-') {
+	while (curArg < argc && argv[curArg][0] == '-') {
 		if (strcmp(argv[curArg], "-team") == 0) {
 			curArg++;
 			team_id id = strtoul(argv[curArg++], NULL, 0);
@@ -210,24 +262,20 @@ DumpVirtPage(int argc, char** argv)
 
 	kprintf("satp: %#" B_PRIx64 "\n", satp.val);
 
-	uint64 firstVirt = 0;
-	uint64 firstPhys = 0;
-	uint64 firstFlags = 0;
-	uint64 len = B_PAGE_SIZE;
-	if (!evaluate_debug_expression(argv[curArg++], &firstVirt, false))
+	uint64 virt = 0;
+	if (!evaluate_debug_expression(argv[curArg++], &virt, false))
 		return 0;
 
-	firstVirt = ROUNDDOWN(firstVirt, B_PAGE_SIZE);
+	virt = ROUNDDOWN(virt, B_PAGE_SIZE);
 
-	Pte* pte = LookupPte(satp.ppn * B_PAGE_SIZE, firstVirt);
+	Pte* pte = LookupPte(satp.ppn * B_PAGE_SIZE, virt);
 	if (pte == NULL) {
 		dprintf("not mapped\n");
 		return 0;
 	}
-	firstPhys = pte->ppn * B_PAGE_SIZE;
-	firstFlags = pte->flags;
 
-	DumpPageWrite(0, 0, 0, 0, firstVirt, firstPhys, firstFlags, len);
+	PageTableDumper dumper;
+	dumper.Write(virt, pte->ppn * B_PAGE_SIZE, B_PAGE_SIZE, pte->flags);
 
 	return 0;
 }

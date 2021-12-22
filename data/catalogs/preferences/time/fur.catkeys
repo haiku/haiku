@@ -1,7 +1,6 @@
-1	friulian	x-vnd.Haiku-Time	834234238
+1	friulian	x-vnd.Haiku-Time	2069485065
 OK	Time		Va ben
 Message receiving failed	Time		Ricezion dal messaç falide
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Ore e Date, scrit di:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Australie
 America	Time		Americhe
 Reset to default server list	Time		Ristabilìs ae liste di servidôrs predefinide
@@ -29,7 +28,7 @@ Stop	Time		Ferme
 Time zone	Time		Fûs orari
 Clock	Time		Orloi
 Network time	Time		Ore di rêt
-Sending request failed	Time		No si è rivâts a inviâ la domande
+Sending request failed	Time		Nol è stât pussibil inviâ la domande
 Preview time:	Time		Anteprime de ore:
 \nNow: 	Time		\nCumò: 
 Could not create socket	Time		Impussibil creâ un socket
@@ -38,7 +37,6 @@ Atlantic	Time		Atlantic
 Show clock in Deskbar	Time		Mostre orloi tal Deskbar
 Display time with seconds	Time		Mostre ore cui seconts
 Time	System name		Ore
-about	Time		informazions
 Show time zone	Time		Mostre fûs orari
 Synchronize at boot	Time		Sincronize al inviament
 Indian	Time		Indian

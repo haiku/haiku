@@ -100,7 +100,7 @@ find_physical_memory_ranges(size_t &total)
 		return B_ERROR;
 	}
 
-	struct of_region<uint64, uint64> regions[64];
+	static struct of_region<uint64, uint64> regions[64];
 	int count = of_getprop(package, "reg", regions, sizeof(regions));
 	if (count == OF_FAILED)
 		count = of_getprop(sMemoryInstance, "reg", regions, sizeof(regions));
@@ -185,7 +185,7 @@ find_allocated_ranges(void **_exceptionHandlers)
 	// we have proper driver support for the target hardware).
 	intptr_t mmu = of_instance_to_package(sMmuInstance);
 
-	struct translation_map {
+	static struct translation_map {
 		void *PhysicalAddress() {
 			int64_t p = data;
 #if 0

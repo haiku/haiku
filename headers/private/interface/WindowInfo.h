@@ -36,7 +36,7 @@ struct window_info {
 struct client_window_info : window_info {
 	float		tab_height;
 	float		border_size;
-	char		name[1];
+	char		name[0];
 } _PACKED;
 
 enum window_action {

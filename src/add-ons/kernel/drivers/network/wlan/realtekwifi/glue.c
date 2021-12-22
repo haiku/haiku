@@ -25,9 +25,9 @@ HAIKU_FBSD_WLAN_DRIVER_GLUE(realtekwifi, rtwn_pci, pci)
 HAIKU_DRIVER_REQUIREMENTS(FBSD_WLAN);
 HAIKU_FIRMWARE_VERSION(0);
 HAIKU_FIRMWARE_NAME_MAP({
-	{"rtwn-rtl8188eefw", "rtl8188eefw.ucode"},
-	{"rtwn-rtl8192cfwE", "rtl8192cfwE.ucode"},
-	{"rtwn-rtl8192cfwE_B", "rtl8192cfwE_B.ucode"},
+	{"rtwn-rtl8188eefw", "rtwn-rtl8188eefw.ucode"},
+	{"rtwn-rtl8192cfwE", "rtwn-rtl8192cfwE.ucode"},
+	{"rtwn-rtl8192cfwE_B", "rtwn-rtl8192cfwE_B.ucode"},
 });
 
 NO_HAIKU_FBSD_MII_DRIVER();

@@ -65,7 +65,7 @@ Handle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 }
 
 
-off_t 
+off_t
 Handle::Size() const
 {
 	// ToDo: fix this!

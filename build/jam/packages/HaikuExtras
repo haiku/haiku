@@ -3,11 +3,22 @@ local architecture = $(HAIKU_PACKAGING_ARCHS[1]) ;
 local extrasPackage = haiku_extras.hpkg ;
 HaikuPackage $(extrasPackage) ;
 
+## Driver Oddities
+
 # kernel modules
 AddFilesToPackage add-ons kernel partitioning_systems
 	: amiga_rdb@!m68k apple@!ppc sun@!sparc ;
 
-AddFilesToPackage add-ons control_look	: BeControlLook ;
+
+## Visual Oddities
+
+# MacDecorator WinDecorator need improved stack and tile support
+
+# Control Looks
+AddFilesToPackage add-ons control_look : BeControlLook FlatControlLook ;
+
+# Decorators
+AddFilesToPackage add-ons decorators : BeDecorator FlatDecorator ;
+
 
 BuildHaikuPackage $(extrasPackage) : haiku_extras ;
-

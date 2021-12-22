@@ -153,9 +153,31 @@ __get_system_info(system_info* info)
 }
 
 
-status_t
-__get_cpu_info(uint32 firstCPU, uint32 cpuCount, cpu_info* info)
+typedef struct {
+	bigtime_t	active_time;
+	bool		enabled;
+} beta2_cpu_info;
+
+
+extern "C" status_t
+__get_cpu_info(uint32 firstCPU, uint32 cpuCount, beta2_cpu_info* beta2_info)
 {
+	cpu_info info;
+	status_t err = _get_cpu_info_etc(firstCPU, cpuCount, &info, sizeof(info));
+	if (err == B_OK) {
+		beta2_info->active_time = info.active_time;
+		beta2_info->enabled = info.enabled;
+	}
+	return err;
+}
+
+
+status_t
+_get_cpu_info_etc(uint32 firstCPU, uint32 cpuCount, cpu_info* info,
+	size_t size)
+{
+	if (info == NULL || size != sizeof(cpu_info))
+		return B_BAD_VALUE;
 	return _kern_get_cpu_info(firstCPU, cpuCount, info);
 }
 

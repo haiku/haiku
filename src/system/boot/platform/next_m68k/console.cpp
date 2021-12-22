@@ -29,14 +29,17 @@ class Console : public ConsoleNode {
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer,
 			size_t bufferSize);
 
-		void PutChar(char c);
-		void PutChars(const char *buffer, int count);
-		char GetChar();
+		virtual void	ClearScreen();
+		virtual int32	Width();
+		virtual int32	Height();
+		virtual void	SetCursor(int32 x, int32 y);
+		virtual void	SetCursorVisible(bool visible);
+		virtual void	SetColors(int32 foreground, int32 background);
 };
 
 
-static Console sInput;
-static Console sOutput;
+extern ConsoleNode* gConsoleNode;
+static Console sConsole;
 FILE *stdin, *stdout, *stderr;
 
 
@@ -81,71 +84,14 @@ Console::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 
 
 void
-Console::PutChar(char c)
+Console::ClearScreen()
 {
-	mg->mg_putc(c);
-}
-
-
-void
-Console::PutChars(const char *buffer, int count)
-{
-	for (int i = 0; i < count; i++)
-		mg->mg_putc(buffer[i]);
-}
-
-
-char
-Console::GetChar()
-{
-	return (char)(mg->mg_getc());
-}
-
-
-//	#pragma mark -
-
-
-static void
-dump_colors()
-{
-	int bg, fg;
-	dprintf("colors:\n");
-	for (bg = 0; bg < 16; bg++) {
-		for (fg = 0; fg < 16; fg++) {
-			console_set_color(fg, bg);
-			dprintf("#");
-		}
-		console_set_color(0, 15);
-		dprintf("\n");
-	}
-}
-
-
-status_t
-console_init(void)
-{
-	// now that we're initialized, enable stdio functionality
-	stdin = (FILE *)&sInput;
-	stdout = stderr = (FILE *)&sOutput;
-
-	//dump_colors();
-
-	return B_OK;
-}
-
-
-// #pragma mark -
-
-
-void
-console_clear_screen(void)
-{
-	sInput.WriteAt(NULL, 0LL, "\033E", 2);
+	sConsole.WriteAt(NULL, 0LL, "\033E", 2);
 }
 
 
 int32
-console_width(void)
+Console::Width()
 {
 	int columnCount = 80; //XXX: check video mode
 	return columnCount;
@@ -153,7 +99,7 @@ console_width(void)
 
 
 int32
-console_height(void)
+Console::Height()
 {
 	int lineCount = 25; //XXX: check video mode
 	return lineCount;
@@ -161,14 +107,14 @@ console_height(void)
 
 
 void
-console_set_cursor(int32 x, int32 y)
+Console::SetCursor(int32 x, int32 y)
 {
 	char buff[] = "\033Y  ";
 	x = MIN(79,MAX(0,x));
 	y = MIN(24,MAX(0,y));
 	buff[3] += (char)x;
 	buff[2] += (char)y;
-	sInput.WriteAt(NULL, 0LL, buff, 4);
+	sConsole.WriteAt(NULL, 0LL, buff, 4);
 }
 
 
@@ -207,34 +153,65 @@ translate_color(int32 color)
 
 
 void
-console_set_color(int32 foreground, int32 background)
+Console::SetColors(int32 foreground, int32 background)
 {
 	char buff[] = "\033b \033c ";
 	if (sForceBW) {
-		if (background == 0)
+		if (background == 0) {
 			foreground = 15;
-		else {
+		} else {
 			background = 15;
 			foreground = 0;
 		}
-
 	}
 	buff[2] += (char)translate_color(foreground);
 	buff[5] += (char)translate_color(background);
-	sInput.WriteAt(NULL, 0LL, buff, 6);
+	sConsole.WriteAt(NULL, 0LL, buff, 6);
 }
 
 
 void
-console_show_cursor(void)
+Console::SetCursorVisible(bool)
 {
+	// TODO?
 }
 
 
-void
-console_hide_cursor(void)
+//	#pragma mark -
+
+
+static void
+dump_colors()
 {
+	int bg, fg;
+	dprintf("colors:\n");
+	for (bg = 0; bg < 16; bg++) {
+		for (fg = 0; fg < 16; fg++) {
+			console_set_color(fg, bg);
+			dprintf("#");
+		}
+		console_set_color(0, 15);
+		dprintf("\n");
+	}
 }
+
+
+status_t
+console_init(void)
+{
+	gConsoleNode = &sConsole;
+
+	// now that we're initialized, enable stdio functionality
+	stdin = (FILE *)&sConsole;
+	stdout = stderr = (FILE *)&sConsole;
+
+	//dump_colors();
+
+	return B_OK;
+}
+
+
+// #pragma mark -
 
 
 int
@@ -246,7 +223,7 @@ console_wait_for_key(void)
 	char buffer[3];
 	ssize_t bytesRead;
 	do {
-		bytesRead = sInput.ReadAt(NULL, 0, buffer, 3);
+		bytesRead = sConsole.ReadAt(NULL, 0, buffer, 3);
 		if (bytesRead < 0)
 			return 0;
 	} while (bytesRead == 0);
@@ -273,4 +250,3 @@ console_wait_for_key(void)
 	} else
 		return key.code.ascii;
 }
-

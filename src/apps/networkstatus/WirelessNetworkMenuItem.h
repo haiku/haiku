@@ -7,19 +7,22 @@
 
 
 #include <MenuItem.h>
+#include <NetworkDevice.h>
 
 
 class WirelessNetworkMenuItem : public BMenuItem {
 public:
-								WirelessNetworkMenuItem(const char* name,
-									int32 signalQuality, int32 authenticationMode,
+								WirelessNetworkMenuItem(
+									wireless_network network,
 									BMessage* message);
 	virtual						~WirelessNetworkMenuItem();
 
-			void				SetSignalQuality(int32 quality);
-			int32				SignalQuality() const
-									{ return fQuality; }
+			wireless_network	Network() const { return fNetwork; }
+
 			BString 			AuthenticationName(int32 mode);
+
+	static	int					CompareSignalStrength(const BMenuItem* a,
+									const BMenuItem* b);
 
 protected:
 	virtual	void				DrawContent();
@@ -28,7 +31,7 @@ protected:
 			void				DrawRadioIcon();
 
 private:
-			int32				fQuality;
+			wireless_network	fNetwork;
 };
 
 

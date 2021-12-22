@@ -57,8 +57,7 @@ public:
 
 class HWInterface : protected MultiLocker {
 public:
-								HWInterface(bool doubleBuffered = false,
-									bool enableUpdateQueue = true);
+								HWInterface();
 	virtual						~HWInterface();
 
 	// locking
@@ -165,7 +164,7 @@ public:
 	virtual	RenderingBuffer*	FrontBuffer() const = 0;
 	virtual	RenderingBuffer*	BackBuffer() const = 0;
 			void				SetAsyncDoubleBuffered(bool doubleBuffered);
-	virtual	bool				IsDoubleBuffered() const;
+	virtual	bool				IsDoubleBuffered() const = 0;
 
 	// Invalidate is used for scheduling an area for updating
 	virtual	status_t			InvalidateRegion(const BRegion& region);
@@ -268,7 +267,6 @@ protected:
 
 			BRect				fTrackingRect;
 
-			bool				fDoubleBuffered;
 			int					fVGADevice;
 
 private:

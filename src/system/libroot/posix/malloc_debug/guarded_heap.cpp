@@ -55,7 +55,7 @@ panic(const char* format, ...)
 	if (sDebuggerCalls)
 		debugger(buffer);
 	else
-		debug_printf(buffer);
+		debug_printf("%s", buffer);
 }
 
 

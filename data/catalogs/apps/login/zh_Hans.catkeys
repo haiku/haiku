@@ -1,11 +1,8 @@
-1	english	x-vnd.Haiku-Login	2683778354
+1	english	x-vnd.Haiku-Login	1085637210
 Invalid login!	Login View		登陆无效！
 Error	Login App		错误
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\t使用编辑模式启动，以便自定义桌面。\n
 Welcome to Haiku	Login Window		欢迎使用 Haiku
 Halt	Login View		挂起
-Login application for Haiku\nUsage:\n	Login App		Haiku 登陆程序\n用法：\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\t不启用窗口模式\n
 Desktop	Desktop Window		桌面
 Hide password	Login View		隐藏密码
 Reboot	Login View		重新启动

@@ -160,7 +160,7 @@ The target disk does not support creating links.	FSUtils		O disco de destino nã
 develop	B_SYSTEM_DEVELOP_DIRECTORY		desenvolvimento
 64-bit integer	AttributesView		Inteiro de 64 bits
 Cut more	ContainerWindow		Cortar mais
-The Tracker must be running to see Info windows.	PoseView		O Rastreador deve ser executado par ver a janela de Informações.
+The Tracker must be running to see Info windows.	PoseView		O Tracker deve estar em execução para ver janelas de Informações.
 Tracker preferences	TrackerSettingsWindow		Preferências do Tracker
 Read	FilePermissionsView		Ler
 There was an error writing the attribute.	WidgetAttributeText		Ocorreu um erro ao gravar o atributo.
@@ -169,7 +169,7 @@ If you rename %target, %osName may not behave properly!\n\nAre you sure you want
 Could not open \"%name\" (%error). 	FSUtils		Não foi possível abrir \"%name\" (%error). 
 Media parameter group	AttributesView		Grupo de parâmetros de mídia
 %name info	InfoWindow	InfoWindow Title	Informações de %name
-If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Se você mover a pasta pessoal,%osName pode não se comportar corretamente!\n\nVocê tem certeza de que quer fazer isso?\n\nPara mover a pasta pessoal de qualquer maneira, mantenha pressionada a tecla Shift e clique em \"Move\".
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Se você mover a pasta home, %osName poderá não funcionar corretamente!\n\nTem certeza de que quer fazer isso?\n\nPara mover a pasta home mesmo assim, mantenha pressionada a tecla Shift e clique em \"Mover\".
 Property info	AttributesView		Informação sobre a propriedade
 Sorry, you can't create links in the Trash.	PoseView		Desculpe, você não pode criar atalhos na Lixeira.
 From	Email Query Columns		De
@@ -256,7 +256,7 @@ Delete	FilePanelPriv		Deletar
 <No recent items>	FavoritesMenu		<Nenhum item recente>
 Formula %formula	FindPanel	FindResultTitle	Fórmula %formula
 Preparing to create links…	StatusWindow		Preparando para criar vínculos...
-Tracker status	StatusWindow		Status do Tracker
+Tracker status	StatusWindow		Estado do Tracker
 Handles any %type	OpenWithWindow		Lidar com qualquer %tipo
 The mount server could not be contacted.	AutoMounterSettings		O servidor de montagem não pode ser contactado
 Query template	FindPanel		Modelo de consulta
@@ -268,7 +268,7 @@ Finish: after several years	StatusWindow		Terminou: depois de vários anos
 Favorites	FilePanelPriv		Favoritos
 Point	AttributesView		Ponto
 home	B_USER_DIRECTORY		home
-Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Novos Modelos do Rastreador
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Novos Modelos do Tracker
 Disk mounting during boot	AutoMounterSettings		Montar discos na inicialização
 Don't automount	AutoMounterSettings		Não automontar
 Node ref	AttributesView		Nó de referência
@@ -338,7 +338,7 @@ Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Não 
 Create %s clipping	PoseView		Criar %s recorte
 Error moving \"%name\"	FSUtils		Erro ao mover \"%name\"
 To: %dir	StatusWindow		Para: %dir
-Paste layout	ContainerWindow		Colar disposição
+Paste layout	ContainerWindow		Colar layout
 Cancel	Tracker		Cancelar
 yes	AttributesView		sim
 Make active printer	ContainerWindow		Marcar como impressora ativa
@@ -423,7 +423,7 @@ KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Reverter
 trash	B_TRASH_DIRECTORY		lixeira
 If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		Se mover a pasta de sistema ou o seu conteúdo, não conseguirá iniciar o %osName!\n\nTem certeza de que quer fazer isso?\n\nPara mover de qualquer modo a pasta de sistema ou o seu conteúdo, mantenha premida a tecla Shift e clique \"Mover\".
-Close all in workspace	ContainerWindow		Fechar tudo no ambiente de trabalho
+Close all in workspace	ContainerWindow		Fechar tudo na área de trabalho
 Corrupted expression.	libtracker		Expressão corrompida.
 32 x 32	DeskWindow		32 x 32
 Network address	AttributesView		Endereço de rede
@@ -519,7 +519,7 @@ New folder	FilePanelPriv		Nova pasta
 Name	AttributesView		Nome
 Invalid bracket range.	libtracker		Intervalo de colchetes inválido.
 the settings folder	FSUtils		a pasta de configurações
-If you move %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se você mover a %target, %osName poderá não funcionar corretamente!\n\nVocê tem certeza de que quer fazer isso?
+If you move %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se você mover a %target, %osName poderá não funcionar corretamente!\n\nTem certeza de que quer fazer isso?
 Create a Query	FindPanel		Criar uma Consulta
 Close	QueryContainerWindow		Fechar
 I know what I'm doing	FSUtils	button label	Eu sei o que estou fazendo

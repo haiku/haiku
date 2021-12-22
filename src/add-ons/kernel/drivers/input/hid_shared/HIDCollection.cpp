@@ -83,7 +83,8 @@ HIDCollection::AddChild(HIDCollection *child)
 HIDCollection *
 HIDCollection::ChildAt(uint32 index)
 {
-	if (index >= fChildren.Count())
+	int32 count = fChildren.Count();
+	if (count < 0 || index >= (uint32)count)
 		return NULL;
 
 	return fChildren[index];
@@ -129,7 +130,8 @@ HIDCollection::AddItem(HIDReportItem *item)
 HIDReportItem *
 HIDCollection::ItemAt(uint32 index)
 {
-	if (index >= fItems.Count())
+	int32 count = fItems.Count();
+	if (count < 0 || index >= (uint32)count)
 		return NULL;
 
 	return fItems[index];
@@ -239,7 +241,8 @@ HIDCollection::_ChildAtFlat(uint8 type, uint32 &index)
 HIDReportItem *
 HIDCollection::_ItemAtFlat(uint32 &index)
 {
-	if (index < fItems.Count())
+	int32 count = fItems.Count();
+	if (count > 0 && index < (uint32)count)
 		return fItems[index];
 
 	index -= fItems.Count();

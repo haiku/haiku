@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-CharacterMap	2410613018
+1	czech	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Různé matematické symboly B
 Latin extended E	UnicodeBlocks		Latinka rozšířená E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		CJK sjednocené ideografické 
 Ancient Greek musical notation	UnicodeBlocks		Starořecká hudební notace
 Thai	UnicodeBlocks		Thajština
 Ethiopic supplement	UnicodeBlocks		Etiopský doplněk
+Only show blocks contained in font	CharacterWindow		Zobrazit pouze bloky obsažené v písmu
 Chess symbols	UnicodeBlocks		Šachové znaky
 Yijing hexagram symbols	UnicodeBlocks		Yijing hexagram symboly
 Ottoman Siyaq numbers	UnicodeBlocks		Osmanská čísla Siyaq

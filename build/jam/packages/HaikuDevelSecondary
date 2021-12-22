@@ -23,12 +23,12 @@ AddFilesToPackage lib $(architecture) : $(developmentLibs) ;
 local lib ;
 for lib in [ HaikuImageGetSystemLibs ] $(developmentLibs) {
 	AddSymlinkToPackage develop lib $(architecture)
-		: /system/lib/$(architecture) $(lib:BS) ;
+		: ../../../lib/$(architecture) $(lib:BS) ;
 	local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
 	if $(abiVersion) {
 		local abiVersionedLib = $(lib:BS).$(abiVersion) ;
 		AddSymlinkToPackage develop lib $(architecture)
-			: /system/lib/$(architecture) $(abiVersionedLib) ;
+			: ../../../lib/$(architecture) $(abiVersionedLib) ;
 	}
 }
 

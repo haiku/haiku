@@ -96,6 +96,9 @@ bump_option(tcp_option *&option, size_t &length)
 static inline size_t
 add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 {
+	// Some network devices can be very sensitive to the ordering of TCP options
+	// https://github.com/torvalds/linux/blob/9e9fb7655ed585da8f468e29221f0ba194a5f613/net/ipv4/tcp_output.c#L598
+
 	tcp_option *option = (tcp_option *)buffer;
 	size_t length = 0;
 
@@ -108,34 +111,44 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 
 	if ((segment.options & TCP_HAS_TIMESTAMPS) != 0
 		&& length + 12 <= bufferSize) {
-		// two NOPs so the timestamps get aligned to a 4 byte boundary
-		option->kind = TCP_OPTION_NOP;
-		bump_option(option, length);
-		option->kind = TCP_OPTION_NOP;
-		bump_option(option, length);
+		if ((segment.options & TCP_SACK_PERMITTED) != 0) {
+			// combine with timestamp
+			option->kind = TCP_OPTION_SACK_PERMITTED;
+			option->length = 2;
+			bump_option(option, length);
+		} else {
+			// two NOPs so the timestamps get aligned to a 4 byte boundary
+			option->kind = TCP_OPTION_NOP;
+			bump_option(option, length);
+			option->kind = TCP_OPTION_NOP;
+			bump_option(option, length);
+		}
 		option->kind = TCP_OPTION_TIMESTAMP;
 		option->length = 10;
 		option->timestamp.value = htonl(segment.timestamp_value);
 		option->timestamp.reply = htonl(segment.timestamp_reply);
 		bump_option(option, length);
+	} else if ((segment.options & TCP_SACK_PERMITTED) != 0
+		&& length + 4 <= bufferSize) {
+		// two NOPs so that the subsequent data is aligned on a 4 byte boundary
+		option->kind = TCP_OPTION_NOP;
+		bump_option(option, length);
+		option->kind = TCP_OPTION_NOP;
+		bump_option(option, length);
+		option->kind = TCP_OPTION_SACK_PERMITTED;
+		option->length = 2;
+		bump_option(option, length);
 	}
 
 	if ((segment.options & TCP_HAS_WINDOW_SCALE) != 0
 		&& length + 4 <= bufferSize) {
-		// insert one NOP so that the subsequent data is aligned on a 4 byte boundary
+		// one NOP so that the subsequent data is aligned on a 4 byte boundary
 		option->kind = TCP_OPTION_NOP;
 		bump_option(option, length);
 
 		option->kind = TCP_OPTION_WINDOW_SHIFT;
 		option->length = 3;
 		option->window_shift = segment.window_shift;
-		bump_option(option, length);
-	}
-
-	if ((segment.options & TCP_SACK_PERMITTED) != 0
-		&& length + 2 <= bufferSize) {
-		option->kind = TCP_OPTION_SACK_PERMITTED;
-		option->length = 2;
 		bump_option(option, length);
 	}
 
@@ -416,7 +429,7 @@ add_tcp_header(net_address_module_info* addressModule,
 			optionsLength);
 	}
 
-	TRACE(("add_tcp_header(): buffer %p, flags 0x%x, seq %lu, ack %lu, up %u, "
+	TRACE(("add_tcp_header(): buffer %p, flags 0x%x, seq %" B_PRIu32 ", ack %" B_PRIu32 ", up %u, "
 		"win %u\n", buffer, segment.flags, segment.sequence,
 		segment.acknowledge, segment.urgent_offset, segment.advertised_window));
 
@@ -435,14 +448,13 @@ tcp_options_length(tcp_segment_header& segment)
 	if (segment.max_segment_size > 0)
 		length += 4;
 
-	if (segment.options & TCP_HAS_TIMESTAMPS)
+	if ((segment.options & TCP_HAS_TIMESTAMPS) != 0)
 		length += 12;
-
-	if (segment.options & TCP_HAS_WINDOW_SCALE)
+	else if ((segment.options & TCP_SACK_PERMITTED) != 0)
 		length += 4;
 
-	if (segment.options & TCP_SACK_PERMITTED)
-		length += 2;
+	if ((segment.options & TCP_HAS_WINDOW_SCALE) != 0)
+		length += 4;
 
 	if (segment.sackCount > 0) {
 		int sackCount = min_c((int)((kMaxOptionSize - length - 4)

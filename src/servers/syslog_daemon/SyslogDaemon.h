@@ -6,9 +6,9 @@
 #define _SYSLOG_DAEMON_H_
 
 
-#include <Application.h>
 #include <Locker.h>
 #include <List.h>
+#include <Server.h>
 #include <OS.h>
 
 #include <syslog_daemon.h>
@@ -17,7 +17,7 @@
 typedef void (*handler_func)(syslog_message&);
 
 
-class SyslogDaemon : public BApplication {
+class SyslogDaemon : public BServer {
 public:
 								SyslogDaemon();
 

@@ -94,7 +94,7 @@ void usbvision_trace(bool b_force, char *fmt, ...){
       release_sem(loglock);
     }
     else
-      dprintf(buf);
+      dprintf("%s", buf);
   }
 }
 

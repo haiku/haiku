@@ -132,6 +132,9 @@ private:
 	static	int32				InterruptHandler(void *data);
 			int32				Interrupt();
 
+			// Device management
+			void				CleanupDevice(xhci_device *device);
+
 			// Endpoint management
 			status_t			ConfigureEndpoint(xhci_endpoint* ep, uint8 slot,
 									uint8 number, uint8 type, bool directionIn,
@@ -252,13 +255,11 @@ private:
 
 			// Root Hub
 			XHCIRootHub *		fRootHub;
-			uint8				fRootHubAddress;
 
 			// Port management
 			uint8				fPortCount;
 			uint8				fSlotCount;
 			usb_speed			fPortSpeeds[XHCI_MAX_PORTS];
-			uint8				fPortSlots[XHCI_MAX_PORTS];
 
 			// Scratchpad
 			uint32				fScratchpadCount;

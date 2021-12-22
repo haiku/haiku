@@ -179,6 +179,12 @@ get_raw_bytes_per_row(color_space colorSpace, int32 width)
 	int32 bpr = 0;
 	switch (colorSpace) {
 		// supported
+		case B_RGBA64: case B_RGBA64_BIG:
+			bpr = 8 * width;
+			break;
+		case B_RGB48: case B_RGB48_BIG:
+			bpr = 6 * width;
+			break;
 		case B_RGB32: case B_RGBA32:
 		case B_RGB32_BIG: case B_RGBA32_BIG:
 		case B_UVL32: case B_UVLA32:
@@ -1731,7 +1737,7 @@ BBitmap::Bounds() const
 	The currently supported source/target color spaces are
 	\c B_RGB{32,24,16,15}[_BIG], \c B_CMAP8 and \c B_GRAY{8,1}.
 
-	\note As this methods is apparently a bit strange to use, OBOS introduces
+	\note As this methods is apparently a bit strange to use, Haiku introduces
 		  ImportBits() methods, which are recommended to be used instead.
 
 	\param data The data to be copied.

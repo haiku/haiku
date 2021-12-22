@@ -1242,15 +1242,15 @@ JP2Translator::PopulateInfoFromFormat(translator_info* info,
 			info->group = formats[i].group;
 			info->quality = formats[i].quality;
 			info->capability = formats[i].capability;
-			if (strncmp(formats[i].name, 
-				"Be Bitmap Format (JPEG2000Translator)", 
-				sizeof("Be Bitmap Format (JPEG2000Translator)")) == 0) 
-				strncpy(info->name, 
-					B_TRANSLATE("Be Bitmap Format (JPEG2000Translator)"), 
+			if (strcmp(formats[i].name, B_TRANSLATOR_BITMAP_DESCRIPTION)
+				== 0) {
+				strlcpy(info->name,
+					B_TRANSLATE(B_TRANSLATOR_BITMAP_DESCRIPTION),
 					sizeof(info->name));
-			else
-				strncpy(info->name, formats[i].name, sizeof(info->name));			
-			strncpy(info->MIME,  formats[i].MIME, sizeof(info->MIME));
+			} else {
+				strlcpy(info->name, formats[i].name, sizeof(info->name));
+			}
+			strlcpy(info->MIME, formats[i].MIME, sizeof(info->MIME));
 			return B_OK;
 		}
 	}

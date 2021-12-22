@@ -51,6 +51,8 @@
 #define INTEL_GROUP_BDW		(INTEL_FAMILY_SOC0 | 0x0040)  // Broadwell
 #define INTEL_GROUP_SKY		(INTEL_FAMILY_LAKE | 0x0010)  // SkyLake
 #define INTEL_GROUP_KBY		(INTEL_FAMILY_LAKE | 0x0020)  // KabyLake
+#define INTEL_GROUP_CFL		(INTEL_FAMILY_LAKE | 0x0040)  // CoffeeLake
+#define INTEL_GROUP_CML		(INTEL_FAMILY_LAKE | 0x0080)  // CometLake
 // models
 #define INTEL_TYPE_SERVER	0x0004
 #define INTEL_TYPE_MOBILE	0x0008
@@ -82,6 +84,11 @@
 #define INTEL_MODEL_SKY		(INTEL_GROUP_SKY)
 #define INTEL_MODEL_SKYM	(INTEL_GROUP_SKY | INTEL_TYPE_MOBILE)
 #define INTEL_MODEL_SKYS	(INTEL_GROUP_SKY | INTEL_TYPE_SERVER)
+#define INTEL_MODEL_KBY		(INTEL_GROUP_KBY)
+#define INTEL_MODEL_KBYM	(INTEL_GROUP_KBY | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_CFL		(INTEL_GROUP_CFL)
+#define INTEL_MODEL_CFLM	(INTEL_GROUP_CFL | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_CML		(INTEL_GROUP_CML)
 
 #define INTEL_PCH_DEVICE_ID_MASK	0xff80
 #define INTEL_PCH_IBX_DEVICE_ID		0x3b00
@@ -96,7 +103,17 @@
 #define INTEL_PCH_KBP_DEVICE_ID		0xa280
 #define INTEL_PCH_CNP_DEVICE_ID		0xa300
 #define INTEL_PCH_CNP_LP_DEVICE_ID	0x9d80
+#define INTEL_PCH_CMP_DEVICE_ID		0x0280
+#define INTEL_PCH_CMP2_DEVICE_ID	0x0680
+#define INTEL_PCH_CMP_V_DEVICE_ID	0xa380
 #define INTEL_PCH_ICP_DEVICE_ID		0x3480
+#define INTEL_PCH_MCC_DEVICE_ID		0x4b00
+#define INTEL_PCH_TGP_DEVICE_ID		0xa080
+#define INTEL_PCH_TGP2_DEVICE_ID	0x4380
+#define INTEL_PCH_JSP_DEVICE_ID		0x4d80
+#define INTEL_PCH_JSP2_DEVICE_ID	0x3880
+#define INTEL_PCH_ADP_DEVICE_ID		0x7a80
+#define INTEL_PCH_ADP2_DEVICE_ID	0x5180
 #define INTEL_PCH_P2X_DEVICE_ID		0x7100
 #define INTEL_PCH_P3X_DEVICE_ID		0x7000
 
@@ -212,15 +229,28 @@ struct DeviceType {
 	}
 };
 
+enum port_index {
+	INTEL_PORT_ANY,				// wildcard for lookup functions
+	INTEL_PORT_A,
+	INTEL_PORT_B,
+	INTEL_PORT_C,
+	INTEL_PORT_D,
+	INTEL_PORT_E,
+	INTEL_PORT_F
+};
+
 enum pch_info {
 	INTEL_PCH_NONE = 0,		// No PCH present
 	INTEL_PCH_IBX,			// Ibexpeak
 	INTEL_PCH_CPT,			// Cougarpoint
 	INTEL_PCH_LPT,			// Lynxpoint
 	INTEL_PCH_SPT,			// SunrisePoint
-	INTEL_PCH_KBP,			// KabyLake
 	INTEL_PCH_CNP,			// CannonLake
 	INTEL_PCH_ICP,			// IceLake
+	INTEL_PCH_JSP,			// JasperLake
+	INTEL_PCH_MCC,			// Mule Creek Canyon
+	INTEL_PCH_TGP,			// TigerLake
+	INTEL_PCH_ADP,			// AlderLake
 	INTEL_PCH_NOP
 };
 
@@ -248,7 +278,8 @@ struct intel_shared_info {
 	area_id			mode_list_area;		// area containing display mode list
 	uint32			mode_count;
 
-	display_mode	panel_mode;			// VBIOS VBT panel mode
+	display_mode	current_mode;		// pretty much a hack until per-display modes
+	display_timing	panel_timing;		// Hardware timings of the LVDS panel, extracted from BIOS
 	uint32			bytes_per_row;
 	uint32			bits_per_pixel;
 	uint32			dpms_mode;
@@ -306,7 +337,8 @@ enum pipe_index {
     INTEL_PIPE_ANY,
     INTEL_PIPE_A,
     INTEL_PIPE_B,
-    INTEL_PIPE_C
+    INTEL_PIPE_C,
+    INTEL_PIPE_D
 };
 
 //----------------- ioctl() interface ----------------
@@ -409,6 +441,54 @@ struct intel_free_graphics_memory {
 #define SNB_GTT_SIZE_1MB				(1 << 8)
 #define SNB_GTT_SIZE_2MB				(2 << 8)
 
+// BDW+ (GGC_0_0_0_PCI)
+
+#define BDW_GRAPHICS_MEMORY_CONTROL		0x50
+
+#define BDW_STOLEN_MEMORY_MASK			0xff00
+#define BDW_STOLEN_MEMORY_32MB			(1 << 8)
+#define BDW_STOLEN_MEMORY_64MB			(2 << 8)
+#define BDW_STOLEN_MEMORY_96MB			(3 << 8)
+#define BDW_STOLEN_MEMORY_128MB			(4 << 8)
+#define BDW_STOLEN_MEMORY_160MB			(5 << 8)
+#define BDW_STOLEN_MEMORY_192MB			(6 << 8)
+#define BDW_STOLEN_MEMORY_224MB			(7 << 8)
+#define BDW_STOLEN_MEMORY_256MB			(8 << 8)
+#define BDW_STOLEN_MEMORY_288MB			(9 << 8)
+#define BDW_STOLEN_MEMORY_320MB			(10 << 8)
+#define BDW_STOLEN_MEMORY_352MB			(11 << 8)
+#define BDW_STOLEN_MEMORY_384MB			(12 << 8)
+#define BDW_STOLEN_MEMORY_416MB			(13 << 8)
+#define BDW_STOLEN_MEMORY_448MB			(14 << 8)
+#define BDW_STOLEN_MEMORY_480MB			(15 << 8)
+#define BDW_STOLEN_MEMORY_512MB			(16 << 8)
+#define BDW_STOLEN_MEMORY_1024MB		(32 << 8)
+#define BDW_STOLEN_MEMORY_1536MB		(48 << 8)
+#define BDW_STOLEN_MEMORY_2016MB		(63 << 8)
+#define SKL_STOLEN_MEMORY_2048MB		(64 << 8)
+#define SKL_STOLEN_MEMORY_4MB			(240 << 8)
+#define SKL_STOLEN_MEMORY_8MB			(241 << 8)
+#define SKL_STOLEN_MEMORY_12MB			(242 << 8)
+#define SKL_STOLEN_MEMORY_16MB			(243 << 8)
+#define SKL_STOLEN_MEMORY_20MB			(244 << 8)
+#define SKL_STOLEN_MEMORY_24MB			(245 << 8)
+#define SKL_STOLEN_MEMORY_28MB			(246 << 8)
+#define SKL_STOLEN_MEMORY_32MB			(247 << 8)
+#define SKL_STOLEN_MEMORY_36MB			(248 << 8)
+#define SKL_STOLEN_MEMORY_40MB			(249 << 8)
+#define SKL_STOLEN_MEMORY_44MB			(250 << 8)
+#define SKL_STOLEN_MEMORY_48MB			(251 << 8)
+#define SKL_STOLEN_MEMORY_52MB			(252 << 8)
+#define SKL_STOLEN_MEMORY_56MB			(253 << 8)
+#define SKL_STOLEN_MEMORY_60MB			(254 << 8)
+
+
+#define BDW_GTT_SIZE_MASK				(3 << 6)
+#define BDW_GTT_SIZE_NONE				(0 << 6)
+#define BDW_GTT_SIZE_2MB				(1 << 6)
+#define BDW_GTT_SIZE_4MB				(2 << 6)
+#define BDW_GTT_SIZE_8MB				(3 << 6)
+
 // graphics page translation table
 #define INTEL_PAGE_TABLE_CONTROL		0x02020
 #define PAGE_TABLE_ENABLED				0x00000001
@@ -510,7 +590,7 @@ struct intel_free_graphics_memory {
 #define LVDS_18BIT_DITHER				(1UL << 25)
 #define LVDS_PORT_EN					(1UL << 31)
 
-// PLL flags
+// PLL flags (pre-DDI)
 #define DISPLAY_PLL_ENABLED				(1UL << 31)
 #define DISPLAY_PLL_2X_CLOCK			(1UL << 30)
 #define DISPLAY_PLL_SYNC_LOCK_ENABLED	(1UL << 29)
@@ -538,10 +618,42 @@ struct intel_free_graphics_memory {
 #define DISPLAY_PLL_M2_DIVISOR_SHIFT	0
 #define DISPLAY_PLL_PULSE_PHASE_SHIFT	9
 
+// Skylake PLLs
+#define SKL_DPLL1_CFGCR1				(0xc040 | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL1_CFGCR2				(0xc044 | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL2_CFGCR1				(0xc048 | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL2_CFGCR2				(0xc04c | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL3_CFGCR1				(0xc050 | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL3_CFGCR2				(0xc054 | REGS_NORTH_PIPE_AND_PORT)
+// These exist also still in CoffeeLake (confirmed):
+#define SKL_DPLL_CTRL1					(0xc058 | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL_CTRL2					(0xc05c | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL_STATUS					(0xc060 | REGS_NORTH_PIPE_AND_PORT)
+#define SKL_DPLL0_DP_LINKRATE_SHIFT		1
+#define SKL_DPLL1_DP_LINKRATE_SHIFT		7
+#define SKL_DPLL2_DP_LINKRATE_SHIFT		13
+#define SKL_DPLL3_DP_LINKRATE_SHIFT		19
+#define SKL_DPLL_DP_LINKRATE_MASK		7
+#define SKL_DPLL_CTRL1_2700				0
+#define SKL_DPLL_CTRL1_1350				1
+#define SKL_DPLL_CTRL1_810				2
+#define SKL_DPLL_CTRL1_1620				3
+#define SKL_DPLL_CTRL1_1080				4
+#define SKL_DPLL_CTRL1_2160				5
+
+// Icelake PLLs
+#define ICL_DSSM						0x51004
+#define ICL_DSSM_REF_FREQ_SHIFT			29
+#define ICL_DSSM_REF_FREQ_MASK			(7 << ICL_DSSM_REF_FREQ_SHIFT)
+#define ICL_DSSM_24000					0
+#define ICL_DSSM_19200					1
+#define ICL_DSSM_38400					2
+
 // display
 
 #define INTEL_DISPLAY_OFFSET			0x1000
 
+// Note: on Skylake below registers are part of the transcoder
 #define INTEL_DISPLAY_A_HTOTAL			(0x0000 | REGS_NORTH_PIPE_AND_PORT)
 #define INTEL_DISPLAY_A_HBLANK			(0x0004 | REGS_NORTH_PIPE_AND_PORT)
 #define INTEL_DISPLAY_A_HSYNC			(0x0008 | REGS_NORTH_PIPE_AND_PORT)
@@ -567,6 +679,16 @@ struct intel_free_graphics_memory {
 #define INTEL_PIPE_B_LINK_M				(0x1060 | REGS_NORTH_PLANE_CONTROL)
 #define INTEL_PIPE_A_LINK_N				(0x0064 | REGS_NORTH_PLANE_CONTROL)
 #define INTEL_PIPE_B_LINK_N				(0x1064 | REGS_NORTH_PLANE_CONTROL)
+
+//DDI port link
+#define INTEL_DDI_PIPE_A_DATA_M			(0x0030 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_B_DATA_M			(0x1030 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_A_DATA_N			(0x0034 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_B_DATA_N			(0x1034 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_A_LINK_M			(0x0040 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_B_LINK_M			(0x1040 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_A_LINK_N			(0x0044 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DDI_PIPE_B_LINK_N			(0x1044 | REGS_NORTH_PIPE_AND_PORT)
 
 // on PCH we also have to set the transcoder
 #define INTEL_TRANSCODER_A_HTOTAL		(0x0000 | REGS_SOUTH_TRANSCODER_PORT)
@@ -638,14 +760,15 @@ struct intel_free_graphics_memory {
 #define DDI_BUF_CTL_C					(0x4200 | REGS_NORTH_PIPE_AND_PORT)
 #define DDI_BUF_CTL_D					(0x4300 | REGS_NORTH_PIPE_AND_PORT)
 #define DDI_BUF_CTL_E					(0x4400 | REGS_NORTH_PIPE_AND_PORT)
-#define 	DDI_BUF_CTL_ENABLE			(1 << 31)
-#define 	DDI_BUF_TRANS_SELECT(n)		((n) << 24)
-#define 	DDI_BUF_EMP_MASK			(0xf << 24)
-#define 	DDI_BUF_PORT_REVERSAL		(1 << 16)
-#define 	DDI_BUF_IS_IDLE				(1 << 7)
-#define 	DDI_A_4_LANES				(1 << 4)
-#define 	DDI_PORT_WIDTH(width)		(((width) - 1) << 1)
-#define 	DDI_INIT_DISPLAY_DETECTED	(1 << 0)
+#define DDI_BUF_CTL_F					(0x4500 | REGS_NORTH_PIPE_AND_PORT)
+#define DDI_BUF_CTL_ENABLE				(1 << 31)
+#define DDI_BUF_TRANS_SELECT(n)			((n) << 24)
+#define DDI_BUF_EMP_MASK				(0xf << 24)
+#define DDI_BUF_PORT_REVERSAL			(1 << 16)
+#define DDI_BUF_IS_IDLE					(1 << 7)
+#define DDI_A_4_LANES					(1 << 4)
+#define DDI_PORT_WIDTH(width)			(((width) - 1) << 1)
+#define DDI_INIT_DISPLAY_DETECTED		(1 << 0)
 
 #define PIPE_DDI_FUNC_CTL_A				(0x0400 | REGS_NORTH_PIPE_AND_PORT)
 #define PIPE_DDI_FUNC_CTL_B				(0x1400 | REGS_NORTH_PIPE_AND_PORT)
@@ -660,6 +783,27 @@ struct intel_free_graphics_memory {
 #define PIPE_DDI_PORT_C					2
 #define PIPE_DDI_PORT_D					3
 #define PIPE_DDI_PORT_E					4
+#define PIPE_DDI_PORT_F					5
+#define PIPE_DDI_MODESEL_SHIFT			24
+#define PIPE_DDI_MODESEL_MODE(x)		((x) << PIPE_DDI_MODESEL_SHIFT)
+#define PIPE_DDI_MODESEL_MASK			(7 << PIPE_DDI_MODESEL_SHIFT)
+#define PIPE_DDI_MODE_HDMI				0
+#define PIPE_DDI_MODE_DVI				1
+#define PIPE_DDI_MODE_DP_SST			2
+#define PIPE_DDI_MODE_DP_MST			3
+#define PIPE_DDI_COLOR_SHIFT			20
+#define PIPE_DDI_BPC(x)					((x) << PIPE_DDI_COLOR_SHIFT)
+#define PIPE_DDI_BPC_MASK				(7 << PIPE_DDI_COLOR_SHIFT)
+#define PIPE_DDI_8BPC					0
+#define PIPE_DDI_10BPC					1
+#define PIPE_DDI_6BPC					2
+#define PIPE_DDI_12BPC					3
+#define PIPE_DDI_DP_WIDTH_SHIFT			1
+#define PIPE_DDI_DP_WIDTH_SEL(x)		((x) << PIPE_DDI_DP_WIDTH_SHIFT)
+#define PIPE_DDI_DP_WIDTH_MASK			(7 << PIPE_DDI_DP_WIDTH_SHIFT)
+#define PIPE_DDI_DP_WIDTH_1				0
+#define PIPE_DDI_DP_WIDTH_2				1
+#define PIPE_DDI_DP_WIDTH_4				2
 
 // DP_A always @ 6xxxx, DP_B-DP_D move with PCH
 #define INTEL_DISPLAY_PORT_A			(0x4000 | REGS_NORTH_PIPE_AND_PORT)
@@ -741,6 +885,7 @@ struct intel_free_graphics_memory {
 	// reserved on A
 #define INTEL_DISPLAY_A_IMAGE_SIZE		(0x0190 | REGS_NORTH_PLANE_CONTROL)
 #define INTEL_DISPLAY_A_SURFACE			(0x019c | REGS_NORTH_PLANE_CONTROL)
+#define INTEL_DISPLAY_A_OFFSET_HAS		(0x01a4 | REGS_NORTH_PLANE_CONTROL)
 	// i965 and up only
 
 #define INTEL_DISPLAY_B_CONTROL			(0x1180 | REGS_NORTH_PLANE_CONTROL)
@@ -749,6 +894,7 @@ struct intel_free_graphics_memory {
 #define INTEL_DISPLAY_B_POS				(0x118c | REGS_NORTH_PLANE_CONTROL)
 #define INTEL_DISPLAY_B_IMAGE_SIZE		(0x1190 | REGS_NORTH_PLANE_CONTROL)
 #define INTEL_DISPLAY_B_SURFACE			(0x119c | REGS_NORTH_PLANE_CONTROL)
+#define INTEL_DISPLAY_B_OFFSET_HAS		(0x11a4 | REGS_NORTH_PLANE_CONTROL)
 	// i965 and up only
 
 // INTEL_DISPLAY_A_CONTROL source pixel format
@@ -759,6 +905,14 @@ struct intel_free_graphics_memory {
 #define DISPLAY_CONTROL_RGB15			(4UL << 26)
 #define DISPLAY_CONTROL_RGB16			(5UL << 26)
 #define DISPLAY_CONTROL_RGB32			(6UL << 26)
+#define DISPLAY_CONTROL_RGB64			(0x0cUL << 26)
+// Skylake
+#define DISPLAY_CONTROL_COLOR_MASK_SKY	(0x0fUL << 24)
+#define DISPLAY_CONTROL_CMAP8_SKY		(0x0cUL << 24)
+#define DISPLAY_CONTROL_RGB15_SKY		(0x0eUL << 24)
+#define DISPLAY_CONTROL_RGB16_SKY		(0x0eUL << 24)
+#define DISPLAY_CONTROL_RGB32_SKY		(0x04UL << 24)
+#define DISPLAY_CONTROL_RGB64_SKY		(0x06UL << 24)
 
 // INTEL_DISPLAY_A_PIPE_CONTROL ILK+
 #define INTEL_PIPE_DITHER_TYPE_MASK		(0x0000000c)
@@ -836,7 +990,7 @@ struct intel_free_graphics_memory {
 
 #define SNB_DPLL_SEL					(0x7000 | REGS_SOUTH_SHARED)
 
-// i2c
+// i2c bit banging interface
 #define INTEL_I2C_IO_A					(0x5010 | REGS_SOUTH_SHARED)
 #define INTEL_I2C_IO_B					(0x5014 | REGS_SOUTH_SHARED)
 #define INTEL_I2C_IO_C					(0x5018 | REGS_SOUTH_SHARED)
@@ -845,6 +999,9 @@ struct intel_free_graphics_memory {
 #define INTEL_I2C_IO_F					(0x5024 | REGS_SOUTH_SHARED)
 #define INTEL_I2C_IO_G					(0x5028 | REGS_SOUTH_SHARED)
 #define INTEL_I2C_IO_H					(0x502c | REGS_SOUTH_SHARED)
+// i2c hardware controller
+#define INTEL_GMBUS0					(0x5100 | REGS_SOUTH_SHARED)
+#define INTEL_GMBUS4					(0x5110 | REGS_SOUTH_SHARED)
 
 #define I2C_CLOCK_DIRECTION_MASK		(1 << 0)
 #define I2C_CLOCK_DIRECTION_OUT			(1 << 1)
@@ -857,6 +1014,15 @@ struct intel_free_graphics_memory {
 #define I2C_DATA_VALUE_OUT				(1 << 11)
 #define I2C_DATA_VALUE_IN				(1 << 12)
 #define I2C_RESERVED					((1 << 13) | (1 << 5))
+
+// gpu block clock gating disable bits
+#define INTEL_DSPCLK_GATE_D				(0x2020 | REGS_SOUTH_SHARED)
+#define PCH_GMBUSUNIT_CLK_GATE_DIS		(1UL << 31)
+#define INTEL_GEN9_CLKGATE_DIS_4		(0x653c | REGS_NORTH_SHARED)
+#define BXT_GMBUSUNIT_CLK_GATE_DIS		(1 << 14)
+
+// gpu power wells
+#define INTEL_PWR_WELL_CTL_2			(0x5404 | REGS_NORTH_SHARED)
 
 // TODO: on IronLake this is in the north shared block at 0x41000
 #define INTEL_VGA_DISPLAY_CONTROL		(0x1400 | REGS_NORTH_PLANE_CONTROL)
@@ -968,6 +1134,12 @@ struct intel_free_graphics_memory {
 #define PCH_TRANS_CONF_A				0x0008
 #define PCH_TRANS_CONF_B				0x1008
 #define PCH_TRANS_CONF_C				0x2008
+
+// Transcoder - skylake DDI
+#define DDI_SKL_TRANS_CONF_A			(0x0008 | REGS_NORTH_PLANE_CONTROL)
+#define DDI_SKL_TRANS_CONF_B			(0x1008 | REGS_NORTH_PLANE_CONTROL)
+#define DDI_SKL_TRANS_CONF_C			(0x2008 | REGS_NORTH_PLANE_CONTROL)
+#define DDI_SKL_TRANS_CONF_EDP			(0xf008 | REGS_NORTH_PLANE_CONTROL)
 
 #define TRANS_ENABLE					(1 << 31)
 #define TRANS_ENABLED					(1 << 30)
@@ -1109,6 +1281,7 @@ struct intel_free_graphics_memory {
 #define PCH_PANEL_FITTER_H_SCALE		0x90
 
 #define PANEL_FITTER_ENABLED			(1 << 31)
+//pipes are hardcoded according to offset on SkyLake and later
 #define PANEL_FITTER_PIPE_MASK			(3 << 29)
 #define PANEL_FITTER_PIPE_A				(0 << 29)
 #define PANEL_FITTER_PIPE_B				(1 << 29)

@@ -22,6 +22,7 @@
 #include <package/hpkg/Strings.h>
 #include <Window.h>
 
+#include "LocaleUtils.h"
 #include "Logger.h"
 #include "MainWindow.h"
 #include "WorkStatusView.h"
@@ -112,6 +113,23 @@ private:
 };
 
 
+class DateField : public BStringField {
+public:
+								DateField(uint64 millisSinceEpoc);
+	virtual						~DateField();
+
+			void				SetMillisSinceEpoc(uint64 millisSinceEpoc);
+			uint64				MillisSinceEpoc() const
+									{ return fMillisSinceEpoc; }
+
+private:
+			void				_SetMillisSinceEpoc(uint64 millisSinceEpoc);
+
+private:
+			uint64				fMillisSinceEpoc;
+};
+
+
 // BColumn for PackageListView which knows how to render
 // a PackageIconAndTitleField
 class PackageColumn : public BTitledColumn {
@@ -159,6 +177,7 @@ public:
 			void				UpdateSize();
 			void				UpdateRepository();
 			void				UpdateVersion();
+			void				UpdateVersionCreateTimestamp();
 
 			PackageRow*&		NextInHash()
 									{ return fNextInHash; }
@@ -294,6 +313,47 @@ SizeField::SetSize(double size)
 
 	fSize = size;
 	SetString(sizeString.String());
+}
+
+
+// #pragma mark - DateField
+
+
+DateField::DateField(uint64 millisSinceEpoc)
+	:
+	BStringField(""),
+	fMillisSinceEpoc(0)
+{
+	_SetMillisSinceEpoc(millisSinceEpoc);
+}
+
+
+DateField::~DateField()
+{
+}
+
+
+void
+DateField::SetMillisSinceEpoc(uint64 millisSinceEpoc)
+{
+	if (millisSinceEpoc == fMillisSinceEpoc)
+		return;
+	_SetMillisSinceEpoc(millisSinceEpoc);
+}
+
+
+void
+DateField::_SetMillisSinceEpoc(uint64 millisSinceEpoc)
+{
+	BString dateString;
+
+	if (millisSinceEpoc == 0)
+		dateString = B_TRANSLATE_CONTEXT("-", "no package publish");
+	else
+		dateString = LocaleUtils::TimestampToDateString(millisSinceEpoc);
+
+	fMillisSinceEpoc = millisSinceEpoc;
+	SetString(dateString.String());
 }
 
 
@@ -455,6 +515,16 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 int
 PackageColumn::CompareFields(BField* field1, BField* field2)
 {
+	DateField* dateField1 = dynamic_cast<DateField*>(field1);
+	DateField* dateField2 = dynamic_cast<DateField*>(field2);
+	if (dateField1 != NULL && dateField2 != NULL) {
+		if (dateField1->MillisSinceEpoc() > dateField2->MillisSinceEpoc())
+			return -1;
+		else if (dateField1->MillisSinceEpoc() < dateField2->MillisSinceEpoc())
+			return 1;
+		return 0;
+	}
+
 	SizeField* sizeField1 = dynamic_cast<SizeField*>(field1);
 	SizeField* sizeField2 = dynamic_cast<SizeField*>(field2);
 	if (sizeField1 != NULL && sizeField2 != NULL) {
@@ -541,6 +611,7 @@ enum {
 	kStatusColumn,
 	kRepositoryColumn,
 	kVersionColumn,
+	kVersionCreateTimestampColumn,
 };
 
 
@@ -561,23 +632,13 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 	// NOTE: The icon BBitmap is referenced by the fPackage member.
 	UpdateIconAndTitle();
 
-	// Rating
 	UpdateRating();
-
-	// Summary
 	UpdateSummary();
-
-	// Size
 	UpdateSize();
-
-	// Status
 	UpdateState();
-
-	// Repository
 	UpdateRepository();
-
-	// Version
 	UpdateVersion();
+	UpdateVersionCreateTimestamp();
 
 	package.AddListener(fPackageListener);
 }
@@ -595,7 +656,6 @@ PackageRow::UpdateIconAndTitle()
 {
 	if (!fPackage.IsSet())
 		return;
-
 	SetField(new PackageIconAndTitleField(
 		fPackage->Name(), fPackage->Title()), kTitleColumn);
 }
@@ -606,7 +666,6 @@ PackageRow::UpdateState()
 {
 	if (!fPackage.IsSet())
 		return;
-
 	SetField(new BStringField(package_state_to_string(fPackage)),
 		kStatusColumn);
 }
@@ -617,7 +676,6 @@ PackageRow::UpdateSummary()
 {
 	if (!fPackage.IsSet())
 		return;
-
 	SetField(new BStringField(fPackage->ShortDescription()),
 		kDescriptionColumn);
 }
@@ -638,7 +696,6 @@ PackageRow::UpdateSize()
 {
 	if (!fPackage.IsSet())
 		return;
-
 	SetField(new SizeField(fPackage->Size()), kSizeColumn);
 }
 
@@ -648,7 +705,6 @@ PackageRow::UpdateRepository()
 {
 	if (!fPackage.IsSet())
 		return;
-
 	SetField(new BStringField(fPackage->DepotName()), kRepositoryColumn);
 }
 
@@ -658,8 +714,17 @@ PackageRow::UpdateVersion()
 {
 	if (!fPackage.IsSet())
 		return;
-
 	SetField(new BStringField(fPackage->Version().ToString()), kVersionColumn);
+}
+
+
+void
+PackageRow::UpdateVersionCreateTimestamp()
+{
+	if (!fPackage.IsSet())
+		return;
+	SetField(new DateField(fPackage->VersionCreateTimestamp()),
+		kVersionCreateTimestampColumn);
 }
 
 
@@ -807,7 +872,7 @@ PackageListView::PackageListView(Model* model)
 		300 * scale, 80 * scale, 1000 * scale,
 		B_TRUNCATE_MIDDLE), kDescriptionColumn);
 	PackageColumn* sizeColumn = new PackageColumn(fModel, B_TRANSLATE("Size"),
-		spacing + StringWidth(B_TRANSLATE("9999.99 KiB")), 50 * scale,
+		spacing + StringWidth("9999.99 KiB"), 50 * scale,
 		140 * scale, B_TRUNCATE_END);
 	sizeColumn->SetAlignment(B_ALIGN_RIGHT);
 	AddColumn(sizeColumn, kSizeColumn);
@@ -821,9 +886,21 @@ PackageListView::PackageListView(Model* model)
 	SetColumnVisible(kRepositoryColumn, false);
 		// invisible by default
 
+	float widthWithPlacboVersion = spacing
+		+ StringWidth("8.2.3176-2");
+		// average sort of version length as model
 	AddColumn(new PackageColumn(fModel, B_TRANSLATE("Version"),
-		50 * scale, 50 * scale, 200 * scale,
+		widthWithPlacboVersion, widthWithPlacboVersion,
+		widthWithPlacboVersion + (50 * scale),
 		B_TRUNCATE_MIDDLE), kVersionColumn);
+
+	float widthWithPlaceboDate = spacing
+		+ StringWidth(LocaleUtils::TimestampToDateString(
+			static_cast<uint64>(1000)));
+	AddColumn(new PackageColumn(fModel, B_TRANSLATE("Date"),
+		widthWithPlaceboDate, widthWithPlaceboDate,
+		widthWithPlaceboDate + (50 * scale),
+		B_TRUNCATE_END), kVersionCreateTimestampColumn);
 
 	fItemCountView = new ItemCountView();
 	AddStatusView(fItemCountView);

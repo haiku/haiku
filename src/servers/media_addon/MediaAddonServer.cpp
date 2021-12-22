@@ -549,7 +549,7 @@ MediaAddonServer::_AddOnAdded(const char* path, ino_t fileNode)
 		// put file's inode and addon's id into map
 		fFileMap.insert(std::make_pair(fileNode, id));
 
-		AddOnInfo info;
+		AddOnInfo info = {};
 		fInfoMap.insert(std::make_pair(id, info));
 	} catch (std::bad_alloc& exception) {
 		fFileMap.erase(fileNode);

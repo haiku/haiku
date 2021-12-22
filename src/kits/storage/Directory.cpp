@@ -352,19 +352,20 @@ BDirectory::GetNextRef(entry_ref* ref)
 	if (InitCheck() != B_OK)
 		return B_FILE_ERROR;
 
-	BPrivate::Storage::LongDirEntry entry;
+	BPrivate::Storage::LongDirEntry longEntry;
+	struct dirent* entry = longEntry.dirent();
 	bool next = true;
 	while (next) {
-		if (GetNextDirents(&entry, sizeof(entry), 1) != 1)
+		if (GetNextDirents(entry, sizeof(longEntry), 1) != 1)
 			return B_ENTRY_NOT_FOUND;
 
-		next = (!strcmp(entry.d_name, ".")
-			|| !strcmp(entry.d_name, ".."));
+		next = (!strcmp(entry->d_name, ".")
+			|| !strcmp(entry->d_name, ".."));
 	}
 
-	ref->device = entry.d_pdev;
-	ref->directory = entry.d_pino;
-	return ref->set_name(entry.d_name);
+	ref->device = entry->d_pdev;
+	ref->directory = entry->d_pino;
+	return ref->set_name(entry->d_name);
 }
 
 
@@ -395,11 +396,12 @@ BDirectory::CountEntries()
 	if (error != B_OK)
 		return error;
 	int32 count = 0;
-	BPrivate::Storage::LongDirEntry entry;
+	BPrivate::Storage::LongDirEntry longEntry;
+	struct dirent* entry = longEntry.dirent();
 	while (error == B_OK) {
-		if (GetNextDirents(&entry, sizeof(entry), 1) != 1)
+		if (GetNextDirents(entry, sizeof(longEntry), 1) != 1)
 			break;
-		if (strcmp(entry.d_name, ".") != 0 && strcmp(entry.d_name, "..") != 0)
+		if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
 			count++;
 	}
 	Rewind();

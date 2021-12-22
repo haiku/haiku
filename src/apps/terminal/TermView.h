@@ -94,6 +94,7 @@ public:
 			void				SetSelectColor(rgb_color fore, rgb_color back);
 			void				SetTermColor(uint index, rgb_color color,
 									bool dynamic = false);
+			status_t			GetTermColor(uint index, rgb_color* color);
 
 			int					Encoding() const;
 			void				SetEncoding(int encoding);

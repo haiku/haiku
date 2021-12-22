@@ -4222,8 +4222,8 @@ OutlineView::RemoveRow(BRow* row)
 	if (row == NULL)
 		return;
 
-	BRow* parentRow;
-	bool parentIsVisible;
+	BRow* parentRow = NULL;
+	bool parentIsVisible = false;
 	FindParent(row, &parentRow, &parentIsVisible);
 		// NOTE: This could be a root row without a parent, in which case
 		// it is always visible, though.

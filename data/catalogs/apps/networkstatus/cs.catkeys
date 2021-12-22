@@ -9,9 +9,9 @@ Open network preferences…	NetworkStatusView		Otevřít volby sítě...
 NetworkStatus	System name		Stav sítě
 Broadcast:	NetworkStatusView		Všesměrové:
 OK	NetworkStatusView		OK
-No link	NetworkStatusView		Není odkaz
+No link	NetworkStatusView		Odpojeno
 Could not join wireless network:\n	NetworkStatusView		Nemohu se připojit do bezdrátové sítě:\n
-Ready	NetworkStatusView		Připraven
+Ready	NetworkStatusView		Spojeno
 Network Status	NetworkStatusView		Stav sítě
 Deskbar is not running, giving up.	NetworkStatus		Panel není spuštěn, vzdávám to.
 Netmask:	NetworkStatusView		Maska sítě:

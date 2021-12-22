@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Installer	1075045498
+1	greek, modern (1453-)	x-vnd.Haiku-Installer	2017577026
 Performing installation.	InstallProgress		Η εγκατάσταση είναι σε εξέλιξη.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Επιλέξτε το δίσκο προέλευσης από το αναδυόμενο μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το παράθυρο Διαχειριστή Δίσκου, πριν κλείσετε το Πρόγραμμα Εγκατάστασης.
@@ -14,6 +14,7 @@ Unknown Type	InstallProgress	Partition content type	Άγνωστος τύπος
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Πατήστε το πλήκτρο Έναρξη για να εγκαταστήσετε από το '%1s' στο '%2s'.
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Επιλέξτε το δίσκο που θέλετε να εγκαταστήσετε από το αναδυόμενο μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Η εγκατάσταση ολοκληρώθηκε. Ο τομέας εκκίνησης εγγράφηκε στο '%s'. Πατήστε Έξοδος για να εγκαταλείψετε την εγκατάσταση ή επιλέξτε μία νέα μονάδα για να εκτελέσετε μια άλλη εγκατάσταση.
+Are you sure you want to stop the installation?	InstallerWindow		Είστε σίγουρος/η ότι θέλετε να σταματήσετε την εγκατάσταση;
 README	InstallerApp		README
 Quit	InstallerWindow		Έξοδος
 Write boot sector to '%s'	InstallerWindow		Εγγραφή τομέα εκκίνησης σε '%s'
@@ -22,6 +23,7 @@ Welcome to the Haiku Installer!\n\n	InstallerApp		Καλώς ήλθατε στη
 ?? of ??	InstallerWindow	Unknown progress	;; από ;;
 Quit Boot Manager	InstallerWindow		Έξοδος από τον Διαχειριστή Εκκίνησης
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Ο Διαχειριστής Δίσκου, η εφαρμογή για διαμορφώσεις κατατμήσεων δίσκων, δεν μπορεί να εκκινηθεί.
+The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Η μονάδα προορισμού δεν είναι κενή. Αν περιέχει ήδη μια εγκατάσταση του Haiku, τότε αυτή θα αντικατασταθεί. Αυτό θα διαγράψει όλο το εγκατεστημένο λογισμικό.\n\nΑν επιθυμείτε να κάνετε μια αναβάθμιση του υπάρχοντος συστήματος, χωρίς αφαίρεση λογισμικού, δείτε το λήμμα του Οδηγού Χρήστη του Haiku σχετικά με την εφαρμογή \"SoftwareUpdater\" για οδηγίες.\n\nΕίστε σίγουρος/η ότι επιθυμείτε να συνεχίσετε την εγκατάσταση;
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Εκτελείται ο Διαχειριστής εκκίνησης...\n\nΚλείστε τον Διαχειριστή Εκκίνησης για να συνεχίσετε την εγκατάσταση.
 Quit DriveSetup	InstallerWindow		Έξοδος από τον Διαχειριστή Δίσκου
 Write boot sector	InstallerWindow		Εγγραφή τομέα εκκίνησης
@@ -31,8 +33,10 @@ Install from:	InstallerWindow		Εγκατάσταση από:
 Additional disk space required: 0.0 KiB	InstallerWindow		Απαιτείται επιπρόσθετος χώρος στο δίσκο: 0.0 KiB
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Το λογισμικό αυτό βρίσκεται σε δοκιμαστική φάση! Αυτό σημαίνει ότι διατρέχετε το ρίσκο απώλειας σημαντικών δεδομένων. Κάντε αντίγραφα ασφαλείας τακτικά! Σας προειδοποιήσαμε.\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
+Install anyway	InstallProgress		Εγκατάσταση με αντικατάσταση
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Εάν κάνετε εγκατάσταση του Haiku σε πραγματικό υλισμικό (και όχι μέσα σε έναν προσομοιωτή), ίσως να θέλετε να προετοιμάσετε μία κατάτμηση με ένα άλλο λειτουργικό σύστημα (για παράδειγμα, θα μπορούσατε να χρησιμοποιήσετε ένα περιβάλλον GParted ζωντανού CD, το οποίο μπορεί και να αλλάξει το μέγεθος προϋπαρχόντων κατατμήσεων, έτσι ώστε να κάνετε χώρο).\nΜπορείτε να διαμορφώσετε κατατμήσεις και με τον Διαχειριστή Δίσκου στο Πρόγραμμα Εγκατάστασης, αλλά δεν θα μπορέσετε να αλλάξετε το μέγεθος προϋπαρχόντων κατατμήσεων με αυτό. Αν και ο Διαχειριστής Δίσκου έχει δοκιμαστεί εκτενώς με την πάροδο του χρόνου, συνιστάται η δημιουργία αντιγράφων ασφαλείας των υπόλοιπων κατατμήσεων στο σύστημά σας. Για καλό και για κακό…
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Επιλέξτε την προέλευση και το δίσκο προορισμού από τα αναδυόμενα μενού. Στη συνέχεια, κάντε κλικ στην \"Έναρξη\".
+2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Haiku User Guide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2) Το πρόγραμμα εγκατάστασης θα ενεργοποιήσει τη δυνατότητα φόρτωσης από την τομή συστήματος του Haiku, αλλά δεν έχει τη δυνατότητα να εντάξει το σύστημα σε ένα υπάρχον μενού φόρτωσης συστήματος. Αν έχετε εγκατεστημένο ήδη το πρόγραμμα GRUB, τότε μπορείτε να προσθέσετε το σύστημα Haiku εκεί.\nΓια πληροφορίες ανατρέξτε στον οδηγό φόρτωσης του Haiku στην ιστοσελίδα μας, υπό τη διεύθυνση https://www.haiku-os.org/guides/booting.\nΕναλλακτικά μπορείτε να φτιάξετε ένα εντελώς καινούριο μενού φόρτωσης συστήματος από το μενού \"Εργαλεία\" του προγράμματος εγκατάστασης, δείτε το λήμμα του Οδηγού Χρήστη του Haiku πάνω στο πρόγραμμα \"BootManager\".\n\n\n
 Hide optional packages	InstallerWindow		Απόκρυψη προαιρετικών πακέτων
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Καλή διασκέδαση και σας ευχαριστούμε που επιλέξατε το Haiku!
@@ -41,17 +45,20 @@ Error writing boot sector.	InstallProgress		Σφάλμα εγγραφής τομ
 OK	InstallerWindow		Εντάξει
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε τον Διαχειριστή Εκκίνησης και τη Διαχείρηση Δίσκου, πριν κλείσετε το Πρόγραμμα Εγκατάστασης.
 Failed to launch Boot Manager	InstallerWindow		Η εκκίνηση του Διαχειριστή Εκκίνησης απέτυχε
+3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3) Όταν το Haiku φορτώσει επιτυχώς για πρώτη φορά, παρακαλούμε διαβάστε τον \"Οδηγό Χρήστη\" μας και κάντε μια \"Γρήγορη Ξενάγηση\" του συστήματος. Υπάρχουν μερικοί σύνδεσμοι στην επιφάνεια εργασίας και στους σελιδοδείκτες του WebPositive.\n\n
 Try installing anyway	InstallProgress		Προσπάθεια εγκατάστασης οπωσδήποτε
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ΣΗΜΑΝΤΙΚΕΣ ΠΛΗΡΟΦΟΡΙΕΣ ΠΡΙΝ ΤΗΝ ΕΓΚΑΤΑΣΤΑΣΗ ΤΟΥ HAIKU\n\n
 Additional disk space required: %s	InstallerWindow		Επιπλέον χώρος δίσκου που απαιτείται: %s
 Stop	InstallerWindow	In alert after pressing Stop	Τερματισμός εγκατάστασης
 Boot sector successfully written.	InstallProgress		Ο τομέας εκκίνησης εγγράφηκε επιτυχώς.
+Writing bootsector.	InstallProgress		Εγγραφή τομέα φόρτωσης συστήματος.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Παρουσιάστηκε ένα σφάλμα και η εγκατάσταση δεν ολοκληρώθηκε:\n\nΣφάλμα: %s
 Restart	InstallerWindow		Επανεκκίνηση
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Ο δίσκος δεν μπορεί να προσαρτηθεί. Παρακαλώ επιλέξτε ένα διαφορετικό δίσκο.
 Begin	InstallerWindow		Έναρξη
 Collecting copy information.	InstallProgress		Συλλογή πληροφοριών αντιγραφής.
 Show optional packages	InstallerWindow		Εμφάνιση προαιρετικών πακέτων
+No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Δεν βρέθηκαν τομές σκληρού δίσκου κατάλληλες για την εγκατάσταση. Παρακαλούμε ρυθμίστε και διαμορφώστε τουλάχιστον μια τομή με σύστημα αρχείων της Be.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Ο δίσκος προορισμού μπορεί να μην έχει αρκετό χώρο. Δοκιμάστε να επιλέξετε ένα διαφορετικό δίσκο ή επιλέξτε να μην εγκαταστήσετε προαιρετικά στοιχεία.
 Installation canceled.	InstallProgress		Η εγκατάσταση ακυρώθηκε.
 Stop	InstallerWindow		Τερματισμός
@@ -59,6 +66,7 @@ Cancel	InstallerWindow		Ακύρωση
 Continue	InstallerWindow	In alert after pressing Stop	Συνέχεια
 Scanning for disks…	InstallerWindow		Αναζήτηση δίσκων…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Σε εξέλιξη η Διαχείρηση Δίσκου…\n\nΚλείστε τη Διαχείρηση Δίσκου για να συνεχίσετε με την εγκατάσταση.
+The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		Η εγκατάσταση δεν έχει ολοκληρωθεί ακόμη.\nΕίστε σίγουρος/η ότι θέλετε να την σταματήσετε;
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Η κατάτμηση δεν μπορεί να προσαρτηθεί. Παρακαλώ επιλέξτε μία διαφορετική κατάτμηση.
 Set up partitions…	InstallerWindow		Ρύθμιση κατατμήσεων…
 Install progress:  	InstallerWindow		Πρόοδος εγκατάστασης:  
@@ -72,5 +80,6 @@ Onto:	InstallerWindow		Σε:
 Quit Boot Manager and DriveSetup	InstallerWindow		Έξοδος από το Διαχειριστή Εκκίνησης και από τη Διαχείρηση Δίσκου
 Tools	InstallerWindow		Εργαλεία
 scanning…	InstallerWindow		αναζήτηση…
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Εκκίνηση της εφαρμογής DriveSetup για τη\nδημιουργία τομών σε διαθέσιμα μέσα. Μια τομή\nπρέπει να έχουν το μορφότυπο του συστήματος\nαρχείων της Be για να μπορεί να αποτελέσει\nτομή φόρτωσης συστήματος του Haiku.
 Set up boot menu	InstallerWindow		Ρύθμιση μενού εκκίνησης
 Continue	InstallerApp		Συνέχεια

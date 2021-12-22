@@ -229,7 +229,7 @@ struct MimeAttribute
 	MimeAttribute& operator=(const MimeAttribute& src);
 
 	void		Dump();
-	void		SyncWith(TUserArgs& args) throw(Error);
+	void		SyncWith(TUserArgs& args);
 	void		StoreInto(BMessage* target);
 	const char*	UserArgValue(TUserArgs& map, const char* name);
 
@@ -329,7 +329,7 @@ MimeAttribute::operator=(const MimeAttribute& src)
 
 
 void
-MimeAttribute::SyncWith(TUserArgs& args) throw(Error)
+MimeAttribute::SyncWith(TUserArgs& args)
 {
 	const char* value = UserArgValue(args, kAttribute);
 	if (value != NULL)
@@ -402,7 +402,7 @@ MimeAttribute::Dump()
 	char c2 = (char)((type >> 16) & 0xFF);
 	char c3 = (char)((type >> 8) & 0xFF);
 	char c4 = (char)(type & 0xFF);
-	
+
 	ios::fmtflags flags = cout.flags();
 
 	cout << " \\" << endl << "\t\t" << kAttrType;
@@ -418,7 +418,7 @@ MimeAttribute::Dump()
 	cout << " \\" << endl << "\t\t" << kAttrViewable << " " << fViewable
 			<< " " << kAttrEditable << " " << fEditable
 			<< " " << kAttrExtra << " " << fExtra;
-	
+
 	cout.flags(flags);
 }
 
@@ -481,19 +481,19 @@ MimeAttribute::UserArgValue(TUserArgs& map, const char* name)
 class MimeType : public BMimeType {
 
 public:
-					MimeType(char** argv) throw (Error);
+					MimeType(char** argv);
 					~MimeType();
 
-	void			Process() throw (Error);
+	void			Process();
 
 private:
 	status_t		_InitCheck();
-	void			_SetTo(const char* mimetype) throw (Error);
+	void			_SetTo(const char* mimetype);
 	void			_PurgeProperties();
-	void			_Init(char** argv) throw (Error);
+	void			_Init(char** argv);
 	void			_DumpIcon(uint8 *iconData, size_t iconSize);
-	void			_Dump(const char* mimetype) throw (Error);
-	void			_DoEdit() throw (Error);
+	void			_Dump(const char* mimetype);
+	void			_DoEdit();
 	void			_SetIcon(const char* iconData, int32 iconSize);
 
 	const char*		_UserArgValue(const char* name);
@@ -533,7 +533,7 @@ private:
 };
 
 
-MimeType::MimeType(char** argv) throw (Error)
+MimeType::MimeType(char** argv)
 		:
 		fStatus(B_NO_INIT),
 		fToolName(argv[0]),
@@ -568,7 +568,7 @@ MimeType::~MimeType()
 
 
 void
-MimeType::_Init(char** argv) throw (Error)
+MimeType::_Init(char** argv)
 {
 	// fill the helper map of options - for quick lookup of arguments
 	map<uint32, const CmdOption*> cmdOptionsMap;
@@ -799,7 +799,7 @@ MimeType::_SetIcon(const char* iconData, int32 iconSize)
 
 
 void
-MimeType::_SetTo(const char* mimetype) throw (Error)
+MimeType::_SetTo(const char* mimetype)
 {
 	if (mimetype == NULL)
 		return; // iterate all types - nothing to load ATM
@@ -880,7 +880,7 @@ MimeType::_UserArgValue(const char* name)
 
 
 void
-MimeType::_Dump(const char* mimetype) throw (Error)
+MimeType::_Dump(const char* mimetype)
 {
 	// _Dump can be called as part of all types iteration - so set to required
 	if (Type() == NULL || strcasecmp(Type(), mimetype) != 0)
@@ -947,7 +947,7 @@ MimeType::_Dump(const char* mimetype) throw (Error)
 
 
 void
-MimeType::_DoEdit() throw (Error)
+MimeType::_DoEdit()
 {
 	if (fDoRemove || fDoForce) {
 		status_t result = Delete();
@@ -1087,7 +1087,7 @@ MimeType::_DoEdit() throw (Error)
 
 
 void
-MimeType::Process() throw (Error)
+MimeType::Process()
 {
 	if (fCheckSniffRule) {
 		TUserArgsI I = fUserArguments.find(fOpMode);

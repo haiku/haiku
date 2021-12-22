@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network ether pegasus ;
+
+SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
+
+# For ether_driver.h
+UsePrivateHeaders net ;
+
+KernelAddon pegasus :
+	driver.c
+	devlist.c
+	if_aue.c
+	;
+
+ObjectHdrs [ FGristFiles driver$(SUFOBJ) if_aue$(SUFOBJ) ]
+	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
+Includes [ FGristFiles driver.c if_aue.c ] : <src!libs!compat!freebsd_network>usbdevs.h ;

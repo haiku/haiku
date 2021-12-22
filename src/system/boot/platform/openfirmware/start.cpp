@@ -100,7 +100,7 @@ platform_boot_options(void)
 extern "C" void
 start(void *openFirmwareEntry)
 {
-	char bootargs[512];
+	static char bootargs[512];
 
 	// stage2 args - might be set via the command line one day
 	stage2_args args;

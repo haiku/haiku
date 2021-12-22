@@ -1,5 +1,5 @@
 /*****************************************************************************/
-// OpenBeOS Translation Kit Test
+// Haiku Translation Kit Test
 // Author: Michael Wilber
 // Version:
 //
@@ -10,7 +10,7 @@
 // where noted, are licensed under the MIT License, and have been written 
 // and are:
 //
-// Copyright (c) 2002 OpenBeOS Project
+// Copyright (c) 2002 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -98,7 +98,7 @@ TranslationUtilsTest::GetBitmapTest()
 	// File
 	NextSubTest();
 	BApplication app(
-		"application/x-vnd.OpenBeOS-translationkit_translationutilstest");
+		"application/x-vnd.Haiku-translationkit_translationutilstest");
 	BBitmap *pbits = NULL;
 	pbits = BTranslationUtils::GetBitmap(
 		"../../src/tests/kits/translation/data/images/image.png");
@@ -216,7 +216,7 @@ TranslationUtilsTest::GetPutStyledTextTest()
 	// Insert text into view with styles OFF
 	NextSubTest();
 	BApplication app(
-		"application/x-vnd.OpenBeOS-translationkit_translationutilstest");
+		"application/x-vnd.Haiku-translationkit_translationutilstest");
 	BTextView *ptextview = NULL;
 	ptextview = new BTextView(BRect(0, 0, 100, 100),
 		"utilstest_textview", BRect(0, 0, 100, 100),
@@ -281,7 +281,7 @@ TranslationUtilsTest::GetDefaultSettingsTest()
 	// Test translator_id version with a BTranslatorRoster * supplied
 	NextSubTest();
 	BApplication app(
-		"application/x-vnd.OpenBeOS-translationkit_translationutilstest");
+		"application/x-vnd.Haiku-translationkit_translationutilstest");
 	BMessage *pmsg = NULL;
 	bool bdummy = false;
 	translator_id *pids = NULL;
@@ -304,7 +304,7 @@ TranslationUtilsTest::GetDefaultSettingsTest()
 	delete[] pids;
 	pids = NULL;
 	
-	// Get settings from the OBOS TGATranslator and ensure that
+	// Get settings from the Haiku TGATranslator and ensure that
 	// all of its settings are there
 	NextSubTest();
 	pmsg = BTranslationUtils::GetDefaultSettings("TGA Images", 100);
@@ -334,7 +334,7 @@ TranslationUtilsTest::AddTranslationItemsTest()
 	// Make menu of bitmap translators
 	NextSubTest();
 	BApplication app(
-		"application/x-vnd.OpenBeOS-translationkit_translationutilstest");
+		"application/x-vnd.Haiku-translationkit_translationutilstest");
 	BMenu *pmenu = new BMenu("utilstest_menu");
 	CPPUNIT_ASSERT(pmenu);
 	CPPUNIT_ASSERT(BTranslationUtils::AddTranslationItems(pmenu,

@@ -101,7 +101,7 @@ init_entities()
 	kMetadataPartitionMapId = entity_id(0, "*UDF Metadata Partition");
 	kSparablePartitionMapId = entity_id(0, "*UDF Sparable Partition");
 	kVirtualPartitionMapId = entity_id(0, "*UDF Virtual Partition");
-	kImplementationId = entity_id(0, "*OpenBeOS UDF", implementation_id_suffix(OS_BEOS, BEOS_GENERIC));
+	kImplementationId = entity_id(0, "*Haiku UDF", implementation_id_suffix(OS_BEOS, BEOS_GENERIC));
 	kPartitionContentsId1xx = entity_id(0, "+NSR02");
 	kPartitionContentsId2xx = entity_id(0, "+NSR03");
 	kLogicalVolumeInfoId150 = entity_id(0, "*UDF LV Info", udf_id_suffix(0x0150, OS_BEOS, BEOS_GENERIC));

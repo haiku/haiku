@@ -129,8 +129,6 @@ struct tty {
 	int32				ref_count;	// referenced by cookies
 	int32				open_count;
 	int32				opened_count;
-	struct mutex		lock;
-	tty_settings		settings;
 	select_sync_pool*	select_pool;
 	RequestQueue		reader_queue;
 	RequestQueue		writer_queue;
@@ -139,6 +137,8 @@ struct tty {
 	tty_service_func	service_func;
 	uint32				pending_eof;
 	bool				is_master;
+	recursive_lock*		lock;
+	tty_settings		settings;
 	uint8				hardware_bits;
 };
 
@@ -146,7 +146,7 @@ struct tty {
 extern struct mutex gTTYCookieLock;
 extern struct recursive_lock gTTYRequestLock;
 
-extern struct tty *tty_create(tty_service_func func, bool isMaster);
+extern struct tty *tty_create(tty_service_func func, struct tty* masterTTY);
 extern void tty_destroy(struct tty *tty);
 
 extern tty_cookie *tty_create_cookie(struct tty *tty, struct tty *otherTTY,

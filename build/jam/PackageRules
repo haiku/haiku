@@ -99,6 +99,7 @@ rule PreprocessPackageOrRepositoryInfo target : source : architecture
 	#		placeholder substitutions have been performed.
 
 	local defines = HAIKU_PACKAGING_ARCH=$(architecture)
+		HAIKU_PACKAGING_ARCH_$(architecture)
 		HAIKU_$(HAIKU_BUILD_TYPE:U)_BUILD ;
 	local sedReplacements = %HAIKU_PACKAGING_ARCH%,$(architecture) ;
 	if $(secondaryArchitecture) {

@@ -81,7 +81,7 @@ Queries	PartitionList		Consultas
 Force unmount	MainWindow		Forçar desmontagem
 Partition	MainWindow		Partição
 Change parameters	MainWindow		Mudar parâmetros
-Rescan	MainWindow		Reanalisar
+Rescan	MainWindow		Re-analisar
 There was an error acquiring the partition row.	MainWindow		Houve um erro ao obter a linha de partição.
 Failed to initialize the disk %s!\n	MainWindow		Falha ao iniciar o disco %s!\n
 Disk system \"%s\" not found!	MainWindow		Disco do sistema \"%s\" não foi encontrado!
@@ -102,7 +102,7 @@ OK	AbstractParametersPanel		OK
 Virtual	PartitionList		Virtual
 Virtual	DiskView		Virtual
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Deseja aplicar todas as alterações agora?\n\nTodos os dados na partição selecionada serão perdidos pra sempre se continuar!
-Select a partition from the list below.	DiskView		Selecione a partição a partir da lista abaixo.
+Select a partition from the list below.	DiskView		Selecione uma partição a partir da lista abaixo.
 Active	PartitionList		Ativo
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Deseja apagar a partição selecionada?\n\nTodos os dados na partição serão perdidos pra sempre se continuar!
 The partition %s has been successfully formatted.\n	MainWindow		A partição %s foi formatada com sucesso.\n

@@ -1,11 +1,11 @@
-1	catalan; valencian	x-vnd.Haiku-Time	834234238
+1	catalan; valencian	x-vnd.Haiku-Time	3691539601
 OK	Time		D'acord
 Message receiving failed	Time		Ha fallat rebre el missatge.
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Dia i hora, escrita per\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Austràlia
 America	Time		Amèrica
 Reset to default server list	Time		Restableix la llista de servidors predeterminada
 Could not resolve server address	Time		No s'ha pogut resoldre l'adreça del servidor.
+Time & Date	System name		Hora i dia
 Set time zone	Time		Estableix la zona horària
 Waiting for answer failed	Time		Ha fallat esperar la resposta.
 <Other>	Time		<Altres>
@@ -38,7 +38,6 @@ Atlantic	Time		Atlàntic
 Show clock in Deskbar	Time		Mostra el rellotge a la barra d'escriptori
 Display time with seconds	Time		Mostra l'hora amb els segons
 Time	System name		Hora
-about	Time		cap a
 Show time zone	Time		Mostra la zona horària
 Synchronize at boot	Time		Sincronitza-ho a l'arrencada
 Indian	Time		Indi

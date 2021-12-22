@@ -1,17 +1,17 @@
-1	japanese	x-vnd.Haiku-Login	336867745
+1	japanese	x-vnd.Haiku-Login	3568987751
 Invalid login!	Login View		ログインが無効です!
 Error	Login App		エラー
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tLaunch in shelf editting mode to allow customizing the desktop.\n
+Login application for Haiku\nUsage:	Login App		Login application for Haiku\nUsage:
+--nonmodal\tDo not make the window modal	Login App		--nonmodal\tDo not make the window modal
 Welcome to Haiku	Login Window		Haiku へようこそ
 Halt	Login View		停止
-Login application for Haiku\nUsage:\n	Login App		Login application for Haiku\nUsage:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tDo not make the window modal\n
 Desktop	Desktop Window		デスクトップ
 Hide password	Login View		パスワードを隠す
 Reboot	Login View		再起動
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Login アプリケーションの背後のデスクトップをレプリカントをドロップすることでカスタマイズできます。\n\n完了後、アプリケーションを終了してください (Cmd-Q)。
 OK	Login View		OK
 Info	Login App		情報
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tLaunch in shelf editting mode to allow customizing the desktop.
 Login:	Login View		ログイン:
 Password:	Login View		パスワード:
 Unimplemented	Login App		未実装

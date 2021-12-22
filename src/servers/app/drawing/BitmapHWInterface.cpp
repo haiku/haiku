@@ -24,7 +24,7 @@ using std::nothrow;
 
 BitmapHWInterface::BitmapHWInterface(ServerBitmap* bitmap)
 	:
-	HWInterface(false, false),
+	HWInterface(),
 	fBackBuffer(NULL),
 	fFrontBuffer(new(nothrow) BitmapBuffer(bitmap))
 {
@@ -204,9 +204,8 @@ BitmapHWInterface::BackBuffer() const
 bool
 BitmapHWInterface::IsDoubleBuffered() const
 {
-	// overwrite double buffered preference
 	if (fFrontBuffer.IsSet())
 		return fBackBuffer.IsSet();
 
-	return HWInterface::IsDoubleBuffered();
+	return false;
 }

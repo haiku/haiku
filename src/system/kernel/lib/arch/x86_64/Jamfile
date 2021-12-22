@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src system kernel lib arch x86_64 ;
 
 # find the generated asm_offsets.h
-SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
+SubDirHdrs [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_KERNEL_ARCH))
 	system kernel arch $(TARGET_KERNEL_ARCH) ] ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;

@@ -5,6 +5,11 @@ rule FQualifiedBuildFeatureName features
 	# Prepends the name of the current target packaging architecture to the
 	# given feature names.
 
+	if $(features[1]) = "QUALIFIED" {
+		# We have been pre-supplied a qualified name.
+		return $(features[2]) ;
+	}
+
 	return $(TARGET_PACKAGING_ARCH):$(features) ;
 }
 

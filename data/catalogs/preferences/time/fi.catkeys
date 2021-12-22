@@ -1,11 +1,11 @@
-1	finnish	x-vnd.Haiku-Time	834234238
+1	finnish	x-vnd.Haiku-Time	3691539601
 OK	Time		Valmis
 Message receiving failed	Time		Viestin vastaanotto epäonnistui
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, tekijät:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Australia
 America	Time		Amerikka
 Reset to default server list	Time		Nollaa oletuspalvelinluettelo
 Could not resolve server address	Time		Palvelinosoitteen ratkaiseminen epäonnistui
+Time & Date	System name		Aika & Päivämäärä
 Set time zone	Time		Aseta aikavyöhyke
 Waiting for answer failed	Time		Vastauksen odottaminen epäonnistui
 <Other>	Time		<Muut>
@@ -38,7 +38,6 @@ Atlantic	Time		Atlantin valtameri
 Show clock in Deskbar	Time		Näytä kello Työpöytäpalkissa
 Display time with seconds	Time		Näytä aika sekunteina
 Time	System name		Aika-asetukset
-about	Time		Ohjelmasta
 Show time zone	Time		Näytä aikavyöhyke
 Synchronize at boot	Time		Synkronoi käynnistyksen yhteydessä
 Indian	Time		Intia

@@ -201,7 +201,6 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		fCmdCompSem(-1),
 		fStopThreads(false),
 		fRootHub(NULL),
-		fRootHubAddress(0),
 		fPortCount(0),
 		fSlotCount(0),
 		fScratchpadCount(0),
@@ -403,7 +402,6 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	install_io_interrupt_handler(fIRQ, InterruptHandler, (void *)this, 0);
 
 	memset(fPortSpeeds, 0, sizeof(fPortSpeeds));
-	memset(fPortSlots, 0, sizeof(fPortSlots));
 	memset(fDevices, 0, sizeof(fDevices));
 
 	fInitOK = true;
@@ -664,8 +662,7 @@ XHCI::Start()
 		TRACE_ERROR("HCH start up timeout\n");
 	}
 
-	fRootHubAddress = AllocateAddress();
-	fRootHub = new(std::nothrow) XHCIRootHub(RootObject(), fRootHubAddress);
+	fRootHub = new(std::nothrow) XHCIRootHub(RootObject(), 1);
 	if (!fRootHub) {
 		TRACE_ERROR("no memory to allocate root hub\n");
 		return B_NO_MEMORY;
@@ -693,7 +690,7 @@ status_t
 XHCI::SubmitTransfer(Transfer *transfer)
 {
 	// short circuit the root hub
-	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
+	if (transfer->TransferPipe()->DeviceAddress() == 1)
 		return fRootHub->ProcessTransfer(this, transfer);
 
 	TRACE("SubmitTransfer(%p)\n", transfer);
@@ -791,7 +788,7 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 status_t
 XHCI::SubmitNormalRequest(Transfer *transfer)
 {
-	TRACE("SubmitNormalRequest() length %ld\n", transfer->DataLength());
+	TRACE("SubmitNormalRequest() length %ld\n", transfer->FragmentLength());
 
 	Pipe *pipe = transfer->TransferPipe();
 	usb_isochronous_data *isochronousData = transfer->IsochronousData();
@@ -829,7 +826,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	}
 
 	// Now that we know trbSize, compute the count.
-	const int32 trbCount = (transfer->DataLength() + trbSize - 1) / trbSize;
+	const int32 trbCount = (transfer->FragmentLength() + trbSize - 1) / trbSize;
 
 	xhci_td *td = CreateDescriptor(trbCount, trbCount, trbSize);
 	if (td == NULL)
@@ -837,7 +834,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 
 	// Normal Stage
 	const size_t maxPacketSize = pipe->MaxPacketSize();
-	size_t remaining = transfer->DataLength();
+	size_t remaining = transfer->FragmentLength();
 	for (int32 i = 0; i < trbCount; i++) {
 		int32 trbLength = (remaining < trbSize) ? remaining : trbSize;
 		remaining -= trbLength;
@@ -1361,22 +1358,21 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 
 	uint8 slot = XHCI_MAX_SLOTS;
 	if (EnableSlot(&slot) != B_OK) {
-		TRACE_ERROR("AllocateDevice() failed enable slot\n");
+		TRACE_ERROR("AllocateDevice: failed to enable slot\n");
 		return NULL;
 	}
 
 	if (slot == 0 || slot > fSlotCount) {
-		TRACE_ERROR("AllocateDevice() bad slot\n");
+		TRACE_ERROR("AllocateDevice: bad slot\n");
 		return NULL;
 	}
 
 	if (fDevices[slot].slot != 0) {
-		TRACE_ERROR("AllocateDevice() slot already used\n");
+		TRACE_ERROR("AllocateDevice: slot already used\n");
 		return NULL;
 	}
 
 	struct xhci_device *device = &fDevices[slot];
-	memset(device, 0, sizeof(struct xhci_device));
 	device->slot = slot;
 
 	device->input_ctx_area = fStack->AllocateArea((void **)&device->input_ctx,
@@ -1384,30 +1380,35 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		"XHCI input context");
 	if (device->input_ctx_area < B_OK) {
 		TRACE_ERROR("unable to create a input context area\n");
+		CleanupDevice(device);
 		return NULL;
+	}
+	if (fContextSizeShift == 1) {
+		// 64-byte contexts have to be page-aligned in order for
+		// _OffsetContextAddr to function properly.
+		ASSERT((((addr_t)device->input_ctx) % B_PAGE_SIZE) == 0);
 	}
 
 	memset(device->input_ctx, 0, sizeof(*device->input_ctx) << fContextSizeShift);
 	_WriteContext(&device->input_ctx->input.dropFlags, 0);
 	_WriteContext(&device->input_ctx->input.addFlags, 3);
 
-	uint32 route = 0;
-	uint8 routePort = hubPort;
 	uint8 rhPort = hubPort;
+	uint32 route = 0;
 	for (Device *hubDevice = parent; hubDevice != RootObject();
-		hubDevice = (Device *)hubDevice->Parent()) {
-
-		rhPort = routePort;
+			hubDevice = (Device *)hubDevice->Parent()) {
 		if (hubDevice->Parent() == RootObject())
 			break;
-		route *= 16;
-		if (hubPort > 15)
-			route += 15;
-		else
-			route += routePort;
 
-		routePort = hubDevice->HubPort();
+		if (rhPort > 15)
+			rhPort = 15;
+		route = route << 4;
+		route |= rhPort;
+
+		rhPort = hubDevice->HubPort();
 	}
+
+	uint32 dwslot0 = SLOT_0_NUM_ENTRIES(1) | SLOT_0_ROUTE(route);
 
 	// Get speed of port, only if device connected to root hub port
 	// else we have to rely on value reported by the Hub Explore thread
@@ -1416,18 +1417,16 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		TRACE("speed updated %d\n", speed);
 	}
 
-	uint32 dwslot0 = SLOT_0_NUM_ENTRIES(1) | SLOT_0_ROUTE(route);
-
 	// add the speed
 	switch (speed) {
 	case USB_SPEED_LOWSPEED:
 		dwslot0 |= SLOT_0_SPEED(2);
 		break;
-	case USB_SPEED_HIGHSPEED:
-		dwslot0 |= SLOT_0_SPEED(3);
-		break;
 	case USB_SPEED_FULLSPEED:
 		dwslot0 |= SLOT_0_SPEED(1);
+		break;
+	case USB_SPEED_HIGHSPEED:
+		dwslot0 |= SLOT_0_SPEED(3);
 		break;
 	case USB_SPEED_SUPERSPEED:
 		dwslot0 |= SLOT_0_SPEED(4);
@@ -1467,8 +1466,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		"XHCI device context");
 	if (device->device_ctx_area < B_OK) {
 		TRACE_ERROR("unable to create a device context area\n");
-		delete_area(device->input_ctx_area);
-		memset(device, 0, sizeof(xhci_device));
+		CleanupDevice(device);
 		return NULL;
 	}
 	memset(device->device_ctx, 0, sizeof(*device->device_ctx) << fContextSizeShift);
@@ -1478,9 +1476,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 			* XHCI_ENDPOINT_RING_SIZE, "XHCI endpoint trbs");
 	if (device->trb_area < B_OK) {
 		TRACE_ERROR("unable to create a device trbs area\n");
-		delete_area(device->input_ctx_area);
-		delete_area(device->device_ctx_area);
-		memset(device, 0, sizeof(xhci_device));
+		CleanupDevice(device);
 		return NULL;
 	}
 
@@ -1515,20 +1511,14 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	if (ConfigureEndpoint(endpoint0, slot, 0, USB_OBJECT_CONTROL_PIPE, false,
 			0, maxPacketSize, speed, 0, 0) != B_OK) {
 		TRACE_ERROR("unable to configure default control endpoint\n");
-		delete_area(device->input_ctx_area);
-		delete_area(device->device_ctx_area);
-		delete_area(device->trb_area);
-		memset(device, 0, sizeof(xhci_device));
+		CleanupDevice(device);
 		return NULL;
 	}
 
 	// device should get to addressed state (bsr = 0)
 	if (SetAddress(device->input_ctx_addr, false, slot) != B_OK) {
 		TRACE_ERROR("unable to set address\n");
-		delete_area(device->input_ctx_area);
-		delete_area(device->device_ctx_area);
-		delete_area(device->trb_area);
-		memset(device, 0, sizeof(xhci_device));
+		CleanupDevice(device);
 		return NULL;
 	}
 
@@ -1569,10 +1559,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	if (actualLength != 8) {
 		TRACE_ERROR("failed to get the device descriptor: %s\n",
 			strerror(status));
-		delete_area(device->input_ctx_area);
-		delete_area(device->device_ctx_area);
-		delete_area(device->trb_area);
-		memset(device, 0, sizeof(xhci_device));
+		CleanupDevice(device);
 		return NULL;
 	}
 
@@ -1613,10 +1600,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		if (actualLength != sizeof(usb_hub_descriptor)) {
 			TRACE_ERROR("error while getting the hub descriptor: %s\n",
 				strerror(status));
-			delete_area(device->input_ctx_area);
-			delete_area(device->device_ctx_area);
-			delete_area(device->trb_area);
-			memset(device, 0, sizeof(xhci_device));
+			CleanupDevice(device);
 			return NULL;
 		}
 
@@ -1645,10 +1629,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		} else {
 			TRACE_ERROR("device object failed to initialize\n");
 		}
-		delete_area(device->input_ctx_area);
-		delete_area(device->device_ctx_area);
-		delete_area(device->trb_area);
-		memset(device, 0, sizeof(xhci_device));
+		CleanupDevice(device);
 		return NULL;
 	}
 
@@ -1656,31 +1637,41 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	// otherwise happen when this Pipe object is destroyed.
 	pipe.SetControllerCookie(NULL);
 
-	fPortSlots[hubPort] = slot;
 	TRACE("AllocateDevice() port %d slot %d\n", hubPort, slot);
 	return deviceObject;
 }
 
 
 void
-XHCI::FreeDevice(Device *device)
+XHCI::FreeDevice(Device *usbDevice)
 {
-	uint8 hubPort = device->HubPort();
-	uint8 slot = fPortSlots[hubPort];
-	TRACE("FreeDevice() port %d slot %d\n", hubPort, slot);
+	xhci_device* device = (xhci_device*)usbDevice->ControllerCookie();
+	TRACE("FreeDevice() slot %d\n", device->slot);
 
 	// Delete the device first, so it cleans up its pipes and tells us
 	// what we need to destroy before we tear down our internal state.
-	delete device;
+	delete usbDevice;
 
-	DisableSlot(slot);
-	fDcba->baseAddress[slot] = 0;
-	fPortSlots[hubPort] = 0;
-	delete_area(fDevices[slot].trb_area);
-	delete_area(fDevices[slot].input_ctx_area);
-	delete_area(fDevices[slot].device_ctx_area);
+	CleanupDevice(device);
+}
 
-	memset(&fDevices[slot], 0, sizeof(xhci_device));
+
+void
+XHCI::CleanupDevice(xhci_device *device)
+{
+	if (device->slot != 0) {
+		DisableSlot(device->slot);
+		fDcba->baseAddress[device->slot] = 0;
+	}
+
+	if (device->trb_addr != 0)
+		delete_area(device->trb_area);
+	if (device->input_ctx_addr != 0)
+		delete_area(device->input_ctx_area);
+	if (device->device_ctx_addr != 0)
+		delete_area(device->device_ctx_area);
+
+	memset(device, 0, sizeof(xhci_device));
 }
 
 
@@ -1705,10 +1696,13 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 	}
 
 	Device* usbDevice = (Device *)pipe->Parent();
+	if (usbDevice->Parent() == RootObject()) {
+		// root hub needs no initialization
+		return B_OK;
+	}
+
 	struct xhci_device *device = (struct xhci_device *)
 		usbDevice->ControllerCookie();
-	if (usbDevice->Parent() == RootObject())
-		return B_OK;
 	if (device == NULL) {
 		panic("device is NULL\n");
 		return B_NO_INIT;
@@ -1836,15 +1830,20 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	TRACE("link descriptor for pipe\n");
 
 	// Use mutex_trylock first, in case we are in KDL.
-	if (mutex_trylock(&endpoint->lock) != B_OK)
-		mutex_lock(&endpoint->lock);
+	MutexLocker endpointLocker(&endpoint->lock, mutex_trylock(&endpoint->lock) == B_OK);
 
 	// "used" refers to the number of currently linked TDs, not the number of
 	// used TRBs on the ring (we use 2 TRBs on the ring per transfer.)
 	if (endpoint->used >= (XHCI_MAX_TRANSFERS - 1)) {
 		TRACE_ERROR("link descriptor for pipe: max transfers count exceeded\n");
-		mutex_unlock(&endpoint->lock);
 		return B_BAD_VALUE;
+	}
+
+	// We do not support queuing other transfers in tandem with a fragmented one.
+	if (endpoint->td_head != NULL && endpoint->td_head->transfer != NULL
+			&& endpoint->td_head->transfer->IsFragmented()) {
+		TRACE_ERROR("cannot submit transfer: a fragmented transfer is queued\n");
+		return B_DEV_RESOURCE_CONFLICT;
 	}
 
 	endpoint->used++;
@@ -1938,7 +1937,7 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 		B_LENDIAN_TO_HOST_INT32(endpoint->trbs[current].flags));
 
 	endpoint->current = next;
-	mutex_unlock(&endpoint->lock);
+	endpointLocker.Unlock();
 
 	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
 		_ReadContext(&endpoint->device->device_ctx->endpoints[endpoint->id].dwendpoint0),
@@ -2126,14 +2125,14 @@ XHCI::GetPortSpeed(uint8 index, usb_speed* speed)
 	uint32 portStatus = ReadOpReg(XHCI_PORTSC(index));
 
 	switch (PS_SPEED_GET(portStatus)) {
-	case 3:
-		*speed = USB_SPEED_HIGHSPEED;
-		break;
 	case 2:
 		*speed = USB_SPEED_LOWSPEED;
 		break;
 	case 1:
 		*speed = USB_SPEED_FULLSPEED;
+		break;
+	case 3:
+		*speed = USB_SPEED_HIGHSPEED;
 		break;
 	case 4:
 		*speed = USB_SPEED_SUPERSPEED;
@@ -2473,8 +2472,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 	}
 
 	// Use mutex_trylock first, in case we are in KDL.
-	MutexLocker endpointLocker(endpoint->lock,
-		mutex_trylock(&endpoint->lock) == B_OK);
+	MutexLocker endpointLocker(endpoint->lock, mutex_trylock(&endpoint->lock) == B_OK);
 	if (!endpointLocker.IsLocked()) {
 		// We failed to get the lock. Most likely it was destroyed
 		// while we were waiting for it.
@@ -2915,7 +2913,8 @@ XHCI::FinishTransfers()
 			bool directionIn = (transfer->TransferPipe()->Direction() != Pipe::Out);
 
 			status_t callbackStatus = B_OK;
-			switch (td->trb_completion_code) {
+			const uint8 completionCode = td->trb_completion_code;
+			switch (completionCode) {
 				case COMP_SHORT_PACKET:
 				case COMP_SUCCESS:
 					callbackStatus = B_OK;
@@ -2939,18 +2938,19 @@ XHCI::FinishTransfers()
 					break;
 			}
 
-			size_t actualLength = transfer->DataLength();
-			if (td->trb_completion_code != COMP_SUCCESS) {
+			size_t actualLength = transfer->FragmentLength();
+			if (completionCode != COMP_SUCCESS) {
 				actualLength = td->td_transferred;
 				if (td->td_transferred == -1)
-					actualLength = transfer->DataLength() - td->trb_left;
+					actualLength = transfer->FragmentLength() - td->trb_left;
 				TRACE("transfer not successful, actualLength=%" B_PRIuSIZE "\n",
 					actualLength);
 			}
 
 			usb_isochronous_data* isochronousData = transfer->IsochronousData();
 			if (isochronousData != NULL) {
-				size_t packetSize = transfer->DataLength() / isochronousData->packet_count,
+				size_t packetSize = transfer->DataLength()
+						/ isochronousData->packet_count,
 					left = actualLength;
 				for (uint32 i = 0; i < isochronousData->packet_count; i++) {
 					size_t size = min_c(packetSize, left);
@@ -2971,9 +2971,22 @@ XHCI::FinishTransfers()
 					callbackStatus = status;
 				}
 			}
-			transfer->Finished(callbackStatus, actualLength);
-			delete transfer;
+
 			FreeDescriptor(td);
+
+			// this transfer may still have data left
+			transfer->AdvanceByFragment(actualLength);
+			if (completionCode == COMP_SUCCESS
+					&& transfer->FragmentLength() > 0) {
+				TRACE("still %" B_PRIuSIZE " bytes left on transfer\n",
+					transfer->FragmentLength());
+				SubmitTransfer(transfer);
+			} else {
+				// The actualLength was already handled in AdvanceByFragment.
+				transfer->Finished(callbackStatus, 0);
+				delete transfer;
+			}
+
 			mutex_lock(&fFinishedLock);
 		}
 		mutex_unlock(&fFinishedLock);

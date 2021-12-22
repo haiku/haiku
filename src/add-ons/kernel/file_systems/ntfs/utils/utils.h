@@ -101,6 +101,27 @@ int mft_next_record(struct mft_search_ctx *ctx);
 #define MAX_PATH 1024
 #endif
 
+#ifdef HAVE_WINDOWS_H
+/*
+ *	Macroes to hide the needs to translate formats on older Windows
+ */
+#define MAX_FMT 1536
+char *ntfs_utils_reformat(char *out, int sz, const char *fmt);
+char *ntfs_utils_unix_path(const char *in);
+#define ntfs_log_redirect(fn,fi,li,le,d,fmt, args...) \
+		do { char _b[MAX_FMT]; ntfs_log_redirect(fn,fi,li,le,d, \
+		ntfs_utils_reformat(_b,MAX_FMT,fmt), args); } while (0)
+#define printf(fmt, args...) \
+		do { char _b[MAX_FMT]; \
+		printf(ntfs_utils_reformat(_b,MAX_FMT,fmt), args); } while (0)
+#define fprintf(str, fmt, args...) \
+		do { char _b[MAX_FMT]; \
+		fprintf(str, ntfs_utils_reformat(_b,MAX_FMT,fmt), args); } while (0)
+#define vfprintf(file, fmt, args) \
+		do { char _b[MAX_FMT]; vfprintf(file, \
+		ntfs_utils_reformat(_b,MAX_FMT,fmt), args); } while (0)
+#endif
+
 /**
  * linux-ntfs's ntfs_mbstoucs has different semantics, so we emulate it with
  * ntfs-3g's.

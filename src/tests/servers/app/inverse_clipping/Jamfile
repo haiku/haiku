@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src tests servers app inverse_clipping ;
+
+AddSubDirSupportedPlatforms libbe_test ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+
+SimpleTest InverseClipping :
+	main.cpp
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ] ;
+
+if ( $(TARGET_PLATFORM) = libbe_test ) {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : InverseClipping
+		: tests!apps ;
+}
+

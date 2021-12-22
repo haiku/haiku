@@ -37,7 +37,7 @@ GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Direitos autorais © 1994-2009, Thomas G. Lane, Guido Vollbeding. Este software é baseado em parte do trabalho do Grupo Independente JPEG.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador do projeto)\n\n
 BSD (3-clause)	AboutWindow		BSD (3-cláusulas)
-About this system	AboutWindow		Sobre o Haiku
+About this system	AboutWindow		Sobre este sistema
 %d MiB used (%d%%)	AboutView		%d MiB usados (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Direitos autorais © 1999-2010 pelos autores do Gutenprint. Todos os direitos reservados.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Direitos autorais © 1994-1997 Mark Kilgard. Todos os direitos reservados.

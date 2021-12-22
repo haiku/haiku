@@ -16,7 +16,7 @@ BuildPlatformSharedLibrary libbe_build.so :
 
 	libshared_build.a
 
-	z $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	z zstd $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 ;
 
 SubInclude HAIKU_TOP src build libbe app ;

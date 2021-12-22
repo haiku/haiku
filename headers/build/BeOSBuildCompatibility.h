@@ -18,10 +18,6 @@
 typedef unsigned long	haiku_build_addr_t;
 #define addr_t			haiku_build_addr_t
 
-#if defined(HAIKU_HOST_PLATFORM_MSYS)
-#define __addr_t_defined
-#endif
-
 #include <Errors.h>
 
 #include <fcntl.h>

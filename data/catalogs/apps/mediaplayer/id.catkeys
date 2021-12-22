@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-MediaPlayer	1313616492
+1	indonesian	x-vnd.Haiku-MediaPlayer	1961774506
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Hapus Entri ke Sampah
 Close	MediaPlayer-PlaylistWindow		Tutup
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dari klip latar
@@ -35,6 +35,7 @@ Full volume	MediaPlayer-SettingsWindow		Suara penuh
 Start media server	MediaPlayer-Main		Mulai server media
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Tampaknya server media tidak berjalan. \nApakah Anda ingin menjalankannya?
 Location	MediaPlayer-InfoWin		Lokasi
+Opening '%s'.	MediaPlayer-Main		Membuka '%s'.
 Medium	MediaPlayer-SettingsWindow		Medium
 Play mode	MediaPlayer-SettingsWindow		Mode putar
 Playlist	MediaPlayer-PlaylistWindow		Daftar putar

@@ -38,8 +38,11 @@ typedef long                LRESULT;
 typedef	unsigned char		UCHAR;
 
 #define ZeroMemory(POINTER, BYTES) memset(POINTER, 0, BYTES);
+
+#if __GNUC__ == 2
 #define max(a,b)    (((a) > (b)) ? (a) : (b))
 #define min(a,b)    (((a) < (b)) ? (a) : (b))
+#endif
 
 //#define __stdcall
 #define CALLBACK

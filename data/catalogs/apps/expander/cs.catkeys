@@ -6,9 +6,9 @@ Set destination…	ExpanderMenu		Nastavit cíl...
 Use:	ExpanderPreferences		Použití:
 File expanded	ExpanderWindow		Soubor rozbalen
 The destination is read only.	ExpanderWindow		Cíl je určen pouze pro čtení.
-Expander: Open	ExpanderWindow		Expander: Otevřít
+Expander: Open	ExpanderWindow		Rozbalovač: Otevřít
  is not supported	ExpanderWindow		 není podporováno
-Expander settings	ExpanderPreferences		Nastavení Expanderu
+Expander settings	ExpanderPreferences		Nastavení rozbalovače
 Select current	DirectoryFilePanel		Vybrat aktuální
 Source	ExpanderWindow		Zdroj
 Error when expanding archive	ExpanderWindow		Chyba při rozbalování archivu
@@ -26,7 +26,7 @@ Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		C
 Same directory as source (archive) file	ExpanderPreferences		Stejná složka, jako zdrojový soubor (archív)
 Settings	ExpanderMenu		Nastavení
 Settings…	ExpanderMenu		Nastavení...
-Expander: Choose destination	DirectoryFilePanel		Expander: Vybrat cíl
+Expander: Choose destination	DirectoryFilePanel		Rozbalovač: Vybrat cíl
 Select	ExpanderPreferences		Vybrat
 Show contents	ExpanderWindow		Zobrazit obsah
 Automatically show contents listing	ExpanderPreferences		Automaticky zobrazit výpis obsahu

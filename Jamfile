@@ -20,10 +20,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 # Include required packages:
 # primary architecture
 AddHaikuImageSystemPackages [ FFilterByBuildFeatures
-	bash bc coreutils freetype libsolv zlib
+	bash bc freetype libsolv zlib
 
-	!gcc2 @{ icu66 }@
-	gcc2 @{ icu icu66_x86@secondary_x86 }@
+	!gcc2 @{ coreutils icu66 }@
+	gcc2 @{ coreutils_x86 icu icu66_x86@secondary_x86 }@
 	regular_image @{
 		bzip2 diffutils expat ffmpeg findutils glu gutenprint8 gzip
 		lame less libedit libicns
@@ -37,7 +37,10 @@ AddHaikuImageSystemPackages [ FFilterByBuildFeatures
 	}@
 ] ;
 AddHaikuImageSourcePackages [ FFilterByBuildFeatures
-	bash bc coreutils
+	bash bc
+
+	!gcc2 @{ coreutils }@
+	gcc2 @{ coreutils_x86 }@
 
 	regular_image @{
 		expat ffmpeg findutils grep gutenprint8 gzip

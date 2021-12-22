@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3106374143
+1	russian	x-vnd.Haiku-HaikuDepot	3437352458
 Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
 Network error	ServerHelper		Ошибка сети
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
@@ -16,7 +16,6 @@ Starting the package daemon failed:\n\n%Error%	App		Не удалось запу
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Вы успешно авторизовались как пользователь %Nickname%.
 <no info>	PackageInfoView		<нет информации>
 No user ratings available.	PackageInfoView		Рейтинг пользователей недоступен.
-Downloading package '%name%'	WorkStatusView		Загрузка пакета '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Не удалось извлечь необходимую информацию о капче из данных, полученных с сервера.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Произошла ошибка при обмене данными с сервером HaikuDepot: %s
 Rating	PackageListView		Оценка
@@ -28,7 +27,6 @@ This application writes and reads some working files on your computer in order t
 Active	PackageListView		Активирован
 Login or Create account	MainWindow		Войти или создать учетную запись
 <Package contents not available for remote packages>	PackageContentsView		<Содержимое пакетов недоступно для нелокальных пакетов>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural, one{осталось скачать # пакет} few{осталось скачать # пакета} other{осталось скачать# пакетов}}
 Ratings	PackageInfoView		Оценки
 Switch account…	MainWindow		Сменить аккаунт…
 Preferred language:	UserLoginWindow		Предпочитаемый язык:
@@ -113,7 +111,6 @@ This rating is visible to other users	RatePackageWindow		Этот рейтинг
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		При обновлении сведений о пакетах произошла проблема которая может вызвать отображение устаревших данных. Дополнительную информацию можно получить запустив приложение из Терминала.\n
 View agreed usage conditions…	MainWindow		Показать согласованные условия использования…
 Cancel	MainWindow		Отмена
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{( осталось скачать # пакет)}few{( осталось скачать # пакета)}other{( осталось скачать # пакетов)}}
 Refresh repositories	MainWindow		Обновить репозитории
 Continue	App		Продолжить
 A password is required.	UserLoginWindow		Требуется пароль.
@@ -140,8 +137,8 @@ Source packages	MainWindow		Пакеты с исходным кодом
 -	no package size		-
 Problem with working files	App		Проблема с рабочими файлами
 Server error	ServerHelper		Ошибка сервера
-Rate package	RatePackageWindow		Оценить пакет
 Try again	App		Попробовать снова
+Rate package	RatePackageWindow		Оценить пакет
 Unknown	PackageListView		Неизвестно
 I agree to the usage conditions	UserLoginWindow		Я согласен с условиями использования
 Log in	UserLoginWindow		Войти
@@ -149,8 +146,8 @@ Sending anonymous usage data	MainWindow		Отправка анонимных д�
 Logged in as %User%	MainWindow		Выполнен вход под пользователем %User%
 Email address:	UserLoginWindow		Email адрес:
 Screenshot	ScreenshotWindow		Снимок экрана
-A reboot is necessary to complete the installation process.	PackageManager		Для завершения установки требуется перезагрузка.
 HaikuDepot	System name		HaikuDepot
+A reboot is necessary to complete the installation process.	PackageManager		Для завершения установки требуется перезагрузка.
 Yes	MainWindow		Да
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural, one{Мне по крайней мере # год} few{Мне по крайней мере # года или старше} other{Мне по крайней мере # лет или старше}}
 View latest usage conditions…	MainWindow		Показать последние условия использования…

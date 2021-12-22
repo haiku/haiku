@@ -67,7 +67,7 @@ if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 
 # drivers
 AddNewDriversToPackage 				: wmi@x86,x86_64 ;
-AddNewDriversToPackage disk			: nvme_disk@x86,x86_64 ;
+AddNewDriversToPackage disk			: nvme_disk ;
 AddNewDriversToPackage disk mmc		: mmc_disk ;
 AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToPackage disk virtual : virtio_block ram_disk ;
@@ -202,7 +202,7 @@ AddBootModuleSymlinksToPackage
 	ide_isa@x86 isa@x86,x86_64 intel it8211
 	legacy_sata locked_pool
 	mmc mmc_disk
-	nvme_disk@x86,x86_64
+	nvme_disk
 	openpic@ppc
 	packagefs pci
 	fdt@riscv64,arm
@@ -214,7 +214,6 @@ AddBootModuleSymlinksToPackage
 
 # add-ons
 AddFilesToPackage add-ons accelerants	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
-AddFilesToPackage add-ons Translators	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
 AddFilesToPackage add-ons locale catalogs : $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
 
 AddFilesToPackage add-ons mail_daemon inbound_protocols		: POP3
@@ -225,7 +224,6 @@ AddFilesToPackage add-ons mail_daemon inbound_filters
 AddFilesToPackage add-ons mail_daemon outbound_filters		: Fortune ;
 
 AddFilesToPackage add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
-AddFilesToPackage add-ons media plugins : $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
 
 AddFilesToPackage add-ons Network\ Settings
 	: IPv4Interface IPv6Interface DNSClientService Hostname FTPService SSHService
@@ -267,10 +265,6 @@ AddFilesToPackage add-ons disk_systems
 
 # Kernel bluetooth stack
 AddFilesToPackage add-ons kernel bluetooth : $(SYSTEM_BT_STACK) ;
-
-# decorators
-AddFilesToPackage add-ons decorators : BeDecorator ;
-	# MacDecorator WinDecorator
 
 # the MIME DB
 CopyDirectoryToPackage data : <mimedb>mime_db : : : isTarget ;

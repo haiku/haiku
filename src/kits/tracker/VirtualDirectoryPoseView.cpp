@@ -208,14 +208,15 @@ VirtualDirectoryPoseView::_EntryCreated(const BMessage* message)
 		if (directory.SetTo(&nodeRef) != B_OK)
 			return true;
 
-		BPrivate::Storage::LongDirEntry entry;
-		while (directory.GetNextDirents(&entry, sizeof(entry), 1) == 1) {
-			if (strcmp(entry.d_name, ".") != 0
-				&& strcmp(entry.d_name, "..") != 0) {
+		BPrivate::Storage::LongDirEntry longEntry;
+		struct dirent* entry = longEntry.dirent();
+		while (directory.GetNextDirents(entry, sizeof(longEntry), 1) == 1) {
+			if (strcmp(entry->d_name, ".") != 0
+				&& strcmp(entry->d_name, "..") != 0) {
 				_DispatchEntryCreatedOrRemovedMessage(B_ENTRY_CREATED,
-					node_ref(entry.d_dev, entry.d_ino),
-					NotOwningEntryRef(entry.d_pdev, entry.d_pino,
-						entry.d_name),
+					node_ref(entry->d_dev, entry->d_ino),
+					NotOwningEntryRef(entry->d_pdev, entry->d_pino,
+						entry->d_name),
 					NULL, false);
 			}
 		}

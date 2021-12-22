@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src system libroot posix musl math arm64 ;
 
-SubDirCcFlags -Wno-unused-but-set-variable ;
+# std=c11 so __FLT_EVAL_METHOD__ is 0 and not 16:
+# https://gcc.gnu.org/bugzilla//show_bug.cgi?id=100854
+SubDirCcFlags -Wno-unused-but-set-variable -std=c11 ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) .. .. include ] ;
 UseHeaders [ FDirName $(SUBDIR) .. .. internal ] ;
@@ -15,7 +17,7 @@ local generics =
 	atan.c atanf.c atanl.c
 	atanh.c atanhf.c atanhl.c
 	cbrt.c cbrtf.c cbrtl.c
-	ceil.c ceilf.c ceill.c
+	ceill.c
 	copysign.c copysignf.c copysignl.c
 	cos.c cosf.c cosl.c __cosl.c __cos.c __cosdf.c
 	cosh.c coshf.c coshl.c
@@ -28,10 +30,10 @@ local generics =
 	fabsl.c
 	fdim.c fdimf.c fdiml.c
 	finite.c finitef.c
-	floor.c floorf.c floorl.c
+	floorl.c
 	fmal.c
-	fmax.c fmaxf.c fmaxl.c
-	fmin.c fminf.c fminl.c
+	fmaxl.c
+	fminl.c
 	fmod.c fmodf.c fmodl.c
 	frexp.c frexpf.c frexpl.c
 	hypot.c hypotf.c hypotl.c
@@ -40,29 +42,29 @@ local generics =
 	j0.c j0f.c j1.c j1f.c jn.c jnf.c
 	ldexp.c ldexpf.c ldexpl.c
 	lgamma.c lgammaf.c lgammaf_r.c lgammal.c lgamma_r.c
-	llrint.c llrintf.c llrintl.c
-	llround.c llroundf.c llroundl.c
+	llrintl.c
+	llroundl.c
 	log10.c log10f.c log10l.c
 	log1p.c log1pf.c log1pl.c
 	log2.c log2_data.c log2f.c log2f_data.c log2l.c
 	logb.c logbf.c logbl.c
 	log.c log_data.c logf.c logf_data.c logl.c
-	lrint.c lrintf.c lrintl.c
-	lround.c lroundf.c lroundl.c
+	lrintl.c
+	lroundl.c
 	__math_divzero.c __math_divzerof.c __math_invalid.c __math_invalidf.c
 	__math_oflow.c __math_oflowf.c __math_uflow.c __math_uflowf.c
 	__math_xflow.c __math_xflowf.c
 	modf.c modff.c modfl.c
 	nan.c nanf.c nanl.c
-	nearbyint.c nearbyintf.c nearbyintl.c
+	nearbyintl.c
 	nextafter.c nextafterf.c nextafterl.c
 	nexttoward.c nexttowardf.c nexttowardl.c
 	__polevll.c pow.c pow_data.c powf.c powf_data.c powl.c
 	remainder.c remainderf.c remainderl.c
 	__rem_pio2.c __rem_pio2f.c __rem_pio2_large.c __rem_pio2l.c
 	remquo.c remquof.c remquol.c
-	rint.c rintf.c rintl.c
-	round.c roundf.c roundl.c
+	rintl.c
+	roundl.c
 	scalb.c scalbf.c scalbln.c scalblnf.c scalblnl.c scalbn.c scalbnf.c scalbnl.c
 	signgam.c
 	significand.c significandf.c
@@ -74,7 +76,7 @@ local generics =
 	__tan.c tan.c __tandf.c tanf.c  __tanl.c tanl.c
 	tanh.c tanhf.c tanhl.c
 	tgamma.c tgammaf.c tgammal.c
-	trunc.c truncf.c truncl.c
+	truncl.c
 	;
 
 local architectureObject ;
@@ -85,9 +87,21 @@ for architectureObject in [ MultiArchSubDirSetup arm64 ] {
 		UseHeaders [ FDirName $(SUBDIR) .. .. arch $(architecture) ] ;
 
 		MergeObject <$(architecture)>posix_musl_math.o :
+			ceil.c ceilf.c
 			fabs.c fabsf.c
+			floor.c floorf.c
 			fma.c fmaf.c
+			fmax.c fmaxf.c
+			fmin.c fminf.c
+			llrint.c llrintf.c
+			llround.c llroundf.c
+			lrint.c lrintf.c
+			lround.c lroundf.c
+			nearbyint.c nearbyintf.c
+			rint.c rintf.c
+			round.c roundf.c
 			sqrt.c sqrtf.c
+			trunc.c truncf.c
 
 			$(generics)
 			;

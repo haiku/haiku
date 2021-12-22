@@ -23,10 +23,6 @@ KernelAddon fdt :
 	$(libFDTSources)
 	;
 
-BootStaticLibrary boot_fdt :
-	$(libFDTSources)
-	;
-
 KernelStaticLibrary kernel_fdt :
 	$(libFDTSources)
 	;

@@ -98,6 +98,7 @@ void	taskqgroup_config_gtask_deinit(struct grouptask *gtask);
 
 #define	GROUPTASK_INIT(gtask, priority, func, context)	\
 	GTASK_INIT(&(gtask)->gt_task, TASK_SKIP_WAKEUP, priority, func, context)
+#define NET_GROUPTASK_INIT GROUPTASK_INIT
 
 #define	GROUPTASK_ENQUEUE(gtask)			\
 	grouptaskqueue_enqueue((gtask)->gt_taskqueue, &(gtask)->gt_task)

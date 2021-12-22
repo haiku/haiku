@@ -84,9 +84,15 @@ fdt_init(void* fdt)
 void
 fdt_set_kernel_args()
 {
-	gKernelArgs.arch_args.fdt = kernel_args_malloc(fdt_totalsize(gFdt));
+	uint32_t fdtSize = fdt_totalsize(gFdt);
+
+	// libfdt requires 8-byte alignment
+	gKernelArgs.arch_args.fdt = (void*)(addr_t)kernel_args_malloc(fdtSize, 8);
+
 	if (gKernelArgs.arch_args.fdt != NULL) {
-		memcpy(gKernelArgs.arch_args.fdt, gFdt, fdt_totalsize(gFdt));
+		memcpy(gKernelArgs.arch_args.fdt, gFdt, fdtSize);
 	} else
 		panic("unable to malloc for FDT!\n");
+
+	dprintf("FDT getting passed to kernel @ %p\n", (void*)gKernelArgs.arch_args.fdt.Pointer());
 }

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CharacterMap	2410613018
+1	japanese	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		ティルフータ文字
 Miscellaneous mathematical symbols B	UnicodeBlocks		各種数学記号 B
 Latin extended E	UnicodeBlocks		ラテン文字拡張 E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		CJK 統合漢字拡張 C
 Ancient Greek musical notation	UnicodeBlocks		古代ギリシャ記譜法
 Thai	UnicodeBlocks		タイ文字
 Ethiopic supplement	UnicodeBlocks		エチオピア文字補足
+Only show blocks contained in font	CharacterWindow		フォントに含まれるブロックのみ表示
 Chess symbols	UnicodeBlocks		チェス記号
 Yijing hexagram symbols	UnicodeBlocks		易経記号
 Ottoman Siyaq numbers	UnicodeBlocks		オスマン・シヤク数字

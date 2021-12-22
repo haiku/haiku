@@ -592,7 +592,7 @@ list_interface(const char* name)
 					first = false;
 				}
 				putchar(' ');
-				printf(kFlags[i].name);
+				fputs(kFlags[i].name, stdout);
 			}
 		}
 	}

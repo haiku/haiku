@@ -1,5 +1,6 @@
-1	russian	application/x-vnd.Cortex.support	1533238747
+1	russian	application/x-vnd.Cortex.support	136489236
 Header has flags	MediaString		Заголовок имеет флаги
+32 bit HLS	MediaString		32-битный HLS
 Recording	MediaString		Запись
 (unknown format)	MediaString		(неизвестный формат)
 Clean buffers	MediaString		Очистить данные буфера
@@ -21,12 +22,25 @@ BeOS format family	MediaString		Семейство файловых формат
 24 bit HSV	MediaString		24-битный HSV
 32 bit CMY	MediaString		32-битный CMY
 (unknown video format)	MediaString		(неизвестный формат видео)
+AVI format family	MediaString		Семейство файловых форматов AVI
+15 bit RGBA	MediaString		15-битный RGBA
+Drop data	MediaString		Сбросить данные
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Гц
 Right	MediaString		Правый
+32 bit RGB	MediaString		32-битный RGB
+System mixer	MediaString		Системный микшер
 Physical output	MediaString		Физический выход
+YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Сверху вниз, слева направо
+ kb/s	MediaString		 кбит/с
+User-defined media type	MediaString		Медиа-формат определённый пользователем
+32 bit CMYA	MediaString		32-битный CMYA
 QuickTime format family	MediaString		Семейство формата QuickTime
 Any format family	MediaString		Семейство любого формата
 Timecode	MediaString		Временной код
+ kHz	MediaString		 кГц
 (unknown matrix mask)	MediaString		(неизвестная маска матрицы)
 32 bit LAB	MediaString		32-битный LAB
 32 bit CMYK	MediaString		32-битный CMYK
@@ -51,6 +65,7 @@ WAV format family	MediaString		Семейство файловых формат�
  (NTSC)	MediaString		 (NTSC)
 Physical input	MediaString		Физический ввод
 YUV411	MediaString		YUV411
+Encoded audio	MediaString		Аудиокодек
 Decrease precision	MediaString		Уменьшить точность
 File interface	MediaString		Файловый интерфейс
 (unknown byte order)	MediaString		(неизвестный порядок байтов)

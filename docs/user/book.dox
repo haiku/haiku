@@ -37,6 +37,8 @@
 		- The \ref interface is used to create responsive and attractive
 			graphical user interfaces building on the messaging facilities
 			provided by the Application Kit.
+			- A \link interface_intro general introduction \endlink to the
+				Interface Kit.
 			- The \link layout_intro Layout API \endlink is a new addition
 				to the Interface Kit in Haiku which provides resources to
 				layout your application flexibly and easily.
