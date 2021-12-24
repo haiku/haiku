@@ -373,6 +373,9 @@ ActivityWindow::_AddDefaultView()
 			view->AddDataSource(new NetworkUsageDataSource(true));
 			view->AddDataSource(new NetworkUsageDataSource(false));
 			break;
+		case 3:
+			view->AddDataSource(new CPUFrequencyDataSource());
+			break;
 		case 1:
 		default:
 			// Everything beyond that defaults to a CPU usage view

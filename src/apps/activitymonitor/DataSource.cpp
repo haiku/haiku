@@ -25,6 +25,7 @@ const DataSource* kSources[] = {
 	new CachedMemoryDataSource(),
 	new SwapSpaceDataSource(),
 	new PageFaultsDataSource(),
+	new CPUFrequencyDataSource(),
 	new CPUUsageDataSource(),
 	new CPUCombinedUsageDataSource(),
 	new NetworkUsageDataSource(true),
@@ -810,6 +811,149 @@ RunningAppsDataSource::AdaptiveScale() const
 //	#pragma mark -
 
 
+CPUFrequencyDataSource::CPUFrequencyDataSource(int32 cpu)
+{
+	fMinimum = 0;
+	fMaximum = 1000000000ll;
+		// Maximum initially set at 1GHz, will be automatically raised if the actual frequency gets
+		// higher than that
+
+	_SetCPU(cpu);
+}
+
+
+CPUFrequencyDataSource::CPUFrequencyDataSource(const CPUFrequencyDataSource& other)
+	: DataSource(other)
+{
+	fCPU = other.fCPU;
+	fLabel = other.fLabel;
+	fShortLabel = other.fShortLabel;
+}
+
+
+CPUFrequencyDataSource::~CPUFrequencyDataSource()
+{
+}
+
+
+DataSource*
+CPUFrequencyDataSource::Copy() const
+{
+	return new CPUFrequencyDataSource(*this);
+}
+
+
+DataSource*
+CPUFrequencyDataSource::CopyForCPU(int32 cpu) const
+{
+	CPUFrequencyDataSource* copy = new CPUFrequencyDataSource(*this);
+	copy->_SetCPU(cpu);
+
+	return copy;
+}
+
+
+void
+CPUFrequencyDataSource::Print(BString& text, int64 value) const
+{
+	text.SetToFormat("%" PRId64 " MHz", value / 1000000);
+}
+
+
+int64
+CPUFrequencyDataSource::NextValue(SystemInfo& info)
+{
+	int64 value = info.CPUCurrentFrequency(fCPU);
+
+	if (value > fMaximum)
+		SetLimits(0, value);
+
+	return value;
+}
+
+
+const char*
+CPUFrequencyDataSource::Label() const
+{
+	return fLabel.String();
+}
+
+
+const char*
+CPUFrequencyDataSource::ShortLabel() const
+{
+	return fShortLabel.String();
+}
+
+
+const char*
+CPUFrequencyDataSource::InternalName() const
+{
+	return "CPU speed";
+}
+
+
+const char*
+CPUFrequencyDataSource::Name() const
+{
+	return B_TRANSLATE("CPU speed");
+}
+
+
+int32
+CPUFrequencyDataSource::CPU() const
+{
+	return fCPU;
+}
+
+
+bool
+CPUFrequencyDataSource::PerCPU() const
+{
+	return true;
+}
+
+
+bool
+CPUFrequencyDataSource::Primary() const
+{
+	return true;
+}
+
+
+void
+CPUFrequencyDataSource::_SetCPU(int32 cpu)
+{
+	fCPU = cpu;
+
+	if (SystemInfo().CPUCount() > 1) {
+		fLabel.SetToFormat(B_TRANSLATE("CPU %d speed"), cpu + 1);
+		fShortLabel.SetToFormat(B_TRANSLATE("CPU %d"), cpu + 1);
+	} else {
+		fLabel = B_TRANSLATE("CPU usage");
+		fShortLabel = B_TRANSLATE("CPU");
+	}
+
+	const rgb_color kColors[] = {
+		// TODO: find some better defaults...
+		{200, 0, 200},
+		{0, 200, 200},
+		{80, 80, 80},
+		{230, 150, 50},
+		{255, 0, 0},
+		{0, 255, 0},
+		{0, 0, 255},
+		{0, 150, 230}
+	};
+	const uint32 kNumColors = B_COUNT_OF(kColors);
+
+	fColor = kColors[cpu % kNumColors];
+}
+
+
+//	#pragma mark -
+
+
 CPUUsageDataSource::CPUUsageDataSource(int32 cpu)
 	:
 	fPreviousActive(0),
@@ -958,7 +1102,7 @@ CPUUsageDataSource::_SetCPU(int32 cpu)
 		{0, 0, 255},
 		{0, 150, 230}
 	};
-	const uint32 kNumColors = sizeof(kColors) / sizeof(kColors[0]);
+	const uint32 kNumColors = B_COUNT_OF(kColors);
 
 	fColor = kColors[cpu % kNumColors];
 }

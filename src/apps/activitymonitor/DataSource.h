@@ -263,6 +263,36 @@ private:
 };
 
 
+class CPUFrequencyDataSource : public DataSource {
+public:
+						CPUFrequencyDataSource(int32 cpu = 0);
+						CPUFrequencyDataSource(const CPUFrequencyDataSource& other);
+	virtual				~CPUFrequencyDataSource();
+
+	virtual DataSource*	Copy() const;
+	virtual DataSource*	CopyForCPU(int32 cpu) const;
+
+	virtual void		Print(BString& text, int64 value) const;
+	virtual	int64		NextValue(SystemInfo& info);
+
+	virtual const char*	InternalName() const;
+	virtual const char*	Name() const;
+	virtual const char*	Label() const;
+	virtual const char*	ShortLabel() const;
+
+	virtual int32		CPU() const;
+	virtual bool		PerCPU() const;
+	virtual bool		Primary() const;
+
+private:
+			void		_SetCPU(int32 cpu);
+
+	int32				fCPU;
+	BString				fLabel;
+	BString				fShortLabel;
+};
+
+
 class PageFaultsDataSource : public DataSource {
 public:
 						PageFaultsDataSource();
