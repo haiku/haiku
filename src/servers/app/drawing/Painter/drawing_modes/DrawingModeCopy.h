@@ -36,7 +36,7 @@ blend_pixel_copy(int x, int y, const color_type& c, uint8 cover,
 	rgb_color color = pattern->ColorAt(x, y);
 	if (cover == 255) {
 		ASSIGN_COPY(p, color.red, color.green, color.blue, color.alpha);
-	} else {
+	} else if (cover != 0) {
 		rgb_color l = pattern->LowColor();
 		BLEND_COPY(p, color.red, color.green, color.blue, cover,
 				   l.red, l.green, l.blue);
@@ -77,7 +77,7 @@ blend_hline_copy(int x, int y, unsigned len,
 			p32++;
 			x++;
 		} while(--len);
-	} else {
+	} else  if (cover != 0) {
 		uint8* p = buffer->row_ptr(y) + (x << 2);
 		rgb_color l = pattern->LowColor();
 		do {
@@ -103,7 +103,7 @@ blend_solid_hspan_copy(int x, int y, unsigned len,
 		if (*covers) {
 			if (*covers == 255) {
 				ASSIGN_COPY(p, color.red, color.green, color.blue, color.alpha);
-			} else {
+			} else if (*covers != 0) {
 				BLEND_COPY(p, color.red, color.green, color.blue, *covers,
 						   l.red, l.green, l.blue);
 			}
@@ -129,7 +129,7 @@ blend_solid_vspan_copy(int x, int y, unsigned len,
 		if (*covers) {
 			if (*covers == 255) {
 				ASSIGN_COPY(p, color.red, color.green, color.blue, color.alpha);
-			} else {
+			} else if (*covers != 0) {
 				BLEND_COPY(p, color.red, color.green, color.blue, *covers,
 						   l.red, l.green, l.blue);
 			}
@@ -155,7 +155,7 @@ blend_color_hspan_copy(int x, int y, unsigned len, const color_type* colors,
 			if(*covers) {
 				if(*covers == 255) {
 					ASSIGN_COPY(p, colors->r, colors->g, colors->b, colors->a);
-				} else {
+				} else if (*covers != 0) {
 					BLEND_COPY(p, colors->r, colors->g, colors->b, *covers,
 							   l.red, l.green, l.blue);
 				}
@@ -173,7 +173,7 @@ blend_color_hspan_copy(int x, int y, unsigned len, const color_type* colors,
 				++colors;
 			} while(--len);
 		// solid partial opacity
-		} else if (cover) {
+		} else if (cover != 0) {
 			do {
 				BLEND_COPY(p, colors->r, colors->g, colors->b, cover,
 						   l.red, l.green, l.blue);
