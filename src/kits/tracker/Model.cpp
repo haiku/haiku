@@ -599,7 +599,7 @@ Model::FinishSettingUpType()
 	// makes sense to look for a node-based icon. This serves as a hint to the
 	// icon cache, allowing it to not hit the disk again for models that do not
 	// have an icon defined by the node.
-	if (CheckNodeIconHint())
+	if (fBaseType != kLinkNode && !CheckAppIconHint())
 		fIconFrom = kUnknownNotFromNode;
 
 	if (fBaseType != kDirectoryNode
@@ -623,7 +623,7 @@ Model::FinishSettingUpType()
 				if (fPreferredAppName)
 					DeletePreferredAppVolumeNameLinkTo();
 
-				if (*type != '0')
+				if (*type != '\0')
 					fPreferredAppName = strdup(type);
 			}
 		}
@@ -720,11 +720,12 @@ Model::FinishSettingUpType()
 
 
 bool
-Model::CheckNodeIconHint() const
+Model::ShouldUseWellKnownIcon() const
 {
-	return (fBaseType == kDirectoryNode || fBaseType == kVolumeNode
-			|| fBaseType == kTrashNode || fBaseType == kDesktopNode)
-		|| (fBaseType == kExecutableNode && !CheckAppIconHint());
+	if (fBaseType == kDirectoryNode || fBaseType == kVolumeNode
+		|| fBaseType == kTrashNode || fBaseType == kDesktopNode)
+		return !CheckAppIconHint();
+	return false;
 }
 
 
@@ -732,13 +733,24 @@ bool
 Model::CheckAppIconHint() const
 {
 	attr_info info;
-	return fNode != NULL
-		// node is open, and it
-		&& (fNode->GetAttrInfo(kAttrIcon, &info) == B_OK
-		// has a vector icon, or
-			|| (fNode->GetAttrInfo(kAttrMiniIcon, &info) == B_OK
-				&& fNode->GetAttrInfo(kAttrLargeIcon, &info) == B_OK));
-			// has a mini _and_ large icon
+	if (fNode == NULL) {
+		// Node is not open.
+		return false;
+	}
+
+	if (fNode->GetAttrInfo(kAttrIcon, &info) == B_OK) {
+		// Node has a vector icon
+		return true;
+	}
+
+	if (fNode->GetAttrInfo(kAttrMiniIcon, &info) == B_OK
+		&& fNode->GetAttrInfo(kAttrLargeIcon, &info) == B_OK) {
+		// Node has a mini _and_ large icon
+		return true;
+	}
+
+	// If there isn't either of these, we can't use the icon attribute from the node.
+	return false;
 }
 
 
@@ -750,7 +762,7 @@ Model::ResetIconFrom()
 	if (InitCheck() != B_OK)
 		return;
 
-	if (CheckNodeIconHint()) {
+	if (ShouldUseWellKnownIcon()) {
 		BDirectory* directory = dynamic_cast<BDirectory*>(fNode);
 		if (WellKnowEntryList::Match(NodeRef()) > (directory_which)-1) {
 			fIconFrom = kTrackerSupplied;
