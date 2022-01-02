@@ -13,6 +13,7 @@
 #include "radeon_hd.h"
 #include "sensors.h"
 
+#include "atombios/atombios.h"
 #include "driver.h"
 #include "utility.h"
 
@@ -21,6 +22,7 @@
 #include <string.h>
 #include <errno.h>
 
+#include <ACPI.h>
 #include <AreaKeeper.h>
 #include <boot_item.h>
 #include <driver_settings.h>
@@ -39,6 +41,89 @@
 
 
 //	#pragma mark -
+
+
+status_t
+mapAtomBIOSACPI(radeon_info &info, uint32& romSize)
+{
+	TRACE("%s: seeking AtomBIOS from ACPI\n", __func__);
+
+	uint8* rom;
+	acpi_module_info* acpiModule;
+
+	status_t status = get_module(B_ACPI_MODULE_NAME, (module_info**)&acpiModule);
+	if (status < B_OK)
+		return status;
+
+	UEFI_ACPI_VFCT* vfct;
+	GOP_VBIOS_CONTENT* vbios;
+	VFCT_IMAGE_HEADER* vhdr;
+	status = acpiModule->get_table("VFCT", 0, (void**)&vfct);
+	if (status != B_OK) {
+		put_module(B_ACPI_MODULE_NAME);
+		return status;
+	}
+
+	vbios = (GOP_VBIOS_CONTENT*)((char*)vfct + vfct->VBIOSImageOffset);
+	vhdr = &vbios->VbiosHeader;
+	TRACE("%s: ACPI VFCT contains a BIOS for: %x:%x:%d %04x:%04x\n", __func__,
+		vhdr->PCIBus, vhdr->PCIDevice, vhdr->PCIFunction, vhdr->VendorID, vhdr->DeviceID);
+
+	if (info.pci->vendor_id != vhdr->VendorID || info.pci->device_id != vhdr->DeviceID
+		|| info.pci->bus != vhdr->PCIBus || info.pci->device != vhdr->PCIDevice
+		|| info.pci->function != vhdr->PCIFunction) {
+		TRACE("%s: not valid AtomBIOS rom for current device\n", __func__);
+		put_module(B_ACPI_MODULE_NAME);
+		return B_ERROR;
+	}
+
+	rom = vbios->VbiosContent;
+	romSize = vhdr->ImageLength;
+	// see if valid AtomBIOS rom
+	uint16 romHeader = RADEON_BIOS16(rom, 0x48);
+	bool romValid = !memcmp(&rom[romHeader + 4], "ATOM", 4)
+		|| !memcmp(&rom[romHeader + 4], "MOTA", 4);
+
+	if (romValid == false) {
+		TRACE("%s: not valid AtomBIOS rom at ACPI\n", __func__);
+		put_module(B_ACPI_MODULE_NAME);
+		return B_ERROR;
+	}
+
+	uint32 areaSize = ROUNDUP(romSize, 1 << 16);
+	info.rom_area = create_area("radeon hd AtomBIOS",
+		(void**)&info.atom_buffer, B_ANY_KERNEL_ADDRESS,
+		areaSize, B_NO_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA);
+
+	if (info.rom_area < 0) {
+		ERROR("%s: unable to map kernel AtomBIOS space!\n",
+			__func__);
+		put_module(B_ACPI_MODULE_NAME);
+		return B_NO_MEMORY;
+	}
+
+	memset((void*)info.atom_buffer, 0, areaSize);
+		// Prevent unknown code execution by AtomBIOS parser
+	memcpy(info.atom_buffer, (void*)rom, romSize);
+		// Copy AtomBIOS to kernel area
+
+	// validate copied rom is valid
+	romHeader = RADEON_BIOS16(info.atom_buffer, 0x48);
+	romValid = !memcmp(&info.atom_buffer[romHeader + 4], "ATOM", 4)
+		|| !memcmp(&info.atom_buffer[romHeader + 4], "MOTA", 4);
+
+	if (romValid == true) {
+		set_area_protection(info.rom_area,
+			B_KERNEL_READ_AREA | B_CLONEABLE_AREA);
+		ERROR("%s: AtomBIOS verified and locked (%u)\n", __func__, romSize);
+	} else
+		ERROR("%s: AtomBIOS memcpy failed!\n", __func__);
+
+	put_module(B_ACPI_MODULE_NAME);
+
+	return romValid ? B_OK : B_ERROR;
+}
 
 
 status_t
@@ -132,8 +217,8 @@ radeon_hd_getbios(radeon_info &info)
 	for (romMethod = 0; romMethod < 3; romMethod++) {
 		switch(romMethod) {
 			case 0:
-				// TODO: *** New ACPI method
-				ERROR("%s: ACPI ATRM AtomBIOS TODO\n", __func__);
+				// *** ACPI method, VFCT table
+				mapResult = mapAtomBIOSACPI(info, romSize);
 				break;
 			case 1:
 				// *** Discreet card on IGP, check PCI BAR 0
