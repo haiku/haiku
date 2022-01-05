@@ -42,6 +42,8 @@ RemotePackageRepository HaikuPorts
 	python-3.9.1-1
 	sed-4.2.1-1
 	texinfo-4.13a-1
+	zstd-1.5.0-2
+	zstd_devel-1.5.0-2
 	zlib-1.2.11-1
 	zlib_devel-1.2.11-1
 	:
