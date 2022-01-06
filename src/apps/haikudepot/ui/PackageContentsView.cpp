@@ -1,6 +1,6 @@
 /*
  * Copyright 2015, TigerKid001.
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2020-2022, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -21,6 +21,7 @@
 #include <StringFormat.h>
 #include <StringItem.h>
 
+#include "GeneralContentScrollView.h"
 #include "Logger.h"
 
 #include <package/PackageDefs.h>
@@ -41,40 +42,6 @@ using BPackageKit::BHPKG::BPackageReader;
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PackageContentsView"
 
-
-//! Layouts the scrollbar so it looks nice with no border and the document
-// window look.
-class CustomScrollView : public BScrollView {
-public:
-	CustomScrollView(const char* name, BView* target)
-		:
-		BScrollView(name, target, 0, false, true, B_NO_BORDER)
-	{
-	}
-
-	virtual void DoLayout()
-	{
-		BRect innerFrame = Bounds();
-		innerFrame.right -= B_V_SCROLL_BAR_WIDTH + 1;
-
-		BView* target = Target();
-		if (target != NULL) {
-			Target()->MoveTo(innerFrame.left, innerFrame.top);
-			Target()->ResizeTo(innerFrame.Width(), innerFrame.Height());
-		}
-
-		BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
-		if (scrollBar != NULL) {
-			BRect rect = innerFrame;
-			rect.left = rect.right + 1;
-			rect.right = rect.left + B_V_SCROLL_BAR_WIDTH;
-			rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-
-			scrollBar->MoveTo(rect.left, rect.top);
-			scrollBar->ResizeTo(rect.Width(), rect.Height());
-		}
-	}
-};
 
 // #pragma mark - PackageEntryItem
 
@@ -237,8 +204,8 @@ PackageContentsView::PackageContentsView(const char* name)
 	fContentListView = new BOutlineListView("content list view",
 		B_SINGLE_SELECTION_LIST);
 
-	BScrollView* scrollView = new CustomScrollView("contents scroll view",
-		fContentListView);
+	BScrollView* scrollView = new GeneralContentScrollView(
+		"contents scroll view", fContentListView);
 
 	BLayoutBuilder::Group<>(this)
 		.Add(scrollView, 1.0f)

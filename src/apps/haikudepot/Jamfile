@@ -122,6 +122,7 @@ local applicationSources =
 	DeskbarLink.cpp
 	FeaturedPackagesView.cpp
 	FilterView.cpp
+	GeneralContentScrollView.cpp
 	IconTarPtr.cpp
 	IncrementViewCounterProcess.cpp
 	JobStateListener.cpp
