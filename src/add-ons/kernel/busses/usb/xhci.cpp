@@ -1532,6 +1532,9 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		ENDPOINT_0_STATE_GET(_ReadContext(
 			&device->device_ctx->endpoints[0].dwendpoint0)));
 
+	// Wait a bit for the device to complete addressing
+	snooze(USB_DELAY_SET_ADDRESS);
+
 	// Create a temporary pipe with the new address
 	ControlPipe pipe(parent);
 	pipe.SetControllerCookie(endpoint0);
