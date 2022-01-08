@@ -46,6 +46,9 @@ FUNCTION(arch_enter_kernel):
 	// set TTBR0
 	MCR p15, 0, r5, c2, c0, 0
 
+	// initialize TTBCR to zero (no LPAE, use only TTBR0)
+	MCR p15, 0, r1, c2, c0, 2
+
 	// flush TLB (again)
 	MCR p15, 0, r1, c8, c7, 0
 
