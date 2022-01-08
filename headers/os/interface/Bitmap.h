@@ -112,7 +112,7 @@ public:
 			void				SetBits(const void* data, int32 length,
 									int32 offset, color_space colorSpace);
 
-public:
+private:
 			status_t			ImportBits(const void* data, int32 length,
 									int32 bpr, color_space colorSpace,
 									BPoint from, BPoint to, int32 width, int32 height);
