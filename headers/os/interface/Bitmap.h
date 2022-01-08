@@ -79,20 +79,15 @@ public:
 			status_t			SetDrawingFlags(uint32 flags);
 			uint32				Flags() const;
 
-			void				SetBits(const void* data, int32 length,
-									int32 offset, color_space colorSpace);
-
-	// not part of the R5 API
 			status_t			ImportBits(const void* data, int32 length,
 									int32 bpr, int32 offset,
 									color_space colorSpace);
 			status_t			ImportBits(const void* data, int32 length,
 									int32 bpr, color_space colorSpace,
-									BPoint from, BPoint to, int32 width,
-									int32 height);
+									BPoint from, BPoint to, BSize size);
 			status_t			ImportBits(const BBitmap* bitmap);
 			status_t			ImportBits(const BBitmap* bitmap, BPoint from,
-									BPoint to, int32 width, int32 height);
+									BPoint to, BSize size);
 
 			status_t			GetOverlayRestrictions(
 									overlay_restrictions* restrictions) const;
@@ -111,6 +106,19 @@ public:
 			BBitmap&			operator=(const BBitmap& source);
 
 	class Private;
+
+public:
+	// deprecated
+			void				SetBits(const void* data, int32 length,
+									int32 offset, color_space colorSpace);
+
+public:
+			status_t			ImportBits(const void* data, int32 length,
+									int32 bpr, color_space colorSpace,
+									BPoint from, BPoint to, int32 width, int32 height);
+			status_t			ImportBits(const BBitmap* bitmap, BPoint from,
+									BPoint to, int32 width, int32 height);
+
 private:
 	friend class BView;
 	friend class BApplication;
