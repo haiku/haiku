@@ -2485,7 +2485,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 	const uint8 completionCode = TRB_2_COMP_CODE_GET(trb->status);
 	int32 transferred = TRB_2_REM_GET(trb->status), remainder = -1;
 
-	TRACE("HandleTransferComplete: ed %d, code %d, transferred %d\n",
+	TRACE("HandleTransferComplete: ed %" B_PRIu32 ", code %" B_PRIu8 ", transferred %" B_PRId32 "\n",
 		  (flags & TRB_3_EVENT_DATA_BIT), completionCode, transferred);
 
 	if ((flags & TRB_3_EVENT_DATA_BIT) == 0) {
