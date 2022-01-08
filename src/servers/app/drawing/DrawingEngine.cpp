@@ -1505,7 +1505,7 @@ DrawingEngine::ReadBitmap(ServerBitmap* bitmap, bool drawCursor, BRect bounds)
 		cursorArea.ImportBits(bitmap->Bits(), bitmap->BitsLength(),
 			bitmap->BytesPerRow(), bitmap->ColorSpace(),
 			cursorPosition,	BPoint(0, 0),
-			cursorWidth, cursorHeight);
+			cursorArea.Bounds().Size());
 
 		uint8* bits = (uint8*)cursorArea.Bits();
 		uint8* cursorBits = (uint8*)cursor->Bits();

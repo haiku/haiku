@@ -734,7 +734,7 @@ private:
 				fCurrentIconBitmap->ImportBits(sourceBitmap,
 					BPoint(0, fCurrentAnimationRow),
 					BPoint(0, fCurrentAnimationRow),
-					sourceBitmap->Bounds().IntegerWidth(), 1);
+					BSize(sourceBitmap->Bounds().IntegerWidth() - 1, 0));
 
 				fCurrentAnimationRow--;
 
