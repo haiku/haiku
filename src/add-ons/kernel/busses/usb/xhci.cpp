@@ -1357,8 +1357,9 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		hubPort, speed);
 
 	uint8 slot = XHCI_MAX_SLOTS;
-	if (EnableSlot(&slot) != B_OK) {
-		TRACE_ERROR("AllocateDevice: failed to enable slot\n");
+	status_t status = EnableSlot(&slot);
+	if (status != B_OK) {
+		TRACE_ERROR("failed to enable slot: %s\n", strerror(status));
 		return NULL;
 	}
 
@@ -1516,8 +1517,9 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	}
 
 	// device should get to addressed state (bsr = 0)
-	if (SetAddress(device->input_ctx_addr, false, slot) != B_OK) {
-		TRACE_ERROR("unable to set address\n");
+	status = SetAddress(device->input_ctx_addr, false, slot);
+	if (status != B_OK) {
+		TRACE_ERROR("unable to set address: %s\n", strerror(status));
 		CleanupDevice(device);
 		return NULL;
 	}
@@ -1549,7 +1551,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	usb_device_descriptor deviceDescriptor;
 
 	TRACE("getting the device descriptor\n");
-	status_t status = pipe.SendRequest(
+	status = pipe.SendRequest(
 		USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD,		// type
 		USB_REQUEST_GET_DESCRIPTOR,							// request
 		USB_DESCRIPTOR_DEVICE << 8,							// value
