@@ -1,9 +1,6 @@
-1	ukrainian	x-vnd.Haiku-MatchHeader	1946584206
+1	ukrainian	x-vnd.Haiku-MatchHeader	631274947
 Delete message	ConfigView		Видалити повідомлення
-Match \"%attribute\" against \"%regex\"	RuleFilter		Зіставити \"%attribute\" з \"%regex\"
-Match header	RuleFilter		Співпадаючий заголовок
 Set flags to	ConfigView		Встановити прапори до
-Header field (e.g. Subject, From, …)	ConfigView		Поле заголовка (наприклад: Тема, Від, …)
 <Choose account>	ConfigView		<Вибрати обліковий запис>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Значення підстановки, як \"*spam*\".\nПрефікс з\"REGEX:\" у випадку вживання регулярних виразів.
 Then	ConfigView		Тоді

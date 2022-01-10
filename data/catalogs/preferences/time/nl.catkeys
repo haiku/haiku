@@ -1,47 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-Time	2069485065
-OK	Time		Oké
+1	dutch; flemish	x-vnd.Haiku-Time	3879356774
 Message receiving failed	Time		Ontvangen van het bericht mislukt
-Australia	Time		Australië
-America	Time		Amerika
-Reset to default server list	Time		Herstel standaard-serverlijst
-Could not resolve server address	Time		Het serveradres opzoeken is mislukt
-Set time zone	Time		Tijdzone instellen
 Waiting for answer failed	Time		Wachten op antwoord mislukt
-<Other>	Time		<Anders>
 Received invalid time	Time		Ongeldige tijd ontvangen
-Remove	Time		Verwijderen
-Synchronize again	Time		Opnieuw synchroniseren
-Asia	Time		Azië
-Try all servers	Time		Alle servers proberen
-Time	Time		Tijd
-Current time:	Time		Huidige tijd:
-The following error occured while synchronizing:\n%s: %s	Time		Er was een fout tijdens het synchroniseren:\n%s: %s
-Europe	Time		Europa
-Show day of week	Time		Dag van de week tonen
-Local time (Windows compatible)	Time		Lokale tijd (Windowscompatibel)
-Hardware clock set to:	Time		Hardwareklok ingesteld op:
-Arctic	Time		Arctica
-Antarctica	Time		Antarctica
-GMT (UNIX compatible)	Time		GMT (UNIX-compatibel)
-Africa	Time		Afrika
-Stop	Time		Stoppen
-Time zone	Time		Tijdzone
-Clock	Time		Klok
-Network time	Time		Netwerktijd
 Sending request failed	Time		Het verzenden van het verzoek is mislukt
-Preview time:	Time		Voorvertoning tijd:
-\nNow: 	Time		\nNu:
 Could not create socket	Time		De socket kon niet aangemaakt worden
-Pacific	Time		Pacific
-Atlantic	Time		Atlantic
-Show clock in Deskbar	Time		Klok in Deskbar tonen
-Display time with seconds	Time		Tijd met seconden tonen
-Time	System name		Tijd
-Show time zone	Time		Tijdzone tonen
-Synchronize at boot	Time		Synchroniseren bij het opstarten
-Indian	Time		Indisch
-Revert	Time		Ongedaan maken
-Date and time	Time		Datum en tijd
-The following error occured while synchronizing:\n%s	Time		Er was een fout tijdens het synchroniseren:\n%s
-Synchronize	Time		Synchroniseren
-Add	Time		Toevoegen 
+Could not resolve server address	Time		Het serveradres opzoeken is mislukt

@@ -1,16 +1,15 @@
-1	japanese	x-vnd.Haiku-TGATranslator	3075011211
-Save with RLE compression	TGAView		保存時に RLE 圧縮を行う
-Targa image (%d bits truecolor)	TGATranslator		Targa イメージ (%d ビット トゥルーカラー)
-Ignore TGA alpha channel	TGAView		TGA のαチャンネルを無視
-Targa image (%d bits colormap)	TGATranslator		Targa イメージ (%d ビット カラーマップ)
-TGA image translator	TGAView		TGA イメージトランスレーター
-Targa image (%d bits RLE colormap)	TGATranslator		Targa イメージ (%d ビット RLE カラーマップ)
-Targa image (%d bits gray)	TGATranslator		Targa イメージ (%d ビット グレー)
-Written by the Haiku Translation Kit Team	TGAView		Haiku トランスレーターキットチーム作
-Targa image (%d bits RLE truecolor)	TGATranslator		Targa イメージ (%d ビット RLE トゥルーカラー)
-TGA images	TGATranslator		TGA イメージ
+1	japanese	x-vnd.Haiku-TGATranslator	1299281918
 Version %d.%d.%d, %s	TGAView		バージョン %d.%d.%d, %s
 TGATranslator Settings	TGATranslator		TGA トランスレーター設定
+Targa image (%d bits RLE truecolor)	TGATranslator		Targa イメージ (%d ビット RLE トゥルーカラー)
+Save with RLE compression	TGAView		保存時に RLE 圧縮を行う
+Targa image (%d bits RLE colormap)	TGATranslator		Targa イメージ (%d ビット RLE カラーマップ)
+Written by the Haiku Translation Kit Team	TGAView		Haiku トランスレーターキットチーム作
+Targa image (%d bits colormap)	TGATranslator		Targa イメージ (%d ビット カラーマップ)
+Ignore TGA alpha channel	TGAView		TGA のαチャンネルを無視
 TGA image translator	TGATranslator		TGA イメージトランスレーター
+TGA images	TGATranslator		TGA イメージ
+Targa image (%d bits gray)	TGATranslator		Targa イメージ (%d ビット グレー)
+TGA image translator	TGAView		TGA イメージトランスレーター
 Targa image (%d bits RLE gray)	TGATranslator		Targa イメージ (%d ビット RLE グレー)
-TGA Settings	TGAMain		TGA 設定
+Targa image (%d bits truecolor)	TGATranslator		Targa イメージ (%d ビット トゥルーカラー)

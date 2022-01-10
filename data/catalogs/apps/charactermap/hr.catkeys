@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-CharacterMap	2269593206
+1	croatian	x-vnd.Haiku-CharacterMap	2489301076
 Miscellaneous mathematical symbols B	UnicodeBlocks		Ostali matematički simboli B
 Arabic supplement	UnicodeBlocks		Arapski nadomjestak
 Ogham	UnicodeBlocks		Ogham
@@ -11,16 +11,13 @@ Cuneiform numbers and punctuation	UnicodeBlocks		Brojevi i iterpunkcija klinasto
 Miscellaneous symbols	UnicodeBlocks		Ostali simboli
 Vertical forms	UnicodeBlocks		Okomite forme
 Miscellaneous mathematical symbols A	UnicodeBlocks		Ostali matematički simboli A
-CharacterMap	System name		Karta znakova
 Latin extended D	UnicodeBlocks		Latinični prošireni D
 Aegean numbers	UnicodeBlocks		Aegean brojevi
-View	CharacterWindow		Pogled
 Cham	UnicodeBlocks		Cham
 Cyrillic	UnicodeBlocks		Ćirilićno
 Ancient Greek musical notation	UnicodeBlocks		Drevna grčka glazbena notacija
 Thai	UnicodeBlocks		Tajlandski
 Yijing hexagram symbols	UnicodeBlocks		Yijing heksagramski simboli
-File	CharacterWindow		Datoteka
 Myanmar	UnicodeBlocks		Mijanmarski
 Musical symbols	UnicodeBlocks		Glazbeni simboli
 Arabic presentation forms B	UnicodeBlocks		Arapske prezentacijske forme B
@@ -34,14 +31,12 @@ CJK compatibility forms	UnicodeBlocks		Kin./jap./kor. obrasci kompatibilnosti
 Old Hungarian	UnicodeBlocks		Staromađarski
 CJK unified ideographs extension B	UnicodeBlocks		CJK ujedinjeni ideografi proširenje B
 Arabic presentation forms A	UnicodeBlocks		Arapske prezentacijske forme A
-Filter:	CharacterWindow		Filter:
 Kannada	UnicodeBlocks		Kanada
 Lydian	UnicodeBlocks		Likijski
 Gurmukhi	UnicodeBlocks		Gurmuki
 Supplemental arrows B	UnicodeBlocks		Dodatne strelice B
 Latin extended B	UnicodeBlocks		Latinični prošireni B
 Phonetic extensions	UnicodeBlocks		Fonetička proširenja
-Code	CharacterWindow		Kod
 Mahjong tiles	UnicodeBlocks		Mahjong pločice
 Gothic	UnicodeBlocks		Gotički
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
@@ -62,7 +57,6 @@ Number forms	UnicodeBlocks		Forme brojeva
 Latin extended A	UnicodeBlocks		Latinični prošireni-A
 Sundanese	UnicodeBlocks		Sudanski
 Geometric shapes	UnicodeBlocks		Geometrijski oblici
-Clear	CharacterWindow		Očisti
 Arabic	UnicodeBlocks		Arapski
 Khmer symbols	UnicodeBlocks		Kmerski simboli
 Vai	UnicodeBlocks		Vai
@@ -73,7 +67,6 @@ Lao	UnicodeBlocks		Lao
 Tamil	UnicodeBlocks		Tamilski
 Greek extended	UnicodeBlocks		Grčki prošireni
 Old italic	UnicodeBlocks		Staroitalski
-Quit	CharacterWindow		Isključi
 Buhid	UnicodeBlocks		Buhid
 Cuneiform	UnicodeBlocks		Klinasto pismo
 Alphabetic presentation forms	UnicodeBlocks		Oblici abecednog prikaza
@@ -107,8 +100,6 @@ Tai Xuan Jing symbols	UnicodeBlocks		Tai Xuan Jing simboli
 Hiragana	UnicodeBlocks		Hiragana
 Tagbanwa	UnicodeBlocks		Tagbanwa
 Greek and Coptic	UnicodeBlocks		Grčki i koptski
-Copy character	CharacterView		Kopiraj znak
-Font	CharacterWindow		Font
 Braille patterns	UnicodeBlocks		Brajlovi uzorci
 Thaana	UnicodeBlocks		Thaana
 Ethiopic	UnicodeBlocks		Etiopski

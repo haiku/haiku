@@ -1,34 +1,3 @@
-1	friulian	x-vnd.Haiku-Notifications	4196496676
-Lower left	GeneralView		In bas a çampe
-Application does not have a valid signature	NotificationView	Alert message	La aplicazion no à une firme valide
-Status	NotificationView		Stât
-Add…	NotificationView		Zonte…
-Lower right	GeneralView		In bas a diestre
-Muted	NotificationView		Cidinât
- is already listed	NotificationView	Alert message	 al è za listât
-OK	PrefletWin		Va ben
-Notifications	PrefletWin		Notifichis
-Notifications preflet sample	PrefletWin		Esempli di notifiche preflet
-Mute notifications from this application	NotificationView		Cidine lis notifichis di cheste aplicazion
-wide	GeneralView	Window width: Slider high text	larc
-narrow	GeneralView	Window width: Slider low text	stret
-Revert	PrefletWin		Torne indaûr
-Applications	PrefletView		Aplicazions
-{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Timeout: # secont}other{Timeout: # seconts}}
-Upper right	GeneralView		In alt a diestre
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Si è verificât un erôr intal salvâ lis preferencis.\nAl è facil che il spazi disponibil al stedi par finî.
-Defaults	PrefletWin		Predefinîts
-Upper left	GeneralView		In alt a çampe
-Window width	GeneralView		Largjece dal barcon
-Applications	NotificationView		Aplicazions
+1	friulian	x-vnd.Haiku-Notifications	1522084233
 General	PrefletView		Gjenerâl
-OK	NotificationView		Va ben
-Follow Deskbar	GeneralView		Seguìs il Deskbar
-Notifications	System name		Notifichis
-Allowed	NotificationView		Permetût
-Duration:	GeneralView		Durade:
-Application	NotificationView		Aplicazion
-Enable notifications	GeneralView		Abilite notifichis
-This is a test notification message	PrefletWin		Chest al è un messaç di notifiche di prove
-Remove	NotificationView		Gjave
-Position:	GeneralView		Posizion:
+Applications	PrefletView		Aplicazions

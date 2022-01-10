@@ -1,16 +1,11 @@
-1	belarusian	x-vnd.Haiku-Login	1085637210
+1	belarusian	x-vnd.Haiku-Login	3025604784
 Invalid login!	Login View		Няправiльны лагiн!
-Error	Login App		Памылка
+OK	Login View		Так
 Welcome to Haiku	Login Window		Haiku вiтае Вас
+Login:	Login View		Лагiн:
+Password:	Login View		Пароль:
 Halt	Login View		Спынiць
 Desktop	Desktop Window		Працоўны стол
 Hide password	Login View		Схаваць пароль
 Reboot	Login View		Перазагрузка
-OK	Login View		Так
-Info	Login App		Iнфармацыя
-Login:	Login View		Лагiн:
-Password:	Login View		Пароль:
-Unimplemented	Login App		Магчымасьць не рэалізаваная
-OK	Login App		Так
-Error: %1	Login App		Памылка: %1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	памылка %s\n

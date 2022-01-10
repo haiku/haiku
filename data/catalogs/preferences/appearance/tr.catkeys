@@ -1,79 +1,39 @@
-1	turkish	x-vnd.Haiku-Appearance	663472720
+1	turkish	x-vnd.Haiku-Appearance	2170377510
 Control border	Colors tab		Denetim kenarlığı
+Failure	Colors tab		Başarısız
 Control mark	Colors tab		Denetim imi
-Off	AntialiasingSettingsView		Kapalı
 Window border	Colors tab		Pencere kenarlığı
 Inactive window tab	Colors tab		Etkin olmayan pencere sekmesi
-Defaults	APRWindow		Öntanımlılar
 Shadow	Colors tab		Gölge
-Document background	Colors tab		Belge arka planı
-List background	Colors tab		Liste arka planı
-No effect on running applications	DecorSettingsView		Çalışan uygulamalar üzerinde etkisiz
-Fixed font:	Font view		Sabit yazıtipi:
-Appearance	System name		Görünüm
-Reduce colored edges filter strength:	AntialiasingSettingsView		Renklendirilmiş uç ışıma düzeyi:
-Glyph hinting:	AntialiasingSettingsView		Glif düzgünleştirme:
-Default Haiku ControlLook	DecorSettingsView		Öntanımlı Haiku Görünüm Denetimcisi
-Menu item text	Colors tab		Menü ögesi metni
-About decorator	DecorSettingsView		Dekorcu hakkında
-Antialiasing menu	AntialiasingSettingsView		Yumuşatma menüsü
-Success	Colors tab		Başarılı
-About	DecorSettingsView		Hakkında
-Shine	Colors tab		Parla
-Arrow style	DecorSettingsView		Ok biçemi
-On	AntialiasingSettingsView		Açık
-Decorator:	DecorSettingsView		Dekorcu:
-Menu background	Colors tab		Menü arka planı
-Revert	APRWindow		Eski haline döndür
-List item text	Colors tab		Liste ögesi metni
-OK	DecorSettingsView		Tamam
-Control text	Colors tab		Denetim metni
-Look and feel	APRWindow		Görünüm ve his
-Selected menu item background	Colors tab		Seçili menü ögesi arka planı
-Link active	Colors tab		Etkin bağlantı
-Antialiasing	APRWindow		Kenar yumuşatma
-Menu font:	Font view		Menü yazıtipi:
-Bold font:	Font view		Kalın yazıtipi:
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nYazarlar:\n\t%decorAuthors\n\nURL: %decorURL\nLisans: %decorLic\n\n%decorDesc\n
-Choose Decorator	DecorSettingsView		Dekorcu seç
-Strong	AntialiasingSettingsView		Güçlü
-Failure	Colors tab		Başarısız
-Double:	DecorSettingsView		Çift:
 Selected menu item text	Colors tab		Seçili menü ögesi metni
-Size:	Font Selection view		Boyut:
+Document background	Colors tab		Belge arka planı
 Panel background	Colors tab		Panel arka planı
-Plain font:	Font view		Düz yazı tipi:
+List background	Colors tab		Liste arka planı
 Window tab text	Colors tab		Pencere sekmesi metni
 Navigation pulse	Colors tab		Navigasyon nabzı
-LCD subpixel	AntialiasingSettingsView		LCD altpiksel
 Window tab	Colors tab		Pencere sekmesi
-Link text	Colors tab		Bağlantı metni
 Tooltip background	Colors tab		Araç ipucu arka planı
-ControlLook:	DecorSettingsView		Görünüm Denetimci:
+Link text	Colors tab		Bağlantı metni
 Scroll bar thumb	Colors tab		Kaydırma çubuğu başı
-Default	DecorSettingsView		Öntanımlı
 Link visited	Colors tab		Ziyaret edilmiş bağlantı
 Selected menu item border	Colors tab		Seçili menü ögesi kenarlığı
 Tooltip text	Colors tab		Araç ipucu metni
-Control background	Colors tab		Denetim arka planı
 Selected list item text	Colors tab		Seçili liste ögesi metni
+Control background	Colors tab		Denetim arka planı
+Menu item text	Colors tab		Menü ögesi metni
 Selected list item background	Colors tab		Seçili liste ögesi arka planı
 Inactive window tab text	Colors tab		Etkin olmayan pencere sekme metni
 Navigation base	Colors tab		Temel navigasyon
-Fonts	APRWindow		Yazıtipleri
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pijamalı hasta, yağız şoföre çabucak güvendi.
-Grayscale	AntialiasingSettingsView		Gri tonlama
-Antialiasing type:	AntialiasingSettingsView		Yumuşatma türü:
+Success	Colors tab		Başarılı
 Panel text	Colors tab		Panel metni
-Hinting menu	AntialiasingSettingsView		Düzgünleştirme menüsü
-Scroll bar:	DecorSettingsView		Kaydırma çubuğu:
-Choose ControlLook	DecorSettingsView		Görünüm Denetimci seç
-Monospaced fonts only	AntialiasingSettingsView		Yalnızca sabit genişlikli yazıtipleri
+Shine	Colors tab		Parla
+Menu background	Colors tab		Menü arka planı
 Document text	Colors tab		Belge metni
+List item text	Colors tab		Liste ögesi metni
 Inactive window border	Colors tab		Etkin olmayan pencere kenarlığı
-Colors	APRWindow		Renkler
-About control look	DecorSettingsView		Görünüm Denetimci hakkında
-Control highlight	Colors tab		Denetim vurgulaması
+Control text	Colors tab		Denetim metni
 Status bar	Colors tab		Durum çubuğu
+Control highlight	Colors tab		Denetim vurgulaması
+Selected menu item background	Colors tab		Seçili menü ögesi arka planı
+Link active	Colors tab		Etkin bağlantı
 Link hover	Colors tab		İmleç bağlantı üzerinde
-Single:	DecorSettingsView		Tekli:

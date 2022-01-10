@@ -1,34 +1,3 @@
-1	hungarian	x-vnd.Haiku-Notifications	4196496676
-Lower left	GeneralView		Bal alsó
-Application does not have a valid signature	NotificationView	Alert message	Az alkalmazásnak nincs érvényes azonosítója
-Status	NotificationView		Állapot
-Add…	NotificationView		Új…
-Lower right	GeneralView		Jobb alsó
-Muted	NotificationView		Némítva
- is already listed	NotificationView	Alert message	már szerepel a listában
-OK	PrefletWin		Rendben
-Notifications	PrefletWin		Értesítések
-Notifications preflet sample	PrefletWin		Próba értesítés
-Mute notifications from this application	NotificationView		Az alkalmazás értesítéseinek némítása
-wide	GeneralView	Window width: Slider high text	széles
-narrow	GeneralView	Window width: Slider low text	keskeny
-Revert	PrefletWin		Visszaállít
-Applications	PrefletView		Programok
-{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1 {Időzítés: # másodperc} other{Időzítés: # másodperc}}
-Upper right	GeneralView		Jobb felső
-An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Nem sikerült menteni a beállításokat.\nLehetséges, hogy nincsen több szabad hely a lemezen.
-Defaults	PrefletWin		Alapértékek
-Upper left	GeneralView		Bal felső
-Window width	GeneralView		Ablak szélessége
-Applications	NotificationView		Programok
+1	hungarian	x-vnd.Haiku-Notifications	1522084233
 General	PrefletView		Általános
-OK	NotificationView		Rendben
-Follow Deskbar	GeneralView		Asztalsáv követése
-Notifications	System name		Értesítések
-Allowed	NotificationView		Engedélyezve
-Duration:	GeneralView		Időtartam:
-Application	NotificationView		Program
-Enable notifications	GeneralView		Értesítések engedélyezése
-This is a test notification message	PrefletWin		Ez egy próba értesítés
-Remove	NotificationView		Eltávolítás
-Position:	GeneralView		Pozíció
+Applications	PrefletView		Programok

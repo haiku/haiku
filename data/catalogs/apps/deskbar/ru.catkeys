@@ -1,50 +1,5 @@
-1	russian	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Выключить компьютер
-Sort applications by name	PreferencesWindow		Сортировать приложения по имени
-Suspend	DeskbarMenu		Приостановить
-Hide clock	TimeView		Скрыть часы
-Applications	PreferencesWindow		Приложения
-Time preferences…	TimeView		Настроить часы…
-About Haiku	DeskbarMenu		О системе Haiku
-Edit in Tracker…	PreferencesWindow		Изменить меню…
-Recent documents:	PreferencesWindow		Недавние документы:
-Recent applications	DeskbarMenu		Недавние приложения
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Приложения
-Find…	DeskbarMenu		Найти…
-Show clock	Tray		Показать часы
-Window	PreferencesWindow		Окно
-Defaults	PreferencesWindow		По умолчанию
-Menu	PreferencesWindow		Меню
-Recent documents	DeskbarMenu		Недавние документы
-Auto-hide	PreferencesWindow		Скрывать автоматически
-Always on top	PreferencesWindow		Всегда сверху
-<Deskbar folder is empty>	DeskbarMenu		<Папка Deskbar пуста>
-Show all	WindowMenu		Показать все
-No windows	WindowMenu		Нет окон
-Deskbar	System name		Deskbar
-Restart system	DeskbarMenu		Перезагрузить компьютер
-Large	PreferencesWindow		Крупные
-Auto-raise	PreferencesWindow		Всплывать при наведении
-Recent folders:	PreferencesWindow		Недавние папки:
-Show application expander	PreferencesWindow		Отображать список окон приложений
-Close all	WindowMenu		Закрыть все
-Deskbar preferences	PreferencesWindow		Настройки Deskbar
-Mount	DeskbarMenu		Подключить
-Revert	PreferencesWindow		Вернуть
-Small	PreferencesWindow		Маленькие
-Recent applications:	PreferencesWindow		Недавние приложения:
-Shutdown…	DeskbarMenu		Завершение работы…
-Tracker always first	PreferencesWindow		Tracker всегда первый
+1	russian	x-vnd.Be-TSKB	1194388652
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Настройки
-Recent folders	DeskbarMenu		Недавние папки
-About this system	DeskbarMenu		Об этой системе
-Show calendar…	TimeView		Показать календарь…
-Deskbar preferences…	DeskbarMenu		Настроить Deskbar…
-Expand new applications	PreferencesWindow		Раскрывать список окон при запуске
-Show replicants	DeskbarMenu		Отображать репликанты
-Hide application names	PreferencesWindow		Скрыть имена приложений
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Демо
-Icon size	PreferencesWindow		Размер значков
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Апплеты
-Hide all	WindowMenu		Скрыть все
-Quit application	WindowMenu		Закрыть приложение
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Приложения

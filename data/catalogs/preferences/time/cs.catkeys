@@ -1,48 +1,7 @@
-1	czech	x-vnd.Haiku-Time	3691539601
-OK	Time		OK
+1	czech	x-vnd.Haiku-Time	3879356774
 Message receiving failed	Time		Přijetí zprávy selhalo
-Australia	Time		Austrálie
-America	Time		Amerika
-Reset to default server list	Time		Vrátit výchozí seznam serverů
-Could not resolve server address	Time		Nepodařilo se získat adresu serveru
-Time & Date	System name		Datum a čas
-Set time zone	Time		Nastavit časové pásmo
 Waiting for answer failed	Time		Čekání na odpověď selhalo
-<Other>	Time		<Jiný>
 Received invalid time	Time		Přijatý čas je neplatný
-Remove	Time		Odstranit
-Synchronize again	Time		Znovu synchronizovat
-Asia	Time		Asie
-Try all servers	Time		Zkusit všechny servery
-Time	Time		Čas
-Current time:	Time		Aktuální čas
-The following error occured while synchronizing:\n%s: %s	Time		Při synchronizaci došlo k následující chybě:\n%s: %s
-Europe	Time		Evropa
-Show day of week	Time		Zobrazit den v týdnu
-Local time (Windows compatible)	Time		Místní čas (kompatibilní s Windows)
-Hardware clock set to:	Time		Hardwarové hodiny nastaveny na:
-Arctic	Time		Arktida
-Antarctica	Time		Antaktida
-GMT (UNIX compatible)	Time		GMT (kompatibilní s UNIXem)
-Africa	Time		Afrika
-Stop	Time		Zastavit
-Time zone	Time		Časové pásmo
-Clock	Time		Hodiny
-Network time	Time		Síťový čas
 Sending request failed	Time		Odeslání požadavku selhalo
-Preview time:	Time		Náhled času:
-\nNow: 	Time		\nTeď: 
 Could not create socket	Time		Nepodařilo se vytořit soket
-Pacific	Time		Tichý oceán
-Atlantic	Time		Atlantský oceán
-Show clock in Deskbar	Time		Zobrazit hodiny v panelu
-Display time with seconds	Time		Zobrazit čas se sekundami
-Time	System name		Čas
-Show time zone	Time		Zobrazit časové pásmo
-Synchronize at boot	Time		Synchronizovat při spuštění počítače
-Indian	Time		Indie
-Revert	Time		Vrátit změny
-Date and time	Time		Datum a čas
-The following error occured while synchronizing:\n%s	Time		Při synchronizaci došlo k následující chybě:\n%s
-Synchronize	Time		Synchronizovat
-Add	Time		Přidat
+Could not resolve server address	Time		Nepodařilo se získat adresu serveru

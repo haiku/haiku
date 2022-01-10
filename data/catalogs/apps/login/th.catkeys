@@ -1,17 +1,11 @@
-1	thai	x-vnd.Haiku-Login	3033693897
+1	thai	x-vnd.Haiku-Login	3025604784
 Invalid login!	Login View		เข้าสู่ระบบไม่ถูกต้อง!
-Error	Login App		ผิดพลาด
+OK	Login View		ตกลง
 Welcome to Haiku	Login Window		ยินดีต้อนรับสู่ Haiku
+Login:	Login View		เข้าสู่ระบบ:
+Password:	Login View		รหัสผ่าน:
 Halt	Login View		หยุด
 Desktop	Desktop Window		เดสก์ท็อป
 Hide password	Login View		ซ่อนรหัสผ่าน
 Reboot	Login View		รีบูธ
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		คุณสามารถปรับแต่งเดสก์ท็อปที่แสดงด้านหลังแอปพลิเคชันเข้าสู่ระบบโดยวางเรพลิเคเตอร์ลงบน \n\nเมื่อเสร็จแล้วเพียงออกจากแอปพลิเคชัน (Cmd-Q)
-OK	Login View		ตกลง
-Info	Login App		ข้อมูล
-Login:	Login View		เข้าสู่ระบบ:
-Password:	Login View		รหัสผ่าน:
-Unimplemented	Login App		ไม่ดำเนินการ
-OK	Login App		ตกลง
-Error: %1	Login App		ผิดพลาด: %1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	ผิดพลาด %s\n

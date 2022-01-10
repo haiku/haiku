@@ -1,9 +1,6 @@
-1	belarusian	x-vnd.Haiku-MatchHeader	2024597924
+1	belarusian	x-vnd.Haiku-MatchHeader	709288665
 Delete message	ConfigView		Выдаліць паведамленне
-Match \"%attribute\" against \"%regex\"	RuleFilter		Супадае \"%attribute\" з \"%regex\"
-Match header	RuleFilter		Супадаючы загаловак
 Set flags to	ConfigView		Меткі паведамлення ў
-Header field (e.g. Subject, From, …)	ConfigView		Поле загалоўка (напр. Тэма, Ад, …)
 <Choose account>	ConfigView		<Абярыце рахунак>
 Then	ConfigView		Тады
 If	ConfigView		Калі

@@ -1,47 +1,7 @@
-1	italian	x-vnd.Haiku-Time	2069485065
-OK	Time		OK
+1	italian	x-vnd.Haiku-Time	3879356774
 Message receiving failed	Time		Ricezione del messaggio fallita
-Australia	Time		Australia
-America	Time		America
-Reset to default server list	Time		Reimposta la lista dei server predefinita
-Could not resolve server address	Time		Impossibile risolvere l'indirizzo del server
-Set time zone	Time		Imposta fuso orario
 Waiting for answer failed	Time		Nessuna risposta pervenuta
-<Other>	Time		<Altro>
 Received invalid time	Time		È stato ricevuto un orario non valido
-Remove	Time		Rimuovi
-Synchronize again	Time		Sincronizza nuovamente
-Asia	Time		Asia
-Try all servers	Time		Prova con tutti i server
-Time	Time		Ora
-Current time:	Time		Ora attuale:
-The following error occured while synchronizing:\n%s: %s	Time		Errore durante la sincronizzazione:\n%s: %s
-Europe	Time		Europa
-Show day of week	Time		Mostra giorno della settimana
-Local time (Windows compatible)	Time		Ora locale (compatibile Windows)
-Hardware clock set to:	Time		Orologio hardware impostato su:
-Arctic	Time		Artide
-Antarctica	Time		Antartide
-GMT (UNIX compatible)	Time		GMT (UNIX compatibile)
-Africa	Time		Africa
-Stop	Time		Interrompi
-Time zone	Time		Fuso orario
-Clock	Time		Orologio
-Network time	Time		Orario di rete
 Sending request failed	Time		Invio di una richiesta fallita
-Preview time:	Time		Durata dell'anteprima:
-\nNow: 	Time		\nOra: 
 Could not create socket	Time		Non è stato possibile creare una socket
-Pacific	Time		Pacifico
-Atlantic	Time		Atlantico
-Show clock in Deskbar	Time		Mostra l'orologio nella Deskbar
-Display time with seconds	Time		Mostra i secondi
-Time	System name		Data e Ora
-Show time zone	Time		Mostra fuso orario
-Synchronize at boot	Time		Sincronizza all'avvio
-Indian	Time		Indiano
-Revert	Time		Ripristina
-Date and time	Time		Data e ora
-The following error occured while synchronizing:\n%s	Time		Errore durante la sincronizzazione:\n%s
-Synchronize	Time		Sincronizza
-Add	Time		Aggiungi
+Could not resolve server address	Time		Impossibile risolvere l'indirizzo del server

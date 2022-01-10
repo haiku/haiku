@@ -1,17 +1,11 @@
-1	romanian	x-vnd.Haiku-Login	3033693897
+1	romanian	x-vnd.Haiku-Login	3025604784
 Invalid login!	Login View		Autentificare nevalidă!
-Error	Login App		Eroare
+OK	Login View		OK
 Welcome to Haiku	Login Window		Bine ați venit la Haiku
+Login:	Login View		Autentificare:
+Password:	Login View		Parolă:
 Halt	Login View		Oprire
 Desktop	Desktop Window		Desktop
 Hide password	Login View		Ascunde parola
 Reboot	Login View		Repornire
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Puteți personaliza desktopul afișat în spatele aplicației de autentificare plasând replicanți pe aceasta.\n\nCând ați terminat, ieșiți din aplicație (Cmd-Q).
-OK	Login View		OK
-Info	Login App		Informații
-Login:	Login View		Autentificare:
-Password:	Login View		Parolă:
-Unimplemented	Login App		Neimplementat
-OK	Login App		OK
-Error: %1	Login App		Eroare: %1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	eroare %s\n

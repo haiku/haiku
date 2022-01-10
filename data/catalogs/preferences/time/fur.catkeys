@@ -1,47 +1,7 @@
-1	friulian	x-vnd.Haiku-Time	2069485065
-OK	Time		Va ben
+1	friulian	x-vnd.Haiku-Time	3879356774
 Message receiving failed	Time		Ricezion dal messaç falide
-Australia	Time		Australie
-America	Time		Americhe
-Reset to default server list	Time		Ristabilìs ae liste di servidôrs predefinide
-Could not resolve server address	Time		Impussibil risolvi la direzion dal servidôr
-Set time zone	Time		Stabilìs fûs orari
 Waiting for answer failed	Time		No si è rivâts a spietâ la rispueste
-<Other>	Time		<Altri>
 Received invalid time	Time		Ricevude ore no valide
-Remove	Time		Gjave
-Synchronize again	Time		Torne sincronize
-Asia	Time		Asie
-Try all servers	Time		Prove ducj i servidôrs
-Time	Time		Ore
-Current time:	Time		Ore atuâl:
-The following error occured while synchronizing:\n%s: %s	Time		Si è verificât l'erôr chi sot intant che si sincronizave:\n%s: %s
-Europe	Time		Europe
-Show day of week	Time		Mostre dì de setemane
-Local time (Windows compatible)	Time		Ore locâl (compatibil Windows)
-Hardware clock set to:	Time		Orloi hardware configurât su:
-Arctic	Time		Artide
-Antarctica	Time		Antartide
-GMT (UNIX compatible)	Time		GMT (UTC, compatibil UNIX)
-Africa	Time		Afriche
-Stop	Time		Ferme
-Time zone	Time		Fûs orari
-Clock	Time		Orloi
-Network time	Time		Ore di rêt
 Sending request failed	Time		Nol è stât pussibil inviâ la domande
-Preview time:	Time		Anteprime de ore:
-\nNow: 	Time		\nCumò: 
 Could not create socket	Time		Impussibil creâ un socket
-Pacific	Time		Pacific
-Atlantic	Time		Atlantic
-Show clock in Deskbar	Time		Mostre orloi tal Deskbar
-Display time with seconds	Time		Mostre ore cui seconts
-Time	System name		Ore
-Show time zone	Time		Mostre fûs orari
-Synchronize at boot	Time		Sincronize al inviament
-Indian	Time		Indian
-Revert	Time		Torne indaûr
-Date and time	Time		Date e ore
-The following error occured while synchronizing:\n%s	Time		Si è verificât l'erôr chi sot intant che si sincronizave:\n%s
-Synchronize	Time		Sincronize
-Add	Time		Zonte
+Could not resolve server address	Time		Impussibil risolvi la direzion dal servidôr

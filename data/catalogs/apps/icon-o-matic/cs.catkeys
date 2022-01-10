@@ -1,201 +1,41 @@
-1	czech	x-vnd.haiku-icon_o_matic	1805671130
-None	Icon-O-Matic-Properties		Žádný
+1	czech	x-vnd.haiku-icon_o_matic	2049516384
+Set 	Set (property name)		Množina
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Otočit indexy cesty
-Add empty	Icon-O-Matic-ShapesList		Přidat prázdný
-Opening the icon failed!	Icon-O-Matic-Main		Otevření ikony selhalo!
-Add with path	Icon-O-Matic-ShapesList		Přidat s cestou
-Copy	Icon-O-Matic-Properties		Kopírovat
-Color	Icon-O-Matic-PropertyNames		Barva
-Format	Icon-O-Matic-SavePanel		Formát
-Move Shapes	Icon-O-Matic-MoveShapesCommand		Přesunout Tvary
-Color	Icon-O-Matic-StyleTypes		Barva
-Select	Icon-O-Matic-Properties		Vybrat
-Reset transformation	Icon-O-Matic-ShapesList		Resetovat transformaci
-Duplicate	Icon-O-Matic-StylesList		Duplikovat
-Rotate	Icon-O-Matic-TransformationBoxStates		Otočit
-Remove Control Points	Icon-O-Matic-RemovePointsCmd		Odstranit ovládací body
-Shorten	Icon-O-Matic-PropertyNames		Zkrátit
-Unassign Path	Icon-O-Matic-UnassignPathCmd		Odebrat Cestu
-The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Text, který se snažíte importovat je dosti dlouhý, jste si jistý?
-Paste	Icon-O-Matic-Properties		Vložit
-Detect Orient.	Icon-O-Matic-PropertyNames		Detekovat Orientaci
-Click on a shape above	Empty transformers list - 1st line		Klikněte na tvar nahoře
-Close	Icon-O-Matic-Menu-File		Zavřít
-Add rect	Icon-O-Matic-PathsList		Přidat obdélník
-Rotation	Icon-O-Matic-PropertyNames		Otočení
-Multi Paste Properties	Icon-O-Matic-Properties		Nastavení vícenásobného vložení
-Bleep!	Exporter - Continue in error dialog		Píp!
-Transform	Icon-O-Matic-PathManipulator		Transformovat
-Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Odstranit Transformátory
-META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON Atribut
-Add shape with style	Icon-O-Matic-Menu-Shape		Přidat tvar se stylem
-Assign Path	Icon-O-Matic-AddPathsCmd		Přiřadit cestu
-Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Resetovat Transformaci
-Transformation	Transformation		Transformace
-Remove	Icon-O-Matic-StylesList		Odstranit
-Cancel	Icon-O-Matic-Menu-Settings		Zrušit
-Assign Style	Icon-O-Matic-AssignStyleCmd		Přiřadit Styl
-Transformation	Icon-O-Matic-TransformationBoxStates		Transformace
-Closed	Icon-O-Matic-PropertyNames		Zavřeno
-Split Control Point	Icon-O-Matic-SplitPointsCmd		Rozdělit ovládací body
-<nothing to redo>	Icon-O-Matic-Menu-Edit		<není co udělat znovu>
-Height	Icon-O-Matic-PropertyNames		Výška
-Add Shape	Icon-O-Matic-AddShapesCmd		Přidat Tvar
-warning	Icon-O-Matic-SVGExport		varování
-File	Icon-O-Matic-Menus		Soubor
-Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Vyčistit Cestu
-Move Style	Icon-O-Matic-MoveStylesCmd		Přesunout Styl
-Properties	Icon-O-Matic-Menus		Vlastnosti
+Translation X	Icon-O-Matic-PropertyNames		Posun ve směru X
 Path	Icon-O-Matic-PropertyNames		Cesta
 Add Control Point	Icon-O-Matic-AddPointCmd		Přidat ovládací bod
-Path	Icon-O-Matic-Menus		Cesta
+Color	Icon-O-Matic-PropertyNames		Barva
 Stroke	Transformation		Tah
-Flip	Icon-O-Matic-PathManipulator		Překlopit
-Select All	Icon-O-Matic-PathManipulator		Vybrat vše
+Miter Limit	Icon-O-Matic-PropertyNames		Limit zkosení
 Opacity	Icon-O-Matic-PropertyNames		Neprůhlednost
-OK	Icon-O-Matic-ColorPicker		OK
-Error: 	Icon-O-Matic-Main		Chyba:
-bad news	Icon-O-Matic-Exporter		špatné zprávy
-Saving your document failed!	Icon-O-Matic-Exporter		Uložení vašeho dokumentu selhalo!
-Snap to grid	Icon-O-Matic-Menu-Settings		Přichytit k mřížce
-Opening the document failed!	Icon-O-Matic-Main		Otevření dokumentu selhalo!
-Shape	Icon-O-Matic-Menus		Tvar
-Add with path & style	Icon-O-Matic-ShapesList		Přidat s cestou a stylem
-<unavailable>	Icon-O-Matic-StyleTypes		<nepřístupné>
+Max LOD	Icon-O-Matic-PropertyNames		Maximální úroveň detailů
+Rotate	Icon-O-Matic-TransformationBoxStates		Otočit
+Shorten	Icon-O-Matic-PropertyNames		Zkrátit
+Unassign Path	Icon-O-Matic-UnassignPathCmd		Odebrat Cestu
+<modify path>	Icon-O-Matic-PathCmd		<změnit cestu>
+Detect Orient.	Icon-O-Matic-PropertyNames		Detekovat Orientaci
+Translation Y	Icon-O-Matic-PropertyNames		Posunutí ve směru Y
+Scale	Icon-O-Matic-TransformationBoxStates		Změnit velikost
+Rotation	Icon-O-Matic-PropertyNames		Otočení
+Multi Paste Properties	Icon-O-Matic-Properties		Nastavení vícenásobného vložení
+Move	Icon-O-Matic-TransformationBoxStates		Přesunout
 Min LOD	Icon-O-Matic-PropertyNames		Minimální úroveň detailů
 Reverse Path	Icon-O-Matic-ReversePathCmd		Převrátit Cestu
-Move Transformers	Icon-O-Matic-MoveTransformersCmd		Přesunout Transformátory
-Add	Icon-O-Matic-TransformersList		Přidat
+Name	Icon-O-Matic-PropertyNames		Jméno
 Paste Properties	Icon-O-Matic-Properties		Vložit vlastnosti
-Undo	Icon-O-Matic-Main		Zpět
-Settings	Icon-O-Matic-Menus		Nastavení
 Scale X	Icon-O-Matic-PropertyNames		Změnit šířku
-Add	Icon-O-Matic-PathsList		Přidat
-Add Styles	Icon-O-Matic-AddStylesCmd		Přidat Styly
-Remove	Icon-O-Matic-PathManipulator		Odstranit
-Duplicate	Icon-O-Matic-ShapesList		Duplikovat
+<unkown property>	Icon-O-Matic-PropertyNames		<neznámé vlastnictví>
 Contour	Transformation		Obrys
-Perspective	Icon-O-Matic-TransformersList		Perspektiva
-Save icon	Dialog title		Uložit ikonu
-Move Paths	Icon-O-Matic-MovePathsCmd		Přesunout Cesty
+Multi Set 	Multi Set (property name)		Vícenásobný výběr
+Move Pivot	Icon-O-Matic-TransformationBoxStates		Přesunout Pivota
 Rounding	Icon-O-Matic-PropertyNames		Zaokrouhlování
 Joins	Icon-O-Matic-PropertyNames		Spoje
-Cancel	Icon-O-Matic-ColorPicker		Zrušit
-Duplicate	Icon-O-Matic-PathsList		Duplikovat
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Odstranit Tvary
-Save	Icon-O-Matic-Menu-Settings		Uložit
-Export as…	Icon-O-Matic-Menu-File		Exportovat jako...
-Error: 	Icon-O-Matic-Exporter		Chyba:
-Move Path	Icon-O-Matic-MovePathsCmd		Přesunout Cestu
-Remove Paths	Icon-O-Matic-RemovePathsCmd		Odstranit Cesty
-Assign Paths	Icon-O-Matic-AddPathsCmd		Přiřadit Cesty
-Diamond	Icon-O-Matic-StyleTypes		Kosočtverec
-Add Style	Icon-O-Matic-AddStylesCmd		Přidat styl
-Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Pošťouchnout ovládací body
-Move Styles	Icon-O-Matic-MoveStylesCmd		Přesunout Styly
-Don't save	Icon-O-Matic-Menu-Settings		Neukládat
-Add shape with path	Icon-O-Matic-Menu-Shape		Přidat tvar s cestou
-Translation X	Icon-O-Matic-PropertyNames		Posun ve směru X
-Flip Control Points	Icon-O-Matic-FlipPointsCmd		Překlopit ovládací body
-Add Transformers	Icon-O-Matic-AddTransformersCmd		Přidat transformátory
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON Atribut
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic nemusel všechna data ze SVG při jeho načtení zpracovat. Přepsáním původního souboru mohou být tyto informace ztraceny.
-Rotate indices backwards	Icon-O-Matic-PathsList		Otočit ukazatele zpět
-Overwrite	Icon-O-Matic-SVGExport		Přepsat
-Modify Control Point	Icon-O-Matic-ChangePointCmd		Změnit ovládací bod
-Cancel	Icon-O-Matic-SVGExport		Zrušit
-Open…	Icon-O-Matic-Menu-File		Otevřít...
-Redo	Icon-O-Matic-Main		Znovu
-Change Color	Icon-O-Matic-SetColorCmd		Změnit barvu
-Remove	Icon-O-Matic-ShapesList		Odstranit
-Drop shapes	Icon-O-Matic-ShapesList		Tvary stínů
-PNG Set	Icon-O-Matic-SavePanel		Výběr PNG
-to attach transformers.	Empty transformers list - 2nd line		pro připojení transformátorů.
-Linear	Icon-O-Matic-StyleTypes		Čárový
-any of the other lists to	Empty property list - 2nd line		kterémkoli z ostatních seznamů
-Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Pošťouchnout ovládací bod
-Flip Control Point	Icon-O-Matic-FlipPointsCmd		Překlopit ovládací bod
-Add Paths	Icon-O-Matic-AddPathsCmd		Přidat Cesty
-Color (#%02x%02x%02x)	Style name after dropping a color		Barva (#%02x%02x%02x)
-Clean up	Icon-O-Matic-PathsList		Vyčistit
-Remove Style	Icon-O-Matic-RemoveStylesCmd		Odstranit Styl
-Split	Icon-O-Matic-PathManipulator		Rozdělit
-Move	Icon-O-Matic-TransformationBoxStates		Přesunout
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Resetovat Transformace
-Split Control Points	Icon-O-Matic-SplitPointsCmd		Rozdělit ovládací body
-Remove Control Point	Icon-O-Matic-RemovePointsCmd		Odstranit ovládací bod
-Conic	Icon-O-Matic-StyleTypes		Kónický
-Name	Icon-O-Matic-PropertyNames		Jméno
-Multi paste	Icon-O-Matic-Properties		Vícenásobné vložení
-Add Shapes	Icon-O-Matic-AddShapesCmd		Přidat Tvary
-Reset transformation	Icon-O-Matic-StylesList		Resetovat transformaci
-Add Transformer	Icon-O-Matic-AddTransformersCmd		Přidat Transformátor
-Reverse	Icon-O-Matic-PathsList		Obrátit
-Move Pivot	Icon-O-Matic-TransformationBoxStates		Přesunout Pivota
-Remove	Icon-O-Matic-PathsList		Odstranit
-Remove Transformers	Icon-O-Matic-RemoveTransformersCmd		Odstranit transformátory
-Style type	Icon-O-Matic-StyleTypes		Typ Stylu
-Quit	Icon-O-Matic-Menu-File		Ukončit
-Remove Styles	Icon-O-Matic-RemoveStylesCmd		Odstranit Styly
-Gradient	Icon-O-Matic-StyleTypes		Gradient
-bad news	Title of error alert		špatné zprávy
-Insert Control Point	Icon-O-Matic-InsertPointCmd		Vložit ovládací bod
-Add shape with path & style	Icon-O-Matic-Menu-Shape		Přidat tvar s cestou a stylem
-Move Shape	Icon-O-Matic-MoveShapesCommand		Přesunout Tvar
-Radial	Icon-O-Matic-StyleTypes		Radiální
-Text too long	Icon-O-Matic-StyledTextImport		Text je příliš dlouhý
-Caps	Icon-O-Matic-PropertyNames		Verzálky
-OK	Icon-O-Matic-SVGImport		OK
-Append…	Icon-O-Matic-Menu-File		Připojit...
-Scale Y	Icon-O-Matic-PropertyNames		Změnit výšku
-Export icon	Dialog title		Exportovat ikonu
-Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Barva (#%02x%02x%02x)
-Edit Gradient	Icon-O-Matic-SetGradientCmd		Editovat Gradient
-Set 	Set (property name)		Množina
-Rotate indices forwards	Icon-O-Matic-PathsList		Otočit ukazatele dopředu
-Click on an object in	Empty property list - 1st line		Klikněte na objekt ve
-Save	Icon-O-Matic-Menu-File		Uložit
-No	Icon-O-Matic-StyledTextImport		Ne
-Add circle	Icon-O-Matic-PathsList		Přidat kruh
-Freeze transformation	Icon-O-Matic-ShapesList		Zmrazit transformaci
-Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Zmrazit Tvary
-Miter Limit	Icon-O-Matic-PropertyNames		Limit zkosení
-Untitled	Icon-O-Matic-Main		Bezejmenný
-Max LOD	Icon-O-Matic-PropertyNames		Maximální úroveň detailů
-Add Path	Icon-O-Matic-AddPathsCmd		Přidat Cestu
-Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Uložit před zavřením změny v aktualní ikoně?
-Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Nepodařilo se otevřít '%s' jako SVG dokument.\n\n
-load error	Icon-O-Matic-SVGImport		chyba nahrávání
-Transformation	Icon-O-Matic-TransformersList		Transformace
-Save as…	Icon-O-Matic-Menu-File		Uložit jako...
-Swatches	Icon-O-Matic-Menus		Vzorky
-<modify path>	Icon-O-Matic-PathCmd		<změnit cestu>
-HVIF Source Code	Icon-O-Matic-SavePanel		HVIF Zdrojový kód
-Icon-O-Matic	System name		Malování ikon
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<nic, co by šlo vrátit>
-Add	Icon-O-Matic-StylesList		Přidat
-Translation Y	Icon-O-Matic-PropertyNames		Posunutí ve směru Y
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Zmrazit tvar
-Scale	Icon-O-Matic-TransformationBoxStates		Změnit velikost
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		Odstranit Tvary
-All	Icon-O-Matic-Properties		Vše
-Transformer	Icon-O-Matic-Menus		Transformátor
-Invert selection	Icon-O-Matic-Properties		Invertovat výběr
-<unkown property>	Icon-O-Matic-PropertyNames		<neznámé vlastnictví>
-Pick a color	Icon-O-Matic-ColorPicker		Vybrat barvu
-Multi Set 	Multi Set (property name)		Vícenásobný výběr
-Settings…	Icon-O-Matic-SavePanel		Nastavení...
-Add with style	Icon-O-Matic-ShapesList		Přidat se stylem
-New	Icon-O-Matic-Menu-File		Nový
-Yes	Icon-O-Matic-StyledTextImport		Ano
-Remove Path	Icon-O-Matic-RemovePathsCmd		Odstranit cestu
-Gradient type	Icon-O-Matic-StyleTypes		Typ gradientu
-Move Transformer	Icon-O-Matic-MoveTransformersCmd		Přesunout Transformátory
+Transformation	Transformation		Transformace
 Perspective	Transformation		Perspektiva
-Export	Icon-O-Matic-Menu-File		Exportovat
+Assign Style	Icon-O-Matic-AssignStyleCmd		Přiřadit Styl
 Width	Icon-O-Matic-PropertyNames		Šířka
-Bummer	Cancel button - error alert		OK
-Style	Icon-O-Matic-Menus		Styl
-edit it's properties here.	Empty property list - 3rd line		pro změnu jeho vlastností zde.
-Off	Icon-O-Matic-Menu-Settings		Vypnout
-Edit	Icon-O-Matic-Menus		Editovat
+Transformation	Icon-O-Matic-TransformationBoxStates		Transformace
+Closed	Icon-O-Matic-PropertyNames		Zavřeno
+Caps	Icon-O-Matic-PropertyNames		Verzálky
+Height	Icon-O-Matic-PropertyNames		Výška
+Scale Y	Icon-O-Matic-PropertyNames		Změnit výšku

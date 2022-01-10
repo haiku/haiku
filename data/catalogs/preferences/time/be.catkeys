@@ -1,43 +1,6 @@
-1	belarusian	x-vnd.Haiku-Time	908714414
-OK	Time		ОК
+1	belarusian	x-vnd.Haiku-Time	3690451231
 Message receiving failed	Time		Памылка атрымання паведамлення
-Australia	Time		Аўстралія
-America	Time		Амерыка
-Set time zone	Time		Пазначыць часавы пояс
 Waiting for answer failed	Time		Памылка падчас чакання адказу
-<Other>	Time		<Іншае>
 Received invalid time	Time		Атрыманы несапраўдны час
-Remove	Time		Выдаліць
-Synchronize again	Time		Сінхранізаваць ізноў
-Asia	Time		Азія
-Try all servers	Time		Паспрабаваць усе серверы
-Time	Time		Час
-Current time:	Time		Сапраўдны час:
-Europe	Time		Эўропа
-Show day of week	Time		Паказваць дзень тыдню
-Local time (Windows compatible)	Time		Лакальны час (як у Windows)
-Hardware clock set to:	Time		Гадзіннік кампутара усталяваны на:
-Arctic	Time		Арктыка
-Antarctica	Time		Антарктыка
-GMT (UNIX compatible)	Time		GMT (як у UNIX)
-Africa	Time		Афрыка
-Stop	Time		Спыніць
-Time zone	Time		Часавы пояс
-Clock	Time		Гадзіннік
-Network time	Time		Сеткавы час
 Sending request failed	Time		Немагчыма адаслаць запыт
-Preview time:	Time		Праглядзець час:
-\nNow: 	Time		\nЗараз: 
 Could not create socket	Time		Немагчыма стварыць сеткавы сокет
-Pacific	Time		Ціхі акіян
-Atlantic	Time		Атлантыка
-Show clock in Deskbar	Time		Паказваць гадзіннік у Deskbar-ы
-Display time with seconds	Time		Паказваць час з секундамі
-Time	System name		Дата і Час
-Show time zone	Time		Паказаць часавы пояс
-Synchronize at boot	Time		Сінхранізаваць падчас старту
-Indian	Time		Індыя
-Revert	Time		Адвярнуць
-Date and time	Time		Дата і Час
-Synchronize	Time		Сінхранізаваць
-Add	Time		Дадаць

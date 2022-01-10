@@ -1,9 +1,9 @@
-1	lithuanian	x-vnd.Haiku-CharacterMap	56063163
+1	lithuanian	x-vnd.Haiku-CharacterMap	903106397
 Miscellaneous mathematical symbols B	UnicodeBlocks		Įvairūs matematiniai simboliai B
 Saurashtra	UnicodeBlocks		Sauraštra
 Arabic supplement	UnicodeBlocks		Arabų papildomi
-Hanunoo	UnicodeBlocks		Hanunoo
 Ogham	UnicodeBlocks		Ogamas
+Hanunoo	UnicodeBlocks		Hanunoo
 Hebrew	UnicodeBlocks		Hebrajų
 Katakana	UnicodeBlocks		Katakana
 Mongolian	UnicodeBlocks		Mongolų
@@ -16,12 +16,10 @@ Cuneiform numbers and punctuation	UnicodeBlocks		Dantiraščio skaičiai ir skyr
 Miscellaneous symbols	UnicodeBlocks		Įvairūs simboliai
 Vertical forms	UnicodeBlocks		Vertikalios formos
 Miscellaneous mathematical symbols A	UnicodeBlocks		Įvairūs matematiniai simboliai A
-CharacterMap	System name		Simbolių lentelė
 Latin extended D	UnicodeBlocks		Lotynų papildomi D
 Aegean numbers	UnicodeBlocks		Egėjo skaičiai
 Hangul syllables	UnicodeBlocks		Hangulo skiemenys
 Modifier tone letters	UnicodeBlocks		Tono keitimo raidės
-View	CharacterWindow		Rodymas
 Enclosed CJK letters and months	UnicodeBlocks		Įrėmintos CJK raidės ir mėnesiai
 Deseret	UnicodeBlocks		Deseretas
 Cham	UnicodeBlocks		Čamų
@@ -31,7 +29,6 @@ Ancient Greek musical notation	UnicodeBlocks		Senovės graikų muzikos notacija
 Thai	UnicodeBlocks		Tajų
 Ethiopic supplement	UnicodeBlocks		Etiopų papildomi
 Yijing hexagram symbols	UnicodeBlocks		Idzingo heksagramų simboliai
-File	CharacterWindow		Failas
 Myanmar	UnicodeBlocks		Birmiečių
 Tifinagh	UnicodeBlocks		Tifinagas
 Musical symbols	UnicodeBlocks		Muzikiniai simboliai
@@ -51,7 +48,6 @@ Georgian	UnicodeBlocks		Gruzinų
 CJK compatibility forms	UnicodeBlocks		CJK suderinamumo formos
 CJK unified ideographs extension B	UnicodeBlocks		CJK unifikuotų ideogramų plėtinys B
 Arabic presentation forms A	UnicodeBlocks		Arabų atvaizdavimo formos A
-Filter:	CharacterWindow		Filtras:
 Kannada	UnicodeBlocks		Kanadų
 Lydian	UnicodeBlocks		Lydų
 Gurmukhi	UnicodeBlocks		Gurmukhi
@@ -59,7 +55,6 @@ Supplemental arrows B	UnicodeBlocks		Papildomos rodyklės B
 CJK unified ideographs	UnicodeBlocks		CJK unifikuotos ideogramos
 Latin extended B	UnicodeBlocks		Lotynų papildomi B
 Phonetic extensions	UnicodeBlocks		Fonetiniai plėtiniai
-Code	CharacterWindow		Kodas
 Block elements	UnicodeBlocks		Blokiniai elementai
 Mahjong tiles	UnicodeBlocks		Mažongo kaladėlės
 Carian	UnicodeBlocks		Karų
@@ -88,7 +83,6 @@ Number forms	UnicodeBlocks		Skaičių formos
 Latin extended A	UnicodeBlocks		Lotynų papildomi A
 Sundanese	UnicodeBlocks		Sundų
 Geometric shapes	UnicodeBlocks		Geometrinės figūros
-Clear	CharacterWindow		Išvalyti
 Arabic	UnicodeBlocks		Arabų
 Khmer symbols	UnicodeBlocks		Khmerų simboliai
 Ol Chiki	UnicodeBlocks		Ol-čiki
@@ -103,7 +97,6 @@ Tamil	UnicodeBlocks		Tamilų
 Greek extended	UnicodeBlocks		Graikų papildomi
 Lepcha	UnicodeBlocks		Lepča
 Old italic	UnicodeBlocks		Etruskų
-Quit	CharacterWindow		Baigti darbą
 Buhid	UnicodeBlocks		Buhidas
 Supplementary private use area B	UnicodeBlocks		Papildoma privačioji sritis B
 Cuneiform	UnicodeBlocks		Dantiraštis
@@ -133,7 +126,6 @@ Supplementary private use area A	UnicodeBlocks		Papildoma privačioji sritis A
 Armenian	UnicodeBlocks		Armėnų
 Phags-pa	UnicodeBlocks		Fags-pa
 CJK compatibility ideographs	UnicodeBlocks		CJK suderinamumo ideogramos
-Show private blocks	CharacterWindow		Rodyti privačiuosius blokus
 Latin extended additional	UnicodeBlocks		Lotynų papildomas plėtinys
 Tibetan	UnicodeBlocks		Tibetiečių
 Combining diacritical marks	UnicodeBlocks		Kombinaciniai diakritiniai ženklai
@@ -146,16 +138,13 @@ Runic	UnicodeBlocks		Runos
 General punctuation	UnicodeBlocks		Bendrieji skyrybos ženklai
 Glagotic	UnicodeBlocks		Glagolica
 Cyrillic extended B	UnicodeBlocks		Kirilicos papildomi B
-Copy as escaped byte string	CharacterView		Kopijuoti kaip baitų kaitos seką
 Tai Xuan Jing symbols	UnicodeBlocks		Tai Xuan Jing simboliai
 Hiragana	UnicodeBlocks		Hiragana
 Tagbanwa	UnicodeBlocks		Tagbanva
 Basic Latin	UnicodeBlocks		Baziniai lotynų
 Greek and Coptic	UnicodeBlocks		Graikų ir koptų
 Kangxi radicals	UnicodeBlocks		Kangzi raktai
-Copy character	CharacterView		Kopijuoti ženklą
 Hangul Jamo	UnicodeBlocks		Hangulo rašmenys
-Font	CharacterWindow		Šriftas
 Phaistos disc	UnicodeBlocks		Festo diskas
 Miscellaneous technical	UnicodeBlocks		Įvairūs techniniai ženklai
 Braille patterns	UnicodeBlocks		Brailio raštas

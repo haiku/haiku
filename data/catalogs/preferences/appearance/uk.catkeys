@@ -1,79 +1,39 @@
-1	ukrainian	x-vnd.Haiku-Appearance	663472720
+1	ukrainian	x-vnd.Haiku-Appearance	2170377510
 Control border	Colors tab		Рамка елемента
+Failure	Colors tab		Збій
 Control mark	Colors tab		Відмітка
-Off	AntialiasingSettingsView		Вимкнути
 Window border	Colors tab		Рамка вікна
 Inactive window tab	Colors tab		Заголовок неактивного вікна
-Defaults	APRWindow		За замовчуванням
 Shadow	Colors tab		Тінь
-Document background	Colors tab		Фон документа
-List background	Colors tab		Фон списку
-No effect on running applications	DecorSettingsView		Не впливає на запущені програми
-Fixed font:	Font view		Моноширинний шрифт:
-Appearance	System name		Appearance
-Reduce colored edges filter strength:	AntialiasingSettingsView		Фільтрація забарвлення кромок:
-Glyph hinting:	AntialiasingSettingsView		Уточнення:
-Default Haiku ControlLook	DecorSettingsView		Haiku ControlLook за замовчуванням
-Menu item text	Colors tab		Текст елемента меню
-About decorator	DecorSettingsView		Про Декоратор
-Antialiasing menu	AntialiasingSettingsView		Меню зглажування
-Success	Colors tab		Успішно
-About	DecorSettingsView		Про це
-Shine	Colors tab		Сяйво
-Arrow style	DecorSettingsView		Стиль стрілок
-On	AntialiasingSettingsView		Увімкнути
-Decorator:	DecorSettingsView		Декоратор:
-Menu background	Colors tab		Фон меню
-Revert	APRWindow		Без змін
-List item text	Colors tab		Текст елементів списку
-OK	DecorSettingsView		ОК
-Control text	Colors tab		Текст елемента
-Look and feel	APRWindow		Вигляд і поведінка
-Selected menu item background	Colors tab		Фон вибраного пункта меню
-Link active	Colors tab		Активне посилання
-Antialiasing	APRWindow		Згладжування
-Menu font:	Font view		Шрифт меню:
-Bold font:	Font view		Жирний шрифт:
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nАвтори:\n\t%decorAuthors\n\nURL: %decorURL\nЛіцензія: %decorLic\n\n%decorDesc\n
-Choose Decorator	DecorSettingsView		Вибір Декоратора
-Strong	AntialiasingSettingsView		Сильно
-Failure	Colors tab		Збій
-Double:	DecorSettingsView		Подвійний:
 Selected menu item text	Colors tab		Текст вибраного елемента меню
-Size:	Font Selection view		Розмір:
+Document background	Colors tab		Фон документа
 Panel background	Colors tab		Фон панелі
-Plain font:	Font view		Простий шрифт:
+List background	Colors tab		Фон списку
 Window tab text	Colors tab		Текст заголовку вікна
 Navigation pulse	Colors tab		Навігація pulse
-LCD subpixel	AntialiasingSettingsView		Субпіксельне зглажування
 Window tab	Colors tab		Заголовок вікна
-Link text	Colors tab		Текст посилання
 Tooltip background	Colors tab		Фон підказки
-ControlLook:	DecorSettingsView		Вигляд віджетів:
+Link text	Colors tab		Текст посилання
 Scroll bar thumb	Colors tab		Повзунок прокрутки
-Default	DecorSettingsView		За замовчуванням
 Link visited	Colors tab		Відвідане посилання
 Selected menu item border	Colors tab		Рамка вибраного елемента меню
 Tooltip text	Colors tab		Текст підказки
-Control background	Colors tab		Фон елемента
 Selected list item text	Colors tab		Текст вибраного елемента списку
+Control background	Colors tab		Фон елемента
+Menu item text	Colors tab		Текст елемента меню
 Selected list item background	Colors tab		Фон вибраного пункта меню
 Inactive window tab text	Colors tab		Текст заголовку неактивного вікна
 Navigation base	Colors tab		Базова навігація
-Fonts	APRWindow		Шрифти
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Факт ґринджол: бій псюг вщух, з’їм шче яєць.
-Grayscale	AntialiasingSettingsView		Відтінки сірого
-Antialiasing type:	AntialiasingSettingsView		Тип згладжування:
+Success	Colors tab		Успішно
 Panel text	Colors tab		Текст панелі
-Hinting menu	AntialiasingSettingsView		Підказки меню
-Scroll bar:	DecorSettingsView		Смуга прокрутки:
-Choose ControlLook	DecorSettingsView		Оберіть вигляд віджетів
-Monospaced fonts only	AntialiasingSettingsView		Тільки моноширинні шрифти
+Shine	Colors tab		Сяйво
+Menu background	Colors tab		Фон меню
 Document text	Colors tab		Текст документа
+List item text	Colors tab		Текст елементів списку
 Inactive window border	Colors tab		Рамка неактивного вікна
-Colors	APRWindow		Кольори
-About control look	DecorSettingsView		Про вигляд віджетів
-Control highlight	Colors tab		Виділення елемента
+Control text	Colors tab		Текст елемента
 Status bar	Colors tab		Смуга стану
+Control highlight	Colors tab		Виділення елемента
+Selected menu item background	Colors tab		Фон вибраного пункта меню
+Link active	Colors tab		Активне посилання
 Link hover	Colors tab		Посилання під курсором
-Single:	DecorSettingsView		Одинарний:

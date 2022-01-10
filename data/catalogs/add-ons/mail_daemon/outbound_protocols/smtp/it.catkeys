@@ -1,14 +1,8 @@
-1	italian	x-vnd.Haiku-SMTP	815985329
-POP3 authentication failed. The server said:\n	smtp		L'autenticazione POP3 è fallita. Risposta del server:\n
-Destination:	ConfigView		Destinazione:
-Error while logging in to %serv	smtp		Errore durante l'autenticazione su %serv
-Connecting to server…	smtp		Connessione al server…
-Unencrypted	ConfigView		Non crittografata
-. The server says:\n	smtp		. Risposta del server:\n
-Error while opening connection to %serv	smtp		Errore durante la connessione a %serv
-. The server said:\n	smtp		. Risposta del server:\n
+1	italian	x-vnd.Haiku-SMTP	3672333926
 None	ConfigView		Nessuno
-SMTP server:	ConfigView		Server SMTP:
 ESMTP	ConfigView		ESMTP
+SMTP server:	ConfigView		Server SMTP:
+Destination:	ConfigView		Destinazione:
 POP3 before SMTP	ConfigView		POP3 prima di SMTP
 SSL	ConfigView		SSL
+Unencrypted	ConfigView		Non crittografata

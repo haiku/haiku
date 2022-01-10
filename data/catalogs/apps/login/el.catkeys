@@ -1,20 +1,11 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Login	3568987751
+1	greek, modern (1453-)	x-vnd.Haiku-Login	3025604784
 Invalid login!	Login View		Μη έγκυρη είσοδος!
-Error	Login App		Σφάλμα
-Login application for Haiku\nUsage:	Login App		Εφαρμογή εισόδου Haiku\nΧρήση:
---nonmodal\tDo not make the window modal	Login App		--nonmodal\tΕμφάνιση σε κανονικό παράθυρο
+OK	Login View		ΟΚ
 Welcome to Haiku	Login Window		Καλωσορίσατε στο Haiku
+Login:	Login View		Είσοδος:
+Password:	Login View		Κωδικός:
 Halt	Login View		Παύση
 Desktop	Desktop Window		Επιφάνεια εργασίας
 Hide password	Login View		Κρύψιμο κωδικού
 Reboot	Login View		Επανεκκίνηση
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Μπορείτε να προσαρμόσετε την επιφάνεια εργασίας πίσω από την εφαρμογή Εισόδου τοποθετώντας ρέπλικες σε αυτήν.\n\nΌταν τελειώσετε, απλά κλείστε την εφαρμογή (Cmd-Q).
-OK	Login View		ΟΚ
-Info	Login App		Πληροφορίες
---edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tΕκκίνηση σε λειτουργία επεξεργασίας για εξατομίκευση της επιφάνειας εργασίας.
-Login:	Login View		Είσοδος:
-Password:	Login View		Κωδικός:
-Unimplemented	Login App		Μη υλοποιημένο
-OK	Login App		ΟΚ
-Error: %1	Login App		Σφάλμα: %1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	σφάλμα %s\n

@@ -1,9 +1,6 @@
-1	catalan; valencian	x-vnd.Haiku-MatchHeader	1946584206
+1	catalan; valencian	x-vnd.Haiku-MatchHeader	631274947
 Delete message	ConfigView		Suprimeix el missatge
-Match \"%attribute\" against \"%regex\"	RuleFilter		Relaciona \"%attribute\" amb \"%regex\"
-Match header	RuleFilter		Capçalera de coincidència
 Set flags to	ConfigView		Estableix les banderes a
-Header field (e.g. Subject, From, …)	ConfigView		Camp de la capçalera (p. ex.: assumpte, de...)
 <Choose account>	ConfigView		<Trieu un compte>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Valor comodí com ara \"*spam*\".\nPoseu-hi el prefix \"REGEX:\" per usar expressions regulars.
 Then	ConfigView		Llavors

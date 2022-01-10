@@ -1,79 +1,39 @@
-1	japanese	x-vnd.Haiku-Appearance	663472720
+1	japanese	x-vnd.Haiku-Appearance	2170377510
 Control border	Colors tab		コントロールの境界
+Failure	Colors tab		失敗
 Control mark	Colors tab		コントロールの選択部
-Off	AntialiasingSettingsView		無効
 Window border	Colors tab		ウィンドウ枠
 Inactive window tab	Colors tab		アクティブでないウィンドウタブ
-Defaults	APRWindow		デフォルト
 Shadow	Colors tab		影
-Document background	Colors tab		ドキュメントの背景
-List background	Colors tab		リストの背景
-No effect on running applications	DecorSettingsView		実行中のアプリケーションには影響しない
-Fixed font:	Font view		等幅フォント:
-Appearance	System name		外観
-Reduce colored edges filter strength:	AntialiasingSettingsView		カラーエッジフィルターの強度を下げる:
-Glyph hinting:	AntialiasingSettingsView		グリフのヒンティング:
-Default Haiku ControlLook	DecorSettingsView		規定の Haiku のコントロール表示
-Menu item text	Colors tab		メニュー項目の文字
-About decorator	DecorSettingsView		デコレーターについて
-Antialiasing menu	AntialiasingSettingsView		アンチエイリアスメニュー
-Success	Colors tab		成功
-About	DecorSettingsView		情報
-Shine	Colors tab		光
-Arrow style	DecorSettingsView		矢印のスタイル
-On	AntialiasingSettingsView		有効
-Decorator:	DecorSettingsView		デコレーター:
-Menu background	Colors tab		メニューの背景
-Revert	APRWindow		戻す
-List item text	Colors tab		リスト項目の文字
-OK	DecorSettingsView		OK
-Control text	Colors tab		コントロールの文字
-Look and feel	APRWindow		外観
-Selected menu item background	Colors tab		メニュー選択項目の背景
-Link active	Colors tab		リンク (選択中)
-Antialiasing	APRWindow		アンチエイリアス
-Menu font:	Font view		メニューフォント:
-Bold font:	Font view		太字フォント:
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\n作者:\n\t%decorAuthors\n\nURL: %decorURL\nライセンス: %decorLic\n\n%decorDesc\n
-Choose Decorator	DecorSettingsView		デコレーターの選択
-Strong	AntialiasingSettingsView		強い
-Failure	Colors tab		失敗
-Double:	DecorSettingsView		両方向:
 Selected menu item text	Colors tab		メニュー選択項目の文字
-Size:	Font Selection view		サイズ:
+Document background	Colors tab		ドキュメントの背景
 Panel background	Colors tab		パネルの背景
-Plain font:	Font view		標準フォント:
+List background	Colors tab		リストの背景
 Window tab text	Colors tab		ウィンドウタブの文字
 Navigation pulse	Colors tab		ナビゲーションの点滅
-LCD subpixel	AntialiasingSettingsView		LCD サブピクセル
 Window tab	Colors tab		ウィンドウタブ
-Link text	Colors tab		リンクテキスト
 Tooltip background	Colors tab		ツールチップの背景
-ControlLook:	DecorSettingsView		コントロール表示:
+Link text	Colors tab		リンクテキスト
 Scroll bar thumb	Colors tab		スクロールバーサム
-Default	DecorSettingsView		デフォルト
 Link visited	Colors tab		リンク (訪問済)
 Selected menu item border	Colors tab		メニュー選択項目の境界
 Tooltip text	Colors tab		ツールチップの文字
-Control background	Colors tab		コントロールの背景
 Selected list item text	Colors tab		リスト選択項目の文字
+Control background	Colors tab		コントロールの背景
+Menu item text	Colors tab		メニュー項目の文字
 Selected list item background	Colors tab		リスト選択項目の背景
 Inactive window tab text	Colors tab		アクティブでないウィンドウタブの文字
 Navigation base	Colors tab		ナビゲーション
-Fonts	APRWindow		フォント
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	古池や A frog jumps in, 水の音。
-Grayscale	AntialiasingSettingsView		グレースケール
-Antialiasing type:	AntialiasingSettingsView		アンチエイリアス:
+Success	Colors tab		成功
 Panel text	Colors tab		パネルの文字
-Hinting menu	AntialiasingSettingsView		ヒンティングメニュー
-Scroll bar:	DecorSettingsView		スクロールバー:
-Choose ControlLook	DecorSettingsView		コントロール表示の選択
-Monospaced fonts only	AntialiasingSettingsView		等幅フォントのみ有効
+Shine	Colors tab		光
+Menu background	Colors tab		メニューの背景
 Document text	Colors tab		ドキュメントの文字
+List item text	Colors tab		リスト項目の文字
 Inactive window border	Colors tab		アクティブでないウィンドウ枠
-Colors	APRWindow		色
-About control look	DecorSettingsView		コントロール表示について
-Control highlight	Colors tab		コントロールのハイライト
+Control text	Colors tab		コントロールの文字
 Status bar	Colors tab		ステータスバー
+Control highlight	Colors tab		コントロールのハイライト
+Selected menu item background	Colors tab		メニュー選択項目の背景
+Link active	Colors tab		リンク (選択中)
 Link hover	Colors tab		リンク (ポイント時)
-Single:	DecorSettingsView		一方向:

@@ -1,67 +1,33 @@
-1	lithuanian	x-vnd.Haiku-Appearance	1992724537
+1	lithuanian	x-vnd.Haiku-Appearance	3579486540
 Control border	Colors tab		Valdiklių rėmeliai
-Off	AntialiasingSettingsView		išjungta
+Failure	Colors tab		Nesėkminga baigtis
 Window border	Colors tab		Veikiamojo lango rėmelis
 Inactive window tab	Colors tab		Foninių lango antraštės
-Defaults	APRWindow		Numatytosios reikšmės
 Shadow	Colors tab		Šešėliai
-Document background	Colors tab		Dokumento fonas
-List background	Colors tab		Sąrašo fonas
-Fixed font:	Font view		Lygiaplotis šriftas:
-Appearance	System name		Išvaizda
-Reduce colored edges filter strength:	AntialiasingSettingsView		Spalvotų kraštų filtro intensyvumas:
-Glyph hinting:	AntialiasingSettingsView		Rašmenų taškinė korekcija:
-Menu item text	Colors tab		Meniu elementų tekstas
-About decorator	DecorSettingsView		Apie dekoruoklį
-Antialiasing menu	AntialiasingSettingsView		Glodinimo meniu
-Success	Colors tab		Sėkminga baigtis
-About	DecorSettingsView		Apie
-Shine	Colors tab		Švytėjimas
-Arrow style	DecorSettingsView		Rodyklės stilius
-On	AntialiasingSettingsView		įjungta
-Decorator:	DecorSettingsView		Dekoruoklis:
-Menu background	Colors tab		Meniu fonas
-Revert	APRWindow		Atšaukti pakeitimus
-List item text	Colors tab		Sąrašo elemento tekstas
-OK	DecorSettingsView		Gerai
-Control text	Colors tab		Valdiklių tekstas
-Look and feel	APRWindow		Išvaizda ir jausena
-Selected menu item background	Colors tab		Veikiamojo meniu elemento fonas
-Antialiasing	APRWindow		Glodinimas
-Menu font:	Font view		Meniu šriftas:
-Bold font:	Font view		Pastorintas šriftas:
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutoriai:\n\t%decorAuthors\n\nTinklalapis: %decorURL\nLicencija: %decorLic\n\n%decorDesc\n
-Choose Decorator	DecorSettingsView		Išsirinkite dekoruoklį
-Strong	AntialiasingSettingsView		Intensyvus
-Failure	Colors tab		Nesėkminga baigtis
-Double:	DecorSettingsView		Dvigubas:
 Selected menu item text	Colors tab		Veikiamojo meniu elemento tekstas
-Size:	Font Selection view		Dydis:
+Document background	Colors tab		Dokumento fonas
 Panel background	Colors tab		Skydelių fonas
-Plain font:	Font view		Paprastas šriftas:
+List background	Colors tab		Sąrašo fonas
 Window tab text	Colors tab		Veikiamojo lango antraštės tekstas
 Navigation pulse	Colors tab		Veikiamojo elemento (židinio) žybsniai
-LCD subpixel	AntialiasingSettingsView		subpikselinis LCD
 Window tab	Colors tab		Veikiamojo lango antraštė
 Tooltip background	Colors tab		Iškylančiųjų paaiškinimų fonas
 Scroll bar thumb	Colors tab		Slankiklis
 Selected menu item border	Colors tab		Veikiamojo meniu elemento rėmelis
 Tooltip text	Colors tab		Iškylančiųjų paaiškinimų tekstas
-Control background	Colors tab		Valdiklių fonas
 Selected list item text	Colors tab		Veikiamojo meniu elemento tekstas
+Control background	Colors tab		Valdiklių fonas
+Menu item text	Colors tab		Meniu elementų tekstas
 Selected list item background	Colors tab		Pasirinktojo sąrašo elemento fonas
 Inactive window tab text	Colors tab		Neaktyvių langų antraščių tekstas
 Navigation base	Colors tab		Veikiamojo elemento (židinio) rėmelis
-Fonts	APRWindow		Šriftai
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Įlinkdama fechtuotojo špaga sublykčiojusi pragręžė apvalų arbūzą.
-Grayscale	AntialiasingSettingsView		pilkumo tonai
-Antialiasing type:	AntialiasingSettingsView		Glodinimo būdas:
+Success	Colors tab		Sėkminga baigtis
 Panel text	Colors tab		Skydelių tekstas
-Hinting menu	AntialiasingSettingsView		Taškinės korekcijos meniu
-Scroll bar:	DecorSettingsView		Slankjuostės:
-Monospaced fonts only	AntialiasingSettingsView		tik lygiapločių šriftų
+Shine	Colors tab		Švytėjimas
+Menu background	Colors tab		Meniu fonas
 Document text	Colors tab		Dokumento tekstas
+List item text	Colors tab		Sąrašo elemento tekstas
 Inactive window border	Colors tab		Foninių langų rėmeliai
-Colors	APRWindow		Spalvos
+Control text	Colors tab		Valdiklių tekstas
 Control highlight	Colors tab		Valdiklių paryškinimas
-Single:	DecorSettingsView		Viengubas:
+Selected menu item background	Colors tab		Veikiamojo meniu elemento fonas

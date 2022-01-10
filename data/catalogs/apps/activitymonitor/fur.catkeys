@@ -1,48 +1,35 @@
-1	friulian	x-vnd.Haiku-ActivityMonitor	2601047281
+1	friulian	x-vnd.Haiku-ActivityMonitor	1330427574
 Teams	DataSource		Team
 Semaphores	DataSource		Semafars
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Memorie cache a blocs
-%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
 Media nodes	DataSource		Grops multimediâi
 Text clipboard	DataSource		Notis di test
 Network send	DataSource		Rêt (inviament)
-Running applications	DataSource		Aplicazions in esecuzion
 Cache	DataSource		Cache
-CPU usage (combined)	DataSource		CPU doprade (cumbinât)
+Running applications	DataSource		Aplicazions in esecuzion
 Threads	DataSource		Thread
+CPU usage (combined)	DataSource		CPU doprade (cumbinât)
 Receiving	DataSource		Ricezion
-Remove graph	ActivityView		Gjave grafic
 Swap space	DataSource		Spazi memorie di scambi
 CPU	DataSource		CPU
-ActivityMonitor	System name		VisôrAtivitâts
 CPU %d	DataSource		CPU %d
-Update time interval:	SettingsWindow		Interval di inzornament:
 RX	DataSource	Shorter version for Receiving.	RX
-Settings…	ActivityWindow		Impostazions…
 Block cache	DataSource		Bloche cache
 Memory	DataSource		Memorie
 CPU usage	DataSource		CPU doprade
-Quit	ActivityWindow		Jes
 Raw clipboard	DataSource		Notis gresis
-Settings	ActivityWindow		Impostazions
 Used memory	DataSource		Memorie doprade
 %.1f faults/s	DataSource		%.1f erôrs/s
-Show legend	ActivityView		Mostre liende
 Cached memory	DataSource		Memorie cache
 CPU %d usage	DataSource		CPU %d doprade
-File	ActivityWindow		File
 Ports	DataSource		Puartis
 Page faults	DataSource		Erôrs di pagjine
 Apps	DataSource		Aplicazions
-Additional items	ActivityView		Elements adizionâi
-Add graph	ActivityWindow		Zonte grafic
 Sending	DataSource		Inviament
 %.1f MiB	DataSource		%.1f MiB
-Always on top	ActivityWindow		Simpri denant
 Swap	DataSource		Mem. di scambi
-%lld sec.	SettingsWindow		%lld sec.
 P-faults	DataSource		Erôrs-pagjine
 Sems	DataSource		Sems
 Network receive	DataSource		Rêt (ricezion)

@@ -1,79 +1,39 @@
-1	esperanto	x-vnd.Haiku-Appearance	663472720
+1	esperanto	x-vnd.Haiku-Appearance	2170377510
 Control border	Colors tab		Administri borderon
+Failure	Colors tab		Malsukceso
 Control mark	Colors tab		Administri markon
-Off	AntialiasingSettingsView		Malŝaltita
 Window border	Colors tab		Bordero de fenestro
 Inactive window tab	Colors tab		Langeto de neaktiva fenestro
-Defaults	APRWindow		Defaŭltoj
 Shadow	Colors tab		Ombro
-Document background	Colors tab		Dokumenta fono
-List background	Colors tab		Fono de listoj
-No effect on running applications	DecorSettingsView		Neniu efekto por rulanta programo
-Fixed font:	Font view		Fiksitlarĝa tiparo:
-Appearance	System name		Aspekto
-Reduce colored edges filter strength:	AntialiasingSettingsView		Intenseco de filtro por kolorigitaj randoj:
-Glyph hinting:	AntialiasingSettingsView		Signobilda polurado:
-Default Haiku ControlLook	DecorSettingsView		Antaŭfiksita ControlLook de Haiku
-Menu item text	Colors tab		Menua teksto
-About decorator	DecorSettingsView		Pri la dekoraciilo
-Antialiasing menu	AntialiasingSettingsView		Glatigada menuo
-Success	Colors tab		Sukceso
-About	DecorSettingsView		Pri
-Shine	Colors tab		Brilo
-Arrow style	DecorSettingsView		Stilo de sago
-On	AntialiasingSettingsView		Ŝaltita
-Decorator:	DecorSettingsView		Dekoraciilo:
-Menu background	Colors tab		Menua fono
-Revert	APRWindow		Malfari
-List item text	Colors tab		Lista teksto
-OK	DecorSettingsView		Bone
-Control text	Colors tab		Administri tekston
-Look and feel	APRWindow		Aspekto kaj konduto
-Selected menu item background	Colors tab		Fono de elektita menuero
-Link active	Colors tab		Aktiva ligilo
-Antialiasing	APRWindow		Glatigado
-Menu font:	Font view		Menua tiparo:
-Bold font:	Font view		Grasa tiparo:
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAŭtoroj:\n\t%decorAuthors\n\nURL: %decorURL\nPermisilo: %decorLic\n\n%decorDesc\n
-Choose Decorator	DecorSettingsView		Elekti dekoraciilon
-Strong	AntialiasingSettingsView		Forta
-Failure	Colors tab		Malsukceso
-Double:	DecorSettingsView		Duobla:
 Selected menu item text	Colors tab		Teksto de elektita menuero
-Size:	Font Selection view		Grando:
+Document background	Colors tab		Dokumenta fono
 Panel background	Colors tab		Panela fono
-Plain font:	Font view		Plata tiparo:
+List background	Colors tab		Fono de listoj
 Window tab text	Colors tab		Teksto en langeto de fenestro
 Navigation pulse	Colors tab		Navigada pulso
-LCD subpixel	AntialiasingSettingsView		Subbildera por likvokristala ekrano
 Window tab	Colors tab		Fenestra langeto
-Link text	Colors tab		Ligila teksto
 Tooltip background	Colors tab		Ŝpruchelpila fono
-ControlLook:	DecorSettingsView		ControlLook:
+Link text	Colors tab		Ligila teksto
 Scroll bar thumb	Colors tab		Butono de ruluma strio
-Default	DecorSettingsView		Defaŭlta
 Link visited	Colors tab		Vizitita ligilo
 Selected menu item border	Colors tab		Bordero de elektita menua elemento
 Tooltip text	Colors tab		Ŝpruchelpila teksto
-Control background	Colors tab		Administri fonon
 Selected list item text	Colors tab		Teksto de elektita listero
+Control background	Colors tab		Administri fonon
+Menu item text	Colors tab		Menua teksto
 Selected list item background	Colors tab		Fono de elektita listero
 Inactive window tab text	Colors tab		Teksto en langeto de neaktiva fenestro
 Navigation base	Colors tab		Navigada bazo
-Fonts	APRWindow		Tiparoj
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Deca paroĥo havebligas ŝinkon. Almozatoj furaĝas ĉiuĵaŭde.
-Grayscale	AntialiasingSettingsView		Grizoskalo
-Antialiasing type:	AntialiasingSettingsView		Glatigada speco:
+Success	Colors tab		Sukceso
 Panel text	Colors tab		Panela teksto
-Hinting menu	AntialiasingSettingsView		Polurada menuo
-Scroll bar:	DecorSettingsView		Rulumskalo:
-Choose ControlLook	DecorSettingsView		Elekti ControlLook
-Monospaced fonts only	AntialiasingSettingsView		Nur egallarĝaj tiparoj
+Shine	Colors tab		Brilo
+Menu background	Colors tab		Menua fono
 Document text	Colors tab		Dokumenta teksto
+List item text	Colors tab		Lista teksto
 Inactive window border	Colors tab		Bordero de neaktiva fenestro
-Colors	APRWindow		Koloroj
-About control look	DecorSettingsView		Pri ControlLook
-Control highlight	Colors tab		Administri emfazon
+Control text	Colors tab		Administri tekston
 Status bar	Colors tab		Statlineo
+Control highlight	Colors tab		Administri emfazon
+Selected menu item background	Colors tab		Fono de elektita menuero
+Link active	Colors tab		Aktiva ligilo
 Link hover	Colors tab		Ligila ŝvebo
-Single:	DecorSettingsView		Sola:

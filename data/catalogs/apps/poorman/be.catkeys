@@ -1,64 +1,40 @@
-1	belarusian	x-vnd.Haiku-PoorMan	3296382959
-Select web folder	PoorMan		Выбраць выб-каталог
-Console logging	PoorMan		Пратакол на кансоль
-Create Log File	PoorMan		Стварыць файл пратаколу
-File logging	PoorMan		Пратакаліраванне файлаў
-Website options	PoorMan		Опцыі вэб-сайта
-Log to file	PoorMan		Пратакол ў файле
-Shutting down.	PoorMan		Выключэнне.
-Error Dir	PoorMan		Каталог Памылак
-Web folder:	PoorMan		Вэб-каталог:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Калі ласка, выберыце каталог, які трэба апублікаваць.\n\nPoorMan можа стварыць для вас стандартны каталог \"public_html\" у хатнім каталозе.\nАбо вы можаце самі выбраць пажаданы каталог.
-Log To Console	PoorMan		Лог у Кансоль
-File Name	PoorMan		Імя Файла
-Starting up... 	PoorMan		Загрузка... 
-Select	PoorMan		Выбраць
-Logging view	PoorMan		Від пратакаліравання
-Save console as…	PoorMan		Захаваць кансоль як…
-Edit	PoorMan		Правіць
-Cancel	PoorMan		Адмена
-Directory: 	PoorMan		Дырэкторыя: 
-Hits: %lu	PoorMan		Пераходы: %lu
-Hits: 0	PoorMan		Пераходы: 0
-Shutting down.\n	PoorMan		Выключэнне.\n
-Select all	PoorMan		Выбраць усё
-Error Server	PoorMan		Сервер Памылак
-Send file listing if there's no start page	PoorMan		Адпраўляць спісы файлаў, калі стартавая старонка не існуе
-Create PoorMan log	PoorMan		Стварыць лог PoorMan
-Max. simultaneous connections:	PoorMan		Макс. колькасць адначасовых спалучэнняў:
-Done	PoorMan		Гатова
-Site	PoorMan		Сайт
+1	belarusian	x-vnd.Haiku-PoorMan	3975027187
 Cannot start the server	PoorMan		Нельга запусціць сервер
+Site	PoorMan		Сайт
 Create log file	PoorMan		Стварыць лог
+Console logging	PoorMan		Пратакол на кансоль
+Select web folder	PoorMan		Выбраць выб-каталог
 Clear hit counter	PoorMan		Ачысціць злічальнік пераходаў
-Status: Stopped	PoorMan		Стан: Спынены
+File logging	PoorMan		Пратакаліраванне файлаў
 File	PoorMan		Файл
 Settings…	PoorMan		Наладкі…
-Log To File	PoorMan		Лог у Файл
+Website options	PoorMan		Опцыі вэб-сайта
+Log to file	PoorMan		Пратакол ў файле
 Connections	PoorMan		Далучэньні
 Controls	PoorMan		Элементы кіравання
 Log to console	PoorMan		Пратакол на кансоль
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Калі ласка, выберыце каталог, які трэба апублікаваць.\n\nPoorMan можа стварыць для вас стандартны каталог \"public_html\" у хатнім каталозе.\nАбо вы можаце самі выбраць пажаданы каталог.
+Web folder:	PoorMan		Вэб-каталог:
 Advanced	PoorMan		Пашыраныя
-Copy	PoorMan		Капіяваць
 Logging	PoorMan		Пратакаліраванне
+Copy	PoorMan		Капіяваць
 PoorMan	System name		Валацуга (Web-сервер)
-Clear console log	PoorMan		Ачысціць лог кансолі
+Logging view	PoorMan		Від пратакаліравання
 Run server	PoorMan		Запусціць сервер
-Create	PoorMan		Стварыць
-done.\n	PoorMan		гатова.\n
+Clear console log	PoorMan		Ачысціць лог кансолі
+Edit	PoorMan		Правіць
+Save console as…	PoorMan		Захаваць кансоль як…
 PoorMan settings	PoorMan		Наладкі PoorMan
-Console Logging	PoorMan		Пратакаліраванне Кансолі
 Clear log file	PoorMan		Ачысціць лог-файл
 Save log console selection	PoorMan		Захоўваць выдзяленні кансолі ў лог
-File Logging	PoorMan		Пратакол ў файл
 Log file name:	PoorMan		Імя лог-файла:
-Status: Running	PoorMan		Стан: Працуе
-Directory: (none)	PoorMan		Дырэкторыя: (няма)
+Select all	PoorMan		Выбраць усё
+Send file listing if there's no start page	PoorMan		Адпраўляць спісы файлаў, калі стартавая старонка не існуе
+Create PoorMan log	PoorMan		Стварыць лог PoorMan
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартны вэб-каталог быў створаны у \"/boot/home/public_html.\"\nПераканайцеся, что там ёсць HTML файл\"index.html\".
-Dir Created	PoorMan		Дырэкторыя Створана
-Save console selections as…	PoorMan		Захоўваць выдзяленні кансолі як…
 Quit	PoorMan		Выйсці
+Save console selections as…	PoorMan		Захоўваць выдзяленні кансолі як…
 Save log console	PoorMan		Захаваць лог кансолі
 Start page:	PoorMan		Стартавая старонка:
-OK	PoorMan		ОК
+Max. simultaneous connections:	PoorMan		Макс. колькасць адначасовых спалучэнняў:
 Website location	PoorMan		Месцазнаходжанне вэб-сайта

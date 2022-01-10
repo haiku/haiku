@@ -1,14 +1,8 @@
-1	esperanto	x-vnd.Haiku-SMTP	815985329
-POP3 authentication failed. The server said:\n	smtp		Fiaskis POP3 aŭtentikigo. La servilo diris:\n
-Destination:	ConfigView		Ricevloko:
-Error while logging in to %serv	smtp		Eraris dum aŭtentikigo je %serv
-Connecting to server…	smtp		Konektante al servilo…
-Unencrypted	ConfigView		Senĉifre
-. The server says:\n	smtp		La servilo diras:\n
-Error while opening connection to %serv	smtp		Eraro dum konekto al %serv
-. The server said:\n	smtp		. La servilo diris:\n
+1	esperanto	x-vnd.Haiku-SMTP	3672333926
 None	ConfigView		Neniu
-SMTP server:	ConfigView		SMTP servilo:
 ESMTP	ConfigView		ESMTP
+SMTP server:	ConfigView		SMTP servilo:
+Destination:	ConfigView		Ricevloko:
 POP3 before SMTP	ConfigView		POP3 antaŭ SMTP
 SSL	ConfigView		SSL
+Unencrypted	ConfigView		Senĉifre

@@ -1,45 +1,7 @@
-1	slovak	x-vnd.Haiku-Time	1987293945
-OK	Time		OK
+1	slovak	x-vnd.Haiku-Time	3879356774
 Message receiving failed	Time		Prijatie správy zlyhalo
-Australia	Time		Austrália
-America	Time		Amerika
-Reset to default server list	Time		Obnoviť predvolený zoznam serverov
-Could not resolve server address	Time		Nepodarilo sa preložiť adresu servera
-Set time zone	Time		Nastaviť časové pásmo
 Waiting for answer failed	Time		Čakanie na odpoveď zlyhalo
-<Other>	Time		<Iné>
 Received invalid time	Time		Prijatý neplatný čas
-Remove	Time		Odstrániť
-Synchronize again	Time		Synchronizovať znova
-Asia	Time		Ázia
-Try all servers	Time		Skúsiť všetky servery
-Time	Time		Čas
-Current time:	Time		Aktuálny čas:
-Europe	Time		Európa
-Show day of week	Time		Zobraziť deň v týždni
-Local time (Windows compatible)	Time		Miestny čas (kompatibilné s Windows)
-Hardware clock set to:	Time		Hardvérové hodiny nastavené na:
-Arctic	Time		Arktída
-Antarctica	Time		Antarktída
-GMT (UNIX compatible)	Time		GMT (kompatibilné s Unixom)
-Africa	Time		Afrika
-Stop	Time		Zastaviť
-Time zone	Time		Časové pásmo
-Clock	Time		Hodiny
-Network time	Time		Čas v sieti
 Sending request failed	Time		Odoslanie požiadavky zlyhalo
-Preview time:	Time		Náhľad času:
-\nNow: 	Time		\nTeraz: 
 Could not create socket	Time		Nepodarilo sa vytvoriť socket
-Pacific	Time		Pacifik
-Atlantic	Time		Atlantik
-Show clock in Deskbar	Time		Zobraziť hodiny v Paneli
-Display time with seconds	Time		Zobraziť sekundy v čase
-Time	System name		Čas
-Show time zone	Time		Zobraziť časové pásmo
-Synchronize at boot	Time		Synchronizovať pri štarte
-Indian	Time		Indický
-Revert	Time		Vrátiť
-Date and time	Time		Dátum a čas
-Synchronize	Time		Synchronizovať
-Add	Time		Pridať
+Could not resolve server address	Time		Nepodarilo sa preložiť adresu servera

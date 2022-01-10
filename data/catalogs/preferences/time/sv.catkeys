@@ -1,48 +1,7 @@
-1	swedish	x-vnd.Haiku-Time	3691539601
-OK	Time		OK
+1	swedish	x-vnd.Haiku-Time	3879356774
 Message receiving failed	Time		Kunde inte ta emot meddelandet
-Australia	Time		Australien
-America	Time		Amerika
-Reset to default server list	Time		Återställ till förinställt värde
-Could not resolve server address	Time		Det gick inte att namnupplösa serveradressen
-Time & Date	System name		Tid och datum
-Set time zone	Time		Ange tidzon
 Waiting for answer failed	Time		Fick inget svar
-<Other>	Time		<Annan>
 Received invalid time	Time		Tog emot en ogiltig tid
-Remove	Time		Ta bort
-Synchronize again	Time		Synkronisera igen
-Asia	Time		Asien
-Try all servers	Time		Prova alla servrarna
-Time	Time		Tid
-Current time:	Time		Aktuell tid:
-The following error occured while synchronizing:\n%s: %s	Time		Följande fel inträffade vid synkronisering:\n%s: %s
-Europe	Time		Europa
-Show day of week	Time		Visa veckodag
-Local time (Windows compatible)	Time		Lokal tid (Windows kompatibel)
-Hardware clock set to:	Time		Hårdvaruklockans tid:
-Arctic	Time		Arktis
-Antarctica	Time		Antarktis
-GMT (UNIX compatible)	Time		GMT (UNIX kompatibel)
-Africa	Time		Afrika
-Stop	Time		Stoppa
-Time zone	Time		Tidzon
-Clock	Time		Klockan
-Network time	Time		Internettid
 Sending request failed	Time		Misslyckades att skicka förfrågan
-Preview time:	Time		Förhandsvisa tid:
-\nNow: 	Time		\nNu: 
 Could not create socket	Time		Kunde inte skapa en socket
-Pacific	Time		Stilla havet
-Atlantic	Time		Atlanten
-Show clock in Deskbar	Time		Visa klockan i deskbaren
-Display time with seconds	Time		Visa tid med sekunder
-Time	System name		Tid
-Show time zone	Time		Ange tidzon
-Synchronize at boot	Time		Synkronisera vid uppstart
-Indian	Time		Indien
-Revert	Time		Återställ
-Date and time	Time		Datum och tid
-The following error occured while synchronizing:\n%s	Time		Följande fel inträffade vid synkronisering:\n%s
-Synchronize	Time		Synkronisera
-Add	Time		Lägg till
+Could not resolve server address	Time		Det gick inte att namnupplösa serveradressen

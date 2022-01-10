@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-CharacterMap	2410613018
+1	polish	x-vnd.Haiku-CharacterMap	3257656252
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Różne symbole matematyczne B
 Latin extended E	UnicodeBlocks		Łaciński rozszerzony E
@@ -6,8 +6,8 @@ Dogra	UnicodeBlocks		Dogra
 Javanese	UnicodeBlocks		Jawajski
 Saurashtra	UnicodeBlocks		Saurashtra
 Arabic supplement	UnicodeBlocks		Uzupełnienie arabskiego
-Hanunoo	UnicodeBlocks		Hanunoo
 Ogham	UnicodeBlocks		Ogamiczny
+Hanunoo	UnicodeBlocks		Hanunoo
 Inscriptional Pahlavi	UnicodeBlocks		Inskrypcyjny pahlavi
 Hebrew	UnicodeBlocks		Hebrajski
 Katakana	UnicodeBlocks		Katakana
@@ -38,7 +38,6 @@ Enclosed ideographic supplement	UnicodeBlocks		Dodatkowe otoczone znaki ideograf
 Warang Citi	UnicodeBlocks		Warang Citi
 Vertical forms	UnicodeBlocks		Formy pionowe
 Miscellaneous mathematical symbols A	UnicodeBlocks		Różne symbole matematyczne A
-CharacterMap	System name		TablicaZnaków
 Latin extended D	UnicodeBlocks		Łaciński rozszerzony D
 Aegean numbers	UnicodeBlocks		Liczby egejskie
 Hangul syllables	UnicodeBlocks		Sylaby Hangyl
@@ -46,7 +45,6 @@ Modifier tone letters	UnicodeBlocks		Modyfikujące litery tonów
 Kaithi	UnicodeBlocks		Kaithi
 Psalter Pahlavi	UnicodeBlocks		Psalter Pahlavi
 Newa	UnicodeBlocks		Newa
-View	CharacterWindow		Widok
 Rumi numeral symbols	UnicodeBlocks		Numeryczny symbole Rumi
 Enclosed CJK letters and months	UnicodeBlocks		Otoczone litery i miesiące CJK
 Deseret	UnicodeBlocks		Deseret
@@ -64,7 +62,6 @@ Chess symbols	UnicodeBlocks		Symbole szachowe
 Yijing hexagram symbols	UnicodeBlocks		Heksagramy Yijing
 Ottoman Siyaq numbers	UnicodeBlocks		Ottomańskie cyfry Siyaq
 Ideographic symbols and punctuation	UnicodeBlocks		Symbole i interpunkcja ideograficzna
-File	CharacterWindow		Plik
 Sudanese supplement	UnicodeBlocks		Uzupełnienie sudańskiego
 Myanmar	UnicodeBlocks		Birmański
 Tifinagh	UnicodeBlocks		Tifinagh
@@ -100,7 +97,6 @@ Duployan	UnicodeBlocks		Pismo skrócone Duploye’a
 Early Dynastic Cuneiform	UnicodeBlocks		Pismo klinowe z okresu wczesnodynastycznego
 Kana extended A	UnicodeBlocks		Rozszerzenie Kana A
 Arabic presentation forms A	UnicodeBlocks		Arabskie formy prezentacyjne A
-Filter:	CharacterWindow		Filtr:
 Small Kana extension	UnicodeBlocks		Rozszerzenie małych Kana
 Kannada	UnicodeBlocks		Kannada
 Brahmi	UnicodeBlocks		Brahmi
@@ -116,7 +112,6 @@ Latin extended B	UnicodeBlocks		Łaciński rozszerzony B
 Phonetic extensions	UnicodeBlocks		Rozszerzenia fonetyczne
 Indic Siyaq numbers	UnicodeBlocks		Indyjskie cyfry Siyaq
 Batak	UnicodeBlocks		Batak
-Code	CharacterWindow		Kod
 Block elements	UnicodeBlocks		Elementy blokowe
 Ethiopic extended A	UnicodeBlocks		Rozszerzony etiopski A
 Mahjong tiles	UnicodeBlocks		Klocki Mahjong
@@ -150,12 +145,11 @@ Ideographic description characters	UnicodeBlocks		Znaki opisu ideograficznego
 Supplemental arrows A	UnicodeBlocks		Dodatkowe strzałki A
 Rejang	UnicodeBlocks		Rejang
 Number forms	UnicodeBlocks		Formy liczbowe
-Avestan	UnicodeBlocks		Awestyjski
 Latin extended A	UnicodeBlocks		Łaciński rozszerzony A
+Avestan	UnicodeBlocks		Awestyjski
 Zanabazar Square	UnicodeBlocks		Kwadratowe pismo Zanabazar
 Sundanese	UnicodeBlocks		Sundajski
 Geometric shapes	UnicodeBlocks		Kształty geometryczne
-Clear	CharacterWindow		Wyczyść
 Symbols and pictographs extended A	UnicodeBlocks		Rozszerzenie symboli i piktogramów A
 Adlam	UnicodeBlocks		Adlamski
 Arabic	UnicodeBlocks		Arabski
@@ -176,8 +170,8 @@ Chorasmian	UnicodeBlocks		Chorezmijski
 Lisu supplement	UnicodeBlocks		Uzupełnienie Lisu
 Takri	UnicodeBlocks		Takri
 Shorthand format controls	UnicodeBlocks		Znaki sterujące formatem pisma skróconego
-Inscriptional Parthian	UnicodeBlocks		Inskrypcyjny partyjski
 Optical character recognition	UnicodeBlocks		Optyczne rozpoznawanie znaków
+Inscriptional Parthian	UnicodeBlocks		Inskrypcyjny partyjski
 Tamil	UnicodeBlocks		Tamilski
 Lisu	UnicodeBlocks		Lisu
 Nandingari	UnicodeBlocks		Nandingari
@@ -187,7 +181,6 @@ Mahajani	UnicodeBlocks		Mahajani
 Lepcha	UnicodeBlocks		Lepczowski
 Mandaic	UnicodeBlocks		Mandejski
 Old italic	UnicodeBlocks		Staroitalski
-Quit	CharacterWindow		Zakończ
 Playing cards	UnicodeBlocks		Karty do gry
 Chakma	UnicodeBlocks		Chakma
 Buhid	UnicodeBlocks		Buid
@@ -220,8 +213,8 @@ Combining diacritical marks extended	UnicodeBlocks		Rozszerzenie łączących zn
 Cyrillic extended C	UnicodeBlocks		Rozszerzona cyrylica C
 Syriac	UnicodeBlocks		Syryjski
 Private use area	UnicodeBlocks		Obszar prywatnego użytku
-Vedic extensions	UnicodeBlocks		Rozszerzenie wedyjskie
 Supplement punctuation	UnicodeBlocks		Dodatkowe znaki interpunkcyjne
+Vedic extensions	UnicodeBlocks		Rozszerzenie wedyjskie
 Lycian	UnicodeBlocks		Licyjsjki
 Myanmar extended A	UnicodeBlocks		Birmański rozszerzony A
 Ancient symbols	UnicodeBlocks		Symbole starożytne
@@ -241,7 +234,6 @@ Phags-pa	UnicodeBlocks		Phags-pa
 Nabataean	UnicodeBlocks		Nabatejski
 Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		Ideogramy zgodności CJK
-Show private blocks	CharacterWindow		Pokaż prywatne bloki
 Samaritan	UnicodeBlocks		Samarytański
 Latin extended additional	UnicodeBlocks		Łaciński rozszerzony dodatkowy
 Tibetan	UnicodeBlocks		Tybetański
@@ -262,16 +254,13 @@ Khudawadi	UnicodeBlocks		Khudawadi
 Glagotic	UnicodeBlocks		Glagotycki
 Cyrillic extended B	UnicodeBlocks		Rozszerzona cyrylica B
 Anatolian hieroglyphs	UnicodeBlocks		Anatolijskie hieroglify
-Copy as escaped byte string	CharacterView		Kopiuj bajty jako sekwencje zmodyfikowane
 Tai Xuan Jing symbols	UnicodeBlocks		Symbole Tai xuan Jing
 Hiragana	UnicodeBlocks		Hiragana
 Tagbanwa	UnicodeBlocks		Tagbanwa
 Basic Latin	UnicodeBlocks		Podstawowy łaciński
 Greek and Coptic	UnicodeBlocks		Grecki i koptyjski
 Kangxi radicals	UnicodeBlocks		Radykały Kangxi
-Copy character	CharacterView		Kopiuj znak
 Hangul Jamo	UnicodeBlocks		Dzamo hangyl
-Font	CharacterWindow		Font
 Ornamental dingbats	UnicodeBlocks		Ornamentalne ozdoby drukarskie
 Egyptian hieroglyph format controls	UnicodeBlocks		Znaki sterujące formatem egipskich hieroglifów
 Manichaean	UnicodeBlocks		Pismo manichejskie

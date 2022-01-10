@@ -1,16 +1,15 @@
-1	portuguese	x-vnd.Haiku-TGATranslator	3075011211
-Save with RLE compression	TGAView		Guardar com compressão RLE
-Targa image (%d bits truecolor)	TGATranslator		Imagem Targa (%d bits truecolor)
-Ignore TGA alpha channel	TGAView		Ignorar canal alfa TGA
-Targa image (%d bits colormap)	TGATranslator		Imagem Targa (%d bits mapa de cores)
-TGA image translator	TGAView		Tradutor de imagens TGA
-Targa image (%d bits RLE colormap)	TGATranslator		Imagem Targa (mapa de cores RLE %d bits)
-Targa image (%d bits gray)	TGATranslator		Imagem Targa (escala de cinzentos %d bits)
-Written by the Haiku Translation Kit Team	TGAView		Escrito pela Equipa do Kit de Tradução do Haiku
-Targa image (%d bits RLE truecolor)	TGATranslator		Imagem Targa (cores verdadeiras RLE %d bits)
-TGA images	TGATranslator		Imagens TGA
+1	portuguese	x-vnd.Haiku-TGATranslator	1299281918
 Version %d.%d.%d, %s	TGAView		Versão %d.%d.%d, %s
 TGATranslator Settings	TGATranslator		Definições do tradutor TGA
+Targa image (%d bits RLE truecolor)	TGATranslator		Imagem Targa (cores verdadeiras RLE %d bits)
+Save with RLE compression	TGAView		Guardar com compressão RLE
+Targa image (%d bits RLE colormap)	TGATranslator		Imagem Targa (mapa de cores RLE %d bits)
+Written by the Haiku Translation Kit Team	TGAView		Escrito pela Equipa do Kit de Tradução do Haiku
+Targa image (%d bits colormap)	TGATranslator		Imagem Targa (%d bits mapa de cores)
+Ignore TGA alpha channel	TGAView		Ignorar canal alfa TGA
 TGA image translator	TGATranslator		Tradutor de imagens TGA
+TGA images	TGATranslator		Imagens TGA
+Targa image (%d bits gray)	TGATranslator		Imagem Targa (escala de cinzentos %d bits)
+TGA image translator	TGAView		Tradutor de imagens TGA
 Targa image (%d bits RLE gray)	TGATranslator		Imagem Targa (escala de cinzentos RLE %d bits)
-TGA Settings	TGAMain		Definições TGA
+Targa image (%d bits truecolor)	TGATranslator		Imagem Targa (%d bits truecolor)

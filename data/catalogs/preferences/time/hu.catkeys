@@ -1,48 +1,7 @@
-1	hungarian	x-vnd.Haiku-Time	3691539601
-OK	Time		Rendben
+1	hungarian	x-vnd.Haiku-Time	3879356774
 Message receiving failed	Time		Sikertelen üzenetfogadás
-Australia	Time		Ausztrália
-America	Time		Amerika
-Reset to default server list	Time		Eredeti kiszolgálólista visszaállìtása
-Could not resolve server address	Time		Nem sikerült feloldani a kiszolgáló címét
-Time & Date	System name		Dátum és idő
-Set time zone	Time		Időzóna beállítása
 Waiting for answer failed	Time		Nem érkezett válasz
-<Other>	Time		<Egyéb>
 Received invalid time	Time		Érvénytelen idő érkezett
-Remove	Time		Eltávolítás
-Synchronize again	Time		Szinkronizálás újra
-Asia	Time		Ázsia
-Try all servers	Time		Összes kiszolgáló kipróbálása
-Time	Time		Idő
-Current time:	Time		Jelenlegi idő:
-The following error occured while synchronizing:\n%s: %s	Time		Hiba történt szinkronizálás közben:\n%s: %s
-Europe	Time		Európa
-Show day of week	Time		A hét napjának megjelenítése
-Local time (Windows compatible)	Time		Helyi idő (Windows kompatibilis)
-Hardware clock set to:	Time		A hardveres óra beállítva erre:
-Arctic	Time		Arktisz
-Antarctica	Time		Antarktisz
-GMT (UNIX compatible)	Time		GMT (UNIX kompatibilis)
-Africa	Time		Afrika
-Stop	Time		Leállítás
-Time zone	Time		Időzóna
-Clock	Time		Óra
-Network time	Time		Hálózati idő
 Sending request failed	Time		Sikertelen kérelemküldés
-Preview time:	Time		Idő előnézete:
-\nNow: 	Time		\nMost:
 Could not create socket	Time		Socket készítése sikertelen
-Pacific	Time		Csendes-óceán
-Atlantic	Time		Atlanti-óceán
-Show clock in Deskbar	Time		Óra az Asztalsávon
-Display time with seconds	Time		Másodpercek megjelenítése
-Time	System name		Dátum és idő
-Show time zone	Time		Időzóna megjelenítése
-Synchronize at boot	Time		Szinkronizálás indításkor
-Indian	Time		India
-Revert	Time		Visszaállít
-Date and time	Time		Dátum és idő
-The following error occured while synchronizing:\n%s	Time		Hiba történt szinkronizálás közben:\n%s
-Synchronize	Time		Szinkronizálás
-Add	Time		Hozzáadás
+Could not resolve server address	Time		Nem sikerült feloldani a kiszolgáló címét

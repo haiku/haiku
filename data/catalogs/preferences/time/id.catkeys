@@ -1,48 +1,7 @@
-1	indonesian	x-vnd.Haiku-Time	3691539601
-OK	Time		OKE
+1	indonesian	x-vnd.Haiku-Time	3879356774
 Message receiving failed	Time		Penerimaan pesan gagal
-Australia	Time		Australia
-America	Time		Amerika
-Reset to default server list	Time		Reset ke daftar server bawaan
-Could not resolve server address	Time		Tidak dapat menemukan alamat server
-Time & Date	System name		Waktu & Tanggal
-Set time zone	Time		Set zona waktu
 Waiting for answer failed	Time		Gagal menunggu jawaban
-<Other>	Time		<Other>
 Received invalid time	Time		Menerima jam yang salah
-Remove	Time		Lepas
-Synchronize again	Time		Sinkronkan lagi
-Asia	Time		Asia
-Try all servers	Time		Coba semua server
-Time	Time		Jam
-Current time:	Time		Waktu saat ini:
-The following error occured while synchronizing:\n%s: %s	Time		Kesalahan berikut terjadi saat menyinkronkan:\n%s: %s
-Europe	Time		Eropa
-Show day of week	Time		Tampilkan nama hari dalam sepekan
-Local time (Windows compatible)	Time		Waktu lokal (kompatibel windows)
-Hardware clock set to:	Time		Jam hardware diset ke:
-Arctic	Time		Arktik
-Antarctica	Time		Antartika
-GMT (UNIX compatible)	Time		GMT (Kompatibel UNIX)
-Africa	Time		Afrika
-Stop	Time		Berhenti
-Time zone	Time		Zona waktu
-Clock	Time		Jam
-Network time	Time		Waktu jaringan
 Sending request failed	Time		Mengirim permintaan gagal
-Preview time:	Time		Pratilik waktu:
-\nNow: 	Time		\nSekarang: 
 Could not create socket	Time		Tidak bisa membuat soket
-Pacific	Time		Pasifik
-Atlantic	Time		Atlantik
-Show clock in Deskbar	Time		Tampilkan jam di Deskbar
-Display time with seconds	Time		Tampilkan jam dengan detik
-Time	System name		Jam
-Show time zone	Time		Tampilkan zona waktu
-Synchronize at boot	Time		Sinkronisasi saat but
-Indian	Time		India
-Revert	Time		Pulihkan
-Date and time	Time		Hari dan jam
-The following error occured while synchronizing:\n%s	Time		Kesalahan berikut terjadi saat menyinkronkan:\n%s
-Synchronize	Time		Singkronkan
-Add	Time		Tambah
+Could not resolve server address	Time		Tidak dapat menemukan alamat server

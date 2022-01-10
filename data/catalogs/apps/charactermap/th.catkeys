@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-CharacterMap	638822715
+1	thai	x-vnd.Haiku-CharacterMap	1485865949
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		สัญลักษณ์ทางคณิตศาสตร์เบ็ดเตล็ด B
 Latin extended E	UnicodeBlocks		Latin ขยาย E
@@ -6,8 +6,8 @@ Dogra	UnicodeBlocks		Dogra
 Javanese	UnicodeBlocks		ชวา
 Saurashtra	UnicodeBlocks		Saurashtra
 Arabic supplement	UnicodeBlocks		อาราบิก เพิ่มเติม
-Hanunoo	UnicodeBlocks		Hanunoo
 Ogham	UnicodeBlocks		Ogham
+Hanunoo	UnicodeBlocks		Hanunoo
 Inscriptional Pahlavi	UnicodeBlocks		ปาห์ลาวี แบบจารึก
 Hebrew	UnicodeBlocks		ฮีบรู
 Katakana	UnicodeBlocks		คาตาคะนะ
@@ -38,7 +38,6 @@ Enclosed ideographic supplement	UnicodeBlocks		Enclosed ideographic supplement
 Warang Citi	UnicodeBlocks		Warang Citi
 Vertical forms	UnicodeBlocks		รูปแบบแนวตั้ง
 Miscellaneous mathematical symbols A	UnicodeBlocks		สัญลักษณ์ทางคณิตศาสตร์เบ็ดเตล็ด A
-CharacterMap	System name		รูปแบบแผนที่
 Latin extended D	UnicodeBlocks		ละติน ขยาย D
 Aegean numbers	UnicodeBlocks		อีเจียน ตัวเลข
 Hangul syllables	UnicodeBlocks		ฮังกุล พยางค์
@@ -46,7 +45,6 @@ Modifier tone letters	UnicodeBlocks		ตัวอักษรโทนดัด�
 Kaithi	UnicodeBlocks		Kaithi
 Psalter Pahlavi	UnicodeBlocks		Psalter Pahlavi
 Newa	UnicodeBlocks		Newa
-View	CharacterWindow		ดู
 Rumi numeral symbols	UnicodeBlocks		Rumi สัญลักษณ์ตัวเลข
 Enclosed CJK letters and months	UnicodeBlocks		แทรก ตัวอักษร CJK และเดือน
 Deseret	UnicodeBlocks		Deseret
@@ -64,7 +62,6 @@ Chess symbols	UnicodeBlocks		สัญลักษณ์ หมากรุก
 Yijing hexagram symbols	UnicodeBlocks		สัญลักษณ์ Yijing hexagram
 Ottoman Siyaq numbers	UnicodeBlocks		ตัวเลข Ottoman Siyaq
 Ideographic symbols and punctuation	UnicodeBlocks		สัญลักษณ์และเครื่องหมายวรรคตอน
-File	CharacterWindow		ไฟล์
 Sudanese supplement	UnicodeBlocks		ซูดาน เสริม
 Myanmar	UnicodeBlocks		พม่า
 Tifinagh	UnicodeBlocks		Tifinagh
@@ -100,7 +97,6 @@ Duployan	UnicodeBlocks		Duployan
 Early Dynastic Cuneiform	UnicodeBlocks		Early Dynastic Cuneiform
 Kana extended A	UnicodeBlocks		คานะ ขยาย A
 Arabic presentation forms A	UnicodeBlocks		อาราบิก แบบฟอร์มการนำเสนอ A
-Filter:	CharacterWindow		กรอง:
 Small Kana extension	UnicodeBlocks		คานะแบบเล็ก ขยาย
 Kannada	UnicodeBlocks		Kannada
 Brahmi	UnicodeBlocks		พราหมณ์
@@ -116,7 +112,6 @@ Latin extended B	UnicodeBlocks		ละตินขยาย B
 Phonetic extensions	UnicodeBlocks		ส่วนขยายการออกเสียง
 Indic Siyaq numbers	UnicodeBlocks		ตัวเลข Indic Siyaq
 Batak	UnicodeBlocks		Batak
-Code	CharacterWindow		รหัส
 Block elements	UnicodeBlocks		รูปแบบบล็อค
 Ethiopic extended A	UnicodeBlocks		เอธิโอเปีย ขยาย A
 Mahjong tiles	UnicodeBlocks		Mahjong tiles
@@ -150,12 +145,11 @@ Ideographic description characters	UnicodeBlocks		อักขระคำอธ
 Supplemental arrows A	UnicodeBlocks		ลูกศร A เพิ่มเติม
 Rejang	UnicodeBlocks		Rejang
 Number forms	UnicodeBlocks		รูปแบบตัวเลข
-Avestan	UnicodeBlocks		อเวสตะ
 Latin extended A	UnicodeBlocks		ละติน ขยาย A
+Avestan	UnicodeBlocks		อเวสตะ
 Zanabazar Square	UnicodeBlocks		Zanabazar Square
 Sundanese	UnicodeBlocks		ซูดาน
 Geometric shapes	UnicodeBlocks		รูปทรงเรขาคณิต
-Clear	CharacterWindow		ใส
 Symbols and pictographs extended A	UnicodeBlocks		สัญลักษณ์และภาพขยาย A
 Adlam	UnicodeBlocks		Adlam
 Arabic	UnicodeBlocks		อาราบิก
@@ -176,8 +170,8 @@ Chorasmian	UnicodeBlocks		Chorasmian
 Lisu supplement	UnicodeBlocks		อักษรเสริม ภาษาลีซอ
 Takri	UnicodeBlocks		ภาษาตะกรี
 Shorthand format controls	UnicodeBlocks		การควบคุมรูปแบบชวเลข
-Inscriptional Parthian	UnicodeBlocks		จารึก Parthian
 Optical character recognition	UnicodeBlocks		การจดจำอักขระด้วยแสง
+Inscriptional Parthian	UnicodeBlocks		จารึก Parthian
 Tamil	UnicodeBlocks		ทมิฬ
 Lisu	UnicodeBlocks		ลีซอ
 Nandingari	UnicodeBlocks		เทวนาครี
@@ -187,7 +181,6 @@ Mahajani	UnicodeBlocks		มหาจานี
 Lepcha	UnicodeBlocks		Lepcha
 Mandaic	UnicodeBlocks		มันดาอิก
 Old italic	UnicodeBlocks		Old italic
-Quit	CharacterWindow		ยกเลิก
 Playing cards	UnicodeBlocks		เล่นไพ่
 Chakma	UnicodeBlocks		จักม่า
 Buhid	UnicodeBlocks		Buhid
@@ -229,7 +222,6 @@ Supplementary private use area A	UnicodeBlocks		พื้นที่ใช้�
 Armenian	UnicodeBlocks		อาเมเนีย
 Phags-pa	UnicodeBlocks		Phags-pa
 CJK compatibility ideographs	UnicodeBlocks		CJK compatibility ideographs
-Show private blocks	CharacterWindow		แสดงบล็อคส่วนตัว
 Latin extended additional	UnicodeBlocks		ละติน เพิ่มเติม
 Tibetan	UnicodeBlocks		ทิเบต
 Combining diacritical marks	UnicodeBlocks		การรวมเครื่องหมายกำกับเสียง
@@ -245,16 +237,13 @@ Mongolian supplement	UnicodeBlocks		มองโกเลีย เพิ่ม�
 Glagotic	UnicodeBlocks		Glagotic
 Cyrillic extended B	UnicodeBlocks		Cyrillic ขยาย B
 Anatolian hieroglyphs	UnicodeBlocks		อักษรอียิปต์โบราณ
-Copy as escaped byte string	CharacterView		คัดลอกเป็นสตริงไบต์ที่ใช้ Escape
 Tai Xuan Jing symbols	UnicodeBlocks		สัญญลักษณ์ Tai Xuan Jing
 Hiragana	UnicodeBlocks		ฮิรากานะ
 Tagbanwa	UnicodeBlocks		Tagbanwa
 Basic Latin	UnicodeBlocks		Basic Latin
 Greek and Coptic	UnicodeBlocks		กรีกและคอปติก
 Kangxi radicals	UnicodeBlocks		Kangxi radicals
-Copy character	CharacterView		คัดลอกตัวอักษร
 Hangul Jamo	UnicodeBlocks		ฮังกุล Jamo
-Font	CharacterWindow		ตัวอักษร
 Phaistos disc	UnicodeBlocks		แผ่นดิสก์ Phaistos
 Miscellaneous technical	UnicodeBlocks		เทคนิคเบ็ดเตล็ด
 Braille patterns	UnicodeBlocks		รูปแบบอักษรเบรลล์

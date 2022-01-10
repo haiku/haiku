@@ -1,66 +1,41 @@
-1	thai	x-vnd.Haiku-PoorMan	1829050509
-Select web folder	PoorMan		เลือกเว็ปโฟลเดอร์
-Console logging	PoorMan		การบันทึกคอนโซล
-Create Log File	PoorMan		สร้างไฟล์บันทึก
-File logging	PoorMan		บันทึกไฟล์
-Website options	PoorMan		ตัวเลือกเว็บไซต์
-Log to file	PoorMan		เข้าสู่ไฟล์
-Shutting down.	PoorMan		กำลังปิด
-Error Dir	PoorMan		ไดเรกทอรี่ผิดพลาด
-Web folder:	PoorMan		เว็ปโฟลเดอร์
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		โปรดเลือกโฟลเดอร์ที่จะเผยแพร่บนเว็บ\n\nคุณสามารถให้ PoorMan สร้างค่าเริ่มต้น \"public_html\" ในโฟลเดอร์บ้านของคุณได้\nหรือคุณเลือกหนึ่งในโฟลเดอร์ของคุณเองแทน
-Log To Console	PoorMan		เข้าสู่คอนโซล
-File Name	PoorMan		ชื่อไฟล์
-Starting up... 	PoorMan		กำลังเริ่ม
-Select	PoorMan		เลือก
-Logging view	PoorMan		เข้าสู่ระบบเพื่อดู
-Save console as…	PoorMan		บันทึกคอนโซลเป็น
-Edit	PoorMan		แก้ไข
-Cancel	PoorMan		ยกเลิก
-Directory: 	PoorMan		ไดเรกทอรี่
-Hits: %lu	PoorMan		พบ: %lu
-Hits: 0	PoorMan		พบ: 0
-Shutting down.\n	PoorMan		กำลังปิด\n
-Select all	PoorMan		เลือกทั้งหมด
-Error Server	PoorMan		เซิฟเวอร์ผิดพลาด
-Send file listing if there's no start page	PoorMan		ส่งรายชื่อไฟล์หากไม่มีหน้าเริ่มต้น
-Create PoorMan log	PoorMan		สร้างบันทึก PoorMan
-Max. simultaneous connections:	PoorMan		การเชื่อมต่อพร้อมกันมากที่สุด:
-Done	PoorMan		เสร็จ
-Site	PoorMan		ไซต์
+1	thai	x-vnd.Haiku-PoorMan	2026082639
 Cannot start the server	PoorMan		ไม่สามารเริ่มเซิฟเวอร์ได้
+Site	PoorMan		ไซต์
 Create log file	PoorMan		สร้างไฟล์บันทึก
-Create public_html	PoorMan		สร้าง public_html
+Console logging	PoorMan		การบันทึกคอนโซล
+Select web folder	PoorMan		เลือกเว็ปโฟลเดอร์
 Clear hit counter	PoorMan		สร้างตัวนับผู้เข้าชม
-Status: Stopped	PoorMan		สถานะ: หยุด
+File logging	PoorMan		บันทึกไฟล์
 File	PoorMan		ไฟล์
 Settings…	PoorMan		ตั้งค่า
-Log To File	PoorMan		เข้าสู่ไฟล์
+Website options	PoorMan		ตัวเลือกเว็บไซต์
+Log to file	PoorMan		เข้าสู่ไฟล์
 Connections	PoorMan		เชื่อมต่อ
 Controls	PoorMan		ควบคุม
 Log to console	PoorMan		เข้าสู่คอนโซล
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		โปรดเลือกโฟลเดอร์ที่จะเผยแพร่บนเว็บ\n\nคุณสามารถให้ PoorMan สร้างค่าเริ่มต้น \"public_html\" ในโฟลเดอร์บ้านของคุณได้\nหรือคุณเลือกหนึ่งในโฟลเดอร์ของคุณเองแทน
+Web folder:	PoorMan		เว็ปโฟลเดอร์
 Advanced	PoorMan		ไปข้างหน้า
-Copy	PoorMan		สำเนา
 Logging	PoorMan		กำลังเข้าสู่ระบบ
+Copy	PoorMan		สำเนา
 PoorMan	System name		PoorMan
-Clear console log	PoorMan		ลบบันทึกคอนโซล
+Logging view	PoorMan		เข้าสู่ระบบเพื่อดู
 Run server	PoorMan		ทำงาานเซิฟเวอร์
-Create	PoorMan		สร้าง
+Clear console log	PoorMan		ลบบันทึกคอนโซล
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connection} อื่นๆ{# connections}}
-done.\n	PoorMan		เสร็จ\n
+Edit	PoorMan		แก้ไข
+Save console as…	PoorMan		บันทึกคอนโซลเป็น
 PoorMan settings	PoorMan		ตั้งค่า PoorMan
-Console Logging	PoorMan		กำลังเข้าสู่คอนโซล
 Clear log file	PoorMan		สร้างไฟล์บันทึก
 Save log console selection	PoorMan		บันทึกการเลือกคอนโซล
-File Logging	PoorMan		การบันทึกไฟล์
 Log file name:	PoorMan		ชื่อไฟล์บันทึก:
-Status: Running	PoorMan		สถานะ: กำลังทำงาน
-Directory: (none)	PoorMan		ไดเรกทอรี: (ไม่มี)
+Select all	PoorMan		เลือกทั้งหมด
+Send file listing if there's no start page	PoorMan		ส่งรายชื่อไฟล์หากไม่มีหน้าเริ่มต้น
+Create PoorMan log	PoorMan		สร้างบันทึก PoorMan
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		สร้างโฟลเดอร์เว็บเริ่มต้นที่ \"/boot/home/public_html\" \nตรวจสอบให้แน่ใจว่ามีไฟล์ HTML ชื่อ \"index.html\" ในโฟลเดอร์นั้น
-Dir Created	PoorMan		ไดเรกทอรี่สร้างแล้ว
-Save console selections as…	PoorMan		บันทึกการเลือกคอนโซลเป็น
 Quit	PoorMan		ออก
+Save console selections as…	PoorMan		บันทึกการเลือกคอนโซลเป็น
 Save log console	PoorMan		บันทึกคอนโซล
 Start page:	PoorMan		เริ่มหน้า:
-OK	PoorMan		ตกลง
+Max. simultaneous connections:	PoorMan		การเชื่อมต่อพร้อมกันมากที่สุด:
 Website location	PoorMan		ที่ตั้งเว็บไซต์

@@ -1,19 +1,11 @@
-1	hungarian	x-vnd.Haiku-Login	1584886353
+1	hungarian	x-vnd.Haiku-Login	3025604784
 Invalid login!	Login View		Érvénytelen felhasználónév!
-Error	Login App		Hiba
-Login application for Haiku\nUsage:	Login App		Bejelentkező alkalmazás Haikuhoz\nHasználat:
---nonmodal\tDo not make the window modal	Login App		--nonmodal\tNe legyen a többi ablak előtt
+OK	Login View		Rendben
 Welcome to Haiku	Login Window		Üdvözöllek a Haikuban
+Login:	Login View		Felhasználónév:
+Password:	Login View		Jelszó:
 Halt	Login View		Megszakítás
 Desktop	Desktop Window		Asztal
 Hide password	Login View		Jelszó elrejtése
 Reboot	Login View		Újraindítás
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		A bejelentkező képernyő mögötti asztal megjelenését személyre szabhatjuk replikánsok behúzásával a bejelentkező alkalmazásba.\n\nA művelet végeztével csupán ki kell lépni az alkalmazásból (Cmd-Q).
-OK	Login View		Rendben
-Info	Login App		Infó
-Login:	Login View		Felhasználónév:
-Password:	Login View		Jelszó:
-Unimplemented	Login App		Nincs még megvalósítva
-OK	Login App		Rendben
-Error: %1	Login App		Hiba: %1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	hiba %s\n

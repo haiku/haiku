@@ -1,42 +1,5 @@
-1	esperanto	x-vnd.Haiku-Repositories	1220143449
-This is not a valid URL.	AddRepoWindow	Add URL error message	Ĉi tiu URL-o estas nevalida.
-Repository URL:	AddRepoWindow	Text box label	URL de deponejo:
-There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Iu eraro okazis dum renovigo de kaŝmemoro de deponejo %name%
-There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Iu eraro okazis dum malŝalto de deponejo %name%
-Unknown	Constants	Unknown repository name	Nekonata
-Remove all	RepositoriesView	Button label	Forigi ĉion
-Enable repositories to use with package management:	RepositoriesView	Label text	Ŝaltu deponejojn por uzi kun administrilo de pakaĵoj:
-Disable	RepositoriesView	Button label	Malŝalti
-Cancel task	TaskTimer	Button label	Nuligi taskon
-Changes completed	RepositoriesView	Status view text	Ŝanĝoj estas faritaj
-Details	TaskLooper	Job log details header	Informoj
-Enabled	RepoRow	Tag in the Status column	Ŝaltita
-Remove	Constants	Button label	Forigi
-There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Iu eraro aperis dum provo ŝalti la deponejon %url%
-Remove this repository?	RepositoriesView	Removal alert confirmation message	Forigi ĉi deponejon?
-The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	La tasko por deponejo %name% postulas tro multe da tempo por plenumi.
-Completed	TaskLooper	Completed task status message	Farite
-OK	Constants	Button label	Bone
-Status	RepositoriesView	Column title	Stato
-Name	RepositoriesView	Column title	Nomo
-Add	AddRepoWindow	Button label	Aldoni
-Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Deponejoj ne povis ricevi nomojn de nun ŝaltitaj deponejoj.
-Enable all	RepositoriesView	Button label	Ŝalti ĉion
-Aborted	TaskLooper	Aborted task status message	Ĉesigita
-URL	RepositoriesView	Column title	URL
-Enable	RepositoriesView	Button label	Ŝalti
-Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Eraro dum ricevo de deponeja agordo por %name%.
-Description	TaskLooper	Failed task error description	Priskribo
-Failed	TaskLooper	Failed task status message	Malsukceso
-Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Bona novaĵo! La tasko por deponejo %name% estas plenumita.
-Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Iuj taskoj ankoraŭ daŭras ruli. Ĉu vi volas halti ilin kaj forlasi?
-This repository URL already exists.	RepositoriesView	Error message	Ĉi tiu deponeja URL jam ekzistas.
-Repositories	System name		Deponejoj
-Changes pending:	RepositoriesView	Status view text	Atendataj ŝanĝoj:
-Remove	RepositoriesView	Button label	Forigi
-Remove these repositories?	RepositoriesView	Removal alert confirmation message	Forigi ĉi tiujn deponejojn?
-Keep trying	TaskTimer	Button label	Daŭre penantaj
+1	esperanto	x-vnd.Haiku-Repositories	4265512303
 Cancel	Constants	Button label	Nuligi
-Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Nur unu URL-on por ĉiu deponejo va rajtas proponi. Bonvolu ŝanĝi vian elekton.
-Stop and quit	RepositoriesWindow	Button label	Halti kaj ĉesi
-Disable all	RepositoriesView	Button label	Malŝalti ĉion
+OK	Constants	Button label	Bone
+Unknown	Constants	Unknown repository name	Nekonata
+Remove	Constants	Button label	Forigi

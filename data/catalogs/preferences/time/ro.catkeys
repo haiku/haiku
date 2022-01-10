@@ -1,47 +1,7 @@
-1	romanian	x-vnd.Haiku-Time	2069485065
-OK	Time		OK
+1	romanian	x-vnd.Haiku-Time	3879356774
 Message receiving failed	Time		Primirea mesajului a eșuat
-Australia	Time		Australia
-America	Time		America
-Reset to default server list	Time		Restabilește la lista de server implicită
-Could not resolve server address	Time		Nu s-a putut rezolva adresa serverului
-Set time zone	Time		Stabilește fusul orar
 Waiting for answer failed	Time		Așteptarea răspunsului a eșuat
-<Other>	Time		<Other>
 Received invalid time	Time		S-a primit o oră nevalidă
-Remove	Time		Elimină
-Synchronize again	Time		Sincronizează din nou
-Asia	Time		Asia
-Try all servers	Time		Încearcă toate serverele
-Time	Time		Oră
-Current time:	Time		Oră curentă:
-The following error occured while synchronizing:\n%s: %s	Time		Următoarea eroare a apărut în timpul sincronizării:\n%s: %s
-Europe	Time		Europa
-Show day of week	Time		Afișează ziua săptămânii
-Local time (Windows compatible)	Time		Ora locală (compatibil cu Windows)
-Hardware clock set to:	Time		Ceasul hardware este stabilit la:
-Arctic	Time		Arctic
-Antarctica	Time		Antarctica
-GMT (UNIX compatible)	Time		GMT (compatibil cu UNIX)
-Africa	Time		Africa
-Stop	Time		Oprește
-Time zone	Time		Fus orar
-Clock	Time		Ceas
-Network time	Time		Oră de rețea
 Sending request failed	Time		Trimiterea cererii a eșuat
-Preview time:	Time		Timp de previzualizare:
-\nNow: 	Time		\nAcum: 
 Could not create socket	Time		Nu s-a putut crea soclul
-Pacific	Time		Pacific
-Atlantic	Time		Atlantic
-Show clock in Deskbar	Time		Arată ceasul pe Deskbar
-Display time with seconds	Time		Afișează ora cu secunde
-Time	System name		Oră
-Show time zone	Time		Arată fusul orar
-Synchronize at boot	Time		Sincronizează la boot
-Indian	Time		Indian
-Revert	Time		Revenire
-Date and time	Time		Dată și oră
-The following error occured while synchronizing:\n%s	Time		Următoarea eroare a apărut în timpul sincronizării:\n%s
-Synchronize	Time		Sincronizează
-Add	Time		Adaugă
+Could not resolve server address	Time		Nu s-a putut rezolva adresa serverului

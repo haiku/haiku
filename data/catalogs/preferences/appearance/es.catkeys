@@ -1,79 +1,39 @@
-1	spanish; castilian	x-vnd.Haiku-Appearance	663472720
+1	spanish; castilian	x-vnd.Haiku-Appearance	2170377510
 Control border	Colors tab		Borde del control
+Failure	Colors tab		Fallo
 Control mark	Colors tab		Marca de control
-Off	AntialiasingSettingsView		Desactivado
 Window border	Colors tab		Borde de ventana
 Inactive window tab	Colors tab		Pestaña de ventana inactiva
-Defaults	APRWindow		Valores predeterminados
 Shadow	Colors tab		Sombra
-Document background	Colors tab		Fondo de documento
-List background	Colors tab		Fondo de listas
-No effect on running applications	DecorSettingsView		Sin efecto en aplicaciones en ejecución
-Fixed font:	Font view		Tipo de letra monoespaciado:
-Appearance	System name		Apariencia
-Reduce colored edges filter strength:	AntialiasingSettingsView		Reducir fortaleza del filtro de bordes coloreados:
-Glyph hinting:	AntialiasingSettingsView		Optimización de glifos:
-Default Haiku ControlLook	DecorSettingsView		ControlLook de Haiku predeterminado
-Menu item text	Colors tab		Texto de elemento de menú
-About decorator	DecorSettingsView		Acerca de Decorador
-Antialiasing menu	AntialiasingSettingsView		Menú de suavizado
-Success	Colors tab		Éxito
-About	DecorSettingsView		Acerca de
-Shine	Colors tab		Brillo
-Arrow style	DecorSettingsView		Estilo de flecha
-On	AntialiasingSettingsView		Activado
-Decorator:	DecorSettingsView		Decorador:
-Menu background	Colors tab		Fondo de menú
-Revert	APRWindow		Deshacer
-List item text	Colors tab		Texto de elemento de lista
-OK	DecorSettingsView		Aceptar
-Control text	Colors tab		Texto de control
-Look and feel	APRWindow		Apariencia
-Selected menu item background	Colors tab		Fondo de elemento de menú seleccionado
-Link active	Colors tab		Enlace activo
-Antialiasing	APRWindow		Suavizado (Antialiasing)
-Menu font:	Font view		Tipo de letra de menú:
-Bold font:	Font view		Negrita:
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutores:\n\t%decorAuthors\n\nURL: %decorURL\nLicencia: %decorLic\n\n%decorDesc\n
-Choose Decorator	DecorSettingsView		Elegir decorador
-Strong	AntialiasingSettingsView		Importante
-Failure	Colors tab		Fallo
-Double:	DecorSettingsView		Doble:
 Selected menu item text	Colors tab		Texto de elemento de menú seleccionado
-Size:	Font Selection view		Tamaño:
+Document background	Colors tab		Fondo de documento
 Panel background	Colors tab		Fondo de panel
-Plain font:	Font view		Tipo de letra plano:
+List background	Colors tab		Fondo de listas
 Window tab text	Colors tab		Texto de pestaña de ventana
 Navigation pulse	Colors tab		Pulso de navegación
-LCD subpixel	AntialiasingSettingsView		Subpíxel LCD
 Window tab	Colors tab		Pestaña de ventana
-Link text	Colors tab		Texto del enlace
 Tooltip background	Colors tab		Fondo de descripción emergente
-ControlLook:	DecorSettingsView		ControlLook:
+Link text	Colors tab		Texto del enlace
 Scroll bar thumb	Colors tab		Miniatura de barra de desplazamiento
-Default	DecorSettingsView		Predeterminado
 Link visited	Colors tab		Enlace visitado
 Selected menu item border	Colors tab		Borde de elemento de menú seleccionado
 Tooltip text	Colors tab		Texto de descripción emergente
-Control background	Colors tab		Fondo de control
 Selected list item text	Colors tab		Texto de elemento de menú seleccionado
+Control background	Colors tab		Fondo de control
+Menu item text	Colors tab		Texto de elemento de menú
 Selected list item background	Colors tab		Fondo de elemento de menú seleccionado
 Inactive window tab text	Colors tab		Texto de la pestaña en ventana inactiva
 Navigation base	Colors tab		Base de navegación
-Fonts	APRWindow		Tipografía
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	El veloz murciélago hindú comía feliz cardillo y kiwi. La cigüeña tocaba el saxofón detrás del palenque de paja.
-Grayscale	AntialiasingSettingsView		Escala de grises
-Antialiasing type:	AntialiasingSettingsView		Tipo de suavizado:
+Success	Colors tab		Éxito
 Panel text	Colors tab		Texto de panel
-Hinting menu	AntialiasingSettingsView		Menú mejorado de tipo de letra
-Scroll bar:	DecorSettingsView		Barra de desplazamiento:
-Choose ControlLook	DecorSettingsView		Escoge ControlLook
-Monospaced fonts only	AntialiasingSettingsView		Solo tipos de letra monoespaciados
+Shine	Colors tab		Brillo
+Menu background	Colors tab		Fondo de menú
 Document text	Colors tab		Texto de documento
+List item text	Colors tab		Texto de elemento de lista
 Inactive window border	Colors tab		Borde de ventana inactiva
-Colors	APRWindow		Colores
-About control look	DecorSettingsView		Sobre ControlLook
-Control highlight	Colors tab		Resaltado del control
+Control text	Colors tab		Texto de control
 Status bar	Colors tab		Barra de estado
+Control highlight	Colors tab		Resaltado del control
+Selected menu item background	Colors tab		Fondo de elemento de menú seleccionado
+Link active	Colors tab		Enlace activo
 Link hover	Colors tab		Enlace flotante
-Single:	DecorSettingsView		Sencillo:

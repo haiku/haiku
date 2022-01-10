@@ -1,73 +1,39 @@
-1	slovak	x-vnd.Haiku-Appearance	583615507
+1	slovak	x-vnd.Haiku-Appearance	2170377510
 Control border	Colors tab		Okraj ovládacieho prvku
+Failure	Colors tab		Zlyhanie
 Control mark	Colors tab		Riadiaca značka
-Off	AntialiasingSettingsView		Vypnutý
 Window border	Colors tab		Okraj okna
 Inactive window tab	Colors tab		Záložka neaktívneho okna
-Defaults	APRWindow		Predvoľby
 Shadow	Colors tab		Tieň
-Document background	Colors tab		Pozadie dokumentu
-List background	Colors tab		Pozadie zoznamu
-Fixed font:	Font view		Písmo s pevnou šírkou:
-Appearance	System name		Vzhľad
-Reduce colored edges filter strength:	AntialiasingSettingsView		Zmenšiť silu filtra farebných hrán:
-Glyph hinting:	AntialiasingSettingsView		Tipy grafém:
-Menu item text	Colors tab		Text položky menu
-About decorator	DecorSettingsView		O dekorátore
-Antialiasing menu	AntialiasingSettingsView		Menu antialiasing
-Success	Colors tab		Úspešné
-About	DecorSettingsView		O aplikácii
-Shine	Colors tab		Svit
-Arrow style	DecorSettingsView		Štýl šípky
-On	AntialiasingSettingsView		Zapnuté
-Decorator:	DecorSettingsView		Dekorátor:
-Menu background	Colors tab		Pozadie menu
-Revert	APRWindow		Vrátiť
-List item text	Colors tab		Text položky menu
-OK	DecorSettingsView		OK
-Control text	Colors tab		Text ovládacieho prvku
-Look and feel	APRWindow		Správanie a vzhľad
-Selected menu item background	Colors tab		Pozadie položky zvoleného menu
-Link active	Colors tab		Aktívny odkaz
-Antialiasing	APRWindow		Antialiasing
-Menu font:	Font view		Písmo menu:
-Bold font:	Font view		Hrubé písmo:
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutori:\n\t%decorAuthors\n\nURL: %decorURL\nLicencia: %decorLic\n\n%decorDesc\n
-Choose Decorator	DecorSettingsView		Vyberte dekorátor
-Strong	AntialiasingSettingsView		Hrubý
-Failure	Colors tab		Zlyhanie
-Double:	DecorSettingsView		Dvojité:
 Selected menu item text	Colors tab		Text položky zvoleného menu
-Size:	Font Selection view		Veľkosť:
+Document background	Colors tab		Pozadie dokumentu
 Panel background	Colors tab		Pozadie panelu
-Plain font:	Font view		Základné písmo:
+List background	Colors tab		Pozadie zoznamu
 Window tab text	Colors tab		Text záložky okna
 Navigation pulse	Colors tab		Pulz navigácie
-LCD subpixel	AntialiasingSettingsView		LCD subpixel
 Window tab	Colors tab		Záložka okna
-Link text	Colors tab		Text odkazu
 Tooltip background	Colors tab		Pozadie tipov
+Link text	Colors tab		Text odkazu
 Scroll bar thumb	Colors tab		Palec posuvníka
 Link visited	Colors tab		Navštívený odkaz
 Selected menu item border	Colors tab		Okraj vybranej položky menu
 Tooltip text	Colors tab		Text tipu
-Control background	Colors tab		Pozadie ovládacieho prvku
 Selected list item text	Colors tab		Text zvolenej položky menu
+Control background	Colors tab		Pozadie ovládacieho prvku
+Menu item text	Colors tab		Text položky menu
 Selected list item background	Colors tab		Pozadie zvolenej položky menu
 Inactive window tab text	Colors tab		Text záložky neaktívneho okna
 Navigation base	Colors tab		Základ navigácie
-Fonts	APRWindow		Písma
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Kŕdeľ ďatľov učí koňa obhrýzať kôru a žrať mäso.
-Grayscale	AntialiasingSettingsView		Stupne šedej
-Antialiasing type:	AntialiasingSettingsView		Typ antialiasingu:
+Success	Colors tab		Úspešné
 Panel text	Colors tab		Text panelu
-Hinting menu	AntialiasingSettingsView		Menu s tipmi
-Scroll bar:	DecorSettingsView		Posuvník:
-Monospaced fonts only	AntialiasingSettingsView		Iba písma s pevnou šírkou znaku
+Shine	Colors tab		Svit
+Menu background	Colors tab		Pozadie menu
 Document text	Colors tab		Text dokumentu
+List item text	Colors tab		Text položky menu
 Inactive window border	Colors tab		Okraj neaktívneho okna
-Colors	APRWindow		Farby
-Control highlight	Colors tab		Zvýraznenie ovládacieho prvku
+Control text	Colors tab		Text ovládacieho prvku
 Status bar	Colors tab		Stavový panel
+Control highlight	Colors tab		Zvýraznenie ovládacieho prvku
+Selected menu item background	Colors tab		Pozadie položky zvoleného menu
+Link active	Colors tab		Aktívny odkaz
 Link hover	Colors tab		Podržanie myši nad odkazom
-Single:	DecorSettingsView		Jednoduché:

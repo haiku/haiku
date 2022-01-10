@@ -1,17 +1,11 @@
-1	friulian	x-vnd.Haiku-Login	3033693897
+1	friulian	x-vnd.Haiku-Login	3025604784
 Invalid login!	Login View		Acès no valit!
-Error	Login App		Erôr
+OK	Login View		Va ben
 Welcome to Haiku	Login Window		Benvignûts su Haiku!
+Login:	Login View		Non utent:
+Password:	Login View		Peraule di ordin:
 Halt	Login View		Distude
 Desktop	Desktop Window		Scritori
 Hide password	Login View		Plate peraule di ordin
 Reboot	Login View		Torne invie
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Si pues modificâ l'aspiet dal scritori, mostrât daûr de aplicazion pal acès, strissinantji i replicants parsore.\n\nCuant che si à finît al baste jessî de aplicazion (Cmd-Q).
-OK	Login View		Va ben
-Info	Login App		Informazions
-Login:	Login View		Non utent:
-Password:	Login View		Peraule di ordin:
-Unimplemented	Login App		No implementât
-OK	Login App		Va ben
-Error: %1	Login App		Erôr: %1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	erôr: %s\n

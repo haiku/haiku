@@ -1,9 +1,6 @@
-1	thai	x-vnd.Haiku-BMPTranslator	2497639570
+1	thai	x-vnd.Haiku-BMPTranslator	3986869408
+BMP image translator	BMPTranslator		เครื่องมือแปลรูปภาพ BMP
 BMP images	BMPTranslator		ภาพ BMP
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	รูปภาพ BMP (รูปแบบ MS, %d bits)
 BMPTranslator Settings	BMPTranslator		การตั้งค่า BMPTranslator
 BMP image (OS/2 format, %d bits)	BMPTranslator		รูปภาพ BMP (รูปแบบ OS/2,%d bits)
-BMP image translator	BMPView		เครื่องมือแปลรูปภาพ BMP
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	รูปภาพ BMP (รูปแบบ MS, %d bits)
-BMP Settings	BMPMain		การตั้งค่า BMP
-Version %d.%d.%d, %s	BMPView		เวอร์ชั่น %d.%d.%d, %s
-BMP image translator	BMPTranslator		เครื่องมือแปลรูปภาพ BMP

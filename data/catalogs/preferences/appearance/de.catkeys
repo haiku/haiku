@@ -1,79 +1,39 @@
-1	german	x-vnd.Haiku-Appearance	663472720
+1	german	x-vnd.Haiku-Appearance	2170377510
 Control border	Colors tab		Steuerelement - Rahmen
-Control mark	Colors tab		Steuerelement - Markierung
-Off	AntialiasingSettingsView		Aus
-Window border	Colors tab		Fenster - Rahmen
-Inactive window tab	Colors tab		Reiter (inaktiv)
-Defaults	APRWindow		Standardwerte
-Shadow	Colors tab		Schatten
-Document background	Colors tab		Dokument - Hintergrund
-List background	Colors tab		Liste - Hintergrund
-No effect on running applications	DecorSettingsView		Keine Auswirkungen auf laufende Anwendungen
-Fixed font:	Font view		Feste Breite:
-Appearance	System name		Erscheinungsbild
-Reduce colored edges filter strength:	AntialiasingSettingsView		Farbsaumfilter:
-Glyph hinting:	AntialiasingSettingsView		Glyph-Hinting:
-Default Haiku ControlLook	DecorSettingsView		Standard Haiku ControlLook
-Menu item text	Colors tab		Menü - Text
-About decorator	DecorSettingsView		Dekorator Info
-Antialiasing menu	AntialiasingSettingsView		Kantenglättungs-Menü
-Success	Colors tab		Erfolg
-About	DecorSettingsView		Über
-Shine	Colors tab		Glanz
-Arrow style	DecorSettingsView		Scroll-Pfeile
-On	AntialiasingSettingsView		Ein
-Decorator:	DecorSettingsView		Dekorator:
-Menu background	Colors tab		Menü - Hintergrund
-Revert	APRWindow		Anfangswerte
-List item text	Colors tab		Liste - Text
-OK	DecorSettingsView		OK
-Control text	Colors tab		Steuerelement - Text
-Look and feel	APRWindow		Aussehen & Handhabung
-Selected menu item background	Colors tab		Menü - Hintergrund (ausgewählt)
-Link active	Colors tab		Link (geklickt)
-Antialiasing	APRWindow		Kantenglättung
-Menu font:	Font view		Menü:
-Bold font:	Font view		Fett:
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutoren:\n\t%decorAuthors\n\nURL: %decorURL\nLizens: %decorLic\n\n%decorDesc\n
-Choose Decorator	DecorSettingsView		Dekorator wählen
-Strong	AntialiasingSettingsView		Stark
 Failure	Colors tab		Fehler
-Double:	DecorSettingsView		Doppelt:
+Control mark	Colors tab		Steuerelement - Markierung
+Window border	Colors tab		Fenster - Rahmen
+Inactive window tab	Colors tab		Fensterreiter (inaktiv)
+Shadow	Colors tab		Schatten
 Selected menu item text	Colors tab		Menü - Text (ausgewählt)
-Size:	Font Selection view		Größe:
+Document background	Colors tab		Dokument - Hintergrund
 Panel background	Colors tab		Oberfläche - Hintergrund
-Plain font:	Font view		Normal:
-Window tab text	Colors tab		Reiter - Text
+List background	Colors tab		Liste - Hintergrund
+Window tab text	Colors tab		Fensterreiter - Text
 Navigation pulse	Colors tab		Navigation - Leuchtfarbe
-LCD subpixel	AntialiasingSettingsView		LCD-Subpixel
-Window tab	Colors tab		Reiter
-Link text	Colors tab		Link Text
+Window tab	Colors tab		Fensterreiter
 Tooltip background	Colors tab		Tooltip - Hintergrund
-ControlLook:	DecorSettingsView		ControlLook:
+Link text	Colors tab		Link Text
 Scroll bar thumb	Colors tab		Scroll-Balken
-Default	DecorSettingsView		Standard
 Link visited	Colors tab		Link (besucht)
 Selected menu item border	Colors tab		Menü - Rahmen (ausgewählt)
 Tooltip text	Colors tab		Tooltip - Text
-Control background	Colors tab		Steuerelement - Hintergrund
 Selected list item text	Colors tab		Liste - Text (ausgewählt)
+Control background	Colors tab		Steuerelement - Hintergrund
+Menu item text	Colors tab		Menü - Text
 Selected list item background	Colors tab		Liste - Hintergrund (ausgewählt)
-Inactive window tab text	Colors tab		Reiter - Text (inaktiv)
+Inactive window tab text	Colors tab		Fensterreiter - Text (inaktiv)
 Navigation base	Colors tab		Navigation - Grundfarbe
-Fonts	APRWindow		Schriftarten
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Franz jagt im total verwahrlosten Taxi quer durch Bayern.
-Grayscale	AntialiasingSettingsView		Graustufen
-Antialiasing type:	AntialiasingSettingsView		Kantenglättungstyp:
+Success	Colors tab		Erfolg
 Panel text	Colors tab		Fenster - Text
-Hinting menu	AntialiasingSettingsView		Hinting-Menü
-Scroll bar:	DecorSettingsView		Scroll-Leiste:
-Choose ControlLook	DecorSettingsView		ControlLook wählen
-Monospaced fonts only	AntialiasingSettingsView		Nur nicht-proportionale Schriften
+Shine	Colors tab		Glanz
+Menu background	Colors tab		Menü - Hintergrund
 Document text	Colors tab		Dokument - Text
+List item text	Colors tab		Liste - Text
 Inactive window border	Colors tab		Fenster - Rahmen (inaktiv)
-Colors	APRWindow		Farben
-About control look	DecorSettingsView		Über ControlLook
-Control highlight	Colors tab		Steuerelement - Ausgewählt
+Control text	Colors tab		Steuerelement - Text
 Status bar	Colors tab		Statusleiste
+Control highlight	Colors tab		Steuerelement - Ausgewählt
+Selected menu item background	Colors tab		Menü - Hintergrund (ausgewählt)
+Link active	Colors tab		Link (geklickt)
 Link hover	Colors tab		Link (unter Mauszeiger)
-Single:	DecorSettingsView		Einfach:

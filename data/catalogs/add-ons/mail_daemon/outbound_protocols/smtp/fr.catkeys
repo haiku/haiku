@@ -1,14 +1,8 @@
-1	french	x-vnd.Haiku-SMTP	815985329
-POP3 authentication failed. The server said:\n	smtp		L’authentification POP3 a échoué. Le serveur a indiqué :\n
-Destination:	ConfigView		Destination :
-Error while logging in to %serv	smtp		Impossible de se connecter à %serv
-Connecting to server…	smtp		Connexion au serveur…
-Unencrypted	ConfigView		Non-chiffré
-. The server says:\n	smtp		. Le serveur indique :\n
-Error while opening connection to %serv	smtp		Impossible d’ouvrir une connexion avec %serv
-. The server said:\n	smtp		. Le serveur a indiqué :\n
+1	french	x-vnd.Haiku-SMTP	3672333926
 None	ConfigView		Aucun
-SMTP server:	ConfigView		Serveur SMTP :
 ESMTP	ConfigView		ESMTP
+SMTP server:	ConfigView		Serveur SMTP :
+Destination:	ConfigView		Destination :
 POP3 before SMTP	ConfigView		POP3 avant SMTP
 SSL	ConfigView		SSL
+Unencrypted	ConfigView		Non-chiffré

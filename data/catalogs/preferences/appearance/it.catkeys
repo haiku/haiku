@@ -1,79 +1,39 @@
-1	italian	x-vnd.Haiku-Appearance	663472720
+1	italian	x-vnd.Haiku-Appearance	2170377510
 Control border	Colors tab		Bordi del controllo
+Failure	Colors tab		Insuccesso
 Control mark	Colors tab		Marcatore del controllo
-Off	AntialiasingSettingsView		Disattivato
 Window border	Colors tab		Bordo finestra
 Inactive window tab	Colors tab		Tab della finestra inattiva
-Defaults	APRWindow		Predefiniti
 Shadow	Colors tab		Ombra
-Document background	Colors tab		Sfondo del documento
-List background	Colors tab		Sfondo della lista
-No effect on running applications	DecorSettingsView		Nessun effetto sulle applicazioni in esecuzione
-Fixed font:	Font view		Tipo di carattere a spaziatura fissa:
-Appearance	System name		Aspetto
-Reduce colored edges filter strength:	AntialiasingSettingsView		Intensità del filtro di riduzione del bordi colorati:
-Glyph hinting:	AntialiasingSettingsView		Hinting dei glifi:
-Default Haiku ControlLook	DecorSettingsView		ControlLook Haiku Predefinito
-Menu item text	Colors tab		Testo della voce nel menu
-About decorator	DecorSettingsView		Informazioni sul decoratore
-Antialiasing menu	AntialiasingSettingsView		Antialias sul menu
-Success	Colors tab		Successo
-About	DecorSettingsView		Informazioni su
-Shine	Colors tab		Brillantezza
-Arrow style	DecorSettingsView		Stile estremità linea
-On	AntialiasingSettingsView		Attivo
-Decorator:	DecorSettingsView		Decoratore:
-Menu background	Colors tab		Sfondo del menu
-Revert	APRWindow		Ripristina
-List item text	Colors tab		Testo dell'elemento della lista
-OK	DecorSettingsView		OK
-Control text	Colors tab		Testo del controllo
-Look and feel	APRWindow		Aspetto
-Selected menu item background	Colors tab		Sfondo della voce selezionata nel menu
-Link active	Colors tab		Testo del collegamento attivo
-Antialiasing	APRWindow		Antialiasing
-Menu font:	Font view		Tipo di carattere del menu:
-Bold font:	Font view		Tipo di carattere in grassetto:
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutori:\n\t%decorAuthors\n\nURL: %decorURL\nLicenza: %decorLic\n\n%decorDesc\n
-Choose Decorator	DecorSettingsView		Scegli il decoratore
-Strong	AntialiasingSettingsView		Forte
-Failure	Colors tab		Insuccesso
-Double:	DecorSettingsView		Doppio:
 Selected menu item text	Colors tab		Testo della voce selezionata nel menu
-Size:	Font Selection view		Dimensione:
+Document background	Colors tab		Sfondo del documento
 Panel background	Colors tab		Sfondo del pannello
-Plain font:	Font view		Tipo di carattere base:
+List background	Colors tab		Sfondo della lista
 Window tab text	Colors tab		Testo della linguetta sulla finestra
 Navigation pulse	Colors tab		Navigation pulse
-LCD subpixel	AntialiasingSettingsView		Componenti LCD
 Window tab	Colors tab		Linguetta della finestra
-Link text	Colors tab		Testo del collegamento
 Tooltip background	Colors tab		Sfondo dei suggerimenti
-ControlLook:	DecorSettingsView		ControlLook:
+Link text	Colors tab		Testo del collegamento
 Scroll bar thumb	Colors tab		Maniglia della barra di scorrimento
-Default	DecorSettingsView		Predefinito
 Link visited	Colors tab		Testo del collegamento visitato
 Selected menu item border	Colors tab		Bordo della voce selezionata nel menu
 Tooltip text	Colors tab		Testo del suggerimento
-Control background	Colors tab		Sfondo del controllo
 Selected list item text	Colors tab		Testo della voce selezionata nella lista
+Control background	Colors tab		Sfondo del controllo
+Menu item text	Colors tab		Testo della voce nel menu
 Selected list item background	Colors tab		Sfondo della voce selezionata nella lista
 Inactive window tab text	Colors tab		Testo della linguetta della finestra inattiva
 Navigation base	Colors tab		Base del navigatore
-Fonts	APRWindow		Tipi di carattere
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Cantami, o Diva, del Pelide Achille l'ira funesta
-Grayscale	AntialiasingSettingsView		Scala di grigio
-Antialiasing type:	AntialiasingSettingsView		Tipo di antialias:
+Success	Colors tab		Successo
 Panel text	Colors tab		Testo del pannello
-Hinting menu	AntialiasingSettingsView		Menu dei suggerimenti
-Scroll bar:	DecorSettingsView		Barra di scorrimento:
-Choose ControlLook	DecorSettingsView		Scegli ControlLook
-Monospaced fonts only	AntialiasingSettingsView		Solo caratteri con spaziatura fissa
+Shine	Colors tab		Brillantezza
+Menu background	Colors tab		Sfondo del menu
 Document text	Colors tab		Testo del documento
+List item text	Colors tab		Testo dell'elemento della lista
 Inactive window border	Colors tab		Bordo finestra inattiva
-Colors	APRWindow		Colori
-About control look	DecorSettingsView		Informazioni su ControlLook
-Control highlight	Colors tab		Evidenziazione del controllo
+Control text	Colors tab		Testo del controllo
 Status bar	Colors tab		Barra di stato
+Control highlight	Colors tab		Evidenziazione del controllo
+Selected menu item background	Colors tab		Sfondo della voce selezionata nel menu
+Link active	Colors tab		Testo del collegamento attivo
 Link hover	Colors tab		Testo del collegamento al passaggio del mouse
-Single:	DecorSettingsView		Singolo:

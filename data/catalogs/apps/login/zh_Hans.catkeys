@@ -1,16 +1,11 @@
-1	english	x-vnd.Haiku-Login	1085637210
+1	english	x-vnd.Haiku-Login	3025604784
 Invalid login!	Login View		登陆无效！
-Error	Login App		错误
+OK	Login View		确定
 Welcome to Haiku	Login Window		欢迎使用 Haiku
+Login:	Login View		登陆：
+Password:	Login View		密码：
 Halt	Login View		挂起
 Desktop	Desktop Window		桌面
 Hide password	Login View		隐藏密码
 Reboot	Login View		重新启动
-OK	Login View		确定
-Info	Login App		信息
-Login:	Login View		登陆：
-Password:	Login View		密码：
-Unimplemented	Login App		未实现
-OK	Login App		确定
-Error: %1	Login App		错误：%1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	错误 %s\n

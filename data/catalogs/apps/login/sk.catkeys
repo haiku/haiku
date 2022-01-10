@@ -1,17 +1,11 @@
-1	slovak	x-vnd.Haiku-Login	3033693897
+1	slovak	x-vnd.Haiku-Login	3025604784
 Invalid login!	Login View		Neplatné prihlasovacie meno!
-Error	Login App		Chyba
+OK	Login View		OK
 Welcome to Haiku	Login Window		Vitajte v Haiku
+Login:	Login View		Prihlasovacie meno:
+Password:	Login View		Heslo:
 Halt	Login View		Vypnúť
 Desktop	Desktop Window		Plocha
 Hide password	Login View		Skryť heslo
 Reboot	Login View		Reštartovať
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Pracovnú plochu zobrazenú za aplikáciou Prihlásenie môžete upraviť tým, že na ňu pretiahnete replikantov.\n\nPo skončení stačí ukončiť aplikáciu (Cmd-Q).
-OK	Login View		OK
-Info	Login App		Informácie
-Login:	Login View		Prihlasovacie meno:
-Password:	Login View		Heslo:
-Unimplemented	Login App		Neimplementované
-OK	Login App		OK
-Error: %1	Login App		Chyba: %1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	chyba %s\n

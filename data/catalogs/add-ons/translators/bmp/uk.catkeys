@@ -1,9 +1,6 @@
-1	ukrainian	x-vnd.Haiku-BMPTranslator	2497639570
+1	ukrainian	x-vnd.Haiku-BMPTranslator	3986869408
+BMP image translator	BMPTranslator		Транслятор зображень BMP
 BMP images	BMPTranslator		Зображення BMP
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Зображення BMP (формат MS , %d бітів)
 BMPTranslator Settings	BMPTranslator		Налаштування транслятора BMP
 BMP image (OS/2 format, %d bits)	BMPTranslator		Зображення BMP (формат OS/2, %d бітів)
-BMP image translator	BMPView		Транслятор зображень BMP
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Зображення BMP (формат MS , %d бітів)
-BMP Settings	BMPMain		Налаштування BMP
-Version %d.%d.%d, %s	BMPView		Версія %d.%d.%d, %s
-BMP image translator	BMPTranslator		Транслятор зображень BMP

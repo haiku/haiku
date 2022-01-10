@@ -1,47 +1,7 @@
-1	esperanto	x-vnd.Haiku-Time	2069485065
-OK	Time		Bone
+1	esperanto	x-vnd.Haiku-Time	3879356774
 Message receiving failed	Time		Ricevo de mesaĝo malsukcesis
-Australia	Time		Aŭstralia
-America	Time		Amerika
-Reset to default server list	Time		Reatribui al defaŭlta servila listo
-Could not resolve server address	Time		Ne sukcesas trovi servilan adreson
-Set time zone	Time		Mencii tempzonon
 Waiting for answer failed	Time		Atendado de respondo malsikcesis
-<Other>	Time		<Alia>
 Received invalid time	Time		Nevalida tempo ricevita
-Remove	Time		Forigi
-Synchronize again	Time		Sinkronigi denove
-Asia	Time		Azia
-Try all servers	Time		Provi ĉiujn servilojn
-Time	Time		Tempo
-Current time:	Time		Nuna tempo:
-The following error occured while synchronizing:\n%s: %s	Time		Jena eraro okazis dum sinkronigo:\n%s: %s
-Europe	Time		Eŭropa
-Show day of week	Time		Tago de semajno
-Local time (Windows compatible)	Time		Loka tempo (kongrue al vindozo)
-Hardware clock set to:	Time		Aparatara horloĝo havas:
-Arctic	Time		Arktika
-Antarctica	Time		Antarkta
-GMT (UNIX compatible)	Time		GMT (kongrue al unikso)
-Africa	Time		Afrika
-Stop	Time		Stopi
-Time zone	Time		Tempzono
-Clock	Time		Horloĝo
-Network time	Time		Reta tempo
 Sending request failed	Time		Petsendo malsukcesis
-Preview time:	Time		Antaŭrigardi tempon
-\nNow: 	Time		\nNun: 
 Could not create socket	Time		Ne povas krei kontakinterfacon
-Pacific	Time		Pacifika
-Atlantic	Time		Atlantika
-Show clock in Deskbar	Time		Montri horloĝon Laborstrie
-Display time with seconds	Time		Montri tempon kun sekundoj
-Time	System name		Tempo
-Show time zone	Time		Montri tempzonon
-Synchronize at boot	Time		Sinkronigi dum ŝargo
-Indian	Time		Hindia/Barata
-Revert	Time		Neigi
-Date and time	Time		Dato kaj tempo
-The following error occured while synchronizing:\n%s	Time		Jena eraro okazis dum sikronigo:\n%s
-Synchronize	Time		Sinkronigi
-Add	Time		Aldoni
+Could not resolve server address	Time		Ne sukcesas trovi servilan adreson

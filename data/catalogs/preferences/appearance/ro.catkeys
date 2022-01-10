@@ -1,79 +1,39 @@
-1	romanian	x-vnd.Haiku-Appearance	663472720
+1	romanian	x-vnd.Haiku-Appearance	2170377510
 Control border	Colors tab		Margine de control
+Failure	Colors tab		Eşec
 Control mark	Colors tab		Semn de control
-Off	AntialiasingSettingsView		Oprit
 Window border	Colors tab		Margine de fereastră
 Inactive window tab	Colors tab		Filă de fereastră inactivă
-Defaults	APRWindow		Implicite
 Shadow	Colors tab		Umbră
-Document background	Colors tab		Fundal de document
-List background	Colors tab		Fundal de listă
-No effect on running applications	DecorSettingsView		Niciun efect asupra aplicațiilor care rulează
-Fixed font:	Font view		Font fix:
-Appearance	System name		Aspect
-Reduce colored edges filter strength:	AntialiasingSettingsView		Reduce intensitatea filtrului marginilor colorate:
-Glyph hinting:	AntialiasingSettingsView		Hinting de glif:
-Default Haiku ControlLook	DecorSettingsView		ControlLock Haiku implicit
-Menu item text	Colors tab		Text de element de meniu
-About decorator	DecorSettingsView		Despre decorator
-Antialiasing menu	AntialiasingSettingsView		Meniu de antialias
-Success	Colors tab		Succes
-About	DecorSettingsView		Despre
-Shine	Colors tab		Strălucire
-Arrow style	DecorSettingsView		Stil de săgeată
-On	AntialiasingSettingsView		Pornit
-Decorator:	DecorSettingsView		Decorator:
-Menu background	Colors tab		Fundal de meniu
-Revert	APRWindow		Revenire
-List item text	Colors tab		Text de element de listă
-OK	DecorSettingsView		OK
-Control text	Colors tab		Text de control
-Look and feel	APRWindow		Aspect
-Selected menu item background	Colors tab		Fundalul elementului de meniu selectat
-Link active	Colors tab		Legătură activă
-Antialiasing	APRWindow		Antialias
-Menu font:	Font view		Font de meniu:
-Bold font:	Font view		Font bold:
-%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutori:\n\t%decorAuthors\n\nURL: %decorURL\nLicență: %decorLic\n\n%decorDesc\n
-Choose Decorator	DecorSettingsView		Alege decorator
-Strong	AntialiasingSettingsView		Puternic
-Failure	Colors tab		Eşec
-Double:	DecorSettingsView		Dublu:
 Selected menu item text	Colors tab		Textul elementului de meniu selectat
-Size:	Font Selection view		Dimensiune:
+Document background	Colors tab		Fundal de document
 Panel background	Colors tab		Fundal de panou
-Plain font:	Font view		Font simplu:
+List background	Colors tab		Fundal de listă
 Window tab text	Colors tab		Text de filă de fereastră
 Navigation pulse	Colors tab		Puls de navigare
-LCD subpixel	AntialiasingSettingsView		Subpixel LCD
 Window tab	Colors tab		Filă de fereastră
-Link text	Colors tab		Text de legătură
 Tooltip background	Colors tab		Fundal de sfaturi de instrumente
-ControlLook:	DecorSettingsView		ControlLock:
+Link text	Colors tab		Text de legătură
 Scroll bar thumb	Colors tab		Miniatură bară de derulare
-Default	DecorSettingsView		Implicit
 Link visited	Colors tab		Legătură vizitată
 Selected menu item border	Colors tab		Marginea elementului de meniu selectat
 Tooltip text	Colors tab		Text de sfaturi de instrumente
-Control background	Colors tab		Fundal de control
 Selected list item text	Colors tab		Textul elementului de listă selectat
+Control background	Colors tab		Fundal de control
+Menu item text	Colors tab		Text de element de meniu
 Selected list item background	Colors tab		Fundalul elementului de listă selectat
 Inactive window tab text	Colors tab		Textul filei de fereastră inactive
 Navigation base	Colors tab		Bază de navigare
-Fonts	APRWindow		Fonturi
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Vând muzică de jazz și haine de bun-gust în New-York și Quebec la preț fix.
-Grayscale	AntialiasingSettingsView		Scală de gri
-Antialiasing type:	AntialiasingSettingsView		Tip de antialias:
+Success	Colors tab		Succes
 Panel text	Colors tab		Text de panou
-Hinting menu	AntialiasingSettingsView		Meniu de hinting
-Scroll bar:	DecorSettingsView		Bară de derulare:
-Choose ControlLook	DecorSettingsView		Alege ControlLock
-Monospaced fonts only	AntialiasingSettingsView		Doar fonturi monospațiate
+Shine	Colors tab		Strălucire
+Menu background	Colors tab		Fundal de meniu
 Document text	Colors tab		Text de document
+List item text	Colors tab		Text de element de listă
 Inactive window border	Colors tab		Margine de fereastră inactivă
-Colors	APRWindow		Culori
-About control look	DecorSettingsView		Despre aspectul de control
-Control highlight	Colors tab		Evidențiază controlul
+Control text	Colors tab		Text de control
 Status bar	Colors tab		Bară de stare
+Control highlight	Colors tab		Evidențiază controlul
+Selected menu item background	Colors tab		Fundalul elementului de meniu selectat
+Link active	Colors tab		Legătură activă
 Link hover	Colors tab		Planare peste legătură
-Single:	DecorSettingsView		Unic:

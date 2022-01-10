@@ -1,64 +1,40 @@
-1	lithuanian	x-vnd.Haiku-PoorMan	3296382959
-Select web folder	PoorMan		Pasirinkite saityne viešintiną aplanką
-Console logging	PoorMan		Žurnalo rodymas pulte
-Create Log File	PoorMan		Sukurti žurnalo failą
-File logging	PoorMan		Žurnalo rašymas į failą
-Website options	PoorMan		Svetainės nuostatos
-Log to file	PoorMan		Rašyti žurnalą į failą
-Shutting down.	PoorMan		Išjungiama.
-Error Dir	PoorMan		Aplanko klaida
-Web folder:	PoorMan		Svetainės aplankas:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Pasirinkite aplanką, kurį norite viešinti saityne.\n\nJeigu norite, programa gali sukurti numatytąjį „public_html“ poaplankį Jūsų namų aplanke.\nArba galite pasirinkti vieną iš jau sukurtų aplankų.
-Log To Console	PoorMan		Rodyti žurnalą pulte
-File Name	PoorMan		Failo vardas
-Starting up... 	PoorMan		Paleidžiama… 
-Select	PoorMan		Rinktis
-Logging view	PoorMan		Žurnalo rodymas
-Save console as…	PoorMan		Įrašyti pulto turinį kaip…
-Edit	PoorMan		Taisa
-Cancel	PoorMan		Atsisakyti
-Directory: 	PoorMan		Aplankas: 
-Hits: %lu	PoorMan		Apsilankymų: %lu
-Hits: 0	PoorMan		Apsilankymų: 0
-Shutting down.\n	PoorMan		Išjungiama.\n
-Select all	PoorMan		Pažymėti viską
-Error Server	PoorMan		Serverio klaida
-Send file listing if there's no start page	PoorMan		Neradus pradžios tinklapio, siųsti failų sąrašą
-Create PoorMan log	PoorMan		Sukurkite žurnalo failą
-Max. simultaneous connections:	PoorMan		Daugiausiai vienu metu priimamų ryšių:
-Done	PoorMan		Atlikta
-Site	PoorMan		Svetainė
+1	lithuanian	x-vnd.Haiku-PoorMan	3975027187
 Cannot start the server	PoorMan		Nepavyko paleisti serverio
+Site	PoorMan		Svetainė
 Create log file	PoorMan		Išvalyti žurnalo failą
+Console logging	PoorMan		Žurnalo rodymas pulte
+Select web folder	PoorMan		Pasirinkite saityne viešintiną aplanką
 Clear hit counter	PoorMan		Išvalyti apsilankymų skaitiklį
-Status: Stopped	PoorMan		Būsena: sustabdytas
+File logging	PoorMan		Žurnalo rašymas į failą
 File	PoorMan		Failas
 Settings…	PoorMan		Nuostatos…
-Log To File	PoorMan		Rašyti žurnalą į failą
+Website options	PoorMan		Svetainės nuostatos
+Log to file	PoorMan		Rašyti žurnalą į failą
 Connections	PoorMan		Ryšiai
 Controls	PoorMan		Valdymas
 Log to console	PoorMan		Rodyti žurnalą pulte
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Pasirinkite aplanką, kurį norite viešinti saityne.\n\nJeigu norite, programa gali sukurti numatytąjį „public_html“ poaplankį Jūsų namų aplanke.\nArba galite pasirinkti vieną iš jau sukurtų aplankų.
+Web folder:	PoorMan		Svetainės aplankas:
 Advanced	PoorMan		Išsamiau
-Copy	PoorMan		Kopijuoti
 Logging	PoorMan		Žurnalas
+Copy	PoorMan		Kopijuoti
 PoorMan	System name		Saityno serveris
-Clear console log	PoorMan		Išvalyti pulto žurnalą
+Logging view	PoorMan		Žurnalo rodymas
 Run server	PoorMan		Paleisti serverį
-Create	PoorMan		Sukurti
-done.\n	PoorMan		baigta.\n
+Clear console log	PoorMan		Išvalyti pulto žurnalą
+Edit	PoorMan		Taisa
+Save console as…	PoorMan		Įrašyti pulto turinį kaip…
 PoorMan settings	PoorMan		Saityno serverio nuostatos
-Console Logging	PoorMan		Žurnalo rodymas pulte
 Clear log file	PoorMan		Išvalyti žurnalo failą
 Save log console selection	PoorMan		Pažymėtosios pulto žurnalo dalies įrašymas
-File Logging	PoorMan		Žurnalo rašymas į failą
 Log file name:	PoorMan		Žurnalo failo vardas:
-Status: Running	PoorMan		Būsena: veikia
-Directory: (none)	PoorMan		Aplankas: (joks)
+Select all	PoorMan		Pažymėti viską
+Send file listing if there's no start page	PoorMan		Neradus pradžios tinklapio, siųsti failų sąrašą
+Create PoorMan log	PoorMan		Sukurkite žurnalo failą
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Numatytasis saityno aplankas „/boot/home/public_html“ sukurtas.\nĮsitikinkite, kad jame yra HTML failas vardu „index.html“.
-Dir Created	PoorMan		Aplankas sukurtas
-Save console selections as…	PoorMan		Įrašyti pažymėtąją pulto turinio dalį kaip…
 Quit	PoorMan		Baigti darbą
+Save console selections as…	PoorMan		Įrašyti pažymėtąją pulto turinio dalį kaip…
 Save log console	PoorMan		Pulto žurnalo įrašymas
 Start page:	PoorMan		Pradžios tinklapis:
-OK	PoorMan		Gerai
+Max. simultaneous connections:	PoorMan		Daugiausiai vienu metu priimamų ryšių:
 Website location	PoorMan		Svetainės adresas

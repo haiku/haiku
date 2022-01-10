@@ -1,66 +1,41 @@
-1	czech	x-vnd.Haiku-PoorMan	1829050509
-Select web folder	PoorMan		Vybrat webovou složku
-Console logging	PoorMan		Záznam konzole
-Create Log File	PoorMan		Vytvořit soubor protokolu
-File logging	PoorMan		Logování do souboru
-Website options	PoorMan		Volby webové stránky
-Log to file	PoorMan		Uložit záznam do souboru
-Shutting down.	PoorMan		Ukončuji.
-Error Dir	PoorMan		Chybový adresář
-Web folder:	PoorMan		Webová složka
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vyberte prosím složku, kterou chcete publikovat na webu.\n\nPoorMan může vytvořit implicitní \"public_html\" ve vaší domovské složce.\nNebo místo ní vyberte některou z vašich složek.
-Log To Console	PoorMan		Logovat do Konzole
-File Name	PoorMan		Jméno souboru
-Starting up... 	PoorMan		Spouštím...
-Select	PoorMan		Vybrat
-Logging view	PoorMan		Zobrazení logování
-Save console as…	PoorMan		Uložit konzoli jako...
-Edit	PoorMan		Editovat
-Cancel	PoorMan		Zrušit
-Directory: 	PoorMan		Adresář:
-Hits: %lu	PoorMan		Přístupy: %lu
-Hits: 0	PoorMan		Přístupy: 0
-Shutting down.\n	PoorMan		Ukončuji.\n
-Select all	PoorMan		Vybrat vše
-Error Server	PoorMan		Chybový server
-Send file listing if there's no start page	PoorMan		Odeslat výpis souborů pokud není úvodní stránka
-Create PoorMan log	PoorMan		Vytvořit log PoorMana
-Max. simultaneous connections:	PoorMan		Max. současných připojení
-Done	PoorMan		Hotovo
-Site	PoorMan		Síť
+1	czech	x-vnd.Haiku-PoorMan	2026082639
 Cannot start the server	PoorMan		Nemohu spustit server
+Site	PoorMan		Síť
 Create log file	PoorMan		Vytvořit soubor logu
-Create public_html	PoorMan		Vytvořit public_html
+Console logging	PoorMan		Záznam konzole
+Select web folder	PoorMan		Vybrat webovou složku
 Clear hit counter	PoorMan		Vymazat počitadlo přístupů
-Status: Stopped	PoorMan		Status: Zastaveno
+File logging	PoorMan		Logování do souboru
 File	PoorMan		Soubor
 Settings…	PoorMan		Nastavení...
-Log To File	PoorMan		Logovat do souboru
+Website options	PoorMan		Volby webové stránky
+Log to file	PoorMan		Uložit záznam do souboru
 Connections	PoorMan		Spojení
 Controls	PoorMan		Ovládací prvky
 Log to console	PoorMan		Záznam do konzole
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Vyberte prosím složku, kterou chcete publikovat na webu.\n\nPoorMan může vytvořit implicitní \"public_html\" ve vaší domovské složce.\nNebo místo ní vyberte některou z vašich složek.
+Web folder:	PoorMan		Webová složka
 Advanced	PoorMan		Pokročilé
-Copy	PoorMan		Kopírovat
 Logging	PoorMan		Logování
+Copy	PoorMan		Kopírovat
 PoorMan	System name		PoorMan
-Clear console log	PoorMan		Vymazat log konzole
+Logging view	PoorMan		Zobrazení logování
 Run server	PoorMan		Spustit server
-Create	PoorMan		Vytvořit
+Clear console log	PoorMan		Vymazat log konzole
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# spojení} few{# spojení} other{# spojení}}
-done.\n	PoorMan		hotovo.\n
+Edit	PoorMan		Editovat
+Save console as…	PoorMan		Uložit konzoli jako...
 PoorMan settings	PoorMan		Nastavení PoorMan
-Console Logging	PoorMan		Logování do konzole
 Clear log file	PoorMan		Vymazat soubor logu
 Save log console selection	PoorMan		Uložit výběr z konzoly logu
-File Logging	PoorMan		Záznam do souboru
 Log file name:	PoorMan		Jméno souboru logu:
-Status: Running	PoorMan		Status: Spuštěn
-Directory: (none)	PoorMan		Adresář: (žádný)
+Select all	PoorMan		Vybrat vše
+Send file listing if there's no start page	PoorMan		Odeslat výpis souborů pokud není úvodní stránka
+Create PoorMan log	PoorMan		Vytvořit log PoorMana
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Implicitní webová složka byla vytvořena v \"/boot/home/public_html.\"\nUjistěte se, že v ní je HTML soubor \"index.html\".
-Dir Created	PoorMan		Adresář vytvořen
-Save console selections as…	PoorMan		Uložit výběry z konzole jako...
 Quit	PoorMan		Ukončit
+Save console selections as…	PoorMan		Uložit výběry z konzole jako...
 Save log console	PoorMan		Uložit konzoli logu
 Start page:	PoorMan		Úvodní stránka
-OK	PoorMan		OK
+Max. simultaneous connections:	PoorMan		Max. současných připojení
 Website location	PoorMan		Umístění webové stránky

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-CharacterMap	3635187938
+1	russian	x-vnd.Haiku-CharacterMap	187263876
 Tirhuta	UnicodeBlocks		Тирхута
 Miscellaneous mathematical symbols B	UnicodeBlocks		Разнообразные математические символы B
 Latin extended E	UnicodeBlocks		Расширенная латиница E
@@ -6,8 +6,8 @@ Dogra	UnicodeBlocks		Догра
 Javanese	UnicodeBlocks		Яванский
 Saurashtra	UnicodeBlocks		Саураштра
 Arabic supplement	UnicodeBlocks		Арабский дополнительные
-Hanunoo	UnicodeBlocks		Хануноо
 Ogham	UnicodeBlocks		Огамический
+Hanunoo	UnicodeBlocks		Хануноо
 Inscriptional Pahlavi	UnicodeBlocks		Пехлеви с надписью
 Hebrew	UnicodeBlocks		Иврит
 Katakana	UnicodeBlocks		Катакана
@@ -38,7 +38,6 @@ Enclosed ideographic supplement	UnicodeBlocks		Дополнение к обра�
 Warang Citi	UnicodeBlocks		Варанг-кшити
 Vertical forms	UnicodeBlocks		Вертикальные формы
 Miscellaneous mathematical symbols A	UnicodeBlocks		Различные математические символы A
-CharacterMap	System name		Карта символов
 Latin extended D	UnicodeBlocks		Расширенная латиница D
 Aegean numbers	UnicodeBlocks		Эгейские цифры
 Hangul syllables	UnicodeBlocks		Хангулийские слоги
@@ -46,7 +45,6 @@ Modifier tone letters	UnicodeBlocks		Модификаторы тона
 Kaithi	UnicodeBlocks		Кайтхи
 Psalter Pahlavi	UnicodeBlocks		Псалтирь Пехлеви
 Newa	UnicodeBlocks		Нева
-View	CharacterWindow		Вид
 Rumi numeral symbols	UnicodeBlocks		Цифры системы руми
 Enclosed CJK letters and months	UnicodeBlocks		Вложенные буквы и месяцы CJK
 Deseret	UnicodeBlocks		Дезерет
@@ -64,7 +62,6 @@ Chess symbols	UnicodeBlocks		Шахматные символы
 Yijing hexagram symbols	UnicodeBlocks		Гексаграммы Ицзин
 Ottoman Siyaq numbers	UnicodeBlocks		Османские числа Cиак
 Ideographic symbols and punctuation	UnicodeBlocks		Идеографические символы и пунктуация
-File	CharacterWindow		Файл
 Sudanese supplement	UnicodeBlocks		Суданское дополнение
 Myanmar	UnicodeBlocks		Мьянма
 Tifinagh	UnicodeBlocks		Тифинаг
@@ -100,7 +97,6 @@ Duployan	UnicodeBlocks		Дюплойе
 Early Dynastic Cuneiform	UnicodeBlocks		Раннединастическая клинопись
 Kana extended A	UnicodeBlocks		Расширенная кана A
 Arabic presentation forms A	UnicodeBlocks		Формы арабского представления A
-Filter:	CharacterWindow		Фильтр:
 Small Kana extension	UnicodeBlocks		Малое расширение кана
 Kannada	UnicodeBlocks		Каннада
 Brahmi	UnicodeBlocks		Брахми
@@ -116,7 +112,6 @@ Latin extended B	UnicodeBlocks		Латинский расширение B
 Phonetic extensions	UnicodeBlocks		Фонетические расширения
 Indic Siyaq numbers	UnicodeBlocks		Индийские цифры сийяк
 Batak	UnicodeBlocks		Батакское письмо
-Code	CharacterWindow		Код
 Block elements	UnicodeBlocks		Блочные элементы
 Ethiopic extended A	UnicodeBlocks		Расширенное эфиопское письмо A
 Mahjong tiles	UnicodeBlocks		Маджонгские плитки
@@ -150,12 +145,11 @@ Ideographic description characters	UnicodeBlocks		Символы описани�
 Supplemental arrows A	UnicodeBlocks		Дополнительные стрелки A
 Rejang	UnicodeBlocks		Реджанг
 Number forms	UnicodeBlocks		Формы чисел
-Avestan	UnicodeBlocks		Авестийское письмо
 Latin extended A	UnicodeBlocks		Расширенная латиница A
+Avestan	UnicodeBlocks		Авестийское письмо
 Zanabazar Square	UnicodeBlocks		Квадратное письмо Дзанабадзара
 Sundanese	UnicodeBlocks		Сунданский
 Geometric shapes	UnicodeBlocks		Геометрические фигуры
-Clear	CharacterWindow		Очистить
 Symbols and pictographs extended A	UnicodeBlocks		Расширенные символы и пиктограммы A
 Adlam	UnicodeBlocks		Адлам
 Arabic	UnicodeBlocks		Арабский
@@ -174,8 +168,8 @@ Chorasmian	UnicodeBlocks		Хорезмийское письмо
 Lisu supplement	UnicodeBlocks		Дополнение к лису
 Takri	UnicodeBlocks		Такри
 Shorthand format controls	UnicodeBlocks		Форматирующие символы стенографии
-Inscriptional Parthian	UnicodeBlocks		Парфянское письмо
 Optical character recognition	UnicodeBlocks		Оптическое распознавание символов
+Inscriptional Parthian	UnicodeBlocks		Парфянское письмо
 Tamil	UnicodeBlocks		Тамильский
 Lisu	UnicodeBlocks		Лису
 Nandingari	UnicodeBlocks		Нандингари
@@ -185,7 +179,6 @@ Mahajani	UnicodeBlocks		Махаджани
 Lepcha	UnicodeBlocks		Лепча
 Mandaic	UnicodeBlocks		Мандейское письмо
 Old italic	UnicodeBlocks		Этрусский алфавит
-Quit	CharacterWindow		Выход
 Playing cards	UnicodeBlocks		Игральные карты
 Chakma	UnicodeBlocks		Чакма
 Buhid	UnicodeBlocks		Бухид
@@ -218,8 +211,8 @@ Combining diacritical marks extended	UnicodeBlocks		Расширенные ко�
 Cyrillic extended C	UnicodeBlocks		Кириллица расширенная A
 Syriac	UnicodeBlocks		Сирийский
 Private use area	UnicodeBlocks		Область для частного использования
-Vedic extensions	UnicodeBlocks		Расширенные ведические символы
 Supplement punctuation	UnicodeBlocks		Дополнительные знаки пунктуации
+Vedic extensions	UnicodeBlocks		Расширенные ведические символы
 Lycian	UnicodeBlocks		Ликийский
 Myanmar extended A	UnicodeBlocks		Мьянманское расширенное письмо A
 Ancient symbols	UnicodeBlocks		Древние символы
@@ -239,7 +232,6 @@ Phags-pa	UnicodeBlocks		Фагс-па
 Nabataean	UnicodeBlocks		Набатейское письмо
 Meetei Mayek	UnicodeBlocks		Мейтей-маек
 CJK compatibility ideographs	UnicodeBlocks		Совместимые иероглифы CJK
-Show private blocks	CharacterWindow		Отображать частные блоки
 Samaritan	UnicodeBlocks		Самаритянское письмо
 Latin extended additional	UnicodeBlocks		Дополнительная расширенная латиница
 Tibetan	UnicodeBlocks		Тибетский
@@ -260,16 +252,13 @@ Khudawadi	UnicodeBlocks		Худабади
 Glagotic	UnicodeBlocks		Глаголический
 Cyrillic extended B	UnicodeBlocks		Кириллица расширение B
 Anatolian hieroglyphs	UnicodeBlocks		Анатолийские иероглифы
-Copy as escaped byte string	CharacterView		Скопировать как экранированную строку байт
 Tai Xuan Jing symbols	UnicodeBlocks		Символы Тай Сюань Цзин
 Hiragana	UnicodeBlocks		Хирагана
 Tagbanwa	UnicodeBlocks		Тагбанва
 Basic Latin	UnicodeBlocks		Основная латиница
 Greek and Coptic	UnicodeBlocks		Греческий и коптский
 Kangxi radicals	UnicodeBlocks		Корни Канси
-Copy character	CharacterView		Скопировать символ
 Hangul Jamo	UnicodeBlocks		Хангыль Чамо
-Font	CharacterWindow		Шрифт
 Ornamental dingbats	UnicodeBlocks		Орнаментные символы
 Egyptian hieroglyph format controls	UnicodeBlocks		Управляющие символы форматирования египетских иероглифов
 Manichaean	UnicodeBlocks		Манихейское письмо

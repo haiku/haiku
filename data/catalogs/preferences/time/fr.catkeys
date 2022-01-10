@@ -1,48 +1,7 @@
-1	french	x-vnd.Haiku-Time	3691539601
-OK	Time		OK
+1	french	x-vnd.Haiku-Time	3879356774
 Message receiving failed	Time		La réception du message a échoué
-Australia	Time		Australie
-America	Time		Amérique
-Reset to default server list	Time		Restaurer la liste de serveurs par défaut
-Could not resolve server address	Time		Impossible de résoudre l’adresse du serveur
-Time & Date	System name		Heure & Date
-Set time zone	Time		Régler le fuseau horaire
 Waiting for answer failed	Time		L’attente d’une réponse a échoué
-<Other>	Time		<Autre>
 Received invalid time	Time		Une heure non valide a été reçue
-Remove	Time		Retirer
-Synchronize again	Time		Synchroniser à nouveau
-Asia	Time		Asie
-Try all servers	Time		Essayer tous les serveurs
-Time	Time		Heure
-Current time:	Time		Heure actuelle :
-The following error occured while synchronizing:\n%s: %s	Time		L’erreur suivante s’est produite lors de la synchronisation :\n%s : %s
-Europe	Time		Europe
-Show day of week	Time		Afficher le jour de la semaine
-Local time (Windows compatible)	Time		Heure locale (compatible Windows)
-Hardware clock set to:	Time		L’horloge matérielle est réglée sur :
-Arctic	Time		Arctique
-Antarctica	Time		Antarctique
-GMT (UNIX compatible)	Time		GMT (compatible UNIX)
-Africa	Time		Afrique
-Stop	Time		Arrêter
-Time zone	Time		Fuseau horaire
-Clock	Time		Horloge
-Network time	Time		Heure réseau
 Sending request failed	Time		L’envoi d’une requête a échoué
-Preview time:	Time		Aperçu de l’heure :
-\nNow: 	Time		\nMaintenant, il est : 
 Could not create socket	Time		Impossible de créer le socket
-Pacific	Time		Pacifique
-Atlantic	Time		Atlantique
-Show clock in Deskbar	Time		Afficher l’heure dans la Deskbar
-Display time with seconds	Time		Afficher l’heure avec les secondes
-Time	System name		Heure
-Show time zone	Time		Afficher le fuseau horaire
-Synchronize at boot	Time		Synchroniser au démarrage
-Indian	Time		Indien
-Revert	Time		Rétablir
-Date and time	Time		Date et heure
-The following error occured while synchronizing:\n%s	Time		L’erreur suivante s’est produite lors de la synchronisation :\n%s
-Synchronize	Time		Synchroniser
-Add	Time		Ajouter
+Could not resolve server address	Time		Impossible de résoudre l’adresse du serveur

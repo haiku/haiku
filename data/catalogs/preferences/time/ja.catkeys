@@ -1,48 +1,7 @@
-1	japanese	x-vnd.Haiku-Time	3691539601
-OK	Time		OK
+1	japanese	x-vnd.Haiku-Time	3879356774
 Message receiving failed	Time		メッセージの取得に失敗しました
-Australia	Time		オーストラリア
-America	Time		アメリカ
-Reset to default server list	Time		デフォルトのサーバーリストにリセット
-Could not resolve server address	Time		サーバーアドレスを解決できません
-Time & Date	System name		日付と時刻
-Set time zone	Time		タイムゾーンを設定
 Waiting for answer failed	Time		返答待ちに失敗しました
-<Other>	Time		<その他>
 Received invalid time	Time		無効な時刻を受け取りました
-Remove	Time		削除
-Synchronize again	Time		再同期
-Asia	Time		アジア
-Try all servers	Time		すべてのサーバーを試す
-Time	Time		日付と時刻
-Current time:	Time		現在時刻:
-The following error occured while synchronizing:\n%s: %s	Time		時刻の同期中に、次のエラーが発生しました:\n%s: %s
-Europe	Time		ヨーロッパ
-Show day of week	Time		曜日の表示
-Local time (Windows compatible)	Time		現地時刻 (Windows 互換)
-Hardware clock set to:	Time		ハードウェアクロックを設定:
-Arctic	Time		北極
-Antarctica	Time		南極
-GMT (UNIX compatible)	Time		GMT (UNIX 互換)
-Africa	Time		アフリカ
-Stop	Time		中断
-Time zone	Time		タイムゾーン
-Clock	Time		時計
-Network time	Time		ネットワークタイム
 Sending request failed	Time		リクエストの送信に失敗しました
-Preview time:	Time		プレビュー:
-\nNow: 	Time		 \n現在:
 Could not create socket	Time		ソケットを作成できません。
-Pacific	Time		太平洋
-Atlantic	Time		大西洋
-Show clock in Deskbar	Time		Deskbar に時計を表示
-Display time with seconds	Time		秒の表示
-Time	System name		日付と時刻
-Show time zone	Time		タイムゾーンの表示
-Synchronize at boot	Time		起動時に同期
-Indian	Time		インド
-Revert	Time		戻す
-Date and time	Time		日付と時刻
-The following error occured while synchronizing:\n%s	Time		時刻の同期中に、次のエラーが発生しました:\n%s
-Synchronize	Time		同期
-Add	Time		追加
+Could not resolve server address	Time		サーバーアドレスを解決できません

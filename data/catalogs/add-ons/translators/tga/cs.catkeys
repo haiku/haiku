@@ -1,16 +1,15 @@
-1	czech	x-vnd.Haiku-TGATranslator	3075011211
-Save with RLE compression	TGAView		Uložit s kompresí RLE
-Targa image (%d bits truecolor)	TGATranslator		obrázek Targa (%d bitový truecolor)
-Ignore TGA alpha channel	TGAView		Ignorovat TGA alfakanál
-Targa image (%d bits colormap)	TGATranslator		obrázek Targa (%d bitové mapování barev)
-TGA image translator	TGAView		převaděč obrázků TGA
-Targa image (%d bits RLE colormap)	TGATranslator		obrázek Targa (%d bitové RLE mapování barev)
-Targa image (%d bits gray)	TGATranslator		obrázek Targa (%d bité stupně šedi)
-Written by the Haiku Translation Kit Team	TGAView		Napsáno Týmem Haiku Translation Kit
-Targa image (%d bits RLE truecolor)	TGATranslator		obrázek Targa (%d bitový RLE truecolor)
-TGA images	TGATranslator		obrázky TGA
+1	czech	x-vnd.Haiku-TGATranslator	1299281918
 Version %d.%d.%d, %s	TGAView		Verze %d.%d.%d, %s
 TGATranslator Settings	TGATranslator		nastavení Převaděče TGA
+Targa image (%d bits RLE truecolor)	TGATranslator		obrázek Targa (%d bitový RLE truecolor)
+Save with RLE compression	TGAView		Uložit s kompresí RLE
+Targa image (%d bits RLE colormap)	TGATranslator		obrázek Targa (%d bitové RLE mapování barev)
+Written by the Haiku Translation Kit Team	TGAView		Napsáno Týmem Haiku Translation Kit
+Targa image (%d bits colormap)	TGATranslator		obrázek Targa (%d bitové mapování barev)
+Ignore TGA alpha channel	TGAView		Ignorovat TGA alfakanál
 TGA image translator	TGATranslator		převaděč obrázků TGA
+TGA images	TGATranslator		obrázky TGA
+Targa image (%d bits gray)	TGATranslator		obrázek Targa (%d bité stupně šedi)
+TGA image translator	TGAView		převaděč obrázků TGA
 Targa image (%d bits RLE gray)	TGATranslator		obrázek TGA (%d bitový RLE stupně šedi)
-TGA Settings	TGAMain		nastavení TGA
+Targa image (%d bits truecolor)	TGATranslator		obrázek Targa (%d bitový truecolor)

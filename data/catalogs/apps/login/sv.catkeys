@@ -1,20 +1,11 @@
-1	swedish	x-vnd.Haiku-Login	3568987751
+1	swedish	x-vnd.Haiku-Login	3025604784
 Invalid login!	Login View		Ogiltig inloggning!
-Error	Login App		Fel
-Login application for Haiku\nUsage:	Login App		Inloggningsapplikation för Haiku\nAnvändande:
---nonmodal\tDo not make the window modal	Login App		--nonmodal\tGör inte fönstret modalt
+OK	Login View		OK
 Welcome to Haiku	Login Window		Välkommen till Haiku
+Login:	Login View		Användarnamn:
+Password:	Login View		Lösenord:
 Halt	Login View		Stoppa
 Desktop	Desktop Window		Skrivbord
 Hide password	Login View		Göm lösenordet
 Reboot	Login View		Starta om
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Du kan skräddarsy skrivbordet som visas bakom loginapplikationen genom att släppa replikanter på det \n\nStäng applikationen när du är klar (Cmd-Q).
-OK	Login View		OK
-Info	Login App		Information
---edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tStarta i hyllredigeringsläge för att anpassa skrivbordet.
-Login:	Login View		Användarnamn:
-Password:	Login View		Lösenord:
-Unimplemented	Login App		Ej implementerad
-OK	Login App		OK
-Error: %1	Login App		Fel: %1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	fel %s\n

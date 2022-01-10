@@ -1,14 +1,13 @@
-1	lithuanian	x-vnd.Haiku-TGATranslator	77519970
-Targa image (%d bits truecolor)	TGATranslator		TGA paveikslas (%d bitų tikrosios spalvos)
-Ignore TGA alpha channel	TGAView		Nepaisyti TGA alfa kanalo
-Targa image (%d bits colormap)	TGATranslator		TGA paveikslas (%d bitų spalvų atvaizdis)
-TGA image translator	TGAView		TGA paveikslų keitiklis
-Targa image (%d bits RLE colormap)	TGATranslator		TGA paveikslas (%d bitų RLE spalvų atvaizdis)
-Targa image (%d bits gray)	TGATranslator		TGA paveikslas (%d bitų pilkumo tonai)
-Written by the Haiku Translation Kit Team	TGAView		Sukūrė „Haiku“ komanda
-Targa image (%d bits RLE truecolor)	TGATranslator		TGA paveikslas (%d bitų RLE tikrosios spalvos)
-TGA images	TGATranslator		TGA paveikslai
+1	lithuanian	x-vnd.Haiku-TGATranslator	2596757973
 TGATranslator Settings	TGATranslator		TGA keitiklio nuostatos
+Targa image (%d bits RLE truecolor)	TGATranslator		TGA paveikslas (%d bitų RLE tikrosios spalvos)
+Targa image (%d bits RLE colormap)	TGATranslator		TGA paveikslas (%d bitų RLE spalvų atvaizdis)
+Written by the Haiku Translation Kit Team	TGAView		Sukūrė „Haiku“ komanda
+Targa image (%d bits colormap)	TGATranslator		TGA paveikslas (%d bitų spalvų atvaizdis)
+Ignore TGA alpha channel	TGAView		Nepaisyti TGA alfa kanalo
 TGA image translator	TGATranslator		TGA paveikslų keitiklis
+TGA images	TGATranslator		TGA paveikslai
+Targa image (%d bits gray)	TGATranslator		TGA paveikslas (%d bitų pilkumo tonai)
+TGA image translator	TGAView		TGA paveikslų keitiklis
 Targa image (%d bits RLE gray)	TGATranslator		TGA paveikslas (%d bitų RLE pilkumo tonai)
-TGA Settings	TGAMain		TGA nuostatos
+Targa image (%d bits truecolor)	TGATranslator		TGA paveikslas (%d bitų tikrosios spalvos)

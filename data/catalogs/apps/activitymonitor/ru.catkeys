@@ -1,48 +1,35 @@
-1	russian	x-vnd.Haiku-ActivityMonitor	2601047281
+1	russian	x-vnd.Haiku-ActivityMonitor	1330427574
 Teams	DataSource		Процессы
 Semaphores	DataSource		Семафоры
 TX	DataSource	Shorter version for Sending	Передача
 Block cache memory	DataSource		Память блокового кэша
-%lld ms	SettingsWindow		%lld мс
 MiB	DataSource		МБ
 Media nodes	DataSource		Медиа узлы
 Text clipboard	DataSource		Текстовый буфер обмена
 Network send	DataSource		Исходящий трафик
-Running applications	DataSource		Запущенные приложения
 Cache	DataSource		Кэш
-CPU usage (combined)	DataSource		Использование процессора (всего)
+Running applications	DataSource		Запущенные приложения
 Threads	DataSource		Потоки
+CPU usage (combined)	DataSource		Использование процессора (всего)
 Receiving	DataSource		Прием
-Remove graph	ActivityView		Удалить график
 Swap space	DataSource		Размер файла подкачки
 CPU	DataSource		Процессор
-ActivityMonitor	System name		Монитор активности
 CPU %d	DataSource		Процессор %d
-Update time interval:	SettingsWindow		Интервал обновления:
 RX	DataSource	Shorter version for Receiving.	Прием
-Settings…	ActivityWindow		Настройки…
 Block cache	DataSource		Блоковый кэш
 Memory	DataSource		Память
 CPU usage	DataSource		Использование ЦПУ
-Quit	ActivityWindow		Выход
 Raw clipboard	DataSource		Полный буфер обмена
-Settings	ActivityWindow		Настройки
 Used memory	DataSource		Используемая память
 %.1f faults/s	DataSource		%.1f отказов/с
-Show legend	ActivityView		Показать легенду
 Cached memory	DataSource		Кэшируемая память
 CPU %d usage	DataSource		Используется %d ЦП
-File	ActivityWindow		Файл
 Ports	DataSource		Порты
 Page faults	DataSource		Отказы страниц
 Apps	DataSource		Приложения
-Additional items	ActivityView		Дополнительные графики
-Add graph	ActivityWindow		Добавить график
 Sending	DataSource		Отправка
 %.1f MiB	DataSource		%.1f МБ
-Always on top	ActivityWindow		Поверх всех окон
 Swap	DataSource		Файл подкачки
-%lld sec.	SettingsWindow		%lld сек.
 P-faults	DataSource		Отказы страниц
 Sems	DataSource		Семафоры
 Network receive	DataSource		Входящий трафик

@@ -1,7 +1,6 @@
-1	esperanto	x-vnd.Haiku.TextSearch	1757850908
+1	esperanto	x-vnd.Haiku.TextSearch	2003518937
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Bonvolu elekti la dosierojn, kiuj por via deziro estus elektitaj en Spurilo.
 %appname% : %path%	GrepWindow		%appname% : %path%
-Failed to start xargs program!	Grepper		La programa xargs ne eblas komenciĝi!
 Open selection	GrepWindow		Uzi elektaĵon
 Actions	GrepWindow		Agoj
 New window	GrepWindow		Nova fenestro
@@ -11,7 +10,6 @@ OK	GrepWindow		Bone
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Fermi
 Look in sub-folders	GrepWindow		Serĉi en subdosierujojn
-%s: Not enough room to escape the filename.	Grepper		%s: Spaco ne sufiĉas por eskapi la dosiernomon.
 Follow symbolic links	GrepWindow		Sekvi simbolajn ligilojn
 Regular expression	GrepWindow		Regula esprimo
 Text files only	GrepWindow		Nur tekstaj dosieroj
@@ -19,16 +17,12 @@ Quit	GrepWindow		Ĉesi
 Show files in Tracker	GrepWindow		Montri dosierojn en Spurilo
 Please select the files you wish to keep searching.	GrepWindow		Bonvolu elekti la dosierojn, por kiuj vi volus daŭrigi serĉadon.
 Trim to selection	GrepWindow		Stuci ĝis selekto
-Set target…	GrepWindow		Atribui celon…
-Failed to open input pipe!	Grepper		Malsukcesis uzi la enigan dukton!
 Search	GrepWindow		Serĉi
 Copy text to clipboard	GrepWindow		Kopii tekston en tondujon
 Show lines	GrepWindow		Montri linojn
-Failed to open errors pipe!	Grepper		Malsukcesis uzi la dukton de eraroj!
 The unselected files will be removed from the list.	GrepWindow		La malelektata dosieroj estos forigata for la listo.
 Open files in code editor	GrepWindow		Uzi dosierojn per la koda redaktilo.
 Skip folders starting with a dot	GrepWindow		Malatenti dosierujon antaŭatajn per punkto
-Failed to open output pipe!	Grepper		Malsukcesis uzi la eligan dukton!
 Cancel	GrepWindow		Nuligi
 History	GrepWindow		Historio
 TextSearch	System name		Tekstoserĉo

@@ -1,66 +1,41 @@
-1	italian	x-vnd.Haiku-PoorMan	1829050509
-Select web folder	PoorMan		Seleziona cartella web
-Console logging	PoorMan		Logging su console
-Create Log File	PoorMan		Crea file di registro
-File logging	PoorMan		Log su file
-Website options	PoorMan		Opzioni del sito
-Log to file	PoorMan		Log su file
-Shutting down.	PoorMan		Il server è stato arrestato.
-Error Dir	PoorMan		Errore nella cartella
-Web folder:	PoorMan		Cartella Web:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Scegliere una cartella da pubblicare sul web.\n\nPoorMan può creare una sottocartella \"public_html\" nella tua cartella personale.\nPuoi anche selezionare un'altra cartella, se preferisci.
-Log To Console	PoorMan		Invia il log alla Console
-File Name	PoorMan		Nome del file
-Starting up... 	PoorMan		Avviamento del server in corso… 
-Select	PoorMan		Seleziona
-Logging view	PoorMan		Vista log
-Save console as…	PoorMan		Salva console come...
-Edit	PoorMan		Modifica
-Cancel	PoorMan		Annulla
-Directory: 	PoorMan		Cartella: 
-Hits: %lu	PoorMan		Hit: %lu
-Hits: 0	PoorMan		Richieste: 0
-Shutting down.\n	PoorMan		Il server è stato arrestato.\n
-Select all	PoorMan		Seleziona tutto
-Error Server	PoorMan		Errore del Server
-Send file listing if there's no start page	PoorMan		Mostra la lista dei file se non c'è nessuna pagina iniziale
-Create PoorMan log	PoorMan		Crea un log di PoorMan
-Max. simultaneous connections:	PoorMan		Massimo numero di connessioni simultanee:
-Done	PoorMan		Applica
-Site	PoorMan		Sito
+1	italian	x-vnd.Haiku-PoorMan	2026082639
 Cannot start the server	PoorMan		Non è stato possibile avviare il server
+Site	PoorMan		Sito
 Create log file	PoorMan		Crea un file di log
-Create public_html	PoorMan		Crea public_html
+Console logging	PoorMan		Logging su console
+Select web folder	PoorMan		Seleziona cartella web
 Clear hit counter	PoorMan		Azzera il contatore delle richieste
-Status: Stopped	PoorMan		Stato: Arrestato
+File logging	PoorMan		Log su file
 File	PoorMan		File
 Settings…	PoorMan		Impostazioni...
-Log To File	PoorMan		Log su file
+Website options	PoorMan		Opzioni del sito
+Log to file	PoorMan		Log su file
 Connections	PoorMan		Connessioni
 Controls	PoorMan		Controlli
 Log to console	PoorMan		Log su console
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Scegliere una cartella da pubblicare sul web.\n\nPoorMan può creare una sottocartella \"public_html\" nella tua cartella personale.\nPuoi anche selezionare un'altra cartella, se preferisci.
+Web folder:	PoorMan		Cartella Web:
 Advanced	PoorMan		Avanzato
-Copy	PoorMan		Copia
 Logging	PoorMan		Log
+Copy	PoorMan		Copia
 PoorMan	System name		PoorMan Web Server
-Clear console log	PoorMan		Pulisci la console
+Logging view	PoorMan		Vista log
 Run server	PoorMan		Esegui server
-Create	PoorMan		Crea
+Clear console log	PoorMan		Pulisci la console
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connessione} other{# connessioni}}
-done.\n	PoorMan		fatto.\n
+Edit	PoorMan		Modifica
+Save console as…	PoorMan		Salva console come...
 PoorMan settings	PoorMan		Impostazioni di PoorMan
-Console Logging	PoorMan		Log della console
 Clear log file	PoorMan		Cancella file di log
 Save log console selection	PoorMan		Salva la selezione del log della console
-File Logging	PoorMan		Logging su File
 Log file name:	PoorMan		Nome del file di log:
-Status: Running	PoorMan		Stato: In esecuzione
-Directory: (none)	PoorMan		Cartella: (nessuno)
+Select all	PoorMan		Seleziona tutto
+Send file listing if there's no start page	PoorMan		Mostra la lista dei file se non c'è nessuna pagina iniziale
+Create PoorMan log	PoorMan		Crea un log di PoorMan
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Una cartella predefinita è stata creata in \"/boot/home/public_html.\"\nAssicurarati che ci sia un file HTML chiamato \"index.html\" nella cartella.
-Dir Created	PoorMan		Cartella creata
-Save console selections as…	PoorMan		Salva selezione della console come...
 Quit	PoorMan		Esci
+Save console selections as…	PoorMan		Salva selezione della console come...
 Save log console	PoorMan		Salva il log della console
 Start page:	PoorMan		Pagina iniziale:
-OK	PoorMan		OK
+Max. simultaneous connections:	PoorMan		Massimo numero di connessioni simultanee:
 Website location	PoorMan		Posizione del sito web

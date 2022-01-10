@@ -1,16 +1,11 @@
-1	lithuanian	x-vnd.Haiku-Login	1085637210
+1	lithuanian	x-vnd.Haiku-Login	3025604784
 Invalid login!	Login View		Netinkamas naudotojo vardas!
-Error	Login App		Klaida
+OK	Login View		Gerai
 Welcome to Haiku	Login Window		Sveiki! Čia „Haiku“
+Login:	Login View		Naudotojo vardas:
+Password:	Login View		Slaptažodis:
 Halt	Login View		Išjungti
 Desktop	Desktop Window		Darbalaukis
 Hide password	Login View		Nerodyti slaptažodžio
 Reboot	Login View		Paleisti iš naujo
-OK	Login View		Gerai
-Info	Login App		Informacija
-Login:	Login View		Naudotojo vardas:
-Password:	Login View		Slaptažodis:
-Unimplemented	Login App		Nerealizuota
-OK	Login App		Gerai
-Error: %1	Login App		Klaida: %1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	klaida %s\n

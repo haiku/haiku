@@ -1,66 +1,41 @@
-1	finnish	x-vnd.Haiku-PoorMan	1829050509
-Select web folder	PoorMan		Valitse webbikansio
-Console logging	PoorMan		Pääteikkunakirjaaminen
-Create Log File	PoorMan		Luo lokitiedosto
-File logging	PoorMan		Tiedostolokikirjaus
-Website options	PoorMan		Webbisivuvalitsimet
-Log to file	PoorMan		Loki tiedostoon
-Shutting down.	PoorMan		Lopetetaan.
-Error Dir	PoorMan		Virhehakemisto
-Web folder:	PoorMan		Webbikansio:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Valitse webissä julkaistava kansio.\n\nSinulla voi olla Pettuleipä-palvelimen luoma oletuskansio ”public_html” kotikansiossasi.\nTai voit sen sijaan valita yhden omista kansioistasi.
-Log To Console	PoorMan		Kirjaa konsoliin
-File Name	PoorMan		Tiedostonimi
-Starting up... 	PoorMan		Aloitetaan... 
-Select	PoorMan		Valitse
-Logging view	PoorMan		Kirjaamisnäkymä
-Save console as…	PoorMan		Tallenna pääteikkuna nimellä...
-Edit	PoorMan		Muokkaa
-Cancel	PoorMan		Peru
-Directory: 	PoorMan		Hakemisto:
-Hits: %lu	PoorMan		Osumia: %lu
-Hits: 0	PoorMan		Osumia: 0
-Shutting down.\n	PoorMan		Lopetetaan.\n
-Select all	PoorMan		Valitse kaikki
-Error Server	PoorMan		Virhepalvelin
-Send file listing if there's no start page	PoorMan		Lähetä tiedostoluettelo, jos aloitussivua ei ole
-Create PoorMan log	PoorMan		Luo Pettuleipäloki
-Max. simultaneous connections:	PoorMan		Enintään samanaikaisia yhteyksiä:
-Done	PoorMan		Valmis
-Site	PoorMan		Sivusto
+1	finnish	x-vnd.Haiku-PoorMan	2026082639
 Cannot start the server	PoorMan		Palvelinta ei voi käynnistää
+Site	PoorMan		Sivusto
 Create log file	PoorMan		Luo lokitiedosto
-Create public_html	PoorMan		Luo public_html
+Console logging	PoorMan		Pääteikkunakirjaaminen
+Select web folder	PoorMan		Valitse webbikansio
 Clear hit counter	PoorMan		Nollaa osumalaskuri
-Status: Stopped	PoorMan		Tila: Pysäytetty
+File logging	PoorMan		Tiedostolokikirjaus
 File	PoorMan		Tiedosto
 Settings…	PoorMan		Asetukset...
-Log To File	PoorMan		Loki tiedostoon
+Website options	PoorMan		Webbisivuvalitsimet
+Log to file	PoorMan		Loki tiedostoon
 Connections	PoorMan		Yhteydet
 Controls	PoorMan		Ohjaimet
 Log to console	PoorMan		Kirjaa pääteikkunaan
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Valitse webissä julkaistava kansio.\n\nSinulla voi olla Pettuleipä-palvelimen luoma oletuskansio ”public_html” kotikansiossasi.\nTai voit sen sijaan valita yhden omista kansioistasi.
+Web folder:	PoorMan		Webbikansio:
 Advanced	PoorMan		Lisäasetukset
-Copy	PoorMan		Kopioi
 Logging	PoorMan		Kirjaaminen
+Copy	PoorMan		Kopioi
 PoorMan	System name		Pettuleipä
-Clear console log	PoorMan		Nollaa konsoliloki
+Logging view	PoorMan		Kirjaamisnäkymä
 Run server	PoorMan		Käynnistä palvelin
-Create	PoorMan		Luo
+Clear console log	PoorMan		Nollaa konsoliloki
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# yhteys} other{# yhteyttä}}
-done.\n	PoorMan		valmis.\n
+Edit	PoorMan		Muokkaa
+Save console as…	PoorMan		Tallenna pääteikkuna nimellä...
 PoorMan settings	PoorMan		Pettuleipäasetukset
-Console Logging	PoorMan		Pääteikkunakirjaaminen
 Clear log file	PoorMan		Nollaa lokitiedosto
 Save log console selection	PoorMan		Tallenna lokikonsolivalinta
-File Logging	PoorMan		Tiedostolokikirjaus
 Log file name:	PoorMan		Lokitiedostonimi:
-Status: Running	PoorMan		Tila: Suoritetaan
-Directory: (none)	PoorMan		Hakemisto: (ei mitään)
+Select all	PoorMan		Valitse kaikki
+Send file listing if there's no start page	PoorMan		Lähetä tiedostoluettelo, jos aloitussivua ei ole
+Create PoorMan log	PoorMan		Luo Pettuleipäloki
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Oletuswebbikansio luotiin osoitteeseen ”/boot/home/public_html”.\nVarmista, että HTML-tiedosto nimeltään ”index.html” on tuossa kansiossa.
-Dir Created	PoorMan		Hakemisto luotu
-Save console selections as…	PoorMan		Tallenna konsolivalinnat nimellä...
 Quit	PoorMan		Lopeta
+Save console selections as…	PoorMan		Tallenna konsolivalinnat nimellä...
 Save log console	PoorMan		Tallenna lokikonsoli
 Start page:	PoorMan		Aloitussivu:
-OK	PoorMan		Valmis
+Max. simultaneous connections:	PoorMan		Enintään samanaikaisia yhteyksiä:
 Website location	PoorMan		Webbisivusijainti
