@@ -43,7 +43,7 @@
 //	#pragma mark -
 
 
-status_t
+static status_t
 mapAtomBIOSACPI(radeon_info &info, uint32& romSize)
 {
 	TRACE("%s: seeking AtomBIOS from ACPI\n", __func__);
@@ -66,7 +66,8 @@ mapAtomBIOSACPI(radeon_info &info, uint32& romSize)
 
 	vbios = (GOP_VBIOS_CONTENT*)((char*)vfct + vfct->VBIOSImageOffset);
 	vhdr = &vbios->VbiosHeader;
-	TRACE("%s: ACPI VFCT contains a BIOS for: %x:%x:%d %04x:%04x\n", __func__,
+	TRACE("%s: ACPI VFCT contains a BIOS for: %" B_PRIx32 ":%" B_PRIx32 ":%"
+		B_PRId32 " %04x:%04x\n", __func__,
 		vhdr->PCIBus, vhdr->PCIDevice, vhdr->PCIFunction, vhdr->VendorID, vhdr->DeviceID);
 
 	if (info.pci->vendor_id != vhdr->VendorID || info.pci->device_id != vhdr->DeviceID
@@ -116,7 +117,7 @@ mapAtomBIOSACPI(radeon_info &info, uint32& romSize)
 	if (romValid == true) {
 		set_area_protection(info.rom_area,
 			B_KERNEL_READ_AREA | B_CLONEABLE_AREA);
-		ERROR("%s: AtomBIOS verified and locked (%u)\n", __func__, romSize);
+		ERROR("%s: AtomBIOS verified and locked (%" B_PRIu32 ")\n", __func__, romSize);
 	} else
 		ERROR("%s: AtomBIOS memcpy failed!\n", __func__);
 
@@ -126,8 +127,35 @@ mapAtomBIOSACPI(radeon_info &info, uint32& romSize)
 }
 
 
-status_t
-mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize)
+static size_t
+radeon_get_rom_size(uint8* rom, size_t romSize)
+{
+	uint8* image = rom;
+	uint8* end = rom + romSize;
+	uint32 length = 0;
+	bool lastImage;
+	if (image[0] != 0x55 || image[1] != 0xaa)
+		return 0;
+	do {
+		uint8* pds = image + *(uint16*)(image + 0x18);
+		if (memcmp(pds, "PCIR", 4) != 0)
+			break;
+		lastImage = (*(pds + 0x15) & 0x80) != 0;
+		length = *(uint16*)(pds + 0x10);
+		image += length * 512;
+		if (image >= end)
+			break;
+		if (!lastImage && (image[0] != 0x55 || image[1] != 0xaa))
+			break;
+	} while (length > 0 && !lastImage);
+
+	return min_c((size_t)(image - rom), romSize);
+}
+
+
+static status_t
+mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize,
+	bool findROMlength = false)
 {
 	TRACE("%s: seeking AtomBIOS @ 0x%" B_PRIX32 " [size: 0x%" B_PRIX32 "]\n",
 		__func__, romBase, romSize);
@@ -182,6 +210,14 @@ mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize)
 
 	memset((void*)info.atom_buffer, 0, romSize);
 		// Prevent unknown code execution by AtomBIOS parser
+	if (findROMlength) {
+		romSize = radeon_get_rom_size(rom, romSize);
+		if (romSize == 0) {
+			TRACE("%s: rom size is zero\n", __func__);
+			delete_area(testArea);
+			return B_ERROR;
+		}
+	}
 	memcpy(info.atom_buffer, (void*)rom, romSize);
 		// Copy AtomBIOS to kernel area
 
@@ -193,7 +229,7 @@ mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize)
 	if (romValid == true) {
 		set_area_protection(info.rom_area,
 			B_KERNEL_READ_AREA | B_CLONEABLE_AREA);
-		ERROR("%s: AtomBIOS verified and locked\n", __func__);
+		ERROR("%s: AtomBIOS verified and locked (%" B_PRIu32 ")\n", __func__, romSize);
 	} else
 		ERROR("%s: AtomBIOS memcpy failed!\n", __func__);
 
@@ -251,7 +287,7 @@ radeon_hd_getbios(radeon_info &info)
 				if (romBase == 0 || romSize == 0) {
 					ERROR("%s: No base found at PCI ROM BAR\n", __func__);
 				} else {
-					mapResult = mapAtomBIOS(info, romBase, romSize);
+					mapResult = mapAtomBIOS(info, romBase, romSize, true);
 				}
 
 				// Disable ROM decoding
@@ -324,7 +360,7 @@ radeon_hd_getbios_ni(radeon_info &info)
 		ERROR("%s: No AtomBIOS location found at PCI ROM BAR\n", __func__);
 		result = B_ERROR;
 	} else {
-		result = mapAtomBIOS(info, romBase, romSize);
+		result = mapAtomBIOS(info, romBase, romSize, true);
 	}
 
 	if (result == B_OK) {
@@ -726,7 +762,7 @@ radeon_hd_init(radeon_info &info)
 			|= (uint64)info.pci->u.h0.base_registers[PCI_BAR_FB + 1] << 32;
 	}
 
-	TRACE("framebuffer paddr: %#" B_PRIxADDR "\n", physicalAddress);
+	TRACE("framebuffer paddr: %#" B_PRIxPHYSADDR "\n", physicalAddress);
 	AreaKeeper frambufferMapper;
 	info.framebuffer_area = frambufferMapper.Map("radeon hd frame buffer",
 		physicalAddress, info.shared_info->frame_buffer_size * 1024,
