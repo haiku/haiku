@@ -104,7 +104,7 @@
 	If your handler cannot handle the object, it will pass the message on to
 	the parent class. 
 
-	\warning Don't forget to actuall call the MessageReceived() method of the
+	\warning Don't forget to actually call the MessageReceived() method of the
 		base class. Failing to do this will mean that the message chain will
 		not completely be followed, which can lead to unhandled messages. There
 		might be some internal system messages that the Haiku API classes
