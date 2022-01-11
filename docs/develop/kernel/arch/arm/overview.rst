@@ -99,14 +99,6 @@ Figure out how to get page flags (modified/accessed) and implement it
 
 use unmapped/read-only mappings to trigger soft faults for tracking used/modified flags for ARMv5 and ARMv6
 
-Fix serial port mapping
-***********************
-
-Currently kernel uses the haiku_loader identity
-mapping for it, but this lives in user virtual address space...
-(Need to not use identity mapping in haiku_loader but just
-map_physical_memory() there too so it can be handed over without issues).
-
 Seperate ARM architecture/System-On-Chip IP code
 ************************************************
 
