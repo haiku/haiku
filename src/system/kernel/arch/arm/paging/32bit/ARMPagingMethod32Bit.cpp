@@ -361,13 +361,15 @@ ARMPagingMethod32Bit::CreateTranslationMap(bool kernel, VMTranslationMap** _map)
 }
 
 
-static phys_addr_t
-get_free_pgtable(kernel_args* args)
+static void
+get_free_pgtable(kernel_args* args, phys_addr_t* phys_addr, addr_t* virt_addr)
 {
 	phys_addr_t phys = args->arch_args.phys_pgdir + args->arch_args.next_pagetable;
-	//addr_t virt = args->arch_args.vir_pgdir + args->arch_args.next_pagetable;
+	addr_t virt = args->arch_args.vir_pgdir + args->arch_args.next_pagetable;
 	args->arch_args.next_pagetable += ARM_MMU_L2_COARSE_TABLE_SIZE;
-	return phys;
+
+	*phys_addr = phys;
+	*virt_addr = virt;
 }
 
 status_t
@@ -378,24 +380,28 @@ ARMPagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 	// check to see if a page table exists for this range
 	int index = VADDR_TO_PDENT(virtualAddress);
 	if ((fKernelVirtualPageDirectory[index] & ARM_PDE_TYPE_MASK) == 0) {
-		phys_addr_t pgtable;
+		phys_addr_t pgtable_phys;
+		addr_t pgtable_virt;
 		page_directory_entry *e;
+
 		// we need to allocate a pgtable
-		pgtable = get_free_pgtable(args);
+		get_free_pgtable(args, &pgtable_phys, &pgtable_virt);
 
 		TRACE("ARMPagingMethod32Bit::MapEarly(): asked for free page for "
-			"pgtable. %#" B_PRIxPHYSADDR "\n", pgtable);
+			"pgtable. phys=%#" B_PRIxPHYSADDR ", virt=%#" B_PRIxADDR "\n",
+			pgtable_phys, pgtable_virt);
 
 		// put it in the pgdir
 		e = &fKernelVirtualPageDirectory[index];
-		PutPageTableInPageDir(e, pgtable, attributes);
+		PutPageTableInPageDir(e, pgtable_phys, attributes);
 
 		// zero it out in it's new mapping
-		memset((void*)pgtable, 0, B_PAGE_SIZE);
+		memset((void*)pgtable_virt, 0, B_PAGE_SIZE);
 	}
 
-	page_table_entry* ptEntry = (page_table_entry*)
-		(fKernelVirtualPageDirectory[index] & ARM_PDE_ADDRESS_MASK);
+	phys_addr_t ptEntryPhys = fKernelVirtualPageDirectory[index] & ARM_PDE_ADDRESS_MASK;
+	addr_t ptEntryVirt = ptEntryPhys - args->arch_args.phys_pgdir + args->arch_args.vir_pgdir;
+	page_table_entry* ptEntry = (page_table_entry*)ptEntryVirt;
 	ptEntry += VADDR_TO_PTENT(virtualAddress);
 
 	ASSERT_PRINT(
@@ -566,8 +572,12 @@ ARMPagingMethod32Bit::_EarlyQuery(addr_t virtualAddress,
 		return B_ERROR;
 	}
 
-	page_table_entry* entry = (page_table_entry*)
-		(method->KernelVirtualPageDirectory()[index] & ARM_PDE_ADDRESS_MASK);
+	phys_addr_t ptEntryPhys = method->KernelVirtualPageDirectory()[index] & ARM_PDE_ADDRESS_MASK;
+	addr_t ptEntryVirt = ptEntryPhys -
+		(uint32_t)method->KernelPhysicalPageDirectory() +
+		(uint32_t)method->KernelVirtualPageDirectory();
+
+	page_table_entry* entry = (page_table_entry*)ptEntryVirt;
 	entry += VADDR_TO_PTENT(virtualAddress);
 
 	if ((*entry & ARM_PTE_TYPE_MASK) == 0) {
