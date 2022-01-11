@@ -147,7 +147,7 @@ public:
 	virtual	status_t			Wcscoll(const wchar_t* a, const wchar_t* b,
 									int& out) = 0;
 	virtual status_t			Wcsxfrm(wchar_t* out, const wchar_t* in,
-									size_t size, size_t& outSize) = 0;
+									size_t outSize, size_t& requiredSize) = 0;
 
 	virtual status_t			TZSet(const char* timeZoneID,
 									const char* tz) = 0;

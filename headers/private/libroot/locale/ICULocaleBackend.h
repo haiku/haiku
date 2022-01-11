@@ -64,7 +64,7 @@ public:
 	virtual	status_t			Wcscoll(const wchar_t* a, const wchar_t* b,
 									int& out);
 	virtual status_t			Wcsxfrm(wchar_t* out, const wchar_t* in,
-									size_t size, size_t& outSize);
+									size_t outSize, size_t& requiredSize);
 
 	virtual status_t			TZSet(const char* timeZoneID, const char* tz);
 	virtual	status_t			Localtime(const time_t* inTime,
