@@ -333,11 +333,6 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 
 	map_range_to_new_area(gKernelArgs.arch_args.uart.regs, ARM_MMU_L2_FLAG_B);
 
-	// identity mapping for page table area
-	uint32_t page_table_area = (uint32_t)sFirstPageTable;
-	map_range(page_table_area, page_table_area, PAGE_TABLE_AREA_SIZE,
-		ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
-
 	sort_address_ranges(gKernelArgs.virtual_allocated_range,
 		gKernelArgs.num_virtual_allocated_ranges);
 
