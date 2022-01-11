@@ -10,15 +10,14 @@
  * Architecture-specific structure passed to signal handlers
  */
 
-// TODO: gcc7's RISCV doesn't seem real keen on identifying 32 vs 64 yet.
-#if defined(__RISCV64__) || defined(__RISCV__)
+#if (defined(__riscv) && __riscv_xlen == 64)
 struct vregs {
 	ulong x[31];
 	ulong pc;
 	double f[32];
 	ulong fcsr;
 };
-#endif /* defined(__RISCV64__) */
+#endif /* (defined(__riscv) && __riscv_xlen == 64) */
 
 
 #endif /* _ARCH_RISCV64_SIGNAL_H_ */
