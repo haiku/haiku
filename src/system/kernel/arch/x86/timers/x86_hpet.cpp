@@ -149,7 +149,7 @@ hpet_dump_timer(volatile struct hpet_timer *timer)
 			dprintf("%d ", i);
 	}
 	dprintf("\n");
-	dprintf("\tconfiguration: 0x%llx\n", timer->config);
+	dprintf("\tconfiguration: 0x%" B_PRIx64 "\n", timer->config);
 	dprintf("\tFSB Enabled: %s\n",
 		timer->config & HPET_CONF_TIMER_FSB_ENABLE ? "Yes" : "No");
 	dprintf("\tInterrupt Enabled: %s\n",
@@ -159,12 +159,12 @@ hpet_dump_timer(volatile struct hpet_timer *timer)
 	dprintf("\tInterrupt Type: %s\n",
 		timer->config & HPET_CONF_TIMER_INT_TYPE ? "Level" : "Edge");
 
-	dprintf("\tconfigured IRQ: %lld\n",
+	dprintf("\tconfigured IRQ: %" B_PRId64 "\n",
 		HPET_GET_CONF_TIMER_INT_ROUTE(timer));
 
 	if (timer->config & HPET_CONF_TIMER_FSB_ENABLE) {
-		dprintf("\tfsb_route[0]: 0x%llx\n", timer->fsb_route[0]);
-		dprintf("\tfsb_route[1]: 0x%llx\n", timer->fsb_route[1]);
+		dprintf("\tfsb_route[0]: 0x%" B_PRIx64 "\n", timer->fsb_route[0]);
+		dprintf("\tfsb_route[1]: 0x%" B_PRIx64 "\n", timer->fsb_route[1]);
 	}
 }
 #endif
@@ -234,7 +234,7 @@ hpet_init(struct kernel_args *args)
 
 	sHPETPeriod = HPET_GET_PERIOD(sHPETRegs);
 
-	TRACE(("hpet_init: HPET is at %p.\n\tVendor ID: %llx, rev: %llx, period: %lld\n",
+	TRACE(("hpet_init: HPET is at %p.\n\tVendor ID: %llx, rev: %llx, period: %" B_PRId64 "\n",
 		sHPETRegs, HPET_GET_VENDOR_ID(sHPETRegs), HPET_GET_REVID(sHPETRegs),
 		sHPETPeriod));
 
@@ -248,10 +248,10 @@ hpet_init(struct kernel_args *args)
 
 	uint32 numTimers = HPET_GET_NUM_TIMERS(sHPETRegs) + 1;
 
-	TRACE(("hpet_init: HPET supports %lu timers, and is %s bits wide.\n",
+	TRACE(("hpet_init: HPET supports %" B_PRIu32 " timers, and is %s bits wide.\n",
 		numTimers, HPET_IS_64BIT(sHPETRegs) ? "64" : "32"));
 
-	TRACE(("hpet_init: configuration: 0x%llx, timer_interrupts: 0x%llx\n",
+	TRACE(("hpet_init: configuration: 0x%" B_PRIx64 ", timer_interrupts: 0x%" B_PRIx64 "\n",
 		sHPETRegs->config, sHPETRegs->interrupt_status));
 
 	if (numTimers < 3) {
