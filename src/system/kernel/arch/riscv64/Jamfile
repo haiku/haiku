@@ -37,3 +37,7 @@ KernelMergeObject kernel_arch_riscv64.o :
 ;
 
 CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp : $(TARGET_KERNEL_ARCH) ;
+
+# syscall_numbers.h is generated on the fly, so we need a explicit dependency.
+Includes [ FGristFiles arch_commpage.cpp arch_int.cpp arch_asm.S ]
+	: <syscalls!$(TARGET_PACKAGING_ARCH)>syscall_numbers.h ;
