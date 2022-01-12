@@ -98,6 +98,18 @@ map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint32_t flags)
 
 
 static void
+insert_virtual_range_to_keep(const addr_range& range)
+{
+	if (gKernelArgs.arch_args.num_virtual_ranges_to_keep
+		>= MAX_VIRTUAL_RANGES_TO_KEEP)
+		panic("too many virtual ranges to keep");
+
+	gKernelArgs.arch_args.virtual_ranges_to_keep[
+		gKernelArgs.arch_args.num_virtual_ranges_to_keep++] = range;
+}
+
+
+static void
 map_range_to_new_area(addr_range& range, uint32_t flags)
 {
 	if (range.size == 0) {
@@ -110,14 +122,19 @@ map_range_to_new_area(addr_range& range, uint32_t flags)
 
 	map_range(virt_addr, phys_addr, range.size, flags);
 
-	if (gKernelArgs.arch_args.num_virtual_ranges_to_keep
-		>= MAX_VIRTUAL_RANGES_TO_KEEP)
-		panic("too many virtual ranges to keep");
-
 	range.start = virt_addr;
 
-	gKernelArgs.arch_args.virtual_ranges_to_keep[
-		gKernelArgs.arch_args.num_virtual_ranges_to_keep++] = range;
+	insert_virtual_range_to_keep(range);
+}
+
+
+static void
+map_range_to_new_area(efi_memory_descriptor *entry, uint32_t flags)
+{
+	uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
+	entry->VirtualStart = get_next_virtual_address(size);
+	map_range(entry->VirtualStart, entry->PhysicalStart, size, flags);
+	insert_virtual_range_to_keep({start: entry->VirtualStart, size: size});
 }
 
 
@@ -149,13 +166,6 @@ build_physical_memory_list(size_t memory_map_size,
 		}
 		case EfiACPIReclaimMemory:
 			// ACPI reclaim -- physical memory we could actually use later
-			break;
-		case EfiRuntimeServicesCode:
-		case EfiRuntimeServicesData:
-			entry->VirtualStart = entry->PhysicalStart;
-			break;
-		case EfiMemoryMappedIO:
-			entry->VirtualStart = entry->PhysicalStart;
 			break;
 		}
 	}
@@ -316,10 +326,10 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
 		efi_memory_descriptor* entry =
 			(efi_memory_descriptor *)(memory_map_addr + i * descriptor_size);
-		if ((entry->Attribute & EFI_MEMORY_RUNTIME) != 0)
-			map_range(entry->VirtualStart, entry->PhysicalStart,
-				entry->NumberOfPages * B_PAGE_SIZE,
+		if ((entry->Attribute & EFI_MEMORY_RUNTIME) != 0) {
+			map_range_to_new_area(entry,
 				ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
+		}
 	}
 
 	void* cookie = NULL;
