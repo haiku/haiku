@@ -33,7 +33,6 @@ local bios_ia32_src =
 	smp.cpp
 	support.S
 	video.cpp
-	hpet.cpp
 	apm.cpp
 	interrupts.cpp
 	interrupts_asm.S

@@ -5,6 +5,8 @@ local defines = $(DEFINES) ;
 local platform ;
 for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 	on $(platform) {
+		SubDirHdrs $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) ;
+
 		DEFINES = $(defines) ;
 		DEFINES += _BOOT_MODE ;
 
@@ -43,6 +45,7 @@ for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 			$(kernelLibArchSpecificSources)
 			$(librootOsArchSources)
 			arch_cpu.cpp
+			arch_hpet.cpp
 			: -std=c++11 # additional flags
 		;
 

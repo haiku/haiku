@@ -2,8 +2,8 @@
  * Copyright 2008, Dustin Howett, dustin.howett@gmail.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef HPET_H
-#define HPET_H
+#ifndef BOOT_ARCH_HPET_H
+#define BOOT_ARCH_HPET_H
 
 #include <SupportDefs.h>
 #include <arch/x86/arch_hpet.h>
@@ -18,4 +18,4 @@ void hpet_init(void);
 }
 #endif
 
-#endif	/* HPET_H */
+#endif	/* BOOT_ARCH_HPET_H */
