@@ -254,7 +254,8 @@ private:
 			void				_ScrollToRange(TermPos start, TermPos end);
 
 			void				_SendMouseEvent(int32 button, int32 mode,
-									int32 x, int32 y, bool motion);
+									int32 x, int32 y, bool motion,
+									bool upEvent = false);
 
 			void				_DrawInlineMethodString();
 			void				_HandleInputMethodChanged(BMessage* message);

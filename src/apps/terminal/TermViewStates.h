@@ -72,6 +72,7 @@ public:
 									int32 modifiers);
 	virtual void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage, int32 modifiers);
+	virtual void				MouseUp(BPoint where, int32 buttons);
 
 	virtual	void				WindowActivated(bool active);
 

@@ -2462,7 +2462,7 @@ TermView::_MouseDistanceSinceLastClick(BPoint where)
 
 void
 TermView::_SendMouseEvent(int32 buttons, int32 mode, int32 x, int32 y,
-	bool motion)
+	bool motion, bool upEvent)
 {
 	if (!fEnableExtendedMouseCoordinates) {
 		char xtermButtons;
@@ -2491,13 +2491,16 @@ TermView::_SendMouseEvent(int32 buttons, int32 mode, int32 x, int32 y,
 		fShell->Write(destBuffer, 6);
 	} else {
 		char xtermButtons;
-		if (buttons == B_PRIMARY_MOUSE_BUTTON)
+		if ((buttons & B_PRIMARY_MOUSE_BUTTON)
+			!= (fMouseButtons & B_PRIMARY_MOUSE_BUTTON)) {
 			xtermButtons = 0;
-		else if (buttons == B_SECONDARY_MOUSE_BUTTON)
+		} else if ((buttons & B_SECONDARY_MOUSE_BUTTON)
+			!= (fMouseButtons & B_SECONDARY_MOUSE_BUTTON)) {
 			xtermButtons = 1;
-		else if (buttons == B_TERTIARY_MOUSE_BUTTON)
+		} else if ((buttons & B_TERTIARY_MOUSE_BUTTON)
+			!= (fMouseButtons & B_TERTIARY_MOUSE_BUTTON)) {
 			xtermButtons = 2;
-		else
+		} else
 			xtermButtons = 3;
 
 		if (motion)
@@ -2519,8 +2522,7 @@ TermView::_SendMouseEvent(int32 buttons, int32 mode, int32 x, int32 y,
 		destBuffer[9] = xtermY / 100 % 10 + '0';
 		destBuffer[10] = xtermY / 10 % 10 + '0';
 		destBuffer[11] = xtermY % 10 + '0';
-		// No support for button press/release
-		destBuffer[12] = 'M';
+		destBuffer[12] = upEvent ? 'm' : 'M';
 		fShell->Write(destBuffer, 13);
 	}
 }
