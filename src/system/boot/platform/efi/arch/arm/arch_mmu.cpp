@@ -27,6 +27,10 @@ static uint32_t *sNextPageTable = NULL;
 static uint32_t *sLastPageTable = NULL;
 
 
+extern "C" void arch_enter_kernel(uint32_t ttbr, struct kernel_args *kernelArgs,
+	addr_t kernelEntry, addr_t kernelStackTop);
+
+
 static void
 dump_page_dir(void)
 {
@@ -153,8 +157,6 @@ build_physical_memory_list(size_t memory_map_size,
 		switch (entry->Type) {
 		case EfiLoaderCode:
 		case EfiLoaderData:
-			entry->VirtualStart = entry->PhysicalStart;
-			break;
 		case EfiBootServicesCode:
 		case EfiBootServicesData:
 		case EfiConventionalMemory: {
@@ -311,21 +313,6 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
 		efi_memory_descriptor* entry =
 			(efi_memory_descriptor *)(memory_map_addr + i * descriptor_size);
-		switch (entry->Type) {
-		case EfiLoaderCode:
-		case EfiLoaderData:
-			map_range(entry->VirtualStart, entry->PhysicalStart,
-				entry->NumberOfPages * B_PAGE_SIZE,
-				ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
-			break;
-		default:
-			;
-		}
-	}
-
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry =
-			(efi_memory_descriptor *)(memory_map_addr + i * descriptor_size);
 		if ((entry->Attribute & EFI_MEMORY_RUNTIME) != 0) {
 			map_range_to_new_area(entry,
 				ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
@@ -340,6 +327,10 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 		map_range(vaddr, paddr, size,
 			ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
 	}
+
+	// identity mapping for entry.S trampoline
+	map_range((uint32_t)arch_enter_kernel, (uint32_t)arch_enter_kernel, B_PAGE_SIZE,
+		ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
 
 	map_range_to_new_area(gKernelArgs.arch_args.uart.regs, ARM_MMU_L2_FLAG_B);
 

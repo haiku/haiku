@@ -16,7 +16,7 @@
 #define ALIGN_MEMORY_MAP	4
 
 
-extern "C" void arch_enter_kernel(uint32_t ttbr, struct kernel_args *kernelArgs,
+extern "C" void arch_enter_kernel(uint32_t ttbr, addr_t kernelArgs,
 	addr_t kernelEntry, addr_t kernelStackTop);
 
 // From arch_mmu.cpp
@@ -79,6 +79,16 @@ memory_region_type_str(int type)
 void
 arch_start_kernel(addr_t kernelEntry)
 {
+	// Allocate virtual memory for kernel args
+	struct kernel_args *kernelArgs = NULL;
+	if (platform_allocate_region((void **)&kernelArgs,
+			sizeof(struct kernel_args), 0, false) != B_OK)
+		panic("Failed to allocate kernel args.");
+
+	addr_t virtKernelArgs;
+	platform_bootloader_address_to_kernel_address((void*)kernelArgs,
+		&virtKernelArgs);
+
 	// Prepare to exit EFI boot services.
 	// Read the memory map.
 	// First call is to determine the buffer size.
@@ -164,14 +174,19 @@ arch_start_kernel(addr_t kernelEntry)
 	arch_mmu_post_efi_setup(memory_map_size, memory_map,
 			descriptor_size, descriptor_version);
 
+	// Copy final kernel args
+	// This should be the last step before jumping to the kernel
+	// as there are some fixups happening to kernel_args even in the last minute
+	memcpy(kernelArgs, &gKernelArgs, sizeof(struct kernel_args));
+
 	//smp_boot_other_cpus(final_pml4, kernelEntry);
 
 	// Enter the kernel!
 	dprintf("arch_enter_kernel(ttbr0: 0x%08x, kernelArgs: 0x%08x, "
 		"kernelEntry: 0x%08x, sp: 0x%08x)\n",
-		final_ttbr0, (uint32_t)&gKernelArgs, (uint32_t)kernelEntry,
+		final_ttbr0, (uint32_t)virtKernelArgs, (uint32_t)kernelEntry,
 		(uint32_t)(gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
 
-	arch_enter_kernel(final_ttbr0, &gKernelArgs, kernelEntry,
+	arch_enter_kernel(final_ttbr0, virtKernelArgs, kernelEntry,
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
 }
