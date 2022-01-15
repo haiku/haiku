@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku.TextSearch	2003518937
+1	hungarian	x-vnd.Haiku.TextSearch	2679411567
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Válassza ki azokat a fájlokat a Nyomkövetőben, melyek kijelölésre kerüljenek.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		Kijelölés megnyitása
@@ -8,6 +8,7 @@ Encoding	GrepWindow		Kódolás
 Set target to parent folder	GrepWindow		A cél a szülő mappa legyen
 OK	GrepWindow		Rendben
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Set target			Cél megadása
 Close	GrepWindow		Bezárás
 Look in sub-folders	GrepWindow		Keresés almappákban is
 Follow symbolic links	GrepWindow		Szimbolikus linkek követése

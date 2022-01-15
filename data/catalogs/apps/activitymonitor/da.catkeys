@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-ActivityMonitor	1330427574
+1	danish	x-vnd.Haiku-ActivityMonitor	3850445261
 Teams	DataSource		Hold
 Semaphores	DataSource		Semaforer
 TX	DataSource	Shorter version for Sending	TX
@@ -18,11 +18,13 @@ CPU %d	DataSource		CPU %d
 RX	DataSource	Shorter version for Receiving.	RX
 Block cache	DataSource		Blok mellemlager
 Memory	DataSource		Hukommelse
+CPU speed	DataSource		CPU-hastighed
 CPU usage	DataSource		CPU forbrug
 Raw clipboard	DataSource		Rå udklipsholder
 Used memory	DataSource		Brugt hukommelse
 %.1f faults/s	DataSource		%.1f fejl/s
 Cached memory	DataSource		Mellemlager hukommelse
+CPU %d speed	DataSource		Hastighed for CPU %d
 CPU %d usage	DataSource		CPU %d forbrug
 Ports	DataSource		Porte
 Page faults	DataSource		Side fejl

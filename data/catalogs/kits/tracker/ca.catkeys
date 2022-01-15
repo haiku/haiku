@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	2769460200
+1	catalan; valencian	x-vnd.Haiku-libtracker	2811852231
 ?+* follows nothing.	libtracker		?+* sense res després.
 Disk mount	TrackerSettingsWindow		Muntatge de discs
 Corrupted opcode.	libtracker		Opcode corrupte.
@@ -19,6 +19,7 @@ Memory corruption.	libtracker		Corrupció de memòria.
 Invert selection	QueryContainerWindow		Selecció inversa
 Expression too long.	libtracker		Expressió massa llarga.
 Windows	TrackerSettingsWindow		Finestres
+Select			Selecciona
 Invalid bracket range.	libtracker		Interval de claudàtors no vàlid.
 Unmatched parenthesis.	libtracker		Parèntesis no coincidents.
 Too many parenthesis.	libtracker		Massa parèntesis.

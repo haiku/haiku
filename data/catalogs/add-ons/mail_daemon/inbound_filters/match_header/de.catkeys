@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MatchHeader	631274947
+1	german	x-vnd.Haiku-MatchHeader	2950227343
 Delete message	ConfigView		Nachricht löschen
 Set flags to	ConfigView		Status setzen auf
 <Choose account>	ConfigView		<Konto wählen>
@@ -6,6 +6,7 @@ Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular 
 Then	ConfigView		Dann
 If	ConfigView		Wenn
 Set as read	ConfigView		Als gelesen markieren
+Header field (e.g. Subject, From, 			Kopfdaten-Feld (z. B. Betreff, Absender, 
 Reply with	ConfigView		Antworten von Konto
 <Choose action>	ConfigView		<Aktion wählen>
 Move to	ConfigView		Verschieben nach

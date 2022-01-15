@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MatchHeader	631274947
+1	hungarian	x-vnd.Haiku-MatchHeader	2950227343
 Delete message	ConfigView		az üzenet törlése
 Set flags to	ConfigView		megjelölés:
 <Choose account>	ConfigView		<Válassza ki a fiókot>
@@ -6,6 +6,7 @@ Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular 
 Then	ConfigView		Akkor
 If	ConfigView		Ha:
 Set as read	ConfigView		olvasottnak jelölés
+Header field (e.g. Subject, From, 			Fejléc mező (pl. Tárgy, Feladó, …)
 Reply with	ConfigView		válaszolás:
 <Choose action>	ConfigView		<Válassza ki a műveletet>
 Move to	ConfigView		mozgatás ide:

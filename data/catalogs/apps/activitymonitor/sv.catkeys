@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-ActivityMonitor	1330427574
+1	swedish	x-vnd.Haiku-ActivityMonitor	3850445261
 Teams	DataSource		Processer
 Semaphores	DataSource		Semaforer
 TX	DataSource	Shorter version for Sending	TX
@@ -18,11 +18,13 @@ CPU %d	DataSource		CPU %d
 RX	DataSource	Shorter version for Receiving.	RX
 Block cache	DataSource		Blockbuffert
 Memory	DataSource		Minne
+CPU speed	DataSource		CPU-hastighet
 CPU usage	DataSource		CPU användning
 Raw clipboard	DataSource		Urklipp rådata
 Used memory	DataSource		Minnesanvändning
 %.1f faults/s	DataSource		%.1f fel/s
 Cached memory	DataSource		Buffertminne
+CPU %d speed	DataSource		CPU %d hastighet
 CPU %d usage	DataSource		CPU %d användande
 Ports	DataSource		Portar
 Page faults	DataSource		Sidfel

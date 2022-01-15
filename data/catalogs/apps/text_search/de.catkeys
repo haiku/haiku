@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku.TextSearch	368729061
+1	german	x-vnd.Haiku.TextSearch	1044621691
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Bitte die Dateien auswählen, die im Tracker markiert werden sollen.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		Auswahl öffnen
@@ -8,6 +8,7 @@ Encoding	GrepWindow		Kodierung
 Set target to parent folder	GrepWindow		Ziel auf übergeordneten Order ändern
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Set target			Ziel wählen
 Close	GrepWindow		Schließen
 Look in sub-folders	GrepWindow		Unterordner durchsuchen
 Follow symbolic links	GrepWindow		Verknüpfungen folgen

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku.TextSearch	2003518937
+1	spanish; castilian	x-vnd.Haiku.TextSearch	2679411567
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Por favor selecciona los archivos que quieras 
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		Abrir selección
@@ -8,6 +8,7 @@ Encoding	GrepWindow		Codificación
 Set target to parent folder	GrepWindow		Definir objetivo a la carpeta superior
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Set target			Establecer objetivo
 Close	GrepWindow		Cerrar
 Look in sub-folders	GrepWindow		Buscar en subcarpetas
 Follow symbolic links	GrepWindow		Siga los enlaces simbólicos

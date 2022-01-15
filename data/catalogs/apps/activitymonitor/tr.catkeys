@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-ActivityMonitor	1330427574
+1	turkish	x-vnd.Haiku-ActivityMonitor	3850445261
 Teams	DataSource		Takımlar
 Semaphores	DataSource		Semaforlar
 TX	DataSource	Shorter version for Sending	TX
@@ -18,11 +18,13 @@ CPU %d	DataSource		CPU %d
 RX	DataSource	Shorter version for Receiving.	RX
 Block cache	DataSource		Blok önbelleği
 Memory	DataSource		Bellek
+CPU speed	DataSource		CPU hızı
 CPU usage	DataSource		CPU kullanımı
 Raw clipboard	DataSource		Ham pano
 Used memory	DataSource		Kullanılan bellek
 %.1f faults/s	DataSource		%.1f hata/s
 Cached memory	DataSource		Önbellekteki dosya
+CPU %d speed	DataSource		%d. CPU hızı
 CPU %d usage	DataSource		%d. CPU kullanımı
 Ports	DataSource		Portlar
 Page faults	DataSource		Sayfa hataları

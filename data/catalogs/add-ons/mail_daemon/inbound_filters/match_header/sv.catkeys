@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MatchHeader	631274947
+1	swedish	x-vnd.Haiku-MatchHeader	2950227343
 Delete message	ConfigView		Radera meddelande
 Set flags to	ConfigView		Markera som
 <Choose account>	ConfigView		<Välj konto>
@@ -6,6 +6,7 @@ Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular 
 Then	ConfigView		Åtgärd
 If	ConfigView		Om
 Set as read	ConfigView		Markera som läst
+Header field (e.g. Subject, From, 			Rubrikfält (t.ex. Ämne, Från, 
 Reply with	ConfigView		Svara med
 <Choose action>	ConfigView		<Välj åtgärd>
 Move to	ConfigView		Flytta till

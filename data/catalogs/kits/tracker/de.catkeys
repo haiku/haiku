@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1708502130
+1	german	x-vnd.Haiku-libtracker	1750894161
 ?+* follows nothing.	libtracker		?+* folgt nichts.
 Disk mount	TrackerSettingsWindow		Datenträger einhängen
 Corrupted opcode.	libtracker		Fehlerhafter Opcode.
@@ -17,6 +17,7 @@ Memory corruption.	libtracker		Speicherfehler.
 Invert selection	QueryContainerWindow		Auswahl umkehren
 Expression too long.	libtracker		Ausdruck zu lange.
 Windows	TrackerSettingsWindow		Fenster
+Select			Auswählen
 Invalid bracket range.	libtracker		Ungültiger Klammerbereich.
 Unmatched parenthesis.	libtracker		Öffnende Klammer ohne schließende Klammer.
 Too many parenthesis.	libtracker		Zu viele Klammern.

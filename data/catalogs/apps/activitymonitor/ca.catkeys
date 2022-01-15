@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	1330427574
+1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	3850445261
 Teams	DataSource		Equips
 Semaphores	DataSource		Semàfors
 TX	DataSource	Shorter version for Sending	TX
@@ -18,11 +18,13 @@ CPU %d	DataSource		CPU %d
 RX	DataSource	Shorter version for Receiving.	RX
 Block cache	DataSource		Bloca la cau
 Memory	DataSource		Memòria
+CPU speed	DataSource		Velocitat de la CPU
 CPU usage	DataSource		Ús de la CPU
 Raw clipboard	DataSource		Porta-retalls en cru
 Used memory	DataSource		Memòria usada
 %.1f faults/s	DataSource		%.1f falles/s
 Cached memory	DataSource		A la memòria cau
+CPU %d speed	DataSource		Velocitat de la CPU %d
 CPU %d usage	DataSource		Ús de la CPU %d
 Ports	DataSource		Ports
 Page faults	DataSource		Falles de pàgina

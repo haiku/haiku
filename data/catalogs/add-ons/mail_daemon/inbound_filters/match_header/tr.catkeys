@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-MatchHeader	631274947
+1	turkish	x-vnd.Haiku-MatchHeader	2950227343
 Delete message	ConfigView		İletiyi sil
 Set flags to	ConfigView		Bayrakları şu şekilde ayarla:
 <Choose account>	ConfigView		<Hesap seçin>
@@ -6,6 +6,7 @@ Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular 
 Then	ConfigView		sonra
 If	ConfigView		Eğer
 Set as read	ConfigView		Okunmuş olarak işaretle
+Header field (e.g. Subject, From, 			Üstbilgi alanı (örn. Konu, Kimden, 
 Reply with	ConfigView		Şununla yanıtla:
 <Choose action>	ConfigView		<Eylem seçin>
 Move to	ConfigView		Taşı

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	1330427574
+1	japanese	x-vnd.Haiku-ActivityMonitor	3850445261
 Teams	DataSource		チーム数
 Semaphores	DataSource		セマフォ数
 TX	DataSource	Shorter version for Sending	送信
@@ -18,11 +18,13 @@ CPU %d	DataSource		CPU %d
 RX	DataSource	Shorter version for Receiving.	受信
 Block cache	DataSource		ブロックキャッシュ
 Memory	DataSource		メモリ
+CPU speed	DataSource		CPU 速度
 CPU usage	DataSource		CPU 使用率
 Raw clipboard	DataSource		バイナリクリップボード
 Used memory	DataSource		使用メモリ
 %.1f faults/s	DataSource		%.1f フォールト/s
 Cached memory	DataSource		キャッシュメモリ
+CPU %d speed	DataSource		CPU %d 速度
 CPU %d usage	DataSource		CPU %d 使用率
 Ports	DataSource		ポート数
 Page faults	DataSource		ページフォールト数

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2769460200
+1	japanese	x-vnd.Haiku-libtracker	2811852231
 ?+* follows nothing.	libtracker		?+* のうしろに何もありません。
 Disk mount	TrackerSettingsWindow		ディスクのマウント
 Corrupted opcode.	libtracker		オペコードが壊れています。
@@ -19,6 +19,7 @@ Memory corruption.	libtracker		メモリが破損しています。
 Invert selection	QueryContainerWindow		選択範囲の反転
 Expression too long.	libtracker		式が長過ぎます。
 Windows	TrackerSettingsWindow		ウィンドウ
+Select			選択
 Invalid bracket range.	libtracker		角括弧内の範囲が正しくありません。
 Unmatched parenthesis.	libtracker		括弧が不一致です。
 Too many parenthesis.	libtracker		括弧が多すぎます。

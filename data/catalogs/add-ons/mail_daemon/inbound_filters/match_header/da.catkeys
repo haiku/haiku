@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-MatchHeader	631274947
+1	danish	x-vnd.Haiku-MatchHeader	2950227343
 Delete message	ConfigView		Slet meddelelse
 Set flags to	ConfigView		Markér som
 <Choose account>	ConfigView		<Vælg konto>
@@ -6,6 +6,7 @@ Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular 
 Then	ConfigView		Så
 If	ConfigView		Hvis
 Set as read	ConfigView		Markér som læst
+Header field (e.g. Subject, From, 			Headerfelt (f.eks. Subject, From, 
 Reply with	ConfigView		Svar med
 <Choose action>	ConfigView		<Vælg handling>
 Move to	ConfigView		Flyt til

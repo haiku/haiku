@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-ActivityMonitor	1330427574
+1	german	x-vnd.Haiku-ActivityMonitor	3850445261
 Teams	DataSource		Teams
 Semaphores	DataSource		Semaphoren
 TX	DataSource	Shorter version for Sending	Senden
@@ -18,11 +18,13 @@ CPU %d	DataSource		CPU %d
 RX	DataSource	Shorter version for Receiving.	Empfangen
 Block cache	DataSource		Block-Cache
 Memory	DataSource		Speicher
+CPU speed	DataSource		CPU Takt
 CPU usage	DataSource		CPU-Auslastung
 Raw clipboard	DataSource		Raw-Ablage
 Used memory	DataSource		Benutzter Speicher
 %.1f faults/s	DataSource		%.1f Fehler/s
 Cached memory	DataSource		Gecachter Speicher
+CPU %d speed	DataSource		CPU %d Takt
 CPU %d usage	DataSource		CPU %d Auslastung
 Ports	DataSource		Ports
 Page faults	DataSource		Seitenfehler

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku.TextSearch	2003518937
+1	japanese	x-vnd.Haiku.TextSearch	2679411567
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Tracker で選択するファイルを選んでください。
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		選択部を開く
@@ -8,6 +8,7 @@ Encoding	GrepWindow		文字コード
 Set target to parent folder	GrepWindow		親フォルダーを検索
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Set target			検索対象フォルダーを指定
 Close	GrepWindow		閉じる
 Look in sub-folders	GrepWindow		サブフォルダーも調べる
 Follow symbolic links	GrepWindow		シンボリックリンクに従う

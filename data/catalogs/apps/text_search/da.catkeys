@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku.TextSearch	2003518937
+1	danish	x-vnd.Haiku.TextSearch	2679411567
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Vælg venligst de filer du vil have valgt til dig i Trackeren.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		Åbn valgte
@@ -8,6 +8,7 @@ Encoding	GrepWindow		Kodning
 Set target to parent folder	GrepWindow		Indstil mål til ophavsmappe
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Set target			Indstil mål
 Close	GrepWindow		Luk
 Look in sub-folders	GrepWindow		Kig i undermapper
 Follow symbolic links	GrepWindow		Følg symbolske links

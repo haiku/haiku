@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku.TextSearch	2003518937
+1	swedish	x-vnd.Haiku.TextSearch	2679411567
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Markera de filer du vill ska markeras i Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		Öppna markering
@@ -8,6 +8,7 @@ Encoding	GrepWindow		Teckenuppsättning
 Set target to parent folder	GrepWindow		Ställ in mål till överordnad mapp
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Set target			Sätt mål
 Close	GrepWindow		Stäng
 Look in sub-folders	GrepWindow		Sök i underkataloger
 Follow symbolic links	GrepWindow		Följ symboliska länkar

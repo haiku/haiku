@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	2769460200
+1	turkish	x-vnd.Haiku-libtracker	2811852231
 ?+* follows nothing.	libtracker		?+*, hiçbir şeyden sonra gelmiyor.
 Disk mount	TrackerSettingsWindow		Disk bağlama
 Corrupted opcode.	libtracker		Hasar görmüş işlem kodu.
@@ -19,6 +19,7 @@ Memory corruption.	libtracker		Bellek hasarı.
 Invert selection	QueryContainerWindow		Seçimi tersine çevir
 Expression too long.	libtracker		İfade çok uzun.
 Windows	TrackerSettingsWindow		Pencereler
+Select			Seç
 Invalid bracket range.	libtracker		Geçersiz köşeli parantez erimi.
 Unmatched parenthesis.	libtracker		Eşleşmeyen parantezler.
 Too many parenthesis.	libtracker		Çok fazla parantez.

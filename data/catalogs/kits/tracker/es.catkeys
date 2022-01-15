@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	2769460200
+1	spanish; castilian	x-vnd.Haiku-libtracker	2811852231
 ?+* follows nothing.	libtracker		?+* no sigue a nada.
 Disk mount	TrackerSettingsWindow		Montaje de disco
 Corrupted opcode.	libtracker		Opcode dañado.
@@ -19,6 +19,7 @@ Memory corruption.	libtracker		Daño de memoria.
 Invert selection	QueryContainerWindow		Invertir selección
 Expression too long.	libtracker		Expresión demasiado larga.
 Windows	TrackerSettingsWindow		Ventanas
+Select			Seleccionar
 Invalid bracket range.	libtracker		Rango de paréntesis inválido.
 Unmatched parenthesis.	libtracker		Paréntesis que no coinciden.
 Too many parenthesis.	libtracker		Demasiados paréntesis.

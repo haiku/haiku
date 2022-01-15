@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-libtracker	2769460200
+1	danish	x-vnd.Haiku-libtracker	2811852231
 ?+* follows nothing.	libtracker		?+* efterfølger ikke noget.
 Disk mount	TrackerSettingsWindow		Diskmontering
 Corrupted opcode.	libtracker		Beskadiget opkode.
@@ -19,6 +19,7 @@ Memory corruption.	libtracker		Hukommelseskorruption.
 Invert selection	QueryContainerWindow		Omvend markering
 Expression too long.	libtracker		Udtryk for langt.
 Windows	TrackerSettingsWindow		Vinduer
+Select			Vælg
 Invalid bracket range.	libtracker		Ugyldigt klammeområde.
 Unmatched parenthesis.	libtracker		Ikke-matchede parenteser.
 Too many parenthesis.	libtracker		For mange parenteser.

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku.TextSearch	2003518937
+1	turkish	x-vnd.Haiku.TextSearch	2679411567
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Lütfen sizin için İzleyici'de seçilmesini dilediğiniz dosyaları seçin.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		Seçimi aç
@@ -8,6 +8,7 @@ Encoding	GrepWindow		Kodlama
 Set target to parent folder	GrepWindow		Hedefi üst klasöre ayarla
 OK	GrepWindow		Tamam
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Set target			Hedef koy
 Close	GrepWindow		Kapat
 Look in sub-folders	GrepWindow		Alt klasörlerde bak
 Follow symbolic links	GrepWindow		Sembolik bağlantıları izle

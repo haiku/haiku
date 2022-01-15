@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ActivityMonitor	1330427574
+1	hungarian	x-vnd.Haiku-ActivityMonitor	3850445261
 Teams	DataSource		Csapatok
 Semaphores	DataSource		Szemaforok
 TX	DataSource	Shorter version for Sending	Adás
@@ -18,11 +18,13 @@ CPU %d	DataSource		CPU %d
 RX	DataSource	Shorter version for Receiving.	Vétel
 Block cache	DataSource		Blokk gyorsítótár
 Memory	DataSource		Memória
+CPU speed	DataSource		CPU sebessége
 CPU usage	DataSource		Processzor használat
 Raw clipboard	DataSource		Nyers vágólap
 Used memory	DataSource		Használt memória
 %.1f faults/s	DataSource		%.1f hiba/mp
 Cached memory	DataSource		Gyorsítótárazott memória
+CPU %d speed	DataSource		CPU %d sebessége
 CPU %d usage	DataSource		CPU %d használat
 Ports	DataSource		Portok
 Page faults	DataSource		Laphibák

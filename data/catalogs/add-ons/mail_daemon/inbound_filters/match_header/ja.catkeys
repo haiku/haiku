@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MatchHeader	631274947
+1	japanese	x-vnd.Haiku-MatchHeader	2950227343
 Delete message	ConfigView		メッセージの削除
 Set flags to	ConfigView		フラグを指定する
 <Choose account>	ConfigView		<アカウントの選択>
@@ -6,6 +6,7 @@ Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular 
 Then	ConfigView		ならば
 If	ConfigView		条件
 Set as read	ConfigView		既読にする
+Header field (e.g. Subject, From, 			ヘッダーフィールド (例. 題名, 送信元, ...
 Reply with	ConfigView		返事を書く
 <Choose action>	ConfigView		<動作の選択>
 Move to	ConfigView		に移動する

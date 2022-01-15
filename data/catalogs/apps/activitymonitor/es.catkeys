@@ -1,35 +1,37 @@
-1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	1330427574
+1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	3850445261
 Teams	DataSource		Equipos
 Semaphores	DataSource		Semáforos
-TX	DataSource	Shorter version for Sending	TX
-Block cache memory	DataSource		Bloquear memoria de caché
+TX	DataSource	Shorter version for Sending	Env.
+Block cache memory	DataSource		Memoria del caché de bloques
 MiB	DataSource		MiB
-Media nodes	DataSource		Nodos de media
+Media nodes	DataSource		Nodos de medios
 Text clipboard	DataSource		Texto en el portapapeles
 Network send	DataSource		Envío de red
 Cache	DataSource		Caché
 Running applications	DataSource		Aplicaciones ejecutándose
 Threads	DataSource		Hilos
 CPU usage (combined)	DataSource		Uso de CPU (conjunto)
-Receiving	DataSource		Recibiendo
+Receiving	DataSource		Recepción
 Swap space	DataSource		Espacio de intercambio
-CPU	DataSource		CPU
-CPU %d	DataSource		CPU %d
-RX	DataSource	Shorter version for Receiving.	RX
-Block cache	DataSource		Bloqueando caché
-Memory	DataSource		Memoria 
-CPU usage	DataSource		Uso de CPU
+CPU	DataSource		Procesador
+CPU %d	DataSource		Procesador %d
+RX	DataSource	Shorter version for Receiving.	Desc.
+Block cache	DataSource		Caché de bloques
+Memory	DataSource		Memoria
+CPU speed	DataSource		Velocidad del procesador
+CPU usage	DataSource		Uso del procesador
 Raw clipboard	DataSource		Portapapeles en bruto
 Used memory	DataSource		Memoria usada
 %.1f faults/s	DataSource		%.1f fallas/s
 Cached memory	DataSource		Memoria de caché
-CPU %d usage	DataSource		Uso CPU %d
+CPU %d speed	DataSource		Velocidad del procesador %d
+CPU %d usage	DataSource		Uso del procesador CPU %d
 Ports	DataSource		Puertos
 Page faults	DataSource		Errores de página
 Apps	DataSource		Aplicaciones
-Sending	DataSource		Enviando
+Sending	DataSource		Envío
 %.1f MiB	DataSource		%.1f MiB
 Swap	DataSource		Intercambio
 P-faults	DataSource		Errores de página
 Sems	DataSource		Sems
-Network receive	DataSource		Recibir de red
+Network receive	DataSource		Recepción de red

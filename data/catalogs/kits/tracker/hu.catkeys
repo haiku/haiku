@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2769460200
+1	hungarian	x-vnd.Haiku-libtracker	2811852231
 ?+* follows nothing.	libtracker		?+* nem követ semmit.
 Disk mount	TrackerSettingsWindow		Csatolás
 Corrupted opcode.	libtracker		Sérült opcode.
@@ -19,6 +19,7 @@ Memory corruption.	libtracker		Sérült memória.
 Invert selection	QueryContainerWindow		Kijelölés megfordítása
 Expression too long.	libtracker		Túl hosszú kifejezés.
 Windows	TrackerSettingsWindow		Ablakok
+Select			Kiválasztás
 Invalid bracket range.	libtracker		Érvénytelen zárójelek.
 Unmatched parenthesis.	libtracker		Páratlan zárójel.
 Too many parenthesis.	libtracker		Túl sok zárójel.

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku.TextSearch	2003518937
+1	catalan; valencian	x-vnd.Haiku.TextSearch	2679411567
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Si us plau, trieu els fitxers que voleu tenir seleccionats al Rastrejador.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		Obre la selecció
@@ -8,6 +8,7 @@ Encoding	GrepWindow		Codificació
 Set target to parent folder	GrepWindow		Estableix la destinació a la carpeta mare
 OK	GrepWindow		D'acord
 %appname% : %path% : %searchtext%	GrepWindow		%appname%: %path%: %searchtext%
+Set target			Establiu un objectiu
 Close	GrepWindow		Tanca
 Look in sub-folders	GrepWindow		Cerca a les carpetes inferiors
 Follow symbolic links	GrepWindow		Segueix els enllaços simbòlics
