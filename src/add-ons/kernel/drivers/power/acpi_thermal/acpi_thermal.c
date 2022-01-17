@@ -64,18 +64,18 @@ acpi_thermal_read(void* _cookie, off_t position, void* buf, size_t* num_bytes)
 		char* str = (char*)buf;
 		acpi_thermal_control(device, drvOpGetThermalType, &therm_info, 0);
 
-		snprintf(str, max_len, "  Critical Temperature: %lu.%lu K\n",
+		snprintf(str, max_len, "  Critical Temperature: %"B_PRIu32" %"B_PRIu32" K\n",
 				(therm_info.critical_temp / 10), (therm_info.critical_temp % 10));
 
 		max_len -= strlen(str);
 		str += strlen(str);
-		snprintf(str, max_len, "  Current Temperature: %lu.%lu K\n",
+		snprintf(str, max_len, "  Current Temperature: %"B_PRIu32" %"B_PRIu32" K\n",
 				(therm_info.current_temp / 10), (therm_info.current_temp % 10));
 
 		if (therm_info.hot_temp > 0) {
 			max_len -= strlen(str);
 			str += strlen(str);
-			snprintf(str, max_len, "  Hot Temperature: %lu.%lu K\n",
+			snprintf(str, max_len, "  Hot Temperature: %"B_PRIu32" %"B_PRIu32" K\n",
 					(therm_info.hot_temp / 10), (therm_info.hot_temp % 10));
 		}
 
