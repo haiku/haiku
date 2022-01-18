@@ -242,7 +242,8 @@ platform_bootloader_address_to_kernel_address(void *address, addr_t *_result)
 	// Convert any physical ranges prior to looking up address
 	convert_physical_ranges();
 
-	phys_addr_t addr = (phys_addr_t)address;
+	// Double cast needed to avoid sign extension issues on 32-bit architecture
+	phys_addr_t addr = (phys_addr_t)(addr_t)address;
 
 	for (memory_region *region = allocated_regions; region;
 			region = region->next) {
@@ -290,9 +291,12 @@ platform_free_region(void *address, size_t size)
 
 	for (memory_region **ref = &allocated_regions; *ref;
 			ref = &(*ref)->next) {
-		if ((*ref)->matches((phys_addr_t)address, size)) {
-			kBootServices->FreePages((efi_physical_addr)address,
+		// Double cast needed to avoid sign extension issues on 32-bit architecture
+		if ((*ref)->matches((phys_addr_t)(addr_t)address, size)) {
+			efi_status status;
+			status = kBootServices->FreePages((efi_physical_addr)(addr_t)address,
 				ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE);
+			ASSERT_ALWAYS(status == EFI_SUCCESS);
 			memory_region* old = *ref;
 			//pointer to current allocated_memory_region* now points to next
 			*ref = (*ref)->next;
