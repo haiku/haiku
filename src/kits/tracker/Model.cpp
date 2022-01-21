@@ -619,6 +619,9 @@ Model::FinishSettingUpType()
 			else if (strcmp(type, kVirtualDirectoryMimeType) == 0)
 				fBaseType = kVirtualDirectoryNode;
 
+			if (ShouldGenerateThumbnail(type))
+				fIconFrom = kNode;
+
 			if (info.GetPreferredApp(type) == B_OK) {
 				if (fPreferredAppName)
 					DeletePreferredAppVolumeNameLinkTo();

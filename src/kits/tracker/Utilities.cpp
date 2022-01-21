@@ -1583,10 +1583,7 @@ GetFileIconFromAttr(Model* model, BBitmap* icon, icon_size which)
 		}
 	}
 
-	// check generate thumbnail setting,
-	// mime type must be an image type
-	if (TrackerSettings().GenerateImageThumbnails()
-		&& BString(model->MimeType()).IStartsWith("image")) {
+	if (ShouldGenerateThumbnail(model->MimeType())) {
 		// try to fetch a new thumbnail icon
 		result = GetThumbnailIcon(model, icon, which);
 		if (result == B_OK) {
@@ -1746,6 +1743,16 @@ GetThumbnailIcon(Model* model, BBitmap* icon, icon_size which)
 	}
 
 	return result;
+}
+
+
+bool
+ShouldGenerateThumbnail(const char* type)
+{
+	// check generate thumbnail setting,
+	// mime type must be an image (for now)
+	return TrackerSettings().GenerateImageThumbnails()
+		&& type != NULL && BString(type).IStartsWith("image");
 }
 
 

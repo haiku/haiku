@@ -485,6 +485,8 @@ status_t GetAppIconFromAttr(BFile* file, BBitmap* icon, icon_size which);
 status_t GetFileIconFromAttr(Model* model, BBitmap* icon, icon_size which);
 status_t GetThumbnailIcon(Model* model, BBitmap* icon, icon_size which);
 
+bool ShouldGenerateThumbnail(const char* type);
+
 // debugging
 void HexDump(const void* buffer, int32 length);
 
