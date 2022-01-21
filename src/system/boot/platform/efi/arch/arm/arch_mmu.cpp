@@ -98,14 +98,17 @@ map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint32_t flags)
 
 
 static void
-insert_virtual_range_to_keep(const addr_range& range)
+insert_virtual_range_to_keep(uint64 start, uint64 size)
 {
-	if (gKernelArgs.arch_args.num_virtual_ranges_to_keep
-		>= MAX_VIRTUAL_RANGES_TO_KEEP)
-		panic("too many virtual ranges to keep");
+	status_t status = insert_address_range(
+		gKernelArgs.arch_args.virtual_ranges_to_keep,
+		&gKernelArgs.arch_args.num_virtual_ranges_to_keep,
+		MAX_VIRTUAL_RANGES_TO_KEEP, start, size);
 
-	gKernelArgs.arch_args.virtual_ranges_to_keep[
-		gKernelArgs.arch_args.num_virtual_ranges_to_keep++] = range;
+	if (status == B_ENTRY_NOT_FOUND)
+		panic("too many virtual ranges to keep");
+	else if (status != B_OK)
+		panic("failed to add virtual range to keep");
 }
 
 
@@ -124,7 +127,7 @@ map_range_to_new_area(addr_range& range, uint32_t flags)
 
 	range.start = virt_addr;
 
-	insert_virtual_range_to_keep(range);
+	insert_virtual_range_to_keep(range.start, range.size);
 }
 
 
@@ -134,7 +137,7 @@ map_range_to_new_area(efi_memory_descriptor *entry, uint32_t flags)
 	uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
 	entry->VirtualStart = get_next_virtual_address(size);
 	map_range(entry->VirtualStart, entry->PhysicalStart, size, flags);
-	insert_virtual_range_to_keep({start: entry->VirtualStart, size: size});
+	insert_virtual_range_to_keep(entry->VirtualStart, size);
 }
 
 
