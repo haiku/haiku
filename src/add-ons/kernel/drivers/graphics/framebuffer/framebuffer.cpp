@@ -38,12 +38,20 @@ find_graphics_card(addr_t frameBuffer, addr_t& base, size_t& size)
 
 		// check PCI BARs
 		for (uint32 i = 0; i < 6; i++) {
-			if (info.u.h0.base_registers[i] <= frameBuffer
-				&& info.u.h0.base_registers[i] + info.u.h0.base_register_sizes[i]
-					> frameBuffer) {
+			phys_addr_t addr = info.u.h0.base_registers[i];
+			uint64 barSize = info.u.h0.base_register_sizes[i];
+			if (i < 5
+				&& (info.u.h0.base_register_flags[i] & PCI_address_type) == PCI_address_type_64) {
+				addr |= (uint64)info.u.h0.base_registers[i + 1] << 32;
+				barSize |= (uint64)info.u.h0.base_register_sizes[i + 1] << 32;
+				i++;
+			}
+			if (addr <= frameBuffer && addr + barSize > frameBuffer) {
 				// found it!
-				base = info.u.h0.base_registers[i];
-				size = info.u.h0.base_register_sizes[i];
+				base = addr;
+				size = barSize;
+				dprintf(DEVICE_NAME " find_graphics_card: found base 0x%lx size %" B_PRIuSIZE "\n",
+					base, size);
 
 				put_module(B_PCI_MODULE_NAME);
 				return B_OK;
@@ -51,6 +59,7 @@ find_graphics_card(addr_t frameBuffer, addr_t& base, size_t& size)
 		}
 	}
 
+	dprintf(DEVICE_NAME " find_graphics_card: no entry found for 0x%lx\n", frameBuffer);
 	put_module(B_PCI_MODULE_NAME);
 	return B_ENTRY_NOT_FOUND;
 }
