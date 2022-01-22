@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2022 Haiku, Inc. All rights reserved.
  * Released under the terms of the MIT License.
  */
 
@@ -14,6 +14,9 @@
 
 
 #define ALIGN_MEMORY_MAP	4
+
+
+extern "C" typedef void (*arch_enter_kernel_t)(uint32_t, addr_t, addr_t, addr_t);
 
 
 extern "C" void arch_enter_kernel(uint32_t ttbr, addr_t kernelArgs,
@@ -76,6 +79,32 @@ memory_region_type_str(int type)
 }
 
 
+static void *
+allocate_trampoline_page(void)
+{
+	void *trampolinePage = NULL;
+	if (platform_allocate_lomem(&trampolinePage, B_PAGE_SIZE) == B_OK)
+		return trampolinePage;
+
+	trampolinePage = (void *)get_next_virtual_address(B_PAGE_SIZE);
+	if (platform_allocate_region(&trampolinePage, B_PAGE_SIZE, 0, true) == B_OK)
+		return trampolinePage;
+
+	trampolinePage = NULL;
+	if (platform_allocate_region(&trampolinePage, B_PAGE_SIZE, 0, false) != B_OK)
+		return NULL;
+
+	if (platform_free_region(trampolinePage, B_PAGE_SIZE) != B_OK)
+		return NULL;
+
+	if (platform_allocate_region(&trampolinePage, B_PAGE_SIZE, 0, true) != B_OK)
+		return NULL;
+
+	ASSERT_ALWAYS((uint32_t)trampolinePage >= 0x88000000);
+	return trampolinePage;
+}
+
+
 void
 arch_start_kernel(addr_t kernelEntry)
 {
@@ -88,6 +117,14 @@ arch_start_kernel(addr_t kernelEntry)
 	addr_t virtKernelArgs;
 	platform_bootloader_address_to_kernel_address((void*)kernelArgs,
 		&virtKernelArgs);
+
+	// Allocate identity mapped region for entry.S trampoline
+	void *trampolinePage = allocate_trampoline_page();
+	if (trampolinePage == NULL)
+		panic("Failed to allocate trampoline page.");
+
+	memcpy(trampolinePage, (void *)arch_enter_kernel, B_PAGE_SIZE);
+	arch_enter_kernel_t enter_kernel = (arch_enter_kernel_t)trampolinePage;
 
 	// Prepare to exit EFI boot services.
 	// Read the memory map.
@@ -182,11 +219,11 @@ arch_start_kernel(addr_t kernelEntry)
 	//smp_boot_other_cpus(final_pml4, kernelEntry);
 
 	// Enter the kernel!
-	dprintf("arch_enter_kernel(ttbr0: 0x%08x, kernelArgs: 0x%08x, "
+	dprintf("enter_kernel(ttbr0: 0x%08x, kernelArgs: 0x%08x, "
 		"kernelEntry: 0x%08x, sp: 0x%08x)\n",
 		final_ttbr0, (uint32_t)virtKernelArgs, (uint32_t)kernelEntry,
 		(uint32_t)(gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size));
 
-	arch_enter_kernel(final_ttbr0, virtKernelArgs, kernelEntry,
+	enter_kernel(final_ttbr0, virtKernelArgs, kernelEntry,
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
 }

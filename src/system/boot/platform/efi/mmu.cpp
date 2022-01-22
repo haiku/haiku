@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 Haiku, Inc. All rights reserved.
+ * Copyright 2016-2022 Haiku, Inc. All rights reserved.
  * Copyright 2014, Jessica Hamilton, jessica.l.hamilton@gmail.com.
  * Copyright 2014, Henry Harrington, henry.harrington@gmail.com.
  * Distributed under the terms of the MIT License.
@@ -96,15 +96,20 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
 {
 	TRACE("%s: called\n", __func__);
 
-	// We don't have any control over the page tables, give up right away if an
-	// exactAddress is wanted.
-	if (exactAddress)
-		return B_NO_MEMORY;
-
 	efi_physical_addr addr;
 	size_t pages = ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE;
-	efi_status status = kBootServices->AllocatePages(AllocateAnyPages,
-		EfiLoaderData, pages, &addr);
+	efi_status status;
+
+	if (exactAddress) {
+		addr = (efi_physical_addr)(addr_t)*_address;
+		status = kBootServices->AllocatePages(AllocateAddress,
+			EfiLoaderData, pages, &addr);
+	} else {
+		addr = 0;
+		status = kBootServices->AllocatePages(AllocateAnyPages,
+			EfiLoaderData, pages, &addr);
+	}
+
 	if (status != EFI_SUCCESS)
 		return B_NO_MEMORY;
 
@@ -134,6 +139,36 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
 #ifdef TRACE_MMU
 	//region->dprint("Allocated");
 #endif
+	allocated_regions = region;
+	*_address = (void *)region->paddr;
+	return B_OK;
+}
+
+
+extern "C" status_t
+platform_allocate_lomem(void **_address, size_t size)
+{
+	TRACE("%s: called\n", __func__);
+
+	efi_physical_addr addr = KERNEL_LOAD_BASE - B_PAGE_SIZE;
+	size_t pages = ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE;
+	efi_status status = kBootServices->AllocatePages(AllocateMaxAddress,
+		EfiLoaderData, pages, &addr);
+	if (status != EFI_SUCCESS)
+		return B_NO_MEMORY;
+
+	memory_region *region = new(std::nothrow) memory_region {
+		next: allocated_regions,
+		vaddr: (addr_t)addr,
+		paddr: (phys_addr_t)addr,
+		size: size
+	};
+
+	if (region == NULL) {
+		kBootServices->FreePages(addr, pages);
+		return B_NO_MEMORY;
+	}
+
 	allocated_regions = region;
 	*_address = (void *)region->paddr;
 	return B_OK;
