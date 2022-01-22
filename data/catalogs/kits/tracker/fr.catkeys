@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	2769460200
+1	french	x-vnd.Haiku-libtracker	2811852231
 ?+* follows nothing.	libtracker		?+* ne faisant suite à rien.
 Disk mount	TrackerSettingsWindow		Montage des disques
 Corrupted opcode.	libtracker		Code d’opération corrompu.
@@ -19,6 +19,7 @@ Memory corruption.	libtracker		Corruption mémoire.
 Invert selection	QueryContainerWindow		Inverser la sélection
 Expression too long.	libtracker		Expression trop longue.
 Windows	TrackerSettingsWindow		Fenêtres
+Select			Sélectionner
 Invalid bracket range.	libtracker		Intervalle non valide.
 Unmatched parenthesis.	libtracker		Parenthèses non appariées.
 Too many parenthesis.	libtracker		Trop de parenthèses.

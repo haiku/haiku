@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-CharacterMap	2229965456
+1	french	x-vnd.Haiku-CharacterMap	3296864857
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Divers symboles mathématiques B
 Latin extended E	UnicodeBlocks		Latin étendu E
@@ -23,6 +23,7 @@ Sharada	UnicodeBlocks		Sharda
 Multani	UnicodeBlocks		Multani
 Linear A	UnicodeBlocks		Linéaire A
 CJK compatibility ideographs Supplement	UnicodeBlocks		Supplément d’idéogrammes de compatibilité CJC
+Pahawh Hmong	UnicodeBlocks		Pahawh hmong
 Bopomofo extended	UnicodeBlocks		Bopomofo étendu
 Bassa Vah	UnicodeBlocks		Vah Bassa
 Georgian extended	UnicodeBlocks		Géorgien étendu
@@ -74,6 +75,7 @@ N'Ko	UnicodeBlocks		N’Ko
 Cherokee supplement	UnicodeBlocks		Supplément Cherokee
 Halfwidth and fullwidth forms	UnicodeBlocks		Formulaires demi-largeur et largeur complète
 Counting rod numerals	UnicodeBlocks		Chiffres-bâtonnets chinois
+Sora Sompeng	UnicodeBlocks		Sora sompeng
 Supplemental arrows C	UnicodeBlocks		Suppléments C de Flèches
 Alchemical symbols	UnicodeBlocks		Symboles alchimiques
 Latin extended C	UnicodeBlocks		Latin étendu C
@@ -171,6 +173,7 @@ Shorthand format controls	UnicodeBlocks		Caractères de formatage sténographiqu
 Optical character recognition	UnicodeBlocks		Reconnaissance optique de caractères
 Inscriptional Parthian	UnicodeBlocks		Écriture Parthe
 Tamil	UnicodeBlocks		Tamoul
+Lisu	UnicodeBlocks		Lissou
 Nandingari	UnicodeBlocks		Nandinagari
 Greek extended	UnicodeBlocks		Grec étendu
 Myanmar extended B	UnicodeBlocks		Myanmar (Birman) étendu B
@@ -283,6 +286,7 @@ Old South Arabian	UnicodeBlocks		Arabe méridional ancien
 Marchen	UnicodeBlocks		Marchen
 Sogdian	UnicodeBlocks		Sogdien
 Control pictures	UnicodeBlocks		Pictogrammes de commande
+Tai Tham	UnicodeBlocks		Taï tham
 Cyrillic extended A	UnicodeBlocks		Cyrillique étendu A
 New Tai Lue	UnicodeBlocks		Nouveau taï lü
 Sutton SignWriting	UnicodeBlocks		Écriture des signes de Sutton

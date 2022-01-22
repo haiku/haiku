@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku.TextSearch	2003518937
+1	french	x-vnd.Haiku.TextSearch	2679411567
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Veuillez choisir les fichiers qui seront sélectionnés pour vous dans le Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		Ouvrir la sélection
@@ -8,6 +8,7 @@ Encoding	GrepWindow		Encodage
 Set target to parent folder	GrepWindow		Définir le dossier parent pour cible
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Set target			Sélectionner la destination
 Close	GrepWindow		Fermer
 Look in sub-folders	GrepWindow		Regarder dans les sous-dossiers
 Follow symbolic links	GrepWindow		Suivre les liens symboliques
