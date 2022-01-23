@@ -555,8 +555,10 @@ SetPlatformCompatibilityFlagVariables TARGET_PLATFORM : TARGET : target ;
 # Haiku architecture is undefined on host-only builds
 # set here to host arch to prevent recusive loops.
 if $(HAIKU_HOST_BUILD_ONLY) = 1 {
+	Echo "Host tools build for $(HOST_ARCH)" ;
 	HAIKU_ARCH = $(HOST_ARCH) ;
 	HAIKU_KERNEL_ARCH = $(HOST_ARCH) ;
+	HAIKU_KERNEL_ARCH_DIR = $(HAIKU_KERNEL_ARCH) ;
 }
 
 # Set TARGET_* variables either from HAIKU_* or HOST_* depending on the
