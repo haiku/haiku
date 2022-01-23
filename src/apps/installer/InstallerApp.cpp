@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, Panagiotis Vasilopoulos <hello@alwayslivid.com>
+ * Copyright 2020, Panagiotis "Ivory" Vasilopoulos <git@n0toose.net>
  * Copyright 2015, Axel Dörfler <axeld@pinc-software.de>
  * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2005, Jérôme DUVAL.

@@ -7,7 +7,7 @@
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
  *		Hamish Morrison <hamish@lavabit.com>
- *		Panagiotis Vasilopoulos <hello@alwayslivid.com>
+ *		Panagiotis "Ivory" Vasilopoulos <git@n0toose.net>
  */
 
 
@@ -67,7 +67,7 @@ TimeApplication::AboutRequested()
 		"Andrew Edward McCall",
 		"Hamish Morrison",
 		"Philippe Saint-Pierre",
-		"Panagiotis Vasilopoulos",
+		"Panagiotis \"Ivory\" Vasilopoulos",
 		"Julun",
 		NULL
 	};
