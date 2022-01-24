@@ -131,10 +131,6 @@ Bootloader TODOs
 - Better handling of memory ranges. Currently no checks are done, and
   memory is assumed to be a single contiguous range, and the "input"
   ranges for mmu_init are setup, but never considered.
-- Allocate the pagetable range using mmu_allocate() instead of identity
-  mapping it. That way, there's a bit more flexibility in where to place
-  it both physically and virtually. This will need a minor change on the
-  kernel side too (in the early pagetable allocator).
 
 Other resources
 ---------------
