@@ -131,12 +131,18 @@ init_device(device_node* node, void** device_cookie)
 	pci->get_pci_info(device, pciInfo);
 
 	bus->info.base_addr = pciInfo->u.h0.base_registers[0];
+	bus->info.map_size = pciInfo->u.h0.base_register_sizes[0];
 	if ((pciInfo->u.h0.base_register_flags[0] & PCI_address_type)
 			== PCI_address_type_64) {
 		bus->info.base_addr |= (uint64)pciInfo->u.h0.base_registers[1] << 32;
+		bus->info.map_size |= (uint64)pciInfo->u.h0.base_register_sizes[1] << 32;
 	}
 
-	bus->info.map_size = pciInfo->u.h0.base_register_sizes[0];
+	if (bus->info.base_addr == 0) {
+		ERROR("PCI BAR not assigned\n");
+		free(bus);
+		return B_ERROR;
+	}
 
 	// enable power
 	pci->set_powerstate(device, PCI_pm_state_d0);

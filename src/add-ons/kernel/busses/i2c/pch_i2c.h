@@ -72,7 +72,7 @@ typedef enum {
 
 typedef struct {
 	phys_addr_t base_addr;
-	size_t map_size;
+	uint64 map_size;
 	uint8 irq;
 	i2c_bus sim;
 

@@ -403,7 +403,7 @@ init_bus(device_node* node, void** bus_cookie)
 	gDeviceManager->get_driver(parent, &driver, (void**)&bus);
 	gDeviceManager->put_node(parent);
 
-	TRACE_ALWAYS("init_bus() addr 0x%" B_PRIxPHYSADDR " size 0x%" B_PRIxSIZE
+	TRACE_ALWAYS("init_bus() addr 0x%" B_PRIxPHYSADDR " size 0x%" B_PRIx64
 		" irq 0x%x\n", bus->base_addr, bus->map_size, bus->irq);
 
 	bus->registersArea = map_physical_memory("PCHI2C memory mapped registers",
@@ -412,7 +412,7 @@ init_bus(device_node* node, void** bus_cookie)
 		(void **)&bus->registers);
 	// init bus
 	bus->capabilities = read32(bus->registers + PCH_SUP_CAPABLITIES);
-	TRACE_ALWAYS("init_bus() 0x%x (0x%" B_PRIx32 ")\n",
+	TRACE_ALWAYS("init_bus() 0x%" B_PRIx32 " (0x%" B_PRIx32 ")\n",
 		(bus->capabilities >> PCH_SUP_CAPABLITIES_TYPE_SHIFT)
 			& PCH_SUP_CAPABLITIES_TYPE_MASK,
 		bus->capabilities);
