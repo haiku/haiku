@@ -318,7 +318,7 @@ dtb_get_reg(const void* fdt, int node, uint32 addressCells, uint32 sizeCells, si
 }
 
 
-static uint32
+static int
 dtb_get_interrupt_parent(const void* fdt, int node)
 {
 	while (node >= 0) {
@@ -339,8 +339,8 @@ dtb_get_interrupt_parent(const void* fdt, int node)
 static uint32
 dtb_get_interrupt_cells(const void* fdt, int node)
 {
-	uint32 intc_node = dtb_get_interrupt_parent(fdt, node);
-	if (intc_node > 0) {
+	int intc_node = dtb_get_interrupt_parent(fdt, node);
+	if (intc_node >= 0) {
 		uint32* prop = (uint32*)fdt_getprop(fdt, intc_node, "#interrupt-cells", NULL);
 		if (prop != NULL) {
 			return fdt32_to_cpu(*prop);
