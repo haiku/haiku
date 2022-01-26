@@ -23,6 +23,11 @@ typedef struct {
 //	TODO:  Deal with this later in the port
 //	FixedWidthPointer<void> fdt;
 //	uart_info		uart;
+
+	uint64 phys_pgdir;
+	uint64 vir_pgdir;
+	uint64 next_pagetable;
+
 } _PACKED arch_kernel_args;
 
 #endif	/* KERNEL_ARCH_ARM64_KERNEL_ARGS_H */
