@@ -891,7 +891,6 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 			return errno;
 
 		isSymlink = S_ISLNK(tmpStat.st_mode);
-
 	} else {
 		Descriptor *descriptor = get_descriptor(fd);
 		if (!descriptor)
@@ -900,17 +899,14 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 		if (FileDescriptor *fileFD
 				= dynamic_cast<FileDescriptor*>(descriptor)) {
 			realFD = fileFD->fd;
-
 		} else if (dynamic_cast<DirectoryDescriptor*>(descriptor)) {
 			error = get_path(fd, NULL, realPath);
 			if (error != B_OK)
 				return error;
-
 		} else if (SymlinkDescriptor *linkFD
 				= dynamic_cast<SymlinkDescriptor*>(descriptor)) {
 			realPath = linkFD->path;
 			isSymlink = true;
-
 		} else
 			return B_FILE_ERROR;
 	}
@@ -941,15 +937,27 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 				return errno;
 		}
 
-		// The timestamps can only be set via utime(), but that requires a
-		// path we don't have.
-		if (statMask & (B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME
-				| B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME)) {
-			return B_ERROR;
+		if (statMask & (B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME)) {
+			// Grab the previous mod and access times so we only overwrite
+			// the specified time and not both
+			struct stat oldStat;
+			if (~statMask & (B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME)) {
+				if (fstat(realFD, &oldStat) < 0)
+					return errno;
+			}
+
+			struct timespec times[2];
+			times[0] = (statMask & B_STAT_ACCESS_TIME) ? st->st_atim : oldStat.st_atim;
+			times[1] = (statMask & B_STAT_MODIFICATION_TIME) ? st->st_mtim : oldStat.st_mtim;
+			if (futimens(realFD, times) < 0)
+				return errno;
 		}
 
-		return 0;
+		// not supported
+		if (statMask & (B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME))
+			return B_ERROR;
 
+		return 0;
 	} else {
 		if (statMask & B_STAT_MODE) {
 			if (chmod(realPath.c_str(), st->st_mode) < 0)
