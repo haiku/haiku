@@ -730,7 +730,10 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				break;
 			}
 
-			acquire_sem(device->notify);
+			status = acquire_sem_etc(device->notify, 1, B_KILL_CAN_INTERRUPT, 0);
+			if (status != B_OK)
+				return status;
+
 			command.control.status = device->status;
 			command.control.length = device->actual_length;
 			deviceLocker.Unlock();
@@ -851,7 +854,10 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				break;
 			}
 
-			acquire_sem(device->notify);
+			status = acquire_sem_etc(device->notify, 1, B_KILL_CAN_INTERRUPT, 0);
+			if (status != B_OK)
+				return status;
+
 			command.transfer.status = device->status;
 			command.transfer.length = device->actual_length;
 			deviceLocker.Unlock();
