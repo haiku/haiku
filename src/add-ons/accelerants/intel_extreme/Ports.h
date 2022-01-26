@@ -182,6 +182,7 @@ virtual	addr_t						_PortRegister();
 
 private:
 		status_t					_SetPortLinkGen4(const display_timing& timing);
+		status_t					_SetPortLinkGen6(const display_timing& timing);
 };
 
 

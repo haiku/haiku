@@ -1174,6 +1174,117 @@ DisplayPort::_SetPortLinkGen4(const display_timing& timing)
 
 
 status_t
+DisplayPort::_SetPortLinkGen6(const display_timing& timing)
+{
+	// Khz / 10. ( each output octet encoded as 10 bits.
+	//uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10; //=270000 khz
+	//fixme: eDP is fixed option 162 or 270Mc, other DPs go via DPLL programming to one of the same vals.
+	uint32 linkBandwidth = 270000; //khz
+	TRACE("%s: DP link reference clock is %gMhz\n", __func__, linkBandwidth / 1000.0f);
+
+	uint32 fPipeOffset = 0;
+	switch (fPipe->Index()) {
+		case INTEL_PIPE_B:
+			fPipeOffset = 0x1000;
+			break;
+		case INTEL_PIPE_C:
+			fPipeOffset = 0x2000;
+			break;
+		default:
+			break;
+	}
+
+	TRACE("%s: DP M1 data before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_DATA_M1 + fPipeOffset));
+	TRACE("%s: DP N1 data before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_DATA_N1 + fPipeOffset));
+	TRACE("%s: DP M1 link before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_LINK_M1 + fPipeOffset));
+	TRACE("%s: DP N1 link before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_LINK_N1 + fPipeOffset));
+
+	uint32 bitsPerPixel =
+		(read32(INTEL_TRANSCODER_A_DP_CTL + fPipeOffset) & INTEL_TRANS_DP_BPC_MASK) >> INTEL_TRANS_DP_COLOR_SHIFT;
+	switch (bitsPerPixel) {
+		case PIPE_DDI_8BPC:
+			bitsPerPixel = 24;
+			break;
+		case PIPE_DDI_10BPC:
+			bitsPerPixel = 30;
+			break;
+		case PIPE_DDI_6BPC:
+			bitsPerPixel = 18;
+			break;
+		case PIPE_DDI_12BPC:
+			bitsPerPixel = 36;
+			break;
+		default:
+			ERROR("%s: DP illegal link colordepth set.\n", __func__);
+			return B_ERROR;
+	}
+	TRACE("%s: DP link colordepth: %" B_PRIu32 "\n", __func__, bitsPerPixel);
+
+	uint32 lanes =
+		1 << ((read32(_PortRegister()) & INTEL_DISP_PORT_WIDTH_MASK) >> INTEL_DISP_PORT_WIDTH_SHIFT);
+	if (lanes > 4) {
+		ERROR("%s: DP illegal number of lanes set.\n", __func__);
+		return B_ERROR;
+	}
+	TRACE("%s: DP mode with %" B_PRIx32 " lane(s) in use\n", __func__, lanes);
+
+	//Reserving 5% bandwidth for possible spread spectrum clock use
+	uint32 bps = timing.pixel_clock * bitsPerPixel * 21 / 20;
+	//use DIV_ROUND_UP:
+	uint32 required_lanes = (bps + (linkBandwidth * 8) - 1) / (linkBandwidth * 8);
+	TRACE("%s: DP mode needs %" B_PRIx32 " lane(s) in use\n", __func__, required_lanes);
+	if (required_lanes > lanes) {
+		//Note that we *must* abort as otherwise the PIPE/DP-link hangs forever (without retraining!).
+		ERROR("%s: DP not enough lanes active for requested mode.\n", __func__);
+		return B_ERROR;
+	}
+
+	//Setup Data M/N
+	uint64 linkspeed = lanes * linkBandwidth * 8;
+	uint64 ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	uint64 ret_m = timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	//Set TU size bits (to default, max) before link training so that error detection works
+	write32(INTEL_TRANSCODER_A_DATA_M1 + fPipeOffset, ret_m | INTEL_TRANSCODER_MN_TU_SIZE_MASK);
+	write32(INTEL_TRANSCODER_A_DATA_N1 + fPipeOffset, ret_n);
+
+	//Setup Link M/N
+	linkspeed = linkBandwidth;
+	ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	ret_m = timing.pixel_clock * ret_n / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	write32(INTEL_TRANSCODER_A_LINK_M1 + fPipeOffset, ret_m);
+	//Writing Link N triggers all four registers to be activated also (on next VBlank)
+	write32(INTEL_TRANSCODER_A_LINK_N1 + fPipeOffset, ret_n);
+
+	TRACE("%s: DP M1 data after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_DATA_M1 + fPipeOffset));
+	TRACE("%s: DP N1 data after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_DATA_N1 + fPipeOffset));
+	TRACE("%s: DP M1 link after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_LINK_M1 + fPipeOffset));
+	TRACE("%s: DP N1 link after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_LINK_N1 + fPipeOffset));
+
+	return B_OK;
+}
+
+
+status_t
 DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
 	CALLED();
@@ -1190,37 +1301,31 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		fPipe->ConfigureTimings(target);
 		result = _SetPortLinkGen4(target->timing);
 	} else {
-		//fixme: doesn't work yet. For now just scale to native mode.
-#if 0
-		// Setup PanelFitter and Train FDI if it exists
-		PanelFitter* fitter = fPipe->PFT();
-		if (fitter != NULL)
-			fitter->Enable(*target);
-		// skip FDI if it doesn't exist
-		if (gInfo->shared_info->device_type.Generation() <= 8) {
-			FDILink* link = fPipe->FDI();
-			if (link != NULL)
-				link->Train(target);
+		result = _SetPortLinkGen6(target->timing);
+		if (result == B_OK) {
+			// Setup PanelFitter and Train FDI if it exists
+			PanelFitter* fitter = fPipe->PFT();
+			if (fitter != NULL)
+				fitter->Enable(target->timing);
+			// skip FDI if it doesn't exist or we don't use it (eDP)
+			if ((gInfo->shared_info->device_type.Generation() <= 8) && (PortIndex() != INTEL_PORT_A)) {
+				FDILink* link = fPipe->FDI();
+				if (link != NULL)
+					link->Train(&target->timing);
+			}
+
+			// Program general pipe config
+			fPipe->Configure(target);
+
+			// Pll programming is not needed for (e)DP..
+
+			// Program target display mode
+			fPipe->ConfigureTimings(target);
+		} else {
+			TRACE("%s: Setting display mode via fallback: using scaling!\n", __func__);
+			// Keep monitor at native mode and scale image to that
+			fPipe->ConfigureScalePos(target);
 		}
-		pll_divisors divisors;
-		compute_pll_divisors(target, &divisors, false);
-
-		uint32 extraPLLFlags = 0;
-		if (gInfo->shared_info->device_type.Generation() >= 3)
-			extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL | DISPLAY_PLL_2X_CLOCK;
-
-		// Program general pipe config
-		fPipe->Configure(target);
-
-		// Program pipe PLL's
-		fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
-
-		// Program target display mode
-		fPipe->ConfigureTimings(target);
-#endif
-
-		// Keep monitor at native mode and scale image to that
-		fPipe->ConfigureScalePos(target);
 	}
 
 	// Set fCurrentMode to our set display mode
@@ -1533,9 +1638,9 @@ DigitalDisplayInterface::_SetPortLinkGen8(const display_timing& timing, uint32 p
 	if (((pipeFunc & PIPE_DDI_MODESEL_MASK) >> PIPE_DDI_MODESEL_SHIFT) >= PIPE_DDI_MODE_DP_SST) {
 		// On gen 9.5 IceLake 3x mode exists (DSI only), earlier models: reserved value.
 		lanes = ((pipeFunc & PIPE_DDI_DP_WIDTH_MASK) >> PIPE_DDI_DP_WIDTH_SHIFT) + 1;
-		TRACE("%s: DDI in DP mode with %" B_PRIx32 " lanes in use\n", __func__, lanes);
+		TRACE("%s: DDI in DP mode with %" B_PRIx32 " lane(s) in use\n", __func__, lanes);
 	} else {
-		TRACE("%s: DDI in non-DP mode with %" B_PRIx32 " lanes in use\n", __func__, lanes);
+		TRACE("%s: DDI in non-DP mode with %" B_PRIx32 " lane(s) in use\n", __func__, lanes);
 	}
 
 	//Setup Data M/N
