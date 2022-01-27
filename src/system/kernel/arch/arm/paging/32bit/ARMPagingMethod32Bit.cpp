@@ -364,6 +364,9 @@ ARMPagingMethod32Bit::CreateTranslationMap(bool kernel, VMTranslationMap** _map)
 static void
 get_free_pgtable(kernel_args* args, phys_addr_t* phys_addr, addr_t* virt_addr)
 {
+	if (args->arch_args.next_pagetable >= args->arch_args.last_pagetable)
+		panic("ran out of early page tables");
+
 	phys_addr_t phys = args->arch_args.phys_pgdir + args->arch_args.next_pagetable;
 	addr_t virt = args->arch_args.vir_pgdir + args->arch_args.next_pagetable;
 	args->arch_args.next_pagetable += ARM_MMU_L2_COARSE_TABLE_SIZE;

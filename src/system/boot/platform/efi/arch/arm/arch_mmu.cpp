@@ -346,6 +346,7 @@ arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
 	gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
 	gKernelArgs.arch_args.vir_pgdir = (uint32)virtPageDirectory;
 	gKernelArgs.arch_args.next_pagetable = (uint32)(sNextPageTable) - (uint32)sPageDirectory;
+	gKernelArgs.arch_args.last_pagetable = (uint32)(sLastPageTable) - (uint32)sPageDirectory;
 
 	TRACE("gKernelArgs.arch_args.phys_pgdir     = 0x%08x\n",
 		(uint32_t)gKernelArgs.arch_args.phys_pgdir);
@@ -353,6 +354,8 @@ arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
 		(uint32_t)gKernelArgs.arch_args.vir_pgdir);
 	TRACE("gKernelArgs.arch_args.next_pagetable = 0x%08x\n",
 		(uint32_t)gKernelArgs.arch_args.next_pagetable);
+	TRACE("gKernelArgs.arch_args.last_pagetable = 0x%08x\n",
+		(uint32_t)gKernelArgs.arch_args.last_pagetable);
 
 #ifdef TRACE_PAGE_DIRECTORY
 	dump_page_dir();
