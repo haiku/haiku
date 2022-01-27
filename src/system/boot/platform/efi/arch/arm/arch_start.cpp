@@ -11,6 +11,7 @@
 
 #include "efi_platform.h"
 #include "mmu.h"
+#include "smp.h"
 
 
 #define ALIGN_MEMORY_MAP	4
@@ -19,17 +20,18 @@
 extern "C" typedef void (*arch_enter_kernel_t)(uint32_t, addr_t, addr_t, addr_t);
 
 
+// From entry.S
 extern "C" void arch_enter_kernel(uint32_t ttbr, addr_t kernelArgs,
 	addr_t kernelEntry, addr_t kernelStackTop);
 
 // From arch_mmu.cpp
-extern void arch_mmu_post_efi_setup(size_t memory_map_size,
-	efi_memory_descriptor *memory_map, size_t descriptor_size,
-	uint32_t descriptor_version);
+extern void arch_mmu_post_efi_setup(size_t memoryMapSize,
+	efi_memory_descriptor *memoryMap, size_t descriptorSize,
+	uint32_t descriptorVersion);
 
-extern uint32_t arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
-	efi_memory_descriptor *memory_map, size_t descriptor_size,
-	uint32_t descriptor_version);
+extern uint32_t arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
+	efi_memory_descriptor *memoryMap, size_t descriptorSize,
+	uint32_t descriptorVersion);
 
 
 void
@@ -43,38 +45,38 @@ static const char*
 memory_region_type_str(int type)
 {
 	switch (type)	{
-	case EfiReservedMemoryType:
-		return "ReservedMemoryType";
-	case EfiLoaderCode:
-		return "LoaderCode";
-	case EfiLoaderData:
-		return "LoaderData";
-	case EfiBootServicesCode:
-		return "BootServicesCode";
-	case EfiBootServicesData:
-		return "BootServicesData";
-	case EfiRuntimeServicesCode:
-		return "RuntimeServicesCode";
-	case EfiRuntimeServicesData:
-		return "RuntimeServicesData";
-	case EfiConventionalMemory:
-		return "ConventionalMemory";
-	case EfiUnusableMemory:
-		return "UnusableMemory";
-	case EfiACPIReclaimMemory:
-		return "ACPIReclaimMemory";
-	case EfiACPIMemoryNVS:
-		return "ACPIMemoryNVS";
-	case EfiMemoryMappedIO:
-		return "MMIO";
-	case EfiMemoryMappedIOPortSpace:
-		return "MMIOPortSpace";
-	case EfiPalCode:
-		return "PalCode";
-	case EfiPersistentMemory:
-		return "PersistentMemory";
-	default:
-		return "unknown";
+		case EfiReservedMemoryType:
+			return "ReservedMemoryType";
+		case EfiLoaderCode:
+			return "LoaderCode";
+		case EfiLoaderData:
+			return "LoaderData";
+		case EfiBootServicesCode:
+			return "BootServicesCode";
+		case EfiBootServicesData:
+			return "BootServicesData";
+		case EfiRuntimeServicesCode:
+			return "RuntimeServicesCode";
+		case EfiRuntimeServicesData:
+			return "RuntimeServicesData";
+		case EfiConventionalMemory:
+			return "ConventionalMemory";
+		case EfiUnusableMemory:
+			return "UnusableMemory";
+		case EfiACPIReclaimMemory:
+			return "ACPIReclaimMemory";
+		case EfiACPIMemoryNVS:
+			return "ACPIMemoryNVS";
+		case EfiMemoryMappedIO:
+			return "MMIO";
+		case EfiMemoryMappedIOPortSpace:
+			return "MMIOPortSpace";
+		case EfiPalCode:
+			return "PalCode";
+		case EfiPersistentMemory:
+			return "PersistentMemory";
+		default:
+			return "unknown";
 	}
 }
 
@@ -129,44 +131,45 @@ arch_start_kernel(addr_t kernelEntry)
 	// Prepare to exit EFI boot services.
 	// Read the memory map.
 	// First call is to determine the buffer size.
-	size_t memory_map_size = 0;
+	size_t memoryMapSize = 0;
 	efi_memory_descriptor dummy;
-	efi_memory_descriptor *memory_map;
-	size_t map_key;
-	size_t descriptor_size;
-	uint32_t descriptor_version;
-	if (kBootServices->GetMemoryMap(&memory_map_size, &dummy, &map_key,
-			&descriptor_size, &descriptor_version) != EFI_BUFFER_TOO_SMALL) {
+	size_t mapKey;
+	size_t descriptorSize;
+	uint32_t descriptorVersion;
+	if (kBootServices->GetMemoryMap(&memoryMapSize, &dummy, &mapKey,
+			&descriptorSize, &descriptorVersion) != EFI_BUFFER_TOO_SMALL) {
 		panic("Unable to determine size of system memory map");
 	}
 
 	// Allocate a buffer twice as large as needed just in case it gets bigger
 	// between calls to ExitBootServices.
-	size_t actual_memory_map_size = memory_map_size * 2;
-	memory_map
-		= (efi_memory_descriptor *)kernel_args_malloc(actual_memory_map_size +
+	size_t actualMemoryMapSize = memoryMapSize * 2;
+	efi_memory_descriptor *memoryMap
+		= (efi_memory_descriptor *)kernel_args_malloc(actualMemoryMapSize +
 			ALIGN_MEMORY_MAP);
 
 	// align memory_map to 4-byte boundary
 	// otherwise we get alignment exception when calling GetMemoryMap below
-	memory_map = (efi_memory_descriptor *)ROUNDUP((uint32_t)memory_map, ALIGN_MEMORY_MAP);
+	memoryMap = (efi_memory_descriptor *)ROUNDUP((uint32_t)memoryMap, ALIGN_MEMORY_MAP);
 
-	if (memory_map == NULL)
+	if (memoryMap == NULL)
 		panic("Unable to allocate memory map.");
 
 	// Read (and print) the memory map.
-	memory_map_size = actual_memory_map_size;
-	if (kBootServices->GetMemoryMap(&memory_map_size, memory_map, &map_key,
-			&descriptor_size, &descriptor_version) != EFI_SUCCESS) {
+	memoryMapSize = actualMemoryMapSize;
+	if (kBootServices->GetMemoryMap(&memoryMapSize, memoryMap, &mapKey,
+			&descriptorSize, &descriptorVersion) != EFI_SUCCESS) {
 		panic("Unable to fetch system memory map.");
 	}
 
-	addr_t addr = (addr_t)memory_map;
+	addr_t addr = (addr_t)memoryMap;
 	dprintf("System provided memory map:\n");
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
+	for (size_t i = 0; i < memoryMapSize / descriptorSize; ++i) {
 		efi_memory_descriptor *entry
-			= (efi_memory_descriptor *)(addr + i * descriptor_size);
-		dprintf("  phys: 0x%08llx-0x%08llx, virt: 0x%08llx-0x%08llx, type: %s (%#x), attr: %#llx\n",
+			= (efi_memory_descriptor *)(addr + i * descriptorSize);
+		dprintf("  phys: 0x%08" PRIx64 "-0x%08" PRIx64
+			", virt: 0x%08" PRIx64 "-0x%08" PRIx64
+			", type: %s (%#x), attr: %#" PRIx64 "\n",
 			entry->PhysicalStart,
 			entry->PhysicalStart + entry->NumberOfPages * B_PAGE_SIZE,
 			entry->VirtualStart,
@@ -177,7 +180,7 @@ arch_start_kernel(addr_t kernelEntry)
 
 	// Generate page tables for use after ExitBootServices.
 	uint32_t final_ttbr0 = arch_mmu_generate_post_efi_page_tables(
-		memory_map_size, memory_map, descriptor_size, descriptor_version);
+		memoryMapSize, memoryMap, descriptorSize, descriptorVersion);
 
 	// Attempt to fetch the memory map and exit boot services.
 	// This needs to be done in a loop, as ExitBootServices can change the
@@ -191,7 +194,7 @@ arch_start_kernel(addr_t kernelEntry)
 	// entry.
 	dprintf("Calling ExitBootServices. So long, EFI!\n");
 	while (true) {
-		if (kBootServices->ExitBootServices(kImage, map_key) == EFI_SUCCESS) {
+		if (kBootServices->ExitBootServices(kImage, mapKey) == EFI_SUCCESS) {
 			// The console was provided by boot services, disable it.
 			stdout = NULL;
 			stderr = NULL;
@@ -200,23 +203,23 @@ arch_start_kernel(addr_t kernelEntry)
 			break;
 		}
 
-		memory_map_size = actual_memory_map_size;
-		if (kBootServices->GetMemoryMap(&memory_map_size, memory_map, &map_key,
-				&descriptor_size, &descriptor_version) != EFI_SUCCESS) {
+		memoryMapSize = actualMemoryMapSize;
+		if (kBootServices->GetMemoryMap(&memoryMapSize, memoryMap, &mapKey,
+				&descriptorSize, &descriptorVersion) != EFI_SUCCESS) {
 			panic("Unable to fetch system memory map.");
 		}
 	}
 
 	// Update EFI, generate final kernel physical memory map, etc.
-	arch_mmu_post_efi_setup(memory_map_size, memory_map,
-			descriptor_size, descriptor_version);
+	arch_mmu_post_efi_setup(memoryMapSize, memoryMap,
+		descriptorSize, descriptorVersion);
 
 	// Copy final kernel args
 	// This should be the last step before jumping to the kernel
 	// as there are some fixups happening to kernel_args even in the last minute
 	memcpy(kernelArgs, &gKernelArgs, sizeof(struct kernel_args));
 
-	//smp_boot_other_cpus(final_pml4, kernelEntry);
+	//smp_boot_other_cpus(final_ttbr0, kernelEntry);
 
 	// Enter the kernel!
 	dprintf("enter_kernel(ttbr0: 0x%08x, kernelArgs: 0x%08x, "
