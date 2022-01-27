@@ -158,7 +158,7 @@ ConditionVariableEntry::_RemoveFromVariable()
 		while (atomic_pointer_get(&fVariable) != NULL) {
 			tries++;
 			if ((tries % 10000) == 0)
-				dprintf("variable pointer was not unset for a long time!");
+				dprintf("variable pointer was not unset for a long time!\n");
 			cpu_pause();
 		}
 
