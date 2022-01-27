@@ -125,13 +125,6 @@ Userland
 
 Even if KDL hangman is fun, users will want to run real applications someday.
 
-Bootloader TODOs
-****************
-
-- Better handling of memory ranges. Currently no checks are done, and
-  memory is assumed to be a single contiguous range, and the "input"
-  ranges for mmu_init are setup, but never considered.
-
 Other resources
 ---------------
 
