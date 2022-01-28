@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2022 Haiku, Inc. All rights reserved.
  * Released under the terms of the MIT License.
  */
 
@@ -13,6 +13,13 @@
 
 extern "C" void arch_enter_kernel(struct kernel_args *kernelArgs,
 	addr_t kernelEntry, addr_t kernelStackTop);
+
+
+void
+arch_convert_kernel_args(void)
+{
+	// empty
+}
 
 
 void
