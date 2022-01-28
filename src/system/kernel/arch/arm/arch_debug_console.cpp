@@ -83,7 +83,12 @@ void
 arch_debug_serial_puts(const char *s)
 {
 	while (*s != '\0') {
-		arch_debug_serial_putchar(*s);
+		char ch = *s;
+		if (ch == '\n') {
+			arch_debug_serial_putchar('\r');
+			arch_debug_serial_putchar('\n');
+		} else if (ch != '\r')
+			arch_debug_serial_putchar(ch);
 		s++;
 	}
 }
