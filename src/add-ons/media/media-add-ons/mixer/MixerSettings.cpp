@@ -86,27 +86,6 @@ MixerSettings::SetAttenuateOutput(bool yesno)
 
 
 bool
-MixerSettings::NonLinearGainSlider()
-{
-	bool temp;
-	fLocker->Lock();
-	temp = fSettings.NonLinearGainSlider;
-	fLocker->Unlock();
-	return temp;
-}
-
-
-void
-MixerSettings::SetNonLinearGainSlider(bool yesno)
-{
-	fLocker->Lock();
-	fSettings.NonLinearGainSlider = yesno;
-	fLocker->Unlock();
-	StartDeferredSave();
-}
-
-
-bool
 MixerSettings::UseBalanceControl()
 {
 	bool temp;
@@ -418,7 +397,6 @@ MixerSettings::Load()
 	fLocker->Lock();
 	// setup defaults
 	fSettings.AttenuateOutput = true;
-	fSettings.NonLinearGainSlider = true;
 	fSettings.UseBalanceControl = false;
 	fSettings.AllowOutputChannelRemapping = false;
 	fSettings.AllowInputChannelRemapping = false;
