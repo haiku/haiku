@@ -27,7 +27,17 @@ FUNCTION(arch_enter_kernel):
 	// initialize stack
 	movl	%eax, %esp
 
-	// set page table
+	// ensure that Paging is disabled
+	movl	%cr0, %eax
+	andl	$0x7fffffff, %eax
+	movl	%eax, %cr0
+
+	// ensure that PAE is disabled
+	movl	%cr4, %eax
+	andl	$0xffffffdf, %eax
+	movl	%eax, %cr4
+
+	// set page directory
 	movl	%edx, %eax
 	movl	%eax, %cr3
 
