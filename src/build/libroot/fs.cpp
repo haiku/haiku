@@ -947,8 +947,10 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 			}
 
 			struct timespec times[2];
-			times[0] = (statMask & B_STAT_ACCESS_TIME) ? st->st_atim : oldStat.st_atim;
-			times[1] = (statMask & B_STAT_MODIFICATION_TIME) ? st->st_mtim : oldStat.st_mtim;
+			times[0] = (statMask & B_STAT_ACCESS_TIME)
+				? HAIKU_HOST_STAT_ATIM(*st) : HAIKU_HOST_STAT_ATIM(oldStat);
+			times[1] = (statMask & B_STAT_MODIFICATION_TIME)
+				? HAIKU_HOST_STAT_MTIM(*st) : HAIKU_HOST_STAT_MTIM(oldStat);
 			if (futimens(realFD, times) < 0)
 				return errno;
 		}
