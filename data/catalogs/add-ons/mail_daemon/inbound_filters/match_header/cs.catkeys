@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MatchHeader	631274947
+1	czech	x-vnd.Haiku-MatchHeader	2950227343
 Delete message	ConfigView		Smazat zprávu
 Set flags to	ConfigView		Nastavit příznaky na
 <Choose account>	ConfigView		<Zvolte účet>
@@ -6,6 +6,7 @@ Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular 
 Then	ConfigView		Pak
 If	ConfigView		Jestliže
 Set as read	ConfigView		Nastavit jako přečtené
+Header field (e.g. Subject, From, 			Hlavička (např. Předmět, od, 
 Reply with	ConfigView		Odpovědět pomocí
 <Choose action>	ConfigView		<Zvolte akci>
 Move to	ConfigView		Přesunout do

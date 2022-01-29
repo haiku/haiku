@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku.TextSearch	2003518937
+1	czech	x-vnd.Haiku.TextSearch	2679411567
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Prosím vyberte soubory, které si přejete mít vybrány v Trackeru.
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		Otevřít výběr
@@ -8,6 +8,7 @@ Encoding	GrepWindow		Kódování
 Set target to parent folder	GrepWindow		Nastavit cíl na nadřazený adresář
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
+Set target			Zvolit cíl
 Close	GrepWindow		Zavřít
 Look in sub-folders	GrepWindow		Dívat se do podsložek
 Follow symbolic links	GrepWindow		Následovat symbolické linky

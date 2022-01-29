@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-ActivityMonitor	1330427574
+1	czech	x-vnd.Haiku-ActivityMonitor	3850445261
 Teams	DataSource		Týmy
 Semaphores	DataSource		Semafory
 TX	DataSource	Shorter version for Sending	TX
@@ -18,11 +18,13 @@ CPU %d	DataSource		CPU %d
 RX	DataSource	Shorter version for Receiving.	RX
 Block cache	DataSource		Bloková vyrovnávací paměť
 Memory	DataSource		Paměť
+CPU speed	DataSource		rychlost CPU
 CPU usage	DataSource		Využití CPU
 Raw clipboard	DataSource		Schránka bez formátu
 Used memory	DataSource		Využitá paměť
 %.1f faults/s	DataSource		%.1f chyb/s
 Cached memory	DataSource		Vyrovnávací paměť
+CPU %d speed	DataSource		rychlost CPU %d
 CPU %d usage	DataSource		Využití CPU %d
 Ports	DataSource		Porty
 Page faults	DataSource		Chyby stránkování

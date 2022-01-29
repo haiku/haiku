@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-libtracker	2769460200
+1	czech	x-vnd.Haiku-libtracker	2811852231
 ?+* follows nothing.	libtracker		?+* po ničem.
 Disk mount	TrackerSettingsWindow		Připojení disků
 Corrupted opcode.	libtracker		Poškozený operační kód.
@@ -19,6 +19,7 @@ Memory corruption.	libtracker		Poškození paměti.
 Invert selection	QueryContainerWindow		Invertovat výběr
 Expression too long.	libtracker		Výraz je příliš dlouhý.
 Windows	TrackerSettingsWindow		Okna
+Select			Vybrat
 Invalid bracket range.	libtracker		Nesprávný rozsah závorek.
 Unmatched parenthesis.	libtracker		Nepárové závorky.
 Too many parenthesis.	libtracker		Příliš mnoho závorek.
