@@ -4,12 +4,12 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-// Relocatable. Before calling, smp_trampoline_args should point
-// to a struct trampoline_args (see smp.cpp). This pointer should
+// Relocatable. Before calling, long_smp_trampoline_args should point
+// to a struct long_trampoline_args (see smp.cpp). This pointer should
 // be 16-byte aligned, below 1MB and identity-mapped.
-.globl smp_trampoline
-.globl smp_trampoline_end
-.globl smp_trampoline_args
+.globl long_smp_trampoline
+.globl long_smp_trampoline_end
+.globl long_smp_trampoline_args
 
 #include <asm_defs.h>
 
@@ -17,13 +17,13 @@
 #include "mmu.h"
 
 .code16
-smp_trampoline:
+long_smp_trampoline:
 	cli
 
 //  movl 0xdeadbeef, esi
 	.byte 0x66
 	.byte 0xbe
-smp_trampoline_args:
+long_smp_trampoline_args:
 	.long 0xdeadbeef
 
 	// Load the trampoline args into ss.
@@ -42,13 +42,13 @@ smp_trampoline_args:
 	movl   %eax,%cr0
 
 	pushl  $8
-	leal  (trampoline_32 - smp_trampoline)(%ebx), %eax
+	leal  (long_trampoline_32 - long_smp_trampoline)(%ebx), %eax
 	pushl  %eax
 	.byte 0x66
 .code32
 	lret
 
-trampoline_32:
+long_trampoline_32:
 	mov    $0x10, %ax
 	mov    %ax, %ds
 	mov    %ax, %es
@@ -86,7 +86,7 @@ trampoline_32:
 
 	// Jump into the 64-bit code segment.
 	pushl	$KERNEL_CODE_SELECTOR
-	leal	(.Llmode - smp_trampoline)(%ebx), %eax
+	leal	(.Llmode - long_smp_trampoline)(%ebx), %eax
 	pushl	%eax
 	lret
 .align 8
@@ -126,4 +126,4 @@ trampoline_32:
 
 	// Call the entry point.
 	call	*%rax
-smp_trampoline_end:
+long_smp_trampoline_end:

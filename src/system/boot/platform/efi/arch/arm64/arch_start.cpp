@@ -218,7 +218,7 @@ arch_start_kernel(addr_t kernelEntry)
 		arch_cache_enable();
 	}
 
-	//smp_boot_other_cpus(final_pml4, kernelEntry);
+	//smp_boot_other_cpus(final_pml4, kernelEntry, (addr_t)&gKernelArgs);
 
 	if (arch_mmu_read_access(kernelEntry) && arch_mmu_read_access(gKernelArgs.cpu_kstack[0].start)) {
 		// Enter the kernel!

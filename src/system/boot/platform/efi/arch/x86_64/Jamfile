@@ -18,11 +18,12 @@ for platform in [ MultiBootSubDirSetup efi ] {
 	local arch_src =
 		crt0-efi-$(TARGET_ARCH).S
 		entry.S
-		smp_trampoline.S
+		long_smp_trampoline.S
 		support.S
 		relocation_func.cpp
 		arch_start.cpp
 		arch_smp.cpp
+		arch_smp_64.cpp
 		arch_mmu.cpp
 		arch_timer.cpp
 		;
@@ -30,5 +31,8 @@ for platform in [ MultiBootSubDirSetup efi ] {
 	BootMergeObject boot_platform_efi_x86_64.o :
 		$(arch_src)
 		;
+
+	SEARCH on [ FGristFiles arch_smp.cpp ]
+		= [ FDirName $(HAIKU_TOP) src system boot platform efi arch x86 ] ;
 	}
 }

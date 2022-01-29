@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2022 Haiku, Inc. All rights reserved.
  * Released under the terms of the MIT License.
  */
 
@@ -147,7 +147,7 @@ arch_start_kernel(addr_t kernelEntry)
 	FlushTlbAll();
 	dprintf("[POST] FlushTlbAll()\n");
 
-	smp_boot_other_cpus(satp, kernelEntry);
+	smp_boot_other_cpus(satp, kernelEntry, (addr_t)&gKernelArgs);
 
 	// Enter the kernel!
 	dprintf("arch_enter_kernel(satp: %#" B_PRIxADDR ", kernelArgs: %#" B_PRIxADDR
