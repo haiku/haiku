@@ -250,7 +250,7 @@ FDILink::FDILink(pipe_index pipeIndex)
 
 
 status_t
-FDILink::Train(display_timing* target)
+FDILink::Train(display_timing* target) // fixme: seperate FDI training and PIPE M/N programming..
 {
 	CALLED();
 
@@ -282,6 +282,7 @@ FDILink::Train(display_timing* target)
 	TRACE("%s: FDI Link Colordepth: %" B_PRIu32 "\n", __func__, bitsPerPixel);
 
 	// Khz / 10. ( each output octet encoded as 10 bits.
+	// note: if used for eDP (PORT_A) might be we should check reg. DP_CTL (0x64000), bit 16-17 (Ivy).
 	uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10;
 	//Reserving 5% bandwidth for possible spread spectrum clock use
 	uint32 bps = target->pixel_clock * bitsPerPixel * 21 / 20;

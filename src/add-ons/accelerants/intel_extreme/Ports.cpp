@@ -1301,18 +1301,56 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		fPipe->ConfigureTimings(target);
 		result = _SetPortLinkGen4(target->timing);
 	} else {
-		result = _SetPortLinkGen6(target->timing);
+		display_timing hardwareTarget = target->timing;
+		bool needsScaling = false;
+		if ((PortIndex() == INTEL_PORT_A) && gInfo->shared_info->device_type.IsMobile()) {
+			// For internal panels, we may need to set the timings according to the panel
+			// native video mode, and let the panel fitter do the scaling.
+			// note: upto/including generation 5 laptop panels are still LVDS types, handled elsewhere.
+
+			if (gInfo->shared_info->got_vbt) {
+				// Set vbios hardware panel mode as base
+				hardwareTarget = gInfo->shared_info->panel_timing;
+
+				if (hardwareTarget.h_display == target->timing.h_display
+						&& hardwareTarget.v_display == target->timing.v_display) {
+					// We are setting the native video mode, nothing special to do
+					// Note: this means refresh and timing might vary according to requested mode.
+					hardwareTarget = target->timing;
+					TRACE("%s: Setting internal panel to native resolution at %" B_PRIu32 "Hz\n", __func__,
+						hardwareTarget.pixel_clock * 1000 / (hardwareTarget.h_total * hardwareTarget.v_total));
+				} else {
+					// We need to enable the panel fitter
+					TRACE("%s: Hardware mode will actually be %dx%d at %" B_PRIu32 "Hz\n", __func__,
+						hardwareTarget.h_display, hardwareTarget.v_display,
+						hardwareTarget.pixel_clock * 1000 / (hardwareTarget.h_total * hardwareTarget.v_total));
+
+					// FIXME we should also get the refresh frequency from the target
+					// mode, and then "sanitize" the resulting mode we made up.
+					needsScaling = true;
+				}
+			} else {
+				TRACE("%s: Setting internal panel mode without VBT info generation, scaling may not work\n",
+					__func__);
+				// We don't have VBT data, try to set the requested mode directly
+				// and hope for the best
+				hardwareTarget = target->timing;
+			}
+		}
+
+		result = B_OK;
+		if (PortIndex() != INTEL_PORT_A)
+			result = _SetPortLinkGen6(hardwareTarget);
+
 		if (result == B_OK) {
 			// Setup PanelFitter and Train FDI if it exists
 			PanelFitter* fitter = fPipe->PFT();
 			if (fitter != NULL)
-				fitter->Enable(target->timing);
-			// skip FDI if it doesn't exist or we don't use it (eDP)
-			if ((gInfo->shared_info->device_type.Generation() <= 8) && (PortIndex() != INTEL_PORT_A)) {
-				FDILink* link = fPipe->FDI();
-				if (link != NULL)
-					link->Train(&target->timing);
-			}
+				fitter->Enable(hardwareTarget);
+			// we should skip FDI if PORT_A, but need pipe M/N programming (is eDP link), so call always for now
+			FDILink* link = fPipe->FDI();
+			if (link != NULL)
+				link->Train(&target->timing);
 
 			// Program general pipe config
 			fPipe->Configure(target);
@@ -1320,7 +1358,7 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 			// Pll programming is not needed for (e)DP..
 
 			// Program target display mode
-			fPipe->ConfigureTimings(target);
+			fPipe->ConfigureTimings(target, !needsScaling);
 		} else {
 			TRACE("%s: Setting display mode via fallback: using scaling!\n", __func__);
 			// Keep monitor at native mode and scale image to that

@@ -1248,7 +1248,7 @@ struct intel_free_graphics_memory {
 #define FDI_LINK_TRAIN_PRE_EMPHASIS_2X		(2 << 22)
 #define FDI_LINK_TRAIN_PRE_EMPHASIS_3X		(3 << 22)
 
-//FDI PIPE M/N DATA AND LINK VALUES (refreshrate)
+//(FDI) PIPE M/N DATA AND LINK VALUES (refreshrate)
 #define PCH_FDI_PIPE_A_DATA_M1				0x0030
 #define PCH_FDI_PIPE_A_DATA_M2				0x0038
 #define PCH_FDI_PIPE_B_DATA_M1				0x1030

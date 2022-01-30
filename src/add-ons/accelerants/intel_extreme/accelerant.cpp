@@ -306,6 +306,8 @@ probe_ports()
 		}
 	}
 
+#if 0
+	// never execute this as the 'standard' DisplayPort class called above already handles it.
 	if (!gInfo->shared_info->device_type.HasDDI()) {
 		// Ensure DP_A isn't already taken
 		TRACE("Probing eDP\n");
@@ -320,6 +322,7 @@ probe_ports()
 				delete eDPPort;
 		}
 	}
+#endif
 
 	if (!gInfo->shared_info->device_type.HasDDI()) {
 		for (int i = INTEL_PORT_B; i <= INTEL_PORT_D; i++) {
