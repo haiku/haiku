@@ -155,10 +155,17 @@ public:
 		}
 	}
 
-	inline void Detach()
+	inline Lockable* Get()
 	{
+		return fLockable;
+	}
+
+	inline Lockable* Detach()
+	{
+		Lockable* res = fLockable;
 		fLockable = NULL;
 		fLocked = false;
+		return res;
 	}
 
 	inline AutoLocker<Lockable, Locking>& operator=(Lockable* lockable)
