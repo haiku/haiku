@@ -17,6 +17,8 @@
 #include <util/OpenHashTable.h>
 
 
+struct mutex;
+struct recursive_lock;
 struct ConditionVariable;
 
 
@@ -72,6 +74,9 @@ public:
 			status_t			Wait(uint32 flags = 0, bigtime_t timeout = 0);
 									// all-in one, i.e. doesn't need a
 									// ConditionVariableEntry
+			status_t			Wait(mutex* lock, uint32 flags = 0, bigtime_t timeout = 0);
+			status_t			Wait(recursive_lock* lock, uint32 flags = 0, bigtime_t timeout = 0);
+			status_t			Wait(spinlock* lock, uint32 flags = 0, bigtime_t timeout = 0);
 
 			const void*			Object() const		{ return fObject; }
 			const char*			ObjectType() const	{ return fObjectType; }

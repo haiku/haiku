@@ -333,6 +333,49 @@ ConditionVariable::Wait(uint32 flags, bigtime_t timeout)
 }
 
 
+status_t
+ConditionVariable::Wait(mutex* lock, uint32 flags, bigtime_t timeout)
+{
+	ConditionVariableEntry entry;
+	Add(&entry);
+	mutex_unlock(lock);
+	status_t res = entry.Wait(flags, timeout);
+	mutex_lock(lock);
+	return res;
+}
+
+
+status_t
+ConditionVariable::Wait(recursive_lock* lock, uint32 flags, bigtime_t timeout)
+{
+	ConditionVariableEntry entry;
+	Add(&entry);
+	int32 recursion = recursive_lock_get_recursion(lock);
+
+	for (int32 i = 0; i < recursion; i++)
+		recursive_lock_unlock(lock);
+
+	status_t res = entry.Wait(flags, timeout);
+
+	for (int32 i = 0; i < recursion; i++)
+		recursive_lock_lock(lock);
+
+	return res;
+}
+
+
+status_t
+ConditionVariable::Wait(spinlock* lock, uint32 flags, bigtime_t timeout)
+{
+	ConditionVariableEntry entry;
+	Add(&entry);
+	release_spinlock(lock);
+	status_t res = entry.Wait(flags, timeout);
+	acquire_spinlock(lock);
+	return res;
+}
+
+
 /*static*/ void
 ConditionVariable::NotifyOne(const void* object, status_t result)
 {
