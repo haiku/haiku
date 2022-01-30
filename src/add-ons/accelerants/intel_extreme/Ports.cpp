@@ -538,8 +538,11 @@ LVDSPort::IsConnected()
 				TRACE("LVDS: Using VESA edid info\n");
 				memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,
 					sizeof(edid1_info));
-				fEDIDState = B_OK;
-				// HasEDID now true
+				if (fEDIDState != B_OK) {
+					fEDIDState = B_OK;
+					// HasEDID now true
+					edid_dump(&fEDIDInfo);
+				}
 			} else if (gInfo->shared_info->got_vbt) {
 				TRACE("LVDS: No EDID, but force enabled as we have a VBT\n");
 				return true;
@@ -1030,9 +1033,28 @@ DisplayPort::IsConnected()
 		return false;
 	}
 
+	TRACE("%s: %s link detected\n", __func__, PortName());
+
+	// On laptops we always have an internal panel.. (this is on the eDP port)
+	if (gInfo->shared_info->device_type.IsMobile() && (PortIndex() == INTEL_PORT_A)) {
+		if (gInfo->shared_info->has_vesa_edid_info) {
+			TRACE("%s: Laptop. Using VESA edid info\n", __func__);
+			memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,
+				sizeof(edid1_info));
+			if (fEDIDState != B_OK) {
+				fEDIDState = B_OK;
+				// HasEDID now true
+				edid_dump(&fEDIDInfo);
+			}
+			return true;
+		} else if (gInfo->shared_info->got_vbt) {
+			TRACE("%s: Laptop. No EDID, but force enabled as we have a VBT\n", __func__);
+			return true;
+		}
+	}
+
 	//since EDID is not correctly implemented yet for this connection type we'll do without it for now
 	//return HasEDID();
-	TRACE("%s: %s link detected\n", __func__, PortName());
 	return true;
 }
 
@@ -1578,8 +1600,11 @@ DigitalDisplayInterface::IsConnected()
 			TRACE("%s: Laptop. Using VESA edid info\n", __func__);
 			memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,
 				sizeof(edid1_info));
-			fEDIDState = B_OK;
-			// HasEDID now true
+			if (fEDIDState != B_OK) {
+				fEDIDState = B_OK;
+				// HasEDID now true
+				edid_dump(&fEDIDInfo);
+			}
 			return true;
 		} else if (gInfo->shared_info->got_vbt) {
 			TRACE("%s: Laptop. No EDID, but force enabled as we have a VBT\n", __func__);
