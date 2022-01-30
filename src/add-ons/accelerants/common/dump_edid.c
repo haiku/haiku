@@ -29,7 +29,7 @@ edid_dump(edid1_info *edid)
 
 	dprintf("  Type: %s\n", edid->display.input_type != 0 ? "Digital" : "Analog");
 	if (edid->display.input_type != 0)
-		dprintf("  Digtial Bit Depth: %d\n", edid->display.digital_params.bit_depth);
+		dprintf("  Digital Bit Depth: %d\n", edid->display.digital_params.bit_depth);
 	dprintf("  Size: %d cm x %d cm\n", edid->display.h_size,
 		edid->display.v_size);
 	dprintf("  Gamma=%.3f\n", (edid->display.gamma + 100) / 100.0);
