@@ -363,7 +363,7 @@ DrawingEngine::SetBlendingMode(source_alpha srcAlpha, alpha_function alphaFunc)
 void
 DrawingEngine::SetPattern(const struct pattern& pattern)
 {
-	fPainter->SetPattern(pattern, false);
+	fPainter->SetPattern(pattern);
 }
 
 

@@ -131,10 +131,6 @@ class PatternHandler {
 
 			void				SetOffsets(int32 x, int32 y);
 
-			void				MakeOpCopyColorCache();
-	inline	const rgb_color*	OpCopyColorCache() const
-									{ return fOpCopyColorCache; }
-
  private:
 			Pattern				fPattern;
 			rgb_color			fHighColor;
@@ -142,9 +138,6 @@ class PatternHandler {
 
 			uint16				fXOffset;
 			uint16				fYOffset;
-
-			rgb_color			fOpCopyColorCache[256];
-			uint64				fColorsWhenCached;
 };
 
 /*!

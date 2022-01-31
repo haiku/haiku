@@ -89,8 +89,7 @@ public:
 			void				SetStrokeMode(cap_mode lineCap,
 									join_mode joinMode, float miterLimit);
 			void				SetFillRule(int32 fillRule);
-			void				SetPattern(const pattern& p,
-									bool drawingText = false);
+			void				SetPattern(const pattern& p);
 	inline	pattern				Pattern() const
 									{ return *fPatternHandler.GetR5Pattern(); }
 			void				SetDrawingMode(drawing_mode mode);
@@ -266,7 +265,7 @@ private:
 
 			void				_UpdateFont() const;
 			void				_UpdateLineWidth();
-			void				_UpdateDrawingMode(bool drawingText = false);
+			void				_UpdateDrawingMode();
 			void				_SetRendererColor(const rgb_color& color) const;
 
 								// drawing functions stroke/fill
@@ -337,7 +336,6 @@ private:
 	// for internal coordinate rounding/transformation
 			bool				fSubpixelPrecise : 1;
 			bool				fValidClipping : 1;
-			bool				fDrawingText : 1;
 			bool				fAttached : 1;
 			bool				fIdentityTransform : 1;
 
