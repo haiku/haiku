@@ -203,6 +203,15 @@ create_mode_list(void)
 		if (status == B_OK)
 			gInfo->has_edid = true;
 	}
+	// use EDID found at boot time if there since we don't have any ourselves
+	if (!gInfo->has_edid && gInfo->shared_info->has_vesa_edid_info) {
+		TRACE("%s: Using VESA edid info\n", __func__);
+		memcpy(&gInfo->edid_info, &gInfo->shared_info->vesa_edid_info,
+			sizeof(edid1_info));
+		// show in log what we got
+		edid_dump(&gInfo->edid_info);
+		gInfo->has_edid = true;
+	}
 
 	display_mode* list;
 	uint32 count = 0;

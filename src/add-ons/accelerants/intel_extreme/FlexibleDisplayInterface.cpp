@@ -330,6 +330,11 @@ FDILink::Train(display_timing* target) // fixme: seperate FDI training and PIPE 
 	Receiver().DisablePLL();
 #endif
 
+	TRACE("%s: FDI M1 data before: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_DATA_M1));
+	TRACE("%s: FDI N1 data before: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_DATA_N1));
+	TRACE("%s: FDI M1 link before: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_LINK_M1));
+	TRACE("%s: FDI N1 link before: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_LINK_N1));
+
 	//Setup Data M/N
 	uint64 linkspeed = lanes * linkBandwidth * 8;
 	uint64 ret_n = 1;
@@ -366,10 +371,10 @@ FDILink::Train(display_timing* target) // fixme: seperate FDI training and PIPE 
 	//Writing Link N triggers all four registers to be activated also (on next VBlank)
 	write32(Transmitter().Base() + PCH_FDI_PIPE_A_LINK_N1, ret_n);
 
-	TRACE("%s: FDI data M1: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_DATA_M1));
-	TRACE("%s: FDI data N1: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_DATA_N1));
-	TRACE("%s: FDI link M1: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_LINK_M1));
-	TRACE("%s: FDI link N1: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_LINK_N1));
+	TRACE("%s: FDI M1 data after: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_DATA_M1));
+	TRACE("%s: FDI N1 data after: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_DATA_N1));
+	TRACE("%s: FDI M1 link after: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_LINK_M1));
+	TRACE("%s: FDI N1 link after: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_LINK_N1));
 
 	//Set receiving end TU size bits to match sending end's setting
 	write32(Receiver().Base() + PCH_FDI_RX_TRANS_UNIT_SIZE_1, FDI_RX_TRANS_UNIT_MASK);
