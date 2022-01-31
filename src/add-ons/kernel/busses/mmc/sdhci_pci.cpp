@@ -104,7 +104,9 @@ SdhciBus::SdhciBus(struct registers* registers, uint8_t irq)
 	}
 
 	fSemaphore = create_sem(0, "SDHCI interrupts");
-	
+
+	DisableInterrupts();
+
 	fStatus = install_io_interrupt_handler(fIrq,
 		sdhci_generic_interrupt, this, 0);
 
@@ -200,7 +202,7 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 
 	uint32_t replyType;
 
-	switch(command) {
+	switch (command) {
 		case SD_GO_IDLE_STATE:
 			replyType = Command::kNoReplyType;
 			break;
@@ -338,7 +340,8 @@ SdhciBus::InitCheck()
 void
 SdhciBus::Reset()
 {
-	fRegisters->software_reset.ResetAll();
+	if (!fRegisters->software_reset.ResetAll())
+		ERROR("SdhciBus::Reset: SoftwareReset timeout\n");
 }
 
 
@@ -392,7 +395,7 @@ SdhciBus::DoIO(uint8_t command, IOOperation* operation, bool offsetAsSectors)
 	off_t offset = operation->Offset();
 	generic_size_t length = operation->Length();
 
-	TRACE("%s %"B_PRIu64 " bytes at %" B_PRIdOFF "\n",
+	TRACE("%s %" B_PRIu64 " bytes at %" B_PRIdOFF "\n",
 		isWrite ? "Write" : "Read", length, offset);
 
 	// Check that the IO scheduler did its job in following our DMA restrictions
@@ -675,14 +678,29 @@ init_bus(device_node* node, void** bus_cookie)
 	pci_info pciInfo;
 	pci->get_pci_info(device, &pciInfo);
 
-	if (pciInfo.u.h0.base_register_sizes[bar] == 0) {
+	for (; bar < 6 && slot > 0; bar++, slot--) {
+		if ((pciInfo.u.h0.base_register_flags[bar] & PCI_address_type)
+			== PCI_address_type_64) {
+			bar++;
+		}
+	}
+
+	phys_addr_t physicalAddress = pciInfo.u.h0.base_registers[bar];
+	uint64 barSize = pciInfo.u.h0.base_register_sizes[bar];
+	if ((pciInfo.u.h0.base_register_flags[bar] & PCI_address_type)
+			== PCI_address_type_64) {
+		physicalAddress |= (uint64)pciInfo.u.h0.base_registers[bar + 1] << 32;
+		barSize |= (uint64)pciInfo.u.h0.base_register_sizes[bar + 1] << 32;
+	}
+
+	if (physicalAddress == 0 || barSize == 0) {
 		ERROR("No registers to map\n");
 		return B_IO_ERROR;
 	}
 
 	int msiCount = sPCIx86Module->get_msi_count(pciInfo.bus,
 		pciInfo.device, pciInfo.function);
-	TRACE("interrupts count: %d\n",msiCount);
+	TRACE("interrupts count: %d\n", msiCount);
 	// FIXME if available, use MSI rather than good old IRQ...
 
 	// enable bus master and io
@@ -695,8 +713,7 @@ init_bus(device_node* node, void** bus_cookie)
 	area_id	regs_area;
 	struct registers* _regs;
 	regs_area = map_physical_memory("sdhc_regs_map",
-		pciInfo.u.h0.base_registers[bar],
-		pciInfo.u.h0.base_register_sizes[bar], B_ANY_KERNEL_BLOCK_ADDRESS,
+		physicalAddress, barSize, B_ANY_KERNEL_BLOCK_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&_regs);
 
 	if (regs_area < B_OK) {
@@ -763,22 +780,23 @@ register_child_devices(void* cookie)
 	device_node* parent = gDeviceManager->get_parent_node(context->fNode);
 	pci_device_module_info* pci;
 	pci_device* device;
-	uint8 slots_count, bar, slotsInfo;
 
 	gDeviceManager->get_driver(parent, (driver_module_info**)&pci,
 		(void**)&device);
-	slotsInfo = pci->read_pci_config(device, SDHCI_PCI_SLOT_INFO, 1);
-	bar = SDHCI_PCI_SLOT_INFO_FIRST_BASE_INDEX(slotsInfo);
-	slots_count = SDHCI_PCI_SLOTS(slotsInfo);
+	uint8 slotsInfo = pci->read_pci_config(device, SDHCI_PCI_SLOT_INFO, 1);
+	uint8 bar = SDHCI_PCI_SLOT_INFO_FIRST_BASE_INDEX(slotsInfo);
+	uint8 slotsCount = SDHCI_PCI_SLOTS(slotsInfo);
+
+	TRACE("register_child_devices: %u, %u\n", bar, slotsCount);
 
 	char prettyName[25];
 
-	if (slots_count > 6 || bar > 5) {
-		ERROR("Invalid slots count: %d or BAR count: %d \n", slots_count, bar);
+	if (slotsCount > 6 || bar > 5) {
+		ERROR("Invalid slots count: %d or BAR count: %d \n", slotsCount, bar);
 		return B_BAD_VALUE;
 	}
 
-	for (uint8_t slot = 0; slot <= slots_count; slot++) {
+	for (uint8_t slot = 0; slot < slotsCount; slot++) {
 		sprintf(prettyName, "SDHC bus %" B_PRIu8, slot);
 		device_attr attrs[] = {
 			// properties of this controller for mmc bus manager
@@ -799,7 +817,7 @@ register_child_devices(void* cookie)
 
 			// private data to identify device
 			{ SLOT_NUMBER, B_UINT8_TYPE, { ui8: slot} },
-			{ BAR_INDEX, B_UINT8_TYPE, { ui8: bar + slot} },
+			{ BAR_INDEX, B_UINT8_TYPE, { ui8: bar} },
 			{ NULL }
 		};
 		device_node* node;
