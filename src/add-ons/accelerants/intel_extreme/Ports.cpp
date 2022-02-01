@@ -416,9 +416,14 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (fitter != NULL)
 		fitter->Enable(target->timing);
 	FDILink* link = fPipe->FDI();
-	if (link != NULL)
-		link->Train(&target->timing);
-
+	if (link != NULL) {
+		uint32 lanes = 0;
+		uint32 linkBandwidth = 0;
+		uint32 bitsPerPixel = 0;
+		link->PreTrain(&target->timing, &linkBandwidth, &lanes, &bitsPerPixel);
+		fPipe->SetFDILink(target->timing, linkBandwidth, lanes, bitsPerPixel);
+		link->Train(&target->timing, lanes);
+	}
 	pll_divisors divisors;
 	compute_pll_divisors(&target->timing, &divisors, false);
 
@@ -656,8 +661,14 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (fitter != NULL)
 		fitter->Enable(hardwareTarget);
 	FDILink* link = fPipe->FDI();
-	if (link != NULL)
-		link->Train(&hardwareTarget);
+	if (link != NULL) {
+		uint32 lanes = 0;
+		uint32 linkBandwidth = 0;
+		uint32 bitsPerPixel = 0;
+		link->PreTrain(&hardwareTarget, &linkBandwidth, &lanes, &bitsPerPixel);
+		fPipe->SetFDILink(hardwareTarget, linkBandwidth, lanes, bitsPerPixel);
+		link->Train(&hardwareTarget, lanes);
+	}
 
 	pll_divisors divisors;
 	compute_pll_divisors(&hardwareTarget, &divisors, true);
@@ -853,8 +864,14 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (fitter != NULL)
 		fitter->Enable(target->timing);
 	FDILink* link = fPipe->FDI();
-	if (link != NULL)
-		link->Train(&target->timing);
+	if (link != NULL) {
+		uint32 lanes = 0;
+		uint32 linkBandwidth = 0;
+		uint32 bitsPerPixel = 0;
+		link->PreTrain(&target->timing, &linkBandwidth, &lanes, &bitsPerPixel);
+		fPipe->SetFDILink(target->timing, linkBandwidth, lanes, bitsPerPixel);
+		link->Train(&target->timing, lanes);
+	}
 
 	pll_divisors divisors;
 	compute_pll_divisors(&target->timing, &divisors, false);
@@ -1371,8 +1388,14 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 				fitter->Enable(hardwareTarget);
 			// we should skip FDI if PORT_A, but need pipe M/N programming (is eDP link), so call always for now
 			FDILink* link = fPipe->FDI();
-			if (link != NULL)
-				link->Train(&target->timing);
+			if (link != NULL) {
+				uint32 lanes = 0;
+				uint32 linkBandwidth = 0;
+				uint32 bitsPerPixel = 0;
+				link->PreTrain(&hardwareTarget, &linkBandwidth, &lanes, &bitsPerPixel);
+				fPipe->SetFDILink(hardwareTarget, linkBandwidth, lanes, bitsPerPixel);
+				link->Train(&hardwareTarget, lanes);
+			}
 
 			// Program general pipe config
 			fPipe->Configure(target);

@@ -40,6 +40,11 @@ public:
 		void						Disable();
 
 		void						Configure(display_mode* mode);
+		status_t					SetFDILink(
+										const display_timing& timing,
+										uint32 linkBandwidth,
+										uint32 lanes,
+										uint32 bitsPerPixel);
 		void						ConfigureScalePos(display_mode* mode);
 		void						ConfigureTimings(display_mode* mode,
 										bool hardware = true);

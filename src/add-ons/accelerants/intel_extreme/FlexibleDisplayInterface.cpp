@@ -250,60 +250,56 @@ FDILink::FDILink(pipe_index pipeIndex)
 
 
 status_t
-FDILink::Train(display_timing* target) // fixme: seperate FDI training and PIPE M/N programming..
+FDILink::PreTrain(display_timing* target, uint32* linkBandwidth, uint32* lanes, uint32* bitsPerPixel)
 {
 	CALLED();
-
-	status_t result = B_OK;
 
 	uint32 txControl = Transmitter().Base() + PCH_FDI_TX_CONTROL;
 	uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
 
 	//Link bit depth: this should be globally known per FDI link (i.e. laptop panel 3x6, rest 3x8)
-	uint32 bitsPerPixel = ((read32(rxControl) & FDI_RX_LINK_BPC_MASK) >> FDI_RX_LINK_COLOR_SHIFT);
-	switch (bitsPerPixel) {
+	*bitsPerPixel = ((read32(rxControl) & FDI_RX_LINK_BPC_MASK) >> FDI_RX_LINK_COLOR_SHIFT);
+	switch (*bitsPerPixel) {
 		case INTEL_PIPE_8BPC:
-			bitsPerPixel = 24;
+			*bitsPerPixel = 24;
 			break;
 		case INTEL_PIPE_10BPC:
-			bitsPerPixel = 30;
+			*bitsPerPixel = 30;
 			break;
 		case INTEL_PIPE_6BPC:
-			bitsPerPixel = 18;
+			*bitsPerPixel = 18;
 			break;
 		case INTEL_PIPE_12BPC:
-			bitsPerPixel = 36;
+			*bitsPerPixel = 36;
 			break;
 		default:
+			*bitsPerPixel = 0;
 			ERROR("%s: FDI illegal link colordepth set.\n", __func__);
 			return B_ERROR;
 	}
 	TRACE("%s: FDI Link %s:\n", __func__, (fPipeIndex == INTEL_PIPE_A) ? "A" : "B");
-	TRACE("%s: FDI Link Colordepth: %" B_PRIu32 "\n", __func__, bitsPerPixel);
+	TRACE("%s: FDI Link Colordepth: %" B_PRIu32 "\n", __func__, *bitsPerPixel);
 
 	// Khz / 10. ( each output octet encoded as 10 bits.
 	// note: if used for eDP (PORT_A) might be we should check reg. DP_CTL (0x64000), bit 16-17 (Ivy).
-	uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10;
+	*linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10;
 	//Reserving 5% bandwidth for possible spread spectrum clock use
-	uint32 bps = target->pixel_clock * bitsPerPixel * 21 / 20;
+	uint32 bps = target->pixel_clock * *bitsPerPixel * 21 / 20;
 
 	//use DIV_ROUND_UP:
-	uint32 lanes = (bps + (linkBandwidth * 8) - 1) / (linkBandwidth * 8);
+	*lanes = (bps + (*linkBandwidth * 8) - 1) / (*linkBandwidth * 8);
 	//remove below line when link training is to be done
-	lanes = ((read32(txControl) & FDI_DP_PORT_WIDTH_MASK) >> FDI_DP_PORT_WIDTH_SHIFT) + 1;
+	*lanes = ((read32(txControl) & FDI_DP_PORT_WIDTH_MASK) >> FDI_DP_PORT_WIDTH_SHIFT) + 1;
 
-	TRACE("%s: FDI Link Lanes: %" B_PRIu32 "\n", __func__, lanes);
+	TRACE("%s: FDI Link Lanes: %" B_PRIu32 "\n", __func__, *lanes);
 	//assuming we'll only use link A and B (not C)
-	if (lanes > 4) {
-		result = B_ERROR;
-	}
-	if (result != B_OK) {
+	if (*lanes > 4) {
 		ERROR("%s: FDI not enough lanes in hardware.\n", __func__);
-		return result;
+		return B_ERROR;
 	}
 
-	TRACE("%s: FDI TX ctrl: 0x%" B_PRIx32 "\n", __func__, read32(txControl));
-	TRACE("%s: FDI RX ctrl: 0x%" B_PRIx32 "\n", __func__, read32(rxControl));
+	TRACE("%s: FDI TX ctrl before: 0x%" B_PRIx32 "\n", __func__, read32(txControl));
+	TRACE("%s: FDI RX ctrl before: 0x%" B_PRIx32 "\n", __func__, read32(rxControl));
 
 #if 0
 	//when link training is to be done re-enable this code
@@ -330,51 +326,19 @@ FDILink::Train(display_timing* target) // fixme: seperate FDI training and PIPE 
 	Receiver().DisablePLL();
 #endif
 
-	TRACE("%s: FDI M1 data before: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_DATA_M1));
-	TRACE("%s: FDI N1 data before: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_DATA_N1));
-	TRACE("%s: FDI M1 link before: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_LINK_M1));
-	TRACE("%s: FDI N1 link before: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_LINK_N1));
+	return B_OK;
+}
 
-	//Setup Data M/N
-	uint64 linkspeed = lanes * linkBandwidth * 8;
-	uint64 ret_n = 1;
-	while(ret_n < linkspeed) {
-		ret_n *= 2;
-	}
-	if (ret_n > 0x800000) {
-		ret_n = 0x800000;
-	}
-	uint64 ret_m = target->pixel_clock * ret_n * bitsPerPixel / linkspeed;
-	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
-		ret_m >>= 1;
-		ret_n >>= 1;
-	}
-	//Set TU size bits (to default, max) before link training so that error detection works
-	write32(Transmitter().Base() + PCH_FDI_PIPE_A_DATA_M1, ret_m | FDI_PIPE_MN_TU_SIZE_MASK);
-	write32(Transmitter().Base() + PCH_FDI_PIPE_A_DATA_N1, ret_n);
 
-	//Setup Link M/N
-	linkspeed = linkBandwidth;
-	ret_n = 1;
-	while(ret_n < linkspeed) {
-		ret_n *= 2;
-	}
-	if (ret_n > 0x800000) {
-		ret_n = 0x800000;
-	}
-	ret_m = target->pixel_clock * ret_n / linkspeed;
-	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
-		ret_m >>= 1;
-		ret_n >>= 1;
-	}
-	write32(Transmitter().Base() + PCH_FDI_PIPE_A_LINK_M1, ret_m);
-	//Writing Link N triggers all four registers to be activated also (on next VBlank)
-	write32(Transmitter().Base() + PCH_FDI_PIPE_A_LINK_N1, ret_n);
+status_t
+FDILink::Train(display_timing* target, uint32 lanes)
+{
+	CALLED();
 
-	TRACE("%s: FDI M1 data after: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_DATA_M1));
-	TRACE("%s: FDI N1 data after: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_DATA_N1));
-	TRACE("%s: FDI M1 link after: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_LINK_M1));
-	TRACE("%s: FDI N1 link after: 0x%" B_PRIx32 "\n", __func__, read32(Transmitter().Base() + PCH_FDI_PIPE_A_LINK_N1));
+	status_t result = B_OK;
+
+	uint32 txControl = Transmitter().Base() + PCH_FDI_TX_CONTROL;
+	uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
 
 	//Set receiving end TU size bits to match sending end's setting
 	write32(Receiver().Base() + PCH_FDI_RX_TRANS_UNIT_SIZE_1, FDI_RX_TRANS_UNIT_MASK);
@@ -399,9 +363,11 @@ FDILink::Train(display_timing* target) // fixme: seperate FDI training and PIPE 
 		result = _NormalTrain(lanes);
 #endif
 
-	if (result != B_OK) {
+	TRACE("%s: FDI TX ctrl after: 0x%" B_PRIx32 "\n", __func__, read32(txControl));
+	TRACE("%s: FDI RX ctrl after: 0x%" B_PRIx32 "\n", __func__, read32(rxControl));
+
+	if (result != B_OK)
 		ERROR("%s: FDI training fault.\n", __func__);
-	}
 
 	return result;
 }

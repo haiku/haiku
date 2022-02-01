@@ -219,6 +219,73 @@ Pipe::_ConfigureTranscoder(display_mode* target)
 }
 
 
+status_t
+Pipe::SetFDILink(const display_timing& timing, uint32 linkBandwidth, uint32 lanes, uint32 bitsPerPixel)
+{
+	TRACE("%s: fPipeOffset: 0x%" B_PRIx32"\n", __func__, fPipeOffset);
+	TRACE("%s: FDI/PIPE link reference clock is %gMhz\n", __func__, linkBandwidth / 1000.0f);
+	TRACE("%s: FDI/PIPE M1 data before: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_DATA_M1 + fPipeOffset));
+	TRACE("%s: FDI/PIPE N1 data before: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_DATA_N1 + fPipeOffset));
+	TRACE("%s: FDI/PIPE M1 link before: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_LINK_M1 + fPipeOffset));
+	TRACE("%s: FDI/PIPE N1 link before: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_LINK_N1 + fPipeOffset));
+
+	if ((bitsPerPixel < 18) || (bitsPerPixel > 36)) {
+		ERROR("%s: FDI/PIPE illegal colordepth set.\n", __func__);
+		return B_ERROR;
+	}
+	TRACE("%s: FDI/PIPE link colordepth: %" B_PRIu32 "\n", __func__, bitsPerPixel);
+
+	if (lanes > 4) {
+		ERROR("%s: FDI/PIPE illegal number of lanes set.\n", __func__);
+		return B_ERROR;
+	}
+	TRACE("%s: FDI/PIPE link with %" B_PRIx32 " lane(s) in use\n", __func__, lanes);
+
+	//Setup Data M/N
+	uint64 linkspeed = lanes * linkBandwidth * 8;
+	uint64 ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	uint64 ret_m = timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	//Set TU size bits (to default, max) before link training so that error detection works
+	write32(PCH_FDI_PIPE_A_DATA_M1 + fPipeOffset, ret_m | FDI_PIPE_MN_TU_SIZE_MASK);
+	write32(PCH_FDI_PIPE_A_DATA_N1 + fPipeOffset, ret_n);
+
+	//Setup Link M/N
+	linkspeed = linkBandwidth;
+	ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	ret_m = timing.pixel_clock * ret_n / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	write32(PCH_FDI_PIPE_A_LINK_M1 + fPipeOffset, ret_m);
+	//Writing Link N triggers all four registers to be activated also (on next VBlank)
+	write32(PCH_FDI_PIPE_A_LINK_N1 + fPipeOffset, ret_n);
+
+	TRACE("%s: FDI/PIPE M1 data after: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_DATA_M1 + fPipeOffset));
+	TRACE("%s: FDI/PIPE N1 data after: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_DATA_N1 + fPipeOffset));
+	TRACE("%s: FDI/PIPE M1 link after: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_LINK_M1 + fPipeOffset));
+	TRACE("%s: FDI/PIPE N1 link after: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_LINK_N1 + fPipeOffset));
+
+	return B_OK;
+}
+
+
 void
 Pipe::ConfigureScalePos(display_mode* target)
 {
