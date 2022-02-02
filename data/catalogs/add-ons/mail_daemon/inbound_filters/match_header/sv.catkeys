@@ -1,12 +1,14 @@
-1	swedish	x-vnd.Haiku-MatchHeader	2950227343
+1	swedish	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		Radera meddelande
+Match \"%attribute\" against \"%regex\"	RuleFilter		Matcha \"%attribute\" mot \"%regex\"
+Match header	RuleFilter		Matcha rubrik
 Set flags to	ConfigView		Markera som
+Header field (e.g. Subject, From, …)	ConfigView		Sidhuvudfält (Ämne, Avsändare, …)
 <Choose account>	ConfigView		<Välj konto>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Jokertecken som \"*spam*\".\nPrefix med \"REGEX:\" i ordning för att använda regular expressions.
 Then	ConfigView		Åtgärd
 If	ConfigView		Om
 Set as read	ConfigView		Markera som läst
-Header field (e.g. Subject, From, 			Rubrikfält (t.ex. Ämne, Från, 
 Reply with	ConfigView		Svara med
 <Choose action>	ConfigView		<Välj åtgärd>
 Move to	ConfigView		Flytta till

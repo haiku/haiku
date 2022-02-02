@@ -1,6 +1,9 @@
-1	russian	x-vnd.Haiku-BMPTranslator	3986869408
-BMP image translator	BMPTranslator		Транслятор точечных рисунков BMP
+1	russian	x-vnd.Haiku-BMPTranslator	2497639570
 BMP images	BMPTranslator		BMP изображения
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Точечный рисунок BMP (Формат MS, %d бит
 BMPTranslator Settings	BMPTranslator		Настройки BMP транслятора
 BMP image (OS/2 format, %d bits)	BMPTranslator		Точечный рисунок BMP (Формат OS/2, %d бит)
+BMP image translator	BMPView		Транслятор BMP изображений
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Точечный рисунок BMP (Формат MS, %d бит
+BMP Settings	BMPMain		Настройки BMP транслятора
+Version %d.%d.%d, %s	BMPView		Версия %d.%d.%d, %s
+BMP image translator	BMPTranslator		Транслятор точечных рисунков BMP

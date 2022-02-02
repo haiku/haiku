@@ -1,5 +1,107 @@
-1	thai	x-vnd.Haiku-DriveSetup	1105395288
-LUKS encrypted	Encryption utils		เข้ารหัส LUKS
-SafeBoot encrypted	Encryption utils		เข้ารหัส SafeBoot
+1	thai	x-vnd.Haiku-DriveSetup	2942313478
+Could not unmount partition %s.	MainWindow		ไม่สามารถยกเลิกการต่อเชื่อมพาร์ติชัน %s
+Mount all	MainWindow		เมานต์ทั้งหมด
+Disk	MainWindow		ดิสก์
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการเขียนการเปลี่ยนแปลงกลับสู่ดิสก์ตอนนี้ \n\nข้อมูลทั้งหมดในพาร์ติชั่นที่เลือกจะหายไปอย่างถาวรหากคุณทำเช่นนั้น!
+Device	PartitionList		อุปกรณ์
+Initialize	MainWindow		เริ่มต้น
+Could not change the parameters of the selected partition.	MainWindow		ไม่สามารถเปลี่ยนพารามิเตอร์ของพาร์ติชันที่เลือกได้
 PGP encrypted	Encryption utils		เข้ารหัส PGP
+Delete partition	MainWindow		ลบพาร์ติชั่น
+Error: 	MainWindow	in any error alert	ผิดพลาด:
+Removable	PartitionList		ลบได้
+Block size	PartitionList		ขนาดบล็อก
+The panel experienced a problem!	MainWindow		พาแนลมีปัญหา!
+Device	DiskView		อุปกรณ์
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการจัดรูปแบบ Intel Extended Partition ส่วนย่อยที่อยู่ในนั้นจะถูกเขียนทับหากคุณดำเนินการต่อ คุณจะถูกถามอีกครั้งก่อนที่การเปลี่ยนแปลงจะถูกเขียนไปยังดิสก์
+Unmount	MainWindow		ยกเลิกการเชื่อมต่อ
+Failed to format the partition %s!\n	MainWindow		ไม่สามารถฟอร์แมตพาร์ติชันได้ %s!\n
+Partition size	CreateParametersPanel		ขนาดพาร์ติชัน
+Validation of the given parameters failed.	MainWindow		การตรวจสอบพารามิเตอร์ที่กำหนดล้มเหลว
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการจัดรูปแบบพาร์ติชัน \"%s\" คุณจะถูกถามอีกครั้งก่อนที่การเปลี่ยนแปลงจะถูกเขียนไปยังดิสก์
+DriveSetup	System name		DriveSetup
+Mounted at	PartitionList		เชื่อมต่อที่
+Create…	MainWindow		สร้าง
+Write changes	MainWindow		เขียนการเปลี่ยนแปลง
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		การเริ่มต้นพาร์ติชัน %s ล้มเหลว (ไม่มีสิ่งใดเขียนลงดิสก์)
+Validation of the given creation parameters failed.	MainWindow		การตรวจสอบพารามิเตอร์การสร้างที่กำหนดล้มเหลว
+Eject	MainWindow		ยกเลิก
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการเขียนการเปลี่ยนแปลงกลับสู่ดิสก์ตอนนี้ \n\nข้อมูลทั้งหมดในดิสก์ %s จะหายไปอย่างถาวรหากคุณทำเช่นนั้น!
+Surface test (not implemented)	MainWindow		การทดสอบพื้นผิว (ไม่ได้ใช้งาน)
+Read only	PartitionList		อ่านเท่านั้น
+The panel could not return successfully.	MainWindow		พาแนลเรียกคืนได้สำเร็จ
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		ไม่สามารถเปลี่ยนพารามิเตอร์ของพาร์ติชันได้ ไม่มีการเปลี่ยนแปลงที่เขียนลงดิสก์
+Partition %ld	DiskView		พาร์ติชั่น %ld
+There's no space on the partition where a child partition could be created.	MainWindow		ไม่มีที่ว่างบนพาร์ติชันที่สามารถสร้างพาร์ติชันย่อยได้
+No disk devices have been recognized.	DiskView		ไม่รู้จักอุปกรณ์ดิสก์
+Attributes	PartitionList		คุณสมบัติ
+Failed to delete the partition. No changes have been written to disk.	MainWindow		ไม่สามารถลบพาร์ติชัน ไม่มีการเปลี่ยนแปลงที่เขียนลงดิสก์
+Change parameters…	MainWindow		เปลี่ยนพารามิเตอร์
+Format	InitializeParametersPanel		รูปแบบ
+Could not unmount partition	MainWindow		ไม่สามารถเชื่อมต่อพาร์ติชั่น
+Create	CreateParametersPanel		สร้าง
+File system	PartitionList		File system
+The selected partition does not contain a partitioning system.	MainWindow		พาร์ติชันที่เลือกไม่มีระบบการแบ่งพาร์ติชัน
+End: %s	Support		สิ้นสุด: %s
+Partition type	PartitionList		ประเภทพาร์ติชัน
+Unable to find the selected partition by ID.	MainWindow		ไม่พบพาร์ติชันที่เลือกตาม ID
+The currently selected partition is not empty.	MainWindow		พาร์ติชันที่เลือกในปัจจุบันไม่ว่าง
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการจัดรูปแบบดิสก์ดิบ (คนส่วนใหญ่เตรียมใช้งานดิสก์ด้วยระบบการแบ่งพาร์ติชันก่อน) คุณจะถูกถามอีกครั้งก่อนที่การเปลี่ยนแปลงจะถูกเขียนลงดิสก์
+Wipe (not implemented)	MainWindow		ลบ (ไม่ได้ใช้งาน)
+The currently selected partition does not have a parent partition.	MainWindow		พาร์ติชันที่เลือกในปัจจุบันไม่มีพาร์ติชันหลัก
+Validation of the given initialization parameters failed.	MainWindow		การตรวจสอบความถูกต้องของพารามิเตอร์การกำหนดค่าเริ่มต้นล้มเหลว
+Shared	PartitionList		แบ่งปัน
+MIMEs	PartitionList		MIMEs
 BitLocker encrypted	Encryption utils		เข้ารหัส BitLocker
+You need to select a partition entry from the list.	MainWindow		คุณต้องเลือกรายการพาร์ติชันจากรายการ
+Offset: %s	Support		Offset: %s
+SafeBoot encrypted	Encryption utils		เข้ารหัส SafeBoot
+Volume name	PartitionList		ตั้งค่าชื่อ
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการเขียนการเปลี่ยนแปลงกลับสู่ดิสก์ตอนนี้ \n\nข้อมูลทั้งหมดในพาร์ติชั่นจะหายไปอย่างถาวรหากคุณทำเช่นนั้น!
+Change	ChangeParametersPanel		เปลี่ยน
+Partition name:	ChangeParametersPanel		ชื่อพาร์ติชั่น:
+LUKS encrypted	Encryption utils		เข้ารหัส LUKS
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการเขียนการเปลี่ยนแปลงกลับสู่ดิสก์ตอนนี้ \n\nข้อมูลทั้งหมดในพาร์ติชัน %s จะหายไปอย่างไม่สามารถกู้คืนได้หากคุณทำเช่นนั้น!
+Cancel	AbstractParametersPanel		ยกเลิก
+Format	MainWindow		Format
+OK	MainWindow		ตกลง
+Open with DiskProbe	MainWindow		เปิดด้วย DiskProbe
+Could not delete the selected partition.	MainWindow		ไม่สามารถลบพาร์ติชันที่เลือก
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		คุณแน่ใจหรือว่าต้องการเริ่มต้นดิสก์ที่เลือก ข้อมูลทั้งหมดจะสูญหาย คุณจะถูกถามอีกครั้งก่อนที่การเปลี่ยนแปลงจะถูกเขียนไปยังดิสก์ \n
+There was an error preparing the disk for modifications.	MainWindow		มีข้อผิดพลาดในการเตรียมดิสก์สำหรับการแก้ไข
+The disk has been successfully initialized.\n	MainWindow		ดิสก์ได้รับการเตรียมใช้งานเรียบร้อยแล้ว \n
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		ควรยกเลิกการต่อเชื่อมหรือไม่ \n\nหมายเหตุ: หากแอปพลิเคชันกำลังเขียนไปยังโวลุ่มให้ยกเลิกการถอดออกในตอนนี้อาจทำให้ข้อมูลสูญหาย \n
+Cancel	MainWindow		ยกเลิก
+Free space	PartitionList		ที่ว่าง
+Queries	PartitionList		สอบถาม
+Force unmount	MainWindow		บังคับ ยกเลิกการเชื่อมต่อ
+Partition	MainWindow		พาร์ติชั่น
+Change parameters	MainWindow		เปลี่ยนพารามิเตอร์
+Rescan	MainWindow		ค้นหาใหม่
+There was an error acquiring the partition row.	MainWindow		มีข้อผิดพลาดในการรับแถวพาร์ติชัน
+Failed to initialize the disk %s!\n	MainWindow		ไม่สามารถเริ่มต้นดิสก์ %s!\n
+Disk system \"%s\" not found!	MainWindow		ไม่พบระบบดิสก์ \"%s\"!
+Delete	MainWindow		ลบ
+Partition type:	ChangeParametersPanel		ชนิดพาร์ติชั่น:
+Parameters	PartitionList		พารามิเตอร์
+Could not acquire partitioning information.	MainWindow		ไม่สามารถรับข้อมูลการแบ่งพาร์ติชันได้
+Cannot delete the selected partition.	MainWindow		ไม่สามารถลบพาร์ติชันที่เลือกได้
+Continue	MainWindow		ต่อไป
+Could not mount partition %s.	MainWindow		ไม่สามารถเชื่อมต่อพาร์ติชัน %s
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		คุณแน่ใจหรือว่าต้องการฟอร์แมตพาร์ติชัน? คุณจะถูกถามอีกครั้งก่อนที่การเปลี่ยนแปลงจะถูกเขียนไปยังดิสก์
+The selected disk is read-only.	MainWindow		ดิสก์ที่เลือกเป็นแบบอ่านอย่างเดียว
+The partition %s is already unmounted.	MainWindow		พาร์ติชัน %s ถูกถอนออกแล้ว
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		คุณแน่ใจหรือว่าต้องการเปลี่ยนพารามิเตอร์ของพาร์ติชั่นที่เลือก? \n\nพาร์ติชั่นอาจไม่ได้รับการรองรับจากระบบปฏิบัติการอื่นอีกต่อไป!
+Boot	PartitionList		Boot
+OK	AbstractParametersPanel		ตกลง
+Virtual	PartitionList		เสมือน
+Virtual	DiskView		เสมือน
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการเขียนการเปลี่ยนแปลงกลับสู่ดิสก์ตอนนี้ \n\nข้อมูลทั้งหมดในดิสก์ที่เลือกจะหายไปอย่างถาวรหากคุณทำเช่นนั้น!
+Select a partition from the list below.	DiskView		เลือกพาร์ติชันจากรายการด้านล่าง
+Active	PartitionList		ใช้งาน
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		คุณแน่ใจหรือไม่ว่าต้องการลบพาร์ติชันที่เลือกไว้ \n\nข้อมูลทั้งหมดในพาร์ติชั่นจะหายไปอย่างถาวรหากคุณทำเช่นนั้น!
+The partition %s has been successfully formatted.\n	MainWindow		ฟอร์แมตพาร์ติชัน %s เรียบร้อยแล้ว \n
+The partition %s is already mounted.	MainWindow		พาร์ติชัน%s ถูกเชื่อมต่อแล้ว
+Size	PartitionList		ขนาด
+Creation of the partition has failed.	MainWindow		การสร้างพาร์ติชันล้มเหลว
+Mount	MainWindow		เชื่อมต่อ

@@ -1,41 +1,66 @@
-1	japanese	x-vnd.Haiku-PoorMan	2026082639
-Cannot start the server	PoorMan		サーバーを開始できません
-Site	PoorMan		サイト
-Create log file	PoorMan		作成
-Console logging	PoorMan		コンソールログ
+1	japanese	x-vnd.Haiku-PoorMan	1829050509
 Select web folder	PoorMan		選択
-Clear hit counter	PoorMan		ヒットカウンタの消去
+Console logging	PoorMan		コンソールログ
+Create Log File	PoorMan		ログファイルの作成
 File logging	PoorMan		ファイルログ
-File	PoorMan		ファイル
-Settings…	PoorMan		設定...
 Website options	PoorMan		ウェブサイトオプション
 Log to file	PoorMan		ファイルにログを出力
+Shutting down.	PoorMan		シャットダウン中。
+Error Dir	PoorMan		ディレクトリエラー
+Web folder:	PoorMan		Web フォルダー:
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Web に公開するフォルダーを選択してください。\n\nPoorMan にデフォルトの \"public_html\" をホームフォルダーに作成させることもできます。\nまたは、その代わりにユーザーのフォルダーを指定することもできます。
+Log To Console	PoorMan		コンソールにログを出力
+File Name	PoorMan		ファイル名
+Starting up... 	PoorMan		起動中です...
+Select	PoorMan		選択
+Logging view	PoorMan		ログビュー
+Save console as…	PoorMan		コンソールを別名で保存...
+Edit	PoorMan		編集
+Cancel	PoorMan		中止
+Directory: 	PoorMan		ディレクトリ:
+Hits: %lu	PoorMan		ヒット: %lu
+Hits: 0	PoorMan		ヒット: 0
+Shutting down.\n	PoorMan		シャットダウン中です。\n
+Select all	PoorMan		すべて選択
+Error Server	PoorMan		サーバーエラー
+Send file listing if there's no start page	PoorMan		スタートページがない場合、ファイルリストを送信します
+Create PoorMan log	PoorMan		PoorMan ログの作成
+Max. simultaneous connections:	PoorMan		最大同時接続数:
+Done	PoorMan		完了
+Site	PoorMan		サイト
+Cannot start the server	PoorMan		サーバーを開始できません
+Create log file	PoorMan		作成
+Create public_html	PoorMan		public_html の生成
+Clear hit counter	PoorMan		ヒットカウンタの消去
+Status: Stopped	PoorMan		状況: 停止中
+File	PoorMan		ファイル
+Settings…	PoorMan		設定...
+Log To File	PoorMan		ファイルにログを出力
 Connections	PoorMan		接続
 Controls	PoorMan		コントロール
 Log to console	PoorMan		コンソールにログを出力
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Web に公開するフォルダーを選択してください。\n\nPoorMan にデフォルトの \"public_html\" をホームフォルダーに作成させることもできます。\nまたは、その代わりにユーザーのフォルダーを指定することもできます。
-Web folder:	PoorMan		Web フォルダー:
 Advanced	PoorMan		詳細設定
-Logging	PoorMan		ログ
 Copy	PoorMan		コピー
+Logging	PoorMan		ログ
 PoorMan	System name		PoorMan
-Logging view	PoorMan		ログビュー
-Run server	PoorMan		サーバーを起動
 Clear console log	PoorMan		コンソールログの消去
+Run server	PoorMan		サーバーを起動
+Create	PoorMan		作成
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# 個の接続} other{# 個の接続}}
-Edit	PoorMan		編集
-Save console as…	PoorMan		コンソールを別名で保存...
+done.\n	PoorMan		完了。\n
 PoorMan settings	PoorMan		PoorMan 設定
+Console Logging	PoorMan		コンソールログ
 Clear log file	PoorMan		ログファイルの消去
 Save log console selection	PoorMan		ログコンソールの選択部を保存
+File Logging	PoorMan		ファイルログ
 Log file name:	PoorMan		ログファイル名:
-Select all	PoorMan		すべて選択
-Send file listing if there's no start page	PoorMan		スタートページがない場合、ファイルリストを送信します
-Create PoorMan log	PoorMan		PoorMan ログの作成
+Status: Running	PoorMan		状況: 実行中
+Directory: (none)	PoorMan		ディレクトリ: (無し)
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		デフォルトの web フォルダーが \"/boot/home/public_html\" に作成されました。\nその中に \"index.html\" という HTML ファイルがあることを確認してください。
-Quit	PoorMan		終了
+Dir Created	PoorMan		ディレクトリが作成されました
 Save console selections as…	PoorMan		コンソールの選択部を保存...
+Quit	PoorMan		終了
 Save log console	PoorMan		ログコンソールの保存
 Start page:	PoorMan		スタートページ:
-Max. simultaneous connections:	PoorMan		最大同時接続数:
+OK	PoorMan		OK
 Website location	PoorMan		ウェブサイトの場所

@@ -1,41 +1,66 @@
-1	french	x-vnd.Haiku-PoorMan	2026082639
-Cannot start the server	PoorMan		Impossible de démarrer le serveur
-Site	PoorMan		Site
-Create log file	PoorMan		Créer un journal
-Console logging	PoorMan		Console de journalisation
+1	french	x-vnd.Haiku-PoorMan	1829050509
 Select web folder	PoorMan		Sélectionner un dossier Web
-Clear hit counter	PoorMan		Réinitialiser le compteur de sollicitations
+Console logging	PoorMan		Console de journalisation
+Create Log File	PoorMan		Créer un journal
 File logging	PoorMan		Fichier de journalisation
-File	PoorMan		Fichier
-Settings…	PoorMan		Réglages…
 Website options	PoorMan		Options du site web
 Log to file	PoorMan		Consigner vers le journal
+Shutting down.	PoorMan		Extinction.
+Error Dir	PoorMan		Répertoire d’erreurs
+Web folder:	PoorMan		Dossier Web :
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Veuillez choisir le dossier à publier sur le Web.\n\nVous pouvez sélectionnez le dossier de votre choix, ou laisser PoorMan\ncréer le dossier par défaut « public_html » dans votre dossier personnel.
+Log To Console	PoorMan		Consigner vers la console
+File Name	PoorMan		Nom du fichier
+Starting up... 	PoorMan		Démarrage…
+Select	PoorMan		Sélectionner
+Logging view	PoorMan		Vue du journal
+Save console as…	PoorMan		Enregistrer la console sous…
+Edit	PoorMan		Éditer
+Cancel	PoorMan		Annuler
+Directory: 	PoorMan		Répertoire : 
+Hits: %lu	PoorMan		Sollicitations : %lu
+Hits: 0	PoorMan		Sollicitations : 0
+Shutting down.\n	PoorMan		Éteindre.\n
+Select all	PoorMan		Sélectionner tout
+Error Server	PoorMan		Erreur du serveur
+Send file listing if there's no start page	PoorMan		Envoyer la liste des fichiers s’il n’y a pas de page d’accueil.
+Create PoorMan log	PoorMan		Créer un journal pour PoorMan
+Max. simultaneous connections:	PoorMan		Nombre max. de connexions simultanées :
+Done	PoorMan		Fait
+Site	PoorMan		Site
+Cannot start the server	PoorMan		Impossible de démarrer le serveur
+Create log file	PoorMan		Créer un journal
+Create public_html	PoorMan		Créer public_html
+Clear hit counter	PoorMan		Réinitialiser le compteur de sollicitations
+Status: Stopped	PoorMan		État : Arrêté
+File	PoorMan		Fichier
+Settings…	PoorMan		Réglages…
+Log To File	PoorMan		Consigner vers le journal
 Connections	PoorMan		Connexions
 Controls	PoorMan		Contrôles
 Log to console	PoorMan		Consigner vers la console
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Veuillez choisir le dossier à publier sur le Web.\n\nVous pouvez sélectionnez le dossier de votre choix, ou laisser PoorMan\ncréer le dossier par défaut « public_html » dans votre dossier personnel.
-Web folder:	PoorMan		Dossier Web :
 Advanced	PoorMan		Avancé
-Logging	PoorMan		Journalisation
 Copy	PoorMan		Copier
+Logging	PoorMan		Journalisation
 PoorMan	System name		PoorMan
-Logging view	PoorMan		Vue du journal
-Run server	PoorMan		Mettre le serveur en fonction
 Clear console log	PoorMan		Vider la console de jounalisation
+Run server	PoorMan		Mettre le serveur en fonction
+Create	PoorMan		Créer
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# connexion} other{# connexions}}
-Edit	PoorMan		Éditer
-Save console as…	PoorMan		Enregistrer la console sous…
+done.\n	PoorMan		fait.\n
 PoorMan settings	PoorMan		Réglages de PoorMan
+Console Logging	PoorMan		Console de journalisation
 Clear log file	PoorMan		Vider le journal
 Save log console selection	PoorMan		Sauvegarder la sélection de la console de journalisation
+File Logging	PoorMan		Fichier de journalisation
 Log file name:	PoorMan		Nom du fichier de journalisation :
-Select all	PoorMan		Sélectionner tout
-Send file listing if there's no start page	PoorMan		Envoyer la liste des fichiers s’il n’y a pas de page d’accueil.
-Create PoorMan log	PoorMan		Créer un journal pour PoorMan
+Status: Running	PoorMan		État : En fonction
+Directory: (none)	PoorMan		Répertoire : (aucun)
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Un dossier Web par défaut a été créé à « /boot/home/public_html ».\nVérifiez qu’il existe un fichier HTML nommé « index.html » dans ce dossier.
-Quit	PoorMan		Quitter
+Dir Created	PoorMan		Répertoire créé
 Save console selections as…	PoorMan		Enregistrer la sélection de la console sous…
+Quit	PoorMan		Quitter
 Save log console	PoorMan		Sauvegarder la console de journalisation
 Start page:	PoorMan		Page d’accueil :
-Max. simultaneous connections:	PoorMan		Nombre max. de connexions simultanées :
+OK	PoorMan		OK
 Website location	PoorMan		Emplacement du site Web

@@ -1,8 +1,14 @@
-1	russian	x-vnd.Haiku-SMTP	3672333926
-None	ConfigView		Отсутствует
-ESMTP	ConfigView		ESMTP
-SMTP server:	ConfigView		SMTP-сервер:
+1	russian	x-vnd.Haiku-SMTP	815985329
+POP3 authentication failed. The server said:\n	smtp		Аутентификация по POP3 не удалась. Сервер сообщил:\n
 Destination:	ConfigView		Папка:
+Error while logging in to %serv	smtp		Ошибка при входе в %serv
+Connecting to server…	smtp		Соединение с сервером…
+Unencrypted	ConfigView		Без шифрования
+. The server says:\n	smtp		. Сообщение сервера:\n
+Error while opening connection to %serv	smtp		Ошибка при открытии соединения с %serv
+. The server said:\n	smtp		. Сообщение сервера:\n
+None	ConfigView		Отсутствует
+SMTP server:	ConfigView		SMTP-сервер:
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 перед SMTP
 SSL	ConfigView		SSL
-Unencrypted	ConfigView		Без шифрования

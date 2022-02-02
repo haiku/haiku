@@ -1,12 +1,12 @@
-1	indonesian	x-vnd.Haiku-CharacterMap	954670796
+1	indonesian	x-vnd.Haiku-CharacterMap	107627562
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Simbol matematika lain-lain B
 Dogra	UnicodeBlocks		Dogra
 Javanese	UnicodeBlocks		Jawa
 Saurashtra	UnicodeBlocks		Saurashtra
 Arabic supplement	UnicodeBlocks		Arab suplemen
-Ogham	UnicodeBlocks		Ogham
 Hanunoo	UnicodeBlocks		Hanunoo
+Ogham	UnicodeBlocks		Ogham
 Hebrew	UnicodeBlocks		Ibrani
 Katakana	UnicodeBlocks		Katakana
 Miao	UnicodeBlocks		Miao
@@ -30,6 +30,7 @@ Medefaidrin	UnicodeBlocks		Medefaidrin
 Warang Citi	UnicodeBlocks		Warang Citi
 Vertical forms	UnicodeBlocks		Form vertikal
 Miscellaneous mathematical symbols A	UnicodeBlocks		Simbol matematika lain-lain A
+CharacterMap	System name		CharacterMap
 Latin extended D	UnicodeBlocks		Latin diperluas D
 Aegean numbers	UnicodeBlocks		Angka Aegea
 Hangul syllables	UnicodeBlocks		Suku kata Hangul
@@ -37,6 +38,7 @@ Modifier tone letters	UnicodeBlocks		Modifier tone letters
 Kaithi	UnicodeBlocks		Kaithi
 Psalter Pahlavi	UnicodeBlocks		Psalter Pahlavi
 Newa	UnicodeBlocks		Newa
+View	CharacterWindow		Tampilkan
 Rumi numeral symbols	UnicodeBlocks		Simbol angka Rumi
 Enclosed CJK letters and months	UnicodeBlocks		Huruf dan bulan CJK tertutup
 Deseret	UnicodeBlocks		Deseret
@@ -53,6 +55,7 @@ Chess symbols	UnicodeBlocks		Simbol catur
 Yijing hexagram symbols	UnicodeBlocks		Simbol hexagram Yijing
 Ottoman Siyaq numbers	UnicodeBlocks		Nomor Ottoman Siyaq
 Ideographic symbols and punctuation	UnicodeBlocks		Simbol dan tanda baca ideografis
+File	CharacterWindow		Berkas
 Sudanese supplement	UnicodeBlocks		Suplemen Sudan
 Myanmar	UnicodeBlocks		Myanmar
 Tifinagh	UnicodeBlocks		Tifinagh
@@ -82,6 +85,7 @@ Ahom	UnicodeBlocks		Ahom
 Duployan	UnicodeBlocks		Dulployan
 Early Dynastic Cuneiform	UnicodeBlocks		Tulisan runcing awal dinasti
 Arabic presentation forms A	UnicodeBlocks		Presentasi Arab bentuk A
+Filter:	CharacterWindow		Saring:
 Kannada	UnicodeBlocks		Kannada
 Brahmi	UnicodeBlocks		Brahmi
 Lydian	UnicodeBlocks		Lydian
@@ -94,6 +98,7 @@ CJK unified ideographs	UnicodeBlocks		Ideograf CJK Dipersatukan
 Latin extended B	UnicodeBlocks		Latin diperluas B
 Phonetic extensions	UnicodeBlocks		Ekstensi fonetik
 Batak	UnicodeBlocks		Batak
+Code	CharacterWindow		Kode
 Block elements	UnicodeBlocks		Elemen blok
 Mahjong tiles	UnicodeBlocks		Ubin Mahjong
 Carian	UnicodeBlocks		Cari
@@ -122,10 +127,11 @@ Ideographic description characters	UnicodeBlocks		Karakter deskripsi ideografis
 Supplemental arrows A	UnicodeBlocks		Panah tambahan A
 Rejang	UnicodeBlocks		Rejang
 Number forms	UnicodeBlocks		Bentuk angka
-Latin extended A	UnicodeBlocks		Latin diperluas A
 Avestan	UnicodeBlocks		Avestan
+Latin extended A	UnicodeBlocks		Latin diperluas A
 Sundanese	UnicodeBlocks		Sunda
 Geometric shapes	UnicodeBlocks		Bentuk Geometrik
+Clear	CharacterWindow		Bersih
 Adlam	UnicodeBlocks		Adlam
 Arabic	UnicodeBlocks		Arab
 Khmer symbols	UnicodeBlocks		Simbol Khmer
@@ -149,6 +155,7 @@ Mahajani	UnicodeBlocks		Mahajani
 Lepcha	UnicodeBlocks		Lepcha
 Mandaic	UnicodeBlocks		Mandaic
 Old italic	UnicodeBlocks		Italik kuno
+Quit	CharacterWindow		Keluar
 Chakma	UnicodeBlocks		Chakma
 Buhid	UnicodeBlocks		Buhid
 Supplementary private use area B	UnicodeBlocks		Penggunaan pribadi tambahan area B
@@ -171,8 +178,8 @@ Ugaritic	UnicodeBlocks		Ugaritik
 Cyrillic extended C	UnicodeBlocks		Cyrillic extended C
 Syriac	UnicodeBlocks		Suryani
 Private use area	UnicodeBlocks		Area penggunaan pribadi
-Supplement punctuation	UnicodeBlocks		Suplemen tanda baca
 Vedic extensions	UnicodeBlocks		Ekstensi Vedic
+Supplement punctuation	UnicodeBlocks		Suplemen tanda baca
 Lycian	UnicodeBlocks		Lycian
 Ancient symbols	UnicodeBlocks		Simbol kuno
 Miscellaneous symbols and arrows	UnicodeBlocks		Simbol dan panah lain-lain
@@ -188,6 +195,7 @@ Phags-pa	UnicodeBlocks		Phags-pa
 Nabataean	UnicodeBlocks		Nabataean
 Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		Ideograf kompatibilitas CJK
+Show private blocks	CharacterWindow		Tampilkan blok pribadi
 Samaritan	UnicodeBlocks		Samaritan
 Latin extended additional	UnicodeBlocks		Tambahan latin yang diperluas
 Tibetan	UnicodeBlocks		Tibet
@@ -205,13 +213,16 @@ Khudawadi	UnicodeBlocks		Khudawadi
 Glagotic	UnicodeBlocks		Glagotik
 Cyrillic extended B	UnicodeBlocks		Sirilik diperluas B
 Anatolian hieroglyphs	UnicodeBlocks		Hieroglif Anatolia
+Copy as escaped byte string	CharacterView		Salin sebagai string bita escaped
 Tai Xuan Jing symbols	UnicodeBlocks		Simbol Tai Xuan Jing
 Hiragana	UnicodeBlocks		Hiragana
 Tagbanwa	UnicodeBlocks		Tagbanwa
 Basic Latin	UnicodeBlocks		Bahasa Latin dasar
 Greek and Coptic	UnicodeBlocks		Yunani dan Koptik
 Kangxi radicals	UnicodeBlocks		Radikal Kangxi
+Copy character	CharacterView		Salin karakter
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
+Font	CharacterWindow		Fon
 Manichaean	UnicodeBlocks		Manichaean
 Phaistos disc	UnicodeBlocks		Cakram phaistos
 Miscellaneous technical	UnicodeBlocks		Serbaneka teknis

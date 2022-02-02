@@ -23,8 +23,8 @@ Belgian (point)	KeymapNames		Belge (point)
 Finnish	KeymapNames		Finnois
 Num lock	Keyboard Layout View		Verr. Num.
 Switch shortcut keys to Windows/Linux mode	Keymap window		Basculer les touches de raccourcis en mode Linux/Windows
-Option	Keyboard Layout View	Option key	Option
 Spanish (Dvorak)	KeymapNames		Espagnol (Dvorak)
+Option	Keyboard Layout View	Option key	Option
 Scroll lock	Keyboard Layout View		Arrêt défilement
 US-International	KeymapNames		US-International
 Right option	Keyboard Layout View		Option droite
@@ -46,8 +46,8 @@ Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium International
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Touche Win/Cmd
 PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
-Apple Aluminum	KeyboardLayoutNames		Apple Aluminium
 Spanish	KeymapNames		Espagnol
+Apple Aluminum	KeyboardLayoutNames		Apple Aluminium
 HOME	Keyboard Layout View		Début
 COMMAND	Keyboard Layout View		Commande
 Ukrainian (Mac)	KeymapNames		Ukrainien (Mac)
@@ -55,8 +55,8 @@ Command:	Modifier keys window	Command key role name	Commande :
 French (Bépo)	KeymapNames		Français (Bépo)
 Russian (Typewriter)	KeymapNames		Russe (Machine à écrire)
 Acute trigger	Keymap window		Accent aigu
-Italian	KeymapNames		Italien
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s International
+Italian	KeymapNames		Italien
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan International
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminium (US)
 French (NF Z71-300)	KeymapNames		Français (NF Z71-300)
@@ -101,8 +101,8 @@ Left control	Keyboard Layout View		Contrôle gauche
 CAPS	Keyboard Layout View	Very short for 'caps lock'	Maj.
 Role	Modifier keys window	As in the role of a modifier key	Rôle
 Svorak	KeymapNames		Svorak
-German	KeymapNames		Allemand
 ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (US)
+German	KeymapNames		Allemand
 Swiss-German	KeymapNames		Suisse-Allemand
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Touche contrôle
 Czech	KeymapNames		Tchèque
@@ -157,8 +157,8 @@ Font	Keymap window		Police
 Danish	KeymapNames		Danois
 Generic 104-key	KeyboardLayoutNames		Générique 104 touches
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Touche majuscule
-PAUSE	Keyboard Layout View		Pause
 Russian	KeymapNames		Russe
+PAUSE	Keyboard Layout View		Pause
 TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Roumain
 CMD	Keyboard Layout View	Very short for 'command'	Cmd

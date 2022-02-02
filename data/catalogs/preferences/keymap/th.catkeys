@@ -22,8 +22,8 @@ Belgian (point)	KeymapNames		เบลเยี่ยม (point)
 Finnish	KeymapNames		ฟินแลนด์
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		สลับปุ่มลัดไปที่โหมด Windows/Linux
-Option	Keyboard Layout View	Option key	ตัวเลือก
 Spanish (Dvorak)	KeymapNames		สเปน (Dvorak)
+Option	Keyboard Layout View	Option key	ตัวเลือก
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		US-International
 Right option	Keyboard Layout View		Right option
@@ -45,8 +45,8 @@ Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium International
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	ปุ่ม Win/Cmd
 PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
-Apple Aluminum	KeyboardLayoutNames		Apple Aluminum
 Spanish	KeymapNames		สเปน
+Apple Aluminum	KeyboardLayoutNames		Apple Aluminum
 HOME	Keyboard Layout View		HOME
 COMMAND	Keyboard Layout View		COMMAND
 Ukrainian (Mac)	KeymapNames		ยูเครน (Mac)
@@ -54,8 +54,8 @@ Command:	Modifier keys window	Command key role name	คำสั่ง:
 French (Bépo)	KeymapNames		ฝรั่งเศส (Bépo)
 Russian (Typewriter)	KeymapNames		รัสเซีย (พิมพ์ดีด)
 Acute trigger	Keymap window		Acute trigger
-Italian	KeymapNames		อิตาลี
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s International
+Italian	KeymapNames		อิตาลี
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan International
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (US)
 French (NF Z71-300)	KeymapNames		ฝรั่งเศส (NF Z71-300)
@@ -99,8 +99,8 @@ Left control	Keyboard Layout View		Left control
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Role
 Svorak	KeymapNames		สโลวัค
-German	KeymapNames		เยอรมัน
 ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (US)
+German	KeymapNames		เยอรมัน
 Swiss-German	KeymapNames		สวิส-เยอรมัน
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	ปุ่ม Ctrl
 Czech	KeymapNames		เชค
@@ -155,8 +155,8 @@ Font	Keymap window		ตัวอักษร
 Danish	KeymapNames		เดนมาร์ก
 Generic 104-key	KeyboardLayoutNames		Generic 104-key
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift key
-PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		รัสเซีย
+PAUSE	Keyboard Layout View		PAUSE
 TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		โรมาเนีย
 CMD	Keyboard Layout View	Very short for 'command'	CMD

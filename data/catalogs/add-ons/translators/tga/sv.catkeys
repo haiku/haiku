@@ -1,15 +1,16 @@
-1	swedish	x-vnd.Haiku-TGATranslator	1299281918
+1	swedish	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		Spara med RLE komprimering
+Targa image (%d bits truecolor)	TGATranslator		Targabild (%d bitars truecolor)
+Ignore TGA alpha channel	TGAView		Ignorera TGA-alfakanal
+Targa image (%d bits colormap)	TGATranslator		Targabild (%d bitars färgbibliotek)
+TGA image translator	TGAView		TGA-bildöversättare
+Targa image (%d bits RLE colormap)	TGATranslator		Targabild (%d bitars RLE färgbibliotek)
+Targa image (%d bits gray)	TGATranslator		Targabild (%d bitars gråskala)
+Written by the Haiku Translation Kit Team	TGAView		Skrivet av Haikus Translation Kit Team
+Targa image (%d bits RLE truecolor)	TGATranslator		Targabild (%d bitars RLE truecolor)
+TGA images	TGATranslator		TGA-bilder
 Version %d.%d.%d, %s	TGAView		Version %d.%d.%d, %s
 TGATranslator Settings	TGATranslator		TGA-översättningsinställningar
-Targa image (%d bits RLE truecolor)	TGATranslator		Targabild (%d bitars RLE truecolor)
-Save with RLE compression	TGAView		Spara med RLE komprimering
-Targa image (%d bits RLE colormap)	TGATranslator		Targabild (%d bitars RLE färgbibliotek)
-Written by the Haiku Translation Kit Team	TGAView		Skrivet av Haikus Translation Kit Team
-Targa image (%d bits colormap)	TGATranslator		Targabild (%d bitars färgbibliotek)
-Ignore TGA alpha channel	TGAView		Ignorera TGA-alfakanal
 TGA image translator	TGATranslator		TGA-bildöversättare
-TGA images	TGATranslator		TGA-bilder
-Targa image (%d bits gray)	TGATranslator		Targabild (%d bitars gråskala)
-TGA image translator	TGAView		TGA-bildöversättare
 Targa image (%d bits RLE gray)	TGATranslator		Targabild (%d bitars RLE gråskala)
-Targa image (%d bits truecolor)	TGATranslator		Targabild (%d bitars truecolor)
+TGA Settings	TGAMain		TGA inställningar

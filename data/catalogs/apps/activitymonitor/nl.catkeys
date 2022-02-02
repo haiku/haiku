@@ -1,35 +1,48 @@
-1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	1330427574
+1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Teams
 Semaphores	DataSource		Semaforen
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Geheugen blok-cache
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
 Media nodes	DataSource		Media-eenheid
 Text clipboard	DataSource		Tekst klembord
 Network send	DataSource		Netwerk (uitgaand)
-Cache	DataSource		Cache
 Running applications	DataSource		Lopende toepassingen
-Threads	DataSource		Threads
+Cache	DataSource		Cache
 CPU usage (combined)	DataSource		CPU-gebruik (gecombineerd)
+Threads	DataSource		Threads
 Receiving	DataSource		Ontvangend
+Remove graph	ActivityView		Verwijder grafiek
 Swap space	DataSource		Swap-ruimte
 CPU	DataSource		CPU
+ActivityMonitor	System name		ActivityMonitor
 CPU %d	DataSource		CPU %d
+Update time interval:	SettingsWindow		Interval bijwerktijd:
 RX	DataSource	Shorter version for Receiving.	RX
+Settings…	ActivityWindow		Instellingen...
 Block cache	DataSource		Blok-cache
 Memory	DataSource		Geheugen
 CPU usage	DataSource		CPU-gebruik
+Quit	ActivityWindow		Afsluiten
 Raw clipboard	DataSource		Onbewerkt klembord
+Settings	ActivityWindow		Instellingen
 Used memory	DataSource		Gebruikt geheugen
 %.1f faults/s	DataSource		%.1f fout(en)
+Show legend	ActivityView		Toon legenda
 Cached memory	DataSource		Geheugen in cache
 CPU %d usage	DataSource		CPU %d gebruik
+File	ActivityWindow		Bestand
 Ports	DataSource		Poorten
 Page faults	DataSource		Page-onderbrekingen
 Apps	DataSource		Toepassingen
+Additional items	ActivityView		Toegevoegde items
+Add graph	ActivityWindow		Voeg grafiek toe
 Sending	DataSource		Versturend
 %.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Altijd bovenop
 Swap	DataSource		Swap
+%lld sec.	SettingsWindow		%lld sec.
 P-faults	DataSource		P-onderbrekingen
 Sems	DataSource		Semaforen
 Network receive	DataSource		Netwerk (ontvangst)

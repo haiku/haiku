@@ -1,9 +1,5 @@
-1	swedish	x-vnd.Haiku-WonderBrushTranslator	1289038178
-Version %d.%d.%d, %s	WonderBrushView		Version %d.%d.%d, %s
-WonderBrush image translator	WonderBrushTranslator		WonderBrush-bildöversättare
-WBI Settings	WonderBrushTranslator		WBI-inställningar
+1	swedish	x-vnd.Haiku-WonderBrushTranslator	2764474812
 WBI Settings	WonderBrushMain		WBI-inställningar
-WonderBrush images	WonderBrushTranslator		WonderBrush-bilder
-WonderBrush image	WonderBrushTranslator		WonderBrush-bild
 WonderBrush image translator	WonderBrushView		WonderBrush-bildöversättare
+Version %d.%d.%d, %s	WonderBrushView		Version %d.%d.%d, %s
 written by:	WonderBrushView		skrivet av:

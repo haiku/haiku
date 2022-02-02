@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-CharacterMap	3257656252
+1	hungarian	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Különféle matematikai B szimbólumok
 Latin extended E	UnicodeBlocks		Latin kiterjesztett E
@@ -6,8 +6,8 @@ Dogra	UnicodeBlocks		Dogra
 Javanese	UnicodeBlocks		Java nyelv
 Saurashtra	UnicodeBlocks		Saurashtra
 Arabic supplement	UnicodeBlocks		Arab kiegészítés
-Ogham	UnicodeBlocks		Ogham
 Hanunoo	UnicodeBlocks		Hanunoo
+Ogham	UnicodeBlocks		Ogham
 Inscriptional Pahlavi	UnicodeBlocks		Felírásos Pahlavi
 Hebrew	UnicodeBlocks		Héber
 Katakana	UnicodeBlocks		Katakana
@@ -38,6 +38,7 @@ Enclosed ideographic supplement	UnicodeBlocks		Zárt ideográfiai kiegészítés
 Warang Citi	UnicodeBlocks		Warang Citi
 Vertical forms	UnicodeBlocks		Függőleges formák
 Miscellaneous mathematical symbols A	UnicodeBlocks		Egyéb matematikai szimbólumok A
+CharacterMap	System name		Karaktertábla
 Latin extended D	UnicodeBlocks		Latin kiterjesztett D
 Aegean numbers	UnicodeBlocks		Aegean számok
 Hangul syllables	UnicodeBlocks		Hangul szótagok
@@ -45,6 +46,7 @@ Modifier tone letters	UnicodeBlocks		Hangmódosító betűk
 Kaithi	UnicodeBlocks		Kaithi
 Psalter Pahlavi	UnicodeBlocks		Psalter Pahlavi
 Newa	UnicodeBlocks		Newa
+View	CharacterWindow		Nézet
 Rumi numeral symbols	UnicodeBlocks		Rumi numerikus szimbólumok
 Enclosed CJK letters and months	UnicodeBlocks		Zárt CJK betűk és hónapok
 Deseret	UnicodeBlocks		Deseret
@@ -58,10 +60,12 @@ CJK unified ideographs extension C	UnicodeBlocks		CJK egységes ideográfiák C 
 Ancient Greek musical notation	UnicodeBlocks		Ősi görög zenei jelek
 Thai	UnicodeBlocks		Thai
 Ethiopic supplement	UnicodeBlocks		Etióp kiegészítés
+Only show blocks contained in font	CharacterWindow		Csak a betűkészletben meglévő blokkok mutatása
 Chess symbols	UnicodeBlocks		Sakk szombólumok
 Yijing hexagram symbols	UnicodeBlocks		Yijing hexagram szimbólumok
 Ottoman Siyaq numbers	UnicodeBlocks		Ottoman Siyaq számok
 Ideographic symbols and punctuation	UnicodeBlocks		Ideográfiai szimbólumok és írásjelek
+File	CharacterWindow		Fájl
 Sudanese supplement	UnicodeBlocks		Szudáni kiegészítés
 Myanmar	UnicodeBlocks		Mianmar
 Tifinagh	UnicodeBlocks		Tifinagh
@@ -97,6 +101,7 @@ Duployan	UnicodeBlocks		Duployan
 Early Dynastic Cuneiform	UnicodeBlocks		Korai dinasztikus Cuneiform
 Kana extended A	UnicodeBlocks		Kana kiterjesztett A
 Arabic presentation forms A	UnicodeBlocks		Arab prezentációs
+Filter:	CharacterWindow		Szűrő:
 Small Kana extension	UnicodeBlocks		Kis Kana kiterjesztések
 Kannada	UnicodeBlocks		Kannada
 Brahmi	UnicodeBlocks		Brahmi
@@ -112,6 +117,7 @@ Latin extended B	UnicodeBlocks		Latin kiterjesztett B
 Phonetic extensions	UnicodeBlocks		Fonetikus kiterjesztések
 Indic Siyaq numbers	UnicodeBlocks		Indic Siyaq számok
 Batak	UnicodeBlocks		Batak
+Code	CharacterWindow		Kód
 Block elements	UnicodeBlocks		Blokk elemek
 Ethiopic extended A	UnicodeBlocks		Etiópiai kiterjesztett A
 Mahjong tiles	UnicodeBlocks		Mahjong kockák
@@ -145,11 +151,12 @@ Ideographic description characters	UnicodeBlocks		Ideografikus leíró karaktere
 Supplemental arrows A	UnicodeBlocks		Kiegáészítő nyilak A
 Rejang	UnicodeBlocks		Rejang
 Number forms	UnicodeBlocks		Számformák
-Latin extended A	UnicodeBlocks		Latin kiterjesztett A
 Avestan	UnicodeBlocks		Avestan
+Latin extended A	UnicodeBlocks		Latin kiterjesztett A
 Zanabazar Square	UnicodeBlocks		Zanabazar szögletes
 Sundanese	UnicodeBlocks		Szundanéz
 Geometric shapes	UnicodeBlocks		Geometriai formák
+Clear	CharacterWindow		Törlés
 Symbols and pictographs extended A	UnicodeBlocks		Szombólumok és piktogramok kiterjesztett A
 Adlam	UnicodeBlocks		Adlam
 Arabic	UnicodeBlocks		Arab
@@ -170,8 +177,8 @@ Chorasmian	UnicodeBlocks		Chorasmian
 Lisu supplement	UnicodeBlocks		Lisu kiegészítő
 Takri	UnicodeBlocks		Takri
 Shorthand format controls	UnicodeBlocks		Gyorsírásos formátum vezérlők
-Optical character recognition	UnicodeBlocks		Optikai karakter felismerés
 Inscriptional Parthian	UnicodeBlocks		Inscriptional Parthian
+Optical character recognition	UnicodeBlocks		Optikai karakter felismerés
 Tamil	UnicodeBlocks		Tamil
 Lisu	UnicodeBlocks		Lisu
 Nandingari	UnicodeBlocks		Nandingari
@@ -181,6 +188,7 @@ Mahajani	UnicodeBlocks		Mahajani
 Lepcha	UnicodeBlocks		Lepcha
 Mandaic	UnicodeBlocks		Mandaic
 Old italic	UnicodeBlocks		Régi dőlt
+Quit	CharacterWindow		Kilépés
 Playing cards	UnicodeBlocks		Kártya játékok
 Chakma	UnicodeBlocks		Chakma
 Buhid	UnicodeBlocks		Buhid
@@ -213,8 +221,8 @@ Combining diacritical marks extended	UnicodeBlocks		Kiterjesztve a diakritikus j
 Cyrillic extended C	UnicodeBlocks		Cirill kiterjesztett C
 Syriac	UnicodeBlocks		Szír
 Private use area	UnicodeBlocks		Személyes használatú terület
-Supplement punctuation	UnicodeBlocks		Kiegészítő írásjelek
 Vedic extensions	UnicodeBlocks		Vedic kiterjesztés
+Supplement punctuation	UnicodeBlocks		Kiegészítő írásjelek
 Lycian	UnicodeBlocks		Lícián
 Myanmar extended A	UnicodeBlocks		Myanmar kiterjesztett A
 Ancient symbols	UnicodeBlocks		Ősi szimbólumok
@@ -234,6 +242,7 @@ Phags-pa	UnicodeBlocks		Phags-pa
 Nabataean	UnicodeBlocks		Nabataean
 Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		CJK kompatibilis ideográfiák
+Show private blocks	CharacterWindow		Privát blokkok megjelenítése
 Samaritan	UnicodeBlocks		Szamaritánus
 Latin extended additional	UnicodeBlocks		Latin további kiterjesztett
 Tibetan	UnicodeBlocks		Tibeti
@@ -254,13 +263,16 @@ Khudawadi	UnicodeBlocks		Khudawadi
 Glagotic	UnicodeBlocks		Glagolita
 Cyrillic extended B	UnicodeBlocks		Cirill B kiterjesztett
 Anatolian hieroglyphs	UnicodeBlocks		Anatóliai hieroglifák
+Copy as escaped byte string	CharacterView		Másolás escape bájt karakterként
 Tai Xuan Jing symbols	UnicodeBlocks		Tai Xuan Jing szimbólumok
 Hiragana	UnicodeBlocks		Hiragana
 Tagbanwa	UnicodeBlocks		Tagbanwa
 Basic Latin	UnicodeBlocks		Alap latin
 Greek and Coptic	UnicodeBlocks		Görög és kopt
 Kangxi radicals	UnicodeBlocks		Kangxi gyökök
+Copy character	CharacterView		Karakter kimásolása
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
+Font	CharacterWindow		Betű
 Ornamental dingbats	UnicodeBlocks		Díszítő dingbats
 Egyptian hieroglyph format controls	UnicodeBlocks		Egyiptomi hieroglif formátum vezérlők
 Manichaean	UnicodeBlocks		Manichaean

@@ -1,10 +1,10 @@
 1	german	application/x-vnd.Cortex.Route	51642783
 Node '%name%' released	CortexRouteApp		Node '%name%' freigegeben
 OK	CortexRouteApp		OK
-About Cortex/Route…	CortexRouteApp		Über Cortex/Route…
+About Cortex/Route…	CortexRouteApp		Über Cortex/Route …
 File	CortexRouteApp		Datei
 Connection '%name%' made	CortexRouteApp		'%name%' verbunden
-Save nodes…	CortexRouteApp		Nodes speichern…
+Save nodes…	CortexRouteApp		Nodes speichern …
 %producer% and %consumer%	CortexRouteApp		%producer% und %consumer%
 Node '%name%' created	CortexRouteApp		Node '%name%' erzeugt
 Negotiated format:	CortexRouteApp		Ausgehandeltes Format:
@@ -15,7 +15,7 @@ Connection failed	CortexRouteApp		Verbinden fehlgeschlagen
 Connection '%name%' broken	CortexRouteApp		Verbindung '%name%' abgebrochen
 Between:	CortexRouteApp		Zwischen:
 Cortex	CortexRouteApp		Cortex
-Open…	CortexRouteApp		Öffnen…
+Open…	CortexRouteApp		Öffnen …
 Connection made	CortexRouteApp		Verbindung hergestellt
 Show transport	CortexRouteApp		Transport anzeigen
 Show add-ons	CortexRouteApp		Add-ons anzeigen

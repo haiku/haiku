@@ -1,41 +1,66 @@
-1	dutch; flemish	x-vnd.Haiku-PoorMan	2026082639
-Cannot start the server	PoorMan		Kon de server niet starten
-Site	PoorMan		Site
-Create log file	PoorMan		Logbestand maken
-Console logging	PoorMan		Loggen naar console
+1	dutch; flemish	x-vnd.Haiku-PoorMan	1829050509
 Select web folder	PoorMan		Webmap selecteren
-Clear hit counter	PoorMan		Maak de hitteller leeg
+Console logging	PoorMan		Loggen naar console
+Create Log File	PoorMan		Logbestand maken
 File logging	PoorMan		Bestandsloggen
-File	PoorMan		Bestand
-Settings…	PoorMan		Instellingen...
 Website options	PoorMan		Website-opties
 Log to file	PoorMan		Loggen naar bestand
+Shutting down.	PoorMan		Bezig met afsluiten.
+Error Dir	PoorMan		Fout Map
+Web folder:	PoorMan		Webmap:
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kies alstublieft de map die u op het web wilt publiceren.\n\nU kunt PoorMan een standaardmap \"public_html\" laten aanmaken in uw home-map.\nOf u kunt in plaats daarvan een van uw eigen mappen gebruiken.
+Log To Console	PoorMan		Loggen naar console
+File Name	PoorMan		Bestandsnaam
+Starting up... 	PoorMan		Bezig met opstarten...
+Select	PoorMan		Selecteren
+Logging view	PoorMan		Logweergave
+Save console as…	PoorMan		Console opslaan als...
+Edit	PoorMan		Aanpassen
+Cancel	PoorMan		Annuleren
+Directory: 	PoorMan		Directory:
+Hits: %lu	PoorMan		Hits: %lu
+Hits: 0	PoorMan		Hits: 0
+Shutting down.\n	PoorMan		Bezig met afsluiten.\n
+Select all	PoorMan		Alles selecteren
+Error Server	PoorMan		Serverfout
+Send file listing if there's no start page	PoorMan		Stuur een bestandslijst als er geen startpagina is
+Create PoorMan log	PoorMan		PoorMan-log aanmaken
+Max. simultaneous connections:	PoorMan		Max. aantal gelijktijdige verbindingen:
+Done	PoorMan		Klaar
+Site	PoorMan		Site
+Cannot start the server	PoorMan		Kon de server niet starten
+Create log file	PoorMan		Logbestand maken
+Create public_html	PoorMan		Aanmaken public_html
+Clear hit counter	PoorMan		Maak de hitteller leeg
+Status: Stopped	PoorMan		Status: gestopt
+File	PoorMan		Bestand
+Settings…	PoorMan		Instellingen...
+Log To File	PoorMan		Loggen naar bestand
 Connections	PoorMan		Verbindingen
 Controls	PoorMan		Controle-elementen
 Log to console	PoorMan		Loggen naar console
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Kies alstublieft de map die u op het web wilt publiceren.\n\nU kunt PoorMan een standaardmap \"public_html\" laten aanmaken in uw home-map.\nOf u kunt in plaats daarvan een van uw eigen mappen gebruiken.
-Web folder:	PoorMan		Webmap:
 Advanced	PoorMan		Geavanceerd
-Logging	PoorMan		Loggen
 Copy	PoorMan		Kopiëren
+Logging	PoorMan		Loggen
 PoorMan	System name		PoorMan
-Logging view	PoorMan		Logweergave
-Run server	PoorMan		Server activeren
 Clear console log	PoorMan		Console-log wissen
+Run server	PoorMan		Server activeren
+Create	PoorMan		Maken
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# verbinding} other{# verbindingen}}
-Edit	PoorMan		Aanpassen
-Save console as…	PoorMan		Console opslaan als...
+done.\n	PoorMan		klaar.\n
 PoorMan settings	PoorMan		PoorMan-instellingen
+Console Logging	PoorMan		Consoleloggen
 Clear log file	PoorMan		Logbestand wissen
 Save log console selection	PoorMan		Selectie uit logconsole bewaren
+File Logging	PoorMan		Bestandsloggen
 Log file name:	PoorMan		Log bestandsnaam:
-Select all	PoorMan		Alles selecteren
-Send file listing if there's no start page	PoorMan		Stuur een bestandslijst als er geen startpagina is
-Create PoorMan log	PoorMan		PoorMan-log aanmaken
+Status: Running	PoorMan		Status: Actief
+Directory: (none)	PoorMan		Directory: (geen)
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Een standaard webfolder werd gemaakt in \"/boot/home/public_html.\"\nZorg ervoor dat er in die folder een HTML-bestand is met de naam \"index.html\".
-Quit	PoorMan		Afsluiten
+Dir Created	PoorMan		Dir. aangemaakt
 Save console selections as…	PoorMan		Consoleselecties opslaan als...
+Quit	PoorMan		Afsluiten
 Save log console	PoorMan		Logconsole opslaan
 Start page:	PoorMan		Startpagina:
-Max. simultaneous connections:	PoorMan		Max. aantal gelijktijdige verbindingen:
+OK	PoorMan		Oké
 Website location	PoorMan		Website-locatie

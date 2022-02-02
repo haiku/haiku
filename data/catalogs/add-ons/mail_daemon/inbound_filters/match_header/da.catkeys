@@ -1,12 +1,14 @@
-1	danish	x-vnd.Haiku-MatchHeader	2950227343
+1	danish	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		Slet meddelelse
+Match \"%attribute\" against \"%regex\"	RuleFilter		Match \"%attribute\" mod \"%regex\"
+Match header	RuleFilter		Match header
 Set flags to	ConfigView		Markér som
+Header field (e.g. Subject, From, …)	ConfigView		Headerfelt (f.eks. Emne, Fra …)
 <Choose account>	ConfigView		<Vælg konto>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Jokertegnværdi såsom \"*spam*\".\nPræfiks med \"REGEX:\" for at bruge regulære udtryk.
 Then	ConfigView		Så
 If	ConfigView		Hvis
 Set as read	ConfigView		Markér som læst
-Header field (e.g. Subject, From, 			Headerfelt (f.eks. Subject, From, 
 Reply with	ConfigView		Svar med
 <Choose action>	ConfigView		<Vælg handling>
 Move to	ConfigView		Flyt til

@@ -10,7 +10,7 @@ X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Option:
 Cancel	Modifier keys window		Abbrechen
-Sample and clipboard:	Keymap window		Tastenausgabe:
+Sample and clipboard:	Keymap window		Testfeld:
 Polish	KeymapNames		Polnisch
 Latin-American	KeymapNames		Lateinamerikanisch
 Ukrainian	KeymapNames		Ukrainisch
@@ -23,10 +23,10 @@ Belgian (point)	KeymapNames		Belgisch (Point)
 Finnish	KeymapNames		Finnisch
 Num lock	Keyboard Layout View		Num-Feststelltaste
 Switch shortcut keys to Windows/Linux mode	Keymap window		Befehlstasten tauschen: Windows/Linux-Modus
-Option	Keyboard Layout View	Option key	Option
 Spanish (Dvorak)	KeymapNames		Spanisch (Dvorak)
+Option	Keyboard Layout View	Option key	Option
 Scroll lock	Keyboard Layout View		Rollen-Feststelltaste
-US-International	KeymapNames		US International
+US-International	KeymapNames		US (international)
 Right option	Keyboard Layout View		Option rechts
 Turkish (Type-Q)	KeymapNames		Türkisch (Typ-Q)
 Revert	Modifier keys window		Anfangswerte
@@ -42,12 +42,12 @@ Belarusian (Mac)	KeymapNames		Weißrussisch (Mac)
 Croatian	KeymapNames		Kroatisch
 PAGE ↑	Keyboard Layout View		BILD ↑
 Set modifier keys	Modifier keys window		Hilfstasten zuordnen
-Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium International
+Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium (international)
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd-Taste
 PG ↓	Keyboard Layout View	Very short for 'page down'	Bld ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
-Apple Aluminum	KeyboardLayoutNames		Apple Aluminum
 Spanish	KeymapNames		Spanisch
+Apple Aluminum	KeyboardLayoutNames		Apple Aluminum
 HOME	Keyboard Layout View		POS1
 COMMAND	Keyboard Layout View		BEFEHL
 Ukrainian (Mac)	KeymapNames		Ukrainisch (Mac)
@@ -55,15 +55,15 @@ Command:	Modifier keys window	Command key role name	Befehl:
 French (Bépo)	KeymapNames		Französisch (Bépo)
 Russian (Typewriter)	KeymapNames		Russisch (Schreibmaschine)
 Acute trigger	Keymap window		´ Akut
+ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s (international)
 Italian	KeymapNames		Italienisch
-ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s International
-Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan International
+Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan (international)
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (US)
 French (NF Z71-300)	KeymapNames		Französisch (NF Z71-300)
 Modifier keys	Modifier keys window		Hilfstasten
-ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 International
+ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 (international)
 Kazakh	KeymapNames		Kasachisch
-Save as…	Keymap window		Speichern unter…
+Save as…	Keymap window		Speichern unter …
 Lithuanian (Standard)	KeymapNames		Litauisch (Standard)
 Error: duplicate keys	Modifier keys window		Fehler: doppelte Tasten
 NUM	Keyboard Layout View	Very short for 'num lock'	NUM
@@ -91,27 +91,27 @@ Belarusian	KeymapNames		Weißrussisch
 Warning: left and right key roles do not match	Modifier keys window		Achtung: linke und rechte Tasten-Funktion passen nicht zusammen
 Circumflex trigger	Keymap window		^ Zirkumflex
 Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
-Caps lock	Keyboard Layout View		Shift-Feststelltaste
+Caps lock	Keyboard Layout View		Feststelltaste
 Left shift	Keyboard Layout View		Shift links
 Russian (Yawert)	KeymapNames		Russisch (Yawert)
-ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e International
+ThinkPad X100e International	KeyboardLayoutNames		ThinkPad X100e (international)
 Bulgarian (Cyrillic)	KeymapNames		Bulgarisch (Kyrillisch)
 Swedish	KeymapNames		Schwedisch
 Left control	Keyboard Layout View		Steuerung links
 CAPS	Keyboard Layout View	Very short for 'caps lock'	FEST
 Role	Modifier keys window	As in the role of a modifier key	Funktion
 Svorak	KeymapNames		Svorak
-German	KeymapNames		Deutsch
 ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (US)
+German	KeymapNames		Deutsch
 Swiss-German	KeymapNames		Schweizerdeutsch
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Strg-Taste
 Czech	KeymapNames		Tschechisch
 Russian (Udmurt, Komi, Mari)	KeymapNames		Russisch (Udmurt, Komi, Mari)
 Thai (TIS-820.2538)	KeymapNames		Thai (TIS-820.2538)
 Control:	Modifier keys window	Control key role name	Steuerung:
-Generic 105-key International	KeyboardLayoutNames		Allgemeine 105-Tasten International
+Generic 105-key International	KeyboardLayoutNames		Allgemeine 105-Tasten (international)
 Disabled	Modifier keys window	Do nothing	Deaktiviert
-Select dead keys	Keymap window		Auslösetasten definieren
+Select dead keys	Keymap window		Tottasten wählen
 Russian (Mac)	KeymapNames		Russisch (Mac)
 Right shift	Keyboard Layout View		Shift rechts
 ESC	Keyboard Layout View		ESC
@@ -128,7 +128,7 @@ Quit	Keymap window		Beenden
 Polish (Typewriter)	KeymapNames		Polnisch (Schreibmaschine)
 French (Mac)	KeymapNames		Französisch (Mac)
 User:	Keymap window		Benutzer:
-Apple Aluminium Extended International	KeyboardLayoutNames		Apple Aluminium Extended International
+Apple Aluminium Extended International	KeyboardLayoutNames		Apple Aluminium Extended (international)
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Alt/Opt-Taste
 SHIFT	Keyboard Layout View		SHIFT
 Estonian	KeymapNames		Estnisch
@@ -140,12 +140,12 @@ Shift:	Modifier keys window	Shift key role name	Shift:
 Keymap	System name		Tastaturlayout
 Slovene	KeymapNames		Slowenisch
 Lithuanian	KeymapNames		Litauisch
-Set modifier keys…	Keymap window		Hilfstasten zuordnen…
+Set modifier keys…	Keymap window		Hilfstasten zuordnen …
 Switch shortcut keys to Haiku mode	Keymap window		Befehlstasten tauschen: Haiku-Modus
 Defaults	Keymap window		Standardwerte
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		System:
-ThinkPad International	KeyboardLayoutNames		ThinkPad International
+ThinkPad International	KeyboardLayoutNames		ThinkPad (international)
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Aluminum Extended (US)
 Switch shortcut keys	Keymap window		Befehlstasten tauschen
 Right command	Keyboard Layout View		Befehl rechts
@@ -157,8 +157,8 @@ Font	Keymap window		Schriftart
 Danish	KeymapNames		Dänisch
 Generic 104-key	KeyboardLayoutNames		Allgemeine 104-Tasten
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift-Taste
-PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		Russisch
+PAUSE	Keyboard Layout View		PAUSE
 TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Rumänisch
 CMD	Keyboard Layout View	Very short for 'command'	BEF
@@ -171,5 +171,5 @@ OPTION	Keyboard Layout View		OPTION
 Dutch	KeymapNames		Niederländisch
 Diaeresis trigger	Keymap window		¨ Trema/Diärese
 Icelandic	KeymapNames		Isländisch
-Open…	Keymap window		Öffnen…
+Open…	Keymap window		Öffnen …
 ThinkPad T400s (US)	KeyboardLayoutNames		ThinkPad T400s (US)

@@ -1,2 +1,46 @@
-1	hungarian	x-vnd.Haiku-SoundRecorder	2344941071
+1	hungarian	x-vnd.Haiku-SoundRecorder	24440888
+Loop	RecorderWindow		Ismétlés
+Cannot find default audio hardware	RecorderWindow		Nem található az alapértelmezett hangeszköz
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Nem található az új felvételt tároló ideiglenes fájl
+Sample size:	RecorderWindow		Méret:
+Nothing to play	RecorderWindow		Nincs mit lejátszani
+None of the files appear to be audio files.	RecorderWindow		A fájlok egyike sem tűnik hangfájlnak.
+Duration: 	RecorderWindow		Hossz:
+File info	RecorderWindow		Fájlinformációk
 Drop files here	SoundListView		Húzza ide a fájlokat
+Input	RecorderWindow		Bemenet
+Some of the files don't appear to be audio files.	RecorderWindow		A fájlok között van olyan, ami nem hangfájl.
+Stop	RecorderWindow		Leállítás
+Format:	RecorderWindow		Formátum:
+Sound List	RecorderWindow		Hanglista
+Compression: 	RecorderWindow		Tömörítés:
+Rewind	RecorderWindow		Visszatekerés
+Sample rate:	RecorderWindow		Frekvencia:
+Invalid audio files	RecorderWindow		Érvénytelen hangfájlok
+ seconds	RecorderWindow		 másodperc
+OK	RecorderWindow		Rendben
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Nem sikerült megnyitni az új felvételt tároló ideiglenes fájlt
+Input:	RecorderWindow		Bemenet:
+Forward	RecorderWindow		Előretekerés
+Play	RecorderWindow		Lejátszás
+SoundRecorder	System name		Hangfelvevő
+Channels:	RecorderWindow		Csatornák:
+ bits	RecorderWindow		 bit
+None	RecorderWindow		Nincs
+Record	RecorderWindow		Felvétel
+Sample size: 	RecorderWindow		Mintavételezés mérete:
+Cannot recognize this file as a media file	RecorderWindow		Ez a fájl nem ismerhető fel médiafájlnak
+Format: 	RecorderWindow		Formátum:
+File name: 	RecorderWindow		Fájlnév:
+Cannot connect to the selected sound input	RecorderWindow		Nem sikerült csatlakozni a kiválasztott hangbemenethez
+Cannot get the file to play	RecorderWindow		Nem sikerült lejátszani a fájlt
+Cannot record a sound that long	RecorderWindow		Nem lehet ilyen hosszú hangfelvételt készíteni
+Duration:	RecorderWindow		Hossz:
+Compression:	RecorderWindow		Tömörítés:
+Cannot find an unused name to use for the new recording	RecorderWindow		Nem található még nem használt név az új felvételnek
+Channels: 	RecorderWindow		Csatornák:
+Save	RecorderWindow		Mentés
+Sample rate: 	RecorderWindow		Mintavételi frekvencia:
+Cannot connect to media server	RecorderWindow		Nem lehet kapcsolódni a kiszolgálóhoz
+The file doesn't appear to be an audio file.	RecorderWindow		Ez a fájl nem tűnik hangfájlnak.
+File name:	RecorderWindow		Fájlnév:

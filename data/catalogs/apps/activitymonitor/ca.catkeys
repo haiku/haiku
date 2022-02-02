@@ -1,37 +1,48 @@
-1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	3850445261
+1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Equips
 Semaphores	DataSource		Semàfors
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Bloca la memòria cau
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
 Media nodes	DataSource		Nodes de mitjans
 Text clipboard	DataSource		Porta-retalls per a text
 Network send	DataSource		Envia amb la xarxa
-Cache	DataSource		Memòria cau
 Running applications	DataSource		Aplicacions en execució
-Threads	DataSource		Fils
+Cache	DataSource		Memòria cau
 CPU usage (combined)	DataSource		Ús de la CPU (combinat)
+Threads	DataSource		Fils
 Receiving	DataSource		Es rep
+Remove graph	ActivityView		Suprimeix el gràfic
 Swap space	DataSource		Espai d'intercanvi
 CPU	DataSource		CPU
+ActivityMonitor	System name		Monitor d'activitat
 CPU %d	DataSource		CPU %d
+Update time interval:	SettingsWindow		Interval d'actualització:
 RX	DataSource	Shorter version for Receiving.	RX
+Settings…	ActivityWindow		Paràmetres...
 Block cache	DataSource		Bloca la cau
 Memory	DataSource		Memòria
-CPU speed	DataSource		Velocitat de la CPU
 CPU usage	DataSource		Ús de la CPU
+Quit	ActivityWindow		Surt
 Raw clipboard	DataSource		Porta-retalls en cru
+Settings	ActivityWindow		Paràmetres
 Used memory	DataSource		Memòria usada
 %.1f faults/s	DataSource		%.1f falles/s
+Show legend	ActivityView		Mostra la llegenda
 Cached memory	DataSource		A la memòria cau
-CPU %d speed	DataSource		Velocitat de la CPU %d
 CPU %d usage	DataSource		Ús de la CPU %d
+File	ActivityWindow		Fitxer
 Ports	DataSource		Ports
 Page faults	DataSource		Falles de pàgina
 Apps	DataSource		Aplicacions
+Additional items	ActivityView		Elements addicionals
+Add graph	ActivityWindow		Afegeix-hi un gràfic
 Sending	DataSource		S'envia
 %.1f MiB	DataSource		%.1f MB
+Always on top	ActivityWindow		Sempre en primer pla
 Swap	DataSource		Memòria d'intercanvi
+%lld sec.	SettingsWindow		%lld seg.
 P-faults	DataSource		Averies de P
 Sems	DataSource		Sems
 Network receive	DataSource		Rep de la xarxa

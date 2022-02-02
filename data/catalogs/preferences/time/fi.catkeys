@@ -1,7 +1,48 @@
-1	finnish	x-vnd.Haiku-Time	3879356774
+1	finnish	x-vnd.Haiku-Time	3691539601
+OK	Time		Valmis
 Message receiving failed	Time		Viestin vastaanotto epäonnistui
-Waiting for answer failed	Time		Vastauksen odottaminen epäonnistui
-Received invalid time	Time		Vastaanotettiin virheellinen aika
-Sending request failed	Time		Pyynnön lähettäminen epäonnistui
-Could not create socket	Time		Vastakkeen luominen epäonnistui
+Australia	Time		Australia
+America	Time		Amerikka
+Reset to default server list	Time		Nollaa oletuspalvelinluettelo
 Could not resolve server address	Time		Palvelinosoitteen ratkaiseminen epäonnistui
+Time & Date	System name		Aika & Päivämäärä
+Set time zone	Time		Aseta aikavyöhyke
+Waiting for answer failed	Time		Vastauksen odottaminen epäonnistui
+<Other>	Time		<Muut>
+Received invalid time	Time		Vastaanotettiin virheellinen aika
+Remove	Time		Poista
+Synchronize again	Time		Synkronoi uudelleen
+Asia	Time		Aasia
+Try all servers	Time		Yritä kaikkia palvelimia
+Time	Time		Aika
+Current time:	Time		Nykyinen aika:
+The following error occured while synchronizing:\n%s: %s	Time		Seuraava virhe tapahtui synkronoinnin aikana:\n%s: %s
+Europe	Time		Eurooppa
+Show day of week	Time		Näytä viikonpäivä
+Local time (Windows compatible)	Time		Paikallinen aika (Windows-yhteensopiva)
+Hardware clock set to:	Time		Laitteistokellon ajaksi asetettu:
+Arctic	Time		Pohjoinen napaseutu
+Antarctica	Time		Etelänapamanner
+GMT (UNIX compatible)	Time		Greenwichin aika (UNIX-yhteensopiva)
+Africa	Time		Afrikka
+Stop	Time		Pysäytä
+Time zone	Time		Aikavyöhyke
+Clock	Time		Kello
+Network time	Time		Verkkoaika
+Sending request failed	Time		Pyynnön lähettäminen epäonnistui
+Preview time:	Time		Esikatseluaika:
+\nNow: 	Time		\nNyt: 
+Could not create socket	Time		Vastakkeen luominen epäonnistui
+Pacific	Time		Tyyni valtameri
+Atlantic	Time		Atlantin valtameri
+Show clock in Deskbar	Time		Näytä kello Työpöytäpalkissa
+Display time with seconds	Time		Näytä aika sekunteina
+Time	System name		Aika-asetukset
+Show time zone	Time		Näytä aikavyöhyke
+Synchronize at boot	Time		Synkronoi käynnistyksen yhteydessä
+Indian	Time		Intia
+Revert	Time		Palauta
+Date and time	Time		Päivämäärä ja aika
+The following error occured while synchronizing:\n%s	Time		Seuraava virhe tapahtui synkronoinnin aikana:\n%s
+Synchronize	Time		Synkronoi
+Add	Time		Lisää

@@ -46,7 +46,7 @@ New tabs:	Settings Window		Yeni sekmeler:
 Open downloads folder	Download Window		İndirilenler klasörünü aç
 Proxy server	Settings Window		Vekil sunucu
 Decrease size	WebPositive Window		Küçült
-Default fixed font size:	Settings Window		Öntanımlı sabit yazıtipi boyutu:
+Default fixed font size:	Settings Window		Öntanımlı eş aralıklı yazıtipi boyutu:
 Sans serif font:	Settings Window		Sans serif yazıtipi:
 Clear	WebPositive Window		Temizle
 Cookies for %s	Cookie Manager		%s için çerezler
@@ -115,7 +115,7 @@ History	WebPositive Window		Geçmiş
 Reset size	WebPositive Window		Orijinal boyut
 Do you really want to clear the browsing history?	WebPositive Window		Tarama geçmişini temizlemek istediğinizden emin misiniz?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Arama dizgisinin bir sonraki oluşumunu bul
-Fixed font:	Settings Window		Sabit yazıtipi
+Fixed font:	Settings Window		Eş aralıklı yazıtipi
 Quit	WebPositive Window		Çık
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Arama dizgisinin önceki oluşumlarını bul
 Remember username and password for this site	Authentication Panel		Bu site için kullanıcı adı ve parolayı hatırla

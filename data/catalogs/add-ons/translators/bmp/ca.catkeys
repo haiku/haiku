@@ -1,6 +1,9 @@
-1	catalan; valencian	x-vnd.Haiku-BMPTranslator	3986869408
-BMP image translator	BMPTranslator		Traductor d'imatges BMP
+1	catalan; valencian	x-vnd.Haiku-BMPTranslator	2497639570
 BMP images	BMPTranslator		Imatges BMP
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Imatge BMP (en format MS, de %d bits
 BMPTranslator Settings	BMPTranslator		Paràmetres del Traductor de BMP
 BMP image (OS/2 format, %d bits)	BMPTranslator		imatge BMP (en format OS/2, de %d bits)
+BMP image translator	BMPView		Traductor d'imatges BMP
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	Imatge BMP (en format MS, de %d bits
+BMP Settings	BMPMain		Paràmetres de BMP
+Version %d.%d.%d, %s	BMPView		Versió %d.%d.%d, %s
+BMP image translator	BMPTranslator		Traductor d'imatges BMP

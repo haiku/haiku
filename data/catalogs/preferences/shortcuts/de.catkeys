@@ -23,7 +23,7 @@ Control	ShortcutsSpec	Name for modifier on keyboard	Strg
 Left	ShortcutsSpec		Links
 Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gelesen werden.
 Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Die Tastenbelegungsdatei konnte nicht gespeichert werden.
-*InsertString \"Your Text Here\"	ShortcutsWindow		*Zeichen einfügen \"Hier der Text\"
+*InsertString \"Your Text Here\"	ShortcutsWindow		*Text einfügen \"Hier der Text\"
 Remove selected shortcut	ShortcutsWindow		Markierten Eintrag entfernen
 Error, NULL state description?	ShortcutsSpec		Fehler, NULL Status Beschreibung?
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
@@ -32,8 +32,8 @@ Save & apply	ShortcutsWindow		Speichern & anwenden
 Open	ShortcutsWindow		Öffnen
 Append	ShortcutsWindow		Anhängen
 Both	ShortcutsSpec		Beide
-Save KeySet as…	ShortcutsWindow		Tastenbelegung speichern unter…
-Append KeySet…	ShortcutsWindow		Tastenbelegung anfügen…
+Save KeySet as…	ShortcutsWindow		Tastenkürzel speichern unter …
+Append KeySet…	ShortcutsWindow		Tastenkürzel anfügen …
 *MouseButton 1	ShortcutsWindow		*Maustaste 1 drücken
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		Maus nach oben ins linke Eck und Maustaste 1 drücken
 Right	ShortcutsSpec		Rechts
@@ -41,7 +41,7 @@ OK	ShortcutsWindow		OK
 Add new shortcut	ShortcutsWindow		Neue Tasten-Kombi
 (None)	ShortcutsSpec		(Keine)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Open KeySet…	ShortcutsWindow		Tastenbelegung öffnen…
+Open KeySet…	ShortcutsWindow		Tastenkürzel öffnen …
 File	ShortcutsWindow		Datei
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Maus zur Bildschirmmitte bewegen

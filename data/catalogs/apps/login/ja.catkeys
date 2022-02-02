@@ -1,11 +1,20 @@
-1	japanese	x-vnd.Haiku-Login	3025604784
+1	japanese	x-vnd.Haiku-Login	3568987751
 Invalid login!	Login View		ログインが無効です!
-OK	Login View		OK
+Error	Login App		エラー
+Login application for Haiku\nUsage:	Login App		Login application for Haiku\nUsage:
+--nonmodal\tDo not make the window modal	Login App		--nonmodal\tDo not make the window modal
 Welcome to Haiku	Login Window		Haiku へようこそ
-Login:	Login View		ログイン:
-Password:	Login View		パスワード:
 Halt	Login View		停止
 Desktop	Desktop Window		デスクトップ
 Hide password	Login View		パスワードを隠す
 Reboot	Login View		再起動
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Login アプリケーションの背後のデスクトップをレプリカントをドロップすることでカスタマイズできます。\n\n完了後、アプリケーションを終了してください (Cmd-Q)。
+OK	Login View		OK
+Info	Login App		情報
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tLaunch in shelf editting mode to allow customizing the desktop.
+Login:	Login View		ログイン:
+Password:	Login View		パスワード:
+Unimplemented	Login App		未実装
+OK	Login App		OK
+Error: %1	Login App		エラー: %1
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	エラー %s\n

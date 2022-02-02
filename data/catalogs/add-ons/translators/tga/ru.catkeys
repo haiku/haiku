@@ -1,15 +1,16 @@
-1	russian	x-vnd.Haiku-TGATranslator	1299281918
+1	russian	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		Сохранить с RLE сжатием
+Targa image (%d bits truecolor)	TGATranslator		Targa изображение (%d битный истинный цвет)
+Ignore TGA alpha channel	TGAView		Игнорировать альфа канал TGA
+Targa image (%d bits colormap)	TGATranslator		Targa изображение (%d битная цветовая карта)
+TGA image translator	TGAView		Транслятор TGA изображений
+Targa image (%d bits RLE colormap)	TGATranslator		Targa изображение (%d битная цветовая карта RLE)
+Targa image (%d bits gray)	TGATranslator		Targa изображение (%d битное серое)
+Written by the Haiku Translation Kit Team	TGAView		Разработан командой Haiku Translation Kit
+Targa image (%d bits RLE truecolor)	TGATranslator		Targa изображение (%d битное полноцветное RLE)
+TGA images	TGATranslator		TGA изображения
 Version %d.%d.%d, %s	TGAView		Версия %d.%d.%d, %s
 TGATranslator Settings	TGATranslator		Настройки TGA транслятора
-Targa image (%d bits RLE truecolor)	TGATranslator		Targa изображение (%d битное полноцветное RLE)
-Save with RLE compression	TGAView		Сохранить с RLE сжатием
-Targa image (%d bits RLE colormap)	TGATranslator		Targa изображение (%d битная цветовая карта RLE)
-Written by the Haiku Translation Kit Team	TGAView		Разработан командой Haiku Translation Kit
-Targa image (%d bits colormap)	TGATranslator		Targa изображение (%d битная цветовая карта)
-Ignore TGA alpha channel	TGAView		Игнорировать альфа канал TGA
 TGA image translator	TGATranslator		Транслятор TGA изображений
-TGA images	TGATranslator		TGA изображения
-Targa image (%d bits gray)	TGATranslator		Targa изображение (%d битное серое)
-TGA image translator	TGAView		Транслятор TGA изображений
 Targa image (%d bits RLE gray)	TGATranslator		Targa изображение (%d битное серое RLE)
-Targa image (%d bits truecolor)	TGATranslator		Targa изображение (%d битный истинный цвет)
+TGA Settings	TGAMain		Настройки TGA транслятора

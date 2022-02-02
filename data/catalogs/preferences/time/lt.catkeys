@@ -1,6 +1,43 @@
-1	lithuanian	x-vnd.Haiku-Time	3690451231
+1	lithuanian	x-vnd.Haiku-Time	908714414
+OK	Time		Gerai
 Message receiving failed	Time		Nepavyko gauti pranešimo
+Australia	Time		Australija
+America	Time		Amerika
+Set time zone	Time		Pakeisti laiko juostą
 Waiting for answer failed	Time		Atsakymas negautas
+<Other>	Time		<Kita>
 Received invalid time	Time		Gautas negalimas laikas
+Remove	Time		Pašalinti
+Synchronize again	Time		Sinchronizuoti vėl
+Asia	Time		Azija
+Try all servers	Time		Bandyti visus serverius
+Time	Time		Laikas
+Current time:	Time		Dabartinis laikas:
+Europe	Time		Europa
+Show day of week	Time		Rodyti savaitės dieną
+Local time (Windows compatible)	Time		Vietinis laikas (suderinama su „Windows“)
+Hardware clock set to:	Time		Aparatiniame šio įrenginio laikrodyje nustatytas:
+Arctic	Time		Arktis
+Antarctica	Time		Antarktis
+GMT (UNIX compatible)	Time		Pasaulinis (Grinvičo) laikas (suderinama su UNIX)
+Africa	Time		Afrika
+Stop	Time		Stabdyti
+Time zone	Time		Laiko juosta
+Clock	Time		Laikrodis
+Network time	Time		Sinchronizavimas
 Sending request failed	Time		Užklausos išsiųsti nepavyko
+Preview time:	Time		Laikas, kuris bus rodomas:
+\nNow: 	Time		\nDabar: 
 Could not create socket	Time		Nepavyko sukurti lizdo
+Pacific	Time		Ramusis vandenynas
+Atlantic	Time		Atlanto vandenynas
+Show clock in Deskbar	Time		Rodyti laikrodį pranešimų srityje
+Display time with seconds	Time		Rodyti sekundes
+Time	System name		Laikas
+Show time zone	Time		Rodyti laiko juostą
+Synchronize at boot	Time		Sinchronizuoti įkeliant sistemą
+Indian	Time		Indijos vandenynas
+Revert	Time		Atšaukti pakeitimus
+Date and time	Time		Data ir laikas
+Synchronize	Time		Sinchronizuoti
+Add	Time		Pridėti

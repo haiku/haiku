@@ -1,6 +1,7 @@
-1	french	x-vnd.Haiku.TextSearch	2679411567
+1	french	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Veuillez choisir les fichiers qui seront sélectionnés pour vous dans le Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		Impossible de démarrer le programme xargs !
 Open selection	GrepWindow		Ouvrir la sélection
 Actions	GrepWindow		Actions
 New window	GrepWindow		Nouvelle fenêtre
@@ -8,9 +9,9 @@ Encoding	GrepWindow		Encodage
 Set target to parent folder	GrepWindow		Définir le dossier parent pour cible
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
-Set target			Sélectionner la destination
 Close	GrepWindow		Fermer
 Look in sub-folders	GrepWindow		Regarder dans les sous-dossiers
+%s: Not enough room to escape the filename.	Grepper		%s: Pas assez de place pour coder le nom du fichier.
 Follow symbolic links	GrepWindow		Suivre les liens symboliques
 Regular expression	GrepWindow		Expression régulière
 Text files only	GrepWindow		Seulement les fichiers texte
@@ -18,12 +19,16 @@ Quit	GrepWindow		Quitter
 Show files in Tracker	GrepWindow		Montrer les fichiers dans le Tracker
 Please select the files you wish to keep searching.	GrepWindow		Veuillez sélectionnez les fichiers dans lesquels vous souhaitez continuer à scruter.
 Trim to selection	GrepWindow		Réduire à la sélection
+Set target…	GrepWindow		Choisir la cible…
+Failed to open input pipe!	Grepper		Impossible d’ouvrir le flux d’entrée !
 Search	GrepWindow		Rechercher
 Copy text to clipboard	GrepWindow		Copier le texte dans le presse-papier
 Show lines	GrepWindow		Montrer les lignes
+Failed to open errors pipe!	Grepper		Impossible d’ouvrir le flux d’erreur !
 The unselected files will be removed from the list.	GrepWindow		Les fichiers non-sélectionnés seront retirés de la liste.
 Open files in code editor	GrepWindow		Ouvrir les fichiers dans l’éditeur de code
 Skip folders starting with a dot	GrepWindow		Ignorer les dossiers commençant par un point
+Failed to open output pipe!	Grepper		Impossible d’ouvrir le flux de sortie !
 Cancel	GrepWindow		Annuler
 History	GrepWindow		Historique
 TextSearch	System name		RechercheTexte

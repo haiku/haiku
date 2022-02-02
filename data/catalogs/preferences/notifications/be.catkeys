@@ -1,2 +1,9 @@
-1	belarusian	x-vnd.Haiku-Notifications	3609297650
+1	belarusian	x-vnd.Haiku-Notifications	525245920
+OK	PrefletWin		ОК
+Revert	PrefletWin		Вярнуць
+Applications	NotificationView		Праграмы
 General	PrefletView		Агульныя
+Notifications	System name		Паведамленні
+Allowed	NotificationView		Дазволена
+Application	NotificationView		Праграма
+Enable notifications	GeneralView		Уключыць паведамленні

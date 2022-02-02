@@ -10,10 +10,10 @@ Latin-American	KeymapNames		Amerika-latin
 Ukrainian	KeymapNames		Ukraina
 Russian (Yawert)	KeymapNames		Rusia (Yawert)
 United-Kingdom	KeymapNames		Britania Raya
-Serbian (Cyrillic)	KeymapNames		Serbia (sirilik)
 Turkish (Type-F)	KeymapNames		Turki(Type-F)
-Bulgarian (Cyrillic)	KeymapNames		Bulgaria (Sirilik)
+Serbian (Cyrillic)	KeymapNames		Serbia (sirilik)
 Belgian (point)	KeymapNames		Belgia (point)
+Bulgarian (Cyrillic)	KeymapNames		Bulgaria (Sirilik)
 Finnish	KeymapNames		Finlandia
 Swedish	KeymapNames		Swedia
 Svorak	KeymapNames		Svorak
@@ -51,8 +51,8 @@ Italian	KeymapNames		Itali
 Portuguese	KeymapNames		Portugis
 Swiss-French	KeymapNames		Swis-Perancis
 Slovene	KeymapNames		Slovene
-Lithuanian	KeymapNames		Lithuania
 French (NF Z71-300)	KeymapNames		Perancis (NF Z71-300)
+Lithuanian	KeymapNames		Lithuania
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Kazakhtan
 Language	BootPromptWindow		Bahasa
@@ -67,8 +67,8 @@ Russian	KeymapNames		Rusia
 Hungarian	KeymapNames		Hunggaria
 Irish	KeymapNames		Irlandia
 Romanian	KeymapNames		Rumania
-Macedonian	KeymapNames		Makedonia
 Czech (Mac)	KeymapNames		Ceko (Mac)
+Macedonian	KeymapNames		Makedonia
 Brazilian (ABNT2)	KeymapNames		Brazil (ABNT2)
 Albanian	KeymapNames		Albania
 Dutch	KeymapNames		Belanda

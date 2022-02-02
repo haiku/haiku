@@ -1,6 +1,7 @@
-1	ukrainian	x-vnd.Haiku.TextSearch	2003518937
+1	ukrainian	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Виберіть файли які Ви маєте виділити у Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		Не вдалося запустити програму xargs!
 Open selection	GrepWindow		Відкрити вибране
 Actions	GrepWindow		Дії
 New window	GrepWindow		Нове вікно
@@ -10,6 +11,7 @@ OK	GrepWindow		ОК
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Закрити
 Look in sub-folders	GrepWindow		Дивитися в підпапках
+%s: Not enough room to escape the filename.	Grepper		%s: Недостатньо місця щоб екранувати ім'я файлу.
 Follow symbolic links	GrepWindow		Дотримуйтесь символічних посилань
 Regular expression	GrepWindow		Регулярний вираз
 Text files only	GrepWindow		Тільки текстові файли
@@ -17,12 +19,16 @@ Quit	GrepWindow		Вийти
 Show files in Tracker	GrepWindow		Показати файли у Tracker
 Please select the files you wish to keep searching.	GrepWindow		Будь ласка виберіть файли в яких Ви хочете продовжити пошук.
 Trim to selection	GrepWindow		Обмежитись вибраними
+Set target…	GrepWindow		Встановити ціль…
+Failed to open input pipe!	Grepper		Збій при відкритті вхідного каналу!
 Search	GrepWindow		Пошук
 Copy text to clipboard	GrepWindow		Копіювати текст до буферу обміну
 Show lines	GrepWindow		Показати лінії
+Failed to open errors pipe!	Grepper		Збій при відкритті каналу помилок!
 The unselected files will be removed from the list.	GrepWindow		Файли, які не вибрані, будуть вилучені зі списку.
 Open files in code editor	GrepWindow		Відкрвати файли в редакторі коду
 Skip folders starting with a dot	GrepWindow		Пропустити папки, що починаються з крапки
+Failed to open output pipe!	Grepper		Збій при відкритті вихідного каналу! 
 Cancel	GrepWindow		Скасувати
 History	GrepWindow		Історія
 TextSearch	System name		TextSearch

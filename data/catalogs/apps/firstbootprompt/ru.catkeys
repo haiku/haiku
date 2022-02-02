@@ -12,10 +12,10 @@ Ukrainian	KeymapNames		Украинский
 Russian (Yawert)	KeymapNames		Русская (фонетическая)
 United-Kingdom	KeymapNames		Британская
 Quit Haiku	System name		Выйти из Haiku
-Serbian (Cyrillic)	KeymapNames		Сербская (Кириллица)
 Turkish (Type-F)	KeymapNames		Турецкая (Тип-F)
-Bulgarian (Cyrillic)	KeymapNames		Болгарская (Кириллица)
+Serbian (Cyrillic)	KeymapNames		Сербская (Кириллица)
 Belgian (point)	KeymapNames		Бельгийская (point)
+Bulgarian (Cyrillic)	KeymapNames		Болгарская (Кириллица)
 Finnish	KeymapNames		Финская
 Swedish	KeymapNames		Шведская
 Svorak	KeymapNames		Сворак
@@ -54,8 +54,8 @@ Italian	KeymapNames		Итальянская
 Portuguese	KeymapNames		Португальская
 Swiss-French	KeymapNames		Швейцарско-Французский
 Slovene	KeymapNames		Словенская
-Lithuanian	KeymapNames		Литовская
 French (NF Z71-300)	KeymapNames		Французская (NF Z71-300)
+Lithuanian	KeymapNames		Литовская
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Казахская
 Language	BootPromptWindow		Язык
@@ -71,8 +71,8 @@ Hungarian	KeymapNames		Венгерская
 Irish	KeymapNames		Ирландская
 Romanian	KeymapNames		Румынская
 Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Вы уверены, что хотите закрыть это окно? Это приведет к перезагрузке компьютера!
-Macedonian	KeymapNames		Македонская
 Czech (Mac)	KeymapNames		Чешская (Mac)
+Macedonian	KeymapNames		Македонская
 Brazilian (ABNT2)	KeymapNames		Бразильская (ABNT2)
 Albanian	KeymapNames		Албанская
 Dutch	KeymapNames		Датская

@@ -1,9 +1,9 @@
-1	belarusian	x-vnd.Haiku-CharacterMap	903106397
+1	belarusian	x-vnd.Haiku-CharacterMap	56063163
 Miscellaneous mathematical symbols B	UnicodeBlocks		Розныя матэматычныя сімвалы B
 Saurashtra	UnicodeBlocks		Саураштра
 Arabic supplement	UnicodeBlocks		Арабскія дапаўненні
-Ogham	UnicodeBlocks		Огам
 Hanunoo	UnicodeBlocks		Хануну
+Ogham	UnicodeBlocks		Огам
 Hebrew	UnicodeBlocks		Іўрыт
 Katakana	UnicodeBlocks		Катакана
 Mongolian	UnicodeBlocks		Мангольскі
@@ -16,10 +16,12 @@ Cuneiform numbers and punctuation	UnicodeBlocks		Клінапісныя лічб
 Miscellaneous symbols	UnicodeBlocks		Розныя сімвалы
 Vertical forms	UnicodeBlocks		Вертыкальныя формы
 Miscellaneous mathematical symbols A	UnicodeBlocks		Розныя матэматычныя сімвалы A
+CharacterMap	System name		Табліца сімвалаў
 Latin extended D	UnicodeBlocks		Лацінка пашыраная D
 Aegean numbers	UnicodeBlocks		Эгейскія лічбы
 Hangul syllables	UnicodeBlocks		Склады Хангул
 Modifier tone letters	UnicodeBlocks		Мадыфікатар танальнасці літар
+View	CharacterWindow		Від
 Enclosed CJK letters and months	UnicodeBlocks		Закрытыя літары і месяцы CJK
 Deseret	UnicodeBlocks		Дэзэрэт
 Cham	UnicodeBlocks		Чам
@@ -29,6 +31,7 @@ Ancient Greek musical notation	UnicodeBlocks		Старажытнагрэчаск
 Thai	UnicodeBlocks		Тайскі
 Ethiopic supplement	UnicodeBlocks		Эфіопскі дапаўненні
 Yijing hexagram symbols	UnicodeBlocks		Гексаграмавыя сімвалы Yijing
+File	CharacterWindow		Файл
 Myanmar	UnicodeBlocks		Маянмар
 Tifinagh	UnicodeBlocks		Тыфінаг
 Musical symbols	UnicodeBlocks		Музычныя сімвалы
@@ -48,6 +51,7 @@ Georgian	UnicodeBlocks		Грузінскі
 CJK compatibility forms	UnicodeBlocks		Формы сумяшчальнасці CJK
 CJK unified ideographs extension B	UnicodeBlocks		Іерогліфы CJK дапаўненне B
 Arabic presentation forms A	UnicodeBlocks		Арабскія формы прадстаўлення А
+Filter:	CharacterWindow		Фільтр:
 Kannada	UnicodeBlocks		Каннада
 Lydian	UnicodeBlocks		Лідыйскі
 Gurmukhi	UnicodeBlocks		Гурмухі
@@ -55,6 +59,7 @@ Supplemental arrows B	UnicodeBlocks		Дадатковыя стрэлкі B
 CJK unified ideographs	UnicodeBlocks		CJK іерогліфы
 Latin extended B	UnicodeBlocks		Лацінка пашыраная B
 Phonetic extensions	UnicodeBlocks		Фанетычныя пашырэнні
+Code	CharacterWindow		Код
 Block elements	UnicodeBlocks		Блокавыя Элементы
 Mahjong tiles	UnicodeBlocks		Пліткі Маджонг
 Carian	UnicodeBlocks		Карыянскі
@@ -83,6 +88,7 @@ Number forms	UnicodeBlocks		Формы лічбаў
 Latin extended A	UnicodeBlocks		Лацінка пашыраная A
 Sundanese	UnicodeBlocks		Суданскі
 Geometric shapes	UnicodeBlocks		Геаметрычныя фігуры
+Clear	CharacterWindow		Ачысціць
 Arabic	UnicodeBlocks		Арабскі
 Khmer symbols	UnicodeBlocks		Сімвалы Кхмер
 Ol Chiki	UnicodeBlocks		Оль Чыкі
@@ -97,6 +103,7 @@ Tamil	UnicodeBlocks		Тамільскі
 Greek extended	UnicodeBlocks		Грэчаскі пашыраны
 Lepcha	UnicodeBlocks		Лепчанскі
 Old italic	UnicodeBlocks		Этрусский алфавит
+Quit	CharacterWindow		Выйсці
 Buhid	UnicodeBlocks		Бухід
 Supplementary private use area B	UnicodeBlocks		Дадатковая вобласць прыватнага карыстання B
 Cuneiform	UnicodeBlocks		Клінапіс
@@ -126,6 +133,7 @@ Supplementary private use area A	UnicodeBlocks		Дадатковая вобла�
 Armenian	UnicodeBlocks		Армянскі
 Phags-pa	UnicodeBlocks		Фагс-па
 CJK compatibility ideographs	UnicodeBlocks		CJK сумяшчальныя іерогліфы
+Show private blocks	CharacterWindow		Паказваць прыватныя блокі
 Latin extended additional	UnicodeBlocks		Лацінка пашыраная дадтковая
 Tibetan	UnicodeBlocks		Тыбецкі
 Combining diacritical marks	UnicodeBlocks		Камбінаванне дыякрытыных метак
@@ -138,13 +146,16 @@ Runic	UnicodeBlocks		Руны
 General punctuation	UnicodeBlocks		Знакі прыпынку
 Glagotic	UnicodeBlocks		Глаголіца
 Cyrillic extended B	UnicodeBlocks		Кірыліца пашыраная B
+Copy as escaped byte string	CharacterView		Капіяваць кадаваным радком
 Tai Xuan Jing symbols	UnicodeBlocks		Сімвалы Tai Xuan Jing
 Hiragana	UnicodeBlocks		Хірагана
 Tagbanwa	UnicodeBlocks		Тагбанва
 Basic Latin	UnicodeBlocks		Простая лацінка
 Greek and Coptic	UnicodeBlocks		Грэчаскі і Каптычны
 Kangxi radicals	UnicodeBlocks		Радыкалы Kangxi
+Copy character	CharacterView		Капіяваць сімвал
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
+Font	CharacterWindow		Шрыфт
 Phaistos disc	UnicodeBlocks		Фесцкі дыск
 Miscellaneous technical	UnicodeBlocks		Розныя тэхнічныя
 Braille patterns	UnicodeBlocks		Шрыфт Брайля

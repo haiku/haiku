@@ -1,12 +1,14 @@
-1	french	x-vnd.Haiku-MatchHeader	2950227343
+1	french	x-vnd.Haiku-MatchHeader	1946584206
 Delete message	ConfigView		Supprimer le message
+Match \"%attribute\" against \"%regex\"	RuleFilter		Faire correspondre « %attribute » à « %regex »
+Match header	RuleFilter		Entête de correspondance
 Set flags to	ConfigView		Placez les drapeaux à
+Header field (e.g. Subject, From, …)	ConfigView		Champ d’en-tête (par ex. Sujet, De …)
 <Choose account>	ConfigView		<Choisir un compte>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Expression joker comme « *spam* ».\nPréfixer avec « REGEX: » afin d’utiliser des expressions régulières.
 Then	ConfigView		Alors
 If	ConfigView		Si
 Set as read	ConfigView		Marquer comme lu
-Header field (e.g. Subject, From, 			Champ d’en-tête (ex. Sujet, De,  
 Reply with	ConfigView		Répondre avec
 <Choose action>	ConfigView		<Choisir une action>
 Move to	ConfigView		Déplacer vers

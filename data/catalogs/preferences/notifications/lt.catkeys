@@ -1,3 +1,12 @@
-1	lithuanian	x-vnd.Haiku-Notifications	1522084233
-General	PrefletView		Bendrosios
+1	lithuanian	x-vnd.Haiku-Notifications	2426115127
+OK	PrefletWin		Gerai
+Notifications	PrefletWin		Pranešimai
+Revert	PrefletWin		Atšaukti pakeitimus
 Applications	PrefletView		Programos
+Applications	NotificationView		Programos
+General	PrefletView		Bendrosios
+OK	NotificationView		Gerai
+Notifications	System name		Pranešimai
+Allowed	NotificationView		Leidžiama
+Application	NotificationView		Programa
+Enable notifications	GeneralView		Įjungti pranešimus

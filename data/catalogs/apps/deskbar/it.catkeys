@@ -1,5 +1,50 @@
-1	italian	x-vnd.Be-TSKB	1194388652
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferenze
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Applicazioni Dimostrative
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applet della Scrivania
+1	italian	x-vnd.Be-TSKB	2656653225
+Power off	DeskbarMenu		Spegni
+Sort applications by name	PreferencesWindow		Ordina per nome
+Suspend	DeskbarMenu		Sospendi
+Hide clock	TimeView		Nascondi orologio
+Applications	PreferencesWindow		Applicazioni
+Time preferences…	TimeView		Preferenze Data e Ora…
+About Haiku	DeskbarMenu		Informazioni su Haiku
+Edit in Tracker…	PreferencesWindow		Modifica…
+Recent documents:	PreferencesWindow		Documenti recenti:
+Recent applications	DeskbarMenu		Applicazioni recenti
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Applicazioni
+Find…	DeskbarMenu		Trova...
+Show clock	Tray		Mostra orologio
+Window	PreferencesWindow		Finestra
+Defaults	PreferencesWindow		Predefinite
+Menu	PreferencesWindow		Menu
+Recent documents	DeskbarMenu		Documenti recenti
+Auto-hide	PreferencesWindow		Nascondi automaticamente
+Always on top	PreferencesWindow		Sempre in primo piano
+<Deskbar folder is empty>	DeskbarMenu		<La cartella Deskbar è vuota>
+Show all	WindowMenu		Mostra tutto
+No windows	WindowMenu		Nessuna finestra
+Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		Riavvia
+Large	PreferencesWindow		Grandi
+Auto-raise	PreferencesWindow		Automaticamente in primo piano
+Recent folders:	PreferencesWindow		Cartelle recenti:
+Show application expander	PreferencesWindow		Mostra menu applicazione
+Close all	WindowMenu		Chiudi tutto
+Deskbar preferences	PreferencesWindow		Preferenze di Deskbar
+Mount	DeskbarMenu		Monta
+Revert	PreferencesWindow		Ripristina
+Small	PreferencesWindow		Piccole
+Recent applications:	PreferencesWindow		Applicazioni recenti:
+Shutdown…	DeskbarMenu		Uscita da Haiku…
+Tracker always first	PreferencesWindow		Tracker sempre per primo
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferenze
+Recent folders	DeskbarMenu		Cartelle recenti
+About this system	DeskbarMenu		Informazioni sul sistema
+Show calendar…	TimeView		Mostra il calendario…
+Deskbar preferences…	DeskbarMenu		Preferenze di Deskbar…
+Expand new applications	PreferencesWindow		Espandi le nuove applicazioni
+Show replicants	DeskbarMenu		Mostra replicanti
+Hide application names	PreferencesWindow		Nascondi il nome delle applicazioni
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Applicazioni Dimostrative
+Icon size	PreferencesWindow		Dimensione icone
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applet della Scrivania
+Hide all	WindowMenu		Nascondi tutto
+Quit application	WindowMenu		Chiudi l'applicazione

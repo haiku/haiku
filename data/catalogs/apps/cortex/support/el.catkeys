@@ -1,7 +1,11 @@
-1	greek, modern (1453-)	application/x-vnd.Cortex.support	2320678932
+1	greek, modern (1453-)	application/x-vnd.Cortex.support	2630173556
+Header has flags	MediaString		Η κεφαλίδα έχει παραμέτρους
+32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		Εγγραφή σε εξέλιξη
 (unknown format)	MediaString		(άγνωστο μορφότυπο)
 Clean buffers	MediaString		Άδειασμα buffers
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		# καρέ μπροστά
+Rear-right	MediaString		Πίσω-δεξιά
 {0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# εικονοστοιχείο} other{# εικονοστοιχεία}
 Mono	MediaString		Μονοφωνικό
 MPEG1	MediaString		MPEG1
@@ -25,11 +29,14 @@ BeOS format family	MediaString		Οικογένεια μορφοτύπων BeOS
 Back-center	MediaString		Πίσω-κέντρο
 32 bit CMY	MediaString		32 bit CMY
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bit ακέραιος}}
+Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(άγνωστο μορφότυπο βίντεο)
 AVI format family	MediaString		Οικογένεια μορφοτύπων AVI
 Homogenous buffers	MediaString		Ομοιογενή buffers
+Interlaced 	MediaString		Interlaced 
 {0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# κανάλι}other{# κανάλια}}
 15 bit RGBA	MediaString		15 bit RGBA
+Drop data	MediaString		Απόρριψη δεδομένων
 AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
@@ -41,6 +48,7 @@ Physical output	MediaString		Φυσική έξοδος
 Top-Back-center	MediaString		Πάνω-πίσω-κέντρο
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Πάνω προς κάτω, αριστερά προς δεξιά
+(unknown run mode)	MediaString		(άγνωστη κατάσταση εκτέλεσης)
  kb/s	MediaString		 kb/δευτ.
 24 bit HSI	MediaString		24 bit HSI
 User-defined media type	MediaString		Μορφότυπο πολυμέσων χρήστη
@@ -48,6 +56,7 @@ User-defined media type	MediaString		Μορφότυπο πολυμέσων χρ�
 Rear-left	MediaString		Πίσω-αριστερά
 QuickTime format family	MediaString		Οικογένεια μορφοτύπων QuickTime
 Any format family	MediaString		Οποιαδήποτε οικογένεια μορφοτύπων
+Timecode	MediaString		Χρονοκωδικός
 Top-Front-right	MediaString		Πάνω-μπροστά-δεξιά
 32 bit float	MediaString		32 bit δεκαδικός
 Controllable	MediaString		Ελεγχόμενος
@@ -56,15 +65,18 @@ Front-right-center	MediaString		Μπροστά-δεξιά-κέντρο
 Side-right	MediaString		Δεξιά πλευρά
  kHz	MediaString		 kHz
 Little endian	MediaString		Little endian
+(unknown matrix mask)	MediaString		(άγνωστη μάσκα matrix)
 32 bit LAB	MediaString		32 bit LAB
 Side-left	MediaString		Αριστερή πλευρά
 {0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# byte ανά buffer} other{# bytes ανά buffer}}
 32 bit CMYK	MediaString		32 bit CMYK
 (unknown multistream format)	MediaString		(άγνωστο μορφότυπο πολλαπλών ροών)
 8 bit integer	MediaString		8 bit ακέραιος
+8 bit grayscale-index	MediaString		8-bit αποχρώσεις του γκρι
 YCbCr444	MediaString		YCbCr444
 Buffer producer	MediaString		Παραγωγός buffer
 Buffer consumer	MediaString		Καταναλωτής buffer
+Increase latency	MediaString		Αύξηση καθυστέρησης
 Front-left-center	MediaString		Μπροστά-αριστερά-κέντρο
 MPEG format family	MediaString		Οικογένεια μορφοτύπων MPEG
 (none)	MediaString		(τίποτα)
@@ -82,6 +94,7 @@ YCbCr422	MediaString		YCbCr422
 Raw audio	MediaString		Ακατέργαστος ήχος
 32 bit LABA	MediaString		32 bit LABA
 24 bit HLS	MediaString		24 bit HLS
+Non-interlaced 	MediaString		Non-interlaced 
 {0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# byte (μέσος όρος)}other{# bytes (μέσος όρος)}}
 MIDI	MediaString		MIDI
 YUV12	MediaString		YUV12
@@ -89,6 +102,7 @@ WAV format family	MediaString		Οικογένεια μορφοτύπων WAV
  (NTSC)	MediaString		 (NTSC)
 Physical input	MediaString		Φυσική είσοδος
 Big endian	MediaString		Big endian
+Sub	MediaString		Sub
 {0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# byte (μέγιστο)}other{# bytes (μέγιστο)}}
 YUV411	MediaString		YUV411
 Multistream media	MediaString		Πολυμέσα πολλαπλών ροών
@@ -106,6 +120,7 @@ HTML	MediaString		HTML
 Time source	MediaString		Πηγή χρόνου
 15 bit RGB	MediaString		15 bit RGB
 ProLogic LR	MediaString		ProLogic LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# byte ανά κάδρο}other{# bytes ανά κάδρο}}
 Parameters	MediaString		Επιλογές
 Raw data from VBL area	MediaString		Ακατέργαστα δεδομένα από περιοχή VBL
 Top-Back-right	MediaString		Πάνω-πίσω-δεξιά
@@ -117,6 +132,7 @@ BeOS video	MediaString		Βίντεο BeOS
 Top-center	MediaString		Πάνω-κέντρο
 Entity interface	MediaString		Διεπαφή οντότητας
 Stereo	MediaString		Στερεοφωνικό
+8 bit color-index	MediaString		8-bit έγχρωμο
 Bottom to top, left to right	MediaString		Κάτω προς πάνω, αριστερά προς δεξιά
 32 bit UVL	MediaString		32 bit UVL
 {0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# γραμμή} other{# γραμμές}}
@@ -125,5 +141,6 @@ Unknown media type	MediaString		Άγνωστο μορφότυπο πολυμέσ
 MPEG2	MediaString		MPEG2
 Miscellaneous format family	MediaString		Άλλη οικογένεια μορφοτύπων
 24 bit RGB	MediaString		24 bit RGB
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# κάδρο μπροστά}other{# κάδρα μπροστά}}
 32 bit HSIA	MediaString		32 bit HSIA
 Raw video	MediaString		Ακατέργαστο βίντεο

@@ -1,6 +1,7 @@
-1	greek, modern (1453-)	x-vnd.Haiku.TextSearch	2003518937
+1	greek, modern (1453-)	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Παρακαλώ επιλέξτε τα αρχεία που επιθυμείτε, τα οποία έχουν επιλέγει στον Ιχνηλάτη για σας.
 %appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		Το ξεκίνημα του προγράμματος xargs απέτυχε!
 Open selection	GrepWindow		Άνοιγμα επιλεγμένου
 Actions	GrepWindow		Ενέργειες
 New window	GrepWindow		Νέο παράθυρο
@@ -10,6 +11,7 @@ OK	GrepWindow		Εντάξει
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Κλείσιμο
 Look in sub-folders	GrepWindow		Ψάξε στους υποφακέλους
+%s: Not enough room to escape the filename.	Grepper		%s: Δεν υπάρχει αρκετός χώρος για την αποφυγή του ονόματος αρχείου.
 Follow symbolic links	GrepWindow		Ακολούθησε τους συμβολικούς δεσμούς
 Regular expression	GrepWindow		Κανονική έκφραση
 Text files only	GrepWindow		Μόνο αρχεία κειμένου
@@ -17,12 +19,16 @@ Quit	GrepWindow		Έξοδος
 Show files in Tracker	GrepWindow		Εμφάνιση των αρχείων στον Ιχνηλάτη
 Please select the files you wish to keep searching.	GrepWindow		Παρακαλώ επιλέξτε τα αρχεία που επιθυμείτε να συνεχίσετε την αναζήτηση.
 Trim to selection	GrepWindow		Περικοπή στην επιλογή
+Set target…	GrepWindow		Ορισμός στόχου…
+Failed to open input pipe!	Grepper		Απέτυχε το άνοιγμα σωλήνα εισόδου!
 Search	GrepWindow		Αναζήτηση
 Copy text to clipboard	GrepWindow		Αντιγραφή κειμένου στο πρόχειρο
 Show lines	GrepWindow		Εμφάνιση γραμμών
+Failed to open errors pipe!	Grepper		Απέτυχε το άνοιγμα σωλήνα σφαλμάτων!
 The unselected files will be removed from the list.	GrepWindow		Τα αρχεία που δεν έχουν επιλεχθεί θα διαγραφούν από τη λίστα.
 Open files in code editor	GrepWindow		Άνοιγμα αρχείων σε επεξεργαστή κώδικα
 Skip folders starting with a dot	GrepWindow		Παρέκαμψε τους φακέλους που ξεκινούν με μια τελεία
+Failed to open output pipe!	Grepper		Απέτυχε το άνοιγμα σωλήνα εξόδου!
 Cancel	GrepWindow		Άκυρο
 History	GrepWindow		Ιστορικό
 TextSearch	System name		Αναζήτηση Κειμένου

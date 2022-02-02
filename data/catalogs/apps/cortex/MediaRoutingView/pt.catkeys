@@ -1,9 +1,11 @@
-1	portuguese	application/x-vnd.Cortex.MediaRoutingView	3146168479
+1	portuguese	application/x-vnd.Cortex.MediaRoutingView	4280054975
 Video output	MediaRoutingView		Saída de vídeo
 Icon view	MediaRoutingView		Vista de ícones
 OK	MediaRoutingView		OK
 Advanced	MediaNodePanel		Avançado
 Audio input	MediaRoutingView		Entrada de áudio
+Run mode	MediaNodePanel		Modo de execução
+Could not load '%filename%'	MediaRoutingView		Não foi possível carregar '%filename%'
 Be Audio Mixer	MediaRoutingView		Misturador de áudio Be
 Video input	MediaRoutingView		Entrada de vídeo
 Release	MediaNodePanel		Lançamento
@@ -19,6 +21,7 @@ Error	MediaRoutingView		Erro
 Output	MediaJack		Saída
 Get info	MediaNodePanel		Obter informações
 Get info	MediaRoutingView		Obter informações
+Clean up	MediaRoutingView		Arrumar
 Start control panel	MediaNodePanel		Iniciar painel de controlo
 Tweak parameters	MediaNodePanel		Ajustar parâmetros
 Could not connect	MediaRoutingView		Não foi possível ligar

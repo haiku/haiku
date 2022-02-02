@@ -1,8 +1,169 @@
-1	russian	x-vnd.Be-MAIL	939699066
-out	B_USER_DIRECTORY/mail/out		Исходящие
-in	B_USER_DIRECTORY/mail/in		Входящие
-queries	B_USER_DIRECTORY/mail/queries		Запросы
+1	russian	x-vnd.Be-MAIL	1477453861
+Set to Saved	Mail		Послать в сохраненные
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основной текст содержит %ld некодируемых символов. Возможно, другая кодировка подойдет лучше? Нажмите Отправить чтобы все равно отправить письмо (некодиуемые символы будут заменены на кодируемые), или нажмите Отмена и попробуйте исправить их вручную.
+Text wrapping:	Mail		Перенос строк:
+Show icons & labels	Mail		Отображать иконки и надписи
+(Date unavailable)	Mail		(Дата недоступна)
+Reply	Mail		Ответить
+Next message	Mail		Следующее сообщение
+Mailing	Mail		Отправка
+Unread	Mail		Непрочитанные
+Same sender	Mail		Тот же отправитель
+Copy to new	Mail		Копировать в новое
+Save as draft	Mail		Сохранить как черновик
+Encoding:	Mail		Кодировка:
+Print	Mail		Печать
+Decrease quote level	Mail		Убрать префикс цитирования
+Encoding	Mail		Кодировка:
+Default account:	Mail		Аккаунт по умолчанию:
+Message	Mail		Сообщение
+Bcc:	Mail		Скрытая копия:
+New	Mail		Новое
+Save	Mail		Сохранить
+Undo	Mail		Отменить
+Button bar:	Mail		Панель кнопок:
+%e wrote:\\n	Mail		%e написал:\\n
+Save changes to this signature?	Mail		Сохранить изменения в этой подписи?
+Save attachment…	Mail		Сохранить вложение…
+Paste	Mail		Вставить
+E-mail draft could not be saved!	Mail		Черновик не может быть сохранен!
+Don't send	Mail		Не отправлять
 sent	B_USER_DIRECTORY/mail/sent		Отправленные
-mail	B_USER_DIRECTORY/mail		Почта
+Only files can be added as attachments.	Mail		Только файлы могут быть добавлены как вложения.
+Close	Mail		Закрыть
+Untitled	Mail		Безымянный
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		Удаление вложений из пересланного письма еще не реализовано!\nЭта функция еще не работает.
+Same recipient	Mail		Тот же получатель
+Previous message	Mail		Предыдущее письмо
+(Address unavailable)	Mail		(Адрес недоступен)
+Mail	System name		Почта
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Вложение: %name% (Tип: %type%)
+Copy link location	Mail		Копировать адрес ссылки
+Attachments: 	Mail		Вложения: 
+Remove enclosure	Mail		Удалить вложения
+Next	Mail		Следущее
+Attachments:	Mail		Вложения:
+Show icons only	Mail		Отображать только иконки
+Subject:	Mail		Тема:
+OK	Mail		ОК
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		Выход
+Title:	Mail		Заголовок:
+Account from mail	Mail		Использовать аккаунт из письма
+%e - E-mail address	Mail		%e - E-mail адрес
+Cc:	Mail		Копия:
+No matches	Mail		Нет совпадений
+Queries	Mail		Запросы
+Cut	Mail		Вырезать
+Reply to sender	Mail		Ответить отправителю
+\\n - Newline	Mail		\\n - Новая строка
+Copy	Mail		Копия
+Add signature	Mail		Добавить подпись
+%n - Full name	Mail		%n - Полное имя
+Signature	Mail		Подпись
+Use default account	Mail		Использовать аккаунт по умолчанию
 draft	B_USER_DIRECTORY/mail/draft		Черновики
+Really delete this signature? This cannot be undone.	Mail		Действительно удалить эту подпись? Эту операцию будет невозможно отменить.
 spam	B_USER_DIRECTORY/mail/spam		Спам
+Reply to all	Mail		Ответить всем
+Cancel	Mail		Отмена
+Off	Mail		Выключить
+Set to %s	Mail		Пометить как %s
+Signature:	Mail		Подпись:
+Forward without attachments	Mail		Переслать без вложений
+queries	B_USER_DIRECTORY/mail/queries		Запросы
+View	Mail		Вид
+Signatures	Mail		Подписи
+On	Mail		Включить
+Find	Mail		Найти
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Извините, не удалось найти приложение поддерживающее тип файлов 'Персона'.
+Date:	Mail		Дата:
+Expert	Mail		Эксперт
+Automatically mark mail as read:	Mail		Автоматически помечать письмо как прочитанное:
+Close and 	Mail		Закрыть и 
+Colored quotes:	Mail		Цветные кавычки:
+Automatic	Mail		Автоматическая
+Open this link	Mail		Открыть эту ссылку
+Auto signature:	Mail		Автоподпись:
+Same subject	Mail		Та же тема письма
+Send	Mail		Отправить
+Open draft	Mail		Открыть черновики
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Оставить как 'New'
+Random	Mail		Случайная
+Attach attributes:	Mail		Прикрепление атрибутов:
+Find again	Mail		Найти далее
+Size:	Mail		Размер:
+To:	Mail		Кому:
+Need Tracker to move items to trash	Mail		Для перемещение объектов в корзину требуется запущенный Tracker
+The mail_daemon could not be started:\n\t	Mail		Невозможно запустить mail_daemon:\n\t
+<no account found>	Mail		<аккаунт не найден>
+Mail couldn't find its dictionary.	Mail		Невозможно найти файл словаря.
+Mail preferences	Mail		Настройки почты
+helpful message	Mail		полезное сообщение
+ Read 	Mail		 Прочитанным 
+Font:	Mail		Шрифт:
+Accounts…	Mail		Аккаунты…
+Previous	Mail		Предыдущее
+Include file attributes in attachments	Mail		Добавлять атрибуты файла во вложение
+Start now	Mail		Запустить сейчас
+(Name unavailable)	Mail		(Имя недоступно)
+Move to trash	Mail		Переместить в корзину
+<none>	Mail		<пусто>
+%d - Date	Mail		%d - Дата
+Check spelling	Mail		Проверять орфографию
+Redo	Mail		Повторить
+Leave as '%s'	Mail		Оставить как '%s'
+Print…	Mail		Печать…
+Settings…	Mail		Настройки…
+Warn unencodable:	Mail		Предупреждать о невозможности декодировать:
+Trash	Mail		Корзина
+Show raw message	Mail		Показать письмо в необработанном виде
+Find…	Mail		Найти…
+Select all	Mail		Выделить все
+Show header	Mail		Показать заголовок
+Reply account:	Mail		Ответить, используя акканут:
+Sorry	Mail		Извините
+Forward	Mail		Переслать
+Open attachment	Mail		Открыть вложение
+mail	B_USER_DIRECTORY/mail		Почта
+Save this message as a draft before closing?	Mail		Сохранить это сообщение в черновики перед закрытием?
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Не запущен mail_daemon. Сообщение поставлено в очередь и будет отправлено как только mail_daemon будет запущен.
+None	Mail		Нет
+Resend	Mail		Переслать
+Hide	Mail		Скрыть
+From:	Mail		От:
+No file attributes, just plain data	Mail		Без атрибутов, только данные
+Add	Mail		Добавить
+out	B_USER_DIRECTORY/mail/out		Исходящие
+Send this message before closing?	Mail		Отправить это сообщение перед закрытием?
+in	B_USER_DIRECTORY/mail/in		Входящие
+Open	Mail		Открыть
+Don't save	Mail		Не сохранять
+Leave same	Mail		Оставить
+An error occurred trying to save the attachment.	Mail		Произошла ошибка при попытке сохранить вложение.
+Save address	Mail		Сохранить адрес
+Initial spell check mode:	Mail		Начальный режим проверки орфографии:
+Edit queries…	Mail		Изменить запросы…
+There is no installed handler for URL links.	Mail		Не выбрано приложение для открытия ссылок.
+File	Mail		Файл
+Reply preamble:	Mail		Ответное вступление:
+New mail message	Mail		Новое сообщение
+An error occurred trying to open this signature.	Mail		Возникла ошибка при попытке открытия этой подписи.
+Edit signatures…	Mail		Изменить подписи…
+User interface	Mail		Интерфейс пользователя
+Inconsistency occurred in the undo/redo buffer.	Mail		Произошло несоответствие в буфере отмены/повтора.
+Remove attachment	Mail		Удалить вложение
+Set to…	Mail		Пометить как…
+Edit	Mail		Изменить
+Page setup…	Mail		Настройка печати…
+An error occurred trying to save this signature.	Mail		Произошла ошибка при попытке сохранить эту подпись.
+Beginner	Mail		Новичок
+Send message	Mail		Послать сообщение
+Delete	Mail		Удалить
+Put your favorite e-mail queries and query templates in this folder.	Mail		Перенесите в эту папку ваши почтовые запросы.
+Spam	Mail		Спам
+Couldn't open this signature. Sorry.	Mail		Невозможно открыть эту подпись. Извините.
+Revert	Mail		Вернуть
+Unknown	Mail		Неизвестно
+Increase quote level	Mail		Добавить префикс цитирования
+Add enclosure…	Mail		Добавить вложение…

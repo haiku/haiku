@@ -1,27 +1,21 @@
-1	romanian	x-vnd.Haiku-mixer.media_addon	3450667169
-Input gain controls represent	AudioMixer		Controalele amplificării de intrare reprezintă
-Linear interpolation	AudioMixer		Interpolare liniară
-Virtual output channels	AudioMixer		Canale de ieșire virtuale
-Refuse output format changes	AudioMixer		Refuză modificările de format de ieșire
-Output mapping	AudioMixer		Maparea ieșirilor
-Allow input channel remapping	AudioMixer		Permite remaparea canalului de intrare
-Resampling algorithm	AudioMixer		Algoritm de reeșantionare
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Atenuează ieșirea de mixaj cu 3dB (ca BeOS R5)
-Display balance control for stereo connections	AudioMixer		Afișează controlul de echilibru pentru conexiunile stereo
+1	romanian	x-vnd.Haiku-mixer.media_addon	2690542047
+Input mapping	AudioMixer		Maparea intrării
 To output	AudioMixer		Spre ieșire
-not connected	AudioMixer		nu este conectat
+Refuse output format changes	AudioMixer		Refuză modificările de format de ieșire
+Gain	AudioMixer		Amplificare
+To master	AudioMixer		Spre principal
 Refuse input format changes	AudioMixer		Refuză modificările de format de intrare
-Drop/repeat samples	AudioMixer		Aruncă/repetă eșantioane
-Output channel sources	AudioMixer		Surse de canal de ieșire
+not connected	AudioMixer		nu este conectat
+Master output	AudioMixer		Ieșire principală
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Controale de amplificare
-Input mapping	AudioMixer		Maparea intrării
-Mute	AudioMixer		Mut
-Input channel destinations	AudioMixer		Destinații de canal de ieșire
-To master	AudioMixer		Spre principal
-Master output	AudioMixer		Ieșire principală
+Output channel sources	AudioMixer		Surse de canal de ieșire
+Allow input channel remapping	AudioMixer		Permite remaparea canalului de intrare
+Display balance control for stereo connections	AudioMixer		Afișează controlul de echilibru pentru conexiunile stereo
 Setup	AudioMixer		Configurare
-Use non linear gain sliders (like BeOS R5)	AudioMixer		Folosește glisoare de amplificare neliniare (ca BeOS R5)
-Gain	AudioMixer		Amplificare
-Allow output channel remapping	AudioMixer		Permite remaparea canalului de ieșire
 Physical input channels	AudioMixer		Canale de intrare fizice
+Input channel destinations	AudioMixer		Destinații de canal de ieșire
+Mute	AudioMixer		Mut
+Output mapping	AudioMixer		Maparea ieșirilor
+Virtual output channels	AudioMixer		Canale de ieșire virtuale
+Allow output channel remapping	AudioMixer		Permite remaparea canalului de ieșire

@@ -1,6 +1,7 @@
-1	indonesian	x-vnd.Haiku.TextSearch	2470358804
+1	indonesian	x-vnd.Haiku.TextSearch	2224690775
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Silakan pilih file yang ingin Anda pilih untuk Anda di Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		Gagal memulai program xargs!
 Open selection	GrepWindow		Buka seleksi
 Actions	GrepWindow		Tindakan
 New window	GrepWindow		Jendela baru
@@ -9,6 +10,7 @@ OK	GrepWindow		Oke
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Tutup
 Look in sub-folders	GrepWindow		Lihat di sub-folder
+%s: Not enough room to escape the filename.	Grepper		%s: Tidak cukup ruang untuk lepas dari nama file.
 Follow symbolic links	GrepWindow		Ikuti tautan simbolik
 Regular expression	GrepWindow		Regular expression
 Text files only	GrepWindow		Hanya file teks
@@ -16,12 +18,16 @@ Quit	GrepWindow		Berhenti
 Show files in Tracker	GrepWindow		Tampilkan file di Tracker
 Please select the files you wish to keep searching.	GrepWindow		Silakan pilih file yang ingin Anda cari.
 Trim to selection	GrepWindow		Pangkas ke seleksi
+Set target…	GrepWindow		Tentukan target…
+Failed to open input pipe!	Grepper		Gagal membuka pipa masukan!
 Search	GrepWindow		Pencarian
 Copy text to clipboard	GrepWindow		Salin teks ke papan klip
 Show lines	GrepWindow		Tampilkan garis
+Failed to open errors pipe!	Grepper		Gagal membuka pipa galat!
 The unselected files will be removed from the list.	GrepWindow		File yang tidak dipilih akan dihapus dari daftar.
 Open files in code editor	GrepWindow		Buka berkas dalam editor kode
 Skip folders starting with a dot	GrepWindow		Lewati folder yang dimulai dengan titik
+Failed to open output pipe!	Grepper		Gagal membuka pipa keluaran!
 Cancel	GrepWindow		Batal
 History	GrepWindow		Sejarah
 File	GrepWindow		Berkas

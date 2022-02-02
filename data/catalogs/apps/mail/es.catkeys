@@ -1,8 +1,169 @@
-1	spanish; castilian	x-vnd.Be-MAIL	939699066
-out	B_USER_DIRECTORY/mail/out		fuera
-in	B_USER_DIRECTORY/mail/in		en
-queries	B_USER_DIRECTORY/mail/queries		consultas
+1	spanish; castilian	x-vnd.Be-MAIL	1477453861
+Set to Saved	Mail		Ajustar como Guardado
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		El texto que ha escrito contiene %ld caracteres indecodificables. ¿Quizás un carácter diferente podría funcionar mejor? Presione enviar de cualquier manera (un carácter sustituto se utilizará en lugar de los indecodificables), o presione Cancelar para regresar e intentar arreglarlo.
+Text wrapping:	Mail		Ajuste del texto:
+Show icons & labels	Mail		Mostrar iconos y etiquetas
+(Date unavailable)	Mail		(Fecha indisponible)
+Reply	Mail		Responder
+Next message	Mail		Mensaje siguiente
+Mailing	Mail		Envío de correo
+Unread	Mail		Sin leer
+Same sender	Mail		El mismo emisor
+Copy to new	Mail		Copiar a mensaje nuevo
+Save as draft	Mail		Guardar como borrador
+Encoding:	Mail		Codificación:
+Print	Mail		Imprimir
+Decrease quote level	Mail		Reducir el nivel de cuota
+Encoding	Mail		Codificación
+Default account:	Mail		Cuenta predeterminada:
+Message	Mail		Mensaje
+Bcc:	Mail		Cco:
+New	Mail		Nuevo
+Save	Mail		Guardar
+Undo	Mail		Deshacer
+Button bar:	Mail		Barra de botones:
+%e wrote:\\n	Mail		%e escribió:\\n
+Save changes to this signature?	Mail		¿Guardar cambios a esta firma?
+Save attachment…	Mail		Guardar archivo adjunto…
+Paste	Mail		Pegar
+E-mail draft could not be saved!	Mail		¡No se pudo guardar el borrador!
+Don't send	Mail		No enviar
 sent	B_USER_DIRECTORY/mail/sent		enviado
-mail	B_USER_DIRECTORY/mail		correo
+Only files can be added as attachments.	Mail		Solo se pueden agregar archivos como adjuntos.
+Close	Mail		Cerrar
+Untitled	Mail		Sin título
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		La función de remover archivos adjuntos de un correo reenviado todavía no se implementa.\nTodavía no funciona correctamente.
+Same recipient	Mail		El mismo receptor
+Previous message	Mail		Mensaje anterior
+(Address unavailable)	Mail		(Dirección indisponible)
+Mail	System name		Correo
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Adjunto: %name% (Tipo: %type%)
+Copy link location	Mail		Copiar la ubicación del enlace
+Attachments: 	Mail		Archivos adjuntos:
+Remove enclosure	Mail		Remover anexo
+Next	Mail		Siguiente
+Attachments:	Mail		Archivos adjuntos:
+Show icons only	Mail		Mostrar solo iconos
+Subject:	Mail		Asunto:
+OK	Mail		Aceptar
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		Salir
+Title:	Mail		Título:
+Account from mail	Mail		Cuenta de correo
+%e - E-mail address	Mail		%e - Dirección de correo
+Cc:	Mail		Cc:
+No matches	Mail		Sin coincidencias
+Queries	Mail		Consultas
+Cut	Mail		Cortar
+Reply to sender	Mail		Responder al remitente
+\\n - Newline	Mail		\\n - Nueva línea
+Copy	Mail		Copiar
+Add signature	Mail		Agregar firma
+%n - Full name	Mail		%n - Nombre completo
+Signature	Mail		Firma
+Use default account	Mail		Usar la cuenta por omisión
 draft	B_USER_DIRECTORY/mail/draft		borrador
+Really delete this signature? This cannot be undone.	Mail		¿Borrar realmente esta firma? Esto no se puede deshacer.
 spam	B_USER_DIRECTORY/mail/spam		Correo Basura
+Reply to all	Mail		Responder a todos
+Cancel	Mail		Cancelar
+Off	Mail		Apagado
+Set to %s	Mail		Establecer a %s
+Signature:	Mail		Firma:
+Forward without attachments	Mail		Reenviar sin archivos adjuntos
+queries	B_USER_DIRECTORY/mail/queries		consultas
+View	Mail		Ver
+Signatures	Mail		Firmas
+On	Mail		En
+Find	Mail		Encontrar
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Lo siento, no se pudo encontrar una aplicación que soporte el tipo de dato 'Persona'.
+Date:	Mail		Fecha:
+Expert	Mail		Experto
+Automatically mark mail as read:	Mail		Marcar correo como leído automáticamente:
+Close and 	Mail		Cerrar y 
+Colored quotes:	Mail		Citas coloreadas:
+Automatic	Mail		Automático
+Open this link	Mail		Abrir este enlace
+Auto signature:	Mail		Autofirma:
+Same subject	Mail		El mismo asunto
+Send	Mail		Enviar
+Open draft	Mail		Abrir borrador
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	Dejar como 'Nuevo'
+Random	Mail		Aleatorio
+Attach attributes:	Mail		Adjuntar atributos:
+Find again	Mail		Buscar de nuevo
+Size:	Mail		Tamaño:
+To:	Mail		Para:
+Need Tracker to move items to trash	Mail		Hacer que Tracker mueva elementos a la basura
+The mail_daemon could not be started:\n\t	Mail		El mail_daemon no se pudo iniciar:\n\t
+<no account found>	Mail		<ninguna cuenta encontrada>
+Mail couldn't find its dictionary.	Mail		Mail no pudo encontrar su diccionario.
+Mail preferences	Mail		Preferencias de correo
+helpful message	Mail		mensaje útil
+ Read 	Mail		 Leer 
+Font:	Mail		Tipografía:
+Accounts…	Mail		Cuentas…
+Previous	Mail		Anterior
+Include file attributes in attachments	Mail		Incluir atributos de archivo en adjuntos
+Start now	Mail		Iniciar ahora
+(Name unavailable)	Mail		(Nombre indisponible)
+Move to trash	Mail		Mover a la papelera
+<none>	Mail		<ninguno>
+%d - Date	Mail		%d - Fecha
+Check spelling	Mail		Comprobar ortografía
+Redo	Mail		Rehacer
+Leave as '%s'	Mail		Dejar como '%s'
+Print…	Mail		Imprimir…
+Settings…	Mail		Configuración…
+Warn unencodable:	Mail		Precaución indecodificable:
+Trash	Mail		Papelera
+Show raw message	Mail		Mostrar mensaje en bruto
+Find…	Mail		Encontrar…
+Select all	Mail		Seleccionar todo
+Show header	Mail		Mostrar encabezado
+Reply account:	Mail		Cuenta para responder:
+Sorry	Mail		Disculpe
+Forward	Mail		Reenviar
+Open attachment	Mail		Abrir adjunto
+mail	B_USER_DIRECTORY/mail		correo
+Save this message as a draft before closing?	Mail		¿Guardar este mensaje como borrador antes de cerrar?
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		El mail_daemon no está corriendo. El mensaje se puso en cola y se enviará cuando el demonio de correo inicie.
+None	Mail		Ninguno
+Resend	Mail		Enviar de nuevo
+Hide	Mail		Ocultar
+From:	Mail		De:
+No file attributes, just plain data	Mail		Sin atributos de archivo, solo información plana
+Add	Mail		Añadir
+out	B_USER_DIRECTORY/mail/out		fuera
+Send this message before closing?	Mail		¿Enviar este mensaje antes de cerrar?
+in	B_USER_DIRECTORY/mail/in		en
+Open	Mail		Abrir
+Don't save	Mail		No guardar
+Leave same	Mail		Dejar el mismo
+An error occurred trying to save the attachment.	Mail		Se produjo un error mientras se trataba de guardar el archivo adjunto.
+Save address	Mail		Guardar dirección
+Initial spell check mode:	Mail		Modo de comprobación de ortografía inicial:
+Edit queries…	Mail		Editar consultas…
+There is no installed handler for URL links.	Mail		No hay manejadores instalados para enlaces URL.
+File	Mail		Archivo
+Reply preamble:	Mail		Responder preámbulo:
+New mail message	Mail		Crear mensaje de correo
+An error occurred trying to open this signature.	Mail		Se produjo un error mientras se trataba de abrir la firma.
+Edit signatures…	Mail		Editar firmas...
+User interface	Mail		Interfaz de usuario
+Inconsistency occurred in the undo/redo buffer.	Mail		Se produjo una inconsistencia en el búfer de deshacer/rehacer.
+Remove attachment	Mail		Eliminar adjunto
+Set to…	Mail		Ajustar a…
+Edit	Mail		Editar
+Page setup…	Mail		Configuración de la página…
+An error occurred trying to save this signature.	Mail		Se produjo un error mientras se trataba de guardar esta firma.
+Beginner	Mail		Principiante
+Send message	Mail		Enviar mensaje
+Delete	Mail		Borrar
+Put your favorite e-mail queries and query templates in this folder.	Mail		Ponga sus consultas y plantillas de consulta de correo favoritas en esta carpeta.
+Spam	Mail		Correo basura
+Couldn't open this signature. Sorry.	Mail		No se pudo abrir la firma. Disculpe.
+Revert	Mail		Revertir
+Unknown	Mail		Desconocido
+Increase quote level	Mail		Incrementar el nivel de cuota
+Add enclosure…	Mail		Agregar anexo…

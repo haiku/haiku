@@ -1,6 +1,7 @@
-1	catalan; valencian	x-vnd.Haiku.TextSearch	2679411567
+1	catalan; valencian	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Si us plau, trieu els fitxers que voleu tenir seleccionats al Rastrejador.
 %appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		No s'ha pogut iniciar el programa xargs!
 Open selection	GrepWindow		Obre la selecció
 Actions	GrepWindow		Accions
 New window	GrepWindow		Finestra nova
@@ -8,9 +9,9 @@ Encoding	GrepWindow		Codificació
 Set target to parent folder	GrepWindow		Estableix la destinació a la carpeta mare
 OK	GrepWindow		D'acord
 %appname% : %path% : %searchtext%	GrepWindow		%appname%: %path%: %searchtext%
-Set target			Establiu un objectiu
 Close	GrepWindow		Tanca
 Look in sub-folders	GrepWindow		Cerca a les carpetes inferiors
+%s: Not enough room to escape the filename.	Grepper		%s: no hi ha prou espai per completar el nom del fitxer.
 Follow symbolic links	GrepWindow		Segueix els enllaços simbòlics
 Regular expression	GrepWindow		Expressió regular
 Text files only	GrepWindow		Només els fitxers de text
@@ -18,12 +19,16 @@ Quit	GrepWindow		Surt
 Show files in Tracker	GrepWindow		Mostra els fitxers al Rastrejador
 Please select the files you wish to keep searching.	GrepWindow		Si us plau, seleccioneu els fitxers que voleu continuar cercant.
 Trim to selection	GrepWindow		Escapça a la selecció
+Set target…	GrepWindow		Establiu-ne la destinació...
+Failed to open input pipe!	Grepper		Ha fallat obrir el conducte d'entrada!
 Search	GrepWindow		Cerca
 Copy text to clipboard	GrepWindow		Copia el text al porta-retalls
 Show lines	GrepWindow		Mostra les línies
+Failed to open errors pipe!	Grepper		Ha fallat obrir el conducte d'errors.
 The unselected files will be removed from the list.	GrepWindow		Els fitxers no seleccionats se suprimiran de la llista.
 Open files in code editor	GrepWindow		Obre els fitxers a l’editor de codi.
 Skip folders starting with a dot	GrepWindow		Ignora les carpetes que comencen a un punt
+Failed to open output pipe!	Grepper		Ha fallat obrir el conducte de sortida!
 Cancel	GrepWindow		Cancel·la
 History	GrepWindow		Historial
 TextSearch	System name		Cerca de text

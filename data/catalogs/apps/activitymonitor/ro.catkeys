@@ -1,35 +1,48 @@
-1	romanian	x-vnd.Haiku-ActivityMonitor	1330427574
+1	romanian	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Echipe
 Semaphores	DataSource		Semafoare
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Memorie cache de bloc
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiO
 Media nodes	DataSource		Noduri media
 Text clipboard	DataSource		Clipboard de text
 Network send	DataSource		Trimite în rețea
-Cache	DataSource		Cache
 Running applications	DataSource		Aplicații care rulează
-Threads	DataSource		Thread-uri
+Cache	DataSource		Cache
 CPU usage (combined)	DataSource		Utilizare CPU (combinat)
+Threads	DataSource		Thread-uri
 Receiving	DataSource		Primire
+Remove graph	ActivityView		Elimină graficul
 Swap space	DataSource		Spaţiu de swap
 CPU	DataSource		CPU
+ActivityMonitor	System name		ActivityMonitor
 CPU %d	DataSource		CPU %d
+Update time interval:	SettingsWindow		Actualizează intervalul de timp:
 RX	DataSource	Shorter version for Receiving.	RX
+Settings…	ActivityWindow		Configurări…
 Block cache	DataSource		Cache de bloc
 Memory	DataSource		Memorie
 CPU usage	DataSource		Utilizare CPU
+Quit	ActivityWindow		Ieșire
 Raw clipboard	DataSource		Clipboard brut
+Settings	ActivityWindow		Configurări
 Used memory	DataSource		Memorie utilizată
 %.1f faults/s	DataSource		%.1f defecțiuni/s
+Show legend	ActivityView		Arată legenda
 Cached memory	DataSource		Memorie în cache
 CPU %d usage	DataSource		Utilizare CPU %d
+File	ActivityWindow		Fișier
 Ports	DataSource		Porturi
 Page faults	DataSource		Defecțiuni de pagină
 Apps	DataSource		Aplicații
+Additional items	ActivityView		Elemente suplimentare
+Add graph	ActivityWindow		Adaugă un grafic
 Sending	DataSource		Trimitere
 %.1f MiB	DataSource		%.1f MiO
+Always on top	ActivityWindow		Mereu deasupra
 Swap	DataSource		Swap
+%lld sec.	SettingsWindow		%lld sec.
 P-faults	DataSource		Defecțiuni-P
 Sems	DataSource		Sems
 Network receive	DataSource		Recepție rețea

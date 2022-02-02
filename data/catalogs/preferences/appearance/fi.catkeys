@@ -1,39 +1,79 @@
-1	finnish	x-vnd.Haiku-Appearance	2170377510
+1	finnish	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Säätimen reuna
-Failure	Colors tab		Epäonnistuminen
 Control mark	Colors tab		Ohjausmerkki
+Off	AntialiasingSettingsView		Pois päältä
 Window border	Colors tab		Ikkunaraja
 Inactive window tab	Colors tab		Epäaktiivisen ikkunavälilehden väri
+Defaults	APRWindow		Oletusasetukset
 Shadow	Colors tab		Varjo
-Selected menu item text	Colors tab		Valitun valikkovalinnan teksti
 Document background	Colors tab		Dokumentin tausta
-Panel background	Colors tab		Paneelin tausta
 List background	Colors tab		Luettelotausta
+No effect on running applications	DecorSettingsView		Ei vaikutusta käynnissä olevissa sovelluksissa
+Fixed font:	Font view		Tasalevyinen kirjasin:
+Appearance	System name		Ulkoasuasetukset
+Reduce colored edges filter strength:	AntialiasingSettingsView		Vähennä värillisten reunojen suodatuksen vahvuutta:
+Glyph hinting:	AntialiasingSettingsView		Kirjoitusmerkin viimeistely:
+Default Haiku ControlLook	DecorSettingsView		Oletus Haiku ControlLook
+Menu item text	Colors tab		Valikkovalinnan teksti
+About decorator	DecorSettingsView		Koristeluohjelmasta
+Antialiasing menu	AntialiasingSettingsView		Reunanpehmennysvalikko
+Success	Colors tab		Onnistuminen
+About	DecorSettingsView		Tietoa
+Shine	Colors tab		Hohto
+Arrow style	DecorSettingsView		Nuolityyli
+On	AntialiasingSettingsView		Käytössä
+Decorator:	DecorSettingsView		Koristelija:
+Menu background	Colors tab		Valikon tausta
+Revert	APRWindow		Palauta
+List item text	Colors tab		Luettelorivin teksti
+OK	DecorSettingsView		Valmis
+Control text	Colors tab		Kontrollin teksti
+Look and feel	APRWindow		Ulkoasu ja käyttötuntuma
+Selected menu item background	Colors tab		Valitun valikkovalinnan tausta
+Link active	Colors tab		Aktiivinen linkki
+Antialiasing	APRWindow		Reunanpehmennys
+Menu font:	Font view		Valikkokirjasin:
+Bold font:	Font view		Lihavoitu kirjasin:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nTekijät:\n\t%decorAuthors\n\nVerkko-osoite: %decorURL\nLisenssi: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Valitse koristelu
+Strong	AntialiasingSettingsView		Vahva
+Failure	Colors tab		Epäonnistuminen
+Double:	DecorSettingsView		Kaksikko:
+Selected menu item text	Colors tab		Valitun valikkovalinnan teksti
+Size:	Font Selection view		Koko:
+Panel background	Colors tab		Paneelin tausta
+Plain font:	Font view		Tavallinen kirjasin:
 Window tab text	Colors tab		Ikkunavälilehden teksti
 Navigation pulse	Colors tab		Navigoinnin välke
+LCD subpixel	AntialiasingSettingsView		LCD-alipikseli
 Window tab	Colors tab		Ikkunan välilehti
-Tooltip background	Colors tab		Työkaluvinkin tausta
 Link text	Colors tab		Linkkiteksti
+Tooltip background	Colors tab		Työkaluvinkin tausta
+ControlLook:	DecorSettingsView		ControlLook:
 Scroll bar thumb	Colors tab		Vierintäpalkkipeukalo
+Default	DecorSettingsView		Oletus
 Link visited	Colors tab		Vierailtu linkki
 Selected menu item border	Colors tab		Valitun valikkovalinnan reuna
 Tooltip text	Colors tab		Työkaluvinkin teksti
-Selected list item text	Colors tab		Valitun luettelorivin teksti
 Control background	Colors tab		Kontrollin tausta
-Menu item text	Colors tab		Valikkovalinnan teksti
+Selected list item text	Colors tab		Valitun luettelorivin teksti
 Selected list item background	Colors tab		Valitun luettelorivin tausta
 Inactive window tab text	Colors tab		Epäaktiivisen ikkunavälilehden tekstin väri
 Navigation base	Colors tab		Navigoinnin pohja
-Success	Colors tab		Onnistuminen
+Fonts	APRWindow		Kirjasimet
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Albert osti fagotin ja töräytti puhkuvan melodian.
+Grayscale	AntialiasingSettingsView		Harmaasävy
+Antialiasing type:	AntialiasingSettingsView		Reunanpehmennystapa:
 Panel text	Colors tab		Paneelin teksti
-Shine	Colors tab		Hohto
-Menu background	Colors tab		Valikon tausta
+Hinting menu	AntialiasingSettingsView		Vinkkausvalikko
+Scroll bar:	DecorSettingsView		Vierityspalkki:
+Choose ControlLook	DecorSettingsView		Valitse ControlLook
+Monospaced fonts only	AntialiasingSettingsView		Vain monospace-kirjasimet
 Document text	Colors tab		Dokumentin teksti
-List item text	Colors tab		Luettelorivin teksti
 Inactive window border	Colors tab		Ei-aktiivinen ikkunaraja
-Control text	Colors tab		Kontrollin teksti
-Status bar	Colors tab		Tilapalkki
+Colors	APRWindow		Värit
+About control look	DecorSettingsView		Ohjelmasta control look
 Control highlight	Colors tab		Säätimen korostus
-Selected menu item background	Colors tab		Valitun valikkovalinnan tausta
-Link active	Colors tab		Aktiivinen linkki
+Status bar	Colors tab		Tilapalkki
 Link hover	Colors tab		Linkkileijunta
+Single:	DecorSettingsView		Yksikkö:

@@ -1,39 +1,79 @@
-1	swedish	x-vnd.Haiku-Appearance	2170377510
+1	swedish	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Kontrollkant
-Failure	Colors tab		Misslyckande
 Control mark	Colors tab		Kontroll märke
+Off	AntialiasingSettingsView		Av
 Window border	Colors tab		Fönsterkant
 Inactive window tab	Colors tab		Flikfärg för inaktiva fönster
+Defaults	APRWindow		Förval
 Shadow	Colors tab		Skugga
-Selected menu item text	Colors tab		Textfärg för valt menyalternativ
 Document background	Colors tab		Dokument bakgrund
-Panel background	Colors tab		Panelbakgrund
 List background	Colors tab		Lista bakgrund
+No effect on running applications	DecorSettingsView		Har ingen effekt på program som är igång.
+Fixed font:	Font view		Fixerad font:
+Appearance	System name		Utseende
+Reduce colored edges filter strength:	AntialiasingSettingsView		Minska färgintensitet på färgade kanter:
+Glyph hinting:	AntialiasingSettingsView		Betona typsnitt:
+Default Haiku ControlLook	DecorSettingsView		Standard ControlLook för Haiku
+Menu item text	Colors tab		Menyalternativstext
+About decorator	DecorSettingsView		Om decorator
+Antialiasing menu	AntialiasingSettingsView		Kantutjämningsmeny
+Success	Colors tab		Framgång
+About	DecorSettingsView		Om
+Shine	Colors tab		Ljusstyrka
+Arrow style	DecorSettingsView		Pil stil
+On	AntialiasingSettingsView		På
+Decorator:	DecorSettingsView		Dekor:
+Menu background	Colors tab		Menybakgrund
+Revert	APRWindow		Återgå
+List item text	Colors tab		List objekt text
+OK	DecorSettingsView		OK
+Control text	Colors tab		Kontrolltext
+Look and feel	APRWindow		Utseende och beteende
+Selected menu item background	Colors tab		Bakgrund för valt menyalternativ
+Link active	Colors tab		Aktiv länk
+Antialiasing	APRWindow		Kantutjämning
+Menu font:	Font view		Menu font:
+Bold font:	Font view		Fetstil
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nUpphovsmän:\n\t%decorAuthors\n\nURL: %decorURL\nLisens: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Välj dekor
+Strong	AntialiasingSettingsView		Framhävd
+Failure	Colors tab		Misslyckande
+Double:	DecorSettingsView		Dubbel
+Selected menu item text	Colors tab		Textfärg för valt menyalternativ
+Size:	Font Selection view		Storlek:
+Panel background	Colors tab		Panelbakgrund
+Plain font:	Font view		Vanlig font:
 Window tab text	Colors tab		Fönsterflik text
 Navigation pulse	Colors tab		Navigeringspuls
+LCD subpixel	AntialiasingSettingsView		LCD-subpixel
 Window tab	Colors tab		Fösterflik
-Tooltip background	Colors tab		Hjälprutsbakgrund
 Link text	Colors tab		Länktext
+Tooltip background	Colors tab		Hjälprutsbakgrund
+ControlLook:	DecorSettingsView		ControlLook:
 Scroll bar thumb	Colors tab		Rullbar märke
+Default	DecorSettingsView		Standard
 Link visited	Colors tab		Besök länk
 Selected menu item border	Colors tab		Kantfärg för valt menyalternativ
 Tooltip text	Colors tab		Hjälprutstext
-Selected list item text	Colors tab		Textfärg för valt menyalternativ
 Control background	Colors tab		Kontrollbakgrund
-Menu item text	Colors tab		Menyalternativstext
+Selected list item text	Colors tab		Textfärg för valt menyalternativ
 Selected list item background	Colors tab		Bakgrund för valt menyalternativ
 Inactive window tab text	Colors tab		Fliktext för inaktiva fönster
 Navigation base	Colors tab		Navigeringsbas
-Success	Colors tab		Framgång
+Fonts	APRWindow		Typsnitt
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Flygande bäckasiner söka strax hwila på mjuka tuvor.
+Grayscale	AntialiasingSettingsView		Gråskala
+Antialiasing type:	AntialiasingSettingsView		Kantutjämningstyp:
 Panel text	Colors tab		Paneltext
-Shine	Colors tab		Ljusstyrka
-Menu background	Colors tab		Menybakgrund
+Hinting menu	AntialiasingSettingsView		Betoningsmeny
+Scroll bar:	DecorSettingsView		Rullningslist:
+Choose ControlLook	DecorSettingsView		Välj ControlLook
+Monospaced fonts only	AntialiasingSettingsView		Endast typsnitt med fast bredd
 Document text	Colors tab		Dokument text
-List item text	Colors tab		List objekt text
 Inactive window border	Colors tab		Inaktiverad fönsterkant
-Control text	Colors tab		Kontrolltext
-Status bar	Colors tab		Statusrad
+Colors	APRWindow		Färger
+About control look	DecorSettingsView		Om ControlLook
 Control highlight	Colors tab		Framhävd kontroll
-Selected menu item background	Colors tab		Bakgrund för valt menyalternativ
-Link active	Colors tab		Aktiv länk
+Status bar	Colors tab		Statusrad
 Link hover	Colors tab		Hovrande länk
+Single:	DecorSettingsView		Enkel:

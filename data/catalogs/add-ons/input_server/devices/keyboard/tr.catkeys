@@ -5,7 +5,7 @@ Open Terminal	Team monitor		Uçbirim'i aç
 {0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural, other{Yeniden başlatmak için CTRL+ALT+DEL'i # saniye basılı tutun.}}
 Restart the desktop	Team monitor		Masaüstü'nü yeniden başlat
 Force reboot	Team monitor		Yeniden başlatmaya zorla
-Team monitor	Team monitor		Takım monitörü
+Team monitor	Team monitor		Takım Monitörü
 Kill application	Team monitor		Uygulamayı sonlandır
 Cancel	Team monitor		İptal
 (This team is a system component)	Team monitor		(Bu takım bir sistem parçasıdır)

@@ -5,9 +5,9 @@ Long	KeyboardView		Lang
 Cancel	TouchpadPrefView		Abbrechen
 4-Button	SettingsView		4-Tasten
 Slow	TouchpadPrefView		Langsam
-Tapping sensitivity	TouchpadPrefView		Tipp Empfindlichkeit
+Tapping sensitivity	TouchpadPrefView		Tipp-Empfindlichkeit
 Device List	InputWindow		Geräteliste
-Double-click speed	SettingsView		Doppelklickgeschwindigkeit
+Double-click speed	SettingsView		Doppelklick-Geschwindigkeit
 5-Button	SettingsView		5-Tasten
 Typing test area	KeyboardView		Feld für Testeingaben
 Mouse type:	SettingsView		Mausart:
@@ -29,7 +29,7 @@ Keyboard Lock Delay	TouchpadPrefView		Verzögerung der Tastatursperre
 Two finger scrolling	TouchpadPrefView		Zwei-Finger-Scrollen
 Input	System name		Eingabegeräte
 Mouse acceleration	SettingsView		Beschleunigung
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Der neue Scroll-Bereich ist sehr groß und könnte eine normale Mausfunktion beeinträchtigen. Soll die Einstellung wirklich geändert werden?
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Der neue Scroll-Bereich ist sehr groß und könnte eine normale Mausfunktion beeinträchtigen. Soll die Einstellung wirklich gesetzt werden?
 High	TouchpadPrefView		Hoch
 Defaults	TouchpadPrefView		Standardwerte
 1-Button	SettingsView		1-Taste
@@ -40,7 +40,7 @@ Slow	KeyboardView		Langsam
 Revert	InputMouse		Anfangswerte
 Key repeat rate	KeyboardView		Tastenwiederholrate
 2-Button	SettingsView		2-Tasten
-Click to focus and raise	SettingsView		Klicken aktiviert und bringt nach vorn
+Click to focus and raise	SettingsView		Klicken aktiviert und holt nach vorn
 Vertical	TouchpadPrefView		Vertikal
 Horizontal	TouchpadPrefView		Horizontal
 Focus follows mouse	SettingsView		Ohne Klicken aktivieren

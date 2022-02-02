@@ -1,5 +1,7 @@
-1	slovak	x-vnd.Haiku-MatchHeader	631274947
+1	slovak	x-vnd.Haiku-MatchHeader	3544711400
 Delete message	ConfigView		Zmazať správu
+Match \"%attribute\" against \"%regex\"	RuleFilter		Zhoda \"%attribute\" voči \"%regex\"
+Match header	RuleFilter		Zhoda hlavičky
 Set flags to	ConfigView		Nastaviť príznaky na
 <Choose account>	ConfigView		<Vyberte účet>
 Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Hodnota so zástupnými znakmi ako napr. „*spam*“.\nPoužite predponu „REGEX:“ ak chcete použiť regulárny výraz.

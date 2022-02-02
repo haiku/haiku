@@ -1,5 +1,50 @@
-1	swedish	x-vnd.Be-TSKB	1194388652
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Inställningar
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Exempelprogram
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Skrivbordsprogram
+1	swedish	x-vnd.Be-TSKB	2656653225
+Power off	DeskbarMenu		Stäng av
+Sort applications by name	PreferencesWindow		Sortera program efter namn
+Suspend	DeskbarMenu		Vänteläge
+Hide clock	TimeView		Dölj klockan
+Applications	PreferencesWindow		Program
+Time preferences…	TimeView		Tidsinställningar...
+About Haiku	DeskbarMenu		Om Haiku
+Edit in Tracker…	PreferencesWindow		Editera i Tracker…
+Recent documents:	PreferencesWindow		Senaste dokument:
+Recent applications	DeskbarMenu		Senaste program
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Program
+Find…	DeskbarMenu		Sök...
+Show clock	Tray		Visa klockan
+Window	PreferencesWindow		Fönster
+Defaults	PreferencesWindow		Standardvärden
+Menu	PreferencesWindow		Meny
+Recent documents	DeskbarMenu		Senaste dokument
+Auto-hide	PreferencesWindow		Dölj automatiskt
+Always on top	PreferencesWindow		Alltid överst
+<Deskbar folder is empty>	DeskbarMenu		<Deskbar mappen är tom>
+Show all	WindowMenu		Visa alla
+No windows	WindowMenu		Saknar fönster
+Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		Starta om
+Large	PreferencesWindow		Stor
+Auto-raise	PreferencesWindow		Höj vid närkontakt
+Recent folders:	PreferencesWindow		Senaste mappar:
+Show application expander	PreferencesWindow		Visa programexpanderare
+Close all	WindowMenu		Stäng alla
+Deskbar preferences	PreferencesWindow		Inställningar för Deskbar
+Mount	DeskbarMenu		Montera
+Revert	PreferencesWindow		Återgå
+Small	PreferencesWindow		Liten
+Recent applications:	PreferencesWindow		Senaste program:
+Shutdown…	DeskbarMenu		Stäng av…
+Tracker always first	PreferencesWindow		Visa Tracker först
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Inställningar
+Recent folders	DeskbarMenu		Senaste mappar
+About this system	DeskbarMenu		Om detta system
+Show calendar…	TimeView		Visa kalender...
+Deskbar preferences…	DeskbarMenu		Inställningar för Deskbar...
+Expand new applications	PreferencesWindow		Expandera nya program
+Show replicants	DeskbarMenu		Visa replikanter
+Hide application names	PreferencesWindow		Göm programnamnen
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Exempelprogram
+Icon size	PreferencesWindow		Ikonstorlek
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Skrivbordsprogram
+Hide all	WindowMenu		Göm alla
+Quit application	WindowMenu		Avsluta program

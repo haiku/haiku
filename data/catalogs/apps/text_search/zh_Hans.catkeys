@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku.TextSearch	1366601226
+1	english	x-vnd.Haiku.TextSearch	1966170500
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		请选择需要在文件浏览器中显示的文件。
 %appname% : %path%	GrepWindow		%appname% : %path%
 Open selection	GrepWindow		打开
@@ -9,12 +9,14 @@ OK	GrepWindow		确定
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		关闭
 Look in sub-folders	GrepWindow		在子目录中搜索
+%s: Not enough room to escape the filename.	Grepper		%s：没有足够的空间以消除文件名。
 Follow symbolic links	GrepWindow		对符号链接有效
 Text files only	GrepWindow		仅文本文件
 Quit	GrepWindow		退出
 Show files in Tracker	GrepWindow		在文件浏览器中显示文件
 Please select the files you wish to keep searching.	GrepWindow		请您选择需要进一步搜索的文件。
 Trim to selection	GrepWindow		缩减选中内容
+Set target…	GrepWindow		设置目标...
 Search	GrepWindow		搜索
 Copy text to clipboard	GrepWindow		复制文本到剪贴板
 Show lines	GrepWindow		显示行

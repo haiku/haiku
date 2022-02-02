@@ -7,7 +7,7 @@ Package installer	PackageView		PackageInstaller
 All existing files will be skipped?	PackageView		Alle existierenden Dateien werden übersprungen?
 Replace	PackageView		Ersetzen
 All existing files will be replaced?	PackageView		Alle vorhandenen Dateien werden ersetzt?
-Other…	PackageView		Andere…
+Other…	PackageView		Andere …
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Im benutzten Pfad existiert bereits ein symbolische Verknüpfung '%s'.\nSoll diese Verknüpfung mit der aus dem Paket ersetzt werden, oder soll dieser Schritt übersprungen werden?
 Stop	PackageStatus		Stopp
 Install to:	PackageView		Installieren nach:
@@ -17,7 +17,7 @@ The installation of the package has been aborted.	PackageView		Die Installation 
 No installation type selected	PackageView		Es wurde kein Installationstyp gewählt
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Soll diese Entscheidung für den Rest der Installation gelten?\n
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Das ausgewählte Paket konnte nicht entfernt werden. Die Infodatei der installierten Pakete könnte beschädigt sein.
-Install…	UninstallView		Installieren…
+Install…	UninstallView		Installieren …
 The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Ein Objekt '%s' existiert bereits im angebenen Pfad.\nSoll es mit dem Objekt aus diesem Paket ersetzt oder übersprungen werden?
 Installing files and folders	PackageInstall		Dateien und Ordner werden installiert
 Installed packages	UninstallWindow		Installierte Pakete

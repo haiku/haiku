@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CharacterMap	3257656252
+1	japanese	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		ティルフータ文字
 Miscellaneous mathematical symbols B	UnicodeBlocks		各種数学記号 B
 Latin extended E	UnicodeBlocks		ラテン文字拡張 E
@@ -6,8 +6,8 @@ Dogra	UnicodeBlocks		ドグラ文字
 Javanese	UnicodeBlocks		ジャワ文字
 Saurashtra	UnicodeBlocks		サウラーシュトラ文字
 Arabic supplement	UnicodeBlocks		アラビア文字補助
-Ogham	UnicodeBlocks		オーム文字
 Hanunoo	UnicodeBlocks		ハヌノオ文字
+Ogham	UnicodeBlocks		オーム文字
 Inscriptional Pahlavi	UnicodeBlocks		碑文パフラヴィー文字
 Hebrew	UnicodeBlocks		ヘブライ文字
 Katakana	UnicodeBlocks		カタカナ
@@ -38,6 +38,7 @@ Enclosed ideographic supplement	UnicodeBlocks		囲み表意文字補助
 Warang Citi	UnicodeBlocks		ワラング・クシティ文字
 Vertical forms	UnicodeBlocks		縦書き用句読点
 Miscellaneous mathematical symbols A	UnicodeBlocks		各種数学記号 A
+CharacterMap	System name		文字表
 Latin extended D	UnicodeBlocks		ラテン文字拡張 D
 Aegean numbers	UnicodeBlocks		エーゲ数字
 Hangul syllables	UnicodeBlocks		ハングル音節文字
@@ -45,6 +46,7 @@ Modifier tone letters	UnicodeBlocks		声調修飾文字
 Kaithi	UnicodeBlocks		カイティー文字
 Psalter Pahlavi	UnicodeBlocks		詩編用パフラヴィー文字
 Newa	UnicodeBlocks		ネワール文字
+View	CharacterWindow		表示
 Rumi numeral symbols	UnicodeBlocks		ルーミー数字記号
 Enclosed CJK letters and months	UnicodeBlocks		囲み CJK 文字・月
 Deseret	UnicodeBlocks		デゼレット文字
@@ -58,10 +60,12 @@ CJK unified ideographs extension C	UnicodeBlocks		CJK 統合漢字拡張 C
 Ancient Greek musical notation	UnicodeBlocks		古代ギリシャ記譜法
 Thai	UnicodeBlocks		タイ文字
 Ethiopic supplement	UnicodeBlocks		エチオピア文字補足
+Only show blocks contained in font	CharacterWindow		フォントに含まれるブロックのみ表示
 Chess symbols	UnicodeBlocks		チェス記号
 Yijing hexagram symbols	UnicodeBlocks		易経記号
 Ottoman Siyaq numbers	UnicodeBlocks		オスマン・シヤク数字
 Ideographic symbols and punctuation	UnicodeBlocks		表意文字の記号と句読点
+File	CharacterWindow		ファイル
 Sudanese supplement	UnicodeBlocks		スンダ文字補助
 Myanmar	UnicodeBlocks		ミャンマー文字
 Tifinagh	UnicodeBlocks		ティフナグ文字
@@ -97,6 +101,7 @@ Duployan	UnicodeBlocks		デュプロワエ式速記
 Early Dynastic Cuneiform	UnicodeBlocks		初期王朝くさび形文字
 Kana extended A	UnicodeBlocks		仮名拡張 A
 Arabic presentation forms A	UnicodeBlocks		アラビア表示形 A
+Filter:	CharacterWindow		フィルター:
 Small Kana extension	UnicodeBlocks		小書き仮名拡張
 Kannada	UnicodeBlocks		カンナダ文字
 Brahmi	UnicodeBlocks		ブラーフミー文字
@@ -112,6 +117,7 @@ Latin extended B	UnicodeBlocks		ラテン文字拡張 B
 Phonetic extensions	UnicodeBlocks		発音拡張
 Indic Siyaq numbers	UnicodeBlocks		インド・シヤク数字
 Batak	UnicodeBlocks		バタク文字
+Code	CharacterWindow		コード
 Block elements	UnicodeBlocks		ブロック要素
 Ethiopic extended A	UnicodeBlocks		エチオピア文字拡張 A
 Mahjong tiles	UnicodeBlocks		麻雀牌
@@ -145,11 +151,12 @@ Ideographic description characters	UnicodeBlocks		漢字構成記述文字
 Supplemental arrows A	UnicodeBlocks		補助矢印 A
 Rejang	UnicodeBlocks		ルジャン文字
 Number forms	UnicodeBlocks		数字に準じるもの
-Latin extended A	UnicodeBlocks		ラテン文字拡張 A
 Avestan	UnicodeBlocks		アヴェスター文字
+Latin extended A	UnicodeBlocks		ラテン文字拡張 A
 Zanabazar Square	UnicodeBlocks		ザナバザル方形文字
 Sundanese	UnicodeBlocks		スンダ文字
 Geometric shapes	UnicodeBlocks		幾何学模様
+Clear	CharacterWindow		クリア
 Symbols and pictographs extended A	UnicodeBlocks		その他の記号と絵文字拡張 A
 Adlam	UnicodeBlocks		アドラム文字
 Arabic	UnicodeBlocks		アラビア文字
@@ -170,8 +177,8 @@ Chorasmian	UnicodeBlocks		ホラズム文字
 Lisu supplement	UnicodeBlocks		リス文字補助
 Takri	UnicodeBlocks		タクリ文字
 Shorthand format controls	UnicodeBlocks		速記書式制御記号
-Optical character recognition	UnicodeBlocks		光学的文字認識
 Inscriptional Parthian	UnicodeBlocks		碑文パルティア文字
+Optical character recognition	UnicodeBlocks		光学的文字認識
 Tamil	UnicodeBlocks		タミル文字
 Lisu	UnicodeBlocks		リス文字
 Nandingari	UnicodeBlocks		ナンディナーガリー文字
@@ -181,6 +188,7 @@ Mahajani	UnicodeBlocks		マハジャニ文字
 Lepcha	UnicodeBlocks		レプチャ文字
 Mandaic	UnicodeBlocks		マンダイック文字
 Old italic	UnicodeBlocks		古イタリア文字
+Quit	CharacterWindow		終了
 Playing cards	UnicodeBlocks		トランプ
 Chakma	UnicodeBlocks		チャクマ文字
 Buhid	UnicodeBlocks		ブヒッド文字
@@ -213,8 +221,8 @@ Combining diacritical marks extended	UnicodeBlocks		ダイアクリティカル�
 Cyrillic extended C	UnicodeBlocks		キリル文字拡張 C
 Syriac	UnicodeBlocks		シリア文字
 Private use area	UnicodeBlocks		私用領域
-Supplement punctuation	UnicodeBlocks		補助句読点
 Vedic extensions	UnicodeBlocks		ヴェーダ文字拡張
+Supplement punctuation	UnicodeBlocks		補助句読点
 Lycian	UnicodeBlocks		リキア文字
 Myanmar extended A	UnicodeBlocks		ミャンマー文字拡張 A
 Ancient symbols	UnicodeBlocks		古代記号
@@ -234,6 +242,7 @@ Phags-pa	UnicodeBlocks		パスパ文字
 Nabataean	UnicodeBlocks		ナバテア文字
 Meetei Mayek	UnicodeBlocks		メイテイ・マイェック文字
 CJK compatibility ideographs	UnicodeBlocks		CJK 互換漢字
+Show private blocks	CharacterWindow		プライベートブロックの表示
 Samaritan	UnicodeBlocks		サマリア文字
 Latin extended additional	UnicodeBlocks		ラテン文字拡張追加
 Tibetan	UnicodeBlocks		チベット文字
@@ -254,13 +263,16 @@ Khudawadi	UnicodeBlocks		フダーワーディ文字
 Glagotic	UnicodeBlocks		グラゴール文字
 Cyrillic extended B	UnicodeBlocks		キリル文字拡張 B
 Anatolian hieroglyphs	UnicodeBlocks		アナトリア・ヒエログリフ
+Copy as escaped byte string	CharacterView		エスケープされた数値としてコピー
 Tai Xuan Jing symbols	UnicodeBlocks		太玄経記号
 Hiragana	UnicodeBlocks		ひらがな
 Tagbanwa	UnicodeBlocks		タグバンワ文字
 Basic Latin	UnicodeBlocks		基本ラテン文字
 Greek and Coptic	UnicodeBlocks		ギリシャ文字およびコプト文字
 Kangxi radicals	UnicodeBlocks		康煕部首
+Copy character	CharacterView		文字のコピー
 Hangul Jamo	UnicodeBlocks		ハングル字母
+Font	CharacterWindow		フォント
 Ornamental dingbats	UnicodeBlocks		装飾用絵記号
 Egyptian hieroglyph format controls	UnicodeBlocks		エジプトヒエログリフ制御記号
 Manichaean	UnicodeBlocks		マニ文字

@@ -12,10 +12,10 @@ Ukrainian	KeymapNames		Ukrán
 Russian (Yawert)	KeymapNames		Orosz (Yawert)
 United-Kingdom	KeymapNames		Egyesült Királyság
 Quit Haiku	System name		Haiku leállítása
-Serbian (Cyrillic)	KeymapNames		Szerb (cirill)
 Turkish (Type-F)	KeymapNames		Török (F-típus)
-Bulgarian (Cyrillic)	KeymapNames		Bolgár (cirill)
+Serbian (Cyrillic)	KeymapNames		Szerb (cirill)
 Belgian (point)	KeymapNames		Belga (pont)
+Bulgarian (Cyrillic)	KeymapNames		Bolgár (cirill)
 Finnish	KeymapNames		Finn
 Swedish	KeymapNames		Svéd
 Svorak	KeymapNames		Svorak
@@ -54,8 +54,8 @@ Italian	KeymapNames		Olasz
 Portuguese	KeymapNames		Portugál
 Swiss-French	KeymapNames		Svájci-Francia
 Slovene	KeymapNames		Szlovén
-Lithuanian	KeymapNames		Litván
 French (NF Z71-300)	KeymapNames		Francia (NF Z71-300)
+Lithuanian	KeymapNames		Litván
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Kazah
 Language	BootPromptWindow		Nyelv
@@ -71,8 +71,8 @@ Hungarian	KeymapNames		Magyar
 Irish	KeymapNames		Ír
 Romanian	KeymapNames		Román
 Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Biztosan beakarod zárni az ablakot? Ezzel a számítógép újra fog indulni.
-Macedonian	KeymapNames		Makedón
 Czech (Mac)	KeymapNames		Cseh (Mac)
+Macedonian	KeymapNames		Makedón
 Brazilian (ABNT2)	KeymapNames		Brazil (ABNT2)
 Albanian	KeymapNames		Albán
 Dutch	KeymapNames		Holland

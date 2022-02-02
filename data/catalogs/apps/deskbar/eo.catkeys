@@ -1,5 +1,50 @@
-1	esperanto	x-vnd.Be-TSKB	1194388652
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Agordo
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demonstraĵoj
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Labortablaj aplikaĵetoj
+1	esperanto	x-vnd.Be-TSKB	2656653225
+Power off	DeskbarMenu		Malŝalti
+Sort applications by name	PreferencesWindow		Ordigi programojn laŭnome
+Suspend	DeskbarMenu		Halteti
+Hide clock	TimeView		Kaŝi la horloĝon
+Applications	PreferencesWindow		Programoj
+Time preferences…	TimeView		Agordo de tempo…
+About Haiku	DeskbarMenu		Pri Haiku
+Edit in Tracker…	PreferencesWindow		Redakti per Spurilo…
+Recent documents:	PreferencesWindow		Ĵusaj dokumentoj:
+Recent applications	DeskbarMenu		Ĵusaj programoj
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programoj
+Find…	DeskbarMenu		Serĉi…
+Show clock	Tray		Montri la horloĝon
+Window	PreferencesWindow		Fenestro
+Defaults	PreferencesWindow		Defaŭltoj
+Menu	PreferencesWindow		Menuo
+Recent documents	DeskbarMenu		Ĵusaj dokumentoj
+Auto-hide	PreferencesWindow		Aŭtomate kaŝi
+Always on top	PreferencesWindow		Ĉiam videbla
+<Deskbar folder is empty>	DeskbarMenu		<Dosierujo de Laborstrio malplenas>
+Show all	WindowMenu		Montri ĉiujn
+No windows	WindowMenu		Neniu fenestro
+Deskbar	System name		Laborstrio
+Restart system	DeskbarMenu		Restartigi la sistemon
+Large	PreferencesWindow		Granda
+Auto-raise	PreferencesWindow		Aŭtomate antaŭigi
+Recent folders:	PreferencesWindow		Ĵusaj dosierujoj:
+Show application expander	PreferencesWindow		Montri liston de programaj fenestroj
+Close all	WindowMenu		Fermi ĉiujn
+Deskbar preferences	PreferencesWindow		Agordoj de Laborstrio
+Mount	DeskbarMenu		Surmeti
+Revert	PreferencesWindow		Malfari
+Small	PreferencesWindow		Malgranda
+Recent applications:	PreferencesWindow		Ĵusaj programoj:
+Shutdown…	DeskbarMenu		Ĉesi laboron…
+Tracker always first	PreferencesWindow		Spurilo ĉiam unua
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Agordo
+Recent folders	DeskbarMenu		Ĵusaj dosierujoj
+About this system	DeskbarMenu		Pri ĉi tiu sistemo
+Show calendar…	TimeView		Montri kalendaron…
+Deskbar preferences…	DeskbarMenu		Agordi Laborstrion…
+Expand new applications	PreferencesWindow		Disvolvi la liston dum lanĉo
+Show replicants	DeskbarMenu		Montri replikilojn
+Hide application names	PreferencesWindow		Kaŝi nomojn de programoj
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demonstraĵoj
+Icon size	PreferencesWindow		Piktograma grando
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Labortablaj aplikaĵetoj
+Hide all	WindowMenu		Kaŝi ĉiujn
+Quit application	WindowMenu		Ĉesi la programon

@@ -12,10 +12,10 @@ Ukrainian	KeymapNames		Ukraina
 Russian (Yawert)	KeymapNames		Rusa (Yawert)
 United-Kingdom	KeymapNames		Angluja
 Quit Haiku	System name		Forlasi Hajkon
-Serbian (Cyrillic)	KeymapNames		Serba (Cirila)
 Turkish (Type-F)	KeymapNames		Turka (Tipo-F)
-Bulgarian (Cyrillic)	KeymapNames		Bulgara (Cirila)
+Serbian (Cyrillic)	KeymapNames		Serba (Cirila)
 Belgian (point)	KeymapNames		Belgia (punkto)
+Bulgarian (Cyrillic)	KeymapNames		Bulgara (Cirila)
 Finnish	KeymapNames		Finna
 Swedish	KeymapNames		Sveda
 Svorak	KeymapNames		Svoraka
@@ -54,8 +54,8 @@ Italian	KeymapNames		Itala
 Portuguese	KeymapNames		Portugala
 Swiss-French	KeymapNames		Svisfranca
 Slovene	KeymapNames		Slovena
-Lithuanian	KeymapNames		Litova
 French (NF Z71-300)	KeymapNames		Franca (NF Z71-300)
+Lithuanian	KeymapNames		Litova
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Kazaĥa
 Language	BootPromptWindow		Lingvo
@@ -71,8 +71,8 @@ Hungarian	KeymapNames		Hungara
 Irish	KeymapNames		Irlanda
 Romanian	KeymapNames		Rumana
 Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Ĉu vi certas ke vi volas fermi la fenestron? Tio restartigos vian sistemon!
-Macedonian	KeymapNames		Makedona
 Czech (Mac)	KeymapNames		Ĉeĥa (Makintoŝa)
+Macedonian	KeymapNames		Makedona
 Brazilian (ABNT2)	KeymapNames		Brazila (ABNT2)
 Albanian	KeymapNames		Albana
 Dutch	KeymapNames		Nederlanda

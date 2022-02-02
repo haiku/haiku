@@ -1,37 +1,48 @@
-1	danish	x-vnd.Haiku-ActivityMonitor	3850445261
+1	danish	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Hold
 Semaphores	DataSource		Semaforer
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Blok mellemlager hukommelse
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
 Media nodes	DataSource		Medienoder
 Text clipboard	DataSource		Tekst udklipsholder
 Network send	DataSource		Netværk afsende
-Cache	DataSource		Mellemlager
 Running applications	DataSource		Kørende programmer
-Threads	DataSource		Tråde
+Cache	DataSource		Mellemlager
 CPU usage (combined)	DataSource		CPU forbrug (samlet)
+Threads	DataSource		Tråde
 Receiving	DataSource		Modtager
+Remove graph	ActivityView		Fjern graf
 Swap space	DataSource		Udvekslings plads
 CPU	DataSource		CPU
+ActivityMonitor	System name		Aktivitetsmonitor
 CPU %d	DataSource		CPU %d
+Update time interval:	SettingsWindow		Opdatering tids interval:
 RX	DataSource	Shorter version for Receiving.	RX
+Settings…	ActivityWindow		Indstillinger…
 Block cache	DataSource		Blok mellemlager
 Memory	DataSource		Hukommelse
-CPU speed	DataSource		CPU-hastighed
 CPU usage	DataSource		CPU forbrug
+Quit	ActivityWindow		Afslut
 Raw clipboard	DataSource		Rå udklipsholder
+Settings	ActivityWindow		Indstillinger
 Used memory	DataSource		Brugt hukommelse
 %.1f faults/s	DataSource		%.1f fejl/s
+Show legend	ActivityView		Vis forklaring
 Cached memory	DataSource		Mellemlager hukommelse
-CPU %d speed	DataSource		Hastighed for CPU %d
 CPU %d usage	DataSource		CPU %d forbrug
+File	ActivityWindow		Fil
 Ports	DataSource		Porte
 Page faults	DataSource		Side fejl
 Apps	DataSource		Programmer
+Additional items	ActivityView		Yderligere elementer
+Add graph	ActivityWindow		Tilføj graf
 Sending	DataSource		Afsender
 %.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Altid øverst
 Swap	DataSource		Udveksling
+%lld sec.	SettingsWindow		%lld sek.
 P-faults	DataSource		P-fejl
 Sems	DataSource		Semas
 Network receive	DataSource		Netværks modtag

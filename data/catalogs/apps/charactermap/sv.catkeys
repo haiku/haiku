@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-CharacterMap	3257656252
+1	swedish	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Diverse matematiska symboler B
 Latin extended E	UnicodeBlocks		Latin förlängd E
@@ -6,8 +6,8 @@ Dogra	UnicodeBlocks		Dogra
 Javanese	UnicodeBlocks		Javanese
 Saurashtra	UnicodeBlocks		Saurashtra
 Arabic supplement	UnicodeBlocks		Arabiska tillägg
-Ogham	UnicodeBlocks		Ogham
 Hanunoo	UnicodeBlocks		Hanunoo
+Ogham	UnicodeBlocks		Ogham
 Inscriptional Pahlavi	UnicodeBlocks		Inscriptional Pahlavi
 Hebrew	UnicodeBlocks		Hebreiska
 Katakana	UnicodeBlocks		Katakana
@@ -38,6 +38,7 @@ Enclosed ideographic supplement	UnicodeBlocks		Länkat ideografiskt tillägg
 Warang Citi	UnicodeBlocks		Warang Citi
 Vertical forms	UnicodeBlocks		Lodräta format
 Miscellaneous mathematical symbols A	UnicodeBlocks		Diverse matematiska symboler A
+CharacterMap	System name		TeckenTabell
 Latin extended D	UnicodeBlocks		Latin D (utökad)
 Aegean numbers	UnicodeBlocks		Egeiska siffror
 Hangul syllables	UnicodeBlocks		Hangul stavelser
@@ -45,6 +46,7 @@ Modifier tone letters	UnicodeBlocks		Tecken för ändringston
 Kaithi	UnicodeBlocks		Kaithi
 Psalter Pahlavi	UnicodeBlocks		Psalter Pahlavi
 Newa	UnicodeBlocks		Newa
+View	CharacterWindow		Visa
 Rumi numeral symbols	UnicodeBlocks		Rumi-siffrasymboler
 Enclosed CJK letters and months	UnicodeBlocks		Omslutna CJK bokstäver och månadstecken
 Deseret	UnicodeBlocks		Deseret
@@ -58,10 +60,12 @@ CJK unified ideographs extension C	UnicodeBlocks		CJK förenade ideografer förl
 Ancient Greek musical notation	UnicodeBlocks		Gammelgrekiska noter
 Thai	UnicodeBlocks		Thai
 Ethiopic supplement	UnicodeBlocks		Etiopiska utökningar
+Only show blocks contained in font	CharacterWindow		Visa bara block som finns i teckensnittet
 Chess symbols	UnicodeBlocks		Schacksymboler
 Yijing hexagram symbols	UnicodeBlocks		Yijing hexagramsymboler
 Ottoman Siyaq numbers	UnicodeBlocks		Osmanska Siyaq-nummer
 Ideographic symbols and punctuation	UnicodeBlocks		Ideografiska symboler och skiljetecken
+File	CharacterWindow		Arkiv
 Sudanese supplement	UnicodeBlocks		Sudans tillägg
 Myanmar	UnicodeBlocks		Myanmar
 Tifinagh	UnicodeBlocks		Tifinagh
@@ -97,6 +101,7 @@ Duployan	UnicodeBlocks		Duployan
 Early Dynastic Cuneiform	UnicodeBlocks		Tidig dynastisk kilskrift
 Kana extended A	UnicodeBlocks		Kana förlängd A
 Arabic presentation forms A	UnicodeBlocks		Arabiskt presentationsformat A
+Filter:	CharacterWindow		Filtrera:
 Small Kana extension	UnicodeBlocks		Liten Kana-förlängning
 Kannada	UnicodeBlocks		Kannada
 Brahmi	UnicodeBlocks		Brahmi
@@ -112,6 +117,7 @@ Latin extended B	UnicodeBlocks		Latin B (utökad)
 Phonetic extensions	UnicodeBlocks		Fonetiska tillägg
 Indic Siyaq numbers	UnicodeBlocks		Indisk Siyaq-nummer
 Batak	UnicodeBlocks		Batak
+Code	CharacterWindow		Kod
 Block elements	UnicodeBlocks		Blockelement
 Ethiopic extended A	UnicodeBlocks		Etiopisk utvidgad A
 Mahjong tiles	UnicodeBlocks		Mahjong-brickor
@@ -145,11 +151,12 @@ Ideographic description characters	UnicodeBlocks		Ideografiska beskrivande tecke
 Supplemental arrows A	UnicodeBlocks		Kompletterande pilar A
 Rejang	UnicodeBlocks		Rejang
 Number forms	UnicodeBlocks		Numreriska former
-Latin extended A	UnicodeBlocks		Latin A (utökad)
 Avestan	UnicodeBlocks		Avestan
+Latin extended A	UnicodeBlocks		Latin A (utökad)
 Zanabazar Square	UnicodeBlocks		Zanabazar Square
 Sundanese	UnicodeBlocks		Sundanesiska
 Geometric shapes	UnicodeBlocks		Geometriska figurer
+Clear	CharacterWindow		Rensa
 Symbols and pictographs extended A	UnicodeBlocks		Symboler och piktogram utvidgade A
 Adlam	UnicodeBlocks		Adlam
 Arabic	UnicodeBlocks		Arabiska
@@ -170,8 +177,8 @@ Chorasmian	UnicodeBlocks		Chorasmian
 Lisu supplement	UnicodeBlocks		Lisu-tillägg
 Takri	UnicodeBlocks		Takri
 Shorthand format controls	UnicodeBlocks		Ställformatkontroller
-Optical character recognition	UnicodeBlocks		Optisk teckenläsning (OCR
 Inscriptional Parthian	UnicodeBlocks		Inscriptional Parthian
+Optical character recognition	UnicodeBlocks		Optisk teckenläsning (OCR
 Tamil	UnicodeBlocks		Tamil
 Lisu	UnicodeBlocks		Lisu
 Nandingari	UnicodeBlocks		Nandingari
@@ -181,6 +188,7 @@ Mahajani	UnicodeBlocks		Mahajani
 Lepcha	UnicodeBlocks		Lepcha
 Mandaic	UnicodeBlocks		Mandaic
 Old italic	UnicodeBlocks		Fornitaliska
+Quit	CharacterWindow		Avsluta
 Playing cards	UnicodeBlocks		Spel kort
 Chakma	UnicodeBlocks		Chakma
 Buhid	UnicodeBlocks		Buhid
@@ -213,8 +221,8 @@ Combining diacritical marks extended	UnicodeBlocks		Kombinera diakritiska märke
 Cyrillic extended C	UnicodeBlocks		Kyrilliska A (utökad)
 Syriac	UnicodeBlocks		Syriska
 Private use area	UnicodeBlocks		För privat användning
-Supplement punctuation	UnicodeBlocks		Kompletterande skiljetecken
 Vedic extensions	UnicodeBlocks		Vediska förlängningar
+Supplement punctuation	UnicodeBlocks		Kompletterande skiljetecken
 Lycian	UnicodeBlocks		Lykiska
 Myanmar extended A	UnicodeBlocks		Myanmar utökade A
 Ancient symbols	UnicodeBlocks		Antika symboler
@@ -234,6 +242,7 @@ Phags-pa	UnicodeBlocks		Phags-pa
 Nabataean	UnicodeBlocks		Nabataean
 Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		CJK kompatibilitetsideogram
+Show private blocks	CharacterWindow		Visa privata block
 Samaritan	UnicodeBlocks		Samaritan
 Latin extended additional	UnicodeBlocks		Latin (utökad extra)
 Tibetan	UnicodeBlocks		Tibetisk
@@ -254,13 +263,16 @@ Khudawadi	UnicodeBlocks		Khudawadi
 Glagotic	UnicodeBlocks		Glagotiska
 Cyrillic extended B	UnicodeBlocks		Kyrilliska B (utökade)
 Anatolian hieroglyphs	UnicodeBlocks		Anatoliska hieroglyfer
+Copy as escaped byte string	CharacterView		Kopiera som kodad byte-sträng
 Tai Xuan Jing symbols	UnicodeBlocks		Tai Xuan Jing-symboler
 Hiragana	UnicodeBlocks		Hiragana
 Tagbanwa	UnicodeBlocks		Tagbanwa
 Basic Latin	UnicodeBlocks		Latin (standard)
 Greek and Coptic	UnicodeBlocks		Grekiska och koptiska
 Kangxi radicals	UnicodeBlocks		Kangxi radikaler
+Copy character	CharacterView		Kopiera tecken
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
+Font	CharacterWindow		Typsnitt
 Ornamental dingbats	UnicodeBlocks		Ornamental dingbats
 Egyptian hieroglyph format controls	UnicodeBlocks		Egyptiska hieroglyfformat kontroller
 Manichaean	UnicodeBlocks		Manichaean

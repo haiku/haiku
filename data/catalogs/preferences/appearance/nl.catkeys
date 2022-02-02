@@ -1,39 +1,79 @@
-1	dutch; flemish	x-vnd.Haiku-Appearance	2170377510
+1	dutch; flemish	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Keuzerand
-Failure	Colors tab		Mislukt
 Control mark	Colors tab		Besturingsteken
+Off	AntialiasingSettingsView		Uit
 Window border	Colors tab		Vensterrand
 Inactive window tab	Colors tab		Niet-actieve venstertab
+Defaults	APRWindow		Standaardwaarden
 Shadow	Colors tab		Schaduw
-Selected menu item text	Colors tab		Tekst geselecteerd menu-item
 Document background	Colors tab		Achtergrond document
-Panel background	Colors tab		Achtergrond paneel
 List background	Colors tab		Achtergrond van lijst
+No effect on running applications	DecorSettingsView		Geen effect op actieve toepassingen.
+Fixed font:	Font view		Vast lettertype:
+Appearance	System name		Uiterlijk
+Reduce colored edges filter strength:	AntialiasingSettingsView		Reductie filtersterkte gekleurde randen:
+Glyph hinting:	AntialiasingSettingsView		Glyph hinting:
+Default Haiku ControlLook	DecorSettingsView		Standaard Haiku InterfaceStijl
+Menu item text	Colors tab		Tekst menu-item
+About decorator	DecorSettingsView		Over de decorator
+Antialiasing menu	AntialiasingSettingsView		Anti-aliasing menu
+Success	Colors tab		Gelukt
+About	DecorSettingsView		Over
+Shine	Colors tab		Glans
+Arrow style	DecorSettingsView		Pijlstijl
+On	AntialiasingSettingsView		Aan
+Decorator:	DecorSettingsView		Decorator:
+Menu background	Colors tab		Achtergrond menu
+Revert	APRWindow		Herstellen
+List item text	Colors tab		Lijstitemtekst
+OK	DecorSettingsView		OK
+Control text	Colors tab		Tekst keuze
+Look and feel	APRWindow		Uiterlijk en gebruik
+Selected menu item background	Colors tab		Achtergrond geselecteerd menu-item
+Link active	Colors tab		Link actief
+Antialiasing	APRWindow		Anti-aliasing
+Menu font:	Font view		Lettertype voor menu:
+Bold font:	Font view		Vet lettertype:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAuteurs:\n\t%decorAuthors\n\nURL: %decorURL\nLicentie: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Decorator kiezen
+Strong	AntialiasingSettingsView		Sterk
+Failure	Colors tab		Mislukt
+Double:	DecorSettingsView		Dubbel:
+Selected menu item text	Colors tab		Tekst geselecteerd menu-item
+Size:	Font Selection view		Grootte:
+Panel background	Colors tab		Achtergrond paneel
+Plain font:	Font view		Standaardlettertype:
 Window tab text	Colors tab		Tekst venstertab
 Navigation pulse	Colors tab		Puls navigatie
+LCD subpixel	AntialiasingSettingsView		LCD-subpixel
 Window tab	Colors tab		Venstertab
-Tooltip background	Colors tab		Achtergrond Tooltip
 Link text	Colors tab		Linktekst
+Tooltip background	Colors tab		Achtergrond Tooltip
+ControlLook:	DecorSettingsView		InterfaceStijl:
 Scroll bar thumb	Colors tab		Schuifbalkknop
+Default	DecorSettingsView		Standaard
 Link visited	Colors tab		Bezochte link
 Selected menu item border	Colors tab		Rand geselecteerd menu-item
 Tooltip text	Colors tab		Tekst Tooltip
-Selected list item text	Colors tab		Selecteer lijstitem-tekst
 Control background	Colors tab		Achtergrond keuze
-Menu item text	Colors tab		Tekst menu-item
+Selected list item text	Colors tab		Selecteer lijstitem-tekst
 Selected list item background	Colors tab		Achtergrond geselecteerde lijstitem
 Inactive window tab text	Colors tab		Tabtekst niet-actief venster
 Navigation base	Colors tab		Basis navigatie
-Success	Colors tab		Gelukt
+Fonts	APRWindow		Lettertypen
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pa's wijze lynx bezag vroom het fikse aquaduct.
+Grayscale	AntialiasingSettingsView		Grijswaarden
+Antialiasing type:	AntialiasingSettingsView		Anti-aliasingtype:
 Panel text	Colors tab		Tekst paneel
-Shine	Colors tab		Glans
-Menu background	Colors tab		Achtergrond menu
+Hinting menu	AntialiasingSettingsView		Hinting-menu
+Scroll bar:	DecorSettingsView		Schuifbalk:
+Choose ControlLook	DecorSettingsView		InterfaceStijl kiezen
+Monospaced fonts only	AntialiasingSettingsView		Alleen niet-proportionele lettertypes
 Document text	Colors tab		Tekst document
-List item text	Colors tab		Lijstitemtekst
 Inactive window border	Colors tab		Rand van een inactief venster
-Control text	Colors tab		Tekst keuze
-Status bar	Colors tab		Statusbalk
+Colors	APRWindow		Kleuren
+About control look	DecorSettingsView		Over de interface stijl
 Control highlight	Colors tab		Keuze-accent
-Selected menu item background	Colors tab		Achtergrond geselecteerd menu-item
-Link active	Colors tab		Link actief
+Status bar	Colors tab		Statusbalk
 Link hover	Colors tab		Zweven over link
+Single:	DecorSettingsView		Enkele:

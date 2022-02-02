@@ -1,3 +1,34 @@
-1	ukrainian	x-vnd.Haiku-Notifications	1522084233
-General	PrefletView		Загальні
+1	ukrainian	x-vnd.Haiku-Notifications	4196496676
+Lower left	GeneralView		Нижній лівий
+Application does not have a valid signature	NotificationView	Alert message	Програма не має дійсного підпису
+Status	NotificationView		Стан
+Add…	NotificationView		Додати…
+Lower right	GeneralView		Нижній правий
+Muted	NotificationView		Приглушити
+ is already listed	NotificationView	Alert message	 вже перелічено
+OK	PrefletWin		ОК
+Notifications	PrefletWin		Оповіщення
+Notifications preflet sample	PrefletWin		Зразок префлета повідомлень
+Mute notifications from this application	NotificationView		Відключити оповіщення для цієї програми
+wide	GeneralView	Window width: Slider high text	широке
+narrow	GeneralView	Window width: Slider low text	вузьке
+Revert	PrefletWin		Без змін
 Applications	PrefletView		Програми
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Тайм-аут: # секунда}few{Тайм-аут: # секунди}other{Тайм-аут: # секунд}}
+Upper right	GeneralView		Верхній правий
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Сталася помилка при збереженні налаштувань.\nМожливо бракує дискового простору.
+Defaults	PrefletWin		За замовчуванням
+Upper left	GeneralView		Верхній лівий
+Window width	GeneralView		Вікно по ширині
+Applications	NotificationView		Програми
+General	PrefletView		Загальні
+OK	NotificationView		ОК
+Follow Deskbar	GeneralView		Слідкувати за Deskbar
+Notifications	System name		Notifications
+Allowed	NotificationView		Дозволити
+Duration:	GeneralView		Тривалість:
+Application	NotificationView		Програма
+Enable notifications	GeneralView		Включити оповіщення
+This is a test notification message	PrefletWin		Це тестове повідомлення
+Remove	NotificationView		Вилучити
+Position:	GeneralView		Позиція:

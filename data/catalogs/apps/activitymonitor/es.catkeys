@@ -1,37 +1,48 @@
-1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	3850445261
+1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Equipos
 Semaphores	DataSource		Semáforos
-TX	DataSource	Shorter version for Sending	Env.
-Block cache memory	DataSource		Memoria del caché de bloques
+TX	DataSource	Shorter version for Sending	TX
+Block cache memory	DataSource		Bloquear memoria de caché
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
-Media nodes	DataSource		Nodos de medios
+Media nodes	DataSource		Nodos de media
 Text clipboard	DataSource		Texto en el portapapeles
 Network send	DataSource		Envío de red
-Cache	DataSource		Caché
 Running applications	DataSource		Aplicaciones ejecutándose
-Threads	DataSource		Hilos
+Cache	DataSource		Caché
 CPU usage (combined)	DataSource		Uso de CPU (conjunto)
-Receiving	DataSource		Recepción
+Threads	DataSource		Hilos
+Receiving	DataSource		Recibiendo
+Remove graph	ActivityView		Quitar el gráfico
 Swap space	DataSource		Espacio de intercambio
-CPU	DataSource		Procesador
-CPU %d	DataSource		Procesador %d
-RX	DataSource	Shorter version for Receiving.	Desc.
-Block cache	DataSource		Caché de bloques
-Memory	DataSource		Memoria
-CPU speed	DataSource		Velocidad del procesador
-CPU usage	DataSource		Uso del procesador
+CPU	DataSource		CPU
+ActivityMonitor	System name		Monitor de actividad
+CPU %d	DataSource		CPU %d
+Update time interval:	SettingsWindow		Intervalo de tiempo de actualización:
+RX	DataSource	Shorter version for Receiving.	RX
+Settings…	ActivityWindow		Configuración...
+Block cache	DataSource		Bloqueando caché
+Memory	DataSource		Memoria 
+CPU usage	DataSource		Uso de CPU
+Quit	ActivityWindow		Salir
 Raw clipboard	DataSource		Portapapeles en bruto
+Settings	ActivityWindow		Configuración
 Used memory	DataSource		Memoria usada
 %.1f faults/s	DataSource		%.1f fallas/s
+Show legend	ActivityView		Mostrar clave
 Cached memory	DataSource		Memoria de caché
-CPU %d speed	DataSource		Velocidad del procesador %d
-CPU %d usage	DataSource		Uso del procesador CPU %d
+CPU %d usage	DataSource		Uso CPU %d
+File	ActivityWindow		Archivo
 Ports	DataSource		Puertos
 Page faults	DataSource		Errores de página
 Apps	DataSource		Aplicaciones
-Sending	DataSource		Envío
+Additional items	ActivityView		Elementos adicionales
+Add graph	ActivityWindow		Insertar gráfico
+Sending	DataSource		Enviando
 %.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Siempre visible
 Swap	DataSource		Intercambio
+%lld sec.	SettingsWindow		%lld sec.
 P-faults	DataSource		Errores de página
 Sems	DataSource		Sems
-Network receive	DataSource		Recepción de red
+Network receive	DataSource		Recibir de red

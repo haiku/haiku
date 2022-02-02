@@ -1,7 +1,8 @@
-1	portuguese	application/x-vnd.Cortex.Route	148328950
+1	portuguese	application/x-vnd.Cortex.Route	2274524609
 OK	CortexRouteApp		OK
 About Cortex/Route…	CortexRouteApp		Acerca de Cortex/Route…
 File	CortexRouteApp		Ficheiro
+%producer% and %consumer%	CortexRouteApp		%producer% e %consumer%
 Node '%name%' created	CortexRouteApp		Nó '%name%' criado
 Negotiated format:	CortexRouteApp		Formato negociado:
 Window	CortexRouteApp		Janela

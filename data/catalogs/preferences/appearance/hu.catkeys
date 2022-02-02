@@ -1,39 +1,79 @@
-1	hungarian	x-vnd.Haiku-Appearance	2170377510
+1	hungarian	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Vezérlőelem kerete
-Failure	Colors tab		Nem sikerült
 Control mark	Colors tab		Vezérlőelem jelölése
+Off	AntialiasingSettingsView		Ki
 Window border	Colors tab		Ablakkeret
 Inactive window tab	Colors tab		Inaktív ablak füle
+Defaults	APRWindow		Alapértékek
 Shadow	Colors tab		Árnyék
-Selected menu item text	Colors tab		Kiválasztott menüelem
 Document background	Colors tab		Dokumentum háttere
-Panel background	Colors tab		Panel háttere
 List background	Colors tab		Lista háttere
+No effect on running applications	DecorSettingsView		Futó alkalmazásokra nincs hatása
+Fixed font:	Font view		Rögzített szélességű betűtípus:
+Appearance	System name		Megjelenés
+Reduce colored edges filter strength:	AntialiasingSettingsView		A színezett betűszélek szűrőjének erősségi szintje:
+Glyph hinting:	AntialiasingSettingsView		Betűképek körvonala:
+Default Haiku ControlLook	DecorSettingsView		Alapértelmezett Haiku megjelenés
+Menu item text	Colors tab		Menüelem-szöveg
+About decorator	DecorSettingsView		Dekoráció névjegye
+Antialiasing menu	AntialiasingSettingsView		Élsimítási menü
+Success	Colors tab		Sikerült
+About	DecorSettingsView		Névjegy
+Shine	Colors tab		Ragyogás színe
+Arrow style	DecorSettingsView		Nyíl stílusa
+On	AntialiasingSettingsView		Be
+Decorator:	DecorSettingsView		Dekoráció:
+Menu background	Colors tab		Menü háttere
+Revert	APRWindow		Visszaállít
+List item text	Colors tab		Listaelem
+OK	DecorSettingsView		Rendben
+Control text	Colors tab		Vezérlőelem szövege
+Look and feel	APRWindow		Arculat
+Selected menu item background	Colors tab		Kiválasztott menüelem háttere
+Link active	Colors tab		Aktív hivatkozás
+Antialiasing	APRWindow		Élsimítás
+Menu font:	Font view		Menü betűtípusa:
+Bold font:	Font view		Félkövér betű:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nKészítette:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Dekoráció kiválasztása
+Strong	AntialiasingSettingsView		Erős
+Failure	Colors tab		Nem sikerült
+Double:	DecorSettingsView		Dupla:
+Selected menu item text	Colors tab		Kiválasztott menüelem
+Size:	Font Selection view		Méret:
+Panel background	Colors tab		Panel háttere
+Plain font:	Font view		Alap betűtípus:
 Window tab text	Colors tab		Ablakfül szövege
 Navigation pulse	Colors tab		Navigációs pulzálás
+LCD subpixel	AntialiasingSettingsView		LCD-szubpixel
 Window tab	Colors tab		Ablakfül
-Tooltip background	Colors tab		Eszköztár háttere
 Link text	Colors tab		Hivatkozás szövege
+Tooltip background	Colors tab		Eszköztár háttere
+ControlLook:	DecorSettingsView		Megjelenés:
 Scroll bar thumb	Colors tab		Görgetősáv megjelenése
+Default	DecorSettingsView		Alapérték
 Link visited	Colors tab		Meglátogatott hivatkozás
 Selected menu item border	Colors tab		Kiválasztott menüelem szegélye
 Tooltip text	Colors tab		Buboréksúgó szövege
-Selected list item text	Colors tab		Kiválasztott listaelem
 Control background	Colors tab		Kiválasztás háttere
-Menu item text	Colors tab		Menüelem-szöveg
+Selected list item text	Colors tab		Kiválasztott listaelem
 Selected list item background	Colors tab		Kiválasztott listaelem háttere
 Inactive window tab text	Colors tab		Inaktív ablak címszövege
 Navigation base	Colors tab		Navigációs alapszín
-Success	Colors tab		Sikerült
+Fonts	APRWindow		Betűtípusok
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Árvíztűrő tükörfúrógép.
+Grayscale	AntialiasingSettingsView		Szürkeárnyalat
+Antialiasing type:	AntialiasingSettingsView		Élsimítás módja:
 Panel text	Colors tab		Panel szövege
-Shine	Colors tab		Ragyogás színe
-Menu background	Colors tab		Menü háttere
+Hinting menu	AntialiasingSettingsView		Körvonalmenü
+Scroll bar:	DecorSettingsView		Görgetősáv:
+Choose ControlLook	DecorSettingsView		Megjelenés kiválasztása
+Monospaced fonts only	AntialiasingSettingsView		Csak rögzített szélességű betűtípusok
 Document text	Colors tab		Dokumentumszöveg
-List item text	Colors tab		Listaelem
 Inactive window border	Colors tab		Inaktív ablakkeret
-Control text	Colors tab		Vezérlőelem szövege
-Status bar	Colors tab		Állapotsor
+Colors	APRWindow		Színek
+About control look	DecorSettingsView		Névjegy
 Control highlight	Colors tab		Kiválasztott vezérlőelem
-Selected menu item background	Colors tab		Kiválasztott menüelem háttere
-Link active	Colors tab		Aktív hivatkozás
+Status bar	Colors tab		Állapotsor
 Link hover	Colors tab		Kijelölt hivatkozás
+Single:	DecorSettingsView		Egyszeres:

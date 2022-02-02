@@ -1,2 +1,46 @@
-1	russian	x-vnd.Haiku-SoundRecorder	2344941071
+1	russian	x-vnd.Haiku-SoundRecorder	24440888
+Loop	RecorderWindow		Закольцевать
+Cannot find default audio hardware	RecorderWindow		Не найдено аудио оборудование
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Не найден временный файл, созданный для хранения новой записи
+Sample size:	RecorderWindow		Размер сэмпла:
+Nothing to play	RecorderWindow		Нечего играть
+None of the files appear to be audio files.	RecorderWindow		Ни один из этих файлов не является звуковым файлом.
+Duration: 	RecorderWindow		Продолжительность: 
+File info	RecorderWindow		Информация о файле:
 Drop files here	SoundListView		Перетащите сюда файлы
+Input	RecorderWindow		Вход
+Some of the files don't appear to be audio files.	RecorderWindow		Некоторые из этих файлов не являются звуковым файлами.
+Stop	RecorderWindow		Остановить
+Format:	RecorderWindow		Формат:
+Sound List	RecorderWindow		Список звуков
+Compression: 	RecorderWindow		Сжатие: 
+Rewind	RecorderWindow		Перемотка
+Sample rate:	RecorderWindow		Частота дискретизации:
+Invalid audio files	RecorderWindow		Некорректные аудио файлы
+ seconds	RecorderWindow		 секунд
+OK	RecorderWindow		ОК
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Невозможно открыть временный файл, созданный для хранения новой записи
+Input:	RecorderWindow		Звуковой вход:
+Forward	RecorderWindow		Вперед
+Play	RecorderWindow		Играть
+SoundRecorder	System name		Звукозапись
+Channels:	RecorderWindow		Каналы:
+ bits	RecorderWindow		 бит
+None	RecorderWindow		Нет
+Record	RecorderWindow		Запись
+Sample size: 	RecorderWindow		Размер сэмпла: 
+Cannot recognize this file as a media file	RecorderWindow		Не удается распознать файл как файл медиа
+Format: 	RecorderWindow		Формат: 
+File name: 	RecorderWindow		Имя файла: 
+Cannot connect to the selected sound input	RecorderWindow		Невозможно подключиться к выбранному звуковому входу
+Cannot get the file to play	RecorderWindow		Невозможно воспроизвести файл
+Cannot record a sound that long	RecorderWindow		Невозможно записать звук такой длины
+Duration:	RecorderWindow		Продолжительность:
+Compression:	RecorderWindow		Сжатие:
+Cannot find an unused name to use for the new recording	RecorderWindow		Невозможно найти свободное имя для новой записи
+Channels: 	RecorderWindow		Каналы: 
+Save	RecorderWindow		Сохранить
+Sample rate: 	RecorderWindow		Частота дискретизации: 
+Cannot connect to media server	RecorderWindow		Невозможно подключиться к медиа серверу
+The file doesn't appear to be an audio file.	RecorderWindow		Этот файл не является звуковым.
+File name:	RecorderWindow		Имя файла:

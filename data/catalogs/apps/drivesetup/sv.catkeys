@@ -1,5 +1,112 @@
-1	swedish	x-vnd.Haiku-DriveSetup	1105395288
-LUKS encrypted	Encryption utils		LUKS-krypterad
-SafeBoot encrypted	Encryption utils		SafeBoot-krypterad
+1	swedish	x-vnd.Haiku-DriveSetup	4048496535
+Could not unmount partition %s.	MainWindow		Kunde inte avmontera partition %s.
+Mount all	MainWindow		Montera alla
+Disk	MainWindow		Disk
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringar tillbaka till disken ny?\n\nAlla data på den valda partitionen kommer att raderas om du gör så!
+Device	PartitionList		Enhet
+Initialize	MainWindow		Initiera
+Could not change the parameters of the selected partition.	MainWindow		Kunde inte ändra parametrarna på den valda partionen.
 PGP encrypted	Encryption utils		PGP-krypterad
+Delete partition	MainWindow		Radera partition
+Error: 	MainWindow	in any error alert	Fel: 
+Removable	PartitionList		Borttagbar
+Block size	PartitionList		Blockstorlek
+The panel experienced a problem!	MainWindow		Panelen hade några problem!
+Device	DiskView		Enhet
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Är du säker på att du vill formatera Intel Extended Partitionen? Alla underpartitioner som den innehåller kommer att skrivas över om du fortsätter. Du kommer att att bli frågad igen innan ändringar skrivs på disken.
+Unmount	MainWindow		Avmontera
+Failed to format the partition %s!\n	MainWindow		Misslyckades att formatera partionen %s!\n
+Partition size	CreateParametersPanel		Partitionsstorlek
+Validation of the given parameters failed.	MainWindow		Valideringen av den givna parametern misslyckades.
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Är du säker att du vill formatera partitionen \"%s\"? Du kommet att få frågan igen innan ändringarna skrivs till disk.
+DriveSetup	System name		DiskHanterare
+Mounted at	PartitionList		Monterad vid
+Create…	MainWindow		Skapa…
+Write changes	MainWindow		Skriv ändringar
+Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initiering av partitionen %s misslyckades (Inget skrevs till disken.)
+Validation of the given creation parameters failed.	MainWindow		Utvärdering av den givna parametern misslyckades.
+Eject	MainWindow		Mata ut
+Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringar tillbaka till disken ny?\n\nAlla data på partitionen %s kommer att raderas om du gör så!
+Surface test (not implemented)	MainWindow		Yttest (inte implementerat)
+Read only	PartitionList		Endast läsbar
+The panel could not return successfully.	MainWindow		Panelen kunde inte återskapas.
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Kunde inte ändra parametrar på partionen. Inga ändringar skrivna till disk.
+Partition %ld	DiskView		Partition %ld
+There's no space on the partition where a child partition could be created.	MainWindow		Det finns inget utrymme för en underpartition på partitionen.
+No disk devices have been recognized.	DiskView		Inga diskenheter har identifierats.
+Attributes	PartitionList		Attribut
+Failed to delete the partition. No changes have been written to disk.	MainWindow		Kunde inte radera partitionen. Inga ändringar har skrivits till disken.
+Change parameters…	MainWindow		Ändra parametrar...
+Format	InitializeParametersPanel		Formatera
+Could not unmount partition	MainWindow		Kunde inte avmontera partition
+Create	CreateParametersPanel		Skapa
+File system	PartitionList		Filsystem
+The selected partition does not contain a partitioning system.	MainWindow		Den valda partitionen innehåller inget partitionssystem.
+End: %s	Support		Slutar: %s
+Partition type	PartitionList		Partitionstyp
+Unable to find the selected partition by ID.	MainWindow		Kunde inte hitta den valda partitionen via ID.
+The currently selected partition is not empty.	MainWindow		Den valda partitionen är inte tom.
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Är du säker på att du vill formatera en rå disk?(De flesta initierar disken med en partion först). Du kommer att få en fråga igen innan ändringar skrivs till disk.
+Wipe (not implemented)	MainWindow		Formatera (inte implementerat)
+The currently selected partition does not have a parent partition.	MainWindow		Den valda partitionen saknar omslutande partition.
+Validation of the given initialization parameters failed.	MainWindow		Utvärdering av de givna initialiseringsparametrarna misslyckades.
+Not formatted (%s)	PartitionList		Ej formaterad (%s)
+Failed to create the partition. No changes have been written to disk.	MainWindow		Det gick inte att skapa partitionen. Inga ändringar har skrivits till disken.
+Shared	PartitionList		Delad
+MIMEs	PartitionList		MIMEs
 BitLocker encrypted	Encryption utils		BitLocker-krypterad
+You need to select a partition entry from the list.	MainWindow		Du måste välja en partiton från listan.
+Offset: %s	Support		Avstånd: %s
+SafeBoot encrypted	Encryption utils		SafeBoot-krypterad
+Volume name	PartitionList		Volymnamn
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringarna till disken?\n\nAll data på partitionen kommer att gå förlorad!
+Change	ChangeParametersPanel		Ändra
+Partition name:	ChangeParametersPanel		Partitionsnamn:
+LUKS encrypted	Encryption utils		LUKS-krypterad
+Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringarna till disken?\n\nAll data på partitionen %s kommer att gå förlorad!
+Empty space	PartitionList		Tomt utrymme
+Cancel	AbstractParametersPanel		Avbryt
+Format	MainWindow		Format
+OK	MainWindow		OK
+Empty space	DiskView		Tomt utrymme
+Open with DiskProbe	MainWindow		Öppna med DiskInspekterare
+Could not delete the selected partition.	MainWindow		Kunde inte radera den valda partitionen.
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Är du säker att du vill initiera den valda disken? All data kommer att förloras. Du kommet att få frågan igen innan ändringarna skrivs till disk.\n
+There was an error preparing the disk for modifications.	MainWindow		Det blev ett fel när diskändringarna förbereddes.
+The disk has been successfully initialized.\n	MainWindow		Partitionen har initierats.\n
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Ska vi tvinga avmonteringen?\n\nNotering: Om ett program skriver till enheten som avmonteras så kan informationen försvinna.\n
+Cancel	MainWindow		Avbryt
+Free space	PartitionList		Ledigt utrymme
+Queries	PartitionList		Frågor
+Force unmount	MainWindow		Tvinga avmontering
+Partition	MainWindow		Partition
+Change parameters	MainWindow		Ändra parametrar
+Rescan	MainWindow		Uppdatera
+There was an error acquiring the partition row.	MainWindow		Ett fel uppstod när partitionsinformationen skulle hämtas.
+Failed to initialize the disk %s!\n	MainWindow		Misslyckades att initiera partionen %s!\n
+Disk system \"%s\" not found!	MainWindow		Disksystemet \"%s\" hittades ej!
+The partition cannot be unmounted.	MainWindow		Partitionen kan inte avmonteras.
+Delete	MainWindow		Ta bort
+Partition type:	ChangeParametersPanel		Partitionstyp:
+Parameters	PartitionList		Parametrar
+Could not acquire partitioning information.	MainWindow		Kunde inte läsa partitionsinformation.
+Cannot delete the selected partition.	MainWindow		Kan inte radera den valda partitionen.
+Continue	MainWindow		Fortsätt
+Could not mount partition %s.	MainWindow		Kunde inte montera partition %s.
+Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Är du säker på att du vill formatera partitionen? Du kommer att så frågan igen innan ändringarna skrivs till disk.
+The selected disk is read-only.	MainWindow		Den valda disken är inte skrivbar.
+The partition %s is already unmounted.	MainWindow		Partitionen %s är redan avmonterad.
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Är du säker på att du vill ändra parametrarna till partionen?\n\nPartionen kommer kanske inte kunna läsas av andra operativsystem!
+Boot	PartitionList		Boot
+OK	AbstractParametersPanel		OK
+Virtual	PartitionList		Virtuell
+Virtual	DiskView		Virtuell
+Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringarna till disken?\n\nAll data på partitionen kommer att gå förlorad!
+Select a partition from the list below.	DiskView		Välj en partition från listan nedan.
+Active	PartitionList		Aktiv
+Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill ta bort partitionen?\n\nAll data på partitionen kommer att gå förlorad!
+The partition %s has been successfully formatted.\n	MainWindow		Partitionen %s har initierats.\n
+The partition %s is already mounted.	MainWindow		Partitionen %s är redan monterad.
+Size	PartitionList		Storlek
+Creation of the partition has failed.	MainWindow		Skapande av partitionen misslyckades.
+Mount	MainWindow		Montera

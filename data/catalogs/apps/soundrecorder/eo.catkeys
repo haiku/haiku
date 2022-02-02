@@ -1,2 +1,46 @@
-1	esperanto	x-vnd.Haiku-SoundRecorder	2344941071
+1	esperanto	x-vnd.Haiku-SoundRecorder	24440888
+Loop	RecorderWindow		Iteracii
+Cannot find default audio hardware	RecorderWindow		Ne povas trovi defaŭltan sonan aparaton
+Cannot find the temporary file created to hold the new recording	RecorderWindow		Ne povas trovi provizoran dosieron kreitan por konservi novan sonregistradon
+Sample size:	RecorderWindow		Grando de specimeno:
+Nothing to play	RecorderWindow		Ludoto forestas
+None of the files appear to be audio files.	RecorderWindow		Neniu dosiero similas al sondosiero.
+Duration: 	RecorderWindow		Daŭro: 
+File info	RecorderWindow		Informo pri dosiero
 Drop files here	SoundListView		Ĵetu dosieron ĉi tien
+Input	RecorderWindow		Enigo
+Some of the files don't appear to be audio files.	RecorderWindow		Iu el dosieroj ŝajnas ne esti sondosiero.
+Stop	RecorderWindow		Halti
+Format:	RecorderWindow		Formato:
+Sound List	RecorderWindow		Listo de sonoj
+Compression: 	RecorderWindow		Densigo: 
+Rewind	RecorderWindow		Reen
+Sample rate:	RecorderWindow		Ekzempla bitrapido:
+Invalid audio files	RecorderWindow		Nevalidaj sondosieroj
+ seconds	RecorderWindow		 sekundoj
+OK	RecorderWindow		Bone
+Cannot open the temporary file created to hold the new recording	RecorderWindow		Ne povas krei provizoran dosieron por nova sonregistrado
+Input:	RecorderWindow		Enigo:
+Forward	RecorderWindow		Antaŭen
+Play	RecorderWindow		Ludi
+SoundRecorder	System name		Sonregistrilo
+Channels:	RecorderWindow		Kanaloj:
+ bits	RecorderWindow		 bitoj
+None	RecorderWindow		Neniu
+Record	RecorderWindow		Registri
+Sample size: 	RecorderWindow		Ekzempla amplekso: 
+Cannot recognize this file as a media file	RecorderWindow		Ne povas rekoni la dosieron kiel plurmedia dosiero
+Format: 	RecorderWindow		Formato: 
+File name: 	RecorderWindow		Dosiernomo: 
+Cannot connect to the selected sound input	RecorderWindow		Ne povas konekti al elektita sona enigo
+Cannot get the file to play	RecorderWindow		Ne povas preni dosieron por ludi
+Cannot record a sound that long	RecorderWindow		Ne povas registri tiel daŭre
+Duration:	RecorderWindow		Daŭro:
+Compression:	RecorderWindow		Densigoformato:
+Cannot find an unused name to use for the new recording	RecorderWindow		Ne povas trovi neuzitan nomon por uzi por nova sonregistrado
+Channels: 	RecorderWindow		kanaloj: 
+Save	RecorderWindow		Konservi
+Sample rate: 	RecorderWindow		Ekzempla bitrapido: 
+Cannot connect to media server	RecorderWindow		Ne povas konekti al plurmedia servilo
+The file doesn't appear to be an audio file.	RecorderWindow		La dosiero ŝajnas ne esti sondosiero.
+File name:	RecorderWindow		Dosiernomo:

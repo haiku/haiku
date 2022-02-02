@@ -1,6 +1,7 @@
-1	romanian	x-vnd.Haiku.TextSearch	2003518937
+1	romanian	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Selectați fișierele pe care doriți să le aveți selectate în Tracker.
 %appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		Nu s-a putut porni programul xargs!
 Open selection	GrepWindow		Deschide selecția
 Actions	GrepWindow		Acțiuni
 New window	GrepWindow		Fereastră nouă
@@ -10,6 +11,7 @@ OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Închide
 Look in sub-folders	GrepWindow		Caută în sub-dosare
+%s: Not enough room to escape the filename.	Grepper		%s: Nu este suficient spațiu pentru a escapa numele de fișier.
 Follow symbolic links	GrepWindow		Urmărește legăturile simbolice
 Regular expression	GrepWindow		Expresie regulată
 Text files only	GrepWindow		Doar fișiere text
@@ -17,12 +19,16 @@ Quit	GrepWindow		Ieșire
 Show files in Tracker	GrepWindow		Arată fișierele în Tracker
 Please select the files you wish to keep searching.	GrepWindow		Selectați fișierele pe care doriți să le căutați în continuare.
 Trim to selection	GrepWindow		Potrivește la selecție
+Set target…	GrepWindow		Stabilește ținta…
+Failed to open input pipe!	Grepper		Nu s-a putut deschide canalul de intrare!
 Search	GrepWindow		Caută
 Copy text to clipboard	GrepWindow		Copiază textul la clipboard
 Show lines	GrepWindow		Arată liniile
+Failed to open errors pipe!	Grepper		Nu s-a putut deschide canalul de erori!
 The unselected files will be removed from the list.	GrepWindow		Fișierele neselectate vor fi eliminate din listă.
 Open files in code editor	GrepWindow		Deschide fișierele în editorul de cod
 Skip folders starting with a dot	GrepWindow		Omite dosarele care încep cu un punct
+Failed to open output pipe!	Grepper		Nu s-a putut deschide canalul de ieșire!
 Cancel	GrepWindow		Anulează
 History	GrepWindow		Istoric
 TextSearch	System name		TextSearch

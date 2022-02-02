@@ -1,2 +1,100 @@
-1	lithuanian	x-vnd.Haiku-Terminal	4158706805
+1	lithuanian	x-vnd.Haiku-Terminal	572307254
+Close other tabs	Terminal TermWindow		Užverti kitas korteles
+Insert path	Terminal TermView		Įterpti kelią
+Terminal couldn't start the shell. Sorry.	Terminal TermApp		Apgailestaujame, terminalui nepavyko paleisti apvalkalo.
+Text encoding	Terminal TermWindow		Teksto koduotė
+OK	Terminal SetTitleWindow		Gerai
+Edit	Terminal TermWindow		Taisa
+Select all	Terminal TermWindow		Pažymėti viską
+Confirm exit if active programs exist	Terminal AppearancePrefView		Prašyti darbo baigimo patvirtinimo, jeigu yra vykdomų programų
+Copy	Terminal TermWindow		Kopijuoti
+Retro	Terminal colors scheme		Retro
+Edit tab title…	Terminal TermWindow		Keisti kortelės antraštę…
+Settings	Terminal TermWindow		Nuostatos
+Print	Terminal TermWindow		Spausdinti
+%app% settings	Terminal PrefWindow	window title	Terminalo nuostatos
+Use default	Terminal SetTitleWindow		Grąžinti numatytąją
+Close tab	Terminal TermWindow		Užverti kortelę
+Selected background	Terminal AppearancePrefView		Pažymėto teksto fono
+Error!	Terminal getString		Klaida!
+Set tab title	Terminal TermWindow		Keisti kortelės antraštę
+Appearance	Terminal PrefWindow		Išvaizda
+Create link here	Terminal TermView		Kurti nuorodą čia
+Custom	Terminal AppearancePrefView	Window size	Pasirinktinė
+Selected text	Terminal AppearancePrefView		Pažymėto teksto
+Change directory	Terminal TermView		Keisti aplanką
+Page setup…	Terminal TermWindow		Puslapio nuostatos…
+Slate	Terminal colors scheme		Skalūnas
+Cancel	Terminal TermView		Atsisakyti
+Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminalas
+Find next	Terminal TermWindow		Ieškoti kito
+Use selection	Terminal FindWindow		Ieškoti pažymėto teksto
+Copy link location	Terminal TermView		Kopijuoti saito adresą
+Window title:	Terminal AppearancePrefView		Lango antraštė:
+New tab	Terminal TermWindow		Nauja kortelė
+Window title…	Terminal TermWindow		Lango antraštė…
+Blue	Terminal colors scheme		Mėlyna
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Nepavyko įvykdyti „%command“:\n\t%error
+Open path	Terminal TermView		Atverti kelią
+Terminal	System name		Terminalas
+Font size	Terminal TermWindow		Šrifto dydis
+Custom	Terminal colors scheme		Pasirinktinė
+Really close?	Terminal TermWindow		Ar tikrai užverti?
+OK	Terminal TermApp		Gerai
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Užduotis „%1“ dar vykdoma.\nUžvėrus langą, jos darbas bus nutrauktas.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nežinomas argumentas: „%s“\n
+Tab title:	Terminal AppearancePrefView		Kortelės antraštė:
+Text not found.	Terminal TermWindow		Ieškotas tekstas nerastas.
+Find failed	Terminal TermWindow		Paieška nepavyko
+Color scheme:	Terminal AppearancePrefView		Spalvų schema:
+Match word	Terminal FindWindow		Atitikti visą žodį
+New Terminal	Terminal TermWindow		Naujas langas
+Quit	Terminal TermWindow		Baigti darbą
+Find previous	Terminal TermWindow		Ieškoti ankstesnio
+Match case	Terminal FindWindow		Paisyti raidžių registro
+Close	Terminal TermWindow		Užverti
+Save to file…	Terminal PrefWindow		Įrašyti į failą…
+Background	Terminal AppearancePrefView		Fono
+Copy path	Terminal TermView		Kopijuoti kelią
+Copy absolute path	Terminal TermView		Kopijuoti absoliutųjį kelią
+Cancel	Terminal TermWindow		Atsisakyti
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Užduotis „%1“ dar vykdoma.\nUžvėrus kortelę, jos darbas bus nutrauktas.
+Cursor	Terminal AppearancePrefView		Žymeklis
+Full screen	Terminal TermWindow		Visame ekrane
+Shell 	Terminal TermWindow		Apvalkalas
+Midnight	Terminal colors scheme		Vidurnaktis
+Tab title:	Terminal TermWindow		Kortelės antraštė:
+Window title:	Terminal TermWindow		Lango antraštė:
+Default	Terminal colors scheme		Numatytoji
+Switch Terminals	Terminal TermWindow		Pereiti į kitą terminalą
+Decrease	Terminal TermWindow		Pamažinti
+Settings…	Terminal TermWindow		Nuostatos…
+Blinking cursor	Terminal AppearancePrefView		Mirksintis žymeklis
+Cancel	Terminal SetTitleWindow		Atsisakyti
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Lango antraštės šablonas. Galite naudoti šiuos vietaženklius:\n
+Close active tab	Terminal TermWindow		Užverti aktyvią kortelę
+Use text:	Terminal FindWindow		Ieškoti teksto:
+Nothing is selected.	Terminal TermWindow		Nėra pažymėto teksto.
+Find	Terminal FindWindow		Ieškoti
+The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Aktyvios kortelės antraštės šablonas. Galite naudoti šiuos vietaženklius:\n
+Professional	Terminal colors scheme		Profesionali
+Font:	Terminal AppearancePrefView		Šriftas:
+Paste	Terminal TermWindow		Įdėti
+Copy here	Terminal TermView		Kopijuoti čia
+Use default shell	Terminal Shell		Naudoti numatytąjį apvalkalą
+Color:	Terminal AppearancePrefView		Spalva:
+Open link	Terminal TermView		Atverti saitą
+Text	Terminal AppearancePrefView		Teksto
+Not found.	Terminal TermWindow		Nerasta.
+Find…	Terminal TermWindow		Ieškoti…
+No search string was entered.	Terminal TermWindow		Neįvestas ieškotinas tekstas.
+Text under cursor	Terminal AppearancePrefView		Tekstas po žymekliu
+Move here	Terminal TermView		Perkelti čia
+Abort	Terminal Shell		Nutraukti
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Šios užduotys dar vykdomos:\n\n\t%1\n\nUžvėrus langą, jų darbas bus nutraktas.
+Set window title	Terminal TermWindow		Keisti lango antraštę
+Increase	Terminal TermWindow		Padidinti
+OK	Terminal TermWindow		Gerai
+Close window	Terminal TermWindow		Užverti langą
+Clear all	Terminal TermWindow		Išvalyti viską
+Search forward	Terminal FindWindow		Ieškoti žemyn

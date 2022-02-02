@@ -22,8 +22,8 @@ Belgian (point)	KeymapNames		Belgia (punkto)
 Finnish	KeymapNames		Finna
 Num lock	Keyboard Layout View		Nombra baskulo
 Switch shortcut keys to Windows/Linux mode	Keymap window		Ŝparvojklavoj laŭ Linukso/Vindozo
-Option	Keyboard Layout View	Option key	Opciklavo
 Spanish (Dvorak)	KeymapNames		Hispana (Dvoraka)
+Option	Keyboard Layout View	Option key	Opciklavo
 Scroll lock	Keyboard Layout View		Ruluma baskulo
 US-International	KeymapNames		Usona internacia
 Right option	Keyboard Layout View		Dekstra opciklavo
@@ -45,8 +45,8 @@ Apple Aluminium International	KeyboardLayoutNames		Internacia por Apple Aluminiu
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Komandklavo (Win/Cmd)
 PG ↓	Keyboard Layout View	Very short for 'page down'	PAĜO ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (Usona)
-Apple Aluminum	KeyboardLayoutNames		Apple Aluminium
 Spanish	KeymapNames		Hispana
+Apple Aluminum	KeyboardLayoutNames		Apple Aluminium
 HOME	Keyboard Layout View		HEJMO
 COMMAND	Keyboard Layout View		KOMANDKLAVO
 Ukrainian (Mac)	KeymapNames		Ukrainia (por Mac)
@@ -54,8 +54,8 @@ Command:	Modifier keys window	Command key role name	Komandklavo:
 French (Bépo)	KeymapNames		Franca (de Bépo)
 Russian (Typewriter)	KeymapNames		Rusa (Tajpilo)
 Acute trigger	Keymap window		Dekstra korno (akuto)
-Italian	KeymapNames		Itala
 ThinkPad T400s International	KeyboardLayoutNames		Internacia por ThinkPad T400s
+Italian	KeymapNames		Itala
 Kinesis Ergo Elan International	KeyboardLayoutNames		Internacia de Kinesis Ergo Elan
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (Usona)
 French (NF Z71-300)	KeymapNames		Franca (por NF Z71-300)
@@ -99,8 +99,8 @@ Left control	Keyboard Layout View		Maldekstra strisklavo
 CAPS	Keyboard Layout View	Very short for 'caps lock'	MAJUSKLBASKULO
 Role	Modifier keys window	As in the role of a modifier key	Rolo
 Svorak	KeymapNames		Sveda (de Dvorak, alinome Svorak)
-German	KeymapNames		Germana
 ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (Usona)
+German	KeymapNames		Germana
 Swiss-German	KeymapNames		Germana por Svislando
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Striklavo
 Czech	KeymapNames		Ĉeĥa
@@ -155,8 +155,8 @@ Font	Keymap window		Tiparo
 Danish	KeymapNames		Dana
 Generic 104-key	KeyboardLayoutNames		Komuna 104-klavoj
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Majuskliga klavo
-PAUSE	Keyboard Layout View		PAŬZI
 Russian	KeymapNames		Rusa
+PAUSE	Keyboard Layout View		PAŬZI
 TypeMatrix 2030	KeyboardLayoutNames		por TypeMatrix 2030
 Romanian	KeymapNames		Rumana
 CMD	Keyboard Layout View	Very short for 'command'	KOMANDKLAVO (CMD)

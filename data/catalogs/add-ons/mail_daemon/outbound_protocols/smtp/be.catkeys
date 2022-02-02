@@ -1,8 +1,14 @@
-1	belarusian	x-vnd.Haiku-SMTP	3672333926
-None	ConfigView		Няма
-ESMTP	ConfigView		ESMTP
-SMTP server:	ConfigView		Сервер SMTP:
+1	belarusian	x-vnd.Haiku-SMTP	815985329
+POP3 authentication failed. The server said:\n	smtp		Аўтэнтыфікацыя POP3 не ўдалася. Паведамленне сервера:\n
 Destination:	ConfigView		Прызначэнне:
+Error while logging in to %serv	smtp		Памылка падчас лагіну ў %serv
+Connecting to server…	smtp		Далучэнне да сервера…
+Unencrypted	ConfigView		Некрыптаваны
+. The server says:\n	smtp		. Паведамленне сервера:\n
+Error while opening connection to %serv	smtp		Памылка падчас далучэння да %serv
+. The server said:\n	smtp		. Паведамленне сервера:\n
+None	ConfigView		Няма
+SMTP server:	ConfigView		Сервер SMTP:
+ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 перад SMTP
 SSL	ConfigView		SSL
-Unencrypted	ConfigView		Некрыптаваны

@@ -1,8 +1,169 @@
-1	thai	x-vnd.Be-MAIL	939699066
-out	B_USER_DIRECTORY/mail/out		ออก
-in	B_USER_DIRECTORY/mail/in		เข้า
-queries	B_USER_DIRECTORY/mail/queries		สอบถาม
+1	thai	x-vnd.Be-MAIL	1477453861
+Set to Saved	Mail		ตั้งเป็นบันทึก
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		ข้อความหลักของคุณมีอักขระที่ไม่สามารถถอดรหัสได้ %ld บางทีชุดอักขระที่แตกต่างกัน กดส่งเพื่อส่งต่อไป (ตัวอักขระทดแทนจะถูกใช้แทนตัวอักษรที่ไม่สามารถถอดรหัสได้) หรือเลือกยกเลิกเพื่อย้อนกลับไปและลองแก้ไข
+Text wrapping:	Mail		การตัดข้อความ:
+Show icons & labels	Mail		แสดงไอคอน & ป้ายกำกับ
+(Date unavailable)	Mail		(วันใช้งานไม่ได้)
+Reply	Mail		ตอบ
+Next message	Mail		ข้อความถัดไป
+Mailing	Mail		จดหมาย
+Unread	Mail		ยังไม่ได้อ่าน
+Same sender	Mail		ผู้ส่งคนเดียวกัน
+Copy to new	Mail		คัดลอกไปที่ใหม่
+Save as draft	Mail		บันทึกเป็นร่าง
+Encoding:	Mail		การเข้ารหัส:
+Print	Mail		พิมพ์
+Decrease quote level	Mail		ลดระดับคำพูด
+Encoding	Mail		การเข้ารหัส
+Default account:	Mail		บัญชีเริ่มต้น:
+Message	Mail		ข้อความ
+Bcc:	Mail		ซ่อนสำเนา:
+New	Mail		ใหม่
+Save	Mail		บันทึก
+Undo	Mail		ยกเลิก
+Button bar:	Mail		แถบปุ่ม:
+%e wrote:\\n	Mail		%e เขียน:\\n
+Save changes to this signature?	Mail		บันทึกการเปลี่ยนแปลงในลายเซ็นนี้หรือไม่?
+Save attachment…	Mail		บันทึกไฟล์แนบ
+Paste	Mail		วาง
+E-mail draft could not be saved!	Mail		ไม่สามารถบันทึกร่างอีเมลได้!
+Don't send	Mail		ไม่ส่ง
 sent	B_USER_DIRECTORY/mail/sent		ส่ง
-mail	B_USER_DIRECTORY/mail		จดหมาย
+Only files can be added as attachments.	Mail		สามารถเพิ่มได้เฉพาะไฟล์เป็นไฟล์แนบ
+Close	Mail		ปิด
+Untitled	Mail		ไม่ได้ตั้งชื่อ
+Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		การลบสิ่งที่แนบมาจากจดหมายที่ส่งต่อยังไม่ได้ถูกนำมาใช้! \nมันจะยังทำงานไม่ถูกต้อง
+Same recipient	Mail		ผู้รับคนเดียวกัน
+Previous message	Mail		ข้อความก่อนหน้า
+(Address unavailable)	Mail		(ที่อยู่ไม่พร้อมใช้งาน)
+Mail	System name		จดหมาย
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	สิ่งที่ส่งมา: %name% (Type: %type%)
+Copy link location	Mail		คัดลอกตำแหน่งลิงก์
+Attachments: 	Mail		สิ่งที่แนบมา:
+Remove enclosure	Mail		ลบกรอบออก
+Next	Mail		ถัดไป
+Attachments:	Mail		สิ่งที่แนบมา:
+Show icons only	Mail		แสดงไอคอนเท่านั้น
+Subject:	Mail		เรื่อง:
+OK	Mail		ตกลง
+UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
+Quit	Mail		ปิด
+Title:	Mail		ชื่อเรื่อง:
+Account from mail	Mail		บัญชีจากจดหมาย
+%e - E-mail address	Mail		%e -ที่อยู่อีเมล
+Cc:	Mail		สำเนา:
+No matches	Mail		ไม่ตรงกัน
+Queries	Mail		สอบถาม
+Cut	Mail		ตัด
+Reply to sender	Mail		ตอบกลับผู้ส่ง
+\\n - Newline	Mail		\\n- บรรทัดใหม่
+Copy	Mail		สำเนา
+Add signature	Mail		เพิ่มลายเซ็น
+%n - Full name	Mail		%n -ชื่อเต็ม
+Signature	Mail		ลายมือชื่อ
+Use default account	Mail		ใช้บัญชีเริ่มต้น
 draft	B_USER_DIRECTORY/mail/draft		ร่าง
+Really delete this signature? This cannot be undone.	Mail		ต้องการลบลายมือชื่อนี้หรือไม่? สิ่งนี้ไม่สามารถยกเลิกได้
 spam	B_USER_DIRECTORY/mail/spam		สแปม
+Reply to all	Mail		ตอบกลับทั้งหมด
+Cancel	Mail		ยกเลิก
+Off	Mail		ปิด
+Set to %s	Mail		ตั้งค่าเป็น %s
+Signature:	Mail		ลายมือชื่อ:
+Forward without attachments	Mail		ส่งต่อโดยไม่มีไฟล์แนบ
+queries	B_USER_DIRECTORY/mail/queries		สอบถาม
+View	Mail		ดู
+Signatures	Mail		ลายมือชื่อ
+On	Mail		เปิด
+Find	Mail		ค้นหา
+Sorry, could not find an application that supports the 'Person' data type.	Mail		ขออภัยไม่พบแอปพลิเคชันที่รองรับประเภทข้อมูล "บุคคล"
+Date:	Mail		วันที่:
+Expert	Mail		ผู้เชี่ยวชาญ
+Automatically mark mail as read:	Mail		ทำเครื่องหมายอีเมลโดยอัตโนมัติว่าอ่านแล้ว:
+Close and 	Mail		ปิดและ
+Colored quotes:	Mail		ใส่สีคำพูด
+Automatic	Mail		อัตโนมัติ
+Open this link	Mail		เปิดลิงค์นี้
+Auto signature:	Mail		ลายมือชื่ออัตโนมัติ:
+Same subject	Mail		เรื่องเดียวกัน
+Send	Mail		ส่ง
+Open draft	Mail		เปิดร่าง
+Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	ปล่อยให้เป็น 'ใหม่'
+Random	Mail		สุ่ม
+Attach attributes:	Mail		แนบคุณสมบัติ:
+Find again	Mail		ค้นหาอีกครั้ง
+Size:	Mail		ขนาด:
+To:	Mail		ถึง:
+Need Tracker to move items to trash	Mail		ต้องการเครื่องมือติดตามเพื่อย้ายรายการไปยังถังขยะ
+The mail_daemon could not be started:\n\t	Mail		ไม่สามารถเริ่มต้น mail_daemon:\n\t
+<no account found>	Mail		<no account found>
+Mail couldn't find its dictionary.	Mail		จดหมายหาพจนานุกรมไม่พบ
+Mail preferences	Mail		การตั้งค่าจดหมาย
+helpful message	Mail		ข้อความที่เป็นประโยชน์
+ Read 	Mail		อ่าน
+Font:	Mail		ตัวอักษร:
+Accounts…	Mail		บัญชี
+Previous	Mail		ก่อนหน้า
+Include file attributes in attachments	Mail		รวมคุณสมบัติของไฟล์ไว้ในไฟล์แนบ
+Start now	Mail		เริ่มตอนนี้
+(Name unavailable)	Mail		(ไม่มีชื่อ)
+Move to trash	Mail		ย้ายไปถังขยะ
+<none>	Mail		<none>
+%d - Date	Mail		%d - วันที่
+Check spelling	Mail		ตรวจสอบการสะกดคำ
+Redo	Mail		ทำซ้ำ
+Leave as '%s'	Mail		ปล่อยให้เป็น '%s'
+Print…	Mail		พิมพ์
+Settings…	Mail		ตั้งค่า
+Warn unencodable:	Mail		เตือนไม่ได้:
+Trash	Mail		ถังขยะ
+Show raw message	Mail		แสดงข้อความเดิม
+Find…	Mail		ค้นหา
+Select all	Mail		เลือกทั้งหมด
+Show header	Mail		แสดงส่วนหัว
+Reply account:	Mail		ตอบบัญชี:
+Sorry	Mail		ขอโทษ
+Forward	Mail		ส่งต่อ
+Open attachment	Mail		เปิดไฟล์แนบ
+mail	B_USER_DIRECTORY/mail		จดหมาย
+Save this message as a draft before closing?	Mail		บันทึกข้อความนี้เป็นฉบับร่างก่อนปิดหรือไม่?
+The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		mail_daemon ไม่ทำงาน ข้อความถูกจัดคิวและจะถูกส่งเมื่อเริ่ม mail_daemon
+None	Mail		ไม่มี
+Resend	Mail		ส่งซ้ำ
+Hide	Mail		ซ่อน
+From:	Mail		จาก:
+No file attributes, just plain data	Mail		ไม่มีคุณลักษณะของไฟล์ มีเพียงข้อมูลธรรมดา
+Add	Mail		เพิ่ม
+out	B_USER_DIRECTORY/mail/out		ออก
+Send this message before closing?	Mail		ส่งข้อความนี้ก่อนที่จะปิด?
+in	B_USER_DIRECTORY/mail/in		เข้า
+Open	Mail		เปิด
+Don't save	Mail		ไม่บันทึก
+Leave same	Mail		ทิ้งไว้เหมือนกัน
+An error occurred trying to save the attachment.	Mail		เกิดข้อผิดพลาดขณะพยายามบันทึกไฟล์แนบ
+Save address	Mail		บันทึกที่อยู่
+Initial spell check mode:	Mail		โหมดตรวจสอบการสะกดคำเริ่มต้น:
+Edit queries…	Mail		แก้ไขข้อความค้นหา
+There is no installed handler for URL links.	Mail		ไม่มีตัวจัดการติดตั้งสำหรับลิงก์ URL
+File	Mail		ไฟล์
+Reply preamble:	Mail		ตอบคำนำ:
+New mail message	Mail		ข้อความจดหมายใหม่
+An error occurred trying to open this signature.	Mail		เกิดข้อผิดพลาดขณะพยายามเปิดลายมือชื่อนี้
+Edit signatures…	Mail		แก้ไขลายมือชื่อ
+User interface	Mail		อินเตอร์เฟซผู้ใช้
+Inconsistency occurred in the undo/redo buffer.	Mail		ความไม่สอดคล้องเกิดขึ้นใน เลิกทำ/ทำซ้ำ บัฟเฟอร์
+Remove attachment	Mail		ลบไฟล์แนบ
+Set to…	Mail		ตั้งค่าเป็น
+Edit	Mail		แก้ไข
+Page setup…	Mail		ตั้งค่าหน้า
+An error occurred trying to save this signature.	Mail		เกิดข้อผิดพลาดขณะพยายามบันทึกลายมือชื่อนี้
+Beginner	Mail		ผู้เริ่ม
+Send message	Mail		ส่งข้อความ
+Delete	Mail		ลบ
+Put your favorite e-mail queries and query templates in this folder.	Mail		ใส่แบบสอบถามอีเมลที่คุณชื่นชอบและแม่แบบแบบสอบถามในโฟลเดอร์นี้
+Spam	Mail		สแปม
+Couldn't open this signature. Sorry.	Mail		ขอโทษ ไม่สามารถเปิดลายมือชื่อนี้
+Revert	Mail		เปลี่ยนกลับ
+Unknown	Mail		ไม่ทราบ
+Increase quote level	Mail		เพิ่มระดับข้อความอ้างอิง
+Add enclosure…	Mail		เพิ่มกรอบ

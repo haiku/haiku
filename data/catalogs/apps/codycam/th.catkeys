@@ -1,2 +1,87 @@
-1	thai	x-vnd.Haiku-CodyCam	2299238672
+1	thai	x-vnd.Haiku-CodyCam	40716723
+destination directory expected	CodyCam		คาดว่าจะมีไดเรกทอรีปลายทาง
+reply: '%s'\n	SftpClient		ตอบ: '%s'\n
+JPEG image	CodyCam		ภาพ JPEG
+Remote host has closed the connection.\n	FtpClient		รีโมตโฮสต์ปิดการเชื่อมต่อ \n
+image file format expected	CodyCam		รูปแบบไฟล์ภาพที่คาดหวัง
+Every 30 minutes	CodyCam		ทุก 30 นาที
+Capturing Image…	VideoConsumer.cpp		จับภาพ
+Cannot start time source!	CodyCam		ไม่สามารถเริ่มต้นเวลาได้!
+Waiting…	CodyCam		รอ
+Passive FTP	CodyCam		FTP แบบพาสซีฟ
+Every 10 minutes	CodyCam		ทุก 10 นาที
+Every minute	CodyCam		ทุก 1 นาที
+Capture Rate Menu	CodyCam		เมนูอัตราการจับภาพ
+Cannot seek time source!	CodyCam		ไม่สามารถหาแหล่งเวลา!
+Server login failed	VideoConsumer.cpp		การเข้าสู่ระบบเซิร์ฟเวอร์ล้มเหลว
 on or off expected	Settings	Do not translate 'on' and 'off'	คาดว่าจะเปิดหรือปิด
+invalid upload client %ld\n	VideoConsumer.cpp		ไคลเอ็นต์การอัปโหลดไม่ถูกต้อง %ld\n
+Every 30 seconds	CodyCam		ทุก 30 วินาที
+Cannot create a video window	CodyCam		ไม่สามารถสร้างหน้าต่างวิดีโอ
+Cannot register the video window	CodyCam		ไม่สามารถลงทะเบียนหน้าต่างวิดีโอ
+capture rate expected	CodyCam		คาดการณ์อัตราการจับภาพ
+Quit	CodyCam		เลิก
+Cannot connect the video source to the video window	CodyCam		ไม่สามารถเชื่อมต่อแหล่งวิดีโอกับหน้าต่างวิดีโอ
+read: %d\n	SftpClient		อ่าน: %d\n
+Every 2 hours	CodyCam		ทุก 2 ชั่วโมง
+Cannot get a time source	CodyCam		ไม่สามารถรับแหล่งเวลาได้
+Every 4 hours	CodyCam		ทุก 4 ชั่วโมง
+cmd: '%s'\n	FtpClient		cmd: '%s'\n
+Closing the window	VideoConsumer.cpp		ปิดหน้าต่าง
+Never	CodyCam		ไม่ต้องทำ
+Every 8 hours	CodyCam		ทุกๆ 8 ชั่วโมง
+Cannot start the video source	CodyCam		ไม่สามารถเปิดแหล่งข้อมูลวิดีโอได้
+Cannot set the time source for the video source	CodyCam		ไม่สามารถตั้งเวลาสำหรับวิดีโอได้
+Renaming…	VideoConsumer.cpp		ตั้งชื่อใหม่
+Send to…	CodyCam		ส่งไปที่
+Password:	CodyCam		รหัส
+still image filename expected	CodyCam		ไฟล์ภาพนิ่ง
+File name:	CodyCam		ชื่อไฟล์
+Directory:	CodyCam		เอกสาร
+Error setting type of output file	VideoConsumer.cpp		ชนิดของเอกสารผิดพลาด
+Locking the window	VideoConsumer.cpp		เปิดหน้าต่างค้างใว้
+Cannot find an available video stream	CodyCam		ไม่สามารถหาวิดีโอที่ถ่ายทอดได้
+Upload…	VideoConsumer.cpp		อัพโหลด
+password expected	CodyCam		รหัส
+SFTP	CodyCam		SFTP
+Output	CodyCam		แสดงผล
+server address expected	CodyCam		ที่อยู่เซิฟเวอร์
+Cannot start the video window	CodyCam		ไม่สามารถเปิดหน้าต่างวิดีโอได้
+reply: %d, %d\n	FtpClient		ตอบกลับ: %d, %d\n
+Cannot set the time source for the video window	CodyCam		ไม่สามารถตั้งเวลาสำหรับหน้าต่างวิดีโอได้
+Every 15 minutes	CodyCam		ทุกๆ 15 นาที
+Every 24 hours	CodyCam		ทุกๆ 24 ชั่วโมง
+Image Format Menu	CodyCam		เมนูไฟล์ภาพ
+Every 5 minutes	CodyCam		ทุกๆ 5 นาที
+File upload failed	VideoConsumer.cpp		อัพโหลดไฟล์ล้มเหลว
+Format:	CodyCam		รูปแบบ:
+Start video	CodyCam		เริ่มวิดีโอ
+Connected…	VideoConsumer.cpp		เชื่อมต่อ
+upload client name expected	CodyCam		ชื่อผู้ใช้สำหรับอัพโหลด
+Every 15 seconds	CodyCam		ทุกๆ 15 วินาที
+Error getting initial latency for the capture node	CodyCam		เกิดข้อผิดพลาดในการเริ่มต้นสำหรับโหนดการจับภาพ
+password	CodyCam		รหัส
+Local	CodyCam		ท้องถิ่น
+Stop video	CodyCam		หยุดวิดีโอ
+Last Capture: 	VideoConsumer.cpp		จับภาพล่าสุด:
+Rate:	CodyCam		อัตรา:
+Couldn't find requested directory on server	VideoConsumer.cpp		หาเอกสารบนเซิฟเวอร์ไม่พบ
+Cannot find the media roster	CodyCam		ไม่พบรายชื่อสื่อบันทึก
+Type:	CodyCam		ชนิด:
+Rename failed	VideoConsumer.cpp		ตั้งชื่อล้มเหลว
+unrecognized upload client specified	CodyCam		ระบุไคลเอนต์อัพโหลดที่ไม่รู้จัก
+Server:	CodyCam		เซิฟเวอร์:
+Login:	CodyCam		เข้าใช้งาน:
+File	CodyCam		เอกสาร
+read: %ld\n	SftpClient		อ่าน: %ld\n
+Every hour	CodyCam		ทุกชั่วโมง
+login ID expected	CodyCam		ไอดีล็อคอิน
+Video settings	CodyCam		ตั้งค่าวิดีโอ
+Can't find an available connection to the video window	CodyCam		ไม่พบการเชื่อมต่อที่พร้อมใช้งานกับหน้าต่างวิดีโอ
+FTP	CodyCam		FTP
+Error creating output file	VideoConsumer.cpp		เกิดข้อผิดพลาดในการสร้างไฟล์เอาต์พุต
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		ไม่พบแหล่งวิดีโอ \nคุณต้องมีเว็บแคมเพื่อใช้ CodyCam
+Logging in…	VideoConsumer.cpp		กำลังล็อคอิน
+CodyCam	System name		CodyCam
+Error writing output file	VideoConsumer.cpp		เกิดข้อผิดพลาดในการเขียนไฟล์เอาต์พุต
+Capture controls	CodyCam		ควบคุมการจับภาพ

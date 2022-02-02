@@ -27,7 +27,7 @@ Start page:	Settings Window		Startseite:
 Cancel	Download Window		Abbrechen
 Settings	Settings Window		Einstellungen
 Downloads	WebPositive Window		Downloads
-Browse…	Settings Window		Auswählen…
+Browse…	Settings Window		Auswählen …
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Für diese Seite existiert bereits ein Lesezeichen (%bookmarkName).
 Resume prior session	Settings Window		Vorige Sitzung fortsetzen
 Match case	WebPositive Window		Groß-/Kleinschreibung beachten
@@ -134,7 +134,7 @@ OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% von %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Nur Text vergrößern
-Save page as…	WebPositive Window		Seite speichern unter…
+Save page as…	WebPositive Window		Seite speichern unter …
 Page source error	WebPositive Window		Fehler im Quellcode der Seite
 Auto-hide mouse pointer	Settings Window		Mauszeiger automatisch ausblenden
 Requesting %url	WebPositive Window		%url wird angefordert

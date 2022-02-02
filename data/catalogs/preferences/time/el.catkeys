@@ -1,7 +1,48 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Time	3879356774
+1	greek, modern (1453-)	x-vnd.Haiku-Time	3691539601
+OK	Time		Εντάξει
 Message receiving failed	Time		Η λήψη μηνυμάτων απέτυχε
-Waiting for answer failed	Time		Η αναμονή για απάντηση απέτυχε
-Received invalid time	Time		Ελήφθη λανθασμένη ώρα
-Sending request failed	Time		Η αποστολή αίτησης απέτυχε
-Could not create socket	Time		Αδυναμία δημιουργίας υποδοχής
+Australia	Time		Αυστραλία
+America	Time		Αμερική
+Reset to default server list	Time		Επαναφορά στην προεπιλεγμένη λίστα διακομιστών
 Could not resolve server address	Time		Δεν ήταν δυνατή η ανάλυση της διεύθυνσης του διακομιστή
+Time & Date	System name		Ώρα & Ημερομηνία
+Set time zone	Time		Ορισμός ζώνης ώρας
+Waiting for answer failed	Time		Η αναμονή για απάντηση απέτυχε
+<Other>	Time		<Άλλο>
+Received invalid time	Time		Ελήφθη λανθασμένη ώρα
+Remove	Time		Αφαίρεση
+Synchronize again	Time		Συγχρονισμός ξανά
+Asia	Time		Ασία
+Try all servers	Time		Δοκιμή όλων των εξυπηρετητών
+Time	Time		Ώρα
+Current time:	Time		Τρέχουσα ώρα:
+The following error occured while synchronizing:\n%s: %s	Time		Προέκυψε το ακόλουθο σφάλμα κατά τον συγχρονισμό:\n%s: %s
+Europe	Time		Ευρώπη
+Show day of week	Time		Εμφάνιση μέρας της εβδομάδας
+Local time (Windows compatible)	Time		Τοπική ώρα (συμβατή με τα Windows)
+Hardware clock set to:	Time		Το ρολόι υλικού μέρους ορίστηκε στο:
+Arctic	Time		Αρκτική
+Antarctica	Time		Ανταρκτική
+GMT (UNIX compatible)	Time		GMT (Συμβατό με το UNIX)
+Africa	Time		Αφρική
+Stop	Time		Διακοπή
+Time zone	Time		Ζώνη ώρας
+Clock	Time		Ρολόι
+Network time	Time		Ώρα δικτύου
+Sending request failed	Time		Η αποστολή αίτησης απέτυχε
+Preview time:	Time		Προεπισκόπηση ώρας:
+\nNow: 	Time		\nΤώρα: 
+Could not create socket	Time		Αδυναμία δημιουργίας υποδοχής
+Pacific	Time		Ειρηνικός
+Atlantic	Time		Αντλαντικός
+Show clock in Deskbar	Time		Εμφάνιση ρολογιού στην Γραμμή Εργασιών
+Display time with seconds	Time		Εμφάνιση ώρας με δευτερόλεπτα
+Time	System name		Ημερομηνία και ώρα
+Show time zone	Time		Εμφάνιση ζώνης ώρας
+Synchronize at boot	Time		Συγχρονισμός κατά την εκκίνηση
+Indian	Time		Ινδικός
+Revert	Time		Αντιστροφή
+Date and time	Time		Ημερομηνία και ώρα
+The following error occured while synchronizing:\n%s	Time		Προέκυψε το ακόλουθο σφάλμα κατά τον συγχρονισμό:\n%s
+Synchronize	Time		Συγχρονισμός
+Add	Time		Προσθήκη

@@ -1,39 +1,79 @@
-1	indonesian	x-vnd.Haiku-Appearance	2170377510
+1	indonesian	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Kontrol batas
-Failure	Colors tab		Kegagalan
 Control mark	Colors tab		Penanda kontrol
+Off	AntialiasingSettingsView		Mati
 Window border	Colors tab		Batasan jendela
 Inactive window tab	Colors tab		Tab jendela non-aktif
+Defaults	APRWindow		Defaults
 Shadow	Colors tab		Bayangan
-Selected menu item text	Colors tab		Teks item menu terpilih
 Document background	Colors tab		Latarbelakang dokumen
-Panel background	Colors tab		Latar-belakang panel
 List background	Colors tab		Latar-belakang daftar
+No effect on running applications	DecorSettingsView		Tidak berpengaruh pada aplikasi berjalan
+Fixed font:	Font view		Fon tetap:
+Appearance	System name		Penampilan
+Reduce colored edges filter strength:	AntialiasingSettingsView		Mengurangi kekuatan filter batas berwarna :
+Glyph hinting:	AntialiasingSettingsView		Glyph hinting:
+Default Haiku ControlLook	DecorSettingsView		Bawaan Haiku ControlLook
+Menu item text	Colors tab		Teks daftar item
+About decorator	DecorSettingsView		Tentang dekorator
+Antialiasing menu	AntialiasingSettingsView		Menu antialias
+Success	Colors tab		Sukses
+About	DecorSettingsView		Tentang
+Shine	Colors tab		Kilau
+Arrow style	DecorSettingsView		Gaya panah
+On	AntialiasingSettingsView		Nyala
+Decorator:	DecorSettingsView		Dekorator:
+Menu background	Colors tab		Latar-belakang menu
+Revert	APRWindow		Pulihkan
+List item text	Colors tab		Item daftar teks
+OK	DecorSettingsView		OKE
+Control text	Colors tab		Teks kontrol
+Look and feel	APRWindow		Tampilan dan rasa
+Selected menu item background	Colors tab		Latar belakang item menu terpilih
+Link active	Colors tab		Link aktif
+Antialiasing	APRWindow		Antialiasing
+Menu font:	Font view		Fon menu:
+Bold font:	Font view		Fon tebal:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nPengarang:\n\t%decorAuthors\n\nURL: %decorURL\nLissensi: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Pilih dekorator
+Strong	AntialiasingSettingsView		Kuat
+Failure	Colors tab		Kegagalan
+Double:	DecorSettingsView		Dobel:
+Selected menu item text	Colors tab		Teks item menu terpilih
+Size:	Font Selection view		Ukuran:
+Panel background	Colors tab		Latar-belakang panel
+Plain font:	Font view		Fon polos:
 Window tab text	Colors tab		Teks tab jendela
 Navigation pulse	Colors tab		Denyut navigasi
+LCD subpixel	AntialiasingSettingsView		Subpiksel LCD
 Window tab	Colors tab		Tab jendela
-Tooltip background	Colors tab		Latarbelakang tooltip
 Link text	Colors tab		Link teks
+Tooltip background	Colors tab		Latarbelakang tooltip
+ControlLook:	DecorSettingsView		ControlLook:
 Scroll bar thumb	Colors tab		Scroll bar thumb
+Default	DecorSettingsView		Standar
 Link visited	Colors tab		Tautan yang dikunjungi
 Selected menu item border	Colors tab		Batas daftar item terpilih
 Tooltip text	Colors tab		Teks tooltip
-Selected list item text	Colors tab		Teks list item yang terpilih
 Control background	Colors tab		Latar-belakang kontrol
-Menu item text	Colors tab		Teks daftar item
+Selected list item text	Colors tab		Teks list item yang terpilih
 Selected list item background	Colors tab		Latar-belakang daftar item terpilih
 Inactive window tab text	Colors tab		Tab teks jendala tak-aktif
 Navigation base	Colors tab		Dasar navigasi
-Success	Colors tab		Sukses
+Fonts	APRWindow		Fon
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	The quick brown fox jumps over the lazy dog.
+Grayscale	AntialiasingSettingsView		Grayscale
+Antialiasing type:	AntialiasingSettingsView		Tipe antialiasing:
 Panel text	Colors tab		Teks panel
-Shine	Colors tab		Kilau
-Menu background	Colors tab		Latar-belakang menu
+Hinting menu	AntialiasingSettingsView		Menu isyarat
+Scroll bar:	DecorSettingsView		Scroll bar:
+Choose ControlLook	DecorSettingsView		Memilih ControlLook
+Monospaced fonts only	AntialiasingSettingsView		Hanya fon monospace
 Document text	Colors tab		Teks dokumen
-List item text	Colors tab		Item daftar teks
 Inactive window border	Colors tab		Batas jendela non-aktif
-Control text	Colors tab		Teks kontrol
-Status bar	Colors tab		Status bar
+Colors	APRWindow		Warna
+About control look	DecorSettingsView		Tentang controlLook
 Control highlight	Colors tab		Kontrol sorot
-Selected menu item background	Colors tab		Latar belakang item menu terpilih
-Link active	Colors tab		Link aktif
+Status bar	Colors tab		Status bar
 Link hover	Colors tab		Link melayang
+Single:	DecorSettingsView		Tunggal:

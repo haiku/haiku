@@ -1,35 +1,48 @@
-1	finnish	x-vnd.Haiku-ActivityMonitor	1330427574
+1	finnish	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Ryhmät
 Semaphores	DataSource		Opastimet
 TX	DataSource	Shorter version for Sending	Läh.
 Block cache memory	DataSource		Lohkovälimuisti
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		mebitavua
 Media nodes	DataSource		Mediasolmut
 Text clipboard	DataSource		Tekstileikepöytä
 Network send	DataSource		Verkkolähetys
-Cache	DataSource		Välimuisti
 Running applications	DataSource		Suoritetaan sovelluksia
-Threads	DataSource		Säikeet
+Cache	DataSource		Välimuisti
 CPU usage (combined)	DataSource		Suoritinkäyttö (yhdistetty)
+Threads	DataSource		Säikeet
 Receiving	DataSource		Vastaanotetaan
+Remove graph	ActivityView		Poista kuvaaja
 Swap space	DataSource		Vaihda tila
 CPU	DataSource		Suoritin
+ActivityMonitor	System name		Aktiviteettivalvonta
 CPU %d	DataSource		CPU %d
+Update time interval:	SettingsWindow		Päivitä aikaväli:
 RX	DataSource	Shorter version for Receiving.	Vast.
+Settings…	ActivityWindow		Asetukset...
 Block cache	DataSource		Lohkovälimuisti
 Memory	DataSource		Muisti
 CPU usage	DataSource		Suoritinkäyttö
+Quit	ActivityWindow		Poistu
 Raw clipboard	DataSource		Raakadataleikepöytä
+Settings	ActivityWindow		Asetukset
 Used memory	DataSource		Käytetty muisti
 %.1f faults/s	DataSource		%.1f vikaa/s
+Show legend	ActivityView		Näytä merkin selitys
 Cached memory	DataSource		Välimuistitettu muisti
 CPU %d usage	DataSource		CPU %d käyttö
+File	ActivityWindow		Tiedosto
 Ports	DataSource		Portit
 Page faults	DataSource		Sivuvirheet
 Apps	DataSource		Sovellukset
+Additional items	ActivityView		Lisäkohteet
+Add graph	ActivityWindow		Lisää kuvaaja
 Sending	DataSource		Lähetetään
 %.1f MiB	DataSource		%.1f Mebitavua
+Always on top	ActivityWindow		Aina päällimmäisenä
 Swap	DataSource		Vaihda
+%lld sec.	SettingsWindow		%lld s
 P-faults	DataSource		P-viat
 Sems	DataSource		Opastimet
 Network receive	DataSource		Verkkovastaanotto

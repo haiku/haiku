@@ -1,6 +1,9 @@
-1	hungarian	x-vnd.Haiku-BMPTranslator	3986869408
-BMP image translator	BMPTranslator		BMP kép értelemző
+1	hungarian	x-vnd.Haiku-BMPTranslator	2497639570
 BMP images	BMPTranslator		BMP kép
-BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP kép (MS formátum, %d bit)
 BMPTranslator Settings	BMPTranslator		BMP értelmező beállításai
 BMP image (OS/2 format, %d bits)	BMPTranslator		BMP kép (OS/2 formátum, %d bit)
+BMP image translator	BMPView		BMP kép értelemző
+BMP image (MS format, %d bits	BMPTranslator	Ignore missing closing round bracket	BMP kép (MS formátum, %d bit)
+BMP Settings	BMPMain		BMP beállítások
+Version %d.%d.%d, %s	BMPView		%d.%d.%d, %s verzió
+BMP image translator	BMPTranslator		BMP kép értelemző

@@ -1,6 +1,7 @@
-1	japanese	x-vnd.Haiku.TextSearch	2679411567
+1	japanese	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Tracker で選択するファイルを選んでください。
 %appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		xargs プログラムを開けません!
 Open selection	GrepWindow		選択部を開く
 Actions	GrepWindow		アクション
 New window	GrepWindow		新しいウィンドウ
@@ -8,9 +9,9 @@ Encoding	GrepWindow		文字コード
 Set target to parent folder	GrepWindow		親フォルダーを検索
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
-Set target			検索対象フォルダーを指定
 Close	GrepWindow		閉じる
 Look in sub-folders	GrepWindow		サブフォルダーも調べる
+%s: Not enough room to escape the filename.	Grepper		%s: ファイル名をエスケープする余裕がありません。
 Follow symbolic links	GrepWindow		シンボリックリンクに従う
 Regular expression	GrepWindow		正規表現
 Text files only	GrepWindow		テキストファイルのみ
@@ -18,12 +19,16 @@ Quit	GrepWindow		終了
 Show files in Tracker	GrepWindow		ファイルの場所を表示
 Please select the files you wish to keep searching.	GrepWindow		検索したいファイルを選択してください。
 Trim to selection	GrepWindow		選択部のみ残す
+Set target…	GrepWindow		検索対象フォルダーを指定...
+Failed to open input pipe!	Grepper		入力パイプを開けませんでした!
 Search	GrepWindow		検索開始
 Copy text to clipboard	GrepWindow		テキストをクリップボードにコピー
 Show lines	GrepWindow		行の表示
+Failed to open errors pipe!	Grepper		エラーパイプを開けませんでした!
 The unselected files will be removed from the list.	GrepWindow		選択されなかったファイルはリストから除かれます。
 Open files in code editor	GrepWindow		コードエディターでファイルを開く
 Skip folders starting with a dot	GrepWindow		ドットで始まるフォルダーを無視
+Failed to open output pipe!	Grepper		出力パイプを開けませんでした!
 Cancel	GrepWindow		検索中止
 History	GrepWindow		検索履歴
 TextSearch	System name		テキスト検索

@@ -1,27 +1,21 @@
-1	italian	x-vnd.Haiku-mixer.media_addon	3450667169
-Input gain controls represent	AudioMixer		Controlli di guadagno in ingresso rappresentano
-Linear interpolation	AudioMixer		Interpolazione lineare
-Virtual output channels	AudioMixer		Canali di uscita virtuali
-Refuse output format changes	AudioMixer		Non consenti cambiamenti nel formato di uscita
-Output mapping	AudioMixer		Mappatura delle uscite
-Allow input channel remapping	AudioMixer		Consenti la riassegnazione di canali di ingresso
-Resampling algorithm	AudioMixer		Algoritmo di ricampionamento
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Attenua l'uscita del mixer di 3dB (come BeOS R5)
-Display balance control for stereo connections	AudioMixer		Visualizza controlli di bilanciamento per le connessioni stereo
+1	italian	x-vnd.Haiku-mixer.media_addon	2690542047
+Input mapping	AudioMixer		Mappatura degli ingressi
 To output	AudioMixer		In uscita
-not connected	AudioMixer		non connessa
+Refuse output format changes	AudioMixer		Non consenti cambiamenti nel formato di uscita
+Gain	AudioMixer		Guadagno
+To master	AudioMixer		Al master
 Refuse input format changes	AudioMixer		Rifiuta cambiamenti nel formato di ingresso
-Drop/repeat samples	AudioMixer		Rimuovi/ripeti campioni
-Output channel sources	AudioMixer		Canali sorgente in uscita
+not connected	AudioMixer		non connessa
+Master output	AudioMixer		Uscita master
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Controlli di guadagno
-Input mapping	AudioMixer		Mappatura degli ingressi
-Mute	AudioMixer		Muto
-Input channel destinations	AudioMixer		Destinazione dei canali di ingresso
-To master	AudioMixer		Al master
-Master output	AudioMixer		Uscita master
+Output channel sources	AudioMixer		Canali sorgente in uscita
+Allow input channel remapping	AudioMixer		Consenti la riassegnazione di canali di ingresso
+Display balance control for stereo connections	AudioMixer		Visualizza controlli di bilanciamento per le connessioni stereo
 Setup	AudioMixer		Configurazione
-Use non linear gain sliders (like BeOS R5)	AudioMixer		Utilizza selettori di guadagno non lineare (come BeOS R5)
-Gain	AudioMixer		Guadagno
-Allow output channel remapping	AudioMixer		Consenti la riassegnazione dei canali di uscita
 Physical input channels	AudioMixer		Canali di ingresso fisici
+Input channel destinations	AudioMixer		Destinazione dei canali di ingresso
+Mute	AudioMixer		Muto
+Output mapping	AudioMixer		Mappatura delle uscite
+Virtual output channels	AudioMixer		Canali di uscita virtuali
+Allow output channel remapping	AudioMixer		Consenti la riassegnazione dei canali di uscita

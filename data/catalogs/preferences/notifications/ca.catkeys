@@ -1,3 +1,34 @@
-1	catalan; valencian	x-vnd.Haiku-Notifications	1522084233
-General	PrefletView		General
+1	catalan; valencian	x-vnd.Haiku-Notifications	4196496676
+Lower left	GeneralView		A baix a l’esquerra
+Application does not have a valid signature	NotificationView	Alert message	L’aplicació no té una signatura vàlida.
+Status	NotificationView		Estat
+Add…	NotificationView		Afegeix...
+Lower right	GeneralView		A baix a la dreta
+Muted	NotificationView		Silenciat
+ is already listed	NotificationView	Alert message	 ja és a la llista
+OK	PrefletWin		D'acord
+Notifications	PrefletWin		Notificacions
+Notifications preflet sample	PrefletWin		Exemple d'aplicació de preferències de notificacions
+Mute notifications from this application	NotificationView		Silencia les notificacions d'aquesta aplicació.
+wide	GeneralView	Window width: Slider high text	ampla
+narrow	GeneralView	Window width: Slider low text	estreta
+Revert	PrefletWin		Reverteix
 Applications	PrefletView		Aplicacions
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Temps d'espera: # segon}other{Temps d'espera: # segons}}
+Upper right	GeneralView		A dalt a la dreta
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Hi ha hagut un error en desar les preferències.\nÉs possible que us estigueu quedant sense espai de disc.
+Defaults	PrefletWin		Valors predeterminats
+Upper left	GeneralView		A dalt a l'esquerra
+Window width	GeneralView		Amplada de la finestra
+Applications	NotificationView		Aplicacions
+General	PrefletView		General
+OK	NotificationView		D'acord
+Follow Deskbar	GeneralView		Segueix la barra d'escriptori
+Notifications	System name		Notificacions
+Allowed	NotificationView		Permès
+Duration:	GeneralView		Durada:
+Application	NotificationView		Aplicació
+Enable notifications	GeneralView		Habilita les notificacions
+This is a test notification message	PrefletWin		Aquest és un missatge de prova de notificació.
+Remove	NotificationView		Suprimeix
+Position:	GeneralView		Posició:

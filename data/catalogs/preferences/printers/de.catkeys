@@ -21,7 +21,7 @@ Print jobs for %printer_name%	PrintersWindow		Druckjobs für %printer_name%
 Add printer	AddPrinterDialog		Drucker hinzufügen
 Printers	PrintersWindow		Printers - Drucker
 No printer found!	TransportMenu		Es wurde kein Drucker gefunden!
-Add…	PrintersWindow		Hinzu…
+Add…	PrintersWindow		Hinzu …
 Magenta	TestPageView		Magenta
 Transport: %transport% %transport_address%	TestPageView		Transport: %transport% %transport_address%
 Add	AddPrinterDialog		Hinzufügen

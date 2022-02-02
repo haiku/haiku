@@ -1,41 +1,66 @@
-1	polish	x-vnd.Haiku-PoorMan	2026082639
-Cannot start the server	PoorMan		Nie można uruchomić serwera
-Site	PoorMan		Strona
-Create log file	PoorMan		Utwórz plik log
-Console logging	PoorMan		Logowanie w konsoli
+1	polish	x-vnd.Haiku-PoorMan	1829050509
 Select web folder	PoorMan		Wybierz katalog WWW
-Clear hit counter	PoorMan		Wyczyść licznik odsłon
+Console logging	PoorMan		Logowanie w konsoli
+Create Log File	PoorMan		Utwórz plik log
 File logging	PoorMan		Logowanie do pliku
-File	PoorMan		Plik
-Settings…	PoorMan		Ustawienia…
 Website options	PoorMan		Opcje strony
 Log to file	PoorMan		Loguj do pliku
+Shutting down.	PoorMan		Wyłączanie.
+Error Dir	PoorMan		Błąd katalogu
+Web folder:	PoorMan		Katalog WWW:
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Proszę wybrać katalog do opublikowania w sieci.\n\nMożesz pozwolić programowi PoorMan utworzyć katalog „public_html”\nw katalogu domowym lub wybrać swój własny.
+Log To Console	PoorMan		Loguj do konsoli
+File Name	PoorMan		Nazwa pliku
+Starting up... 	PoorMan		Uruchamianie... 
+Select	PoorMan		Wybierz
+Logging view	PoorMan		Widok logowania
+Save console as…	PoorMan		Zapisz konsolę jako…
+Edit	PoorMan		Edycja
+Cancel	PoorMan		Anuluj
+Directory: 	PoorMan		Katalog: 
+Hits: %lu	PoorMan		Odsłon: %lu
+Hits: 0	PoorMan		Odsłon: 0
+Shutting down.\n	PoorMan		Wyłączanie.\n
+Select all	PoorMan		Zaznacz wszystko
+Error Server	PoorMan		Błąd serwera
+Send file listing if there's no start page	PoorMan		Wyślij listę plików jeśli nie ma strony startowej
+Create PoorMan log	PoorMan		Utwórz log programu PoorMan
+Max. simultaneous connections:	PoorMan		Limit jednoczesnych połączeń:
+Done	PoorMan		Gotowe
+Site	PoorMan		Strona
+Cannot start the server	PoorMan		Nie można uruchomić serwera
+Create log file	PoorMan		Utwórz plik log
+Create public_html	PoorMan		Utwórz public_html
+Clear hit counter	PoorMan		Wyczyść licznik odsłon
+Status: Stopped	PoorMan		Status: Wyłączony
+File	PoorMan		Plik
+Settings…	PoorMan		Ustawienia…
+Log To File	PoorMan		Loguj do pliku
 Connections	PoorMan		Połączenia
 Controls	PoorMan		Kontroluj
 Log to console	PoorMan		Loguj do konsoli
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Proszę wybrać katalog do opublikowania w sieci.\n\nMożesz pozwolić programowi PoorMan utworzyć katalog „public_html”\nw katalogu domowym lub wybrać swój własny.
-Web folder:	PoorMan		Katalog WWW:
 Advanced	PoorMan		Zaawansowane
-Logging	PoorMan		Logowanie
 Copy	PoorMan		Kopiuj
+Logging	PoorMan		Logowanie
 PoorMan	System name		PoorMan
-Logging view	PoorMan		Widok logowania
-Run server	PoorMan		Uruchom serwer
 Clear console log	PoorMan		Wyczyść log konsoli
+Run server	PoorMan		Uruchom serwer
+Create	PoorMan		Utwórz
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# połączenie} few{# połączenia} many{# połączeń} other{# połączenia}}
-Edit	PoorMan		Edycja
-Save console as…	PoorMan		Zapisz konsolę jako…
+done.\n	PoorMan		gotowe.\n
 PoorMan settings	PoorMan		Ustawienia programu PoorMan
+Console Logging	PoorMan		Logowanie w konsoli
 Clear log file	PoorMan		Wyczyść plik log
 Save log console selection	PoorMan		Zapisz wybrany fragment logu konsoli
+File Logging	PoorMan		Logowanie do pliku
 Log file name:	PoorMan		Nazwa pliku log:
-Select all	PoorMan		Zaznacz wszystko
-Send file listing if there's no start page	PoorMan		Wyślij listę plików jeśli nie ma strony startowej
-Create PoorMan log	PoorMan		Utwórz log programu PoorMan
+Status: Running	PoorMan		Status: Uruchomiony
+Directory: (none)	PoorMan		Katalog: (brak)
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Domyślny katalog WWW („/boot/home/public_html”) został utworzony.\nUpewnij się, że jest w nim plik HTML o nazwie „index.html”.
-Quit	PoorMan		Zakończ
+Dir Created	PoorMan		Katalog utworzono
 Save console selections as…	PoorMan		Zapisz wybrany fragment logu konsoli jako…
+Quit	PoorMan		Zakończ
 Save log console	PoorMan		Zapisz log konsoli
 Start page:	PoorMan		Strona startowa:
-Max. simultaneous connections:	PoorMan		Limit jednoczesnych połączeń:
+OK	PoorMan		OK
 Website location	PoorMan		Położenie strony

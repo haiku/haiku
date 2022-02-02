@@ -1,39 +1,79 @@
-1	russian	x-vnd.Haiku-Appearance	2170377510
+1	russian	x-vnd.Haiku-Appearance	663472720
 Control border	Colors tab		Граница элемента
-Failure	Colors tab		Неудача
 Control mark	Colors tab		Отметка
+Off	AntialiasingSettingsView		Выключить
 Window border	Colors tab		Рамка окна
 Inactive window tab	Colors tab		Заголовок неактивного окна
+Defaults	APRWindow		По умолчанию
 Shadow	Colors tab		Тень
-Selected menu item text	Colors tab		Текст выделенного пункта меню
 Document background	Colors tab		Фон документа
-Panel background	Colors tab		Фон панели
 List background	Colors tab		Фон списка
+No effect on running applications	DecorSettingsView		Не влияет на уже запущенные приложения
+Fixed font:	Font view		Моноширинный шрифт:
+Appearance	System name		Внешний вид
+Reduce colored edges filter strength:	AntialiasingSettingsView		Фильтрация цветных краев:
+Glyph hinting:	AntialiasingSettingsView		Уточнение:
+Default Haiku ControlLook	DecorSettingsView		Вид виджетов по умолчанию
+Menu item text	Colors tab		Текст пункта меню
+About decorator	DecorSettingsView		Об этом декораторе
+Antialiasing menu	AntialiasingSettingsView		Сглаживание меню
+Success	Colors tab		Успех
+About	DecorSettingsView		Информация
+Shine	Colors tab		Сияние
+Arrow style	DecorSettingsView		Стиль стрелок
+On	AntialiasingSettingsView		Включить
+Decorator:	DecorSettingsView		Декоратор:
+Menu background	Colors tab		Фон меню
+Revert	APRWindow		Вернуть
+List item text	Colors tab		Текст списка
+OK	DecorSettingsView		ОК
+Control text	Colors tab		Текст элемента
+Look and feel	APRWindow		Вид и поведение
+Selected menu item background	Colors tab		Фон выбранного пункта меню
+Link active	Colors tab		Активная ссылка
+Antialiasing	APRWindow		Сглаживание
+Menu font:	Font view		Шрифт меню:
+Bold font:	Font view		Жирный шрифт:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nАвторы:\n\t%decorAuthors\n\nURL: %decorURL\nЛицензия: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Выберите декоратор
+Strong	AntialiasingSettingsView		Сильная
+Failure	Colors tab		Неудача
+Double:	DecorSettingsView		Двойной:
+Selected menu item text	Colors tab		Текст выделенного пункта меню
+Size:	Font Selection view		Размер:
+Panel background	Colors tab		Фон панели
+Plain font:	Font view		Простой шрифт:
 Window tab text	Colors tab		Текст заголовка окна
 Navigation pulse	Colors tab		Навигационная пульсация
+LCD subpixel	AntialiasingSettingsView		Субпиксельное сглаживание
 Window tab	Colors tab		Заголовок окна
-Tooltip background	Colors tab		Фон подсказки
 Link text	Colors tab		Текст ссылки
+Tooltip background	Colors tab		Фон подсказки
+ControlLook:	DecorSettingsView		Вид виджетов:
 Scroll bar thumb	Colors tab		Ползунок прокрутки
+Default	DecorSettingsView		По умолчанию
 Link visited	Colors tab		Посещенная ссылка
 Selected menu item border	Colors tab		Рамка выделенного пункта меню
 Tooltip text	Colors tab		Текст подсказки
-Selected list item text	Colors tab		Текст выделенного пункта меню
 Control background	Colors tab		Фон элемента
-Menu item text	Colors tab		Текст пункта меню
+Selected list item text	Colors tab		Текст выделенного пункта меню
 Selected list item background	Colors tab		Фон выбранного пункта меню
 Inactive window tab text	Colors tab		Текст заголовка неактивного окна
 Navigation base	Colors tab		Основа навигации
-Success	Colors tab		Успех
+Fonts	APRWindow		Шрифты
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф.
+Grayscale	AntialiasingSettingsView		Оттенки серого
+Antialiasing type:	AntialiasingSettingsView		Тип сглаживания:
 Panel text	Colors tab		Текст панели
-Shine	Colors tab		Сияние
-Menu background	Colors tab		Фон меню
+Hinting menu	AntialiasingSettingsView		Корректировка (хинтинг)
+Scroll bar:	DecorSettingsView		Полоса прокрутки:
+Choose ControlLook	DecorSettingsView		Выберите вид виджетов
+Monospaced fonts only	AntialiasingSettingsView		Только моноширинные шрифты
 Document text	Colors tab		Текст документа
-List item text	Colors tab		Текст списка
 Inactive window border	Colors tab		Рамка неактивного окна
-Control text	Colors tab		Текст элемента
-Status bar	Colors tab		Строка статуса
+Colors	APRWindow		Цвета
+About control look	DecorSettingsView		Об этом виде виджетов
 Control highlight	Colors tab		Подсветка элемента
-Selected menu item background	Colors tab		Фон выбранного пункта меню
-Link active	Colors tab		Активная ссылка
+Status bar	Colors tab		Строка статуса
 Link hover	Colors tab		Цвет наведенной ссылки
+Single:	DecorSettingsView		Одинарный:

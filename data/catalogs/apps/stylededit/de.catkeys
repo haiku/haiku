@@ -4,7 +4,7 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen u
 Cut	Menus		Ausschneiden
 Center	Menus		Zentriert
 Increase size	Menus		Vergrößern
-Page setup…	Menus		Seite einrichten…
+Page setup…	Menus		Seite einrichten …
 Wrap-around search	FindandReplaceWindow		Gesamtes Dokument durchsuchen
 Untitled 	StyledEditWindow		Unbenannt
 OK	Statistics		OK
@@ -27,7 +27,7 @@ OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Datei entsperren
 Italic	Menus		Kursiv
 Can't undo	Menus		Rückgängig nicht möglich
-Replace…	Menus		Ersetzen…
+Replace…	Menus		Ersetzen …
 File	Menus		Datei
 Paste	Menus		Einfügen
 Bold	Menus		Fett
@@ -40,7 +40,7 @@ Save	SaveAlert		Speichern
 Default	Open_and_SaveAsPanel		Standard
 Cancel	RevertToSavedAlert		Abbrechen
 Cancel	FindandReplaceWindow		Abbrechen
-Statistics…	Menus		Statistik…
+Statistics…	Menus		Statistik …
 Encoding	Open_and_SaveAsPanel		Kodierung
 Replace all	FindandReplaceWindow		Alle ersetzen
 Close	Menus		Schließen
@@ -55,8 +55,8 @@ Find:	FindandReplaceWindow		Suche:
 Undo typing	QuitAlert		Rückgängig: Eingabe
 Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von \"%s\":\n\t%s
 Don't save	SaveAlert		Verwerfen
-Reload…	Menus		Neu laden…
-Print…	Menus		Drucken…
+Reload…	Menus		Neu laden …
+Print…	Menus		Drucken …
 Quit	Menus		Beenden
 Redo typing	QuitAlert		Wiederholen: Eingabe
 Ignore	NodeMonitorAlerts		Ignorieren
@@ -68,7 +68,7 @@ OK	LoadAlert		OK
 Save	QuitAlert		Speichern
 Case-sensitive	FindandReplaceWindow		Groß-/Kleinschreibung beachten
 Find selection	Menus		Auswahl suchen
-Find…	Menus		Suchen…
+Find…	Menus		Suchen …
 Cancel	SaveAlert		Abbrechen
 Revert	RevertToSavedAlert		Wiederherstellen
 Size	Menus		Größe
@@ -78,8 +78,8 @@ Replace next	Menus		Weiter ersetzen
 OK	QuitAlert		OK
 Edit	Menus		Bearbeiten
 Replace with:	FindandReplaceWindow		Ersetzen durch:
-Open…	Menus		Öffnen…
-Save as…	Menus		Speichern unter…
+Open…	Menus		Öffnen …
+Save as…	Menus		Speichern unter …
 Replace	FindandReplaceWindow		Ersetzen
 Characters:	Statistics		Zeichen:
 Don't save	QuitAlert		Verwerfen

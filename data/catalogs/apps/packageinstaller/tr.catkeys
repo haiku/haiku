@@ -17,7 +17,7 @@ The installation of the package has been aborted.	PackageView		Paket kurulumu ip
 No installation type selected	PackageView		Hiçbir kurulum türü seçilmedi
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Bu seçimi kurulumun geri kalanında hatırlamak istiyor musunuz?\n
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Seçili paket sisteminizden kaldırılamadı. Paket bilgisi dosyası hasar görmüş olabilir.
-Install…	UninstallView		Yükle…
+Install…	UninstallView		Yükleniyor…
 The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Verilen yolda '%s' adlı öge zaten var.\nBu öge paketteki ile değiştirilsin mi?
 Installing files and folders	PackageInstall		Dosyalar ve klasörler yükleniyor
 Installed packages	UninstallWindow		Yüklü paketler

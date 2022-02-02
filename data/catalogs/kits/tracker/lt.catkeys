@@ -1,20 +1,407 @@
-1	lithuanian	x-vnd.Haiku-libtracker	2976937849
-develop	B_SYSTEM_DEVELOP_DIRECTORY		Programavimas
-Defaults	TrackerSettingsWindow		Numatytai
-Resize to fit	QueryContainerWindow		Pritaikyti dydį prie turinio
-Desktop	B_DESKTOP_DIRECTORY		Darbalaukis
-Tracker preferences	TrackerSettingsWindow		Pėdsekio nuostatos
-system	B_SYSTEM_DIRECTORY		Sistema
+1	lithuanian	x-vnd.Haiku-libtracker	1356723787
+Created	ContainerWindow		Sukūrimo data
+Open and make preferred	OpenWithWindow		Atverti ir laikyti numatytąja
+Kind	ContainerWindow		Tipas
+Open with…	ContainerWindow		Atverti naudojant…
+Error moving \"%name\" to Trash. (%error)	FSUtils		Klaida perkeliant „%name“ į Šiukšlinę (%error)
+Or	FindPanel		arba
+before	FindPanel		iki
 Volume icons	TrackerSettingsWindow		Tomų piktogramos
+Ignore case	SelectionWindow		Nepaisyti raidžių registro
+Current folder	ContainerWindow		Šis aplankas
+Finish: %time - Over %finishtime left	StatusWindow		Pabaiga: %time – liko dar virš %finishtime
+Mount all disks now	AutoMounterSettings		Prijungti visus tomus dabar
+Location:	InfoWindow		Vieta:
+Name	PoseView		Vardas
+Kind:	InfoWindow		Tipas:
+contains	FindPanel		savyje turi
+32 x 32	ContainerWindow		32×32
+Open	FilePanelPriv		Atverti
+You can't replace a folder with one of its sub-folders.	FSUtils		Aplanko pakeisti vienu jo poaplankių negalima.
+Name	Default Query Columns		Pavadinimas
+Unmount	ContainerWindow		Atjungti
+Eject when unmounting	AutoMounterSettings		Išimti atjungiant
+Searching for disks to mount…	StatusWindow		Ieškoma prijungtinų diskų…
+Error emptying Trash	FSUtils		Klaida tuštinant Šiukšlinę
+Opens with:	InfoWindow		Atveriamas naudojant:
+Size	QueryPoseView		Dydis
+128 x 128	ContainerWindow		128×128
+Prompt	FSUtils		Klausti
+Error in regular expression:\n\n'%errstring'	PoseView		Klaida reguliariąjame reiškinyje:\n\n„%errstring“
+Would you like to find a suitable application to open the file?	FSUtils		Ar norite paieškoti tinkamos programos šiam failui atverti?
+64 x 64	ContainerWindow		64×64
+You cannot replace a folder or a symbolic link with a file.	FSUtils		Aplanko arba simbolinės nuorodos pakeisti failu negalima.
+At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Ties %func \nnepavyko įvykdyti find_directory(). \nPriežastis: %error
+Handles any file	OpenWithWindow		Palaiko visus failus
+save text	FilePanelPriv		įrašyti tekstą
+Preparing to move items…	StatusWindow		Rengiamasi perkelti objektus…
+Size	ContainerWindow		Dydis
+Select…	ContainerWindow		Pažymėti…
+Show shared volumes on Desktop	SettingsView		Darbalaukyje rodyti bendrintus tomus
+Size	PoseView		Dydis
+matches wildcard expression	SelectionWindow		atitinka šabloną
+96 x 96	ContainerWindow		96×96
+Identify	ContainerWindow		Atpažinti
+You can't move or copy items to read-only volumes.	FSUtils		Perkelti ar kopijuoti objektų į tomus, prijungtus tik skaitymui, negalima.
+Create link	ContainerWindow		Kurti nuorodą
+starts with	FindPanel		prasideda
+Replace	FSUtils		Pakeisti
+Move to	ContainerWindow		Perkelti į
+New folder	FSUtils		Naujas aplankas
+New Query	FindPanel		Nauja užklausa
+system	B_SYSTEM_DIRECTORY		Sistema
+Preparing to delete items…	StatusWindow		Rengiamasi šalinti objektus…
+Open %name with:	OpenWithWindow		Atverti %name naudojant:
+\"%name\" is an unsupported executable.	FSUtils		„%name%“ yra nepalaikomo tipo vykdomasis failas.
+You cannot copy or move the root directory.	FSUtils		Šakninio aplanko negalima nei kopijuoti, nei perkelti.
+Capacity:	InfoWindow		Talpa:
+File	ContainerWindow		Failas
+Relation	OpenWithWindow		Santykis
+Moving: 	StatusWindow		Perkeliama:
+Select	SelectionWindow		Pažymėti
+Select	InfoWindow		Pažymėti
+OK	OpenWithWindow		Gerai
+Include trash	FindPanel		Ieškoti ir Šiukšlinėje
+GiB	WidgetAttributeText		GiB
+Clean up	ContainerWindow		Sutvarkyti
+Modified	FindPanel		Modifikavimo data
+Select all	QueryContainerWindow		Pažymėti viską
+Select…	FilePanelPriv		Pažymėti…
+preferences	B_PREFERENCES_DIRECTORY		Nuostatos
+Name	Person Query Columns		Pavadinimas
+%SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed iš %TotalSize, %BytesPerSecond/s
+Preparing to restore items…	StatusWindow		Ruošiamasi atkurti objektus…
+Mount	ContainerWindow		Prijungti
+Desktop	B_DESKTOP_DIRECTORY		Darbalaukis
+Link to:	InfoWindow		Nuoroda į:
+Copy here	ContainerWindow		Kopijuoti čia
+All disks	FindPanel		Visuose tomuose
+Window	ContainerWindow		Langas
+%BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
+Remove	FindPanel		Pašalinti
+Recent documents	FavoritesMenu		Paskiausi dokumentai
+Save as Query template:	FindPanel		Įrašyti kaip užklausos šabloną:
+Edit templates…	TemplatesMenu		Tvarkyti šablonus…
+%capacity (%used used -- %free free)	InfoWindow		%capacity (užpildyta %used, laisva %free)
+Trash	Model		Šiukšlinė
+Enable type-ahead filtering	SettingsView		Leisti filtravimą renkant tekstą
+copy	FSUtils	filename copy	kopija
+New folder%ld	FSUtils		Naujas aplankas %ld
+Location	OpenWithWindow		Vieta
+%Ld B	WidgetAttributeText		%Ld B
+Resize to fit	QueryContainerWindow		Pritaikyti dydį prie turinio
+List folders first	SettingsView		Aplankus rikiuoti pirmiau
+Find	FSUtils		Ieškoti
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Objektas vardu „%name“ jau egzistuoja šiame aplanke. Ar norite jį pakeisti kuriama simboline nuoroda?
+Temporary	FindPanel		Užklausa laikina
+Modified	QueryPoseView		Modifikavimo data
+Create relative link	ContainerWindow		Kurti santykinę nuorodą
+Owner	FilePermissionsView		Savininkas
+Cancel	FSClipBoard		Atsisakyti
+Modified	PoseView		Modifikavimo data
+Move to Trash	ContainerWindow		Išmesti Šiukšlinėn
+All files and folders	FindPanel		Visų failų ir aplankų
+Add-ons	ContainerWindow		Priedai
+Increase size	ContainerWindow		Padidinti
+\nShould this be fixed?	FSUtils		\nAr pašalinti šį nesklandumą?
+Move	PoseView		Perkelti
+Cancel	ContainerWindow		Atsisakyti
+Attributes	ContainerWindow		Požymiai
+Error deleting items	FSUtils		Klaida šalinant objektus
+Cut	ContainerWindow		Iškirpti
+Disks	Model		Tomai
+Create a Query template	FindPanel		Sukurti užklausos šabloną
+Size	FindPanel		Dydis
+Window	FilePanelPriv		Langas
+Replace other file	WidgetAttributeText		Pakeisti kitą failą
+OK	Email Query Columns		Gerai
+Location	QueryPoseView		Vieta
+Edit query	ContainerWindow		Taisyti užklausą
+Previously mounted disks	AutoMounterSettings		Praėjusį kartą prijungtus tomus
+You cannot replace a file with a folder or a symbolic link.	FSUtils		Failo pakeisti aplanku arba simboline nuoroda negalima.
+The target disk does not support creating links.	FSUtils		Paskirties tome nuorodos nepalaikomos.
+develop	B_SYSTEM_DEVELOP_DIRECTORY		Programavimas
+Cut more	ContainerWindow		Iškirpti dar
+The Tracker must be running to see Info windows.	PoseView		Informacijos langams parodyti turi būti paleistas Pėdsekys.
+Tracker preferences	TrackerSettingsWindow		Pėdsekio nuostatos
+Read	FilePermissionsView		Skaityti
+There was an error writing the attribute.	WidgetAttributeText		Įrašant požymį, įvyko klaida.
+Could not open \"%name\" (%error). 	FSUtils		Nepavyko atverti „%name“ (%error).
+%name info	InfoWindow	InfoWindow Title	Informacija apie „%name“
+Sorry, you can't create links in the Trash.	PoseView		Deja, šiukšlinėje kurti nuorodų neleidžiama.
+Invert selection	QueryContainerWindow		Invertuoti žymėjimą
+Open selection with:	OpenWithWindow		Atverti pažymėtus naudojant:
+Preferences…	ContainerWindow		Nuostatos…
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Failo „%document“ nepavyko atverti, nes programa „%app“ yra Šiukšlinėje.
+Close	ContainerWindow		Užverti
+Get info	ContainerWindow		Savybės
+Show folder location in title tab	SettingsView		Rodyti pilną aplanko kelią lango antraštėje
+There was an error resolving the link.	Tracker		Nustatant nuorodos tikslą, įvyko klaida.
+There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Iškilo nesklandumų bandant rašyti į nurodytą aplanką. Pabandykite nurodyti kitą.
+Desktop	TrackerSettingsWindow		Darbalaukis
+Move	FSUtils	button label	Perkelti
+Clean up	DeskWindow		Sutvarkyti
+Group	FilePermissionsView		Grupė
+Could not find an application to open \"%name\" (%error). 	FSUtils		Nepavyko rasti programos, galinčios atverti „%name“ (%error).
+Mini icon view	DeskWindow		Rodyti mažas piktogramas
+contains	SelectionWindow		savyje turi
+Replace	FilePanelPriv		Pakeisti
+is not	FindPanel		nėra
+Icon view	DeskWindow		Rodyti piktogramas
+Mount settings…	ContainerWindow		Tomų prijungimo nuostatos…
+Copy more	ContainerWindow		Kopijuoti dar
+by name	FindPanel		pagal vardą
+Sorry, you can't save things at the root of your system.	FilePanelPriv		Apgailestaujame, tačiau į šakninį failų sistemos aplanką nieko rašyti neleidžiama.
+Restore	ContainerWindow		Atkurti
+Location	ContainerWindow		Vieta
+Warning space color	SettingsView		Užpildytos vietos spalva (įspėjant)
+Skip	FSUtils		Praleisti
+Used space color	SettingsView		Užpildytos vietos spalva
+Cancel	FSUtils		Atsisakyti
+Original name	ContainerWindow		Tikras vardas
+Unknown	WidgetAttributeText		Nežinomas
+The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Nurodytu vardu jau yra pavadintas aplankas. Įveskite kitą vardą.
+48 x 48	ContainerWindow		48×48
+Modified	ContainerWindow		Modifikavimo data
+Mini icon view	ContainerWindow		Rodyti mažas piktogramas
+File	FilePanelPriv		Failas
+Search	FindPanel		Ieškoti
+Modified:	InfoWindow		Modifikavimo data:
+Cancel	FilePanelPriv		Atsisakyti
+Sorry, you cannot edit that attribute.	WidgetAttributeText		Deja, šio atributo keisti negalite.
+Cancel	OpenWithWindow		Atsisakyti
+Select…	DeskWindow		Pažymėti…
+Files cannot be moved or deleted from a read-only volume.	PoseView		Perkelti ar šalinti objektų iš tomų, prijungtų tik skaitymui, negalima.
+Edit name	FilePanelPriv		Pervardinti
+There was an error deleting \"%name\":\n\t%error	FSUtils		Šalinant „%name“ įvyko klaida:\n\t%error
+Resize to fit	ContainerWindow		Pritaikyti dydį prie turinio
+Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Nukreipti „%name“ į:
+Mount server error	AutoMounterSettings		Tomų prijungimo tarnybos klaida
+Invert selection	FilePanelPriv		Invertuoti žymėjimą
+TiB	WidgetAttributeText		TiB
+New folder	TemplatesMenu		Naujas aplankas
+Replace all	FSUtils		Pakeisti visus
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Programa „%appname“ nepalaiko dokumento, kurį bandote ja atverti, tipo.\nAr tikrai norite tęsti?\n\nJeigu žinote, jog ši programa geba dirbti su šio tipo dokumentais, jums derėtų susisiekti su programos leidėju ir paprašyti programą pataisyti, kad ji nurodytų šį dokumentų tipą kaip palaikomą.
+Reverse order	ContainerWindow		Rikiuoti atvirkščiai
+Copying: 	StatusWindow		Kopijuojama:
+Show navigator	SettingsView		Rodyti naršymo juostą
+Select all	DeskWindow		Pažymėti viską
+Decrease size	ContainerWindow		Sumažinti
+Recent queries	FindPanel		Paskiausios užklausos
+Mount all	MountMenu		Prijungti visus
+128 x 128	DeskWindow		128×128
+Size	Default Query Columns		Dydis
+Favorites	FavoritesMenu		Parankiniai
+Delete	FilePanelPriv		Šalinti
+<No recent items>	FavoritesMenu		<Paskiausių objektų nėra>
+Formula %formula	FindPanel	FindResultTitle	Formulė %formula
+Preparing to create links…	StatusWindow		Rengiamasi kurti nuorodas…
+Tracker status	StatusWindow		Pėdsekio būsena
+Handles any %type	OpenWithWindow		Paliko bet kurį %type
+The mount server could not be contacted.	AutoMounterSettings		Nepavyko susisiekti su tomų prijungimo tarnyba.
+Query template	FindPanel		Užklausos šablonas
+ends with	SelectionWindow		baigiasi
+Open	OpenWithWindow		Atverti
+You must have at least one attribute showing.	PoseView		Bent vienas požymis turi likti matomas.
+Cut	FilePanelPriv		Iškirpti
+Favorites	FilePanelPriv		Parankiniai
 home	B_USER_DIRECTORY		Namai
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Naujų failų šablonai
-Invert selection	QueryContainerWindow		Invertuoti žymėjimą
-Windows	TrackerSettingsWindow		Langai
+Disk mounting during boot	AutoMounterSettings		Įkeliant sistemą, prijungti tomus:
+Don't automount	AutoMounterSettings		Automatiškai neprijungti
+Could not find application \"%appname\"	OpenWithWindow		Programos „%appname“ rasti nepavyko
+Error %error loading Add-On %name.	ContainerWindow		Klaida %error įkeliant priedą „%name“.
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Bandote pakeisti objektą:\n\t%name%dest\nšiuo:\n\t%name%src\n\nAr norite jį pakeisti %movemode objektu?
+Empty Trash	ContainerWindow		Ištuštinti šiukšlinę
+no supporting apps	OpenWithWindow		palaikančių programų nėra
+Preparing to empty Trash…	StatusWindow		Ruošiamasi tuštinti Šiukšlinę…
+Deleting: 	StatusWindow		Šalinama:
+You can't move or copy the trash.	FSUtils		Šiukšlinės negalima nei perkelti, nei nukopijuoti.
+label too long	PoseView		vardas per ilgas
+Error creating link to \"%name\".	FSUtils		Klaida kuriant nuorodą į „%name“.
+Unknown	FilePermissionsView		Nežinomas
+Paste links	ContainerWindow		Įdėti nuorodas
+Restoring: 	StatusWindow		Atkuriama:
+calculating…	InfoWindow		skaičiuojamas…
+Preferred for file	OpenWithWindow		Numatytoji failui
+OK	AutoMounterSettings		Gerai
+copying	FSUtils		kopijuojate
+Get info	FilePanelPriv		Savybės
+Delete	ContainerWindow		Šalinti
+Execute	FilePermissionsView		Vykdyti
+Show volumes on Desktop	SettingsView		Rodyti atskirus tomus
+Recent folders	ContainerWindow		Paskiausi aplankai
+Desktop	Model		Darbalaukis
+Select all	ContainerWindow		Pažymėti viską
 apps	B_APPS_DIRECTORY		Programos
-Close	QueryContainerWindow		Užverti
+Error calculating folder size.	InfoWindow		Skaičiuojant aplanko dydį, įvyko klaida.
+MiB	WidgetAttributeText		MiB
+Delete	FSUtils		Šalinti
+Edit name	ContainerWindow		Pervardinti
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Failo „%document“ nepavyko atverti (trūksta simbolio: %symbol).\n
+config	B_USER_CONFIG_DIRECTORY		Konfigūracija
+Error moving \"%name\".	FSUtils		Klaida perkeliant „%name“.
+Select…	QueryContainerWindow		Pažymėti…
+Open	ContainerWindow		Atverti
+Settings…	MountMenu		Nuostatos…
+You cannot put the selected item(s) into the trash.	FSUtils		Pažymėtų elementų negalima išmesti Šiukšlinėn.
+Increase size	DeskWindow		Padidinti
+starts with	SelectionWindow		prasideda
+New	DeskWindow		Naujas
+Invert	SelectionWindow		Invertuoti
+Would you like to find some other suitable application?	FSUtils		Ar norėtumėte paieškoti kokios nors kitos tinkamos programos?
+Recent folders	FavoritesMenu		Paskiausi aplankai
+The specified name is illegal. Please choose another name.	FilePanelPriv		Įvestas vardas negalimas. Įveskite kitą vardą.
+of %items	StatusWindow		iš %items
+less than	FindPanel		mažesnis nei
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Klaida kopijuojant failą „%name“:\n\t%error\n\nAr norite tęsti?
+Creating links: 	StatusWindow		Kuriamos nuorodos:
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Failo „%document“ nepavyko atverti programa „%app“ (%error).
+Create %s clipping	PoseView		Sukurti „%s“ tipo iškarpą
+Error moving \"%name\"	FSUtils		Klaida perkeliant „%name“
+To: %dir	StatusWindow		Į: %dir
+Paste layout	ContainerWindow		Pritaikyti nukopijuotą išdėstymą
+Cancel	Tracker		Atsisakyti
+Make active printer	ContainerWindow		Laikyti numatytuoju spausdintuvu
+Copy to	ContainerWindow		Kopijuoti į
+Name	SelectionWindow		Vardas
+by attribute	FindPanel		pagal požymį
+Write	FilePermissionsView		Rašyti
+Save	FilePanelPriv		Įrašyti
+Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Failo „%document“ nepavyko atverti programa „%app“ (trūksta bibliotekų: %library).\n
+Finish: %time	StatusWindow		Pabaiga: %time
+after	FindPanel		nuo
+Version	OpenWithWindow		Versija
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Kai kurių pažymėtų elementų išmesti Šiukšlinėn negalima. Ar norite vietoje to juos pašalinti? Neužmirškite, jog šis veiksmas negrįžtamas!
+Add printer…	ContainerWindow		Pridėti spausdintuvą…
+On	FindPanel		Tome
+Permissions	ContainerWindow		Leidimai
+Size:	InfoWindow		Dydis:
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Pažymėto elemento išmesti Šiukšlinėn negalima. Ar norite vietoje to jį pašalinti? Neužmirškite, jog šis veiksmas negrįžtamas!
+Copy	ContainerWindow		Kopijuoti
+Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Apgailestaujame, tačiau „Character“ požymyje negalima saugoti daugiabaičio rašmens.
+And	FindPanel		ir
+multiple disks	FindPanel		keliuose diskuose
+Name = %name	FindPanel	FindResultTitle	Vardas = %name
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Klaida kopijuojant aplanką „%name“:\n\t%error\nAr norite tęsti?
+You cannot create a link to the root directory.	FSUtils		Šakniniame aplanke nuorodų kurti neleidžiama.
+Select all	FilePanelPriv		Pažymėti viską
+Other	FilePermissionsView		Kiti
+Automatic disk mounting	AutoMounterSettings		Automatiškai prijungti tomus:
+parent folder	NavMenu		Viršaplankis
+Create link here	ContainerWindow		Sukurti nuorodą čia
+Force identify	ContainerWindow		Priverstinai atpažinti
+48 x 48	DeskWindow		48×48
+no items	CountView		Objektų nėra
+Disks	DirMenu		Tomai
+Query name:	FindPanel		Užklausos vardas:
+Open parent	ContainerWindow		Atverti viršaplankį
+Find…	ContainerWindow		Ieškoti…
+moving	FSUtils		perkeliate
+Single window navigation	SettingsView		Naršyti viename lange
+greater than	FindPanel		didesnis nei
+Add	FindPanel		Pridėti
+Created:	InfoWindow		Sukūrimo data:
+Edit Query template	FindPanel		Taisyti užklausos šabloną
+Save query as template…	FindPanel		Įrašyti užklausą kaip šabloną…
+All disks	AutoMounterSettings		Visus tomus
+link	FSUtils	filename link	nuoroda
+Proceed	FSUtils		Vykdyti
+Edit favorites…	FilePanelPriv		Tvarkyti parankinius…
+You can't move a folder into itself or any of its own sub-folders.	FSUtils		Aplanko perkelti į jį patį arba į bet kurį jo poaplankį negalima.
+New	ContainerWindow		Naujas
+You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Objektus turėtumėte numesti ant vieno iš tomų piktogramos Tomų lange.
+Sorry, you can't copy items to the Trash.	FSClipBoard		Deja, Šiukšlinėn objektų kopijuoti neleidžiama.
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Šiame aplanke, jau yra objektų, kurių vardai sutampa su objektų, kuriuos %verb, pavadinimais.\n\nAr norite visus konfliktinius objektus pakeisti tais, kuriuos %verb, ar geriau Jūsų atsiklausti dėl kiekvieno atskirai?
+Paste	FilePanelPriv		Įdėti
+Paste	ContainerWindow		Įdėti
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Aplankas vardu „%name“ jau egzistuoja šiame aplanke ir gali būti, jog jame yra kitų objektų sutampančiais vardais. Ar norite šiuos konfliktinius objektus pakeisti esančiais aplanke, kurį %verb?
+Cannot unmount the boot volume \"%name\".	FSUtils		Paleidimo tomo „%name“ atjungti negalima.
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Failo „%document“ nepavyko atverti programa „%app“ (truksta simbolio: %symbol).\n
+New folder	ContainerWindow		Naujas aplankas
+Name	OpenWithWindow		Pavadinimas
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Iškilo nesklandumų bandant pakeisti „%name“. Gali būti, jog objektas atvertas arba užimtas.
+Windows	TrackerSettingsWindow		Langai
+Show space bars on volumes	SettingsView		Rodyti tomų užpildymo indikatorius
+Could not update permissions of file \"%name\". %error	FSUtils		Nepavyko atnaujinti failo „%name“ leidimų. %error
+Decrease size	DeskWindow		Sumažinti
+Emptying Trash… 	StatusWindow		Šiukšlinė tuštinama…
+KiB	WidgetAttributeText		KiB
 Revert	TrackerSettingsWindow		Atšaukti pakeitimus
 trash	B_TRASH_DIRECTORY		Šiukšlinė
-Desktop	TrackerSettingsWindow		Darbalaukis
-Select all	QueryContainerWindow		Pažymėti viską
-preferences	B_PREFERENCES_DIRECTORY		Nuostatos
-config	B_USER_CONFIG_DIRECTORY		Konfigūracija
+Close all in workspace	ContainerWindow		Užverti visus šiame darbalaukyje
+32 x 32	DeskWindow		32×32
+Finish: %time - %finishtime left	StatusWindow		Pabaiga: %time – liko dar %finishtime
+Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Failo „%document“ nepavyko atverti (trūksta bibliotekų: %library).\n
+Create relative link here	ContainerWindow		Sukurti santykinę nuorodą čia
+Copy	FilePanelPriv		Kopijuoti
+Close all	ContainerWindow		Užverti visus
+Paused: click to resume or stop	StatusWindow		Pristabdyta. Galite pratęsti arba nutraukti
+Name	QueryPoseView		Vardas
+Error %error loading add-On %name.	ContainerWindow		Klaida %error įkeliant priedą „%name“.
+Does not handle file	OpenWithWindow		Šis failas nepalaikomas
+Arrange by	ContainerWindow		Rikiuoti pagal
+Sorry, saving more than one item is not allowed.	FilePanelPriv		Deja, vienu metu įrašyti daugiau nei vieno failo neleidžiama.
+Move here	ContainerWindow		Perkelti čia
+Sorry, could not create a new folder.	FSUtils		Deja, naujo aplanko sukurti nepavyko.
+Rename	FSUtils	button label	Pervardinti
+Clean up all	ContainerWindow		Sutvarkyti visus
+Add current folder	FilePanelPriv		Įtraukti šį aplanką
+Description:	InfoWindow		Aprašas:
+Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ar tikrai norite pašalinti pažymėtus objektus? Neužmirškite, jog šis veiksmas negrįžtamas.
+Mount	DeskWindow		Prijungti
+ends with	FindPanel		baigiasi
+Show Disks icon	SettingsView		Rodyti Tomų piktogramą
+Outline selection rectangle only	SettingsView		Žymint, rodyti tik kontūrą
+by formula	FindPanel		pagal formulę
+Move to Trash	FilePanelPriv		Išmesti Šiukšlinėn
+is	FindPanel		lygus
+40 x 40	DeskWindow		40×40
+40 x 40	ContainerWindow		40×40
+New folder %ld	FSUtils		Naujas aplankas %ld
+64 x 64	DeskWindow		64×64
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		„%name%“ yra pasenusio tipo vykdomasis failas. Įsigykite naujesnę programos versiją arba ją perkompiliuokite.
+Only the boot disk	AutoMounterSettings		Tik paleidimo tomą
+That name is already taken. Please type another one.	WidgetAttributeText		Šis vardas jau užimtas. Įveskite kitą
+Modified	Default Query Columns		Modifikavimo data
+Default application	InfoWindow		numatytąją programą
+Untitled bitmap	PoseView		Bevardis paveikslas
+matches regular expression	SelectionWindow		atitinka reguliarųjį reiškinį
+Invert selection	ContainerWindow		Invertuoti žymėjimą
+Real name	ContainerWindow		Tikras vardas
+Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Failo „%name“ nepavyko atverti. Jis klaidingai pažymėtas kaip vykdomasis.
+Go to parent	FilePanelPriv		Eiti į viršaplankį
+Save	FindPanel		Įrašyti
+Name	FindPanel		Vardas
+Cancel	WidgetAttributeText		Atsisakyti
+Copy layout	ContainerWindow		Kopijuoti išdėstymą
+Duplicate	ContainerWindow		Dubliuoti
+Untitled clipping	PoseView		Bevardė iškarpa
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Paskirties aplanke jau yra failas „%name“. Ar norite jį pakeisti?
+You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Objektus turėtumėte numesti ant vieno iš tomų piktogramos Tomų lange.
+Version:	InfoWindow		Versija:
+OK	PoseView		Gerai
+Add-ons	DeskWindow		Priedai
+Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Ar tikrai norite perkelti arba nukopijuoti pažymėtus objektus į šį aplanką?
+Find	FindPanel		Ieškoti
+Empty folder	NavMenu		Aplankas tuščias
+Defaults	TrackerSettingsWindow		Numatytai
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Deja, paskirties tome nepakanka laisvos vietos pažymėtiems objektams nukopijuoti.
+Add-ons	FilePanelPriv		Priedai
+96 x 96	DeskWindow		96×96
+Empty folder	SlowContextPopup		Tuščias aplankas
+Move to Trash	FSUtils		Išmesti Šiukšlinėn
+Handles %type	OpenWithWindow		Palaiko %type
+Cancel	PoseView		Atsisakyti
+Delete	PoseView		Šalinti
+Sorry, you can't copy items to the Trash.	PoseView		Deja, Šiukšlinėn objektų kopijuoti neleidžiama.
+New folder	FilePanelPriv		Naujas aplankas
+Create a Query	FindPanel		Kurti užklausą
+Close	QueryContainerWindow		Užverti
+Preparing to copy items…	StatusWindow		Rengiamasi kopijuoti objektus…
+Icon view	ContainerWindow		Rodyti piktogramas
+Name	ContainerWindow		Vardas
+Preferred for %type	OpenWithWindow		Numatytoji %type objektams
+Free space color	SettingsView		Laisvos vietos spalva
+OK	WidgetAttributeText		Gerai
+OK	FSUtils		Gerai

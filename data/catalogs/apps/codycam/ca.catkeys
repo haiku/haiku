@@ -1,2 +1,88 @@
-1	catalan; valencian	x-vnd.Haiku-CodyCam	2299238672
+1	catalan; valencian	x-vnd.Haiku-CodyCam	12021044
+destination directory expected	CodyCam		s'espera un directori de destinació
+reply: '%s'\n	SftpClient		resposta: %s\n
+PASS <suppressed>  (real password sent)	FtpClient		Contrasenya <suppressed>  (contrasenya real enviada)
+JPEG image	CodyCam		Imatge JPEG
+Remote host has closed the connection.\n	FtpClient		El servidor remot ha tancat la connexió.\n
+image file format expected	CodyCam		s'espera un format de fitxer d'imatge
+Every 30 minutes	CodyCam		Cada 30 minuts
+Capturing Image…	VideoConsumer.cpp		Es captura la imatge...
+Cannot start time source!	CodyCam		No es pot iniciar la font horària!
+Waiting…	CodyCam		Esperant...
+Passive FTP	CodyCam		FTP Passiu
+Every 10 minutes	CodyCam		Cada 10 minuts
+Every minute	CodyCam		Cada minut
+Capture Rate Menu	CodyCam		Menú de velocitat de captura
+Cannot seek time source!	CodyCam		No es pot cercar la font horària!
+Server login failed	VideoConsumer.cpp		Ha fallat la identificació del servidor
 on or off expected	Settings	Do not translate 'on' and 'off'	s'esperava ON o OFF
+invalid upload client %ld\n	VideoConsumer.cpp		client de càrrega de vàlid: %ld\n
+Every 30 seconds	CodyCam		Cada 30 segons
+Cannot create a video window	CodyCam		No es pot crear una finestra de vídeo.
+Cannot register the video window	CodyCam		No es pot registrar la finestra de vídeo
+capture rate expected	CodyCam		S'esperava una freqüència de captura
+Quit	CodyCam		Surt
+Cannot connect the video source to the video window	CodyCam		No es pot connectar l'origen del vídeo a la finestra del vídeo.
+read: %d\n	SftpClient		llegeix: %d\n
+Every 2 hours	CodyCam		Cada 2 hores
+Cannot get a time source	CodyCam		No es pot obtenir una font horària.
+Every 4 hours	CodyCam		Cada 4 hores
+cmd: '%s'\n	FtpClient		cmd: %s\n
+Closing the window	VideoConsumer.cpp		Es tanca la finestra
+Never	CodyCam		Mai
+Every 8 hours	CodyCam		Cada 8 hores
+Cannot start the video source	CodyCam		No es pot iniciar la font de vídeo.
+Cannot set the time source for the video source	CodyCam		No es pot establir la font horària per a la font de vídeo.
+Renaming…	VideoConsumer.cpp		Canvi de nom...
+Send to…	CodyCam		Envia a...
+Password:	CodyCam		Contrasenya:
+still image filename expected	CodyCam		s'esperava un nom de fitxer d'imatge fixa
+File name:	CodyCam		Nom del fitxer:
+Directory:	CodyCam		Directori:
+Error setting type of output file	VideoConsumer.cpp		Error en establir el tipus de fitxer de sortida
+Locking the window	VideoConsumer.cpp		Es bloca la finestra
+Cannot find an available video stream	CodyCam		No es pot trobar el flux de vídeo
+Upload…	VideoConsumer.cpp		Carrega...
+password expected	CodyCam		s'esperava la contrasenya
+SFTP	CodyCam		SFTP
+Output	CodyCam		Sortida
+server address expected	CodyCam		s'esperava l'adreça del servidor
+Cannot start the video window	CodyCam		No es pot iniciar la finestra de vídeo.
+reply: %d, %d\n	FtpClient		resposta: %d, %d\n
+Cannot set the time source for the video window	CodyCam		No es pot establir la font horària per a la finestra de vídeo.
+Every 15 minutes	CodyCam		Cada 15 minuts
+Every 24 hours	CodyCam		Cada 24 hores
+Image Format Menu	CodyCam		Menú del format de la imatge
+Every 5 minutes	CodyCam		Cada 5 minuts
+File upload failed	VideoConsumer.cpp		Ha fallat carregar el fitxer.
+Format:	CodyCam		Format:
+Start video	CodyCam		Inicia el vídeo
+Connected…	VideoConsumer.cpp		Connectat...
+upload client name expected	CodyCam		s'esperava el nom del client de càrrega
+Every 15 seconds	CodyCam		Cada 15 segons
+Error getting initial latency for the capture node	CodyCam		Error en obtenir la latència inicial del node de captura
+password	CodyCam		contrasenya
+Local	CodyCam		Local
+Stop video	CodyCam		Interromp el vídeo
+Last Capture: 	VideoConsumer.cpp		Darrera Captura: 
+Rate:	CodyCam		Freqüència:
+Couldn't find requested directory on server	VideoConsumer.cpp		No s'ha pogut trobar el directori sol·licitat al servidor.
+Cannot find the media roster	CodyCam		No es pot trobar la llista de mitjans.
+Type:	CodyCam		Tipus:
+Rename failed	VideoConsumer.cpp		Ha fallat canviar el nom del fitxer.
+unrecognized upload client specified	CodyCam		no es reconeix el client de càrrega especificat
+Server:	CodyCam		Servidor:
+Login:	CodyCam		Entrada:
+File	CodyCam		Fitxer
+read: %ld\n	SftpClient		llegeix: %ld\n
+Every hour	CodyCam		Cada hora
+login ID expected	CodyCam		s'esperava un identificador d'entrada
+Video settings	CodyCam		Paràmetres de vídeo
+Can't find an available connection to the video window	CodyCam		No es pot trobar una connexió a la finestra de vídeo disponible
+FTP	CodyCam		FTP
+Error creating output file	VideoConsumer.cpp		Error en crear el fitxer de sortida.
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		No es pot trobar cap font de vídeo.\nCal una càmera web per usar el CodyCam.
+Logging in…	VideoConsumer.cpp		S'entra...
+CodyCam	System name		CodyCam
+Error writing output file	VideoConsumer.cpp		Error en escriure el fitxer de sortida.
+Capture controls	CodyCam		Controls de captura

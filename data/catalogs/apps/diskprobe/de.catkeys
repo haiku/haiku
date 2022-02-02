@@ -17,14 +17,14 @@ Add	ProbeView		Hinzu
 64 bit signed value:	TypeEditors		64-Bit-Wert mit Vorzeichen:
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Soll das Attribut \"%s\" wirklich von der Datei \"%s\" entfernt werden?\n\nDiese Aktion kann nicht rückgängig gemacht werden.
 No type editor available	AttributeWindow		Kein Editor für diesen Typ vorhanden
-Print…	ProbeView		Drucken…
-New…	FileWindow		Neu…
+Print…	ProbeView		Drucken …
+New…	FileWindow		Neu …
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	what: '%.4s'\n\n
 OK	DiskProbe		OK
 Back	ProbeView		Zurück
 Device: 	ProbeView		Gerät: 
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Basis
-Open file…	FileWindow		Datei öffnen…
+Open file…	FileWindow		Datei öffnen …
 32 bit unsigned pointer:	TypeEditors		Vorzeichenloser 32-Bit-Zeiger:
 DiskProbe request	DiskProbe		DiskProbe-Anfrage
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexadezimal
@@ -71,7 +71,7 @@ Mode:	FindWindow		Modus:
 of 	ProbeView		von 
 Contents:	TypeEditors		Inhalt:
 Could not open file \"%s\": %s\n	DiskProbe		Die Datei \"%s\" konnte nicht geöffnet werden: %s\n
-Probe file…	OpenWindow		Datei untersuchen…
+Probe file…	OpenWindow		Datei untersuchen …
 Block: 	ProbeView		Block: 
 Bookmarks	ProbeView		Lesezeichen
 Probe device	OpenWindow		Gerät untersuchen
@@ -98,7 +98,7 @@ Save	ProbeView		Speichern
 of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	von 0x0
 Attribute type: 	ProbeView		Attributtyp: 
 15 bit	TypeEditors		15 Bit
-Page setup…	ProbeView		Seite einrichten…
+Page setup…	ProbeView		Seite einrichten …
 Boolean	TypeEditors	This is the type of editor	Boolesch
 Icon view	TypeEditors		Symbolansicht
 Select all	ProbeView		Alles auswählen
@@ -124,7 +124,7 @@ Edit	ProbeView		Bearbeiten
 String editor	TypeEditors		Zeichen-Editor
 Boolean editor	TypeEditors		Boolescher Editor
 Device offset: 	ProbeView		Gerät-Offset: 
-Find…	ProbeView		Suchen…
+Find…	ProbeView		Suchen …
 8 bit palette	TypeEditors		8-Bit-Palette
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Dezimal
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Bild-Ansicht

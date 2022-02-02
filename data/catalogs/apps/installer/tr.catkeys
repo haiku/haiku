@@ -46,7 +46,7 @@ OK	InstallerWindow		Tamam
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Yükleyici penceresini kapatmadan önce Önyükleme Yöneticisi ve Disk İzlencesi pencerelerini kapatın.
 Failed to launch Boot Manager	InstallerWindow		Önyükleme Yönetici başlatılamadı
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Haiku kurulumunu tamamlayıp sistemi ilk kez açtığınızda, \"Kullanıcı Kılavuzu\" ve \"Hızlı Tur\"'a bir göz atmayı lütfen unutmayın. Masaüstünde ve WebPositive yer imleri içinde bağlantılar bulunmaktadır.\n\n
-Try installing anyway	InstallProgress		Yine de kurmayı dene
+Try installing anyway	InstallProgress		Yine de yüklemeyi dene
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		HAİKU'YU YÜKLEMEDEN ÖNCE LÜTFEN OKUYUN!\n\n
 Additional disk space required: %s	InstallerWindow		Gereken ek disk alanı: %s
 Stop	InstallerWindow	In alert after pressing Stop	Durdur

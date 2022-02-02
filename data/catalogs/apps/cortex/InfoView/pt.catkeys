@@ -1,4 +1,4 @@
-1	portuguese	application/x-vnd.Cortex.InfoView	2468362915
+1	portuguese	application/x-vnd.Cortex.InfoView	1127209869
 Offset	InfoView		Deslocamento
 Description	DormantNodeInfoView		Descrição
 Connection	InfoView		Conexão
@@ -31,6 +31,7 @@ Input format	DormantNodeInfoView		Formato de entrada
 Format	InfoView		Formato
 Version	AppNodeInfoView		Versão
 Frame size	InfoView		Tamanho de quadro
+Run mode	LiveNodeInfoView		Modo de execução
 Port	LiveNodeInfoView		Porta
 Output format	DormantNodeInfoView		Formato de saída
 Aspect ratio	InfoView		Proporção

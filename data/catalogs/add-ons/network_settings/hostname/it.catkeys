@@ -1,2 +1,5 @@
-1	italian	x-vnd.Haiku-Hostname	1582398232
+1	italian	x-vnd.Haiku-Hostname	1423335302
 Hostname settings	HostnameAddOn		Impostazioni nome host
+Apply	HostnameView		Applica
+Hostname settings	HostnameView		Impostazioni nome host
+Hostname:	HostnameView		Nome host:

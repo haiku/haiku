@@ -1,35 +1,48 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	1330427574
+1	polish	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Zespoły
 Semaphores	DataSource		Semafory
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Blokowa pamięć podręczna
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
 Media nodes	DataSource		Węzły multimediów
 Text clipboard	DataSource		Schowek tekstowy
 Network send	DataSource		Wysłane
-Cache	DataSource		Cache
 Running applications	DataSource		Uruchomione aplikacje
-Threads	DataSource		Wątki
+Cache	DataSource		Cache
 CPU usage (combined)	DataSource		Użycie procesora (całkowite)
+Threads	DataSource		Wątki
 Receiving	DataSource		Otrzymane
+Remove graph	ActivityView		Usuń wykres
 Swap space	DataSource		Przestrzeń wymiany
 CPU	DataSource		Procesor
+ActivityMonitor	System name		Monitor Aktywności
 CPU %d	DataSource		Procesor %d
+Update time interval:	SettingsWindow		Częstotliwość odświeżania:
 RX	DataSource	Shorter version for Receiving.	RX
+Settings…	ActivityWindow		Ustawienia…
 Block cache	DataSource		Blokowa pamięć podręczna
 Memory	DataSource		Pamięć
 CPU usage	DataSource		Użycie procesora
+Quit	ActivityWindow		Zakończ
 Raw clipboard	DataSource		Schowek binarny
+Settings	ActivityWindow		Ustawienia
 Used memory	DataSource		Używana pamięć
 %.1f faults/s	DataSource		%.1f błędów/s
+Show legend	ActivityView		Pokaż legendę
 Cached memory	DataSource		Pamięć podręczna
 CPU %d usage	DataSource		Użycie procesora %d
+File	ActivityWindow		Plik
 Ports	DataSource		Porty
 Page faults	DataSource		Błędy stronicowania
 Apps	DataSource		Aplikacje
+Additional items	ActivityView		Dodatkowe informacje
+Add graph	ActivityWindow		Dodaj wykres
 Sending	DataSource		Wysłane
 %.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		Zawsze na wierzchu
 Swap	DataSource		Przestrzeń wymiany
+%lld sec.	SettingsWindow		%lld s
 P-faults	DataSource		P-błędy
 Sems	DataSource		Semy
 Network receive	DataSource		Otrzymane

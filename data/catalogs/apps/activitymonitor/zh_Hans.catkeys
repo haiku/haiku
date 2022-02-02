@@ -1,35 +1,48 @@
-1	english	x-vnd.Haiku-ActivityMonitor	1330427574
+1	english	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		团队
 Semaphores	DataSource		信号量
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		高速缓存
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		MiB
 Media nodes	DataSource		媒介节点
 Text clipboard	DataSource		文本剪贴板
 Network send	DataSource		网络发送
-Cache	DataSource		高速缓存
 Running applications	DataSource		运行程序
-Threads	DataSource		线程
+Cache	DataSource		高速缓存
 CPU usage (combined)	DataSource		CPU 使用率（总和）
+Threads	DataSource		线程
 Receiving	DataSource		接收
+Remove graph	ActivityView		删除图示
 Swap space	DataSource		交换空间
 CPU	DataSource		CPU
+ActivityMonitor	System name		系统监视器
 CPU %d	DataSource		CPU %d
+Update time interval:	SettingsWindow		更新频率：
 RX	DataSource	Shorter version for Receiving.	RX
+Settings…	ActivityWindow		设置...
 Block cache	DataSource		高速缓存
 Memory	DataSource		内存
 CPU usage	DataSource		CPU使用率
+Quit	ActivityWindow		退出
 Raw clipboard	DataSource		原始剪贴板
+Settings	ActivityWindow		设置
 Used memory	DataSource		已用内存
 %.1f faults/s	DataSource		%.1f faults/s
+Show legend	ActivityView		显示说明
 Cached memory	DataSource		高速缓存
 CPU %d usage	DataSource		CPU %d 用量
+File	ActivityWindow		文件
 Ports	DataSource		端口
 Page faults	DataSource		页面错误
 Apps	DataSource		应用程序
+Additional items	ActivityView		附加项
+Add graph	ActivityWindow		添加图示
 Sending	DataSource		发送
 %.1f MiB	DataSource		%.1f MiB
+Always on top	ActivityWindow		始终置顶
 Swap	DataSource		Swap
+%lld sec.	SettingsWindow		%lld sec.
 P-faults	DataSource		页面错误
 Sems	DataSource		Sems
 Network receive	DataSource		网络接收

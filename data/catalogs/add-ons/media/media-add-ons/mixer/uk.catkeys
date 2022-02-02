@@ -1,27 +1,21 @@
-1	ukrainian	x-vnd.Haiku-mixer.media_addon	3450667169
-Input gain controls represent	AudioMixer		Представлення регуляторів підсилення вхідного сигналу
-Linear interpolation	AudioMixer		Лінійна інтерполяція
-Virtual output channels	AudioMixer		Віртуальні вихідні канали
-Refuse output format changes	AudioMixer		Відхилити зміни вихідного формату
-Output mapping	AudioMixer		Перепризначення виходу
-Allow input channel remapping	AudioMixer		Дозволити перепризначення вхідного каналу
-Resampling algorithm	AudioMixer		Алгоритм передискретизації
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Послабити вихід мікшера на 3 дБ (як у BeOS R5)
-Display balance control for stereo connections	AudioMixer		Показати регулятор балансу для стереоз'єднань
+1	ukrainian	x-vnd.Haiku-mixer.media_addon	2690542047
+Input mapping	AudioMixer		Перепризначення входу
 To output	AudioMixer		До виходу
-not connected	AudioMixer		не приєднано
+Refuse output format changes	AudioMixer		Відхилити зміни вихідного формату
+Gain	AudioMixer		Підсилення
+To master	AudioMixer		До головного
 Refuse input format changes	AudioMixer		Відхилити зміни вхідного формату
-Drop/repeat samples	AudioMixer		Пропуск/повтор семплів
-Output channel sources	AudioMixer		Джерела вихідного канала
+not connected	AudioMixer		не приєднано
+Master output	AudioMixer		Головний вихід
 dB	AudioMixer		дБ
 Gain controls	AudioMixer		Регулювання підсилення
-Input mapping	AudioMixer		Перепризначення входу
-Mute	AudioMixer		Заглушити
-Input channel destinations	AudioMixer		Напрямки вхідних каналів
-To master	AudioMixer		До головного
-Master output	AudioMixer		Головний вихід
+Output channel sources	AudioMixer		Джерела вихідного канала
+Allow input channel remapping	AudioMixer		Дозволити перепризначення вхідного каналу
+Display balance control for stereo connections	AudioMixer		Показати регулятор балансу для стереоз'єднань
 Setup	AudioMixer		Настройки
-Use non linear gain sliders (like BeOS R5)	AudioMixer		Використовувати нелінійні регулятори підсилення (як у BeOS R5)
-Gain	AudioMixer		Підсилення
-Allow output channel remapping	AudioMixer		Дозволити перепризначення вихідного каналу
 Physical input channels	AudioMixer		Фізичні вхідні канали
+Input channel destinations	AudioMixer		Напрямки вхідних каналів
+Mute	AudioMixer		Заглушити
+Output mapping	AudioMixer		Перепризначення виходу
+Virtual output channels	AudioMixer		Віртуальні вихідні канали
+Allow output channel remapping	AudioMixer		Дозволити перепризначення вихідного каналу

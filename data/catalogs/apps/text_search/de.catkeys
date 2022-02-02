@@ -1,6 +1,7 @@
-1	german	x-vnd.Haiku.TextSearch	1044621691
+1	german	x-vnd.Haiku.TextSearch	123061032
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Bitte die Dateien auswählen, die im Tracker markiert werden sollen.
 %appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		Konnte xargs Program nicht starten!
 Open selection	GrepWindow		Auswahl öffnen
 Actions	GrepWindow		Aktionen
 New window	GrepWindow		Neues Fenster
@@ -8,9 +9,9 @@ Encoding	GrepWindow		Kodierung
 Set target to parent folder	GrepWindow		Ziel auf übergeordneten Order ändern
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
-Set target			Ziel wählen
 Close	GrepWindow		Schließen
 Look in sub-folders	GrepWindow		Unterordner durchsuchen
+%s: Not enough room to escape the filename.	Grepper		%s: Nicht genügend Platz für Escape-Sequenzen für den Dateinamen.
 Follow symbolic links	GrepWindow		Verknüpfungen folgen
 Regular expression	GrepWindow		Regulärer Ausdruck
 Text files only	GrepWindow		Nur Textdateien
@@ -18,12 +19,16 @@ Quit	GrepWindow		Beenden
 Show files in Tracker	GrepWindow		Dateien im Tracker zeigen
 Please select the files you wish to keep searching.	GrepWindow		Bitte die Dateien auswählen, die weiterhin durchsucht werden sollen.
 Trim to selection	GrepWindow		Auf Auswahl begrenzen
+Set target…	GrepWindow		Ziel wählen ...
+Failed to open input pipe!	Grepper		Konnte Input-Pipe nicht öffnen!
 Search	GrepWindow		Suchen
 Copy text to clipboard	GrepWindow		Text in Ablage kopieren
 Show lines	GrepWindow		Treffer-Zeilen anzeigen
+Failed to open errors pipe!	Grepper		Konnte die Error-Pipe nicht öffnen!
 The unselected files will be removed from the list.	GrepWindow		Die nicht ausgewählten Dateien werden aus der Liste entfernt.
 Open files in code editor	GrepWindow		Öffne Dateien im Code-Editor
 Skip folders starting with a dot	GrepWindow		Mit Punkt beginnende Ordner ignorieren
+Failed to open output pipe!	Grepper		Konnte Output-Pipe nicht öffnen!
 Cancel	GrepWindow		Abbrechen
 History	GrepWindow		Historie
 File	GrepWindow		Datei

@@ -1,25 +1,2 @@
-1	dutch; flemish	x-vnd.Haiku-WebPTranslator	828165164
-©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
-Compression method:	ConfigView		Compressie methode:
-WebP image translator	ConfigView		WebP afbeelding vertaler
-Preset	ConfigView		Voorinstelling
-WebP images	WebPTranslator		WebP afbeeldingen
-WebPTranslator Settings	ConfigView		WebPVertaler Instellingen
-Output quality:	ConfigView		Uitvoerkwaliteit:
-©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+1	dutch; flemish	x-vnd.Haiku-WebPTranslator	1475550615
 WebP Settings	main		WebP Instellingen
-Text	ConfigView		Tekst
-Slower but better	ConfigView		Trager maar beter
-WebP image	WebPTranslator		WebP afbeelding
-Output preset:	ConfigView		Uitvoer voorinstellingen:
-Picture	ConfigView		Afbeelding
-Low	ConfigView		Laag
-High	ConfigView		Hoog
-Drawing	ConfigView		Tekening
-Based on libwebp %version%	ConfigView		Gebaseerd op libwebp %version%
-Default	ConfigView		Standaard
-Fast	ConfigView		Snel
-Photo	ConfigView		Foto
-Preprocessing filter	ConfigView		Voorverwerkingsfilter
-WebP image translator	WebPTranslator		WebP afbeelding vertaler
-Icon	ConfigView		Pictogram

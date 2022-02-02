@@ -1,37 +1,48 @@
-1	french	x-vnd.Haiku-ActivityMonitor	3850445261
+1	french	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Processus
 Semaphores	DataSource		Sémaphores
 TX	DataSource	Shorter version for Sending	Tx
 Block cache memory	DataSource		Mémoire cache de blocs
+%lld ms	SettingsWindow		%lld ms
 MiB	DataSource		Mio
 Media nodes	DataSource		Nœuds média
 Text clipboard	DataSource		Presse-papier texte
 Network send	DataSource		Émission réseau
-Cache	DataSource		Cache
 Running applications	DataSource		Applications en cours
-Threads	DataSource		Tâches
+Cache	DataSource		Cache
 CPU usage (combined)	DataSource		Activité CPU (combinée)
+Threads	DataSource		Tâches
 Receiving	DataSource		Réception
+Remove graph	ActivityView		Supprimer un graphe
 Swap space	DataSource		Espace d’échange
 CPU	DataSource		CPU
+ActivityMonitor	System name		Moniteur d’activité
 CPU %d	DataSource		CPU %d
+Update time interval:	SettingsWindow		Fréquence de mise à jour :
 RX	DataSource	Shorter version for Receiving.	Rx
+Settings…	ActivityWindow		Réglages…
 Block cache	DataSource		Cache blocs
 Memory	DataSource		Mémoire
-CPU speed	DataSource		Vitesse CPU
 CPU usage	DataSource		Activité CPU
+Quit	ActivityWindow		Quitter
 Raw clipboard	DataSource		Presse-papier brut
+Settings	ActivityWindow		Réglages
 Used memory	DataSource		Mémoire utilisée
 %.1f faults/s	DataSource		%.1f fautes/s
+Show legend	ActivityView		Afficher la légende
 Cached memory	DataSource		Mémoire cache
-CPU %d speed	DataSource		Vitesse CPU %d
 CPU %d usage	DataSource		Charge du CPU %d
+File	ActivityWindow		Fichier
 Ports	DataSource		Ports
 Page faults	DataSource		Fautes de pages
 Apps	DataSource		Applis
+Additional items	ActivityView		Éléments supplémentaires
+Add graph	ActivityWindow		Ajouter un graphe
 Sending	DataSource		Émission
 %.1f MiB	DataSource		%.1f Mio
+Always on top	ActivityWindow		Toujours au-dessus
 Swap	DataSource		Échange
+%lld sec.	SettingsWindow		%lld sec.
 P-faults	DataSource		P-fautes
 Sems	DataSource		Sems
 Network receive	DataSource		Réception réseau

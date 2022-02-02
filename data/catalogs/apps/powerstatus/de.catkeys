@@ -5,7 +5,7 @@ Show status icon	PowerStatus		Statusicon anzeigen
 Battery charging	PowerStatus		Akku wird geladen
 Design capacity low warning: 	PowerStatus		Kapazitätswarnung (Herstellerangabe):
 The battery level is critical, please plug in the device immediately.	PowerStatus		Der Akku ist beinahe leer; er sollte sofort geladen werden.
-non-rechargeable	PowerStatus		nicht aufladbar
+non-rechargeable	PowerStatus		nicht wiederaufladbar
 Last full charge: 	PowerStatus		Letzte vollständige Ladung:
  mV	PowerStatus		mV
 Current rate: 	PowerStatus		Aktueller Wert:
@@ -22,10 +22,10 @@ Battery discharging	PowerStatus		Akku wird entladen
 Design voltage: 	PowerStatus		Spannung (lt. Hersteller):
 discharging	PowerStatus		wird entladen
 rechargeable	PowerStatus		wiederaufladbar
-Battery info…	PowerStatus		Akku-Infos…
+Battery info…	PowerStatus		Akku-Infos …
 Show time	PowerStatus		Zeit anzeigen
  mA	PowerStatus		 mA
-About…	PowerStatus		Über…
+About…	PowerStatus		Über …
 Serial number: 	PowerStatus		Seriennummer:
 Battery critical	PowerStatus		Ladezustand kritisch
 Capacity: 	PowerStatus		Kapazität:
@@ -33,7 +33,7 @@ Capacity: 	PowerStatus		Kapazität:
 No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Es wurde kein unterstützter Akku gefunden. Daher funktioniert PowerStatus auf diesem Rechner nicht.
 Show percent	PowerStatus		Prozent anzeigen
 Capacity granularity 1: 	PowerStatus		Kapazitätsgenauigkeit 1:
-The battery level is getting low, please plug in the device.	PowerStatus		Der Akku ist ziemlich leer; er sollte demnächst geladen werden.
+The battery level is getting low, please plug in the device.	PowerStatus		Die Ladung geht zu Neige. Der Akku sollte jetzt geladen werden.
 Design capacity warning: 	PowerStatus		Kapazitätswarnung (lt. Hersteller):
 Capacity granularity 2: 	PowerStatus		Kapazitätsgenauigkeit 2:
 Too bad!	PowerStatus		Schade!

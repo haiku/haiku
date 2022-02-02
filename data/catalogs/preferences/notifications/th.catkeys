@@ -1,3 +1,30 @@
-1	thai	x-vnd.Haiku-Notifications	1522084233
-General	PrefletView		ทั่วไป
+1	thai	x-vnd.Haiku-Notifications	3906219317
+Lower left	GeneralView		Lower left
+Application does not have a valid signature	NotificationView	Alert message	แอปพลิเคชันไม่มีลายเซ็นที่ถูกต้อง
+Status	NotificationView		สถานะ
+Add…	NotificationView		เพิ่ม
+Lower right	GeneralView		Lower right
+Muted	NotificationView		ปิดเสียง
+ is already listed	NotificationView	Alert message	อยู่ในรายการแล้ว
+OK	PrefletWin		ตกลง
+Notifications	PrefletWin		แจ้ง
+Notifications preflet sample	PrefletWin		แจ้งเตือนตัวอย่าง preflet
+Mute notifications from this application	NotificationView		ปิดเสียงการแจ้งเตือนจากแอปพลิเคชันนี้
+Revert	PrefletWin		เปลี่ยนกลับ
 Applications	PrefletView		แอพลิเคชั่น
+Upper right	GeneralView		Upper right
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		เกิดข้อผิดพลาดในการบันทึกค่ากำหนด\nเป็นไปได้ว่าคุณมีพื้นที่ดิสก์ไม่เพียงพอ
+Defaults	PrefletWin		ค่าเริ่มต้น
+Upper left	GeneralView		Upper left
+Applications	NotificationView		แอพพลิเคชั่น
+General	PrefletView		ทั่วไป
+OK	NotificationView		ตกลง
+Follow Deskbar	GeneralView		ติดตามเดสก์บาร์
+Notifications	System name		แจ้งเตือน
+Allowed	NotificationView		อนุญาต
+Duration:	GeneralView		ระยะเวลา:
+Application	NotificationView		แอพพลิเคชั่น
+Enable notifications	GeneralView		เปิดใช้งานการแจ้งเตือน
+This is a test notification message	PrefletWin		นี่คือข้อความแจ้งเตือนการทดสอบ
+Remove	NotificationView		ลบ
+Position:	GeneralView		ตำแหน่ง:

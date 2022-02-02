@@ -1,3 +1,34 @@
-1	italian	x-vnd.Haiku-Notifications	1522084233
-General	PrefletView		Generale
+1	italian	x-vnd.Haiku-Notifications	4196496676
+Lower left	GeneralView		In basso a sinistra
+Application does not have a valid signature	NotificationView	Alert message	L'applicazione non ha una firma valida
+Status	NotificationView		Stato
+Add…	NotificationView		Aggiungi…
+Lower right	GeneralView		In basso a destra
+Muted	NotificationView		Silenziato
+ is already listed	NotificationView	Alert message	 è già in elenco
+OK	PrefletWin		OK
+Notifications	PrefletWin		Notifiche
+Notifications preflet sample	PrefletWin		Esempio di preflet di notifica
+Mute notifications from this application	NotificationView		Silenzia le notifiche da questa applicazione
+wide	GeneralView	Window width: Slider high text	largo
+narrow	GeneralView	Window width: Slider low text	stretto
+Revert	PrefletWin		Ripristina
 Applications	PrefletView		Applicazioni
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Timeout: # secondo}other{Timeout: # secondi}}
+Upper right	GeneralView		In alto a destra
+An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Si è verificato un errore durante il salvataggio delle preferenze.\nÈ possibile che lo spazio disponibile sia in esaurimento.
+Defaults	PrefletWin		Predefiniti
+Upper left	GeneralView		In alto a sinistra
+Window width	GeneralView		Bordo finestra
+Applications	NotificationView		Applicazioni
+General	PrefletView		Generale
+OK	NotificationView		OK
+Follow Deskbar	GeneralView		Segui la Deskbar
+Notifications	System name		Notifiche
+Allowed	NotificationView		Permesso
+Duration:	GeneralView		Durata:
+Application	NotificationView		Applicazione
+Enable notifications	GeneralView		Abilita le notifiche
+This is a test notification message	PrefletWin		Questo è un messaggio di notifica di prova
+Remove	NotificationView		Rimuovi
+Position:	GeneralView		Posizione:

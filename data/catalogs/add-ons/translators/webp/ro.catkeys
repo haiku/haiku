@@ -1,25 +1,2 @@
-1	romanian	x-vnd.Haiku-WebPTranslator	828165164
-©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
-Compression method:	ConfigView		Metodă de compresie:
-WebP image translator	ConfigView		Traducător de imagine WebP
-Preset	ConfigView		Prestabilit
-WebP images	WebPTranslator		Imagini WebP
-WebPTranslator Settings	ConfigView		Configurări WebPTranslator
-Output quality:	ConfigView		Calitatea ieșirii:
-©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+1	romanian	x-vnd.Haiku-WebPTranslator	1475550615
 WebP Settings	main		Configurări WebP
-Text	ConfigView		Text
-Slower but better	ConfigView		Mai lent dar mai bine
-WebP image	WebPTranslator		Imagine WebP
-Output preset:	ConfigView		Ieșire prestabilită:
-Picture	ConfigView		Poză
-Low	ConfigView		Scăzută
-High	ConfigView		Ridicată
-Drawing	ConfigView		Desenare
-Based on libwebp %version%	ConfigView		Bazat pe libwebp %version%
-Default	ConfigView		Implicit
-Fast	ConfigView		Rapid
-Photo	ConfigView		Fotografie
-Preprocessing filter	ConfigView		Filtru de preprocesare
-WebP image translator	WebPTranslator		Traducător de imagine WebP
-Icon	ConfigView		Pictogramă
