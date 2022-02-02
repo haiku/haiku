@@ -142,8 +142,6 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 		gKernelArgs.num_virtual_allocated_ranges);
 
 	// Switch EFI to virtual mode, using the kernel pmap.
-	// Something involving ConvertPointer might need to be done after this?
-	// http://wiki.phoenix.com/wiki/index.php/EFI_RUNTIME_SERVICES
 	kRuntimeServices->SetVirtualAddressMap(memory_map_size, descriptor_size,
 		descriptor_version, memory_map);
 
