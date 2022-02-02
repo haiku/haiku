@@ -429,7 +429,7 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 {
 	addr_t memory_map_addr = (addr_t)memory_map;
 
-	Mair currentMair;
+	MemoryAttributeIndirection currentMair;
 
 // 	arch_mmu_allocate_page_tables();
 	arch_mmu_allocate_kernel_page_tables();

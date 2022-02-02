@@ -135,10 +135,10 @@ private:
 };
 
 
-class Mair {
+class MemoryAttributeIndirection {
 
 public:
-	Mair(uint8 el = kInvalidExceptionLevel)
+	MemoryAttributeIndirection(uint8 el = kInvalidExceptionLevel)
 	{
 		if (el == kInvalidExceptionLevel) {
 			el = arch_exception_level();

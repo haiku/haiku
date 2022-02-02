@@ -55,6 +55,10 @@ FUNCTION(_arch_transition_EL2_EL1):
 	mov x10, sp
 	msr sp_el1, x10
 
+	// Enable FP/SIMD
+	mov x10, #3 << 20
+	msr cpacr_el1, x10
+
     b drop_to_el1
     // eret will return to caller
 FUNCTION_END(_arch_transition_EL2_EL1)
