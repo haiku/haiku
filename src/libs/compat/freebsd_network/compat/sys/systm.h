@@ -99,8 +99,6 @@ extern int vsnprintf(char *, size_t, const char *, __va_list)
 int msleep(void *, struct mtx *, int, const char *, int);
 int _pause(const char *, int);
 #define pause(waitMessage, timeout) _pause((waitMessage), (timeout))
-#define tsleep(channel, priority, waitMessage, timeout) \
-	msleep((channel), NULL, (priority), (waitMessage), (timeout))
 #define msleep_spin(chan, mtx, wmesg, timo) \
 	msleep(chan, mtx, PZERO, wmesg, timo)
 #define mtx_sleep msleep

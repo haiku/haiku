@@ -18,8 +18,7 @@ KernelStaticLibrary libfreebsd_network.a :
 	bus_dma.cpp
 	callout.cpp
 	clock.c
-	condvar.c
-	Condvar.cpp
+	condvar.cpp
 	device.c
 	device_hooks.c
 	driver.c
@@ -45,7 +44,7 @@ KernelStaticLibrary libfreebsd_network.a :
 	priv.cpp
 	smp.c
 	subr_autoconf.cpp
-	synch.c
+	synch.cpp
 	systm.cpp
 	sysinit.c
 	taskqueue.c
