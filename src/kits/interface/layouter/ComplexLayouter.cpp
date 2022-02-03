@@ -605,6 +605,12 @@ ComplexLayouter::_ValidateLayout()
 		Constraint* constraint = fConstraints[i];
 		while (constraint != NULL) {
 			int32 minSum = fSums[constraint->start].min + constraint->min;
+			//Do not allow the cumulative minimum at fSums[i+1].min to be less than the
+			//cumulative minimum already established at fSums[i].min (fSums[i] may have been
+			//ignored if fSums[constraint->start] evaluates to, say, fSums[i-1]).
+			if (minSum < fSums[i].min) {
+				minSum = fSums[i].min;
+			}
 			if (minSum > sum.min) {
 				sum.min = minSum;
 			} else {

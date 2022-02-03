@@ -408,7 +408,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 
 	BLayoutBuilder::Grid<>(typeBox, padding, padding)
 		.SetInsets(padding, padding * 2, padding, padding)
-		.Add(scrollView, 0, 0, 1, 4)
+		.Add(scrollView, 0, 0, 1, 5)
 		.Add(fAddTypeButton, 1, 0, 1, 2)
 		.Add(fRemoveTypeButton, 1, 2, 1, 2)
 		.Add(iconHolder, 2, 1, 1, 2)
@@ -515,7 +515,7 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 				.Add(flagsBox, 3)
 				.Add(iconBox, 1)
 				.End()
-			.Add(typeBox)
+			.Add(typeBox, 2)
 			.Add(versionBox);
 
 	SetKeyMenuBar(menuBar);
