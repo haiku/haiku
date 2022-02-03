@@ -18,6 +18,34 @@ pci_module_info* gPci;
 pci_x86_module_info* gPCIx86Module;
 
 
+static struct {
+	uint16	vendor;
+	uint16	device;
+} kSupportedDevices[] = {
+	{ 0x8086, 0x9d71},	// 200 Series HD Audio
+	{ 0x8086, 0x9dc8},	// 300 Series HD Audio
+	{ 0x8086, 0x06c8},	// 400 Series cAVS
+	{ 0x8086, 0xa0c8},	// 500 Series HD Audio
+	{ 0x8086, 0x4dc8},	// JasperLake HD Audio
+	{ 0x8086, 0x43c8},	// Tiger Lake-H HD Audio
+	{ 0x8086, 0xa171},	// CM238 HD Audio
+	{ 0x8086, 0x3198},	// GeminiLake HD Audio
+};
+
+
+static bool
+supports_device(pci_info &info)
+{
+	for (size_t i = 0; i < B_COUNT_OF(kSupportedDevices); i++) {
+		if (info.vendor_id == kSupportedDevices[i].vendor
+			&& info.device_id == kSupportedDevices[i].device) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
 extern "C" status_t
 init_hardware(void)
 {
@@ -28,8 +56,9 @@ init_hardware(void)
 		return ENODEV;
 
 	for (i = 0; gPci->get_nth_pci_info(i, &info) == B_OK; i++) {
-		if (info.class_base == PCI_multimedia
-			&& info.class_sub == PCI_hd_audio) {
+		if ((info.class_base == PCI_multimedia
+				&& info.class_sub == PCI_hd_audio)
+			|| supports_device(info)) {
 			put_module(B_PCI_MODULE_NAME);
 			return B_OK;
 		}
@@ -54,8 +83,9 @@ init_driver(void)
 
 	for (i = 0; gPci->get_nth_pci_info(i, &info) == B_OK
 			&& gNumCards < MAX_CARDS; i++) {
-		if (info.class_base == PCI_multimedia
-			&& info.class_sub == PCI_hd_audio) {
+		if ((info.class_base == PCI_multimedia
+				&& info.class_sub == PCI_hd_audio)
+			|| supports_device(info)) {
 #ifdef __HAIKU__
 			if ((*gPci->reserve_device)(info.bus, info.device, info.function,
 				"hda", &gCards[gNumCards]) < B_OK) {

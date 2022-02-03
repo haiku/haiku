@@ -18,6 +18,14 @@
 #include "hda_codec_defs.h"
 
 
+//#define TRACE_HDA_VERBS
+#ifdef TRACE_HDA_VERBS
+#	define TRACE_VERBS(x...) dprintf("\33[33mhda:\33[0m " x)
+#else
+#	define TRACE_VERBS(x...) ;
+#endif
+
+
 #define MAKE_RATE(base, multiply, divide) \
 	((base == 44100 ? FORMAT_44_1_BASE_RATE : 0) \
 		| ((multiply - 1) << FORMAT_MULTIPLY_RATE_SHIFT) \
@@ -1026,6 +1034,9 @@ hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, uint32 count)
 			}
 
 			controller->corb[writePos] = verbs[sent++];
+			TRACE_VERBS("send_verb: (%02x:%02x.%x:%u) cmd 0x%08" B_PRIx32 "\n",
+				controller->pci_info.bus, controller->pci_info.device,
+				controller->pci_info.function, codec->addr, controller->corb[writePos]);
 			controller->corb_write_pos = writePos;
 			queued++;
 		}
@@ -1037,8 +1048,13 @@ hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, uint32 count)
 			return status;
 	}
 
-	if (responses != NULL)
+	if (responses != NULL) {
+		TRACE_VERBS("send_verb: (%02x:%02x.%x:%u) resp 0x%08" B_PRIx32 "\n",
+			controller->pci_info.bus, controller->pci_info.device,
+			controller->pci_info.function, codec->addr, codec->responses[0]);
+
 		memcpy(responses, codec->responses, count * sizeof(uint32));
+	}
 
 	return B_OK;
 }
@@ -1320,6 +1336,14 @@ hda_hw_stop(hda_controller* controller)
 	for (uint32 index = 0; index < HDA_MAX_STREAMS; index++) {
 		if (controller->streams[index] && controller->streams[index]->running)
 			hda_stream_stop(controller, controller->streams[index]);
+	}
+
+	// Power off the audio functions
+	for (uint32 index = 0; index < controller->active_codec->num_audio_groups; index++) {
+		hda_audio_group* audioGroup = controller->active_codec->audio_groups[index];
+		corb_t verb = MAKE_VERB(audioGroup->codec->addr, audioGroup->widget.node_id,
+			VID_SET_POWER_STATE, 3);
+		hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
 	}
 }
 
