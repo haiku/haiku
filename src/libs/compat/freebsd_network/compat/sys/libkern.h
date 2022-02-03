@@ -9,6 +9,8 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
+__BEGIN_DECLS
+
 
 extern int random(void);
 u_int read_random(void *, u_int);
@@ -19,5 +21,8 @@ static __inline int imax(int a, int b) { return (a > b ? a : b); }
 static __inline int imin(int a, int b) { return (a < b ? a : b); }
 
 extern int abs(int a);
+
+
+__END_DECLS
 
 #endif /* _FBSD_COMPAT_SYS_LIBKERN_H_ */
