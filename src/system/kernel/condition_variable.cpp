@@ -203,25 +203,21 @@ ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 	}
 #endif
 
-	// The race in-between get_and_set and (re)set is irrelevant, because
-	// if the status really is <= 0, we have already been or are about to
-	// be removed from the variable, and nothing else is going to set the status.
-	status_t waitStatus = atomic_get_and_set(&fWaitStatus, STATUS_WAITING);
-	if (waitStatus <= 0) {
-		fWaitStatus = waitStatus;
-		return waitStatus;
-	}
+	ConditionVariable* variable = atomic_pointer_get(&fVariable);
+	if (variable == NULL)
+		return fWaitStatus;
 
 	InterruptsLocker _;
+	SpinLocker schedulerLocker(thread_get_current_thread()->scheduler_lock);
+
+	if (fWaitStatus <= 0)
+		return fWaitStatus;
+	fWaitStatus = STATUS_WAITING;
 
 	thread_prepare_to_block(thread_get_current_thread(), flags,
-		THREAD_BLOCK_TYPE_CONDITION_VARIABLE, atomic_pointer_get(&fVariable));
+		THREAD_BLOCK_TYPE_CONDITION_VARIABLE, variable);
 
-	waitStatus = atomic_get(&fWaitStatus);
-	if (waitStatus <= 0) {
-		// We were just woken up! Unblock ourselves immediately.
-		thread_unblock(thread_get_current_thread(), waitStatus);
-	}
+	schedulerLocker.Unlock();
 
 	status_t error;
 	if ((flags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0)
@@ -443,14 +439,14 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 				cpu_pause();
 			}
 		} else {
-			status_t waitStatus = atomic_get_and_set(&entry->fWaitStatus, result);
-
-			SpinLocker threadLocker(thread->scheduler_lock);
-			if (waitStatus == STATUS_WAITING && thread->state != B_THREAD_WAITING) {
+			SpinLocker schedulerLocker(thread->scheduler_lock);
+			status_t lastWaitStatus = entry->fWaitStatus;
+			entry->fWaitStatus = result;
+			if (lastWaitStatus == STATUS_WAITING && thread->state != B_THREAD_WAITING) {
 				// The thread is not in B_THREAD_WAITING state, so we must unblock it early,
 				// in case it tries to re-block itself immediately after we unset fVariable.
 				thread_unblock_locked(thread, result);
-				waitStatus = result;
+				lastWaitStatus = result;
 			}
 
 			// No matter what the thread is doing, as we were the ones to clear its
@@ -462,7 +458,7 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 			// If the thread was in B_THREAD_WAITING state, we unblock it after unsetting
 			// fVariable, because otherwise it will wake up before thread_unblock returns
 			// and spin while waiting for us to do so.
-			if (waitStatus == STATUS_WAITING)
+			if (lastWaitStatus == STATUS_WAITING)
 				thread_unblock_locked(thread, result);
 		}
 
