@@ -26,8 +26,8 @@
 #include <string.h>
 
 #include "arch_mailbox.h"
-#include "arch_mmu.h"
 #include "fdt_support.h"
+#include "mmu.h"
 
 
 //XXX

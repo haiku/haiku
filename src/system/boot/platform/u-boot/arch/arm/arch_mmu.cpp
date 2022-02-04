@@ -6,7 +6,7 @@
  */
 
 
-#include "arch_mmu.h"
+#include "mmu.h"
 
 #include <boot/platform.h>
 #include <boot/stdio.h>
