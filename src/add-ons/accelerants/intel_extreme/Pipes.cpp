@@ -331,7 +331,7 @@ Pipe::ConfigureScalePos(display_mode* target)
 
 
 void
-Pipe::ConfigureTimings(display_mode* target, bool hardware)
+Pipe::ConfigureTimings(display_mode* target, bool hardware, port_index portIndex)
 {
 	CALLED();
 
@@ -372,6 +372,13 @@ Pipe::ConfigureTimings(display_mode* target, bool hardware)
 	}
 
 	ConfigureScalePos(target);
+
+	// transcoder is not applicable if eDP is targeted on Sandy- and IvyBridge
+	if ((gInfo->shared_info->device_type.InGroup(INTEL_GROUP_SNB) ||
+		 gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IVB)) &&
+		(portIndex == INTEL_PORT_A)) {
+		return;
+	}
 
 	if (fHasTranscoder && hardware) {
 		_ConfigureTranscoder(target);

@@ -47,7 +47,8 @@ public:
 										uint32 bitsPerPixel);
 		void						ConfigureScalePos(display_mode* mode);
 		void						ConfigureTimings(display_mode* mode,
-										bool hardware = true);
+										bool hardware = true,
+										port_index portIndex = INTEL_PORT_ANY);
 		void						ConfigureClocks(
 										const pll_divisors& divisors,
 										uint32 pixelClock,

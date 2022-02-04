@@ -1152,7 +1152,6 @@ status_t
 DisplayPort::_SetPortLinkGen4(const display_timing& timing)
 {
 	// Khz / 10. ( each output octet encoded as 10 bits. 
-	//uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10; //=270000 khz
 	//fixme: always so?
 	uint32 linkBandwidth = 270000; //khz
 	uint32 fPipeOffset = 0;
@@ -1216,8 +1215,7 @@ status_t
 DisplayPort::_SetPortLinkGen6(const display_timing& timing)
 {
 	// Khz / 10. ( each output octet encoded as 10 bits.
-	//uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10; //=270000 khz
-	//fixme: eDP is fixed option 162 or 270Mc, other DPs go via DPLL programming to one of the same vals.
+	//note: (fixme) eDP is fixed option 162 or 270Mc, other DPs go via DPLL programming to one of the same vals.
 	uint32 linkBandwidth = 270000; //khz
 	TRACE("%s: DP link reference clock is %gMhz\n", __func__, linkBandwidth / 1000.0f);
 
@@ -1259,8 +1257,7 @@ DisplayPort::_SetPortLinkGen6(const display_timing& timing)
 	}
 	TRACE("%s: DP link colordepth: %" B_PRIu32 "\n", __func__, bitsPerPixel);
 
-	uint32 lanes =
-		1 << ((read32(_PortRegister()) & INTEL_DISP_PORT_WIDTH_MASK) >> INTEL_DISP_PORT_WIDTH_SHIFT);
+	uint32 lanes = ((read32(_PortRegister()) & INTEL_DISP_PORT_WIDTH_MASK) >> INTEL_DISP_PORT_WIDTH_SHIFT) + 1;
 	if (lanes > 4) {
 		ERROR("%s: DP illegal number of lanes set.\n", __func__);
 		return B_ERROR;
@@ -1386,15 +1383,59 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 			PanelFitter* fitter = fPipe->PFT();
 			if (fitter != NULL)
 				fitter->Enable(hardwareTarget);
-			// we should skip FDI if PORT_A, but need pipe M/N programming (is eDP link), so call always for now
-			FDILink* link = fPipe->FDI();
-			if (link != NULL) {
-				uint32 lanes = 0;
-				uint32 linkBandwidth = 0;
-				uint32 bitsPerPixel = 0;
-				link->PreTrain(&hardwareTarget, &linkBandwidth, &lanes, &bitsPerPixel);
+
+			uint32 lanes = 0;
+			uint32 linkBandwidth = 0;
+			uint32 bitsPerPixel = 0;
+			if (PortIndex() != INTEL_PORT_A) {
+				FDILink* link = fPipe->FDI();
+				if (link != NULL) {
+					link->PreTrain(&hardwareTarget, &linkBandwidth, &lanes, &bitsPerPixel);
+					fPipe->SetFDILink(hardwareTarget, linkBandwidth, lanes, bitsPerPixel);
+					link->Train(&hardwareTarget, lanes);
+				}
+			} else {
+				// 'local' eDP port is in use
+				linkBandwidth =
+					(read32(INTEL_DISPLAY_PORT_A) & INTEL_DISP_EDP_PLL_FREQ_MASK) >> INTEL_DISP_EDP_PLL_FREQ_SHIFT;
+				switch (linkBandwidth) {
+					case INTEL_DISP_EDP_PLL_FREQ_270:
+						linkBandwidth = 270000; //khz
+						break;
+					case INTEL_DISP_EDP_PLL_FREQ_162:
+						linkBandwidth = 162000; //khz
+						break;
+					default:
+						TRACE("%s: eDP illegal reference clock ID set, assuming 270Mhz.\n", __func__);
+						linkBandwidth = 270000; //khz
+				}
+
+				bitsPerPixel =
+					(read32(INTEL_DISPLAY_A_PIPE_CONTROL) & INTEL_PIPE_BPC_MASK) >> INTEL_PIPE_COLOR_SHIFT;
+				switch (bitsPerPixel) {
+					case INTEL_PIPE_8BPC:
+						bitsPerPixel = 24;
+						break;
+					case INTEL_PIPE_10BPC:
+						bitsPerPixel = 30;
+						break;
+					case INTEL_PIPE_6BPC:
+						bitsPerPixel = 18;
+						break;
+					case INTEL_PIPE_12BPC:
+						bitsPerPixel = 36;
+						break;
+					default:
+						bitsPerPixel = 0;
+				}
+
+				lanes = 2; //fixme: doc is incorrect on SandyBridge (DP_CTL b19..21 is NOT port_width)
+				if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IVB)) {
+					lanes =
+						((read32(_PortRegister()) & INTEL_DISP_PORT_WIDTH_MASK) >> INTEL_DISP_PORT_WIDTH_SHIFT) + 1;
+				}
+
 				fPipe->SetFDILink(hardwareTarget, linkBandwidth, lanes, bitsPerPixel);
-				link->Train(&hardwareTarget, lanes);
 			}
 
 			// Program general pipe config
@@ -1403,7 +1444,7 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 			// Pll programming is not needed for (e)DP..
 
 			// Program target display mode
-			fPipe->ConfigureTimings(target, !needsScaling);
+			fPipe->ConfigureTimings(target, !needsScaling, PortIndex());
 		} else {
 			TRACE("%s: Setting display mode via fallback: using scaling!\n", __func__);
 			// Keep monitor at native mode and scale image to that
