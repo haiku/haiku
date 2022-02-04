@@ -298,18 +298,19 @@ Painter::SetDrawState(const DrawState* state, int32 xOffset, int32 yOffset)
 	}
 
 	// any of these conditions means we need to use a different drawing
-	// mode instance
+	// mode instance, but when the pattern changes it is already changed
+	// from SetPattern
 	bool updateDrawingMode
-		= !(state->GetPattern() == fPatternHandler.GetPattern())
-			|| state->GetDrawingMode() != fDrawingMode
-			|| (state->GetDrawingMode() == B_OP_ALPHA
-				&& (state->AlphaSrcMode() != fAlphaSrcMode
-					|| state->AlphaFncMode() != fAlphaFncMode));
+		= state->GetPattern() == fPatternHandler.GetPattern()
+			&& (state->GetDrawingMode() != fDrawingMode
+				|| (state->GetDrawingMode() == B_OP_ALPHA
+					&& (state->AlphaSrcMode() != fAlphaSrcMode
+						|| state->AlphaFncMode() != fAlphaFncMode)));
 
 	fDrawingMode = state->GetDrawingMode();
 	fAlphaSrcMode = state->AlphaSrcMode();
 	fAlphaFncMode = state->AlphaFncMode();
-	fPatternHandler.SetPattern(state->GetPattern());
+	SetPattern(state->GetPattern().GetPattern());
 	fPatternHandler.SetOffsets(xOffset, yOffset);
 	fLineCapMode = state->LineCapMode();
 	fLineJoinMode = state->LineJoinMode();
