@@ -20,8 +20,8 @@ Open containing folder	Download Window		İndirildiği klasörü aç
 Find previous	WebPositive Window		Öncekini bul
 Full screen	WebPositive Window		Tam ekran
 Downloads in progress	WebPositive		Süren indirmeler
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount yer imini aynı anda açmak istediğinizden emin misiniz?
 Copy URL to clipboard	Download Window		URL'yi panoya kopyala
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount yer imini aynı anda açmak istediğinizden emin misiniz?
 Clone current page	Settings Window		Geçerli sayfadan bir tane daha aç
 Start page:	Settings Window		Başlangıç sayfası:
 Cancel	Download Window		İptal
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Küçült
 Default fixed font size:	Settings Window		Öntanımlı eş aralıklı yazıtipi boyutu:
 Sans serif font:	Settings Window		Sans serif yazıtipi:
 Clear	WebPositive Window		Temizle
-Cookies for %s	Cookie Manager		%s için çerezler
 The download could not be opened.	Download Window		İndirilen öge açılamadı.
+Cookies for %s	Cookie Manager		%s için çerezler
 Close	Download Window		Kapat
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Arama terimi
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		İndirmeleri sürdür
 Proxy server requires authentication	Settings Window		Vekil sunucu oturum açma gerektirir
 Cancel	Settings Window		İptal
-History	WebPositive Window		Geçmiş
 Reset size	WebPositive Window		Orijinal boyut
+History	WebPositive Window		Geçmiş
 Do you really want to clear the browsing history?	WebPositive Window		Tarama geçmişini temizlemek istediğinizden emin misiniz?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Arama dizgisinin bir sonraki oluşumunu bul
 Fixed font:	Settings Window		Eş aralıklı yazıtipi

@@ -1,4 +1,4 @@
-1	finnish	application/x-vnd.Cortex.support	2630173556
+1	finnish	application/x-vnd.Cortex.support	1625162530
 Header has flags	MediaString		Otsakkeella on lippuja
 32 bit HLS	MediaString		32-bittinen HLS
 Recording	MediaString		Tallennetaan
@@ -42,7 +42,6 @@ YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Oikea
 32 bit RGB	MediaString		32-bittinen RGB
-Video data between line u and u	MediaString		Videodata rivien u ja u välillä
 System mixer	MediaString		Järjestelmäsekoitin
 Physical output	MediaString		Fyysinen lähtö
 Top-Back-center	MediaString		Ylätaustakeskusta

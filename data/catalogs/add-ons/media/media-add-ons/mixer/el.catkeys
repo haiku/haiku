@@ -1,5 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-mixer.media_addon	2690542047
+1	greek, modern (1453-)	x-vnd.Haiku-mixer.media_addon	3797408169
 Input mapping	AudioMixer		Χαρτογράφηση εισόδου
+High quality (linear interpolation)	AudioMixer		Υψηλή ποιότητα (γραμμική παρεμβολή)
 To output	AudioMixer		Προς έξοδο
 Refuse output format changes	AudioMixer		Απαγόρευση αλλαγών στις μονάδες εξόδου
 Gain	AudioMixer		Απολαβή
@@ -9,13 +10,17 @@ not connected	AudioMixer		μη συνδεδεμένο
 Master output	AudioMixer		Κύρια έξοδος
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Έλεγχος απολαβής
+Low quality (drop/repeat samples)	AudioMixer		Χαμηλή ποιότητα (απόρριψη/επανάληψη δειγμάτων)
 Output channel sources	AudioMixer		Πηγές καναλιών εξόδου
 Allow input channel remapping	AudioMixer		Έγκριση επαναχαρτογράφησης του καναλιού εισαγωγής
 Display balance control for stereo connections	AudioMixer		Προβολή ελέγχου ισορροπίας ήχου για στερεοφωνικές συνδέσεις
 Setup	AudioMixer		Ρύθμιση
 Physical input channels	AudioMixer		Υλικά κανάλια εισόδου
 Input channel destinations	AudioMixer		Προορισμοί καναλιού εισαγωγής
+Resampling algorithm:	AudioMixer		Αλγόριθμος για resampling:
 Mute	AudioMixer		Σίγαση
 Output mapping	AudioMixer		Χαρτογράφηση εξόδου
 Virtual output channels	AudioMixer		Κανάλια εικονικής εξόδου
 Allow output channel remapping	AudioMixer		Έγκριση επαναχαρτογράφησης του καναλιού εξαγωγής
+Input gain controls represent:	AudioMixer		Τα χειριστήρια αύξησης εισόδου αναπαριστούν:
+Attenuate mixer output by 3 dB	AudioMixer		Εξασθένιση εξόδου του μίκτη κατά 3 dB

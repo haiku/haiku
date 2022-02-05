@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-ActivityMonitor	2601047281
+1	greek, modern (1453-)	x-vnd.Haiku-ActivityMonitor	826097672
 Teams	DataSource		Ομάδες
 Semaphores	DataSource		Σηματοφόροι
 TX	DataSource	Shorter version for Sending	ΑΠ
@@ -24,6 +24,7 @@ Settings…	ActivityWindow		Ρυθμίσεις…
 Block cache	DataSource		Αποκλεισμός cache
 Memory	DataSource		Μνήμη
 CPU usage	DataSource		Χρήση ΚΜΕ
+CPU speed	DataSource		Ταχύτητα ΚΜΕ
 Quit	ActivityWindow		Έξοδος
 Raw clipboard	DataSource		Ακατέργαστο πρόχειρο
 Settings	ActivityWindow		Ρυθμίσεις
@@ -32,6 +33,7 @@ Used memory	DataSource		Χρησιμοποιημένη μνήμη
 Show legend	ActivityView		Εμφάνιση υπομνήματος
 Cached memory	DataSource		Μνήμη προσωρινής αποθήκευσης
 CPU %d usage	DataSource		Χρήση ΚΜΕ %d
+CPU %d speed	DataSource		Ταχύτητα ΚΜΕ %d
 File	ActivityWindow		Αρχείο
 Ports	DataSource		Θύρες
 Page faults	DataSource		Σφάλματα σελίδας

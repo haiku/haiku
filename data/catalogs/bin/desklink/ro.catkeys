@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-desklink	3568085956
+1	romanian	x-vnd.Haiku-desklink	3759597613
 desklink	MediaReplicant	Title of an alert box	desklink
 Sound preferences…	MediaReplicant		Preferințe sunet…
 Muted	MediaReplicant		Dezactivat
@@ -7,7 +7,6 @@ OK	MediaReplicant		OK
 Couldn't launch 	MediaReplicant		Nu s-a putut lansa 
 Volume	VolumeControl		Volum
 Open MediaPlayer	MediaReplicant		Deschide MediaPlayer
-%d dB	VolumeControl		%d dB
 Media preferences…	MediaReplicant		Preferințe media…
 Options	MediaReplicant		Opțiuni
 Beep	MediaReplicant		Bip

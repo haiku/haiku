@@ -20,8 +20,8 @@ Open containing folder	Download Window		เปิดโฟลเดอร์ท�
 Find previous	WebPositive Window		ค้าหาก่อนหน้านี้
 Full screen	WebPositive Window		เต็มจอ
 Downloads in progress	WebPositive		กำลังดาวน์โหลดอยู่
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	คุณต้องการเปิด %addedCount คั่นหน้าจำนวนเพิ่มทั้งหมดในครั้งเดียวหรือไม่?
 Copy URL to clipboard	Download Window		คัดลอก URL ไปยังคลิปบอร์ด
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	คุณต้องการเปิด %addedCount คั่นหน้าจำนวนเพิ่มทั้งหมดในครั้งเดียวหรือไม่?
 Clone current page	Settings Window		ทำซ้ำหน้าปัจจุบัน
 Start page:	Settings Window		หน้าเริ่มต้น:
 Cancel	Download Window		ยกเลิก
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		ลดขนาด
 Default fixed font size:	Settings Window		ขนาดตัวอักษรเริ่มต้นคงที่:
 Sans serif font:	Settings Window		ตัวอักษร Sans serif:
 Clear	WebPositive Window		ลบ
-Cookies for %s	Cookie Manager		คุกกี้ %s
 The download could not be opened.	Download Window		ไม่สามารถเปิดการดาวน์โหลด
+Cookies for %s	Cookie Manager		คุกกี้ %s
 Close	Download Window		ปิด
 WebPositive	System name		Web Positive
 Reload	WebPositive Window		โหลดใหม่
@@ -109,8 +109,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		ดาวน์โหลดต่อไป
 Proxy server requires authentication	Settings Window		พร็อกซีเซิร์ฟเวอร์ต้องการการรับรองความถูกต้อง
 Cancel	Settings Window		ยกเลิก
-History	WebPositive Window		ประวัติ
 Reset size	WebPositive Window		ตั้งค่าขนาดใหม่
+History	WebPositive Window		ประวัติ
 Do you really want to clear the browsing history?	WebPositive Window		คุณต้องการล้างประวัติการเข้าชมจริง ๆ หรือไม่?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	ค้นหาคำที่ค้นหาถัดไป
 Fixed font:	Settings Window		ตัวอักษรคงที่:

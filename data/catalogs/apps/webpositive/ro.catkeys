@@ -20,8 +20,8 @@ Open containing folder	Download Window		Deschide dosarul conținător
 Find previous	WebPositive Window		Găsește anteriorul
 Full screen	WebPositive Window		Ecran complet
 Downloads in progress	WebPositive		Descărcări în progres
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Doriți să deschideți %addedCount marcaje în același timp?
 Copy URL to clipboard	Download Window		Copiază URL la clipboard
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Doriți să deschideți %addedCount marcaje în același timp?
 Clone current page	Settings Window		Clonează pagina curentă
 Start page:	Settings Window		Pagină de pornire:
 Cancel	Download Window		Anulează
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Micșorează dimensiunea
 Default fixed font size:	Settings Window		Dimensiune fixă implicită a fontului
 Sans serif font:	Settings Window		Fontul sans serif:
 Clear	WebPositive Window		Eliberează
-Cookies for %s	Cookie Manager		Cookies pentru %s
 The download could not be opened.	Download Window		Descărcarea nu a putut fi deschisă.
+Cookies for %s	Cookie Manager		Cookies pentru %s
 Close	Download Window		Închide
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - termen de căutare
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Continuă descărcările
 Proxy server requires authentication	Settings Window		Serverul proxy necesită autentificare
 Cancel	Settings Window		Anulează
-History	WebPositive Window		Istoric
 Reset size	WebPositive Window		Restabilește dimensiunea
+History	WebPositive Window		Istoric
 Do you really want to clear the browsing history?	WebPositive Window		Sigur doriți să ștergeți istoricul de navigare?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Găsiți următoarea apariție a termenilor de căutare
 Fixed font:	Settings Window		Font fixat:

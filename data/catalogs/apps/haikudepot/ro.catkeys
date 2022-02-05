@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	2668924891
+1	romanian	x-vnd.Haiku-HaikuDepot	1504929345
 Repository update error	LocalRepositoryUpdateProcess		Eroare de actualizare a depozitului
 Network error	ServerHelper		Eroare de rețea
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare la reîmprospătarea depozitului: %error%
@@ -95,7 +95,6 @@ Repository	PackageListView		Depozit
 The email is malformed.	UserLoginWindow		Emailul este deformat.
 Close	UserLoginWindow		Închide
 Close	RatePackageWindow		Închide
-An unexpected error has been sent from the server [%i]	ServerHelper		O eroare neașteptată a fost trimisă de la serverul [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronizează datele pachetelor pentru depozitul „%REPO_NAME%”
 Settings	SettingsWindow		Configurări
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		A apărut o eroare la descărcarea condițiilor de utilizare necesare pentru a crea unui nou utilizator. Verificați istoricul pentru detalii și încercați din nou. \nInformații despre modul de vizualizare a istoricului sunt disponibile în secțiunea HaikuDepot a Ghidului utilizatorului Haiku.

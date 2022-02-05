@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	2668924891
+1	french	x-vnd.Haiku-HaikuDepot	1504929345
 Repository update error	LocalRepositoryUpdateProcess		Erreur à l’actualisation du dépôt
 Network error	ServerHelper		Erreur réseau
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
@@ -95,7 +95,6 @@ Repository	PackageListView		Dépôt
 The email is malformed.	UserLoginWindow		L’adresse mail est malformée.
 Close	UserLoginWindow		Fermer
 Close	RatePackageWindow		Fermer
-An unexpected error has been sent from the server [%i]	ServerHelper		Le serveur a retourné une erreur inattendue [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisation des données de paquets depuis le dépôt « %REPO_NAME% ».
 Settings	SettingsWindow		Réglages
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Une erreur s’est produite lors du téléchargement des conditions d’utilisation requises pour créer un nouvel utilisateur. Vérifiez les détails dans le journal et réessayez.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide de l’utilisateur Haiku.

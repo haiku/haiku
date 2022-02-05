@@ -1,4 +1,4 @@
-1	czech	application/x-vnd.Cortex.support	2630173556
+1	czech	application/x-vnd.Cortex.support	1625162530
 Header has flags	MediaString		Hlavička má příznaky
 32 bit HLS	MediaString		32 bitů HLS
 Recording	MediaString		Nahrávám
@@ -42,7 +42,6 @@ YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Pravý
 32 bit RGB	MediaString		32 bitů RGB
-Video data between line u and u	MediaString		Video data mezi řádky u a u
 System mixer	MediaString		Systémový směšovač
 Physical output	MediaString		Fyzický výstup
 Top-Back-center	MediaString		Horní-zadní-prostřední

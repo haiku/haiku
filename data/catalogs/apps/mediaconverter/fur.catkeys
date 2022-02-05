@@ -1,10 +1,8 @@
-1	friulian	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		Scriture de linie audio: %d%% completade
+1	friulian	x-vnd.Haiku-MediaConverter	1322040280
 Input file not recognized as Audio or Video	MediaConverter		File di input no ricognossût come Audio o Video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Cualitât video: %3d%%
 Source files	MediaConverter		File sorzints
-Error writing video frame %ld	MediaConverter		Erôr tal scrivi il fotogram dal video %ld
 Error converting '%filename'	MediaConverter		Erôr tal convertî '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		La cartele selezionade no je stade cjatade. Si stabilìs chê predefinide: /boot/home
 Conversion completed	MediaConverter		Conversion completade
@@ -43,7 +41,6 @@ Error loading files	MediaConverter		Erôr tal cjariâ i file
 End   [ms]: 	MediaConverter		Fin    [ms]: 
 Cancel	MediaConverter		Cancele
 OK	MediaConverter-FileInfo		Va ben
-Error read audio frame %ld	MediaConverter		Erôr tal lei il campion audio %ld
 Video encoding:	MediaConverter		Codifiche video:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Si è verificât un erôr tal lei lis informazions dal file.\n\nErôr: 
 Error	MediaConverter		Erôr
@@ -57,11 +54,9 @@ Duration:	MediaConverter-FileInfo		Durade:
 MediaConverter	System name		ConvertidôrMultimediâl
 Error launching: %strError%	MediaConverter		Erôr tal inviâ: %strError%
 File format:	MediaConverter		Formât file:
-Error writing audio frame %ld	MediaConverter		Erôr tal scrivi il campion audio %ld
 File	Menu		File
 Video quality not supported	MediaConverter		Cualitât video no supuartade
 Select this folder	MediaConverter		Selezione cheste cartele
-Error read video frame %ld	MediaConverter		Erôr tal lei il fotogram video %ld
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canâl
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Nissun video
@@ -69,6 +64,5 @@ Continue	MediaConverter		Continue
 Convert	MediaConverter		Convertìs
 Audio quality not supported	MediaConverter		Cualitât audio no supuartade
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Erôr tal scrivi sul percors: %strPath%. Si stabilìs ae posizion predefinide: /boot/home
-Writing video track: %d%% complete	MediaConverter		Scriture de linie video: %d%% completade
 Preview	MediaConverter		Anteprime
 Start [ms]: 	MediaConverter		Inizi [ms]: 

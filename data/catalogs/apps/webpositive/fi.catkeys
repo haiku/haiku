@@ -20,8 +20,8 @@ Open containing folder	Download Window		Avaa sisältyvä kansio
 Find previous	WebPositive Window		Etsi edellinen
 Full screen	WebPositive Window		Kokonäyttö
 Downloads in progress	WebPositive		Käynnissä olevat lataukset
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Haluatko avata kaikki %addedCount kirjanmerkkiä heti?
 Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Haluatko avata kaikki %addedCount kirjanmerkkiä heti?
 Clone current page	Settings Window		Kloonaa nykyinen sivu
 Start page:	Settings Window		Aloitussivu:
 Cancel	Download Window		Peru
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Pienennä kokoa
 Default fixed font size:	Settings Window		Oletuskoko sovitetulle kirjasimelle:
 Sans serif font:	Settings Window		Sans serif-kirjasin:
 Clear	WebPositive Window		Tyhjennä
-Cookies for %s	Cookie Manager		Evästeet kohteelle %s
 The download could not be opened.	Download Window		Latauksen avaaminen epäonnistui.
+Cookies for %s	Cookie Manager		Evästeet kohteelle %s
 Close	Download Window		Sulje
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Hakutermi
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Jatka latauksia
 Proxy server requires authentication	Settings Window		Välityspalvelin vaatii todentamista
 Cancel	Settings Window		Peru
-History	WebPositive Window		Historia
 Reset size	WebPositive Window		Palauta oletuskoko
+History	WebPositive Window		Historia
 Do you really want to clear the browsing history?	WebPositive Window		Haluatko todella tyhjentää selaushistorian?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Etsi hakutermien seuraava esiintyminen
 Fixed font:	Settings Window		Sovitettu kirjasin:

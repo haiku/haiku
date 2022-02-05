@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2668924891
+1	hungarian	x-vnd.Haiku-HaikuDepot	1504929345
 Repository update error	LocalRepositoryUpdateProcess		Tároló frissítési hiba
 Network error	ServerHelper		Hálózati hiba
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hiba történt a tároló frissítésekor: %error%
@@ -95,7 +95,6 @@ Repository	PackageListView		Tároló
 The email is malformed.	UserLoginWindow		Hibás a levél formátuma.
 Close	UserLoginWindow		Bezárás
 Close	RatePackageWindow		Bezárás
-An unexpected error has been sent from the server [%i]	ServerHelper		A szerver váratlan hibát jelzett [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Csomagadatok szinkronizálása a tárolóból: '%REPO_NAME%'
 Settings	SettingsWindow		Beállítások
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Hiba történt az új felhasználó létrehozásához szükséges használati feltételek letöltésével. Ellenőrizd a naplót a részletekért, és próbáld újra.\nA naplók megtekintésével kapcsolatos információk a Haiku felhasználói kézikönyv HaikuDepot szakaszában találhatók.

@@ -1,4 +1,4 @@
-1	friulian	application/x-vnd.Cortex.support	3808791440
+1	friulian	application/x-vnd.Cortex.support	2803780414
 Header has flags	MediaString		La intestazion e à opzions
 32 bit HLS	MediaString		HLS a 32 bit
 Recording	MediaString		Regjistrazion
@@ -41,7 +41,6 @@ YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Diestre
 32 bit RGB	MediaString		RGB a 32 bit
-Video data between line u and u	MediaString		Dâts video tra la linie u e u
 Physical output	MediaString		Jessude fisiche
 Top-Back-center	MediaString		In alt daûr tal mieç
 YUV420	MediaString		YUV420

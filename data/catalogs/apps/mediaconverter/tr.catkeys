@@ -1,10 +1,8 @@
-1	turkish	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		Ses parçası yazılıyor: %d%% tamamlandı
+1	turkish	x-vnd.Haiku-MediaConverter	1322040280
 Input file not recognized as Audio or Video	MediaConverter		Girdi dosyası ses veya görüntü değil
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Video kalitesi: %3d%%
 Source files	MediaConverter		Kaynak dosyaları
-Error writing video frame %ld	MediaConverter		%ld. video karesi yazılırken hata
 Error converting '%filename'	MediaConverter		'%filename' dönüştürülürken hata
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Seçili dizin bulunamadı. Yerine /boot/home kullanılacak.
 Conversion completed	MediaConverter		Dönüştürme tamamlandı
@@ -43,7 +41,6 @@ Error loading files	MediaConverter		Dosyalar yüklenirken hata
 End   [ms]: 	MediaConverter		Son [ms]: 
 Cancel	MediaConverter		İptal
 OK	MediaConverter-FileInfo		Tamam
-Error read audio frame %ld	MediaConverter		Ses karesi %ld okunurken hata
 Video encoding:	MediaConverter		Video kodlaması:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Dosya bilgisi okunurken bir hata oluştu.\n\nError: 
 Error	MediaConverter		Hata
@@ -57,11 +54,9 @@ Duration:	MediaConverter-FileInfo		Uzunluk:
 MediaConverter	System name		Ortam Dönüştürücü
 Error launching: %strError%	MediaConverter		Başlatılırken hata: %strError%
 File format:	MediaConverter		Dosya biçimi:
-Error writing audio frame %ld	MediaConverter		Ses karesi %ld yazılırken hata
 File	Menu		Dosya
 Video quality not supported	MediaConverter		Video kalitesi desteklenmiyor
 Select this folder	MediaConverter		Bu klasörü seç
-Error read video frame %ld	MediaConverter		Video karesi %ld okunurken hata
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanal
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Video yok
@@ -69,6 +64,5 @@ Continue	MediaConverter		Sürdür
 Convert	MediaConverter		Dönüştür
 Audio quality not supported	MediaConverter		Ses kalitesi desteklenmiyor
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Konuma yazılırken hata: %strPath%. Yerine kullanılacak konum: /boot/home
-Writing video track: %d%% complete	MediaConverter		Video parçası yazılıyor: %d%% tamamlandı
 Preview	MediaConverter		Önizleme
 Start [ms]: 	MediaConverter		Başlangıç [ms]: 

@@ -1,4 +1,4 @@
-1	swedish	application/x-vnd.Be.LoggingConsumerApp	1634779870
+1	swedish	application/x-vnd.Be.LoggingConsumerApp	3653006715
 Priority	CortexAddOnsLoggingConsumer		Prioritet
 Latency	CortexAddOnsLoggingConsumer		Latens
 Logged input	CortexAddOnsLoggingConsumer		Loggad ingång
@@ -8,9 +8,7 @@ Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Start
 Thread priority	CortexAddOnsLoggingConsumer		Trådprioritet
 LoggingConsumer parameters	CortexAddOnsLoggingConsumer		Logga konsumentparametrar
 Latency control	CortexAddOnsLoggingConsumer		Latens kontroll
-MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunde inte få nodinformation (%d):\n%s\n
 CPU percentage	CortexAddOnsLoggingConsumer		CPU-procent
-MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunde inte hitta nod (%d):\n%s\n
 LoggingConsumer	CortexAddOnsLoggingConsumer		Loggning konsument
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Sluta
 An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		En tilläggsversion av LoggingConsumer-noden.\nSe Be Nyhetsbrev för utvecklare III.18: 5 maj, 1999\nanpassad av Eric Moon (4 juni 1999)
@@ -19,4 +17,3 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Kontroller
 controls	CortexAddOnsCommonMediaNodeControlApp		kontroller
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Ansluta
 percent	CortexAddOnsLoggingConsumer		procent
-MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp:  inga parametrar för nod (%d):\n%s\n

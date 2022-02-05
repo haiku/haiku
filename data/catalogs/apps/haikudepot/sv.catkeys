@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2668924891
+1	swedish	x-vnd.Haiku-HaikuDepot	1504929345
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 Network error	ServerHelper		Nätverksfel
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
@@ -95,7 +95,6 @@ Repository	PackageListView		Repositorie
 The email is malformed.	UserLoginWindow		E-postadressen är felaktigt angiven.
 Close	UserLoginWindow		Stäng
 Close	RatePackageWindow		Stäng
-An unexpected error has been sent from the server [%i]	ServerHelper		Ett oväntat fel har skickats från servern [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserar paketdata för repositoriet '%REPO_NAME%'
 Settings	SettingsWindow		Inställningar
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ett fel har uppstått vid nedladdning av de användningsvillkor som krävs för att skapa en ny användare. Kontrollera loggen för mer information och försök igen. \nInformation om hur du ser loggarna finns i avsnittet HaikuDepot i Haiku användarhandbok.

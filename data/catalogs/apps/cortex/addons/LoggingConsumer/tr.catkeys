@@ -1,4 +1,4 @@
-1	turkish	application/x-vnd.Be.LoggingConsumerApp	1634779870
+1	turkish	application/x-vnd.Be.LoggingConsumerApp	3653006715
 Priority	CortexAddOnsLoggingConsumer		Öncelik
 Latency	CortexAddOnsLoggingConsumer		Gecikme
 Logged input	CortexAddOnsLoggingConsumer		Günlüklenmiş giriş
@@ -8,9 +8,7 @@ Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Başlat
 Thread priority	CortexAddOnsLoggingConsumer		İş parçacığı önceliği
 LoggingConsumer parameters	CortexAddOnsLoggingConsumer		LoggingConsumer parametreleri
 Latency control	CortexAddOnsLoggingConsumer		Gecikme denetimi
-MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: Düğüm bilgisi alınamadı (%d):\n%s\n
 CPU percentage	CortexAddOnsLoggingConsumer		CPU yüzdesi
-MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: Düğüm bulunamadı (%d):\n%s\n
 LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Durdur
 An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		LoggingConsumer düğümünün bir eklenti biçimindeki sürümü.\n5 Mayıs 1999 tarihli Be Developer Newsletter III.18 sayısına bakın: \nEric Moon tarafından uyarlanmıştır (4 Haziran 1999).
@@ -19,4 +17,3 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Denetimler
 controls	CortexAddOnsCommonMediaNodeControlApp		Denetimler
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Bağlan
 percent	CortexAddOnsLoggingConsumer		yüzde
-MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: Düğüm için parametre yok (%d):\n%s\n

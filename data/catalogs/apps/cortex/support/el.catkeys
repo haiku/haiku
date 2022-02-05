@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	application/x-vnd.Cortex.support	2630173556
+1	greek, modern (1453-)	application/x-vnd.Cortex.support	1625162530
 Header has flags	MediaString		Η κεφαλίδα έχει παραμέτρους
 32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		Εγγραφή σε εξέλιξη
@@ -42,7 +42,6 @@ YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Δεξιά
 32 bit RGB	MediaString		32 bit RGB
-Video data between line u and u	MediaString		Δεδομένα βίντεο μεταξύ γραμμών u και u
 System mixer	MediaString		Μίκτης συστήματος
 Physical output	MediaString		Φυσική έξοδος
 Top-Back-center	MediaString		Πάνω-πίσω-κέντρο

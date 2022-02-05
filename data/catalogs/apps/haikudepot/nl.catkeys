@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	1050184462
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	4181156212
 Repository update error	LocalRepositoryUpdateProcess		Fout bij updaten softwarebronnen
 Network error	ServerHelper		Netwerk fout
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Er is een fout opgetreden bij het verversen van de softwarebronnen: %error%
@@ -94,7 +94,6 @@ Repository	PackageListView		Pakketbron
 The email is malformed.	UserLoginWindow		Het e-mailadres is ongeldig.
 Close	UserLoginWindow		Sluiten
 Close	RatePackageWindow		Sluiten
-An unexpected error has been sent from the server [%i]	ServerHelper		Een onverwachte fout is ontvangen van de server [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchroniseer pakketdata voor pakketbron '%REPO_NAME%'
 Settings	SettingsWindow		Instellingen
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Er is een fout opgetreden bij het ophalen van de gebruiksvoorwaarden voor het maken van een nieuwe gebruikersaccount. Controleer de log voor details en probeer het later nog eens. \nInformatie over hoe u de logs kunt bekijken is te vinden in het HaikuDepot-onderdeel van de Haiku User Guide.

@@ -1,10 +1,8 @@
-1	japanese	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		オーディトラックの書込み: %d%% 完了
+1	japanese	x-vnd.Haiku-MediaConverter	1322040280
 Input file not recognized as Audio or Video	MediaConverter		入力ファイルはオーディオまたはビデオとして認識できません。
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		ビデオ品質: %3d%%
 Source files	MediaConverter		ソースファイル
-Error writing video frame %ld	MediaConverter		ビデオフレーム %ld の書込みに失敗しました
 Error converting '%filename'	MediaConverter		'%filename'の変換中にエラーが発生しました
 Selected directory not found. Defaulting to /boot/home	MediaConverter		選択されたディレクトリが見つかりません。初期設定の /boot/home を使用します。
 Conversion completed	MediaConverter		変換が完了しました
@@ -43,7 +41,6 @@ Error loading files	MediaConverter		ファイルのロード中にエラーが�
 End   [ms]: 	MediaConverter		終了 [ms]:
 Cancel	MediaConverter		中止
 OK	MediaConverter-FileInfo		OK
-Error read audio frame %ld	MediaConverter		オーディオフレーム %ld の読込みに失敗しました
 Video encoding:	MediaConverter		ビデオエンコーディング:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		ファイル情報を読み取る際にエラーが発生しました。\n\nError : 
 Error	MediaConverter		エラー
@@ -57,11 +54,9 @@ Duration:	MediaConverter-FileInfo		再生時間:
 MediaConverter	System name		メディアコンバーター
 Error launching: %strError%	MediaConverter		起動時にエラーが発生しました: %strError%
 File format:	MediaConverter		ファイルフォーマット:
-Error writing audio frame %ld	MediaConverter		オーディオフレーム %ld の書込みに失敗しました
 File	Menu		ファイル
 Video quality not supported	MediaConverter		ビデオ品質はサポートされていません
 Select this folder	MediaConverter		このフォルダーを選択
-Error read video frame %ld	MediaConverter		ビデオフレーム %ld の読込みに失敗しました
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld チャンネル
 %d bit 	MediaFileInfo		%d ビット
 No video	Video codecs list		ビデオ無し
@@ -69,6 +64,5 @@ Continue	MediaConverter		続ける
 Convert	MediaConverter		変換
 Audio quality not supported	MediaConverter		オーディオ品質がサポートされていません
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		%strPath% への書き込み時にエラーが発生しました。初期設定の /boot/home を使用します。
-Writing video track: %d%% complete	MediaConverter		ビデオトラックの書込み: %d%% 完了
 Preview	MediaConverter		プレビュー
 Start [ms]: 	MediaConverter		開始 [ms]:

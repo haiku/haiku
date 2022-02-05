@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	2668924891
+1	finnish	x-vnd.Haiku-HaikuDepot	1504929345
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 Network error	ServerHelper		Verkkovirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
@@ -95,7 +95,6 @@ Repository	PackageListView		Tietovarasto
 The email is malformed.	UserLoginWindow		Sähköpostiosoite on vääränmuotoinen.
 Close	UserLoginWindow		Sulje
 Close	RatePackageWindow		Sulje
-An unexpected error has been sent from the server [%i]	ServerHelper		Palvelin [%i] lähetti odottamattoman virheen
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkronoidaan pakkaustietoja tietovarastolle '%REPO_NAME%'
 Settings	SettingsWindow		Asetukset
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ilmeni virhe ladattaessa käyttöehtoja, jotka vaaditaan uuden käyttäjän luomiseksi. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen. \nTieto siitä, kuinka lokitiedostoa katsotaan, on saatavilla Haiku-käyttöohjeen HaikuVarasto-osasta.

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-HaikuDepot	353929546
+1	italian	x-vnd.Haiku-HaikuDepot	3484901296
 Repository update error	LocalRepositoryUpdateProcess		Errore nell'aggiornamento del Repository
 Network error	ServerHelper		Errore di rete
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificato un errore nell'aggiornamento del repository: %error%
@@ -88,7 +88,6 @@ Repository	PackageListView		Repository
 The email is malformed.	UserLoginWindow		L'indirizzo e-mail è malformato.
 Close	UserLoginWindow		Chiudi
 Close	RatePackageWindow		Chiudi
-An unexpected error has been sent from the server [%i]	ServerHelper		Un errore inatteso è stato comunicato dal server [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizzazione dei dati dei pacchetti del repository '%REPO_NAME%' in corso
 View the usage conditions	UserLoginWindow		Vedi le condizioni d'uso
 Login issue	MainWindow		Errore di Autenticazione

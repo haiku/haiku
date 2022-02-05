@@ -1,10 +1,8 @@
-1	esperanto	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		Registrado de sontrako: %d%% de plenumo
+1	esperanto	x-vnd.Haiku-MediaConverter	1322040280
 Input file not recognized as Audio or Video	MediaConverter		Eniga dosiero ne estas rekonita kiel aŭdaĵo aŭ video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u * %u, %.2f kadrojn sekunde
 Video quality: %3d%%	MediaConverter		Kvalito de video: %3d%%
 Source files	MediaConverter		Fontaj dosieroj
-Error writing video frame %ld	MediaConverter		Eraro dum registrado de videokadro %ld
 Error converting '%filename'	MediaConverter		Eraro de konvertado de '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Elektita dosierujo ne estis trovita. Defaŭltigita al /boot/home
 Conversion completed	MediaConverter		Konvertado estis kompletigita
@@ -43,7 +41,6 @@ Error loading files	MediaConverter		Eraro dum ŝargado de dosieroj
 End   [ms]: 	MediaConverter		Fino   [ms]: 
 Cancel	MediaConverter		Nuligi
 OK	MediaConverter-FileInfo		Bone
-Error read audio frame %ld	MediaConverter		Eraro dum preno de aŭdaĵa kadro %ld
 Video encoding:	MediaConverter		Videa enkodigeco:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Eraro okazis dum preno de la dosiera informo.\n\nEraro: 
 Error	MediaConverter		Eraro
@@ -57,11 +54,9 @@ Duration:	MediaConverter-FileInfo		Daŭro:
 MediaConverter	System name		PlurmediaKonvertilo
 Error launching: %strError%	MediaConverter		Eraro dum lanĉado: %strError%
 File format:	MediaConverter		Formato de dosiero:
-Error writing audio frame %ld	MediaConverter		Eraro dum skribado de aŭdaĵa kadro %ld
 File	Menu		Dosiero
 Video quality not supported	MediaConverter		Kvalito de video ne estas subtenata
 Select this folder	MediaConverter		Elekti ĉi dosierujon
-Error read video frame %ld	MediaConverter		Eraro dum legado de videa kadro %ld
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanalo
 %d bit 	MediaFileInfo		%d bito(j) 
 No video	Video codecs list		Video forestas
@@ -69,6 +64,5 @@ Continue	MediaConverter		Daŭri
 Convert	MediaConverter		Konverti
 Audio quality not supported	MediaConverter		Aŭdaĵa kvalito ne estas subtenata
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Eraro dum skribo en lokon: %strPath%. Defaŭltigo al loko: /boot/home
-Writing video track: %d%% complete	MediaConverter		Skribado de videa trako: %d%% farite
 Preview	MediaConverter		Antaŭrigardo
 Start [ms]: 	MediaConverter		Komenco [ms]: 

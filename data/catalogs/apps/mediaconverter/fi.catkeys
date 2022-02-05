@@ -1,10 +1,8 @@
-1	finnish	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		Kirjoitetaan audiokappaletta: %d%% valmiina
+1	finnish	x-vnd.Haiku-MediaConverter	1322040280
 Input file not recognized as Audio or Video	MediaConverter		Syötetiedostoa ei tunnistettu audioksi tai videoksi
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f kehystä sekunnissa
 Video quality: %3d%%	MediaConverter		Videolaatu: %3d%%
 Source files	MediaConverter		Lähdetiedostot
-Error writing video frame %ld	MediaConverter		Videokehyksen %ld kirjoitusvirhe
 Error converting '%filename'	MediaConverter		Virhe muunnettaessa tiedostoa ’%filename’
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Vallittua hakemistoa ei löytynyt. Muutetaan oletukseksi /boot/home
 Conversion completed	MediaConverter		Muunnos valmis
@@ -43,7 +41,6 @@ Error loading files	MediaConverter		Virhe ladattaessa tiedostoja
 End   [ms]: 	MediaConverter		Loppu [ms]: 
 Cancel	MediaConverter		Peru
 OK	MediaConverter-FileInfo		Valmis
-Error read audio frame %ld	MediaConverter		Audiokehyksen %ld lukuvirhe
 Video encoding:	MediaConverter		Videokoodaus:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Tapahtui virhe luettaessa tiedostotietoja.\n\nVirhe : 
 Error	MediaConverter		Virhe
@@ -57,11 +54,9 @@ Duration:	MediaConverter-FileInfo		Kesto:
 MediaConverter	System name		Mediamuunnin
 Error launching: %strError%	MediaConverter		Virhe käynnistettäessä: %strError%
 File format:	MediaConverter		Tiedostomuoto:
-Error writing audio frame %ld	MediaConverter		Audiokehyksen %ld kirjoitusvirhe
 File	Menu		Tiedosto
 Video quality not supported	MediaConverter		Videolaatua ei tueta
 Select this folder	MediaConverter		Valitse tämä kansio
-Error read video frame %ld	MediaConverter		Videokehyksen %ld lukuvirhe
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanava
 %d bit 	MediaFileInfo		%d bitti 
 No video	Video codecs list		Ei videota
@@ -69,6 +64,5 @@ Continue	MediaConverter		Jatka
 Convert	MediaConverter		Muunna
 Audio quality not supported	MediaConverter		Äänen laatua ei tueta
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Virhe kirjoitettaessa sijaintiin: %strPath%. Muutetaan oletussijainniksi: /boot/home
-Writing video track: %d%% complete	MediaConverter		Kirjoitetaan videokappaletta: %d%% valmiina
 Preview	MediaConverter		Esikatselu
 Start [ms]: 	MediaConverter		Alku [ms]:

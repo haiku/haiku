@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	2668924891
+1	friulian	x-vnd.Haiku-HaikuDepot	1504929345
 Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
 Network error	ServerHelper		Erôr di rêt
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
@@ -95,7 +95,6 @@ Repository	PackageListView		Dipuesit
 The email is malformed.	UserLoginWindow		La direzion e-mail e je malformade.
 Close	UserLoginWindow		Siere
 Close	RatePackageWindow		Siere
-An unexpected error has been sent from the server [%i]	ServerHelper		Al è stât inviât dal servidôr [%i] un erôr inspietât
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizazion dâts dai pachets pal dipuesit '%REPO_NAME%'
 Settings	SettingsWindow		Impostazions
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Al è vignût fûr un erôr discjariant lis condizions di ûs necessaris par creâ un gnûf utent. Controle il regjistri pai detais e torne prove. \nLis informazions su ce mût viodi i regjistris a son disponibilis inte sezion di HaikuDepot  de Vuide utent di Haiku.

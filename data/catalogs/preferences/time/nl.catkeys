@@ -1,10 +1,11 @@
-1	dutch; flemish	x-vnd.Haiku-Time	2069485065
+1	dutch; flemish	x-vnd.Haiku-Time	3691539601
 OK	Time		Oké
 Message receiving failed	Time		Ontvangen van het bericht mislukt
 Australia	Time		Australië
 America	Time		Amerika
 Reset to default server list	Time		Herstel standaard-serverlijst
 Could not resolve server address	Time		Het serveradres opzoeken is mislukt
+Time & Date	System name		Tijd & Datum
 Set time zone	Time		Tijdzone instellen
 Waiting for answer failed	Time		Wachten op antwoord mislukt
 <Other>	Time		<Anders>

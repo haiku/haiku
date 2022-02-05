@@ -1,4 +1,4 @@
-1	ukrainian	application/x-vnd.Cortex.support	2630173556
+1	ukrainian	application/x-vnd.Cortex.support	1625162530
 Header has flags	MediaString		Заголовок з позначками
 32 bit HLS	MediaString		32-бітовий HLS
 Recording	MediaString		Запис
@@ -42,7 +42,6 @@ YUV9	MediaString		YUV9
  Hz	MediaString		 Гц
 Right	MediaString		Правий
 32 bit RGB	MediaString		32-бітовий RGB
-Video data between line u and u	MediaString		Відеодані між рядками u та u
 System mixer	MediaString		Системний мікшер
 Physical output	MediaString		Фізичний вихід
 Top-Back-center	MediaString		Зверху-Тил-центр

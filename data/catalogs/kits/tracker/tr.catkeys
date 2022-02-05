@@ -35,7 +35,7 @@ Size	QueryPoseView		Boyut
 128 x 128	ContainerWindow		128 x 128
 Disk mount	TrackerSettingsWindow		Disk bağlama
 Type	AttributesView		Tür
-Prompt	FSUtils		İstem
+Prompt	FSUtils		Sor
 Error in regular expression:\n\n'%errstring'	PoseView		Düzenli ifadede hata:\n\n'%errstring'
 Small bitmap icon	AttributesView		Küçük biteşlem simge
 Would you like to find a suitable application to open the file?	FSUtils		Bu dosyayı açmak için uygun bir uygulama bulmak ister misiniz?

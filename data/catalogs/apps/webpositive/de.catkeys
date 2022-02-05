@@ -20,8 +20,8 @@ Open containing folder	Download Window		Speicherort öffnen
 Find previous	WebPositive Window		Vorheriger Treffer
 Full screen	WebPositive Window		Vollbild
 Downloads in progress	WebPositive		Download Warnung
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sollen alle %addedCount Lesezeichen auf einmal geöffnet werden?
 Copy URL to clipboard	Download Window		Adresse kopieren
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sollen alle %addedCount Lesezeichen auf einmal geöffnet werden?
 Clone current page	Settings Window		Aktuelle Seite verwenden
 Start page:	Settings Window		Startseite:
 Cancel	Download Window		Abbrechen
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Verkleinern
 Default fixed font size:	Settings Window		Größe der Schrift fester Breite:
 Sans serif font:	Settings Window		Serifenlose Schrift:
 Clear	WebPositive Window		Leeren
-Cookies for %s	Cookie Manager		Cookies für %s
 The download could not be opened.	Download Window		Die heruntergeladene Datei kann nicht geöffnet werden.
+Cookies for %s	Cookie Manager		Cookies für %s
 Close	Download Window		Schließen
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Suchbegriff
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Downloads fortsetzen
 Proxy server requires authentication	Settings Window		Der Proxy-Server verlangt eine Authentifizierung
 Cancel	Settings Window		Abbrechen
-History	WebPositive Window		Verlauf
 Reset size	WebPositive Window		Größe zurücksetzen
+History	WebPositive Window		Verlauf
 Do you really want to clear the browsing history?	WebPositive Window		Soll der Verlauf wirklich gelöscht werden?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Nächster Treffer
 Fixed font:	Settings Window		Schrift fester Breite:

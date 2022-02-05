@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	2668924891
+1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	481425000
 Repository update error	LocalRepositoryUpdateProcess		Σφάλμα ενημέρωσης αποθετηρίων
 Network error	ServerHelper		Σφάλμα δικτύου
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Προέκυψε ένα σφάλμα κατά την ανανέωση του αποθετηρίου: %error%
@@ -44,6 +44,7 @@ Category	FilterView		Κατηγορία
 User rating	RatePackageWindow		Αξιολόγηση χρήστη
 Installed packages	MainWindow		Εγκατεστημένα πακέτα
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Το ζητούμενο αντικείμενο ή ένα αντικείμενο που έχει σχέσει με το αίτημά σας δεν βρέθηκε στον διακομιστή.
+Date	PackageListView		Ημ/νία
 No changelog available.	PackageInfoView		Δεν υπάρχει διαθέσιμη καταγραφή αλλαγών.
 Error	App		Σφάλμα
 There was a puzzling response from the web service.	UserLoginWindow		Ο εξυπηρετητής έστειλε μία ακατανόητη απάντηση.
@@ -55,6 +56,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Δεν ήταν δυνατή η επικοινωνία με τον διακομιστή για την λήψη εικόνας captcha που απαιτείται για την δημιουργία ενός νέου χρήστη.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Η βαθμολογία σας ενημερώθηκε επιτυχώς. Μπορείτε να την ενημερώσετε ή να την αφαιρέσετε στην ιστοσελίδα του διακομιστή HaikuDepot.
 Available	PackageListView		Διαθέσιμο
+-	no package publish		-
 Cancel	UserLoginWindow		Ακύρωση
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Το HaikuDepot χρειάζεται το πρόγραμμα παρασκηνίου διαχείρισης πακέτων για να λειτουργήσει, το οποίο δεν εκτελείται.\nΘα θέλατε να το ξεκινήσετε;
 Click a package to view information	PackageInfoView		Κάντε κλικ σε ένα πακέτο για προβολή πληροφοριών
@@ -66,6 +68,7 @@ Changelog	PackageInfoView		Καταγραφή αλλαγών
 Rating not possible	MainWindow		Δεν είναι δυνατή η αξιολόγηση
 Package update error	MainWindow		Σφάλμα ενημέρωσης πακέτου
 About	PackageInfoView		Σχετικά
+%VersionCreateDate%	FeaturedPackagesView		%VersionCreateDate%
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# διαδικασία} other{# διαδικασίες}}
 Reboot required	PackageManager		Απαιτείται επανεκκίνηση
 Password:	UserLoginWindow		Κωδικός πρόσβασης:
@@ -95,7 +98,6 @@ Repository	PackageListView		Αποθετήριο
 The email is malformed.	UserLoginWindow		Η διεύθυνση ηλεκτρονικού ταχυδρομείου δεν είναι έγκυρη.
 Close	UserLoginWindow		Κλείσιμο
 Close	RatePackageWindow		Κλείσιμο
-An unexpected error has been sent from the server [%i]	ServerHelper		Ένα απρόσμενο σφάλμα προέκυψε από τη μεριά του εξυπηρετητή [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Γίνεται συγχρονισμός πληροφοριών πακέτων για το αποθετήριο '%REPO_NAME%'
 Settings	SettingsWindow		Ρυθμίσεις
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Σφάλμα κατά τη λήψη των όρων χρήσης για την εγγραφή νέου χρήστη. Παρακαλώ ελέγξτε το αρχείο καταγραφών και ξαναδοκιμάστε.\nΠληροφορίες για το αρχείο καταγραφών υπάρχουν στο λήμμα του Οδηγού Χρήστη του Haiku για την εφαρμογή HaikuDepot.

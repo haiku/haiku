@@ -1,4 +1,4 @@
-1	friulian	application/x-vnd.Be.LoggingConsumerApp	1634779870
+1	friulian	application/x-vnd.Be.LoggingConsumerApp	3653006715
 Priority	CortexAddOnsLoggingConsumer		Prioritât
 Latency	CortexAddOnsLoggingConsumer		Latence
 Logged input	CortexAddOnsLoggingConsumer		Jentrade regjistrade
@@ -8,9 +8,7 @@ Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Scomence
 Thread priority	CortexAddOnsLoggingConsumer		Prioritât dal thread
 LoggingConsumer parameters	CortexAddOnsLoggingConsumer		Parametris di LoggingConsumer
 Latency control	CortexAddOnsLoggingConsumer		Control de latence
-MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: impussibil otignî lis informazions dal grop (%d):\n%s\n
 CPU percentage	CortexAddOnsLoggingConsumer		Percentuâl di CPU
-MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: impussibil cjatâ il grop (%d):\n%s\n
 LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Ferme
 An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		Une version zonte dal grop LoggingConsumer.\nViôt la Newsletter III.18 dai disvilupadôrs di Be dal 5 di May dal 1999\nadatât di Eric Moon (ai 4 di Jugn dal 1999)
@@ -19,4 +17,3 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Controi
 controls	CortexAddOnsCommonMediaNodeControlApp		controi
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Conet
 percent	CortexAddOnsLoggingConsumer		par cent
-MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nissun parametri pal grop (%d):\n%s\n

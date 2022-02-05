@@ -1,4 +1,4 @@
-1	turkish	application/x-vnd.Cortex.support	2630173556
+1	turkish	application/x-vnd.Cortex.support	1625162530
 Header has flags	MediaString		Üstbilginin bayrakları var
 32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		Kayıt yapılıyor
@@ -42,7 +42,6 @@ YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Sağ
 32 bit RGB	MediaString		32 bit RGB
-Video data between line u and u	MediaString		u/u hattı arasındaki video verisi
 System mixer	MediaString		Sistem karıştırıcısı
 Physical output	MediaString		Fiziksel çıkış
 Top-Back-center	MediaString		Üst arka merkez

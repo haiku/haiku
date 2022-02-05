@@ -16,8 +16,8 @@ Open containing folder	Download Window		Адкрыць паку з гэтым ф
 Find previous	WebPositive Window		Шукаць папярэдняе
 Full screen	WebPositive Window		Поўнаэкранны рэжым
 Downloads in progress	WebPositive		Ідзе спампоўванне файлаў
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Жадаеце адчыніць %addedCount закладак за адзін раз?
 Copy URL to clipboard	Download Window		Скапіяваць спасылку
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Жадаеце адчыніць %addedCount закладак за адзін раз?
 Clone current page	Settings Window		Кланаваць гэту старонку
 Start page:	Settings Window		Пачатковая старонка:
 Cancel	Download Window		Скасаваць
@@ -95,8 +95,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Працягваць спампоўку
 Proxy server requires authentication	Settings Window		Проксі сервер патрабуе ідэнтыфікацыі
 Cancel	Settings Window		Скасаваць
-History	WebPositive Window		Гісторыя
 Reset size	WebPositive Window		Вярнуць памер
+History	WebPositive Window		Гісторыя
 Do you really want to clear the browsing history?	WebPositive Window		Вы сапраўды жадаеце выдаліць ўсю гісторыю?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Знайсці наступны выпадак таго, што шукаеце
 Fixed font:	Settings Window		Роўнашырокі шрыфт:

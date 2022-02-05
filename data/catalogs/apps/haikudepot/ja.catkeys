@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2668924891
+1	japanese	x-vnd.Haiku-HaikuDepot	481425000
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Network error	ServerHelper		ネットワークエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
@@ -44,6 +44,7 @@ Category	FilterView		分類
 User rating	RatePackageWindow		ユーザーによる評価
 Installed packages	MainWindow		インストール済パッケージ
 A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つからなかった。
+Date	PackageListView		日付
 No changelog available.	PackageInfoView		変更記録はありません。
 Error	App		エラー
 There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
@@ -55,6 +56,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		新しいユーザーを作成するために必要なキャプチャの取得のためのサーバーとの通信ができませんでした。
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		評価が正常に更新されました。HaikuDepot Server のウェブサイトで評価を更新または削除できます。
 Available	PackageListView		利用可能
+-	no package publish		-
 Cancel	UserLoginWindow		中止
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot はパッケージデーモンが動作することを必要とします。 そしてそれは動作していないようです。\n今起動しますか?
 Click a package to view information	PackageInfoView		パッケージをクリックして情報を見る
@@ -66,6 +68,7 @@ Changelog	PackageInfoView		変更履歴
 Rating not possible	MainWindow		評価不能
 Package update error	MainWindow		パッケージアップデートエラー
 About	PackageInfoView		パッケージについて
+%VersionCreateDate%	FeaturedPackagesView		%VersionCreateDate%
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# プロセス} other{# プロセス}}
 Reboot required	PackageManager		再起動が必要です
 Password:	UserLoginWindow		パスワード:
@@ -95,7 +98,6 @@ Repository	PackageListView		リポジトリ
 The email is malformed.	UserLoginWindow		メールアドレスの形式が正しくありません。
 Close	UserLoginWindow		閉じる
 Close	RatePackageWindow		閉じる
-An unexpected error has been sent from the server [%i]	ServerHelper		サーバーから予期しないエラーが送信されました [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		リポジトリ '%REPO_NAME%' のパッケージデータを同期中
 Settings	SettingsWindow		設定
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		新しいユーザー作成に必要な使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。

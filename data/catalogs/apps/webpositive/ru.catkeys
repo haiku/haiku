@@ -20,8 +20,8 @@ Open containing folder	Download Window		Открыть папку с файло�
 Find previous	WebPositive Window		Найти ранее
 Full screen	WebPositive Window		Полноэкранный режим
 Downloads in progress	WebPositive		Загрузка файлов
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Вы хотите открыть сразу %addedCount закладок?
 Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Вы хотите открыть сразу %addedCount закладок?
 Clone current page	Settings Window		Клонировать текущую страницу
 Start page:	Settings Window		Начальная страница:
 Cancel	Download Window		Отмена
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Уменьшить размер
 Default fixed font size:	Settings Window		Размер моноширинного шрифта:
 Sans serif font:	Settings Window		Шрифт без засечек:
 Clear	WebPositive Window		Очистить
-Cookies for %s	Cookie Manager		Куки для %s
 The download could not be opened.	Download Window		Невозможно открыть загруженный файл.
+Cookies for %s	Cookie Manager		Куки для %s
 Close	Download Window		Закрыть
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Термин для поиска
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Продолжить загрузку
 Proxy server requires authentication	Settings Window		Прокси требует проверки подлинности
 Cancel	Settings Window		Отмена
-History	WebPositive Window		История
 Reset size	WebPositive Window		Сбросить размер
+History	WebPositive Window		История
 Do you really want to clear the browsing history?	WebPositive Window		Вы действительно хотите очистить историю посещений?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Найти вперед
 Fixed font:	Settings Window		Моноширинный шрифт:

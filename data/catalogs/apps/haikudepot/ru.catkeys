@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	1050184462
+1	russian	x-vnd.Haiku-HaikuDepot	4181156212
 Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
 Network error	ServerHelper		Ошибка сети
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
@@ -94,7 +94,6 @@ Repository	PackageListView		Репозиторий
 The email is malformed.	UserLoginWindow		Неверный формат адреса электронной почты.
 Close	UserLoginWindow		Закрыть
 Close	RatePackageWindow		Закрыть
-An unexpected error has been sent from the server [%i]	ServerHelper		Сервер вернул неожиданная ошибку [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронизация данных пакетов репозитория '%REPO_NAME%'
 Settings	SettingsWindow		Настройки
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Произошла ошибка при скачивании условий использования необходимых для создания нового пользователя. \nДля получения более подробных сведений об ошибке можно запустить приложение из Терминала.

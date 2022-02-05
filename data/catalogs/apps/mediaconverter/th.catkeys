@@ -1,10 +1,8 @@
-1	thai	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		กำลังเขียนแทร็กเสียง: %d%% สมบรูณ์
+1	thai	x-vnd.Haiku-MediaConverter	1322040280
 Input file not recognized as Audio or Video	MediaConverter		ไฟล์อินพุตไม่รู้จักว่าเป็นเสียงหรือวิดีโอ
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		คุณภาพวิดีโอ: %3d%%
 Source files	MediaConverter		ไฟล์ต้นฉบับ
-Error writing video frame %ld	MediaConverter		เกิดข้อผิดพลาดในการเขียนเฟรมวิดีโอ %ld
 Error converting '%filename'	MediaConverter		ข้อผิดพลาดในการแปลง '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		ไม่พบไดเรกทอรีที่เลือก เริ่มต้นที่ /boot/home
 Conversion completed	MediaConverter		การแปลงเสร็จสมบูรณ์
@@ -43,7 +41,6 @@ Error loading files	MediaConverter		เกิดข้อผิดพลาด�
 End   [ms]: 	MediaConverter		สิ้นสุด [ms]:
 Cancel	MediaConverter		ยกเลิก
 OK	MediaConverter-FileInfo		ตกลง
-Error read audio frame %ld	MediaConverter		เกิดข้อผิดพลาดในการอ่านเฟรมเสียง %ld
 Video encoding:	MediaConverter		การเข้ารหัสวิดีโอ:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		เกิดข้อผิดพลาดในการอ่านข้อมูลไฟล์ \n\nข้อผิดพลาด:
 Error	MediaConverter		ผิดพลาด
@@ -57,11 +54,9 @@ Duration:	MediaConverter-FileInfo		ระยะเวลา:
 MediaConverter	System name		ตัวแปลงสื่อ
 Error launching: %strError%	MediaConverter		ข้อผิดพลาดในการเปิด: %strError%
 File format:	MediaConverter		รูปแบบไฟล์:
-Error writing audio frame %ld	MediaConverter		เกิดข้อผิดพลาดในการเขียนเฟรมเสียง %ld
 File	Menu		ไฟล์
 Video quality not supported	MediaConverter		คุณภาพวิดีโอไม่รองรับ
 Select this folder	MediaConverter		เลือกโฟลเดอร์นี้
-Error read video frame %ld	MediaConverter		เกิดข้อผิดพลาดในการอ่านเฟรมวิดีโอ %ld
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld channel
 %d bit 	MediaFileInfo		%d bit
 No video	Video codecs list		ไม่มีวีดีโอ
@@ -69,6 +64,5 @@ Continue	MediaConverter		ต่อไป
 Convert	MediaConverter		แปลง
 Audio quality not supported	MediaConverter		คุณภาพเสียงไม่รองรับ
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		เกิดข้อผิดพลาดในการเขียนไปยังตำแหน่ง:%strPath% ตั้งค่าเริ่มต้นไปที่ตำแหน่ง: /boot /home
-Writing video track: %d%% complete	MediaConverter		กำลังเขียนแทร็กวิดีโอ: %d%% เสร็จ
 Preview	MediaConverter		ตัวอย่าง
 Start [ms]: 	MediaConverter		เริ่ม [ms]:

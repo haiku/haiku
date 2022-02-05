@@ -1,4 +1,4 @@
-1	portuguese	application/x-vnd.Cortex.support	1882557543
+1	portuguese	application/x-vnd.Cortex.support	877546517
 Recording	MediaString		Gravação
 (unknown format)	MediaString		(formato desconhecido)
 Clean buffers	MediaString		Limpar buffers
@@ -21,7 +21,6 @@ AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Direito
-Video data between line u and u	MediaString		Dados de vídeo entre as linhas u e u
 System mixer	MediaString		Misturador do sistema
 Physical output	MediaString		Saída física
 YUV420	MediaString		YUV420

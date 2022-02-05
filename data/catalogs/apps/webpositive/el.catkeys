@@ -20,8 +20,8 @@ Open containing folder	Download Window		Άνοιγμα εμπεριεχόμεν�
 Find previous	WebPositive Window		Εύρεση προηγούμενου
 Full screen	WebPositive Window		Πλήρης οθόνη
 Downloads in progress	WebPositive		Λήψεις σε εξέλιξη
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Είστε σίγουρος πως θέλετε να ανοίξετε %addedCount σελιδοδείκτες ταυτόχρονα;
 Copy URL to clipboard	Download Window		Αντιγραφή υπερσυνδέσμου στο πρόχειρο
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Είστε σίγουρος πως θέλετε να ανοίξετε %addedCount σελιδοδείκτες ταυτόχρονα;
 Clone current page	Settings Window		Αντίγραφο καρτέλας
 Start page:	Settings Window		Αρχική σελίδα:
 Cancel	Download Window		Ακύρωση
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Σμίκρυνση
 Default fixed font size:	Settings Window		Προεπιλεγμένο μέγεθος γραμματοσειράς σταθερού πλάτους:
 Sans serif font:	Settings Window		Γραμματοσειρά Sans serif:
 Clear	WebPositive Window		Εκκαθάριση
-Cookies for %s	Cookie Manager		Cookies για %s
 The download could not be opened.	Download Window		Δεν ήταν δυνατό το άνοιγμα της λήψης.
+Cookies for %s	Cookie Manager		Cookies για %s
 Close	Download Window		Κλείσιμο
 WebPositive	System name		Περιηγητής Ιστού
 %s - Search term	Settings Window		%s – όρος αναζήτησης
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Συνέχιση λήψεων
 Proxy server requires authentication	Settings Window		Ο μεσολαβητής απαιτεί ταυτοποίηση
 Cancel	Settings Window		Άκυρο
-History	WebPositive Window		Ιστορικό
 Reset size	WebPositive Window		Επαναφορά μεγέθους
+History	WebPositive Window		Ιστορικό
 Do you really want to clear the browsing history?	WebPositive Window		Είστε σίγουρος ότι θέλετε να διαγράψετε το ιστορικό περιήγησης σας;
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Εύρεση επόμενης εμφάνισης των όρων αναζήτησης
 Fixed font:	Settings Window		Γραμματοσειρά σταθερού πλάτους:

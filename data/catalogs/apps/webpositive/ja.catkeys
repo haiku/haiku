@@ -20,8 +20,8 @@ Open containing folder	Download Window		フォルダーを開く
 Find previous	WebPositive Window		前を検索
 Full screen	WebPositive Window		全画面表示
 Downloads in progress	WebPositive		ダウンロードが進行中です
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount 個のブックマークを同時に開きますか?
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount 個のブックマークを同時に開きますか?
 Clone current page	Settings Window		現在のページを複製
 Start page:	Settings Window		スタートページ:
 Cancel	Download Window		中止
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		縮小
 Default fixed font size:	Settings Window		等幅フォントサイズ:
 Sans serif font:	Settings Window		サンセリフフォント:
 Clear	WebPositive Window		クリア
-Cookies for %s	Cookie Manager		%s 用の Cookie
 The download could not be opened.	Download Window		ダウンロードファイルを開けません。
+Cookies for %s	Cookie Manager		%s 用の Cookie
 Close	Download Window		閉じる
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - 検索語
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		ダウンロードを続ける
 Proxy server requires authentication	Settings Window		プロキシサーバーが認証を要求する
 Cancel	Settings Window		中止
-History	WebPositive Window		履歴
 Reset size	WebPositive Window		リセット
+History	WebPositive Window		履歴
 Do you really want to clear the browsing history?	WebPositive Window		閲覧履歴を本当に消去しますか?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	検索語の次の項目を検索
 Fixed font:	Settings Window		等幅フォント:

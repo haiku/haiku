@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-desklink	3568085956
+1	ukrainian	x-vnd.Haiku-desklink	3759597613
 desklink	MediaReplicant	Title of an alert box	desklink
 Sound preferences…	MediaReplicant		Налаштування звуку…
 Muted	MediaReplicant		Приглушити
@@ -7,7 +7,6 @@ OK	MediaReplicant		ОК
 Couldn't launch 	MediaReplicant		Не вдалося запустити 
 Volume	VolumeControl		Гучність
 Open MediaPlayer	MediaReplicant		Відкрити MediaPlayer
-%d dB	VolumeControl		%d дБ
 Media preferences…	MediaReplicant		Налаштування медіа…
 Options	MediaReplicant		Опції
 Beep	MediaReplicant		Сигнал

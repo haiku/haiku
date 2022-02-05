@@ -20,8 +20,8 @@ Open containing folder	Download Window		Mostre te cartele
 Find previous	WebPositive Window		Cjate precedent
 Full screen	WebPositive Window		Plen visôr
 Downloads in progress	WebPositive		Discjariaments in pîts
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vierzi %addedCount segnelibris adun?
 Copy URL to clipboard	Download Window		Copie URL tes notis
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vierzi %addedCount segnelibris adun?
 Clone current page	Settings Window		Clone la pagjine atuâl
 Start page:	Settings Window		Pagjine di inizi:
 Cancel	Download Window		Anule
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Diminuìs dimension
 Default fixed font size:	Settings Window		Dimension predefinide dal caratar a spaziadure fisse:
 Sans serif font:	Settings Window		Caratar Sans serif:
 Clear	WebPositive Window		Nete
-Cookies for %s	Cookie Manager		Cookie par %s
 The download could not be opened.	Download Window		Nol è stât pussibil vierzi il file discjariât.
+Cookies for %s	Cookie Manager		Cookie par %s
 Close	Download Window		Siere
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Tiermin di ricercje
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Ripie i discjariaments
 Proxy server requires authentication	Settings Window		Il servidôr proxy al domande autenticazion
 Cancel	Settings Window		Anule
-History	WebPositive Window		Cronologjie
 Reset size	WebPositive Window		Ristabilìs dimension
+History	WebPositive Window		Cronologjie
 Do you really want to clear the browsing history?	WebPositive Window		Netâ pardabon la cronologjie di navigazion?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Cjate il prossim câs dai tiermins di ricercje
 Fixed font:	Settings Window		Caratar a spaziadure fisse:

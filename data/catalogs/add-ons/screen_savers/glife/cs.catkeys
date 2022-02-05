@@ -1,10 +1,9 @@
-1	czech	x-vnd.Haiku-GLifeScreensaver	2955223231
+1	czech	x-vnd.Haiku-GLifeScreensaver	2189777521
 by Aaron Hill	GLife ScreenSaver		napsal Aaron Hill
 Grid life delay: none	GLife ScreenSaver		Životnost mřížky: žádná
 None	GLife ScreenSaver		Žádná
 Grid height: %li	GLife ScreenSaver		Výška mřížky: %li
 Grid width: 	GLife ScreenSaver		Šířka mřížky: 
-Grid life delay: %dx	This is a factor: the x represents 'times', don't translate '%d'		Životnost mřížky: %dx
 Grid border: %li	GLife ScreenSaver		Okraj mřížky: %li
 Grid border: 	GLife ScreenSaver		Okraj mřížky: 
 OpenGL \"Game of Life\"	GLife ScreenSaver		OpenGL \"Hra života\"

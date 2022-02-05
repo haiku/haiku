@@ -20,8 +20,8 @@ Open containing folder	Download Window		Mostrar na pasta correspondente
 Find previous	WebPositive Window		Procurar anterior
 Full screen	WebPositive Window		Ecrã completo
 Downloads in progress	WebPositive		Descargas em curso
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Deseja abrir %addedCount marcadores de uma só vez?
 Copy URL to clipboard	Download Window		Copiar URL para a área de transferência
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Deseja abrir %addedCount marcadores de uma só vez?
 Clone current page	Settings Window		Clonar a página atual
 Start page:	Settings Window		Página inicial:
 Cancel	Download Window		Cancelar
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Diminuir tamanho
 Default fixed font size:	Settings Window		Tamanho predefinido de tipo de letra mono-espaçado:
 Sans serif font:	Settings Window		Tipo de letra sem serifas:
 Clear	WebPositive Window		Limpar
-Cookies for %s	Cookie Manager		Cookies para %s
 The download could not be opened.	Download Window		Não foi possível abrir o ficheiro descarregado.
+Cookies for %s	Cookie Manager		Cookies para %s
 Close	Download Window		Fechar
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Termo de pesquisa
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Continuar descargas
 Proxy server requires authentication	Settings Window		O servidor proxy requer autenticação
 Cancel	Settings Window		Cancelar
-History	WebPositive Window		Histórico
 Reset size	WebPositive Window		Redefinir tamanho
+History	WebPositive Window		Histórico
 Do you really want to clear the browsing history?	WebPositive Window		Tem a certeza de que pretende apagar o histórico de navegação?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Procurar a ocorrência seguinte dos termos de pesquisa
 Fixed font:	Settings Window		Tipo de letra mono-espaçado:

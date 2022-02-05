@@ -1,10 +1,8 @@
-1	catalan; valencian	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		S'escriu la pista d'àudio: %d%% completat
+1	catalan; valencian	x-vnd.Haiku-MediaConverter	1322040280
 Input file not recognized as Audio or Video	MediaConverter		No es reconeix el fitxer d’entrada com a àudio ni vídeo.
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Qualitat del vídeo: %3d%%
 Source files	MediaConverter		Fitxers d'origen
-Error writing video frame %ld	MediaConverter		Error en escriure el fotograma de vídeo %ld
 Error converting '%filename'	MediaConverter		Error en convertir %filename
 Selected directory not found. Defaulting to /boot/home	MediaConverter		No s'ha trobat el directori seleccionat. Es restableix a /boot/home.
 Conversion completed	MediaConverter		Conversió completada
@@ -43,7 +41,6 @@ Error loading files	MediaConverter		Error en carregar fitxers
 End   [ms]: 	MediaConverter		Fi   [ms]: 
 Cancel	MediaConverter		Cancel·la
 OK	MediaConverter-FileInfo		D'acord
-Error read audio frame %ld	MediaConverter		Error en llegir el marc de l'àudio %ld
 Video encoding:	MediaConverter		Codificació de vídeo:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Hi ha hagut un error en llegir la informació del fitxer.\n\nError: 
 Error	MediaConverter		Error
@@ -57,11 +54,9 @@ Duration:	MediaConverter-FileInfo		Durada:
 MediaConverter	System name		Convertidor multimèdia
 Error launching: %strError%	MediaConverter		Error d'obertura: %strError%
 File format:	MediaConverter		Format del fitxer:
-Error writing audio frame %ld	MediaConverter		Error en escriure el marc d'àudio %ld
 File	Menu		Fitxer
 Video quality not supported	MediaConverter		No s'admet la qualitat del vídeo.
 Select this folder	MediaConverter		Selecciona aquesta carpeta
-Error read video frame %ld	MediaConverter		Error en llegir el fotograma de vídeo %ld
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz, canal %ld
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Sense vídeo
@@ -69,6 +64,5 @@ Continue	MediaConverter		Continua
 Convert	MediaConverter		Conveteix
 Audio quality not supported	MediaConverter		No s'admet la qualitat d'àudio.
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Error en escriure a la ubicació: %strPath%. Es restableix a /boot/home.
-Writing video track: %d%% complete	MediaConverter		S'escriu la pista de vídeo: %d%% completat
 Preview	MediaConverter		Previsualització
 Start [ms]: 	MediaConverter		Inici [ms]: 

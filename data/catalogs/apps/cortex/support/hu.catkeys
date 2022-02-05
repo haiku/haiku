@@ -1,4 +1,4 @@
-1	hungarian	application/x-vnd.Cortex.support	2630173556
+1	hungarian	application/x-vnd.Cortex.support	1625162530
 Header has flags	MediaString		A fejlécnek vannak zászlói
 32 bit HLS	MediaString		32 bites HLS
 Recording	MediaString		Felvétel
@@ -42,7 +42,6 @@ YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Jobb
 32 bit RGB	MediaString		32 bites RGB
-Video data between line u and u	MediaString		u és u közötti videó adat
 System mixer	MediaString		Rendszer keverő
 Physical output	MediaString		Fizikai kimenet
 Top-Back-center	MediaString		Közép hátsó-felső

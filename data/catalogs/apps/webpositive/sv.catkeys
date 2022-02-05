@@ -20,8 +20,8 @@ Open containing folder	Download Window		Öppna innehållande mapp
 Find previous	WebPositive Window		Hitta tidigare
 Full screen	WebPositive Window		Fullskärm
 Downloads in progress	WebPositive		Nedladdningar pågår
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vill du öppna %addedCount bokmärken på samma gång?
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vill du öppna %addedCount bokmärken på samma gång?
 Clone current page	Settings Window		Klona aktuell sida
 Start page:	Settings Window		Startsida:
 Cancel	Download Window		Avbryt
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Minska storleken
 Default fixed font size:	Settings Window		Förinställd fast typsnittsstorlek:
 Sans serif font:	Settings Window		Sans-serif-typsnitt:
 Clear	WebPositive Window		Rensa
-Cookies for %s	Cookie Manager		Kakor för %s
 The download could not be opened.	Download Window		Nedladdningen kunde inte öppnas.
+Cookies for %s	Cookie Manager		Kakor för %s
 Close	Download Window		Stäng
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Sökterm
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Återuppta nedladdningar
 Proxy server requires authentication	Settings Window		Proxyservern kräver autentisiering
 Cancel	Settings Window		Avbryt
-History	WebPositive Window		Historik
 Reset size	WebPositive Window		Återställ storlek
+History	WebPositive Window		Historik
 Do you really want to clear the browsing history?	WebPositive Window		Vill du verkligen rensa din historik?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Hitta nästa förekomst av söktermer
 Fixed font:	Settings Window		Fast typsnitt:

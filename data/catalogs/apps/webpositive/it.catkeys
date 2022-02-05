@@ -20,8 +20,8 @@ Open containing folder	Download Window		Mostra nella cartella
 Find previous	WebPositive Window		Trova precedente
 Full screen	WebPositive Window		Schermo intero
 Downloads in progress	WebPositive		Download in corso
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sei sicuro di voler aprire %addedCount segnalibri contemporaneamente?
 Copy URL to clipboard	Download Window		Copia URL negli appunti
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sei sicuro di voler aprire %addedCount segnalibri contemporaneamente?
 Clone current page	Settings Window		Clona la pagina corrente
 Start page:	Settings Window		Pagina di avvio:
 Cancel	Download Window		Annulla
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Diminuisci dimensioni
 Default fixed font size:	Settings Window		Dimensione predefinita caratteri a spaziatura fissa:
 Sans serif font:	Settings Window		Tipo di carattere senza grazie:
 Clear	WebPositive Window		Cancella
-Cookies for %s	Cookie Manager		Cookie per %s
 The download could not be opened.	Download Window		La cartella dei file scaricati non può essere aperta.
+Cookies for %s	Cookie Manager		Cookie per %s
 Close	Download Window		Chiudi
 WebPositive	System name		WebPositive
 Reload	WebPositive Window		Ricarica
@@ -109,8 +109,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Riprendi i download
 Proxy server requires authentication	Settings Window		Il server proxy richiede l'autenticazione
 Cancel	Settings Window		Annulla
-History	WebPositive Window		Cronologia
 Reset size	WebPositive Window		Reimposta dimensioni
+History	WebPositive Window		Cronologia
 Do you really want to clear the browsing history?	WebPositive Window		Sei sicuro di voler cancellare la cronologia del browser?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Trova la prossima occorrenza dei termini di ricerca
 Fixed font:	Settings Window		Tipo di carattere a spaziatura fissa:

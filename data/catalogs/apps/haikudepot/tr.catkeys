@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	2668924891
+1	turkish	x-vnd.Haiku-HaikuDepot	481425000
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 Network error	ServerHelper		Ağ hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
@@ -44,6 +44,7 @@ Category	FilterView		Kategori
 User rating	RatePackageWindow		Kullanıcı oyları
 Installed packages	MainWindow		Yüklü paketler
 A requested object or an object involved in the request was not found on the server.	ServerHelper		İstenen nesne veya istekle ilgili bir nesne sunucuda bulunamadı.
+Date	PackageListView		Tarih
 No changelog available.	PackageInfoView		Değişiklik günlüğü mevcut değil
 Error	App		Hata
 There was a puzzling response from the web service.	UserLoginWindow		Web servisinden kafa karıştıran bir yanıt alındı.
@@ -55,6 +56,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Yeni bir kullanıcı oluşturma için gerekli olan CAPTCHA görseli için sunucu ile iletişim kurulamadı.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Derecelendirmeniz başarıyla yüklendi. Haiku Depo sunucusu web sitesinden güncelleyebilir veya silebilirsiniz.
 Available	PackageListView		Kullanılabilir
+-	no package publish		-
 Cancel	UserLoginWindow		İptal
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Haiku Depo, paket hizmetine gereksinim duyuyor ancak şu anda çalışmıyor görünüyor.\nŞimdi başlatılsın mı?
 Click a package to view information	PackageInfoView		Paket bilgisini görmek için üzerine tıklayın
@@ -66,6 +68,7 @@ Changelog	PackageInfoView		Değişiklik günlüğü
 Rating not possible	MainWindow		Derecelendirme olanaklı değil
 Package update error	MainWindow		Paket güncelleme hatası
 About	PackageInfoView		Hakkında
+%VersionCreateDate%	FeaturedPackagesView		%VersionCreateDate%
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, other{# işlem}}
 Reboot required	PackageManager		Yeniden başlatma gerekli
 Password:	UserLoginWindow		Parola:
@@ -95,7 +98,6 @@ Repository	PackageListView		Depo
 The email is malformed.	UserLoginWindow		E-posta biçimi hatalı.
 Close	UserLoginWindow		Kapat
 Close	RatePackageWindow		Kapat
-An unexpected error has been sent from the server [%i]	ServerHelper		Sunucudan beklenmedik bir hata gönderildi [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		'%REPO_NAME%' depo paket bilgisi eşitleniyor
 Settings	SettingsWindow		Ayarlar
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Yeni bir kullanıcı oluşturmak için gerekli kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlük görüntüleme üzerine bilgiyi Haiku Kullanıcı Kılavuzu'nun Haiku Depo bölümünde bulabilirsiniz.

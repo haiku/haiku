@@ -1,5 +1,6 @@
-1	dutch; flemish	x-vnd.Haiku-mixer.media_addon	2690542047
+1	dutch; flemish	x-vnd.Haiku-mixer.media_addon	3511569803
 Input mapping	AudioMixer		Invoermapping
+High quality (linear interpolation)	AudioMixer		Hoge kwaliteit (lineaire interpolatie)
 To output	AudioMixer		Uitvoer
 Refuse output format changes	AudioMixer		Weiger wijzigingen van het uitvoerformaat
 Gain	AudioMixer		Versterking
@@ -9,12 +10,14 @@ not connected	AudioMixer		niet verbonden
 Master output	AudioMixer		Masteruitvoer
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Gain instellingen
+Low quality (drop/repeat samples)	AudioMixer		Lage kwaliteit (samples overslaan/herhalen)
 Output channel sources	AudioMixer		Uitgangskanaal bronnen
 Allow input channel remapping	AudioMixer		Sta toe het invoerkanaal opnieuw te mappen
 Display balance control for stereo connections	AudioMixer		Balansknop voor stereoverbindingen weergeven
 Setup	AudioMixer		Instellingen
 Physical input channels	AudioMixer		Fysieke invoerkanalen
 Input channel destinations	AudioMixer		Ingang kanaal bestemming
+Resampling algorithm:	AudioMixer		Algoritme om te hersamplen:
 Mute	AudioMixer		Dempen
 Output mapping	AudioMixer		Uitgang mapping
 Virtual output channels	AudioMixer		Virtuele uitvoerkanalen
