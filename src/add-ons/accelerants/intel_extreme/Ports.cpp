@@ -6,6 +6,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Lotz, mmlr@mlotz.ch
  *		Alexander von Gluck IV, kallisti5@unixzen.com
+ *		Rudolf Cornelissen, ruud@highsand-juicylake.nl
  */
 
 
@@ -1429,7 +1430,9 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 						bitsPerPixel = 0;
 				}
 
-				lanes = 2; //fixme: doc is incorrect on SandyBridge (DP_CTL b19..21 is NOT port_width)
+				// #lanes seems fixed (like on skylake/gen9 gfx): port_width does not adhere to read on
+				// DP_CTL b19..21 on SandyBridge (confirmed)
+				lanes = 4;
 				if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IVB)) {
 					lanes =
 						((read32(_PortRegister()) & INTEL_DISP_PORT_WIDTH_MASK) >> INTEL_DISP_PORT_WIDTH_SHIFT) + 1;
