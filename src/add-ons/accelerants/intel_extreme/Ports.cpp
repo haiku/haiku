@@ -1430,13 +1430,8 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 						bitsPerPixel = 0;
 				}
 
-				// #lanes seems fixed (like on skylake/gen9 gfx): port_width does not adhere to read on
-				// DP_CTL b19..21 on SandyBridge (confirmed)
-				lanes = 4;
-				if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IVB)) {
-					lanes =
-						((read32(_PortRegister()) & INTEL_DISP_PORT_WIDTH_MASK) >> INTEL_DISP_PORT_WIDTH_SHIFT) + 1;
-				}
+				lanes =
+					((read32(INTEL_DISPLAY_PORT_A) & INTEL_DISP_PORT_WIDTH_MASK) >> INTEL_DISP_PORT_WIDTH_SHIFT) + 1;
 
 				fPipe->SetFDILink(hardwareTarget, linkBandwidth, lanes, bitsPerPixel);
 			}
