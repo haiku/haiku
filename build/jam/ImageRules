@@ -1701,6 +1701,9 @@ rule BuildEfiSystemPartition image : efiLoader
 			Exit "Error: Unknown EFI architecture!" ;
 	}
 
+	# public efi keys for efi bios trust
+	EFIKEYS on $(image) = [ FDirName $(HAIKU_TOP) data boot efi keys ] ;
+
 	BuildEfiSystemPartition1 $(image) : $(fatshell) $(macVolumeIcon) $(efiLoader) ;
 }
 
@@ -1720,7 +1723,15 @@ actions BuildEfiSystemPartition1
 
 	${FATFS} --initialize "$(<)" 'Haiku ESP'
 	echo "mkdir myfs/EFI" | ${FATFS} $(<)
+	echo "mkdir myfs/KEYS" | ${FATFS} $(<)
 	echo "mkdir myfs/EFI/BOOT" | ${FATFS} $(<)
+
 	echo "cp :${LOADER} myfs/EFI/BOOT/$(EFINAME)" | ${FATFS} $(<)
 	echo "cp :${EFIICON} myfs/.VolumeIcon.icns" | ${FATFS} $(<)
+
+	# Copy UEFI signing keys and a README for end users
+	echo "cp :$(EFIKEYS)/README.md myfs/KEYS/README.md" | ${FATFS} $(<)
+	for i in auth cer crt; do
+		echo "cp :$(EFIKEYS)/DB.$i myfs/KEYS/DB.$i" | ${FATFS} $(<)
+	done
 }
