@@ -33,6 +33,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			timelocal.cpp
 			time.c
 			timer_support.cpp
+			timespec_get.cpp
 			wcsftime.c
 			;
 	}
