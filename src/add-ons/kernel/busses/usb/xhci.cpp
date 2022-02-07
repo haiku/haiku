@@ -945,8 +945,13 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 		return B_NO_INIT;
 	}
 
-	TRACE_ALWAYS("cancel queued transfers (%" B_PRId8 ") for pipe %p (%d)\n",
-		endpoint->used, pipe, pipe->EndpointAddress());
+#ifndef TRACE_USB
+	if (force)
+#endif
+	{
+		TRACE_ALWAYS("cancel queued transfers (%" B_PRId8 ") for pipe %p (%d)\n",
+			endpoint->used, pipe, pipe->EndpointAddress());
+	}
 
 	MutexLocker endpointLocker(endpoint->lock);
 
