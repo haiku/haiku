@@ -2500,7 +2500,8 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 		transferred = -1;
 	}
 
-	if (completionCode != COMP_SUCCESS && completionCode != COMP_SHORT_PACKET) {
+	if (completionCode != COMP_SUCCESS && completionCode != COMP_SHORT_PACKET
+			&& completionCode != COMP_STOPPED) {
 		TRACE_ALWAYS("transfer error on slot %" B_PRId8 " endpoint %" B_PRId8
 			": %s\n", slot, endpointNumber, xhci_error_string(completionCode));
 	}
