@@ -198,6 +198,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		dec21xxx
 		emulex_oce
 		ipro100 ipro1000
+		intel22x
 		jmicron2x0
 		marvell_yukon
 		nforce
