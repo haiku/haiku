@@ -21,6 +21,7 @@
 
 #include <zlib.h>
 
+#include <AutoDeleterPosix.h>
 #include <ColorQuantizer.h>
 
 // TODO: Create 4 bit palette version of these
