@@ -265,15 +265,7 @@ ConditionVariable::Publish(const void* object, const char* objectType)
 {
 	ASSERT(object != NULL);
 
-	fObject = object;
-	fObjectType = objectType;
-	new(&fEntries) EntryList;
-	fEntriesCount = 0;
-	B_INITIALIZE_SPINLOCK(&fLock);
-
-	T_SCHEDULING_ANALYSIS(InitConditionVariable(this, object, objectType));
-	NotifyWaitObjectListeners(&WaitObjectListener::ConditionVariableInitialized,
-		this);
+	Init(object, objectType);
 
 	InterruptsWriteSpinLocker _(sConditionVariableHashLock);
 
@@ -356,18 +348,6 @@ ConditionVariable::Wait(recursive_lock* lock, uint32 flags, bigtime_t timeout)
 	for (int32 i = 0; i < recursion; i++)
 		recursive_lock_lock(lock);
 
-	return res;
-}
-
-
-status_t
-ConditionVariable::Wait(spinlock* lock, uint32 flags, bigtime_t timeout)
-{
-	ConditionVariableEntry entry;
-	Add(&entry);
-	release_spinlock(lock);
-	status_t res = entry.Wait(flags, timeout);
-	acquire_spinlock(lock);
 	return res;
 }
 

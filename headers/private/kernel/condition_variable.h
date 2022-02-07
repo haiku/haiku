@@ -33,8 +33,6 @@ public:
 			status_t			Wait(const void* object, uint32 flags = 0,
 									bigtime_t timeout = 0);
 
-	inline	status_t			WaitStatus() const { return fWaitStatus; }
-
 	inline	ConditionVariable*	Variable() const { return fVariable; }
 
 private:
@@ -71,12 +69,10 @@ public:
 
 			void				Add(ConditionVariableEntry* entry);
 
+	// Convenience methods, no ConditionVariableEntry required.
 			status_t			Wait(uint32 flags = 0, bigtime_t timeout = 0);
-									// all-in one, i.e. doesn't need a
-									// ConditionVariableEntry
 			status_t			Wait(mutex* lock, uint32 flags = 0, bigtime_t timeout = 0);
 			status_t			Wait(recursive_lock* lock, uint32 flags = 0, bigtime_t timeout = 0);
-			status_t			Wait(spinlock* lock, uint32 flags = 0, bigtime_t timeout = 0);
 
 			const void*			Object() const		{ return fObject; }
 			const char*			ObjectType() const	{ return fObjectType; }
