@@ -33,7 +33,7 @@ public:
 			status_t			Wait(const void* object, uint32 flags = 0,
 									bigtime_t timeout = 0);
 
-	inline	ConditionVariable*	Variable() const { return fVariable; }
+			ConditionVariable*	Variable() const;
 
 private:
 	inline	void				_AddToLockedVariable(ConditionVariable* variable);

@@ -129,6 +129,13 @@ ConditionVariableEntry::Add(const void* object)
 }
 
 
+ConditionVariable*
+ConditionVariableEntry::Variable() const
+{
+	return atomic_pointer_get(&fVariable);
+}
+
+
 inline void
 ConditionVariableEntry::_AddToLockedVariable(ConditionVariable* variable)
 {
