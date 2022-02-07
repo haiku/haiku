@@ -6,6 +6,13 @@
 
 #include <Referenceable.h>
 
+#ifdef _KERNEL_MODE
+#	include "kernel_debug_config.h"
+#	if PARANOID_KERNEL_FREE
+#		define DEBUG
+#	endif
+#endif
+
 #ifdef DEBUG
 #include <stdio.h>
 #endif
@@ -30,7 +37,7 @@ BReferenceable::BReferenceable()
 
 BReferenceable::~BReferenceable()
 {
-#if defined(DEBUG) && !defined(_BOOT_MODE)
+#if !defined(_BOOT_MODE) && defined(DEBUG)
 	bool enterDebugger = false;
 	char message[256];
 	if (fReferenceCount == 1) {
