@@ -53,7 +53,7 @@ atomic_pointer_set(PointerType** _pointer, const PointerType* set)
 
 
 template<typename PointerType> PointerType*
-atomic_pointer_get(PointerType** _pointer)
+atomic_pointer_get(PointerType* const* _pointer)
 {
 	ASSERT((addr_t(_pointer) & (sizeof(PointerType*) - 1)) == 0);
 #if LONG_MAX == INT_MAX
