@@ -8,7 +8,7 @@
 
 #ifdef _KERNEL_MODE
 #	include "kernel_debug_config.h"
-#	if PARANOID_KERNEL_FREE
+#	if PARANOID_KERNEL_FREE && !defined(DEBUG)
 #		define DEBUG
 #	endif
 #endif
