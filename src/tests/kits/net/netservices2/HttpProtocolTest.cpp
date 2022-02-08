@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Haiku Inc. All rights reserved.
+ * Copyright 2022 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,9 +12,9 @@
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
 
-#include <HttpHeaders.h>
+#include <HttpFields.h>
 
-using BPrivate::Network::BHttpHeader;
+using BPrivate::Network::BHttpFields;
 using BPrivate::Network::BHttpSession;
 
 
@@ -25,23 +25,24 @@ HttpProtocolTest::HttpProtocolTest()
 
 
 void
-HttpProtocolTest::HttpHeaderTest()
+HttpProtocolTest::HttpFieldsTest()
 {
 	using namespace std::literals;
 
 	// Header field name validation (ignore value validation)
 	{
+		auto fields = BHttpFields();
 		try {
 			auto validFieldName = "Content-Encoding"sv;
-			auto header = BHttpHeader{validFieldName, ""sv};
+			fields.AddField(validFieldName, "value"sv);
 		} catch (...) {
 			CPPUNIT_FAIL("Unexpected exception when passing valid field name");
 		}
 		try {
 			auto invalidFieldName = "Cóntênt_Éncõdìng";
-			auto header = BHttpHeader{invalidFieldName, ""sv};
+			fields.AddField(invalidFieldName, "value"sv);
 			CPPUNIT_FAIL("Creating a header with an invalid name did not raise an exception");
-		} catch (const BHttpHeader::InvalidInput& e) {
+		} catch (const BHttpFields::InvalidInput& e) {
 			// success
 		} catch (...) {
 			CPPUNIT_FAIL("Unexpected exception when creating a header with an invalid name");
@@ -49,17 +50,18 @@ HttpProtocolTest::HttpHeaderTest()
 	}
 	// Header field value validation (ignore name validation)
 	{
+		auto fields = BHttpFields();
 		try {
 			auto validFieldValue = "VálìdF|êldValue"sv;
-			auto header = BHttpHeader{""sv, validFieldValue};
+			fields.AddField("Field"sv, validFieldValue);
 		} catch (...) {
 			CPPUNIT_FAIL("Unexpected exception when passing valid field value");
 		}
 		try {
 			auto invalidFieldValue = "Invalid\tField\0Value";
-			auto header = BHttpHeader{""sv, invalidFieldValue};
+			fields.AddField("Field"sv, invalidFieldValue);
 			CPPUNIT_FAIL("Creating a header with an invalid value did not raise an exception");
-		} catch (const BHttpHeader::InvalidInput& e) {
+		} catch (const BHttpFields::InvalidInput& e) {
 			// success
 		} catch (...) {
 			CPPUNIT_FAIL("Unexpected exception when creating a header with an invalid value");
@@ -68,12 +70,100 @@ HttpProtocolTest::HttpHeaderTest()
 
 	// Header field name case insensitive comparison
 	{
-		BHttpHeader header = BHttpHeader{"content-type"sv, ""sv};
-		CPPUNIT_ASSERT(header.Name() == "content-type"sv);
-		CPPUNIT_ASSERT(header.Name() == "Content-Type"sv);
-		CPPUNIT_ASSERT(header.Name() == "cOnTeNt-TyPe"sv);
-		CPPUNIT_ASSERT(header.Name() != "content_type"sv);
-		CPPUNIT_ASSERT(header.Name() == BString{"Content-Type"});
+		BHttpFields fields = BHttpFields();
+		fields.AddField("content-type"sv, "value"sv);
+		CPPUNIT_ASSERT(fields[0].Name() == "content-type"sv);
+		CPPUNIT_ASSERT(fields[0].Name() == "Content-Type"sv);
+		CPPUNIT_ASSERT(fields[0].Name() == "cOnTeNt-TyPe"sv);
+		CPPUNIT_ASSERT(fields[0].Name() != "content_type"sv);
+		CPPUNIT_ASSERT(fields[0].Name() == BString{"Content-Type"});
+	}
+
+	// Set up a generic set of headers for further use
+	const BHttpFields defaultFields = {
+		{"Host"sv, "haiku-os.org"sv},
+		{"Accept"sv, "*/*"sv},
+		{"Set-Cookie"sv, "qwerty=494793ddkl; Domain=haiku-os.co.uk"sv},
+		{"Set-Cookie"sv, "afbzyi=0kdnke0lyv; Domain=haiku-os.co.uk"sv},
+		{},	// Empty; should be ignored by the constructor
+		{"Accept-Encoding"sv, "gzip"sv}
+	};
+
+	// Validate std::initializer_list constructor
+	CPPUNIT_ASSERT_EQUAL(5, defaultFields.CountFields());
+
+	// Test copying and moving
+	{
+		BHttpFields copiedFields = defaultFields;
+		CPPUNIT_ASSERT_EQUAL(copiedFields.CountFields(), defaultFields.CountFields());
+		for (size_t i = 0; i < defaultFields.CountFields(); i++) {
+			std::string_view copiedName = copiedFields[i].Name();
+			CPPUNIT_ASSERT(defaultFields[i].Name() == copiedName);
+			CPPUNIT_ASSERT_EQUAL(defaultFields[i].Value(), copiedFields[i].Value());
+		}
+
+		BHttpFields movedFields(std::move(copiedFields));
+		CPPUNIT_ASSERT_EQUAL(movedFields.CountFields(), defaultFields.CountFields());
+		for (size_t i = 0; i < movedFields.CountFields(); i++) {
+			std::string_view defaultName = defaultFields[i].Name();
+			CPPUNIT_ASSERT(movedFields[i].Name() == defaultName);
+			CPPUNIT_ASSERT_EQUAL(movedFields[i].Value(), defaultFields[i].Value());
+		}
+
+		CPPUNIT_ASSERT_EQUAL(copiedFields.CountFields(), 0);
+	}
+
+	// Test query and modification tools
+	{
+		BHttpFields fields = defaultFields;
+		// test order of adding fields
+		fields.AddField("Set-Cookie"sv, "vfxdrm=9lpqrsvxm; Domain=haiku-os.co.uk"sv);
+		// query for Set-Cookie
+		auto it = fields.FindField("Set-Cookie"sv);
+		CPPUNIT_ASSERT(it != fields.end());
+		CPPUNIT_ASSERT((*it).Name() == "Set-Cookie"sv);
+		CPPUNIT_ASSERT_EQUAL(defaultFields[2].Value(), (*it).Value());
+		it++;
+		CPPUNIT_ASSERT(it != fields.end());
+		CPPUNIT_ASSERT((*it).Name() == "Set-Cookie"sv);
+		CPPUNIT_ASSERT_EQUAL(defaultFields[3].Value(), (*it).Value());
+		it++;
+		CPPUNIT_ASSERT(it != fields.end());
+		CPPUNIT_ASSERT((*it).Name() == "Set-Cookie"sv);
+		it++;
+		CPPUNIT_ASSERT(it != fields.end());
+		CPPUNIT_ASSERT_EQUAL(defaultFields[4].Value(), (*it).Value());
+		// Remove the Accept-Encoding entry by iterator
+		fields.RemoveField(it);
+		CPPUNIT_ASSERT_EQUAL(fields.CountFields(), defaultFields.CountFields());
+		// Remove the Set-Cookie entries by name
+		fields.RemoveField("Set-Cookie"sv);
+		CPPUNIT_ASSERT_EQUAL(fields.CountFields(), 2);
+		// Test MakeEmpty
+		fields.MakeEmpty();
+		CPPUNIT_ASSERT_EQUAL(fields.CountFields(), 0);
+	}
+
+	// Iterate through the fields using a constant iterator
+	{
+		const BHttpFields fields = {
+			{"key1"sv, "value1"sv},
+			{"key2"sv, "value2"sv},
+			{"key3"sv, "value3"sv},
+			{"key4"sv, "value4"sv}
+		};
+
+		auto count = 0L;
+		for (const auto& field: fields) {
+			count++;
+			auto key = BString("key");
+			auto value = BString("value");
+			key << count;
+			value << count;
+			CPPUNIT_ASSERT_EQUAL(key, field.Name());
+			CPPUNIT_ASSERT_EQUAL(value, BString(field.Value().data(), field.Value().length()));
+		}
+		CPPUNIT_ASSERT_EQUAL(count, 4);
 	}
 }
 
@@ -84,8 +174,7 @@ HttpProtocolTest::AddTests(BTestSuite& parent)
 	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("HttpProtocolTest");
 
 	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
-		"HttpProtocolTest::HttpHeaderTest", &HttpProtocolTest::HttpHeaderTest));
+		"HttpProtocolTest::HttpFieldsTest", &HttpProtocolTest::HttpFieldsTest));
 
-		// leak for now
 	parent.addTest("HttpProtocolTest", &suite);
 }

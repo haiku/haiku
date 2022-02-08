@@ -17,7 +17,7 @@ class HttpProtocolTest: public BTestCase {
 public:
 					HttpProtocolTest();
 
-			void	HttpHeaderTest();
+			void	HttpFieldsTest();
 
 	static	void	AddTests(BTestSuite& suite);
 
