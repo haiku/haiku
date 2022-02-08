@@ -242,6 +242,11 @@ aligned_alloc(size_t alignment, size_t size)
 void
 free_etc(void *address, uint32 flags)
 {
+	if ((flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
+		deferred_free(address);
+		return;
+	}
+
 	block_free(address, flags & CACHE_ALLOC_FLAGS);
 }
 
