@@ -3221,6 +3221,8 @@ cache_start_sub_transaction(void* _cache, int32 id)
 			if (block->original_data != NULL) {
 				memcpy(block->current_data, block->original_data,
 					cache->block_size);
+
+				cache->Free(block->original_data);
 				block->original_data = NULL;
 			}
 			continue;
