@@ -429,7 +429,66 @@ Team::Team(team_id id, bool kernel)
 	// allocate an ID
 	this->id = id;
 	visible = true;
+
+	hash_next = siblings_next = parent = children = group_next = NULL;
 	serial_number = -1;
+
+	group_id = session_id = -1;
+	group = NULL;
+
+	num_threads = 0;
+	state = TEAM_STATE_BIRTH;
+	flags = 0;
+	io_context = NULL;
+	realtime_sem_context = NULL;
+	xsi_sem_context = NULL;
+	death_entry = NULL;
+	list_init(&dead_threads);
+
+	dead_children.condition_variable.Init(&dead_children, "team children");
+	dead_children.count = 0;
+	dead_children.kernel_time = 0;
+	dead_children.user_time = 0;
+
+	job_control_entry = new(nothrow) ::job_control_entry;
+	if (job_control_entry != NULL) {
+		job_control_entry->state = JOB_CONTROL_STATE_NONE;
+		job_control_entry->thread = id;
+		job_control_entry->team = this;
+	}
+
+	address_space = NULL;
+	main_thread = NULL;
+	thread_list = NULL;
+	loading_info = NULL;
+
+	list_init(&image_list);
+	list_init(&watcher_list);
+	list_init(&sem_list);
+	list_init_etc(&port_list, port_team_link_offset());
+
+	user_data = 0;
+	user_data_area = -1;
+	used_user_data = 0;
+	user_data_size = 0;
+	free_user_threads = NULL;
+
+	commpage_address = NULL;
+
+	clear_team_debug_info(&debug_info, true);
+
+	dead_threads_kernel_time = 0;
+	dead_threads_user_time = 0;
+	cpu_clock_offset = 0;
+	B_INITIALIZE_SPINLOCK(&time_lock);
+
+	saved_set_uid = real_uid = effective_uid = -1;
+	saved_set_gid = real_gid = effective_gid = -1;
+
+	// exit status -- setting initialized to false suffices
+	exit.initialized = false;
+
+	B_INITIALIZE_SPINLOCK(&signal_lock);
 
 	// init mutex
 	if (kernel) {
@@ -440,68 +499,12 @@ Team::Team(team_id id, bool kernel)
 		mutex_init_etc(&fLock, lockName, MUTEX_FLAG_CLONE_NAME);
 	}
 
-	hash_next = siblings_next = children = parent = NULL;
 	fName[0] = '\0';
 	fArgs[0] = '\0';
-	num_threads = 0;
-	io_context = NULL;
-	address_space = NULL;
-	realtime_sem_context = NULL;
-	xsi_sem_context = NULL;
-	thread_list = NULL;
-	main_thread = NULL;
-	loading_info = NULL;
-	state = TEAM_STATE_BIRTH;
-	flags = 0;
-	death_entry = NULL;
-	user_data_area = -1;
-	user_data = 0;
-	used_user_data = 0;
-	user_data_size = 0;
-	free_user_threads = NULL;
-
-	commpage_address = NULL;
-
-	dead_threads_kernel_time = 0;
-	dead_threads_user_time = 0;
-	cpu_clock_offset = 0;
-
-	// dead threads
-	list_init(&dead_threads);
-
-	// dead children
-	dead_children.count = 0;
-	dead_children.kernel_time = 0;
-	dead_children.user_time = 0;
-
-	// job control entry
-	job_control_entry = new(nothrow) ::job_control_entry;
-	if (job_control_entry != NULL) {
-		job_control_entry->state = JOB_CONTROL_STATE_NONE;
-		job_control_entry->thread = id;
-		job_control_entry->team = this;
-	}
-
-	// exit status -- setting initialized to false suffices
-	exit.initialized = false;
-
-	list_init(&sem_list);
-	list_init_etc(&port_list, port_team_link_offset());
-	list_init(&image_list);
-	list_init(&watcher_list);
-
-	clear_team_debug_info(&debug_info, true);
-
-	// init dead/stopped/continued children condition vars
-	dead_children.condition_variable.Init(&dead_children, "team children");
-
-	B_INITIALIZE_SPINLOCK(&time_lock);
-	B_INITIALIZE_SPINLOCK(&signal_lock);
 
 	fQueuedSignalsCounter = new(std::nothrow) BKernel::QueuedSignalsCounter(
 		kernel ? -1 : MAX_QUEUED_SIGNALS);
 	memset(fSignalActions, 0, sizeof(fSignalActions));
-
 	fUserDefinedTimerCount = 0;
 
 	fCoreDumpCondition = NULL;
