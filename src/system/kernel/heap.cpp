@@ -295,7 +295,7 @@ get_caller()
 		STACK_TRACE_KERNEL);
 	for (int32 i = 0; i < depth; i++) {
 		if (returnAddresses[i] < (addr_t)&get_caller
-			|| returnAddresses[i] > (addr_t)&malloc_referenced_release) {
+			|| returnAddresses[i] > (addr_t)&deferred_delete) {
 			return returnAddresses[i];
 		}
 	}
@@ -2500,42 +2500,6 @@ deferred_free(void *block)
 
 	InterruptsSpinLocker _(sDeferredFreeListLock);
 	sDeferredFreeList.Add(entry);
-}
-
-
-void *
-malloc_referenced(size_t size)
-{
-	int32 *referencedData = (int32 *)malloc(size + 4);
-	if (referencedData == NULL)
-		return NULL;
-
-	*referencedData = 1;
-	return referencedData + 1;
-}
-
-
-void *
-malloc_referenced_acquire(void *data)
-{
-	if (data != NULL) {
-		int32 *referencedData = (int32 *)data - 1;
-		atomic_add(referencedData, 1);
-	}
-
-	return data;
-}
-
-
-void
-malloc_referenced_release(void *data)
-{
-	if (data == NULL)
-		return;
-
-	int32 *referencedData = (int32 *)data - 1;
-	if (atomic_add(referencedData, -1) < 1)
-		free(referencedData);
 }
 
 
