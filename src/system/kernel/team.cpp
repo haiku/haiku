@@ -1365,7 +1365,7 @@ remove_team_from_group(Team* team)
 	Team* last = NULL;
 
 	// the team must be in a process group to let this function have any effect
-	if  (group == NULL)
+	if (group == NULL)
 		return;
 
 	for (current = group->teams; current != NULL;
@@ -1376,7 +1376,6 @@ remove_team_from_group(Team* team)
 			else
 				last->group_next = current->group_next;
 
-			team->group = NULL;
 			break;
 		}
 		last = current;
@@ -1384,6 +1383,7 @@ remove_team_from_group(Team* team)
 
 	team->group = NULL;
 	team->group_next = NULL;
+	team->group_id = -1;
 
 	group->ReleaseReference();
 }
