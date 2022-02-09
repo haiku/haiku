@@ -201,6 +201,12 @@ typedef int32 (*thread_entry_func)(thread_func, void *);
 namespace BKernel {
 
 
+struct GroupsArray : KernelReferenceable {
+	int		count;
+	gid_t	groups[];
+};
+
+
 template<typename IDType>
 struct TeamThreadIteratorEntry
 	: DoublyLinkedListLinkImpl<TeamThreadIteratorEntry<IDType> > {
@@ -287,8 +293,7 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 	gid_t			saved_set_gid;
 	gid_t			real_gid;
 	gid_t			effective_gid;
-	gid_t*			supplementary_groups;
-	int				supplementary_group_count;
+	BReference<GroupsArray> supplementary_groups;
 
 	// Exit status information. Set when the first terminal event occurs,
 	// immutable afterwards. Protected by fLock.

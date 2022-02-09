@@ -462,9 +462,6 @@ Team::Team(team_id id, bool kernel)
 
 	commpage_address = NULL;
 
-	supplementary_groups = NULL;
-	supplementary_group_count = 0;
-
 	dead_threads_kernel_time = 0;
 	dead_threads_user_time = 0;
 	cpu_clock_offset = 0;
@@ -540,8 +537,6 @@ Team::~Team()
 		free_user_threads = entry->next;
 		free(entry);
 	}
-
-	malloc_referenced_release(supplementary_groups);
 
 	delete job_control_entry;
 		// usually already NULL and transferred to the parent
@@ -2872,7 +2867,6 @@ team_init(kernel_args* args)
 	sKernelTeam->real_gid = 0;
 	sKernelTeam->effective_gid = 0;
 	sKernelTeam->supplementary_groups = NULL;
-	sKernelTeam->supplementary_group_count = 0;
 
 	insert_team_into_group(group, sKernelTeam);
 

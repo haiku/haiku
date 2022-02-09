@@ -169,8 +169,13 @@ common_getgroups(int groupCount, gid_t* groupList, bool kernel)
 
 	TeamLocker teamLocker(team);
 
-	const gid_t* groups = team->supplementary_groups;
-	int actualCount = team->supplementary_group_count;
+	const gid_t* groups = NULL;
+	int actualCount = 0;
+
+	if (team->supplementary_groups != NULL) {
+		groups = team->supplementary_groups->groups;
+		actualCount = team->supplementary_groups->count;
+	}
 
 	// follow the specification and return always at least one group
 	if (actualCount == 0) {
@@ -207,35 +212,35 @@ common_setgroups(int groupCount, const gid_t* groupList, bool kernel)
 	if (groupCount < 0 || groupCount > NGROUPS_MAX)
 		return B_BAD_VALUE;
 
-	gid_t* newGroups = NULL;
+	BKernel::GroupsArray* newGroups = NULL;
 	if (groupCount > 0) {
-		newGroups = (gid_t*)malloc_referenced(sizeof(gid_t) * groupCount);
+		newGroups = (BKernel::GroupsArray*)malloc(sizeof(BKernel::GroupsArray)
+			+ (sizeof(gid_t) * groupCount));
 		if (newGroups == NULL)
 			return B_NO_MEMORY;
+		new(newGroups) BKernel::GroupsArray;
 
 		if (kernel) {
-			memcpy(newGroups, groupList, sizeof(gid_t) * groupCount);
+			memcpy(newGroups->groups, groupList, sizeof(gid_t) * groupCount);
 		} else {
 			if (!IS_USER_ADDRESS(groupList)
-				|| user_memcpy(newGroups, groupList,
+				|| user_memcpy(newGroups->groups, groupList,
 					sizeof(gid_t) * groupCount) != B_OK) {
-				malloc_referenced_release(newGroups);
+				delete newGroups;
 				return B_BAD_ADDRESS;
 			}
 		}
+		newGroups->count = groupCount;
 	}
 
 	Team* team = thread_get_current_thread()->team;
-
 	TeamLocker teamLocker(team);
 
-	gid_t* toFree = team->supplementary_groups;
-	team->supplementary_groups = newGroups;
-	team->supplementary_group_count = groupCount;
+	BReference<BKernel::GroupsArray> previous = team->supplementary_groups;
+		// so it will not be (potentially) destroyed until after we unlock
+	team->supplementary_groups.SetTo(newGroups, true);
 
 	teamLocker.Unlock();
-
-	malloc_referenced_release(toFree);
 
 	return B_OK;
 }
@@ -256,10 +261,7 @@ inherit_parent_user_and_group(Team* team, Team* parent)
 	team->saved_set_gid = parent->saved_set_gid;
 	team->real_gid = parent->real_gid;
 	team->effective_gid = parent->effective_gid;
-
-	malloc_referenced_acquire(parent->supplementary_groups);
 	team->supplementary_groups = parent->supplementary_groups;
-	team->supplementary_group_count = parent->supplementary_group_count;
 }
 
 
