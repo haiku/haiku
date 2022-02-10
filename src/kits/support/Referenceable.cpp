@@ -6,17 +6,7 @@
 
 #include <Referenceable.h>
 
-#ifdef _KERNEL_MODE
-#	include "kernel_debug_config.h"
-#	if PARANOID_KERNEL_FREE && !defined(DEBUG)
-#		define DEBUG
-#	endif
-#endif
-
-#ifdef DEBUG
 #include <stdio.h>
-#endif
-
 #include <OS.h>
 
 //#define TRACE_REFERENCEABLE
@@ -37,7 +27,7 @@ BReferenceable::BReferenceable()
 
 BReferenceable::~BReferenceable()
 {
-#if !defined(_BOOT_MODE) && defined(DEBUG)
+#if !defined(_BOOT_MODE)
 	if (fReferenceCount != 0 && fReferenceCount != 1) {
 		char message[256];
 		snprintf(message, sizeof(message), "deleting referenceable object %p with "
