@@ -154,8 +154,6 @@ FontManager::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_NODE_MONITOR:
 		{
-			// TODO: support removing fonts!
-
 			int32 opcode;
 			if (message->FindInt32("opcode", &opcode) != B_OK)
 				return;
