@@ -294,7 +294,12 @@ FontManager::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+
+		default:
+			break;
 	}
+
+	BLooper::MessageReceived(message);
 }
 
 
