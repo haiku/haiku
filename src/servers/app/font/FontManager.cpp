@@ -126,6 +126,9 @@ FontManager::FontManager()
 			// Precache the plain and bold fonts
 			_PrecacheFontFile(fDefaultPlainFont.Get());
 			_PrecacheFontFile(fDefaultBoldFont.Get());
+
+			// Post a message so we scan the initial paths.
+			PostMessage(B_PULSE);
 		}
 	}
 }
@@ -296,6 +299,9 @@ FontManager::MessageReceived(BMessage* message)
 		default:
 			break;
 	}
+
+	// Scan fonts here if we need to, preventing other threads from having to do so.
+	_ScanFontsIfNecessary();
 
 	BLooper::MessageReceived(message);
 }
