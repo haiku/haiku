@@ -3055,11 +3055,11 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 			if (block->parent_data != block->current_data) {
 				// The block had been changed in both transactions
 				block->original_data = block->parent_data;
-				block->parent_data = NULL;
 			} else {
 				// The block has only been changed in the parent
-				block->original_data = block->parent_data = NULL;
+				block->original_data = NULL;
 			}
+			block->parent_data = NULL;
 
 			// move the block to the previous transaction list
 			transaction->blocks.Add(block);
