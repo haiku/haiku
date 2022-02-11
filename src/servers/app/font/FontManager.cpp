@@ -297,13 +297,12 @@ FontManager::MessageReceived(BMessage* message)
 		}
 
 		default:
+			BLooper::MessageReceived(message);
 			break;
 	}
 
 	// Scan fonts here if we need to, preventing other threads from having to do so.
 	_ScanFontsIfNecessary();
-
-	BLooper::MessageReceived(message);
 }
 
 
