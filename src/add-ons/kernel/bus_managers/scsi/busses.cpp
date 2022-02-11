@@ -132,11 +132,7 @@ scsi_create_bus(device_node *node, uint8 path_id)
 		goto err4;
 	}
 
-	res = INIT_BEN(&bus->mutex, "scsi_bus_mutex");
-
-	if (res < B_OK)
-		goto err3;
-
+	mutex_init(&bus->mutex, "scsi_bus_mutex");
 	spinlock_irq_init(&bus->dpc_lock);
 
 	res = scsi_init_ccb_alloc(bus);
@@ -158,8 +154,7 @@ scsi_create_bus(device_node *node, uint8 path_id)
 err1:
 	scsi_uninit_ccb_alloc(bus);
 err2:
-	DELETE_BEN(&bus->mutex);
-err3:
+	mutex_destroy(&bus->mutex);
 	delete_sem(bus->start_service);
 err4:
 	delete_sem(bus->scan_lun_lock);
@@ -181,7 +176,7 @@ scsi_destroy_bus(scsi_bus_info *bus)
 	wait_for_thread(bus->service_thread, &retcode);
 
 	delete_sem(bus->start_service);
-	DELETE_BEN(&bus->mutex);
+	mutex_destroy(&bus->mutex);
 	delete_sem(bus->scan_lun_lock);
 
 	scsi_uninit_ccb_alloc(bus);

@@ -13,6 +13,7 @@
 #include <scsi_cmds.h>
 #include <locked_pool.h>
 #include <device_manager.h>
+#include <lock.h>
 
 #define debug_level_error 4
 #define debug_level_info 4

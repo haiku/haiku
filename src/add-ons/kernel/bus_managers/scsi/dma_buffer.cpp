@@ -364,14 +364,14 @@ scsi_get_dma_buffer(scsi_ccb *request)
 	acquire_sem(device->dma_buffer_owner);
 
 	// make sure, clean-up daemon doesn't bother us
-	ACQUIRE_BEN(&device->dma_buffer_lock);
+	mutex_lock(&device->dma_buffer_lock);
 
 	// there is only one buffer, so no further management
 	buffer = &device->dma_buffer;
 
 	buffer->inuse = true;
 
-	RELEASE_BEN(&device->dma_buffer_lock);
+	mutex_unlock(&device->dma_buffer_lock);
 
 	// memorize buffer for cleanup
 	request->dma_buffer = buffer;
@@ -412,12 +412,12 @@ scsi_get_dma_buffer(scsi_ccb *request)
 err:
 	SHOW_INFO0(3, "error setting up DMA buffer");
 
-	ACQUIRE_BEN(&device->dma_buffer_lock);
+	mutex_lock(&device->dma_buffer_lock);
 
 	// some of this is probably not required, but I'm paranoid
 	buffer->inuse = false;
 
-	RELEASE_BEN(&device->dma_buffer_lock);
+	mutex_unlock(&device->dma_buffer_lock);
 	release_sem(device->dma_buffer_owner);
 
 	return false;
@@ -448,12 +448,12 @@ scsi_release_dma_buffer(scsi_ccb *request)
 	request->sg_count = buffer->orig_sg_count;
 
 	// free buffer
-	ACQUIRE_BEN(&device->dma_buffer_lock);
+	mutex_lock(&device->dma_buffer_lock);
 
 	buffer->last_use = system_time();
 	buffer->inuse = false;
 
-	RELEASE_BEN(&device->dma_buffer_lock);
+	mutex_unlock(&device->dma_buffer_lock);
 
 	release_sem(device->dma_buffer_owner);
 
@@ -469,7 +469,7 @@ scsi_dma_buffer_daemon(void *dev, int counter)
 	scsi_device_info *device = (scsi_device_info*)dev;
 	dma_buffer *buffer;
 
-	ACQUIRE_BEN(&device->dma_buffer_lock);
+	mutex_lock(&device->dma_buffer_lock);
 
 	buffer = &device->dma_buffer;
 
@@ -479,7 +479,7 @@ scsi_dma_buffer_daemon(void *dev, int counter)
 		scsi_free_dma_buffer_sg_orig(buffer);
 	}
 
-	RELEASE_BEN(&device->dma_buffer_lock);
+	mutex_unlock(&device->dma_buffer_lock);
 }
 
 
