@@ -992,6 +992,28 @@ DisplayPort::PipePreference()
 	uint32 TranscoderPort = INTEL_TRANS_DP_PORT_NONE;
 	switch (PortIndex()) {
 		case INTEL_PORT_A:
+			if (gInfo->shared_info->device_type.Generation() == 6) {
+				if (((read32(INTEL_DISPLAY_PORT_A) & INTEL_DISP_PORTA_SNB_PIPE_MASK)
+					>> INTEL_DISP_PORTA_SNB_PIPE_SHIFT) == INTEL_DISP_PORTA_SNB_PIPE_A) {
+					return INTEL_PIPE_A;
+				} else {
+					return INTEL_PIPE_B;
+				}
+			}
+			if (gInfo->shared_info->device_type.Generation() == 7) {
+				uint32 Pipe = (read32(INTEL_DISPLAY_PORT_A) & INTEL_DISP_PORTA_IVB_PIPE_MASK)
+					>> INTEL_DISP_PORTA_IVB_PIPE_SHIFT;
+				switch (Pipe) {
+					case INTEL_DISP_PORTA_IVB_PIPE_A:
+						return INTEL_PIPE_A;
+					case INTEL_DISP_PORTA_IVB_PIPE_B:
+						return INTEL_PIPE_B;
+					case INTEL_DISP_PORTA_IVB_PIPE_C:
+						return INTEL_PIPE_C;
+					default:
+						return INTEL_PIPE_ANY;
+				}
+			}
 			return INTEL_PIPE_ANY;
 		case INTEL_PORT_B:
 			TranscoderPort = INTEL_TRANS_DP_PORT_B;
