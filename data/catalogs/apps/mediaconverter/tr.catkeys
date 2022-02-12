@@ -1,8 +1,9 @@
-1	turkish	x-vnd.Haiku-MediaConverter	1322040280
+1	turkish	x-vnd.Haiku-MediaConverter	2816184527
 Input file not recognized as Audio or Video	MediaConverter		Girdi dosyası ses veya görüntü değil
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Video kalitesi: %3d%%
 Source files	MediaConverter		Kaynak dosyaları
+Error writing video frame %lld	MediaConverter		Video çerçevesi %lld yazılırken hata
 Error converting '%filename'	MediaConverter		'%filename' dönüştürülürken hata
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Seçili dizin bulunamadı. Yerine /boot/home kullanılacak.
 Conversion completed	MediaConverter		Dönüştürme tamamlandı
@@ -47,12 +48,16 @@ Error	MediaConverter		Hata
 File details	MediaConverter		Dosya ayrıntıları
 No audio	Audio codecs list		Ses yok
 Drop media files onto this window	MediaConverter		Bu pencereye ortam dosyalarını bırakın
+Writing video track: %ld%% complete	MediaConverter		Video parçası yazılıyor: %%ld% tamamlandı
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, other{# kare}}
+Error read audio frame %lld	MediaConverter		Ses çerçevesi %lld okunurken hata
 Quit	Menu		Çık
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, other{# bayt}}
 Duration:	MediaConverter-FileInfo		Uzunluk:
 MediaConverter	System name		Ortam Dönüştürücü
 Error launching: %strError%	MediaConverter		Başlatılırken hata: %strError%
+Error writing audio frame %lld	MediaConverter		Ses çerçevesi %lld yazılırken hata
+Writing audio track: %ld%% complete	MediaConverter		Ses çerçevesi yazılıyor: %%ld% tamamlandı
 File format:	MediaConverter		Dosya biçimi:
 File	Menu		Dosya
 Video quality not supported	MediaConverter		Video kalitesi desteklenmiyor
@@ -64,5 +69,6 @@ Continue	MediaConverter		Sürdür
 Convert	MediaConverter		Dönüştür
 Audio quality not supported	MediaConverter		Ses kalitesi desteklenmiyor
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Konuma yazılırken hata: %strPath%. Yerine kullanılacak konum: /boot/home
+Error read video frame %lld	MediaConverter		Video çerçevesi %lld okunurken hata
 Preview	MediaConverter		Önizleme
 Start [ms]: 	MediaConverter		Başlangıç [ms]: 

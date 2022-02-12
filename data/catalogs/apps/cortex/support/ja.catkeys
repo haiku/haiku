@@ -1,4 +1,4 @@
-1	japanese	application/x-vnd.Cortex.support	1625162530
+1	japanese	application/x-vnd.Cortex.support	1570889156
 Header has flags	MediaString		ヘッダーにフラグ有り
 32 bit HLS	MediaString		32 ビット HLS
 Recording	MediaString		レコーディング
@@ -91,6 +91,7 @@ Top-Back-left	MediaString		Top-Back-left
 16 bit RGB	MediaString		16 ビット RGB
 YCbCr422	MediaString		YCbCr422
 Raw audio	MediaString		Raw オーディオ
+Video data between line lu and lu	MediaString		ライン lu と lu 間のビデオデーター
 32 bit LABA	MediaString		32 ビット LABA
 24 bit HLS	MediaString		24 ビット HLS
 Non-interlaced 	MediaString		ノンインターレース

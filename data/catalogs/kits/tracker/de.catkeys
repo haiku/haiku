@@ -109,8 +109,8 @@ Recent documents	FavoritesMenu		Letzte Dokumente
 Save as Query template:	FindPanel		Query als Vorlage speichern:
 Edit templates…	TemplatesMenu		Vorlagen bearbeiten …
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{(# Byte)} other{(# Bytes)}}
-8-bit integer	AttributesView		8-bit Integer
-8-bit unsigned integer	AttributesView		8-bit Integer, vorzeichenlos
+8-bit integer	AttributesView		Integer 8-bit
+8-bit unsigned integer	AttributesView		Integer 8-bit, vorzeichenlos
 %s info	InfoWindow	window title	%s-Info
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used benutzt – %free frei)
 Hide dotfiles	SettingsView		Mit Punkt (.) beginnende Dateien ausblenden
@@ -156,7 +156,7 @@ Edit query	ContainerWindow		Query bearbeiten
 Previously mounted disks	AutoMounterSettings		Zuletzt eingehängte Datenträger
 You cannot replace a file with a folder or a symbolic link.	FSUtils		Dateien können nicht mit Ordnern oder Verknüpfungen ersetzt werden.
 The target disk does not support creating links.	FSUtils		Der Zieldatenträger unterstützt das Erstellen von Verknüpfungen nicht.
-64-bit integer	AttributesView		64-bit Integer
+64-bit integer	AttributesView		Integer 64-bit
 Cut more	ContainerWindow		Mehr ausschneiden
 The Tracker must be running to see Info windows.	PoseView		Um Info-Fenster zeigen zu können, muss Tracker laufen.
 Tracker preferences	TrackerSettingsWindow		Tracker-Einstellungen
@@ -211,7 +211,7 @@ Used space color	SettingsView		Farbe für benutzten Speicher
 Cancel	FSUtils		Abbrechen
 Original name	ContainerWindow		Ursprung
 Unknown	WidgetAttributeText		Unbekannt
-32-bit integer	AttributesView		32-bit Integer
+32-bit integer	AttributesView		Integer 32-bit
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Der angegebene Name wird bereits von einem Ordner benutzt. Bitte einen anderen wählen.
 48 x 48	ContainerWindow		48 x 48
 Modified	ContainerWindow		Geändert
@@ -278,7 +278,7 @@ Error %error loading Add-On %name.	ContainerWindow		Fehler %error beim Laden des
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Es wird versucht das Objekt: \n\t%name%dest\nmit:\n\t%name%src\nzu ersetzen.\n\nSoll es mit dem ersetzt werden, das gerade %movemode werden soll? 
 Empty Trash	ContainerWindow		Papierkorb leeren
 no supporting apps	OpenWithWindow		keine unterstützenden Anwendungen
-32-bit unsigned integer	AttributesView		32-bit Integer, vorzeichenlos
+32-bit unsigned integer	AttributesView		Integer 32-bit, vorzeichenlos
 Preparing to empty Trash…	StatusWindow		Leeren des Papierkorbs wird vorbereitet …
 Deleting: 	StatusWindow		Löschen:
 the MIME settings	FSUtils		die MIME-Einstellungen
@@ -390,7 +390,7 @@ Edit Query template	FindPanel		Query-Vorlage bearbeiten
 Save query as template…	FindPanel		Query als Vorlage speichern …
 All disks	AutoMounterSettings		Alle Datenträger
 link	FSUtils	filename link	Verknüpfung
-16-bit unsigned integer	AttributesView		16-bit Integer, vorzeichenlos
+16-bit unsigned integer	AttributesView		Integer 16-bit, vorzeichenlos
 Proceed	FSUtils		Fortfahren
 Edit favorites…	FilePanelPriv		Favoriten bearbeiten …
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Ein Ordner kann nicht in sich selbst oder in einen seiner Unterordner verschoben werden.
@@ -485,7 +485,7 @@ Expression too long.	libtracker		Ausdruck zu lange.
 Color	AttributesView		Farbe
 Copy layout	ContainerWindow		Anordnung kopieren
 Duplicate	ContainerWindow		Duplizieren
-16-bit integer	AttributesView		16-bit Integer
+16-bit integer	AttributesView		Integer 16-bit
 Untitled clipping	PoseView		Unbenannter Ausschnitt
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Die Datei \"%name\" existiert bereits in diesem Ordner. Soll sie ersetzt werden?
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Objekte müssen auf eines der Icons im \"Datenträger\" Fenster fallengelassen werden.

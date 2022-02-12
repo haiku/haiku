@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-StyledEdit	2796309255
+1	hungarian	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Statisztika
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, a fájl \"%s\" nem található.
 Cut	Menus		Kivágás
@@ -51,6 +51,7 @@ OK	SaveAlert		Rendben
 Color	Menus		Szín
 Save changes to the document \"%s\"? 	QuitAlert		Mented a dokumentum \"%s\" változtatásait?
 StyledEdit	System name		StyledEdit
+Underline	Menus		Aláhúzás
 Find:	FindandReplaceWindow		Keresés:
 Undo typing	QuitAlert		Gépelés visszavonása
 Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" betöltése sikertelen:\n\t%s

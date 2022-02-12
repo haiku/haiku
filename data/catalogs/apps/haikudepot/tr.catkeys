@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	481425000
+1	turkish	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 Network error	ServerHelper		Ağ hatası
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Depo güncellenirken bir hata oluştu: %error%
@@ -7,6 +7,7 @@ Check for updates…	MainWindow		Güncellemeleri denetle…
 Uninstalled	PackageListView		Kaldırıldı
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
 Available packages	MainWindow		Kullanılabilir paketler
+An unexpected error has been sent from the server [%li]	ServerHelper		Sunucudan beklenmeyen bir hata alındı [%li]
 Create account	UserLoginWindow		Hesap oluştur
 Install %PackageTitle%	PackageManager		Yükle: %PackageTitle%
 OK	App		Tamam
@@ -68,7 +69,6 @@ Changelog	PackageInfoView		Değişiklik günlüğü
 Rating not possible	MainWindow		Derecelendirme olanaklı değil
 Package update error	MainWindow		Paket güncelleme hatası
 About	PackageInfoView		Hakkında
-%VersionCreateDate%	FeaturedPackagesView		%VersionCreateDate%
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, other{# işlem}}
 Reboot required	PackageManager		Yeniden başlatma gerekli
 Password:	UserLoginWindow		Parola:

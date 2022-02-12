@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	2601047281
+1	catalan; valencian	x-vnd.Haiku-ActivityMonitor	826097672
 Teams	DataSource		Equips
 Semaphores	DataSource		Semàfors
 TX	DataSource	Shorter version for Sending	TX
@@ -24,6 +24,7 @@ Settings…	ActivityWindow		Paràmetres...
 Block cache	DataSource		Bloca la cau
 Memory	DataSource		Memòria
 CPU usage	DataSource		Ús de la CPU
+CPU speed	DataSource		Velocitat de la CPU
 Quit	ActivityWindow		Surt
 Raw clipboard	DataSource		Porta-retalls en cru
 Settings	ActivityWindow		Paràmetres
@@ -32,6 +33,7 @@ Used memory	DataSource		Memòria usada
 Show legend	ActivityView		Mostra la llegenda
 Cached memory	DataSource		A la memòria cau
 CPU %d usage	DataSource		Ús de la CPU %d
+CPU %d speed	DataSource		Velocitat de la CPU %d
 File	ActivityWindow		Fitxer
 Ports	DataSource		Ports
 Page faults	DataSource		Falles de pàgina

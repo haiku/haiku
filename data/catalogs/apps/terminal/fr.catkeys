@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	610710493
+1	french	x-vnd.Haiku-Terminal	1264587816
 ANSI cyan color	Terminal AppearancePrefView		Couleur cyan ANSI
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
 Insert path	Terminal TermView		Insérer un chemin de recherche
@@ -37,6 +37,7 @@ Slate	Terminal colors scheme		Ardoise
 Defaults	Terminal PrefWindow		Paramètres par défaut
 Cancel	Terminal TermView		Annuler
 Revert	Terminal PrefWindow		Rétablir
+Relaxed	Terminal colors scheme		Décontracté
 ANSI bright magenta color	Terminal AppearancePrefView		Couleur magenta clair ANSI
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 ANSI bright cyan color	Terminal AppearancePrefView		Couleur cyan clair ANSI

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	1504929345
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		Error d'actualització del repositori
 Network error	ServerHelper		Error de xarxa
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hi ha hagut un error en actualitzar el repositori: %error%
@@ -7,6 +7,7 @@ Check for updates…	MainWindow		Comprova si hi ha actualitzacions...
 Uninstalled	PackageListView		Desinstal·lat
 It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
 Available packages	MainWindow		Paquets disponibles
+An unexpected error has been sent from the server [%li]	ServerHelper		S'ha enviat un error inesperat des del servidor [%li]
 Create account	UserLoginWindow		Creeu un compte
 Install %PackageTitle%	PackageManager		Instal·la %PackageTitle%
 OK	App		D'acord
@@ -44,6 +45,7 @@ Category	FilterView		Categoria
 User rating	RatePackageWindow		Puntuació de l'usuari
 Installed packages	MainWindow		Paquets instal·lats
 A requested object or an object involved in the request was not found on the server.	ServerHelper		No s'ha trobat al servidor un objecte sol·licitat o un objecte implicat en la sol·licitud.
+Date	PackageListView		Data
 No changelog available.	PackageInfoView		No hi ha cap registre de canvis disponible.
 Error	App		Error
 There was a puzzling response from the web service.	UserLoginWindow		Hi ha hagut una resposta desconcertant del servei web.
@@ -55,6 +57,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		No ha estat possible comunicar-se amb el servidor per obtenir una imatge de CAPTCHA necessària per crear un usuari nou.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		S'ha carregat correctament la puntuació. Podeu actualitzar-la o suprimir-la al lloc web del servidor del Dipòsit del Haiku.
 Available	PackageListView		Disponible
+-	no package publish		-
 Cancel	UserLoginWindow		Cancel·la
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		El Dipòsit del Haiku necessita que el dimoni del paquet funcioni i sembla que no funciona.\nVoleu iniciar-lo ara?
 Click a package to view information	PackageInfoView		Cliqueu sobre un paquet per veure'n la informació.

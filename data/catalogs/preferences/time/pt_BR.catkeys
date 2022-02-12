@@ -1,10 +1,11 @@
-1	portuguese (brazil)	x-vnd.Haiku-Time	2069485065
+1	portuguese (brazil)	x-vnd.Haiku-Time	3691539601
 OK	Time		OK
 Message receiving failed	Time		Falha ao receber a mensagem
 Australia	Time		Austrália
 America	Time		América
 Reset to default server list	Time		Restaurar para lista de padrão de servidores
 Could not resolve server address	Time		Não foi possível determinar o endereço do servidor
+Time & Date	System name		Hora e Data
 Set time zone	Time		Definir fuso horário
 Waiting for answer failed	Time		Espera por resposta falhou
 <Other>	Time		<Outro>

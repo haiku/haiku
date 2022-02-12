@@ -1,8 +1,9 @@
-1	japanese	x-vnd.Haiku-MediaConverter	1322040280
+1	japanese	x-vnd.Haiku-MediaConverter	2816184527
 Input file not recognized as Audio or Video	MediaConverter		入力ファイルはオーディオまたはビデオとして認識できません。
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		ビデオ品質: %3d%%
 Source files	MediaConverter		ソースファイル
+Error writing video frame %lld	MediaConverter		ビデオフレーム %lld の書き込みに失敗しました
 Error converting '%filename'	MediaConverter		'%filename'の変換中にエラーが発生しました
 Selected directory not found. Defaulting to /boot/home	MediaConverter		選択されたディレクトリが見つかりません。初期設定の /boot/home を使用します。
 Conversion completed	MediaConverter		変換が完了しました
@@ -47,12 +48,16 @@ Error	MediaConverter		エラー
 File details	MediaConverter		ファイルの詳細
 No audio	Audio codecs list		オーディオ無し
 Drop media files onto this window	MediaConverter		メディアファイルをこのウィンドウにドロップしてください
+Writing video track: %ld%% complete	MediaConverter		ビデオトラックの書き込み: %ld%% 完了
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# フレーム} other{# フレーム}}
+Error read audio frame %lld	MediaConverter		オーディオフレーム %lld の読み取りに失敗しました
 Quit	Menu		終了
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# バイト} other{# バイト}}
 Duration:	MediaConverter-FileInfo		再生時間:
 MediaConverter	System name		メディアコンバーター
 Error launching: %strError%	MediaConverter		起動時にエラーが発生しました: %strError%
+Error writing audio frame %lld	MediaConverter		オーディオフレーム %lld の書き込みに失敗しました
+Writing audio track: %ld%% complete	MediaConverter		オーディトラックの書き込み: %ld%% 完了
 File format:	MediaConverter		ファイルフォーマット:
 File	Menu		ファイル
 Video quality not supported	MediaConverter		ビデオ品質はサポートされていません
@@ -64,5 +69,6 @@ Continue	MediaConverter		続ける
 Convert	MediaConverter		変換
 Audio quality not supported	MediaConverter		オーディオ品質がサポートされていません
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		%strPath% への書き込み時にエラーが発生しました。初期設定の /boot/home を使用します。
+Error read video frame %lld	MediaConverter		ビデオフレーム %lld の読み込みに失敗しました
 Preview	MediaConverter		プレビュー
 Start [ms]: 	MediaConverter		開始 [ms]:

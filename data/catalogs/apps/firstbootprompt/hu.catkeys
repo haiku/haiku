@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-FirstBootPrompt	2131367349
+1	hungarian	x-vnd.Haiku-FirstBootPrompt	4188642861
 Japanese	KeymapNames		Japán
 US	KeymapNames		Egyesült Államok
 Cancel	BootPromptWindow		Mégse
@@ -11,6 +11,7 @@ Latin-American	KeymapNames		Latin-Amerika
 Ukrainian	KeymapNames		Ukrán
 Russian (Yawert)	KeymapNames		Orosz (Yawert)
 United-Kingdom	KeymapNames		Egyesült Királyság
+Welcome!	BootPromptWindow		Üdvözöllek!
 Quit Haiku	System name		Haiku leállítása
 Turkish (Type-F)	KeymapNames		Török (F-típus)
 Serbian (Cyrillic)	KeymapNames		Szerb (cirill)
@@ -43,8 +44,10 @@ Faeroese	KeymapNames		Feröeri
 Polish (Typewriter)	KeymapNames		Lengyel (írógép)
 French (Mac)	KeymapNames		Francia (Mac)
 Spanish	KeymapNames		Spanyol
+Try it out	BootPromptWindow		Próbáld ki!
 Ukrainian (Mac)	KeymapNames		Ukrán (Mac)
 Estonian	KeymapNames		Észt
+Install Haiku	BootPromptWindow		Haiku telepítése
 French (Bépo)	KeymapNames		Francia (Bépo)
 Restart system	BootPromptWindow		Újraindítás
 Serbian (Latin)	KeymapNames		Szerb (latin)
@@ -66,8 +69,10 @@ Norwegian	KeymapNames		Norvég
 Danish	KeymapNames		Dán
 Bulgarian (Phonetic)	KeymapNames		Belga (fonetikus)
 Canadian-French	KeymapNames		Kanadai-Francia
+Welcome to Haiku!	BootPromptWindow		Üdvözöllek a Haiku-ban!
 Russian	KeymapNames		Orosz
 Hungarian	KeymapNames		Magyar
+Install	BootPromptWindow		Telepítés
 Irish	KeymapNames		Ír
 Romanian	KeymapNames		Román
 Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Biztosan beakarod zárni az ablakot? Ezzel a számítógép újra fog indulni.

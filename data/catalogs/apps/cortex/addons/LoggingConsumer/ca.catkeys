@@ -1,5 +1,7 @@
-1	catalan; valencian	application/x-vnd.Be.LoggingConsumerApp	3653006715
+1	catalan; valencian	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: no s'ha pogut obtenir la informació del node (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Prioritat
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: no s'ha pogut trobar el node (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Latència
 Logged input	CortexAddOnsLoggingConsumer		Entrada registrada
 CPU spin percentage	CortexAddOnsLoggingConsumer		Percentatge de rotació de la CPU
@@ -17,3 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Controls
 controls	CortexAddOnsCommonMediaNodeControlApp		controls
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Connecta
 percent	CortexAddOnsLoggingConsumer		percentatge
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: no hi ha paràmetres per al node (%ld):\n%s\n

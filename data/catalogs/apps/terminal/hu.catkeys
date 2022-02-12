@@ -1,8 +1,10 @@
-1	hungarian	x-vnd.Haiku-Terminal	3117643489
+1	hungarian	x-vnd.Haiku-Terminal	4032760800
+ANSI cyan color	Terminal AppearancePrefView		ANSI cián
 Close other tabs	Terminal TermWindow		Többi lap bezárása
 Insert path	Terminal TermView		Útvonal beszúrása
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Sajnos, a terminálnak nem sikerült elindítani a shellt.
 Text encoding	Terminal TermWindow		Szöveg kódolása
+ANSI blue color	Terminal AppearancePrefView		ANSI kék
 OK	Terminal SetTitleWindow		Rendben
 Edit	Terminal TermWindow		Szerkesztés
 Select all	Terminal TermWindow		Összes kijelölése
@@ -10,39 +12,49 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Kilépés meg
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tA jelenlegi folyamat munka mappája az aktuális fülön.\n\t\t\tOpcionálisan megadható a maximális útvonal-elemek száma.\n\t\t\tPéldául '%2d' a legutolsó kettő elem.\n\t%T\t-\tA Terminal neve az aktuális nyelven.\n\t%e\t-\tA jelenlegi fül kódolása. UTF-8 esetén nem látszik.\n\t%i\t-\tAz ablak sorszáma.\n\t%p\t-\tAz aktív folyamat neve az aktuális fülön.\n\t%t\t-\tA jelenlegi fül címe.
 Solarized Dark	Terminal colors scheme		Erős sötét színek
 Copy	Terminal TermWindow		Másolás
+ANSI bright green color	Terminal AppearancePrefView		ANSI fényes zöld
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		-h, --help a súgó kiírása\n-t, --title ablak címének megadása\n-f, --fullscreen indítás teljesképernyős módban\n-w, --working-directory kezdő mappa megadása
+ANSI white color	Terminal AppearancePrefView		ANSI fehér
 Retro	Terminal colors scheme		Retró
 Edit tab title…	Terminal TermWindow		Lap címének szerkesztése…
 Settings	Terminal TermWindow		Beállítások
 Print	Terminal TermWindow		Nyomtatás
 %app% settings	Terminal PrefWindow	window title	%app% beállítások
+ANSI black color	Terminal AppearancePrefView		ANSI fekete
 Use default	Terminal SetTitleWindow		Alapérték használata
 Close tab	Terminal TermWindow		Lap bezárása
 Selected background	Terminal AppearancePrefView		Kijelölés háttere
 Error!	Terminal getString		Hiba!
 Set tab title	Terminal TermWindow		Lap címének beállítása
 Appearance	Terminal PrefWindow		Megjelenés
+ANSI bright yellow color	Terminal AppearancePrefView		ANSI fényes sárga
 Encoding:	Terminal AppearancePrefView		Kódolás:
 Create link here	Terminal TermView		Hivatkozás létrehozása
 Custom	Terminal AppearancePrefView	Window size	Egyéni
 Selected text	Terminal AppearancePrefView		Kijelölt szöveg
 Change directory	Terminal TermView		Mappa váltása
+ANSI magenta color	Terminal AppearancePrefView		ANSI magenta
 Page setup…	Terminal TermWindow		Oldalbeállítás…
 Slate	Terminal colors scheme		Pala
 Defaults	Terminal PrefWindow		Alapértékek
 Cancel	Terminal TermView		Mégse
 Revert	Terminal PrefWindow		Visszavonás
+Relaxed	Terminal colors scheme		Kiegyensúlyozott
+ANSI bright magenta color	Terminal AppearancePrefView		ANSI fényes magenta
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminál
+ANSI bright cyan color	Terminal AppearancePrefView		ANSI fényes cián
 Find next	Terminal TermWindow		Következő keresése
 Use selection	Terminal FindWindow		Kijelölés használata
 Copy link location	Terminal TermView		Hivatkozás másolása
 Window title:	Terminal AppearancePrefView		Ablak címe:
 New tab	Terminal TermWindow		Új lap
+ANSI bright blue color	Terminal AppearancePrefView		ANSI fényes kék
 Allow bold text	Terminal AppearancePrefView		Félkövér betűk engedélyezése
 Window title…	Terminal TermWindow		Ablak címe…
 Blue	Terminal colors scheme		Kék
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Nem sikerült lefuttatni:\" %command\":\n\t%error
 Open path	Terminal TermView		Útvonal megnyitása
+ANSI yellow color	Terminal AppearancePrefView		ANSI sárga
 Terminal	System name		Terminál
 Font size	Terminal TermWindow		Betűméret
 Custom	Terminal colors scheme		Egyéni
@@ -63,6 +75,7 @@ The pattern specifying the tab titles. The following placeholders\ncan be used:	
 Close	Terminal TermWindow		Bezárás
 Save to file…	Terminal PrefWindow		Mentés fájlba…
 Background	Terminal AppearancePrefView		Háttér
+ANSI green color	Terminal AppearancePrefView		ANSI zöld
 Copy path	Terminal TermView		Útvonal másolása
 Window size	Terminal TermWindow		Ablak mérete
 Copy absolute path	Terminal TermView		Teljes útvonal másolása
@@ -80,6 +93,7 @@ Window size:	Terminal AppearancePrefView		Ablak mérete:
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Decrease	Terminal TermWindow		Csökkentés
 Settings…	Terminal TermWindow		Beállítások…
+ANSI bright white color	Terminal AppearancePrefView		ANSI fényes fehér
 Blinking cursor	Terminal AppearancePrefView		Villogó kurzor
 Cancel	Terminal SetTitleWindow		Mégse
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Az ablak címét meghatározó minta. A következő kódok\nhasználhatóak:\n
@@ -87,6 +101,7 @@ Close active tab	Terminal TermWindow		Aktív lap bezárása
 Use text:	Terminal FindWindow		Szöveg használata:
 Save as default	Terminal TermWindow		Beállítás alapértelmezettként
 Nothing is selected.	Terminal TermWindow		Nincs semmi kijelölve.
+ANSI red color	Terminal AppearancePrefView		ANSI piros
 Use left Option as Meta key	Terminal AppearancePrefView		Bal Opció használata Meta-billentyűnek
 Find	Terminal FindWindow		Keresés
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		A jelenlegi lap címét meghatározó minta. A következő kódok \nhasználhatóak:\n
@@ -94,7 +109,9 @@ Professional	Terminal colors scheme		Professzionális
 Font:	Terminal AppearancePrefView		Betűtípus:
 Paste	Terminal TermWindow		Beillesztés
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Minta alapján megadható az ablak cím. Az alábbi behelyettesítések \nhasználhatóak:
+ANSI bright black color	Terminal AppearancePrefView		ANSI fényes fekete
 Copy here	Terminal TermView		Másolás
+ANSI bright red color	Terminal AppearancePrefView		ANSI fényes piros
 Use default shell	Terminal Shell		Alapértelmezett shell használata
 Color:	Terminal AppearancePrefView		Szín:
 Open link	Terminal TermView		Hivatkozás megnyitása

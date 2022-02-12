@@ -12,8 +12,8 @@ GIF image	GIFTranslator		Image GIF
 Write transparent images	GIFView		Enregistrer la transparence des images
 GIF images	GIFTranslator		Images GIF
 Version %d.%d.%d, %s	GIFView		Version %d.%d.%d, %s
-Use RGB color	GIFView		Utilisez la couleur RVB
-Use dithering	GIFView		Utilisez le tramage
+Use RGB color	GIFView		Utiliser la couleur RVB
+Use dithering	GIFView		Utiliser le tramage
 GIF Settings	GIFTranslator		Réglages GIF
 BeOS system	GIFView		Système BeOS
 Automatic (from alpha channel)	GIFView		Automatique (à partir du canal alpha)

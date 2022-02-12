@@ -1,12 +1,14 @@
-1	indonesian	x-vnd.Haiku-Mandelbrot	3875916167
+1	indonesian	x-vnd.Haiku-Mandelbrot	2302392624
 Grassland	MandelbrotWindow		Padang rumput
 Tricorn	MandelbrotWindow		Tricorn
 Orbit Trap	MandelbrotWindow		Jebakan Orbit
 Deepfrost	MandelbrotWindow		Deepfrost
 1 (none)	MandelbrotWindow		1 (tiada)
 Quit	MandelbrotWindow		Berhenti
+Save as image…	MandelbrotWindow		Simpan sebagai gambar…
 Fire	MandelbrotWindow		Api
 High contrast	MandelbrotWindow		Kontras tinggi
+Full screen	MandelbrotWindow		Layar penuh
 Midnight	MandelbrotWindow		Tengah malam
 Burning Ship	MandelbrotWindow		Kapal Terbakar
 Lightning	MandelbrotWindow		Petir
@@ -18,6 +20,7 @@ Subsampling	MandelbrotWindow		Subsampling
 File	MandelbrotWindow		Berkas
 Julia	MandelbrotWindow		Julia
 Frost	MandelbrotWindow		Embun beku
+View	MandelbrotWindow		Lihat
 Mandelbrot	System name		Mandelbrot
 Multibrot	MandelbrotWindow		Multibrot
 Iterations	MandelbrotWindow		Iterasi

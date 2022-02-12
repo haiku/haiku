@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	1504929345
+1	french	x-vnd.Haiku-HaikuDepot	326741919
 Repository update error	LocalRepositoryUpdateProcess		Erreur à l’actualisation du dépôt
 Network error	ServerHelper		Erreur réseau
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
@@ -7,6 +7,7 @@ Check for updates…	MainWindow		Vérifier les mises à jour…
 Uninstalled	PackageListView		Désinstallé
 It was not possible to create the new user.	UserLoginWindow		Impossible de créer le nouvel utilisateur.
 Available packages	MainWindow		Paquets disponibles
+An unexpected error has been sent from the server [%li]	ServerHelper		Le serveur [%li] a renvoyé une erreur inattendue.
 Create account	UserLoginWindow		Créer un compte
 Install %PackageTitle%	PackageManager		Installer %PackageTitle%
 OK	App		OK
@@ -44,6 +45,7 @@ Category	FilterView		Catégorie
 User rating	RatePackageWindow		Avis de l’utilisateur
 Installed packages	MainWindow		Paquets installés
 A requested object or an object involved in the request was not found on the server.	ServerHelper		L’objet demandé ou l’objet associé à la requête n’a pas été trouvé sur le serveur.
+Date	PackageListView		Date
 No changelog available.	PackageInfoView		La liste des modifications n’est pas disponible.
 Error	App		Erreur
 There was a puzzling response from the web service.	UserLoginWindow		La réponse du service web est incompréhensible.

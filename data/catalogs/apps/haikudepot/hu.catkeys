@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	1504929345
+1	hungarian	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		Tároló frissítési hiba
 Network error	ServerHelper		Hálózati hiba
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hiba történt a tároló frissítésekor: %error%
@@ -7,6 +7,7 @@ Check for updates…	MainWindow		Frissítések keresése…
 Uninstalled	PackageListView		Eltávolítva
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
 Available packages	MainWindow		Elérhető csomagok
+An unexpected error has been sent from the server [%li]	ServerHelper		A kiszolgáló váratlan hibaüzenetet küldött [%li]
 Create account	UserLoginWindow		Felhasználói fiók létrehozása
 Install %PackageTitle%	PackageManager		%PackageTitle% telepítése
 OK	App		Rendben
@@ -44,6 +45,7 @@ Category	FilterView		Kategória
 User rating	RatePackageWindow		Felhasználói értékelés
 Installed packages	MainWindow		Telepített csomagok
 A requested object or an object involved in the request was not found on the server.	ServerHelper		A kért objektum vagy a kérésben szereplő objektum nem található a kiszolgálón.
+Date	PackageListView		Dátum
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
 Error	App		Hiba
 There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
@@ -55,6 +57,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nem sikerült kapcsolódni a kiszolgálóhoz a captcha kód letöltéséhez.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Az értékelés feltöltése sikeres volt. Frissítheted vagy eltávolíthatod a HaikuDepot kiszolgáló webhelyén.
 Available	PackageListView		Elérhető
+-	no package publish		-
 Cancel	UserLoginWindow		Mégse
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		A Raktárnak szüksége van a csomag démonra a helyes működéshez, de úgy látszik, hogy az nem fut.\nElindíthatom?
 Click a package to view information	PackageInfoView		Válassz egy csomagot az információk megtekintéséhez

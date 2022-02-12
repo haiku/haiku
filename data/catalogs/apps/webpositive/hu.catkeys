@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	250728390
+1	hungarian	x-vnd.Haiku-WebPositive	3767274013
 Authentication required	Authentication Panel		Azonosítás szükséges
 Previous	WebPositive Window		Előző
 (Finish: %date)	Download Window		(Befejezés: %date)
@@ -56,6 +56,7 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Keresési feltétel
 Reload	WebPositive Window		Újratöltés
 Expiration	Cookie Manager		Érvényesség
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		A processzor túl régi, és nem támogatja az SSE2 kiterjesztést, amelyek nélkül a WebPositive nem futhat. Javasoljuk a NetSurf telepítését helyette.
 Download finished	Download Window		Elkészült a letöltés
 Cookie manager	WebPositive Window		Süti kezelő
 OK	Authentication Panel		Rendben
@@ -149,6 +150,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Indítás:
 Confirmation	WebPositive Window		Megerősítés
 Session cookie	Cookie Manager		Folyamat-süti
+No SSE2 support	WebPositive		Az SSE2 nem támogatott
 Open all	WebPositive Window		Összes megnyitása
 Cut	WebPositive Window		Kivág
 Downloads	Download Window		Letöltések

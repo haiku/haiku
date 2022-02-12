@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	250728390
+1	japanese	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		認証が必要です
 Previous	WebPositive Window		前へ
 (Finish: %date)	Download Window		(完了: %date)
@@ -45,6 +45,7 @@ New tabs:	Settings Window		新しいタブ:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url の読み込みに失敗しました
 Open downloads folder	Download Window		ダウンロードフォルダーの表示
 Proxy server	Settings Window		プロキシサーバー
+Darn!	WebPositive		Darn!
 Decrease size	WebPositive Window		縮小
 Default fixed font size:	Settings Window		等幅フォントサイズ:
 Sans serif font:	Settings Window		サンセリフフォント:
@@ -56,6 +57,7 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - 検索語
 Reload	WebPositive Window		再読み込み
 Expiration	Cookie Manager		有効期限
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		CPUが古く、SSE2拡張をサポートしていません。そのためWebPositiveを動作できません。代わりにNetSurfのインストールをお勧めします。
 Download finished	Download Window		ダウンロードが完了しました
 Cookie manager	WebPositive Window		Cookie マネージャー
 OK	Authentication Panel		OK
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		スタートアップ:
 Confirmation	WebPositive Window		確認
 Session cookie	Cookie Manager		セッション cookie
+No SSE2 support	WebPositive		SSE2 のサポートがありません
 Open all	WebPositive Window		すべてを開く
 Cut	WebPositive Window		切り取り
 Downloads	Download Window		ダウンロード

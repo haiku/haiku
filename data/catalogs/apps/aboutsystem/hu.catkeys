@@ -1,8 +1,9 @@
-1	hungarian	x-vnd.Haiku-About	1736446963
+1	hungarian	x-vnd.Haiku-About	2473434391
 Revision	AboutView		kiadás:
 The Haikuware team and their bounty program\n	AboutView		A Haikuware csapatának és az adományprogramjuknak\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Minden jog fenntartva.
 %.2f GHz	AboutView		%.2f GHz
+Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Minden jog fenntartva.
 \n\nSpecial thanks to:\n	AboutView		\n\nKülön köszönet jár:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrechtnek (NewOS kernel)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Minden jog fenntartva.
@@ -13,9 +14,11 @@ Copyright © 2006-2012 Kentaro Fukuchi	AboutView		© 2006-2012 Kentaro Fukuchi
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Minden jog fenntartva.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Minden jog fenntartva.
 Past website & marketing:\n	AboutView		Előző weboldal illetve marketing:\n
+Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Minden jog fenntartva.
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe és mások.
 Testing and bug triaging:\n	AboutView		Tesztelés és hibakeresés:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processzor:} other{# processzor:}}
+Ralink WiFi Firmware	AboutWindow		Ralink WiFi Firmware
 %d MiB total	AboutView		%d MiB összesen
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Minden egyedi kód a Haikuban, különösen a kernel és azon kódrészletek, amelyek csatolva vannak programokhoz, az <MIT licenc> alatt érhetőek el. Néhány funkciótár tartalmaz harmadik féltől származó kódot, ezek az <LGPL licenc> alatt érhetőek el. A harmadik felekre vonatkozó szerzői jogok alább találhatóak.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Minden jog fenntartva.
@@ -38,6 +41,7 @@ Michael Phipps (project founder)\n\n	AboutView		Michael Phippsnek (projektalapí
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 About this system	AboutWindow		Haiku névjegye
 %d MiB used (%d%%)	AboutView		%d MiB használt (%d%%)
+Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Minden jog fenntartva.
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 a Gutenprint szerzőitől. Minden jog fenntartva.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Minden jog fenntartva.
 AboutSystem	System name		Névjegy
@@ -55,14 +59,18 @@ Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright �
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		© 2000-2019 Fabrice Bellard, et al.
 Current maintainers:\n	AboutView		Jelenlegi karbantartók:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Minden jog fenntartva.
+Intel WiFi Firmware	AboutWindow		Intel WiFi Firmware
+Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Minden jog fenntartva.
 Version:	AboutView		Verzió:
 The BeGeistert team\n	AboutView		A BeGeistert csapatának\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 License: 	AboutView		Licenc:
+Intel (2xxx firmware)	AboutWindow		Intel (2xxx firmware)
 GNU GPL v2	AboutWindow		GNU GPL v2
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Az Aucklandi Egyetem és Christof Lutteroth\n\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB összesen, %inaccessible MiB nem használható
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 Google fordító csapata.
+Copyright © 2001-%ld The Haiku project. 	AboutView		Copyright © 2001-%ld A Haiku projekt.
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Minden jog fenntartva.
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-loup Gailly és Mark Adler.
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Expat üzemeltetők.
@@ -70,10 +78,12 @@ Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		© 2002-2006 Maxim 
 Translations:\n	AboutView		Fordítások:\n
 Memory:	AboutView		Memória:
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… és a többi ember, akiket lehet elfelejtettünk megemlíteni (elnézést!)\n\n
+Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. Minden jog fenntartva.
 BSD (2-clause)	AboutWindow		BSD (2-clause)
 Website & marketing:\n	AboutView		Weboldal és marketing:\n
 Copyright © 2018-2021, Frederic Cambus	AboutView		© 2018-2021, Frederic Cambus
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 Andy Ritger által, az Általános Időzítéses Formula (Generalized Timing Formula) alapján
 …and the many people making donations!\n\n	AboutView		… a rengeteg adományokkal segítő embernek!\n\n
+Marvell (firmware)	AboutWindow		Marvell (firmware)
 BSD (4-clause)	AboutWindow		BSD (4-clause)
 BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER a Bitstream Inc. regisztrált védjegye

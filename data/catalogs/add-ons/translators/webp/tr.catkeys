@@ -1,2 +1,25 @@
-1	turkish	x-vnd.Haiku-WebPTranslator	1475550615
+1	turkish	x-vnd.Haiku-WebPTranslator	828165164
+High	ConfigView		Yüksek
+WebPTranslator Settings	ConfigView		WebPTranslator Ayarları
+Low	ConfigView		Düşük
+WebP image translator	ConfigView		WebP görseli çevirmeni
+Photo	ConfigView		Fotoğraf
+WebP image translator	WebPTranslator		WebP görseli çevirmeni
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc
+Picture	ConfigView		Resim
+Default	ConfigView		Öntanımlı
+Text	ConfigView		Metin
+Preprocessing filter	ConfigView		Ön işleme süzgeci
+Compression method:	ConfigView		Sıkıştırma yöntemi:
+Preset	ConfigView		Önayar
+Drawing	ConfigView		Çizim
+Output preset:	ConfigView		Çıkış önayarı:
 WebP Settings	main		WebP Ayarları
+Icon	ConfigView		Simge
+WebP image	WebPTranslator		WebP görseli
+Output quality:	ConfigView		Çıkış kalitesi:
+Slower but better	ConfigView		Daha yavaş; ancak daha iyi
+Based on libwebp %version%	ConfigView		libwebp %version% temellidir
+Fast	ConfigView		Hızlı
+WebP images	WebPTranslator		WebP görselleri

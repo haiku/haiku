@@ -1,8 +1,9 @@
-1	french	x-vnd.Haiku-MediaConverter	1322040280
+1	french	x-vnd.Haiku-MediaConverter	2816184527
 Input file not recognized as Audio or Video	MediaConverter		Le fichier d’entrée n’est pas reconnu comme un fichier audio ou vidéo
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f fps
 Video quality: %3d%%	MediaConverter		Qualité vidéo : %3d%%
 Source files	MediaConverter		Fichiers sources
+Error writing video frame %lld	MediaConverter		Erreur d’écriture de l’image vidéo %lld
 Error converting '%filename'	MediaConverter		Erreur à la conversion de « %filename »
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Le dossier sélectionné est introuvable. Dossier de repli : /boot/home
 Conversion completed	MediaConverter		Conversion achevée
@@ -47,12 +48,16 @@ Error	MediaConverter		Erreur
 File details	MediaConverter		Détails du fichier
 No audio	Audio codecs list		Pas de son
 Drop media files onto this window	MediaConverter		Déposez les médias à convertir dans cette fenêtre
+Writing video track: %ld%% complete	MediaConverter		Écriture de la piste vidéo : %ld%% réalisé
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# trame} other{# trames}}
+Error read audio frame %lld	MediaConverter		Erreur de lecture de la trame audio %lld
 Quit	Menu		Quitter
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# octet} other{# octets}}
 Duration:	MediaConverter-FileInfo		Durée :
 MediaConverter	System name		Convertisseur de média
 Error launching: %strError%	MediaConverter		Erreur de lancement : %strError%
+Error writing audio frame %lld	MediaConverter		Erreur d’écriture de la trame audio %lld
+Writing audio track: %ld%% complete	MediaConverter		Écriture de la piste audio : %ld%% réalisé
 File format:	MediaConverter		Format de fichier :
 File	Menu		Fichier
 Video quality not supported	MediaConverter		Qualité vidéo non prise en charge
@@ -64,5 +69,6 @@ Continue	MediaConverter		Continuer
 Convert	MediaConverter		Convertir
 Audio quality not supported	MediaConverter		Qualité audio non prise en charge
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Erreur d’écriture à l’emplacement: %strPath%. Emplacement de repli : /boot/home
+Error read video frame %lld	MediaConverter		Erreur de lecture de l’image vidéo %lld
 Preview	MediaConverter		Aperçu
 Start [ms]: 	MediaConverter		Début [ms] : 

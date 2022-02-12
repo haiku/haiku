@@ -1,6 +1,7 @@
-1	indonesian	x-vnd.Haiku-CodyCam	40716723
+1	indonesian	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		direktori tujuan diharapkan
 reply: '%s'\n	SftpClient		balas: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed> (sandi asli terkirim)
 JPEG image	CodyCam		Gambar JPEG
 Remote host has closed the connection.\n	FtpClient		Remote host telah menutup koneksi.\n
 image file format expected	CodyCam		format berkas gambar diharapkan

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	250728390
+1	catalan; valencian	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Acabament: %date)
@@ -45,6 +45,7 @@ New tabs:	Settings Window		Pestanyes noves:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url ha fallat
 Open downloads folder	Download Window		Obre la carpeta de baixades
 Proxy server	Settings Window		Servidor intermediari
+Darn!	WebPositive		Merda!
 Decrease size	WebPositive Window		Redueix-ne la mida
 Default fixed font size:	Settings Window		Mida de lletra fixa per defecte:
 Sans serif font:	Settings Window		Lletra Sans serif:
@@ -56,6 +57,7 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - terme de cerca
 Reload	WebPositive Window		Torna a carregar
 Expiration	Cookie Manager		Venciment
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		La CPU és massa antiga i no admet les extensions SSE2, sense les quals el WebPositive no pot funcionar. Us recomanem que instal·leu el NetSurf.
 Download finished	Download Window		Baixada acabada
 Cookie manager	WebPositive Window		Gestor de galetes
 OK	Authentication Panel		D'acord
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Inicia:
 Confirmation	WebPositive Window		Confirmació
 Session cookie	Cookie Manager		Galeta de la sessió
+No SSE2 support	WebPositive		Sense suport per a SSE2
 Open all	WebPositive Window		Obre-ho tot
 Cut	WebPositive Window		Retalla
 Downloads	Download Window		Baixades

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-WebPositive	250728390
+1	turkish	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Kimlik doğrulaması gerekli
 Previous	WebPositive Window		Önceki
 (Finish: %date)	Download Window		(Bitiş: %date)
@@ -45,6 +45,7 @@ New tabs:	Settings Window		Yeni sekmeler:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url yüklenemedi
 Open downloads folder	Download Window		İndirilenler klasörünü aç
 Proxy server	Settings Window		Vekil sunucu
+Darn!	WebPositive		Tüh!
 Decrease size	WebPositive Window		Küçült
 Default fixed font size:	Settings Window		Öntanımlı eş aralıklı yazıtipi boyutu:
 Sans serif font:	Settings Window		Sans serif yazıtipi:
@@ -56,6 +57,7 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Arama terimi
 Reload	WebPositive Window		Yeniden yükle
 Expiration	Cookie Manager		Son kullanım süresi
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		CPU'nuz pek eski ve WebPositive'in çalışması için gerekli olan SSE2 uzantılarını desteklemiyor. Yerine NetSurf yüklemenizi öneririz.
 Download finished	Download Window		İndirme bitti
 Cookie manager	WebPositive Window		Çerez yöneticisi
 OK	Authentication Panel		Tamam
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Başlangıç:
 Confirmation	WebPositive Window		Onaylama
 Session cookie	Cookie Manager		Oturum çerezi
+No SSE2 support	WebPositive		SSE2 desteği yok
 Open all	WebPositive Window		Tümünü aç
 Cut	WebPositive Window		Kes
 Downloads	Download Window		İndirmeler

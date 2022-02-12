@@ -1,4 +1,4 @@
-1	catalan; valencian	application/x-vnd.Cortex.support	1625162530
+1	catalan; valencian	application/x-vnd.Cortex.support	1570889156
 Header has flags	MediaString		La capçalera té banderes.
 32 bit HLS	MediaString		HLS de 32 bits
 Recording	MediaString		Gravació
@@ -33,7 +33,7 @@ Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(format de vídeo desconegut)
 AVI format family	MediaString		Família de formats AVI
 Homogenous buffers	MediaString		Memòria intermèdia homogènia
-Interlaced 	MediaString		Entrellaçat 
+Interlaced 	MediaString		Entrellaçament 
 {0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# canal}other{# canals}}
 15 bit RGBA	MediaString		RGBA de 15 bits
 Drop data	MediaString		Eliminació de dades
@@ -91,6 +91,7 @@ Top-Back-left	MediaString		Dalt-darrere-esquerra
 16 bit RGB	MediaString		RGB de 16 bits
 YCbCr422	MediaString		YCbCr422
 Raw audio	MediaString		Àudio en brut
+Video data between line lu and lu	MediaString		Dades de vídeo entre la línia lu i lu
 32 bit LABA	MediaString		LABA de 32 bits
 24 bit HLS	MediaString		HLS de 24 bits
 Non-interlaced 	MediaString		No entrellaçat 

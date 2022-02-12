@@ -1,2 +1,12 @@
-1	french	x-vnd.Haiku-TIFFTranslator	2591143631
+1	french	x-vnd.Haiku-TIFFTranslator	931339721
+TIFF Library:	TIFFView		Librairie TIFF :
+RLE (Packbits)	TIFFView		RLE (Bits compactés)
+ZIP (Deflate)	TIFFView		ZIP (Compressé)
+Use compression:	TIFFView		Utiliser la compression :
+TIFF image translator	TIFFView		Traducteur d’images TIFF
+TIFF image	TIFFTranslator		Image TIFF
 TIFF Settings	TIFFMain		Réglages TIFF
+TIFF image translator	TIFFTranslator		Traducteur d’images TIFF
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		Images TIFF
+None	TIFFView		Aucune

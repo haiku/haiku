@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Keymap	1075970008
+1	indonesian	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Tombol
 Japanese	KeymapNames		Jepang
 US	KeymapNames		AS
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brazil
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (AS)
 Right control	Keyboard Layout View		Control kanan
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Pilihan:
 Cancel	Modifier keys window		Batal
@@ -89,6 +90,7 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Belarusia
 Warning: left and right key roles do not match	Modifier keys window		Peringatan: key-role kiri dan kanan tidak cocok
 Circumflex trigger	Keymap window		Pemicu sirkomfleks
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Shift kiri
 Russian (Yawert)	KeymapNames		Russia (Yawert)

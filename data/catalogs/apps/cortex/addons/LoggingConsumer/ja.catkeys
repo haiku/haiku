@@ -1,5 +1,7 @@
-1	japanese	application/x-vnd.Be.LoggingConsumerApp	3653006715
+1	japanese	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ノード (%ld) の情報が得られません:\n%s\n
 Priority	CortexAddOnsLoggingConsumer		優先度
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ノード (%ld) が見つかりません:\n%s\n
 Latency	CortexAddOnsLoggingConsumer		レイテンシ
 Logged input	CortexAddOnsLoggingConsumer		ロク入力
 CPU spin percentage	CortexAddOnsLoggingConsumer		CPU スピン率
@@ -17,3 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		コントロール
 controls	CortexAddOnsCommonMediaNodeControlApp		コントロール
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		接続
 percent	CortexAddOnsLoggingConsumer		%
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ノード (%ld) のパラメーターがありません:\n%s\n

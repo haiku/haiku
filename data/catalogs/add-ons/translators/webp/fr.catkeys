@@ -1,2 +1,21 @@
-1	french	x-vnd.Haiku-WebPTranslator	1475550615
+1	french	x-vnd.Haiku-WebPTranslator	3099662998
+High	ConfigView		Haute
+Low	ConfigView		Basse
+WebP image translator	ConfigView		Traducteur d’images WebP
+Photo	ConfigView		Photo
+WebP image translator	WebPTranslator		Traducteur d’images WebP
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Picture	ConfigView		Image
+Default	ConfigView		Par défaut
+Text	ConfigView		Texte
+Preset	ConfigView		Préréglage
+Drawing	ConfigView		Dessin
 WebP Settings	main		Réglages WebP
+Icon	ConfigView		Icône
+WebP image	WebPTranslator		Image WebP
+Output quality:	ConfigView		Qualité de rendu :
+Slower but better	ConfigView		Plus lente mais meilleure
+Based on libwebp %version%	ConfigView		Basé sur libwebp %version%
+Fast	ConfigView		Rapide
+WebP images	WebPTranslator		Images WebP

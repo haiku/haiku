@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	250728390
+1	german	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Anmeldung erforderlich
 Previous	WebPositive Window		Zurück
 (Finish: %date)	Download Window		(Fertig: %date)
@@ -45,6 +45,7 @@ New tabs:	Settings Window		Neue Reiter:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url fehlgeschlagen
 Open downloads folder	Download Window		Download-Ordner öffnen
 Proxy server	Settings Window		Proxy-Server
+Darn!	WebPositive		Mist!
 Decrease size	WebPositive Window		Verkleinern
 Default fixed font size:	Settings Window		Größe der Schrift fester Breite:
 Sans serif font:	Settings Window		Serifenlose Schrift:
@@ -56,6 +57,7 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Suchbegriff
 Reload	WebPositive Window		Aktualisieren
 Expiration	Cookie Manager		Ablaufdatum
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Der Prozessor ist zu alt und unterstützt keine SSE2-Erweiterungen, ohne die WebPositive nicht läuft. Es wird empfohlen NetSurf zu installieren.
 Download finished	Download Window		Download abgeschlossen
 Cookie manager	WebPositive Window		Cookieverwaltung
 OK	Authentication Panel		OK
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Start:
 Confirmation	WebPositive Window		Bestätigung
 Session cookie	Cookie Manager		Sitzungs-Cookie
+No SSE2 support	WebPositive		Keine SSE2-Unterstützung
 Open all	WebPositive Window		Alle öffnen
 Cut	WebPositive Window		Ausschneiden
 Downloads	Download Window		Downloads

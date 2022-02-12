@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	1504929345
+1	german	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		Fehler bei Paketquellen-Aktualisierung
 Network error	ServerHelper		Netzwerkfehler
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Fehler bei der Aktualisierung der Paketquelle: %error%
@@ -7,6 +7,7 @@ Check for updates…	MainWindow		Aktualisierungen suchen …
 Uninstalled	PackageListView		Deinstalliert
 It was not possible to create the new user.	UserLoginWindow		Das neue Benutzerkonto konnte nicht angelegt werden.
 Available packages	MainWindow		Verfügbare Pakete
+An unexpected error has been sent from the server [%li]	ServerHelper		Der Server hat einen unerwarteten Fehler gesendet [%li]
 Create account	UserLoginWindow		Benutzerkonto erstellen
 Install %PackageTitle%	PackageManager		%PackageTitle% installieren
 OK	App		OK
@@ -44,6 +45,7 @@ Category	FilterView		Kategorie
 User rating	RatePackageWindow		Bewertung
 Installed packages	MainWindow		Installierte Pakete
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Ein angefordertes Objekt bzw. ein bei der Anfrage beteiligtes Objekt wurde auf dem Server nicht gefunden.
+Date	PackageListView		Datum
 No changelog available.	PackageInfoView		Änderungsprotokoll nicht vorhanden.
 Error	App		Fehler
 There was a puzzling response from the web service.	UserLoginWindow		Der Web-Dienst hat mit einer wirren Meldung geantwortet.
@@ -55,6 +57,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Es konnte keine Verbindung mit dem Server aufgebaut werden, um ein Captcha für das Anlegen eines neuen Benutzerkontos zu erhalten.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Die Bewertung wurde erfolgreich hochgeladen. Auf der Webseite des HaikuDepot-Servers lässt sie sich aktualisieren oder auch wieder löschen.
 Available	PackageListView		Verfügbar
+-	no package publish		-
 Cancel	UserLoginWindow		Abbrechen
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Um richtig zu funktionieren, benötigt HaikuDepot den Paket-Daemon, der aber anscheinend gerade nicht läuft.\nSoll er gestartet werden?
 Click a package to view information	PackageInfoView		Paket anklicken, um Infos anzuzeigen

@@ -1,4 +1,4 @@
-1	turkish	application/x-vnd.Cortex.support	1625162530
+1	turkish	application/x-vnd.Cortex.support	1570889156
 Header has flags	MediaString		Üstbilginin bayrakları var
 32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		Kayıt yapılıyor
@@ -91,6 +91,7 @@ Top-Back-left	MediaString		Üst sol arka
 16 bit RGB	MediaString		16 bit RGB
 YCbCr422	MediaString		YCbCr422
 Raw audio	MediaString		Ham ses
+Video data between line lu and lu	MediaString		lu ve lu arasındaki video verisi
 32 bit LABA	MediaString		32 bit LABA
 24 bit HLS	MediaString		24 bit HLS
 Non-interlaced 	MediaString		Üst üste bindirilmemiş 
