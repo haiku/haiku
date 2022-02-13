@@ -64,9 +64,8 @@ void
 PadView::Draw(BRect updateRect)
 {
 	rgb_color background = LowColor();
-	rgb_color light = ui_color(B_SHINE_COLOR);
-	rgb_color shadow = ui_color(B_SHADOW_COLOR);
-
+	rgb_color light = tint_color(background, B_LIGHTEN_MAX_TINT);
+	rgb_color shadow = tint_color(background, B_DARKEN_2_TINT);
 	BRect r(Bounds());
 	BeginLineArray(4);
 		AddLine(BPoint(r.left, r.bottom), BPoint(r.left, r.top), light);
@@ -346,7 +345,7 @@ PadView::DisplayMenu(BPoint where, LaunchButton* button) const
 		item->SetTarget(window);
 		menu->AddItem(item);
 		// Open containing folder button
-		if (button->Ref() != NULL) {
+		if (button->Ref() != NULL) {	
 			message = new BMessage(MSG_OPEN_CONTAINING_FOLDER);
 			message->AddPointer("be:source", (void*)button);
 			item = new BMenuItem(B_TRANSLATE("Open containing folder"), message);
