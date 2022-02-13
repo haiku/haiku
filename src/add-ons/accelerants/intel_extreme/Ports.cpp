@@ -148,15 +148,24 @@ Port::SetPipe(Pipe* pipe)
 
 	uint32 portState = read32(portRegister);
 
-	// FIXME is the use of PORT_TRANS_* constants correct for Sandy Bridge /
-	// Cougar Point? Or is it only for Ivy Bridge / Panther point onwards?
+	// generation 6 gfx SandyBridge/SNB non-DP use the same 2 bits on all ports (eDP = 1 bit).
+	// generation 7 gfx IvyBridge/IVB non-DP use the same 2 bits on all ports (eDP = 2 bits).
+	// DP ports/all DDI ports: Pipe selections works differently, via own SetPipe() implementation.
 	if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
 		portState &= ~PORT_TRANS_SEL_MASK;
-		if (pipe->Index() == INTEL_PIPE_A)
-			write32(portRegister, portState | PORT_TRANS_A_SEL_CPT);
-		else
-			write32(portRegister, portState | PORT_TRANS_B_SEL_CPT);
+		switch (pipe->Index()) {
+			case INTEL_PIPE_B:
+				write32(portRegister, portState | PORT_TRANS_B_SEL_CPT);
+				break;
+			case INTEL_PIPE_C:
+				write32(portRegister, portState | PORT_TRANS_C_SEL_CPT);
+				break;
+			default:
+				write32(portRegister, portState | PORT_TRANS_A_SEL_CPT);
+				break;
+		}
 	} else {
+		// generation 3/4/5 gfx uses the same single bit on all ports
 		if (pipe->Index() == INTEL_PIPE_A)
 			write32(portRegister, portState & ~DISPLAY_MONITOR_PIPE_B);
 		else
@@ -255,7 +264,6 @@ Port::PipePreference()
 	// - The BIOSes seen sofar program transcoder A to PIPE A, etc.
 	// - Later devices add a pipe C alongside the added transcoder C.
 
-	// FIXME How's this setup in newer gens? Currently return INTEL_PIPE_ANY there..
 	if ((gInfo->shared_info->device_type.Generation() <= 7) &&
 		(!gInfo->shared_info->device_type.HasDDI())) {
 		uint32 portState = read32(_PortRegister());
@@ -1046,6 +1054,42 @@ DisplayPort::PipePreference()
 }
 
 
+status_t
+DisplayPort::SetPipe(Pipe* pipe)
+{
+	CALLED();
+
+	if (pipe == NULL) {
+		ERROR("%s: Invalid pipe provided!\n", __func__);
+		return B_ERROR;
+	}
+
+	// TODO: UnAssignPipe?  This likely needs reworked a little
+	if (fPipe != NULL) {
+		ERROR("%s: Can't reassign display pipe (yet)\n", __func__);
+		return B_ERROR;
+	}
+
+	// generation 3/4/5 gfx have no eDP ports.
+	// generation 6 gfx SandyBridge/SNB uses one bit (b30) on the eDP port.
+	// generation 7 gfx IvyBridge/IVB uses 2 bits (b29-30) on the eDP port.
+	// on all other DP ports pipe selections works differently (indirect).
+	// fixme: implement..
+	TRACE("%s: Assuming pipe is assigned by BIOS (fixme)\n", __func__);
+
+	fPipe = pipe;
+
+	if (fPipe == NULL)
+		return B_NO_MEMORY;
+
+	// Disable display pipe until modesetting enables it
+	if (fPipe->IsEnabled())
+		fPipe->Enable(false);
+
+	return B_OK;
+}
+
+
 bool
 DisplayPort::IsConnected()
 {
@@ -1594,6 +1638,39 @@ DigitalDisplayInterface::Power(bool enabled)
 		enabled ? (state | DDI_BUF_CTL_ENABLE) : (state & ~DDI_BUF_CTL_ENABLE));
 	read32(portRegister);
 #endif
+
+	return B_OK;
+}
+
+
+status_t
+DigitalDisplayInterface::SetPipe(Pipe* pipe)
+{
+	CALLED();
+
+	if (pipe == NULL) {
+		ERROR("%s: Invalid pipe provided!\n", __func__);
+		return B_ERROR;
+	}
+
+	// TODO: UnAssignPipe?  This likely needs reworked a little
+	if (fPipe != NULL) {
+		ERROR("%s: Can't reassign display pipe (yet)\n", __func__);
+		return B_ERROR;
+	}
+
+	// all DDI ports pipe selections works differently than on the old port types (indirect).
+	// fixme: implement..
+	TRACE("%s: Assuming pipe is assigned by BIOS (fixme)\n", __func__);
+
+	fPipe = pipe;
+
+	if (fPipe == NULL)
+		return B_NO_MEMORY;
+
+	// Disable display pipe until modesetting enables it
+	if (fPipe->IsEnabled())
+		fPipe->Enable(false);
 
 	return B_OK;
 }

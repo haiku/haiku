@@ -48,7 +48,7 @@ virtual	uint32						Type() const = 0;
 
 virtual	bool						IsConnected() = 0;
 
-		status_t					SetPipe(Pipe* pipe);
+virtual	status_t					SetPipe(Pipe* pipe);
 		::Pipe*						GetPipe()
 										{ return fPipe; };
 
@@ -64,7 +64,6 @@ virtual status_t					SetDisplayMode(display_mode* mode,
 										uint32 colorMode) { return B_ERROR; };
 
 virtual pipe_index					PipePreference();
-//										{ return INTEL_PIPE_ANY; };
 
 protected:
 		void						_SetName(const char* name);
@@ -169,6 +168,8 @@ public:
 virtual	uint32						Type() const
 										{ return INTEL_PORT_TYPE_DP; }
 
+virtual	status_t					SetPipe(Pipe* pipe);
+
 virtual	bool						IsConnected();
 
 virtual status_t					SetDisplayMode(display_mode* mode,
@@ -207,6 +208,8 @@ virtual	uint32						Type() const
 										{ return INTEL_PORT_TYPE_DVI; }
 
 virtual	status_t					Power(bool enabled);
+
+virtual	status_t					SetPipe(Pipe* pipe);
 
 virtual	bool						IsConnected();
 
