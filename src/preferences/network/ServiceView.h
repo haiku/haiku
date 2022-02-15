@@ -10,7 +10,7 @@
 
 
 #include <NetworkSettings.h>
-#include <View.h>
+#include <GroupView.h>
 
 
 using namespace BNetworkKit;
@@ -18,7 +18,7 @@ using namespace BNetworkKit;
 class BButton;
 
 
-class ServiceView : public BView {
+class ServiceView : public BGroupView {
 public:
 								ServiceView(const char* name,
 									const char* executable, const char* title,
