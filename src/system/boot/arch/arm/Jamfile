@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot arch arm ;
 
+UsePrivateHeaders [ FDirName kernel arch arm ] ;
+UsePrivateHeaders [ FDirName kernel boot arch arm ] ;
 UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
 
 local librootGenericSources =
