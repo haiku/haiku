@@ -1417,22 +1417,17 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 				if (hardwareTarget.h_display == target->timing.h_display
 						&& hardwareTarget.v_display == target->timing.v_display) {
-					// We are setting the native video mode, nothing special to do
-					// Note: this means refresh and timing might vary according to requested mode.
-					hardwareTarget = target->timing;
-					TRACE("%s: Setting internal panel to native resolution at %" B_PRIu32 "Hz\n", __func__,
-						hardwareTarget.pixel_clock * 1000 / (hardwareTarget.h_total * hardwareTarget.v_total));
+					// We are feeding the native video mode, nothing to do: disable scaling
+					TRACE("%s: Requested mode is panel's native resolution: disabling scaling\n", __func__);
 				} else {
 					// We need to enable the panel fitter
-					TRACE("%s: Hardware mode will actually be %dx%d at %" B_PRIu32 "Hz\n", __func__,
-						hardwareTarget.h_display, hardwareTarget.v_display,
-						hardwareTarget.pixel_clock * 1000 / (hardwareTarget.h_total * hardwareTarget.v_total));
-
-					// FIXME we should also get the refresh frequency from the target
-					// mode, and then "sanitize" the resulting mode we made up.
+					TRACE("%s: Requested mode is not panel's native resolution: enabling scaling\n", __func__);
 					needsScaling = true;
 				}
 			} else {
+				//fixme: We should now first try for EDID info detailed timing, highest res in list: that's the
+				//native mode as well. If we also have no EDID, then fallback to setting mode directly as below.
+
 				TRACE("%s: Setting internal panel mode without VBT info generation, scaling may not work\n",
 					__func__);
 				// We don't have VBT data, try to set the requested mode directly
