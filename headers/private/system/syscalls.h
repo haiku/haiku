@@ -112,7 +112,8 @@ extern status_t		_kern_realtime_sem_unlink(const char* name);
 
 extern status_t		_kern_realtime_sem_get_value(sem_id semID, int* value);
 extern status_t		_kern_realtime_sem_post(sem_id semID);
-extern status_t		_kern_realtime_sem_wait(sem_id semID, bigtime_t timeout);
+extern status_t		_kern_realtime_sem_wait(sem_id semID, uint32 flags,
+						bigtime_t timeout);
 
 /* POSIX XSI semaphore syscalls */
 extern int			_kern_xsi_semget(key_t key, int numSems, int flags);

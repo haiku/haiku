@@ -33,7 +33,9 @@ int		sem_init(sem_t* semaphore, int shared, unsigned value);
 int		sem_destroy(sem_t* semaphore);
 
 int		sem_post(sem_t* semaphore);
-int		sem_timedwait(sem_t* semaphore, const struct timespec* timeout);
+int		sem_clockwait(sem_t* semaphore, clockid_t clock_id,
+			const struct timespec* abstime);
+int		sem_timedwait(sem_t* semaphore, const struct timespec* abstime);
 int		sem_trywait(sem_t* semaphore);
 int		sem_wait(sem_t* semaphore);
 int		sem_getvalue(sem_t* semaphore, int* value);

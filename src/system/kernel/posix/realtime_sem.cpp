@@ -506,7 +506,7 @@ struct realtime_sem_context {
 		return B_OK;
 	}
 
-	status_t AcquireSem(sem_id id, bigtime_t timeout)
+	status_t AcquireSem(sem_id id, uint32 flags, bigtime_t timeout)
 	{
 		MutexLocker locker(fLock);
 
@@ -518,17 +518,7 @@ struct realtime_sem_context {
 
 		locker.Unlock();
 
-		status_t error;
-		if (timeout == 0) {
-			error = acquire_sem_etc(id, 1, B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT,
-				0);
-		} else if (timeout == B_INFINITE_TIMEOUT) {
-			error = acquire_sem_etc(id, 1, B_CAN_INTERRUPT, 0);
-		} else {
-			error = acquire_sem_etc(id, 1,
-				B_CAN_INTERRUPT | B_ABSOLUTE_REAL_TIME_TIMEOUT, timeout);
-		}
-
+		status_t error = acquire_sem_etc(id, 1, flags | B_CAN_INTERRUPT, timeout);
 		return error == B_BAD_SEM_ID ? B_BAD_VALUE : error;
 	}
 
@@ -813,11 +803,11 @@ _user_realtime_sem_post(sem_id semID)
 
 
 status_t
-_user_realtime_sem_wait(sem_id semID, bigtime_t timeout)
+_user_realtime_sem_wait(sem_id semID, uint32 flags, bigtime_t timeout)
 {
 	realtime_sem_context* context = get_current_team_context();
 	if (context == NULL)
 		return B_BAD_VALUE;
 
-	return syscall_restart_handle_post(context->AcquireSem(semID, timeout));
+	return syscall_restart_handle_post(context->AcquireSem(semID, flags, timeout));
 }
