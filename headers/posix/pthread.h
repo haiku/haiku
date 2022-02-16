@@ -136,6 +136,8 @@ extern int pthread_cond_init(pthread_cond_t *cond,
 	const pthread_condattr_t *attr);
 extern int pthread_cond_broadcast(pthread_cond_t *cond);
 extern int pthread_cond_signal(pthread_cond_t *cond);
+extern int pthread_cond_clockwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
+	clockid_t clock_id, const struct timespec *abstime);
 extern int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
 	const struct timespec *abstime);
 extern int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
