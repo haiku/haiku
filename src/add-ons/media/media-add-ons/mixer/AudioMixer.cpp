@@ -1891,11 +1891,13 @@ AudioMixer::UpdateParameterWeb()
 	dp->AddItem(1, B_TRANSLATE("Drop/repeat samples (template based)"));
 	dp->AddItem(3, B_TRANSLATE("17th order filtering"));
 	*/
+
+	/* Remove those option from the GUI, but keep them in the settings
 	group->MakeDiscreteParameter(PARAM_ETC(80), B_MEDIA_RAW_AUDIO,
 		B_TRANSLATE("Refuse output format changes"), B_ENABLE);
 	group->MakeDiscreteParameter(PARAM_ETC(90), B_MEDIA_RAW_AUDIO,
 		B_TRANSLATE("Refuse input format changes"), B_ENABLE);
-
+	*/
 	fCore->Unlock();
 	SetParameterWeb(web);
 }

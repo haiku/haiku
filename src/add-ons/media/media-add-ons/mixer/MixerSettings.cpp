@@ -402,7 +402,7 @@ MixerSettings::Load()
 	fSettings.AllowInputChannelRemapping = false;
 	fSettings.InputGainControls = 0;
 	fSettings.ResamplingAlgorithm = 2;
-	fSettings.RefuseOutputFormatChange = true;
+	fSettings.RefuseOutputFormatChange = false;
 	fSettings.RefuseInputFormatChange = true;
 
 	// if we don't have a settings file, don't continue
