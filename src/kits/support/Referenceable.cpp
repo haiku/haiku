@@ -31,7 +31,7 @@ BReferenceable::~BReferenceable()
 	if (fReferenceCount != 0 && fReferenceCount != 1) {
 		char message[256];
 		snprintf(message, sizeof(message), "deleting referenceable object %p with "
-			"reference count (%" B_PRId32 ")\n", this, fReferenceCount);
+			"reference count (%" B_PRId32 ")", this, fReferenceCount);
 		debugger(message);
 	}
 #endif
