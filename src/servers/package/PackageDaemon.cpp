@@ -38,6 +38,9 @@ PackageDaemon::PackageDaemon(status_t* _error)
 
 PackageDaemon::~PackageDaemon()
 {
+	for (int32 i = 0; Root* root = fRoots.ItemAt(i); i++)
+		root->ReleaseReference();
+	fRoots.MakeEmpty(false);
 }
 
 
