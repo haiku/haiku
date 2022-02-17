@@ -50,7 +50,7 @@ pthread_mutex_destroy(pthread_mutex_t* mutex)
 
 
 status_t
-__pthread_mutex_lock(pthread_mutex_t* mutex, bigtime_t timeout)
+__pthread_mutex_lock(pthread_mutex_t* mutex, uint32 flags, bigtime_t timeout)
 {
 	thread_id thisThread = find_thread(NULL);
 
@@ -83,10 +83,7 @@ __pthread_mutex_lock(pthread_mutex_t* mutex, bigtime_t timeout)
 		// we have to call the kernel
 		status_t error;
 		do {
-			error = _kern_mutex_lock((int32*)&mutex->lock, NULL,
-				timeout == B_INFINITE_TIMEOUT
-					? 0 : B_ABSOLUTE_REAL_TIME_TIMEOUT,
-				timeout);
+			error = _kern_mutex_lock((int32*)&mutex->lock, NULL, flags, timeout);
 		} while (error == B_INTERRUPTED);
 
 		if (error != B_OK)
@@ -104,29 +101,44 @@ __pthread_mutex_lock(pthread_mutex_t* mutex, bigtime_t timeout)
 int
 pthread_mutex_lock(pthread_mutex_t* mutex)
 {
-	return __pthread_mutex_lock(mutex, B_INFINITE_TIMEOUT);
+	return __pthread_mutex_lock(mutex, 0, B_INFINITE_TIMEOUT);
 }
 
 
 int
 pthread_mutex_trylock(pthread_mutex_t* mutex)
 {
-	return __pthread_mutex_lock(mutex, -1);
+	return __pthread_mutex_lock(mutex, B_ABSOLUTE_REAL_TIME_TIMEOUT, -1);
 }
 
 
 int
-pthread_mutex_timedlock(pthread_mutex_t* mutex, const struct timespec* tv)
+pthread_mutex_clocklock(pthread_mutex_t* mutex, clockid_t clock_id,
+	const struct timespec* abstime)
 {
 	// translate the timeout
 	bool invalidTime = false;
 	bigtime_t timeout = 0;
-	if (tv && tv->tv_nsec < 1000 * 1000 * 1000 && tv->tv_nsec >= 0)
-		timeout = tv->tv_sec * 1000000LL + tv->tv_nsec / 1000LL;
-	else
+	if (abstime != NULL && abstime->tv_nsec < 1000 * 1000 * 1000
+		&& abstime->tv_nsec >= 0) {
+		timeout = abstime->tv_sec * 1000000LL + abstime->tv_nsec / 1000LL;
+	} else
 		invalidTime = true;
 
-	status_t status = __pthread_mutex_lock(mutex, timeout);
+	uint32 flags = 0;
+	switch (clock_id) {
+		case CLOCK_REALTIME:
+			flags = B_ABSOLUTE_REAL_TIME_TIMEOUT;
+			break;
+		case CLOCK_MONOTONIC:
+			flags = B_ABSOLUTE_TIMEOUT;
+			break;
+		default:
+			invalidTime = true;
+			break;
+	}
+
+	status_t status = __pthread_mutex_lock(mutex, flags, timeout);
 	if (status != B_OK && invalidTime) {
 		// The timespec was not valid and the mutex could not be locked
 		// immediately.
@@ -134,6 +146,13 @@ pthread_mutex_timedlock(pthread_mutex_t* mutex, const struct timespec* tv)
 	}
 
 	return status;
+}
+
+
+int
+pthread_mutex_timedlock(pthread_mutex_t* mutex, const struct timespec* abstime)
+{
+	return pthread_mutex_clocklock(mutex, CLOCK_REALTIME, abstime);
 }
 
 
