@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2021, Haiku Inc. All rights reserved.
+ * Copyright 2003-2022, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,6 +15,7 @@
 
 #include <int.h>
 
+#include <arch_cpu_defs.h>
 #include <arch/smp.h>
 #include <boot/kernel_args.h>
 #include <device_manager.h>
@@ -245,13 +246,14 @@ arch_arm_data_abort(struct iframe *frame)
 {
 	Thread *thread = thread_get_current_thread();
 	bool isUser = (frame->spsr & 0x1f) == 0x10;
+	int32 fsr = arm_get_fsr();
 	addr_t far = arm_get_far();
-	bool isWrite = true;
+	bool isWrite = (fsr & FSR_WNR) == FSR_WNR;
 	addr_t newip = 0;
 
 #ifdef TRACE_ARCH_INT
 	print_iframe("Data Abort", frame);
-	dprintf("FAR: %08lx, thread: %s\n", far, thread->name);
+	dprintf("FAR: %08lx, isWrite: %d, thread: %s\n", far, isWrite, thread->name);
 #endif
 
 	IFrameScope scope(frame);
