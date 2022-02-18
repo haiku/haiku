@@ -730,6 +730,9 @@ Team::LockTeamAndProcessGroup()
 		// Try to lock the group. This will succeed in most cases, simplifying
 		// things.
 		ProcessGroup* group = this->group;
+		if (group == NULL)
+			return;
+
 		if (group->TryLock())
 			return;
 
@@ -4112,6 +4115,12 @@ _user_setpgid(pid_t processID, pid_t groupID)
 			team->LockProcessGroup();
 
 			ProcessGroup* oldGroup = team->group;
+			if (oldGroup == NULL) {
+				// This can only happen if the team is exiting.
+				ASSERT(team->state >= TEAM_STATE_SHUTDOWN);
+				return ESRCH;
+			}
+
 			if (oldGroup == group) {
 				// it's the same as the target group, so just bail out
 				oldGroup->Unlock();
