@@ -1087,6 +1087,10 @@ hda_hw_init(hda_controller* controller)
 	const pci_info& pciInfo = controller->pci_info;
 	uint32 quirks = get_controller_quirks(pciInfo);
 
+	// enable power
+	gPci->set_powerstate(pciInfo.bus, pciInfo.device, pciInfo.function,
+		PCI_pm_state_d0);
+
 	// map the registers (low + high for 64-bit when requested)
 	phys_addr_t physicalAddress = pciInfo.u.h0.base_registers[0];
 	if ((pciInfo.u.h0.base_register_flags[0] & PCI_address_type)
