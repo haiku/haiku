@@ -158,7 +158,7 @@ private:
 };
 
 
-// BRow for the PartitionListView
+// BRow for the PackageListView
 class PackageRow : public BRow {
 	typedef BRow Inherited;
 public:
