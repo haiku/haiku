@@ -182,6 +182,9 @@ struct pci_module_info {
 						uint16	cap_id,
 						uint16	*offset
 					);
+
+	status_t		(*get_powerstate)(uint8 bus, uint8 device, uint8 function, uint8* state);
+	status_t		(*set_powerstate)(uint8 bus, uint8 device, uint8 function, uint8 newState);
 };
 
 #define	B_PCI_MODULE_NAME		"bus_managers/pci/v1"
