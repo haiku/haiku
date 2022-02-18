@@ -292,6 +292,13 @@ MainWindow::~MainWindow()
 		if (fShuttingDownWindow->Lock())
 			fShuttingDownWindow->Quit();
 	}
+
+	// We must clear and delete these early to release references.
+	fModel.Clear();
+	fFeaturedPackagesView->RemoveSelf();
+	fPackageListView->RemoveSelf();
+	delete fFeaturedPackagesView;
+	delete fPackageListView;
 }
 
 
