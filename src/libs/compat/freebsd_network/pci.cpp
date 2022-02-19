@@ -156,6 +156,10 @@ pci_set_command_bit(device_t dev, uint16_t bit)
 int
 pci_enable_busmaster(device_t dev)
 {
+	// We do this a bit later than FreeBSD does.
+	if (pci_get_powerstate(dev) != PCI_POWERSTATE_D0)
+		pci_set_powerstate(dev, PCI_POWERSTATE_D0);
+
 	pci_set_command_bit(dev, PCI_command_master);
 	return 0;
 }
