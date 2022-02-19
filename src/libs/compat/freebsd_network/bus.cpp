@@ -77,10 +77,8 @@ bus_alloc_irq_resource(device_t dev, struct resource *res)
 	if (irq == 0 || irq == 0xff)
 		return -1;
 
-	/* TODO: IRQ resources! */
-	res->r_bustag = 0;
+	res->r_bustag = BUS_SPACE_TAG_IRQ;
 	res->r_bushandle = irq;
-
 	return 0;
 }
 
@@ -119,7 +117,7 @@ bus_alloc_mem_resource(device_t dev, struct resource *res, pci_info *info,
 	if (res->r_mapped_area < B_OK)
 		return -1;
 
-	res->r_bustag = X86_BUS_SPACE_MEM;
+	res->r_bustag = BUS_SPACE_TAG_MEM;
 	res->r_bushandle = (bus_space_handle_t)virtualAddr;
 	return 0;
 }
@@ -144,7 +142,7 @@ bus_alloc_ioport_resource(device_t dev, struct resource *res, pci_info *info,
 	if (pci_enable_io(dev, SYS_RES_IOPORT) != 0)
 		return -1;
 
-	res->r_bustag = X86_BUS_SPACE_IO;
+	res->r_bustag = BUS_SPACE_TAG_IO;
 	res->r_bushandle = info->u.h0.base_registers[bar_index];
 	return 0;
 }
@@ -193,7 +191,7 @@ bus_alloc_resource(device_t dev, int type, int *rid, unsigned long start,
 			// msi or msi-x interrupt at index *rid - 1
 			pci_info *info;
 			info = &((struct root_device_softc *)dev->root->softc)->pci_info;
-			res->r_bustag = 1;
+			res->r_bustag = BUS_SPACE_TAG_MSI;
 			res->r_bushandle = info->u.h0.interrupt_line + *rid - 1;
 			result = 0;
 		}
@@ -404,7 +402,7 @@ bus_setup_intr(device_t dev, struct resource *res, int flags,
 			intr_wrapper, intr, 0);
 	}
 
-	if (status == B_OK && res->r_bustag == 1 && gPCIx86 != NULL) {
+	if (status == B_OK && res->r_bustag == BUS_SPACE_TAG_MSI && gPCIx86 != NULL) {
 		// this is an msi, enable it
 		pci_info *info
 			= &((struct root_device_softc *)dev->root->softc)->pci_info;
