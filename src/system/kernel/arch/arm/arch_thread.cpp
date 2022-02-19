@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku Inc. All rights reserved.
+ * Copyright 2003-2022, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -27,6 +27,9 @@
 #include <arch/vm_translation_map.h>
 
 #include <string.h>
+
+#include "ARMPagingStructures.h"
+#include "ARMVMTranslationMap.h"
 
 //#define TRACE_ARCH_THREAD
 #ifdef TRACE_ARCH_THREAD
@@ -131,9 +134,41 @@ arch_thread_init_tls(Thread *thread)
 
 extern "C" void arm_context_switch(void *from, void *to);
 
+
+void
+arm_swap_pgdir(uint32_t pageDirectoryAddress)
+{
+	// Set translation table base
+	asm volatile("MCR p15, 0, %[addr], c2, c0, 0"::[addr] "r" (pageDirectoryAddress));
+	isb();
+
+	arch_cpu_global_TLB_invalidate();
+
+	//TODO: update Context ID (incl. ASID)
+	//TODO: check if any additional TLB or Cache maintenance is needed
+}
+
+
 void
 arch_thread_context_switch(Thread *from, Thread *to)
 {
+	VMAddressSpace *oldAddressSpace = from->team->address_space;
+	VMTranslationMap *oldTranslationMap = oldAddressSpace->TranslationMap();
+	phys_addr_t oldPageDirectoryAddress =
+		((ARMVMTranslationMap *)oldTranslationMap)->PagingStructures()->pgdir_phys;
+
+	VMAddressSpace *newAddressSpace = to->team->address_space;
+	VMTranslationMap *newTranslationMap = newAddressSpace->TranslationMap();
+	phys_addr_t newPageDirectoryAddress =
+		((ARMVMTranslationMap *)newTranslationMap)->PagingStructures()->pgdir_phys;
+
+	if (oldPageDirectoryAddress != newPageDirectoryAddress) {
+		TRACE(("arch_thread_context_switch: swap pgdir: "
+			"0x%08" B_PRIxPHYSADDR " -> 0x%08" B_PRIxPHYSADDR "\n",
+			oldPageDirectoryAddress, newPageDirectoryAddress));
+		arm_swap_pgdir(newPageDirectoryAddress);
+	}
+
 	TRACE(("arch_thread_context_switch: %p(%s/%p) -> %p(%s/%p)\n",
 		from, from->name, from->arch_info.sp, to, to->name, to->arch_info.sp));
 	arm_context_switch(&from->arch_info, &to->arch_info);
