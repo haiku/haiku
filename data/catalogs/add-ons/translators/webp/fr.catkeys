@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPTranslator	3099662998
+1	french	x-vnd.Haiku-WebPTranslator	1562962379
 High	ConfigView		Haute
 Low	ConfigView		Basse
 WebP image translator	ConfigView		Traducteur d’images WebP
@@ -9,8 +9,11 @@ WebP image translator	WebPTranslator		Traducteur d’images WebP
 Picture	ConfigView		Image
 Default	ConfigView		Par défaut
 Text	ConfigView		Texte
+Preprocessing filter	ConfigView		Filtre de prétraitement
+Compression method:	ConfigView		Méthode de compression :
 Preset	ConfigView		Préréglage
 Drawing	ConfigView		Dessin
+Output preset:	ConfigView		Préréglage de sortie :
 WebP Settings	main		Réglages WebP
 Icon	ConfigView		Icône
 WebP image	WebPTranslator		Image WebP

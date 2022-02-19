@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	250728390
+1	ukrainian	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Потрібна авторизація
 Previous	WebPositive Window		Попереднє
 (Finish: %date)	Download Window		(Завершення: %date)
@@ -45,6 +45,7 @@ New tabs:	Settings Window		Нові вкладки:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url невдало
 Open downloads folder	Download Window		Відкрити папку завантажень
 Proxy server	Settings Window		Проксі-сервер
+Darn!	WebPositive		Непруха!
 Decrease size	WebPositive Window		Зменшити розмір
 Default fixed font size:	Settings Window		Розмір шрифту за замовчуванням:
 Sans serif font:	Settings Window		Шрифт Sans serif:
@@ -56,6 +57,7 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Параметри пошуку
 Reload	WebPositive Window		Перезавантажити
 Expiration	Cookie Manager		Термін дії
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Ваш процесор занадто старий і не підтримує розширення SSE2, без яких WebPositive не може працювати. Натомість ми рекомендуємо встановити NetSurf.
 Download finished	Download Window		Завантаження завершене
 Cookie manager	WebPositive Window		Менеджер Cookie
 OK	Authentication Panel		ОК
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		При запуску:
 Confirmation	WebPositive Window		Підтвердження
 Session cookie	Cookie Manager		Сесійний файл cookie
+No SSE2 support	WebPositive		SSE2 не підтримується
 Open all	WebPositive Window		Відкрити всі
 Cut	WebPositive Window		Вирізати
 Downloads	Download Window		Завантаження

@@ -108,7 +108,7 @@ There is no decoder installed to handle the file format, or the decoder has trou
 Lock Peaks	MediaPlayer-PeakView		Tepeleri kilitle
 none	Audio track menu		yok
 Open network stream	MediaPlayer-NetworkStream		Ağ akışı aç
-Automatically start playing	MediaPlayer-SettingsWindow		Kendiliğinden oynatmaya başla
+Automatically start playing	MediaPlayer-SettingsWindow		Kendiliğinden oynatmaya başlat
 Undo	MediaPlayer-PlaylistWindow		Geri al
 Display mode	MediaPlayer-InfoWin		Görüntüleme kipi
 Bottom of video	MediaPlayer-SettingsWindow		Videonun alt kısmı

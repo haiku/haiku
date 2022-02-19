@@ -1,8 +1,9 @@
-1	ukrainian	x-vnd.Haiku-About	1736446963
+1	ukrainian	x-vnd.Haiku-About	3767028061
 Revision	AboutView		Ревізія
 The Haikuware team and their bounty program\n	AboutView		Команді Haikuware з їхньою програмою заохочень\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. All rights reserved.
 %.2f GHz	AboutView		%.2f ГГц
+Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Всі права захищені.
 \n\nSpecial thanks to:\n	AboutView		\n\nОкрема подяка:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (і ядро NewOS)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. All rights reserved.
@@ -13,6 +14,7 @@ Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. All rights reserved.
 Past website & marketing:\n	AboutView		Попередній веб-сайт & маркетинг:\n
+Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Всі права захищені.
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe and others.
 Testing and bug triaging:\n	AboutView		Тестування та тріаж багів:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{процесор:} few{# процесора:} other{# процесорів:}}
@@ -38,6 +40,7 @@ Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (засновни
 BSD (3-clause)	AboutWindow		BSD (3-х пунктна)
 About this system	AboutWindow		Про цю систему
 %d MiB used (%d%%)	AboutView		%d МБ використано (%d%%)
+Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Всі права захищені.
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. All rights reserved.
 AboutSystem	System name		AboutSystem
@@ -55,6 +58,7 @@ Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright �
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2019 Fabrice Bellard, et al.
 Current maintainers:\n	AboutView		Поточні розробники:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.
+Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Всі права захищені.
 Version:	AboutView		Версія:
 The BeGeistert team\n	AboutView		Команді BeGeistert\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
@@ -63,6 +67,7 @@ GNU GPL v2	AboutWindow		GNU GPL v2
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Університету Окленда і Крістофу Люттероту\n\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total МБ загалом, %inaccessible МБ недоступно
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 Google Internationalization team.
+Copyright © 2001-%ld The Haiku project. 	AboutView		Copyright © 2001-%ld The Haiku project. 
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. All rights reserved.
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Expat maintainers.
@@ -70,6 +75,7 @@ Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2
 Translations:\n	AboutView		Перекладачі:\n
 Memory:	AboutView		Пам’ять:
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…а також тим про кого ми забули згадати (пробачте!)\n\n
+Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. Всі права захищені.
 BSD (2-clause)	AboutWindow		BSD (2-х пунктна)
 Website & marketing:\n	AboutView		Веб-сайт & маркетинг:\n
 Copyright © 2018-2021, Frederic Cambus	AboutView		Copyright © 2018-2021, Frederic Cambus

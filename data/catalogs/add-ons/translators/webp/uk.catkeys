@@ -1,2 +1,15 @@
-1	ukrainian	x-vnd.Haiku-WebPTranslator	1475550615
+1	ukrainian	x-vnd.Haiku-WebPTranslator	3219956844
+WebPTranslator Settings	ConfigView		Налаштування транслятора WebP
+WebP image translator	ConfigView		Транслятор зображень WebP
+Photo	ConfigView		Фото
+WebP image translator	WebPTranslator		Транслятор зображень WebP
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Picture	ConfigView		Картинка
+Default	ConfigView		За замовчуванням
+Text	ConfigView		Текст
+Preprocessing filter	ConfigView		Фільтр попередньої обробки
 WebP Settings	main		Налаштування WebP
+WebP image	WebPTranslator		Зображення WebP
+Based on libwebp %version%	ConfigView		На основі libwebp %version%
+WebP images	WebPTranslator		Зображення WebP

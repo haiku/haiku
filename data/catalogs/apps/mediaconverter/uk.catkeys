@@ -1,8 +1,9 @@
-1	ukrainian	x-vnd.Haiku-MediaConverter	1322040280
+1	ukrainian	x-vnd.Haiku-MediaConverter	1665492291
 Input file not recognized as Audio or Video	MediaConverter		Вхідний файл не розпізнаний як аудіо або відео
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Якість відео: %3d%%
 Source files	MediaConverter		Початкові файли
+Error writing video frame %lld	MediaConverter		Помилка запису відеофрейму %lld
 Error converting '%filename'	MediaConverter		Помилка конвертації '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Вибраний коталог не знайдено. За замовчуванням: /boot/home
 Conversion completed	MediaConverter		Конвертація завершена
@@ -53,6 +54,7 @@ Quit	Menu		Вийти
 Duration:	MediaConverter-FileInfo		Тривалість:
 MediaConverter	System name		MediaConverter
 Error launching: %strError%	MediaConverter		Помилка запуску: %strError%
+Error writing audio frame %lld	MediaConverter		Помилка запису аудіофрейму %lld
 File format:	MediaConverter		Формат файлу:
 File	Menu		Файл
 Video quality not supported	MediaConverter		Якість відео не підтримується

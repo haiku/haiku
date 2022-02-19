@@ -1,4 +1,4 @@
-1	catalan; valencian	application/x-vnd.Cortex.support	1570889156
+1	catalan; valencian	application/x-vnd.Cortex.support	1625162530
 Header has flags	MediaString		La capçalera té banderes.
 32 bit HLS	MediaString		HLS de 32 bits
 Recording	MediaString		Gravació
@@ -91,7 +91,6 @@ Top-Back-left	MediaString		Dalt-darrere-esquerra
 16 bit RGB	MediaString		RGB de 16 bits
 YCbCr422	MediaString		YCbCr422
 Raw audio	MediaString		Àudio en brut
-Video data between line lu and lu	MediaString		Dades de vídeo entre la línia lu i lu
 32 bit LABA	MediaString		LABA de 32 bits
 24 bit HLS	MediaString		HLS de 24 bits
 Non-interlaced 	MediaString		No entrellaçat 

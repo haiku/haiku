@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	1504929345
+1	ukrainian	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		Помилка оновлення репозитарія 
 Network error	ServerHelper		Помилка мережі
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Під час оновлення репозитарія сталася помилка: %error%
@@ -7,6 +7,7 @@ Check for updates…	MainWindow		Перевірити на обнови…
 Uninstalled	PackageListView		Деінстальовані
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
 Available packages	MainWindow		Доступні пакети
+An unexpected error has been sent from the server [%li]	ServerHelper		Сервер надіслав неочікувану помилку [%li]
 Create account	UserLoginWindow		Створити обліковий запис
 Install %PackageTitle%	PackageManager		Інсталяція %PackageTitle%
 OK	App		ОК
@@ -44,6 +45,7 @@ Category	FilterView		Категорія
 User rating	RatePackageWindow		Рейтинг користувача
 Installed packages	MainWindow		Встановлені пакети
 A requested object or an object involved in the request was not found on the server.	ServerHelper		На сервері не знайдено потрібний об'єкт або об'єкт, що міститься у запиті.
+Date	PackageListView		Дата
 No changelog available.	PackageInfoView		Історія змін недоступна
 Error	App		Помилка
 There was a puzzling response from the web service.	UserLoginWindow		Отримано загадкову відповідь від мережевого сервісу.
@@ -55,6 +57,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Не вдалося спілкуватися з сервером для отримання зображення капчі, необхідного для створення нового користувача.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Ваша оцінка успішно завантажена. Ви можете оновити або вилучити її на веб-сайті HaikuDepot Server.
 Available	PackageListView		Доступні
+-	no package publish		-
 Cancel	UserLoginWindow		Скасувати
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot потребує запуску демона пакетів, який напевно не працює.\nЗапустити його зараз?
 Click a package to view information	PackageInfoView		Клікніть по пакету, для відображення інформації про нього

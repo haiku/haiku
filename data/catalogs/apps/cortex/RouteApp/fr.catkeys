@@ -1,4 +1,4 @@
-1	french	application/x-vnd.Cortex.Route	1581450909
+1	french	application/x-vnd.Cortex.Route	837113336
 Node '%name%' released	CortexRouteApp		Nœud « %name% » libéré
 OK	CortexRouteApp		OK
 About Cortex/Route…	CortexRouteApp		À propos de Cortex/Route…
@@ -18,4 +18,5 @@ Open…	CortexRouteApp		Ouvrir…
 Connection made	CortexRouteApp		Connexion effectuée
 Show add-ons	CortexRouteApp		Montrer les extensions
 Quit	CortexRouteApp		Quitter
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nTous droits réservés.\n\nL’équipe Cortex :\n\nChristopher Lenz: UI\nEric Moon: UI, dorsal\n\nRemerciements:\nJohn Ashmun\nJon Watte\nDoug Wright\n<votre nom ici>\n\nCertaines icônes utilisées ici sont la propriété de\nBe, Inc. et sont utilisées avec leur permission.
 Tried format:	CortexRouteApp		Format essayé :

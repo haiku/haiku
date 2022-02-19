@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-mixer.media_addon	2690542047
+1	ukrainian	x-vnd.Haiku-mixer.media_addon	251696696
 Input mapping	AudioMixer		Перепризначення входу
 To output	AudioMixer		До виходу
 Refuse output format changes	AudioMixer		Відхилити зміни вихідного формату
@@ -15,6 +15,7 @@ Display balance control for stereo connections	AudioMixer		Показати ре
 Setup	AudioMixer		Настройки
 Physical input channels	AudioMixer		Фізичні вхідні канали
 Input channel destinations	AudioMixer		Напрямки вхідних каналів
+Resampling algorithm:	AudioMixer		Алгоритм передискретизації:
 Mute	AudioMixer		Заглушити
 Output mapping	AudioMixer		Перепризначення виходу
 Virtual output channels	AudioMixer		Віртуальні вихідні канали

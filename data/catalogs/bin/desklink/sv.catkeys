@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-desklink	3759597613
+1	swedish	x-vnd.Haiku-desklink	3078806724
 desklink	MediaReplicant	Title of an alert box	desklink
 Sound preferences…	MediaReplicant		Ljudinställningar...
 Muted	MediaReplicant		Tyst
@@ -7,6 +7,7 @@ OK	MediaReplicant		OK
 Couldn't launch 	MediaReplicant		Kunde inte starta
 Volume	VolumeControl		Volym
 Open MediaPlayer	MediaReplicant		Öppna MediaSpelare
+%ld dB	VolumeControl		%ld dB
 Media preferences…	MediaReplicant		Mediainställningar...
 Options	MediaReplicant		Alternativ
 Beep	MediaReplicant		Pip

@@ -1,5 +1,6 @@
-1	swedish	x-vnd.Haiku-mixer.media_addon	2690542047
+1	swedish	x-vnd.Haiku-mixer.media_addon	653252162
 Input mapping	AudioMixer		Ingångs mappning
+High quality (linear interpolation)	AudioMixer		Hög kvalitet (linjär interpolation)
 To output	AudioMixer		Till utgång
 Refuse output format changes	AudioMixer		Tillåt inte utformatändringar
 Gain	AudioMixer		Volym

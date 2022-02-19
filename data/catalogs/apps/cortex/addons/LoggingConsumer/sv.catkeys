@@ -1,5 +1,7 @@
-1	swedish	application/x-vnd.Be.LoggingConsumerApp	3653006715
+1	swedish	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunde inte hämta nodinformation (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Prioritet
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kunde inte hitta nod (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Latens
 Logged input	CortexAddOnsLoggingConsumer		Loggad ingång
 CPU spin percentage	CortexAddOnsLoggingConsumer		Procent av CPU-spinn
@@ -17,3 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Kontroller
 controls	CortexAddOnsCommonMediaNodeControlApp		kontroller
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Ansluta
 percent	CortexAddOnsLoggingConsumer		procent
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: inga parametrar för nod (%ld):\n%s\n

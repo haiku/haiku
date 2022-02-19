@@ -1,4 +1,6 @@
-1	french	x-vnd.Haiku-EXRTranslator	558185124
+1	french	x-vnd.Haiku-EXRTranslator	660682238
 EXR image translator	ConfigView		Traducteur d’images EXR
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
 EXR image translator	EXRTranslator		Traducteur d’images EXR
+Based on OpenEXR %version%	ConfigView		Basé sur OpenEXR %version%
 EXR Settings	main		Réglages EXR

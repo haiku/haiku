@@ -1,6 +1,7 @@
-1	ukrainian	x-vnd.Haiku-Login	3033693897
+1	ukrainian	x-vnd.Haiku-Login	2717156077
 Invalid login!	Login View		Невірний логін!
 Error	Login App		Помилка
+--nonmodal\tDo not make the window modal	Login App		--nonmodal\tНе робити вікно модальним
 Welcome to Haiku	Login Window		Запрошуємо в Haiku
 Halt	Login View		Зупинити
 Desktop	Desktop Window		Робочий стіл
