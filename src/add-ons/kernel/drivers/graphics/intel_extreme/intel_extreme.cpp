@@ -507,6 +507,10 @@ intel_extreme_init(intel_info &info)
 		return info.shared_area;
 	}
 
+	// enable power
+	gPCI->set_powerstate(info.pci->bus, info.pci->device, info.pci->function,
+		PCI_pm_state_d0);
+
 	memset((void*)info.shared_info, 0, sizeof(intel_shared_info));
 
 	int mmioIndex = 1;
