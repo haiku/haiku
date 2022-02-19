@@ -70,7 +70,7 @@ udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 	status = walk_volume_recognition_sequence(device, offset, blockSize,
 		blockShift);
 	if (status != B_OK) {
-		TRACE_ERROR(("udf_recognize: Invalid sequence. status = %" B_PRId32
+		TRACE(("udf_recognize: Invalid sequence. status = %" B_PRId32
 			"\n", status));
 		return status;
 	}
@@ -118,7 +118,7 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 	if (chunk.InitCheck() != B_OK) {
 		TRACE_ERROR(("walk_volume_recognition_sequence: Failed to construct "
 			"MemoryChunk\n"));
-		return B_ERROR;
+		return chunk.InitCheck();
 	}
 
 	bool foundExtended = false;
@@ -156,7 +156,7 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize,
 				break;
 			}
 		} else {
-			TRACE_ERROR(("read_pos(pos:%" B_PRIdOFF ", len:%" B_PRIu32 ") "
+			TRACE(("read_pos(pos:%" B_PRIdOFF ", len:%" B_PRIu32 ") "
 				"failed with: 0x%lx\n", address, blockSize, bytesRead));
 			break;
 		}
