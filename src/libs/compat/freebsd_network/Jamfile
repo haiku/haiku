@@ -41,6 +41,7 @@ KernelStaticLibrary libfreebsd_network.a :
 	mbuf.c
 	mii.c
 	mutex.c
+	pci.cpp
 	priv.cpp
 	smp.c
 	subr_autoconf.cpp
