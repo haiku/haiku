@@ -1,0 +1,255 @@
+/*
+ * Copyright 2022 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Corresponds to:
+ *		headers/private/netservices2/HttpRequest.h			hrev?????
+ *		src/kits/network/libnetservices2/HttpRequest.cpp	hrev?????
+ */
+
+
+#if __cplusplus >= 201703L
+
+
+/*!
+	\file HttpRequest.h
+	\ingroup netservices
+	\brief Provides the classes and tools to build HTTP Requests.
+
+	\since Haiku R1
+*/
+
+
+namespace BPrivate {
+
+namespace Network {
+
+
+/*!
+	\class BHttpMethod
+	\ingroup netservices
+	\brief Represent a HTTP method.
+
+	The <a href="https://datatracker.ietf.org/doc/html/rfc7231#section-4.1">HTTP standard</a>
+	specifies that HTTP requests have a method. Common methods are \c GET and \c HEAD methods.
+	Standardized and common methods are in the form of \em verbs and are in capitalized letters
+	from the ASCII token set, though any valid token can be used.
+
+	It is most likely that you will not use the methods of this class directly, instead you will
+	use the implicit constructors while interacting with the \ref BHttpRequest class.
+
+	\code
+	auto url = BUrl2("https://www.haiku-os.org/");
+	// implicitly construct a standard get request
+	auto standard = BHttpRequest(url, BHttpMethod::Get);
+	// implicitly construct a nonstandard patch request
+	auto custom = BHttpRequest(url, "PATCH"sv);
+	\endcode
+
+	\note When you are using the standard list of verbs, there will never be an exception when
+		creating objects of this type. When you create a custom method, exceptions may be raised
+		when the system runs out of memory, or when your custom method contains invalid characters.
+		In almost all cases, you can probably safely assume you will not run into these exceptions,
+		except for cases where you use user input to create methods or you are very defensive
+		about memory management.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BHttpMethod::InvalidMethod
+	\ingroup netservices
+	\brief Error that represents when a custom method does not conform to the HTTP standard.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BString BHttpMethod::InvalidMethod::input
+	\brief The input that contains the invalid contents.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpMethod::InvalidMethod::InvalidMethod(const char *origin, BString input)
+	\brief Constructor that sets the \a origin and the invalid \a input.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\enum BHttpMethod::Verb
+	\ingroup netservices
+	\brief A list of standard HTTP methods.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BHttpMethod::Verb BHttpMethod::Get
+	\brief Represents the \c GET method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BHttpMethod::Verb BHttpMethod::Head
+	\brief Represents the \c HEAD method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BHttpMethod::Verb BHttpMethod::Post
+	\brief Represents the \c POST method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BHttpMethod::Verb BHttpMethod::Put
+	\brief Represents the \c PUT method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BHttpMethod::Verb BHttpMethod::Delete
+	\brief Represents the \c DELETE method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BHttpMethod::Verb BHttpMethod::Connect
+	\brief Represents the \c CONNECT method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BHttpMethod::Verb BHttpMethod::Options
+	\brief Represents the \c OPTIONS method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BHttpMethod::Verb BHttpMethod::Trace
+	\brief Represents the \c TRACE method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpMethod::BHttpMethod(BHttpMethod &&other) noexcept
+	\brief Move constructor.
+
+	Moves the data from the \a other to this object. The \a other object will be set to
+	\ref BHttpMethod::Get.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpMethod::BHttpMethod(const BHttpMethod &other)
+	\brief Copy constructor.
+
+	Copy data from an \a other object.
+
+	\exception std::bad_alloc When the \a other object contains a custom verb, this exception
+		will be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpMethod::BHttpMethod(const std::string_view &method)
+	\brief Construct a custom method.
+
+	\param method The verb for the method.
+
+	\exception std::bad_alloc In case it is not possible to allocate memory for the custom string.
+	\exception BHttpMethod::InvalidMethod In case the \a method is empty or contains invalid
+		characters.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpMethod::BHttpMethod(Verb verb) noexcept
+	\brief Construct a standard method.
+
+	\param verb The chosen method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpMethod::~BHttpMethod()
+	\brief Destructor.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const std::string_view BHttpMethod::Method() const noexcept
+	\brief Get a string representation of the method.
+
+	\return A \c std::string_view that is a string representation of the standard or custom method
+		in this object. The lifetime of the string view is bound to the lifetime of this method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpMethod& BHttpMethod::operator=(BHttpMethod &&other) noexcept
+	\brief Move assignment.
+	Moves the data from the \a other to this object. The \a other object will be set to
+	\ref BHttpMethod::Get.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpMethod& BPrivate::Network::BHttpMethod::operator=(const BHttpMethod &other)
+	\brief Copy assignment.
+
+	Copy data from an \a other object.
+
+	\exception std::bad_alloc When the \a other object contains a custom verb, this exception
+		will be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+} // namespace Network
+
+} // namespace BPrivate
+
+#endif

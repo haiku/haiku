@@ -13,8 +13,10 @@
 #include <cppunit/TestSuite.h>
 
 #include <HttpFields.h>
+#include <HttpRequest.h>
 
 using BPrivate::Network::BHttpFields;
+using BPrivate::Network::BHttpMethod;
 using BPrivate::Network::BHttpSession;
 
 
@@ -168,6 +170,55 @@ HttpProtocolTest::HttpFieldsTest()
 }
 
 
+void
+HttpProtocolTest::HttpMethodTest()
+{
+	using namespace std::literals;
+
+	// Default methods
+	{
+		CPPUNIT_ASSERT_EQUAL(BHttpMethod(BHttpMethod::Get).Method(), "GET"sv);
+		CPPUNIT_ASSERT_EQUAL(BHttpMethod(BHttpMethod::Head).Method(), "HEAD"sv);
+		CPPUNIT_ASSERT_EQUAL(BHttpMethod(BHttpMethod::Post).Method(), "POST"sv);
+		CPPUNIT_ASSERT_EQUAL(BHttpMethod(BHttpMethod::Put).Method(), "PUT"sv);
+		CPPUNIT_ASSERT_EQUAL(BHttpMethod(BHttpMethod::Delete).Method(), "DELETE"sv);
+		CPPUNIT_ASSERT_EQUAL(BHttpMethod(BHttpMethod::Connect).Method(), "CONNECT"sv);
+		CPPUNIT_ASSERT_EQUAL(BHttpMethod(BHttpMethod::Options).Method(), "OPTIONS"sv);
+		CPPUNIT_ASSERT_EQUAL(BHttpMethod(BHttpMethod::Trace).Method(), "TRACE"sv);
+	}
+
+	// Valid custom method
+	{
+		try {
+			auto method = BHttpMethod("PATCH"sv);
+			CPPUNIT_ASSERT_EQUAL(method.Method(), "PATCH"sv);
+		} catch (...) {
+			CPPUNIT_FAIL("Unexpected error when creating valid method");
+		}
+	}
+
+	// Invalid empty method
+	try {
+		auto method = BHttpMethod("");
+		CPPUNIT_FAIL("Creating an empty method was succesful unexpectedly");
+	} catch (BHttpMethod::InvalidMethod&) {
+		// success
+	} catch (...) {
+		CPPUNIT_FAIL("Unexpected exception type when creating an empty method");
+	}
+
+	// Method with invalid characters (arabic translation of GET)
+	try {
+		auto method = BHttpMethod("جلب");
+		CPPUNIT_FAIL("Creating a method with invalid characters was succesful unexpectedly");
+	} catch (BHttpMethod::InvalidMethod&) {
+		// success
+	} catch (...) {
+		CPPUNIT_FAIL("Unexpected exception type when creating a method with invalid characters");
+	}
+}
+
+
 /* static */ void
 HttpProtocolTest::AddTests(BTestSuite& parent)
 {
@@ -175,6 +226,8 @@ HttpProtocolTest::AddTests(BTestSuite& parent)
 
 	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
 		"HttpProtocolTest::HttpFieldsTest", &HttpProtocolTest::HttpFieldsTest));
+	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
+		"HttpProtocolTest::HttpMethodTest", &HttpProtocolTest::HttpMethodTest));
 
 	parent.addTest("HttpProtocolTest", &suite);
 }
