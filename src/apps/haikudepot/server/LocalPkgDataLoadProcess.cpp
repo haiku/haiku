@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
@@ -28,6 +28,7 @@
 #include "Logger.h"
 #include "PackageInfo.h"
 #include "PackageManager.h"
+#include "PackageUtils.h"
 #include "RepositoryUrlUtils.h"
 
 #include <package/Context.h>
@@ -198,6 +199,8 @@ LocalPkgDataLoadProcess::RunInternal()
 
 			if (!modelInfo.IsSet())
 				return B_ERROR;
+
+			modelInfo->SetSize(_DeriveSize(modelInfo));
 
 			foundPackages[repoPackageInfo.Name()] = modelInfo;
 		}
@@ -377,6 +380,32 @@ LocalPkgDataLoadProcess::RunInternal()
 	HDDEBUG("did refresh the package list");
 
 	return B_OK;
+}
+
+
+off_t
+LocalPkgDataLoadProcess::_DeriveSize(const PackageInfoRef package) const
+{
+	BPath path;
+	if (PackageUtils::DeriveLocalFilePath(package.Get(), path) == B_OK) {
+		BEntry entry(path.Path());
+		if (entry.Exists()) {
+			off_t size;
+			if (entry.GetSize(&size) == B_OK)
+				return size;
+			else {
+				HDDEBUG("unable to get the size of local file [%s]",
+					path.Path());
+			}
+		}
+		else
+			HDDEBUG("the local file [%s] does not exist", path.Path());
+	}
+	else {
+		HDDEBUG("unable to get the local file of package [%s]",
+			package->Name().String());
+	}
+	return 0;
 }
 
 

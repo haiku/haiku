@@ -23,6 +23,7 @@
 
 #include "GeneralContentScrollView.h"
 #include "Logger.h"
+#include "PackageUtils.h"
 
 #include <package/PackageDefs.h>
 #include <package/hpkg/NoErrorOutput.h>
@@ -332,29 +333,9 @@ PackageContentsView::_PopulatePackageContents(const PackageInfo& package)
 {
 	BPath packagePath;
 
-	// Obtain path to the package file
-	if (package.IsLocalFile()) {
-		BString pathString = package.LocalFilePath();
-		packagePath.SetTo(pathString.String());
-	} else {
-		int32 installLocation = _InstallLocation(package);
-		if (installLocation == B_PACKAGE_INSTALLATION_LOCATION_SYSTEM) {
-			if (find_directory(B_SYSTEM_PACKAGES_DIRECTORY, &packagePath)
-				!= B_OK) {
-				return false;
-			}
-		} else if (installLocation == B_PACKAGE_INSTALLATION_LOCATION_HOME) {
-			if (find_directory(B_USER_PACKAGES_DIRECTORY, &packagePath)
-				!= B_OK) {
-				return false;
-			}
-		} else {
-			HDINFO("PackageContentsView::_PopulatePackageContents(): "
-				"unknown install location");
-			return false;
-		}
-
-		packagePath.Append(package.FileName());
+	if (PackageUtils::DeriveLocalFilePath(&package, packagePath) != B_OK) {
+		HDDEBUG("unable to obtain local file path");
+		return false;
 	}
 
 	// Setup a BPackageReader
@@ -381,18 +362,4 @@ PackageContentsView::_PopulatePackageContents(const PackageInfo& package)
 		// populating the contents early.
 	}
 	return true;
-}
-
-
-int32
-PackageContentsView::_InstallLocation(const PackageInfo& package) const
-{
-	const PackageInstallationLocationSet& locations
-		= package.InstallationLocations();
-
-	// If the package is already installed, return its first installed location
-	if (locations.size() != 0)
-		return *locations.begin();
-
-	return B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
 }

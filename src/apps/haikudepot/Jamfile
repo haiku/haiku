@@ -199,6 +199,7 @@ local applicationSources =
 	DataIOUtils.cpp
 	LanguageMenuUtils.cpp
 	LocaleUtils.cpp
+	PackageUtils.cpp
 	RepositoryUrlUtils.cpp
 	StorageUtils.cpp
 	LoggingUrlProtocolListener.cpp

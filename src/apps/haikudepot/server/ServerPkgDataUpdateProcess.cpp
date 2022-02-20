@@ -110,7 +110,7 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 			package->SetFullDescription(*(pkgVersion->Description()));
 
 		if (!pkgVersion->PayloadLengthIsNull())
-			package->SetSize(pkgVersion->PayloadLength());
+			package->SetSize(static_cast<off_t>(pkgVersion->PayloadLength()));
 
 		if (!pkgVersion->CreateTimestampIsNull())
 			package->SetVersionCreateTimestamp(pkgVersion->CreateTimestamp());
