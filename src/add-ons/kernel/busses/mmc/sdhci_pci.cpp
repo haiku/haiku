@@ -259,13 +259,13 @@ SdhciBus::ExecuteCommand(uint8_t command, uint32_t argument, uint32_t* response)
 
 	// Wait for command response to be available ("command complete" interrupt)
 	TRACE("Wait for command complete...");
-	while (fCommandResult == 0) {
+	do {
 		acquire_sem(fSemaphore);
 		TRACE("command complete sem acquired, status: %x\n", fCommandResult);
 		TRACE("real status = %x command line busy: %d\n",
 			fRegisters->interrupt_status,
 			fRegisters->present_state.CommandInhibit());
-	}
+	} while (fCommandResult == 0);
 
 	TRACE("Command response available\n");
 
