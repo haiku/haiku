@@ -12,32 +12,12 @@
 #include <ctype.h>
 #include <utility>
 
+#include "HttpPrivate.h"
+
 using namespace BPrivate::Network;
 
 
 // #pragma mark -- utilities
-
-
-/*!
-	\brief Validate whether the string conforms to a HTTP token value
-
-	RFC 7230 section 3.2.6 determines that valid tokens for the header name are:
-	!#$%&'*+=.^_`|~, any digits or alpha.
-
-	\returns \c true if the string is valid, or \c false if it is not.
-*/
-static inline bool
-validate_token_string(const std::string_view& string)
-{
-	for (auto it = string.cbegin(); it < string.cend(); it++) {
-		if (*it <= 31 || *it == 127 || *it == '(' || *it == ')' || *it == '<' || *it == '>'
-				|| *it == '@' || *it == ',' || *it == ';' || *it == '\\' || *it == '"'
-				|| *it == '/' || *it == '[' || *it == ']' || *it == '?' || *it == '='
-				|| *it == '{' || *it == '}' || *it == ' ')
-			return false;
-	}
-	return true;
-}
 
 
 /*!
@@ -269,7 +249,7 @@ BHttpFields::Field::Field(const std::string_view& name, const std::string_view& 
 BHttpFields::Field::Field(const std::string_view& name, const std::string_view& value, bool borrowed)
 	: fName(name), fValue(value)
 {
-	if (name.length() == 0 || !validate_token_string(name))
+	if (name.length() == 0 || !validate_http_token_string(name))
 		throw BHttpFields::InvalidInput(__PRETTY_FUNCTION__, fName);
 	if (value.length() == 0 || !validate_value_string(value))
 		throw BHttpFields::InvalidInput(__PRETTY_FUNCTION__, BString(value.data(), value.length()));
