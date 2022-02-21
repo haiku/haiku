@@ -352,7 +352,7 @@ for platform in [ MultiBootSubDirSetup ] {
 		}
 
 		if $(TARGET_BOOT_PLATFORM) = riscv {
-			ldflags += -z,notext ;
+			ldflags += -z notext ;
 		}
 
 		BootLd boot_loader_$(platform:G=) :
