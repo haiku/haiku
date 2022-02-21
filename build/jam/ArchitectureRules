@@ -48,6 +48,11 @@ rule ArchitectureSetup architecture
 		# TODO: These should be included in Clang's compiler specs.
 		ccBaseFlags += -fPIC ;
 		HAIKU_LINKFLAGS_$(architecture) += -shared ;
+
+		# lld doesn't currently implement R_RISCV_ALIGN relaxation
+		if $(cpu) = riscv64 {
+			ccBaseFlags += -mno-relax ;
+		}
 	}
 	ccBaseFlags += $(archFlags) ;
 
