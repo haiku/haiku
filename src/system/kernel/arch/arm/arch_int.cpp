@@ -21,7 +21,9 @@
 #include <device_manager.h>
 #include <kscheduler.h>
 #include <interrupt_controller.h>
+#include <ksyscalls.h>
 #include <smp.h>
+#include <syscall_numbers.h>
 #include <thread.h>
 #include <timer.h>
 #include <util/AutoLock.h>
@@ -30,6 +32,7 @@
 #include <vm/vm.h>
 #include <vm/vm_priv.h>
 #include <vm/VMAddressSpace.h>
+#include <algorithm>
 #include <string.h>
 
 #include <drivers/bus/FDT.h>
@@ -236,8 +239,39 @@ arch_arm_undefined(struct iframe *iframe)
 extern "C" void
 arch_arm_syscall(struct iframe *iframe)
 {
+#ifdef TRACE_ARCH_INT
 	print_iframe("Software interrupt", iframe);
-	IFrameScope scope(iframe); // push/pop iframe
+#endif
+
+	uint32_t syscall = *(uint32_t *)(iframe->pc-4) & 0x00ffffff;
+	TRACE(("syscall number: %d\n", syscall));
+
+	uint32_t args[20];
+	if (syscall < kSyscallCount) {
+		TRACE(("syscall(%s,%d)\n",
+			kExtendedSyscallInfos[syscall].name,
+			kExtendedSyscallInfos[syscall].parameter_count));
+
+		int argSize = kSyscallInfos[syscall].parameter_size;
+		memcpy(args, &iframe->r0, std::min<int>(argSize, 4 * sizeof(uint32)));
+		if (argSize > 4 * sizeof(uint32)) {
+			status_t res = user_memcpy(&args[4], (void *)iframe->usr_sp,
+				(argSize - 4 * sizeof(uint32)));
+			if (res < B_OK) {
+				dprintf("can't read syscall arguments on user stack\n");
+				iframe->r0 = res;
+				return;
+			}
+		}
+	}
+
+	enable_interrupts();
+
+	uint64 returnValue = 0;
+	syscall_dispatcher(syscall, (void*)args, &returnValue);
+
+	TRACE(("returning %" B_PRId64 "\n", returnValue));
+	iframe->r0 = returnValue;
 }
 
 

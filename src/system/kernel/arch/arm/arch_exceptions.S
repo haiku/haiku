@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Haiku Inc. All rights reserved.
+ * Copyright 2012-2022, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -50,6 +50,30 @@
 	mov		r0, r0						/* NOP for previous instruction */
 	add		sp, sp, #(4*15)				/* Adjust the stack pointer */
 	ldmia	sp, {sp, lr, pc}^			/* Restore lr and exit */
+.endm
+
+/* The following two macros are adapted from the two macros above, taken from FreeBSD. */
+
+.macro	PUSHFRAMEINSWI
+	str		lr, [sp, #-4]!				/* Push the return address */
+	sub		sp, sp, #(4*17)				/* Adjust the stack pointer */
+	stmia	sp, {r0-r12}				/* Store the general purpose registers */
+	add		r0, sp, #(4*13)				/* Adjust the stack pointer */
+	stmia	r0, {r13-r14}^				/* Store the user mode sp and lr registers */
+	mrs		r0, spsr					/* Store the SPSR */
+	str		r0, [sp, #-4]!
+	mov		r0, #0						/* Fill in svc mode sp and lr with zeroes */
+	str		r0, [sp, #(4*16)]
+	str		r0, [sp, #(4*17)]
+.endm
+
+.macro	PULLFRAMEINSWIANDEXIT
+	ldr		r0, [sp], #4				/* Get SPSR from stack */
+	msr		spsr, r0
+	ldmia	sp, {r0-r14}^				/* Restore user mode registers */
+	add		sp, sp, #(4*17)				/* Adjust the stack pointer */
+	ldr		lr, [sp], #4				/* Pull the return address */
+	movs	pc, lr						/* Return to user mode */
 .endm
 
 .text
@@ -137,12 +161,12 @@ FUNCTION_END(arm_undefined)
 
 
 FUNCTION(arm_syscall):
-	PUSHFRAMEINSVC
+	PUSHFRAMEINSWI
 
 	mov	r0, sp
 	bl	arch_arm_syscall
 
-	PULLFRAMEFROMSVCANDEXIT
+	PULLFRAMEINSWIANDEXIT
 FUNCTION_END(arm_syscall)
 
 
