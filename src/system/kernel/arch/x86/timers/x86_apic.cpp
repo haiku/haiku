@@ -18,6 +18,14 @@
 #include "apic_timer.h"
 
 
+//#define TRACE_APIC
+#ifdef TRACE_APIC
+#	define TRACE(x...) dprintf("apic: " x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
 /* Method Prototypes */
 static int apic_timer_get_priority();
 static status_t apic_timer_set_hardware_timer(bigtime_t relativeTimeout);
@@ -70,8 +78,9 @@ apic_timer_set_hardware_timer(bigtime_t relativeTimeout)
 	config = apic_lvt_timer() & ~APIC_LVT_MASKED; // unmask the timer
 	apic_set_lvt_timer(config);
 
-	//TRACE_TIMER(("arch_smp_set_apic_timer: config 0x%lx, timeout %Ld, tics/sec %lu, tics %lu\n",
-	//	config, relativeTimeout, sApicTicsPerSec, ticks));
+	TRACE("arch_smp_set_apic_timer: config 0x%" B_PRIx32 ", timeout %" B_PRIdBIGTIME
+		", tics/sec %" B_PRIu32 ", tics %" B_PRId32 "\n", config, relativeTimeout,
+		sApicTicsPerSec, ticks);
 
 	apic_set_lvt_initial_timer_count(ticks); // start it up
 

@@ -250,8 +250,8 @@ timer_interrupt()
 	per_cpu_timer_data& cpuData = sPerCPU[smp_get_current_cpu()];
 	int32 rc = B_HANDLED_INTERRUPT;
 
-	TRACE(("timer_interrupt: time %lld, cpu %ld\n", system_time(),
-		smp_get_current_cpu()));
+	TRACE(("timer_interrupt: time %" B_PRIdBIGTIME ", cpu %" B_PRId32 "\n",
+		system_time(), smp_get_current_cpu()));
 
 	spinlock = &cpuData.lock;
 
