@@ -11,6 +11,9 @@
 
 #define SPINLOCK_PAUSE()	do {} while (false)
 
+#define CPSR_MODE_MASK		0x1f
+#define CPSR_MODE_USR		0x10
+
 #define FSR_WNR				0x800
 
 #endif	/* _SYSTEM_ARCH_ARM_DEFS_H */

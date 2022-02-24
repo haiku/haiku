@@ -175,7 +175,7 @@ FUNCTION(arm_prefetch_abort):
 	nop					/* Make absolutely sure any pending */
 	nop					/* imprecise aborts have occurred. */
 #endif
- 	add	lr, lr, #4
+	sub	lr, lr, #4
 	PUSHFRAMEINSVC
 
 	mov	r0, sp
