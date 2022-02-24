@@ -118,7 +118,7 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 status_t
 arch_thread_init_tls(Thread *thread)
 {
-	uint32 tls[TLS_USER_THREAD_SLOT + 1];
+	uint32 tls[TLS_FIRST_FREE_SLOT];
 
 	thread->user_local_storage = thread->user_stack_base
 		+ thread->user_stack_size;
@@ -150,8 +150,19 @@ arm_swap_pgdir(uint32_t pageDirectoryAddress)
 
 
 void
+arm_set_tls_context(Thread *thread)
+{
+	// Set TPIDRURO to point to TLS base
+	asm volatile("MCR p15, 0, %0, c13, c0, 3"
+		: : "r" (thread->user_local_storage));
+}
+
+
+void
 arch_thread_context_switch(Thread *from, Thread *to)
 {
+	arm_set_tls_context(to);
+
 	VMAddressSpace *oldAddressSpace = from->team->address_space;
 	VMTranslationMap *oldTranslationMap = oldAddressSpace->TranslationMap();
 	phys_addr_t oldPageDirectoryAddress =
