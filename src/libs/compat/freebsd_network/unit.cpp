@@ -9,10 +9,10 @@
 
 
 extern "C" {
+#include <sys/mutex.h>
+
 #include "unit.h"
 }
-
-#include <compat/sys/mutex.h>
 
 #include <stdlib.h>
 #include <util/RadixBitmap.h>
