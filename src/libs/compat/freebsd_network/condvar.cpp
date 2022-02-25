@@ -3,15 +3,26 @@
  * Distributed under the terms of the MIT license.
  */
 
+extern "C" {
 #include <compat/sys/mutex.h>
-#include <compat/sys/condvar.h>
 #include <compat/sys/kernel.h>
+}
+
+#include <compat/sys/condvar.h>
 
 
 void
 cv_init(struct cv* variable, const char* description)
 {
 	variable->condition.Init(NULL, description);
+}
+
+
+void
+cv_destroy(struct cv* variable)
+{
+	variable->condition.NotifyAll();
+	// Nothing else to do.
 }
 
 
