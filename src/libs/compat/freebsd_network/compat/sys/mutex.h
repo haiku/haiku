@@ -7,22 +7,14 @@
 #define _FBSD_COMPAT_SYS_MUTEX_H_
 
 
-#include <sys/haiku-module.h>
-#include <kernel/int.h>
-
-#include <sys/queue.h>
 #include <sys/_mutex.h>
-#include <sys/pcpu.h>
-#include <machine/atomic.h>
-#include <machine/cpufunc.h>
+#include <sys/systm.h>
 
 
 #define MA_OWNED		0x1
 #define MA_NOTOWNED		0x2
 #define MA_RECURSED		0x4
 #define MA_NOTRECURSED	0x8
-
-#define mtx_assert(mtx, what)
 
 #define	MTX_DEF			0x00000000
 #define MTX_SPIN		0x00000001
@@ -34,17 +26,23 @@
 #define MTX_NETWORK_LOCK	"network driver"
 
 
-/* on FreeBSD these are different functions */
-#define	mtx_lock_spin(x) 	mtx_lock(x)
-#define	mtx_unlock_spin(x)	mtx_unlock(x)
-
-
 extern struct mtx Giant;
 
 
 void mtx_init(struct mtx*, const char*, const char*, int);
 void mtx_sysinit(void *arg);
 void mtx_destroy(struct mtx*);
+void mtx_lock_spin(struct mtx* mutex);
+void mtx_unlock_spin(struct mtx* mutex);
+void _mtx_assert(struct mtx *m, int what, const char *file, int line);
+
+
+#ifdef INVARIANTS
+#	define	mtx_assert(m, what)						\
+	_mtx_assert((m), (what), __FILE__, __LINE__)
+#else
+#	define	mtx_assert(m, what)
+#endif
 
 
 static inline void
@@ -56,9 +54,7 @@ mtx_lock(struct mtx* mutex)
 	} else if (mutex->type == MTX_RECURSE) {
 		recursive_lock_lock(&mutex->u.recursive);
 	} else if (mutex->type == MTX_SPIN) {
-		cpu_status status = disable_interrupts();
-		acquire_spinlock(&mutex->u.spinlock.lock);
-		mutex->u.spinlock.state = status;
+		mtx_lock_spin(mutex);
 	}
 }
 
@@ -91,9 +87,7 @@ mtx_unlock(struct mtx* mutex)
 	} else if (mutex->type == MTX_RECURSE) {
 		recursive_lock_unlock(&mutex->u.recursive);
 	} else if (mutex->type == MTX_SPIN) {
-		cpu_status status = mutex->u.spinlock.state;
-		release_spinlock(&mutex->u.spinlock.lock);
-		restore_interrupts(status);
+		mtx_unlock_spin(mutex);
 	}
 }
 
@@ -118,7 +112,18 @@ mtx_owned(struct mtx* mutex)
 		return mutex->u.recursive.holder == find_thread(NULL);
 #endif
 	}
+	if (mutex->type == MTX_SPIN)
+		return mutex->u.spinlock.lock.lock != 0;
 
+	return 0;
+}
+
+
+static inline int
+mtx_recursed(struct mtx* mutex)
+{
+	if (mutex->type == MTX_RECURSE)
+		return mutex->u.recursive.recursion != 0;
 	return 0;
 }
 
