@@ -1,0 +1,485 @@
+/*
+ * Copyright 2022, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ */
+
+#include <sys/condvar.h>
+
+extern "C" {
+#include <sys/mutex.h>
+#include <sys/systm.h>
+#include <sys/taskqueue.h>
+#include <sys/priority.h>
+
+#include <dev/usb/usb.h>
+#include <dev/usb/usbdi.h>
+#include <dev/usb/usb_device.h>
+
+#include "device.h"
+}
+
+// undo name remappings, so we can use both FreeBSD and Haiku ones in this file
+#undef usb_device
+#undef usb_interface
+#undef usb_endpoint_descriptor
+
+#include <USB3.h>
+
+
+usb_module_info* sUSB = NULL;
+struct taskqueue* sUSBTaskqueue = NULL;
+
+
+status_t
+init_usb()
+{
+	if (sUSB != NULL)
+		return B_OK;
+
+	if (get_module(B_USB_MODULE_NAME, (module_info**)&sUSB) != B_OK) {
+		dprintf("cannot get module \"%s\"\n", B_USB_MODULE_NAME);
+		return B_ERROR;
+	}
+	return B_OK;
+}
+
+
+void
+uninit_usb()
+{
+	if (sUSB != NULL)
+		put_module(B_USB_MODULE_NAME);
+	if (sUSBTaskqueue != NULL)
+		taskqueue_free(sUSBTaskqueue);
+
+	sUSB = NULL;
+	sUSBTaskqueue = NULL;
+}
+
+
+status_t
+get_next_usb_device(uint32* cookie, freebsd_usb_device* result)
+{
+	// We cheat here: since USB IDs are sequential, instead of doing a
+	// complicated parent/child iteration dance, we simply request device
+	// descriptors and let the USB stack figure out the rest.
+	//
+	// It would be better if we used USB->register_driver, but that is not
+	// an option at present for a variety of reasons...
+	const usb_configuration_info* config;
+	usb_device current;
+	while (*cookie < 1024) {
+		current = *cookie;
+		*cookie = *cookie + 1;
+
+		config = sUSB->get_configuration(current);
+		if (config != NULL)
+			break;
+	}
+	if (config == NULL)
+		return ENODEV;
+
+	result->haiku_usb_device = current;
+	result->endpoints_max = 0;
+	for (size_t i = 0; i < config->interface_count; i++) {
+		usb_interface_info* iface = config->interface[i].active;
+		for (size_t j = 0; j < iface->endpoint_count; j++) {
+			const int rep = result->endpoints_max++;
+			result->endpoints[rep].iface_index = i;
+
+			static_assert(sizeof(freebsd_usb_endpoint_descriptor)
+				== sizeof(usb_endpoint_descriptor), "size mismatch");
+
+			if (result->endpoints[rep].edesc == NULL)
+				result->endpoints[rep].edesc = new freebsd_usb_endpoint_descriptor;
+
+			memcpy(result->endpoints[rep].edesc, iface->endpoint[j].descr,
+				sizeof(usb_endpoint_descriptor));
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+get_usb_device_attach_arg(struct freebsd_usb_device* device, struct usb_attach_arg* uaa)
+{
+	memset(uaa, 0, sizeof(struct usb_attach_arg));
+
+	const usb_device_descriptor* device_desc =
+		sUSB->get_device_descriptor(device->haiku_usb_device);
+	if (!device_desc)
+		return B_BAD_VALUE;
+
+	uaa->info.idVendor = device_desc->vendor_id;
+	uaa->info.idProduct = device_desc->product_id;
+	uaa->info.bcdDevice = device_desc->device_version;
+	uaa->info.bDeviceClass = device_desc->device_class;
+	uaa->info.bDeviceSubClass = device_desc->device_subclass;
+	uaa->info.bDeviceProtocol = device_desc->device_protocol;
+
+	const usb_configuration_info* config = sUSB->get_configuration(device->haiku_usb_device);
+	if (!device_desc)
+		return B_BAD_VALUE;
+
+	// TODO: represent more than just interface[0], but how?
+	usb_interface_info* iface = config->interface[0].active;
+
+	uaa->info.bInterfaceClass = iface->descr->interface_class;
+	uaa->info.bInterfaceSubClass = iface->descr->interface_subclass;
+	uaa->info.bInterfaceProtocol = iface->descr->interface_protocol;
+
+	// TODO: bIface{Index,Num}, bConfig{Index,Num}
+
+	uaa->device = device;
+	uaa->iface = NULL;
+
+	// TODO: fetch values for these?
+	uaa->usb_mode = USB_MODE_HOST;
+	uaa->port = 1;
+	uaa->dev_state = UAA_DEV_READY;
+
+	return B_OK;
+}
+
+
+void
+usb_cleanup_device(freebsd_usb_device* udev)
+{
+	for (int i = 0; i < USB_MAX_EP_UNITS; i++) {
+		delete udev->endpoints[i].edesc;
+		udev->endpoints[i].edesc = NULL;
+	}
+}
+
+
+static usb_error_t
+map_usb_error(status_t err)
+{
+	switch (err) {
+	case B_OK:			return USB_ERR_NORMAL_COMPLETION;
+	case B_DEV_STALLED:	return USB_ERR_STALLED;
+	case B_CANCELED:	return USB_ERR_CANCELLED;
+	}
+	return USB_ERR_INVAL;
+}
+
+
+extern "C" usb_error_t
+usbd_do_request_flags(struct freebsd_usb_device* udev, struct mtx* mtx,
+	struct usb_device_request* req, void* data, uint16_t flags,
+	uint16_t* actlen, usb_timeout_t timeout)
+{
+	if (mtx != NULL)
+		mtx_unlock(mtx);
+
+	// FIXME: timeouts
+	// TODO: flags
+
+	size_t actualLen = 0;
+	status_t ret = sUSB->send_request((usb_device)udev->haiku_usb_device,
+		req->bmRequestType, req->bRequest,
+		UGETW(req->wValue), UGETW(req->wIndex), UGETW(req->wLength),
+		data, &actualLen);
+	if (actlen)
+		*actlen = actualLen;
+
+	if (mtx != NULL)
+		mtx_lock(mtx);
+
+	return map_usb_error(ret);
+}
+
+
+enum usb_dev_speed
+usbd_get_speed(struct freebsd_usb_device* udev)
+{
+	const usb_device_descriptor* descriptor = sUSB->get_device_descriptor(
+		(usb_device)udev->haiku_usb_device);
+	KASSERT(descriptor != NULL, ("no device"));
+
+	if (descriptor->usb_version >= 0x0300)
+		return USB_SPEED_SUPER;
+	else if (descriptor->usb_version >= 0x200)
+		return USB_SPEED_HIGH;
+	else if (descriptor->usb_version >= 0x110)
+		return USB_SPEED_FULL;
+	else if (descriptor->usb_version >= 0x100)
+		return USB_SPEED_LOW;
+
+	panic("unknown USB version!");
+	return (usb_dev_speed)-1;
+}
+
+
+struct usb_xfer {
+	struct mtx* mutex;
+	void* priv_sc;
+	usb_callback_t* callback;
+	usb_xfer_flags flags;
+	usb_frlength_t max_data_length;
+
+	usb_device device;
+	uint8 type;
+	usb_pipe pipe;
+	iovec* frames;
+	int nframes;
+
+	uint8 usb_state;
+	bool in_progress;
+	status_t result;
+	int transferred_length;
+
+	struct task invoker;
+	struct cv condition;
+};
+
+
+extern "C" usb_error_t
+usbd_transfer_setup(struct freebsd_usb_device* udev,
+	const uint8_t* ifaces, struct usb_xfer** ppxfer,
+	const struct usb_config* setup_start, uint16_t n_setup,
+	void* priv_sc, struct mtx* xfer_mtx)
+{
+	if (xfer_mtx == NULL)
+		xfer_mtx = &Giant;
+
+	// Make sure the taskqueue exists.
+	if (sUSBTaskqueue == NULL) {
+		mtx_lock(&Giant);
+		if (sUSBTaskqueue == NULL) {
+			sUSBTaskqueue = taskqueue_create("usb taskq", 0,
+				taskqueue_thread_enqueue, &sUSBTaskqueue);
+			taskqueue_start_threads(&sUSBTaskqueue, 1, PZERO, "usb taskq");
+		}
+		mtx_unlock(&Giant);
+	}
+
+	const usb_configuration_info* device_config = sUSB->get_configuration(
+		(usb_device)udev->haiku_usb_device);
+
+	for (const struct usb_config* setup = setup_start;
+			setup < (setup_start + n_setup); setup++) {
+		/* skip transfers w/o callbacks */
+		if (setup->callback == NULL)
+			continue;
+
+		struct usb_xfer* xfer = new usb_xfer;
+		xfer->mutex = xfer_mtx;
+		xfer->priv_sc = priv_sc;
+		xfer->callback = setup->callback;
+		xfer->flags = setup->flags;
+		xfer->max_data_length = setup->bufsize;
+
+		xfer->device = (usb_device)udev->haiku_usb_device;
+		xfer->type = setup->type;
+
+		xfer->pipe = -1;
+		uint8_t endpoint = setup->endpoint;
+		uint8_t iface_index = ifaces[setup->if_index];
+		if (endpoint == UE_ADDR_ANY) {
+			for (int i = 0; i < udev->endpoints_max; i++) {
+				if (UE_GET_XFERTYPE(udev->endpoints[i].edesc->bmAttributes) != xfer->type)
+					continue;
+
+				endpoint = udev->endpoints[i].edesc->bEndpointAddress;
+				break;
+			}
+		}
+		usb_interface_info* iface = device_config->interface[iface_index].active;
+		for (int i = 0; i < iface->endpoint_count; i++) {
+			if (iface->endpoint[i].descr->endpoint_address != endpoint)
+				continue;
+
+			xfer->pipe = iface->endpoint[i].handle;
+			break;
+		}
+		if (xfer->pipe == -1)
+			panic("failed to locate endpoint!");
+
+		xfer->nframes = setup->frames;
+		if (xfer->nframes == 0)
+			xfer->nframes = 1;
+		xfer->frames = (iovec*)calloc(xfer->nframes, sizeof(iovec));
+
+		xfer->usb_state = USB_ST_SETUP;
+		xfer->in_progress = false;
+		xfer->transferred_length = 0;
+		cv_init(&xfer->condition, "FreeBSD USB transfer");
+
+		if (xfer->flags.proxy_buffer)
+			panic("not yet supported");
+
+		ppxfer[setup - setup_start] = xfer;
+	}
+
+	return USB_ERR_NORMAL_COMPLETION;
+}
+
+
+extern "C" void
+usbd_transfer_unsetup(struct usb_xfer** pxfer, uint16_t n_setup)
+{
+	for (int i = 0; i < n_setup; i++) {
+		struct usb_xfer* xfer = pxfer[i];
+		usbd_transfer_drain(xfer);
+		cv_destroy(&xfer->condition);
+		free(xfer->frames);
+		delete xfer;
+	}
+}
+
+
+extern "C" usb_frlength_t
+usbd_xfer_max_len(struct usb_xfer* xfer)
+{
+	return xfer->max_data_length;
+}
+
+
+extern "C" void*
+usbd_xfer_softc(struct usb_xfer* xfer)
+{
+	return xfer->priv_sc;
+}
+
+
+extern "C" uint8_t
+usbd_xfer_state(struct usb_xfer* xfer)
+{
+	return xfer->usb_state;
+}
+
+
+extern "C" void
+usbd_xfer_set_frame_data(struct usb_xfer* xfer,
+	usb_frcount_t frindex, void* ptr, usb_frlength_t len)
+{
+	KASSERT(frindex < uint32_t(xfer->nframes), ("frame index overflow"));
+
+	xfer->frames[frindex].iov_base = ptr;
+	xfer->frames[frindex].iov_len = len;
+}
+
+
+extern "C" void
+usbd_xfer_set_stall(struct usb_xfer *xfer)
+{
+	// Not needed?
+}
+
+
+static void
+usbd_invoker(void* arg, int pending)
+{
+	struct usb_xfer* xfer = (struct usb_xfer*)arg;
+	mtx_lock(xfer->mutex);
+	xfer->in_progress = false;
+	xfer->usb_state = (xfer->result == B_OK) ? USB_ST_TRANSFERRED : USB_ST_ERROR;
+	xfer->callback(xfer, map_usb_error(xfer->result));
+	mtx_unlock(xfer->mutex);
+	cv_signal(&xfer->condition);
+}
+
+
+static void
+usbd_callback(void* arg, status_t status, void* data, size_t actualLength)
+{
+	struct usb_xfer* xfer = (struct usb_xfer*)arg;
+	xfer->result = status;
+	xfer->transferred_length = actualLength;
+
+	TASK_INIT(&xfer->invoker, 0, usbd_invoker, xfer);
+	taskqueue_enqueue(sUSBTaskqueue, &xfer->invoker);
+}
+
+
+extern "C" void
+usbd_transfer_start(struct usb_xfer* xfer)
+{
+	if (xfer->in_progress)
+		return;
+
+	xfer->usb_state = USB_ST_SETUP;
+	xfer->callback(xfer, USB_ERR_NOT_STARTED);
+}
+
+
+extern "C" void
+usbd_transfer_submit(struct usb_xfer* xfer)
+{
+	KASSERT(!xfer->in_progress, ("cannot submit in-progress transfer!"));
+
+	xfer->transferred_length = 0;
+	xfer->in_progress = true;
+	switch (xfer->type) {
+	case UE_BULK:
+		sUSB->queue_bulk_v(xfer->pipe, xfer->frames, xfer->nframes, usbd_callback, xfer);
+		break;
+
+	case UE_INTERRUPT:
+		KASSERT(xfer->nframes == 1, ("invalid frame count for interrupt transfer"));
+		sUSB->queue_interrupt(xfer->pipe, xfer->frames[0].iov_base, xfer->frames[0].iov_len,
+			usbd_callback, xfer);
+		break;
+
+	default:
+		panic("unhandled pipe type %d", xfer->type);
+	}
+}
+
+
+extern "C" void
+usbd_transfer_stop(struct usb_xfer* xfer)
+{
+	if (xfer == NULL)
+		return;
+	mtx_assert(xfer->mutex, MA_OWNED);
+
+	if (!xfer->in_progress)
+		return;
+
+	// Unfortunately we have no way of cancelling just one transfer.
+	sUSB->cancel_queued_transfers(xfer->pipe);
+}
+
+
+extern "C" void
+usbd_transfer_drain(struct usb_xfer* xfer)
+{
+	if (xfer == NULL)
+		return;
+
+	mtx_lock(xfer->mutex);
+	usbd_transfer_stop(xfer);
+	while (xfer->in_progress)
+		cv_wait(&xfer->condition, xfer->mutex);
+	mtx_unlock(xfer->mutex);
+}
+
+
+extern "C" void
+usbd_xfer_status(struct usb_xfer* xfer, int* actlen, int* sumlen, int* aframes, int* nframes)
+{
+	if (actlen)
+		*actlen = xfer->transferred_length;
+	if (sumlen) {
+		int sum = 0;
+		for (int i = 0; i < xfer->nframes; i++)
+			sum += xfer->frames[i].iov_len;
+		*sumlen = sum;
+	}
+	if (aframes) {
+		int length = xfer->transferred_length;
+		int frames = 0;
+		for (int i = 0; i < xfer->nframes && length > 0; i++) {
+			length -= xfer->frames[i].iov_len;
+			if (length >= 0)
+				frames++;
+		}
+		*aframes = frames;
+	}
+	if (nframes)
+		*nframes = xfer->nframes;
+}

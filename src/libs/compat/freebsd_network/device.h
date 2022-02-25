@@ -77,6 +77,12 @@ void uninit_callout(void);
 status_t init_pci();
 void uninit_pci();
 
+status_t init_usb();
+void uninit_usb();
+
+status_t get_next_usb_device(uint32* cookie, struct freebsd_usb_device* result);
+status_t get_usb_device_attach_arg(struct freebsd_usb_device* device, struct usb_attach_arg* uaa);
+
 device_t find_root_device(int);
 pci_info* get_device_pci_info(device_t dev);
 
