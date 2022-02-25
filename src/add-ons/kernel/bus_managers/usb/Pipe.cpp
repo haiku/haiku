@@ -412,7 +412,7 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 		// After the above cancel returns it is guaranteed that the callback
 		// has been invoked. Therefore we can simply grab that released
 		// semaphore again to clean up.
-		acquire_sem_etc(fNotifySem, 1, B_RELATIVE_TIMEOUT, 0);
+		acquire_sem(fNotifySem);
 
 		if (actualLength)
 			*actualLength = 0;
