@@ -9,6 +9,7 @@
 
 #include <sys/_mutex.h>
 #include <sys/systm.h>
+#include <sys/pcpu.h>
 
 
 #define MA_OWNED		0x1
