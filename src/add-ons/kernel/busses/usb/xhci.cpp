@@ -788,7 +788,7 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 status_t
 XHCI::SubmitNormalRequest(Transfer *transfer)
 {
-	TRACE("SubmitNormalRequest() length %ld\n", transfer->FragmentLength());
+	TRACE("SubmitNormalRequest() length %" B_PRIuSIZE "\n", transfer->FragmentLength());
 
 	Pipe *pipe = transfer->TransferPipe();
 	usb_isochronous_data *isochronousData = transfer->IsochronousData();
