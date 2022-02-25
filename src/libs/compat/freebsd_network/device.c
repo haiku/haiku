@@ -26,8 +26,6 @@
 spinlock __haiku_intr_spinlock;
 
 struct net_stack_module_info *gStack;
-pci_module_info *gPci;
-struct pci_x86_module_info *gPCIx86;
 
 static struct list sRootDevices;
 static int sNextUnit;

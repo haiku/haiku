@@ -23,10 +23,50 @@ extern "C" {
 #endif
 
 
+pci_module_info *gPci;
+struct pci_x86_module_info *gPCIx86;
+
+
+status_t
+init_pci()
+{
+	if (gPci != NULL)
+		return B_OK;
+
+	status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPci);
+	if (status != B_OK)
+		return status;
+
+	// if it fails we just don't support x86 specific features (like MSIs)
+	if (get_module(B_PCI_X86_MODULE_NAME, (module_info **)&gPCIx86) != B_OK)
+		gPCIx86 = NULL;
+
+	return B_OK;
+}
+
+
+void
+uninit_pci()
+{
+	if (gPci != NULL)
+		put_module(B_PCI_MODULE_NAME);
+	if (gPCIx86 != NULL)
+		put_module(B_PCI_X86_MODULE_NAME);
+}
+
+
+pci_info*
+get_device_pci_info(device_t device)
+{
+	struct root_device_softc* root_softc = (struct root_device_softc*)device->root->softc;
+	return &root_softc->pci_info;
+}
+
+
 uint32_t
 pci_read_config(device_t dev, int offset, int size)
 {
-	pci_info *info = &((struct root_device_softc *)dev->root->softc)->pci_info;
+	pci_info* info = get_device_pci_info(dev);
 
 	uint32_t value = gPci->read_pci_config(info->bus, info->device,
 		info->function, offset, size);
@@ -38,7 +78,7 @@ pci_read_config(device_t dev, int offset, int size)
 void
 pci_write_config(device_t dev, int offset, uint32_t value, int size)
 {
-	pci_info *info = &((struct root_device_softc *)dev->root->softc)->pci_info;
+	pci_info* info = get_device_pci_info(dev);
 
 	TRACE_PCI(dev, "pci_write_config(%i, 0x%x, %i)\n", offset, value, size);
 
@@ -129,8 +169,7 @@ pci_get_slot(device_t dev)
 uint8_t
 pci_get_function(device_t dev)
 {
-	pci_info *info
-		= &((struct root_device_softc *)dev->root->softc)->pci_info;
+	pci_info* info = get_device_pci_info(dev);
 	return info->function;
 }
 
@@ -242,11 +281,10 @@ pci_find_extcap(device_t child, int capability, int *_capabilityRegister)
 int
 pci_msi_count(device_t dev)
 {
-	pci_info *info;
 	if (gPCIx86 == NULL)
 		return 0;
 
-	info = &((struct root_device_softc *)dev->root->softc)->pci_info;
+	pci_info* info = get_device_pci_info(dev);
 	return gPCIx86->get_msi_count(info->bus, info->device, info->function);
 }
 
@@ -254,13 +292,11 @@ pci_msi_count(device_t dev)
 int
 pci_alloc_msi(device_t dev, int *count)
 {
-	pci_info *info;
-	uint8 startVector = 0;
 	if (gPCIx86 == NULL)
 		return ENODEV;
 
-	info = &((struct root_device_softc *)dev->root->softc)->pci_info;
-
+	pci_info* info = get_device_pci_info(dev);
+	uint8 startVector = 0;
 	if (gPCIx86->configure_msi(info->bus, info->device, info->function, *count,
 			&startVector) != B_OK) {
 		return ENODEV;
@@ -275,11 +311,10 @@ pci_alloc_msi(device_t dev, int *count)
 int
 pci_release_msi(device_t dev)
 {
-	pci_info *info;
 	if (gPCIx86 == NULL)
 		return ENODEV;
 
-	info = &((struct root_device_softc *)dev->root->softc)->pci_info;
+	pci_info* info = get_device_pci_info(dev);
 	gPCIx86->unconfigure_msi(info->bus, info->device, info->function);
 	((struct root_device_softc *)dev->root->softc)->is_msi = false;
 	((struct root_device_softc *)dev->root->softc)->is_msix = false;
@@ -290,7 +325,7 @@ pci_release_msi(device_t dev)
 int
 pci_msix_table_bar(device_t dev)
 {
-	pci_info *info = &((struct root_device_softc *)dev->root->softc)->pci_info;
+	pci_info* info = get_device_pci_info(dev);
 
 	uint8 capability_offset;
 	if (gPci->find_pci_capability(info->bus, info->device, info->function,
@@ -308,11 +343,10 @@ pci_msix_table_bar(device_t dev)
 int
 pci_msix_count(device_t dev)
 {
-	pci_info *info;
 	if (gPCIx86 == NULL)
 		return 0;
 
-	info = &((struct root_device_softc *)dev->root->softc)->pci_info;
+	pci_info* info = get_device_pci_info(dev);
 	return gPCIx86->get_msix_count(info->bus, info->device, info->function);
 }
 
@@ -320,13 +354,11 @@ pci_msix_count(device_t dev)
 int
 pci_alloc_msix(device_t dev, int *count)
 {
-	pci_info *info;
-	uint8 startVector = 0;
 	if (gPCIx86 == NULL)
 		return ENODEV;
 
-	info = &((struct root_device_softc *)dev->root->softc)->pci_info;
-
+	pci_info* info = get_device_pci_info(dev);
+	uint8 startVector = 0;
 	if (gPCIx86->configure_msix(info->bus, info->device, info->function, *count,
 			&startVector) != B_OK) {
 		return ENODEV;

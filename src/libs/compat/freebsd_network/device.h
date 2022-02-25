@@ -74,7 +74,11 @@ void uninit_hard_clock(void);
 status_t init_callout(void);
 void uninit_callout(void);
 
+status_t init_pci();
+void uninit_pci();
+
 device_t find_root_device(int);
+pci_info* get_device_pci_info(device_t dev);
 
 void driver_printf(const char *format, ...)
 	__attribute__ ((format (__printf__, 1, 2)));

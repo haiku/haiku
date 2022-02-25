@@ -111,12 +111,9 @@ _fbsd_init_hardware(driver_t *drivers[])
 	device_t root;
 
 	status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPci);
+	status = init_pci();
 	if (status != B_OK)
 		return status;
-
-	// if it fails we just don't support x86 specific features (like MSIs)
-	if (get_module(B_PCI_X86_MODULE_NAME, (module_info **)&gPCIx86) != B_OK)
-		gPCIx86 = NULL;
 
 	status = init_root_device(&root);
 	if (status != B_OK)
@@ -168,9 +165,7 @@ _fbsd_init_hardware(driver_t *drivers[])
 	if (p > 0)
 		return B_OK;
 
-	put_module(B_PCI_MODULE_NAME);
-	if (gPCIx86 != NULL)
-		put_module(B_PCI_X86_MODULE_NAME);
+	uninit_pci();
 	return B_NOT_SUPPORTED;
 }
 
@@ -254,9 +249,7 @@ err2:
 			gDriverName, NULL);
 	}
 
-	put_module(B_PCI_MODULE_NAME);
-	if (gPCIx86 != NULL)
-		put_module(B_PCI_X86_MODULE_NAME);
+	uninit_pci();
 
 	return status;
 }
@@ -288,9 +281,7 @@ _fbsd_uninit_drivers(driver_t *drivers[])
 			gDriverName, NULL);
 	}
 
-	put_module(B_PCI_MODULE_NAME);
-	if (gPCIx86 != NULL)
-		put_module(B_PCI_X86_MODULE_NAME);
+	uninit_pci();
 
 	return B_OK;
 }
