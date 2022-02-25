@@ -2986,13 +2986,16 @@ XHCI::FinishTransfers()
 			FreeDescriptor(td);
 
 			// this transfer may still have data left
+			bool finished = true;
 			transfer->AdvanceByFragment(actualLength);
 			if (completionCode == COMP_SUCCESS
 					&& transfer->FragmentLength() > 0) {
 				TRACE("still %" B_PRIuSIZE " bytes left on transfer\n",
 					transfer->FragmentLength());
-				SubmitTransfer(transfer);
-			} else {
+				callbackStatus = SubmitTransfer(transfer);
+				finished = (callbackStatus != B_OK);
+			}
+			if (finished) {
 				// The actualLength was already handled in AdvanceByFragment.
 				transfer->Finished(callbackStatus, 0);
 				delete transfer;
