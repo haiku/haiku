@@ -29,13 +29,21 @@ extern "C" {
 #endif
 
 struct root_device_softc {
+	enum {
+		BUS_INVALID = 0,
+		BUS_pci,
+		BUS_uhub,
+	} bus;
+
 	struct pci_info	pci_info;
 	bool			is_msi;
 	bool			is_msix;
+
+	struct freebsd_usb_device* usb_dev;
 };
 
 enum {
-	DEVICE_OPEN		= 1 << 0,
+	DEVICE_OPEN			= 1 << 0,
 	DEVICE_CLOSED		= 1 << 1,
 	DEVICE_NON_BLOCK	= 1 << 2,
 	DEVICE_DESC_ALLOCED	= 1 << 3,

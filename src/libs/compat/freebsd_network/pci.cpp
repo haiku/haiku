@@ -59,6 +59,8 @@ pci_info*
 get_device_pci_info(device_t device)
 {
 	struct root_device_softc* root_softc = (struct root_device_softc*)device->root->softc;
+	if (root_softc->bus != root_device_softc::BUS_pci)
+		return NULL;
 	return &root_softc->pci_info;
 }
 

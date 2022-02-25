@@ -14,15 +14,6 @@ SubDirCcFlags [ FDefines _KERNEL=1 ] ;
 SubDirC++Flags [ FDefines _KERNEL=1 ] ;
 
 KernelStaticLibrary libfreebsd_network.a :
-	bus.cpp
-	bus_dma.cpp
-	callout.cpp
-	clock.c
-	condvar.cpp
-	device.c
-	device_hooks.c
-	driver.c
-	eventhandler.c
 	fbsd_ether.c
 	fbsd_if_media.c
 	fbsd_kern_mbuf.c
@@ -34,6 +25,19 @@ KernelStaticLibrary libfreebsd_network.a :
 	fbsd_subr_bufring.c
 	fbsd_subr_sbuf.c
 	fbsd_time.c
+	fbsd_usb_error.c
+	fbsd_usb_util.c
+	fbsd_usb_lookup.c
+
+	bus.cpp
+	bus_dma.cpp
+	callout.cpp
+	clock.c
+	condvar.cpp
+	device.c
+	device_hooks.c
+	driver.c
+	eventhandler.c
 	firmware.c
 	if.c
 	libkern.cpp
@@ -50,6 +54,8 @@ KernelStaticLibrary libfreebsd_network.a :
 	sysinit.c
 	taskqueue.c
 	unit.cpp
+	usb.cpp
+	usb_util.c
 	;
 
 rule MIIHeaderGen
