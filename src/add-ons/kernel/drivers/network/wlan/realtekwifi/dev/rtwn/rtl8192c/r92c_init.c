@@ -53,7 +53,6 @@ __FBSDID("$FreeBSD$");
 #include <dev/rtwn/rtl8192c/r92c_reg.h>
 #include <dev/rtwn/rtl8192c/r92c_var.h>
 
-
 int
 r92c_check_condition(struct rtwn_softc *sc, const uint8_t cond[])
 {
@@ -322,6 +321,7 @@ r92c_init_antsel(struct rtwn_softc *sc)
 	rtwn_bb_setbits(sc, R92C_FPGA0_RFPARAM(0), 0, 0x2000);
 	reg = rtwn_bb_read(sc, R92C_FPGA0_RFIFACEOE(0));
 	sc->sc_ant = MS(reg, R92C_FPGA0_RFIFACEOE0_ANT);	/* XXX */
+	rtwn_setbits_1(sc, R92C_LEDCFG2, 0x80, 0);
 }
 
 void

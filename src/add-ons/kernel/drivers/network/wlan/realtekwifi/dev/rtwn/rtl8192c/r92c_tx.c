@@ -54,7 +54,6 @@ __FBSDID("$FreeBSD$");
 #include <dev/rtwn/rtl8192c/r92c_var.h>
 #include <dev/rtwn/rtl8192c/r92c_tx_desc.h>
 
-
 static int
 r92c_tx_get_sco(struct rtwn_softc *sc, struct ieee80211_channel *c)
 {
@@ -103,7 +102,7 @@ r92c_tx_protection(struct rtwn_softc *sc, struct r92c_tx_desc *txd,
 			rate = rtwn_ctl_mcsrate(ic->ic_rt, ridx);
 		else
 			rate = ieee80211_ctl_rate(ic->ic_rt, ridx2rate[ridx]);
-		ridx = rate2ridx(rate);
+		ridx = rate2ridx(IEEE80211_RV(rate));
 
 		txd->txdw4 |= htole32(SM(R92C_TXDW4_RTSRATE, ridx));
 		/* RTS rate fallback limit (max). */
@@ -211,6 +210,12 @@ r92c_tx_setup_macid(void *buf, int id)
 	struct r92c_tx_desc *txd = (struct r92c_tx_desc *)buf;
 
 	txd->txdw1 |= htole32(SM(R92C_TXDW1_MACID, id));
+
+	/* XXX does not belong here */
+	/* XXX temporary (I hope) */
+	/* Force CCK1 for RTS / CTS frames (driver bug) */
+	txd->txdw4 &= ~htole32(SM(R92C_TXDW4_RTSRATE, R92C_TXDW4_RTSRATE_M));
+	txd->txdw4 &= ~htole32(R92C_TXDW4_RTS_SHORT);
 }
 
 void
@@ -250,7 +255,6 @@ r92c_fill_tx_desc(struct rtwn_softc *sc, struct ieee80211_node *ni,
 		txd->flags0 |= R92C_FLAGS0_BMCAST;
 
 	if (!ismcast) {
-		struct rtwn_node *un = RTWN_NODE(ni);
 		/* Unicast frame, check if an ACK is expected. */
 		if (!qos || (qos & IEEE80211_QOS_ACKPOLICY) !=
 		    IEEE80211_QOS_ACKPOLICY_NOACK) {
@@ -259,6 +263,7 @@ r92c_fill_tx_desc(struct rtwn_softc *sc, struct ieee80211_node *ni,
 			    maxretry));
 		}
 
+		struct rtwn_node *un = RTWN_NODE(ni);
 		macid = un->id;
 
 		if (type == IEEE80211_FC0_TYPE_DATA) {
@@ -330,7 +335,7 @@ r92c_fill_tx_desc(struct rtwn_softc *sc, struct ieee80211_node *ni,
 		uint16_t seqno;
 
 		if (m->m_flags & M_AMPDU_MPDU) {
-			seqno = ni->ni_txseqs[tid];
+			seqno = ni->ni_txseqs[tid] % IEEE80211_SEQ_RANGE;
 			ni->ni_txseqs[tid]++;
 		} else
 			seqno = M_SEQNO_GET(m) % IEEE80211_SEQ_RANGE;

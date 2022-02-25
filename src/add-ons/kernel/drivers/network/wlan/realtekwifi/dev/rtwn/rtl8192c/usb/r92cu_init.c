@@ -55,7 +55,6 @@ __FBSDID("$FreeBSD$");
 #include <dev/rtwn/rtl8192c/usb/r92cu.h>
 #include <dev/rtwn/rtl8192c/usb/r92cu_reg.h>
 
-
 void
 r92cu_init_bb(struct rtwn_softc *sc)
 {
@@ -356,6 +355,8 @@ r92cu_init_rx_agg(struct rtwn_softc *sc)
 void
 r92cu_post_init(struct rtwn_softc *sc)
 {
+
+	rtwn_write_4(sc, R92C_POWER_STATUS, 0x5);
 
 	/* Perform LO and IQ calibrations. */
 	r92c_iq_calib(sc);

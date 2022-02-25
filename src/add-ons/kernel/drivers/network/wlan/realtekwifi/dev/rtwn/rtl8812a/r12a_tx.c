@@ -58,7 +58,6 @@ __FBSDID("$FreeBSD$");
 #include <dev/rtwn/rtl8812a/r12a.h>
 #include <dev/rtwn/rtl8812a/r12a_tx_desc.h>
 
-
 static int
 r12a_get_primary_channel(struct rtwn_softc *sc, struct ieee80211_channel *c)
 {
@@ -111,7 +110,7 @@ r12a_tx_protection(struct rtwn_softc *sc, struct r12a_tx_desc *txd,
 			rate = rtwn_ctl_mcsrate(ic->ic_rt, ridx);
 		else
 			rate = ieee80211_ctl_rate(ic->ic_rt, ridx2rate[ridx]);
-		ridx = rate2ridx(rate);
+		ridx = rate2ridx(IEEE80211_RV(rate));
 
 		txd->txdw4 |= htole32(SM(R12A_TXDW4_RTSRATE, ridx));
 		/* RTS rate fallback limit (max). */
@@ -424,7 +423,6 @@ r12a_fill_tx_desc_null(struct rtwn_softc *sc, void *buf, int is11b, int qos,
 	if (!qos) {
 		txd->txdw8 = htole32(R12A_TXDW8_HWSEQ_EN);
 		txd->txdw3 |= htole32(SM(R12A_TXDW3_SEQ_SEL, id));
-
 	}
 }
 
