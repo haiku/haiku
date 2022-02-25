@@ -12,6 +12,9 @@
 #include <ctype.h>
 #include <utility>
 
+#include <NetServicesDefs.h>
+#include <Url.h>
+
 #include "HttpPrivate.h"
 
 using namespace std::literals;
@@ -124,4 +127,100 @@ BHttpMethod::Method() const noexcept
 		// the following constructor is not noexcept, but we know we pass in valid data
 		return std::string_view(methodString.String());
 	}
+}
+
+
+// #pragma mark -- BHttpRequest::Impl
+static const BUrl kDefaultUrl = BUrl();
+static const BHttpMethod kDefaultMethod = BHttpMethod::Get;
+
+
+struct BHttpRequest::Impl {
+	BUrl		url;
+	BHttpMethod	method	= kDefaultMethod;
+	bool		ssl		= false;
+};
+
+
+// #pragma mark -- BHttpRequest
+
+
+BHttpRequest::BHttpRequest()
+	: fData(std::make_unique<Impl>())
+{
+
+}
+
+
+BHttpRequest::BHttpRequest(const BUrl& url)
+	: fData(std::make_unique<Impl>())
+{
+	SetUrl(url);
+}
+
+
+BHttpRequest::BHttpRequest(BHttpRequest&& other) noexcept = default;
+
+
+BHttpRequest::~BHttpRequest() = default;
+
+
+BHttpRequest&
+BHttpRequest::operator=(BHttpRequest&&) noexcept = default;
+
+
+bool
+BHttpRequest::IsEmpty() const noexcept
+{
+	return (!fData || !fData->url.IsValid());
+}
+
+
+const BHttpMethod&
+BHttpRequest::Method() const noexcept
+{
+	if (!fData)
+		return kDefaultMethod;
+	return fData->method;
+}
+
+
+const BUrl&
+BHttpRequest::Url() const noexcept
+{
+	if (!fData)
+		return kDefaultUrl;
+	return fData->url;
+}
+
+
+void
+BHttpRequest::SetMethod(const BHttpMethod& method)
+{
+	if (!fData)
+		fData = std::make_unique<Impl>();
+	fData->method = method;
+}
+
+
+void
+BHttpRequest::SetUrl(const BUrl& url)
+{
+	if (!fData)
+		fData = std::make_unique<Impl>();
+
+	if (!url.IsValid())
+		throw BInvalidUrl(__PRETTY_FUNCTION__, BUrl(url));
+	if (url.Protocol() == "http")
+		fData->ssl = false;
+	else if (url.Protocol() == "https")
+		fData->ssl = true;
+	else {
+		// TODO: optimize BStringList with modern language features
+		BStringList list;
+		list.Add("http");
+		list.Add("https");
+		throw BUnsupportedProtocol(__PRETTY_FUNCTION__, BUrl(url), list);
+	}
+	fData->url = url;
 }

@@ -248,6 +248,231 @@ namespace Network {
 */
 
 
+/*!
+	\class BHttpRequest
+	\ingroup netservices
+	\brief Represent a HTTP request.
+
+	This class can be used to construct HTTP requests that can be executed by the Network Services
+	Kit. A request has two states, either it is is a valid request, or it is an empty request. The
+	criterium is whether or not the request has a URL.
+
+	This class has all kinds of convenience methods set and retrieve particular options. Most
+	options are wrapped in specialized container classes that do some form of validation.
+
+	The default options are:
+	<table>
+		<tr><th>Getter</th><th>Setter</th><th>Description</th><th>Default</th></tr>
+		<tr>
+			<td> \ref Url() </td>
+			<td> \ref SetUrl() </td>
+			<td> The URL. This must start with http or https. </td>
+			<td> Defaults to an empty \ref BUrl </td>
+		</tr>
+		<tr>
+			<td> \ref Method() </td>
+			<td> \ref SetMethod() </td>
+			<td> The HTTP method for the request </td>
+			<td> Defaults to \ref BHttpMethod::Get </td>
+		</tr>
+	</table>
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Constructors and Destructor
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BHttpRequest::BHttpRequest()
+	\brief Construct an empty HTTP request.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpRequest::BHttpRequest(const BUrl &url)
+	\brief Construct a HTTP request for an \a url.
+
+	\param url A valid URL with the \c http or \c https protocol.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+	\exception BUnsupportedProtocol This exception is raised when the protocol of the URL cannot be
+		handled.
+	\exception BInvalidUrl This exception is raised when the \a url is invalid.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpRequest::BHttpRequest(const BHttpRequest &other)=delete
+	\brief Copying is not allowed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpRequest::BHttpRequest(BHttpRequest &&other) noexcept
+	\brief Move constructor.
+
+	After a move, the \a other object is left in an empty state.
+
+	\param other The request to move data from.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::Network::BHttpRequest::~BHttpRequest()
+	\brief Destructor
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Assignment operators
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BHttpRequest& BHttpRequest::operator=(const BHttpRequest &other)=delete
+	\brief Copy assignment is not allowed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpRequest& BHttpRequest::operator=(BHttpRequest &&other) noexcept
+	\brief Move assignment
+
+	After a move, the \a other object is left in an empty state.
+
+	\param other The request to move data from.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Valid or empty
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BHttpRequest::IsEmpty() const noexcept
+	\brief Check if the request is valid or empty
+
+	\retval true The request is empty.
+	\retval false The request is valid.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Current Options
+*/
+
+
+//! @{
+
+
+/*!
+	\fn const BHttpMethod& BHttpRequest::Method() const noexcept
+	\brief Get the current method for the request.
+
+	This will either return the custom value set for this request, or the default as is listed in
+	the overview documentation of this class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUrl& BHttpRequest::Url() const noexcept
+	\brief Get the current Url for the request.
+
+	This will either return the custom value set for this request, or the default as is listed in
+	the overview documentation of this class.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Setting Options
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BHttpRequest::SetMethod(const BHttpMethod &method)
+	\brief Set the \a method for this request.
+
+	Note that there currently is no additional validation done on any semantical incompatibilities.
+	This means that it is currently allowed to do a \c GET or \c HEAD request with data, while that
+	is forbidden by the standard.
+
+	\param method The method to use for the request.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpRequest::SetUrl(const BUrl &url)
+	\brief Set the \a url for this request.
+
+	\param url A valid URL with the \c http or \c https protocol.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+	\exception BUnsupportedProtocol This exception is raised when the protocol of the URL cannot be
+		handled.
+	\exception BInvalidUrl This exception is raised when the \a url is invalid.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
 } // namespace Network
 
 } // namespace BPrivate

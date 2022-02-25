@@ -14,9 +14,11 @@
 
 #include <HttpFields.h>
 #include <HttpRequest.h>
+#include <Url.h>
 
 using BPrivate::Network::BHttpFields;
 using BPrivate::Network::BHttpMethod;
+using BPrivate::Network::BHttpRequest;
 using BPrivate::Network::BHttpSession;
 
 
@@ -219,6 +221,18 @@ HttpProtocolTest::HttpMethodTest()
 }
 
 
+void
+HttpProtocolTest::HttpRequestTest()
+{
+	// Basic test
+	BHttpRequest request;
+	CPPUNIT_ASSERT(request.IsEmpty());
+	auto url = BUrl("https://www.haiku-os.org");
+	request.SetUrl(url);
+	CPPUNIT_ASSERT(request.Url() == url);
+}
+
+
 /* static */ void
 HttpProtocolTest::AddTests(BTestSuite& parent)
 {
@@ -228,6 +242,8 @@ HttpProtocolTest::AddTests(BTestSuite& parent)
 		"HttpProtocolTest::HttpFieldsTest", &HttpProtocolTest::HttpFieldsTest));
 	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
 		"HttpProtocolTest::HttpMethodTest", &HttpProtocolTest::HttpMethodTest));
+	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
+		"HttpProtocolTest::HttpRequestTest", &HttpProtocolTest::HttpRequestTest));
 
 	parent.addTest("HttpProtocolTest", &suite);
 }

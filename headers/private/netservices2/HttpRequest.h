@@ -6,11 +6,14 @@
 #ifndef _B_HTTP_REQUEST_H_
 #define _B_HTTP_REQUEST_H_
 
+#include <memory>
 #include <string_view>
 #include <variant>
 
 #include <ErrorsExt.h>
 #include <String.h>
+
+class BUrl;
 
 
 namespace BPrivate {
@@ -62,8 +65,36 @@ private:
 };
 
 
+class BHttpRequest {
+public:
+	// Constructors and Destructor
+	BHttpRequest();
+	BHttpRequest(const BUrl& url);
+	BHttpRequest(const BHttpRequest& other) = delete;
+	BHttpRequest(BHttpRequest&& other) noexcept;
+	~BHttpRequest();
+
+	// Assignment operators
+			BHttpRequest&	operator=(const BHttpRequest& other) = delete;
+			BHttpRequest&	operator=(BHttpRequest&&) noexcept;
+
+	// Access
+			bool			IsEmpty() const noexcept;
+	const	BHttpMethod&	Method() const noexcept;
+	const	BUrl&			Url() const noexcept;
+
+	// Named Setters
+			void			SetMethod(const BHttpMethod& method);
+			void			SetUrl(const BUrl& url);
+
+private:
+	struct Impl;
+	std::unique_ptr<Impl>	fData;
+};
+
+
 } // namespace Network
 
 } // namespace BPrivate
 
-#endif // B_HTTP_REQUEST
+#endif // _B_HTTP_REQUEST_H_
