@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-DataTranslations	4156631142
 Path:	DataTranslations		Шлях:
-Name:	DataTranslations		І’мя:
+Name:	DataTranslations		Назва:
 DataTranslations - Note	DataTranslations		DataTranslations - Примітка
 The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Елемент '%name' не є транслятором і не буде встановлений.
 Could not install %s:\n%s	DataTranslations		Неможливо встановити %s:\n%s
@@ -8,7 +8,7 @@ OK	DataTranslations		ОК
 Cancel	DataTranslations		Скасувати
 Info:	DataTranslations		Інфо:
 DataTranslations - Error	DataTranslations		DataTranslations - Помилка
-Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Використовуйте цю панель управляння щоб в разі необхідності змінити трансляторам значення за замовчуванням. Ці налаштування будуть використані програмами які не мають своїх параметрів.
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Використовуйте цю панель управління щоб змінити трансляторам значення за замовчуванням. Ці налаштування будуть використані програмами які не мають своїх параметрів.
 The new translator has been installed successfully.	DataTranslations		Новий транслятор успішно встановлено.
 An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		Елемент з назвою '%name' вже існує в папці трансляторів! Перезаписати існуючий транслятор?
 DataTranslations	System name		DataTranslations

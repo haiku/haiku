@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ActivityMonitor	2601047281
+1	ukrainian	x-vnd.Haiku-ActivityMonitor	826097672
 Teams	DataSource		Команди
 Semaphores	DataSource		Семафори
 TX	DataSource	Shorter version for Sending	TX
@@ -24,6 +24,7 @@ Settings…	ActivityWindow		Налаштування…
 Block cache	DataSource		Кеш блоку
 Memory	DataSource		Пам'ять
 CPU usage	DataSource		Використання CPU
+CPU speed	DataSource		Частота CPU
 Quit	ActivityWindow		Вийти
 Raw clipboard	DataSource		Буфер обміну
 Settings	ActivityWindow		Налаштування
@@ -32,6 +33,7 @@ Used memory	DataSource		Використана пам'ять
 Show legend	ActivityView		Показати легенду
 Cached memory	DataSource		Кешована пам'ять
 CPU %d usage	DataSource		Використання CPU %d
+CPU %d speed	DataSource		Частота CPU %d
 File	ActivityWindow		Файл
 Ports	DataSource		Порти
 Page faults	DataSource		Помилки на сторінці

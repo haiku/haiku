@@ -1,5 +1,6 @@
-1	ukrainian	x-vnd.Haiku-mixer.media_addon	251696696
+1	ukrainian	x-vnd.Haiku-mixer.media_addon	3797408169
 Input mapping	AudioMixer		Перепризначення входу
+High quality (linear interpolation)	AudioMixer		Висока якість (лінійна інтерполяція)
 To output	AudioMixer		До виходу
 Refuse output format changes	AudioMixer		Відхилити зміни вихідного формату
 Gain	AudioMixer		Підсилення
@@ -9,6 +10,7 @@ not connected	AudioMixer		не приєднано
 Master output	AudioMixer		Головний вихід
 dB	AudioMixer		дБ
 Gain controls	AudioMixer		Регулювання підсилення
+Low quality (drop/repeat samples)	AudioMixer		Низька якість (пропуски/повтор семплів)
 Output channel sources	AudioMixer		Джерела вихідного канала
 Allow input channel remapping	AudioMixer		Дозволити перепризначення вхідного каналу
 Display balance control for stereo connections	AudioMixer		Показати регулятор балансу для стереоз'єднань
@@ -20,3 +22,5 @@ Mute	AudioMixer		Заглушити
 Output mapping	AudioMixer		Перепризначення виходу
 Virtual output channels	AudioMixer		Віртуальні вихідні канали
 Allow output channel remapping	AudioMixer		Дозволити перепризначення вихідного каналу
+Input gain controls represent:	AudioMixer		Регулятор вхідного підсилення діє на:
+Attenuate mixer output by 3 dB	AudioMixer		Знизити вихід мікшера на 3 дБ

@@ -1,4 +1,4 @@
-1	french	application/x-vnd.Cortex.Route	837113336
+1	french	application/x-vnd.Cortex.Route	2636226021
 Node '%name%' released	CortexRouteApp		Nœud « %name% » libéré
 OK	CortexRouteApp		OK
 About Cortex/Route…	CortexRouteApp		À propos de Cortex/Route…
@@ -9,6 +9,7 @@ Save nodes…	CortexRouteApp		Enregistrer les nœuds…
 Node '%name%' created	CortexRouteApp		Nœud « %name% » créé
 Negotiated format:	CortexRouteApp		Format négocié :
 Window	CortexRouteApp		Fenêtre
+Connection broken	CortexRouteApp		Connexion interrompue
 Untitled group	CortexRouteApp		Groupe sans titre
 Connection failed	CortexRouteApp		La connexion a échoué
 Connection '%name%' broken	CortexRouteApp		Connexion ‘%name%’ interrompue

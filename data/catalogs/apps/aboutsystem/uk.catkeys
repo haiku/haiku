@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-About	3767028061
+1	ukrainian	x-vnd.Haiku-About	2473434391
 Revision	AboutView		Ревізія
 The Haikuware team and their bounty program\n	AboutView		Команді Haikuware з їхньою програмою заохочень\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. All rights reserved.
@@ -18,6 +18,7 @@ Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView	
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe and others.
 Testing and bug triaging:\n	AboutView		Тестування та тріаж багів:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{процесор:} few{# процесора:} other{# процесорів:}}
+Ralink WiFi Firmware	AboutWindow		Ralink WiFi Firmware
 %d MiB total	AboutView		%d МБ загалом
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Код, що є унікальним для Haiku, особливо ядро та код пов'язаний з програмами, надається на умовах <MIT license>. Деякі системні бібліотеки містять код інших розробників, що надається за <LGPL license>. Авторські права на цей код дивіться нижче.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. All rights reserved.
@@ -58,11 +59,13 @@ Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright �
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2019 Fabrice Bellard, et al.
 Current maintainers:\n	AboutView		Поточні розробники:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.
+Intel WiFi Firmware	AboutWindow		Intel WiFi Firmware
 Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Всі права захищені.
 Version:	AboutView		Версія:
 The BeGeistert team\n	AboutView		Команді BeGeistert\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 License: 	AboutView		Ліцензія: 
+Intel (2xxx firmware)	AboutWindow		Intel (2xxx вбудоване ПЗ)
 GNU GPL v2	AboutWindow		GNU GPL v2
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Університету Окленда і Крістофу Люттероту\n\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total МБ загалом, %inaccessible МБ недоступно
@@ -81,5 +84,6 @@ Website & marketing:\n	AboutView		Веб-сайт & маркетинг:\n
 Copyright © 2018-2021, Frederic Cambus	AboutView		Copyright © 2018-2021, Frederic Cambus
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		Розробив Andy Ritger в 2001, на основі Generalized Timing Formula
 …and the many people making donations!\n\n	AboutView		…і багатьом тим, хто зробив пожертви!\n\n
+Marvell (firmware)	AboutWindow		Marvell (вбудоване ПЗ)
 BSD (4-clause)	AboutWindow		BSD (4-х пунктна)
 BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER це зареєстрована торгова марка Bitstream Inc.

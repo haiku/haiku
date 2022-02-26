@@ -1,4 +1,4 @@
-1	ukrainian	application/x-vnd.Cortex.support	1625162530
+1	ukrainian	application/x-vnd.Cortex.support	2097798758
 Header has flags	MediaString		Заголовок з позначками
 32 bit HLS	MediaString		32-бітовий HLS
 Recording	MediaString		Запис
@@ -31,6 +31,7 @@ Back-center	MediaString		Тил-центр
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{# бітове ціле}}
 Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(невідомий формат відео)
+Video data between line %lu and %lu	MediaString		Відеодані між рядками %lu та %lu
 AVI format family	MediaString		Сімейство форматів AVI
 Homogenous buffers	MediaString		Однорідні буфери
 Interlaced 	MediaString		Черезрядкова 

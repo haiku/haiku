@@ -1,8 +1,9 @@
-1	ukrainian	x-vnd.Haiku-TIFFTranslator	1929518018
+1	ukrainian	x-vnd.Haiku-TIFFTranslator	2234713102
 TIFF Library:	TIFFView		Бібліотека TIFF:
 RLE (Packbits)	TIFFView		RLE (Packbits)
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: недійсний індекс документа\n
+Use compression:	TIFFView		Використовувати стиснення:
 TIFF image translator	TIFFView		Транслятор зображень TIFF
 TIFF image	TIFFTranslator		Зображення TIFF
 TIFF Settings	TIFFMain		Налаштування TIFF
