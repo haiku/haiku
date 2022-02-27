@@ -19,7 +19,7 @@
 #include "PanelFitter.h"
 
 
-#define MAX_PIPES	2
+#define MAX_PIPES	4	// not all cards have this much though
 
 
 void program_pipe_color_modes(uint32 colorMode);

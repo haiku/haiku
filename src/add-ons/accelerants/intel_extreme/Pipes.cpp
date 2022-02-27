@@ -68,21 +68,21 @@ Pipe::Pipe(pipe_index pipeIndex)
 	fPipeOffset(0),
 	fPlaneOffset(0)
 {
-	if (pipeIndex == INTEL_PIPE_B) {
-		fPlaneOffset = INTEL_PLANE_OFFSET;
-	}
 	switch (pipeIndex) {
 		case INTEL_PIPE_B:
 			TRACE("Pipe B.\n");
 			fPipeOffset = 0x1000;
+			fPlaneOffset = INTEL_PLANE_OFFSET;
 			break;
 		case INTEL_PIPE_C:
 			TRACE("Pipe C.\n");
 			fPipeOffset = 0x2000;
+			fPlaneOffset = INTEL_PLANE_OFFSET * 2;
 			break;
 		case INTEL_PIPE_D:
 			TRACE("Pipe D.\n");
 			fPipeOffset = 0xf000;
+			//no fPlaneOffset..
 			break;
 		default:
 			TRACE("Pipe A.\n");
@@ -94,8 +94,7 @@ Pipe::Pipe(pipe_index pipeIndex)
 	// SkyLake: FDI gone. No more northbridge video.
 	if ((gInfo->shared_info->pch_info != INTEL_PCH_NONE) &&
 		(gInfo->shared_info->device_type.Generation() <= 8)) {
-		TRACE("%s: Pipe %s routed through FDI\n", __func__,
-			(pipeIndex == INTEL_PIPE_A) ? "A" : "B");
+		TRACE("%s: Pipe is routed through FDI\n", __func__);
 
 		// Program FDILink if PCH
 		fFDILink = new(std::nothrow) FDILink(pipeIndex);
@@ -561,7 +560,7 @@ Pipe::ConfigureClocksSKL(const skl_wrpll_params& wrpll_params, uint32 pixelClock
 		*pllSel = (portSel & 0x6000) >> 13;
 		break;
 	default:
-		TRACE("No port selected!");
+		TRACE("No port selected!\n");
 		return;
 	}
 	TRACE("PLL selected is %" B_PRIx32 "\n", *pllSel);

@@ -143,13 +143,20 @@ init_common(int device, bool isClone)
 	gInfo->pipe_count = 0;
 
 	// Allocate all of our pipes
-	for (int i = 0; i < MAX_PIPES; i++) {
+	int pipeCnt = 2;
+	if (gInfo->shared_info->device_type.Generation() >= 7)
+		pipeCnt = 3; // some newer gens have even more..
+
+	for (int i = 0; i < pipeCnt; i++) {
 		switch (i) {
 			case 0:
 				gInfo->pipes[i] = new(std::nothrow) Pipe(INTEL_PIPE_A);
 				break;
 			case 1:
 				gInfo->pipes[i] = new(std::nothrow) Pipe(INTEL_PIPE_B);
+				break;
+			case 2:
+				gInfo->pipes[i] = new(std::nothrow) Pipe(INTEL_PIPE_C);
 				break;
 			default:
 				ERROR("%s: Unknown pipe %d\n", __func__, i);

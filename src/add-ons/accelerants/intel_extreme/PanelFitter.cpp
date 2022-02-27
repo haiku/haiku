@@ -57,7 +57,9 @@ PanelFitter::PanelFitter(pipe_index pipeIndex)
 			TRACE("%s: this fitter is enabled by the BIOS\n", __func__);
 		}
 	} else {
-		TRACE("%s: this fitter is not setup by the BIOS\n", __func__);
+		TRACE("%s: this fitter is not setup by the BIOS: Enabling.\n", __func__);
+		fitCtl |= PANEL_FITTER_ENABLED;
+		write32(fRegisterBase + PCH_PANEL_FITTER_CONTROL, fitCtl);
 	}
 }
 

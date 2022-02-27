@@ -1087,8 +1087,14 @@ struct intel_free_graphics_memory {
 #define INTEL_GEN9_CLKGATE_DIS_4		(0x653c | REGS_NORTH_SHARED)
 #define BXT_GMBUSUNIT_CLK_GATE_DIS		(1 << 14)
 
-// gpu power wells
-#define INTEL_PWR_WELL_CTL_2			(0x5404 | REGS_NORTH_SHARED)
+// gpu power wells (confirmed skylake)
+#define INTEL_PWR_WELL_CTL_1_BIOS		(0x5400 | REGS_NORTH_SHARED)
+#define INTEL_PWR_WELL_CTL_2_DRIVER		(0x5404 | REGS_NORTH_SHARED)
+
+// gpu pll enable registers (confirmed skylake)
+#define INTEL_WRPLL_CTL_1_DPLL2			(0x6040 | REGS_NORTH_SHARED)
+#define INTEL_WRPLL_CTL_2_DPLL3			(0x6060 | REGS_NORTH_SHARED)
+#define WRPLL_PLL_ENABLE				(1 << 31)
 
 // TODO: on IronLake this is in the north shared block at 0x41000
 #define INTEL_VGA_DISPLAY_CONTROL		(0x1400 | REGS_NORTH_PLANE_CONTROL)

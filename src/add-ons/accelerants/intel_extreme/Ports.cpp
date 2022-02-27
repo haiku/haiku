@@ -1721,41 +1721,24 @@ DigitalDisplayInterface::IsConnected()
 		PortName(), fMaxLanes);
 
 	// fetch EDID but determine 'in use' later (below) so we also catch screens that fail EDID
-	HasEDID();
+	bool edidDetected = HasEDID();
 
-	// scan all our pipes to find the one connected to the current port and check it's enabled
+	// On laptops we always have an internal panel.. (on the eDP port on DDI systems, fixed on eDP pipe)
 	uint32 pipeState = 0;
-	for (uint32 pipeCnt = 0; pipeCnt < 4; pipeCnt++) {
-		switch (pipeCnt) {
-			case 0:
-				pipeState = read32(PIPE_DDI_FUNC_CTL_A);
-				break;
-			case 1:
-				pipeState = read32(PIPE_DDI_FUNC_CTL_B);
-				break;
-			case 2:
-				pipeState = read32(PIPE_DDI_FUNC_CTL_C);
-				break;
-			default:
-				pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
-				break;
-		}
-
-		if ((((pipeState & PIPE_DDI_SELECT_MASK) >> PIPE_DDI_SELECT_SHIFT) + 1) == (uint32)PortIndex()) {
-			// See if the BIOS enabled our output as it indicates it's in use
-			if (pipeState & PIPE_DDI_FUNC_CTL_ENABLE) {
-				TRACE("%s: Connected\n", __func__);
-				return true;
-			}
-		}
-	}
-
-	// On laptops we always have an internal panel.. (this is on the eDP port)
 	if (gInfo->shared_info->device_type.IsMobile() && (PortIndex() == INTEL_PORT_E)) {
+		pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
+		TRACE("%s: PIPE_DDI_FUNC_CTL_EDP: 0x%" B_PRIx32 "\n", __func__, pipeState);
+		if (!(pipeState & PIPE_DDI_FUNC_CTL_ENABLE)) {
+			TRACE("%s: Laptop, but eDP port down: enabling port on pipe EDP\n", __func__);
+			//fixme: turn on port and power
+			write32(PIPE_DDI_FUNC_CTL_EDP, pipeState | PIPE_DDI_FUNC_CTL_ENABLE);
+			TRACE("%s: PIPE_DDI_FUNC_CTL_EDP after: 0x%" B_PRIx32 "\n", __func__,
+				read32(PIPE_DDI_FUNC_CTL_EDP));
+		}
+
 		if (gInfo->shared_info->has_vesa_edid_info) {
 			TRACE("%s: Laptop. Using VESA edid info\n", __func__);
-			memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,
-				sizeof(edid1_info));
+			memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,	sizeof(edid1_info));
 			if (fEDIDState != B_OK) {
 				fEDIDState = B_OK;
 				// HasEDID now true
@@ -1766,6 +1749,62 @@ DigitalDisplayInterface::IsConnected()
 			TRACE("%s: Laptop. No EDID, but force enabled as we have a VBT\n", __func__);
 			return true;
 		}
+		//should not happen:
+		TRACE("%s: No (panel) type info found, assuming not connected\n", __func__);
+		return false;
+	}
+
+	// scan all our non-eDP pipes to find the one connected to the current port and check it's enabled
+	for (uint32 pipeCnt = 0; pipeCnt < 3; pipeCnt++) {
+		switch (pipeCnt) {
+			case 1:
+				pipeState = read32(PIPE_DDI_FUNC_CTL_B);
+				break;
+			case 2:
+				pipeState = read32(PIPE_DDI_FUNC_CTL_C);
+				break;
+			default:
+				pipeState = read32(PIPE_DDI_FUNC_CTL_A);
+				break;
+		}
+		if ((((pipeState & PIPE_DDI_SELECT_MASK) >> PIPE_DDI_SELECT_SHIFT) + 1) == (uint32)PortIndex()) {
+			TRACE("%s: PIPE_DDI_FUNC_CTL nr %" B_PRIx32 ": 0x%" B_PRIx32 "\n", __func__, pipeCnt + 1, pipeState);
+			// See if the BIOS enabled our output as it indicates it's in use
+			if (pipeState & PIPE_DDI_FUNC_CTL_ENABLE) {
+				TRACE("%s: Connected\n", __func__);
+				return true;
+			}
+		}
+	}
+
+	if (edidDetected) {
+		for (uint32 pipeCnt = 0; pipeCnt < 3; pipeCnt++) {
+			uint32 pipeReg = 0;
+			switch (pipeCnt) {
+				case 1:
+					pipeReg = PIPE_DDI_FUNC_CTL_B;
+					break;
+				case 2:
+					pipeReg = PIPE_DDI_FUNC_CTL_C;
+					break;
+				default:
+					pipeReg = PIPE_DDI_FUNC_CTL_A;
+					break;
+			}
+			pipeState = read32(pipeReg);
+			if (!(pipeState & PIPE_DDI_FUNC_CTL_ENABLE)) {
+				TRACE("%s: Connected but port down: enabling port on pipe nr %" B_PRIx32 "\n", __func__, pipeCnt + 1);
+				//fixme: turn on port and power
+				pipeState |= PIPE_DDI_FUNC_CTL_ENABLE;
+				pipeState &= ~PIPE_DDI_SELECT_MASK;
+				pipeState |= (((uint32)PortIndex()) - 1) << PIPE_DDI_SELECT_SHIFT;
+				//fixme: set mode to DVI mode for now (b26..24 = %001)
+				write32(pipeReg, pipeState);
+				TRACE("%s: PIPE_DDI_FUNC_CTL after: 0x%" B_PRIx32 "\n", __func__, read32(pipeReg));
+				return true;
+			}
+		}
+		TRACE("%s: No pipe available, ignoring connected screen\n", __func__);
 	}
 
 	TRACE("%s: Not connected\n", __func__);
