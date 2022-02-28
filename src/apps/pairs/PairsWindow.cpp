@@ -178,6 +178,7 @@ PairsWindow::NewGame()
 {
 	fButtonClicks = 0;
 	fFinishPairs = 0;
+	fIsFirstClick = true;
 	fPairsView->CreateGameBoard();
 }
 
