@@ -37,4 +37,15 @@ struct arch_fork_arg {
 	char	dummy;
 };
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void arch_return_to_userland(struct iframe *);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif	/* KERNEL_ARCH_ARM_THREAD_TYPES_H */

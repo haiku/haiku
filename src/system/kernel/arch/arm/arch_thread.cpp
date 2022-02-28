@@ -18,6 +18,7 @@
 #include <arch_cpu.h>
 #include <arch/thread.h>
 #include <boot/stage2.h>
+#include <commpage.h>
 #include <kernel.h>
 #include <thread.h>
 #include <tls.h>
@@ -198,9 +199,37 @@ arch_thread_dump_info(void *info)
 
 status_t
 arch_thread_enter_userspace(Thread *thread, addr_t entry,
-	void *arg1, void *arg2)
+	void *args1, void *args2)
 {
-	panic("arch_thread_enter_uspace(): not yet implemented\n");
+	arm_set_tls_context(thread);
+
+	addr_t stackTop = thread->user_stack_base + thread->user_stack_size;
+
+	TRACE(("arch_thread_enter_userspace: entry 0x%" B_PRIxADDR ", args %p %p, "
+		"ustack_top 0x%" B_PRIxADDR "\n", entry, args1, args2, stackTop));
+
+	//stackTop = arch_randomize_stack_pointer(stackTop - sizeof(args));
+
+	// Copy the address of the stub that calls exit_thread() when the thread
+	// entry function returns to LR to act as the return address.
+	// The stub is inside commpage.
+	addr_t commPageAddress = (addr_t)thread->team->commpage_address;
+
+	disable_interrupts();
+
+	// prepare the user iframe
+	iframe frame = {};
+	frame.r0 = (uint32)args1;
+	frame.r1 = (uint32)args2;
+	frame.usr_sp = stackTop;
+	frame.usr_lr = ((addr_t*)commPageAddress)[COMMPAGE_ENTRY_ARM_THREAD_EXIT]
+		+ commPageAddress;
+	frame.pc = entry;
+
+	// return to userland
+	arch_return_to_userland(&frame);
+
+	// normally we don't get here
 	return B_ERROR;
 }
 
