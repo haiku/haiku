@@ -34,11 +34,12 @@ status_t csi_write_block(struct csi *csi, uint8 *buffer);
 
 /* directory entry iterator */
 struct diri {
-	struct csi csi = {};
+	struct csi csi;
 	uint32 starting_cluster;
 	uint32 current_index;
-	uint8 *current_block = NULL;
+	uint8 *current_block;
 
+	diri();
 	~diri();
 };
 
