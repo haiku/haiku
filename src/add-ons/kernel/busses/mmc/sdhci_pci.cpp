@@ -80,7 +80,6 @@ class SdhciDevice {
 
 device_manager_info* gDeviceManager;
 device_module_info* gMMCBusController;
-static pci_x86_module_info* sPCIx86Module;
 
 
 static int32
@@ -659,14 +658,6 @@ init_bus(device_node* node, void** bus_cookie)
 	gDeviceManager->put_node(pciParent);
 	gDeviceManager->put_node(parent);
 
-	if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module)
-	    != B_OK) {
-	    sPCIx86Module = NULL;
-		ERROR("PCIx86Module not loaded\n");
-		// FIXME try probing FDT as well
-		return B_NO_MEMORY;
-	}
-
 	uint8_t bar, slot;
 	if (gDeviceManager->get_attr_uint8(node, SLOT_NUMBER, &slot, false) < B_OK
 		|| gDeviceManager->get_attr_uint8(node, BAR_INDEX, &bar, false) < B_OK)
@@ -697,11 +688,6 @@ init_bus(device_node* node, void** bus_cookie)
 		ERROR("No registers to map\n");
 		return B_IO_ERROR;
 	}
-
-	int msiCount = sPCIx86Module->get_msi_count(pciInfo.bus,
-		pciInfo.device, pciInfo.function);
-	TRACE("interrupts count: %d\n", msiCount);
-	// FIXME if available, use MSI rather than good old IRQ...
 
 	// enable bus master and io
 	uint16 pcicmd = pci->read_pci_config(device, PCI_command, 2);
@@ -735,11 +721,6 @@ init_bus(device_node* node, void** bus_cookie)
 		status = bus->InitCheck();
 
 	if (status != B_OK) {
-		if (sPCIx86Module != NULL) {
-			put_module(B_PCI_X86_MODULE_NAME);
-			sPCIx86Module = NULL;
-		}
-
 		if (bus != NULL)
 			delete bus;
 		else
