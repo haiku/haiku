@@ -19,6 +19,7 @@
 #include <Select.h>
 
 #include <AutoDeleter.h>
+#include <StackOrHeapArray.h>
 
 #include <fs/fd.h>
 #include <port.h>
@@ -945,9 +946,7 @@ ssize_t
 _user_select(int numFDs, fd_set *userReadSet, fd_set *userWriteSet,
 	fd_set *userErrorSet, bigtime_t timeout, const sigset_t *userSigMask)
 {
-	fd_set *readSet = NULL, *writeSet = NULL, *errorSet = NULL;
 	uint32 bytes = _howmany(numFDs, NFDBITS) * sizeof(fd_mask);
-	sigset_t sigMask;
 	int result;
 
 	if (timeout >= 0) {
@@ -968,45 +967,43 @@ _user_select(int numFDs, fd_set *userReadSet, fd_set *userWriteSet,
 
 	// copy parameters
 
-	if (userReadSet != NULL) {
-		readSet = (fd_set *)malloc(bytes);
-		if (readSet == NULL)
-			return B_NO_MEMORY;
+	BStackOrHeapArray<char, 128> sets(bytes * (
+		((userReadSet != NULL) ? 1 : 0) +
+		((userWriteSet != NULL) ? 1 : 0) +
+		((userErrorSet != NULL) ? 1 : 0)));
+	if (!sets.IsValid())
+		return B_NO_MEMORY;
 
-		if (user_memcpy(readSet, userReadSet, bytes) < B_OK) {
-			result = B_BAD_ADDRESS;
-			goto err;
-		}
+	char *nextSet = &sets[0];
+	fd_set *readSet = NULL, *writeSet = NULL, *errorSet = NULL;
+
+	if (userReadSet != NULL) {
+		readSet = (fd_set *)nextSet;
+		nextSet += bytes;
+
+		if (user_memcpy(readSet, userReadSet, bytes) != B_OK)
+			return B_BAD_ADDRESS;
 	}
 
 	if (userWriteSet != NULL) {
-		writeSet = (fd_set *)malloc(bytes);
-		if (writeSet == NULL) {
-			result = B_NO_MEMORY;
-			goto err;
-		}
-		if (user_memcpy(writeSet, userWriteSet, bytes) < B_OK) {
-			result = B_BAD_ADDRESS;
-			goto err;
-		}
+		writeSet = (fd_set *)nextSet;
+		nextSet += bytes;
+
+		if (user_memcpy(writeSet, userWriteSet, bytes) != B_OK)
+			return B_BAD_ADDRESS;
 	}
 
 	if (userErrorSet != NULL) {
-		errorSet = (fd_set *)malloc(bytes);
-		if (errorSet == NULL) {
-			result = B_NO_MEMORY;
-			goto err;
-		}
-		if (user_memcpy(errorSet, userErrorSet, bytes) < B_OK) {
-			result = B_BAD_ADDRESS;
-			goto err;
-		}
+		errorSet = (fd_set *)nextSet;
+
+		if (user_memcpy(errorSet, userErrorSet, bytes) != B_OK)
+			return B_BAD_ADDRESS;
 	}
 
+	sigset_t sigMask;
 	if (userSigMask != NULL
-		&& user_memcpy(&sigMask, userSigMask, sizeof(sigMask)) < B_OK) {
-		result = B_BAD_ADDRESS;
-		goto err;
+			&& user_memcpy(&sigMask, userSigMask, sizeof(sigMask)) != B_OK) {
+		return B_BAD_ADDRESS;
 	}
 
 	result = common_select(numFDs, readSet, writeSet, errorSet, timeout,
@@ -1024,11 +1021,6 @@ _user_select(int numFDs, fd_set *userReadSet, fd_set *userWriteSet,
 		result = B_BAD_ADDRESS;
 	}
 
-err:
-	free(readSet);
-	free(writeSet);
-	free(errorSet);
-
 	return result;
 }
 
@@ -1037,11 +1029,6 @@ ssize_t
 _user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout,
 	const sigset_t *userSigMask)
 {
-	struct pollfd *fds = NULL;
-	size_t bytes = 0;
-	sigset_t sigMask;
-	int result;
-
 	if (timeout >= 0) {
 		timeout += system_time();
 		// deal with overflow
@@ -1049,35 +1036,30 @@ _user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout,
 			timeout = B_INFINITE_TIMEOUT;
 	}
 
-	if (numFDs < 0)
+	if (numFDs < 0 || !check_max_fds(numFDs))
 		return B_BAD_VALUE;
 
+	BStackOrHeapArray<struct pollfd, 16> fds(numFDs);
+	if (!fds.IsValid())
+		return B_NO_MEMORY;
+
+	size_t bytes = 0;
 	if (numFDs != 0) {
-
-		if (!check_max_fds(numFDs))
-			return B_BAD_VALUE;
-
 		if (userfds == NULL || !IS_USER_ADDRESS(userfds))
 			return B_BAD_ADDRESS;
 
-		fds = (struct pollfd *)malloc(bytes = numFDs * sizeof(struct pollfd));
-		if (fds == NULL)
-			return B_NO_MEMORY;
-
-		if (user_memcpy(fds, userfds, bytes) < B_OK) {
-			result = B_BAD_ADDRESS;
-			goto err;
-		}
+		if (user_memcpy(fds, userfds, bytes) < B_OK)
+			return B_BAD_ADDRESS;
 	}
 
+	sigset_t sigMask;
 	if (userSigMask != NULL
 		&& (!IS_USER_ADDRESS(userSigMask)
 			|| user_memcpy(&sigMask, userSigMask, sizeof(sigMask)) < B_OK)) {
-		result = B_BAD_ADDRESS;
-		goto err;
+		return B_BAD_ADDRESS;
 	}
 
-	result = common_poll(fds, numFDs, timeout,
+	status_t result = common_poll(fds, numFDs, timeout,
 		userSigMask != NULL ? &sigMask : NULL, false);
 
 	// copy back results
@@ -1085,8 +1067,6 @@ _user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout,
 		if (result >= 0)
 			result = B_BAD_ADDRESS;
 	}
-err:
-	free(fds);
 
 	return result;
 }
@@ -1114,27 +1094,21 @@ _user_wait_for_objects(object_wait_info* userInfos, int numInfos, uint32 flags,
 	if (userInfos == NULL || !IS_USER_ADDRESS(userInfos))
 		return B_BAD_ADDRESS;
 
-	int bytes = sizeof(object_wait_info) * numInfos;
-	object_wait_info* infos = (object_wait_info*)malloc(bytes);
-	if (infos == NULL)
+	BStackOrHeapArray<object_wait_info, 16> infos(numInfos);
+	if (!infos.IsValid())
 		return B_NO_MEMORY;
+	const int bytes = sizeof(object_wait_info) * numInfos;
 
-	// copy parameters to kernel space, call the function, and copy the results
-	// back
-	ssize_t result;
-	if (user_memcpy(infos, userInfos, bytes) == B_OK) {
-		result = common_wait_for_objects(infos, numInfos, flags, timeout,
-			false);
+	if (user_memcpy(infos, userInfos, bytes) != B_OK)
+		return B_BAD_ADDRESS;
 
-		if (result >= 0 && user_memcpy(userInfos, infos, bytes) != B_OK) {
-			result = B_BAD_ADDRESS;
-		} else
-			syscall_restart_handle_timeout_post(result, timeout);
-	} else
+	ssize_t result = common_wait_for_objects(infos, numInfos, flags, timeout, false);
+
+	if (result >= 0 && user_memcpy(userInfos, infos, bytes) != B_OK) {
 		result = B_BAD_ADDRESS;
-
-	free(infos);
+	} else {
+		syscall_restart_handle_timeout_post(result, timeout);
+	}
 
 	return result;
 }
-
