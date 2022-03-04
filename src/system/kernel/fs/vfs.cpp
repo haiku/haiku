@@ -5033,7 +5033,7 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 	// allocate space for FDs and their close-on-exec flag
 	context->fds = (file_descriptor**)malloc(
 		sizeof(struct file_descriptor*) * tableSize
-		+ sizeof(struct select_sync*) * tableSize
+		+ sizeof(struct select_info**) * tableSize
 		+ (tableSize + 7) / 8);
 	if (context->fds == NULL) {
 		free(context);
@@ -5044,7 +5044,7 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 	context->fds_close_on_exec = (uint8*)(context->select_infos + tableSize);
 
 	memset(context->fds, 0, sizeof(struct file_descriptor*) * tableSize
-		+ sizeof(struct select_sync*) * tableSize
+		+ sizeof(struct select_info**) * tableSize
 		+ (tableSize + 7) / 8);
 
 	mutex_init(&context->io_mutex, "I/O context");
@@ -5154,7 +5154,7 @@ vfs_resize_fd_table(struct io_context* context, uint32 newSize)
 	// allocate new tables
 	file_descriptor** newFDs = (file_descriptor**)malloc(
 		sizeof(struct file_descriptor*) * newSize
-		+ sizeof(struct select_sync*) * newSize
+		+ sizeof(struct select_infos**) * newSize
 		+ newCloseOnExitBitmapSize);
 	if (newFDs == NULL)
 		return B_NO_MEMORY;
