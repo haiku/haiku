@@ -413,20 +413,25 @@ usbd_transfer_submit(struct usb_xfer* xfer)
 
 	xfer->transferred_length = 0;
 	xfer->in_progress = true;
+	status_t status = B_NOT_SUPPORTED;
 	switch (xfer->type) {
 	case UE_BULK:
-		sUSB->queue_bulk_v(xfer->pipe, xfer->frames, xfer->nframes, usbd_callback, xfer);
+		status = sUSB->queue_bulk_v(xfer->pipe, xfer->frames, xfer->nframes, usbd_callback, xfer);
 		break;
 
 	case UE_INTERRUPT:
 		KASSERT(xfer->nframes == 1, ("invalid frame count for interrupt transfer"));
-		sUSB->queue_interrupt(xfer->pipe, xfer->frames[0].iov_base, xfer->frames[0].iov_len,
+		status = sUSB->queue_interrupt(xfer->pipe,
+			xfer->frames[0].iov_base, xfer->frames[0].iov_len,
 			usbd_callback, xfer);
 		break;
 
 	default:
 		panic("unhandled pipe type %d", xfer->type);
 	}
+
+	if (status != B_OK)
+		usbd_callback(xfer, status, NULL, 0);
 }
 
 
