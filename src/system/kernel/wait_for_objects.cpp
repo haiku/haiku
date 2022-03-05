@@ -1043,7 +1043,7 @@ _user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout,
 	if (!fds.IsValid())
 		return B_NO_MEMORY;
 
-	size_t bytes = 0;
+	const size_t bytes = numFDs * sizeof(struct pollfd);
 	if (numFDs != 0) {
 		if (userfds == NULL || !IS_USER_ADDRESS(userfds))
 			return B_BAD_ADDRESS;
