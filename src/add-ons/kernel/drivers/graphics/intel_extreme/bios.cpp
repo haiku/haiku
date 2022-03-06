@@ -7,8 +7,12 @@
 #include <string.h>
 
 #include <KernelExport.h>
+#include <directories.h>
+#include <stdio.h>
+#include <driver_settings.h>
 
 #include "intel_extreme.h"
+#include "driver.h"
 
 
 #define TRACE_BIOS
@@ -112,29 +116,106 @@ static struct vbios {
 } vbios;
 
 
+static bool
+read_settings_dumpRom(void)
+{
+	bool dumpRom = false;
+
+	void* settings = load_driver_settings("intel_extreme");
+	if (settings != NULL) {
+		dumpRom = get_driver_boolean_parameter(settings,
+			"dump_rom", false, false);
+
+		unload_driver_settings(settings);
+	}
+	return dumpRom;
+}
+
+
+static void
+dumprom(void *rom, uint32 size, intel_info &info)
+{
+	int fd;
+	uint32 cnt;
+	char fname[64];
+
+	/* determine the romfile name: we need split-up per card in the system */
+	sprintf (fname, kUserDirectory "//intel_extreme.%04x_%04x_%02x%02x%02x.rom",
+		info.pci->vendor_id, info.pci->device_id, info.pci->bus, info.pci->device, info.pci->function);
+
+	fd = open (fname, O_WRONLY | O_CREAT, 0666);
+	if (fd < 0) return;
+
+	/* The ROM size is a multiple of 1kb.. */
+	for (cnt = 0; (cnt < size); cnt += 1024)
+		write (fd, ((void *)(((uint8 *)rom) + cnt)), 1024);
+	close (fd);
+}
+
+
 /*!	This is reimplementation, Haiku uses BIOS call and gets most current panel
 	info, we're, otherwise, digging in VBIOS memory and parsing VBT tables to
 	get native panel timings. This will allow to get non-updated,
 	PROM-programmed timings info when compensation mode is off on your machine.
 */
+
+#define ASLS 0xfc // ASL Storage.
+#define OPREGION_SIGNATURE "IntelGraphicsMem"
+
 static bool
 get_bios(int* vbtOffset)
 {
-	static const uint64_t kVBIOSAddress = 0xc0000;
-	static const int kVBIOSSize = 64 * 1024;
-		// FIXME: is this the same for all cards?
+	intel_info &info = *gDeviceInfo[0];
+	// first try to fetch Intel OpRegion which should be polulated by the BIOS at start
+	uint64_t kVBIOSAddress = 0;
+	uint32 kVBIOSSize = 8 * 1024;
 
-	/* !!!DANGER!!!: mapping of BIOS using legacy location for now,
-	hence, if panel mode will be set using info from VBT, it will
-	be taken from primary card's VBIOS */
-	vbios.area = map_physical_memory("VBIOS mapping", kVBIOSAddress,
-		kVBIOSSize, B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void**)&vbios.memory);
+	// get OpRegion - see Intel ACPI IGD info in acpi_igd_opregion_spec_0.pdf
+	kVBIOSAddress = get_pci_config(info.pci, ASLS, 4);
+	if (!kVBIOSAddress) {
+		TRACE((DEVICE_NAME ": ACPI OpRegion not supported!\n"));
+	} else {
+		TRACE((DEVICE_NAME ": Graphic OpRegion physical addr: 0x%" B_PRIx64
+				"; size: 0x%" B_PRIx32 "\n", kVBIOSAddress, kVBIOSSize));
+		vbios.area = map_physical_memory("ASLS mapping", kVBIOSAddress,
+			kVBIOSSize, B_ANY_KERNEL_ADDRESS, B_READ_AREA, (void **)&vbios.memory);
 
-	if (vbios.area < 0)
-		return false;
+		if (vbios.area >= 0) {
+			TRACE((DEVICE_NAME ": mapping ASLS: 0x%" B_PRIx64 " -> %p\n",
+				kVBIOSAddress, vbios.memory));
+			// check if we got the ASLS and signature
+			if (memcmp(vbios.memory, OPREGION_SIGNATURE, 16)) {
+				TRACE((DEVICE_NAME ": OpRegion signature mismatch\n"));
+				delete_area(vbios.area);
+				vbios.area = -1;
+				// force using ISA legacy map as fall-back
+				kVBIOSAddress = 0;
+			}
+		} else {
+			// mapping failed: force using ISA legacy map as fall-back
+			kVBIOSAddress = 0;
+		}
+	}
 
-	TRACE((DEVICE_NAME ": mapping VBIOS: 0x%" B_PRIx64 " -> %p\n",
-		kVBIOSAddress, vbios.memory));
+	if (!kVBIOSAddress) {
+		kVBIOSAddress = 0xc0000;
+		kVBIOSSize = 64 * 1024;
+		/* !!!DANGER!!!: mapping of BIOS using legacy location as a fallback,
+		hence, if panel mode will be set using info from VBT this way, it will
+		be taken from primary card's VBIOS */
+		vbios.area = map_physical_memory("VBIOS mapping", kVBIOSAddress,
+			kVBIOSSize, B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void**)&vbios.memory);
+
+		if (vbios.area < 0)
+			return false;
+
+		TRACE((DEVICE_NAME ": mapping VBIOS: 0x%" B_PRIx64 " -> %p\n",
+			kVBIOSAddress, vbios.memory));
+	}
+
+	// dump ROM to file if selected in settings file
+	if (read_settings_dumpRom())
+		dumprom(vbios.memory, kVBIOSSize, info);
 
 	// scan BIOS for VBT signature
 	*vbtOffset = kVBIOSSize;
@@ -145,7 +226,7 @@ get_bios(int* vbtOffset)
 		}
 	}
 
-	if ((*vbtOffset + (int)sizeof(vbt_header)) >= kVBIOSSize) {
+	if ((*vbtOffset + (uint32)sizeof(vbt_header)) >= kVBIOSSize) {
 		TRACE((DEVICE_NAME": bad VBT offset : 0x%x\n", *vbtOffset));
 		delete_area(vbios.area);
 		return false;
