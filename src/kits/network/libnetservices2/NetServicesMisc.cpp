@@ -11,6 +11,9 @@
 using namespace BPrivate::Network;
 
 
+// #pragma mark -- BUnsupportedProtocol
+
+
 BUnsupportedProtocol::BUnsupportedProtocol(const char* origin,
 		BUrl url, BStringList supportedProtocols)
 	:
@@ -54,6 +57,9 @@ BUnsupportedProtocol::SupportedProtocols() const
 }
 
 
+// #pragma mark -- BInvalidUrl
+
+
 BInvalidUrl::BInvalidUrl(const char* origin, BUrl url)
 	:
 	BError(origin),
@@ -83,4 +89,61 @@ const BUrl&
 BInvalidUrl::Url() const
 {
 	return fUrl;
+}
+
+
+// #pragma mark -- BNetworkRequestError
+
+
+BNetworkRequestError::BNetworkRequestError(const char* origin, ErrorType type, status_t errorCode)
+	: BError(origin), fErrorType(type), fErrorCode(errorCode)
+{
+
+}
+
+
+const char*
+BNetworkRequestError::Message() const noexcept
+{
+	switch (fErrorType) {
+	case HostnameError:
+		return "Cannot resolving hostname";
+	case NetworkError:
+		return "Network error during operation";
+	case ProtocolError:
+		return "Protocol error";
+	case SystemError:
+		return "System error";
+	case Canceled:
+		return "Network request was canceled";
+	}
+	// Unreachable
+	return "Network request error";
+}
+
+
+BString
+BNetworkRequestError::DebugMessage() const
+{
+	BString debugMessage;
+	debugMessage << "[" << Origin() << "] " << Message();
+	if (fErrorCode != B_OK) {
+		debugMessage << "\n\tUnderlying System Error: " << fErrorCode << " ("
+			<< strerror(fErrorCode) << ")";
+	}
+	return debugMessage;
+}
+
+
+BNetworkRequestError::ErrorType
+BNetworkRequestError::Type() const noexcept
+{
+	return fErrorType;
+}
+
+
+status_t
+BNetworkRequestError::ErrorCode() const noexcept
+{
+	return fErrorCode;
 }

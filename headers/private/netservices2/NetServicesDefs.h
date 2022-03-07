@@ -50,6 +50,31 @@ private:
 };
 
 
+class BNetworkRequestError : public BError {
+public:
+	enum ErrorType {
+		HostnameError,
+		NetworkError,
+		ProtocolError,
+		SystemError,
+		Canceled
+	};
+
+							BNetworkRequestError(const char* origin, ErrorType type,
+								status_t errorCode = B_OK);
+
+	virtual	const char*		Message() const noexcept override;
+	virtual	BString			DebugMessage() const override;
+
+			ErrorType		Type() const noexcept;
+			status_t		ErrorCode() const noexcept;
+
+private:
+			ErrorType		fErrorType;
+			status_t		fErrorCode = B_OK;
+};
+
+
 }
 
 }

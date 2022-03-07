@@ -101,7 +101,7 @@ namespace Network {
 	When there are errors during the request that lead to the situation where there is no valid
 	response according to the HTTP specification, then this object goes into an error state. This
 	means that the access methods of this object will throw an exception of the
-	\ref BNetServiceError type.
+	\ref BNetworkRequestError type.
 
 	A special property of this object is that it is unique. This means it cannot be copied, only
 	moved. Objects that have moved from, are in an invalid state, and will always raise a
@@ -275,7 +275,7 @@ namespace Network {
 
 	\exception BRuntimeException This exception is raised when the object has been moved from and
 		is thus no longer valid.
-	\exception BNetServicesError This exception is raised when there was an error that prevented
+	\exception BNetworkRequestError This exception is raised when there was an error that prevented
 		completely retrieving and parsing the HTTP response.
 
 	\since Haiku R1

@@ -18,6 +18,16 @@ namespace Network {
 
 
 /*!
+	\file NetServicesDefs.h
+	\ingroup netservices
+	\brief Various standardized error and notification types used by multiple protocols of the
+		Network Services Kit.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\class BUnsupportedProtocol
 	\ingroup netservices
 	\brief Error that indicates that the protocol is not supported.
@@ -29,7 +39,7 @@ namespace Network {
 /*!
 	\fn BUnsupportedProtocol::BUnsupportedProtocol(const char* origin,
 		BUrl url, BStringList supportedProtocols)
-	\brief Create a new error unsupported protocol error.
+	\brief Create a new unsupported protocol error.
 
 	\param origin A string representing where this error occured. It is advised
 		to initialize it to \c __PRETTY_FUNCTION__ by default.
@@ -116,6 +126,123 @@ namespace Network {
 /*!
 	\fn const BUrl& BInvalidUrl::Url() const
 	\brief The URL that caused the issue.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BNetworkRequestError
+	\ingroup netservices
+	\brief Error that indicates there was an issue executing the network request.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\enum BNetworkRequestError::ErrorType
+	\ingroup netservices
+	\brief A list of errors that can occur while executing a network request.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BNetworkRequestError::ErrorType BNetworkRequestError::HostnameError
+	\brief Error resolving the hostname.
+
+	\ref ErrorCode() will be set to contain the underlying error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BNetworkRequestError::ErrorType BNetworkRequestError::NetworkError
+	\brief The request was interrupted due to a network error.
+
+	This may occur when reading or writing fails due to an underlying network error, like an
+	unexpected closed connection.
+
+	\ref ErrorCode() will be set to contain the underlying error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BNetworkRequestError::ErrorType BNetworkRequestError::ProtocolError
+	\brief The request did not complete because the response did not conform to the protocol.
+
+	The server gave an unexpected or incorrect response. The network request could not complete
+	because of this.
+
+	There will not be any \ref ErrorCode() set.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BNetworkRequestError::ErrorType BNetworkRequestError::SystemError
+	\brief Other internal error while handling the request.
+
+	There could have been issues initializing buffers or decompression engines.
+
+	\ref ErrorCode() will be set to contain the underlying error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BNetworkRequestError::ErrorType BNetworkRequestError::Canceled
+	\brief The request was canceled before it was completed.
+
+	This could either have been done through the API, or because the session that schedules and
+	executes the requests was destroyed.
+
+	There will not be any \ref ErrorCode() set.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkRequestError::BNetworkRequestError(const char *origin, ErrorType type,
+		status_t errorCode=B_OK)
+	\brief Create a new network request error.
+
+	\param origin A string representing where this error occured. It is advised
+		to initialize it to \c __PRETTY_FUNCTION__ by default.
+	\param type The error type that describes what the issue was that prevented the completion of
+		the request.
+	\param error Optional underlying system error. See the \ref BNetworkRequestError::ErrorType
+		documentation on which error types expect a system error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRequestError::ErrorCode() const noexcept
+	\brief Get the underlying system error code.
+
+	\return A \c status_t error code when the associated \ref BNetworkRequestError::ErrorType sets
+		the system error, or \c B_OK if there is no additional error code available.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ErrorType BNetworkRequestError::Type() const noexcept
+	\brief Get the error type.
+
+	\return Get the \ref BNetworkRequestError::ErrorType that describes the cause for the request
+		to fail.
 
 	\since Haiku R1
 */
