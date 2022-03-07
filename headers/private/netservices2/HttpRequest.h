@@ -88,8 +88,9 @@ public:
 			void			SetUrl(const BUrl& url);
 
 private:
-	struct Impl;
-	std::unique_ptr<Impl>	fData;
+	friend class BHttpSession;
+	struct Data;
+	std::unique_ptr<Data>	fData;
 };
 
 

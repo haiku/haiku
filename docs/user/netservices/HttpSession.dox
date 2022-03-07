@@ -13,6 +13,16 @@
 
 #if __cplusplus >= 201703L
 
+
+/*!
+	\file HttpSession.h
+	\ingroup netservices
+	\brief Provides classes and tools to schedule and execute HTTP requests.
+
+	\since Haiku R1
+*/
+
+
 namespace BPrivate {
 
 namespace Network {
@@ -148,6 +158,26 @@ namespace Network {
 	BHttpSession objects cannot be moved. Because it has a shared internal
 	state, making copies is cheap and it is the only supported method of
 	creating multiple scoped objects with a shared lifetime.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpResult BHttpSession::Execute(BHttpRequest &&request,
+		std::unique_ptr< BDataIO > target=nullptr, BMessenger observer=BMessenger())
+	\brief Schedule and execute a \a request.
+
+	\param request The (valid) request to move from.
+	\param target An optional data buffer to write the incoming body of the request to. This can be
+		\c nullptr if you want to use the default internal storage. If you provide a buffer, it
+		must be wrapped in a \c std::unique_ptr. This means that you transfer ownership to the
+		session. After the request is finished, you can regain ownership.
+	\param observer An optional observer that will receive the progress and status messages for
+		this request.
+
+	\return The \ref BHttpResult object that corresponds to this request, and that can be used to
+		monitor the progress.
 
 	\since Haiku R1
 */

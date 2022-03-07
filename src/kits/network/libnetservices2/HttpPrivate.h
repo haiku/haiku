@@ -8,6 +8,9 @@
 
 #include <string_view>
 
+#include <HttpRequest.h>
+#include <Url.h>
+
 
 namespace BPrivate {
 

@@ -1,6 +1,9 @@
 SubDir HAIKU_TOP src kits network libnetservices2 ;
 
+UsePrivateHeaders net ;
 UsePrivateHeaders netservices2 ;
+UsePrivateHeaders support ;
+UsePrivateHeaders shared ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {

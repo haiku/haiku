@@ -14,12 +14,16 @@
 
 #include <HttpFields.h>
 #include <HttpRequest.h>
+#include <HttpResult.h>
+#include <NetServicesDefs.h>
 #include <Url.h>
 
 using BPrivate::Network::BHttpFields;
 using BPrivate::Network::BHttpMethod;
 using BPrivate::Network::BHttpRequest;
 using BPrivate::Network::BHttpSession;
+using BPrivate::Network::BHttpResult;
+using BPrivate::Network::BNetworkRequestError;
 
 
 HttpProtocolTest::HttpProtocolTest()
@@ -233,6 +237,54 @@ HttpProtocolTest::HttpRequestTest()
 }
 
 
+void
+HttpProtocolTest::HttpIntegrationTest()
+{
+	// Test hostname resolution fail
+	{
+		auto request = BHttpRequest(BUrl("http://doesnotexist/"));
+		auto result = fSession.Execute(std::move(request));
+		try {
+			result.Status();
+			CPPUNIT_FAIL("Expecting exception when trying to connect to invalid hostname");
+		} catch (const BNetworkRequestError& e) {
+			CPPUNIT_ASSERT_EQUAL(BNetworkRequestError::HostnameError, e.Type());
+		} catch (...) {
+			CPPUNIT_FAIL("Unknown exception raised when getting invalid hostname");
+		}
+	}
+
+	// Test connection error fail
+	{
+		// FIXME: find a better way to get an unused local port, instead of hardcoding one
+		auto request = BHttpRequest(BUrl("http://localhost:59445/"));
+		auto result = fSession.Execute(std::move(request));
+		try {
+			result.Status();
+			CPPUNIT_FAIL("Expecting exception when trying to connect to invalid hostname");
+		} catch (const BNetworkRequestError& e) {
+			CPPUNIT_ASSERT_EQUAL(BNetworkRequestError::NetworkError, e.Type());
+		} catch (...) {
+			CPPUNIT_FAIL("Unknown exception raised when getting invalid hostname");
+		}
+	}
+
+	// Succesful connection (fails as canceled right now)
+	{
+		auto request = BHttpRequest(BUrl("https://www.haiku-os.org/"));
+		auto result = fSession.Execute(std::move(request));
+		try {
+			result.Status();
+			CPPUNIT_FAIL("Expecting exception");
+		} catch (const BNetworkRequestError& e) {
+			CPPUNIT_ASSERT_EQUAL(BNetworkRequestError::Canceled, e.Type());
+		} catch (...) {
+			CPPUNIT_FAIL("Unknown exception raised when executing request");
+		}
+	}
+}
+
+
 /* static */ void
 HttpProtocolTest::AddTests(BTestSuite& parent)
 {
@@ -244,6 +296,8 @@ HttpProtocolTest::AddTests(BTestSuite& parent)
 		"HttpProtocolTest::HttpMethodTest", &HttpProtocolTest::HttpMethodTest));
 	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
 		"HttpProtocolTest::HttpRequestTest", &HttpProtocolTest::HttpRequestTest));
+	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
+		"HttpProtocolTest::HttpIntegrationTest", &HttpProtocolTest::HttpIntegrationTest));
 
 	parent.addTest("HttpProtocolTest", &suite);
 }

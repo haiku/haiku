@@ -8,7 +8,10 @@
 
 #include <NetServicesDefs.h>
 
-using namespace BPrivate::Network;
+
+namespace BPrivate {
+
+namespace Network {
 
 
 // #pragma mark -- BUnsupportedProtocol
@@ -147,3 +150,21 @@ BNetworkRequestError::ErrorCode() const noexcept
 {
 	return fErrorCode;
 }
+
+
+// #pragma mark -- Private functions and data
+
+
+static int32 gRequestIdentifier = 1;
+
+
+int32
+get_netservices_request_identifier()
+{
+	return atomic_add(&gRequestIdentifier, 1);
+}
+
+
+} // namespace Network
+
+} // namespace BPrivate

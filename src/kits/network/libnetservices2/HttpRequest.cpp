@@ -130,15 +130,14 @@ BHttpMethod::Method() const noexcept
 }
 
 
-// #pragma mark -- BHttpRequest::Impl
+// #pragma mark -- BHttpRequest::Data
 static const BUrl kDefaultUrl = BUrl();
 static const BHttpMethod kDefaultMethod = BHttpMethod::Get;
 
 
-struct BHttpRequest::Impl {
-	BUrl		url;
+struct BHttpRequest::Data {
+	BUrl		url = kDefaultUrl;
 	BHttpMethod	method	= kDefaultMethod;
-	bool		ssl		= false;
 };
 
 
@@ -146,14 +145,14 @@ struct BHttpRequest::Impl {
 
 
 BHttpRequest::BHttpRequest()
-	: fData(std::make_unique<Impl>())
+	: fData(std::make_unique<Data>())
 {
 
 }
 
 
 BHttpRequest::BHttpRequest(const BUrl& url)
-	: fData(std::make_unique<Impl>())
+	: fData(std::make_unique<Data>())
 {
 	SetUrl(url);
 }
@@ -198,7 +197,7 @@ void
 BHttpRequest::SetMethod(const BHttpMethod& method)
 {
 	if (!fData)
-		fData = std::make_unique<Impl>();
+		fData = std::make_unique<Data>();
 	fData->method = method;
 }
 
@@ -207,15 +206,11 @@ void
 BHttpRequest::SetUrl(const BUrl& url)
 {
 	if (!fData)
-		fData = std::make_unique<Impl>();
+		fData = std::make_unique<Data>();
 
 	if (!url.IsValid())
 		throw BInvalidUrl(__PRETTY_FUNCTION__, BUrl(url));
-	if (url.Protocol() == "http")
-		fData->ssl = false;
-	else if (url.Protocol() == "https")
-		fData->ssl = true;
-	else {
+	if (url.Protocol() != "http" && url.Protocol() != "https") {
 		// TODO: optimize BStringList with modern language features
 		BStringList list;
 		list.Add("http");

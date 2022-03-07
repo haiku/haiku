@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Haiku Inc. All rights reserved.
+ * Copyright 2022 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,11 +8,17 @@
 
 #include <memory>
 
+#include <Messenger.h>
+
 class BUrl;
+
 
 namespace BPrivate {
 
 namespace Network {
+
+class BHttpRequest;
+class BHttpResult;
 
 
 class BHttpSession {
@@ -26,6 +32,12 @@ public:
 	// Assignment operators
 	BHttpSession&			operator=(const BHttpSession&) noexcept;
 	BHttpSession&			operator=(BHttpSession&&) noexcept = delete;
+
+
+	// Requests
+	BHttpResult				Execute(BHttpRequest&& request,
+								std::unique_ptr<BDataIO> target = nullptr,
+								BMessenger observer = BMessenger());
 
 private:
 	class Request;
