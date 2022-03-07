@@ -178,7 +178,7 @@ get_bios(int* vbtOffset)
 		TRACE((DEVICE_NAME ": Graphic OpRegion physical addr: 0x%" B_PRIx64
 				"; size: 0x%" B_PRIx32 "\n", kVBIOSAddress, kVBIOSSize));
 		vbios.area = map_physical_memory("ASLS mapping", kVBIOSAddress,
-			kVBIOSSize, B_ANY_KERNEL_ADDRESS, B_READ_AREA, (void **)&vbios.memory);
+			kVBIOSSize, B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void **)&vbios.memory);
 
 		if (vbios.area >= 0) {
 			TRACE((DEVICE_NAME ": mapping ASLS: 0x%" B_PRIx64 " -> %p\n",
