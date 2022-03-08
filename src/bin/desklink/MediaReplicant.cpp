@@ -264,7 +264,7 @@ MediaReplicant::MouseDown(BPoint point)
 			B_TRANSLATE("Media preferences" B_UTF8_ELLIPSIS),
 			new BMessage(kMsgOpenMediaSettings)));
 		menu->AddItem(new BMenuItem(
-			B_TRANSLATE("Sound preferences" B_UTF8_ELLIPSIS),
+			B_TRANSLATE("Sounds preferences" B_UTF8_ELLIPSIS),
 			new BMessage(kMsgOpenSoundSettings)));
 
 		menu->AddSeparatorItem();
