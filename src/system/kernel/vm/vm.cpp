@@ -1014,11 +1014,9 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 		allocationFlags, _virtualAddress);
 	if (status == B_NO_MEMORY
 			&& addressRestrictions->address_specification == B_ANY_KERNEL_ADDRESS) {
-		// TODO: At present, there is no way to notify the low_resource monitor
-		// that kernel addresss space is fragmented, nor does it check for this
-		// automatically. Due to how many locks are held, we cannot wait here
-		// for space to be freed up, but it would be good to at least notify
-		// that we tried and failed to allocate some amount.
+		// Due to how many locks are held, we cannot wait here for space to be
+		// freed up, but we can at least notify the low_resource handler.
+		low_resource(B_KERNEL_RESOURCE_ADDRESS_SPACE, size, B_RELATIVE_TIMEOUT, 0);
 	}
 	if (status != B_OK)
 		goto err2;
