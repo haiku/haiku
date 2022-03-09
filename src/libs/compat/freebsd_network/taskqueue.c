@@ -357,7 +357,8 @@ taskqueue_timeout_func(void *arg)
 
 	timeout_task = arg;
 	queue = timeout_task->q;
-	KASSERT((timeout_task->f & DT_CALLOUT_ARMED) != 0, ("Stray timeout"));
+	KASSERT((timeout_task->f & DT_CALLOUT_ARMED) != 0,
+		("stray timeout ('%s')", timeout_task->q->tq_name));
 	timeout_task->f &= ~DT_CALLOUT_ARMED;
 	queue->tq_callouts--;
 	taskqueue_enqueue_locked(timeout_task->q, &timeout_task->t, status);
