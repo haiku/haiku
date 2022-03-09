@@ -362,26 +362,29 @@ ConditionVariable::Wait(recursive_lock* lock, uint32 flags, bigtime_t timeout)
 /*static*/ void
 ConditionVariable::NotifyOne(const void* object, status_t result)
 {
-	InterruptsReadSpinLocker locker(sConditionVariableHashLock);
-	ConditionVariable* variable = sConditionVariableHash.Lookup(object);
-	locker.Unlock();
-	if (variable == NULL)
-		return;
-
-	variable->NotifyOne(result);
+	_Notify(object, false, result);
 }
 
 
 /*static*/ void
 ConditionVariable::NotifyAll(const void* object, status_t result)
 {
-	InterruptsReadSpinLocker locker(sConditionVariableHashLock);
+	_Notify(object, true, result);
+}
+
+
+/*static*/ void
+ConditionVariable::_Notify(const void* object, bool all, status_t result)
+{
+	InterruptsLocker ints;
+	ReadSpinLocker hashLocker(sConditionVariableHashLock);
 	ConditionVariable* variable = sConditionVariableHash.Lookup(object);
-	locker.Unlock();
 	if (variable == NULL)
 		return;
+	SpinLocker variableLocker(variable->fLock);
+	hashLocker.Unlock();
 
-	variable->NotifyAll(result);
+	variable->_NotifyLocked(all, result);
 }
 
 

@@ -63,9 +63,6 @@ public:
 
 	static	void				NotifyOne(const void* object, status_t result);
 	static	void				NotifyAll(const void* object, status_t result);
-									// (both methods) caller must ensure that
-									// the variable is not unpublished
-									// concurrently
 
 			void				Add(ConditionVariableEntry* entry);
 
@@ -81,6 +78,7 @@ public:
 			void				Dump() const;
 
 private:
+	static 	void				_Notify(const void* object, bool all, status_t result);
 			void				_Notify(bool all, status_t result);
 			void				_NotifyLocked(bool all, status_t result);
 
