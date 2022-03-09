@@ -70,7 +70,7 @@ size_to_index(size_t size)
 }
 
 
-void*
+static void*
 block_alloc(size_t size, size_t alignment, uint32 flags)
 {
 	if (alignment > kMinObjectAlignment) {
@@ -143,7 +143,7 @@ block_alloc_early(size_t size)
 }
 
 
-void
+static void
 block_free(void* block, uint32 flags)
 {
 	if (block == NULL)
