@@ -676,7 +676,7 @@ cut_area(VMAddressSpace* addressSpace, VMArea* area, addr_t address,
 	// If no one else uses the area's cache and it's an anonymous cache, we can
 	// resize or split it, too.
 	bool onlyCacheUser = cache->areas == area && area->cache_next == NULL
-		&& cache->consumers.IsEmpty() && cache->type == CACHE_TYPE_RAM;
+		&& cache->consumers.IsEmpty() && area->cache_type == CACHE_TYPE_RAM;
 
 	// Cut the end only?
 	if (offset > 0 && size == area->Size() - offset) {
