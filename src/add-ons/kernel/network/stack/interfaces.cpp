@@ -1209,6 +1209,8 @@ find_interface(const char* name)
 static Interface*
 find_interface(uint32 index)
 {
+	ASSERT_LOCKED_RECURSIVE(&sLock);
+
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
 		if (interface->index == index)
