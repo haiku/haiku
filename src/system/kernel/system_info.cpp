@@ -525,25 +525,20 @@ _get_cpu_info_etc(uint32 firstCPU, uint32 cpuCount, cpu_info* info, size_t size)
 
 	// This function is called very often from userland by applications
 	// that display CPU usage information, so we want to keep this as
-	// optimized and touch as little as possible. Hence, no use of
-	// a temporary buffer.
+	// optimized and touch as little as possible. Hence, we avoid use
+	// of an allocated temporary buffer.
 
-	if (IS_USER_ADDRESS(info)) {
-		if (user_memset(info, 0, sizeof(cpu_info) * count) != B_OK)
+	cpu_info local_info[8];
+	for (uint32 i = 0; i < count; ) {
+		uint32 j;
+		for (j = 0; i < count && j < B_COUNT_OF(local_info); i++, j++) {
+			local_info[j].active_time = cpu_get_active_time(firstCPU + i);
+			local_info[j].enabled = !gCPU[firstCPU + i].disabled;
+			local_info[j].current_frequency = cpu_frequency(firstCPU + i);
+		}
+
+		if (user_memcpy(info + (i - j), local_info, sizeof(cpu_info) * j) != B_OK)
 			return B_BAD_ADDRESS;
-		set_ac();
-	} else {
-		memset(info, 0, sizeof(cpu_info) * count);
-	}
-
-	for (uint32 i = 0; i < count; i++) {
-		info[i].active_time = cpu_get_active_time(firstCPU + i);
-		info[i].enabled = !gCPU[firstCPU + i].disabled;
-		info[i].current_frequency = cpu_frequency(i);
-	}
-
-	if (IS_USER_ADDRESS(info)) {
-		clear_ac();
 	}
 
 	return B_OK;
