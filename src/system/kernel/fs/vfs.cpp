@@ -967,7 +967,7 @@ create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
 	rw_lock_write_lock(&sVnodeLock);
 	struct vnode* existingVnode = lookup_vnode(mountID, vnodeID);
 	if (existingVnode != NULL) {
-		free(vnode);
+		object_cache_free(sVnodeCache, vnode, 0);
 		_vnode = existingVnode;
 		_nodeCreated = false;
 		return B_OK;
@@ -979,7 +979,7 @@ create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
 	if (!vnode->mount || vnode->mount->unmounting) {
 		rw_lock_read_unlock(&sMountLock);
 		rw_lock_write_unlock(&sVnodeLock);
-		free(vnode);
+		object_cache_free(sVnodeCache, vnode, 0);
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -1261,7 +1261,7 @@ restart:
 			remove_vnode_from_mount_list(vnode, vnode->mount);
 			rw_lock_write_unlock(&sVnodeLock);
 
-			free(vnode);
+			object_cache_free(sVnodeCache, vnode, 0);
 			return status;
 		}
 
@@ -3837,7 +3837,7 @@ restart:
 			locker.Lock();
 			sVnodeTable->Remove(vnode);
 			remove_vnode_from_mount_list(vnode, vnode->mount);
-			free(vnode);
+			object_cache_free(sVnodeCache, vnode, 0);
 		}
 	} else {
 		// we still hold the write lock -- mark the node unbusy and published
