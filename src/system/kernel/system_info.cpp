@@ -528,16 +528,16 @@ _get_cpu_info_etc(uint32 firstCPU, uint32 cpuCount, cpu_info* info, size_t size)
 	// optimized and touch as little as possible. Hence, we avoid use
 	// of an allocated temporary buffer.
 
-	cpu_info local_info[8];
+	cpu_info localInfo[8];
 	for (uint32 i = 0; i < count; ) {
 		uint32 j;
-		for (j = 0; i < count && j < B_COUNT_OF(local_info); i++, j++) {
-			local_info[j].active_time = cpu_get_active_time(firstCPU + i);
-			local_info[j].enabled = !gCPU[firstCPU + i].disabled;
-			local_info[j].current_frequency = cpu_frequency(firstCPU + i);
+		for (j = 0; i < count && j < B_COUNT_OF(localInfo); i++, j++) {
+			localInfo[j].active_time = cpu_get_active_time(firstCPU + i);
+			localInfo[j].enabled = !gCPU[firstCPU + i].disabled;
+			localInfo[j].current_frequency = cpu_frequency(firstCPU + i);
 		}
 
-		if (user_memcpy(info + (i - j), local_info, sizeof(cpu_info) * j) != B_OK)
+		if (user_memcpy(info + (i - j), localInfo, sizeof(cpu_info) * j) != B_OK)
 			return B_BAD_ADDRESS;
 	}
 
