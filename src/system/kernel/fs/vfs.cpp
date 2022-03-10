@@ -329,6 +329,7 @@ typedef BOpenHashTable<MountHash> MountTable;
 
 
 object_cache* sPathNameCache;
+object_cache* sVnodeCache;
 object_cache* sFileDescriptorCache;
 
 #define VNODE_HASH_TABLE_SIZE 1024
@@ -950,7 +951,7 @@ create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
 {
 	FUNCTION(("create_new_vnode_and_lock()\n"));
 
-	struct vnode* vnode = (struct vnode*)malloc(sizeof(struct vnode));
+	struct vnode* vnode = (struct vnode*)object_cache_alloc(sVnodeCache, 0);
 	if (vnode == NULL)
 		return B_NO_MEMORY;
 
@@ -1055,7 +1056,7 @@ free_vnode(struct vnode* vnode, bool reenter)
 
 	remove_vnode_from_mount_list(vnode, vnode->mount);
 
-	free(vnode);
+	object_cache_free(sVnodeCache, vnode, 0);
 }
 
 
@@ -5378,6 +5379,11 @@ vfs_init(kernel_args* args)
 		B_PATH_NAME_LENGTH + 1, 8, NULL, NULL, NULL);
 	if (sPathNameCache == NULL)
 		panic("vfs_init: error creating path name object_cache\n");
+
+	sVnodeCache = create_object_cache("vfs vnodes",
+		sizeof(struct vnode), 8, NULL, NULL, NULL);
+	if (sVnodeCache == NULL)
+		panic("vfs_init: error creating vnode object_cache\n");
 
 	sFileDescriptorCache = create_object_cache("vfs fds",
 		sizeof(file_descriptor), 8, NULL, NULL, NULL);
