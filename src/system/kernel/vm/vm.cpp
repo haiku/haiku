@@ -4725,7 +4725,8 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 
 		// check permissions
 		uint32 protection = get_area_page_protection(area, address);
-		if (isUser && (protection & B_USER_PROTECTION) == 0) {
+		if (isUser && (protection & B_USER_PROTECTION) == 0
+				&& (area->protection & B_KERNEL_AREA) != 0) {
 			dprintf("user access on kernel area 0x%" B_PRIx32 " at %p\n",
 				area->id, (void*)originalAddress);
 			TPF(PageFaultError(area->id,
