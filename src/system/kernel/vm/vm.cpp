@@ -6706,6 +6706,13 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 		if (area->page_protections == NULL) {
 			if (area->protection == protection)
 				continue;
+			if (offset == 0 && rangeSize == area->Size()) {
+				status_t status = vm_set_area_protection(area->address_space->ID(),
+					area->id, protection, false);
+				if (status != B_OK)
+					return status;
+				continue;
+			}
 
 			status_t status = allocate_area_page_protections(area);
 			if (status != B_OK)
