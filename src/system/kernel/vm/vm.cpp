@@ -4743,8 +4743,7 @@ vm_soft_fault(VMAddressSpace* addressSpace, addr_t originalAddress,
 			status = B_PERMISSION_DENIED;
 			break;
 		} else if (isExecute && (protection
-				& (B_EXECUTE_AREA
-					| (isUser ? 0 : B_KERNEL_EXECUTE_AREA))) == 0) {
+				& (B_EXECUTE_AREA | (isUser ? 0 : B_KERNEL_EXECUTE_AREA))) == 0) {
 			dprintf("instruction fetch attempted on execute-protected area 0x%"
 				B_PRIx32 " at %p\n", area->id, (void*)originalAddress);
 			TPF(PageFaultError(area->id,
