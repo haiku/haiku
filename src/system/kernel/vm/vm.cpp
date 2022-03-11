@@ -6905,11 +6905,7 @@ _user_get_memory_properties(team_id teamID, const void* address,
 	if (area == NULL)
 		return B_NO_MEMORY;
 
-
-	uint32 protection = area->protection;
-	if (area->page_protections != NULL)
-		protection = get_area_page_protection(area, (addr_t)address);
-
+	uint32 protection = get_area_page_protection(area, (addr_t)address);
 	uint32 wiring = area->wiring;
 
 	locker.Unlock();
