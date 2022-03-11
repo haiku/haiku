@@ -127,8 +127,6 @@ thread_id thread_create_thread(const ThreadCreationAttributes& attributes,
 
 thread_id spawn_kernel_thread_etc(thread_func, const char *name, int32 priority,
 	void *args, team_id team);
-status_t wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
-	status_t *_returnCode);
 
 status_t select_thread(int32 object, struct select_info *info, bool kernel);
 status_t deselect_thread(int32 object, struct select_info *info, bool kernel);
@@ -147,6 +145,8 @@ status_t _user_resume_thread(thread_id thread);
 status_t _user_rename_thread(thread_id thread, const char *name);
 thread_id _user_spawn_thread(struct thread_creation_attributes* attributes);
 status_t _user_wait_for_thread(thread_id id, status_t *_returnCode);
+status_t _user_wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
+	status_t *_returnCode);
 status_t _user_snooze_etc(bigtime_t timeout, int timebase, uint32 flags,
 	bigtime_t* _remainingTime);
 status_t _user_kill_thread(thread_id thread);

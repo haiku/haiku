@@ -341,6 +341,8 @@ extern status_t		rename_thread(thread_id thread, const char *newName);
 extern status_t		set_thread_priority(thread_id thread, int32 newPriority);
 extern void			exit_thread(status_t status);
 extern status_t		wait_for_thread(thread_id thread, status_t *returnValue);
+extern status_t		wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
+						status_t *_returnCode);
 extern status_t		on_exit_thread(void (*callback)(void *), void *data);
 
 extern thread_id 	find_thread(const char *name);

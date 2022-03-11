@@ -2841,6 +2841,7 @@ void wait_for_debugger() {}
 void wait_for_objects() {}
 void wait_for_objects_etc() {}
 void wait_for_thread() {}
+void wait_for_thread_etc() {}
 void waitid() {}
 void waitpid() {}
 void wcpcpy() {}
