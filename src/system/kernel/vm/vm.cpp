@@ -505,19 +505,17 @@ get_area_page_protection(VMArea* area, addr_t pageAddress)
 	else
 		protection >>= 4;
 
-	// If this is a kernel area we translate the user flags to kernel flags.
-	if (area->address_space == VMAddressSpace::Kernel()) {
-		uint32 kernelProtection = 0;
-		if ((protection & B_READ_AREA) != 0)
-			kernelProtection |= B_KERNEL_READ_AREA;
-		if ((protection & B_WRITE_AREA) != 0)
-			kernelProtection |= B_KERNEL_WRITE_AREA;
+	uint32 kernelProtection = 0;
+	if ((protection & B_READ_AREA) != 0)
+		kernelProtection |= B_KERNEL_READ_AREA;
+	if ((protection & B_WRITE_AREA) != 0)
+		kernelProtection |= B_KERNEL_WRITE_AREA;
 
+	// If this is a kernel area we return only the kernel flags.
+	if (area->address_space == VMAddressSpace::Kernel())
 		return kernelProtection;
-	}
 
-	return protection | B_KERNEL_READ_AREA
-		| (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0);
+	return protection | kernelProtection;
 }
 
 
