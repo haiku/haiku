@@ -36,7 +36,7 @@ Changes pending:	RepositoriesView	Status view text	Bekleyen değişiklikler:
 Remove	RepositoriesView	Button label	Kaldır
 Remove these repositories?	RepositoriesView	Removal alert confirmation message	Bu depolar kaldırılsın mı?
 Keep trying	TaskTimer	Button label	Denemeyi sürdür
-Cancel	Constants	Button label	İptal
+Cancel	Constants	Button label	Vazgeç
 Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Her depo için yalnızca bir URL etkinleştirilebilir. Lütfen seçimlerinizi değiştirin.
 Stop and quit	RepositoriesWindow	Button label	Durdur ve çık
 Disable all	RepositoriesView	Button label	Tümünü devre dışı bırak

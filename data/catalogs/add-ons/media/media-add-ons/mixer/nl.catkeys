@@ -1,11 +1,9 @@
-1	dutch; flemish	x-vnd.Haiku-mixer.media_addon	3511569803
+1	dutch; flemish	x-vnd.Haiku-mixer.media_addon	4284602042
 Input mapping	AudioMixer		Invoermapping
 High quality (linear interpolation)	AudioMixer		Hoge kwaliteit (lineaire interpolatie)
 To output	AudioMixer		Uitvoer
-Refuse output format changes	AudioMixer		Weiger wijzigingen van het uitvoerformaat
 Gain	AudioMixer		Versterking
 To master	AudioMixer		Naar master
-Refuse input format changes	AudioMixer		Weiger veranderingen in invoerformaat
 not connected	AudioMixer		niet verbonden
 Master output	AudioMixer		Masteruitvoer
 dB	AudioMixer		dB

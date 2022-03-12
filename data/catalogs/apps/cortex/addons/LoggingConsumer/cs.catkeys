@@ -1,5 +1,7 @@
-1	czech	application/x-vnd.Be.LoggingConsumerApp	3653006715
+1	czech	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		AplikaceŘídícíMediálníUzly: nelze získat informace uzlu (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Priorita
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		AplikaceŘídícíMediálníUzly: nelze najít uzel (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Latence
 Logged input	CortexAddOnsLoggingConsumer		Zapisovaný vstup
 CPU spin percentage	CortexAddOnsLoggingConsumer		Podíl roztočení CPU
@@ -17,3 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Ovládací prvky
 controls	CortexAddOnsCommonMediaNodeControlApp		ovládací prvky
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Připojit
 percent	CortexAddOnsLoggingConsumer		procent
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		AplikaceŘídícíMediálníUzly: žádné parametry uzlu (%ld):\n%s\n

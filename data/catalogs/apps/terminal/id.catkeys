@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Terminal	2277843400
+1	indonesian	x-vnd.Haiku-Terminal	307289061
 Close other tabs	Terminal TermWindow		Tutup tab yang lain
 Insert path	Terminal TermView		Sisipkan jalur
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal tidak dapat memulai shell. Maaf.
@@ -104,7 +104,6 @@ No search string was entered.	Terminal TermWindow		Tidak ada kata pencarian yang
 Text under cursor	Terminal AppearancePrefView		Teks di bawah kursor
 Move here	Terminal TermView		Pindah ke sini
 Abort	Terminal Shell		Gugurkan
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDirektori kerja saat ini dari proses aktif.\n\t\t\tSecara opsional, jumlah maksimum komponen jalur dapat\n\t\t\tditentukan.misal. '%2d' paling banyak dua komponen.\n\t%i\t-\tIndeks tab.\n\t%e\t-\tPengkodean tab saat ini. Tidak diperlihatkan untuk UTF-8.\n\t%p\t-\tNama proses aktif.\n\t%%\t-\tKarakter '%'.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Proses berikut masih berjalan:\n\n\t%1\n\nJika Anda menutup Terminal, proses akan dibunuh.
 Set window title	Terminal TermWindow		Setel judul jendela
 Increase	Terminal TermWindow		Meningkat

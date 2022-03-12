@@ -1,4 +1,4 @@
-1	hungarian	application/x-vnd.Cortex.support	1625162530
+1	hungarian	application/x-vnd.Cortex.support	2097798758
 Header has flags	MediaString		A fejlécnek vannak zászlói
 32 bit HLS	MediaString		32 bites HLS
 Recording	MediaString		Felvétel
@@ -31,6 +31,7 @@ Back-center	MediaString		Hátsó-közép
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bites integer}}
 Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(ismeretlen videó formátum)
+Video data between line %lu and %lu	MediaString		Videó adat %lu és %lu sor között
 AVI format family	MediaString		AVI formátum-család
 Homogenous buffers	MediaString		Homogén pufferek
 Interlaced 	MediaString		Átlapolt

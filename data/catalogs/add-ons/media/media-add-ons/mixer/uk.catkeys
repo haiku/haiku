@@ -1,11 +1,9 @@
-1	ukrainian	x-vnd.Haiku-mixer.media_addon	3797408169
+1	ukrainian	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Перепризначення входу
 High quality (linear interpolation)	AudioMixer		Висока якість (лінійна інтерполяція)
 To output	AudioMixer		До виходу
-Refuse output format changes	AudioMixer		Відхилити зміни вихідного формату
 Gain	AudioMixer		Підсилення
 To master	AudioMixer		До головного
-Refuse input format changes	AudioMixer		Відхилити зміни вхідного формату
 not connected	AudioMixer		не приєднано
 Master output	AudioMixer		Головний вихід
 dB	AudioMixer		дБ

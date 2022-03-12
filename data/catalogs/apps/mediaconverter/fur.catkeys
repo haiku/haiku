@@ -1,8 +1,9 @@
-1	friulian	x-vnd.Haiku-MediaConverter	1322040280
+1	friulian	x-vnd.Haiku-MediaConverter	2816184527
 Input file not recognized as Audio or Video	MediaConverter		File di input no ricognossût come Audio o Video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Cualitât video: %3d%%
 Source files	MediaConverter		File sorzints
+Error writing video frame %lld	MediaConverter		Erôr tal scrivi il fotogram video %lld
 Error converting '%filename'	MediaConverter		Erôr tal convertî '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		La cartele selezionade no je stade cjatade. Si stabilìs chê predefinide: /boot/home
 Conversion completed	MediaConverter		Conversion completade
@@ -47,12 +48,16 @@ Error	MediaConverter		Erôr
 File details	MediaConverter		Detais dai file
 No audio	Audio codecs list		Nissun audio
 Drop media files onto this window	MediaConverter		Strissine i file multimediâi su chest barcon
+Writing video track: %ld%% complete	MediaConverter		Scriture de linie video: %ld%% completade
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# fotogram/campion} other{# fotograms/campions}}
+Error read audio frame %lld	MediaConverter		Erôr tal lei il pacut audio %lld
 Quit	Menu		Jes
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# byte}}
 Duration:	MediaConverter-FileInfo		Durade:
 MediaConverter	System name		ConvertidôrMultimediâl
 Error launching: %strError%	MediaConverter		Erôr tal inviâ: %strError%
+Error writing audio frame %lld	MediaConverter		Erôr tal scrivi il pacut audio %lld
+Writing audio track: %ld%% complete	MediaConverter		Scriture de linie audio: %ld%% completade
 File format:	MediaConverter		Formât file:
 File	Menu		File
 Video quality not supported	MediaConverter		Cualitât video no supuartade
@@ -64,5 +69,6 @@ Continue	MediaConverter		Continue
 Convert	MediaConverter		Convertìs
 Audio quality not supported	MediaConverter		Cualitât audio no supuartade
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Erôr tal scrivi sul percors: %strPath%. Si stabilìs ae posizion predefinide: /boot/home
+Error read video frame %lld	MediaConverter		Erôr tal lei il fotogram video %lld
 Preview	MediaConverter		Anteprime
 Start [ms]: 	MediaConverter		Inizi [ms]: 

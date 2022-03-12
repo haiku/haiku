@@ -1,11 +1,9 @@
-1	japanese	x-vnd.Haiku-mixer.media_addon	3797408169
+1	japanese	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		入力再マッピング
 High quality (linear interpolation)	AudioMixer		高品質 (線形補間)
 To output	AudioMixer		出力へ
-Refuse output format changes	AudioMixer		出力フォーマットの変更を拒否
 Gain	AudioMixer		ゲイン
 To master	AudioMixer		マスターへ
-Refuse input format changes	AudioMixer		入力フォーマットの変更を拒否
 not connected	AudioMixer		接続されていません
 Master output	AudioMixer		マスター出力
 dB	AudioMixer		dB

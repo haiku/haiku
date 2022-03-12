@@ -1,11 +1,9 @@
-1	german	x-vnd.Haiku-mixer.media_addon	3797408169
+1	german	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Eingangs-Zuordnung
 High quality (linear interpolation)	AudioMixer		Hohe Qualität (lineare Interpolation)
 To output	AudioMixer		Zum Ausgang
-Refuse output format changes	AudioMixer		Änderungen des Ausgabeformats verhindern
 Gain	AudioMixer		Verstärkung
 To master	AudioMixer		Zum Master
-Refuse input format changes	AudioMixer		Änderungen des Eingangsformats verhindern
 not connected	AudioMixer		nicht verbunden
 Master output	AudioMixer		Master-Ausgang
 dB	AudioMixer		dB
@@ -13,7 +11,7 @@ Gain controls	AudioMixer		Lautstärke
 Low quality (drop/repeat samples)	AudioMixer		Niedrige Qualität (Samples weglassen/wiederholen)
 Output channel sources	AudioMixer		Ausgangskanalquellen
 Allow input channel remapping	AudioMixer		Neuzuordnung der Eingangskanäle erlauben
-Display balance control for stereo connections	AudioMixer		Balance-Regler für Stereo-Anschlüsse anzeigen 
+Display balance control for stereo connections	AudioMixer		Balance-Regler für Stereo-Verbindungen anzeigen 
 Setup	AudioMixer		Einstellungen
 Physical input channels	AudioMixer		Physische Eingangskanäle
 Input channel destinations	AudioMixer		Eingangskanalziele

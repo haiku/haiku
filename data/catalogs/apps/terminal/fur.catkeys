@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Terminal	4032760800
+1	friulian	x-vnd.Haiku-Terminal	247549485
 ANSI cyan color	Terminal AppearancePrefView		Colôr ciano ANSI
 Close other tabs	Terminal TermWindow		Siere altris schedis
 Insert path	Terminal TermView		Inserìs percors
@@ -20,6 +20,7 @@ Edit tab title…	Terminal TermWindow		Modifiche titul schede…
 Settings	Terminal TermWindow		Impostazions
 Print	Terminal TermWindow		Stampe
 %app% settings	Terminal PrefWindow	window title	Impostazions %app%
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tLa cartele di lavôr atuâl dal procès atîf.\n\t\t\tIn mût opzionâl il numar massim di components di percors che si pues\n\t\t\tspecificâ. P.e. '%2d' par un massim di doi components.\n\t%i\t-\tThe indiç de schede.\n\t%e\t-\tLa codifiche de schede atuâl. No mostrât par UTF-8.\n\t%p\t-\tIl non dal procès atîf.
 ANSI black color	Terminal AppearancePrefView		Colôr neri ANSI
 Use default	Terminal SetTitleWindow		Dopre predefinît
 Close tab	Terminal TermWindow		Siere schede
@@ -122,7 +123,6 @@ No search string was entered.	Terminal TermWindow		No je stade inseride nissune 
 Text under cursor	Terminal AppearancePrefView		Test sot dal cursôr
 Move here	Terminal TermView		Sposte achì
 Abort	Terminal Shell		Interomp
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLa cartele di lavôr atuâl dal procès atîf.\n\t\t\tIn mût opzionâl il massim numar di components di percors al pues jessi\n\t\t\tspecificât. P.e. '%2d' par massim doi components.\n\t%i\t-\tL'indicadôr de schede.\n\t%e\t-\tLa codifiche de schede atuâl. No mostrât se UTF-8.\n\t%p\t-\tIl non dal procès atîf.\n\t%%\t-\tIl caratar '%'.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Chescj procès a son ancjemò in esecuzion:\n\n\t%1\n\nSe si siere il terminâl, i procès a vignaran copâts.
 Set window title	Terminal TermWindow		Stabilìs titul barcon
 Increase	Terminal TermWindow		Aumente

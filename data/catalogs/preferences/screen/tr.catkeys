@@ -19,7 +19,7 @@ Use laptop panel:	Screen		Dizüstü panelini kullan:
 Could not write VESA mode settings file:\n\t	Screen		VESA kipi ayar dosyasına yazılamıyor:\n\t
 Display info	Screen		Ekran bilgisi
 Settings will revert in %seconds.	Screen		Ayarlar %seconds içinde eski haline dönecektir.
-Cancel	Screen		İptal
+Cancel	Screen		Vazgeç
 Other…	Screen		Diğer…
 Screen	Screen		Ekran
 Colors:	Screen		Renkler:

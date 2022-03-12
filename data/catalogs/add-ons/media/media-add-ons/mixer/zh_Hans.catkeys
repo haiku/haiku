@@ -1,10 +1,8 @@
-1	english	x-vnd.Haiku-mixer.media_addon	2690542047
+1	english	x-vnd.Haiku-mixer.media_addon	3463574286
 Input mapping	AudioMixer		输入映射
 To output	AudioMixer		输出
-Refuse output format changes	AudioMixer		禁止改变输出格式
 Gain	AudioMixer		增益
 To master	AudioMixer		到主音量
-Refuse input format changes	AudioMixer		禁止输入格式改变
 not connected	AudioMixer		未连接
 Master output	AudioMixer		主音量输出
 dB	AudioMixer		分贝

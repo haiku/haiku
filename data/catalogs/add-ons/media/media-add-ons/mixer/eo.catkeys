@@ -1,10 +1,8 @@
-1	esperanto	x-vnd.Haiku-mixer.media_addon	2690542047
+1	esperanto	x-vnd.Haiku-mixer.media_addon	3463574286
 Input mapping	AudioMixer		Eniga mapado
 To output	AudioMixer		Al enigo
-Refuse output format changes	AudioMixer		Malpermesi eligajn formŝangojn
 Gain	AudioMixer		Pliigo
 To master	AudioMixer		Al majstro
-Refuse input format changes	AudioMixer		Rifuzi enigformajn ŝanĝojn
 not connected	AudioMixer		nekonektanta
 Master output	AudioMixer		Majstra eligo
 dB	AudioMixer		dB

@@ -40,7 +40,7 @@ Low	MediaConverter		Düşük
 Error loading files	MediaConverter		Dosyalar yüklenirken hata
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, other{# bit}}
 End   [ms]: 	MediaConverter		Son [ms]: 
-Cancel	MediaConverter		İptal
+Cancel	MediaConverter		Vazgeç
 OK	MediaConverter-FileInfo		Tamam
 Video encoding:	MediaConverter		Video kodlaması:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Dosya bilgisi okunurken bir hata oluştu.\n\nError: 

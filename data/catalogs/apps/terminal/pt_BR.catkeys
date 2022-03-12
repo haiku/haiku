@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	3771520812
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	1800966473
 Close other tabs	Terminal TermWindow		Fechar outras guias
 Insert path	Terminal TermView		Inserir caminho
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal não pôde iniciar o shell. Desculpe.
@@ -106,7 +106,6 @@ No search string was entered.	Terminal TermWindow		Não foi introduzida nenhuma 
 Text under cursor	Terminal AppearancePrefView		Texto sob cursor
 Move here	Terminal TermView		Mover aqui
 Abort	Terminal Shell		Cancelar
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tO diretório atual de trabalho do processo ativo.\n\t\t\tOpcionalmente, o número máximo de componentes do caminho\n\t\t\tpode ser especificado. Ex.: '%2d' para até dois componentes.\n\t%i\t-\tO índice da aba.\n\t%e\t-\tA codificação da aba atual. Não mostrada para UTF-8.\n\t%p\t-\tO nome do processo ativo.\n\t%%\t-\tO caractere '%'.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Os seguintes processos ainda estão executando:\n\n\t %1\n\nSe fechar o Terminal, os processos serão mortos.
 Set window title	Terminal TermWindow		Definir título da janela
 Increase	Terminal TermWindow		Aumentar

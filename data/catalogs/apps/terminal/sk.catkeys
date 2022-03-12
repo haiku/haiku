@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Terminal	722771482
+1	slovak	x-vnd.Haiku-Terminal	3047184439
 Close other tabs	Terminal TermWindow		Zatvoriť ostatné karty
 Insert path	Terminal TermView		Vložiť cestu
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminálu sa nepodarilo spustiť shell. Ľutujeme.
@@ -103,7 +103,6 @@ No search string was entered.	Terminal TermWindow		Nebol zadaný vyhľadávací 
 Text under cursor	Terminal AppearancePrefView		Text pod kurzorom
 Move here	Terminal TermView		Presunúť sem
 Abort	Terminal Shell		Zrušiť
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktuálny adresár aktívneho procesu.\n\t\t\tNepovinný. Je možné zadať maximálny počet zložiek\n\t\t\tcesty. Napr. „%2d“ pre javiac dve zložky.\n\t%i\t-\tIndex karty.\n\t%e\t-\tKódovanie aktuálnej karty. Nezobrazuje sa v prípade UTF-8.\n\t%p\t-\tNázov aktívneho procesu.\n\t%%\t-\tZnak „%“.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Nasledovné procesy ešte stále bežia:\n\n\t%1\n\nAk zatvoríte Terminál, procesy budú zabité.
 Set window title	Terminal TermWindow		Nastaviť titulok okna
 Increase	Terminal TermWindow		Zväčšiť

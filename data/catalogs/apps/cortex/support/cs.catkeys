@@ -1,4 +1,4 @@
-1	czech	application/x-vnd.Cortex.support	1625162530
+1	czech	application/x-vnd.Cortex.support	2097798758
 Header has flags	MediaString		Hlavička má příznaky
 32 bit HLS	MediaString		32 bitů HLS
 Recording	MediaString		Nahrávám
@@ -31,6 +31,7 @@ Back-center	MediaString		Zadní-prostřední
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bitové celé číslo}}
 Ambisonic WXYZ	MediaString		Ambisonické WXYZ
 (unknown video format)	MediaString		(neznámý video formát)
+Video data between line %lu and %lu	MediaString		Video data mezi řádkem %lu a %lu
 AVI format family	MediaString		Skupina formátů AVI
 Homogenous buffers	MediaString		Homogenní zásobník
 Interlaced 	MediaString		Prokládaný 

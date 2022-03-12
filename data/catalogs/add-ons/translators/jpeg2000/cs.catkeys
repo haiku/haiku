@@ -1,14 +1,14 @@
 1	czech	x-vnd.Haiku-JPEG2000Translator	3265915643
-High	JPEG2000Translator		Vysoké
-Low	JPEG2000Translator		Nízké
-Output quality	JPEG2000Translator		Kvalita výstupu
+High	JPEG2000Translator		Vysoká
+Low	JPEG2000Translator		Nízká
+Output quality	JPEG2000Translator		Výstupní kvalita
 JPEG2000 images	JPEG2000Translator		obrázky JPEG2000
-About	JPEG2000Translator		O programu
-Write black-and-white images as RGB24	JPEG2000Translator		Zapsat černobílé obrazy jako RGB24
+About	JPEG2000Translator		O
+Write black-and-white images as RGB24	JPEG2000Translator		Zapsat černobílé obrázky jako RGB24
 Version %d.%d.%d	JPEG2000Translator		Verze %d.%d.%d
-Read	JPEG2000Translator		Načíst
-Read greyscale images as RGB32	JPEG2000Translator		Načíst obrázky ve stupních šedi jako RGB32
-©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nkodek ImageMagick's jp2 byl použit jako \"tutorial\".\n\thttp://www.imagemagick.org/\n
+Read	JPEG2000Translator		Čtení
+Read greyscale images as RGB32	JPEG2000Translator		Načíst černobílé obrázky jako RGB32
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nZaloženo na knihovně JasPer:\n© 1999-2000, Image Power, Inc. a\nuniverzita Britiská Columbie, Kanada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nKodek jp2 z projektu ImageMagick byl použit jako \"tutoriál\".\n\thttp://www.imagemagick.org/\n
 Write	JPEG2000Translator		Zápis
-Output only codestream (.jpc)	JPEG2000Translator		Vytvořit pouze codestream (.jpc)
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Formát Be Bitmap (Převaděč JPEG2000)
+Output only codestream (.jpc)	JPEG2000Translator		Zapsat pouze codestream (.jpc)
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Formát Be Bitmap (JPEG2000Převaděč)

@@ -1,7 +1,7 @@
 1	turkish	x-vnd.Haiku-FirstBootPrompt	189132197
 Japanese	KeymapNames		Japonca
 US	KeymapNames		ABD
-Cancel	BootPromptWindow		İptal
+Cancel	BootPromptWindow		Vazgeç
 Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Beyaz Rusça
 Brazilian	KeymapNames		Brezilya
@@ -48,7 +48,7 @@ Spanish	KeymapNames		İspanyolca
 Try it out	BootPromptWindow		Dene
 Ukrainian (Mac)	KeymapNames		Ukraynaca (Mac)
 Estonian	KeymapNames		Estonca
-Install Haiku	BootPromptWindow		Haiku'yu yükle
+Install Haiku	BootPromptWindow		Haiku'yu kur
 French (Bépo)	KeymapNames		Fransızca (Bépo)
 Restart system	BootPromptWindow		Sistemi yeniden başlat
 Serbian (Latin)	KeymapNames		Sırpça (Latin)
@@ -73,16 +73,16 @@ Canadian-French	KeymapNames		Kanada Fransızcası
 Welcome to Haiku!	BootPromptWindow		Haiku'ya hoş geldiniz!
 Russian	KeymapNames		Rusça
 Hungarian	KeymapNames		Macarca
-Install	BootPromptWindow		Yükle
+Install	BootPromptWindow		Kur
 Irish	KeymapNames		İrlandaca
 Romanian	KeymapNames		Romence
 Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Bu pencereyi kapatmak istediğinizden emin misiniz? Sisteminiz yeniden başlatılacaktır.
-Thank you for trying out Haiku! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later when running Haiku.\n\nDo you wish to install Haiku now, or try it out first?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Haiku'yu denediğiniz için teşekkür ederiz. Umarız hoşunuza gider.\n\nLütfen kullanmak istediğiniz dili ve klavye dizilimini seçin. Her iki ayar da daha sonra Haiku içinden değiştirilebilir.\n\nHaiku'yu yüklemek mi yoksa denemek mi istersiniz?
+Thank you for trying out Haiku! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later when running Haiku.\n\nDo you wish to install Haiku now, or try it out first?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Haiku'yu denediğiniz için teşekkür ederiz. Umarız hoşunuza gider.\n\nLütfen kullanmak istediğiniz dili ve klavye dizilimini seçin. Her iki ayar da daha sonra Haiku içinden değiştirilebilir.\n\nHaiku'yu kurmak mı yoksa denemek mi istersiniz?
 Czech (Mac)	KeymapNames		Çekçe (Mac)
 Macedonian	KeymapNames		Makedonca
 Brazilian (ABNT2)	KeymapNames		Brezilya (ABNT2)
 Albanian	KeymapNames		Arnavutça
 Dutch	KeymapNames		Hollandaca
-Thank you for trying out our operating system! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later.\n\nDo you wish to install the operating system now, or try it out first?	BootPromptWindow	This notice appears when the build of Haiku that's currently being used is unofficial, as in, not distributed by Haiku itself.For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	İşletim sistemimizi denediğiniz için teşekkür ederiz. Umarız hoşunuza gider.\n\nLütfen kullanmak istediğiniz dili ve klavye dizilimini seçin. Her iki ayar da daha sonra değiştirilebilir.\n\nİşletim sistemini yüklemek mi yoksa denemek mi istersiniz?
+Thank you for trying out our operating system! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later.\n\nDo you wish to install the operating system now, or try it out first?	BootPromptWindow	This notice appears when the build of Haiku that's currently being used is unofficial, as in, not distributed by Haiku itself.For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	İşletim sistemimizi denediğiniz için teşekkür ederiz. Umarız hoşunuza gider.\n\nLütfen kullanmak istediğiniz dili ve klavye dizilimini seçin. Her iki ayar da daha sonra değiştirilebilir.\n\nİşletim sistemini kurmak mı yoksa denemek mi istersiniz?
 Friulian	KeymapNames		Furlanca
 Icelandic	KeymapNames		İzlandaca

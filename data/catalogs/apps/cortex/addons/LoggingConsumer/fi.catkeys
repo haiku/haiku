@@ -1,5 +1,7 @@
-1	finnish	application/x-vnd.Be.LoggingConsumerApp	3653006715
+1	finnish	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: solmutietojen hakeminen epäonnistui (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Prioriteetti
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: solmun löytäminen epäonnistui (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Viive
 Logged input	CortexAddOnsLoggingConsumer		Kirjautumissyöte
 CPU spin percentage	CortexAddOnsLoggingConsumer		Prosessorituulettimen pyörimisprosentti
@@ -17,3 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Ohjaimet
 controls	CortexAddOnsCommonMediaNodeControlApp		ohjaimet
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Yhdistä
 percent	CortexAddOnsLoggingConsumer		prosentti
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: solmulle ei ole parametreja (%ld):\n%s\n

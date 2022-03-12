@@ -1,4 +1,4 @@
-1	swedish	application/x-vnd.Cortex.support	1625162530
+1	swedish	application/x-vnd.Cortex.support	2097798758
 Header has flags	MediaString		Rubrik har flaggor
 32 bit HLS	MediaString		32-bitars HLS
 Recording	MediaString		Inspelning
@@ -31,6 +31,7 @@ Back-center	MediaString		Baksida mitten
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bit heltal}}
 Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(okänt videoformat)
+Video data between line %lu and %lu	MediaString		Videodata mellan rad %lu och %lu
 AVI format family	MediaString		AVI-formatfamilj
 Homogenous buffers	MediaString		Homogena buffertar
 Interlaced 	MediaString		Interlaced 

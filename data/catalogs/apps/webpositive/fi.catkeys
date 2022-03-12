@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	250728390
+1	finnish	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Vaaditaan todentamista
 Previous	WebPositive Window		Edellinen
 (Finish: %date)	Download Window		(Päättyi: %date)
@@ -45,6 +45,7 @@ New tabs:	Settings Window		Uudet välilehdet:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url epäonnistui
 Open downloads folder	Download Window		Avaa lataukset-kansio
 Proxy server	Settings Window		Välityspalvelin
+Darn!	WebPositive		Perhana!
 Decrease size	WebPositive Window		Pienennä kokoa
 Default fixed font size:	Settings Window		Oletuskoko sovitetulle kirjasimelle:
 Sans serif font:	Settings Window		Sans serif-kirjasin:
@@ -56,6 +57,7 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Hakutermi
 Reload	WebPositive Window		Lataa uudelleen
 Expiration	Cookie Manager		Erääntymisaika
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Prosessorisi on liian vanha ja ei tue SSE2-laajennuksia, mitä ilman WebPositive-sovellus ei toimi. Suosittelemme sen sijaan asentamaan NetSurf-sovelluksen.
 Download finished	Download Window		Lataus päättyi
 Cookie manager	WebPositive Window		Evästehallinta
 OK	Authentication Panel		Valmis
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Käynnistä:
 Confirmation	WebPositive Window		Vahvistus
 Session cookie	Cookie Manager		Istuntoeväste
+No SSE2 support	WebPositive		Ei SSE2-tukea
 Open all	WebPositive Window		Avaa kaikki
 Cut	WebPositive Window		Leikkaa
 Downloads	Download Window		Lataukset

@@ -1,10 +1,8 @@
-1	spanish; castilian	x-vnd.Haiku-mixer.media_addon	2690542047
+1	spanish; castilian	x-vnd.Haiku-mixer.media_addon	3463574286
 Input mapping	AudioMixer		Asignación de entrada
 To output	AudioMixer		A la salida
-Refuse output format changes	AudioMixer		Rechazar los cambios de formato de salida
 Gain	AudioMixer		Ganancia
 To master	AudioMixer		A maestro
-Refuse input format changes	AudioMixer		Rechazar los cambios de formato de entrada
 not connected	AudioMixer		no conectado
 Master output	AudioMixer		Salida maestra
 dB	AudioMixer		dB

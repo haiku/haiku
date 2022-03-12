@@ -1,11 +1,9 @@
-1	turkish	x-vnd.Haiku-mixer.media_addon	3797408169
+1	turkish	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Girdi eşleme
 High quality (linear interpolation)	AudioMixer		Yüksek kalite (doğrusal aradeğerleme)
 To output	AudioMixer		Çıktıya
-Refuse output format changes	AudioMixer		Çıktı biçimi değişimlerini reddet
 Gain	AudioMixer		Kazanım
 To master	AudioMixer		Ana denetleyiciye
-Refuse input format changes	AudioMixer		Girdi biçimi değişikliklerini reddet
 not connected	AudioMixer		bağlı değil
 Master output	AudioMixer		Ana çıktı
 dB	AudioMixer		dB

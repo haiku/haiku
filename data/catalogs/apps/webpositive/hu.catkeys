@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	3767274013
+1	hungarian	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Azonosítás szükséges
 Previous	WebPositive Window		Előző
 (Finish: %date)	Download Window		(Befejezés: %date)
@@ -45,6 +45,7 @@ New tabs:	Settings Window		Új fülek:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url betöltése meghiúsult
 Open downloads folder	Download Window		Letöltések megnyitása
 Proxy server	Settings Window		Proxy kiszolgáló
+Darn!	WebPositive		Fenébe!
 Decrease size	WebPositive Window		Méret csökkentése
 Default fixed font size:	Settings Window		Alapértelmezett betűméret:
 Sans serif font:	Settings Window		Sans serif betű:

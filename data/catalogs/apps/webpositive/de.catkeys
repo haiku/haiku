@@ -96,7 +96,7 @@ OK	Download Window		OK
 Proxy username:	Settings Window		Proxy-Nutzername:
 Manage bookmarks	WebPositive Window		Lesezeichen verwalten
 /s)	Download Window	...as in 'per second'	/s)
-Restart	Download Window		Neustart
+Restart	Download Window		Neustarten
 Serif font:	Settings Window		Serifenschrift:
 Apply	Settings Window		Anwenden
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Der Lesezeichen-Ordner kann nicht angezeigt werden.\n\nFehler: %error

@@ -1,10 +1,8 @@
-1	belarusian	x-vnd.Haiku-mixer.media_addon	2690542047
+1	belarusian	x-vnd.Haiku-mixer.media_addon	3463574286
 Input mapping	AudioMixer		Перапрызначенне ўваходаў
 To output	AudioMixer		Выводзіць
-Refuse output format changes	AudioMixer		Адмовіць змяняць выхадны фармат
 Gain	AudioMixer		Узмацненне
 To master	AudioMixer		Да асноўнага
-Refuse input format changes	AudioMixer		Адмова змен ўваходнага фармату
 not connected	AudioMixer		ня злучана
 Master output	AudioMixer		Асноўны выхад
 dB	AudioMixer		дБ

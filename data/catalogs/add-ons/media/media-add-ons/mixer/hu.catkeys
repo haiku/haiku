@@ -1,21 +1,24 @@
-1	hungarian	x-vnd.Haiku-mixer.media_addon	2690542047
+1	hungarian	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Bemenet leképezése
+High quality (linear interpolation)	AudioMixer		‎Kiváló minőség (lineáris interpoláció)‎
 To output	AudioMixer		Kimenetre
-Refuse output format changes	AudioMixer		Kimeneti formátum változtatásainak visszautasítása
 Gain	AudioMixer		Erősítés
 To master	AudioMixer		Az elsődlegesre
-Refuse input format changes	AudioMixer		Bemeneti formátum változtatásainak visszautasítása
 not connected	AudioMixer		nincs csatlakoztatva
 Master output	AudioMixer		Elsődleges kimenet
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Erősítő vezérlői
+Low quality (drop/repeat samples)	AudioMixer		Alacsony minőség (eldob/ismétel mintákat)
 Output channel sources	AudioMixer		Kimeneti csatorna forrásai
 Allow input channel remapping	AudioMixer		Bemeneti csatorna újraképezésének az engedélyezése
 Display balance control for stereo connections	AudioMixer		Sztereó kapcsolatok egyensúlycsúszkáinak megjelenítése
 Setup	AudioMixer		Beállítás
 Physical input channels	AudioMixer		Fizikai bemeneti csatornák
 Input channel destinations	AudioMixer		Bemeneti csatornák céljai
+Resampling algorithm:	AudioMixer		Újraszámítási algoritmus:
 Mute	AudioMixer		Némítás
 Output mapping	AudioMixer		Kimenet leképezése
 Virtual output channels	AudioMixer		Virtuális kimeneti csatornák
 Allow output channel remapping	AudioMixer		Kimeneti csatorna újraképezésének az engedélyezése
+Input gain controls represent:	AudioMixer		‎A bemeneti erősítés vezérlői a következőket képviselik:‎
+Attenuate mixer output by 3 dB	AudioMixer		‎A keverő kimenetének csillapítása 3 dB-lel‎

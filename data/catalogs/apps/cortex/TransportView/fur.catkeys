@@ -1,11 +1,15 @@
-1	friulian	application/x-vnd.Cortex.TransportView	2185811074
+1	friulian	application/x-vnd.Cortex.TransportView	1402918430
+Roll	TransportView		Disrodole
 (none)	TransportView		(nissun)
 {0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# grop} other{# grops}}
+Start	TransportView		Scomence
 No errors.	TransportView		Nissun erôr.
 to	TransportView		a
 Offline	TransportView		Fûr rêt
 (???)	TransportView		(???)
+Stop	TransportView		Ferme
 (no group)	TransportView		(nissun grup)
+Drop data	TransportView		Mole dâts
 To:	TransportView		A:
 Recording	TransportView		Regjistrazion
 Increase latency	TransportView		Aumente la latence
@@ -14,4 +18,5 @@ DAC time source	TransportView		Sorzint temporâl DAC
 Decrease precision	TransportView		Diminuìs la precision
 System clock	TransportView		Orloi di sisteme
 From:	TransportView		Di:
+Roll from	TransportView		Disrodole di
 Run mode:	TransportView		Modalitât esecuzion:

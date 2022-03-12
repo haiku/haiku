@@ -1,4 +1,4 @@
-1	friulian	application/x-vnd.Cortex.MediaRoutingView	2377053421
+1	friulian	application/x-vnd.Cortex.MediaRoutingView	3442339205
 Lock group	MediaNodePanel		Bloche il grup
 %refname% (no file)	MediaNodePanel		%refname% (nissun file)
 Video output	MediaRoutingView		Jessude video
@@ -10,6 +10,7 @@ Audio input	MediaRoutingView		Jentrade audio
 Run mode	MediaNodePanel		Modalitât di esecuzion
 Could not load '%filename%'	MediaRoutingView		Impussibil cjariâ '%filename%'
 Stop time source	MediaNodePanel		Ferme la sorzint temporâl
+Be Audio Mixer	MediaRoutingView		Mixer Audio Be
 Video input	MediaRoutingView		Jentrade video
 Release	MediaNodePanel		Mole
 Disconnect	MediaRoutingView		Disconet

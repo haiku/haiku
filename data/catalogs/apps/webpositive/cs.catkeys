@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-WebPositive	250728390
+1	czech	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Ověření vyžadováno
 Previous	WebPositive Window		Předchozí
 (Finish: %date)	Download Window		(Dokončeno: %date)
@@ -45,6 +45,7 @@ New tabs:	Settings Window		Nové karty:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url se nepodařilo načíst
 Open downloads folder	Download Window		Otevřít složku stahování
 Proxy server	Settings Window		Proxy server
+Darn!	WebPositive		Zpropadeně!
 Decrease size	WebPositive Window		Zmenšit velikost
 Default fixed font size:	Settings Window		Výchozí velikost proporcionálního písma:
 Sans serif font:	Settings Window		Bezpatkové písmo:
@@ -56,6 +57,7 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Hledat výraz
 Reload	WebPositive Window		Obnovit
 Expiration	Cookie Manager		Expirace
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Váš procesor je moc starý a nepodporuje rozšíření SSE2, bez kterého WebPositive nemaká. Doporučujeme raději nainstalovat NetSurf.
 Download finished	Download Window		Stahování dokončeno
 Cookie manager	WebPositive Window		Správce sušenek
 OK	Authentication Panel		OK
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Spouštění:
 Confirmation	WebPositive Window		Potvrzení
 Session cookie	Cookie Manager		Sušenky relace
+No SSE2 support	WebPositive		Žádná podpora SSE2
 Open all	WebPositive Window		Otevřít všechny
 Cut	WebPositive Window		Vyjmout
 Downloads	Download Window		Stažené

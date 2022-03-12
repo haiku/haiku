@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-WebPositive	250728390
+1	friulian	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
 (Finish: %date)	Download Window		(Terminât: %date)
@@ -45,6 +45,7 @@ New tabs:	Settings Window		Gnovis schedis:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url falît
 Open downloads folder	Download Window		Vierç cartele dai file discjariâts
 Proxy server	Settings Window		Servidôr proxy
+Darn!	WebPositive		Maledizion!
 Decrease size	WebPositive Window		Diminuìs dimension
 Default fixed font size:	Settings Window		Dimension predefinide dal caratar a spaziadure fisse:
 Sans serif font:	Settings Window		Caratar Sans serif:
@@ -56,6 +57,7 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Tiermin di ricercje
 Reload	WebPositive Window		Torne cjarie
 Expiration	Cookie Manager		Scjadince
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		La tô CPU e je masse vecje e no supuarte lis estensions SSE2, cence di chês WebPositive nol pues zirâ. O conseìn di instalâ NetSurf al so puest.
 Download finished	Download Window		Discjariament completât
 Cookie manager	WebPositive Window		Gjestôr dai Cookie
 OK	Authentication Panel		Va ben
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Inviament:
 Confirmation	WebPositive Window		Conferme
 Session cookie	Cookie Manager		Cookie di session
+No SSE2 support	WebPositive		Nissun supuart aes SSE2
 Open all	WebPositive Window		Vierç ducj
 Cut	WebPositive Window		Taie
 Downloads	Download Window		File discjariâts

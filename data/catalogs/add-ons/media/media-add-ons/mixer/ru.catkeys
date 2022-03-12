@@ -1,10 +1,8 @@
-1	russian	x-vnd.Haiku-mixer.media_addon	2690542047
+1	russian	x-vnd.Haiku-mixer.media_addon	3463574286
 Input mapping	AudioMixer		Переназначение входа
 To output	AudioMixer		Выход
-Refuse output format changes	AudioMixer		Отклонять изменения выходного формата
 Gain	AudioMixer		Усиление
 To master	AudioMixer		К главному
-Refuse input format changes	AudioMixer		Отклонять изменения входного формата
 not connected	AudioMixer		не подключен
 Master output	AudioMixer		Основной выход
 dB	AudioMixer		дБ

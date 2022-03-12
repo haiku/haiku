@@ -1,11 +1,9 @@
-1	french	x-vnd.Haiku-mixer.media_addon	3797408169
+1	french	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Correspondances d’entrées
 High quality (linear interpolation)	AudioMixer		Haute qualité (interpolation linéaire)
 To output	AudioMixer		Vers la sortie
-Refuse output format changes	AudioMixer		Refuser les changements de formats de sorties
 Gain	AudioMixer		Gain
 To master	AudioMixer		Vers la sortie principale
-Refuse input format changes	AudioMixer		Refuser les changements de formats d’entrées
 not connected	AudioMixer		débranché
 Master output	AudioMixer		Sortie principale
 dB	AudioMixer		dB

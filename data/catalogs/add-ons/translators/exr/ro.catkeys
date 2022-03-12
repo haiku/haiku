@@ -1,3 +1,8 @@
-1	romanian	x-vnd.Haiku-EXRTranslator	868345548
+1	romanian	x-vnd.Haiku-EXRTranslator	3148139045
 EXR image translator	ConfigView		Traducător de imagine EXR
+Version %d.%d.%d, %s	ConfigView		Versiunea %d.%d.%d, %s
+EXR images	EXRTranslator		Imagini EXR
+EXR image	EXRTranslator		Imagine EXR
+EXR image translator	EXRTranslator		Traducător de imagini EXR
+Based on OpenEXR %version%	ConfigView		Bazat pe OpenEXR %version%
 EXR Settings	main		Configurări EXR

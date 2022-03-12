@@ -1,11 +1,9 @@
-1	greek, modern (1453-)	x-vnd.Haiku-mixer.media_addon	3797408169
+1	greek, modern (1453-)	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Χαρτογράφηση εισόδου
 High quality (linear interpolation)	AudioMixer		Υψηλή ποιότητα (γραμμική παρεμβολή)
 To output	AudioMixer		Προς έξοδο
-Refuse output format changes	AudioMixer		Απαγόρευση αλλαγών στις μονάδες εξόδου
 Gain	AudioMixer		Απολαβή
 To master	AudioMixer		Προς κύρια έξοδο
-Refuse input format changes	AudioMixer		Απαγόρευση αλλαγών στις μονάδες εισόδου
 not connected	AudioMixer		μη συνδεδεμένο
 Master output	AudioMixer		Κύρια έξοδος
 dB	AudioMixer		dB

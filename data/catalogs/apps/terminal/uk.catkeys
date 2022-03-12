@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	4032760800
+1	ukrainian	x-vnd.Haiku-Terminal	2062206461
 ANSI cyan color	Terminal AppearancePrefView		ANSI ціан
 Close other tabs	Terminal TermWindow		Закрити інші вкладки
 Insert path	Terminal TermView		Введіть шлях
@@ -122,7 +122,6 @@ No search string was entered.	Terminal TermWindow		Стрічка для пош�
 Text under cursor	Terminal AppearancePrefView		Текст під курсором
 Move here	Terminal TermView		Перемістити сюди
 Abort	Terminal Shell		Перервати
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tПоточний робочий каталог активного процесу.\n\t\t\tПри необхідності можна вказати максимальне число компонентів шляху.\n\t\t\tНаприклад, '%2d' для не більше ніж двох компонентів.\n\t%i\t-\tІндекс вкладки.\n\t%e\t-\tКодування поточної вкладки. Для UTF-8 не відображається.\n\t%p\t-\tІм'я активного процесу.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Наступні процеси все ще запущені:\n\n\t%1\n\nЯкщо Ви закриєте Термінал, процеси будуть знищені.
 Set window title	Terminal TermWindow		Встановити заголовок вікна
 Increase	Terminal TermWindow		Збільшити

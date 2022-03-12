@@ -45,6 +45,6 @@ Show replicants	DeskbarMenu		Yinelenenleri göster
 Hide application names	PreferencesWindow		Uygulama adlarını gizle
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demolar
 Icon size	PreferencesWindow		Simge boyutu
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Masaüstü gereçleri
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Masaüstü uygulamacıkları
 Hide all	WindowMenu		Tümünü gizle
 Quit application	WindowMenu		Uygulamadan çık

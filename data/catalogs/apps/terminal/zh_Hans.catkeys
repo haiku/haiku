@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Terminal	838376638
+1	english	x-vnd.Haiku-Terminal	3162789595
 Close other tabs	Terminal TermWindow		关闭其他标签
 Insert path	Terminal TermView		插入路径  
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		终端无法启动shell，非常抱歉。
@@ -102,7 +102,6 @@ No search string was entered.	Terminal TermWindow		未输入任何字符。
 Text under cursor	Terminal AppearancePrefView		下划线
 Move here	Terminal TermView		移动到此
 Abort	Terminal Shell		放弃
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\t活动进程的当前工作目录。\n\t\t\t可以指定路径组成的最大数量，\n\t\t\t如，'%2d' 表示最多两个部分。\n\t%i\t-\t标签索引。\n\t%e\t-\t当前标签编码格式。对于 UTF-8 不显示。\n\t%p\t-\t活动进程名称。\n\t%%\t-\t字符 '%'。
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		下述进程仍在运行：\n\n\t%1\n\n如果您关闭终端，这些进程将被杀死。
 Set window title	Terminal TermWindow		设置窗口标题
 Increase	Terminal TermWindow		增大

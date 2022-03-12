@@ -1,2 +1,25 @@
-1	greek, modern (1453-)	x-vnd.Haiku-WebPTranslator	1475550615
+1	greek, modern (1453-)	x-vnd.Haiku-WebPTranslator	828165164
+High	ConfigView		Υψηλή
+WebPTranslator Settings	ConfigView		Ρυθμίσεις μετατροπέα WebP
+Low	ConfigView		Χαμηλή
+WebP image translator	ConfigView		Μετατροπέας εικόνων WebP
+Photo	ConfigView		Φωτοφραφία
+WebP image translator	WebPTranslator		Μετατροπέας εικόνων WebP
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Picture	ConfigView		Εικόνα
+Default	ConfigView		Προεπιλογή
+Text	ConfigView		Κείμενο
+Preprocessing filter	ConfigView		Φίλτρο προεπεξεργασίας
+Compression method:	ConfigView		Μέθοδος συμπίεσης:
+Preset	ConfigView		Προεπιλογή
+Drawing	ConfigView		Ζωγραφιά
+Output preset:	ConfigView		Προεπιλογή εξόδου:
 WebP Settings	main		Ρυθμίσεις WebP
+Icon	ConfigView		Εικονίδιο
+WebP image	WebPTranslator		Εικόνα WebP
+Output quality:	ConfigView		Ποιότητα εξόδου:
+Slower but better	ConfigView		Πιο αργή αλλά καλύτερη
+Based on libwebp %version%	ConfigView		Βασισμένο στη βιβλιοθήκη libwebp %version%
+Fast	ConfigView		Γρήγορη
+WebP images	WebPTranslator		Εικόνες WebP

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	4032760800
+1	hungarian	x-vnd.Haiku-Terminal	247549485
 ANSI cyan color	Terminal AppearancePrefView		ANSI cián
 Close other tabs	Terminal TermWindow		Többi lap bezárása
 Insert path	Terminal TermView		Útvonal beszúrása
@@ -20,6 +20,7 @@ Edit tab title…	Terminal TermWindow		Lap címének szerkesztése…
 Settings	Terminal TermWindow		Beállítások
 Print	Terminal TermWindow		Nyomtatás
 %app% settings	Terminal PrefWindow	window title	%app% beállítások
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tAz aktív folyamat jelenlegi mappája..\n\t\t\tA maximális szint megadása az útvonalhoz.\n\t\t\tPéldául '%2d' legfeljebb két szinthez.\n\t%i\t-\tA fül sorszáma.\n\t%e\t-\tAz aktuális fül kódolása. UTF-8-nál nem jelenik meg.\n\t%p\t-\tAz aktív folyamat neve.
 ANSI black color	Terminal AppearancePrefView		ANSI fekete
 Use default	Terminal SetTitleWindow		Alapérték használata
 Close tab	Terminal TermWindow		Lap bezárása
@@ -122,7 +123,6 @@ No search string was entered.	Terminal TermWindow		Nincs beírva keresendő szö
 Text under cursor	Terminal AppearancePrefView		Kurzor alatti szöveg
 Move here	Terminal TermView		Mozgatás
 Abort	Terminal Shell		Megszakítás
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAz aktív folyamat aktuális mappája.\n\t\t\tOpcionálisan az útvonal maximális elemei megadhatóak.\n\t\t\tPéldául '%2d' az utolsó két elem számára.\n\t%i\t-\tA fül sorszáma.\n\t%e\t-\tAz aktuális fül kódolása. UTF-8 esetén nem jelenik meg.\n\t%p\t-\tAz aktív folyamat neve.\n\t%%\t-\t'%' karakter.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Ezek a folyamatok még futnak: \n\n\t%1\n\nHa bezárja a Terminált, a folyamatok megszakadnak.
 Set window title	Terminal TermWindow		Ablak címének beállítása
 Increase	Terminal TermWindow		Növelés

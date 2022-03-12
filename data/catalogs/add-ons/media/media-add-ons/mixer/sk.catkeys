@@ -1,10 +1,8 @@
-1	slovak	x-vnd.Haiku-mixer.media_addon	2690542047
+1	slovak	x-vnd.Haiku-mixer.media_addon	3463574286
 Input mapping	AudioMixer		Mapovanie vstupu
 To output	AudioMixer		Na výstup
-Refuse output format changes	AudioMixer		Odmietnuť zmeny výstupného formátu
 Gain	AudioMixer		Zosilnenie
 To master	AudioMixer		Na hlavný
-Refuse input format changes	AudioMixer		Odmietnuť zmeny formátu vstupu
 not connected	AudioMixer		nepripojené
 Master output	AudioMixer		Hlavný výstup
 dB	AudioMixer		dB

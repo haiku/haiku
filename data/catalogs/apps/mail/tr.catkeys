@@ -1,6 +1,6 @@
 1	turkish	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Kaydedilenlere ekle
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ana metniniz %ld kodlanamayan karakter içeriyor. Gönder'e basmak bu iletinizi gönderir, ancak kodlanamayan karakterin yerine bir başkası kullanılır. Bu durumda başka bir karakter seti kullanmayı deneyebilirsiniz. Sorunu çözmeyi denemek için İptal'e tıklayın.
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ana metniniz %ld kodlanamayan karakter içeriyor. Gönder'e basmak bu iletinizi gönderir; ancak kodlanamayan karakterin yerine bir başkası kullanılır. Bu durumda başka bir karakter kümesi kullanmayı deneyebilirsiniz. Sorunu çözmeyi denemek için Vazgeç'e tıklayın.
 Text wrapping:	Mail		Metin kaydırma:
 Show icons & labels	Mail		Simgeleri ve etiketleri göster
 (Date unavailable)	Mail		(Tarih mevcut değil)
@@ -66,7 +66,7 @@ draft	B_USER_DIRECTORY/mail/draft		taslaklar
 Really delete this signature? This cannot be undone.	Mail		İmza silinsin mi? Bu işlem geri alınamaz.
 spam	B_USER_DIRECTORY/mail/spam		istenmeyen
 Reply to all	Mail		Tümünü yanıtla
-Cancel	Mail		İptal
+Cancel	Mail		Vazgeç
 Off	Mail		Kapalı
 Set to %s	Mail		%s olarak ayarla
 Signature:	Mail		İmza:
@@ -94,7 +94,7 @@ Attach attributes:	Mail		Öznitelik ekle:
 Find again	Mail		Yeniden bul
 Size:	Mail		Boyut:
 To:	Mail		Kime:
-Need Tracker to move items to trash	Mail		Ögelerin çöpe taşınabilmesi için İzleyici'nin çalışması gerekiyor
+Need Tracker to move items to trash	Mail		Ögelerin çöpe taşınabilmesi için İzleyici gerekiyor
 The mail_daemon could not be started:\n\t	Mail		mail_daemon başlatılamadı:\n\t
 <no account found>	Mail		<hesap bulunamadı>
 Mail couldn't find its dictionary.	Mail		Posta, kendi sözlüğünü bulamadı.

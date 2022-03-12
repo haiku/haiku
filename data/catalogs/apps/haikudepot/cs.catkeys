@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-HaikuDepot	1504929345
+1	czech	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		Chyba aktualizace repozitářů
 Network error	ServerHelper		Chyba sítě
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Nastala chyba při aktualizaci repozitáře: %error%
@@ -7,6 +7,7 @@ Check for updates…	MainWindow		Zkontrolovat aktualizace…
 Uninstalled	PackageListView		Odinstalován
 It was not possible to create the new user.	UserLoginWindow		Nepodařilo se vytvořit nového uživatele.
 Available packages	MainWindow		Dostupné balíčky
+An unexpected error has been sent from the server [%li]	ServerHelper		Neočekávaná chyba byla poslána ze serveru [%li]
 Create account	UserLoginWindow		Vytvořit účet
 Install %PackageTitle%	PackageManager		Nainstalovat %PackageTitle%
 OK	App		OK
@@ -44,6 +45,7 @@ Category	FilterView		Kategorie
 User rating	RatePackageWindow		Uživatelské hodnocení
 Installed packages	MainWindow		Nainstalované balíčky
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Pořadovaný objekt nebo objekt součástí požadavku nebyl na serveru nalezen.
+Date	PackageListView		Datum
 No changelog available.	PackageInfoView		Seznam změn není k dispozici.
 Error	App		Chyba
 There was a puzzling response from the web service.	UserLoginWindow		Přišla nejasná odpověd z webové služby.
@@ -55,6 +57,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nepodařilo se spojit se serverem pro stažení captcha obrázku potřebného pro vytvoření uživatele.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Vaše hodnocení bylo úspěšně nahráno. Můžete ho změnit nebo odstranit z webových stránek HaikuDepot serveru.
 Available	PackageListView		Dostupné
+-	no package publish		-
 Cancel	UserLoginWindow		Zrušit
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot potřebuje spuštěnou službu balíků aby fungoval, ale zdá se že spuštěna není.\nChcete ji spustit nyní?
 Click a package to view information	PackageInfoView		Kliknutím na balíček zobrazíte informace

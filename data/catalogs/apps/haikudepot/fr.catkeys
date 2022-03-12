@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	326741919
+1	french	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		Erreur à l’actualisation du dépôt
 Network error	ServerHelper		Erreur réseau
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Une erreur est survenue lors du rafraîchissement : %error%
@@ -57,6 +57,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Impossible de communiquer avec le serveur pour obtenir l’image Captcha nécessaire à la création d’un nouvel utilisateur.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Votre évaluation a été postée avec succès. Vous pouvez la mettre à jour ou la supprimer sur le site Web du Dépôt Haiku.
 Available	PackageListView		Disponible
+-	no package publish		-
 Cancel	UserLoginWindow		Annuler
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Le DépôtHaiku a besoin du serveur de paquets pour fonctionner, et il ne semble pas être démarré.\nVoulez-vous le démarrer maintenant ?
 Click a package to view information	PackageInfoView		Cliquez sur un paquet pour afficher ses informations

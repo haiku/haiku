@@ -1,10 +1,8 @@
-1	danish	x-vnd.Haiku-mixer.media_addon	2690542047
+1	danish	x-vnd.Haiku-mixer.media_addon	3463574286
 Input mapping	AudioMixer		Inputkortlægning
 To output	AudioMixer		Til output
-Refuse output format changes	AudioMixer		Nægt ændringer af outputformat
 Gain	AudioMixer		Gain
 To master	AudioMixer		Til master
-Refuse input format changes	AudioMixer		Nægt ændringer af inputformat
 not connected	AudioMixer		ikke tilsluttet
 Master output	AudioMixer		Master-output
 dB	AudioMixer		dB

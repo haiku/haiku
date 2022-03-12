@@ -1,21 +1,24 @@
-1	finnish	x-vnd.Haiku-mixer.media_addon	2690542047
+1	finnish	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Tulokuvaus
+High quality (linear interpolation)	AudioMixer		Korkea laatu (lineaarinen interpolointi)
 To output	AudioMixer		Lähtöön
-Refuse output format changes	AudioMixer		Kiellä lähtömuodon muutokset
 Gain	AudioMixer		Vahvistus
 To master	AudioMixer		Master-laitteelle
-Refuse input format changes	AudioMixer		Kiellä tulomuodon muutokset
 not connected	AudioMixer		ei ole yhdistetty
 Master output	AudioMixer		Master-lähtö
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Vahvistusohjaimet
+Low quality (drop/repeat samples)	AudioMixer		Alhainen laatu (pudota/toista näytteistys)
 Output channel sources	AudioMixer		Lähtökanavalähteet
 Allow input channel remapping	AudioMixer		Salli tulokanavien uudelleenkuvaus
 Display balance control for stereo connections	AudioMixer		Näytä balanssiohjaus stereoyhteyksille
 Setup	AudioMixer		Asetus
 Physical input channels	AudioMixer		Fyysiset tulokanavat
 Input channel destinations	AudioMixer		Tulokanavakohteet
+Resampling algorithm:	AudioMixer		Uudelleennäytteistysalgoritmi:
 Mute	AudioMixer		Mykistä
 Output mapping	AudioMixer		Lähtökuvaus
 Virtual output channels	AudioMixer		Virtuaaliset lähtökanavat
 Allow output channel remapping	AudioMixer		Salli lähtökanavien uudelleennäytteistys
+Input gain controls represent:	AudioMixer		Syötevahvistusohjaimet edustavat:
+Attenuate mixer output by 3 dB	AudioMixer		Vaimenna mikserilähtöä 3:lla dB:llä

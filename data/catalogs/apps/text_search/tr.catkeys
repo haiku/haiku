@@ -29,7 +29,7 @@ The unselected files will be removed from the list.	GrepWindow		Seçilmeyen dosy
 Open files in code editor	GrepWindow		Dosyaları kod düzenleyicisinde aç
 Skip folders starting with a dot	GrepWindow		Nokta ile başlayan klasörleri atla
 Failed to open output pipe!	Grepper		Çıktı veri yolu açılamadı!
-Cancel	GrepWindow		İptal
+Cancel	GrepWindow		Vazgeç
 History	GrepWindow		Geçmiş
 TextSearch	System name		Metin Arama
 File	GrepWindow		Dosya

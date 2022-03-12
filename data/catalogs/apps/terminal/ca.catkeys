@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Terminal	4032760800
+1	catalan; valencian	x-vnd.Haiku-Terminal	247549485
 ANSI cyan color	Terminal AppearancePrefView		Color cian ANSI
 Close other tabs	Terminal TermWindow		Tanca altres pestanyes
 Insert path	Terminal TermView		Insereix un camí
@@ -20,6 +20,7 @@ Edit tab title…	Terminal TermWindow		Edita el títol de la pestanya...
 Settings	Terminal TermWindow		Paràmetres
 Print	Terminal TermWindow		Imprimeix
 %app% settings	Terminal PrefWindow	window title	Paràmetres del %app%
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tEl directori de treball actual del procés actiu.\n\t\t\tOpcionalment, el nombre màxim de components del camí es pot\n\t\t\tespecificar. Per exemple, %2d com a màxim per a dos components.\n\t%i\t-\tL'índex de la pestanya.\n\t%e\t-\tLa codificació de la pestanya actual. No es mostra per a UTF-8.\n\t%p\t-\tEl nom del procés actiu.
 ANSI black color	Terminal AppearancePrefView		Color negre ANSI
 Use default	Terminal SetTitleWindow		Valor per defecte
 Close tab	Terminal TermWindow		Tanca la pestanya
@@ -122,7 +123,6 @@ No search string was entered.	Terminal TermWindow		No s'ha proporcionat cap cade
 Text under cursor	Terminal AppearancePrefView		Text sota el cursor
 Move here	Terminal TermView		Mou aquí
 Abort	Terminal Shell		Avorta
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tEl directori de treball actual del procés actiu.\n\t\t\tOpcionalment, es pot especificar el nombre màxim de components\n\t\t\tde camí. Per exemple, "%2d" per a un màxim de dos components.\n\t%i\t-\tL’índex de la pestanya.\n\t%e\t-\tLa codificació de la pestanya actual. No mostrat per UTF-8.\n\t%p\t-\tEl nom del procés actiu.\n\t%%\t-\tEl caràcter "%".
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Els processos següents encara s'executen:\n\n\t%1\n\nSi tanqueu el Terminal, els processos es mataran.
 Set window title	Terminal TermWindow		Establiu el títol de la finestra
 Increase	Terminal TermWindow		Augmenta

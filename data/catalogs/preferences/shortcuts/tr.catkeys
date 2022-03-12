@@ -7,7 +7,7 @@ Revert to saved	ShortcutsWindow		Kaydedilene döndür
 Don't save	ShortcutsWindow		Kaydetme
 *MouseDown	ShortcutsWindow		*FareAşağı
 *Beep	ShortcutsWindow		*Bip
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Kısayollar düğme setinizi kaydedemedi.
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Kısayollar düğme kümenizi kaydedemedi.
 Save	ShortcutsWindow		Kaydet
 Either	ShortcutsSpec		Herhangi biri
 Oh no	ShortcutsWindow		N'olamaz
@@ -17,23 +17,23 @@ Select	ShortcutsWindow		Seç
 Shortcuts	System name		Kısayollar
 Quit	ShortcutsWindow		Çık
 (Choose application with file requester)	ShortcutsWindow		(Dosya isteyicisi olan bir uygulama seçin)
-Cancel	ShortcutsWindow		İptal
+Cancel	ShortcutsWindow		Vazgeç
 *MoveMouse +20 +0	ShortcutsWindow		*FareyiHareketEttir +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Left	ShortcutsSpec		Sol
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Kısayollar düğme seti dosyanızı işleyemedi!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Kısayollar düğme seti dosyanızı kaydedemedi!
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Kısayollar düğme kümesi dosyanızı işleyemedi!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Kısayollar düğme kümesi dosyanızı kaydedemedi!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*DiziGir \"Buraya metin girin\"
 Remove selected shortcut	ShortcutsWindow		Seçili kısayolu kaldır
 Error, NULL state description?	ShortcutsSpec		Hata, NULL durum açıklaması?
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Kısayollar düğme setinizi açamadı!
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Kısayollar düğme kümenizi açamadı!
 Save & apply	ShortcutsWindow		Kaydet & uygula
 Open	ShortcutsWindow		Aç
 Append	ShortcutsWindow		İliştir
 Both	ShortcutsSpec		Her ikisi de
-Save KeySet as…	ShortcutsWindow		Düğme setini farklı kaydet…
-Append KeySet…	ShortcutsWindow		Düğme seti iliştir…
+Save KeySet as…	ShortcutsWindow		Düğme kümesini farklı kaydet…
+Append KeySet…	ShortcutsWindow		Düğme kümesi iliştir…
 *MouseButton 1	ShortcutsWindow		*FareDüğmesi 1
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Çoklu \"*FareyiHareketEttir %100 0\" \"*FareDüğmesi 1\"
 Right	ShortcutsSpec		Sağ
@@ -41,7 +41,7 @@ OK	ShortcutsWindow		Tamam
 Add new shortcut	ShortcutsWindow		Yeni kısayol ekle
 (None)	ShortcutsSpec		(Yok)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Open KeySet…	ShortcutsWindow		Düğme seti aç…
+Open KeySet…	ShortcutsWindow		Düğme kümesi aç…
 File	ShortcutsWindow		Dosya
 *LaunchHandler text/html	ShortcutsWindow		*Başlatmaİşleyicisi metin/html
 *MoveMouseTo 50% 50%	ShortcutsWindow		*FareyiHareketEttir %50 %50

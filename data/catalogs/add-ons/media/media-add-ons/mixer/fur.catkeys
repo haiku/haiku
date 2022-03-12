@@ -1,21 +1,24 @@
-1	friulian	x-vnd.Haiku-mixer.media_addon	2690542047
+1	friulian	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Mapadure des jentradis
+High quality (linear interpolation)	AudioMixer		Alte cualitât (interpolazion lineâr)
 To output	AudioMixer		In jessude
-Refuse output format changes	AudioMixer		Refude modifichis al formât di jessude
 Gain	AudioMixer		Vuadagn
 To master	AudioMixer		Al principâl
-Refuse input format changes	AudioMixer		Refude modifichis al formât di jentrade
 not connected	AudioMixer		no conetût
 Master output	AudioMixer		Jessude principâl
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Controi di vuadagn
+Low quality (drop/repeat samples)	AudioMixer		Basse cualitât (campions di scartâ/ripeti)
 Output channel sources	AudioMixer		Sorzints canâi di jessude
 Allow input channel remapping	AudioMixer		Permet modifiche di mapadure dal canâl di jentrade
 Display balance control for stereo connections	AudioMixer		Mostre controi di belançament pes conessions stereo
 Setup	AudioMixer		Configurazion
 Physical input channels	AudioMixer		Canâi di jentrade fisics
 Input channel destinations	AudioMixer		Destinazions canâi di jentrade
+Resampling algorithm:	AudioMixer		Algoritmi di ricampionament:
 Mute	AudioMixer		Cidin
 Output mapping	AudioMixer		Mapadure des jessudis
 Virtual output channels	AudioMixer		Canâi di jessude virtuâi
 Allow output channel remapping	AudioMixer		Permet di tornâ a mapâ i canâi di jessude
+Input gain controls represent:	AudioMixer		I controi dal vuadagn di jentrade a rapresentin:
+Attenuate mixer output by 3 dB	AudioMixer		Moreste la jessude dal mixer di 3 dB

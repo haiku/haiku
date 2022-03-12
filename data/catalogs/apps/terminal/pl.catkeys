@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Terminal	3117643489
+1	polish	x-vnd.Haiku-Terminal	1147089150
 Close other tabs	Terminal TermWindow		Zamknij pozostałe karty
 Insert path	Terminal TermView		Wstaw ścieżkę
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nie może uruchomić powłoki. Przepraszamy.
@@ -105,7 +105,6 @@ No search string was entered.	Terminal TermWindow		Nie podano ciągu znaków do 
 Text under cursor	Terminal AppearancePrefView		Tekst pod kursorem
 Move here	Terminal TermView		Przenieś tutaj
 Abort	Terminal Shell		Anuluj
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktualny katalog roboczy aktywnego procesu.\n\t\t\tOpcjonalnie może może zostać podana maksymalna liczba\n\t\t\telementów ścieżki. Np. „%2d” dla maksymalnie dwóch elementów.\n\t%i\t-\tIndeks karty.\n\t%e\t-\tKodowanie karty. W przypadku UTF-8 niewyświetlane.\n\t%p\t-\tNazwa aktywnego procesu.\n\t%%\t-\t„%”.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Następujące procesy są wciąż w użyciu:\n\n\t%1\n\nJeśli zamkniesz terminal, te procesy zostaną zatrzymane.
 Set window title	Terminal TermWindow		Ustaw tytuł okna
 Increase	Terminal TermWindow		Powiększ

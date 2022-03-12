@@ -1,10 +1,8 @@
-1	lithuanian	x-vnd.Haiku-mixer.media_addon	2690542047
+1	lithuanian	x-vnd.Haiku-mixer.media_addon	3463574286
 Input mapping	AudioMixer		Įvesties susiejimas
 To output	AudioMixer		Į išvestį
-Refuse output format changes	AudioMixer		Neleisti išvesties formato keitimų
 Gain	AudioMixer		Stiprinimas
 To master	AudioMixer		Į pagrindinį
-Refuse input format changes	AudioMixer		Neleisti įvesties formato keitimų
 not connected	AudioMixer		neprijungta
 Master output	AudioMixer		Pagrindinė išvestis
 dB	AudioMixer		dB

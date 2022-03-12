@@ -1,5 +1,7 @@
-1	hungarian	application/x-vnd.Be.LoggingConsumerApp	3653006715
+1	hungarian	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nem sikerült lekérni a csomóponti információkat (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Prioritás
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nem található a csomópont (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Késleltetés
 Logged input	CortexAddOnsLoggingConsumer		Naplózott bemenet
 CPU spin percentage	CortexAddOnsLoggingConsumer		CPU kihasználtsága
@@ -17,3 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Vezérlők
 controls	CortexAddOnsCommonMediaNodeControlApp		vezérlők
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Csatlakozás
 percent	CortexAddOnsLoggingConsumer		százalék
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nincs paraméter a csomóponthoz (%ld):\n%s\n

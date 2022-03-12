@@ -1,10 +1,8 @@
-1	italian	x-vnd.Haiku-mixer.media_addon	2690542047
+1	italian	x-vnd.Haiku-mixer.media_addon	3463574286
 Input mapping	AudioMixer		Mappatura degli ingressi
 To output	AudioMixer		In uscita
-Refuse output format changes	AudioMixer		Non consenti cambiamenti nel formato di uscita
 Gain	AudioMixer		Guadagno
 To master	AudioMixer		Al master
-Refuse input format changes	AudioMixer		Rifiuta cambiamenti nel formato di ingresso
 not connected	AudioMixer		non connessa
 Master output	AudioMixer		Uscita master
 dB	AudioMixer		dB

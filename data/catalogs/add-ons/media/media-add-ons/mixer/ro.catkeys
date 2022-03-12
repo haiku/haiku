@@ -1,11 +1,9 @@
-1	romanian	x-vnd.Haiku-mixer.media_addon	3511569803
+1	romanian	x-vnd.Haiku-mixer.media_addon	4284602042
 Input mapping	AudioMixer		Maparea intrării
 High quality (linear interpolation)	AudioMixer		Calitate înaltă (interpolare liniară)
 To output	AudioMixer		Spre ieșire
-Refuse output format changes	AudioMixer		Refuză modificările de format de ieșire
 Gain	AudioMixer		Amplificare
 To master	AudioMixer		Spre principal
-Refuse input format changes	AudioMixer		Refuză modificările de format de intrare
 not connected	AudioMixer		nu este conectat
 Master output	AudioMixer		Ieșire principală
 dB	AudioMixer		dB

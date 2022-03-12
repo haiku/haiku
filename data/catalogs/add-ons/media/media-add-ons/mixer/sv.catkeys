@@ -1,22 +1,24 @@
-1	swedish	x-vnd.Haiku-mixer.media_addon	653252162
+1	swedish	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Ingångs mappning
 High quality (linear interpolation)	AudioMixer		Hög kvalitet (linjär interpolation)
 To output	AudioMixer		Till utgång
-Refuse output format changes	AudioMixer		Tillåt inte utformatändringar
 Gain	AudioMixer		Volym
 To master	AudioMixer		Till huvudkanal
-Refuse input format changes	AudioMixer		Tillåt inte informatsändringar
 not connected	AudioMixer		ej ansluten
 Master output	AudioMixer		Utgång för huvudkanal
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Volymkontroller
+Low quality (drop/repeat samples)	AudioMixer		Låg kvalitet (släpp/upprepa)
 Output channel sources	AudioMixer		Källa till utgångs kanaler
 Allow input channel remapping	AudioMixer		Tillåt ingång remapping
 Display balance control for stereo connections	AudioMixer		Visa balanskontroll för stereoanslutningar
 Setup	AudioMixer		Inställningar
 Physical input channels	AudioMixer		Fysiska ingångskanaler
 Input channel destinations	AudioMixer		Ingångskanalens mål
+Resampling algorithm:	AudioMixer		Omsamplingsalgoritm:
 Mute	AudioMixer		Tyst
 Output mapping	AudioMixer		Utgångs mappning
 Virtual output channels	AudioMixer		Virtuella utkanaler
 Allow output channel remapping	AudioMixer		Tillåt ommappning av utgående kanal
+Input gain controls represent:	AudioMixer		Ingångsförstärkningskontroller representerar:
+Attenuate mixer output by 3 dB	AudioMixer		Dämpa mixereffekten med 3 dB

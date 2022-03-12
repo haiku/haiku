@@ -1,4 +1,4 @@
-1	russian	application/x-vnd.Cortex.support	136489236
+1	russian	application/x-vnd.Cortex.support	3457841531
 Header has flags	MediaString		Заголовок имеет флаги
 32 bit HLS	MediaString		32-битный HLS
 Recording	MediaString		Запись
@@ -35,6 +35,7 @@ Physical output	MediaString		Физический выход
 YUV420	MediaString		YUV420
 Top to bottom, left to right	MediaString		Сверху вниз, слева направо
  kb/s	MediaString		 кбит/с
+24 bit HSI	MediaString		24-битный HSI
 User-defined media type	MediaString		Медиа-формат определённый пользователем
 32 bit CMYA	MediaString		32-битный CMYA
 QuickTime format family	MediaString		Семейство формата QuickTime

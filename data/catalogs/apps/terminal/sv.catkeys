@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	4032760800
+1	swedish	x-vnd.Haiku-Terminal	247549485
 ANSI cyan color	Terminal AppearancePrefView		ANSI cyan färg
 Close other tabs	Terminal TermWindow		Stäng övriga flikar
 Insert path	Terminal TermView		Lägg till sökväg
@@ -20,6 +20,7 @@ Edit tab title…	Terminal TermWindow		Redigera fliktitel...
 Settings	Terminal TermWindow		Inställningar
 Print	Terminal TermWindow		Skriv ut
 %app% settings	Terminal PrefWindow	window title	%app% inställningar
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tDen aktuella arbetskatalogen för den aktiva processen.\n\t\t\tValfritt kan det maximala antalet sökvägskomponenter vara\n\t\t\tspecificerat. T.ex. '%2d' för högst två komponenter.\n\t%i\t-\tIndex för fliken.\n\t%e\t-\tKodningen av den aktuella fliken. Visas inte för UTF-8.\n\t%p\t-\tNamnet på den aktiva processen.
 ANSI black color	Terminal AppearancePrefView		ANSI svart färg
 Use default	Terminal SetTitleWindow		Använd förvald
 Close tab	Terminal TermWindow		Stäng flik
@@ -122,7 +123,6 @@ No search string was entered.	Terminal TermWindow		Ingen söksträng angiven.
 Text under cursor	Terminal AppearancePrefView		Text under markören
 Move here	Terminal TermView		Flytta hit
 Abort	Terminal Shell		Avbryt
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tArbetskatalog för den aktiva processen.\n\t\t\tValfritt så kan den maximala antal sökvägs komponenter vara\n\t\t\tspecificerad. E.g. '%2d' för som mest två komponenter.\n\t%i\t-\tIndexeringen av tabben.\n\t%e\t-\tEncoding av den valda tabben. Visas inte som UTF-8.\n\t%p\t-\tNamnet på den aktiva processen.\n\t%%\t-\tTecknet '%'.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Följande processer körs fortfarande:\n\n\t%1\n\nOm du stänger Terminalen kommer processerna att termineras.
 Set window title	Terminal TermWindow		Ange fönstertitel
 Increase	Terminal TermWindow		Öka

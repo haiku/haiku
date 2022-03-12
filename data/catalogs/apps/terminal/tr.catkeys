@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Terminal	4032760800
+1	turkish	x-vnd.Haiku-Terminal	247549485
 ANSI cyan color	Terminal AppearancePrefView		ANSI camgöbeği
 Close other tabs	Terminal TermWindow		Diğer sekmeleri kapat
 Insert path	Terminal TermView		Yolu ekle
@@ -20,6 +20,7 @@ Edit tab title…	Terminal TermWindow		Sekme başlığını düzenle…
 Settings	Terminal TermWindow		Ayarlar
 Print	Terminal TermWindow		Yazdır
 %app% settings	Terminal PrefWindow	window title	%app% Ayarları
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tEtkin sürecin geçerli çalışma dizini.\n\t\t\tOlabilecek en çok yol bileşeni sayısı isteğe bağlı olarak\n\t\t\tbelirtilebilir. Örn. en çok iki bileşen için '%2d'.\n\t%i\t-\tSekmenin indeksi.\n\t%e\t-\tGeçerli sekmenin kodlaması. UTF-8 için gösterilmez.\n\t%p\t-\tEtkin sürecin adı.
 ANSI black color	Terminal AppearancePrefView		ANSI siyah
 Use default	Terminal SetTitleWindow		Öntanımlıları kullan
 Close tab	Terminal TermWindow		Sekmeyi kapat
@@ -37,7 +38,7 @@ ANSI magenta color	Terminal AppearancePrefView		ANSI mor
 Page setup…	Terminal TermWindow		Sayfa düzeni…
 Slate	Terminal colors scheme		Arduvaz
 Defaults	Terminal PrefWindow		Öntanımlılar
-Cancel	Terminal TermView		İptal
+Cancel	Terminal TermView		Vazgeç
 Revert	Terminal PrefWindow		Eski haline döndür
 Relaxed	Terminal colors scheme		Sakin
 ANSI bright magenta color	Terminal AppearancePrefView		ANSI açık mor
@@ -60,7 +61,7 @@ Font size	Terminal TermWindow		Yazıtipi boyutu
 Custom	Terminal colors scheme		Özel
 Really close?	Terminal TermWindow		Gerçekten kapatılsın mı?
 OK	Terminal TermApp		Tamam
-The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\" işlemi hâlâ çalışıyor.\nUçbirimi kapatırsanız işlem sonlandırılacaktır.
+The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\" süreci hâlâ çalışıyor.\nUçbirimi kapatırsanız süreç sonlandırılacaktır.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Tanımlanamayan seçenek \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Sekme başlığı:
 Text not found.	Terminal TermWindow		Metin bulunamadı.
@@ -79,7 +80,7 @@ ANSI green color	Terminal AppearancePrefView		ANSI yeşil
 Copy path	Terminal TermView		Yolu kopyala
 Window size	Terminal TermWindow		Pencere boyutu
 Copy absolute path	Terminal TermView		Tam yolu kopyala
-Cancel	Terminal TermWindow		İptal
+Cancel	Terminal TermWindow		Vazgeç
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\" işlemi hâlâ çalışıyor.\nBu sekmeyi kapatırsanız işlem sonlandırılacaktır.
 Cursor	Terminal AppearancePrefView		İmleç
 Full screen	Terminal TermWindow		Tam ekran
@@ -95,7 +96,7 @@ Decrease	Terminal TermWindow		Azalt
 Settings…	Terminal TermWindow		Ayarlar…
 ANSI bright white color	Terminal AppearancePrefView		ANSI açık beyaz
 Blinking cursor	Terminal AppearancePrefView		Yanıp sönen imleç
-Cancel	Terminal SetTitleWindow		İptal
+Cancel	Terminal SetTitleWindow		Vazgeç
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pencere başlığını belirten dizgi.\nAşağıdaki yer tutucular kullanılabilir:\n
 Close active tab	Terminal TermWindow		Etkin sekmeyi kapat
 Use text:	Terminal FindWindow		Şu metni kullan:
@@ -121,9 +122,8 @@ Find…	Terminal TermWindow		Bul…
 No search string was entered.	Terminal TermWindow		Hiçbir arama dizisi girilmedi.
 Text under cursor	Terminal AppearancePrefView		İmleç altındaki metin
 Move here	Terminal TermView		Buraya taşı
-Abort	Terminal Shell		İptal
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tEtkin işlemin içinde çalıştığı dizin\n\t\t\tİsteğe bağlı olarak olabilecek en çok yol bileşenlerinin sayısı\n\t\t\tbelirtilebilir. Örneğin en fazla iki bileşen için '%2d'.\n\t%i\t-\tSekme sırası\n\t%e\t-\tSekme kodlaması. UTF-8 için gösterilmez.\n\t%p\t-\tEtkin işlemin adı\n\t%%\t-\t'%' karakteri.
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Aşağıdaki işlemler hâlâ çalışıyor:\n\n\t%1\n\nUçbirim'i kapatırsanız, işlemler sonlandırılacak.
+Abort	Terminal Shell		İptal et
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Aşağıdaki süreçler hâlâ çalışıyor:\n\n\t%1\n\nUçbirim'i kapatırsanız süreçler sonlandırılacak.
 Set window title	Terminal TermWindow		Pencere başlığını ayarla
 Increase	Terminal TermWindow		Artır
 OK	Terminal TermWindow		Tamam

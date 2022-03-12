@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Terminal	4032760800
+1	greek, modern (1453-)	x-vnd.Haiku-Terminal	2062206461
 ANSI cyan color	Terminal AppearancePrefView		Γαλάζιο χρώμα ANSI
 Close other tabs	Terminal TermWindow		Κλείσιμο άλλων καρτελών
 Insert path	Terminal TermView		Εισάγετε την διαδρομή
@@ -122,7 +122,6 @@ No search string was entered.	Terminal TermWindow		Δεν καταχωρήθηκ
 Text under cursor	Terminal AppearancePrefView		Κείμενο κάτω από τον δρομέα
 Move here	Terminal TermView		Μετακίνηση εδώ
 Abort	Terminal Shell		Ματαίωση
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tΟ τρέχων κατάλογος εργασίας της ενεργής διεργασίας.\n\t\t\tΜπορείτε προαιρετικά να ορίσετε τον μέγιστο αριθμό\n\t\t\tκομματιών διαδρομής. π.χ. '%2d' για δύο κομμάτια.\n\t%i\t-\tΟ αριθμός της καρτέλας.\n\t%e\t-\tΗ κωδικοποίηση της τρέχουσας καρτέλας. Δεν εμφανίζεται για UTF-8.\n\t%p\t-\tΤο όνομα της ενεργής διεργασίας.\n\t%%\t-\tΟ χαρακτήρας '%'.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Οι παρακάτω διεργασίες ακόμη εκτελούνται:\n\n\t%1\n\nΕαν κλείσετε το τερματικό, οι διεργασίες θα τερματιστούν.
 Set window title	Terminal TermWindow		Ορισμός τίτλου παραθύρου
 Increase	Terminal TermWindow		Άυξηση

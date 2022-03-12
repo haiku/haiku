@@ -1,11 +1,9 @@
-1	catalan; valencian	x-vnd.Haiku-mixer.media_addon	3797408169
+1	catalan; valencian	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Mapeig d'entrada
 High quality (linear interpolation)	AudioMixer		Alta qualitat (interpolació lineal)
 To output	AudioMixer		Cap a la sortida
-Refuse output format changes	AudioMixer		Rebutja els canvis de format de la sortida
 Gain	AudioMixer		Guany
 To master	AudioMixer		Cap al mestre
-Refuse input format changes	AudioMixer		Rebutja els canvis de format de l'entrada
 not connected	AudioMixer		no està connectat
 Master output	AudioMixer		Sortida principal
 dB	AudioMixer		dB
