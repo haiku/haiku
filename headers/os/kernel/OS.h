@@ -37,6 +37,9 @@ enum {
 	B_TIMEOUT_REAL_TIME_BASE		= 0x40,
 	B_ABSOLUTE_REAL_TIME_TIMEOUT	= B_ABSOLUTE_TIMEOUT
 										| B_TIMEOUT_REAL_TIME_BASE
+								/* fails after an absolute timeout
+												with B_TIMED_OUT based on the
+												real time clock */
 };
 
 
