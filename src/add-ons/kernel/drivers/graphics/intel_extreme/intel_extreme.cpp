@@ -530,10 +530,14 @@ intel_extreme_init(intel_info &info)
 	// TODO: registers are mapped twice (by us and intel_gart), maybe we
 	// can share it between the drivers
 
+	phys_addr_t addr = info.pci->u.h0.base_registers[mmioIndex];
+	uint64 barSize = info.pci->u.h0.base_register_sizes[mmioIndex];
+	if ((info.pci->u.h0.base_register_flags[mmioIndex] & PCI_address_type) == PCI_address_type_64) {
+		addr |= (uint64)info.pci->u.h0.base_registers[mmioIndex + 1] << 32;
+		barSize |= (uint64)info.pci->u.h0.base_register_sizes[mmioIndex + 1] << 32;
+	}
 	AreaKeeper mmioMapper;
-	info.registers_area = mmioMapper.Map("intel extreme mmio",
-		info.pci->u.h0.base_registers[mmioIndex],
-		info.pci->u.h0.base_register_sizes[mmioIndex],
+	info.registers_area = mmioMapper.Map("intel extreme mmio", addr, barSize,
 		B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA,
 		(void**)&info.registers);
