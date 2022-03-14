@@ -154,10 +154,10 @@ radeon_get_rom_size(uint8* rom, size_t romSize)
 
 
 static status_t
-mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize,
+mapAtomBIOS(radeon_info &info, phys_addr_t romBase, uint32 romSize,
 	bool findROMlength = false)
 {
-	TRACE("%s: seeking AtomBIOS @ 0x%" B_PRIX32 " [size: 0x%" B_PRIX32 "]\n",
+	TRACE("%s: seeking AtomBIOS @ 0x%" B_PRIXPHYSADDR " [size: 0x%" B_PRIX32 "]\n",
 		__func__, romBase, romSize);
 
 	uint8* rom;
@@ -168,7 +168,7 @@ mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize,
 		(void**)&rom);
 
 	if (testArea < 0) {
-		ERROR("%s: couldn't map potential rom @ 0x%" B_PRIX32
+		ERROR("%s: couldn't map potential rom @ 0x%" B_PRIXPHYSADDR
 			"\n", __func__, romBase);
 		return B_NO_MEMORY;
 	}
@@ -176,7 +176,7 @@ mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize,
 	// check for valid BIOS signature
 	if (rom[0] != 0x55 || rom[1] != 0xAA) {
 		uint16 id = rom[0] + (rom[1] << 8);
-		TRACE("%s: BIOS signature incorrect @ 0x%" B_PRIX32 " (%X)\n",
+		TRACE("%s: BIOS signature incorrect @ 0x%" B_PRIXPHYSADDR " (%X)\n",
 			__func__, romBase, id);
 		delete_area(testArea);
 		return B_ERROR;
@@ -190,7 +190,7 @@ mapAtomBIOS(radeon_info &info, uint32 romBase, uint32 romSize,
 	if (romValid == false) {
 		// FAIL : a PCI VGA bios but not AtomBIOS
 		uint16 id = rom[0] + (rom[1] << 8);
-		TRACE("%s: not AtomBIOS rom at 0x%" B_PRIX32 "(%X)\n",
+		TRACE("%s: not AtomBIOS rom at 0x%" B_PRIXPHYSADDR "(%X)\n",
 			__func__, romBase, id);
 		delete_area(testArea);
 		return B_ERROR;
@@ -243,7 +243,7 @@ radeon_hd_getbios(radeon_info &info)
 {
 	TRACE("card(%" B_PRId32 "): %s: called\n", info.id, __func__);
 
-	uint32 romBase = 0;
+	phys_addr_t romBase = 0;
 	uint32 romSize = 0;
 	uint32 romMethod = 0;
 
@@ -261,6 +261,10 @@ radeon_hd_getbios(radeon_info &info)
 				// On post, the bios puts a copy of the IGP
 				// AtomBIOS at the start of the video ram
 				romBase = info.pci->u.h0.base_registers[PCI_BAR_FB];
+				if ((info.pci->u.h0.base_register_flags[PCI_BAR_FB] & PCI_address_type)
+					== PCI_address_type_64) {
+					romBase |= (uint64)info.pci->u.h0.base_registers[PCI_BAR_FB + 1] << 32;
+				}
 				romSize = 256 * 1024;
 
 				if (romBase == 0 || romSize == 0) {
@@ -299,11 +303,11 @@ radeon_hd_getbios(radeon_info &info)
 
 		if (mapResult == B_OK) {
 			ERROR("%s: AtomBIOS found using active method %" B_PRIu32
-				" at 0x%" B_PRIX32 "\n", __func__, romMethod, romBase);
+				" at 0x%" B_PRIXPHYSADDR "\n", __func__, romMethod, romBase);
 			break;
 		} else {
 			ERROR("%s: AtomBIOS not found using active method %" B_PRIu32
-				" at 0x%" B_PRIX32 "\n", __func__, romMethod, romBase);
+				" at 0x%" B_PRIXPHYSADDR "\n", __func__, romMethod, romBase);
 		}
 	}
 
@@ -680,13 +684,18 @@ radeon_hd_init(radeon_info &info)
 	sharedCreator.Detach();
 
 	// *** Map Memory mapped IO
-	AreaKeeper mmioMapper;
 	const uint32 pciBarMmio = radeon_hd_pci_bar_mmio(info.chipsetID);
-	info.registers_area = mmioMapper.Map("radeon hd mmio",
-		info.pci->u.h0.base_registers[pciBarMmio],
-		info.pci->u.h0.base_register_sizes[pciBarMmio],
-		B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA,
+	phys_addr_t addr = info.pci->u.h0.base_registers[pciBarMmio];
+	uint64 mmioSize = info.pci->u.h0.base_register_sizes[pciBarMmio];
+	if (pciBarMmio < 5
+		&& (info.pci->u.h0.base_register_flags[pciBarMmio] & PCI_address_type) == PCI_address_type_64) {
+		addr |= (uint64)info.pci->u.h0.base_registers[pciBarMmio + 1] << 32;
+		mmioSize |= (uint64)info.pci->u.h0.base_register_sizes[pciBarMmio + 1] << 32;
+	}
+
+	AreaKeeper mmioMapper;
+	info.registers_area = mmioMapper.Map("radeon hd mmio", addr, mmioSize,
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA,
 		(void**)&info.registers);
 	if (mmioMapper.InitCheck() < B_OK) {
 		ERROR("%s: card (%" B_PRId32 "): couldn't map memory I/O!\n",
