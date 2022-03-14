@@ -41,6 +41,7 @@
 
 #include "soc_pxa.h"
 #include "soc_omap3.h"
+#include "soc_sun4i.h"
 
 #define TRACE_ARCH_INT
 #ifdef TRACE_ARCH_INT
@@ -177,6 +178,12 @@ arch_int_init_post_vm(kernel_args *args)
 	} else if (strncmp(args->arch_args.interrupt_controller.kind, INTC_KIND_PXA,
 		sizeof(args->arch_args.interrupt_controller.kind)) == 0) {
 		InterruptController *ic = new(std::nothrow) PXAInterruptController(
+			args->arch_args.interrupt_controller.regs1.start);
+		if (ic == NULL)
+			return B_NO_MEMORY;
+	} else if (strncmp(args->arch_args.interrupt_controller.kind, INTC_KIND_SUN4I,
+		sizeof(args->arch_args.interrupt_controller.kind)) == 0) {
+		InterruptController *ic = new(std::nothrow) Sun4iInterruptController(
 			args->arch_args.interrupt_controller.regs1.start);
 		if (ic == NULL)
 			return B_NO_MEMORY;
