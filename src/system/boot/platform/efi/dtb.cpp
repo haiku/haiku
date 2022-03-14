@@ -298,11 +298,11 @@ dtb_get_reg(const void* fdt, int node, uint32 addressCells, uint32 sizeCells, si
 	if (prop == NULL)
 		return false;
 
-	size_t entrySize = 4*(addressCells + sizeCells);
-	if ((idx + 1)*entrySize > (size_t)propSize)
+	size_t entrySize = 4 * (addressCells + sizeCells);
+	if ((idx + 1) * entrySize > (size_t)propSize)
 		return false;
 
-	prop += idx*entrySize;
+	prop += idx * entrySize;
 
 	switch (addressCells) {
 		case 1: range.start = fdt32_to_cpu(*(uint32*)prop); prop += 4; break;
@@ -471,8 +471,20 @@ dtb_init()
 
 		int node = -1;
 		int depth = -1;
+		uint32 addressCells = 0;
+		uint32 sizeCells = 0;
 		while ((node = fdt_next_node(sDtbTable, node, &depth)) >= 0 && depth >= 0) {
-			dtb_handle_fdt(sDtbTable, node, 2, 2);
+			if (addressCells == 0) {
+				uint32* prop = (uint32*)fdt_getprop(sDtbTable, node, "#address-cells", NULL);
+				addressCells = fdt32_to_cpu(*prop);
+				INFO("Address cells at %p: %u\n", prop, addressCells);
+			}
+			if (sizeCells == 0) {
+				uint32* prop = (uint32*)fdt_getprop(sDtbTable, node, "#size-cells", NULL);
+				sizeCells = fdt32_to_cpu(*prop);
+				INFO("Size cells at %p: %u\n", prop, sizeCells);
+			}
+			dtb_handle_fdt(sDtbTable, node, addressCells, sizeCells);
 		}
 		break;
 	}
