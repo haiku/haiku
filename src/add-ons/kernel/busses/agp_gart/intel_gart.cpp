@@ -609,11 +609,16 @@ intel_map(intel_info &info)
 		fbIndex = 2;
 	}
 
+	phys_addr_t addr = info.display.u.h0.base_registers[mmioIndex];
+	uint64 barSize = info.display.u.h0.base_register_sizes[mmioIndex];
+	if ((info.display.u.h0.base_register_flags[mmioIndex] & PCI_address_type) == PCI_address_type_64) {
+		addr |= (uint64)info.display.u.h0.base_registers[mmioIndex + 1] << 32;
+		barSize |= (uint64)info.display.u.h0.base_register_sizes[mmioIndex + 1] << 32;
+	}
+
 	AreaKeeper mmioMapper;
-	info.registers_area = mmioMapper.Map("intel GMCH mmio",
-		info.display.u.h0.base_registers[mmioIndex],
-		info.display.u.h0.base_register_sizes[mmioIndex], B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.registers);
+	info.registers_area = mmioMapper.Map("intel GMCH mmio", addr, barSize,
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.registers);
 
 	if (mmioMapper.InitCheck() < B_OK) {
 		ERROR("could not map memory I/O!\n");
@@ -654,8 +659,7 @@ intel_map(intel_info &info)
 		info.gtt_physical_base = get_pci_config(info.display, i915_GTT_BASE, 4);
 	} else {
 		// 945+?
-		info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
-			+ (2UL << 20);
+		info.gtt_physical_base = addr + (2UL << 20);
 	}
 
 	size_t gttSize = determine_gtt_size(info);
@@ -678,7 +682,13 @@ intel_map(intel_info &info)
 
 	info.aperture_physical_base = info.display.u.h0.base_registers[fbIndex];
 	info.aperture_stolen_size = stolenSize;
-	if (info.aperture_size == 0)
+	if ((info.display.u.h0.base_register_flags[fbIndex] & PCI_address_type) == PCI_address_type_64) {
+		info.aperture_physical_base |= (uint64)info.display.u.h0.base_registers[fbIndex + 1] << 32;
+		if (info.aperture_size == 0) {
+			info.aperture_size = info.display.u.h0.base_register_sizes[fbIndex]
+				|= (uint64)info.display.u.h0.base_register_sizes[fbIndex + 1] << 32;
+		}
+	} else if (info.aperture_size == 0)
 		info.aperture_size = info.display.u.h0.base_register_sizes[fbIndex];
 
 	ERROR("detected %ld MB of stolen memory, aperture size %ld MB, "
