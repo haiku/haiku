@@ -66,6 +66,7 @@ const struct supported_uarts {
 	{ "sifive,uart0", UART_KIND_SIFIVE, &get_uart<ArchUARTSifive> },
 #elif defined(__ARM__) || defined(__aarch64__)
 	{ "arm,pl011", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
+	{ "snps,dw-apb-uart", UART_KIND_8250, &get_uart<DebugUART8250> },
 #endif
 };
 
@@ -510,8 +511,7 @@ dtb_set_kernel_args()
 	if (uart.kind[0] == 0) {
 		dprintf("kind: None!\n");
 	} else {
-		dprintf("  kind: %s", uart.kind);
-		dprintf("\n");
+		dprintf("  kind: %s\n", uart.kind);
 		dprintf("  regs: %#" B_PRIx64 ", %#" B_PRIx64 "\n", uart.regs.start, uart.regs.size);
 		dprintf("  irq: %" B_PRIu32 "\n", uart.irq);
 		dprintf("  clock: %" B_PRIu64 "\n", uart.clock);
