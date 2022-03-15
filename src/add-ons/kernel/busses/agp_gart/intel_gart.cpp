@@ -169,6 +169,12 @@ const struct supported_device {
 	{0x3ec4, 0x3eab, INTEL_MODEL_CFLM, "CoffeeLake Halo GT2"},
 	{0x3ed0, 0x3ea5, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
 	{0x3ed0, 0x3ea6, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
+
+	{0x4e22, 0x4e55, INTEL_MODEL_JSL, "JasperLake"},
+	{0x4e24, 0x4e55, INTEL_MODEL_JSL, "JasperLake"},
+	{0x4e12, 0x4e61, INTEL_MODEL_JSL, "JasperLake"},
+	{0x4e26, 0x4e71, INTEL_MODEL_JSLM, "JasperLake"},
+	{0x4e28, 0x4e71, INTEL_MODEL_JSLM, "JasperLake"},
 };
 
 struct intel_info {

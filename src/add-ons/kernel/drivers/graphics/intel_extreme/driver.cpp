@@ -158,6 +158,10 @@ const struct supported_device {
 	{0x3eab, INTEL_MODEL_CFLM, "CoffeeLake Halo GT2"},
 	{0x3ea5, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
 	{0x3ea6, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
+
+	{0x4e55, INTEL_MODEL_JSL,	"JasperLake"},
+	{0x4e61, INTEL_MODEL_JSL,	"JasperLake"},
+	{0x4e71, INTEL_MODEL_JSLM,	"JasperLake"},
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
