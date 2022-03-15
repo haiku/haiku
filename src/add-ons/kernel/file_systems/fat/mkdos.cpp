@@ -16,11 +16,26 @@
 
 
 void PrintUsage();
-void CreateVolumeLabel(void *sector, const char *label);
 status_t Initialize(int fatbits, const char *device, const char *label,
 	bool noprompt, bool testmode);
 status_t parse_initialize_parameters(const char* parameterString,
 	initialize_parameters& parameters);
+
+
+static void
+create_volume_label_sector(void *sector, const char *label)
+{
+	// create a volume name directory entry in the 512 byte sector
+	// XXX convert from UTF8, and check for valid characters
+	// XXX this could be changed to use long file name entrys,
+	// XXX but the dosfs would have to be updated, too
+
+	fatdirent *d = (fatdirent *)sector;
+	memset(d, 0, sizeof(*d));
+	memset(d->Name, 0x20, 11);
+	memcpy(d->Name, label, min_c(11, strlen(label)));
+	d->Attr = 0x08;
+}
 
 
 status_t
@@ -389,7 +404,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 		bs->BS_Reserved1 = 0x00;
 		bs->BS_BootSig = 0x29;
 		*(uint32*)bs->BS_VolID = (uint32)system_time();
-		memcpy(bs->BS_VolLab,"NO NAME    ",11);
+		memset(bs->BS_VolLab, 0x20, 11);
+		memcpy(bs->BS_VolLab, label, min_c(11, strlen(label)));
 		memcpy(bs->BS_FilSysType,"FAT32   ",8);
 		bs->signature = B_HOST_TO_LENDIAN_INT16(0xAA55);
 	} else {
@@ -419,7 +435,8 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 		bs->BS_Reserved1 = 0x00;
 		bs->BS_BootSig = 0x29;
 		*(uint32*)bs->BS_VolID = (uint32)system_time();
-		memcpy(bs->BS_VolLab,"NO NAME    ",11);
+		memset(bs->BS_VolLab, 0x20, 11);
+		memcpy(bs->BS_VolLab, label, min_c(11, strlen(label)));
 		memcpy(bs->BS_FilSysType,(fatbits == 12) ? "FAT12   " : "FAT16   ",8);
 		bs->signature = B_HOST_TO_LENDIAN_INT16(0xAA55);
 	}
@@ -553,7 +570,7 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 	if (fatbits == 12 || fatbits == 16) {
 		uint8 data[512];
 		memset(data, 0, 512);
-		CreateVolumeLabel(data, label);
+		create_volume_label_sector(data, label);
 		uint32 rootDirSector = reservedSectorCount + (numFATs * FATSize);
 		written = write_pos(fd, rootDirSector * 512, data, 512);
 		if (written != 512) {
@@ -565,7 +582,7 @@ dosfs_initialize(int fd, partition_id partitionID, const char* name,
 		int size = 512 * sectorPerCluster;
 		uint8 *cluster = (uint8*)malloc(size);
 		memset(cluster, 0, size);
-		CreateVolumeLabel(cluster, label);
+		create_volume_label_sector(cluster, label);
 		uint32 rootDirSector = reservedSectorCount + (numFATs * FATSize)
 			+ rootDirSectors;
 		written = write_pos(fd, rootDirSector * 512, cluster, size);
@@ -727,18 +744,3 @@ main(int argc, char *argv[])
 	return (s == B_OK) ? 0 : 1;
 }
 #endif
-
-
-void CreateVolumeLabel(void *sector, const char *label)
-{
-	// create a volume name directory entry in the 512 byte sector
-	// XXX convert from UTF8, and check for valid characters
-	// XXX this could be changed to use long file name entrys,
-	// XXX but the dosfs would have to be updated, too
-	
-	fatdirent *d = (fatdirent *)sector;
-	memset(d, 0, sizeof(*d));
-	memset(d->Name, 0x20, 11);
-	memcpy(d->Name, label, min_c(11, strlen(label)));
-	d->Attr = 0x08;
-}
