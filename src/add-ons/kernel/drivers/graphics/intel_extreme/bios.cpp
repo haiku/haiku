@@ -45,7 +45,8 @@ struct bdb_header {
 
 enum bdb_block_id {
 	BDB_LVDS_OPTIONS = 40,
-	BDB_LVDS_LFP_DATA_PTRS
+	BDB_LVDS_LFP_DATA_PTRS = 41,
+	BDB_GENERIC_DTD = 58
 };
 
 
@@ -103,6 +104,36 @@ struct lvds_bdb2_lfp_info {
 	uint32 pfit_reg;
 	uint32 pfit_reg_val;
 	uint16 terminator;
+} __attribute__((packed));
+
+
+
+struct generic_dtd_entry {
+	uint32 pixel_clock;
+	uint16 hactive;
+	uint16 hblank;
+	uint16 hfront_porch;
+	uint16 hsync;
+	uint16 vactive;
+	uint16 vblank;
+	uint16 vfront_porch;
+	uint16 vsync;
+	uint16 width_mm;
+	uint16 height_mm;
+
+	uint8 rsvd_flags:6;
+	uint8 vsync_positive_polarity:1;
+	uint8 hsync_positive_polarity:1;
+
+	uint8 rsvd[3];
+} __attribute__((packed));
+
+
+struct bdb_generic_dtd {
+	uint8 id;
+	uint16 size;
+	uint16 gdtd_size;
+	struct generic_dtd_entry dtd[];
 } __attribute__((packed));
 
 
@@ -372,6 +403,7 @@ get_lvds_mode_from_bios(display_timing* panelTiming)
 
 	int blockSize;
 	int panelType = -1;
+	bool panelTimingFound = false;
 
 	for (int bdbBlockOffset = bdb->header_size; bdbBlockOffset < bdb->bdb_size;
 			bdbBlockOffset += blockSize) {
@@ -427,12 +459,65 @@ get_lvds_mode_from_bios(display_timing* panelTiming)
 				panelTiming->flags = 0;
 
 				sanitize_panel_timing(*panelTiming);
+
+				// on newer versions, check also generic DTD, use LFP panel DTD as a fallback
+				if (bdb->version >= 229) {
+					panelTimingFound = true;
+					break;
+				}
 				delete_area(vbios.area);
 				return true;
+			}
+			case BDB_GENERIC_DTD:
+			{
+				// First make sure we found block BDB_LVDS_OPTIONS and the panel type
+				if (panelType == -1)
+					break;
+
+				bdb_generic_dtd* generic_dtd = (bdb_generic_dtd*)(vbios.memory + start);
+				if (generic_dtd->gdtd_size < sizeof(bdb_generic_dtd)) {
+					TRACE((DEVICE_NAME ": invalid gdtd_size %d\n", generic_dtd->gdtd_size));
+					break;
+				}
+				int32 count = (blockSize - sizeof(bdb_generic_dtd)) / generic_dtd->gdtd_size;
+				if (panelType >= count) {
+					TRACE((DEVICE_NAME ": panel type not found %d in %" B_PRId32 " dtds\n",
+						panelType, count));
+					break;
+				}
+				generic_dtd_entry* dtd = &generic_dtd->dtd[panelType];
+				TRACE((DEVICE_NAME ": pixel_clock %" B_PRId32 " "
+					"hactive %d hfront_porch %d hsync %d hblank %d "
+					"vactive %d vfront_porch %d vsync %d vblank %d\n",
+						dtd->pixel_clock, dtd->hactive, dtd->hfront_porch, dtd->hsync, dtd->hblank,
+						dtd->vactive, dtd->vfront_porch, dtd->vsync, dtd->vblank));
+
+				TRACE((DEVICE_NAME ": found generic dtd entry of size %d x %d "
+					"in BIOS VBT tables\n", dtd->hactive, dtd->vactive));
+
+				panelTiming->pixel_clock = dtd->pixel_clock;
+				panelTiming->h_sync_start = dtd->hactive + dtd->hfront_porch;
+				panelTiming->h_sync_end = panelTiming->h_sync_start + dtd->hsync;
+				panelTiming->h_total = dtd->hactive + dtd->hblank;
+				panelTiming->h_display = dtd->hactive;
+				panelTiming->v_sync_start = dtd->vactive + dtd->vfront_porch;
+				panelTiming->v_sync_end = panelTiming->v_sync_start + dtd->vsync;
+				panelTiming->v_total = dtd->vactive + dtd->vblank;
+				panelTiming->v_display = dtd->vactive;
+				panelTiming->flags = 0;
+				if (dtd->hsync_positive_polarity)
+					panelTiming->flags |= B_POSITIVE_HSYNC;
+				if (dtd->vsync_positive_polarity)
+					panelTiming->flags |= B_POSITIVE_VSYNC;
+
+				sanitize_panel_timing(*panelTiming);
+				delete_area(vbios.area);
+				return true;
+
 			}
 		}
 	}
 
 	delete_area(vbios.area);
-	return false;
+	return panelTimingFound;
 }
