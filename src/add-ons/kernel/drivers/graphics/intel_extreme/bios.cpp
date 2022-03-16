@@ -159,86 +159,167 @@ dumprom(void *rom, uint32 size, intel_info &info)
 	PROM-programmed timings info when compensation mode is off on your machine.
 */
 
+// outdated: https://01.org/sites/default/files/documentation/skl_opregion_rev0p5.pdf
+
 #define ASLS 0xfc // ASL Storage.
 #define OPREGION_SIGNATURE "IntelGraphicsMem"
+#define OPREGION_ASLE_OFFSET   0x300
+#define OPREGION_VBT_OFFSET   0x400
+#define MBOX_ACPI (1 << 0)
+#define MBOX_SWSCI (1 << 1)
+#define MBOX_ASLE (1 << 2)
+#define MBOX_ASLE_EXT (1 << 3)
+
+
+struct opregion_header {
+	uint8 signature[16];
+	uint32 size;
+	uint8 reserved;
+	uint8 revision_version;
+	uint8 minor_version;
+	uint8 major_version;
+	uint8 sver[32];
+	uint8 vver[16];
+	uint8 gver[16];
+	uint32 mboxes;
+	uint32 driver_model;
+	uint32 platform_configuration;
+	uint8 gop_version[32];
+	uint8 rsvd[124];
+} __attribute__((packed));
+
+
+struct opregion_asle {
+	uint32 ardy;
+	uint32 aslc;
+	uint32 tche;
+	uint32 alsi;
+	uint32 bclp;
+	uint32 pfit;
+	uint32 cblv;
+	uint16 bclm[20];
+	uint32 cpfm;
+	uint32 epfm;
+	uint8 plut[74];
+	uint32 pfmb;
+	uint32 cddv;
+	uint32 pcft;
+	uint32 srot;
+	uint32 iuer;
+	uint64 fdss;
+	uint32 fdsp;
+	uint32 stat;
+	uint64 rvda;
+	uint32 rvds;
+	uint8 rsvd[58];
+} __attribute__((packed));
+
 
 static bool
 get_bios(int* vbtOffset)
 {
+	STATIC_ASSERT(sizeof(opregion_header) == 0x100);
+	STATIC_ASSERT(sizeof(opregion_asle) == 0x100);
+
 	intel_info &info = *gDeviceInfo[0];
-	// first try to fetch Intel OpRegion which should be polulated by the BIOS at start
-	uint64_t kVBIOSAddress = 0;
-	uint32 kVBIOSSize = 8 * 1024;
+	// first try to fetch Intel OpRegion which should be populated by the BIOS at start
+	uint32 kVBIOSSize;
 
-	// get OpRegion - see Intel ACPI IGD info in acpi_igd_opregion_spec_0.pdf
-	kVBIOSAddress = get_pci_config(info.pci, ASLS, 4);
-	if (!kVBIOSAddress) {
-		TRACE((DEVICE_NAME ": ACPI OpRegion not supported!\n"));
-	} else {
-		TRACE((DEVICE_NAME ": Graphic OpRegion physical addr: 0x%" B_PRIx64
-				"; size: 0x%" B_PRIx32 "\n", kVBIOSAddress, kVBIOSSize));
-		vbios.area = map_physical_memory("ASLS mapping", kVBIOSAddress,
-			kVBIOSSize, B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void **)&vbios.memory);
-
-		if (vbios.area >= 0) {
-			TRACE((DEVICE_NAME ": mapping ASLS: 0x%" B_PRIx64 " -> %p\n",
-				kVBIOSAddress, vbios.memory));
-			// check if we got the ASLS and signature
-			if (memcmp(vbios.memory, OPREGION_SIGNATURE, 16)) {
-				TRACE((DEVICE_NAME ": OpRegion signature mismatch\n"));
+	for (uint32 romMethod = 0; romMethod < 2; romMethod++) {
+		switch(romMethod) {
+			case 0:
+			{
+				// get OpRegion - see Intel ACPI IGD info in acpi_igd_opregion_spec_0.pdf
+				uint64 kVBIOSAddress = get_pci_config(info.pci, ASLS, 4);
+				if (kVBIOSAddress == 0) {
+					TRACE((DEVICE_NAME ": ACPI OpRegion not supported!\n"));
+					continue;
+				}
+				kVBIOSSize = 8 * 1024;
+				TRACE((DEVICE_NAME ": Graphic OpRegion physical addr: 0x%" B_PRIx64
+						"; size: 0x%" B_PRIx32 "\n", kVBIOSAddress, kVBIOSSize));
+				vbios.area = map_physical_memory("ASLS mapping", kVBIOSAddress,
+					kVBIOSSize, B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void **)&vbios.memory);
+				if (vbios.area < 0)
+					continue;
+				TRACE((DEVICE_NAME ": mapping OpRegion: 0x%" B_PRIx64 " -> %p\n",
+					kVBIOSAddress, vbios.memory));
+				// check if we got the OpRegion and signature
+				if (memcmp(vbios.memory, OPREGION_SIGNATURE, 16) != 0) {
+					TRACE((DEVICE_NAME ": OpRegion signature mismatch\n"));
+					delete_area(vbios.area);
+					vbios.area = -1;
+					continue;
+				}
+				opregion_header* header = (opregion_header*)vbios.memory;
+				opregion_asle* asle = (opregion_asle*)(vbios.memory + OPREGION_ASLE_OFFSET);
+				if (header->major_version < 2 || (header->mboxes & MBOX_ASLE) == 0
+					|| asle->rvda == 0 || asle->rvds == 0) {
+					vbios.memory += OPREGION_VBT_OFFSET;
+					kVBIOSSize -= OPREGION_VBT_OFFSET;
+					break;
+				}
+				uint64 rvda = asle->rvda;
+				kVBIOSSize = asle->rvds;
+				if (header->major_version > 3 || header->minor_version >= 1) {
+					rvda += kVBIOSAddress;
+				}
+				TRACE((DEVICE_NAME ": RVDA physical addr: 0x%" B_PRIx64
+						"; size: 0x%" B_PRIx32 "\n", rvda, kVBIOSSize));
 				delete_area(vbios.area);
-				vbios.area = -1;
-				// force using ISA legacy map as fall-back
-				kVBIOSAddress = 0;
+				vbios.area = map_physical_memory("RVDA mapping", rvda,
+					kVBIOSSize, B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void **)&vbios.memory);
+				if (vbios.area < 0)
+					continue;
+				break;
 			}
-		} else {
-			// mapping failed: force using ISA legacy map as fall-back
-			kVBIOSAddress = 0;
+			case 1:
+			{
+				uint64 kVBIOSAddress = 0xc0000;
+				kVBIOSSize = 64 * 1024;
+				/* !!!DANGER!!!: mapping of BIOS using legacy location as a fallback,
+				  hence, if panel mode will be set using info from VBT this way, it will
+				  be taken from primary card's VBIOS */
+				vbios.area = map_physical_memory("VBIOS mapping", kVBIOSAddress,
+					kVBIOSSize, B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void**)&vbios.memory);
+				if (vbios.area < 0)
+					continue;
+
+				TRACE((DEVICE_NAME ": mapping VBIOS: 0x%" B_PRIx64 " -> %p\n",
+					kVBIOSAddress, vbios.memory));
+				break;
+			}
 		}
-	}
 
-	if (!kVBIOSAddress) {
-		kVBIOSAddress = 0xc0000;
-		kVBIOSSize = 64 * 1024;
-		/* !!!DANGER!!!: mapping of BIOS using legacy location as a fallback,
-		hence, if panel mode will be set using info from VBT this way, it will
-		be taken from primary card's VBIOS */
-		vbios.area = map_physical_memory("VBIOS mapping", kVBIOSAddress,
-			kVBIOSSize, B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void**)&vbios.memory);
+		// dump ROM to file if selected in settings file
+		if (read_settings_dumpRom())
+			dumprom(vbios.memory, kVBIOSSize, info);
 
-		if (vbios.area < 0)
-			return false;
+		// scan BIOS for VBT signature
+		*vbtOffset = kVBIOSSize;
+		for (uint32 i = 0; i + 4 < kVBIOSSize; i += 4) {
+			if (memcmp(vbios.memory + i, "$VBT", 4) == 0) {
+				*vbtOffset = i;
+				break;
+			}
+		}
 
-		TRACE((DEVICE_NAME ": mapping VBIOS: 0x%" B_PRIx64 " -> %p\n",
-			kVBIOSAddress, vbios.memory));
-	}
-
-	// dump ROM to file if selected in settings file
-	if (read_settings_dumpRom())
-		dumprom(vbios.memory, kVBIOSSize, info);
-
-	// scan BIOS for VBT signature
-	*vbtOffset = kVBIOSSize;
-	for (uint32 i = 0; i + 4 < kVBIOSSize; i += 4) {
-		if (memcmp(vbios.memory + i, "$VBT", 4) == 0) {
-			*vbtOffset = i;
+		if ((*vbtOffset + (uint32)sizeof(vbt_header)) >= kVBIOSSize) {
+			TRACE((DEVICE_NAME": bad VBT offset : 0x%x\n", *vbtOffset));
+			delete_area(vbios.area);
 			continue;
 		}
+
+		struct vbt_header* vbt = (struct vbt_header*)(vbios.memory + *vbtOffset);
+		if (memcmp(vbt->signature, "$VBT", 4) != 0) {
+			TRACE((DEVICE_NAME": bad VBT signature: %20s\n", vbt->signature));
+			delete_area(vbios.area);
+			continue;
+		}
+		return true;
 	}
 
-	if ((*vbtOffset + (uint32)sizeof(vbt_header)) >= kVBIOSSize) {
-		TRACE((DEVICE_NAME": bad VBT offset : 0x%x\n", *vbtOffset));
-		delete_area(vbios.area);
-		return false;
-	}
-
-	struct vbt_header* vbt = (struct vbt_header*)(vbios.memory + *vbtOffset);
-	if (memcmp(vbt->signature, "$VBT", 4) != 0) {
-		TRACE((DEVICE_NAME": bad VBT signature: %20s\n", vbt->signature));
-		delete_area(vbios.area);
-		return false;
-	}
-	return true;
+	return false;
 }
 
 
