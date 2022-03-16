@@ -9,7 +9,7 @@ SYSTEM_BIN += [ FFilterByBuildFeatures
 	dpms
 	FirstBootPrompt
 	<bin>i2c@x86,x86_64 installsound
-	mail mail2mbox mbox2mail media_client mkdos mount_nfs
+	mail mail2mbox mbox2mail media_client mount_nfs
 	play recover screenshot setcontrollook setdecor spamdbm
 	translate
 	WindowShade
