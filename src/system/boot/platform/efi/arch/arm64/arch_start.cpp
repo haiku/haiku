@@ -150,30 +150,40 @@ arch_start_kernel(addr_t kernelEntry)
 *    On AArch64 UEFI shall execute as 64-bit code at either EL1 or EL2,
 *    depending on whether or not virtualization is available at OS load time."
 */
-	if (arch_exception_level() != 1) {
-		dprintf("Current Exception Level EL%1ld\n", arch_exception_level());
-		if (arch_exception_level() == 2) {
-			/* Transitioning from EL we lose present MMU configuration
-			 * which we would like to preserve e.g. peripherals mappings */
-			if (arch_mmu_enabled()) {
-				dprintf("MMU Enabled, Translation Table @ %lx Granularity %s, bits %d\n",
-					arch_mmu_base_register(),
-					granule_type_str(arch_mmu_user_granule()),
-					arch_mmu_user_address_bits());
+	dprintf("Current Exception Level EL%1lx\n", arch_exception_level());
+	dprintf("TTBR0: %" B_PRIx64 " TTBRx: %" B_PRIx64 " SCTLR: %" B_PRIx64 " TCR: %" B_PRIx64 "\n",
+		arch_mmu_base_register(),
+		arch_mmu_base_register(true),
+		_arch_mmu_get_sctlr(),
+		_arch_mmu_get_tcr());
 
-				dprintf("Kernel entry accessibility W: %x R: %x\n",
-					arch_mmu_write_access(kernelEntry),
-					arch_mmu_read_access(kernelEntry));
+	if (arch_mmu_enabled()) {
+		dprintf("MMU Enabled, Granularity %s, bits %d\n",
+			granule_type_str(arch_mmu_user_granule()),
+			arch_mmu_user_address_bits());
 
-				arch_mmu_dump_present_tables();
+		dprintf("Kernel entry accessibility W: %x R: %x\n",
+			arch_mmu_write_access(kernelEntry),
+			arch_mmu_read_access(kernelEntry));
 
-				el2toel1 = true; // we want to print before exit services
-			}
+		arch_mmu_dump_present_tables();
+	}
 
-		} else {
-			// Not ready, undexpected any transition different than EL2 >> EL1
+	switch (arch_exception_level()) {
+		case 1:
+			/* arch_cache_disable(); */
+			/* arch_mmu_generate_post_efi_page_tables */
+
+			break;
+
+		case 2:
+
+			el2toel1 = true; // we want to print before exit services
+			break;
+
+		default:
 			panic("Unexpected Exception Level\n");
-		}
+			break;
 	}
 
 
@@ -214,6 +224,9 @@ arch_start_kernel(addr_t kernelEntry)
 		arch_cache_disable();
 
 		_arch_transition_EL2_EL1();
+
+		arch_cache_enable();
+	} else {
 
 		arch_cache_enable();
 	}

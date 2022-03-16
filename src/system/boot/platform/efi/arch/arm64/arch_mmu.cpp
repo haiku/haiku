@@ -411,14 +411,22 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 void
 arch_mmu_allocate_kernel_page_tables(void)
 {
-	uint64* page = CurrentRegime.AllocatePage();
+	uint64* page = reinterpret_cast<uint64*>(READ_SPECIALREG(TTBR1_EL1));
 
-	if (page != NULL) {
-		WRITE_SPECIALREG(TTBR1_EL1, page);
-		sPageDirectory = page;
+	// NOTE: On devices supporting multiple translation base registers, TTBR0 must
+	// be used solely.
+	if (page == NULL) {
+		page = CurrentRegime.AllocatePage();
+		if (page != NULL) {
+			WRITE_SPECIALREG(TTBR1_EL1, page);
+		} else {
+			panic("Not enough memory for kernel initial page\n");
+		}
 	} else {
-		panic("Not enough memory for kernel initial page\n");
+		TRACE(("TTBR1_EL1 present ..."));
 	}
+
+	sPageDirectory = page;
 }
 
 
