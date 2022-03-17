@@ -521,7 +521,7 @@ _get_cpu_info_etc(uint32 firstCPU, uint32 cpuCount, cpu_info* info, size_t size)
 	if (firstCPU >= (uint32)smp_get_num_cpus())
 		return B_BAD_VALUE;
 
-	uint32 count = std::min(cpuCount, smp_get_num_cpus() - firstCPU);
+	const uint32 endCPU = firstCPU + std::min(cpuCount, smp_get_num_cpus() - firstCPU);
 
 	// This function is called very often from userland by applications
 	// that display CPU usage information, so we want to keep this as
@@ -529,16 +529,18 @@ _get_cpu_info_etc(uint32 firstCPU, uint32 cpuCount, cpu_info* info, size_t size)
 	// of an allocated temporary buffer.
 
 	cpu_info localInfo[8];
-	for (uint32 i = 0; i < count; ) {
-		uint32 j;
-		for (j = 0; i < count && j < B_COUNT_OF(localInfo); i++, j++) {
-			localInfo[j].active_time = cpu_get_active_time(firstCPU + i);
-			localInfo[j].enabled = !gCPU[firstCPU + i].disabled;
-			localInfo[j].current_frequency = cpu_frequency(firstCPU + i);
+	for (uint32 cpuIdx = firstCPU; cpuIdx < endCPU; ) {
+		uint32 localIdx;
+		for (localIdx = 0; cpuIdx < endCPU && localIdx < B_COUNT_OF(localInfo);
+				cpuIdx++, localIdx++) {
+			localInfo[localIdx].active_time = cpu_get_active_time(cpuIdx);
+			localInfo[localIdx].enabled = !gCPU[cpuIdx].disabled;
+			localInfo[localIdx].current_frequency = cpu_frequency(cpuIdx);
 		}
 
-		if (user_memcpy(info + (i - j), localInfo, sizeof(cpu_info) * j) != B_OK)
+		if (user_memcpy(info, localInfo, sizeof(cpu_info) * localIdx) != B_OK)
 			return B_BAD_ADDRESS;
+		info += localIdx;
 	}
 
 	return B_OK;
