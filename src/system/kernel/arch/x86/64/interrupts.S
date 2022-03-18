@@ -505,10 +505,11 @@ FUNCTION(x86_64_syscall_entry):
 	push	IFRAME_di(%rbp)
 	movq	%r14, %rdi				// syscall number
 	movq	%rsp, %rsi
+	subq	$8, %rsp
 	push	%rax
 	call	user_debug_pre_syscall
 	pop		%rax
-	addq	$48, %rsp
+	addq	$56, %rsp
 	jmp		.Lpre_syscall_debug_done
 
 .Lpost_syscall_work:
