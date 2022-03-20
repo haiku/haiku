@@ -160,7 +160,6 @@ BImageResources::GetIconResource(int32 id, icon_size size,
 
 	data = LoadResource(size == B_MINI_ICON ? 'MICN' : 'ICON', id, &length);
 	if (data == NULL || length != (size_t)(size * size)) {
-		TRESPASS();
 		return B_ERROR;
 	}
 
