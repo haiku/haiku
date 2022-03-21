@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2021-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "IncrementViewCounterProcess.h"
@@ -68,6 +68,12 @@ IncrementViewCounterProcess::RunInternal()
 		HDERROR("the package's depot is not present to increment the view "
 			"counter");
 		return B_ERROR;
+	}
+
+	if (depot->WebAppRepositorySourceCode().IsEmpty()) {
+		HDERROR("cannot increment view counter because depot has no web app "
+			"repository source code");
+		return B_BAD_DATA;
 	}
 
 	int32 attempts = ATTEMPTS;

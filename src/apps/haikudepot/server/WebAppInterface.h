@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef WEB_APP_INTERFACE_H
@@ -57,6 +57,7 @@ public:
 			status_t			RetreiveUserRatingsForPackageForDisplay(
 									const BString& packageName,
 									const BString& webAppRepositoryCode,
+									const BString& webAppRepositorySourceCode,
 									int resultOffset, int maxResults,
 									BMessage& message);
 
@@ -64,7 +65,8 @@ public:
 									const BString& packageName,
 									const BPackageVersion& version,
 									const BString& architecture,
-									const BString& repositoryCode,
+									const BString& webAppRepositoryCode,
+									const BString& webAppRepositorySourceCode,
 									const BString& userNickname,
 									BMessage& message);
 
@@ -72,7 +74,8 @@ public:
 									const BString& packageName,
 									const BPackageVersion& version,
 									const BString& architecture,
-									const BString& repositoryCode,
+									const BString& webAppRepositoryCode,
+									const BString& webAppRepositorySourceCode,
 									const BString& languageCode,
 									const BString& comment,
 									const BString& stability,
