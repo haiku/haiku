@@ -435,6 +435,34 @@ taskqueue_cancel_timeout(struct taskqueue *queue,
 
 
 void
+taskqueue_block(struct taskqueue *taskQueue)
+{
+	if (taskQueue == NULL)
+		return;
+
+	tq_lock(taskQueue);
+	taskQueue->tq_flags |= TQ_FLAGS_BLOCKED;
+	tq_unlock(taskQueue);
+}
+
+
+void
+taskqueue_unblock(struct taskqueue *taskQueue)
+{
+	if (taskQueue == NULL)
+		return;
+
+	tq_lock(taskQueue);
+	taskQueue->tq_flags &= ~TQ_FLAGS_BLOCKED;
+	if (taskQueue->tq_flags & TQ_FLAGS_PENDING) {
+		taskQueue->tq_flags &= ~TQ_FLAGS_PENDING;
+		taskQueue->tq_enqueue(taskQueue->tq_arg);
+	}
+	tq_unlock(taskQueue);
+}
+
+
+void
 taskqueue_thread_enqueue(void *context)
 {
 	struct taskqueue **tqp = context;
@@ -553,26 +581,4 @@ uninit_taskqueues()
 
 	if (HAIKU_DRIVER_REQUIRES(FBSD_FAST_TASKQUEUE))
 		taskqueue_free(taskqueue_fast);
-}
-
-
-void
-taskqueue_block(struct taskqueue *taskQueue)
-{
-	tq_lock(taskQueue);
-	taskQueue->tq_flags |= TQ_FLAGS_BLOCKED;
-	tq_unlock(taskQueue);
-}
-
-
-void
-taskqueue_unblock(struct taskqueue *taskQueue)
-{
-	tq_lock(taskQueue);
-	taskQueue->tq_flags &= ~TQ_FLAGS_BLOCKED;
-	if (taskQueue->tq_flags & TQ_FLAGS_PENDING) {
-		taskQueue->tq_flags &= ~TQ_FLAGS_PENDING;
-		taskQueue->tq_enqueue(taskQueue->tq_arg);
-	}
-	tq_unlock(taskQueue);
 }
