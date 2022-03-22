@@ -67,6 +67,7 @@ const struct supported_uarts {
 #elif defined(__ARM__) || defined(__aarch64__)
 	{ "arm,pl011", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
 	{ "snps,dw-apb-uart", UART_KIND_8250, &get_uart<DebugUART8250> },
+	{ "brcm,bcm2835-aux-uart", UART_KIND_8250, &get_uart<DebugUART8250> },
 #endif
 };
 
