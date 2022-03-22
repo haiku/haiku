@@ -27,7 +27,7 @@ static addr_range sClint = {0};
 
 
 void
-arch_handle_fdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
+arch_handle_fdt(const void* fdt, int node)
 {
 	const char* deviceType = (const char*)fdt_getprop(fdt, node,
 		"device_type", NULL);
@@ -73,13 +73,13 @@ arch_handle_fdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells
 		return;
 
 	if (dtb_has_fdt_string(compatible, compatibleLen, "riscv,clint0")) {
-		dtb_get_reg(fdt, node, addressCells, sizeCells, 0, sClint);
+		dtb_get_reg(fdt, node, 0, sClint);
 		return;
 	}
 
 	if (dtb_has_fdt_string(compatible, compatibleLen, "riscv,plic0")
 		|| dtb_has_fdt_string(compatible, compatibleLen, "sifive,plic-1.0.0")) {
-		dtb_get_reg(fdt, node, addressCells, sizeCells, 0, sPlic);
+		dtb_get_reg(fdt, node, 0, sPlic);
 		int propSize;
 		if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "interrupts-extended", &propSize)) {
 			dprintf("PLIC contexts\n");

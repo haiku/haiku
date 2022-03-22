@@ -9,7 +9,7 @@
 #include <SupportDefs.h>
 
 
-void arch_handle_fdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells);
+void arch_handle_fdt(const void* fdt, int node);
 void arch_dtb_set_kernel_args(void);
 
 

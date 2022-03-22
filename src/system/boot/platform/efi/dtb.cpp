@@ -291,9 +291,48 @@ dtb_has_fdt_string(const char* prop, int size, const char* pattern)
 }
 
 
-bool
-dtb_get_reg(const void* fdt, int node, uint32 addressCells, uint32 sizeCells, size_t idx, addr_range& range)
+uint32
+dtb_get_address_cells(const void* fdt, int node)
 {
+	uint32 res = 2;
+
+	int parent = fdt_parent_offset(fdt, node);
+	if (parent < 0)
+		return res;
+
+	uint32 *prop = (uint32*)fdt_getprop(sDtbTable, parent, "#address-cells", NULL);
+	if (prop == NULL)
+		return res;
+
+	res = fdt32_to_cpu(*prop);
+	return res;
+}
+
+
+uint32
+dtb_get_size_cells(const void* fdt, int node)
+{
+	uint32 res = 1;
+
+	int parent = fdt_parent_offset(fdt, node);
+	if (parent < 0)
+		return res;
+
+	uint32 *prop = (uint32*)fdt_getprop(sDtbTable, parent, "#size-cells", NULL);
+	if (prop == NULL)
+		return res;
+
+	res = fdt32_to_cpu(*prop);
+	return res;
+}
+
+
+bool
+dtb_get_reg(const void* fdt, int node, size_t idx, addr_range& range)
+{
+	uint32 addressCells = dtb_get_address_cells(fdt, node);
+	uint32 sizeCells = dtb_get_size_cells(fdt, node);
+
 	int propSize;
 	const uint8* prop = (const uint8*)fdt_getprop(fdt, node, "reg", &propSize);
 	if (prop == NULL)
@@ -400,9 +439,9 @@ dtb_get_clock_frequency(const void* fdt, int node)
 
 
 static void
-dtb_handle_fdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
+dtb_handle_fdt(const void* fdt, int node)
 {
-	arch_handle_fdt(fdt, node, addressCells, sizeCells);
+	arch_handle_fdt(fdt, node);
 
 	int compatibleLen;
 	const char* compatible = (const char*)fdt_getprop(fdt, node,
@@ -423,7 +462,7 @@ dtb_handle_fdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
 				memcpy(uart.kind, kSupportedUarts[i].kind,
 					sizeof(uart.kind));
 
-				dtb_get_reg(fdt, node, addressCells, sizeCells, 0, uart.regs);
+				dtb_get_reg(fdt, node, 0, uart.regs);
 				uart.irq = dtb_get_interrupt(fdt, node);
 				uart.clock = dtb_get_clock_frequency(fdt, node);
 
@@ -472,20 +511,8 @@ dtb_init()
 
 		int node = -1;
 		int depth = -1;
-		uint32 addressCells = 0;
-		uint32 sizeCells = 0;
 		while ((node = fdt_next_node(sDtbTable, node, &depth)) >= 0 && depth >= 0) {
-			if (addressCells == 0) {
-				uint32* prop = (uint32*)fdt_getprop(sDtbTable, node, "#address-cells", NULL);
-				addressCells = fdt32_to_cpu(*prop);
-				INFO("Address cells at %p: %u\n", prop, addressCells);
-			}
-			if (sizeCells == 0) {
-				uint32* prop = (uint32*)fdt_getprop(sDtbTable, node, "#size-cells", NULL);
-				sizeCells = fdt32_to_cpu(*prop);
-				INFO("Size cells at %p: %u\n", prop, sizeCells);
-			}
-			dtb_handle_fdt(sDtbTable, node, addressCells, sizeCells);
+			dtb_handle_fdt(sDtbTable, node);
 		}
 		break;
 	}

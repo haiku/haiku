@@ -31,7 +31,7 @@ const struct supported_interrupt_controllers {
 
 
 void
-arch_handle_fdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
+arch_handle_fdt(const void* fdt, int node)
 {
 	const char* deviceType = (const char*)fdt_getprop(fdt, node,
 		"device_type", NULL);
@@ -66,10 +66,8 @@ arch_handle_fdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells
 				memcpy(interrupt_controller.kind, kSupportedInterruptControllers[i].kind,
 					sizeof(interrupt_controller.kind));
 
-				dtb_get_reg(fdt, node, addressCells, sizeCells, 0,
-					interrupt_controller.regs1);
-				dtb_get_reg(fdt, node, addressCells, sizeCells, 1,
-					interrupt_controller.regs2);
+				dtb_get_reg(fdt, node, 0, interrupt_controller.regs1);
+				dtb_get_reg(fdt, node, 1, interrupt_controller.regs2);
 			}
 		}
 	}
