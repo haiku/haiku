@@ -773,10 +773,14 @@ intel_extreme_uninit(intel_info &info)
 
 	if (!info.fake_interrupts && info.shared_info->vblank_sem > 0) {
 		// disable interrupt generation
-		write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
-		write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
-
-		remove_io_interrupt_handler(info.irq, intel_interrupt_handler, &info);
+		if (info.device_type.Generation() >= 8) {
+			bdw_enable_global_interrupts(info, false);
+			remove_io_interrupt_handler(info.irq, bdw_interrupt_handler, &info);
+		} else {
+			write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
+			write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
+			remove_io_interrupt_handler(info.irq, intel_interrupt_handler, &info);
+		}
 
 		if (info.use_msi && gPCIx86Module != NULL) {
 			gPCIx86Module->disable_msi(info.pci->bus,
