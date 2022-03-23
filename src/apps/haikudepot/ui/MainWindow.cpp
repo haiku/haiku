@@ -293,12 +293,8 @@ MainWindow::~MainWindow()
 			fShuttingDownWindow->Quit();
 	}
 
-	// We must clear and delete these early to release references.
+	// We must clear the model early to release references.
 	fModel.Clear();
-	fFeaturedPackagesView->RemoveSelf();
-	fPackageListView->RemoveSelf();
-	delete fFeaturedPackagesView;
-	delete fPackageListView;
 }
 
 

@@ -35,9 +35,9 @@ class ShuttingDownWindow;
 class WorkStatusView;
 
 
-class MainWindow : public BWindow, private PackageInfoListener,
+class MainWindow : private PackageInfoListener,
 	private ProcessCoordinatorConsumer, public ProcessCoordinatorListener,
-	public UserDetailVerifierListener {
+	public UserDetailVerifierListener, public BWindow {
 public:
 								MainWindow(const BMessage& settings);
 								MainWindow(const BMessage& settings,
