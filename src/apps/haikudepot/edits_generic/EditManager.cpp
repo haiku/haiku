@@ -174,9 +174,7 @@ EditManager::AddListener(Listener* listener)
 void
 EditManager::RemoveListener(Listener* listener)
 {
-	fListeners.erase(std::remove(
-		fListeners.begin(),
-		fListeners.end(),
+	fListeners.erase(std::remove(fListeners.begin(), fListeners.end(),
 		listener), fListeners.end());
 }
 

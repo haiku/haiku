@@ -1041,7 +1041,8 @@ PackageInfo::AddListener(const PackageInfoListenerRef& listener)
 void
 PackageInfo::RemoveListener(const PackageInfoListenerRef& listener)
 {
-	std::remove(fListeners.begin(), fListeners.end(), listener);
+	fListeners.erase(std::remove(fListeners.begin(), fListeners.end(),
+		listener), fListeners.end());
 }
 
 
