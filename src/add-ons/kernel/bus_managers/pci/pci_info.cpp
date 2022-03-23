@@ -413,6 +413,39 @@ get_extended_capability_name(uint16 cap_id)
 			return "Downstream Porto Containment";
 		case PCI_extcap_id_l1pm:
 			return "L1 Power Management Substates";
+		case PCI_extcap_id_ptm:
+			return "Precision Time Measurement";
+		case PCI_extcap_id_m_pcie:
+			return "PCIe over M-PHY";
+		case PCI_extcap_id_frs:
+			return "FRS Queuing";
+		case PCI_extcap_id_rtr:
+			return "Readiness Time Reporting";
+		case PCI_extcap_id_dvsec:
+			return "Designated Vendor-Specific";
+		case PCI_extcap_id_vf_resizable_bar:
+			return "VF Resizable BAR";
+		case PCI_extcap_id_datalink:
+			return "Data Link Feature";
+		case PCI_extcap_id_16gt:
+			return "Physical Layer 16.0 GT/s";
+		case PCI_extcap_id_lmr:
+			return "Lane Marging at the Receiver";
+		case PCI_extcap_id_hierarchy_id:
+			return "Hierarchy ID";
+		case PCI_extcap_id_npem:
+			return "Native PCIe Enclosure Management";
+		case PCI_extcap_id_pl32:
+			return "Physical Layer 32.0 GT/s";
+		case PCI_extcap_id_ap:
+			return "Alternate Protocol";
+		case PCI_extcap_id_sfi:
+			return "System Firmware Intermediary";
+		case PCI_extcap_id_sf:
+			return "Shadow Functions";
+		case PCI_extcap_id_doe:
+			return "Data Object Exchange";
+
 		default:
 			return NULL;
 	}
