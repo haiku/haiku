@@ -121,9 +121,13 @@ rule TargetBootLibsupc++ asPath
 
 	if $(TARGET_PLATFORM) = haiku {
 		if $(TARGET_PACKAGING_ARCH) = x86_64 {
-			# we need to use the 32-bit libsupc++.a built by the cross-compiler
-			return $(TARGET_BOOT_LIBSUPC++) ;
-
+			if $(TARGET_BOOT_PLATFORM) = efi {
+				# we need to use the 64-bit libsupc++.a built by the cross-compiler
+				return $(TARGET_BOOT_LIBSUPC++) ;
+			} else {
+				# we need to use the 32-bit libsupc++.a built by the cross-compiler
+				return $(TARGET_BOOT_32_LIBSUPC++) ;
+			}
 			# TODO: ideally, we would build this as part of gcc_syslibs_devel,
 			#       but that isn't currently possible, as that would require
 			#       32-bit support (libraries and glue-code) on x86_64-Haiku.
@@ -239,9 +243,13 @@ rule TargetBootLibgcc architecture : asPath
 
 	if $(TARGET_PLATFORM) = haiku {
 		if $(architecture) = x86_64 {
-			# we need to use the 32-bit libgcc.a built by the cross-compiler
-			return $(TARGET_BOOT_LIBGCC) ;
-
+			if $(TARGET_BOOT_PLATFORM) = efi {
+				# we need to use the 64-bit libgcc.a built by the cross-compiler
+				return $(TARGET_BOOT_LIBGCC) ;
+			} else {
+				# we need to use the 32-bit libgcc.a built by the cross-compiler
+				return $(TARGET_BOOT_32_LIBGCC) ;
+			}
 			# TODO: ideally, we would build this as part of gcc_syslibs_devel,
 			#       but that isn't currently possible, as that would require
 			#       32-bit support (libraries and glue-code) on x86_64-Haiku.

@@ -314,18 +314,24 @@ standard_gcc_settings()
 	local bootLibgcc
 	local bootLibSupCxx
 	local bootCxxHeaders
+	local boot32Libgcc
+	local boot32LibSupCxx
+	local boot32CxxHeaders
 	case $gccMachine in
 		x86_64-*)
 			# Boot loader is 32-bit, need the 32-bit libs and c++ config
-			bootLibgcc=`$gcc -m32 -print-file-name=libgcc.a`
-			bootLibSupCxx=`$gcc -m32 -print-file-name=libsupc++.a`
+			boot32Libgcc=`$gcc -m32 -print-file-name=libgcc.a`
+			boot32LibSupCxx=`$gcc -m32 -print-file-name=libsupc++.a`
+			bootLibgcc=`$gcc -print-file-name=libgcc.a`
+			bootLibSupCxx=`$gcc -print-file-name=libsupc++.a`
 
 			local headersBase=$gccdir/../../../..
 			local headers=$headersBase/$gccMachine/include/c++/$gccRawVersion
 			if [ ! -d $headers ]; then
 				headers=$headersBase/include/c++/$gccRawVersion
 			fi
-			bootCxxHeaders="$headers/$gccMachine/32"
+			boot32CxxHeaders="$headers/$gccMachine/32"
+			bootCxxHeaders="$headers/$gccMachine"
 			;;
 	esac
 
@@ -355,6 +361,9 @@ standard_gcc_settings()
 	set_variable HAIKU_BOOT_CXX_HEADERS_DIR_$targetArch "$bootCxxHeaders"
 	set_variable HAIKU_BOOT_LIBSUPCXX_$targetArch "$bootLibSupCxx"
 	set_variable HAIKU_BOOT_LIBGCC_$targetArch $bootLibgcc
+	set_variable HAIKU_BOOT_32_CXX_HEADERS_DIR_$targetArch "$boot32CxxHeaders"
+	set_variable HAIKU_BOOT_32_LIBSUPCXX_$targetArch "$boot32LibSupCxx"
+	set_variable HAIKU_BOOT_32_LIBGCC_$targetArch $boot32Libgcc
 	set_variable HAIKU_USE_GCC_GRAPHITE_$targetArch $useGraphite
 
 	standard_gcc_settings_targetArch=$targetArch
@@ -1132,6 +1141,8 @@ for targetArch in $HAIKU_PACKAGING_ARCHS; do
 		HAIKU_GCC_LIB_DIR			HAIKU_GCC_LIB_DIR
 		HAIKU_BOOT_LIBGCC			HAIKU_BOOT_LIBGCC
 		HAIKU_BOOT_LIBSUPC++		HAIKU_BOOT_LIBSUPCXX
+		HAIKU_BOOT_32_LIBGCC		HAIKU_BOOT_32_LIBGCC
+		HAIKU_BOOT_32_LIBSUPC++		HAIKU_BOOT_32_LIBSUPCXX
 		HAIKU_AR					HAIKU_AR
 		HAIKU_LD					HAIKU_LD
 		HAIKU_OBJCOPY				HAIKU_OBJCOPY
@@ -1157,6 +1168,7 @@ for targetArch in $HAIKU_PACKAGING_ARCHS; do
 	# lines so that jam doesn't hit the maximum line length.
 	variables="
 		HAIKU_BOOT_C++_HEADERS_DIR	HAIKU_BOOT_CXX_HEADERS_DIR
+		HAIKU_BOOT_32_C++_HEADERS_DIR	HAIKU_BOOT_32_CXX_HEADERS_DIR
 		"
 	set -- $variables
 	while [ $# -ge 2 ]; do
