@@ -6969,19 +6969,18 @@ struct LockedPages : DoublyLinkedListLinkImpl<LockedPages> {
 
 
 status_t
-_user_mlock(const void* address, size_t size)
+_user_mlock(const void* _address, size_t size)
 {
-	if (size == 0)
-		return B_OK;
+	// check address range
+	addr_t address = (addr_t)_address;
+	size = PAGE_ALIGN(size);
 
-	// Make sure the address is multiple of B_PAGE_SIZE (POSIX allows us to
-	// reject the call otherwise)
-	if ((addr_t)address % B_PAGE_SIZE != 0)
+	if ((address % B_PAGE_SIZE) != 0)
+		return EINVAL;
+	if (!validate_user_memory_range(_address, size))
 		return EINVAL;
 
-	size = ROUNDUP(size, B_PAGE_SIZE);
-
-	addr_t endAddress = (addr_t)address + size;
+	addr_t endAddress = address + size;
 
 	// Pre-allocate a linked list element we may need (it's simpler to do it
 	// now than run out of memory in the midle of changing things)
@@ -7000,13 +6999,13 @@ _user_mlock(const void* address, size_t size)
 
 	// Locate the first locked range possibly overlapping ours
 	LockedPages* currentRange = lockedPages->Head();
-	while (currentRange != NULL && currentRange->end <= (addr_t)address)
+	while (currentRange != NULL && currentRange->end <= address)
 		currentRange = lockedPages->GetNext(currentRange);
 
 	if (currentRange == NULL || currentRange->start >= endAddress) {
 		// No existing range is overlapping with ours. We can just lock our
 		// range and stop here.
-		newRange->start = (addr_t)address;
+		newRange->start = address;
 		newRange->end = endAddress;
 		error = newRange->LockMemory();
 		if (error != B_OK)
@@ -7019,7 +7018,7 @@ _user_mlock(const void* address, size_t size)
 
 	// We get here when there is at least one existing overlapping range.
 
-	if (currentRange->start <= (addr_t)address) {
+	if (currentRange->start <= address) {
 		if (currentRange->end >= endAddress) {
 			// An existing range is already fully covering the pages we need to
 			// lock. Nothing to do then.
@@ -7027,7 +7026,7 @@ _user_mlock(const void* address, size_t size)
 		} else {
 			// An existing range covers the start of the area we want to lock.
 			// Advance our start address to avoid it.
-			address = (void*)currentRange->end;
+			address = currentRange->end;
 
 			// Move on to the next range for the next step
 			currentRange = lockedPages->GetNext(currentRange);
@@ -7035,7 +7034,7 @@ _user_mlock(const void* address, size_t size)
 	}
 
 	// First, lock the new range
-	newRange->start = (addr_t)address;
+	newRange->start = address;
 	newRange->end = endAddress;
 	error = newRange->LockMemory();
 	if (error != B_OK)
@@ -7062,7 +7061,7 @@ _user_mlock(const void* address, size_t size)
 	if (currentRange != NULL) {
 		// One last range may cover the end of the area we're trying to lock
 
-		if (currentRange->start == (addr_t)address) {
+		if (currentRange->start == address) {
 			// In case two overlapping ranges (one at the start and the other
 			// at the end) already cover the area we're after, there's nothing
 			// more to do. So we destroy our new extra allocation
@@ -7089,20 +7088,18 @@ _user_mlock(const void* address, size_t size)
 
 
 status_t
-_user_munlock(const void* address, size_t size)
+_user_munlock(const void* _address, size_t size)
 {
-	if (size == 0)
-		return B_OK;
+	// check address range
+	addr_t address = (addr_t)_address;
+	size = PAGE_ALIGN(size);
 
-	// Make sure the address is multiple of B_PAGE_SIZE (POSIX allows us to
-	// reject the call otherwise)
-	if ((addr_t)address % B_PAGE_SIZE != 0)
+	if ((address % B_PAGE_SIZE) != 0)
+		return EINVAL;
+	if (!validate_user_memory_range(_address, size))
 		return EINVAL;
 
-	// Round size up to the next page
-	size = ROUNDUP(size, B_PAGE_SIZE);
-
-	addr_t endAddress = (addr_t)address + size;
+	addr_t endAddress = address + size;
 
 	// Get and lock the team
 	Team* team = thread_get_current_thread()->team;
@@ -7114,7 +7111,7 @@ _user_munlock(const void* address, size_t size)
 
 	// Locate the first locked range possibly overlapping ours
 	LockedPages* currentRange = lockedPages->Head();
-	while (currentRange != NULL && currentRange->end <= (addr_t)address)
+	while (currentRange != NULL && currentRange->end <= address)
 		currentRange = lockedPages->GetNext(currentRange);
 
 	if (currentRange == NULL || currentRange->start >= endAddress) {
@@ -7122,7 +7119,7 @@ _user_munlock(const void* address, size_t size)
 		return B_OK;
 	}
 
-	if (currentRange->start < (addr_t)address) {
+	if (currentRange->start < address) {
 		if (currentRange->end > endAddress) {
 			// There is a range fully covering the area we want to unlock,
 			// and it extends on both sides. We need to split it in two
@@ -7139,7 +7136,7 @@ _user_munlock(const void* address, size_t size)
 				return error;
 			}
 
-			error = currentRange->Move(currentRange->start, (addr_t)address);
+			error = currentRange->Move(currentRange->start, address);
 			if (error != B_OK) {
 				delete newRange;
 				return error;
@@ -7150,7 +7147,7 @@ _user_munlock(const void* address, size_t size)
 		} else {
 			// There is a range that overlaps and extends before the one we
 			// want to unlock, we need to shrink it
-			error = currentRange->Move(currentRange->start, (addr_t)address);
+			error = currentRange->Move(currentRange->start, address);
 			if (error != B_OK)
 				return error;
 		}
