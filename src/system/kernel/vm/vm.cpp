@@ -6969,8 +6969,8 @@ struct LockedPages : DoublyLinkedListLinkImpl<LockedPages> {
 
 
 status_t
-_user_mlock(const void* address, size_t size) {
-	// Maybe there's nothing to do, in which case, do nothing
+_user_mlock(const void* address, size_t size)
+{
 	if (size == 0)
 		return B_OK;
 
@@ -6988,6 +6988,7 @@ _user_mlock(const void* address, size_t size) {
 	LockedPages* newRange = new(std::nothrow) LockedPages();
 	if (newRange == NULL)
 		return ENOMEM;
+	ObjectDeleter<LockedPages> newRangeDeleter(newRange);
 
 	// Get and lock the team
 	Team* team = thread_get_current_thread()->team;
@@ -7008,11 +7009,11 @@ _user_mlock(const void* address, size_t size) {
 		newRange->start = (addr_t)address;
 		newRange->end = endAddress;
 		error = newRange->LockMemory();
-		if (error != B_OK) {
-			delete newRange;
+		if (error != B_OK)
 			return error;
-		}
+
 		lockedPages->InsertBefore(currentRange, newRange);
+		newRangeDeleter.Detach();
 		return B_OK;
 	}
 
@@ -7022,7 +7023,6 @@ _user_mlock(const void* address, size_t size) {
 		if (currentRange->end >= endAddress) {
 			// An existing range is already fully covering the pages we need to
 			// lock. Nothing to do then.
-			delete newRange;
 			return B_OK;
 		} else {
 			// An existing range covers the start of the area we want to lock.
@@ -7038,10 +7038,8 @@ _user_mlock(const void* address, size_t size) {
 	newRange->start = (addr_t)address;
 	newRange->end = endAddress;
 	error = newRange->LockMemory();
-	if (error != B_OK) {
-		delete newRange;
+	if (error != B_OK)
 		return error;
-	}
 
 	// Unlock all ranges fully overlapping with the area we need to lock
 	while (currentRange != NULL && currentRange->end < endAddress) {
@@ -7053,7 +7051,6 @@ _user_mlock(const void* address, size_t size) {
 		if (error != B_OK) {
 			panic("Failed to unlock a memory range: %s", strerror(error));
 			newRange->UnlockMemory();
-			delete newRange;
 			return error;
 		}
 		LockedPages* temp = currentRange;
@@ -7070,7 +7067,6 @@ _user_mlock(const void* address, size_t size) {
 			// at the end) already cover the area we're after, there's nothing
 			// more to do. So we destroy our new extra allocation
 			error = newRange->UnlockMemory();
-			delete newRange;
 			return error;
 		}
 
@@ -7080,7 +7076,6 @@ _user_mlock(const void* address, size_t size) {
 			if (error != B_OK) {
 				panic("Failed to move a memory range: %s", strerror(error));
 				newRange->UnlockMemory();
-				delete newRange;
 				return error;
 			}
 		}
@@ -7088,13 +7083,14 @@ _user_mlock(const void* address, size_t size) {
 
 	// Finally, store the new range in the locked list
 	lockedPages->InsertBefore(currentRange, newRange);
+	newRangeDeleter.Detach();
 	return B_OK;
 }
 
 
 status_t
-_user_munlock(const void* address, size_t size) {
-	// Maybe there's nothing to do, in which case, do nothing
+_user_munlock(const void* address, size_t size)
+{
 	if (size == 0)
 		return B_OK;
 
