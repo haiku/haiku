@@ -467,7 +467,8 @@ TextDocument::AddUndoListener(UndoableEditListenerRef listener)
 bool
 TextDocument::RemoveUndoListener(UndoableEditListenerRef listener)
 {
-	std::remove(fUndoListeners.begin(), fUndoListeners.end(), listener);
+	fUndoListeners.erase(std::remove(fUndoListeners.begin(), fUndoListeners.end(),
+		listener), fUndoListeners.end());
 	return true;
 }
 
