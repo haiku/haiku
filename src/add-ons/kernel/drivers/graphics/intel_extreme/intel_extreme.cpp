@@ -101,6 +101,14 @@ bdw_enable_interrupts(intel_info& info, pipe_index pipe, bool enable)
 
 
 static void
+gen11_enable_global_interrupts(intel_info& info, bool enable)
+{
+	write32(info, GEN11_GFX_MSTR_IRQ, enable ? GEN11_MASTER_IRQ : 0);
+	read32(info, GEN11_GFX_MSTR_IRQ);
+}
+
+
+static void
 bdw_enable_global_interrupts(intel_info& info, bool enable)
 {
 	const uint32 bit = PCH_MASTER_INT_CTL_GLOBAL_BDW;
@@ -120,7 +128,7 @@ bdw_check_interrupt(intel_info& info, pipes& which)
 	ASSERT(info.device_type.Generation() >= 12 || !which.HasPipe(INTEL_PIPE_D));
 
 	which.ClearPipe(INTEL_PIPE_ANY);
-	const uint32 interrupt = read32(info, PCH_MASTER_INT_CTL_BDW);
+	uint32 interrupt = read32(info, PCH_MASTER_INT_CTL_BDW);
 	if ((interrupt & PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_A)) != 0)
 		which.SetPipe(INTEL_PIPE_A);
 	if ((interrupt & PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_B)) != 0)
@@ -129,6 +137,12 @@ bdw_check_interrupt(intel_info& info, pipes& which)
 		which.SetPipe(INTEL_PIPE_C);
 	if ((interrupt & PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_D)) != 0)
 		which.SetPipe(INTEL_PIPE_D);
+	interrupt &= ~(PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_A)
+		| PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_B)
+		| PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_C)
+		| PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_D));
+	if (interrupt != 0)
+		dprintf("bdw_check_interrupt %" B_PRIx32 "\n", interrupt);
 	return which.HasPipe(INTEL_PIPE_ANY);
 }
 
@@ -428,9 +442,34 @@ init_interrupt_handler(intel_info &info)
 			status = install_io_interrupt_handler(info.irq,
 				&bdw_interrupt_handler, (void*)&info, 0);
 			if (status == B_OK) {
-				bdw_enable_global_interrupts(info, true);
 				bdw_enable_interrupts(info, INTEL_PIPE_A, true);
 				bdw_enable_interrupts(info, INTEL_PIPE_B, true);
+				if (info.device_type.Generation() >= 11)
+					bdw_enable_interrupts(info, INTEL_PIPE_C, true);
+				bdw_enable_global_interrupts(info, true);
+
+				if (info.device_type.Generation() >= 11) {
+					uint32 mask = GEN8_AUX_CHANNEL_A;
+					mask |= GEN9_AUX_CHANNEL_B | GEN9_AUX_CHANNEL_C | GEN9_AUX_CHANNEL_D;
+					mask |= CNL_AUX_CHANNEL_F;
+					mask |= ICL_AUX_CHANNEL_E;
+					read32(info, GEN8_DE_PORT_ISR);
+					write32(info, GEN8_DE_PORT_IER, mask);
+					write32(info, GEN8_DE_PORT_IMR, ~mask);
+					read32(info, GEN8_DE_PORT_IMR);
+
+					read32(info, GEN8_DE_MISC_ISR);
+					write32(info, GEN8_DE_MISC_IER, GEN8_DE_EDP_PSR);
+					write32(info, GEN8_DE_MISC_IMR, ~GEN8_DE_EDP_PSR);
+					read32(info, GEN8_DE_MISC_IMR);
+
+					read32(info, GEN11_GU_MISC_IIR);
+					write32(info, GEN11_GU_MISC_IER, GEN11_GU_MISC_GSE);
+					write32(info, GEN11_GU_MISC_IMR, ~GEN11_GU_MISC_GSE);
+					read32(info, GEN11_GU_MISC_IMR);
+					// Missing: Hotplug
+					gen11_enable_global_interrupts(info, true);
+				}
 			}
 		} else {
 			status = install_io_interrupt_handler(info.irq,
@@ -660,13 +699,13 @@ intel_extreme_init(intel_info &info)
 		info.shared_info->pll_info.max_frequency = 350000;
 			// 350 MHz RAM DAC speed
 		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz
-	} else if ((info.device_type.Generation() == 9) &&
+	} else if ((info.device_type.Generation() >= 9) &&
 				info.device_type.InGroup(INTEL_GROUP_SKY)) {
 		info.shared_info->pll_info.reference_frequency = 24000;	// 24 MHz
 		info.shared_info->pll_info.max_frequency = 350000;
 			// 350 MHz RAM DAC speed
 		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz
-	} else if (info.device_type.Generation() == 9) {
+	} else if (info.device_type.Generation() >= 9) {
 		uint32 refInfo =
 			(read32(info, ICL_DSSM) & ICL_DSSM_REF_FREQ_MASK) >> ICL_DSSM_REF_FREQ_SHIFT;
 		switch (refInfo) {
@@ -774,6 +813,9 @@ intel_extreme_uninit(intel_info &info)
 	if (!info.fake_interrupts && info.shared_info->vblank_sem > 0) {
 		// disable interrupt generation
 		if (info.device_type.Generation() >= 8) {
+			if (info.device_type.Generation() >= 11) {
+				gen11_enable_global_interrupts(info, false);
+			}
 			bdw_enable_global_interrupts(info, false);
 			remove_io_interrupt_handler(info.irq, bdw_interrupt_handler, &info);
 		} else {

@@ -224,6 +224,8 @@ struct DeviceType {
 			return 7;
 		if (InGroup(INTEL_GROUP_CHV) || InGroup(INTEL_GROUP_BDW))
 			return 8;
+		if (InGroup(INTEL_GROUP_JSL))
+			return 11;
 		if (InFamily(INTEL_FAMILY_LAKE))
 			return 9;
 
@@ -596,12 +598,46 @@ struct intel_free_graphics_memory {
 #define PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(pipe)	(1 << (15 + pipe))
 #define PCH_MASTER_INT_CTL_GLOBAL_BDW				(1 << 31)
 
-#define PCH_INTERRUPT_PIPE_STATUS_BDW(pipe)		(0x44400 + (pipe - 1) * 0x10)
-#define PCH_INTERRUPT_PIPE_MASK_BDW(pipe)		(0x44404 + (pipe - 1) * 0x10)
-#define PCH_INTERRUPT_PIPE_IDENTITY_BDW(pipe)	(0x44408 + (pipe - 1) * 0x10)
-#define PCH_INTERRUPT_PIPE_ENABLED_BDW(pipe)	(0x4440c + (pipe - 1) * 0x10)
+#define PCH_INTERRUPT_PIPE_STATUS_BDW(pipe)		(0x44400 + (pipe - 1) * 0x10)	// GEN8_DE_PIPE_ISR
+#define PCH_INTERRUPT_PIPE_MASK_BDW(pipe)		(0x44404 + (pipe - 1) * 0x10)	// GEN8_DE_PIPE_IMR
+#define PCH_INTERRUPT_PIPE_IDENTITY_BDW(pipe)	(0x44408 + (pipe - 1) * 0x10)	// GEN8_DE_PIPE_IIR
+#define PCH_INTERRUPT_PIPE_ENABLED_BDW(pipe)	(0x4440c + (pipe - 1) * 0x10)	// GEN8_DE_PIPE_IER
 
-#define PCH_INTERRUPT_VBLANK_BDW				(1 << 0)
+#define GEN8_DE_PORT_ISR						0x44440
+#define GEN8_DE_PORT_IMR						0x44444
+#define GEN8_DE_PORT_IIR						0x44448
+#define GEN8_DE_PORT_IER						0x4444c
+#define		GEN8_AUX_CHANNEL_A					(1 << 0)
+#define		GEN9_AUX_CHANNEL_B					(1 << 25)
+#define		GEN9_AUX_CHANNEL_C					(1 << 26)
+#define		GEN9_AUX_CHANNEL_D					(1 << 27)
+#define		CNL_AUX_CHANNEL_F					(1 << 28)
+#define		ICL_AUX_CHANNEL_E					(1 << 29)
+
+#define GEN8_DE_MISC_ISR						0x44460
+#define GEN8_DE_MISC_IMR						0x44464
+#define GEN8_DE_MISC_IIR						0x44468
+#define GEN8_DE_MISC_IER						0x4446c
+#define		GEN8_DE_EDP_PSR						(1 << 19)
+
+#define PCH_INTERRUPT_VBLANK_BDW				(1 << 0)						// GEN8_PIPE_VBLANK
+#define GEN8_PIPE_VSYNC							(1 << 1)
+#define GEN8_PIPE_SCAN_LINE_EVENT				(1 << 2)
+
+#define GEN11_DISPLAY_INT_CTL					0x44200			// same as PCH_MASTER_INT_CTL_BDW
+#define GEN11_GFX_MSTR_IRQ						0x190010
+#define GEN11_MASTER_IRQ						(1 << 31)
+#define GEN11_GT_DW1_IRQ						(1 << 1)
+#define GEN11_GT_DW0_IRQ						(1 << 0)
+
+#define GEN11_GT_INTR_DW0						0x190018
+#define GEN11_GT_INTR_DW1						0x19001c
+
+#define GEN11_GU_MISC_IMR						0x444f4
+#define GEN11_GU_MISC_IIR						0x444f8
+#define GEN11_GU_MISC_IER						0x444fc
+#define 	GEN11_GU_MISC_GSE					(1 << 27)
+
 
 // graphics port control (i.e. G45)
 #define DISPLAY_MONITOR_PORT_ENABLED	(1UL << 31)
