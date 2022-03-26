@@ -15,9 +15,14 @@
 #include <arch/generic/debug_uart_8250.h>
 #if defined(__riscv)
 #	include <arch/riscv64/arch_uart_sifive.h>
-#elif defined(__ARM__) || defined(__aarch64__)
+#elif defined(__ARM__)
 #	include <arch/arm/arch_uart_pl011.h>
+#elif defined(__aarch64__)
+#	include <arch/arm/arch_uart_pl011.h>
+#	include <arch/arm64/arch_uart_linflex.h>
 #endif
+
+
 #include <boot/addr_range.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
@@ -64,10 +69,14 @@ const struct supported_uarts {
 	{ "ns16550", UART_KIND_8250, &get_uart<DebugUART8250> },
 #if defined(__riscv)
 	{ "sifive,uart0", UART_KIND_SIFIVE, &get_uart<ArchUARTSifive> },
-#elif defined(__ARM__) || defined(__aarch64__)
+#elif defined(__ARM__)
 	{ "arm,pl011", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
 	{ "snps,dw-apb-uart", UART_KIND_8250, &get_uart<DebugUART8250> },
-	{ "brcm,bcm2835-aux-uart", UART_KIND_8250, &get_uart<DebugUART8250> },
+	{ "brcm,bcm2835-aux-uart", UART_KIND_8250, &get_uart<DebugUART8250> }
+#elif defined(__aarch64__)
+	{ "arm,pl011", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
+	{ "fsl,s32-linflexuart", UART_KIND_LINFLEX, &get_uart<ArchUARTlinflex> },
+	{ "brcm,bcm2835-aux-uart", UART_KIND_8250, &get_uart<DebugUART8250> }
 #endif
 };
 

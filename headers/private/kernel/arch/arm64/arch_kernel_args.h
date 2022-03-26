@@ -11,6 +11,7 @@
 
 
 #include <util/FixedWidthPointer.h>
+#include <boot/interrupt_controller.h>
 #include <boot/uart.h>
 
 
@@ -18,15 +19,16 @@
 
 
 typedef struct {
-	// needed for UEFI, otherwise kernel acpi support can't find ACPI root
-	FixedWidthPointer<void> acpi_root;
-//	TODO:  Deal with this later in the port
-//	FixedWidthPointer<void> fdt;
-//	uart_info		uart;
+	uint64	phys_pgdir;
+	uint64	vir_pgdir;
+	uint64	next_pagetable;
 
-	uint64 phys_pgdir;
-	uint64 vir_pgdir;
-	uint64 next_pagetable;
+	// needed for UEFI, otherwise kernel acpi support can't find ACPI root
+	FixedWidthPointer<void>	acpi_root;
+	FixedWidthPointer<void>	fdt;
+
+	uart_info	uart;
+	intc_info	interrupt_controller;
 
 } _PACKED arch_kernel_args;
 
