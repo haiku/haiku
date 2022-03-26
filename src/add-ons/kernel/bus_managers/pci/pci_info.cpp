@@ -113,11 +113,22 @@ print_generic_info(const pci_info *info, bool verbose)
 	TRACE(("PCI:   interrupt_line %02x, interrupt_pin %02x, min_grant %02x, "
 		"max_latency %02x\n", info->u.h0.interrupt_line, info->u.h0.interrupt_pin,
 		info->u.h0.min_grant, info->u.h0.max_latency));
-	for (int i = 0; i < 6; i++)
-		TRACE(("PCI:   base reg %d: host %08" B_PRIx32 ", pci %08" B_PRIx32 ", "
-			"size %08" B_PRIx32 ", flags %02x\n", i, info->u.h0.base_registers[i],
-			info->u.h0.base_registers_pci[i], info->u.h0.base_register_sizes[i],
-			info->u.h0.base_register_flags[i]));
+	for (int i = 0; i < 6; i++) {
+		if ((info->u.h0.base_register_flags[i] & PCI_address_type) == PCI_address_type_64) {
+			TRACE(("PCI:   base reg %d: host %016" B_PRIx64 ", pci %016" B_PRIx64 ", "
+				"size %08" B_PRIx64 ", flags %02x %02x\n", i,
+				info->u.h0.base_registers[i] | ((uint64)info->u.h0.base_registers[i + 1] << 32),
+				info->u.h0.base_registers_pci[i] | ((uint64)info->u.h0.base_registers_pci[i + 1] << 32),
+				info->u.h0.base_register_sizes[i] | ((uint64)info->u.h0.base_register_sizes[i + 1] << 32),
+				info->u.h0.base_register_flags[i], info->u.h0.base_register_flags[i + 1]));
+			i++;
+		} else {
+			TRACE(("PCI:   base reg %d: host %08" B_PRIx32 ", pci %08" B_PRIx32 ", "
+				"size %08" B_PRIx32 ", flags %02x\n", i, info->u.h0.base_registers[i],
+				info->u.h0.base_registers_pci[i], info->u.h0.base_register_sizes[i],
+				info->u.h0.base_register_flags[i]));
+		}
+	}
 }
 
 
