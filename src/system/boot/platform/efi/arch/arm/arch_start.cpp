@@ -5,6 +5,7 @@
 
 
 #include <kernel.h>
+#include <boot/arch/arm/arch_cpu.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <boot/stdio.h>
@@ -13,6 +14,13 @@
 #include "mmu.h"
 #include "serial.h"
 #include "smp.h"
+
+//#define TRACE_ARCH_START
+#ifdef TRACE_ARCH_START
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...) ;
+#endif
 
 
 #define ALIGN_MEMORY_MAP	4
@@ -223,6 +231,13 @@ arch_start_kernel(addr_t kernelEntry)
 	memcpy(kernelArgs, &gKernelArgs, sizeof(struct kernel_args));
 
 	//smp_boot_other_cpus(final_ttbr0, kernelEntry, (addr_t)&gKernelArgs);
+
+	TRACE("CPSR = 0x%08" B_PRIx32 "\n", cpu_read_CPSR());
+	TRACE("SCTLR = 0x%08" B_PRIx32 "\n", mmu_read_SCTLR());
+	TRACE("TTBR0 = 0x%08" B_PRIx32 ", TTBR1 = 0x%08" B_PRIx32 ", TTBCR = 0x%08" B_PRIx32 "\n",
+		mmu_read_TTBR0(), mmu_read_TTBR1(), mmu_read_TTBCR());
+	TRACE("DACR = 0x%08" B_PRIx32 "\n",
+		mmu_read_DACR());
 
 	// Enter the kernel!
 	dprintf("enter_kernel(ttbr0: 0x%08x, kernelArgs: 0x%08x, "
