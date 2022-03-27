@@ -496,13 +496,11 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 		| currentMair.MaskOf(MAIR_DEVICE_nGnRnE));
 */
 
-/*  TODO: Whole physical map already covered ...
-	// identity mapping for page table area
-	uint64_t page_table_area = (uint64_t)sFirstPageTable;
-	map_range(page_table_area, page_table_area, PAGE_TABLE_AREA_SIZE,
+	// TODO: We actually can only map physical RAM, mapping everything
+	// could cause unwanted MMIO or bus errors on real hardware.
+	map_range(KERNEL_PMAP_BASE, 0, KERNEL_PMAP_SIZE - 1,
 		ARMv8TranslationTableDescriptor::DefaultCodeAttribute
 		| currentMair.MaskOf(MAIR_NORMAL_WB));
-*/
 
 	sort_address_ranges(gKernelArgs.virtual_allocated_range,
 		gKernelArgs.num_virtual_allocated_ranges);

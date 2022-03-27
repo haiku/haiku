@@ -23,5 +23,8 @@
 #define USER_STACK_REGION		0x70000000
 #define USER_STACK_REGION_SIZE	((USER_TOP - USER_STACK_REGION) + 1)
 
+// Kernel physical memory map area.
+#define KERNEL_PMAP_BASE	0xffffff0000000000
+#define KERNEL_PMAP_SIZE	0x8000000000
 
 #endif /* _KERNEL_ARCH_ARM64_ARCH_KERNEL_H_ */
