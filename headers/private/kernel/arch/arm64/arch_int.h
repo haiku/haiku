@@ -15,7 +15,7 @@
 static inline void
 arch_int_enable_interrupts_inline(void)
 {
-	__asm__ __volatile__("msr daifclr, #2");
+	asm volatile("msr daifclr, #0xf" : : : "memory");
 }
 
 
@@ -24,10 +24,7 @@ arch_int_disable_interrupts_inline(void)
 {
 	uint32 flags;
 
-	__asm__ __volatile__(
-			"mrs %0, daif\n\t"
-			"msr daifset, #2\n\t"
-			: "=&r"(flags));
+	asm volatile("mrs %0, daif\n" "msr daifset, #0xf" : "=r"(flags) : : "memory");
 
 	return flags;
 }
@@ -36,21 +33,16 @@ arch_int_disable_interrupts_inline(void)
 static inline void
 arch_int_restore_interrupts_inline(int oldState)
 {
-	WRITE_SPECIALREG(daif, oldState);
+	asm volatile("msr daif, %0" : : "r"(oldState) : "memory");
 }
 
 
 static inline bool
 arch_int_are_interrupts_enabled_inline(void)
 {
-	uint32 flags;
-
-	__asm__ __volatile__(
-			"mrs %0, daif\n\t"
-			: "=&r"(flags));
-
-	return (flags & PSR_I) == 0;
+	return (READ_SPECIALREG(DAIF) & PSR_I) == 0;
 }
+
 
 // map the functions to the inline versions
 #define arch_int_enable_interrupts()	arch_int_enable_interrupts_inline()
@@ -59,5 +51,6 @@ arch_int_are_interrupts_enabled_inline(void)
 	arch_int_restore_interrupts_inline(status)
 #define arch_int_are_interrupts_enabled()	\
 	arch_int_are_interrupts_enabled_inline()
+
 
 #endif /* _KERNEL_ARCH_ARM64_ARCH_INT_H_ */
