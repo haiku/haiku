@@ -208,20 +208,9 @@ Port::GetEDID(edid1_info* edid, bool forceRead)
 	if (fEDIDState == B_NO_INIT || forceRead) {
 		TRACE("%s: trying to read EDID\n", PortName());
 
-		addr_t ddcRegister = _DDCRegister();
-		if (ddcRegister == 0) {
-			TRACE("%s: no DDC register found\n", PortName());
-			fEDIDState = B_ERROR;
-			return fEDIDState;
-		}
-
-		TRACE("%s: using ddc @ 0x%" B_PRIxADDR "\n", PortName(), ddcRegister);
-
 		i2c_bus bus;
-		bus.cookie = (void*)ddcRegister;
-		bus.set_signals = &_SetI2CSignals;
-		bus.get_signals = &_GetI2CSignals;
-		ddc2_init_timing(&bus);
+		if (SetupI2c(&bus) != B_OK)
+			return fEDIDState;
 
 		fEDIDState = ddc2_read_edid1(&bus, &fEDIDInfo, NULL, NULL);
 
@@ -238,6 +227,27 @@ Port::GetEDID(edid1_info* edid, bool forceRead)
 
 	if (edid != NULL)
 		memcpy(edid, &fEDIDInfo, sizeof(edid1_info));
+
+	return B_OK;
+}
+
+
+status_t
+Port::SetupI2c(i2c_bus *bus)
+{
+	addr_t ddcRegister = _DDCRegister();
+	if (ddcRegister == 0) {
+		TRACE("%s: no DDC register found\n", PortName());
+		fEDIDState = B_ERROR;
+		return fEDIDState;
+	}
+
+	TRACE("%s: using ddc @ 0x%" B_PRIxADDR "\n", PortName(), ddcRegister);
+
+	ddc2_init_timing(bus);
+	bus->cookie = (void*)ddcRegister;
+	bus->set_signals = &_SetI2CSignals;
+	bus->get_signals = &_GetI2CSignals;
 
 	return B_OK;
 }

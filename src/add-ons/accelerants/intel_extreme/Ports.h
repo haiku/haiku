@@ -21,6 +21,7 @@
 #define MAX_PORTS	20	// a generous upper bound
 
 struct pll_limits;
+struct i2c_bus;
 
 enum port_type {
 	INTEL_PORT_TYPE_ANY,		// wildcard for lookup functions
@@ -57,6 +58,7 @@ virtual	status_t					Power(bool enabled);
 		bool						HasEDID();
 virtual	status_t					GetEDID(edid1_info* edid,
 										bool forceRead = false);
+virtual	status_t					SetupI2c(struct i2c_bus *bus);
 
 virtual	status_t					GetPLLLimits(pll_limits& limits);
 

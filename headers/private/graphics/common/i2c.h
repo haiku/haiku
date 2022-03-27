@@ -35,17 +35,26 @@ typedef struct i2c_timing {
 } i2c_timing;
 
 
+struct i2c_bus;
+
 // set signals on bus
 typedef status_t (*i2c_set_signals)(void *cookie, int clock, int data);
 // read signals from bus
 typedef status_t (*i2c_get_signals)(void *cookie, int *clock, int *data);
+// send/receive from bus
+typedef status_t (*i2c_send_receive)(const struct i2c_bus *bus, uint32 slave_address,
+		const uint8 *writeBuffer, size_t writeLength, uint8 *readBuffer,
+		size_t readLength);
 
 // i2c bus definition
 typedef struct i2c_bus {
 	void *cookie;					// user-defined cookie
+	// low-level
 	i2c_timing timing;
 	i2c_set_signals set_signals;	// callback to set signals
 	i2c_get_signals get_signals;	// callback to detect signals
+	// high-level
+	i2c_send_receive send_receive;
 } i2c_bus;
 
 
@@ -54,7 +63,7 @@ extern "C" {
 #endif
 
 // send and receive data via i2c bus
-status_t i2c_send_receive(const i2c_bus *bus, int slave_address,
+status_t i2c_send_receive_callback(const i2c_bus *bus, uint32 slave_address,
 	const uint8 *writeBuffer, size_t writeLength, uint8 *readBuffer,
 	size_t readLength);
 

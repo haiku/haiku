@@ -54,6 +54,19 @@ verify_checksum(const uint8 *data, size_t len)
 }
 
 
+static status_t
+call_send_receive(const i2c_bus *bus, int slave_address,
+	const uint8 *writeBuffer, size_t writeLength, uint8 *readBuffer,
+	size_t readLength)
+{
+	i2c_send_receive send_receive = bus->send_receive;
+	if (send_receive == NULL)
+		send_receive = i2c_send_receive_callback;
+	return send_receive(bus, slave_address, writeBuffer, writeLength, readBuffer,
+		readLength);
+}
+
+
 //!	Read ddc2 data from monitor
 static status_t
 ddc2_read(const i2c_bus *bus, int start, uint8 *buffer, size_t length)
@@ -66,7 +79,7 @@ ddc2_read(const i2c_bus *bus, int start, uint8 *buffer, size_t length)
 	writeBuffer[1] = (start >> 8) & 0xff;
 
 	for (i = 0; i < READ_RETRIES; ++i) {
-		status = i2c_send_receive(bus, 0xa0, writeBuffer,
+		status = call_send_receive(bus, 0x50, writeBuffer,
 			start < 0x100 ? 1 : 2, buffer, length);
 
 		if (status != B_OK)
@@ -135,6 +148,8 @@ ddc2_read_vdif(const i2c_bus *bus, int start,
 void
 ddc2_init_timing(i2c_bus *bus)
 {
+	bus->send_receive = NULL;
+
 	i2c_get100k_timing(&bus->timing);
 
 	// VESA standard
