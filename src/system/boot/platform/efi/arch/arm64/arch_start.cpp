@@ -229,7 +229,7 @@ arch_start_kernel(addr_t kernelEntry)
 	if (arch_mmu_read_access(kernelEntry) && arch_mmu_read_access(gKernelArgs.cpu_kstack[0].start)) {
 		// Enter the kernel!
 		arch_enter_kernel(&gKernelArgs, kernelEntry,
-			gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size - 8);
+			gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
 	} else {
 		// _arch_exception_panic("Kernel or Stack memory not accessible\n", __LINE__);
 		panic("Kernel or Stack memory not accessible\n");
