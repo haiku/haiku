@@ -54,6 +54,7 @@
 #define INTEL_GROUP_CFL		(INTEL_FAMILY_LAKE | 0x0040)  // CoffeeLake
 #define INTEL_GROUP_CML		(INTEL_FAMILY_LAKE | 0x0080)  // CometLake
 #define INTEL_GROUP_JSL		(INTEL_FAMILY_LAKE | 0x0100)  // JasperLake
+#define INTEL_GROUP_TGL		(INTEL_FAMILY_LAKE | 0x0200)  // TigerLake
 // models
 #define INTEL_TYPE_SERVER	0x0004
 #define INTEL_TYPE_MOBILE	0x0008
@@ -92,6 +93,7 @@
 #define INTEL_MODEL_CML		(INTEL_GROUP_CML)
 #define INTEL_MODEL_JSL		(INTEL_GROUP_JSL)
 #define INTEL_MODEL_JSLM	(INTEL_GROUP_JSL | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_TGLM	(INTEL_GROUP_TGL | INTEL_TYPE_MOBILE)
 
 #define INTEL_PCH_DEVICE_ID_MASK	0xff80
 #define INTEL_PCH_IBX_DEVICE_ID		0x3b00
@@ -224,7 +226,7 @@ struct DeviceType {
 			return 7;
 		if (InGroup(INTEL_GROUP_CHV) || InGroup(INTEL_GROUP_BDW))
 			return 8;
-		if (InGroup(INTEL_GROUP_JSL))
+		if (InGroup(INTEL_GROUP_JSL) || InGroup(INTEL_GROUP_TGL))
 			return 11;
 		if (InFamily(INTEL_FAMILY_LAKE))
 			return 9;

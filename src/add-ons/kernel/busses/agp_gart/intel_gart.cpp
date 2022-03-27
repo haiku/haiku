@@ -175,6 +175,8 @@ const struct supported_device {
 	{0x4e12, 0x4e61, INTEL_MODEL_JSL, "JasperLake"},
 	{0x4e26, 0x4e71, INTEL_MODEL_JSLM, "JasperLake"},
 	{0x4e28, 0x4e71, INTEL_MODEL_JSLM, "JasperLake"},
+
+	{0x9a14, 0x9a49, INTEL_MODEL_TGLM, "TigerLake-LP GT2"},
 };
 
 struct intel_info {
