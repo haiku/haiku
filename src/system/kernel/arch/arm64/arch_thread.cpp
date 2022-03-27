@@ -51,6 +51,10 @@ void
 arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 	void (*function)(void*), const void* data)
 {
+	memset(&thread->arch_info, 0, sizeof(arch_thread));
+	thread->arch_info.regs[10] = (uint64_t)data;
+	thread->arch_info.regs[11] = (uint64_t)function;
+	thread->arch_info.regs[12] = (uint64_t)_stackTop;
 }
 
 
@@ -61,9 +65,13 @@ arch_thread_init_tls(Thread *thread)
 }
 
 
+extern "C" void _arch_context_swap(arch_thread *from, arch_thread *to);
+
+
 void
 arch_thread_context_switch(Thread *from, Thread *to)
 {
+	_arch_context_swap(&from->arch_info, &to->arch_info);
 }
 
 void
