@@ -11,6 +11,7 @@
 
 #include "efi_platform.h"
 #include "mmu.h"
+#include "serial.h"
 #include "smp.h"
 
 
@@ -195,11 +196,13 @@ arch_start_kernel(addr_t kernelEntry)
 	dprintf("Calling ExitBootServices. So long, EFI!\n");
 	while (true) {
 		if (kBootServices->ExitBootServices(kImage, mapKey) == EFI_SUCCESS) {
-			// The console was provided by boot services, disable it.
+			// If the console was provided by boot services, disable it.
 			stdout = NULL;
 			stderr = NULL;
-			// Can we adjust gKernelArgs.platform_args.serial_base_ports[0]
-			// to something fixed in qemu for debugging?
+			// Also switch to legacy serial output
+			// (may not work on all systems)
+			serial_switch_to_legacy();
+			dprintf("Switched to legacy serial output\n");
 			break;
 		}
 
