@@ -6,6 +6,7 @@
 #include <asm_defs.h>
 
 
+	.arch_extension virt
 	.text
 
 /*	status_t arch_enter_kernel(uint32_t ttbr, struct kernel_args *kernelArgs,
@@ -18,6 +19,28 @@
 */
 FUNCTION(arch_enter_kernel):
 
+	// check whether we are running in HYP mode
+	mrs		r9, cpsr
+	and		r9, r9, #0x1f
+
+	// proceed to _pl1_entry if we're not in HYP mode
+	cmp		r9, #0x1a
+	bne		_pl1_entry
+
+	// set SVC mode in SPSR
+	mrs		r9, cpsr
+	bic		r9, r9, #0x1f
+	orr		r9, r9, #0x13
+	msr		spsr_cxsf, r9
+
+	// load PL1 entry point address
+	adr		lr, _pl1_entry
+	msr		elr_hyp, lr
+
+	// drop to PL1 SVC mode
+	eret
+
+_pl1_entry:
 
 	mov		r5,r0
 	mov		r4,r2
