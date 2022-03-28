@@ -110,8 +110,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ TargetKernelLibsupc++ ]
 			[ TargetKernelLibgcc ]
 			[ TargetKernelLibgcceh ]
-			: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/runtime_loader.ld
-			: --no-undefined -shared -Bsymbolic -soname=runtime_loader
+			:
+			: --no-undefined -shared -Bsymbolic -soname=runtime_loader -entry=runtime_loader
 		;
 	}
 }
