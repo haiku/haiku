@@ -675,10 +675,11 @@ intel_extreme_init(intel_info &info)
 	info.shared_info->graphics_memory_size = apertureInfo.size;
 	info.shared_info->frame_buffer = 0;
 	info.shared_info->dpms_mode = B_DPMS_ON;
+	info.shared_info->min_brightness = 2;
 
 	// Pull VBIOS panel mode for later use
 	info.shared_info->got_vbt = get_lvds_mode_from_bios(
-		&info.shared_info->panel_timing);
+		&info.shared_info->panel_timing, &info.shared_info->min_brightness);
 
 	/* at least 855gm can't drive more than one head at time */
 	if (info.device_type.InFamily(INTEL_FAMILY_8xx))

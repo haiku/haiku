@@ -12,10 +12,10 @@
 #include <OS.h>
 
 
-typedef struct lock {
+struct lock {
 	sem_id	sem;
 	int32	count;
-} lock;
+};
 
 
 static inline status_t

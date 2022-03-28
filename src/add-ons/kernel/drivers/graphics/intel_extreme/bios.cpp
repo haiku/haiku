@@ -46,6 +46,7 @@ struct bdb_header {
 enum bdb_block_id {
 	BDB_LVDS_OPTIONS = 40,
 	BDB_LVDS_LFP_DATA_PTRS = 41,
+	BDB_LVDS_BACKLIGHT = 43,
 	BDB_GENERIC_DTD = 58
 };
 
@@ -61,6 +62,9 @@ enum bdb_block_id {
 #define _V_BLANK(x) (x[6] + ((x[7] & 0x0F) << 8))
 #define _V_SYNC_OFF(x) ((x[10] >> 4) + ((x[11] & 0x0C) << 2))
 #define _V_SYNC_WIDTH(x) ((x[10] & 0x0F) + ((x[11] & 0x03) << 4))
+
+#define BDB_BACKLIGHT_TYPE_NONE 0
+#define BDB_BACKLIGHT_TYPE_PWM 2
 
 
 struct lvds_bdb1 {
@@ -134,6 +138,40 @@ struct bdb_generic_dtd {
 	uint16 size;
 	uint16 gdtd_size;
 	struct generic_dtd_entry dtd[];
+} __attribute__((packed));
+
+
+struct bdb_lfp_backlight_data_entry {
+	uint8 type: 2;
+	uint8 active_low_pwm: 1;
+	uint8 reserved1: 5;
+	uint16 pwm_freq_hz;
+	uint8 min_brightness; // Versions < 234
+	uint8 reserved2;
+	uint8 reserved3;
+} __attribute__((packed));
+
+
+struct bdb_lfp_backlight_control_method {
+	uint8 type: 4;
+	uint8 controller: 4;
+} __attribute__((packed));
+
+
+struct lfp_brightness_level {
+	uint16 level;
+	uint16 reserved;
+} __attribute__((packed));
+
+
+struct bdb_lfp_backlight_data {
+	uint8 entry_size;
+	struct bdb_lfp_backlight_data_entry data[16];
+	uint8 level [16]; // Only for versions < 234
+	struct bdb_lfp_backlight_control_method backlight_control[16];
+	struct lfp_brightness_level brightness_level[16]; // Versions >= 234
+	struct lfp_brightness_level brightness_min_level[16]; // Versions >= 234
+	uint8 brightness_precision_bits[16]; // Versions >= 236
 } __attribute__((packed));
 
 
@@ -384,7 +422,7 @@ sanitize_panel_timing(display_timing& timing)
 
 
 bool
-get_lvds_mode_from_bios(display_timing* panelTiming)
+get_lvds_mode_from_bios(display_timing* panelTiming, uint16* minBrightness)
 {
 	int vbtOffset = 0;
 	if (!get_bios(&vbtOffset))
@@ -431,6 +469,10 @@ get_lvds_mode_from_bios(display_timing* panelTiming)
 				if (panelType == -1)
 					break;
 
+				// on newer versions, check also generic DTD, use LFP panel DTD as a fallback
+				if (bdb->version >= 229 && panelTimingFound)
+					break;
+
 				struct lvds_bdb2 *lvds2;
 				struct lvds_bdb2_lfp_info *lvds2_lfp_info;
 
@@ -460,13 +502,9 @@ get_lvds_mode_from_bios(display_timing* panelTiming)
 
 				sanitize_panel_timing(*panelTiming);
 
-				// on newer versions, check also generic DTD, use LFP panel DTD as a fallback
-				if (bdb->version >= 229) {
-					panelTimingFound = true;
-					break;
-				}
-				delete_area(vbios.area);
-				return true;
+				panelTimingFound = true;
+				break;
+
 			}
 			case BDB_GENERIC_DTD:
 			{
@@ -511,9 +549,41 @@ get_lvds_mode_from_bios(display_timing* panelTiming)
 					panelTiming->flags |= B_POSITIVE_VSYNC;
 
 				sanitize_panel_timing(*panelTiming);
-				delete_area(vbios.area);
-				return true;
+				panelTimingFound = true;
+				break;
+			}
+			case BDB_LVDS_BACKLIGHT:
+			{
+				TRACE((DEVICE_NAME ": found bdb lvds backlight info\n"));
+				// First make sure we found block BDB_LVDS_OPTIONS and the panel type
+				if (panelType == -1)
+					break;
 
+				bdb_lfp_backlight_data* backlightData
+					= (bdb_lfp_backlight_data*)(vbios.memory + start);
+
+				const struct bdb_lfp_backlight_data_entry* entry = &backlightData->data[panelType];
+
+				if (entry->type == BDB_BACKLIGHT_TYPE_PWM) {
+					uint16 minLevel;
+					if (bdb->version < 234) {
+						minLevel = entry->min_brightness;
+					} else {
+						minLevel = backlightData->brightness_min_level[panelType].level;
+						if (bdb->version >= 236
+							&& backlightData->brightness_precision_bits[panelType] == 16) {
+							TRACE((DEVICE_NAME ": divide level by 255\n"));
+							minLevel /= 255;
+						}
+					}
+
+					*minBrightness = minLevel;
+					TRACE((DEVICE_NAME ": display %d min brightness level is %u\n", panelType,
+						minLevel));
+				} else {
+					TRACE((DEVICE_NAME ": display %d does not have PWM\n", panelType));
+				}
+				break;
 			}
 		}
 	}
