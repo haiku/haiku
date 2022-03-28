@@ -129,8 +129,8 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 
 	uint8 auxMessage[20];
 	auxMessage[0] = message->address & 0xff;
-	auxMessage[1] = message->address >> 8;
-	auxMessage[2] = message->request << 4;
+	auxMessage[1] = (message->address >> 8) & 0xff;
+	auxMessage[2] = (message->request << 4) | ((message->address >> 16) & 0xf);
 	auxMessage[3] = message->size ? (message->size - 1) : 0;
 
 	if (message->size == 0)
@@ -188,9 +188,9 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 
 
 void
-dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value)
+dpcd_reg_write(uint32 connectorIndex, uint32 address, uint8 value)
 {
-	//TRACE("%s: connector(%" B_PRId32 "): 0x%" B_PRIx16 " -> 0x%" B_PRIx8 "\n",
+	//TRACE("%s: connector(%" B_PRId32 "): 0x%" B_PRIx32 " -> 0x%" B_PRIx8 "\n",
 	//	__func__, connectorIndex, address, value);
 	dp_aux_msg message;
 	memset(&message, 0, sizeof(message));
@@ -209,9 +209,9 @@ dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value)
 
 
 uint8
-dpcd_reg_read(uint32 connectorIndex, uint16 address)
+dpcd_reg_read(uint32 connectorIndex, uint32 address)
 {
-	//TRACE("%s: connector(%" B_PRId32 "): read 0x%" B_PRIx16 ".\n",
+	//TRACE("%s: connector(%" B_PRId32 "): read 0x%" B_PRIx32 ".\n",
 	//	__func__, connectorIndex, address);
 	uint8 response[3];
 
@@ -234,7 +234,7 @@ dpcd_reg_read(uint32 connectorIndex, uint16 address)
 
 
 status_t
-dp_aux_get_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
+dp_aux_get_i2c_byte(uint32 connectorIndex, uint32 address, uint8* data,
 	bool start, bool stop)
 {
 	uint8 reply[3];
@@ -284,7 +284,7 @@ dp_aux_get_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 
 
 status_t
-dp_aux_set_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
+dp_aux_set_i2c_byte(uint32 connectorIndex, uint32 address, uint8* data,
 	bool start, bool stop)
 {
 	dp_aux_msg message;
