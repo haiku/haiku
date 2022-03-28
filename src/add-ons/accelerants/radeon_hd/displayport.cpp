@@ -531,9 +531,9 @@ static bool
 dp_clock_equalization_ok(dp_info* dp)
 {
 	uint8 laneAlignment
-		= dp->linkStatus[DP_LANE_ALIGN - DP_LANE_STATUS_0_1];
+		= dp->linkStatus[DP_LANE_ALIGN_STATUS_UPDATED - DP_LANE_STATUS_0_1];
 
-	if ((laneAlignment & DP_LANE_ALIGN_DONE) == 0) {
+	if ((laneAlignment & DP_INTERLANE_ALIGN_DONE) == 0) {
 		TRACE("%s: false. Lane alignment incomplete.\n", __func__);
 		return false;
 	}
@@ -565,7 +565,7 @@ dp_update_vs_emph(uint32 connectorIndex)
 	memset(&message, 0, sizeof(message));
 
 	message.request = DP_AUX_NATIVE_WRITE;
-	message.address = DP_TRAIN_LANE0;
+	message.address = DP_TRAINING_LANE0_SET;
 	message.buffer = dp->trainingSet;
 	message.size = dp->laneCount;
 		// TODO: Review laneCount as it sounds strange.
@@ -654,23 +654,23 @@ dp_set_tp(uint32 connectorIndex, int trainingPattern)
 	if (info.dceMajor >= 4) {
 		TRACE("%s: Training with encoder...\n", __func__);
 		switch (trainingPattern) {
-			case DP_TRAIN_PATTERN_1:
+			case DP_TRAINING_PATTERN_1:
 				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN1;
 				break;
-			case DP_TRAIN_PATTERN_2:
+			case DP_TRAINING_PATTERN_2:
 				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN2;
 				break;
-			case DP_TRAIN_PATTERN_3:
+			case DP_TRAINING_PATTERN_3:
 				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN3;
 				break;
 		}
 		encoder_dig_setup(connectorIndex, pll->pixelClock, rawTrainingPattern);
 	} else {
 		switch (trainingPattern) {
-			case DP_TRAIN_PATTERN_1:
+			case DP_TRAINING_PATTERN_1:
 				rawTrainingPattern = 0;
 				break;
-			case DP_TRAIN_PATTERN_2:
+			case DP_TRAINING_PATTERN_2:
 				rawTrainingPattern = 1;
 				break;
 		}
@@ -680,7 +680,7 @@ dp_set_tp(uint32 connectorIndex, int trainingPattern)
 	}
 
 	// Enable training pattern on the sink
-	dpcd_reg_write(connectorIndex, DP_TRAIN, trainingPattern);
+	dpcd_reg_write(connectorIndex, DP_TRAINING_PATTERN_SET, trainingPattern);
 }
 
 
@@ -697,7 +697,7 @@ dp_link_train_cr(uint32 connectorIndex)
 	uint8 voltage = 0xff;
 	int lane;
 
-	dp_set_tp(connectorIndex, DP_TRAIN_PATTERN_1);
+	dp_set_tp(connectorIndex, DP_TRAINING_PATTERN_1);
 	memset(dp->trainingSet, 0, 4);
 	dp_update_vs_emph(connectorIndex);
 	snooze(400);
@@ -764,9 +764,9 @@ dp_link_train_ce(uint32 connectorIndex, bool tp3Support)
 	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
 
 	if (tp3Support)
-		dp_set_tp(connectorIndex, DP_TRAIN_PATTERN_3);
+		dp_set_tp(connectorIndex, DP_TRAINING_PATTERN_3);
 	else
-		dp_set_tp(connectorIndex, DP_TRAIN_PATTERN_2);
+		dp_set_tp(connectorIndex, DP_TRAINING_PATTERN_2);
 
 	dp->trainingAttempts = 0;
 	bool channelEqual = false;
@@ -858,7 +858,7 @@ dp_link_train(uint8 crtcID)
 	sandbox = dpcd_reg_read(connectorIndex, DP_LANE_COUNT);
 	if (dp->revision >= DP_DPCD_REV_11
 		&& (dpcd_reg_read(connectorIndex, DP_MAX_LANE_COUNT)
-			& DP_ENHANCED_FRAME_CAP_EN)) {
+			& DP_ENHANCED_FRAME_CAP)) {
 		sandbox |= DP_ENHANCED_FRAME_EN;
 	}
 	dpcd_reg_write(connectorIndex, DP_LANE_COUNT, sandbox);
@@ -879,7 +879,7 @@ dp_link_train(uint8 crtcID)
 	}
 
 	// Disable the training pattern on the sink
-	dpcd_reg_write(connectorIndex, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
+	dpcd_reg_write(connectorIndex, DP_TRAINING_PATTERN_SET, DP_TRAINING_PATTERN_DISABLE);
 
 	dp_link_train_cr(connectorIndex);
 	dp_link_train_ce(connectorIndex, dpTPS3Supported);
@@ -888,7 +888,7 @@ dp_link_train(uint8 crtcID)
 	snooze(400);
 
 	// Disable the training pattern on the sink
-	dpcd_reg_write(connectorIndex, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
+	dpcd_reg_write(connectorIndex, DP_TRAINING_PATTERN_SET, DP_TRAINING_PATTERN_DISABLE);
 
 	// Disable the training pattern on the source
 	if (info.dceMajor >= 4) {
@@ -1016,11 +1016,11 @@ debug_dp_info()
 			ERROR("   - receiver port count:     %d\n",
 				dpcd_reg_read(id, DP_NORP) & DP_NORP_MASK);
 			ERROR("   - downstream port present: %s\n",
-				dpcd_reg_read(id, DP_DOWNSTREAMPORT) & DP_DOWNSTREAMPORT_EN
+				dpcd_reg_read(id, DP_DOWNSTREAMPORT_PRESENT) & DP_DWN_STRM_PORT_PRESENT
 					? "yes" : "no");
 			ERROR("   - downstream port count:   %d\n",
-				dpcd_reg_read(id, DP_DOWNSTREAMPORT_COUNT)
-					& DP_DOWNSTREAMPORT_COUNT_MASK);
+				dpcd_reg_read(id, DP_DOWN_STREAM_PORT_COUNT)
+					& DP_PORT_COUNT_MASK);
 			ERROR(" + Training\n");
 			ERROR("   - attempts:                %" B_PRIu8 "\n",
 				dp->trainingAttempts);
