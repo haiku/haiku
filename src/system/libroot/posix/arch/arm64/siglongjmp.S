@@ -11,9 +11,17 @@
 FUNCTION(siglongjmp):
 FUNCTION(longjmp):
 FUNCTION(_longjmp):
-	/* Loop infinitely here, for now.
-	 TODO implement this for real */
-	b		.
+	ldp x19, x20, [x0], #16
+	ldp x21, x22, [x0], #16
+	ldp x23, x24, [x0], #16
+	ldp x25, x26, [x0], #16
+	ldp x27, x28, [x0], #16
+	ldp x29, x30, [x0], #16
+
+	ldr x2, [x0]
+	mov sp, x2
+
+	b __longjmp_return
 FUNCTION_END(siglongjmp)
 FUNCTION_END(longjmp)
 FUNCTION_END(_longjmp)
