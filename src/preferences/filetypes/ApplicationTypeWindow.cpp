@@ -298,10 +298,10 @@ SupportedTypeListView::AcceptsDrag(const BMessage* message)
 //	#pragma mark -
 
 
-ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
+ApplicationTypeWindow::ApplicationTypeWindow(const BMessage& settings, BPoint offset,
 	const BEntry& entry)
 	:
-	BWindow(BRect(0.0f, 0.0f, 250.0f, 340.0f).OffsetBySelf(position),
+	BWindow(_Frame(settings).OffsetBySelf(offset),
 		B_TRANSLATE("Application type"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS |
 			B_FRAME_EVENTS | B_AUTO_UPDATE_SIZE_LIMITS),
@@ -531,6 +531,15 @@ ApplicationTypeWindow::~ApplicationTypeWindow()
 	BMimeType::StopWatching(this);
 }
 
+BRect
+ApplicationTypeWindow::_Frame(const BMessage& settings) const
+{
+	BRect rect;
+	if (settings.FindRect("app_type_frame", &rect) == B_OK)
+		return rect;
+
+	return BRect(100.0f, 110.0f, 250.0f, 340.0f);
+}
 
 BString
 ApplicationTypeWindow::_Title(const BEntry& entry)
@@ -1075,6 +1084,10 @@ ApplicationTypeWindow::QuitRequested()
 				break;
 		}
 	}
+
+	BMessage update(kMsgSettingsChanged);
+	update.AddRect("app_type_frame", Frame());
+	be_app_messenger.SendMessage(&update);
 
 	be_app->PostMessage(kMsgTypeWindowClosed);
 	return true;
