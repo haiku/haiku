@@ -6954,6 +6954,11 @@ struct LockedPages : DoublyLinkedListLinkImpl<LockedPages> {
 
 status_t
 _user_mlock(const void* address, size_t size) {
+#if 1
+	// This implementation is broken and cause panics.
+	// Disable for now.
+	return B_NOT_SUPPORTED;
+#else
 	// Maybe there's nothing to do, in which case, do nothing
 	if (size == 0)
 		return B_OK;
@@ -7073,11 +7078,15 @@ _user_mlock(const void* address, size_t size) {
 	// Finally, store the new range in the locked list
 	lockedPages->InsertBefore(currentRange, newRange);
 	return B_OK;
+#endif
 }
 
 
 status_t
 _user_munlock(const void* address, size_t size) {
+#if 1
+	return B_NOT_SUPPORTED;
+#else
 	// Maybe there's nothing to do, in which case, do nothing
 	if (size == 0)
 		return B_OK;
@@ -7163,6 +7172,7 @@ _user_munlock(const void* address, size_t size) {
 	}
 
 	return B_OK;
+#endif
 }
 
 
