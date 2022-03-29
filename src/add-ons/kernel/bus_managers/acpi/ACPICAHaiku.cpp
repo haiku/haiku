@@ -140,6 +140,8 @@ __BEGIN_DECLS
 #include "acdebug.h"
 __END_DECLS
 
+#include "arch_init.h"
+
 
 ACPI_MODULE_NAME("Haiku ACPI Module")
 
@@ -239,12 +241,8 @@ AcpiOsGetRootPointer()
 		if (acpiRootPointer != NULL)
 			sACPIRoot = *acpiRootPointer;
 
-		if (sACPIRoot == 0) {
-			ACPI_PHYSICAL_ADDRESS address;
-			ACPI_STATUS status = AcpiFindRootPointer(&address);
-			if (status == AE_OK)
-				sACPIRoot = address;
-		}
+		if (sACPIRoot == 0)
+			sACPIRoot = arch_init_find_root_pointer();
 	}
 	return sACPIRoot;
 #else

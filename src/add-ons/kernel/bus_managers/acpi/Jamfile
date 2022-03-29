@@ -3,9 +3,14 @@ SubDir HAIKU_TOP src add-ons kernel bus_managers acpi ;
 UsePrivateKernelHeaders ;
 SubDirHdrs [ FDirName $(SUBDIR) acpica include ] ;
 SubDirHdrs [ FDirName $(SUBDIR) acpica include platform ] ;
+SubDirHdrs [ FDirName $(SUBDIR) arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) pci ] ;
 SubDirCcFlags -D_KERNEL_MODE ;
 
+
+local arch_src =
+	arch_init.cpp
+	;
 
 local dispatcher_src =
 	dsargs.c
@@ -193,7 +198,6 @@ local utilities_src =
 	;
 
 StaticLibrary libacpi_ca.a :
-	$(compiler_src)
 	$(dispatcher_src)
 	$(events_src)
 	$(executer_src)
@@ -205,6 +209,19 @@ StaticLibrary libacpi_ca.a :
 	$(utilities_src)
 	;
 
+KernelAddon acpi :
+	ACPICAHaiku.cpp
+	BusManager.cpp
+	Module.cpp
+	Device.cpp
+	NamespaceDump.cpp
+	EmbeddedController.cpp
+	$(arch_src)
+	:
+	libacpi_ca.a
+	;
+
+SEARCH on [ FGristFiles $(arch_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 SEARCH on [ FGristFiles $(dispatcher_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components dispatcher ] ;
 SEARCH on [ FGristFiles $(events_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components events ] ;
 SEARCH on [ FGristFiles $(executer_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components executer ] ;
@@ -214,14 +231,3 @@ SEARCH on [ FGristFiles $(parser_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons k
 SEARCH on [ FGristFiles $(resources_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components resources ] ;
 SEARCH on [ FGristFiles $(tables_src) ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components tables ] ;
 SEARCH on [ FGristFiles $(utilities_src)  ] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica components utilities ] ;
-
-KernelAddon acpi :
-	ACPICAHaiku.cpp
-	BusManager.cpp
-	Module.cpp
-	Device.cpp
-	NamespaceDump.cpp
-	EmbeddedController.cpp
-	:
-	libacpi_ca.a
-	;

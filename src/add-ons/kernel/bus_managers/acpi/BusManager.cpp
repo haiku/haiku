@@ -14,7 +14,6 @@
 #include <string.h>
 
 #include <ACPI.h>
-#include <apic.h>
 #include <dpc.h>
 #include <KernelExport.h>
 #include <PCI.h>
@@ -29,6 +28,9 @@ extern "C" {
 }
 #include "ACPIPrivate.h"
 
+#include "arch_init.h"
+
+
 //#define TRACE_ACPI_BUS
 #ifdef TRACE_ACPI_BUS
 #define TRACE(x...) dprintf("acpi: " x)
@@ -37,9 +39,6 @@ extern "C" {
 #endif
 
 #define ERROR(x...) dprintf("acpi: " x)
-
-#define PIC_MODE 0
-#define APIC_MODE 1
 
 #define ACPI_DEVICE_ID_LENGTH	0x08
 
@@ -179,8 +178,6 @@ acpi_std_ops(int32 op,...)
 	switch (op) {
 		case B_MODULE_INIT:
 		{
-			ACPI_OBJECT arg;
-			ACPI_OBJECT_LIST parameter;
 			void *settings;
 			bool acpiDisabled = false;
 			AcpiGbl_CopyDsdtLocally = true;
@@ -232,13 +229,7 @@ acpi_std_ops(int32 op,...)
 
 			/* Install the default address space handlers. */
 
-			arg.Integer.Type = ACPI_TYPE_INTEGER;
-			arg.Integer.Value = apic_available() ? APIC_MODE : PIC_MODE;
-
-			parameter.Count = 1;
-			parameter.Pointer = &arg;
-
-			AcpiEvaluateObject(NULL, (ACPI_STRING)"\\_PIC", &parameter, NULL);
+			arch_init_interrupt_controller();
 
 			if (checkAndLogFailure(AcpiEnableSubsystem(
 						ACPI_FULL_INITIALIZATION),
