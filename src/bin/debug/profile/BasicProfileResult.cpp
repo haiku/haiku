@@ -286,10 +286,12 @@ InclusiveProfileResult::AddSamples(ImageProfileResultContainer* container,
 		int32 symbol = -1;
 		if (image != NULL) {
 			symbol = image->GetImage()->FindSymbol(address - loadDelta);
-			if (symbol < 0) {
-				// TODO: Count unknown image hits?
-			} else if (image != previousImage || symbol != previousSymbol)
-				image->AddSymbolHit(symbol);
+			if (image != previousImage || symbol != previousSymbol) {
+				if (symbol < 0)
+					image->AddUnknownHit();
+				else
+					image->AddSymbolHit(symbol);
+			}
 
 			if (image != previousImage)
 				image->AddImageHit();
