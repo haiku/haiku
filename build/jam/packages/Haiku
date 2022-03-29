@@ -182,7 +182,7 @@ AddFilesToPackage data KeyboardLayouts ThinkPad
 
 # boot module links
 AddBootModuleSymlinksToPackage
-	acpi@x86,x86_64 ahci ata ata_adapter
+	acpi@x86,x86_64,arm64 ahci ata ata_adapter
 	bfs
 	dpc
 	efi_gpt
