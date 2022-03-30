@@ -116,15 +116,33 @@ const struct supported_device {
 	{0x0d04, 0x0d26, INTEL_MODEL_HASM, "Haswell Mobile"},
 	{0x0a04, 0x0a16, INTEL_MODEL_HASM, "Haswell Mobile"},
 
+#if 0
 	// XXX: 0x0f00 only confirmed on 0x0f30, 0x0f31
-	{0x0f00, 0x0155, INTEL_MODEL_VLV, "ValleyView Desktop"},
 	{0x0f00, 0x0f30, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0f31, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0f32, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0f33, INTEL_MODEL_VLVM, "ValleyView Mobile"},
-	{0x0f00, 0x0157, INTEL_MODEL_VLVM, "ValleyView Mobile"},
+#endif
 
-	{0x1604, 0x1616, INTEL_MODEL_BDWM, "HD Graphics 5500 (Broadwell GT2)"},
+	// XXX: 0x1604 only confirmed on 0x1616
+	{0x1604, 0x1606, INTEL_MODEL_BDWM, "Broadwell GT1 ULT"},
+	{0x1604, 0x160b, INTEL_MODEL_BDWM, "Broadwell GT1 Iris"},
+	{0x1604, 0x160e, INTEL_MODEL_BDWM, "Broadwell GT1 ULX"},
+	{0x1604, 0x1602, INTEL_MODEL_BDWM, "Broadwell GT1 ULT"},
+	{0x1604, 0x160a, INTEL_MODEL_BDWS, "Broadwell GT1 Server"},
+	{0x1604, 0x160d, INTEL_MODEL_BDW,  "Broadwell GT1 Workstation"},
+	{0x1604, 0x1616, INTEL_MODEL_BDWM, "Broadwell GT2 ULT"},
+	{0x1604, 0x161b, INTEL_MODEL_BDWM, "Broadwell GT2 ULT"},
+	{0x1604, 0x161e, INTEL_MODEL_BDWM, "Broadwell GT2 ULX"},
+	{0x1604, 0x1612, INTEL_MODEL_BDWM, "Broadwell GT2 Halo"},
+	{0x1604, 0x161a, INTEL_MODEL_BDWS, "Broadwell GT2 Server"},
+	{0x1604, 0x161d, INTEL_MODEL_BDW,  "Broadwell GT2 Workstation"},
+	{0x1604, 0x1626, INTEL_MODEL_BDWM, "Broadwell GT3 ULT"},
+	{0x1604, 0x162b, INTEL_MODEL_BDWM, "Broadwell GT3 Iris"},
+	{0x1604, 0x162e, INTEL_MODEL_BDWM, "Broadwell GT3 ULX"},
+	{0x1604, 0x1622, INTEL_MODEL_BDWM, "Broadwell GT3 ULT"},
+	{0x1604, 0x162a, INTEL_MODEL_BDWS, "Broadwell GT3 Server"},
+	{0x1604, 0x162d, INTEL_MODEL_BDW,  "Broadwell GT3 Workstation"},
 
 	// XXX: 0x1904 only confirmed on 0x1916
 	{0x1904, 0x1902, INTEL_MODEL_SKY,  "Skylake GT1"},
