@@ -226,8 +226,10 @@ struct DeviceType {
 			return 7;
 		if (InGroup(INTEL_GROUP_CHV) || InGroup(INTEL_GROUP_BDW))
 			return 8;
-		if (InGroup(INTEL_GROUP_JSL) || InGroup(INTEL_GROUP_TGL))
+		if (InGroup(INTEL_GROUP_JSL))
 			return 11;
+		if (InGroup(INTEL_GROUP_TGL))
+			return 12;
 		if (InFamily(INTEL_FAMILY_LAKE))
 			return 9;
 
