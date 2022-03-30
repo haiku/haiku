@@ -477,6 +477,23 @@ namespace Network {
 
 
 /*!
+	\fn void BHttpFields::AddFields(std::initializer_list< Field > fields)
+	\brief Add a list of fields.
+
+	This enables you to add a list of \ref BHttpFields::Field objects. Like \ref AddField(), the
+	fields are added in the the original order, though if there are duplicate keys within the
+	\a fields list, or there are existing keys in the object, they will be grouped together in
+	sequence.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+	\exception BHttpFields::InvalidInput This error indicates that some of the names or values in
+		the list do not adhere to the HTTP specification.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn void BHttpFields::RemoveField(const std::string_view &name) noexcept
 	\brief Remove all fields with the \a name.
 

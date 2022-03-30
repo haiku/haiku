@@ -13,6 +13,8 @@
 #include <ErrorsExt.h>
 #include <String.h>
 
+class BDataIO;
+class BMallocIO;
 class BUrl;
 
 
@@ -87,6 +89,9 @@ public:
 			void			SetMethod(const BHttpMethod& method);
 			void			SetUrl(const BUrl& url);
 
+	// Serialization
+			ssize_t			SerializeHeaderTo(BDataIO* target) const;
+			BString			HeaderToString() const;
 private:
 	friend class BHttpSession;
 	struct Data;

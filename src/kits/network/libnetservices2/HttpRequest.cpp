@@ -10,8 +10,11 @@
 
 #include <algorithm>
 #include <ctype.h>
+#include <sstream>
 #include <utility>
 
+#include <DataIO.h>
+#include <HttpFields.h>
 #include <NetServicesDefs.h>
 #include <Url.h>
 
@@ -218,4 +221,84 @@ BHttpRequest::SetUrl(const BUrl& url)
 		throw BUnsupportedProtocol(__PRETTY_FUNCTION__, BUrl(url), list);
 	}
 	fData->url = url;
+}
+
+
+[[nodiscard]] static inline ssize_t
+_write_to_dataio(BDataIO* target, const std::string_view& data)
+{
+	if (auto status = target->WriteExactly(data.data(), data.size()); status != B_OK)
+		throw BSystemError("BDataIO::WriteExactly()", status);
+	return data.size();
+}
+
+
+[[nodiscard]] static inline ssize_t
+_write_to_dataio(BDataIO* target, const BString& string)
+{
+	auto length = string.Length();
+	if (auto status = target->WriteExactly(string.String(), length); status != B_OK)
+		throw BSystemError("BDataIO::WriteExactly()", status);
+	return length;
+}
+
+
+ssize_t
+BHttpRequest::SerializeHeaderTo(BDataIO* target) const
+{
+	auto bytesWritten = _write_to_dataio(target, fData->method.Method());
+	bytesWritten += _write_to_dataio(target, " "sv);
+
+	// TODO: proxy
+
+	if (fData->url.HasPath() && fData->url.Path().Length() > 0)
+		bytesWritten += _write_to_dataio(target, fData->url.Path());
+	else
+		bytesWritten += _write_to_dataio(target, "/"sv);
+
+	// TODO: switch between HTTP 1.0 and 1.1 based on configuration
+	bytesWritten += _write_to_dataio(target, " HTTP/1.1\r\n"sv);
+
+	BHttpFields outputFields;
+	if (true /* http == 1.1 */) {
+		BString host = fData->url.Host();
+		int defaultPort = fData->url.Protocol() == "http" ? 80 : 443;
+		if (fData->url.HasPort() && fData->url.Port() != defaultPort)
+			host << ':' << fData->url.Port();
+
+		outputFields.AddFields({
+			{"Host"sv, std::string_view(host.String())},
+			{"Accept"sv, "*"sv},
+			{"Accept-Encoding"sv, "gzip"sv},
+				// Allows the server to compress data using the "gzip" format.
+				// "deflate" is not supported, because there are two interpretations
+				// of what it means (the RFC and Microsoft products), and we don't
+				// want to handle this. Very few websites support only deflate,
+				// and most of them will send gzip, or at worst, uncompressed data.
+			{"Connection"sv, "close"sv}
+				// Let the remote server close the connection after response since
+				// we don't handle multiple request on a single connection
+		});
+	}
+
+	for (const auto& field: outputFields) {
+		std::string_view name = field.Name();
+		bytesWritten += _write_to_dataio(target, name);
+		bytesWritten += _write_to_dataio(target, ": "sv);
+		bytesWritten += _write_to_dataio(target, field.Value());
+		bytesWritten += _write_to_dataio(target, "\r\n"sv);
+	}
+
+	bytesWritten += _write_to_dataio(target, "\r\n"sv);
+	return bytesWritten;
+}
+
+
+BString
+BHttpRequest::HeaderToString() const
+{
+	BMallocIO buffer;
+	auto size = SerializeHeaderTo(&buffer);
+
+	return BString(static_cast<const char*>(buffer.Buffer()), size);
 }

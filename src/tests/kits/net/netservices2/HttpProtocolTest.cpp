@@ -234,6 +234,10 @@ HttpProtocolTest::HttpRequestTest()
 	auto url = BUrl("https://www.haiku-os.org");
 	request.SetUrl(url);
 	CPPUNIT_ASSERT(request.Url() == url);
+
+	// Validate header serialization
+	BString header = request.HeaderToString();
+	CPPUNIT_ASSERT(header.Compare("GET / HTTP/1.1\r\nHost: www.haiku-os.org\r\nAccept: *\r\nAccept-Encoding: gzip\r\nConnection: close\r\n\r\n") == 0);
 }
 
 

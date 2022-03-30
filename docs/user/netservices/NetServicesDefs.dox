@@ -219,7 +219,7 @@ namespace Network {
 		to initialize it to \c __PRETTY_FUNCTION__ by default.
 	\param type The error type that describes what the issue was that prevented the completion of
 		the request.
-	\param error Optional underlying system error. See the \ref BNetworkRequestError::ErrorType
+	\param errorCode Optional underlying system error. See the \ref BNetworkRequestError::ErrorType
 		documentation on which error types expect a system error.
 
 	\since Haiku R1

@@ -408,6 +408,16 @@ BHttpFields::AddField(const std::string_view& name, const std::string_view& valu
 
 
 void
+BHttpFields::AddFields(std::initializer_list<Field> fields)
+{
+	for (auto& field: fields) {
+		if (!field.IsEmpty())
+			_AddField(Field(field));
+	}
+}
+
+
+void
 BHttpFields::RemoveField(const std::string_view& name) noexcept
 {
 	for(auto it = FindField(name); it != end(); it = FindField(name)) {

@@ -103,6 +103,7 @@ public:
 
 	// Modifiers
 	void				AddField(const std::string_view& name, const std::string_view& value);
+	void				AddFields(std::initializer_list<Field> fields);
 	void				RemoveField(const std::string_view& name) noexcept; 
 	void				RemoveField(ConstIterator it) noexcept;
 	void				MakeEmpty() noexcept;
