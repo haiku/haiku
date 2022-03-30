@@ -6925,52 +6925,10 @@ _user_get_memory_properties(team_id teamID, const void* address,
 }
 
 
-// An ordered list of non-overlapping ranges to track mlock/munlock locking.
-// It is allowed to call mlock/munlock in unbalanced ways (lock a range
-// multiple times, unlock a part of it, lock several consecutive ranges and
-// unlock them in one go, etc). However the low level lock_memory and
-// unlock_memory calls require the locks/unlocks to be balanced (you lock a
-// fixed range, and then unlock exactly the same range). This list allows to
-// keep track of what was locked exactly so we can unlock the correct things.
-struct LockedPages : DoublyLinkedListLinkImpl<LockedPages> {
-	addr_t start;
-	addr_t end;
-
-	status_t LockMemory()
-	{
-		return lock_memory((void*)start, end - start, 0);
-	}
-
-	status_t UnlockMemory()
-	{
-		return unlock_memory((void*)start, end - start, 0);
-	}
-
-	status_t Move(addr_t start, addr_t end)
-	{
-		status_t result = lock_memory((void*)start, end - start, 0);
-		if (result != B_OK)
-			return result;
-
-		result = UnlockMemory();
-
-		if (result != B_OK) {
-			// What can we do if the unlock fails?
-			panic("Failed to unlock memory: %s", strerror(result));
-			return result;
-		}
-
-		this->start = start;
-		this->end = end;
-
-		return B_OK;
-	}
-};
-
-
-status_t
-_user_mlock(const void* _address, size_t size)
+static status_t
+user_set_memory_swappable(const void* _address, size_t size, bool swappable)
 {
+#if ENABLE_SWAP_SUPPORT
 	// check address range
 	addr_t address = (addr_t)_address;
 	size = PAGE_ALIGN(size);
@@ -6980,198 +6938,77 @@ _user_mlock(const void* _address, size_t size)
 	if (!validate_user_memory_range(_address, size))
 		return EINVAL;
 
-	addr_t endAddress = address + size;
+	const addr_t endAddress = address + size;
 
-	// Pre-allocate a linked list element we may need (it's simpler to do it
-	// now than run out of memory in the midle of changing things)
-	LockedPages* newRange = new(std::nothrow) LockedPages();
-	if (newRange == NULL)
-		return ENOMEM;
-	ObjectDeleter<LockedPages> newRangeDeleter(newRange);
-
-	// Get and lock the team
-	Team* team = thread_get_current_thread()->team;
-	TeamLocker teamLocker(team);
-	teamLocker.Lock();
-
-	status_t error = B_OK;
-	LockedPagesList* lockedPages = &team->locked_pages_list;
-
-	// Locate the first locked range possibly overlapping ours
-	LockedPages* currentRange = lockedPages->Head();
-	while (currentRange != NULL && currentRange->end <= address)
-		currentRange = lockedPages->GetNext(currentRange);
-
-	if (currentRange == NULL || currentRange->start >= endAddress) {
-		// No existing range is overlapping with ours. We can just lock our
-		// range and stop here.
-		newRange->start = address;
-		newRange->end = endAddress;
-		error = newRange->LockMemory();
-		if (error != B_OK)
-			return error;
-
-		lockedPages->InsertBefore(currentRange, newRange);
-		newRangeDeleter.Detach();
-		return B_OK;
-	}
-
-	// We get here when there is at least one existing overlapping range.
-
-	if (currentRange->start <= address) {
-		if (currentRange->end >= endAddress) {
-			// An existing range is already fully covering the pages we need to
-			// lock. Nothing to do then.
-			return B_OK;
-		} else {
-			// An existing range covers the start of the area we want to lock.
-			// Advance our start address to avoid it.
-			address = currentRange->end;
-
-			// Move on to the next range for the next step
-			currentRange = lockedPages->GetNext(currentRange);
-		}
-	}
-
-	// First, lock the new range
-	newRange->start = address;
-	newRange->end = endAddress;
-	error = newRange->LockMemory();
+	AddressSpaceReadLocker addressSpaceLocker;
+	status_t error = addressSpaceLocker.SetTo(team_get_current_team_id());
 	if (error != B_OK)
 		return error;
+	VMAddressSpace* addressSpace = addressSpaceLocker.AddressSpace();
 
-	// Unlock all ranges fully overlapping with the area we need to lock
-	while (currentRange != NULL && currentRange->end < endAddress) {
-		// The existing range is fully contained inside the new one we're
-		// trying to lock. Delete/unlock it, and replace it with a new one
-		// (this limits fragmentation of the range list, and is simpler to
-		// manage)
-		error = currentRange->UnlockMemory();
+	// iterate through all concerned areas
+	addr_t nextAddress = address;
+	while (nextAddress != endAddress) {
+		// get the next area
+		VMArea* area = addressSpace->LookupArea(nextAddress);
+		if (area == NULL) {
+			error = B_BAD_ADDRESS;
+			break;
+		}
+
+		const addr_t areaStart = nextAddress;
+		const addr_t areaEnd = std::min(endAddress, area->Base() + area->Size());
+		nextAddress = areaEnd;
+
+		error = lock_memory_etc(addressSpace->ID(), (void*)areaStart, areaEnd - areaStart, 0);
 		if (error != B_OK) {
-			panic("Failed to unlock a memory range: %s", strerror(error));
-			newRange->UnlockMemory();
-			return error;
+			// We don't need to unset or reset things on failure.
+			break;
 		}
-		LockedPages* temp = currentRange;
-		currentRange = lockedPages->GetNext(currentRange);
-		lockedPages->Remove(temp);
-		delete temp;
+
+		VMCacheChainLocker cacheChainLocker(vm_area_get_locked_cache(area));
+		VMAnonymousCache* anonCache = NULL;
+		if (dynamic_cast<VMAnonymousNoSwapCache*>(area->cache) != NULL) {
+			// This memory will aready never be swapped. Nothing to do.
+		} else if ((anonCache = dynamic_cast<VMAnonymousCache*>(area->cache)) != NULL) {
+			error = anonCache->SetCanSwapPages(areaStart - area->Base(),
+				areaEnd - areaStart, swappable);
+		} else {
+			// Some other cache type? We cannot affect anything here.
+			error = EINVAL;
+		}
+
+		cacheChainLocker.Unlock();
+
+		unlock_memory_etc(addressSpace->ID(), (void*)areaStart, areaEnd - areaStart, 0);
+		if (error != B_OK)
+			break;
 	}
 
-	if (currentRange != NULL) {
-		// One last range may cover the end of the area we're trying to lock
-
-		if (currentRange->start == address) {
-			// In case two overlapping ranges (one at the start and the other
-			// at the end) already cover the area we're after, there's nothing
-			// more to do. So we destroy our new extra allocation
-			error = newRange->UnlockMemory();
-			return error;
-		}
-
-		if (currentRange->start < endAddress) {
-			// Make sure the last range is not overlapping, by moving its start
-			error = currentRange->Move(endAddress, currentRange->end);
-			if (error != B_OK) {
-				panic("Failed to move a memory range: %s", strerror(error));
-				newRange->UnlockMemory();
-				return error;
-			}
-		}
-	}
-
-	// Finally, store the new range in the locked list
-	lockedPages->InsertBefore(currentRange, newRange);
-	newRangeDeleter.Detach();
+	return error;
+#else
+	// No swap support? Nothing to do.
 	return B_OK;
+#endif
+}
+
+
+status_t
+_user_mlock(const void* _address, size_t size)
+{
+	return user_set_memory_swappable(_address, size, false);
 }
 
 
 status_t
 _user_munlock(const void* _address, size_t size)
 {
-	// check address range
-	addr_t address = (addr_t)_address;
-	size = PAGE_ALIGN(size);
-
-	if ((address % B_PAGE_SIZE) != 0)
-		return EINVAL;
-	if (!validate_user_memory_range(_address, size))
-		return EINVAL;
-
-	addr_t endAddress = address + size;
-
-	// Get and lock the team
-	Team* team = thread_get_current_thread()->team;
-	TeamLocker teamLocker(team);
-	teamLocker.Lock();
-	LockedPagesList* lockedPages = &team->locked_pages_list;
-
-	status_t error = B_OK;
-
-	// Locate the first locked range possibly overlapping ours
-	LockedPages* currentRange = lockedPages->Head();
-	while (currentRange != NULL && currentRange->end <= address)
-		currentRange = lockedPages->GetNext(currentRange);
-
-	if (currentRange == NULL || currentRange->start >= endAddress) {
-		// No range is intersecting, nothing to unlock
-		return B_OK;
-	}
-
-	if (currentRange->start < address) {
-		if (currentRange->end > endAddress) {
-			// There is a range fully covering the area we want to unlock,
-			// and it extends on both sides. We need to split it in two
-			LockedPages* newRange = new(std::nothrow) LockedPages();
-			if (newRange == NULL)
-				return ENOMEM;
-
-			newRange->start = endAddress;
-			newRange->end = currentRange->end;
-
-			error = newRange->LockMemory();
-			if (error != B_OK) {
-				delete newRange;
-				return error;
-			}
-
-			error = currentRange->Move(currentRange->start, address);
-			if (error != B_OK) {
-				delete newRange;
-				return error;
-			}
-
-			lockedPages->InsertAfter(currentRange, newRange);
-			return B_OK;
-		} else {
-			// There is a range that overlaps and extends before the one we
-			// want to unlock, we need to shrink it
-			error = currentRange->Move(currentRange->start, address);
-			if (error != B_OK)
-				return error;
-		}
-	}
-
-	while (currentRange != NULL && currentRange->end <= endAddress) {
-		// Unlock all fully overlapping ranges
-		error = currentRange->UnlockMemory();
-		if (error != B_OK)
-			return error;
-		LockedPages* temp = currentRange;
-		currentRange = lockedPages->GetNext(currentRange);
-		lockedPages->Remove(temp);
-		delete temp;
-	}
-
-	// Finally split the last partially overlapping range if any
-	if (currentRange != NULL && currentRange->start < endAddress) {
-		error = currentRange->Move(endAddress, currentRange->end);
-		if (error != B_OK)
-			return error;
-	}
-
-	return B_OK;
+	// TODO: B_SHARED_AREAs need to be handled a bit differently:
+	// if multiple clones of an area had mlock() called on them,
+	// munlock() must also be called on all of them to actually unlock.
+	// (At present, the first munlock() will unlock all.)
+	// TODO: fork() should automatically unlock memory in the child.
+	return user_set_memory_swappable(_address, size, true);
 }
 
 

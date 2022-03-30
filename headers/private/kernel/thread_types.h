@@ -66,9 +66,6 @@ struct select_info;
 struct user_thread;				// defined in libroot/user_thread.h
 struct VMAddressSpace;
 struct xsi_sem_context;			// defined in xsi_semaphore.cpp
-struct LockedPages;
-
-typedef DoublyLinkedList<LockedPages> LockedPagesList;
 
 namespace Scheduler {
 	struct ThreadData;
@@ -247,8 +244,6 @@ struct Team : TeamThreadIteratorEntry<team_id>, KernelReferenceable,
 	struct xsi_sem_context *xsi_sem_context;
 	struct team_death_entry *death_entry;	// protected by fLock
 	struct list		dead_threads;
-
-	LockedPagesList	locked_pages_list;
 
 	// protected by the team's fLock
 	team_dead_children dead_children;
