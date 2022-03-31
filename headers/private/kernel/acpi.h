@@ -10,6 +10,7 @@
 #define ACPI_RSDT_SIGNATURE		"RSDT"
 #define ACPI_XSDT_SIGNATURE		"XSDT"
 #define ACPI_MADT_SIGNATURE		"APIC"
+#define ACPI_SPCR_SIGNATURE		"SPCR"
 
 #define ACPI_LOCAL_APIC_ENABLED	0x01
 
@@ -201,6 +202,42 @@ typedef struct acpi_local_x2_apic_nmi {
 	uint8	reserved2;				/* reserved (must be set to zero) */
 	uint8	reserved3;				/* reserved (must be set to zero) */
 } _PACKED acpi_local_x2_apic_nmi;
+
+typedef struct acpi_gas {
+	uint8 address_space_id;
+	uint8 bit_width;
+	uint8 bit_offset;
+	uint8 access_size;
+	uint64 address;
+} _PACKED acpi_gas;
+
+typedef struct acpi_spcr {
+	acpi_descriptor_header header;
+	uint32 interface_type;
+	acpi_gas base_address;
+	uint8 interrupt_type;
+	uint8 irq;
+	uint32 gisv;
+	uint8 baud;
+	uint8 parity;
+	uint8 stop_bits;
+	uint8 flow_control;
+	uint8 terminal_type;
+	uint8 language;
+	uint16 pci_device_id;
+	uint16 pci_vendor_id;
+	uint8 pci_bus_num;
+	uint8 pci_vendor_num;
+	uint8 pci_function_num;
+	uint32 pci_flags;
+	uint8 pci_segment;
+	uint32 clock;
+} _PACKED acpi_spcr;
+
+enum {
+	ACPI_SPCR_INTERFACE_TYPE_16550 = 0,
+	ACPI_SPCR_INTERFACE_TYPE_PL011 = 3,
+};
 
 
 #endif	/* _KERNEL_ACPI_H */

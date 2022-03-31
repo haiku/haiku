@@ -564,9 +564,6 @@ dtb_init()
 	efi_configuration_table *table = kSystemTable->ConfigurationTable;
 	size_t entries = kSystemTable->NumberOfTableEntries;
 
-	// Ensure uart is empty before we scan for one
-	memset(&gKernelArgs.arch_args.uart, 0, sizeof(uart_info));
-
 	INFO("Probing for device trees from UEFI...\n");
 
 	// Try to find an FDT
