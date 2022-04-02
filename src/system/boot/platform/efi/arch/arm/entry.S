@@ -67,7 +67,14 @@ _pl1_entry:
 	MCR p15, 0, r1, c8, c7, 0
 
 	// set TTBR0
-	MCR p15, 0, r5, c2, c0, 0
+	// cacheability attributes for the page tables are:
+	// Normal Memory, Inner/Outer Write-Back no Write-Allocate Cacheable
+
+	// Note that this relies on ARMv7 multiprocessing extensions
+	// on uniprocessors we need only the flag 0x01 i.e. Inner Cacheable
+
+	orr		r5, r5, #0x59
+	mcr		p15, 0, r5, c2, c0, 0
 
 	// initialize TTBCR to zero (no LPAE, use only TTBR0)
 	MCR p15, 0, r1, c2, c0, 2
@@ -79,10 +86,12 @@ _pl1_entry:
 	mov r9, #0xffffffff
 	MCR p15, 0, r9, c3, c0, 0
 
-	// enable MMU
-	MRC p15, 0, r9, c1, c0, 0
-	orr r9, r9, #1
-	MCR p15, 0, r9, c1, c0, 0
+	// enable MMU and caches
+	mrc		p15, 0, r9, c1, c0, 0
+	orr		r9, r9, #0x00001000		// i-cache enabled
+	orr		r9, r9, #0x00000004		// d-cache enabled
+	orr		r9, r9, #0x00000001		// MMU enabled
+	mcr		p15, 0, r9, c1, c0, 0
 
 	// set the kernel stack
 	mov		sp,r3
