@@ -85,7 +85,7 @@ release_vblank_sem(intel_info &info)
 
 
 static void
-bdw_enable_interrupts(intel_info& info, pipe_index pipe, bool enable)
+gen8_enable_interrupts(intel_info& info, pipe_index pipe, bool enable)
 {
 	ASSERT(pipe != INTEL_PIPE_ANY);
 	ASSERT(info.device_type.Generation() >= 12 || pipe != INTEL_PIPE_D);
@@ -100,78 +100,79 @@ bdw_enable_interrupts(intel_info& info, pipe_index pipe, bool enable)
 }
 
 
-static void
+static uint32
 gen11_enable_global_interrupts(intel_info& info, bool enable)
 {
 	write32(info, GEN11_GFX_MSTR_IRQ, enable ? GEN11_MASTER_IRQ : 0);
-	read32(info, GEN11_GFX_MSTR_IRQ);
+	return enable ? 0 : read32(info, GEN11_GFX_MSTR_IRQ);
 }
 
 
-static void
-bdw_enable_global_interrupts(intel_info& info, bool enable)
+static uint32
+gen8_enable_global_interrupts(intel_info& info, bool enable)
 {
-	const uint32 bit = PCH_MASTER_INT_CTL_GLOBAL_BDW;
-	const uint32 mask = enable ? bit : 0;
-	const uint32 value = read32(info, PCH_MASTER_INT_CTL_BDW);
-	write32(info, PCH_MASTER_INT_CTL_BDW, (value & ~bit) | mask);
+	write32(info, PCH_MASTER_INT_CTL_BDW, enable ? PCH_MASTER_INT_CTL_GLOBAL_BDW : 0);
+	return enable ? 0 : read32(info, PCH_MASTER_INT_CTL_BDW);
 }
 
 
 /*!
-	Checks interrupt status in master interrupt control register.
-	For Gen8 to Gen11. From Gen11 the register is called DISPLAY_INT_CTL.
+	Checks interrupt status with provided master interrupt control register.
+	For Gen8 to Gen11.
 */
-static bool
-bdw_check_interrupt(intel_info& info, pipes& which)
+static int32
+gen8_handle_interrupts(intel_info& info, uint32 interrupt)
 {
-	ASSERT(info.device_type.Generation() >= 12 || !which.HasPipe(INTEL_PIPE_D));
+	int32 handled = B_HANDLED_INTERRUPT;
+	if ((interrupt & PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_A)) != 0) {
+		const uint32 regIdentity = PCH_INTERRUPT_PIPE_IDENTITY_BDW(INTEL_PIPE_A);
+		uint32 identity = read32(info, regIdentity);
+		if ((identity & PCH_INTERRUPT_VBLANK_BDW) != 0) {
+			handled = release_vblank_sem(info);
+			write32(info, regIdentity, identity | PCH_INTERRUPT_VBLANK_BDW);
+		} else {
+			dprintf("gen8_handle_interrupts unhandled interrupt on pipe A\n");
+		}
+		interrupt &= ~PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_A);
+	}
+	if ((interrupt & PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_B)) != 0) {
+		const uint32 regIdentity = PCH_INTERRUPT_PIPE_IDENTITY_BDW(INTEL_PIPE_B);
+		uint32 identity = read32(info, regIdentity);
+		if ((identity & PCH_INTERRUPT_VBLANK_BDW) != 0) {
+			handled = release_vblank_sem(info);
+			write32(info, regIdentity, identity | PCH_INTERRUPT_VBLANK_BDW);
+		} else {
+			dprintf("gen8_handle_interrupts unhandled interrupt on pipe B\n");
+		}
+		interrupt &= ~PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_B);
+	}
+	if ((interrupt & PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_C)) != 0) {
+		const uint32 regIdentity = PCH_INTERRUPT_PIPE_IDENTITY_BDW(INTEL_PIPE_C);
+		uint32 identity = read32(info, regIdentity);
+		if ((identity & PCH_INTERRUPT_VBLANK_BDW) != 0) {
+			handled = release_vblank_sem(info);
+			write32(info, regIdentity, identity | PCH_INTERRUPT_VBLANK_BDW);
+		} else {
+			dprintf("gen8_handle_interrupts unhandled interrupt on pipe C\n");
+		}
+		interrupt &= ~PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_C);
+	}
 
-	which.ClearPipe(INTEL_PIPE_ANY);
-	uint32 interrupt = read32(info, PCH_MASTER_INT_CTL_BDW);
-	if ((interrupt & PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_A)) != 0)
-		which.SetPipe(INTEL_PIPE_A);
-	if ((interrupt & PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_B)) != 0)
-		which.SetPipe(INTEL_PIPE_B);
-	if ((interrupt & PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_C)) != 0)
-		which.SetPipe(INTEL_PIPE_C);
-	if ((interrupt & PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_D)) != 0)
-		which.SetPipe(INTEL_PIPE_D);
-	interrupt &= ~(PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_A)
-		| PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_B)
-		| PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_C)
-		| PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_D));
+	uint32 iir = 0;
+	if ((interrupt & GEN8_DE_PORT_IRQ) != 0) {
+		iir = read32(info, GEN8_DE_PORT_IIR);
+		if (iir != 0) {
+			write32(info, GEN8_DE_PORT_IIR, iir);
+		}
+		interrupt &= ~GEN8_DE_PORT_IRQ;
+	}
+
+	interrupt &= ~PCH_MASTER_INT_CTL_GLOBAL_BDW;
 	if (interrupt != 0)
-		dprintf("bdw_check_interrupt %" B_PRIx32 "\n", interrupt);
-	return which.HasPipe(INTEL_PIPE_ANY);
+		dprintf("gen8_handle_interrupts unhandled %" B_PRIx32 "\n", interrupt);
+	return handled;
 }
 
-
-/*!
-	Checks vblank interrupt status for a specified pipe.
-	Gen8 to Gen12.
-*/
-static bool
-bdw_check_pipe_interrupt(intel_info& info, pipe_index pipe)
-{
-	ASSERT(pipe != INTEL_PIPE_ANY);
-	ASSERT(info.device_type.Generation() >= 12 || pipe != INTEL_PIPE_D);
-
-	const uint32 identity = read32(info, PCH_INTERRUPT_PIPE_IDENTITY_BDW(pipe));
-	return (identity & PCH_INTERRUPT_VBLANK_BDW) != 0;
-}
-
-
-static void
-bdw_clear_pipe_interrupt(intel_info& info, pipe_index pipe)
-{
-	ASSERT(pipe != INTEL_PIPE_ANY);
-	ASSERT(info.device_type.Generation() >= 12 || pipe != INTEL_PIPE_D);
-
-	const uint32 regIdentity = PCH_INTERRUPT_PIPE_IDENTITY_BDW(pipe);
-	const uint32 identity = read32(info, regIdentity);
-	write32(info, regIdentity, identity | PCH_INTERRUPT_VBLANK_BDW);
-}
 
 
 /** Get the appropriate interrupt mask for enabling or testing interrupts on
@@ -307,49 +308,47 @@ intel_clear_pipe_interrupt(intel_info& info, pipe_index pipe)
 
 /*!
 	Interrupt routine for Gen8 and Gen9.
-	TODO: Gen11 and 12 require one additional check at the beginning.
 	See Gen12 Display Engine: Interrupt Service Routine chapter.
 */
 static int32
-bdw_interrupt_handler(void* data)
+gen8_interrupt_handler(void* data)
 {
 	intel_info& info = *(intel_info*)data;
 
-	bdw_enable_global_interrupts(info, false);
+	uint32 interrupt = gen8_enable_global_interrupts(info, false);
+	if (interrupt == 0) {
+		gen8_enable_global_interrupts(info, true);
+		return B_UNHANDLED_INTERRUPT;
+	}
 
-	pipes which;
-	bool shouldHandle = bdw_check_interrupt(info, which);
+	int32 handled = gen8_handle_interrupts(info, interrupt);
 
-	if (!shouldHandle) {
-		bdw_enable_global_interrupts(info, true);
+	gen8_enable_global_interrupts(info, true);
+	return handled;
+}
+
+
+/*!
+	Interrupt routine for Gen11.
+	See Gen12 Display Engine: Interrupt Service Routine chapter.
+*/
+static int32
+gen11_interrupt_handler(void* data)
+{
+	intel_info& info = *(intel_info*)data;
+
+	uint32 interrupt = gen11_enable_global_interrupts(info, false);
+
+	if (interrupt == 0) {
+		gen11_enable_global_interrupts(info, true);
 		return B_UNHANDLED_INTERRUPT;
 	}
 
 	int32 handled = B_HANDLED_INTERRUPT;
+	if ((interrupt & GEN11_DISPLAY_IRQ) != 0)
+		handled = gen8_handle_interrupts(info, read32(info, GEN11_DISPLAY_INT_CTL));
 
-	while (shouldHandle) {
-		if (which.HasPipe(INTEL_PIPE_A) && bdw_check_pipe_interrupt(info, INTEL_PIPE_A)) {
-			handled = release_vblank_sem(info);
-
-			bdw_clear_pipe_interrupt(info, INTEL_PIPE_A);
-		}
-
-		if (which.HasPipe(INTEL_PIPE_B) && bdw_check_pipe_interrupt(info, INTEL_PIPE_B)) {
-			handled = release_vblank_sem(info);
-
-			bdw_clear_pipe_interrupt(info, INTEL_PIPE_B);
-		}
-
-		if (which.HasPipe(INTEL_PIPE_C) && bdw_check_pipe_interrupt(info, INTEL_PIPE_C)) {
-			handled = release_vblank_sem(info);
-
-			bdw_clear_pipe_interrupt(info, INTEL_PIPE_C);
-		}
-
-		shouldHandle = bdw_check_interrupt(info, which);
-	}
-
-	bdw_enable_global_interrupts(info, true);
+	gen11_enable_global_interrupts(info, true);
 	return handled;
 }
 
@@ -439,14 +438,17 @@ init_interrupt_handler(intel_info &info)
 		info.fake_interrupts = false;
 
 		if (info.device_type.Generation() >= 8) {
+			interrupt_handler handler = &gen8_interrupt_handler;
+			if (info.device_type.Generation() >= 11)
+				handler = &gen11_interrupt_handler;
 			status = install_io_interrupt_handler(info.irq,
-				&bdw_interrupt_handler, (void*)&info, 0);
+				handler, (void*)&info, 0);
 			if (status == B_OK) {
-				bdw_enable_interrupts(info, INTEL_PIPE_A, true);
-				bdw_enable_interrupts(info, INTEL_PIPE_B, true);
+				gen8_enable_interrupts(info, INTEL_PIPE_A, true);
+				gen8_enable_interrupts(info, INTEL_PIPE_B, true);
 				if (info.device_type.Generation() >= 11)
-					bdw_enable_interrupts(info, INTEL_PIPE_C, true);
-				bdw_enable_global_interrupts(info, true);
+					gen8_enable_interrupts(info, INTEL_PIPE_C, true);
+				gen8_enable_global_interrupts(info, true);
 
 				if (info.device_type.Generation() >= 11) {
 					uint32 mask = GEN8_AUX_CHANNEL_A;
@@ -817,8 +819,11 @@ intel_extreme_uninit(intel_info &info)
 			if (info.device_type.Generation() >= 11) {
 				gen11_enable_global_interrupts(info, false);
 			}
-			bdw_enable_global_interrupts(info, false);
-			remove_io_interrupt_handler(info.irq, bdw_interrupt_handler, &info);
+			gen8_enable_global_interrupts(info, false);
+			interrupt_handler handler = &gen8_interrupt_handler;
+			if (info.device_type.Generation() >= 11)
+				handler = &gen11_interrupt_handler;
+			remove_io_interrupt_handler(info.irq, handler, &info);
 		} else {
 			write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
 			write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);

@@ -602,7 +602,8 @@ struct intel_free_graphics_memory {
 #define PCH_MASTER_INT_CTL_BDW					0x44200
 
 #define PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(pipe)	(1 << (15 + pipe))
-#define PCH_MASTER_INT_CTL_GLOBAL_BDW				(1 << 31)
+#define GEN8_DE_PORT_IRQ						(1 << 20)
+#define PCH_MASTER_INT_CTL_GLOBAL_BDW			(1 << 31)
 
 #define PCH_INTERRUPT_PIPE_STATUS_BDW(pipe)		(0x44400 + (pipe - 1) * 0x10)	// GEN8_DE_PIPE_ISR
 #define PCH_INTERRUPT_PIPE_MASK_BDW(pipe)		(0x44404 + (pipe - 1) * 0x10)	// GEN8_DE_PIPE_IMR
@@ -633,6 +634,7 @@ struct intel_free_graphics_memory {
 #define GEN11_DISPLAY_INT_CTL					0x44200			// same as PCH_MASTER_INT_CTL_BDW
 #define GEN11_GFX_MSTR_IRQ						0x190010
 #define GEN11_MASTER_IRQ						(1 << 31)
+#define GEN11_DISPLAY_IRQ						(1 << 16)
 #define GEN11_GT_DW1_IRQ						(1 << 1)
 #define GEN11_GT_DW0_IRQ						(1 << 0)
 
