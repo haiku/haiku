@@ -13,6 +13,7 @@
 #include "Ports.h"
 
 #include <ddc.h>
+#include <dp_raw.h>
 #include <stdlib.h>
 #include <string.h>
 #include <Debug.h>
@@ -64,6 +65,22 @@ wait_for_clear(addr_t address, uint32 mask, uint32 timeout)
 			return true;
 	}
 	return false;
+}
+
+
+static uint32
+wait_for_clear_status(addr_t address, uint32 mask, uint32 timeout)
+{
+	int interval = 50;
+	uint32 i = 0;
+	uint32 status = 0;
+	for(i = 0; i <= timeout; i += interval) {
+		spin(interval);
+		status = read32(address);
+		if ((status & mask) == 0)
+			return status;
+	}
+	return status;
 }
 
 
@@ -757,7 +774,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		read32(panelControl);
 
 		if (!wait_for_set(panelStatus, PANEL_STATUS_POWER_ON, 1000)) {
-			ERROR("%s: %s didn't power on within 1000ms!\n", __func__,
+			ERROR("%s: %s didn't power on within 1000us!\n", __func__,
 				PortName());
 		}
 	}
@@ -1156,29 +1173,350 @@ DisplayPort::IsConnected()
 addr_t
 DisplayPort::_DDCRegister()
 {
-	// TODO: Do VLV + CHV use the VLV_DP_AUX_CTL_B + VLV_DP_AUX_CTL_C?
-	switch (PortIndex()) {
-		case INTEL_PORT_A:
-			return INTEL_DP_AUX_CTL_A;
-		case INTEL_PORT_B:
-			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV))
-				return VLV_DP_AUX_CTL_B;
-			return INTEL_DP_AUX_CTL_B;
-		case INTEL_PORT_C:
-			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV))
-				return VLV_DP_AUX_CTL_C;
-			return INTEL_DP_AUX_CTL_C;
-		case INTEL_PORT_D:
-			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_CHV))
-				return CHV_DP_AUX_CTL_D;
-			else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV))
-				return 0;
-			return INTEL_DP_AUX_CTL_D;
-		default:
-			return 0;
+	return 0;
+}
+
+
+status_t
+DigitalDisplayInterface::SetupI2c(i2c_bus *bus)
+{
+	CALLED();
+	ddc2_init_timing(bus);
+	bus->cookie = this;
+	bus->send_receive = &_DpAuxSendReceiveHook;
+
+	if (gInfo->shared_info->device_type.Generation() >= 11) {
+		uint32 value = read32(ICL_PWR_WELL_CTL_AUX2);
+		if ((value & HSW_PWR_WELL_CTL_STATE(0)) != 0)
+			return B_OK;
+
+		write32(ICL_PWR_WELL_CTL_AUX2, value | HSW_PWR_WELL_CTL_REQ(0));
+		if (!wait_for_set(ICL_PWR_WELL_CTL_AUX2, HSW_PWR_WELL_CTL_STATE(0), 1000))
+			ERROR("%s: %s AUX didn't power on within 1000us!\n", __func__, PortName());
+	}
+	return B_OK;
+}
+
+
+
+status_t
+DigitalDisplayInterface::_DpAuxSendReceive(uint32 slaveAddress,
+	const uint8 *writeBuffer, size_t writeLength, uint8 *readBuffer, size_t readLength)
+{
+	size_t transferLength = 16;
+
+	dp_aux_msg message;
+	memset(&message, 0, sizeof(message));
+
+	if (writeBuffer != NULL) {
+		message.address = slaveAddress;
+		message.buffer = NULL;
+		message.request = DP_AUX_I2C_WRITE;
+		message.size = 0;
+		ssize_t result = _DpAuxTransfer(&message);
+		if (result < 0)
+			return result;
+
+		for (size_t i = 0; i < writeLength;) {
+			message.buffer = (void*)(writeBuffer + i);
+			message.size = min_c(transferLength, writeLength - i);
+			// Middle-Of-Transmission on final transaction
+			if (writeLength - i > transferLength)
+				message.request |= DP_AUX_I2C_MOT;
+			else
+				message.request &= ~DP_AUX_I2C_MOT;
+
+			for (int attempt = 0; attempt < 7; attempt++) {
+				ssize_t result = _DpAuxTransfer(&message);
+				if (result < 0) {
+					ERROR("%s: aux_ch transaction failed!\n", __func__);
+					return result;
+				}
+
+				switch (message.reply & DP_AUX_I2C_REPLY_MASK) {
+					case DP_AUX_I2C_REPLY_ACK:
+						goto nextWrite;
+					case DP_AUX_I2C_REPLY_NACK:
+						TRACE("%s: aux i2c nack\n", __func__);
+						return B_IO_ERROR;
+					case DP_AUX_I2C_REPLY_DEFER:
+						TRACE("%s: aux i2c defer\n", __func__);
+						snooze(400);
+						break;
+					default:
+						TRACE("%s: aux invalid I2C reply: 0x%02x\n",
+							__func__, message.reply);
+						return B_ERROR;
+				}
+			}
+nextWrite:
+			if (result < 0)
+				return result;
+			i += message.size;
+		}
 	}
 
-	return 0;
+
+	if (readBuffer != NULL) {
+		message.address = slaveAddress;
+		message.buffer = NULL;
+		message.request = DP_AUX_I2C_READ;
+		message.size = 0;
+		ssize_t result = _DpAuxTransfer(&message);
+		if (result < 0)
+			return result;
+
+		for (size_t i = 0; i < readLength;) {
+			message.buffer = readBuffer + i;
+			message.size = min_c(transferLength, readLength - i);
+			// Middle-Of-Transmission on final transaction
+			if (readLength - i > transferLength)
+				message.request |= DP_AUX_I2C_MOT;
+			else
+				message.request &= ~DP_AUX_I2C_MOT;
+
+			for (int attempt = 0; attempt < 7; attempt++) {
+				result = _DpAuxTransfer(&message);
+				if (result < 0) {
+					ERROR("%s: aux_ch transaction failed!\n", __func__);
+					return result;
+				}
+
+				switch (message.reply & DP_AUX_I2C_REPLY_MASK) {
+					case DP_AUX_I2C_REPLY_ACK:
+						goto nextRead;
+					case DP_AUX_I2C_REPLY_NACK:
+						TRACE("%s: aux i2c nack\n", __func__);
+						return B_IO_ERROR;
+					case DP_AUX_I2C_REPLY_DEFER:
+						TRACE("%s: aux i2c defer\n", __func__);
+						snooze(400);
+						break;
+					default:
+						TRACE("%s: aux invalid I2C reply: 0x%02x\n",
+							__func__, message.reply);
+						return B_ERROR;
+				}
+			}
+nextRead:
+			if (result < 0)
+				return result;
+			if (result == 0)
+				i += message.size;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+DigitalDisplayInterface::_DpAuxSendReceiveHook(const struct i2c_bus *bus, uint32 slaveAddress,
+	const uint8 *writeBuffer, size_t writeLength, uint8 *readBuffer, size_t readLength)
+{
+	CALLED();
+	DigitalDisplayInterface* port = (DigitalDisplayInterface*)bus->cookie;
+	return port->_DpAuxSendReceive(slaveAddress, writeBuffer, writeLength, readBuffer, readLength);
+}
+
+
+ssize_t
+DigitalDisplayInterface::_DpAuxTransfer(dp_aux_msg* message)
+{
+	CALLED();
+	if (message == NULL) {
+		ERROR("%s: DP message is invalid!\n", __func__);
+		return B_ERROR;
+	}
+
+	if (message->size > 16) {
+		ERROR("%s: Too many bytes! (%" B_PRIuSIZE ")\n", __func__,
+			message->size);
+		return B_ERROR;
+	}
+
+	uint8 transmitSize = message->size > 0 ? 4 : 3;
+	uint8 receiveSize;
+
+	switch(message->request & ~DP_AUX_I2C_MOT) {
+		case DP_AUX_NATIVE_WRITE:
+		case DP_AUX_I2C_WRITE:
+		case DP_AUX_I2C_WRITE_STATUS_UPDATE:
+			transmitSize += message->size;
+			break;
+	}
+
+	// If not bare address, check for buffer
+	if (message->size > 0 && message->buffer == NULL) {
+		ERROR("%s: DP message uninitalized buffer!\n", __func__);
+		return B_ERROR;
+	}
+
+	uint8 receiveBuffer[20];
+	uint8 transmitBuffer[20];
+	transmitBuffer[0] = (message->request << 4) | ((message->address >> 16) & 0xf);
+	transmitBuffer[1] = (message->address >> 8) & 0xff;
+	transmitBuffer[2] = message->address & 0xff;
+	transmitBuffer[3] = message->size != 0 ? (message->size - 1) : 0;
+
+	uint8 retry;
+	for (retry = 0; retry < 7; retry++) {
+		ssize_t result = B_ERROR;
+		switch(message->request & ~DP_AUX_I2C_MOT) {
+			case DP_AUX_NATIVE_WRITE:
+			case DP_AUX_I2C_WRITE:
+			case DP_AUX_I2C_WRITE_STATUS_UPDATE:
+				receiveSize = 2;
+				if (message->buffer != NULL)
+					memcpy(transmitBuffer + 4, message->buffer, message->size);
+				result = _DpAuxTransfer(transmitBuffer,
+					transmitSize, receiveBuffer, receiveSize);
+				if (result > 0) {
+					message->reply = receiveBuffer[0] >> 4;
+					if (result > 1)
+						result = min_c(receiveBuffer[1], message->size);
+					else
+						result = message->size;
+				}
+				break;
+			case DP_AUX_NATIVE_READ:
+			case DP_AUX_I2C_READ:
+				receiveSize = message->size + 1;
+				result = _DpAuxTransfer(transmitBuffer,
+					transmitSize, receiveBuffer, receiveSize);
+				if (result > 0) {
+					message->reply = receiveBuffer[0] >> 4;
+					result--;
+					memcpy(message->buffer, receiveBuffer + 1, result);
+				}
+				break;
+			default:
+				ERROR("%s: Unknown dp_aux_msg request!\n", __func__);
+				return B_ERROR;
+		}
+
+		if (result == B_BUSY)
+			continue;
+		else if (result < B_OK)
+			return result;
+
+		switch(message->reply & DP_AUX_NATIVE_REPLY_MASK) {
+			case DP_AUX_NATIVE_REPLY_ACK:
+				return B_OK;
+			case DP_AUX_NATIVE_REPLY_DEFER:
+				TRACE("%s: aux reply defer received. Snoozing.\n", __func__);
+				snooze(400);
+				break;
+			default:
+				TRACE("%s: aux invalid native reply: 0x%02x\n", __func__,
+					message->reply);
+				return B_IO_ERROR;
+		}
+	}
+
+	ERROR("%s: IO Error. %" B_PRIu8 " attempts\n", __func__, retry);
+	return B_IO_ERROR;
+}
+
+
+ssize_t
+DigitalDisplayInterface::_DpAuxTransfer(uint8* transmitBuffer, uint8 transmitSize,
+	uint8* receiveBuffer, uint8 receiveSize)
+{
+	addr_t channelControl;
+	addr_t channelData[5];
+	if (gInfo->shared_info->device_type.Generation() >= 9) {
+		// assume AUX channel 0
+		channelControl = DP_AUX_CH_CTL(0);
+		for (int i = 0; i < 5; i++)
+			channelData[i] = DP_AUX_CH_DATA(0, i);
+	} else {
+		ERROR("DigitalDisplayInterface::_DpAuxTransfer() unknown register config\n");
+		return B_BUSY;
+	}
+	if (transmitSize > 20 || receiveSize > 20)
+		return E2BIG;
+
+	int tries = 0;
+	while ((read32(channelControl) & INTEL_DP_AUX_CTL_BUSY) != 0) {
+		if (tries++ == 3) {
+			ERROR("%s: %s AUX channel is busy!\n", __func__, PortName());
+			return B_BUSY;
+		}
+		snooze(1000);
+	}
+
+	uint32 sendControl = 0;
+	if (gInfo->shared_info->device_type.Generation() >= 9) {
+		sendControl = INTEL_DP_AUX_CTL_BUSY | INTEL_DP_AUX_CTL_DONE | INTEL_DP_AUX_CTL_INTERRUPT
+			| INTEL_DP_AUX_CTL_TIMEOUT_ERROR | INTEL_DP_AUX_CTL_TIMEOUT_1600us | INTEL_DP_AUX_CTL_RECEIVE_ERROR
+			| (transmitSize << INTEL_DP_AUX_CTL_MSG_SIZE_SHIFT) | INTEL_DP_AUX_CTL_FW_SYNC_PULSE_SKL(32)
+			| INTEL_DP_AUX_CTL_SYNC_PULSE_SKL(32);
+	}
+
+	uint8 retry;
+	uint32 status = 0;
+	for (retry = 0; retry < 5; retry++) {
+		for (uint8 i = 0; i < transmitSize;) {
+			uint8 index = i / 4;
+			uint32 data = ((uint32)transmitBuffer[i++]) << 24;
+			if (i < transmitSize)
+				data |= ((uint32)transmitBuffer[i++]) << 16;
+			if (i < transmitSize)
+				data |= ((uint32)transmitBuffer[i++]) << 8;
+			if (i < transmitSize)
+				data |= transmitBuffer[i++];
+			write32(channelData[index], data);
+		}
+		write32(channelControl, sendControl);
+
+		// wait 10 ms reading channelControl until INTEL_DP_AUX_CTL_BUSY
+		status = wait_for_clear_status(channelControl, INTEL_DP_AUX_CTL_BUSY, 10000);
+		if ((status & INTEL_DP_AUX_CTL_BUSY) != 0) {
+			ERROR("%s: %s AUX channel stayed busy for 10000us!\n", __func__, PortName());
+		}
+
+		write32(channelControl, status | INTEL_DP_AUX_CTL_DONE | INTEL_DP_AUX_CTL_TIMEOUT_ERROR
+			| INTEL_DP_AUX_CTL_RECEIVE_ERROR);
+		if ((status & INTEL_DP_AUX_CTL_TIMEOUT_ERROR) != 0)
+			continue;
+		if ((status & INTEL_DP_AUX_CTL_RECEIVE_ERROR) != 0) {
+			snooze(400);
+			continue;
+		}
+		if ((status & INTEL_DP_AUX_CTL_DONE) != 0)
+			goto done;
+	}
+
+	if ((status & INTEL_DP_AUX_CTL_DONE) == 0) {
+		ERROR("%s: Busy Error. %" B_PRIu8 " attempts\n", __func__, retry);
+		return B_BUSY;
+	}
+done:
+	if ((status & INTEL_DP_AUX_CTL_RECEIVE_ERROR) != 0)
+		return B_IO_ERROR;
+	if ((status & INTEL_DP_AUX_CTL_TIMEOUT_ERROR) != 0)
+		return B_TIMEOUT;
+
+	uint8 bytes = (status & INTEL_DP_AUX_CTL_MSG_SIZE_MASK) >> INTEL_DP_AUX_CTL_MSG_SIZE_SHIFT;
+	if (bytes == 0 || bytes > 20) {
+		ERROR("%s: Status byte count incorrect %u\n", __func__, bytes);
+		return B_BUSY;
+	}
+	if (bytes > receiveSize)
+		bytes = receiveSize;
+	for (uint8 i = 0; i < bytes;) {
+		uint32 data = read32(channelData[i / 4]);
+		receiveBuffer[i++] = data >> 24;
+		if (i < bytes)
+			receiveBuffer[i++] = data >> 16;
+		if (i < bytes)
+			receiveBuffer[i++] = data >> 8;
+		if (i < bytes)
+			receiveBuffer[i++] = data;
+	}
+
+	return bytes;
 }
 
 

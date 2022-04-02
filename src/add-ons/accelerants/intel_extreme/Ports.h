@@ -10,6 +10,7 @@
 #define INTEL_PORTS_H
 
 
+#include <dp.h>
 #include <edid.h>
 
 #include "intel_extreme.h"
@@ -212,6 +213,7 @@ virtual	uint32						Type() const
 virtual	status_t					Power(bool enabled);
 
 virtual	status_t					SetPipe(Pipe* pipe);
+virtual	status_t					SetupI2c(i2c_bus *bus);
 
 virtual	bool						IsConnected();
 
@@ -226,6 +228,17 @@ private:
 
 		status_t					_SetPortLinkGen8(const display_timing& timing,
 										uint32 pllSel);
+
+		ssize_t						_DpAuxTransfer(dp_aux_msg* message);
+		ssize_t						_DpAuxTransfer(uint8* transmitBuffer, uint8 transmitSize,
+										uint8* receiveBuffer, uint8 receiveSize);
+		status_t					_DpAuxSendReceive(uint32 slave_address,
+										const uint8 *writeBuffer, size_t writeLength,
+										uint8 *readBuffer, size_t readLength);
+static 	status_t					_DpAuxSendReceiveHook(const struct i2c_bus *bus,
+										uint32 slave_address, const uint8 *writeBuffer,
+										size_t writeLength, uint8 *readBuffer,
+										size_t readLength);
 };
 
 

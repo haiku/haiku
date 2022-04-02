@@ -9,8 +9,8 @@
 #include "Pipes.h"
 
 #include "accelerant.h"
+#include "accelerant_protos.h"
 #include "intel_extreme.h"
-#include <KernelExport.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -18,9 +18,9 @@
 #include <new>
 
 
+#undef TRACE
 #define TRACE_PIPE
 #ifdef TRACE_PIPE
-extern "C" void _sPrintf(const char* format, ...);
 #	define TRACE(x...) _sPrintf("intel_extreme: " x)
 #else
 #	define TRACE(x...) ;
@@ -106,7 +106,7 @@ Pipe::Pipe(pipe_index pipeIndex)
 		fPanelFitter = new(std::nothrow) PanelFitter(pipeIndex);
 	}
 
-	TRACE("Pipe Base: 0x%" B_PRIxADDR " Plane Base: 0x% " B_PRIxADDR "\n",
+	TRACE("Pipe Base: 0x%" B_PRIxADDR " Plane Base: 0x%" B_PRIxADDR "\n",
 			fPipeOffset, fPlaneOffset);
 }
 
@@ -161,7 +161,7 @@ Pipe::_ConfigureTranscoder(display_mode* target)
 {
 	CALLED();
 
-	TRACE("%s: fPipeOffset: 0x%" B_PRIx32"\n", __func__, fPipeOffset);
+	TRACE("%s: fPipeOffset: 0x%" B_PRIxADDR"\n", __func__, fPipeOffset);
 
 	if (gInfo->shared_info->device_type.Generation() < 9) {
 		// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
@@ -221,7 +221,7 @@ Pipe::_ConfigureTranscoder(display_mode* target)
 status_t
 Pipe::SetFDILink(const display_timing& timing, uint32 linkBandwidth, uint32 lanes, uint32 bitsPerPixel)
 {
-	TRACE("%s: fPipeOffset: 0x%" B_PRIx32"\n", __func__, fPipeOffset);
+	TRACE("%s: fPipeOffset: 0x%" B_PRIxADDR "\n", __func__, fPipeOffset);
 	TRACE("%s: FDI/PIPE link reference clock is %gMhz\n", __func__, linkBandwidth / 1000.0f);
 	TRACE("%s: FDI/PIPE M1 data before: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_DATA_M1 + fPipeOffset));
 	TRACE("%s: FDI/PIPE N1 data before: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_DATA_N1 + fPipeOffset));
@@ -290,7 +290,7 @@ Pipe::ConfigureScalePos(display_mode* target)
 {
 	CALLED();
 
-	TRACE("%s: fPipeOffset: 0x%" B_PRIx32"\n", __func__, fPipeOffset);
+	TRACE("%s: fPipeOffset: 0x%" B_PRIxADDR "\n", __func__, fPipeOffset);
 
 	if (target == NULL) {
 		ERROR("%s: Invalid display mode!\n", __func__);
@@ -334,7 +334,7 @@ Pipe::ConfigureTimings(display_mode* target, bool hardware, port_index portIndex
 {
 	CALLED();
 
-	TRACE("%s(%d): fPipeOffset: 0x%" B_PRIx32"\n", __func__, hardware,
+	TRACE("%s(%d): fPipeOffset: 0x%" B_PRIxADDR"\n", __func__, hardware,
 		fPipeOffset);
 
 	if (target == NULL) {

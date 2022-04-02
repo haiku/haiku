@@ -945,14 +945,14 @@ struct intel_free_graphics_memory {
 #define CHV_DISPLAY_PORT_D				(VLV_DISPLAY_BASE + 0x64300)
 
 // DP AUX channels
-#define INTEL_DP_AUX_CTL_A				(0x4010 | REGS_NORTH_PIPE_AND_PORT)
-#define INTEL_DP_AUX_CTL_B				(0x4110 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DP_AUX_CTL_C				(0x4210 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DP_AUX_CTL_D				(0x4310 | REGS_SOUTH_TRANSCODER_PORT)
-
-#define VLV_DP_AUX_CTL_B				(VLV_DISPLAY_BASE + 0x64110)
-#define VLV_DP_AUX_CTL_C				(VLV_DISPLAY_BASE + 0x64210)
-#define CHV_DP_AUX_CTL_D				(VLV_DISPLAY_BASE + 0x64310)
+#define _DPA_AUX_CH_CTL					(0x4010 | REGS_NORTH_PIPE_AND_PORT)
+#define _DPA_AUX_CH_DATA1				(0x4014 | REGS_NORTH_PIPE_AND_PORT)
+#define _DPB_AUX_CH_CTL					(0x4110 | REGS_NORTH_PIPE_AND_PORT)
+#define _DPB_AUX_CH_DATA1				(0x4114 | REGS_NORTH_PIPE_AND_PORT)
+#define DP_AUX_CH_CTL(aux)		\
+					(_DPA_AUX_CH_CTL + (_DPB_AUX_CH_CTL - _DPA_AUX_CH_CTL) * aux)
+#define DP_AUX_CH_DATA(aux, i)	\
+					(_DPA_AUX_CH_DATA1 + (_DPB_AUX_CH_DATA1 - _DPA_AUX_CH_DATA1) * aux + i * 4)
 
 #define INTEL_DP_AUX_CTL_BUSY			(1 << 31)
 #define INTEL_DP_AUX_CTL_DONE			(1 << 30)
@@ -970,6 +970,7 @@ struct intel_free_graphics_memory {
 #define INTEL_DP_AUX_CTL_PRECHARGE_2US_SHIFT 16
 #define INTEL_DP_AUX_CTL_BIT_CLOCK_2X_MASK (0x7ff)
 #define INTEL_DP_AUX_CTL_BIT_CLOCK_2X_SHIFT 0
+#define INTEL_DP_AUX_CTL_FW_SYNC_PULSE_SKL(c)   (((c) - 1) << 5)
 #define INTEL_DP_AUX_CTL_SYNC_PULSE_SKL(c)   ((c) - 1)
 
 // planes
@@ -1137,6 +1138,22 @@ struct intel_free_graphics_memory {
 // gpu power wells (confirmed skylake)
 #define INTEL_PWR_WELL_CTL_1_BIOS		(0x5400 | REGS_NORTH_SHARED)
 #define INTEL_PWR_WELL_CTL_2_DRIVER		(0x5404 | REGS_NORTH_SHARED)
+
+#define	HSW_PWR_WELL_CTL_REQ(i)			(0x2 << ((2 * i)))
+#define	HSW_PWR_WELL_CTL_STATE(i)		(0x1 << ((2 * i)))
+
+#define HSW_PWR_WELL_CTL1				INTEL_PWR_WELL_CTL_1_BIOS
+#define HSW_PWR_WELL_CTL2				INTEL_PWR_WELL_CTL_2_DRIVER
+#define HSW_PWR_WELL_CTL3				(0x5408 | REGS_NORTH_SHARED)
+#define HSW_PWR_WELL_CTL4				(0x540c | REGS_NORTH_SHARED)
+
+#define ICL_PWR_WELL_CTL_AUX1			(0x5440 | REGS_NORTH_SHARED)
+#define ICL_PWR_WELL_CTL_AUX2			(0x5444 | REGS_NORTH_SHARED)
+#define ICL_PWR_WELL_CTL_AUX4			(0x544c | REGS_NORTH_SHARED)
+
+#define ICL_PWR_WELL_CTL_DDI1			(0x5450 | REGS_NORTH_SHARED)
+#define ICL_PWR_WELL_CTL_DDI2			(0x5454 | REGS_NORTH_SHARED)
+#define ICL_PWR_WELL_CTL_DDI4			(0x545c | REGS_NORTH_SHARED)
 
 // gpu pll enable registers (confirmed skylake)
 #define INTEL_WRPLL_CTL_1_DPLL2			(0x6040 | REGS_NORTH_SHARED)
