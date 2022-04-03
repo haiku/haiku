@@ -9,6 +9,7 @@
 #include <boot/stdio.h>
 
 #include "efi_platform.h"
+#include "serial.h"
 
 #include "aarch64.h"
 
@@ -26,7 +27,7 @@ extern void arch_mmu_post_efi_setup(size_t memory_map_size,
 	efi_memory_descriptor *memory_map, size_t descriptor_size,
 	uint32_t descriptor_version);
 
-extern void arch_mmu_setup_EL1();
+extern void arch_mmu_setup_EL1(uint64 tcr);
 
 
 static const char*
@@ -130,11 +131,6 @@ arch_start_kernel(addr_t kernelEntry)
 	// offset for properly align symbols
 	dprintf("Efi loader symbols offset: 0x%0lx:\n", loaderCode);
 
-	// Generate page tables for use after ExitBootServices.
-	arch_mmu_generate_post_efi_page_tables(
-		memory_map_size, memory_map, descriptor_size, descriptor_version);
-
-	bool el2toel1 = false;
 /*
 *   "The AArch64 exception model is made up of a number of exception levels
 *    (EL0 - EL3), with EL0 and EL1 having a secure and a non-secure
@@ -150,7 +146,8 @@ arch_start_kernel(addr_t kernelEntry)
 *    On AArch64 UEFI shall execute as 64-bit code at either EL1 or EL2,
 *    depending on whether or not virtualization is available at OS load time."
 */
-	dprintf("Current Exception Level EL%1lx\n", arch_exception_level());
+	uint64 el = arch_exception_level();
+	dprintf("Current Exception Level EL%1lx\n", el);
 	dprintf("TTBR0: %" B_PRIx64 " TTBRx: %" B_PRIx64 " SCTLR: %" B_PRIx64 " TCR: %" B_PRIx64 "\n",
 		arch_mmu_base_register(),
 		arch_mmu_base_register(true),
@@ -167,25 +164,16 @@ arch_start_kernel(addr_t kernelEntry)
 			arch_mmu_read_access(kernelEntry));
 
 		arch_mmu_dump_present_tables();
+
+		if (el == 1) {
+			// Disable CACHE & MMU before dealing with TTBRx
+			arch_cache_disable();
+		}
 	}
 
-	switch (arch_exception_level()) {
-		case 1:
-			/* arch_cache_disable(); */
-			/* arch_mmu_generate_post_efi_page_tables */
-
-			break;
-
-		case 2:
-
-			el2toel1 = true; // we want to print before exit services
-			break;
-
-		default:
-			panic("Unexpected Exception Level\n");
-			break;
-	}
-
+	// Generate page tables for use after ExitBootServices.
+	arch_mmu_generate_post_efi_page_tables(
+		memory_map_size, memory_map, descriptor_size, descriptor_version);
 
 	// Attempt to fetch the memory map and exit boot services.
 	// This needs to be done in a loop, as ExitBootServices can change the
@@ -205,6 +193,8 @@ arch_start_kernel(addr_t kernelEntry)
 			stderr = NULL;
 			// Can we adjust gKernelArgs.platform_args.serial_base_ports[0]
 			// to something fixed in qemu for debugging?
+			serial_switch_to_legacy();
+			dprintf("Switched to legacy serial output\n");
 			break;
 		}
 
@@ -216,20 +206,23 @@ arch_start_kernel(addr_t kernelEntry)
 	}
 
 	// Update EFI, generate final kernel physical memory map, etc.
-	//arch_mmu_post_efi_setup(memory_map_size, memory_map,
-	//		descriptor_size, descriptor_version);
+	// arch_mmu_post_efi_setup(memory_map_size, memory_map, descriptor_size, descriptor_version);
 
-	if (el2toel1) {
-		arch_mmu_setup_EL1();
-		arch_cache_disable();
-
-		_arch_transition_EL2_EL1();
-
-		arch_cache_enable();
-	} else {
-
-		arch_cache_enable();
+	switch (el) {
+		case 1:
+			arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL1));
+			break;
+		case 2:
+			arch_mmu_setup_EL1(READ_SPECIALREG(TCR_EL2));
+			arch_cache_disable();
+			_arch_transition_EL2_EL1();
+			break;
+		default:
+			panic("Unexpected Exception Level\n");
+			break;
 	}
+
+	arch_cache_enable();
 
 	//smp_boot_other_cpus(final_pml4, kernelEntry, (addr_t)&gKernelArgs);
 
@@ -238,6 +231,7 @@ arch_start_kernel(addr_t kernelEntry)
 		arch_enter_kernel(&gKernelArgs, kernelEntry,
 			gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size - 8);
 	} else {
-		_arch_exception_panic("Kernel or Stack memory not accessible\n", __LINE__);
+		// _arch_exception_panic("Kernel or Stack memory not accessible\n", __LINE__);
+		panic("Kernel or Stack memory not accessible\n");
 	}
 }

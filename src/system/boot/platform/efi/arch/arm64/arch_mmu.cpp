@@ -109,10 +109,7 @@ arch_mmu_dump_present_tables()
 }
 
 
-void arch_mmu_setup_EL1() {
-
-	// Inherit TCR from EL2
-	uint64 tcr = READ_SPECIALREG(TCR_EL2);
+void arch_mmu_setup_EL1(uint64 tcr) {
 
 	// Enable TTBR1
 	tcr &= ~TCR_EPD1_DISABLE;
@@ -380,7 +377,7 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 	// Switch EFI to virtual mode, using the kernel pmap.
 	kRuntimeServices->SetVirtualAddressMap(memory_map_size, descriptor_size,
 		descriptor_version, memory_map);
-#ifdef DUMP_RANGES_AFTER_EXIT_SERIVCES
+
 	TRACE(("phys memory ranges:\n"));
 	for (uint32_t i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
 		uint32_t start = (uint32_t)gKernelArgs.physical_memory_range[i].start;
@@ -404,7 +401,7 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 		TRACE(("    0x%08x-0x%08x, length 0x%08x\n",
 			start, start + size, size));
 	}
-#endif
+
 }
 
 
