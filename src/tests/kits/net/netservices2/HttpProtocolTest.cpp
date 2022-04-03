@@ -15,14 +15,16 @@
 #include <HttpFields.h>
 #include <HttpRequest.h>
 #include <HttpResult.h>
+#include <HttpStream.h>
 #include <NetServicesDefs.h>
 #include <Url.h>
 
 using BPrivate::Network::BHttpFields;
 using BPrivate::Network::BHttpMethod;
 using BPrivate::Network::BHttpRequest;
-using BPrivate::Network::BHttpSession;
 using BPrivate::Network::BHttpResult;
+using BPrivate::Network::BHttpSession;
+using BPrivate::Network::BHttpRequestStream;
 using BPrivate::Network::BNetworkRequestError;
 
 
@@ -225,6 +227,14 @@ HttpProtocolTest::HttpMethodTest()
 }
 
 
+constexpr std::string_view kHaikuGetRequestText =
+	"GET / HTTP/1.1\r\n"
+	"Host: www.haiku-os.org\r\n"
+	"Accept: *\r\n"
+	"Accept-Encoding: gzip\r\n"
+	"Connection: close\r\n\r\n";
+
+
 void
 HttpProtocolTest::HttpRequestTest()
 {
@@ -237,7 +247,72 @@ HttpProtocolTest::HttpRequestTest()
 
 	// Validate header serialization
 	BString header = request.HeaderToString();
-	CPPUNIT_ASSERT(header.Compare("GET / HTTP/1.1\r\nHost: www.haiku-os.org\r\nAccept: *\r\nAccept-Encoding: gzip\r\nConnection: close\r\n\r\n") == 0);
+	CPPUNIT_ASSERT(header.Compare(kHaikuGetRequestText.data(), kHaikuGetRequestText.size()) == 0);
+}
+
+
+class RequestStreamTestIO : public BDataIO
+{
+public:
+	RequestStreamTestIO(const std::string_view expectedOutput)
+		: fExpectedOutput(expectedOutput)
+	{
+		
+	}
+
+	// Accept maximum of 8 bytes at a time.
+	ssize_t Write(const void* buffer, size_t size) {
+		ssize_t bytesWritten = (size < 8) ? size : 8;
+		CPPUNIT_ASSERT_MESSAGE("RequestStreamTestIO: bytes written larger than expected output",
+			fExpectedOutput.size() >= (fPos + bytesWritten));
+		CPPUNIT_ASSERT(fExpectedOutput.substr(fPos, bytesWritten) == std::string_view(static_cast<const char*>(buffer), bytesWritten));
+		fPos += bytesWritten;
+		return bytesWritten;
+	};
+
+private:
+	const std::string_view fExpectedOutput;
+	ssize_t fPos = 0;
+};
+
+
+void
+HttpProtocolTest::HttpRequestStreamTest()
+{
+	// Set up basic GET for https://www.haiku-os.org/
+	BHttpRequest request;
+	auto url = BUrl("https://www.haiku-os.org");
+	request.SetUrl(url);
+
+	// Test streaming the request
+	BHttpRequestStream requestStream(request);
+	RequestStreamTestIO testIO(kHaikuGetRequestText.data());
+	bool finished = false;
+	ssize_t expectedBytesWritten = 8;
+	ssize_t expectedTotalBytesWritten = 8;
+	const ssize_t expectedTotalSize = kHaikuGetRequestText.size();
+	if (expectedTotalSize < 8) {
+		expectedBytesWritten = expectedTotalSize;
+		expectedTotalBytesWritten = expectedTotalSize;
+	}
+	while (!finished) {
+		auto [currentBytesWritten, totalBytesWritten, totalSize, complete] = requestStream.Transfer(&testIO);
+		CPPUNIT_ASSERT_EQUAL(expectedBytesWritten, currentBytesWritten);
+		CPPUNIT_ASSERT_EQUAL(expectedTotalBytesWritten, totalBytesWritten);
+		CPPUNIT_ASSERT_EQUAL(expectedTotalSize, totalSize);
+		if (expectedTotalBytesWritten == expectedTotalSize) {
+			// loop should be finished
+			CPPUNIT_ASSERT_EQUAL(true, complete);
+			finished = true;
+		} else {
+			// prepare for next loop
+			if (totalSize - totalBytesWritten < 8) {
+				expectedBytesWritten = totalSize - totalBytesWritten;
+			}
+			expectedTotalBytesWritten += expectedBytesWritten;
+			CPPUNIT_ASSERT_EQUAL(false, complete);
+		}
+	}
 }
 
 
@@ -300,6 +375,8 @@ HttpProtocolTest::AddTests(BTestSuite& parent)
 		"HttpProtocolTest::HttpMethodTest", &HttpProtocolTest::HttpMethodTest));
 	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
 		"HttpProtocolTest::HttpRequestTest", &HttpProtocolTest::HttpRequestTest));
+	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
+		"HttpProtocolTest::HttpRequestStreamTest", &HttpProtocolTest::HttpRequestStreamTest));
 	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
 		"HttpProtocolTest::HttpIntegrationTest", &HttpProtocolTest::HttpIntegrationTest));
 

@@ -23,6 +23,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			HttpRequest.cpp
 			HttpResult.cpp
 			HttpSession.cpp
+			HttpStream.cpp
 			NetServicesMisc.cpp
 			;
 

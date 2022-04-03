@@ -33,7 +33,6 @@ public:
 	BHttpSession&			operator=(const BHttpSession&) noexcept;
 	BHttpSession&			operator=(BHttpSession&&) noexcept = delete;
 
-
 	// Requests
 	BHttpResult				Execute(BHttpRequest&& request,
 								std::unique_ptr<BDataIO> target = nullptr,
@@ -46,8 +45,8 @@ private:
 };
 
 
-}
+} // namespace Network
 
-}
+} // namespace BPrivate
 
-#endif // _B_HTTP_REQUEST_H_
+#endif // _B_HTTP_SESSION_H_
