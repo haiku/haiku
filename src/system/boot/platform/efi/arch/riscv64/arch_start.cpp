@@ -18,7 +18,7 @@
 
 
 // From entry.S
-extern "C" void arch_enter_kernel(uint64 satp, struct kernel_args *kernelArgs,
+extern "C" void arch_enter_kernel(uint64 satp, addr_t kernelArgs,
         addr_t kernelEntry, addr_t kernelStackTop);
 
 // From arch_mmu.cpp
@@ -37,13 +37,23 @@ extern uint64_t arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 void
 arch_convert_kernel_args(void)
 {
-	// empty
+	fix_address(gKernelArgs.arch_args.fdt);
 }
 
 
 void
 arch_start_kernel(addr_t kernelEntry)
 {
+	// Allocate virtual memory for kernel args
+	struct kernel_args *kernelArgs = NULL;
+	if (platform_allocate_region((void **)&kernelArgs,
+			sizeof(struct kernel_args), 0, false) != B_OK)
+		panic("Failed to allocate kernel args.");
+
+	addr_t virtKernelArgs;
+	platform_bootloader_address_to_kernel_address((void*)kernelArgs,
+		&virtKernelArgs);
+
 	// EFI assumed to be SBI booted
 	gKernelArgs.arch_args.machine_platform = kPlatformSbi;
 
@@ -147,14 +157,19 @@ arch_start_kernel(addr_t kernelEntry)
 	FlushTlbAll();
 	dprintf("[POST] FlushTlbAll()\n");
 
-	smp_boot_other_cpus(satp, kernelEntry, (addr_t)&gKernelArgs);
+	// Copy final kernel args
+	// This should be the last step before jumping to the kernel
+	// as there are some fixups happening to kernel_args even in the last minute
+	memcpy(kernelArgs, &gKernelArgs, sizeof(struct kernel_args));
+
+	smp_boot_other_cpus(satp, kernelEntry, virtKernelArgs);
 
 	// Enter the kernel!
 	dprintf("arch_enter_kernel(satp: %#" B_PRIxADDR ", kernelArgs: %#" B_PRIxADDR
 		", kernelEntry: %#" B_PRIxADDR ", sp: %#" B_PRIxADDR ")\n",	satp,
-		(addr_t)&gKernelArgs, (addr_t)kernelEntry, gKernelArgs.cpu_kstack[0].start
-			+ gKernelArgs.cpu_kstack[0].size);
+		(addr_t)&kernelArgs, (addr_t)kernelEntry, kernelArgs->cpu_kstack[0].start
+			+ kernelArgs->cpu_kstack[0].size);
 
-	arch_enter_kernel(satp, &gKernelArgs, kernelEntry,
-		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
+	arch_enter_kernel(satp, virtKernelArgs, kernelEntry,
+		kernelArgs->cpu_kstack[0].start + kernelArgs->cpu_kstack[0].size);
 }
