@@ -9,6 +9,9 @@
 #include <HttpSession.h>
 #include <TestCase.h>
 #include <TestSuite.h>
+#include <tools/cppunit/ThreadedTestCase.h>
+
+#include "TestServer.h"
 
 using BPrivate::Network::BHttpSession;
 
@@ -21,13 +24,26 @@ public:
 			void	HttpMethodTest();
 			void	HttpRequestTest();
 			void	HttpRequestStreamTest();
-			void	HttpIntegrationTest();
+
+	static	void	AddTests(BTestSuite& suite);
+};
+
+
+class HttpIntegrationTest : public BThreadedTestCase
+{
+public:
+					HttpIntegrationTest(TestServerMode mode);
+
+	virtual	void		setUp() override;
+
+
+			void	HostAndNetworkFailTest();
 
 	static	void	AddTests(BTestSuite& suite);
 
 private:
-	BHttpSession	fSession;
+			TestServer		fTestServer;
+			BHttpSession	fSession;
 };
-
 
 #endif

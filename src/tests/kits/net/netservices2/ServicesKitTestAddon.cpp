@@ -16,6 +16,7 @@ getTestSuite()
 	BTestSuite* suite = new BTestSuite("NetServices2Kit");
 
 	HttpProtocolTest::AddTests(*suite);
+	HttpIntegrationTest::AddTests(*suite);
 
 	return suite;
 }

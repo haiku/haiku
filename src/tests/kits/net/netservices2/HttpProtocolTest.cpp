@@ -11,6 +11,7 @@
 #include <cppunit/TestAssert.h>
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
+#include <tools/cppunit/ThreadedTestCaller.h>
 
 #include <HttpFields.h>
 #include <HttpRequest.h>
@@ -316,8 +317,82 @@ HttpProtocolTest::HttpRequestStreamTest()
 }
 
 
+/* static */ void
+HttpProtocolTest::AddTests(BTestSuite& parent)
+{
+	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("HttpProtocolTest");
+
+	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
+		"HttpProtocolTest::HttpFieldsTest", &HttpProtocolTest::HttpFieldsTest));
+	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
+		"HttpProtocolTest::HttpMethodTest", &HttpProtocolTest::HttpMethodTest));
+	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
+		"HttpProtocolTest::HttpRequestTest", &HttpProtocolTest::HttpRequestTest));
+	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
+		"HttpProtocolTest::HttpRequestStreamTest", &HttpProtocolTest::HttpRequestStreamTest));
+
+	parent.addTest("HttpProtocolTest", &suite);
+}
+
+
+
+// HttpIntegrationTest
+
+
+HttpIntegrationTest::HttpIntegrationTest(TestServerMode mode)
+	: fTestServer(mode)
+{
+
+}
+
+
 void
-HttpProtocolTest::HttpIntegrationTest()
+HttpIntegrationTest::setUp()
+{
+	CPPUNIT_ASSERT_EQUAL_MESSAGE(
+		"Starting up test server",
+		B_OK,
+		fTestServer.Start());
+}
+
+
+/* static */ void
+HttpIntegrationTest::AddTests(BTestSuite& parent)
+{
+	// Http
+	{
+		CppUnit::TestSuite& suite = *new CppUnit::TestSuite("HttpIntegrationTest");
+
+		HttpIntegrationTest* httpIntegrationTest = new HttpIntegrationTest(TestServerMode::Http);
+		BThreadedTestCaller<HttpIntegrationTest>* testCaller
+			= new BThreadedTestCaller<HttpIntegrationTest>("HttpTest::", httpIntegrationTest);
+
+		// HTTP
+		testCaller->addThread("HostAndNetworkFailTest", &HttpIntegrationTest::HostAndNetworkFailTest);
+
+		suite.addTest(testCaller);
+		parent.addTest("HttpIntegrationTest", &suite);
+	}
+
+	// Https
+	{
+		CppUnit::TestSuite& suite = *new CppUnit::TestSuite("HttpsIntegrationTest");
+
+		HttpIntegrationTest* httpsIntegrationTest = new HttpIntegrationTest(TestServerMode::Https);
+		BThreadedTestCaller<HttpIntegrationTest>* testCaller
+			= new BThreadedTestCaller<HttpIntegrationTest>("HttpsTest::", httpsIntegrationTest);
+
+		// HTTP
+		testCaller->addThread("HostAndNetworkFailTest", &HttpIntegrationTest::HostAndNetworkFailTest);
+
+		suite.addTest(testCaller);
+		parent.addTest("HttpsIntegrationTest", &suite);
+	}
+}
+
+
+void
+HttpIntegrationTest::HostAndNetworkFailTest()
 {
 	// Test hostname resolution fail
 	{
@@ -361,24 +436,4 @@ HttpProtocolTest::HttpIntegrationTest()
 			CPPUNIT_FAIL("Unknown exception raised when executing request");
 		}
 	}
-}
-
-
-/* static */ void
-HttpProtocolTest::AddTests(BTestSuite& parent)
-{
-	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("HttpProtocolTest");
-
-	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
-		"HttpProtocolTest::HttpFieldsTest", &HttpProtocolTest::HttpFieldsTest));
-	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
-		"HttpProtocolTest::HttpMethodTest", &HttpProtocolTest::HttpMethodTest));
-	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
-		"HttpProtocolTest::HttpRequestTest", &HttpProtocolTest::HttpRequestTest));
-	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
-		"HttpProtocolTest::HttpRequestStreamTest", &HttpProtocolTest::HttpRequestStreamTest));
-	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
-		"HttpProtocolTest::HttpIntegrationTest", &HttpProtocolTest::HttpIntegrationTest));
-
-	parent.addTest("HttpProtocolTest", &suite);
 }
