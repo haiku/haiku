@@ -22,7 +22,9 @@ static struct {
 	uint16	vendor;
 	uint16	device;
 } kSupportedDevices[] = {
+	{ 0x8086, 0xa170},	// 100 Series HD Audio
 	{ 0x8086, 0x9d71},	// 200 Series HD Audio
+	{ 0x8086, 0xa348},	// 300 Series cAVS
 	{ 0x8086, 0x9dc8},	// 300 Series HD Audio
 	{ 0x8086, 0x06c8},	// 400 Series cAVS
 	{ 0x8086, 0xa0c8},	// 500 Series HD Audio
