@@ -85,10 +85,10 @@ TLSBlockTemplate::SetBaseAddress(addr_t baseAddress)
 TLSBlock
 TLSBlockTemplate::CreateBlock()
 {
-	void* pointer = (uint8*)malloc(fMemorySize + TLS_DTV_OFFSET);
-	memset((uint8*)pointer, 0, TLS_DTV_OFFSET);
+	void* pointer = malloc(fMemorySize + TLS_DTV_OFFSET);
 	if (pointer == NULL)
 		return TLSBlock();
+	memset(pointer, 0, TLS_DTV_OFFSET);
 	memcpy((char*)pointer + TLS_DTV_OFFSET, fAddress, fFileSize);
 	if (fMemorySize > fFileSize)
 		memset((char*)pointer + TLS_DTV_OFFSET + fFileSize, 0, fMemorySize - fFileSize);
