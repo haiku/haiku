@@ -18,6 +18,10 @@
 #include "arch_gensyscalls.h"
 	// for the alignment type macros (only for the type names)
 
+#ifndef SYSCALL_LONG_PARAMETER_ALIGNMENT_TYPE
+#define SYSCALL_LONG_PARAMETER_ALIGNMENT_TYPE SYSCALL_PARAMETER_ALIGNMENT_TYPE
+#endif
+
 
 // macro trickery to create a string literal
 #define MAKE_STRING(x)	#x
@@ -357,10 +361,15 @@ private:
 		file << "const char* const kParameterAlignmentType = \""
 			EVAL_MACRO(MAKE_STRING, SYSCALL_PARAMETER_ALIGNMENT_TYPE)
 			<< "\";" << endl;
+		file << "const char* const kLongParameterAlignmentType = \""
+			EVAL_MACRO(MAKE_STRING, SYSCALL_LONG_PARAMETER_ALIGNMENT_TYPE)
+			<< "\";" << endl;
 		file << "const int kReturnTypeAlignmentSize = "
 			"SYSCALL_RETURN_TYPE_ALIGNMENT_SIZE;" << endl;
 		file << "const int kParameterAlignmentSize = "
 			"SYSCALL_PARAMETER_ALIGNMENT_SIZE;" << endl;
+		file << "const int kLongParameterAlignmentSize = "
+			"SYSCALL_LONG_PARAMETER_ALIGNMENT_SIZE;" << endl;
 		file << endl;
 
 		file << "SyscallVector* create_syscall_vector() {" << endl;
@@ -418,12 +427,18 @@ private:
 		file << endl;
 		file << "#include \"arch_gensyscalls.h\"" << endl;
 		file << endl;
+		file << "#ifndef SYSCALL_LONG_PARAMETER_ALIGNMENT_TYPE" << endl;
+		file << "#define SYSCALL_LONG_PARAMETER_ALIGNMENT_TYPE SYSCALL_PARAMETER_ALIGNMENT_TYPE"
+			<< endl;
+		file << "#endif" << endl;
 		file << "void dummy() {" << endl;
 
 		file << "DEFINE_COMPUTED_ASM_MACRO(SYSCALL_RETURN_TYPE_ALIGNMENT_SIZE, "
 			"sizeof(SYSCALL_RETURN_TYPE_ALIGNMENT_TYPE));" << endl;
   		file << "DEFINE_COMPUTED_ASM_MACRO(SYSCALL_PARAMETER_ALIGNMENT_SIZE, "
 			"sizeof(SYSCALL_PARAMETER_ALIGNMENT_TYPE));" << endl;
+		file << "DEFINE_COMPUTED_ASM_MACRO(SYSCALL_LONG_PARAMETER_ALIGNMENT_SIZE, "
+			"sizeof(SYSCALL_LONG_PARAMETER_ALIGNMENT_TYPE));" << endl;
 		file << endl;
 
 		// syscalls
