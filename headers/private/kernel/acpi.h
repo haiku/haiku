@@ -10,6 +10,7 @@
 #define ACPI_RSDT_SIGNATURE		"RSDT"
 #define ACPI_XSDT_SIGNATURE		"XSDT"
 #define ACPI_MADT_SIGNATURE		"APIC"
+#define ACPI_MCFG_SIGNATURE		"MCFG"
 #define ACPI_SPCR_SIGNATURE		"SPCR"
 
 #define ACPI_LOCAL_APIC_ENABLED	0x01
@@ -248,6 +249,21 @@ typedef struct acpi_gas {
 	uint64 address;
 } _PACKED acpi_gas;
 
+typedef struct acpi_mcfg
+{
+	acpi_descriptor_header header;
+	uint8 reserved[8];
+} _PACKED acpi_mcfg;
+
+typedef struct acpi_mcfg_allocation
+{
+	uint64 address;
+	uint16 pci_segment;
+	uint8 start_bus_number;
+	uint8 end_bus_number;
+	uint32 reserved;
+} _PACKED acpi_mcfg_allocation;
+
 typedef struct acpi_spcr {
 	acpi_descriptor_header header;
 	uint32 interface_type;
@@ -293,6 +309,92 @@ typedef struct acpi_resource_fixed_memory32 {
 	uint32 address_length;
 } _PACKED acpi_resource_fixed_memory32;
 
+typedef struct acpi_memory_attribute {
+	uint8 write_protect;
+	uint8 caching;
+	uint8 range_type;
+	uint8 translation;
+} _PACKED acpi_memory_attribute;
+
+typedef struct acpi_io_attribute {
+	uint8 range_type;
+	uint8 translation;
+	uint8 translation_type;
+	uint8 reserved1;
+} _PACKED acpi_io_attribute;
+
+typedef union acpi_resource_attribute {
+	acpi_memory_attribute mem;
+	acpi_io_attribute io;
+	uint8 type_specific;
+} acpi_resource_attribute;
+
+typedef struct acpi_address16_attribute {
+	uint16 granularity;
+	uint16 minimum;
+	uint16 maximum;
+	uint16 translation_offset;
+	uint16 address_length;
+} _PACKED acpi_address16_attribute;
+
+typedef struct acpi_address32_attribute {
+	uint32 granularity;
+	uint32 minimum;
+	uint32 maximum;
+	uint32 translation_offset;
+	uint32 address_length;
+} _PACKED acpi_address32_attribute;
+
+typedef struct acpi_address64_attribute {
+	uint64 granularity;
+	uint64 minimum;
+	uint64 maximum;
+	uint64 translation_offset;
+	uint64 address_length;
+} _PACKED acpi_address64_attribute;
+
+typedef struct acpi_resource_address {
+	uint8 resource_type;
+	uint8 producer_consumer;
+	uint8 decode;
+	uint8 minAddress_fixed;
+	uint8 maxAddress_fixed;
+	acpi_resource_attribute info;
+} _PACKED acpi_resource_address;
+
+typedef struct acpi_resource_address16 {
+	uint8 resource_type;
+	uint8 producer_consumer;
+	uint8 decode;
+	uint8 minAddress_fixed;
+	uint8 maxAddress_fixed;
+	acpi_resource_attribute info;
+	acpi_address16_attribute address;
+	acpi_resource_source resource_source;
+} _PACKED acpi_resource_address16;
+
+typedef struct acpi_resource_address32 {
+	uint8 resource_type;
+	uint8 producer_consumer;
+	uint8 decode;
+	uint8 minAddress_fixed;
+	uint8 maxAddress_fixed;
+	acpi_resource_attribute info;
+	acpi_address32_attribute address;
+	acpi_resource_source resource_source;
+} _PACKED acpi_resource_address32;
+
+typedef struct acpi_resource_address64 {
+	uint8 resource_type;
+	uint8 producer_consumer;
+	uint8 decode;
+	uint8 minAddress_fixed;
+	uint8 maxAddress_fixed;
+	acpi_resource_attribute info;
+	acpi_address64_attribute address;
+	acpi_resource_source resource_source;
+} _PACKED acpi_resource_address64;
+
 typedef struct acpi_resource_extended_irq {
 	uint8 producer_consumer;
 	uint8 triggering;
@@ -306,7 +408,12 @@ typedef struct acpi_resource_extended_irq {
 
 typedef union acpi_resource_data {
 	acpi_resource_fixed_memory32 fixed_memory32;
+	acpi_resource_address16 address16;
+	acpi_resource_address32 address32;
+	acpi_resource_address64 address64;
 	acpi_resource_extended_irq extended_irq;
+
+	acpi_resource_address address;
 } acpi_resource_data;
 
 typedef struct acpi_resource {
@@ -317,6 +424,9 @@ typedef struct acpi_resource {
 
 enum {
 	ACPI_RESOURCE_TYPE_FIXED_MEMORY32 = 10,
+	ACPI_RESOURCE_TYPE_ADDRESS16 = 11,
+	ACPI_RESOURCE_TYPE_ADDRESS32 = 12,
+	ACPI_RESOURCE_TYPE_ADDRESS64 = 13,
 	ACPI_RESOURCE_TYPE_EXTENDED_IRQ = 15,
 };
 
