@@ -18,8 +18,13 @@ FUNCTION(_longjmp):
 	ldp x27, x28, [x0], #16
 	ldp x29, x30, [x0], #16
 
-	ldr x2, [x0]
+	ldr x2, [x0], #8
 	mov sp, x2
+
+	ldp  d8,  d9, [x0], #16
+	ldp d10, d11, [x0], #16
+	ldp d12, d13, [x0], #16
+	ldp d14, d15, [x0], #16
 
 	b __longjmp_return
 FUNCTION_END(siglongjmp)

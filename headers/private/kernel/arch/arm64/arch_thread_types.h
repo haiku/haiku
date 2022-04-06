@@ -10,7 +10,8 @@
 
 
 struct arch_thread {
-	uint64			regs[13]; // x19-x30, sp
+	uint64 regs[13]; // x19-x30, sp
+	uint64 fp_regs[8]; // d8-d15
 };
 
 struct arch_team {
