@@ -1903,14 +1903,22 @@ TermView::MessageReceived(BMessage *message)
 			if (message->FindBool("reportX10MouseEvent", &value) == B_OK)
 				fReportX10MouseEvent = value;
 
-			if (message->FindBool("reportNormalMouseEvent", &value) == B_OK)
+			// setting one of the three disables the other two
+			if (message->FindBool("reportNormalMouseEvent", &value) == B_OK) {
 				fReportNormalMouseEvent = value;
-
-			if (message->FindBool("reportButtonMouseEvent", &value) == B_OK)
+				fReportButtonMouseEvent = false;
+				fReportAnyMouseEvent = false;
+			}
+			if (message->FindBool("reportButtonMouseEvent", &value) == B_OK) {
 				fReportButtonMouseEvent = value;
-
-			if (message->FindBool("reportAnyMouseEvent", &value) == B_OK)
+				fReportNormalMouseEvent = false;
+				fReportAnyMouseEvent = false;
+			}
+			if (message->FindBool("reportAnyMouseEvent", &value) == B_OK) {
 				fReportAnyMouseEvent = value;
+				fReportNormalMouseEvent = false;
+				fReportButtonMouseEvent = false;
+			}
 
 			if (message->FindBool(
 				"enableExtendedMouseCoordinates", &value) == B_OK)
@@ -2475,7 +2483,8 @@ TermView::_SendMouseEvent(int32 buttons, int32 mode, int32 x, int32 y,
 		else
 			xtermButtons = 32 + 3;
 
-		if (motion)
+		// dragging motion
+		if (buttons != 0 && motion && fReportButtonMouseEvent)
 			xtermButtons += 32;
 
 		char xtermX = x + 1 + 32;
@@ -2492,38 +2501,32 @@ TermView::_SendMouseEvent(int32 buttons, int32 mode, int32 x, int32 y,
 	} else {
 		char xtermButtons;
 		if ((buttons & B_PRIMARY_MOUSE_BUTTON)
-			!= (fMouseButtons & B_PRIMARY_MOUSE_BUTTON)) {
+			!= (motion ? 0 : (fMouseButtons & B_PRIMARY_MOUSE_BUTTON))) {
 			xtermButtons = 0;
 		} else if ((buttons & B_SECONDARY_MOUSE_BUTTON)
-			!= (fMouseButtons & B_SECONDARY_MOUSE_BUTTON)) {
-			xtermButtons = 1;
-		} else if ((buttons & B_TERTIARY_MOUSE_BUTTON)
-			!= (fMouseButtons & B_TERTIARY_MOUSE_BUTTON)) {
+			!= (motion ? 0 : (fMouseButtons & B_SECONDARY_MOUSE_BUTTON))) {
 			xtermButtons = 2;
+		} else if ((buttons & B_TERTIARY_MOUSE_BUTTON)
+			!= (motion ? 0 : (fMouseButtons & B_TERTIARY_MOUSE_BUTTON))) {
+			xtermButtons = 1;
 		} else
 			xtermButtons = 3;
 
-		if (motion)
+		// nur button events requested
+		if (buttons == 0 && motion && fReportButtonMouseEvent)
+			return;
+
+		// dragging motion
+		if (buttons != 0 && motion && fReportButtonMouseEvent)
 			xtermButtons += 32;
 
 		int16 xtermX = x + 1;
 		int16 xtermY = y + 1;
 
-		char destBuffer[13];
-		destBuffer[0] = '\033';
-		destBuffer[1] = '[';
-		destBuffer[2] = '<';
-		destBuffer[3] = xtermButtons + '0';
-		destBuffer[4] = ';';
-		destBuffer[5] = xtermX / 100 % 10 + '0';
-		destBuffer[6] = xtermX / 10 % 10 + '0';
-		destBuffer[7] = xtermX % 10 + '0';
-		destBuffer[8] = ';';
-		destBuffer[9] = xtermY / 100 % 10 + '0';
-		destBuffer[10] = xtermY / 10 % 10 + '0';
-		destBuffer[11] = xtermY % 10 + '0';
-		destBuffer[12] = upEvent ? 'm' : 'M';
-		fShell->Write(destBuffer, 13);
+		char destBuffer[21];
+		int size = snprintf(destBuffer, sizeof(destBuffer), "\033[<%u;%u;%u%c",
+			xtermButtons, xtermX, xtermY, upEvent ? 'm' : 'M');
+		fShell->Write(destBuffer, size);
 	}
 }
 

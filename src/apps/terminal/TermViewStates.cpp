@@ -160,7 +160,7 @@ TermView::StandardBaseState::_StandardMouseMoved(BPoint where, int32 modifiers)
 
 	TermPos clickPos = fView->_ConvertToTerminal(where);
 
-	if (fView->fReportButtonMouseEvent) {
+	if (fView->fReportButtonMouseEvent || fView->fEnableExtendedMouseCoordinates) {
 		if (fView->fPrevPos.x != clickPos.x
 			|| fView->fPrevPos.y != clickPos.y) {
 			fView->_SendMouseEvent(fView->fMouseButtons, modifiers,
