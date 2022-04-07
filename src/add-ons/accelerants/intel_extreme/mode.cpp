@@ -615,7 +615,7 @@ intel_set_brightness(float brightness)
 	// working ACPI keyboard shortcuts for this). So always keep the backlight
 	// at least a little bit on for now.
 
-	if (gInfo->shared_info->device_type.Generation() >= 11) {
+	if (gInfo->shared_info->pch_info >= INTEL_PCH_CNP) {
 		uint32_t period = read32(intel_get_backlight_register(true));
 
 		uint32_t duty = (uint32_t)(period * brightness);
@@ -650,7 +650,7 @@ intel_get_brightness(float* brightness)
 	uint32_t duty;
 	uint32_t period;
 
-	if (gInfo->shared_info->device_type.Generation() >= 11) {
+	if (gInfo->shared_info->pch_info >= INTEL_PCH_CNP) {
 		period = read32(intel_get_backlight_register(true));
 		duty = read32(intel_get_backlight_register(false));
 	} else {
