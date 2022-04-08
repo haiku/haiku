@@ -532,7 +532,7 @@ MouseDevice::_UpdateSettings()
 	if (get_mouse_speed_by_name(fDeviceRef.name, &fSettings.accel.speed) != B_OK)
 		LOG_ERR("error when get_mouse_speed\n");
 	else {
-		if (get_mouse_acceleration(&fSettings.accel.accel_factor) != B_OK)
+		if (get_mouse_acceleration_by_name(fDeviceRef.name, &fSettings.accel.accel_factor) != B_OK)
 			LOG_ERR("error when get_mouse_acceleration\n");
 		else {
 			mouse_accel accel;

@@ -432,6 +432,8 @@ status_t		get_mouse_speed_by_name(BString mouse_name, int32* speed);
 status_t		set_mouse_speed_by_name(BString mouse_name, int32 speed);
 status_t		get_mouse_acceleration(int32* speed);
 status_t		set_mouse_acceleration(int32 speed);
+status_t		get_mouse_acceleration_by_name(BString mouse_name, int32* speed);
+status_t		set_mouse_acceleration_by_name(BString mouse_name, int32 speed);
 
 status_t		get_key_repeat_rate(int32* rate);
 status_t		set_key_repeat_rate(int32 rate);

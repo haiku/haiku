@@ -95,7 +95,7 @@ MouseSettings::_RetrieveSettings()
 		return B_ERROR;
 	if (get_mouse_speed_by_name(fName, &fSettings.accel.speed) != B_OK)
 		return B_ERROR;
-	if (get_mouse_acceleration(&fSettings.accel.accel_factor) != B_OK)
+	if (get_mouse_acceleration_by_name(fName, &fSettings.accel.accel_factor) != B_OK)
 		return B_ERROR;
 	if (get_mouse_type_by_name(fName, &fSettings.type) != B_OK)
 		return B_ERROR;
@@ -294,7 +294,7 @@ MouseSettings::SetMouseSpeed(int32 speed)
 void
 MouseSettings::SetAccelerationFactor(int32 factor)
 {
-	if (set_mouse_acceleration(factor) == B_OK)
+	if (set_mouse_acceleration_by_name(fName, factor) == B_OK)
 		fSettings.accel.accel_factor = factor;
 }
 

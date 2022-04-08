@@ -684,6 +684,35 @@ set_mouse_acceleration(int32 speed)
 
 
 status_t
+get_mouse_acceleration_by_name(BString mouse_name, int32 *speed)
+{
+	BMessage command(IS_GET_MOUSE_ACCELERATION);
+	BMessage reply;
+	command.AddString("mouse_name", mouse_name.String());
+
+	_control_input_server_(&command, &reply);
+
+	if (reply.FindInt32("speed", speed) != B_OK)
+		*speed = 65536;
+
+	return B_OK;
+}
+
+
+status_t
+set_mouse_acceleration_by_name(BString mouse_name, int32 speed)
+{
+	BMessage command(IS_SET_MOUSE_ACCELERATION);
+	BMessage reply;
+	command.AddString("mouse_name", mouse_name.String());
+
+	command.AddInt32("speed", speed);
+
+	return _control_input_server_(&command, &reply);
+}
+
+
+status_t
 get_key_repeat_rate(int32 *rate)
 {
 	BMessage command(IS_GET_KEY_REPEAT_RATE);
