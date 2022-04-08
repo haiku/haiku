@@ -1201,14 +1201,18 @@ struct intel_free_graphics_memory {
 // These have moved around, initially they were per pipe, then they were moved in the "north" part
 // of the PCH with a single backlight control (independant of pipes), and then moved again to the
 // "south" part of the PCH, with a simplified register layout.
-#define PCH_BLC_PWM_CTL2                (0x8250 | REGS_NORTH_SHARED) // Linux BLC_PWM_CPU_CTL2
-#define PCH_BLC_PWM_CTL                 (0x8254 | REGS_NORTH_SHARED) // Linux BLC_PWM_CPU_CTL
+#define PCH_BLC_PWM_CTL2				(0x8250 | REGS_NORTH_SHARED) // Linux BLC_PWM_CPU_CTL2
+#define PCH_BLC_PWM_CTL					(0x8254 | REGS_NORTH_SHARED) // Linux BLC_PWM_CPU_CTL
+
+// Kaby Lake/Sunrisepoint
+#define BLC_PWM_PCH_CTL1				(0x8250 | REGS_SOUTH_SHARED) // Enable with bit 31
+#define BLC_PWM_PCH_CTL2				(0x8254 | REGS_SOUTH_SHARED) // Duty Cycle and Period
 
 // Devices after Cannonlake have a new register layout, with separate registers for the period
 // and duty cycle instead of having two 16bit values in a 32bit register
-#define PCH_SOUTH_BLC_PWM_CONTROL       (0x8250 | REGS_SOUTH_SHARED) // Linux _BXT_BLC_PWM_CTL1
-#define PCH_SOUTH_BLC_PWM_PERIOD        (0x8254 | REGS_SOUTH_SHARED) // Linux _BXT_BLC_PWM_FREQ1
-#define PCH_SOUTH_BLC_PWM_DUTY_CYCLE    (0x8258 | REGS_SOUTH_SHARED) // Linux _BXT_BLC_PWM_DUTY1
+#define PCH_SOUTH_BLC_PWM_CONTROL		(0x8250 | REGS_SOUTH_SHARED) // Linux _BXT_BLC_PWM_CTL1
+#define PCH_SOUTH_BLC_PWM_PERIOD		(0x8254 | REGS_SOUTH_SHARED) // Linux _BXT_BLC_PWM_FREQ1
+#define PCH_SOUTH_BLC_PWM_DUTY_CYCLE	(0x8258 | REGS_SOUTH_SHARED) // Linux _BXT_BLC_PWM_DUTY1
 
 #define MCH_BLC_PWM_CTL                 (0x1254 | REGS_NORTH_PIPE_AND_PORT)
 	// Linux VLV_BLC_PWM_CTL (one register per pipe) or BLC_PWM_CTL (a single register that can be

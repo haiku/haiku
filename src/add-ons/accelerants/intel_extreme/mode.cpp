@@ -586,7 +586,8 @@ intel_get_backlight_register(bool period)
 			return PCH_SOUTH_BLC_PWM_PERIOD;
 		else
 			return PCH_SOUTH_BLC_PWM_DUTY_CYCLE;
-	}
+	} else if (gInfo->shared_info->pch_info >= INTEL_PCH_SPT)
+		return BLC_PWM_PCH_CTL2;
 
 	if (gInfo->shared_info->pch_info == INTEL_PCH_NONE)
 		return MCH_BLC_PWM_CTL;
@@ -622,6 +623,13 @@ intel_set_brightness(float brightness)
 		duty = std::max(duty, (uint32_t)gInfo->shared_info->min_brightness);
 
 		write32(intel_get_backlight_register(false), duty);
+	} else 	if (gInfo->shared_info->pch_info >= INTEL_PCH_SPT) {
+		uint32_t period = read32(intel_get_backlight_register(true)) >> 16;
+
+		uint32_t duty = (uint32_t)(period * brightness) & 0xffff;
+		duty = std::max(duty, (uint32_t)gInfo->shared_info->min_brightness);
+
+		write32(intel_get_backlight_register(false), duty | (period << 16));
 	} else {
 		// On older devices there is a single register with both period and duty cycle
 		uint32_t period = read32(intel_get_backlight_register(true)) >> 16;
