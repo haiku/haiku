@@ -364,6 +364,51 @@ dtb_get_reg(const void* fdt, int node, size_t idx, addr_range& range)
 		case 2: range.size = fdt64_to_cpu(*(uint64*)prop); prop += 8; break;
 		default: panic("unsupported sizeCells");
 	}
+
+	int parent = fdt_parent_offset(fdt, node);
+	if (parent >= 0) {
+		uint32 parentAddressCells = dtb_get_address_cells(fdt, parent);
+
+		uint32 rangesSize = 0;
+		uint32 *ranges = (uint32 *)fdt_getprop(fdt, parent, "ranges", (int *)&rangesSize);
+		if (ranges == NULL)
+			return true;
+
+		uint32 rangesPos = 0;
+		while (rangesSize >= (rangesPos + parentAddressCells + addressCells + sizeCells)) {
+			addr_t childAddress;
+			addr_t parentAddress;
+			size_t rangeSize;
+
+			if (addressCells == 1) {
+				childAddress = fdt32_to_cpu(*(uint32*)(ranges+rangesPos));
+			} else {
+				childAddress = fdt64_to_cpu(*(uint64*)(ranges+rangesPos));
+			}
+			rangesPos += addressCells;
+
+			if (parentAddressCells == 1) {
+				parentAddress = fdt32_to_cpu(*(uint32*)(ranges+rangesPos));
+			} else {
+				parentAddress = fdt64_to_cpu(*(uint64*)(ranges+rangesPos));
+			}
+			rangesPos += parentAddressCells;
+
+			if (sizeCells == 1) {
+				rangeSize = fdt32_to_cpu(*(uint32*)(ranges+rangesPos));
+			} else {
+				rangeSize = fdt64_to_cpu(*(uint64*)(ranges+rangesPos));
+			}
+			rangesPos += sizeCells;
+
+			if ((range.start >= childAddress) && (range.start <= childAddress + rangeSize)) {
+				range.start -= childAddress;
+				range.start += parentAddress;
+				break;
+			}
+		}
+	}
+
 	return true;
 }
 
