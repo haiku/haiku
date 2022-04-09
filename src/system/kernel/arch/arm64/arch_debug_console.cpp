@@ -4,7 +4,7 @@
  */
 #include <arch/debug_console.h>
 #include <arch/generic/debug_uart.h>
-// #include <arch/generic/debug_uart_8250.h>
+#include <arch/generic/debug_uart_8250.h>
 // #include <arch/arm/arch_uart_8250_omap.h>
 #include <arch/arm/arch_uart_pl011.h>
 #include <arch/arm64/arch_uart_linflex.h>
@@ -110,11 +110,11 @@ arch_debug_console_init(kernel_args *args)
 		sizeof(args->arch_args.uart.kind)) == 0) {
 		sArchDebugUART = arch_get_uart_8250_omap(args->arch_args.uart.regs.start,
 			args->arch_args.uart.clock);
-	} else if (strncmp(args->arch_args.uart.kind, UART_KIND_8250,
+	}*/ else if (strncmp(args->arch_args.uart.kind, UART_KIND_8250,
 		sizeof(args->arch_args.uart.kind)) == 0) {
 		sArchDebugUART = arch_get_uart_8250(args->arch_args.uart.regs.start,
 			args->arch_args.uart.clock);
-	}*/
+	}
 
 	// Oh well.
 	if (sArchDebugUART == NULL)
