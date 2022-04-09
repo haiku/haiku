@@ -1574,7 +1574,7 @@ actions BuildFloppyBootImage1
 	fi
 	$(RM) $(<)
 	# make an empty image
-	dd if=/dev/zero of=$(<) bs=1k count=$(FLOPPY_IMAGE_SIZE)
+	dd if=/dev/zero of=$(<) bs=1024 count=$(FLOPPY_IMAGE_SIZE)
 	# add haiku_loader
 	dd if=$(>[1]) of=$(<) conv=notrunc
 	# add the boot drivers tgz archive

@@ -62,7 +62,7 @@ actions BuildUBootSDImage1
 	MMC_SIZE=`expr $(SDIMAGE_OS_SIZE) \* 1024 + ${BOOT_SIZE}`
 
 	# Build "boot" disk
-	dd if=/dev/zero of=$(1) bs=1K count=${BOOT_SIZE}
+	dd if=/dev/zero of=$(1) bs=1024 count=${BOOT_SIZE}
 
 	# generate u-boot environment variables
 	echo 'os=haiku' > uEnv.txt
@@ -122,7 +122,7 @@ actions BuildEfiSDImage1
 	MMC_SIZE=`expr $(SDIMAGE_OS_SIZE) \* 1024 + ${BOOT_SIZE}`
 
 	# Build "boot" disk
-	dd if=/dev/zero of=$(1) bs=1K count=${BOOT_SIZE}
+	dd if=/dev/zero of=$(1) bs=1024 count=${BOOT_SIZE}
 
 	# generate u-boot environment variables
 	echo 'os=haiku' > uEnv.txt

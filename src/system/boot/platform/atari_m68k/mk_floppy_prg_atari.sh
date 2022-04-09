@@ -2,7 +2,7 @@
 IMG=$HOME/floppy.img
 ZBEOS=haiku_loader
 jam -q haiku.prg $ZBEOS && \
-dd if=/dev/zero of=$IMG bs=1k count=1440 && \
+dd if=/dev/zero of=$IMG bs=1024 count=1440 && \
 dd if=generated/objects/haiku/m68k/release/system/boot/$ZBEOS of=$IMG bs=512 conv=notrunc && \
 src/system/boot/platform/atari_m68k/fixup_tos_floppy_chksum $IMG && \
 true
