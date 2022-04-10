@@ -65,7 +65,12 @@ enum {
 	ACPI_MADT_LOCAL_SAPIC = 7,
 	ACPI_MADT_PLATFORM_INTERRUPT_SOURCE = 8,
 	ACPI_MADT_PROCESSOR_LOCAL_X2_APIC_NMI = 9,
-	ACPI_MADT_LOCAL_X2_APIC_NMI = 0XA
+	ACPI_MADT_LOCAL_X2_APIC_NMI = 0xA,
+	ACPI_MADT_GIC_INTERFACE = 0xB,
+	ACPI_MADT_GIC_DISTRIBUTOR = 0xC,
+	ACPI_MADT_GIC_MSI_FRAME = 0xD,
+	ACPI_MADT_GIC_REDISTRIBUTOR = 0xE,
+	ACPI_MADT_GIC_ITS = 0xF
 };
 
 typedef struct acpi_apic {
@@ -202,6 +207,38 @@ typedef struct acpi_local_x2_apic_nmi {
 	uint8	reserved2;				/* reserved (must be set to zero) */
 	uint8	reserved3;				/* reserved (must be set to zero) */
 } _PACKED acpi_local_x2_apic_nmi;
+
+typedef struct acpi_gic_interface {
+	uint8 type;
+	uint8 length;
+	uint16 reserved1;
+	uint32 cpu_interface_num;
+	uint32 acpi_processor_uid;
+	uint32 flags;
+	uint32 parking_protocol_ver;
+	uint32 performance_gsiv;
+	uint64 parked_address;
+	uint64 base_address;
+	uint64 gicv_address;
+	uint64 gich_address;
+	uint32 vgic_maintenance_gsiv;
+	uint64 gicr_address;
+	uint64 mpidr;
+	uint8 efficiency_class;
+	uint8 reserved2;
+	uint16 spe_overflow_gsiv;
+} _PACKED acpi_gic_interface;
+
+typedef struct acpi_gic_distributor {
+	uint8 type;
+	uint8 length;
+	uint16 reserved1;
+	uint32 gic_id;
+	uint64 base_address;
+	uint32 reserved2;
+	uint8 gic_version;
+	uint8 reserved[3];
+} _PACKED acpi_gic_distributor;
 
 typedef struct acpi_gas {
 	uint8 address_space_id;
