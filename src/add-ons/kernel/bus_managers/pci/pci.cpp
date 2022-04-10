@@ -476,6 +476,9 @@ pcirefresh(int argc, char **argv)
 static bool sInitDone;
 
 
+status_t __attribute__((weak)) pci_controller_finalize() { return B_OK; }
+
+
 status_t
 pci_init_deferred(void)
 {
@@ -515,6 +518,11 @@ pci_init_deferred(void)
 
 	add_debugger_command("pcistatus", &pcistatus, "dump and clear pci device status registers");
 	add_debugger_command("pcirefresh", &pcirefresh, "refresh and print all pci_info");
+
+	if (pci_controller_finalize() != B_OK) {
+		TRACE(("PCI: pci_controller_finalize failed\n"));
+		return B_ERROR;
+	}
 
 	sInitDone = true;
 	return B_OK;

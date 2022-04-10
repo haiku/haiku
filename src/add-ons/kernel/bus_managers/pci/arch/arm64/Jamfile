@@ -6,6 +6,8 @@ UsePrivateKernelHeaders ;
 UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_ARCH) ]
 	[ FDirName kernel boot platform $(HAIKU_BOOT_PLATFORM) ] ;
 
+SubDirHdrs $(HAIKU_TOP) src system kernel arch generic ;
+
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 KernelStaticLibrary pci_arch_bus_manager :

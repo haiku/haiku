@@ -7,6 +7,7 @@
 #include "pci_controller.h"
 
 #include <kernel/debug.h>
+#include <kernel/int.h>
 #include <util/Vector.h>
 
 #include <AutoDeleterDrivers.h>
@@ -15,6 +16,8 @@
 
 #include <ACPI.h> // module
 #include <acpi.h>
+
+#include "acpi_irq_routing_table.h"
 
 
 addr_t gPCIeBase;
@@ -89,6 +92,13 @@ AcpiCrsScanCallback(acpi_resource *res, void *context)
 	ranges.PushBack(range);
 
 	return B_OK;
+}
+
+
+static bool
+is_interrupt_available(int32 gsi)
+{
+	return true;
 }
 
 
@@ -188,6 +198,38 @@ pci_controller_init(void)
 	}
 
 	return B_ERROR;
+}
+
+
+status_t
+pci_controller_finalize(void)
+{
+	status_t res;
+
+	acpi_module_info *acpiModule;
+	res = get_module(B_ACPI_MODULE_NAME, (module_info**)&acpiModule);
+	if (res != B_OK)
+		return B_ERROR;
+
+	IRQRoutingTable table;
+	res = prepare_irq_routing(acpiModule, table, &is_interrupt_available);
+	if (res != B_OK) {
+		dprintf("PCI: irq routing preparation failed\n");
+		return B_ERROR;
+	}
+
+	for (Vector<irq_routing_entry>::Iterator it = table.Begin(); it != table.End(); it++)
+		reserve_io_interrupt_vectors(1, it->irq, INTERRUPT_TYPE_IRQ);
+
+	res = enable_irq_routing(acpiModule, table);
+	if (res != B_OK) {
+		dprintf("PCI: irq routing failed\n");
+		return B_ERROR;
+	}
+
+	print_irq_routing_table(table);
+
+	return B_OK;
 }
 
 
