@@ -7,7 +7,7 @@
  */
 
 
-#include "irq_routing_table.h"
+#include "acpi_irq_routing_table.h"
 
 #include "acpi.h"
 
@@ -34,7 +34,11 @@ const char* kACPIPciExpressRootName = "PNP0A08";
 static const uint8 kMaxPCIFunctionCount = 8;
 static const uint8 kMaxPCIDeviceCount = 32;
 	// TODO: actually this is mechanism dependent
+#if defined(__i386__) || defined(__x86_64__)
 static const uint8 kMaxISAInterrupts = 16;
+#else
+static const uint8 kMaxISAInterrupts = 0;
+#endif
 
 irq_descriptor::irq_descriptor()
 	:
