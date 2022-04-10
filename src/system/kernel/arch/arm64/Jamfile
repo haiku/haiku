@@ -23,7 +23,7 @@ KernelMergeObject kernel_arch_arm64.o :
 	arch_real_time_clock.cpp
 	arch_platform.cpp
 	arch_asm.S
-
+	arch_int_gicv2.cpp
 	soc.cpp
 
 	VMSAv8TranslationMap.cpp
