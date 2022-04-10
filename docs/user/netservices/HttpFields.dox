@@ -42,9 +42,8 @@ namespace Network {
 	to valid data for the lifetime of this object, which in case of a HTTP response, will be
 	bound to the lifetime of the object that contains the HTTP response.
 
-	When adding headers, the fields are stored in the order in which they were added. However,
-	when you add additional values with an existing name, the new field will be added below the
-	existing field.
+	When adding headers, the fields are stored in the order in which they were added. You can use
+	\ref AddField() to add more than one field with the same key.
 
 	The HTTP protocol does not prohibit multiple fields with the same name, but it does note that
 	semantically this is only allowed for a limited set of explicitly named headers, like the
@@ -164,6 +163,27 @@ namespace Network {
 
 
 /*!
+	\fn BHttpFields::Field::Field(BString& field)
+	\brief Construct a field from the raw \a field value.
+
+	The raw header field is checked to determine whether it corresponds to the the HTTP
+	specification. Note that the raw field should not include any newline characters at the end
+	of the string.
+
+	If succesful, the string is moved into the fields object, and the original input value will be
+	empty.
+
+	\param field The raw header field to move into the list of headers 
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+	\exception BHttpFields::InvalidInput This error indicates that the \a name or the \a value
+		is empty or contains invalid characters.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn BHttpFields::Field::Field(const Field &other)
 	\brief Copy constructor.
 
@@ -221,7 +241,18 @@ namespace Network {
 	\fn std::string_view BHttpFields::Field::Value() const noexcept
 	\brief Get a const reference to the field value.
 
-	\return The contents of the field value as a \a std::string_view.
+	\return The contents of the field value as a \c std::string_view.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn std::string_view BHttpFields::Field::RawField() const noexcept
+	\brief Get a view to the field value.
+
+	\return The raw field value as a \c string_view. The raw value does not include the line
+		ending (\\r\\n).
 
 	\since Haiku R1
 */
@@ -249,16 +280,6 @@ namespace Network {
 	\c COnTenT-ENcOdING.
 
 	A header field name can never be empty.
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\fn BHttpFields::FieldName::operator BString() const
-	\brief Return a copy of the header name as a string.
-
-	\return The header name as a \ref BString object.
 
 	\since Haiku R1
 */
@@ -336,11 +357,12 @@ namespace Network {
 
 	This enables you to initialize the fields with a list of \ref BHttpFields::Field objects. Any
 	empty fields will be skipped. Like \ref AddField(), this constructor keeps the fields in the
-	original order, though duplicate keys will be grouped together in sequence.
+	original order.
 
 	The example below will create an object with four fields, even though five fields have been
-	passed in the initializer. The last header will be reorderd to follow the other
-	\c Accept-Encoding header.
+	passed in the initializer. The two \c Accept-Encoding will be added in this order, even though
+	the HTTP specification does not explicitly allow this.
+
 	\code
 	const BHttpFields defaultFields = {
 		{"Host"sv, "haiku-os.org"sv},
@@ -477,13 +499,32 @@ namespace Network {
 
 
 /*!
+	\fn void BHttpFields::AddField(BString &field)
+	\brief Append a field from the raw \a field line
+
+	The raw header field is checked to determine whether it corresponds to the the HTTP
+	specification. Note that the raw field should not include any newline characters at the end
+	of the string.
+
+	If succesful, the string is moved into the fields object, and the original input value will be
+	empty.
+
+	\param field The raw header field to move into the list of headers.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+	\exception BHttpFields::InvalidInput This error indicates that the \a name or the \a value
+		is empty or contains invalid characters.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn void BHttpFields::AddFields(std::initializer_list< Field > fields)
 	\brief Add a list of fields.
 
 	This enables you to add a list of \ref BHttpFields::Field objects. Like \ref AddField(), the
-	fields are added in the the original order, though if there are duplicate keys within the
-	\a fields list, or there are existing keys in the object, they will be grouped together in
-	sequence.
+	fields are added in the the original order.
 
 	\exception std::bad_alloc Error in case memory cannot be allocated.
 	\exception BHttpFields::InvalidInput This error indicates that some of the names or values in
@@ -541,9 +582,8 @@ namespace Network {
 	\fn ConstIterator BHttpFields::FindField(const std::string_view &name) const noexcept
 	\brief Find a field with \a name.
 
-	In case there are more than one fields with the same name, this container will make sure that
-	these are grouped together. That means that you can use the properties of the iterator to find
-	the other fields.
+	In case there are more than one fields with the same name, you cannot use this method to find
+	all instances, and you should iterate through the fields instead.
 
 	\param name The name of the field to be found.
 

@@ -79,6 +79,52 @@ HttpProtocolTest::HttpFieldsTest()
 		}
 	}
 
+	// Header line parsing validation
+	{
+		auto fields = BHttpFields();
+		try {
+			BString noWhiteSpace("Connection:close");
+			fields.AddField(noWhiteSpace);
+			BString extraWhiteSpace("Connection:     close\t\t  \t");
+			fields.AddField(extraWhiteSpace);
+			for (const auto& field: fields) {
+				std::string_view name = field.Name();
+				CPPUNIT_ASSERT_EQUAL("Connection"sv, name);
+				CPPUNIT_ASSERT_EQUAL("close"sv, field.Value());
+			}
+		} catch (const BHttpFields::InvalidInput& e) {
+			CPPUNIT_FAIL(e.input.String());
+			CPPUNIT_FAIL("Unexpected exception when adding a header with an valid value");
+		}
+
+		try {
+			BString noSeparator("Connection close");
+			fields.AddField(noSeparator);
+		} catch (const BHttpFields::InvalidInput& e) {
+			// success
+		} catch (...) {
+			CPPUNIT_FAIL("Unexpected exception when creating a header with an invalid value");
+		}
+
+		try {
+			BString noName = (":close");
+			fields.AddField(noName);
+		} catch (const BHttpFields::InvalidInput& e) {
+			// success
+		} catch (...) {
+			CPPUNIT_FAIL("Unexpected exception when creating a header with an invalid value");
+		}
+
+		try {
+			BString noValue = ("Connection     :");
+			fields.AddField(noValue);
+		} catch (const BHttpFields::InvalidInput& e) {
+			// success
+		} catch (...) {
+			CPPUNIT_FAIL("Unexpected exception when creating a header with an invalid value");
+		}
+	}
+
 	// Header field name case insensitive comparison
 	{
 		BHttpFields fields = BHttpFields();
@@ -127,30 +173,33 @@ HttpProtocolTest::HttpFieldsTest()
 	// Test query and modification tools
 	{
 		BHttpFields fields = defaultFields;
-		// test order of adding fields
+		// test order of adding fields (in order of construction)
 		fields.AddField("Set-Cookie"sv, "vfxdrm=9lpqrsvxm; Domain=haiku-os.co.uk"sv);
-		// query for Set-Cookie
+		// query for Set-Cookie should find the first in the list
 		auto it = fields.FindField("Set-Cookie"sv);
 		CPPUNIT_ASSERT(it != fields.end());
 		CPPUNIT_ASSERT((*it).Name() == "Set-Cookie"sv);
 		CPPUNIT_ASSERT_EQUAL(defaultFields[2].Value(), (*it).Value());
-		it++;
-		CPPUNIT_ASSERT(it != fields.end());
+
+		// the last item should be the newly insterted one
+		it = fields.end();
+		it--;
+		CPPUNIT_ASSERT(it != fields.begin());
 		CPPUNIT_ASSERT((*it).Name() == "Set-Cookie"sv);
-		CPPUNIT_ASSERT_EQUAL(defaultFields[3].Value(), (*it).Value());
-		it++;
-		CPPUNIT_ASSERT(it != fields.end());
-		CPPUNIT_ASSERT((*it).Name() == "Set-Cookie"sv);
-		it++;
-		CPPUNIT_ASSERT(it != fields.end());
-		CPPUNIT_ASSERT_EQUAL(defaultFields[4].Value(), (*it).Value());
-		// Remove the Accept-Encoding entry by iterator
+		CPPUNIT_ASSERT_EQUAL("vfxdrm=9lpqrsvxm; Domain=haiku-os.co.uk"sv, (*it).Value());
+
+		// the item before should be the Accept-Encoding one
+		it--;
+		CPPUNIT_ASSERT(it != fields.begin());
+		CPPUNIT_ASSERT((*it).Name() == "Accept-Encoding"sv);
+
+		// remove the Accept-Encoding entry by iterator
 		fields.RemoveField(it);
 		CPPUNIT_ASSERT_EQUAL(fields.CountFields(), defaultFields.CountFields());
-		// Remove the Set-Cookie entries by name
+		// remove the Set-Cookie entries by name
 		fields.RemoveField("Set-Cookie"sv);
 		CPPUNIT_ASSERT_EQUAL(fields.CountFields(), 2);
-		// Test MakeEmpty
+		// test MakeEmpty
 		fields.MakeEmpty();
 		CPPUNIT_ASSERT_EQUAL(fields.CountFields(), 0);
 	}
@@ -171,7 +220,7 @@ HttpProtocolTest::HttpFieldsTest()
 			auto value = BString("value");
 			key << count;
 			value << count;
-			CPPUNIT_ASSERT_EQUAL(key, field.Name());
+			CPPUNIT_ASSERT_EQUAL(std::string_view(key.String()), field.Name());
 			CPPUNIT_ASSERT_EQUAL(value, BString(field.Value().data(), field.Value().length()));
 		}
 		CPPUNIT_ASSERT_EQUAL(count, 4);

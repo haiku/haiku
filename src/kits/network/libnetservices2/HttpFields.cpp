@@ -44,7 +44,7 @@ validate_value_string(const std::string_view& string)
 }
 
 
-/*
+/*!
 	\brief Case insensitively compare two string_views.
 
 	Inspired by https://stackoverflow.com/a/4119881
@@ -58,6 +58,30 @@ iequals(const std::string_view& a, const std::string_view& b)
 		[](char a, char b) {
 			return tolower(a) == tolower(b);
 	});
+}
+
+
+/*!
+	\brief Trim whitespace from the beginning and end of a string_view
+
+	Inspired by:
+		https://terrislinenbach.medium.com/trimming-whitespace-from-a-string-view-6795e18b108f
+*/
+static inline std::string_view
+trim(std::string_view in)
+{
+	auto left = in.begin();
+	for (;; ++left) {
+		if (left == in.end())
+			return std::string_view();
+		if (!isspace(*left))
+			break;
+	}
+
+	auto right = in.end() - 1;
+	for (; right > left && isspace(*right); --right);
+
+	return std::string_view(left, std::distance(left, right) + 1);
 }
 
 
@@ -92,28 +116,24 @@ BHttpFields::InvalidInput::DebugMessage() const
 // #pragma mark -- BHttpFields::Name
 
 
-BHttpFields::FieldName::FieldName(const std::string_view& name)
+BHttpFields::FieldName::FieldName() noexcept
+	: fName(std::string_view())
+{
+
+}
+
+
+BHttpFields::FieldName::FieldName(const std::string_view& name) noexcept
 	: fName(name)
 {
 
 }
 
 
-BHttpFields::FieldName::FieldName(BString name)
-	: fName(std::move(name))
-{
-
-}
-
-
 /*!
-	\brief Copy constructor; any borrowed field is copied into an owned field
+	\brief Copy constructor;
 */
-BHttpFields::FieldName::FieldName(const FieldName& other)
-{
-	BString otherName = other;
-	fName = std::move(otherName);
-}
+BHttpFields::FieldName::FieldName(const FieldName& other) noexcept = default;
 
 
 /*!
@@ -131,15 +151,10 @@ BHttpFields::FieldName::FieldName(FieldName&& other) noexcept
 
 
 /*!
-	\brief Copy assignment; the copy is always owned
+	\brief Copy assignment; 
 */
 BHttpFields::FieldName&
-BHttpFields::FieldName::operator=(const BHttpFields::FieldName& other)
-{
-	BString otherName = other;
-	fName = std::move(otherName);
-	return *this;
-}
+BHttpFields::FieldName::operator=(const BHttpFields::FieldName& other) noexcept = default;
 
 
 /*!
@@ -158,71 +173,30 @@ BHttpFields::FieldName::operator=(BHttpFields::FieldName&& other) noexcept
 }
 
 
-/*!
-	\brief Unchecked assignment of owned name
-
-	This should only be used interally when the name is known to be valid!
-*/
-BHttpFields::FieldName&
-BHttpFields::FieldName::operator=(BString name)
-{
-	fName = std::move(name);
-	return *this;
-}
-
-
 bool
 BHttpFields::FieldName::operator==(const BString& other) const noexcept
 {
-	if (std::holds_alternative<std::string_view>(fName)) {
-		return iequals(std::get<std::string_view>(fName), std::string_view(other.String()));
-	} else {
-		return std::get<BString>(fName).ICompare(other) == 0;
-	}
+	return iequals(fName, std::string_view(other.String()));
 }
 
 
 bool
 BHttpFields::FieldName::operator==(const std::string_view& other) const noexcept
 {
-	if (std::holds_alternative<std::string_view>(fName)) {
-		return iequals(std::get<std::string_view>(fName), other);
-	} else {
-		return std::get<BString>(fName).ICompare(other.data(), other.size()) == 0;
-	}
+	return iequals(fName, other);
 }
 
 
 bool
 BHttpFields::FieldName::operator==(const BHttpFields::FieldName& other) const noexcept
 {
-	if (std::holds_alternative<std::string_view>(other.fName)) {
-		return *this == std::get<std::string_view>(other.fName);
-	} else {
-		return *this == std::get<BString>(other.fName);
-	}
-}
-
-
-
-BHttpFields::FieldName::operator BString() const
-{
-	if (std::holds_alternative<std::string_view>(fName)) {
-		const auto& name = std::get<std::string_view>(fName);
-		return BString(name.data(), name.size());
-	} else {
-		return std::get<BString>(fName);
-	}
+	return iequals(fName, other.fName);
 }
 
 
 BHttpFields::FieldName::operator std::string_view() const
 {
-	if (std::holds_alternative<std::string_view>(fName)) {
-		return std::get<std::string_view>(fName);
-	} else {
-		return std::string_view(std::get<BString>(fName).String());
-	}
+	return fName;
 }
 
 
@@ -237,45 +211,63 @@ BHttpFields::Field::Field() noexcept
 
 
 BHttpFields::Field::Field(const std::string_view& name, const std::string_view& value)
-	: Field(name, value, false)
-{
-
-}
-
-
-/*!
-	\brief Internal constructor that has the option to create an instance of a 'borrowed' item.
-*/
-BHttpFields::Field::Field(const std::string_view& name, const std::string_view& value, bool borrowed)
-	: fName(name), fValue(value)
 {
 	if (name.length() == 0 || !validate_http_token_string(name))
-		throw BHttpFields::InvalidInput(__PRETTY_FUNCTION__, fName);
+		throw BHttpFields::InvalidInput(__PRETTY_FUNCTION__, BString(name.data(), name.size()));
 	if (value.length() == 0 || !validate_value_string(value))
 		throw BHttpFields::InvalidInput(__PRETTY_FUNCTION__, BString(value.data(), value.length()));
 
-	if (!borrowed) {
-		// set as owned
-		fName = BHttpFields::FieldName(BString(name.data(), name.length()));
-		fValue = BString(value.data(), value.length());
-	}
+	BString rawField(name.data(), name.size());
+	rawField << ": ";
+	rawField.Append(value.data(), value.size());
+
+	fName = std::string_view(rawField.String(), name.size());
+	fValue = std::string_view(rawField.String() + name.size() + 2, value.size());
+	fRawField = std::move(rawField);
+}
+
+
+BHttpFields::Field::Field(BString& field)
+{
+	// Check if the input contains a key, a separator and a value.
+	auto separatorIndex = field.FindFirst(':');
+	if (separatorIndex <= 0)
+		throw BHttpFields::InvalidInput(__PRETTY_FUNCTION__, field);
+
+	// Get the name and the value. Remove whitespace around the value.
+	auto name = std::string_view(field.String(), separatorIndex);
+	auto value = trim(std::string_view(field.String() + separatorIndex + 1));
+
+	if (name.length() == 0 || !validate_http_token_string(name))
+		throw BHttpFields::InvalidInput(__PRETTY_FUNCTION__, BString(name.data(), name.size()));
+	if (value.length() == 0 || !validate_value_string(value))
+		throw BHttpFields::InvalidInput(__PRETTY_FUNCTION__, BString(value.data(), value.length()));
+
+	fRawField = std::move(field);
+	fName = name;
+	fValue = value;
 }
 
 
 BHttpFields::Field::Field(const BHttpFields::Field& other)
 	: fName(std::string_view()), fValue(std::string_view())
 {
-	if (!other.IsEmpty()) {
-		BString name = other.fName;
-		fName = std::move(name);
-		std::string_view otherValue = other.Value();
-		fValue = BString(otherValue.data(), otherValue.length());
+	if (other.IsEmpty()) {
+		fRawField = BString();
+		fName = std::string_view();
+		fValue = std::string_view();
+	} else {
+		fRawField = other.fRawField;
+		auto nameSize = other.Name().fName.size();
+		auto valueOffset = other.fValue.data() - other.fRawField.value().String();
+		fName = std::string_view((*fRawField).String(), nameSize);
+		fValue = std::string_view((*fRawField).String() + valueOffset, other.fValue.size());
 	}
 }
 
 
 BHttpFields::Field::Field(BHttpFields::Field&& other) noexcept
-	: fName(std::move(other.fName)), fValue(std::move(other.fValue))
+	: fRawField(std::move(other.fRawField)), fName(std::move(other.fName)), fValue(std::move(other.fValue))
 {
 	other.fName.fName = std::string_view();
 	other.fValue = std::string_view();
@@ -286,13 +278,15 @@ BHttpFields::Field&
 BHttpFields::Field::operator=(const BHttpFields::Field& other)
 {
 	if (other.IsEmpty()) {
+		fRawField = BString();
 		fName = std::string_view();
 		fValue = std::string_view();
 	} else {
-		BString name = other.fName;
-		fName = std::move(name);
-		std::string_view otherValue = other.Value();
-		fValue = BString(otherValue.data(), otherValue.length());
+		fRawField = other.fRawField;
+		auto nameSize = other.Name().fName.size();
+		auto valueOffset = other.fValue.data() - other.fRawField.value().String();
+		fName = std::string_view((*fRawField).String(), nameSize);
+		fValue = std::string_view((*fRawField).String() + valueOffset, other.fValue.size());
 	}
 	return *this;
 }
@@ -301,6 +295,7 @@ BHttpFields::Field::operator=(const BHttpFields::Field& other)
 BHttpFields::Field&
 BHttpFields::Field::operator=(BHttpFields::Field&& other) noexcept
 {
+	fRawField = std::move(other.fRawField);
 	fName = std::move(other.fName);
 	other.fName.fName = std::string_view();
 	fValue = std::move(other.fValue);
@@ -319,11 +314,17 @@ BHttpFields::Field::Name() const noexcept
 std::string_view
 BHttpFields::Field::Value() const noexcept
 {
-	if (std::holds_alternative<std::string_view>(fValue)) {
-		return std::get<std::string_view>(fValue);
-	} else {
-		return std::string_view(std::get<BString>(fValue).String());
-	}
+	return fValue;
+}
+
+
+std::string_view
+BHttpFields::Field::RawField() const noexcept
+{
+	if (fRawField)
+		return std::string_view((*fRawField).String(), (*fRawField).Length());
+	else
+		return std::string_view();
 }
 
 
@@ -331,9 +332,7 @@ bool
 BHttpFields::Field::IsEmpty() const noexcept
 {
 	// The object is either fully empty, or it has data, so we only have to check fValue.
-	if (std::holds_alternative<std::string_view>(fValue))
-		return std::get<std::string_view>(fValue).length() == 0;
-	return false;
+	return !fRawField.has_value();
 }
 
 
@@ -348,10 +347,7 @@ BHttpFields::BHttpFields()
 
 BHttpFields::BHttpFields(std::initializer_list<BHttpFields::Field> fields)
 {
-	for (auto& field: fields) {
-		if (!field.IsEmpty())
-			_AddField(Field(field));
-	}
+	AddFields(fields);
 }
 
 
@@ -403,7 +399,14 @@ BHttpFields::operator[](size_t index) const
 void
 BHttpFields::AddField(const std::string_view& name, const std::string_view& value)
 {
-	_AddField(BHttpFields::Field(name, value));
+	fFields.emplace_back(name, value);
+}
+
+
+void
+BHttpFields::AddField(BString& field)
+{
+	fFields.emplace_back(field);
 }
 
 
@@ -412,7 +415,7 @@ BHttpFields::AddFields(std::initializer_list<Field> fields)
 {
 	for (auto& field: fields) {
 		if (!field.IsEmpty())
-			_AddField(Field(field));
+			fFields.push_back(std::move(field));
 	}
 }
 
@@ -469,19 +472,4 @@ BHttpFields::ConstIterator
 BHttpFields::end() const noexcept
 {
 	return fFields.cend();
-}
-
-
-void
-BHttpFields::_AddField(Field&& field)
-{
-	// This could be made more efficient bay adding a set of existing keys to quickly check against
-	auto rIterator = std::find_if(fFields.rbegin(), fFields.rend(), [&, field](const Field& f){
-		return f.Name() == field.Name();
-	});
-
-	if (rIterator == fFields.rend())
-		fFields.push_back(field);
-	else
-		fFields.insert(rIterator.base(), field);
 }

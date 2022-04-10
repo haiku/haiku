@@ -282,10 +282,7 @@ BHttpRequest::SerializeHeaderTo(BDataIO* target) const
 	}
 
 	for (const auto& field: outputFields) {
-		std::string_view name = field.Name();
-		bytesWritten += _write_to_dataio(target, name);
-		bytesWritten += _write_to_dataio(target, ": "sv);
-		bytesWritten += _write_to_dataio(target, field.Value());
+		bytesWritten += _write_to_dataio(target, field.RawField());
 		bytesWritten += _write_to_dataio(target, "\r\n"sv);
 	}
 
