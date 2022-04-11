@@ -206,18 +206,6 @@ enum {
 #define BACKCOLOR		0xFF000000
 #define CHAR_ATTRIBUTES	0xFFFF7700
 
-#define IS_WIDTH(x)	(((x) & A_WIDTH)   )
-#define IS_BOLD(x)	(((x) & BOLD)      )
-#define IS_UNDER(x)	(((x) & UNDERLINE) )
-#define IS_INVERSE(x)	(((x) & INVERSE)   )
-#define IS_MOUSE(x)	(((x) & MOUSE)     )
-#define IS_FORESET(x)	(((x) & FORESET)   )
-#define IS_BACKSET(x)	(((x) & BACKSET)   )
-#define IS_FONT(x)	(((x) & FONT)      )
-#define IS_CR(x)	(((x) & DUMPCR)	   )
-#define IS_FORECOLOR(x) (((x) & FORECOLOR) >> 16)
-#define IS_BACKCOLOR(x) (((x) & BACKCOLOR) >> 24)
-
 #define FORECOLORED(x) ((x) << 16)
 #define BACKCOLORED(x) ((x) << 24)
 

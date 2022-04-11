@@ -42,8 +42,8 @@ public:
 			void				SetCursorBlinking(bool blinking);
 			void				SetCursorHidden(bool hidden);
 			void				SetPaletteColor(uint8 index, rgb_color color);
-			rgb_color			PaletteColor(uint8 index);
-			int					GuessPaletteColor(int red, int green, int blue);
+			inline const rgb_color*
+								Palette() const { return fColorsPalette; }
 
 			void				NotifyQuit(int32 reason);
 
@@ -75,7 +75,7 @@ private:
 			TerminalLine**		fAlternateScreen;
 			HistoryBuffer*		fAlternateHistory;
 			int32				fAlternateScreenOffset;
-			uint32				fAlternateAttributes;
+			Attributes			fAlternateAttributes;
 			rgb_color*			fColorsPalette;
 
 			// listener/dirty region management

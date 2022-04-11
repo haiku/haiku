@@ -1028,13 +1028,13 @@ TermView::_Deactivate()
 
 //! Draw part of a line in the given view.
 void
-TermView::_DrawLinePart(float x1, float y1, uint32 attr, char *buf,
-	int32 width, Highlight* highlight, bool cursor, BView *inView)
+TermView::_DrawLinePart(float x1, float y1, Attributes attr,
+	char *buf, int32 width, Highlight* highlight, bool cursor, BView *inView)
 {
 	if (highlight != NULL)
-		attr = highlight->Highlighter()->AdjustTextAttributes(attr);
+		attr.state = highlight->Highlighter()->AdjustTextAttributes(attr.state);
 
-	inView->SetFont(IS_BOLD(attr) && !fEmulateBold && fAllowBold
+	inView->SetFont(attr.IsBold() && !fEmulateBold && fAllowBold
 		? &fBoldFont : &fHalfFont);
 
 	// Set pen point
@@ -1045,13 +1045,10 @@ TermView::_DrawLinePart(float x1, float y1, uint32 attr, char *buf,
 	rgb_color rgb_back = fTextBackColor;
 
 	// color attribute
-	int forecolor = IS_FORECOLOR(attr);
-	int backcolor = IS_BACKCOLOR(attr);
-
-	if (IS_FORESET(attr))
-		rgb_fore = fTextBuffer->PaletteColor(forecolor);
-	if (IS_BACKSET(attr))
-		rgb_back = fTextBuffer->PaletteColor(backcolor);
+	if (attr.IsForeSet())
+		rgb_fore = attr.ForegroundColor(fTextBuffer->Palette());
+	if (attr.IsBackSet())
+		rgb_back = attr.BackgroundColor(fTextBuffer->Palette());
 
 	// Selection check.
 	if (cursor) {
@@ -1062,7 +1059,7 @@ TermView::_DrawLinePart(float x1, float y1, uint32 attr, char *buf,
 		rgb_back = highlight->Highlighter()->BackgroundColor();
 	} else {
 		// Reverse attribute(If selected area, don't reverse color).
-		if (IS_INVERSE(attr)) {
+		if (attr.IsInverse()) {
 			rgb_color rgb_tmp = rgb_fore;
 			rgb_fore = rgb_back;
 			rgb_back = rgb_tmp;
@@ -1076,7 +1073,7 @@ TermView::_DrawLinePart(float x1, float y1, uint32 attr, char *buf,
 	inView->SetHighColor(rgb_fore);
 
 	// Draw character.
-	if (IS_BOLD(attr)) {
+	if (attr.IsBold()) {
 		if (fEmulateBold) {
 			inView->MovePenTo(x1 - 1, y1 + fFontAscent - 1);
 			inView->DrawString((char *)buf);
@@ -1097,7 +1094,7 @@ TermView::_DrawLinePart(float x1, float y1, uint32 attr, char *buf,
 	inView->SetDrawingMode(B_OP_COPY);
 
 	// underline attribute
-	if (IS_UNDER(attr)) {
+	if (attr.IsUnder()) {
 		inView->MovePenTo(x1, y1 + fFontAscent);
 		inView->StrokeLine(BPoint(x1 , y1 + fFontAscent),
 			BPoint(x2 , y1 + fFontAscent));
@@ -1116,7 +1113,7 @@ TermView::_DrawCursor()
 	int32 firstVisible = _LineAt(0);
 
 	UTF8Char character;
-	uint32 attr = 0;
+	Attributes attr;
 
 	bool cursorVisible = _IsCursorVisible();
 
@@ -1139,7 +1136,7 @@ TermView::_DrawCursor()
 			character, attr) == A_CHAR
 			&& (fCursorStyle == BLOCK_CURSOR || !cursorVisible)) {
 
-		int32 width = IS_WIDTH(attr) ? FULL_WIDTH : HALF_WIDTH;
+		int32 width = attr.IsWidth() ? FULL_WIDTH : HALF_WIDTH;
 		char buffer[5];
 		int32 bytes = UTF8Char::ByteCount(character.bytes[0]);
 		memcpy(buffer, character.bytes, bytes);
@@ -1160,15 +1157,15 @@ TermView::_DrawCursor()
 				fTextBuffer->GetCellAttributes(
 						fCursor.y, fCursor.x, attr, count);
 			else
-				attr = fVisibleTextBuffer->GetLineColor(
-						fCursor.y - firstVisible);
+				fVisibleTextBuffer->GetLineColor(fCursor.y - firstVisible, attr);
 
-			if (IS_BACKSET(attr))
-				rgb_back = fTextBuffer->PaletteColor(IS_BACKCOLOR(attr));
+			if (attr.IsBackSet())
+				rgb_back = attr.BackgroundColor(fTextBuffer->Palette());
+
 			SetHighColor(rgb_back);
 		}
 
-		if (IS_WIDTH(attr) && fCursorStyle != IBEAM_CURSOR)
+		if (attr.IsWidth() && fCursorStyle != IBEAM_CURSOR)
 			rect.right += fFontWidth;
 
 		FillRect(rect);
@@ -1339,7 +1336,7 @@ TermView::Draw(BRect updateRect)
 
 	// draw the affected line parts
 	if (x1 <= x2) {
-		uint32 attr = 0;
+		Attributes attr;
 
 		for (int32 j = y1; j <= y2; j++) {
 			int32 k = x1;
@@ -1383,12 +1380,10 @@ TermView::Draw(BRect updateRect)
 						rect.right = rect.left + fFontWidth * count - 1;
 						nextColumn = i + count;
 					} else
-						attr = fVisibleTextBuffer->GetLineColor(j - firstVisible);
+						fVisibleTextBuffer->GetLineColor(j - firstVisible, attr);
 
-					if (IS_BACKSET(attr)) {
-						int backcolor = IS_BACKCOLOR(attr);
-						rgb_back = fTextBuffer->PaletteColor(backcolor);
-					}
+					if (attr.IsBackSet())
+						rgb_back = attr.BackgroundColor(fTextBuffer->Palette());
 
 					SetHighColor(rgb_back);
 					rgb_back = HighColor();
@@ -1404,7 +1399,7 @@ TermView::Draw(BRect updateRect)
 				// side - drawing the whole string with one call render the
 				// characters not aligned to cells grid - that looks much more
 				// inaccurate for full-width strings than for half-width ones.
-				if (IS_WIDTH(attr))
+				if (attr.IsWidth())
 					count = FULL_WIDTH;
 
 				_DrawLinePart(fFontWidth * i, (int32)_LineOffset(j),
