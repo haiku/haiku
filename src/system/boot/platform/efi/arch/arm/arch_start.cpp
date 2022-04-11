@@ -26,6 +26,9 @@
 #define ALIGN_MEMORY_MAP	4
 
 
+extern "C" void clean_dcache_all(void);
+extern "C" void invalidate_icache_all(void);
+
 extern "C" typedef void (*arch_enter_kernel_t)(uint32_t, addr_t, addr_t, addr_t);
 
 
@@ -238,6 +241,9 @@ arch_start_kernel(addr_t kernelEntry)
 		mmu_read_TTBR0(), mmu_read_TTBR1(), mmu_read_TTBCR());
 	TRACE("DACR = 0x%08" B_PRIx32 "\n",
 		mmu_read_DACR());
+
+	clean_dcache_all();
+	invalidate_icache_all();
 
 	// Enter the kernel!
 	dprintf("enter_kernel(ttbr0: 0x%08x, kernelArgs: 0x%08x, "
