@@ -1,0 +1,5 @@
+Name: fuse
+Description: File System Userspace Executor
+Version: 2.7-Haiku
+Libs: -luserlandfs_fuse
+CFlags: -I/system/develop/headers/userlandfs/fuse/

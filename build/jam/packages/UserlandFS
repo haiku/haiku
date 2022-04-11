@@ -45,4 +45,11 @@ SEARCH on $(fuseHeaders)
 	= [ FDirName $(HAIKU_TOP) headers private userlandfs fuse ] ;
 AddFilesToPackage develop headers userlandfs fuse : $(fuseHeaders) ;
 
+# Pkg-config file (for ease of use with software designed for the original FUSE)
+
+local fusePkgConfig = fuse.pc ;
+fusePkgConfig = $(fusePkgConfig:G=userlandfs!fuse) ;
+SEARCH on $(fusePkgConfig) = [ FDirName $(HAIKU_TOP) data develop ] ;
+AddFilesToPackage develop lib pkgconfig : $(fusePkgConfig) ;
+
 BuildHaikuPackage $(userlandFSPackage) : userland_fs ;
