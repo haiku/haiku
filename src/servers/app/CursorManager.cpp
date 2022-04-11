@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2016, Haiku.
+ * Copyright 2001-2024, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,7 +12,6 @@
 
 #include "CursorManager.h"
 
-#include "CursorData.h"
 #include "ServerCursor.h"
 #include "ServerConfig.h"
 #include "ServerTokenSpace.h"
@@ -20,88 +19,99 @@
 #include <Autolock.h>
 #include <Directory.h>
 #include <String.h>
+#include <IconUtils.h>
+
+#include <agg_pixfmt_rgba.h>
+#include <agg_blur.h>
 
 #include <new>
 #include <stdio.h>
+
+#include "CursorData.cpp"
 
 
 CursorManager::CursorManager()
 	:
 	BLocker("CursorManager")
 {
-	// Init system cursors
-	const BPoint kHandHotspot(1, 1);
-	const BPoint kResizeHotspot(8, 8);
-	_InitCursor(fCursorSystemDefault, kCursorSystemDefaultBits,
-		B_CURSOR_ID_SYSTEM_DEFAULT, kHandHotspot);
-	_InitCursor(fCursorContextMenu, kCursorContextMenuBits,
-		B_CURSOR_ID_CONTEXT_MENU, kHandHotspot);
-	_InitCursor(fCursorCopy, kCursorCopyBits,
-		B_CURSOR_ID_COPY, kHandHotspot);
-	_InitCursor(fCursorCreateLink, kCursorCreateLinkBits,
-		B_CURSOR_ID_CREATE_LINK, kHandHotspot);
-	_InitCursor(fCursorCrossHair, kCursorCrossHairBits,
-		B_CURSOR_ID_CROSS_HAIR, BPoint(10, 10));
-	_InitCursor(fCursorFollowLink, kCursorFollowLinkBits,
-		B_CURSOR_ID_FOLLOW_LINK, BPoint(5, 0));
-	_InitCursor(fCursorGrab, kCursorGrabBits,
-		B_CURSOR_ID_GRAB, kHandHotspot);
-	_InitCursor(fCursorGrabbing, kCursorGrabbingBits,
-		B_CURSOR_ID_GRABBING, kHandHotspot);
-	_InitCursor(fCursorHelp, kCursorHelpBits,
-		B_CURSOR_ID_HELP, BPoint(0, 8));
-	_InitCursor(fCursorIBeam, kCursorIBeamBits,
-		B_CURSOR_ID_I_BEAM, BPoint(7, 9));
-	_InitCursor(fCursorIBeamHorizontal, kCursorIBeamHorizontalBits,
-		B_CURSOR_ID_I_BEAM_HORIZONTAL, BPoint(8, 8));
-	_InitCursor(fCursorMove, kCursorMoveBits,
-		B_CURSOR_ID_MOVE, kResizeHotspot);
-	_InitCursor(fCursorNoCursor, 0, B_CURSOR_ID_NO_CURSOR, BPoint(0, 0));
-	_InitCursor(fCursorNotAllowed, kCursorNotAllowedBits,
-		B_CURSOR_ID_NOT_ALLOWED, BPoint(8, 8));
-	_InitCursor(fCursorProgress, kCursorProgressBits,
-		B_CURSOR_ID_PROGRESS, BPoint(7, 10));
-	_InitCursor(fCursorResizeEast, kCursorResizeEastBits,
-		B_CURSOR_ID_RESIZE_EAST, kResizeHotspot);
-	_InitCursor(fCursorResizeEastWest, kCursorResizeEastWestBits,
-		B_CURSOR_ID_RESIZE_EAST_WEST, kResizeHotspot);
-	_InitCursor(fCursorResizeNorth, kCursorResizeNorthBits,
-		B_CURSOR_ID_RESIZE_NORTH, kResizeHotspot);
-	_InitCursor(fCursorResizeNorthEast, kCursorResizeNorthEastBits,
-		B_CURSOR_ID_RESIZE_NORTH_EAST, kResizeHotspot);
-	_InitCursor(fCursorResizeNorthEastSouthWest,
-		kCursorResizeNorthEastSouthWestBits,
-		B_CURSOR_ID_RESIZE_NORTH_EAST_SOUTH_WEST, kResizeHotspot);
-	_InitCursor(fCursorResizeNorthSouth, kCursorResizeNorthSouthBits,
-		B_CURSOR_ID_RESIZE_NORTH_SOUTH, kResizeHotspot);
-	_InitCursor(fCursorResizeNorthWest, kCursorResizeNorthWestBits,
-		B_CURSOR_ID_RESIZE_NORTH_WEST, kResizeHotspot);
-	_InitCursor(fCursorResizeNorthWestSouthEast,
-		kCursorResizeNorthWestSouthEastBits,
-		B_CURSOR_ID_RESIZE_NORTH_WEST_SOUTH_EAST, kResizeHotspot);
-	_InitCursor(fCursorResizeSouth, kCursorResizeSouthBits,
-		B_CURSOR_ID_RESIZE_SOUTH, kResizeHotspot);
-	_InitCursor(fCursorResizeSouthEast, kCursorResizeSouthEastBits,
-		B_CURSOR_ID_RESIZE_SOUTH_EAST, kResizeHotspot);
-	_InitCursor(fCursorResizeSouthWest, kCursorResizeSouthWestBits,
-		B_CURSOR_ID_RESIZE_SOUTH_WEST, kResizeHotspot);
-	_InitCursor(fCursorResizeWest, kCursorResizeWestBits,
-		B_CURSOR_ID_RESIZE_WEST, kResizeHotspot);
-	_InitCursor(fCursorZoomIn, kCursorZoomInBits,
-		B_CURSOR_ID_ZOOM_IN, BPoint(6, 6));
-	_InitCursor(fCursorZoomOut, kCursorZoomOutBits,
-		B_CURSOR_ID_ZOOM_OUT, BPoint(6, 6));
 }
 
 
-//! Does all the teardown
 CursorManager::~CursorManager()
+{
+	ReleaseCursors();
+}
+
+
+void
+CursorManager::InitializeCursors(float scale)
+{
+	if (scale < 1.0)
+		scale = 1.0;
+
+	const BPoint kHandHotspot(1, 1);
+	const BPoint kResizeHotspot(8, 8);
+
+	struct StandardCursor {
+		ServerCursor*& member;
+		BCursorID id;
+		const uint8* data;
+		uint32 dataLength;
+		BPoint hotspot;
+
+#define C(IDNAME, NAME, HOTSPOT) {fCursor##NAME, B_CURSOR_ID_##IDNAME, \
+		kCursor##NAME, B_COUNT_OF(kCursor##NAME), HOTSPOT}
+	} standardCursors[] = {
+		{fCursorNoCursor, B_CURSOR_ID_NO_CURSOR, NULL, 0, BPoint(0, 0)},
+
+		C(SYSTEM_DEFAULT,	SystemDefault,	kHandHotspot),
+		C(CONTEXT_MENU,		ContextMenu,	kHandHotspot),
+		C(COPY,				Copy,			kHandHotspot),
+		C(CREATE_LINK,		CreateLink,		kHandHotspot),
+		C(CROSS_HAIR,		CrossHair,		BPoint(10, 10)),
+		C(FOLLOW_LINK,		FollowLink,		BPoint(5, 0)),
+		C(GRAB,				Grab,			kHandHotspot),
+		C(GRABBING,			Grabbing,		kHandHotspot),
+		C(HELP,				Help,			BPoint(0, 8)),
+		C(I_BEAM,			IBeam,			BPoint(7, 9)),
+		C(I_BEAM_HORIZONTAL, IBeamHorizontal, BPoint(8, 8)),
+		C(MOVE,				Move,			kResizeHotspot),
+		C(NOT_ALLOWED,		NotAllowed,		BPoint(8, 8)),
+		C(PROGRESS,			Progress,		BPoint(7, 10)),
+		C(RESIZE_EAST,		ResizeEast,		kResizeHotspot),
+		C(RESIZE_EAST_WEST, ResizeEastWest, kResizeHotspot),
+		C(RESIZE_NORTH,		ResizeNorth,	kResizeHotspot),
+		C(RESIZE_NORTH_EAST, ResizeNorthEast, kResizeHotspot),
+		C(RESIZE_NORTH_EAST_SOUTH_WEST, ResizeNorthEastSouthWest, kResizeHotspot),
+		C(RESIZE_NORTH_SOUTH, ResizeNorthSouth, kResizeHotspot),
+		C(RESIZE_NORTH_WEST, ResizeNorthWest, kResizeHotspot),
+		C(RESIZE_NORTH_WEST_SOUTH_EAST, ResizeNorthWestSouthEast, kResizeHotspot),
+		C(RESIZE_SOUTH,		ResizeSouth,	kResizeHotspot),
+		C(RESIZE_SOUTH_EAST, ResizeSouthEast, kResizeHotspot),
+		C(RESIZE_SOUTH_WEST, ResizeSouthWest, kResizeHotspot),
+		C(RESIZE_WEST,		ResizeWest,		kResizeHotspot),
+		C(ZOOM_IN,			ZoomIn,			BPoint(6, 6)),
+		C(ZOOM_OUT,			ZoomOut,		BPoint(6, 6))
+	};
+#undef C
+
+	for (size_t i = 0; i < B_COUNT_OF(standardCursors); i++) {
+		const StandardCursor& info = standardCursors[i];
+		_InitCursor(info.member, info.id, info.data, info.dataLength, info.hotspot, scale);
+	}
+}
+
+
+void
+CursorManager::ReleaseCursors()
 {
 	for (int32 i = 0; i < fCursorList.CountItems(); i++) {
 		ServerCursor* cursor = ((ServerCursor*)fCursorList.ItemAtFast(i));
 		cursor->fManager = NULL;
+		fTokenSpace.RemoveToken(cursor->Token());
 		cursor->ReleaseReference();
 	}
+	fCursorList.MakeEmpty();
 }
 
 
@@ -158,14 +168,20 @@ CursorManager::CreateCursor(team_id clientTeam, BRect r, color_space format,
 int32
 CursorManager::AddCursor(ServerCursor* cursor, int32 token)
 {
-	if (!cursor)
+	if (cursor == NULL)
 		return B_BAD_VALUE;
 	if (!Lock())
 		return B_ERROR;
 
-	if (!fCursorList.AddItem(cursor)) {
-		Unlock();
-		return B_NO_MEMORY;
+	ServerCursor* oldCursor = FindCursor(token);
+	if (oldCursor != NULL) {
+		fCursorList.ReplaceItem(fCursorList.IndexOf(oldCursor), cursor);
+		oldCursor->ReleaseReference();
+	} else {
+		if (!fCursorList.AddItem(cursor)) {
+			Unlock();
+			return B_NO_MEMORY;
+		}
 	}
 
 	if (token == -1)
@@ -177,7 +193,6 @@ CursorManager::AddCursor(ServerCursor* cursor, int32 token)
 	cursor->AttachedToManager(this);
 
 	Unlock();
-
 	return token;
 }
 
@@ -375,22 +390,103 @@ CursorManager::FindCursor(int32 token)
 }
 
 
+BBitmap
+CursorManager::_RenderVectorCursor(uint32 size, const uint8* vector,
+	uint32 vectorSize, float shadowStrength)
+{
+	const uint32 flags = B_BITMAP_NO_SERVER_LINK;
+
+	// The cursor HVIFs need to be rendered at an equivalent of 32x32,
+	// with everything outside the 22x22 area discarded.
+	const int32 renderRectSize = (int32)(size * (32.0f / 22.0f));
+
+	BBitmap renderCursor(BRect(0, 0, renderRectSize - 1, renderRectSize - 1), flags, B_RGBA32);
+	status_t status = BIconUtils::GetVectorIcon(vector, vectorSize, &renderCursor);
+	if (status != B_OK) {
+		BBitmap fallback(BRect(0, 0, 21, 21), B_BITMAP_NO_SERVER_LINK, B_RGBA32);
+		fallback.SetBits(kCursorFallbackBits, 22 * 22 * 4, 0, B_RGBA32);
+		return fallback;
+	}
+
+	const BRect rect(0, 0, size - 1, size - 1);
+	BBitmap cursor(rect, flags, B_RGBA32);
+	cursor.ImportBits(&renderCursor, B_ORIGIN, B_ORIGIN, rect.Size());
+
+	BBitmap shadow(rect, flags, B_RGBA32);
+	memset(shadow.Bits(), 0, shadow.BitsLength());
+
+	{
+		int32 offset = size / 32;
+		if (offset == 0)
+			offset = 1; // <32px cursors
+
+		shadow.ImportBits(&cursor, BPoint(0, 0), BPoint(offset, offset),
+			BSize(size - offset - 1, size - offset - 1));
+
+		agg::rendering_buffer buffer((unsigned char*)shadow.Bits(),
+			size, size, shadow.BytesPerRow());
+		agg::pixfmt_rgba32 pixFmt(buffer);
+
+		agg::recursive_blur<agg::rgba8, agg::recursive_blur_calc_rgba<> > blur;
+		blur.blur(pixFmt, 1);
+
+		for (int32 i = 0; i < shadow.BitsLength(); i += 4) {
+			uint8* bits = (uint8*)shadow.Bits() + i;
+			bits[0] = 0;
+			bits[1] = 0;
+			bits[2] = 0;
+			bits[3] = (uint8)(bits[3] * shadowStrength);
+		}
+	}
+
+	BBitmap composite(rect, flags, B_RGBA32);
+
+	uint8* s = (uint8*)shadow.Bits();
+	uint8* c = (uint8*)cursor.Bits();
+	uint8* d = (uint8*)composite.Bits();
+	for (uint32 y = 0; y < size; y++) {
+		for (uint32 x = 0; x < size; x++) {
+			uint8 a = (uint8)(c[3] + (255 - c[3]) * (s[3] / 255.0));
+			d[3] = a;
+			for (int32 i = 0; i < 3; ++i) {
+				d[i] = ((s[i] * (255 - c[3]) + 255) >> 8) + c[i];
+
+				// premultiply
+				d[i] = (uint8)(d[i] * int32(a) / 255.0);
+			}
+			s += 4;
+			c += 4;
+			d += 4;
+		}
+	}
+
+	return composite;
+}
+
+
 /*!	\brief Initializes a predefined system cursor.
 
 	This method must only be called in the CursorManager's constructor,
 	as it may throw exceptions.
 */
 void
-CursorManager::_InitCursor(ServerCursor*& cursorMember,
-	const uint8* cursorBits, BCursorID id, const BPoint& hotSpot)
+CursorManager::_InitCursor(ServerCursor*& cursorMember, BCursorID id,
+	const uint8* vector, uint32 vectorSize, const BPoint& hotSpot, float scale)
 {
-	if (cursorBits) {
-		cursorMember = new ServerCursor(cursorBits, kCursorWidth,
-			kCursorHeight, kCursorFormat);
-	} else
-		cursorMember = new ServerCursor(kCursorNoCursor, 1, 1, kCursorFormat);
+	int32 cursorSize = (int32)(22 * scale);
+	float shadow = 3 / 10.0;
+	BPoint scaledHotspot((int32)(hotSpot.x * scale), (int32)(hotSpot.y * scale));
 
-	cursorMember->SetHotSpot(hotSpot);
+	if (vector != NULL) {
+		BBitmap bitmap = _RenderVectorCursor(cursorSize, vector, vectorSize, shadow);
+		cursorMember = new ServerCursor((uint8*)bitmap.Bits(), cursorSize,
+			cursorSize, bitmap.ColorSpace());
+	} else {
+		const unsigned char noCursor[] = {0x00, 0x00, 0x00, 0x00};
+		cursorMember = new ServerCursor(noCursor, 1, 1, B_RGBA32);
+	}
+
+	cursorMember->SetHotSpot(scaledHotspot);
 	AddCursor(cursorMember, id);
 }
 
@@ -401,13 +497,7 @@ CursorManager::_LoadCursor(ServerCursor*& cursorMember, const CursorSet& set,
 {
 	ServerCursor* cursor;
 	if (set.FindCursor(id, &cursor) == B_OK) {
-		int32 index = fCursorList.IndexOf(cursorMember);
-		if (index >= 0) {
-			ServerCursor** items = reinterpret_cast<ServerCursor**>(
-				fCursorList.Items());
-			items[index] = cursor;
-		}
-		delete cursorMember;
+		AddCursor(cursor, id);
 		cursorMember = cursor;
 	}
 }

@@ -62,7 +62,6 @@ Application app_server :
 	BitmapManager.cpp
 	Canvas.cpp
 	ClientMemoryAllocator.cpp
-	CursorData.cpp
 	CursorManager.cpp
 	CursorSet.cpp
 	DelayedMessage.cpp

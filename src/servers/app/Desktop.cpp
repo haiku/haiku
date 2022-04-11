@@ -558,6 +558,8 @@ Desktop::Init()
 	}
 #endif
 
+	fCursorManager.InitializeCursors(fSettings->DefaultBoldFont().Size() / 12.0f);
+
 	HWInterface()->SetDPMSMode(B_DPMS_ON);
 
 	float brightness = fWorkspaces[0].StoredScreenConfiguration().Brightness(0);
@@ -1774,6 +1776,8 @@ Desktop::FontsChanged(Window* window)
 	window->FontsChanged(&dirty);
 
 	RebuildAndRedrawAfterWindowChange(window, dirty);
+
+	fCursorManager.InitializeCursors(fSettings->DefaultBoldFont().Size() / 12.0f);
 }
 
 
