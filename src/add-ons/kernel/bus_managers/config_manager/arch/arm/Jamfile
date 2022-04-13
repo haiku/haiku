@@ -4,7 +4,5 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 
 UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_ARCH) ] ;
 
-KernelStaticLibrary config_manager_arch : 
-	config_manager_arch.c
+KernelStaticLibrary config_manager_arch :
 	;
-
