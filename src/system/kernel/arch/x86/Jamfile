@@ -28,7 +28,6 @@ if $(TARGET_ARCH) = x86_64 {
 		errata.cpp
 		interrupts.S
 		signals.cpp
-		signals_asm.S
 		syscalls.cpp
 		thread.cpp
 
