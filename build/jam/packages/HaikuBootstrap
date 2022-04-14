@@ -161,7 +161,7 @@ AddFilesToPackage data KeyboardLayouts ThinkPad
 
 # boot module links
 AddBootModuleSymlinksToPackage
-	acpi@x86,x86_64 ata pci isa@x86,x86_64 config_manager dpc
+	acpi@x86,x86_64 ata pci isa@x86,x86_64 dpc
 	scsi usb
 	openpic@ppc
 	ata_adapter locked_pool scsi_periph
