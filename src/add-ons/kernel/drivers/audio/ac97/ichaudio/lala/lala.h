@@ -2,7 +2,6 @@
 #define __LALA_H
 
 #include <KernelExport.h>
-#include <config_manager.h>
 #include <PCI.h>
 #include <OS.h>
 #include <malloc.h>

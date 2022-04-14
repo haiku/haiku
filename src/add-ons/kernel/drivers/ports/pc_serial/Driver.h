@@ -17,7 +17,6 @@
 #include <Drivers.h>
 #include <ISA.h>
 #include <PCI.h>
-#include <config_manager.h>
 #include <string.h>
 
 #include <lock.h>
@@ -51,6 +50,16 @@ extern "C" {
 #define PCI_serial_16950        0x06                    /* 16950-compatible serial controller */
 #endif
 
+
+
+typedef enum {
+    B_ISA_BUS,
+    B_PCI_BUS,
+    B_PCMCIA_BUS,
+    B_UNKNOWN_BUS = 0x80
+} bus_type;
+
+
 class SerialDevice;
 
 struct port_constraints {
@@ -65,7 +74,7 @@ struct port_constraints {
 #define PCI_INVAL 0xffff
 
 struct serial_support_descriptor {
-	bus_type bus;	// B_*_BUS
+	const bus_type bus;   // B_*_BUS
 	const char *name;
 	const uint32 *bauds;
 	// not yet used
@@ -88,13 +97,13 @@ struct serial_support_descriptor {
 typedef struct serial_support_descriptor serial_support_descriptor;
 
 
-struct serial_config_descriptor {
-	bus_type bus;	// B_*_BUS
-	struct serial_support_descriptor *descriptor;
-	union {
-		struct pci_info pci;
-	} d;
-};
+//struct serial_config_descriptor {
+//	bus_type bus;	// B_*_BUS
+//	struct serial_support_descriptor *descriptor;
+//	union {
+//		struct pci_info pci;
+//	} d;
+//};
 
 
 /* This one rounds the size to integral count of segs (segments) */
@@ -126,7 +135,6 @@ typedef struct pc_serial_line_coding_s {
 #define CLS_LINE_RTS			0x0002
 
 
-extern config_manager_for_driver_module_info *gConfigManagerModule;
 extern isa_module_info *gISAModule;
 extern pci_module_info *gPCIModule;
 extern tty_module_info *gTTYModule;
