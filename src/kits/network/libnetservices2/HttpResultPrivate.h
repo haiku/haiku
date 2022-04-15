@@ -16,6 +16,7 @@
 
 #include <DataIO.h>
 #include <OS.h> 
+#include <String.h>
 
 
 namespace BPrivate {
@@ -40,14 +41,14 @@ struct HttpResultPrivate {
 
 	// Data
 			std::optional<BHttpStatus>	status;
-//			std::optional<BHttpHeaders>	headers;
-//			std::optional<BHttpBody>	body;
+			std::optional<BHttpFields>	fields;
+			std::optional<BHttpBody>	body;
 			std::optional<std::exception_ptr>	error;
 
 	// Body storage
-			std::unique_ptr<BDataIO>	owned_body = nullptr;
+			std::unique_ptr<BDataIO>	ownedBody = nullptr;
 	//		std::shared_ptr<BMemoryRingIO>	shared_body = nullptr;
-			std::string					body_text;
+			BString						bodyText;
 
 	// Utility functions
 										HttpResultPrivate(int32 identifier);
@@ -56,8 +57,8 @@ struct HttpResultPrivate {
 			void						SetCancel();
 			void						SetError(std::exception_ptr e);
 			void						SetStatus(BHttpStatus&& s);
-//			void						SetHeaders(BHttpHeaders&& h);
-//			void						SetBody();
+			void						SetFields(BHttpFields&& f);
+			void						SetBody();
 			ssize_t						WriteToBody(const void* buffer, ssize_t size);
 };
 
@@ -112,22 +113,22 @@ HttpResultPrivate::SetStatus(BHttpStatus&& s)
 }
 
 
-//inline void
-//HttpResultPrivate::SetHeaders(BHttpHeaders&& h)
-//{
-//	headers = std::move(h);
-//	atomic_set(&requestStatus, kHeadersReady);
-//	release_sem(data_wait);
-//}
+inline void
+HttpResultPrivate::SetFields(BHttpFields&& f)
+{
+	fields = std::move(f);
+	atomic_set(&requestStatus, kHeadersReady);
+	release_sem(data_wait);
+}
 
 
-//inline void
-//HttpResultPrivate::SetBody()
-//{
-//	body = BHttpBody{std::move(owned_body), std::move(body_text)};
-//	atomic_set(&requestStatus, kBodyReady);
-//	release_sem(data_wait);
-//}
+inline void
+HttpResultPrivate::SetBody()
+{
+	body = BHttpBody{std::move(ownedBody), std::move(bodyText)};
+	atomic_set(&requestStatus, kBodyReady);
+	release_sem(data_wait);
+}
 
 
 inline ssize_t
@@ -135,11 +136,11 @@ HttpResultPrivate::WriteToBody(const void* buffer, ssize_t size)
 {
 	// TODO: when the support for a shared BMemoryRingIO is here, choose
 	// between one or the other depending on which one is available.
-	if (owned_body == nullptr) {
-		body_text.append(static_cast<const char*>(buffer), size);
+	if (ownedBody == nullptr) {
+		bodyText.Append(static_cast<const char*>(buffer), size);
 		return size;
 	}
-	return owned_body->Write(buffer, size);
+	return ownedBody->Write(buffer, size);
 }
 
 

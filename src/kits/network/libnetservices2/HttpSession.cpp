@@ -6,12 +6,14 @@
  *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  */
 
+#include <algorithm>
 #include <deque>
 #include <map>
+#include <optional>
 #include <vector>
 
 #include <AutoLocker.h>
-#include <DynamicBuffer.h>
+#include <DataIO.h>
 #include <ErrorsExt.h>
 #include <HttpFields.h>
 #include <HttpRequest.h>
@@ -26,13 +28,41 @@
 #include <OS.h>
 #include <SecureSocket.h>
 #include <Socket.h>
-#include <StackOrHeapArray.h>
 #include <ZlibCompressionAlgorithm.h>
 
 #include "HttpResultPrivate.h"
 #include "NetServicesPrivate.h"
 
 using namespace BPrivate::Network;
+
+
+/*!
+	\brief Size of subsequent reads
+
+	Curl 7.82.0 sets the default to 512 kB (524288 bytes)
+		https://github.com/curl/curl/blob/64db5c575d9c5536bd273a890f50777ad1ca7c13/include/curl/curl.h#L232
+	Libsoup sets it to 8 kB, though the buffer may grow beyond that if there are leftover bytes.
+	The absolute maximum seems to be 64 kB (HEADER_SIZE_LIMIT)
+		https://gitlab.gnome.org/GNOME/libsoup/-/blob/master/libsoup/http1/soup-client-message-io-http1.c#L58
+	The previous iteration set it to 4 kB, though the input buffer would dynamically grow.
+*/
+static constexpr ssize_t kMaxReadSize = 8192;
+
+/*!
+	\brief Maximum size of the HTTP Header lines of the message.
+	
+	In the RFC there is no maximum, but we need to prevent the situation where we keep growing the
+	internal buffer waiting for the end of line ('\r\n\') characters to occur.
+*/
+static constexpr ssize_t kMaxHeaderLineSize = 64 * 1024;
+
+
+/*!
+	\brief Newline sequence
+
+	As per the RFC, defined as \r\n
+*/
+static constexpr std::array<std::byte, 2> kNewLine = {std::byte('\r'), std::byte('\n')};
 
 
 class BHttpSession::Request {
@@ -45,6 +75,7 @@ public:
 	enum RequestState {
 		InitialState,
 		Connected,
+		RequestSent,
 		StatusReceived,
 		HeadersReceived,
 		ContentReceived,
@@ -65,8 +96,13 @@ public:
 	void							Disconnect() noexcept;
 
 	// Object information
-	int							Socket() const noexcept { return fSocket->Socket(); }
+	int								Socket() const noexcept { return fSocket->Socket(); }
 	int32							Id() const noexcept { return fResult->id; }
+	bool							CanCancel() const noexcept { return fResult->CanCancel(); }
+
+private:
+	std::optional<BString>			_GetLine(std::vector<std::byte>::const_iterator& offset);
+	BHttpStatus						_ParseStatus(BString&& statusLine);
 
 private:
 	BHttpRequest					fRequest;
@@ -86,20 +122,18 @@ private:
 	std::unique_ptr<BAbstractDataStream>
 									fDataStream;
 
+	// Receive buffers
+	std::vector<std::byte>			fInputBuffer;
+
 	// Receive state
-/*	bool							receiveEnd = false;
-	bool							parseEnd = false;
-	BNetBuffer						inputBuffer;
-	size_t							previousBufferSize = 0;
-	off_t							bytesReceived = 0;
-	off_t							bytesTotal = 0;
-	BHttpFields						headers;
-	bool							readByChunks = false;
-	bool							decompress = false;
-	DynamicBuffer					decompressorStorage;
-	std::unique_ptr<BDataIO>		decompressingStream = nullptr;
-	std::vector<char>				inputTempBuffer = std::vector<char>(4096);
-	BHttpStatus						status; */
+	off_t							fBodyBytesTotal = 0;
+	off_t							fBodyBytesReceived = 0;
+	BHttpFields						fFields;
+
+	// Optional decompression
+	std::unique_ptr<BMallocIO>		fDecompressorStorage = nullptr;
+	std::unique_ptr<BDataIO>		fDecompressingStream = nullptr;
+
 	// TODO: reset method to reset Connection and Receive State when redirected
 
 };
@@ -194,7 +228,7 @@ BHttpSession::Impl::Execute(BHttpRequest&& request, std::unique_ptr<BDataIO> tar
 	return retval;
 }
 
-
+#include <iostream>
 /*static*/ status_t
 BHttpSession::Impl::ControlThreadFunc(void* arg)
 {
@@ -220,6 +254,8 @@ BHttpSession::Impl::ControlThreadFunc(void* arg)
 			impl->fControlQueue.pop_front();
 			impl->fLock.Unlock();
 
+			std::cout << "ControlThreadFunc(): processing request " << request.Id() << std::endl;
+
 			switch (request.State()) {
 				case Request::InitialState:
 				{
@@ -228,6 +264,7 @@ BHttpSession::Impl::ControlThreadFunc(void* arg)
 						request.ResolveHostName();
 						request.OpenConnection();
 					} catch (...) {
+						std::cout << "ControlThreadFunc()[" << request.Id() << "] error resolving/connecting" << std::endl;
 						request.SetError(std::current_exception());
 						hasError = true;
 					}
@@ -237,13 +274,6 @@ BHttpSession::Impl::ControlThreadFunc(void* arg)
 						break;
 					}
 
-					// TODO: temporary end of the line here, as data thread not implemented
-					try {
-						throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::Canceled);
-					} catch (...) {
-						request.SetError(std::current_exception());
-						break;
-					}
 					impl->fLock.Lock();
 					impl->fDataQueue.push_back(std::move(request));
 					impl->fLock.Unlock();
@@ -304,9 +334,11 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 
 	while (true) {
 		if (auto status = wait_for_objects(data->objectList.data(), data->objectList.size());
-			status < B_OK)
-		{
+				status == B_INTERRUPTED)
+			continue;
+		else if (status < 0) {
 			// Something went inexplicably wrong
+			std::cout << "BSystemError wait_for_objects() " << status << std::endl;
 			throw BSystemError("wait_for_objects()", status);
 		}
 
@@ -365,10 +397,12 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 				continue;
 			if ((item.events & B_EVENT_WRITE) == B_EVENT_WRITE) {
 				auto& request = data->connectionMap.find(item.object)->second;
+				std::cout << "DataThreadFunc() [" << request.Id() << "] ready for sending the request" << std::endl;
 				auto error = false;
 				try {
 					request.TransferRequest();
 				} catch (...) {
+					std::cout << "DataThreadFunc() [" << request.Id() << "] error sending the request" << std::endl;
 					request.SetError(std::current_exception());
 					error = true;
 				}
@@ -381,35 +415,24 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 				}
 			} else if ((item.events & B_EVENT_READ) == B_EVENT_READ) {
 				auto& request = data->connectionMap.find(item.object)->second;
+				std::cout << "DataThreadFunc() [" << request.Id() << "] ready for receiving the response" << std::endl;
 				auto finished = false;
-				// TODO: replace the 5 lines below
+				auto success = false;
 				try {
-					throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::Canceled);
+					finished = request.ReceiveResult();
+					success = true;
 				} catch (...) {
 					request.SetError(std::current_exception());
 					finished = true;
 				}
 
-/* TODO with a properly implement read
-				auto& request = data->connectionMap.find(item.object)->second;
-				auto success = false;
-				try {
-					finished = _RequestRead(request);
-					if (finished)
-						request.result->SetBody();
-					success = true;
-				} catch (...) {
-					request.result->SetError(std::current_exception());
-					finished = true;
-				}
-*/
-
-/*				if (request.result->CanCancel()) {
+				if (request.CanCancel()) {
 					// This could be done earlier, but this seems cleaner for the flow
+					std::cout << "DataThreadFunc() [" << request.Id() << "] CanCancel() true" << std::endl;
 					request.Disconnect();
 					data->connectionMap.erase(item.object);
 					resizeObjectList = true;
-				} else */ if (finished) {
+				} else if (finished) {
 					request.Disconnect();
 					/* TODO: implement this somewhere else
 					if (request.observer.IsValid()) {
@@ -464,6 +487,7 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 		// Reset objectList
 		data->objectList[0].events = B_EVENT_ACQUIRE_SEMAPHORE;
 		if (resizeObjectList) {
+			std::cout << "DataThreadFunc() resizing objectlist to " << data->connectionMap.size() + 1 << std::endl;
 			data->objectList.resize(data->connectionMap.size() + 1);
 		}
 		auto i = 1;
@@ -471,10 +495,13 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 			data->objectList[i].object = it->first;
 			if (it->second.State() == Request::InitialState)
 				throw BRuntimeError(__PRETTY_FUNCTION__, "Invalid state of request");
-			else if (it->second.State() == Request::Connected)
+			else if (it->second.State() == Request::Connected) {
 				data->objectList[i].events = B_EVENT_WRITE | B_EVENT_DISCONNECTED;
-			else
+				std::cout << "DataThreadFunc() [ " << it->second.Id() << "] wait for B_EVENT_WRITE" << std::endl;
+			} else {
+				std::cout << "DataThreadFunc() [ " << it->second.Id() << "] wait for B_EVENT_READ" << std::endl;
 				data->objectList[i].events = B_EVENT_READ | B_EVENT_DISCONNECTED;
+			}
 			i++;
 		}
 	}
@@ -540,7 +567,7 @@ BHttpSession::Request::Request(BHttpRequest&& request, std::unique_ptr<BDataIO> 
 
 	// create shared data
 	fResult = std::make_shared<HttpResultPrivate>(identifier);
-	fResult->owned_body = std::move(target);
+	fResult->ownedBody = std::move(target);
 }
 
 
@@ -563,6 +590,7 @@ BHttpSession::Request::ResolveHostName()
 		throw BNetworkRequestError("BNetworkAddress::SetTo()",
 			BNetworkRequestError::HostnameError, status);
 	}
+	std::cout << "ResolveHostName() [" << Id() << "] Hostname resolved" << std::endl;
 }
 
 
@@ -572,6 +600,8 @@ BHttpSession::Request::ResolveHostName()
 void
 BHttpSession::Request::OpenConnection()
 {
+	std::cout << "OpenConnection() [" << Id() << "] Opening Connection" << std::endl;
+
 	// Set up the socket
 	if (fRequest.Url().Protocol() == "https") {
 		// To do: secure socket with callbacks to check certificates
@@ -608,6 +638,8 @@ BHttpSession::Request::OpenConnection()
 void
 BHttpSession::Request::TransferRequest()
 {
+	std::cout << "TransferRequest() [" << Id() << "] Starting sending of request" << std::endl;
+
 	// Assert that we are in the right state
 	if (fRequestStatus != Connected)
 		throw BRuntimeError(__PRETTY_FUNCTION__,
@@ -620,7 +652,254 @@ BHttpSession::Request::TransferRequest()
 		= fDataStream->Transfer(fSocket.get());
 
 	// TODO: notification
+
+	if (complete)
+		fRequestStatus = RequestSent;
+
+	std::cout << "TransferRequest() [" << Id() << "] currentBytesWritten: " << currentBytesWritten << " totalBytesWritten: " <<
+		totalBytesWritten << " totalSize: " << totalSize << " complete: " << complete << std::endl;
 }
+
+
+/*!
+	\brief Transfer data from the socket and parse the result.
+
+	\returns \c true if the request is complete, or false if there is more.
+*/
+bool
+BHttpSession::Request::ReceiveResult()
+{
+	ssize_t bytesRead = 0;
+	bool receiveEnd = false;
+
+	// First: stream data from the socket
+	auto newDataOffset = fInputBuffer.size();
+	std::cout << "ReceiveResult() [" << Id() << "] before receive fInputBuffer.size() " << fInputBuffer.size() << std::endl;
+
+	fInputBuffer.resize(newDataOffset + kMaxReadSize);
+	bytesRead = fSocket->Read(fInputBuffer.data() + newDataOffset, kMaxReadSize);
+
+	if (bytesRead == B_WOULD_BLOCK || bytesRead == B_INTERRUPTED) {
+		fInputBuffer.resize(newDataOffset); // revert to previous size of the data in the buffer
+		return false;
+	}
+
+	if (bytesRead < 0) {
+		std::cout << "ReceiveResult() [" << Id() << "] BSocket::Read error " << bytesRead << std::endl;
+		throw BNetworkRequestError("BSocket::Read()", BNetworkRequestError::NetworkError,
+			bytesRead);
+	} else if (bytesRead == 0) {
+		// This may occur when the connection is closed (and the transfer is finished).
+		// Later on, there is a check to determine whether the request is finished as expected.
+		receiveEnd = true;
+		fInputBuffer.resize(newDataOffset); // revert to previous size of the data in buffer
+	}
+	fInputBuffer.resize(newDataOffset + bytesRead);
+	std::cout << "ReceiveResult() [" << Id() << "] after fInputBuffer.size() " << fInputBuffer.size() << std::endl;
+
+	// Parse the content in the buffer
+	auto bufferStart = fInputBuffer.cbegin();
+	switch (fRequestStatus) {
+	case InitialState:
+	[[fallthrough]];
+	case Connected:
+		throw BRuntimeError(__PRETTY_FUNCTION__,
+			"Read function called for object that is not yet connected or sent");
+	case RequestSent:
+	{
+		auto statusLine = _GetLine(bufferStart);
+		BHttpStatus status;
+
+		if (statusLine) {
+			std::cout << "statusLine: " << statusLine.value() << std::endl;
+			status = _ParseStatus(std::move(statusLine.value()));
+		}
+		if (status.code != 0) {
+			// the status headers are now received, decide what to do next
+
+			// TODO: handle the case where we have a redirect code and we want to follow redirect
+
+			// TODO: handle the case where we have an error code and we want to stop on error
+
+			fResult->SetStatus(std::move(status));
+
+			// TODO: inform listeners of receiving the status code
+
+			fRequestStatus = StatusReceived;
+		} else {
+			// We do not have enough data for the status line yet, continue receiving data.
+			return false;
+		}
+
+		[[fallthrough]];
+	}
+	case StatusReceived:
+	{
+		auto fieldLine = _GetLine(bufferStart);
+		while (fieldLine && !fieldLine.value().IsEmpty()){
+			std::cout << "ReceiveResult() [" << Id() << "] StatusReceived; adding header " << fieldLine.value() << std::endl;
+			// Parse next header line
+			fFields.AddField(fieldLine.value());
+			fieldLine = _GetLine(bufferStart);
+		}
+
+		if (fieldLine && fieldLine.value().IsEmpty()){
+			std::cout << "ReceiveResult() [" << Id() << "] End of Header Block of Message" << std::endl;
+			// end of the header section of the message
+		} else {
+			// no more lines to process, and we are not done with receiving headers yet.
+			break;
+		}
+
+		// The headers have been received, now set up the rest of the response handling
+
+		// TODO: handle redirect
+
+		// TODO: Parse received cookies
+
+		// Handle Chunked Transfers
+		auto header = fFields.FindField("Transfer-Encoding");
+		if (header != fFields.end() && header->Value() == "chunked") {
+			// TODO: Implement chunked transfers
+			throw BRuntimeError(__PRETTY_FUNCTION__, "Chunked transfers are not supported");
+		}
+
+		// Content-encoding
+		header = fFields.FindField("Content-Encoding");
+		if (header != fFields.end()
+			&& (header->Value() == "gzip" || header->Value() == "deflate"))
+		{
+			std::cout << "ReceiveResult() [" << Id() << "] Content-Encoding has compression: " <<  header->Value() << std::endl;
+
+			fDecompressorStorage = std::make_unique<BMallocIO>();
+
+			BDataIO* stream = nullptr;
+			auto result = BZlibCompressionAlgorithm()
+				.CreateDecompressingOutputStream(fDecompressorStorage.get(), nullptr, stream);
+			
+			if (result != B_OK) {
+				throw BNetworkRequestError(
+					"BZlibCompressionAlgorithm().CreateCompressingOutputStream",
+					BNetworkRequestError::SystemError, result);
+			}
+
+			fDecompressingStream = std::unique_ptr<BDataIO>(stream);
+		}
+
+		// Content-length
+		header = fFields.FindField("Content-Length");
+		if (header != fFields.end()) {
+			try {
+				auto contentLength = std::string(header->Value());
+				fBodyBytesTotal = std::stol(contentLength);
+			} catch (const std::logic_error& e) {
+				throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+			}
+		}
+
+		// TODO: check if we are head only or if there is no content
+
+		// TODO: move headers to the result and inform listener
+		fResult->SetFields(std::move(fFields));
+
+		fRequestStatus = HeadersReceived;
+		[[fallthrough]];
+	}
+	case HeadersReceived:
+	{
+		// TODO: handle chunked transfer
+
+		bytesRead = std::distance(bufferStart, fInputBuffer.cend());
+		fBodyBytesReceived += bytesRead;
+		std::cout << "ReceiveResult() [" << Id() << "] body bytes current read/total received/total expected: " << 
+			bytesRead << "/" << fBodyBytesReceived << "/" << fBodyBytesTotal  << std::endl;
+
+		// Normally, the request is done when the number of bytes received is the number of bytes expected.
+		// The exceptions are:
+		//	For chunked transfers (with unknown total size)
+		//	HTTP HEAD requests (will never have a body)
+		if (fBodyBytesTotal > 0 && fBodyBytesReceived == fBodyBytesTotal) {
+			std::cout << "ReceiveResult() [" << Id() << "] received all body bytes: " << fBodyBytesTotal << std::endl;
+			receiveEnd = true;
+		} else if (fBodyBytesTotal > 0 && fBodyBytesReceived > fBodyBytesTotal) {
+			std::cout << "ReceiveResult() [" << Id() << "] received more body than expected: "
+				<< fBodyBytesReceived << "/" << fBodyBytesTotal << std::endl;
+			throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+		}
+
+		// TODO: check for HEAD requests and chunked requests
+
+		// Process the incoming data and write to body
+		if (bytesRead > 0) {
+			if (fDecompressingStream) {
+				auto status = fDecompressingStream->WriteExactly(std::addressof(*bufferStart),
+					bytesRead);
+				if (status != B_OK) {
+					throw BNetworkRequestError("BZlibDecompressionStream::WriteExactly()",
+						BNetworkRequestError::SystemError, status);
+				}
+
+				if (receiveEnd) {
+					// No more bytes expected so flush out the final bytes
+					if (auto s = fDecompressingStream->Flush(); s != B_OK)
+						throw BNetworkRequestError("BZlibDecompressionStream::Flush()",
+							BNetworkRequestError::SystemError, status);
+				}
+
+				if (auto bodySize = fDecompressorStorage->Position(); bodySize > 0) {
+					std::cout << "ReceiveResult() [" << Id() << "] Decompressed " << bodySize << " bytes and copying into target." << std::endl;
+					fResult->WriteToBody(fDecompressorStorage->Buffer(), bodySize);
+					fDecompressorStorage->Seek(0, SEEK_SET);
+				}
+				bufferStart = fInputBuffer.cend();
+			} else {
+				fResult->WriteToBody(std::addressof(*bufferStart), bytesRead);
+				bufferStart = fInputBuffer.cend();
+			}
+		}
+
+		if (receiveEnd) {
+			// Normally, the request is done when the number of bytes received is the number of bytes expected.
+			// The exceptions are:
+			//	For chunked transfers (with unknown total size)
+			//	HTTP HEAD requests (will never have a body)
+			if (fBodyBytesTotal > 0) {
+				if(fBodyBytesReceived == fBodyBytesTotal) {
+					std::cout << "ReceiveResult() [" << Id() << "] received all body bytes: " << fBodyBytesTotal << std::endl;
+					fResult->SetBody();
+					return true;
+				} else {
+					throw BNetworkRequestError(__PRETTY_FUNCTION__,
+						BNetworkRequestError::ProtocolError);
+				}
+			} else {
+				// TODO: validate that HTTP HEAD requests are handled perfectly
+				// The expectation is that broken HTTP chunked requests would be noticed before here.
+				fResult->SetBody();
+				return true;
+			}
+		}
+		break;
+	}
+	default:
+		throw BRuntimeError(__PRETTY_FUNCTION__, "To do");
+	}
+
+	// Check if there are any remaining bytes in the inputbuffer
+	if (bufferStart != fInputBuffer.cend()) {
+		// move those bytes to the beginning and resize
+		auto bytesleft = std::distance(bufferStart, fInputBuffer.cend());
+		std::cout << "ReceiveResult() [" << Id() << "] fInputBuffer bytes left at end: " << bytesleft << std::endl;
+		std::copy(bufferStart, fInputBuffer.cend(), fInputBuffer.begin());
+		fInputBuffer.resize(bytesleft);
+	} else {
+		fInputBuffer.resize(0);
+	}
+
+	// There is more to receive
+	return false;
+}
+
 
 
 /*!
@@ -632,4 +911,61 @@ BHttpSession::Request::Disconnect() noexcept
 	fSocket->Disconnect();
 
 	// TODO: inform listeners that the request has ended
+}
+
+
+/*!
+	\brief Get a line from the input buffer
+
+	If succesful, the offset will be updated to the next byte after the line
+*/
+std::optional<BString>
+BHttpSession::Request::_GetLine(std::vector<std::byte>::const_iterator& offset)
+{
+	auto result = std::search(offset, fInputBuffer.cend(), kNewLine.cbegin(), kNewLine.cend());
+	if (result == fInputBuffer.cend())
+		return std::nullopt;
+
+	BString line(reinterpret_cast<const char*>(std::addressof(*offset)), std::distance(offset, result));
+	offset = result + 2;
+	std::cout << "_GetLine() [" << Id() << "] " << line << std::endl;
+	return line;
+}
+
+
+/*!
+	\brief Parse a HTTP status line, and return a BHttpStatus object on success
+
+	\exception BNetworkRequestError If the status line does not follow protocol.
+*/
+BHttpStatus
+BHttpSession::Request::_ParseStatus(BString&& statusLine)
+{
+	// From the RFC:
+	//	status-line = HTTP-version SP status-code SP reason-phrase CRLF
+	//	note that the reason phrase may also contain spaces.
+
+	std::cout << "_ParseStatus() [" << Id() << "] status line: " << statusLine << std::endl;
+
+	auto codeStart = statusLine.FindFirst(' ') + 1;
+	if (codeStart < 0)
+		throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+
+	auto codeEnd = statusLine.FindFirst(' ', codeStart);
+
+	if (codeEnd < 0 || (codeEnd - codeStart) != 3)
+		throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+
+	std::string statusCodeString(statusLine.String() + codeStart, 3);
+	std::cout << "_ParseStatus() [" << Id() << "] status code string: " << statusCodeString << std::endl;
+
+	// build the output
+	BHttpStatus status = {0, std::move(statusLine)};
+	try {
+		status.code = std::stol(statusCodeString);
+	} catch (...) {
+		throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+	}
+
+	return status;
 }

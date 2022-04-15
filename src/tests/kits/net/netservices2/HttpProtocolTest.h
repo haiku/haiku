@@ -38,6 +38,7 @@ public:
 
 
 			void	HostAndNetworkFailTest();
+			void	GetTest();
 
 	static	void	AddTests(BTestSuite& suite);
 

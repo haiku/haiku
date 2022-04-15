@@ -8,6 +8,7 @@
 
 
 #include <ErrorsExt.h>
+#include <HttpFields.h>
 #include <HttpResult.h>
 
 #include "HttpResultPrivate.h"
@@ -36,9 +37,30 @@ BHttpResult::~BHttpResult()
 BHttpResult&
 BHttpResult::operator=(BHttpResult&& other) noexcept = default;
 
-
+#include <iostream>
 const BHttpStatus&
 BHttpResult::Status() const
+{
+	if (!fData)
+		throw BRuntimeError(__PRETTY_FUNCTION__, "The BHttpResult object is no longer valid");
+	status_t status = B_OK;
+	while (status == B_INTERRUPTED || status == B_OK) {
+		auto dataStatus = fData->GetStatusAtomic();
+		std::cout << "BHttpResult::Status() dataStatus " << dataStatus << std::endl;
+		if (dataStatus == HttpResultPrivate::kError)
+			std::rethrow_exception(*(fData->error));
+
+		if (dataStatus >= HttpResultPrivate::kStatusReady)
+			return fData->status.value();
+
+		status = acquire_sem(fData->data_wait);
+	}
+	throw BRuntimeError(__PRETTY_FUNCTION__, "Unexpected error waiting for status!");
+}
+
+
+const BHttpFields&
+BHttpResult::Fields() const
 {
 	if (!fData)
 		throw BRuntimeError(__PRETTY_FUNCTION__, "The BHttpResult object is no longer valid");
@@ -48,12 +70,32 @@ BHttpResult::Status() const
 		if (dataStatus == HttpResultPrivate::kError)
 			std::rethrow_exception(*(fData->error));
 
-		if (dataStatus >= HttpResultPrivate::kStatusReady)
-			return *(fData->status);
+		if (dataStatus >= HttpResultPrivate::kHeadersReady)
+			return *(fData->fields);
 
 		status = acquire_sem(fData->data_wait);
 	}
-	throw BRuntimeError(__PRETTY_FUNCTION__, "Unexpected error waiting for status!");
+	throw BRuntimeError(__PRETTY_FUNCTION__, "Unexpected error waiting for fields!");
+}
+
+
+BHttpBody&
+BHttpResult::Body() const
+{
+	if (!fData)
+		throw BRuntimeError(__PRETTY_FUNCTION__, "The BHttpResult object is no longer valid");
+	status_t status = B_OK;
+	while (status == B_INTERRUPTED || status == B_OK) {
+		auto dataStatus = fData->GetStatusAtomic();
+		if (dataStatus == HttpResultPrivate::kError)
+			std::rethrow_exception(*(fData->error));
+
+		if (dataStatus >= HttpResultPrivate::kBodyReady)
+			return *(fData->body);
+
+		status = acquire_sem(fData->data_wait);
+	}
+	throw BRuntimeError(__PRETTY_FUNCTION__, "Unexpected error waiting for the body!");
 }
 
 
@@ -67,7 +109,7 @@ BHttpResult::HasStatus() const
 
 
 bool
-BHttpResult::HasHeaders() const
+BHttpResult::HasFields() const
 {
 	if (!fData)
 		throw BRuntimeError(__PRETTY_FUNCTION__, "The BHttpResult object is no longer valid");

@@ -28,6 +28,8 @@ using BPrivate::Network::BHttpSession;
 using BPrivate::Network::BHttpRequestStream;
 using BPrivate::Network::BNetworkRequestError;
 
+using namespace std::literals;
+
 
 HttpProtocolTest::HttpProtocolTest()
 {
@@ -38,8 +40,6 @@ HttpProtocolTest::HttpProtocolTest()
 void
 HttpProtocolTest::HttpFieldsTest()
 {
-	using namespace std::literals;
-
 	// Header field name validation (ignore value validation)
 	{
 		auto fields = BHttpFields();
@@ -55,8 +55,6 @@ HttpProtocolTest::HttpFieldsTest()
 			CPPUNIT_FAIL("Creating a header with an invalid name did not raise an exception");
 		} catch (const BHttpFields::InvalidInput& e) {
 			// success
-		} catch (...) {
-			CPPUNIT_FAIL("Unexpected exception when creating a header with an invalid name");
 		}
 	}
 	// Header field value validation (ignore name validation)
@@ -74,8 +72,6 @@ HttpProtocolTest::HttpFieldsTest()
 			CPPUNIT_FAIL("Creating a header with an invalid value did not raise an exception");
 		} catch (const BHttpFields::InvalidInput& e) {
 			// success
-		} catch (...) {
-			CPPUNIT_FAIL("Unexpected exception when creating a header with an invalid value");
 		}
 	}
 
@@ -261,8 +257,6 @@ HttpProtocolTest::HttpMethodTest()
 		CPPUNIT_FAIL("Creating an empty method was succesful unexpectedly");
 	} catch (BHttpMethod::InvalidMethod&) {
 		// success
-	} catch (...) {
-		CPPUNIT_FAIL("Unexpected exception type when creating an empty method");
 	}
 
 	// Method with invalid characters (arabic translation of GET)
@@ -271,8 +265,6 @@ HttpProtocolTest::HttpMethodTest()
 		CPPUNIT_FAIL("Creating a method with invalid characters was succesful unexpectedly");
 	} catch (BHttpMethod::InvalidMethod&) {
 		// success
-	} catch (...) {
-		CPPUNIT_FAIL("Unexpected exception type when creating a method with invalid characters");
 	}
 }
 
@@ -418,6 +410,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 
 		// HTTP
 		testCaller->addThread("HostAndNetworkFailTest", &HttpIntegrationTest::HostAndNetworkFailTest);
+		testCaller->addThread("GetTest", &HttpIntegrationTest::GetTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpIntegrationTest", &suite);
@@ -433,6 +426,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 
 		// HTTP
 		testCaller->addThread("HostAndNetworkFailTest", &HttpIntegrationTest::HostAndNetworkFailTest);
+		testCaller->addThread("GetTest", &HttpIntegrationTest::GetTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpsIntegrationTest", &suite);
@@ -452,8 +446,6 @@ HttpIntegrationTest::HostAndNetworkFailTest()
 			CPPUNIT_FAIL("Expecting exception when trying to connect to invalid hostname");
 		} catch (const BNetworkRequestError& e) {
 			CPPUNIT_ASSERT_EQUAL(BNetworkRequestError::HostnameError, e.Type());
-		} catch (...) {
-			CPPUNIT_FAIL("Unknown exception raised when getting invalid hostname");
 		}
 	}
 
@@ -467,22 +459,56 @@ HttpIntegrationTest::HostAndNetworkFailTest()
 			CPPUNIT_FAIL("Expecting exception when trying to connect to invalid hostname");
 		} catch (const BNetworkRequestError& e) {
 			CPPUNIT_ASSERT_EQUAL(BNetworkRequestError::NetworkError, e.Type());
-		} catch (...) {
-			CPPUNIT_FAIL("Unknown exception raised when getting invalid hostname");
 		}
 	}
+}
 
-	// Succesful connection (fails as canceled right now)
-	{
-		auto request = BHttpRequest(BUrl("https://www.haiku-os.org/"));
-		auto result = fSession.Execute(std::move(request));
-		try {
-			result.Status();
-			CPPUNIT_FAIL("Expecting exception");
-		} catch (const BNetworkRequestError& e) {
-			CPPUNIT_ASSERT_EQUAL(BNetworkRequestError::Canceled, e.Type());
-		} catch (...) {
-			CPPUNIT_FAIL("Unknown exception raised when executing request");
+
+static const BHttpFields kExpectedGetFields = {
+	{"Server"sv, "Test HTTP Server for Haiku"sv},
+	{"Date"sv, "bogus date"sv},
+		// Dynamic content
+	{"Content-Type"sv, "text/plain"sv},
+	{"Content-Length"sv, "110"sv},
+	{"Content-Encoding"sv, "gzip"sv},
+};
+
+
+constexpr std::string_view kExpectedGetBody = {
+	"Path: /\r\n"
+	"\r\n"
+	"Headers:\r\n"
+	"--------\r\n"
+	"Host: 127.0.0.1:PORT\r\n"
+	"Accept: *\r\n"
+	"Accept-Encoding: gzip\r\n"
+	"Connection: close\r\n"
+};
+
+
+void
+HttpIntegrationTest::GetTest()
+{
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/"));
+	auto result = fSession.Execute(std::move(request));
+	try {
+		auto receivedFields = result.Fields();
+
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("Mismatch in number of headers", kExpectedGetFields.CountFields(), receivedFields.CountFields());
+		for (auto& field: receivedFields) {
+			if (field.Name() == "Date"sv) {
+				// Field with dynamic content; skip
+				continue;
+			}
+			auto expectedField = kExpectedGetFields.FindField(field.Name());
+			if (expectedField == kExpectedGetFields.end())
+				CPPUNIT_FAIL("Could not find expected field in response headers");
+
+			CPPUNIT_ASSERT_EQUAL(field.Value(), (*expectedField).Value());
 		}
+		auto receivedBody = result.Body().text;
+		CPPUNIT_ASSERT_EQUAL(kExpectedGetBody, receivedBody.String());
+	} catch (const BPrivate::Network::BError& e) {
+		CPPUNIT_FAIL(e.DebugMessage().String());
 	}
 }

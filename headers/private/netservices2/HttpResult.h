@@ -10,12 +10,22 @@
 
 #include <String.h>
 
+class BDataIO;
+
 
 namespace BPrivate {
 
 namespace Network {
 
+class BHttpFields;
 struct HttpResultPrivate;
+
+
+struct BHttpBody
+{
+	std::unique_ptr<BDataIO>			target = nullptr;
+	BString								text;
+};
 
 
 struct BHttpStatus
@@ -39,12 +49,12 @@ public:
 
 	// Blocking Access Functions
 	const	BHttpStatus&				Status() const;
-//	BHttpHeaders&						Headers() const;
-//	BHttpBody&							Body() const;
+	const	BHttpFields&				Fields() const;
+			BHttpBody&					Body() const;
 
 	// Check if data is available yet
 			bool						HasStatus() const;
-			bool						HasHeaders() const;
+			bool						HasFields() const;
 			bool						HasBody() const;
 			bool						IsCompleted() const;
 
