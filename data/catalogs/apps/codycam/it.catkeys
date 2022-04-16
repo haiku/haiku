@@ -1,6 +1,7 @@
-1	italian	x-vnd.Haiku-CodyCam	40716723
+1	italian	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		cartella di destinazione non indicata
 reply: '%s'\n	SftpClient		ripeti: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <occultata> (invio password reale)
 JPEG image	CodyCam		Immagine JPEG
 Remote host has closed the connection.\n	FtpClient		L'host remoto ha chiuso la connessione.\n
 image file format expected	CodyCam		formato del file immagine non indicato

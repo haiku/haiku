@@ -1,17 +1,52 @@
-1	english	x-vnd.Haiku-Keymap	1385051534
+1	english	x-vnd.Haiku-Keymap	541420657
 Key	Modifier keys window	As in a computer keyboard key	按键
+Japanese	KeymapNames		日语
+US	KeymapNames		美国
+PG ↑	Keyboard Layout View	Very short for 'page up'	上翻 ↑
+Brazilian	KeymapNames		巴西
+ThinkPad (US)	KeyboardLayoutNames		ThinkPad (美国)
 Right control	Keyboard Layout View		右 Ctrl 键
+Dvorak	KeymapNames		德沃夏克
 Option:	Modifier keys window	Option key role name	选项：
 Cancel	Modifier keys window		取消
 Sample and clipboard:	Keymap window		示例和剪贴板：
+Polish	KeymapNames		波兰
+Latin-American	KeymapNames		拉丁美洲
+Ukrainian	KeymapNames		乌克兰
+PAGE ↓	Keyboard Layout View		下翻 ↓
+DEL	Keyboard Layout View		DEL
+United-Kingdom	KeymapNames		英国
+Turkish (Type-F)	KeymapNames		土耳其(F型)
+Serbian (Cyrillic)	KeymapNames		塞尔维亚 (西里尔)
+Belgian (point)	KeymapNames		比利时 (point)
+Finnish	KeymapNames		芬兰
 Num lock	Keyboard Layout View		Mum 锁
 Switch shortcut keys to Windows/Linux mode	Keymap window		切换快捷键为 Windows/Linux 模式
+Spanish (Dvorak)	KeymapNames		西班牙(德沃夏克)
 Option	Keyboard Layout View	Option key	选项
 Scroll lock	Keyboard Layout View		滚动锁定
+US-International	KeymapNames		美国-国际
 Right option	Keyboard Layout View		右侧选项
+Turkish (Type-Q)	KeymapNames		土耳其 (Q型)
 Revert	Modifier keys window		取消
+Slovak	KeymapNames		斯洛伐克
+CAPS LOCK	Keyboard Layout View		大写锁定
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (程序员版)
+PRINT	Keyboard Layout View		PRINT
+German (Mac)	KeymapNames		德国 (Mac)
+Arabic (102)	KeymapNames		阿拉伯 (102)
+ThinkPad	KeyboardLayoutNames		ThinkPad
+Belarusian (Mac)	KeymapNames		白俄罗斯 (Mac)
+Croatian	KeymapNames		克罗地亚
+PAGE ↑	Keyboard Layout View		PAGE ↑
 Set modifier keys	Modifier keys window		设置修饰键
+Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium International
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd 键
+PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
+ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (美国)
+Spanish	KeymapNames		西班牙
+Apple Aluminum	KeyboardLayoutNames		Apple Aluminum
 Command:	Modifier keys window	Command key role name	命令：
 Acute trigger	Keymap window		触发尖重音符
 Modifier keys	Modifier keys window		修饰键

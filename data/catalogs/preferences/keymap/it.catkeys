@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Keymap	1075970008
+1	italian	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Tasto
 Japanese	KeymapNames		Giapponese
 US	KeymapNames		Inglese (Stati Uniti)
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brasiliano
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right control	Keyboard Layout View		Control destro
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opzione:
 Cancel	Modifier keys window		Annulla
@@ -89,6 +90,7 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Bielorusso
 Warning: left and right key roles do not match	Modifier keys window		Attenzione: i tasti sinistro e destro hanno impostazioni diverse
 Circumflex trigger	Keymap window		Circonflesso
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Shift sinistro
 Russian (Yawert)	KeymapNames		Russo (Yawert)

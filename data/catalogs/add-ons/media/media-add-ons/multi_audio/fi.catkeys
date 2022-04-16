@@ -8,19 +8,19 @@ CD	MultiAudio		CD
 Tone control	MultiAudio		Äänensävyn säätö
 Phone	MultiAudio		Puhelin
 Aux	MultiAudio		Aux
-Output bass	MultiAudio		Basso-ulostulo
+Output bass	MultiAudio		Lähtöbasso
 Headphones	MultiAudio		Kuulokkeet
 Beep	MultiAudio		Piip
-Output mono mix	MultiAudio		Monomiksaus-ulostulo
-Output stereo mix	MultiAudio		Stereomiksaus-ulostulo
+Output mono mix	MultiAudio		Lähtömonomiksaus
+Output stereo mix	MultiAudio		Lähtöstereomiksaus
 Input	MultiAudio		Tulo
-Output treble	MultiAudio		Diskantti-ulostulo
+Output treble	MultiAudio		Lähtödiskantti
 Mono mix	MultiAudio		Monomiksaus
 General	MultiAudio		Yleisasetukset
-Input & Output	MultiAudio		Tulot ja lähdöt
+Input & Output	MultiAudio		Syötteet ja lähdöt
 Enhanced Setup	MultiAudio		Laajennetut asetukset
 Stereo mix	MultiAudio		Stereomiksaus
-Output 3D depth	MultiAudio		Tulosta 3D-syvyys
+Output 3D depth	MultiAudio		Lähtö-3D-syvyys
 Volume	MultiAudio		Äänenvoimakkuus
 Output	MultiAudio		Lähtö
 Video	MultiAudio		Video

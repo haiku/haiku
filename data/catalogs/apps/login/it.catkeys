@@ -1,6 +1,8 @@
-1	italian	x-vnd.Haiku-Login	3033693897
+1	italian	x-vnd.Haiku-Login	1584886353
 Invalid login!	Login View		Accesso invalido!
 Error	Login App		Errore
+Login application for Haiku\nUsage:	Login App		Applicazione di accesso per Haiku\nUtilizzo:
+--nonmodal\tDo not make the window modal	Login App		--nonmodal\tNon rendere la finestra modale
 Welcome to Haiku	Login Window		Benvenuti su Haiku!
 Halt	Login View		Arresta
 Desktop	Desktop Window		Scrivania

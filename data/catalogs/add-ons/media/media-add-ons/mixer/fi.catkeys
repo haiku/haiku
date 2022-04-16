@@ -1,5 +1,5 @@
 1	finnish	x-vnd.Haiku-mixer.media_addon	275473112
-Input mapping	AudioMixer		Tulokuvaus
+Input mapping	AudioMixer		Syötekuvaus
 High quality (linear interpolation)	AudioMixer		Korkea laatu (lineaarinen interpolointi)
 To output	AudioMixer		Lähtöön
 Gain	AudioMixer		Vahvistus
@@ -13,8 +13,8 @@ Output channel sources	AudioMixer		Lähtökanavalähteet
 Allow input channel remapping	AudioMixer		Salli tulokanavien uudelleenkuvaus
 Display balance control for stereo connections	AudioMixer		Näytä balanssiohjaus stereoyhteyksille
 Setup	AudioMixer		Asetus
-Physical input channels	AudioMixer		Fyysiset tulokanavat
-Input channel destinations	AudioMixer		Tulokanavakohteet
+Physical input channels	AudioMixer		Fyysiset syötekanavat
+Input channel destinations	AudioMixer		Syötekanavakohteet
 Resampling algorithm:	AudioMixer		Uudelleennäytteistysalgoritmi:
 Mute	AudioMixer		Mykistä
 Output mapping	AudioMixer		Lähtökuvaus

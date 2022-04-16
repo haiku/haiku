@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Input	3034525542
+1	english	x-vnd.Haiku-Input	3312605348
 Scrolling	TouchpadPrefView		滚动
 Defaults	InputMouse		默认
 Long	KeyboardView		长
@@ -11,6 +11,7 @@ Double-click speed	SettingsView		双击速度
 5-Button	SettingsView		5键
 Typing test area	KeyboardView		按键测试区
 Mouse type:	SettingsView		鼠标类型：
+Revert	InputKeyboard		恢复
 Fast	KeyboardView		快
 Off	TouchpadPrefView		关闭
 Never	TouchpadPrefView		从不
@@ -28,6 +29,7 @@ Keyboard Lock Delay	TouchpadPrefView		键盘锁定延迟
 Two finger scrolling	TouchpadPrefView		双指滚动
 Input	System name		输入
 Mouse acceleration	SettingsView		鼠标加速
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		新的滚动区域非常大，可能会影响鼠标的正常操作。您真的想更改它吗？
 High	TouchpadPrefView		高
 Defaults	TouchpadPrefView		默认
 1-Button	SettingsView		单键

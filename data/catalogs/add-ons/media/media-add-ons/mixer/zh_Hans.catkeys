@@ -1,5 +1,6 @@
-1	english	x-vnd.Haiku-mixer.media_addon	3463574286
+1	english	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		输入映射
+High quality (linear interpolation)	AudioMixer		高品质(线性插补)
 To output	AudioMixer		输出
 Gain	AudioMixer		增益
 To master	AudioMixer		到主音量
@@ -7,13 +8,17 @@ not connected	AudioMixer		未连接
 Master output	AudioMixer		主音量输出
 dB	AudioMixer		分贝
 Gain controls	AudioMixer		增益控制
+Low quality (drop/repeat samples)	AudioMixer		低品质 (丢弃/重复采样)
 Output channel sources	AudioMixer		输出通道源
 Allow input channel remapping	AudioMixer		启用输入频道重映射
 Display balance control for stereo connections	AudioMixer		为立体声系统显示均衡控制器
 Setup	AudioMixer		配置
 Physical input channels	AudioMixer		物理输入频道
 Input channel destinations	AudioMixer		输入通道目标
+Resampling algorithm:	AudioMixer		重新采样算法:
 Mute	AudioMixer		静音
 Output mapping	AudioMixer		输出映射
 Virtual output channels	AudioMixer		虚拟输出通道
 Allow output channel remapping	AudioMixer		启用输出频道重映射
+Input gain controls represent:	AudioMixer		输入增益控制表示：
+Attenuate mixer output by 3 dB	AudioMixer		衰减混音输出 3dB

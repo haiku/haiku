@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-WebPositive	1591513524
+1	italian	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Richiesta autenticazione
 Previous	WebPositive Window		Precedente
 (Finish: %date)	Download Window		(Terminato: %date)
@@ -13,7 +13,7 @@ Bookmarks	WebPositive Window		Segnalibri
 Use proxy server to connect to the internet	Settings Window		Utilizza un server proxy per la connessione a Internet
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url completato
 Auto-hide interface in full screen mode	Settings Window		Nasconti automaticamente l'interfaccia in modalità a schermo intero
-There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	C'è stato un errore nell'accedere alla dei segnalibri.\n\nErrore: %error
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	C'è stato un errore nell'accesso alla cartella dei segnalibri.\n\nErrore: %error
 Delete	Cookie Manager		Elimina
 (Finish: %date - Over %duration left)	Download Window		(Termine: %date - Mancano oltre %duration)
 Open containing folder	Download Window		Mostra nella cartella
@@ -53,6 +53,7 @@ The download could not be opened.	Download Window		La cartella dei file scaricat
 Cookies for %s	Cookie Manager		Cookie per %s
 Close	Download Window		Chiudi
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Termine di ricerca
 Reload	WebPositive Window		Ricarica
 Expiration	Cookie Manager		Scadenza
 Download finished	Download Window		Download completato
@@ -100,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Ripristina
 Copy	WebPositive Window		Copia
 Default standard font size:	Settings Window		Dimensione predefinita caratteri:
+Custom	Settings Window		Personalizzato
 Bookmark this page	WebPositive Window		Aggiungi questa pagina ai segnalibri
 Show tabs if only one page is open	Settings Window		Mostra tab anche se solo una pagina è aperta
 Close tab	WebPositive Window		Chiudi tab

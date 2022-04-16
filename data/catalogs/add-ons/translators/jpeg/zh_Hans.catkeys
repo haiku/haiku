@@ -1,22 +1,22 @@
 1	english	x-vnd.Haiku-JPEGTranslator	3788699631
 Read	JPEGTranslator		读取
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be 位图格式（JPEG转换器
-Show warning messages	JPEGTranslator		显示警告信息
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		启用 0 CMYK编码用于 100% 墨水覆盖
-JPEG Library Error: %s\n	be_jerror		JPEG 二进制错误：%s\n
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Be 位图格式 (JPEG转换器)
+Show warning messages	JPEGTranslator		显示警告消息
+Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		使用 CMYK 码 和 0 用于 100% 油墨覆盖
+JPEG Library Error: %s\n	be_jerror		JPEG 库错误：%s\n
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\n基于 IJG library © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\n基于 \"lossless\" Ken Murchison 提供的编码支持补丁\n\thttp://www.oceana.com/ftp/ljpeg/\n\n基于 Magnus Hellman 提供的一些颜色空间转换程序\n\thttp://www.bebits.com/app/802\n
 None	JPEGTranslator		无
 About	JPEGTranslator		关于
 Version %d.%d.%d	JPEGTranslator		版本 %d.%d.%d
-Write black-and-white images as RGB24	JPEGTranslator		以 RGB24 写入黑白图像
-Output smoothing strength	JPEGTranslator		输出平滑力量
-Use progressive compression	JPEGTranslator		启用连续压缩
-Make file smaller (sligthtly worse quality)	JPEGTranslator		创建较小文件（较差的质量）
+Write black-and-white images as RGB24	JPEGTranslator		写入黑白图像为 RGB24
+Output smoothing strength	JPEGTranslator		输出平滑强度
+Use progressive compression	JPEGTranslator		使用渐进压缩
+Make file smaller (sligthtly worse quality)	JPEGTranslator		生成更小文件(较差品质)
 High	JPEGTranslator		高
-Read greyscale images as RGB32	JPEGTranslator		以 RGB32 读取灰度图像
+Read greyscale images as RGB32	JPEGTranslator		读取灰度图像为 RGB32
 Output quality	JPEGTranslator		输出质量
 Low	JPEGTranslator		低
 Write	JPEGTranslator		写入
-Prevent colors 'washing out'	JPEGTranslator		防止颜色 '消退'
-JPEG Library Warning: %s\n	be_jerror		JPEG 二进制警告：%s\n
+Prevent colors 'washing out'	JPEGTranslator		防止色彩 “褪色”
+JPEG Library Warning: %s\n	be_jerror		JPEG 库警告：%s\n
 JPEG images	JPEGTranslator		JPEG 图像

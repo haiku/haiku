@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-StyledEdit	2796309255
+1	italian	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Statistiche sul documento
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossibile ripristinare, file non trovato: \"%s\".
 Cut	Menus		Taglia
@@ -51,6 +51,7 @@ OK	SaveAlert		OK
 Color	Menus		Colore
 Save changes to the document \"%s\"? 	QuitAlert		Salva le modifiche al documento \"%s\"? 
 StyledEdit	System name		StyledEdit
+Underline	Menus		Sottolineatura
 Find:	FindandReplaceWindow		Cerca:
 Undo typing	QuitAlert		Annulla digitazione
 Error loading \"%s\":\n\t%s	LoadAlert		Errore nel caricamento di \"%s\":\n\t%s

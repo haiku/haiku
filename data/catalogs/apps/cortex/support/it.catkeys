@@ -1,0 +1,39 @@
+1	italian	application/x-vnd.Cortex.support	2926900334
+Header has flags	MediaString		Intestazione ha stati:
+32 bit HLS	MediaString		HLS 32 bit
+Recording	MediaString		Registrazione
+(unknown format)	MediaString		(formato sconosciuto)
+Clean buffers	MediaString		Pulisci buffer
+Rear-right	MediaString		Posteriore-destro
+ASF format family	MediaString		Famiglia formato ASF
+Encoded video	MediaString		Video codificato
+Port	MediaString		Porta
+Top-Front-left	MediaString		Superiore-Anteriore-sinistra
+24 bit LAB	MediaString		LAB 24 bit
+16 bit integer	MediaString		intero 16 bit
+32 bit HSVA	MediaString		HSVA 32 bit
+Offline	MediaString		Disconnesso
+(unkown video orientation)	MediaString		(orientamento video sconosciuto)
+32 bit HLSA	MediaString		HLSA 32 bit
+Top-Front-center	MediaString		Superiore-Anteriore-centro
+BeOS format family	MediaString		Famiglia formato BeOS
+24 bit HSV	MediaString		HSV 24 bit
+Back-center	MediaString		Posteriore-centro
+32 bit CMY	MediaString		CMY 32 bit
+(unknown video format)	MediaString		(formato video sconosciuto)
+AVI format family	MediaString		Formato famiglia AVI
+Homogenous buffers	MediaString		Buffer omogenei
+Interlaced 	MediaString		Interlacciato 
+15 bit RGBA	MediaString		RGBA 15 bit
+Drop data	MediaString		Dati scartati
+32 bit RGB	MediaString		RGB 32 bit
+System mixer	MediaString		Mixer di sistema
+Physical output	MediaString		Uscita fisica
+Top-Back-center	MediaString		Superiore-Posteriore-centro
+Top to bottom, left to right	MediaString		Da superiore a inferiore, da sinistra a destra
+(unknown run mode)	MediaString		(modo esecuzione sconosciuto)
+24 bit HSI	MediaString		HSI 24 bit
+User-defined media type	MediaString		Tipo di media definito da utente
+32 bit CMYA	MediaString		CMYA 32 bit
+Rear-left	MediaString		Posteriore-sinistra
+QuickTime format family	MediaString		Famiglia formato QuickTime
