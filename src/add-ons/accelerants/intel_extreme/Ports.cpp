@@ -2094,7 +2094,7 @@ DigitalDisplayInterface::IsConnected()
 			}
 			return true;
 		} else if (gInfo->shared_info->got_vbt) {
-			TRACE("%s: Laptop. No EDID, but force enabled as we have a VBT\n", __func__);
+			TRACE("%s: Laptop. No VESA EDID, but force enabled as we have a VBT\n", __func__);
 			return true;
 		}
 		//should not happen:
@@ -2311,10 +2311,42 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 		// For internal panels, we may need to set the timings according to the panel
 		// native video mode, and let the panel fitter do the scaling.
 
-		if (gInfo->shared_info->got_vbt) {
+		if (gInfo->shared_info->got_vbt || HasEDID()) {
 			// Set vbios hardware panel mode as base
 			hardwareTarget = gInfo->shared_info->panel_timing;
-
+			if (HasEDID()) {
+				// the first detailed timing supposed to be the best supported one
+				int i;
+				for (i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
+					edid1_detailed_monitor *monitor = &fEDIDInfo.detailed_monitor[i];
+					if (monitor->monitor_desc_type == EDID1_IS_DETAILED_TIMING)
+						break;
+				}
+				if (i < EDID1_NUM_DETAILED_MONITOR_DESC) {
+					TRACE("%s: Using EDID detailed timing %d for the internal panel\n",
+						__func__, i);
+					const edid1_detailed_timing& timing
+						= fEDIDInfo.detailed_monitor[i].data.detailed_timing;
+					hardwareTarget.pixel_clock = timing.pixel_clock * 10;
+					hardwareTarget.h_display = timing.h_active;
+					hardwareTarget.h_sync_start = timing.h_active + timing.h_sync_off;
+					hardwareTarget.h_sync_end = hardwareTarget.h_sync_start + timing.h_sync_width;
+					hardwareTarget.h_total = timing.h_active + timing.h_blank;
+					hardwareTarget.v_display = timing.v_active;
+					hardwareTarget.v_sync_start = timing.v_active + timing.v_sync_off;
+					hardwareTarget.v_sync_end = hardwareTarget.v_sync_start + timing.v_sync_width;
+					hardwareTarget.v_total = timing.v_active + timing.v_blank;
+					hardwareTarget.flags = 0;
+					if (timing.sync == 3) {
+						if (timing.misc & 1)
+							hardwareTarget.flags |= B_POSITIVE_HSYNC;
+						if (timing.misc & 2)
+							hardwareTarget.flags |= B_POSITIVE_VSYNC;
+					}
+					if (timing.interlaced)
+						hardwareTarget.flags |= B_TIMING_INTERLACED;
+				}
+			}
 			if (hardwareTarget.h_display == target->timing.h_display
 					&& hardwareTarget.v_display == target->timing.v_display) {
 				// We are setting the native video mode, nothing special to do
