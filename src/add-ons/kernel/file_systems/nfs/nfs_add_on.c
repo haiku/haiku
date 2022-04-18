@@ -389,7 +389,8 @@ is_successful_reply(struct XDRInPacket *reply)
 	} else {
 		rpc_auth_flavor flavor = (rpc_auth_flavor)XDRInPacketGetInt32(reply);
 		char body[400];
-		size_t bodyLength = XDRInPacketGetDynamic(reply, body);
+		size_t bodyLength;
+		XDRInPacketGetDynamic(reply, body, &bodyLength);
 
 		rpc_accept_stat acceptStat = (rpc_accept_stat)XDRInPacketGetInt32(reply);
 		(void)flavor;
@@ -1554,7 +1555,9 @@ fs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 		get_nfs_attr(&reply, &st);
 		cookie->st = st;
 
-		readbytes = XDRInPacketGetDynamic(&reply, buf);
+		status_t err = XDRInPacketGetDynamic(&reply, buf, &readbytes);
+		if (err != B_OK)
+			return err;
 
 		buf = (char *)buf + readbytes;
 		(*len) += readbytes;
@@ -1605,7 +1608,9 @@ fs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 		XDROutPacketAddInt32(&call, 0);
 		XDROutPacketAddInt32(&call, pos + bytesWritten);
 		XDROutPacketAddInt32(&call, 0);
-		XDROutPacketAddDynamic(&call, (const char *)buf + bytesWritten, count);
+		status_t err = XDROutPacketAddDynamic(&call, (const char *)buf + bytesWritten, count);
+		if (err != B_OK)
+			return err;
 
 		replyBuf = send_rpc_call(ns, &ns->nfsAddr, NFS_PROGRAM, NFS_VERSION,
 			NFSPROC_WRITE, &call);
@@ -2309,7 +2314,7 @@ fs_readlink(fs_volume *_volume, fs_vnode *_node, char *buf, size_t *bufsize)
 		return map_nfs_to_system_error(status);
 	}
 
-	length = XDRInPacketGetDynamic(&reply, data);
+	XDRInPacketGetDynamic(&reply, data, &length);
 
 	memcpy(buf, data, min_c(length, *bufsize));
 	*bufsize = length;

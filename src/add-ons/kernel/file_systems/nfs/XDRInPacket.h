@@ -13,9 +13,8 @@ struct XDRInPacket
 void XDRInPacketInit (struct XDRInPacket *packet);
 void XDRInPacketDestroy (struct XDRInPacket *packet);
 int32 XDRInPacketGetInt32 (struct XDRInPacket *packet);
-int32 XDRInPacketGetFixed (struct XDRInPacket *packet, void *buffer,
-	size_t len);
-size_t XDRInPacketGetDynamic (struct XDRInPacket *packet, void *buffer);
+status_t XDRInPacketGetFixed (struct XDRInPacket *packet, void *buffer, size_t len);
+status_t XDRInPacketGetDynamic (struct XDRInPacket *packet, void *buffer, size_t *_len);
 char *XDRInPacketGetString (struct XDRInPacket *packet);
 void XDRInPacketSetTo (struct XDRInPacket *packet, uint8 *buffer, size_t offset);
 
