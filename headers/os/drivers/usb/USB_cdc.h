@@ -5,6 +5,7 @@
 // Reference: http://www.usb.org/developers/devclass_docs/usbcdc11.pdf
 
 #define USB_COMMUNICATION_DEVICE_CLASS 			0x02
+#define USB_COMMUNICATION_WIRELESS_DEVICE_CLASS 	0xe0
 
 #define USB_CDC_COMMUNICATION_INTERFACE_CLASS	0x02
 #define USB_CDC_CLASS_VERSION					0x0101
