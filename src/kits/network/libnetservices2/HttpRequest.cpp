@@ -100,6 +100,19 @@ BHttpMethod::operator=(BHttpMethod&& other) noexcept
 }
 
 
+bool
+BHttpMethod::operator==(const BHttpMethod::Verb& other) const noexcept
+{
+	if (std::holds_alternative<Verb>(fMethod)) {
+		return std::get<Verb>(fMethod) == other;
+	} else {
+		BHttpMethod otherMethod(other);
+		auto otherMethodSv = otherMethod.Method();
+		return std::get<BString>(fMethod).Compare(otherMethodSv.data(), otherMethodSv.size()) == 0;
+	}
+}
+
+
 const std::string_view
 BHttpMethod::Method() const noexcept
 {

@@ -75,6 +75,40 @@ namespace Network {
 
 
 /*!
+	\struct BHttpBody
+	\ingroup netservices
+	\brief Represents a HTTP response body.
+	
+	The HTTP response body is captured in this object. The body is either stored into a
+	\ref target, or into a \a text variable, depending on how you called the
+	\ref BHttpSession::Execute() method. If there is a \a target, the body will be empty,
+	and vice versa.
+
+	You will usually get a reference to this object through the \ref BHttpResult::Body() method.
+	If you want to keep the contents of the body beyond the lifetime of the BHttpResult object,
+	you should move the data into owned objects of your own.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var std::unique_ptr<BDataIO> BHttpBody::target
+	\brief An owned pointer to where the body has been written.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BString BHttpBody::text
+	\brief A string containing the body of the HTTP request.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\class BHttpResult
 	\ingroup netservices
 	\brief Unique object to wait for and access a HTTP response data.
@@ -211,11 +245,11 @@ namespace Network {
 
 
 /*!
-	\fn bool BPrivate::Network::BHttpResult::HasHeaders() const
-	\brief Check if the headers are available.
+	\fn bool BPrivate::Network::BHttpResult::HasFields() const
+	\brief Check if the header fields are available.
 
-	\retval true The headers of the response is available using the \ref Headers() method.
-	\retval false They are not yet available. Any call to \ref Headers() will block.
+	\retval true The header fields of the response is available using the \ref Fields() method.
+	\retval false They are not yet available. Any call to \ref Fields() will block.
 
 	\exception BRuntimeException This exception is raised when the object has been moved from and
 		is thus no longer valid.
@@ -282,6 +316,46 @@ namespace Network {
 */
 
 
+/*!
+	\fn const BHttpFields& BHttpResult::Fields() const
+	\brief Retrieve the header fields of the HTTP response.
+
+	If the header fields are not yet available, then this method call will block until it is. You
+	can use the \ref HasFields() method to do a non-blocking check if the fields are available.
+
+	\returns A const reference to the \ref BHttpFields object that describes the header fields of
+		the response.
+
+	\exception BRuntimeException This exception is raised when the object has been moved from and
+		is thus no longer valid.
+	\exception BNetworkRequestError This exception is raised when there was an error that prevented
+		completely retrieving and parsing the HTTP response.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpBody& BHttpResult::Body() const
+	\brief Retrieve the body of the HTTP response.
+
+	If the body is not yet available, then this method call will block until it is. You can
+	use the \ref HasBody() method to do a non-blocking check if the status is available.
+
+	The lifetime of the body is tied to the lifetime of this response result object. If you want to
+	keep the body beyond that time, you can copy or move the data from the \ref BHttpBody object.
+
+	\returns A reference to the \ref BHttpBody object that contains the body.
+
+	\exception BRuntimeException This exception is raised when the object has been moved from and
+		is thus no longer valid.
+	\exception BNetworkRequestError This exception is raised when there was an error that prevented
+		completely retrieving and parsing the HTTP response.
+
+	\since Haiku R1
+*/
+
+
 //! @}
 
 
@@ -290,4 +364,3 @@ namespace Network {
 } // namespace Network
 
 #endif
-

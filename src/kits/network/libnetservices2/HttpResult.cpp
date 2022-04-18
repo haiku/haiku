@@ -37,7 +37,7 @@ BHttpResult::~BHttpResult()
 BHttpResult&
 BHttpResult::operator=(BHttpResult&& other) noexcept = default;
 
-#include <iostream>
+
 const BHttpStatus&
 BHttpResult::Status() const
 {
@@ -46,7 +46,6 @@ BHttpResult::Status() const
 	status_t status = B_OK;
 	while (status == B_INTERRUPTED || status == B_OK) {
 		auto dataStatus = fData->GetStatusAtomic();
-		std::cout << "BHttpResult::Status() dataStatus " << dataStatus << std::endl;
 		if (dataStatus == HttpResultPrivate::kError)
 			std::rethrow_exception(*(fData->error));
 

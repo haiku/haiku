@@ -39,6 +39,8 @@ public:
 
 			void	HostAndNetworkFailTest();
 			void	GetTest();
+			void	HeadTest();
+			void	NoContentTest();
 
 	static	void	AddTests(BTestSuite& suite);
 

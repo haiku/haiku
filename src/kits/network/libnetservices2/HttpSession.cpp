@@ -129,6 +129,7 @@ private:
 	off_t							fBodyBytesTotal = 0;
 	off_t							fBodyBytesReceived = 0;
 	BHttpFields						fFields;
+	bool							fNoContent = false;
 
 	// Optional decompression
 	std::unique_ptr<BMallocIO>		fDecompressorStorage = nullptr;
@@ -478,8 +479,13 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 				}*/
 				data->connectionMap.erase(item.object);
 				resizeObjectList = true;
+			} else if (item.events == 0) {
+				// No events for this item, skip
+				continue;
 			} else {
 				// Likely to be B_EVENT_INVALID. This should not happen
+				auto& request = data->connectionMap.find(item.object)->second;
+				std::cout << "DataThreadFunc() [" << request.Id() << "] other event " << item.events << std::endl;
 				throw BRuntimeError(__PRETTY_FUNCTION__, "Socket was deleted at an unexpected time");
 			}
 		}
@@ -493,8 +499,10 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 		auto i = 1;
 		for (auto it = data->connectionMap.cbegin(); it != data->connectionMap.cend(); it++) {
 			data->objectList[i].object = it->first;
-			if (it->second.State() == Request::InitialState)
+			if (it->second.State() == Request::InitialState) {
+				std::cout << "DataThreadFunc() [" << it->second.Id() << "] in Request::InitialState" << std::endl;
 				throw BRuntimeError(__PRETTY_FUNCTION__, "Invalid state of request");
+			}
 			else if (it->second.State() == Request::Connected) {
 				data->objectList[i].events = B_EVENT_WRITE | B_EVENT_DISCONNECTED;
 				std::cout << "DataThreadFunc() [ " << it->second.Id() << "] wait for B_EVENT_WRITE" << std::endl;
@@ -523,6 +531,7 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 			}*/
 	 	}
 	} else {
+		std::cout << "DataThreadFunc(): Unknown reason that the dataQueueSem is deleted" << std::endl;
 		throw BRuntimeError(__PRETTY_FUNCTION__,
 			"Unknown reason that the dataQueueSem is deleted");
 	}
@@ -577,6 +586,7 @@ BHttpSession::Request::Request(BHttpRequest&& request, std::unique_ptr<BDataIO> 
 void
 BHttpSession::Request::ResolveHostName()
 {
+	std::cout << "BHttpSession::Request::ResolveHostName() [" << Id() << "] for URL: " << fRequest.Url().UrlString() << std::endl;
 	int port;
 	if (fRequest.Url().HasPort())
 		port = fRequest.Url().Port();
@@ -721,6 +731,9 @@ BHttpSession::Request::ReceiveResult()
 
 			// TODO: handle the case where we have an error code and we want to stop on error
 
+			if (status.code == 204)
+				fNoContent = true;
+
 			fResult->SetStatus(std::move(status));
 
 			// TODO: inform listeners of receiving the status code
@@ -797,12 +810,17 @@ BHttpSession::Request::ReceiveResult()
 			}
 		}
 
-		// TODO: check if we are head only or if there is no content
-
 		// TODO: move headers to the result and inform listener
 		fResult->SetFields(std::move(fFields));
-
 		fRequestStatus = HeadersReceived;
+
+		if (fRequest.Method() == BHttpMethod::Head || fNoContent) {
+			// HEAD requests and requests with status 204 (No content) are finished
+			std::cout << "ReceiveResult() [" << Id() << "] Request is completing without content" << std::endl;
+			fResult->SetBody();
+			fRequestStatus = ContentReceived;
+			return true;
+		}
 		[[fallthrough]];
 	}
 	case HeadersReceived:

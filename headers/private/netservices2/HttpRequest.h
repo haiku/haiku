@@ -59,6 +59,9 @@ public:
 			BHttpMethod&		operator=(const BHttpMethod& other);
 			BHttpMethod&		operator=(BHttpMethod&& other) noexcept;
 
+	// Comparison
+			bool				operator==(const Verb& other) const noexcept;
+
 	// Get the method as a string
 	const	std::string_view	Method() const noexcept;
 

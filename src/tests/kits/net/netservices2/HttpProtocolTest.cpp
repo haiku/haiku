@@ -307,7 +307,8 @@ public:
 		ssize_t bytesWritten = (size < 8) ? size : 8;
 		CPPUNIT_ASSERT_MESSAGE("RequestStreamTestIO: bytes written larger than expected output",
 			fExpectedOutput.size() >= (fPos + bytesWritten));
-		CPPUNIT_ASSERT(fExpectedOutput.substr(fPos, bytesWritten) == std::string_view(static_cast<const char*>(buffer), bytesWritten));
+		CPPUNIT_ASSERT(fExpectedOutput.substr(fPos, bytesWritten)
+			== std::string_view(static_cast<const char*>(buffer), bytesWritten));
 		fPos += bytesWritten;
 		return bytesWritten;
 	};
@@ -338,7 +339,8 @@ HttpProtocolTest::HttpRequestStreamTest()
 		expectedTotalBytesWritten = expectedTotalSize;
 	}
 	while (!finished) {
-		auto [currentBytesWritten, totalBytesWritten, totalSize, complete] = requestStream.Transfer(&testIO);
+		auto [currentBytesWritten, totalBytesWritten, totalSize, complete]
+			= requestStream.Transfer(&testIO);
 		CPPUNIT_ASSERT_EQUAL(expectedBytesWritten, currentBytesWritten);
 		CPPUNIT_ASSERT_EQUAL(expectedTotalBytesWritten, totalBytesWritten);
 		CPPUNIT_ASSERT_EQUAL(expectedTotalSize, totalSize);
@@ -409,8 +411,11 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 			= new BThreadedTestCaller<HttpIntegrationTest>("HttpTest::", httpIntegrationTest);
 
 		// HTTP
-		testCaller->addThread("HostAndNetworkFailTest", &HttpIntegrationTest::HostAndNetworkFailTest);
+		testCaller->addThread("HostAndNetworkFailTest",
+			&HttpIntegrationTest::HostAndNetworkFailTest);
 		testCaller->addThread("GetTest", &HttpIntegrationTest::GetTest);
+		testCaller->addThread("HeadTest", &HttpIntegrationTest::HeadTest);
+		testCaller->addThread("NoContentTest", &HttpIntegrationTest::NoContentTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpIntegrationTest", &suite);
@@ -425,8 +430,11 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 			= new BThreadedTestCaller<HttpIntegrationTest>("HttpsTest::", httpsIntegrationTest);
 
 		// HTTP
-		testCaller->addThread("HostAndNetworkFailTest", &HttpIntegrationTest::HostAndNetworkFailTest);
+		testCaller->addThread("HostAndNetworkFailTest",
+			&HttpIntegrationTest::HostAndNetworkFailTest);
 		testCaller->addThread("GetTest", &HttpIntegrationTest::GetTest);
+		testCaller->addThread("HeadTest", &HttpIntegrationTest::HeadTest);
+		testCaller->addThread("NoContentTest", &HttpIntegrationTest::NoContentTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpsIntegrationTest", &suite);
@@ -466,8 +474,7 @@ HttpIntegrationTest::HostAndNetworkFailTest()
 
 static const BHttpFields kExpectedGetFields = {
 	{"Server"sv, "Test HTTP Server for Haiku"sv},
-	{"Date"sv, "bogus date"sv},
-		// Dynamic content
+	{"Date"sv, "Sun, 09 Feb 2020 19:32:42 GMT"sv},
 	{"Content-Type"sv, "text/plain"sv},
 	{"Content-Length"sv, "110"sv},
 	{"Content-Encoding"sv, "gzip"sv},
@@ -494,12 +501,9 @@ HttpIntegrationTest::GetTest()
 	try {
 		auto receivedFields = result.Fields();
 
-		CPPUNIT_ASSERT_EQUAL_MESSAGE("Mismatch in number of headers", kExpectedGetFields.CountFields(), receivedFields.CountFields());
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("Mismatch in number of headers",
+			kExpectedGetFields.CountFields(), receivedFields.CountFields());
 		for (auto& field: receivedFields) {
-			if (field.Name() == "Date"sv) {
-				// Field with dynamic content; skip
-				continue;
-			}
 			auto expectedField = kExpectedGetFields.FindField(field.Name());
 			if (expectedField == kExpectedGetFields.end())
 				CPPUNIT_FAIL("Could not find expected field in response headers");
@@ -508,6 +512,66 @@ HttpIntegrationTest::GetTest()
 		}
 		auto receivedBody = result.Body().text;
 		CPPUNIT_ASSERT_EQUAL(kExpectedGetBody, receivedBody.String());
+	} catch (const BPrivate::Network::BError& e) {
+		CPPUNIT_FAIL(e.DebugMessage().String());
+	}
+}
+
+
+void
+HttpIntegrationTest::HeadTest()
+{
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/"));
+	request.SetMethod(BHttpMethod::Head);
+	auto result = fSession.Execute(std::move(request));
+	try {
+		auto receivedFields = result.Fields();
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("Mismatch in number of headers",
+			kExpectedGetFields.CountFields(), receivedFields.CountFields());
+		for (auto& field: receivedFields) {
+			auto expectedField = kExpectedGetFields.FindField(field.Name());
+			if (expectedField == kExpectedGetFields.end())
+				CPPUNIT_FAIL("Could not find expected field in response headers");
+
+			CPPUNIT_ASSERT_EQUAL(field.Value(), (*expectedField).Value());
+		}
+
+		auto receivedBody = result.Body().text;
+		CPPUNIT_ASSERT_EQUAL(receivedBody.Length(), 0);
+	} catch (const BPrivate::Network::BError& e) {
+		CPPUNIT_FAIL(e.DebugMessage().String());
+	}
+}
+
+
+static const BHttpFields kExpectedNoContentFields = {
+	{"Server"sv, "Test HTTP Server for Haiku"sv},
+	{"Date"sv, "Sun, 09 Feb 2020 19:32:42 GMT"sv},
+};
+
+
+void
+HttpIntegrationTest::NoContentTest()
+{
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/204"));
+	auto result = fSession.Execute(std::move(request));
+	try {
+		auto receivedStatus = result.Status();
+		CPPUNIT_ASSERT_EQUAL(204, receivedStatus.code);
+
+		auto receivedFields = result.Fields();
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("Mismatch in number of headers",
+			kExpectedNoContentFields.CountFields(), receivedFields.CountFields());
+		for (auto& field: receivedFields) {
+			auto expectedField = kExpectedNoContentFields.FindField(field.Name());
+			if (expectedField == kExpectedNoContentFields.end())
+				CPPUNIT_FAIL("Could not find expected field in response headers");
+
+			CPPUNIT_ASSERT_EQUAL(field.Value(), (*expectedField).Value());
+		}
+
+		auto receivedBody = result.Body().text;
+		CPPUNIT_ASSERT_EQUAL(receivedBody.Length(), 0);
 	} catch (const BPrivate::Network::BError& e) {
 		CPPUNIT_FAIL(e.DebugMessage().String());
 	}

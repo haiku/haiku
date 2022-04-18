@@ -42,7 +42,7 @@ namespace Network {
 	use the implicit constructors while interacting with the \ref BHttpRequest class.
 
 	\code
-	auto url = BUrl2("https://www.haiku-os.org/");
+	auto url = BUrl("https://www.haiku-os.org/");
 	// implicitly construct a standard get request
 	auto standard = BHttpRequest(url, BHttpMethod::Get);
 	// implicitly construct a nonstandard patch request
@@ -209,6 +209,19 @@ namespace Network {
 /*!
 	\fn BHttpMethod::~BHttpMethod()
 	\brief Destructor.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BHttpMethod::operator==(const Verb &other) const noexcept
+	\brief Comparison operator.
+
+	\param other The verb to compare to.
+
+	\retval true This method is equal to \a other.
+	\retval false This method is different from \a other.
 
 	\since Haiku R1
 */
