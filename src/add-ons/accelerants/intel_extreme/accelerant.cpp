@@ -144,8 +144,10 @@ init_common(int device, bool isClone)
 
 	// Allocate all of our pipes
 	int pipeCnt = 2;
-	if (gInfo->shared_info->device_type.Generation() >= 7)
-		pipeCnt = 3; // some newer gens have even more..
+	if (gInfo->shared_info->device_type.Generation() >= 12)
+		pipeCnt = 4;
+	else if (gInfo->shared_info->device_type.Generation() >= 7)
+		pipeCnt = 3;
 
 	for (int i = 0; i < pipeCnt; i++) {
 		switch (i) {
@@ -157,6 +159,9 @@ init_common(int device, bool isClone)
 				break;
 			case 2:
 				gInfo->pipes[i] = new(std::nothrow) Pipe(INTEL_PIPE_C);
+				break;
+			case 3:
+				gInfo->pipes[i] = new(std::nothrow) Pipe(INTEL_PIPE_D);
 				break;
 			default:
 				ERROR("%s: Unknown pipe %d\n", __func__, i);
