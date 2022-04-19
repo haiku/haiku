@@ -287,6 +287,7 @@ detect_intel_pch()
 				ERROR("%s: Found Comet Lake V PCH\n", __func__);
 				return INTEL_PCH_SPT;
 			case INTEL_PCH_ICP_DEVICE_ID:
+			case INTEL_PCH_ICP2_DEVICE_ID:
 				ERROR("%s: Found Ice Lake PCH\n", __func__);
 				return INTEL_PCH_ICP;
 			case INTEL_PCH_MCC_DEVICE_ID:
@@ -297,11 +298,12 @@ detect_intel_pch()
 				ERROR("%s: Found Tiger Lake PCH\n", __func__);
 				return INTEL_PCH_TGP;
 			case INTEL_PCH_JSP_DEVICE_ID:
-			case INTEL_PCH_JSP2_DEVICE_ID:
 				ERROR("%s: Found Jasper Lake PCH\n", __func__);
 				return INTEL_PCH_JSP;
 			case INTEL_PCH_ADP_DEVICE_ID:
 			case INTEL_PCH_ADP2_DEVICE_ID:
+			case INTEL_PCH_ADP3_DEVICE_ID:
+			case INTEL_PCH_ADP4_DEVICE_ID:
 				ERROR("%s: Found Alder Lake PCH\n", __func__);
 				return INTEL_PCH_ADP;
 		}
