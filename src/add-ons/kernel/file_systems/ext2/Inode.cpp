@@ -857,7 +857,7 @@ Inode::_EnlargeDataStream(Transaction& transaction, off_t size)
 	fNode.SetSize(size);
 	TRACE("Inode::_EnlargeDataStream(): Setting allocated block count to %"
 		B_PRIdOFF "\n", end);
-	return _SetNumBlocks(_NumBlocks() + end * (fVolume->BlockSize() / 512));
+	return _SetNumBlocks(NumBlocks() + end * (fVolume->BlockSize() / 512));
 }
 
 
@@ -895,12 +895,12 @@ Inode::_ShrinkDataStream(Transaction& transaction, off_t size)
 	}
 
 	fNode.SetSize(size);
-	return _SetNumBlocks(_NumBlocks() - end * (fVolume->BlockSize() / 512));
+	return _SetNumBlocks(NumBlocks() - end * (fVolume->BlockSize() / 512));
 }
 
 
 uint64
-Inode::_NumBlocks()
+Inode::NumBlocks()
 {
 	if (fVolume->HugeFiles()) {
 		if (fNode.Flags() & EXT2_INODE_HUGE_FILE)

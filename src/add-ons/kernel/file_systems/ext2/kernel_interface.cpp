@@ -587,7 +587,7 @@ ext2_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* stat)
 	inode->GetCreationTime(&stat->st_crtim);
 
 	stat->st_size = inode->Size();
-	stat->st_blocks = (inode->Size() + 511) / 512;
+	stat->st_blocks = inode->NumBlocks();
 
 	return B_OK;
 }
