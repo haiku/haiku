@@ -13,9 +13,10 @@
 
 #include <errno_private.h>
 #include <syscalls.h>
+#include <time_private.h>
 
 
-int __ppoll(struct pollfd *fds, nfds_t numfds, const struct timespec *tv,
+extern "C" int __ppoll(struct pollfd *fds, nfds_t numfds, const struct timespec *tv,
 	const sigset_t *sigMask);
 
 int
@@ -32,8 +33,8 @@ __ppoll(struct pollfd *fds, nfds_t numfds, const struct timespec *tv,
 {
 	int status;
 	bigtime_t timeout = -1LL;
-	if (tv)
-		timeout = tv->tv_sec * 1000000LL + tv->tv_nsec / 1000LL;
+	if (tv != NULL && !timespec_to_bigtime(*tv, timeout))
+		RETURN_AND_SET_ERRNO_TEST_CANCEL(EINVAL);
 
 	status = _kern_poll(fds, numfds, timeout, sigMask);
 

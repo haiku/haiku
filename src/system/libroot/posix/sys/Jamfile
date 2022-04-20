@@ -23,7 +23,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			mman.cpp
 			priority.c
 			rlimit.c
-			select.c
+			select.cpp
 			stat.c
 			statvfs.c
 			times.cpp

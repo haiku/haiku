@@ -29,7 +29,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			inttypes.c
 			libgen.cpp
 			nftw.c
-			poll.c
+			poll.cpp
 			$(PWD_BACKEND)
 			scheduler.cpp
 			semaphore.cpp

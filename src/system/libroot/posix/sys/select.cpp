@@ -13,16 +13,16 @@
 #include <syscall_utils.h>
 
 #include <errno_private.h>
+#include <signal_private.h>
 #include <symbol_versioning.h>
 #include <syscalls.h>
+#include <time_private.h>
 
-#include <signal_private.h>
 
-
-int __pselect_beos(int numBits, struct fd_set *readBits,
+extern "C" int __pselect_beos(int numBits, struct fd_set *readBits,
 	struct fd_set *writeBits, struct fd_set *errorBits,
 	const struct timespec *tv, const sigset_t *beosSignalMask);
-int __pselect(int numBits, struct fd_set *readBits, struct fd_set *writeBits,
+extern "C" int __pselect(int numBits, struct fd_set *readBits, struct fd_set *writeBits,
 	struct fd_set *errorBits, const struct timespec *tv,
 	const sigset_t *sigMask);
 
@@ -35,8 +35,8 @@ __pselect_beos(int numBits, struct fd_set *readBits, struct fd_set *writeBits,
 	int status;
 	sigset_t signalMask;
 	bigtime_t timeout = -1LL;
-	if (tv)
-		timeout = tv->tv_sec * 1000000LL + tv->tv_nsec / 1000LL;
+	if (tv != NULL && !timespec_to_bigtime(*tv, timeout))
+		RETURN_AND_SET_ERRNO_TEST_CANCEL(EINVAL);
 
 	if (beosSignalMask != NULL)
 		signalMask = from_beos_sigset(*beosSignalMask);
@@ -55,8 +55,8 @@ __pselect(int numBits, struct fd_set *readBits, struct fd_set *writeBits,
 {
 	int status;
 	bigtime_t timeout = -1LL;
-	if (tv)
-		timeout = tv->tv_sec * 1000000LL + tv->tv_nsec / 1000LL;
+	if (tv != NULL && !timespec_to_bigtime(*tv, timeout))
+		RETURN_AND_SET_ERRNO_TEST_CANCEL(EINVAL);
 
 	status = _kern_select(numBits, readBits, writeBits, errorBits, timeout,
 		sigMask);
@@ -71,8 +71,8 @@ select(int numBits, struct fd_set *readBits, struct fd_set *writeBits,
 {
 	int status;
 	bigtime_t timeout = -1LL;
-	if (tv)
-		timeout = tv->tv_sec * 1000000LL + tv->tv_usec;
+	if (tv != NULL && !timeval_to_bigtime(*tv, timeout))
+		RETURN_AND_SET_ERRNO_TEST_CANCEL(EINVAL);
 
 	status = _kern_select(numBits, readBits, writeBits, errorBits, timeout,
 		NULL);
