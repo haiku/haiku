@@ -128,22 +128,27 @@ insert_virtual_range_to_keep(uint64 start, uint64 size)
 }
 
 
+static addr_t
+map_range_to_new_area(addr_t start, size_t size, uint32_t flags)
+{
+	if (size == 0)
+		return 0;
+
+	phys_addr_t physAddr = ROUNDDOWN(start, B_PAGE_SIZE);
+	size_t alignedSize = ROUNDUP(size + (start - physAddr), B_PAGE_SIZE);
+	addr_t virtAddr = get_next_virtual_address(alignedSize);
+
+	map_range(virtAddr, physAddr, alignedSize, flags);
+	insert_virtual_range_to_keep(virtAddr, alignedSize);
+
+	return virtAddr + (start - physAddr);
+}
+
+
 static void
 map_range_to_new_area(addr_range& range, uint32_t flags)
 {
-	if (range.size == 0) {
-		range.start = 0;
-		return;
-	}
-
-	phys_addr_t physAddr = range.start;
-	addr_t virtAddr = get_next_virtual_address(range.size);
-
-	map_range(virtAddr, physAddr, range.size, flags);
-
-	range.start = virtAddr;
-
-	insert_virtual_range_to_keep(range.start, range.size);
+	range.start = map_range_to_new_area(range.start, range.size, flags);
 }
 
 
@@ -151,9 +156,7 @@ static void
 map_range_to_new_area(efi_memory_descriptor *entry, uint32_t flags)
 {
 	uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
-	entry->VirtualStart = get_next_virtual_address(size);
-	map_range(entry->VirtualStart, entry->PhysicalStart, size, flags);
-	insert_virtual_range_to_keep(entry->VirtualStart, size);
+	entry->VirtualStart = map_range_to_new_area(entry->PhysicalStart, size, flags);
 }
 
 
