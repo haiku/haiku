@@ -633,6 +633,13 @@ intel_set_brightness(float brightness)
 	} else {
 		// On older devices there is a single register with both period and duty cycle
 		uint32 tmp = read32(intel_get_backlight_register(true));
+		bool legacyMode = false;
+		if (gInfo->shared_info->device_type.Generation() == 2
+			|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_915M)
+			|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_945M)) {
+			legacyMode = (tmp & BLM_LEGACY_MODE) != 0;
+		}
+
 		uint32_t period = tmp >> 16;
 
 		uint32_t mask = 0xffff;
@@ -645,7 +652,21 @@ intel_set_brightness(float brightness)
 			shift = 1;
 			period = tmp >> 17;
 		}
+		if (legacyMode)
+			period *= 0xfe;
 		uint32_t duty = (uint32_t)(period * brightness);
+		if (legacyMode) {
+			uint8 lpc = duty / 0xff + 1;
+			duty /= lpc;
+
+			// set pci config reg with lpc
+			intel_brightness_legacy brightnessLegacy;
+			brightnessLegacy.magic = INTEL_PRIVATE_DATA_MAGIC;
+			brightnessLegacy.lpc = lpc;
+			ioctl(gInfo->device, INTEL_SET_BRIGHTNESS_LEGACY, &brightnessLegacy,
+				sizeof(brightnessLegacy));
+		}
+
 		duty = std::max(duty, (uint32_t)gInfo->shared_info->min_brightness);
 		duty <<= shift;
 
@@ -671,9 +692,25 @@ intel_get_brightness(float* brightness)
 		period = read32(intel_get_backlight_register(true));
 		duty = read32(intel_get_backlight_register(false));
 	} else {
-		period = read32(intel_get_backlight_register(true)) >> 16;
+		uint32 tmp = read32(intel_get_backlight_register(true));
+		bool legacyMode = false;
+		if (gInfo->shared_info->device_type.Generation() == 2
+			|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_915M)
+			|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_945M)) {
+			legacyMode = (tmp & BLM_LEGACY_MODE) != 0;
+		}
+		period = tmp >> 16;
 		duty = read32(intel_get_backlight_register(false)) & 0xffff;
+		if (legacyMode) {
+			period *= 0xff;
 
+			// get lpc from pci config reg
+			intel_brightness_legacy brightnessLegacy;
+			brightnessLegacy.magic = INTEL_PRIVATE_DATA_MAGIC;
+			ioctl(gInfo->device, INTEL_GET_BRIGHTNESS_LEGACY, &brightnessLegacy,
+				sizeof(brightnessLegacy));
+			duty *= brightnessLegacy.lpc;
+		}
 		if (gInfo->shared_info->device_type.Generation() < 4) {
 			period >>= 1;
 			duty >>= 1;

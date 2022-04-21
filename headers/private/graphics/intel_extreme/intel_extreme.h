@@ -398,7 +398,9 @@ enum {
 
 	INTEL_GET_DEVICE_NAME,
 	INTEL_ALLOCATE_GRAPHICS_MEMORY,
-	INTEL_FREE_GRAPHICS_MEMORY
+	INTEL_FREE_GRAPHICS_MEMORY,
+	INTEL_GET_BRIGHTNESS_LEGACY,
+	INTEL_SET_BRIGHTNESS_LEGACY
 };
 
 // retrieve the area_id of the kernel/accelerant shared info
@@ -420,6 +422,12 @@ struct intel_allocate_graphics_memory {
 struct intel_free_graphics_memory {
 	uint32 	magic;
 	addr_t	buffer_base;
+};
+
+// brightness legacy
+struct intel_brightness_legacy {
+	uint32 	magic;
+	uint8	lpc;
 };
 
 //----------------------------------------------------------
@@ -534,6 +542,9 @@ struct intel_free_graphics_memory {
 #define BDW_GTT_SIZE_2MB				(1 << 6)
 #define BDW_GTT_SIZE_4MB				(2 << 6)
 #define BDW_GTT_SIZE_8MB				(3 << 6)
+
+// Gen2, i915GM, i945GM
+#define LEGACY_BACKLIGHT_BRIGHTNESS		0xf4
 
 // graphics page translation table
 #define INTEL_PAGE_TABLE_CONTROL		0x02020
@@ -1218,6 +1229,7 @@ struct intel_free_graphics_memory {
 #define MCH_BLC_PWM_CTL                 (0x1254 | REGS_NORTH_PIPE_AND_PORT)
 	// Linux VLV_BLC_PWM_CTL (one register per pipe) or BLC_PWM_CTL (a single register that can be
 	// programmed for use on either pipe)
+#define BLM_LEGACY_MODE					(1 << 16)
 
 // ring buffer commands
 
