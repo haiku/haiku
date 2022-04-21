@@ -1387,7 +1387,8 @@ DigitalDisplayInterface::_DpAuxTransfer(dp_aux_msg* message)
 				if (result > 0) {
 					message->reply = receiveBuffer[0] >> 4;
 					result--;
-					memcpy(message->buffer, receiveBuffer + 1, result);
+					if (message->buffer != NULL)
+						memcpy(message->buffer, receiveBuffer + 1, result);
 				}
 				break;
 			default:
