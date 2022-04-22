@@ -209,11 +209,11 @@ DumpCDCDescriptor(const usb_generic_descriptor* descriptor, int subclass)
 					= (const usb_cdc_cm_functional_descriptor*)descriptor;
 				printf("                    Capabilities ..... ");
 				bool somethingPrinted = false;
-				if (cmDesc->capabilities & USB_CDC_CM_DOES_CALL_MANAGEMENT != 0) {
+				if ((cmDesc->capabilities & USB_CDC_CM_DOES_CALL_MANAGEMENT) != 0) {
 					printf("Call management");
 					somethingPrinted = true;
 				}
-				if (cmDesc->capabilities & USB_CDC_CM_OVER_DATA_INTERFACE != 0) {
+				if ((cmDesc->capabilities & USB_CDC_CM_OVER_DATA_INTERFACE) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("Over data interface");
@@ -232,23 +232,23 @@ DumpCDCDescriptor(const usb_generic_descriptor* descriptor, int subclass)
 					= (const usb_cdc_acm_functional_descriptor*)descriptor;
 				printf("                    Capabilities ..... ");
 				bool somethingPrinted = false;
-				if (acmDesc->capabilities & USB_CDC_ACM_HAS_COMM_FEATURES != 0) {
+				if ((acmDesc->capabilities & USB_CDC_ACM_HAS_COMM_FEATURES) != 0) {
 					printf("Communication features");
 					somethingPrinted = true;
 				}
-				if (acmDesc->capabilities & USB_CDC_ACM_HAS_LINE_CONTROL != 0) {
+				if ((acmDesc->capabilities & USB_CDC_ACM_HAS_LINE_CONTROL) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("Line control");
 					somethingPrinted = true;
 				}
-				if (acmDesc->capabilities & USB_CDC_ACM_HAS_SEND_BREAK != 0) {
+				if ((acmDesc->capabilities & USB_CDC_ACM_HAS_SEND_BREAK) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("Send break");
 					somethingPrinted = true;
 				}
-				if (acmDesc->capabilities & USB_CDC_ACM_HAS_NETWORK_CONNECTION != 0) {
+				if ((acmDesc->capabilities & USB_CDC_ACM_HAS_NETWORK_CONNECTION) != 0) {
 					if (somethingPrinted)
 						printf(", ");
 					printf("Network connection");

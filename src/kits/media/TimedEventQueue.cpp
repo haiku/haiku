@@ -50,7 +50,7 @@ media_timed_event::media_timed_event(bigtime_t inTime,
 									 uint32 inCleanup,
 									 int32 inData,
 									 int64 inBigdata,
-									 char *inUserData,
+									 const char *inUserData,
 									 size_t dataSize)
 {
 	CALLED();

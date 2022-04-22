@@ -21,7 +21,7 @@ struct media_timed_event {
 									bigtime_t inTime, int32 inType,
 									void* inPointer, uint32 inCleanup,
 									int32 inData, int64 inBigdata,
-									char* inUserData, size_t dataSize = 0);
+									const char* inUserData, size_t dataSize = 0);
 
 								media_timed_event(
 									const media_timed_event& other);
