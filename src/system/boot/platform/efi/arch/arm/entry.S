@@ -83,11 +83,13 @@ _pl1_entry:
 	MCR p15, 0, r1, c8, c7, 0
 
 	// write DACR
-	mov r9, #0xffffffff
-	MCR p15, 0, r9, c3, c0, 0
+	mov		r9, #0x00000001
+	mcr		p15, 0, r9, c3, c0, 0
 
 	// enable MMU and caches
 	mrc		p15, 0, r9, c1, c0, 0
+	bic		r9, r9, #0x20000000		// access flag disabled
+	bic		r9, r9, #0x10000000		// TEX remap disabled
 	orr		r9, r9, #0x00001000		// i-cache enabled
 	orr		r9, r9, #0x00000004		// d-cache enabled
 	orr		r9, r9, #0x00000001		// MMU enabled
