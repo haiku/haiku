@@ -345,7 +345,6 @@ pch_i2c_scan_bus_callback(acpi_handle object, uint32 nestingLevel,
 		return status;
 	}
 
-	device_node* deviceNode;
 	status = gI2c->register_device(bus->sim, crs.i2c_addr, hid, cidList,
 		object);
 	free(hid);

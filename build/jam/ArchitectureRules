@@ -665,14 +665,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons input_server ;
 	EnableWerror src add-ons kernel bluetooth ;
 	EnableWerror src add-ons kernel bus_managers ;
-	EnableWerror src add-ons kernel busses agp_gart ;
-	EnableWerror src add-ons kernel busses ata ;
-#	EnableWerror src add-ons kernel busses i2c ;
-#	EnableWerror src add-ons kernel busses mmc ;
-#	EnableWerror src add-ons kernel busses random ;
-	EnableWerror src add-ons kernel busses scsi ;
-	EnableWerror src add-ons kernel busses usb ;
-#	EnableWerror src add-ons kernel busses virtio ;
+	EnableWerror src add-ons kernel busses ;
 	EnableWerror src add-ons kernel console ;
 	EnableWerror src add-ons kernel cpu ;
 	EnableWerror src add-ons kernel debugger ;

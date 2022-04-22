@@ -389,11 +389,13 @@ supports_device(device_node* parent)
 		pci_device* device;
 		gDeviceManager->get_driver(parent, (driver_module_info**)&pci,
 			(void**)&device);
+#ifdef TRACE_PCH_I2C
 		uint8 pciSubDeviceId = pci->read_pci_config(device, PCI_revision,
 			1);
 
-		TRACE("PCH I2C device found! vendor 0x%04x, device 0x%04x\n", vendorID,
-			deviceID);
+		TRACE("PCH I2C device found! vendor 0x%04x, device 0x%04x, subdevice 0x%02x\n", vendorID,
+			deviceID, pciSubDeviceId);
+#endif
 		return 0.8f;
 	}
 

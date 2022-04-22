@@ -210,7 +210,7 @@ class Capabilities
 		static const uint8_t k1v8 = 4;
 
 	private:
-		const uint64_t fBits;
+		uint64_t fBits;
 } __attribute__((packed));
 
 
