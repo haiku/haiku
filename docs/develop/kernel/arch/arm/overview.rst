@@ -115,11 +115,6 @@ Currently it is not possible to disassemble code in the kernel debugger.
 
 The `NetBSD disassembler <http://fxr.watson.org/fxr/source/arch/arm/arm/disassem.c?v=NETBSD>`_ could be ported and used for this.
 
-Add KDL hangman to the boot image
-*********************************
-
-for more enjoyment during porting....
-
 Userland
 ********
 
