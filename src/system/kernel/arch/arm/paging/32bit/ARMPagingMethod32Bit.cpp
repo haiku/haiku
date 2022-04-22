@@ -181,7 +181,8 @@ ARMPagingMethod32Bit::PhysicalPageSlotPool::Map(phys_addr_t physicalAddress,
 	page_table_entry& pte = fPageTable[
 		(virtualAddress - fVirtualBase) / B_PAGE_SIZE];
 	pte = (physicalAddress & ARM_PTE_ADDRESS_MASK)
-		| ARM_MMU_L2_TYPE_SMALLEXT;
+		| ARM_MMU_L2_TYPE_SMALLNEW
+		| ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C;
 
 	arch_cpu_invalidate_TLB_range(virtualAddress, virtualAddress + B_PAGE_SIZE);
 //	invalidate_TLB(virtualAddress);
@@ -508,7 +509,8 @@ ARMPagingMethod32Bit::PutPageTableEntryInTable(page_table_entry* entry,
 	bool globalPage)
 {
 	page_table_entry page = (physicalAddress & ARM_PTE_ADDRESS_MASK)
-		| ARM_MMU_L2_TYPE_SMALLEXT;
+		| ARM_MMU_L2_TYPE_SMALLNEW
+		| ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C;
 #if 0 //IRA
 		| X86_PTE_PRESENT | (globalPage ? X86_PTE_GLOBAL : 0)
 		| MemoryTypeToPageTableEntryFlags(memoryType);
