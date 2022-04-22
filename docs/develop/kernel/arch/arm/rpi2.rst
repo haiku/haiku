@@ -9,7 +9,7 @@ Hardware Information
 -  ARMv7 Architecture
 -  Broadcom BCM2836 (SoC)
 
-   -  Includes Quad ARM1176JZF-S CPU @ 900 MHz
+   -  Includes Quad ARM Cortex-A7 CPU @ 900 MHz
    -  Includes VideoCore IV GPU
 
 -  SD Card Storage
@@ -36,8 +36,9 @@ Boot Partition
 Required Files
 ~~~~~~~~~~~~~~
 
--  bootcode.bin : 2nd stage bootloader
+-  bootcode.bin: 2nd stage bootloader
 -  start.elf: The GPU binary firmware image
+-  fixup.dat: Additional code for the GPU
 -  config.txt: A configuration file read by the Pi to start u-boot.bin
 -  u-boot.bin: u-boot loader for the Pi 2
 -  bcm2836-rpi-2-b.dtb: FDT binary for the Raspberry Pi 2
