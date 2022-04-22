@@ -408,7 +408,19 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 void
 arch_mmu_allocate_kernel_page_tables(void)
 {
-	uint64* page = reinterpret_cast<uint64*>(READ_SPECIALREG(TTBR1_EL1));
+	uint64* page = NULL;
+	uint64 ttbr1 = READ_SPECIALREG(TTBR1_EL1);
+
+	// Trust possible previous allocations of TTBR1
+	// only if we come from a preset EL1 context
+	if (ttbr1 != 0ll) {
+		if (arch_exception_level() == 1) {
+			page = reinterpret_cast<uint64*>(ttbr1);
+			TRACE(("Resusing TTBR1_EL1 present : %" B_PRIx64 "\n", ttbr1));
+		} else if (arch_exception_level() == 2) {
+			TRACE(("Ignoring EL1 TTBR1(%" B_PRIx64") tables\n", ttbr1));
+		}
+	}
 
 	// NOTE: On devices supporting multiple translation base registers, TTBR0 must
 	// be used solely.
@@ -419,8 +431,6 @@ arch_mmu_allocate_kernel_page_tables(void)
 		} else {
 			panic("Not enough memory for kernel initial page\n");
 		}
-	} else {
-		TRACE(("TTBR1_EL1 present ..."));
 	}
 
 	sPageDirectory = page;
