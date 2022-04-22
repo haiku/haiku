@@ -117,6 +117,9 @@ _arm_fiq:
 
 .globl _vectors_end
 _vectors_end:
+
+.data
+
 	.rept	64
 	.word	0xdeadbeef
 	.endr
@@ -149,6 +152,7 @@ und_stack:
 	.word	. - 4
 	.word	0xccccdddd
 
+.text
 
 FUNCTION(arm_undefined):
 	PUSHFRAMEINSVC
@@ -236,22 +240,26 @@ FUNCTION(arm_vector_init):
 	mov	r0, r1
 	orr	r0, r0, #CPSR_MODE_FIQ
 	msr	cpsr_c, r0
-	ldr	sp, fiq_stack
+	ldr r2, =fiq_stack
+	ldr sp, [r2]
 
 	mov	r0, r1
 	orr	r0, r0, #CPSR_MODE_IRQ
 	msr	cpsr_c, r0
-	ldr	sp, irq_stack
+	ldr r2, =irq_stack
+	ldr sp, [r2]
 
 	mov	r0, r1
 	orr	r0, r0, #CPSR_MODE_ABT
 	msr	cpsr_c, r0
-	ldr	sp, abort_stack
+	ldr r2, =abort_stack
+	ldr sp, [r2]
 
 	mov	r0, r1
 	orr	r0, r0, #CPSR_MODE_UND
 	msr	cpsr_c, r0
-	ldr	sp, und_stack
+	ldr r2, =und_stack
+	ldr sp, [r2]
 
 	/* ... and return back to supervisor mode */
 	mov	r0, r1
