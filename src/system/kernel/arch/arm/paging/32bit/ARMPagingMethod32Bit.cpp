@@ -511,22 +511,10 @@ ARMPagingMethod32Bit::PutPageTableEntryInTable(page_table_entry* entry,
 {
 	page_table_entry page = (physicalAddress & ARM_PTE_ADDRESS_MASK)
 		| ARM_MMU_L2_TYPE_SMALLNEW
-		| ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C
-		| ARM_MMU_L2_FLAG_AP_RW;
-#if 0 //IRA
-		| X86_PTE_PRESENT | (globalPage ? X86_PTE_GLOBAL : 0)
-		| MemoryTypeToPageTableEntryFlags(memoryType);
+		| MemoryTypeToPageTableEntryFlags(memoryType)
+		| AttributesToPageTableEntryFlags(attributes)
+		| (globalPage ? 0 : ARM_MMU_L2_FLAG_NG);
 
-	// if the page is user accessible, it's automatically
-	// accessible in kernel space, too (but with the same
-	// protection)
-	if ((attributes & B_USER_PROTECTION) != 0) {
-		page |= X86_PTE_USER;
-		if ((attributes & B_WRITE_AREA) != 0)
-			page |= X86_PTE_WRITABLE;
-	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
-		page |= X86_PTE_WRITABLE;
-#endif
 	// put it in the page table
 	*(volatile page_table_entry*)entry = page;
 }
