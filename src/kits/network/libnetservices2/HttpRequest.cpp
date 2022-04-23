@@ -113,6 +113,13 @@ BHttpMethod::operator==(const BHttpMethod::Verb& other) const noexcept
 }
 
 
+bool
+BHttpMethod::operator!=(const BHttpMethod::Verb& other) const noexcept
+{
+	return !operator==(other);
+}
+
+
 const std::string_view
 BHttpMethod::Method() const noexcept
 {
@@ -149,11 +156,13 @@ BHttpMethod::Method() const noexcept
 // #pragma mark -- BHttpRequest::Data
 static const BUrl kDefaultUrl = BUrl();
 static const BHttpMethod kDefaultMethod = BHttpMethod::Get;
+static const BHttpRedirectOptions kDefaultRedirectOptions = BHttpRedirectOptions();
 
 
 struct BHttpRequest::Data {
-	BUrl		url = kDefaultUrl;
-	BHttpMethod	method	= kDefaultMethod;
+	BUrl					url = kDefaultUrl;
+	BHttpMethod				method	= kDefaultMethod;
+	BHttpRedirectOptions	redirectOptions;
 };
 
 
@@ -200,6 +209,15 @@ BHttpRequest::Method() const noexcept
 }
 
 
+const BHttpRedirectOptions&
+BHttpRequest::Redirect() const noexcept
+{
+	if (!fData)
+		return kDefaultRedirectOptions;
+	return fData->redirectOptions;
+}
+
+
 const BUrl&
 BHttpRequest::Url() const noexcept
 {
@@ -215,6 +233,15 @@ BHttpRequest::SetMethod(const BHttpMethod& method)
 	if (!fData)
 		fData = std::make_unique<Data>();
 	fData->method = method;
+}
+
+
+void
+BHttpRequest::SetRedirect(const BHttpRedirectOptions& redirectOptions)
+{
+	if (!fData)
+		fData = std::make_unique<Data>();
+	fData->redirectOptions = redirectOptions;
 }
 
 

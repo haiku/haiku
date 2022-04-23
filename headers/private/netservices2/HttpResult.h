@@ -28,10 +28,79 @@ struct BHttpBody
 };
 
 
+enum class BHttpStatusClass : int16 {
+	Invalid			= 000,
+	Informational 	= 100,
+	Success			= 200,
+	Redirection		= 300,
+	ClientError		= 400,
+	ServerError		= 500
+};
+
+
+enum class BHttpStatusCode : int16 {
+	Unknown = 0,
+
+	// Informational status codes
+	Continue = 100,
+	SwitchingProtocols,
+
+	// Success status codes
+	Ok = 200,
+	Created,
+	Accepted,
+	NonAuthoritativeInformation,
+	NoContent,
+	ResetContent,
+	PartialContent,
+
+	// Redirection status codes
+	MultipleChoice = 300,
+	MovedPermanently,
+	Found,
+	SeeOther,
+	NotModified,
+	UseProxy,
+	TemporaryRedirect = 307,
+	PermanentRedirect,
+
+	// Client error status codes
+	BadRequest = 400,
+	Unauthorized,
+	PaymentRequired,
+	Forbidden,
+	NotFound,
+	MethodNotAllowed,
+	NotAcceptable,
+	ProxyAuthenticationRequired,
+	RequestTimeout,
+	Conflict,
+	Gone,
+	LengthRequired,
+	PreconditionFailed,
+	RequestEntityTooLarge,
+	RequestUriTooLarge,
+	UnsupportedMediaType,
+	RequestedRangeNotSatisfiable,
+	ExpectationFailed,
+
+	// Server error status codes
+	InternalServerError = 500,
+	NotImplemented,
+	BadGateway,
+	ServiceUnavailable,
+	GatewayTimeout,
+};
+
+
 struct BHttpStatus
 { 
-	int16			code = 0;
-	BString			text;
+	int16				code = 0;
+	BString				text;
+
+	// Helpers
+	BHttpStatusClass	StatusClass() const noexcept;
+	BHttpStatusCode		StatusCode() const noexcept;
 };
 
 

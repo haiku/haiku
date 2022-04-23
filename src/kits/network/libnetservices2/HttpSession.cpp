@@ -71,6 +71,8 @@ public:
 													std::unique_ptr<BDataIO> target,
 													BMessenger observer);
 
+									Request(Request& original, const Redirect& redirect);
+
 	// States
 	enum RequestState {
 		InitialState,
@@ -99,7 +101,7 @@ public:
 	int								Socket() const noexcept { return fSocket->Socket(); }
 	int32							Id() const noexcept { return fResult->id; }
 	bool							CanCancel() const noexcept { return fResult->CanCancel(); }
-
+ 
 private:
 	std::optional<BString>			_GetLine(std::vector<std::byte>::const_iterator& offset);
 	BHttpStatus						_ParseStatus(BString&& statusLine);
@@ -131,12 +133,13 @@ private:
 	BHttpFields						fFields;
 	bool							fNoContent = false;
 
+	// Redirection
+	BHttpStatus						fRedirectStatus;
+	int8							fRemainingRedirects;
+
 	// Optional decompression
 	std::unique_ptr<BMallocIO>		fDecompressorStorage = nullptr;
 	std::unique_ptr<BDataIO>		fDecompressingStream = nullptr;
-
-	// TODO: reset method to reset Connection and Receive State when redirected
-
 };
 
 
@@ -173,6 +176,12 @@ private:
 	// data owned by the dataThread
 			std::map<int,BHttpSession::Request>	connectionMap;
 			std::vector<object_wait_info>		objectList;
+};
+
+
+struct BHttpSession::Redirect {
+	BUrl	url;
+	bool	redirectToGet;
 };
 
 
@@ -297,6 +306,7 @@ BHttpSession::Impl::ControlThreadFunc(void* arg)
 		wait_for_thread(impl->fDataThread, &threadResult);
 		// Cancel all requests
 		for (auto& request: impl->fControlQueue) {
+			std::cout << "ControlThreadFunc()[" << request.Id() << "] canceling request because the session is quitting" << std::endl;
 			try {
 				throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::Canceled);
 			} catch (...) {
@@ -420,22 +430,30 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 				auto finished = false;
 				auto success = false;
 				try {
-					finished = request.ReceiveResult();
+					if (request.CanCancel())
+						finished = true;
+					else
+						finished = request.ReceiveResult();
 					success = true;
+				} catch (const Redirect& r) {
+					// Request is redirected, send back to the controlThread
+					std::cout << "DataThreadFunc() [" << request.Id() << "] will be redirected to " << r.url.UrlString().String() << std::endl;
+
+					// Move existing request into a new request and hand over to the control queue
+					auto lock = AutoLocker<BLocker>(data->fLock);
+					data->fControlQueue.emplace_back(request, r);
+					release_sem(data->fControlQueueSem);
+
+					finished = true;
 				} catch (...) {
 					request.SetError(std::current_exception());
 					finished = true;
 				}
 
-				if (request.CanCancel()) {
-					// This could be done earlier, but this seems cleaner for the flow
-					std::cout << "DataThreadFunc() [" << request.Id() << "] CanCancel() true" << std::endl;
+				if (finished) {
+					// Clean up finished requests; including redirected requests
 					request.Disconnect();
-					data->connectionMap.erase(item.object);
-					resizeObjectList = true;
-				} else if (finished) {
-					request.Disconnect();
-					/* TODO: implement this somewhere else
+					/* TODO: implement this somewhere else; only notify if we are not redirecting
 					if (request.observer.IsValid()) {
 						BMessage msg(UrlEvent::RequestCompleted);
 						msg.AddInt32(UrlEventData::Id, request.result->id);
@@ -518,6 +536,7 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 		// Cancel all requests
 		for (auto it = data->connectionMap.begin(); it != data->connectionMap.end(); it++) {
 			try {
+				std::cout << "DataThreadFunc() [ " << it->second.Id() << "] canceling request because we are quitting" << std::endl;
 				throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::Canceled);
 			} catch (...) {
 				it->second.SetError(std::current_exception());
@@ -574,9 +593,32 @@ BHttpSession::Request::Request(BHttpRequest&& request, std::unique_ptr<BDataIO> 
 {
 	auto identifier = get_netservices_request_identifier();
 
+	// interpret the remaining redirects
+	if (fRequest.Redirect().followRedirect)
+		fRemainingRedirects = fRequest.Redirect().maxRedirections;
+	else
+		fRemainingRedirects = 0;
+
 	// create shared data
 	fResult = std::make_shared<HttpResultPrivate>(identifier);
 	fResult->ownedBody = std::move(target);
+}
+
+
+BHttpSession::Request::Request(Request& original, const BHttpSession::Redirect& redirect)
+	: fRequest(std::move(original.fRequest)), fObserver(original.fObserver),
+		fResult(original.fResult)
+{
+	// update the original request with the new location
+	fRequest.SetUrl(redirect.url);
+
+	if (redirect.redirectToGet
+		&& (fRequest.Method() != BHttpMethod::Head && fRequest.Method() != BHttpMethod::Get)) {
+		fRequest.SetMethod(BHttpMethod::Get);
+		// TODO: clear Post fields/Update Data when that is supported.
+	}
+
+	fRemainingRedirects = original.fRemainingRedirects--;
 }
 
 
@@ -727,16 +769,19 @@ BHttpSession::Request::ReceiveResult()
 		if (status.code != 0) {
 			// the status headers are now received, decide what to do next
 
-			// TODO: handle the case where we have a redirect code and we want to follow redirect
+			// Handle redirects
+			if (status.StatusClass() == BHttpStatusClass::Redirection && fRemainingRedirects > 0) {
+				fRedirectStatus = std::move(status);
+			} else {
+				// Register NoContent before moving the status to the result
+				if (status.StatusCode() == BHttpStatusCode::NoContent)
+					fNoContent = true;
+
+				fResult->SetStatus(std::move(status));
+				// TODO: inform listeners of receiving the status code
+			}
 
 			// TODO: handle the case where we have an error code and we want to stop on error
-
-			if (status.code == 204)
-				fNoContent = true;
-
-			fResult->SetStatus(std::move(status));
-
-			// TODO: inform listeners of receiving the status code
 
 			fRequestStatus = StatusReceived;
 		} else {
@@ -766,7 +811,38 @@ BHttpSession::Request::ReceiveResult()
 
 		// The headers have been received, now set up the rest of the response handling
 
-		// TODO: handle redirect
+		// Handle redirects
+		if (fRedirectStatus.StatusClass() == BHttpStatusClass::Redirection) {
+			auto redirectToGet = false;
+			switch (fRedirectStatus.StatusCode()) {
+			case BHttpStatusCode::Found:
+			case BHttpStatusCode::SeeOther:
+				// 302 and 303 redirections convert all requests to GET request, except for HEAD
+				redirectToGet = true;
+				[[fallthrough]];
+			case BHttpStatusCode::MovedPermanently:
+			case BHttpStatusCode::TemporaryRedirect:
+			case BHttpStatusCode::PermanentRedirect:
+			{
+				std::cout << "ReceiveResult() [" << Id() << "] Handle redirect with status: " << fRedirectStatus.code << std::endl;
+				auto locationField = fFields.FindField("Location");
+				if (locationField == fFields.end()) {
+					throw BNetworkRequestError(__PRETTY_FUNCTION__,
+						BNetworkRequestError::ProtocolError);
+				}
+				auto locationString = BString((*locationField).Value().data(),
+					(*locationField).Value().size());
+				auto redirect = BHttpSession::Redirect{BUrl(fRequest.Url(), locationString), redirectToGet};
+				if (!redirect.url.IsValid())
+					throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+
+				throw redirect;
+			}
+			default:
+				// ignore other status codes and continue regular processing
+				break;
+			}
+		}
 
 		// TODO: Parse received cookies
 

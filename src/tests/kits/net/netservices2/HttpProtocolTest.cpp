@@ -416,6 +416,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 		testCaller->addThread("GetTest", &HttpIntegrationTest::GetTest);
 		testCaller->addThread("HeadTest", &HttpIntegrationTest::HeadTest);
 		testCaller->addThread("NoContentTest", &HttpIntegrationTest::NoContentTest);
+		testCaller->addThread("AutoRedirectTest", &HttpIntegrationTest::AutoRedirectTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpIntegrationTest", &suite);
@@ -435,6 +436,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 		testCaller->addThread("GetTest", &HttpIntegrationTest::GetTest);
 		testCaller->addThread("HeadTest", &HttpIntegrationTest::HeadTest);
 		testCaller->addThread("NoContentTest", &HttpIntegrationTest::NoContentTest);
+		testCaller->addThread("AutoRedirectTest", &HttpIntegrationTest::AutoRedirectTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpsIntegrationTest", &suite);
@@ -572,6 +574,31 @@ HttpIntegrationTest::NoContentTest()
 
 		auto receivedBody = result.Body().text;
 		CPPUNIT_ASSERT_EQUAL(receivedBody.Length(), 0);
+	} catch (const BPrivate::Network::BError& e) {
+		CPPUNIT_FAIL(e.DebugMessage().String());
+	}
+}
+
+
+void
+HttpIntegrationTest::AutoRedirectTest()
+{
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/302"));
+	auto result = fSession.Execute(std::move(request));
+	try {
+		auto receivedFields = result.Fields();
+
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("Mismatch in number of headers",
+			kExpectedGetFields.CountFields(), receivedFields.CountFields());
+		for (auto& field: receivedFields) {
+			auto expectedField = kExpectedGetFields.FindField(field.Name());
+			if (expectedField == kExpectedGetFields.end())
+				CPPUNIT_FAIL("Could not find expected field in response headers");
+
+			CPPUNIT_ASSERT_EQUAL(field.Value(), (*expectedField).Value());
+		}
+		auto receivedBody = result.Body().text;
+		CPPUNIT_ASSERT_EQUAL(kExpectedGetBody, receivedBody.String());
 	} catch (const BPrivate::Network::BError& e) {
 		CPPUNIT_FAIL(e.DebugMessage().String());
 	}

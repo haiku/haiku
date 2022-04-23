@@ -29,6 +29,18 @@ namespace Network {
 
 
 /*!
+	\enum BHttpStatusClass
+	\brief Category of the HTTP response status code.
+*/
+
+
+/*!
+	\enum BHttpStatusCode
+	\brief Enumeration of standardized HTTP status codes.
+*/
+
+
+/*!
 	\struct BHttpStatus
 	\ingroup netservices
 	\brief Represents the HTTP status code and status text of an incoming response.
@@ -69,6 +81,28 @@ namespace Network {
 	<a href="https://datatracker.ietf.org/doc/html/rfc7230#section-3.1.2">specification</a>, the
 	status text should only be taken as informative. Only the \ref BHttpStatus::code should be used
 	for further processing.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpStatusClass BHttpStatus::StatusClass() const noexcept
+	\brief Map the \ref code value to a \ref BHttpStatusClass value
+
+	\return One of the valid values of \ref BHttpStatusClass, or \c BHttpStatusClass::Invalid if
+		the return code cannot be maped.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpStatusCode BHttpStatus::StatusCode() const noexcept
+	\brief Map the \ref code value to a \ref BHttpStatusCode value
+
+	\return One of the valid values of \ref BHttpStatusCode, or \c BHttpStatusCode::Unknown if
+		the return code cannot be maped.
 
 	\since Haiku R1
 */

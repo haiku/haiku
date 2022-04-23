@@ -228,6 +228,19 @@ namespace Network {
 
 
 /*!
+	\fn bool BHttpMethod::operator!=(const Verb &other) const noexcept
+	\brief Comparison operator.
+
+	\param other The verb to compare to.
+
+	\retval true This method is different from \a other.
+	\retval false This method is equal to \a other.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn const std::string_view BHttpMethod::Method() const noexcept
 	\brief Get a string representation of the method.
 
@@ -249,13 +262,47 @@ namespace Network {
 
 
 /*!
-	\fn BHttpMethod& BPrivate::Network::BHttpMethod::operator=(const BHttpMethod &other)
+	\fn BHttpMethod& BHttpMethod::operator=(const BHttpMethod &other)
 	\brief Copy assignment.
 
 	Copy data from an \a other object.
 
 	\exception std::bad_alloc When the \a other object contains a custom verb, this exception
 		will be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\struct BHttpRedirectOptions
+	\ingroup netservices
+	\brief Describe redirection options for a \ref BHttpRequest.
+
+	\see These options are used by \ref BHttpRequest::Redirect() and
+		\ref BHttpRequest::SetRedirect()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var bool BHttpRedirectOptions::followRedirect
+	\brief Describe whether the request should follow redirects.
+
+	\see These options are used by \ref BHttpRequest::Redirect() and
+		\ref BHttpRequest::SetRedirect()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var uint8 BHttpRedirectOptions::maxRedirections
+	\brief The maximum number of redirects that should be followed.
+
+	\see These options are used by \ref BHttpRequest::Redirect() and
+		\ref BHttpRequest::SetRedirect()
 
 	\since Haiku R1
 */
@@ -287,6 +334,12 @@ namespace Network {
 			<td> \ref SetMethod() </td>
 			<td> The HTTP method for the request </td>
 			<td> Defaults to \ref BHttpMethod::Get </td>
+		</tr>
+		<tr>
+			<td> \ref Redirect() </td>
+			<td> \ref SetRedirect() </td>
+			<td> Whether redirects should be followed, and if so, how many </td>
+			<td> By default redirects are followed, up to 8 redirects for one request </td>
 		</tr>
 	</table>
 
@@ -431,6 +484,16 @@ namespace Network {
 
 
 /*!
+	\fn const BHttpRedirectOptions& BHttpRequest::Redirect() const noexcept
+	\brief Get the current redirection options for this request.
+
+	\see \ref BHttpRequest::SetRedirect() for details on the options.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn const BUrl& BHttpRequest::Url() const noexcept
 	\brief Get the current Url for the request.
 
@@ -461,6 +524,30 @@ namespace Network {
 	is forbidden by the standard.
 
 	\param method The method to use for the request.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpRequest::SetRedirect(const BHttpRedirectOptions &redirectOptions)
+	\brief Set the redirection options for this request.
+
+	The HTTP protocol allows the server to redirect requests if the resources have moved to a new
+	location. For your convenience, you can instruct the network services kit to follow these
+	redirections.
+
+	The \ref BHttpRedirectOptions allows you to set what the redirection policy should be. You can
+	set whether redirects should be followed at all, and if so, how many redirects should be
+	followed. The maximum value is that of an unsigned 8 bit int, so maximum is 256 redirects. This
+	prevents the request from staying stuck in a redirection loop.
+
+	If redirects are disabled, or the maximum number of redirects have been processed, then the
+	response will be set to the actual (last) received redirection response.
+
+	\param redirectOptions The options for redirections.
 
 	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
 

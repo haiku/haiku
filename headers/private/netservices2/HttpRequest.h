@@ -61,6 +61,7 @@ public:
 
 	// Comparison
 			bool				operator==(const Verb& other) const noexcept;
+			bool				operator!=(const Verb& other) const noexcept;
 
 	// Get the method as a string
 	const	std::string_view	Method() const noexcept;
@@ -70,35 +71,44 @@ private:
 };
 
 
+struct BHttpRedirectOptions {
+	bool	followRedirect = true;
+	uint8	maxRedirections = 8;
+};
+
+
 class BHttpRequest {
 public:
 	// Constructors and Destructor
-	BHttpRequest();
-	BHttpRequest(const BUrl& url);
-	BHttpRequest(const BHttpRequest& other) = delete;
-	BHttpRequest(BHttpRequest&& other) noexcept;
-	~BHttpRequest();
+									BHttpRequest();
+									BHttpRequest(const BUrl& url);
+									BHttpRequest(const BHttpRequest& other) = delete;
+									BHttpRequest(BHttpRequest&& other) noexcept;
+									~BHttpRequest();
 
 	// Assignment operators
-			BHttpRequest&	operator=(const BHttpRequest& other) = delete;
-			BHttpRequest&	operator=(BHttpRequest&&) noexcept;
+			BHttpRequest&			operator=(const BHttpRequest& other) = delete;
+			BHttpRequest&			operator=(BHttpRequest&&) noexcept;
 
 	// Access
-			bool			IsEmpty() const noexcept;
-	const	BHttpMethod&	Method() const noexcept;
-	const	BUrl&			Url() const noexcept;
+			bool					IsEmpty() const noexcept;
+	const	BHttpMethod&			Method() const noexcept;
+	const	BHttpRedirectOptions&	Redirect() const noexcept;
+	const	BUrl&					Url() const noexcept;
 
 	// Named Setters
-			void			SetMethod(const BHttpMethod& method);
-			void			SetUrl(const BUrl& url);
+			void					SetMethod(const BHttpMethod& method);
+			void					SetRedirect(const BHttpRedirectOptions& redirectOptions);
+			void					SetUrl(const BUrl& url);
 
 	// Serialization
-			ssize_t			SerializeHeaderTo(BDataIO* target) const;
-			BString			HeaderToString() const;
+			ssize_t					SerializeHeaderTo(BDataIO* target) const;
+			BString					HeaderToString() const;
+
 private:
 	friend class BHttpSession;
 	struct Data;
-	std::unique_ptr<Data>	fData;
+	std::unique_ptr<Data>			fData;
 };
 
 

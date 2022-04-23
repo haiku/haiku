@@ -41,6 +41,7 @@ public:
 			void	GetTest();
 			void	HeadTest();
 			void	NoContentTest();
+			void	AutoRedirectTest();
 
 	static	void	AddTests(BTestSuite& suite);
 

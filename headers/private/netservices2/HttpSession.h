@@ -39,6 +39,7 @@ public:
 								BMessenger observer = BMessenger());
 
 private:
+	struct Redirect;
 	class Request;
 	class Impl;
 	std::shared_ptr<Impl>	fImpl;
