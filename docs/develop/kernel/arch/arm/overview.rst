@@ -57,10 +57,6 @@ switches at build time, however, they aren't passed on to haikuporter
 during the bootstrap build, leading to the ports failing to find the
 gcc atomic ops again.
 
-It seems this create other problems, mainly because the UEFI environment for ARM is not supposed to
-handle floating point registers. So, the softfloat ABI should be used there instead. To be able
-to build both "soft float" and "hard float" code, we need multilib support, see below.
-
 Determine how to handle atomic functions on ARM
 ***********************************************
 
