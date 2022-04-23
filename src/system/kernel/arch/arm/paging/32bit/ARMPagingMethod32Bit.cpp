@@ -185,8 +185,7 @@ ARMPagingMethod32Bit::PhysicalPageSlotPool::Map(phys_addr_t physicalAddress,
 		| ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C
 		| ARM_MMU_L2_FLAG_AP_KRW | ARM_MMU_L2_FLAG_XN;
 
-	arch_cpu_invalidate_TLB_range(virtualAddress, virtualAddress + B_PAGE_SIZE);
-//	invalidate_TLB(virtualAddress);
+	arch_cpu_invalidate_TLB_page(virtualAddress);
 }
 
 
@@ -396,12 +395,12 @@ ARMPagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 			"pgtable. phys=%#" B_PRIxPHYSADDR ", virt=%#" B_PRIxADDR "\n",
 			pgtable_phys, pgtable_virt);
 
+		// zero it out in it's new mapping
+		memset((void*)pgtable_virt, 0, B_PAGE_SIZE);
+
 		// put it in the pgdir
 		e = &fKernelVirtualPageDirectory[index];
 		PutPageTableInPageDir(e, pgtable_phys, attributes);
-
-		// zero it out in it's new mapping
-		memset((void*)pgtable_virt, 0, B_PAGE_SIZE);
 	}
 
 	phys_addr_t ptEntryPhys = fKernelVirtualPageDirectory[index] & ARM_PDE_ADDRESS_MASK;
@@ -493,14 +492,12 @@ ARMPagingMethod32Bit::IsKernelPageAccessible(addr_t virtualAddress,
 ARMPagingMethod32Bit::PutPageTableInPageDir(page_directory_entry* entry,
 	phys_addr_t pgtablePhysical, uint32 attributes)
 {
+	dsb();
+
 	*entry = (pgtablePhysical & ARM_PDE_ADDRESS_MASK) | ARM_MMU_L1_TYPE_COARSE;
-		// TODO: we ignore the attributes of the page table - for compatibility
-		// with BeOS we allow having user accessible areas in the kernel address
-		// space. This is currently being used by some drivers, mainly for the
-		// frame buffer. Our current real time data implementation makes use of
-		// this fact, too.
-		// We might want to get rid of this possibility one day, especially if
-		// we intend to port it to a platform that does not support this.
+
+	dsb();
+	isb();
 }
 
 
@@ -517,6 +514,9 @@ ARMPagingMethod32Bit::PutPageTableEntryInTable(page_table_entry* entry,
 
 	// put it in the page table
 	*(volatile page_table_entry*)entry = page;
+
+	dsb();
+	isb();
 }
 
 
