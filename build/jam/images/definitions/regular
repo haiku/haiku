@@ -110,8 +110,8 @@ SYSTEM_ADD_ONS_DRIVERS_BT_H2 +=
 ;
 
 SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures
-	ati.accelerant
 	x86,x86_64 @{
+		ati.accelerant
 		intel_810.accelerant intel_extreme.accelerant
 		matrox.accelerant
 		nvidia.accelerant
@@ -206,8 +206,8 @@ SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD +=
 ;
 
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS += [ FFilterByBuildFeatures
-	ati
 	x86,x86_64 @{
+		ati
 		intel_810 intel_extreme
 		matrox
 		nvidia
