@@ -11,6 +11,7 @@ class BDiskScannerParameterEditor;
 class BPartition;
 class BSession;
 class BString;
+class BView;
 
 // BDiskScannerPartitionAddOn
 class BDiskScannerPartitionAddOn {
