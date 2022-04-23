@@ -19,9 +19,10 @@ Hardware Information
    -  HDMI Video Output
    -  Composite Video Output
 
--  Ethernet
+-  Ethernet 10/100 Mbit/s
 -  Wifi b/g/n single band 2.4 GHz
--  Bluetooth
+-  Bluetooth 4.1 BLE
+-  4x USB 2.0
 
 Setting up the Haiku SD card
 ============================
@@ -61,7 +62,7 @@ Compiling Haiku and preparing SD card
 -  Create your ARM work directory
    ``mkdir generated.arm; cd generated.arm``
 -  Build an ARM toolchain using
-   ``../configure --build-cross-tools arm ../../buildtools``
+   ``../configure --build-cross-tools arm --cross-tools-source ../../buildtools``
 -  Build SD card image using ``jam -q -j6 @minimum-mmc``
 -  Prepare customized SD card using the ``rune`` tool. E.g. ``rune -b rpi3 -i haiku-mmc.image /dev/mmcblk0``
 -  Ensure that partition 1 has partition type fat16: ``parted /dev/mmcblk0 set 1 esp off``
