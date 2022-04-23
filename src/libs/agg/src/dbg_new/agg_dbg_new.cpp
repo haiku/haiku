@@ -479,13 +479,13 @@ namespace agg
 #endif
 
 //----------------------------------------------------------------------------
-void* operator new (unsigned size, const char* file, int line)
+void* operator new (size_t size, const char* file, int line)
 {
     return agg::dbg_malloc(size, file, line);
 }
 
 //----------------------------------------------------------------------------
-void* operator new [] (unsigned size, const char* file, int line)
+void* operator new [] (size_t size, const char* file, int line)
 {
     return agg::dbg_malloc(size, file, line);
 }

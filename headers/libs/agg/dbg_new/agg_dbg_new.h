@@ -26,8 +26,8 @@
 
 //#define AGG_DBG_NEW_CHECK_ADDR
 
-void* operator new (unsigned size, const char* file, int line);
-void* operator new [] (unsigned size, const char* file, int line);
+void* operator new (size_t size, const char* file, int line);
+void* operator new [] (size_t size, const char* file, int line);
 #define AGG_DBG_NEW_OPERATOR new(__FILE__, __LINE__)
 
 void  operator delete(void *ptr) throw();
