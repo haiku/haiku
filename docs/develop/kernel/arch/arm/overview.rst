@@ -120,7 +120,7 @@ The `NetBSD disassembler <http://fxr.watson.org/fxr/source/arch/arm/arm/disassem
 Userland
 ********
 
-Even if KDL hangman is fun, users will want to run real applications someday.
+Even if poking around in the kernel debugger is fun, users will want to run real applications someday.
 
 Other resources
 ---------------
