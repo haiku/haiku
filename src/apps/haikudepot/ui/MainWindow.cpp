@@ -293,6 +293,9 @@ MainWindow::~MainWindow()
 			fShuttingDownWindow->Quit();
 	}
 
+	delete_sem(fPackageToPopulateSem);
+	wait_for_thread(fPopulatePackageWorker, NULL);
+
 	// We must clear the model early to release references.
 	fModel.Clear();
 }
