@@ -134,6 +134,15 @@ struct Attributes {
 struct TerminalCell {
 	UTF8Char			character;
 	Attributes			attributes;
+
+	inline bool
+	operator!=(const Attributes& other) const
+	{
+		return (attributes.state & CHAR_ATTRIBUTES)
+				!= (other.state & CHAR_ATTRIBUTES)
+			|| attributes.foreground != other.foreground
+			|| attributes.background != other.background;
+	}
 };
 
 

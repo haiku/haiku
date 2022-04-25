@@ -146,8 +146,10 @@ HistoryBuffer::AddLine(const TerminalLine* line)
 	for (int32 i = 0; i < line->length; i++) {
 		const TerminalCell& cell = line->cells[i];
 		byteLength += cell.character.ByteCount();
-		if ((cell.attributes.state & CHAR_ATTRIBUTES) != attributes.state) {
+		if (cell != attributes) {
 			attributes.state = cell.attributes.state & CHAR_ATTRIBUTES;
+			attributes.foreground = cell.attributes.foreground;
+			attributes.background = cell.attributes.background;
 			if (attributes.state != 0)
 				attributesRuns++;
 		}
@@ -173,7 +175,7 @@ HistoryBuffer::AddLine(const TerminalLine* line)
 		chars += charLength;
 
 		// deal with attributes
-		if ((cell.attributes.state & CHAR_ATTRIBUTES) != attributes.state) {
+		if (cell != attributes) {
 			// terminate the previous attributes run
 			if (attributes.state != 0) {
 				attributesRun->length = i - attributesRun->offset;
@@ -181,6 +183,8 @@ HistoryBuffer::AddLine(const TerminalLine* line)
 			}
 
 			attributes.state = cell.attributes.state & CHAR_ATTRIBUTES;
+			attributes.foreground = cell.attributes.foreground;
+			attributes.background = cell.attributes.background;
 
 			// init the new one
 			if (attributes.state != 0) {
