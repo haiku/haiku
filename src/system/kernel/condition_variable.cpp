@@ -425,7 +425,7 @@ ConditionVariable::_NotifyLocked(bool all, status_t result)
 			while (atomic_get(&fEntriesCount) == oldCount) {
 				tries++;
 				if ((tries % 10000) == 0)
-					panic("entries count was not decremented for a long time!");
+					dprintf("entries count was not decremented for a long time!\n");
 				cpu_pause();
 			}
 		} else {
