@@ -386,9 +386,6 @@ extern bigtime_t	system_time(void);
 extern nanotime_t	system_time_nsecs(void);
 						/* time since booting in nanoseconds */
 
-					/* deprecated (is no-op) */
-extern status_t		set_timezone(const char *timezone);
-
 /* Alarm */
 
 enum {
