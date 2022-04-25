@@ -983,12 +983,7 @@ MemoryManager::_AllocateChunks(size_t chunkSize, uint32 chunkCount,
 		} else
 			break;
 
-		ConditionVariableEntry entry;
-		allocationEntry->condition.Add(&entry);
-
-		mutex_unlock(&sLock);
-		entry.Wait();
-		mutex_lock(&sLock);
+		allocationEntry->condition.Wait(&sLock);
 
 		if (_GetChunks(metaChunkList, chunkSize, chunkCount, _metaChunk,
 				_chunk)) {
