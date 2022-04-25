@@ -196,7 +196,6 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		atheros813x atheros81xx attansic_l1 attansic_l2
 		broadcom440x broadcom570x
 		dec21xxx
-		emulex_oce
 		ipro100 ipro1000
 		intel22x
 		jmicron2x0
