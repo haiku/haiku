@@ -74,7 +74,8 @@
 
 // TODO: should extract from /etc/passwd instead???
 const char *kDefaultShell = "/bin/sh";
-const char *kTerminalType = "xterm";
+const char *kColorTerminalType = "truecolor";
+const char *kTerminalType = "xterm-256color";
 
 /*
  * Set environment variable.
@@ -549,6 +550,7 @@ Shell::_Spawn(int row, int col, const ShellParameters& parameters)
 		/*
 		 * setenv TERM and TTY.
 		 */
+		setenv("COLORTERM", kColorTerminalType, true);
 		setenv("TERM", kTerminalType, true);
 		setenv("TTY", ttyName, true);
 		setenv("TTYPE", fShellInfo.EncodingName(), true);
