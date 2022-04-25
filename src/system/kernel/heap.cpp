@@ -1864,7 +1864,7 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 #endif
 
 	// if not, allocate a new chunk of memory
-	*newAddress = memalign(0, newSize);
+	*newAddress = malloc(newSize);
 	T(Reallocate((addr_t)address, (addr_t)*newAddress, newSize));
 	if (*newAddress == NULL) {
 		// we tried but it didn't work out, but still the operation is done
@@ -2349,7 +2349,7 @@ free_etc(void *address, uint32 flags)
 void *
 malloc(size_t size)
 {
-	return memalign(0, size);
+	return memalign_etc(0, size, 0);
 }
 
 
@@ -2410,7 +2410,7 @@ realloc(void *address, size_t newSize)
 	}
 
 	if (address == NULL)
-		return memalign(0, newSize);
+		return malloc(newSize);
 
 	if (newSize == 0) {
 		free(address);
@@ -2455,7 +2455,7 @@ realloc(void *address, size_t newSize)
 			}
 
 			// have to allocate/copy/free - TODO maybe resize the area instead?
-			newAddress = memalign(0, newSize);
+			newAddress = malloc(newSize);
 			if (newAddress == NULL) {
 				dprintf("realloc(): failed to allocate new block of %ld bytes\n",
 					newSize);
@@ -2482,7 +2482,7 @@ realloc(void *address, size_t newSize)
 void *
 calloc(size_t numElements, size_t size)
 {
-	void *address = memalign(0, numElements * size);
+	void *address = malloc(numElements * size);
 	if (address != NULL)
 		memset(address, 0, numElements * size);
 
