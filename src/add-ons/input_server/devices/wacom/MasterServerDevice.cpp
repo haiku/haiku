@@ -137,14 +137,14 @@ MasterServerDevice::Control(const char* device, void* cookie, uint32 code, BMess
 	// respond to changes in the system
 	switch (code) {
 		case B_MOUSE_SPEED_CHANGED:
-			get_mouse_speed(&fSpeed);
+			get_mouse_speed(device, &fSpeed);
 			_CalculateAccelerationTable();
 			break;
 		case B_CLICK_SPEED_CHANGED:
 			get_click_speed(&fDblClickSpeed);
 			break;
 		case B_MOUSE_ACCELERATION_CHANGED:
-			get_mouse_acceleration(&fAcceleration);
+			get_mouse_acceleration(device, &fAcceleration);
 			_CalculateAccelerationTable();
 			break;
 		case B_NODE_MONITOR:
