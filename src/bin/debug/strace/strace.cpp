@@ -260,8 +260,10 @@ patch_syscalls()
 	// instead of having this done here manually we should either add the
 	// patching step to gensyscalls also manually or add metadata to
 	// kernel/syscalls.h and have it parsed automatically
+	extern void patch_fcntl();
 	extern void patch_ioctl();
 
+	patch_fcntl();
 	patch_ioctl();
 
 	Syscall *poll = get_syscall("_kern_poll");
@@ -271,6 +273,10 @@ patch_syscalls()
 	select->ParameterAt(1)->SetInOut(true);
 	select->ParameterAt(2)->SetInOut(true);
 	select->ParameterAt(3)->SetInOut(true);
+
+	Syscall *wait = get_syscall("_kern_wait_for_child");
+	wait->ParameterAt(2)->SetOut(true);
+	wait->ParameterAt(3)->SetOut(true);
 }
 
 
@@ -379,6 +385,8 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_pre_syscall &message,
 		for (int32 i = 0; i < count; i++) {
 			// get the value
 			Parameter *parameter = syscall->ParameterAt(i);
+			if (parameter->Out())
+				continue;
 			TypeHandler *handler = parameter->Handler();
 			::string value =
 				handler->GetParameterValue(ctx, parameter,
@@ -455,7 +463,7 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
 		for (int32 i = 0; i < count; i++) {
 			// get the value
 			Parameter *parameter = syscall->ParameterAt(i);
-			if (!parameter->InOut())
+			if (!parameter->InOut() && !parameter->Out())
 				continue;
 			TypeHandler *handler = parameter->Handler();
 			::string value =
