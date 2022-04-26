@@ -74,6 +74,7 @@ All rights reserved.
 #include "IconCache.h"
 #include "MimeTypes.h"
 #include "Model.h"
+#include "Thumbnails.h"
 
 
 //#if DEBUG
@@ -785,8 +786,11 @@ IconCache::GetNodeIcon(ModelNodeLazyOpener* modelOpener,
 		if (model->IsExecutable()
 			&& (file = dynamic_cast<BFile*>(model->Node())) != NULL) {
 			result = GetAppIconFromAttr(file, lazyBitmap->Get(), size);
-		} else
-			result = GetFileIconFromAttr(model, lazyBitmap->Get(), size);
+		} else {
+			result = GetThumbnailFromAttr(model, lazyBitmap->Get(), size);
+			if (result != B_OK && result != B_BUSY)
+				result = GetFileIconFromAttr(model->Node(), lazyBitmap->Get(), size);
+		}
 
 		if (result == B_OK) {
 			// node has its own icon, use it
@@ -800,10 +804,6 @@ IconCache::GetNodeIcon(ModelNodeLazyOpener* modelOpener,
 				entry->ConstructBitmap(mode, size, lazyBitmap);
 				entry->SetIcon(lazyBitmap->Adopt(), mode, size);
 			}
-			source = kNode;
-		} else if (result == B_BUSY) {
-			// still waiting for thumbnail icon to be generated,
-			// provide a hint to come back here for it
 			source = kNode;
 		}
 	}

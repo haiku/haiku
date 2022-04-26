@@ -68,6 +68,7 @@ All rights reserved.
 #include "FindPanel.h"
 #include "FSUtils.h"
 #include "MimeTypes.h"
+#include "Thumbnails.h"
 #include "Tracker.h"
 #include "Utilities.h"
 
