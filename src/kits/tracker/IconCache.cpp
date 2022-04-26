@@ -292,18 +292,24 @@ void
 IconCacheEntry::SetIcon(BBitmap* bitmap, IconDrawMode mode, icon_size size,
 	bool /*create*/)
 {
+	BBitmap** icon = NULL;
 	if (mode == kNormalIcon) {
 		if (size == B_MINI_ICON)
-			fMiniIcon = bitmap;
+			icon = &fMiniIcon;
 		else
-			fLargeIcon = bitmap;
+			icon = &fLargeIcon;
 	} else if (mode == kSelectedIcon) {
 		if (size == B_MINI_ICON)
-			fHighlightedMiniIcon = bitmap;
+			icon = &fHighlightedMiniIcon;
 		else
-			fHighlightedLargeIcon = bitmap;
-	} else
+			icon = &fHighlightedLargeIcon;
+	}
+	if (icon == NULL)
 		TRESPASS();
+
+	if ((*icon) != NULL)
+		delete *icon;
+	*icon = bitmap;
 }
 
 
