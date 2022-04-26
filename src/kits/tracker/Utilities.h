@@ -348,36 +348,6 @@ private:
 };
 
 
-class LooperAutoLocker {
-public:
-	LooperAutoLocker(BHandler* handler)
-	:	fHandler(handler),
-		fHasLock(handler->LockLooper())
-	{
-	}
-
-	~LooperAutoLocker()
-	{
-		if (fHasLock)
-			fHandler->UnlockLooper();
-	}
-
-	bool operator!() const
-	{
-		return !fHasLock;
-	}
-
-	bool IsLocked() const
-	{
-		return fHasLock;
-	}
-
-private:
-	BHandler* fHandler;
-	bool fHasLock;
-};
-
-
 class ShortcutFilter : public BMessageFilter {
 public:
 	ShortcutFilter(uint32 shortcutKey, uint32 shortcutModifier,

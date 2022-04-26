@@ -2023,7 +2023,7 @@ PositionPassingMenuItem::Invoke(BMessage* message)
 	// use the window position only, if the item was invoked from the menu
 	// menu->Window() points to the window the item was invoked from
 	if (dynamic_cast<BContainerWindow*>(menu->Window()) == NULL) {
-		LooperAutoLocker lock(menu);
+		AutoLocker<BLooper> lock(menu->Looper());
 		if (lock.IsLocked()) {
 			BPoint invokeOrigin(menu->Window()->Frame().LeftTop());
 			clone.AddPoint("be:invoke_origin", invokeOrigin);
