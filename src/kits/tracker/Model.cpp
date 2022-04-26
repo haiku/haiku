@@ -898,7 +898,8 @@ Model::AttrChanged(const char* attrName)
 	if (attrName != NULL
 		&& (strcmp(attrName, kAttrIcon) == 0
 			|| strcmp(attrName, kAttrMiniIcon) == 0
-			|| strcmp(attrName, kAttrLargeIcon) == 0)) {
+			|| strcmp(attrName, kAttrLargeIcon) == 0
+			|| strcmp(attrName, kAttrThumbnail) == 0)) {
 		return true;
 	}
 
