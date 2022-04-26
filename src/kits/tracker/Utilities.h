@@ -409,18 +409,6 @@ extern void DeleteSubmenu(BMenuItem* submenuItem);
 extern bool BootedInSafeMode();
 
 
-inline rgb_color
-Color(int32 r, int32 g, int32 b, int32 alpha = 255)
-{
-	rgb_color result;
-	result.red = (uchar)r;
-	result.green = (uchar)g;
-	result.blue = (uchar)b;
-	result.alpha = (uchar)alpha;
-
-	return result;
-}
-
 void PrintToStream(rgb_color color);
 
 template <class InitCheckable>
