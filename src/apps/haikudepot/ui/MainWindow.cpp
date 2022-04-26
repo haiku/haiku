@@ -929,6 +929,8 @@ MainWindow::_AddRemovePackageFromLists(const PackageInfoRef& package)
 void
 MainWindow::_IncrementViewCounter(const PackageInfoRef& package)
 {
+	// Temporarily disabled, see tickets #16879 and #17689.
+#if 0
 	bool shouldIncrementViewCounter = false;
 
 	{
@@ -941,11 +943,12 @@ MainWindow::_IncrementViewCounter(const PackageInfoRef& package)
 	}
 
 	if (shouldIncrementViewCounter) {
-		ProcessCoordinator* bulkLoadCoordinator =
+		ProcessCoordinator* incrementViewCoordinator =
 			ProcessCoordinatorFactory::CreateIncrementViewCounter(
 				&fModel, package);
-		_AddProcessCoordinator(bulkLoadCoordinator);
+		_AddProcessCoordinator(incrementViewCoordinator);
 	}
+#endif
 }
 
 
