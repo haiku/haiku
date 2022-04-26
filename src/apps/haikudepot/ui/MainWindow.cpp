@@ -1419,12 +1419,12 @@ MainWindow::_HandleUserUsageConditionsNotLatest(
 void
 MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
 {
+	BReference<ProcessCoordinator> itemRef(item, true);
 	AutoLocker<BLocker> lock(&fCoordinatorLock);
 
 	if (fShouldCloseWhenNoProcessesToCoordinate) {
 		HDINFO("system shutting down --> new process coordinator [%s] rejected",
 			item->Name().String());
-		delete item;
 		return;
 	}
 
@@ -1435,10 +1435,9 @@ MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
 			debugger("unable to acquire the process coordinator sem");
 		HDINFO("adding and starting a process coordinator [%s]",
 			item->Name().String());
-		fCoordinator = BReference<ProcessCoordinator>(item);
+		fCoordinator = itemRef;
 		fCoordinator->Start();
-	}
-	else {
+	} else {
 		HDINFO("adding process coordinator [%s] to the queue",
 			item->Name().String());
 		fCoordinatorQueue.push(item);
