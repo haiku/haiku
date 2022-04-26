@@ -8,9 +8,11 @@
  */
 #include "Thumbnails.h"
 
+#include <list>
 #include <fs_attr.h>
 
 #include <Application.h>
+#include <Autolock.h>
 #include <BitmapStream.h>
 #include <Mime.h>
 #include <Node.h>
@@ -21,6 +23,9 @@
 #include <TypeConstants.h>
 #include <View.h>
 #include <Volume.h>
+
+#include <AutoDeleter.h>
+#include <JobQueue.h>
 
 #include "Attributes.h"
 #include "Commands.h"
@@ -35,6 +40,293 @@
 
 
 namespace BPrivate {
+
+
+//	#pragma mark - thumbnail generation
+
+
+enum ThumbnailWorkers {
+	SMALLER_FILES_WORKER = 0,
+	LARGER_FILES_WORKER,
+
+	TOTAL_THUMBNAIL_WORKERS
+};
+using BSupportKit::BPrivate::JobQueue;
+static JobQueue* sThumbnailWorkers[TOTAL_THUMBNAIL_WORKERS];
+
+static std::list<GenerateThumbnailJob*> sActiveJobs;
+static BLocker sActiveJobsLock;
+
+
+static BRect
+ThumbBounds(BBitmap* icon, float aspectRatio)
+{
+	BRect thumbBounds;
+
+	if ((icon->Bounds().Width() / icon->Bounds().Height()) == aspectRatio)
+		return icon->Bounds();
+
+	if (aspectRatio > 1) {
+		// wide
+		thumbBounds = BRect(0, 0, icon->Bounds().IntegerWidth() - 1,
+			floorf((icon->Bounds().IntegerHeight() - 1) / aspectRatio));
+		thumbBounds.OffsetBySelf(0, floorf((icon->Bounds().IntegerHeight()
+			- thumbBounds.IntegerHeight()) / 2.0f));
+	} else if (aspectRatio < 1) {
+		// tall
+		thumbBounds = BRect(0, 0, floorf((icon->Bounds().IntegerWidth() - 1)
+			* aspectRatio), icon->Bounds().IntegerHeight() - 1);
+		thumbBounds.OffsetBySelf(floorf((icon->Bounds().IntegerWidth()
+			- thumbBounds.IntegerWidth()) / 2.0f), 0);
+	} else {
+		// square
+		thumbBounds = icon->Bounds();
+	}
+
+	return thumbBounds;
+}
+
+
+static status_t
+ScaleBitmap(BBitmap* source, BBitmap& dest, BRect bounds, color_space colorSpace)
+{
+	dest = BBitmap(bounds, colorSpace, true);
+	BView view(dest.Bounds(), "", B_FOLLOW_NONE, B_WILL_DRAW);
+	dest.AddChild(&view);
+	if (view.LockLooper()) {
+		// fill with transparent
+		view.SetLowColor(B_TRANSPARENT_COLOR);
+		view.FillRect(view.Bounds(), B_SOLID_LOW);
+		// draw bitmap
+		view.SetDrawingMode(B_OP_ALPHA);
+		view.SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+		view.DrawBitmap(source, source->Bounds(),
+			ThumbBounds(&dest, source->Bounds().Width()
+				/ source->Bounds().Height()),
+			B_FILTER_BITMAP_BILINEAR);
+		view.Sync();
+		view.UnlockLooper();
+	}
+	dest.RemoveChild(&view);
+	return B_OK;
+}
+
+
+static status_t
+ScaleBitmap(BBitmap* source, BBitmap& dest, icon_size size, color_space colorSpace)
+{
+	return ScaleBitmap(source, dest, BRect(0, 0, size - 1, size - 1), colorSpace);
+}
+
+
+class GenerateThumbnailJob : public BSupportKit::BJob {
+public:
+	GenerateThumbnailJob(Model* model, const BFile& file,
+			icon_size size, color_space colorSpace)
+		: BJob("GenerateThumbnail"),
+		  fMimeType(model->MimeType()),
+		  fSize(size),
+		  fColorSpace(colorSpace)
+	{
+		fFile = new(std::nothrow) BFile(file);
+		fFile->GetNodeRef((node_ref*)&fNodeRef);
+
+		BAutolock lock(sActiveJobsLock);
+		sActiveJobs.push_back(this);
+	}
+	virtual ~GenerateThumbnailJob()
+	{
+		delete fFile;
+
+		BAutolock lock(sActiveJobsLock);
+		sActiveJobs.remove(this);
+	}
+
+	status_t InitCheck()
+	{
+		if (fFile == NULL)
+			return B_NO_MEMORY;
+		return BJob::InitCheck();
+	}
+
+	virtual status_t Execute();
+
+public:
+	const BString fMimeType;
+	const node_ref fNodeRef;
+	const icon_size fSize;
+	const color_space fColorSpace;
+
+private:
+	BFile* fFile;
+};
+
+
+status_t
+GenerateThumbnailJob::Execute()
+{
+	BBitmapStream imageStream;
+	status_t status = BTranslatorRoster::Default()->Translate(fFile, NULL, NULL,
+		&imageStream, B_TRANSLATOR_BITMAP, 0, fMimeType);
+	if (status != B_OK)
+		return status;
+
+	BBitmap* image;
+	status = imageStream.DetachBitmap(&image);
+	if (status != B_OK)
+		return status;
+
+	// we have translated the image file into a BBitmap
+
+	// now, scale and directly insert into the icon cache
+	BBitmap tmp(NULL, false);
+	ScaleBitmap(image, tmp, fSize, fColorSpace);
+
+	BBitmap* cacheThumb = new BBitmap(tmp.Bounds(), 0, tmp.ColorSpace());
+	cacheThumb->ImportBits(&tmp);
+
+	NodeIconCache* nodeIconCache = &IconCache::sIconCache->fNodeCache;
+	AutoLocker<NodeIconCache> cacheLocker(nodeIconCache);
+	NodeCacheEntry* entry = nodeIconCache->FindItem(&fNodeRef);
+	if (entry == NULL)
+		entry = nodeIconCache->AddItem(&fNodeRef);
+	if (entry == NULL) {
+		delete cacheThumb;
+		return B_NO_MEMORY;
+	}
+
+	entry->SetIcon(cacheThumb, kNormalIcon, fSize);
+	cacheLocker.Unlock();
+
+	// write values to attributes
+	bool thumbnailWritten = false;
+	const int32 width = image->Bounds().IntegerWidth();
+	const size_t written = fFile->WriteAttr("Media:Width", B_INT32_TYPE,
+		0, &width, sizeof(int32));
+	if (written == sizeof(int32)) {
+		// first attribute succeeded, write the rest
+		const int32 height = image->Bounds().IntegerHeight();
+		fFile->WriteAttr("Media:Height", B_INT32_TYPE, 0, &height, sizeof(int32));
+
+		// convert image into a 128x128 WebP image and stash it
+		BBitmap thumb(NULL, false);
+		ScaleBitmap(image, thumb, B_XXL_ICON, fColorSpace);
+
+		BBitmap* thumbPointer = &thumb;
+		BBitmapStream thumbStream(thumbPointer);
+		BMallocIO stream;
+		if (BTranslatorRoster::Default()->Translate(&thumbStream,
+					NULL, NULL, &stream, B_WEBP_FORMAT) == B_OK
+				&& thumbStream.DetachBitmap(&thumbPointer) == B_OK) {
+			// write WebP image data into an attribute
+			status = fFile->WriteAttr(kAttrThumbnail, B_RAW_TYPE, 0,
+				stream.Buffer(), stream.BufferLength());
+			thumbnailWritten = (status == B_OK);
+
+			// write thumbnail creation time into an attribute
+			bigtime_t created = system_time();
+			fFile->WriteAttr(kAttrThumbnailCreationTime, B_TIME_TYPE,
+				0, &created, sizeof(bigtime_t));
+		}
+	}
+
+	delete image;
+
+	// Manually trigger an icon refresh, if necessary.
+	// (If the attribute was written, node monitoring will handle this automatically.)
+	if (!thumbnailWritten) {
+		// send Tracker a message to tell it to update the thumbnail
+		BMessage message(kUpdateThumbnail);
+		if (message.AddInt32("device", fNodeRef.device) == B_OK
+				&& message.AddUInt64("node", fNodeRef.node) == B_OK) {
+			be_app->PostMessage(&message);
+		}
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+thumbnail_worker(void* castToJobQueue)
+{
+	JobQueue* queue = (JobQueue*)castToJobQueue;
+	while (true) {
+		BSupportKit::BJob* job;
+		status_t status = queue->Pop(B_INFINITE_TIMEOUT, false, &job);
+		if (status == B_INTERRUPTED)
+			continue;
+		if (status != B_OK)
+			break;
+
+		job->Run();
+		delete job;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+GenerateThumbnail(Model* model, color_space colorSpace, icon_size which)
+{
+	// First check we do not have a job queued already.
+	BAutolock jobsLock(sActiveJobsLock);
+	for (std::list<GenerateThumbnailJob*>::iterator it = sActiveJobs.begin();
+			it != sActiveJobs.end(); it++) {
+		if ((*it)->fNodeRef == *model->NodeRef())
+			return B_BUSY;
+	}
+	jobsLock.Unlock();
+
+	BFile* file = dynamic_cast<BFile*>(model->Node());
+	if (file == NULL)
+		return B_NOT_SUPPORTED;
+
+	struct stat st;
+	status_t status = file->GetStat(&st);
+	if (status != B_OK)
+		return status;
+
+	GenerateThumbnailJob* job = new(std::nothrow) GenerateThumbnailJob(model,
+		*file, which, colorSpace);
+	ObjectDeleter<GenerateThumbnailJob> jobDeleter(job);
+	if (job == NULL)
+		return B_NO_MEMORY;
+	if (job->InitCheck() != B_OK)
+		return job->InitCheck();
+
+	JobQueue** jobQueue;
+	if (st.st_size >= (128 * kKBSize)) {
+		jobQueue = &sThumbnailWorkers[LARGER_FILES_WORKER];
+	} else {
+		jobQueue = &sThumbnailWorkers[SMALLER_FILES_WORKER];
+	}
+
+	if ((*jobQueue) == NULL) {
+		// We need to create the worker.
+		*jobQueue = new(std::nothrow) JobQueue();
+		if ((*jobQueue) == NULL)
+			return B_NO_MEMORY;
+		if ((*jobQueue)->InitCheck() != B_OK)
+			return (*jobQueue)->InitCheck();
+		thread_id thread = spawn_thread(thumbnail_worker, "thumbnail worker",
+			B_NORMAL_PRIORITY, *jobQueue);
+		if (thread < B_OK)
+			return thread;
+		resume_thread(thread);
+	}
+
+	jobDeleter.Detach();
+	status = (*jobQueue)->AddJob(job);
+	if (status == B_OK)
+		return B_BUSY;
+
+	return status;
+}
+
+
+//	#pragma mark - thumbnail fetching
 
 
 status_t
@@ -65,11 +357,11 @@ GetThumbnailFromAttr(Model* model, BBitmap* icon, icon_size which)
 			// file has not changed, try to return an existing thumbnail
 			attr_info attrInfo;
 			if (node->GetAttrInfo(kAttrThumbnail, &attrInfo) == B_OK) {
-				uint8 webpData[attrInfo.size];
+				BMallocIO webpData;
+				webpData.SetSize(attrInfo.size);
 				if (node->ReadAttr(kAttrThumbnail, attrInfo.type, 0,
-						webpData, attrInfo.size) == attrInfo.size) {
-					BMemoryIO stream((const void*)webpData, attrInfo.size);
-					BBitmap thumb(BTranslationUtils::GetBitmap(&stream));
+						(void*)webpData.Buffer(), attrInfo.size) == attrInfo.size) {
+					BBitmap thumb(BTranslationUtils::GetBitmap(&webpData));
 
 					// convert thumb to icon size
 					if (which == B_XXL_ICON) {
@@ -77,26 +369,9 @@ GetThumbnailFromAttr(Model* model, BBitmap* icon, icon_size which)
 						result = icon->ImportBits(&thumb);
 					} else {
 						// down-scale thumb to icon size
-						// TODO don't make a copy, allow icon to accept views
-						BBitmap tmp = BBitmap(icon->Bounds(),
-							icon->ColorSpace(), true);
-						BView view(tmp.Bounds(), "", B_FOLLOW_NONE,
-							B_WILL_DRAW);
-						tmp.AddChild(&view);
-						if (view.LockLooper()) {
-							// fill with transparent
-							view.SetLowColor(B_TRANSPARENT_COLOR);
-							view.FillRect(view.Bounds(), B_SOLID_LOW);
-							// draw bitmap
-							view.SetDrawingMode(B_OP_ALPHA);
-							view.SetBlendingMode(B_PIXEL_ALPHA,
-								B_ALPHA_COMPOSITE);
-							view.DrawBitmap(&thumb, thumb.Bounds(),
-								tmp.Bounds(), B_FILTER_BITMAP_BILINEAR);
-							view.Sync();
-							view.UnlockLooper();
-						}
-						tmp.RemoveChild(&view);
+						// TODO don't make a copy, allow icon to accept views?
+						BBitmap tmp(NULL, false);
+						ScaleBitmap(&thumb, tmp, icon->Bounds(), icon->ColorSpace());
 
 						// copy tmp bitmap into icon
 						result = icon->ImportBits(&tmp);
@@ -117,163 +392,10 @@ GetThumbnailFromAttr(Model* model, BBitmap* icon, icon_size which)
 		}
 	}
 
-	if (ShouldGenerateThumbnail(model->MimeType())) {
-		// try to fetch a new thumbnail icon
-		result = GetThumbnailIcon(model, icon, which);
-		if (result == B_OK) {
-			// icon ready
-			return B_OK;
-		} else if (result == B_BUSY) {
-			// working on icon, come back later
-			return B_BUSY;
-		}
-	}
+	if (ShouldGenerateThumbnail(model->MimeType()))
+		return GenerateThumbnail(model, icon->ColorSpace(), which);
 
-	return ENOENT;
-}
-
-//	#pragma mark - image thumbnails
-
-
-struct ThumbGenParams {
-	ThumbGenParams(Model* _model, BFile* _file, icon_size _which,
-		color_space _colorSpace, port_id _port);
-	virtual	~ThumbGenParams();
-
-	status_t InitCheck() { return fInitStatus; };
-
-	Model* model;
-	BFile* file;
-	icon_size which;
-	color_space colorSpace;
-	port_id port;
-
-private:
-	status_t fInitStatus;
-};
-
-
-ThumbGenParams::ThumbGenParams(Model* _model, BFile* _file, icon_size _which,
-	color_space _colorSpace, port_id _port)
-{
-	model = new(std::nothrow) Model(*_model);
-	file = new(std::nothrow) BFile(*_file);
-	which = _which;
-	colorSpace = _colorSpace;
-	port = _port;
-
-	fInitStatus = (model == NULL || file == NULL ? B_NO_MEMORY : B_OK);
-}
-
-
-ThumbGenParams::~ThumbGenParams()
-{
-	delete file;
-	delete model;
-}
-
-
-status_t get_thumbnail(void* castToParams);
-static const int32 kMsgIconData = 'ICON';
-
-
-BRect
-ThumbBounds(BBitmap* icon, float aspectRatio)
-{
-	BRect thumbBounds;
-
-	if (aspectRatio > 1) {
-		// wide
-		thumbBounds = BRect(0, 0, icon->Bounds().IntegerWidth() - 1,
-			floorf((icon->Bounds().IntegerHeight() - 1) / aspectRatio));
-		thumbBounds.OffsetBySelf(0, floorf((icon->Bounds().IntegerHeight()
-			- thumbBounds.IntegerHeight()) / 2.0f));
-	} else if (aspectRatio < 1) {
-		// tall
-		thumbBounds = BRect(0, 0, floorf((icon->Bounds().IntegerWidth() - 1)
-			* aspectRatio), icon->Bounds().IntegerHeight() - 1);
-		thumbBounds.OffsetBySelf(floorf((icon->Bounds().IntegerWidth()
-			- thumbBounds.IntegerWidth()) / 2.0f), 0);
-	} else {
-		// square
-		thumbBounds = icon->Bounds();
-	}
-
-	return thumbBounds;
-}
-
-
-status_t
-GetThumbnailIcon(Model* model, BBitmap* icon, icon_size which)
-{
-	status_t result = B_ERROR;
-
-	// create a name for the node icon generator thread (32 chars max)
-	icon_size w = (icon_size)B_XXL_ICON;
-	dev_t d = model->NodeRef()->device;
-	ino_t n = model->NodeRef()->node;
-	BString genThreadName = BString("_thumbgen_w")
-		<< w << "_d" << d << "_n" << n << "_";
-
-	bool volumeReadOnly = true;
-	BVolume volume(model->NodeRef()->device);
-	if (volume.InitCheck() == B_OK)
-		volumeReadOnly = volume.IsReadOnly() || !volume.KnowsAttr();
-
-	port_id port = B_NAME_NOT_FOUND;
-	if (volumeReadOnly) {
-		// look for a port with some icon data
-		port = find_port(genThreadName.String());
-			// give the port the same name as the generator thread
-		if (port != B_NAME_NOT_FOUND && port_count(port) > 0) {
-			// a generator thread has written some data to the port, fetch it
-			uint8 iconData[icon->BitsLength()];
-			int32 msgCode;
-			int32 bytesRead = read_port(port, &msgCode, iconData,
-				icon->BitsLength());
-			if (bytesRead == icon->BitsLength() && msgCode == kMsgIconData
-				&& iconData != NULL) {
-				// fill icon data into the passed in icon
-				result = icon->ImportBits(iconData, icon->BitsLength(),
-					icon->BytesPerRow(), 0, icon->ColorSpace());
-			}
-
-			if (result == B_OK) {
-				// make a new port next time
-				delete_port(port);
-				port = B_NAME_NOT_FOUND;
-			}
-		}
-	}
-
-	// we found an icon from a generator thread
-	if (result == B_OK)
-		return B_OK;
-
-	// look for an existing generator thread before spawning a new one
-	if (find_thread(genThreadName.String()) == B_NAME_NOT_FOUND) {
-		// no generater thread found, spawn one
-		BFile* file = dynamic_cast<BFile*>(model->Node());
-		if (file == NULL)
-			result = B_NOT_SUPPORTED; // node must be a file
-		else {
-			// create a new port if one doesn't already exist
-			if (volumeReadOnly && port == B_NAME_NOT_FOUND)
-				port = create_port(1, genThreadName.String());
-
-			ThumbGenParams* params = new ThumbGenParams(model, file, which,
-				icon->ColorSpace(), port);
-			if (params->InitCheck() == B_OK) {
-				// generator thread will delete params, it makes copies
-				resume_thread(spawn_thread(get_thumbnail,
-					genThreadName.String(), B_LOW_PRIORITY, params));
-				result = B_BUSY; // try again later
-			} else
-				delete params;
-		}
-	}
-
-	return result;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -284,147 +406,6 @@ ShouldGenerateThumbnail(const char* type)
 	// mime type must be an image (for now)
 	return TrackerSettings().GenerateImageThumbnails()
 		&& type != NULL && BString(type).IStartsWith("image");
-}
-
-
-//	#pragma mark - thumbnail generator thread
-
-
-status_t
-get_thumbnail(void* castToParams)
-{
-	ThumbGenParams* params = (ThumbGenParams*)castToParams;
-	Model* model = params->model;
-	BFile* file = params->file;
-	icon_size which = params->which;
-	color_space colorSpace = params->colorSpace;
-	port_id port = params->port;
-
-	// get the mime type from the model
-	const char* type = model->MimeType();
-
-	// check if attributes can be written to
-	bool volumeReadOnly = true;
-	BVolume volume(model->NodeRef()->device);
-	if (volume.InitCheck() == B_OK)
-		volumeReadOnly = volume.IsReadOnly() || !volume.KnowsAttr();
-
-	// see if we have a thumbnail attribute
-	attr_info attrInfo;
-	status_t result = file->GetAttrInfo(kAttrThumbnail, &attrInfo);
-	if (result != B_OK) {
-		// create a new thumbnail
-
-		// check to see if we have a translator that works
-		BBitmapStream imageStream;
-		BBitmap* image;
-		if (BTranslatorRoster::Default()->Translate(file, NULL, NULL,
-				&imageStream, B_TRANSLATOR_BITMAP, 0, type) == B_OK
-			&& imageStream.DetachBitmap(&image) == B_OK) {
-			// we have translated the image file into a BBitmap
-
-			// check if we can write attrs
-			if (!volumeReadOnly) {
-				// write image width to an attribute
-				int32 width = image->Bounds().IntegerWidth();
-				file->WriteAttr("Media:Width", B_INT32_TYPE, 0, &width,
-					sizeof(int32));
-
-				// write image height to an attribute
-				int32 height = image->Bounds().IntegerHeight();
-				file->WriteAttr("Media:Height", B_INT32_TYPE, 0, &height,
-					sizeof(int32));
-
-				// convert image into a 128x128 WebP image and stash it
-				BBitmap thumb = BBitmap(BRect(0, 0, B_XXL_ICON - 1,
-					B_XXL_ICON - 1), colorSpace, true);
-				BView view(thumb.Bounds(), "", B_FOLLOW_NONE,
-					B_WILL_DRAW);
-				thumb.AddChild(&view);
-				if (view.LockLooper()) {
-					// fill with transparent
-					view.SetLowColor(B_TRANSPARENT_COLOR);
-					view.FillRect(view.Bounds(), B_SOLID_LOW);
-					// draw bitmap
-					view.SetDrawingMode(B_OP_ALPHA);
-					view.SetBlendingMode(B_PIXEL_ALPHA,
-						B_ALPHA_COMPOSITE);
-					view.DrawBitmap(image, image->Bounds(),
-						ThumbBounds(&thumb, image->Bounds().Width()
-							/ image->Bounds().Height()),
-						B_FILTER_BITMAP_BILINEAR);
-					view.Sync();
-					view.UnlockLooper();
-				}
-				thumb.RemoveChild(&view);
-
-				BBitmap* thumbPointer = &thumb;
-				BBitmapStream thumbStream(thumbPointer);
-				BMallocIO stream;
-				if (BTranslatorRoster::Default()->Translate(&thumbStream,
-						NULL, NULL, &stream, B_WEBP_FORMAT) == B_OK
-					&& thumbStream.DetachBitmap(&thumbPointer) == B_OK) {
-					// write WebP image data into an attribute
-					file->WriteAttr(kAttrThumbnail, B_RAW_TYPE, 0,
-						stream.Buffer(), stream.BufferLength());
-
-					// write thumbnail creation time into an attribute
-					bigtime_t created = system_time();
-					file->WriteAttr(kAttrThumbnailCreationTime, B_TIME_TYPE,
-						0, &created, sizeof(bigtime_t));
-
-					// we wrote thumbnail to an attribute
-					result = B_OK;
-				}
-			} else if (port != B_NAME_NOT_FOUND) {
-				// create a thumb at the requested icon size
-				BBitmap thumb = BBitmap(BRect(0, 0, which - 1, which - 1),
-					colorSpace, true);
-				// copy image into a view bitmap, scaled and centered
-				BView view(thumb.Bounds(), "", B_FOLLOW_NONE, B_WILL_DRAW);
-				thumb.AddChild(&view);
-				if (view.LockLooper()) {
-					// fill with transparent
-					view.SetLowColor(B_TRANSPARENT_COLOR);
-					view.FillRect(view.Bounds(), B_SOLID_LOW);
-					// draw bitmap
-					view.SetDrawingMode(B_OP_ALPHA);
-					view.SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
-					view.DrawBitmap(image, image->Bounds(),
-						ThumbBounds(&thumb, image->Bounds().Width()
-							/ image->Bounds().Height()),
-						B_FILTER_BITMAP_BILINEAR);
-					view.Sync();
-					view.UnlockLooper();
-				}
-				thumb.RemoveChild(&view);
-
-				// send icon back to the calling thread through the port
-				result = write_port(port, kMsgIconData, (void*)thumb.Bits(),
-					thumb.BitsLength());
-			}
-		}
-
-		delete image;
-	}
-
-	if (result == B_OK) {
-		// trigger an icon refresh
-		if (!volumeReadOnly)
-			model->Mimeset(true); // only works on read-write volumes
-		else {
-			// send Tracker a message to tell it to update the thumbnail
-			BMessage message(kUpdateThumbnail);
-			if (message.AddInt32("device", model->NodeRef()->device) == B_OK
-				&& message.AddUInt64("node", model->NodeRef()->node) == B_OK) {
-				be_app->PostMessage(&message);
-			}
-		}
-	}
-
-	delete params;
-
-	return result;
 }
 
 

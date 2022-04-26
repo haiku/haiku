@@ -21,7 +21,6 @@ class Model;
 
 
 status_t GetThumbnailFromAttr(Model* model, BBitmap* icon, icon_size which);
-status_t GetThumbnailIcon(Model* model, BBitmap* icon, icon_size which);
 bool ShouldGenerateThumbnail(const char* type);
 
 
