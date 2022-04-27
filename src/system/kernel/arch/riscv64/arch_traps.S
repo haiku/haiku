@@ -64,13 +64,13 @@ FUNCTION(SVecU):
 	call STrap
 
 FUNCTION(SVecURet):
+	ld   t0, IFRAME_status(sp)
+	csrw sstatus, t0
+
 	csrw sscratch, fp # save kernel SP
 
 	la   t0,    SVecU
 	csrw stvec, t0
-
-	ld   t0, IFRAME_status(sp)
-	csrw sstatus, t0
 
 	ld tp, IFRAME_tp(sp)
 	ld t0, IFRAME_epc(sp)
