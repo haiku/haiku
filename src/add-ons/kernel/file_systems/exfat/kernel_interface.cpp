@@ -397,10 +397,13 @@ exfat_lookup(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	status = DirectoryIterator(directory).Lookup(name, strlen(name), _vnodeID);
 	if (status != B_OK) {
 		ERROR("exfat_lookup: name %s (%s)\n", name, strerror(status));
+		if (status == B_ENTRY_NOT_FOUND)
+			entry_cache_add_missing(volume->ID(), directory->ID(), name);
 		return status;
 	}
 
 	TRACE("exfat_lookup: ID %" B_PRIdINO "\n", *_vnodeID);
+	entry_cache_add(volume->ID(), directory->ID(), name, *_vnodeID);
 
 	return get_vnode(volume->FSVolume(), *_vnodeID, NULL);
 }
