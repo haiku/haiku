@@ -38,7 +38,7 @@ public:
 			void				FillMapEntry(int num, ExtentMapEntry* map);
 			status_t			FillBuffer(int type, char* buffer,
 									int howManyBlocksFurther);
-			void				SearchAndFillDataMap(int blockNo);
+			void				SearchAndFillDataMap(uint64 blockNo);
 			uint32				FindHashInNode(uint32 hashVal);
 			uint32				GetOffsetFromAddress(uint32 address);
 			int					EntrySize(int len) const;

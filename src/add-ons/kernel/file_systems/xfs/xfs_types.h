@@ -8,11 +8,13 @@
 #include "system_dependencies.h"
 
 /*
-Reference documentation: 
+Reference documentation:
 https://mirrors.edge.kernel.org/pub/linux/utils/fs/xfs/docs
 /xfs_filesystem_structure.pdf
 
 Chapter 5: Common XFS types		(Page 8)
+
+These are on-disk data types (how the data is stored on disk)
 */
 
 

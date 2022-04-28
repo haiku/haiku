@@ -231,9 +231,9 @@ public:
 			status_t			ReadExtents();
 			status_t			ReadAt(off_t pos, uint8* buffer, size_t* length);
 			status_t			GetNodefromTree(uint16& levelsInTree,
-									Volume* volume, size_t& len,
+									Volume* volume, ssize_t& len,
 									size_t DirBlockSize, char* block);
-			int					SearchMapInAllExtent(int blockNo);
+			int					SearchMapInAllExtent(uint64 blockNo);
 			void				UnWrapExtentFromWrappedEntry(
 									uint64 wrappedExtent[2],
 									ExtentMapEntry* entry);

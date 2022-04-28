@@ -32,8 +32,8 @@ Extent::FillMapEntry(void* pointerToMap)
 	fMap->br_startoff = (firstHalf & MASK(63)) >> 9;
 	fMap->br_startblock = ((firstHalf & MASK(9)) << 43) | (secondHalf >> 21);
 	fMap->br_blockcount = (secondHalf & MASK(21));
-	TRACE("Extent::Init: startoff:(%ld), startblock:(%ld), blockcount:(%ld),"
-		"state:(%d)\n", fMap->br_startoff, fMap->br_startblock,
+	TRACE("Extent::Init: startoff:(%" B_PRIu64 "), startblock:(%" B_PRIu64 "),"
+		"blockcount:(%" B_PRIu64 "),state:(%" B_PRIu8 ")\n", fMap->br_startoff, fMap->br_startblock,
 		fMap->br_blockcount, fMap->br_state);
 }
 
@@ -153,11 +153,11 @@ Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 
 	// We don't read stale entries.
 	numberOfEntries -= numberOfStaleEntries;
-	TRACE("numberOfEntries:(%d)\n", numberOfEntries);
+	TRACE("numberOfEntries:(%" B_PRId32 ")\n", numberOfEntries);
 	uint16 currentOffset = (char*)entry - fBlockBuffer;
 
 	for (int i = 0; i < numberOfEntries; i++) {
-		TRACE("EntryNumber:(%d)\n", i);
+		TRACE("EntryNumber:(%" B_PRId32 ")\n", i);
 		ExtentUnusedEntry* unusedEntry = (ExtentUnusedEntry*)entry;
 
 		if (B_BENDIAN_TO_HOST_INT16(unusedEntry->freetag) == DIR2_FREE_TAG) {
@@ -170,7 +170,7 @@ Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 		}
 		ExtentDataEntry* dataEntry = (ExtentDataEntry*) entry;
 
-		TRACE("GetNext: fOffset:(%d), currentOffset:(%d)\n",
+		TRACE("GetNext: fOffset:(%" B_PRIu32 "), currentOffset:(%" B_PRIu16 ")\n",
 			fOffset, currentOffset);
 
 		if (fOffset >= currentOffset) {
@@ -179,7 +179,7 @@ Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 			continue;
 		}
 
-		if (dataEntry->namelen + 1 > *length)
+		if ((size_t)(dataEntry->namelen) >= *length)
 				return B_BUFFER_OVERFLOW;
 
 		fOffset = currentOffset;
@@ -188,7 +188,7 @@ Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 		*length = dataEntry->namelen + 1;
 		*ino = B_BENDIAN_TO_HOST_INT64(dataEntry->inumber);
 
-		TRACE("Entry found. Name: (%s), Length: (%ld),ino: (%ld)\n", name,
+		TRACE("Entry found. Name: (%s), Length: (%" B_PRIuSIZE "),ino: (%" B_PRIu64 ")\n", name,
 			*length, *ino);
 		return B_OK;
 	}
@@ -203,7 +203,7 @@ Extent::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 	TRACE("Extent: Lookup\n");
 	TRACE("Name: %s\n", name);
 	uint32 hashValueOfRequest = hashfunction(name, length);
-	TRACE("Hashval:(%ld)\n", hashValueOfRequest);
+	TRACE("Hashval:(%" B_PRIu32 ")\n", hashValueOfRequest);
 	ExtentBlockTail* blockTail = BlockTail();
 	ExtentLeafEntry* leafEntry = BlockFirstLeaf(blockTail);
 
@@ -228,7 +228,7 @@ Extent::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 			left = mid+1;
 		}
 	}
-	TRACE("left:(%d), right:(%d)\n", left, right);
+	TRACE("left:(%" B_PRId32 "), right:(%" B_PRId32 ")\n", left, right);
 
 	while (B_BENDIAN_TO_HOST_INT32(leafEntry[left].hashval)
 			== hashValueOfRequest) {
@@ -240,13 +240,13 @@ Extent::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 		}
 
 		uint32 offset = GetOffsetFromAddress(address);
-		TRACE("offset:(%d)\n", offset);
+		TRACE("offset:(%" B_PRIu32 ")\n", offset);
 		ExtentDataEntry* entry = (ExtentDataEntry*)(fBlockBuffer + offset);
 
 		int retVal = strncmp(name, (char*)entry->name, entry->namelen);
 		if (retVal == 0) {
 			*ino = B_BENDIAN_TO_HOST_INT64(entry->inumber);
-			TRACE("ino:(%d)\n", *ino);
+			TRACE("ino:(%" B_PRIu64 ")\n", *ino);
 			return B_OK;
 		}
 		left++;

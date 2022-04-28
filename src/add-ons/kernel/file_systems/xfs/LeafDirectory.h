@@ -41,7 +41,7 @@ public:
 			void				FillMapEntry(int num, ExtentMapEntry* map);
 			status_t			FillBuffer(int type, char* buffer,
 									int howManyBlocksFurthur);
-			void				SearchAndFillDataMap(int blockNo);
+			void				SearchAndFillDataMap(uint64 blockNo);
 			ExtentLeafEntry*	FirstLeaf();
 			xfs_ino_t			GetIno();
 			uint32				GetOffsetFromAddress(uint32 address);

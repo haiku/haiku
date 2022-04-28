@@ -90,7 +90,7 @@ public:
 			TreePointer*		GetPtrFromNode(int pos, void* buffer);
 			TreeKey*			GetKeyFromRoot(int pos);
 			TreePointer*		GetPtrFromRoot(int pos);
-			status_t			SearchMapInAllExtent(int blockNo,
+			status_t			SearchMapInAllExtent(uint64 blockNo,
 									uint32& mapIndex);
 			status_t			GetAllExtents();
 			size_t				MaxRecordsPossibleRoot();
@@ -105,7 +105,7 @@ public:
 			status_t			SearchAndFillPath(uint32 offset, int type);
 			status_t			SearchOffsetInTreeNode (uint32 offset,
 									TreePointer** pointer, int pathIndex);
-			void				SearchForMapInDirectoryBlock (int blockNo,
+			void				SearchForMapInDirectoryBlock (uint64 blockNo,
 									int entries, ExtentMapEntry** map,
 									int type, int pathIndex);
 			uint32				SearchForHashInNodeBlock(uint32 hashVal);

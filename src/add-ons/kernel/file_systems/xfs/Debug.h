@@ -9,13 +9,18 @@
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
 
+#define TRACE_XFS
 #ifdef TRACE_XFS
 #define TRACE(x...) dprintf("\n\33[34mxfs:\33[0m " x)
+#ifdef FS_SHELL
 #define ASSERT(x) \
 	{ if (!(x)) kernel_debugger("xfs: assert failed: " #x "\n"); }
+#endif
 #else
 #define TRACE(x...)
+#ifdef FS_SHELL
 #define ASSERT(x)
+#endif
 #endif
 #define ERROR(x...) dprintf("\n\33[34mxfs:\33[0m " x)
 

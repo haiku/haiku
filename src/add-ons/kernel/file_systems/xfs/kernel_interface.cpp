@@ -22,25 +22,6 @@ struct identify_cookie
 	int cookie;
 };
 
-
-//!	xfs_io() callback hook
-static status_t
-iterative_io_get_vecs_hook(void *cookie, io_request *request, off_t offset,
-	size_t size, struct file_io_vec *vecs, size_t *_count)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-//!	xfs_io() callback hook
-static status_t
-iterative_io_finished_hook(void *cookie, io_request *request, status_t status,
-	bool partialTransfer, size_t bytesTransferred)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
 //	#pragma mark - Scanning
 
 

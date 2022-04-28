@@ -140,8 +140,8 @@ xfs_inode_t::DataExtentsCount() const
 
 Inode::Inode(Volume* volume, xfs_ino_t id)
 	:
-	fVolume(volume),
 	fId(id),
+	fVolume(volume),
 	fBuffer(NULL),
 	fExtents(NULL)
 {
@@ -291,7 +291,7 @@ Inode::GetPtrFromNode(int pos, void* buffer)
 
 status_t
 Inode::GetNodefromTree(uint16& levelsInTree, Volume* volume,
-	size_t& len, size_t DirBlockSize, char* block) {
+	ssize_t& len, size_t DirBlockSize, char* block) {
 
 	char* node = new(std::nothrow) char[len];
 	if (node == NULL)
@@ -300,7 +300,7 @@ Inode::GetNodefromTree(uint16& levelsInTree, Volume* volume,
 
 	ArrayDeleter<char> nodeDeleter(node);
 
-	TRACE("levels:(%d)\n", levelsInTree);
+	TRACE("levels:(%" B_PRIu16 ")\n", levelsInTree);
 
 	TreePointer* ptrToNode = GetPtrFromRoot(1);
 	uint64 fileSystemBlockNo = B_BENDIAN_TO_HOST_INT64(*ptrToNode);
@@ -345,13 +345,13 @@ Inode::ReadExtentsFromTreeInode()
 		DIR_DFORK_PTR(Buffer()), sizeof(BlockInDataFork));
 
 	size_t maxRecords = MaxRecordsPossibleInTreeRoot();
-	TRACE("Maxrecords: (%d)\n", maxRecords);
+	TRACE("Maxrecords: (%" B_PRIuSIZE ")\n", maxRecords);
 
 	uint16 levelsInTree = root->Levels();
 	delete root;
 
 	Volume* volume = GetVolume();
-	size_t len = volume->BlockSize();
+	ssize_t len = volume->BlockSize();
 
 	len = DirBlockSize();
 	char* block = new(std::nothrow) char[len];
@@ -385,8 +385,8 @@ Inode::ReadExtentsFromTreeInode()
 		}
 
 		fileSystemBlockNo = ((LongBlock*)leafBuffer)->Right();
-		TRACE("Next leaf is at: (%d)\n", fileSystemBlockNo);
-		if (fileSystemBlockNo == -1)
+		TRACE("Next leaf is at: (%" B_PRIu64 ")\n", fileSystemBlockNo);
+		if (fileSystemBlockNo == (uint64) -1)
 			break;
 		uint64 readPos = FileSystemBlockToAddr(fileSystemBlockNo);
 		if (read_pos(volume->Device(), readPos, block, len)
@@ -395,7 +395,7 @@ Inode::ReadExtentsFromTreeInode()
 				return B_IO_ERROR;
 		}
 	}
-	TRACE("Total covered: (%d)\n", indexIntoExtents);
+	TRACE("Total covered: (%" B_PRId32 ")\n", indexIntoExtents);
 	return B_OK;
 }
 
@@ -414,7 +414,7 @@ Inode::ReadExtents()
 
 
 int
-Inode::SearchMapInAllExtent(int blockNo)
+Inode::SearchMapInAllExtent(uint64 blockNo)
 {
 	for (int i = 0; i < DataExtentsCount(); i++) {
 		if (fExtents[i].br_startoff <= blockNo
@@ -431,7 +431,7 @@ Inode::SearchMapInAllExtent(int blockNo)
 status_t
 Inode::ReadAt(off_t pos, uint8* buffer, size_t* length)
 {
-	TRACE("Inode::ReadAt: pos:(%ld), *length:(%ld)\n", pos, *length);
+	TRACE("Inode::ReadAt: pos:(%" B_PRIdOFF "), *length:(%" B_PRIuSIZE ")\n", pos, *length);
 	status_t status;
 	if (fExtents == NULL) {
 		status = ReadExtents();
@@ -442,13 +442,13 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* length)
 	// set/check boundaries for pos/length
 	if (pos < 0) {
 		ERROR("inode %" B_PRIdINO ": ReadAt failed(pos %" B_PRIdOFF
-			", length %lu)\n", ID(), pos, length);
+			", length %lu)\n", ID(), pos, *length);
 		return B_BAD_VALUE;
 	}
 
 	if (pos >= Size() || length == 0) {
 		TRACE("inode %" B_PRIdINO ": ReadAt 0 (pos %" B_PRIdOFF
-			", length %lu)\n", ID(), pos, length);
+			", length %" B_PRIuSIZE ")\n", ID(), pos, *length);
 		*length = 0;
 		return B_NO_ERROR;
 	}
@@ -456,7 +456,7 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* length)
 	uint32 blockNo = BLOCKNO_FROM_POSITION(pos, GetVolume());
 	uint32 offsetIntoBlock = BLOCKOFFSET_FROM_POSITION(pos, this);
 
-	size_t lengthOfBlock = BlockSize();
+	ssize_t lengthOfBlock = BlockSize();
 	char* block = new(std::nothrow) char[lengthOfBlock];
 	if (block == NULL)
 		return B_NO_MEMORY;
@@ -467,9 +467,9 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* length)
 	size_t lengthLeftInFile;
 	size_t lengthLeftInBlock;
 	size_t lengthToRead;
-	TRACE("What is blockLen:(%d)\n", lengthOfBlock);
+	TRACE("What is blockLen:(%" B_PRId64 ")\n", lengthOfBlock);
 	while (*length > 0) {
-		TRACE("Inode::ReadAt: pos:(%ld), *length:(%ld)\n", pos, *length);
+		TRACE("Inode::ReadAt: pos:(%" B_PRIdOFF "), *length:(%" B_PRIuSIZE ")\n", pos, *length);
 		// As long as you can read full blocks, read.
 		lengthLeftInFile = Size() - pos;
 		lengthLeftInBlock = lengthOfBlock - offsetIntoBlock;
@@ -509,7 +509,7 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* length)
 		offsetIntoBlock = BLOCKOFFSET_FROM_POSITION(pos, this);
 	}
 
-	TRACE("lengthRead:(%d)\n", lengthRead);
+	TRACE("lengthRead:(%" B_PRIuSIZE ")\n", lengthRead);
 	*length = lengthRead;
 	return B_OK;
 }
@@ -529,9 +529,9 @@ Inode::GetFromDisk()
 	uint32 len = fVolume->InodeSize();
 		// Inode len to read (size of inode)
 
-	TRACE("AgNumber: (%d), AgRelativeIno: (%d), AgRelativeBlockNum: (%d),"
-		"Offset: (%d), len: (%d)\n", agNo,
-		agRelativeInodeNo, agBlock, offset, len);
+	TRACE("AgNumber: (%" B_PRIu32 "), AgRelativeIno: (%" B_PRIu32 "),"
+		"AgRelativeBlockNum: (%" B_PRIu32 "),Offset: (%" B_PRId64 "),"
+		"len: (%" B_PRIu32 ")\n", agNo,agRelativeInodeNo, agBlock, offset, len);
 
 	if (agNo > fVolume->AgCount()) {
 		ERROR("Inode::GetFromDisk : AG Number more than number of AGs");
@@ -568,7 +568,7 @@ Inode::FileSystemBlockToAddr(uint64 block)
 	xfs_fsblock_t actualBlockToRead =
 		FSBLOCKS_TO_BASICBLOCKS(fVolume->BlockLog(),
 			((uint64)(agNo * numberOfBlocksInAg) + agBlockNo));
-	TRACE("blockToRead:(%d)\n", actualBlockToRead);
+	TRACE("blockToRead:(%" B_PRIu64 ")\n", actualBlockToRead);
 
 	uint64 readPos = actualBlockToRead * (BASICBLOCKSIZE);
 	return readPos;

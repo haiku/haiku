@@ -10,11 +10,11 @@
 LeafDirectory::LeafDirectory(Inode* inode)
 	:
 	fInode(inode),
+	fDataMap(NULL),
+	fLeafMap(NULL),
 	fOffset(0),
 	fDataBuffer(NULL),
 	fLeafBuffer(NULL),
-	fLeafMap(NULL),
-	fDataMap(NULL),
 	fCurBlockNumber(-1)
 {
 }
@@ -52,7 +52,7 @@ LeafDirectory::IsLeafType()
 	bool status = true;
 	if (fInode->BlockCount() == 1
 		|| fInode->DataExtentsCount() == 1
-		|| fInode->Size() !=
+		|| (uint64) fInode->Size() !=
 			(fInode->BlockCount() - 1) * fInode->DirBlockSize())
 		status = false;
 
@@ -60,7 +60,7 @@ LeafDirectory::IsLeafType()
 		return status;
 
 	FillMapEntry(fInode->DataExtentsCount() - 1, fLeafMap);
-	TRACE("leaf_Startoffset:(%ld)\n",
+	TRACE("leaf_Startoffset:(%" B_PRIu64 ")\n",
 		LEAF_STARTOFFSET(fInode->GetVolume()->BlockLog()));
 
 	if (fLeafMap->br_startoff
@@ -87,9 +87,9 @@ LeafDirectory::FillMapEntry(int num, ExtentMapEntry* fMap)
 	fMap->br_startoff = (firstHalf & MASK(63)) >> 9;
 	fMap->br_startblock = ((firstHalf & MASK(9)) << 43) | (secondHalf >> 21);
 	fMap->br_blockcount = secondHalf & MASK(21);
-	TRACE("FillMapEntry: startoff:(%ld), startblock:(%ld), blockcount:(%ld),"
-			"state:(%d)\n", fMap->br_startoff, fMap->br_startblock,
-			fMap->br_blockcount, fMap->br_state);
+	TRACE("Extent::Init: startoff:(%" B_PRIu64 "), startblock:(%" B_PRIu64 "),"
+		"blockcount:(%" B_PRIu64 "),state:(%" B_PRIu8 ")\n", fMap->br_startoff, fMap->br_startblock,
+		fMap->br_blockcount, fMap->br_state);
 }
 
 
@@ -136,7 +136,7 @@ LeafDirectory::FillBuffer(int type, char* blockBuffer, int howManyBlocksFurthur)
 	} else if (type == LEAF) {
 		fLeafBuffer = blockBuffer;
 		ExtentLeafHeader* header = (ExtentLeafHeader*) fLeafBuffer;
-		TRACE("NumberOfEntries in leaf: (%d)\n",
+		TRACE("NumberOfEntries in leaf: (%" B_PRIu16 ")\n",
 			B_BENDIAN_TO_HOST_INT16(header->count));
 	}
 	return B_OK;
@@ -180,7 +180,7 @@ LeafDirectory::EntrySize(int len) const
 
 
 void
-LeafDirectory::SearchAndFillDataMap(int blockNo)
+LeafDirectory::SearchAndFillDataMap(uint64 blockNo)
 {
 	int len = fInode->DataExtentsCount();
 
@@ -221,7 +221,7 @@ LeafDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 	while (fOffset != curDirectorySize) {
 		blockNoFromAddress = BLOCKNO_FROM_ADDRESS(fOffset, volume);
 
-		TRACE("fOffset:(%d), blockNoFromAddress:(%d)\n",
+		TRACE("fOffset:(%" B_PRIu32 "), blockNoFromAddress:(%" B_PRIu32 ")\n",
 			fOffset, blockNoFromAddress);
 		if (fCurBlockNumber != blockNoFromAddress
 			&& blockNoFromAddress > fDataMap->br_startoff
@@ -260,7 +260,7 @@ LeafDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 		ExtentDataEntry* dataEntry = (ExtentDataEntry*) entry;
 
 		uint16 currentOffset = (char*)dataEntry - fDataBuffer;
-		TRACE("GetNext: fOffset:(%d), currentOffset:(%d)\n",
+		TRACE("GetNext: fOffset:(%" B_PRIu32 "), currentOffset:(%" B_PRIu16 ")\n",
 			BLOCKOFFSET_FROM_ADDRESS(fOffset, fInode), currentOffset);
 
 		if (BLOCKOFFSET_FROM_ADDRESS(fOffset, fInode) > currentOffset) {
@@ -268,7 +268,7 @@ LeafDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 			continue;
 		}
 
-		if (dataEntry->namelen + 1 > *length)
+		if ((size_t)(dataEntry->namelen) >= *length)
 			return B_BUFFER_OVERFLOW;
 
 		fOffset = fOffset + EntrySize(dataEntry->namelen);
@@ -277,8 +277,8 @@ LeafDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 		*length = dataEntry->namelen + 1;
 		*ino = B_BENDIAN_TO_HOST_INT64(dataEntry->inumber);
 
-		TRACE("Entry found. Name: (%s), Length: (%ld),ino: (%ld)\n", name,
-			*length, *ino);
+		TRACE("Entry found. Name: (%s), Length: (%" B_PRIuSIZE "),ino: (%" B_PRIu64 ")\n",
+			name, *length, *ino);
 		return B_OK;
 	}
 
@@ -292,9 +292,9 @@ LeafDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 	TRACE("LeafDirectory: Lookup\n");
 	TRACE("Name: %s\n", name);
 	uint32 hashValueOfRequest = hashfunction(name, length);
-	TRACE("Hashval:(%ld)\n", hashValueOfRequest);
+	TRACE("Hashval:(%" B_PRIu32 ")\n", hashValueOfRequest);
 
-	status_t status;
+	status_t status = B_OK;
 	if (fLeafBuffer == NULL)
 		status = FillBuffer(LEAF, fLeafBuffer, 0);
 	if (status != B_OK)
@@ -306,7 +306,7 @@ LeafDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 		return B_NO_MEMORY;
 
 	int numberOfLeafEntries = B_BENDIAN_TO_HOST_INT16(leafHeader->count);
-	TRACE("numberOfLeafEntries:(%d)\n", numberOfLeafEntries);
+	TRACE("numberOfLeafEntries:(%" B_PRId32 ")\n", numberOfLeafEntries);
 	int left = 0;
 	int mid;
 	int right = numberOfLeafEntries - 1;
@@ -328,7 +328,7 @@ LeafDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 			left = mid+1;
 		}
 	}
-	TRACE("left:(%d), right:(%d)\n", left, right);
+	TRACE("left:(%" B_PRId32 "), right:(%" B_PRId32 ")\n", left, right);
 
 	while (B_BENDIAN_TO_HOST_INT32(leafEntry[left].hashval)
 			== hashValueOfRequest) {
@@ -342,7 +342,7 @@ LeafDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 		uint32 dataBlockNumber = BLOCKNO_FROM_ADDRESS(address * 8, volume);
 		uint32 offset = BLOCKOFFSET_FROM_ADDRESS(address * 8, fInode);
 
-		TRACE("DataBlockNumber:(%d), offset:(%d)\n", dataBlockNumber, offset);
+		TRACE("DataBlockNumber:(%" B_PRIu32 "), offset:(%" B_PRIu32 ")\n", dataBlockNumber, offset);
 		if (dataBlockNumber != fCurBlockNumber) {
 			fCurBlockNumber = dataBlockNumber;
 			SearchAndFillDataMap(dataBlockNumber);
@@ -352,13 +352,13 @@ LeafDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 				return B_OK;
 		}
 
-		TRACE("offset:(%d)\n", offset);
+		TRACE("offset:(%" B_PRIu32 ")\n", offset);
 		ExtentDataEntry* entry = (ExtentDataEntry*)(fDataBuffer + offset);
 
 		int retVal = strncmp(name, (char*)entry->name, entry->namelen);
 		if (retVal == 0) {
 			*ino = B_BENDIAN_TO_HOST_INT64(entry->inumber);
-			TRACE("ino:(%d)\n", *ino);
+			TRACE("ino:(%" B_PRIu64 ")\n", *ino);
 			return B_OK;
 		}
 		left++;
