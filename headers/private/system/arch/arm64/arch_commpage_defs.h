@@ -10,4 +10,6 @@
 #	error Must not be included directly. Include <commpage_defs.h> instead!
 #endif
 
+#define COMMPAGE_ENTRY_ARM64_THREAD_EXIT (COMMPAGE_ENTRY_FIRST_ARCH_SPECIFIC + 0)
+
 #endif	/* _SYSTEM_ARCH_ARM64_COMMPAGE_DEFS_H */

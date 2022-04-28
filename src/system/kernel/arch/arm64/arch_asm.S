@@ -5,8 +5,13 @@
 #include <arch/arm/arch_cpu.h>
 #include <asm_defs.h>
 #include "asm_offsets.h"
+#include "syscall_numbers.h"
 
 .text
+
+FUNCTION(_thread_exit_syscall):
+	svc #((SYSCALL_EXIT_THREAD << 5) | 1)
+FUNCTION_END(_thread_exit_syscall)
 
 .macro xchg_sp xt
 add	sp, sp, \xt
