@@ -102,14 +102,13 @@ actions HdsSchemaGenParser1
 # output files and the target for a given python script run.
 
 # 1 : generated files (.h and .cpp)
-# 2 : target that will generate the generated files (dummy file)
+# 2 : target directory generated files will be placed in
+# 3 : target that will generate the generated files (dummy file)
 
 rule HdsSchemaGenAppSrcDependsOnGeneration {
-	local generatedSource ;
-	local applicationSource ;
-
-	MakeLocate $(1) : $(2:D) ;
-	Depends $(1) : $(2) ;
+	MakeLocate $(1) : $(2) ;
+	MkDir $(2) ;
+	Depends $(1) : $(2) $(3) ;
 	Clean $(1) ;
 
 	# just in case the dummy file ends up being newer than the generated
