@@ -221,7 +221,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	}
 
 	// store capacity information
-	TRACE_ALWAYS("\tblock size: %" B_PRIuSIZE ", stripe size: %" B_PRIu32 "\n",
+	TRACE_ALWAYS("\tblock size: %" B_PRIuSIZE ", stripe size: %u\n",
 		nsstat.sector_size, info->ns->stripe_size);
 	nvme_disk_set_capacity(info, nsstat.sectors, nsstat.sector_size);
 
@@ -275,9 +275,9 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	}
 
 	// allocate qpairs
-	int32 try_qpairs = cstat.io_qpairs;
+	uint32 try_qpairs = cstat.io_qpairs;
 	try_qpairs = min_c(try_qpairs, NVME_MAX_QPAIRS);
-	if (try_qpairs >= smp_get_num_cpus()) {
+	if (try_qpairs >= (uint32)smp_get_num_cpus()) {
 		try_qpairs = smp_get_num_cpus();
 	} else {
 		// Find the highest number of qpairs that evenly divides the number of CPUs.
@@ -759,7 +759,7 @@ nvme_disk_io(void* cookie, io_request* request)
 
 		nvme_request.lba_count = 0;
 		for (int i = 0; i < nvme_request.iovec_count; i++) {
-			int32 new_lba_count = nvme_request.lba_count
+			uint32 new_lba_count = nvme_request.lba_count
 				+ (nvme_request.iovecs[i].size / block_size);
 			if (nvme_request.lba_count > 0 && new_lba_count > max_io_blocks) {
 				// We already have a nonzero length, and adding this vec would
