@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	application/x-vnd.Cortex.support	1625162530
+1	greek, modern (1453-)	application/x-vnd.Cortex.support	2097798758
 Header has flags	MediaString		Η κεφαλίδα έχει παραμέτρους
 32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		Εγγραφή σε εξέλιξη
@@ -31,6 +31,7 @@ Back-center	MediaString		Πίσω-κέντρο
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bit ακέραιος}}
 Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(άγνωστο μορφότυπο βίντεο)
+Video data between line %lu and %lu	MediaString		Βιντεοδεδομένα μεταξύ γραμμών %lu και %lu
 AVI format family	MediaString		Οικογένεια μορφοτύπων AVI
 Homogenous buffers	MediaString		Ομοιογενή buffers
 Interlaced 	MediaString		Interlaced 

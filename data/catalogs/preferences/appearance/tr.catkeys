@@ -10,7 +10,7 @@ Document background	Colors tab		Belge arka planı
 List background	Colors tab		Liste arka planı
 No effect on running applications	DecorSettingsView		Çalışan uygulamalar üzerinde etkisiz
 Fixed font:	Font view		Eş aralıklı yazıtipi:
-Appearance	System name		Görünüm
+Appearance	System name		Görünüş
 Reduce colored edges filter strength:	AntialiasingSettingsView		Renklendirilmiş uç ışıma düzeyi:
 Glyph hinting:	AntialiasingSettingsView		Glif düzgünleştirme:
 Default Haiku ControlLook	DecorSettingsView		Öntanımlı Haiku Görünüm Denetimcisi

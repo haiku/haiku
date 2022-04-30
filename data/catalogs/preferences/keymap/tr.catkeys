@@ -22,7 +22,7 @@ Serbian (Cyrillic)	KeymapNames		Sırpça (Kiril)
 Belgian (point)	KeymapNames		Flamanca (nokta)
 Finnish	KeymapNames		Fince
 Num lock	Keyboard Layout View		Num lock
-Switch shortcut keys to Windows/Linux mode	Keymap window		Kısayol düğmelerini Windows/Linux kipine geçir
+Switch shortcut keys to Windows/Linux mode	Keymap window		Kestirme düğmelerini Windows/Linux kipine geçir
 Spanish (Dvorak)	KeymapNames		İspanyolca (Dvorak)
 Option	Keyboard Layout View	Option key	Alt
 Scroll lock	Keyboard Layout View		Scroll lock
@@ -141,13 +141,13 @@ Keymap	System name		Klavye Dizilimi
 Slovene	KeymapNames		Slovence
 Lithuanian	KeymapNames		Litvanca
 Set modifier keys…	Keymap window		Değiştiren düğmeleri ayarla…
-Switch shortcut keys to Haiku mode	Keymap window		Kısayol düğmelerini Haiku kipine geçir
+Switch shortcut keys to Haiku mode	Keymap window		Kestirme düğmelerini Haiku kipine geçir
 Defaults	Keymap window		Öntanımlılar
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistem:
 ThinkPad International	KeyboardLayoutNames		ThinkPad Uluslararası
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Alüminyum Genişletilmiş (US)
-Switch shortcut keys	Keymap window		Kısayol düğmelerini değiştir
+Switch shortcut keys	Keymap window		Kestirme düğmelerini değiştir
 Right command	Keyboard Layout View		Sağ Command
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU

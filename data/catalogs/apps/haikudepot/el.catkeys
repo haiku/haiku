@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	3595646197
+1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		Σφάλμα ενημέρωσης αποθετηρίων
 Network error	ServerHelper		Σφάλμα δικτύου
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Προέκυψε ένα σφάλμα κατά την ανανέωση του αποθετηρίου: %error%
@@ -7,6 +7,7 @@ Check for updates…	MainWindow		Έλεγχος για ενημερώσεις…
 Uninstalled	PackageListView		Έγινε απεγκατάσταση
 It was not possible to create the new user.	UserLoginWindow		Δεν ήταν δυνατή η δημιουργία του νέου χρήστη.
 Available packages	MainWindow		Διαθέσιμα πακέτα
+An unexpected error has been sent from the server [%li]	ServerHelper		Ένα απρόσμενο σφάλμα ήρθε ως απάντηση από τον εξυπηρετητή [%li]
 Create account	UserLoginWindow		Δημιουργία λογαριασμού
 Install %PackageTitle%	PackageManager		Εγκατάσταση του πακέτου %PackageTitle%
 OK	App		Εντάξει

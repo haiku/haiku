@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-About	3435007759
+1	portuguese	x-vnd.Haiku-About	284324802
 Revision	AboutView		Revisão
 The Haikuware team and their bounty program\n	AboutView		À equipa do Haikuware e ao seu programa de recompensas\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Todos os direitos reservados.
@@ -18,6 +18,7 @@ Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView	
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe e outros.
 Testing and bug triaging:\n	AboutView		Testes e triagem de bugs:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processador:} other{# Processadores:}}
+Ralink WiFi Firmware	AboutWindow		Firmware WiFi Ralink
 %d MiB total	AboutView		%d MiB no total
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	O código que é único ao Haiku, especialmente o núcleo e todo o código a que as aplicações podem ligar, é distribuído sob os termos da <licença MIT>. Algumas bibliotecas do sistema contêm código de terceiros distribídos sob a <licença LGPL>. Você pode encontrar os direitos de cópia para código de terceiros em baixo.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Todos os direitos reservados.
@@ -58,6 +59,7 @@ Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright �
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2019 Fabrice Bellard, et al.
 Current maintainers:\n	AboutView		Programadores atuais:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Todos os direitos reservados.
+Intel WiFi Firmware	AboutWindow		Firmware WiFi Intel
 Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Todos os direitos reservados.
 Version:	AboutView		Versão:
 The BeGeistert team\n	AboutView		À equipa da BeGeistert\n
@@ -67,6 +69,7 @@ GNU GPL v2	AboutWindow		GNU GPL v2
 The University of Auckland and Christof Lutteroth\n\n	AboutView		A Universidade de Auckland e Christof Lutteroth\n\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB total, %inaccessible MiB inacessíveis
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Copyright © 2012-2016 Google Internationalization team.
+Copyright © 2001-%ld The Haiku project. 	AboutView		Copyright © 2001-%ld The Haiku project. 
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Todos os direitos reservados.
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Copyright © 1995-2004 Jean-Loup Gailly e Mark Adler.
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 Os mantenedores de Expat.
@@ -74,6 +77,7 @@ Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2
 Translations:\n	AboutView		Traduções:\n
 Memory:	AboutView		Memória:
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…e provavelmente alguns mais que nos esquecemos de mencionar (pedimos desculpa!)\n\n
+Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. todos os direitos reservados.
 BSD (2-clause)	AboutWindow		BSD (2-clause)
 Website & marketing:\n	AboutView		Website & marketing:\n
 Copyright © 2018-2021, Frederic Cambus	AboutView		Copyright © 2018-2021, Frederic Cambus

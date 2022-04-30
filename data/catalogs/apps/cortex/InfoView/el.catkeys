@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	application/x-vnd.Cortex.InfoView	4015199187
+1	greek, modern (1453-)	application/x-vnd.Cortex.InfoView	2382053937
 Offset	InfoView		Μετατόπιση
 Description	DormantNodeInfoView		Περιγραφή
 Byte order	InfoView		Σειρά bytes
@@ -16,15 +16,19 @@ Buffer size	InfoView		Μέγεθος buffer
 \n- Quality:	FileNodeInfoView		\n- Ποιότητα
 Kinds	LiveNodeInfoView		Είδη
 Application	AppNodeInfoView		Εφσρμογή
+Flavor flags	DormantNodeInfoView		Προτιμήσεις ποικιλίας
 Max. instances	DormantNodeInfoView		Μέγ. αριθμός αντιγράφων
 \n- Duration:	FileNodeInfoView		\n- Διάρκεια:
+Dormant media node	DormantNodeInfoView		Αδρανής πολυμεσικός κόμβος
 Latency	LiveNodeInfoView		Καθυστέρηση
 Media type	InfoView		Είδος πολυμέσων
 Live media node	LiveNodeInfoView		Ζωντανός κόμβος μέσου
+Field rate	InfoView		Ρυθμός πεδίου
 Kinds	DormantNodeInfoView		Είδη
 %title% info	InfoView		Πληροφορίες για %title%
 Node ID	LiveNodeInfoView		Αναγνωριστικό κόμβου
 Resolution	InfoView		Ανάλυση
+Chunk size	InfoView		Μέγεθος κομματιού
 File format	AppNodeInfoView		Μορφότυπο
 Matrix mask	InfoView		Μάσκα matrix
 Channel mask	InfoView		Μάσκα καναλιού
@@ -41,10 +45,14 @@ Format	InfoView		Μορφότυπο
 Version	AppNodeInfoView		Έκδοση
 AddOn ID	DormantNodeInfoView		Αναγνωριστικό προσθέτου
 Frame size	InfoView		Μέγεθος κάδρου
+Flavor ID	DormantNodeInfoView		Αναγνωριστικό ποικιλίας
 Run mode	LiveNodeInfoView		Λειτουργία
 \n- Codec:	FileNodeInfoView		\n- Κωδικοποιητής:
 Port	LiveNodeInfoView		Θύρα
 Output format	DormantNodeInfoView		Μορφότυπο εξόδου
+Aspect ratio	InfoView		Αναλογία διαστάσεων
+Application-owned node	AppNodeInfoView		Κόμβος εφαρμογής
+Tracks	FileNodeInfoView		Κομμάτια
 Source	InfoView		Προέλευση
 Destination	InfoView		Προορισμός
 Copyright	FileNodeInfoView		Πνευματικά δικαιώματα

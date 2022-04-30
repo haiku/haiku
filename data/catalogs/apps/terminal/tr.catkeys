@@ -27,7 +27,7 @@ Close tab	Terminal TermWindow		Sekmeyi kapat
 Selected background	Terminal AppearancePrefView		Seçili arka plan
 Error!	Terminal getString		Hata!
 Set tab title	Terminal TermWindow		Sekme başlığını ayarla
-Appearance	Terminal PrefWindow		Görünüm
+Appearance	Terminal PrefWindow		Görünüş
 ANSI bright yellow color	Terminal AppearancePrefView		ANSI açık sarı
 Encoding:	Terminal AppearancePrefView		Kodlama:
 Create link here	Terminal TermView		Burada bağlantı oluştur

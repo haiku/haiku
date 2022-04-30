@@ -7,27 +7,27 @@ Revert to saved	ShortcutsWindow		Kaydedilene döndür
 Don't save	ShortcutsWindow		Kaydetme
 *MouseDown	ShortcutsWindow		*FareAşağı
 *Beep	ShortcutsWindow		*Bip
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Kısayollar düğme kümenizi kaydedemedi.
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Kestirmeler, düğme kümenizi kaydedemedi.
 Save	ShortcutsWindow		Kaydet
 Either	ShortcutsSpec		Herhangi biri
 Oh no	ShortcutsWindow		N'olamaz
 Key	ShortcutsWindow		Düğme
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*İletiGönder application/x-vnd.Be-TRAK 'Tfnd'
 Select	ShortcutsWindow		Seç
-Shortcuts	System name		Kısayollar
+Shortcuts	System name		Kestirmeler
 Quit	ShortcutsWindow		Çık
 (Choose application with file requester)	ShortcutsWindow		(Dosya isteyicisi olan bir uygulama seçin)
 Cancel	ShortcutsWindow		Vazgeç
 *MoveMouse +20 +0	ShortcutsWindow		*FareyiHareketEttir +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Left	ShortcutsSpec		Sol
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Kısayollar düğme kümesi dosyanızı işleyemedi!
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Kısayollar düğme kümesi dosyanızı kaydedemedi!
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Kestirmeler, düğme kümesi dosyanızı işleyemedi!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Kestirmeler, düğme kümesi dosyanızı kaydedemedi!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*DiziGir \"Buraya metin girin\"
-Remove selected shortcut	ShortcutsWindow		Seçili kısayolu kaldır
+Remove selected shortcut	ShortcutsWindow		Seçili kestirmeyi kaldır
 Error, NULL state description?	ShortcutsSpec		Hata, NULL durum açıklaması?
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Kısayollar düğme kümenizi açamadı!
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Kestirmeler, düğme kümenizi açamadı!
 Save & apply	ShortcutsWindow		Kaydet & uygula
 Open	ShortcutsWindow		Aç
 Append	ShortcutsWindow		İliştir
@@ -38,7 +38,7 @@ Append KeySet…	ShortcutsWindow		Düğme kümesi iliştir…
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Çoklu \"*FareyiHareketEttir %100 0\" \"*FareDüğmesi 1\"
 Right	ShortcutsSpec		Sağ
 OK	ShortcutsWindow		Tamam
-Add new shortcut	ShortcutsWindow		Yeni kısayol ekle
+Add new shortcut	ShortcutsWindow		Yeni kestirme ekle
 (None)	ShortcutsSpec		(Yok)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 Open KeySet…	ShortcutsWindow		Düğme kümesi aç…

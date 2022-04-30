@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Terminal	2062206461
+1	greek, modern (1453-)	x-vnd.Haiku-Terminal	247549485
 ANSI cyan color	Terminal AppearancePrefView		Γαλάζιο χρώμα ANSI
 Close other tabs	Terminal TermWindow		Κλείσιμο άλλων καρτελών
 Insert path	Terminal TermView		Εισάγετε την διαδρομή
@@ -20,6 +20,7 @@ Edit tab title…	Terminal TermWindow		Επεξεργασία τίτλου κα�
 Settings	Terminal TermWindow		Ρυθμίσεις
 Print	Terminal TermWindow		Εκτύπωση
 %app% settings	Terminal PrefWindow	window title	Ρυθμίσεις %app%
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tΟ τρέχων κατάλογος εργασίας της ενεργής διεργασίας.\t\t\tΠροαιρετικά μπορεί να οριστεί ο μέγιστος αριθμός των μερών\t\t\tαπό τα οποία επιτρέπεται να αποτελείται η διαδρομή. Π.χ. "%2d"\t\t\tγια μια διαδρομή που να μην υπερβαίνει τα 2 κομμάτια.\t%i\t-\tΟ αριθμός της καρτέλας\t%e\t-\tΗ κωδικοποίηση της τρέχουσας καρτέλας. Δεν εμφανίζεται για την UTF-8.\t%p\t-\tΤο όνομα της ενεργής διεργασίας.
 ANSI black color	Terminal AppearancePrefView		Μαύρο χρώμα ANSI
 Use default	Terminal SetTitleWindow		Χρήση προεπιλεγμένου
 Close tab	Terminal TermWindow		Κλείσιμο καρτέλας

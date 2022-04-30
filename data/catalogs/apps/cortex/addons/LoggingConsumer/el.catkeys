@@ -1,5 +1,7 @@
-1	greek, modern (1453-)	application/x-vnd.Be.LoggingConsumerApp	3653006715
+1	greek, modern (1453-)	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: αδύνατη η λήψη πληροφοριών για τον κόμβο (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Προτεραιότητα
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: αδύνατη η ανεύρεση του κόμβου (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Καθυστέρηση
 Logged input	CortexAddOnsLoggingConsumer		Καταγεγραμμένη είσοδος
 CPU spin percentage	CortexAddOnsLoggingConsumer		Ποσοστο περιστροφών ΚΜΕ
@@ -17,3 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Χειριστήρια
 controls	CortexAddOnsCommonMediaNodeControlApp		χειριστήρια
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Σύνδεση
 percent	CortexAddOnsLoggingConsumer		ποσοστό
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: δεν υπάρχουν παράμετροι για τον κόμβο (%ld):\n%s\n

@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	250728390
+1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Απαιτείται ταυτοποίηση
 Previous	WebPositive Window		Προηγούμενο
 (Finish: %date)	Download Window		(Ολοκλήρωση: %date)
@@ -45,6 +45,7 @@ New tabs:	Settings Window		Νέες καρτέλες:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url απέτυχε
 Open downloads folder	Download Window		Άνοιγμα φακέλου λήψεων
 Proxy server	Settings Window		Μεσολαβητής
+Darn!	WebPositive		Κατάρα!
 Decrease size	WebPositive Window		Σμίκρυνση
 Default fixed font size:	Settings Window		Προεπιλεγμένο μέγεθος γραμματοσειράς σταθερού πλάτους:
 Sans serif font:	Settings Window		Γραμματοσειρά Sans serif:
@@ -56,6 +57,7 @@ WebPositive	System name		Περιηγητής Ιστού
 %s - Search term	Settings Window		%s – όρος αναζήτησης
 Reload	WebPositive Window		Ανανέωση
 Expiration	Cookie Manager		Λήξη
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Η ΚΜΕ σας είναι πολύ παλιά και δεν υποστηρίζει τις επεκτάσεις SSE2, χωρίς τις οποίες δεν μπορεί να τρέξει ο WebPositive. Συνιστούμε να εγκαταστήσετε την εφαρμογή NetSurf για την πλοήγηση στο Διαδίκτυο.
 Download finished	Download Window		Η λήψη ολοκληρώθηκε
 Cookie manager	WebPositive Window		Διαχειριστής Cookie
 OK	Authentication Panel		Εντάξει
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Εκκίνηση:
 Confirmation	WebPositive Window		Επιβεβαίωση
 Session cookie	Cookie Manager		Cookie συνεδρίας
+No SSE2 support	WebPositive		Χωρίς υποστήριξη SSE2
 Open all	WebPositive Window		Άνοιγμα όλων
 Cut	WebPositive Window		Αποκοπή
 Downloads	Download Window		Λήψεις
