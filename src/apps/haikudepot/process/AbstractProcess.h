@@ -1,12 +1,11 @@
 /*
- * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef ABSTRACT_PROCESS_H
 #define ABSTRACT_PROCESS_H
 
 #include <String.h>
-#include <Referenceable.h>
 #include <Url.h>
 
 #include "StandardMetaData.h"
@@ -20,15 +19,7 @@ typedef enum process_state {
 } process_state;
 
 
-/*! Clients are able to subclass from this 'interface' in order to accept
-    call-backs when a process has exited; either through success or through
-    failure.
- */
-
-class AbstractProcessListener : public BReferenceable {
-public:
-	virtual	void				ProcessChanged() = 0;
-};
+class ProcessListener;
 
 
 /*! This is the superclass of all Processes. */
@@ -47,7 +38,8 @@ public:
 			bool				IsRunning();
 			bool				WasStopped();
 			process_state		ProcessState();
-			void				SetListener(AbstractProcessListener* listener);
+
+			void				SetListener(ProcessListener* listener);
 
 protected:
 	virtual	status_t			RunInternal() = 0;
@@ -58,8 +50,7 @@ protected:
 			BLocker				fLock;
 
 private:
-			BReference<AbstractProcessListener>
-								fListener;
+			ProcessListener*	fListener;
 			bool				fWasStopped;
 			process_state		fProcessState;
 			status_t			fErrorStatus;

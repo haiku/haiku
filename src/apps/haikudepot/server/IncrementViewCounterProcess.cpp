@@ -20,7 +20,7 @@
 
 
 IncrementViewCounterProcess::IncrementViewCounterProcess(
-	Model* model, const PackageInfoRef package)
+	Model* model, const PackageInfoRef& package)
 	:
 	fPackage(package),
 	fModel(model)

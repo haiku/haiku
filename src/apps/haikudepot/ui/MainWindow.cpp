@@ -3,7 +3,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -68,6 +68,7 @@ enum {
 	MSG_AUTHORIZATION_CHANGED				= 'athc',
 	MSG_CATEGORIES_LIST_CHANGED				= 'clic',
 	MSG_PACKAGE_CHANGED						= 'pchd',
+	MSG_PROCESS_COORDINATOR_CHANGED			= 'pccd',
 	MSG_WORK_STATUS_CHANGE					= 'wsch',
 	MSG_WORK_STATUS_CLEAR					= 'wscl',
 
@@ -128,6 +129,30 @@ private:
 };
 
 
+class MainWindowPackageInfoListener : public PackageInfoListener {
+public:
+	MainWindowPackageInfoListener(MainWindow* mainWindow)
+		:
+		fMainWindow(mainWindow)
+	{
+	}
+
+	~MainWindowPackageInfoListener()
+	{
+	}
+
+private:
+	// PackageInfoListener
+	virtual	void PackageChanged(const PackageInfoEvent& event)
+	{
+		fMainWindow->PackageChanged(event);
+	}
+
+private:
+	MainWindow*	fMainWindow;
+};
+
+
 MainWindow::MainWindow(const BMessage& settings)
 	:
 	BWindow(BRect(50, 50, 650, 550), B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
@@ -146,6 +171,9 @@ MainWindow::MainWindow(const BMessage& settings)
 {
 	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
 		debugger("unable to create the process coordinator semaphore");
+
+	fPackageInfoListener = PackageInfoListenerRef(
+		new MainWindowPackageInfoListener(this), true);
 
 	BMenuBar* menuBar = new BMenuBar("Main Menu");
 	_BuildMenu(menuBar);
@@ -242,6 +270,9 @@ MainWindow::MainWindow(const BMessage& settings, PackageInfoRef& package)
 	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
 		debugger("unable to create the process coordinator semaphore");
 
+	fPackageInfoListener = PackageInfoListenerRef(
+		new MainWindowPackageInfoListener(this), true);
+
 	fFilterView = new FilterView();
 	fPackageInfoView = new PackageInfoView(&fModel, this);
 	fWorkStatusView = new WorkStatusView("work status");
@@ -317,7 +348,7 @@ MainWindow::QuitRequested()
 		AutoLocker<BLocker> lock(&fCoordinatorLock);
 		fShouldCloseWhenNoProcessesToCoordinate = true;
 
-		if (fCoordinator.IsSet()) {
+		if (fCoordinator != NULL) {
 			HDINFO("a coordinator is running --> will wait before quitting...");
 
 			if (fShuttingDownWindow == NULL)
@@ -542,6 +573,13 @@ MainWindow::MessageReceived(BMessage* message)
 				_AddRemovePackageFromLists(ref);
 				fFeaturedPackagesView->EndAddRemove();
 			}
+			break;
+		}
+
+		case MSG_PROCESS_COORDINATOR_CHANGED:
+		{
+			ProcessCoordinatorState state(message);
+			_HandleProcessCoordinatorChanged(state);
 			break;
 		}
 
@@ -927,10 +965,8 @@ MainWindow::_AddRemovePackageFromLists(const PackageInfoRef& package)
 
 
 void
-MainWindow::_IncrementViewCounter(const PackageInfoRef& package)
+MainWindow::_IncrementViewCounter(const PackageInfoRef package)
 {
-	// Temporarily disabled, see tickets #16879 and #17689.
-#if 0
 	bool shouldIncrementViewCounter = false;
 
 	{
@@ -948,7 +984,6 @@ MainWindow::_IncrementViewCounter(const PackageInfoRef& package)
 				&fModel, package);
 		_AddProcessCoordinator(incrementViewCoordinator);
 	}
-#endif
 }
 
 
@@ -988,9 +1023,7 @@ MainWindow::_StartBulkLoad(bool force)
 	fRefreshRepositoriesItem->SetEnabled(false);
 	ProcessCoordinator* bulkLoadCoordinator =
 		ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
-			this,
-				// PackageInfoListener
-			&fModel, force);
+			fPackageInfoListener, &fModel, force);
 	_AddProcessCoordinator(bulkLoadCoordinator);
 }
 
@@ -1422,7 +1455,6 @@ MainWindow::_HandleUserUsageConditionsNotLatest(
 void
 MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
 {
-	BReference<ProcessCoordinator> itemRef(item, true);
 	AutoLocker<BLocker> lock(&fCoordinatorLock);
 
 	if (fShouldCloseWhenNoProcessesToCoordinate) {
@@ -1433,12 +1465,13 @@ MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
 
 	item->SetListener(this);
 
-	if (!fCoordinator.IsSet()) {
+	if (fCoordinator == NULL) {
 		if (acquire_sem(fCoordinatorRunningSem) != B_OK)
 			debugger("unable to acquire the process coordinator sem");
 		HDINFO("adding and starting a process coordinator [%s]",
 			item->Name().String());
-		fCoordinator = itemRef;
+		delete fCoordinator;
+		fCoordinator = item;
 		fCoordinator->Start();
 	} else {
 		HDINFO("adding process coordinator [%s] to the queue",
@@ -1458,7 +1491,7 @@ MainWindow::_SpinUntilProcessCoordinatorComplete()
 			debugger("unable to release the process coordinator sem");
 		{
 			AutoLocker<BLocker> lock(&fCoordinatorLock);
-			if (!fCoordinator.IsSet())
+			if (fCoordinator == NULL)
 				return;
 		}
 	}
@@ -1472,14 +1505,15 @@ MainWindow::_StopProcessCoordinators()
 	AutoLocker<BLocker> lock(&fCoordinatorLock);
 
 	while (!fCoordinatorQueue.empty()) {
-		BReference<ProcessCoordinator> processCoordinator
+		ProcessCoordinator* processCoordinator
 			= fCoordinatorQueue.front();
 		HDINFO("will drop queued process coordinator [%s]",
 			processCoordinator->Name().String());
 		fCoordinatorQueue.pop();
+		delete processCoordinator;
 	}
 
-	if (fCoordinator.IsSet())
+	if (fCoordinator != NULL)
 		fCoordinator->RequestStop();
 }
 
@@ -1493,9 +1527,22 @@ MainWindow::_StopProcessCoordinators()
 void
 MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 {
+	BMessage message(MSG_PROCESS_COORDINATOR_CHANGED);
+	if (coordinatorState.Archive(&message, true) != B_OK) {
+		HDFATAL("unable to archive message when the process coordinator"
+			" has changed");
+	}
+	BMessenger(this).SendMessage(&message);
+}
+
+
+void
+MainWindow::_HandleProcessCoordinatorChanged(ProcessCoordinatorState& coordinatorState)
+{
 	AutoLocker<BLocker> lock(&fCoordinatorLock);
 
-	if (fCoordinator.Get() == coordinatorState.Coordinator()) {
+	if (fCoordinator->Identifier()
+			== coordinatorState.ProcessCoordinatorIdentifier()) {
 		if (!coordinatorState.IsRunning()) {
 			if (release_sem(fCoordinatorRunningSem) != B_OK)
 				debugger("unable to release the process coordinator sem");
@@ -1511,9 +1558,8 @@ MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 				messenger.SendMessage(message);
 			}
 
-			fCoordinator = BReference<ProcessCoordinator>(NULL);
-				// will delete the old process coordinator if it is not used
-				// elsewhere.
+			delete fCoordinator;
+			fCoordinator = NULL;
 
 			// now schedule the next one.
 			if (!fCoordinatorQueue.empty()) {

@@ -57,7 +57,7 @@ typedef std::map<BString, PackageInfoRef> PackageInfoMap;
 */
 
 LocalPkgDataLoadProcess::LocalPkgDataLoadProcess(
-	PackageInfoListener* packageInfoListener,
+	PackageInfoListenerRef packageInfoListener,
 	Model *model, bool force)
 	:
 	AbstractProcess(),

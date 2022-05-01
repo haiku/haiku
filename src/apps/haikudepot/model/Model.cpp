@@ -519,6 +519,8 @@ Model::CanPopulatePackage(const PackageInfoRef& package)
 void
 Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 {
+	HDTRACE("will populate package for [%s]", package->Name().String());
+
 	if (!CanPopulatePackage(package)) {
 		HDINFO("unable to populate package [%s]", package->Name().String());
 		return;

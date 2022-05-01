@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PROCESS_COORDINATOR_H
@@ -11,6 +11,7 @@
 
 #include "AbstractProcess.h"
 #include "AbstractProcessNode.h"
+#include "ProcessListener.h"
 
 
 class ProcessCoordinator;
@@ -20,8 +21,9 @@ class ProcessCoordinator;
     it can be dealt with atomically without having call back to the coordinator.
 */
 
-class ProcessCoordinatorState {
+class ProcessCoordinatorState : public BArchivable {
 public:
+								ProcessCoordinatorState(BMessage* from);
 								ProcessCoordinatorState(
 									const ProcessCoordinator*
 										processCoordinator,
@@ -29,14 +31,15 @@ public:
 									bool isRunning, status_t errorStatus);
 	virtual						~ProcessCoordinatorState();
 
-	const	ProcessCoordinator*	Coordinator() const;
+	const	BString				ProcessCoordinatorIdentifier() const;
 			float				Progress() const;
 			BString				Message() const;
 			bool				IsRunning() const;
 			status_t			ErrorStatus() const;
 
+			status_t			Archive(BMessage* into, bool deep = true) const;
 private:
-	const	ProcessCoordinator*	fProcessCoordinator;
+			BString				fProcessCoordinatorIdentifier;
 			float				fProgress;
 			BString				fMessage;
 			bool				fIsRunning;
@@ -80,12 +83,14 @@ public:
     list of ProcessNode-s so that they are all completed in the correct order.
 */
 
-class ProcessCoordinator : public AbstractProcessListener {
+class ProcessCoordinator : public ProcessListener {
 public:
 								ProcessCoordinator(
 									const char* name,
 									BMessage* message = NULL);
 	virtual						~ProcessCoordinator();
+
+	const	BString&			Identifier() const;
 
 			void				SetListener(
 									ProcessCoordinatorListener *listener);
@@ -93,7 +98,7 @@ public:
 			void				AddNode(AbstractProcessNode* nodes);
 
 			void				ProcessChanged();
-				// AbstractProcessListener
+				// ProcessListener
 
 			bool				IsRunning();
 
@@ -108,7 +113,6 @@ public:
 			BMessage*			Message() const;
 
 private:
-			bool				_IsRunning(AbstractProcessNode* node);
 			void				_CoordinateAndCallListener();
 			ProcessCoordinatorState
 								_Coordinate();
@@ -122,12 +126,15 @@ private:
 private:
 			BString				fName;
 			BLocker				fLock;
+			bool				fCoordinateAndCallListenerRerun;
+			BLocker				fCoordinateAndCallListenerRerunLock;
 			BObjectList<AbstractProcessNode>
 								fNodes;
 			ProcessCoordinatorListener*
 								fListener;
 			BMessage*			fMessage;
 			bool				fWasStopped;
+			BString				fIdentifier;
 };
 
 

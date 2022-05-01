@@ -2,7 +2,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MAIN_WINDOW_H
@@ -35,7 +35,7 @@ class ShuttingDownWindow;
 class WorkStatusView;
 
 
-class MainWindow : private PackageInfoListener,
+class MainWindow :
 	private ProcessCoordinatorConsumer, public ProcessCoordinatorListener,
 	public UserDetailVerifierListener, public BWindow {
 public:
@@ -61,9 +61,9 @@ public:
 	virtual	void				UserCredentialsFailed();
 	virtual void				UserUsageConditionsNotLatest(
 									const UserDetail& userDetail);
-private:
-	// PackageInfoListener
-	virtual	void				PackageChanged(
+
+	// services PackageInfoListener via MainWindowPackageInfoListener
+			void				PackageChanged(
 									const PackageInfoEvent& event);
 
 private:
@@ -99,7 +99,7 @@ private:
 			void				_ClearPackage();
 
 			void				_IncrementViewCounter(
-									const PackageInfoRef& package);
+									const PackageInfoRef package);
 
 			void				_PopulatePackageAsync(bool forcePopulate);
 			void				_StartBulkLoad(bool force = false);
@@ -117,6 +117,9 @@ private:
 									const BMessage* message);
 
 			void				_HandleChangePackageListViewMode();
+
+			void				_HandleProcessCoordinatorChanged(
+									ProcessCoordinatorState& coordinatorState);
 
 	static	status_t			_RefreshModelThreadWorker(void* arg);
 	static	status_t			_PopulatePackageWorker(void* arg);
@@ -165,10 +168,9 @@ private:
 			Model				fModel;
 			ModelListenerRef	fModelListener;
 
-			std::queue<BReference<ProcessCoordinator> >
+			std::queue<ProcessCoordinator*>
 								fCoordinatorQueue;
-			BReference<ProcessCoordinator>
-								fCoordinator;
+			ProcessCoordinator*	fCoordinator;
 			BLocker				fCoordinatorLock;
 			sem_id				fCoordinatorRunningSem;
 			bool				fShouldCloseWhenNoProcessesToCoordinate;
@@ -180,6 +182,11 @@ private:
 			bool				fForcePopulatePackage;
 			BLocker				fPackageToPopulateLock;
 			sem_id				fPackageToPopulateSem;
+
+			PackageInfoListenerRef
+								fPackageInfoListener;
 };
+
+
 
 #endif // MAIN_WINDOW_H

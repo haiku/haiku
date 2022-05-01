@@ -914,6 +914,9 @@ WebAppInterface::_SendRawGetRequest(const BString urlPathComponents,
 {
 	BUrl url = ServerSettings::CreateFullUrl(urlPathComponents);
 
+	HDDEBUG("http-get; will make request to [%s]",
+		url.UrlString().String());
+
 	ProtocolListener listener;
 
 	BHttpHeaders headers;
@@ -933,6 +936,9 @@ WebAppInterface::_SendRawGetRequest(const BString urlPathComponents,
 		request->Result());
 
 	int32 statusCode = result.StatusCode();
+
+	HDDEBUG("http-get; did receive http-status [%" B_PRId32 "] from [%s]",
+		statusCode, url.UrlString().String());
 
 	if (statusCode == 200)
 		return B_OK;

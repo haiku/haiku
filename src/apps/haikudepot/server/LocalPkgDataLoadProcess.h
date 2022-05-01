@@ -32,7 +32,7 @@ class PkgDataLoadState;
 class LocalPkgDataLoadProcess : public AbstractProcess {
 public:
 								LocalPkgDataLoadProcess(
-									PackageInfoListener* packageInfoListener,
+									PackageInfoListenerRef packageInfoListener,
 									Model *model, bool force = false);
 	virtual						~LocalPkgDataLoadProcess();
 
@@ -49,7 +49,7 @@ private:
 private:
 			Model*				fModel;
 			bool				fForce;
-			PackageInfoListener*
+			PackageInfoListenerRef
 								fPackageInfoListener;
 };
 
