@@ -285,7 +285,104 @@ struct ring_buffer {
 	uint8*			base;
 };
 
-struct overlay_registers;
+
+struct child_device_config {
+	uint16 handle;
+	uint16 device_type;
+	uint8 device_id[10];
+	uint16 addin_offset;
+	uint8 dvo_port;
+	uint8 i2c_pin;
+	uint8 slave_addr;
+	uint8 ddc_pin;
+	uint16 edid_ptr;
+	uint8 dvo_cfg;
+
+	struct {
+		bool efp_routed:1;
+		bool lane_reversal:1;
+		bool lspcon:1;
+		bool iboost:1;
+		bool hpd_invert:1;
+		bool use_vbt_vswing:1;
+		uint8 reserved:2;
+		bool hdmi_support:1;
+		bool dp_support:1;
+		bool tmds_support:1;
+		uint8 reserved2:5;
+		uint8 aux_channel;
+		uint8 dongle_detect;
+	} __attribute__((packed));
+
+	uint8 caps;
+	uint8 dvo_wiring;
+	uint8 dvo2_wiring;
+	uint16 extended_type;
+	uint8 dvo_function;
+
+	bool dp_usb_type_c:1;
+	bool tbt:1;
+	uint8 reserved3:2;
+	uint8 dp_port_trace_length:4;
+	uint8 dp_gpio_index;
+	uint8 dp_gpio_pin_num;
+	uint8 dp_iboost_level:4;
+	uint8 hdmi_iboost_level:4;
+	uint8 dp_max_link_rate:3;
+	uint8 dp_max_link_rate_reserved:5;
+} __attribute__((packed));
+
+
+enum dvo_port {
+	DVO_PORT_HDMIA,
+	DVO_PORT_HDMIB,
+	DVO_PORT_HDMIC,
+	DVO_PORT_HDMID,
+	DVO_PORT_LVDS,
+	DVO_PORT_TV,
+	DVO_PORT_CRT,
+	DVO_PORT_DPB,
+	DVO_PORT_DPC,
+	DVO_PORT_DPD,
+	DVO_PORT_DPA,
+	DVO_PORT_DPE,
+	DVO_PORT_HDMIE,
+	DVO_PORT_DPF,
+	DVO_PORT_HDMIF,
+	DVO_PORT_DPG,
+	DVO_PORT_HDMIG,
+	DVO_PORT_DPH,
+	DVO_PORT_HDMIH,
+	DVO_PORT_DPI,
+	DVO_PORT_HDMII,
+};
+
+
+enum dp_aux_channel {
+	DP_AUX_A = 0x40,
+	DP_AUX_B = 0x10,
+	DP_AUX_C = 0x20,
+	DP_AUX_D = 0x30,
+	DP_AUX_E = 0x50,
+	DP_AUX_F = 0x60,
+	DP_AUX_G = 0x70,
+	DP_AUX_H = 0x80,
+	DP_AUX_I = 0x90
+};
+
+
+enum aux_channel {
+	AUX_CH_A,
+	AUX_CH_B,
+	AUX_CH_C,
+	AUX_CH_D,
+	AUX_CH_E,
+	AUX_CH_F,
+	AUX_CH_G,
+	AUX_CH_H,
+	AUX_CH_I,
+};
+
 
 struct intel_shared_info {
 	area_id			mode_list_area;		// area containing display mode list
@@ -345,6 +442,9 @@ struct intel_shared_info {
 
 	edid1_info		vesa_edid_info;
 	bool			has_vesa_edid_info;
+
+	uint32			device_config_count;
+	child_device_config device_configs[10];
 };
 
 enum pipe_index {

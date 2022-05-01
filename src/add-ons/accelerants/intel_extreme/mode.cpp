@@ -201,8 +201,10 @@ create_mode_list(void)
 			continue;
 
 		status_t status = gInfo->ports[i]->GetEDID(&gInfo->edid_info);
-		if (status == B_OK)
+		if (status == B_OK) {
 			gInfo->has_edid = true;
+			break;
+		}
 	}
 	// use EDID found at boot time if there since we don't have any ourselves
 	if (!gInfo->has_edid && gInfo->shared_info->has_vesa_edid_info) {

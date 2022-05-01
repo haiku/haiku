@@ -44,11 +44,23 @@ struct bdb_header {
 
 
 enum bdb_block_id {
+	BDB_GENERAL_DEFINITIONS = 2,
 	BDB_LVDS_OPTIONS = 40,
 	BDB_LVDS_LFP_DATA_PTRS = 41,
 	BDB_LVDS_BACKLIGHT = 43,
 	BDB_GENERIC_DTD = 58
 };
+
+
+struct bdb_general_definitions {
+	uint8 id;
+	uint16 size;
+	uint8 crt_ddc_gmbus_pin;
+	uint8 dpms_bits;
+	uint8 boot_display[2];
+	uint8 child_device_size;
+	uint8 devices[];
+} __attribute__((packed));
 
 
 // FIXME the struct definition for the bdb_header is not complete, so we rely
@@ -422,8 +434,11 @@ sanitize_panel_timing(display_timing& timing)
 
 
 bool
-get_lvds_mode_from_bios(display_timing* panelTiming, uint16* minBrightness)
+parse_vbt_from_bios(struct intel_shared_info* info)
 {
+	display_timing* panelTiming = &info->panel_timing;
+	uint16* minBrightness = &info->min_brightness;
+
 	int vbtOffset = 0;
 	if (!get_bios(&vbtOffset))
 		return false;
@@ -450,6 +465,29 @@ get_lvds_mode_from_bios(display_timing* panelTiming, uint16* minBrightness)
 		int id = vbios.memory[start];
 		blockSize = vbios.ReadWord(start + 1) + 3;
 		switch (id) {
+			case BDB_GENERAL_DEFINITIONS:
+			{
+				info->device_config_count = 0;
+				struct bdb_general_definitions* defs;
+				if (bdb->version < 111)
+					break;
+				defs = (struct bdb_general_definitions*)(vbios.memory + start);
+				uint8 childDeviceSize = defs->child_device_size;
+				uint32 device_config_count = (blockSize - sizeof(*defs)) / childDeviceSize;
+				for (uint32 i = 0; i < device_config_count; i++) {
+					child_device_config* config =
+						(child_device_config*)(&defs->devices[i * childDeviceSize]);
+					if (config->device_type == 0)
+						continue;
+					memcpy(&info->device_configs[info->device_config_count], config,
+						min_c(sizeof(child_device_config), childDeviceSize));
+					TRACE((DEVICE_NAME ": found child device type: 0x%x\n", config->device_type));
+					info->device_config_count++;
+					if (info->device_config_count > 10)
+						break;
+				}
+				break;
+			}
 			case BDB_LVDS_OPTIONS:
 			{
 				struct lvds_bdb1 *lvds1;

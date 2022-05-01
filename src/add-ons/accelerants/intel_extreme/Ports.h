@@ -75,6 +75,8 @@ static	status_t					_GetI2CSignals(void* cookie, int* _clock,
 										int* _data);
 static	status_t					_SetI2CSignals(void* cookie, int clock,
 										int data);
+		bool						_IsPortInVBT(uint32* foundIndex = NULL);
+		bool						_IsDisplayPortInVBT();
 
 		display_mode				fCurrentMode;
 		Pipe*						fPipe;
@@ -239,6 +241,7 @@ static 	status_t					_DpAuxSendReceiveHook(const struct i2c_bus *bus,
 										uint32 slave_address, const uint8 *writeBuffer,
 										size_t writeLength, uint8 *readBuffer,
 										size_t readLength);
+		aux_channel					_DpAuxChannel();
 };
 
 
