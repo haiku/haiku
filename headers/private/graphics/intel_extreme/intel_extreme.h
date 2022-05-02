@@ -384,6 +384,21 @@ enum aux_channel {
 };
 
 
+enum hpd_pin {
+	HPD_PORT_A,
+	HPD_PORT_B,
+	HPD_PORT_C,
+	HPD_PORT_D,
+	HPD_PORT_E,
+	HPD_PORT_TC1,
+	HPD_PORT_TC2,
+	HPD_PORT_TC3,
+	HPD_PORT_TC4,
+	HPD_PORT_TC5,
+	HPD_PORT_TC6,
+};
+
+
 struct intel_shared_info {
 	area_id			mode_list_area;		// area containing display mode list
 	uint32			mode_count;
@@ -716,6 +731,7 @@ struct intel_brightness_legacy {
 #define PCH_MASTER_INT_CTL_BDW					0x44200
 
 #define PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(pipe)	(1 << (15 + pipe))
+#define GEN8_DE_PCH_IRQ							(1 << 23)
 #define GEN8_DE_PORT_IRQ						(1 << 20)
 #define PCH_MASTER_INT_CTL_GLOBAL_BDW			(1 << 31)
 
@@ -741,16 +757,45 @@ struct intel_brightness_legacy {
 #define GEN8_DE_MISC_IER						0x4446c
 #define		GEN8_DE_EDP_PSR						(1 << 19)
 
+#define GEN11_DE_HPD_ISR						0x44470
+#define GEN11_DE_HPD_IMR						0x44474
+#define GEN11_DE_HPD_IIR						0x44478
+#define GEN11_DE_HPD_IER						0x4447c
+#define GEN11_DE_TC_HOTPLUG_MASK				(0x3f << 16)
+#define GEN11_DE_TBT_HOTPLUG_MASK				(0x3f)
+
+#define GEN11_TBT_HOTPLUG_CTL					0x44030
+#define GEN11_TC_HOTPLUG_CTL					0x44038
+
+#define SHPD_FILTER_CNT							0xc4038
+#define SHPD_FILTER_CNT_500_ADJ					0x1d9
+
+#define SDEISR									0xc4000
+#define SDEIMR									0xc4004
+#define SDEIIR									0xc4008
+#define SDEIER									0xc400c
+#define SDE_GMBUS_ICP							(1 << 23)
+
+#define SHOTPLUG_CTL_DDI						0xc4030
+#define SHOTPLUG_CTL_DDI_HPD_ENABLE(hpd_pin)	(0x8 << (4 * ((hpd_pin) - HPD_PORT_A)))
+#define SHOTPLUG_CTL_TC							0xc4034
+#define SHOTPLUG_CTL_TC_HPD_ENABLE(hpd_pin)		(0x8 << (4 * ((hpd_pin) - HPD_PORT_TC1)))
+
+#define PCH_PORT_HOTPLUG						SHOTPLUG_CTL_DDI
+#define PCH_PORT_HOTPLUG2						0xc403c
+
 #define PCH_INTERRUPT_VBLANK_BDW				(1 << 0)						// GEN8_PIPE_VBLANK
 #define GEN8_PIPE_VSYNC							(1 << 1)
 #define GEN8_PIPE_SCAN_LINE_EVENT				(1 << 2)
 
-#define GEN11_DISPLAY_INT_CTL					0x44200			// same as PCH_MASTER_INT_CTL_BDW
 #define GEN11_GFX_MSTR_IRQ						0x190010
 #define GEN11_MASTER_IRQ						(1 << 31)
 #define GEN11_DISPLAY_IRQ						(1 << 16)
 #define GEN11_GT_DW1_IRQ						(1 << 1)
 #define GEN11_GT_DW0_IRQ						(1 << 0)
+
+#define GEN11_DISPLAY_INT_CTL					0x44200			// same as PCH_MASTER_INT_CTL_BDW
+#define GEN11_DE_HPD_IRQ						(1 << 21)
 
 #define GEN11_GT_INTR_DW0						0x190018
 #define GEN11_GT_INTR_DW1						0x19001c
@@ -1744,5 +1789,6 @@ struct hardware_status {
 	uint32	_reserved3[3];
 	uint32	store[1008];
 };
+
 
 #endif	/* INTEL_EXTREME_H */
