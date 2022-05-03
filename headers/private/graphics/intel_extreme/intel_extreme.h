@@ -289,6 +289,22 @@ struct ring_buffer {
 struct child_device_config {
 	uint16 handle;
 	uint16 device_type;
+#define DEVICE_TYPE_ANALOG_OUTPUT		(1 << 0)
+#define DEVICE_TYPE_DIGITAL_OUTPUT		(1 << 1)
+#define DEVICE_TYPE_DISPLAYPORT_OUTPUT	(1 << 2)
+#define DEVICE_TYPE_VIDEO_SIGNALING		(1 << 3)
+#define DEVICE_TYPE_TMDS_DVI_SIGNALING	(1 << 4)
+#define DEVICE_TYPE_LVDS_SIGNALING		(1 << 5)
+#define DEVICE_TYPE_HIGH_SPEED_LINK		(1 << 6)
+#define DEVICE_TYPE_DUAL_CHANNEL		(1 << 8)
+#define DEVICE_TYPE_COMPOSITE_OUTPUT	(1 << 9)
+#define DEVICE_TYPE_MIPI_OUTPUT			(1 << 10)
+#define DEVICE_TYPE_NOT_HDMI_OUTPUT		(1 << 11)
+#define DEVICE_TYPE_INTERNAL_CONNECTOR	(1 << 12)
+#define DEVICE_TYPE_HOTPLUG_SIGNALING	(1 << 13)
+#define DEVICE_TYPE_POWER_MANAGEMENT	(1 << 14)
+#define DEVICE_TYPE_CLASS_EXTENSION		(1 << 15)
+
 	uint8 device_id[10];
 	uint16 addin_offset;
 	uint8 dvo_port;
@@ -1112,6 +1128,15 @@ struct intel_brightness_legacy {
 					(_DPA_AUX_CH_CTL + (_DPB_AUX_CH_CTL - _DPA_AUX_CH_CTL) * aux)
 #define DP_AUX_CH_DATA(aux, i)	\
 					(_DPA_AUX_CH_DATA1 + (_DPB_AUX_CH_DATA1 - _DPA_AUX_CH_DATA1) * aux + i * 4)
+#define _PCH_DPB_AUX_CH_CTL				(0x4110 | REGS_SOUTH_TRANSCODER_PORT)
+#define _PCH_DPB_AUX_CH_DATA1			(0x4114 | REGS_SOUTH_TRANSCODER_PORT)
+#define _PCH_DPC_AUX_CH_CTL				(0x4210 | REGS_SOUTH_TRANSCODER_PORT)
+#define _PCH_DPC_AUX_CH_DATA1			(0x4214 | REGS_SOUTH_TRANSCODER_PORT)
+#define PCH_DP_AUX_CH_CTL(aux)		\
+		(_PCH_DPB_AUX_CH_CTL + (_PCH_DPC_AUX_CH_CTL - _PCH_DPB_AUX_CH_CTL) * (aux - AUX_CH_B))
+#define PCH_DP_AUX_CH_DATA(aux, i)	\
+		(_PCH_DPB_AUX_CH_DATA1 + (_PCH_DPC_AUX_CH_DATA1 - _PCH_DPB_AUX_CH_DATA1) * (aux - AUX_CH_B) \
+			+ i * 4)
 
 #define INTEL_DP_AUX_CTL_BUSY			(1 << 31)
 #define INTEL_DP_AUX_CTL_DONE			(1 << 30)
