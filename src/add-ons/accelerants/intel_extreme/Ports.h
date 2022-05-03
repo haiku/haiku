@@ -78,6 +78,19 @@ static	status_t					_SetI2CSignals(void* cookie, int clock,
 		bool						_IsPortInVBT(uint32* foundIndex = NULL);
 		bool						_IsDisplayPortInVBT();
 		bool						_IsInternalPanelPort();
+		status_t					_SetupDpAuxI2c(struct i2c_bus *bus);
+
+		ssize_t						_DpAuxTransfer(dp_aux_msg* message);
+		ssize_t						_DpAuxTransfer(uint8* transmitBuffer, uint8 transmitSize,
+										uint8* receiveBuffer, uint8 receiveSize);
+		status_t					_DpAuxSendReceive(uint32 slave_address,
+										const uint8 *writeBuffer, size_t writeLength,
+										uint8 *readBuffer, size_t readLength);
+static 	status_t					_DpAuxSendReceiveHook(const struct i2c_bus *bus,
+										uint32 slave_address, const uint8 *writeBuffer,
+										size_t writeLength, uint8 *readBuffer,
+										size_t readLength);
+		aux_channel					_DpAuxChannel();
 
 		display_mode				fCurrentMode;
 		Pipe*						fPipe;
@@ -175,6 +188,7 @@ virtual	uint32						Type() const
 										{ return INTEL_PORT_TYPE_DP; }
 
 virtual	status_t					SetPipe(Pipe* pipe);
+virtual	status_t					SetupI2c(i2c_bus *bus);
 
 virtual	bool						IsConnected();
 
@@ -231,18 +245,6 @@ private:
 
 		status_t					_SetPortLinkGen8(const display_timing& timing,
 										uint32 pllSel);
-
-		ssize_t						_DpAuxTransfer(dp_aux_msg* message);
-		ssize_t						_DpAuxTransfer(uint8* transmitBuffer, uint8 transmitSize,
-										uint8* receiveBuffer, uint8 receiveSize);
-		status_t					_DpAuxSendReceive(uint32 slave_address,
-										const uint8 *writeBuffer, size_t writeLength,
-										uint8 *readBuffer, size_t readLength);
-static 	status_t					_DpAuxSendReceiveHook(const struct i2c_bus *bus,
-										uint32 slave_address, const uint8 *writeBuffer,
-										size_t writeLength, uint8 *readBuffer,
-										size_t readLength);
-		aux_channel					_DpAuxChannel();
 };
 
 
