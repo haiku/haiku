@@ -21,6 +21,7 @@
 #include <Plic.h>
 #include <Clint.h>
 #include <AutoDeleterDrivers.h>
+#include <ScopeExit.h>
 #include "RISCV64VMTranslationMap.h"
 
 #include <algorithm>
@@ -354,40 +355,6 @@ SetAccessedFlags(addr_t addr, bool isWrite)
 }
 
 
-// TODO: needs moved into an arch-agnostic location?
-
-template<typename F>
-class ScopeExit 
-{
-public:
-	explicit ScopeExit(F&& fn) : fFn(fn)
-	{
-	}
-
-	~ScopeExit()
-	{
-		fFn();
-	}
-
-	ScopeExit(ScopeExit&& other) : fFn(std::move(other.fFn))
-	{
-	}
-
-private:
-	ScopeExit(const ScopeExit&);
-	ScopeExit& operator=(const ScopeExit&);
-
-private:
-	F fFn;
-};
-
-template<typename F>
-ScopeExit<F> MakeScopeExit(F&& fn)
-{
-	return ScopeExit<F>(std::move(fn));
-}
-
-
 extern "C" void
 STrap(iframe* frame)
 {
@@ -428,7 +395,7 @@ STrap(iframe* frame)
 		thread_get_current_thread()->arch_info.oldA0 = frame->a0;
 		thread_at_kernel_entry(system_time());
 	}
-	const auto& kernelExit = MakeScopeExit([&]() {
+	const auto& kernelExit = ScopeExit([&]() {
 		if (SstatusReg(frame->status).spp == modeU) {
 			disable_interrupts();
 			atomic_and(&thread_get_current_thread()->flags, ~THREAD_FLAGS_SYSCALL_RESTARTED);
