@@ -463,7 +463,14 @@ STrap(iframe* frame)
 			return SendSignal(B_ALIGNMENT_EXCEPTION, SIGBUS, BUS_ADRALN,
 				Stval());
 		}
-		// case causeBreakpoint:
+		case causeBreakpoint: {
+			if (SstatusReg(frame->status).spp == modeU) {
+				user_debug_breakpoint_hit(false);
+			} else {
+				panic("hit kernel breakpoint");
+			}
+			return;
+		}
 		case causeExecAccessFault:
 		case causeLoadAccessFault:
 		case causeStoreAccessFault: {
