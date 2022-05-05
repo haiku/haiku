@@ -846,14 +846,13 @@ ether_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 {
 	struct ifreq *ifr = (struct ifreq *) data;
 
+	//dprintf("ether_ioctl: received %d\n", command);
+
 	switch (command) {
 		case SIOCSIFMTU:
-			if (ifr->ifr_mtu > ETHERMTU)
+			if (ifr->ifr_mtu > ETHERMTU_JUMBO)
 				return EINVAL;
-			else
-				;
-			// need to fix our ifreq to work with C...
-			// ifp->ifr_mtu = ifr->ifr_mtu;
+			ifp->if_mtu = ifr->ifr_mtu;
 			break;
 
 		default:

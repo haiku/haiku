@@ -287,6 +287,12 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 				return B_BAD_ADDRESS;
 			}
 			return B_OK;
+
+		case SIOCSIFFLAGS:
+		case SIOCSIFMEDIA:
+		case SIOCGIFMEDIA:
+		case SIOCSIFMTU:
+			return ifp->if_ioctl(ifp, op, (caddr_t)arg);
 	}
 
 	return wlan_control(cookie, op, arg, length);

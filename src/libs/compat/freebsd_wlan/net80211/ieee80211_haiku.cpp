@@ -256,13 +256,6 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 				return B_BAD_ADDRESS;
 			return B_OK;
 		}
-
-		case SIOCSIFFLAGS:
-		case SIOCSIFMEDIA:
-		case SIOCGIFMEDIA:
-		case SIOCSIFMTU:
-			// Requests that make it here always come from the kernel
-			return ifp->if_ioctl(ifp, op, (caddr_t)arg);
 	}
 
 	return B_BAD_VALUE;
