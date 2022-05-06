@@ -24,6 +24,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			HttpResult.cpp
 			HttpSession.cpp
 			HttpStream.cpp
+			HttpTime.cpp
 			NetServicesMisc.cpp
 			;
 

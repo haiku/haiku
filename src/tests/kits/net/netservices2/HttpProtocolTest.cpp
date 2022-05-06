@@ -13,20 +13,27 @@
 #include <cppunit/TestSuite.h>
 #include <tools/cppunit/ThreadedTestCaller.h>
 
+#include <DateTime.h>
 #include <HttpFields.h>
 #include <HttpRequest.h>
 #include <HttpResult.h>
 #include <HttpStream.h>
+#include <HttpTime.h>
 #include <NetServicesDefs.h>
 #include <Url.h>
 
+using BPrivate::BDateTime;
 using BPrivate::Network::BHttpFields;
 using BPrivate::Network::BHttpMethod;
 using BPrivate::Network::BHttpRequest;
+using BPrivate::Network::BHttpRequestStream;
 using BPrivate::Network::BHttpResult;
 using BPrivate::Network::BHttpSession;
-using BPrivate::Network::BHttpRequestStream;
+using BPrivate::Network::BHttpTime;
+using BPrivate::Network::BHttpTimeFormat;
 using BPrivate::Network::BNetworkRequestError;
+using BPrivate::Network::format_http_time;
+using BPrivate::Network::parse_http_time;
 
 using namespace std::literals;
 
@@ -360,6 +367,52 @@ HttpProtocolTest::HttpRequestStreamTest()
 }
 
 
+void
+HttpProtocolTest::HttpTimeTest()
+{
+	const std::vector<BString> kValidTimeStrings = {
+		"Sun, 07 Dec 2003 16:01:00 GMT",
+		"Sun, 07 Dec 2003 16:01:00",
+		"Sunday, 07-Dec-03 16:01:00 GMT",
+		"Sunday, 07-Dec-03 16:01:00 GMT",
+		"Sunday, 07-Dec-2003 16:01:00",
+		"Sunday, 07-Dec-2003 16:01:00 GMT",
+		"Sunday, 07-Dec-2003 16:01:00 UTC",
+		"Sun Dec  7 16:01:00 2003"
+	};
+	const BDateTime kExpectedDateTime = {BDate{2003, 12, 7}, BTime{16, 01, 0}};
+
+	for (const auto& timeString: kValidTimeStrings) {
+		CPPUNIT_ASSERT(kExpectedDateTime == parse_http_time(timeString));
+	}
+
+	const std::vector<BString> kInvalidTimeStrings = {
+		"Sun, 07 Dec 2003",					// Date only
+		"Sun, 07 Dec 2003 16:01:00 BST",	// Invalid timezone
+		"On Sun, 07 Dec 2003 16:01:00 GMT",	// Extra data in front of the string
+	};
+
+	for (const auto& timeString: kInvalidTimeStrings) {
+		try {
+			parse_http_time(timeString);
+			BString errorMessage = "Expected exception with invalid timestring: ";
+			errorMessage.Append(timeString);
+			CPPUNIT_FAIL(errorMessage.String());
+		} catch (const BHttpTime::InvalidInput& e) {
+			// expected exception; continue
+		}
+	}
+
+	// Validate format_http_time()
+	CPPUNIT_ASSERT_EQUAL(BString("Sun, 07 Dec 2003 16:01:00 GMT"),
+		format_http_time(kExpectedDateTime));
+	CPPUNIT_ASSERT_EQUAL(BString("Sunday, 07-Dec-03 16:01:00 GMT"),
+		format_http_time(kExpectedDateTime, BHttpTimeFormat::RFC850));
+	CPPUNIT_ASSERT_EQUAL(BString("Sun Dec  7 16:01:00 2003"),
+		format_http_time(kExpectedDateTime, BHttpTimeFormat::AscTime));
+}
+
+
 /* static */ void
 HttpProtocolTest::AddTests(BTestSuite& parent)
 {
@@ -373,6 +426,8 @@ HttpProtocolTest::AddTests(BTestSuite& parent)
 		"HttpProtocolTest::HttpRequestTest", &HttpProtocolTest::HttpRequestTest));
 	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
 		"HttpProtocolTest::HttpRequestStreamTest", &HttpProtocolTest::HttpRequestStreamTest));
+	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
+		"HttpProtocolTest::HttpTimeTest", &HttpProtocolTest::HttpTimeTest));
 
 	parent.addTest("HttpProtocolTest", &suite);
 }

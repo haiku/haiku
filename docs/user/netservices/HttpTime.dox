@@ -1,0 +1,259 @@
+/*
+ * Copyright 2022 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Corresponds to:
+ *		headers/private/netservices2/HttpTime.h	    		hrev?????
+ *		src/kits/network/libnetservices2/HttpTime.cpp		hrev?????
+ */
+
+
+#if __cplusplus >= 201703L
+
+
+namespace BPrivate {
+
+namespace Network {
+
+
+/*!
+	\file HttpTime.h
+	\ingroup netservices
+	\brief Provides tools to parse and format HTTP dates.
+
+	The HTTP protocols prescribe that each HTTP response should have a \c Date header field with a
+	timestamp the response was generated. Optionally, there are other fields that may have a
+	timestamp in them, such as \c Set-Cookie or \c If-Modified-Since.
+
+	According to section 3.3 of RFC 2616, the standard date format is the format described by
+	RFC 1123, which updates the previous RFC 822. However, a proper implementation of a HTTP parser
+	may also want to support the RFC 850 format (which was obsoleted by RFC 1036) and the old
+	C-library standard date formatting of \c asctime().
+
+	Examples:
+	<table>
+		<tr><td>RFC1123 / RFC822</td><td>Sun, 06 Nov 1994 08:49:37 GMT</td></tr>
+		<tr><td>RFC850</td><td>Sunday, 06-Nov-94 08:49:37 GMT</td></tr>
+		<tr><td>asctime</td><td>Sun Nov  6 08:49:37 1994</td></tr>
+	</table>
+
+	The tools in this module will make it easer to parse and format dates according to those
+	standards. When parsing the
+
+	You can use \ref parse_http_time() to parse a string that contains a HTTP timestamp. You can
+	use \ref format_http_time() to format the HTTP time according to the prescribed format. If you
+	want slightly more information about parsing, or if you want to hold an intermediate
+	representation of the timestamp, have a look at the \ref BPrivate::Network::BHttpTime class.
+	
+	Note that when parsing a timestamp string, the tools are slightly more permissive than the
+	standards. For example, if the RFC 1123 timestamp does not have the GMT timezone indicator at
+	the end, it will still be accepted. Likewise, there is support for RFC 850 timestamps with a
+	4-digit year format. When formatting a \ref BPrivate::BDateTime to a string, it will always use
+	prescribed representation.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\enum BHttpTimeFormat
+	\brief Describes the three time formats supported by the HTTP RFC.
+*/
+
+
+/*!
+	\class BHttpTime::InvalidInput
+	\ingroup netservices
+	\brief Error that indicates that a string cannot be parsed as a valid HTTP timestamp.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BString BHttpTime::InvalidInput::input
+	\brief Copy of the original timestamp that could not be parsed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpTime::InvalidInput::InvalidInput(const char *origin, BString input)
+	\brief Constructor that sets the \a origin and the invalid \a input.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BHttpTime
+	\ingroup netservices
+	\brief Utility class that can parse and format HTTP Date strings.
+
+	See the description of the module in \ref HttpTime.h for more information about HTTP
+	timestamps.
+
+	Note that for quick conversions of a \ref BDateTime into a \ref BString and vice versa, you can
+	also use the \ref format_http_time() and \ref parse_http_time() utilities.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpTime::BHttpTime() noexcept
+	\brief Constructs a new object and sets the timestamp to the current time.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpTime::BHttpTime(BDateTime date)
+	\brief Constructs a new object and sets the timestamp to \a date.
+
+	\param date A valid \ref BDateTime object for the desired timestamp.
+
+	\exception BHttpTime::InvalidInput The \a date does not contain a valid timestamp.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpTime::BHttpTime(const BString &dateString)
+	\brief Constructs a new object and parses the timestamp from \a dateString.
+
+	\param dateString A string that contains a valid HTTP timestamp. The \a dateString must not
+		contain any characters, other than the timestamp. It is up to the caller to sanitize any
+		input, including trimming whitespace at the beginning and end of the string.
+
+	\exception BHttpTime::InvalidInput The \a dateString cannot be parsed as a valid timestamp.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpTime::SetTo(BDateTime date)
+	\brief Set the current timestamp to \a date.
+
+	\param date A valid \ref BDateTime object for the desired timestamp.
+
+	\exception BHttpTime::InvalidInput The \a date does not contain a valid timestamp.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::Network::BHttpTime::SetTo(const BString &string)
+	\brief Set the current timestamp by parsing \a string.
+
+	\param string A string that contains a valid HTTP timestamp. The \a dateString must not
+		contain any characters, other than the timestamp. It is up to the caller to sanitize any
+		input, including trimming whitespace at the beginning and end of the string.
+
+	\exception BHttpTime::InvalidInput The \a dateString cannot be parsed as a valid timestamp.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BDateTime BPrivate::Network::BHttpTime::DateTime() const noexcept
+	\brief Get the current timestamp.
+
+	\return A valid \ref BDateTime object that contains the timestamp that this object is currently
+		set to.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpTimeFormat BHttpTime::DateTimeFormat() const noexcept
+	\brief Get the format that the current timestamp parsed from.
+
+	If the timestamp was parsed from a string, this method supplies a bit of information about what
+	format the original string was in. Note that for both the RFC 1132 and RFC 850 formats, the
+	parsing is slightly less strict than the RFC prescribes. This may mean that if you parse a
+	non-canonical string, and then format it back using the same format specifier, the two strings
+	may differ in content.
+
+	If the timestamp was set by setting it to a \ref BDateTime object, then this will always return
+	\c BHttpTimeFormat::RFC1123.
+
+	\return The \ref BHttpTimeFormat that describes the format the input string was in, or
+		\c BHttpTimeFormat::RFC1123 if the timestamp was set by a \ref BDateTime.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString BHttpTime::ToString(BHttpTimeFormat outputFormat=BHttpTimeFormat::RFC1123) const
+	\brief Formats the timestamp to a string.
+
+	\param outputFormat The requested outputformat. The default is the recommended RFC 1123 format.
+
+	\return A string that contains the formatted timestamp.
+
+	\exception std::bad_alloc In the future this method may throw this exception when the memory
+		for the output string cannot be allocated.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString format_http_time(BDateTime timestamp,
+		BHttpTimeFormat outputFormat=BHttpTimeFormat::RFC1123)
+	\brief Format the \a timestamp into a string according to the \a outputFormat.
+
+	See the description of the module in \ref HttpTime.h for more information about HTTP
+	timestamps.
+
+	\param timestamp A valid \ref BDateTime object for the desired timestamp.
+	\param outputFormat The requested outputformat. The default is the recommended RFC 1123 format.
+
+	\return A string that contains the formatted timestamp.
+
+	\exception BHttpTime::InvalidInput The \a date does not contain a valid timestamp.
+	\exception std::bad_alloc In the future this method may throw this exception when the memory
+		for the output string cannot be allocated.
+
+	\see \ref BHttpTime \ref parse_http_time()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BDateTime parse_http_time(const BString &string)
+	\brief Parse a \a string that contains a timestamp and return a \ref BDateTime object.
+
+	See the description of the module in \ref HttpTime.h for more information about HTTP
+	timestamps.
+
+	\param string A string that contains a valid HTTP timestamp. The \a dateString must not
+		contain any characters, other than the timestamp. It is up to the caller to sanitize any
+		input, including trimming whitespace at the beginning and end of the string.
+
+	\exception BHttpTime::InvalidInput The \a string cannot be parsed as a valid timestamp.
+
+	\see \ref BHttpTime \ref format_http_time()
+
+	\since Haiku R1
+*/
+
+
+} // namespace BPrivate
+
+} // namespace Network
+
+#endif
