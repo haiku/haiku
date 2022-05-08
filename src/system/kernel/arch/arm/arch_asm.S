@@ -1,4 +1,7 @@
 /*
+ * Copyright 2022, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
  * Copyright 2009, Wischert, johanneswi@gmail.com.
  * All rights reserved. Distributed under the terms of the MIT License.
  *
@@ -7,10 +10,12 @@
  */
 
 #include <arch/arm/arch_cpu.h>
+#include <arch/arm/arch_cpu_defs.h>
 
 #include <asm_defs.h>
 
 #include "asm_offsets.h"
+#include "syscall_numbers.h"
 
 .text
 
@@ -253,3 +258,42 @@ FUNCTION(arch_debug_call_with_fault_handler):
 	mov	r1, #1
 	b	longjmp
 FUNCTION_END(arch_debug_call_with_fault_handler)
+
+
+FUNCTION(arch_return_to_userland):
+	// set SPSR to user mode, IRQ enabled, FIQ disabled
+	mrs		ip, cpsr
+	bic		ip, ip, #(CPSR_MODE_MASK | CPSR_T | CPSR_F | CPSR_I)
+	orr		ip, ip, #(CPSR_MODE_USR | CPSR_F)
+	msr		spsr, ip
+
+	// use system mode to load user mode SP and LR
+	ldr		r4, [r0, #IFRAME_usr_sp]
+	ldr		r5, [r0, #IFRAME_usr_lr]
+	mrs		ip, cpsr
+	bic		ip, ip, #(CPSR_MODE_MASK)
+	orr		ip, ip, #(CPSR_MODE_SYS)
+	msr		cpsr, ip
+	mov		sp, r4
+	mov		lr, r5
+	bic		ip, ip, #(CPSR_MODE_MASK)
+	orr		ip, ip, #(CPSR_MODE_SVC)
+	msr		cpsr, ip
+
+	// load user mode entry point in LR
+	ldr		lr, [r0, #IFRAME_pc]
+
+	// load general purpose registers
+	mov		sp, r0
+	add		sp, sp, #4
+	ldmfd	sp!, { r0-r12 }
+
+	// jump to user mode entry point
+	movs	pc, lr
+FUNCTION_END(arch_return_to_userland)
+
+
+FUNCTION(arch_user_thread_exit):
+	svc		SYSCALL_EXIT_THREAD
+	bx		lr
+FUNCTION_END(arch_user_thread_exit)

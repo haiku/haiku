@@ -15,7 +15,7 @@ Search backwards	FindandReplaceWindow		Geriye doğru ara
 Find again	Menus		Yeniden bul
 Read-only	StatusView		Saltokunur
 Save	Menus		Kaydet
-Cancel	QuitAlert		İptal
+Cancel	QuitAlert		Vazgeç
 Copy	Menus		Kopyala
 Reload	NodeMonitorAlerts		Yeniden yükle
 line %d, column %d	StatusView		%d. satır, %d. sütun
@@ -38,8 +38,8 @@ Replace in all windows	FindandReplaceWindow		Tüm pencerelerde değiştir
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" içinde kaydedilmeyen değişiklikler var.\nDeğişiklikleri yoksaymak istediğinizden emin misiniz?
 Save	SaveAlert		Kaydet
 Default	Open_and_SaveAsPanel		Öntanımlı
-Cancel	RevertToSavedAlert		İptal
-Cancel	FindandReplaceWindow		İptal
+Cancel	RevertToSavedAlert		Vazgeç
+Cancel	FindandReplaceWindow		Vazgeç
 Statistics…	Menus		İstatistikler…
 Encoding	Open_and_SaveAsPanel		Kodlama
 Replace all	FindandReplaceWindow		Tümünü değiştir
@@ -70,7 +70,7 @@ Save	QuitAlert		Kaydet
 Case-sensitive	FindandReplaceWindow		BÜYÜK/küçük harf duyarlı
 Find selection	Menus		Seçimi bul
 Find…	Menus		Bul…
-Cancel	SaveAlert		İptal
+Cancel	SaveAlert		Vazgeç
 Revert	RevertToSavedAlert		Eski haline döndür
 Size	Menus		Boyut
 Decrease size	Menus		Küçült

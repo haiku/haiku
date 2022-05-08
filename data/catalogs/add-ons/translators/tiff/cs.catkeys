@@ -1,16 +1,16 @@
 1	czech	x-vnd.Haiku-TIFFTranslator	2234713102
-TIFF Library:	TIFFView		TIFF knihovna:
-RLE (Packbits)	TIFFView		RLE (Packbits)
+TIFF Library:	TIFFView		Knihovna TIFF:
+RLE (Packbits)	TIFFView		RLE (balení bitů)
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
-identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: chybný document index\n
+identify_tiff_header: invalid document index\n	TIFFTranslator		identifikace_hlavičky_tiff: neplatný index dokumentu\n
 Use compression:	TIFFView		Použít kompresi:
-TIFF image translator	TIFFView		převaděč obrázků TIFF
-TIFF image	TIFFTranslator		obrázek TIFF
+TIFF image translator	TIFFView		Překladač TIFF obrázků
+TIFF image	TIFFTranslator		TIFF obrázek
 TIFF Settings	TIFFMain		nastavení TIFF
-TIFF image translator	TIFFTranslator		převaděč obrázků TIFF
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nelze nastavit adresář\n
+TIFF image translator	TIFFTranslator		Překladač TIFF obrázků
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identifikace_hlavičky_tiff: nelze nastavit adresář\n
 Version %d.%d.%d, %s	TIFFView		Verze %d.%d.%d, %s
-TIFFTranslator Settings	TIFFTranslator		nastavení Převaděče TIFF
+TIFFTranslator Settings	TIFFTranslator		Nastavení TIFFPřevaděče
 LZW	TIFFView		LZW
-TIFF images	TIFFTranslator		obrázky TIFF
-None	TIFFView		Žádný
+TIFF images	TIFFTranslator		TIFF obrázky
+None	TIFFView		Nic

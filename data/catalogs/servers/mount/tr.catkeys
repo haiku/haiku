@@ -1,7 +1,7 @@
 1	turkish	x-vnd.Haiku-mount_server	2818767263
 Mount read-only	AutoMounter		Saltokunur bağla
 Error mounting volume:\n\n%s	AutoMounter		Bölümü bağlarken hata:\n\n%s
-Cancel	AutoMounter		İptal
+Cancel	AutoMounter		Vazgeç
 OK	AutoMounter		Tamam
 Unmount error	AutoMounter		Ayırma hatası
 The file system on this volume is not the Be file system. It is recommended to mount it in read-only mode, to prevent unintentional data loss because of bugs in Haiku.	AutoMounter		Bu diskteki dosya sistemi Be dosya sistemi değil. Haiku'daki olası hatalardan dolayı veri kaybına neden olmamak için saltokunur bağlamanız önerilir.

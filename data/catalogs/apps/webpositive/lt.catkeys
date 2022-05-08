@@ -16,8 +16,8 @@ Open containing folder	Download Window		Atverti gaubiantįjį aplanką
 Find previous	WebPositive Window		Ieškoti ankstesnio frazės egzemplioriaus
 Full screen	WebPositive Window		Visas ekranas
 Downloads in progress	WebPositive		Vyksta parsiuntimai
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ar tikrai norite atverti iškart %addedCount adresyno įrašus(-ų)?
 Copy URL to clipboard	Download Window		Kopijuoti URL adresą į iškarpinę
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ar tikrai norite atverti iškart %addedCount adresyno įrašus(-ų)?
 Clone current page	Settings Window		Klonuoti atvertą tinklapį
 Start page:	Settings Window		Pradžios tinklapis:
 Cancel	Download Window		Atsisakyti
@@ -95,8 +95,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Tęsti parsiuntimus
 Proxy server requires authentication	Settings Window		Įgaliotasis serveris reikalauja patvirtinti tapatybę
 Cancel	Settings Window		Atsisakyti
-History	WebPositive Window		Žurnalas
 Reset size	WebPositive Window		Atstatyti pradinį dydį
+History	WebPositive Window		Žurnalas
 Do you really want to clear the browsing history?	WebPositive Window		Ar tikrai norite išvalyti naršymo žurnalą?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Rasti tolesnį ieškomos frazės pasikartojimą
 Fixed font:	Settings Window		Lygiaplotis šriftas:

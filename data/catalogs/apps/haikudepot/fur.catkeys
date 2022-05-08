@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	3437352458
+1	friulian	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
 Network error	ServerHelper		Erôr di rêt
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
@@ -7,7 +7,9 @@ Check for updates…	MainWindow		Controle inzornaments…
 Uninstalled	PackageListView		Disinstalât
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
 Available packages	MainWindow		Pachets disponibii
+An unexpected error has been sent from the server [%li]	ServerHelper		Al è rivât un erôr inspietât dal servidôr [%li]
 Create account	UserLoginWindow		Cree account
+Install %PackageTitle%	PackageManager		Instale %PackageTitle%
 OK	App		Va ben
 The response to the captcha was incorrect.	ServerHelper		La rispueste al captcha e jere sbaliade.
 Develop packages	MainWindow		Pachets di svilup
@@ -43,6 +45,7 @@ Category	FilterView		Categorie
 User rating	RatePackageWindow		Valutazion utents
 Installed packages	MainWindow		Pachets instalâts
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un ogjet domandât o un ogjet che al centrave cu la richieste nol è stât cjatât sul servidôr.
+Date	PackageListView		Date
 No changelog available.	PackageInfoView		Nissun regjistri des modifichis disponibil.
 Error	App		Erôr
 There was a puzzling response from the web service.	UserLoginWindow		La rispueste dal servizi web e jere ambigue.
@@ -54,6 +57,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nol è stât pussibil comunicâ cul servidôr par otignî une imagjin captcha necessarie par creâ un gnûf utent.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		La tô valutazion e je stade cjariade cun sucès. Tu puedis modificâle o gjavâle sul sît web dal servidôr di HaikuDepot.
 Available	PackageListView		Disponibil
+-	no package publish		-
 Cancel	UserLoginWindow		Anule
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot al à bisugne dal demoni dai pachets par funzionâ, ma pal moment al semee che nol sedi in esecuzion.\nInviâlu cumò?
 Click a package to view information	PackageInfoView		Fâs clic suntun pachet par viodi plui informazions
@@ -94,7 +98,6 @@ Repository	PackageListView		Dipuesit
 The email is malformed.	UserLoginWindow		La direzion e-mail e je malformade.
 Close	UserLoginWindow		Siere
 Close	RatePackageWindow		Siere
-An unexpected error has been sent from the server [%i]	ServerHelper		Al è stât inviât dal servidôr [%i] un erôr inspietât
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizazion dâts dai pachets pal dipuesit '%REPO_NAME%'
 Settings	SettingsWindow		Impostazions
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Al è vignût fûr un erôr discjariant lis condizions di ûs necessaris par creâ un gnûf utent. Controle il regjistri pai detais e torne prove. \nLis informazions su ce mût viodi i regjistris a son disponibilis inte sezion di HaikuDepot  de Vuide utent di Haiku.
@@ -123,6 +126,7 @@ Status	PackageListView		Stât
 The password has been incorrectly repeated.	UserLoginWindow		La peraule d'ordin e je stade ripetude sbaliade.
 Network transport error	ServerHelper		Erôr di traspuart de rêt
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		La peraule d'ordin furnide in precedence pal utent [%Nickname%] no je pal moment valide. L'utent al vignarà disconetût di cheste aplicazion e tu varâs di jentrâ di gnûf cu la peraule d'ordin inzornade.
+Uninstall %PackageTitle%	PackageManager		Disinstale %PackageTitle%
 Update	RatePackageWindow		Inzorne
 OK	ServerHelper		Va ben
 Language	UserLoginWindow		Lenghe
@@ -137,8 +141,8 @@ Source packages	MainWindow		Pachets sorzint
 -	no package size		-
 Problem with working files	App		Probleme cui file di lavôr de aplicazion
 Server error	ServerHelper		Erôr dal servidôr
-Try again	App		Torne prove
 Rate package	RatePackageWindow		Valute pachet
+Try again	App		Torne prove
 Unknown	PackageListView		No cognossût
 I agree to the usage conditions	UserLoginWindow		O aceti lis condizions di ûs
 Log in	UserLoginWindow		Jentre
@@ -170,6 +174,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Version dal client masse vecje
 Local repository load error	LocalPkgDataLoadProcess		Erôr tal cjariament dal dipuesit locâl
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		L'utent nol esist o la peraule d'ordin dade e je sbaliade. Controle lis tôs credenziâls e torne prove.
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Ripet peraule d'ordin:
 All repositories	MainWindow		Ducj i dipuesits

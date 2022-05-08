@@ -106,17 +106,30 @@ const struct supported_device {
 	{0x0a16, INTEL_MODEL_HASM, "Haswell Mobile"},
 
 #if 0
-	// The driver does not make any attempt to handle this modern hardware.
-	// Better let VESA/UEFI do it.
-	{0x0155, INTEL_MODEL_VLV, "ValleyView Desktop"},
 	{0x0f30, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f31, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f32, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f33, INTEL_MODEL_VLVM, "ValleyView Mobile"},
-	{0x0157, INTEL_MODEL_VLVM, "ValleyView Mobile"},
-
-//	{0x1616, INTEL_MODEL_BDWM, "HD Graphics 5500 (Broadwell GT2)"},
 #endif
+
+	{0x1606, INTEL_MODEL_BDWM, "Broadwell GT1 ULT"},
+	{0x160b, INTEL_MODEL_BDWM, "Broadwell GT1 Iris"},
+	{0x160e, INTEL_MODEL_BDWM, "Broadwell GT1 ULX"},
+	{0x1602, INTEL_MODEL_BDWM, "Broadwell GT1 ULT"},
+	{0x160a, INTEL_MODEL_BDWS, "Broadwell GT1 Server"},
+	{0x160d, INTEL_MODEL_BDW,  "Broadwell GT1 Workstation"},
+	{0x1616, INTEL_MODEL_BDWM, "Broadwell GT2 ULT"},
+	{0x161b, INTEL_MODEL_BDWM, "Broadwell GT2 ULT"},
+	{0x161e, INTEL_MODEL_BDWM, "Broadwell GT2 ULX"},
+	{0x1612, INTEL_MODEL_BDWM, "Broadwell GT2 Halo"},
+	{0x161a, INTEL_MODEL_BDWS, "Broadwell GT2 Server"},
+	{0x161d, INTEL_MODEL_BDW,  "Broadwell GT2 Workstation"},
+	{0x1626, INTEL_MODEL_BDWM, "Broadwell GT3 ULT"},
+	{0x162b, INTEL_MODEL_BDWM, "Broadwell GT3 Iris"},
+	{0x162e, INTEL_MODEL_BDWM, "Broadwell GT3 ULX"},
+	{0x1622, INTEL_MODEL_BDWM, "Broadwell GT3 ULT"},
+	{0x162a, INTEL_MODEL_BDWS, "Broadwell GT3 Server"},
+	{0x162d, INTEL_MODEL_BDW,  "Broadwell GT3 Workstation"},
 
 	{0x1902, INTEL_MODEL_SKY,  "Skylake GT1"},
 	{0x1906, INTEL_MODEL_SKYM, "Skylake GT1"},
@@ -158,6 +171,26 @@ const struct supported_device {
 	{0x3eab, INTEL_MODEL_CFLM, "CoffeeLake Halo GT2"},
 	{0x3ea5, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
 	{0x3ea6, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
+
+	{0x9ba4, INTEL_MODEL_CML,	"CometLake GT1"},
+	{0x9ba8, INTEL_MODEL_CML,	"CometLake GT1"},
+	{0x9b21, INTEL_MODEL_CMLM,	"CometLake U GT1"},
+	{0x9baa, INTEL_MODEL_CMLM,	"CometLake U GT1"},
+	{0x9bc4, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9bc5, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9bc6, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9bc8, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9be6, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9bf6, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b41, INTEL_MODEL_CMLM,	"CometLake U GT2"},
+	{0x9bca, INTEL_MODEL_CMLM,	"CometLake U GT2"},
+	{0x9bcc, INTEL_MODEL_CMLM,	"CometLake U GT2"},
+
+	{0x4e55, INTEL_MODEL_JSL,	"JasperLake"},
+	{0x4e61, INTEL_MODEL_JSL,	"JasperLake"},
+	{0x4e71, INTEL_MODEL_JSLM,	"JasperLake"},
+
+	{0x9a49, INTEL_MODEL_TGLM,	"TigerLake"},
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
@@ -254,6 +287,7 @@ detect_intel_pch()
 				ERROR("%s: Found Comet Lake V PCH\n", __func__);
 				return INTEL_PCH_SPT;
 			case INTEL_PCH_ICP_DEVICE_ID:
+			case INTEL_PCH_ICP2_DEVICE_ID:
 				ERROR("%s: Found Ice Lake PCH\n", __func__);
 				return INTEL_PCH_ICP;
 			case INTEL_PCH_MCC_DEVICE_ID:
@@ -264,11 +298,12 @@ detect_intel_pch()
 				ERROR("%s: Found Tiger Lake PCH\n", __func__);
 				return INTEL_PCH_TGP;
 			case INTEL_PCH_JSP_DEVICE_ID:
-			case INTEL_PCH_JSP2_DEVICE_ID:
 				ERROR("%s: Found Jasper Lake PCH\n", __func__);
 				return INTEL_PCH_JSP;
 			case INTEL_PCH_ADP_DEVICE_ID:
 			case INTEL_PCH_ADP2_DEVICE_ID:
+			case INTEL_PCH_ADP3_DEVICE_ID:
+			case INTEL_PCH_ADP4_DEVICE_ID:
 				ERROR("%s: Found Alder Lake PCH\n", __func__);
 				return INTEL_PCH_ADP;
 		}

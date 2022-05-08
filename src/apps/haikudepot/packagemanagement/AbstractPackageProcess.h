@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2022, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef ABSTRACT_PACKAGE_PROCESS_H
@@ -24,8 +24,6 @@ public:
 
 			int32				InstallLocation() const
 									{ return fInstallLocation; }
-
-	static	int32				InstallLocation(const PackageInfoRef& package);
 
 protected:
 			PackageInfoRef		FindPackageByName(const BString& name);

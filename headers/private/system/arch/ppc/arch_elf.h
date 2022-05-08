@@ -46,4 +46,6 @@
 #define	R_PPC_SECTOFF_HA		36
 #define	R_PPC_ADDR30			37
 
+#define TLS_DTV_OFFSET 0
+
 #endif	/* _KERNEL_ARCH_PPC_ELF_H */

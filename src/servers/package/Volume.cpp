@@ -231,13 +231,12 @@ Volume::Init(const node_ref& rootDirectoryRef, node_ref& _packageRootRef)
 		RETURN_ERROR(B_NO_MEMORY);
 
 	// get a volume info from the FS
-	int fd = directory.Dup();
-	if (fd < 0) {
+	FileDescriptorCloser fd(directory.Dup());
+	if (!fd.IsSet()) {
 		ERROR("Volume::Init(): failed to get root directory FD: %s\n",
-			strerror(fd));
-		RETURN_ERROR(fd);
+			strerror(fd.Get()));
+		RETURN_ERROR(fd.Get());
 	}
-	FileDescriptorCloser fdCloser(fd);
 
 	// get the volume info from packagefs
 	uint32 maxPackagesDirCount = 16;
@@ -252,7 +251,7 @@ Volume::Init(const node_ref& rootDirectoryRef, node_ref& _packageRootRef)
 			RETURN_ERROR(B_NO_MEMORY);
 		infoDeleter.SetTo(info);
 
-		if (ioctl(fd, PACKAGE_FS_OPERATION_GET_VOLUME_INFO, info,
+		if (ioctl(fd.Get(), PACKAGE_FS_OPERATION_GET_VOLUME_INFO, info,
 				bufferSize) != 0) {
 			ERROR("Volume::Init(): failed to get volume info: %s\n",
 				strerror(errno));
@@ -311,13 +310,12 @@ Volume::InitPackages(Listener* listener)
 	}
 
 	// read the packages directory and get the active packages
-	int fd = OpenRootDirectory();
-	if (fd < 0) {
+	FileDescriptorCloser fd(OpenRootDirectory());
+	if (!fd.IsSet()) {
 		ERROR("Volume::InitPackages(): failed to open root directory: %s\n",
-			strerror(fd));
-		RETURN_ERROR(fd);
+			strerror(fd.Get()));
+		RETURN_ERROR(fd.Get());
 	}
-	FileDescriptorCloser fdCloser(fd);
 
 	error = _ReadPackagesDirectory();
 	if (error != B_OK)
@@ -327,7 +325,7 @@ Volume::InitPackages(Listener* listener)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	error = _GetActivePackages(fd);
+	error = _GetActivePackages(fd.Get());
 	if (error != B_OK)
 		RETURN_ERROR(error);
 

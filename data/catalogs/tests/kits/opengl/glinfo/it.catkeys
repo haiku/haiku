@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-GLInfo	2211760527
+1	italian	x-vnd.Haiku-GLInfo	1282327690
 Maximum clipping planes	Capabilities		Numero massimo di piani di clipping
 Maximum evaluators equation order	Capabilities		Ordine massimo nella risoluzione di equazioni
 Texture stack size	Capabilities		Dimensione stack texture
@@ -13,12 +13,15 @@ Value	Capabilities		Valore
 Name stack size	Capabilities		Dimensione stack nomi
 Capabilities	Capabilities		Capacità
 Maximum texture units	Capabilities		Numero massimo unità di texture
+Unknown or missing OpenGL renderer.	InfoView		Renderizzatore OpenGL sconosciuto o mancante.
 Capability	Capabilities		Capacità
 Maximum 2D texture size	Capabilities		Dimensione massima texture 2D
 Auxiliary buffer(s)	Capabilities		Buffer ausiliari
+Unknown vendor	InfoView		Marca sconosciuta
 Maximum convolution	Capabilities		Convoluzione massima
 Maximum 3D texture size	Capabilities		Massima dimensione texture 3D
 Maximum recommended index elements	Capabilities		Numero massimo raccomandato di elementi di indice
+Unknown version	InfoView		Versione sconosciuta
 List stack size	Capabilities		Dimensioni stack liste
 Model stack size	Capabilities		Dimensioni stack modelli
 Projection stack size	Capabilities		Dimensione stack proiezioni

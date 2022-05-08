@@ -1139,7 +1139,7 @@ BString MediaString::forVideoActiveLines(
 
 	BString s = "";
 	s.SetToFormat(
-		B_TRANSLATE("Video data between line " B_PRIu32 " and " B_PRIu32),
+		B_TRANSLATE("Video data between line %" B_PRIu32 " and %" B_PRIu32),
 		firstActive, lastActive);
 	return s;
 }

@@ -382,8 +382,12 @@ btrfs_lookup(fs_volume* _volume, fs_vnode* _directory, const char* name,
 		return status;
 
 	status = DirectoryIterator(directory).Lookup(name, strlen(name), _vnodeID);
-	if (status != B_OK)
+	if (status != B_OK) {
+		if (status == B_ENTRY_NOT_FOUND)
+			entry_cache_add_missing(volume->ID(), directory->ID(), name);
 		return status;
+	}
+	entry_cache_add(volume->ID(), directory->ID(), name, *_vnodeID);
 
 	return get_vnode(volume->FSVolume(), *_vnodeID, NULL);
 }

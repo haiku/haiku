@@ -66,18 +66,6 @@ set_real_time_clock(unsigned long secs)
 }
 
 
-status_t
-set_timezone(const char* /*timezone*/)
-{
-	/* There's nothing we can do here, since we no longer support named
-	 * timezones.
-	 *
-	 * TODO: should we keep this around for compatibility or get rid of it?
-	 */
-	return ENOSYS;
-}
-
-
 bigtime_t
 set_alarm(bigtime_t when, uint32 mode)
 {
@@ -112,3 +100,13 @@ set_alarm(bigtime_t when, uint32 mode)
 	return oldInfo.remaining_time != B_INFINITE_TIMEOUT
 		? oldInfo.remaining_time : 0;
 }
+
+
+#ifdef _BEOS_R5_COMPATIBLE_
+extern "C" status_t
+set_timezone(const char* /*timezone*/)
+{
+	// There's nothing we can do here, since we no longer support named timezones.
+	return ENOSYS;
+}
+#endif

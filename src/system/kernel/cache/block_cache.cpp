@@ -3059,11 +3059,11 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 				// The block has only been changed in the parent
 				block->original_data = NULL;
 			}
+			block->parent_data = NULL;
 
 			// move the block to the previous transaction list
 			transaction->blocks.Add(block);
 			block->previous_transaction = transaction;
-			block->parent_data = NULL;
 		}
 
 		if (block->original_data != NULL) {
@@ -3221,6 +3221,8 @@ cache_start_sub_transaction(void* _cache, int32 id)
 			if (block->original_data != NULL) {
 				memcpy(block->current_data, block->original_data,
 					cache->block_size);
+
+				cache->Free(block->original_data);
 				block->original_data = NULL;
 			}
 			continue;

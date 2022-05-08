@@ -194,7 +194,7 @@ static const Translation kTranslations[] = {
 		"Efstathios Iosifidis\n"
 		"Edward Pasenidis\n"
 		"Jim Spentzos\n"
-		"Panagiotis Vasilopoulos (AlwaysLivid)\n"
+		"Panagiotis \"Ivory\" Vasilopoulos (n0toose)\n"
 		"blu.256\n"
 		"JamesSP472\n"
 		"hxze\n"
@@ -700,7 +700,7 @@ static const Translation kTranslations[] = {
 	"Atsushi Takamatsu\n" \
 	"James Urquhart\n" \
 	"Jason Vandermark\n" \
-	"Panagiotis Vasilopoulos (AlwaysLivid)\n" \
+	"Panagiotis \"Ivory\" Vasilopoulos (n0toose)\n" \
 	"Sandor Vroemisse\n" \
 	"Jürgen Wall\n" \
 	"Denis Washington\n" \

@@ -26,9 +26,6 @@ class MixerSettings {
 		bool							AttenuateOutput();
 		void							SetAttenuateOutput(bool yesno);
 
-		bool							NonLinearGainSlider();
-		void							SetNonLinearGainSlider(bool yesno);
-
 		bool							UseBalanceControl();
 		void							SetUseBalanceControl(bool yesno);
 
@@ -76,7 +73,6 @@ class MixerSettings {
 
 		struct settings {
 			bool	AttenuateOutput;
-			bool	NonLinearGainSlider;
 			bool	UseBalanceControl;
 			bool	AllowOutputChannelRemapping;
 			bool	AllowInputChannelRemapping;

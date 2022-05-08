@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2021, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2022, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,7 +10,7 @@
 void
 DebugUART::Out8(int reg, uint8 value)
 {
-#ifdef __ARM__
+#if defined(__ARM__) || defined(__aarch64__)
 	// 32-bit aligned
 	*((uint8 *)Base() + reg * sizeof(uint32)) = value;
 #else
@@ -22,7 +22,7 @@ DebugUART::Out8(int reg, uint8 value)
 uint8
 DebugUART::In8(int reg)
 {
-#ifdef __ARM__
+#if defined(__ARM__) || defined(__aarch64__)
 	// 32-bit aligned
 	return *((uint8 *)Base() + reg * sizeof(uint32));
 #else
@@ -37,7 +37,7 @@ DebugUART::Barrier()
 	// Simple memory barriers
 #if defined(__POWERPC__)
 	asm volatile("eieio; sync");
-#elif defined(__ARM__)
+#elif defined(__ARM__) || defined(__aarch64__)
 	asm volatile ("" : : : "memory");
 #endif
 }

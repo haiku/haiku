@@ -69,6 +69,14 @@ StackingEventHandler::HandleMessage(SATWindow* sender,
 			SATWindow* candidate = stackAndTile->GetSATWindow(window);
 			if (!candidate)
 				return false;
+
+			// Is that window already part of the stack?
+			if (area->WindowList().HasItem(candidate)) {
+				reply.StartMessage(B_MISMATCHED_VALUES);
+				reply.Flush();
+				break;
+			}
+
 			if (!parent->StackWindow(candidate))
 				return false;
 

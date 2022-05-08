@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	250728390
+1	finnish	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Vaaditaan todentamista
 Previous	WebPositive Window		Edellinen
 (Finish: %date)	Download Window		(Päättyi: %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		Avaa sisältyvä kansio
 Find previous	WebPositive Window		Etsi edellinen
 Full screen	WebPositive Window		Kokonäyttö
 Downloads in progress	WebPositive		Käynnissä olevat lataukset
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Haluatko avata kaikki %addedCount kirjanmerkkiä heti?
 Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Haluatko avata kaikki %addedCount kirjanmerkkiä heti?
 Clone current page	Settings Window		Kloonaa nykyinen sivu
 Start page:	Settings Window		Aloitussivu:
 Cancel	Download Window		Peru
@@ -45,17 +45,19 @@ New tabs:	Settings Window		Uudet välilehdet:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url epäonnistui
 Open downloads folder	Download Window		Avaa lataukset-kansio
 Proxy server	Settings Window		Välityspalvelin
+Darn!	WebPositive		Perhana!
 Decrease size	WebPositive Window		Pienennä kokoa
 Default fixed font size:	Settings Window		Oletuskoko sovitetulle kirjasimelle:
 Sans serif font:	Settings Window		Sans serif-kirjasin:
 Clear	WebPositive Window		Tyhjennä
-Cookies for %s	Cookie Manager		Evästeet kohteelle %s
 The download could not be opened.	Download Window		Latauksen avaaminen epäonnistui.
+Cookies for %s	Cookie Manager		Evästeet kohteelle %s
 Close	Download Window		Sulje
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Hakutermi
 Reload	WebPositive Window		Lataa uudelleen
 Expiration	Cookie Manager		Erääntymisaika
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Prosessorisi on liian vanha ja ei tue SSE2-laajennuksia, mitä ilman WebPositive-sovellus ei toimi. Suosittelemme sen sijaan asentamaan NetSurf-sovelluksen.
 Download finished	Download Window		Lataus päättyi
 Cookie manager	WebPositive Window		Evästehallinta
 OK	Authentication Panel		Valmis
@@ -111,8 +113,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Jatka latauksia
 Proxy server requires authentication	Settings Window		Välityspalvelin vaatii todentamista
 Cancel	Settings Window		Peru
-History	WebPositive Window		Historia
 Reset size	WebPositive Window		Palauta oletuskoko
+History	WebPositive Window		Historia
 Do you really want to clear the browsing history?	WebPositive Window		Haluatko todella tyhjentää selaushistorian?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Etsi hakutermien seuraava esiintyminen
 Fixed font:	Settings Window		Sovitettu kirjasin:
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Käynnistä:
 Confirmation	WebPositive Window		Vahvistus
 Session cookie	Cookie Manager		Istuntoeväste
+No SSE2 support	WebPositive		Ei SSE2-tukea
 Open all	WebPositive Window		Avaa kaikki
 Cut	WebPositive Window		Leikkaa
 Downloads	Download Window		Lataukset

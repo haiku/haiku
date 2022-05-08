@@ -45,18 +45,17 @@ PackageSettingsItem::Load(::Directory* systemDirectory, const char* name)
 	const char* settingsFilePath
 		= &(kSystemSettingsDirectory "/packages")[strlen(kSystemDirectory) + 1];
 
-	int fd = open_from(systemDirectory, settingsFilePath, B_READ_ONLY, 0);
-	if (fd < 0)
+	FileDescriptorCloser fd(open_from(systemDirectory, settingsFilePath,
+		B_READ_ONLY, 0));
+	if (!fd.IsSet())
 		return NULL;
-	FileDescriptorCloser fdCloser(fd);
 
 	// load the driver settings
-	void* settingsHandle = load_driver_settings_file(fd);
-	if (settingsHandle == NULL)
+	DriverSettingsUnloader settingsHandle(load_driver_settings_file(fd.Get()));
+	if (!settingsHandle.IsSet())
 		return NULL;
-	DriverSettingsUnloader settingsDeleter(settingsHandle);
 
-	const driver_settings* settings = get_driver_settings(settingsHandle);
+	const driver_settings* settings = get_driver_settings(settingsHandle.Get());
 	for (int i = 0; i < settings->parameter_count; i++) {
 		const driver_parameter& parameter = settings->parameters[i];
 		if (strcmp(parameter.name, "Package") != 0

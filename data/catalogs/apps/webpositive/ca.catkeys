@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	250728390
+1	catalan; valencian	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Acabament: %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		Obre la carpeta que ho conté
 Find previous	WebPositive Window		Troba'n l'anterior
 Full screen	WebPositive Window		Pantalla completa
 Downloads in progress	WebPositive		Baixada en progrés
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Voleu obrir %addedCount adreces d'interès alhora?
 Copy URL to clipboard	Download Window		Copia l'URL al porta-retalls
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Voleu obrir %addedCount adreces d'interès alhora?
 Clone current page	Settings Window		Clona la pàgina actual
 Start page:	Settings Window		Pàgina d'inici:
 Cancel	Download Window		Cancel·la
@@ -45,17 +45,19 @@ New tabs:	Settings Window		Pestanyes noves:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url ha fallat
 Open downloads folder	Download Window		Obre la carpeta de baixades
 Proxy server	Settings Window		Servidor intermediari
+Darn!	WebPositive		Merda!
 Decrease size	WebPositive Window		Redueix-ne la mida
 Default fixed font size:	Settings Window		Mida de lletra fixa per defecte:
 Sans serif font:	Settings Window		Lletra Sans serif:
 Clear	WebPositive Window		Neteja
-Cookies for %s	Cookie Manager		Galetes per a %s
 The download could not be opened.	Download Window		La baixada no s'ha pogut obrir.
+Cookies for %s	Cookie Manager		Galetes per a %s
 Close	Download Window		Tanca
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - terme de cerca
 Reload	WebPositive Window		Torna a carregar
 Expiration	Cookie Manager		Venciment
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		La CPU és massa antiga i no admet les extensions SSE2, sense les quals el WebPositive no pot funcionar. Us recomanem que instal·leu el NetSurf.
 Download finished	Download Window		Baixada acabada
 Cookie manager	WebPositive Window		Gestor de galetes
 OK	Authentication Panel		D'acord
@@ -111,8 +113,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Continua les baixades
 Proxy server requires authentication	Settings Window		El servidor intermediari requereix autenticació.
 Cancel	Settings Window		Cancel·la
-History	WebPositive Window		Historial
 Reset size	WebPositive Window		Restableix-ne la mida
+History	WebPositive Window		Historial
 Do you really want to clear the browsing history?	WebPositive Window		Realment voleu esborrar l'historial de navegació?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Troba l'ocurrència següent dels termes de cerca
 Fixed font:	Settings Window		Lletra fixada:
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Inicia:
 Confirmation	WebPositive Window		Confirmació
 Session cookie	Cookie Manager		Galeta de la sessió
+No SSE2 support	WebPositive		Sense suport per a SSE2
 Open all	WebPositive Window		Obre-ho tot
 Cut	WebPositive Window		Retalla
 Downloads	Download Window		Baixades

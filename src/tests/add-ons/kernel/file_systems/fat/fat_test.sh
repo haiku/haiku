@@ -12,7 +12,7 @@ run_fstorture() # ${1} => block size
 {
 	echo "Run test with bs=${1} ..."
 
-	mkdos --fat 32 ${TEST_DEV}
+	mkfs -t fat ${TEST_DEV} TESTVOL
 
 	mkdir -p ${TEST_MP}
 	mount -t fat ${TEST_DEV} ${TEST_MP}
@@ -48,7 +48,7 @@ run_fsx() # ${1} => block size ${2} => features list
 {
 	echo "Run run_fsx_combined_parallel with bs=${1}"
 
-	mkdos --fat 32 ${TEST_DEV}
+	mkfs -t fat ${TEST_DEV} TESTVOL
 
 	mkdir -p ${TEST_MP}
 	mount -t fat ${TEST_DEV} ${TEST_MP}

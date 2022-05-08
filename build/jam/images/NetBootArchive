@@ -20,7 +20,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	pci isa@x86 ata
-	scsi config_manager agp_gart
+	scsi agp_gart
 ] ;
 SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs packagefs ;
 

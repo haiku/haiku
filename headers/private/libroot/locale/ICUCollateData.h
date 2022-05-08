@@ -33,7 +33,7 @@ public:
 			status_t			Wcscoll(const wchar_t* a, const wchar_t* b,
 									int& out);
 			status_t			Wcsxfrm(wchar_t* out, const wchar_t* in,
-									size_t size, size_t& outSize);
+									size_t outSize, size_t& requiredSize);
 
 private:
 			status_t			_ToUnicodeString(const char* in,

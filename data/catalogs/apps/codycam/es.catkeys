@@ -1,27 +1,27 @@
 1	spanish; castilian	x-vnd.Haiku-CodyCam	12021044
-destination directory expected	CodyCam		se esperaba directorio de destino
+destination directory expected	CodyCam		se esperaba un directorio de destino
 reply: '%s'\n	SftpClient		responder '%s\n
 PASS <suppressed>  (real password sent)	FtpClient		CONTRASEÑA <omitida>  (enviada contraseña real)
 JPEG image	CodyCam		Imagen JPEG
 Remote host has closed the connection.\n	FtpClient		El host remoto ha cerrado la conexión.\n
-image file format expected	CodyCam		se esperaba formato de archivo de imagen
+image file format expected	CodyCam		se esperaba un formato de archivo de imagen
 Every 30 minutes	CodyCam		Cada 30 minutos
 Capturing Image…	VideoConsumer.cpp		Capturando imagen...
-Cannot start time source!	CodyCam		No se puede Iniciar fuente de tiempo!
-Waiting…	CodyCam		Esperando...
+Cannot start time source!	CodyCam		No se puede iniciar fuente de tiempo.
+Waiting…	CodyCam		Esperando…
 Passive FTP	CodyCam		FTP pasivo 
 Every 10 minutes	CodyCam		Cada 10 minutos
 Every minute	CodyCam		Cada minuto
-Capture Rate Menu	CodyCam		Menú Tasa de capturas
+Capture Rate Menu	CodyCam		Menú de tasa de capturas
 Cannot seek time source!	CodyCam		No se puede encontrar fuente de tiempo.
 Server login failed	VideoConsumer.cpp		Falló el inicio de sesión del servidor
 on or off expected	Settings	Do not translate 'on' and 'off'	Se espera on u off
 invalid upload client %ld\n	VideoConsumer.cpp		cliente de carga invalido %ld\n
 Every 30 seconds	CodyCam		Cada 30 segundos
-Cannot create a video window	CodyCam		no se puede crear ventana de vídeo
+Cannot create a video window	CodyCam		No se puede crear ventana de vídeo
 Cannot register the video window	CodyCam		No se puede registrar ventana de vídeo
 capture rate expected	CodyCam		se esperaba tasa de captura
-Quit	CodyCam		Abandonar
+Quit	CodyCam		Salir
 Cannot connect the video source to the video window	CodyCam		No se puede conectar a la fuente de vídeo a la ventana de vídeo
 read: %d\n	SftpClient		leer: %d\n
 Every 2 hours	CodyCam		Cada 2 horas

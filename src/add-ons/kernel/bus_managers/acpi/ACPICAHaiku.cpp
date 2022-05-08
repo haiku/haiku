@@ -233,13 +233,15 @@ ACPI_PHYSICAL_ADDRESS
 AcpiOsGetRootPointer()
 {
 #ifdef _KERNEL_MODE
-	ACPI_PHYSICAL_ADDRESS address;
-	ACPI_STATUS status = AE_OK;
 	DEBUG_FUNCTION();
 	if (sACPIRoot == 0) {
-		sACPIRoot = (ACPI_PHYSICAL_ADDRESS)get_boot_item("ACPI_ROOT_POINTER", NULL);
+		phys_addr_t* acpiRootPointer = (phys_addr_t*)get_boot_item("ACPI_ROOT_POINTER", NULL);
+		if (acpiRootPointer != NULL)
+			sACPIRoot = *acpiRootPointer;
+
 		if (sACPIRoot == 0) {
-			status = AcpiFindRootPointer(&address);
+			ACPI_PHYSICAL_ADDRESS address;
+			ACPI_STATUS status = AcpiFindRootPointer(&address);
 			if (status == AE_OK)
 				sACPIRoot = address;
 		}

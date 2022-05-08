@@ -25,20 +25,19 @@ read_password(const char* prompt, char* password, size_t bufferSize,
 	FILE* out = stdout;
 
 	// open tty
-	FILE* tty = NULL;
+	FileCloser tty;
 	if (!useStdio) {
 // TODO: Open tty with O_NOCTTY!
-		tty = fopen("/dev/tty", "w+");
-		if (tty == NULL) {
+		tty.SetTo(fopen("/dev/tty", "w+"));
+		if (!tty.IsSet()) {
 			fprintf(stderr, "Error: Failed to open tty: %s\n",
 				strerror(errno));
 			return errno;
 		}
 
-		in = tty;
-		out = tty;
+		in = tty.Get();
+		out = tty.Get();
 	}
-	FileCloser ttyCloser(tty);
 
 	// disable echo
 	int inFD = fileno(in);

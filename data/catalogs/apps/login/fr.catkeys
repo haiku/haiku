@@ -1,6 +1,7 @@
-1	french	x-vnd.Haiku-Login	406290179
+1	french	x-vnd.Haiku-Login	3568987751
 Invalid login!	Login View		Échec de l’identification !
 Error	Login App		Erreur
+Login application for Haiku\nUsage:	Login App		Application de connexion pour Haiku\nUsage :
 --nonmodal\tDo not make the window modal	Login App		--nonmodal\tNe pas rendre la fenêtre modale
 Welcome to Haiku	Login Window		Bienvenue dans Haiku
 Halt	Login View		Arrêter

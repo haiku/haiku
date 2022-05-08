@@ -1,17 +1,14 @@
-1	russian	application/x-vnd.Be.LoggingConsumerApp	1022793487
+1	russian	application/x-vnd.Be.LoggingConsumerApp	3041020332
 Priority	CortexAddOnsLoggingConsumer		Приоритет
 Latency	CortexAddOnsLoggingConsumer		Задержка
 CPU spin percentage	CortexAddOnsLoggingConsumer		Процент спин-блокировок ЦПУ
 Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Старт
 Thread priority	CortexAddOnsLoggingConsumer		Приоритет потока
 Latency control	CortexAddOnsLoggingConsumer		Управление задержкой
-MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не удалось получить информацию об узле (%d):\n%s\n
 CPU percentage	CortexAddOnsLoggingConsumer		Нагрузка на CPU
-MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не удалось найти узел (%d):\n%s\n
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Стоп
 OK	CortexAddOnsCommonMediaNodeControlApp		ОК
 Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Элементы управления
 controls	CortexAddOnsCommonMediaNodeControlApp		управление
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Подключить
 percent	CortexAddOnsLoggingConsumer		процент
-MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: нет параметров для узла (%d):\n%s\n

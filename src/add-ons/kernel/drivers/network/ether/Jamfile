@@ -16,7 +16,6 @@ HaikuSubInclude attansic_l1 ;
 HaikuSubInclude attansic_l2 ;
 HaikuSubInclude broadcom440x ;
 HaikuSubInclude dec21xxx ;
-HaikuSubInclude emulex_oce ;
 HaikuSubInclude ipro100 ;
 HaikuSubInclude jmicron2x0 ;
 HaikuSubInclude marvell_yukon ;

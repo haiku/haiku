@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-CharacterMap	2410613018
+1	friulian	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Simbui matematics varis - B
 Latin extended E	UnicodeBlocks		Latin complet E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		Estension C dai ideograms unif
 Ancient Greek musical notation	UnicodeBlocks		Notazion musicâl Grêc Antîc
 Thai	UnicodeBlocks		Thai
 Ethiopic supplement	UnicodeBlocks		Etiop suplementâr
+Only show blocks contained in font	CharacterWindow		Mostre dome i blocs contignûts tal caratar
 Chess symbols	UnicodeBlocks		Simbui dai scacs
 Yijing hexagram symbols	UnicodeBlocks		Simbui a esagrams Yijing
 Ottoman Siyaq numbers	UnicodeBlocks		Numars siyaq otomans

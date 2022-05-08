@@ -8,6 +8,7 @@
  */
 
 #include <arpa/inet.h>
+#include <signal.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -109,6 +110,62 @@ TypeHandlerImpl<fd_set *>::GetReturnValue(Context &context, uint64 value)
 {
 	return context.FormatPointer((void *)value);
 }
+
+
+static string
+format_ltype(Context &context, int ltype)
+{
+	if (context.GetContents(Context::ENUMERATIONS)) {
+#define LTYPE(type) \
+		case type: \
+			return #type
+
+		switch (ltype) {
+			LTYPE(F_RDLCK);
+			LTYPE(F_UNLCK);
+			LTYPE(F_WRLCK);
+		}
+	}
+
+	return context.FormatSigned(ltype);
+}
+
+
+static string
+format_lwhence(Context &context, int lwhence)
+{
+	if (context.GetContents(Context::ENUMERATIONS)) {
+#define LWHENCE(whence) \
+		case whence: \
+			return #whence
+
+		switch (lwhence) {
+			LWHENCE(SEEK_SET);
+			LWHENCE(SEEK_CUR);
+			LWHENCE(SEEK_END);
+			LWHENCE(SEEK_DATA);
+			LWHENCE(SEEK_HOLE);
+		}
+	}
+
+	return context.FormatSigned(lwhence);
+}
+
+
+
+static string
+format_pointer(Context &context, flock *lock)
+{
+	string r;
+
+	r = "l_type=" + format_ltype(context, lock->l_type) + ", ";
+	r += "l_whence=" + format_lwhence(context, lock->l_whence) + ", ";
+	r += "l_start=" + context.FormatSigned(lock->l_start) + ", ";
+	r += "l_len=" + context.FormatSigned(lock->l_len);
+
+	return r;
+}
+
 
 
 template<typename value_t>
@@ -606,6 +663,21 @@ format_pointer(Context &context, ifconf *conf)
 }
 
 
+static string
+format_pointer(Context &context, siginfo_t *info)
+{
+	string r;
+
+	switch (info->si_code) {
+		case CLD_EXITED:
+			r = "WIFEXITED(s) && WEXITSTATUS(s) == " + context.FormatUnsigned(info->si_status & 0xff);
+			break;
+	}
+	return r;
+}
+
+
+
 template<typename Type>
 class SpecializedPointerTypeHandler : public TypeHandler {
 	string GetParameterValue(Context &context, Parameter *,
@@ -633,9 +705,11 @@ class SpecializedPointerTypeHandler : public TypeHandler {
 	}
 
 DEFINE_TYPE(fdset_ptr, fd_set *);
+POINTER_TYPE(flock_ptr, flock);
 POINTER_TYPE(ifconf_ptr, ifconf);
 POINTER_TYPE(ifreq_ptr, ifreq);
 DEFINE_TYPE(pollfd_ptr, pollfd *);
+POINTER_TYPE(siginfo_t_ptr, siginfo_t);
 #if 0
 POINTER_TYPE(message_args_ptr, message_args);
 POINTER_TYPE(msghdr_ptr, msghdr);

@@ -20,8 +20,8 @@ Open containing folder	Download Window		Uzi enhavantan dosierujon
 Find previous	WebPositive Window		Antaŭserĉi
 Full screen	WebPositive Window		Plenekrane
 Downloads in progress	WebPositive		Daŭrantaj elŝutadoj
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ĉu vi volas uzi ĉiujn %addedCount legosignojn samtempe?
 Copy URL to clipboard	Download Window		Kopii retadreson en tondujon
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ĉu vi volas uzi ĉiujn %addedCount legosignojn samtempe?
 Clone current page	Settings Window		Dubli la aktivan paĝon
 Start page:	Settings Window		Komenca paĝo:
 Cancel	Download Window		Nuligi
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Malgrandigi
 Default fixed font size:	Settings Window		Defaŭlta grado de fiksitlarĝa tiparo:
 Sans serif font:	Settings Window		Senserifa tiparo:
 Clear	WebPositive Window		Viŝi
-Cookies for %s	Cookie Manager		Retkuketo por %s
 The download could not be opened.	Download Window		La elŝutito ne povas esti uzata.
+Cookies for %s	Cookie Manager		Retkuketo por %s
 Close	Download Window		Fermi
 WebPositive	System name		Retprospero
 %s - Search term	Settings Window		%s - Serĉvorto
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Daŭrigi elŝutadon
 Proxy server requires authentication	Settings Window		La prokurilo postulas aŭtentigon
 Cancel	Settings Window		Nuligi
-History	WebPositive Window		Historio
 Reset size	WebPositive Window		Restarigi grandon
+History	WebPositive Window		Historio
 Do you really want to clear the browsing history?	WebPositive Window		Ĉu vi certas ke volas nuligi historion de rigardado?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Serĉi sekvan aperon de serĉaĵo
 Fixed font:	Settings Window		Fiksitlarĝa tiparo:

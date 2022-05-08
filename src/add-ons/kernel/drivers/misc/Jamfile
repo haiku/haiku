@@ -11,10 +11,6 @@ KernelAddon <driver>poke :
 	poke.cpp
 	;
 
-KernelAddon <driver>config :
-	config.c
-	;
-
 KernelAddon <driver>kdl :
 	kdl.c
 	;

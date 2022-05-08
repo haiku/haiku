@@ -1913,7 +1913,8 @@ TermWindow::_OpenSetTabTitleDialog(int32 index)
 	BString toolTip = BString(B_TRANSLATE(
 		"The pattern specifying the current tab title. The following "
 			"placeholders\n"
-		"can be used:\n")) << kTooTipSetTabTitlePlaceholders;
+		"can be used:\n")) << kToolTipSetTabTitlePlaceholders << "\n"
+		<< kToolTipCommonTitlePlaceholders;
 	fSetTabTitleDialog = new SetTitleDialog(
 		B_TRANSLATE("Set tab title"), B_TRANSLATE("Tab title:"),
 		toolTip);
@@ -1942,7 +1943,8 @@ TermWindow::_OpenSetWindowTitleDialog()
 
 	BString toolTip = BString(B_TRANSLATE(
 		"The pattern specifying the window title. The following placeholders\n"
-		"can be used:\n")) << kTooTipSetTabTitlePlaceholders;
+		"can be used:\n")) << kToolTipSetWindowTitlePlaceholders << "\n"
+		<< kToolTipCommonTitlePlaceholders;
 	fSetWindowTitleDialog = new SetTitleDialog(B_TRANSLATE("Set window title"),
 		B_TRANSLATE("Window title:"), toolTip);
 

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	732799617
+1	indonesian	x-vnd.Haiku-HaikuDepot	2640598917
 Repository update error	LocalRepositoryUpdateProcess		Kesalahan pembaruan repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 User Created	UserLoginWindow		Pengguna Dibuat
@@ -121,8 +121,8 @@ The nickname is required.	UserLoginWindow		Nama panggilan diperlukan.
 Source packages	MainWindow		Paket sumber
 -	no package size		-
 Problem with working files	App		Masalah dengan file yang berkaitan
-Try again	App		Coba lagi
 Rate package	RatePackageWindow		Nilai paket
+Try again	App		Coba lagi
 Unknown	PackageListView		Tidak dikenal
 I agree to the usage conditions	UserLoginWindow		Saya menyetujui ketentuan penggunaan
 Log in	UserLoginWindow		Masuk
@@ -152,6 +152,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Versi klien terlalu lama
 Local repository load error	LocalPkgDataLoadProcess		Kesalahan pemuatan repositori lokal
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Pengguna tidak ada atau kata sandi yang salah diberikan. Periksa kredensial Anda dan coba lagi.
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Masukkan kata kunci kembali:
 All repositories	MainWindow		Semua repositori

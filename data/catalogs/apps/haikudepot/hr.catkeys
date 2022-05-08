@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-HaikuDepot	544560333
+1	croatian	x-vnd.Haiku-HaikuDepot	2452359633
 Repository update error	LocalRepositoryUpdateProcess		Greška pri ažuriranju repozitorija
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Došlo je do greške prilikom osvježavanja repozitorija: %error%
 User Created	UserLoginWindow		Korisnik je napravljen
@@ -68,8 +68,8 @@ Stability:	RatePackageWindow		Stabilnost:
 The nickname is required.	UserLoginWindow		Potreban je nadimak.
 Source packages	MainWindow		Izvorni paketi
 -	no package size		-
-Try again	App		Pokušaj ponovno
 Rate package	RatePackageWindow		Ocijeni paket
+Try again	App		Pokušaj ponovno
 Unknown	PackageListView		Nepoznato
 I agree to the usage conditions	UserLoginWindow		Slažem se sa uvjetima korištenja
 Log in	UserLoginWindow		Prijava
@@ -83,6 +83,5 @@ Manage repositories…	MainWindow		Upravljaj repozitorijima…
 Description	PackageListView		Opis
 Open %DeskbarLink%	PackageManager		Otvori %DeskbarLink%
 Log in…	MainWindow		Prijava...
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Ponovi lozinku:
 All repositories	MainWindow		Svi repozitoriji

@@ -6,7 +6,6 @@
 #define _KERNEL_ARCH_ARM_ELF_H
 
 
-
 /* ARM relocs.  */
 #define R_ARM_NONE              0       /* No reloc */
 #define R_ARM_PC24              1       /* PC relative 26 bit branch */
@@ -50,9 +49,7 @@
 #define R_ARM_RPC24             254
 #define R_ARM_RBASE             255
 
-
-
-
+#define TLS_DTV_OFFSET 0
 
 
 #endif	/* _KERNEL_ARCH_M68K_ELF_H */

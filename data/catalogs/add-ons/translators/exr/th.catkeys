@@ -1,9 +1,2 @@
-1	thai	x-vnd.Haiku-EXRTranslator	3596882613
-Version %d.%d.%d, %s	ConfigView		เวอร์ชั่น %d.%d.%d, %s
-EXR image translator	EXRTranslator		เครื่องแปลรูปภาพ EXR
+1	thai	x-vnd.Haiku-EXRTranslator	3088028300
 EXR Settings	main		การตั้งค่า EXR
-EXR images	EXRTranslator		ภาพ EXR
-a division of Lucasfilm Entertainment Company Ltd	ConfigView		ส่วนหนึ่งของ Lucasfilm Entertainment Company Ltd
-EXR image	EXRTranslator		ภาพ EXR
-EXR image translator	ConfigView		ตัวแปลรูปภาพ EXR
-Based on OpenEXR %version%	ConfigView		อ้างอิงจาก OpenEXR %version%

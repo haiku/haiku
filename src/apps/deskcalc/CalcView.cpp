@@ -31,9 +31,11 @@
 #include <Clipboard.h>
 #include <File.h>
 #include <Font.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <MessageRunner.h>
+#include <NumberFormat.h>
 #include <Point.h>
 #include <PopUpMenu.h>
 #include <Region.h>
@@ -1100,8 +1102,14 @@ CalcView::_EvaluateThread(void* data)
 	BString result;
 	status_t status = acquire_sem(calcView->fEvaluateSemaphore);
 	if (status == B_OK) {
+		BLocale locale;
+		BNumberFormat format(&locale);
+
 		ExpressionParser parser;
 		parser.SetDegreeMode(calcView->fOptions->degree_mode);
+		parser.SetSeparators(format.GetSeparator(B_DECIMAL_SEPARATOR),
+			format.GetSeparator(B_GROUPING_SEPARATOR));
+
 		BString expression(calcView->fExpressionTextView->Text());
 		try {
 			result = parser.Evaluate(expression.String());
@@ -1301,6 +1309,11 @@ CalcView::_PressKey(int key)
 			static_cast<BTextView*>(fExpressionTextView)->Select(
 				endSelection + labelLen + 1, endSelection + labelLen + 1);
 		}
+	} else if (strcmp(fKeypad[key].code, ".") == 0) {
+		BLocale locale;
+		BNumberFormat format(&locale);
+
+		fExpressionTextView->Insert(format.GetSeparator(B_DECIMAL_SEPARATOR));
 	} else {
 		// check for evaluation order
 		if (fKeypad[key].code[0] == '\n') {

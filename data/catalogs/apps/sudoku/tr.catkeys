@@ -1,5 +1,5 @@
 1	turkish	x-vnd.Haiku-Sudoku	3382377306
-Restore snapshot	SudokuWindow		Anlık görüntüyü eski durumuna getir
+Restore snapshot	SudokuWindow		Anlık görüntüyü geri yükle
 File	SudokuWindow		Dosya
 Mark invalid values	SudokuWindow		Geçersiz değerleri imle
 Solve single field	SudokuWindow		Tek alanı çöz

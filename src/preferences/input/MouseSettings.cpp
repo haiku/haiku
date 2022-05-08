@@ -93,11 +93,11 @@ MouseSettings::_RetrieveSettings()
 		return B_ERROR;
 	if (get_click_speed(&fSettings.click_speed) != B_OK)
 		return B_ERROR;
-	if (get_mouse_speed_by_name(fName, &fSettings.accel.speed) != B_OK)
+	if (get_mouse_speed(fName, &fSettings.accel.speed) != B_OK)
 		return B_ERROR;
-	if (get_mouse_acceleration(&fSettings.accel.accel_factor) != B_OK)
+	if (get_mouse_acceleration(fName, &fSettings.accel.accel_factor) != B_OK)
 		return B_ERROR;
-	if (get_mouse_type_by_name(fName, &fSettings.type) != B_OK)
+	if (get_mouse_type(fName, &fSettings.type) != B_OK)
 		return B_ERROR;
 
 	fMode = mouse_mode();
@@ -260,7 +260,7 @@ MouseSettings::IsRevertable()
 void
 MouseSettings::SetMouseType(int32 type)
 {
-	if (set_mouse_type_by_name(fName, type) == B_OK)
+	if (set_mouse_type(fName, type) == B_OK)
 		fSettings.type = type;
 }
 
@@ -286,7 +286,7 @@ MouseSettings::SetClickSpeed(bigtime_t clickSpeed)
 void
 MouseSettings::SetMouseSpeed(int32 speed)
 {
-	if (set_mouse_speed_by_name(fName, speed) == B_OK)
+	if (set_mouse_speed(fName, speed) == B_OK)
 		fSettings.accel.speed = speed;
 }
 
@@ -294,7 +294,7 @@ MouseSettings::SetMouseSpeed(int32 speed)
 void
 MouseSettings::SetAccelerationFactor(int32 factor)
 {
-	if (set_mouse_acceleration(factor) == B_OK)
+	if (set_mouse_acceleration(fName, factor) == B_OK)
 		fSettings.accel.accel_factor = factor;
 }
 

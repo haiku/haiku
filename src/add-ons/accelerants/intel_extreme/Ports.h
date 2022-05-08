@@ -10,6 +10,7 @@
 #define INTEL_PORTS_H
 
 
+#include <dp.h>
 #include <edid.h>
 
 #include "intel_extreme.h"
@@ -21,6 +22,7 @@
 #define MAX_PORTS	20	// a generous upper bound
 
 struct pll_limits;
+struct i2c_bus;
 
 enum port_type {
 	INTEL_PORT_TYPE_ANY,		// wildcard for lookup functions
@@ -48,7 +50,7 @@ virtual	uint32						Type() const = 0;
 
 virtual	bool						IsConnected() = 0;
 
-		status_t					SetPipe(Pipe* pipe);
+virtual	status_t					SetPipe(Pipe* pipe);
 		::Pipe*						GetPipe()
 										{ return fPipe; };
 
@@ -57,6 +59,7 @@ virtual	status_t					Power(bool enabled);
 		bool						HasEDID();
 virtual	status_t					GetEDID(edid1_info* edid,
 										bool forceRead = false);
+virtual	status_t					SetupI2c(struct i2c_bus *bus);
 
 virtual	status_t					GetPLLLimits(pll_limits& limits);
 
@@ -64,7 +67,6 @@ virtual status_t					SetDisplayMode(display_mode* mode,
 										uint32 colorMode) { return B_ERROR; };
 
 virtual pipe_index					PipePreference();
-//										{ return INTEL_PIPE_ANY; };
 
 protected:
 		void						_SetName(const char* name);
@@ -73,6 +75,22 @@ static	status_t					_GetI2CSignals(void* cookie, int* _clock,
 										int* _data);
 static	status_t					_SetI2CSignals(void* cookie, int clock,
 										int data);
+		bool						_IsPortInVBT(uint32* foundIndex = NULL);
+		bool						_IsDisplayPortInVBT();
+		bool						_IsInternalPanelPort();
+		status_t					_SetupDpAuxI2c(struct i2c_bus *bus);
+
+		ssize_t						_DpAuxTransfer(dp_aux_msg* message);
+		ssize_t						_DpAuxTransfer(uint8* transmitBuffer, uint8 transmitSize,
+										uint8* receiveBuffer, uint8 receiveSize);
+		status_t					_DpAuxSendReceive(uint32 slave_address,
+										const uint8 *writeBuffer, size_t writeLength,
+										uint8 *readBuffer, size_t readLength);
+static 	status_t					_DpAuxSendReceiveHook(const struct i2c_bus *bus,
+										uint32 slave_address, const uint8 *writeBuffer,
+										size_t writeLength, uint8 *readBuffer,
+										size_t readLength);
+		aux_channel					_DpAuxChannel();
 
 		display_mode				fCurrentMode;
 		Pipe*						fPipe;
@@ -169,6 +187,9 @@ public:
 virtual	uint32						Type() const
 										{ return INTEL_PORT_TYPE_DP; }
 
+virtual	status_t					SetPipe(Pipe* pipe);
+virtual	status_t					SetupI2c(i2c_bus *bus);
+
 virtual	bool						IsConnected();
 
 virtual status_t					SetDisplayMode(display_mode* mode,
@@ -182,6 +203,7 @@ virtual	addr_t						_PortRegister();
 
 private:
 		status_t					_SetPortLinkGen4(const display_timing& timing);
+		status_t					_SetPortLinkGen6(const display_timing& timing);
 };
 
 
@@ -206,6 +228,9 @@ virtual	uint32						Type() const
 										{ return INTEL_PORT_TYPE_DVI; }
 
 virtual	status_t					Power(bool enabled);
+
+virtual	status_t					SetPipe(Pipe* pipe);
+virtual	status_t					SetupI2c(i2c_bus *bus);
 
 virtual	bool						IsConnected();
 

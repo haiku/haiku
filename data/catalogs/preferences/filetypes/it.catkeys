@@ -24,7 +24,7 @@ Gamma	Application Type Window		Gamma
 Cancel	Application Type Window		Annulla
 Attribute	Attribute Window		Attributo
 Multiple launch	Application Type Window		Avvio multiplo
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# tipo di applicazione può essere rimosso} other{# tipi di applicazione possono essere rimossi}}
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# tipo di applicazione può essere rimosso} other{# tipi di applicazioni possono essere rimossi}}
 Edit…	Application Types Window		Modifica…
 Could not set preferred application	FileTypes Window		Impossibile impostare l'applicazione preferita
 Description	FileTypes Window		Descrizione

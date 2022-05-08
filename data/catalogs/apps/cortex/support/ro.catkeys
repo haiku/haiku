@@ -1,4 +1,4 @@
-1	romanian	application/x-vnd.Cortex.support	2630173556
+1	romanian	application/x-vnd.Cortex.support	1625162530
 Header has flags	MediaString		Antetul are fanioane
 32 bit HLS	MediaString		HLS pe 32 biți
 Recording	MediaString		Înregistare
@@ -42,7 +42,6 @@ YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Dreapta
 32 bit RGB	MediaString		RGB pe 32 biți
-Video data between line u and u	MediaString		Date video între liniile u și u
 System mixer	MediaString		Mixer de sistem
 Physical output	MediaString		Ieșire fizică
 Top-Back-center	MediaString		Sus-spate-centru

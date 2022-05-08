@@ -522,7 +522,7 @@ create_display_modes(const char* name, edid1_info* edid,
 		& ~(B_PAGE_SIZE - 1);
 	display_mode *list;
 	area_id area = create_area(name, (void **)&list, B_ANY_ADDRESS,
-		size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA);
 	if (area < B_OK)
 		return area;
 

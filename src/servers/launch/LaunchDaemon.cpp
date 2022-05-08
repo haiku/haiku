@@ -11,6 +11,7 @@
 
 #include <errno.h>
 #include <grp.h>
+#include <spawn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -101,18 +102,25 @@ public:
 									const char* name, uint32 flags);
 								~ExternalEventSource();
 
+			const BMessenger&	Source() const
+									{ return fSource; }
+
 			const char*			Name() const;
+			const char*			OwnerName() const;
 			uint32				Flags() const
 									{ return fFlags; }
 
 			void				Trigger();
+			bool				StickyTriggered() const
+									{ return fStickyTriggered; }
 			void				ResetSticky();
 
 			status_t			AddDestination(Event* event);
 			void				RemoveDestination(Event* event);
 
 private:
-			BString				fName;
+			BMessenger			fSource;
+			BString				fName, fOwnerName;
 			uint32				fFlags;
 			BObjectList<Event>	fDestinations;
 			bool				fStickyTriggered;
@@ -129,8 +137,7 @@ typedef std::map<team_id, Job*> TeamMap;
 class LaunchDaemon : public BServer, public Finder, public ConditionContext,
 	public EventRegistrator, public TeamListener {
 public:
-								LaunchDaemon(bool userMode,
-									const EventMap& events, status_t& error);
+								LaunchDaemon(bool userMode, status_t& error);
 	virtual						~LaunchDaemon();
 
 	virtual	Job*				FindJob(const char* name) const;
@@ -272,7 +279,9 @@ Session::Session(uid_t user, const BMessenger& daemon)
 ExternalEventSource::ExternalEventSource(BMessenger& source,
 	const char* ownerName, const char* name, uint32 flags)
 	:
+	fSource(source),
 	fName(name),
+	fOwnerName(ownerName),
 	fFlags(flags),
 	fDestinations(5),
 	fStickyTriggered(false)
@@ -289,6 +298,13 @@ const char*
 ExternalEventSource::Name() const
 {
 	return fName.String();
+}
+
+
+const char*
+ExternalEventSource::OwnerName() const
+{
+	return fOwnerName.String();
 }
 
 
@@ -337,13 +353,11 @@ ExternalEventSource::RemoveDestination(Event* event)
 // #pragma mark -
 
 
-LaunchDaemon::LaunchDaemon(bool userMode, const EventMap& events,
-	status_t& error)
+LaunchDaemon::LaunchDaemon(bool userMode, status_t& error)
 	:
 	BServer(kLaunchDaemonSignature, NULL,
 		create_port(B_LOOPER_PORT_DEFAULT_CAPACITY,
 			userMode ? "AppPort" : B_LAUNCH_DAEMON_PORT_NAME), false, &error),
-	fEvents(events),
 	fInitTarget(userMode ? NULL : new Target("init")),
 #ifdef TEST_MODE
 	fUserMode(true)
@@ -993,6 +1007,27 @@ LaunchDaemon::_HandleRegisterSessionDaemon(BMessage* message)
 			fSessions.insert(std::make_pair(user, session));
 		else
 			status = B_NO_MEMORY;
+
+		// Send registration messages for all already-known events.
+		for (EventMap::iterator iterator = fEvents.begin(); iterator != fEvents.end();
+				iterator++) {
+			ExternalEventSource* eventSource = iterator->second;
+			if (eventSource->Name() != iterator->first)
+				continue; // skip alternative event names
+
+			BMessage message(B_REGISTER_LAUNCH_EVENT);
+			message.AddInt32("user", 0);
+			message.AddString("name", eventSource->Name());
+			message.AddString("owner", eventSource->OwnerName());
+			message.AddUInt32("flags", eventSource->Flags());
+			message.AddMessenger("source", eventSource->Source());
+			target.SendMessage(&message);
+
+			if (eventSource->StickyTriggered()) {
+				message.what = B_NOTIFY_LAUNCH_EVENT;
+				target.SendMessage(&message);
+			}
+		}
 	}
 
 	BMessage reply((uint32)status);
@@ -1961,58 +1996,17 @@ LaunchDaemon::_ForwardEventMessage(uid_t user, BMessage* message)
 status_t
 LaunchDaemon::_StartSession(const char* login)
 {
-	// TODO: enable user/group code
-	// The launch_daemon currently cannot talk to the registrar, though
+	char path[B_PATH_NAME_LENGTH];
+	status_t status = get_app_path(path);
+	if (status != B_OK)
+		return status;
 
-	struct passwd* passwd = getpwnam(login);
-	if (passwd == NULL)
-		return B_NAME_NOT_FOUND;
-	if (strcmp(passwd->pw_name, login) != 0)
-		return B_NAME_NOT_FOUND;
+	pid_t pid = -1;
+	const char* argv[] = {path, login, NULL};
+	status = posix_spawn(&pid, path, NULL, NULL, (char* const*)argv, environ);
+	if (status != B_OK)
+		return status;
 
-	// Check if there is a user session running already
-	uid_t user = passwd->pw_uid;
-	gid_t group = passwd->pw_gid;
-
-	Unlock();
-
-	if (fork() == 0) {
-		if (setsid() < 0)
-			exit(EXIT_FAILURE);
-
-		if (initgroups(login, group) == -1)
-			exit(EXIT_FAILURE);
-		if (setgid(group) != 0)
-			exit(EXIT_FAILURE);
-		if (setuid(user) != 0)
-			exit(EXIT_FAILURE);
-
-		if (passwd->pw_dir != NULL && passwd->pw_dir[0] != '\0') {
-			setenv("HOME", passwd->pw_dir, true);
-
-			if (chdir(passwd->pw_dir) != 0) {
-				debug_printf("Could not switch to home dir %s: %s\n",
-					passwd->pw_dir, strerror(errno));
-			}
-		}
-
-		// TODO: This leaks the parent application
-		be_app = NULL;
-
-		// Reinitialize be_roster
-		BRoster::Private().DeleteBeRoster();
-		BRoster::Private().InitBeRoster();
-
-		// TODO: take over system jobs, and reserve their names (or ask parent)
-		status_t status;
-		LaunchDaemon* daemon = new LaunchDaemon(true, fEvents, status);
-		if (status == B_OK)
-			daemon->Run();
-
-		delete daemon;
-		exit(EXIT_SUCCESS);
-	}
-	Lock();
 	return B_OK;
 }
 
@@ -2092,9 +2086,55 @@ open_stdio(int targetFD, int openMode)
 #endif	// TEST_MODE
 
 
-int
-main()
+static int
+user_main(const char* login)
 {
+	struct passwd* passwd = getpwnam(login);
+	if (passwd == NULL)
+		return B_NAME_NOT_FOUND;
+	if (strcmp(passwd->pw_name, login) != 0)
+		return B_NAME_NOT_FOUND;
+
+	// Check if there is a user session running already
+	uid_t user = passwd->pw_uid;
+	gid_t group = passwd->pw_gid;
+
+	if (setsid() < 0)
+		exit(EXIT_FAILURE);
+
+	if (initgroups(login, group) == -1)
+		exit(EXIT_FAILURE);
+	if (setgid(group) != 0)
+		exit(EXIT_FAILURE);
+	if (setuid(user) != 0)
+		exit(EXIT_FAILURE);
+
+	if (passwd->pw_dir != NULL && passwd->pw_dir[0] != '\0') {
+		setenv("HOME", passwd->pw_dir, true);
+
+		if (chdir(passwd->pw_dir) != 0) {
+			debug_printf("Could not switch to home dir %s: %s\n",
+				passwd->pw_dir, strerror(errno));
+		}
+	}
+
+	// TODO: take over system jobs, and reserve their names? (by asking parent)
+	status_t status;
+	LaunchDaemon* daemon = new LaunchDaemon(true, status);
+	if (status == B_OK)
+		daemon->Run();
+
+	delete daemon;
+	return 0;
+}
+
+
+int
+main(int argc, char* argv[])
+{
+	if (argc == 2 && geteuid() == 0)
+		return user_main(argv[1]);
+
 	if (find_port(B_LAUNCH_DAEMON_PORT_NAME) >= 0) {
 		fprintf(stderr, "The launch_daemon is already running!\n");
 		return EXIT_FAILURE;
@@ -2107,9 +2147,8 @@ main()
 	dup2(STDOUT_FILENO, STDERR_FILENO);
 #endif
 
-	EventMap events;
 	status_t status;
-	LaunchDaemon* daemon = new LaunchDaemon(false, events, status);
+	LaunchDaemon* daemon = new LaunchDaemon(false, status);
 	if (status == B_OK)
 		daemon->Run();
 

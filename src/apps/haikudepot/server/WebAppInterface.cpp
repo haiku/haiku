@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -173,7 +173,9 @@ WebAppInterface::GetChangelog(const BString& packageName, BMessage& message)
 
 status_t
 WebAppInterface::RetreiveUserRatingsForPackageForDisplay(
-	const BString& packageName, const BString& webAppRepositoryCode,
+	const BString& packageName,
+	const BString& webAppRepositoryCode,
+	const BString& webAppRepositorySourceCode,
 	int resultOffset, int maxResults, BMessage& message)
 {
 		// BHttpRequest later takes ownership of this.
@@ -187,6 +189,11 @@ WebAppInterface::RetreiveUserRatingsForPackageForDisplay(
 	requestEnvelopeWriter.WriteInteger(resultOffset);
 	requestEnvelopeWriter.WriteObjectName("limit");
 	requestEnvelopeWriter.WriteInteger(maxResults);
+
+	if (!webAppRepositorySourceCode.IsEmpty()) {
+		requestEnvelopeWriter.WriteObjectName("repositorySourceCode");
+		requestEnvelopeWriter.WriteString(webAppRepositorySourceCode);
+	}
 
 	if (!webAppRepositoryCode.IsEmpty()) {
 		requestEnvelopeWriter.WriteObjectName("repositoryCode");
@@ -204,7 +211,9 @@ WebAppInterface::RetreiveUserRatingsForPackageForDisplay(
 status_t
 WebAppInterface::RetreiveUserRatingForPackageAndVersionByUser(
 	const BString& packageName, const BPackageVersion& version,
-	const BString& architecture, const BString &repositoryCode,
+	const BString& architecture,
+	const BString& webAppRepositoryCode,
+	const BString& webAppRepositorySourceCode,
 	const BString& userNickname, BMessage& message)
 {
 		// BHttpRequest later takes ownership of this.
@@ -220,7 +229,9 @@ WebAppInterface::RetreiveUserRatingForPackageAndVersionByUser(
 	requestEnvelopeWriter.WriteObjectName("pkgVersionArchitectureCode");
 	requestEnvelopeWriter.WriteString(architecture.String());
 	requestEnvelopeWriter.WriteObjectName("repositoryCode");
-	requestEnvelopeWriter.WriteString(repositoryCode.String());
+	requestEnvelopeWriter.WriteString(webAppRepositoryCode.String());
+	requestEnvelopeWriter.WriteObjectName("repositorySourceCode");
+	requestEnvelopeWriter.WriteString(webAppRepositorySourceCode.String());
 
 	if (version.Major().Length() > 0) {
 		requestEnvelopeWriter.WriteObjectName("pkgVersionMajor");
@@ -469,7 +480,9 @@ WebAppInterface::_RetrieveUserUsageConditionsCopy(const BString& code,
 status_t
 WebAppInterface::CreateUserRating(const BString& packageName,
 	const BPackageVersion& version,
-	const BString& architecture, const BString& repositoryCode,
+	const BString& architecture,
+	const BString& webAppRepositoryCode,
+	const BString& webAppRepositorySourceCode,
 	const BString& languageCode, const BString& comment,
 	const BString& stability, int rating, BMessage& message)
 {
@@ -483,7 +496,9 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 	requestEnvelopeWriter.WriteObjectName("pkgVersionArchitectureCode");
 	requestEnvelopeWriter.WriteString(architecture.String());
 	requestEnvelopeWriter.WriteObjectName("repositoryCode");
-	requestEnvelopeWriter.WriteString(repositoryCode.String());
+	requestEnvelopeWriter.WriteString(webAppRepositoryCode.String());
+	requestEnvelopeWriter.WriteObjectName("repositorySourceCode");
+	requestEnvelopeWriter.WriteString(webAppRepositorySourceCode.String());
 	requestEnvelopeWriter.WriteObjectName("naturalLanguageCode");
 	requestEnvelopeWriter.WriteString(languageCode.String());
 	requestEnvelopeWriter.WriteObjectName("pkgVersionType");
@@ -690,6 +705,8 @@ WebAppInterface::IncrementViewCounter(const PackageInfoRef package,
 	requestEnvelopeWriter.WriteString(package->Architecture());
 	requestEnvelopeWriter.WriteObjectName("repositoryCode");
 	requestEnvelopeWriter.WriteString(depot->WebAppRepositoryCode());
+	requestEnvelopeWriter.WriteObjectName("repositorySourceCode");
+	requestEnvelopeWriter.WriteString(depot->WebAppRepositorySourceCode());
 	requestEnvelopeWriter.WriteObjectName("name");
 	requestEnvelopeWriter.WriteString(package->Name());
 

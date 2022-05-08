@@ -720,6 +720,12 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 
 	hda_codec* codec = audioGroup->codec;
 	uint32 codec_id = (codec->vendor_id << 16) | codec->product_id;
+
+	// Power up the audio function
+	verbs[0] = MAKE_VERB(audioGroup->codec->addr, audioGroup->widget.node_id,
+		VID_SET_POWER_STATE, 0);
+	hda_send_verbs(audioGroup->codec, verbs, NULL, 1);
+
 	hda_widget_get_stream_support(audioGroup, &audioGroup->widget);
 	hda_widget_get_pm_support(audioGroup, &audioGroup->widget);
 	hda_widget_get_amplifier_capabilities(audioGroup, &audioGroup->widget);

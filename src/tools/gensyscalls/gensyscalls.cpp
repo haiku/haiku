@@ -166,6 +166,15 @@ Syscall::AddParameter(int size, const char* typeName, const char* parameterName)
 	if (Parameter* previous = LastParameter())
 		offset = previous->Offset() + previous->UsedSize();
 
+	// take care of extra alignment for long parameters
+	// this is needed to sort out parameter offsets on ARM
+	if (size >= kLongParameterAlignmentSize) {
+		if ((offset % kLongParameterAlignmentSize) != 0) {
+			offset += kLongParameterAlignmentSize
+				- offset % kLongParameterAlignmentSize;
+		}
+	}
+
 	int usedSize = (size + kParameterAlignmentSize - 1)
 		/ kParameterAlignmentSize * kParameterAlignmentSize;
 	const char* alignmentType

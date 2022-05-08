@@ -1,10 +1,9 @@
-1	czech	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		Zápis zvukové stopy: %d%% hotový
+1	czech	x-vnd.Haiku-MediaConverter	2816184527
 Input file not recognized as Audio or Video	MediaConverter		Vstupní soubor nebyl rozpoznán jako zvuk nebo obraz
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Kvalita videa: %3d%%
 Source files	MediaConverter		Zdrojový soubor
-Error writing video frame %ld	MediaConverter		Chyba zápisu snímku %ld
+Error writing video frame %lld	MediaConverter		Chyba zápisu snímku videa %lld
 Error converting '%filename'	MediaConverter		Chyba převádění '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Vybraný adresář nebyl nalezen. Použije se výchozí /boot/home
 Conversion completed	MediaConverter		Převod dokončen
@@ -43,25 +42,26 @@ Error loading files	MediaConverter		Chyba otevírání souborů
 End   [ms]: 	MediaConverter		Konec [ms]: 
 Cancel	MediaConverter		Zrušit
 OK	MediaConverter-FileInfo		OK
-Error read audio frame %ld	MediaConverter		Chyba při čtení zvukového rámce %ld
 Video encoding:	MediaConverter		Kódování videa:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Vyskytla se chyba načítání informací o souboru.\n\nChyba: 
 Error	MediaConverter		Chyba
 File details	MediaConverter		Podrobnosti souboru
 No audio	Audio codecs list		Bez zvuku
 Drop media files onto this window	MediaConverter		Soubory médií přetáhni do tohoto okna
+Writing video track: %ld%% complete	MediaConverter		Zápis obrazové stopy: %ld%% hotovo
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# snímek} few{# snímky} other{# snímků}}
+Error read audio frame %lld	MediaConverter		Chyba čtení zvukového snímku %lld
 Quit	Menu		Konec
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# bajt} other{# bajty} other{# bajtů}}
 Duration:	MediaConverter-FileInfo		Tvání:
 MediaConverter	System name		Konvertor multimédií
 Error launching: %strError%	MediaConverter		Chyba otevírání: %strError%
+Error writing audio frame %lld	MediaConverter		Chyba při zápisu zvukového snímku %lld
+Writing audio track: %ld%% complete	MediaConverter		Zápis zvukové stopy: %ld%% hotovo
 File format:	MediaConverter		Formát souboru:
-Error writing audio frame %ld	MediaConverter		Chyba zápisu zvukového rámce %ld
 File	Menu		Soubor
 Video quality not supported	MediaConverter		Nepodporovaná videokvalita
 Select this folder	MediaConverter		Zvolit tento adresář
-Error read video frame %ld	MediaConverter		Chyba čtení snímku %ld
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanál
 %d bit 	MediaFileInfo		%d bitový
 No video	Video codecs list		Bez videa
@@ -69,6 +69,6 @@ Continue	MediaConverter		Pokračovat
 Convert	MediaConverter		Převést
 Audio quality not supported	MediaConverter		Nepodporovaná kvalita zvuku
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Chyba při zápisu do umístění: %strPath%. Výchozí umístění: /boot/home
-Writing video track: %d%% complete	MediaConverter		Zápis video stopy: %d%% hotový
+Error read video frame %lld	MediaConverter		Chyba čtení obrazového snímku %lld
 Preview	MediaConverter		Náhled
 Start [ms]: 	MediaConverter		Start [ms]: 

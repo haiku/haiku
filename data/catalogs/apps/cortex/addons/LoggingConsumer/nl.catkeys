@@ -1,4 +1,4 @@
-1	dutch; flemish	application/x-vnd.Be.LoggingConsumerApp	1634779870
+1	dutch; flemish	application/x-vnd.Be.LoggingConsumerApp	3653006715
 Priority	CortexAddOnsLoggingConsumer		Prioriteit
 Latency	CortexAddOnsLoggingConsumer		Vertraging
 Logged input	CortexAddOnsLoggingConsumer		Gelogde invoer
@@ -8,9 +8,7 @@ Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Start
 Thread priority	CortexAddOnsLoggingConsumer		Thread-prioriteit
 LoggingConsumer parameters	CortexAddOnsLoggingConsumer		Parameters LoggingConsumer
 Latency control	CortexAddOnsLoggingConsumer		Vertragingsbeheersing
-MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kan geen node info (%d) vinden:\n%s\n
 CPU percentage	CortexAddOnsLoggingConsumer		CPU-percentage
-MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kan node (%d) niet vinden:\n%s\n
 LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Stoppen
 An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		Een plugin-versie van de LoggingConsumer node.\nZie de Be Developer Newsletter III.18: 5 mei 1999\naangepast door Eric Moon (4 juni 1999)
@@ -19,4 +17,3 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Knoppen
 controls	CortexAddOnsCommonMediaNodeControlApp		knoppen
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Verbinden
 percent	CortexAddOnsLoggingConsumer		procent
-MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: geen parameters voor node (%d):\n%s\n

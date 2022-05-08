@@ -788,7 +788,7 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 status_t
 XHCI::SubmitNormalRequest(Transfer *transfer)
 {
-	TRACE("SubmitNormalRequest() length %ld\n", transfer->FragmentLength());
+	TRACE("SubmitNormalRequest() length %" B_PRIuSIZE "\n", transfer->FragmentLength());
 
 	Pipe *pipe = transfer->TransferPipe();
 	usb_isochronous_data *isochronousData = transfer->IsochronousData();
@@ -945,8 +945,13 @@ XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 		return B_NO_INIT;
 	}
 
-	TRACE_ALWAYS("cancel queued transfers (%" B_PRId8 ") for pipe %p (%d)\n",
-		endpoint->used, pipe, pipe->EndpointAddress());
+#ifndef TRACE_USB
+	if (force)
+#endif
+	{
+		TRACE_ALWAYS("cancel queued transfers (%" B_PRId8 ") for pipe %p (%d)\n",
+			endpoint->used, pipe, pipe->EndpointAddress());
+	}
 
 	MutexLocker endpointLocker(endpoint->lock);
 
@@ -1357,8 +1362,9 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		hubPort, speed);
 
 	uint8 slot = XHCI_MAX_SLOTS;
-	if (EnableSlot(&slot) != B_OK) {
-		TRACE_ERROR("AllocateDevice: failed to enable slot\n");
+	status_t status = EnableSlot(&slot);
+	if (status != B_OK) {
+		TRACE_ERROR("failed to enable slot: %s\n", strerror(status));
 		return NULL;
 	}
 
@@ -1516,8 +1522,9 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	}
 
 	// device should get to addressed state (bsr = 0)
-	if (SetAddress(device->input_ctx_addr, false, slot) != B_OK) {
-		TRACE_ERROR("unable to set address\n");
+	status = SetAddress(device->input_ctx_addr, false, slot);
+	if (status != B_OK) {
+		TRACE_ERROR("unable to set address: %s\n", strerror(status));
 		CleanupDevice(device);
 		return NULL;
 	}
@@ -1531,6 +1538,9 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	TRACE("endpoint0 state 0x%08" B_PRIx32 "\n",
 		ENDPOINT_0_STATE_GET(_ReadContext(
 			&device->device_ctx->endpoints[0].dwendpoint0)));
+
+	// Wait a bit for the device to complete addressing
+	snooze(USB_DELAY_SET_ADDRESS);
 
 	// Create a temporary pipe with the new address
 	ControlPipe pipe(parent);
@@ -1546,7 +1556,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	usb_device_descriptor deviceDescriptor;
 
 	TRACE("getting the device descriptor\n");
-	status_t status = pipe.SendRequest(
+	status = pipe.SendRequest(
 		USB_REQTYPE_DEVICE_IN | USB_REQTYPE_STANDARD,		// type
 		USB_REQUEST_GET_DESCRIPTOR,							// request
 		USB_DESCRIPTOR_DEVICE << 8,							// value
@@ -2485,7 +2495,7 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 	const uint8 completionCode = TRB_2_COMP_CODE_GET(trb->status);
 	int32 transferred = TRB_2_REM_GET(trb->status), remainder = -1;
 
-	TRACE("HandleTransferComplete: ed %d, code %d, transferred %d\n",
+	TRACE("HandleTransferComplete: ed %" B_PRIu32 ", code %" B_PRIu8 ", transferred %" B_PRId32 "\n",
 		  (flags & TRB_3_EVENT_DATA_BIT), completionCode, transferred);
 
 	if ((flags & TRB_3_EVENT_DATA_BIT) == 0) {
@@ -2495,7 +2505,8 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 		transferred = -1;
 	}
 
-	if (completionCode != COMP_SUCCESS && completionCode != COMP_SHORT_PACKET) {
+	if (completionCode != COMP_SUCCESS && completionCode != COMP_SHORT_PACKET
+			&& completionCode != COMP_STOPPED) {
 		TRACE_ALWAYS("transfer error on slot %" B_PRId8 " endpoint %" B_PRId8
 			": %s\n", slot, endpointNumber, xhci_error_string(completionCode));
 	}
@@ -2975,13 +2986,16 @@ XHCI::FinishTransfers()
 			FreeDescriptor(td);
 
 			// this transfer may still have data left
+			bool finished = true;
 			transfer->AdvanceByFragment(actualLength);
 			if (completionCode == COMP_SUCCESS
 					&& transfer->FragmentLength() > 0) {
 				TRACE("still %" B_PRIuSIZE " bytes left on transfer\n",
 					transfer->FragmentLength());
-				SubmitTransfer(transfer);
-			} else {
+				callbackStatus = SubmitTransfer(transfer);
+				finished = (callbackStatus != B_OK);
+			}
+			if (finished) {
 				// The actualLength was already handled in AdvanceByFragment.
 				transfer->Finished(callbackStatus, 0);
 				delete transfer;

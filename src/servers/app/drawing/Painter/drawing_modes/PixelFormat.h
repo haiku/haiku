@@ -99,8 +99,7 @@ class PixelFormat {
 
 			void				SetDrawingMode(drawing_mode mode,
 											   source_alpha alphaSrcMode,
-											   alpha_function alphaFncMode,
-											   bool text);
+											   alpha_function alphaFncMode);
 
 			// AGG "pixel format" interface
 	inline	unsigned			width() const

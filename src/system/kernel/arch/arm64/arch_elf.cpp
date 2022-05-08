@@ -130,6 +130,7 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 				rel[i].r_offset);
 			return B_BAD_ADDRESS;
 		}
+		*(Elf64_Addr *)relocAddr = relocValue;
 #endif
 	}
 

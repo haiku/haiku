@@ -292,6 +292,12 @@ MainWindow::~MainWindow()
 		if (fShuttingDownWindow->Lock())
 			fShuttingDownWindow->Quit();
 	}
+
+	delete_sem(fPackageToPopulateSem);
+	wait_for_thread(fPopulatePackageWorker, NULL);
+
+	// We must clear the model early to release references.
+	fModel.Clear();
 }
 
 
@@ -923,6 +929,8 @@ MainWindow::_AddRemovePackageFromLists(const PackageInfoRef& package)
 void
 MainWindow::_IncrementViewCounter(const PackageInfoRef& package)
 {
+	// Temporarily disabled, see tickets #16879 and #17689.
+#if 0
 	bool shouldIncrementViewCounter = false;
 
 	{
@@ -935,11 +943,12 @@ MainWindow::_IncrementViewCounter(const PackageInfoRef& package)
 	}
 
 	if (shouldIncrementViewCounter) {
-		ProcessCoordinator* bulkLoadCoordinator =
+		ProcessCoordinator* incrementViewCoordinator =
 			ProcessCoordinatorFactory::CreateIncrementViewCounter(
 				&fModel, package);
-		_AddProcessCoordinator(bulkLoadCoordinator);
+		_AddProcessCoordinator(incrementViewCoordinator);
 	}
+#endif
 }
 
 
@@ -1413,12 +1422,12 @@ MainWindow::_HandleUserUsageConditionsNotLatest(
 void
 MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
 {
+	BReference<ProcessCoordinator> itemRef(item, true);
 	AutoLocker<BLocker> lock(&fCoordinatorLock);
 
 	if (fShouldCloseWhenNoProcessesToCoordinate) {
 		HDINFO("system shutting down --> new process coordinator [%s] rejected",
 			item->Name().String());
-		delete item;
 		return;
 	}
 
@@ -1429,10 +1438,9 @@ MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
 			debugger("unable to acquire the process coordinator sem");
 		HDINFO("adding and starting a process coordinator [%s]",
 			item->Name().String());
-		fCoordinator = BReference<ProcessCoordinator>(item);
+		fCoordinator = itemRef;
 		fCoordinator->Start();
-	}
-	else {
+	} else {
 		HDINFO("adding process coordinator [%s] to the queue",
 			item->Name().String());
 		fCoordinatorQueue.push(item);

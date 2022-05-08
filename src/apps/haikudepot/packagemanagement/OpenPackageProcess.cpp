@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2022, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,6 +29,7 @@
 #include <package/hpkg/PackageReader.h>
 
 #include "Logger.h"
+#include "PackageUtils.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "OpenPackageProcess"
@@ -198,26 +199,11 @@ OpenPackageProcess::FindAppToLaunch(const PackageInfoRef& package,
 	if (!package.IsSet())
 		return false;
 
-	int32 installLocation = AbstractPackageProcess::InstallLocation(package);
-
 	BPath packagePath;
-	if (installLocation == B_PACKAGE_INSTALLATION_LOCATION_SYSTEM) {
-		if (find_directory(B_SYSTEM_PACKAGES_DIRECTORY, &packagePath)
-			!= B_OK) {
-			return false;
-		}
-	} else if (installLocation == B_PACKAGE_INSTALLATION_LOCATION_HOME) {
-		if (find_directory(B_USER_PACKAGES_DIRECTORY, &packagePath)
-			!= B_OK) {
-			return false;
-		}
-	} else {
-		HDINFO("OpenPackageAction::FindAppToLaunch(): "
-			"unknown install location");
+	if (PackageUtils::DeriveLocalFilePath(package, packagePath) != B_OK) {
+		HDDEBUG("unable to derive local file path for package");
 		return false;
 	}
-
-	packagePath.Append(package->FileName());
 
 	BNoErrorOutput errorOutput;
 	BPackageReader reader(&errorOutput);

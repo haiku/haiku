@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	4032760800
+1	finnish	x-vnd.Haiku-Terminal	247549485
 ANSI cyan color	Terminal AppearancePrefView		ANSI-sinivihreä väri
 Close other tabs	Terminal TermWindow		Sulje muut välilehdet
 Insert path	Terminal TermView		Lisää polku
@@ -20,6 +20,7 @@ Edit tab title…	Terminal TermWindow		Muokkaa välilehtiotsikkoa...
 Settings	Terminal TermWindow		Asetukset
 Print	Terminal TermWindow		Tulosta
 %app% settings	Terminal PrefWindow	window title	%app% -asetukset
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tAktiivin prosessin nykyinen työhakemisto.\n\t\t\tPolkukomponenttien valinnainen enimmäismäärä voi olla\n\t\t\tmääritelty. Esim.: '%2d' useimmille kahdelle komponentille.\n\t%i\t-\tVälilehden hakemisto.\n\t%e\t-\tNykyisen välilähden koodaus. Ei näytetty UTF-8:lle.\n\t%p\t-\tAktiivin prosessin nimi.
 ANSI black color	Terminal AppearancePrefView		ANSIä-musta väri
 Use default	Terminal SetTitleWindow		Käytä oletusta
 Close tab	Terminal TermWindow		Sulje välilehti
@@ -122,7 +123,6 @@ No search string was entered.	Terminal TermWindow		Hakumerkkijono ei kirjoitettu
 Text under cursor	Terminal AppearancePrefView		Teksti kohdistimen alla
 Move here	Terminal TermView		Siirrä tänne
 Abort	Terminal Shell		Keskeytä
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktiiviprosessin nykyinen työhakemisto.\n\t\t\tValinnaisesti polkukomponenttien enimmäismäärä voidaan\n\t\t\tmääritellä. Esim.: ’%2d’ enintään kahdelle komponentille.\n\t%i\t-\tVälilehtihakemisto.\n\t%e\t-\tNykyisen välilehden koodaus. Ei näytetä jos UTF-8.\n\t%p\t-\tAktiiviprosessin nimi.\n\t%%\t-\tMerkki ’%’.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Seuraavia prosesseja suoritetaan edelleen:\n\n\t%1\n\nJos suljet Pääteikkunan, prosessit tapetaan.
 Set window title	Terminal TermWindow		Aseta ikkunaotsikko
 Increase	Terminal TermWindow		Kasvata

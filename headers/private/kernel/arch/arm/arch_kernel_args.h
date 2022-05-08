@@ -32,6 +32,7 @@ typedef struct {
 	uint32	phys_pgdir;
 	uint32	vir_pgdir;
 	uint32	next_pagetable;
+	uint32	last_pagetable;
 
 	// The virtual ranges we want to keep in the kernel.
 	uint32		num_virtual_ranges_to_keep;

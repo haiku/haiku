@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	761125591
+1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		Σφάλμα ενημέρωσης αποθετηρίων
 Network error	ServerHelper		Σφάλμα δικτύου
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Προέκυψε ένα σφάλμα κατά την ανανέωση του αποθετηρίου: %error%
@@ -7,6 +7,7 @@ Check for updates…	MainWindow		Έλεγχος για ενημερώσεις…
 Uninstalled	PackageListView		Έγινε απεγκατάσταση
 It was not possible to create the new user.	UserLoginWindow		Δεν ήταν δυνατή η δημιουργία του νέου χρήστη.
 Available packages	MainWindow		Διαθέσιμα πακέτα
+An unexpected error has been sent from the server [%li]	ServerHelper		Ένα απρόσμενο σφάλμα ήρθε ως απάντηση από τον εξυπηρετητή [%li]
 Create account	UserLoginWindow		Δημιουργία λογαριασμού
 Install %PackageTitle%	PackageManager		Εγκατάσταση του πακέτου %PackageTitle%
 OK	App		Εντάξει
@@ -44,6 +45,7 @@ Category	FilterView		Κατηγορία
 User rating	RatePackageWindow		Αξιολόγηση χρήστη
 Installed packages	MainWindow		Εγκατεστημένα πακέτα
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Το ζητούμενο αντικείμενο ή ένα αντικείμενο που έχει σχέσει με το αίτημά σας δεν βρέθηκε στον διακομιστή.
+Date	PackageListView		Ημ/νία
 No changelog available.	PackageInfoView		Δεν υπάρχει διαθέσιμη καταγραφή αλλαγών.
 Error	App		Σφάλμα
 There was a puzzling response from the web service.	UserLoginWindow		Ο εξυπηρετητής έστειλε μία ακατανόητη απάντηση.
@@ -55,6 +57,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Δεν ήταν δυνατή η επικοινωνία με τον διακομιστή για την λήψη εικόνας captcha που απαιτείται για την δημιουργία ενός νέου χρήστη.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Η βαθμολογία σας ενημερώθηκε επιτυχώς. Μπορείτε να την ενημερώσετε ή να την αφαιρέσετε στην ιστοσελίδα του διακομιστή HaikuDepot.
 Available	PackageListView		Διαθέσιμο
+-	no package publish		-
 Cancel	UserLoginWindow		Ακύρωση
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Το HaikuDepot χρειάζεται το πρόγραμμα παρασκηνίου διαχείρισης πακέτων για να λειτουργήσει, το οποίο δεν εκτελείται.\nΘα θέλατε να το ξεκινήσετε;
 Click a package to view information	PackageInfoView		Κάντε κλικ σε ένα πακέτο για προβολή πληροφοριών
@@ -95,7 +98,6 @@ Repository	PackageListView		Αποθετήριο
 The email is malformed.	UserLoginWindow		Η διεύθυνση ηλεκτρονικού ταχυδρομείου δεν είναι έγκυρη.
 Close	UserLoginWindow		Κλείσιμο
 Close	RatePackageWindow		Κλείσιμο
-An unexpected error has been sent from the server [%i]	ServerHelper		Ένα απρόσμενο σφάλμα προέκυψε από τη μεριά του εξυπηρετητή [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Γίνεται συγχρονισμός πληροφοριών πακέτων για το αποθετήριο '%REPO_NAME%'
 Settings	SettingsWindow		Ρυθμίσεις
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Σφάλμα κατά τη λήψη των όρων χρήσης για την εγγραφή νέου χρήστη. Παρακαλώ ελέγξτε το αρχείο καταγραφών και ξαναδοκιμάστε.\nΠληροφορίες για το αρχείο καταγραφών υπάρχουν στο λήμμα του Οδηγού Χρήστη του Haiku για την εφαρμογή HaikuDepot.
@@ -139,8 +141,8 @@ Source packages	MainWindow		Πηγαία πακέτα
 -	no package size		-
 Problem with working files	App		Πρόβλημα με τα επεξεργαζόμενα αρχεία
 Server error	ServerHelper		Σφάλμα εξυπηρετητή
-Try again	App		Προσπάθεια ξανά
 Rate package	RatePackageWindow		Αξιολόγηση πακέτου
+Try again	App		Προσπάθεια ξανά
 Unknown	PackageListView		Άγνωστο
 I agree to the usage conditions	UserLoginWindow		Συμφωνώ στους όρους χρήσης
 Log in	UserLoginWindow		Είσοδος
@@ -172,6 +174,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Η έκδοση πελάτη είναι υπερβολικά παλιά
 Local repository load error	LocalPkgDataLoadProcess		Σφάλμα φόρτωσης τοπικού αποθετηρίου
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Ο χρήστης δεν υπάρχει ή ο κωδικός πρόσβασης είναι λανθασμένος. Ελέγξτε τα στοιχεία σας και προσπαθήστε ξανά.
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Επανάληψη κωδικού:
 All repositories	MainWindow		Όλα τα αποθετήρια

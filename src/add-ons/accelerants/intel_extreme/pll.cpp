@@ -477,16 +477,23 @@ refclk_activate_ilk(bool hasPanel)
 	bool wantsSSC;
 	bool hasCK505;
 	if (gInfo->shared_info->pch_info == INTEL_PCH_IBX) {
+		TRACE("%s: Generation 5 graphics\n", __func__);
 		//XXX: This should be == vbt display_clock_mode
 		hasCK505 = false;
 		wantsSSC = hasCK505;
 	} else {
+		if (gInfo->shared_info->device_type.Generation() == 6) {
+			TRACE("%s: Generation 6 graphics\n", __func__);
+		} else {
+			TRACE("%s: Generation 7 graphics\n", __func__);
+		}
 		hasCK505 = false;
 		wantsSSC = true;
 	}
 
 	uint32 clkRef = read32(PCH_DREF_CONTROL);
 	uint32 newRef = clkRef;
+	TRACE("%s: PCH_DREF_CONTROL before: 0x%" B_PRIx32 "\n", __func__, clkRef);
 
 	newRef &= ~DREF_NONSPREAD_SOURCE_MASK;
 
@@ -516,6 +523,8 @@ refclk_activate_ilk(bool hasPanel)
 		// Power up SSC before enabling outputs
 		write32(PCH_DREF_CONTROL, newRef);
 		read32(PCH_DREF_CONTROL);
+		TRACE("%s: PCH_DREF_CONTROL after SSC on/off: 0x%" B_PRIx32 "\n",
+				__func__, read32(PCH_DREF_CONTROL));
 		spin(200);
 
 		newRef &= ~DREF_CPU_SOURCE_OUTPUT_MASK;
@@ -531,6 +540,8 @@ refclk_activate_ilk(bool hasPanel)
 
 		write32(PCH_DREF_CONTROL, newRef);
 		read32(PCH_DREF_CONTROL);
+		TRACE("%s: PCH_DREF_CONTROL after done: 0x%" B_PRIx32 "\n",
+				__func__, read32(PCH_DREF_CONTROL));
 		spin(200);
 	} else {
 		newRef &= ~DREF_CPU_SOURCE_OUTPUT_MASK;
@@ -538,6 +549,8 @@ refclk_activate_ilk(bool hasPanel)
 
 		write32(PCH_DREF_CONTROL, newRef);
 		read32(PCH_DREF_CONTROL);
+		TRACE("%s: PCH_DREF_CONTROL after disable CPU output: 0x%" B_PRIx32 "\n",
+				__func__, read32(PCH_DREF_CONTROL));
 		spin(200);
 
 		if (!wantsSSC) {
@@ -547,6 +560,8 @@ refclk_activate_ilk(bool hasPanel)
 
 			write32(PCH_DREF_CONTROL, newRef);
 			read32(PCH_DREF_CONTROL);
+			TRACE("%s: PCH_DREF_CONTROL after disable SSC: 0x%" B_PRIx32 "\n",
+					__func__, read32(PCH_DREF_CONTROL));
 			spin(200);
 		}
 	}

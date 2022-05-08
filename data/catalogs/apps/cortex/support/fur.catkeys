@@ -1,4 +1,4 @@
-1	friulian	application/x-vnd.Cortex.support	3808791440
+1	friulian	application/x-vnd.Cortex.support	168903602
 Header has flags	MediaString		La intestazion e à opzions
 32 bit HLS	MediaString		HLS a 32 bit
 Recording	MediaString		Regjistrazion
@@ -31,17 +31,19 @@ Back-center	MediaString		Daûr tal mieç
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{intîr a # bit}}
 Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(formât video no cognossût)
+Video data between line %lu and %lu	MediaString		Dâts video tra la rie %lu e %lu
 AVI format family	MediaString		Famee di formâts AVI
 Homogenous buffers	MediaString		Memoriis tampon omogjeniis
 Interlaced 	MediaString		Interlaçât 
 {0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# canâl}other{# canâi}}
 15 bit RGBA	MediaString		RGBA a 15 bit
+Drop data	MediaString		Mole dâts
 AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Diestre
 32 bit RGB	MediaString		RGB a 32 bit
-Video data between line u and u	MediaString		Dâts video tra la linie u e u
+System mixer	MediaString		Mixer di sisteme
 Physical output	MediaString		Jessude fisiche
 Top-Back-center	MediaString		In alt daûr tal mieç
 YUV420	MediaString		YUV420
@@ -77,6 +79,7 @@ Buffer consumer	MediaString		Consumadôr di memorie tampon
 Increase latency	MediaString		Aumente latence
 Front-left-center	MediaString		Denant a çampe tal mieç
 MPEG format family	MediaString		Famee di formâts MPEG
+(none)	MediaString		(nissun)
 Center	MediaString		Tal mieç
  kb/s (max)	MediaString		 kb/s (max)
 Monochrome	MediaString		Monocromatic

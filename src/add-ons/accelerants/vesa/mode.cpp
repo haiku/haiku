@@ -13,6 +13,7 @@
 #include "accelerant_protos.h"
 #include "accelerant.h"
 #include "utility.h"
+#include "vesa_info.h"
 
 
 //#define TRACE_MODE
@@ -22,6 +23,26 @@ extern "C" void _sPrintf(const char* format, ...);
 #else
 #	define TRACE(x) ;
 #endif
+
+
+struct nvidia_resolution {
+	int width;
+	int height;
+};
+
+static const nvidia_resolution kNVidiaAllowedResolutions[] = {
+	{ 1280, 720 },
+	{ 1280, 800 },
+	{ 1360, 768 },
+	{ 1400, 1050 },
+	{ 1440, 900 },
+	{ 1600, 900 },
+	{ 1600, 1200 },
+	{ 1680, 1050 },
+	{ 1920, 1080 },
+	{ 1920, 1200 },
+	{ 2048, 1536 },
+};
 
 
 static uint32
@@ -53,6 +74,8 @@ is_mode_supported(display_mode* mode)
 {
 	vesa_mode* modes = gInfo->vesa_modes;
 
+	bool colorspaceSupported = false;
+
 	for (uint32 i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
 		// search mode in VESA mode list
 		// TODO: list is ordered, we could use binary search
@@ -61,6 +84,23 @@ is_mode_supported(display_mode* mode)
 			&& get_color_space_for_depth(modes[i].bits_per_pixel)
 				== mode->space)
 			return true;
+
+		if (get_color_space_for_depth(modes[i].bits_per_pixel) == mode->space)
+			colorspaceSupported = true;
+	}
+
+	bios_type_enum type = gInfo->shared_info->bios_type;
+	if (type == kIntelBiosType || type == kAtomBiosType1 || type == kAtomBiosType2) {
+		// We know how to patch the BIOS, so we can set any mode we want
+		return colorspaceSupported;
+	}
+
+	if (type == kNVidiaBiosType) {
+		for (size_t i = 0; i < B_COUNT_OF(kNVidiaAllowedResolutions); i++) {
+			if (mode->virtual_width == kNVidiaAllowedResolutions[i].width
+				&& mode->virtual_height == kNVidiaAllowedResolutions[i].height)
+				return colorspaceSupported;
+		}
 	}
 
 	return false;
@@ -136,7 +176,8 @@ vesa_propose_display_mode(display_mode* target, const display_mode* low,
 {
 	TRACE(("vesa_propose_display_mode()\n"));
 
-	// just search for the specified mode in the list
+	// Search for the specified mode in the list. If it's in there, we don't need a custom mode and
+	// we just normalize it to the info provided by the VESA BIOS.
 
 	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {
 		display_mode* current = &gInfo->mode_list[i];
@@ -149,6 +190,23 @@ vesa_propose_display_mode(display_mode* target, const display_mode* low,
 		*target = *current;
 		return B_OK;
 	}
+
+	bios_type_enum type = gInfo->shared_info->bios_type;
+	if (type == kIntelBiosType || type == kAtomBiosType1 || type == kAtomBiosType2) {
+		// The driver says it knows the BIOS type, and therefore how to patch it to apply custom
+		// modes.
+		return B_OK;
+	}
+
+	if (type == kNVidiaBiosType) {
+		// For NVidia there is only a limited set of extra resolutions we know how to set
+		for (size_t i = 0; i < B_COUNT_OF(kNVidiaAllowedResolutions); i++) {
+			if (target->virtual_width == kNVidiaAllowedResolutions[i].width
+				&& target->virtual_height == kNVidiaAllowedResolutions[i].height)
+				return B_OK;
+		}
+	}
+
 	return B_BAD_VALUE;
 }
 
@@ -163,7 +221,7 @@ vesa_set_display_mode(display_mode* _mode)
 		return B_BAD_VALUE;
 
 	vesa_mode* modes = gInfo->vesa_modes;
-	for (uint32 i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
+	for (int32 i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
 		// search mode in VESA mode list
 		// TODO: list is ordered, we could use binary search
 		if (modes[i].width == mode.virtual_width
@@ -179,7 +237,14 @@ vesa_set_display_mode(display_mode* _mode)
 		}
 	}
 
-	return B_UNSUPPORTED;
+	// If the mode is not found in the list of standard mode, live patch the BIOS to get it anyway
+	status_t result = ioctl(gInfo->device, VESA_SET_CUSTOM_DISPLAY_MODE,
+		&mode, sizeof(display_mode));
+	if (result == B_OK) {
+		gInfo->current_mode = -1;
+	}
+
+	return result;
 }
 
 

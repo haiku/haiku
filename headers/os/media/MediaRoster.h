@@ -11,7 +11,15 @@
 
 #include <MediaDefs.h>
 #include <MediaNode.h>
-#include <config_manager.h>
+
+
+typedef enum {
+	B_ISA_BUS,
+	B_PCI_BUS,
+	B_PCMCIA_BUS,
+	B_UNKNOWN_BUS = 0x80
+} bus_type;
+
 
 class BBufferGroup;
 class BMediaAddOn;

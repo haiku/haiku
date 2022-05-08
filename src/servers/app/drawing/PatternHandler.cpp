@@ -9,7 +9,6 @@
 #include "PatternHandler.h"
 
 #include <stdio.h>
-#include <string.h>
 
 #include <Point.h>
 
@@ -31,10 +30,8 @@ PatternHandler::PatternHandler(void)
 	  fHighColor(kBlack),
 	  fLowColor(kWhite),
 	  fXOffset(0),
-	  fYOffset(0),
-	  fColorsWhenCached(ULONGLONG_MAX)
+	  fYOffset(0)
 {
-	memset((void*)fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 /*!
@@ -49,10 +46,8 @@ PatternHandler::PatternHandler(const int8* pat)
 	  fHighColor(kBlack),
 	  fLowColor(kWhite),
 	  fXOffset(0),
-	  fYOffset(0),
-	  fColorsWhenCached(ULONGLONG_MAX)
+	  fYOffset(0)
 {
-	memset((void*)fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 /*!
@@ -67,10 +62,8 @@ PatternHandler::PatternHandler(const uint64& pat)
 	  fHighColor(kBlack),
 	  fLowColor(kWhite),
 	  fXOffset(0),
-	  fYOffset(0),
-	  fColorsWhenCached(ULONGLONG_MAX)
+	  fYOffset(0)
 {
-	memset((void*)fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 /*!
@@ -85,10 +78,8 @@ PatternHandler::PatternHandler(const Pattern& pat)
 	  fHighColor(kBlack),
 	  fLowColor(kWhite),
 	  fXOffset(0),
-	  fYOffset(0),
-	  fColorsWhenCached(ULONGLONG_MAX)
+	  fYOffset(0)
 {
-	memset((void*)fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 /*!
@@ -102,10 +93,8 @@ PatternHandler::PatternHandler(const PatternHandler& other)
 	  fHighColor(other.fHighColor),
 	  fLowColor(other.fLowColor),
 	  fXOffset(other.fXOffset),
-	  fYOffset(other.fYOffset),
-	  fColorsWhenCached(ULONGLONG_MAX)
+	  fYOffset(other.fYOffset)
 {
-	memset((void*)fOpCopyColorCache, 255, 256 * sizeof(rgb_color));
 }
 
 //! Destructor does nothing
@@ -236,35 +225,4 @@ PatternHandler::SetOffsets(int32 x, int32 y)
 	fXOffset = x & 7;
 	fYOffset = y & 7;
 }
-
-
-void
-PatternHandler::MakeOpCopyColorCache()
-{
-	uint64 t = *(uint32*)&fHighColor;
-	uint64 colors = (t << 32) | *(uint32*)&fLowColor;
-
-	if (fColorsWhenCached == colors)
-		return;
-
-	fColorsWhenCached = colors;
-
-	// ramp from low color to high color
-	uint8 rA = fLowColor.red;
-	uint8 gA = fLowColor.green;
-	uint8 bA = fLowColor.blue;
-
-	uint8 rB = fHighColor.red;
-	uint8 gB = fHighColor.green;
-	uint8 bB = fHighColor.blue;
-
-	for (int32 i = 0; i < 256; i++) {
-		// NOTE: rgb is twisted around, since this is
-		// only used as uint32 in the end
-		fOpCopyColorCache[i].red = (((bB - bA) * i) + (bA << 8)) >> 8;
-		fOpCopyColorCache[i].green = (((gB - gA) * i) + (gA << 8)) >> 8;
-		fOpCopyColorCache[i].blue = (((rB - rA) * i) + (rA << 8)) >> 8;
-	}
-}
-
 

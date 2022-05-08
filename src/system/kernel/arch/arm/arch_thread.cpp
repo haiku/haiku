@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku Inc. All rights reserved.
+ * Copyright 2003-2022, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,6 +18,7 @@
 #include <arch_cpu.h>
 #include <arch/thread.h>
 #include <boot/stage2.h>
+#include <commpage.h>
 #include <kernel.h>
 #include <thread.h>
 #include <tls.h>
@@ -27,6 +28,9 @@
 #include <arch/vm_translation_map.h>
 
 #include <string.h>
+
+#include "ARMPagingStructures.h"
+#include "ARMVMTranslationMap.h"
 
 //#define TRACE_ARCH_THREAD
 #ifdef TRACE_ARCH_THREAD
@@ -115,7 +119,7 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 status_t
 arch_thread_init_tls(Thread *thread)
 {
-	uint32 tls[TLS_USER_THREAD_SLOT + 1];
+	uint32 tls[TLS_FIRST_FREE_SLOT];
 
 	thread->user_local_storage = thread->user_stack_base
 		+ thread->user_stack_size;
@@ -131,9 +135,52 @@ arch_thread_init_tls(Thread *thread)
 
 extern "C" void arm_context_switch(void *from, void *to);
 
+
+void
+arm_swap_pgdir(uint32_t pageDirectoryAddress)
+{
+	// Set translation table base
+	asm volatile("MCR p15, 0, %[addr], c2, c0, 0"::[addr] "r" (pageDirectoryAddress));
+	isb();
+
+	arch_cpu_global_TLB_invalidate();
+
+	//TODO: update Context ID (incl. ASID)
+	//TODO: check if any additional TLB or Cache maintenance is needed
+}
+
+
+void
+arm_set_tls_context(Thread *thread)
+{
+	// Set TPIDRURO to point to TLS base
+	asm volatile("MCR p15, 0, %0, c13, c0, 3"
+		: : "r" (thread->user_local_storage));
+}
+
+
 void
 arch_thread_context_switch(Thread *from, Thread *to)
 {
+	arm_set_tls_context(to);
+
+	VMAddressSpace *oldAddressSpace = from->team->address_space;
+	VMTranslationMap *oldTranslationMap = oldAddressSpace->TranslationMap();
+	phys_addr_t oldPageDirectoryAddress =
+		((ARMVMTranslationMap *)oldTranslationMap)->PagingStructures()->pgdir_phys;
+
+	VMAddressSpace *newAddressSpace = to->team->address_space;
+	VMTranslationMap *newTranslationMap = newAddressSpace->TranslationMap();
+	phys_addr_t newPageDirectoryAddress =
+		((ARMVMTranslationMap *)newTranslationMap)->PagingStructures()->pgdir_phys;
+
+	if (oldPageDirectoryAddress != newPageDirectoryAddress) {
+		TRACE(("arch_thread_context_switch: swap pgdir: "
+			"0x%08" B_PRIxPHYSADDR " -> 0x%08" B_PRIxPHYSADDR "\n",
+			oldPageDirectoryAddress, newPageDirectoryAddress));
+		arm_swap_pgdir(newPageDirectoryAddress);
+	}
+
 	TRACE(("arch_thread_context_switch: %p(%s/%p) -> %p(%s/%p)\n",
 		from, from->name, from->arch_info.sp, to, to->name, to->arch_info.sp));
 	arm_context_switch(&from->arch_info, &to->arch_info);
@@ -152,9 +199,37 @@ arch_thread_dump_info(void *info)
 
 status_t
 arch_thread_enter_userspace(Thread *thread, addr_t entry,
-	void *arg1, void *arg2)
+	void *args1, void *args2)
 {
-	panic("arch_thread_enter_uspace(): not yet implemented\n");
+	arm_set_tls_context(thread);
+
+	addr_t stackTop = thread->user_stack_base + thread->user_stack_size;
+
+	TRACE(("arch_thread_enter_userspace: entry 0x%" B_PRIxADDR ", args %p %p, "
+		"ustack_top 0x%" B_PRIxADDR "\n", entry, args1, args2, stackTop));
+
+	//stackTop = arch_randomize_stack_pointer(stackTop - sizeof(args));
+
+	// Copy the address of the stub that calls exit_thread() when the thread
+	// entry function returns to LR to act as the return address.
+	// The stub is inside commpage.
+	addr_t commPageAddress = (addr_t)thread->team->commpage_address;
+
+	disable_interrupts();
+
+	// prepare the user iframe
+	iframe frame = {};
+	frame.r0 = (uint32)args1;
+	frame.r1 = (uint32)args2;
+	frame.usr_sp = stackTop;
+	frame.usr_lr = ((addr_t*)commPageAddress)[COMMPAGE_ENTRY_ARM_THREAD_EXIT]
+		+ commPageAddress;
+	frame.pc = entry;
+
+	// return to userland
+	arch_return_to_userland(&frame);
+
+	// normally we don't get here
 	return B_ERROR;
 }
 

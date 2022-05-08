@@ -13,9 +13,11 @@
 
 #include <string.h>
 
+#include <arch_thread_defs.h>
 #include <commpage.h>
 #include <cpu.h>
 #include <debug.h>
+#include <generic_syscall.h>
 #include <kernel.h>
 #include <ksignal.h>
 #include <int.h>
@@ -96,6 +98,7 @@ x86_set_tls_context(Thread* thread)
 {
 	// Set FS segment base address to the TLS segment.
 	x86_write_msr(IA32_MSR_FS_BASE, thread->user_local_storage);
+	x86_write_msr(IA32_MSR_KERNEL_GS_BASE, thread->arch_info.user_gs_base);
 }
 
 
@@ -132,6 +135,32 @@ get_signal_stack(Thread* thread, iframe* frame, struct sigaction* action,
 	// by signal handlers).
 	return (uint8*)((frame->user_sp - 128 - spaceNeeded) & ~addr_t(0xf)) - 8;
 		// align stack pointer (cf. arch_randomize_stack_pointer())
+}
+
+
+static status_t
+arch_thread_control(const char* subsystem, uint32 function, void* buffer,
+	size_t bufferSize)
+{
+	switch (function) {
+		case THREAD_SET_GS_BASE:
+		{
+			uint64 base;
+			if (bufferSize != sizeof(base))
+				return B_BAD_VALUE;
+
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_memcpy(&base, buffer, sizeof(base)) < B_OK) {
+				return B_BAD_ADDRESS;
+			}
+
+			Thread* thread = thread_get_current_thread();
+			thread->arch_info.user_gs_base = base;
+			x86_write_msr(IA32_MSR_KERNEL_GS_BASE, base);
+			return B_OK;
+		}
+	}
+	return B_BAD_HANDLER;
 }
 
 
@@ -172,6 +201,9 @@ arch_thread_init(kernel_args* args)
 			"fxsaveq %0"
 			:: "m" (sInitialState.fpu_state));
 	}
+
+	register_generic_syscall(THREAD_SYSCALLS, arch_thread_control, 1, 0);
+
 	return B_OK;
 }
 

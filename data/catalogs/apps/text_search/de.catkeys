@@ -19,7 +19,7 @@ Quit	GrepWindow		Beenden
 Show files in Tracker	GrepWindow		Dateien im Tracker zeigen
 Please select the files you wish to keep searching.	GrepWindow		Bitte die Dateien auswählen, die weiterhin durchsucht werden sollen.
 Trim to selection	GrepWindow		Auf Auswahl begrenzen
-Set target…	GrepWindow		Ziel wählen...
+Set target…	GrepWindow		Ziel wählen ...
 Failed to open input pipe!	Grepper		Konnte Input-Pipe nicht öffnen!
 Search	GrepWindow		Suchen
 Copy text to clipboard	GrepWindow		Text in Ablage kopieren

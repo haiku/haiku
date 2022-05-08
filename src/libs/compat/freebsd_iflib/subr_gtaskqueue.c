@@ -79,9 +79,6 @@ struct gtaskqueue {
 	char			*tq_name;
 	TAILQ_HEAD(, gtaskqueue_busy) tq_active;
 	struct mtx		tq_mutex;
-#ifdef __HAIKU__
-	sem_id 			tq_sem;
-#endif
 	struct thread		**tq_threads;
 	int			tq_tcount;
 	int			tq_spin;
@@ -163,9 +160,6 @@ _gtaskqueue_create(const char *name, int mflags,
 	if (enqueue == gtaskqueue_thread_enqueue)
 		queue->tq_flags |= TQ_FLAGS_UNLOCKED_ENQUEUE;
 	mtx_init(&queue->tq_mutex, tq_name, NULL, mtxflags);
-#ifdef __HAIKU__
-	queue->tq_sem = create_sem(0, tq_name);
-#endif
 
 	return (queue);
 }
@@ -194,9 +188,6 @@ gtaskqueue_free(struct gtaskqueue *queue)
 	KASSERT(TAILQ_EMPTY(&queue->tq_active), ("Tasks still running?"));
 	KASSERT(queue->tq_callouts == 0, ("Armed timeout tasks"));
 	mtx_destroy(&queue->tq_mutex);
-#ifdef __HAIKU__
-	delete_sem(queue->tq_sem);
-#endif
 	free(queue->tq_threads, M_GTASKQUEUE);
 	free(queue->tq_name, M_GTASKQUEUE);
 	free(queue, M_GTASKQUEUE);
@@ -583,13 +574,7 @@ gtaskqueue_thread_loop(void *arg)
 		 */
 		if ((tq->tq_flags & TQ_FLAGS_ACTIVE) == 0)
 			break;
-#ifndef __HAIKU__
 		TQ_SLEEP(tq, tq, &tq->tq_mutex, 0, "-", 0);
-#else
-		TQ_UNLOCK(tq);
-		acquire_sem(tq->tq_sem);
-		TQ_LOCK(tq);
-#endif
 	}
 	gtaskqueue_run_locked(tq);
 	/*
@@ -615,11 +600,7 @@ gtaskqueue_thread_enqueue(void *context)
 
 	tqp = context;
 	tq = *tqp;
-#ifndef __HAIKU__
 	wakeup_one(tq);
-#else
-	release_sem_etc(tq->tq_sem, 1, B_DO_NOT_RESCHEDULE);
-#endif
 }
 
 

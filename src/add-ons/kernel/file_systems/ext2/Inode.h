@@ -59,6 +59,7 @@ public:
 			int32		Flags() const { return fNode.Flags(); }
 
 			off_t		Size() const { return fNode.Size(); }
+			uint64		NumBlocks();
 			void		GetChangeTime(struct timespec *timespec) const
 						{ fNode.GetChangeTime(timespec, fHasExtraAttributes); }
 			void		GetModificationTime(struct timespec *timespec) const
@@ -142,7 +143,6 @@ private:
 			status_t	_ShrinkDataStream(Transaction& transaction,
 							off_t size);
 	
-			uint64		_NumBlocks();
 			status_t	_SetNumBlocks(uint64 numBlocks);
 
 			uint32		_InodeChecksum(ext2_inode* inode);

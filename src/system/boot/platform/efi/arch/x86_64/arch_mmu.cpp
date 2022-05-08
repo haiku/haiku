@@ -142,8 +142,6 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 		gKernelArgs.num_virtual_allocated_ranges);
 
 	// Switch EFI to virtual mode, using the kernel pmap.
-	// Something involving ConvertPointer might need to be done after this?
-	// http://wiki.phoenix.com/wiki/index.php/EFI_RUNTIME_SERVICES
 	kRuntimeServices->SetVirtualAddressMap(memory_map_size, descriptor_size,
 		descriptor_version, memory_map);
 
@@ -174,11 +172,11 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 		&gKernelArgs.arch_args.vir_pgdir);
 
 	// Store the virtual memory usage information.
-	gKernelArgs.virtual_allocated_range[0].start = KERNEL_LOAD_BASE_64_BIT;
+	gKernelArgs.virtual_allocated_range[0].start = KERNEL_LOAD_BASE;
 	gKernelArgs.virtual_allocated_range[0].size
-		= get_current_virtual_address() - KERNEL_LOAD_BASE_64_BIT;
+		= get_current_virtual_address() - KERNEL_LOAD_BASE;
 	gKernelArgs.num_virtual_allocated_ranges = 1;
-	gKernelArgs.arch_args.virtual_end = ROUNDUP(KERNEL_LOAD_BASE_64_BIT
+	gKernelArgs.arch_args.virtual_end = ROUNDUP(KERNEL_LOAD_BASE
 		+ gKernelArgs.virtual_allocated_range[0].size, 0x200000);
 
 	// Find the highest physical memory address. We map all physical memory
@@ -246,7 +244,7 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 		// Get the physical address to map.
 		void *phys;
 		if (platform_kernel_address_to_bootloader_address(
-			KERNEL_LOAD_BASE_64_BIT + (i * B_PAGE_SIZE), &phys) != B_OK) {
+			KERNEL_LOAD_BASE + (i * B_PAGE_SIZE), &phys) != B_OK) {
 			continue;
 		}
 

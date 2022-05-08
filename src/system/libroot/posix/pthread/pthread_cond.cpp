@@ -57,7 +57,8 @@ pthread_cond_destroy(pthread_cond_t* cond)
 
 
 static status_t
-cond_wait(pthread_cond_t* cond, pthread_mutex_t* mutex, bigtime_t timeout)
+cond_wait(pthread_cond_t* cond, pthread_mutex_t* mutex, uint32 flags,
+	bigtime_t timeout)
 {
 	if (mutex->owner != find_thread(NULL)) {
 		// calling thread isn't mutex owner
@@ -79,12 +80,8 @@ cond_wait(pthread_cond_t* cond, pthread_mutex_t* mutex, bigtime_t timeout)
 	mutex->owner = -1;
 	mutex->owner_count = 0;
 
-	int32 flags = (cond->flags & COND_FLAG_MONOTONIC) != 0 ? B_ABSOLUTE_TIMEOUT
-		: B_ABSOLUTE_REAL_TIME_TIMEOUT;
-
 	status_t status = _kern_mutex_switch_lock((int32*)&mutex->lock,
-		(int32*)&cond->lock, "pthread condition",
-		timeout == B_INFINITE_TIMEOUT ? 0 : flags, timeout);
+		(int32*)&cond->lock, "pthread condition", flags, timeout);
 
 	if (status == B_INTERRUPTED) {
 		// EINTR is not an allowed return value. We either have to restart
@@ -118,19 +115,42 @@ cond_signal(pthread_cond_t* cond, bool broadcast)
 int
 pthread_cond_wait(pthread_cond_t* cond, pthread_mutex_t* _mutex)
 {
-	RETURN_AND_TEST_CANCEL(cond_wait(cond, _mutex, B_INFINITE_TIMEOUT));
+	RETURN_AND_TEST_CANCEL(cond_wait(cond, _mutex, 0, B_INFINITE_TIMEOUT));
+}
+
+
+int
+pthread_cond_clockwait(pthread_cond_t* cond, pthread_mutex_t* mutex,
+	clockid_t clock_id, const struct timespec* abstime)
+{
+	if (abstime == NULL || abstime->tv_nsec < 0 || abstime->tv_nsec >= 1000 * 1000 * 1000)
+		RETURN_AND_TEST_CANCEL(EINVAL);
+
+	bigtime_t timeoutMicros = ((bigtime_t)abstime->tv_sec) * 1000000
+		+ abstime->tv_nsec / 1000;
+	uint32 flags = 0;
+	switch (clock_id) {
+		case CLOCK_REALTIME:
+			flags = B_ABSOLUTE_REAL_TIME_TIMEOUT;
+			break;
+		case CLOCK_MONOTONIC :
+			flags = B_ABSOLUTE_TIMEOUT;
+			break;
+		default:
+			return B_BAD_VALUE;
+	}
+
+	RETURN_AND_TEST_CANCEL(cond_wait(cond, mutex, flags, timeoutMicros));
 }
 
 
 int
 pthread_cond_timedwait(pthread_cond_t* cond, pthread_mutex_t* mutex,
-	const struct timespec* tv)
+	const struct timespec* abstime)
 {
-	if (tv == NULL || tv->tv_nsec < 0 || tv->tv_nsec >= 1000 * 1000 * 1000)
-		RETURN_AND_TEST_CANCEL(EINVAL);
-
-	RETURN_AND_TEST_CANCEL(
-		cond_wait(cond, mutex, tv->tv_sec * 1000000LL + tv->tv_nsec / 1000LL));
+	return pthread_cond_clockwait(cond, mutex,
+		(cond->flags & COND_FLAG_MONOTONIC) != 0 ? CLOCK_MONOTONIC : CLOCK_REALTIME,
+		abstime);
 }
 
 

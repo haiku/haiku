@@ -113,7 +113,11 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 			case R_386_RELATIVE:
 			case R_386_GOTOFF:
 			case R_386_GOTPC:
+#ifndef _BOOT_MODE
 				A = *(uint32 *)(image->text_region.delta + rel[i].r_offset);
+#else
+				A = boot_elf32_get_relocation(image->text_region.delta + rel[i].r_offset);
+#endif
 				TRACE(("A %p\n", (void *)A));
 				break;
 		}
@@ -159,8 +163,10 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 				rel[i].r_offset);
 			return B_BAD_ADDRESS;
 		}
-#endif
 		*resolveAddress = finalAddress;
+#else
+		boot_elf32_set_relocation((Elf32_Addr)resolveAddress, finalAddress);
+#endif
 		TRACE(("-> offset %#lx (%#lx) = %#lx\n",
 			(image->text_region.delta + rel[i].r_offset), rel[i].r_offset, finalAddress));
 	}
@@ -184,10 +190,12 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 }
 
 
-#endif	// !__x86_64__ || defined(ELF32_COMPAT) ||  (_BOOT_MODE && _BOOT_PLATFORM != efi)
+#endif	// !defined(__x86_64__) || defined(ELF32_COMPAT) ||
+	// (defined(_BOOT_MODE) && _BOOT_PLATFORM != efi)
 
 
-#if (defined(__x86_64__) && !defined(ELF32_COMPAT)) || defined(_BOOT_MODE)
+#if (defined(__x86_64__) && !defined(ELF32_COMPAT)) || \
+	(defined(_BOOT_MODE) && defined(BOOT_SUPPORT_ELF64))
 
 
 #ifdef _BOOT_MODE
@@ -280,4 +288,5 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 }
 
 
-#endif	// (defined(__x86_64__) && !defined(ELF32_COMPAT)) || defined(_BOOT_MODE)
+#endif	// (defined(__x86_64__) && !defined(ELF32_COMPAT)) ||
+	// (defined(_BOOT_MODE) && defined(BOOT_SUPPORT_ELF64))

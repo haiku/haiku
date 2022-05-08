@@ -20,8 +20,8 @@ Open containing folder	Download Window		Otwórz katalog zawierający
 Find previous	WebPositive Window		Znajdź poprzednie
 Full screen	WebPositive Window		Pełny ekran
 Downloads in progress	WebPositive		Pobieranie jest w toku
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Czy naprawdę chcesz otworzyć wszystkie zakładki %addedCount na raz?
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Czy naprawdę chcesz otworzyć wszystkie zakładki %addedCount na raz?
 Clone current page	Settings Window		Sklonuj bieżącą stronę
 Start page:	Settings Window		Strona startowa:
 Cancel	Download Window		Anuluj
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Zmniejsz wielkość
 Default fixed font size:	Settings Window		Domyślny rozmiar fontu o stałej szerokości:
 Sans serif font:	Settings Window		Font bezszeryfowy:
 Clear	WebPositive Window		Wyczyść
-Cookies for %s	Cookie Manager		Ciasteczka dla %s
 The download could not be opened.	Download Window		Pobrania nie można otworzyć.
+Cookies for %s	Cookie Manager		Ciasteczka dla %s
 Close	Download Window		Zamknij
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s – Wyszukiwane hasło
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Kontynuowanie pobierania
 Proxy server requires authentication	Settings Window		Serwer proxy wymaga uwierzytelnienia
 Cancel	Settings Window		Anuluj
-History	WebPositive Window		Historia
 Reset size	WebPositive Window		Resetuj rozmiar
+History	WebPositive Window		Historia
 Do you really want to clear the browsing history?	WebPositive Window		Na pewno chcesz wyczyścić całą historię przeglądania?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Wyszukuje następne wystąpienie tekstu
 Fixed font:	Settings Window		Font o stałej szerokości:

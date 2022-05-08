@@ -41,7 +41,7 @@ Hide optional packages	InstallerWindow		オプショナルパッケージを隠�
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Haikuを試用していただきありがとうございます。Haikuを堪能してください!
 Quit	InstallerApp		終了
-Error writing boot sector.	InstallProgress		ブートセクターの書込に失敗しました。
+Error writing boot sector.	InstallProgress		ブートセクターの書き込みに失敗しました。
 OK	InstallerWindow		OK
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Haikuインストーラーを閉じる前に、Boot ManagerとDriveSetupを終了してください。
 Failed to launch Boot Manager	InstallerWindow		ブートマネージャーの起動に失敗しました

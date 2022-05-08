@@ -3,7 +3,7 @@ Partially download messages larger than	ProtocolConfigView		Nur Kopfzeilen herun
 Password:	ProtocolConfigView		Passwort:
 Remove mail from server when deleted	ProtocolConfigView		Gelöschte E-Mails auch vom Server löschen
 Mail server:	ProtocolConfigView		E-Mail-Server:
-Select…	MailKit		Auswählen…
+Select…	MailKit		Auswählen …
 Connection type:	ProtocolConfigView		Verbindungsart:
 KB	ProtocolConfigView	kilo byte	KiB
 Leave mail on server	ProtocolConfigView		E-Mails auf dem Server belassen

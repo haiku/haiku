@@ -66,10 +66,6 @@ void* memalign(size_t alignment, size_t size) _ALIGNED_BY_ARG(1);
 
 void deferred_free(void* block);
 
-void* malloc_referenced(size_t size);
-void* malloc_referenced_acquire(void* data);
-void malloc_referenced_release(void* data);
-
 void heap_add_area(heap_allocator* heap, area_id areaID, addr_t base,
 	size_t size);
 heap_allocator*	heap_create_allocator(const char* name, addr_t base,

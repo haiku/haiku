@@ -255,17 +255,16 @@ PackageVolumeInfo::LoadOldStates()
 PackageVolumeState*
 PackageVolumeInfo::_AddState(const char* stateName)
 {
-	PackageVolumeState* state = new(std::nothrow) PackageVolumeState;
-	if (state == NULL)
+	ObjectDeleter<PackageVolumeState> state(new(std::nothrow) PackageVolumeState);
+	if (!state.IsSet())
 		return NULL;
 
 	if (state->SetTo(stateName) != B_OK) {
-		delete state;
 		return NULL;
 	}
 
-	fStates.Add(state);
-	return state;
+	fStates.Add(state.Get());
+	return state.Detach();
 }
 
 
@@ -274,27 +273,26 @@ PackageVolumeInfo::_InitState(Directory* packagesDirectory, DIR* dir,
 	PackageVolumeState* state)
 {
 	// find the system package
-	char* systemPackageName = (char*)malloc(B_FILE_NAME_LENGTH);
-	if (systemPackageName == NULL)
+	ArrayDeleter<char> systemPackageName(new(std::nothrow) char[B_FILE_NAME_LENGTH]);
+	if (!systemPackageName.IsSet())
 		return B_NO_MEMORY;
-	char* packagePath = (char*)malloc(B_PATH_NAME_LENGTH);
-	if (packagePath == NULL) {
-		free(systemPackageName);
+	ArrayDeleter<char> packagePath(new(std::nothrow) char[B_PATH_NAME_LENGTH]);
+	if (!packagePath.IsSet()) {
 		return B_NO_MEMORY;
 	}
 
 	status_t error = _ParseActivatedPackagesFile(packagesDirectory, state,
-		systemPackageName, B_FILE_NAME_LENGTH);
+		systemPackageName.Get(), B_FILE_NAME_LENGTH);
 	if (error == B_OK) {
 		// check, if package exists
 		for (PackageVolumeState* otherState = state; otherState != NULL;
 				otherState = fStates.GetPrevious(otherState)) {
-			otherState->GetPackagePath(systemPackageName, packagePath,
+			otherState->GetPackagePath(systemPackageName.Get(), packagePath.Get(),
 				B_PATH_NAME_LENGTH);
 			struct stat st;
-			if (get_stat(packagesDirectory, packagePath, st) == B_OK
+			if (get_stat(packagesDirectory, packagePath.Get(), st) == B_OK
 				&& S_ISREG(st.st_mode)) {
-				state->SetSystemPackage(packagePath);
+				state->SetSystemPackage(packagePath.Get());
 				break;
 			}
 		}
@@ -317,8 +315,6 @@ PackageVolumeInfo::_InitState(Directory* packagesDirectory, DIR* dir,
 		}
 	}
 
-	free(packagePath);
-	free(systemPackageName);
 	if (state->SystemPackage() == NULL)
 		return B_ENTRY_NOT_FOUND;
 
@@ -332,50 +328,40 @@ PackageVolumeInfo::_ParseActivatedPackagesFile(Directory* packagesDirectory,
 {
 	// open the activated-packages file
 	static const size_t kBufferSize = 3 * B_FILE_NAME_LENGTH + 2;
-	char* path = (char*)malloc(kBufferSize);
-	if (path == NULL)
+	ArrayDeleter<char> path(new(std::nothrow) char[kBufferSize]);
+	if (!path.IsSet())
 		return B_NO_MEMORY;
-	snprintf(path, kBufferSize, "%s/%s/%s",
+	snprintf(path.Get(), kBufferSize, "%s/%s/%s",
 		kAdministrativeDirectory, state->Name() != NULL ? state->Name() : "",
 		kActivatedPackagesFile);
-	int fd = open_from(packagesDirectory, path, O_RDONLY);
-	if (fd < 0) {
-		free(path);
-		return fd;
-	}
-	FileDescriptorCloser fdCloser(fd);
+	FileDescriptorCloser fd(open_from(packagesDirectory, path.Get(), O_RDONLY));
+	if (!fd.IsSet())
+		return fd.Get();
 
 	struct stat st;
-	if (fstat(fd, &st) != 0) {
-		free(path);
+	if (fstat(fd.Get(), &st) != 0)
 		return errno;
-	}
-	if (!S_ISREG(st.st_mode)) {
-		free(path);
+	if (!S_ISREG(st.st_mode))
 		return B_ENTRY_NOT_FOUND;
-	}
 
 	// read the file until we find the system package line
 	size_t remainingBytes = 0;
 	for (;;) {
-		ssize_t bytesRead = read(fd, path + remainingBytes,
+		ssize_t bytesRead = read(fd.Get(), path.Get() + remainingBytes,
 			kBufferSize - remainingBytes - 1);
-		if (bytesRead <= 0) {
-			free(path);
+		if (bytesRead <= 0)
 			return B_ENTRY_NOT_FOUND;
-		}
 
 		remainingBytes += bytesRead;
 		path[remainingBytes] = '\0';
 
-		char* line = path;
+		char* line = path.Get();
 		while (char* lineEnd = strchr(line, '\n')) {
 			*lineEnd = '\0';
 			if (is_system_package(line)) {
 				status_t result = strlcpy(packageName, line, packageNameSize)
 						< packageNameSize
 					?  B_OK : B_NAME_TOO_LONG;
-				free(path);
 				return result;
 			}
 
@@ -383,14 +369,13 @@ PackageVolumeInfo::_ParseActivatedPackagesFile(Directory* packagesDirectory,
 		}
 
 		// move the remainder to the start of the buffer
-		if (line < path + remainingBytes) {
-			size_t left = path + remainingBytes - line;
-			memmove(path, line, left);
+		if (line < path.Get() + remainingBytes) {
+			size_t left = path.Get() + remainingBytes - line;
+			memmove(path.Get(), line, left);
 			remainingBytes = left;
 		} else
 			remainingBytes = 0;
 	}
 
-	free(path);
 	return B_ENTRY_NOT_FOUND;
 }

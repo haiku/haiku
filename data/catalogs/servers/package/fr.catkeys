@@ -5,7 +5,7 @@ ignore problem for now	PackageProblem		ignorer le problème pour l’instant
 solution %d:	PackageProblem	Don't change the %d variable	solution %d :
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Les problèmes suivants ont été rencontrés. Veuillez choisir une solution pour chacun :
 Apply changes	PackageResult		Appliquer les modifications
-Package daemon	PackageManager		Démon des paquets
+Package daemon	PackageManager		Serveur de paquets
 install package %s from repository %s\n	PackageResult	Don't change '%s' variables	installation du paquet %s depuis le dépot %s\n
 The following additional package changes have to be made:	PackageResult		L’ajout des paquets supplémentaires suivants doit être effectué :
 Warning	PackageManager		Attention

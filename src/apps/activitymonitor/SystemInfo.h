@@ -45,6 +45,8 @@ public:
 			uint32		CPUCount() const { return fSystemInfo.cpu_count; }
 			bigtime_t	CPUActiveTime(uint32 cpu) const
 							{ return fCPUInfos[cpu].active_time; }
+			uint64		CPUCurrentFrequency(uint32 cpu) const
+							{ return fCPUInfos[cpu].current_frequency; }
 			const system_info& Info() const { return fSystemInfo; }
 
 			uint64		NetworkReceived();

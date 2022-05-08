@@ -8,12 +8,12 @@ Preferred application	FileTypes Window		Bevorzugte Anwendung
 Launch	Application Types Window		Starten
 Removing uninstalled application types	Application Types Window		Deinstallierte Anwendungen werden entfernt
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Breite:
-Same as…	FileType Window	The same TYPE as ...	Gleicher wie…
+Same as…	FileType Window	The same TYPE as ...	Gleicher wie …
 (from super type)	FileTypes Window		(vom Supertyp)
 Select same preferred application as	FileTypes Window		Gleiche bevorzugte Anwendung wählen wie
 Could not change attributes	Attribute Window		Attribute konnten nicht verändert werden
 Icon	FileTypes Window		Icon
-Add…	Application Type Window		Hinzu…
+Add…	Application Type Window		Hinzu …
 Attribute name:	Attribute Window		Attributname:
 Long description:	Application Type Window		Ausführliche Beschreibung:
 Cancel	Preferred App Menu		Abbrechen
@@ -25,7 +25,7 @@ Cancel	Application Type Window		Abbrechen
 Attribute	Attribute Window		Attribute
 Multiple launch	Application Type Window		Mehrfache Ausführung
 {0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Anwendungstyp könnte entfernt werden} other{# Anwendungstypen könnten entfernt werden}}
-Edit…	Application Types Window		Bearbeiten…
+Edit…	Application Types Window		Bearbeiten …
 Could not set preferred application	FileTypes Window		Bevorzugte Anwendung konnte nicht gesetzt werden
 Description	FileTypes Window		Beschreibung
 Signature:	Application Types Window		Signatur:
@@ -37,10 +37,10 @@ Cancel	New File Type Window		Abbrechen
 Select same preferred application as	FileType Window		Gleiche bevorzugte Anwendung wählen wie
 Cancel	Type List Window		Abbrechen
 Don't save	Application Type Window		Nicht speichern
-Center	Attribute Window	Attribute column alignment in Tracker	Mittig
+Center	Attribute Window	Attribute column alignment in Tracker	Zentriert
 Done	Extension Window		Fertig
 Development	Application Types Window		Entwicklung
-Same as…	FileType Window	The same APPLICATION as ...	Gleiche wie…
+Same as…	FileType Window	The same APPLICATION as ...	Gleiche wie …
 Abort	Application Types Window		Abbrechen
 Save	Application Type Window		Speichern
 %1 application type	Application Type Window		%1 Anwendungstyp
@@ -60,7 +60,7 @@ Add new group	New File Type Window		Neue Gruppe hinzufügen
 Remove uninstalled	Application Types Window		Deinstallierte entfernen
 File	Application Type Window		Datei
 Progress	Application Types Window		Fortschritt
-Select…	FileType Window		Auswählen…
+Select…	FileType Window		Auswählen …
 Information	Application Types Window		Information
 Settings	FileTypes Window		Einstellungen
 Done	Attribute Window		Fertig
@@ -82,17 +82,17 @@ Background app	Application Type Window		Hintergrundanwendung
 Recognition rule is not valid:\n\n	FileTypes Window		Erkennungsregel ist ungültig:\n\n
 Show icons in list	FileTypes Window		Icons in Liste anzeigen
 Editable	Attribute Window	If Tracker allows to edit this attribute.	Editierbar
-New resource file…	FileTypes Window		Neue Ressource-Datei…
+New resource file…	FileTypes Window		Neue Ressource-Datei …
 [Multiple files] file types	FileType Window		[Mehrere Dateien] Dateitypen
 Application type	Application Type Window		Anwendungstyp
-Show in Tracker…	Application Types Window		Im Tracker zeigen…
+Show in Tracker…	Application Types Window		Im Tracker zeigen …
 Type name:	FileTypes Window		Typname:
 Visible	Attribute Window		Sichtbar
 Select preferred application	FileTypes Window		Bevorzugte Anwendung wählen
 Path:	Application Types Window		Pfad:
 rating	Attribute ListView		Bewertung
 Could not install file type	New File Type Window		Dateityp konnte nicht eingerichtet werden
-Same as…	FileTypes Window		Gleiche wie…
+Same as…	FileTypes Window		Gleiche wie …
 Golden master	Application Type Window		Golden Master
 Checkbox	Attribute ListView		Checkbox
 FileTypes request	Preferred App Menu		Dateityp-Anfrage
@@ -112,17 +112,17 @@ Signature:	Application Type Window		Signatur:
 Development	Application Type Window		Entwicklung
 Golden master	Application Types Window		Golden Master
 Add	Extension Window		Hinzufügen
-Open…	FileTypes Window		Öffnen…
+Open…	FileTypes Window		Öffnen …
 checkbox	Attribute ListView		Checkbox
 Could not change file extensions	Extension Window		Dateiendung konnte nicht geändert werden
 Could not open file	FileType Window		Datei konnte nicht geöffnet werden
 Choose type	Type List Window		Wähle Typ
-Select…	FileTypes Window		Auswählen…
+Select…	FileTypes Window		Auswählen …
 File recognition	FileTypes Window		Dateierkennung
-Application types…	FileTypes Window		Anwendungstypen…
-Add icon…	Icon View		Icon hinzufügen…
+Application types…	FileTypes Window		Anwendungstypen …
+Add icon…	Icon View		Icon hinzufügen …
 Cancel	FileTypes Window		Abbrechen
-Save into resource file…	Application Type Window		In Ressource-Datei speichern…
+Save into resource file…	Application Type Window		In Ressource-Datei speichern …
 Special:	Attribute Window		Spezial:
 Type:	Attribute Window		Typ:
 Could not retrieve application signature	Preferred App Menu		Die Signatur der Anwendung konnte nicht gefunden werden
@@ -133,8 +133,8 @@ Gamma	Application Types Window		Gamma
 Supported types	Application Type Window		Unterstützte Typen
 Integer 32 bit	Attribute ListView		Integer 32-bit
 Beta	Application Type Window		Beta
-Could not retrieve preferred application of this file	Preferred App Menu		Die bevorzugte Anwendung für diese Datei konnte nicht gefunden werden
-Application flags	Application Type Window		Anwendungseigenschaften
+Could not retrieve preferred application of this file	Preferred App Menu		Die bevorzugte Anwendung für diese Datei konnte nicht ermittelt werden
+Application flags	Application Type Window		Flags der Anwendung
 OK	FileTypes		OK
 Group name:	New File Type Window		Gruppenname:
 Move up	FileTypes Window		Hoch
@@ -152,20 +152,20 @@ Save request	Application Type Window		Anfrage speichern
 Could not remove file type: %s\n	FileTypes Window		Der Dateityp %s konnte nicht entfernt werden\n
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Anzeigen als:
 Done	Type List Window		Fertig
-Extra attributes	FileTypes Window		Extra Attribute
+Extra attributes	FileTypes Window		Zusätzliche Attribute
 Group:	New File Type Window		Gruppe:
 Alpha	Application Types Window		Alpha
 Close	Application Type Window		Schließen
 Integer 16 bit	Attribute ListView		Integer 16-bit
-Extension	Extension Window		Erweiterung
+Extension	Extension Window		Endung
 Rule:	FileTypes Window		Regel:
 FileTypes	System name		Dateitypen
 Version	Application Types Window		Version
 Quit	FileTypes Window		Beenden
 File type	FileType Window		Dateityp
 Internal name:	FileTypes Window		Interner Name:
-Add…	FileTypes Window		Hinzu…
-Edit icon…	Icon View		Icon bearbeiten…
+Add…	FileTypes Window		Hinzu …
+Edit icon…	Icon View		Icon bearbeiten …
 Internal name:	Attribute Window		Interner Name:
 Show recognition rule	FileTypes Window		Erkennungsregel zeigen
 Double	Attribute ListView		Double

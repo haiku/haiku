@@ -109,8 +109,8 @@
 /*
  * Values for the x86 bus space tag, not to be used directly by MI code.
  */
-#define	X86_BUS_SPACE_IO	0	/* space is i/o space */
-#define	X86_BUS_SPACE_MEM	1	/* space is mem space */
+#define	X86_BUS_SPACE_IO	BUS_SPACE_TAG_IO	/* space is i/o space */
+#define	X86_BUS_SPACE_MEM	BUS_SPACE_TAG_MEM	/* space is mem space */
 
 #define BUS_SPACE_MAXSIZE_24BIT	0xFFFFFF
 #define BUS_SPACE_MAXSIZE_32BIT 0xFFFFFFFF

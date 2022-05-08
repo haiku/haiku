@@ -212,17 +212,24 @@ callout_schedule(struct callout *callout, int _ticks)
 int
 _callout_stop_safe(struct callout *c, int safe)
 {
-	MutexLocker locker(sLock);
-
-	if (c == NULL) {
-		printf("_callout_stop_safe called with NULL callout\n");
-		return 0;
-	}
+	if (c == NULL)
+		return -1;
 
 	TRACE("_callout_stop_safe %p, func %p, arg %p\n", c, c->c_func, c->c_arg);
 
+	MutexLocker locker(sLock);
+
 	if (c->due <= 0)
+		return -1;
+
+	if (callout_active(c)) {
+		if (safe) {
+			locker.Unlock();
+			while (callout_active(c))
+				snooze(100);
+		}
 		return 0;
+	}
 
 	// this timer is scheduled, cancel it
 	list_remove_item(&sTimers, c);

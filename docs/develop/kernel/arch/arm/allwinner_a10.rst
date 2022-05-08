@@ -96,4 +96,4 @@ layout, etc)
 http://archlinuxarm.org/platforms/armv7/allwinner/cubieboard#qt-platform_tabs-ui-tabs2
 
 Linux SunXi: mainline Linux support for the Allwinner chips. Lots of
-docs on the hardware. http://linux-sunxi.org/
+docs on the hardware. https://linux-sunxi.org/

@@ -920,12 +920,7 @@ object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
 		} else
 			break;
 
-		ConditionVariableEntry entry;
-		resizeEntry->condition.Add(&entry);
-
-		cache->Unlock();
-		entry.Wait();
-		cache->Lock();
+		resizeEntry->condition.Wait(&cache->lock);
 	}
 
 	// prepare the resize entry others can wait on
@@ -1072,11 +1067,7 @@ object_cache_maintainer(void*)
 				continue;
 			}
 
-			ConditionVariableEntry entry;
-			sMaintenanceCondition.Add(&entry);
-			locker.Unlock();
-			entry.Wait();
-			locker.Lock();
+			sMaintenanceCondition.Wait(locker.Get());
 		}
 
 		ObjectCache* cache = sMaintenanceQueue.RemoveHead();

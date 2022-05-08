@@ -13,6 +13,8 @@ virtio_get_feature_name(uint32 feature)
 	switch (feature) {
 		case VIRTIO_FEATURE_NOTIFY_ON_EMPTY:
 			return "notify on empty";
+		case VIRTIO_FEATURE_ANY_LAYOUT:
+			return "any layout";
 		case VIRTIO_FEATURE_RING_INDIRECT_DESC:
 			return "ring indirect";
 		case VIRTIO_FEATURE_RING_EVENT_IDX:

@@ -160,7 +160,6 @@ BImageResources::GetIconResource(int32 id, icon_size size,
 
 	data = LoadResource(size == B_MINI_ICON ? 'MICN' : 'ICON', id, &length);
 	if (data == NULL || length != (size_t)(size * size)) {
-		TRESPASS();
 		return B_ERROR;
 	}
 
@@ -192,7 +191,7 @@ BImageResources::GetIconResource(int32 id, icon_size size,
 	float x = roundf((dest->Bounds().Width() - size) / 2);
 	float y = roundf((dest->Bounds().Height() - size) / 2);
 	return dest->ImportBits(data, (int32)length, size, B_CMAP8,
-		BPoint(0, 0), BPoint(x, y), size, size);
+		BPoint(0, 0), BPoint(x, y), BSize(size - 1, size - 1));
 }
 
 

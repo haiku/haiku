@@ -11,6 +11,8 @@
 
 #include "intel_extreme.h"
 
+#include <Debug.h>
+
 #include <edid.h>
 #include <video_overlay.h>
 

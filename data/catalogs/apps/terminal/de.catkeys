@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	4032760800
+1	german	x-vnd.Haiku-Terminal	247549485
 ANSI cyan color	Terminal AppearancePrefView		ANSI-Farbe Blaugrün
 Close other tabs	Terminal TermWindow		Andere Reiter schließen
 Insert path	Terminal TermView		Pfad einfügen
@@ -16,10 +16,11 @@ ANSI bright green color	Terminal AppearancePrefView		ANSI-Farbe Hellgrün
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               Diese Hilfe ausgeben\n  -t,     --title              Fenstertitel setzen\n  -f,     --fullscreen         Im Vollbild-Modus starten\n  -w,     --working-directory  Setzt das anfängliche Arbeitsverzeichnis
 ANSI white color	Terminal AppearancePrefView		ANSI-Farbe Weiß (Hellgrau)
 Retro	Terminal colors scheme		Retro
-Edit tab title…	Terminal TermWindow		Reiter umbenennen...
+Edit tab title…	Terminal TermWindow		Reiter umbenennen ...
 Settings	Terminal TermWindow		Einstellungen
 Print	Terminal TermWindow		Drucken
 %app% settings	Terminal PrefWindow	window title	%app%-Einstellungen
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tArbeitsverzeichnis des gerade im aktuellen Reiter\n\t\t\tlaufenden Prozesses. Optional kann auch die maximale\n\t\t\tAnzahl der Pfadkomponenten angegeben werden.\n\t\t\tZum Beispiel: '%2d' für maximal zwei Komponenten.\n\t%e\t-\tKodierung des aktuellen Reiters, außer bei UTF-8.\n\t%p\t-\tName des aktiven Prozesses.
 ANSI black color	Terminal AppearancePrefView		ANSI-Farbe Schwarz
 Use default	Terminal SetTitleWindow		Standardwerte
 Close tab	Terminal TermWindow		Reiter schließen
@@ -34,7 +35,7 @@ Custom	Terminal AppearancePrefView	Window size	Benutzerdefiniert
 Selected text	Terminal AppearancePrefView		Ausgewählter Text
 Change directory	Terminal TermView		Zum Ordner wechseln
 ANSI magenta color	Terminal AppearancePrefView		ANSI-Farbe Magenta
-Page setup…	Terminal TermWindow		Seiten einrichten…
+Page setup…	Terminal TermWindow		Seiten einrichten …
 Slate	Terminal colors scheme		Schiefer
 Defaults	Terminal PrefWindow		Standardwerte
 Cancel	Terminal TermView		Abbrechen
@@ -50,7 +51,7 @@ Window title:	Terminal AppearancePrefView		Fenstertitel:
 New tab	Terminal TermWindow		Neuer Reiter
 ANSI bright blue color	Terminal AppearancePrefView		ANSI-Farbe Hellblau
 Allow bold text	Terminal AppearancePrefView		Text in Fettschrift zulassen
-Window title…	Terminal TermWindow		Fenstertitel…
+Window title…	Terminal TermWindow		Fenstertitel …
 Blue	Terminal colors scheme		Blau
 Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" kann nicht ausgeführt werden:\n\t%error
 Open path	Terminal TermView		Pfad öffnen
@@ -73,7 +74,7 @@ Find previous	Terminal TermWindow		Rückwärts suchen
 Match case	Terminal FindWindow		Groß-/Kleinschreibung beachten
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Die Formel für Reitertitel. Folgende Variablen\nstehen zur Verfügung:
 Close	Terminal TermWindow		Schließen
-Save to file…	Terminal PrefWindow		In Datei speichern…
+Save to file…	Terminal PrefWindow		In Datei speichern …
 Background	Terminal AppearancePrefView		Hintergrund
 ANSI green color	Terminal AppearancePrefView		ANSI-Farbe Grün
 Copy path	Terminal TermView		Pfad kopieren
@@ -92,7 +93,7 @@ Default	Terminal colors scheme		Standard
 Window size:	Terminal AppearancePrefView		Fenstergröße
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Decrease	Terminal TermWindow		Verkleinern
-Settings…	Terminal TermWindow		Einstellungen...
+Settings…	Terminal TermWindow		Einstellungen ...
 ANSI bright white color	Terminal AppearancePrefView		ANSI-Farbe Hellweiß (Weiß)
 Blinking cursor	Terminal AppearancePrefView		Blinkender Cursor
 Cancel	Terminal SetTitleWindow		Abbrechen
@@ -117,12 +118,11 @@ Color:	Terminal AppearancePrefView		Farbe:
 Open link	Terminal TermView		Link öffnen
 Text	Terminal AppearancePrefView		Text
 Not found.	Terminal TermWindow		Nicht gefunden.
-Find…	Terminal TermWindow		Suchen...
+Find…	Terminal TermWindow		Suchen ...
 No search string was entered.	Terminal TermWindow		Es wurde kein Suchbegriff eingegeben.
 Text under cursor	Terminal AppearancePrefView		Text unter Cursor
 Move here	Terminal TermView		Hierher verschieben
 Abort	Terminal Shell		Abbrechen
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tArbeitsverzeichnis des gerade im aktuellen Reiter\n\t\t\tlaufenden Prozesses. Optional kann auch die maximale\n\t\t\tAnzahl der Pfadkomponenten angegeben werden.\n\t\t\tZum Beispiel: '%2d' für maximal zwei Komponenten.\n\t%T\t-\tName der Terminalanwendung in der aktuellen Systemsprache\n\t%T\t-\tKodierung des aktuellen Reiters. Unterdrückt bei UTF-8\n\t%i\t-\tLaufende Nummer des Fensters\n\t%p\t-\tName des laufenden Prozesses im aktuellen Reiter\n\t%t\t-\tTitel des aktuellen Reiters\n\t%%\t-\tDas Zeichen '%'
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Die folgenden Prozesse laufen noch:\n\n\t%1\n\n Wird das Terminal geschlossen, werden auch diese Prozesse abgebrochen.
 Set window title	Terminal TermWindow		Setze Fenstertitel
 Increase	Terminal TermWindow		Vergrößern

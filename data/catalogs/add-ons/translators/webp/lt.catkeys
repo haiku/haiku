@@ -1,22 +1,2 @@
-1	lithuanian	x-vnd.Haiku-WebPTranslator	3343078170
-Compression method:	ConfigView		Glaudinimo būdas:
-WebP image translator	ConfigView		„WebP“ paveikslų keitiklis
-Preset	ConfigView		Ruošinys
-WebP images	WebPTranslator		WebP paveikslai
-WebPTranslator Settings	ConfigView		WebP keitiklio nuostatos
-Output quality:	ConfigView		Išvesties kokybė:
+1	lithuanian	x-vnd.Haiku-WebPTranslator	1475550615
 WebP Settings	main		WebP nuostatos
-Text	ConfigView		Tekstas
-Slower but better	ConfigView		Lėtesnis, bet geresnis
-WebP image	WebPTranslator		WebP paveikslas
-Output preset:	ConfigView		Išvesties nuostatų ruošinys:
-Picture	ConfigView		Paveikslas
-Low	ConfigView		Žema
-High	ConfigView		Aukšta
-Drawing	ConfigView		Piešinys
-Default	ConfigView		Numatytasis
-Fast	ConfigView		Greitas
-Photo	ConfigView		Nuotrauka
-Preprocessing filter	ConfigView		Išankstinio apdorojimo filtras
-WebP image translator	WebPTranslator		„WebP“ paveikslų keitiklis
-Icon	ConfigView		Piktograma

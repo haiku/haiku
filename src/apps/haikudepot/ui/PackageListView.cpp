@@ -158,7 +158,7 @@ private:
 };
 
 
-// BRow for the PartitionListView
+// BRow for the PackageListView
 class PackageRow : public BRow {
 	typedef BRow Inherited;
 public:
@@ -857,7 +857,8 @@ PackageListView::PackageListView(Model* model)
 	fModel(model),
 	fPackageListener(new(std::nothrow) PackageListener(this)),
 	fRowByNameTable(new RowByNameTable()),
-	fWorkStatusView(NULL)
+	fWorkStatusView(NULL),
+	fIgnoreSelectionChanged(false)
 {
 	float scale = be_plain_font->Size() / 12.f;
 	float spacing = be_control_look->DefaultItemSpacing() * 2;
@@ -981,6 +982,9 @@ PackageListView::SelectionChanged()
 {
 	BColumnListView::SelectionChanged();
 
+	if (fIgnoreSelectionChanged)
+		return;
+
 	BMessage message(MSG_PACKAGE_SELECTED);
 
 	PackageRow* selected = dynamic_cast<PackageRow*>(CurrentSelection());
@@ -1046,6 +1050,8 @@ PackageListView::RemovePackage(const PackageInfoRef& package)
 void
 PackageListView::SelectPackage(const PackageInfoRef& package)
 {
+	fIgnoreSelectionChanged = true;
+
 	PackageRow* row = _FindRow(package);
 	BRow* selected = CurrentSelection();
 	if (row != selected)
@@ -1055,6 +1061,8 @@ PackageListView::SelectPackage(const PackageInfoRef& package)
 		SetFocusRow(row, false);
 		ScrollTo(row);
 	}
+
+	fIgnoreSelectionChanged = false;
 }
 
 

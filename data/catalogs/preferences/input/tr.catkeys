@@ -2,7 +2,7 @@
 Scrolling	TouchpadPrefView		Kaydırma
 Defaults	InputMouse		Öntanımlılar
 Long	KeyboardView		Uzun
-Cancel	TouchpadPrefView		İptal
+Cancel	TouchpadPrefView		Vazgeç
 4-Button	SettingsView		4 düğmeli
 Slow	TouchpadPrefView		Yavaş
 Tapping sensitivity	TouchpadPrefView		Hafifçe vurma duyarlılığı

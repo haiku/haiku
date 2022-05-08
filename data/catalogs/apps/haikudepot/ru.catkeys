@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3437352458
+1	russian	x-vnd.Haiku-HaikuDepot	4181156212
 Repository update error	LocalRepositoryUpdateProcess		Ошибка обновления репозитория
 Network error	ServerHelper		Ошибка сети
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Произошла ошибка при обновлении репозитория: %error%
@@ -94,7 +94,6 @@ Repository	PackageListView		Репозиторий
 The email is malformed.	UserLoginWindow		Неверный формат адреса электронной почты.
 Close	UserLoginWindow		Закрыть
 Close	RatePackageWindow		Закрыть
-An unexpected error has been sent from the server [%i]	ServerHelper		Сервер вернул неожиданная ошибку [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронизация данных пакетов репозитория '%REPO_NAME%'
 Settings	SettingsWindow		Настройки
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Произошла ошибка при скачивании условий использования необходимых для создания нового пользователя. \nДля получения более подробных сведений об ошибке можно запустить приложение из Терминала.
@@ -137,8 +136,8 @@ Source packages	MainWindow		Пакеты с исходным кодом
 -	no package size		-
 Problem with working files	App		Проблема с рабочими файлами
 Server error	ServerHelper		Ошибка сервера
-Try again	App		Попробовать снова
 Rate package	RatePackageWindow		Оценить пакет
+Try again	App		Попробовать снова
 Unknown	PackageListView		Неизвестно
 I agree to the usage conditions	UserLoginWindow		Я согласен с условиями использования
 Log in	UserLoginWindow		Войти
@@ -170,6 +169,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Слишком старая версия клиента
 Local repository load error	LocalPkgDataLoadProcess		Ошибка загрузки локального репозитория
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Пользователь не существует или введён неверный пароль. Проверьте свои учётные данные и попробуйте снова.
-9999.99 KiB	PackageListView		9999.99 КБ
 Repeat password:	UserLoginWindow		Повторите пароль:
 All repositories	MainWindow		Все репозитории

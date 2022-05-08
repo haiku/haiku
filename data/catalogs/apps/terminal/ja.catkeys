@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	4032760800
+1	japanese	x-vnd.Haiku-Terminal	247549485
 ANSI cyan color	Terminal AppearancePrefView		ANSI シアン
 Close other tabs	Terminal TermWindow		他のタブを閉じる
 Insert path	Terminal TermView		パスの挿入
@@ -20,6 +20,7 @@ Edit tab title…	Terminal TermWindow		タブタイトルの編集...
 Settings	Terminal TermWindow		設定
 Print	Terminal TermWindow		印刷
 %app% settings	Terminal PrefWindow	window title	%app% 設定
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\t動作中のプロセスの作業中フォルダー\n\t\t\tオプションでパスの最大要素数を指定できます。\n\t\t\t例. '%2d' は最大 2 つの要素を示します。\n\t%i\t-\tタブのインデックス\n\t%e\t-\tタブの文字コード。UTF-8 の場合は非表示です。\n\t%p\t-\tタブ内で実行中のプロセス名
 ANSI black color	Terminal AppearancePrefView		ANSI ブラック
 Use default	Terminal SetTitleWindow		デフォルトを使用
 Close tab	Terminal TermWindow		タブを閉じる
@@ -122,7 +123,6 @@ No search string was entered.	Terminal TermWindow		検索テキストが入力�
 Text under cursor	Terminal AppearancePrefView		カーソル位置の文字
 Move here	Terminal TermView		カレントディレクトリへ移動
 Abort	Terminal Shell		中断
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tThe アクティブなプロセスのカレントワーキングディレクトリ。\n\t\t\tオプションとして、パス要素の最大数を指定できます。\n\t\t\t例 '%2d' は最大 2 つの要素を示します。\n\t%i\t-\tタブのインデックス。\n\t%e\t-\t現在のタブの文字コード。UTF-8 の場合は表示されません。\n\t%p\t-\tアクティブなプロセス名。\n\t%%\t-\t文字 '%'.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		次のプロセスがまだ実行中です:\n\n\t%1\n\nターミナルを閉じると強制終了されます。
 Set window title	Terminal TermWindow		ウィンドウタイトルの設定
 Increase	Terminal TermWindow		拡大

@@ -61,7 +61,7 @@ Show optional packages	InstallerWindow		Показати опціональні 
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		Відсутні розділи, які придатні для інсталяції. Будь ласка, проведіть розмітку/настройку розділів і відформатуйте хоча б один розділ під файлову систему Be (BFS).
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Поточний диск має недостатньо місця. Виберіть інший диск або не встановлюйте необов’язкові елементи.
 Installation canceled.	InstallProgress		Інсталяція скасована.
-Stop	InstallerWindow		Зупинено
+Stop	InstallerWindow		Зупинити
 Cancel	InstallerWindow		Скасувати
 Continue	InstallerWindow	In alert after pressing Stop	Продовжити
 Scanning for disks…	InstallerWindow		Сканування дисків…

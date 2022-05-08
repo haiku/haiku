@@ -143,13 +143,25 @@ init_common(int device, bool isClone)
 	gInfo->pipe_count = 0;
 
 	// Allocate all of our pipes
-	for (int i = 0; i < MAX_PIPES; i++) {
+	int pipeCnt = 2;
+	if (gInfo->shared_info->device_type.Generation() >= 12)
+		pipeCnt = 4;
+	else if (gInfo->shared_info->device_type.Generation() >= 7)
+		pipeCnt = 3;
+
+	for (int i = 0; i < pipeCnt; i++) {
 		switch (i) {
 			case 0:
 				gInfo->pipes[i] = new(std::nothrow) Pipe(INTEL_PIPE_A);
 				break;
 			case 1:
 				gInfo->pipes[i] = new(std::nothrow) Pipe(INTEL_PIPE_B);
+				break;
+			case 2:
+				gInfo->pipes[i] = new(std::nothrow) Pipe(INTEL_PIPE_C);
+				break;
+			case 3:
+				gInfo->pipes[i] = new(std::nothrow) Pipe(INTEL_PIPE_D);
 				break;
 			default:
 				ERROR("%s: Unknown pipe %d\n", __func__, i);
@@ -289,7 +301,7 @@ probe_ports()
 
 	// Digital Display Interface (for DP, HDMI, DVI and eDP)
 	if (gInfo->shared_info->device_type.HasDDI()) {
-		for (int i = INTEL_PORT_B; i <= INTEL_PORT_F; i++) {
+		for (int i = INTEL_PORT_A; i <= INTEL_PORT_F; i++) {
 			TRACE("Probing DDI %d\n", i);
 
 			Port* ddiPort
@@ -306,6 +318,8 @@ probe_ports()
 		}
 	}
 
+#if 0
+	// never execute this as the 'standard' DisplayPort class called above already handles it.
 	if (!gInfo->shared_info->device_type.HasDDI()) {
 		// Ensure DP_A isn't already taken
 		TRACE("Probing eDP\n");
@@ -320,6 +334,7 @@ probe_ports()
 				delete eDPPort;
 		}
 	}
+#endif
 
 	if (!gInfo->shared_info->device_type.HasDDI()) {
 		for (int i = INTEL_PORT_B; i <= INTEL_PORT_D; i++) {

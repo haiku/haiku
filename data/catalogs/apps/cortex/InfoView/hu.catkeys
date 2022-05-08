@@ -1,4 +1,4 @@
-1	hungarian	application/x-vnd.Cortex.InfoView	1365951004
+1	hungarian	application/x-vnd.Cortex.InfoView	2382053937
 Offset	InfoView		Eltolás
 Description	DormantNodeInfoView		Leírás
 Byte order	InfoView		Bájt-sorrend
@@ -7,6 +7,7 @@ Output formats	DormantNodeInfoView		Kimeneti formátumok
 History	InfoView		Előzmény
 Input formats	DormantNodeInfoView		Bemeneti formátumok
 Signature	AppNodeInfoView		Aláírás
+Video data between	InfoView		‎Videoadatok a következők között:‎
 Any number	DormantNodeInfoView	For 'Max. instances' field	Bármely szám
 Flags	InfoView		Zászlók
 Media output	InfoView		Média kimenet
@@ -15,6 +16,7 @@ Buffer size	InfoView		Puffer mérete
 \n- Quality:	FileNodeInfoView		\n- Minőség:
 Kinds	LiveNodeInfoView		Fajták
 Application	AppNodeInfoView		Alkalmazás
+Flavor flags	DormantNodeInfoView		Zászlók
 Max. instances	DormantNodeInfoView		Maximális példány
 \n- Duration:	FileNodeInfoView		\n- Hossz:
 Dormant media node	DormantNodeInfoView		Alvó média csomópont
@@ -43,6 +45,7 @@ Format	InfoView		Formátum
 Version	AppNodeInfoView		Verzió
 AddOn ID	DormantNodeInfoView		Kiegészítő azonosító
 Frame size	InfoView		Képkocka mérete
+Flavor ID	DormantNodeInfoView		Azonosító
 Run mode	LiveNodeInfoView		Futás módja
 \n- Codec:	FileNodeInfoView		\n- Kódoló:
 Port	LiveNodeInfoView		Port

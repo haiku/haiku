@@ -10,13 +10,19 @@
 // TODO: split arch-depending code to per-arch source
 
 #include <arch_cpu_defs.h>
+#include <arch_dtb.h>
 #include <arch_smp.h>
 #include <arch/generic/debug_uart_8250.h>
 #if defined(__riscv)
 #	include <arch/riscv64/arch_uart_sifive.h>
-#elif defined(__ARM__) || defined(__aarch64__)
+#elif defined(__ARM__)
 #	include <arch/arm/arch_uart_pl011.h>
+#elif defined(__aarch64__)
+#	include <arch/arm/arch_uart_pl011.h>
+#	include <arch/arm64/arch_uart_linflex.h>
 #endif
+
+
 #include <boot/addr_range.h>
 #include <boot/platform.h>
 #include <boot/stage2.h>
@@ -41,14 +47,6 @@ extern "C" {
 static void* sDtbTable = NULL;
 static uint32 sDtbSize = 0;
 
-// TODO: gBootHart is riscy, move
-uint32 gBootHart = 0;
-static uint64 sTimerFrequency = 10000000;
-
-static addr_range sPlic = {0};
-static addr_range sClint = {0};
-
-
 static void WriteString(const char *str) {dprintf("%s", str);}
 static void WriteLn() {dprintf("\n");}
 static void WriteHex(uint64_t val, int n) {dprintf("%08" B_PRIx64, val);}
@@ -71,23 +69,16 @@ const struct supported_uarts {
 	{ "ns16550", UART_KIND_8250, &get_uart<DebugUART8250> },
 #if defined(__riscv)
 	{ "sifive,uart0", UART_KIND_SIFIVE, &get_uart<ArchUARTSifive> },
-#elif defined(__ARM__) || defined(__aarch64__)
+#elif defined(__ARM__)
 	{ "arm,pl011", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
+	{ "snps,dw-apb-uart", UART_KIND_8250, &get_uart<DebugUART8250> },
+	{ "brcm,bcm2835-aux-uart", UART_KIND_8250, &get_uart<DebugUART8250> }
+#elif defined(__aarch64__)
+	{ "arm,pl011", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
+	{ "fsl,s32-linflexuart", UART_KIND_LINFLEX, &get_uart<ArchUARTlinflex> },
+	{ "brcm,bcm2835-aux-uart", UART_KIND_8250, &get_uart<DebugUART8250> }
 #endif
 };
-
-
-#ifdef __ARM__
-const struct supported_interrupt_controllers {
-	const char*	dtb_compat;
-	const char*	kind;
-} kSupportedInterruptControllers[] = {
-	{ "arm,cortex-a9-gic", INTC_KIND_GICV1 },
-	{ "arm,cortex-a15-gic", INTC_KIND_GICV2 },
-	{ "ti,omap3-intc", INTC_KIND_OMAP3 },
-	{ "marvell,pxa-intc", INTC_KIND_PXA },
-};
-#endif
 
 
 static void WriteStringList(const char* prop, size_t size)
@@ -295,8 +286,8 @@ static void DumpFdt(const void *fdt)
 
 
 
-static bool
-HasFdtString(const char* prop, int size, const char* pattern)
+bool
+dtb_has_fdt_string(const char* prop, int size, const char* pattern)
 {
 	int patternLen = strlen(pattern);
 	const char* propEnd = prop + size;
@@ -310,19 +301,58 @@ HasFdtString(const char* prop, int size, const char* pattern)
 }
 
 
-static bool
-GetReg(const void* fdt, int node, uint32 addressCells, uint32 sizeCells, size_t idx, addr_range& range)
+uint32
+dtb_get_address_cells(const void* fdt, int node)
 {
+	uint32 res = 2;
+
+	int parent = fdt_parent_offset(fdt, node);
+	if (parent < 0)
+		return res;
+
+	uint32 *prop = (uint32*)fdt_getprop(sDtbTable, parent, "#address-cells", NULL);
+	if (prop == NULL)
+		return res;
+
+	res = fdt32_to_cpu(*prop);
+	return res;
+}
+
+
+uint32
+dtb_get_size_cells(const void* fdt, int node)
+{
+	uint32 res = 1;
+
+	int parent = fdt_parent_offset(fdt, node);
+	if (parent < 0)
+		return res;
+
+	uint32 *prop = (uint32*)fdt_getprop(sDtbTable, parent, "#size-cells", NULL);
+	if (prop == NULL)
+		return res;
+
+	res = fdt32_to_cpu(*prop);
+	return res;
+}
+
+
+bool
+dtb_get_reg(const void* fdt, int node, size_t idx, addr_range& range)
+{
+	uint32 addressCells = dtb_get_address_cells(fdt, node);
+	uint32 sizeCells = dtb_get_size_cells(fdt, node);
+
 	int propSize;
 	const uint8* prop = (const uint8*)fdt_getprop(fdt, node, "reg", &propSize);
 	if (prop == NULL)
 		return false;
 
-	size_t entrySize = 4*(addressCells + sizeCells);
-	if ((idx + 1)*entrySize > (size_t)propSize)
+	size_t entrySize = 4 * (addressCells + sizeCells);
+	if ((idx + 1) * entrySize > (size_t)propSize)
 		return false;
 
-	prop += idx*entrySize;
+	prop += idx * entrySize;
 
 	switch (addressCells) {
 		case 1: range.start = fdt32_to_cpu(*(uint32*)prop); prop += 4; break;
@@ -334,12 +364,57 @@ GetReg(const void* fdt, int node, uint32 addressCells, uint32 sizeCells, size_t 
 		case 2: range.size = fdt64_to_cpu(*(uint64*)prop); prop += 8; break;
 		default: panic("unsupported sizeCells");
 	}
+
+	int parent = fdt_parent_offset(fdt, node);
+	if (parent >= 0) {
+		uint32 parentAddressCells = dtb_get_address_cells(fdt, parent);
+
+		uint32 rangesSize = 0;
+		uint32 *ranges = (uint32 *)fdt_getprop(fdt, parent, "ranges", (int *)&rangesSize);
+		if (ranges == NULL)
+			return true;
+
+		uint32 rangesPos = 0;
+		while (rangesSize >= (rangesPos + parentAddressCells + addressCells + sizeCells)) {
+			addr_t childAddress;
+			addr_t parentAddress;
+			size_t rangeSize;
+
+			if (addressCells == 1) {
+				childAddress = fdt32_to_cpu(*(uint32*)(ranges+rangesPos));
+			} else {
+				childAddress = fdt64_to_cpu(*(uint64*)(ranges+rangesPos));
+			}
+			rangesPos += addressCells;
+
+			if (parentAddressCells == 1) {
+				parentAddress = fdt32_to_cpu(*(uint32*)(ranges+rangesPos));
+			} else {
+				parentAddress = fdt64_to_cpu(*(uint64*)(ranges+rangesPos));
+			}
+			rangesPos += parentAddressCells;
+
+			if (sizeCells == 1) {
+				rangeSize = fdt32_to_cpu(*(uint32*)(ranges+rangesPos));
+			} else {
+				rangeSize = fdt64_to_cpu(*(uint64*)(ranges+rangesPos));
+			}
+			rangesPos += sizeCells;
+
+			if ((range.start >= childAddress) && (range.start <= childAddress + rangeSize)) {
+				range.start -= childAddress;
+				range.start += parentAddress;
+				break;
+			}
+		}
+	}
+
 	return true;
 }
 
 
-static uint32
-GetInterruptParent(const void* fdt, int node)
+static int
+dtb_get_interrupt_parent(const void* fdt, int node)
 {
 	while (node >= 0) {
 		uint32* prop;
@@ -357,10 +432,10 @@ GetInterruptParent(const void* fdt, int node)
 
 
 static uint32
-GetInterruptCells(const void* fdt, int node)
+dtb_get_interrupt_cells(const void* fdt, int node)
 {
-	uint32 intc_node = GetInterruptParent(fdt, node);
-	if (intc_node > 0) {
+	int intc_node = dtb_get_interrupt_parent(fdt, node);
+	if (intc_node >= 0) {
 		uint32* prop = (uint32*)fdt_getprop(fdt, intc_node, "#interrupt-cells", NULL);
 		if (prop != NULL) {
 			return fdt32_to_cpu(*prop);
@@ -372,9 +447,9 @@ GetInterruptCells(const void* fdt, int node)
 
 
 static uint32
-GetInterrupt(const void* fdt, int node)
+dtb_get_interrupt(const void* fdt, int node)
 {
-	uint32 interruptCells = GetInterruptCells(fdt, node);
+	uint32 interruptCells = dtb_get_interrupt_cells(fdt, node);
 
 	if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "interrupts-extended", NULL)) {
 		return fdt32_to_cpu(*(prop + 1));
@@ -392,7 +467,7 @@ GetInterrupt(const void* fdt, int node)
 
 
 static int64
-GetClockFrequency(const void* fdt, int node)
+dtb_get_clock_frequency(const void* fdt, int node)
 {
 	uint32* prop;
 	int len = 0;
@@ -419,43 +494,9 @@ GetClockFrequency(const void* fdt, int node)
 
 
 static void
-HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
+dtb_handle_fdt(const void* fdt, int node)
 {
-	const char* name = fdt_get_name(fdt, node, NULL);
-	if (strcmp(name, "chosen") == 0) {
-		if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "boot-hartid", NULL))
-			gBootHart = fdt32_to_cpu(*prop);
-	} else if (strcmp(name, "cpus") == 0) {
-		if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "timebase-frequency", NULL))
-			sTimerFrequency = fdt32_to_cpu(*prop);
-	}
-
-	const char* deviceType = (const char*)fdt_getprop(fdt, node,
-		"device_type", NULL);
-
-	if (deviceType != NULL) {
-		if (strcmp(deviceType, "cpu") == 0) {
-			// TODO: improve incompatible CPU detection
-			if (!(fdt_getprop(fdt, node, "mmu-type", NULL) != NULL))
-				return;
-			platform_cpu_info* info;
-			arch_smp_register_cpu(&info);
-			if (info == NULL)
-				return;
-			info->id = fdt32_to_cpu(*(uint32*)fdt_getprop(fdt, node,
-				"reg", NULL));
-			dprintf("cpu\n");
-			dprintf("  id: %" B_PRIu32 "\n", info->id);
-
-			int subNode = fdt_subnode_offset(fdt, node, "interrupt-controller");
-			if (subNode < 0) {
-				dprintf("  [!] no interrupt controller\n");
-			} else {
-				info->phandle = fdt_get_phandle(fdt, subNode);
-				dprintf("  phandle: %" B_PRIu32 "\n", info->phandle);
-			}
-		}
-	}
+	arch_handle_fdt(fdt, node);
 
 	int compatibleLen;
 	const char* compatible = (const char*)fdt_getprop(fdt, node,
@@ -464,50 +505,19 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
 	if (compatible == NULL)
 		return;
 
-	if (HasFdtString(compatible, compatibleLen, "riscv,clint0")) {
-		GetReg(fdt, node, addressCells, sizeCells, 0, sClint);
-		return;
-	}
-
-	if (HasFdtString(compatible, compatibleLen, "riscv,plic0")
-		|| HasFdtString(compatible, compatibleLen, "sifive,plic-1.0.0")) {
-		GetReg(fdt, node, addressCells, sizeCells, 0, sPlic);
-		int propSize;
-		if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "interrupts-extended", &propSize)) {
-			dprintf("PLIC contexts\n");
-			uint32 contextId = 0;
-			for (uint32 *it = prop; (uint8_t*)it - (uint8_t*)prop < propSize; it += 2) {
-				uint32 phandle = fdt32_to_cpu(*it);
-				uint32 interrupt = fdt32_to_cpu(*(it + 1));
-				if (interrupt == sExternInt) {
-					platform_cpu_info* cpuInfo = arch_smp_find_cpu(phandle);
-					dprintf("  context %" B_PRIu32 ": %" B_PRIu32 "\n", contextId, phandle);
-					if (cpuInfo != NULL) {
-						cpuInfo->plicContext = contextId;
-						dprintf("    cpu id: %" B_PRIu32 "\n", cpuInfo->id);
-					}
-				}
-				contextId++;
-			}
-		}
-		return;
-	}
-
-	// TODO: We should check for the "chosen" uart and prioritize that one
-
 	// check for a uart if we don't have one
 	uart_info &uart = gKernelArgs.arch_args.uart;
 	if (uart.kind[0] == 0) {
 		for (uint32 i = 0; i < B_COUNT_OF(kSupportedUarts); i++) {
-			if (HasFdtString(compatible, compatibleLen,
+			if (dtb_has_fdt_string(compatible, compatibleLen,
 					kSupportedUarts[i].dtb_compat)) {
 
 				memcpy(uart.kind, kSupportedUarts[i].kind,
 					sizeof(uart.kind));
 
-				GetReg(fdt, node, addressCells, sizeCells, 0, uart.regs);
-				uart.irq = GetInterrupt(fdt, node);
-				uart.clock = GetClockFrequency(fdt, node);
+				dtb_get_reg(fdt, node, 0, uart.regs);
+				uart.irq = dtb_get_interrupt(fdt, node);
+				uart.clock = dtb_get_clock_frequency(fdt, node);
 
 				gUART = kSupportedUarts[i].uart_driver_init(uart.regs.start,
 					uart.clock);
@@ -517,25 +527,34 @@ HandleFdt(const void* fdt, int node, uint32 addressCells, uint32 sizeCells)
 		if (gUART != NULL)
 			gUART->InitEarly();
 	}
+}
 
-#if defined(__ARM__)
-	intc_info &interrupt_controller = gKernelArgs.arch_args.interrupt_controller;
-	if (interrupt_controller.kind[0] == 0) {
-		for (uint32 i = 0; i < B_COUNT_OF(kSupportedInterruptControllers); i++) {
-			if (HasFdtString(compatible, compatibleLen,
-				kSupportedInterruptControllers[i].dtb_compat)) {
 
-				memcpy(interrupt_controller.kind, kSupportedInterruptControllers[i].kind,
-					sizeof(interrupt_controller.kind));
+static void
+dtb_handle_chosen_node(const void *fdt)
+{
+	int chosen = fdt_path_offset(fdt, "/chosen");
+	if (chosen < 0)
+		return;
 
-				GetReg(fdt, node, addressCells, sizeCells, 0,
-					interrupt_controller.regs1);
-				GetReg(fdt, node, addressCells, sizeCells, 1,
-					interrupt_controller.regs2);
-			}
-		}
-	}
-#endif
+	int len;
+	const char *stdoutPath = (const char *)fdt_getprop(fdt, chosen, "stdout-path", &len);
+	if (stdoutPath == NULL)
+		return;
+
+	// stdout-path can optionally contain a ":" separator character
+	// The part after the ":" character specifies the UART configuration
+	// We can ignore it here as the UART should be already initialized
+	// by the UEFI firmware (e.g. U-Boot or TianoCore)
+
+	char *separator = strchr(stdoutPath, ':');
+	int namelen = (separator == NULL) ? len - 1 : separator - stdoutPath;
+
+	int stdoutNode = fdt_path_offset_namelen(fdt, stdoutPath, namelen);
+	if (stdoutNode < 0)
+		return;
+
+	dtb_handle_fdt(fdt, stdoutNode);
 }
 
 
@@ -571,10 +590,12 @@ dtb_init()
 		if (false)
 			DumpFdt(sDtbTable);
 
+		dtb_handle_chosen_node(sDtbTable);
+
 		int node = -1;
 		int depth = -1;
 		while ((node = fdt_next_node(sDtbTable, node, &depth)) >= 0 && depth >= 0) {
-			HandleFdt(sDtbTable, node, 2, 2);
+			dtb_handle_fdt(sDtbTable, node);
 		}
 		break;
 	}
@@ -586,7 +607,6 @@ dtb_set_kernel_args()
 {
 	// pack into proper location if the architecture cares
 	if (sDtbTable != NULL) {
-		#if defined(__ARM__) || defined(__riscv)
 		// libfdt requires 8-byte alignment
 		gKernelArgs.arch_args.fdt = (void*)(addr_t)kernel_args_malloc(sDtbSize, 8);
 
@@ -594,45 +614,18 @@ dtb_set_kernel_args()
 			memcpy(gKernelArgs.arch_args.fdt, sDtbTable, sDtbSize);
 		else
 			ERROR("unable to malloc for fdt!\n");
-		#endif
 	}
 
-#ifdef __riscv
-	dprintf("bootHart: %" B_PRIu32 "\n", gBootHart);
-	dprintf("timerFrequency: %" B_PRIu64 "\n", sTimerFrequency);
-	gKernelArgs.arch_args.timerFrequency = sTimerFrequency;
-
-//	gKernelArgs.arch_args.htif  = {.start = 0x40008000, .size = 0x10};
-	gKernelArgs.arch_args.htif  = {.start = 0, .size = 0};
-	gKernelArgs.arch_args.plic  = sPlic;
-	gKernelArgs.arch_args.clint = sClint;
-#endif
-#if defined(__ARM__) || defined(__riscv)
 	uart_info &uart = gKernelArgs.arch_args.uart;
 	dprintf("Chosen UART:\n");
 	if (uart.kind[0] == 0) {
 		dprintf("kind: None!\n");
 	} else {
-		dprintf("  kind: %s", uart.kind);
-		dprintf("\n");
+		dprintf("  kind: %s\n", uart.kind);
 		dprintf("  regs: %#" B_PRIx64 ", %#" B_PRIx64 "\n", uart.regs.start, uart.regs.size);
 		dprintf("  irq: %" B_PRIu32 "\n", uart.irq);
 		dprintf("  clock: %" B_PRIu64 "\n", uart.clock);
 	}
-#endif
-#if defined(__ARM__)
-	intc_info &interrupt_controller = gKernelArgs.arch_args.interrupt_controller;
-	dprintf("Chosen interrupt controller:\n");
-	if (interrupt_controller.kind[0] == 0) {
-		dprintf("kind: None!\n");
-	} else {
-		dprintf("  kind: %s\n", interrupt_controller.kind);
-		dprintf("  regs: %#" B_PRIx64 ", %#" B_PRIx64 "\n",
-			interrupt_controller.regs1.start,
-			interrupt_controller.regs1.size);
-		dprintf("        %#" B_PRIx64 ", %#" B_PRIx64 "\n",
-			interrupt_controller.regs2.start,
-			interrupt_controller.regs2.size);
-	}
-#endif
+
+	arch_dtb_set_kernel_args();
 }

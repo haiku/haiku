@@ -19,7 +19,7 @@ typedef struct accelerant_info {
 	area_id				mode_list_area;
 		// cloned list of standard display modes
 	display_mode		*mode_list;
-	uint16				current_mode;
+	int16				current_mode; // index in the mode_list, or -1 if using a custom mode
 
 	vesa_mode			*vesa_modes;
 } accelerant_info;

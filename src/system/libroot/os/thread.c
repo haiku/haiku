@@ -184,6 +184,13 @@ wait_for_thread(thread_id thread, status_t *_returnCode)
 
 
 status_t
+wait_for_thread_etc(thread_id thread, uint32 flags, bigtime_t timeout, status_t *_returnCode)
+{
+	return _kern_wait_for_thread_etc(thread, flags, timeout, _returnCode);
+}
+
+
+status_t
 on_exit_thread(void (*callback)(void *), void *data)
 {
 	callback_node **head = (callback_node **)tls_address(TLS_ON_EXIT_THREAD_SLOT);

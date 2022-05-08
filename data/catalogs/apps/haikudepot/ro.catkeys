@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	3437352458
+1	romanian	x-vnd.Haiku-HaikuDepot	1504929345
 Repository update error	LocalRepositoryUpdateProcess		Eroare de actualizare a depozitului
 Network error	ServerHelper		Eroare de rețea
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		A apărut o eroare la reîmprospătarea depozitului: %error%
@@ -8,6 +8,7 @@ Uninstalled	PackageListView		Dezinstalat
 It was not possible to create the new user.	UserLoginWindow		Nu a fost posibil să se creeze utilizatorul nou.
 Available packages	MainWindow		Pachete disponibile
 Create account	UserLoginWindow		Creează un cont
+Install %PackageTitle%	PackageManager		Instalează %PackageTitle%
 OK	App		OK
 The response to the captcha was incorrect.	ServerHelper		Răspunsul la captcha nu a fost corect.
 Develop packages	MainWindow		Pachete de dezvoltare
@@ -94,7 +95,6 @@ Repository	PackageListView		Depozit
 The email is malformed.	UserLoginWindow		Emailul este deformat.
 Close	UserLoginWindow		Închide
 Close	RatePackageWindow		Închide
-An unexpected error has been sent from the server [%i]	ServerHelper		O eroare neașteptată a fost trimisă de la serverul [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronizează datele pachetelor pentru depozitul „%REPO_NAME%”
 Settings	SettingsWindow		Configurări
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		A apărut o eroare la descărcarea condițiilor de utilizare necesare pentru a crea unui nou utilizator. Verificați istoricul pentru detalii și încercați din nou. \nInformații despre modul de vizualizare a istoricului sunt disponibile în secțiunea HaikuDepot a Ghidului utilizatorului Haiku.
@@ -123,6 +123,7 @@ Status	PackageListView		Stare
 The password has been incorrectly repeated.	UserLoginWindow		Parola nu a fost repetată corect.
 Network transport error	ServerHelper		Eroare de transport în rețea
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Parola furnizată anterior pentru utilizatorul [%Nickname%] nu este validă în prezent. Utilizatorul va fi deconectat de la această aplicație și ar trebui să vă autentificați din nou cu parola actualizată.
+Uninstall %PackageTitle%	PackageManager		Dezinstalează %PackageTitle%
 Update	RatePackageWindow		Actualizare
 OK	ServerHelper		OK
 Language	UserLoginWindow		Limbă
@@ -137,8 +138,8 @@ Source packages	MainWindow		Pachete sursă
 -	no package size		-
 Problem with working files	App		Problemă cu fișierele de lucru
 Server error	ServerHelper		Eroare de server
-Try again	App		Încearcă din nou
 Rate package	RatePackageWindow		Evaluați pachetul
+Try again	App		Încearcă din nou
 Unknown	PackageListView		Necunoscut
 I agree to the usage conditions	UserLoginWindow		Sunt de acord cu condițiile de utilizare
 Log in	UserLoginWindow		Autentificare
@@ -170,6 +171,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Versiunea clientului este prea veche
 Local repository load error	LocalPkgDataLoadProcess		Eroare de încărcare a depozitului local
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Utilizatorul nu există sau a fost furnizată o parolă greșită. Verificați-vă certificările și încercați din nou.
-9999.99 KiB	PackageListView		9999.99 KiO
 Repeat password:	UserLoginWindow		Repetați parola:
 All repositories	MainWindow		Toate depozitele

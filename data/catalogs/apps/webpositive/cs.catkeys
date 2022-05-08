@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-WebPositive	250728390
+1	czech	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Ověření vyžadováno
 Previous	WebPositive Window		Předchozí
 (Finish: %date)	Download Window		(Dokončeno: %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		Otevřít nahrazenou složku
 Find previous	WebPositive Window		Najít předchozí
 Full screen	WebPositive Window		Celá obrazovka
 Downloads in progress	WebPositive		Stahování probíhá
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Chcete otevřít %addedCount záložek naráz?
 Copy URL to clipboard	Download Window		Zkopírovat adresu URL do schránky
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Chcete otevřít %addedCount záložek naráz?
 Clone current page	Settings Window		Duplikovat tuto stránku
 Start page:	Settings Window		Úvodní stránka:
 Cancel	Download Window		Zrušit
@@ -45,17 +45,19 @@ New tabs:	Settings Window		Nové karty:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url se nepodařilo načíst
 Open downloads folder	Download Window		Otevřít složku stahování
 Proxy server	Settings Window		Proxy server
+Darn!	WebPositive		Zpropadeně!
 Decrease size	WebPositive Window		Zmenšit velikost
 Default fixed font size:	Settings Window		Výchozí velikost proporcionálního písma:
 Sans serif font:	Settings Window		Bezpatkové písmo:
 Clear	WebPositive Window		Vyčistit
-Cookies for %s	Cookie Manager		Sušenky pro %s
 The download could not be opened.	Download Window		Stahování se nepodařilo otevřít.
+Cookies for %s	Cookie Manager		Sušenky pro %s
 Close	Download Window		Zavřít
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Hledat výraz
 Reload	WebPositive Window		Obnovit
 Expiration	Cookie Manager		Expirace
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Váš procesor je moc starý a nepodporuje rozšíření SSE2, bez kterého WebPositive nemaká. Doporučujeme raději nainstalovat NetSurf.
 Download finished	Download Window		Stahování dokončeno
 Cookie manager	WebPositive Window		Správce sušenek
 OK	Authentication Panel		OK
@@ -111,8 +113,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Pokračovat ve stahování
 Proxy server requires authentication	Settings Window		Proxy server vyžaduje ověření
 Cancel	Settings Window		Zrušit
-History	WebPositive Window		Historie
 Reset size	WebPositive Window		Obnovit velikost
+History	WebPositive Window		Historie
 Do you really want to clear the browsing history?	WebPositive Window		Opravdu smazat historii prohlížení?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Najít další výskyt hledaného textu
 Fixed font:	Settings Window		Proporcionální písmo:
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Spouštění:
 Confirmation	WebPositive Window		Potvrzení
 Session cookie	Cookie Manager		Sušenky relace
+No SSE2 support	WebPositive		Žádná podpora SSE2
 Open all	WebPositive Window		Otevřít všechny
 Cut	WebPositive Window		Vyjmout
 Downloads	Download Window		Stažené

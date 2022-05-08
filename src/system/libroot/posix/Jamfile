@@ -17,6 +17,14 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		} else {
 			PWD_BACKEND = pwd.cpp grp.cpp shadow.cpp user_group_common.cpp ;
 		}
+
+
+		local threadsLib = threads.c ;
+		if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 1 {
+			# the threads library is not available on gcc2
+			threadsLib = ;
+		}
+
 		MergeObject <$(architecture)>posix_main.o :
 			assert.cpp
 			dlfcn.c
@@ -29,13 +37,14 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			inttypes.c
 			libgen.cpp
 			nftw.c
-			poll.c
+			poll.cpp
 			$(PWD_BACKEND)
 			scheduler.cpp
 			semaphore.cpp
 			spawn.cpp
 			syslog.cpp
 			termios.c
+			$(threadsLib)
 			utime.c
 			utmpx.cpp
 			;

@@ -79,6 +79,9 @@ uint32 gTimeConversionFactor;
 	// if the TSC just isn't stable and we can't get our desired error range.
 
 
+#ifdef __SIZEOF_INT128__
+typedef unsigned __int128 uint128;
+#else
 struct uint128 {
 	uint128(uint64 low, uint64 high = 0)
 		:
@@ -178,6 +181,7 @@ private:
 	uint64	low;
 	uint64	high;
 };
+#endif
 
 
 static inline void

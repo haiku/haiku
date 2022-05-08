@@ -1,10 +1,8 @@
-1	indonesian	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		Menulis trek audio: %d%% lengkap
+1	indonesian	x-vnd.Haiku-MediaConverter	1322040280
 Input file not recognized as Audio or Video	MediaConverter		Berkas masukan tidak dikenali sebagai Audio atau Video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Kualitas video: %3d%%
 Source files	MediaConverter		Berkas sumber
-Error writing video frame %ld	MediaConverter		Ada kesalahan menulis frame video %ld
 Error converting '%filename'	MediaConverter		Ada galat saat mengonversi '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Direktori yang dipilih tidak ditemukan. Atur standar ke /boot/home
 Conversion completed	MediaConverter		Konversi selesai
@@ -43,7 +41,6 @@ Error loading files	MediaConverter		Ada galat saat memuat berkas
 End   [ms]: 	MediaConverter		Akhir [ms]: 
 Cancel	MediaConverter		Batalkan
 OK	MediaConverter-FileInfo		OKE
-Error read audio frame %ld	MediaConverter		Ada kesalahan baca frame audio %ld
 Video encoding:	MediaConverter		Enkode video:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ada galat saat membaca info file.\n\nGalat : 
 Error	MediaConverter		Kesalahan
@@ -57,11 +54,9 @@ Duration:	MediaConverter-FileInfo		Durasi:
 MediaConverter	System name		MediaConverter
 Error launching: %strError%	MediaConverter		Kesalahan peluncuran: %strError%
 File format:	MediaConverter		Format berkas:
-Error writing audio frame %ld	MediaConverter		Kesalahan menulis frame audio %ld
 File	Menu		Berkas
 Video quality not supported	MediaConverter		Kualitas video tidak didukung
 Select this folder	MediaConverter		Pilih folder ini
-Error read video frame %ld	MediaConverter		Ada kesalahan baca frame video %ld
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanal
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Tak ada video
@@ -69,6 +64,5 @@ Continue	MediaConverter		Lanjutkan
 Convert	MediaConverter		Mengkonversi
 Audio quality not supported	MediaConverter		Kualitas audio tidak didukung
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Ada galat menulis ke lokasi: %strPath%. Membuat standar ke lokasi: /boot/home
-Writing video track: %d%% complete	MediaConverter		Menulis trek video: %d%% lengkap
 Preview	MediaConverter		Pratinjau
 Start [ms]: 	MediaConverter		Mulai [ms]: 

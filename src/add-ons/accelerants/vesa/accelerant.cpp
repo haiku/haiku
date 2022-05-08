@@ -184,13 +184,31 @@ status_t
 vesa_get_accelerant_device_info(accelerant_device_info *info)
 {
 	info->version = B_ACCELERANT_VERSION;
-	strcpy(info->name, "VESA Driver");
-	strcpy(info->chipset, "VESA");
-		// ToDo: provide some more insight here...
+
+	strcpy(info->name, "VESA driver");
+	if (gInfo->shared_info->name[0] != '\0') {
+		strlcpy(info->chipset, gInfo->shared_info->name, 32);
+	} else {
+		switch (gInfo->shared_info->bios_type) {
+			case kIntelBiosType:
+				strcpy(info->chipset, "Intel");
+				break;
+			case kNVidiaBiosType:
+				strcpy(info->chipset, "nVidia");
+				break;
+			case kAtomBiosType1:
+			case kAtomBiosType2:
+				strcpy(info->chipset, "AMD/ATI Atombios");
+				break;
+			default:
+				strcpy(info->chipset, "Generic VESA");
+				break;
+		}
+	}
 	strcpy(info->serial_no, "None");
 
+	info->memory = gInfo->shared_info->vram_size;
 #if 0
-	info->memory = ???
 	info->dac_speed = ???
 #endif
 

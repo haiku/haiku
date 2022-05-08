@@ -1,25 +1,25 @@
 1	hungarian	x-vnd.Haiku-WebPTranslator	828165164
-©2010-2017 Haiku Inc.	ConfigView		© 2010-2017 Haiku Inc.
-Compression method:	ConfigView		Tömörítés módja:
-WebP image translator	ConfigView		WebP kép értelmező
-Preset	ConfigView		Beállítások
-WebP images	WebPTranslator		WebP kép
-WebPTranslator Settings	ConfigView		WebP értelmező beállításai
-Output quality:	ConfigView		Kimenet minősége:
-©2010-2017 Google Inc.	ConfigView		© 2010-2017 Google Inc.
-WebP Settings	main		WebP beállítások
-Text	ConfigView		Szöveg
-Slower but better	ConfigView		Lassabb, de jobb
-WebP image	WebPTranslator		WebP kép
-Output preset:	ConfigView		Kimeneti beállítások:
-Picture	ConfigView		Kép
-Low	ConfigView		Alacsony
 High	ConfigView		Magas
-Drawing	ConfigView		Rajz
-Based on libwebp %version%	ConfigView		libwebp %version% alapján
-Default	ConfigView		Alapérték
-Fast	ConfigView		Gyors
+WebPTranslator Settings	ConfigView		WebPTranslator beállítások
+Low	ConfigView		Alacsony
+WebP image translator	ConfigView		WebP-kép értelmező
 Photo	ConfigView		Fotó
-Preprocessing filter	ConfigView		Előfeldolgozó szűrő
-WebP image translator	WebPTranslator		WebP kép értelmező
+WebP image translator	WebPTranslator		WebP-kép értelmező
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Picture	ConfigView		Kép
+Default	ConfigView		‎Alapértelmezett‎
+Text	ConfigView		Szöveg
+Preprocessing filter	ConfigView		‎Előfeldolgozási szűrő‎
+Compression method:	ConfigView		‎Tömörítési módszer:‎
+Preset	ConfigView		‎Előre beállít‎ott
+Drawing	ConfigView		Rajz
+Output preset:	ConfigView		‎Kimeneti beállítás:‎
+WebP Settings	main		WebP beállítások
 Icon	ConfigView		Ikon
+WebP image	WebPTranslator		WebP kép
+Output quality:	ConfigView		Kimeneti minőség:
+Slower but better	ConfigView		Lassabb, de jobb
+Based on libwebp %version%	ConfigView		libwebp %version% alapján
+Fast	ConfigView		Gyors
+WebP images	WebPTranslator		WebP képek

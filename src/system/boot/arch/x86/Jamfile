@@ -1,9 +1,25 @@
 SubDir HAIKU_TOP src system boot arch x86 ;
 
+local defines = $(DEFINES) ;
+
 local platform ;
 for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 	on $(platform) {
+		SubDirHdrs $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) ;
+
+		DEFINES = $(defines) ;
 		DEFINES += _BOOT_MODE ;
+
+		if $(TARGET_BOOT_PLATFORM) = efi {
+			if $(TARGET_ARCH) = x86_64 {
+				DEFINES += BOOT_SUPPORT_ELF64 ;
+			} else {
+				DEFINES += BOOT_SUPPORT_ELF32 ;
+			}
+		} else {
+			DEFINES += BOOT_SUPPORT_ELF64 ;
+			DEFINES += BOOT_SUPPORT_ELF32 ;
+		}
 
 		local kernelArchSources =
 			arch_elf.cpp
@@ -29,6 +45,7 @@ for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 			$(kernelLibArchSpecificSources)
 			$(librootOsArchSources)
 			arch_cpu.cpp
+			arch_hpet.cpp
 			: -std=c++11 # additional flags
 		;
 

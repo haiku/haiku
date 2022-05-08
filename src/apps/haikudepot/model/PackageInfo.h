@@ -337,8 +337,8 @@ public:
 			int32				CountScreenshots() const;
 			const BitmapRef		ScreenshotAtIndex(int32 index) const;
 
-			void				SetSize(int64 size);
-			int64				Size() const
+			void				SetSize(off_t size);
+			off_t				Size() const
 									{ return fSize; }
 
 			void				SetViewed();
@@ -398,7 +398,7 @@ private:
 			BString				fArchitecture;
 			BString				fLocalFilePath;
 			BString				fFileName;
-			int64				fSize;
+			off_t				fSize;
 			BString				fDepotName;
 			bool				fViewed;
 

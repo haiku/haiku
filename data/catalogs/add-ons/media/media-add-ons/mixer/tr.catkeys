@@ -1,27 +1,24 @@
-1	turkish	x-vnd.Haiku-mixer.media_addon	3450667169
-Input gain controls represent	AudioMixer		Girdi kazanım denetimleri şunu yansıtmakta:
-Linear interpolation	AudioMixer		Doğrusal aradeğerleme
-Virtual output channels	AudioMixer		Sanal çıktı kanalları
-Refuse output format changes	AudioMixer		Çıktı biçimi değişimlerini reddet
-Output mapping	AudioMixer		Çıktı eşleme
-Allow input channel remapping	AudioMixer		Girdi kanalı yeniden eşlemesine izin ver
-Resampling algorithm	AudioMixer		Yeniden örnekleme algoritması
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Karıştırıcı çıktısını 3dB azalt (BeOS R5'teki gibi)
-Display balance control for stereo connections	AudioMixer		Çift kanallı bağlantılar için denge denetimini göster
+1	turkish	x-vnd.Haiku-mixer.media_addon	275473112
+Input mapping	AudioMixer		Girdi eşleme
+High quality (linear interpolation)	AudioMixer		Yüksek kalite (doğrusal aradeğerleme)
 To output	AudioMixer		Çıktıya
+Gain	AudioMixer		Kazanım
+To master	AudioMixer		Ana denetleyiciye
 not connected	AudioMixer		bağlı değil
-Refuse input format changes	AudioMixer		Girdi biçimi değişikliklerini reddet
-Drop/repeat samples	AudioMixer		Örnekleri bırak/tekrar et
-Output channel sources	AudioMixer		Çıktı kanalı kaynakları
+Master output	AudioMixer		Ana çıktı
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Kazanım ayarları
-Input mapping	AudioMixer		Girdi eşleme
-Mute	AudioMixer		Sessiz
-Input channel destinations	AudioMixer		Girdi kanalı hedefleri
-To master	AudioMixer		Ana denetleyiciye
-Master output	AudioMixer		Ana çıktı
+Low quality (drop/repeat samples)	AudioMixer		Düşük kalite (örneklemeleri bırak/yinele)
+Output channel sources	AudioMixer		Çıktı kanalı kaynakları
+Allow input channel remapping	AudioMixer		Girdi kanalı yeniden eşlemesine izin ver
+Display balance control for stereo connections	AudioMixer		Çift kanallı bağlantılar için denge denetimini göster
 Setup	AudioMixer		Kurulum
-Use non linear gain sliders (like BeOS R5)	AudioMixer		Doğrusal olmayan kazanım kaydırıcısı kullan (BeOS R5'teki gibi)
-Gain	AudioMixer		Kazanım
-Allow output channel remapping	AudioMixer		Çıktı kanalı yeniden eşlemesine izin ver
 Physical input channels	AudioMixer		Fiziksel girdi kanalları
+Input channel destinations	AudioMixer		Girdi kanalı hedefleri
+Resampling algorithm:	AudioMixer		Yeniden örnekleme algoritması:
+Mute	AudioMixer		Sessiz
+Output mapping	AudioMixer		Çıktı eşleme
+Virtual output channels	AudioMixer		Sanal çıktı kanalları
+Allow output channel remapping	AudioMixer		Çıktı kanalı yeniden eşlemesine izin ver
+Input gain controls represent:	AudioMixer		Giriş artışı denetimleri şunları belirtir:
+Attenuate mixer output by 3 dB	AudioMixer		Karıştırıcı çıkışını 3 dB azalt

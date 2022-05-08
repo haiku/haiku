@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	250728390
+1	japanese	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		認証が必要です
 Previous	WebPositive Window		前へ
 (Finish: %date)	Download Window		(完了: %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		フォルダーを開く
 Find previous	WebPositive Window		前を検索
 Full screen	WebPositive Window		全画面表示
 Downloads in progress	WebPositive		ダウンロードが進行中です
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount 個のブックマークを同時に開きますか?
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount 個のブックマークを同時に開きますか?
 Clone current page	Settings Window		現在のページを複製
 Start page:	Settings Window		スタートページ:
 Cancel	Download Window		中止
@@ -45,17 +45,19 @@ New tabs:	Settings Window		新しいタブ:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url の読み込みに失敗しました
 Open downloads folder	Download Window		ダウンロードフォルダーの表示
 Proxy server	Settings Window		プロキシサーバー
+Darn!	WebPositive		Darn!
 Decrease size	WebPositive Window		縮小
 Default fixed font size:	Settings Window		等幅フォントサイズ:
 Sans serif font:	Settings Window		サンセリフフォント:
 Clear	WebPositive Window		クリア
-Cookies for %s	Cookie Manager		%s 用の Cookie
 The download could not be opened.	Download Window		ダウンロードファイルを開けません。
+Cookies for %s	Cookie Manager		%s 用の Cookie
 Close	Download Window		閉じる
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - 検索語
 Reload	WebPositive Window		再読み込み
 Expiration	Cookie Manager		有効期限
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		CPUが古く、SSE2拡張をサポートしていません。そのためWebPositiveを動作できません。代わりにNetSurfのインストールをお勧めします。
 Download finished	Download Window		ダウンロードが完了しました
 Cookie manager	WebPositive Window		Cookie マネージャー
 OK	Authentication Panel		OK
@@ -111,8 +113,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		ダウンロードを続ける
 Proxy server requires authentication	Settings Window		プロキシサーバーが認証を要求する
 Cancel	Settings Window		中止
-History	WebPositive Window		履歴
 Reset size	WebPositive Window		リセット
+History	WebPositive Window		履歴
 Do you really want to clear the browsing history?	WebPositive Window		閲覧履歴を本当に消去しますか?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	検索語の次の項目を検索
 Fixed font:	Settings Window		等幅フォント:
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		スタートアップ:
 Confirmation	WebPositive Window		確認
 Session cookie	Cookie Manager		セッション cookie
+No SSE2 support	WebPositive		SSE2 のサポートがありません
 Open all	WebPositive Window		すべてを開く
 Cut	WebPositive Window		切り取り
 Downloads	Download Window		ダウンロード

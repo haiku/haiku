@@ -141,9 +141,9 @@ TextDocument::Replace(int32 textOffset, int32 length, TextDocumentRef document)
 {
 	int32 firstParagraph = 0;
 	int32 paragraphCount = 0;
-	
+
 	// TODO: Call _NotifyTextChanging() before any change happened
-	
+
 	status_t ret = _Remove(textOffset, length, firstParagraph, paragraphCount);
 	if (ret != B_OK)
 		return ret;
@@ -443,7 +443,8 @@ TextDocument::AddListener(TextListenerRef listener)
 bool
 TextDocument::RemoveListener(TextListenerRef listener)
 {
-	std::remove(fTextListeners.begin(), fTextListeners.end(), listener);
+	fTextListeners.erase(std::remove(fTextListeners.begin(), fTextListeners.end(),
+		listener), fTextListeners.end());
 	return true;
 }
 
@@ -466,7 +467,8 @@ TextDocument::AddUndoListener(UndoableEditListenerRef listener)
 bool
 TextDocument::RemoveUndoListener(UndoableEditListenerRef listener)
 {
-	std::remove(fUndoListeners.begin(), fUndoListeners.end(), listener);
+	fUndoListeners.erase(std::remove(fUndoListeners.begin(), fUndoListeners.end(),
+		listener), fUndoListeners.end());
 	return true;
 }
 

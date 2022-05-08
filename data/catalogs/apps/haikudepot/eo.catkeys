@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-HaikuDepot	1522183623
+1	esperanto	x-vnd.Haiku-HaikuDepot	2265987377
 Repository update error	LocalRepositoryUpdateProcess		Eraro dum ĝisdatigo de deponejo
 Network error	ServerHelper		Eraro de reto
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Eraro okazis dum aktualigo de la deponejo: %error%
@@ -94,7 +94,6 @@ Repository	PackageListView		Deponejo
 The email is malformed.	UserLoginWindow		La retpoŝtadreso estas misformita.
 Close	UserLoginWindow		Forlasi
 Close	RatePackageWindow		Forlasi
-An unexpected error has been sent from the server [%i]	ServerHelper		La servilo sendis neatenditan eraron [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sinkronigado de pakaĵa datumo por la deponejo '%REPO_NAME%'
 Settings	SettingsWindow		Agordo
 View the usage conditions	UserLoginWindow		Vidi la kondiĉojn de uzado
@@ -135,8 +134,8 @@ Source packages	MainWindow		Fontaj pakaĵoj
 -	no package size		-
 Problem with working files	App		Problemo kun kurantaj dosieroj
 Server error	ServerHelper		Eraro de servilo
-Try again	App		Provi denove
 Rate package	RatePackageWindow		Taksi pakaĵon
+Try again	App		Provi denove
 Unknown	PackageListView		Nekonata
 I agree to the usage conditions	UserLoginWindow		Mi konsentas la kondiĉojn de uzado
 Log in	UserLoginWindow		Ensaluti
@@ -168,6 +167,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Versio de kliento estas tro maljuna
 Local repository load error	LocalPkgDataLoadProcess		Eraro dum ŝargado de loka deponejo
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		La uzanto ne ekzistas aŭ la malĝusta pasvorto estis donita. Kontroli viajn ensalutilojn kaj provu denove.
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Ripeti pasvorton:
 All repositories	MainWindow		Ĉiuj deponejoj

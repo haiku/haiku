@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	2277843400
+1	russian	x-vnd.Haiku-Terminal	307289061
 Close other tabs	Terminal TermWindow		Закрыть остальные вкладки
 Insert path	Terminal TermView		Вставить путь
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Терминал не смог запустить оболочку. Простите.
@@ -104,7 +104,6 @@ No search string was entered.	Terminal TermWindow		Не введена стро�
 Text under cursor	Terminal AppearancePrefView		Текста под курсором
 Move here	Terminal TermView		Переместить сюда
 Abort	Terminal Shell		Отменить
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tТекущая директория активного процесса.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\tНапример '%2d' отобразит последние 2 компонента.\n\t%i\t-\tНомер вкладки.\n\t%e\t-\tКодировка текущей вкладки. Для UTF-8 не отображается.\n\t%p\t-\tНазвание активного процесса.\n\t%%\t-\tСимвол процента - '%'.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Данные процессы все еще работают:\n\n\t%1\n\nЕсли вы закроете Терминал, то эти процессы будут уничтожены.
 Set window title	Terminal TermWindow		Установить заголовок окна
 Increase	Terminal TermWindow		Увеличить

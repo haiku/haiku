@@ -174,18 +174,18 @@ ICUCollateData::Wcscoll(const wchar_t* a, const wchar_t* b, int& result)
 
 
 status_t
-ICUCollateData::Wcsxfrm(wchar_t* out, const wchar_t* in, size_t size,
-	size_t& outSize)
+ICUCollateData::Wcsxfrm(wchar_t* out, const wchar_t* in, size_t outSize,
+	size_t& requiredSize)
 {
 	if (in == NULL) {
-		outSize = 0;
+		requiredSize = 0;
 		return B_OK;
 	}
 
 	if (fCollator == NULL || strcmp(fPosixLocaleName, "POSIX") == 0) {
 		// handle POSIX here as the collator ICU uses for that (english) is
 		// incompatible in too many ways
-		outSize = wcslcpy(out, in, size);
+		requiredSize = wcslcpy(out, in, outSize);
 		for (const wchar_t* inIter = in; *inIter != 0; ++inIter) {
 			if (*inIter > 127)
 				return B_BAD_VALUE;
@@ -194,10 +194,13 @@ ICUCollateData::Wcsxfrm(wchar_t* out, const wchar_t* in, size_t size,
 	}
 
 	UnicodeString unicodeIn = UnicodeString::fromUTF32((UChar32*)in, -1);
-	size_t requiredSize = fCollator->getSortKey(unicodeIn, NULL, 0);
+	requiredSize = fCollator->getSortKey(unicodeIn, NULL, 0);
+
+	if (outSize == 0)
+		return B_OK;
 
 	uint8_t* buffer = (uint8_t*)out;
-	outSize = fCollator->getSortKey(unicodeIn, buffer, requiredSize);
+	fCollator->getSortKey(unicodeIn, buffer, outSize);
 
 	// convert 1-byte characters to 4-byte wide characters:
 	for (size_t i = 0; i < outSize; ++i)

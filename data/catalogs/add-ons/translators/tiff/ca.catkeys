@@ -1,16 +1,16 @@
 1	catalan; valencian	x-vnd.Haiku-TIFFTranslator	2234713102
-TIFF Library:	TIFFView		Biblioteca de TIFF:
-RLE (Packbits)	TIFFView		RLE (Packbits)
-ZIP (Deflate)	TIFFView		ZIP (Comprimit)
-identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: l'índex del document no és vàlid\n
-Use compression:	TIFFView		Compressió:
+TIFF Library:	TIFFView		Biblioteca TIFF:
+RLE (Packbits)	TIFFView		RLE (Paquets de bits)
+ZIP (Deflate)	TIFFView		ZIP (Desinfla)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identific_tiff_header: índex de document no vàlid\n
+Use compression:	TIFFView		Usa la compressió:
 TIFF image translator	TIFFView		Traductor d'imatges TIFF
 TIFF image	TIFFTranslator		Imatge TIFF
 TIFF Settings	TIFFMain		Paràmetres de TIFF
 TIFF image translator	TIFFTranslator		Traductor d'imatges TIFF
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: no s'ha pogut establir la carpeta\n
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identific_tiff_header: no s'ha pogut establir el directori\n
 Version %d.%d.%d, %s	TIFFView		Versió %d.%d.%d, %s
-TIFFTranslator Settings	TIFFTranslator		Paràmetres del Traductor de TIFF
+TIFFTranslator Settings	TIFFTranslator		Configuració del Traductor TIFF
 LZW	TIFFView		LZW
 TIFF images	TIFFTranslator		Imatges TIFF
 None	TIFFView		Cap

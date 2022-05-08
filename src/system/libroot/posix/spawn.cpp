@@ -593,7 +593,8 @@ do_posix_spawn(pid_t *_pid, const char *path,
 	const posix_spawnattr_t *attrp, char *const argv[], char *const envp[],
 	bool envpath)
 {
-	if (actions == NULL && attrp == NULL) {
+	if ((actions == NULL || (*actions)->count == 0)
+			&& (attrp == NULL || (*attrp)->flags == 0)) {
 		return spawn_using_load_image(_pid, path, argv, envp, envpath);
 	} else {
 		return spawn_using_fork(_pid, path, actions, attrp, argv, envp,

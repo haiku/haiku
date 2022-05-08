@@ -7,24 +7,30 @@
 
     .text
 
-/*  status_t arch_enter_kernel(struct kernel_args* kernelArgs,
+/*  status_t arch_enter_kernel(uint64 satp, struct kernel_args *kernelArgs,
         addr_t kernelEntry, addr_t kernelStackTop);
 
-    a0  - kernelArgs
-    a1  - kernelEntry
-    a2  - kernelStackTop
+    a0  - SATP register value
+    a1  - kernelArgs
+    a2  - kernelEntry
+    a3  - kernelStackTop
 */
 FUNCTION(arch_enter_kernel):
+	csrw satp, a0
+	sfence.vma
+
 	// set the kernel stack
-	mv	sp,a2
+	mv	sp, a3
+#	li	fp, 0
+#	li  ra, 0
 
 	// Setup kernel args
-	//mv	a0,a0	// kernelArgs
-	mv	a4,a1
-	li	a1,0	// currentCPU=0
+	mv	a0, a1	// kernelArgs
+	mv	t0, a2
+	li	a1, 0	// currentCPU=0
 
 	// call the kernel
-	jr	a4
+	jr	t0
 
 	// return
 	li	a0,-1  // B_ERROR

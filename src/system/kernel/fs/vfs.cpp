@@ -329,6 +329,7 @@ typedef BOpenHashTable<MountHash> MountTable;
 
 
 object_cache* sPathNameCache;
+object_cache* sVnodeCache;
 object_cache* sFileDescriptorCache;
 
 #define VNODE_HASH_TABLE_SIZE 1024
@@ -950,7 +951,7 @@ create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
 {
 	FUNCTION(("create_new_vnode_and_lock()\n"));
 
-	struct vnode* vnode = (struct vnode*)malloc(sizeof(struct vnode));
+	struct vnode* vnode = (struct vnode*)object_cache_alloc(sVnodeCache, 0);
 	if (vnode == NULL)
 		return B_NO_MEMORY;
 
@@ -966,7 +967,7 @@ create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
 	rw_lock_write_lock(&sVnodeLock);
 	struct vnode* existingVnode = lookup_vnode(mountID, vnodeID);
 	if (existingVnode != NULL) {
-		free(vnode);
+		object_cache_free(sVnodeCache, vnode, 0);
 		_vnode = existingVnode;
 		_nodeCreated = false;
 		return B_OK;
@@ -978,7 +979,7 @@ create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
 	if (!vnode->mount || vnode->mount->unmounting) {
 		rw_lock_read_unlock(&sMountLock);
 		rw_lock_write_unlock(&sVnodeLock);
-		free(vnode);
+		object_cache_free(sVnodeCache, vnode, 0);
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -1055,7 +1056,7 @@ free_vnode(struct vnode* vnode, bool reenter)
 
 	remove_vnode_from_mount_list(vnode, vnode->mount);
 
-	free(vnode);
+	object_cache_free(sVnodeCache, vnode, 0);
 }
 
 
@@ -1260,7 +1261,7 @@ restart:
 			remove_vnode_from_mount_list(vnode, vnode->mount);
 			rw_lock_write_unlock(&sVnodeLock);
 
-			free(vnode);
+			object_cache_free(sVnodeCache, vnode, 0);
 			return status;
 		}
 
@@ -3836,7 +3837,7 @@ restart:
 			locker.Lock();
 			sVnodeTable->Remove(vnode);
 			remove_vnode_from_mount_list(vnode, vnode->mount);
-			free(vnode);
+			object_cache_free(sVnodeCache, vnode, 0);
 		}
 	} else {
 		// we still hold the write lock -- mark the node unbusy and published
@@ -3986,47 +3987,6 @@ get_vnode_removed(fs_volume* volume, ino_t vnodeID, bool* _removed)
 	}
 
 	return B_BAD_VALUE;
-}
-
-
-extern "C" status_t
-mark_vnode_busy(fs_volume* volume, ino_t vnodeID, bool busy)
-{
-	ReadLocker locker(sVnodeLock);
-
-	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
-	if (vnode == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	// are we trying to mark an already busy node busy again?
-	if (busy && vnode->IsBusy())
-		return B_BUSY;
-
-	vnode->Lock();
-	vnode->SetBusy(busy);
-	vnode->Unlock();
-
-	return B_OK;
-}
-
-
-extern "C" status_t
-change_vnode_id(fs_volume* volume, ino_t vnodeID, ino_t newID)
-{
-	WriteLocker locker(sVnodeLock);
-
-	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
-	if (vnode == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	sVnodeTable->Remove(vnode);
-	vnode->id = newID;
-	sVnodeTable->Insert(vnode);
-
-	if (vnode->cache != NULL && vnode->cache->type == CACHE_TYPE_VNODE)
-		((VMVnodeCache*)vnode->cache)->SetVnodeID(newID);
-
-	return B_OK;
 }
 
 
@@ -5033,7 +4993,7 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 	// allocate space for FDs and their close-on-exec flag
 	context->fds = (file_descriptor**)malloc(
 		sizeof(struct file_descriptor*) * tableSize
-		+ sizeof(struct select_sync*) * tableSize
+		+ sizeof(struct select_info**) * tableSize
 		+ (tableSize + 7) / 8);
 	if (context->fds == NULL) {
 		free(context);
@@ -5044,7 +5004,7 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 	context->fds_close_on_exec = (uint8*)(context->select_infos + tableSize);
 
 	memset(context->fds, 0, sizeof(struct file_descriptor*) * tableSize
-		+ sizeof(struct select_sync*) * tableSize
+		+ sizeof(struct select_info**) * tableSize
 		+ (tableSize + 7) / 8);
 
 	mutex_init(&context->io_mutex, "I/O context");
@@ -5154,7 +5114,7 @@ vfs_resize_fd_table(struct io_context* context, uint32 newSize)
 	// allocate new tables
 	file_descriptor** newFDs = (file_descriptor**)malloc(
 		sizeof(struct file_descriptor*) * newSize
-		+ sizeof(struct select_sync*) * newSize
+		+ sizeof(struct select_infos**) * newSize
 		+ newCloseOnExitBitmapSize);
 	if (newFDs == NULL)
 		return B_NO_MEMORY;
@@ -5378,6 +5338,11 @@ vfs_init(kernel_args* args)
 		B_PATH_NAME_LENGTH + 1, 8, NULL, NULL, NULL);
 	if (sPathNameCache == NULL)
 		panic("vfs_init: error creating path name object_cache\n");
+
+	sVnodeCache = create_object_cache("vfs vnodes",
+		sizeof(struct vnode), 8, NULL, NULL, NULL);
+	if (sVnodeCache == NULL)
+		panic("vfs_init: error creating vnode object_cache\n");
 
 	sFileDescriptorCache = create_object_cache("vfs fds",
 		sizeof(file_descriptor), 8, NULL, NULL, NULL);

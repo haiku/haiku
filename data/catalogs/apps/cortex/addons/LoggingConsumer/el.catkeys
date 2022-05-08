@@ -1,5 +1,7 @@
-1	greek, modern (1453-)	application/x-vnd.Be.LoggingConsumerApp	1634779870
+1	greek, modern (1453-)	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: αδύνατη η λήψη πληροφοριών για τον κόμβο (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Προτεραιότητα
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: αδύνατη η ανεύρεση του κόμβου (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Καθυστέρηση
 Logged input	CortexAddOnsLoggingConsumer		Καταγεγραμμένη είσοδος
 CPU spin percentage	CortexAddOnsLoggingConsumer		Ποσοστο περιστροφών ΚΜΕ
@@ -8,9 +10,7 @@ Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Εκκίνηση
 Thread priority	CortexAddOnsLoggingConsumer		Προτεραιότητα νήματος
 LoggingConsumer parameters	CortexAddOnsLoggingConsumer		 Ρυθμίσεις Καταναλωτή Καταγραφών
 Latency control	CortexAddOnsLoggingConsumer		Έλεγχος καθυστέρησης
-MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: αδύνατη η λήψη πληροφοριών κόμβου (%d):\n%s\n
 CPU percentage	CortexAddOnsLoggingConsumer		Ποσοστό ΚΜΕ
-MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: αδύνατη η εύρεση του κόμβου (%d):\n%s\n
 LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Σταμάτημα
 An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		Κόμβος LoggingConsumer σε μορφή προσθέτου.\nΒλ. Be Developer Newsletter III.18: 5 Μαΐου 1999\nπροσαρμόστηκε από Eric Moon (4 Ιουνίου 1999)
@@ -19,4 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Χειριστήρια
 controls	CortexAddOnsCommonMediaNodeControlApp		χειριστήρια
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Σύνδεση
 percent	CortexAddOnsLoggingConsumer		ποσοστό
-MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: δεν υπάρχουν ρυθμίσεις για τον κόμβο (%d):\n%s\n
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: δεν υπάρχουν παράμετροι για τον κόμβο (%ld):\n%s\n

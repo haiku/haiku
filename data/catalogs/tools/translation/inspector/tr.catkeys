@@ -4,7 +4,7 @@ Next Page	ImageWindow		Sonraki sayfa
 Previous Page	ImageWindow		Önceki sayfa
 Active Translators	InspectorApp		Etkin çevirmenler
 System Translators	ActiveTranslatorsWindow		Sistem çevirmenleri
-\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTür: '%1' (%2)\nGrup: '%3' (%4)\nKalite: %5\nKapasite: %6\nMIME türü: %7\nAd: %8\n
+\nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTür: '%1' (%2)\nGrup: '%3' (%4)\nKalite: %5\nSığa: %6\nMIME türü: %7\nAd: %8\n
 OK	ImageWindow		Tamam
 View	ImageWindow		Görünüm
 Open…	ImageWindow		Aç…

@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src system libroot posix string arch m68k ;
 
+# Optimizations create infinite recursion otherwise.
+SubDirCcFlags -fno-builtin ;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup m68k ] {
 	on $(architectureObject) {

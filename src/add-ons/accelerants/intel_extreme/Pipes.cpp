@@ -9,8 +9,8 @@
 #include "Pipes.h"
 
 #include "accelerant.h"
+#include "accelerant_protos.h"
 #include "intel_extreme.h"
-#include <KernelExport.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -18,9 +18,9 @@
 #include <new>
 
 
+#undef TRACE
 #define TRACE_PIPE
 #ifdef TRACE_PIPE
-extern "C" void _sPrintf(const char* format, ...);
 #	define TRACE(x...) _sPrintf("intel_extreme: " x)
 #else
 #	define TRACE(x...) ;
@@ -68,21 +68,21 @@ Pipe::Pipe(pipe_index pipeIndex)
 	fPipeOffset(0),
 	fPlaneOffset(0)
 {
-	if (pipeIndex == INTEL_PIPE_B) {
-		fPlaneOffset = INTEL_PLANE_OFFSET;
-	}
 	switch (pipeIndex) {
 		case INTEL_PIPE_B:
 			TRACE("Pipe B.\n");
 			fPipeOffset = 0x1000;
+			fPlaneOffset = INTEL_PLANE_OFFSET;
 			break;
 		case INTEL_PIPE_C:
 			TRACE("Pipe C.\n");
 			fPipeOffset = 0x2000;
+			fPlaneOffset = INTEL_PLANE_OFFSET * 2;
 			break;
 		case INTEL_PIPE_D:
 			TRACE("Pipe D.\n");
 			fPipeOffset = 0xf000;
+			//no fPlaneOffset..
 			break;
 		default:
 			TRACE("Pipe A.\n");
@@ -94,8 +94,7 @@ Pipe::Pipe(pipe_index pipeIndex)
 	// SkyLake: FDI gone. No more northbridge video.
 	if ((gInfo->shared_info->pch_info != INTEL_PCH_NONE) &&
 		(gInfo->shared_info->device_type.Generation() <= 8)) {
-		TRACE("%s: Pipe %s routed through FDI\n", __func__,
-			(pipeIndex == INTEL_PIPE_A) ? "A" : "B");
+		TRACE("%s: Pipe is routed through FDI\n", __func__);
 
 		// Program FDILink if PCH
 		fFDILink = new(std::nothrow) FDILink(pipeIndex);
@@ -107,7 +106,7 @@ Pipe::Pipe(pipe_index pipeIndex)
 		fPanelFitter = new(std::nothrow) PanelFitter(pipeIndex);
 	}
 
-	TRACE("Pipe Base: 0x%" B_PRIxADDR " Plane Base: 0x% " B_PRIxADDR "\n",
+	TRACE("Pipe Base: 0x%" B_PRIxADDR " Plane Base: 0x%" B_PRIxADDR "\n",
 			fPipeOffset, fPlaneOffset);
 }
 
@@ -162,7 +161,7 @@ Pipe::_ConfigureTranscoder(display_mode* target)
 {
 	CALLED();
 
-	TRACE("%s: fPipeOffset: 0x%" B_PRIx32"\n", __func__, fPipeOffset);
+	TRACE("%s: fPipeOffset: 0x%" B_PRIxADDR"\n", __func__, fPipeOffset);
 
 	if (gInfo->shared_info->device_type.Generation() < 9) {
 		// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
@@ -219,12 +218,79 @@ Pipe::_ConfigureTranscoder(display_mode* target)
 }
 
 
+status_t
+Pipe::SetFDILink(const display_timing& timing, uint32 linkBandwidth, uint32 lanes, uint32 bitsPerPixel)
+{
+	TRACE("%s: fPipeOffset: 0x%" B_PRIxADDR "\n", __func__, fPipeOffset);
+	TRACE("%s: FDI/PIPE link reference clock is %gMhz\n", __func__, linkBandwidth / 1000.0f);
+	TRACE("%s: FDI/PIPE M1 data before: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_DATA_M1 + fPipeOffset));
+	TRACE("%s: FDI/PIPE N1 data before: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_DATA_N1 + fPipeOffset));
+	TRACE("%s: FDI/PIPE M1 link before: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_LINK_M1 + fPipeOffset));
+	TRACE("%s: FDI/PIPE N1 link before: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_LINK_N1 + fPipeOffset));
+
+	if ((bitsPerPixel < 18) || (bitsPerPixel > 36)) {
+		ERROR("%s: FDI/PIPE illegal colordepth set.\n", __func__);
+		return B_ERROR;
+	}
+	TRACE("%s: FDI/PIPE link colordepth: %" B_PRIu32 "\n", __func__, bitsPerPixel);
+
+	if (lanes > 4) {
+		ERROR("%s: FDI/PIPE illegal number of lanes set.\n", __func__);
+		return B_ERROR;
+	}
+	TRACE("%s: FDI/PIPE link with %" B_PRIx32 " lane(s) in use\n", __func__, lanes);
+
+	//Setup Data M/N
+	uint64 linkspeed = lanes * linkBandwidth * 8;
+	uint64 ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	uint64 ret_m = timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	//Set TU size bits (to default, max) before link training so that error detection works
+	write32(PCH_FDI_PIPE_A_DATA_M1 + fPipeOffset, ret_m | FDI_PIPE_MN_TU_SIZE_MASK);
+	write32(PCH_FDI_PIPE_A_DATA_N1 + fPipeOffset, ret_n);
+
+	//Setup Link M/N
+	linkspeed = linkBandwidth;
+	ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	ret_m = timing.pixel_clock * ret_n / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	write32(PCH_FDI_PIPE_A_LINK_M1 + fPipeOffset, ret_m);
+	//Writing Link N triggers all four registers to be activated also (on next VBlank)
+	write32(PCH_FDI_PIPE_A_LINK_N1 + fPipeOffset, ret_n);
+
+	TRACE("%s: FDI/PIPE M1 data after: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_DATA_M1 + fPipeOffset));
+	TRACE("%s: FDI/PIPE N1 data after: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_DATA_N1 + fPipeOffset));
+	TRACE("%s: FDI/PIPE M1 link after: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_LINK_M1 + fPipeOffset));
+	TRACE("%s: FDI/PIPE N1 link after: 0x%" B_PRIx32 "\n", __func__, read32(PCH_FDI_PIPE_A_LINK_N1 + fPipeOffset));
+
+	return B_OK;
+}
+
+
 void
 Pipe::ConfigureScalePos(display_mode* target)
 {
 	CALLED();
 
-	TRACE("%s: fPipeOffset: 0x%" B_PRIx32"\n", __func__, fPipeOffset);
+	TRACE("%s: fPipeOffset: 0x%" B_PRIxADDR "\n", __func__, fPipeOffset);
 
 	if (target == NULL) {
 		ERROR("%s: Invalid display mode!\n", __func__);
@@ -264,11 +330,11 @@ Pipe::ConfigureScalePos(display_mode* target)
 
 
 void
-Pipe::ConfigureTimings(display_mode* target, bool hardware)
+Pipe::ConfigureTimings(display_mode* target, bool hardware, port_index portIndex)
 {
 	CALLED();
 
-	TRACE("%s(%d): fPipeOffset: 0x%" B_PRIx32"\n", __func__, hardware,
+	TRACE("%s(%d): fPipeOffset: 0x%" B_PRIxADDR"\n", __func__, hardware,
 		fPipeOffset);
 
 	if (target == NULL) {
@@ -305,6 +371,13 @@ Pipe::ConfigureTimings(display_mode* target, bool hardware)
 	}
 
 	ConfigureScalePos(target);
+
+	// transcoder is not applicable if eDP is targeted on Sandy- and IvyBridge
+	if ((gInfo->shared_info->device_type.InGroup(INTEL_GROUP_SNB) ||
+		 gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IVB)) &&
+		(portIndex == INTEL_PORT_A)) {
+		return;
+	}
 
 	if (fHasTranscoder && hardware) {
 		_ConfigureTranscoder(target);
@@ -487,7 +560,7 @@ Pipe::ConfigureClocksSKL(const skl_wrpll_params& wrpll_params, uint32 pixelClock
 		*pllSel = (portSel & 0x6000) >> 13;
 		break;
 	default:
-		TRACE("No port selected!");
+		TRACE("No port selected!\n");
 		return;
 	}
 	TRACE("PLL selected is %" B_PRIx32 "\n", *pllSel);

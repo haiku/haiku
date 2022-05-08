@@ -14,10 +14,10 @@ Russian (Yawert)	KeymapNames		Ryska (Yawert)
 United-Kingdom	KeymapNames		Storbritannien
 Welcome!	BootPromptWindow		Välkommen!
 Quit Haiku	System name		Avsluta Haiku
-Serbian (Cyrillic)	KeymapNames		Serbiska (Kyrilliska)
 Turkish (Type-F)	KeymapNames		Turkiska (Typ-F)
-Bulgarian (Cyrillic)	KeymapNames		Bulgariska (Kyrilliska)
+Serbian (Cyrillic)	KeymapNames		Serbiska (Kyrilliska)
 Belgian (point)	KeymapNames		Belgiska (punkt)
+Bulgarian (Cyrillic)	KeymapNames		Bulgariska (Kyrilliska)
 Finnish	KeymapNames		Finska
 Swedish	KeymapNames		Svenska
 Svorak	KeymapNames		Svorak
@@ -58,8 +58,8 @@ Italian	KeymapNames		Italienska
 Portuguese	KeymapNames		Portugisiska
 Swiss-French	KeymapNames		Swiss-Franska
 Slovene	KeymapNames		Slovenska
-Lithuanian	KeymapNames		Litauiska
 French (NF Z71-300)	KeymapNames		Franska (NF Z71-300)
+Lithuanian	KeymapNames		Litauiska
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Kazakiska
 Language	BootPromptWindow		Språk
@@ -78,8 +78,8 @@ Irish	KeymapNames		Irländska
 Romanian	KeymapNames		Rumänska
 Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Är du säker på att du vill stänga det här fönstret? Detta startar om ditt system!
 Thank you for trying out Haiku! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later when running Haiku.\n\nDo you wish to install Haiku now, or try it out first?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Tack för att du provade Haiku! Vi hoppas att du kommer att gilla det!\n\nVälj vilket språk du vill ha och tangentbordslayout. Båda inställningarna kan också ändras senare när Haiku körs.\n\nVill du installera Haiku nu, eller testa det först?
-Macedonian	KeymapNames		Makedonska
 Czech (Mac)	KeymapNames		Tjeckiska (Mac)
+Macedonian	KeymapNames		Makedonska
 Brazilian (ABNT2)	KeymapNames		Brasilianska (ABNT2)
 Albanian	KeymapNames		Albanska
 Dutch	KeymapNames		Holländska

@@ -1,5 +1,5 @@
 # Quick start for file UserSetupEnvironment.  Copy or rename this file as
-#	"/boot/home/config/boot/UserSetupEnvironment".
+#	"/boot/home/config/settings/boot/UserSetupEnvironment".
 # Add custom environment variables to initialize
 
 # This file is a standard bash script.  For more information regarding shell

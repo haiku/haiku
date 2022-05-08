@@ -127,7 +127,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		new BMessage(MSG_TAB_TITLE_SETTING_CHANGED));
 	fTabTitle->SetToolTip(BString(B_TRANSLATE(
 		"The pattern specifying the tab titles. The following placeholders\n"
-		"can be used:")) << "\n" << kTooTipSetTabTitlePlaceholders
+		"can be used:")) << "\n" << kToolTipSetTabTitlePlaceholders
 		<< "\n" << kToolTipCommonTitlePlaceholders);
 
 	fWindowTitle = new BTextControl("windowTitle", B_TRANSLATE("Window title:"),
@@ -136,7 +136,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		new BMessage(MSG_WINDOW_TITLE_SETTING_CHANGED));
 	fWindowTitle->SetToolTip(BString(B_TRANSLATE(
 		"The pattern specifying the window titles. The following placeholders\n"
-		"can be used:")) << "\n" << kTooTipSetWindowTitlePlaceholders
+		"can be used:")) << "\n" << kToolTipSetWindowTitlePlaceholders
 		<< "\n" << kToolTipCommonTitlePlaceholders);
 
 	BLayoutBuilder::Group<>(this)

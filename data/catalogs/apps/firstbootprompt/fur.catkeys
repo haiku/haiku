@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-FirstBootPrompt	2131367349
+1	friulian	x-vnd.Haiku-FirstBootPrompt	189132197
 Japanese	KeymapNames		Gjaponês
 US	KeymapNames		Statunitens
 Cancel	BootPromptWindow		Anule
@@ -7,15 +7,17 @@ Belarusian	KeymapNames		Bielorùs
 Brazilian	KeymapNames		Brasilian
 Dvorak	KeymapNames		Dvorak
 Polish	KeymapNames		Polac
+Try Haiku	BootPromptWindow		Prove Haiku
 Latin-American	KeymapNames		Latinoamerican
 Ukrainian	KeymapNames		Ucrain
 Russian (Yawert)	KeymapNames		Rus (Yawert)
 United-Kingdom	KeymapNames		Ream-Unît
+Welcome!	BootPromptWindow		Benvignûts!
 Quit Haiku	System name		Jes di Haiku
-Serbian (Cyrillic)	KeymapNames		Serp  (Cirilic)
 Turkish (Type-F)	KeymapNames		Turc (Type-F)
-Bulgarian (Cyrillic)	KeymapNames		Bulgar (Cirilic)
+Serbian (Cyrillic)	KeymapNames		Serp  (Cirilic)
 Belgian (point)	KeymapNames		Belgjic (pont)
+Bulgarian (Cyrillic)	KeymapNames		Bulgar (Cirilic)
 Finnish	KeymapNames		Finlandês
 Swedish	KeymapNames		Svedês
 Svorak	KeymapNames		Svorak
@@ -43,8 +45,10 @@ Faeroese	KeymapNames		Faeroês
 Polish (Typewriter)	KeymapNames		Polac (Machine di scrivi)
 French (Mac)	KeymapNames		Francês (Mac)
 Spanish	KeymapNames		Spagnûl
+Try it out	BootPromptWindow		Provilu
 Ukrainian (Mac)	KeymapNames		Ucrain (Mac)
 Estonian	KeymapNames		Eston
+Install Haiku	BootPromptWindow		Instale Haiku
 French (Bépo)	KeymapNames		Francês (Bépo)
 Restart system	BootPromptWindow		Torne invie il sisteme
 Serbian (Latin)	KeymapNames		Serp (Latin)
@@ -54,8 +58,8 @@ Italian	KeymapNames		Talian
 Portuguese	KeymapNames		Portughês
 Swiss-French	KeymapNames		Francês de Svuizare
 Slovene	KeymapNames		Sloven
-Lithuanian	KeymapNames		Lituan
 French (NF Z71-300)	KeymapNames		Francês (NF Z71-300)
+Lithuanian	KeymapNames		Lituan
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Kazac
 Language	BootPromptWindow		Lenghe
@@ -66,15 +70,19 @@ Norwegian	KeymapNames		Norvegjês
 Danish	KeymapNames		Danês
 Bulgarian (Phonetic)	KeymapNames		Bulgar (Fonetic)
 Canadian-French	KeymapNames		Francês dal Canadà
+Welcome to Haiku!	BootPromptWindow		Benvignûts in Haiku!
 Russian	KeymapNames		Rus
 Hungarian	KeymapNames		Ongjarês
+Install	BootPromptWindow		Instale
 Irish	KeymapNames		Irlandês
 Romanian	KeymapNames		Rumen
 Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Sierâ pardabon chest barcon? Tu tornarâs a inviâ il sisteme!
-Macedonian	KeymapNames		Macedon
+Thank you for trying out Haiku! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later when running Haiku.\n\nDo you wish to install Haiku now, or try it out first?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Graciis di provâ Haiku! O sperìn che ti plasi!\n\nSelezione la tô lenghe e la tastiere preferide. Al è pussibil cambiâ dutis dôs lis impostazions plui indenant, intant che tu dopris Haiku.\n\nDesideristu instalâ Haiku cumò o desideristu prime provâlu?
 Czech (Mac)	KeymapNames		Cec (Mac)
+Macedonian	KeymapNames		Macedon
 Brazilian (ABNT2)	KeymapNames		Brasilian (ABNT2)
 Albanian	KeymapNames		Albanês
 Dutch	KeymapNames		Olandês
+Thank you for trying out our operating system! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later.\n\nDo you wish to install the operating system now, or try it out first?	BootPromptWindow	This notice appears when the build of Haiku that's currently being used is unofficial, as in, not distributed by Haiku itself.For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Graciis di provâ il nestri sisteme operatîf! O sperìn che ti plasi!\n\nSelezione la tô lenghe e la tastiere preferiede. Al è pussibil cambiâ dutis dôs lis impostazions plui indenant.\n\nDesideristu instalâ il sisteme operatîf cumò o desideristu prime provâlu?
 Friulian	KeymapNames		Furlan
 Icelandic	KeymapNames		Islandês

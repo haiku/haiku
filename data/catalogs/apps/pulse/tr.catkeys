@@ -43,6 +43,6 @@ OK	DeskbarPulseView		Tamam
 Info	PulseApp		Bilgi
 Pulse	System name		Nabız
 Active color	ConfigView		Etkin renk
-Installing in Deskbar failed\n%s	PulseApp		Masaüstü Çubuğu'na yükleme başarısız oldu\n%s
+Installing in Deskbar failed\n%s	PulseApp		Masaüstü Çubuğu'na kurma başarısız oldu\n%s
 Idle color	ConfigView		Boştaki renk
 Normal mode	PrefsWindow		Normal kip

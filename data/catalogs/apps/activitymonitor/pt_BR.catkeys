@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-ActivityMonitor	2601047281
+1	portuguese (brazil)	x-vnd.Haiku-ActivityMonitor	448101400
 Teams	DataSource		Equipes
 Semaphores	DataSource		Semáforos
 TX	DataSource	Shorter version for Sending	TX
@@ -24,6 +24,7 @@ Settings…	ActivityWindow		Configurações...
 Block cache	DataSource		Bloquear cache
 Memory	DataSource		Memória
 CPU usage	DataSource		Utilização da CPU
+CPU speed	DataSource		Velocidade da CPU
 Quit	ActivityWindow		Sair
 Raw clipboard	DataSource		Área de transferência bruta
 Settings	ActivityWindow		Configurações

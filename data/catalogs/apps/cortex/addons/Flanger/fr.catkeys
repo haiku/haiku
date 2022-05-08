@@ -1,15 +1,13 @@
-1	french	application/x-vnd.moon-Flanger.media_addon	1005167688
+1	french	application/x-vnd.moon-Flanger.media_addon	455620896
 An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Une version du FlangerNode sous forme d’extension.\npar Eric Moon (16 juin 1999)
 Delay	CortexAddOnsFlanger		Retard
 Depth	CortexAddOnsFlanger		Profondeur
 Feedback	CortexAddOnsFlanger		Rétroaction
 Sweep rate	CortexAddOnsFlanger		Vitesse de balayage
 Mix ratio	CortexAddOnsFlanger		Ratio de mixage
-MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp : Impossible d’obtenir des informations sur le nœud (%d) :\n%s\n
-MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp : Impossible de trouver le nœud (%d) :\n%s\n
 FlangerNode parameters	CortexAddOnsFlanger		Paramètres du FlangerNode
 OK	CortexAddOnsCommonMediaNodeControlApp		OK
 controls	CortexAddOnsCommonMediaNodeControlApp		contrôles
+Mix output	CortexAddOnsFlanger		Sortie mixée
 Flanger	CortexAddOnsFlanger		Flanger
-MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp : aucun paramètre pour le nœud (%d) :\n%s\n
 Audio input	CortexAddOnsFlanger		Entrée audio

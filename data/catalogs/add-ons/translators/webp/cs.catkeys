@@ -1,25 +1,25 @@
 1	czech	x-vnd.Haiku-WebPTranslator	828165164
-©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
-Compression method:	ConfigView		Metoda komprese:
-WebP image translator	ConfigView		převaděč obrázků WebP
-Preset	ConfigView		Přednastavení
-WebP images	WebPTranslator		obrázky WebP
-WebPTranslator Settings	ConfigView		Nastavení WebP Převaděče
-Output quality:	ConfigView		Kvalita výstupu:
-©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
-WebP Settings	main		WebP Nastavení
-Text	ConfigView		Text
-Slower but better	ConfigView		Pomaleji, ale lépe
-WebP image	WebPTranslator		obrázek WebP
-Output preset:	ConfigView		Přednastavení výstupu:
-Picture	ConfigView		Obrázek
-Low	ConfigView		Nízká
 High	ConfigView		Vysoká
-Drawing	ConfigView		Náčrtek
-Based on libwebp %version%	ConfigView		Založeno na libwebp %version%
-Default	ConfigView		Základní
-Fast	ConfigView		Rychlé
-Photo	ConfigView		Fotka
-Preprocessing filter	ConfigView		Předzpracující filtr
-WebP image translator	WebPTranslator		převaděč obrázků WebP
+WebPTranslator Settings	ConfigView		Nastavení WebPPřevaděče
+Low	ConfigView		Nízká
+WebP image translator	ConfigView		Převaděč WebP obrázků
+Photo	ConfigView		Fotografie
+WebP image translator	WebPTranslator		Převaděč WebP obrázků
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Picture	ConfigView		Obrázek
+Default	ConfigView		Výchozí
+Text	ConfigView		Text
+Preprocessing filter	ConfigView		Předžvýkající filtr
+Compression method:	ConfigView		Metoda komprese:
+Preset	ConfigView		Předvolba
+Drawing	ConfigView		Kresba
+Output preset:	ConfigView		Výstupní předvolba:
+WebP Settings	main		WebP Nastavení
 Icon	ConfigView		Ikona
+WebP image	WebPTranslator		obrázek WebP
+Output quality:	ConfigView		Výstupní kvalita:
+Slower but better	ConfigView		Pomalejší ale lepší
+Based on libwebp %version%	ConfigView		Založeno na libwebp %version%
+Fast	ConfigView		Rychlé
+WebP images	WebPTranslator		obrázky WebP

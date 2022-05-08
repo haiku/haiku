@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Terminal	2277843400
+1	thai	x-vnd.Haiku-Terminal	307289061
 Close other tabs	Terminal TermWindow		ปิดแท็บอื่น ๆ
 Insert path	Terminal TermView		แทรกเส้นทาง
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		เทอร์มินัลไม่สามารถเริ่มเชลล์ ขอโทษ
@@ -104,7 +104,6 @@ No search string was entered.	Terminal TermWindow		ไม่มีการป�
 Text under cursor	Terminal AppearancePrefView		ข้อความใต้เคอร์เซอร์
 Move here	Terminal TermView		ย้ายมาที่นี้
 Abort	Terminal Shell		ยกเลิก
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tไดเรกทอรีการทำงานปัจจุบันของกระบวนการที่ใช้งานอยู่\n\t\t\tจำนวนทางเลือกสูงสุดขององค์ประกอบเส้นทางสามารถ\n\t\t\tระบุ ตัวอย่าง '%2d' สำหรับส่วนประกอบได้มากที่สุดสองรายการ\n\t%i\t-\tดัชนีของแท็บ\n\t%e\t-\tการเข้ารหัสของแท็บปัจจุบัน ไม่แสดงสำหรับ UTF-8\n\t%p\t-\tชื่อของกระบวนการที่ใช้งานอยู่\n\t%%\t-\tตัวอักษร '%'.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		กระบวนการต่อไปนี้ยังคงทำงานอยู่:\n\n\t%1\n\nหากคุณปิดเทอร์มินอล กระบวนการจะหยุดการทำงาน
 Set window title	Terminal TermWindow		ตั้งชื่อหน้าต่าง
 Increase	Terminal TermWindow		เพิ่มขึ้น

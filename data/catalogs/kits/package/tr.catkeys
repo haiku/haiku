@@ -1,6 +1,6 @@
 1	turkish	x-vnd.Haiku-libpackage	134767648
 Fetching repository-cache from %url	RefreshRepositoryRequest		%url konumundan depo önbelleği alınıyor
-Validating checksum for %repositoryName	RefreshRepositoryRequest		%repositoryName için sağlama toplamı doğrulanıyor…
+Validating checksum for %repositoryName	RefreshRepositoryRequest		%repositoryName sağlama toplamı doğrulanıyor…
 Failed to remove transaction directory	PackageManagerKit		İşlem dizini kaldırılamadı
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		\"%s\" deposu için yapılandırma alınamadı. Atlanıyor.
 Refreshing repository \"%s\" failed	PackageManagerKit		\"%s\" deposunu güncelleme başarısız oldu

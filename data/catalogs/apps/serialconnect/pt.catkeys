@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.haiku.SerialConnect	3534464201
+1	portuguese	x-vnd.haiku.SerialConnect	354154115
 Hardware	SerialWindow	Flowcontrol	Hardware
 Connection	SerialWindow		Conexão
 Raw send…	SerialWindow		Envio raw…
@@ -11,6 +11,7 @@ Sending…	XModemStatus		A enviar…
 Log to file…	SerialWindow		Registar no ficheiro…
 Custom baudrate	Custom baudrate window		Taxa baud personalizada
 File	SerialWindow		Ficheiro
+SerialConnect	System name		Conexão Série
 custom…	SerialWindow	Baudrate	personalizado…
 Parity	SerialWindow		Paridade
 None	SerialWindow	Parity	Nenhum
@@ -20,6 +21,7 @@ Odd	SerialWindow	Parity	Ímpar
 Flow control	SerialWindow		Controlo de fluxo
 file transfer progress	SerialWindow		progresso transferência ficheiro
 CRC requested	XModemStatus		CRC requisitado
+Data bits	SerialWindow		Bits de dados
 Both	SerialWindow	Flowcontrol	Ambos
 Edit	SerialWindow		Editar
 XModem send…	SerialWindow		XModem enviar…

@@ -2,7 +2,7 @@
  * Copyright 2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2010-2021, Adrien Destugues, pulkomandy@pulkomandy.tk.
  * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2020-2021, Panagiotis Vasilopoulos <hello@alwayslivid.com>
+ * Copyright 2020-2021, Panagiotis "Ivory" Vasilopoulos <git@n0toose.net>
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */

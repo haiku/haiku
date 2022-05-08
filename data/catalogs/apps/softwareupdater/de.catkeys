@@ -16,7 +16,7 @@ No updates available	UpdateAction		Keine Aktualisierungen verfügbar
 New packages to be installed	SoftwareUpdaterWindow	List super item label	Zu installierende neue Pakete
 Packages to be updated	SoftwareUpdaterWindow	List super item label	Pakete werden aktualisiert
 to	SoftwareUpdaterWindow	List item text	auf
-Attempting to cancel the updates…	SoftwareUpdaterWindow		Versuche die Aktualisierungen abzubrechen…
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Versuche die Aktualisierungen abzubrechen …
 Contacting software repositories to check for package updates.	CheckManager		Um nach Aktualisierungen zu suchen, wird eine Verbindung mit den Paketquellen hergestellt.
 Available updates found	CheckManager		Aktualisierungen gefunden
 from repository	SoftwareUpdaterWindow	List item text	von Paketquelle
@@ -44,13 +44,13 @@ Don't quit	SoftwareUpdaterWindow		Nicht beenden
 Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Hier klicken, um SoftwareUpater zu starten. Für einige Aktualisierungen muss eine Problemlösung ausgewählt werden.
 Checking for updates	SoftwareUpdaterWindow		Aktualisierungen werden gesucht
 Updates completed	UpdateManager		Aktualisierungen abgeschlossen
-Reboot	SoftwareUpdaterWindow		Neustart
+Reboot	SoftwareUpdaterWindow		Neustarten
 Show more details	SoftwareUpdaterWindow		Weitere Details anzeigen
 Installing version	SoftwareUpdaterWindow	List item text	Installieren der Version
 Checking for updates	CheckManager		Aktualisierungen werden gesucht
 No remote repositories are available	UpdateManager	Error message	Es sind keine Paketquellen erreichbar
 Software {0, plural, one{update} other{updates}} available	CheckManager		Software{0, plural, one{aktualisierung} other{aktualisierungen}} verfügbar
-Reboot	SoftwareUpdaterWindow	Button label	Neustart
+Reboot	SoftwareUpdaterWindow	Button label	Neustarten
 Update	SoftwareUpdaterWindow	Alert button label	Aktualisieren
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Paketquellen öffnen
 Updates did not complete	UpdateAction		Aktualisierungen wurden nicht abgeschlossen
@@ -60,5 +60,5 @@ Uninstalling version	SoftwareUpdaterWindow	List item text	Deinstallieren der Ver
 Quit	SoftwareUpdaterWindow		Beenden
 No updates available	CheckManager		Keine Aktualisierungen verfügbar
 Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Gebrauch:  SoftwareUpdater <Befehl> [ <Option> ]\nAktualisiert installierte Pakete.\n\nBefehle:\n  update     - Durchsucht die Paketquellen nach Aktualisierungen aller Pakete.\n  check      - Sucht verfügbare Aktualisierungen, zeigt aber nur einen Hinweis mit dem Ergebnis.\n  full-sync  - Synchronisiert die installierten Pakete mit den Paketquellen.\n\nOptionen:\n  -h oder --help       Gibt diesen Hilfetext aus\n  -v oder --verbose   Gibt ausführliche Infos aus\n
-No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Es stehen keine Paketquellen zur Verfügung. Mit den 'Paketquellen'' Einstellungen bzw. dem 'pkman' Befehl lässt sich überprüfen, ob und welche Paketquellen aktiviert sind.
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Es stehen keine Paketquellen zur Verfügung. Mit den 'Paketquellen'' Einstellungen oder dem Befehl 'pkgman' lässt sich überprüfen, ob und welche Paketquellen aktiviert sind.
 Downloading packages	UpdateManager		Pakete werden heruntergeladen

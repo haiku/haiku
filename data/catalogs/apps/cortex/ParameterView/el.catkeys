@@ -1,0 +1,8 @@
+1	greek, modern (1453-)	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Θέματα
+Start control panel	ParameterWindow		Εκκίνηση πίνακα ελέγχου
+%nodeinfo% parameters	ParameterWindow		Ρυθμίσεις του %nodeinfo%
+OK	ParameterWindow		Εντάξει
+Window	ParameterWindow		Παράθυρο
+Could not start control panel (%error%)	ParameterWindow		Απέτυχε η εκκίνηση του πίνακα ελέγχου (%error%)
+Close	ParameterWindow		Κλείσιμο

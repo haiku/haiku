@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	610710493
+1	french	x-vnd.Haiku-Terminal	247549485
 ANSI cyan color	Terminal AppearancePrefView		Couleur cyan ANSI
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
 Insert path	Terminal TermView		Insérer un chemin de recherche
@@ -14,11 +14,14 @@ Solarized Dark	Terminal colors scheme		Ombragé
 Copy	Terminal TermWindow		Copier
 ANSI bright green color	Terminal AppearancePrefView		Couleur vert clair ANSI
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               affiche cette aide\n  -t,     --title              défini le titre de la fenêtre\n  -f,     --fullscreen         démarre en plein écran\n  -w,     --working-directory  défini le répertoire de travail initial
+ANSI white color	Terminal AppearancePrefView		Couleur blanc ANSI
 Retro	Terminal colors scheme		Rétro
 Edit tab title…	Terminal TermWindow		Éditer le titre de l’onglet…
 Settings	Terminal TermWindow		Réglages
 Print	Terminal TermWindow		Imprimer
 %app% settings	Terminal PrefWindow	window title	Réglages du %app%
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail actuel du processus actif.\n\t\t\tEn option, le nombre maximum de composants du chemin\n\t\t\tpeut être spécifié. Ex. « %2d » pour au plus deux composants.\n\t%i\t-\tL’index de l’onglet.\n\t%e\t-\tL’encodage de l’onglet actuel. Non affiché pour UTF-8.\n\t%p\t-\tLe nom du processus actif.
+ANSI black color	Terminal AppearancePrefView		Couleur noir ANSI 
 Use default	Terminal SetTitleWindow		Par défaut
 Close tab	Terminal TermWindow		Fermer l’onglet
 Selected background	Terminal AppearancePrefView		Fond sélectionné
@@ -37,6 +40,7 @@ Slate	Terminal colors scheme		Ardoise
 Defaults	Terminal PrefWindow		Paramètres par défaut
 Cancel	Terminal TermView		Annuler
 Revert	Terminal PrefWindow		Rétablir
+Relaxed	Terminal colors scheme		Décontracté
 ANSI bright magenta color	Terminal AppearancePrefView		Couleur magenta clair ANSI
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 ANSI bright cyan color	Terminal AppearancePrefView		Couleur cyan clair ANSI
@@ -90,6 +94,7 @@ Window size:	Terminal AppearancePrefView		Taille de la fenêtre :
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Decrease	Terminal TermWindow		Réduire
 Settings…	Terminal TermWindow		Réglages…
+ANSI bright white color	Terminal AppearancePrefView		Couleur blanc lumineux ANSI
 Blinking cursor	Terminal AppearancePrefView		Curseur clignotant
 Cancel	Terminal SetTitleWindow		Annuler
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre des fenêtres peut\ncontenir les éléments suivants :\n
@@ -105,6 +110,7 @@ Professional	Terminal colors scheme		Professionnel
 Font:	Terminal AppearancePrefView		Police :
 Paste	Terminal TermWindow		Coller
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Le motif servant à composer le titre de la fenêtre. Vous pouvez\nutiliser les variables suivantes :
+ANSI bright black color	Terminal AppearancePrefView		Couleur noir clair ANSI
 Copy here	Terminal TermView		Copier ici
 ANSI bright red color	Terminal AppearancePrefView		Couleur rouge clair ANSI
 Use default shell	Terminal Shell		Utiliser l’interpréteur de commande par défaut
@@ -117,7 +123,6 @@ No search string was entered.	Terminal TermWindow		Aucun texte à rechercher n�
 Text under cursor	Terminal AppearancePrefView		Texte sous le curseur
 Move here	Terminal TermView		Déplacer ici
 Abort	Terminal Shell		Abandonner
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail du processus actif.\n\t\t\tVous pouvez éventuellement spécifier le nombre d’éléments maximum\n\t\t\tdans le chemin. Par exemple, « %2d » pour au plus deux éléments.\n\t%i\t-\tL’indice de l’onglet.\n\t%e\t-\tLe jeu de caractère utilisé par l’onglet courant. Masqué pour UTF-8.\n\t%p\t-\tLe nom du processus actif.\n\t%%\t-\tLe caractère « % ».
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Les applications suivantes sont encore en fonctionnement :\n\n\t%1\n\nSi vous fermez le Terminal, les applications seront interrompues.
 Set window title	Terminal TermWindow		Changer le titre de la fenêtre
 Increase	Terminal TermWindow		Augmenter

@@ -167,17 +167,12 @@ ReadBatteryInfo(battery_driver_cookie* cookie,
 		batteryInfo->revision = GetUint32(pointer++);
 		TRACE("ReadBatteryInfo revision %u\n", batteryInfo->revision);
 
-		if (batteryInfo->revision == ACPI_BATTERY_REVISION_0) {
-			if (object->package.count < 20) {
-				status = B_ERROR;
-				goto exit;
-			}
-		} else if (object->package.count < 21) {
+		if (object->package.count < 20) {
 			status = B_ERROR;
 			goto exit;
 		}
-
 	}
+
 	batteryInfo->power_unit = GetUint32(pointer++);
 	batteryInfo->design_capacity = GetUint32(pointer++);
 	batteryInfo->last_full_charge = GetUint32(pointer++);
@@ -205,7 +200,8 @@ ReadBatteryInfo(battery_driver_cookie* cookie,
 	GetString(batteryInfo->oem_info, sizeof(batteryInfo->oem_info), pointer++);
 
 	if (batteryInfo->revision != ACPI_BATTERY_REVISION_BIF
-		&& batteryInfo->revision >= ACPI_BATTERY_REVISION_1) {
+		&& batteryInfo->revision >= ACPI_BATTERY_REVISION_1
+		&& object->package.count > 20) {
 		batteryInfo->swapping_capability = GetUint32(pointer++);
 	}
 exit:

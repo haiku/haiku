@@ -1,9 +1,8 @@
-1	thai	x-vnd.Haiku-About	2374494647
+1	thai	x-vnd.Haiku-About	3702260021
 Revision	AboutView		ปรับปรุง
 The Haikuware team and their bounty program\n	AboutView		ทีมไฮกุแวร์และโปรแกรมสนับสนุนของพวกเขา\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		ลิขสิทธิ์© 1999-2007 Michael C. Ring สงวนลิขสิทธิ์.
 %.2f GHz	AboutView		%.2f GHz
-Copyright © 2001-%d The Haiku project. 	AboutView		ลิขสิทธิ์© 2001-%d โครงงาน Haiku 
 \n\nSpecial thanks to:\n	AboutView		\n\nขอขอบคุณเป็นพิเศษสำหรับ: \n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (และเคอร์เนล NewOS ของเขา) \n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		ลิขสิทธิ์© 1999-2000 Y.Takagi สงวนลิขสิทธิ์.
@@ -47,9 +46,9 @@ Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	Ab
 Source Code: 	AboutView		Source Code:
 \nCopyrights\n\n	AboutView		\nลิขสิทธิ์\n\n
 GNU GPL v3	AboutWindow		GNU GPL v3
+Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		ลิขสิทธิ์ © 1996-2002, 2006 David Turner, Robert Wilhelm และ Werner Lemberg
 The HaikuPorts team\n	AboutView		The HaikuPorts team\n
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		มีซอฟต์แวร์จากโครงการ GNU ภายใต้ลิขสิทธิ์ GPL และ LGPL: \nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell \nลิขสิทธิ์ © The Free Software Foundation
-Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		ลิขสิทธิ์ © 1996-2002, 2006 David Turner, Robert Wilhelm และ Werner Lemberg
 Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		มีซอฟต์แวร์จากโครงการ FreeBSD ภายใต้ลิขสิทธิ์ BSD: \nftpd, ping, telnet, telnetd, traceroute \nลิขสิทธิ์ © 1994-2008 The FreeBSD Project สงวนลิขสิทธิ์
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		ลิขสิทธิ์ © 2002-2003 Steve Lhomme สงวนลิขสิทธิ์
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		ลิขสิทธิ์ © 2000-2019 Fabrice Bellard, et al.

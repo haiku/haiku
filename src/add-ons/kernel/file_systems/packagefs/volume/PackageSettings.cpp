@@ -216,12 +216,12 @@ PackageSettings::Load(dev_t mountPointDeviceID, ino_t mountPointNodeID,
 		return error;
 
 	// load the driver settings
-	void* settingsHandle = load_driver_settings(path.Path());
-	if (settingsHandle == NULL)
+	DriverSettingsUnloader settingsHandle(load_driver_settings(path.Path()));
+	if (!settingsHandle.IsSet())
 		return B_ENTRY_NOT_FOUND;
-	DriverSettingsUnloader settingsDeleter(settingsHandle);
 
-	const driver_settings* settings = get_driver_settings(settingsHandle);
+	const driver_settings* settings
+		= get_driver_settings(settingsHandle.Get());
 	for (int i = 0; i < settings->parameter_count; i++) {
 		const driver_parameter& parameter = settings->parameters[i];
 		if (strcmp(parameter.name, "Package") != 0

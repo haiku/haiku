@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -547,19 +547,24 @@ RatePackageWindow::_QueryRatingThread()
 	WebAppInterface interface;
 	BMessage info;
 	const DepotInfo* depot = fModel.DepotForName(package->DepotName());
-	BString repositoryCode;
+	BString webAppRepositoryCode;
+	BString webAppRepositorySourceCode;
 
-	if (depot != NULL)
-		repositoryCode = depot->WebAppRepositoryCode();
+	if (depot != NULL) {
+		webAppRepositoryCode = depot->WebAppRepositoryCode();
+		webAppRepositorySourceCode = depot->WebAppRepositorySourceCode();
+	}
 
-	if (repositoryCode.IsEmpty()) {
-		HDERROR("unable to obtain the repository code for depot; %s",
-			package->DepotName().String());
+	if (webAppRepositoryCode.IsEmpty()
+			|| webAppRepositorySourceCode.IsEmpty()) {
+		HDERROR("unable to obtain the repository code or repository source "
+			"code for depot; %s", package->DepotName().String());
 		BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 	} else {
 		status_t status = interface
 			.RetreiveUserRatingForPackageAndVersionByUser(package->Name(),
-				package->Version(), package->Architecture(), repositoryCode,
+				package->Version(), package->Architecture(),
+				webAppRepositoryCode, webAppRepositorySourceCode,
 				nickname, info);
 
 		if (status == B_OK) {
@@ -623,7 +628,8 @@ RatePackageWindow::_SendRatingThread()
 	BMessenger messenger = BMessenger(this);
 	BString package = fPackage->Name();
 	BString architecture = fPackage->Architecture();
-	BString repositoryCode;
+	BString webAppRepositoryCode;
+	BString webAppRepositorySourceCode;
 	int rating = (int)fRating;
 	BString stability = fStabilityCode;
 	BString comment = fRatingText->Text();
@@ -636,16 +642,25 @@ RatePackageWindow::_SendRatingThread()
 
 	const DepotInfo* depot = fModel.DepotForName(fPackage->DepotName());
 
-	if (depot != NULL)
-		repositoryCode = depot->WebAppRepositoryCode();
+	if (depot != NULL) {
+		webAppRepositoryCode = depot->WebAppRepositoryCode();
+		webAppRepositorySourceCode = depot->WebAppRepositorySourceCode();
+	}
 
 	WebAppInterface interface = fModel.GetWebAppInterface();
 
 	Unlock();
 
-	if (repositoryCode.Length() == 0) {
-		HDERROR("unable to find the web app repository code for the local "
-			"depot %s",
+	if (webAppRepositoryCode.IsEmpty()) {
+		HDERROR("unable to find the web app repository code for the "
+			"local depot %s",
+			fPackage->DepotName().String());
+		return;
+	}
+
+	if (webAppRepositorySourceCode.IsEmpty()) {
+		HDERROR("unable to find the web app repository source code for the "
+			"local depot %s",
 			fPackage->DepotName().String());
 		return;
 	}
@@ -662,8 +677,8 @@ RatePackageWindow::_SendRatingThread()
 	} else {
 		HDINFO("will create a new user rating for pkg [%s]", package.String());
 		status = interface.CreateUserRating(package, fPackage->Version(),
-			architecture, repositoryCode, languageCode, comment, stability,
-			rating, info);
+			architecture, webAppRepositoryCode, webAppRepositorySourceCode,
+			languageCode, comment, stability, rating, info);
 	}
 
 	if (status == B_OK) {

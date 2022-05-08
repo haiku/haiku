@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2021 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2022 Haiku, Inc. All rights reserved.
  * Released under the terms of the MIT License.
  */
 
@@ -17,16 +17,28 @@
 #include "mmu.h"
 #include "efi_platform.h"
 
-#define ALIGN_PAGEDIR (1024 * 16)
-#define MAX_PAGE_TABLES 192
-#define PAGE_TABLE_AREA_SIZE (MAX_PAGE_TABLES * ARM_MMU_L2_COARSE_TABLE_SIZE)
+
+//#define TRACE_MMU
+#ifdef TRACE_MMU
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
+//#define TRACE_MEMORY_MAP
+//#define TRACE_PAGE_DIRECTORY
+
+#define ALIGN_PAGEDIR			(1024 * 16)
+#define MAX_PAGE_TABLES			192
+#define PAGE_TABLE_AREA_SIZE	(MAX_PAGE_TABLES * ARM_MMU_L2_COARSE_TABLE_SIZE)
 
 static uint32_t *sPageDirectory = NULL;
-static uint32_t *sFirstPageTable = NULL;
 static uint32_t *sNextPageTable = NULL;
 static uint32_t *sLastPageTable = NULL;
 
 
+#ifdef TRACE_PAGE_DIRECTORY
 static void
 dump_page_dir(void)
 {
@@ -50,25 +62,27 @@ dump_page_dir(void)
 		}
 	}
 }
+#endif
+
 
 static uint32 *
 get_next_page_table(void)
 {
-	uint32 *page_table = sNextPageTable;
+	uint32 *pageTable = sNextPageTable;
 	sNextPageTable += ARM_MMU_L2_COARSE_ENTRY_COUNT;
 	if (sNextPageTable >= sLastPageTable)
 		panic("ran out of page tables\n");
-	return page_table;
+	return pageTable;
 }
 
 
 static void
-map_page(addr_t virt_addr, phys_addr_t phys_addr, uint32_t flags)
+map_page(addr_t virtAddr, phys_addr_t physAddr, uint32_t flags)
 {
-	phys_addr &= ~(B_PAGE_SIZE - 1);
+	physAddr &= ~(B_PAGE_SIZE - 1);
 
 	uint32 *pageTable = NULL;
-	uint32 pageDirectoryIndex = VADDR_TO_PDENT(virt_addr);
+	uint32 pageDirectoryIndex = VADDR_TO_PDENT(virtAddr);
 	uint32 pageDirectoryEntry = sPageDirectory[pageDirectoryIndex];
 
 	if (pageDirectoryEntry == 0) {
@@ -78,104 +92,119 @@ map_page(addr_t virt_addr, phys_addr_t phys_addr, uint32_t flags)
 		pageTable = (uint32 *)(pageDirectoryEntry & ARM_PDE_ADDRESS_MASK);
 	}
 
-	uint32 pageTableIndex = VADDR_TO_PTENT(virt_addr);
-	pageTable[pageTableIndex] = phys_addr | flags | ARM_MMU_L2_TYPE_SMALLNEW;
+	uint32 pageTableIndex = VADDR_TO_PTENT(virtAddr);
+	pageTable[pageTableIndex] = physAddr | flags | ARM_MMU_L2_TYPE_SMALLNEW;
 }
 
 
 static void
-map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint32_t flags)
+map_range(addr_t virtAddr, phys_addr_t physAddr, size_t size, uint32_t flags)
 {
-	//dprintf("map 0x%08x --> 0x%08x, len=0x%08x, flags=0x%08x\n",
-	//	(uint32_t)virt_addr, (uint32_t)phys_addr, (uint32_t)size, flags);
+	//TRACE("map 0x%08" B_PRIxADDR " --> 0x%08" B_PRIxPHYSADDR
+	//	", len=0x%08" B_PRIxSIZE ", flags=0x%08" PRIx32 "\n",
+	//	virtAddr, physAddr, size, flags);
 
 	for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
-		map_page(virt_addr + offset, phys_addr + offset, flags);
+		map_page(virtAddr + offset, physAddr + offset, flags);
 	}
 
-	ASSERT_ALWAYS(insert_virtual_allocated_range(virt_addr, size) >= B_OK);
+	if (virtAddr >= KERNEL_LOAD_BASE)
+		ASSERT_ALWAYS(insert_virtual_allocated_range(virtAddr, size) >= B_OK);
+}
+
+
+static void
+insert_virtual_range_to_keep(uint64 start, uint64 size)
+{
+	status_t status = insert_address_range(
+		gKernelArgs.arch_args.virtual_ranges_to_keep,
+		&gKernelArgs.arch_args.num_virtual_ranges_to_keep,
+		MAX_VIRTUAL_RANGES_TO_KEEP, start, size);
+
+	if (status == B_ENTRY_NOT_FOUND)
+		panic("too many virtual ranges to keep");
+	else if (status != B_OK)
+		panic("failed to add virtual range to keep");
+}
+
+
+static addr_t
+map_range_to_new_area(addr_t start, size_t size, uint32_t flags)
+{
+	if (size == 0)
+		return 0;
+
+	phys_addr_t physAddr = ROUNDDOWN(start, B_PAGE_SIZE);
+	size_t alignedSize = ROUNDUP(size + (start - physAddr), B_PAGE_SIZE);
+	addr_t virtAddr = get_next_virtual_address(alignedSize);
+
+	map_range(virtAddr, physAddr, alignedSize, flags);
+	insert_virtual_range_to_keep(virtAddr, alignedSize);
+
+	return virtAddr + (start - physAddr);
 }
 
 
 static void
 map_range_to_new_area(addr_range& range, uint32_t flags)
 {
-	if (range.size == 0) {
-		range.start = 0;
-		return;
-	}
-
-	phys_addr_t phys_addr = range.start;
-	addr_t virt_addr = get_next_virtual_address(range.size);
-
-	map_range(virt_addr, phys_addr, range.size, flags);
-
-	if (gKernelArgs.arch_args.num_virtual_ranges_to_keep
-		>= MAX_VIRTUAL_RANGES_TO_KEEP)
-		panic("too many virtual ranges to keep");
-
-	range.start = virt_addr;
-
-	gKernelArgs.arch_args.virtual_ranges_to_keep[
-		gKernelArgs.arch_args.num_virtual_ranges_to_keep++] = range;
+	range.start = map_range_to_new_area(range.start, range.size, flags);
 }
 
 
 static void
-build_physical_memory_list(size_t memory_map_size,
-	efi_memory_descriptor *memory_map, size_t descriptor_size,
-	uint32_t descriptor_version)
+map_range_to_new_area(efi_memory_descriptor *entry, uint32_t flags)
 {
-	addr_t addr = (addr_t)memory_map;
+	uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
+	entry->VirtualStart = map_range_to_new_area(entry->PhysicalStart, size, flags);
+}
+
+
+static void
+build_physical_memory_list(size_t memoryMapSize,
+	efi_memory_descriptor *memoryMap, size_t descriptorSize,
+	uint32_t descriptorVersion)
+{
+	addr_t addr = (addr_t)memoryMap;
 
 	gKernelArgs.num_physical_memory_ranges = 0;
 
 	// First scan: Add all usable ranges
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = (efi_memory_descriptor *)(addr + i * descriptor_size);
+	for (size_t i = 0; i < memoryMapSize / descriptorSize; ++i) {
+		efi_memory_descriptor* entry = (efi_memory_descriptor *)(addr + i * descriptorSize);
 		switch (entry->Type) {
-		case EfiLoaderCode:
-		case EfiLoaderData:
-			entry->VirtualStart = entry->PhysicalStart;
-			break;
-		case EfiBootServicesCode:
-		case EfiBootServicesData:
-		case EfiConventionalMemory: {
-			// Usable memory.
-			uint64_t base = entry->PhysicalStart;
-			uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
-			insert_physical_memory_range(base, size);
-			break;
-		}
-		case EfiACPIReclaimMemory:
-			// ACPI reclaim -- physical memory we could actually use later
-			break;
-		case EfiRuntimeServicesCode:
-		case EfiRuntimeServicesData:
-			entry->VirtualStart = entry->PhysicalStart;
-			break;
-		case EfiMemoryMappedIO:
-			entry->VirtualStart = entry->PhysicalStart;
-			break;
+			case EfiLoaderCode:
+			case EfiLoaderData:
+			case EfiBootServicesCode:
+			case EfiBootServicesData:
+			case EfiConventionalMemory: {
+				// Usable memory.
+				uint64_t base = entry->PhysicalStart;
+				uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
+				insert_physical_memory_range(base, size);
+				break;
+			}
+			default:
+				break;
 		}
 	}
 
 	uint64_t initialPhysicalMemory = total_physical_memory();
 
 	// Second scan: Remove everything reserved that may overlap
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = (efi_memory_descriptor *)(addr + i * descriptor_size);
+	for (size_t i = 0; i < memoryMapSize / descriptorSize; ++i) {
+		efi_memory_descriptor* entry = (efi_memory_descriptor *)(addr + i * descriptorSize);
 		switch (entry->Type) {
-		case EfiLoaderCode:
-		case EfiLoaderData:
-		case EfiBootServicesCode:
-		case EfiBootServicesData:
-		case EfiConventionalMemory:
-			break;
-		default:
-			uint64_t base = entry->PhysicalStart;
-			uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
-			remove_physical_memory_range(base, size);
+			case EfiLoaderCode:
+			case EfiLoaderData:
+			case EfiBootServicesCode:
+			case EfiBootServicesData:
+			case EfiConventionalMemory:
+				break;
+			default:
+				uint64_t base = entry->PhysicalStart;
+				uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
+				remove_physical_memory_range(base, size);
 		}
 	}
 
@@ -188,22 +217,22 @@ build_physical_memory_list(size_t memory_map_size,
 
 
 static void
-build_physical_allocated_list(size_t memory_map_size,
-	efi_memory_descriptor *memory_map, size_t descriptor_size,
-	uint32_t descriptor_version)
+build_physical_allocated_list(size_t memoryMapSize,
+	efi_memory_descriptor *memoryMap, size_t descriptorSize,
+	uint32_t descriptorVersion)
 {
-	addr_t addr = (addr_t)memory_map;
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = (efi_memory_descriptor *)(addr + i * descriptor_size);
+	addr_t addr = (addr_t)memoryMap;
+	for (size_t i = 0; i < memoryMapSize / descriptorSize; ++i) {
+		efi_memory_descriptor* entry = (efi_memory_descriptor *)(addr + i * descriptorSize);
 		switch (entry->Type) {
-		case EfiLoaderData: {
-			uint64_t base = entry->PhysicalStart;
-			uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
-			insert_physical_allocated_range(base, size);
-			break;
-		}
-		default:
-			;
+			case EfiLoaderData: {
+				uint64_t base = entry->PhysicalStart;
+				uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
+				insert_physical_allocated_range(base, size);
+				break;
+			}
+			default:
+				;
 		}
 	}
 
@@ -213,56 +242,50 @@ build_physical_allocated_list(size_t memory_map_size,
 
 
 void
-arch_mmu_init()
+arch_mmu_post_efi_setup(size_t memoryMapSize,
+	efi_memory_descriptor *memoryMap, size_t descriptorSize,
+	uint32_t descriptorVersion)
 {
-}
-
-
-void
-arch_mmu_post_efi_setup(size_t memory_map_size,
-	efi_memory_descriptor *memory_map, size_t descriptor_size,
-	uint32_t descriptor_version)
-{
-	build_physical_allocated_list(memory_map_size, memory_map,
-		descriptor_size, descriptor_version);
+	build_physical_allocated_list(memoryMapSize, memoryMap,
+		descriptorSize, descriptorVersion);
 
 	// Switch EFI to virtual mode, using the kernel pmap.
-	// Something involving ConvertPointer might need to be done after this?
-	// http://wiki.phoenix.com/wiki/index.php/EFI_RUNTIME_SERVICES
-	kRuntimeServices->SetVirtualAddressMap(memory_map_size, descriptor_size,
-		descriptor_version, memory_map);
+	kRuntimeServices->SetVirtualAddressMap(memoryMapSize, descriptorSize,
+		descriptorVersion, memoryMap);
 
+#ifdef TRACE_MEMORY_MAP
 	dprintf("phys memory ranges:\n");
 	for (uint32_t i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
-		uint32_t start = (uint32_t)gKernelArgs.physical_memory_range[i].start;
-		uint32_t size = (uint32_t)gKernelArgs.physical_memory_range[i].size;
-		dprintf("    0x%08x-0x%08x, length 0x%08x\n",
+		uint64 start = gKernelArgs.physical_memory_range[i].start;
+		uint64 size = gKernelArgs.physical_memory_range[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
 			start, start + size, size);
 	}
 
 	dprintf("allocated phys memory ranges:\n");
 	for (uint32_t i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
-		uint32_t start = (uint32_t)gKernelArgs.physical_allocated_range[i].start;
-		uint32_t size = (uint32_t)gKernelArgs.physical_allocated_range[i].size;
-		dprintf("    0x%08x-0x%08x, length 0x%08x\n",
+		uint64 start = gKernelArgs.physical_allocated_range[i].start;
+		uint64 size = gKernelArgs.physical_allocated_range[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
 			start, start + size, size);
 	}
 
 	dprintf("allocated virt memory ranges:\n");
 	for (uint32_t i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
-		uint32_t start = (uint32_t)gKernelArgs.virtual_allocated_range[i].start;
-		uint32_t size = (uint32_t)gKernelArgs.virtual_allocated_range[i].size;
-		dprintf("    0x%08x-0x%08x, length 0x%08x\n",
+		uint64 start = gKernelArgs.virtual_allocated_range[i].start;
+		uint64 size = gKernelArgs.virtual_allocated_range[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
 			start, start + size, size);
 	}
 
 	dprintf("virt memory ranges to keep:\n");
 	for (uint32_t i = 0; i < gKernelArgs.arch_args.num_virtual_ranges_to_keep; i++) {
-		uint32_t start = (uint32_t)gKernelArgs.arch_args.virtual_ranges_to_keep[i].start;
-		uint32_t size = (uint32_t)gKernelArgs.arch_args.virtual_ranges_to_keep[i].size;
-		dprintf("    0x%08x-0x%08x, length 0x%08x\n",
+		uint32 start = gKernelArgs.arch_args.virtual_ranges_to_keep[i].start;
+		uint32 size = gKernelArgs.arch_args.virtual_ranges_to_keep[i].size;
+		dprintf("    0x%08" B_PRIx32 "-0x%08" B_PRIx32 ", length 0x%08" B_PRIx32 "\n",
 			start, start + size, size);
 	}
+#endif
 }
 
 
@@ -275,51 +298,35 @@ arch_mmu_allocate_page_tables(void)
 	sPageDirectory = (uint32 *)ROUNDUP((uint32)sPageDirectory, ALIGN_PAGEDIR);
 	memset(sPageDirectory, 0, ARM_MMU_L1_TABLE_SIZE);
 
-	sFirstPageTable = (uint32*)((uint32)sPageDirectory + ARM_MMU_L1_TABLE_SIZE);
-	sNextPageTable = sFirstPageTable;
-	sLastPageTable = (uint32*)((uint32)sFirstPageTable + PAGE_TABLE_AREA_SIZE);
+	sNextPageTable = (uint32*)((uint32)sPageDirectory + ARM_MMU_L1_TABLE_SIZE);
+	sLastPageTable = (uint32*)((uint32)sNextPageTable + PAGE_TABLE_AREA_SIZE);
 
-	memset(sFirstPageTable, 0, PAGE_TABLE_AREA_SIZE);
+	memset(sNextPageTable, 0, PAGE_TABLE_AREA_SIZE);
 
-	dprintf("sPageDirectory  = 0x%08x\n", (uint32)sPageDirectory);
-	dprintf("sFirstPageTable = 0x%08x\n", (uint32)sFirstPageTable);
-	dprintf("sLastPageTable  = 0x%08x\n", (uint32)sLastPageTable);
+	TRACE("sPageDirectory = 0x%08x\n", (uint32)sPageDirectory);
+	TRACE("sNextPageTable = 0x%08x\n", (uint32)sNextPageTable);
+	TRACE("sLastPageTable = 0x%08x\n", (uint32)sLastPageTable);
 }
 
-uint32_t
-arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
-	efi_memory_descriptor *memory_map, size_t descriptor_size,
-	uint32_t descriptor_version)
-{
-	addr_t memory_map_addr = (addr_t)memory_map;
 
+uint32_t
+arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
+	efi_memory_descriptor *memoryMap, size_t descriptorSize,
+	uint32_t descriptorVersion)
+{
 	arch_mmu_allocate_page_tables();
 
-	build_physical_memory_list(memory_map_size, memory_map,
-		descriptor_size, descriptor_version);
+	build_physical_memory_list(memoryMapSize, memoryMap,
+		descriptorSize, descriptorVersion);
 
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
+	addr_t memoryMapAddr = (addr_t)memoryMap;
+	for (size_t i = 0; i < memoryMapSize / descriptorSize; ++i) {
 		efi_memory_descriptor* entry =
-			(efi_memory_descriptor *)(memory_map_addr + i * descriptor_size);
-		switch (entry->Type) {
-		case EfiLoaderCode:
-		case EfiLoaderData:
-			map_range(entry->VirtualStart, entry->PhysicalStart,
-				entry->NumberOfPages * B_PAGE_SIZE,
-				ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
-			break;
-		default:
-			;
+			(efi_memory_descriptor *)(memoryMapAddr + i * descriptorSize);
+		if ((entry->Attribute & EFI_MEMORY_RUNTIME) != 0) {
+			map_range_to_new_area(entry,
+				ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_KRW);
 		}
-	}
-
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry =
-			(efi_memory_descriptor *)(memory_map_addr + i * descriptor_size);
-		if ((entry->Attribute & EFI_MEMORY_RUNTIME) != 0)
-			map_range(entry->VirtualStart, entry->PhysicalStart,
-				entry->NumberOfPages * B_PAGE_SIZE,
-				ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
 	}
 
 	void* cookie = NULL;
@@ -328,34 +335,42 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	size_t size;
 	while (mmu_next_region(&cookie, &vaddr, &paddr, &size)) {
 		map_range(vaddr, paddr, size,
-			ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
+			ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_KRW);
 	}
 
-	map_range_to_new_area(gKernelArgs.arch_args.uart.regs, ARM_MMU_L2_FLAG_B);
-
-	// identity mapping for page table area
-	uint32_t page_table_area = (uint32_t)sFirstPageTable;
-	map_range(page_table_area, page_table_area, PAGE_TABLE_AREA_SIZE,
-		ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C | ARM_MMU_L2_FLAG_AP_RW);
+	map_range_to_new_area(gKernelArgs.arch_args.uart.regs,
+		ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_AP_KRW | ARM_MMU_L2_FLAG_XN);
 
 	sort_address_ranges(gKernelArgs.virtual_allocated_range,
 		gKernelArgs.num_virtual_allocated_ranges);
 
-	addr_t vir_pgdir;
-	platform_bootloader_address_to_kernel_address((void*)sPageDirectory, &vir_pgdir);
+	addr_t virtPageDirectory;
+	platform_bootloader_address_to_kernel_address((void*)sPageDirectory, &virtPageDirectory);
 
 	gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
-	gKernelArgs.arch_args.vir_pgdir = (uint32)vir_pgdir;
+	gKernelArgs.arch_args.vir_pgdir = (uint32)virtPageDirectory;
 	gKernelArgs.arch_args.next_pagetable = (uint32)(sNextPageTable) - (uint32)sPageDirectory;
+	gKernelArgs.arch_args.last_pagetable = (uint32)(sLastPageTable) - (uint32)sPageDirectory;
 
-	dprintf("gKernelArgs.arch_args.phys_pgdir     = 0x%08x\n",
+	TRACE("gKernelArgs.arch_args.phys_pgdir     = 0x%08x\n",
 		(uint32_t)gKernelArgs.arch_args.phys_pgdir);
-	dprintf("gKernelArgs.arch_args.vir_pgdir      = 0x%08x\n",
+	TRACE("gKernelArgs.arch_args.vir_pgdir      = 0x%08x\n",
 		(uint32_t)gKernelArgs.arch_args.vir_pgdir);
-	dprintf("gKernelArgs.arch_args.next_pagetable = 0x%08x\n",
+	TRACE("gKernelArgs.arch_args.next_pagetable = 0x%08x\n",
 		(uint32_t)gKernelArgs.arch_args.next_pagetable);
+	TRACE("gKernelArgs.arch_args.last_pagetable = 0x%08x\n",
+		(uint32_t)gKernelArgs.arch_args.last_pagetable);
 
-	//dump_page_dir();
+#ifdef TRACE_PAGE_DIRECTORY
+	dump_page_dir();
+#endif
 
 	return (uint32_t)sPageDirectory;
+}
+
+
+void
+arch_mmu_init()
+{
+	// empty
 }

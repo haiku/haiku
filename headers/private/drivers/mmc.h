@@ -110,8 +110,8 @@ typedef struct mmc_device_interface {
 
 
 // Device attribute paths for the MMC device
-static const char* kMmcRcaAttribute = "mmc/rca";
-static const char* kMmcTypeAttribute = "mmc/type";
+const char* const kMmcRcaAttribute = "mmc/rca";
+const char* const kMmcTypeAttribute = "mmc/type";
 
 
 #endif /* _MMC_H */

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	3437352458
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	4181156212
 Repository update error	LocalRepositoryUpdateProcess		Erro de atualização do repositório
 Network error	ServerHelper		Erro de rede
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ocorreu um erro ao atualizar o repositório: %error%
@@ -94,7 +94,6 @@ Repository	PackageListView		Repositório
 The email is malformed.	UserLoginWindow		O e-mail está malformado.
 Close	UserLoginWindow		Fechar
 Close	RatePackageWindow		Fechar
-An unexpected error has been sent from the server [%i]	ServerHelper		Um erro inesperado foi enviado do servidor [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizando dados do pacote para o repositório '%REPO_NAME%'
 Settings	SettingsWindow		Configurações
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ocorreu um erro ao baixar as condições de uso necessárias para criar um novo usuário. Verifique o log para obter detalhes e tente novamente. \nAs informações sobre como visualizar os logs estão disponíveis na seção HaikuDepot do Guia do usuário do Haiku.
@@ -137,8 +136,8 @@ Source packages	MainWindow		Pacotes fonte
 -	no package size		-
 Problem with working files	App		Problema com arquivos de trabalho
 Server error	ServerHelper		Erro de servidor
-Try again	App		Tente novamente
 Rate package	RatePackageWindow		Avaliar pacote…
+Try again	App		Tente novamente
 Unknown	PackageListView		Desconhecido
 I agree to the usage conditions	UserLoginWindow		Eu concordo com as condições de uso
 Log in	UserLoginWindow		Entrar
@@ -170,6 +169,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Versão do cliente muito antiga
 Local repository load error	LocalPkgDataLoadProcess		Erro de carregamento do repositório local
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		O usuário não existe ou a senha errada foi fornecida. Verifique suas credenciais e tente novamente.
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Repita a senha:
 All repositories	MainWindow		Todos os repositórios

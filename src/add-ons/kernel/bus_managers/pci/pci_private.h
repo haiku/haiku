@@ -60,6 +60,10 @@ status_t	pci_unreserve_device(uchar virtualBus, uchar device, uchar function,
 
 status_t	pci_update_interrupt_line(uchar virtualBus, uchar device,
 				uchar function, uchar newInterruptLineValue);
+status_t	pci_get_powerstate(uchar virtualBus, uint8 device,
+				uint8 function, uint8* state);
+status_t 	pci_set_powerstate(uchar virtualBus, uint8 device,
+				uint8 function, uint8 newState);
 
 status_t 	pci_io_init(void);
 uint8		pci_read_io_8(int mapped_io_addr);

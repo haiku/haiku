@@ -62,4 +62,7 @@
 #define R_RISCV_32_PCREL			57
 #define R_RISCV_IRELATIVE			58
 
+#define TLS_DTV_OFFSET 0x800
+
+
 #endif	/* _SYSTEM_ARCH_RISCV64_ELF_H */

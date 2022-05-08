@@ -126,6 +126,9 @@ FontManager::FontManager()
 			// Precache the plain and bold fonts
 			_PrecacheFontFile(fDefaultPlainFont.Get());
 			_PrecacheFontFile(fDefaultBoldFont.Get());
+
+			// Post a message so we scan the initial paths.
+			PostMessage(B_PULSE);
 		}
 	}
 }
@@ -154,8 +157,6 @@ FontManager::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_NODE_MONITOR:
 		{
-			// TODO: support removing fonts!
-
 			int32 opcode;
 			if (message->FindInt32("opcode", &opcode) != B_OK)
 				return;
@@ -294,7 +295,14 @@ FontManager::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+
+		default:
+			BLooper::MessageReceived(message);
+			break;
 	}
+
+	// Scan fonts here if we need to, preventing other threads from having to do so.
+	_ScanFontsIfNecessary();
 }
 
 

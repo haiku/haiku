@@ -65,7 +65,12 @@ public:
 		FDIReceiver&				Receiver()
 										{ return fReceiver; };
 
-		status_t					Train(display_timing* target);
+		status_t					PreTrain(
+										display_timing* target,
+										uint32* linkBandwidth,
+										uint32* lanes,
+										uint32* bitsPerPixel);
+		status_t					Train(display_timing* target, uint32 lanes);
 
 private:
 		status_t					_NormalTrain(uint32 lanes);

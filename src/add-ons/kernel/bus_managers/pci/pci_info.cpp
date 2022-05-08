@@ -113,11 +113,22 @@ print_generic_info(const pci_info *info, bool verbose)
 	TRACE(("PCI:   interrupt_line %02x, interrupt_pin %02x, min_grant %02x, "
 		"max_latency %02x\n", info->u.h0.interrupt_line, info->u.h0.interrupt_pin,
 		info->u.h0.min_grant, info->u.h0.max_latency));
-	for (int i = 0; i < 6; i++)
-		TRACE(("PCI:   base reg %d: host %08" B_PRIx32 ", pci %08" B_PRIx32 ", "
-			"size %08" B_PRIx32 ", flags %02x\n", i, info->u.h0.base_registers[i],
-			info->u.h0.base_registers_pci[i], info->u.h0.base_register_sizes[i],
-			info->u.h0.base_register_flags[i]));
+	for (int i = 0; i < 6; i++) {
+		if ((info->u.h0.base_register_flags[i] & PCI_address_type) == PCI_address_type_64) {
+			TRACE(("PCI:   base reg %d: host %016" B_PRIx64 ", pci %016" B_PRIx64 ", "
+				"size %08" B_PRIx64 ", flags %02x %02x\n", i,
+				info->u.h0.base_registers[i] | ((uint64)info->u.h0.base_registers[i + 1] << 32),
+				info->u.h0.base_registers_pci[i] | ((uint64)info->u.h0.base_registers_pci[i + 1] << 32),
+				info->u.h0.base_register_sizes[i] | ((uint64)info->u.h0.base_register_sizes[i + 1] << 32),
+				info->u.h0.base_register_flags[i], info->u.h0.base_register_flags[i + 1]));
+			i++;
+		} else {
+			TRACE(("PCI:   base reg %d: host %08" B_PRIx32 ", pci %08" B_PRIx32 ", "
+				"size %08" B_PRIx32 ", flags %02x\n", i, info->u.h0.base_registers[i],
+				info->u.h0.base_registers_pci[i], info->u.h0.base_register_sizes[i],
+				info->u.h0.base_register_flags[i]));
+		}
+	}
 }
 
 
@@ -402,6 +413,39 @@ get_extended_capability_name(uint16 cap_id)
 			return "Downstream Porto Containment";
 		case PCI_extcap_id_l1pm:
 			return "L1 Power Management Substates";
+		case PCI_extcap_id_ptm:
+			return "Precision Time Measurement";
+		case PCI_extcap_id_m_pcie:
+			return "PCIe over M-PHY";
+		case PCI_extcap_id_frs:
+			return "FRS Queuing";
+		case PCI_extcap_id_rtr:
+			return "Readiness Time Reporting";
+		case PCI_extcap_id_dvsec:
+			return "Designated Vendor-Specific";
+		case PCI_extcap_id_vf_resizable_bar:
+			return "VF Resizable BAR";
+		case PCI_extcap_id_datalink:
+			return "Data Link Feature";
+		case PCI_extcap_id_16gt:
+			return "Physical Layer 16.0 GT/s";
+		case PCI_extcap_id_lmr:
+			return "Lane Marging at the Receiver";
+		case PCI_extcap_id_hierarchy_id:
+			return "Hierarchy ID";
+		case PCI_extcap_id_npem:
+			return "Native PCIe Enclosure Management";
+		case PCI_extcap_id_pl32:
+			return "Physical Layer 32.0 GT/s";
+		case PCI_extcap_id_ap:
+			return "Alternate Protocol";
+		case PCI_extcap_id_sfi:
+			return "System Firmware Intermediary";
+		case PCI_extcap_id_sf:
+			return "Shadow Functions";
+		case PCI_extcap_id_doe:
+			return "Data Object Exchange";
+
 		default:
 			return NULL;
 	}

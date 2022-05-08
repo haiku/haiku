@@ -20,7 +20,7 @@ Use month/day-names from preferred language	TimeFormatSettings		Ay/gün adların
 already chosen	LanguageListView		halihazırda seçili
 Preferred languages	Locale Preflet Window		Tercih edilen diller
 Full format:	TimeFormatSettings		Tam biçim:
-Cancel	Locale Preflet Window		İptal
+Cancel	Locale Preflet Window		Vazgeç
 Revert	Locale Preflet Window		Eski haline döndür
 Translate application and folder names	TimeFormatSettings		Uygulama ve klasör adlarını çevir
 12 hour	TimeFormatSettings		12 saat

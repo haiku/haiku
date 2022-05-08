@@ -34,4 +34,6 @@
 #define	R_68K_GNU_VTINHERIT 23
 #define	R_68K_GNU_VTENTRY 24
 
+#define TLS_DTV_OFFSET 0
+
 #endif	/* _KERNEL_ARCH_M68K_ELF_H */

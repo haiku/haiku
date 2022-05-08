@@ -32,7 +32,8 @@ status_t	_user_realtime_sem_unlink(const char* name);
 
 status_t	_user_realtime_sem_get_value(sem_id semID, int* value);
 status_t	_user_realtime_sem_post(sem_id semID);
-status_t	_user_realtime_sem_wait(sem_id semID, bigtime_t timeout);
+status_t	_user_realtime_sem_wait(sem_id semID, uint32 flags,
+					bigtime_t timeout);
 
 __END_DECLS
 

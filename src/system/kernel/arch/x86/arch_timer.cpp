@@ -27,10 +27,11 @@
 
 //#define TRACE_TIMER
 #ifdef TRACE_TIMER
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf("arch_timer: " x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
+
 
 extern timer_info gPITTimer;
 extern timer_info gAPICTimer;
@@ -48,7 +49,7 @@ static timer_info *sTimer = NULL;
 void
 arch_timer_set_hardware_timer(bigtime_t timeout)
 {
-	TRACE(("arch_timer_set_hardware_timer: timeout %lld\n", timeout));
+	TRACE("arch_timer_set_hardware_timer: timeout %" B_PRIdBIGTIME "\n", timeout);
 	sTimer->set_hardware_timer(timeout);
 }
 
@@ -56,7 +57,7 @@ arch_timer_set_hardware_timer(bigtime_t timeout)
 void
 arch_timer_clear_hardware_timer(void)
 {
-	TRACE(("arch_timer_clear_hardware_timer\n"));
+	TRACE("arch_timer_clear_hardware_timer\n");
 	sTimer->clear_hardware_timer();
 }
 
@@ -65,10 +66,10 @@ static void
 sort_timers(timer_info *timers[], int numTimers)
 {
 	timer_info *tempPtr;
-	int max = 0;	
+	int max = 0;
 	int i = 0;
 	int j = 0;
-	
+
 	for (i = 0; i < numTimers - 1; i++) {
 		max = i;
 		for (j = i + 1; j < numTimers; j++) {
@@ -78,10 +79,10 @@ sort_timers(timer_info *timers[], int numTimers)
 		if (max != i) {
 			tempPtr = timers[max];
 			timers[max] = timers[i];
-			timers[i] = tempPtr;		
+			timers[i] = tempPtr;
 		}
 	}
-	
+
 #if 0
 	for (i = 0; i < numTimers; i++)
 		dprintf(" %s: priority %d\n", timers[i]->name, timers[i]->get_priority());
@@ -97,7 +98,7 @@ arch_init_timer(kernel_args *args)
 
 	timer_info *timer = NULL;
 	cpu_status state = disable_interrupts();
-	
+
 	for (int i = 0; (timer = sTimers[i]) != NULL; i++) {
 		if (timer->init(args) == B_OK)
 			break;

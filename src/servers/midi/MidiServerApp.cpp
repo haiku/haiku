@@ -1,14 +1,14 @@
 /*
  * Copyright 2002-2015, Haiku, Inc. All rights reserved.
  * Copyright 2002-2004, Matthijs Hollemans
- * Copyright 2021, Panagiotis Vasilopoulos <hello@alwayslivid.com>
+ * Copyright 2021, Panagiotis "Ivory" Vasilopoulos <git@n0toose.net>
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger
  *		Matthijs Hollemans
  *		Oliver Tappe
- *		Panagiotis Vasilopoulos
+ *		Panagiotis "Ivory" Vasilopoulos
  *		Philippe Houdoin
  */
 
@@ -75,7 +75,7 @@ MidiServerApp::AboutRequested()
 
 	const char* extraCopyrights[] = {
 		"2002-2004 Matthijs Hollemans",
-		"2021 Panagiotis Vasilopoulos",
+		"2021 Panagiotis \"Ivory\" Vasilopoulos",
 		NULL
 	};
 
@@ -83,7 +83,7 @@ MidiServerApp::AboutRequested()
 		"Humdinger",
 		"Matthijs Hollemans",
 		"Oliver Tappe",
-		"Panagiotis Vasilopoulos",
+		"Panagiotis \"Ivory\" Vasilopoulos",
 		"Philippe Houdoin",
 		NULL
 	};

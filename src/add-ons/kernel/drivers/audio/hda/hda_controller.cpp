@@ -18,6 +18,14 @@
 #include "hda_codec_defs.h"
 
 
+//#define TRACE_HDA_VERBS
+#ifdef TRACE_HDA_VERBS
+#	define TRACE_VERBS(x...) dprintf("\33[33mhda:\33[0m " x)
+#else
+#	define TRACE_VERBS(x...) ;
+#endif
+
+
 #define MAKE_RATE(base, multiply, divide) \
 	((base == 44100 ? FORMAT_44_1_BASE_RATE : 0) \
 		| ((multiply - 1) << FORMAT_MULTIPLY_RATE_SHIFT) \
@@ -88,7 +96,6 @@ static const struct {
 	{ PCI_VENDOR_INTEL, 0x4d55, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0x4dc8, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0x5a98, HDA_QUIRK_SNOOP | HDA_QUIRK_NOINIT_MISCBDCGE },
-	{ PCI_VENDOR_INTEL, 0x7270, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0x811b, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0x8c20, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0x8c21, HDA_QUIRK_SNOOP },
@@ -102,7 +109,6 @@ static const struct {
 	{ PCI_VENDOR_INTEL, 0x9d71, HDA_QUIRK_SNOOP | HDA_QUIRK_NOINIT_MISCBDCGE },
 	{ PCI_VENDOR_INTEL, 0x9dc8, HDA_QUIRK_SNOOP | HDA_QUIRK_NOINIT_MISCBDCGE },
 	{ PCI_VENDOR_INTEL, 0xa0c8, HDA_QUIRK_SNOOP },
-	{ PCI_VENDOR_INTEL, 0xa100, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0xa170, HDA_QUIRK_SNOOP | HDA_QUIRK_NOINIT_MISCBDCGE },
 	{ PCI_VENDOR_INTEL, 0xa171, HDA_QUIRK_SNOOP | HDA_QUIRK_NOINIT_MISCBDCGE },
 	{ PCI_VENDOR_INTEL, 0xa1f0, HDA_QUIRK_SNOOP },
@@ -110,15 +116,6 @@ static const struct {
 	{ PCI_VENDOR_INTEL, 0xa2f0, HDA_QUIRK_SNOOP | HDA_QUIRK_NOINIT_MISCBDCGE },
 	{ PCI_VENDOR_INTEL, 0xa348, HDA_QUIRK_SNOOP | HDA_QUIRK_NOINIT_MISCBDCGE },
 	{ PCI_VENDOR_INTEL, 0xa3f0, HDA_QUIRK_SNOOP },
-	{ PCI_VENDOR_INTEL, 0xd400, HDA_QUIRK_SNOOP },
-	{ PCI_VENDOR_INTEL, 0xd401, HDA_QUIRK_SNOOP },
-	{ PCI_VENDOR_INTEL, 0xd402, HDA_QUIRK_SNOOP },
-	{ PCI_VENDOR_INTEL, 0xe224, HDA_QUIRK_SNOOP },
-	{ PCI_VENDOR_INTEL, 0xe305, HDA_QUIRK_SNOOP },
-	{ PCI_VENDOR_INTEL, 0xe308, HDA_QUIRK_SNOOP },
-	{ PCI_VENDOR_INTEL, 0xe400, HDA_QUIRK_SNOOP },
-	{ PCI_VENDOR_INTEL, 0xe401, HDA_QUIRK_SNOOP },
-	{ PCI_VENDOR_INTEL, 0xe402, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_ATI, 0x437b, HDA_QUIRKS_AMD },
 	{ PCI_VENDOR_ATI, 0x4383, HDA_QUIRKS_AMD },
 	{ PCI_VENDOR_AMD, 0x157a, HDA_QUIRKS_AMD },
@@ -1037,6 +1034,9 @@ hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, uint32 count)
 			}
 
 			controller->corb[writePos] = verbs[sent++];
+			TRACE_VERBS("send_verb: (%02x:%02x.%x:%u) cmd 0x%08" B_PRIx32 "\n",
+				controller->pci_info.bus, controller->pci_info.device,
+				controller->pci_info.function, codec->addr, controller->corb[writePos]);
 			controller->corb_write_pos = writePos;
 			queued++;
 		}
@@ -1048,8 +1048,13 @@ hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, uint32 count)
 			return status;
 	}
 
-	if (responses != NULL)
+	if (responses != NULL) {
+		TRACE_VERBS("send_verb: (%02x:%02x.%x:%u) resp 0x%08" B_PRIx32 "\n",
+			controller->pci_info.bus, controller->pci_info.device,
+			controller->pci_info.function, codec->addr, codec->responses[0]);
+
 		memcpy(responses, codec->responses, count * sizeof(uint32));
+	}
 
 	return B_OK;
 }
@@ -1081,6 +1086,10 @@ hda_hw_init(hda_controller* controller)
 	status_t status;
 	const pci_info& pciInfo = controller->pci_info;
 	uint32 quirks = get_controller_quirks(pciInfo);
+
+	// enable power
+	gPci->set_powerstate(pciInfo.bus, pciInfo.device, pciInfo.function,
+		PCI_pm_state_d0);
 
 	// map the registers (low + high for 64-bit when requested)
 	phys_addr_t physicalAddress = pciInfo.u.h0.base_registers[0];
@@ -1331,6 +1340,14 @@ hda_hw_stop(hda_controller* controller)
 	for (uint32 index = 0; index < HDA_MAX_STREAMS; index++) {
 		if (controller->streams[index] && controller->streams[index]->running)
 			hda_stream_stop(controller, controller->streams[index]);
+	}
+
+	// Power off the audio functions
+	for (uint32 index = 0; index < controller->active_codec->num_audio_groups; index++) {
+		hda_audio_group* audioGroup = controller->active_codec->audio_groups[index];
+		corb_t verb = MAKE_VERB(audioGroup->codec->addr, audioGroup->widget.node_id,
+			VID_SET_POWER_STATE, 3);
+		hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
 	}
 }
 

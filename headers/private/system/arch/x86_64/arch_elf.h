@@ -52,6 +52,8 @@
 #define R_X86_64_REX_GOTPCRELX		41	/* Load from 32 bit signed pc relative offset to GOT entry
 										with REX prefix, relaxable. */
 
+#define TLS_DTV_OFFSET 0
+
 
 #if defined(_BOOT_MODE) || defined(ELF32_COMPAT)
 # include "../x86/arch_elf.h"

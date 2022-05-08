@@ -1,27 +1,24 @@
-1	czech	x-vnd.Haiku-mixer.media_addon	3450667169
-Input gain controls represent	AudioMixer		Ovládací prvky zesílení vstupu představují
-Linear interpolation	AudioMixer		Lineární interpolace
-Virtual output channels	AudioMixer		Virtuální výstupní kanály
-Refuse output format changes	AudioMixer		Odmítnout změny výstupního formátu
-Output mapping	AudioMixer		Mapování výstupu
-Allow input channel remapping	AudioMixer		Povolit přemapování vstupního kanálu
-Resampling algorithm	AudioMixer		Algoritmus převzorkování
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Utlumit výstup směšovače o 3dB (jako BeOS R5)
-Display balance control for stereo connections	AudioMixer		Zobrazit ovládání vyvážení při stereo připojeních
+1	czech	x-vnd.Haiku-mixer.media_addon	275473112
+Input mapping	AudioMixer		Mapování vstupu
+High quality (linear interpolation)	AudioMixer		Vysoká kvalita (lineární prokládání)
 To output	AudioMixer		Na výstup
+Gain	AudioMixer		Zesílení
+To master	AudioMixer		Na hlavní
 not connected	AudioMixer		není připojeno
-Refuse input format changes	AudioMixer		Odmítnout změny formátu vstupu
-Drop/repeat samples	AudioMixer		Zahodit/opakovat vzorky
-Output channel sources	AudioMixer		Zdroje výstupního kanálu
+Master output	AudioMixer		Hlavní výstup
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Ovládání zesílení
-Input mapping	AudioMixer		Mapování vstupu
-Mute	AudioMixer		Ztlumit
-Input channel destinations	AudioMixer		Cíle vstupního kanálu
-To master	AudioMixer		Na hlavní
-Master output	AudioMixer		Hlavní výstup
+Low quality (drop/repeat samples)	AudioMixer		Nízká kvalita (zahazovat/opakovat vzorky)
+Output channel sources	AudioMixer		Zdroje výstupního kanálu
+Allow input channel remapping	AudioMixer		Povolit přemapování vstupního kanálu
+Display balance control for stereo connections	AudioMixer		Zobrazit ovládání vyvážení při stereo připojeních
 Setup	AudioMixer		Nastavení
-Use non linear gain sliders (like BeOS R5)	AudioMixer		Použít nelineární posuvníky zesílení (jako BeOS R5)
-Gain	AudioMixer		Zesílení
-Allow output channel remapping	AudioMixer		Povolit přemapování výstupních kanálů
 Physical input channels	AudioMixer		Fyzické vstupní kanály
+Input channel destinations	AudioMixer		Cíle vstupního kanálu
+Resampling algorithm:	AudioMixer		Algoritmus převzorkování:
+Mute	AudioMixer		Ztlumit
+Output mapping	AudioMixer		Mapování výstupu
+Virtual output channels	AudioMixer		Virtuální výstupní kanály
+Allow output channel remapping	AudioMixer		Povolit přemapování výstupních kanálů
+Input gain controls represent:	AudioMixer		Vstupní ovládací prvky zesílení představují:
+Attenuate mixer output by 3 dB	AudioMixer		Zmírnit výstup mixéru o 3 dB

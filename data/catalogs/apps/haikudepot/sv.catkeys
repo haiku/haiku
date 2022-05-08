@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	761125591
+1	swedish	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		Fel vid uppdatering av repositorie
 Network error	ServerHelper		Nätverksfel
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Ett fel inträffade vid uppdatering av repositoriet: %error%
@@ -7,6 +7,7 @@ Check for updates…	MainWindow		Leta efter uppdateringar…
 Uninstalled	PackageListView		Avinstallera
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
 Available packages	MainWindow		Tillgängliga paket
+An unexpected error has been sent from the server [%li]	ServerHelper		Ett oväntat fel har skickats från servern [%li]
 Create account	UserLoginWindow		Skapa konto
 Install %PackageTitle%	PackageManager		Installera %PackageTitle%
 OK	App		OK
@@ -44,6 +45,7 @@ Category	FilterView		Kategori
 User rating	RatePackageWindow		Användarbetyg
 Installed packages	MainWindow		Installerade paket
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Ett begärt objekt eller ett objekt involverat i begäran hittades inte på servern.
+Date	PackageListView		Datum
 No changelog available.	PackageInfoView		Ingen ändringslogg finns.
 Error	App		Fel
 There was a puzzling response from the web service.	UserLoginWindow		Det komm ett konstigt meddelande från webb servicen.
@@ -55,6 +57,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Det var inte möjligt att kommunicera med servern för att få en captcha-bild som krävs för att skapa en ny användare.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Ditt betyg har laddats upp. Du kan uppdatera eller ta bort det på webbplatsen för HaikuDepot-servern.
 Available	PackageListView		Tillgänglig
+-	no package publish		-
 Cancel	UserLoginWindow		Avbryt
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Servicen behövs för HaikuDepot och den verkar inte köra.\nSkulle du vilja starta den nu?
 Click a package to view information	PackageInfoView		Klicka på ett paket för att se information
@@ -95,7 +98,6 @@ Repository	PackageListView		Repositorie
 The email is malformed.	UserLoginWindow		E-postadressen är felaktigt angiven.
 Close	UserLoginWindow		Stäng
 Close	RatePackageWindow		Stäng
-An unexpected error has been sent from the server [%i]	ServerHelper		Ett oväntat fel har skickats från servern [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkroniserar paketdata för repositoriet '%REPO_NAME%'
 Settings	SettingsWindow		Inställningar
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ett fel har uppstått vid nedladdning av de användningsvillkor som krävs för att skapa en ny användare. Kontrollera loggen för mer information och försök igen. \nInformation om hur du ser loggarna finns i avsnittet HaikuDepot i Haiku användarhandbok.
@@ -139,8 +141,8 @@ Source packages	MainWindow		Källkodspaket
 -	no package size		-
 Problem with working files	App		Problem med att arbeta filer
 Server error	ServerHelper		Serverfel
-Try again	App		Försök igen
 Rate package	RatePackageWindow		Betygsatt paket
+Try again	App		Försök igen
 Unknown	PackageListView		Okänd
 I agree to the usage conditions	UserLoginWindow		Jag godkänner användarvillkoren
 Log in	UserLoginWindow		Logga in
@@ -172,6 +174,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Klientversionen är för gammal
 Local repository load error	LocalPkgDataLoadProcess		Fel vid laddning av lokalt repositorie
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Användaren finns inte eller så är lösenordet felaktigt. Kontrollera dina inloggningsuppgifter och försök igen.
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Repetera lösenord:
 All repositories	MainWindow		Alla repositorier

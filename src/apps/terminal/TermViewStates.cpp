@@ -160,7 +160,7 @@ TermView::StandardBaseState::_StandardMouseMoved(BPoint where, int32 modifiers)
 
 	TermPos clickPos = fView->_ConvertToTerminal(where);
 
-	if (fView->fReportButtonMouseEvent) {
+	if (fView->fReportButtonMouseEvent || fView->fEnableExtendedMouseCoordinates) {
 		if (fView->fPrevPos.x != clickPos.x
 			|| fView->fPrevPos.y != clickPos.y) {
 			fView->_SendMouseEvent(fView->fMouseButtons, modifiers,
@@ -423,7 +423,7 @@ TermView::DefaultState::MouseDown(BPoint where, int32 buttons, int32 modifiers)
 		|| fView->fReportNormalMouseEvent || fView->fReportX10MouseEvent) {
 		TermPos clickPos = fView->_ConvertToTerminal(where);
 		fView->_SendMouseEvent(buttons, modifiers, clickPos.x, clickPos.y,
-			false);
+			false, false);
 		return;
 	}
 
@@ -449,6 +449,18 @@ TermView::DefaultState::MouseMoved(BPoint where, uint32 transit,
 		return;
 
 	_StandardMouseMoved(where, modifiers);
+}
+
+
+void
+TermView::DefaultState::MouseUp(BPoint where, int32 buttons)
+{
+	if (fView->fReportAnyMouseEvent || fView->fReportButtonMouseEvent
+		|| fView->fReportNormalMouseEvent || fView->fReportX10MouseEvent) {
+		TermPos clickPos = fView->_ConvertToTerminal(where);
+		fView->_SendMouseEvent(buttons, 0, clickPos.x, clickPos.y,
+			false, true);
+	}
 }
 
 

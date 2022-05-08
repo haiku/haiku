@@ -913,6 +913,9 @@ socket_request_notification(net_socket* _socket, uint8 event, selectsync* sync)
 		}
 		case B_SELECT_WRITE:
 		{
+			if ((socket->options & SO_ACCEPTCONN) != 0)
+				break;
+
 			ssize_t available = socket_send_avail(socket);
 			if ((ssize_t)socket->send.low_water_mark <= available
 				|| available < B_OK)

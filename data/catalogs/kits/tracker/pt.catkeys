@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	256413178
+1	portuguese	x-vnd.Haiku-libtracker	4086629042
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
@@ -85,6 +85,7 @@ GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Arrumar
 Modified	FindPanel		Modificado
 Select all	QueryContainerWindow		Selecionar tudo
+Generate image thumbnails	SettingsView		Gerar miniaturas de imagem
 Select…	FilePanelPriv		Selecionar…
 preferences	B_PREFERENCES_DIRECTORY		preferências
 Name	Person Query Columns		Nome

@@ -1,5 +1,7 @@
-1	czech	application/x-vnd.Be.LoggingConsumerApp	1634779870
+1	czech	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		AplikaceŘídícíMediálníUzly: nelze získat informace uzlu (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Priorita
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		AplikaceŘídícíMediálníUzly: nelze najít uzel (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Latence
 Logged input	CortexAddOnsLoggingConsumer		Zapisovaný vstup
 CPU spin percentage	CortexAddOnsLoggingConsumer		Podíl roztočení CPU
@@ -8,9 +10,7 @@ Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Start
 Thread priority	CortexAddOnsLoggingConsumer		Priorita vlákna
 LoggingConsumer parameters	CortexAddOnsLoggingConsumer		LoggingConsumer parametry
 Latency control	CortexAddOnsLoggingConsumer		Řízení latence
-MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nepodařilo se zjistit informace o uzlu (%d):\n%s\n
 CPU percentage	CortexAddOnsLoggingConsumer		Procenta CPU
-MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nepodařilo se najít uzel (%d):\n%s\n
 LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Zastavit
 An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		Doplněk verze LoggingConsumer uzlu.\nPodívejte se na Be Developer Newsletter III.18: 5 May, 1999\npřizpůsobil Eric Moon (4 June, 1999)
@@ -19,4 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Ovládací prvky
 controls	CortexAddOnsCommonMediaNodeControlApp		ovládací prvky
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Připojit
 percent	CortexAddOnsLoggingConsumer		procent
-MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nenalezeny parametry pro uzel (%d):\n%s\n
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		AplikaceŘídícíMediálníUzly: žádné parametry uzlu (%ld):\n%s\n

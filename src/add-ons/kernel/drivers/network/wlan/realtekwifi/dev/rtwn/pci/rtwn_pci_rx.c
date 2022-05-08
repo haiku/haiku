@@ -35,6 +35,7 @@ __FBSDID("$FreeBSD$");
 #include <sys/taskqueue.h>
 #include <sys/bus.h>
 #include <sys/endian.h>
+#include <sys/epoch.h>
 
 #include <machine/bus.h>
 #include <machine/resource.h>
@@ -55,7 +56,6 @@ __FBSDID("$FreeBSD$");
 
 #include <dev/rtwn/pci/rtwn_pci_var.h>
 #include <dev/rtwn/pci/rtwn_pci_rx.h>
-
 
 void
 rtwn_pci_dma_map_addr(void *arg, bus_dma_segment_t *segs, int nsegs,
@@ -85,6 +85,7 @@ rtwn_pci_setup_rx_desc(struct rtwn_pci_softc *pc,
 static void
 rtwn_pci_rx_frame(struct rtwn_pci_softc *pc)
 {
+	struct epoch_tracker et;
 	struct rtwn_softc *sc = &pc->pc_sc;
 	struct rtwn_rx_ring *ring = &pc->rx_ring;
 	struct rtwn_rx_stat_pci *rx_desc = &ring->desc[ring->cur];
@@ -164,12 +165,15 @@ rtwn_pci_rx_frame(struct rtwn_pci_softc *pc)
 
 	/* Send the frame to the 802.11 layer. */
 	RTWN_UNLOCK(sc);
+
+	NET_EPOCH_ENTER(et);
 	if (ni != NULL) {
 		(void)ieee80211_input_mimo(ni, m);
 		/* Node is no longer needed. */
 		ieee80211_free_node(ni);
 	} else
 		(void)ieee80211_input_mimo_all(ic, m);
+	NET_EPOCH_EXIT(et);
 
 	RTWN_LOCK(sc);
 

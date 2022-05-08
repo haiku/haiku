@@ -59,7 +59,7 @@ Playlist…	MediaPlayer-Main		Oynatma listesi…
 <unnamed media>	MediaPlayer-InfoWin		<adsız ortam>
 Save	MediaPlayer-PlaylistWindow		Kaydet
 Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Girdileri rastgele dağıt
-Cancel	MediaPlayer-NetworkStream		İptal
+Cancel	MediaPlayer-NetworkStream		Vazgeç
 Nothing to Play	MediaPlayer-Main		Oynatacak bir şey yok
 OK	MediaPlayer-SettingsWindow		Tamam
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Girdileri kaldır
@@ -75,7 +75,7 @@ Quit	MediaPlayer-Main		Çık
 Redo	MediaPlayer-PlaylistWindow		Yinele
 Move Entry	MediaPlayer-MovePLItemsCmd		Girdiyi taşı
 <unknown>	PlaylistItem-author		<bilinmeyen>
-Cancel	MediaPlayer-SettingsWindow		İptal
+Cancel	MediaPlayer-SettingsWindow		Vazgeç
 Large	MediaPlayer-SettingsWindow		Geniş
 Import Entry	MediaPlayer-ImportPLItemsCmd		Girdi içe aktar
 unknown format	MediaPlayer-InfoWin		bilinmeyen biçim
@@ -108,7 +108,7 @@ There is no decoder installed to handle the file format, or the decoder has trou
 Lock Peaks	MediaPlayer-PeakView		Tepeleri kilitle
 none	Audio track menu		yok
 Open network stream	MediaPlayer-NetworkStream		Ağ akışı aç
-Automatically start playing	MediaPlayer-SettingsWindow		Kendiliğinden oynatmaya başla
+Automatically start playing	MediaPlayer-SettingsWindow		Kendiliğinden oynatmaya başlat
 Undo	MediaPlayer-PlaylistWindow		Geri al
 Display mode	MediaPlayer-InfoWin		Görüntüleme kipi
 Bottom of video	MediaPlayer-SettingsWindow		Videonun alt kısmı

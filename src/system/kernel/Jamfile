@@ -134,7 +134,7 @@ KernelLd kernel_$(TARGET_ARCH) :
 if $(HAIKU_ARCH) in x86_64 arm {
 	# Cannot relink everything as a shared object on x86_64 as shared library
 	# code is required to be position-independent. Instead create a copy of the
-	# executable kernel image and change the ELF header type to DYN. A bit of
+	# executable kernel image and change the ELF header type to DYN. A bit of
 	# a hack, but avoids having to recompile a PIC copy of the kernel code.
 	# kernel.so is only used when linking modules to provide symbol information,
 	# this is sufficient for that purpose.

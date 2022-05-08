@@ -1,8 +1,12 @@
 #include "XDRInPacket.h"
+
 #include <malloc.h>
 #include <string.h>
+
 #include <ByteOrder.h>
 #include <KernelExport.h>
+
+#include <kernel.h>
 
 #include "nfs.h"
 
@@ -29,25 +33,27 @@ XDRInPacketGetInt32(struct XDRInPacket *packet)
 	return val;
 }
 
-extern int32
+
+status_t
 XDRInPacketGetFixed(struct XDRInPacket *packet, void *buffer, size_t len)
 {
-	if (user_memcpy(buffer, &packet->fBuffer[packet->fOffset], len)
-		!= B_OK) {
-		return NFSERR_IO;
-	}
+	if (!IS_USER_ADDRESS(buffer))
+		memcpy(buffer, &packet->fBuffer[packet->fOffset], len);
+	else if (user_memcpy(buffer, &packet->fBuffer[packet->fOffset], len) != B_OK)
+		return B_BAD_ADDRESS;
 
 	packet->fOffset += (len + 3) & ~3;
-	return NFS_OK;
+	return B_OK;
 }
 
-extern size_t 
-XDRInPacketGetDynamic(struct XDRInPacket *packet, void *buffer)
+
+status_t
+XDRInPacketGetDynamic(struct XDRInPacket *packet, void *buffer, size_t *len)
 {
-	size_t size=XDRInPacketGetInt32(packet);
-	XDRInPacketGetFixed(packet,buffer,size);
-	return size;
+	*len = XDRInPacketGetInt32(packet);
+	return XDRInPacketGetFixed(packet, buffer, *len);
 }
+
 
 extern char *
 XDRInPacketGetString(struct XDRInPacket *packet)

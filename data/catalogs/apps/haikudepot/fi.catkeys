@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	761125591
+1	finnish	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		Tietovaraston päivitysvirhe
 Network error	ServerHelper		Verkkovirhe
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Tietovaraston päivityksen yhteydessä tapahtui virhe: %error%
@@ -7,6 +7,7 @@ Check for updates…	MainWindow		Tarkista päivitykset…
 Uninstalled	PackageListView		Poistetut asennukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
 Available packages	MainWindow		Saatavilla olevat pakkaukset
+An unexpected error has been sent from the server [%li]	ServerHelper		Odottamaton virhe lähetetty palvelimesta [%li]
 Create account	UserLoginWindow		Luo tili
 Install %PackageTitle%	PackageManager		Asenna %PackageTitle%
 OK	App		Valmis
@@ -44,6 +45,7 @@ Category	FilterView		Luokka
 User rating	RatePackageWindow		Käyttäjäarvosanat
 Installed packages	MainWindow		Asennetut paketit
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Pyydettyä objektia tai pyyntöön liittyvää objektia ei löytynyt palvelimelta.
+Date	PackageListView		Päivämäärä
 No changelog available.	PackageInfoView		Mitään muutoslokia ei ole saatavilla.
 Error	App		Virhe
 There was a puzzling response from the web service.	UserLoginWindow		Webbipalvelun vastaus oli pulmallinen.
@@ -55,6 +57,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Viestintä uuden käyttäjän luomisessa tarvittavan captcha-kuvan saamiseksi palvelimelta epäonnistui.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Arvosanasi kopiointi palvelimelle onnistui. Voit päivittää tai poistaa sen HaikuDepot-palvelimen webbisivulla.
 Available	PackageListView		Saatavilla
+-	no package publish		-
 Cancel	UserLoginWindow		Peru
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuVarasto tarvitsee toimiakseen pakkaustaustaprosessin, ja se ei näytä olevan käynnissä.\nHaluaisitko käynnistää sen nyt?
 Click a package to view information	PackageInfoView		Napsauta pakkausta tietojen katsomiseksi
@@ -95,7 +98,6 @@ Repository	PackageListView		Tietovarasto
 The email is malformed.	UserLoginWindow		Sähköpostiosoite on vääränmuotoinen.
 Close	UserLoginWindow		Sulje
 Close	RatePackageWindow		Sulje
-An unexpected error has been sent from the server [%i]	ServerHelper		Palvelin [%i] lähetti odottamattoman virheen
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkronoidaan pakkaustietoja tietovarastolle '%REPO_NAME%'
 Settings	SettingsWindow		Asetukset
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ilmeni virhe ladattaessa käyttöehtoja, jotka vaaditaan uuden käyttäjän luomiseksi. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen. \nTieto siitä, kuinka lokitiedostoa katsotaan, on saatavilla Haiku-käyttöohjeen HaikuVarasto-osasta.
@@ -139,8 +141,8 @@ Source packages	MainWindow		Lähdekoodipakkaukset
 -	no package size		-
 Problem with working files	App		Pulma työtiedostoissa
 Server error	ServerHelper		Palvelinvirhe
-Try again	App		Yritä uudelleen
 Rate package	RatePackageWindow		Anna pakkaukselle arvosana
+Try again	App		Yritä uudelleen
 Unknown	PackageListView		Tuntematon
 I agree to the usage conditions	UserLoginWindow		Hyväksyn käyttöehdot
 Log in	UserLoginWindow		Kirjaudu
@@ -172,6 +174,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Asiakasohjelman versio on liian vanha
 Local repository load error	LocalPkgDataLoadProcess		Paikallisen tietovaraston latausvirhe
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Käyttäjä ei ole olemassa tai tarjottiin väärä salasana. Tarkista pääsytiedot ja yritä uudelleen.
-9999.99 KiB	PackageListView		9999.99 kibitavua
 Repeat password:	UserLoginWindow		Toista salasana:
 All repositories	MainWindow		Kaikki tietovarastot

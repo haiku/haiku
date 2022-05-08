@@ -49,5 +49,7 @@
 #define	R_MIPSEL_SECTOFF_HA			36
 #define	R_MIPSEL_ADDR30				37
 
+#define TLS_DTV_OFFSET 0
+
 #endif	/* _SYSTEM_ARCH_MIPSEL_ELF_H */
 

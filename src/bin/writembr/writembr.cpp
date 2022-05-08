@@ -78,7 +78,7 @@ main(int argc, char** argv)
 
 	unsigned char MBR[kMBRSize];
 	fs.read((char*)MBR, kMBRSize);
-	if (fs.fail() || fs.gcount() < kMBRSize ) {
+	if (fs.fail() || fs.gcount() < (off_t)kMBRSize ) {
 		cerr << "Cannot read " << kMBRSize
 			<< " bytes from " << device.Path() << endl;
 		fs.close();

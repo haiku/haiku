@@ -1,4 +1,4 @@
-1	dutch; flemish	application/x-vnd.Cortex.support	2630173556
+1	dutch; flemish	application/x-vnd.Cortex.support	1625162530
 Header has flags	MediaString		De header heeft opties
 32 bit HLS	MediaString		32-bit HLS
 Recording	MediaString		Aan het opnemen
@@ -42,7 +42,6 @@ YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Rechts
 32 bit RGB	MediaString		32-bit RGB
-Video data between line u and u	MediaString		Videodata tussen lijn u en u
 System mixer	MediaString		Systeemmixer
 Physical output	MediaString		Fysieke uitvoer
 Top-Back-center	MediaString		Boven-achter-midden

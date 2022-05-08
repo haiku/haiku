@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	250728390
+1	swedish	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Autentisiering krävs
 Previous	WebPositive Window		Tidigare
 (Finish: %date)	Download Window		(Avsluta: %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		Öppna innehållande mapp
 Find previous	WebPositive Window		Hitta tidigare
 Full screen	WebPositive Window		Fullskärm
 Downloads in progress	WebPositive		Nedladdningar pågår
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vill du öppna %addedCount bokmärken på samma gång?
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vill du öppna %addedCount bokmärken på samma gång?
 Clone current page	Settings Window		Klona aktuell sida
 Start page:	Settings Window		Startsida:
 Cancel	Download Window		Avbryt
@@ -45,17 +45,19 @@ New tabs:	Settings Window		Nya flikar:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url misslyckades
 Open downloads folder	Download Window		Öppna nedladdningsmapp 
 Proxy server	Settings Window		Proxyserver
+Darn!	WebPositive		Attans!
 Decrease size	WebPositive Window		Minska storleken
 Default fixed font size:	Settings Window		Förinställd fast typsnittsstorlek:
 Sans serif font:	Settings Window		Sans-serif-typsnitt:
 Clear	WebPositive Window		Rensa
-Cookies for %s	Cookie Manager		Kakor för %s
 The download could not be opened.	Download Window		Nedladdningen kunde inte öppnas.
+Cookies for %s	Cookie Manager		Kakor för %s
 Close	Download Window		Stäng
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Sökterm
 Reload	WebPositive Window		Ladda om
 Expiration	Cookie Manager		Upphör
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Din CPU är för gammal och stöder inte SSE2-tillägg, vilka krävs för att WebPositive ska fungera. Vi rekommenderar att du installerar NetSurf istället.
 Download finished	Download Window		Nedladdning avslutad
 Cookie manager	WebPositive Window		Kakhanterare
 OK	Authentication Panel		OK
@@ -111,8 +113,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Återuppta nedladdningar
 Proxy server requires authentication	Settings Window		Proxyservern kräver autentisiering
 Cancel	Settings Window		Avbryt
-History	WebPositive Window		Historik
 Reset size	WebPositive Window		Återställ storlek
+History	WebPositive Window		Historik
 Do you really want to clear the browsing history?	WebPositive Window		Vill du verkligen rensa din historik?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Hitta nästa förekomst av söktermer
 Fixed font:	Settings Window		Fast typsnitt:
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Börja:
 Confirmation	WebPositive Window		Bekräftelse
 Session cookie	Cookie Manager		Sessionskaka
+No SSE2 support	WebPositive		Inget stöd för SSE2
 Open all	WebPositive Window		Öppna alla
 Cut	WebPositive Window		Klipp ut
 Downloads	Download Window		Nedladdningar

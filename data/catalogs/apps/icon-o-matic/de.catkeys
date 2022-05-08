@@ -84,7 +84,7 @@ Cancel	Icon-O-Matic-ColorPicker		Abbrechen
 Duplicate	Icon-O-Matic-PathsList		Duplizieren
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Formen entfernen
 Save	Icon-O-Matic-Menu-Settings		Speichern
-Export as…	Icon-O-Matic-Menu-File		Exportieren als…
+Export as…	Icon-O-Matic-Menu-File		Exportieren als …
 Error: 	Icon-O-Matic-Exporter		Fehler:
 Move Path	Icon-O-Matic-MovePathsCmd		Pfad umsortieren
 Remove Paths	Icon-O-Matic-RemovePathsCmd		Pfade entfernen
@@ -104,7 +104,7 @@ Rotate indices backwards	Icon-O-Matic-PathsList		Indizes rückwärts rotieren
 Overwrite	Icon-O-Matic-SVGExport		Überschreiben
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Kontrollpunkt verändern
 Cancel	Icon-O-Matic-SVGExport		Abbrechen
-Open…	Icon-O-Matic-Menu-File		Öffnen…
+Open…	Icon-O-Matic-Menu-File		Öffnen …
 Redo	Icon-O-Matic-Main		Wiederholen:
 Change Color	Icon-O-Matic-SetColorCmd		Farbe ändern
 Remove	Icon-O-Matic-ShapesList		Entfernen
@@ -146,7 +146,7 @@ Radial	Icon-O-Matic-StyleTypes		Radial
 Text too long	Icon-O-Matic-StyledTextImport		Text zu lang
 Caps	Icon-O-Matic-PropertyNames		Enden
 OK	Icon-O-Matic-SVGImport		OK
-Append…	Icon-O-Matic-Menu-File		Anhängen…
+Append…	Icon-O-Matic-Menu-File		Anhängen …
 Scale Y	Icon-O-Matic-PropertyNames		Skalieren in Y-Richtung
 Export icon	Dialog title		Icon exportieren
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farbe (#%02x%02x%02x)
@@ -167,7 +167,7 @@ Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Änderu
 Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Die Datei '%s' konnte nicht als SVG Dokument geöffnet werden.\n\n
 load error	Icon-O-Matic-SVGImport		Ladefehler
 Transformation	Icon-O-Matic-TransformersList		Transformation
-Save as…	Icon-O-Matic-Menu-File		Speichern als…
+Save as…	Icon-O-Matic-Menu-File		Speichern als …
 Swatches	Icon-O-Matic-Menus		Farbfelder
 <modify path>	Icon-O-Matic-PathCmd		<Pfad ändern>
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF-Quellcode
@@ -184,7 +184,7 @@ Invert selection	Icon-O-Matic-Properties		Auswahl umkehren
 <unkown property>	Icon-O-Matic-PropertyNames		<unbekannte Eigenschaft>
 Pick a color	Icon-O-Matic-ColorPicker		Farbe aussuchen
 Multi Set 	Multi Set (property name)		Mehrfach-Setzen
-Settings…	Icon-O-Matic-SavePanel		Einstellungen…
+Settings…	Icon-O-Matic-SavePanel		Einstellungen …
 Add with style	Icon-O-Matic-ShapesList		Mit Stil hinzufügen
 New	Icon-O-Matic-Menu-File		Neu
 Yes	Icon-O-Matic-StyledTextImport		Ja

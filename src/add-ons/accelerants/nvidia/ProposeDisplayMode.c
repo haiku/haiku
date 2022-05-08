@@ -632,7 +632,7 @@ create_mode_list(void)
 	/* create an area to hold the info */
 	si->mode_area = my_mode_list_area = create_area("NV accelerant mode info",
 		(void **)&my_mode_list, B_ANY_ADDRESS, max_size, B_NO_LOCK,
-		B_READ_AREA | B_WRITE_AREA);
+		B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA);
 	if (my_mode_list_area < B_OK)
 		return my_mode_list_area;
 

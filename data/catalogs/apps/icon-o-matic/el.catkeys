@@ -95,7 +95,7 @@ Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Ειδοποίηση ση�
 Move Styles	Icon-O-Matic-MoveStylesCmd		Μετακίνηση Στυλ
 Don't save	Icon-O-Matic-Menu-Settings		Χωρίς αποθήκευση
 Add shape with path	Icon-O-Matic-Menu-Shape		Προσθήκη σχήματος με μονοπάτι
-Translation X	Icon-O-Matic-PropertyNames		Μετάφραση Χ
+Translation X	Icon-O-Matic-PropertyNames		Μετατόπιση στον άξονα Χ
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		Αλλαγή σημείων ελένχου
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Προσθήκη μεταμορφοτών
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Ιδιότητα BEOS:ICON
@@ -174,7 +174,7 @@ HVIF Source Code	Icon-O-Matic-SavePanel		HVIF Πηγαίος Κώδικας
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<τίποτε προς επαναφορά>
 Add	Icon-O-Matic-StylesList		Προσθήκη
-Translation Y	Icon-O-Matic-PropertyNames		Μετάφραση Υ
+Translation Y	Icon-O-Matic-PropertyNames		Μετατόπιση στον άξονα Υ
 Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Πάγωμα Σχήματος
 Scale	Icon-O-Matic-TransformationBoxStates		Κλίμακα
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Αφαίρεση Σχήματος

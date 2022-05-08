@@ -300,6 +300,30 @@ pci_update_interrupt_line(uchar virtualBus, uchar device, uchar function,
 }
 
 
+status_t
+pci_get_powerstate(uchar virtualBus, uint8 device, uint8 function, uint8* state)
+{
+	uint8 bus;
+	uint8 domain;
+	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
+		return B_ERROR;
+
+	return gPCI->GetPowerstate(domain, bus, device, function, state);
+}
+
+
+status_t
+pci_set_powerstate(uchar virtualBus, uint8 device, uint8 function, uint8 newState)
+{
+	uint8 bus;
+	uint8 domain;
+	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
+		return B_ERROR;
+
+	return gPCI->SetPowerstate(domain, bus, device, function, newState);
+}
+
+
 // used by pci_info.cpp print_info_basic()
 void
 __pci_resolve_virtual_bus(uint8 virtualBus, uint8 *domain, uint8 *bus)
@@ -1836,5 +1860,31 @@ PCI::SetPowerstate(PCIDev *device, uint8 newState)
 				snooze(10);
 		}
 	}
+}
+
+
+status_t
+PCI::GetPowerstate(uint8 domain, uint8 bus, uint8 _device, uint8 function,
+	uint8* state)
+{
+	PCIDev *device = FindDevice(domain, bus, _device, function);
+	if (device == NULL)
+		return B_ERROR;
+
+	*state = GetPowerstate(device);
+	return B_OK;
+}
+
+
+status_t
+PCI::SetPowerstate(uint8 domain, uint8 bus, uint8 _device, uint8 function,
+	uint8 newState)
+{
+	PCIDev *device = FindDevice(domain, bus, _device, function);
+	if (device == NULL)
+		return B_ERROR;
+
+	SetPowerstate(device, newState);
+	return B_OK;
 }
 

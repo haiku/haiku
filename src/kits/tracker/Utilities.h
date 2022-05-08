@@ -348,36 +348,6 @@ private:
 };
 
 
-class LooperAutoLocker {
-public:
-	LooperAutoLocker(BHandler* handler)
-	:	fHandler(handler),
-		fHasLock(handler->LockLooper())
-	{
-	}
-
-	~LooperAutoLocker()
-	{
-		if (fHasLock)
-			fHandler->UnlockLooper();
-	}
-
-	bool operator!() const
-	{
-		return !fHasLock;
-	}
-
-	bool IsLocked() const
-	{
-		return fHasLock;
-	}
-
-private:
-	BHandler* fHandler;
-	bool fHasLock;
-};
-
-
 class ShortcutFilter : public BMessageFilter {
 public:
 	ShortcutFilter(uint32 shortcutKey, uint32 shortcutModifier,
@@ -439,18 +409,6 @@ extern void DeleteSubmenu(BMenuItem* submenuItem);
 extern bool BootedInSafeMode();
 
 
-inline rgb_color
-Color(int32 r, int32 g, int32 b, int32 alpha = 255)
-{
-	rgb_color result;
-	result.red = (uchar)r;
-	result.green = (uchar)g;
-	result.blue = (uchar)b;
-	result.alpha = (uchar)alpha;
-
-	return result;
-}
-
 void PrintToStream(rgb_color color);
 
 template <class InitCheckable>
@@ -482,8 +440,7 @@ void _ThrowOnAssert(bool, const char*, int32);
 // stub calls that work around BAppFile info inefficiency
 status_t GetAppSignatureFromAttr(BFile*, char*);
 status_t GetAppIconFromAttr(BFile* file, BBitmap* icon, icon_size which);
-status_t GetFileIconFromAttr(Model* model, BBitmap* icon, icon_size which);
-status_t GetThumbnailIcon(Model* model, BBitmap* icon, icon_size which);
+status_t GetFileIconFromAttr(BNode* node, BBitmap* icon, icon_size which);
 
 // debugging
 void HexDump(const void* buffer, int32 length);

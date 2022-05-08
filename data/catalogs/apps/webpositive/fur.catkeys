@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-WebPositive	250728390
+1	friulian	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
 (Finish: %date)	Download Window		(Terminât: %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		Mostre te cartele
 Find previous	WebPositive Window		Cjate precedent
 Full screen	WebPositive Window		Plen visôr
 Downloads in progress	WebPositive		Discjariaments in pîts
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vierzi %addedCount segnelibris adun?
 Copy URL to clipboard	Download Window		Copie URL tes notis
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vierzi %addedCount segnelibris adun?
 Clone current page	Settings Window		Clone la pagjine atuâl
 Start page:	Settings Window		Pagjine di inizi:
 Cancel	Download Window		Anule
@@ -45,17 +45,19 @@ New tabs:	Settings Window		Gnovis schedis:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url falît
 Open downloads folder	Download Window		Vierç cartele dai file discjariâts
 Proxy server	Settings Window		Servidôr proxy
+Darn!	WebPositive		Maledizion!
 Decrease size	WebPositive Window		Diminuìs dimension
 Default fixed font size:	Settings Window		Dimension predefinide dal caratar a spaziadure fisse:
 Sans serif font:	Settings Window		Caratar Sans serif:
 Clear	WebPositive Window		Nete
-Cookies for %s	Cookie Manager		Cookie par %s
 The download could not be opened.	Download Window		Nol è stât pussibil vierzi il file discjariât.
+Cookies for %s	Cookie Manager		Cookie par %s
 Close	Download Window		Siere
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Tiermin di ricercje
 Reload	WebPositive Window		Torne cjarie
 Expiration	Cookie Manager		Scjadince
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		La tô CPU e je masse vecje e no supuarte lis estensions SSE2, cence di chês WebPositive nol pues zirâ. O conseìn di instalâ NetSurf al so puest.
 Download finished	Download Window		Discjariament completât
 Cookie manager	WebPositive Window		Gjestôr dai Cookie
 OK	Authentication Panel		Va ben
@@ -111,8 +113,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Ripie i discjariaments
 Proxy server requires authentication	Settings Window		Il servidôr proxy al domande autenticazion
 Cancel	Settings Window		Anule
-History	WebPositive Window		Cronologjie
 Reset size	WebPositive Window		Ristabilìs dimension
+History	WebPositive Window		Cronologjie
 Do you really want to clear the browsing history?	WebPositive Window		Netâ pardabon la cronologjie di navigazion?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Cjate il prossim câs dai tiermins di ricercje
 Fixed font:	Settings Window		Caratar a spaziadure fisse:
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Inviament:
 Confirmation	WebPositive Window		Conferme
 Session cookie	Cookie Manager		Cookie di session
+No SSE2 support	WebPositive		Nissun supuart aes SSE2
 Open all	WebPositive Window		Vierç ducj
 Cut	WebPositive Window		Taie
 Downloads	Download Window		File discjariâts

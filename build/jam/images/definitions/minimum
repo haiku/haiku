@@ -196,8 +196,8 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		atheros813x atheros81xx attansic_l1 attansic_l2
 		broadcom440x broadcom570x
 		dec21xxx
-		emulex_oce
 		ipro100 ipro1000
+		intel22x
 		jmicron2x0
 		marvell_yukon
 		nforce
@@ -224,7 +224,6 @@ SYSTEM_ADD_ONS_DRIVERS_SENSOR = [ FFilterByBuildFeatures
 
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	acpi@x86,x86_64 agp_gart@x86,x86_64 ata
-	config_manager
 	i2c@x86,x86_64 isa@x86,x86_64
 	mmc
 	scsi

@@ -36,7 +36,7 @@ Clear selection	Menus		Seçimi temizle
 Close document	ClosePrompt		Belgeyi kapat
 Height: 	PrintOptionsWindow		Yükseklik: 
 The file '%s' could not be written.	SaveToFile		'%s' dosyası yazılamadı.
-Cancel	ClosePrompt		İptal
+Cancel	ClosePrompt		Vazgeç
 Show tool bar	Menus		Araç çubuğunu göster
 Fit to window	Menus		Pencereye sığdır
 Print options	PrintOptionsWindow		Yazdırma seçenekleri

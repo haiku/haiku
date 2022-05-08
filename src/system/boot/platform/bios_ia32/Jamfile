@@ -40,7 +40,6 @@ for platform in [ MultiBootSubDirSetup bios_ia32 ] {
 			support.S
 			video.cpp
 			apm.cpp
-			hpet.cpp
 			interrupts.cpp
 			interrupts_asm.S
 			long.cpp

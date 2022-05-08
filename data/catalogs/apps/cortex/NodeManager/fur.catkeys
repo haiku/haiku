@@ -1,4 +1,5 @@
-1	friulian	application/x-vnd.Cortex.NodeManager	339534753
+1	friulian	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		Mixer audio di sisteme
 System video output	NodeManager		Jessude video dal sisteme
 System video input	NodeManager		Jentrade video dal sisteme
 No name	NodeManager		Cence non

@@ -42,6 +42,7 @@ KernelMergeObject kernel_arch_arm.o :
 	soc.cpp
 	soc_pxa.cpp
 	soc_omap3.cpp
+	soc_sun4i.cpp
 
 	# paging
 	arm_physical_page_mapper_large_memory.cpp

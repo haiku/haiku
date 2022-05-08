@@ -10,6 +10,7 @@
 //#include "images.h"
 #include "graphics.h"
 #include "virtio.h"
+#include "FwCfg.h"
 
 #include <arch/cpu.h>
 #include <boot/stage2.h>
@@ -94,7 +95,7 @@ platform_switch_to_logo(void)
 	gKernelArgs.frame_buffer.height = gFramebuf.height;
 	gKernelArgs.frame_buffer.depth = 32;
 	gKernelArgs.frame_buffer.bytes_per_row = 4 * gFramebuf.stride;
-	gKernelArgs.frame_buffer.enabled = true;
+	gKernelArgs.frame_buffer.enabled = gFramebuf.width > 0 && gFramebuf.height > 0;
 
 	video_display_splash(gKernelArgs.frame_buffer.physical_buffer.start);
 }
@@ -110,6 +111,7 @@ platform_switch_to_text_mode(void)
 extern "C" status_t
 platform_init_video(void)
 {
+	FwCfg::Init();
 	virtio_init(); // we want heap initalized
 	Clear(gFramebuf, 0xff000000);
 	console_init();

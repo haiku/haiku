@@ -36,6 +36,8 @@ We have accumulated some notes and documentation on some of them.
    /kernel/arch/arm/ipaq
    /kernel/arch/arm/rpi1
    /kernel/arch/arm/rpi2
+   /kernel/arch/arm/rpi3
+   /kernel/arch/arm/rpi4
 
 TODO list
 ---------
@@ -54,10 +56,6 @@ below. This should be done by setting the -mcpu,-march and -mfloat-abi
 switches at build time, however, they aren't passed on to haikuporter
 during the bootstrap build, leading to the ports failing to find the
 gcc atomic ops again.
-
-It seems this create other problems, mainly because the UEFI environment for ARM is not supposed to
-handle floating point registers. So, the softfloat ABI should be used there instead. To be able
-to build both "soft float" and "hard float" code, we need multilib support, see below.
 
 Determine how to handle atomic functions on ARM
 ***********************************************
@@ -99,14 +97,6 @@ Figure out how to get page flags (modified/accessed) and implement it
 
 use unmapped/read-only mappings to trigger soft faults for tracking used/modified flags for ARMv5 and ARMv6
 
-Fix serial port mapping
-***********************
-
-Currently kernel uses the haiku_loader identity
-mapping for it, but this lives in user virtual address space...
-(Need to not use identity mapping in haiku_loader but just
-map_physical_memory() there too so it can be handed over without issues).
-
 Seperate ARM architecture/System-On-Chip IP code
 ************************************************
 
@@ -123,26 +113,10 @@ Currently it is not possible to disassemble code in the kernel debugger.
 
 The `NetBSD disassembler <http://fxr.watson.org/fxr/source/arch/arm/arm/disassem.c?v=NETBSD>`_ could be ported and used for this.
 
-Add KDL hangman to the boot image
-*********************************
-
-for more enjoyment during porting....
-
 Userland
 ********
 
-Even if KDL hangman is fun, users will want to run real applications someday.
-
-Bootloader TODOs
-****************
-
-- Better handling of memory ranges. Currently no checks are done, and
-  memory is assumed to be a single contiguous range, and the "input"
-  ranges for mmu_init are setup, but never considered.
-- Allocate the pagetable range using mmu_allocate() instead of identity
-  mapping it. That way, there's a bit more flexibility in where to place
-  it both physically and virtually. This will need a minor change on the
-  kernel side too (in the early pagetable allocator).
+Even if poking around in the kernel debugger is fun, users will want to run real applications someday.
 
 Other resources
 ---------------

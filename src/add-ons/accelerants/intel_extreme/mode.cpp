@@ -10,6 +10,7 @@
  */
 
 
+#include <algorithm>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -200,8 +201,19 @@ create_mode_list(void)
 			continue;
 
 		status_t status = gInfo->ports[i]->GetEDID(&gInfo->edid_info);
-		if (status == B_OK)
+		if (status == B_OK) {
 			gInfo->has_edid = true;
+			break;
+		}
+	}
+	// use EDID found at boot time if there since we don't have any ourselves
+	if (!gInfo->has_edid && gInfo->shared_info->has_vesa_edid_info) {
+		TRACE("%s: Using VESA edid info\n", __func__);
+		memcpy(&gInfo->edid_info, &gInfo->shared_info->vesa_edid_info,
+			sizeof(edid1_info));
+		// show in log what we got
+		edid_dump(&gInfo->edid_info);
+		gInfo->has_edid = true;
 	}
 
 	display_mode* list;
@@ -563,14 +575,29 @@ intel_get_edid_info(void* info, size_t size, uint32* _version)
 }
 
 
+// Get the backlight registers. We need the backlight frequency (we never write it, but we ned to
+// know it's value as the duty cycle/brihtness level is proportional to it), and the duty cycle
+// register (read to get the current backlight value, written to set it). On older generations,
+// the two values are in the same register (16 bits each), on newer ones there are two separate
+// registers.
 static int32_t
-intel_get_backlight_register(bool read)
+intel_get_backlight_register(bool period)
 {
+	if (gInfo->shared_info->pch_info >= INTEL_PCH_CNP) {
+		if (period)
+			return PCH_SOUTH_BLC_PWM_PERIOD;
+		else
+			return PCH_SOUTH_BLC_PWM_DUTY_CYCLE;
+	} else if (gInfo->shared_info->pch_info >= INTEL_PCH_SPT)
+		return BLC_PWM_PCH_CTL2;
+
 	if (gInfo->shared_info->pch_info == INTEL_PCH_NONE)
 		return MCH_BLC_PWM_CTL;
-	
-	if (read)
-		return PCH_SBLC_PWM_CTL2;
+
+	// FIXME this mixup of south and north registers seems very strange; it should either be
+	// a single register with both period and duty in it, or two separate registers.
+	if (period)
+		return PCH_SOUTH_BLC_PWM_PERIOD;
 	else
 		return PCH_BLC_PWM_CTL;
 }
@@ -584,21 +611,69 @@ intel_set_brightness(float brightness)
 	if (brightness < 0 || brightness > 1)
 		return B_BAD_VALUE;
 
-	uint32_t period = read32(intel_get_backlight_register(true)) >> 16;
-
 	// The "duty cycle" is a proportion of the period (0 = backlight off,
-	// period = maximum brightness). The low bit must be masked out because
-	// it is apparently used for something else on some Atom machines (no
-	// reference to that in the documentation that I know of).
+	// period = maximum brightness).
 	// Additionally we don't want it to be completely 0 here, because then
 	// it becomes hard to turn the display on again (at least until we get
 	// working ACPI keyboard shortcuts for this). So always keep the backlight
 	// at least a little bit on for now.
-	uint32_t duty = (uint32_t)(period * brightness) & 0xfffe;
-	if (duty == 0 && period != 0)
-		duty = 2;
 
-	write32(intel_get_backlight_register(false), duty | (period << 16));
+	if (gInfo->shared_info->pch_info >= INTEL_PCH_CNP) {
+		uint32_t period = read32(intel_get_backlight_register(true));
+
+		uint32_t duty = (uint32_t)(period * brightness);
+		duty = std::max(duty, (uint32_t)gInfo->shared_info->min_brightness);
+
+		write32(intel_get_backlight_register(false), duty);
+	} else 	if (gInfo->shared_info->pch_info >= INTEL_PCH_SPT) {
+		uint32_t period = read32(intel_get_backlight_register(true)) >> 16;
+
+		uint32_t duty = (uint32_t)(period * brightness) & 0xffff;
+		duty = std::max(duty, (uint32_t)gInfo->shared_info->min_brightness);
+
+		write32(intel_get_backlight_register(false), duty | (period << 16));
+	} else {
+		// On older devices there is a single register with both period and duty cycle
+		uint32 tmp = read32(intel_get_backlight_register(true));
+		bool legacyMode = false;
+		if (gInfo->shared_info->device_type.Generation() == 2
+			|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_915M)
+			|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_945M)) {
+			legacyMode = (tmp & BLM_LEGACY_MODE) != 0;
+		}
+
+		uint32_t period = tmp >> 16;
+
+		uint32_t mask = 0xffff;
+		uint32_t shift = 0;
+		if (gInfo->shared_info->device_type.Generation() < 4) {
+			// The low bit must be masked out because
+			// it is apparently used for something else on some Atom machines (no
+			// reference to that in the documentation that I know of).
+			mask = 0xfffe;
+			shift = 1;
+			period = tmp >> 17;
+		}
+		if (legacyMode)
+			period *= 0xfe;
+		uint32_t duty = (uint32_t)(period * brightness);
+		if (legacyMode) {
+			uint8 lpc = duty / 0xff + 1;
+			duty /= lpc;
+
+			// set pci config reg with lpc
+			intel_brightness_legacy brightnessLegacy;
+			brightnessLegacy.magic = INTEL_PRIVATE_DATA_MAGIC;
+			brightnessLegacy.lpc = lpc;
+			ioctl(gInfo->device, INTEL_SET_BRIGHTNESS_LEGACY, &brightnessLegacy,
+				sizeof(brightnessLegacy));
+		}
+
+		duty = std::max(duty, (uint32_t)gInfo->shared_info->min_brightness);
+		duty <<= shift;
+
+		write32(intel_get_backlight_register(false), (duty & mask) | (tmp & ~mask));
+	}
 
 	return B_OK;
 }
@@ -612,8 +687,37 @@ intel_get_brightness(float* brightness)
 	if (brightness == NULL)
 		return B_BAD_VALUE;
 
-	uint16_t period = read32(intel_get_backlight_register(true)) >> 16;
-	uint16_t   duty = read32(intel_get_backlight_register(false)) & 0xffff;
+	uint32_t duty;
+	uint32_t period;
+
+	if (gInfo->shared_info->pch_info >= INTEL_PCH_CNP) {
+		period = read32(intel_get_backlight_register(true));
+		duty = read32(intel_get_backlight_register(false));
+	} else {
+		uint32 tmp = read32(intel_get_backlight_register(true));
+		bool legacyMode = false;
+		if (gInfo->shared_info->device_type.Generation() == 2
+			|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_915M)
+			|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_945M)) {
+			legacyMode = (tmp & BLM_LEGACY_MODE) != 0;
+		}
+		period = tmp >> 16;
+		duty = read32(intel_get_backlight_register(false)) & 0xffff;
+		if (legacyMode) {
+			period *= 0xff;
+
+			// get lpc from pci config reg
+			intel_brightness_legacy brightnessLegacy;
+			brightnessLegacy.magic = INTEL_PRIVATE_DATA_MAGIC;
+			ioctl(gInfo->device, INTEL_GET_BRIGHTNESS_LEGACY, &brightnessLegacy,
+				sizeof(brightnessLegacy));
+			duty *= brightnessLegacy.lpc;
+		}
+		if (gInfo->shared_info->device_type.Generation() < 4) {
+			period >>= 1;
+			duty >>= 1;
+		}
+	}
 	*brightness = (float)duty / period;
 
 	return B_OK;

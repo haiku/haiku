@@ -1,5 +1,5 @@
 /*
- * Copyright 2018, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -44,6 +44,7 @@ protected:
 
 private:
 			void				_NotifyError(const BString& messageText) const;
+			off_t				_DeriveSize(const PackageInfoRef modelInfo) const;
 
 private:
 			Model*				fModel;

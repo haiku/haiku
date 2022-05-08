@@ -1,5 +1,7 @@
-1	ukrainian	application/x-vnd.Be.LoggingConsumerApp	1634779870
+1	ukrainian	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не вдалося отримати інфо про ноду (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Пріоритет
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не вдалося знайти ноду (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Латентність
 Logged input	CortexAddOnsLoggingConsumer		Вхід реєстратора
 CPU spin percentage	CortexAddOnsLoggingConsumer		Використати CPU (%)
@@ -8,9 +10,7 @@ Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Старт
 Thread priority	CortexAddOnsLoggingConsumer		Пріоритет потоку
 LoggingConsumer parameters	CortexAddOnsLoggingConsumer		Параметри LoggingConsumer
 Latency control	CortexAddOnsLoggingConsumer		Контроль латентності
-MediaNodeControlApp: couldn't get node info (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не вдалося отримати інфо про ноду (%d):\n%s\n
 CPU percentage	CortexAddOnsLoggingConsumer		Загрузка CPU
-MediaNodeControlApp: couldn't find node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не вдалося знайти ноду (%d):\n%s\n
 LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
 Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Стоп
 An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		Нода LoggingConsumer в версії доповнення.\nДивіться Інформаційний бюлетень Be Developer III.18: 5 травня 1999\nадаптував Eric Moon (4 червня 1999)
@@ -19,4 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Управління
 controls	CortexAddOnsCommonMediaNodeControlApp		управління
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		З'єднати
 percent	CortexAddOnsLoggingConsumer		відсотків
-MediaNodeControlApp: no parameters for node (%d):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: відсутні параметри для ноди (%d):\n%s\n
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: відсутні параметри для ноди (%ld):\n%s\n

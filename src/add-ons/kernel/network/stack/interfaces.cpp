@@ -1209,6 +1209,8 @@ find_interface(const char* name)
 static Interface*
 find_interface(uint32 index)
 {
+	ASSERT_LOCKED_RECURSIVE(&sLock);
+
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
 		if (interface->index == index)
@@ -1424,11 +1426,16 @@ get_interface(net_domain* domain, uint32 index)
 	if (interface == NULL || interface->IsBusy())
 		return NULL;
 
+	// We must unlock before invoking CreateDomainDatalinkIfNeeded, because
+	// otherwise we can hit lock ordering inversions with receive threads,
+	// usually in register_device_handler.
+	BReference<Interface> interfaceRef(interface);
+	locker.Unlock();
+
 	if (interface->CreateDomainDatalinkIfNeeded(domain) != B_OK)
 		return NULL;
 
-	interface->AcquireReference();
-	return interface;
+	return interfaceRef.Detach();
 }
 
 
@@ -1441,11 +1448,14 @@ get_interface(net_domain* domain, const char* name)
 	if (interface == NULL || interface->IsBusy())
 		return NULL;
 
+	// See comment in get_interface.
+	BReference<Interface> interfaceRef(interface);
+	locker.Unlock();
+
 	if (interface->CreateDomainDatalinkIfNeeded(domain) != B_OK)
 		return NULL;
 
-	interface->AcquireReference();
-	return interface;
+	return interfaceRef.Detach();
 }
 
 
@@ -1459,11 +1469,15 @@ get_interface_for_device(net_domain* domain, uint32 index)
 		if (interface->device->index == index) {
 			if (interface->IsBusy())
 				return NULL;
+
+			// See comment in get_interface.
+			BReference<Interface> interfaceRef(interface);
+			locker.Unlock();
+
 			if (interface->CreateDomainDatalinkIfNeeded(domain) != B_OK)
 				return NULL;
 
-			interface->AcquireReference();
-			return interface;
+			return interfaceRef.Detach();
 		}
 	}
 
@@ -1497,11 +1511,15 @@ get_interface_for_link(net_domain* domain, const sockaddr* _linkAddress)
 				&& linkAddress.sdl_index == interface->index)) {
 			if (interface->IsBusy())
 				return NULL;
+
+			// See comment in get_interface.
+			BReference<Interface> interfaceRef(interface);
+			locker.Unlock();
+
 			if (interface->CreateDomainDatalinkIfNeeded(domain) != B_OK)
 				return NULL;
 
-			interface->AcquireReference();
-			return interface;
+			return interfaceRef.Detach();
 		}
 	}
 

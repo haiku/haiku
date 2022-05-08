@@ -59,7 +59,7 @@ CJK unified ideographs extension C	UnicodeBlocks		CJK: Vereinheitlichte Ideogram
 Ancient Greek musical notation	UnicodeBlocks		Antike griechische musikalische Notation
 Thai	UnicodeBlocks		Thai
 Ethiopic supplement	UnicodeBlocks		Äthiopisch (Ergänzung)
-Only show blocks contained in font	CharacterWindow		Nur die Blöcke der Schriftart anzeigen
+Only show blocks contained in font	CharacterWindow		Nur die in der Schriftart vorhandenen Blöcke zeigen
 Chess symbols	UnicodeBlocks		Schachsymbole
 Yijing hexagram symbols	UnicodeBlocks		Yijing: Hexagramm-Symbole
 Ottoman Siyaq numbers	UnicodeBlocks		Ottomanische Siyaq Zahlen
@@ -176,7 +176,7 @@ Chorasmian	UnicodeBlocks		Chorasmisch
 Lisu supplement	UnicodeBlocks		Lisu Ergänzung
 Takri	UnicodeBlocks		Takri
 Shorthand format controls	UnicodeBlocks		Kurzschrift Formatsteuerzeichen
-Inscriptional Parthian	UnicodeBlocks		 Parthische Inschrift
+Inscriptional Parthian	UnicodeBlocks		Parthische Inschrift
 Optical character recognition	UnicodeBlocks		Optische Zeichenerkennung
 Tamil	UnicodeBlocks		Tamil
 Lisu	UnicodeBlocks		Lisu

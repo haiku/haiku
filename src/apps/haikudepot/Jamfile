@@ -3,8 +3,7 @@ SubDir HAIKU_TOP src apps haikudepot ;
 # disable -Werror for this directory only
 SubDirC++Flags -Wno-error ;
 
-include [ FDirName $(HAIKU_TOP) src apps haikudepot build jam
-	HdsSchemaGenRules ] ;
+include [ FDirName $(SUBDIR) build jam HdsSchemaGenRules ] ;
 
 UsePrivateHeaders interface kernel net netservices package shared storage ;
 UsePrivateHeaders support locale ;
@@ -71,7 +70,7 @@ local sourceDirs =
 
 local sourceDir ;
 for sourceDir in $(sourceDirs) {
-	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps haikudepot $(sourceDir) ] ;
+	SEARCH_SOURCE += [ FDirName $(SUBDIR) $(sourceDir) ] ;
 }
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers package ] ;
@@ -122,6 +121,7 @@ local applicationSources =
 	DeskbarLink.cpp
 	FeaturedPackagesView.cpp
 	FilterView.cpp
+	GeneralContentScrollView.cpp
 	IconTarPtr.cpp
 	IncrementViewCounterProcess.cpp
 	JobStateListener.cpp
@@ -198,6 +198,7 @@ local applicationSources =
 	DataIOUtils.cpp
 	LanguageMenuUtils.cpp
 	LocaleUtils.cpp
+	PackageUtils.cpp
 	RepositoryUrlUtils.cpp
 	StorageUtils.cpp
 	LoggingUrlProtocolListener.cpp
@@ -310,35 +311,51 @@ HdsSchemaGenParser $(dumpExportReferenceListenerTargetFile)
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedPkgParserSourceFiles) ]
 	[ FGristFiles $(generatedPkgParserSourceFiles:S=.h) ]
+	: $(dumpExportPkgBulkListenerTargetDirectory)
 	: $(dumpExportPkgBulkListenerTargetFile) ;
 
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedRepositoryParserSourceFiles) ]
 	[ FGristFiles $(generatedRepositoryParserSourceFiles:S=.h) ]
+	: $(dumpExportRepositoryBulkListerTargetDirectory)
 	: $(dumpExportRepositoryBulkListerTargetFile) ;
 
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedReferenceParserSourceFiles) ]
 	[ FGristFiles $(generatedReferenceParserSourceFiles:S=.h) ]
+	: $(dumpExportReferenceListenerTargetDirectory)
 	: $(dumpExportReferenceListenerTargetFile) ;
 
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedRepositoryModelSourceFiles) ]
 	[ FGristFiles $(generatedRepositoryModelSourceFiles:S=.h) ]
+	: $(dumpExportRepositoryModelTargetDirectory)
 	: $(dumpExportRepositoryModelTargetFile) ;
 
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedPkgModelSourceFiles) ]
 	[ FGristFiles $(generatedPkgModelSourceFiles:S=.h) ]
+	: $(dumpExportPkgModelTargetDirectory)
 	: $(dumpExportPkgModelTargetFile) ;
 
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedReferenceModelSourceFiles) ]
 	[ FGristFiles $(generatedReferenceModelSourceFiles:S=.h) ]
+	: $(dumpExportReferenceModelTargetDirectory)
 	: $(dumpExportReferenceModelTargetFile) ;
 
 # This will ensure that if any of the generated files' header files change, then
 # the application should be re-built.
+
+Includes [ FGristFiles $(applicationSources) ]
+	:
+	$(dumpExportRepositoryBulkListerTargetDirectory)
+	$(dumpExportPkgBulkListenerTargetDirectory)
+	$(dumpExportReferenceListenerTargetDirectory)
+	$(dumpExportPkgModelTargetDirectory)
+	$(dumpExportRepositoryModelTargetDirectory)
+	$(dumpExportReferenceModelTargetDirectory)
+;
 
 Depends [ FGristFiles $(applicationSources:S=.o) ]
 	:

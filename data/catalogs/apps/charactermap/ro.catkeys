@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CharacterMap	2410613018
+1	romanian	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Simboluri matematice diverse B
 Latin extended E	UnicodeBlocks		Latină extinsă E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		CJK ideografuri unificate exte
 Ancient Greek musical notation	UnicodeBlocks		Notație muzicală greaca veche
 Thai	UnicodeBlocks		Thailandeză
 Ethiopic supplement	UnicodeBlocks		Supliment etiopic
+Only show blocks contained in font	CharacterWindow		Arată doar blocurile conținute în font
 Chess symbols	UnicodeBlocks		Simboluri de șah
 Yijing hexagram symbols	UnicodeBlocks		Simboluri hexagrame Yijing
 Ottoman Siyaq numbers	UnicodeBlocks		Numere Siyaq otomane

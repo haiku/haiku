@@ -11,6 +11,7 @@ SubDirHdrs $(SUBDIR) timers ;
 
 UsePrivateKernelHeaders ;
 UsePrivateHeaders shared ;
+UsePrivateHeaders [ FDirName system arch x86 ] ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) paging ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) timers ] ;
@@ -27,7 +28,6 @@ if $(TARGET_ARCH) = x86_64 {
 		errata.cpp
 		interrupts.S
 		signals.cpp
-		signals_asm.S
 		syscalls.cpp
 		thread.cpp
 

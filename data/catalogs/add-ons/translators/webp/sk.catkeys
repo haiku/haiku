@@ -1,22 +1,2 @@
-1	slovak	x-vnd.Haiku-WebPTranslator	3343078170
-Compression method:	ConfigView		Spôsob kompresie:
-WebP image translator	ConfigView		Prekladač obrázkov WebP
-Preset	ConfigView		Predvoľby
-WebP images	WebPTranslator		Obrázky WebP
-WebPTranslator Settings	ConfigView		Nastavenie WebPTranslator
-Output quality:	ConfigView		Kvalita výstupu:
+1	slovak	x-vnd.Haiku-WebPTranslator	1475550615
 WebP Settings	main		Nastavenie WebP
-Text	ConfigView		Text
-Slower but better	ConfigView		Pomalšia, ale lepšia
-WebP image	WebPTranslator		Obrázok WebP
-Output preset:	ConfigView		Predvoľby výstupu:
-Picture	ConfigView		Obraz
-Low	ConfigView		Nízka
-High	ConfigView		Vysoká
-Drawing	ConfigView		Vykresľovanie
-Default	ConfigView		Predvolené
-Fast	ConfigView		Rýchla
-Photo	ConfigView		Foto
-Preprocessing filter	ConfigView		Filter predspracovania
-WebP image translator	WebPTranslator		Prekladač obrázkov WebP
-Icon	ConfigView		Ikona

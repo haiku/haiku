@@ -1,13 +1,13 @@
-1	french	x-vnd.Haiku-desklink	3568085956
+1	french	x-vnd.Haiku-desklink	2223625451
 desklink	MediaReplicant	Title of an alert box	desklink
-Sound preferences…	MediaReplicant		Réglages sons…
 Muted	MediaReplicant		Muet
 %g dB	MediaReplicant		%g dB
 OK	MediaReplicant		OK
+Sounds preferences…	MediaReplicant		Préférences sons…
 Couldn't launch 	MediaReplicant		Lancement impossible 
 Volume	VolumeControl		Volume
 Open MediaPlayer	MediaReplicant		Ouvrir le Lecteur Média
-%d dB	VolumeControl		%d dB
+%ld dB	VolumeControl		%ld dB
 Media preferences…	MediaReplicant		Réglages média…
 Options	MediaReplicant		Options
 Beep	MediaReplicant		Bip

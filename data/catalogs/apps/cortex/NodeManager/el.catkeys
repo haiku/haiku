@@ -1,0 +1,7 @@
+1	greek, modern (1453-)	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		Μίκτης ήχου συστήματος
+System video output	NodeManager		Έξοδος βίντεο συστήματος
+System video input	NodeManager		Είσοδος βίντεο συστήματος
+No name	NodeManager		Χωρίς όνομα
+System audio input	NodeManager		Είσοδος ήχου συστήματος
+Time sources	NodeManager		Πηγές χρόνου

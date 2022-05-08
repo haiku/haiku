@@ -18,11 +18,15 @@
 
 #ifdef _BOOT_MODE
 
-
-// 32-bit and 64-bit kernel load addresses.
+#ifdef _BOOT_PLATFORM_BIOS
+#define KERNEL_LOAD_BASE_32_BIT			0x80000000
+#define KERNEL_LOAD_BASE_64_BIT		0xffffffff80000000ll
+#define KERNEL_FIXUP_FOR_LONG_MODE	(KERNEL_LOAD_BASE_64_BIT - KERNEL_LOAD_BASE_32_BIT)
+#elif __x86_64__
+#define KERNEL_LOAD_BASE	0xffffffff80000000ll
+#else
 #define KERNEL_LOAD_BASE		0x80000000
-#define KERNEL_LOAD_BASE_64_BIT	0xffffffff80000000ll
-
+#endif
 
 #elif defined(__x86_64__)
 

@@ -1,6 +1,6 @@
 /*
  * Copyright 2010, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2020, Panagiotis Vasilopoulos <hello@alwayslivid.com>
+ * Copyright 2020, Panagiotis "Ivory" Vasilopoulos <git@n0toose.net>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef BOOT_PROMPT_WINDOW_H

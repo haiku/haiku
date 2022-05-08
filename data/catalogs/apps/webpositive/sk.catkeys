@@ -20,8 +20,8 @@ Open containing folder	Download Window		Otvoriť nadradený priečinok
 Find previous	WebPositive Window		Nájsť predošlé
 Full screen	WebPositive Window		Celoobrazovkový režim
 Downloads in progress	WebPositive		Prebiehajú sťahovania
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Chcete otvoriť %addedCount záložiek naraz?
 Copy URL to clipboard	Download Window		Skopírovať adresu URL do schránky
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Chcete otvoriť %addedCount záložiek naraz?
 Clone current page	Settings Window		Duplikovať aktuálnu stránku
 Start page:	Settings Window		Počiatočná stránka:
 Cancel	Download Window		Zrušiť
@@ -47,8 +47,8 @@ Decrease size	WebPositive Window		Zmenšiť veľkosť
 Default fixed font size:	Settings Window		Predvolená veľkosť proporcionálneho písma:
 Sans serif font:	Settings Window		Bezpätkové písmo:
 Clear	WebPositive Window		Vyčistiť
-Cookies for %s	Cookie Manager		Cookies pre %s
 The download could not be opened.	Download Window		Sťahovanie sa nepodarilo otvoriť.
+Cookies for %s	Cookie Manager		Cookies pre %s
 Close	Download Window		Zatvoriť
 WebPositive	System name		WebPositive
 Reload	WebPositive Window		Obnoviť
@@ -107,8 +107,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Pokračovať v sťahovaní
 Proxy server requires authentication	Settings Window		Server proxy vyžaduje overenie totožnosti
 Cancel	Settings Window		Zrušiť
-History	WebPositive Window		História
 Reset size	WebPositive Window		Znovu nastaviť veľkosť
+History	WebPositive Window		História
 Do you really want to clear the browsing history?	WebPositive Window		Skutočne chcete vymazať históriu prehliadania?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Nájsť ďalší výskyt hľadaného textu
 Fixed font:	Settings Window		Proporcionálne písmo:

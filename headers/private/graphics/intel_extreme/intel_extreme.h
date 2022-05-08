@@ -53,6 +53,8 @@
 #define INTEL_GROUP_KBY		(INTEL_FAMILY_LAKE | 0x0020)  // KabyLake
 #define INTEL_GROUP_CFL		(INTEL_FAMILY_LAKE | 0x0040)  // CoffeeLake
 #define INTEL_GROUP_CML		(INTEL_FAMILY_LAKE | 0x0080)  // CometLake
+#define INTEL_GROUP_JSL		(INTEL_FAMILY_LAKE | 0x0100)  // JasperLake
+#define INTEL_GROUP_TGL		(INTEL_FAMILY_LAKE | 0x0200)  // TigerLake
 // models
 #define INTEL_TYPE_SERVER	0x0004
 #define INTEL_TYPE_MOBILE	0x0008
@@ -81,6 +83,7 @@
 #define INTEL_MODEL_VLVM	(INTEL_GROUP_VLV | INTEL_TYPE_MOBILE)
 #define INTEL_MODEL_BDW		(INTEL_GROUP_BDW)
 #define INTEL_MODEL_BDWM	(INTEL_GROUP_BDW | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_BDWS	(INTEL_GROUP_BDW | INTEL_TYPE_SERVER)
 #define INTEL_MODEL_SKY		(INTEL_GROUP_SKY)
 #define INTEL_MODEL_SKYM	(INTEL_GROUP_SKY | INTEL_TYPE_MOBILE)
 #define INTEL_MODEL_SKYS	(INTEL_GROUP_SKY | INTEL_TYPE_SERVER)
@@ -89,6 +92,10 @@
 #define INTEL_MODEL_CFL		(INTEL_GROUP_CFL)
 #define INTEL_MODEL_CFLM	(INTEL_GROUP_CFL | INTEL_TYPE_MOBILE)
 #define INTEL_MODEL_CML		(INTEL_GROUP_CML)
+#define INTEL_MODEL_CMLM	(INTEL_GROUP_CML | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_JSL		(INTEL_GROUP_JSL)
+#define INTEL_MODEL_JSLM	(INTEL_GROUP_JSL | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_TGLM	(INTEL_GROUP_TGL | INTEL_TYPE_MOBILE)
 
 #define INTEL_PCH_DEVICE_ID_MASK	0xff80
 #define INTEL_PCH_IBX_DEVICE_ID		0x3b00
@@ -107,13 +114,15 @@
 #define INTEL_PCH_CMP2_DEVICE_ID	0x0680
 #define INTEL_PCH_CMP_V_DEVICE_ID	0xa380
 #define INTEL_PCH_ICP_DEVICE_ID		0x3480
+#define INTEL_PCH_ICP2_DEVICE_ID	0x3880
 #define INTEL_PCH_MCC_DEVICE_ID		0x4b00
 #define INTEL_PCH_TGP_DEVICE_ID		0xa080
 #define INTEL_PCH_TGP2_DEVICE_ID	0x4380
 #define INTEL_PCH_JSP_DEVICE_ID		0x4d80
-#define INTEL_PCH_JSP2_DEVICE_ID	0x3880
 #define INTEL_PCH_ADP_DEVICE_ID		0x7a80
 #define INTEL_PCH_ADP2_DEVICE_ID	0x5180
+#define INTEL_PCH_ADP3_DEVICE_ID	0x7a00
+#define INTEL_PCH_ADP4_DEVICE_ID	0x5480
 #define INTEL_PCH_P2X_DEVICE_ID		0x7100
 #define INTEL_PCH_P3X_DEVICE_ID		0x7000
 
@@ -221,6 +230,10 @@ struct DeviceType {
 			return 7;
 		if (InGroup(INTEL_GROUP_CHV) || InGroup(INTEL_GROUP_BDW))
 			return 8;
+		if (InGroup(INTEL_GROUP_JSL))
+			return 11;
+		if (InGroup(INTEL_GROUP_TGL))
+			return 12;
 		if (InFamily(INTEL_FAMILY_LAKE))
 			return 9;
 
@@ -272,7 +285,135 @@ struct ring_buffer {
 	uint8*			base;
 };
 
-struct overlay_registers;
+
+struct child_device_config {
+	uint16 handle;
+	uint16 device_type;
+#define DEVICE_TYPE_ANALOG_OUTPUT		(1 << 0)
+#define DEVICE_TYPE_DIGITAL_OUTPUT		(1 << 1)
+#define DEVICE_TYPE_DISPLAYPORT_OUTPUT	(1 << 2)
+#define DEVICE_TYPE_VIDEO_SIGNALING		(1 << 3)
+#define DEVICE_TYPE_TMDS_DVI_SIGNALING	(1 << 4)
+#define DEVICE_TYPE_LVDS_SIGNALING		(1 << 5)
+#define DEVICE_TYPE_HIGH_SPEED_LINK		(1 << 6)
+#define DEVICE_TYPE_DUAL_CHANNEL		(1 << 8)
+#define DEVICE_TYPE_COMPOSITE_OUTPUT	(1 << 9)
+#define DEVICE_TYPE_MIPI_OUTPUT			(1 << 10)
+#define DEVICE_TYPE_NOT_HDMI_OUTPUT		(1 << 11)
+#define DEVICE_TYPE_INTERNAL_CONNECTOR	(1 << 12)
+#define DEVICE_TYPE_HOTPLUG_SIGNALING	(1 << 13)
+#define DEVICE_TYPE_POWER_MANAGEMENT	(1 << 14)
+#define DEVICE_TYPE_CLASS_EXTENSION		(1 << 15)
+
+	uint8 device_id[10];
+	uint16 addin_offset;
+	uint8 dvo_port;
+	uint8 i2c_pin;
+	uint8 slave_addr;
+	uint8 ddc_pin;
+	uint16 edid_ptr;
+	uint8 dvo_cfg;
+
+	struct {
+		bool efp_routed:1;
+		bool lane_reversal:1;
+		bool lspcon:1;
+		bool iboost:1;
+		bool hpd_invert:1;
+		bool use_vbt_vswing:1;
+		uint8 reserved:2;
+		bool hdmi_support:1;
+		bool dp_support:1;
+		bool tmds_support:1;
+		uint8 reserved2:5;
+		uint8 aux_channel;
+		uint8 dongle_detect;
+	} __attribute__((packed));
+
+	uint8 caps;
+	uint8 dvo_wiring;
+	uint8 dvo2_wiring;
+	uint16 extended_type;
+	uint8 dvo_function;
+
+	bool dp_usb_type_c:1;
+	bool tbt:1;
+	uint8 reserved3:2;
+	uint8 dp_port_trace_length:4;
+	uint8 dp_gpio_index;
+	uint8 dp_gpio_pin_num;
+	uint8 dp_iboost_level:4;
+	uint8 hdmi_iboost_level:4;
+	uint8 dp_max_link_rate:3;
+	uint8 dp_max_link_rate_reserved:5;
+} __attribute__((packed));
+
+
+enum dvo_port {
+	DVO_PORT_HDMIA,
+	DVO_PORT_HDMIB,
+	DVO_PORT_HDMIC,
+	DVO_PORT_HDMID,
+	DVO_PORT_LVDS,
+	DVO_PORT_TV,
+	DVO_PORT_CRT,
+	DVO_PORT_DPB,
+	DVO_PORT_DPC,
+	DVO_PORT_DPD,
+	DVO_PORT_DPA,
+	DVO_PORT_DPE,
+	DVO_PORT_HDMIE,
+	DVO_PORT_DPF,
+	DVO_PORT_HDMIF,
+	DVO_PORT_DPG,
+	DVO_PORT_HDMIG,
+	DVO_PORT_DPH,
+	DVO_PORT_HDMIH,
+	DVO_PORT_DPI,
+	DVO_PORT_HDMII,
+};
+
+
+enum dp_aux_channel {
+	DP_AUX_A = 0x40,
+	DP_AUX_B = 0x10,
+	DP_AUX_C = 0x20,
+	DP_AUX_D = 0x30,
+	DP_AUX_E = 0x50,
+	DP_AUX_F = 0x60,
+	DP_AUX_G = 0x70,
+	DP_AUX_H = 0x80,
+	DP_AUX_I = 0x90
+};
+
+
+enum aux_channel {
+	AUX_CH_A,
+	AUX_CH_B,
+	AUX_CH_C,
+	AUX_CH_D,
+	AUX_CH_E,
+	AUX_CH_F,
+	AUX_CH_G,
+	AUX_CH_H,
+	AUX_CH_I,
+};
+
+
+enum hpd_pin {
+	HPD_PORT_A,
+	HPD_PORT_B,
+	HPD_PORT_C,
+	HPD_PORT_D,
+	HPD_PORT_E,
+	HPD_PORT_TC1,
+	HPD_PORT_TC2,
+	HPD_PORT_TC3,
+	HPD_PORT_TC4,
+	HPD_PORT_TC5,
+	HPD_PORT_TC6,
+};
+
 
 struct intel_shared_info {
 	area_id			mode_list_area;		// area containing display mode list
@@ -283,6 +424,7 @@ struct intel_shared_info {
 	uint32			bytes_per_row;
 	uint32			bits_per_pixel;
 	uint32			dpms_mode;
+	uint16			min_brightness;
 
 	area_id			registers_area;		// area of memory mapped registers
 	uint32			register_blocks[REGISTER_BLOCK_COUNT];
@@ -331,6 +473,9 @@ struct intel_shared_info {
 
 	edid1_info		vesa_edid_info;
 	bool			has_vesa_edid_info;
+
+	uint32			device_config_count;
+	child_device_config device_configs[10];
 };
 
 enum pipe_index {
@@ -339,6 +484,40 @@ enum pipe_index {
     INTEL_PIPE_B,
     INTEL_PIPE_C,
     INTEL_PIPE_D
+};
+
+class pipes {
+public:
+	pipes() : bitmask(0) {}
+
+	bool HasPipe(pipe_index pipe)
+	{
+		if (pipe == INTEL_PIPE_ANY)
+			return bitmask != 0;
+
+		return (bitmask & (1 << pipe)) != 0;
+	}
+
+	void SetPipe(pipe_index pipe)
+	{
+		if (pipe == INTEL_PIPE_ANY) {
+			bitmask = ~1;
+				// first bit corresponds to INTEL_PIPE_ANY but it's never used,
+				// so it should be 0
+		}
+		bitmask |= (1 << pipe);
+	}
+
+	void ClearPipe(pipe_index pipe)
+	{
+		if (pipe == INTEL_PIPE_ANY)
+			bitmask = 0;
+
+		bitmask &= ~(1 << pipe);
+	}
+
+private:
+	uint8 bitmask;
 };
 
 //----------------- ioctl() interface ----------------
@@ -352,7 +531,9 @@ enum {
 
 	INTEL_GET_DEVICE_NAME,
 	INTEL_ALLOCATE_GRAPHICS_MEMORY,
-	INTEL_FREE_GRAPHICS_MEMORY
+	INTEL_FREE_GRAPHICS_MEMORY,
+	INTEL_GET_BRIGHTNESS_LEGACY,
+	INTEL_SET_BRIGHTNESS_LEGACY
 };
 
 // retrieve the area_id of the kernel/accelerant shared info
@@ -374,6 +555,12 @@ struct intel_allocate_graphics_memory {
 struct intel_free_graphics_memory {
 	uint32 	magic;
 	addr_t	buffer_base;
+};
+
+// brightness legacy
+struct intel_brightness_legacy {
+	uint32 	magic;
+	uint8	lpc;
 };
 
 //----------------------------------------------------------
@@ -489,6 +676,9 @@ struct intel_free_graphics_memory {
 #define BDW_GTT_SIZE_4MB				(2 << 6)
 #define BDW_GTT_SIZE_8MB				(3 << 6)
 
+// Gen2, i915GM, i945GM
+#define LEGACY_BACKLIGHT_BRIGHTNESS		0xf4
+
 // graphics page translation table
 #define INTEL_PAGE_TABLE_CONTROL		0x02020
 #define PAGE_TABLE_ENABLED				0x00000001
@@ -553,6 +743,84 @@ struct intel_free_graphics_memory {
 #define PCH_INTERRUPT_VBLANK_PIPEA_SNB		(1 << 7)
 #define PCH_INTERRUPT_VBLANK_PIPEB_SNB		(1 << 15)
 #define PCH_INTERRUPT_GLOBAL_SNB			(1 << 31)
+
+#define PCH_MASTER_INT_CTL_BDW					0x44200
+
+#define PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(pipe)	(1 << (15 + pipe))
+#define GEN8_DE_PCH_IRQ							(1 << 23)
+#define GEN8_DE_PORT_IRQ						(1 << 20)
+#define PCH_MASTER_INT_CTL_GLOBAL_BDW			(1 << 31)
+
+#define PCH_INTERRUPT_PIPE_STATUS_BDW(pipe)		(0x44400 + (pipe - 1) * 0x10)	// GEN8_DE_PIPE_ISR
+#define PCH_INTERRUPT_PIPE_MASK_BDW(pipe)		(0x44404 + (pipe - 1) * 0x10)	// GEN8_DE_PIPE_IMR
+#define PCH_INTERRUPT_PIPE_IDENTITY_BDW(pipe)	(0x44408 + (pipe - 1) * 0x10)	// GEN8_DE_PIPE_IIR
+#define PCH_INTERRUPT_PIPE_ENABLED_BDW(pipe)	(0x4440c + (pipe - 1) * 0x10)	// GEN8_DE_PIPE_IER
+
+#define GEN8_DE_PORT_ISR						0x44440
+#define GEN8_DE_PORT_IMR						0x44444
+#define GEN8_DE_PORT_IIR						0x44448
+#define GEN8_DE_PORT_IER						0x4444c
+#define		GEN8_AUX_CHANNEL_A					(1 << 0)
+#define		GEN9_AUX_CHANNEL_B					(1 << 25)
+#define		GEN9_AUX_CHANNEL_C					(1 << 26)
+#define		GEN9_AUX_CHANNEL_D					(1 << 27)
+#define		CNL_AUX_CHANNEL_F					(1 << 28)
+#define		ICL_AUX_CHANNEL_E					(1 << 29)
+
+#define GEN8_DE_MISC_ISR						0x44460
+#define GEN8_DE_MISC_IMR						0x44464
+#define GEN8_DE_MISC_IIR						0x44468
+#define GEN8_DE_MISC_IER						0x4446c
+#define		GEN8_DE_EDP_PSR						(1 << 19)
+
+#define GEN11_DE_HPD_ISR						0x44470
+#define GEN11_DE_HPD_IMR						0x44474
+#define GEN11_DE_HPD_IIR						0x44478
+#define GEN11_DE_HPD_IER						0x4447c
+#define GEN11_DE_TC_HOTPLUG_MASK				(0x3f << 16)
+#define GEN11_DE_TBT_HOTPLUG_MASK				(0x3f)
+
+#define GEN11_TBT_HOTPLUG_CTL					0x44030
+#define GEN11_TC_HOTPLUG_CTL					0x44038
+
+#define SHPD_FILTER_CNT							0xc4038
+#define SHPD_FILTER_CNT_500_ADJ					0x1d9
+
+#define SDEISR									0xc4000
+#define SDEIMR									0xc4004
+#define SDEIIR									0xc4008
+#define SDEIER									0xc400c
+#define SDE_GMBUS_ICP							(1 << 23)
+
+#define SHOTPLUG_CTL_DDI						0xc4030
+#define SHOTPLUG_CTL_DDI_HPD_ENABLE(hpd_pin)	(0x8 << (4 * ((hpd_pin) - HPD_PORT_A)))
+#define SHOTPLUG_CTL_TC							0xc4034
+#define SHOTPLUG_CTL_TC_HPD_ENABLE(hpd_pin)		(0x8 << (4 * ((hpd_pin) - HPD_PORT_TC1)))
+
+#define PCH_PORT_HOTPLUG						SHOTPLUG_CTL_DDI
+#define PCH_PORT_HOTPLUG2						0xc403c
+
+#define PCH_INTERRUPT_VBLANK_BDW				(1 << 0)						// GEN8_PIPE_VBLANK
+#define GEN8_PIPE_VSYNC							(1 << 1)
+#define GEN8_PIPE_SCAN_LINE_EVENT				(1 << 2)
+
+#define GEN11_GFX_MSTR_IRQ						0x190010
+#define GEN11_MASTER_IRQ						(1 << 31)
+#define GEN11_DISPLAY_IRQ						(1 << 16)
+#define GEN11_GT_DW1_IRQ						(1 << 1)
+#define GEN11_GT_DW0_IRQ						(1 << 0)
+
+#define GEN11_DISPLAY_INT_CTL					0x44200			// same as PCH_MASTER_INT_CTL_BDW
+#define GEN11_DE_HPD_IRQ						(1 << 21)
+
+#define GEN11_GT_INTR_DW0						0x190018
+#define GEN11_GT_INTR_DW1						0x19001c
+
+#define GEN11_GU_MISC_IMR						0x444f4
+#define GEN11_GU_MISC_IIR						0x444f8
+#define GEN11_GU_MISC_IER						0x444fc
+#define 	GEN11_GU_MISC_GSE					(1 << 27)
+
 
 // graphics port control (i.e. G45)
 #define DISPLAY_MONITOR_PORT_ENABLED	(1UL << 31)
@@ -811,6 +1079,26 @@ struct intel_free_graphics_memory {
 #define INTEL_DISPLAY_PORT_C			(0x4200 | REGS_SOUTH_TRANSCODER_PORT)
 #define INTEL_DISPLAY_PORT_D			(0x4300 | REGS_SOUTH_TRANSCODER_PORT)
 
+#define INTEL_DISP_PORTA_SNB_PIPE_SHIFT	30
+#define INTEL_DISP_PORTA_SNB_PIPE_MASK	(1 << INTEL_DISP_PORTA_SNB_PIPE_SHIFT)
+#define INTEL_DISP_PORTA_SNB_PIPE_A		0
+#define INTEL_DISP_PORTA_SNB_PIPE_B		1
+#define INTEL_DISP_PORTA_IVB_PIPE_SHIFT	29
+#define INTEL_DISP_PORTA_IVB_PIPE_MASK	(3 << INTEL_DISP_PORTA_IVB_PIPE_SHIFT)
+#define INTEL_DISP_PORTA_IVB_PIPE_A		0
+#define INTEL_DISP_PORTA_IVB_PIPE_B		1
+#define INTEL_DISP_PORTA_IVB_PIPE_C		2
+
+#define INTEL_DISP_PORT_WIDTH_SHIFT		19
+#define INTEL_DISP_PORT_WIDTH_MASK		(7 << INTEL_DISP_PORT_WIDTH_SHIFT)
+#define INTEL_DISP_PORT_WIDTH_1			0
+#define INTEL_DISP_PORT_WIDTH_2			1
+#define INTEL_DISP_PORT_WIDTH_4			3
+#define INTEL_DISP_EDP_PLL_FREQ_SHIFT	16
+#define INTEL_DISP_EDP_PLL_FREQ_MASK	(3 << INTEL_DISP_EDP_PLL_FREQ_SHIFT)
+#define INTEL_DISP_EDP_PLL_FREQ_270		0
+#define INTEL_DISP_EDP_PLL_FREQ_162		1
+
 #define INTEL_TRANSCODER_A_DP_CTL		(0x0300 | REGS_SOUTH_TRANSCODER_PORT)
 #define INTEL_TRANSCODER_B_DP_CTL		(0x1300 | REGS_SOUTH_TRANSCODER_PORT)
 #define INTEL_TRANSCODER_C_DP_CTL		(0x2300 | REGS_SOUTH_TRANSCODER_PORT)
@@ -832,14 +1120,23 @@ struct intel_free_graphics_memory {
 #define CHV_DISPLAY_PORT_D				(VLV_DISPLAY_BASE + 0x64300)
 
 // DP AUX channels
-#define INTEL_DP_AUX_CTL_A				(0x4010 | REGS_NORTH_PIPE_AND_PORT)
-#define INTEL_DP_AUX_CTL_B				(0x4110 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DP_AUX_CTL_C				(0x4210 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DP_AUX_CTL_D				(0x4310 | REGS_SOUTH_TRANSCODER_PORT)
-
-#define VLV_DP_AUX_CTL_B				(VLV_DISPLAY_BASE + 0x64110)
-#define VLV_DP_AUX_CTL_C				(VLV_DISPLAY_BASE + 0x64210)
-#define CHV_DP_AUX_CTL_D				(VLV_DISPLAY_BASE + 0x64310)
+#define _DPA_AUX_CH_CTL					(0x4010 | REGS_NORTH_PIPE_AND_PORT)
+#define _DPA_AUX_CH_DATA1				(0x4014 | REGS_NORTH_PIPE_AND_PORT)
+#define _DPB_AUX_CH_CTL					(0x4110 | REGS_NORTH_PIPE_AND_PORT)
+#define _DPB_AUX_CH_DATA1				(0x4114 | REGS_NORTH_PIPE_AND_PORT)
+#define DP_AUX_CH_CTL(aux)		\
+					(_DPA_AUX_CH_CTL + (_DPB_AUX_CH_CTL - _DPA_AUX_CH_CTL) * aux)
+#define DP_AUX_CH_DATA(aux, i)	\
+					(_DPA_AUX_CH_DATA1 + (_DPB_AUX_CH_DATA1 - _DPA_AUX_CH_DATA1) * aux + i * 4)
+#define _PCH_DPB_AUX_CH_CTL				(0x4110 | REGS_SOUTH_TRANSCODER_PORT)
+#define _PCH_DPB_AUX_CH_DATA1			(0x4114 | REGS_SOUTH_TRANSCODER_PORT)
+#define _PCH_DPC_AUX_CH_CTL				(0x4210 | REGS_SOUTH_TRANSCODER_PORT)
+#define _PCH_DPC_AUX_CH_DATA1			(0x4214 | REGS_SOUTH_TRANSCODER_PORT)
+#define PCH_DP_AUX_CH_CTL(aux)		\
+		(_PCH_DPB_AUX_CH_CTL + (_PCH_DPC_AUX_CH_CTL - _PCH_DPB_AUX_CH_CTL) * (aux - AUX_CH_B))
+#define PCH_DP_AUX_CH_DATA(aux, i)	\
+		(_PCH_DPB_AUX_CH_DATA1 + (_PCH_DPC_AUX_CH_DATA1 - _PCH_DPB_AUX_CH_DATA1) * (aux - AUX_CH_B) \
+			+ i * 4)
 
 #define INTEL_DP_AUX_CTL_BUSY			(1 << 31)
 #define INTEL_DP_AUX_CTL_DONE			(1 << 30)
@@ -857,6 +1154,7 @@ struct intel_free_graphics_memory {
 #define INTEL_DP_AUX_CTL_PRECHARGE_2US_SHIFT 16
 #define INTEL_DP_AUX_CTL_BIT_CLOCK_2X_MASK (0x7ff)
 #define INTEL_DP_AUX_CTL_BIT_CLOCK_2X_SHIFT 0
+#define INTEL_DP_AUX_CTL_FW_SYNC_PULSE_SKL(c)   (((c) - 1) << 5)
 #define INTEL_DP_AUX_CTL_SYNC_PULSE_SKL(c)   ((c) - 1)
 
 // planes
@@ -1021,8 +1319,30 @@ struct intel_free_graphics_memory {
 #define INTEL_GEN9_CLKGATE_DIS_4		(0x653c | REGS_NORTH_SHARED)
 #define BXT_GMBUSUNIT_CLK_GATE_DIS		(1 << 14)
 
-// gpu power wells
-#define INTEL_PWR_WELL_CTL_2			(0x5404 | REGS_NORTH_SHARED)
+// gpu power wells (confirmed skylake)
+#define INTEL_PWR_WELL_CTL_1_BIOS		(0x5400 | REGS_NORTH_SHARED)
+#define INTEL_PWR_WELL_CTL_2_DRIVER		(0x5404 | REGS_NORTH_SHARED)
+
+#define	HSW_PWR_WELL_CTL_REQ(i)			(0x2 << ((2 * i)))
+#define	HSW_PWR_WELL_CTL_STATE(i)		(0x1 << ((2 * i)))
+
+#define HSW_PWR_WELL_CTL1				INTEL_PWR_WELL_CTL_1_BIOS
+#define HSW_PWR_WELL_CTL2				INTEL_PWR_WELL_CTL_2_DRIVER
+#define HSW_PWR_WELL_CTL3				(0x5408 | REGS_NORTH_SHARED)
+#define HSW_PWR_WELL_CTL4				(0x540c | REGS_NORTH_SHARED)
+
+#define ICL_PWR_WELL_CTL_AUX1			(0x5440 | REGS_NORTH_SHARED)
+#define ICL_PWR_WELL_CTL_AUX2			(0x5444 | REGS_NORTH_SHARED)
+#define ICL_PWR_WELL_CTL_AUX4			(0x544c | REGS_NORTH_SHARED)
+
+#define ICL_PWR_WELL_CTL_DDI1			(0x5450 | REGS_NORTH_SHARED)
+#define ICL_PWR_WELL_CTL_DDI2			(0x5454 | REGS_NORTH_SHARED)
+#define ICL_PWR_WELL_CTL_DDI4			(0x545c | REGS_NORTH_SHARED)
+
+// gpu pll enable registers (confirmed skylake)
+#define INTEL_WRPLL_CTL_1_DPLL2			(0x6040 | REGS_NORTH_SHARED)
+#define INTEL_WRPLL_CTL_2_DPLL3			(0x6060 | REGS_NORTH_SHARED)
+#define WRPLL_PLL_ENABLE				(1 << 31)
 
 // TODO: on IronLake this is in the north shared block at 0x41000
 #define INTEL_VGA_DISPLAY_CONTROL		(0x1400 | REGS_NORTH_PLANE_CONTROL)
@@ -1062,11 +1382,26 @@ struct intel_free_graphics_memory {
 #define PANEL_DIVISOR_POW_CYCLE_DLY_SHIFT 0x1f
 
 // Backlight control registers
-#define PCH_BLC_PWM_CTL2                (0x8250 | REGS_NORTH_SHARED)
-#define PCH_BLC_PWM_CTL                 (0x8254 | REGS_NORTH_SHARED)
-#define PCH_SBLC_PWM_CTL2               (0x8254 | REGS_SOUTH_SHARED)
+// These have moved around, initially they were per pipe, then they were moved in the "north" part
+// of the PCH with a single backlight control (independant of pipes), and then moved again to the
+// "south" part of the PCH, with a simplified register layout.
+#define PCH_BLC_PWM_CTL2				(0x8250 | REGS_NORTH_SHARED) // Linux BLC_PWM_CPU_CTL2
+#define PCH_BLC_PWM_CTL					(0x8254 | REGS_NORTH_SHARED) // Linux BLC_PWM_CPU_CTL
+
+// Kaby Lake/Sunrisepoint
+#define BLC_PWM_PCH_CTL1				(0x8250 | REGS_SOUTH_SHARED) // Enable with bit 31
+#define BLC_PWM_PCH_CTL2				(0x8254 | REGS_SOUTH_SHARED) // Duty Cycle and Period
+
+// Devices after Cannonlake have a new register layout, with separate registers for the period
+// and duty cycle instead of having two 16bit values in a 32bit register
+#define PCH_SOUTH_BLC_PWM_CONTROL		(0x8250 | REGS_SOUTH_SHARED) // Linux _BXT_BLC_PWM_CTL1
+#define PCH_SOUTH_BLC_PWM_PERIOD		(0x8254 | REGS_SOUTH_SHARED) // Linux _BXT_BLC_PWM_FREQ1
+#define PCH_SOUTH_BLC_PWM_DUTY_CYCLE	(0x8258 | REGS_SOUTH_SHARED) // Linux _BXT_BLC_PWM_DUTY1
 
 #define MCH_BLC_PWM_CTL                 (0x1254 | REGS_NORTH_PIPE_AND_PORT)
+	// Linux VLV_BLC_PWM_CTL (one register per pipe) or BLC_PWM_CTL (a single register that can be
+	// programmed for use on either pipe)
+#define BLM_LEGACY_MODE					(1 << 16)
 
 // ring buffer commands
 
@@ -1196,31 +1531,31 @@ struct intel_free_graphics_memory {
 #define FDI_LINK_TRAIN_PRE_EMPHASIS_2X		(2 << 22)
 #define FDI_LINK_TRAIN_PRE_EMPHASIS_3X		(3 << 22)
 
-//FDI PIPE M/N DATA AND LINK VALUES (refreshrate)
-#define PCH_FDI_PIPE_A_DATA_M1				0x0030
-#define PCH_FDI_PIPE_A_DATA_M2				0x0038
-#define PCH_FDI_PIPE_B_DATA_M1				0x1030
-#define PCH_FDI_PIPE_B_DATA_M2				0x1038
-#define PCH_FDI_PIPE_C_DATA_M1				0x2030
-#define PCH_FDI_PIPE_C_DATA_M2				0x2038
-#define PCH_FDI_PIPE_A_DATA_N1				0x0034
-#define PCH_FDI_PIPE_A_DATA_N2				0x003c
-#define PCH_FDI_PIPE_B_DATA_N1				0x1034
-#define PCH_FDI_PIPE_B_DATA_N2				0x103c
-#define PCH_FDI_PIPE_C_DATA_N1				0x2034
-#define PCH_FDI_PIPE_C_DATA_N2				0x203c
-#define PCH_FDI_PIPE_A_LINK_M1				0x0040
-#define PCH_FDI_PIPE_A_LINK_M2				0x0048
-#define PCH_FDI_PIPE_B_LINK_M1				0x1040
-#define PCH_FDI_PIPE_B_LINK_M2				0x1048
-#define PCH_FDI_PIPE_C_LINK_M1				0x2040
-#define PCH_FDI_PIPE_C_LINK_M2				0x2048
-#define PCH_FDI_PIPE_A_LINK_N1				0x0044
-#define PCH_FDI_PIPE_A_LINK_N2				0x004c
-#define PCH_FDI_PIPE_B_LINK_N1				0x1044
-#define PCH_FDI_PIPE_B_LINK_N2				0x104c
-#define PCH_FDI_PIPE_C_LINK_N1				0x2044
-#define PCH_FDI_PIPE_C_LINK_N2				0x204c
+// FDI/PIPE M/N DATA AND LINK VALUES (refreshrate)
+#define PCH_FDI_PIPE_A_DATA_M1				(0x0030 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_A_DATA_M2				(0x0038 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_B_DATA_M1				(0x1030 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_B_DATA_M2				(0x1038 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_C_DATA_M1				(0x2030 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_C_DATA_M2				(0x2038 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_A_DATA_N1				(0x0034 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_A_DATA_N2				(0x003c | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_B_DATA_N1				(0x1034 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_B_DATA_N2				(0x103c | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_C_DATA_N1				(0x2034 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_C_DATA_N2				(0x203c | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_A_LINK_M1				(0x0040 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_A_LINK_M2				(0x0048 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_B_LINK_M1				(0x1040 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_B_LINK_M2				(0x1048 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_C_LINK_M1				(0x2040 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_C_LINK_M2				(0x2048 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_A_LINK_N1				(0x0044 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_A_LINK_N2				(0x004c | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_B_LINK_N1				(0x1044 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_B_LINK_N2				(0x104c | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_C_LINK_N1				(0x2044 | REGS_NORTH_PIPE_AND_PORT)
+#define PCH_FDI_PIPE_C_LINK_N2				(0x204c | REGS_NORTH_PIPE_AND_PORT)
 #define FDI_PIPE_MN_TU_SIZE_MASK			(0x3f << 25)
 #define FDI_PIPE_MN_VALUE_MASK				(0xffffff << 0)
 
@@ -1479,5 +1814,6 @@ struct hardware_status {
 	uint32	_reserved3[3];
 	uint32	store[1008];
 };
+
 
 #endif	/* INTEL_EXTREME_H */

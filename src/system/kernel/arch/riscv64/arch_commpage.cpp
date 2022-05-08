@@ -18,15 +18,17 @@
 
 extern "C" void arch_user_thread_exit();
 
-typedef void (*SignalHandler)(int signal, siginfo_t* signalInfo,
-	ucontext_t* ctx);
 
-
-extern "C" void
+extern "C" void __attribute__((noreturn))
 arch_user_signal_handler(signal_frame_data* data)
 {
-	SignalHandler handler = (SignalHandler)data->handler;
-	handler(data->info.si_signo, &data->info, &data->context);
+	if (data->siginfo_handler) {
+		auto handler = (void (*)(int, siginfo_t*, void*, void*))data->handler;
+		handler(data->info.si_signo, &data->info, &data->context, data->user_data);
+	} else {
+		auto handler = (void (*)(int, void*, vregs*))data->handler;
+		handler(data->info.si_signo, data->user_data, &data->context.uc_mcontext);
+	}
 
 	#define TO_STRING_LITERAL_HELPER(number)	#number
 	#define TO_STRING_LITERAL(number)	TO_STRING_LITERAL_HELPER(number)
@@ -41,6 +43,8 @@ arch_user_signal_handler(signal_frame_data* data)
 
 	#undef TO_STRING_LITERAL_HELPER
 	#undef TO_STRING_LITERAL
+
+	__builtin_unreachable();
 }
 
 

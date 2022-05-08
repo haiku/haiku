@@ -16,22 +16,20 @@
 
 class SerialDevice {
 public:
-/*								SerialDevice(struct serial_config_descriptor 
-									*device, uint32 ioBase, uint32 irq, SerialDevice *master=NULL);*/
-								SerialDevice(const struct serial_support_descriptor 
+								SerialDevice(const struct serial_support_descriptor
 									*device, uint32 ioBase, uint32 irq, const SerialDevice *master=NULL);
 virtual							~SerialDevice();
 
 		bool					Probe();
 
-static	SerialDevice *			MakeDevice(struct serial_config_descriptor 
+static	SerialDevice *			MakeDevice(struct serial_config_descriptor
 									*device);
 
 		status_t				Init();
 
-		const struct serial_support_descriptor	*SupportDescriptor() const 
+		const struct serial_support_descriptor	*SupportDescriptor() const
 									{ return fSupportDescriptor; };
-		struct serial_config_descriptor	*ConfigDescriptor() const 
+		struct serial_config_descriptor	*ConfigDescriptor() const
 									{ return fDevice; };
 		//uint16					ProductID() const { return fProductID; };
 		//uint16					VendorID() const { return fVendorID; };

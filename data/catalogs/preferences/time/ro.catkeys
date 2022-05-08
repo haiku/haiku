@@ -1,10 +1,11 @@
-1	romanian	x-vnd.Haiku-Time	2069485065
+1	romanian	x-vnd.Haiku-Time	3691539601
 OK	Time		OK
 Message receiving failed	Time		Primirea mesajului a eșuat
 Australia	Time		Australia
 America	Time		America
 Reset to default server list	Time		Restabilește la lista de server implicită
 Could not resolve server address	Time		Nu s-a putut rezolva adresa serverului
+Time & Date	System name		Oră și dată
 Set time zone	Time		Stabilește fusul orar
 Waiting for answer failed	Time		Așteptarea răspunsului a eșuat
 <Other>	Time		<Other>

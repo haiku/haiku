@@ -1,10 +1,11 @@
-1	indonesian	x-vnd.Haiku-Input	3272444562
+1	indonesian	x-vnd.Haiku-Input	3312605348
 Scrolling	TouchpadPrefView		Menggulung
 Defaults	InputMouse		Bawaan
 Long	KeyboardView		Panjang
 Cancel	TouchpadPrefView		Batalkan
 4-Button	SettingsView		4-Tombol
 Slow	TouchpadPrefView		Lambat
+Tapping sensitivity	TouchpadPrefView		Sensitivitas penekanan
 Device List	InputWindow		Daftar perangkat
 Double-click speed	SettingsView		Kecepatan klik dua kali
 5-Button	SettingsView		5-Tombol
@@ -13,7 +14,9 @@ Mouse type:	SettingsView		Jenis mouse:
 Revert	InputKeyboard		Pulihkan
 Fast	KeyboardView		Cepat
 Off	TouchpadPrefView		Mati
+Never	TouchpadPrefView		Tidak pernah
 Fast	TouchpadPrefView		Cepat
+6-Button	SettingsView		6-Tombol
 Please confirm	TouchpadPrefView		Mohon konfirmasi
 Click to focus	SettingsView		Klik untuk fokus
 Acceleration	TouchpadPrefView		Percepatan
@@ -22,6 +25,7 @@ Accept first click	SettingsView		Terima klik pertama
 OK	TouchpadPrefView		Oke
 Horizontal scrolling	TouchpadPrefView		Pengguliran horizontal
 Delay until key repeat	KeyboardView		Tunda hingga tombol berulang
+Keyboard Lock Delay	TouchpadPrefView		Penundaan Kunci Keyboard
 Two finger scrolling	TouchpadPrefView		Pengguliran dua jari
 Input	System name		Masukan
 Mouse acceleration	SettingsView		Akselerasi mouse
@@ -30,6 +34,7 @@ High	TouchpadPrefView		Tinggi
 Defaults	TouchpadPrefView		Bawaan
 1-Button	SettingsView		1-Tombol
 Defaults	InputKeyboard		Bawaan
+Quick	TouchpadPrefView		Cepat
 Short	KeyboardView		Cepat
 Slow	KeyboardView		Lambat
 Revert	InputMouse		Pulihkan

@@ -1,10 +1,8 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		Gravando faixa de áudio: %d%% concluído
+1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	1322040280
 Input file not recognized as Audio or Video	MediaConverter		Arquivo de entrada não reconhecido como Áudio ou Vídeo
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Qualidade de vídeo: %3d%%
 Source files	MediaConverter		Arquivos fonte
-Error writing video frame %ld	MediaConverter		Erro ao gravar quadro de vídeo %ld
 Error converting '%filename'	MediaConverter		Erro ao converter '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Diretório selecionado não encontrado. Padronizando em /boot/home
 Conversion completed	MediaConverter		Conversão concluída
@@ -43,7 +41,6 @@ Error loading files	MediaConverter		Erro ao carregar arquivos
 End   [ms]: 	MediaConverter		Fim [ms]: 
 Cancel	MediaConverter		Cancelar
 OK	MediaConverter-FileInfo		OK
-Error read audio frame %ld	MediaConverter		Erro ao ler quadro de áudio %ld
 Video encoding:	MediaConverter		Codificação de vídeo:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ocorreu um erro ao ler as informações do arquivo.\n\nErro: 
 Error	MediaConverter		Erro
@@ -57,11 +54,9 @@ Duration:	MediaConverter-FileInfo		Duração:
 MediaConverter	System name		Conversor de Mídia
 Error launching: %strError%	MediaConverter		Erro ao lançar: %strError%
 File format:	MediaConverter		Formato de arquivo:
-Error writing audio frame %ld	MediaConverter		Erro ao gravar quadro de áudio %ld
 File	Menu		Arquivo
 Video quality not supported	MediaConverter		Qualidade de vídeo não suportada
 Select this folder	MediaConverter		Selecionar esta pasta
-Error read video frame %ld	MediaConverter		Erro ao ler quadro de vídeo %ld
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canal
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Nenhum vídeo
@@ -69,6 +64,5 @@ Continue	MediaConverter		Continuar
 Convert	MediaConverter		Converter
 Audio quality not supported	MediaConverter		Qualidade de áudio não suportada
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Erro ao escrever no local: %strPath%. Padronizando em: /boot/home
-Writing video track: %d%% complete	MediaConverter		Gravando faixa de vídeo: %d%% concluído
 Preview	MediaConverter		Pré-visualização
 Start [ms]: 	MediaConverter		Início [ms]: 

@@ -37,6 +37,7 @@
 #include <thread.h>
 #include <runtime_loader.h>
 #include <util/AutoLock.h>
+#include <StackOrHeapArray.h>
 #include <vfs.h>
 #include <vm/vm.h>
 #include <vm/vm_types.h>
@@ -1826,21 +1827,16 @@ status_t
 elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 {
 	elf_ehdr elfHeader;
-	elf_phdr *programHeaders = NULL;
 	char baseName[B_OS_NAME_LENGTH];
 	status_t status;
 	ssize_t length;
-	int fd;
-	int i;
-	addr_t delta = 0;
-	uint32 addressSpec = B_RANDOMIZED_BASE_ADDRESS;
-	area_id* mappedAreas = NULL;
 
 	TRACE(("elf_load: entry path '%s', team %p\n", path, team));
 
-	fd = _kern_open(-1, path, O_RDONLY, 0);
+	int fd = _kern_open(-1, path, O_RDONLY, 0);
 	if (fd < 0)
 		return fd;
+	FileDescriptorCloser fdCloser(fd);
 
 	struct stat st;
 	status = _kern_read_stat(fd, NULL, false, &st, sizeof(st));
@@ -1850,19 +1846,16 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 	// read and verify the ELF header
 
 	length = _kern_read(fd, 0, &elfHeader, sizeof(elfHeader));
-	if (length < B_OK) {
-		status = length;
-		goto error;
-	}
+	if (length < B_OK)
+		return length;
 
 	if (length != sizeof(elfHeader)) {
 		// short read
-		status = B_NOT_AN_EXECUTABLE;
-		goto error;
+		return B_NOT_AN_EXECUTABLE;
 	}
 	status = verify_eheader(&elfHeader);
 	if (status < B_OK)
-		goto error;
+		return status;
 
 #ifdef ELF_LOAD_USER_IMAGE_TEST_EXECUTABLE
 	if ((flags & ELF_LOAD_USER_IMAGE_TEST_EXECUTABLE) != 0)
@@ -1871,35 +1864,45 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 
 	struct elf_image_info* image;
 	image = create_image_struct();
-	if (image == NULL) {
-		status = B_NO_MEMORY;
-		goto error;
-	}
+	if (image == NULL)
+		return B_NO_MEMORY;
+	CObjectDeleter<elf_image_info, void, delete_elf_image> imageDeleter(image);
+
+	struct ElfHeaderUnsetter {
+		ElfHeaderUnsetter(elf_image_info* image)
+			: fImage(image)
+		{
+		}
+		~ElfHeaderUnsetter()
+		{
+			fImage->elf_header = NULL;
+		}
+
+		elf_image_info* fImage;
+	} headerUnsetter(image);
 	image->elf_header = &elfHeader;
 
 	// read program header
 
-	programHeaders = (elf_phdr *)malloc(
+	elf_phdr *programHeaders = (elf_phdr *)malloc(
 		elfHeader.e_phnum * elfHeader.e_phentsize);
 	if (programHeaders == NULL) {
 		dprintf("error allocating space for program headers\n");
-		status = B_NO_MEMORY;
-		goto error2;
+		return B_NO_MEMORY;
 	}
+	MemoryDeleter headersDeleter(programHeaders);
 
 	TRACE(("reading in program headers at 0x%lx, length 0x%x\n",
 		elfHeader.e_phoff, elfHeader.e_phnum * elfHeader.e_phentsize));
 	length = _kern_read(fd, elfHeader.e_phoff, programHeaders,
 		elfHeader.e_phnum * elfHeader.e_phentsize);
 	if (length < B_OK) {
-		status = length;
 		dprintf("error reading in program headers\n");
-		goto error2;
+		return length;
 	}
 	if (length != elfHeader.e_phnum * elfHeader.e_phentsize) {
 		dprintf("short read while reading in program headers\n");
-		status = -1;
-		goto error2;
+		return B_ERROR;
 	}
 
 	// construct a nice name for the region we have to create below
@@ -1922,16 +1925,16 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 	// map the program's segments into memory, initially with rw access
 	// correct area protection will be set after relocation
 
-	mappedAreas = (area_id*)malloc(sizeof(area_id) * elfHeader.e_phnum);
-	if (mappedAreas == NULL) {
-		status = B_NO_MEMORY;
-		goto error2;
-	}
+	BStackOrHeapArray<area_id, 8> mappedAreas(elfHeader.e_phnum);
+	if (!mappedAreas.IsValid())
+		return B_NO_MEMORY;
 
 	extended_image_info imageInfo;
 	memset(&imageInfo, 0, sizeof(imageInfo));
 
-	for (i = 0; i < elfHeader.e_phnum; i++) {
+	addr_t delta = 0;
+	uint32 addressSpec = B_RANDOMIZED_BASE_ADDRESS;
+	for (int i = 0; i < elfHeader.e_phnum; i++) {
 		char regionName[B_OS_NAME_LENGTH];
 		char *regionAddress;
 		char *originalRegionAddress;
@@ -1969,8 +1972,7 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 				fd, ROUNDDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
 				dprintf("error mapping file data: %s!\n", strerror(id));
-				status = B_NOT_AN_EXECUTABLE;
-				goto error2;
+				return B_NOT_AN_EXECUTABLE;
 			}
 			mappedAreas[i] = id;
 
@@ -2010,8 +2012,7 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 					&physicalRestrictions, (void**)&regionAddress);
 				if (id < B_OK) {
 					dprintf("error allocating bss area: %s!\n", strerror(id));
-					status = B_NOT_AN_EXECUTABLE;
-					goto error2;
+					return B_NOT_AN_EXECUTABLE;
 				}
 			}
 		} else {
@@ -2027,8 +2028,7 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 				ROUNDDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
 				dprintf("error mapping file text: %s!\n", strerror(id));
-				status = B_NOT_AN_EXECUTABLE;
-				goto error2;
+				return B_NOT_AN_EXECUTABLE;
 			}
 
 			mappedAreas[i] = id;
@@ -2054,17 +2054,21 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 
 	set_ac();
 	status = elf_parse_dynamic_section(image);
-	if (status != B_OK)
-		goto error2;
+	if (status != B_OK) {
+		clear_ac();
+		return status;
+	}
 
 	status = elf_relocate(image, image);
-	if (status != B_OK)
-		goto error2;
+	if (status != B_OK) {
+		clear_ac();
+		return status;
+	}
 
 	clear_ac();
 
 	// set correct area protection
-	for (i = 0; i < elfHeader.e_phnum; i++) {
+	for (int i = 0; i < elfHeader.e_phnum; i++) {
 		if (mappedAreas[i] == -1)
 			continue;
 
@@ -2080,7 +2084,7 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 		status = vm_set_area_protection(team->id, mappedAreas[i], protection,
 			true);
 		if (status != B_OK)
-			goto error2;
+			return status;
 	}
 
 	// register the loaded image
@@ -2109,20 +2113,7 @@ elf_load_user_image(const char *path, Team *team, uint32 flags, addr_t *entry)
 	TRACE(("elf_load: done!\n"));
 
 	*entry = elfHeader.e_entry + delta;
-	status = B_OK;
-
-error2:
-	clear_ac();
-	free(mappedAreas);
-
-	image->elf_header = NULL;
-	delete_elf_image(image);
-
-error:
-	free(programHeaders);
-	_kern_close(fd);
-
-	return status;
+	return B_OK;
 }
 
 

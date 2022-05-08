@@ -90,6 +90,7 @@ App::ReadyToRun()
 	}
 
 	fMainWindow = new MainWindow(frame);
+	fMainWindow->MoveOnScreen();
 	fMainWindow->Show();
 
 	if (fSavedRefsReceived) {

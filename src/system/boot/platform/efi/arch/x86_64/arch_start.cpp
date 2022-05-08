@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 Haiku, Inc. All rights reserved.
+ * Copyright 2014-2022 Haiku, Inc. All rights reserved.
  * Copyright 2013-2014, Fredrik Holmqvist, fredrik.holmqvist@gmail.com.
  * Copyright 2014, Henry Harrington, henry.harrington@gmail.com.
  * All rights reserved.
@@ -125,7 +125,7 @@ arch_start_kernel(addr_t kernelEntry)
 	arch_mmu_post_efi_setup(memory_map_size, memory_map,
 			descriptor_size, descriptor_version);
 
-	smp_boot_other_cpus(final_pml4, kernelEntry);
+	smp_boot_other_cpus(final_pml4, kernelEntry, (addr_t)&gKernelArgs);
 
 	// Enter the kernel!
 	arch_enter_kernel(final_pml4, kernelEntry,

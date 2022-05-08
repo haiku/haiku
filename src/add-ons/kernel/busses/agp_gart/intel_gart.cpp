@@ -116,15 +116,33 @@ const struct supported_device {
 	{0x0d04, 0x0d26, INTEL_MODEL_HASM, "Haswell Mobile"},
 	{0x0a04, 0x0a16, INTEL_MODEL_HASM, "Haswell Mobile"},
 
+#if 0
 	// XXX: 0x0f00 only confirmed on 0x0f30, 0x0f31
-	{0x0f00, 0x0155, INTEL_MODEL_VLV, "ValleyView Desktop"},
 	{0x0f00, 0x0f30, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0f31, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0f32, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0f33, INTEL_MODEL_VLVM, "ValleyView Mobile"},
-	{0x0f00, 0x0157, INTEL_MODEL_VLVM, "ValleyView Mobile"},
+#endif
 
-	{0x1604, 0x1616, INTEL_MODEL_BDWM, "HD Graphics 5500 (Broadwell GT2)"},
+	// XXX: 0x1604 only confirmed on 0x1616
+	{0x1604, 0x1606, INTEL_MODEL_BDWM, "Broadwell GT1 ULT"},
+	{0x1604, 0x160b, INTEL_MODEL_BDWM, "Broadwell GT1 Iris"},
+	{0x1604, 0x160e, INTEL_MODEL_BDWM, "Broadwell GT1 ULX"},
+	{0x1604, 0x1602, INTEL_MODEL_BDWM, "Broadwell GT1 ULT"},
+	{0x1604, 0x160a, INTEL_MODEL_BDWS, "Broadwell GT1 Server"},
+	{0x1604, 0x160d, INTEL_MODEL_BDW,  "Broadwell GT1 Workstation"},
+	{0x1604, 0x1616, INTEL_MODEL_BDWM, "Broadwell GT2 ULT"},
+	{0x1604, 0x161b, INTEL_MODEL_BDWM, "Broadwell GT2 ULT"},
+	{0x1604, 0x161e, INTEL_MODEL_BDWM, "Broadwell GT2 ULX"},
+	{0x1604, 0x1612, INTEL_MODEL_BDWM, "Broadwell GT2 Halo"},
+	{0x1604, 0x161a, INTEL_MODEL_BDWS, "Broadwell GT2 Server"},
+	{0x1604, 0x161d, INTEL_MODEL_BDW,  "Broadwell GT2 Workstation"},
+	{0x1604, 0x1626, INTEL_MODEL_BDWM, "Broadwell GT3 ULT"},
+	{0x1604, 0x162b, INTEL_MODEL_BDWM, "Broadwell GT3 Iris"},
+	{0x1604, 0x162e, INTEL_MODEL_BDWM, "Broadwell GT3 ULX"},
+	{0x1604, 0x1622, INTEL_MODEL_BDWM, "Broadwell GT3 ULT"},
+	{0x1604, 0x162a, INTEL_MODEL_BDWS, "Broadwell GT3 Server"},
+	{0x1604, 0x162d, INTEL_MODEL_BDW,  "Broadwell GT3 Workstation"},
 
 	// XXX: 0x1904 only confirmed on 0x1916
 	{0x1904, 0x1902, INTEL_MODEL_SKY,  "Skylake GT1"},
@@ -169,6 +187,32 @@ const struct supported_device {
 	{0x3ec4, 0x3eab, INTEL_MODEL_CFLM, "CoffeeLake Halo GT2"},
 	{0x3ed0, 0x3ea5, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
 	{0x3ed0, 0x3ea6, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
+
+	{0x9b64, 0x9ba4, INTEL_MODEL_CML,	"CometLake GT1"},
+	{0x9b73, 0x9ba8, INTEL_MODEL_CML,	"CometLake GT1"},
+	{0x9b71, 0x9b21, INTEL_MODEL_CMLM,	"CometLake U GT1"},
+	{0x9b71, 0x9baa, INTEL_MODEL_CMLM,	"CometLake U GT1"},
+	{0x9b54, 0x9bc4, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b43, 0x9bc5, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b53, 0x9bc5, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b33, 0x9bc6, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b53, 0x9bc8, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b63, 0x9bc8, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b53, 0x9be6, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b44, 0x9bf6, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b54, 0x9bf6, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b61, 0x9b41, INTEL_MODEL_CMLM,	"CometLake U GT2"},
+	{0x9b51, 0x9bca, INTEL_MODEL_CMLM,	"CometLake U GT2"},
+	{0x9b61, 0x9bca, INTEL_MODEL_CMLM,	"CometLake U GT2"},
+	{0x9b51, 0x9bcc, INTEL_MODEL_CMLM,	"CometLake U GT2"},
+
+	{0x4e22, 0x4e55, INTEL_MODEL_JSL, "JasperLake"},
+	{0x4e24, 0x4e55, INTEL_MODEL_JSL, "JasperLake"},
+	{0x4e12, 0x4e61, INTEL_MODEL_JSL, "JasperLake"},
+	{0x4e26, 0x4e71, INTEL_MODEL_JSLM, "JasperLake"},
+	{0x4e28, 0x4e71, INTEL_MODEL_JSLM, "JasperLake"},
+
+	{0x9a14, 0x9a49, INTEL_MODEL_TGLM, "TigerLake-LP GT2"},
 };
 
 struct intel_info {
@@ -609,11 +653,16 @@ intel_map(intel_info &info)
 		fbIndex = 2;
 	}
 
+	phys_addr_t addr = info.display.u.h0.base_registers[mmioIndex];
+	uint64 barSize = info.display.u.h0.base_register_sizes[mmioIndex];
+	if ((info.display.u.h0.base_register_flags[mmioIndex] & PCI_address_type) == PCI_address_type_64) {
+		addr |= (uint64)info.display.u.h0.base_registers[mmioIndex + 1] << 32;
+		barSize |= (uint64)info.display.u.h0.base_register_sizes[mmioIndex + 1] << 32;
+	}
+
 	AreaKeeper mmioMapper;
-	info.registers_area = mmioMapper.Map("intel GMCH mmio",
-		info.display.u.h0.base_registers[mmioIndex],
-		info.display.u.h0.base_register_sizes[mmioIndex], B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.registers);
+	info.registers_area = mmioMapper.Map("intel GMCH mmio", addr, barSize,
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.registers);
 
 	if (mmioMapper.InitCheck() < B_OK) {
 		ERROR("could not map memory I/O!\n");
@@ -654,8 +703,7 @@ intel_map(intel_info &info)
 		info.gtt_physical_base = get_pci_config(info.display, i915_GTT_BASE, 4);
 	} else {
 		// 945+?
-		info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
-			+ (2UL << 20);
+		info.gtt_physical_base = addr + (2UL << 20);
 	}
 
 	size_t gttSize = determine_gtt_size(info);
@@ -678,7 +726,13 @@ intel_map(intel_info &info)
 
 	info.aperture_physical_base = info.display.u.h0.base_registers[fbIndex];
 	info.aperture_stolen_size = stolenSize;
-	if (info.aperture_size == 0)
+	if ((info.display.u.h0.base_register_flags[fbIndex] & PCI_address_type) == PCI_address_type_64) {
+		info.aperture_physical_base |= (uint64)info.display.u.h0.base_registers[fbIndex + 1] << 32;
+		if (info.aperture_size == 0) {
+			info.aperture_size = info.display.u.h0.base_register_sizes[fbIndex]
+				|= (uint64)info.display.u.h0.base_register_sizes[fbIndex + 1] << 32;
+		}
+	} else if (info.aperture_size == 0)
 		info.aperture_size = info.display.u.h0.base_register_sizes[fbIndex];
 
 	ERROR("detected %ld MB of stolen memory, aperture size %ld MB, "

@@ -26,4 +26,6 @@
 #define	R_AARCH64_TLSDESC 		1031	/* Identify the TLS descriptor */
 #define	R_AARCH64_IRELATIVE		1032	/* STT_GNU_IFUNC relocation.  */
 
+#define TLS_DTV_OFFSET 0
+
 #endif	/* _KERNEL_ARCH_ARM64_ELF_H */

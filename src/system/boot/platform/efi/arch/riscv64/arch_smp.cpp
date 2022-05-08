@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020, Haiku, Inc. All rights reserved.
+ * Copyright 2019-2022, Haiku, Inc. All rights reserved.
  * Released under the terms of the MIT License.
 */
 
@@ -200,7 +200,7 @@ arch_smp_init_other_cpus(void)
 
 
 void
-arch_smp_boot_other_cpus(uint64 satp, uint64 kernel_entry)
+arch_smp_boot_other_cpus(uint64 satp, uint64 kernel_entry, addr_t virtKernelArgs)
 {
 	dprintf("arch_smp_boot_other_cpus(%p, %p)\n", (void*)satp, (void*)kernel_entry);
 

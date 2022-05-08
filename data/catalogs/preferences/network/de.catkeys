@@ -5,7 +5,7 @@ disconnected	IntefaceView		getrennt
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Netzwerk:
 Received:	IntefaceView		Empfangen:
-New…	NetworkWindow		Neu…
+New…	NetworkWindow		Neu …
 no link	InterfaceListItem		keine Verbindung
 Other	NetworkWindow		Anderes
 Sent:	IntefaceView		Gesendet:
@@ -45,7 +45,7 @@ Automatic	IntefaceAddressView		Automatisch
 Choose automatically	IntefaceView		Automatisch wählen
 Status:	IntefaceView		Status:
 Disable	IntefaceView		Deaktivieren
-Manage…	NetworkWindow		Verwalten…
+Manage…	NetworkWindow		Verwalten …
 open	Open network		frei
 Network	System name		Netzwerk
 Your gateway to the internet	IntefaceAddressView		Zugangsadresse zum Internet

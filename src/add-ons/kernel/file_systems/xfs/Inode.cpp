@@ -301,7 +301,6 @@ Inode::GetNodefromTree(uint16& levelsInTree, Volume* volume,
 	ArrayDeleter<char> nodeDeleter(node);
 
 	TRACE("levels:(%d)\n", levelsInTree);
-	TRACE("Numrecs:(%d)\n", fRoot->NumRecords());
 
 	TreePointer* ptrToNode = GetPtrFromRoot(1);
 	uint64 fileSystemBlockNo = B_BENDIAN_TO_HOST_INT64(*ptrToNode);

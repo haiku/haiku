@@ -27,7 +27,7 @@ public:
 			bool		IsInvalid() const	{ return fPointer == NULL; }
 
 			void*		operator+(addr_t offset) const
-							{ return (void*)((addr_t)fPointer + offset); }
+							{ return (void*)((addr_t)fPointer + TLS_DTV_OFFSET + offset); }
 
 private:
 			void*		fPointer;
@@ -85,12 +85,13 @@ TLSBlockTemplate::SetBaseAddress(addr_t baseAddress)
 TLSBlock
 TLSBlockTemplate::CreateBlock()
 {
-	void* pointer = malloc(fMemorySize);
+	void* pointer = malloc(fMemorySize + TLS_DTV_OFFSET);
 	if (pointer == NULL)
 		return TLSBlock();
-	memcpy(pointer, fAddress, fFileSize);
+	memset(pointer, 0, TLS_DTV_OFFSET);
+	memcpy((char*)pointer + TLS_DTV_OFFSET, fAddress, fFileSize);
 	if (fMemorySize > fFileSize)
-		memset((char*)pointer + fFileSize, 0, fMemorySize - fFileSize);
+		memset((char*)pointer + TLS_DTV_OFFSET + fFileSize, 0, fMemorySize - fFileSize);
 	return TLSBlock(pointer);
 }
 

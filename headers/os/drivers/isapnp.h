@@ -1,8 +1,6 @@
 #ifndef _ISA_CONFIG_H
 #define _ISA_CONFIG_H
 
-#include <config_manager.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif

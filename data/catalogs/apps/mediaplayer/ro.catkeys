@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	1961774506
+1	romanian	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Elimină intrarea la gunoi
 Close	MediaPlayer-PlaylistWindow		Închide
 Volume of background clips	MediaPlayer-SettingsWindow		Volumul clipurilor de fundal
@@ -30,6 +30,7 @@ Open file…	MediaPlayer-Main		Deschidere fișier…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Scalează controalele în modul ecran complet
 View options	MediaPlayer-SettingsWindow		Opțiuni de vizualizare
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Scoate dispozitivul
 Full volume	MediaPlayer-SettingsWindow		Volum complet
 <untitled>	PlaylistItem-title		<untitled>
 Start media server	MediaPlayer-Main		Pornește serverul media

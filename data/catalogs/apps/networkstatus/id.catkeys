@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-NetworkStatus	1515316847
+1	indonesian	x-vnd.Haiku-NetworkStatus	2828540217
 IPv6 address:	NetworkStatusView		Alamat IPv6
 Quit	NetworkStatusView		Keluar
 Unknown	NetworkStatusView		Takdiketahui
@@ -7,12 +7,14 @@ Install in Deskbar	NetworkStatus		Pasang di Deskbar
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Pilihan NetworkStatus:\n\t--deskbar\totomatos menambah replicant ke Deskbar\n\t--help\t\tcetak info ini dan keluar
 Open network preferences…	NetworkStatusView		Buka preferensi jaringan...
 NetworkStatus	System name		StatusJaringan
+Broadcast:	NetworkStatusView		Broadcast:
 OK	NetworkStatusView		OKE
 No link	NetworkStatusView		Tak ada tautan
 Could not join wireless network:\n	NetworkStatusView		Tidak bisa gabung ke jaringan nirkabel:\n
 Ready	NetworkStatusView		Siap
 Network Status	NetworkStatusView		Status Jaringan
 Deskbar is not running, giving up.	NetworkStatus		Deskbar tidak berjalan, menyerah.
+Netmask:	NetworkStatusView		Netmask:
 No stateful configuration	NetworkStatusView		Takada konfigurasi tersimpan
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Anda dapat menjalankan StatusJaringan di sebuah Jendela atau memasangnya di Deksbar.
 IPv4 address:	NetworkStatusView		Alamat IPv4

@@ -1062,8 +1062,10 @@ DataEditor::GetViewBuffer(const uint8 **_buffer)
 		debugger("DataEditor: view not locked");
 
 	status_t status = UpdateIfNeeded();
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
+	if (fView == NULL)
+		return B_NO_INIT;
 
 	*_buffer = fView + fViewOffset - fRealViewOffset;
 	return B_OK;

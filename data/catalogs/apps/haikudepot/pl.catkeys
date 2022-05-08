@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-HaikuDepot	3437352458
+1	polish	x-vnd.Haiku-HaikuDepot	4181156212
 Repository update error	LocalRepositoryUpdateProcess		Błąd podczas odświeżania repozytorium
 Network error	ServerHelper		Błąd sieci
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Wystąpił błąd podczas odświeżania repozytorium: %error%
@@ -94,7 +94,6 @@ Repository	PackageListView		Repozytorium
 The email is malformed.	UserLoginWindow		Adres e-mail jest nieprawidłowy.
 Close	UserLoginWindow		Zamknij
 Close	RatePackageWindow		Zamknij
-An unexpected error has been sent from the server [%i]	ServerHelper		Otrzymano niespodziewany błąd od serwera [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronizacja danych pakietów dla repozytorium „%REPO_NAME%”
 Settings	SettingsWindow		Ustawienia
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Wystąpił błąd podczas pobierania warunków korzystania wymaganych to stworzenia nowego użytkownika. Sprawdź szczegóły w dzienniku i spróbuj ponownie.\nInformacje o tym jak dostać się do dziennika znajdują się w rozdziale HaikuDepot Podręcznika użytkownika Haiku.
@@ -137,8 +136,8 @@ Source packages	MainWindow		Pakiety źródłowe
 -	no package size		-
 Problem with working files	App		Problem z plikami roboczymi
 Server error	ServerHelper		Błąd serwera
-Try again	App		Spróbuj ponownie
 Rate package	RatePackageWindow		Oceń pakiet
+Try again	App		Spróbuj ponownie
 Unknown	PackageListView		Nieznany
 I agree to the usage conditions	UserLoginWindow		Zgadzam się na warunki korzystania
 Log in	UserLoginWindow		Zaloguj
@@ -170,6 +169,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Wersja klienta za stara
 Local repository load error	LocalPkgDataLoadProcess		Błąd podczas ładowania lokalnego repozytorium
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Użytkownik nie istnieje lub podano błędne hasło. Sprawdź swoje dane logowania i spróbuj ponownie.
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Powtórz hasło:
 All repositories	MainWindow		Wszystkie repozytoria

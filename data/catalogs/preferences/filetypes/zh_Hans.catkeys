@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-FileTypes	586766331
+1	english	x-vnd.Haiku-FileTypes	436017301
 Left	Attribute Window	Attribute column alignment in Tracker	左对齐
 Float	Attribute ListView		浮动
 Final	Application Types Window		最终版
@@ -45,6 +45,7 @@ Abort	Application Types Window		放弃
 Save	Application Type Window		保存
 %1 application type	Application Type Window		%1 程序类型
 Icon	Application Type Window		图标
+Duration	Attribute ListView		耗时
 Version:	Application Type Window		版本:
 Default application	FileType Window		默认程序
 Internal name:	New File Type Window		内部名称:
@@ -71,6 +72,7 @@ Application types	Application Types Window		应用类型
 Description:	Application Types Window		描述：
 Name:	Application Types Window		名称：
 Rating	Attribute ListView		排序
+duration	Attribute ListView		耗时
 File could not be opened	Preferred App Menu		文件无法打开
 Args only	Application Type Window		仅含参数
 Could not open \"%s\":\n%s	FileTypes		无法打开 \"%s\":\n%s
@@ -88,6 +90,7 @@ Type name:	FileTypes Window		类型名：
 Visible	Attribute Window		可见
 Select preferred application	FileTypes Window		选择首选程序
 Path:	Application Types Window		路径：
+rating	Attribute ListView		评级
 Could not install file type	New File Type Window		无法安装文件类型
 Same as…	FileTypes Window		相同于...
 Golden master	Application Type Window		发运版
@@ -101,6 +104,7 @@ Removing a super type cannot be reverted.\nAll file types that belong to this su
 String	Attribute ListView		字符串
 Add type	New File Type Window		增加类型
 Remove icon	Icon View		删除图标
+Boolean	Attribute ListView		布尔值
 Cancel	Extension Window		取消
 Alignment:	Attribute Window		排序:
 Icon	FileType Window		图标
@@ -109,6 +113,7 @@ Development	Application Type Window		开发版
 Golden master	Application Types Window		发运版
 Add	Extension Window		增加
 Open…	FileTypes Window		打开...
+checkbox	Attribute ListView		复选框
 Could not change file extensions	Extension Window		无法改变文件属性
 Could not open file	FileType Window		无法打开文件
 Choose type	Type List Window		选择类型

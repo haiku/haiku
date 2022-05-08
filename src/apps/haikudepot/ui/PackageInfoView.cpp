@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -35,6 +35,7 @@
 #include <package/hpkg/PackageEntry.h>
 
 #include "BitmapView.h"
+#include "GeneralContentScrollView.h"
 #include "LinkView.h"
 #include "LinkedBitmapView.h"
 #include "LocaleUtils.h"
@@ -65,52 +66,17 @@ enum {
 static const float kContentTint = (B_NO_TINT + B_LIGHTEN_1_TINT) / 2.0f;
 
 
-//! Layouts the scrollbar so it looks nice with no border and the document
-// window look.
-class CustomScrollView : public BScrollView {
-public:
-	CustomScrollView(const char* name, BView* target)
-		:
-		BScrollView(name, target, 0, false, true, B_NO_BORDER)
-	{
-	}
-
-	virtual void DoLayout()
-	{
-		BRect innerFrame = Bounds();
-		innerFrame.right -= B_V_SCROLL_BAR_WIDTH + 1;
-
-		BView* target = Target();
-		if (target != NULL) {
-			Target()->MoveTo(innerFrame.left, innerFrame.top);
-			Target()->ResizeTo(innerFrame.Width(), innerFrame.Height());
-		}
-
-		BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
-		if (scrollBar != NULL) {
-			BRect rect = innerFrame;
-			rect.left = rect.right + 1;
-			rect.right = rect.left + B_V_SCROLL_BAR_WIDTH;
-			rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-
-			scrollBar->MoveTo(rect.left, rect.top);
-			scrollBar->ResizeTo(rect.Width(), rect.Height());
-		}
-	}
-};
-
-
-class RatingsScrollView : public CustomScrollView {
+class RatingsScrollView : public GeneralContentScrollView {
 public:
 	RatingsScrollView(const char* name, BView* target)
 		:
-		CustomScrollView(name, target)
+		GeneralContentScrollView(name, target)
 	{
 	}
 
 	virtual void DoLayout()
 	{
-		CustomScrollView::DoLayout();
+		GeneralContentScrollView::DoLayout();
 
 		BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
 		BView* target = Target();
@@ -685,7 +651,7 @@ public:
 		fDescriptionView->SetViewUIColor(ViewUIColor(), kContentTint);
 		fDescriptionView->SetInsets(be_plain_font->Size());
 
-		BScrollView* scrollView = new CustomScrollView(
+		BScrollView* scrollView = new GeneralContentScrollView(
 			"description scroll view", fDescriptionView);
 
 		BFont smallFont;
@@ -1165,7 +1131,7 @@ public:
 		fTextView->SetLowUIColor(ViewUIColor());
 		fTextView->SetInsets(be_plain_font->Size());
 
-		BScrollView* scrollView = new CustomScrollView(
+		BScrollView* scrollView = new GeneralContentScrollView(
 			"changelog scroll view", fTextView);
 
 		BLayoutBuilder::Group<>(this)

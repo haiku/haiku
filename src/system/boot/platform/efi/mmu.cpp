@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 Haiku, Inc. All rights reserved.
+ * Copyright 2016-2022 Haiku, Inc. All rights reserved.
  * Copyright 2014, Jessica Hamilton, jessica.l.hamilton@gmail.com.
  * Copyright 2014, Henry Harrington, henry.harrington@gmail.com.
  * Distributed under the terms of the MIT License.
@@ -42,15 +42,7 @@ struct memory_region {
 };
 
 
-#if defined(KERNEL_LOAD_BASE_64_BIT)
-static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE_64_BIT + 32 * 1024 * 1024;
-#elif defined(KERNEL_LOAD_BASE)
 static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE + 32 * 1024 * 1024;
-#else
-#error Unable to find kernel load base on this architecture!
-#endif
-
-
 static memory_region *allocated_regions = NULL;
 
 
@@ -104,15 +96,20 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
 {
 	TRACE("%s: called\n", __func__);
 
-	// We don't have any control over the page tables, give up right away if an
-	// exactAddress is wanted.
-	if (exactAddress)
-		return B_NO_MEMORY;
-
 	efi_physical_addr addr;
 	size_t pages = ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE;
-	efi_status status = kBootServices->AllocatePages(AllocateAnyPages,
-		EfiLoaderData, pages, &addr);
+	efi_status status;
+
+	if (exactAddress) {
+		addr = (efi_physical_addr)(addr_t)*_address;
+		status = kBootServices->AllocatePages(AllocateAddress,
+			EfiLoaderData, pages, &addr);
+	} else {
+		addr = 0;
+		status = kBootServices->AllocatePages(AllocateAnyPages,
+			EfiLoaderData, pages, &addr);
+	}
+
 	if (status != EFI_SUCCESS)
 		return B_NO_MEMORY;
 
@@ -142,6 +139,36 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
 #ifdef TRACE_MMU
 	//region->dprint("Allocated");
 #endif
+	allocated_regions = region;
+	*_address = (void *)region->paddr;
+	return B_OK;
+}
+
+
+extern "C" status_t
+platform_allocate_lomem(void **_address, size_t size)
+{
+	TRACE("%s: called\n", __func__);
+
+	efi_physical_addr addr = KERNEL_LOAD_BASE - B_PAGE_SIZE;
+	size_t pages = ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE;
+	efi_status status = kBootServices->AllocatePages(AllocateMaxAddress,
+		EfiLoaderData, pages, &addr);
+	if (status != EFI_SUCCESS)
+		return B_NO_MEMORY;
+
+	memory_region *region = new(std::nothrow) memory_region {
+		next: allocated_regions,
+		vaddr: (addr_t)addr,
+		paddr: (phys_addr_t)addr,
+		size: size
+	};
+
+	if (region == NULL) {
+		kBootServices->FreePages(addr, pages);
+		return B_NO_MEMORY;
+	}
+
 	allocated_regions = region;
 	*_address = (void *)region->paddr;
 	return B_OK;
@@ -215,7 +242,8 @@ platform_bootloader_address_to_kernel_address(void *address, addr_t *_result)
 	// Convert any physical ranges prior to looking up address
 	convert_physical_ranges();
 
-	phys_addr_t addr = (phys_addr_t)address;
+	// Double cast needed to avoid sign extension issues on 32-bit architecture
+	phys_addr_t addr = (phys_addr_t)(addr_t)address;
 
 	for (memory_region *region = allocated_regions; region;
 			region = region->next) {
@@ -263,9 +291,12 @@ platform_free_region(void *address, size_t size)
 
 	for (memory_region **ref = &allocated_regions; *ref;
 			ref = &(*ref)->next) {
-		if ((*ref)->matches((phys_addr_t)address, size)) {
-			kBootServices->FreePages((efi_physical_addr)address,
+		// Double cast needed to avoid sign extension issues on 32-bit architecture
+		if ((*ref)->matches((phys_addr_t)(addr_t)address, size)) {
+			efi_status status;
+			status = kBootServices->FreePages((efi_physical_addr)(addr_t)address,
 				ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE);
+			ASSERT_ALWAYS(status == EFI_SUCCESS);
 			memory_region* old = *ref;
 			//pointer to current allocated_memory_region* now points to next
 			*ref = (*ref)->next;

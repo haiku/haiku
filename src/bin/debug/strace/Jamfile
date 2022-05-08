@@ -13,7 +13,7 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 SubDirHdrs $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
 
 local straceSources =
-	Context.cpp ioctl.cpp MemoryReader.cpp NetworkTypes.cpp
+	Context.cpp fcntl.cpp ioctl.cpp MemoryReader.cpp NetworkTypes.cpp
 	strace.cpp TypeHandler.cpp
 ;
 

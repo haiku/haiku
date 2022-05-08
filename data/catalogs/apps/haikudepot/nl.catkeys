@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	3437352458
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	4181156212
 Repository update error	LocalRepositoryUpdateProcess		Fout bij updaten softwarebronnen
 Network error	ServerHelper		Netwerk fout
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Er is een fout opgetreden bij het verversen van de softwarebronnen: %error%
@@ -94,7 +94,6 @@ Repository	PackageListView		Pakketbron
 The email is malformed.	UserLoginWindow		Het e-mailadres is ongeldig.
 Close	UserLoginWindow		Sluiten
 Close	RatePackageWindow		Sluiten
-An unexpected error has been sent from the server [%i]	ServerHelper		Een onverwachte fout is ontvangen van de server [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchroniseer pakketdata voor pakketbron '%REPO_NAME%'
 Settings	SettingsWindow		Instellingen
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Er is een fout opgetreden bij het ophalen van de gebruiksvoorwaarden voor het maken van een nieuwe gebruikersaccount. Controleer de log voor details en probeer het later nog eens. \nInformatie over hoe u de logs kunt bekijken is te vinden in het HaikuDepot-onderdeel van de Haiku User Guide.
@@ -137,8 +136,8 @@ Source packages	MainWindow		Broncodepakketten
 -	no package size		-
 Problem with working files	App		Probleem met de werkbestanden
 Server error	ServerHelper		Server fout
-Try again	App		Opnieuw proberen
 Rate package	RatePackageWindow		Beoordeel pakket
+Try again	App		Opnieuw proberen
 Unknown	PackageListView		Onbekend
 I agree to the usage conditions	UserLoginWindow		Ik aanvaard de gebruiksvoorwaarden
 Log in	UserLoginWindow		Inloggen
@@ -170,6 +169,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		Client versie te oud
 Local repository load error	LocalPkgDataLoadProcess		Fout bij laden lokaal pakketbron
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		De gebruiker bestaat niet of het verkeerde wachtwoord was ingevuld. Controleer uw gegevens en probeer het nogmaals.
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Wachtwoord herhalen:
 All repositories	MainWindow		Alle pakketbronnen

@@ -20,8 +20,8 @@ Open containing folder	Download Window		Abrir carpeta
 Find previous	WebPositive Window		Buscar anterior
 Full screen	WebPositive Window		Pantalla completa
 Downloads in progress	WebPositive		Descargas en proceso
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	¿Desea abrir %addedCount marcadores al mismo tiempo?
 Copy URL to clipboard	Download Window		Copiar URL al portapapeles
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	¿Desea abrir %addedCount marcadores al mismo tiempo?
 Clone current page	Settings Window		Duplicar página actual
 Start page:	Settings Window		Página de inicio:
 Cancel	Download Window		Cancelar
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Disminuir tamaño
 Default fixed font size:	Settings Window		Tamaño de fuente monoespaciada por defecto:
 Sans serif font:	Settings Window		Tipo de letra Sans serif:
 Clear	WebPositive Window		Limpiar
-Cookies for %s	Cookie Manager		Cookies para %s
 The download could not be opened.	Download Window		No se pudo abrir la descarga.
+Cookies for %s	Cookie Manager		Cookies para %s
 Close	Download Window		Cerrar
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Término de búsqueda
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Continuar descargas
 Proxy server requires authentication	Settings Window		El servidor proxy requiere autenticación
 Cancel	Settings Window		Cancelar
-History	WebPositive Window		Historial
 Reset size	WebPositive Window		Restablecer tamaño
+History	WebPositive Window		Historial
 Do you really want to clear the browsing history?	WebPositive Window		¿Realmente desea borrar el historial del navegador?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Buscar la siguiente coincidencia de los términos de búsqueda
 Fixed font:	Settings Window		Fuente monoespaciada:

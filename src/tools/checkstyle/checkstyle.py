@@ -54,7 +54,7 @@ def visit(result, dir, names):
 
 
 cppRules = {}
-cppRules["Line over 80 char"] = re.compile('[^\n]{81,}')
+cppRules["Line over 100 char"] = re.compile('[^\n]{101,}')
 cppRules["Spaces instead of tabs"] = re.compile('   ')
 cppRules["Missing space after control statement"] \
     = re.compile('(for|if|while|switch)\(')

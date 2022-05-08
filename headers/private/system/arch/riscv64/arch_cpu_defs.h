@@ -37,7 +37,7 @@ struct MstatusReg {
 			uint64 mpp:     2; // previous mode (machine)
 			uint64 fs:      2; // FPU status
 			uint64 xs:      2; // extensions status
-			uint64 mprv:    1; // modify privelege
+			uint64 mprv:    1; // modify privilege
 			uint64 sum:     1; // permit supervisor user memory access
 			uint64 mxr:     1; // make executable readable
 			uint64 tvm:     1; // trap virtual memory

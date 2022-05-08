@@ -6,12 +6,14 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Lotz, mmlr@mlotz.ch
  *		Alexander von Gluck IV, kallisti5@unixzen.com
+ *		Rudolf Cornelissen, ruud@highsand-juicylake.nl
  */
 
 
 #include "Ports.h"
 
 #include <ddc.h>
+#include <dp_raw.h>
 #include <stdlib.h>
 #include <string.h>
 #include <Debug.h>
@@ -63,6 +65,22 @@ wait_for_clear(addr_t address, uint32 mask, uint32 timeout)
 			return true;
 	}
 	return false;
+}
+
+
+static uint32
+wait_for_clear_status(addr_t address, uint32 mask, uint32 timeout)
+{
+	int interval = 50;
+	uint32 i = 0;
+	uint32 status = 0;
+	for(i = 0; i <= timeout; i += interval) {
+		spin(interval);
+		status = read32(address);
+		if ((status & mask) == 0)
+			return status;
+	}
+	return status;
 }
 
 
@@ -147,15 +165,24 @@ Port::SetPipe(Pipe* pipe)
 
 	uint32 portState = read32(portRegister);
 
-	// FIXME is the use of PORT_TRANS_* constants correct for Sandy Bridge /
-	// Cougar Point? Or is it only for Ivy Bridge / Panther point onwards?
+	// generation 6 gfx SandyBridge/SNB non-DP use the same 2 bits on all ports (eDP = 1 bit).
+	// generation 7 gfx IvyBridge/IVB non-DP use the same 2 bits on all ports (eDP = 2 bits).
+	// DP ports/all DDI ports: Pipe selections works differently, via own SetPipe() implementation.
 	if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
 		portState &= ~PORT_TRANS_SEL_MASK;
-		if (pipe->Index() == INTEL_PIPE_A)
-			write32(portRegister, portState | PORT_TRANS_A_SEL_CPT);
-		else
-			write32(portRegister, portState | PORT_TRANS_B_SEL_CPT);
+		switch (pipe->Index()) {
+			case INTEL_PIPE_B:
+				write32(portRegister, portState | PORT_TRANS_B_SEL_CPT);
+				break;
+			case INTEL_PIPE_C:
+				write32(portRegister, portState | PORT_TRANS_C_SEL_CPT);
+				break;
+			default:
+				write32(portRegister, portState | PORT_TRANS_A_SEL_CPT);
+				break;
+		}
 	} else {
+		// generation 3/4/5 gfx uses the same single bit on all ports
 		if (pipe->Index() == INTEL_PIPE_A)
 			write32(portRegister, portState & ~DISPLAY_MONITOR_PIPE_B);
 		else
@@ -198,20 +225,9 @@ Port::GetEDID(edid1_info* edid, bool forceRead)
 	if (fEDIDState == B_NO_INIT || forceRead) {
 		TRACE("%s: trying to read EDID\n", PortName());
 
-		addr_t ddcRegister = _DDCRegister();
-		if (ddcRegister == 0) {
-			TRACE("%s: no DDC register found\n", PortName());
-			fEDIDState = B_ERROR;
-			return fEDIDState;
-		}
-
-		TRACE("%s: using ddc @ 0x%" B_PRIxADDR "\n", PortName(), ddcRegister);
-
 		i2c_bus bus;
-		bus.cookie = (void*)ddcRegister;
-		bus.set_signals = &_SetI2CSignals;
-		bus.get_signals = &_GetI2CSignals;
-		ddc2_init_timing(&bus);
+		if (SetupI2c(&bus) != B_OK)
+			return fEDIDState;
 
 		fEDIDState = ddc2_read_edid1(&bus, &fEDIDInfo, NULL, NULL);
 
@@ -228,6 +244,27 @@ Port::GetEDID(edid1_info* edid, bool forceRead)
 
 	if (edid != NULL)
 		memcpy(edid, &fEDIDInfo, sizeof(edid1_info));
+
+	return B_OK;
+}
+
+
+status_t
+Port::SetupI2c(i2c_bus *bus)
+{
+	addr_t ddcRegister = _DDCRegister();
+	if (ddcRegister == 0) {
+		TRACE("%s: no DDC register found\n", PortName());
+		fEDIDState = B_ERROR;
+		return fEDIDState;
+	}
+
+	TRACE("%s: using ddc @ 0x%" B_PRIxADDR "\n", PortName(), ddcRegister);
+
+	ddc2_init_timing(bus);
+	bus->cookie = (void*)ddcRegister;
+	bus->set_signals = &_SetI2CSignals;
+	bus->get_signals = &_GetI2CSignals;
 
 	return B_OK;
 }
@@ -254,7 +291,6 @@ Port::PipePreference()
 	// - The BIOSes seen sofar program transcoder A to PIPE A, etc.
 	// - Later devices add a pipe C alongside the added transcoder C.
 
-	// FIXME How's this setup in newer gens? Currently return INTEL_PIPE_ANY there..
 	if ((gInfo->shared_info->device_type.Generation() <= 7) &&
 		(!gInfo->shared_info->device_type.HasDDI())) {
 		uint32 portState = read32(_PortRegister());
@@ -364,6 +400,456 @@ Port::_SetI2CSignals(void* cookie, int clock, int data)
 }
 
 
+bool
+Port::_IsPortInVBT(uint32* foundIndex)
+{
+	// check VBT mapping
+	bool found = false;
+	const uint32 deviceConfigCount = gInfo->shared_info->device_config_count;
+	for (uint32 i = 0; i < deviceConfigCount; i++) {
+		child_device_config& config = gInfo->shared_info->device_configs[i];
+		if (config.dvo_port > DVO_PORT_HDMII) {
+			ERROR("%s: DVO port unknown\n", __func__);
+			continue;
+		}
+		dvo_port port = (dvo_port)config.dvo_port;
+		switch (PortIndex()) {
+			case INTEL_PORT_A:
+				found = port == DVO_PORT_HDMIA || port == DVO_PORT_DPA;
+				break;
+			case INTEL_PORT_B:
+				found = port == DVO_PORT_HDMIB || port == DVO_PORT_DPB;
+				break;
+			case INTEL_PORT_C:
+				found = port == DVO_PORT_HDMIC || port == DVO_PORT_DPC;
+				break;
+			case INTEL_PORT_D:
+				found = port == DVO_PORT_HDMID || port == DVO_PORT_DPD;
+				break;
+			case INTEL_PORT_E:
+				found = port == DVO_PORT_HDMIE || port == DVO_PORT_DPE || port == DVO_PORT_CRT;
+				break;
+			case INTEL_PORT_F:
+				found = port == DVO_PORT_HDMIF || port == DVO_PORT_DPF;
+				break;
+			default:
+				ERROR("%s: DDI port unknown\n", __func__);
+				break;
+		}
+		if (found) {
+			if (foundIndex != NULL)
+				*foundIndex = i;
+			break;
+		}
+	}
+	return found;
+}
+
+
+bool
+Port::_IsDisplayPortInVBT()
+{
+	uint32 foundIndex = 0;
+	if (!_IsPortInVBT(&foundIndex))
+		return false;
+	child_device_config& config = gInfo->shared_info->device_configs[foundIndex];
+	return config.aux_channel > 0;
+}
+
+
+bool
+Port::_IsInternalPanelPort()
+{
+	uint32 foundIndex = 0;
+	if (!_IsPortInVBT(&foundIndex))
+		return false;
+	child_device_config& config = gInfo->shared_info->device_configs[foundIndex];
+	return (config.device_type & DEVICE_TYPE_INTERNAL_CONNECTOR) == DEVICE_TYPE_INTERNAL_CONNECTOR;
+}
+
+
+status_t
+Port::_SetupDpAuxI2c(i2c_bus *bus)
+{
+	CALLED();
+
+	ddc2_init_timing(bus);
+	bus->cookie = this;
+	bus->send_receive = &_DpAuxSendReceiveHook;
+
+	if (gInfo->shared_info->device_type.Generation() >= 11) {
+		uint32 value = read32(ICL_PWR_WELL_CTL_AUX2);
+		if ((value & HSW_PWR_WELL_CTL_STATE(0)) != 0)
+			return B_OK;
+
+		write32(ICL_PWR_WELL_CTL_AUX2, value | HSW_PWR_WELL_CTL_REQ(0));
+		if (!wait_for_set(ICL_PWR_WELL_CTL_AUX2, HSW_PWR_WELL_CTL_STATE(0), 1000))
+			ERROR("%s: %s AUX didn't power on within 1000us!\n", __func__, PortName());
+	}
+	return B_OK;
+}
+
+
+status_t
+Port::_DpAuxSendReceive(uint32 slaveAddress,
+	const uint8 *writeBuffer, size_t writeLength, uint8 *readBuffer, size_t readLength)
+{
+	size_t transferLength = 16;
+
+	dp_aux_msg message;
+	memset(&message, 0, sizeof(message));
+
+	if (writeBuffer != NULL) {
+		message.address = slaveAddress;
+		message.buffer = NULL;
+		message.request = DP_AUX_I2C_WRITE;
+		message.size = 0;
+		ssize_t result = _DpAuxTransfer(&message);
+		if (result < 0)
+			return result;
+
+		for (size_t i = 0; i < writeLength;) {
+			message.buffer = (void*)(writeBuffer + i);
+			message.size = min_c(transferLength, writeLength - i);
+			// Middle-Of-Transmission on final transaction
+			if (writeLength - i > transferLength)
+				message.request |= DP_AUX_I2C_MOT;
+			else
+				message.request &= ~DP_AUX_I2C_MOT;
+
+			for (int attempt = 0; attempt < 7; attempt++) {
+				ssize_t result = _DpAuxTransfer(&message);
+				if (result < 0) {
+					ERROR("%s: aux_ch transaction failed!\n", __func__);
+					return result;
+				}
+
+				switch (message.reply & DP_AUX_I2C_REPLY_MASK) {
+					case DP_AUX_I2C_REPLY_ACK:
+						goto nextWrite;
+					case DP_AUX_I2C_REPLY_NACK:
+						TRACE("%s: aux i2c nack\n", __func__);
+						return B_IO_ERROR;
+					case DP_AUX_I2C_REPLY_DEFER:
+						TRACE("%s: aux i2c defer\n", __func__);
+						snooze(400);
+						break;
+					default:
+						TRACE("%s: aux invalid I2C reply: 0x%02x\n",
+							__func__, message.reply);
+						return B_ERROR;
+				}
+			}
+nextWrite:
+			if (result < 0)
+				return result;
+			i += message.size;
+		}
+	}
+
+
+	if (readBuffer != NULL) {
+		message.address = slaveAddress;
+		message.buffer = NULL;
+		message.request = DP_AUX_I2C_READ;
+		message.size = 0;
+		ssize_t result = _DpAuxTransfer(&message);
+		if (result < 0)
+			return result;
+
+		for (size_t i = 0; i < readLength;) {
+			message.buffer = readBuffer + i;
+			message.size = min_c(transferLength, readLength - i);
+			// Middle-Of-Transmission on final transaction
+			if (readLength - i > transferLength)
+				message.request |= DP_AUX_I2C_MOT;
+			else
+				message.request &= ~DP_AUX_I2C_MOT;
+
+			for (int attempt = 0; attempt < 7; attempt++) {
+				result = _DpAuxTransfer(&message);
+				if (result < 0) {
+					ERROR("%s: aux_ch transaction failed!\n", __func__);
+					return result;
+				}
+
+				switch (message.reply & DP_AUX_I2C_REPLY_MASK) {
+					case DP_AUX_I2C_REPLY_ACK:
+						goto nextRead;
+					case DP_AUX_I2C_REPLY_NACK:
+						TRACE("%s: aux i2c nack\n", __func__);
+						return B_IO_ERROR;
+					case DP_AUX_I2C_REPLY_DEFER:
+						TRACE("%s: aux i2c defer\n", __func__);
+						snooze(400);
+						break;
+					default:
+						TRACE("%s: aux invalid I2C reply: 0x%02x\n",
+							__func__, message.reply);
+						return B_ERROR;
+				}
+			}
+nextRead:
+			if (result < 0)
+				return result;
+			if (result == 0)
+				i += message.size;
+		}
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Port::_DpAuxSendReceiveHook(const struct i2c_bus *bus, uint32 slaveAddress,
+	const uint8 *writeBuffer, size_t writeLength, uint8 *readBuffer, size_t readLength)
+{
+	CALLED();
+	DigitalDisplayInterface* port = (DigitalDisplayInterface*)bus->cookie;
+	return port->_DpAuxSendReceive(slaveAddress, writeBuffer, writeLength, readBuffer, readLength);
+}
+
+
+ssize_t
+Port::_DpAuxTransfer(dp_aux_msg* message)
+{
+	CALLED();
+	if (message == NULL) {
+		ERROR("%s: DP message is invalid!\n", __func__);
+		return B_ERROR;
+	}
+
+	if (message->size > 16) {
+		ERROR("%s: Too many bytes! (%" B_PRIuSIZE ")\n", __func__,
+			message->size);
+		return B_ERROR;
+	}
+
+	uint8 transmitSize = message->size > 0 ? 4 : 3;
+	uint8 receiveSize;
+
+	switch(message->request & ~DP_AUX_I2C_MOT) {
+		case DP_AUX_NATIVE_WRITE:
+		case DP_AUX_I2C_WRITE:
+		case DP_AUX_I2C_WRITE_STATUS_UPDATE:
+			transmitSize += message->size;
+			break;
+	}
+
+	// If not bare address, check for buffer
+	if (message->size > 0 && message->buffer == NULL) {
+		ERROR("%s: DP message uninitalized buffer!\n", __func__);
+		return B_ERROR;
+	}
+
+	uint8 receiveBuffer[20];
+	uint8 transmitBuffer[20];
+	transmitBuffer[0] = (message->request << 4) | ((message->address >> 16) & 0xf);
+	transmitBuffer[1] = (message->address >> 8) & 0xff;
+	transmitBuffer[2] = message->address & 0xff;
+	transmitBuffer[3] = message->size != 0 ? (message->size - 1) : 0;
+
+	uint8 retry;
+	for (retry = 0; retry < 7; retry++) {
+		ssize_t result = B_ERROR;
+		switch(message->request & ~DP_AUX_I2C_MOT) {
+			case DP_AUX_NATIVE_WRITE:
+			case DP_AUX_I2C_WRITE:
+			case DP_AUX_I2C_WRITE_STATUS_UPDATE:
+				receiveSize = 2;
+				if (message->buffer != NULL)
+					memcpy(transmitBuffer + 4, message->buffer, message->size);
+				result = _DpAuxTransfer(transmitBuffer,
+					transmitSize, receiveBuffer, receiveSize);
+				if (result > 0) {
+					message->reply = receiveBuffer[0] >> 4;
+					if (result > 1)
+						result = min_c(receiveBuffer[1], message->size);
+					else
+						result = message->size;
+				}
+				break;
+			case DP_AUX_NATIVE_READ:
+			case DP_AUX_I2C_READ:
+				receiveSize = message->size + 1;
+				result = _DpAuxTransfer(transmitBuffer,
+					transmitSize, receiveBuffer, receiveSize);
+				if (result > 0) {
+					message->reply = receiveBuffer[0] >> 4;
+					result--;
+					if (message->buffer != NULL)
+						memcpy(message->buffer, receiveBuffer + 1, result);
+				}
+				break;
+			default:
+				ERROR("%s: Unknown dp_aux_msg request!\n", __func__);
+				return B_ERROR;
+		}
+
+		if (result == B_BUSY)
+			continue;
+		else if (result < B_OK)
+			return result;
+
+		switch(message->reply & DP_AUX_NATIVE_REPLY_MASK) {
+			case DP_AUX_NATIVE_REPLY_ACK:
+				return B_OK;
+			case DP_AUX_NATIVE_REPLY_DEFER:
+				TRACE("%s: aux reply defer received. Snoozing.\n", __func__);
+				snooze(400);
+				break;
+			default:
+				TRACE("%s: aux invalid native reply: 0x%02x\n", __func__,
+					message->reply);
+				return B_IO_ERROR;
+		}
+	}
+
+	ERROR("%s: IO Error. %" B_PRIu8 " attempts\n", __func__, retry);
+	return B_IO_ERROR;
+}
+
+
+ssize_t
+Port::_DpAuxTransfer(uint8* transmitBuffer, uint8 transmitSize,
+	uint8* receiveBuffer, uint8 receiveSize)
+{
+	addr_t channelControl;
+	addr_t channelData[5];
+	aux_channel channel = _DpAuxChannel();
+	if (gInfo->shared_info->device_type.Generation() >= 9
+		|| (gInfo->shared_info->pch_info != INTEL_PCH_NONE && channel == AUX_CH_A)) {
+		channelControl = DP_AUX_CH_CTL(channel);
+		for (int i = 0; i < 5; i++)
+			channelData[i] = DP_AUX_CH_DATA(channel, i);
+	} else if (gInfo->shared_info->pch_info != INTEL_PCH_NONE) {
+		channelControl = PCH_DP_AUX_CH_CTL(channel);
+		for (int i = 0; i < 5; i++)
+			channelData[i] = PCH_DP_AUX_CH_DATA(channel, i);
+	} else {
+		ERROR("DigitalDisplayInterface::_DpAuxTransfer() unknown register config\n");
+		return B_BUSY;
+	}
+	if (transmitSize > 20 || receiveSize > 20)
+		return E2BIG;
+
+	int tries = 0;
+	while ((read32(channelControl) & INTEL_DP_AUX_CTL_BUSY) != 0) {
+		if (tries++ == 3) {
+			ERROR("%s: %s AUX channel is busy!\n", __func__, PortName());
+			return B_BUSY;
+		}
+		snooze(1000);
+	}
+
+	uint32 sendControl = 0;
+	if (gInfo->shared_info->device_type.Generation() >= 9) {
+		sendControl = INTEL_DP_AUX_CTL_BUSY | INTEL_DP_AUX_CTL_DONE | INTEL_DP_AUX_CTL_INTERRUPT
+			| INTEL_DP_AUX_CTL_TIMEOUT_ERROR | INTEL_DP_AUX_CTL_TIMEOUT_1600us | INTEL_DP_AUX_CTL_RECEIVE_ERROR
+			| (transmitSize << INTEL_DP_AUX_CTL_MSG_SIZE_SHIFT) | INTEL_DP_AUX_CTL_FW_SYNC_PULSE_SKL(32)
+			| INTEL_DP_AUX_CTL_SYNC_PULSE_SKL(32);
+	} else {
+		uint32 aux_clock_divider = 0xe1; // TODO: value for 450Mhz
+		uint32 timeout = INTEL_DP_AUX_CTL_TIMEOUT_400us;
+		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_BDW))
+			timeout = INTEL_DP_AUX_CTL_TIMEOUT_600us;
+		sendControl = INTEL_DP_AUX_CTL_BUSY | INTEL_DP_AUX_CTL_DONE | INTEL_DP_AUX_CTL_INTERRUPT
+			| INTEL_DP_AUX_CTL_TIMEOUT_ERROR | timeout | INTEL_DP_AUX_CTL_RECEIVE_ERROR
+			| (transmitSize << INTEL_DP_AUX_CTL_MSG_SIZE_SHIFT) | (3 << INTEL_DP_AUX_CTL_PRECHARGE_2US_SHIFT)
+			| (aux_clock_divider << INTEL_DP_AUX_CTL_BIT_CLOCK_2X_SHIFT);
+	}
+
+	uint8 retry;
+	uint32 status = 0;
+	for (retry = 0; retry < 5; retry++) {
+		for (uint8 i = 0; i < transmitSize;) {
+			uint8 index = i / 4;
+			uint32 data = ((uint32)transmitBuffer[i++]) << 24;
+			if (i < transmitSize)
+				data |= ((uint32)transmitBuffer[i++]) << 16;
+			if (i < transmitSize)
+				data |= ((uint32)transmitBuffer[i++]) << 8;
+			if (i < transmitSize)
+				data |= transmitBuffer[i++];
+			write32(channelData[index], data);
+		}
+		write32(channelControl, sendControl);
+
+		// wait 10 ms reading channelControl until INTEL_DP_AUX_CTL_BUSY
+		status = wait_for_clear_status(channelControl, INTEL_DP_AUX_CTL_BUSY, 10000);
+		if ((status & INTEL_DP_AUX_CTL_BUSY) != 0) {
+			ERROR("%s: %s AUX channel stayed busy for 10000us!\n", __func__, PortName());
+		}
+
+		write32(channelControl, status | INTEL_DP_AUX_CTL_DONE | INTEL_DP_AUX_CTL_TIMEOUT_ERROR
+			| INTEL_DP_AUX_CTL_RECEIVE_ERROR);
+		if ((status & INTEL_DP_AUX_CTL_TIMEOUT_ERROR) != 0)
+			continue;
+		if ((status & INTEL_DP_AUX_CTL_RECEIVE_ERROR) != 0) {
+			snooze(400);
+			continue;
+		}
+		if ((status & INTEL_DP_AUX_CTL_DONE) != 0)
+			goto done;
+	}
+
+	if ((status & INTEL_DP_AUX_CTL_DONE) == 0) {
+		ERROR("%s: Busy Error. %" B_PRIu8 " attempts\n", __func__, retry);
+		return B_BUSY;
+	}
+done:
+	if ((status & INTEL_DP_AUX_CTL_RECEIVE_ERROR) != 0)
+		return B_IO_ERROR;
+	if ((status & INTEL_DP_AUX_CTL_TIMEOUT_ERROR) != 0)
+		return B_TIMEOUT;
+
+	uint8 bytes = (status & INTEL_DP_AUX_CTL_MSG_SIZE_MASK) >> INTEL_DP_AUX_CTL_MSG_SIZE_SHIFT;
+	if (bytes == 0 || bytes > 20) {
+		ERROR("%s: Status byte count incorrect %u\n", __func__, bytes);
+		return B_BUSY;
+	}
+	if (bytes > receiveSize)
+		bytes = receiveSize;
+	for (uint8 i = 0; i < bytes;) {
+		uint32 data = read32(channelData[i / 4]);
+		receiveBuffer[i++] = data >> 24;
+		if (i < bytes)
+			receiveBuffer[i++] = data >> 16;
+		if (i < bytes)
+			receiveBuffer[i++] = data >> 8;
+		if (i < bytes)
+			receiveBuffer[i++] = data;
+	}
+
+	return bytes;
+}
+
+
+aux_channel
+Port::_DpAuxChannel()
+{
+	uint32 foundIndex = 0;
+	if (!_IsPortInVBT(&foundIndex))
+		return AUX_CH_A;
+	child_device_config& config = gInfo->shared_info->device_configs[foundIndex];
+	switch (config.aux_channel) {
+		case DP_AUX_B:
+			return AUX_CH_B;
+		case DP_AUX_C:
+			return AUX_CH_C;
+		case DP_AUX_D:
+			return AUX_CH_D;
+		case DP_AUX_E:
+			return AUX_CH_E;
+		case DP_AUX_F:
+			return AUX_CH_F;
+		default:
+			return AUX_CH_A;
+	}
+}
+
+
 // #pragma mark - Analog Port
 
 
@@ -416,9 +902,14 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (fitter != NULL)
 		fitter->Enable(target->timing);
 	FDILink* link = fPipe->FDI();
-	if (link != NULL)
-		link->Train(&target->timing);
-
+	if (link != NULL) {
+		uint32 lanes = 0;
+		uint32 linkBandwidth = 0;
+		uint32 bitsPerPixel = 0;
+		link->PreTrain(&target->timing, &linkBandwidth, &lanes, &bitsPerPixel);
+		fPipe->SetFDILink(target->timing, linkBandwidth, lanes, bitsPerPixel);
+		link->Train(&target->timing, lanes);
+	}
 	pll_divisors divisors;
 	compute_pll_divisors(&target->timing, &divisors, false);
 
@@ -538,8 +1029,11 @@ LVDSPort::IsConnected()
 				TRACE("LVDS: Using VESA edid info\n");
 				memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,
 					sizeof(edid1_info));
-				fEDIDState = B_OK;
-				// HasEDID now true
+				if (fEDIDState != B_OK) {
+					fEDIDState = B_OK;
+					// HasEDID now true
+					edid_dump(&fEDIDInfo);
+				}
 			} else if (gInfo->shared_info->got_vbt) {
 				TRACE("LVDS: No EDID, but force enabled as we have a VBT\n");
 				return true;
@@ -653,8 +1147,14 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (fitter != NULL)
 		fitter->Enable(hardwareTarget);
 	FDILink* link = fPipe->FDI();
-	if (link != NULL)
-		link->Train(&hardwareTarget);
+	if (link != NULL) {
+		uint32 lanes = 0;
+		uint32 linkBandwidth = 0;
+		uint32 bitsPerPixel = 0;
+		link->PreTrain(&hardwareTarget, &linkBandwidth, &lanes, &bitsPerPixel);
+		fPipe->SetFDILink(hardwareTarget, linkBandwidth, lanes, bitsPerPixel);
+		link->Train(&hardwareTarget, lanes);
+	}
 
 	pll_divisors divisors;
 	compute_pll_divisors(&hardwareTarget, &divisors, true);
@@ -724,7 +1224,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		read32(panelControl);
 
 		if (!wait_for_set(panelStatus, PANEL_STATUS_POWER_ON, 1000)) {
-			ERROR("%s: %s didn't power on within 1000ms!\n", __func__,
+			ERROR("%s: %s didn't power on within 1000us!\n", __func__,
 				PortName());
 		}
 	}
@@ -850,8 +1350,14 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (fitter != NULL)
 		fitter->Enable(target->timing);
 	FDILink* link = fPipe->FDI();
-	if (link != NULL)
-		link->Train(&target->timing);
+	if (link != NULL) {
+		uint32 lanes = 0;
+		uint32 linkBandwidth = 0;
+		uint32 bitsPerPixel = 0;
+		link->PreTrain(&target->timing, &linkBandwidth, &lanes, &bitsPerPixel);
+		fPipe->SetFDILink(target->timing, linkBandwidth, lanes, bitsPerPixel);
+		link->Train(&target->timing, lanes);
+	}
 
 	pll_divisors divisors;
 	compute_pll_divisors(&target->timing, &divisors, false);
@@ -899,6 +1405,16 @@ HDMIPort::IsConnected()
 
 	if (portRegister == 0)
 		return false;
+
+	const uint32 deviceConfigCount = gInfo->shared_info->device_config_count;
+	if (gInfo->shared_info->device_type.Generation() >= 6 && deviceConfigCount > 0) {
+		// check VBT mapping
+		if (!_IsPortInVBT()) {
+			TRACE("%s: %s: port not found in VBT\n", __func__, PortName());
+			return false;
+		} else
+			TRACE("%s: %s: port found in VBT\n", __func__, PortName());
+	}
 
 	//Notes:
 	//- DISPLAY_MONITOR_PORT_DETECTED does only tell you *some* sort of digital display is
@@ -971,6 +1487,28 @@ DisplayPort::PipePreference()
 	uint32 TranscoderPort = INTEL_TRANS_DP_PORT_NONE;
 	switch (PortIndex()) {
 		case INTEL_PORT_A:
+			if (gInfo->shared_info->device_type.Generation() == 6) {
+				if (((read32(INTEL_DISPLAY_PORT_A) & INTEL_DISP_PORTA_SNB_PIPE_MASK)
+					>> INTEL_DISP_PORTA_SNB_PIPE_SHIFT) == INTEL_DISP_PORTA_SNB_PIPE_A) {
+					return INTEL_PIPE_A;
+				} else {
+					return INTEL_PIPE_B;
+				}
+			}
+			if (gInfo->shared_info->device_type.Generation() == 7) {
+				uint32 Pipe = (read32(INTEL_DISPLAY_PORT_A) & INTEL_DISP_PORTA_IVB_PIPE_MASK)
+					>> INTEL_DISP_PORTA_IVB_PIPE_SHIFT;
+				switch (Pipe) {
+					case INTEL_DISP_PORTA_IVB_PIPE_A:
+						return INTEL_PIPE_A;
+					case INTEL_DISP_PORTA_IVB_PIPE_B:
+						return INTEL_PIPE_B;
+					case INTEL_DISP_PORTA_IVB_PIPE_C:
+						return INTEL_PIPE_C;
+					default:
+						return INTEL_PIPE_ANY;
+				}
+			}
 			return INTEL_PIPE_ANY;
 		case INTEL_PORT_B:
 			TranscoderPort = INTEL_TRANS_DP_PORT_B;
@@ -1003,6 +1541,57 @@ DisplayPort::PipePreference()
 }
 
 
+status_t
+DisplayPort::SetPipe(Pipe* pipe)
+{
+	CALLED();
+
+	if (pipe == NULL) {
+		ERROR("%s: Invalid pipe provided!\n", __func__);
+		return B_ERROR;
+	}
+
+	// TODO: UnAssignPipe?  This likely needs reworked a little
+	if (fPipe != NULL) {
+		ERROR("%s: Can't reassign display pipe (yet)\n", __func__);
+		return B_ERROR;
+	}
+
+	// generation 3/4/5 gfx have no eDP ports.
+	// generation 6 gfx SandyBridge/SNB uses one bit (b30) on the eDP port.
+	// generation 7 gfx IvyBridge/IVB uses 2 bits (b29-30) on the eDP port.
+	// on all other DP ports pipe selections works differently (indirect).
+	// fixme: implement..
+	TRACE("%s: Assuming pipe is assigned by BIOS (fixme)\n", __func__);
+
+	fPipe = pipe;
+
+	if (fPipe == NULL)
+		return B_NO_MEMORY;
+
+	// Disable display pipe until modesetting enables it
+	if (fPipe->IsEnabled())
+		fPipe->Enable(false);
+
+	return B_OK;
+}
+
+
+status_t
+DisplayPort::SetupI2c(i2c_bus *bus)
+{
+	CALLED();
+
+	const uint32 deviceConfigCount = gInfo->shared_info->device_config_count;
+	if (gInfo->shared_info->device_type.Generation() >= 6 && deviceConfigCount > 0) {
+		if (!_IsDisplayPortInVBT())
+			return Port::SetupI2c(bus);
+	}
+
+	return _SetupDpAuxI2c(bus);
+}
+
+
 bool
 DisplayPort::IsConnected()
 {
@@ -1013,6 +1602,16 @@ DisplayPort::IsConnected()
 
 	if (portRegister == 0)
 		return false;
+
+	const uint32 deviceConfigCount = gInfo->shared_info->device_config_count;
+	if (gInfo->shared_info->device_type.Generation() >= 6 && deviceConfigCount > 0) {
+		// check VBT mapping
+		if (!_IsPortInVBT()) {
+			TRACE("%s: %s: port not found in VBT\n", __func__, PortName());
+			return false;
+		} else
+			TRACE("%s: %s: port found in VBT\n", __func__, PortName());
+	}
 
 	//Notes:
 	//- DISPLAY_MONITOR_PORT_DETECTED does only tell you *some* sort of digital display is
@@ -1030,9 +1629,30 @@ DisplayPort::IsConnected()
 		return false;
 	}
 
+	TRACE("%s: %s link detected\n", __func__, PortName());
+	bool edidDetected = HasEDID();
+
+	// On laptops we always have an internal panel.. (this is on the eDP port)
+	if ((gInfo->shared_info->device_type.IsMobile() || _IsInternalPanelPort())
+		&& (PortIndex() == INTEL_PORT_A) && !edidDetected) {
+		if (gInfo->shared_info->has_vesa_edid_info) {
+			TRACE("%s: Laptop. Using VESA edid info\n", __func__);
+			memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,
+				sizeof(edid1_info));
+			if (fEDIDState != B_OK) {
+				fEDIDState = B_OK;
+				// HasEDID now true
+				edid_dump(&fEDIDInfo);
+			}
+			return true;
+		} else if (gInfo->shared_info->got_vbt) {
+			TRACE("%s: Laptop. No EDID, but force enabled as we have a VBT\n", __func__);
+			return true;
+		}
+	}
+
 	//since EDID is not correctly implemented yet for this connection type we'll do without it for now
 	//return HasEDID();
-	TRACE("%s: %s link detected\n", __func__, PortName());
 	return true;
 }
 
@@ -1040,28 +1660,6 @@ DisplayPort::IsConnected()
 addr_t
 DisplayPort::_DDCRegister()
 {
-	// TODO: Do VLV + CHV use the VLV_DP_AUX_CTL_B + VLV_DP_AUX_CTL_C?
-	switch (PortIndex()) {
-		case INTEL_PORT_A:
-			return INTEL_DP_AUX_CTL_A;
-		case INTEL_PORT_B:
-			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV))
-				return VLV_DP_AUX_CTL_B;
-			return INTEL_DP_AUX_CTL_B;
-		case INTEL_PORT_C:
-			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV))
-				return VLV_DP_AUX_CTL_C;
-			return INTEL_DP_AUX_CTL_C;
-		case INTEL_PORT_D:
-			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_CHV))
-				return CHV_DP_AUX_CTL_D;
-			else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV))
-				return 0;
-			return INTEL_DP_AUX_CTL_D;
-		default:
-			return 0;
-	}
-
 	return 0;
 }
 
@@ -1113,7 +1711,6 @@ status_t
 DisplayPort::_SetPortLinkGen4(const display_timing& timing)
 {
 	// Khz / 10. ( each output octet encoded as 10 bits. 
-	//uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10; //=270000 khz
 	//fixme: always so?
 	uint32 linkBandwidth = 270000; //khz
 	uint32 fPipeOffset = 0;
@@ -1174,6 +1771,115 @@ DisplayPort::_SetPortLinkGen4(const display_timing& timing)
 
 
 status_t
+DisplayPort::_SetPortLinkGen6(const display_timing& timing)
+{
+	// Khz / 10. ( each output octet encoded as 10 bits.
+	//note: (fixme) eDP is fixed option 162 or 270Mc, other DPs go via DPLL programming to one of the same vals.
+	uint32 linkBandwidth = 270000; //khz
+	TRACE("%s: DP link reference clock is %gMhz\n", __func__, linkBandwidth / 1000.0f);
+
+	uint32 fPipeOffset = 0;
+	switch (fPipe->Index()) {
+		case INTEL_PIPE_B:
+			fPipeOffset = 0x1000;
+			break;
+		case INTEL_PIPE_C:
+			fPipeOffset = 0x2000;
+			break;
+		default:
+			break;
+	}
+
+	TRACE("%s: DP M1 data before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_DATA_M1 + fPipeOffset));
+	TRACE("%s: DP N1 data before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_DATA_N1 + fPipeOffset));
+	TRACE("%s: DP M1 link before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_LINK_M1 + fPipeOffset));
+	TRACE("%s: DP N1 link before: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_LINK_N1 + fPipeOffset));
+
+	uint32 bitsPerPixel =
+		(read32(INTEL_TRANSCODER_A_DP_CTL + fPipeOffset) & INTEL_TRANS_DP_BPC_MASK) >> INTEL_TRANS_DP_COLOR_SHIFT;
+	switch (bitsPerPixel) {
+		case PIPE_DDI_8BPC:
+			bitsPerPixel = 24;
+			break;
+		case PIPE_DDI_10BPC:
+			bitsPerPixel = 30;
+			break;
+		case PIPE_DDI_6BPC:
+			bitsPerPixel = 18;
+			break;
+		case PIPE_DDI_12BPC:
+			bitsPerPixel = 36;
+			break;
+		default:
+			ERROR("%s: DP illegal link colordepth set.\n", __func__);
+			return B_ERROR;
+	}
+	TRACE("%s: DP link colordepth: %" B_PRIu32 "\n", __func__, bitsPerPixel);
+
+	uint32 lanes = ((read32(_PortRegister()) & INTEL_DISP_PORT_WIDTH_MASK) >> INTEL_DISP_PORT_WIDTH_SHIFT) + 1;
+	if (lanes > 4) {
+		ERROR("%s: DP illegal number of lanes set.\n", __func__);
+		return B_ERROR;
+	}
+	TRACE("%s: DP mode with %" B_PRIx32 " lane(s) in use\n", __func__, lanes);
+
+	//Reserving 5% bandwidth for possible spread spectrum clock use
+	uint32 bps = timing.pixel_clock * bitsPerPixel * 21 / 20;
+	//use DIV_ROUND_UP:
+	uint32 required_lanes = (bps + (linkBandwidth * 8) - 1) / (linkBandwidth * 8);
+	TRACE("%s: DP mode needs %" B_PRIx32 " lane(s) in use\n", __func__, required_lanes);
+	if (required_lanes > lanes) {
+		//Note that we *must* abort as otherwise the PIPE/DP-link hangs forever (without retraining!).
+		ERROR("%s: DP not enough lanes active for requested mode.\n", __func__);
+		return B_ERROR;
+	}
+
+	//Setup Data M/N
+	uint64 linkspeed = lanes * linkBandwidth * 8;
+	uint64 ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	uint64 ret_m = timing.pixel_clock * ret_n * bitsPerPixel / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	//Set TU size bits (to default, max) before link training so that error detection works
+	write32(INTEL_TRANSCODER_A_DATA_M1 + fPipeOffset, ret_m | INTEL_TRANSCODER_MN_TU_SIZE_MASK);
+	write32(INTEL_TRANSCODER_A_DATA_N1 + fPipeOffset, ret_n);
+
+	//Setup Link M/N
+	linkspeed = linkBandwidth;
+	ret_n = 1;
+	while(ret_n < linkspeed) {
+		ret_n *= 2;
+	}
+	if (ret_n > 0x800000) {
+		ret_n = 0x800000;
+	}
+	ret_m = timing.pixel_clock * ret_n / linkspeed;
+	while ((ret_n > 0xffffff) || (ret_m > 0xffffff)) {
+		ret_m >>= 1;
+		ret_n >>= 1;
+	}
+	write32(INTEL_TRANSCODER_A_LINK_M1 + fPipeOffset, ret_m);
+	//Writing Link N triggers all four registers to be activated also (on next VBlank)
+	write32(INTEL_TRANSCODER_A_LINK_N1 + fPipeOffset, ret_n);
+
+	TRACE("%s: DP M1 data after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_DATA_M1 + fPipeOffset));
+	TRACE("%s: DP N1 data after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_DATA_N1 + fPipeOffset));
+	TRACE("%s: DP M1 link after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_LINK_M1 + fPipeOffset));
+	TRACE("%s: DP N1 link after: 0x%" B_PRIx32 "\n", __func__, read32(INTEL_TRANSCODER_A_LINK_N1 + fPipeOffset));
+
+	return B_OK;
+}
+
+
+status_t
 DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
 	CALLED();
@@ -1190,37 +1896,112 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		fPipe->ConfigureTimings(target);
 		result = _SetPortLinkGen4(target->timing);
 	} else {
-		//fixme: doesn't work yet. For now just scale to native mode.
-#if 0
-		// Setup PanelFitter and Train FDI if it exists
-		PanelFitter* fitter = fPipe->PFT();
-		if (fitter != NULL)
-			fitter->Enable(*target);
-		// skip FDI if it doesn't exist
-		if (gInfo->shared_info->device_type.Generation() <= 8) {
-			FDILink* link = fPipe->FDI();
-			if (link != NULL)
-				link->Train(target);
+		display_timing hardwareTarget = target->timing;
+		bool needsScaling = false;
+		if ((PortIndex() == INTEL_PORT_A)
+			&& (gInfo->shared_info->device_type.IsMobile() || _IsInternalPanelPort())) {
+			// For internal panels, we may need to set the timings according to the panel
+			// native video mode, and let the panel fitter do the scaling.
+			// note: upto/including generation 5 laptop panels are still LVDS types, handled elsewhere.
+
+			if (gInfo->shared_info->got_vbt) {
+				// Set vbios hardware panel mode as base
+				hardwareTarget = gInfo->shared_info->panel_timing;
+
+				if (hardwareTarget.h_display == target->timing.h_display
+						&& hardwareTarget.v_display == target->timing.v_display) {
+					// We are feeding the native video mode, nothing to do: disable scaling
+					TRACE("%s: Requested mode is panel's native resolution: disabling scaling\n", __func__);
+				} else {
+					// We need to enable the panel fitter
+					TRACE("%s: Requested mode is not panel's native resolution: enabling scaling\n", __func__);
+					needsScaling = true;
+				}
+			} else {
+				//fixme: We should now first try for EDID info detailed timing, highest res in list: that's the
+				//native mode as well. If we also have no EDID, then fallback to setting mode directly as below.
+
+				TRACE("%s: Setting internal panel mode without VBT info generation, scaling may not work\n",
+					__func__);
+				// We don't have VBT data, try to set the requested mode directly
+				// and hope for the best
+				hardwareTarget = target->timing;
+			}
 		}
-		pll_divisors divisors;
-		compute_pll_divisors(target, &divisors, false);
 
-		uint32 extraPLLFlags = 0;
-		if (gInfo->shared_info->device_type.Generation() >= 3)
-			extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL | DISPLAY_PLL_2X_CLOCK;
+		result = B_OK;
+		if (PortIndex() != INTEL_PORT_A)
+			result = _SetPortLinkGen6(hardwareTarget);
 
-		// Program general pipe config
-		fPipe->Configure(target);
+		if (result == B_OK) {
+			// Setup PanelFitter and Train FDI if it exists
+			PanelFitter* fitter = fPipe->PFT();
+			if (fitter != NULL)
+				fitter->Enable(hardwareTarget);
 
-		// Program pipe PLL's
-		fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
+			uint32 lanes = 0;
+			uint32 linkBandwidth = 0;
+			uint32 bitsPerPixel = 0;
+			if (PortIndex() != INTEL_PORT_A) {
+				FDILink* link = fPipe->FDI();
+				if (link != NULL) {
+					link->PreTrain(&hardwareTarget, &linkBandwidth, &lanes, &bitsPerPixel);
+					fPipe->SetFDILink(hardwareTarget, linkBandwidth, lanes, bitsPerPixel);
+					link->Train(&hardwareTarget, lanes);
+				}
+			} else {
+				// 'local' eDP port is in use
+				linkBandwidth =
+					(read32(INTEL_DISPLAY_PORT_A) & INTEL_DISP_EDP_PLL_FREQ_MASK) >> INTEL_DISP_EDP_PLL_FREQ_SHIFT;
+				switch (linkBandwidth) {
+					case INTEL_DISP_EDP_PLL_FREQ_270:
+						linkBandwidth = 270000; //khz
+						break;
+					case INTEL_DISP_EDP_PLL_FREQ_162:
+						linkBandwidth = 162000; //khz
+						break;
+					default:
+						TRACE("%s: eDP illegal reference clock ID set, assuming 270Mhz.\n", __func__);
+						linkBandwidth = 270000; //khz
+				}
 
-		// Program target display mode
-		fPipe->ConfigureTimings(target);
-#endif
+				bitsPerPixel =
+					(read32(INTEL_DISPLAY_A_PIPE_CONTROL) & INTEL_PIPE_BPC_MASK) >> INTEL_PIPE_COLOR_SHIFT;
+				switch (bitsPerPixel) {
+					case INTEL_PIPE_8BPC:
+						bitsPerPixel = 24;
+						break;
+					case INTEL_PIPE_10BPC:
+						bitsPerPixel = 30;
+						break;
+					case INTEL_PIPE_6BPC:
+						bitsPerPixel = 18;
+						break;
+					case INTEL_PIPE_12BPC:
+						bitsPerPixel = 36;
+						break;
+					default:
+						bitsPerPixel = 0;
+				}
 
-		// Keep monitor at native mode and scale image to that
-		fPipe->ConfigureScalePos(target);
+				lanes =
+					((read32(INTEL_DISPLAY_PORT_A) & INTEL_DISP_PORT_WIDTH_MASK) >> INTEL_DISP_PORT_WIDTH_SHIFT) + 1;
+
+				fPipe->SetFDILink(hardwareTarget, linkBandwidth, lanes, bitsPerPixel);
+			}
+
+			// Program general pipe config
+			fPipe->Configure(target);
+
+			// Pll programming is not needed for (e)DP..
+
+			// Program target display mode
+			fPipe->ConfigureTimings(target, !needsScaling, PortIndex());
+		} else {
+			TRACE("%s: Setting display mode via fallback: using scaling!\n", __func__);
+			// Keep monitor at native mode and scale image to that
+			fPipe->ConfigureScalePos(target);
+		}
 	}
 
 	// Set fCurrentMode to our set display mode
@@ -1350,6 +2131,54 @@ DigitalDisplayInterface::Power(bool enabled)
 }
 
 
+status_t
+DigitalDisplayInterface::SetPipe(Pipe* pipe)
+{
+	CALLED();
+
+	if (pipe == NULL) {
+		ERROR("%s: Invalid pipe provided!\n", __func__);
+		return B_ERROR;
+	}
+
+	// TODO: UnAssignPipe?  This likely needs reworked a little
+	if (fPipe != NULL) {
+		ERROR("%s: Can't reassign display pipe (yet)\n", __func__);
+		return B_ERROR;
+	}
+
+	// all DDI ports pipe selections works differently than on the old port types (indirect).
+	// fixme: implement..
+	TRACE("%s: Assuming pipe is assigned by BIOS (fixme)\n", __func__);
+
+	fPipe = pipe;
+
+	if (fPipe == NULL)
+		return B_NO_MEMORY;
+
+	// Disable display pipe until modesetting enables it
+	if (fPipe->IsEnabled())
+		fPipe->Enable(false);
+
+	return B_OK;
+}
+
+
+status_t
+DigitalDisplayInterface::SetupI2c(i2c_bus *bus)
+{
+	CALLED();
+
+	const uint32 deviceConfigCount = gInfo->shared_info->device_config_count;
+	if (gInfo->shared_info->device_type.Generation() >= 6 && deviceConfigCount > 0) {
+		if (!_IsDisplayPortInVBT())
+			return Port::SetupI2c(bus);
+	}
+
+	return _SetupDpAuxI2c(bus);
+}
+
+
 bool
 DigitalDisplayInterface::IsConnected()
 {
@@ -1396,19 +2225,57 @@ DigitalDisplayInterface::IsConnected()
 		}
 	}
 
+	const uint32 deviceConfigCount = gInfo->shared_info->device_config_count;
+	if (gInfo->shared_info->device_type.Generation() >= 6 && deviceConfigCount > 0) {
+		// check VBT mapping
+		if (!_IsPortInVBT()) {
+			TRACE("%s: %s: port not found in VBT\n", __func__, PortName());
+			return false;
+		} else
+			TRACE("%s: %s: port found in VBT\n", __func__, PortName());
+	}
+
 	TRACE("%s: %s Maximum Lanes: %" B_PRId8 "\n", __func__,
 		PortName(), fMaxLanes);
 
 	// fetch EDID but determine 'in use' later (below) so we also catch screens that fail EDID
-	HasEDID();
+	bool edidDetected = HasEDID();
 
-	// scan all our pipes to find the one connected to the current port and check it's enabled
+	// On laptops we always have an internal panel.. (on the eDP port on DDI systems, fixed on eDP pipe)
 	uint32 pipeState = 0;
-	for (uint32 pipeCnt = 0; pipeCnt < 4; pipeCnt++) {
+	if ((gInfo->shared_info->device_type.IsMobile() || _IsInternalPanelPort())
+		&& (PortIndex() == INTEL_PORT_E)) {
+		pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
+		TRACE("%s: PIPE_DDI_FUNC_CTL_EDP: 0x%" B_PRIx32 "\n", __func__, pipeState);
+		if (!(pipeState & PIPE_DDI_FUNC_CTL_ENABLE)) {
+			TRACE("%s: Laptop, but eDP port down: enabling port on pipe EDP\n", __func__);
+			//fixme: turn on port and power
+			write32(PIPE_DDI_FUNC_CTL_EDP, pipeState | PIPE_DDI_FUNC_CTL_ENABLE);
+			TRACE("%s: PIPE_DDI_FUNC_CTL_EDP after: 0x%" B_PRIx32 "\n", __func__,
+				read32(PIPE_DDI_FUNC_CTL_EDP));
+		}
+
+		if (gInfo->shared_info->has_vesa_edid_info) {
+			TRACE("%s: Laptop. Using VESA edid info\n", __func__);
+			memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,	sizeof(edid1_info));
+			if (fEDIDState != B_OK) {
+				fEDIDState = B_OK;
+				// HasEDID now true
+				edid_dump(&fEDIDInfo);
+			}
+			return true;
+		} else if (gInfo->shared_info->got_vbt) {
+			TRACE("%s: Laptop. No VESA EDID, but force enabled as we have a VBT\n", __func__);
+			return true;
+		}
+		//should not happen:
+		TRACE("%s: No (panel) type info found, assuming not connected\n", __func__);
+		return false;
+	}
+
+	// scan all our non-eDP pipes to find the one connected to the current port and check it's enabled
+	for (uint32 pipeCnt = 0; pipeCnt < 3; pipeCnt++) {
 		switch (pipeCnt) {
-			case 0:
-				pipeState = read32(PIPE_DDI_FUNC_CTL_A);
-				break;
 			case 1:
 				pipeState = read32(PIPE_DDI_FUNC_CTL_B);
 				break;
@@ -1416,11 +2283,11 @@ DigitalDisplayInterface::IsConnected()
 				pipeState = read32(PIPE_DDI_FUNC_CTL_C);
 				break;
 			default:
-				pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
+				pipeState = read32(PIPE_DDI_FUNC_CTL_A);
 				break;
 		}
-
 		if ((((pipeState & PIPE_DDI_SELECT_MASK) >> PIPE_DDI_SELECT_SHIFT) + 1) == (uint32)PortIndex()) {
+			TRACE("%s: PIPE_DDI_FUNC_CTL nr %" B_PRIx32 ": 0x%" B_PRIx32 "\n", __func__, pipeCnt + 1, pipeState);
 			// See if the BIOS enabled our output as it indicates it's in use
 			if (pipeState & PIPE_DDI_FUNC_CTL_ENABLE) {
 				TRACE("%s: Connected\n", __func__);
@@ -1429,19 +2296,34 @@ DigitalDisplayInterface::IsConnected()
 		}
 	}
 
-	// On laptops we always have an internal panel.. (this is on the eDP port)
-	if (gInfo->shared_info->device_type.IsMobile() && (PortIndex() == INTEL_PORT_E)) {
-		if (gInfo->shared_info->has_vesa_edid_info) {
-			TRACE("%s: Laptop. Using VESA edid info\n", __func__);
-			memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,
-				sizeof(edid1_info));
-			fEDIDState = B_OK;
-			// HasEDID now true
-			return true;
-		} else if (gInfo->shared_info->got_vbt) {
-			TRACE("%s: Laptop. No EDID, but force enabled as we have a VBT\n", __func__);
-			return true;
+	if (edidDetected) {
+		for (uint32 pipeCnt = 0; pipeCnt < 3; pipeCnt++) {
+			uint32 pipeReg = 0;
+			switch (pipeCnt) {
+				case 1:
+					pipeReg = PIPE_DDI_FUNC_CTL_B;
+					break;
+				case 2:
+					pipeReg = PIPE_DDI_FUNC_CTL_C;
+					break;
+				default:
+					pipeReg = PIPE_DDI_FUNC_CTL_A;
+					break;
+			}
+			pipeState = read32(pipeReg);
+			if (!(pipeState & PIPE_DDI_FUNC_CTL_ENABLE)) {
+				TRACE("%s: Connected but port down: enabling port on pipe nr %" B_PRIx32 "\n", __func__, pipeCnt + 1);
+				//fixme: turn on port and power
+				pipeState |= PIPE_DDI_FUNC_CTL_ENABLE;
+				pipeState &= ~PIPE_DDI_SELECT_MASK;
+				pipeState |= (((uint32)PortIndex()) - 1) << PIPE_DDI_SELECT_SHIFT;
+				//fixme: set mode to DVI mode for now (b26..24 = %001)
+				write32(pipeReg, pipeState);
+				TRACE("%s: PIPE_DDI_FUNC_CTL after: 0x%" B_PRIx32 "\n", __func__, read32(pipeReg));
+				return true;
+			}
 		}
+		TRACE("%s: No pipe available, ignoring connected screen\n", __func__);
 	}
 
 	TRACE("%s: Not connected\n", __func__);
@@ -1533,9 +2415,9 @@ DigitalDisplayInterface::_SetPortLinkGen8(const display_timing& timing, uint32 p
 	if (((pipeFunc & PIPE_DDI_MODESEL_MASK) >> PIPE_DDI_MODESEL_SHIFT) >= PIPE_DDI_MODE_DP_SST) {
 		// On gen 9.5 IceLake 3x mode exists (DSI only), earlier models: reserved value.
 		lanes = ((pipeFunc & PIPE_DDI_DP_WIDTH_MASK) >> PIPE_DDI_DP_WIDTH_SHIFT) + 1;
-		TRACE("%s: DDI in DP mode with %" B_PRIx32 " lanes in use\n", __func__, lanes);
+		TRACE("%s: DDI in DP mode with %" B_PRIx32 " lane(s) in use\n", __func__, lanes);
 	} else {
-		TRACE("%s: DDI in non-DP mode with %" B_PRIx32 " lanes in use\n", __func__, lanes);
+		TRACE("%s: DDI in non-DP mode with %" B_PRIx32 " lane(s) in use\n", __func__, lanes);
 	}
 
 	//Setup Data M/N
@@ -1596,14 +2478,47 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	display_timing hardwareTarget = target->timing;
 	bool needsScaling = false;
-	if ((PortIndex() == INTEL_PORT_E) && gInfo->shared_info->device_type.IsMobile()) {
+	if ((PortIndex() == INTEL_PORT_E)
+		&& (gInfo->shared_info->device_type.IsMobile() || _IsInternalPanelPort())) {
 		// For internal panels, we may need to set the timings according to the panel
 		// native video mode, and let the panel fitter do the scaling.
 
-		if (gInfo->shared_info->got_vbt) {
+		if (gInfo->shared_info->got_vbt || HasEDID()) {
 			// Set vbios hardware panel mode as base
 			hardwareTarget = gInfo->shared_info->panel_timing;
-
+			if (HasEDID()) {
+				// the first detailed timing supposed to be the best supported one
+				int i;
+				for (i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; ++i) {
+					edid1_detailed_monitor *monitor = &fEDIDInfo.detailed_monitor[i];
+					if (monitor->monitor_desc_type == EDID1_IS_DETAILED_TIMING)
+						break;
+				}
+				if (i < EDID1_NUM_DETAILED_MONITOR_DESC) {
+					TRACE("%s: Using EDID detailed timing %d for the internal panel\n",
+						__func__, i);
+					const edid1_detailed_timing& timing
+						= fEDIDInfo.detailed_monitor[i].data.detailed_timing;
+					hardwareTarget.pixel_clock = timing.pixel_clock * 10;
+					hardwareTarget.h_display = timing.h_active;
+					hardwareTarget.h_sync_start = timing.h_active + timing.h_sync_off;
+					hardwareTarget.h_sync_end = hardwareTarget.h_sync_start + timing.h_sync_width;
+					hardwareTarget.h_total = timing.h_active + timing.h_blank;
+					hardwareTarget.v_display = timing.v_active;
+					hardwareTarget.v_sync_start = timing.v_active + timing.v_sync_off;
+					hardwareTarget.v_sync_end = hardwareTarget.v_sync_start + timing.v_sync_width;
+					hardwareTarget.v_total = timing.v_active + timing.v_blank;
+					hardwareTarget.flags = 0;
+					if (timing.sync == 3) {
+						if (timing.misc & 1)
+							hardwareTarget.flags |= B_POSITIVE_HSYNC;
+						if (timing.misc & 2)
+							hardwareTarget.flags |= B_POSITIVE_VSYNC;
+					}
+					if (timing.interlaced)
+						hardwareTarget.flags |= B_TIMING_INTERLACED;
+				}
+			}
 			if (hardwareTarget.h_display == target->timing.h_display
 					&& hardwareTarget.v_display == target->timing.v_display) {
 				// We are setting the native video mode, nothing special to do

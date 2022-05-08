@@ -128,15 +128,11 @@ arch_vm_supports_protection(uint32 protection)
 void
 arch_vm_unset_memory_type(VMArea *area)
 {
-	// TODO
 }
 
 
 status_t
 arch_vm_set_memory_type(VMArea *area, phys_addr_t physicalBase, uint32 type)
 {
-	if (type != 0)
-		dprintf("%s: undefined type %lx!\n", __PRETTY_FUNCTION__, type);
-
 	return B_OK;
 }

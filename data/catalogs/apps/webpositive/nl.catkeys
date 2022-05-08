@@ -20,8 +20,8 @@ Open containing folder	Download Window		Bijbehorende map openen
 Find previous	WebPositive Window		Vorige zoeken
 Full screen	WebPositive Window		Volledig scherm
 Downloads in progress	WebPositive		Actieve downloads
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Wilt u %addedCount bladwijzers tegelijkertijd openen?
 Copy URL to clipboard	Download Window		URL naar klembord kopiëren
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Wilt u %addedCount bladwijzers tegelijkertijd openen?
 Clone current page	Settings Window		Huidige pagina klonen
 Start page:	Settings Window		Startpagina:
 Cancel	Download Window		Annuleren
@@ -49,8 +49,8 @@ Decrease size	WebPositive Window		Grootte verkleinen
 Default fixed font size:	Settings Window		Standaardgrootte van proportioneel lettertype:
 Sans serif font:	Settings Window		Schreefloos lettertype:
 Clear	WebPositive Window		Wissen
-Cookies for %s	Cookie Manager		Cookies voor %s
 The download could not be opened.	Download Window		De download kan niet worden geöpend.
+Cookies for %s	Cookie Manager		Cookies voor %s
 Close	Download Window		Sluiten
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Zoek term
@@ -111,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Downloads hervatten
 Proxy server requires authentication	Settings Window		Proxyserver vereist authenticatie
 Cancel	Settings Window		Annuleren
-History	WebPositive Window		Geschiedenis
 Reset size	WebPositive Window		Grootte opnieuw instellen
+History	WebPositive Window		Geschiedenis
 Do you really want to clear the browsing history?	WebPositive Window		Wilt u echt de browsergeschiedenis wissen?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Naar de volgende plek met deze zoektermen gaan
 Fixed font:	Settings Window		Lettertype met vaste breedte:

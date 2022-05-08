@@ -125,6 +125,9 @@ Settings::UpdateFrom(BMessage* message)
 	if (message->FindRect("app_types_frame", &frame) == B_OK)
 		fMessage.ReplaceRect("app_types_frame", frame);
 
+	if (message->FindRect("app_type_frame", &frame) == B_OK)
+		fMessage.ReplaceRect("app_type_frame", frame);
+
 	bool showIcons;
 	if (message->FindBool("show_icons", &showIcons) == B_OK)
 		fMessage.ReplaceBool("show_icons", showIcons);
@@ -148,6 +151,7 @@ Settings::_SetDefaults()
 {
 	fMessage.AddRect("file_types_frame", BRect(80.0f, 80.0f, 600.0f, 480.0f));
 	fMessage.AddRect("app_types_frame", BRect(100.0f, 100.0f, 540.0f, 480.0f));
+	fMessage.AddRect("app_type_frame", BRect(100.0f, 110.0f, 250.0f, 340.0f));
 	fMessage.AddBool("show_icons", true);
 	fMessage.AddBool("show_rule", false);
 	fMessage.AddFloat("left_split_weight", 0.2);
@@ -248,10 +252,9 @@ FileTypes::RefsReceived(BMessage* message)
 		message->RemoveData("refs", --index);
 
 		// There are some refs left that want to be handled by the type window
-		BPoint point(100.0f + kCascadeOffset * fTypeWindowCount,
-			110.0f + kCascadeOffset * fTypeWindowCount);
+		BPoint totalOffset(kCascadeOffset * fTypeWindowCount, kCascadeOffset * fTypeWindowCount);
 
-		BWindow* window = new ApplicationTypeWindow(point, entry);
+		BWindow* window = new ApplicationTypeWindow(fSettings.Message(), totalOffset, entry);
 		window->Show();
 
 		fTypeWindowCount++;

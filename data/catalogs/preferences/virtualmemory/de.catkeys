@@ -7,9 +7,9 @@ Turn off	SettingsWindow		Ausschalten
 Changes will take effect upon reboot.	SettingsWindow		Änderungen werden erst nach einem Neustart aktiv.
 Revert	SettingsWindow		Anfangswerte
 Keep enabled	SettingsWindow		Aktiviert lassen
-The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Die Einträge in der  Einstellungsdatei sind ungültig. Die Anwendung kann beendet oder die Standardwerte geladen werden.
+The settings specified in the settings file are invalid. You can load the defaults or quit.	SettingsWindow		Die Einträge in der Einstellungsdatei sind ungültig. Die Anwendung kann beendet oder die Standardwerte geladen werden.
 VirtualMemory\n\twritten by Axel Dörfler\n\tCopyright 2005, Haiku.\n	VirtualMemoryApp		Virtueller Speicher\n\tvon Axel Dörfler\n\tCopyright 2005, Haiku.\n
-The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Das in der Einstellungsdatei angegebene Laufwerk wurd enicht gefunden. Die Anwendung kann beendet oder das Boot-Laufwerk verwendet werden.
+The volume specified in the settings file could not be found. You can use the boot volume or quit.	SettingsWindow		Das in der Einstellungsdatei angegebene Laufwerk wurden nicht gefunden. Die Anwendung kann beendet oder das Boot-Laufwerk verwendet werden.
 Current Swap:	SettingsWindow		Aktuelle Auslagerungsdatei:
 Load defaults	SettingsWindow		Standardwerte laden
 Use boot volume	SettingsWindow		Boot-Laufwerk verwenden

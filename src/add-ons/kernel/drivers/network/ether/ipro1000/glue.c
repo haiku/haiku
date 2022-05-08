@@ -18,12 +18,12 @@ NO_HAIKU_REENABLE_INTERRUPTS();
 
 
 status_t
-__haiku_handle_fbsd_drivers_list(status_t (*handler)(driver_t *[]))
+__haiku_handle_fbsd_drivers_list(status_t (*handler)(driver_t *[], driver_t *[]))
 {
 	driver_t *drivers[] = {
 		DRIVER_MODULE_NAME(em, pci),
 		DRIVER_MODULE_NAME(igb, pci),
 		NULL
 	};
-	return (*handler)(drivers);
+	return (*handler)(drivers, NULL);
 }

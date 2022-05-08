@@ -21,7 +21,7 @@ OK	MainWin		OK
 TV	MainWin		TV
 Settings	MainWin		Einstellungen
 TV	System name		TV
-Settings…	MainWin		Einstellungen...
+Settings…	MainWin		Einstellungen ...
 None	MainWin		Kein
 Error, interface is busy:\n\n	MainWin		Fehler, Hardware ist beschäftigt:\n\n
 pixel aspect ratio	MainWin		Pixel-Seitenverhältnis

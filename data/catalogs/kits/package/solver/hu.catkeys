@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libsolvsolver	3515443848
+1	hungarian	x-vnd.Haiku-libsolvsolver	3404387783
 allow architecture change of %source% to %target%	SolverProblemSolution		Architektúra váltás %source% -> %target% engedélyezése.
 install %source% from excluded repository	SolverProblemSolution		%source% telepítése a letiltott tárolóból
 unspecified problem	SolverProblem		meghatározatlan hiba
@@ -35,3 +35,4 @@ do not lock \"%selection%\"	SolverProblemSolution		\"%selection%\" zárolásána
 do not install \"%selection%\"	SolverProblemSolution		\"%selection%\" telepítésének mellőzése
 nothing provides %dependency% needed by %source%	SolverProblem		%source% előfeltéte (%dependency%) nem található
 %source% has inferior architecture	SolverProblem		%source% alacsonyabb architektúrával rendelkezik
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		ne távolítsa el az összes feloldható elemet: \"%selection%\"

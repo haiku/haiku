@@ -69,4 +69,6 @@
 #define R_SPARC_SIZE32		86
 #define R_SPARC_SIZE64		87
 
+#define TLS_DTV_OFFSET 0
+
 #endif	/* _KERNEL_ARCH_SPARC_ELF_H */

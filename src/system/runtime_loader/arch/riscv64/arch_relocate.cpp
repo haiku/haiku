@@ -58,10 +58,10 @@ relocate_rela(image_t* rootImage, image_t* image, Elf64_Rela* rel,
 			case R_RISCV_TLS_DTPMOD64:
 				relocValue = symbolImage == NULL
 							? image->dso_tls_id : symbolImage->dso_tls_id;
-				continue;
+				break;
 			case R_RISCV_TLS_DTPREL64:
 				relocValue = symAddr;
-				continue;
+				break;
 			default:
 				TRACE(("unhandled relocation type %d\n", type));
 				return B_BAD_DATA;

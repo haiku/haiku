@@ -1,4 +1,4 @@
-1	turkish	application/x-vnd.Cortex.support	2630173556
+1	turkish	application/x-vnd.Cortex.support	2097798758
 Header has flags	MediaString		Üstbilginin bayrakları var
 32 bit HLS	MediaString		32 bit HLS
 Recording	MediaString		Kayıt yapılıyor
@@ -31,6 +31,7 @@ Back-center	MediaString		Arka merkez
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bit tamsayı}}
 Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(bilinmeyen video biçimi)
+Video data between line %lu and %lu	MediaString		%lu ve %lu arasındaki video verisi
 AVI format family	MediaString		AVI biçimleri ailesi
 Homogenous buffers	MediaString		Homojen arabellekler
 Interlaced 	MediaString		Üst üste bindirilmiş 
@@ -42,7 +43,6 @@ YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Sağ
 32 bit RGB	MediaString		32 bit RGB
-Video data between line u and u	MediaString		u/u hattı arasındaki video verisi
 System mixer	MediaString		Sistem karıştırıcısı
 Physical output	MediaString		Fiziksel çıkış
 Top-Back-center	MediaString		Üst arka merkez

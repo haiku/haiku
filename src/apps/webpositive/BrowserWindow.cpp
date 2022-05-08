@@ -547,7 +547,9 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	fLoadingProgressBar = new BStatusBar("progress");
 	fLoadingProgressBar->SetMaxValue(100);
 	fLoadingProgressBar->Hide();
-	fLoadingProgressBar->SetBarHeight(12);
+	font_height height;
+	font.GetHeight(&height);
+	fLoadingProgressBar->SetBarHeight(height.ascent + height.descent);
 
 	const float kInsetSpacing = 3;
 	const float kElementSpacing = 5;
@@ -2493,7 +2495,7 @@ BrowserWindow::_VisitSearchEngine(const BString& search)
 
 	BString searchPrefix;
 	search.CopyCharsInto(searchPrefix, 0, 2);
-	
+
 	// Default search URL
 	BString engine(fSearchPageURL);
 
@@ -2505,7 +2507,7 @@ BrowserWindow::_VisitSearchEngine(const BString& search)
 			break;
 		}
 	}
-	
+
 	engine.ReplaceAll("%s", _EncodeURIComponent(searchQuery));
 	_VisitURL(engine);
 }

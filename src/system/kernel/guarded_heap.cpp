@@ -562,7 +562,7 @@ guarded_heap_realloc(void* address, size_t newSize)
 	if (oldSize == newSize)
 		return address;
 
-	void* newBlock = memalign(0, newSize);
+	void* newBlock = malloc(newSize);
 	if (newBlock == NULL)
 		return NULL;
 
@@ -974,7 +974,7 @@ realloc(void* address, size_t newSize)
 	}
 
 	if (address == NULL)
-		return memalign(0, newSize);
+		return malloc(newSize);
 
 	return guarded_heap_realloc(address, newSize);
 }

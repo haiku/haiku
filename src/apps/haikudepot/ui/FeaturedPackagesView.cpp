@@ -511,10 +511,7 @@ public:
 		float y, bool selected)
 	{
 		BString versionCreateTimestampPresentation
-			= B_TRANSLATE("%VersionCreateDate%");
-		versionCreateTimestampPresentation.ReplaceAll("%VersionCreateDate%",
-			LocaleUtils::TimestampToDateString(
-				pkg->VersionCreateTimestamp()));
+			= LocaleUtils::TimestampToDateString(pkg->VersionCreateTimestamp());
 		_DrawPackageGenericTextSlug(updateRect, pkg,
 			versionCreateTimestampPresentation, y,
 			Y_PROPORTION_CHRONOLOGICAL_DATA, selected);

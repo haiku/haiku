@@ -14,8 +14,8 @@
 
 
 #define SDHCI_PCI_SLOT_INFO 							0x40
-#define SDHCI_PCI_SLOTS(x) 								((( x >> 4) & 7))
-#define SDHCI_PCI_SLOT_INFO_FIRST_BASE_INDEX(x)			(( x ) & 7)
+#define SDHCI_PCI_SLOTS(x) 								((((x) >> 4) & 0x7) + 1)
+#define SDHCI_PCI_SLOT_INFO_FIRST_BASE_INDEX(x)			((x) & 0x7)
 
 // Ricoh specific PCI registers
 // Ricoh devices start in a vendor-specific mode but can be switched
@@ -159,9 +159,13 @@ class SoftwareReset {
 	public:
 		uint8_t Bits() { return fBits; }
 
-		void ResetAll() {
-			fBits |= 1;
-			while(fBits & 1);
+		bool ResetAll() {
+			fBits = 1;
+			int i = 0;
+			// wait up to 100ms
+			while ((fBits & 1) != 0 && i++ < 10)
+				snooze(10000);
+			return i < 10;
 		}
 
 		void ResetCommandLine() {
@@ -206,7 +210,7 @@ class Capabilities
 		static const uint8_t k1v8 = 4;
 
 	private:
-		const uint64_t fBits;
+		uint64_t fBits;
 } __attribute__((packed));
 
 

@@ -18,9 +18,9 @@ void XDROutPacketDestroy (struct XDROutPacket *packet);
 
 void XDROutPacketGrow (struct XDROutPacket *packet, size_t size);
 void XDROutPacketAddInt32 (struct XDROutPacket *packet, int32 val);
-void XDROutPacketAddDynamic (struct XDROutPacket *packet, const void *data, size_t size);
-void XDROutPacketAddFixed (struct XDROutPacket *packet, const void *data, size_t size);
-void XDROutPacketAddString (struct XDROutPacket *packet, const char *string);
+status_t XDROutPacketAddDynamic (struct XDROutPacket *packet, const void *data, size_t size);
+status_t XDROutPacketAddFixed (struct XDROutPacket *packet, const void *data, size_t size);
+status_t XDROutPacketAddString (struct XDROutPacket *packet, const char *string);
 void XDROutPacketAppend (struct XDROutPacket *me, const struct XDROutPacket *packet);
 
 const uint8 *XDROutPacketBuffer (struct XDROutPacket *packet);

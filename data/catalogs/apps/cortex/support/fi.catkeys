@@ -1,4 +1,4 @@
-1	finnish	application/x-vnd.Cortex.support	2630173556
+1	finnish	application/x-vnd.Cortex.support	2097798758
 Header has flags	MediaString		Otsakkeella on lippuja
 32 bit HLS	MediaString		32-bittinen HLS
 Recording	MediaString		Tallennetaan
@@ -31,6 +31,7 @@ Back-center	MediaString		Takakeskusta
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bittinen kokonaisluku}}
 Ambisonic WXYZ	MediaString		Ambisoninen WXYZ
 (unknown video format)	MediaString		(tuntematon videomuoto)
+Video data between line %lu and %lu	MediaString		Video-tietoja rivien %lu ja %lu välillä
 AVI format family	MediaString		AVI-muotoperhe
 Homogenous buffers	MediaString		Homogeeniset puskurit
 Interlaced 	MediaString		Lomitettuja 
@@ -42,7 +43,6 @@ YUV9	MediaString		YUV9
  Hz	MediaString		 Hz
 Right	MediaString		Oikea
 32 bit RGB	MediaString		32-bittinen RGB
-Video data between line u and u	MediaString		Videodata rivien u ja u välillä
 System mixer	MediaString		Järjestelmäsekoitin
 Physical output	MediaString		Fyysinen lähtö
 Top-Back-center	MediaString		Ylätaustakeskusta

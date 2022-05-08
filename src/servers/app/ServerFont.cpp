@@ -311,6 +311,11 @@ ServerFont::SetFace(uint16 face)
 	// FontStyle class takes care of mapping the font style name to the Be
 	// API face flags in FontStyle::_TranslateStyleToFace().
 
+	if (fStyle->PreservedFace(face) == face) {
+		fFace = face;
+		return B_OK;
+	}
+
 	BReference <FontStyle> style;
 	uint16 familyID = FamilyID();
 	if (gFontManager->Lock()) {

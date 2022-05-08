@@ -1,81 +1,86 @@
 /*
- * Copyright 2013 Haiku, Inc. All rights reserved.
+ * Copyright 2013-2022, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Paweł Dziepak, pdziepak@quarnos.org
+ *		Augustin Cavalier <waddlesplash>
  */
 #ifndef KERNEL_UTIL_BITMAP_H
 #define KERNEL_UTIL_BITMAP_H
 
 
-#include <debug.h>
+#ifdef _KERNEL_MODE
+#	include <debug.h>
+#else
+#	include <Debug.h>
+#endif
 
 #include <SupportDefs.h>
 
+namespace BKernel {
 
 class Bitmap {
 public:
-						Bitmap(int bitCount);
+						Bitmap(size_t bitCount);
 						~Bitmap();
 
-	inline	status_t	GetInitStatus();
+			status_t	InitCheck();
 
-	inline	bool		Get(int index) const;
-	inline	void		Set(int index);
-	inline	void		Clear(int index);
+			status_t	Resize(size_t bitCount);
+			void		Shift(ssize_t bitCount);
 
-			int			GetHighestSet() const;
+	inline	bool		Get(size_t index) const;
+	inline	void		Set(size_t index);
+	inline	void		Clear(size_t index);
+
+			ssize_t		GetHighestSet() const;
 
 private:
-			status_t	fInitStatus;
-
-			int			fElementsCount;
-			int			fSize;
+			size_t		fElementsCount;
+			size_t		fSize;
 			addr_t*		fBits;
 
-	static	const int	kBitsPerElement;
+	static	const int	kBitsPerElement = (sizeof(addr_t) * 8);
 };
 
 
-status_t
-Bitmap::GetInitStatus()
-{
-	return fInitStatus;
-}
-
-
 bool
-Bitmap::Get(int index) const
+Bitmap::Get(size_t index) const
 {
 	ASSERT(index < fSize);
 
-	const int kArrayElement = index / kBitsPerElement;
+	const size_t kArrayElement = index / kBitsPerElement;
 	const addr_t kBitMask = addr_t(1) << (index % kBitsPerElement);
 	return fBits[kArrayElement] & kBitMask;
 }
 
 
 void
-Bitmap::Set(int index)
+Bitmap::Set(size_t index)
 {
 	ASSERT(index < fSize);
 
-	const int kArrayElement = index / kBitsPerElement;
+	const size_t kArrayElement = index / kBitsPerElement;
 	const addr_t kBitMask = addr_t(1) << (index % kBitsPerElement);
 	fBits[kArrayElement] |= kBitMask;
 }
 
 
 void
-Bitmap::Clear(int index)
+Bitmap::Clear(size_t index)
 {
 	ASSERT(index < fSize);
 
-	const int kArrayElement = index / kBitsPerElement;
+	const size_t kArrayElement = index / kBitsPerElement;
 	const addr_t kBitMask = addr_t(1) << (index % kBitsPerElement);
 	fBits[kArrayElement] &= ~addr_t(kBitMask);
 }
+
+} // namespace BKernel
+
+
+using BKernel::Bitmap;
 
 
 #endif	// KERNEL_UTIL_BITMAP_H

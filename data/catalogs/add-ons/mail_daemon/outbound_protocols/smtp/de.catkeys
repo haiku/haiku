@@ -2,7 +2,7 @@
 POP3 authentication failed. The server said:\n	smtp		POP3-Authentifizierung fehlgeschlagen. Servermeldung:\n
 Destination:	ConfigView		Zielverzeichnis:
 Error while logging in to %serv	smtp		Fehler beim Anmelden an %serv
-Connecting to server…	smtp		Mit Server verbinden…
+Connecting to server…	smtp		Mit Server verbinden …
 Unencrypted	ConfigView		Unverschlüsselt
 . The server says:\n	smtp		. Servermeldung:\n
 Error while opening connection to %serv	smtp		Fehler beim Verbinden mit %serv

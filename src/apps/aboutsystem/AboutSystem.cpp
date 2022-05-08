@@ -1473,19 +1473,19 @@ AboutView::_AddCopyrightsFromAttribute()
 		return;
 
 	// attach it to a FILE
-	FILE* attrFile = fdopen(attrFD, "r");
-	if (attrFile == NULL) {
+	FileCloser attrFile(fdopen(attrFD, "r"));
+	if (!attrFile.IsSet()) {
 		close(attrFD);
 		return;
 	}
-	FileCloser _(attrFile);
 
 	// read and parse the copyrights
 	BMessage package;
 	BString fieldName;
 	BString fieldValue;
 	char lineBuffer[LINE_MAX];
-	while (char* line = fgets(lineBuffer, sizeof(lineBuffer), attrFile)) {
+	while (char* line
+		= fgets(lineBuffer, sizeof(lineBuffer), attrFile.Get())) {
 		// chop off line break
 		size_t lineLen = strlen(line);
 		if (lineLen > 0 && line[lineLen - 1] == '\n')

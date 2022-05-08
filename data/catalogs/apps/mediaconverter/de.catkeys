@@ -1,10 +1,9 @@
-1	german	x-vnd.Haiku-MediaConverter	2437569950
-Writing audio track: %d%% complete	MediaConverter		Schreibe Audiospur: %d%% fertig
+1	german	x-vnd.Haiku-MediaConverter	3002350450
 Input file not recognized as Audio or Video	MediaConverter		Eingabedatei nicht als Audio oder Video erkannt.
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2fBilder/s
 Video quality: %3d%%	MediaConverter		Videoqualität: %3d%%
 Source files	MediaConverter		Quelldateien
-Error writing video frame %ld	MediaConverter		Fehler beim Schreiben von Videoframe %ld
+Error writing video frame %lld	MediaConverter		Fehler beim Schreiben von Video-Frame %lld
 Error converting '%filename'	MediaConverter		Fehler beim Konvertieren von '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Der gewählte Ordner wurde nicht gefunden. Versuche /boot/home stattdessen.
 Conversion completed	MediaConverter		Konvertierung abgeschlossen
@@ -25,10 +24,10 @@ OK	MediaConverter		OK
 Error creating '%filename'	MediaConverter		Fehler beim Erstellen von '%filename'
 Error loading a file	MediaConverter		Fehler beim Laden einer Datei
 Encoder parameters	MediaConverter-EncoderWindow		Encoder-Parameter
-Open…	Menu		Öffnen…
+Open…	Menu		Öffnen …
 Audio encoding:	MediaConverter		Audiokodierung:
 Audio quality: %3d%%	MediaConverter		Tonqualität: %3d%%
-Cancelling…	MediaConverter		Abbruch…
+Cancelling…	MediaConverter		Wird abgebrochen …
 Output file '%filename' created	MediaConverter		Ausgabedatei '%filename' erstellt
 Output folder	MediaConverter		Ausgabeordner
 Error creating track.	MediaConverter		Fehler beim Erstellen der Spur.
@@ -43,24 +42,25 @@ Error loading files	MediaConverter		Fehler beim Laden der Dateien
 End   [ms]: 	MediaConverter		Ende [ms]:
 Cancel	MediaConverter		Abbrechen
 OK	MediaConverter-FileInfo		OK
-Error read audio frame %ld	MediaConverter		Fehler beim Lesen von Audioframe %ld
 Video encoding:	MediaConverter		Videokodierung:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Es ist ein Fehler beim Lesen der Dateiinformationen aufgetreten.\n\nFehler:
 Error	MediaConverter		Fehler
 File details	MediaConverter		Dateidetails
 No audio	Audio codecs list		Keine Tonspur
 Drop media files onto this window	MediaConverter		Mediadateien auf diesem Fenster fallen lassen.
+Writing video track: %ld%% complete	MediaConverter		Schreibe Videospur: %ld%% fertig
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# Bild} other{# Bilder}}
+Error read audio frame %lld	MediaConverter		Fehler beim Lesen von Audio-Frame %lld
 Quit	Menu		Beenden
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# Byte} other{# Bytes}}
 Duration:	MediaConverter-FileInfo		Dauer:
 Error launching: %strError%	MediaConverter		Fehler beim Start: %strError%
+Error writing audio frame %lld	MediaConverter		Fehler beim Schreiben von Audio-Frame %lld
+Writing audio track: %ld%% complete	MediaConverter		Schreibe Audiospur: %ld%% fertig
 File format:	MediaConverter		Dateiformat:
-Error writing audio frame %ld	MediaConverter		Fehler beim Schreiben von Audioframe %ld
 File	Menu		Datei
 Video quality not supported	MediaConverter		Videoqualität nicht einstellbar
 Select this folder	MediaConverter		Diesen Ordner wählen
-Error read video frame %ld	MediaConverter		Fehler beim Lesen von Videoframe %ld
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld Kanal
 %d bit 	MediaFileInfo		%d Bit
 No video	Video codecs list		Keine Videospur
@@ -68,6 +68,6 @@ Continue	MediaConverter		Fortsetzen
 Convert	MediaConverter		Konvertieren
 Audio quality not supported	MediaConverter		Tonqualität nicht einstellbar
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Fehler beim Schreiben nach %strPath%. Versuche /boot/home stattdessen.
-Writing video track: %d%% complete	MediaConverter		Schreibe Videospur: %d%% fertig
+Error read video frame %lld	MediaConverter		Fehler beim Lesen von Video-Frame %lld
 Preview	MediaConverter		Vorschau
 Start [ms]: 	MediaConverter		Anfang [ms]:

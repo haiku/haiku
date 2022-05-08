@@ -9,7 +9,7 @@ Right control	Keyboard Layout View		Sağ Ctrl
 X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Seçenek:
-Cancel	Modifier keys window		İptal
+Cancel	Modifier keys window		Vazgeç
 Sample and clipboard:	Keymap window		Örnek ve pano
 Polish	KeymapNames		Lehçe
 Latin-American	KeymapNames		Latin Amerika
@@ -22,9 +22,9 @@ Serbian (Cyrillic)	KeymapNames		Sırpça (Kiril)
 Belgian (point)	KeymapNames		Flamanca (nokta)
 Finnish	KeymapNames		Fince
 Num lock	Keyboard Layout View		Num lock
-Switch shortcut keys to Windows/Linux mode	Keymap window		Kısayol düğmelerini Windows/Linux kipine geçir
-Option	Keyboard Layout View	Option key	Alt
+Switch shortcut keys to Windows/Linux mode	Keymap window		Kestirme düğmelerini Windows/Linux kipine geçir
 Spanish (Dvorak)	KeymapNames		İspanyolca (Dvorak)
+Option	Keyboard Layout View	Option key	Alt
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		Birleşik Devletler-Uluslararası
 Right option	Keyboard Layout View		Sağ Alt
@@ -46,8 +46,8 @@ Apple Aluminium International	KeyboardLayoutNames		Apple Alüminyum Uluslararas�
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Win/Cmd düğmesi
 PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
-Apple Aluminum	KeyboardLayoutNames		Apple Alüminyum
 Spanish	KeymapNames		İspanyolca
+Apple Aluminum	KeyboardLayoutNames		Apple Alüminyum
 HOME	Keyboard Layout View		HOME
 COMMAND	Keyboard Layout View		COMMAND
 Ukrainian (Mac)	KeymapNames		Ukraynaca (Mac)
@@ -55,12 +55,12 @@ Command:	Modifier keys window	Command key role name	Komut:
 French (Bépo)	KeymapNames		Fransızca (Bépo)
 Russian (Typewriter)	KeymapNames		Rusça (Daktilo)
 Acute trigger	Keymap window		Aksan tetikleyicisi
-Italian	KeymapNames		İtalyanca
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s Uluslararası
+Italian	KeymapNames		İtalyanca
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan Uluslararası
 Apple Aluminum (US)	KeyboardLayoutNames		Apple Alüminyum (US)
 French (NF Z71-300)	KeymapNames		Fransızca (NF Z71-300)
-Modifier keys	Modifier keys window		Değiştiren düğmeler
+Modifier keys	Modifier keys window		Değiştiren Düğmeler
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 Uluslararası
 Kazakh	KeymapNames		Kazak
 Save as…	Keymap window		Farklı kaydet…
@@ -101,8 +101,8 @@ Left control	Keyboard Layout View		Sol Ctrl
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Role	Modifier keys window	As in the role of a modifier key	Rol
 Svorak	KeymapNames		Svorak
-German	KeymapNames		Almanca
 ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (US)
+German	KeymapNames		Almanca
 Swiss-German	KeymapNames		İsviçre Almancası
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl düğmesi
 Czech	KeymapNames		Çekçe
@@ -141,13 +141,13 @@ Keymap	System name		Klavye Dizilimi
 Slovene	KeymapNames		Slovence
 Lithuanian	KeymapNames		Litvanca
 Set modifier keys…	Keymap window		Değiştiren düğmeleri ayarla…
-Switch shortcut keys to Haiku mode	Keymap window		Kısayol düğmelerini Haiku kipine geçir
+Switch shortcut keys to Haiku mode	Keymap window		Kestirme düğmelerini Haiku kipine geçir
 Defaults	Keymap window		Öntanımlılar
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Sistem:
 ThinkPad International	KeyboardLayoutNames		ThinkPad Uluslararası
 Apple Aluminum Extended (US)	KeyboardLayoutNames		Apple Alüminyum Genişletilmiş (US)
-Switch shortcut keys	Keymap window		Kısayol düğmelerini değiştir
+Switch shortcut keys	Keymap window		Kestirme düğmelerini değiştir
 Right command	Keyboard Layout View		Sağ Command
 NUM LOCK	Keyboard Layout View		NUM LOCK
 MENU	Keyboard Layout View		MENU
@@ -157,8 +157,8 @@ Font	Keymap window		Yazıtipi
 Danish	KeymapNames		Danca
 Generic 104-key	KeyboardLayoutNames		Standart 104 düğmeli
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift düğmesi
-PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		Rusça
+PAUSE	Keyboard Layout View		PAUSE
 TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Romence
 CMD	Keyboard Layout View	Very short for 'command'	CMD

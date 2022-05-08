@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-CharacterMap	2410613018
+1	ukrainian	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Тірхута
 Miscellaneous mathematical symbols B	UnicodeBlocks		Різні математичні символи В
 Latin extended E	UnicodeBlocks		Розширена латиниця E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		Уніфіковані ієр�
 Ancient Greek musical notation	UnicodeBlocks		Давньогрецький нотний запис
 Thai	UnicodeBlocks		Тайська
 Ethiopic supplement	UnicodeBlocks		Ефіопські додатки
+Only show blocks contained in font	CharacterWindow		Відображати лише блоки, які містяться у шрифті
 Chess symbols	UnicodeBlocks		Шахматні символи
 Yijing hexagram symbols	UnicodeBlocks		Гексаграми Іцзін
 Ottoman Siyaq numbers	UnicodeBlocks		Османська (числа)

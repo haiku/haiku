@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Terminal	4032760800
+1	danish	x-vnd.Haiku-Terminal	2062206461
 ANSI cyan color	Terminal AppearancePrefView		ANSI cyan farve
 Close other tabs	Terminal TermWindow		Luk andre faneblade
 Insert path	Terminal TermView		Indsæt sti
@@ -122,7 +122,6 @@ No search string was entered.	Terminal TermWindow		Ingen søgestreng blev indfø
 Text under cursor	Terminal AppearancePrefView		Tekst under markør
 Move here	Terminal TermView		Flyt hertil
 Abort	Terminal Shell		Afbryd
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDen nuværende arbejdsmappe for den aktive proces.\n\t\t\tDet maksimale antal stikomponenter kan valgfrit angives.\n\t\t\tF.eks. '%2d' for højst to komponenter.\n\t%i\t-\tIndekset på fanebladet.\n\t%e\t-\tKodningen på det nuværende faneblad. Vises ikke ved UTF-8.\n\t%p\t-\tNavnet på den aktive proces.\n\t%%\t-\tTegnet '%'.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Følgende processer kører stadig:\n\n\t%1\n\nHvis du lukker terminalen, vil processen blive dræbt.
 Set window title	Terminal TermWindow		Sæt vinduestitel
 Increase	Terminal TermWindow		Større

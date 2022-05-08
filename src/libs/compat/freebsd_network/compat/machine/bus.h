@@ -12,6 +12,8 @@
 
 #if defined(__i386__) || defined(__amd64__)
 #  include <machine/x86/bus.h>
+#elif (defined(__riscv) && __riscv_xlen == 64)
+#  include <machine/generic/bus.h>
 #else
 #  error Need a bus.h for this arch!
 #endif

@@ -529,8 +529,13 @@ resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 	void* location = NULL;
 	if (sharedSym == NULL) {
 		// symbol not found at all
-		lookupError = ERROR_NO_SYMBOL;
-		sharedImage = NULL;
+		if (sym->Bind() == STB_WEAK) {
+			// weak symbol: treat as NULL
+			location = sharedImage = NULL;
+		} else {
+			lookupError = ERROR_NO_SYMBOL;
+			sharedImage = NULL;
+		}
 	} else if (sym->Type() != STT_NOTYPE
 		&& sym->Type() != sharedSym->Type()) {
 		// symbol not of the requested type
@@ -556,7 +561,7 @@ resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 			&location, &type);
 	}
 
-	if (location == NULL && lookupError != SUCCESS) {
+	if (type == 0 || (location == NULL && sym->Bind() != STB_WEAK && lookupError != SUCCESS)) {
 		switch (lookupError) {
 			case ERROR_NO_SYMBOL:
 				FATAL("%s: Could not resolve symbol '%s'\n",

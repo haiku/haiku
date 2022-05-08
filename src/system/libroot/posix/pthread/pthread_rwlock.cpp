@@ -63,16 +63,15 @@ struct SharedRWLock {
 		return delete_sem(sem) == B_OK ? B_OK : B_BAD_VALUE;
 	}
 
-	status_t ReadLock(bigtime_t timeout)
+	status_t ReadLock(uint32 flags, bigtime_t timeout)
 	{
-		return acquire_sem_etc(sem, 1,
-			timeout >= 0 ? B_ABSOLUTE_REAL_TIME_TIMEOUT : 0, timeout);
+		return acquire_sem_etc(sem, 1, flags, timeout);
 	}
 
-	status_t WriteLock(bigtime_t timeout)
+	status_t WriteLock(uint32 flags, bigtime_t timeout)
 	{
 		status_t error = acquire_sem_etc(sem, MAX_READER_COUNT,
-			timeout >= 0 ? B_ABSOLUTE_REAL_TIME_TIMEOUT : 0, timeout);
+			flags, timeout);
 		if (error == B_OK)
 			owner = find_thread(NULL);
 		return error;
@@ -148,7 +147,7 @@ struct LocalRWLock {
 			_kern_mutex_unlock((int32*)&mutex, 0);
 	}
 
-	status_t ReadLock(bigtime_t timeout)
+	status_t ReadLock(uint32 flags, bigtime_t timeout)
 	{
 		Locker locker(this);
 
@@ -157,10 +156,10 @@ struct LocalRWLock {
 			return B_OK;
 		}
 
-		return _Wait(false, timeout);
+		return _Wait(false, flags, timeout);
 	}
 
-	status_t WriteLock(bigtime_t timeout)
+	status_t WriteLock(uint32 flags, bigtime_t timeout)
 	{
 		Locker locker(this);
 
@@ -170,7 +169,7 @@ struct LocalRWLock {
 			return B_OK;
 		}
 
-		return _Wait(true, timeout);
+		return _Wait(true, flags, timeout);
 	}
 
 	status_t Unlock()
@@ -189,7 +188,7 @@ struct LocalRWLock {
 	}
 
 private:
-	status_t _Wait(bool writer, bigtime_t timeout)
+	status_t _Wait(bool writer, uint32 flags, bigtime_t timeout)
 	{
 		if (timeout == 0)
 			return B_TIMED_OUT;
@@ -203,8 +202,7 @@ private:
 			writer_count++;
 
 		StructureUnlock();
-		status_t error = _kern_block_thread(
-			timeout >= 0 ? B_ABSOLUTE_REAL_TIME_TIMEOUT : 0, timeout);
+		status_t error = _kern_block_thread(flags, timeout);
 		StructureLock();
 
 		if (!waiter.queued)
@@ -323,9 +321,9 @@ int
 pthread_rwlock_rdlock(pthread_rwlock_t* lock)
 {
 	if ((lock->flags & RWLOCK_FLAG_SHARED) != 0)
-		return ((SharedRWLock*)lock)->ReadLock(B_INFINITE_TIMEOUT);
+		return ((SharedRWLock*)lock)->ReadLock(0, B_INFINITE_TIMEOUT);
 	else
-		return ((LocalRWLock*)lock)->ReadLock(B_INFINITE_TIMEOUT);
+		return ((LocalRWLock*)lock)->ReadLock(0, B_INFINITE_TIMEOUT);
 }
 
 
@@ -334,27 +332,49 @@ pthread_rwlock_tryrdlock(pthread_rwlock_t* lock)
 {
 	status_t error;
 	if ((lock->flags & RWLOCK_FLAG_SHARED) != 0)
-		error = ((SharedRWLock*)lock)->ReadLock(0);
+		error = ((SharedRWLock*)lock)->ReadLock(B_ABSOLUTE_REAL_TIME_TIMEOUT, 0);
 	else
-		error = ((LocalRWLock*)lock)->ReadLock(0);
+		error = ((LocalRWLock*)lock)->ReadLock(B_ABSOLUTE_REAL_TIME_TIMEOUT, 0);
 
 	return error == B_TIMED_OUT ? EBUSY : error;
 }
 
 
-int pthread_rwlock_timedrdlock(pthread_rwlock_t* lock,
-	const struct timespec *timeout)
+int
+pthread_rwlock_clockrdlock(pthread_rwlock_t* lock, clockid_t clock_id,
+            const struct timespec *abstime)
 {
-	bigtime_t timeoutMicros = timeout->tv_sec * 1000000LL
-		+ timeout->tv_nsec / 1000LL;
+	bigtime_t timeout = abstime->tv_sec * 1000000LL
+		+ abstime->tv_nsec / 1000LL;
+	uint32 flags = 0;
+	if (timeout >= 0) {
+		switch (clock_id) {
+			case CLOCK_REALTIME:
+				flags = B_ABSOLUTE_REAL_TIME_TIMEOUT;
+				break;
+			case CLOCK_MONOTONIC:
+				flags = B_ABSOLUTE_TIMEOUT;
+				break;
+			default:
+				return EINVAL;
+		}
+	}
 
 	status_t error;
 	if ((lock->flags & RWLOCK_FLAG_SHARED) != 0)
-		error = ((SharedRWLock*)lock)->ReadLock(timeoutMicros);
+		error = ((SharedRWLock*)lock)->ReadLock(flags, timeout);
 	else
-		error = ((LocalRWLock*)lock)->ReadLock(timeoutMicros);
+		error = ((LocalRWLock*)lock)->ReadLock(flags, timeout);
 
 	return error == B_TIMED_OUT ? EBUSY : error;
+}
+
+
+int
+pthread_rwlock_timedrdlock(pthread_rwlock_t* lock,
+	const struct timespec *abstime)
+{
+	return pthread_rwlock_clockrdlock(lock, CLOCK_REALTIME, abstime);
 }
 
 
@@ -362,9 +382,9 @@ int
 pthread_rwlock_wrlock(pthread_rwlock_t* lock)
 {
 	if ((lock->flags & RWLOCK_FLAG_SHARED) != 0)
-		return ((SharedRWLock*)lock)->WriteLock(B_INFINITE_TIMEOUT);
+		return ((SharedRWLock*)lock)->WriteLock(0, B_INFINITE_TIMEOUT);
 	else
-		return ((LocalRWLock*)lock)->WriteLock(B_INFINITE_TIMEOUT);
+		return ((LocalRWLock*)lock)->WriteLock(0, B_INFINITE_TIMEOUT);
 }
 
 
@@ -373,9 +393,39 @@ pthread_rwlock_trywrlock(pthread_rwlock_t* lock)
 {
 	status_t error;
 	if ((lock->flags & RWLOCK_FLAG_SHARED) != 0)
-		error = ((SharedRWLock*)lock)->WriteLock(0);
+		error = ((SharedRWLock*)lock)->WriteLock(B_ABSOLUTE_REAL_TIME_TIMEOUT, 0);
 	else
-		error = ((LocalRWLock*)lock)->WriteLock(0);
+		error = ((LocalRWLock*)lock)->WriteLock(B_ABSOLUTE_REAL_TIME_TIMEOUT, 0);
+
+	return error == B_TIMED_OUT ? EBUSY : error;
+}
+
+
+int
+pthread_rwlock_clockwrlock (pthread_rwlock_t* lock, clockid_t clock_id,
+	const struct timespec *abstime)
+{
+	bigtime_t timeout = abstime->tv_sec * 1000000LL
+		+ abstime->tv_nsec / 1000LL;
+	uint32 flags = 0;
+	if (timeout >= 0) {
+		switch (clock_id) {
+			case CLOCK_REALTIME:
+				flags = B_ABSOLUTE_REAL_TIME_TIMEOUT;
+				break;
+			case CLOCK_MONOTONIC:
+				flags = B_ABSOLUTE_TIMEOUT;
+				break;
+			default:
+				return EINVAL;
+		}
+	}
+
+	status_t error;
+	if ((lock->flags & RWLOCK_FLAG_SHARED) != 0)
+		error = ((SharedRWLock*)lock)->WriteLock(flags, timeout);
+	else
+		error = ((LocalRWLock*)lock)->WriteLock(flags, timeout);
 
 	return error == B_TIMED_OUT ? EBUSY : error;
 }
@@ -383,18 +433,9 @@ pthread_rwlock_trywrlock(pthread_rwlock_t* lock)
 
 int
 pthread_rwlock_timedwrlock(pthread_rwlock_t* lock,
-	const struct timespec *timeout)
+	const struct timespec *abstime)
 {
-	bigtime_t timeoutMicros = timeout->tv_sec * 1000000LL
-		+ timeout->tv_nsec / 1000LL;
-
-	status_t error;
-	if ((lock->flags & RWLOCK_FLAG_SHARED) != 0)
-		error = ((SharedRWLock*)lock)->WriteLock(timeoutMicros);
-	else
-		error = ((LocalRWLock*)lock)->WriteLock(timeoutMicros);
-
-	return error == B_TIMED_OUT ? EBUSY : error;
+	return pthread_rwlock_clockwrlock(lock, CLOCK_REALTIME, abstime);
 }
 
 

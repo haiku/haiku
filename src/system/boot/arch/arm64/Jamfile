@@ -4,6 +4,16 @@ local platform ;
 
 local kernelArchSources =
 	arch_elf.cpp
+	arch_uart_linflex.cpp
+;
+
+local kernelArchReusableSources =
+	arch_uart_pl011.cpp
+;
+
+local kernelGenericDriverSources =
+	debug_uart.cpp
+	debug_uart_8250.cpp
 ;
 
 kernelLibGenericSources =
@@ -23,16 +33,23 @@ for platform in [ MultiBootSubDirSetup efi ] {
 
 
 		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
+			$(kernelGenericDriverSources)
 			$(kernelArchSources)
+			$(kernelArchReusableSources)
 			$(kernelLibArchSources)
 			$(kernelLibGenericSources)
 			$(librootOsArchSources)
+
 			arch_cpu.cpp
 			: # additional flags
 		;
 
+		SEARCH on [ FGristFiles $(kernelGenericDriverSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
 		SEARCH on [ FGristFiles $(kernelArchSources) ]
-			= [ FDirName $(HAIKU_TOP) src system kernel arch arm64 ] ;
+			= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;
+		SEARCH on [ FGristFiles $(kernelArchReusableSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel arch arm ] ;
 		SEARCH on [ FGristFiles $(kernelLibGenericSources) ]
 			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch generic ] ;
 		SEARCH on [ FGristFiles $(kernelLibArchSources) ]

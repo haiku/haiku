@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
- * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -550,19 +550,24 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 
 		BString packageName;
 		BString webAppRepositoryCode;
+		BString webAppRepositorySourceCode;
+
 		{
 			BAutolock locker(&fLock);
 			packageName = package->Name();
 			const DepotInfo* depot = DepotForName(package->DepotName());
 
-			if (depot != NULL)
+			if (depot != NULL) {
 				webAppRepositoryCode = depot->WebAppRepositoryCode();
+				webAppRepositorySourceCode
+					= depot->WebAppRepositorySourceCode();
+			}
 		}
 
 		status_t status = fWebAppInterface
 			.RetreiveUserRatingsForPackageForDisplay(packageName,
-				webAppRepositoryCode, 0, PACKAGE_INFO_MAX_USER_RATINGS,
-				info);
+				webAppRepositoryCode, webAppRepositorySourceCode, 0,
+				PACKAGE_INFO_MAX_USER_RATINGS, info);
 		if (status == B_OK) {
 			// Parse message
 			BMessage result;

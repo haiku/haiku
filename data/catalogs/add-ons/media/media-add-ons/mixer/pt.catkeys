@@ -1,27 +1,24 @@
-1	portuguese	x-vnd.Haiku-mixer.media_addon	3450667169
-Input gain controls represent	AudioMixer		Controles de ganho de entrada representam
-Linear interpolation	AudioMixer		Interpolação linear
-Virtual output channels	AudioMixer		Canais de saída virtuais
-Refuse output format changes	AudioMixer		Recusar alterações do formato de saída
-Output mapping	AudioMixer		Mapeamento de saída
-Allow input channel remapping	AudioMixer		Permitir re-mapeamento do canal de entrada
-Resampling algorithm	AudioMixer		Algoritmo de reamostragem
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Atenuar a saída do misturador em 3dB (como no BeOS R5)
-Display balance control for stereo connections	AudioMixer		Mostrar ajuste de equilíbrio para ligações estéreo
+1	portuguese	x-vnd.Haiku-mixer.media_addon	275473112
+Input mapping	AudioMixer		Mapeamento de entrada
+High quality (linear interpolation)	AudioMixer		Alta qualidade (interpolação linear)
 To output	AudioMixer		Para a saída
+Gain	AudioMixer		Ganho
+To master	AudioMixer		Para master
 not connected	AudioMixer		não ligado
-Refuse input format changes	AudioMixer		Recusar alterações do formato de entrada
-Drop/repeat samples	AudioMixer		Descartar/repetir amostras
-Output channel sources	AudioMixer		Origens de canal de saída
+Master output	AudioMixer		Saída master
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Controlos de ganho
-Input mapping	AudioMixer		Mapeamento de entrada
-Mute	AudioMixer		Silenciar
-Input channel destinations	AudioMixer		Destinos de canal de entrada
-To master	AudioMixer		Para master
-Master output	AudioMixer		Saída master
+Low quality (drop/repeat samples)	AudioMixer		Baixa qualidade (descartar/repetir amostras)
+Output channel sources	AudioMixer		Origens de canal de saída
+Allow input channel remapping	AudioMixer		Permitir re-mapeamento do canal de entrada
+Display balance control for stereo connections	AudioMixer		Mostrar ajuste de equilíbrio para ligações estéreo
 Setup	AudioMixer		Configurar
-Use non linear gain sliders (like BeOS R5)	AudioMixer		Usar controlo deslizante de ganho não linear (como no BeOS R5)
-Gain	AudioMixer		Ganho
-Allow output channel remapping	AudioMixer		Permitir re-mapeamento do canal de saída
 Physical input channels	AudioMixer		Canais de entrada físicos
+Input channel destinations	AudioMixer		Destinos de canal de entrada
+Resampling algorithm:	AudioMixer		Algoritmo de reamostragem:
+Mute	AudioMixer		Silenciar
+Output mapping	AudioMixer		Mapeamento de saída
+Virtual output channels	AudioMixer		Canais de saída virtuais
+Allow output channel remapping	AudioMixer		Permitir re-mapeamento do canal de saída
+Input gain controls represent:	AudioMixer		Controlos de ganho de entrada representam:
+Attenuate mixer output by 3 dB	AudioMixer		Atenuar saída do misturador em 3 dB

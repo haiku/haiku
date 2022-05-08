@@ -20,7 +20,7 @@ Partition size	CreateParametersPanel		Partitionsgröße
 Validation of the given parameters failed.	MainWindow		Die Überprüfung der angegebenen Parameter ist fehlgeschlagen.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
 Mounted at	PartitionList		Eingehangen als
-Create…	MainWindow		Anlegen…
+Create…	MainWindow		Anlegen …
 Write changes	MainWindow		Änderungen schreiben
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen. Der Datenträger blieb unverändert.
 Validation of the given creation parameters failed.	MainWindow		Die Überprüfung der zum Anlegen angegebenen Parameter ist fehlgeschlagen.
@@ -35,7 +35,7 @@ There's no space on the partition where a child partition could be created.	Main
 No disk devices have been recognized.	DiskView		Es wurden keine Datenträger erkannt.
 Attributes	PartitionList		Attribute
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Das Löschen der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
-Change parameters…	MainWindow		Parameter ändern…
+Change parameters…	MainWindow		Parameter ändern …
 Format	InitializeParametersPanel		Formatieren
 Could not unmount partition	MainWindow		Partition konnte nicht ausgehangen werden.
 Create	CreateParametersPanel		Anlegen

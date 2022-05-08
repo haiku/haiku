@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Terminal	4032760800
+1	spanish; castilian	x-vnd.Haiku-Terminal	2062206461
 ANSI cyan color	Terminal AppearancePrefView		Color ANSI cian
 Close other tabs	Terminal TermWindow		Cerrar otras pestañas
 Insert path	Terminal TermView		Insertar la ruta de acceso
@@ -122,7 +122,6 @@ No search string was entered.	Terminal TermWindow		No se ha especificado la cade
 Text under cursor	Terminal AppearancePrefView		Texto bajo el cursor
 Move here	Terminal TermView		Mover aquí
 Abort	Terminal Shell		Interrumpir
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tEl directorio de trabajo del proceso activo.\n\t\t\tOpcionalmente, la cantidad máxima de componentes de la ruta pueden ser\n\t\t\tespecificadas. Por ej. '%2d' para un máximo de dos componentes.\n\t%i\t-\tEl índice de la pestaña.\n\t%e\t-\tLa codificación de la pestaña actual. No se muestra para UTF-8.\n\t%p\t-\tEl nombre del proceso activo.\n\t%%\t-\tEl carácter '%'.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Los siguientes procesos están activos:\n\n\t%1\n\nSi cierra la Terminal, los procesos finalizarán
 Set window title	Terminal TermWindow		Fijar el título de la ventana
 Increase	Terminal TermWindow		Aumentar

@@ -1,19 +1,20 @@
-1	italian	x-vnd.Haiku-Network	3062143965
+1	italian	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Dispositivo Ethernet
-Link speed:	IntefaceView		Velocità collegamento:
+Link speed:	IntefaceView		Velocità connessione:
 disconnected	IntefaceView		disconnesso
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Rete:
 Received:	IntefaceView		Ricevuti:
 New…	NetworkWindow		Nuovo...
-no link	InterfaceListItem		nessun collegamento
+no link	InterfaceListItem		nessuna connessione
 Other	NetworkWindow		Altro
 Sent:	IntefaceView		Inviati:
 Gateway:	IntefaceAddressView		Gateway:
 The netmask defines your local network	IntefaceAddressView		La maschera di rete definisce la tua rete locale
 Your IP address	IntefaceAddressView		Il tuo indirizzo IP
 DHCP	IntefaceAddressView		DHCP
-Netmask:	IntefaceAddressView		Netmask:
+IP address:	IntefaceAddressView		Indirizzo IP:
+Netmask:	IntefaceAddressView		Maschera di Rete:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servizi
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installazione di Stato Rete nella Deskbar fallita: %s
@@ -30,7 +31,7 @@ Show network status in Deskbar	NetworkWindow		Mostra lo stato della rete sulla D
 Mode:	IntefaceAddressView		Modalità:
 connected	InterfaceListItem		connesso
 OK	NetworkWindow		OK
-Static	IntefaceAddressView		Statico
+Static	IntefaceAddressView		Statica
 launch error	NetworkWindow		Errore di avvio
 Renegotiate	IntefaceView		Rinegoziare
 MAC address:	IntefaceView		Indirizzo MAC:
@@ -40,12 +41,12 @@ Dial-up connection	InterfaceListItem		Connessione Dial-up
 on	ServiceListItem		attivato
 The method for obtaining an IP address	IntefaceAddressView		Modalità di assegnazione indirizzo IP
 disconnected	InterfaceListItem		disconnesso
-Automatic	IntefaceAddressView		Automatico
+Automatic	IntefaceAddressView		Automatica
 Choose automatically	IntefaceView		Scegli automaticamente
 Status:	IntefaceView		Stato:
 Disable	IntefaceView		Disabilita
 Manage…	NetworkWindow		Gestisci…
-open	Open network		apri
+open	Open network		Aperta
 Network	System name		Rete
 Your gateway to the internet	IntefaceAddressView		Il tuo gateway su internet
 Enable	ServiceView		Abilita

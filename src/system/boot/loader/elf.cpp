@@ -86,13 +86,24 @@ struct ELF32Class {
 			return status;
 
 		*_mappedAddress = (void*)*_address;
+
+		addr_t res;
+		platform_bootloader_address_to_kernel_address((void*)*_address, &res);
+
+		*_address = res;
+
 		return B_OK;
 	}
 
 	static inline void*
 	Map(AddrType address)
 	{
-		return (void*)address;
+		void *result = NULL;
+		if (platform_kernel_address_to_bootloader_address(address, &result) != B_OK) {
+			panic("Couldn't convert address 0x%08x", (uint32_t)address);
+		}
+
+		return result;
 	}
 };
 
@@ -121,7 +132,7 @@ struct ELF64Class {
 	{
 #if defined(_BOOT_PLATFORM_BIOS)
 		// Assume the real 64-bit base address is KERNEL_LOAD_BASE_64_BIT and
-		// the mappings in the loader address space are at KERNEL_LOAD_BASE.
+		// the mappings in the loader address space are at KERNEL_LOAD_BASE_32_BIT.
 
 		void* address = (void*)(addr_t)(*_address & 0xffffffff);
 #else
@@ -135,8 +146,7 @@ struct ELF64Class {
 
 		*_mappedAddress = address;
 #if defined(_BOOT_PLATFORM_BIOS)
-		*_address = (AddrType)(addr_t)address + KERNEL_LOAD_BASE_64_BIT
-			- KERNEL_LOAD_BASE;
+		*_address = (AddrType)(addr_t)address + KERNEL_FIXUP_FOR_LONG_MODE;
 #else
 		platform_bootloader_address_to_kernel_address(address, _address);
 #endif
@@ -147,8 +157,7 @@ struct ELF64Class {
 	Map(AddrType address)
 	{
 #ifdef _BOOT_PLATFORM_BIOS
-		return (void*)(addr_t)(address - KERNEL_LOAD_BASE_64_BIT
-			+ KERNEL_LOAD_BASE);
+		return (void*)(addr_t)(address - KERNEL_FIXUP_FOR_LONG_MODE);
 #else
 		void *result;
 		if (platform_kernel_address_to_bootloader_address(address, &result) != B_OK) {
@@ -743,6 +752,20 @@ boot_elf_resolve_symbol(preloaded_elf32_image* image, Elf32_Sym* symbol,
 	Elf32_Addr* symbolAddress)
 {
 	return ELF32Loader::Resolve(image, symbol, symbolAddress);
+}
+
+Elf32_Addr
+boot_elf32_get_relocation(Elf32_Addr resolveAddress)
+{
+	Elf32_Addr* src = (Elf32_Addr*)ELF32Class::Map(resolveAddress);
+	return *src;
+}
+
+void
+boot_elf32_set_relocation(Elf32_Addr resolveAddress, Elf32_Addr finalAddress)
+{
+	Elf32_Addr* dest = (Elf32_Addr*)ELF32Class::Map(resolveAddress);
+	*dest = finalAddress;
 }
 #endif
 

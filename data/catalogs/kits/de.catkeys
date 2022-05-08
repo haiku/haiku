@@ -27,7 +27,7 @@ Paste	TextView		Einfügen
 OK	AboutWindow		OK
 {0, plural, one{# byte/s} other{# bytes/s}}	StringForRate		{0, plural, one{# Byte/s} other{# Bytes/s}}
 Special Thanks:	AboutWindow		Besonderen Dank an:
-Default Haiku window decorator.	Default decorator about box		Standard Haiku Fenster Dekorator.
+Default Haiku window decorator.	Default decorator about box		Standard-Dekorator aller Fenster
 %.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		Replikant entfernen
 Version	AboutWindow		Version
@@ -40,7 +40,7 @@ alpha	AboutWindow		Alpha
 %3.2f MiB/s	StringForRate		%3.2f MiB/s
 Error	PrintJob		Fehler
 About %app%	AboutWindow		Über %app%
-About %app…	Dragger		Über %app...
+About %app…	Dragger		Über %app ...
 Version history:	AboutWindow		Historie:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Das Ursprungsprogramm für den Replikanten konnte nicht gefunden werden, da keine Programm-Signatur zur Verfügung steht.\n%error
 %3.2f KiB	StringForSize		%3.2f KiB

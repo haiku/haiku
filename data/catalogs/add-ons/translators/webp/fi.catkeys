@@ -1,25 +1,25 @@
 1	finnish	x-vnd.Haiku-WebPTranslator	828165164
-©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
-Compression method:	ConfigView		Tiivistysmenetelmä:
-WebP image translator	ConfigView		WebP-kuvamuunnin
-Preset	ConfigView		Esiasetus
-WebP images	WebPTranslator		WebP-kuvat
-WebPTranslator Settings	ConfigView		WebP-muunninasetukset
-Output quality:	ConfigView		Tulostuslaatu:
-©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
-WebP Settings	main		WebP-asetukset
-Text	ConfigView		Teksti
-Slower but better	ConfigView		Hitaampi mutta parempi
-WebP image	WebPTranslator		WebP-kuva
-Output preset:	ConfigView		Tuloste-esiasetus
-Picture	ConfigView		Kuva
-Low	ConfigView		Alhainen
 High	ConfigView		Korkea
-Drawing	ConfigView		Piirros
-Based on libwebp %version%	ConfigView		Perustuu libwebp-versioon %version%
-Default	ConfigView		Oletus
-Fast	ConfigView		Nopea
+WebPTranslator Settings	ConfigView		WebPTranslator-asetukset
+Low	ConfigView		Alhainen
+WebP image translator	ConfigView		WebP-kuvamuunnin
 Photo	ConfigView		Valokuva
-Preprocessing filter	ConfigView		Esikäsittelysuodatin
 WebP image translator	WebPTranslator		WebP-kuvamuunnin
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Picture	ConfigView		Kuva
+Default	ConfigView		Oletus
+Text	ConfigView		Teksti
+Preprocessing filter	ConfigView		Esiprosessointisuodatin
+Compression method:	ConfigView		Kompressointimenetelmä:
+Preset	ConfigView		Esiasetus
+Drawing	ConfigView		Piirros
+Output preset:	ConfigView		Lähtöesiasetus:
+WebP Settings	main		WebP-asetukset
 Icon	ConfigView		Kuvake
+WebP image	WebPTranslator		WebP-kuva
+Output quality:	ConfigView		Lähtölaatu:
+Slower but better	ConfigView		Hitaampi, mutta parempi
+Based on libwebp %version%	ConfigView		Perustuu libwebp-versioon %version%
+Fast	ConfigView		Nopea
+WebP images	WebPTranslator		WebP-kuvat

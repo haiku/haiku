@@ -235,7 +235,7 @@ static void scsi_unblock_bus_int( scsi_bus_info *bus, bool by_SIM )
 	
 	SHOW_FLOW0( 3, "" );
 
-	ACQUIRE_BEN( &bus->mutex );
+	mutex_lock( &bus->mutex );
 	
 	was_servicable = scsi_can_service_bus( bus );
 
@@ -243,7 +243,7 @@ static void scsi_unblock_bus_int( scsi_bus_info *bus, bool by_SIM )
 	
 	start_retry = !was_servicable && scsi_can_service_bus( bus );
 
-	RELEASE_BEN( &bus->mutex );
+	mutex_unlock( &bus->mutex );
 	
 	if( start_retry )
 		release_sem( bus->start_service );
@@ -265,7 +265,7 @@ static void scsi_unblock_device_int( scsi_device_info *device, bool by_SIM )
 	
 	SHOW_FLOW0( 3, "" );
 	
-	ACQUIRE_BEN( &bus->mutex );
+	mutex_lock( &bus->mutex );
 	
 	was_servicable = scsi_can_service_bus( bus );
 
@@ -277,7 +277,7 @@ static void scsi_unblock_device_int( scsi_device_info *device, bool by_SIM )
 	
 	start_retry = !was_servicable && scsi_can_service_bus( bus );
 
-	RELEASE_BEN( &bus->mutex );
+	mutex_unlock( &bus->mutex );
 	
 	if( start_retry )
 		release_sem( bus->start_service );
@@ -298,7 +298,7 @@ void scsi_cont_send_bus( scsi_bus_info *bus )
 	
 	SHOW_FLOW0( 3, "" );
 	
-	ACQUIRE_BEN( &bus->mutex );
+	mutex_lock( &bus->mutex );
 	
 	was_servicable = scsi_can_service_bus( bus );
 
@@ -306,7 +306,7 @@ void scsi_cont_send_bus( scsi_bus_info *bus )
 	
 	start_retry = !was_servicable && scsi_can_service_bus( bus );
 				
-	RELEASE_BEN( &bus->mutex );
+	mutex_unlock( &bus->mutex );
 
 	if( start_retry )
 		release_sem_etc( bus->start_service, 1, 0/*B_DO_NOT_RESCHEDULE*/ );
@@ -321,7 +321,7 @@ void scsi_cont_send_device( scsi_device_info *device )
 	
 	SHOW_FLOW0( 3, "" );
 	
-	ACQUIRE_BEN( &bus->mutex );
+	mutex_lock( &bus->mutex );
 	
 	was_servicable = scsi_can_service_bus( bus );
 	
@@ -340,7 +340,7 @@ void scsi_cont_send_device( scsi_device_info *device )
 	
 	start_retry = !was_servicable && scsi_can_service_bus( bus );
 				
-	RELEASE_BEN( &bus->mutex );
+	mutex_unlock( &bus->mutex );
 	
 	// tell service thread if there are pending requests which
 	// weren't pending before	
@@ -354,11 +354,11 @@ static void scsi_block_bus_int( scsi_bus_info *bus, bool by_SIM )
 {
 	SHOW_FLOW0( 3, "" );
 	
-	ACQUIRE_BEN( &bus->mutex );
+	mutex_lock( &bus->mutex );
 
 	scsi_block_bus_nolock( bus, by_SIM );
 	
-	RELEASE_BEN( &bus->mutex );
+	mutex_unlock( &bus->mutex );
 }
 
 
@@ -376,14 +376,14 @@ static void scsi_block_device_int( scsi_device_info *device, bool by_SIM )
 	
 	SHOW_FLOW0( 3, "" );
 	
-	ACQUIRE_BEN( &bus->mutex );
+	mutex_lock( &bus->mutex );
 
 	scsi_block_device_nolock( device, by_SIM );
 
 	// remove device from bus queue as it cannot be processed anymore
 	scsi_remove_device_queue( device );
 	
-	RELEASE_BEN( &bus->mutex );
+	mutex_unlock( &bus->mutex );
 }
 
 

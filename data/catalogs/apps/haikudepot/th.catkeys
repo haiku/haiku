@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-HaikuDepot	732799617
+1	thai	x-vnd.Haiku-HaikuDepot	2640598917
 Repository update error	LocalRepositoryUpdateProcess		ข้อผิดพลาดการอัพเดตที่เก็บ
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		เกิดข้อผิดพลาดขณะรีเฟรชที่เก็บ: %error%
 User Created	UserLoginWindow		ผู้ใช้ถูกสร้างแล้ว
@@ -121,8 +121,8 @@ The nickname is required.	UserLoginWindow		ต้องระบุชื่อ�
 Source packages	MainWindow		แพ็คเกจต้นทาง
 -	no package size		-
 Problem with working files	App		ปัญหาเกี่ยวกับไฟล์ทำงาน
-Try again	App		ลองใหม่อีกครั้ง
 Rate package	RatePackageWindow		Rate package
+Try again	App		ลองใหม่อีกครั้ง
 Unknown	PackageListView		ไม่ทราบ
 I agree to the usage conditions	UserLoginWindow		ฉันเห็นด้วยกับเงื่อนไขการใช้งาน
 Log in	UserLoginWindow		เข้าสู่ระบบ
@@ -152,6 +152,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		รุ่นไคลเอ็นต์เก่าเกินไป
 Local repository load error	LocalPkgDataLoadProcess		ข้อผิดพลาดในการโหลดที่เก็บในเครื่อง
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		ผู้ใช้ไม่มีอยู่หรือระบุรหัสผ่านผิด ตรวจสอบข้อมูลรับรองของคุณแล้วลองอีกครั้ง
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		ใส่รหัสผ่านอีกครั้ง:
 All repositories	MainWindow		ที่จัดเก็บทั้งหมด

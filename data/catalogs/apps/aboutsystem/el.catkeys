@@ -1,9 +1,9 @@
-1	greek, modern (1453-)	x-vnd.Haiku-About	408681589
+1	greek, modern (1453-)	x-vnd.Haiku-About	2473434391
 Revision	AboutView		Αναθεώρηση
 The Haikuware team and their bounty program\n	AboutView		Η ομάδα της Haikuware και το πρόγραμμα επιδοτήσεων της\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2007 Michael C. Ring. Με επιφύλαξη παντός δικαιώματος.
 %.2f GHz	AboutView		%.2f GHz
-Copyright © 2001-%d The Haiku project. 	AboutView		Πνευματική ιδιοκτησία © 2001-%d The Haiku project. 
+Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Με επιφύλαξη παντός δικαιώματος.
 \n\nSpecial thanks to:\n	AboutView		\n\nΙδιαίτερες ευχαριστίες στους:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (και ο πυρήνας του, NewOS)\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2000 Y.Takagi. Με επιφύλαξη παντός δικαιώματος.
@@ -14,9 +14,11 @@ Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Πνευματική ιδιο�
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1991-2000 Silicon Graphics, Inc. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1990-2002 Info-ZIP. Με επιφύλαξη παντός δικαιώματος.
 Past website & marketing:\n	AboutView		Πρώην ιστοσελίδα & μάρκετινγκ:\n
+Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 2003 Peter Hanappe and others.	AboutView		Πνευματική ιδιοκτησία © 2003 Peter Hanappe και άλλοι.
 Testing and bug triaging:\n	AboutView		Δοκιμές και αποσφαλμάτωση:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Επεξεργαστής:} other{# Επεξεργαστές:}}
+Ralink WiFi Firmware	AboutWindow		Υλισμικό WiFi για Ralink
 %d MiB total	AboutView		%d MiB συνολικά
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Ο κώδικας που είναι μοναδικός στο Haiku, και ειδικά ο πυρήνας και όλος ο κώδικας των εφαρμογών που συνδέονται, διανέμονται υπό τους όρους της <Άδειας Χρήσης MIT>. Μερικές βιβλιοθήκες του συστήματος περιέχουν ένα μέρος κώδικα τρίτων, ο οποίος διανέμεται κάτω από την <Άδεια Χρήσης LGPL>. Μπορείτε να βρείτε τα δικαιώματα πνευματικής ιδιοκτησίας παρακάτω.\n\n
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1996-1997 Jeff Prosise. Με επιφύλαξη παντός δικαιώματος.
@@ -39,6 +41,7 @@ Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (ιδρυτής �
 BSD (3-clause)	AboutWindow		BSD (3-όρων)
 About this system	AboutWindow		Πληροφορίες συστήματος
 %d MiB used (%d%%)	AboutView		%d MiB σε χρήση (%d%%)
+Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2010 απο τους συγγραφείς του Gutenprint. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1994-1997 Mark Kilgard. Με επιφύλαξη παντός δικαιώματος.
 AboutSystem	System name		Σχετικά
@@ -48,22 +51,26 @@ Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	Ab
 Source Code: 	AboutView		Πηγαίος Κώδικας: 
 \nCopyrights\n\n	AboutView		\nΠνευματικά δικαιώματα\n\n
 GNU GPL v3	AboutWindow		GNU GPL v3
+Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Πνευματική ιδιοκτησία © 1996-2002, 2006 David Turner, Robert Wilhelm και Werner Lemberg.
 The HaikuPorts team\n	AboutView		Η ομάδα HaikuPorts\n
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Εμπεριέχει λογισμικό από το GNU Project, το οποίο έχει δημοσιευτεί με τις άδειες χρήσεις GPL και GPL:\nΒιβλιοθήκη GNU C, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nΠνευματική ιδιοκτησία © The Free Software Foundation.
-Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Πνευματική ιδιοκτησία © 1996-2002, 2006 David Turner, Robert Wilhelm και Werner Lemberg.
 Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Εμπεριέχει λογισμικό από το FreeBSD Project, το οποίο έχει δημοσιευτεί με την άδεια χρήσης BSD:\nftpd, ping, telnet, telnetd, traceroute\nΠνευματική ιδιοκτησία © 1994-2008 The FreeBSD Project. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 2002-2003 Steve Lhomme. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Πνευματική ιδιοκτησία © 2000-2019 Fabrice Bellard, κλπ.
 Current maintainers:\n	AboutView		Εν ενεργεία συντηρητές:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1995, 1998-2001 Jef Poskanzer. Με επιφύλαξη παντός δικαιώματος.
+Intel WiFi Firmware	AboutWindow		Υλισμικό WiFi για Intel
+Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Με επιφύλαξη παντός δικαιώματος.
 Version:	AboutView		Έκδοση:
 The BeGeistert team\n	AboutView		Η ομάδα BeGeistert\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 License: 	AboutView		Άδεια Χρήσης: 
+Intel (2xxx firmware)	AboutWindow		Υλισμικό WiFi για Intel (2xxx)
 GNU GPL v2	AboutWindow		GNU GPL v2
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Το πανεπιστήμιο του Auckland και ο Christof Lutteroth\n\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB συνολικά, %inaccessible MiB μη χρησιμοποιούμενα
 Copyright © 2012-2016 Google Internationalization team.	AboutView		Πνευματική ιδιοκτησία © 2012-2016 Ομάδα διεθνοποίησης Google.
+Copyright © 2001-%ld The Haiku project. 	AboutView		Copyright © 2001-%ld Εγχείρημα Haiku. 
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1994-2008 Xiph.Org. Με επιφύλαξη παντός δικαιώματος.
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		Πνευματική ιδιοκτησία © 1995-2004 Jean-loup Gailly και Mark Adler.
 Copyright © 2001-2003 Expat maintainers.	AboutView		Πνευματική ιδιοκτησία © 2001-2003 Expat maintainers.
@@ -71,10 +78,12 @@ Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Πνευματικ�
 Translations:\n	AboutView		Μεταφράσεις:\n
 Memory:	AboutView		Μνήμη:
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…και μάλλον αρκετά άλλα άτομα που ξεχάσαμε να αναφέρουμε (συγγνώμη!)\n\n
+Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. Με επιφύλαξη παντός δικαιώματος.
 BSD (2-clause)	AboutWindow		BSD (2-όρων)
 Website & marketing:\n	AboutView		Ιστοσελίδα & μάρκετινγκ:\n
 Copyright © 2018-2021, Frederic Cambus	AboutView		Copyright © 2018-2021, Frederic Cambus
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 απο τον Andy Ritger βασισμένο στο Generalized Timing Formula
 …and the many people making donations!\n\n	AboutView		...και τους πολλούς δωρητές μας!\n\n
+Marvell (firmware)	AboutWindow		Υλισμικό Marvell
 BSD (4-clause)	AboutWindow		BSD (4-όρων)
 BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		Το BITSTREAM CHARTER είναι σήμα κατατεθέν της Bitstream Inc.

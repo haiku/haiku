@@ -50,10 +50,11 @@ status_t
 Volume::Mount(const char* parameterString)
 {
 	const char* source = NULL;
-	void* parameterHandle = parse_driver_settings_string(parameterString);
-	DriverSettingsUnloader parameterDeleter(parameterHandle);
-	if (parameterHandle != NULL)
-		source = get_driver_parameter(parameterHandle, "source", NULL, NULL);
+	DriverSettingsUnloader parametersHandle(
+		parse_driver_settings_string(parameterString));
+	if (parametersHandle.IsSet())
+		source = get_driver_parameter(
+			parametersHandle.Get(), "source", NULL, NULL);
 	if (source == NULL || source[0] == '\0') {
 		ERROR("need source folder ('source' parameter)!\n");
 		RETURN_ERROR(B_BAD_VALUE);

@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-ActivityMonitor	2601047281
+1	friulian	x-vnd.Haiku-ActivityMonitor	826097672
 Teams	DataSource		Team
 Semaphores	DataSource		Semafars
 TX	DataSource	Shorter version for Sending	TX
@@ -24,6 +24,7 @@ Settings…	ActivityWindow		Impostazions…
 Block cache	DataSource		Bloche cache
 Memory	DataSource		Memorie
 CPU usage	DataSource		CPU doprade
+CPU speed	DataSource		Velocitât de CPU
 Quit	ActivityWindow		Jes
 Raw clipboard	DataSource		Notis gresis
 Settings	ActivityWindow		Impostazions
@@ -32,6 +33,7 @@ Used memory	DataSource		Memorie doprade
 Show legend	ActivityView		Mostre liende
 Cached memory	DataSource		Memorie cache
 CPU %d usage	DataSource		CPU %d doprade
+CPU %d speed	DataSource		Velocitât CPU %d
 File	ActivityWindow		File
 Ports	DataSource		Puartis
 Page faults	DataSource		Erôrs di pagjine

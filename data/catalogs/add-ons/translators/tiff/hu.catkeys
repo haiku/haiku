@@ -1,16 +1,16 @@
 1	hungarian	x-vnd.Haiku-TIFFTranslator	2234713102
-TIFF Library:	TIFFView		TIFF funkciótár:
-RLE (Packbits)	TIFFView		RLE
-ZIP (Deflate)	TIFFView		ZIP
-identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: érvénytelen dokumentumindex\n
-Use compression:	TIFFView		Tömörítés módja:
+TIFF Library:	TIFFView		TIFF könyvtár:
+RLE (Packbits)	TIFFView		RLE (Packbits)
+ZIP (Deflate)	TIFFView		ZIP (Deflate)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: érvénytelen dokumentum index\n
+Use compression:	TIFFView		Használt tömörítés:
 TIFF image translator	TIFFView		TIFF kép értelmező
 TIFF image	TIFFTranslator		TIFF kép
 TIFF Settings	TIFFMain		TIFF beállítások
 TIFF image translator	TIFFTranslator		TIFF kép értelmező
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nem sikerült a mappát beállítani\n
-Version %d.%d.%d, %s	TIFFView		Verzió: %d.%d.%d %s
-TIFFTranslator Settings	TIFFTranslator		TIFF értelmező beállításai
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: mappabeállítási hiba\n
+Version %d.%d.%d, %s	TIFFView		Verzió: %d.%d.%d, %s
+TIFFTranslator Settings	TIFFTranslator		TIFFTranslator beállítások
 LZW	TIFFView		LZW
-TIFF images	TIFFTranslator		TIFF kép
+TIFF images	TIFFTranslator		TIFF képek
 None	TIFFView		Nincs

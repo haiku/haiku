@@ -1,9 +1,9 @@
 1	czech	x-vnd.Haiku-WonderBrushTranslator	1289038178
-Version %d.%d.%d, %s	WonderBrushView		Verze %d.%d.%d, %s
-WonderBrush image translator	WonderBrushTranslator		převaděč obrázků WonderBrush
-WBI Settings	WonderBrushTranslator		Nastavení WBI
+WonderBrush image translator	WonderBrushTranslator		Překladač WonderBrush obrázků
 WBI Settings	WonderBrushMain		Nastavení WBI
-WonderBrush images	WonderBrushTranslator		obrázky WonderBrush
-WonderBrush image	WonderBrushTranslator		obrázky WonderBrush
-WonderBrush image translator	WonderBrushView		převaděč obrázků obrázky WonderBrush
+Version %d.%d.%d, %s	WonderBrushView		Verze %d.%d.%d, %s
 written by:	WonderBrushView		Napsali:
+WonderBrush images	WonderBrushTranslator		WonderBrush obrázky
+WonderBrush image translator	WonderBrushView		převaděč obrázků obrázky WonderBrush
+WonderBrush image	WonderBrushTranslator		WonderBrush obrázek
+WBI Settings	WonderBrushTranslator		Nastavení WonderBrush obrázku

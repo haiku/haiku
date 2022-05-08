@@ -14,7 +14,7 @@ Failed	JobListView		Başarısız
 Blue	TestPageView		Mavi
 Waiting	JobListView		Bekleyen
 Processing	JobListView		İşleniyor
-Cancel	AddPrinterDialog		İptal
+Cancel	AddPrinterDialog		Vazgeç
 Unknown status	JobListView		Bilinmeyen durum
 Print jobs for %printer_name%	PrintersWindow		%printer_name% işleri
 {0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? sayfa}=1{# sayfa}other{# sayfa}}

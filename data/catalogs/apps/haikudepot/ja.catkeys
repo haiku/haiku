@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	761125591
+1	japanese	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		リポジトリアップデートエラー
 Network error	ServerHelper		ネットワークエラー
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		リポジトリの更新中に次のエラーが発生しました: %error%
@@ -7,6 +7,7 @@ Check for updates…	MainWindow		更新のチェック...
 Uninstalled	PackageListView		アンインストール済
 It was not possible to create the new user.	UserLoginWindow		新しいユーザーを作成できません。
 Available packages	MainWindow		使用可能なパッケージ
+An unexpected error has been sent from the server [%li]	ServerHelper		サーバーから予期しないエラーが送信されました [%li]
 Create account	UserLoginWindow		アカウントの作成
 Install %PackageTitle%	PackageManager		%PackageTitle% をインストール
 OK	App		OK
@@ -24,7 +25,7 @@ Synchronizing icons	ServerIconExportUpdateProcess		アイコンを同期して�
 Show	MainWindow		表示
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		パッケージリストの取得中にエラーが発生しました: %message%
 Settings…	MainWindow		設定...
-This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		このアプリケーションは動作するためにあなたのコンピューター上のいくつかの作業ファイルを読み書きします。テストファイルの [%TestFilePath%] への書込みに問題があるようです。ローカルディスクに問題がないことや、そのディレクトリにアプリケーションが書込みできない権限になっているかをチェックしてください。この問題を認識して続行することもできますが、いくつかの機能が無効となるかもしれません。
+This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		このアプリケーションは動作するためにあなたのコンピューター上のいくつかの作業ファイルを読み書きします。テストファイルの [%TestFilePath%] への書き込みに問題があるようです。ローカルディスクに問題がないことや、そのディレクトリにアプリケーションが書込みできない権限になっているかをチェックしてください。この問題を認識して続行することもできますが、いくつかの機能が無効となるかもしれません。
 Active	PackageListView		有効
 Login or Create account	MainWindow		ログインまたはアカウントの作成
 <Package contents not available for remote packages>	PackageContentsView		<リモートパッケージには利用できません>
@@ -44,6 +45,7 @@ Category	FilterView		分類
 User rating	RatePackageWindow		ユーザーによる評価
 Installed packages	MainWindow		インストール済パッケージ
 A requested object or an object involved in the request was not found on the server.	ServerHelper		要求されたオブジェクトまたはリクエストに関連するオブジェクトがサーバー上に見つからなかった。
+Date	PackageListView		日付
 No changelog available.	PackageInfoView		変更記録はありません。
 Error	App		エラー
 There was a puzzling response from the web service.	UserLoginWindow		ウェブサービスから不可解なレスポンスがあった。
@@ -55,6 +57,7 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		新しいユーザーを作成するために必要なキャプチャの取得のためのサーバーとの通信ができませんでした。
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		評価が正常に更新されました。HaikuDepot Server のウェブサイトで評価を更新または削除できます。
 Available	PackageListView		利用可能
+-	no package publish		-
 Cancel	UserLoginWindow		中止
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot はパッケージデーモンが動作することを必要とします。 そしてそれは動作していないようです。\n今起動しますか?
 Click a package to view information	PackageInfoView		パッケージをクリックして情報を見る
@@ -95,7 +98,6 @@ Repository	PackageListView		リポジトリ
 The email is malformed.	UserLoginWindow		メールアドレスの形式が正しくありません。
 Close	UserLoginWindow		閉じる
 Close	RatePackageWindow		閉じる
-An unexpected error has been sent from the server [%i]	ServerHelper		サーバーから予期しないエラーが送信されました [%i]
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		リポジトリ '%REPO_NAME%' のパッケージデータを同期中
 Settings	SettingsWindow		設定
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		新しいユーザー作成に必要な使用条件のダウンロード中にエラーが発生しました。詳細はログをチェックして、再度試してみてください。\nログの見方は、HaikuユーザーガイドのHaikuDepotの章で得られます。
@@ -139,8 +141,8 @@ Source packages	MainWindow		ソースパッケージ
 -	no package size		-
 Problem with working files	App		作業用ファイルに問題があります
 Server error	ServerHelper		サーバーエラー
-Try again	App		再試行
 Rate package	RatePackageWindow		パッケージを評価
+Try again	App		再試行
 Unknown	PackageListView		不明
 I agree to the usage conditions	UserLoginWindow		使用条件に同意します
 Log in	UserLoginWindow		ログイン
@@ -172,6 +174,5 @@ You need to be logged into an account before you can rate packages.	MainWindow		
 Client version too old	ServerHelper		クライアントのバージョンが古すぎます
 Local repository load error	LocalPkgDataLoadProcess		ローカルリポジトリ読み込みエラー
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		ユーザーが存在しないかパスワードが違っています。情報を確認して再度試してください。
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		パスワードの再入力:
 All repositories	MainWindow		すべてのリポジトリ

@@ -17,8 +17,8 @@ Serbian (Cyrillic)	KeymapNames		Srpski (ćirilica)
 Finnish	KeymapNames		Finski
 Num lock	Keyboard Layout View		Num Lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Prebaci tipke prečaca u Windows/Linux način rada
-Option	Keyboard Layout View	Option key	Opcija
 Spanish (Dvorak)	KeymapNames		Španjolski (Dvorak)
+Option	Keyboard Layout View	Option key	Opcija
 Turkish (Type-Q)	KeymapNames		Turski (tip-Q)
 Revert	Modifier keys window		Obrnuto
 Slovak	KeymapNames		Slovački
@@ -68,8 +68,8 @@ Bulgarian (Cyrillic)	KeymapNames		Bulgarski (ćirilica)
 Swedish	KeymapNames		Švedski
 CAPS	Keyboard Layout View	Very short for 'caps lock'	CAPS
 Svorak	KeymapNames		Svorak
-German	KeymapNames		Njemački
 ThinkPad X100e (US)	KeyboardLayoutNames		ThinkPad X100e (US)
+German	KeymapNames		Njemački
 Swiss-German	KeymapNames		Švicarsko njemački
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl tipka
 Czech	KeymapNames		Češki

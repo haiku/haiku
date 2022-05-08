@@ -18,7 +18,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <syslog.h>
 
 #include <Bitmap.h>
 #include <GraphicsDefs.h>
@@ -184,7 +183,6 @@ Painter::Painter()
 	fInternal(fPatternHandler),
 	fSubpixelPrecise(false),
 	fValidClipping(false),
-	fDrawingText(false),
 	fAttached(false),
 
 	fPenSize(1.0),
@@ -201,8 +199,7 @@ Painter::Painter()
 		fSubpixUnpackedScanline, fSubpixRasterizer, fMaskedUnpackedScanline,
 		fTransform)
 {
-	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode,
-		false);
+	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode);
 
 #if ALIASED_DRAWING
 	fRasterizer.gamma(agg::gamma_threshold(0.5));
@@ -298,18 +295,19 @@ Painter::SetDrawState(const DrawState* state, int32 xOffset, int32 yOffset)
 	}
 
 	// any of these conditions means we need to use a different drawing
-	// mode instance
+	// mode instance, but when the pattern changes it is already changed
+	// from SetPattern
 	bool updateDrawingMode
-		= !(state->GetPattern() == fPatternHandler.GetPattern())
-			|| state->GetDrawingMode() != fDrawingMode
-			|| (state->GetDrawingMode() == B_OP_ALPHA
-				&& (state->AlphaSrcMode() != fAlphaSrcMode
-					|| state->AlphaFncMode() != fAlphaFncMode));
+		= state->GetPattern() == fPatternHandler.GetPattern()
+			&& (state->GetDrawingMode() != fDrawingMode
+				|| (state->GetDrawingMode() == B_OP_ALPHA
+					&& (state->AlphaSrcMode() != fAlphaSrcMode
+						|| state->AlphaFncMode() != fAlphaFncMode)));
 
 	fDrawingMode = state->GetDrawingMode();
 	fAlphaSrcMode = state->AlphaSrcMode();
 	fAlphaFncMode = state->AlphaFncMode();
-	fPatternHandler.SetPattern(state->GetPattern());
+	SetPattern(state->GetPattern().GetPattern());
 	fPatternHandler.SetOffsets(xOffset, yOffset);
 	fLineCapMode = state->LineCapMode();
 	fLineJoinMode = state->LineJoinMode();
@@ -438,12 +436,11 @@ Painter::SetFillRule(int32 fillRule)
 
 // SetPattern
 void
-Painter::SetPattern(const pattern& p, bool drawingText)
+Painter::SetPattern(const pattern& p)
 {
-	if (!(p == *fPatternHandler.GetR5Pattern()) || drawingText != fDrawingText) {
+	if (p != *fPatternHandler.GetR5Pattern()) {
 		fPatternHandler.SetPattern(p);
-		fDrawingText = drawingText;
-		_UpdateDrawingMode(fDrawingText);
+		_UpdateDrawingMode();
 
 		// update renderer color if necessary
 		if (fPatternHandler.IsSolidHigh()) {
@@ -1343,7 +1340,7 @@ Painter::DrawString(const char* utf8String, uint32 length, BPoint baseLine,
 	// text is not rendered with patterns, but we need to
 	// make sure that the previous pattern is restored
 	pattern oldPattern = *fPatternHandler.GetR5Pattern();
-	SetPattern(B_SOLID_HIGH, true);
+	SetPattern(B_SOLID_HIGH);
 
 	bounds = fTextRenderer.RenderString(utf8String, length,
 		baseLine, fClippingRegion->Frame(), false, NULL, delta,
@@ -1369,7 +1366,7 @@ Painter::DrawString(const char* utf8String, uint32 length,
 	// text is not rendered with patterns, but we need to
 	// make sure that the previous pattern is restored
 	pattern oldPattern = *fPatternHandler.GetR5Pattern();
-	SetPattern(B_SOLID_HIGH, true);
+	SetPattern(B_SOLID_HIGH);
 
 	bounds = fTextRenderer.RenderString(utf8String, length,
 		offsets, fClippingRegion->Frame(), false, NULL,
@@ -1559,7 +1556,7 @@ Painter::_Clipped(const BRect& rect) const
 
 // _UpdateDrawingMode
 void
-Painter::_UpdateDrawingMode(bool drawingText)
+Painter::_UpdateDrawingMode()
 {
 	// The AGG renderers have their own color setting, however
 	// almost all drawing mode classes ignore the color given
@@ -1570,19 +1567,10 @@ Painter::_UpdateDrawingMode(bool drawingText)
 	// has been implemented for B_OP_COPY and a couple others (the
 	// DrawingMode*Solid ones) as of now. The PixelFormat knows the
 	// PatternHandler and makes its decision based on the pattern.
-	// The last parameter to SetDrawingMode() is a special flag
-	// for when Painter is used to draw text. In this case, another
-	// special version of B_OP_COPY is used that acts like R5 in that
-	// anti-aliased pixel are not rendered against the actual background
-	// but the current low color instead. This way, the frame buffer
-	// doesn't need to be read.
 	// When a solid pattern is used, _SetRendererColor()
 	// has to be called so that all internal colors in the renderes
 	// are up to date for use by the solid drawing mode version.
-	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode,
-		drawingText);
-	if (drawingText)
-		fPatternHandler.MakeOpCopyColorCache();
+	fPixelFormat.SetDrawingMode(fDrawingMode, fAlphaSrcMode, fAlphaFncMode);
 }
 
 

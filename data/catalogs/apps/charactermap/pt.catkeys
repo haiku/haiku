@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-CharacterMap	2226647913
+1	portuguese	x-vnd.Haiku-CharacterMap	1271392542
 Miscellaneous mathematical symbols B	UnicodeBlocks		Símbolos matemáticos diversos B
 Latin extended E	UnicodeBlocks		Latim expandido E
 Javanese	UnicodeBlocks		Javanês
@@ -21,6 +21,7 @@ Coptic	UnicodeBlocks		Copta
 Cuneiform numbers and punctuation	UnicodeBlocks		Números e pontuação cuneiforme
 Miscellaneous symbols	UnicodeBlocks		Símbolos diversos
 Kana supplement	UnicodeBlocks		Suplemento de kana
+Enclosed ideographic supplement	UnicodeBlocks		Suplemento ideográfico fechado
 Vertical forms	UnicodeBlocks		Formas verticais
 Miscellaneous mathematical symbols A	UnicodeBlocks		Símbolos matemáticos diversos A
 CharacterMap	System name		Mapa de Caracteres
@@ -40,6 +41,7 @@ CJK unified ideographs extension C	UnicodeBlocks		Ideogramas unificados CJK exte
 Ancient Greek musical notation	UnicodeBlocks		Notação musical grega antiga
 Thai	UnicodeBlocks		Tailandês
 Ethiopic supplement	UnicodeBlocks		Suplemento etíope
+Only show blocks contained in font	CharacterWindow		Mostrar apenas blocos presentes no tipo de letra
 Chess symbols	UnicodeBlocks		Símbolos de xadrez
 Yijing hexagram symbols	UnicodeBlocks		Símbolos de hexagrama de Yijing
 Ideographic symbols and punctuation	UnicodeBlocks		Símbolos e pontuação ideográficos
@@ -83,6 +85,7 @@ Glagolitic supplement	UnicodeBlocks		Suplemento glagolítico
 Gurmukhi	UnicodeBlocks		Gurmukhi
 Supplemental arrows B	UnicodeBlocks		Setas suplementares B
 CJK unified ideographs	UnicodeBlocks		Ideogramas CJK unificados
+Enclosed alphanumeric supplement	UnicodeBlocks		Suplemento alfanumérico fechado
 Latin extended B	UnicodeBlocks		Latim expandido B
 Phonetic extensions	UnicodeBlocks		Extensões fonéticas
 Code	CharacterWindow		Código
@@ -131,6 +134,7 @@ CJK compatibility	UnicodeBlocks		Compatibilidade CJK
 Tai Le	UnicodeBlocks		Tai Le
 Devanagari extended	UnicodeBlocks		Devanágari expandido
 Lao	UnicodeBlocks		Lao
+Shorthand format controls	UnicodeBlocks		Controlos de formato de taquigrafia
 Optical character recognition	UnicodeBlocks		Reconhecimento ótico de caracteres
 Tamil	UnicodeBlocks		Tâmil
 Greek extended	UnicodeBlocks		Grego expandido
@@ -155,6 +159,7 @@ Supplemental mathematical operators	UnicodeBlocks		Operadores matemáticos suple
 Sinhala	UnicodeBlocks		Cingalês
 Bhaiksuki	UnicodeBlocks		Bhaiksuki
 Ugaritic	UnicodeBlocks		Ugarítico
+Geometric shapes extended	UnicodeBlocks		Formas geométricas expandido
 Transport and map symbols	UnicodeBlocks		Símbolos de mapas e transportes
 Cyrillic extended C	UnicodeBlocks		Cirílico Expandido C
 Syriac	UnicodeBlocks		Siríaco
@@ -201,6 +206,7 @@ Kangxi radicals	UnicodeBlocks		Radicais Kangxi
 Copy character	CharacterView		Copiar caráter
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
 Font	CharacterWindow		Tipo de letra
+Egyptian hieroglyph format controls	UnicodeBlocks		Controlos de formato de hieróglifo egípcio
 Phaistos disc	UnicodeBlocks		Disco de Festo
 Miscellaneous technical	UnicodeBlocks		Caracteres técnicos diversos
 Braille patterns	UnicodeBlocks		Padrões de Braille
