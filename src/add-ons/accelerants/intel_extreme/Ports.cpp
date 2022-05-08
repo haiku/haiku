@@ -458,13 +458,14 @@ Port::_IsDisplayPortInVBT()
 
 
 bool
-Port::_IsInternalPanelPort()
+Port::_IsEDPPort()
 {
 	uint32 foundIndex = 0;
 	if (!_IsPortInVBT(&foundIndex))
 		return false;
 	child_device_config& config = gInfo->shared_info->device_configs[foundIndex];
-	return (config.device_type & DEVICE_TYPE_INTERNAL_CONNECTOR) == DEVICE_TYPE_INTERNAL_CONNECTOR;
+	return (config.device_type & (DEVICE_TYPE_INTERNAL_CONNECTOR | DEVICE_TYPE_DISPLAYPORT_OUTPUT))
+		== (DEVICE_TYPE_INTERNAL_CONNECTOR | DEVICE_TYPE_DISPLAYPORT_OUTPUT);
 }
 
 
@@ -718,6 +719,7 @@ Port::_DpAuxTransfer(uint8* transmitBuffer, uint8 transmitSize,
 	addr_t channelControl;
 	addr_t channelData[5];
 	aux_channel channel = _DpAuxChannel();
+	TRACE("%s: %s DpAuxChannel: 0x%x\n", __func__, PortName(), channel);
 	if (gInfo->shared_info->device_type.Generation() >= 9
 		|| (gInfo->shared_info->pch_info != INTEL_PCH_NONE && channel == AUX_CH_A)) {
 		channelControl = DP_AUX_CH_CTL(channel);
@@ -1633,7 +1635,7 @@ DisplayPort::IsConnected()
 	bool edidDetected = HasEDID();
 
 	// On laptops we always have an internal panel.. (this is on the eDP port)
-	if ((gInfo->shared_info->device_type.IsMobile() || _IsInternalPanelPort())
+	if ((gInfo->shared_info->device_type.IsMobile() || _IsEDPPort())
 		&& (PortIndex() == INTEL_PORT_A) && !edidDetected) {
 		if (gInfo->shared_info->has_vesa_edid_info) {
 			TRACE("%s: Laptop. Using VESA edid info\n", __func__);
@@ -1899,7 +1901,7 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		display_timing hardwareTarget = target->timing;
 		bool needsScaling = false;
 		if ((PortIndex() == INTEL_PORT_A)
-			&& (gInfo->shared_info->device_type.IsMobile() || _IsInternalPanelPort())) {
+			&& (gInfo->shared_info->device_type.IsMobile() || _IsEDPPort())) {
 			// For internal panels, we may need to set the timings according to the panel
 			// native video mode, and let the panel fitter do the scaling.
 			// note: upto/including generation 5 laptop panels are still LVDS types, handled elsewhere.
@@ -2243,8 +2245,8 @@ DigitalDisplayInterface::IsConnected()
 
 	// On laptops we always have an internal panel.. (on the eDP port on DDI systems, fixed on eDP pipe)
 	uint32 pipeState = 0;
-	if ((gInfo->shared_info->device_type.IsMobile() || _IsInternalPanelPort())
-		&& (PortIndex() == INTEL_PORT_E)) {
+	if ((gInfo->shared_info->device_type.IsMobile() || _IsEDPPort())
+		&& (PortIndex() == INTEL_PORT_A)) {
 		pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
 		TRACE("%s: PIPE_DDI_FUNC_CTL_EDP: 0x%" B_PRIx32 "\n", __func__, pipeState);
 		if (!(pipeState & PIPE_DDI_FUNC_CTL_ENABLE)) {
@@ -2478,8 +2480,8 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	display_timing hardwareTarget = target->timing;
 	bool needsScaling = false;
-	if ((PortIndex() == INTEL_PORT_E)
-		&& (gInfo->shared_info->device_type.IsMobile() || _IsInternalPanelPort())) {
+	if ((PortIndex() == INTEL_PORT_A)
+		&& (gInfo->shared_info->device_type.IsMobile() || _IsEDPPort())) {
 		// For internal panels, we may need to set the timings according to the panel
 		// native video mode, and let the panel fitter do the scaling.
 

@@ -77,7 +77,7 @@ static	status_t					_SetI2CSignals(void* cookie, int clock,
 										int data);
 		bool						_IsPortInVBT(uint32* foundIndex = NULL);
 		bool						_IsDisplayPortInVBT();
-		bool						_IsInternalPanelPort();
+		bool						_IsEDPPort();
 		status_t					_SetupDpAuxI2c(struct i2c_bus *bus);
 
 		ssize_t						_DpAuxTransfer(dp_aux_msg* message);
