@@ -2329,33 +2329,34 @@ dump_block(const char* buffer, int size, const char* prefix)
 {
 	const int DUMPED_BLOCK_SIZE = 16;
 	int i;
+	char lineBuffer[3 + DUMPED_BLOCK_SIZE * 4];
 
 	for (i = 0; i < size;) {
+		char* pointer = lineBuffer;
 		int start = i;
 
-		dprintf("%s%04x ", prefix, i);
 		for (; i < start + DUMPED_BLOCK_SIZE; i++) {
 			if (!(i % 4))
-				dprintf(" ");
+				pointer += sprintf(pointer, " ");
 
 			if (i >= size)
-				dprintf("  ");
+				pointer += sprintf(pointer, "  ");
 			else
-				dprintf("%02x", *(unsigned char*)(buffer + i));
+				pointer += sprintf(pointer, "%02x", *(unsigned char*)(buffer + i));
 		}
-		dprintf("  ");
+		pointer += sprintf(pointer, "  ");
 
 		for (i = start; i < start + DUMPED_BLOCK_SIZE; i++) {
 			if (i < size) {
 				char c = buffer[i];
 
 				if (c < 30)
-					dprintf(".");
+					pointer += sprintf(pointer, ".");
 				else
-					dprintf("%c", c);
+					pointer += sprintf(pointer, "%c", c);
 			} else
 				break;
 		}
-		dprintf("\n");
+		dprintf("%s%04x%s\n", prefix, start, lineBuffer);
 	}
 }
