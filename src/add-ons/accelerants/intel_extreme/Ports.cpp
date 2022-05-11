@@ -2250,11 +2250,8 @@ DigitalDisplayInterface::IsConnected()
 		pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
 		TRACE("%s: PIPE_DDI_FUNC_CTL_EDP: 0x%" B_PRIx32 "\n", __func__, pipeState);
 		if (!(pipeState & PIPE_DDI_FUNC_CTL_ENABLE)) {
-			TRACE("%s: Laptop, but eDP port down: enabling port on pipe EDP\n", __func__);
-			//fixme: turn on port and power
-			write32(PIPE_DDI_FUNC_CTL_EDP, pipeState | PIPE_DDI_FUNC_CTL_ENABLE);
-			TRACE("%s: PIPE_DDI_FUNC_CTL_EDP after: 0x%" B_PRIx32 "\n", __func__,
-				read32(PIPE_DDI_FUNC_CTL_EDP));
+			TRACE("%s: Laptop, but eDP port down\n", __func__);
+			return false;
 		}
 
 		if (gInfo->shared_info->has_vesa_edid_info) {
