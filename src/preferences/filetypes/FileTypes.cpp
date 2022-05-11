@@ -22,6 +22,7 @@
 #include <Entry.h>
 #include <Path.h>
 #include <Resources.h>
+#include <Screen.h>
 
 #include <stdio.h>
 #include <strings.h>
@@ -69,6 +70,10 @@ public:
 private:
 			void				_WindowClosed();
 
+			// Add one degree of offset to the starting position of the next ApplicationTypeWindow
+			void				_AppTypeCascade(BRect lastFrame);
+
+private:
 			Settings			fSettings;
 			BFilePanel*			fFilePanel;
 			BMessenger			fFilePanelTarget;
@@ -125,8 +130,10 @@ Settings::UpdateFrom(BMessage* message)
 	if (message->FindRect("app_types_frame", &frame) == B_OK)
 		fMessage.ReplaceRect("app_types_frame", frame);
 
-	if (message->FindRect("app_type_frame", &frame) == B_OK)
-		fMessage.ReplaceRect("app_type_frame", frame);
+	// "app_type_initial_frame" is omitted because it is not meant to be updated
+
+	if (message->FindRect("app_type_next_frame", &frame) == B_OK)
+		fMessage.ReplaceRect("app_type_next_frame", frame);
 
 	bool showIcons;
 	if (message->FindBool("show_icons", &showIcons) == B_OK)
@@ -151,7 +158,8 @@ Settings::_SetDefaults()
 {
 	fMessage.AddRect("file_types_frame", BRect(80.0f, 80.0f, 600.0f, 480.0f));
 	fMessage.AddRect("app_types_frame", BRect(100.0f, 100.0f, 540.0f, 480.0f));
-	fMessage.AddRect("app_type_frame", BRect(100.0f, 110.0f, 250.0f, 340.0f));
+	fMessage.AddRect("app_type_initial_frame", BRect(100.0f, 110.0f, 250.0f, 340.0f));
+	fMessage.AddRect("app_type_next_frame", BRect(100.0f, 110.0f, 250.0f, 340.0f));
 	fMessage.AddBool("show_icons", true);
 	fMessage.AddBool("show_rule", false);
 	fMessage.AddFloat("left_split_weight", 0.2);
@@ -252,9 +260,11 @@ FileTypes::RefsReceived(BMessage* message)
 		message->RemoveData("refs", --index);
 
 		// There are some refs left that want to be handled by the type window
-		BPoint totalOffset(kCascadeOffset * fTypeWindowCount, kCascadeOffset * fTypeWindowCount);
 
-		BWindow* window = new ApplicationTypeWindow(fSettings.Message(), totalOffset, entry);
+		BWindow* window = new ApplicationTypeWindow(fSettings.Message(), entry);
+		_AppTypeCascade(window->Frame());
+			// For accurate height and width, get the frame that results after layouting,
+			// instead of the initial frame that's stored in fSettings.
 		window->Show();
 
 		fTypeWindowCount++;
@@ -439,6 +449,34 @@ FileTypes::_WindowClosed()
 {
 	if (--fWindowCount == 0 && !fFilePanel->IsShowing())
 		PostMessage(B_QUIT_REQUESTED);
+}
+
+
+void
+FileTypes::_AppTypeCascade(BRect lastFrame)
+{
+	BScreen screen;
+	BRect screenBorder = screen.Frame();
+	BRect initFrame;
+
+	float left = lastFrame.left + kCascadeOffset;
+	if (left + lastFrame.Width() > screenBorder.right) {
+		// If about to cascade off the right edge of the screen, revert the horizontal
+		// position to that of the first window.
+		if (fSettings.Message().FindRect("app_type_initial_frame", &initFrame) == B_OK)
+			left = initFrame.LeftTop().x;
+	}
+
+	float top = lastFrame.top + kCascadeOffset;
+	if (top + lastFrame.Height() > screenBorder.bottom) {
+		if (fSettings.Message().FindRect("app_type_initial_frame", &initFrame) == B_OK)
+			top = initFrame.LeftTop().y;
+	}
+
+	lastFrame.OffsetTo(BPoint(left, top));
+	BMessage update(kMsgSettingsChanged);
+	update.AddRect("app_type_next_frame", lastFrame);
+	fSettings.UpdateFrom(&update);
 }
 
 

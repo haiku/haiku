@@ -26,7 +26,7 @@ class MimeTypeListView;
 
 class ApplicationTypeWindow : public BWindow {
 public:
-								ApplicationTypeWindow(const BMessage& settings, BPoint offset,
+								ApplicationTypeWindow(const BMessage& settings,
 									const BEntry& entry);
 	virtual						~ApplicationTypeWindow();
 

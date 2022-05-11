@@ -298,13 +298,10 @@ SupportedTypeListView::AcceptsDrag(const BMessage* message)
 //	#pragma mark -
 
 
-ApplicationTypeWindow::ApplicationTypeWindow(const BMessage& settings, BPoint offset,
-	const BEntry& entry)
+ApplicationTypeWindow::ApplicationTypeWindow(const BMessage& settings, const BEntry& entry)
 	:
-	BWindow(_Frame(settings).OffsetBySelf(offset),
-		B_TRANSLATE("Application type"), B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS |
-			B_FRAME_EVENTS | B_AUTO_UPDATE_SIZE_LIMITS),
+	BWindow(_Frame(settings), B_TRANSLATE("Application type"), B_TITLED_WINDOW,
+		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS | B_FRAME_EVENTS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fChangedProperties(0)
 {
 	float padding = be_control_look->DefaultItemSpacing();
@@ -523,6 +520,8 @@ ApplicationTypeWindow::ApplicationTypeWindow(const BMessage& settings, BPoint of
 	fSignatureControl->MakeFocus(true);
 	BMimeType::StartWatching(this);
 	_SetTo(entry);
+
+	Layout(false);
 }
 
 
@@ -535,7 +534,7 @@ BRect
 ApplicationTypeWindow::_Frame(const BMessage& settings) const
 {
 	BRect rect;
-	if (settings.FindRect("app_type_frame", &rect) == B_OK)
+	if (settings.FindRect("app_type_next_frame", &rect) == B_OK)
 		return rect;
 
 	return BRect(100.0f, 110.0f, 250.0f, 340.0f);
@@ -1086,7 +1085,7 @@ ApplicationTypeWindow::QuitRequested()
 	}
 
 	BMessage update(kMsgSettingsChanged);
-	update.AddRect("app_type_frame", Frame());
+	update.AddRect("app_type_next_frame", Frame());
 	be_app_messenger.SendMessage(&update);
 
 	be_app->PostMessage(kMsgTypeWindowClosed);
