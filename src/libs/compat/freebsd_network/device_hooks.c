@@ -49,6 +49,8 @@ compat_open(const char *name, uint32 flags, void **cookie)
 		return B_BUSY;
 	}
 
+	IFF_LOCKGIANT(ifp);
+
 	ifp->if_init(ifp->if_softc);
 
 	if (!HAIKU_DRIVER_REQUIRES(FBSD_WLAN_FEATURE)) {
@@ -67,6 +69,8 @@ compat_open(const char *name, uint32 flags, void **cookie)
 	ifp->if_flags |= IFF_UP;
 	ifp->flags &= ~DEVICE_CLOSED;
 	ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
+
+	IFF_UNLOCKGIANT(ifp);
 
 	*cookie = ifp;
 	return B_OK;
@@ -184,7 +188,11 @@ compat_write(void *cookie, off_t position, const void *buffer,
 	memcpy(mtod(mb, void *), buffer, mb->m_len);
 	*numBytes = length;
 
-	return ifp->if_output(ifp, mb, NULL, NULL);
+	IFF_LOCKGIANT(ifp);
+	int result = ifp->if_output(ifp, mb, NULL, NULL);
+	IFF_UNLOCKGIANT(ifp);
+
+	return result;
 }
 
 
@@ -192,6 +200,7 @@ static status_t
 compat_control(void *cookie, uint32 op, void *arg, size_t length)
 {
 	struct ifnet *ifp = cookie;
+	status_t status;
 
 	//if_printf(ifp, "compat_control(op %lu, %p, [%lu])\n", op,
 	//	arg, length);
@@ -228,7 +237,11 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 				ifp->if_flags |= IFF_PROMISC;
 			else
 				ifp->if_flags &= ~IFF_PROMISC;
-			return ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
+
+			IFF_LOCKGIANT(ifp);
+			status = ifp->if_ioctl(ifp, SIOCSIFFLAGS, NULL);
+			IFF_UNLOCKGIANT(ifp);
+			return status;
 		}
 
 		case ETHER_GETFRAMESIZE:
@@ -273,10 +286,13 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 			if (user_memcpy(LLADDR(&address), arg, ETHER_ADDR_LEN) < B_OK)
 				return B_BAD_ADDRESS;
 
+			IFF_LOCKGIANT(ifp);
 			if (op == ETHER_ADDMULTI)
-				return if_addmulti(ifp, (struct sockaddr *)&address, NULL);
-
-			return if_delmulti(ifp, (struct sockaddr *)&address);
+				status = if_addmulti(ifp, (struct sockaddr *)&address, NULL);
+			else
+				status = if_delmulti(ifp, (struct sockaddr *)&address);
+			IFF_UNLOCKGIANT(ifp);
+			return status;
 		}
 
 		case ETHER_GET_LINK_STATE:
@@ -289,7 +305,9 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 				return EINVAL;
 
 			memset(&mediareq, 0, sizeof(mediareq));
+			IFF_LOCKGIANT(ifp);
 			status = ifp->if_ioctl(ifp, SIOCGIFMEDIA, (caddr_t)&mediareq);
+			IFF_UNLOCKGIANT(ifp);
 			if (status < B_OK)
 				return status;
 
@@ -313,7 +331,12 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 		case SIOCSIFMEDIA:
 		case SIOCGIFMEDIA:
 		case SIOCSIFMTU:
-			return ifp->if_ioctl(ifp, op, (caddr_t)arg);
+		{
+			IFF_LOCKGIANT(ifp);
+			status = ifp->if_ioctl(ifp, op, (caddr_t)arg);
+			IFF_UNLOCKGIANT(ifp);
+			return status;
+		}
 	}
 
 	return wlan_control(cookie, op, arg, length);

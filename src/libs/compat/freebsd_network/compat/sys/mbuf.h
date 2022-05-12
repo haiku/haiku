@@ -215,6 +215,12 @@ struct pkthdr {
 	uint8_t		rsstype;		/* hash type */
 	uint16_t	tso_segsz;
 	uint16_t	ether_vtag;
+
+	/* Layer specific non-persistent local storage for reassembly, etc. */
+	union {
+		uintptr_t	unintptr[1];
+		void*		ptr;
+	} PH_loc;
 };
 
 struct m_tag {

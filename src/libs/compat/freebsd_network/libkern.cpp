@@ -1,6 +1,5 @@
 /*
- * Copyright 2009, Colin Günther, coling@gmx.de. All rights reserved.
- * Copyright 2018, Haiku, Inc. All rights reserved.
+ * Copyright 2018-2022, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -35,4 +34,11 @@ arc4random(void)
 
 	arc4rand(&ret, sizeof ret, 0);
 	return ret;
+}
+
+
+void
+arc4random_buf(void *ptr, size_t len)
+{
+	arc4rand(ptr, len, 0);
 }

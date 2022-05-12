@@ -127,7 +127,13 @@ tq_handle_thread(void *data)
 		pending = t->ta_pending;
 		t->ta_pending = 0;
 
+		if ((t->ta_flags & TASK_NEEDSGIANT) != 0)
+			mtx_lock(&Giant);
+
 		t->ta_handler(t->ta_argument, pending);
+
+		if ((t->ta_flags & TASK_NEEDSGIANT) != 0)
+			mtx_unlock(&Giant);
 	}
 
 	return 0;
@@ -489,6 +495,7 @@ void
 task_init(struct task *task, int prio, task_fn_t handler, void *context)
 {
 	task->ta_priority = prio;
+	task->ta_flags = 0;
 	task->ta_handler = handler;
 	task->ta_argument = context;
 	task->ta_pending = 0;

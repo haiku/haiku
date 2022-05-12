@@ -43,7 +43,7 @@ void _kernel_contigfree(void *addr, unsigned long size);
 #define kernel_malloc(size, base, flags) \
 	_kernel_malloc(size, flags)
 
-#define kernel_free(ptr, base) \
+#define kernel_free(ptr, tag) \
 	_kernel_free(ptr)
 
 #define kernel_contigmalloc(size, type, flags, low, high, alignment, boundary) \

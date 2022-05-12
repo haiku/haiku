@@ -258,7 +258,6 @@ struct ifnet {
 	void	*if_afdata[AF_MAX];
 	int	if_afdata_initialized;
 	struct	mtx if_afdata_mtx;
-	struct	task if_starttask;	/* task for IFF_NEEDSGIANT */
 	struct	task if_linktask;	/* task for link change events */
 	struct	mtx if_addr_mtx;	/* mutex to protect address lists */
 
@@ -751,6 +750,10 @@ void	if_up(struct ifnet *);
 int	ifioctl(struct socket *, u_long, caddr_t, struct thread *);
 int	ifpromisc(struct ifnet *, int);
 struct	ifnet *ifunit(const char *);
+
+/* Haiku extension for OpenBSD compat */
+int if_alloc_inplace(struct ifnet *ifp, u_char type);
+void if_free_inplace(struct ifnet *ifp);
 
 struct	ifaddr *ifa_ifwithaddr(struct sockaddr *);
 struct	ifaddr *ifa_ifwithbroadaddr(struct sockaddr *);

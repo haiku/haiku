@@ -269,7 +269,7 @@ buf_ring_advance_sc(struct buf_ring *br)
 static __inline void
 buf_ring_putback_sc(struct buf_ring *br, void *_new)
 {
-	KASSERT(br->br_cons_head != br->br_prod_tail,
+	KASSERT_FREEBSD(br->br_cons_head != br->br_prod_tail,
 		("Buf-Ring has none in putback")) ;
 	br->br_ring[br->br_cons_head] = _new;
 }

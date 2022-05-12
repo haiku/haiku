@@ -70,6 +70,7 @@
 #define	IFF_MONITOR			0x00400000		/* (n) user-requested monitor mode */
 #define	IFF_PPROMISC		0x00800000		/* (n) user-requested promisc mode */
 #define	IFF_NOGROUP			0x01000000		/* (n) interface is not part of any groups */
+#define	IFF_NEEDSGIANT		0x02000000		/* (i) hold Giant over hook calls (OpenBSD compatibility) */
 
 #define LINK_STATE_UNKNOWN	0
 #define LINK_STATE_DOWN		1

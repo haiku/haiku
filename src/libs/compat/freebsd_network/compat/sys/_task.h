@@ -13,12 +13,17 @@
 typedef void (*task_fn_t)(void *context, int pending);
 
 struct task {
+	int ta_pending;
 	int ta_priority;
+	int ta_flags;
 	task_fn_t ta_handler;
 	void *ta_argument;
-	int ta_pending;
 
 	struct list_link ta_link;
 };
+
+
+#define TASK_NEEDSGIANT (1 << 0) /* Haiku extension, OpenBSD compatibility */
+
 
 #endif
