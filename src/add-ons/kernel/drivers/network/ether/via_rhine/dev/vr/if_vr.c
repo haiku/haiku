@@ -1263,7 +1263,7 @@ static __inline void
 vr_fixup_rx(struct mbuf *m)
 {
         uint16_t		*src, *dst;
-        int			i;
+        unsigned int			i;
 
 	src = mtod(m, uint16_t *);
 	dst = src - 1;

@@ -142,7 +142,7 @@ uninit_driver()
 	mutex_lock(&gDriverLock);
 
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
-		if (gECMDevices[i]) {
+		if (gECMDevices[i] != NULL) {
 			delete gECMDevices[i];
 			gECMDevices[i] = NULL;
 		}
@@ -167,9 +167,10 @@ usb_ecm_open(const char *name, uint32 flags, void **cookie)
 	*cookie = NULL;
 	status_t status = ENODEV;
 	int32 index = strtol(name + strlen(sDeviceBaseName), NULL, 10);
-	if (index >= 0 && index < MAX_DEVICES && gECMDevices[index]) {
+	if (index >= 0 && index < MAX_DEVICES && gECMDevices[index] != NULL) {
 		status = gECMDevices[index]->Open();
-		*cookie = gECMDevices[index];
+		if (status == B_OK)
+			*cookie = gECMDevices[index];
 	}
 
 	mutex_unlock(&gDriverLock);
@@ -252,7 +253,7 @@ publish_devices()
 			continue;
 
 		gDeviceNames[deviceCount] = (char *)malloc(strlen(sDeviceBaseName) + 4);
-		if (gDeviceNames[deviceCount]) {
+		if (gDeviceNames[deviceCount] != NULL) {
 			sprintf(gDeviceNames[deviceCount], "%s%" B_PRId32, sDeviceBaseName,
 				i);
 			TRACE("publishing %s\n", gDeviceNames[deviceCount]);

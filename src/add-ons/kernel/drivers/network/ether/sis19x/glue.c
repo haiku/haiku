@@ -19,6 +19,8 @@
 #include <dev/pci/pcivar.h>
 #include <dev/sge/if_sgereg.h>
 
+#include "glue.h"
+
 
 HAIKU_FBSD_DRIVER_GLUE(sis19x, sge, pci);
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_FAST_TASKQUEUE);

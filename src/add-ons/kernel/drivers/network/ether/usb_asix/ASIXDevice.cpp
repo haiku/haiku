@@ -228,7 +228,7 @@ ASIXDevice::Read(uint8 *buffer, size_t *numBytes)
 
 		// the device pushes packets 16bit aligned
 		if (fActualLengthRead - sizeof(TRXHeader) > header.Length()
-				+ (header.Length() % 2)) {
+				+ (header.Length() % 2u)) {
 			TRACE_ALWAYS("MISMATCH of the frame length: hdr %d; received:%d\n",
 				header.Length(), fActualLengthRead - sizeof(TRXHeader));
 		} else if (fActualLengthRead - sizeof(TRXHeader) < header.Length()) {
