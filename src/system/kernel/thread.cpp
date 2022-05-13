@@ -2470,6 +2470,8 @@ wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 {
 	if (id < 0)
 		return B_BAD_THREAD_ID;
+	if (id == thread_get_current_thread_id())
+		return EDEADLK;
 
 	// get the thread, queue our death entry, and fetch the semaphore we have to
 	// wait on
