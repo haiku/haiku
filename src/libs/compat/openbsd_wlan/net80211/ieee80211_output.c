@@ -123,6 +123,7 @@ ieee80211_output(struct ifnet *ifp, struct mbuf *m, struct sockaddr *dst,
 		goto bad;
 	}
 
+#ifdef PACKET_TAG_DLT
 	/* Try to get the DLT from a mbuf tag */
 	if ((mtag = m_tag_find(m, PACKET_TAG_DLT, NULL)) != NULL) {
 		struct ieee80211com *ic = (void *)ifp;
@@ -145,6 +146,7 @@ ieee80211_output(struct ifnet *ifp, struct mbuf *m, struct sockaddr *dst,
 
 		return (if_enqueue(ifp, m));
 	}
+#endif
 
  fallback:
 	return (ether_output(ifp, m, dst, rt));
@@ -456,6 +458,7 @@ ieee80211_classify(struct ieee80211com *ic, struct mbuf *m)
 	 * Preserves backward compatibility with IP Precedence field.
 	 */
 	switch (ds_field & 0xfc) {
+#ifdef IPTOS_PREC_PRIORITY
 	case IPTOS_PREC_PRIORITY:
 		return EDCA_AC_VI;
 	case IPTOS_PREC_IMMEDIATE:
@@ -466,6 +469,7 @@ ieee80211_classify(struct ieee80211com *ic, struct mbuf *m)
 	case IPTOS_PREC_INTERNETCONTROL:
 	case IPTOS_PREC_NETCONTROL:
 		return EDCA_AC_VO;
+#endif
 	default:
 		return EDCA_AC_BE;
 	}
@@ -531,6 +535,7 @@ ieee80211_encap(struct ifnet *ifp, struct mbuf *m, struct ieee80211_node **pni)
 	u_int dlt, hdrlen;
 	int addqos, tid;
 
+#ifdef PACKET_TAG_DLT
 	/* Handle raw frames if mbuf is tagged as 802.11 */
 	if ((mtag = m_tag_find(m, PACKET_TAG_DLT, NULL)) != NULL) {
 		dlt = *(u_int *)(mtag + 1);
@@ -567,6 +572,7 @@ ieee80211_encap(struct ifnet *ifp, struct mbuf *m, struct ieee80211_node **pni)
 		*pni = ni;
 		return (m);
 	}
+#endif
 
  fallback:
 	if (m->m_len < sizeof(struct ether_header)) {

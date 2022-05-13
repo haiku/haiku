@@ -44,6 +44,9 @@
 #include <sys/endian.h>
 #include <sys/errno.h>
 #include <sys/sysctl.h>
+#ifdef __HAIKU__
+#include <sys/task.h>
+#endif
 
 #include <net/if.h>
 #include <net/if_dl.h>
@@ -162,9 +165,13 @@ ieee80211_ifattach(struct ifnet *ifp)
 {
 	struct ieee80211com *ic = (void *)ifp;
 
+#ifdef __FreeBSD_version
+	ether_ifattach(ifp, ic->ic_myaddr);
+#else
 	memcpy(((struct arpcom *)ifp)->ac_enaddr, ic->ic_myaddr,
 		ETHER_ADDR_LEN);
 	ether_ifattach(ifp);
+#endif
 
 	ifp->if_output = ieee80211_output;
 
@@ -190,8 +197,10 @@ ieee80211_ifattach(struct ifnet *ifp)
 	ieee80211_node_attach(ifp);
 	ieee80211_proto_attach(ifp);
 
+#ifndef __FreeBSD_version
 	if_addgroup(ifp, "wlan");
 	ifp->if_priority = IF_WIRELESS_DEFAULT_PRIORITY;
+#endif
 
 	task_set(&ic->ic_rtm_80211info_task, ieee80211_rtm_80211info_task, ic);
 	ieee80211_set_link_state(ic, LINK_STATE_DOWN);
@@ -207,17 +216,21 @@ ieee80211_ifdetach(struct ifnet *ifp)
 	task_del(systq, &ic->ic_rtm_80211info_task);
 	timeout_del(&ic->ic_bgscan_timeout);
 
+#ifndef __HAIKU__
 	/*
 	 * Undo pseudo-driver changes. Pseudo-driver detach hooks could
 	 * call back into the driver, e.g. via ioctl. So deactivate the
 	 * interface before freeing net80211-specific data structures.
 	 */
 	if_deactivate(ifp);
+#endif
 
 	ieee80211_proto_detach(ifp);
 	ieee80211_crypto_detach(ifp);
 	ieee80211_node_detach(ifp);
+#ifndef __HAIKU__
 	ifmedia_delete_instance(&ic->ic_media, IFM_INST_ANY);
+#endif
 	ether_ifdetach(ifp);
 }
 
@@ -412,7 +425,12 @@ ieee80211_media_init(struct ifnet *ifp,
 	}
 
 	if (ic->ic_modecaps & (1 << IEEE80211_MODE_11N)) {
+#ifdef __FreeBSD_version
+		// TODO: this probably isn't correct!
+		mopt = IFM_IEEE80211_11NA | IFM_IEEE80211_11NG;
+#else
 		mopt = IFM_IEEE80211_11N;
+#endif
 		ADD(ic, IFM_AUTO, mopt);
 #ifndef IEEE80211_STA_ONLY
 		if (ic->ic_caps & IEEE80211_C_IBSS)
@@ -425,6 +443,9 @@ ieee80211_media_init(struct ifnet *ifp,
 		for (i = 0; i < IEEE80211_HT_NUM_MCS; i++) {
 			if (!isset(ic->ic_sup_mcs, i))
 				continue;
+#ifdef __FreeBSD_version
+			ADD(ic, IFM_IEEE80211_MCS, mopt);
+#else
 			ADD(ic, IFM_IEEE80211_HT_MCS0 + i, mopt);
 #ifndef IEEE80211_STA_ONLY
 			if (ic->ic_caps & IEEE80211_C_IBSS)
@@ -437,13 +458,19 @@ ieee80211_media_init(struct ifnet *ifp,
 			if (ic->ic_caps & IEEE80211_C_MONITOR)
 				ADD(ic, IFM_IEEE80211_HT_MCS0 + i,
 				    mopt | IFM_IEEE80211_MONITOR);
+#endif
 		}
 		ic->ic_flags |= IEEE80211_F_HTON; /* enable 11n by default */
 		ieee80211_configure_ampdu_tx(ic, 1);
 	}
 
 	if (ic->ic_modecaps & (1 << IEEE80211_MODE_11AC)) {
+#ifdef __FreeBSD_version
+		// TODO: this probably isn't correct!
+		mopt = IFM_IEEE80211_VHT2G | IFM_IEEE80211_VHT5G;
+#else
 		mopt = IFM_IEEE80211_11AC;
+#endif
 		ADD(ic, IFM_AUTO, mopt);
 #ifndef IEEE80211_STA_ONLY
 		if (ic->ic_caps & IEEE80211_C_IBSS)
@@ -459,6 +486,9 @@ ieee80211_media_init(struct ifnet *ifp,
 			if (!vht_mcs_supported)
 				continue;
 #endif
+#ifdef __FreeBSD_version
+			ADD(ic, IFM_IEEE80211_VHT, mopt);
+#else
 			ADD(ic, IFM_IEEE80211_VHT_MCS0 + i, mopt);
 #ifndef IEEE80211_STA_ONLY
 			if (ic->ic_caps & IEEE80211_C_IBSS)
@@ -471,6 +501,7 @@ ieee80211_media_init(struct ifnet *ifp,
 			if (ic->ic_caps & IEEE80211_C_MONITOR)
 				ADD(ic, IFM_IEEE80211_VHT_MCS0 + i,
 				    mopt | IFM_IEEE80211_MONITOR);
+#endif
 		}
 		ic->ic_flags |= IEEE80211_F_VHTON; /* enable 11ac by default */
 		ic->ic_flags |= IEEE80211_F_HTON; /* 11ac implies 11n */
@@ -527,10 +558,20 @@ ieee80211_media_change(struct ifnet *ifp)
 	case IFM_IEEE80211_11G:
 		newphymode = IEEE80211_MODE_11G;
 		break;
+#ifdef __FreeBSD_version
+	case IFM_IEEE80211_11NA:
+	case IFM_IEEE80211_11NG:
+#else
 	case IFM_IEEE80211_11N:
+#endif
 		newphymode = IEEE80211_MODE_11N;
 		break;
+#ifdef __FreeBSD_version
+	case IFM_IEEE80211_VHT5G:
+	case IFM_IEEE80211_VHT2G:
+#else
 	case IFM_IEEE80211_11AC:
+#endif
 		newphymode = IEEE80211_MODE_11AC;
 		break;
 	case IFM_AUTO:
@@ -550,8 +591,12 @@ ieee80211_media_change(struct ifnet *ifp)
 	 * Next, the fixed/variable rate.
 	 */
 	i = -1;
+#ifdef __FreeBSD_version
+	if (IFM_SUBTYPE(ime->ifm_media) == IFM_IEEE80211_VHT) {
+#else
 	if (IFM_SUBTYPE(ime->ifm_media) >= IFM_IEEE80211_VHT_MCS0 &&
 	    IFM_SUBTYPE(ime->ifm_media) <= IFM_IEEE80211_VHT_MCS9) {
+#endif
 		if ((ic->ic_modecaps & (1 << IEEE80211_MODE_11AC)) == 0)
 			return EINVAL;
 		if (newphymode != IEEE80211_MODE_AUTO &&
@@ -561,8 +606,12 @@ ieee80211_media_change(struct ifnet *ifp)
 		/* TODO: Obtain VHT MCS information from VHT CAP IE. */
 		if (i == -1 /* || !vht_mcs_supported */)
 			return EINVAL;
+#ifdef __FreeBSD_version
+	} else if (IFM_SUBTYPE(ime->ifm_media) == IFM_IEEE80211_MCS) {
+#else
 	} else if (IFM_SUBTYPE(ime->ifm_media) >= IFM_IEEE80211_HT_MCS0 &&
 	    IFM_SUBTYPE(ime->ifm_media) <= IFM_IEEE80211_HT_MCS76) {
+#endif
 		if ((ic->ic_modecaps & (1 << IEEE80211_MODE_11N)) == 0)
 			return EINVAL;
 		if (newphymode != IEEE80211_MODE_AUTO &&
@@ -778,10 +827,18 @@ ieee80211_media_status(struct ifnet *ifp, struct ifmediareq *imr)
 		imr->ifm_active |= IFM_IEEE80211_11G;
 		break;
 	case IEEE80211_MODE_11N:
+#ifdef __FreeBSD_version
+		imr->ifm_active |= IEEE80211_IS_CHAN_5GHZ(ni->ni_chan) ? IFM_IEEE80211_11NA : IFM_IEEE80211_11NG;
+#else
 		imr->ifm_active |= IFM_IEEE80211_11N;
+#endif
 		break;
 	case IEEE80211_MODE_11AC:
+#ifdef __FreeBSD_version
+		imr->ifm_active |= IEEE80211_IS_CHAN_5GHZ(ni->ni_chan) ? IFM_IEEE80211_VHT5G : IFM_IEEE80211_VHT2G;
+#else
 		imr->ifm_active |= IFM_IEEE80211_11AC;
+#endif
 		break;
 	}
 }
@@ -1236,6 +1293,7 @@ ieee80211_mcs2media(struct ieee80211com *ic, int mcs,
 		/* these modes use rates, not MCS */
 		panic("%s: unexpected mode %d", __func__, mode);
 		break;
+#ifndef __FreeBSD_version /* can't be converted to FreeBSD IFM */
 	case IEEE80211_MODE_11N:
 		if (mcs >= 0 && mcs < IEEE80211_HT_NUM_MCS)
 			return (IFM_IEEE80211_11N |
@@ -1246,6 +1304,7 @@ ieee80211_mcs2media(struct ieee80211com *ic, int mcs,
 			return (IFM_IEEE80211_11AC |
 			    (IFM_IEEE80211_VHT_MCS0 + mcs));
 		break;
+#endif
 	case IEEE80211_MODE_AUTO:
 		break;
 	}
@@ -1268,6 +1327,7 @@ ieee80211_media2mcs(uint64_t mword)
 	else if (subtype == IFM_MANUAL || subtype == IFM_NONE)
 		return 0;
 
+#ifndef __FreeBSD_version
 	if (subtype >= IFM_IEEE80211_HT_MCS0 &&
 	    subtype <= IFM_IEEE80211_HT_MCS76)
 		return (int)(subtype - IFM_IEEE80211_HT_MCS0);
@@ -1275,6 +1335,7 @@ ieee80211_media2mcs(uint64_t mword)
 	if (subtype >= IFM_IEEE80211_VHT_MCS0 &&
 	    subtype <= IFM_IEEE80211_VHT_MCS9)
 		return (int)(subtype - IFM_IEEE80211_VHT_MCS0);
+#endif
 
 	return -1;
 }

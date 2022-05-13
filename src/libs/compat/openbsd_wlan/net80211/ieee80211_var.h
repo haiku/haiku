@@ -37,9 +37,9 @@
  * Definitions for IEEE 802.11 drivers.
  */
 
-#ifdef	SMALL_KERNEL
+//#ifdef	SMALL_KERNEL
 #define IEEE80211_STA_ONLY	1
-#endif
+//#endif
 
 #include <sys/timeout.h>
 
@@ -229,7 +229,10 @@ struct ieee80211_defrag {
 struct ieee80211_node_switch_bss_arg;
 
 struct ieee80211com {
-	struct arpcom		ic_ac;
+	struct {
+		struct 	ifnet ac_if;
+		u_char	ac_enaddr[6];
+	} ic_ac;
 	LIST_ENTRY(ieee80211com) ic_list;	/* chain of all ieee80211com */
 	void			(*ic_recv_mgmt)(struct ieee80211com *,
 				    struct mbuf *, struct ieee80211_node *,

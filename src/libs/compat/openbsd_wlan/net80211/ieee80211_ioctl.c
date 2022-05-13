@@ -40,6 +40,9 @@
 #include <sys/systm.h>
 #include <sys/endian.h>
 #include <sys/tree.h>
+#ifdef __HAIKU__
+#include <sys/ucred.h>
+#endif
 
 #include <net/if.h>
 #include <net/if_media.h>
@@ -968,6 +971,7 @@ ieee80211_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 		ic->ic_userflags = flags;
 		error = ENETRESET;
 		break;
+#ifndef __HAIKU__
 	case SIOCADDMULTI:
 	case SIOCDELMULTI:
 		error = (cmd == SIOCADDMULTI) ?
@@ -976,8 +980,13 @@ ieee80211_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 		if (error == ENETRESET)
 			error = 0;
 		break;
+#endif
 	default:
+#ifdef __FreeBSD_version
+		error = ether_ioctl(ifp, cmd, data);
+#else
 		error = ether_ioctl(ifp, &ic->ic_ac, cmd, data);
+#endif
 	}
 
 	return error;

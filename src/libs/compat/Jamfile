@@ -3,3 +3,4 @@ SubDir HAIKU_TOP src libs compat ;
 SubInclude HAIKU_TOP src libs compat freebsd_network ;
 SubInclude HAIKU_TOP src libs compat freebsd_iflib ;
 SubInclude HAIKU_TOP src libs compat freebsd_wlan ;
+SubInclude HAIKU_TOP src libs compat openbsd_wlan ;

@@ -43,6 +43,9 @@
 #include <sys/endian.h>
 #include <sys/errno.h>
 #include <sys/sysctl.h>
+#ifdef __HAIKU__
+#include <sys/task.h>
+#endif
 
 #include <net/if.h>
 #include <net/if_dl.h>
@@ -1342,6 +1345,7 @@ justcleanup:
 	return 0;
 }
 
+#ifndef __FreeBSD_version
 void
 ieee80211_rtm_80211info_task(void *arg)
 {
@@ -1366,6 +1370,7 @@ ieee80211_rtm_80211info_task(void *arg)
 
 	splx(s);
 }
+#endif
 
 void
 ieee80211_set_link_state(struct ieee80211com *ic, int nstate)
@@ -1386,9 +1391,14 @@ ieee80211_set_link_state(struct ieee80211com *ic, int nstate)
 		break;
 	}
 	if (nstate != ifp->if_link_state) {
+#ifdef __FreeBSD_version
+		if_link_state_change(ifp, nstate);
+		task_add(systq, &ic->ic_rtm_80211info_task);
+#else
 		ifp->if_link_state = nstate;
 		if (LINK_STATE_IS_UP(nstate))
 			task_add(systq, &ic->ic_rtm_80211info_task);
 		if_link_state_change(ifp);
+#endif
 	}
 }
