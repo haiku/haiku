@@ -546,14 +546,17 @@ down_device_interface(net_device_interface* interface)
 	// Known callers are `interface_protocol_down' which gets
 	// here via one of the following paths:
 	//
-	// - domain_interface_control() [rx lock held, domain lock held]
-	//    interface_set_down()
+	// - Interface::Control()
+	//    Interface::SetDown()
 	//     interface_protocol_down()
 	//
-	// - domain_interface_control() [rx lock held, domain lock held]
-	//    remove_interface_from_domain()
-	//     delete_interface()
-	//      interface_set_down()
+	// - datalink_control()
+	//    remove_interface()
+	//     Interface::SetDown() etc.
+	//
+	// - device_removed()
+	//    interface_removed_device_interface()
+	//     remove_interface() etc.
 
 	net_device* device = interface->device;
 
@@ -566,6 +569,7 @@ down_device_interface(net_device_interface* interface)
 		thread_id readerThread = interface->reader_thread;
 
 		// make sure the reader thread is gone before shutting down the interface
+		// (note that we may be the reader thread)
 		status_t status;
 		wait_for_thread(readerThread, &status);
 	}
