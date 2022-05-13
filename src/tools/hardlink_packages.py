@@ -8,7 +8,7 @@
 # Distributed under the terms of the MIT License.
 
 import sys, os, subprocess, re, hashlib
-from distutils.version import LooseVersion
+from pkg_resources import parse_version
 
 if len(sys.argv) != 5:
 	print("usage: hardlink_packages.py [arch] [jam RemotePackageRepository file] "
@@ -46,7 +46,7 @@ for filename in os.listdir(args_src):
 pattern = re.compile("^[a-z0-9]")
 newFileForJam = []
 packageFiles = []
-errorsOccurred = False
+filesNotFound = False
 with open(args_jamf) as f:
 	for line in f:
 		pkg = line.strip()
@@ -68,23 +68,20 @@ with open(args_jamf) as f:
 
 		greatestVersion = None
 		for pkgVersion in packageVersions:
-			if (pkgVersion.startswith(pkgname + '-') and
-					((greatestVersion == None)
-						or (LooseVersion(pkgVersion) > LooseVersion(greatestVersion)))):
-				greatestVersion = pkgVersion
+			if (pkgVersion.startswith(pkgname + '-')):
+				if ((greatestVersion == None) or parse_version(pkgVersion) > parse_version(greatestVersion)):
+					greatestVersion = pkgVersion
 		if (greatestVersion == None):
 			print("not found: " + pkg)
 			newFileForJam.append(line)
-			errorsOccurred = True
+			filesNotFound = True
 			continue
 		else:
 			# found it, so hardlink it
 			if not (os.path.exists(args_dst_packages + greatestVersion)):
 				os.link(args_src + greatestVersion, args_dst_packages + greatestVersion)
-			if ('packages/' + greatestVersion) in packageFiles:
-				print("error: duplicated package: " + pkgname)
-				errorsOccurred = True
-			packageFiles.append('packages/' + greatestVersion)
+			if ('packages/' + greatestVersion) not in packageFiles:
+				packageFiles.append('packages/' + greatestVersion)
 			# also hardlink the source package, if one exists
 			srcpkg = greatestVersion.replace("-" + args_arch + ".hpkg",
 				"-source.hpkg").replace('-', '_source-', 1)
@@ -95,7 +92,7 @@ with open(args_jamf) as f:
 					packageFiles.append('packages/' + srcpkg)
 		newFileForJam.append("\t" + greatestVersion[:greatestVersion.rfind('-')] + "\n");
 
-if errorsOccurred:
+if filesNotFound:
 	sys.exit(1)
 
 finalizedNewFile = "".join(newFileForJam).encode('UTF-8')
