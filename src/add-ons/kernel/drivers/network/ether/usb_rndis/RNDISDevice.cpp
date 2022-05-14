@@ -74,6 +74,7 @@ RNDISDevice::RNDISDevice(usb_device device)
 		fNotifyReadSem(-1),
 		fNotifyWriteSem(-1),
 		fNotifyControlSem(-1),
+		fReadHeader(NULL),
 		fLinkStateChangeSem(-1),
 		fMediaConnectState(MEDIA_STATE_UNKNOWN),
 		fDownstreamSpeed(0)
@@ -243,72 +244,75 @@ RNDISDevice::Read(uint8 *buffer, size_t *numBytes)
 		return B_DEVICE_NOT_FOUND;
 	}
 
-	iovec vec[2];
-	uint32 header[11] = { 0 };
-
-	vec[0].iov_base = &header;
-	vec[0].iov_len = sizeof(header);
-
-	vec[1].iov_base = buffer;
-	vec[1].iov_len = *numBytes;
-
-	status_t result = gUSBModule->queue_bulk_v(fReadEndpoint, vec, 2,
-		_ReadCallback, this);
-	if (result != B_OK) {
-		*numBytes = 0;
-		return result;
-	}
-
-	result = acquire_sem_etc(fNotifyReadSem, 1, B_CAN_INTERRUPT, 0);
-	if (result < B_OK) {
-		*numBytes = 0;
-		return result;
-	}
-
-	if (fStatusRead != B_OK && fStatusRead != B_CANCELED && !fRemoved) {
-		TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", fStatusRead);
-		result = gUSBModule->clear_feature(fReadEndpoint,
-			USB_FEATURE_ENDPOINT_HALT);
+	// The read funcion can return only one packet at a time, but we can receive multiple ones in
+	// a single USB transfer. So we need to buffer them, and check if we have something in our
+	// buffer for each Read() call before scheduling a new USB transfer. This would be more
+	// efficient if the network stack had a way to read multiple frames at once.
+	if (fReadHeader == NULL) {
+		status_t result = gUSBModule->queue_bulk(fReadEndpoint, fReadBuffer, sizeof(fReadBuffer),
+			_ReadCallback, this);
 		if (result != B_OK) {
-			TRACE_ALWAYS("failed to clear halt state on read\n");
 			*numBytes = 0;
 			return result;
 		}
+
+		result = acquire_sem_etc(fNotifyReadSem, 1, B_CAN_INTERRUPT, 0);
+		if (result < B_OK) {
+			*numBytes = 0;
+			return result;
+		}
+
+		if (fStatusRead != B_OK && fStatusRead != B_CANCELED && !fRemoved) {
+			TRACE_ALWAYS("device status error 0x%08" B_PRIx32 "\n", fStatusRead);
+			result = gUSBModule->clear_feature(fReadEndpoint,
+				USB_FEATURE_ENDPOINT_HALT);
+			if (result != B_OK) {
+				TRACE_ALWAYS("failed to clear halt state on read\n");
+				*numBytes = 0;
+				return result;
+			}
+		}
+		fReadHeader = (uint32*)fReadBuffer;
 	}
 
-	// TODO buffering is needed if we receive multiple packets, OOB data, etc since each Read
-	// call can only return one packet? (which isn't great and could be improved on network stack
-	// side to reduce syscalls if we had a readmmsg device call or something similar...)
-
-	if (header[0] != REMOTE_NDIS_PACKET_MSG) {
-		TRACE_ALWAYS("Received unexpected packet type %08" B_PRIx32 " on data link\n", header[0]);
+	if (fReadHeader[0] != REMOTE_NDIS_PACKET_MSG) {
+		TRACE_ALWAYS("Received unexpected packet type %08" B_PRIx32 " on data link\n",
+			fReadHeader[0]);
 		*numBytes = 0;
+		fReadHeader = NULL;
 		return B_BAD_VALUE;
 	}
 
-	if (header[1] != fActualLengthRead) {
-		TRACE_ALWAYS("Received frame length %08" B_PRIx32 " but USB transfer length is %08"
-			B_PRIx32 "\n", header[1], fActualLengthRead);
+	if (fReadHeader[1] + ((uint8*)fReadHeader - fReadBuffer) > fActualLengthRead) {
+		TRACE_ALWAYS("Received frame at %ld length %08" B_PRIx32 " out of bounds of receive buffer"
+			"%08" B_PRIx32 "\n", (uint8*) fReadHeader - fReadBuffer, fReadHeader[1],
+			fActualLengthRead);
 	}
 
-	if (header[4] != 0 || header[5] != 0 || header[6] != 0) {
+	if (fReadHeader[4] != 0 || fReadHeader[5] != 0 || fReadHeader[6] != 0) {
 		TRACE_ALWAYS("Received frame has out of bound data: off %08" B_PRIx32 " len %08" B_PRIx32
-			" count %08" B_PRIx32 "\n", header[4], header[5], header[6]);
+			" count %08" B_PRIx32 "\n", fReadHeader[4], fReadHeader[5], fReadHeader[6]);
 	}
 
-	if (header[7] != 0 || header[8] != 0) {
+	if (fReadHeader[7] != 0 || fReadHeader[8] != 0) {
 		TRACE_ALWAYS("Received frame has per-packet info: off %08" B_PRIx32 " len %08" B_PRIx32
-			"\n", header[7], header[8]);
+			"\n", fReadHeader[7], fReadHeader[8]);
 	}
 
-	if (header[9] != 0) {
-		TRACE_ALWAYS("Received frame has non-0 reserved fied %08x\n", header[9]);
+	if (fReadHeader[9] != 0) {
+		TRACE_ALWAYS("Received frame has non-0 reserved fied %08x\n", fReadHeader[9]);
 	}
 
-	*numBytes = header[3];
+	*numBytes = fReadHeader[3];
+	memcpy(buffer, fReadHeader + 11, fReadHeader[3]);
 
 	TRACE("Received data packet len %08x data [off %08x len %08x]\n",
-		header[1], header[2], header[3]);
+		fReadHeader[1], fReceivHeader[2], fReadHeader[3]);
+
+	// Advance to next packet
+	fReadHeader += fReadHeader[1];
+	if ((uint8*)fReadHeader - fReadBuffer >= fActualLengthRead)
+		fReadHeader = NULL;
 
 	return B_OK;
 }
