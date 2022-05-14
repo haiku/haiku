@@ -42,7 +42,7 @@ static uint32 sDeviceIndex;
 
 
 /*!	A service thread for each device interface. It just reads as many packets
-	as availabe, deframes them, and puts them into the receive queue of the
+	as available, deframes them, and puts them into the receive queue of the
 	device interface.
 */
 static status_t
@@ -69,7 +69,8 @@ device_reader_thread(void* _interface)
 
 			fifo_enqueue_buffer(&interface->receive_queue, buffer);
 		} else if (status == B_DEVICE_NOT_FOUND) {
-				device_removed(device);
+			device_removed(device);
+			return status;
 		} else {
 			// In case of error, give the other threads some
 			// time to run since this is a high priority time thread.
