@@ -23,6 +23,9 @@ namespace BPrivate {
 namespace Network {
 
 
+class BHttpFields;
+
+
 class BHttpMethod {
 public:
 	// Constants for default methods in RFC 7230 section 4.2
@@ -92,11 +95,13 @@ public:
 
 	// Access
 			bool					IsEmpty() const noexcept;
+	const	BHttpFields&			Fields() const noexcept;
 	const	BHttpMethod&			Method() const noexcept;
 	const	BHttpRedirectOptions&	Redirect() const noexcept;
 	const	BUrl&					Url() const noexcept;
 
 	// Named Setters
+			void					SetFields(const BHttpFields& fields);
 			void					SetMethod(const BHttpMethod& method);
 			void					SetRedirect(const BHttpRedirectOptions& redirectOptions);
 			void					SetUrl(const BUrl& url);

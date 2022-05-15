@@ -157,12 +157,13 @@ BHttpMethod::Method() const noexcept
 static const BUrl kDefaultUrl = BUrl();
 static const BHttpMethod kDefaultMethod = BHttpMethod::Get;
 static const BHttpRedirectOptions kDefaultRedirectOptions = BHttpRedirectOptions();
-
+static const BHttpFields kDefaultOptionalFields = BHttpFields();
 
 struct BHttpRequest::Data {
 	BUrl					url = kDefaultUrl;
 	BHttpMethod				method	= kDefaultMethod;
 	BHttpRedirectOptions	redirectOptions;
+	BHttpFields				optionalFields;
 };
 
 
@@ -200,6 +201,15 @@ BHttpRequest::IsEmpty() const noexcept
 }
 
 
+const BHttpFields&
+BHttpRequest::Fields() const noexcept
+{
+	if (!fData)
+		return kDefaultOptionalFields;
+	return fData->optionalFields;
+}
+
+
 const BHttpMethod&
 BHttpRequest::Method() const noexcept
 {
@@ -224,6 +234,32 @@ BHttpRequest::Url() const noexcept
 	if (!fData)
 		return kDefaultUrl;
 	return fData->url;
+}
+
+
+static constexpr std::array<std::string_view, 4> fReservedOptionalFieldNames = {
+	"Host"sv,
+	"Accept"sv,
+	"Accept-Encoding"sv,
+	"Connection"sv
+};
+
+
+void
+BHttpRequest::SetFields(const BHttpFields& fields)
+{
+	if (!fData)
+		fData = std::make_unique<Data>();
+
+	for (auto& field: fields) {
+		if (std::find(fReservedOptionalFieldNames.begin(), fReservedOptionalFieldNames.end(),
+			field.Name()) != fReservedOptionalFieldNames.end())
+		{
+			std::string_view fieldName = field.Name();
+			throw BHttpFields::InvalidInput(__PRETTY_FUNCTION__, BString(fieldName.data(), fieldName.size()));
+		}
+	}
+	fData->optionalFields = fields;
 }
 
 
@@ -322,6 +358,11 @@ BHttpRequest::SerializeHeaderTo(BDataIO* target) const
 	}
 
 	for (const auto& field: outputFields) {
+		bytesWritten += _write_to_dataio(target, field.RawField());
+		bytesWritten += _write_to_dataio(target, "\r\n"sv);
+	}
+
+	for (const auto& field: fData->optionalFields) {
 		bytesWritten += _write_to_dataio(target, field.RawField());
 		bytesWritten += _write_to_dataio(target, "\r\n"sv);
 	}

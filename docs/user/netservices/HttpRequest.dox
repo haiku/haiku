@@ -330,6 +330,12 @@ namespace Network {
 			<td> Defaults to an empty \ref BUrl </td>
 		</tr>
 		<tr>
+			<td> \ref Fields() </td>
+			<td> \ref SetFields() </td>
+			<td> Additional fields set in the request header. </td>
+			<td> Defaults with no additional fields </td>
+		</tr>
+		<tr>
 			<td> \ref Method() </td>
 			<td> \ref SetMethod() </td>
 			<td> The HTTP method for the request </td>
@@ -473,6 +479,16 @@ namespace Network {
 
 
 /*!
+	\fn const BHttpFields& BHttpRequest::Fields() const noexcept
+	\brief Get the additional header fields set for the request.
+
+	The returned header fields may be empty if no additional header fields were set.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn const BHttpMethod& BHttpRequest::Method() const noexcept
 	\brief Get the current method for the request.
 
@@ -513,6 +529,26 @@ namespace Network {
 
 
 //! @{
+
+
+/*!
+	\fn void BHttpRequest::SetFields(const BHttpFields &fields)
+	\brief Set additional header \a fields for this request.
+
+	There are a few reserved fields, which cannot be set as optional fields. These currently are:
+	* \c Host
+	* \c Accept
+	* \c Accept-Encoding
+	* \c Connection
+
+	\param fields Additional fields for the header of the request.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+	\exception BHttpFields::InvalidData This exception is raised when the \a fields contain
+		reserved fields.
+
+	\since Haiku R1
+*/
 
 
 /*!

@@ -276,12 +276,13 @@ HttpProtocolTest::HttpMethodTest()
 }
 
 
-constexpr std::string_view kHaikuGetRequestText =
+constexpr std::string_view kExpectedRequestText =
 	"GET / HTTP/1.1\r\n"
 	"Host: www.haiku-os.org\r\n"
 	"Accept: *\r\n"
 	"Accept-Encoding: gzip\r\n"
-	"Connection: close\r\n\r\n";
+	"Connection: close\r\n"
+	"Api-Key: 01234567890abcdef\r\n\r\n";
 
 
 void
@@ -294,9 +295,22 @@ HttpProtocolTest::HttpRequestTest()
 	request.SetUrl(url);
 	CPPUNIT_ASSERT(request.Url() == url);
 
+	// Add Invalid HTTP fields (should throw)
+	try {
+		BHttpFields invalidField = {{"Host"sv, "haiku-os.org"sv}};
+		request.SetFields(invalidField);
+		CPPUNIT_FAIL("Should not be able to add the invalid \"Host\" field to a request");
+	} catch (BHttpFields::InvalidInput& e) {
+		// Correct; do nothing
+	}
+
+	// Add valid HTTP field
+	BHttpFields validField = {{"Api-Key"sv, "01234567890abcdef"}};
+	request.SetFields(validField);
+
 	// Validate header serialization
 	BString header = request.HeaderToString();
-	CPPUNIT_ASSERT(header.Compare(kHaikuGetRequestText.data(), kHaikuGetRequestText.size()) == 0);
+	CPPUNIT_ASSERT(header.Compare(kExpectedRequestText.data(), kExpectedRequestText.size()) == 0);
 }
 
 
@@ -326,6 +340,14 @@ private:
 };
 
 
+constexpr std::string_view kExpectedStreamText =
+	"GET / HTTP/1.1\r\n"
+	"Host: www.haiku-os.org\r\n"
+	"Accept: *\r\n"
+	"Accept-Encoding: gzip\r\n"
+	"Connection: close\r\n\r\n";
+
+
 void
 HttpProtocolTest::HttpRequestStreamTest()
 {
@@ -336,11 +358,11 @@ HttpProtocolTest::HttpRequestStreamTest()
 
 	// Test streaming the request
 	BHttpRequestStream requestStream(request);
-	RequestStreamTestIO testIO(kHaikuGetRequestText.data());
+	RequestStreamTestIO testIO(kExpectedStreamText.data());
 	bool finished = false;
 	ssize_t expectedBytesWritten = 8;
 	ssize_t expectedTotalBytesWritten = 8;
-	const ssize_t expectedTotalSize = kHaikuGetRequestText.size();
+	const ssize_t expectedTotalSize = kExpectedStreamText.size();
 	if (expectedTotalSize < 8) {
 		expectedBytesWritten = expectedTotalSize;
 		expectedTotalBytesWritten = expectedTotalSize;
