@@ -300,18 +300,18 @@ RNDISDevice::Read(uint8 *buffer, size_t *numBytes)
 	}
 
 	if (fReadHeader[9] != 0) {
-		TRACE_ALWAYS("Received frame has non-0 reserved fied %08x\n", fReadHeader[9]);
+		TRACE_ALWAYS("Received frame has non-0 reserved field %08" B_PRIx32 "\n", fReadHeader[9]);
 	}
 
 	*numBytes = fReadHeader[3];
 	memcpy(buffer, fReadHeader + 11, fReadHeader[3]);
 
-	TRACE("Received data packet len %08x data [off %08x len %08x]\n",
-		fReadHeader[1], fReceivHeader[2], fReadHeader[3]);
+	TRACE("Received data packet len %08" B_PRIx32 " data [off %08" B_PRIx32 " len %08" B_PRIx32 "]\n",
+		fReadHeader[1], fReadHeader[2], fReadHeader[3]);
 
 	// Advance to next packet
 	fReadHeader += fReadHeader[1];
-	if ((uint8*)fReadHeader - fReadBuffer >= fActualLengthRead)
+	if ((uint32)((uint8*)fReadHeader - fReadBuffer) >= fActualLengthRead)
 		fReadHeader = NULL;
 
 	return B_OK;
@@ -840,7 +840,7 @@ RNDISDevice::_NotifyCallback(void *cookie, int32 status, void *_data,
 		uint32* data = (uint32*)_data;
 		uint32 notification = data[0];
 		uint32 reserved = data[1];
-		TRACE("Received notification %" PRIx32 " %" PRIx32 "\n", notification, reserved);
+		TRACE("Received notification %" B_PRIx32 " %" B_PRIx32 "\n", notification, reserved);
 #endif
 		release_sem_etc(device->fNotifyControlSem, 1, B_DO_NOT_RESCHEDULE);
 	}
