@@ -867,9 +867,37 @@ intel_extreme_init(intel_info &info)
 		} else {
 			info.shared_info->fdi_link_frequency = 2700;
 		}
+		if (info.shared_info->pch_info >= INTEL_PCH_CNP) {
+			// TODO read/write info.shared_info->hraw_clock
+		} else {
+			info.shared_info->hraw_clock = (read32(info, PCH_RAWCLK_FREQ)
+				& RAWCLK_FREQ_MASK) * 1000;
+			TRACE("%s: rawclk rate: %" B_PRIu32 " kHz\n", __func__, info.shared_info->hraw_clock);
+		}
 	} else {
+		// TODO read info.shared_info->hraw_clock
 		info.shared_info->fdi_link_frequency = 0;
 	}
+
+	if (info.device_type.InGroup(INTEL_GROUP_HAS)) {
+		uint32 lcpll = read32(info, LCPLL_CTL);
+		if ((lcpll & LCPLL_CD_SOURCE_FCLK) != 0)
+			info.shared_info->hw_cdclk = 800000;
+		else if ((lcpll & LCPLL_CLK_FREQ_MASK) == LCPLL_CLK_FREQ_450)
+			info.shared_info->hw_cdclk = 450000;
+		/* ULT type is missing
+		else if (IS_ULT)
+			info.shared_info->hw_cdclk = 337500;
+		*/
+		else
+			info.shared_info->hw_cdclk = 540000;
+	} else if (info.device_type.InGroup(INTEL_GROUP_SNB)
+		|| info.device_type.InGroup(INTEL_GROUP_IVB)) {
+		info.shared_info->hw_cdclk = 400000;
+	} else if (info.device_type.InGroup(INTEL_GROUP_ILK)) {
+		info.shared_info->hw_cdclk = 450000;
+	}
+	TRACE("%s: hw_cdclk: %" B_PRIu32 " kHz\n", __func__, info.shared_info->hw_cdclk);
 
 	TRACE("%s: completed successfully!\n", __func__);
 	return B_OK;

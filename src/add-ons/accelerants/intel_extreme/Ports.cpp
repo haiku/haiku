@@ -781,7 +781,12 @@ Port::_DpAuxTransfer(uint8* transmitBuffer, uint8 transmitSize,
 			| (transmitSize << INTEL_DP_AUX_CTL_MSG_SIZE_SHIFT) | INTEL_DP_AUX_CTL_FW_SYNC_PULSE_SKL(32)
 			| INTEL_DP_AUX_CTL_SYNC_PULSE_SKL(32);
 	} else {
-		uint32 aux_clock_divider = 0xe1; // TODO: value for 450Mhz
+		uint32 frequency = gInfo->shared_info->hw_cdclk;
+		if (channel != AUX_CH_A)
+			frequency = gInfo->shared_info->hraw_clock;
+		uint32 aux_clock_divider = (frequency + 2000 / 2) / 2000;
+		if (gInfo->shared_info->pch_info == INTEL_PCH_LPT && channel != AUX_CH_A)
+			aux_clock_divider = 0x48; // or 0x3f
 		uint32 timeout = INTEL_DP_AUX_CTL_TIMEOUT_400us;
 		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_BDW))
 			timeout = INTEL_DP_AUX_CTL_TIMEOUT_600us;

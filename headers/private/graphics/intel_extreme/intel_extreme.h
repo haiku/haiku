@@ -439,6 +439,8 @@ struct intel_shared_info {
 	uint32			frame_buffer_offset;
 
 	uint32			fdi_link_frequency;	// In Mhz
+	uint32			hraw_clock;
+	uint32			hw_cdclk;
 
 	bool			got_vbt;
 	bool			single_head_locked;
@@ -917,6 +919,11 @@ struct intel_brightness_legacy {
 #define ICL_DSSM_19200					1
 #define ICL_DSSM_38400					2
 
+#define LCPLL_CTL						0x130040
+#define LCPLL_CLK_FREQ_MASK				(3 << 26)
+#define LCPLL_CLK_FREQ_450				(0 << 26)
+#define LCPLL_CD_SOURCE_FCLK			(1 << 21)
+
 // display
 
 #define INTEL_DISPLAY_OFFSET			0x1000
@@ -1272,6 +1279,9 @@ struct intel_brightness_legacy {
 #define DREF_SSC4_DISABLE					(0 << 0)
 #define DREF_SSC4_ENABLE					(1 << 0)
 
+#define PCH_RAWCLK_FREQ						(0x6204 | REGS_SOUTH_SHARED)
+#define RAWCLK_FREQ_MASK					0x3ff
+
 // PLL registers
 //  Multiplier Divisor
 #define INTEL_DISPLAY_A_PLL				(0x6014 | REGS_SOUTH_SHARED)
@@ -1602,6 +1612,9 @@ struct intel_brightness_legacy {
 #define PCH_FDI_RXB_CHICKEN				(0x2010 | REGS_SOUTH_SHARED)
 #define FDI_RX_PHASE_SYNC_POINTER_EN	(1 << 0)
 #define FDI_RX_PHASE_SYNC_POINTER_OVR	(1 << 1)
+
+#define SFUSE_STRAP						(0x2014 | REGS_SOUTH_SHARED)
+#define SFUSE_STRAP_RAW_FREQUENCY		(1 << 8)
 
 // CPU Panel Fitters - These are for IronLake and up and are the CPU internal
 // panel fitters.
