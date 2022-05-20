@@ -165,17 +165,6 @@ if_alloc(u_char type)
 	if (ifp->receive_sem < B_OK)
 		goto err1;
 
-	switch (type) {
-		case IFT_ETHER:
-		{
-			ifp->if_l2com = _kernel_malloc(sizeof(struct arpcom), M_ZERO);
-			if (ifp->if_l2com == NULL)
-				goto err2;
-			IFP2AC(ifp)->ac_ifp = ifp;
-			break;
-		}
-	}
-
 	ifp->link_state_sem = -1;
 	ifp->open_count = 0;
 	ifp->flags = 0;
@@ -183,7 +172,7 @@ if_alloc(u_char type)
 	ifq_init(&ifp->receive_queue, semName);
 
 	ifp->scan_done_sem = -1;
-		// WLAN specific, doesn't hurt when initilized for other devices
+		// WLAN specific, doesn't hurt when initialized for other devices
 
 	// Search for the first free device slot, and use that one
 	IFNET_WLOCK();
