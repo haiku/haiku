@@ -1860,9 +1860,10 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	descriptor->next = endpoint->td_head;
 	endpoint->td_head = descriptor;
 
-	const uint8 current = endpoint->current,
-		eventdata = current + 1;
-	uint8 next = eventdata + 1;
+	const uint32 current = endpoint->current,
+		eventdata = current + 1,
+		last = XHCI_ENDPOINT_RING_SIZE - 1;
+	uint32 next = eventdata + 1;
 
 	TRACE("link descriptor for pipe: current %d, next %d\n", current, next);
 
@@ -1919,16 +1920,17 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 		B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_EVENT_DATA)
 			| TRB_3_IOC_BIT | TRB_3_CYCLE_BIT);
 
-	if (next == (XHCI_ENDPOINT_RING_SIZE - 1)) {
+	if (next == last) {
 		// We always use 2 TRBs per _Link..() call, so if "next" is the last
 		// TRB in the ring, we need to generate a link TRB at "next", and
-		// then wrap it to 0.
+		// then wrap it to 0. (We write the cycle bit later, after wrapping,
+		// for the reason noted in the previous comment.)
 		endpoint->trbs[next].address =
 			B_HOST_TO_LENDIAN_INT64(endpoint->trb_addr);
 		endpoint->trbs[next].status =
 			B_HOST_TO_LENDIAN_INT32(TRB_2_IRQ(0));
 		endpoint->trbs[next].flags =
-			B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_LINK) | TRB_3_CYCLE_BIT);
+			B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_LINK));
 
 		next = 0;
 	}
@@ -1937,8 +1939,12 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	endpoint->trbs[next].status = 0;
 	endpoint->trbs[next].flags = 0;
 
-	// Everything is ready, so write the cycle bit.
+	memory_write_barrier();
+
+	// Everything is ready, so write the cycle bit(s).
 	endpoint->trbs[current].flags |= B_HOST_TO_LENDIAN_INT32(TRB_3_CYCLE_BIT);
+	if (current == 0 && endpoint->trbs[last].address != 0)
+		endpoint->trbs[last].flags |= B_HOST_TO_LENDIAN_INT32(TRB_3_CYCLE_BIT);
 
 	TRACE("_LinkDescriptorForPipe pCurrent %p phys 0x%" B_PRIxPHYSADDR
 		" 0x%" B_PRIxPHYSADDR " 0x%08" B_PRIx32 "\n", &endpoint->trbs[current],
