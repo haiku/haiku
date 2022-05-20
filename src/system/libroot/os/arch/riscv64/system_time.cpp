@@ -31,17 +31,6 @@ __riscv64_setup_system_time(uint64 cv)
 [[gnu::optimize("omit-frame-pointer")]] bigtime_t
 system_time()
 {
-	// TODO: Timer unit conversion needs fixed here
-	// QEMU and SiFive boards use diferent timer frequencies
-	return CpuTime();
-/*
-	uint64 time = CpuTime();
-	uint64 lo = (uint32)time;
-	uint64 hi = time >> 32;
-	return ((lo * cv_factor) >> 32) + hi * cv_factor;
-*/
-/*
 	__uint128_t time = static_cast<__uint128_t>(CpuTime()) * cv_factor;
 	return time >> 32;
-*/
 }
