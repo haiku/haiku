@@ -174,10 +174,10 @@ IconSpewer::DrawSomeNew()
 	ASSERT(view);
 
 	BRect bounds(target->Bounds());
-	view->SetHighColor(Color(255, 255, 255));
+	view->SetHighColor(255, 255, 255);
 	view->FillRect(bounds);
 
-	view->SetHighColor(Color(0, 0, 0));
+	view->SetHighColor(0, 0, 0);
 	char buffer[256];
 	if (cycleTime) {
 		sprintf(buffer, "last cycle time %" B_PRId64 " ms", cycleTime/1000);
@@ -232,10 +232,10 @@ IconSpewer::DrawSomeOld()
 	ASSERT(view);
 
 	BRect bounds(target->Bounds());
-	view->SetHighColor(Color(255, 255, 255));
+	view->SetHighColor(255, 255, 255);
 	view->FillRect(bounds);
 
-	view->SetHighColor(Color(0, 0, 0));
+	view->SetHighColor(0, 0, 0);
 	char buffer[256];
 	if (cycleTime) {
 		sprintf(buffer, "last cycle time %Ld ms", cycleTime/1000);
