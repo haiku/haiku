@@ -2,7 +2,7 @@
 If the application will not quit you may have to kill it.	Team monitor		アプリケーションが終了しない場合は、強制終了しないといけないかもしれません。
 Quit application	Team monitor		アプリケーションの終了
 Open Terminal	Team monitor		ターミナルを開く
-{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{CONTROL+ALT+DELETE を # 秒押すと再起動します。}other{CONTROL+ALT+DELETE を # 秒押すと再起動します。}}
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural, one{CONTROL+ALT+DELETE を # 秒押すと再起動します。}other{CONTROL+ALT+DELETE を # 秒押すと再起動します。}}
 Restart the desktop	Team monitor		デスクトップの再起動
 Force reboot	Team monitor		強制再起動
 Team monitor	Team monitor		チームモニター
