@@ -112,8 +112,8 @@ bus_alloc_mem_resource(device_t dev, struct resource *res, pci_info *info,
 
 	void *virtualAddr;
 
-	res->r_mapped_area = map_mem(&virtualAddr, addr, size, 0,
-		"bus_alloc_resource(MEMORY)");
+	res->r_mapped_area = map_mem(&virtualAddr, addr, size,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, "bus_alloc_resource(MEMORY)");
 	if (res->r_mapped_area < B_OK)
 		return -1;
 

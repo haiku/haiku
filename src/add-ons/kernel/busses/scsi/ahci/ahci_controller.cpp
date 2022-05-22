@@ -131,7 +131,8 @@ AHCIController::Init()
 		return B_ERROR;
 	}
 
-	fRegsArea = map_mem((void **)&fRegs, addr, size, 0, "AHCI HBA regs");
+	fRegsArea = map_mem((void **)&fRegs, addr, size, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		"AHCI HBA regs");
 	if (fRegsArea < B_OK) {
 		TRACE("mapping registers failed\n");
 		return B_ERROR;

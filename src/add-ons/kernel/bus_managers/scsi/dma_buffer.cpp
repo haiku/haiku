@@ -193,7 +193,8 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 			// TODO: Use 64 bit addresses, if possible!
 #endif
 		buffer->area = create_area_etc(B_SYSTEM_TEAM, "DMA buffer", size,
-			B_CONTIGUOUS, 0, 0, 0, &virtualRestrictions, &physicalRestrictions,
+			B_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, 0,
+			&virtualRestrictions, &physicalRestrictions,
 			(void**)&buffer->address);
 
 		if (buffer->area < 0) {
@@ -207,7 +208,7 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 		// we can live with a fragmented buffer - very nice
 		buffer->area = create_area("DMA buffer",
 			(void **)&buffer->address, B_ANY_KERNEL_ADDRESS, size,
-			B_32_BIT_FULL_LOCK, 0);
+			B_32_BIT_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 				// TODO: Use B_FULL_LOCK, if possible!
 		if (buffer->area < 0) {
 			SHOW_ERROR(2, "Cannot create DMA buffer of %" B_PRIu32 " bytes",
@@ -226,7 +227,7 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 
 	buffer->sg_list_area = create_area("DMA buffer S/G table",
 		(void **)&buffer->sg_list, B_ANY_KERNEL_ADDRESS, sg_list_size,
-		B_32_BIT_FULL_LOCK, 0);
+		B_32_BIT_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 			// TODO: Use B_FULL_LOCK, if possible!
 	if (buffer->sg_list_area < 0) {
 		SHOW_ERROR( 2, "Cannot create DMA buffer S/G list of %" B_PRIuSIZE
@@ -287,7 +288,7 @@ scsi_alloc_dma_buffer_sg_orig(dma_buffer *buffer, size_t size)
 	buffer->sg_orig = create_area("S/G to original data",
 		(void **)&buffer->sg_list_orig,
 		B_ANY_KERNEL_ADDRESS, size,
-		B_NO_LOCK, 0);
+		B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (buffer->sg_orig < 0) {
 		SHOW_ERROR(2, "Cannot S/G list buffer to original data of %" B_PRIuSIZE
 			" bytes", size);
