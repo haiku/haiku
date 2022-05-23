@@ -747,6 +747,9 @@ intel_extreme_init(intel_info &info)
 	info.shared_info->frame_buffer = 0;
 	info.shared_info->dpms_mode = B_DPMS_ON;
 	info.shared_info->min_brightness = 2;
+	info.shared_info->internal_crt_support = true;
+	info.shared_info->pch_info = info.pch_info;
+	info.shared_info->device_type = info.device_type;
 
 	// Pull VBIOS info for later use
 	info.shared_info->got_vbt = parse_vbt_from_bios(info.shared_info);
@@ -806,9 +809,6 @@ intel_extreme_init(intel_info &info)
 
 	info.shared_info->pll_info.divisor_register = INTEL_DISPLAY_A_PLL_DIVISOR_0;
 
-	info.shared_info->pch_info = info.pch_info;
-
-	info.shared_info->device_type = info.device_type;
 #ifdef __HAIKU__
 	strlcpy(info.shared_info->device_identifier, info.device_identifier,
 		sizeof(info.shared_info->device_identifier));

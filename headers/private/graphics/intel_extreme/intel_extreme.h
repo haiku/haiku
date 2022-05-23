@@ -476,6 +476,7 @@ struct intel_shared_info {
 	edid1_info		vesa_edid_info;
 	bool			has_vesa_edid_info;
 
+	bool			internal_crt_support;
 	uint32			device_config_count;
 	child_device_config device_configs[10];
 };
