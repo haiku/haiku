@@ -25,11 +25,11 @@ public:
 		void						EnablePLL(uint32 lanes);
 		void						DisablePLL();
 
-		uint32						Base()
-										 { return fRegisterBase; };
+		pipe_index					PipeIndex()
+										 { return fPipeIndex; };
 
-private:
-		uint32						fRegisterBase;
+protected:
+		pipe_index					fPipeIndex;
 };
 
 
@@ -47,11 +47,11 @@ public:
 
 		void						SwitchClock(bool toPCDClock);
 
-		uint32						Base()
-										 { return fRegisterBase; };
+		pipe_index					PipeIndex()
+										 { return fPipeIndex; };
 
 protected:
-		uint32						fRegisterBase;
+		pipe_index					fPipeIndex;
 };
 
 

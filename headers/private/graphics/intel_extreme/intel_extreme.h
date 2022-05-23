@@ -1462,12 +1462,18 @@ struct intel_brightness_legacy {
 // PCH for each display pipe.
 // FDI receiver A is hooked up to transcoder A, FDI receiver B is hooked up to
 // transcoder B, so we have the same mapping as with the display pipes.
-#define PCH_FDI_RX_BASE_REGISTER		0xf0000
-#define PCH_FDI_RX_PIPE_OFFSET			0x01000
-#define PCH_FDI_RX_CONTROL				0x00c
-#define PCH_FDI_RX_MISC					0x010
-#define PCH_FDI_RX_IIR					0x014
-#define PCH_FDI_RX_IMR					0x018
+#define _FDI_RXA_CTL					0xf000c
+#define _FDI_RXB_CTL					0xf100c
+#define FDI_RX_CTL(pipe)				(_FDI_RXA_CTL + (_FDI_RXB_CTL - _FDI_RXA_CTL) * (pipe - INTEL_PIPE_A))
+#define _FDI_RXA_MISC					0xf0010
+#define _FDI_RXB_MISC					0xf1010
+#define FDI_RX_MISC(pipe)				(_FDI_RXA_MISC + (_FDI_RXB_MISC - _FDI_RXA_MISC) * (pipe - INTEL_PIPE_A))
+#define _FDI_RXA_IIR					0xf0014
+#define _FDI_RXB_IIR					0xf1014
+#define FDI_RX_IIR(pipe)				(_FDI_RXA_IIR + (_FDI_RXB_IIR - _FDI_RXA_IIR) * (pipe - INTEL_PIPE_A))
+#define _FDI_RXA_IMR					0xf0018
+#define _FDI_RXB_IMR					0xf1018
+#define FDI_RX_IMR(pipe)				(_FDI_RXA_IMR + (_FDI_RXB_IMR - _FDI_RXA_IMR) * (pipe - INTEL_PIPE_A))
 
 #define FDI_RX_ENABLE					(1 << 31)
 #define FDI_RX_PLL_ENABLED				(1 << 13)
@@ -1506,8 +1512,12 @@ struct intel_brightness_legacy {
 #define FDI_FS_ERRC_ENABLE				(1 << 27)
 #define FDI_FE_ERRC_ENABLE				(1 << 26)
 
-#define PCH_FDI_RX_TRANS_UNIT_SIZE_1	0x30
-#define PCH_FDI_RX_TRANS_UNIT_SIZE_2	0x38
+#define _FDI_RXA_TUSIZE1				0xf0030
+#define _FDI_RXA_TUSIZE2				0xf0038
+#define _FDI_RXB_TUSIZE1				0xf1030
+#define _FDI_RXB_TUSIZE2				0xf1038
+#define FDI_RX_TUSIZE1(pipe)	(_FDI_RXA_TUSIZE1 + (_FDI_RXB_TUSIZE1 - _FDI_RXA_TUSIZE1) * (pipe - INTEL_PIPE_A))
+#define FDI_RX_TUSIZE2(pipe)	(_FDI_RXA_TUSIZE2 + (_FDI_RXB_TUSIZE2 - _FDI_RXA_TUSIZE2) * (pipe - INTEL_PIPE_A))
 #define FDI_RX_TRANS_UNIT_SIZE(x)		((x - 1) << 25)
 #define FDI_RX_TRANS_UNIT_MASK			0x7e000000
 
@@ -1525,9 +1535,9 @@ struct intel_brightness_legacy {
 #define FDI_RX_TP1_TO_TP2_64		(3 << 20)
 #define FDI_RX_FDI_DELAY_90			(0x90 << 0)
 
-#define PCH_FDI_TX_BASE_REGISTER			0x60000
-#define PCH_FDI_TX_PIPE_OFFSET				0x01000
-#define PCH_FDI_TX_CONTROL					0x100
+#define _FDI_TXA_CTL 					(0x0100 | REGS_NORTH_PIPE_AND_PORT)
+#define _FDI_TXB_CTL 					(0x1100 | REGS_NORTH_PIPE_AND_PORT)
+#define FDI_TX_CTL(pipe)				(_FDI_TXA_CTL + (_FDI_TXB_CTL - _FDI_TXA_CTL) * (pipe - INTEL_PIPE_A))
 #define FDI_TX_ENABLE						(1 << 31)
 #define FDI_LINK_TRAIN_PATTERN_1			(0 << 28)
 #define FDI_LINK_TRAIN_PATTERN_2			(1 << 28)
