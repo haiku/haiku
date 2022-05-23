@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021, Andrew Lindesay, <apl@lindesay.co.nz>.
+ * Copyright 2018-2022, Andrew Lindesay, <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath, <julian.harnath@rwth-aachen.de>.
  * Copyright 2015, Axel Dörfler, <axeld@pinc-software.de>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
@@ -966,6 +966,8 @@ PackageListView::MessageReceived(BMessage* message)
 					row->UpdateRepository();
 				if ((changes & PKG_CHANGED_VERSION) != 0)
 					row->UpdateVersion();
+				if ((changes & PKG_CHANGED_VERSION_CREATE_TIMESTAMP) != 0)
+					row->UpdateVersionCreateTimestamp();
 			}
 			break;
 		}

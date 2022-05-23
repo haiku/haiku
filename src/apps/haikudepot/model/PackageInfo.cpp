@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
- * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -1016,7 +1016,10 @@ PackageInfo::SetViewed()
 void
 PackageInfo::SetVersionCreateTimestamp(uint64 value)
 {
-	fVersionCreateTimestamp = value;
+	if (fVersionCreateTimestamp != value) {
+		fVersionCreateTimestamp = value;
+		_NotifyListeners(PKG_CHANGED_VERSION_CREATE_TIMESTAMP);
+	}
 }
 
 
