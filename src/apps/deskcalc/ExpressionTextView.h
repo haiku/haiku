@@ -43,7 +43,7 @@ class ExpressionTextView : public InputTextView {
 			void				AddKeypadLabel(const char* label);
 
 			void				SetExpression(const char* expression);
-			void				SetValue(BString value);
+			void				SetValue(BString value, BString decimalSeparator = ".");
 
 			void				BackSpace();
 			void				Clear();
