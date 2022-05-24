@@ -546,7 +546,7 @@ A C D E F G B H I J
 	\brief Perform an action on every item in the list.
 
 	If one of the actions on the items fails it means that the \a func function
-	returned \c false and the processing of the list will be stopped.
+	returned \c true and the processing of the list will be stopped.
 
 	\param func A pointer to a function that takes a \c void* argument and
 	       returns a bool.
@@ -562,7 +562,7 @@ A C D E F G B H I J
 	\brief Perform an action on every item in the list with an argument.
 
 	If one of the actions on the items fails it means that the \a func function
-	returned \c false and the processing of the list will be stopped.
+	returned \c true and the processing of the list will be stopped.
 
 	\param func A function with the first \c void* argument being the item
 	       and the second \c void* being the argument that you supply. It
