@@ -296,9 +296,10 @@ BStringList::Join(const char* separator, int32 length) const
 void
 BStringList::DoForEach(bool (*func)(const BString& string))
 {
+	bool terminate = false;
 	int32 count = fStrings.CountItems();
-	for (int32 i = 0; i < count; i++)
-		func(StringAt(i));
+	for (int32 i = 0; i < count && !terminate; i++)
+		terminate = func(StringAt(i));
 }
 
 
@@ -306,9 +307,10 @@ void
 BStringList::DoForEach(bool (*func)(const BString& string, void* arg2),
 	void* arg2)
 {
+	bool terminate = false;
 	int32 count = fStrings.CountItems();
-	for (int32 i = 0; i < count; i++)
-		func(StringAt(i), arg2);
+	for (int32 i = 0; i < count && !terminate; i++)
+		terminate = func(StringAt(i), arg2);
 }
 
 
