@@ -1103,7 +1103,8 @@ hda_hw_init(hda_controller* controller)
 	// Map MMIO registers
 	controller->regs_area = map_physical_memory("hda_hw_regs",
 		physicalAddress, pciInfo.u.h0.base_register_sizes[0],
-		B_ANY_KERNEL_ADDRESS, 0, (void**)&controller->regs);
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		(void**)&controller->regs);
 	if (controller->regs_area < B_OK) {
 		status = controller->regs_area;
 		goto error;

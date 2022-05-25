@@ -113,7 +113,7 @@ map_mem(void **log, phys_addr_t phy, size_t size, const char *name)
 	phyadr = phy - offset;
 	size = round_to_pagesize(size + offset);
 	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_ADDRESS,
-		0, &mapadr);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &mapadr);
 	*log = mapadr + offset;
 
 	LOG(("physical = %p, logical = %p, offset = %#x, phyadr = %p, mapadr = %p, size = %#x, area = %#x\n",
