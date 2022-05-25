@@ -5,6 +5,7 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders shared storage ;
 UsePrivateHeaders file_systems ;
 UsePrivateKernelHeaders ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] : true ;
 
 KernelAddon ext2 :
 	Attribute.cpp
@@ -31,4 +32,10 @@ KernelAddon ext2 :
 ;
 
 SEARCH on [ FGristFiles DeviceOpener.cpp ]
+	= [ FDirName  $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
+
+SEARCH on [ FGristFiles crc32.c ]
+	= [ FDirName  $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
+
+SEARCH on [ FGristFiles CRCTable.cpp ]
 	= [ FDirName  $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
