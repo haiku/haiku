@@ -43,14 +43,30 @@ FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face)
 	fName.Truncate(B_FONT_STYLE_LENGTH);
 		// make sure this style can be found using the Be API
 
-	fHeight.ascent = (double)face->ascender / face->units_per_EM;
-	fHeight.descent = (double)-face->descender / face->units_per_EM;
-		// FT2's descent numbers are negative. Be's is positive
+	if (IsScalable()) {
+		fHeight.ascent = (double)face->ascender / face->units_per_EM;
+		fHeight.descent = (double)-face->descender / face->units_per_EM;
+			// FT2's descent numbers are negative. Be's is positive
 
-	// FT2 doesn't provide a linegap, but according to the docs, we can
-	// calculate it because height = ascending + descending + leading
-	fHeight.leading = (double)(face->height - face->ascender + face->descender)
-		/ face->units_per_EM;
+		// FT2 doesn't provide a linegap, but according to the docs, we can
+		// calculate it because height = ascending + descending + leading
+		fHeight.leading = (double)(face->height - face->ascender
+			+ face->descender) / face->units_per_EM;
+	} else {
+		// We don't have global metrics, get them from a bitmap
+		FT_Pos size = face->available_sizes[0].size;
+		for (int i = 1; i < face->num_fixed_sizes; i++)
+			size = max_c(size, face->available_sizes[i].size);
+		FT_Set_Pixel_Sizes(face, 0, size / 64);
+			// Size is encoded as 26.6 fixed point, while FT_Set_Pixel_Sizes
+			// uses the integer unencoded value
+
+		FT_Size_Metrics metrics = face->size->metrics;
+		fHeight.ascent = (double)metrics.ascender / size;
+		fHeight.descent = (double)-metrics.descender / size;
+		fHeight.leading = (double)(metrics.height - metrics.ascender
+			+ metrics.descender) / size;
+	}
 
 	if (IsFixedWidth())
 		return;
@@ -172,7 +188,8 @@ uint16
 FontStyle::PreservedFace(uint16 face) const
 {
 	// TODO: make this better
-	face &= ~(B_REGULAR_FACE | B_BOLD_FACE | B_ITALIC_FACE);
+	face &= ~(B_REGULAR_FACE | B_BOLD_FACE | B_ITALIC_FACE | B_CONDENSED_FACE
+		| B_LIGHT_FACE | B_HEAVY_FACE);
 	face |= Face();
 
 	return face;

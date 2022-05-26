@@ -106,6 +106,7 @@ MediaFileListView::KeyDown(const char *bytes, int32 numBytes)
 			break;
 		default:
 			BListView::KeyDown(bytes, numBytes);
+			break;
 	}
 }
 
@@ -117,4 +118,3 @@ MediaFileListView::SelectionChanged()
 	if (win != NULL)
 		win->SourceFileSelectionChanged();
 }
-

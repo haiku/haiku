@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -177,7 +177,6 @@
 #define ACPI_SIG_MPST           "MPST"      /* Memory Power State Table */
 #define ACPI_SIG_MSCT           "MSCT"      /* Maximum System Characteristics Table */
 #define ACPI_SIG_MSDM           "MSDM"      /* Microsoft Data Management Table */
-#define ACPI_SIG_MTMR           "MTMR"      /* MID Timer table */
 #define ACPI_SIG_NFIT           "NFIT"      /* NVDIMM Firmware Interface Table */
 #define ACPI_SIG_PCCT           "PCCT"      /* Platform Communications Channel Table */
 #define ACPI_SIG_PDTT           "PDTT"      /* Platform Debug Trigger Table */
@@ -187,6 +186,7 @@
 #define ACPI_SIG_SBST           "SBST"      /* Smart Battery Specification Table */
 #define ACPI_SIG_SDEI           "SDEI"      /* Software Delegated Exception Interface Table */
 #define ACPI_SIG_SDEV           "SDEV"      /* Secure Devices table */
+#define ACPI_SIG_NHLT           "NHLT"      /* Non-HDAudio Link Table */
 
 
 /*
@@ -303,7 +303,7 @@ typedef struct acpi_iort_memory_access
 typedef struct acpi_iort_its_group
 {
     UINT32                  ItsCount;
-    UINT32                  Identifiers[1];         /* GIC ITS identifier arrary */
+    UINT32                  Identifiers[1];         /* GIC ITS identifier array */
 
 } ACPI_IORT_ITS_GROUP;
 
@@ -457,7 +457,8 @@ typedef struct acpi_ivrs_header
 
 enum AcpiIvrsType
 {
-    ACPI_IVRS_TYPE_HARDWARE         = 0x10,
+    ACPI_IVRS_TYPE_HARDWARE1        = 0x10,
+    ACPI_IVRS_TYPE_HARDWARE2        = 0x11,
     ACPI_IVRS_TYPE_MEMORY1          = 0x20,
     ACPI_IVRS_TYPE_MEMORY2          = 0x21,
     ACPI_IVRS_TYPE_MEMORY3          = 0x22
@@ -485,16 +486,30 @@ enum AcpiIvrsType
 
 /* 0x10: I/O Virtualization Hardware Definition Block (IVHD) */
 
-typedef struct acpi_ivrs_hardware
+typedef struct acpi_ivrs_hardware_10
 {
     ACPI_IVRS_HEADER        Header;
     UINT16                  CapabilityOffset;   /* Offset for IOMMU control fields */
     UINT64                  BaseAddress;        /* IOMMU control registers */
     UINT16                  PciSegmentGroup;
     UINT16                  Info;               /* MSI number and unit ID */
-    UINT32                  Reserved;
+    UINT32                  FeatureReporting;
 
-} ACPI_IVRS_HARDWARE;
+} ACPI_IVRS_HARDWARE1;
+
+/* 0x11: I/O Virtualization Hardware Definition Block (IVHD) */
+
+typedef struct acpi_ivrs_hardware_11
+{
+    ACPI_IVRS_HEADER        Header;
+    UINT16                  CapabilityOffset;   /* Offset for IOMMU control fields */
+    UINT64                  BaseAddress;        /* IOMMU control registers */
+    UINT16                  PciSegmentGroup;
+    UINT16                  Info;               /* MSI number and unit ID */
+    UINT32                  Attributes;
+    UINT64                  EfrRegisterImage;
+    UINT64                  Reserved;
+} ACPI_IVRS_HARDWARE2;
 
 /* Masks for Info field above */
 
@@ -873,7 +888,7 @@ typedef struct acpi_madt_local_x2apic_nmi
 } ACPI_MADT_LOCAL_X2APIC_NMI;
 
 
-/* 11: Generic Interrupt (ACPI 5.0 + ACPI 6.0 changes) */
+/* 11: Generic Interrupt - GICC (ACPI 5.0 + ACPI 6.0 + ACPI 6.3 changes) */
 
 typedef struct acpi_madt_generic_interrupt
 {
@@ -892,7 +907,8 @@ typedef struct acpi_madt_generic_interrupt
     UINT64                  GicrBaseAddress;
     UINT64                  ArmMpidr;
     UINT8                   EfficiencyClass;
-    UINT8                   Reserved2[3];
+    UINT8                   Reserved2[1];
+    UINT16                  SpeInterrupt;       /* ACPI 6.3 */
 
 } ACPI_MADT_GENERIC_INTERRUPT;
 
@@ -1225,34 +1241,6 @@ typedef struct acpi_table_msdm
     ACPI_TABLE_HEADER       Header;             /* Common ACPI table header */
 
 } ACPI_TABLE_MSDM;
-
-
-/*******************************************************************************
- *
- * MTMR - MID Timer Table
- *        Version 1
- *
- * Conforms to "Simple Firmware Interface Specification",
- * Draft 0.8.2, Oct 19, 2010
- * NOTE: The ACPI MTMR is equivalent to the SFI MTMR table.
- *
- ******************************************************************************/
-
-typedef struct acpi_table_mtmr
-{
-    ACPI_TABLE_HEADER       Header;             /* Common ACPI table header */
-
-} ACPI_TABLE_MTMR;
-
-/* MTMR entry */
-
-typedef struct acpi_mtmr_entry
-{
-    ACPI_GENERIC_ADDRESS    PhysicalAddress;
-    UINT32                  Frequency;
-    UINT32                  Irq;
-
-} ACPI_MTMR_ENTRY;
 
 
 /*******************************************************************************
@@ -1737,6 +1725,7 @@ typedef struct acpi_pdtt_channel
 
 #define ACPI_PDTT_RUNTIME_TRIGGER           (1)
 #define ACPI_PDTT_WAIT_COMPLETION           (1<<1)
+#define ACPI_PDTT_TRIGGER_ORDER             (1<<2)
 
 
 /*******************************************************************************
@@ -1873,8 +1862,11 @@ typedef struct acpi_pptt_processor
 
 /* Flags */
 
-#define ACPI_PPTT_PHYSICAL_PACKAGE          (1)     /* Physical package */
-#define ACPI_PPTT_ACPI_PROCESSOR_ID_VALID   (2)     /* ACPI Processor ID valid */
+#define ACPI_PPTT_PHYSICAL_PACKAGE          (1)
+#define ACPI_PPTT_ACPI_PROCESSOR_ID_VALID   (1<<1)
+#define ACPI_PPTT_ACPI_PROCESSOR_IS_THREAD  (1<<2)  /* ACPI 6.3 */
+#define ACPI_PPTT_ACPI_LEAF_NODE            (1<<3)  /* ACPI 6.3 */
+#define ACPI_PPTT_ACPI_IDENTICAL            (1<<4)  /* ACPI 6.3 */
 
 
 /* 1: Cache Type Structure */

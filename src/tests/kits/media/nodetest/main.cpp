@@ -18,7 +18,7 @@ status_t rv;
 int main()
 {
 	out("Basic BBufferProducer, BBufferConsumer, BMediaRoster test\n");
-	out("for OpenBeOS by Marcus Overhagen <Marcus@Overhagen.de>\n\n");
+	out("for Haiku by Marcus Overhagen <Marcus@Overhagen.de>\n\n");
 	out("Creating BApplication now\n");
 	BApplication app("application/x-vnd.OpenBeOS-NodeTest");	
 

@@ -6,7 +6,7 @@ Boot Manager is unable to read the partition table!	BootManagerController		Öny�
 Immediately	DefaultPartitionPage		Hemen şimdi
 Uninstall Boot Manager	UninstallPage	Title	Önyükleme Yöneticisi'ni kaldır
 Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Bilinmeyen
-Installation of boot menu failed	BootManagerController	Title	Önyükleme menüsü yüklenemedi
+Installation of boot menu failed	BootManagerController	Title	Önyükleme menüsü kurulamadı
 Backup Master Boot Record	BootManagerController	Title	Ana Önyükleme Kaydını yedekle
 Cannot access!	DrivesPage	Cannot install	Erişilemiyor!
 After one second	DefaultPartitionPage		Bir saniye sonra
@@ -24,7 +24,7 @@ About to write the following boot menu to the boot disk (%s). Please verify the 
 The first partition on the disk starts too early and does not leave enough space free for a boot menu.\nBoot Manager needs 2 KiB available space before the first partition.	BootManagerController		Diskteki ilk bölümün konumu bir önyükleme menüsü için yeterli boş alan sağlanamamasına neden oluyor.\nÖnyükleme Yöneticisi ilk bölüm başlamadan önce en az 2 KiB kullanılabilir alana gereksinim duyar.
 Uninstall	DrivesPage	Button	Kaldır
 Update	DrivesPage	Button	Güncelle
-The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Ana Önyükleme Kaydı:\n\t%s\ndiskine kaydedildi. Lütfen AÖK'nin kaydedileceği dosyayı seçiniz.\n\nEğer yükleme sırasında bir şeyler ters giderse veya gelecekte önyükleme menüsünü kaldırmak isterseniz, bootman uygulamasını çalıştırın ve 'Kaldır' özelliğini seçin.
+The Master Boot Record (MBR) of the boot device:\n\t%s\nwill now be saved to disk. Please select a file to save the MBR into.\n\nIf something goes wrong with the installation or if you later wish to remove the boot menu, simply run the bootman program and choose the 'Uninstall' option.	BootManagerController		Ana Önyükleme Kaydı:\n\t%s\ndiskine kaydedildi. Lütfen AÖK'nin kaydedileceği dosyayı seçiniz.\n\nEğer kurulum sırasında bir şeyler ters giderse veya gelecekte önyükleme menüsünü kaldırmak isterseniz bootman uygulamasını çalıştırın ve 'Kaldır' özelliğini seçin.
 Default Partition	DefaultPartitionPage	Title	Öntanımlı bölüm
 Installation of boot menu completed	BootManagerController	Title	Açılış menüsü kurulumu tamamlandı
 After one minute	DefaultPartitionPage		Bir dakika sonra
@@ -38,7 +38,7 @@ After five seconds	DefaultPartitionPage		Beş saniye sonra
 Timeout: %s	DefaultPartitionPage		Zaman aşımı: %s
 The Master Boot Record could not be restored!	BootManagerController		Ana Önyükleme Kaydı geri yüklenemedi!
 The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Mevcut sabit diskin bölüm tablosu Önyükleme Yöneticisi ile uyumlu değil.\nÖnyükleme Yöneticisi yalnızca IBM PC MBR bölümleri ile uyumludur.
-Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Önyükleme Yöneticisi'nin yükleneceği veya kaldırılacağı diski seçin.
+Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Önyükleme Yöneticisi'nin kurulacağı veya kaldırılacağı diski seçin.
 After four seconds	DefaultPartitionPage		Dört saniye sonra
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Adsız %d
 First partition starts too early	BootManagerController	Title	İlk bölüm konumu çok önde
@@ -61,9 +61,9 @@ BootManager	System name		Önyükleme Yöneticisi
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Geri yüklemenin yapılacağı Ana Önyükleme Kaydı (MBR) dosyasının konumunu belirtin. Bu dosya önyükleme yöneticisi ilk kurulduğunda oluşturulan dosyadır.
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	BootManagerController		Lütfen Ana Önyükleme Kaydı dosyasını konumunu belirtin. Bu dosya önyükleme yöneticisi ilk kurulduğunda oluşturulan dosyadır.
 About to restore the Master Boot Record (MBR) of %disk from %file. Do you wish to continue?	BootManagerController	Don't translate the place holders: %disk and %file	%disk diskinin Ana Önyükleme Kaydı %file dosyasından geri yüklenecek. Sürdürmek istiyor musunuz?
-Install	DrivesPage	Button	Yükle
+Install	DrivesPage	Button	Kur
 File:	FileSelectionPage	Text control label	Dosya:
 Error reading partition table	BootManagerController	Title	Bölüm tablosu okunurken hata
 Back	BootManagerController	Button	Geri
 The boot manager has been successfully installed on your system.	BootManagerController		Önyükleme Yöneticisi sisteminize başarıyla kuruldu.
-The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Eski Ana Önyükleme Kaydı %s konumuna kaydedilemedi. Kurulumu sürdürebilirsiniz ancak önyükleme menüsünü kaldırmanız artık olanaklı olmayacaktır.
+The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Eski Ana Önyükleme Kaydı %s konumuna kaydedilemedi. Kurulumu sürdürebilirsiniz; ancak önyükleme menüsünü kaldırmanız artık olanaklı olmayacaktır.

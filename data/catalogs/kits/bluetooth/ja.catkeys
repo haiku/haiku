@@ -2,7 +2,7 @@
 Positioning	DeviceClass		位置
 Controller	DeviceClass		コントローラー
 Common ISDN access	DeviceClass		一般的な ISDN 接続
-Unknown (reserved) minor device class	DeviceClass		不明 (予約済) の副デバイスクラス
+Unknown (reserved) minor device class	DeviceClass		不明 (予約済) なマイナーデバイスクラス
 Uncategorized	DeviceClass		未分類
 Keyboard	DeviceClass		キーボード
 Smart phone	DeviceClass		スマートフォン
@@ -22,18 +22,18 @@ Imaging	DeviceClass		イメージングデバイス
 Device conforms to the headset profile	DeviceClass		デバイスはヘッドセットプロファイルに適合します
 Remote control	DeviceClass		リモコン
 Fully available	DeviceClass		すべて有効
-#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#無効な名前です
+#CommandFailed#Not Valid name	RemoteDevice		#CommandFailed#無効な名前
 Server	DeviceClass		サーバー
 No service available	DeviceClass		サービスが有効ではありません
 Printer	DeviceClass		プリンター
 Card reader	DeviceClass		カードリーダー
 Wired modem or voice gateway	DeviceClass		有線モデムかボイスゲートウェイ
-#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#無効な名前です
-#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#無効な名前です
+#ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#無効な名前
+#NoOwnerError#Not Valid name	RemoteDevice		#NoOwnerError#無効な名前
 Camcorder	DeviceClass		カムコーダー
-#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#無効な名前です
+#NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#無効な名前
 17-33% utilized	DeviceClass		17-33% 使用
-Desktop workstation	DeviceClass		デスクトップ ワークステーション
+Desktop workstation	DeviceClass		デスクトップワークステーション
 Unspecified	DeviceClass		未分類
 Miscellaneous	DeviceClass		その他
 Robot	DeviceClass		ロボット

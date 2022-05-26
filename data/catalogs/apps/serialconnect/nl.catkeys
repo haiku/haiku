@@ -1,0 +1,37 @@
+1	dutch; flemish	x-vnd.haiku.SerialConnect	354154115
+Hardware	SerialWindow	Flowcontrol	Hardware
+Connection	SerialWindow		Verbinding
+Raw send…	SerialWindow		Onbewerkt verzenden…
+Baud rate	SerialWindow		Baudsnelheid
+Stop bits	SerialWindow		Stopbits
+None	SerialWindow	Flowcontrol	Geen
+Cancel	Custom baudrate window		Annuleren
+Sending…	XModemStatus		Versturen…
+<no serial port available>	SerialWindow		<geen seriële poort beschikbaar>
+Log to file…	SerialWindow		In bestand loggen…
+Custom baudrate	Custom baudrate window		Aangepaste baudsnelheid
+File	SerialWindow		Bestand
+SerialConnect	System name		SerialConnect
+custom…	SerialWindow	Baudrate	aangepast…
+Parity	SerialWindow		Pariteit
+None	SerialWindow	Parity	Geen
+Disconnect	SerialWindow		Verbinding sluiten
+Everything sent, waiting for acknowledge	XModemStatus		Alles is verzonden, bezig met wachten op bevestiging
+Odd	SerialWindow	Parity	Oneven
+Flow control	SerialWindow		Flow controle
+file transfer progress	SerialWindow		bestands overdracht progressie
+CRC requested	XModemStatus		CRC nodig
+Data bits	SerialWindow		Data bits
+Both	SerialWindow	Flowcontrol	Beide
+Edit	SerialWindow		Bewerken
+XModem send…	SerialWindow		XModem verstuurd…
+Baudrate:	Custom baudrate window		Baudsnelheid:
+OK	Custom baudrate window		Ok
+Waiting for receiver…	XModemStatus		Wacht op ontvanger...
+Clear history	SerialWindow		Geschiedenis wissen
+Checksum error, re-send block	XModemStatus		Checksum fout, block opnieuw verzenden
+Settings	SerialWindow		Instellingen
+Even	SerialWindow	Parity	Even
+Software	SerialWindow	Flowcontrol	Software
+Line terminator	SerialWindow		Lijn terminator
+Remote cancelled transfer	XModemStatus		Overdracht extern afgebroken

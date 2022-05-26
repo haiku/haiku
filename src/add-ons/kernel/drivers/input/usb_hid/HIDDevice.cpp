@@ -263,10 +263,10 @@ HIDDevice::Removed()
 
 
 status_t
-HIDDevice::MaybeScheduleTransfer()
+HIDDevice::MaybeScheduleTransfer(HIDReport*)
 {
 	if (fRemoved)
-		return B_ERROR;
+		return ENODEV;
 
 	if (atomic_get_and_set(&fTransferScheduled, 1) != 0) {
 		// someone else already caused a transfer to be scheduled

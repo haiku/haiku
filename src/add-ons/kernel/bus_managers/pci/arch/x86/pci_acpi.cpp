@@ -16,15 +16,17 @@
 
 #include <KernelExport.h>
 
+#include <boot_item.h>
 #include <arch/x86/arch_acpi.h>
 
 
 //#define TRACE_ACPI
 #ifdef TRACE_ACPI
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
+#define ERROR(x...)	dprintf(x)
 
 static struct scan_spots_struct acpi_scan_spots[] = {
 	{ 0x0, 0x1000, 0x1000 },
@@ -48,7 +50,7 @@ acpi_validate_rsdp(acpi_rsdp* rsdp)
 		checksum += data[i];
 
 	if ((checksum & 0xff) != 0) {
-		TRACE(("acpi: rsdp failed basic checksum\n"));
+		TRACE("acpi: rsdp failed basic checksum\n");
 		return B_BAD_DATA;
 	}
 
@@ -60,7 +62,7 @@ acpi_validate_rsdp(acpi_rsdp* rsdp)
 		}
 
 		if ((checksum & 0xff) != 0) {
-			TRACE(("acpi: rsdp failed extended checksum\n"));
+			ERROR("acpi: rsdp failed extended checksum\n");
 			return B_BAD_DATA;
 		}
 	}
@@ -89,9 +91,9 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 
 	bool usingXsdt = false;
 
-	TRACE(("acpi: found rsdp at %p oem id: %.6s, rev %d\n",
-		rsdp, rsdp->oem_id, rsdp->revision));
-	TRACE(("acpi: rsdp points to rsdt at 0x%lx\n", rsdp->rsdt_address));
+	TRACE("acpi: found rsdp at %p oem id: %.6s, rev %d\n",
+		rsdp, rsdp->oem_id, rsdp->revision);
+	TRACE("acpi: rsdp points to rsdt at 0x%" B_PRIx32 "\n", rsdp->rsdt_address);
 
 	uint32 length = 0;
 	acpi_descriptor_header* rsdt = NULL;
@@ -105,7 +107,7 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 			&& strncmp(rsdt->signature, ACPI_XSDT_SIGNATURE, 4) != 0) {
 			delete_area(rsdtArea);
 			rsdt = NULL;
-			TRACE(("acpi: invalid extended system description table\n"));
+			ERROR("acpi: invalid extended system description table\n");
 		} else
 			usingXsdt = true;
 	}
@@ -118,19 +120,19 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 			rsdp->rsdt_address, sizeof(acpi_descriptor_header),
 			B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void **)&rsdt);
 		if (rsdt == NULL) {
-			TRACE(("acpi: couldn't map rsdt header\n"));
+			ERROR("acpi: couldn't map rsdt header\n");
 			return B_ERROR;
 		}
 		if (strncmp(rsdt->signature, ACPI_RSDT_SIGNATURE, 4) != 0) {
 			delete_area(rsdtArea);
 			rsdt = NULL;
-			TRACE(("acpi: invalid root system description table\n"));
+			ERROR("acpi: invalid root system description table\n");
 			return B_ERROR;
 		}
 
 		length = rsdt->length;
 		// Map the whole table, not just the header
-		TRACE(("acpi: rsdt length: %lu\n", length));
+		TRACE("acpi: rsdt length: %" B_PRIu32 "\n", length);
 		delete_area(rsdtArea);
 		rsdtArea = map_physical_memory("rsdt acpi",
 			rsdp->rsdt_address, length, B_ANY_KERNEL_ADDRESS,
@@ -139,7 +141,7 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 
 	if (rsdt != NULL) {
 		if (acpi_validate_rsdt(rsdt) != B_OK) {
-			TRACE(("acpi: rsdt failed checksum validation\n"));
+			TRACE("acpi: rsdt failed checksum validation\n");
 			delete_area(rsdtArea);
 			return B_ERROR;
 		} else {
@@ -147,9 +149,9 @@ acpi_check_rsdt(acpi_rsdp* rsdp)
 				sAcpiXsdt = rsdt;
 			else
 				sAcpiRsdt = rsdt;
-			TRACE(("acpi: found valid %s at %p\n",
+			TRACE("acpi: found valid %s at %p\n",
 				usingXsdt ? ACPI_XSDT_SIGNATURE : ACPI_RSDT_SIGNATURE,
-				rsdt));
+				rsdt);
 		}
 	} else
 		return B_ERROR;
@@ -173,12 +175,12 @@ acpi_find_table_generic(const char* signature, acpi_descriptor_header* acpiSdt)
 	}
 
 	if (sNumEntries <= 0) {
-		TRACE(("acpi: root system description table is empty\n"));
+		ERROR("acpi: root system description table is empty\n");
 		return NULL;
 	}
 
-	TRACE(("acpi: searching %ld entries for table '%.4s'\n", sNumEntries,
-		signature));
+	TRACE("acpi: searching %" B_PRId32 " entries for table '%.4s'\n", sNumEntries,
+		signature);
 
 	PointerType* pointer = (PointerType*)((uint8*)acpiSdt
 		+ sizeof(acpi_descriptor_header));
@@ -193,8 +195,8 @@ acpi_find_table_generic(const char* signature, acpi_descriptor_header* acpiSdt)
 		if (header == NULL
 			|| strncmp(header->signature, signature, 4) != 0) {
 			// not interesting for us
-			TRACE(("acpi: Looking for '%.4s'. Skipping '%.4s'\n",
-				signature, header != NULL ? header->signature : "null"));
+			TRACE("acpi: Looking for '%.4s'. Skipping '%.4s'\n",
+				signature, header != NULL ? header->signature : "null");
 
 			if (header != NULL) {
 				delete_area(headerArea);
@@ -204,7 +206,7 @@ acpi_find_table_generic(const char* signature, acpi_descriptor_header* acpiSdt)
 			continue;
 		}
 
-		TRACE(("acpi: Found '%.4s' @ %p\n", signature, pointer));
+		TRACE("acpi: Found '%.4s' @ %p\n", signature, pointer);
 		break;
 	}
 
@@ -238,27 +240,65 @@ acpi_find_table(const char* signature)
 void
 acpi_init()
 {
+	// Try pointer from boot loader, if any
+	phys_addr_t* acpiRootPointer = (phys_addr_t*)get_boot_item("ACPI_ROOT_POINTER", NULL);
+	if (acpiRootPointer != NULL) {
+		acpi_rsdp* rsdp = NULL;
+		area_id rsdpArea = map_physical_memory("acpi rsdp",
+			*acpiRootPointer, B_PAGE_SIZE,
+			B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void **)&rsdp);
+		if (rsdpArea < B_OK) {
+			ERROR("acpi_init: couldn't map %s\n", strerror(rsdpArea));
+		} else {
+			status_t status = B_ERROR;
+			if (strncmp((char*)rsdp, ACPI_RSDP_SIGNATURE, 8) == 0)
+				status = acpi_check_rsdt(rsdp);
+			delete_area(rsdpArea);
+			if (status == B_OK)
+				return;
+		}
+	}
+
+	// Try to find the ACPI RSDP in EBDA
+	uint8* start = NULL;
+	area_id ebdaArea = map_physical_memory("ebda", 0, B_PAGE_SIZE,
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void **)&start);
+	if (ebdaArea < 0) {
+		ERROR("acpi_init: couldn't map 1K: %s\n", strerror(ebdaArea));
+	} else {
+		phys_addr_t ebda = *(uint16*)&start[0x40e];
+		ebda <<= 4;
+		TRACE("acpi_init: 0x%lx\n", ebda);
+		delete_area(ebdaArea);
+		if (ebda > 0x400) {
+			acpi_scan_spots[0].start = ebda;
+			acpi_scan_spots[0].stop = ebda + 0x1000;
+			acpi_scan_spots[0].length = 0x1000;
+			// will be scanned first
+		}
+	}
+
 	// Try to find the ACPI RSDP.
 	for (int32 i = 0; acpi_scan_spots[i].length > 0; i++) {
 		acpi_rsdp* rsdp = NULL;
 
-		TRACE(("acpi_init: entry base 0x%lx, limit 0x%lx\n",
-			acpi_scan_spots[i].start, acpi_scan_spots[i].stop));
+		TRACE("acpi_init: entry base 0x%" B_PRIx32 ", limit 0x%" B_PRIx32 "\n",
+			acpi_scan_spots[i].start, acpi_scan_spots[i].stop);
 
 		char* start = NULL;
 		area_id rsdpArea = map_physical_memory("acpi rsdp",
 			acpi_scan_spots[i].start, acpi_scan_spots[i].length,
 			B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void **)&start);
 		if (rsdpArea < B_OK) {
-			TRACE(("acpi_init: couldn't map %s\n", strerror(rsdpArea)));
+			ERROR("acpi_init: couldn't map %s\n", strerror(rsdpArea));
 			break;
 		}
 		for (char *pointer = start;
 			(addr_t)pointer < (addr_t)start + acpi_scan_spots[i].length;
 			pointer += 16) {
 			if (strncmp(pointer, ACPI_RSDP_SIGNATURE, 8) == 0) {
-				TRACE(("acpi_init: found ACPI RSDP signature at %p\n",
-					pointer));
+				TRACE("acpi_init: found ACPI RSDP signature at %p\n",
+					pointer);
 				rsdp = (acpi_rsdp*)pointer;
 			}
 		}

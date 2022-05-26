@@ -1,29 +1,37 @@
-1	portuguese (brazil)	x-vnd.Haiku.TextSearch	1966170500
+1	portuguese (brazil)	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Por favor selecione os arquivos que você deseja ter selecionados por você no Tracker
 %appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		Falha ao iniciar o programa xargs!
 Open selection	GrepWindow		Abrir seleção
 Actions	GrepWindow		Ações
 New window	GrepWindow		Nova janela
 Encoding	GrepWindow		Codificação
+Set target to parent folder	GrepWindow		Definir destino para pasta de origem
 OK	GrepWindow		OK
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		Fechar
 Look in sub-folders	GrepWindow		Procurar nas sub-pastas
-%s: Not enough room to escape the filename.	Grepper		%s. Não há espaço suficiente para escapar o nome do arquivo.
+%s: Not enough room to escape the filename.	Grepper		%s: Não há espaço suficiente para escapar o nome do arquivo.
 Follow symbolic links	GrepWindow		Seguir atalhos
+Regular expression	GrepWindow		Expressão regular
 Text files only	GrepWindow		Somente arquivos de texto
 Quit	GrepWindow		Sair
 Show files in Tracker	GrepWindow		Mostrar arquivos no Tracker
 Please select the files you wish to keep searching.	GrepWindow		Por favor selecione os arquivos em que deseja que a procura continue.
 Trim to selection	GrepWindow		Reduzir para seleção
 Set target…	GrepWindow		Estabelecer objetivo…
+Failed to open input pipe!	Grepper		Falha ao abrir o canal de entrada!
 Search	GrepWindow		Localizar
 Copy text to clipboard	GrepWindow		Copiar texto para a Área de Transferência
 Show lines	GrepWindow		Mostrar linhas
+Failed to open errors pipe!	Grepper		Falha ao abrir o canal de erros!
 The unselected files will be removed from the list.	GrepWindow		Os arquivos não selecionados irão ser removidos da lista.
+Open files in code editor	GrepWindow		Abrir arquivos no editor de código
 Skip folders starting with a dot	GrepWindow		Ignorar pastas iniciando com um ponto
+Failed to open output pipe!	Grepper		Falha ao abrir o canal de saída!
 Cancel	GrepWindow		Cancelar
 History	GrepWindow		Histórico
+TextSearch	System name		Pesquisa de texto
 File	GrepWindow		Arquivo
 Case-sensitive	GrepWindow		Diferenciar maiúsculas e minúsculas
 Select all	GrepWindow		Selecionar tudo

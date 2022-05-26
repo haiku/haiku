@@ -1,48 +1,60 @@
-1	ukrainian	x-vnd.Haiku-Terminal	2664488407
+1	ukrainian	x-vnd.Haiku-Terminal	2062206461
+ANSI cyan color	Terminal AppearancePrefView		ANSI ціан
 Close other tabs	Terminal TermWindow		Закрити інші вкладки
 Insert path	Terminal TermView		Введіть шлях
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Термінал не зміг запустити оболонку. Прикро.
 Text encoding	Terminal TermWindow		Кодування тексту
+ANSI blue color	Terminal AppearancePrefView		ANSI синій
 OK	Terminal SetTitleWindow		ОК
 Edit	Terminal TermWindow		Дія
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               роздрукувати цю довідку\n  -t,     --title              встановити заголовок вікна\n  -f,     --fullscreen         запускати у повноекранному режимі\n  -w,     --working-directory  встановити початкову робочу директорію\n
 Select all	Terminal TermWindow		Вибрати все
 Confirm exit if active programs exist	Terminal AppearancePrefView		Підтверджувати вихід якщо присутні активні програми
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tПоточна робоча папка активного процесу в поточній вкладці.\n\t\t\tПри необхідності можна вказати максимальне число компонентів\n\t\t\tдля відображення. Наприклад '%2d' для більш ніж двох компонентів.\n\t%T\t-\tНазва програми Terminal для поточної локалі.\n\t%e\t-\tКодування поточної локалі. Для UTF-8 не відображається.\n\t%i\t-\tІндекс вікна.\n\t%p\t-\tНазва активного процесу у поточній вкладці.\n\t%t\t-\tЗаголовок поточної вкладки.
 Solarized Dark	Terminal colors scheme		Сяючий морок
 Copy	Terminal TermWindow		Копіювати
+ANSI bright green color	Terminal AppearancePrefView		ANSI яскраво-зелений
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               показати довідку\n  -t,     --title              установити заголовок вікна\n  -f,     --fullscreen         повноекранний режим\n  -w,     --working-directory  установити робочий каталог
+ANSI white color	Terminal AppearancePrefView		ANSI білий
 Retro	Terminal colors scheme		Ретро
 Edit tab title…	Terminal TermWindow		Редагувати заголовок вкладки…
-Print	Terminal TermWindow		Друк
 Settings	Terminal TermWindow		Налаштування
+Print	Terminal TermWindow		Друк
 %app% settings	Terminal PrefWindow	window title	%app% налаштування
+ANSI black color	Terminal AppearancePrefView		ANSI чорний
 Use default	Terminal SetTitleWindow		За замовчуванням
 Close tab	Terminal TermWindow		Закрити вкладку
 Selected background	Terminal AppearancePrefView		Вибраний фон
 Error!	Terminal getString		Помилка!
 Set tab title	Terminal TermWindow		Встановити заголовок вкладки
 Appearance	Terminal PrefWindow		Вигляд
+ANSI bright yellow color	Terminal AppearancePrefView		ANSI яскраво-жовтий
 Encoding:	Terminal AppearancePrefView		Кодування:
 Create link here	Terminal TermView		Створити посилання тут
 Custom	Terminal AppearancePrefView	Window size	Вибір користувача
 Selected text	Terminal AppearancePrefView		Вибраний текст
 Change directory	Terminal TermView		Змінити каталог
+ANSI magenta color	Terminal AppearancePrefView		ANSI пурпурний
 Page setup…	Terminal TermWindow		Налаштування друку…
 Slate	Terminal colors scheme		Сланець
 Defaults	Terminal PrefWindow		За замовчуванням
 Cancel	Terminal TermView		Скасувати
 Revert	Terminal PrefWindow		Без змін
+Relaxed	Terminal colors scheme		Релаксація
+ANSI bright magenta color	Terminal AppearancePrefView		ANSI яскравий пурпурний
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Термінал
-Use selection	Terminal FindWindow		Використати вибране
+ANSI bright cyan color	Terminal AppearancePrefView		ANSI яскравий ціан
 Find next	Terminal TermWindow		Знайти наступне
+Use selection	Terminal FindWindow		Використати вибране
 Copy link location	Terminal TermView		Копіювати адресу посилання
 Window title:	Terminal AppearancePrefView		Заголовок вікна:
 New tab	Terminal TermWindow		Нова вкладка
+ANSI bright blue color	Terminal AppearancePrefView		ANSI яскраво-блакитний
 Allow bold text	Terminal AppearancePrefView		Дозволити жирний текст
 Window title…	Terminal TermWindow		Заголовок вікна…
 Blue	Terminal colors scheme		Синій
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Неможливо виконати \"%command\":\n\t%error
 Open path	Terminal TermView		Відкрити шлях
+ANSI yellow color	Terminal AppearancePrefView		ANSI жовтий
 Terminal	System name		Terminal
 Font size	Terminal TermWindow		Розмір шрифту
 Custom	Terminal colors scheme		Вибір користувача
@@ -53,16 +65,17 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Нероспізнан�
 Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
 Text not found.	Terminal TermWindow		Текст не знайдено.
 Find failed	Terminal TermWindow		Збій пошуку
-Match word	Terminal FindWindow		Слово повністю
 Color scheme:	Terminal AppearancePrefView		Схема кольорів:
+Match word	Terminal FindWindow		Слово повністю
 New Terminal	Terminal TermWindow		Новий Термінал
 Quit	Terminal TermWindow		Вийти
-Match case	Terminal FindWindow		Враховувати регістр
 Find previous	Terminal TermWindow		Знайти попереднє
+Match case	Terminal FindWindow		Враховувати регістр
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Шаблон визначає заголовки вкладок.\nМожна використовувати наступні заповнювачі:\n\n
 Close	Terminal TermWindow		Закрити
 Save to file…	Terminal PrefWindow		Зберегти у файл…
 Background	Terminal AppearancePrefView		Фон
+ANSI green color	Terminal AppearancePrefView		ANSI зелений
 Copy path	Terminal TermView		Копіювати шлях
 Window size	Terminal TermWindow		Розмір вікна
 Copy absolute path	Terminal TermView		Копіювати абсолютний шлях
@@ -80,13 +93,15 @@ Window size:	Terminal AppearancePrefView		Розмір вікна:
 Switch Terminals	Terminal TermWindow		Переключити термінали
 Decrease	Terminal TermWindow		Зменшити
 Settings…	Terminal TermWindow		Налаштування…
-Cancel	Terminal SetTitleWindow		Скасувати
+ANSI bright white color	Terminal AppearancePrefView		ANSI насичений білий
 Blinking cursor	Terminal AppearancePrefView		Мигання курсору
+Cancel	Terminal SetTitleWindow		Скасувати
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон визначає заголовок вікна.\nМожна використовувати наступні заповнювачі:\n\n
-Use text:	Terminal FindWindow		Використати текст:
 Close active tab	Terminal TermWindow		Закрити активну вкладку
+Use text:	Terminal FindWindow		Використати текст:
 Save as default	Terminal TermWindow		Зберегти за замовчуванням
 Nothing is selected.	Terminal TermWindow		Нічого не вибрано.
+ANSI red color	Terminal AppearancePrefView		ANSI червоний
 Use left Option as Meta key	Terminal AppearancePrefView		Використовувати лівий Option як клавішу Meta 
 Find	Terminal FindWindow		Знайти
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон визначає заголовок поточної вкладки.\nМожна використовувати наступні заповнювачі:\n\n
@@ -94,7 +109,9 @@ Professional	Terminal colors scheme		Професійний
 Font:	Terminal AppearancePrefView		Шрифт:
 Paste	Terminal TermWindow		Вставити
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Шаблон визначає заголовки вікна.\nМожна використовувати наступні заповнювачі:\n\n
+ANSI bright black color	Terminal AppearancePrefView		ANSI насичений чорний
 Copy here	Terminal TermView		Копіювати сюди
+ANSI bright red color	Terminal AppearancePrefView		ANSI яскраво-червоний
 Use default shell	Terminal Shell		Використати оболонку за замовчуванням
 Color:	Terminal AppearancePrefView		Колір:
 Open link	Terminal TermView		Відкрити посилання
@@ -105,13 +122,12 @@ No search string was entered.	Terminal TermWindow		Стрічка для пош�
 Text under cursor	Terminal AppearancePrefView		Текст під курсором
 Move here	Terminal TermView		Перемістити сюди
 Abort	Terminal Shell		Перервати
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tПоточний робочий каталог активного процесу.\n\t\t\tПри необхідності можна вказати максимальне число компонентів шляху.\n\t\t\tНаприклад, '%2d' для не більше ніж двох компонентів.\n\t%i\t-\tІндекс вкладки.\n\t%e\t-\tКодування поточної вкладки. Для UTF-8 не відображається.\n\t%p\t-\tІм'я активного процесу.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Наступні процеси все ще запущені:\n\n\t%1\n\nЯкщо Ви закриєте Термінал, процеси будуть знищені.
 Set window title	Terminal TermWindow		Встановити заголовок вікна
 Increase	Terminal TermWindow		Збільшити
 OK	Terminal TermWindow		ОК
 Close window	Terminal TermWindow		Закрити вікно
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nВикористання: %s [OPTION] [SHELL]\n
-Solarized Light	Terminal colors scheme		Сяюче світло
 Clear all	Terminal TermWindow		Очистити все
+Solarized Light	Terminal colors scheme		Сяюче світло
 Search forward	Terminal FindWindow		Шукати далі

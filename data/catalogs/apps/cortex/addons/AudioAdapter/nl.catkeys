@@ -1,0 +1,10 @@
+1	dutch; flemish	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		Invoerformaat
+Channels:	CortexAudioAdapter		Kanalen:
+stereo	CortexAudioAdapter		stereo
+mono	CortexAudioAdapter		mono
+Output format	CortexAudioAdapter		Uitvoerformaat
+Audio input	CortexAddOnsCommon		Audioinvoer
+Sample format:	CortexAudioAdapter		Sample-formaat:
+Audio output	CortexAddOnsCommon		Audiouitvoer
+%groupname% parameters	CortexAddOnsCommon		%groupname% parameters

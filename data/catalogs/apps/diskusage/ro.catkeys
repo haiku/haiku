@@ -1,23 +1,23 @@
 1	romanian	x-vnd.Haiku-DiskUsage	2951688400
-%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% în {0, plural, one{# fișier} other{# fișiere}}
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% in {0, plural, one{# file} other{# files}}
 Scanning %refName%	Scanner		Se scanează %refName%
 %d files	Status View	For UI layouting only, use the longest plural form for your language	%d fișiere
 Size	Info Window		Dimensiune
 Rescan	Pie View		Rescanează
-Kind	Info Window		Tip
+Kind	Info Window		Fel
 file unavailable	Pie View		fișier indisponibil
-no supporting apps	Pie View		fără aplicații compatibile
+no supporting apps	Pie View		fără aplicații suport
 Path	Info Window		Cale
 Scan	Status View		Scanează
 Rescan	Status View		Rescanează
 file unavailable	Status View		fișier indisponibil
-Get info	Pie View		Detalii
-DiskUsage	System name		UtilizareDisc
+Get info	Pie View		Obține informații
+DiskUsage	System name		DiskUsage
 Created	Info Window		Creat
 Modified	Info Window		Modificat
-Abort	Status View		Renunță
+Abort	Status View		Întrerupe
 Open with	Pie View		Deschide cu
 Open	Pie View		Deschide
-{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# fișier} other{# fișiere}}
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# file} other{# files}}
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Liber pe %refName%

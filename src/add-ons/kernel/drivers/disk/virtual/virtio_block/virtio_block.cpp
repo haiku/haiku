@@ -146,20 +146,6 @@ get_geometry(virtio_block_handle* handle, device_geometry* geometry)
 }
 
 
-static int
-log2(uint32 x)
-{
-	int y;
-
-	for (y = 31; y >= 0; --y) {
-		if (x == ((uint32)1 << y))
-			break;
-	}
-
-	return y;
-}
-
-
 static void
 virtio_block_config_callback(void* driverCookie)
 {
@@ -498,12 +484,6 @@ virtio_block_set_capacity(virtio_block_driver_info* info, uint64 capacity,
 	TRACE("set_capacity(device = %p, capacity = %Ld, blockSize = %ld)\n",
 		info, capacity, blockSize);
 
-	// get log2, if possible
-	uint32 blockShift = log2(blockSize);
-
-	if ((1UL << blockShift) != blockSize)
-		blockShift = 0;
-
 	info->capacity = capacity;
 
 	if (info->block_size != blockSize) {
@@ -576,8 +556,8 @@ virtio_block_register_device(device_node *node)
 {
 	CALLED();
 
-	// ready to register
 	device_attr attrs[] = {
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Virtio Block"} },
 		{ NULL }
 	};
 
@@ -655,8 +635,8 @@ virtio_block_register_child_devices(void* _cookie)
 
 
 module_dependency module_dependencies[] = {
-	{B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&sDeviceManager},
-	{}
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&sDeviceManager },
+	{ NULL }
 };
 
 struct device_module_info sVirtioBlockDevice = {

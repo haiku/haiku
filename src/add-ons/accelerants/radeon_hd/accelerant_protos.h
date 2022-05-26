@@ -38,6 +38,10 @@ status_t radeon_get_pixel_clock_limits(display_mode* mode,
 	uint32* low, uint32* high);
 status_t radeon_get_edid_info(void* info, size_t size, uint32* edid_version);
 
+//brightness
+status_t radeon_set_brightness(float brightness);
+status_t radeon_get_brightness(float* brightness);
+
 // accelerant engine
 uint32 radeon_accelerant_engine_count(void);
 status_t radeon_acquire_engine(uint32 capabilities, uint32 maxWait,

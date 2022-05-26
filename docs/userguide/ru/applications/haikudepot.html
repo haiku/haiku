@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2020 Haiku. All rights reserved.
+ * Copyright 2013-2021 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Руководство пользователя</span></div>
 </div>
 
 <div class="nav">
@@ -37,6 +37,7 @@
 <li><a href="../../de/applications/haikudepot.html">Deutsch</a></li>
 <li><a href="../../en/applications/haikudepot.html">English</a></li>
 <li><a href="../../es/applications/haikudepot.html">Español</a></li>
+<li><a href="../../eo/applications/haikudepot.html">Esperanto</a></li>
 <li><a href="../../fr/applications/haikudepot.html">Français</a></li>
 <li><a href="../../fur/applications/haikudepot.html">Furlan</a></li>
 <li><a href="../../it/applications/haikudepot.html">Italiano</a></li>
@@ -54,25 +55,26 @@
 <li><a href="../../jp/applications/haikudepot.html">日本語</a></li>
 </ul>
 <span>
- «  <a href="expander.html">Expander</a> 
+ «  <a href="expander.html">Распаковщик (Expander)</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Приложения</a> 
-::  <a href="icon-o-matic.html">Icon-O-Matic</a>  »
+::  <a href="icon-o-matic.html">Икономатик (Icon-O-Matic)</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Содержание</td></tr>
 <tr class="index"><td><a href="#filter">The Filter</a><br />
                 <a href="#list">The List</a><br />
                 <a href="#info">The Info Area</a><br />
-                <a href="#menu">Tools and Show menus</a><br />
+                <a href="#menu">HaikuDepot and Show menu</a><br />
                 <a href="#account">Creating a User Account</a><br />
                 <a href="#rating">Rating and Commenting</a><br />
                 <a href="#logs">Diagnostic Logs</a><br />
+                <a href="#tips">Tips</a><br />
 </td></tr>
 </table>
 
@@ -130,10 +132,11 @@ To the right of package name, author, rating and version is a button, that – d
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Инструменты и отображение</a></h2>
-<p>В меню <span class="menu">Инструменты</span> вверху окна находится опция <span class="menu">Обновить репозитории</span>. Она запрашивает обновленный список всех пакетов из репозиториев.<br />
-Второй пункт - <span class="menu">Управление репозиториями...</span>. Он открывает панель настроек <a href="../preferences/repositories.html">Репозитории</a>, с помощью которой можно добавлять и удалять либо включать и отключать репозитории.<br />
-Пункт <span class="menu">Проверить обновления...</span> запускает <a href="../apps/softwareupdater.html">Обновление приложений</a> для поиска и установки обновленных пакетов.</p>
+<a id="menu" name="menu">HaikuDepot and Show menu</a></h2>
+<p>In the <span class="menu">HaikuDepot</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories.<br />
+The second item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.<br />
+<span class="menu">Check for updates...</span> opens the <a href="../apps/softwareupdater.html">SoftwareUpdater</a> to search and install updated packages.<br />
+<span class="menu">Settings...</span> opens a window with the currently only option: <span class="menu">Share anonymous usage data with HaikuDepotServer</span>. The data is used to, for example, increase a counter on how often a package is viewed and installed, which then can determine if a package is promoted to the "Featured packages" list.</p>
 <p>В меню <span class="menu">Показывать</span> вы можете выбрать, отображать ли <span class="menu">Пакеты для разработчиков</span> и <span class="menu">Пакеты с исходным кодом</span> в общем списке. Для обычного пользователя они не представляют особого интереса и будут лишь загромождать список. Тем не менее, данные пакеты важны для людей, которые нуждаются в библиотеках, заголовочных файлах из пакета для разработки и компиляции приложений, зависящих от них.</p>
 <p>Более интересны другие две опции, позволяющие показывать только <span class="menu">Доступные пакеты</span> и <span class="menu">Установленные пакеты</span>.</p>
 
@@ -146,8 +149,9 @@ To the right of package name, author, rating and version is a button, that – d
 <li>использовать пароль длиной минимум восемь символов, содержащий минимум две заглавные буквы и две цифры</li>
 <li>указать корректный адрес email (если вы хотите иметь возможность получить новый пароль в случае, когда старый - забыт)</li>
 <li>ответить на капчу</li>
-<li>tick the checkmarks to confirm you're over 16 and have read the usage conditions linked below them.</li></ul>
+<li>tick the checkboxes to confirm you're over 16 and have read the usage conditions linked below them.</li></ul>
 <p>После входа в правом верхнем углу окна HaikuDepot будет написано <span class="menu">Выполнен вход под пользователем (...)</span> вместе с вашим ником. Данное меню теперь позволяет вам <span class="menu">Сменить учетную запись...</span> или <span class="menu">Выйти из системы</span>.</p>
+<p>As a reminder of what you actually agreed to when you ticked the above mentioned checkbox, there are menu items to <span class="menu">View latest/agreed usage conditions...</span></p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rating" name="rating">Оценки и комментирование</a></h2>
@@ -157,7 +161,7 @@ To the right of package name, author, rating and version is a button, that – d
 После нажатия кнопки <span class="button">Отправить</span> данные будут переданы на сервер. Вам, возможно, придется выбрать в меню <span class="menu">Инструменты</span> опцию <span class="menu">Обновить репозитории</span>, прежде чем вы сможете увидеть ваши изменения.</p>
 <p>At any time, you can come back and edit your comment and re-rate it. You can also hide your rating from other users by deactivating a checkbox <span class="menu">This rating is visible to other users</span>, that appears in this window once you've rated a package.</p>
 
- <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="logs" name="logs">Diagnostic Logs</a></h2>
 <p>As HaikuDepot is used, it interacts with network as well as local services. Things can go wrong, sometimes in ways that were not anticipated when the application was written. In those cases the error message may be quite unspecific. To help diagnosing a given problem, HaikuDepot can provide a log of what the application does.</p>
 <p>An error message may suggest to view the logs to get further in-depth information or you may be asked to provide the log when you file an issue at the Haiku <a href="https://dev.haiku-os.org/">bug tracking system</a>.</p>
@@ -165,14 +169,19 @@ To the right of package name, author, rating and version is a button, that – d
 <pre>HaikuDepot -v debug</pre>
 <p>The command uses the <span class="cli">-v</span> flag to control the verbosity of the diagnostic logs. Possible values are: <span class="cli">off</span>, <span class="cli">info</span>, <span class="cli">debug</span> and <span class="cli">trace</span>. Using <span class="cli">off</span> will do only a small amount of logging, while <span class="cli">trace</span> does it in the highest detail.</p>
 <p>As HaikuDepot starts up and when interacting with the application, you will see text scroll by in the Terminal window; this is the diagnostic log.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tips" name="tips">Tips</a></h2>
+<p>Not directly from within the HaikuDepot application, but there is a way to keep track of new and updated packages. For that, you need to create an RSS ATOM feed at the <a href="https://depot.haiku-os.org">Haiku Depot Server</a> website. Click the "hamburger" widget at the top right, and choose <span class="menu">Build Feed URL</span> under Data.<br />
+Most interesting of the few settings on that page: Besides getting a feed for all new/updated packages, you are also able to add just the names of the packages you're interested in. Click the <span class="button">Build Feed URL</span> button and you get an RSS URL that you can paste into an RSS feed reader like BePodder, QuiteRSS, fRiSS etc.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="expander.html">Expander</a> 
+ «  <a href="expander.html">Распаковщик (Expander)</a> 
 ::  <a href="../applications.html#list-of-apps" class="uplink">Приложения</a> 
-::  <a href="icon-o-matic.html">Icon-O-Matic</a>  »
+::  <a href="icon-o-matic.html">Икономатик (Icon-O-Matic)</a>  »
 </span></div>
 </div>
 

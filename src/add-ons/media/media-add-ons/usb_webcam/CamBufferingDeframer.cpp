@@ -46,7 +46,8 @@ CamBufferingDeframer::Write(const void *buffer, size_t size)
 	b = (uint8 *)IB.Buffer();
 	l = IB.BufferLength();
 
-	PRINT((CH "(%p, %d), IB: %d" CT, buffer, size, IB.BufferLength()));
+	PRINT((CH "(%p, %" B_PRIuSIZE "), IB: %" B_PRIuSIZE CT, buffer, size,
+		IB.BufferLength()));
 
 	if (l < (int)(fMinFrameSize + fSkipSOFTags + fSkipEOFTags))
 		return size; // not enough data anyway
@@ -56,7 +57,8 @@ CamBufferingDeframer::Write(const void *buffer, size_t size)
 		if (fFrames.CountItems() < MAXFRAMEBUF)
 			fCurrentFrame = AllocFrame();
 		else {
-			PRINT((CH "DROPPED %d bytes! (too many queued frames)" CT, size));
+			PRINT((CH "DROPPED %" B_PRIuSIZE " bytes! "
+				"(too many queued frames)" CT, size));
 			return size; // drop XXX
 		}
 	}
@@ -93,7 +95,9 @@ CamBufferingDeframer::Write(const void *buffer, size_t size)
 
 			// queue it
 			BAutolock f(fLocker);
-			PRINT((CH ": Detaching a frame (%d bytes, %d to %d / %d)" CT, (size_t)fCurrentFrame->Position(), s, e, l));
+			PRINT((CH ": Detaching a frame (%" B_PRIuSIZE " bytes, "
+				"%d to %d / %d)" CT, (size_t)fCurrentFrame->Position(),
+				s, e, l));
 			fCurrentFrame->Seek(0LL, SEEK_SET);
 			fFrames.AddItem(fCurrentFrame);
 			release_sem(fFrameSem);
@@ -113,7 +117,9 @@ size_t
 CamBufferingDeframer::DiscardFromInput(size_t size)
 {
 	int next = (fInputBuffIndex+1)%2;
-	PRINT((CH ": %d bytes of %d from buffs[%d] (%d left)" CT, size, IB.BufferLength(), fInputBuffIndex, IB.BufferLength() - size));
+	PRINT((CH ": %" B_PRIuSIZE " bytes of %" B_PRIuSIZE " from buffs[%d] "
+		"(%" B_PRIuSIZE " left)" CT,
+		size, IB.BufferLength(), fInputBuffIndex, IB.BufferLength() - size));
 	fInputBuffs[next].Seek(0LL, SEEK_SET);
 	fInputBuffs[next].SetSize(0);
 	uint8 *buff = (uint8 *)IB.Buffer();

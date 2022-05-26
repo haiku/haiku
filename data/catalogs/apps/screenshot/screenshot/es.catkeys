@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.haiku-screenshot-cli	1618937837
+1	spanish; castilian	x-vnd.haiku-screenshot-cli	3958461128
 Include window border	ScreenshotWindow		Incluir el borde de la ventana
 Overwrite	ScreenshotWindow		Sobrescribir
 Save in:	ScreenshotWindow		Guardar en:
@@ -12,6 +12,7 @@ seconds	ScreenshotWindow		segundos
 New screenshot	ScreenshotWindow		Nueva captura de pantalla
 Screenshot	System name		Captura de pantalla
 Desktop	ScreenshotWindow		Escritorio
+Artwork folder	ScreenshotWindow		Carpeta de ilustraciones
 Translator Settings	ScreenshotWindow		Configuración del Intérprete
 Include mouse pointer	ScreenshotWindow		Incluir puntero del ratón
 overwrite	ScreenshotWindow		sobrescribir

@@ -1,0 +1,34 @@
+1	greek, modern (1453-)	application/x-vnd.Cortex.MediaRoutingView	3442339205
+Lock group	MediaNodePanel		Κλείδωμα ομάδας
+%refname% (no file)	MediaNodePanel		%refname% (κανένα αρχείο)
+Video output	MediaRoutingView		Έξοδος βίντεο
+Icon view	MediaRoutingView		Προβολή εικονιδίων
+OK	MediaRoutingView		Εντάξει
+Cycle	MediaNodePanel		Κύκλος
+Advanced	MediaNodePanel		Προχωρημένα
+Audio input	MediaRoutingView		Είσοδος ήχου
+Run mode	MediaNodePanel		Λειτουργία
+Could not load '%filename%'	MediaRoutingView		Αδύνατη η φόρτωση του αρχείου "%filename%"
+Stop time source	MediaNodePanel		Σταμάτημα πηγής χρόνου
+Be Audio Mixer	MediaRoutingView		Μίκτης ήχου Be
+Video input	MediaRoutingView		Είσοδος βίντεο
+Release	MediaNodePanel		Αποδέσμευση
+Disconnect	MediaRoutingView		Αποσύνδεση
+Could not disconnect	MediaRoutingView		Αδύνατη η αποσύνδεση
+Could not instantiate '%infoname%'	MediaRoutingView		Αδύνατη η αρχικοποίηση του "%infoname%"
+Mini icon view	MediaRoutingView		Προβολή μικρών εικονιδίων
+Select all	MediaRoutingView		Επιλογή όλων
+(same as group)	MediaNodePanel		(όπως και στην ομάδα)
+Input	MediaJack		Είσοδος
+Get info	MediaJack		Πληροφορίες
+Start time source	MediaNodePanel		Έναρξη πηγής χρόνου
+Error	MediaRoutingView		Σφάλμα
+Could not release '%refname%'	MediaRoutingView		Αδύνατη η αποδέσμευση του "%refname%"
+Output	MediaJack		Έξοδος
+Get info	MediaNodePanel		Πληροφορίες
+Get info	MediaRoutingView		Πληροφορίες
+Clean up	MediaRoutingView		Συγύρισμα
+Start control panel	MediaNodePanel		Έναρξη πίνακα ελέγχου
+Tweak parameters	MediaNodePanel		Προσαρμογή παραμέτρων
+Could not connect	MediaRoutingView		Αδύνατη η σύνδεση
+Unlock group	MediaNodePanel		Ξεκλείδωμα ομάδας

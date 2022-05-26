@@ -1,0 +1,13 @@
+1	portuguese	application/x-vnd.Be.LoggingConsumerApp	1963040350
+Priority	CortexAddOnsLoggingConsumer		Prioridade
+Latency	CortexAddOnsLoggingConsumer		Latência
+CPU spin percentage	CortexAddOnsLoggingConsumer		Percentagem de rotação da CPU
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Iniciar
+Latency control	CortexAddOnsLoggingConsumer		Controlo de latência
+CPU percentage	CortexAddOnsLoggingConsumer		Percentagem de CPU
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Parar
+OK	CortexAddOnsCommonMediaNodeControlApp		OK
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Controlos
+controls	CortexAddOnsCommonMediaNodeControlApp		controlos
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Ligar
+percent	CortexAddOnsLoggingConsumer		percentagem

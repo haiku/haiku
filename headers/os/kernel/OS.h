@@ -7,6 +7,7 @@
 
 /** Kernel specific structures and functions */
 
+#include <limits.h>
 #include <stdarg.h>
 #include <sys/types.h>
 
@@ -21,8 +22,9 @@ extern "C" {
 /* System constants */
 
 #define B_OS_NAME_LENGTH	32
-#define B_PAGE_SIZE			4096
 #define B_INFINITE_TIMEOUT	(9223372036854775807LL)
+
+#define B_PAGE_SIZE			PAGESIZE
 
 enum {
 	B_TIMEOUT						= 0x8,	/* relative timeout */
@@ -339,6 +341,8 @@ extern status_t		rename_thread(thread_id thread, const char *newName);
 extern status_t		set_thread_priority(thread_id thread, int32 newPriority);
 extern void			exit_thread(status_t status);
 extern status_t		wait_for_thread(thread_id thread, status_t *returnValue);
+extern status_t		wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
+						status_t *_returnCode);
 extern status_t		on_exit_thread(void (*callback)(void *), void *data);
 
 extern thread_id 	find_thread(const char *name);
@@ -382,9 +386,6 @@ extern bigtime_t	system_time(void);
 extern nanotime_t	system_time_nsecs(void);
 						/* time since booting in nanoseconds */
 
-					/* deprecated (is no-op) */
-extern status_t		set_timezone(const char *timezone);
-
 /* Alarm */
 
 enum {
@@ -424,6 +425,7 @@ extern void			ktrace_vprintf(const char *format, va_list args);
 typedef struct {
 	bigtime_t	active_time;	/* usec of doing useful work since boot */
 	bool		enabled;
+	uint64		current_frequency;
 } cpu_info;
 
 typedef struct {
@@ -484,7 +486,9 @@ enum cpu_platform {
 	B_CPU_ARM_64,
 	B_CPU_ALPHA,
 	B_CPU_MIPS,
-	B_CPU_SH
+	B_CPU_SH,
+	B_CPU_SPARC,
+	B_CPU_RISC_V
 };
 
 enum cpu_vendor {
@@ -500,7 +504,9 @@ enum cpu_vendor {
 	B_CPU_VENDOR_IBM,
 	B_CPU_VENDOR_MOTOROLA,
 	B_CPU_VENDOR_NEC,
-	B_CPU_VENDOR_HYGON
+	B_CPU_VENDOR_HYGON,
+	B_CPU_VENDOR_SUN,
+	B_CPU_VENDOR_FUJITSU
 };
 
 typedef struct {
@@ -531,8 +537,11 @@ typedef struct {
 
 
 extern status_t		get_system_info(system_info* info);
-extern status_t		get_cpu_info(uint32 firstCPU, uint32 cpuCount,
-						cpu_info* info);
+extern status_t		_get_cpu_info_etc(uint32 firstCPU, uint32 cpuCount,
+						cpu_info* info, size_t size);
+#define get_cpu_info(firstCPU, cpuCount, info) \
+	_get_cpu_info_etc((firstCPU), (cpuCount), (info), sizeof(*(info)))
+
 extern status_t		get_cpu_topology_info(cpu_topology_node_info* topologyInfos,
 						uint32* topologyInfoCount);
 

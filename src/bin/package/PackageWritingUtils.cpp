@@ -14,6 +14,7 @@
 #include <package/hpkg/HPKGDefs.h>
 
 #include <AutoDeleter.h>
+#include <AutoDeleterPosix.h>
 
 
 status_t
@@ -21,15 +22,14 @@ add_current_directory_entries(BPackageWriter& packageWriter,
 	BPackageWriterListener& listener, bool skipPackageInfo)
 {
 	// open the current directory
-	DIR* dir = opendir(".");
-	if (dir == NULL) {
+	DirCloser dir(opendir("."));
+	if (!dir.IsSet()) {
 		listener.PrintError("Error: Failed to opendir '.': %s\n",
 			strerror(errno));
 		return errno;
 	}
-	CObjectDeleter<DIR, int> dirCloser(dir, &closedir);
 
-	while (dirent* entry = readdir(dir)) {
+	while (dirent* entry = readdir(dir.Get())) {
 		// skip "." and ".."
 		if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 			continue;

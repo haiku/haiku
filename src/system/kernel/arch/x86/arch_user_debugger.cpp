@@ -33,7 +33,9 @@
 	// TODO: Make those real error codes.
 
 
-#ifndef __x86_64__
+#ifdef __x86_64__
+extern bool gHasXsave;
+#else
 extern bool gHasSSE;
 #endif
 
@@ -202,12 +204,21 @@ get_cpu_state(Thread* thread, iframe* frame, debug_cpu_state* cpuState)
 	// For the floating point state to be correct the calling function must
 	// not use these registers (not even indirectly).
 #ifdef __x86_64__
+	memset(&cpuState->extended_registers, 0,
+		sizeof(cpuState->extended_registers));
+
 	if (frame->fpu != nullptr) {
-		memcpy(&cpuState->extended_registers, frame->fpu,
-			sizeof(cpuState->extended_registers));
-	} else {
-		memset(&cpuState->extended_registers, 0,
-			sizeof(cpuState->extended_registers));
+		if (gHasXsave) {
+			// TODO check the xsave header to know the actual size of the
+			// register context depending on what is saved. For now we assume
+			// there is only the YMM AVX registers
+			memcpy(&cpuState->extended_registers, frame->fpu,
+				sizeof(cpuState->extended_registers));
+		} else {
+			// Only the "legacy area" saved by fxsave is available
+			memcpy(&cpuState->extended_registers, frame->fpu,
+				sizeof(cpuState->extended_registers.fp_fxsave));
+		}
 	}
 #else
 	Thread* thisThread = thread_get_current_thread();

@@ -42,16 +42,24 @@ public:
 	Parameter(string name, int32 offset, string typeName, TypeHandler *handler)
 		: Type(typeName, handler),
 		  fName(name),
-		  fOffset(offset)
+		  fOffset(offset),
+		  fInOut(false),
+		  fOut(false)
 	{
 	}
 
 	const string &Name() const		{ return fName; }
 	int32 Offset() const			{ return fOffset; }
+	bool InOut() const				{ return fInOut; }
+	void SetInOut(bool inout)		{ fInOut = inout; }
+	bool Out() const				{ return fOut; }
+	void SetOut(bool out)			{ fOut = out; }
 
 private:
 	string	fName;
 	int32	fOffset;
+	bool	fInOut;
+	bool	fOut;
 };
 
 // Syscall

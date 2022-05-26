@@ -466,9 +466,83 @@ BeControlLook::DrawScrollBarButton(BView* view, BRect rect,
 	rect.InsetBy(1, 1);
 	view->FillRect(rect);
 
+	// draw button triangle
+	// don't use DrawArrowShape because we use that to draw arrows differently
+	// in menus and outline list view
+
 	rect.InsetBy(1, 1);
 	rect.OffsetBy(-3, -3);
-	DrawArrowShape(view, rect, updateRect, base, direction, flags, B_NO_TINT);
+
+	BPoint tri1, tri2, tri3;
+	BPoint off1, off2, off3;
+	BRect r(rect.left, rect.top, rect.left + 14, rect.top + 14);
+	rgb_color lightenmax = tint_color(base, B_LIGHTEN_MAX_TINT);
+	rgb_color light, dark, arrow, arrow2;
+
+	switch(direction) {
+		case B_LEFT_ARROW:
+			tri1.Set(r.left + 3, floorf((r.top + r.bottom) / 2));
+			tri2.Set(r.right - 4, r.top + 4);
+			tri3.Set(r.right - 4, r.bottom - 4);
+			break;
+
+		default:
+		case B_RIGHT_ARROW:
+			tri1.Set(r.left + 4, r.bottom - 4);
+			tri2.Set(r.left + 4, r.top + 4);
+			tri3.Set(r.right - 3, floorf((r.top + r.bottom) / 2));
+			break;
+
+		case B_UP_ARROW:
+			tri1.Set(r.left + 4, r.bottom - 4);
+			tri2.Set(floorf((r.left + r.right) / 2), r.top + 3);
+			tri3.Set(r.right - 4, r.bottom - 4);
+			break;
+
+		case B_DOWN_ARROW:
+			tri1.Set(r.left + 4, r.top + 4);
+			tri2.Set(r.right - 4, r.top + 4);
+			tri3.Set(floorf((r.left + r.right) / 2), r.bottom - 3);
+			break;
+	}
+
+	r.InsetBy(1, 1);
+
+	float tint = B_NO_TINT;
+	if (!isEnabled)
+		tint = (tint + B_NO_TINT + B_NO_TINT) / 3;
+
+	view->SetHighColor(tint_color(base, tint));
+	view->MovePenTo(B_ORIGIN);
+	view->SetDrawingMode(B_OP_OVER);
+
+	view->SetHighColor(tint_color(base, tint));
+
+	if (isEnabled) {
+		arrow2 = light = tint_color(base, B_DARKEN_2_TINT);
+		dark = tint_color(base, B_DARKEN_3_TINT);
+		arrow = tint_color(base, B_DARKEN_MAX_TINT);
+	} else
+		arrow = arrow2 = light = dark = tint_color(base, B_DARKEN_1_TINT);
+
+	// white triangle offset by 1px
+	off1.Set(tri1.x + 1, tri1.y + 1);
+	off2.Set(tri2.x + 1, tri2.y + 1);
+	off3.Set(tri3.x + 1, tri3.y + 1);
+
+	// draw white triangle
+	view->BeginLineArray(3);
+	view->AddLine(off2, off3, lightenmax);
+	view->AddLine(off1, off3, lightenmax);
+	view->AddLine(off1, off2, lightenmax);
+	view->EndLineArray();
+
+	// draw triangle on top
+	view->BeginLineArray(3);
+	view->AddLine(tri2, tri3, dark);
+	view->AddLine(tri1, tri3, dark);
+	view->AddLine(tri1, tri2, arrow2);
+	view->EndLineArray();
 
 	view->PopState();
 }
@@ -673,79 +747,60 @@ void
 BeControlLook::DrawArrowShape(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, uint32 direction, uint32 flags, float tint)
 {
+	if (!rect.IsValid() || !rect.Intersects(updateRect))
+		return;
+
 	view->PushState();
 
-	bool isEnabled = (flags & B_DISABLED) == 0;
-
-	BPoint tri1, tri2, tri3;
-	BPoint off1, off2, off3;
-	BRect r(rect.left, rect.top, rect.left + 14, rect.top + 14);
-	rgb_color lightenmax = tint_color(base, B_LIGHTEN_MAX_TINT);
-	rgb_color light, dark, arrow, arrow2;
+	rgb_color fill = tint_color(base, 1.074); // 200
+	rgb_color stroke = tint_color(base, 1.629); // 80
 
 	switch(direction) {
 		case B_LEFT_ARROW:
-			tri1.Set(r.left + 3, floorf((r.top + r.bottom) / 2));
-			tri2.Set(r.right - 4, r.top + 4);
-			tri3.Set(r.right - 4, r.bottom - 4);
+			view->SetHighColor(fill);
+			view->FillTriangle(rect.LeftTop() + BPoint(4, 6),
+				rect.LeftTop() + BPoint(8, 2),
+				rect.LeftTop() + BPoint(8, 10));
+			view->SetHighColor(stroke);
+			view->StrokeTriangle(rect.LeftTop() + BPoint(4, 6),
+				rect.LeftTop() + BPoint(8, 2),
+				rect.LeftTop() + BPoint(8, 10));
 			break;
 
 		default:
 		case B_RIGHT_ARROW:
-			tri1.Set(r.left + 4, r.bottom - 4);
-			tri2.Set(r.left + 4, r.top + 4);
-			tri3.Set(r.right - 3, floorf((r.top + r.bottom) / 2));
+			view->SetHighColor(fill);
+			view->FillTriangle(rect.LeftTop() + BPoint(4, 2),
+				rect.LeftTop() + BPoint(4, 10),
+				rect.LeftTop() + BPoint(8, 6));
+			view->SetHighColor(stroke);
+			view->StrokeTriangle(rect.LeftTop() + BPoint(4, 2),
+				rect.LeftTop() + BPoint(4, 10),
+				rect.LeftTop() + BPoint(8, 6));
 			break;
 
 		case B_UP_ARROW:
-			tri1.Set(r.left + 4, r.bottom - 4);
-			tri2.Set(floorf((r.left + r.right) / 2), r.top + 3);
-			tri3.Set(r.right - 4, r.bottom - 4);
+			view->SetHighColor(fill);
+			view->FillTriangle(rect.LeftTop() + BPoint(6, 4),
+				rect.LeftTop() + BPoint(2, 8),
+				rect.LeftTop() + BPoint(10, 8));
+			view->SetHighColor(stroke);
+			view->StrokeTriangle(rect.LeftTop() + BPoint(6, 4),
+				rect.LeftTop() + BPoint(2, 8),
+				rect.LeftTop() + BPoint(10, 8));
 			break;
 
 		case B_DOWN_ARROW:
-			tri1.Set(r.left + 4, r.top + 4);
-			tri2.Set(r.right - 4, r.top + 4);
-			tri3.Set(floorf((r.left + r.right) / 2), r.bottom - 3);
+			view->SetHighColor(fill);
+			view->FillTriangle(rect.LeftTop() + BPoint(2, 4),
+				rect.LeftTop() + BPoint(10, 4),
+				rect.LeftTop() + BPoint(6, 8));
+			view->SetHighColor(stroke);
+			view->StrokeTriangle(rect.LeftTop() + BPoint(2, 4),
+				rect.LeftTop() + BPoint(10, 4),
+				rect.LeftTop() + BPoint(6, 8));
 			break;
 	}
-
-	r.InsetBy(1, 1);
-
-	if (!isEnabled)
-		tint = (tint + B_NO_TINT + B_NO_TINT) / 3;
-
-	view->SetHighColor(tint_color(base, tint));
-	view->MovePenTo(B_ORIGIN);
-	view->SetDrawingMode(B_OP_OVER);
-
-	view->SetHighColor(tint_color(base, tint));
-
-	if (isEnabled) {
-		arrow2 = light = tint_color(base, B_DARKEN_2_TINT);
-		dark = tint_color(base, B_DARKEN_3_TINT);
-		arrow = tint_color(base, B_DARKEN_MAX_TINT);
-	} else
-		arrow = arrow2 = light = dark = tint_color(base, B_DARKEN_1_TINT);
-
-	// white triangle offset by 1px
-	off1.Set(tri1.x + 1, tri1.y + 1);
-	off2.Set(tri2.x + 1, tri2.y + 1);
-	off3.Set(tri3.x + 1, tri3.y + 1);
-
-	// draw white triangle
-	view->BeginLineArray(3);
-	view->AddLine(off2, off3, lightenmax);
-	view->AddLine(off1, off3, lightenmax);
-	view->AddLine(off1, off2, lightenmax);
-	view->EndLineArray();
-
-	// draw triangle on top
-	view->BeginLineArray(3);
-	view->AddLine(tri2, tri3, dark);
-	view->AddLine(tri1, tri3, dark);
-	view->AddLine(tri1, tri2, arrow2);
-	view->EndLineArray();
 
 	view->PopState();
 }
@@ -768,7 +823,7 @@ BeControlLook::DrawMenuBarBackground(BView* view, BRect& rect,
 	rgb_color lighten2 = tint_color(base, B_LIGHTEN_2_TINT);
 	rgb_color darken1 = tint_color(base, B_DARKEN_1_TINT);
 
-	view->BeginLineArray(5);
+	view->BeginLineArray(3);
 	view->AddLine(rect.LeftTop(), rect.RightTop(), lighten2);
 	// left bottom pixel is base color
 	view->AddLine(rect.LeftTop(), rect.LeftBottom() - BPoint(0, 1),
@@ -818,7 +873,6 @@ BeControlLook::DrawMenuFieldFrame(BView* view, BRect& rect,
 	rect.InsetBy(2, 2);
 
 	rgb_color darken2 = tint_color(base, B_DARKEN_2_TINT);
-	rgb_color darken4 = tint_color(base, B_DARKEN_4_TINT);
 
 	// draw left and top side and top right corner
 	view->BeginLineArray(3);
@@ -1009,31 +1063,33 @@ BeControlLook::DrawSliderBar(BView* view, BRect rect, const BRect& updateRect,
 	rgb_color darken2 = tint_color(base, B_DARKEN_2_TINT);
 	rgb_color darkenmax = tint_color(base, B_DARKEN_MAX_TINT);
 
-	view->SetHighColor(darken1);
-	view->StrokeLine(BPoint(rect.left, rect.top),
-		BPoint(rect.left + 1, rect.top));
-	view->StrokeLine(BPoint(rect.left, rect.bottom),
-		BPoint(rect.left + 1, rect.bottom));
-	view->StrokeLine(BPoint(rect.right - 1, rect.top),
-		BPoint(rect.right, rect.top));
+	view->BeginLineArray(9);
 
-	view->SetHighColor(darken2);
-	view->StrokeLine(BPoint(rect.left + 1, rect.top),
-		BPoint(rect.right - 1, rect.top));
-	view->StrokeLine(BPoint(rect.left, rect.bottom - 1),
-		BPoint(rect.left, rect.top + 1));
+	view->AddLine(BPoint(rect.left, rect.top),
+		BPoint(rect.left + 1, rect.top), darken1);
+	view->AddLine(BPoint(rect.left, rect.bottom),
+		BPoint(rect.left + 1, rect.bottom), darken1);
+	view->AddLine(BPoint(rect.right - 1, rect.top),
+		BPoint(rect.right, rect.top), darken1);
 
-	view->SetHighColor(lightenmax);
-	view->StrokeLine(BPoint(rect.left + 1, rect.bottom),
-		BPoint(rect.right, rect.bottom));
-	view->StrokeLine(BPoint(rect.right, rect.top + 1));
+	view->AddLine(BPoint(rect.left + 1, rect.top),
+		BPoint(rect.right - 1, rect.top), darken2);
+	view->AddLine(BPoint(rect.left, rect.bottom - 1),
+		BPoint(rect.left, rect.top + 1), darken2);
+
+	view->AddLine(BPoint(rect.left + 1, rect.bottom),
+		BPoint(rect.right, rect.bottom), lightenmax);
+	view->AddLine(BPoint(rect.right, rect.top + 1),
+		BPoint(rect.right, rect.bottom), lightenmax);
 
 	rect.InsetBy(1, 1);
 
-	view->SetHighColor(darkenmax);
-	view->StrokeLine(BPoint(rect.left, rect.bottom),
-		BPoint(rect.left, rect.top));
-	view->StrokeLine(BPoint(rect.right, rect.top));
+	view->AddLine(BPoint(rect.left, rect.top),
+		BPoint(rect.left, rect.bottom), darkenmax);
+	view->AddLine(BPoint(rect.left, rect.top),
+		BPoint(rect.right, rect.top), darkenmax);
+
+	view->EndLineArray();
 }
 
 
@@ -1045,20 +1101,21 @@ BeControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRect
 		return;
 
 	rgb_color lighten2 = tint_color(base, B_LIGHTEN_2_TINT);
-	rgb_color darken2 = tint_color(base, B_DARKEN_2_TINT);
-	rgb_color darken3 = tint_color(base, B_DARKEN_3_TINT);
+	rgb_color dark = tint_color(base, 1.333); // 144
+	rgb_color darker = tint_color(base, 1.444); // 120
 	rgb_color darkenmax = tint_color(base, B_DARKEN_MAX_TINT);
 
+	view->BeginLineArray(14);
+
 	// outline
-	view->SetHighColor(darken3);
-	view->StrokeLine(BPoint(rect.left, rect.bottom - 2),
-		BPoint(rect.left, rect.top + 1));
-	view->StrokeLine(BPoint(rect.left + 1, rect.top),
-		BPoint(rect.right - 2, rect.top));
-	view->StrokeLine(BPoint(rect.right, rect.top + 2),
-		BPoint(rect.right, rect.bottom - 1));
-	view->StrokeLine(BPoint(rect.left + 2, rect.bottom),
-		BPoint(rect.right - 1, rect.bottom));
+	view->AddLine(BPoint(rect.left, rect.bottom - 2),
+		BPoint(rect.left, rect.top + 1), darker);
+	view->AddLine(BPoint(rect.left + 1, rect.top),
+		BPoint(rect.right - 2, rect.top), darker);
+	view->AddLine(BPoint(rect.right, rect.top + 2),
+		BPoint(rect.right, rect.bottom - 1), darker);
+	view->AddLine(BPoint(rect.left + 2, rect.bottom),
+		BPoint(rect.right - 1, rect.bottom), darker);
 
 	// first bevel
 	rect.InsetBy(1, 1);
@@ -1066,46 +1123,51 @@ BeControlLook::DrawSliderThumb(BView* view, BRect& rect, const BRect& updateRect
 	view->SetHighColor(lighten2);
 	view->FillRect(rect);
 
-	view->SetHighColor(darkenmax);
-	view->StrokeLine(BPoint(rect.left, rect.bottom),
-		BPoint(rect.right - 1, rect.bottom));
-	view->StrokeLine(BPoint(rect.right, rect.bottom - 1),
-		BPoint(rect.right, rect.top));
+	view->AddLine(BPoint(rect.left, rect.bottom),
+		BPoint(rect.right - 1, rect.bottom), darkenmax);
+	view->AddLine(BPoint(rect.right, rect.bottom - 1),
+		BPoint(rect.right, rect.top), darkenmax);
 
 	rect.InsetBy(1, 1);
 
 	// second bevel and center dots
-	view->SetHighColor(darken2);
-	view->StrokeLine(BPoint(rect.left, rect.bottom),
-		BPoint(rect.right, rect.bottom));
-	view->StrokeLine(BPoint(rect.right, rect.top));
+	view->SetHighColor(dark);
+	view->AddLine(BPoint(rect.left, rect.bottom),
+		BPoint(rect.right, rect.bottom), dark);
+	view->AddLine(BPoint(rect.right, rect.top),
+		BPoint(rect.right, rect.bottom), dark);
 
+	// center dots
+	float hCenter = rect.Width() / 2;
+	float vMiddle = rect.Height() / 2;
 	if (orientation == B_HORIZONTAL) {
-		view->StrokeLine(BPoint(rect.left + 6, rect.top + 2),
-			BPoint(rect.left + 6, rect.top + 2));
-		view->StrokeLine(BPoint(rect.left + 6, rect.top + 4),
-			BPoint(rect.left + 6, rect.top + 4));
-		view->StrokeLine(BPoint(rect.left + 6, rect.top + 6),
-			BPoint(rect.left + 6, rect.top + 6));
+		view->AddLine(BPoint(rect.left + hCenter, rect.top + 1),
+			BPoint(rect.left + hCenter, rect.top + 1), dark);
+		view->AddLine(BPoint(rect.left + hCenter, rect.top + 3),
+			BPoint(rect.left + hCenter, rect.top + 3), dark);
+		view->AddLine(BPoint(rect.left + hCenter, rect.top + 5),
+			BPoint(rect.left + hCenter, rect.top + 5), dark);
 	} else {
-		view->StrokeLine(BPoint(rect.left + 2, rect.top + 6),
-			BPoint(rect.left + 2, rect.top + 6));
-		view->StrokeLine(BPoint(rect.left + 4, rect.top + 6),
-			BPoint(rect.left + 4, rect.top + 6));
-		view->StrokeLine(BPoint(rect.left + 6, rect.top + 6),
-			BPoint(rect.left + 6, rect.top + 6));
+		view->AddLine(BPoint(rect.left + 1, rect.top + vMiddle),
+			BPoint(rect.left + 1, rect.top + vMiddle), dark);
+		view->AddLine(BPoint(rect.left + 3, rect.top + vMiddle),
+			BPoint(rect.left + 3, rect.top + vMiddle), dark);
+		view->AddLine(BPoint(rect.left + 5, rect.top + vMiddle - 1),
+			BPoint(rect.left + 5, rect.top + vMiddle), dark);
 	}
 
-	view->StrokeLine(BPoint(rect.right + 1, rect.bottom + 1),
-		BPoint(rect.right + 1, rect.bottom + 1));
+	view->AddLine(BPoint(rect.right + 1, rect.bottom + 1),
+		BPoint(rect.right + 1, rect.bottom + 1), dark);
 
 	rect.InsetBy(1, 1);
 
 	// third bevel
-	view->SetHighColor(base);
-	view->StrokeLine(BPoint(rect.left, rect.bottom),
-		BPoint(rect.right, rect.bottom));
-	view->StrokeLine(BPoint(rect.right, rect.top));
+	view->AddLine(BPoint(rect.left, rect.bottom),
+		BPoint(rect.right, rect.bottom), base);
+	view->AddLine(BPoint(rect.right, rect.top),
+		BPoint(rect.right, rect.bottom), base);
+
+	view->EndLineArray();
 }
 
 
@@ -1275,6 +1337,9 @@ BeControlLook::DrawTabFrame(BView* view, BRect& rect, const BRect& updateRect,
 	const rgb_color& base, uint32 flags, uint32 borders,
 	border_style borderStyle, uint32 side)
 {
+	view->SetHighColor(base);
+	view->FillRect(rect);
+
 	rgb_color lightenmax = tint_color(base, B_LIGHTEN_MAX_TINT);
 
 	view->BeginLineArray(1);
@@ -1309,7 +1374,7 @@ BeControlLook::DrawTabFrame(BView* view, BRect& rect, const BRect& updateRect,
 void
 BeControlLook::DrawActiveTab(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
-	uint32 borders, uint32 side)
+	uint32 borders, uint32 side, int32, int32, int32, int32)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -1531,10 +1596,14 @@ BeControlLook::DrawActiveTab(BView* view, BRect& rect,
 void
 BeControlLook::DrawInactiveTab(BView* view, BRect& rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
-	uint32 borders, uint32 side)
+	uint32 borders, uint32 side, int32 index, int32 selected,
+	int32 first, int32 last)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
+
+	bool isFirst = index == first;
+	bool isFull = index != selected - 1;
 
 	view->PushState();
 
@@ -1551,16 +1620,12 @@ BeControlLook::DrawInactiveTab(BView* view, BRect& rect,
 	view->SetHighColor(darkenmax);
 	view->SetLowColor(base);
 
-	BTabView* tabView = dynamic_cast<BTabView*>(view);
-	if (tabView == NULL)
-		return;
-
 	view->BeginLineArray(12);
 
 	switch (side) {
 		case BTabView::kLeftSide:
 			// only draw if first tab is unselected
-			if (updateRect == tabView->TabFrame(0)) {
+			if (isFirst) {
 				// before going left
 				view->AddLine(BPoint(rect.right - 1, rect.top - 1),
 					BPoint(rect.right - 1, rect.top - 1), lightenmax);
@@ -1593,7 +1658,7 @@ BeControlLook::DrawInactiveTab(BView* view, BRect& rect,
 				BPoint(rect.right - 4, rect.bottom - 1), darken4);
 
 			// only draw if not before selected tab
-			if (updateRect != tabView->TabFrame(tabView->Selection() - 1)) {
+			if (isFull) {
 				// after going right
 				view->AddLine(BPoint(rect.right - 3, rect.bottom),
 					BPoint(rect.right - 2, rect.bottom), darken4);
@@ -1604,7 +1669,7 @@ BeControlLook::DrawInactiveTab(BView* view, BRect& rect,
 
 		case BTabView::kRightSide:
 			// only draw if first tab is unselected
-			if (updateRect == tabView->TabFrame(0)) {
+			if (isFirst) {
 				// before going right
 				view->AddLine(BPoint(rect.left - 1, rect.top - 1),
 					BPoint(rect.left - 1, rect.top - 1), lightenmax);
@@ -1637,7 +1702,7 @@ BeControlLook::DrawInactiveTab(BView* view, BRect& rect,
 				BPoint(rect.left - 4, rect.bottom - 1), darken4);
 
 			// only draw if not before selected tab
-			if (updateRect != tabView->TabFrame(tabView->Selection() - 1)) {
+			if (isFull) {
 				// after going left
 				view->AddLine(BPoint(rect.left - 3, rect.bottom),
 					BPoint(rect.left - 2, rect.bottom), darken4);
@@ -1649,7 +1714,7 @@ BeControlLook::DrawInactiveTab(BView* view, BRect& rect,
 		default:
 		case BTabView::kTopSide:
 			// only draw if first tab is unselected
-			if (updateRect == tabView->TabFrame(0)) {
+			if (isFirst) {
 				// before going up
 				view->AddLine(BPoint(rect.left - 1, rect.bottom - 1),
 					BPoint(rect.left - 1, rect.bottom - 1), lightenmax);
@@ -1682,7 +1747,7 @@ BeControlLook::DrawInactiveTab(BView* view, BRect& rect,
 				BPoint(rect.right - 1, rect.bottom - 4), darken4);
 
 			// only draw if not before selected tab
-			if (updateRect != tabView->TabFrame(tabView->Selection() - 1)) {
+			if (isFull) {
 				// after going down
 				view->AddLine(BPoint(rect.right, rect.bottom - 3),
 					BPoint(rect.right, rect.bottom - 2), darken4);
@@ -1693,7 +1758,7 @@ BeControlLook::DrawInactiveTab(BView* view, BRect& rect,
 
 		case BTabView::kBottomSide:
 			// only draw if first tab is unselected
-			if (updateRect == tabView->TabFrame(0)) {
+			if (isFirst) {
 				// before going down
 				view->AddLine(BPoint(rect.left - 1, rect.top - 1),
 					BPoint(rect.left - 1, rect.top - 1), lightenmax);
@@ -1726,7 +1791,7 @@ BeControlLook::DrawInactiveTab(BView* view, BRect& rect,
 				BPoint(rect.right - 1, rect.top - 4), darken4);
 
 			// only draw if not before selected tab
-			if (updateRect != tabView->TabFrame(tabView->Selection() - 1)) {
+			if (isFull) {
 				// after going up
 				view->AddLine(BPoint(rect.right, rect.top - 3),
 					BPoint(rect.right, rect.top - 2), darken4);
@@ -1876,68 +1941,89 @@ BeControlLook::DrawBorder(BView* view, BRect& rect, const BRect& updateRect,
 	BRegion clipping(updateRect);
 	view->ConstrainClippingRegion(&clipping);
 
-	rgb_color lightColor = tint_color(base, B_LIGHTEN_MAX_TINT);
-	rgb_color shadowColor = tint_color(base, B_DARKEN_3_TINT);
+	rgb_color lightColor;
+	rgb_color shadowColor;
 	if (base.Brightness() > 128) {
 		lightColor = tint_color(base, B_DARKEN_2_TINT);
 		shadowColor = tint_color(base, B_LIGHTEN_2_TINT);
+	} else {
+		lightColor = tint_color(base, B_LIGHTEN_MAX_TINT);
+		shadowColor = tint_color(base, B_DARKEN_3_TINT);
 	}
+
+	view->BeginLineArray(8);
 
 	if (borderStyle == B_FANCY_BORDER) {
-		rect.left++;
-		rect.top++;
-
-		view->BeginLineArray(4);
-		if ((borders & B_LEFT_BORDER) != 0)
+		if ((borders & B_LEFT_BORDER) != 0) {
 			view->AddLine(rect.LeftBottom(), rect.LeftTop(), shadowColor);
-		if ((borders & B_TOP_BORDER) != 0)
+			rect.left++;
+		}
+		if ((borders & B_TOP_BORDER) != 0) {
 			view->AddLine(rect.LeftTop(), rect.RightTop(), shadowColor);
-		if ((borders & B_RIGHT_BORDER) != 0)
+			rect.top++;
+		}
+		if ((borders & B_RIGHT_BORDER) != 0) {
 			view->AddLine(rect.RightTop(), rect.RightBottom(), shadowColor);
-		if ((borders & B_BOTTOM_BORDER) != 0)
+			rect.right--;
+		}
+		if ((borders & B_BOTTOM_BORDER) != 0) {
 			view->AddLine(rect.RightBottom(), rect.LeftBottom(), shadowColor);
-		view->EndLineArray();
+			rect.bottom--;
+		}
 
-		rect.OffsetBy(-1, -1);
-
-		view->BeginLineArray(4);
-		if ((borders & B_LEFT_BORDER) != 0)
+		if ((borders & B_LEFT_BORDER) != 0) {
 			view->AddLine(rect.LeftBottom(), rect.LeftTop(), lightColor);
-		if ((borders & B_TOP_BORDER) != 0)
+			rect.left++;
+		}
+		if ((borders & B_TOP_BORDER) != 0) {
 			view->AddLine(rect.LeftTop(), rect.RightTop(), lightColor);
-		if ((borders & B_RIGHT_BORDER) != 0)
+			rect.top++;
+		}
+		if ((borders & B_RIGHT_BORDER) != 0) {
 			view->AddLine(rect.RightTop(), rect.RightBottom(), lightColor);
-		if ((borders & B_BOTTOM_BORDER) != 0)
+			rect.right--;
+		}
+		if ((borders & B_BOTTOM_BORDER) != 0) {
 			view->AddLine(rect.RightBottom(), rect.LeftBottom(), lightColor);
-		view->EndLineArray();
+			rect.bottom--;
+		}
 	} else if (borderStyle == B_PLAIN_BORDER) {
-		rect.left++;
-		rect.top++;
-
-		view->BeginLineArray(4);
-		if ((borders & B_LEFT_BORDER) != 0)
+		if ((borders & B_LEFT_BORDER) != 0) {
 			view->AddLine(rect.LeftBottom(), rect.LeftTop(), shadowColor);
-		if ((borders & B_TOP_BORDER) != 0)
+			rect.left++;
+		}
+		if ((borders & B_TOP_BORDER) != 0) {
 			view->AddLine(rect.LeftTop(), rect.RightTop(), shadowColor);
-		if ((borders & B_RIGHT_BORDER) != 0)
+			rect.top++;
+		}
+		if ((borders & B_RIGHT_BORDER) != 0) {
 			view->AddLine(rect.RightTop(), rect.RightBottom(), shadowColor);
-		if ((borders & B_BOTTOM_BORDER) != 0)
+			rect.right--;
+		}
+		if ((borders & B_BOTTOM_BORDER) != 0) {
 			view->AddLine(rect.RightBottom(), rect.LeftBottom(), shadowColor);
-		view->EndLineArray();
+			rect.bottom--;
+		}
 
-		rect.OffsetBy(-1, -1);
-
-		view->BeginLineArray(4);
-		if ((borders & B_LEFT_BORDER) != 0)
+		if ((borders & B_LEFT_BORDER) != 0) {
 			view->AddLine(rect.LeftBottom(), rect.LeftTop(), lightColor);
-		if ((borders & B_TOP_BORDER) != 0)
+			rect.left++;
+		}
+		if ((borders & B_TOP_BORDER) != 0) {
 			view->AddLine(rect.LeftTop(), rect.RightTop(), lightColor);
-		if ((borders & B_RIGHT_BORDER) != 0)
+			rect.top++;
+		}
+		if ((borders & B_RIGHT_BORDER) != 0) {
 			view->AddLine(rect.RightTop(), rect.RightBottom(), lightColor);
-		if ((borders & B_BOTTOM_BORDER) != 0)
+			rect.right--;
+		}
+		if ((borders & B_BOTTOM_BORDER) != 0) {
 			view->AddLine(rect.RightBottom(), rect.LeftBottom(), lightColor);
-		view->EndLineArray();
+			rect.bottom--;
+		}
 	}
+
+	view->EndLineArray();
 
 	view->PopState();
 }
@@ -1967,31 +2053,42 @@ BeControlLook::DrawRaisedBorder(BView* view, BRect& rect,
 		shadowColor = tint_color(base, 1.07);
 	}
 
-	rect.left++;
-	rect.top++;
+	view->BeginLineArray(8);
 
-	view->BeginLineArray(4);
-	if ((borders & B_LEFT_BORDER) != 0)
+	if ((borders & B_LEFT_BORDER) != 0) {
 		view->AddLine(rect.LeftBottom(), rect.LeftTop(), lightColor);
-	if ((borders & B_TOP_BORDER) != 0)
+		rect.left++;
+	}
+	if ((borders & B_TOP_BORDER) != 0) {
 		view->AddLine(rect.LeftTop(), rect.RightTop(), lightColor);
-	if ((borders & B_RIGHT_BORDER) != 0)
+		rect.top++;
+	}
+	if ((borders & B_RIGHT_BORDER) != 0) {
 		view->AddLine(rect.RightTop(), rect.RightBottom(), lightColor);
-	if ((borders & B_BOTTOM_BORDER) != 0)
+		rect.right--;
+	}
+	if ((borders & B_BOTTOM_BORDER) != 0) {
 		view->AddLine(rect.RightBottom(), rect.LeftBottom(), lightColor);
-	view->EndLineArray();
+		rect.bottom--;
+	}
 
-	rect.OffsetBy(-1, -1);
-
-	view->BeginLineArray(4);
-	if ((borders & B_LEFT_BORDER) != 0)
+	if ((borders & B_LEFT_BORDER) != 0) {
 		view->AddLine(rect.LeftBottom(), rect.LeftTop(), shadowColor);
-	if ((borders & B_TOP_BORDER) != 0)
+		rect.left++;
+	}
+	if ((borders & B_TOP_BORDER) != 0) {
 		view->AddLine(rect.LeftTop(), rect.RightTop(), shadowColor);
-	if ((borders & B_RIGHT_BORDER) != 0)
+		rect.top++;
+	}
+	if ((borders & B_RIGHT_BORDER) != 0) {
 		view->AddLine(rect.RightTop(), rect.RightBottom(), shadowColor);
-	if ((borders & B_BOTTOM_BORDER) != 0)
+		rect.right--;
+	}
+	if ((borders & B_BOTTOM_BORDER) != 0) {
 		view->AddLine(rect.RightBottom(), rect.LeftBottom(), shadowColor);
+		rect.bottom--;
+	}
+
 	view->EndLineArray();
 
 	view->PopState();
@@ -2029,43 +2126,54 @@ BeControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 	bevelLight = isEnabled ? lightenmax : lighten1;
 
 	view->BeginLineArray(4);
-	if ((borders & B_LEFT_BORDER) != 0)
+	if ((borders & B_LEFT_BORDER) != 0) {
 		view->AddLine(rect.LeftBottom(), rect.LeftTop(), bevelShadow);
-	if ((borders & B_TOP_BORDER) != 0)
+		rect.left++;
+	}
+	if ((borders & B_TOP_BORDER) != 0) {
 		view->AddLine(rect.LeftTop(), rect.RightTop(), bevelShadow);
+		rect.top++;
+	}
 	if ((borders & B_RIGHT_BORDER) != 0) {
 		view->AddLine(BPoint(rect.left + 1, rect.bottom), rect.RightBottom(),
 			bevelLight);
+		rect.right--;
 	}
 	if ((borders & B_BOTTOM_BORDER) != 0) {
 		view->AddLine(rect.RightBottom(), BPoint(rect.right, rect.top + 1),
 			bevelLight);
+		rect.bottom--;
 	}
 	view->EndLineArray();
-
-	rect.InsetBy(1, 1);
 
 	// second bevel
 
 	if (isEnabled && isFocused) {
 		view->SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 		view->StrokeRect(rect);
+		rect.InsetBy(1, 1);
 	} else {
 		bevelShadow = isEnabled ? darken4 : darken2;
 		bevelLight = base;
 
 		view->BeginLineArray(4);
-		if ((borders & B_LEFT_BORDER) != 0)
+		if ((borders & B_LEFT_BORDER) != 0) {
 			view->AddLine(rect.LeftBottom(), rect.LeftTop(), bevelShadow);
-		if ((borders & B_TOP_BORDER) != 0)
+			rect.left++;
+		}
+		if ((borders & B_TOP_BORDER) != 0) {
 			view->AddLine(rect.LeftTop(), rect.RightTop(), bevelShadow);
+			rect.top++;
+		}
 		if ((borders & B_RIGHT_BORDER) != 0) {
 			view->AddLine(BPoint(rect.left + 1, rect.bottom), rect.RightBottom(),
 				bevelLight);
+			rect.right--;
 		}
 		if ((borders & B_BOTTOM_BORDER) != 0) {
 			view->AddLine(rect.RightBottom(), BPoint(rect.right, rect.top + 1),
 				bevelLight);
+			rect.bottom--;
 		}
 		view->EndLineArray();
 	}
@@ -2111,6 +2219,8 @@ BeControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 {
 	view->PushState();
 
+	bool isButton = (flags & B_FLAT) != 0 || (flags & B_HOVER) != 0
+		|| (flags & B_DEFAULT_BUTTON) != 0;
 	bool isEnabled = (flags & B_DISABLED) == 0;
 	bool isActivated = (flags & B_ACTIVATED) != 0;
 
@@ -2222,7 +2332,7 @@ BeControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 	}
 
 	rgb_color invertedIfClicked = color;
-	if (isEnabled && isActivated && dynamic_cast<BButton*>(view) != NULL) {
+	if (isButton && isEnabled && isActivated) {
 		// only for enabled and activated buttons
 		invertedIfClicked.red = 255 - invertedIfClicked.red;
 		invertedIfClicked.green = 255 - invertedIfClicked.green;
@@ -2283,7 +2393,7 @@ BeControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
 	BFont font;
 	view->GetFont(&font);
 
-	font.TruncateString(&truncatedLabel, B_TRUNCATE_END, availableWidth);
+	font.TruncateString(&truncatedLabel, B_TRUNCATE_MIDDLE, availableWidth);
 	width += ceilf(font.StringWidth(truncatedLabel.String()));
 
 	font_height fontHeight;
@@ -2316,10 +2426,10 @@ BeControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
 		float y = location.y + ceilf(fontHeight.descent);
 		view->SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 		view->StrokeLine(BPoint(x, y),
-			BPoint(x + view->StringWidth(label), y));
+			BPoint(x + view->StringWidth(truncatedLabel.String()), y));
 	}
 
-	DrawLabel(view, label, base, flags, location, textColor);
+	DrawLabel(view, truncatedLabel.String(), base, flags, location, textColor);
 
 	view->PopState();
 }
@@ -2525,24 +2635,26 @@ BeControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 			// dark border
 			view->BeginLineArray(4);
 			if ((borders & B_LEFT_BORDER) != 0) {
-				view->AddLine(BPoint(rect.left, rect.bottom - 1),
-					BPoint(rect.left, rect.top + 1), dark2BorderColor);
+				view->AddLine(BPoint(rect.left, rect.top + 1),
+					BPoint(rect.left, rect.bottom - 1), dark2BorderColor);
+				rect.left++;
 			}
 			if ((borders & B_TOP_BORDER) != 0) {
-				view->AddLine(BPoint(rect.left + 1, rect.top),
+				view->AddLine(BPoint(rect.left, rect.top),
 					BPoint(rect.right - 1, rect.top), dark2BorderColor);
+				rect.top++;
 			}
 			if ((borders & B_RIGHT_BORDER) != 0) {
-				view->AddLine(BPoint(rect.right, rect.top + 1),
+				view->AddLine(BPoint(rect.right, rect.top),
 					BPoint(rect.right, rect.bottom - 1), dark2BorderColor);
+				rect.right--;
 			}
 			if ((borders & B_BOTTOM_BORDER) != 0) {
-				view->AddLine(BPoint(rect.left + 1, rect.bottom),
-					BPoint(rect.right - 1, rect.bottom), dark2BorderColor);
+				view->AddLine(BPoint(rect.left, rect.bottom),
+					BPoint(rect.right, rect.bottom), dark2BorderColor);
+				rect.bottom--;
 			}
 			view->EndLineArray();
-
-			rect.InsetBy(1, 1);
 
 			// bevel
 			view->SetHighColor(darken1);
@@ -2559,24 +2671,26 @@ BeControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 			// dark border
 			view->BeginLineArray(4);
 			if ((borders & B_LEFT_BORDER) != 0) {
-				view->AddLine(BPoint(rect.left, rect.bottom - 1),
-					BPoint(rect.left, rect.top + 1), darken1);
+				view->AddLine(BPoint(rect.left, rect.top + 1),
+					BPoint(rect.left, rect.bottom - 1), darken1);
+				rect.left++;
 			}
 			if ((borders & B_TOP_BORDER) != 0) {
-				view->AddLine(BPoint(rect.left + 1, rect.top),
+				view->AddLine(BPoint(rect.left, rect.top),
 					BPoint(rect.right - 1, rect.top), darken1);
+				rect.top++;
 			}
 			if ((borders & B_RIGHT_BORDER) != 0) {
-				view->AddLine(BPoint(rect.right, rect.top + 1),
+				view->AddLine(BPoint(rect.right, rect.top),
 					BPoint(rect.right, rect.bottom - 1), darken1);
+				rect.right--;
 			}
 			if ((borders & B_BOTTOM_BORDER) != 0) {
-				view->AddLine(BPoint(rect.left + 1, rect.bottom),
-					BPoint(rect.right - 1, rect.bottom), darken1);
+				view->AddLine(BPoint(rect.left, rect.bottom),
+					BPoint(rect.right, rect.bottom), darken1);
+				rect.bottom--;
 			}
 			view->EndLineArray();
-
-			rect.InsetBy(1, 1);
 
 			// fill
 			view->SetHighColor(lighten1);
@@ -2585,10 +2699,8 @@ BeControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 			rect.InsetBy(3, 3);
 		}
 	} else {
-		// if not default button, add a 1px base color border
-		view->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		view->StrokeRect(rect);
-		rect.InsetBy(1, 1);
+		// if not default button, inset top and bottom by 1px
+		rect.InsetBy(1, 0);
 	}
 
 	// stroke frame to draw four corners, then write on top

@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie można przywróci
 Cut	Menus		Wytnij
 Center	Menus		Wyśrodkuj
 Increase size	Menus		Zwiększ rozmiar
-Wrap-around search	FindandReplaceWindow		Szukanie owijające
 Page setup…	Menus		Ustawienia strony…
+Wrap-around search	FindandReplaceWindow		Szukanie owijające
 Untitled 	StyledEditWindow		Bez tytułu 
 OK	Statistics		OK
 Find	FindandReplaceWindow		Znajdź
@@ -29,8 +29,8 @@ Italic	Menus		Kursywa
 Can't undo	Menus		Nie można cofnąć
 Replace…	Menus		Zastąp…
 File	Menus		Plik
-Bold	Menus		Pogrubienie
 Paste	Menus		Wklej
+Bold	Menus		Pogrubienie
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Plik „%file%” został zmieniony przez inny program. Czy wczytać go ponownie?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Plik „%file%” został usunięty przez inny program. Czy chcesz go przywrócić?
 Lines:	Statistics		Linie:
@@ -68,23 +68,23 @@ OK	LoadAlert		OK
 Save	QuitAlert		Zapisz
 Case-sensitive	FindandReplaceWindow		Uwzględnij wielkość liter
 Find selection	Menus		Znajdź zaznaczenie
-Cancel	SaveAlert		Anuluj
 Find…	Menus		Znajdź…
+Cancel	SaveAlert		Anuluj
 Revert	RevertToSavedAlert		Przywróć
-Decrease size	Menus		Zmniejsz rozmiar
 Size	Menus		Rozmiar
+Decrease size	Menus		Zmniejsz rozmiar
 Autodetect	Menus		Autodetekcja
 Replace next	Menus		Zamień następne
 OK	QuitAlert		OK
-Replace with:	FindandReplaceWindow		Zamień na:
 Edit	Menus		Edycja
+Replace with:	FindandReplaceWindow		Zamień na:
 Open…	Menus		Otwórz…
 Save as…	Menus		Zapisz jako…
 Replace	FindandReplaceWindow		Zamień
 Characters:	Statistics		Znaków:
 Don't save	QuitAlert		Nie zapisuj
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Czy zapisać zmiany w dokumencie „%s”? 
-Align	Menus		Wyrównaj
 Font	Menus		Font
+Align	Menus		Wyrównaj
 Select all	Menus		Zaznacz wszystko
 Right	Menus		Prawo

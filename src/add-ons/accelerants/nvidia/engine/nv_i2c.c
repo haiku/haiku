@@ -2,7 +2,7 @@
  * i2c interface.
  * Bus should be run at max. 100kHz: see original Philips I2C specification
  *	
- * Rudolf Cornelissen 12/2002-10/2009
+ * Rudolf Cornelissen 12/2002-4/2021
  */
 
 #define MODULE_BIT 0x00004000
@@ -46,73 +46,144 @@ static void i2c_select_bus_set(bool set)
 static void OutSCL(uint8 BusNR, bool Bit)
 {
 	uint8 data;
+	uint32 data32;
 
-	switch (BusNR) {
-	case 0:
-		data = (CRTCR(WR_I2CBUS_0) & 0xf0) | 0x01;
-		if (Bit)
-			CRTCW(WR_I2CBUS_0, (data | 0x20));
-		else
-			CRTCW(WR_I2CBUS_0, (data & ~0x20));
-		break;
-	case 1:
-		data = (CRTCR(WR_I2CBUS_1) & 0xf0) | 0x01;
-		if (Bit)
-			CRTCW(WR_I2CBUS_1, (data | 0x20));
-		else
-			CRTCW(WR_I2CBUS_1, (data & ~0x20));
-		break;
-	case 2:
-		data = (CRTCR(WR_I2CBUS_2) & 0xf0) | 0x01;
-		if (Bit)
-			CRTCW(WR_I2CBUS_2, (data | 0x20));
-		else
-			CRTCW(WR_I2CBUS_2, (data & ~0x20));
-		break;
+	if ((CFGR(DEVID) & 0xfff0ffff) == 0x024010de) {
+		/* C51 chipset */	
+		switch (BusNR) {
+		case 0:
+			data32 = NV_REG32(NV32_NV4E_I2CBUS_0) & ~0x2f;
+			if (Bit)
+				NV_REG32(NV32_NV4E_I2CBUS_0) = data32 | 0x21;
+			else
+				NV_REG32(NV32_NV4E_I2CBUS_0) = data32 | 0x01;
+			break;
+		case 1:
+			data32 = NV_REG32(NV32_NV4E_I2CBUS_1) & ~0x2f;
+			if (Bit)
+				NV_REG32(NV32_NV4E_I2CBUS_1) = data32 | 0x21;
+			else
+				NV_REG32(NV32_NV4E_I2CBUS_1) = data32 | 0x01;
+			break;
+		case 2:
+			data32 = NV_REG32(NV32_NV4E_I2CBUS_2) & ~0x2f;
+			if (Bit)
+				NV_REG32(NV32_NV4E_I2CBUS_2) = data32 | 0x21;
+			else
+				NV_REG32(NV32_NV4E_I2CBUS_2) = data32 | 0x01;
+			break;
+		}
+	} else {
+		switch (BusNR) {
+		case 0:
+			data = (CRTCR(WR_I2CBUS_0) & 0xf0) | 0x01;
+			if (Bit)
+				CRTCW(WR_I2CBUS_0, (data | 0x20));
+			else
+				CRTCW(WR_I2CBUS_0, (data & ~0x20));
+			break;
+		case 1:
+			data = (CRTCR(WR_I2CBUS_1) & 0xf0) | 0x01;
+			if (Bit)
+				CRTCW(WR_I2CBUS_1, (data | 0x20));
+			else
+				CRTCW(WR_I2CBUS_1, (data & ~0x20));
+			break;
+		case 2:
+			data = (CRTCR(WR_I2CBUS_2) & 0xf0) | 0x01;
+			if (Bit)
+				CRTCW(WR_I2CBUS_2, (data | 0x20));
+			else
+				CRTCW(WR_I2CBUS_2, (data & ~0x20));
+			break;
+		}
 	}
 }
 
 static void OutSDA(uint8 BusNR, bool Bit)
 {
 	uint8 data;
+	uint32 data32;
 	
-	switch (BusNR) {
-	case 0:
-		data = (CRTCR(WR_I2CBUS_0) & 0xf0) | 0x01;
-		if (Bit)
-			CRTCW(WR_I2CBUS_0, (data | 0x10));
-		else
-			CRTCW(WR_I2CBUS_0, (data & ~0x10));
-		break;
-	case 1:
-		data = (CRTCR(WR_I2CBUS_1) & 0xf0) | 0x01;
-		if (Bit)
-			CRTCW(WR_I2CBUS_1, (data | 0x10));
-		else
-			CRTCW(WR_I2CBUS_1, (data & ~0x10));
-		break;
-	case 2:
-		data = (CRTCR(WR_I2CBUS_2) & 0xf0) | 0x01;
-		if (Bit)
-			CRTCW(WR_I2CBUS_2, (data | 0x10));
-		else
-			CRTCW(WR_I2CBUS_2, (data & ~0x10));
-		break;
+	if ((CFGR(DEVID) & 0xfff0ffff) == 0x024010de) {
+		/* C51 chipset */	
+		switch (BusNR) {
+		case 0:
+			data32 = NV_REG32(NV32_NV4E_I2CBUS_0) & ~0x1f;
+			if (Bit)
+				NV_REG32(NV32_NV4E_I2CBUS_0) = data32 | 0x11;
+			else
+				NV_REG32(NV32_NV4E_I2CBUS_0) = data32 | 0x01;
+			break;
+		case 1:
+			data32 = NV_REG32(NV32_NV4E_I2CBUS_1) & ~0x1f;
+			if (Bit)
+				NV_REG32(NV32_NV4E_I2CBUS_1) = data32 | 0x11;
+			else
+				NV_REG32(NV32_NV4E_I2CBUS_1) = data32 | 0x01;
+			break;
+		case 2:
+			data32 = NV_REG32(NV32_NV4E_I2CBUS_2) & ~0x1f;
+			if (Bit)
+				NV_REG32(NV32_NV4E_I2CBUS_2) = data32 | 0x11;
+			else
+				NV_REG32(NV32_NV4E_I2CBUS_2) = data32 | 0x01;
+			break;
+		}
+	} else {
+		switch (BusNR) {
+		case 0:
+			data = (CRTCR(WR_I2CBUS_0) & 0xf0) | 0x01;
+			if (Bit)
+				CRTCW(WR_I2CBUS_0, (data | 0x10));
+			else
+				CRTCW(WR_I2CBUS_0, (data & ~0x10));
+			break;
+		case 1:
+			data = (CRTCR(WR_I2CBUS_1) & 0xf0) | 0x01;
+			if (Bit)
+				CRTCW(WR_I2CBUS_1, (data | 0x10));
+			else
+				CRTCW(WR_I2CBUS_1, (data & ~0x10));
+			break;
+		case 2:
+			data = (CRTCR(WR_I2CBUS_2) & 0xf0) | 0x01;
+			if (Bit)
+				CRTCW(WR_I2CBUS_2, (data | 0x10));
+			else
+				CRTCW(WR_I2CBUS_2, (data & ~0x10));
+			break;
+		}
 	}
 }
 
 static bool InSCL(uint8 BusNR)
 {
-	switch (BusNR) {
-	case 0:
-		if ((CRTCR(RD_I2CBUS_0) & 0x04)) return true;
-		break;
-	case 1:
-		if ((CRTCR(RD_I2CBUS_1) & 0x04)) return true;
-		break;
-	case 2:
-		if ((CRTCR(RD_I2CBUS_2) & 0x04)) return true;
-		break;
+	if ((CFGR(DEVID) & 0xfff0ffff) == 0x024010de) {
+		/* C51 chipset */	
+		switch (BusNR) {
+		case 0:
+			if (NV_REG32(NV32_NV4E_I2CBUS_0) & 0x00040000) return true;
+			break;
+		case 1:
+			if (NV_REG32(NV32_NV4E_I2CBUS_1) & 0x00040000) return true;
+			break;
+		case 2:
+			if (NV_REG32(NV32_NV4E_I2CBUS_2) & 0x00040000) return true;
+			break;
+		}
+	} else {
+		switch (BusNR) {
+		case 0:
+			if ((CRTCR(RD_I2CBUS_0) & 0x04)) return true;
+			break;
+		case 1:
+			if ((CRTCR(RD_I2CBUS_1) & 0x04)) return true;
+			break;
+		case 2:
+			if ((CRTCR(RD_I2CBUS_2) & 0x04)) return true;
+			break;
+		}
 	}
 
 	return false;
@@ -120,16 +191,31 @@ static bool InSCL(uint8 BusNR)
 
 static bool InSDA(uint8 BusNR)
 {
-	switch (BusNR) {
-	case 0:
-		if ((CRTCR(RD_I2CBUS_0) & 0x08)) return true;
-		break;
-	case 1:
-		if ((CRTCR(RD_I2CBUS_1) & 0x08)) return true;
-		break;
-	case 2:
-		if ((CRTCR(RD_I2CBUS_2) & 0x08)) return true;
-		break;
+	if ((CFGR(DEVID) & 0xfff0ffff) == 0x024010de) {
+		/* C51 chipset */	
+		switch (BusNR) {
+		case 0:
+			if (NV_REG32(NV32_NV4E_I2CBUS_0) & 0x00080000) return true;
+			break;
+		case 1:
+			if (NV_REG32(NV32_NV4E_I2CBUS_1) & 0x00080000) return true;
+			break;
+		case 2:
+			if (NV_REG32(NV32_NV4E_I2CBUS_2) & 0x00080000) return true;
+			break;
+		}
+	} else {
+		switch (BusNR) {
+		case 0:
+			if ((CRTCR(RD_I2CBUS_0) & 0x08)) return true;
+			break;
+		case 1:
+			if ((CRTCR(RD_I2CBUS_1) & 0x08)) return true;
+			break;
+		case 2:
+			if ((CRTCR(RD_I2CBUS_2) & 0x08)) return true;
+			break;
+		}
 	}
 
 	return false;

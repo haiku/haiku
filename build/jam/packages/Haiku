@@ -25,6 +25,11 @@ for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
 	}
 }
 
+# bootloaders
+local bootTarget ;
+for bootTarget in $(HAIKU_BOOT_TARGETS) {
+	AddFilesToPackage data platform_loaders : haiku_loader.$(bootTarget) ;
+}
 
 # modules
 AddFilesToPackage add-ons kernel bus_managers : $(SYSTEM_ADD_ONS_BUS_MANAGERS) ;
@@ -34,11 +39,13 @@ AddFilesToPackage add-ons kernel busses ata
 	: generic_ide_pci it8211 legacy_sata silicon_image_3112 highpoint_ide_pci ide_isa@x86 ;
 
 AddFilesToPackage add-ons kernel busses i2c : pch_i2c@x86,x86_64 ;
+AddFilesToPackage add-ons kernel busses mmc : sdhci_pci ;
 AddFilesToPackage add-ons kernel busses random : virtio_rng ;
 AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
 AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci
 	<usb>xhci ;
-AddFilesToPackage add-ons kernel busses virtio : virtio_pci ;
+AddFilesToPackage add-ons kernel busses virtio : virtio_mmio@riscv64,arm,arm64
+	virtio_pci ;
 AddFilesToPackage add-ons kernel console : vga_text ;
 AddFilesToPackage add-ons kernel debugger
 	: <kdebug>demangle <kdebug>disasm@x86,x86_64 <kdebug>hangman
@@ -60,12 +67,14 @@ if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
 
 # drivers
 AddNewDriversToPackage 				: wmi@x86,x86_64 ;
-AddNewDriversToPackage disk			: nvme_disk@x86,x86_64 ;
+AddNewDriversToPackage disk			: nvme_disk ;
+AddNewDriversToPackage disk mmc		: mmc_disk ;
 AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToPackage disk virtual : virtio_block ram_disk ;
 AddNewDriversToPackage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 AddNewDriversToPackage sensor		: $(SYSTEM_ADD_ONS_DRIVERS_SENSOR) ;
 AddNewDriversToPackage network		: virtio_net ;
+AddNewDriversToPackage input		: virtio_input ;
 #AddNewDriversToPackage display		: display_adapter@x86 ;
 
 # legacy drivers
@@ -74,8 +83,7 @@ AddDriversToPackage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToPackage audio old		: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
 AddDriversToPackage bluetooth h2	: $(SYSTEM_ADD_ONS_DRIVERS_BT_H2) ;
 AddDriversToPackage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
-AddDriversToPackage bus				: usb_raw fw_raw@x86 ;
-AddDriversToPackage disk floppy		: pc_floppy@x86 ;
+AddDriversToPackage bus				: usb_raw ;
 AddDriversToPackage disk usb		: usb_disk ;
 AddDriversToPackage disk virtual	: nbd ;
 AddDriversToPackage dvb				: cx23882 ;
@@ -93,7 +101,7 @@ AddLibrariesToPackage lib
 	: [ HaikuImageGetSystemLibs ] [ HaikuImageGetPrivateSystemLibs ] ;
 
 # libnetwork.so replaces quite a few libraries
-if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
+if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 1 {
 	local libNetworkAliases = libsocket.so libbind.so libnet.so ;
 	local lib ;
 	for lib in $(libNetworkAliases) {
@@ -103,6 +111,10 @@ if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
 	AddSymlinkToPackage lib : libbnetapi.so : libnetapi.so ;
 }
 
+
+# trusted keys
+SEARCH on haiku-2019.pub = [ FDirName $(HAIKU_TOP) data trust_db ] ;
+AddFilesToPackage data trust_db : haiku-2019.pub ;
 
 # servers
 AddFilesToPackage servers : $(SYSTEM_SERVERS) ;
@@ -133,13 +145,7 @@ local userLaunchScripts = <data!launch>user ;
 SEARCH on $(userLaunchScripts) = [ FDirName $(HAIKU_TOP) data launch ] ;
 AddFilesToPackage data user_launch : $(userLaunchScripts) ;
 
-# post install + first login scripts
-local postInstallFiles = add_catalog_entry_attributes.sh ;
-postInstallFiles = $(postInstallFiles:G=post-install) ;
-SEARCH on $(postInstallFiles)
-	= [ FDirName $(HAIKU_TOP) data system boot post_install ] ;
-AddFilesToPackage boot post-install : $(postInstallFiles) ;
-
+# first login scripts
 local firstLoginFiles = default_deskbar_items.sh ;
 firstLoginFiles = $(firstLoginFiles:G=first-login) ;
 SEARCH on $(firstLoginFiles)
@@ -188,23 +194,24 @@ AddFilesToPackage data KeyboardLayouts ThinkPad
 AddBootModuleSymlinksToPackage
 	acpi@x86,x86_64 ahci ata ata_adapter
 	bfs
-	config_manager
 	dpc
 	efi_gpt
 	generic_ide_pci
 	ide_isa@x86 isa@x86,x86_64 intel it8211
 	legacy_sata locked_pool
-	nvme_disk@x86,x86_64
+	mmc mmc_disk
+	nvme_disk
 	openpic@ppc
 	packagefs pci
+	fdt@riscv64,arm
 	scsi scsi_cd scsi_disk scsi_periph silicon_image_3112 highpoint_ide_pci
+	sdhci_pci
 	usb usb_disk <usb>ehci <usb>ohci <usb>uhci <usb>xhci
-	virtio virtio_block virtio_pci virtio_scsi
+	virtio virtio_block virtio_mmio@riscv64,arm,arm64 virtio_pci virtio_scsi
 ;
 
 # add-ons
 AddFilesToPackage add-ons accelerants	: $(SYSTEM_ADD_ONS_ACCELERANTS) ;
-AddFilesToPackage add-ons Translators	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
 AddFilesToPackage add-ons locale catalogs : $(SYSTEM_ADD_ONS_LOCALE_CATALOGS) ;
 
 AddFilesToPackage add-ons mail_daemon inbound_protocols		: POP3
@@ -215,7 +222,6 @@ AddFilesToPackage add-ons mail_daemon inbound_filters
 AddFilesToPackage add-ons mail_daemon outbound_filters		: Fortune ;
 
 AddFilesToPackage add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
-AddFilesToPackage add-ons media plugins : $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
 
 AddFilesToPackage add-ons Network\ Settings
 	: IPv4Interface IPv6Interface DNSClientService Hostname FTPService SSHService
@@ -232,7 +238,7 @@ AddSymlinkToPackage add-ons Tracker
 	: /boot/system/apps/DiskUsage : DiskUsage ;
 
 AddFilesToPackage add-ons input_server devices
-	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
+	: <input>keyboard <input>mouse <input>tablet <input>virtio <input>wacom ;
 AddFilesToPackage add-ons input_server filters
 	: padblocker screen_saver shortcut_catcher switch_workspace ;
 AddDirectoryToPackage add-ons input_server methods ;
@@ -258,10 +264,6 @@ AddFilesToPackage add-ons disk_systems
 # Kernel bluetooth stack
 AddFilesToPackage add-ons kernel bluetooth : $(SYSTEM_BT_STACK) ;
 
-# decorators
-AddFilesToPackage add-ons decorators : BeDecorator ;
-	# MacDecorator WinDecorator
-
 # the MIME DB
 CopyDirectoryToPackage data : <mimedb>mime_db : : : isTarget ;
 
@@ -271,21 +273,27 @@ AddDirectoryToPackage preferences : system-preferences.rdef ;
 
 # Deskbar menu symlinks
 
-# "Applications" links
 local linkTarget ;
+
+# "Applications" links
+AddDirectoryToPackage data deskbar menu Applications
+	: deskbar-applications.rdef ;
 for linkTarget in $(DESKBAR_APPLICATIONS) {
 	AddSymlinkToPackage data deskbar menu Applications
 		: ../../../../apps/$(linkTarget) : $(linkTarget) ;
 }
 
 # "Desktop applets" links
+AddDirectoryToPackage data deskbar menu Desktop\ applets
+	: deskbar-applets.rdef ;
 for linkTarget in $(DESKBAR_DESKTOP_APPLETS) {
 	AddSymlinkToPackage data deskbar menu Desktop\ applets
 		: ../../../../apps/$(linkTarget) : $(linkTarget) ;
 }
 
 # "Preferences" links
-AddDirectoryToPackage data deskbar menu Preferences ;
+AddDirectoryToPackage data deskbar menu Preferences
+	: deskbar-preferences.rdef ;
 DESKBAR_PREFERENCES = $(SYSTEM_PREFERENCES:B) ;
 for linkTarget in $(DESKBAR_PREFERENCES) {
 	AddSymlinkToPackage data deskbar menu Preferences
@@ -294,7 +302,8 @@ for linkTarget in $(DESKBAR_PREFERENCES) {
 }
 
 # "Demo" links
-AddDirectoryToPackage data deskbar menu Demos ;
+AddDirectoryToPackage data deskbar menu Demos
+	: deskbar-demos.rdef ;
 for linkTarget in $(SYSTEM_DEMOS) {
 	AddSymlinkToPackage data deskbar menu Demos
 		: ../../../../demos/$(linkTarget) : $(linkTarget) ;

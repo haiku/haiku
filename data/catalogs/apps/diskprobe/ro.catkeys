@@ -2,41 +2,41 @@
 Raw editor	AttributeWindow		Editor brut
 Remove	AttributeWindow		Elimină
 Close	ProbeView		Închide
-Boolean value:	TypeEditors		Valoare logică:
+Boolean value:	TypeEditors		Valoare boolean:
 File	ProbeView		Fișier
 Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 'Font size'	Dimensiune bloc
-MIME type editor	TypeEditors		Editor tip MIME
+MIME type editor	TypeEditors		Editor de tip MIME
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hexazecimal
-16 bit unsigned value:	TypeEditors		valoare pozitivă 16 biți:
-8 bit signed value:	TypeEditors		valoare pozitivă 8 biți:
+16 bit unsigned value:	TypeEditors		Valoare fără semn pe 16 biți:
+8 bit signed value:	TypeEditors		Valoare întreagă pe 8 biți:
  (native)	ProbeView		 (nativ)
-Attribute offset: 	ProbeView		Decalaj atribut: 
+Attribute offset: 	ProbeView		Decalaj de atribut: 
 Text	TypeEditors	This is the type of editor	Text
-File offset: 	ProbeView		Decalaj fișier: 
+File offset: 	ProbeView		Decalaj de fișier: 
 Add	ProbeView		Adaugă
-64 bit signed value:	TypeEditors		valoare întreagă 64 bit:
-Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Doriți să eliminați atributul \"%s\" de la fișierul \"%s\"?\n\nNu puteți să refaceți această acțiune.
-No type editor available	AttributeWindow		Niciun editor de tip disponibil
-Print…	ProbeView		Tipărește…
+64 bit signed value:	TypeEditors		Valoare întreagă pe 64 de biți:
+Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Doriți să eliminați atributul \„%s\” de la fișierul \„%s\”?\n\nNu puteți reface această acțiune.
+No type editor available	AttributeWindow		Nu este disponibil niciun editor de tip
+Print…	ProbeView		Tipărire…
 New…	FileWindow		Nou…
-what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ce: '%.4s'\n\n
+what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ce: „%.4s”\n\n
 OK	DiskProbe		OK
-DiskProbe	System name		TestareDisc
+DiskProbe	System name		DiskProbe
 Back	ProbeView		Înapoi
 Device: 	ProbeView		Dispozitiv: 
-Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Bază
+Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	Baza
 Open file…	FileWindow		Deschide fișier…
-32 bit unsigned pointer:	TypeEditors		indicator pozitiv 32 biți:
-DiskProbe request	DiskProbe		Cerere TestareDisc
+32 bit unsigned pointer:	TypeEditors		Indicator fără semn pe 32 de biți:
+DiskProbe request	DiskProbe		Cerere DiskProbe
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Hex
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Scrierea în fișier a eșuat.\n%s\n\nToate modificările vor fi pierdute atunci când închideți.
-Examine device:	OpenWindow		Examinează dispozitiv:
-Number editor	TypeEditors		Editor de număr
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Scrierea în fișier a eșuat:\n%s\n\nToate modificările vor fi pierdute când ieșiți.
+Examine device:	OpenWindow		Examinează dispozitivul:
+Number editor	TypeEditors		Editor de numere
 Icon	TypeEditors		Pictogramă
 Attribute	ProbeView		Atribut
 Don't save	ProbeView		Nu salva
 Undo	ProbeView		Refă
-Flattened bitmap	TypeEditors		Bitmap neted
+Flattened bitmap	TypeEditors		Bitmap aplatizat
 Block %Ld (0x%Lx)	ProbeView		Bloc %Ld (0x%Lx)
 Cancel	OpenWindow		Anulează
 Unknown format	TypeEditors		Format necunoscut
@@ -44,90 +44,90 @@ File: 	ProbeView		Fișier:
 Swapped: %Ld (0x%0*Lx)	ProbeView		Interschimbat: %Ld (0x%0*Lx)
 Stop	ProbeView		Oprește
 Cancel	ProbeView		Anulează
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Nu s-a putut deschide \"%s\":\n%s
-Font size	ProbeView		Mărime font
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	Nu s-a putut deschide \„%s\”:\n%s
+Font size	ProbeView		Dimensiune font
 Type editor not supported	ProbeView		Editorul de tip nu este suportat
 Native: 0x%0*Lx	ProbeView		Nativ: 0x%0*Lx
 Copy	ProbeView		Copiază
 Redo	ProbeView		Repetă
 Floating-point value:	TypeEditors		Valoare cu virgulă mobilă:
 Cancel	AttributeWindow		Anulează
-16 bit signed value:	TypeEditors		valoare întreagă 16 bit:
-DiskProbe request	AttributeWindow		Cerere TestareDisc
-Next	ProbeView		Următor
-64 bit signed offset:	TypeEditors		decalaj întreg 64 bit:
-32 bit signed value:	TypeEditors		valoare 32 biți:
+16 bit signed value:	TypeEditors		Valoare întreagă pe 16 biți:
+DiskProbe request	AttributeWindow		Cerere DiskProbe
+Next	ProbeView		Înainte
+64 bit signed offset:	TypeEditors		Decalaj întreg pe 64 de biți:
+32 bit signed value:	TypeEditors		Valoare întreagă pe 32 de biți:
 Could not find search string.	ProbeView		Nu s-a putut găsi șirul căutat.
 Close	FileWindow		Închide
 Unknown type	TypeEditors		Tip necunoscut
-Open device	FileWindow		Deschide dispozitiv
+Open device	FileWindow		Deschide un dispozitiv
 Number:	TypeEditors		Număr:
-Quit	FileWindow		Închidere
+Quit	FileWindow		Ieșire
 Text	FindWindow		Text
 Block 0x%Lx	ProbeView		Bloc 0x%Lx
 Attribute	AttributeWindow		Atribut
 Mode:	FindWindow		Mod:
 16 bit	TypeEditors		16 biți
-32 bit size or status:	TypeEditors		stare sau dimensiune 32 bit:
+32 bit size or status:	TypeEditors		Stare sau dimensiune pe 32 de biți:
 of 	ProbeView		de 
-Contents:	TypeEditors		Conținuturi:
-Could not open file \"%s\": %s\n	DiskProbe		Nu s-a putut deschide fișierul \"%s\": %s\n
-Probe file…	OpenWindow		Testează fișier…
+Contents:	TypeEditors		Conținut:
+Could not open file \"%s\": %s\n	DiskProbe		Nu s-a putut deschide fișierul \„%s\”: %s\n
+Probe file…	OpenWindow		Testare fișier…
 Block: 	ProbeView		Bloc: 
-Bookmarks	ProbeView		Semne de carte
-Probe device	OpenWindow		Testează dispozitiv
-none	ProbeView	No attributes	nimic
+Bookmarks	ProbeView		Marcaje
+Probe device	OpenWindow		Testează dispozitivul
+none	ProbeView	No attributes	nespecificat
 Case sensitive	FindWindow		Sensibil la majuscule
-32 bit unsigned value:	TypeEditors		valoare pozitivă 32 biți:
+32 bit unsigned value:	TypeEditors		Valoare fără semn pe 32 de biți:
 Remove from file	AttributeWindow		Elimină din fișier
 Attributes	ProbeView		Atribute
 Message	TypeEditors	This is the type of view	Mesaj
-Message View	TypeEditors		Vizualizare mesaj
+Message View	TypeEditors		Vizualizare de mesaj
 Offset: 	ProbeView		Decalaj: 
 Swapped: 0x%0*Lx	ProbeView		Interschimbat: 0x%0*Lx
 MIME type:	TypeEditors		Tip MIME:
-Fit	ProbeView	Size of fonts, fits to available room	Potrivește
+Fit	ProbeView	Size of fonts, fits to available room	Potrivire
 Type editor	ProbeView		Editor de tip
 File	FileWindow		Fișier
 Grayscale	TypeEditors		Scală de gri
-32 bit	TypeEditors		32 biți
+32 bit	TypeEditors		32 de biți
 Native: %Ld (0x%0*Lx)	ProbeView		Nativ: %Ld (0x%0*Lx)
 Device	ProbeView		Dispozitiv
 Close	AttributeWindow		Închide
 Type editor	AttributeWindow		Editor de tip
 Save	ProbeView		Salvează
 of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	din 0x0
-Attribute type: 	ProbeView		Tip atribut: 
-15 bit	TypeEditors		15 bit
+Attribute type: 	ProbeView		Tip de atribut: 
+15 bit	TypeEditors		15 biți
 Page setup…	ProbeView		Configurare pagină…
-Boolean	TypeEditors	This is the type of editor	Logic
+Boolean	TypeEditors	This is the type of editor	Boolean
 Icon view	TypeEditors		Vizualizare pictogramă
-Select all	ProbeView		Selectează tot
-64 bit unsigned value:	TypeEditors		valoare pozitivă 64 biți:
+Select all	ProbeView		Selectează toate
+64 bit unsigned value:	TypeEditors		Valoare fără semn pe 64 de biți:
 OK	ProbeView		OK
-Previous	ProbeView		Precedent
+Previous	ProbeView		Înapoi
 Selection	ProbeView		Selecție
 Find	FindWindow		Găsește
-8 bit unsigned value:	TypeEditors		valoare pozitivă 8 biți:
+8 bit unsigned value:	TypeEditors		Valoare fără semn pe 8 biți:
 %ld (native)	ProbeView		%ld (nativ)
 Attribute: 	ProbeView		Atribut: 
 Block	ProbeView		Bloc
 Find again	ProbeView		Găsește din nou
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Vizualizare
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nu s-a putut citi mesajul
-DiskProbe request	ProbeView		Cerere TestareDisc
-Double precision floating-point value:	TypeEditors		Valoare cu virgulă mobilă cu precizie dublă:
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Nu s-a putut citi imaginea
+DiskProbe request	ProbeView		Cerere DiskProbe
+Double precision floating-point value:	TypeEditors		Valoare în virgulă mobilă de dublă precizie:
 Image	TypeEditors	This is the type of view	Imagine
 Save changes before closing?	ProbeView		Salvați modificările înainte de a închide?
 PNG format	TypeEditors		Format PNG
 Number	TypeEditors	This is the type of editor	Număr
-Edit	ProbeView		Editează
+Edit	ProbeView		Editare
 String editor	TypeEditors		Editor de șir
-Boolean editor	TypeEditors		Editor logic
-Device offset: 	ProbeView		Decalaj dispozitiv: 
+Boolean editor	TypeEditors		Editor boolean
+Device offset: 	ProbeView		Decalaj de dispozitiv: 
 Find…	ProbeView		Găsește…
-8 bit palette	TypeEditors		paletă de 8 bit
+8 bit palette	TypeEditors		Paletă pe 8 biți
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Zecimal
 Image view	TypeEditors	Image means here a picture file, not a disk image.	Vizualizare imagine
 Paste	ProbeView		Lipește
-32 bit unsigned size:	TypeEditors		dimensiune naturală 32 bit:
+32 bit unsigned size:	TypeEditors		Dimensiune fără semn pe 32 de biți:

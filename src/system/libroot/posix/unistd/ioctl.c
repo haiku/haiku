@@ -14,6 +14,14 @@
 
 
 int
+__ioctl(int fd, ulong cmd, struct ioctl_args args)
+{
+	RETURN_AND_SET_ERRNO(_kern_ioctl(fd, cmd, args.argument, args.size));
+}
+
+
+#undef ioctl
+int
 ioctl(int fd, ulong cmd, ...)
 {
 	va_list args;

@@ -1,0 +1,8 @@
+1	catalan; valencian	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Temes
+Start control panel	ParameterWindow		Inicia el tauler de control
+%nodeinfo% parameters	ParameterWindow		Paràmetres de %nodeinfo%
+OK	ParameterWindow		D'acord
+Window	ParameterWindow		Finestra
+Could not start control panel (%error%)	ParameterWindow		No s'ha pogut iniciar el tauler de control (%error%).
+Close	ParameterWindow		Tanca

@@ -73,7 +73,8 @@ typedef struct scsi_periph_callbacks {
 } scsi_periph_callbacks;
 
 typedef struct scsi_block_range {
-	uint64	offset;
+	// values are in blocks
+	uint64	lba;
 	uint64	size;
 } scsi_block_range;
 
@@ -123,7 +124,7 @@ typedef struct scsi_periph_interface {
 	err_res (*synchronize_cache)(scsi_periph_device device, scsi_ccb *request);
 
 	status_t (*trim_device)(scsi_periph_device_info *device, scsi_ccb *request,
-		scsi_block_range* ranges, uint32 rangeCount);
+		scsi_block_range* ranges, uint32 rangeCount, uint64* trimmedBlocks);
 
 	// *** removable media ***
 	// to be called when a medium change is detected to block subsequent commands

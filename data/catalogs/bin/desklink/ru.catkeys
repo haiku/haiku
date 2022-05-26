@@ -1,13 +1,11 @@
-1	russian	x-vnd.Haiku-desklink	3568085956
+1	russian	x-vnd.Haiku-desklink	1299174281
 desklink	MediaReplicant	Title of an alert box	desklink
-Sound preferences…	MediaReplicant		Настройки звуков…
 Muted	MediaReplicant		Приглушено
 %g dB	MediaReplicant		%g дБ
 OK	MediaReplicant		ОК
 Couldn't launch 	MediaReplicant		Не удалось запустить 
 Volume	VolumeControl		Громкость
 Open MediaPlayer	MediaReplicant		Открыть Медиаплеер
-%d dB	VolumeControl		%d дБ
 Media preferences…	MediaReplicant		Настройки медиа…
 Options	MediaReplicant		Настройки
 Beep	MediaReplicant		Сигнал

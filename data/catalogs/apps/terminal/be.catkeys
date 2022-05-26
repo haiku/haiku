@@ -10,8 +10,8 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Пытацц�
 Copy	Terminal TermWindow		Капіяваць
 Retro	Terminal colors scheme		Даўніна
 Edit tab title…	Terminal TermWindow		Правіць імя ўкладкі…
-Print	Terminal TermWindow		Друк
 Settings	Terminal TermWindow		Наладкі
+Print	Terminal TermWindow		Друк
 %app% settings	Terminal PrefWindow	window title	Наладкі %app%
 Use default	Terminal SetTitleWindow		Ужыць прадвызначаныя
 Close tab	Terminal TermWindow		Закрыць укладку
@@ -27,8 +27,8 @@ Page setup…	Terminal TermWindow		Наладкі старонкі…
 Slate	Terminal colors scheme		Шыфер
 Cancel	Terminal TermView		Адмена
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Тэрмінал
-Use selection	Terminal FindWindow		Карыстаць выдзяленне
 Find next	Terminal TermWindow		Знайсці далейшае
+Use selection	Terminal FindWindow		Карыстаць выдзяленне
 Copy link location	Terminal TermView		Капіяваць спасылку
 Window title:	Terminal AppearancePrefView		Імя вакна:
 New tab	Terminal TermWindow		Новая ўкладка
@@ -46,12 +46,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Невядомая оп
 Tab title:	Terminal AppearancePrefView		Імя ўкладкі:
 Text not found.	Terminal TermWindow		Тэкст не знойдзены.
 Find failed	Terminal TermWindow		Не ўдалося знайсці
-Match word	Terminal FindWindow		Усё слова
 Color scheme:	Terminal AppearancePrefView		Каляровая схема:
+Match word	Terminal FindWindow		Усё слова
 New Terminal	Terminal TermWindow		Новы Тэрмінал
 Quit	Terminal TermWindow		Выйсці
-Match case	Terminal FindWindow		З улікам рэгістру
 Find previous	Terminal TermWindow		Знайсці ранейшае
+Match case	Terminal FindWindow		З улікам рэгістру
 Close	Terminal TermWindow		Закрыць
 Save to file…	Terminal PrefWindow		Захаваць у файл…
 Background	Terminal AppearancePrefView		Фон
@@ -69,11 +69,11 @@ Default	Terminal colors scheme		Дапомная
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Decrease	Terminal TermWindow		Паменшыць
 Settings…	Terminal TermWindow		Наладкі…
-Cancel	Terminal SetTitleWindow		Адмена
 Blinking cursor	Terminal AppearancePrefView		Мільгаючы курсор
+Cancel	Terminal SetTitleWindow		Адмена
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для імёнаў вакон. Можна ўжываць наступныя\n запаўняльнікі:\n
-Use text:	Terminal FindWindow		Ужыць тэкст:
 Close active tab	Terminal TermWindow		Закрыць актыўную ўкладку
+Use text:	Terminal FindWindow		Ужыць тэкст:
 Nothing is selected.	Terminal TermWindow		Нічога не выбрана.
 Find	Terminal FindWindow		Шукаць
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для цякучага імя ўкладкі. Можна ўжываць наступныя\n запаўняльнікі:\n

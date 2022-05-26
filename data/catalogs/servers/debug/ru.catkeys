@@ -3,6 +3,6 @@ The application:\n\n      %app\n\nhas encountered an error which prevents it fro
 Oh yeah!	DebugServer		О да!
 Debug	DebugServer		Отладить
 Terminate	DebugServer		Завершить
-Save report	DebugServer		Сохранить отчёт
+Save report	DebugServer		Сохранить отчёт на рабочем столе
 Write core file	DebugServer		Сохранить дамп памяти
 Oh no!	DebugServer		О, нет!

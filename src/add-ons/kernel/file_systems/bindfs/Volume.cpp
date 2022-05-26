@@ -19,11 +19,11 @@
 #include <vfs.h>
 
 #include <AutoDeleter.h>
+#include <AutoDeleterDrivers.h>
 
 #include "DebugSupport.h"
 #include "kernel_interface.h"
 #include "Node.h"
-#include "Utils.h"
 
 
 // #pragma mark - Volume
@@ -50,11 +50,11 @@ status_t
 Volume::Mount(const char* parameterString)
 {
 	const char* source = NULL;
-	void* parameterHandle = parse_driver_settings_string(parameterString);
-	CObjectDeleter<void, status_t> parameterDeleter(parameterHandle,
-		delete_driver_settings);
-	if (parameterHandle != NULL)
-		source = get_driver_parameter(parameterHandle, "source", NULL, NULL);
+	DriverSettingsUnloader parametersHandle(
+		parse_driver_settings_string(parameterString));
+	if (parametersHandle.IsSet())
+		source = get_driver_parameter(
+			parametersHandle.Get(), "source", NULL, NULL);
 	if (source == NULL || source[0] == '\0') {
 		ERROR("need source folder ('source' parameter)!\n");
 		RETURN_ERROR(B_BAD_VALUE);

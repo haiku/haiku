@@ -89,7 +89,7 @@ TextDocumentView::Draw(BRect updateRect)
 	fTextDocumentLayout.SetWidth(_TextLayoutWidth(Bounds().Width()));
 	fTextDocumentLayout.Draw(this, BPoint(fInsetLeft, fInsetTop), updateRect);
 
-	if (!fSelectionEnabled || fTextEditor.Get() == NULL)
+	if (!fSelectionEnabled || !fTextEditor.IsSet())
 		return;
 
 	bool isCaret = fTextEditor->SelectionLength() == 0;
@@ -179,7 +179,7 @@ TextDocumentView::MouseMoved(BPoint where, uint32 transit,
 void
 TextDocumentView::KeyDown(const char* bytes, int32 numBytes)
 {
-	if (fTextEditor.Get() == NULL)
+	if (!fTextEditor.IsSet())
 		return;
 
 	KeyEvent event;
@@ -263,7 +263,7 @@ TextDocumentView::SetTextDocument(const TextDocumentRef& document)
 {
 	fTextDocument = document;
 	fTextDocumentLayout.SetTextDocument(fTextDocument);
-	if (fTextEditor.Get() != NULL)
+	if (fTextEditor.IsSet())
 		fTextEditor->SetDocument(document);
 
 	InvalidateLayout();
@@ -275,7 +275,7 @@ TextDocumentView::SetTextDocument(const TextDocumentRef& document)
 void
 TextDocumentView::SetEditingEnabled(bool enabled)
 {
-	if (fTextEditor.Get() != NULL)
+	if (fTextEditor.IsSet())
 		fTextEditor->SetEditingEnabled(enabled);
 }
 
@@ -286,7 +286,7 @@ TextDocumentView::SetTextEditor(const TextEditorRef& editor)
 	if (fTextEditor == editor)
 		return;
 
-	if (fTextEditor.Get() != NULL) {
+	if (fTextEditor.IsSet()) {
 		fTextEditor->SetDocument(TextDocumentRef());
 		fTextEditor->SetLayout(TextDocumentLayoutRef());
 		// TODO: Probably has to remove listeners
@@ -294,7 +294,7 @@ TextDocumentView::SetTextEditor(const TextEditorRef& editor)
 
 	fTextEditor = editor;
 
-	if (fTextEditor.Get() != NULL) {
+	if (fTextEditor.IsSet()) {
 		fTextEditor->SetDocument(fTextDocument);
 		fTextEditor->SetLayout(TextDocumentLayoutRef(
 			&fTextDocumentLayout));
@@ -349,7 +349,7 @@ TextDocumentView::SetSelectionEnabled(bool enabled)
 void
 TextDocumentView::SetCaret(BPoint location, bool extendSelection)
 {
-	if (!fSelectionEnabled || fTextEditor.Get() == NULL)
+	if (!fSelectionEnabled || !fTextEditor.IsSet())
 		return;
 
 	location.x -= fInsetLeft;
@@ -364,7 +364,7 @@ TextDocumentView::SetCaret(BPoint location, bool extendSelection)
 void
 TextDocumentView::SelectAll()
 {
-	if (!fSelectionEnabled || fTextEditor.Get() == NULL)
+	if (!fSelectionEnabled || !fTextEditor.IsSet())
 		return;
 
 	fTextEditor->SelectAll();
@@ -376,14 +376,14 @@ TextDocumentView::SelectAll()
 bool
 TextDocumentView::HasSelection() const
 {
-	return fTextEditor.Get() != NULL && fTextEditor->HasSelection();
+	return fTextEditor.IsSet() && fTextEditor->HasSelection();
 }
 
 
 void
 TextDocumentView::GetSelection(int32& start, int32& end) const
 {
-	if (fTextEditor.Get() != NULL) {
+	if (fTextEditor.IsSet()) {
 		start = fTextEditor->SelectionStart();
 		end = fTextEditor->SelectionEnd();
 	}
@@ -393,7 +393,7 @@ TextDocumentView::GetSelection(int32& start, int32& end) const
 void
 TextDocumentView::Copy(BClipboard* clipboard)
 {
-	if (!HasSelection() || fTextDocument.Get() == NULL) {
+	if (!HasSelection() || !fTextDocument.IsSet()) {
 		// Nothing to copy, don't clear clipboard contents for now reason.
 		return;
 	}
@@ -493,7 +493,7 @@ TextDocumentView::_ShowCaret(bool show)
 void
 TextDocumentView::_BlinkCaret()
 {
-	if (!fSelectionEnabled || fTextEditor.Get() == NULL)
+	if (!fSelectionEnabled || !fTextEditor.IsSet())
 		return;
 
 	_ShowCaret(!fShowCaret);

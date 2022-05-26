@@ -25,11 +25,11 @@ public:
 		void						EnablePLL(uint32 lanes);
 		void						DisablePLL();
 
-		uint32						Base()
-										 { return fRegisterBase; };
+		pipe_index					PipeIndex()
+										 { return fPipeIndex; };
 
-private:
-		uint32						fRegisterBase;
+protected:
+		pipe_index					fPipeIndex;
 };
 
 
@@ -47,11 +47,11 @@ public:
 
 		void						SwitchClock(bool toPCDClock);
 
-		uint32						Base()
-										 { return fRegisterBase; };
+		pipe_index					PipeIndex()
+										 { return fPipeIndex; };
 
 protected:
-		uint32						fRegisterBase;
+		pipe_index					fPipeIndex;
 };
 
 
@@ -65,7 +65,12 @@ public:
 		FDIReceiver&				Receiver()
 										{ return fReceiver; };
 
-		status_t					Train(display_mode* target);
+		status_t					PreTrain(
+										display_timing* target,
+										uint32* linkBandwidth,
+										uint32* lanes,
+										uint32* bitsPerPixel);
+		status_t					Train(display_timing* target, uint32 lanes);
 
 private:
 		status_t					_NormalTrain(uint32 lanes);

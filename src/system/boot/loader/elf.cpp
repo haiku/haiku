@@ -86,13 +86,24 @@ struct ELF32Class {
 			return status;
 
 		*_mappedAddress = (void*)*_address;
+
+		addr_t res;
+		platform_bootloader_address_to_kernel_address((void*)*_address, &res);
+
+		*_address = res;
+
 		return B_OK;
 	}
 
 	static inline void*
 	Map(AddrType address)
 	{
-		return (void*)address;
+		void *result = NULL;
+		if (platform_kernel_address_to_bootloader_address(address, &result) != B_OK) {
+			panic("Couldn't convert address 0x%08x", (uint32_t)address);
+		}
+
+		return result;
 	}
 };
 
@@ -119,21 +130,14 @@ struct ELF64Class {
 	AllocateRegion(AddrType* _address, AddrType size, uint8 protection,
 		void **_mappedAddress)
 	{
-#ifdef _BOOT_PLATFORM_EFI
-		void* address = (void*)*_address;
-
-		status_t status = platform_allocate_region(&address, size, protection,
-			false);
-		if (status != B_OK)
-			return status;
-
-		*_mappedAddress = address;
-		platform_bootloader_address_to_kernel_address(address, _address);
-#else
+#if defined(_BOOT_PLATFORM_BIOS)
 		// Assume the real 64-bit base address is KERNEL_LOAD_BASE_64_BIT and
-		// the mappings in the loader address space are at KERNEL_LOAD_BASE.
+		// the mappings in the loader address space are at KERNEL_LOAD_BASE_32_BIT.
 
 		void* address = (void*)(addr_t)(*_address & 0xffffffff);
+#else
+		void* address = (void*)*_address;
+#endif
 
 		status_t status = platform_allocate_region(&address, size, protection,
 			false);
@@ -141,8 +145,10 @@ struct ELF64Class {
 			return status;
 
 		*_mappedAddress = address;
-		*_address = (AddrType)(addr_t)address + KERNEL_LOAD_BASE_64_BIT
-			- KERNEL_LOAD_BASE;
+#if defined(_BOOT_PLATFORM_BIOS)
+		*_address = (AddrType)(addr_t)address + KERNEL_FIXUP_FOR_LONG_MODE;
+#else
+		platform_bootloader_address_to_kernel_address(address, _address);
 #endif
 		return B_OK;
 	}
@@ -150,15 +156,14 @@ struct ELF64Class {
 	static inline void*
 	Map(AddrType address)
 	{
-#ifdef _BOOT_PLATFORM_EFI
+#ifdef _BOOT_PLATFORM_BIOS
+		return (void*)(addr_t)(address - KERNEL_FIXUP_FOR_LONG_MODE);
+#else
 		void *result;
 		if (platform_kernel_address_to_bootloader_address(address, &result) != B_OK) {
-			panic("Couldn't convert address %#lx", address);
+			panic("Couldn't convert address %#" PRIx64, address);
 		}
 		return result;
-#else
-		return (void*)(addr_t)(address - KERNEL_LOAD_BASE_64_BIT
-			+ KERNEL_LOAD_BASE);
 #endif
 	}
 };
@@ -272,10 +277,11 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 			B_PAGE_SIZE);
 		region->delta = -region->start;
 
-		TRACE(("segment %ld: start = 0x%llx, size = %llu, delta = %llx\n", i,
-			(uint64)region->start, (uint64)region->size,
-			(int64)(AddrType)region->delta));
+		TRACE(("segment %" B_PRId32 ": start = 0x%" B_PRIx64 ", size = %"
+			B_PRIu64 ", delta = %" B_PRIx64 "\n", i, (uint64)region->start,
+			(uint64)region->size, (int64)(AddrType)region->delta));
 	}
+
 
 	// found both, text and data?
 	if (image->data_region.size == 0 || image->text_region.size == 0) {
@@ -299,10 +305,15 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 	// can automatically allocate an address, but shall prefer the specified
 	// base address.
 	totalSize = secondRegion->start + secondRegion->size - firstRegion->start;
-	if (Class::AllocateRegion(&firstRegion->start, totalSize,
-			B_READ_AREA | B_WRITE_AREA, &mappedRegion) != B_OK) {
-		status = B_NO_MEMORY;
-		goto error1;
+	{
+		AddrType address = firstRegion->start;
+		if (Class::AllocateRegion(&address, totalSize,
+				B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA, &mappedRegion)
+				!= B_OK) {
+			status = B_NO_MEMORY;
+			goto error1;
+		}
+		firstRegion->start = address;
 	}
 
 	// initialize the region pointers to the allocated region
@@ -311,11 +322,13 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 	image->data_region.delta += image->data_region.start;
 	image->text_region.delta += image->text_region.start;
 
-	TRACE(("text: start 0x%llx, size 0x%llx, delta 0x%llx\n",
-		(uint64)image->text_region.start, (uint64)image->text_region.size,
+	TRACE(("text: start 0x%" B_PRIx64 ", size 0x%" B_PRIx64 ", delta 0x%"
+		B_PRIx64 "\n", (uint64)image->text_region.start,
+		(uint64)image->text_region.size,
 		(int64)(AddrType)image->text_region.delta));
-	TRACE(("data: start 0x%llx, size 0x%llx, delta 0x%llx\n",
-		(uint64)image->data_region.start, (uint64)image->data_region.size,
+	TRACE(("data: start 0x%" B_PRIx64 ", size 0x%" B_PRIx64 ", delta 0x%"
+		B_PRIx64 "\n", (uint64)image->data_region.start,
+		(uint64)image->data_region.size,
 		(int64)(AddrType)image->data_region.delta));
 
 	// load program data
@@ -334,8 +347,8 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 		else
 			continue;
 
-		TRACE(("load segment %ld (%llu bytes) mapped at %p...\n", i,
-			(uint64)header.p_filesz, Class::Map(region->start)));
+		TRACE(("load segment %" PRId32 " (%" PRIu64 " bytes) mapped at %p...\n",
+			i, (uint64)header.p_filesz, Class::Map(region->start)));
 
 		length = read_pos(fd, header.p_offset,
 			Class::Map(region->start + (header.p_vaddr % B_PAGE_SIZE)),
@@ -540,7 +553,7 @@ ELFLoader<Class>::_LoadSymbolTable(int fd, ImageType* image)
 		goto error3;
 	}
 
-	TRACE(("loaded %ld debug symbols\n", numSymbols));
+	TRACE(("loaded %" B_PRIu32 " debug symbols\n", numSymbols));
 
 	// insert tables into image
 	image->debug_symbols = symbolTable;
@@ -724,13 +737,12 @@ elf_relocate_image(preloaded_image* image)
 #ifdef BOOT_SUPPORT_ELF64
 	if (image->elf_class == ELFCLASS64)
 		return ELF64Loader::Relocate(image);
-	else
 #endif
 #ifdef BOOT_SUPPORT_ELF32
+	if (image->elf_class == ELFCLASS32)
 		return ELF32Loader::Relocate(image);
-#else
-		return B_ERROR;
 #endif
+	return B_ERROR;
 }
 
 
@@ -740,6 +752,20 @@ boot_elf_resolve_symbol(preloaded_elf32_image* image, Elf32_Sym* symbol,
 	Elf32_Addr* symbolAddress)
 {
 	return ELF32Loader::Resolve(image, symbol, symbolAddress);
+}
+
+Elf32_Addr
+boot_elf32_get_relocation(Elf32_Addr resolveAddress)
+{
+	Elf32_Addr* src = (Elf32_Addr*)ELF32Class::Map(resolveAddress);
+	return *src;
+}
+
+void
+boot_elf32_set_relocation(Elf32_Addr resolveAddress, Elf32_Addr finalAddress)
+{
+	Elf32_Addr* dest = (Elf32_Addr*)ELF32Class::Map(resolveAddress);
+	*dest = finalAddress;
 }
 #endif
 

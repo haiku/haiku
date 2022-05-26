@@ -3,7 +3,10 @@
 #define __STDBOOL_H__	1
 
 #if defined(__BEOS__) || defined(__HAIKU__)
-	typedef unsigned char _Bool;
+	#if __GNUC__ < 3
+		typedef unsigned char _Bool;
+	#endif
+
 	#define bool _Bool
 	#define false 0
 	#define true 1

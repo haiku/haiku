@@ -34,7 +34,7 @@ typedef struct {
 } dp_info;
 
 typedef struct {
-	uint16	address;
+	uint32	address;
 	uint8	request;
 	uint8	reply;
 	void*	buffer;

@@ -48,8 +48,14 @@ PackageDirectory::HasPrecedenceOver(const PackageDirectory* other) const
 {
 	// If one of us has the SYSTEM_PACKAGE flag and the other doesn't,
 	// let PackageNode take care of the comparison.
-	if ((fPackageFlags & BPackageKit::B_PACKAGE_FLAG_SYSTEM_PACKAGE)
-			!= (other->fPackageFlags
+	uint32 packageFlags = 0, otherPackageFlags = 0;
+	BReference<Package> package(GetPackage()), otherPackage(other->GetPackage());
+	if (package)
+		packageFlags = package->Flags();
+	if (otherPackage)
+		otherPackageFlags = otherPackage->Flags();
+	if ((packageFlags & BPackageKit::B_PACKAGE_FLAG_SYSTEM_PACKAGE)
+			!= (otherPackageFlags
 				& BPackageKit::B_PACKAGE_FLAG_SYSTEM_PACKAGE)) {
 		return PackageNode::HasPrecedenceOver(other);
 	}

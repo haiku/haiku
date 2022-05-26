@@ -1,0 +1,23 @@
+1	finnish	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Vieritä
+(none)	TransportView		(ei mitään)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# solmu} other{# solmua}}
+Start	TransportView		Käynnistä
+No errors.	TransportView		Ei virheitä.
+to	TransportView		->
+Offline	TransportView		Erillisverkko
+(???)	TransportView		(???)
+Stop	TransportView		Pysäytä
+(no group)	TransportView		(ei ryhmää)
+Drop data	TransportView		Pudota dataa
+To:	TransportView		Vastaanottaja:
+Recording	TransportView		Tallennetaan
+Increase latency	TransportView		Lisää viivettä
+Time source:	TransportView		Aikalähde:
+DAC time source	TransportView		DAC-aikalähde
+Decrease precision	TransportView		Pienennä tarkkuutta
+System clock	TransportView		Järjestelmäkello
+From:	TransportView		Lähettäjä:
+Roll from	TransportView		Vieritä kohteesta
+Preroll	TransportView		Esivieritä
+Run mode:	TransportView		Suoritustila:

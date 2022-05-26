@@ -1,0 +1,71 @@
+# X-Bows Nature 86 key compact mechanical keyboard Layout
+# ANSI layout
+name = X-Bows Nature
+
+# Needed doc to create keyboard layouts:
+# https://www.haiku-os.org/docs/api/keyboard.html
+#       keyboard scancodes -> for rows 
+# https://git.haiku-os.org/haiku/tree/src/preferences/keymap/KeyboardLayout.cpp#n190
+#       definition of the KeyboardLayout files
+# https://git.haiku-os.org/haiku/tree/data/system/data/KeyboardLayouts
+#       Keyboard layout files to use as example
+
+# Manual install: 
+# Put this file in (create KeyboardLayouts folder if needed):
+#        /boot/system/non-packaged/data/KeyboardLayouts
+
+# Key size definition.
+#   1- Define a default key size for most common keys
+#   2- Create variables with the sizes of different keys
+#   3- Create variables with the sizes of spaces between keys (if needed)
+default-size = 10,10
+$tall = 10,15           # std tall key
+$wide = 20,10           # std wide key
+$tall-wide = 20,15      # Backspace key
+$spce = 3,10            # space between func key groups
+$hdis = 1,10            # horizontal displacement
+$andhalf = 15,10        # middle backspace
+$andthree = 18,10       # middle enter
+
+
+# Key rows (X-Bows has six rows, though with some shape)
+# first pair defines starting position (left, key number) 
+#       left = 0:   all keys are aligned at the left of keyboard
+#       key number: the key number that starts the row
+#                   first row is 0
+#                   other rows need to add the number of keys in the 
+#                   previos row
+# All lines are arrays of pairs, defining the (key size:key code;)
+#   . if no key size present > the key size is default
+#   . if key code is '+number' means to add the next following 'number'
+#       of keys in the standard row
+#   . '-' is an empty space between keys 
+# Row1: Esc - F1 > F12 - Del - PrtScr row
+[0,0; d:0x01; $spce:-; :+4; $spce:-; :+4; $spce:-; :+4; $spce:-; $wide:0x34;
+$wide:0x0e; ]
+
+# Row2: numbers row
+[0,20; $tall:0x11+1; $hdis:-+3; :+1; $hdis:-+3; :+1; $hdis:-+3; :+1; $hdis:-+3;
+:+1; $hdis:-+5; :+1; $hdis:-+3; :+1; $hdis:-+3; :+1; $hdis:-+3; :+1; $hdis:-+3;
+$tall:0x1b; $spce:-; $tall:+2; $tall-wide:0x1e;]
+
+# Row3: tab-qwert row
+[0,40; :0x26; $hdis:-+2; :+1; $hdis:-+2; :+1; $hdis:-+2; :+1; $hdis:-+2;
+:+1; $hdis:-+2; :+1; $hdis:-+9; :+1; $hdis:-+2; :+1; $hdis:-+2; :+1; $hdis:-+2;
+:+1; $hdis:-+2; :+1; $hdis:-+5; :+3;
+ :0x21;]
+
+# Row4: caps-asdf row
+[0,55; :0x3b; $hdis:-+1; :+1; $hdis:-+1; :+1; $hdis:-+1; :+1; $hdis:-+1; :+1;
+$hdis:-+1; :+1;  $hdis:-+2; $andhalf:0x1e;  $hdis:-+2; :0x41; $hdis:-+1; :+1;
+$hdis:-+1; :+1; $hdis:-+1; :+1; $hdis:-+1; :+1; $hdis:-+4; :+1; $wide:0x47; :0x36;]
+
+# Row5: shift-zxcv row
+[0,70; :0x4b; $hdis:-; :+1; $hdis:-; :+1; $hdis:-; :+1; $hdis:-; :+1; $hdis:-;
+:+1; $hdis:-; $andthree:0x47; $hdis:-; :0x51; $hdis:-; :+1; $hdis:-; :+1;
+$hdis:-; :+1; $hdis:-; :+1; $hdis:-+3; :+1; :-; :0x57; :-;]
+
+# Row6: Ctrl-bottom row
+[0,85; :0x5c; :0x66;  $wide:0x5d; $wide:0x5e; $hdis:-; $andhalf:0x5c;
+$andhalf:0x56; $hdis:-; 
+$wide:0x5e; $wide:0x5f; d:0x99; :0x60+3;]

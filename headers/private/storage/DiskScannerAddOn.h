@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
+//  This software is part of the Haiku distribution and is covered
 //  by the MIT License.
 //---------------------------------------------------------------------
 #ifndef _DISK_SCANNER_ADD_ON
@@ -11,6 +11,7 @@ class BDiskScannerParameterEditor;
 class BPartition;
 class BSession;
 class BString;
+class BView;
 
 // BDiskScannerPartitionAddOn
 class BDiskScannerPartitionAddOn {

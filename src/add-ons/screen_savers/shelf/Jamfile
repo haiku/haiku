@@ -1,12 +1,14 @@
 SubDir HAIKU_TOP src add-ons screen_savers shelf ;
 
+AddResources Shelf : Shelf.rdef ;
+
 ScreenSaver Shelf :
-	Shelf.cpp : 
+	Shelf.cpp :
 	be libscreensaver.so localestub [ TargetLibsupc++ ]
 ;
 
 
-DoCatalogs Message :
+DoCatalogs Shelf :
 	x-vnd.Haiku-ShelfScreensaver
 	:
 	Shelf.cpp

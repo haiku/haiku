@@ -1,24 +1,27 @@
-1	russian	x-vnd.Haiku-GLInfo	2211760527
+1	russian	x-vnd.Haiku-GLInfo	1282327690
 Maximum clipping planes	Capabilities		Максимальные плоскости отсечения
-Maximum 2D texture size	Capabilities		Максимальный размер 2D текстур
-Auxiliary buffer(s)	Capabilities		Вспомогательных буферов
 Maximum evaluators equation order	Capabilities		Максимальный порядок уравнения оценщиков
 Texture stack size	Capabilities		Размер стека текстур
 GL Info	System name		Сведения о GL
 Information	InfoView		Информация
-Maximum convolution	Capabilities		Максимальное свертывание
 Attributes stack size	Capabilities		Размер стека атрибутов
 Maximum lights	Capabilities		Максимальное число источников света
-Maximum 3D texture size	Capabilities		Максимальный размер 3D текстур
 Extensions	Extensions		Расширения
-Maximum recommended index elements	Capabilities		Максимально рекомендуемые индексные элементы
 Available extensions	Extensions		Доступные расширения
 Maximum recommended vertex elements	Capabilities		Максимально рекомендуемые элементы вершины
 Value	Capabilities		Значение
-Maximum texture units	Capabilities		Максимальные текстурные единицы
-Capabilities	Capabilities		Возможности
 Name stack size	Capabilities		Размер стека имен
-List stack size	Capabilities		Размер стека списка
-Projection stack size	Capabilities		Размер проекционного стека
-Model stack size	Capabilities		Размер стека модели
+Capabilities	Capabilities		Возможности
+Maximum texture units	Capabilities		Максимальные текстурные единицы
+Unknown or missing OpenGL renderer.	InfoView		OpenGL renderer неизвестен или не установлен.
 Capability	Capabilities		Возможность
+Maximum 2D texture size	Capabilities		Максимальный размер 2D текстур
+Auxiliary buffer(s)	Capabilities		Вспомогательных буферов
+Unknown vendor	InfoView		Неизвестный поставщик
+Maximum convolution	Capabilities		Максимальное свертывание
+Maximum 3D texture size	Capabilities		Максимальный размер 3D текстур
+Maximum recommended index elements	Capabilities		Максимально рекомендуемые индексные элементы
+Unknown version	InfoView		Неизвестная версия
+List stack size	Capabilities		Размер стека списка
+Model stack size	Capabilities		Размер стека модели
+Projection stack size	Capabilities		Размер проекционного стека

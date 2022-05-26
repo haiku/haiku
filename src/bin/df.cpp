@@ -22,7 +22,7 @@
 void
 PrintFlag(uint32 deviceFlags, uint32 testFlag, const char *yes, const char *no)
 {
-	printf(deviceFlags & testFlag ? yes : no);
+	printf("%s", deviceFlags & testFlag ? yes : no);
 }
 
 

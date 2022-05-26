@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network ether usb_rndis ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders net ;
+
+KernelAddon usb_rndis :
+	Driver.cpp
+	RNDISDevice.cpp
+	;

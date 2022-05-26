@@ -16,6 +16,7 @@
 #include <OS.h>
 
 #include <AutoDeleter.h>
+#include <AutoDeleterDrivers.h>
 #include <BytePointer.h>
 
 #include <syscalls.h>
@@ -497,7 +498,7 @@ dup_foreign_fd(team_id fromTeam, int fd, bool kernel)
 	file_descriptor* descriptor = get_fd(fromContext, fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
-	CObjectDeleter<file_descriptor> descriptorPutter(descriptor, put_fd);
+	DescriptorPutter descriptorPutter(descriptor);
 
 	// create a new FD in the target I/O context
 	int result = new_fd(get_current_io_context(kernel), descriptor);
@@ -731,9 +732,6 @@ common_close(int fd, bool kernel)
 static ssize_t
 common_user_io(int fd, off_t pos, void* buffer, size_t length, bool write)
 {
-	if (!IS_USER_ADDRESS(buffer))
-		return B_BAD_ADDRESS;
-
 	if (pos < -1)
 		return B_BAD_VALUE;
 
@@ -758,6 +756,12 @@ common_user_io(int fd, off_t pos, void* buffer, size_t length, bool write)
 		return B_BAD_VALUE;
 	}
 
+	if (length == 0)
+		return 0;
+
+	if (!IS_USER_ADDRESS(buffer))
+		return B_BAD_ADDRESS;
+
 	SyscallRestartWrapper<status_t> status;
 
 	if (write)
@@ -768,8 +772,10 @@ common_user_io(int fd, off_t pos, void* buffer, size_t length, bool write)
 	if (status != B_OK)
 		return status;
 
-	if (movePosition)
-		descriptor->pos = pos + length;
+	if (movePosition) {
+		descriptor->pos = write && (descriptor->open_mode & O_APPEND) != 0
+			? descriptor->ops->fd_seek(descriptor, 0, SEEK_END) : pos + length;
+	}
 
 	return length <= SSIZE_MAX ? (ssize_t)length : SSIZE_MAX;
 }
@@ -858,8 +864,10 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 			break;
 	}
 
-	if (movePosition)
-		descriptor->pos = pos;
+	if (movePosition) {
+		descriptor->pos = write && (descriptor->open_mode & O_APPEND) != 0
+			? descriptor->ops->fd_seek(descriptor, 0, SEEK_END) : pos;
+	}
 
 	return bytesTransferred;
 }

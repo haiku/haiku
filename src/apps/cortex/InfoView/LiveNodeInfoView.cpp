@@ -41,11 +41,19 @@
 #include "MediaIcon.h"
 #include "MediaString.h"
 
+// Locale Kit
+#undef B_CATALOG
+#define B_CATALOG (&sCatalog)
+#include <Catalog.h>
+
 // Media Kit
 #include <MediaNode.h>
 
 // Interface Kit
 #include <Window.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "LiveNodeInfoView"
 
 __USE_CORTEX_NAMESPACE
 
@@ -53,25 +61,27 @@ __USE_CORTEX_NAMESPACE
 #define D_METHOD(x) //PRINT (x)
 #define D_MESSAGE(x) //PRINT (x)
 
+static BCatalog sCatalog("x-vnd.Cortex.InfoView");
+
 // -------------------------------------------------------- //
 // *** ctor/dtor (public)
 // -------------------------------------------------------- //
 
 LiveNodeInfoView::LiveNodeInfoView(
 	const NodeRef *ref)
-	: InfoView(ref->name(), "Live Media Node",
+	: InfoView(ref->name(), B_TRANSLATE("Live media node"),
 			   new MediaIcon(ref->nodeInfo(), B_LARGE_ICON)),
 	  m_nodeID(ref->id())
 {
 	D_METHOD(("LiveNodeInfoView::LiveNodeInfoView()\n"));
 
 	// adjust view properties
-	setSideBarWidth(be_plain_font->StringWidth(" Run Mode ") + 2 * InfoView::M_H_MARGIN);
+	setSideBarWidth(be_plain_font->StringWidth(B_TRANSLATE("Run mode")) + 2 * InfoView::M_H_MARGIN);
 
 	// add "Node ID" field
 	BString s;
 	s << ref->id();
-	addField("Node ID", s);
+	addField(B_TRANSLATE("Node ID"), s);
 
 	// add "Port" field
 	s = "";
@@ -81,13 +91,13 @@ LiveNodeInfoView::LiveNodeInfoView(
 	{
 		s << " (" << portInfo.name << ")";
 	}
-	addField("Port", s);
+	addField(B_TRANSLATE("Port"), s);
 
 	// add separator field
 	addField("", "");
 
 	// add "Kinds" field
-	addField("Kinds", MediaString::getStringFor(static_cast<node_kind>(ref->kind())));
+	addField(B_TRANSLATE("Kinds"), MediaString::getStringFor(static_cast<node_kind>(ref->kind())));
 
 	// add "Run Mode" field
 	BMediaNode::run_mode runMode = static_cast<BMediaNode::run_mode>(ref->runMode());
@@ -99,7 +109,7 @@ LiveNodeInfoView::LiveNodeInfoView(
 			runMode = group->runMode();
 		}
 	}
-	addField("Run Mode", MediaString::getStringFor(runMode));
+	addField(B_TRANSLATE("Run mode"), MediaString::getStringFor(runMode));
 
 	// add "Latency" field
 	bigtime_t latency;
@@ -114,7 +124,7 @@ LiveNodeInfoView::LiveNodeInfoView(
 		{
 			s = "?";
 		}
-		addField("Latency", s);
+		addField(B_TRANSLATE("Latency"), s);
 	}
 }
 

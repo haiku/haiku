@@ -1,0 +1,19 @@
+1	dutch; flemish	application/x-vnd.Be.LoggingConsumerApp	3653006715
+Priority	CortexAddOnsLoggingConsumer		Prioriteit
+Latency	CortexAddOnsLoggingConsumer		Vertraging
+Logged input	CortexAddOnsLoggingConsumer		Gelogde invoer
+CPU spin percentage	CortexAddOnsLoggingConsumer		Percentage CPU-gebruik
+NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Start
+Thread priority	CortexAddOnsLoggingConsumer		Thread-prioriteit
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		Parameters LoggingConsumer
+Latency control	CortexAddOnsLoggingConsumer		Vertragingsbeheersing
+CPU percentage	CortexAddOnsLoggingConsumer		CPU-percentage
+LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Stoppen
+An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		Een plugin-versie van de LoggingConsumer node.\nZie de Be Developer Newsletter III.18: 5 mei 1999\naangepast door Eric Moon (4 juni 1999)
+OK	CortexAddOnsCommonMediaNodeControlApp		Okee
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Knoppen
+controls	CortexAddOnsCommonMediaNodeControlApp		knoppen
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Verbinden
+percent	CortexAddOnsLoggingConsumer		procent

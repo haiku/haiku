@@ -316,10 +316,42 @@ BTab::DrawLabel(BView* owner, BRect frame)
 
 
 void
-BTab::DrawTab(BView* owner, BRect frame, tab_position position, bool full)
+BTab::DrawTab(BView* owner, BRect frame, tab_position, bool)
 {
-	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
+	if (fTabView == NULL)
+		return;
+
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	uint32 flags = 0;
+	uint32 borders = _Borders(owner, frame);
+
+	int32 index = fTabView->IndexOf(this);
+	int32 selected = fTabView->Selection();
+	int32 first = 0;
+	int32 last = fTabView->CountTabs() - 1;
+
+	if (index == selected) {
+		be_control_look->DrawActiveTab(owner, frame, frame, base, flags,
+			borders, fTabView->TabSide(), index, selected, first, last);
+	} else {
+		be_control_look->DrawInactiveTab(owner, frame, frame, base, flags,
+			borders, fTabView->TabSide(), index, selected, first, last);
+	}
+
+	DrawLabel(owner, frame);
+}
+
+
+//	#pragma mark - BTab private methods
+
+
+uint32
+BTab::_Borders(BView* owner, BRect frame)
+{
 	uint32 borders = 0;
+	if (owner == NULL || fTabView == NULL)
+		return borders;
+
 	if (fTabView->TabSide() == BTabView::kTopSide
 		|| fTabView->TabSide() == BTabView::kBottomSide) {
 		borders = BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;
@@ -340,15 +372,7 @@ BTab::DrawTab(BView* owner, BRect frame, tab_position position, bool full)
 			borders |= BControlLook::B_BOTTOM_BORDER;
 	}
 
-	if (position == B_TAB_FRONT) {
-		be_control_look->DrawActiveTab(owner, frame, frame, no_tint, 0,
-			borders, fTabView->TabSide());
-	} else {
-		be_control_look->DrawInactiveTab(owner, frame, frame, no_tint, 0,
-			borders, fTabView->TabSide());
-	}
-
-	DrawLabel(owner, frame);
+	return borders;
 }
 
 
@@ -921,9 +945,9 @@ BTabView::DrawTabs()
 			activeTabFrame = tabFrame;
 
 		TabAt(i)->DrawTab(this, tabFrame,
-			i == fSelection ? B_TAB_FRONT :
-				(i == 0) ? B_TAB_FIRST : B_TAB_ANY,
-			i + 1 != fSelection);
+			i == fSelection ? B_TAB_FRONT
+				: (i == 0) ? B_TAB_FIRST : B_TAB_ANY,
+			i != fSelection - 1);
 	}
 
 	BRect tabsBounds;
@@ -1345,6 +1369,21 @@ BTabView::ViewForTab(int32 tabIndex) const
 		return tab->View();
 
 	return NULL;
+}
+
+
+int32
+BTabView::IndexOf(BTab* tab) const
+{
+	if (tab != NULL) {
+		int32 tabCount = CountTabs();
+		for (int32 index = 0; index < tabCount; index++) {
+			if (TabAt(index) == tab)
+				return index;
+		}
+	}
+
+	return -1;
 }
 
 

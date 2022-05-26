@@ -11,3 +11,9 @@ StaticLibrary cortex_parameter_view.a :
 	ParameterWindow.cpp
 	ParameterContainerView.cpp
 ;
+
+DoCatalogs cortex_parameter_view.a :
+	x-vnd.Cortex.ParameterView
+	:
+	ParameterWindow.cpp
+;

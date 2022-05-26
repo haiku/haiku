@@ -1,0 +1,11 @@
+1	esperanto	application/x-vnd.moon-Flanger.media_addon	2288091029
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Aldonaĵa versio de FlangerNode.\nde Eric Moon (16a de Junio, 1999)
+Delay	CortexAddOnsFlanger		Prokrasto
+Depth	CortexAddOnsFlanger		Profundeco
+Feedback	CortexAddOnsFlanger		Prisondo
+Mix ratio	CortexAddOnsFlanger		Miksa kvociento
+FlangerNode parameters	CortexAddOnsFlanger		FlangerNode parametroj
+OK	CortexAddOnsCommonMediaNodeControlApp		Bone
+controls	CortexAddOnsCommonMediaNodeControlApp		stiriloj
+Mix output	CortexAddOnsFlanger		Miksa eliro
+Audio input	CortexAddOnsFlanger		Aŭdenigo

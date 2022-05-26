@@ -58,6 +58,7 @@
 #include <vm/vm.h>
 #include <vm/VMAddressSpace.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 
 #include "TeamThreadTables.h"
 
@@ -428,7 +429,66 @@ Team::Team(team_id id, bool kernel)
 	// allocate an ID
 	this->id = id;
 	visible = true;
+
+	hash_next = siblings_next = parent = children = group_next = NULL;
 	serial_number = -1;
+
+	group_id = session_id = -1;
+	group = NULL;
+
+	num_threads = 0;
+	state = TEAM_STATE_BIRTH;
+	flags = 0;
+	io_context = NULL;
+	realtime_sem_context = NULL;
+	xsi_sem_context = NULL;
+	death_entry = NULL;
+	list_init(&dead_threads);
+
+	dead_children.condition_variable.Init(&dead_children, "team children");
+	dead_children.count = 0;
+	dead_children.kernel_time = 0;
+	dead_children.user_time = 0;
+
+	job_control_entry = new(nothrow) ::job_control_entry;
+	if (job_control_entry != NULL) {
+		job_control_entry->state = JOB_CONTROL_STATE_NONE;
+		job_control_entry->thread = id;
+		job_control_entry->team = this;
+	}
+
+	address_space = NULL;
+	main_thread = NULL;
+	thread_list = NULL;
+	loading_info = NULL;
+
+	list_init(&image_list);
+	list_init(&watcher_list);
+	list_init(&sem_list);
+	list_init_etc(&port_list, port_team_link_offset());
+
+	user_data = 0;
+	user_data_area = -1;
+	used_user_data = 0;
+	user_data_size = 0;
+	free_user_threads = NULL;
+
+	commpage_address = NULL;
+
+	clear_team_debug_info(&debug_info, true);
+
+	dead_threads_kernel_time = 0;
+	dead_threads_user_time = 0;
+	cpu_clock_offset = 0;
+	B_INITIALIZE_SPINLOCK(&time_lock);
+
+	saved_set_uid = real_uid = effective_uid = -1;
+	saved_set_gid = real_gid = effective_gid = -1;
+
+	// exit status -- setting initialized to false suffices
+	exit.initialized = false;
+
+	B_INITIALIZE_SPINLOCK(&signal_lock);
 
 	// init mutex
 	if (kernel) {
@@ -439,71 +499,12 @@ Team::Team(team_id id, bool kernel)
 		mutex_init_etc(&fLock, lockName, MUTEX_FLAG_CLONE_NAME);
 	}
 
-	hash_next = siblings_next = children = parent = NULL;
 	fName[0] = '\0';
 	fArgs[0] = '\0';
-	num_threads = 0;
-	io_context = NULL;
-	address_space = NULL;
-	realtime_sem_context = NULL;
-	xsi_sem_context = NULL;
-	thread_list = NULL;
-	main_thread = NULL;
-	loading_info = NULL;
-	state = TEAM_STATE_BIRTH;
-	flags = 0;
-	death_entry = NULL;
-	user_data_area = -1;
-	user_data = 0;
-	used_user_data = 0;
-	user_data_size = 0;
-	free_user_threads = NULL;
-
-	commpage_address = NULL;
-
-	supplementary_groups = NULL;
-	supplementary_group_count = 0;
-
-	dead_threads_kernel_time = 0;
-	dead_threads_user_time = 0;
-	cpu_clock_offset = 0;
-
-	// dead threads
-	list_init(&dead_threads);
-
-	// dead children
-	dead_children.count = 0;
-	dead_children.kernel_time = 0;
-	dead_children.user_time = 0;
-
-	// job control entry
-	job_control_entry = new(nothrow) ::job_control_entry;
-	if (job_control_entry != NULL) {
-		job_control_entry->state = JOB_CONTROL_STATE_NONE;
-		job_control_entry->thread = id;
-		job_control_entry->team = this;
-	}
-
-	// exit status -- setting initialized to false suffices
-	exit.initialized = false;
-
-	list_init(&sem_list);
-	list_init_etc(&port_list, port_team_link_offset());
-	list_init(&image_list);
-	list_init(&watcher_list);
-
-	clear_team_debug_info(&debug_info, true);
-
-	// init dead/stopped/continued children condition vars
-	dead_children.condition_variable.Init(&dead_children, "team children");
-
-	B_INITIALIZE_SPINLOCK(&time_lock);
-	B_INITIALIZE_SPINLOCK(&signal_lock);
 
 	fQueuedSignalsCounter = new(std::nothrow) BKernel::QueuedSignalsCounter(
 		kernel ? -1 : MAX_QUEUED_SIGNALS);
 	memset(fSignalActions, 0, sizeof(fSignalActions));
-
 	fUserDefinedTimerCount = 0;
 
 	fCoreDumpCondition = NULL;
@@ -539,8 +540,6 @@ Team::~Team()
 		free_user_threads = entry->next;
 		free(entry);
 	}
-
-	malloc_referenced_release(supplementary_groups);
 
 	delete job_control_entry;
 		// usually already NULL and transferred to the parent
@@ -731,6 +730,9 @@ Team::LockTeamAndProcessGroup()
 		// Try to lock the group. This will succeed in most cases, simplifying
 		// things.
 		ProcessGroup* group = this->group;
+		if (group == NULL)
+			return;
+
 		if (group->TryLock())
 			return;
 
@@ -1223,6 +1225,50 @@ dump_teams(int argc, char** argv)
 //	#pragma mark - Private functions
 
 
+/*! Get the parent of a given process.
+
+	Used in the implementation of getppid (where a process can get its own
+	parent, only) as well as in user_process_info where the information is
+	available to anyone (allowing to display a tree of running processes)
+*/
+static pid_t
+_getppid(pid_t id)
+{
+	if (id < 0) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	if (id == 0) {
+		Team* team = thread_get_current_thread()->team;
+		TeamLocker teamLocker(team);
+		if (team->parent == NULL) {
+			errno = EINVAL;
+			return -1;
+		}
+		return team->parent->id;
+	}
+
+	Team* team = Team::GetAndLock(id);
+	if (team == NULL) {
+		errno = ESRCH;
+		return -1;
+	}
+
+	pid_t parentID;
+
+	if (team->parent == NULL) {
+		errno = EINVAL;
+		parentID = -1;
+	} else
+		parentID = team->parent->id;
+
+	team->UnlockAndReleaseReference();
+
+	return parentID;
+}
+
+
 /*!	Inserts team \a team into the child list of team \a parent.
 
 	The caller must hold the lock of both \a parent and \a team.
@@ -1322,7 +1368,7 @@ remove_team_from_group(Team* team)
 	Team* last = NULL;
 
 	// the team must be in a process group to let this function have any effect
-	if  (group == NULL)
+	if (group == NULL)
 		return;
 
 	for (current = group->teams; current != NULL;
@@ -1333,7 +1379,6 @@ remove_team_from_group(Team* team)
 			else
 				last->group_next = current->group_next;
 
-			team->group = NULL;
 			break;
 		}
 		last = current;
@@ -1341,6 +1386,7 @@ remove_team_from_group(Team* team)
 
 	team->group = NULL;
 	team->group_next = NULL;
+	team->group_id = -1;
 
 	group->ReleaseReference();
 }
@@ -2815,6 +2861,8 @@ team_init(kernel_args* args)
 	sKernelTeam = Team::Create(1, "kernel_team", true);
 	if (sKernelTeam == NULL)
 		panic("could not create kernel team!\n");
+
+	sKernelTeam->address_space = VMAddressSpace::Kernel();
 	sKernelTeam->SetArgs(sKernelTeam->Name());
 	sKernelTeam->state = TEAM_STATE_NORMAL;
 
@@ -2825,7 +2873,6 @@ team_init(kernel_args* args)
 	sKernelTeam->real_gid = 0;
 	sKernelTeam->effective_gid = 0;
 	sKernelTeam->supplementary_groups = NULL;
-	sKernelTeam->supplementary_group_count = 0;
 
 	insert_team_into_group(group, sKernelTeam);
 
@@ -3857,13 +3904,9 @@ getpid(void)
 
 
 pid_t
-getppid(void)
+getppid()
 {
-	Team* team = thread_get_current_thread()->team;
-
-	TeamLocker teamLocker(team);
-
-	return team->parent->id;
+	return _getppid(0);
 }
 
 
@@ -3998,11 +4041,6 @@ _user_wait_for_child(thread_id child, uint32 flags, siginfo_t* userInfo,
 pid_t
 _user_process_info(pid_t process, int32 which)
 {
-	// we only allow to return the parent of the current process
-	if (which == PARENT_ID
-		&& process != 0 && process != thread_get_current_thread()->team->id)
-		return B_BAD_VALUE;
-
 	pid_t result;
 	switch (which) {
 		case SESSION_ID:
@@ -4012,7 +4050,7 @@ _user_process_info(pid_t process, int32 which)
 			result = getpgid(process);
 			break;
 		case PARENT_ID:
-			result = getppid();
+			result = _getppid(process);
 			break;
 		default:
 			return B_BAD_VALUE;
@@ -4077,6 +4115,12 @@ _user_setpgid(pid_t processID, pid_t groupID)
 			team->LockProcessGroup();
 
 			ProcessGroup* oldGroup = team->group;
+			if (oldGroup == NULL) {
+				// This can only happen if the team is exiting.
+				ASSERT(team->state >= TEAM_STATE_SHUTDOWN);
+				return ESRCH;
+			}
+
 			if (oldGroup == group) {
 				// it's the same as the target group, so just bail out
 				oldGroup->Unlock();
@@ -4426,8 +4470,8 @@ _user_get_extended_team_info(team_id teamID, uint32 flags, void* buffer,
 			ioContext = team->io_context;
 			vfs_get_io_context(ioContext);
 		}
-		CObjectDeleter<io_context> ioContextPutter(ioContext,
-			&vfs_put_io_context);
+		CObjectDeleter<io_context, void, vfs_put_io_context>
+			ioContextPutter(ioContext);
 
 		// add the basic data to the info message
 		if (info.AddInt32("id", teamClone.id) != B_OK

@@ -464,7 +464,8 @@ malloc(size_t size)
 		return malloc_large(size);
 
 	if (size > sAvailable) {
-		dprintf("malloc(): Out of memory!\n");
+		dprintf("malloc(): Out of memory allocating a block of %ld bytes, "
+			"only %ld left!\n", size, sAvailable);
 		return NULL;
 	}
 
@@ -473,7 +474,8 @@ malloc(size_t size)
 
 	if (chunk == NULL) {
 		// could not find a free chunk as large as needed
-		dprintf("malloc(): Out of memory!\n");
+		dprintf("malloc(): Out of memory allocating a block of %ld bytes, "
+			"no free chunks!\n", size);
 		return NULL;
 	}
 
@@ -543,6 +545,17 @@ realloc(void* oldBuffer, size_t newSize)
 
 	TRACE("realloc(%p, %lu) -> %p\n", oldBuffer, newSize, newBuffer);
 	return newBuffer;
+}
+
+
+void*
+calloc(size_t numElements, size_t size)
+{
+	void* address = malloc(numElements * size);
+	if (address != NULL)
+		memset(address, 0, numElements * size);
+
+	return address;
 }
 
 

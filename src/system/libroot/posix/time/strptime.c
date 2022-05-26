@@ -55,9 +55,6 @@ _strptime(const char *buf, const char *fmt, struct tm *tm, int *GMTp)
 
 	ptr = fmt;
 	while (*ptr != 0) {
-		if (*buf == 0)
-			break;
-
 		c = *ptr++;
 
 		if (c != '%') {
@@ -74,7 +71,6 @@ _strptime(const char *buf, const char *fmt, struct tm *tm, int *GMTp)
 label:
 		c = *ptr++;
 		switch (c) {
-		case 0:
 		case '%':
 			if (*buf++ != '%')
 				return 0;
@@ -479,6 +475,9 @@ label:
 			}
 			}
 			break;
+
+		default:
+			return 0;
 		}
 	}
 	return (char *)buf;

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-CharacterMap	2410613018
+1	ukrainian	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Тірхута
 Miscellaneous mathematical symbols B	UnicodeBlocks		Різні математичні символи В
 Latin extended E	UnicodeBlocks		Розширена латиниця E
@@ -46,7 +46,7 @@ Modifier tone letters	UnicodeBlocks		Модифікатор тонових лі�
 Kaithi	UnicodeBlocks		Кайтхі
 Psalter Pahlavi	UnicodeBlocks		Пахлеві
 Newa	UnicodeBlocks		Newa
-View	CharacterWindow		Вид
+View	CharacterWindow		Режим перегляду
 Rumi numeral symbols	UnicodeBlocks		Числові символи Румі
 Enclosed CJK letters and months	UnicodeBlocks		Вкладені букви и місяці CJK
 Deseret	UnicodeBlocks		Дезерет
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		Уніфіковані ієр�
 Ancient Greek musical notation	UnicodeBlocks		Давньогрецький нотний запис
 Thai	UnicodeBlocks		Тайська
 Ethiopic supplement	UnicodeBlocks		Ефіопські додатки
+Only show blocks contained in font	CharacterWindow		Відображати лише блоки, які містяться у шрифті
 Chess symbols	UnicodeBlocks		Шахматні символи
 Yijing hexagram symbols	UnicodeBlocks		Гексаграми Іцзін
 Ottoman Siyaq numbers	UnicodeBlocks		Османська (числа)
@@ -175,7 +176,7 @@ Lao	UnicodeBlocks		Лаоська
 Chorasmian	UnicodeBlocks		Хорезмійська
 Lisu supplement	UnicodeBlocks		Додаток Лісу
 Takri	UnicodeBlocks		Такрі
-Shorthand format controls	UnicodeBlocks		Елементи керування форматом скорочень
+Shorthand format controls	UnicodeBlocks		Управління форматом скорочень
 Inscriptional Parthian	UnicodeBlocks		Парфянська
 Optical character recognition	UnicodeBlocks		Оптичне розпізнавання символів
 Tamil	UnicodeBlocks		Тамільська
@@ -273,7 +274,7 @@ Copy character	CharacterView		Зкопіювати символ
 Hangul Jamo	UnicodeBlocks		Хангуль Джамо
 Font	CharacterWindow		Шрифт
 Ornamental dingbats	UnicodeBlocks		Декоративні позначки (дінгбати)
-Egyptian hieroglyph format controls	UnicodeBlocks		Елементи керування форматом єгипетських ієрогліфів
+Egyptian hieroglyph format controls	UnicodeBlocks		Управління форматом єгипетських ієрогліфів
 Manichaean	UnicodeBlocks		Маніхейське письмо
 Phaistos disc	UnicodeBlocks		Фестська
 Miscellaneous technical	UnicodeBlocks		Інші технічні

@@ -1,6 +1,6 @@
 1	hungarian	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		Mentésre jelöl
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A szöveg %ld nem kódolható karaktert tartalmaz. Lehetséges, hogy egy másik karakterkészlet jobb lenne? Kattints a „Küldés”-re, ha mindenképp el akarod küldeni így (egy helyettesítő karakter fog megjelenni a nem kódolható karakter helyén), vagy térj vissza, és javítsd ki azt.
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		A szöveg %ld nem kódolható karaktert tartalmaz. Lehetséges, hogy egy másik karakterkészlet jobb lenne? Kattints a Küldésre, ha mindenképp el akarod küldeni így (egy helyettesítő karakter fog megjelenni a nem kódolható karakter helyén), vagy térj vissza, és javítsd ki azt.
 Text wrapping:	Mail		Szöveg tördelése:
 Show icons & labels	Mail		Ikonok és feliratok
 (Date unavailable)	Mail		(A dátum nem elérhető)
@@ -112,7 +112,7 @@ Move to trash	Mail		Áthelyezés a Szemetesbe
 %d - Date	Mail		%d - dátum
 Check spelling	Mail		Helyesírás-ellenőrzés
 Redo	Mail		Újra
-Leave as '%s'	Mail		Hagyja „%s”-ként
+Leave as '%s'	Mail		Hagyja '%s'-ként
 Print…	Mail		Nyomtatás…
 Settings…	Mail		Beállítások…
 Warn unencodable:	Mail		Figyelemztetés nem kódolható szövegnél:

@@ -13,6 +13,7 @@
 
 #include "HWInterface.h"
 
+#include <AutoDeleter.h>
 #include <image.h>
 #include <video_overlay.h>
 
@@ -181,8 +182,10 @@ private:
 			int					fModeCount;
 			display_mode*		fModeList;
 
-			RenderingBuffer*	fBackBuffer;
-			AccelerantBuffer*	fFrontBuffer;
+			ObjectDeleter<RenderingBuffer>
+								fBackBuffer;
+			ObjectDeleter<AccelerantBuffer>
+								fFrontBuffer;
 			bool				fOffscreenBackBuffer;
 
 			display_mode		fDisplayMode;

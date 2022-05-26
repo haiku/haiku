@@ -56,7 +56,8 @@ public:
 class CookieRow: public BRow
 {
 public:
-	CookieRow(BColumnListView* list, const BNetworkCookie& cookie)
+	CookieRow(BColumnListView* list,
+		const BPrivate::Network::BNetworkCookie& cookie)
 		:
 		BRow(),
 		fCookie(cookie)
@@ -79,12 +80,12 @@ public:
 		SetField(new BStringField(flags.String()), 4);
 	}
 
-	BNetworkCookie& Cookie() {
+	BPrivate::Network::BNetworkCookie& Cookie() {
 		return fCookie;
 	}
 
 private:
-	BNetworkCookie	fCookie;
+	BPrivate::Network::BNetworkCookie	fCookie;
 };
 
 
@@ -103,7 +104,8 @@ public:
 };
 
 
-CookieWindow::CookieWindow(BRect frame, BNetworkCookieJar& jar)
+CookieWindow::CookieWindow(BRect frame,
+	BPrivate::Network::BNetworkCookieJar& jar)
 	:
 	BWindow(frame, B_TRANSLATE("Cookie manager"), B_TITLED_WINDOW,
 		B_NORMAL_WINDOW_FEEL,
@@ -220,9 +222,9 @@ CookieWindow::_BuildDomainList()
 	fDomains->AddItem(rootItem);
 
 	// Populate the domain list
-	BNetworkCookieJar::Iterator it = fCookieJar.GetIterator();
+	BPrivate::Network::BNetworkCookieJar::Iterator it = fCookieJar.GetIterator();
 
-	const BNetworkCookie* cookie;
+	const BPrivate::Network::BNetworkCookie* cookie;
 	while ((cookie = it.NextDomain()) != NULL) {
 		_AddDomain(cookie->Domain(), false);
 	}
@@ -351,9 +353,10 @@ CookieWindow::_ShowCookiesForDomain(BString domain)
 	fCookies->Clear();
 
 	// Populate the domain list
-	BNetworkCookieJar::Iterator it = fCookieJar.GetIterator();
+	BPrivate::Network::BNetworkCookieJar::Iterator it
+		= fCookieJar.GetIterator();
 
-	const BNetworkCookie* cookie;
+	const BPrivate::Network::BNetworkCookie* cookie;
 	/* FIXME A direct access to a domain would be needed in BNetworkCookieJar. */
 	while ((cookie = it.Next()) != NULL) {
 		if (cookie->Domain() == domain)
@@ -388,7 +391,7 @@ CookieWindow::_DeleteCookies()
 			break;
 
 		// delete this cookie
-		BNetworkCookie& cookie = row->Cookie();
+		BPrivate::Network::BNetworkCookie& cookie = row->Cookie();
 		cookie.SetExpirationDate(0);
 		fCookieJar.AddCookie(cookie);
 	}
@@ -402,7 +405,7 @@ CookieWindow::_DeleteCookies()
 			if (row == NULL)
 				break;
 
-			BNetworkCookie& cookie = row->Cookie();
+			BPrivate::Network::BNetworkCookie& cookie = row->Cookie();
 			cookie.SetExpirationDate(0);
 			fCookieJar.AddCookie(cookie);
 			fCookies->RemoveRow(row);

@@ -1,6 +1,6 @@
 #!/usr/bin/vmware
 config.version = "8"
-virtualHW.version = "6"
+virtualHW.version = "13"
 
 MemAllowAutoScaleDown = "false"
 MemTrimRate = "-1"
@@ -13,7 +13,7 @@ checkpoint.vmState = ""
 
 displayName = "Haiku"
 guestOS = "other"
-memsize = "512"
+memSize = "512"
 
 ethernet0.present= "true"
 ethernet0.startConnected = "true"

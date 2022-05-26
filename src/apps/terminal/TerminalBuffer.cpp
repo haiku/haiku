@@ -30,7 +30,7 @@ TerminalBuffer::TerminalBuffer()
 	fAlternateScreen(NULL),
 	fAlternateHistory(NULL),
 	fAlternateScreenOffset(0),
-	fAlternateAttributes(0),
+	fAlternateAttributes(),
 	fColorsPalette(NULL),
 	fListenerValid(false)
 {
@@ -229,6 +229,17 @@ TerminalBuffer::ResetColors(uint8* indexes, int32 count, bool dynamic)
 
 
 void
+TerminalBuffer::GetColor(uint8 index)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_GET_TERMINAL_COLOR);
+		message.AddUInt8("index", index);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
 TerminalBuffer::SetCursorStyle(int32 style, bool blinking)
 {
 	if (fListenerValid) {
@@ -266,34 +277,6 @@ void
 TerminalBuffer::SetPaletteColor(uint8 index, rgb_color color)
 {
 	fColorsPalette[index] = color;
-}
-
-
-rgb_color
-TerminalBuffer::PaletteColor(uint8 index)
-{
-	return fColorsPalette[index];
-}
-
-
-int
-TerminalBuffer::GuessPaletteColor(int red, int green, int blue)
-{
-	int distance = 255 * 100;
-	int index = -1;
-	for (uint32 i = 0; i < kTermColorCount && distance > 0; i++) {
-		rgb_color color = fColorsPalette[i];
-		int r = 30 * abs(color.red - red);
-		int g = 59 * abs(color.green - green);
-		int b = 11 * abs(color.blue - blue);
-		int d = r + g + b;
-		if (distance > d) {
-			index = i;
-			distance = d;
-		}
-	}
-
-	return min_c(index, int(kTermColorCount - 1));
 }
 
 

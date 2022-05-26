@@ -3,10 +3,10 @@ SubDir HAIKU_TOP src apps haikudepot ;
 # disable -Werror for this directory only
 SubDirC++Flags -Wno-error ;
 
-include [ FDirName $(HAIKU_TOP) src apps haikudepot build jam
-	HdsSchemaGenRules ] ;
+include [ FDirName $(SUBDIR) build jam HdsSchemaGenRules ] ;
 
-UsePrivateHeaders interface kernel net package shared storage support locale ;
+UsePrivateHeaders interface kernel net netservices package shared storage ;
+UsePrivateHeaders support locale ;
 
 HAIKUDEPOT_GENERATED_SOURCES_DIRECTORY = $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
 
@@ -58,6 +58,8 @@ local dumpExportReferenceModelTargetFile =
 local sourceDirs =
 	edits_generic
 	model
+	packagemanagement
+	process
 	textview
 	ui
 	ui_generic
@@ -68,7 +70,7 @@ local sourceDirs =
 
 local sourceDir ;
 for sourceDir in $(sourceDirs) {
-	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps haikudepot $(sourceDir) ] ;
+	SEARCH_SOURCE += [ FDirName $(SUBDIR) $(sourceDir) ] ;
 }
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers package ] ;
@@ -86,7 +88,6 @@ local textDocumentSources =
 	CompoundEdit.cpp
 	EditContext.cpp
 	EditManager.cpp
-	EditStack.cpp
 	UndoableEdit.cpp
 
 	# textview
@@ -117,9 +118,12 @@ local applicationSources =
 	Captcha.cpp
 	CreateUserDetail.cpp
 	DecisionProvider.cpp
+	DeskbarLink.cpp
 	FeaturedPackagesView.cpp
 	FilterView.cpp
+	GeneralContentScrollView.cpp
 	IconTarPtr.cpp
+	IncrementViewCounterProcess.cpp
 	JobStateListener.cpp
 	LanguageModel.cpp
 	LinkView.cpp
@@ -130,22 +134,22 @@ local applicationSources =
 	MarkupTextView.cpp
 	MessagePackageListener.cpp
 	Model.cpp
-	PackageAction.cpp
-	PackageActionHandler.cpp
 	PackageContentsView.cpp
 	PackageIconTarRepository.cpp
 	PackageInfo.cpp
 	PackageInfoListener.cpp
 	PackageInfoView.cpp
 	PackageListView.cpp
-	PackageManager.cpp
 	RatePackageWindow.cpp
 	RatingView.cpp
+	RatingStability.cpp
 	RatingUtils.cpp
 	support.cpp
 	ScreenshotWindow.cpp
 	ScrollableGroupView.cpp
+	SettingsWindow.cpp
 	SharedBitmap.cpp
+	ShuttingDownWindow.cpp
 	ToLatestUserUsageConditionsWindow.cpp
 	UserCredentials.cpp
 	UserDetail.cpp
@@ -156,15 +160,23 @@ local applicationSources =
 	ValidationUtils.cpp
 	WorkStatusView.cpp
 
+	# packagemanagement
+	AbstractPackageProcess.cpp
+	InstallPackageProcess.cpp
+	OpenPackageProcess.cpp
+	PackageAction.cpp
+	PackageManager.cpp
+	UninstallPackageProcess.cpp
+
 	# network + server / local processes
 	AbstractProcess.cpp
+	AbstractProcessNode.cpp
 	AbstractServerProcess.cpp
 	AbstractSingleFileServerProcess.cpp
 	LocalPkgDataLoadProcess.cpp
 	LocalRepositoryUpdateProcess.cpp
 	ProcessCoordinator.cpp
 	ProcessCoordinatorFactory.cpp
-	ProcessNode.cpp
 	ServerHelper.cpp
 	ServerSettings.cpp
 	ServerPkgDataUpdateProcess.cpp
@@ -173,6 +185,7 @@ local applicationSources =
 	ServerIconExportUpdateProcess.cpp
 	StandardMetaDataJsonEventListener.cpp
 	StandardMetaData.cpp
+	ThreadedProcessNode.cpp
 	UserDetailVerifierProcess.cpp
 	WebAppInterface.cpp
 
@@ -185,9 +198,10 @@ local applicationSources =
 	DataIOUtils.cpp
 	LanguageMenuUtils.cpp
 	LocaleUtils.cpp
+	PackageUtils.cpp
 	RepositoryUrlUtils.cpp
 	StorageUtils.cpp
-	ToFileUrlProtocolListener.cpp
+	LoggingUrlProtocolListener.cpp
 
 	# package_daemon
 	ProblemWindow.cpp
@@ -238,7 +252,7 @@ Application HaikuDepot
 	$(generatedRepositoryParserSourceFiles)
 	$(generatedReferenceParserSourceFiles)
 	:
-	be package bnetapi translation libcolumnlistview.a shared
+	be package bnetapi translation libnetservices.a libcolumnlistview.a shared
 	[ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub
 	:
 	HaikuDepot.rdef
@@ -267,6 +281,7 @@ DoCatalogs HaikuDepot :
 	ServerPkgDataUpdateProcess.cpp
 	ServerReferenceDataUpdateProcess.cpp
 	ServerRepositoryDataUpdateProcess.cpp
+	SettingsWindow.cpp
 	UserLoginWindow.cpp
 	WorkStatusView.cpp
 ;
@@ -296,35 +311,51 @@ HdsSchemaGenParser $(dumpExportReferenceListenerTargetFile)
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedPkgParserSourceFiles) ]
 	[ FGristFiles $(generatedPkgParserSourceFiles:S=.h) ]
+	: $(dumpExportPkgBulkListenerTargetDirectory)
 	: $(dumpExportPkgBulkListenerTargetFile) ;
 
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedRepositoryParserSourceFiles) ]
 	[ FGristFiles $(generatedRepositoryParserSourceFiles:S=.h) ]
+	: $(dumpExportRepositoryBulkListerTargetDirectory)
 	: $(dumpExportRepositoryBulkListerTargetFile) ;
 
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedReferenceParserSourceFiles) ]
 	[ FGristFiles $(generatedReferenceParserSourceFiles:S=.h) ]
+	: $(dumpExportReferenceListenerTargetDirectory)
 	: $(dumpExportReferenceListenerTargetFile) ;
 
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedRepositoryModelSourceFiles) ]
 	[ FGristFiles $(generatedRepositoryModelSourceFiles:S=.h) ]
+	: $(dumpExportRepositoryModelTargetDirectory)
 	: $(dumpExportRepositoryModelTargetFile) ;
 
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedPkgModelSourceFiles) ]
 	[ FGristFiles $(generatedPkgModelSourceFiles:S=.h) ]
+	: $(dumpExportPkgModelTargetDirectory)
 	: $(dumpExportPkgModelTargetFile) ;
 
 HdsSchemaGenAppSrcDependsOnGeneration
 	[ FGristFiles $(generatedReferenceModelSourceFiles) ]
 	[ FGristFiles $(generatedReferenceModelSourceFiles:S=.h) ]
+	: $(dumpExportReferenceModelTargetDirectory)
 	: $(dumpExportReferenceModelTargetFile) ;
 
 # This will ensure that if any of the generated files' header files change, then
 # the application should be re-built.
+
+Includes [ FGristFiles $(applicationSources) ]
+	:
+	$(dumpExportRepositoryBulkListerTargetDirectory)
+	$(dumpExportPkgBulkListenerTargetDirectory)
+	$(dumpExportReferenceListenerTargetDirectory)
+	$(dumpExportPkgModelTargetDirectory)
+	$(dumpExportRepositoryModelTargetDirectory)
+	$(dumpExportReferenceModelTargetDirectory)
+;
 
 Depends [ FGristFiles $(applicationSources:S=.o) ]
 	:

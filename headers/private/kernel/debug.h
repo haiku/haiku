@@ -91,20 +91,21 @@
 
 // Macros for for placing marker functions. They can be used to mark the
 // beginning and end of code sections (e.g. used in the slab code).
+// Note that in order for these to work, the kernel must be built with -fno-toplevel-reorder.
 #define RANGE_MARKER_FUNCTION(functionName) \
-	void functionName() {}
+	void RANGE_MARKER_##functionName() {}
 #define RANGE_MARKER_FUNCTION_BEGIN(scope) \
 	RANGE_MARKER_FUNCTION(scope##_begin)
 #define RANGE_MARKER_FUNCTION_END(scope) \
 	RANGE_MARKER_FUNCTION(scope##_end)
 
 #define RANGE_MARKER_FUNCTION_PROTOTYPE(functionName) \
-	void functionName();
+	void RANGE_MARKER_##functionName();
 #define RANGE_MARKER_FUNCTION_PROTOTYPES(scope)		\
 	RANGE_MARKER_FUNCTION_PROTOTYPE(scope##_begin)	\
 	RANGE_MARKER_FUNCTION_PROTOTYPE(scope##_end)
 #define RANGE_MARKER_FUNCTION_ADDRESS_RANGE(scope) \
-	(addr_t)&scope##_begin, (addr_t)&scope##_end
+	(addr_t)&RANGE_MARKER_##scope##_begin, (addr_t)&RANGE_MARKER_##scope##_end
 
 
 // command return value

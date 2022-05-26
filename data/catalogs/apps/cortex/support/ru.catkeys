@@ -1,0 +1,95 @@
+1	russian	application/x-vnd.Cortex.support	3457841531
+Header has flags	MediaString		Заголовок имеет флаги
+32 bit HLS	MediaString		32-битный HLS
+Recording	MediaString		Запись
+(unknown format)	MediaString		(неизвестный формат)
+Clean buffers	MediaString		Очистить данные буфера
+Mono	MediaString		Моно
+MPEG1	MediaString		MPEG1
+ASF format family	MediaString		Семейство файловых форматов ASF
+Encoded video	MediaString		Кодированное видео
+YUV444	MediaString		YUV444
+Port	MediaString		Порт
+24 bit LAB	MediaString		24-битный LAB
+32 bit HSVA	MediaString		32-битный HSVA
+YCbCr411	MediaString		YCbCr411
+Offline	MediaString		Офлайн
+YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		неизвестная ориентация видео
+QuickTime	MediaString		QuickTime
+32 bit HLSA	MediaString		32-битный HLSA
+BeOS format family	MediaString		Семейство файловых форматов BeOS
+24 bit HSV	MediaString		24-битный HSV
+32 bit CMY	MediaString		32-битный CMY
+(unknown video format)	MediaString		(неизвестный формат видео)
+AVI format family	MediaString		Семейство файловых форматов AVI
+15 bit RGBA	MediaString		15-битный RGBA
+Drop data	MediaString		Сбросить данные
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Гц
+Right	MediaString		Правый
+32 bit RGB	MediaString		32-битный RGB
+System mixer	MediaString		Системный микшер
+Physical output	MediaString		Физический выход
+YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		Сверху вниз, слева направо
+ kb/s	MediaString		 кбит/с
+24 bit HSI	MediaString		24-битный HSI
+User-defined media type	MediaString		Медиа-формат определённый пользователем
+32 bit CMYA	MediaString		32-битный CMYA
+QuickTime format family	MediaString		Семейство формата QuickTime
+Any format family	MediaString		Семейство любого формата
+Timecode	MediaString		Временной код
+ kHz	MediaString		 кГц
+(unknown matrix mask)	MediaString		(неизвестная маска матрицы)
+32 bit LAB	MediaString		32-битный LAB
+32 bit CMYK	MediaString		32-битный CMYK
+(unknown multistream format)	MediaString		(неизвестный формат мультистрима)
+YCbCr444	MediaString		YCbCr444
+Increase latency	MediaString		Увеличить задержку
+MPEG format family	MediaString		Семейство файловых форматов MPEG
+(none)	MediaString		(нет)
+ kb/s (max)	MediaString		 кб/с (макс.)
+24 bit UVL	MediaString		24-битный UVL
+32 bit HSV	MediaString		32-битный HSV
+ID	MediaString		ID
+AIFF format family	MediaString		Семейство файловых форматов AIFF
+16 bit RGB	MediaString		16-битный RGB
+YCbCr422	MediaString		YCbCr422
+Raw audio	MediaString		Raw-аудио
+32 bit LABA	MediaString		32-битный LABA
+24 bit HLS	MediaString		24-битный HLS
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		Семейство файловых форматов WAV
+ (NTSC)	MediaString		 (NTSC)
+Physical input	MediaString		Физический ввод
+YUV411	MediaString		YUV411
+Encoded audio	MediaString		Аудиокодек
+Decrease precision	MediaString		Уменьшить точность
+File interface	MediaString		Файловый интерфейс
+(unknown byte order)	MediaString		(неизвестный порядок байтов)
+32 bit HSI	MediaString		32-битный HSI
+Typeless media	MediaString		Безтиповое медиа
+ (PAL)	MediaString		 (PAL)
+32 bit RGBA	MediaString		32-битный RGBA
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 кб/с (среднее)
+HTML	MediaString		HTML
+15 bit RGB	MediaString		15-битный RGB
+ProLogic LR	MediaString		ProLogic LR
+Parameters	MediaString		Параметры
+Raw data from VBL area	MediaString		Raw значения из VBL
+BeOS video	MediaString		BeOS видео
+24 bit CMY	MediaString		24-битный CMY
+32 bit UVLA	MediaString		32-битный UVLA
+Stereo	MediaString		Стерео
+8 bit color-index	MediaString		8-битное индексированное изображение
+32 bit UVL	MediaString		32-битный UVL
+Text	MediaString		Текст
+Unknown media type	MediaString		Неизвестный медиаформат
+MPEG2	MediaString		MPEG2
+24 bit RGB	MediaString		24-битный RGB
+32 bit HSIA	MediaString		32-битный HSIA
+Raw video	MediaString		Raw-видео

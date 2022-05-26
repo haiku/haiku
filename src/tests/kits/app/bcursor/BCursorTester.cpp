@@ -7,6 +7,7 @@
 
 // System Includes ------------------------------------------------------------
 #include <Application.h>
+#include <Bitmap.h>
 #include <Cursor.h>
 #include <Message.h>
 
@@ -101,6 +102,24 @@ void BCursorTester::BCursor5()
   */
   BMessage msg;
   BCursor cur(&msg);
+}
+
+/*
+	BCursor(BBitmap *bitmap, BPoint* hotspot)
+	@case 1
+	@results		nothing apparent (empty cursor)
+ */
+void BCursorTester::BCursor6()
+{
+  BApplication app("application/x-vnd.cursortest");
+
+  BBitmap *bitmap;
+  BPoint hotspot(0, 0);
+
+  get_mouse_bitmap(&bitmap, &hotspot);
+  hotspot.x += 1;
+  hotspot.y += 1;
+  BCursor cur(bitmap, hotspot);
 }
 
 /*

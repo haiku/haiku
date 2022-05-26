@@ -1,4 +1,5 @@
 /*
+ * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -27,8 +28,26 @@ extern fs_volume_ops gxfsVolumeOps;
 #define XFS_SB_MAXSIZE 512
 #define BASICBLOCKLOG 9
 	// Log of block size should be 9
-#define BASICBLOCKSIZE 1 << BASICBLOCKLOG
+#define BASICBLOCKSIZE (1 << BASICBLOCKLOG)
 	// The size of a basic block should be 512
+#define XFS_OPEN_MODE_USER_MASK 0x7fffffff
+
+/* B+Tree related macros
+*/
+#define XFS_BTREE_SBLOCK_SIZE	18
+	// Header for Short Format btree
+#define XFS_BTREE_LBLOCK_SIZE	24
+	// Header for Long Format btree
+#define XFS_BMAP_MAGIC 0x424d4150
+#define MAX_TREE_DEPTH 5
+#define XFS_KEY_SIZE sizeof(xfs_fileoff_t)
+#define XFS_PTR_SIZE sizeof(xfs_fsblock_t)
+
+struct file_cookie {
+	bigtime_t last_notification;
+	off_t	last_size;
+	int		open_mode;
+};
 
 
 /*	Version 4 superblock definition	*/
@@ -41,6 +60,7 @@ public:
 			uint8				BlockLog() const;
 			uint32				DirBlockSize() const;
 				// maximum 65536
+			uint32				DirBlockLog() const;
 			uint8				AgInodeBits() const;
 			uint8				InodesPerBlkLog() const;
 			uint8				AgBlocksLog() const;

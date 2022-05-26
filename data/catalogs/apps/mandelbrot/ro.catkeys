@@ -1,25 +1,28 @@
-1	romanian	x-vnd.Haiku-Mandelbrot	3875916167
-Burning Ship	MandelbrotWindow		Navă aprinsă
-Grassland	MandelbrotWindow		Pășune
+1	romanian	x-vnd.Haiku-Mandelbrot	2302392624
+Grassland	MandelbrotWindow		Pajiști
+Tricorn	MandelbrotWindow		Tricorn
+Orbit Trap	MandelbrotWindow		Capcană pe orbită
+Deepfrost	MandelbrotWindow		Îngheț adânc
+1 (none)	MandelbrotWindow		1 (nespecificat)
+Quit	MandelbrotWindow		Ieșire
+Save as image…	MandelbrotWindow		Salvare ca imagine…
+Fire	MandelbrotWindow		Foc
+High contrast	MandelbrotWindow		Contrast mare
+Full screen	MandelbrotWindow		Ecran complet
+Midnight	MandelbrotWindow		Miezul nopții
+Burning Ship	MandelbrotWindow		Navă în flăcări
 Lightning	MandelbrotWindow		Fulger
 About	MandelbrotWindow		Despre
 Palette	MandelbrotWindow		Paletă
-Set	MandelbrotWindow		Stabilire
-Tricorn	MandelbrotWindow		Tricorn
+Set	MandelbrotWindow		Stabilește
 Royal	MandelbrotWindow		Regal
-Orbit Trap	MandelbrotWindow		Capcană pe orbită
-Deepfrost	MandelbrotWindow		Îngheț profund
-Subsampling	MandelbrotWindow		Subeșantionare
-1 (none)	MandelbrotWindow		1 (nimic)
-Quit	MandelbrotWindow		Închidere
+Subsampling	MandelbrotWindow		Sub-eșantionare
 File	MandelbrotWindow		Fișier
 Julia	MandelbrotWindow		Iulia
 Frost	MandelbrotWindow		Îngheț
-Fire	MandelbrotWindow		Foc
+View	MandelbrotWindow		Vizualizare
 Mandelbrot	System name		Mandelbrot
-Iterations	MandelbrotWindow		Iterații
-High contrast	MandelbrotWindow		Contrast mare
 Multibrot	MandelbrotWindow		Multibrot
+Iterations	MandelbrotWindow		Iterații
 Spring	MandelbrotWindow		Primăvară
-Midnight	MandelbrotWindow		Miezul nopții
 Mandelbrot	MandelbrotWindow		Mandelbrot

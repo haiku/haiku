@@ -173,7 +173,8 @@ protected:
 									bool shear) const;
 			void				PutTransformedFace(FT_Face face) const;
 
-			FontStyle*			fStyle;
+			BReference<FontStyle>
+								fStyle;
 			float				fSize;
 			float				fRotation;
 			float				fShear;

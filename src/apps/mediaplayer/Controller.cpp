@@ -281,7 +281,7 @@ Controller::SetTo(const PlaylistItemRef& item)
 	fSeekFrame = -1;
 	fRequestedSeekFrame = -1;
 
-	if (fItem.Get() == NULL)
+	if (!fItem.IsSet())
 		return B_BAD_VALUE;
 
 	TrackSupplier* trackSupplier = fItem->GetTrackSupplier();
@@ -703,7 +703,7 @@ Controller::TimePosition()
 status_t
 Controller::SaveState(bool reset)
 {
-	if (fItem.Get() == NULL)
+	if (!fItem.IsSet())
 		return B_OK;
 	if (reset)
 		fCurrentFrame = 0;
@@ -906,7 +906,7 @@ status_t
 Controller::GetLocation(BString* location)
 {
 	// you need to hold the data lock
-	if (fItem.Get() == NULL)
+	if (!fItem.IsSet())
 		return B_NO_INIT;
 	*location = fItem->LocationURI();
 	return B_OK;
@@ -917,7 +917,7 @@ status_t
 Controller::GetName(BString* name)
 {
 	// you need to hold the data lock
-	if (fItem.Get() == NULL)
+	if (!fItem.IsSet())
 		return B_NO_INIT;
 	*name = fItem->Name();
 	return B_OK;

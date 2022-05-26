@@ -2,7 +2,12 @@
 
 #include <malloc.h>
 #include <string.h>
+
 #include <ByteOrder.h>
+#include <KernelExport.h>
+
+#include <kernel.h>
+
 
 extern const uint8 *
 XDROutPacketBuffer(struct XDROutPacket *packet)
@@ -49,28 +54,36 @@ XDROutPacketAddInt32(struct XDROutPacket *packet, int32 val)
 	packet->fLength+=4;
 }
 
-extern void 
+
+status_t
 XDROutPacketAddDynamic(struct XDROutPacket *packet, const void *data, size_t size)
 {
-	XDROutPacketAddInt32 (packet,size);
-	XDROutPacketAddFixed (packet,data,size);
+	XDROutPacketAddInt32(packet, size);
+	return XDROutPacketAddFixed(packet, data, size);
 }
 
-extern void 
+
+status_t
 XDROutPacketAddFixed(struct XDROutPacket *packet, const void *data, size_t size)
 {
-	size_t roundedSize=(size+3)&~3;
-	XDROutPacketGrow (packet,roundedSize);
-	memcpy (&packet->fBuffer[packet->fLength],data,size);
-	memset (&packet->fBuffer[packet->fLength+size],0,roundedSize-size);
-	packet->fLength+=roundedSize;
+	size_t roundedSize = (size + 3) & ~3;
+	XDROutPacketGrow(packet, roundedSize);
+	if (!IS_USER_ADDRESS(data))
+		memcpy(&packet->fBuffer[packet->fLength], data, size);
+	else if (user_memcpy(&packet->fBuffer[packet->fLength], data, size) != B_OK)
+		return B_BAD_ADDRESS;
+	memset(&packet->fBuffer[packet->fLength + size], 0, roundedSize - size);
+	packet->fLength += roundedSize;
+	return B_OK;
 }
 
-extern void 
+
+status_t
 XDROutPacketAddString(struct XDROutPacket *packet, const char *string)
 {
-	XDROutPacketAddDynamic(packet,string,strlen(string));
+	return XDROutPacketAddDynamic(packet, string, strlen(string));
 }
+
 
 extern void 
 XDROutPacketAppend(struct XDROutPacket *me, const struct XDROutPacket *packet)

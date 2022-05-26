@@ -1,0 +1,37 @@
+1	esperanto	application/x-vnd.Cortex.InfoView	1672479626
+Offset	InfoView		Deŝovo
+Description	DormantNodeInfoView		Priskribo
+Byte order	InfoView		Ordo bitoka
+Connection	InfoView		Konekto
+Output formats	DormantNodeInfoView		Eligaj formoj
+History	InfoView		Historio
+Input formats	DormantNodeInfoView		Enigaj formoj
+Signature	AppNodeInfoView		Subskribo
+Video data between	InfoView		Filmdatumo inter
+Any number	DormantNodeInfoView	For 'Max. instances' field	Ajna numero
+Flags	InfoView		Flagoj
+Media output	InfoView		Media eligo
+Active lines	InfoView		Aktivaj linioj
+\n- Quality:	FileNodeInfoView		\n- Kvalito:
+Kinds	LiveNodeInfoView		Specoj
+Flavor flags	DormantNodeInfoView		Gustflagoj
+Max. instances	DormantNodeInfoView		Maksimuma instancokvanto
+\n- Duration:	FileNodeInfoView		\n- Daŭrotempo:
+Latency	LiveNodeInfoView		Prokrasto
+Media type	InfoView		Mediospeco
+Kinds	DormantNodeInfoView		Specoj
+%title% info	InfoView		%title% informo
+Node ID	LiveNodeInfoView		Identigaĵo de nodo
+File format	AppNodeInfoView		Dosierformo
+Channels	InfoView		Kanaloj
+File format	FileNodeInfoView		Dosierformo
+(no file)	FileNodeInfoView		(neniu dosiero)
+Media input	InfoView		Media enigo
+Input format	DormantNodeInfoView		Eniga formo
+Format	InfoView		Formo
+Version	AppNodeInfoView		Versio
+AddOn ID	DormantNodeInfoView		Identigaĵo de aldonaĵo
+Port	LiveNodeInfoView		Pordo
+Output format	DormantNodeInfoView		Eliga formo
+Source	InfoView		Fonto
+Copyright	FileNodeInfoView		Kopirajto

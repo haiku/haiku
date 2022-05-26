@@ -66,25 +66,10 @@ rule ExtractCatalogEntries target : sources : signature : regexp
 	local subdir = [ on $(signature) return $(HAIKU_CATALOGS_SUBDIR) ] ;
 	MakeLocate $(target) : [ FDirName $(HAIKU_CATALOGS_OBJECT_DIR) $(subdir) ] ;
 	Depends $(target) : $(sources) <build>collectcatkeys ;
-	if $(HAIKU_CC_IS_CLANG_$(TARGET_PACKAGING_ARCH)) = 1 {
-		# Clang emits preprocessed source even if some included headers were not
-		# found, so we can treat a return code of 1 from it as not an error.
-		ExtractCatalogEntries2 $(target) : <build>collectcatkeys $(sources) ;
-	} else {
-		ExtractCatalogEntries1 $(target) : <build>collectcatkeys $(sources) ;
-	}
+	ExtractCatalogEntries1 $(target) : <build>collectcatkeys $(sources) ;
 }
 
 actions ExtractCatalogEntries1
-{
-	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
-	$(CC) -E $(CCDEFS) -DB_COLLECTING_CATKEYS $(HDRS) "$(2[2-])" > "$(1)".pre
-	$(2[1]) $(HAIKU_CATALOG_REGEXP) -s $(HAIKU_CATALOG_SIGNATURE) \
-		-w -o "$(1)" "$(1)".pre
-	$(RM) "$(1)".pre
-}
-
-actions ExtractCatalogEntries2
 {
 	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	$(CC) -E $(CCDEFS) -DB_COLLECTING_CATKEYS $(HDRS) "$(2[2-])" > "$(1)".pre \

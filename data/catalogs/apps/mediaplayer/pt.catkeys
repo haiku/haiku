@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-MediaPlayer	1313616492
+1	portuguese	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Eliminar elemento para o Lixo
 Close	MediaPlayer-PlaylistWindow		Fechar
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dos clips em segundo plano
@@ -30,11 +30,13 @@ Open file…	MediaPlayer-Main		Abrir ficheiro…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Redimensionar controlos no modo de ecrã completo
 View options	MediaPlayer-SettingsWindow		Opções de visualização
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Ejetar dispositivo
 Full volume	MediaPlayer-SettingsWindow		Volume máximo
 <untitled>	PlaylistItem-title		<sem título>
 Start media server	MediaPlayer-Main		Iniciar o servidor de multimédia
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Parece que o servidor de multimédia não está em execução.\nGostaria de o iniciar?
 Location	MediaPlayer-InfoWin		Localização
+Opening '%s'.	MediaPlayer-Main		A abrir '%s'.
 Medium	MediaPlayer-SettingsWindow		Médio
 Play mode	MediaPlayer-SettingsWindow		Modo de reprodução
 Playlist	MediaPlayer-PlaylistWindow		Lista de reprodução

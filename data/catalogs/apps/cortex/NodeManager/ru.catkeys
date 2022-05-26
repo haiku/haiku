@@ -1,0 +1,7 @@
+1	russian	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		Системный аудиомикшер
+System video output	NodeManager		Системный видеовыход
+System video input	NodeManager		Системный видеовход
+No name	NodeManager		Без имени
+System audio input	NodeManager		Системный аудиовход
+Time sources	NodeManager		Источники времени

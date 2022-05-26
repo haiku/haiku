@@ -397,7 +397,7 @@ build_dirent(const BEntry* source, struct dirent* ent,
 	entry_ref ref;
 	source->GetRef(&ref);
 
-	size_t recordLength = strlen(ref.name) + sizeof(dirent);
+	size_t recordLength = offsetof(struct dirent, d_name) + strlen(ref.name) + 1;
 	if (recordLength > size || count <= 0) {
 		// can't fit in buffer, bail
 		return 0;

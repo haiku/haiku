@@ -76,6 +76,7 @@ Hub::Hub(Object *parent, int8 hubAddress, uint8 hubPort,
 	} else {
 		TRACE_ALWAYS("no interrupt pipe found\n");
 	}
+	object->SetBusy(false);
 
 	// Wait some time before powering up the ports
 	if (!isRootHub)

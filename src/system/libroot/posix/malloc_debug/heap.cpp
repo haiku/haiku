@@ -71,7 +71,7 @@ panic(const char *format, ...)
 	if (sDebuggerCalls)
 		debugger(buffer);
 	else
-		debug_printf(buffer);
+		debug_printf("%s", buffer);
 }
 
 
@@ -247,7 +247,7 @@ dump_allocator_areas(heap_allocator *heap)
 {
 	heap_area *area = heap->all_areas;
 	while (area) {
-		printf("\tarea %p: area: %" B_PRId32 "; base: 0x%08lx; size: %lu; "
+		printf("\tarea %p: area: %" B_PRId32 "; base: 0x%08lx; size: %" B_PRIuSIZE "; "
 			"page_count: %" B_PRIu32 "; free_pages: %p (%" B_PRIu32 " entr%s)\n",
 			area, area->area, area->base, area->size, area->page_count,
 			area->free_pages, area->free_page_count,
@@ -320,7 +320,7 @@ dump_allocations(bool statsOnly, thread_id thread)
 							// interesting...
 							if (!statsOnly) {
 								printf("thread: % 6" B_PRId32 "; address: "
-									"0x%08lx; size: %lu bytes\n", info->thread,
+									"0x%08lx; size: %" B_PRIuSIZE " bytes\n", info->thread,
 									base, info->size);
 							}
 
@@ -346,7 +346,7 @@ dump_allocations(bool statsOnly, thread_id thread)
 						// interesting...
 						if (!statsOnly) {
 							printf("thread: % 6" B_PRId32 "; address: 0x%08lx;"
-								" size: %lu bytes\n", info->thread,
+								" size: %" B_PRIuSIZE " bytes\n", info->thread,
 								base, info->size);
 						}
 
@@ -363,7 +363,7 @@ dump_allocations(bool statsOnly, thread_id thread)
 		}
 	}
 
-	printf("total allocations: %" B_PRIu32 "; total bytes: %lu\n", totalCount,
+	printf("total allocations: %" B_PRIu32 "; total bytes: %" B_PRIuSIZE "\n", totalCount,
 		totalSize);
 }
 
@@ -412,8 +412,8 @@ heap_validate_walls()
 							- sizeof(heap_leak_check_info));
 						if (info->size > elementSize - sizeof(addr_t)
 								- sizeof(heap_leak_check_info)) {
-							panic("leak check info has invalid size %lu for"
-								" element size %lu\n", info->size, elementSize);
+							panic("leak check info has invalid size %" B_PRIuSIZE " for"
+								" element size %" B_PRIuSIZE "\n", info->size, elementSize);
 							continue;
 						}
 
@@ -422,7 +422,8 @@ heap_validate_walls()
 						memcpy(&wallValue, (void *)wallAddress, sizeof(addr_t));
 						if (wallValue != wallAddress) {
 							panic("someone wrote beyond small allocation at"
-								" 0x%08lx; size: %lu bytes; allocated by %ld;"
+								" 0x%08lx; size: %" B_PRIuSIZE " bytes;"
+								" allocated by %" B_PRId32 ";"
 								" value: 0x%08lx\n", base, info->size,
 								info->thread, wallValue);
 						}
@@ -443,8 +444,8 @@ heap_validate_walls()
 
 					if (info->size > pageCount * heap->page_size
 							- sizeof(addr_t) - sizeof(heap_leak_check_info)) {
-						panic("leak check info has invalid size %lu for"
-							" page count %lu (%lu bytes)\n", info->size,
+						panic("leak check info has invalid size %" B_PRIuSIZE " for"
+							" page count %" B_PRIu32 " (%" B_PRIu32 " bytes)\n", info->size,
 							pageCount, pageCount * heap->page_size);
 						continue;
 					}
@@ -454,7 +455,7 @@ heap_validate_walls()
 					memcpy(&wallValue, (void *)wallAddress, sizeof(addr_t));
 					if (wallValue != wallAddress) {
 						panic("someone wrote beyond big allocation at 0x%08lx;"
-							" size: %lu bytes; allocated by %ld;"
+							" size: %" B_PRIuSIZE " bytes; allocated by %" B_PRId32 ";"
 							" value: 0x%08lx\n", base, info->size,
 							info->thread, wallValue);
 					}
@@ -515,7 +516,7 @@ heap_validate_heap(heap_allocator *heap)
 		totalPageCount += freePageCount;
 		totalFreePageCount += freePageCount;
 		if (area->free_page_count != freePageCount) {
-			panic("free page count %ld doesn't match free page list %ld\n",
+			panic("free page count %" B_PRIu32 " doesn't match free page list %" B_PRIu32 "\n",
 				area->free_page_count, freePageCount);
 		}
 
@@ -528,7 +529,8 @@ heap_validate_heap(heap_allocator *heap)
 
 		totalPageCount += usedPageCount;
 		if (freePageCount + usedPageCount != area->page_count) {
-			panic("free pages and used pages do not add up (%lu + %lu != %lu)\n",
+			panic("free pages and used pages do not add up "
+				"(%" B_PRIu32 " + %" B_PRIu32 " != %" B_PRIu32 ")\n",
 				freePageCount, usedPageCount, area->page_count);
 		}
 
@@ -586,24 +588,24 @@ heap_validate_heap(heap_allocator *heap)
 				panic("used page is not part of the page table\n");
 
 			if (page->index >= area->page_count)
-				panic("used page has invalid index %lu\n", page->index);
+				panic("used page has invalid index %" B_PRIu16 "\n", page->index);
 
 			if ((addr_t)&area->page_table[page->index] != (addr_t)page) {
 				panic("used page index does not lead to target page"
-					" (%lu vs. %lu)\n", (addr_t)&area->page_table[page->index],
+					" (%p vs. %p)\n", &area->page_table[page->index],
 					page);
 			}
 
 			if (page->prev != lastPage) {
 				panic("used page entry has invalid prev link (%p vs %p bin "
-					"%lu)\n", page->prev, lastPage, i);
+					"%" B_PRIu32 ")\n", page->prev, lastPage, i);
 			}
 
 			if (!page->in_use)
 				panic("used page %p marked as not in use\n", page);
 
 			if (page->bin_index != i) {
-				panic("used page with bin index %u in page list of bin %lu\n",
+				panic("used page with bin index %" B_PRIu16 " in page list of bin %" B_PRIu32 "\n",
 					page->bin_index, i);
 			}
 
@@ -628,7 +630,7 @@ heap_validate_heap(heap_allocator *heap)
 
 			uint32 slotCount = bin->max_free_count;
 			if (page->empty_index > slotCount) {
-				panic("empty index beyond slot count (%u with %lu slots)\n",
+				panic("empty index beyond slot count (%" B_PRIu16 " with %" B_PRIu32 " slots)\n",
 					page->empty_index, slotCount);
 			}
 
@@ -1019,8 +1021,8 @@ heap_add_leak_check_info(addr_t address, size_t allocated, size_t size)
 static void *
 heap_raw_alloc(heap_allocator *heap, size_t size, size_t alignment)
 {
-	INFO(("heap %p: allocate %lu bytes from raw pages with alignment %lu\n",
-		heap, size, alignment));
+	INFO(("heap %p: allocate %" B_PRIuSIZE " bytes from raw pages with"
+		" alignment %" B_PRIuSIZE "\n", heap, size, alignment));
 
 	uint32 pageCount = (size + heap->page_size - 1) / heap->page_size;
 
@@ -1028,7 +1030,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, size_t alignment)
 	heap_page *firstPage = heap_allocate_contiguous_pages(heap, pageCount,
 		alignment);
 	if (firstPage == NULL) {
-		INFO(("heap %p: found no contiguous pages to allocate %ld bytes\n",
+		INFO(("heap %p: found no contiguous pages to allocate %" B_PRIuSIZE " bytes\n",
 			heap, size));
 		return NULL;
 	}
@@ -1043,7 +1045,8 @@ static void *
 heap_allocate_from_bin(heap_allocator *heap, uint32 binIndex, size_t size)
 {
 	heap_bin *bin = &heap->bins[binIndex];
-	INFO(("heap %p: allocate %lu bytes from bin %lu with element_size %lu\n",
+	INFO(("heap %p: allocate %" B_PRIuSIZE " bytes from bin %" B_PRIu32
+		" with element_size %" B_PRIu32 "\n",
 		heap, size, binIndex, bin->element_size));
 
 	MutexLocker binLocker(bin->lock);
@@ -1052,7 +1055,7 @@ heap_allocate_from_bin(heap_allocator *heap, uint32 binIndex, size_t size)
 		MutexLocker pageLocker(heap->page_lock);
 		heap_area *area = heap->areas;
 		if (area == NULL) {
-			INFO(("heap %p: no free pages to allocate %lu bytes\n", heap,
+			INFO(("heap %p: no free pages to allocate %" B_PRIuSIZE " bytes\n", heap,
 				size));
 			return NULL;
 		}
@@ -1110,10 +1113,11 @@ heap_allocate_from_bin(heap_allocator *heap, uint32 binIndex, size_t size)
 static void *
 heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 {
-	INFO(("memalign(alignment = %lu, size = %lu)\n", alignment, size));
+	INFO(("memalign(alignment = %" B_PRIuSIZE ", size = %" B_PRIuSIZE ")\n",
+		alignment, size));
 
 	if (!is_valid_alignment(alignment)) {
-		panic("memalign() with an alignment which is not a power of 2 (%lu)\n",
+		panic("memalign() with an alignment which is not a power of 2 (%" B_PRIuSIZE ")\n",
 			alignment);
 	}
 
@@ -1151,7 +1155,7 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 
 	size -= sizeof(addr_t) + sizeof(heap_leak_check_info);
 
-	INFO(("memalign(): asked to allocate %lu bytes, returning pointer %p\n",
+	INFO(("memalign(): asked to allocate %" B_PRIuSIZE " bytes, returning pointer %p\n",
 		size, address));
 
 	if (address == NULL)
@@ -1219,7 +1223,7 @@ heap_free(heap_allocator *heap, void *address)
 		heap_bin *bin = &heap->bins[page->bin_index];
 		if (((addr_t)address - pageBase) % bin->element_size != 0) {
 			panic("free(): address %p does not fall on allocation boundary"
-				" for page base %p and element size %lu\n", address,
+				" for page base %p and element size %" B_PRIu32 "\n", address,
 				(void *)pageBase, bin->element_size);
 			return B_ERROR;
 		}
@@ -1243,7 +1247,8 @@ heap_free(heap_allocator *heap, void *address)
 			+ bin->element_size - sizeof(heap_leak_check_info));
 		if (info->size > bin->element_size - sizeof(addr_t)
 				- sizeof(heap_leak_check_info)) {
-			panic("leak check info has invalid size %lu for element size %lu,"
+			panic("leak check info has invalid size %" B_PRIuSIZE
+				" for element size %" B_PRIu32 ","
 				" probably memory has been overwritten past allocation size\n",
 				info->size, bin->element_size);
 		}
@@ -1253,7 +1258,8 @@ heap_free(heap_allocator *heap, void *address)
 		memcpy(&wallValue, (void *)wallAddress, sizeof(addr_t));
 		if (wallValue != wallAddress) {
 			panic("someone wrote beyond small allocation at %p;"
-				" size: %lu bytes; allocated by %ld; value: 0x%08lx\n",
+				" size: %" B_PRIuSIZE " bytes; allocated by %" B_PRId32 ";"
+				" value: 0x%08lx\n",
 				address, info->size, info->thread, wallValue);
 		}
 
@@ -1334,7 +1340,8 @@ heap_free(heap_allocator *heap, void *address)
 			+ allocationSize - sizeof(heap_leak_check_info));
 		if (info->size > allocationSize - sizeof(addr_t)
 				- sizeof(heap_leak_check_info)) {
-			panic("leak check info has invalid size %lu for allocation of %lu,"
+			panic("leak check info has invalid size %" B_PRIuSIZE
+				" for allocation of %" B_PRIuSIZE ","
 				" probably memory has been overwritten past allocation size\n",
 				info->size, allocationSize);
 		}
@@ -1344,7 +1351,7 @@ heap_free(heap_allocator *heap, void *address)
 		memcpy(&wallValue, (void *)wallAddress, sizeof(addr_t));
 		if (wallValue != wallAddress) {
 			panic("someone wrote beyond big allocation at %p;"
-				" size: %lu bytes; allocated by %ld; value: 0x%08lx\n",
+				" size: %" B_PRIuSIZE " bytes; allocated by %" B_PRId32 "; value: 0x%08lx\n",
 				address, info->size, info->thread, wallValue);
 		}
 
@@ -1410,7 +1417,7 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	INFO(("realloc(address = %p, newSize = %lu)\n", address, newSize));
+	INFO(("realloc(address = %p, newSize = %" B_PRIuSIZE ")\n", address, newSize));
 
 	heap_page *page = &area->page_table[((addr_t)address - area->base)
 		/ heap->page_size];
@@ -1543,7 +1550,7 @@ heap_get_allocation_info(heap_allocator *heap, void *address, size_t *size,
 		heap_bin *bin = &heap->bins[page->bin_index];
 		if (((addr_t)address - pageBase) % bin->element_size != 0) {
 			panic("get_allocation_info(): address %p does not fall on"
-				" allocation boundary for page base %p and element size %lu\n",
+				" allocation boundary for page base %p and element size %" B_PRIu32 "\n",
 				address, (void *)pageBase, bin->element_size);
 			return B_ERROR;
 		}
@@ -1554,7 +1561,8 @@ heap_get_allocation_info(heap_allocator *heap, void *address, size_t *size,
 			- sizeof(heap_leak_check_info));
 		if (info->size > bin->element_size - sizeof(addr_t)
 				- sizeof(heap_leak_check_info)) {
-			panic("leak check info has invalid size %lu for element size %lu,"
+			panic("leak check info has invalid size %" B_PRIuSIZE
+				" for element size %" B_PRIu32 ","
 				" probably memory has been overwritten past allocation size\n",
 				info->size, bin->element_size);
 			return B_ERROR;
@@ -1585,7 +1593,8 @@ heap_get_allocation_info(heap_allocator *heap, void *address, size_t *size,
 			- sizeof(heap_leak_check_info));
 		if (info->size > allocationSize - sizeof(addr_t)
 				- sizeof(heap_leak_check_info)) {
-			panic("leak check info has invalid size %lu for allocation of %lu,"
+			panic("leak check info has invalid size %" B_PRIuSIZE
+				" for allocation of %" B_PRIuSIZE ","
 				" probably memory has been overwritten past allocation size\n",
 				info->size, allocationSize);
 			return B_ERROR;
@@ -1722,7 +1731,7 @@ debug_heap_malloc_with_guard_page(size_t size)
 	area_id allocationArea = create_area("guarded area", &address,
 		B_ANY_ADDRESS, areaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (allocationArea < B_OK) {
-		panic("heap: failed to create area for guarded allocation of %lu"
+		panic("heap: failed to create area for guarded allocation of %" B_PRIuSIZE
 			" bytes\n", size);
 		return NULL;
 	}
@@ -1747,7 +1756,7 @@ debug_heap_malloc_with_guard_page(size_t size)
 	// is at the end of the usable space of the requested area
 	address = (void *)((addr_t)address + areaSize - B_PAGE_SIZE - size);
 
-	INFO(("heap: allocated area %ld for guarded allocation of %lu bytes\n",
+	INFO(("heap: allocated area %" B_PRId32 " for guarded allocation of %" B_PRIuSIZE " bytes\n",
 		allocationArea, size));
 
 	info->allocation_base = address;
@@ -1844,7 +1853,7 @@ debug_heap_memalign(size_t alignment, size_t size)
 		area_id allocationArea = create_area("memalign area", &address,
 			B_ANY_ADDRESS, areaSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (allocationArea < B_OK) {
-			panic("heap: failed to create area for huge allocation of %lu"
+			panic("heap: failed to create area for huge allocation of %" B_PRIuSIZE
 				" bytes\n", size);
 			return NULL;
 		}
@@ -1865,7 +1874,7 @@ debug_heap_memalign(size_t alignment, size_t size)
 			ASSERT((addr_t)address + size - 1 < (addr_t)info + areaSize - 1);
 		}
 
-		INFO(("heap: allocated area %ld for huge allocation of %lu bytes\n",
+		INFO(("heap: allocated area %" B_PRId32 " for huge allocation of %" B_PRIuSIZE " bytes\n",
 			allocationArea, size));
 
 		info->allocation_base = address;
@@ -1889,7 +1898,7 @@ debug_heap_memalign(size_t alignment, size_t size)
 		heap_validate_heap(heap);
 
 	if (result == NULL) {
-		panic("heap: heap has run out of memory trying to allocate %lu bytes\n",
+		panic("heap: heap has run out of memory trying to allocate %" B_PRIuSIZE " bytes\n",
 			size);
 	}
 
@@ -1933,7 +1942,7 @@ debug_heap_free(void *address)
 			&& info->size == areaInfo.size && info->base == areaInfo.address
 			&& info->allocation_size < areaInfo.size) {
 			delete_area(area);
-			INFO(("free(): freed huge allocation by deleting area %ld\n",
+			INFO(("free(): freed huge allocation by deleting area %" B_PRId32 "\n",
 				area));
 			return;
 		}
@@ -1982,9 +1991,10 @@ debug_heap_realloc(void *address, size_t newSize)
 					// there is enough room available for the newSize
 					newAddress = (void*)((addr_t)info->allocation_base
 						+ info->allocation_size - newSize);
-					INFO(("realloc(): new size %ld fits in old area %ld with "
-						"%ld available -> new address: %p\n", newSize, area,
-						available, newAddress));
+					INFO(("realloc(): new size %" B_PRIuSIZE
+						" fits in old area %" B_PRId32 " with "
+						"%" B_PRIuSIZE " available -> new address: %p\n",
+						newSize, area, available, newAddress));
 					memmove(newAddress, info->allocation_base,
 						min_c(newSize, info->allocation_size));
 					info->allocation_base = newAddress;
@@ -1997,8 +2007,10 @@ debug_heap_realloc(void *address, size_t newSize)
 
 				if (available >= newSize) {
 					// there is enough room available for the newSize
-					INFO(("realloc(): new size %ld fits in old area %ld with "
-						"%ld available\n", newSize, area, available));
+					INFO(("realloc(): new size %" B_PRIuSIZE
+						" fits in old area %" B_PRId32 " with "
+						"%" B_PRIuSIZE " available\n",
+						newSize, area, available));
 					info->allocation_size = newSize;
 					return address;
 				}
@@ -2007,20 +2019,21 @@ debug_heap_realloc(void *address, size_t newSize)
 			// have to allocate/copy/free - TODO maybe resize the area instead?
 			newAddress = debug_heap_memalign(sDefaultAlignment, newSize);
 			if (newAddress == NULL) {
-				panic("realloc(): failed to allocate new block of %ld"
+				panic("realloc(): failed to allocate new block of %" B_PRIuSIZE
 					" bytes\n", newSize);
 				return NULL;
 			}
 
 			memcpy(newAddress, address, min_c(newSize, info->allocation_size));
 			delete_area(area);
-			INFO(("realloc(): allocated new block %p for size %ld and deleted "
-				"old area %ld\n", newAddress, newSize, area));
+			INFO(("realloc(): allocated new block %p for size %" B_PRIuSIZE
+				" and deleted old area %" B_PRId32 "\n",
+				newAddress, newSize, area));
 			return newAddress;
 		}
 	}
 
-	panic("realloc(): failed to realloc address %p to size %lu\n", address,
+	panic("realloc(): failed to realloc address %p to size %" B_PRIuSIZE "\n", address,
 		newSize);
 	return NULL;
 }

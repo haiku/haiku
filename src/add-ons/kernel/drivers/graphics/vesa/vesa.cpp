@@ -7,10 +7,6 @@
 #include "vesa_private.h"
 #include "vesa.h"
 
-#include <string.h>
-
-#include <drivers/bios.h>
-
 #include <boot_item.h>
 #include <frame_buffer_console.h>
 #include <util/kernel_cpp.h>
@@ -21,13 +17,19 @@
 #include "vesa_info.h"
 
 
-static bios_module_info* sBIOSModule;
+#define LINEAR_ADDRESS(segment, offset) \
+	        (((addr_t)(segment) << 4) + (addr_t)(offset))
+#define SEGMENTED_TO_LINEAR(segmented) \
+	        LINEAR_ADDRESS((addr_t)(segmented) >> 16, (addr_t)(segmented) & 0xffff)
+
+
+bios_module_info* sBIOSModule;
 
 
 /*!	Loads the BIOS module and sets up a state for it. The BIOS module is only
 	loaded when we need it, as it is quite a large module.
 */
-static status_t
+status_t
 vbe_call_prepare(bios_state** state)
 {
 	status_t status;
@@ -50,7 +52,7 @@ vbe_call_prepare(bios_state** state)
 }
 
 
-static void
+void
 vbe_call_finish(bios_state* state)
 {
 	sBIOSModule->finish(state);
@@ -92,7 +94,7 @@ find_graphics_card(addr_t frameBuffer, addr_t& base, size_t& size)
 }
 
 
-static uint32
+uint32
 get_color_space_for_depth(uint32 depth)
 {
 	switch (depth) {
@@ -117,7 +119,7 @@ get_color_space_for_depth(uint32 depth)
 }
 
 
-static status_t
+status_t
 vbe_get_mode_info(bios_state* state, uint16 mode, struct vbe_mode_info* modeInfo)
 {
 	void* vbeModeInfo = sBIOSModule->allocate_mem(state,
@@ -151,7 +153,7 @@ vbe_get_mode_info(bios_state* state, uint16 mode, struct vbe_mode_info* modeInfo
 }
 
 
-static status_t
+status_t
 vbe_set_mode(bios_state* state, uint16 mode)
 {
 	bios_regs regs = {};
@@ -191,17 +193,11 @@ vbe_to_system_dpms(uint8 vbeMode)
 
 
 static status_t
-vbe_get_dpms_capabilities(uint32& vbeMode, uint32& mode)
+vbe_get_dpms_capabilities(bios_state* state, uint32& vbeMode, uint32& mode)
 {
 	// we always return a valid mode
 	vbeMode = 0;
 	mode = B_DPMS_ON;
-
-	// Prepare BIOS environment
-	bios_state* state;
-	status_t status = vbe_call_prepare(&state);
-	if (status != B_OK)
-		return status;
 
 	bios_regs regs = {};
 	regs.eax = 0x4f10;
@@ -209,30 +205,26 @@ vbe_get_dpms_capabilities(uint32& vbeMode, uint32& mode)
 	regs.esi = 0;
 	regs.edi = 0;
 
-	status = sBIOSModule->interrupt(state, 0x10, &regs);
+	status_t status = sBIOSModule->interrupt(state, 0x10, &regs);
 	if (status != B_OK) {
 		dprintf(DEVICE_NAME ": vbe_get_dpms_capabilities(): BIOS failed: %s\n",
 			strerror(status));
-		goto out;
+		return status;
 	}
 
 	if ((regs.eax & 0xffff) != 0x4f) {
 		dprintf(DEVICE_NAME ": vbe_get_dpms_capabilities(): BIOS returned "
 			"0x%04" B_PRIx32 "\n", regs.eax & 0xffff);
-		status = B_ERROR;
-		goto out;
+		return B_ERROR;
 	}
 
 	vbeMode = regs.ebx >> 8;
 	mode = vbe_to_system_dpms(vbeMode);
-
-out:
-	vbe_call_finish(state);
 	return status;
 }
 
 
-static status_t
+status_t
 vbe_set_bits_per_gun(bios_state* state, vesa_info& info, uint8 bits)
 {
 	info.bits_per_gun = 6;
@@ -260,18 +252,33 @@ vbe_set_bits_per_gun(bios_state* state, vesa_info& info, uint8 bits)
 
 
 static status_t
-vbe_set_bits_per_gun(vesa_info& info, uint8 bits)
+vbe_get_vesa_info(bios_state* state, vesa_info& info)
 {
-	info.bits_per_gun = 6;
+	vbe_info_block* infoHeader = (vbe_info_block*)sBIOSModule->allocate_mem(state, 256);
+	phys_addr_t physicalAddress = sBIOSModule->physical_address(state, infoHeader);
 
-	bios_state* state;
-	status_t status = vbe_call_prepare(&state);
-	if (status != B_OK)
+	bios_regs regs = {};
+	regs.eax = 0x4f00;
+	regs.es  = physicalAddress >> 4;
+	regs.edi = physicalAddress - (regs.es << 4);
+
+	status_t status = sBIOSModule->interrupt(state, 0x10, &regs);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME ": vbe_get_vesa_info(): BIOS failed: %s\n",
+			strerror(status));
 		return status;
+	}
 
-	status = vbe_set_bits_per_gun(state, info, bits);
+	if ((regs.eax & 0xffff) != 0x4f) {
+		dprintf(DEVICE_NAME ": vbe_get_vesa_info(): BIOS returned "
+			"0x%04" B_PRIx32 "\n", regs.eax & 0xffff);
+		return B_ERROR;
+	}
 
-	vbe_call_finish(state);
+	info.shared_info->vram_size = infoHeader->total_memory * 65536;
+	strlcpy(info.shared_info->name, (char*)sBIOSModule->virtual_address(state,
+			SEGMENTED_TO_LINEAR(infoHeader->oem_string)), 32);
+
 	return status;
 }
 
@@ -279,7 +286,7 @@ vbe_set_bits_per_gun(vesa_info& info, uint8 bits)
 /*!	Remaps the frame buffer if necessary; if we've already mapped the complete
 	frame buffer, there is no need to map it again.
 */
-static status_t
+status_t
 remap_frame_buffer(vesa_info& info, addr_t physicalBase, uint32 width,
 	uint32 height, int8 depth, uint32 bytesPerRow, bool initializing)
 {
@@ -402,12 +409,19 @@ vesa_init(vesa_info& info)
 		memcpy(&sharedInfo.edid_info, edidInfo, sizeof(edid1_info));
 	}
 
-	if (modes != NULL) {
-		vbe_get_dpms_capabilities(info.vbe_dpms_capabilities,
-			sharedInfo.dpms_capabilities);
-		if (bufferInfo->depth <= 8)
-			vbe_set_bits_per_gun(info, 8);
-	}
+	bios_state* state;
+	status_t status = vbe_call_prepare(&state);
+	if (status != B_OK)
+		return status;
+
+	vesa_identify_bios(state, &sharedInfo);
+
+	vbe_get_dpms_capabilities(state, info.vbe_dpms_capabilities,
+		sharedInfo.dpms_capabilities);
+	if (bufferInfo->depth <= 8)
+		vbe_set_bits_per_gun(state, info, 8);
+
+	vbe_call_finish(state);
 
 	dprintf(DEVICE_NAME ": vesa_init() completed successfully!\n");
 	return B_OK;
@@ -479,9 +493,6 @@ vesa_get_dpms_mode(vesa_info& info, uint32& mode)
 	mode = B_DPMS_ON;
 		// we always return a valid mode
 
-	if (info.modes == NULL)
-		return B_ERROR;
-
 	// Prepare BIOS environment
 	bios_state* state;
 	status_t status = vbe_call_prepare(&state);
@@ -519,9 +530,6 @@ out:
 status_t
 vesa_set_dpms_mode(vesa_info& info, uint32 mode)
 {
-	if (info.modes == NULL)
-		return B_ERROR;
-
 	// Only let supported modes through
 	mode &= info.shared_info->dpms_capabilities;
 

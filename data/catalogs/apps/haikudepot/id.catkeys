@@ -1,14 +1,12 @@
-1	indonesian	x-vnd.Haiku-HaikuDepot	3833361367
+1	indonesian	x-vnd.Haiku-HaikuDepot	2640598917
 Repository update error	LocalRepositoryUpdateProcess		Kesalahan pembaruan repositori
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Terjadi kesalahan saat menyegarkan repositori: %error%
 User Created	UserLoginWindow		Pengguna Dibuat
 Check for updates…	MainWindow		Memeriksa pembaruan…
-Uninstall	PackageManager		Hapus
 Uninstalled	PackageListView		Telah dilepas
 It was not possible to create the new user.	UserLoginWindow		Tadi tidak mungkin untuk membuat pengguna baru.
 Available packages	MainWindow		Paket yang tersedia
 Create account	UserLoginWindow		Membuat akun
-Mostly stable	RatePackageWindow		Sebagian besar stabil
 OK	App		OKE
 The response to the captcha was incorrect.	ServerHelper		Respons terhadap captcha salah.
 Develop packages	MainWindow		Paket pengembangan
@@ -17,20 +15,15 @@ Starting the package daemon failed:\n\n%Error%	App		Mulai layanan paket gagal :\
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Anda telah berhasil diautentikasi sebagai pengguna %Nickname%.
 <no info>	PackageInfoView		<no info>
 No user ratings available.	PackageInfoView		Tak tersedia penilaian pengguna.
-Downloading package '%name%'	WorkStatusView		Paket pengunduhan '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Tadi tidak mungkin mengekstraksi informasi captcha yang diperlukan dari data yang dikirim kembali dari server.
 Rating	PackageListView		Penilaian
 Synchronizing icons	ServerIconExportUpdateProcess		Ikon sinkronisasi
-Does not start	RatePackageWindow		Tidak memulai
 Show	MainWindow		Menunjukkan
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Terjadi kesalahan saat mendapatkan daftar paket:%message%
-Unstable but usable	RatePackageWindow		Tidak stabil tapi bisa digunakan
-Not specified	RatePackageWindow		Tidak ditentukan
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Aplikasi ini menulis dan membaca beberapa file yang berfungsi di komputer Anda agar berfungsi. Tampaknya ada masalah saat menulis file uji di [%TestFilePath%].Periksa bahwa tidak ada masalah dengan disk lokal Anda atau izin yang dapat mencegah aplikasi ini dari menulis file ke lokasi direktori itu. Anda dapat memilih untuk mengakui masalah ini dan melanjutkan, tetapi beberapa fungsi mungkin dinonaktifkan.
 Active	PackageListView		Aktif
 Login or Create account	MainWindow		Masuk atau Buat akun
 <Package contents not available for remote packages>	PackageContentsView		<Package contents not available for remote packages>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 package to download}other{# paket diunduh}}
 Ratings	PackageInfoView		Peringkat
 Switch account…	MainWindow		Beralih akun...
 Preferred language:	UserLoginWindow		Bahasa pilihan:
@@ -46,9 +39,6 @@ Category	FilterView		Kategori
 User rating	RatePackageWindow		Peringkat pengguna
 Installed packages	MainWindow		Paket-paket yang terpasang
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Objek yang diminta atau objek yang terlibat dalam permintaan tidak ditemukan di server.
-Stable	RatePackageWindow		Stabil
-Fatal error	PackageManager		Kesalahan fatal
-Package action failed	PackageInfoView		Tindakan paket gagal
 No changelog available.	PackageInfoView		Tak ada log perubahan tersedia.
 Error	App		Kesalahan
 There was a puzzling response from the web service.	UserLoginWindow		Ada respon membingungkan dari layanan web.
@@ -72,14 +62,12 @@ Package update error	MainWindow		Kesalahan pembaruan paket
 About	PackageInfoView		Tentang
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# proses}}
 Reboot required	PackageManager		Diperlukan boot ulang
-Very unstable	RatePackageWindow		Amat tak-stabil
 Password:	UserLoginWindow		Kata sandi:
 All packages	PackageListView		Semua paket
 Stability	RatePackageWindow		Kestabilan
 Send	RatePackageWindow		Kirim
 Start package daemon	App		Mulai daemon paket
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Kata sandi harus diulang untuk mengurangi kemungkinan memasukkan kata sandi yang salah.
-The package action could not be scheduled: %Error%	PackageInfoView		Tindakan paket tidak dapat dijadwalkan: %Error%
 Cancel	RatePackageWindow		Batal
 Inactive	PackageListView		Tak aktif
 Nickname:	UserLoginWindow		Nama panggilan:
@@ -88,7 +76,6 @@ There are problems in the supplied data:	UserLoginWindow		Ada masalah dalam data
 OK	MainWindow		OKE
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 Usage conditions download problem	UserLoginWindow		Masalah pengunduhan kondisi penggunaan
-OK	PackageInfoView		OKE
 Downloading:	PackageInfoView		Mengunduh:
 Success	UserLoginWindow		Berhasil
 Package daemon problem	App		Masalah daemon paket
@@ -101,8 +88,8 @@ Close	RatePackageWindow		Tutup
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Menyinkronkan data paket untuk repositori '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Lihat kondisi penggunaan
 Login issue	MainWindow		Masalah masukc
-Size	PackageListView		Ukuran
 Your rating:	RatePackageWindow		Penilaianmu:
+Size	PackageListView		Ukuran
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Pengguna %Nickname% telah berhasil dibuat di sistem HaikuDepotServer. Anda dapat mengelola detail pengguna Anda dengan menggunakan antarmuka web. Anda sekarang masuk sebagai pengguna baru ini.
 Your rating was updated.	RatePackageWindow		Peringkat anda telah diperbarui.
 All categories	FilterView		Semua kategori
@@ -111,9 +98,7 @@ n/a	PackageInfoView		n/a
 This rating is visible to other users	RatePackageWindow		Peringkat ini terlihat oleh pengguna lain
 View agreed usage conditions…	MainWindow		Lihat ketentuan penggunaan yang disepakati…
 Cancel	MainWindow		Batal
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}other{(# more to download)}}
 Refresh repositories	MainWindow		Muat-ulang repositori
-Tools	MainWindow		Perkakas
 Continue	App		Terus
 A password is required.	UserLoginWindow		Diperlukan kata sandi.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Paket ini sepertinya tidak ada di Server HaikuDepot, jadi tidak mungkin membuat peringkat baru atau mengedit peringkat yang sudah ada.
@@ -132,13 +117,12 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Menyi
 Stability:	RatePackageWindow		Kestabilan:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Perjanjian penggunaan harus disepakati dan konfirmasi harus dibuat bahwa orang yang membuat pengguna memenuhi persyaratan usia minimum.
 A validation error has occurred	ServerHelper		Kesalahan validasi telah terjadi
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Saat memperbarui data paket, muncul masalah yang dapat menyebabkan data menjadi usang atau hilang dari tampilan aplikasi. Rincian tambahan tentang masalah ini mungkin dapat diperoleh dari log aplikasi.\nInformasi tentang cara melihat log tersedia di bagian HaikuDepot pada panduan pengguna.
 The nickname is required.	UserLoginWindow		Nama panggilan diperlukan.
 Source packages	MainWindow		Paket sumber
 -	no package size		-
 Problem with working files	App		Masalah dengan file yang berkaitan
-Try again	App		Coba lagi
 Rate package	RatePackageWindow		Nilai paket
+Try again	App		Coba lagi
 Unknown	PackageListView		Tidak dikenal
 I agree to the usage conditions	UserLoginWindow		Saya menyetujui ketentuan penggunaan
 Log in	UserLoginWindow		Masuk
@@ -159,17 +143,14 @@ Captcha error	UserLoginWindow		Kesalahan captcha
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Nama panggilan harus unik, tetapi nama panggilan yang diberikan sudah diambil. Pilih nama panggilan yang berbeda.
 Manage repositories…	MainWindow		Kelola repositori…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Mengambil data repositori jarak jauh
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Terjadi kesalahan saat mengunduh kondisi penggunaan yang diperlukan untuk membuat pengguna baru. Periksa log untuk detailnya dan coba lagi.\nInformasi tentang cara melihat log tersedia di bagian HaikuDepot pada panduan pengguna.
 Description	PackageListView		Deskripsi
 Open %DeskbarLink%	PackageManager		Buka %DeskbarLink%
 User creation error	UserLoginWindow		Kesalahan pembuatan pengguna
-Install	PackageManager		Instalasi
 Input validation	UserLoginWindow		Validasi masukan
 Log in…	MainWindow		Log masuk…
 You need to be logged into an account before you can rate packages.	MainWindow		Anda harus masuk ke akun sebelum dapat memberi nilai paket.
 Client version too old	ServerHelper		Versi klien terlalu lama
 Local repository load error	LocalPkgDataLoadProcess		Kesalahan pemuatan repositori lokal
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Pengguna tidak ada atau kata sandi yang salah diberikan. Periksa kredensial Anda dan coba lagi.
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Masukkan kata kunci kembali:
 All repositories	MainWindow		Semua repositori

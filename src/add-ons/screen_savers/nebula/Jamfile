@@ -13,7 +13,7 @@ ScreenSaver Nebula :
 	be libscreensaver.so localestub [ TargetLibsupc++ ]
 ;
 
-DoCatalogs Message :
+DoCatalogs Nebula :
 	x-vnd.Haiku-NebulaScreensaver
 	:
 	Nebula.cpp

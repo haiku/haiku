@@ -75,9 +75,9 @@
 			   before you start, it is changed by the call to GetItemInfo().
 			   So, if it points to allocated memory, there is a good chance
 			   for a leak.  I would argue that Be should return B_BAD_VALUE
-			   if it points to non-NULL.  The OpenBeOS implementation does
+			   if it points to non-NULL.  The Haiku implementation does
 			   not return B_BAD_VALUE in this case so this assert would fail
-			   from OpenBeOS.  However, this is considered to be an acceptable
+			   from Haiku.  However, this is considered to be an acceptable
 			   deviation from Be's implementation.
 			name = NULL;
 			assert(myDeskbar.GetItemInfo(id, &name) == B_BAD_VALUE); */

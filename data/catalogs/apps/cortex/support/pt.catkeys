@@ -1,0 +1,76 @@
+1	portuguese	application/x-vnd.Cortex.support	877546517
+Recording	MediaString		Gravação
+(unknown format)	MediaString		(formato desconhecido)
+Clean buffers	MediaString		Limpar buffers
+Mono	MediaString		Mono
+MPEG1	MediaString		MPEG1
+Encoded video	MediaString		Vídeo codificado
+YUV444	MediaString		YUV444
+Port	MediaString		Porta
+16 bit integer	MediaString		Inteiro de 16 bit
+YCbCr411	MediaString		YCbCr411
+Offline	MediaString		Desligado
+YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		(orientação de vídeo desconhecida)
+QuickTime	MediaString		QuickTime
+Ambisonic WXYZ	MediaString		Ambisonic WXYZ
+(unknown video format)	MediaString		(formato de vídeo desconhecido)
+AVI format family	MediaString		Família de formatos AVI
+Homogenous buffers	MediaString		Buffers homogéneos
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
+Right	MediaString		Direito
+System mixer	MediaString		Misturador do sistema
+Physical output	MediaString		Saída física
+YUV420	MediaString		YUV420
+(unknown run mode)	MediaString		(modo de execução desconhecido)
+ kb/s	MediaString		 kb/s
+User-defined media type	MediaString		Tipo de mídia definido pelo utilizador
+QuickTime format family	MediaString		Família de formatos QuickTime
+Any format family	MediaString		Qualquer família de formatos
+Controllable	MediaString		Controlável
+32 bit integer	MediaString		Inteiro de 32 bit
+Side-right	MediaString		Lado direito
+ kHz	MediaString		 kHz
+Side-left	MediaString		Lado esquerdo
+(unknown multistream format)	MediaString		(formato multistream desconhecido)
+8 bit integer	MediaString		Inteiro de 8 bit
+YCbCr444	MediaString		YCbCr444
+Increase latency	MediaString		Aumentar latência
+MPEG format family	MediaString		Família de formatos MPEG
+(none)	MediaString		(nenhum)
+Center	MediaString		Centro
+ kb/s (max)	MediaString		 kb/s (máx.)
+Monochrome	MediaString		Monocromática
+Private Be media type	MediaString		Tipo de mídia privado Be
+ID	MediaString		ID
+AIFF format family	MediaString		Família de formatos AIFF
+YCbCr422	MediaString		YCbCr422
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		Família de formatos WAV
+ (NTSC)	MediaString		 (NTSC)
+Physical input	MediaString		Entrada física
+Big endian	MediaString		Big endian
+Sub	MediaString		Sub
+YUV411	MediaString		YUV411
+Encoded audio	MediaString		Áudio codificado
+Decrease precision	MediaString		Diminuir a precisão
+File interface	MediaString		Interface de ficheiro
+(unknown byte order)	MediaString		(ordem de bytes desconhecida)
+Typeless media	MediaString		Mídia sem tipo
+ (PAL)	MediaString		 (PAL)
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 kb/s (média)
+HTML	MediaString		HTML
+ProLogic LR	MediaString		ProLogic LR
+Parameters	MediaString		Parâmetros
+Left	MediaString		Esquerda
+BeOS video	MediaString		Vídeo BeOS
+Stereo	MediaString		Estéreo
+Bottom to top, left to right	MediaString		De baixo para cima, da esquerda para a direita
+Text	MediaString		Texto
+Unknown media type	MediaString		Tipo de mídia desconhecido
+MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		Família de formatos diversos

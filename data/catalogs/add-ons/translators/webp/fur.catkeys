@@ -1,25 +1,25 @@
 1	friulian	x-vnd.Haiku-WebPTranslator	828165164
-©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
-Compression method:	ConfigView		Metodi di compression:
-WebP image translator	ConfigView		Tradutôr imagjin WebP
-Preset	ConfigView		Prestabilît
-WebP images	WebPTranslator		Imagjins WebP
-WebPTranslator Settings	ConfigView		Impostazions WebPTranslator
-Output quality:	ConfigView		Cualitât in jessude:
-©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
-WebP Settings	main		Impostazions WebP
-Text	ConfigView		Test
-Slower but better	ConfigView		Miôr ma plui lente
-WebP image	WebPTranslator		Imagjin WebP
-Output preset:	ConfigView		Jessude prestabilide:
-Picture	ConfigView		Imagjin
-Low	ConfigView		Bas
-High	ConfigView		Alt
-Drawing	ConfigView		Dissen
-Based on libwebp %version%	ConfigView		Basât su libwebp %version%
-Default	ConfigView		Predefinît
-Fast	ConfigView		Veloç
+High	ConfigView		Elevade
+WebPTranslator Settings	ConfigView		Impostazions tradutôr WebP
+Low	ConfigView		Basse
+WebP image translator	ConfigView		Tradutôr di imagjin WebP
 Photo	ConfigView		Foto
-Preprocessing filter	ConfigView		Filtri pre-elaborazion
 WebP image translator	WebPTranslator		Tradutôr di imagjin WebP
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Picture	ConfigView		Figure
+Default	ConfigView		Predefinît
+Text	ConfigView		Test
+Preprocessing filter	ConfigView		Filtri di pre-elaborazion
+Compression method:	ConfigView		Metodi di compression:
+Preset	ConfigView		Pre-configurazion
+Drawing	ConfigView		Dissen
+Output preset:	ConfigView		Pre-configurazion di jessude:
+WebP Settings	main		Impostazions WebP
 Icon	ConfigView		Icone
+WebP image	WebPTranslator		Imagjin WebP
+Output quality:	ConfigView		Cualitât de jessude:
+Slower but better	ConfigView		Plui lent ma miôr
+Based on libwebp %version%	ConfigView		Basât su libwebp %version%
+Fast	ConfigView		Svelt
+WebP images	WebPTranslator		Imagjins WebP

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2008-2013, 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,32 +8,116 @@
  *		Braden Ewing, brewin@gmail.com
  *		Humdinger, humdingerb@gmail.com
  *		John Scipione, jscipione@gmail.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  */
 
 /* color names provided by: https://chir.ag/projects/name-that-color */
 
-html {
-	overflow-x: hidden;
-	overflow-y: scroll;
+/*
+	This stylesheet is designed to override the base style sheet doxygen.css
+	for Doxygen 1.8.20.
+
+	Some principles:
+		* Normal fonts are "Noto Sans",Arial,sans-serif
+		* Fixed space fonts are "Noto Sans Mono", Consolas, "Courier New", monospace, fixed;
+		* No rounded corners (border-radius: 0;)
+		* No box shadows (box-shadow: 0;)
+		* A selection of specific colors for borders, links, and other visual elements
+*/
+
+/* Override font selections */
+
+body, table, div, p, dl {
+	font: 400 14px/22px "Noto Sans",Arial,sans-serif;
 }
 
-body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,
-	p,blockquote,th,td {
-	margin: 0;
-	padding: 0;
+p.reference, p.definition {
+	font: 400 14px/22px "Noto Sans",Arial,sans-serif;
 }
+
+pre.fragment {
+	font-family: "Noto Sans Mono", Consolas, "Courier New", monospace, fixed;
+}
+
+div.line {
+	font-family: "Noto Sans Mono", Consolas, "Courier New", monospace, fixed;
+	line-height: 1.4;
+}
+
+.overload {
+	font-family: "Noto Sans Mono", Consolas, "Courier New", monospace, fixed;
+}
+
+.params .paramdir, .tparams .paramdir {
+	font-family: "Noto Sans Mono", Consolas, "Courier New", monospace, fixed;
+}
+
+table.directory {
+    font: 400 14px "Noto Sans", Arial,sans-serif;
+}
+
+.navpath li.navelem a
+{
+	font-family: "Noto Sans", Arial, sans-serif;
+}
+
+div.toc li {
+	font: 10px/1.2 "Noto Sans", Arial,sans-serif;
+}
+
+div.toc h3 {
+	font: bold 12px/1.2 "Noto Sans", Arial,sans-serif;
+}
+
+#powerTip div {
+	font: 12px/16px "Noto Sans", Arial,sans-serif;
+}
+
+/* Remove rounded borders */
+div.ah, span.ah {
+	border-radius: 0;
+}
+
+.memtitle {
+	border-radius: 0;
+}
+
+.memproto, dl.reflist dt {
+	border-radius: 0;
+}
+
+.memdoc, dl.reflist dd {
+	border-radius: 0;
+}
+
+table.fieldtable {
+	border-radius: 0;
+}
+
+.fieldtable th {
+	border-radius: 0;
+}
+
+div.toc {
+	border-radius: 0;
+}
+
+#powerTip {
+	border-radius: 0;
+}
+
+/* Colors and headers */
 
 body {
 	color: #333333; /* mine shaft */
 	background-color: white;
-	font-size: 14.4px;
-	font-family: "Noto Sans", Arial, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
 	color: #0c3762; /* madison */
 	margin-top: 1em;
 	margin-bottom: 1em;
+	margin-right: 0;
 }
 
 h1 {
@@ -64,37 +148,34 @@ h5, h6 {
 	font-weight: normal;
 }
 
-p {
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
+.title {
+	color: #0c3762; /* madison */
+	font-size: 1.3em;
+	font-weight: bold;
+	border-bottom: dotted thin #c0c0c0; /* silver */
+	margin-top: 1em;
+	margin-bottom: 1em;
 }
 
-table {
-	border-collapse: collapse;
-	border-spacing: 0;
+h2.groupheader, h2.memtitle {
+	font-size: 1.3em;
+	border: none;
+	border-bottom: dotted thin #c0c0c0; /* silver */
+	color: #0c3762;
+	margin-top: 1em;
+	padding: 0;
+	background: none;
 }
 
-td, th {
-	vertical-align: top;
-	text-align: left;
-	padding: 4px;
+.dirtab {
+	border: 1px solid #84b0c7; /* glacier */
 }
 
-caption {
-	text-align:left;
+th.dirtab {
+	background-color: #f3f3f3; /* concrete */
 }
 
-fieldset,img {
-	border: 0;
-}
-
-q:before,q:after {
-	content: '';
-}
-
-abbr,acronym {
-	border: 0;
-}
+/* Links */
 
 a:link {
 	font-weight: bold;
@@ -102,7 +183,7 @@ a:link {
 	color: #dc3c01; /* grenadier */
 }
 
-a:visited {
+.contents a:visited {
 	font-weight: bold;
 	text-decoration: none;
 	color: #892601; /* peru tan */
@@ -112,20 +193,6 @@ a:hover, a:active {
 	text-decoration: underline;
 	color: #ff4500; /* vermilion */
 }
-
-dl.since {
-	margin-top: 1em;
-}
-
-dl.since dt {
-	display: inline;
-	padding-right: 0.5em;
-}
-
-dl.since dd {
-	display: inline;
-}
-
 
 /* Some headers act as anchors, don't give them a hover effect */
 
@@ -186,6 +253,8 @@ div.header {
 	margin: 10px auto;
 	min-width: 59em;
 	max-width: 70em;
+	border: none;
+	background: none;
 }
 
 div.summary {
@@ -199,6 +268,7 @@ div.summary {
 div.headertitle {
 	min-width: 59em;
 	max-width: 70em;
+	padding: 0;
 }
 
 div.headertitle div.title {
@@ -214,7 +284,23 @@ div.headertitle div.title {
 	margin-top: 10px;
 }
 
-/* Navigation Tabs */
+/* Make the "Since" member docs one line */
+
+dl.since {
+	margin-top: 1em;
+}
+
+dl.since dt {
+	display: inline;
+	padding-right: 0.5em;
+}
+
+dl.since dd {
+	display: inline;
+}
+
+
+/* Navigation Tabs (overrides tabs.css) */
 
 .sm-dox {
 	background: #e0e0e0; /* alto */
@@ -311,24 +397,6 @@ div#main-nav ul#main-menu {
 	max-width: 70em;
 }
 
-div.tabs, div.tabs2, div.tabs3 {
-	position: relative;
-	left: 0;
-	top: 0;
-	background: #e0e0e0; /* alto */
-	margin: 0;
-	padding: 0;
-}
-
-div.tabs ul.tablist, div.tabs2 ul.tablist, div.tabs3 ul.tablist {
-	margin: 0 auto;
-	padding-top: 3px;
-	padding-bottom: 2px;
-	list-style: none;
-	min-width: 59em;
-	max-width: 70em;
-}
-
 div.navpath {
 	margin: 20px auto;
 	min-width: 59em;
@@ -359,21 +427,29 @@ div.tabs ul.tablist li li.current a, div.tabs2 ul.tablist li li.current a,
 	text-decoration: none;
 }
 
-/* Contents div */
+/* Standard table styling */
 
-div.contents, footer {
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+td, th {
+	vertical-align: top;
+	text-align: left;
+	padding: 4px;
+}
+
+/* Contents & footer: center on page with a maximum width */
+
+div.contents, .footer {
 	line-height: 1.5;
 	margin: 10px auto;
 	min-width: 59em;
 	max-width: 70em;
 }
-footer {
-	font-size: 90%;
-}
 
-div.contents ul, div.contents ol {
-	line-height: 1.3;
-}
+/* Contents: Style the elements on the page */
 
 div.contents em, div.contents code, div.contents .mlabel {
 	font-weight: normal;
@@ -387,16 +463,31 @@ div.contents em {
 div.contents .mlabels-right {
 	vertical-align: middle;
 }
-div.contents code, div.contents .mlabel {
+
+
+div.contents code, span.mlabel {
 	color: blue;
-	font-family: "Deja Vu Mono", Consolas, "Courier New", monospace, fixed;
+	font-family: "Noto Sans Mono", Consolas, "Courier New", monospace, fixed;
 	font-weight: normal;
 	font-style: normal;
+	border:none;
 }
-div.contents .mlabel:before {
+
+div.title span.mlabel {
+	background-color: white;
+	font-size: 14.4px;
+}
+
+div.memproto span.mlabel {
+	background-color: #f3f3f3; /* concrete */
+	font-size: 14.4px;
+}
+
+span.mlabel:before {
 	content: "[";
 }
-div.contents .mlabel:after {
+
+span.mlabel:after {
 	content: "]";
 }
 
@@ -541,7 +632,6 @@ dl.note dd, dl.remark dd, dl.warning dd, dl.attention dd {
 	color: black; /* pseudo-bold */
 }
 
-
 /* For keyboard shortcuts and the like (also from userguide) */
 
 div.contents span.keycap {
@@ -558,78 +648,8 @@ div.contents span.keycap {
 	font-variant: small-caps;
 }
 
-
 /* Continue with the rest of the standard Doxygen stuff... */
 
-CAPTION { font-weight: bold }
-div.qindex {
-	width: 100%;
-	background-color: #f3f3f3; /* concrete */
-	border: 1px solid #c0c0c0; /* silver */
-	text-align: center;
-	margin: 2px;
-	padding: 2px;
-	line-height: 1.3;
-}
-div.nav {
-	width: 100%;
-	background-color: #f3f3f3; /* concrete */
-	border: 1px solid #c0c0c0; /* silver */
-	text-align: center;
-	margin: 2px;
-	padding: 2px;
-	line-height: 1.3;
-}
-div.navtab {
-	background-color: #f3f3f3; /* concrete */
-	border: 1px solid #c0c0c0; /* silver */
-	text-align: center;
-	margin: 2px;
-	margin-right: 15px;
-	padding: 2px;
-}
-TD.navtab {
-	;
-}
-A.qindex {
-	text-decoration: none;
-	font-weight: bold;
-	color: #1a419d; /* fun blue */
-}
-A.qindex:visited {
-	text-decoration: none;
-	font-weight: bold;
-	color: #1a419d; /* fun blue */
-}
-A.qindex:hover {
-	text-decoration: none;
-	background-color: #ddddff; /* fog */
-}
-A.qindexHL {
-	text-decoration: none;
-	font-weight: bold;
-	background-color: #6666cc; /* blue marguerite */
-	color: white;
-	border: 1px double #9295c2; /* bell blue */
-}
-A.qindexHL:hover {
-	text-decoration: none;
-	background-color: #6666cc; /* blue marguerite */
-	color: white;
-}
-A.qindexHL:visited {
-	text-decoration: none;
-	background-color: #6666cc; /* blue marguerite */
-	color: white;
-}
-A.elRef {
-	font-weight: bold
-}
-A.code:link {
-	text-decoration: none;
-	font-weight: normal;
-	color: blue;
-}
 A.code:visited {
 	text-decoration: none;
 	font-weight: normal;
@@ -646,14 +666,15 @@ A.codeRef:visited {
 dl.el {
 	margin-left: -1cm
 }
+
+/* Code blocks */
 div.fragment {
-	white-space: pre;
 	width: 99%;
 	background-color: #f3f3f3; /* concrete */
 	border: 1px solid #c0c0c0; /* silver */
 	padding: 4px;
 	color: black;
-	font-family: "Deja Vu Mono", Consolas, "Courier New", monospace, fixed;
+	font-family: "Noto Sans Mono", Consolas, "Courier New", monospace, fixed;
 	font-weight: normal;
 	font-style: normal;
 	font-size: 13px;
@@ -698,39 +719,7 @@ TD.indexvalue {
 TR.memlist {
    background-color: #f0f0f0; /* gallery */
 }
-P.formulaDsp { text-align: center; }
-IMG.formulaDsp { }
-IMG.formulaInl { vertical-align: middle; }
-SPAN.keyword       { color: #008000; /* japanese laurel */ }
-SPAN.keywordtype   { color: #5c5f05; /* antique bronze */ }
-SPAN.keywordflow   { color: #e08000; /* mango tango */ }
-SPAN.comment       { color: #008000; /* japanese laurel */ }
-SPAN.preprocessor  { color: #806020; /* kumera */ }
-SPAN.stringliteral { color: gray; }
-SPAN.charliteral   { color: #008080; /* teal */ }
-.search {
-	color: #003399; /* smalt */
-	font-weight: bold;
-}
-FORM.search {
-	margin-bottom: 0px;
-	margin-top: 0px;
-}
-INPUT.search {
-	color: #000080; /* navy blue */
-	font-weight: normal;
-	background-color: #f3f3f3; /* concrete */
-}
-TD.tiny { font-size: 75%; }
-.dirtab {
-	padding: 4px;
-	border-collapse: collapse;
-	border: 1px solid #84b0c7; /* glacier */
-}
-TH.dirtab {
-	background-color: #f3f3f3; /* concrete */
-	font-weight: bold;
-}
+
 
 /* member declaration table */
 
@@ -740,7 +729,7 @@ table.memberdecls {
 
 table.memberdecls td.memItemLeft {
 	font-size: 13px;
-	font-family: "Deja Vu Mono", Consolas, "Courier New", monospace, fixed;
+	font-family: "Noto Sans Mono", Consolas, "Courier New", monospace, fixed;
 	white-space: nowrap;
 	text-align: right;
 	padding: 6px 0px 4px 8px;
@@ -753,7 +742,7 @@ table.memberdecls td.memItemLeft {
 
 table.memberdecls td.memItemRight {
 	font-size: 13px;
-	font-family: "Deja Vu Mono", Consolas, "Courier New", monospace, fixed;
+	font-family: "Noto Sans Mono", Consolas, "Courier New", monospace, fixed;
 	padding: 6px 8px 4px 0px;
 	margin: 4px;
 	vertical-align: top;
@@ -852,6 +841,8 @@ div.memnav {
 div.memitem {
 	margin-bottom: 20px;
 	width: 100%;
+	box-shadow: none;
+	transition: none;
 }
 
 div.memitem dl.info, div.memitem dl.note, div.memitem dl.attention,
@@ -866,7 +857,9 @@ div.memproto {
 	padding: 4px;
 	background-color: #f3f3f3; /* concrete */
 	border: 1px solid #c0c0c0; /* silver */
-	font-family: "Deja Vu Mono", Consolas, "Courier New", monospace, fixed;
+	font-family: "Noto Sans Mono", Consolas, "Courier New", monospace, fixed;
+	box-shadow: none;
+	border-radius: 0;
 }
 
 div.memproto table {
@@ -877,6 +870,7 @@ div.memproto table {
 
 div.memproto table.memname {
 	line-height: 1.3;
+	font-family: "Noto Sans Mono", Consolas, "Courier New", monospace, fixed;
 }
 
 div.memproto table.memname td.paramtype {
@@ -895,10 +889,13 @@ div.memproto table.memname td.memname {
 	white-space: nowrap;
 }
 
-/* member documetation */
+/* member documentation */
 
 div.memdoc {
 	width: 100%;
+	border: none;
+	box-shadow: none;
+	background: none;
 }
 
 div.memdoc div.memproto {
@@ -964,81 +961,19 @@ div.memdoc dl dd table.retval td.paramname {
 
 /* End Styling for detailed member documentation */
 
-/* for the tree view */
-.ftvtree {
-	font-family: sans-serif;
-	margin: 0.5em;
+/* Tree View on Directory Pages */
+div.directory {
+	border-top: 1px solid #c0c0c0; /* silver */
+	border-bottom: 1px solid #c0c0c0; /* silver */
 }
 
-.directory { font-size: 14.4px; font-weight: bold; }
-.directory h3 { margin: 0px; margin-top: 1em; font-size: 11pt; }
-.directory > h3 { margin-top: 0; }
-.directory p { margin: 0px; white-space: nowrap; }
-.directory div { display: none; margin: 0px; }
-.directory img { vertical-align: -30%; }
+.directory .levels span {
+	color: #dc3c01; /* grenadier */
+}
 
-/* printer only pretty stuff */
-@media print {
-	/* suggest page orientation */
-	@page { size: portrait; }
-	.noprint {
-		display: none;
-	}
+/* Footer: color separator */
 
-	html {
-		background: #FFF;
-	}
-
-	/* hide header and nav bar */
-	#banner {
-		display:none;
-	}
-
-	div.tabs, div.tabs2, div.tabs3 {
-		display:none;
-	}
-
-	div.summary {
-		margin: 0px;
-		padding: 0px;
-	}
-
-	div.headertitle {
-		margin: 0px;
-		padding: 0px;
-	}
-
-	div.content {
-		margin: 0px;
-		padding: 0px;
-	}
-
-	/* some links we want to print the url along with (CSS2) */
-	a.printurl:after {
-		content: " <" attr(href) ">";
-		font-weight: normal;
-		font-size: small;
-	}
-
-	/* override for those we really don't want to print */
-	a.noprinturl:after {
-		content: "";
-	}
-
-	/* for acronyms we want their definitions inlined at print time */
-	acronym[title]:after {
-		font-size: small;
-		content: " (" attr(title) ")";
-		font-style: italic;
-	}
-
-	/* and not have mozilla dotted underline */
-	acronym {
-		border: none;
-	}
-
-	pre.terminal { /* Terminal output black on white */
-		background-color: #ffffff;
-		color: #000000;
-	}
+hr.footer {
+	height: 1px;
+	border-top: 1px solid #c0c0c0;
 }

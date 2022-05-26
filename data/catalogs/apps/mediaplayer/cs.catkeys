@@ -1,0 +1,157 @@
+1	czech	x-vnd.Haiku-MediaPlayer	716811487
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do koše
+Close	MediaPlayer-PlaylistWindow		Zavřít
+Volume of background clips	MediaPlayer-SettingsWindow		Hlasitost klipů na pozadí
+Use hardware video overlays if available	MediaPlayer-SettingsWindow		Použít hardwareový video overlay, je-li dostupný
+Audio	MediaPlayer-InfoWin		Zvuk
+Subtitle placement:	MediaPlayer-SettingsWindow		Umístění titulků:
+MediaPlayer	System name		Přehrávač multimédií
+Audio track	MediaPlayer-Main		Audio stopa
+Muted	MediaPlayer-SettingsWindow		Vypnutý zvuk
+OK	MediaPlayer-RemovePLItemsCmd		OK
+Open Playlist	MediaPlayer-PlaylistWindow		Otevřít Playlist
+Subtitles	MediaPlayer-Main		Titulky
+%app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		V aplikaci %app% se vyskytla vnitřní chyba. Soubor nebylo možné otevřít.
+DrawBitmap	MediaPlayer-InfoWin		Kreslit rastr
+File info	MediaPlayer-InfoWin		Informace o souboru
+raw audio	MediaPlayer-InfoWin		nezpracovaný zvuk
+Select all	MediaPlayer-PlaylistWindow		Vybrat vše
+New player…	MediaPlayer-Main		Nový přehrávač...
+Move Entries	MediaPlayer-MovePLItemsCmd		Přesunout položky
+OK	MediaPlayer-Main		OK
+Remove	MediaPlayer-PlaylistWindow		Odstranit
+<unknown>	MediaPlayer-InfoWin		<neznámý>
+Resume:	MediaPlayer-SettingsWindow		Pokračovat:
+Duration	MediaPlayer-InfoWin		Trvání
+Import Entries	MediaPlayer-ImportPLItemsCmd		Importovat položky
+Open network stream	MediaPlayer-Main		Otevřít síťový proud
+Move file to Trash	MediaPlayer-PlaylistWindow		Přesunout soubor do koše
+Open file…	MediaPlayer-Main		Otevřít soubor...
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Přizpůsobit velikost ovládacích prvků v režimu celé obrazovky
+View options	MediaPlayer-SettingsWindow		Volby zobrazení
+%d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Vysunout zařízení
+Full volume	MediaPlayer-SettingsWindow		Plná hlasitost
+<untitled>	PlaylistItem-title		<bez titulku>
+Start media server	MediaPlayer-Main		Spustit media server
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Vypadá to, že media server neběží.\nChcete jej spustit?
+Location	MediaPlayer-InfoWin		Umístění
+Opening '%s'.	MediaPlayer-Main		Otevírám '%s'.
+Medium	MediaPlayer-SettingsWindow		Střední
+Play mode	MediaPlayer-SettingsWindow		Režim přehrávání
+Playlist	MediaPlayer-PlaylistWindow		Playlist
+%d Bit	MediaPlayer-InfoWin		%d bitů
+Track	Audio Track Menu		Stopa
+Close	MediaPlayer-Main		Zavřít
+Save error	MediaPlayer-PlaylistWindow		Chyba uložení
+Attributes	MediaPlayer-Main		Atributy
+Bottom of screen	MediaPlayer-SettingsWindow		Spodek obrazovky
+MediaPlayer settings	MediaPlayer-SettingsWindow		Nastavení Přehrávače médií
+Copyright	MediaPlayer-InfoWin		Autorská práva
+Invalid URL inserted!	MediaPlayer-NetworkStream		Vloženo neplatné URL!
+Aspect ratio	MediaPlayer-Main		Poměr stran
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Uložení playlistu selhalo.\n\nChyba:
+<no media>	MediaPlayer-InfoWin		<žádné médium>
+Hide interface	MediaPlayer-Main		Skrýt rozhraní
+Error: 	MediaPlayer-Main		Chyba:
+Video track	MediaPlayer-Main		Video stopa
+Playlist…	MediaPlayer-Main		Playlist...
+<unnamed media>	MediaPlayer-InfoWin		<médium bez názvu>
+Save	MediaPlayer-PlaylistWindow		Uložit
+Randomize Entries	MediaPlayer-RandomizePLItemsCmd		Zamíchat položky
+Cancel	MediaPlayer-NetworkStream		Zrušit
+Nothing to Play	MediaPlayer-Main		Není co přehrát
+OK	MediaPlayer-SettingsWindow		OK
+Remove Entries	MediaPlayer-RemovePLItemsCmd		Odstranit položky
+never	MediaPlayer-SettingsWindow		nikdy
+Loop audio	MediaPlayer-SettingsWindow		Přehrávat zvuk dokola
+Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Vnitřní chyba (zdeformovaná zpráva). Uložení playlistu selhalo.
+Open…	MediaPlayer-PlaylistWindow		Otevřít...
+Revert	MediaPlayer-SettingsWindow		Vrátit
+Low volume	MediaPlayer-SettingsWindow		Nízká hlasitost
+Audio	MediaPlayer-Main		Audio
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} =3{3 kanály} =4{4 kanály} other{# kanálů}}
+Quit	MediaPlayer-Main		Ukončit
+Redo	MediaPlayer-PlaylistWindow		Znovu
+Move Entry	MediaPlayer-MovePLItemsCmd		Přesunout položku
+<unknown>	PlaylistItem-author		<neznámý>
+Cancel	MediaPlayer-SettingsWindow		Zrušit
+Large	MediaPlayer-SettingsWindow		Veliký
+Import Entry	MediaPlayer-ImportPLItemsCmd		Importovat položku
+unknown format	MediaPlayer-InfoWin		neznámý formát
+Track %d	MediaPlayer-Main		Stopa %d
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Všechny soubory nemohly být přesunuty do koše.
+Total duration: %s	MediaPlayer-PlaylistWindow		Celková délka: %s
+%.3f kHz	MediaPlayer-InfoWin		%.3f kHz
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Chyba při přesouvání do koše
+50% scale	MediaPlayer-Main		50% měřítko
+Drop files to play	MediaPlayer-Main		Upusťte soubory pro jejich přehrání
+Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopírovat položku
+Close window after playing audio	MediaPlayer-SettingsWindow		Zavřít okno po přehrání zvuku
+Edit	MediaPlayer-PlaylistWindow		Editovat
+Copy Entries	MediaPlayer-CopyPLItemsCmd		Kopírovat položky
+Always on top	MediaPlayer-Main		Vždy navrchu
+Open	MediaPlayer-PlaylistWindow		Otevřít
+always	MediaPlayer-SettingsWindow		vždy
+Loop video	MediaPlayer-SettingsWindow		Přehrávat video dokola
+Stream URL:	MediaPlayer-NetworkStream		URL proudu:
+<unknown>	PlaylistItem-album		<neznámý>
+Stream settings	MediaPlayer-Main		Nastavení streamu
+none	Subtitles menu		žádný
+Save Playlist	MediaPlayer-PlaylistWindow		Uložit Playlist
+Overlay	MediaPlayer-InfoWin		Překrytí
+2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
+Rating	MediaPlayer-Main		Hodnocení
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Vnitřní chyba (out of memory). Uložení playlistu selhalo.
+Video	MediaPlayer-Main		Video
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Není nainstalován žádný dekodér pro tento formát souboru, nebo má dekodér problém se specifickou verzí tohoto formátu.
+Lock Peaks	MediaPlayer-PeakView		Zamknout špičky
+none	Audio track menu		žádný
+Open network stream	MediaPlayer-NetworkStream		Otevřít síťový proud
+Automatically start playing	MediaPlayer-SettingsWindow		Automaticky spustit přehrávání
+Undo	MediaPlayer-PlaylistWindow		Zpět
+Display mode	MediaPlayer-InfoWin		Zobrazovací režim
+Bottom of video	MediaPlayer-SettingsWindow		Spodek videa
+Small	MediaPlayer-SettingsWindow		Malý
+Settings…	MediaPlayer-Main		Nastavení...
+min	MediaPlayer-InfoWin	Minutes	min
+Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Uložení plalistu selhalo:\n\nChyba:
+Video	MediaPlayer-InfoWin		Video
+File info…	MediaPlayer-Main		Informace o souboru...
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americký)
+<unnamed>	PlaylistItem-name		<bezejmenný>
+Track	Video Track Menu		Stopa
+Full screen	MediaPlayer-Main		Celá obrazovka
+OK	MediaPlayer-NetworkStream		OK
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Vnitřní chyba (locking failed). Uložení playlistu selhalo.
+100% scale	MediaPlayer-Main		100% měřítko
+<nothing to redo>	MediaPlayer-PlaylistWindow		<nic, co by šlo vrátit>
+Bad URL	MediaPlayer-NetworkStream		Chybné URL
+Save	MediaPlayer-Main		Uložit
+Close window after playing video	MediaPlayer-SettingsWindow		Zavřít okno po přehrání videa
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Měnit velikost filmů hladce (non-overlay režim)
+200% scale	MediaPlayer-Main		200% měřítko
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Soubor '%filename' nebylo možné otevřít.\n\n
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Žádný ze souborů, které jste chtěli přehrát, nevypadá jako media soubor.
+Remove Entry	MediaPlayer-RemovePLItemsCmd		Odstranit položku
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Odstranit položky do koše
+Subtitle size:	MediaPlayer-SettingsWindow		Velikost Titulků:
+No aspect correction	MediaPlayer-Main		Bez korekce poměru stran
+raw video	MediaPlayer-InfoWin		nezpracované video
+Container	MediaPlayer-InfoWin		Kontejnér
+none	MediaPlayer-Main		žádné
+Open clips	MediaPlayer-Main		Otevřít klipy
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Některé soubory nemohly být přesunuty do koše.
+<nothing to undo>	MediaPlayer-PlaylistWindow		<není co vzít zpět>
+Save as…	MediaPlayer-PlaylistWindow		Uložit jako...
+Error: 	MediaPlayer-RemovePLItemsCmd		Chyba:
+300% scale	MediaPlayer-Main		300% měřítko
+Open	MediaPlayer-Main		Otevřít
+ask every time	MediaPlayer-SettingsWindow		vždy se zeptat
+(not supported)	MediaPlayer-InfoWin		(nepodporováno)
+Randomize	MediaPlayer-PlaylistWindow		Náhodně
+%.3f fps	MediaPlayer-InfoWin		%.3f fps
+Off	Subtitles menu		Vypnuto
+400% scale	MediaPlayer-Main		400% měřítko
+h	MediaPlayer-InfoWin	Hours	h
+OK	MediaPlayer-PlaylistWindow		OK

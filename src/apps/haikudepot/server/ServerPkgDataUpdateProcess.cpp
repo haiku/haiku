@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -51,14 +51,12 @@ public:
 
 private:
 			int32				IndexOfPackageByName(const BString& name) const;
-			int32				IndexOfCategoryByName(
-									const BString& name) const;
-			int32				IndexOfCategoryByCode(
-									const BString& code) const;
 
+private:
 			BString				fDepotName;
 			Model*				fModel;
-			CategoryList		fCategories;
+			std::vector<CategoryRef>
+								fCategories;
 			Stoppable*			fStoppable;
 			uint32				fCount;
 			bool				fDebugEnabled;
@@ -74,32 +72,11 @@ PackageFillingPkgListener::PackageFillingPkgListener(Model* model,
 	fCount(0),
 	fDebugEnabled(Logger::IsDebugEnabled())
 {
-	fCategories = model->Categories();
 }
 
 
 PackageFillingPkgListener::~PackageFillingPkgListener()
 {
-}
-
-
-	// TODO; performance could be improved by not needing the linear search
-
-inline int32
-PackageFillingPkgListener::IndexOfCategoryByCode(
-	const BString& code) const
-{
-	int32 i;
-	int32 categoryCount = fCategories.CountItems();
-
-	for (i = 0; i < categoryCount; i++) {
-		const CategoryRef categoryRef = fCategories.ItemAtFast(i);
-
-		if (categoryRef->Code() == code)
-			return i;
-	}
-
-	return -1;
 }
 
 
@@ -133,22 +110,23 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 			package->SetFullDescription(*(pkgVersion->Description()));
 
 		if (!pkgVersion->PayloadLengthIsNull())
-			package->SetSize(pkgVersion->PayloadLength());
+			package->SetSize(static_cast<off_t>(pkgVersion->PayloadLength()));
+
+		if (!pkgVersion->CreateTimestampIsNull())
+			package->SetVersionCreateTimestamp(pkgVersion->CreateTimestamp());
 	}
 
 	int32 countPkgCategories = pkg->CountPkgCategories();
 
 	for (i = 0; i < countPkgCategories; i++) {
 		BString* categoryCode = pkg->PkgCategoriesItemAt(i)->Code();
-		int categoryIndex = IndexOfCategoryByCode(*(categoryCode));
+		CategoryRef category = fModel->CategoryByCode(*categoryCode);
 
-		if (categoryIndex == -1) {
+		if (!category.IsSet()) {
 			HDERROR("unable to find the category for [%s]",
 				categoryCode->String());
-		} else {
-			package->AddCategory(
-				fCategories.ItemAtFast(categoryIndex));
-		}
+		} else
+			package->AddCategory(category);
 	}
 
 	RatingSummary summary;
@@ -168,12 +146,12 @@ PackageFillingPkgListener::ConsumePackage(const PackageInfoRef& package,
 
 	for (i = 0; i < countPkgScreenshots; i++) {
 		DumpExportPkgScreenshot* screenshot = pkg->PkgScreenshotsItemAt(i);
-		package->AddScreenshotInfo(ScreenshotInfo(
+		package->AddScreenshotInfo(ScreenshotInfoRef(new ScreenshotInfo(
 			*(screenshot->Code()),
 			static_cast<int32>(screenshot->Width()),
 			static_cast<int32>(screenshot->Height()),
 			static_cast<int32>(screenshot->Length())
-		));
+		), true));
 	}
 
 	HDDEBUG("did populate data for [%s] (%s)", pkg->Name()->String(),
@@ -197,20 +175,15 @@ PackageFillingPkgListener::Count()
 bool
 PackageFillingPkgListener::Handle(DumpExportPkg* pkg)
 {
-	const DepotInfo* depotInfo = fModel->DepotForName(fDepotName);
+	AutoLocker<BLocker> locker(fModel->Lock());
+	DepotInfoRef depot = fModel->DepotForName(fDepotName);
 
-	if (depotInfo != NULL) {
+	if (depot.Get() != NULL) {
 		const BString packageName = *(pkg->Name());
-		int32 packageIndex = depotInfo->PackageIndexByName(packageName);
-
-		if (-1 != packageIndex) {
-			const PackageList& packages = depotInfo->Packages();
-			const PackageInfoRef& packageInfoRef =
-				packages.ItemAtFast(packageIndex);
-
-			AutoLocker<BLocker> locker(fModel->Lock());
-			ConsumePackage(packageInfoRef, pkg);
-		} else {
+		PackageInfoRef package = depot->PackageByName(packageName);
+		if (package.Get() != NULL)
+			ConsumePackage(package, pkg);
+		else {
 			HDINFO("[PackageFillingPkgListener] unable to find the pkg [%s]",
 				packageName.String());
 		}

@@ -1,17 +1,17 @@
-1	ukrainian	x-vnd.Haiku-Login	336867745
+1	ukrainian	x-vnd.Haiku-Login	3568987751
 Invalid login!	Login View		Невірний логін!
 Error	Login App		Помилка
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tЗапустити в режимі редагування для того, щоб налаштувати робочий стіл.\n
+Login application for Haiku\nUsage:	Login App		Авторизація для Haiku\nВикористання:
+--nonmodal\tDo not make the window modal	Login App		--nonmodal\tНе робити вікно модальним
 Welcome to Haiku	Login Window		Запрошуємо в Haiku
 Halt	Login View		Зупинити
-Login application for Haiku\nUsage:\n	Login App		Програма для авторизації у Haiku\nВикористання:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tНе робити вікно модальним\n
 Desktop	Desktop Window		Робочий стіл
 Hide password	Login View		Приховати пароль
 Reboot	Login View		Перезавантажити
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Щоб налаштувати робочий стіл, який відображається позаду програми Авторизація, скиньте на нього репліканти.\n\n Коли Ви завершите просто вийдіть з програми (Cmd-Q).
 OK	Login View		ОК
 Info	Login App		Інфо
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tЗапуск у режимі редагування для налаштування робочого столу.
 Login:	Login View		Логін:
 Password:	Login View		Пароль:
 Unimplemented	Login App		Не реалізовано

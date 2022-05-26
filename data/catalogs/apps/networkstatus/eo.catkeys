@@ -1,22 +1,23 @@
-1	esperanto	x-vnd.Haiku-NetworkStatus	186344131
-Netmask	NetworkStatusView		Retmasko
+1	esperanto	x-vnd.Haiku-NetworkStatus	2828540217
+IPv6 address:	NetworkStatusView		IPv6 adreso:
 Quit	NetworkStatusView		Ĉesi
 Unknown	NetworkStatusView		Nekonata
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Lanĉado de agordilo por reto malsukcesis.\n\nEraro: 
 Install in Deskbar	NetworkStatus		Instaliĝi Laborstrie
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opcioj de la Retstato:\n\t--deskbar\taŭtomate aldoni replikilon al Laborstrio\n\t--help\t\tmontri ĉi informon kaj fini
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Parametroj de Retstato:\n\t--deskbar\tmemage aldoni replikilon al Laborstrio\n\t--help\t\tmontri ĉi tiujn informojn kaj ĉesi
 Open network preferences…	NetworkStatusView		Agordi reton…
 NetworkStatus	System name		Retstato
+Broadcast:	NetworkStatusView		Dissendadreso:
 OK	NetworkStatusView		Bone
 No link	NetworkStatusView		Konekto forestas
 Could not join wireless network:\n	NetworkStatusView		Ne povas konekti sendratan reton:\n
 Ready	NetworkStatusView		Preta
 Network Status	NetworkStatusView		Stato de reto
-Address	NetworkStatusView		Adreso
 Deskbar is not running, giving up.	NetworkStatus		Laborstrio ne estas rulata, mi rezignas.
+Netmask:	NetworkStatusView		Retmasko:
 No stateful configuration	NetworkStatusView		La agordo ne estas kompleta
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Vi povas ruli Retstaton fenestre aŭ instali Laborstrie.
-Broadcast	NetworkStatusView		Dissendado
+IPv4 address:	NetworkStatusView		IPv4 adreso:
 %ifaceName information:\n	NetworkStatusView		Informo pri %ifaceName:\n
 Run in window	NetworkStatus		Ekruli fenestre
 <no wireless networks found>	NetworkStatusView		<neniu sendrata reto estas trovita>

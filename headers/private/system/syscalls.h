@@ -112,7 +112,8 @@ extern status_t		_kern_realtime_sem_unlink(const char* name);
 
 extern status_t		_kern_realtime_sem_get_value(sem_id semID, int* value);
 extern status_t		_kern_realtime_sem_post(sem_id semID);
-extern status_t		_kern_realtime_sem_wait(sem_id semID, bigtime_t timeout);
+extern status_t		_kern_realtime_sem_wait(sem_id semID, uint32 flags,
+						bigtime_t timeout);
 
 /* POSIX XSI semaphore syscalls */
 extern int			_kern_xsi_semget(key_t key, int numSems, int flags);
@@ -166,6 +167,8 @@ extern status_t		_kern_cancel_thread(thread_id threadID,
 extern void			_kern_thread_yield(void);
 extern status_t		_kern_wait_for_thread(thread_id thread,
 						status_t *_returnCode);
+extern status_t		_kern_wait_for_thread_etc(thread_id thread, uint32 flags,
+						bigtime_t timeout, status_t *_returnCode);
 extern bool			_kern_has_data(thread_id thread);
 extern status_t		_kern_send_data(thread_id thread, int32 code,
 						const void *buffer, size_t bufferSize);
@@ -286,7 +289,7 @@ extern ssize_t		_kern_select(int numfds, struct fd_set *readSet,
 						struct fd_set *writeSet, struct fd_set *errorSet,
 						bigtime_t timeout, const sigset_t *sigMask);
 extern ssize_t		_kern_poll(struct pollfd *fds, int numFDs,
-						bigtime_t timeout);
+						bigtime_t timeout, const sigset_t *sigMask);
 
 extern int			_kern_open_attr_dir(int fd, const char *path,
 						bool traverseLeafLink);
@@ -338,6 +341,7 @@ extern status_t		_kern_lock_node(int fd);
 extern status_t		_kern_unlock_node(int fd);
 extern status_t		_kern_get_next_fd_info(team_id team, uint32 *_cookie,
 						struct fd_info *info, size_t infoSize);
+extern status_t		_kern_preallocate(int fd, off_t offset, off_t length);
 
 // socket functions
 extern int			_kern_socket(int family, int type, int protocol);
@@ -446,6 +450,9 @@ extern status_t		_kern_memory_advice(void *address, size_t size,
 
 extern status_t		_kern_get_memory_properties(team_id teamID,
 						const void *address, uint32* _protected, uint32* _lock);
+
+extern status_t		_kern_mlock(const void* address, size_t size);
+extern status_t		_kern_munlock(const void* address, size_t size);
 
 /* kernel port functions */
 extern port_id		_kern_create_port(int32 queue_length, const char *name);

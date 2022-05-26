@@ -1,22 +1,25 @@
-1	japanese	x-vnd.Haiku-FirstBootPrompt	1158596356
+1	japanese	x-vnd.Haiku-FirstBootPrompt	189132197
 Japanese	KeymapNames		日本語
 US	KeymapNames		英語 (US)
+Cancel	BootPromptWindow		キャンセル
 Esperanto	KeymapNames		エスペラント語
 Belarusian	KeymapNames		ベラルーシ語
 Brazilian	KeymapNames		ブラジル語
 Dvorak	KeymapNames		Dvorak
 Polish	KeymapNames		ポーランド語
+Try Haiku	BootPromptWindow		Haiku を試してみる
 Latin-American	KeymapNames		ラテンアメリカ言語
 Ukrainian	KeymapNames		ウクライナ語
 Russian (Yawert)	KeymapNames		ロシア語 (Yawert)
 United-Kingdom	KeymapNames		英語 (United-Kingdom)
-Serbian (Cyrillic)	KeymapNames		セルビア語 (Cyrillic)
+Welcome!	BootPromptWindow		ようこそ!
+Quit Haiku	System name		Haiku の終了
 Turkish (Type-F)	KeymapNames		トルコ語 (Type-F)
-Bulgarian (Cyrillic)	KeymapNames		ブルガリア語 (Cyrillic)
+Serbian (Cyrillic)	KeymapNames		セルビア語 (Cyrillic)
 Belgian (point)	KeymapNames		ベルギー語 (point)
+Bulgarian (Cyrillic)	KeymapNames		ブルガリア語 (Cyrillic)
 Finnish	KeymapNames		フィンランド語
 Swedish	KeymapNames		スウェーデン語
-Thank you for trying out Haiku! We hope you'll like it!\n\nSelect your preferred language and keymap from the list on the left which will then be used instantly. Both settings can be changed from the Desktop later on on the fly.\n\nDo you wish to run the Installer or continue booting to the Desktop?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Haikuを試用してくれてありがとう。気に入ってくれることを期待します。\n\n左から希望の言語とキーマップを選択し、すぐに使用できます。どちらの設定もあとデスクトップから簡単に変更できます。\n\nインストーラーを実行しますか、それとも引き続きデスクトップを起動しますか?\n\n注：Haikuやユーザーガイドの翻訳は進行中のため、未翻訳の部分が表示されることや翻訳がおかしいことがあります。Haikuの翻訳に協力したい方は、https://freelists.org/list/haiku-i18n-jpにてご連絡ください。
 Svorak	KeymapNames		Svorak
 German	KeymapNames		ドイツ語
 Swiss-German	KeymapNames		ドイツ語 (スイス)
@@ -38,14 +41,16 @@ Belarusian (Mac)	KeymapNames		ベラルーシ語 (Mac)
 Hebrew	KeymapNames		ヘブライ語
 Greek	KeymapNames		ギリシア語
 Croatian	KeymapNames		クロアチア語
-Run Installer	BootPromptWindow		インストーラーを実行
 Faeroese	KeymapNames		フェロー語
 Polish (Typewriter)	KeymapNames		ポーランド語 (Typewriter)
 French (Mac)	KeymapNames		フランス語 (Mac)
 Spanish	KeymapNames		スペイン語
+Try it out	BootPromptWindow		試してみる
 Ukrainian (Mac)	KeymapNames		ウクライナ語 (Mac)
 Estonian	KeymapNames		エストニア語
+Install Haiku	BootPromptWindow		IHaiku のインストール
 French (Bépo)	KeymapNames		フランス語 (Bépo)
+Restart system	BootPromptWindow		システムの再起動
 Serbian (Latin)	KeymapNames		セルビア語 (Latin)
 Russian (Typewriter)	KeymapNames		ロシア語 (Typewriter)
 French	KeymapNames		フランス語
@@ -53,8 +58,8 @@ Italian	KeymapNames		イタリア語
 Portuguese	KeymapNames		ポルトガル語
 Swiss-French	KeymapNames		フランス語 (スイス)
 Slovene	KeymapNames		スロベニア語
-Lithuanian	KeymapNames		リトアニア語
 French (NF Z71-300)	KeymapNames		フランス語 (NF Z71-300)
+Lithuanian	KeymapNames		リトアニア語
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		カザフ語
 Language	BootPromptWindow		言語
@@ -63,18 +68,21 @@ Belgian (comma)	KeymapNames		ベルギー語 (comma)
 Custom	BootPromptWindow		カスタム
 Norwegian	KeymapNames		ノルウェー語
 Danish	KeymapNames		デンマーク語
-Boot to Desktop	BootPromptWindow		デスクトップを起動
 Bulgarian (Phonetic)	KeymapNames		ブルガリア語 (Phonetic)
 Canadian-French	KeymapNames		フランス語 (カナダ)
-Welcome to Haiku!	BootPromptWindow		Welcome to Haiku!
+Welcome to Haiku!	BootPromptWindow		Haiku へようこそ!
 Russian	KeymapNames		ロシア語
 Hungarian	KeymapNames		ハンガリー語
+Install	BootPromptWindow		インストール
 Irish	KeymapNames		アイルランド語
 Romanian	KeymapNames		ルーマニア語
-Macedonian	KeymapNames		マケドニア語
+Are you sure you want to close this window? This will restart your system!	BootPromptWindow		本当にこのウィンドウを閉じてもいいですか? システムが再起動します!
+Thank you for trying out Haiku! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later when running Haiku.\n\nDo you wish to install Haiku now, or try it out first?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Haiku を試用していただきありがとうございます。気に入っていただければ幸いです。\n\nご希望の言語とキーマップを選択してください。これらの設定は、後で Haiku を実行中に変更できます。\n\n今すぐ Haiku をインストールしますか、または最初に試用してみますか?
 Czech (Mac)	KeymapNames		チェコ語 (Mac)
+Macedonian	KeymapNames		マケドニア語
 Brazilian (ABNT2)	KeymapNames		ブラジル語 (ABNT2)
 Albanian	KeymapNames		アルバニア語
 Dutch	KeymapNames		オランダ語
+Thank you for trying out our operating system! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later.\n\nDo you wish to install the operating system now, or try it out first?	BootPromptWindow	This notice appears when the build of Haiku that's currently being used is unofficial, as in, not distributed by Haiku itself.For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	私達のオペレーティングシステムを試用していただきありがとうございます。気に入っていただければ幸いです。\n\nご希望の言語とキーマップの選択してください。これらの設定は、後で変更できます。\n\n今すぐオペレーティングシステムををインストールしますか、または最初に試用してみますか?
 Friulian	KeymapNames		フリウリ語
 Icelandic	KeymapNames		アイスランド語

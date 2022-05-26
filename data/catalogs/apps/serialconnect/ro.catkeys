@@ -1,0 +1,37 @@
+1	romanian	x-vnd.haiku.SerialConnect	354154115
+Hardware	SerialWindow	Flowcontrol	Hardware
+Connection	SerialWindow		Conexiune
+Raw send…	SerialWindow		Trimitere brută…
+Baud rate	SerialWindow		Rată de baud
+Stop bits	SerialWindow		Oprește biții
+None	SerialWindow	Flowcontrol	Nespecificat
+Cancel	Custom baudrate window		Anulează
+Sending…	XModemStatus		Se trimite…
+<no serial port available>	SerialWindow		<no serial port available>
+Log to file…	SerialWindow		Jurnalizează în fișier…
+Custom baudrate	Custom baudrate window		Rată de baud personalizată
+File	SerialWindow		Fișier
+SerialConnect	System name		SerialConnect
+custom…	SerialWindow	Baudrate	personalizare…
+Parity	SerialWindow		Paritate
+None	SerialWindow	Parity	Nespecificat
+Disconnect	SerialWindow		Deconectare
+Everything sent, waiting for acknowledge	XModemStatus		Totul a fost trimis, se așteaptă confirmarea
+Odd	SerialWindow	Parity	Impar
+Flow control	SerialWindow		Control de flux
+file transfer progress	SerialWindow		progresul transferului de fișiere
+CRC requested	XModemStatus		CRC cerut
+Data bits	SerialWindow		Biți de date
+Both	SerialWindow	Flowcontrol	Ambele
+Edit	SerialWindow		Editare
+XModem send…	SerialWindow		Trimitere XModem…
+Baudrate:	Custom baudrate window		Rată de baud:
+OK	Custom baudrate window		OK
+Waiting for receiver…	XModemStatus		Se așteaptă destinatarul…
+Clear history	SerialWindow		Curăță istoricul
+Checksum error, re-send block	XModemStatus		Eroare de sumă de control, se retrimite blocul
+Settings	SerialWindow		Configurări
+Even	SerialWindow	Parity	Par
+Software	SerialWindow	Flowcontrol	Software
+Line terminator	SerialWindow		Terminator de linie
+Remote cancelled transfer	XModemStatus		Transfer anulat de la distanță

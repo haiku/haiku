@@ -2,13 +2,7 @@ SubDir HAIKU_TOP src system libroot posix musl math x86 ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) .. .. include ] ;
 UseHeaders [ FDirName $(SUBDIR) .. .. internal ] ;
-
-local arch ;
-for arch in $(TARGET_ARCHS) {
-	UseHeaders [ FDirName $(SUBDIR) .. .. arch $(arch) ] ;
-}
 UseHeaders [ FDirName $(SUBDIR) .. .. arch generic ] [ FDirName $(SUBDIR) .. ]  ;
-
 
 local generics =
 	acosh.c acoshf.c acoshl.c
@@ -58,9 +52,11 @@ local generics =
 	;
 
 local architectureObject ;
-for architectureObject in [ MultiArchSubDirSetup ] {
+for architectureObject in [ MultiArchSubDirSetup x86 x86_gcc2 ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		UseHeaders [ FDirName $(SUBDIR) .. .. arch $(architecture) ] ;
 
 		if $(architecture) = x86_gcc2 {
 			# GCC 2 miscompiles some of the files in here, so we use GCC 8.

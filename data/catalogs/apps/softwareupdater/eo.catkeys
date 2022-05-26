@@ -25,7 +25,7 @@ Cancelling updates	SoftwareUpdaterWindow		Ĉesigado de ĝisdatigado
 Cancel	SoftwareUpdaterWindow	Alert button label	Nuligi
 There were no updates found.	UpdateAction		Ĝisdatigoj forestas.
 OK	SoftwareUpdaterWindow		Bone
-Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Elektu opciojn de ĝisdatigo:\n\nĜisdatigi:\n\tĜisdatigi ĉiujn instalitajn pakaĵojn.\nPlena sinkronigo:\n\tSinkronigi la instalitajn pakaĵojn al deponejoj.
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Bonvole elektu ion sekvontan:\n\nĜisdatigi:\n\tĜisdatigi ĉiujn instalitajn pakaĵojn.\nPlena sinkronigo:\n\tSinkronigi la instalitajn pakaĵojn al deponejoj.
 The following changes will be made:	SoftwareUpdaterWindow		Sekvaj ŝanĝoj estos faritaj:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumentaj variabloj plu ne estas akceptataj\n
 Fatal error while checking for updates: %s\n	CheckAction		Fatala eraro dum determinado de ĝisdatigoj: %s\n

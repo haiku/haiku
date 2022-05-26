@@ -117,7 +117,7 @@ NodeTest::AddBaseClassTests(const char *prefix, CppUnit::TestSuite *suite)
 	suite->addTest( new TC(p + "BNode::Dup Test", &NodeTest::DupTest) );
 	suite->addTest( new TC(p + "BNode::Lock Test"
 #if TEST_OBOS /* !!!POSIX ONLY!!! */
-								" (NOTE: test not actually performed with OpenBeOS Posix libraries)"
+								" (NOTE: test not actually performed with Haiku Posix libraries)"
 #endif
 								, &NodeTest::LockTest) );
 }

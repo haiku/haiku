@@ -1,24 +1,27 @@
-1	ukrainian	x-vnd.Haiku-GLInfo	2211760527
+1	ukrainian	x-vnd.Haiku-GLInfo	1282327690
 Maximum clipping planes	Capabilities		Максимум площин відсікання
-Maximum 2D texture size	Capabilities		Максимальний розмір 2D текстур
-Auxiliary buffer(s)	Capabilities		Допоміжний буфер
 Maximum evaluators equation order	Capabilities		Максимальний порядок рівнянь оцінювачів
 Texture stack size	Capabilities		Розмір стека текстур
 GL Info	System name		GL Інфо
 Information	InfoView		Інформація
-Maximum convolution	Capabilities		Максимальне згортання
 Attributes stack size	Capabilities		Розмір стека атрибутів
 Maximum lights	Capabilities		Максимальна кількість джерел світла
-Maximum 3D texture size	Capabilities		Максимальний розмір 3D текстур
 Extensions	Extensions		Розширення
-Maximum recommended index elements	Capabilities		Максимум рекомендованих індексних елементів
 Available extensions	Extensions		Доступні розширення
 Maximum recommended vertex elements	Capabilities		Максимум рекомендованих вершинних елементів
 Value	Capabilities		Значення
-Maximum texture units	Capabilities		Максимум текстурних одиниць
-Capabilities	Capabilities		Спроможність
 Name stack size	Capabilities		Розмір стека імен
-List stack size	Capabilities		Розмір стека списку
-Projection stack size	Capabilities		Розмір стека проекцій
-Model stack size	Capabilities		Розмір стека моделі
+Capabilities	Capabilities		Спроможність
+Maximum texture units	Capabilities		Максимум текстурних одиниць
+Unknown or missing OpenGL renderer.	InfoView		Невідомий або відсутній рендерер OpenGL
 Capability	Capabilities		Спромога
+Maximum 2D texture size	Capabilities		Максимальний розмір 2D текстур
+Auxiliary buffer(s)	Capabilities		Допоміжний буфер
+Unknown vendor	InfoView		Невідомий вендор
+Maximum convolution	Capabilities		Максимальне згортання
+Maximum 3D texture size	Capabilities		Максимальний розмір 3D текстур
+Maximum recommended index elements	Capabilities		Максимум рекомендованих індексних елементів
+Unknown version	InfoView		Невідома версія
+List stack size	Capabilities		Розмір стека списку
+Model stack size	Capabilities		Розмір стека моделі
+Projection stack size	Capabilities		Розмір стека проекцій

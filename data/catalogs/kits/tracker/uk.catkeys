@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	3669766136
+1	ukrainian	x-vnd.Haiku-libtracker	2915475646
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Різновид
 Open with…	ContainerWindow		Відкрити у…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Помилка переміщення \"%name\" до смітника. (%error)
 Or	FindPanel		Або
+MIME Description	AttributesView		MIME Опис
 before	FindPanel		до
 Volume icons	TrackerSettingsWindow		Значки томів
 Ignore case	SelectionWindow		Ігнорувати регістр
@@ -84,6 +85,7 @@ GiB	WidgetAttributeText		ГБ
 Clean up	ContainerWindow		Очистити
 Modified	FindPanel		Змінений
 Select all	QueryContainerWindow		Вибрати все
+Generate image thumbnails	SettingsView		Генерувати мініатюри зображень
 Select…	FilePanelPriv		Вибрати…
 preferences	B_PREFERENCES_DIRECTORY		налаштування
 Name	Person Query Columns		Ім'я
@@ -179,7 +181,7 @@ Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUt
 Work Phone	Person Query Columns		Робочий телефон
 Close	ContainerWindow		Закрити
 Get info	ContainerWindow		Дивитись інфо
-MIME Type	AttributesView		Тип MIME
+MIME Type	AttributesView		MIME Тип
 Show folder location in title tab	SettingsView		Показати розташування папки в заголовку
 There was an error resolving the link.	Tracker		Виникла проблема при відкритті посилання.
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		Виникла проблема збереження у визначену папку. Будь-ласка виберіть іншу.
@@ -270,6 +272,7 @@ home	B_USER_DIRECTORY		Home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Нові шаблони Tracker
 Disk mounting during boot	AutoMounterSettings		Підключення дисків при завантаженні
 Don't automount	AutoMounterSettings		Не підключати автоматично
+Node ref	AttributesView		Node ref
 Could not find application \"%appname\"	OpenWithWindow		Програма \"%appname\" не знайдена
 Unmatched parenthesis.	libtracker		Невизначені фігурні дужки
 Extended attribute	AttributesView		Розширені атрибути
@@ -294,7 +297,7 @@ Preferred for file	OpenWithWindow		Насамперед для файлу
 OK	AutoMounterSettings		ОК
 copying	FSUtils		копіювання
 Get info	FilePanelPriv		Дивитись інфо
-MIME String	AttributesView		Рядок MIME
+MIME String	AttributesView		MIME Рядок
 Delete	ContainerWindow		Видалити
 Execute	FilePermissionsView		Виконати
 Show volumes on Desktop	SettingsView		Показувати томи на робочому столі
@@ -328,6 +331,7 @@ Recent folders	FavoritesMenu		Недавні папки
 Signed memory size	AttributesView		Означений розмір пам'яті
 The specified name is illegal. Please choose another name.	FilePanelPriv		Зазначене ім'я є недопустимим. Будь ласка виберіть інше.
 of %items	StatusWindow		з %items
+MIME Path	AttributesView		MIME Шлях
 less than	FindPanel		менше ніж
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Помилка копіювання файлу \"%name\":\n\t%error\n\nБажаєте продовжити?
 Creating links: 	StatusWindow		Створення посилань: 
@@ -412,7 +416,7 @@ Name	OpenWithWindow		Ім'я
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		Виникла проблема при спробі перемістити \"%name\". Елемент може бути відкритим або зайнятим.
 Windows	TrackerSettingsWindow		Вікна
 Show space bars on volumes	SettingsView		Показувати індикатори місця на томах
-Could not update permissions of file \"%name\". %error	FSUtils		Не вдалося обновити дозволи файлу \"%name\". %error
+Could not update permissions of file \"%name\". %error	FSUtils		Не вдалося оновити дозволи файлу \"%name\". %error
 Decrease size	DeskWindow		Зменшити розмір
 Emptying Trash… 	StatusWindow		Спорожнення смітника… 
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{for # файл} few{# файли} other{for # файлів}}
@@ -442,6 +446,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Вибачте, 
 Move here	ContainerWindow		Перемістити сюди
 the config folder	FSUtils		папка конфігурації
 Sorry, could not create a new folder.	FSUtils		Вибачте, не вдалося створити нову папку.
+MIME Signature	AttributesView		MIME Сигнатура
 Select all	VirtualDirectoryWindow		Вибрати все
 Rename	FSUtils	button label	Перейменувати
 Clean up all	ContainerWindow		Очистити все
@@ -520,6 +525,7 @@ Create a Query	FindPanel		Створити запит
 Close	QueryContainerWindow		Закрити
 I know what I'm doing	FSUtils	button label	Я знаю що роблю
 Preparing to copy items…	StatusWindow		Підготовка до копіювання елементів…
+Entry ref	AttributesView		Entry ref
 Icon view	ContainerWindow		У вигляді значків
 Name	ContainerWindow		Ім'я
 Preferred for %type	OpenWithWindow		Насамперед для %type

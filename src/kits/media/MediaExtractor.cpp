@@ -14,17 +14,16 @@
 #include <string.h>
 
 #include <Autolock.h>
+#include <InterfacePrivate.h>
 
 #include "ChunkCache.h"
 #include "MediaDebug.h"
+#include "MediaMisc.h"
 #include "PluginManager.h"
 
 
 // should be 0, to disable the chunk cache set it to 1
 #define DISABLE_CHUNK_CACHE 0
-
-
-static const size_t kMaxCacheBytes = 3 * 1024 * 1024;
 
 
 class MediaExtractorChunkProvider : public ChunkProvider {
@@ -93,15 +92,9 @@ MediaExtractor::_Init(BDataIO* source, int32 flags)
 		fStreamInfo[i].hasCookie = false;
 		fStreamInfo[i].infoBuffer = 0;
 		fStreamInfo[i].infoBufferSize = 0;
-		fStreamInfo[i].chunkCache
-			= new ChunkCache(fExtractorWaitSem, kMaxCacheBytes);
 		fStreamInfo[i].lastChunk = NULL;
+		fStreamInfo[i].chunkCache = NULL;
 		fStreamInfo[i].encodedFormat.Clear();
-
-		if (fStreamInfo[i].chunkCache->InitCheck() != B_OK) {
-			fInitStatus = B_NO_MEMORY;
-			return;
-		}
 	}
 
 	// create all stream cookies
@@ -131,6 +124,17 @@ MediaExtractor::_Init(BDataIO* source, int32 flags)
 			ERROR("MediaExtractor::MediaExtractor: GetStreamInfo for "
 				"stream %" B_PRId32 " failed\n", i);
 		}
+
+#if !DISABLE_CHUNK_CACHE
+		// Allocate our ChunkCache
+		size_t chunkCacheMaxBytes = _CalculateChunkBuffer(i);
+		fStreamInfo[i].chunkCache
+			= new ChunkCache(fExtractorWaitSem, chunkCacheMaxBytes);
+		if (fStreamInfo[i].chunkCache->InitCheck() != B_OK) {
+			fInitStatus = B_NO_MEMORY;
+			return;
+		}
+#endif
 	}
 
 #if !DISABLE_CHUNK_CACHE
@@ -262,14 +266,18 @@ MediaExtractor::Seek(int32 stream, uint32 seekTo, int64* _frame,
 	if (info.status != B_OK)
 		return info.status;
 
+#if !DISABLE_CHUNK_CACHE
 	BAutolock _(info.chunkCache);
+#endif
 
 	status_t status = fReader->Seek(info.cookie, seekTo, _frame, _time);
 	if (status != B_OK)
 		return status;
 
+#if !DISABLE_CHUNK_CACHE
 	// clear buffered chunks after seek
 	info.chunkCache->MakeEmpty();
+#endif
 
 	return B_OK;
 }
@@ -430,6 +438,29 @@ MediaExtractor::_ExtractorEntry(void* extractor)
 {
 	static_cast<MediaExtractor*>(extractor)->_ExtractorThread();
 	return B_OK;
+}
+
+
+size_t
+MediaExtractor::_CalculateChunkBuffer(int32 stream)
+{
+	// WARNING: magic
+	// Your A/V may skip frames, chunks or not play at all if the cache size
+	// is insufficient. Unfortunately there's currently no safe way to
+	// calculate it.
+
+	size_t cacheSize = 3 * 1024 * 1024;
+
+	const media_format* format = EncodedFormat(stream);
+	if (format->IsVideo()) {
+		// For video, have space for at least two frames
+		int32 rowSize = BPrivate::get_bytes_per_row(format->ColorSpace(),
+			format->Width());
+		if (rowSize > 0) {
+			cacheSize = max_c(cacheSize, rowSize * format->Height() * 2);
+		}
+	}
+	return ROUND_UP_TO_PAGE(cacheSize);
 }
 
 

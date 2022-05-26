@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-CharacterMap	120394814
+1	thai	x-vnd.Haiku-CharacterMap	638822715
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		สัญลักษณ์ทางคณิตศาสตร์เบ็ดเตล็ด B
 Latin extended E	UnicodeBlocks		Latin ขยาย E
@@ -156,39 +156,63 @@ Zanabazar Square	UnicodeBlocks		Zanabazar Square
 Sundanese	UnicodeBlocks		ซูดาน
 Geometric shapes	UnicodeBlocks		รูปทรงเรขาคณิต
 Clear	CharacterWindow		ใส
+Symbols and pictographs extended A	UnicodeBlocks		สัญลักษณ์และภาพขยาย A
 Adlam	UnicodeBlocks		Adlam
 Arabic	UnicodeBlocks		อาราบิก
 Khmer symbols	UnicodeBlocks		เขมร สัญลักษณ์
 Ol Chiki	UnicodeBlocks		Ol Chiki
+Wancho	UnicodeBlocks		Wancho
 Box drawing	UnicodeBlocks		ภาพวาดกล่อง
+Egyptian hieroglyphs	UnicodeBlocks		อักษรอียิปต์โบราณ
 Vai	UnicodeBlocks		Vai
+Meetei Mayek extensions	UnicodeBlocks		ส่วนขยาย Meetei Mayek
 Ethiopic extended	UnicodeBlocks		เอธิโอเปีย ขยาย
 CJK compatibility	UnicodeBlocks		ความเข้ากันได้ของ CJK
 Tai Le	UnicodeBlocks		ไทลื้อ
+Old Sogdian	UnicodeBlocks		Sogdian เก่า
+Devanagari extended	UnicodeBlocks		เทวนาครี ขยาย
 Lao	UnicodeBlocks		ลาว
+Chorasmian	UnicodeBlocks		Chorasmian
+Lisu supplement	UnicodeBlocks		อักษรเสริม ภาษาลีซอ
+Takri	UnicodeBlocks		ภาษาตะกรี
+Shorthand format controls	UnicodeBlocks		การควบคุมรูปแบบชวเลข
+Inscriptional Parthian	UnicodeBlocks		จารึก Parthian
 Optical character recognition	UnicodeBlocks		การจดจำอักขระด้วยแสง
 Tamil	UnicodeBlocks		ทมิฬ
+Lisu	UnicodeBlocks		ลีซอ
+Nandingari	UnicodeBlocks		เทวนาครี
 Greek extended	UnicodeBlocks		กรีก เพิ่มเติม
+Myanmar extended B	UnicodeBlocks		พม่า ขยาย บี
+Mahajani	UnicodeBlocks		มหาจานี
 Lepcha	UnicodeBlocks		Lepcha
+Mandaic	UnicodeBlocks		มันดาอิก
 Old italic	UnicodeBlocks		Old italic
 Quit	CharacterWindow		ยกเลิก
+Playing cards	UnicodeBlocks		เล่นไพ่
+Chakma	UnicodeBlocks		จักม่า
 Buhid	UnicodeBlocks		Buhid
 Supplementary private use area B	UnicodeBlocks		พื้นที่ใช้งานส่วนตัวเพิ่มเติม B
 Cuneiform	UnicodeBlocks		Cuneiform
 Alphabetic presentation forms	UnicodeBlocks		แบบฟอร์มการนำเสนอตามตัวอักษร
+Mayan numerals	UnicodeBlocks		ตัวเลขมายัน
 Tangut components	UnicodeBlocks		ส่วนประกอบ Tangut
 Letterlike symbols	UnicodeBlocks		สัญลักษณ์เหมือนอักษร
 Spacing modifier letters	UnicodeBlocks		ตัวอักษรปรับปรุงเว้นระยะ
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		พยางค์ดั้งเดิมของแคนาดา
+Hanifi Rohingya	UnicodeBlocks		โรฮิงยา
 Dingbats	UnicodeBlocks		Dingbats
 Mathematical operators	UnicodeBlocks		ตัวดำเนินการทางคณิตศาสตร์
 Bopomofo	UnicodeBlocks		Bopomofo
 Variation selectors	UnicodeBlocks		ตัวเลือกชุดรูปแบบ
 Variation selectors supplement	UnicodeBlocks		ตัวเลือกชุดรูปแบบเพิ่มเติม
+Old Permic	UnicodeBlocks		เปอร์มิก เก่า
 Supplemental mathematical operators	UnicodeBlocks		ตัวดำเนินการทางคณิตศาสตร์เพิ่มเติม
 Sinhala	UnicodeBlocks		สิงหล
 Bhaiksuki	UnicodeBlocks		Bhaiksuki
+Dives Akuru	UnicodeBlocks		ดิเวส อกุรุ
 Ugaritic	UnicodeBlocks		Ugaritic
+Old North Arabian	UnicodeBlocks		อาระเบียนเหนือโบราญ
+Mende Kikakui	UnicodeBlocks		เมนเด คิคากุย
 Cyrillic extended C	UnicodeBlocks		Cyrillic extended C
 Syriac	UnicodeBlocks		Syriac
 Private use area	UnicodeBlocks		พื้นที่ใช้งานส่วนตัว

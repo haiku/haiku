@@ -283,7 +283,8 @@ public:
 			uint32			GetChannelsDescription(
 								Vector<multi_channel_info>& Channels,
 								multi_description* Description,
-								Vector<_AudioControl*>& USBTerminals);
+								Vector<_AudioControl*>& USBTerminals,
+								bool isForInput);
 			uint32			GetBusChannelsDescription(
 								Vector<multi_channel_info>& Channels,
 								multi_description* Description);

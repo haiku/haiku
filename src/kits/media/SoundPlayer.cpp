@@ -150,7 +150,7 @@ cleanup:
 	// this should be the case. The Quit() synchronization
 	// is handled by the DeleteHook inheritance.
 	// NOTE: this might be crucial when using a BMediaEventLooper.
-	if (fPlayerNode->Release() != NULL) {
+	if (fPlayerNode != NULL && fPlayerNode->Release() != NULL) {
 		TRACE("BSoundPlayer::~BSoundPlayer: Error the producer node "
 			"appears to be acquired by someone else than us!");
 	}

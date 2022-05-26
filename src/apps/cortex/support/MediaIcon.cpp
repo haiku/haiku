@@ -47,6 +47,9 @@
 #include <NodeInfo.h>
 // Support Kit
 #include <String.h>
+// Interface Kit
+#include <IconUtils.h>
+
 
 __USE_CORTEX_NAMESPACE
 
@@ -61,7 +64,7 @@ __USE_CORTEX_NAMESPACE
 MediaIcon::MediaIcon(
 	const live_node_info &nodeInfo,
 	icon_size size)
-	: BBitmap(BRect(0.0, 0.0, size - 1.0, size - 1.0), B_CMAP8),
+	: BBitmap(BRect(0.0, 0.0, size - 1.0, size - 1.0), B_RGBA32),
 	  m_size(size),
 	  m_nodeKind(nodeInfo.node.kind) {
 	D_ALLOC(("MediaIcon::MediaIcon(live_node_info '%s')\n", nodeInfo.name));
@@ -72,7 +75,7 @@ MediaIcon::MediaIcon(
 MediaIcon::MediaIcon(
 	const dormant_node_info &nodeInfo,
 	icon_size size)
-	: BBitmap(BRect(0.0, 0.0, size - 1.0, size - 1.0), B_CMAP8),
+	: BBitmap(BRect(0.0, 0.0, size - 1.0, size - 1.0), B_RGBA32),
 	  m_size(size),
 	  m_nodeKind(0) {
 	D_ALLOC(("MediaIcon::MediaIcon(dormant_node_info '%s')\n", nodeInfo.name));
@@ -204,12 +207,13 @@ MediaIcon::_findIconFor(const dormant_node_info &nodeInfo)
 		bool videoIn = false, videoOut = false;
 		_getMediaTypesFor(flavorInfo, &audioIn, &audioOut, &videoIn, &videoOut);
 		_findDefaultIconFor(audioIn, audioOut, videoIn, videoOut);
+	} else if (BString(nodeInfo.name).Compare("System clock") == 0) {
+		BIconUtils::GetVectorIcon(M_TIME_SOURCE_ICON,
+			sizeof(M_TIME_SOURCE_ICON), this);
 	} else {
 		// use generic icon in case we couldn't get any info
-		if (m_size == B_LARGE_ICON)
-			SetBits(M_GENERIC_ICON.large, 1024, 0, B_CMAP8);
-		else if (m_size == B_MINI_ICON)
-			SetBits(M_GENERIC_ICON.small, 256, 0, B_CMAP8);
+		BIconUtils::GetVectorIcon(M_GENERIC_ICON,
+			sizeof(M_GENERIC_ICON), this);
 	}
 }
 
@@ -228,7 +232,8 @@ MediaIcon::_getMediaTypesFor(const live_node_info &nodeInfo, bool *audioIn,
 	int32 numberOfFreeOutputs, numberOfConnectedOutputs;
 	media_output outputs[numberOfOutputs];
 	BMediaRoster *roster = BMediaRoster::CurrentRoster();
-	if (roster->GetFreeInputsFor(nodeInfo.node, inputs, numberOfInputs, &numberOfFreeInputs) == B_OK) {
+	if (roster->GetFreeInputsFor(nodeInfo.node, inputs, numberOfInputs,
+			&numberOfFreeInputs) == B_OK) {
 		for (int32 i = 0; i < numberOfFreeInputs; i++) {
 			if ((inputs[i].format.type == B_MEDIA_RAW_AUDIO)
 			 || (inputs[i].format.type == B_MEDIA_ENCODED_AUDIO)) {
@@ -241,7 +246,8 @@ MediaIcon::_getMediaTypesFor(const live_node_info &nodeInfo, bool *audioIn,
 			}
 		}
 	}
-	if (roster->GetConnectedInputsFor(nodeInfo.node, inputs, numberOfInputs, &numberOfConnectedInputs) == B_OK) {
+	if (roster->GetConnectedInputsFor(nodeInfo.node, inputs, numberOfInputs,
+			&numberOfConnectedInputs) == B_OK) {
 		for (int32 i = 0; i < numberOfConnectedInputs; i++) {
 			if ((inputs[i].format.type == B_MEDIA_RAW_AUDIO)
 			 || (inputs[i].format.type == B_MEDIA_ENCODED_AUDIO)) {
@@ -254,7 +260,8 @@ MediaIcon::_getMediaTypesFor(const live_node_info &nodeInfo, bool *audioIn,
 			}
 		}
 	}
-	if (roster->GetFreeOutputsFor(nodeInfo.node, outputs, numberOfOutputs, &numberOfFreeOutputs) == B_OK) {
+	if (roster->GetFreeOutputsFor(nodeInfo.node, outputs, numberOfOutputs,
+			&numberOfFreeOutputs) == B_OK) {
 		for (int32 i = 0; i < numberOfFreeOutputs; i++) {
 			if ((outputs[i].format.type == B_MEDIA_RAW_AUDIO)
 			 || (outputs[i].format.type == B_MEDIA_ENCODED_AUDIO)) {
@@ -267,7 +274,8 @@ MediaIcon::_getMediaTypesFor(const live_node_info &nodeInfo, bool *audioIn,
 			}
 		}
 	}
-	if (roster->GetConnectedOutputsFor(nodeInfo.node, outputs, numberOfOutputs, &numberOfConnectedOutputs) == B_OK) {
+	if (roster->GetConnectedOutputsFor(nodeInfo.node, outputs, numberOfOutputs,
+			&numberOfConnectedOutputs) == B_OK) {
 		for (int32 i = 0; i < numberOfConnectedOutputs; i++) {
 			if ((outputs[i].format.type == B_MEDIA_RAW_AUDIO)
 			 || (outputs[i].format.type == B_MEDIA_ENCODED_AUDIO)) {
@@ -322,133 +330,97 @@ void MediaIcon::_findDefaultIconFor(
 	D_INTERNAL(("MediaIcon::_findDefaultIcon()\n"));
 
 	if (_isTimeSource()) {
-		if (m_size == B_LARGE_ICON)
-			SetBits(M_TIME_SOURCE_ICON.large, 1024, 0, B_CMAP8);
-		else if (m_size == B_MINI_ICON)
-			SetBits(M_TIME_SOURCE_ICON.small, 256, 0, B_CMAP8);
+		BIconUtils::GetVectorIcon(M_TIME_SOURCE_ICON,
+			sizeof(M_TIME_SOURCE_ICON), this);
 		return;
 	}
 
 	if (_isSystemMixer()) {
-		if (m_size == B_LARGE_ICON)
-			SetBits(M_AUDIO_MIXER_ICON.large, 1024, 0, B_CMAP8);
-		else if (m_size == B_MINI_ICON)
-			SetBits(M_AUDIO_MIXER_ICON.small, 256, 0, B_CMAP8);
+		BIconUtils::GetVectorIcon(M_AUDIO_MIXER_ICON,
+			sizeof(M_AUDIO_MIXER_ICON), this);
 		return;
 	}
 
 	if (m_nodeKind & B_FILE_INTERFACE) {
 		if (_isProducer()) {
-			if (m_size == B_LARGE_ICON)
-				SetBits(M_FILE_READER_ICON.large, 1024, 0, B_CMAP8);
-			else if (m_size == B_MINI_ICON)
-				SetBits(M_FILE_READER_ICON.small, 256, 0, B_CMAP8);
+			BIconUtils::GetVectorIcon(M_FILE_READER_ICON,
+				sizeof(M_FILE_READER_ICON), this);
 			return;
-		}
-		else {
-			if (m_size == B_LARGE_ICON)
-				SetBits(M_FILE_WRITER_ICON.large, 1024, 0, B_CMAP8);
-			else if (m_size == B_MINI_ICON)
-				SetBits(M_FILE_WRITER_ICON.small, 256, 0, B_CMAP8);
+		} else {
+			BIconUtils::GetVectorIcon(M_FILE_WRITER_ICON,
+				sizeof(M_FILE_WRITER_ICON), this);
 			return;
 		}
 	}
 
 	if (_isPhysicalInput()) {
-		if (audioOut) {
-			if (m_size == B_LARGE_ICON)
-				SetBits(M_AUDIO_INPUT_ICON.large, 1024, 0, B_CMAP8);
-			else if (m_size == B_MINI_ICON)
-				SetBits(M_AUDIO_INPUT_ICON.small, 256, 0, B_CMAP8);
+		if (audioIn) {
+			BIconUtils::GetVectorIcon(M_AUDIO_DEVICE_ICON,
+				sizeof(M_AUDIO_DEVICE_ICON), this);
 			return;
-		}
-		else if (videoOut) {
-			if (m_size == B_LARGE_ICON)
-				SetBits(M_VIDEO_INPUT_ICON.large, 1024, 0, B_CMAP8);
-			else if (m_size == B_MINI_ICON)
-				SetBits(M_VIDEO_INPUT_ICON.small, 256, 0, B_CMAP8);
+		} else if (audioOut) {
+			BIconUtils::GetVectorIcon(M_AUDIO_INPUT_ICON,
+				sizeof(M_AUDIO_INPUT_ICON), this);
+			return;
+		} else if (videoOut) {
+			BIconUtils::GetVectorIcon(M_VIDEO_INPUT_ICON,
+				sizeof(M_VIDEO_INPUT_ICON), this);
 			return;
 		}
 	}
 	
 	if (_isPhysicalOutput()) {
 		if (audioIn) {
-			if (m_size == B_LARGE_ICON)
-				SetBits(M_AUDIO_OUTPUT_ICON.large, 1024, 0, B_CMAP8);
-			else if (m_size == B_MINI_ICON)
-				SetBits(M_AUDIO_OUTPUT_ICON.small, 256, 0, B_CMAP8);
+			BIconUtils::GetVectorIcon(M_AUDIO_OUTPUT_ICON,
+				sizeof(M_AUDIO_OUTPUT_ICON), this);
 			return;
-		}
-		else if (videoIn) {
-			if (m_size == B_LARGE_ICON)
-				SetBits(M_VIDEO_OUTPUT_ICON.large, 1024, 0, B_CMAP8);
-			else if (m_size == B_MINI_ICON)
-				SetBits(M_VIDEO_OUTPUT_ICON.small, 256, 0, B_CMAP8);
+		} else if (videoIn) {
+			BIconUtils::GetVectorIcon(M_VIDEO_OUTPUT_ICON,
+				sizeof(M_VIDEO_OUTPUT_ICON), this);
 			return;
 		}
 	}
 
 	if (_isProducer()) {
 		if (audioOut) {
-			if (m_size == B_LARGE_ICON)
-				SetBits(M_AUDIO_PRODUCER_ICON.large, 1024, 0, B_CMAP8);
-			else if (m_size == B_MINI_ICON)
-				SetBits(M_AUDIO_PRODUCER_ICON.small, 256, 0, B_CMAP8);
+			BIconUtils::GetVectorIcon(M_AUDIO_PRODUCER_ICON,
+				sizeof(M_AUDIO_PRODUCER_ICON), this);
 			return;
-		}
-		else if (videoOut) {
-			if (m_size == B_LARGE_ICON)
-				SetBits(M_VIDEO_PRODUCER_ICON.large, 1024, 0, B_CMAP8);
-			else if (m_size == B_MINI_ICON)
-				SetBits(M_VIDEO_PRODUCER_ICON.small, 256, 0, B_CMAP8);
+		} else if (videoOut) {
+			BIconUtils::GetVectorIcon(M_VIDEO_PRODUCER_ICON,
+				sizeof(M_VIDEO_PRODUCER_ICON), this);
 			return;
 		}
 	}
 
 	if (_isFilter()) {
 		if (audioIn && audioOut && !videoIn && !videoOut) {
-			if (m_size == B_LARGE_ICON)
-				SetBits(M_AUDIO_FILTER_ICON.large, 1024, 0, B_CMAP8);
-			else if (m_size == B_MINI_ICON)
-				SetBits(M_AUDIO_FILTER_ICON.small, 256, 0, B_CMAP8);
+			BIconUtils::GetVectorIcon(M_AUDIO_FILTER_ICON,
+				sizeof(M_AUDIO_FILTER_ICON), this);
 			return;
-		}
-		else if (audioIn && !videoIn && videoOut) {
-			if (m_size == B_LARGE_ICON)
-				SetBits(M_AUDIO_CONSUMER_ICON.large, 1024, 0, B_CMAP8);
-			else if (m_size == B_MINI_ICON)
-				SetBits(M_AUDIO_CONSUMER_ICON.small, 256, 0, B_CMAP8);
+		} else if (audioIn && !videoIn && videoOut) {
+			BIconUtils::GetVectorIcon(M_AUDIO_CONSUMER_ICON,
+				sizeof(M_AUDIO_CONSUMER_ICON), this);
 			return;
-		}
-		else if (!audioIn && !audioOut && videoIn && videoOut) {
-			if (m_size == B_LARGE_ICON)
-				SetBits(M_VIDEO_FILTER_ICON.large, 1024, 0, B_CMAP8);
-			else if (m_size == B_MINI_ICON)
-				SetBits(M_VIDEO_FILTER_ICON.small, 256, 0, B_CMAP8);
+		} else if (!audioIn && !audioOut && videoIn && videoOut) {
+			BIconUtils::GetVectorIcon(M_VIDEO_FILTER_ICON,
+				sizeof(M_VIDEO_FILTER_ICON), this);
 			return;
 		}
 	}
 
 	if (_isConsumer()) {
 		if (audioIn) {
-			if (m_size == B_LARGE_ICON)
-				SetBits(M_AUDIO_CONSUMER_ICON.large, 1024, 0, B_CMAP8);
-			else if (m_size == B_MINI_ICON)
-				SetBits(M_AUDIO_CONSUMER_ICON.small, 256, 0, B_CMAP8);
+			BIconUtils::GetVectorIcon(M_AUDIO_CONSUMER_ICON,
+				sizeof(M_AUDIO_CONSUMER_ICON), this);
 			return;
-		}
-		else if (videoIn) {
-			if (m_size == B_LARGE_ICON)
-				SetBits(M_VIDEO_CONSUMER_ICON.large, 1024, 0, B_CMAP8);
-			else if (m_size == B_MINI_ICON)
-				SetBits(M_VIDEO_CONSUMER_ICON.small, 256, 0, B_CMAP8);
+		} else if (videoIn) {
+			BIconUtils::GetVectorIcon(M_VIDEO_CONSUMER_ICON,
+				sizeof(M_VIDEO_CONSUMER_ICON), this);
 			return;
 		}
 	}
 
 	// assign a default icon
-	if (m_size == B_LARGE_ICON)
-		SetBits(M_GENERIC_ICON.large, 1024, 0, B_CMAP8);
-	else if (m_size == B_MINI_ICON)
-		SetBits(M_GENERIC_ICON.small, 256, 0, B_CMAP8);
+	BIconUtils::GetVectorIcon(M_GENERIC_ICON, sizeof(M_GENERIC_ICON), this);
 }

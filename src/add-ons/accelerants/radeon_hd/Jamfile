@@ -5,7 +5,9 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants radeon_hd atomb
 UseHeaders [ FDirName $(SUBDIR) atombios ] ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics radeon_hd ] ;
+UsePrivateHeaders [ FDirName graphics radeon_hd atombios ] ;
 UsePrivateHeaders [ FDirName graphics common ] ;
+UsePrivateHeaders shared ;
 
 Addon radeon_hd.accelerant :
 	accelerant.cpp

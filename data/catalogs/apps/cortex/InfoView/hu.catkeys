@@ -1,0 +1,59 @@
+1	hungarian	application/x-vnd.Cortex.InfoView	2382053937
+Offset	InfoView		Eltolás
+Description	DormantNodeInfoView		Leírás
+Byte order	InfoView		Bájt-sorrend
+Connection	InfoView		Kapcsolat
+Output formats	DormantNodeInfoView		Kimeneti formátumok
+History	InfoView		Előzmény
+Input formats	DormantNodeInfoView		Bemeneti formátumok
+Signature	AppNodeInfoView		Aláírás
+Video data between	InfoView		‎Videoadatok a következők között:‎
+Any number	DormantNodeInfoView	For 'Max. instances' field	Bármely szám
+Flags	InfoView		Zászlók
+Media output	InfoView		Média kimenet
+Active lines	InfoView		Aktív sorok
+Buffer size	InfoView		Puffer mérete
+\n- Quality:	FileNodeInfoView		\n- Minőség:
+Kinds	LiveNodeInfoView		Fajták
+Application	AppNodeInfoView		Alkalmazás
+Flavor flags	DormantNodeInfoView		Zászlók
+Max. instances	DormantNodeInfoView		Maximális példány
+\n- Duration:	FileNodeInfoView		\n- Hossz:
+Dormant media node	DormantNodeInfoView		Alvó média csomópont
+Latency	LiveNodeInfoView		Késleltetés
+Media type	InfoView		Média típusa
+Live media node	LiveNodeInfoView		Élő média csomópont
+Field rate	InfoView		Mező mértéke
+Kinds	DormantNodeInfoView		Fajták
+%title% info	InfoView		%title% információ
+Node ID	LiveNodeInfoView		Csomópont azonosító
+Resolution	InfoView		Felbontás
+Chunk size	InfoView		Darab mérete
+File format	AppNodeInfoView		Fájl formátuma
+Matrix mask	InfoView		Mátrix maszk
+Channel mask	InfoView		Csatorna maszk
+Orientation	InfoView		Orientáció
+Live file-interface node	FileNodeInfoView		Élő fájl-interfész csomópont
+Channels	InfoView		Csatornák
+Sample rate	InfoView		Mintavételi arány
+File format	FileNodeInfoView		Fájl formátuma
+(no file)	FileNodeInfoView		(nincs fájl)
+Media input	InfoView		Média bemenet
+Bit rate	InfoView		Bit arány
+Input format	DormantNodeInfoView		Bemeneti formátum
+Format	InfoView		Formátum
+Version	AppNodeInfoView		Verzió
+AddOn ID	DormantNodeInfoView		Kiegészítő azonosító
+Frame size	InfoView		Képkocka mérete
+Flavor ID	DormantNodeInfoView		Azonosító
+Run mode	LiveNodeInfoView		Futás módja
+\n- Codec:	FileNodeInfoView		\n- Kódoló:
+Port	LiveNodeInfoView		Port
+Output format	DormantNodeInfoView		Kimeneti formátum
+Aspect ratio	InfoView		Képarány
+Application-owned node	AppNodeInfoView		Alkamazás csomópont
+Tracks	FileNodeInfoView		Sávok
+Source	InfoView		Forrás
+Destination	InfoView		Cél
+Copyright	FileNodeInfoView		Copyright
+ID:	FileNodeInfoView		Azonosító:

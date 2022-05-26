@@ -42,8 +42,7 @@ const char* kUTF8ControlMap[] = {
 	NULL, NULL,
 	NULL, /* B_BACKSPACE */
 	"\xe2\x86\xb9", /* B_TAB U+21B9 */
-	"\xe2\x86\xb5", /* B_ENTER, U+21B5 */
-	//"\xe2\x8f\x8e", /* B_ENTER, U+23CE it's the official one */
+	"\xe2\x8f\x8e", /* B_ENTER, U+23CE */
 	NULL, /* B_PAGE_UP */
 	NULL, /* B_PAGE_DOWN */
 	NULL, NULL, NULL,

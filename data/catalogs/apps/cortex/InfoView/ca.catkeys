@@ -1,0 +1,59 @@
+1	catalan; valencian	application/x-vnd.Cortex.InfoView	2382053937
+Offset	InfoView		Desplaçament
+Description	DormantNodeInfoView		Descripció
+Byte order	InfoView		Ordre de bits
+Connection	InfoView		Connexió
+Output formats	DormantNodeInfoView		Formats de sortida
+History	InfoView		Historial
+Input formats	DormantNodeInfoView		Formats d'entrada
+Signature	AppNodeInfoView		Signatura
+Video data between	InfoView		Interval de dades de vídeo
+Any number	DormantNodeInfoView	For 'Max. instances' field	Qualsevol número
+Flags	InfoView		Banderes
+Media output	InfoView		Sortida de mitjans
+Active lines	InfoView		Línies actives
+Buffer size	InfoView		Mida de memòria intermèdia
+\n- Quality:	FileNodeInfoView		\n- Qualitat:
+Kinds	LiveNodeInfoView		Tipus
+Application	AppNodeInfoView		Aplicació
+Flavor flags	DormantNodeInfoView		Banderes de gust
+Max. instances	DormantNodeInfoView		Màx. d'instàncies
+\n- Duration:	FileNodeInfoView		\n- Durada:
+Dormant media node	DormantNodeInfoView		Node de mitjans inactius
+Latency	LiveNodeInfoView		Latència
+Media type	InfoView		Tipus de mitjà
+Live media node	LiveNodeInfoView		Node de mitjans actius
+Field rate	InfoView		Taxa de camp
+Kinds	DormantNodeInfoView		Tipus
+%title% info	InfoView		Informació sobre %title%
+Node ID	LiveNodeInfoView		ID de node
+Resolution	InfoView		Resolució
+Chunk size	InfoView		Mida del fragment
+File format	AppNodeInfoView		Format del fitxer
+Matrix mask	InfoView		Màscara del matriu
+Channel mask	InfoView		Màscara del canal
+Orientation	InfoView		Orientació
+Live file-interface node	FileNodeInfoView		Node d'interfície de fitxer actiu
+Channels	InfoView		Canals
+Sample rate	InfoView		Freqüència de mostratge
+File format	FileNodeInfoView		Format del fitxer
+(no file)	FileNodeInfoView		(cap fitxer)
+Media input	InfoView		Entrada de mitjans
+Bit rate	InfoView		Taxa de bits
+Input format	DormantNodeInfoView		Format d'entrada
+Format	InfoView		Format
+Version	AppNodeInfoView		Versió
+AddOn ID	DormantNodeInfoView		ID del complement
+Frame size	InfoView		Mida del marc
+Flavor ID	DormantNodeInfoView		ID del gust
+Run mode	LiveNodeInfoView		Mode d'execució
+\n- Codec:	FileNodeInfoView		\n- Còdec:
+Port	LiveNodeInfoView		Port
+Output format	DormantNodeInfoView		Format de sortida
+Aspect ratio	InfoView		Relació d'aspecte
+Application-owned node	AppNodeInfoView		Node propietat de l'aplicació
+Tracks	FileNodeInfoView		Pistes
+Source	InfoView		Font
+Destination	InfoView		Destinació
+Copyright	FileNodeInfoView		Drets de còpia
+ID:	FileNodeInfoView		ID:

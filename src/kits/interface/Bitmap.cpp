@@ -87,6 +87,12 @@ get_raw_bytes_per_row(color_space colorSpace, int32 width)
 	int32 bpr = 0;
 	switch (colorSpace) {
 		// supported
+		case B_RGBA64: case B_RGBA64_BIG:
+			bpr = 8 * width;
+			break;
+		case B_RGB48: case B_RGB48_BIG:
+			bpr = 6 * width;
+			break;
 		case B_RGB32: case B_RGBA32:
 		case B_RGB32_BIG: case B_RGBA32_BIG:
 		case B_UVL32: case B_UVLA32:
@@ -637,11 +643,7 @@ BBitmap::SetBits(const void* data, int32 length, int32 offset,
 	int32 inBPR = -1;
 	// tweaks to mimic R5 behavior
 	if (error == B_OK) {
-		if (colorSpace == B_RGB32) {
-			// B_RGB32 means actually unpadded B_RGB24_BIG
-			colorSpace = B_RGB24_BIG;
-			inBPR = width * 3;
-		} else if (colorSpace == B_CMAP8 && fColorSpace != B_CMAP8) {
+		if (colorSpace == B_CMAP8 && fColorSpace != B_CMAP8) {
 			// If in color space is B_CMAP8, but the bitmap's is another one,
 			// ignore source data row padding.
 			inBPR = width;
@@ -718,8 +720,7 @@ BBitmap::ImportBits(const void* data, int32 length, int32 bpr, int32 offset,
 	\param colorSpace Color space of the source data.
 	\param from The offset in the source where reading should begin.
 	\param to The offset in the bitmap where the source should be written.
-	\param width The width (in pixels) to be imported.
-	\param height The height (in pixels) to be imported.
+	\param size The size (in pixels) to be imported.
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a data, invalid \a bpr, unsupported
@@ -727,14 +728,14 @@ BBitmap::ImportBits(const void* data, int32 length, int32 bpr, int32 offset,
 */
 status_t
 BBitmap::ImportBits(const void* data, int32 length, int32 bpr,
-	color_space colorSpace, BPoint from, BPoint to, int32 width, int32 height)
+	color_space colorSpace, BPoint from, BPoint to, BSize size)
 {
 	_AssertPointer();
 
 	if (InitCheck() != B_OK)
 		return B_NO_INIT;
 
-	if (!data || length < 0 || width < 0 || height < 0)
+	if (!data || length < 0 || size.IntegerWidth() < 0 || size.IntegerHeight() < 0)
 		return B_BAD_VALUE;
 
 	if (bpr <= 0) {
@@ -745,11 +746,20 @@ BBitmap::ImportBits(const void* data, int32 length, int32 bpr,
 	}
 
 	return BPrivate::ConvertBits(data, fBasePointer, length, fSize, bpr,
-		fBytesPerRow, colorSpace, fColorSpace, from, to, width, height);
+		fBytesPerRow, colorSpace, fColorSpace, from, to,
+		size.IntegerWidth() + 1, size.IntegerHeight() + 1);
 }
 
 
-/*!	\briefly Assigns another bitmap's data to this bitmap.
+status_t
+BBitmap::ImportBits(const void* data, int32 length, int32 bpr,
+	color_space colorSpace, BPoint from, BPoint to, int32 width, int32 height)
+{
+	return ImportBits(data, length, bpr, colorSpace, from, to, BSize(width - 1, height - 1));
+}
+
+
+/*!	\brief Assigns another bitmap's data to this bitmap.
 
 	The supplied bitmap must have the exactly same dimensions as this bitmap.
 	Its data is converted to the color space of this bitmap.
@@ -790,15 +800,13 @@ BBitmap::ImportBits(const BBitmap* bitmap)
 	\param bitmap The source bitmap.
 	\param from The offset in the source where reading should begin.
 	\param to The offset in the bitmap where the source should be written.
-	\param width The width (in pixels) to be imported.
-	\param height The height (in pixels) to be imported.
+	\param size The size (in pixels) to be imported.
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a bitmap, the conversion from or to one of
 	  the color spaces is not supported, or invalid width/height.
 */
 status_t
-BBitmap::ImportBits(const BBitmap* bitmap, BPoint from, BPoint to, int32 width,
-	int32 height)
+BBitmap::ImportBits(const BBitmap* bitmap, BPoint from, BPoint to, BSize size)
 {
 	if (InitCheck() != B_OK)
 		return B_NO_INIT;
@@ -807,7 +815,14 @@ BBitmap::ImportBits(const BBitmap* bitmap, BPoint from, BPoint to, int32 width,
 		return B_BAD_VALUE;
 
 	return ImportBits(bitmap->Bits(), bitmap->BitsLength(),
-		bitmap->BytesPerRow(), bitmap->ColorSpace(), from, to, width, height);
+		bitmap->BytesPerRow(), bitmap->ColorSpace(), from, to, size);
+}
+
+
+status_t
+BBitmap::ImportBits(const BBitmap* bitmap, BPoint from, BPoint to, int32 width, int32 height)
+{
+	return ImportBits(bitmap, from, to, BSize(width - 1, height - 1));
 }
 
 

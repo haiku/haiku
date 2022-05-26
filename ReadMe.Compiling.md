@@ -31,7 +31,7 @@ nightly builds.
  * `makeinfo` (part of `texinfo`, only needed for building GCC 4)
  * `autoheader` (part of `autoconf`, needed for building GCC)
  * `automake` (needed for building GCC)
- * `gawk`
+ * `awk` (GNU awk is most tested, but other implementations should work)
  * `nasm`
  * `wget`
  * `[un]zip`
@@ -128,14 +128,15 @@ haiku/generated.x86gcc2
 ### Configure an x86_64 (GCC 8) build
 ```bash
 cd haiku/generated.x86_64
-../configure --build-cross-tools x86_64 ../../buildtools/
+../configure --cross-tools-source ../../buildtools --build-cross-tools x86_64
 ```
 
 ### Configure a 32-bit GCC 2.95/GCC 8 Hybrid, from a non-Haiku platform
 ```bash
 cd haiku/generated.x86gcc2
 ../configure \
-	--build-cross-tools x86_gcc2 ../../buildtools/ \
+	--cross-tools-source ../../buildtools/ \
+	--build-cross-tools x86_gcc2 \
 	--build-cross-tools x86
 ```
 
@@ -243,7 +244,7 @@ Configure Haiku's build system for a bootstrap build specifying the location
 of all of the repositories above.
 ```
 ../configure -j4 \
-  --build-cross-tools myarch ../../buildtools \
+  --build-cross-tools myarch --cross-tools-source ../../buildtools \
   --bootstrap ../../haikuporter/haikuporter ../../haikuports.cross ../../haikuports
 ```
 

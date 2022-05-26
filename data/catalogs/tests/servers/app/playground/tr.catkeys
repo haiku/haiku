@@ -12,7 +12,7 @@ Alpha:	Playground		Alfa:
 Mode:	Playground		Kip:
 Submenu	Playground		Altmenü
 Copy	Playground		Kopyala
-Cancel	Playground		İptal et
+Cancel	Playground		Vazgeç
 Clear	Playground		Temizle
 Min	Playground		En az
 Blend	Playground		Harmanla
@@ -27,6 +27,6 @@ Add	Playground		Ekle
 Playground	System name		Oyun Alanı
 Erase	Playground		Sil
 File	Playground		Dosya
-Subtract	Playground		Çıkart
+Subtract	Playground		Çıkar
 <pick>	Playground		<seç>
 Ellipse	Playground		Elips

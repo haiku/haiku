@@ -35,11 +35,15 @@
 #include "AddOnHostProtocol.h"
 
 #include <Alert.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <MediaRoster.h>
 
 #include <cstdlib>
 #include <cstring>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexAddOnHost"
 
 __USE_CORTEX_NAMESPACE
 using namespace addon_host;
@@ -170,10 +174,11 @@ main(int argc, char** argv)
 {
 	App app;
 	if (argc < 2 || strcmp(argv[1], "--addon-host") != 0) {
-		BAlert* alert = new BAlert("Cortex AddOnHost",
-			"This program runs in the background, and is started automatically "
-			"by Cortex when necessary.  You probably don't want to start it manually.",
-			"Continue", "Quit");
+		BAlert* alert = new BAlert(B_TRANSLATE("Cortex AddOnHost"),
+			B_TRANSLATE("This program runs in the background, and is started "
+				"automatically by Cortex when necessary. You probably don't "
+				"want to start it manually."),
+			B_TRANSLATE("Continue"), B_TRANSLATE("Quit"));
 		alert->SetShortcut(1, B_ESCAPE);
 		int32 response = alert->Go();
 

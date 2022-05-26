@@ -1,27 +1,19 @@
-1	slovak	x-vnd.Haiku-mixer.media_addon	3450667169
-Input gain controls represent	AudioMixer		Ovládacie prvky vstupného zosilnenia predstavujú
-Linear interpolation	AudioMixer		Lineárna interpolácia
-Virtual output channels	AudioMixer		Virtuálne výstupné kanály
-Refuse output format changes	AudioMixer		Odmietnuť zmeny výstupného formátu
-Output mapping	AudioMixer		Mapovanie výstupu
-Allow input channel remapping	AudioMixer		Povoliť premapovanie vstupného kanála
-Resampling algorithm	AudioMixer		Algoritmus prevzorkovania
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Utlmiť výstup zmiešavača o 3dB (ako BeOS R5)
-Display balance control for stereo connections	AudioMixer		Zobraziť ovládanie vyváženia pri stereo spojeniach
+1	slovak	x-vnd.Haiku-mixer.media_addon	3463574286
+Input mapping	AudioMixer		Mapovanie vstupu
 To output	AudioMixer		Na výstup
+Gain	AudioMixer		Zosilnenie
+To master	AudioMixer		Na hlavný
 not connected	AudioMixer		nepripojené
-Refuse input format changes	AudioMixer		Odmietnuť zmeny formátu vstupu
-Drop/repeat samples	AudioMixer		Zahodiť/opakovať vzorky
-Output channel sources	AudioMixer		Zdroje výstupného kanála
+Master output	AudioMixer		Hlavný výstup
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Ovládanie zosilnenia
-Input mapping	AudioMixer		Mapovanie vstupu
-Mute	AudioMixer		Stlmiť
-Input channel destinations	AudioMixer		Ciele vstupného kanála
-To master	AudioMixer		Na hlavný
-Master output	AudioMixer		Hlavný výstup
+Output channel sources	AudioMixer		Zdroje výstupného kanála
+Allow input channel remapping	AudioMixer		Povoliť premapovanie vstupného kanála
+Display balance control for stereo connections	AudioMixer		Zobraziť ovládanie vyváženia pri stereo spojeniach
 Setup	AudioMixer		Nastavenie
-Use non linear gain sliders (like BeOS R5)	AudioMixer		Použiť nelineárne posuvníky zosilnenia (ako BeOS R5)
-Gain	AudioMixer		Zosilnenie
-Allow output channel remapping	AudioMixer		Povoliť premapovanie výstupných kanálov
 Physical input channels	AudioMixer		Fyzické vstupné kanály
+Input channel destinations	AudioMixer		Ciele vstupného kanála
+Mute	AudioMixer		Stlmiť
+Output mapping	AudioMixer		Mapovanie výstupu
+Virtual output channels	AudioMixer		Virtuálne výstupné kanály
+Allow output channel remapping	AudioMixer		Povoliť premapovanie výstupných kanálov

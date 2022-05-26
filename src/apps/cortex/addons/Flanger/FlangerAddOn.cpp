@@ -34,10 +34,14 @@
 
 #include "FlangerNode.h"
 #include "FlangerAddOn.h"
+#include <Catalog.h>
 #include <Entry.h>
 #include <Debug.h>
 #include <cstring>
 #include <cstdlib>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexAddOnsFlanger"
 
 // instantiation function
 extern "C" _EXPORT BMediaAddOn* make_media_addon(image_id image);
@@ -76,10 +80,9 @@ status_t FlangerAddOn::GetFlavorAt(
 	
 	flavor_info* pInfo = new flavor_info;
 	pInfo->internal_id = n;
-	pInfo->name = (char *)"Flanger";
-	pInfo->info = (char *)
-		"An add-on version of FlangerNode.\n"
-		"by Eric Moon (16 June, 1999)";
+	pInfo->name = B_TRANSLATE("Flanger");
+	pInfo->info = B_TRANSLATE("An add-on version of FlangerNode.\n"
+		"by Eric Moon (16 June, 1999)");
 	pInfo->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_CONTROLLABLE;
 	pInfo->flavor_flags = 0;
 	pInfo->possible_count = 0;

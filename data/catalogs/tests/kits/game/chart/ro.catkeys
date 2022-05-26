@@ -1,24 +1,24 @@
 1	romanian	x-vnd.Haiku-ChartDemo	986636897
-Slow rotation	ChartWindow		Rotire lentă
+Slow rotation	ChartWindow		Rotație lentă
 Pink	ChartWindow		Roz
 Comet	ChartWindow		Cometă
 DirectWindow	ChartWindow		DirectWindow
 Orange	ChartWindow		Portocaliu
-Refresh rate	ChartWindow		Rata de actualizare
+Refresh rate	ChartWindow		Rata de reîmprospătare
 Blue	ChartWindow		Albastru
 Colors	ChartWindow		Culori
 Novas	ChartWindow		Nove
 LineArray	ChartWindow		LineArray
- 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (scală logaritmică)
+ 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (scară logaritmică)
 Free motion	ChartWindow		Mişcare liberă
 (high) 100% 	ChartWindow		(ridicat) 100% 
 Green	ChartWindow		Verde
 Amas	ChartWindow		Amas
-2 threads	ChartWindow		2 threaduri
+2 threads	ChartWindow		2 thread-uri
 Yellow	ChartWindow		Galben
-Off	ChartWindow		Dezactivat
+Off	ChartWindow		Oprit
 Chaos	ChartWindow		Haos
-Full screen	ChartWindow		Tot ecranul
+Full screen	ChartWindow		Ecran complet
 Spiral	ChartWindow		Spirală
 Slow motion	ChartWindow		Mişcare lentă
  5% (low)	ChartWindow		 5% (scăzut)
@@ -27,16 +27,16 @@ Special	ChartWindow		Special
 Status	ChartWindow		Stare
 Star density	ChartWindow		Densitate stelară
 600.0 f/s	ChartWindow		600.0 f/s
-Display:	ChartWindow		Afişaj:
-Space color	ChartWindow		Culoare spaţiu
+Display:	ChartWindow		Afișaj:
+Space color	ChartWindow		Culoare spațiu
 White	ChartWindow		Alb
 Chart	System name		Chart
-Animation:	ChartWindow		Animaţie:
+Animation:	ChartWindow		Animație:
 Frames/s	ChartWindow		Cadre/s
 Auto demo	ChartWindow		Demo auto
 CPU load	ChartWindow		Încărcare CPU
 DrawBitmap	ChartWindow		DrawBitmap
-Red	ChartWindow		Roşu
-None	ChartWindow		Nimic
-Battle	ChartWindow		Bătălie
-Space:	ChartWindow		Spaţiu:
+Red	ChartWindow		Roșu
+None	ChartWindow		Nespecificat
+Battle	ChartWindow		Luptă
+Space:	ChartWindow		Spațiu:

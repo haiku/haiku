@@ -65,11 +65,10 @@ ARMPagingStructures32Bit::Init(page_directory_entry* virtualPageDir,
 	pgdir_virt = virtualPageDir;
 	pgdir_phys = physicalPageDir;
 
-#if 0 // IRA: handle UART better; identity map of DEVICE_BASE from loader gets wiped here
 	// zero out the bottom portion of the new pgdir
 	memset(pgdir_virt + FIRST_USER_PGDIR_ENT, 0,
 		NUM_USER_PGDIR_ENTS * sizeof(page_directory_entry));
-#endif
+
 	// insert this new map into the map list
 	{
 		int state = disable_interrupts();

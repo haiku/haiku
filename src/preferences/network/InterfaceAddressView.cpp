@@ -76,7 +76,7 @@ InterfaceAddressView::InterfaceAddressView(int family,
 
 	float minimumWidth = be_control_look->DefaultItemSpacing() * 15;
 
-	fAddressField = new IPAddressControl(fFamily, B_TRANSLATE("IP Address:"),
+	fAddressField = new IPAddressControl(fFamily, B_TRANSLATE("IP address:"),
 		NULL);
 	fAddressField->SetToolTip(B_TRANSLATE("Your IP address"));
 	fAddressField->TextView()->SetExplicitMinSize(

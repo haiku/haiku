@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-ProcessController	2524565058
+1	croatian	x-vnd.Haiku-ProcessController	3367463588
 Error saving file	ProcessController		Greška pri spremanju datoteke
 That's no Fun!	ProcessController		To nije zabavno!
 Your setting file could not be saved!\n(%s)	ProcessController		Vaša datoteka postavki nije mogla biti spremljena!\n(%s)
@@ -14,7 +14,6 @@ Restart Deskbar	ProcessController		Ponovno pokreni Deskabar
 Usage: %s [-deskbar]\n	ProcessController		Upotreba: %s [-deskbar]\n
 Please confirm	ProcessController		Molim potvrdite
 Urgent priority	ProcessController		Hitni prioritet
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 Quit application	ProcessController		Izađi iz programa
 Info	ProcessController		Informacije
 Quit an application	ProcessController		Ugasi program

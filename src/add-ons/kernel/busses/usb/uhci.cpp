@@ -215,7 +215,7 @@ Queue::AppendTransfer(uhci_qh *transfer, bool lock)
 	} else {
 		// append the transfer queue to the list
 		uhci_qh *element = fQueueTop;
-		while (element && element->link_log)
+		while (element->link_log != NULL)
 			element = (uhci_qh *)element->link_log;
 
 		element->link_log = transfer;
@@ -719,8 +719,14 @@ UHCI::SubmitTransfer(Transfer *transfer)
 		return SubmitRequest(transfer);
 
 	// Process isochronous transfers
+#if 0
 	if (pipe->Type() & USB_OBJECT_ISO_PIPE)
 		return SubmitIsochronous(transfer);
+#else
+	// At present, isochronous transfers cause busylooping, and do not seem to work.
+	if (pipe->Type() & USB_OBJECT_ISO_PIPE)
+		return B_NOT_SUPPORTED;
+#endif
 
 	uhci_td *firstDescriptor = NULL;
 	uhci_qh *transferQueue = NULL;
@@ -986,7 +992,7 @@ UHCI::SubmitRequest(Transfer *transfer)
 		uhci_td *lastDescriptor = NULL;
 		status_t result = CreateDescriptorChain(pipe, &dataDescriptor,
 			&lastDescriptor, directionIn ? TD_TOKEN_IN : TD_TOKEN_OUT,
-			transfer->VectorLength());
+			transfer->FragmentLength());
 
 		if (result < B_OK) {
 			FreeDescriptor(setupDescriptor);
@@ -1057,6 +1063,21 @@ UHCI::AddPendingTransfer(Transfer *transfer, Queue *queue,
 	if (!Lock()) {
 		delete data;
 		return B_ERROR;
+	}
+
+	// We do not support queuing other transfers in tandem with a fragmented one.
+	transfer_data *it = fFirstTransfer;
+	while (it) {
+		if (it->transfer && it->transfer->TransferPipe() == transfer->TransferPipe()
+				&& it->transfer->IsFragmented()) {
+			TRACE_ERROR("cannot submit transfer: a fragmented transfer is queued\n");
+
+			Unlock();
+			delete data;
+			return B_DEV_RESOURCE_CONFLICT;
+		}
+
+		it = it->link;
 	}
 
 	if (fLastTransfer)
@@ -1498,9 +1519,9 @@ UHCI::FinishTransfers()
 						// this transfer may still have data left
 						TRACE("advancing fragmented transfer\n");
 						transfer->transfer->AdvanceByFragment(actualLength);
-						if (transfer->transfer->VectorLength() > 0) {
+						if (transfer->transfer->FragmentLength() > 0) {
 							TRACE("still %ld bytes left on transfer\n",
-								transfer->transfer->VectorLength());
+								transfer->transfer->FragmentLength());
 
 							Transfer *resubmit = transfer->transfer;
 
@@ -1956,7 +1977,7 @@ UHCI::CreateFilledTransfer(Transfer *transfer, uhci_td **_firstDescriptor,
 	uhci_td *lastDescriptor = NULL;
 	status_t result = CreateDescriptorChain(pipe, &firstDescriptor,
 		&lastDescriptor, directionIn ? TD_TOKEN_IN : TD_TOKEN_OUT,
-		transfer->VectorLength());
+		transfer->FragmentLength());
 
 	if (result < B_OK)
 		return result;

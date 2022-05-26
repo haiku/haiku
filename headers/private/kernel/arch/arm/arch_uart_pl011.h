@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2012 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2021 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,6 +14,9 @@
 #include <SupportDefs.h>
 
 #include <arch/generic/debug_uart.h>
+
+
+#define UART_KIND_PL011 "pl011"
 
 
 class ArchUARTPL011 : public DebugUART {

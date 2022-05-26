@@ -32,9 +32,15 @@
 
 //#define TRACE_PS2
 #ifdef TRACE_PS2
-#	define TRACE(x...) dprintf(x)
-#else
-#	define TRACE(x...)
+#define TRACE_PS2_ALPS
+#define TRACE_PS2_COMMON
+#define TRACE_PS2_DEV
+#define TRACE_PS2_ELANTECH
+#define TRACE_PS2_MOUSE
+#define TRACE_PS2_KEYBOARD
+#define TRACE_PS2_SERVICE
+#define TRACE_PS2_SYNAPTICS
+#define TRACE_PS2_TRACKPOINT
 #endif
 
 

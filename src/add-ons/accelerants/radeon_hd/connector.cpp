@@ -131,8 +131,10 @@ connector_pick_atom_hpdid(uint32 connectorIndex)
 		uint32 targetReg = AVIVO_DC_GPIO_HPD_A;
 		if (info.dceMajor >= 13) {
 			ERROR("WARNING: CHECK NEW DCE mmDC_GPIO_HPD_A value!\n");
-			targetReg = CAR_mmDC_GPIO_HPD_A;
-		} else if (info.dceMajor >= 11)
+			targetReg = POL_mmDC_GPIO_HPD_A;
+		} else if (info.dceMajor >= 12)
+			targetReg = POL_mmDC_GPIO_HPD_A;
+		else if (info.dceMajor >= 11)
 			targetReg = CAR_mmDC_GPIO_HPD_A;
 		else if (info.dceMajor >= 10)
 			targetReg = VOL_mmDC_GPIO_HPD_A;
@@ -317,7 +319,25 @@ connector_attach_gpio_i2c(uint32 connectorIndex, uint8 hwPin)
 	}
 
 	// We couldnt find the GPIO pin in the known GPIO pins.
-    TRACE("%s: can't find GPIO pin 0x%" B_PRIX8 " for connector %" B_PRIu32 "\n",
+	TRACE("%s: can't find GPIO pin 0x%" B_PRIX8 " for connector %" B_PRIu32 "\n",
+		__func__, hwPin, connectorIndex);
+	return B_ERROR;
+}
+
+
+static status_t
+connector_attach_gpio_router(uint32 connectorIndex, uint8 hwPin)
+{
+	gConnector[connectorIndex]->router.i2cPinIndex = 0;
+	for (uint32 i = 0; i < MAX_GPIO_PINS; i++) {
+		if (gGPIOInfo[i]->hwPin != hwPin)
+			continue;
+		gConnector[connectorIndex]->router.i2cPinIndex = i;
+		return B_OK;
+	}
+
+	// We couldnt find the GPIO pin in the known GPIO pins.
+	TRACE("%s: can't find GPIO pin 0x%" B_PRIX8 " for connector %" B_PRIu32 "\n",
 		__func__, hwPin, connectorIndex);
 	return B_ERROR;
 }
@@ -831,7 +851,71 @@ connector_probe()
 					}
 					// END if object is encoder
 				} else if (graphicObjectType == GRAPH_OBJECT_TYPE_ROUTER) {
-					ERROR("%s: TODO: Found router object?\n", __func__);
+					int32 k;
+					for (k = 0; k < routerObject->ucNumberOfObjects; k++) {
+						uint16 routerObjectID
+							= B_LENDIAN_TO_HOST_INT16(routerObject->asObjects[k].usObjectID);
+						if (B_LENDIAN_TO_HOST_INT16(path->usGraphicObjIds[j]) == routerObjectID) {
+							ATOM_COMMON_RECORD_HEADER* record = (ATOM_COMMON_RECORD_HEADER*)
+								((uint16*)gAtomContext->bios + tableOffset
+								+ B_LENDIAN_TO_HOST_INT16(
+								routerObject->asObjects[k].usRecordOffset));
+							ATOM_I2C_RECORD* i2cRecord;
+							ATOM_I2C_ID_CONFIG_ACCESS* i2cConfig;
+							ATOM_ROUTER_DDC_PATH_SELECT_RECORD* ddcPath;
+							ATOM_ROUTER_DATA_CLOCK_PATH_SELECT_RECORD* cdPath;
+							ATOM_SRC_DST_TABLE_FOR_ONE_OBJECT* routerConnTable =
+								(ATOM_SRC_DST_TABLE_FOR_ONE_OBJECT *)
+								((uint16*)gAtomContext->bios + tableOffset +
+								+ B_LENDIAN_TO_HOST_INT16(
+								routerObject->asObjects[k].usSrcDstTableOffset));
+							uint8* destObjCount = (uint8*)((uint8*)routerConnTable + 1
+								+ (routerConnTable->ucNumberOfSrc * 2));
+							uint16 *dstObjs = (uint16 *)(destObjCount + 1);
+
+							int enumId;
+							router_info* router = &connector->router;
+							router->objectID = routerObjectID;
+							for (enumId = 0; enumId < (*destObjCount); enumId++) {
+								if (B_LENDIAN_TO_HOST_INT16(path->usConnObjectId) ==
+									B_LENDIAN_TO_HOST_INT16(dstObjs[enumId]))
+									break;
+							}
+							while (record->ucRecordSize > 0 &&
+								record->ucRecordType > 0 &&
+								record->ucRecordType <= ATOM_MAX_OBJECT_RECORD_NUMBER) {
+								switch (record->ucRecordType) {
+									case ATOM_I2C_RECORD_TYPE:
+										i2cRecord = (ATOM_I2C_RECORD*)record;
+										i2cConfig
+											= (ATOM_I2C_ID_CONFIG_ACCESS*)&i2cRecord->sucI2cId;
+										connector_attach_gpio_router(connectorIndex,
+											i2cConfig->ucAccess);
+										router->i2cAddr = i2cRecord->ucI2CAddr >> 1; // ??
+										break;
+									case ATOM_ROUTER_DDC_PATH_SELECT_RECORD_TYPE:
+										ddcPath = (ATOM_ROUTER_DDC_PATH_SELECT_RECORD*)record;
+										router->ddcValid = true;
+										router->ddcMuxType = ddcPath->ucMuxType;
+										router->ddcMuxControlPin = ddcPath->ucMuxControlPin;
+										router->ddcMuxState = ddcPath->ucMuxState[enumId];
+										break;
+									case ATOM_ROUTER_DATA_CLOCK_PATH_SELECT_RECORD_TYPE:
+										cdPath
+											= (ATOM_ROUTER_DATA_CLOCK_PATH_SELECT_RECORD *)record;
+										router->cdValid = true;
+										router->cdMuxType = cdPath->ucMuxType;
+										router->cdMuxControlPin = cdPath->ucMuxControlPin;
+										router->cdMuxState = cdPath->ucMuxState[enumId];
+										break;
+								}
+
+								// move to next record
+								record = (ATOM_COMMON_RECORD_HEADER*)
+									((char *)record + record->ucRecordSize);
+							}
+						}
+					}
 				} // END if object is router
 			}
 
@@ -933,11 +1017,33 @@ debug_connectors()
 				gGPIOInfo[i2cPinIndex]->valid ? "true" : "false");
 			ERROR("   - i2c valid:        %s\n",
 				gGPIOInfo[i2cPinIndex]->i2c.valid ? "true" : "false");
+
+			// hot plug detection info
 			ERROR(" + hpd gpio table id:  %" B_PRIu16 "\n", hpdPinIndex);
 			ERROR("   - gpio hw pin:      0x%" B_PRIX32 "\n",
 				 gGPIOInfo[hpdPinIndex]->hwPin);
 			ERROR("   - gpio valid:       %s\n",
 				gGPIOInfo[hpdPinIndex]->valid ? "true" : "false");
+
+			// router info
+			router_info* router = &gConnector[id]->router;
+			ERROR(" + router gpio table id: %" B_PRIu16 "\n", router->i2cPinIndex);
+			ERROR(" + router (ddc):       %s\n",
+				router->ddcValid ? "true" : "false");
+			if (router->ddcValid) {
+				ERROR("   - mux  type: 0x%" B_PRIX8 "\n", router->ddcMuxType);
+				ERROR("   - mux   pin: 0x%" B_PRIX8 "\n", router->ddcMuxControlPin);
+				ERROR("   - mux state: 0x%" B_PRIX8 "\n", router->ddcMuxState);
+			}
+			ERROR(" + router (c/d):       %s\n",
+				router->cdValid ? "true" : "false");
+			if (router->cdValid) {
+				ERROR("   - mux  type: 0x%" B_PRIX8 "\n", router->cdMuxType);
+				ERROR("   - mux   pin: 0x%" B_PRIX8 "\n", router->cdMuxControlPin);
+				ERROR("   - mux state: 0x%" B_PRIX8 "\n", router->cdMuxState);
+			}
+
+			// encoder info
 			encoder_info* encoder = &gConnector[id]->encoder;
 			ERROR(" + encoder:            %s\n",
 				get_encoder_name(encoder->type));

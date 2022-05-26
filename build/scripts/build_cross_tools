@@ -118,7 +118,7 @@ fi
 
 # build binutils
 cd $binutilsObjDir
-CFLAGS="-O2" CXXFLAGS="-O2" $buildToolsDir/binutils/configure \
+CFLAGS="-O2 -fcommon" CXXFLAGS="-O2 -fcommon" $buildToolsDir/binutils/configure \
 	--prefix=$installDir $buildHostSpec --target=i586-pc-haiku \
 	--disable-nls --enable-shared=yes --disable-werror || exit 1
 $MAKE $additionalMakeArgs || exit 1
@@ -159,7 +159,7 @@ copy_headers $haikuSourceDir/headers/posix $tmpIncludeDir/posix
 cd $gccObjDir
 # GCC 2 compiled for x86_64 on most systems is broken, compile for 32-bit.
 export CC="gcc -m32"
-CFLAGS="-O2 -U_FORTIFY_SOURCE" CXXFLAGS="-O2" $buildToolsDir/gcc/configure \
+CFLAGS="-O2 -U_FORTIFY_SOURCE -fcommon" CXXFLAGS="-O2 -fcommon" $buildToolsDir/gcc/configure \
 	--prefix=$installDir $buildHostSpec --target=i586-pc-haiku \
 	--disable-nls --enable-shared=yes --enable-languages=c,c++ \
 	--with-headers=$tmpIncludeDir --with-libs=$tmpLibDir $gccConfigureArgs \

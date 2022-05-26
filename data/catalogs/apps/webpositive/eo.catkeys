@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-WebPositive	1976607515
+1	esperanto	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Aŭtentigo nepra
 Previous	WebPositive Window		Antaŭa
 (Finish: %date)	Download Window		(Fino: %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		Uzi enhavantan dosierujon
 Find previous	WebPositive Window		Antaŭserĉi
 Full screen	WebPositive Window		Plenekrane
 Downloads in progress	WebPositive		Daŭrantaj elŝutadoj
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ĉu vi volas uzi ĉiujn %addedCount legosignojn samtempe?
 Copy URL to clipboard	Download Window		Kopii retadreson en tondujon
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ĉu vi volas uzi ĉiujn %addedCount legosignojn samtempe?
 Clone current page	Settings Window		Dubli la aktivan paĝon
 Start page:	Settings Window		Komenca paĝo:
 Cancel	Download Window		Nuligi
@@ -49,10 +49,10 @@ Decrease size	WebPositive Window		Malgrandigi
 Default fixed font size:	Settings Window		Defaŭlta grado de fiksitlarĝa tiparo:
 Sans serif font:	Settings Window		Senserifa tiparo:
 Clear	WebPositive Window		Viŝi
-Cookies for %s	Cookie Manager		Retkuketo por %s
 The download could not be opened.	Download Window		La elŝutito ne povas esti uzata.
+Cookies for %s	Cookie Manager		Retkuketo por %s
 Close	Download Window		Fermi
-WebPositive	System name		La Retprospero (WebPositive)
+WebPositive	System name		Retprospero
 %s - Search term	Settings Window		%s - Serĉvorto
 Reload	WebPositive Window		Reŝargi
 Expiration	Cookie Manager		Eksvalidiĝo
@@ -101,17 +101,18 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Malfari
 Copy	WebPositive Window		Kopii
 Default standard font size:	Settings Window		Defaŭlta grado de implica tiparo:
+Custom	Settings Window		Adaptita
 Bookmark this page	WebPositive Window		Konservi ligilon de ĉi paĝo
 Show tabs if only one page is open	Settings Window		Montri panelon de langetoj eĉ se nur unu paĝo estas uzata
 Close tab	WebPositive Window		Fermi langeton
 Remove	Download Window		Forigi
 About	WebPositive Window		Pri
-There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		La elŝutado daŭras, ĉu vi certas ke vi volas ĉesigi la Retprosperon nun?
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		La elŝutado daŭras, ĉu vi certas ke vi volas ĉesigi Retprosperon nun?
 Continue downloads	WebPositive		Daŭrigi elŝutadon
 Proxy server requires authentication	Settings Window		La prokurilo postulas aŭtentigon
 Cancel	Settings Window		Nuligi
-History	WebPositive Window		Historio
 Reset size	WebPositive Window		Restarigi grandon
+History	WebPositive Window		Historio
 Do you really want to clear the browsing history?	WebPositive Window		Ĉu vi certas ke volas nuligi historion de rigardado?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Serĉi sekvan aperon de serĉaĵo
 Fixed font:	Settings Window		Fiksitlarĝa tiparo:
@@ -131,7 +132,7 @@ Next	WebPositive Window		Sekva
 Bookmark error	WebPositive Window		Eraro de legosignoj
 OK	WebPositive Window		Bone
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% el %expectedSize%, %rate%/s)
-WebPositive	Download Window		La Retprospero (WebPositive)
+WebPositive	Download Window		Retprospero
 Zoom text only	WebPositive Window		Zomi nur tekston
 Save page as…	WebPositive Window		Konservi paĝon kiel...
 Page source error	WebPositive Window		Eraro de paĝa fonto

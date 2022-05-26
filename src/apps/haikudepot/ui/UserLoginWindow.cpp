@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -854,8 +854,8 @@ UserLoginWindow::_UnpackCaptcha(BMessage& responsePayload, Captcha& captcha)
 	if (result == B_OK)
 		result = resultMessage.FindString("pngImageDataBase64", &pngImageDataBase64);
 
-	ssize_t encodedSize;
-	ssize_t decodedSize;
+	ssize_t encodedSize = 0;
+	ssize_t decodedSize = 0;
 	if (result == B_OK) {
 		encodedSize = pngImageDataBase64.Length();
 		decodedSize = (encodedSize * 3 + 3) / 4;

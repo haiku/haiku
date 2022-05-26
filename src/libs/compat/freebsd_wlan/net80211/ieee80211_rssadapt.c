@@ -117,12 +117,13 @@ static void
 rssadapt_setinterval(const struct ieee80211vap *vap, int msecs)
 {
 	struct ieee80211_rssadapt *rs = vap->iv_rs;
-	int t;
+
+	if (!rs)
+		return;
 
 	if (msecs < 100)
 		msecs = 100;
-	t = msecs_to_ticks(msecs);
-	rs->interval = (t < 1) ? 1 : t;
+	rs->interval = msecs_to_ticks(msecs);
 }
 
 static void
@@ -176,6 +177,12 @@ rssadapt_node_init(struct ieee80211_node *ni)
 	struct ieee80211vap *vap = ni->ni_vap;
 	struct ieee80211_rssadapt *rsa = vap->iv_rs;
 	const struct ieee80211_rateset *rs = &ni->ni_rates;
+
+	if (!rsa) {
+		if_printf(vap->iv_ifp, "ratectl structure was not allocated, "
+		    "per-node structure allocation skipped\n");
+		return;
+	}
 
 	if (ni->ni_rctls == NULL) {
 		ni->ni_rctls = ra = 
@@ -231,10 +238,18 @@ rssadapt_rate(struct ieee80211_node *ni, void *arg __unused, uint32_t iarg)
 {
 	struct ieee80211_rssadapt_node *ra = ni->ni_rctls;
 	u_int pktlen = iarg;
-	const struct ieee80211_rateset *rs = &ra->ra_rates;
+	const struct ieee80211_rateset *rs;
 	uint16_t (*thrs)[IEEE80211_RATE_SIZE];
 	int rix, rssi;
 
+	/* XXX should return -1 here, but drivers may not expect this... */
+	if (!ra)
+	{
+		ni->ni_txrate = ni->ni_rates.rs_rates[0];
+		return 0;
+	}
+
+	rs = &ra->ra_rates;
 	if ((ticks - ra->ra_ticks) > ra->ra_rs->interval) {
 		rssadapt_updatestats(ra);
 		ra->ra_ticks = ticks;
@@ -320,6 +335,9 @@ rssadapt_tx_complete(const struct ieee80211_node *ni,
 	struct ieee80211_rssadapt_node *ra = ni->ni_rctls;
 	int pktlen, rssi;
 
+	if (!ra)
+		return;
+
 	if ((status->flags &
 	    (IEEE80211_RATECTL_STATUS_PKTLEN|IEEE80211_RATECTL_STATUS_RSSI)) !=
 	    (IEEE80211_RATECTL_STATUS_PKTLEN|IEEE80211_RATECTL_STATUS_RSSI))
@@ -344,9 +362,12 @@ rssadapt_sysctl_interval(SYSCTL_HANDLER_ARGS)
 {
 	struct ieee80211vap *vap = arg1;
 	struct ieee80211_rssadapt *rs = vap->iv_rs;
-	int msecs = ticks_to_msecs(rs->interval);
-	int error;
+	int msecs, error;
 
+	if (!rs)
+		return ENOMEM;
+
+	msecs = ticks_to_msecs(rs->interval);
 	error = sysctl_handle_int(oidp, &msecs, 0, req);
 	if (error || !req->newptr)
 		return error;
@@ -360,6 +381,7 @@ rssadapt_sysctlattach(struct ieee80211vap *vap,
 {
 
 	SYSCTL_ADD_PROC(ctx, SYSCTL_CHILDREN(tree), OID_AUTO,
-	    "rssadapt_rate_interval", CTLTYPE_INT | CTLFLAG_RW, vap,
-	    0, rssadapt_sysctl_interval, "I", "rssadapt operation interval (ms)");
+	    "rssadapt_rate_interval",
+	    CTLTYPE_INT | CTLFLAG_RW | CTLFLAG_NEEDGIANT, vap, 0,
+	    rssadapt_sysctl_interval, "I", "rssadapt operation interval (ms)");
 }

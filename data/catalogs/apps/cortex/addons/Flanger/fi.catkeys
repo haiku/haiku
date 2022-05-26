@@ -1,0 +1,16 @@
+1	finnish	application/x-vnd.moon-Flanger.media_addon	278353351
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: solmutietojen hakeminen epäonnistui (%ld):\n%s\n
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		FlangerNode-lisäosaversio.\ntekijä: Eric Moon (16 kesäkuuta, 1999)
+Delay	CortexAddOnsFlanger		Viive
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: solmun löytäminen epäonnistui (%ld):\n%s\n
+Depth	CortexAddOnsFlanger		Syvyys
+Feedback	CortexAddOnsFlanger		Palaute
+Sweep rate	CortexAddOnsFlanger		Pyyhkäisynopeus
+Mix ratio	CortexAddOnsFlanger		Sekoitussuhde
+FlangerNode parameters	CortexAddOnsFlanger		FlangerNode-parametrit
+OK	CortexAddOnsCommonMediaNodeControlApp		Valmis
+controls	CortexAddOnsCommonMediaNodeControlApp		ohjaimet
+Mix output	CortexAddOnsFlanger		Sekoituslähtö
+Flanger	CortexAddOnsFlanger		Reunustaja
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: solmulle ei ole parametreja (%ld):\n%s\n
+Audio input	CortexAddOnsFlanger		Audiosyöte

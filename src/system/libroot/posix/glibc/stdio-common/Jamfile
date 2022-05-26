@@ -23,7 +23,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			_itoa.c
 			_itowa.c
 			asprintf.c
-#			dprintf.c
+			dprintf.c
 			fprintf.c
 			fscanf.c
 			getline.c

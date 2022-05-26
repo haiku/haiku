@@ -1,6 +1,6 @@
 /*
  * Copyright 2015, TigerKid001.
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2020-2022, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_CONTENTS_VIEW_H
@@ -30,8 +30,6 @@ private:
 	static	int32				_ContentPopulatorThread(void* arg);
 			bool				_PopulatePackageContents(
 									const PackageInfo& package);
-			int32				_InstallLocation(
-									const PackageInfo& package) const;
 
 private:
 			BOutlineListView*	fContentListView;

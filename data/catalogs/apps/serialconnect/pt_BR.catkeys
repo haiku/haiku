@@ -1,0 +1,37 @@
+1	portuguese (brazil)	x-vnd.haiku.SerialConnect	354154115
+Hardware	SerialWindow	Flowcontrol	Hardware
+Connection	SerialWindow		Conexão
+Raw send…	SerialWindow		Envio raw…
+Baud rate	SerialWindow		Taxa de transmissão
+Stop bits	SerialWindow		Bits de parada
+None	SerialWindow	Flowcontrol	Nenhum
+Cancel	Custom baudrate window		Cancelar
+Sending…	XModemStatus		Enviando…
+<no serial port available>	SerialWindow		<nenhuma porta serial disponível>
+Log to file…	SerialWindow		Registrar no arquivo…
+Custom baudrate	Custom baudrate window		Taxa de transmissão personalizada
+File	SerialWindow		Arquivo
+SerialConnect	System name		Conexão Serial
+custom…	SerialWindow	Baudrate	personalizado…
+Parity	SerialWindow		Paridade
+None	SerialWindow	Parity	Nenhum
+Disconnect	SerialWindow		Desconectar
+Everything sent, waiting for acknowledge	XModemStatus		Tudo enviado, aguardando reconhecimento
+Odd	SerialWindow	Parity	Ímpar
+Flow control	SerialWindow		Controle de fluxo
+file transfer progress	SerialWindow		progresso de transferência de arquivo
+CRC requested	XModemStatus		CRC solicitado
+Data bits	SerialWindow		Bits de dados
+Both	SerialWindow	Flowcontrol	Ambos
+Edit	SerialWindow		Editar
+XModem send…	SerialWindow		XModem enviar…
+Baudrate:	Custom baudrate window		Taxa de transmissão:
+OK	Custom baudrate window		OK
+Waiting for receiver…	XModemStatus		Esperando pelo receptor…
+Clear history	SerialWindow		Limpar histórico
+Checksum error, re-send block	XModemStatus		Erro de soma de verificação, reenviar bloqueio
+Settings	SerialWindow		Configurações
+Even	SerialWindow	Parity	Até
+Software	SerialWindow	Flowcontrol	Software
+Line terminator	SerialWindow		Terminador de linha
+Remote cancelled transfer	XModemStatus		Transferência cancelada remotamente

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015 Haiku, Inc.
+ * Copyright 2001-2020 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,7 +8,9 @@
  *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
- *		Joseph Groover <looncraz@looncraz.net>
+ *		Joseph Groover, looncraz@looncraz.net
+ *		Tri-Edge AI
+ *		Jacob Secunda, secundja@gmail.com
  */
 
 
@@ -83,13 +85,20 @@ Decorator::Decorator(DesktopSettings& settings, BRect frame,
 	fFrame(frame),
 	fResizeRect(),
 	fBorderRect(),
+	fOutlineBorderRect(),
 
 	fLeftBorder(),
 	fTopBorder(),
 	fBottomBorder(),
 	fRightBorder(),
 
+	fLeftOutlineBorder(),
+	fTopOutlineBorder(),
+	fBottomOutlineBorder(),
+	fRightOutlineBorder(),
+
 	fBorderWidth(-1),
+	fOutlineBorderWidth(-1),
 
 	fTopTab(NULL),
 
@@ -215,8 +224,10 @@ Decorator::SetDrawingEngine(DrawingEngine* engine)
 	fDrawingEngine = engine;
 	// lots of subclasses will depend on the driver for text support, so call
 	// _DoLayout() after we have it
-	if (fDrawingEngine != NULL)
+	if (fDrawingEngine != NULL) {
 		_DoLayout();
+		_DoOutlineLayout();
+	}
 }
 
 
@@ -558,9 +569,16 @@ Decorator::GetFootprint()
 	AutoReadLocker _(fLocker);
 
 	if (!fFootprintValid) {
+		fFootprint.MakeEmpty();
+
 		_GetFootprint(&fFootprint);
+
+		if (IsOutlineResizing())
+			_GetOutlineFootprint(&fFootprint);
+
 		fFootprintValid = true;
 	}
+
 	return fFootprint;
 }
 
@@ -657,6 +675,7 @@ Decorator::MoveBy(BPoint offset)
 		fFootprint.OffsetBy(offset.x, offset.y);
 
 	_MoveBy(offset);
+	_MoveOutlineBy(offset);
 }
 
 
@@ -681,7 +700,18 @@ void
 Decorator::ResizeBy(BPoint offset, BRegion* dirty)
 {
 	AutoWriteLocker _(fLocker);
+
 	_ResizeBy(offset, dirty);
+	_ResizeOutlineBy(offset, dirty);
+
+	_InvalidateFootprint();
+}
+
+
+void
+Decorator::SetOutlinesDelta(BPoint delta, BRegion* dirty)
+{
+	_SetOutlinesDelta(delta, dirty);
 	_InvalidateFootprint();
 }
 
@@ -1019,6 +1049,7 @@ Decorator::_FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
 
 	_UpdateFont(settings);
 	_DoLayout();
+	_DoOutlineLayout();
 
 	_InvalidateFootprint();
 	if (updateRegion != NULL)
@@ -1040,6 +1071,7 @@ Decorator::_SetLook(Decorator::Tab* tab, DesktopSettings& settings,
 
 	_UpdateFont(settings);
 	_DoLayout();
+	_DoOutlineLayout();
 
 	_InvalidateFootprint();
 	if (updateRegion != NULL)
@@ -1058,6 +1090,7 @@ Decorator::_SetFlags(Decorator::Tab* tab, uint32 flags, BRegion* updateRegion)
 
 	tab->flags = flags;
 	_DoLayout();
+	_DoOutlineLayout();
 
 	_InvalidateFootprint();
 	if (updateRegion != NULL)
@@ -1083,6 +1116,65 @@ Decorator::_MoveBy(BPoint offset)
 }
 
 
+void
+Decorator::_MoveOutlineBy(BPoint offset)
+{
+	fOutlineBorderRect.OffsetBy(offset);
+
+	fLeftOutlineBorder.OffsetBy(offset);
+	fRightOutlineBorder.OffsetBy(offset);
+	fTopOutlineBorder.OffsetBy(offset);
+	fBottomOutlineBorder.OffsetBy(offset);
+}
+
+
+void
+Decorator::_ResizeOutlineBy(BPoint offset, BRegion* dirty)
+{
+	fOutlineBorderRect.right += offset.x;
+	fOutlineBorderRect.bottom += offset.y;
+
+	fLeftOutlineBorder.bottom += offset.y;
+	fTopOutlineBorder.right += offset.x;
+
+	fRightOutlineBorder.OffsetBy(offset.x, 0.0);
+	fRightOutlineBorder.bottom += offset.y;
+
+	fBottomOutlineBorder.OffsetBy(0.0, offset.y);
+	fBottomOutlineBorder.right += offset.x;
+}
+
+
+void
+Decorator::_SetOutlinesDelta(BPoint delta, BRegion* dirty)
+{
+	BPoint offset = delta - fOutlinesDelta;
+	fOutlinesDelta = delta;
+
+	dirty->Include(fLeftOutlineBorder);
+	dirty->Include(fRightOutlineBorder);
+	dirty->Include(fTopOutlineBorder);
+	dirty->Include(fBottomOutlineBorder);
+
+	fOutlineBorderRect.right += offset.x;
+	fOutlineBorderRect.bottom += offset.y;
+
+	fLeftOutlineBorder.bottom += offset.y;
+	fTopOutlineBorder.right += offset.x;
+
+	fRightOutlineBorder.OffsetBy(offset.x, 0.0);
+	fRightOutlineBorder.bottom	+= offset.y;
+
+	fBottomOutlineBorder.OffsetBy(0.0, offset.y);
+	fBottomOutlineBorder.right	+= offset.x;
+
+	dirty->Include(fLeftOutlineBorder);
+	dirty->Include(fRightOutlineBorder);
+	dirty->Include(fTopOutlineBorder);
+	dirty->Include(fBottomOutlineBorder);
+}
+
+
 bool
 Decorator::_SetSettings(const BMessage& settings, BRegion* updateRegion)
 {
@@ -1100,6 +1192,19 @@ Decorator::_SetSettings(const BMessage& settings, BRegion* updateRegion)
 void
 Decorator::_GetFootprint(BRegion *region)
 {
+}
+
+
+void
+Decorator::_GetOutlineFootprint(BRegion* region)
+{
+	if (region == NULL)
+		return;
+
+	region->Include(fTopOutlineBorder);
+	region->Include(fLeftOutlineBorder);
+	region->Include(fRightOutlineBorder);
+	region->Include(fBottomOutlineBorder);
 }
 
 

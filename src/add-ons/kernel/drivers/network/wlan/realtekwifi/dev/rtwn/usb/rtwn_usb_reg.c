@@ -58,7 +58,6 @@ static int	rtwn_usb_read_region_1(struct rtwn_softc *,
 /* USB Requests. */
 #define R92C_REQ_REGS		0x05
 
-
 static int
 rtwn_do_request(struct rtwn_softc *sc, struct usb_device_request *req,
     void *data)
@@ -172,8 +171,6 @@ rtwn_usb_delay(struct rtwn_softc *sc, int usec)
 	/* 1ms delay as default is too big. */
 	if (usec < 1000)
 		DELAY(usec);
-	else {
-		usb_pause_mtx(&sc->sc_mtx,
-		    MAX(msecs_to_ticks(usec / 1000), 1));
-	}
+	else
+		usb_pause_mtx(&sc->sc_mtx, msecs_to_ticks(usec / 1000));
 }

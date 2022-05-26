@@ -10,6 +10,7 @@ SEARCH on $(repoInfo) = $(HAIKU_TOP)/src/data/repository_infos ;
 local secondaryArchs = $(TARGET_PACKAGING_ARCHS[2-]) ;
 local packages = [ FFilterByBuildFeatures
 	haiku
+	haiku_datatranslators
 	haiku_devel
 	haiku_loader
 

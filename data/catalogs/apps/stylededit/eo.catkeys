@@ -4,8 +4,8 @@ Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ne povas malfari, dos
 Cut	Menus		Eltondi
 Center	Menus		Centre
 Increase size	Menus		Pligrandigi
-Wrap-around search	FindandReplaceWindow		Iteracia serĉo
 Page setup…	Menus		Agordo de paĝo…
+Wrap-around search	FindandReplaceWindow		Iteracia serĉo
 Untitled 	StyledEditWindow		Sentitola 
 OK	Statistics		Bone
 Find	FindandReplaceWindow		Serĉi
@@ -29,8 +29,8 @@ Italic	Menus		Kursiva
 Can't undo	Menus		Ne povas malfari
 Replace…	Menus		Anstataŭigi…
 File	Menus		Dosiero
-Bold	Menus		Grasa
 Paste	Menus		Alglui
+Bold	Menus		Grasa
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Dosiero \"%file%\" estas ŝanĝita per alia programo, ĉu reŝargi ĝin?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Dosiero \"%file%\" estas forigita per alia programo, ĉu restaŭri ĝin?
 Lines:	Statistics		Vicojn:
@@ -68,23 +68,23 @@ OK	LoadAlert		Bone
 Save	QuitAlert		Konservi
 Case-sensitive	FindandReplaceWindow		Usklecodistinga
 Find selection	Menus		Serĉi elektitan
-Cancel	SaveAlert		Nuligi
 Find…	Menus		Serĉi…
+Cancel	SaveAlert		Nuligi
 Revert	RevertToSavedAlert		Malfari
-Decrease size	Menus		Malgrandigi
 Size	Menus		Grado
+Decrease size	Menus		Malgrandigi
 Autodetect	Menus		Detekti aŭtomate
 Replace next	Menus		Anstataŭigi tekston
 OK	QuitAlert		Bone
-Replace with:	FindandReplaceWindow		Anstataŭigi per:
 Edit	Menus		Redakti
+Replace with:	FindandReplaceWindow		Anstataŭigi per:
 Open…	Menus		Uzi…
 Save as…	Menus		Konservi kiel…
 Replace	FindandReplaceWindow		Anstataŭigi
 Characters:	Statistics		Signojn:
 Don't save	QuitAlert		Ne konservi
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		La dosiero estas markita kiel nurlegebla. Ĉu konservi ŝanĝojn en dokumento \"%s\"? 
-Align	Menus		Ĝisrandigi
 Font	Menus		Tiparo
+Align	Menus		Ĝisrandigi
 Select all	Menus		Elekti ĉion
 Right	Menus		Dekstre

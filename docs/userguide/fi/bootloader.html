@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Käyttäjäopas</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../de/bootloader.html">Deutsch</a></li>
 <li><a href="../en/bootloader.html">English</a></li>
 <li><a href="../es/bootloader.html">Español</a></li>
+<li><a href="../eo/bootloader.html">Esperanto</a></li>
 <li><a href="../fr/bootloader.html">Français</a></li>
 <li><a href="../fur/bootloader.html">Furlan</a></li>
 <li><a href="../it/bootloader.html">Italiano</a></li>
@@ -55,19 +56,20 @@
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+    <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h1>Käynnistyslataaja</h1>
 
 <p>Haikun käynnistyslataaja voi auttaa kun koet laitteistopulmia tai haluat valita, minkä Haiku-asennuksen käynnistät, jos sinulla on useampia kuin yksi asennettu järjestelmä (ehkä asennus-CD:ltä tai USB-tikulta). Se on myös kätevä kun olet asentanut ohjelmistokomponentin, joka oireilee ja estää sinua käynnistämästä järjestelmää uudelleen komponentin poistamiseksi, katso alla <a href="#troubleshooting">Vianjäljitys</a>.</p>
 <p>Käynnistyslataajan valitsimiin pääsemiseksi sinun on painettava ja pidettävä alhaalla  <span class="key">VAIHTO</span>-näppäintä ennen Haikun käynnistysprosessin alkamista. Jos käynnistyshallinta on asennettu, voit aloittaa pitämällä <span class="key">VAIHTO</span>-näppäintä alhaalla ennen Haikun käynnistysrivin valintaa. Jos Haiku on ainoa koneeseen asennettu käyttöjärjestelmä, voit aloittaa näppäimen pitämisen alhaalla jo silloin, kun näet näytölläsi BIOS-käynnistysviestit.</p>
-<div class="box-info">Niissä tietokoneissa, joissa käytetään UEFI:a käynnistämiseen klassisen BIOS:in sijasta, sinun on käytettävä sen sijaan <span class="key">VÄLILYÖNTI</span>-painiketta.</div>
+<div class="box-info">Joissakin laitteissa sinun on varmistuttava, että USB-näppäimistö on käytössä BIOS:issa.<br />Niissä tietokoneissa, joissa käytetään UEFI:a käynnistämiseen klassisen BIOS:in sijasta, sinun on käytettävä <span class="key">VÄLILYÖNTI</span>-näppäintä <span class="key">VAIHTO</span>-näppäimen sijasta.</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Käynnistyslataajavalitsimet</a></h2>
@@ -77,35 +79,35 @@
 <tr><td><b>Valitse turvatilavalitsimet</b>
 </td><td> </td><td>Laitteistopulmien tapahtuessa voit kokeilla useita valitsimia tai jos järjestelmä tulee epästabiiliksi tai sitä ei pysty käynnistämään huonosti käyttäytyvän lisäosan vuoksi. Kun valintapalkin siirtää valitsimelle, niin näytön alalaitaan ilmaantuu lyhyt selite.</td></tr>
 <tr><td></td><td></td><td>
-	<p><span class="menu">Turvatila</span><br />
-		Laittaa järjestelmän turvatilaan. Tämä voidaan ottaa käyttöön riippumatta muista valitsimista.</p>
-	<p><span class="menu">Ota pois käytöstä käyttäjälisäosat</span><br />
-		Estää kaikkien käyttäjän asentamien lisäosien latauksen. Vain järjestelmähakemistossa sijaitsevia lisäosia käytetään. Katso alla <a href="#troubleshooting">Vianjäljitys</a>.</p>
-	<p><span class="menu">Ota pois käytöstä IDE DMA</span><br />
-		Ottaa pois käytöstä IDE DMA:an, lisää IDE-yhteensopivuutta suorituskyvyn kustannuksella.</p>
-	<p><span class="menu">Ohita muisti 4:n gibitavun takana</span><br />
-		Ohittaa kaiken muistin 4:n gibitavun rajan takana, korvaa asetukset käyttöjärjestelmäytimen asetustiedostossa.
+	<p><span class="menu">Safe mode</span><br />
+		Puts the system into safe mode. This can be enabled independently from the other options.</p>
+	<p><span class="menu">Disable user add-ons</span><br />
+		Prevents all user installed add-ons from being loaded. Only the add-ons in the system directory will be used. See <a href="#troubleshooting">Troubleshooting</a> below.</p>
+	<p><span class="menu">Disable IDE DMA</span><br />
+		Disables IDE DMA, increasing IDE compatibility at the expense of performance.</p>
+	<p><span class="menu">Ignore memory beyond 4 GiB</span><br />
+		Ignores all memory beyond the 4 GiB address limit, overriding the setting in the kernel settings file.
 </p>
-	<p><span class="menu">Käytä vikasietoista videoajuria</span><br />
-		Järjestelmä käyttää VESA-tilaa ja ei yritä käyttää videografiikka-ajureita.</p>
-	<p><span class="menu">Ota pois käytöstä IO-APIC</span><br />
-		Ottaa pois käytöstä IO APIC-keskeytysreitityksen, pakotetaan sen sijaan perinne-PIC-keskeytysreititykseen.</p>
-	<p><span class="menu">Ota pois käytöstä paikallinen APIC</span><br />
-		Ottaa pois käytöstä paikallisen APIC:in, ottaa pois käytöstä myös SMP:n.</p>
-	<p><span class="menu">Ota pois käytöstä X2APIC</span><br />
-		Ottaa pois käytöstä toisen sukupolven APIC:n</p>
-	<p><span class="menu">Ota pois käytöstä SMEP ja SMAP</span><br />
-		Ottaa pois käytöstä prosessorin SMEP/SMAP-turvaominaisuudet.</p>
-	<p><span class="menu">Ota pois käytöstä SMP</span><br />
-		Ottaa pois käytöstä kaiken muun paitsi yhden prosessoriytimen.</p>
-	<p><span class="menu">Älä kutsu BIOS:ia</span><br />
-		Estää järjestelmää kutsumasta BIOS-funktioita.</p>
-	<p><span class="menu">Ota pois käytöstä APM</span><br />
-		Ottaa pois käytöstä Advanced Power Management -laitetuen, korvaa APM-asetukset käyttöjärjestelmäytimen asetustiedostossa.</p>
-	<p><span class="menu">Ota pois käytöstä ACPI</span><br />
-		Ottaa pois käytöstä Advanced Configuration ja Power Interface -laitetuen, korvaa ACPI-asetukset käyttöjärjestelmäytimen asetustiedostossa.</p>
-	<p><span class="menu">Merkitse kohde mustalle listalle</span><br />
-		Sallii valita järjestelmätiedostoja, jotka ohitetaan. Hyödyllinen esim. otettaessa tilapäisesti ajureita pois käytöstä. Katso alla <a href="#troubleshooting">Vianjäljitys</a>.</p></td></tr>
+	<p><span class="menu">Use fail-safe graphics driver</span><br />
+		The system will use VESA mode and won't try to use any video graphics drivers.</p>
+	<p><span class="menu">Disable IO-APIC</span><br />
+		Disables using the IO APIC for interrupt routing, forcing the use of the legacy PIC instead.</p>
+	<p><span class="menu">Disable local APIC</span><br />
+		Disables using the local APIC, also disables SMP.</p>
+	<p><span class="menu">Disable X2APIC</span><br />
+		Disables second generation APIC.</p>
+	<p><span class="menu">Disable SMEP and SMAP</span><br />
+		Disables SMEP/SMAP security features of the CPU.</p>
+	<p><span class="menu">Disable SMP</span><br />
+		Disables all but one CPU core.</p>
+	<p><span class="menu">Don't call the BIOS</span><br />
+		Stops the system from calling BIOS functions.</p>
+	<p><span class="menu">Disable APM</span><br />
+		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
+	<p><span class="menu">Disable ACPI</span><br />
+		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
+	<p><span class="menu">Disable system components</span><br />
+		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
 <tr><td><b>Valitse vianjäljitysvalitsimet</b>
 </td><td> </td><td>Tästä löydät useita valitsimia, jotka opastavat vianjäljityksessä tai lisätietojen hakemisessa <a href="../../welcome/fi/bugreports.html">vikailmoitukseen</a>. Taas näytön alalaidassa näytetään lyhyt selite.</td></tr>
 <tr><td></td><td></td><td>
@@ -139,8 +141,8 @@
 <li><p><span class="menu">Turvatila</span>-aktivointi estää useimpien palvelin-, taustaprosessi- ja KäyttäjäKäynnistysSkriptien käynnistymisen.</p></li>
 <li><p><span class="menu">Ota pois käytöstä käyttäjälisäosat</span>-aktivointi estää kaikkien lisäosien käytön (ajurit, kääntäjät, jne.), jotka olet asentanut kotikansion alaiseen hierarkkiaan.</p></li>
 <li><p>Jos <span class="menu">Käyttäjäturvallisen grafiikkaohjaimen käyttö</span>-aktivointi ratkaisee pulmasi putoamalla takaisin VESA-grafiikkaan, voit tehdä tämän asetuksen pysyväksi poistamalla merkin <tt>#</tt> riviltä <i>#fail_safe_video_mode true</i> tekstitiedostosta <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
-<li><p>Jos häiritsevä ajuri, lisäosa jne. on asennettu järjestelmähierarkiaan, asiat ovat hiukan mutkikkaampia, koska se alue on kirjoitussuojattu. Tässä <span class="menu">Merkitse kohteita mustalle listalle</span> voi näytellä tärkeää roolia. Sen avulla voit navigoida läpi koko järjestelmähierarkian ja ottaa pois käytöstä komponentit, jotka sotkevat järjestelmää merkitsemällä kohteita <span class="key">VÄLILYÖNTI</span>-näppäimellä tai <span class="key">RETURN</span>-näppäimellä. <span class="key">ESC</span>-näppäin palauttaa sinut yhden tason ylöspäin ylempään hakemistoon.</p>
-<p>Verkossa oleva artikkeli <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">Kuinka merkitä pakkaustiedoston mustalle listalle pysyvästi</a> näyttää, kuinka tästä asetuksesta tekee pysyvän.</p></li>
+<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Disable system components</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
+<p>Online, there's the guide <a href="https://www.haiku-os.org/guides/daily-tasks/blacklist-packages">Disabling components of packages</a> showing how to make that setting stick.</p></li>
 <li><p>Kohdasta <span class="menu">Valitse käynnistyslevy</span> voit määritellä, että minkä aikaisemman ”version” käynnistät. Joka kerta kun asennat pakkauksen tai poistat sen, vanha tila tallennetaan ja voit käynnistää järjestelmän siihen tilaan valitsemalla sen käynnistyslatausvalitsimissa esitetystä luettelosta.<br />
 Joten jos kohtaat käynnistyspulmia jonkun pakkauksen asentamisen jälkeen, käynnistä Haiku-versioon ennen sitä aikaa ja poista haittallinen pakkaus.</p></li>
 </ul>
@@ -168,8 +170,8 @@ Joten jos kohtaat käynnistyspulmia jonkun pakkauksen asentamisen jälkeen, käy
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+    <a href="contents.html" class="uplink">Sisältö</a> 
+::  <a href="filesystem-layout.html">Tiedostojärjestelmäsijoittelu</a>  »
 </span></div>
 </div>
 

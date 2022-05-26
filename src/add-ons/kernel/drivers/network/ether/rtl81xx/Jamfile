@@ -1,0 +1,25 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network ether rtl81xx ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
+	: true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ] ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev mii ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev re ] ;
+
+KernelAddon rtl81xx :
+	glue.c
+	rgephy.c
+	rlphy.c
+	if_re.c
+	: libfreebsd_network.a
+	;
+
+ObjectHdrs [ FGristFiles rgephy$(SUFOBJ) rlphy$(SUFOBJ) ]
+	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
+Includes [ FGristFiles rgephy.c rlphy.c ] : <src!libs!compat!freebsd_network>miidevs.h ;

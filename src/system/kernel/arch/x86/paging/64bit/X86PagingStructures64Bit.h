@@ -14,16 +14,16 @@ struct X86PagingStructures64Bit final : X86PagingStructures {
 								X86PagingStructures64Bit();
 	virtual						~X86PagingStructures64Bit();
 
-			void				Init(uint64* virtualPML4,
-									phys_addr_t physicalPML4);
+			void				Init(uint64* virtualPMLTop,
+									phys_addr_t physicalPMLTop);
 
 	virtual	void				Delete();
 
-			uint64*				VirtualPML4()
-									{ return fVirtualPML4; }
+			uint64*				VirtualPMLTop()
+									{ return fVirtualPMLTop; }
 
 private:
-			uint64*				fVirtualPML4;
+			uint64*				fVirtualPMLTop;
 };
 
 

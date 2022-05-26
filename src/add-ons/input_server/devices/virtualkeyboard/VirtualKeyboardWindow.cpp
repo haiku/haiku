@@ -61,7 +61,6 @@ VirtualKeyboardWindow::VirtualKeyboardWindow(BInputServerDevice* dev)
 
 	fKeyboardView = new KeyboardLayoutView("Keyboard",fDevice);
 	fKeyboardView->GetKeyboardLayout()->SetDefault();
-	fKeyboardView->SetEditable(false);
 	fKeyboardView->SetKeymap(&fCurrentKeymap);
 
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
@@ -130,7 +129,7 @@ VirtualKeyboardWindow::_LoadMaps()
 
 	if (directory.SetTo(path.Path()) == B_OK) {
 		while (directory.GetNextRef(&ref) == B_OK) {
-			fMapListView->AddItem(new KeymapListItem(ref));	
+			fMapListView->AddItem(new KeymapListItem(ref));
 		}
 	}
 	fMapListView->SortItems(&compare_key_list_items);

@@ -1,19 +1,35 @@
 /*
- * Copyright 2018, Jaroslaw Pelczar <jarek@jpelczar.com>
- * Distributed under the terms of the MIT License.
- */
-#ifndef _KERNEL_ARCH_ARM64_ARCH_KERNEL_ARGS_H_
-#define _KERNEL_ARCH_ARM64_ARCH_KERNEL_ARGS_H_
-
+** Copyright 2021 Haiku, Inc. All rights reserved.
+** Distributed under the terms of the MIT License.
+*/
+#ifndef KERNEL_ARCH_ARM64_KERNEL_ARGS_H
+#define KERNEL_ARCH_ARM64_KERNEL_ARGS_H
 
 #ifndef KERNEL_BOOT_KERNEL_ARGS_H
 #	error This file is included from <boot/kernel_args.h> only
 #endif
 
 
+#include <util/FixedWidthPointer.h>
+#include <boot/interrupt_controller.h>
+#include <boot/uart.h>
+
+
+#define _PACKED __attribute__((packed))
+
+
 typedef struct {
-	int			nothing_yet;
-} arch_kernel_args;
+	uint64	phys_pgdir;
+	uint64	vir_pgdir;
+	uint64	next_pagetable;
 
+	// needed for UEFI, otherwise kernel acpi support can't find ACPI root
+	FixedWidthPointer<void>	acpi_root;
+	FixedWidthPointer<void>	fdt;
 
-#endif /* _KERNEL_ARCH_ARM64_ARCH_KERNEL_ARGS_H_ */
+	uart_info	uart;
+	intc_info	interrupt_controller;
+
+} _PACKED arch_kernel_args;
+
+#endif	/* KERNEL_ARCH_ARM64_KERNEL_ARGS_H */

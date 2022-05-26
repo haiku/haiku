@@ -589,7 +589,7 @@ Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 	void *address;
 	memory->area = create_area("GART memory", &address, B_ANY_KERNEL_ADDRESS,
 		size, B_FULL_LOCK | ((flags & B_APERTURE_NEED_PHYSICAL) != 0
-			? B_CONTIGUOUS : 0), 0);
+			? B_CONTIGUOUS : 0), B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (memory->area < B_OK) {
 		ERROR("Aperture::AllocateMemory(): create_area() failed\n");
 		return B_NO_MEMORY;

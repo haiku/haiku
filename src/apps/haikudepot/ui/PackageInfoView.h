@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_INFO_VIEW_H
@@ -11,12 +11,12 @@
 #include "Model.h"
 #include "PackageInfo.h"
 #include "PackageInfoListener.h"
+#include "ProcessCoordinator.h"
 
 
 class BCardLayout;
 class BLocker;
 class OnePackageMessagePackageListener;
-class PackageActionHandler;
 class PackageActionView;
 class PagesView;
 class TitleView;
@@ -30,7 +30,8 @@ enum {
 class PackageInfoView : public BView {
 public:
 								PackageInfoView(Model* model,
-									PackageActionHandler* handler);
+									ProcessCoordinatorConsumer*
+										processCoordinatorConsumer);
 	virtual						~PackageInfoView();
 
 	virtual void				AttachedToWindow();

@@ -76,29 +76,27 @@ rule DefineDefaultBuildProfiles
 			if $(HAIKU_INCLUDE_SOURCES) = 1 {
 				HAIKU_IMAGE_SIZE ?= 1100 ;
 			} else {
-				HAIKU_IMAGE_SIZE ?= 690 ;
+				HAIKU_IMAGE_SIZE ?= 710 ;
 			}
 
 			AddHaikuImageSystemPackages
 				bepdf
 				keymapswitcher
 				mandoc
-				nano
 				noto
 				noto_sans_cjk_jp
 				openssh
-				p7zip
 				pdfwriter
 				pe
-				python
 				timgmsoundfont
 				vision
 				wpa_supplicant
 				wqy_microhei
-				# xz_utils can't be built with gcc2, so we install it for
-				# primary gcc 8 architectures or gcc 2 hybrids.
-				xz_utils@!gcc2
-				gcc2 @{ xz_utils_x86@secondary_x86 }@
+				# Some packages can't be built with gcc2, so we install the gcc8
+				# secondary architecture package instead in this case
+				!gcc2 @{ nano p7zip python3 xz_utils }@
+				gcc2 @{ nano_x86@secondary_x86 p7zip_x86@secondary_x86
+					python3_x86@secondary_x86 xz_utils_x86@secondary_x86 }@
 				;
 			AddHaikuImageSourcePackages
 				bepdf
@@ -137,18 +135,20 @@ rule DefineDefaultBuildProfiles
 
 			AddHaikuImageSystemPackages
 				mandoc
-				nano
 				noto
 				openssh
 				openssl
-				p7zip
 				pe
 				vision
 				wpa_supplicant
 				# xz_utils can't be built with gcc2, so we install it for
-				# primary gcc 4 architectures or gcc 2 hybrids.
-				xz_utils@!gcc2
-				gcc2 @{ xz_utils_x86@secondary_x86 }@
+				# primary gcc 8 architectures or gcc 2 hybrids.
+				!gcc2 @{ nano p7zip xz_utils }@
+				gcc2 @{
+					nano_x86@secondary_x86
+					p7zip_x86@secondary_x86
+					xz_utils_x86@secondary_x86
+				}@
 				;
 			AddHaikuImageSourcePackages
 				nano
@@ -187,7 +187,6 @@ rule DefineDefaultBuildProfiles
 				bison
 				expat
 				flex
-				gawk
 				gcc
 				grep
 				haikuporter
@@ -195,15 +194,17 @@ rule DefineDefaultBuildProfiles
 				libedit
 				m4
 				make
+				mawk
 				ncurses6
 				noto
 				python
 				sed
 				texinfo
+				!gcc2 @{ grep }@
+				gcc2 @{ grep_x86@secondary_x86 }@
 				;
 
 			AddHaikuImageDisabledPackages
-				curl_devel
 				freetype_devel
 				libedit_devel
 				ncurses6_devel
@@ -217,18 +218,16 @@ rule DefineDefaultBuildProfiles
 				on $(architectureObject) {
 					AddHaikuImageSystemPackages
 						binutils
-						curl
 						expat
 						freetype
 						gcc
-						icu
+						icu@gcc2 icu66@!gcc2
 						libsolv
 						libedit
 						ncurses6
 						zlib
 						;
 					AddHaikuImageDisabledPackages
-						curl_devel
 						freetype_devel
 						libedit_devel
 						ncurses6_devel

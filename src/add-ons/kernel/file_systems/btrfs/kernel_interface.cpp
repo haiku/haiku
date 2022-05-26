@@ -1,4 +1,5 @@
 /*
+ * Copyright 2019, Bharathi Ramana Joshi, joshibharathiramana@gmail.com
  * Copyright 2019, Les De Ridder, les@lesderid.net
  * Copyright 2017, Chế Vũ Gia Hy, cvghy116@gmail.com.
  * Copyright 2011, Jérôme Duval, korli@users.berlios.de.
@@ -171,6 +172,33 @@ btrfs_read_fs_info(fs_volume* _volume, struct fs_info* info)
 	strlcpy(info->fsh_name, "btrfs", sizeof(info->fsh_name));
 
 	return B_OK;
+}
+
+
+static status_t
+btrfs_write_fs_info(fs_volume* _volume, const struct fs_info* info, uint32 mask)
+{
+	Volume* volume = (Volume*)_volume->private_volume;
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	if (mask & ~FS_WRITE_FSINFO_NAME != 0)
+		return B_NOT_SUPPORTED;
+
+	MutexLocker locker(volume->GetLock());
+	status_t status = B_BAD_VALUE;
+
+	if (mask & FS_WRITE_FSINFO_NAME) {
+		btrfs_super_block& superBlock = volume->SuperBlock();
+
+		strncpy(superBlock.label, info->volume_name,
+			sizeof(superBlock.label) - 1);
+		superBlock.label[sizeof(superBlock.label) - 1] = '\0';
+
+		status = volume->WriteSuperBlock();
+	}
+
+	return status;
 }
 
 
@@ -354,8 +382,12 @@ btrfs_lookup(fs_volume* _volume, fs_vnode* _directory, const char* name,
 		return status;
 
 	status = DirectoryIterator(directory).Lookup(name, strlen(name), _vnodeID);
-	if (status != B_OK)
+	if (status != B_OK) {
+		if (status == B_ENTRY_NOT_FOUND)
+			entry_cache_add_missing(volume->ID(), directory->ID(), name);
 		return status;
+	}
+	entry_cache_add(volume->ID(), directory->ID(), name, *_vnodeID);
 
 	return get_vnode(volume->FSVolume(), *_vnodeID, NULL);
 }
@@ -529,6 +561,26 @@ btrfs_open(fs_volume* /*_volume*/, fs_vnode* _node, int openMode,
 	*_cookie = cookie;
 
 	return B_OK;
+}
+
+
+status_t
+btrfs_write(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
+		const void* buffer, size_t* _length)
+{
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	if (pos < 0)
+		return B_BAD_VALUE;
+
+	if (!inode->IsFile())
+		return B_BAD_VALUE;
+
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -766,7 +818,7 @@ btrfs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 	while (count < maxCount && bufferSize > sizeof(struct dirent)) {
 		ino_t id;
-		size_t length = bufferSize - sizeof(struct dirent) + 1;
+		size_t length = bufferSize - offsetof(struct dirent, d_name);
 
 		status_t status = iterator->GetNext(dirent->d_name, &length,
 			&id);
@@ -786,7 +838,7 @@ btrfs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = id;
-		dirent->d_reclen = sizeof(struct dirent) + length;
+		dirent->d_reclen = offsetof(struct dirent, d_name) + length + 1;
 
 		bufferSize -= dirent->d_reclen;
 		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
@@ -880,7 +932,7 @@ btrfs_read_attr_dir(fs_volume* _volume, fs_vnode* _node,
 
 	Volume* volume = (Volume*)_volume->private_volume;
 	dirent->d_dev = volume->ID();
-	dirent->d_reclen = sizeof(struct dirent) + length;
+	dirent->d_reclen = offsetof(struct dirent, d_name) + length + 1;
 	*_num = 1;
 
 	return B_OK;
@@ -1098,7 +1150,7 @@ btrfs_std_ops(int32 op, ...)
 fs_volume_ops gBtrfsVolumeOps = {
 	&btrfs_unmount,
 	&btrfs_read_fs_info,
-	NULL,	// write_fs_info()
+	&btrfs_write_fs_info,
 	NULL,	// fs_sync,
 	&btrfs_get_vnode,
 };
@@ -1146,7 +1198,7 @@ fs_vnode_ops gBtrfsVnodeOps = {
 	&btrfs_close,
 	&btrfs_free_cookie,
 	&btrfs_read,
-	NULL,	//	fs_write,
+	&btrfs_write,
 
 	/* directory operations */
 	&btrfs_create_dir,

@@ -51,7 +51,7 @@ Checking for updates	CheckManager		Перевірка оновлень
 No remote repositories are available	UpdateManager	Error message	Віддалені репозитарії недоступні
 Software {0, plural, one{update} other{updates}} available	CheckManager		Доступно {0, plural, one{оновлення} few{оновлення} other{оновлень}} програмного забезпечення
 Reboot	SoftwareUpdaterWindow	Button label	Перезавантажити
-Update	SoftwareUpdaterWindow	Alert button label	Оновлення
+Update	SoftwareUpdaterWindow	Alert button label	Оновити
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Відкрити Репозитарії
 Updates did not complete	UpdateAction		Оновлення не завершені
 Invalid update type, cannot continue with updates	UpdateAction		Недійсний тип оновлення, неможливо продовжити оновлення

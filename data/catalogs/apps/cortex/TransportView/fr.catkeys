@@ -1,0 +1,21 @@
+1	french	application/x-vnd.Cortex.TransportView	4230127975
+Roll	TransportView		Dérouler
+(none)	TransportView		(aucun)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# nœud} other{# nœuds}}
+Start	TransportView		Démarrer
+No errors.	TransportView		Pas d’erreurs.
+to	TransportView		à
+Offline	TransportView		Hors ligne
+(???)	TransportView		(???)
+Stop	TransportView		Arrêter
+(no group)	TransportView		(aucun groupe)
+Drop data	TransportView		Rejeter les données
+To:	TransportView		À :
+Recording	TransportView		En enregistrement
+Increase latency	TransportView		Augmenter le temps de latence
+Time source:	TransportView		Référence de temps :
+Decrease precision	TransportView		Réduire la précision
+System clock	TransportView		Horloge système
+From:	TransportView		De :
+Roll from	TransportView		Dérouler de
+Run mode:	TransportView		Mode d’exécution :

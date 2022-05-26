@@ -1,0 +1,34 @@
+1	catalan; valencian	application/x-vnd.Cortex.MediaRoutingView	3442339205
+Lock group	MediaNodePanel		Bloqueig de grup
+%refname% (no file)	MediaNodePanel		%refname% (cap fitxer)
+Video output	MediaRoutingView		Sortida de vídeo
+Icon view	MediaRoutingView		Vista d'icones
+OK	MediaRoutingView		D'acord
+Cycle	MediaNodePanel		Cicle
+Advanced	MediaNodePanel		Avançat
+Audio input	MediaRoutingView		Entrada d'àudio
+Run mode	MediaNodePanel		Mode d'execució
+Could not load '%filename%'	MediaRoutingView		No s'ha pogut carregar %filename%.
+Stop time source	MediaNodePanel		Atura la font del temps
+Be Audio Mixer	MediaRoutingView		Mesclador d'àudio del Be
+Video input	MediaRoutingView		Entrada de vídeo
+Release	MediaNodePanel		Publicació
+Disconnect	MediaRoutingView		Desconnecta
+Could not disconnect	MediaRoutingView		No s'ha pogut desconnectar.
+Could not instantiate '%infoname%'	MediaRoutingView		No s'ha pogut crear una instància de %infoname%.
+Mini icon view	MediaRoutingView		Vista d'icones petites
+Select all	MediaRoutingView		Selecciona-ho tot
+(same as group)	MediaNodePanel		(igual que el grup)
+Input	MediaJack		Entrada
+Get info	MediaJack		Obtén-ne informació
+Start time source	MediaNodePanel		Font de l’hora d’inici
+Error	MediaRoutingView		Error
+Could not release '%refname%'	MediaRoutingView		No s'ha pogut publicar %refname%.
+Output	MediaJack		Sortida
+Get info	MediaNodePanel		Obtén-ne informació
+Get info	MediaRoutingView		Obtén-ne informació
+Clean up	MediaRoutingView		Neteja
+Start control panel	MediaNodePanel		Inicia el tauler de control
+Tweak parameters	MediaNodePanel		Ajusteu els paràmetres
+Could not connect	MediaRoutingView		No s'ha pogut connectar.
+Unlock group	MediaNodePanel		Desbloca el grup

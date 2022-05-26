@@ -1,11 +1,11 @@
-1	swedish	x-vnd.Haiku-StyledEdit	2796309255
+1	swedish	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Dokumentstatistik
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan inte återgå, filen hittades inte: \"%s\".
 Cut	Menus		Klipp ut
 Center	Menus		Mitten
 Increase size	Menus		Öka storleken
-Wrap-around search	FindandReplaceWindow		Fortsätt sökning vid andra änden
 Page setup…	Menus		Sidinställningar...
+Wrap-around search	FindandReplaceWindow		Fortsätt sökning vid andra änden
 Untitled 	StyledEditWindow		Namnlös 
 OK	Statistics		OK
 Find	FindandReplaceWindow		Sök
@@ -29,8 +29,8 @@ Italic	Menus		Kursiv
 Can't undo	Menus		Kan inte ångra
 Replace…	Menus		Ersätt…
 File	Menus		Arkiv
-Bold	Menus		Fet
 Paste	Menus		Klistra in
+Bold	Menus		Fet
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Filen \"%file%\" blev modifierad av ett annat program. Vill du laddaom programmet?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Filen \"%file%\" blev bortplockad av ett annat program. Vill du plocka tillbaka den?
 Lines:	Statistics		Rader:
@@ -50,7 +50,8 @@ Default	Menus		Standard
 OK	SaveAlert		OK
 Color	Menus		Färg
 Save changes to the document \"%s\"? 	QuitAlert		Spara ändringar till dokumentet \"%s\"? 
-StyledEdit	System name		SkrivStiligt
+StyledEdit	System name		StyledEdit
+Underline	Menus		Understrykning
 Find:	FindandReplaceWindow		Sök:
 Undo typing	QuitAlert		Ångra inmatning
 Error loading \"%s\":\n\t%s	LoadAlert		Fel vid inläsning \"%s\":\n\t%s
@@ -68,23 +69,23 @@ OK	LoadAlert		OK
 Save	QuitAlert		Spara
 Case-sensitive	FindandReplaceWindow		Skiftlägeskänslig
 Find selection	Menus		Sök efter markerad text
-Cancel	SaveAlert		Avbryt
 Find…	Menus		Sök…
+Cancel	SaveAlert		Avbryt
 Revert	RevertToSavedAlert		Återställ
-Decrease size	Menus		Minska storleken
 Size	Menus		Storlek
+Decrease size	Menus		Minska storleken
 Autodetect	Menus		Identifiera automatiskt
 Replace next	Menus		Ersätt nästa
 OK	QuitAlert		OK
-Replace with:	FindandReplaceWindow		Ersätt med:
 Edit	Menus		Redigera
+Replace with:	FindandReplaceWindow		Ersätt med:
 Open…	Menus		Öppna…
 Save as…	Menus		Spara som...
 Replace	FindandReplaceWindow		Ersätt
 Characters:	Statistics		Tecken:
 Don't save	QuitAlert		Spara inte
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Denna fil är markerad som endast läsbar. Vill du spara ändringarna till dokumentet \"%s\"?  
-Align	Menus		Justera
 Font	Menus		Font
+Align	Menus		Justera
 Select all	Menus		Markera allt
 Right	Menus		Höger

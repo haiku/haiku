@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -435,7 +435,7 @@ AcpiUtExecute_CID (
      * 3) Size of the actual CID strings
      */
     CidListSize = sizeof (ACPI_PNP_DEVICE_ID_LIST) +
-        ((Count - 1) * sizeof (ACPI_PNP_DEVICE_ID)) +
+        (Count * sizeof (ACPI_PNP_DEVICE_ID)) +
         StringAreaSize;
 
     CidList = ACPI_ALLOCATE_ZEROED (CidListSize);

@@ -26,6 +26,7 @@
 #include <thread.h>
 #include <user_debugger.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <vm/vm.h>
 #include <vm/VMArea.h>

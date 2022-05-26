@@ -30,7 +30,7 @@ static const bigtime_t kDisableDuration = 500000;
 ServiceView::ServiceView(const char* name, const char* executable,
 	const char* title, const char* description, BNetworkSettings& settings)
 	:
-	BView("service", 0),
+	BGroupView(B_VERTICAL),
 	fName(name),
 	fExecutable(executable),
 	fSettings(settings)

@@ -57,14 +57,14 @@ UrlWrapper::_Warn(const char* url)
 	message << "\n" << url << "\n\n";
 	message << "This type of URL has a potential security risk.\n";
 	message << "Proceed anyway?";
-	BAlert* alert = new BAlert("Warning", message.String(), "Proceed", "Stop", NULL,
-		B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+	BAlert* alert = new BAlert("Warning", message.String(), "Proceed", "Stop",
+		NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 	alert->SetShortcut(1, B_ESCAPE);
 	int32 button;
 	button = alert->Go();
 	if (button == 0)
 		return B_OK;
-		
+
 	return B_ERROR;
 }
 
@@ -139,9 +139,10 @@ UrlWrapper::RefsReceived(BMessage* msg)
 				const char bplist_match[] = "bplist00\xd1\x01\x02SURL_\x10";
 				if (f.ReadAt(0LL, buffer, size) < B_OK)
 					continue;
-					printf("webloc\n");
+				printf("webloc\n");
 				if (size > (sizeof(bplist_match) + 2)
-					&& !strncmp(buffer, bplist_match, sizeof(bplist_match) - 1)) {
+					&& !strncmp(buffer, bplist_match,
+						sizeof(bplist_match) - 1)) {
 					// binary plist, let's be crude
 					uint8 len = buffer[sizeof(bplist_match) - 1];
 					url.SetTo(buffer + sizeof(bplist_match), len);
@@ -228,7 +229,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 {
 	if (argc <= 1)
 		return;
-	
+
 	const char* failc = " || read -p 'Press any key'";
 	const char* pausec = " ; read -p 'Press any key'";
 	char* args[] = { (char *)"/bin/sh", (char *)"-c", NULL, NULL};
@@ -248,7 +249,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		fprintf(stderr, "malformed url: '%s'\n", url.UrlString().String());
 		return;
 	}
-	
+
 	// XXX: debug
 	PRINT(("PROTO='%s'\n", proto.String()));
 	PRINT(("HOST='%s'\n", host.String()));
@@ -273,7 +274,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		be_roster->Launch("application/x-vnd.Haiku-About");
 		return;
 	}
-	
+
 	if (proto == "telnet") {
 		BString cmd("telnet ");
 		if (url.HasUserInfo())
@@ -287,12 +288,12 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		be_roster->Launch(kTerminalSig, 3, args);
 		return;
 	}
-	
+
 	// see draft:
 	// http://tools.ietf.org/wg/secsh/draft-ietf-secsh-scp-sftp-ssh-uri/
 	if (proto == "ssh") {
 		BString cmd("ssh ");
-		
+
 		if (url.HasUserInfo())
 			cmd << "-l " << user << " ";
 		if (url.HasPort())
@@ -308,7 +309,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 
 	if (proto == "ftp") {
 		BString cmd("ftp ");
-		
+
 		cmd << proto << "://";
 		/*
 		if (user.Length())
@@ -323,10 +324,10 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		// TODO: handle errors
 		return;
 	}
-	
+
 	if (proto == "sftp") {
 		BString cmd("sftp ");
-		
+
 		//cmd << url;
 		if (url.HasPort())
 			cmd << "-oPort=" << port << " ";
@@ -345,7 +346,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 
 	if (proto == "finger") {
 		BString cmd("/bin/finger ");
-		
+
 		if (url.HasUserInfo())
 			cmd << user;
 		if (url.HasHost() == 0)
@@ -361,7 +362,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 
 	if (proto == "http" || proto == "https" /*|| proto == "ftp"*/) {
 		BString cmd("/bin/wget ");
-		
+
 		//cmd << url;
 		cmd << proto << "://";
 		if (url.HasUserInfo())
@@ -393,10 +394,10 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 		qname << getpid() << "-" << system_time();
 		BFile query(qname.String(), O_CREAT|O_EXCL);
 		// XXX: should check for failure
-		
+
 		BString s;
 		int32 v;
-		
+
 		_DecodeUrlString(full);
 		// TODO: handle options (list of attrs in the column, ...)
 
@@ -413,7 +414,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 			s.Length()+1);
 		s = "application/x-vnd.Be-query";
 		query.WriteAttr("BEOS:TYPE", 'MIMS', 0LL, s.String(), s.Length()+1);
-		
+
 
 		BEntry e(qname.String());
 		entry_ref er;
@@ -446,7 +447,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 			BMessage mserver('serv');
 			mserver.AddString("server", host);
 			msgr.SendMessage(&mserver);
-			
+
 		}
 		if (url.HasPath()) {
 			BMessage mquery('quer');
@@ -466,7 +467,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 			BMessage mserver(B_REFS_RECEIVED);
 			mserver.AddString("server", host);
 			msgr.SendMessage(&mserver);
-			
+
 		}
 		// TODO: handle errors
 		return;
@@ -544,7 +545,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	vnc: ?
 	irc: ?
 	im: http://tools.ietf.org/html/rfc3860
-	
+
 	svn: handled by checkitout
 	cvs: handled by checkitout
 	git: handled by checkitout
@@ -572,7 +573,7 @@ UrlWrapper::ArgvReceived(int32 argc, char** argv)
 	data: (but it's dangerous)
 
 	*/
-	
+
 
 }
 
@@ -593,7 +594,7 @@ UrlWrapper::_DecodeUrlString(BString& string)
 			length -= 2;
 		}
 	}
-	
+
 	return B_OK;
 }
 

@@ -7,4 +7,4 @@ Refreshing repository \"%s\" failed	PackageManagerKit		Aktualisierung der Paketq
 Fetching repository checksum from %url	RefreshRepositoryRequest		Abrufen der Repository Checksumme von %url
 Failed to get repository names	PackageManagerKit		Paketquellen-Namen nicht verfügbar
 Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Cache der Paketquelle \"%s\" nicht verfügbar. Wird übersprungen.
-Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Das Paket %s-%s besitzt kein passendes 'Requires' für sein Base-Paket \"%s\"
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Paket %s-%s hat kein passendes 'Requires' für sein Base-Paket \"%s\"

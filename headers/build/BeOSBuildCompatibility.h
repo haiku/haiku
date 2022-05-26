@@ -18,10 +18,6 @@
 typedef unsigned long	haiku_build_addr_t;
 #define addr_t			haiku_build_addr_t
 
-#if defined(HAIKU_HOST_PLATFORM_MSYS)
-#define __addr_t_defined
-#endif
-
 #include <Errors.h>
 
 #include <fcntl.h>
@@ -49,12 +45,14 @@ extern size_t	strnlen(const char* string, size_t length);
 #endif
 
 // BeOS only
+#if !defined(HAIKU_HOST_PLATFORM_HAIKU)
 extern ssize_t  read_pos(int fd, off_t pos, void* buffer, size_t count);
 extern ssize_t  write_pos(int fd, off_t pos, const void* buffer, size_t count);
 extern ssize_t	readv_pos(int fd, off_t pos, const struct iovec* vec,
-					size_t count);
+					int count);
 extern ssize_t	writev_pos(int fd, off_t pos, const struct iovec* vec,
-					size_t count);
+					int count);
+#endif
 
 
 // There's no O_NOTRAVERSE under Linux and FreeBSD -- we replace it with a flag

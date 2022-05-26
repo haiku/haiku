@@ -154,6 +154,12 @@ rule StaticLibrary
 
 	InheritPlatform $(objects) : $(lib) ;
 
+	if $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_PACKAGING_ARCH)) = 0
+			&& [ on $(lib) return $(NO_HIDDEN_VISIBILITY) ] != 1 {
+		CCFLAGS on $(objects) += -fvisibility=hidden ;
+		C++FLAGS on $(objects) += -fvisibility=hidden ;
+	}
+
 	StaticLibraryFromObjects $(lib) : $(objects) $(otherObjects) ;
 	Objects $(2) ;
 }
@@ -252,14 +258,16 @@ actions Ld
 	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" "$(NEEDLIBS)" $(LINKLIBS)
 }
 
-rule CreateAsmStructOffsetsHeader header : source
+rule CreateAsmStructOffsetsHeader header : source : architecture
 {
-	# CreateAsmStructOffsetsHeader header : source
+	# CreateAsmStructOffsetsHeader header : source : architecture
 	#
 	# Grist will be added to both header and source.
 
 	header = [ FGristFiles $(header) ] ;
 	source = [ FGristFiles $(source) ] ;
+
+	TARGET_PACKAGING_ARCH on $(header) = $(architecture) ;
 
 	# find out which headers, defines, etc. to use
 	local headers ;
@@ -361,7 +369,8 @@ rule CreateAsmStructOffsetsHeader header : source
 
 	Depends $(header) : $(source) $(PLATFORM) ;
 	SEARCH on $(source) += $(SEARCH_SOURCE) ;
-	MakeLocateArch $(header) ;
+	MakeLocate $(header) : [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(architecture))
+		system kernel ] ;
 	LocalClean clean : $(header) ;
 
 	HDRRULE on $(source) = HdrRule ;
@@ -508,6 +517,9 @@ rule LinkAgainst
 	local libs = $(2) ;
 	local mapLibs = $(3:E=true) ;
 
+	local linkLibs ;
+	local needLibs ;
+
 	on $(target) {
 		local i ;
 
@@ -525,11 +537,7 @@ rule LinkAgainst
 			libs = $(mappedLibs) ;
 		}
 
-		local linkLibs ;
-		local needLibs ;
-
-		for i in $(libs)
-		{
+		for i in $(libs) {
 			local isfile = ;
 			if $(i:D) || $(i:G) {
 				isfile = true ;
@@ -556,7 +564,18 @@ rule LinkAgainst
 				linkLibs += $(i) ;
 			}
 		}
+	}
 
+	# Copy in the library dependencies from any static libraries first.
+	# (We have to do the [ on ... ] outside the on { } block. )
+	for i in $(needLibs) {
+		if $(i:S) = .a  {
+			needLibs += [ on $(i) return $(NEEDLIBS) ] ;
+			linkLibs += [ on $(i) return $(LINKLIBS) ] ;
+		}
+	}
+
+	on $(target) {
 		NEEDLIBS on $(1) = $(NEEDLIBS) $(needLibs) ;
 		LINKLIBS on $(1) = $(LINKLIBS) -l$(linkLibs) ;
 

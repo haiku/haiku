@@ -187,7 +187,7 @@ void init_root_sd(u8 **sd_val, int *sd_val_len)
 	sd->control = SE_SELF_RELATIVE | SE_DACL_PRESENT;
 	sd->owner = const_cpu_to_le32(0x1014);
 	sd->group = const_cpu_to_le32(0x1020);
-	sd->sacl = 0;
+	sd->sacl = const_cpu_to_le32(0);
 	sd->dacl = const_cpu_to_le32(sizeof(SECURITY_DESCRIPTOR_RELATIVE));
 
 	//acl
@@ -196,7 +196,7 @@ void init_root_sd(u8 **sd_val, int *sd_val_len)
 	acl->alignment1 = 0;
 	acl->size = const_cpu_to_le16(0x1000);
 	acl->ace_count = const_cpu_to_le16(0x08);
-	acl->alignment2 = 0;
+	acl->alignment2 = const_cpu_to_le16(0);
 
 	//ace1
 	ace = (ACCESS_ALLOWED_ACE*)((u8*)acl + sizeof(ACL));
@@ -436,7 +436,7 @@ void init_secure_sds(char *sd_val)
 	acl->alignment1 = 0x00;
 	acl->size = const_cpu_to_le16(0x34);
 	acl->ace_count = const_cpu_to_le16(0x02);
-	acl->alignment2 = 0x00;
+	acl->alignment2 = const_cpu_to_le16(0x00);
 
 	//ace1
 	ace = (ACCESS_ALLOWED_ACE*)((char*)acl + sizeof(ACL));
@@ -532,7 +532,7 @@ void init_secure_sds(char *sd_val)
 	acl->alignment1 = 0x00;
 	acl->size = const_cpu_to_le16(0x34);
 	acl->ace_count = const_cpu_to_le16(0x02);
-	acl->alignment2 = 0x00;
+	acl->alignment2 = const_cpu_to_le16(0x00);
 
 	//ace1
 	ace = (ACCESS_ALLOWED_ACE*)((char*)acl + sizeof(ACL));

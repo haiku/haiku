@@ -152,8 +152,7 @@ default_database_location()
 /*! \brief Returns properly formatted raw bitmap data, ready to be shipped off
 	to the hacked up 4-parameter version of Database::SetIcon()
 
-	This function exists as something of a hack until an OBOS::BBitmap
-	implementation is available. It takes the given bitmap, converts it to the
+	BBitmap implemented.  This function takes the given bitmap, converts it to the
 	B_CMAP8 color space if necessary and able, and returns said bitmap data in
 	a newly allocated array pointed to by the pointer that's pointed to by
 	\c data. The length of the array is stored in the integer pointed to by

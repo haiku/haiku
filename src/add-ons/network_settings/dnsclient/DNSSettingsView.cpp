@@ -34,6 +34,7 @@
 
 static const int32 kMsgAddServer = 'adds';
 static const int32 kMsgDeleteServer = 'dels';
+static const int32 kMsgSelectServer = 'sels';
 static const int32 kMsgMoveUp = 'mvup';
 static const int32 kMsgMoveDown = 'mvdn';
 static const int32 kMsgApply = 'aply';
@@ -54,6 +55,7 @@ DNSSettingsView::DNSSettingsView(BNetworkSettingsItem* item)
 	titleView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fServerListView = new BListView("nameservers");
+	fServerListView->SetSelectionMessage(new BMessage(kMsgSelectServer));
 	const char* serverLabel = B_TRANSLATE("Server:");
 	fTextControl = new IPAddressControl(AF_UNSPEC, serverLabel, "server");
 	fTextControl->SetExplicitMinSize(BSize(fTextControl->StringWidth("5") * 16
@@ -63,12 +65,15 @@ DNSSettingsView::DNSSettingsView(BNetworkSettingsItem* item)
 	fAddButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	fUpButton = new BButton(B_TRANSLATE("Move up"), new BMessage(kMsgMoveUp));
 	fUpButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	fUpButton->SetEnabled(false);
 	fDownButton = new BButton(B_TRANSLATE("Move down"),
 		new BMessage(kMsgMoveDown));
 	fDownButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	fDownButton->SetEnabled(false);
 	fRemoveButton = new BButton(B_TRANSLATE("Remove"),
 		new BMessage(kMsgDeleteServer));
 	fRemoveButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	fRemoveButton->SetEnabled(false);
 	fDomain = new BTextControl(B_TRANSLATE("Domain:"), "", NULL);
 	fApplyButton = new BButton(B_TRANSLATE("Apply"), new BMessage(kMsgApply));
 
@@ -143,6 +148,8 @@ DNSSettingsView::AttachedToWindow()
 	fUpButton->SetTarget(this);
 	fDownButton->SetTarget(this);
 
+	fServerListView->SetTarget(this);
+
 	fTextControl->SetTarget(this);
 
 	fApplyButton->SetTarget(this);
@@ -176,6 +183,17 @@ DNSSettingsView::MessageReceived(BMessage* message)
 			int index = fServerListView->CurrentSelection();
 			if (index < fServerListView->CountItems() - 1)
 				fServerListView->SwapItems(index, index + 1);
+			break;
+		}
+		case kMsgSelectServer:
+		{
+			bool enabled = false;
+			if (fServerListView->CurrentSelection() > -1)
+				enabled = true;
+
+			fUpButton->SetEnabled(enabled);
+			fDownButton->SetEnabled(enabled);
+			fRemoveButton->SetEnabled(enabled);
 			break;
 		}
 		case kMsgApply:

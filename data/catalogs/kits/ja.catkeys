@@ -29,7 +29,7 @@ OK	AboutWindow		OK
 Special Thanks:	AboutWindow		Special Thanks:
 Default Haiku window decorator.	Default decorator about box		デフォルトの Haiku ウィンドウデコレーター。
 %.2f TiB	StringForSize		%.2f TiB
-Remove replicant	Dragger		レプリカントを削除
+Remove replicant	Dragger		レプリカントの削除
 Version	AboutWindow		バージョン
 Red:	ColorControl		赤:
 <empty>	Menu		<空>
@@ -40,7 +40,7 @@ alpha	AboutWindow		α
 %3.2f MiB/s	StringForRate		%3.2f MiB/s
 Error	PrintJob		エラー
 About %app%	AboutWindow		%app% について
-About %app…	Dragger		%appについて…
+About %app…	Dragger		%appについて...
 Version history:	AboutWindow		改訂履歴:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		このレプリカント用のアプリケーションを見つけることができません。アプリケーション識別子が提供されていません。\n%error
 %3.2f KiB	StringForSize		%3.2f KiB

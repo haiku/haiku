@@ -15,55 +15,23 @@
 #include <add-ons/tracker/TrackerAddOn.h>
 
 const char* kTerminalSignature = "application/x-vnd.Haiku-Terminal";
-const directory_which kAppsDirectory = B_SYSTEM_APPS_DIRECTORY;
 
-void
-launch_terminal(BEntry* targetEntry, BPath* terminalPath) {
-
+static void
+launch_terminal(BEntry& targetEntry) {
 	BPath targetPath;
 
-	if (targetEntry->GetPath(&targetPath) != B_OK)
+	if (targetEntry.GetPath(&targetPath) != B_OK)
 		return;
 
-	// Escape paths which contain an apostraphe
-	BString target(targetPath.Path());
-	target.ReplaceAll("'", "'\\''");
-
-	BString terminal(terminalPath->Path());
-	terminal.ReplaceAll("'", "'\\''");
-
-	// Build the command to "cd '/my/target/folder'; '/path/to/Terminal' &"
-	BString command("cd '");
-	command << target << "'; '" << terminal << "' &";
-
 	// Launch the Terminal.
-	system(command.String());
+	const char* argv[] = {"-w", targetPath.Path(), NULL};
+	be_roster->Launch(kTerminalSignature, 2, argv);
 }
 
 
 void
-process_refs(entry_ref base_ref, BMessage* message, void* reserved) 
+process_refs(entry_ref base_ref, BMessage* message, void* reserved)
 {
-	BPath terminalPath;
-
-	bool terminalFound = false;
-
-	// Search for Terminal path by asking BRoster.
-	entry_ref terminalRef;
-	if (be_roster->FindApp(kTerminalSignature, &terminalRef) == B_OK) {
-		if (terminalPath.SetTo(&terminalRef) == B_OK)
-			terminalFound = true;
-	}
-
-	// Fall back to manually creating a path if BRoster didn't find it.
-	if (!terminalFound) {
-		if (find_directory(kAppsDirectory, &terminalPath) != B_OK)
-			return;
-
-		if (terminalPath.Append("Terminal") != B_OK)
-			return;
-	}
-
 	BEntry entry;
 	int32 i;
 	entry_ref tracker_ref;
@@ -101,13 +69,12 @@ process_refs(entry_ref base_ref, BMessage* message, void* reserved)
 		// Push entry onto the vector so we can check for duplicates later.
 		entries.push_back(BEntry(entry));
 
-		launch_terminal(&entry, &terminalPath);
-
+		launch_terminal(entry);
 	}
 
 	// If nothing was selected we'll use the base folder.
 	if (i == 0) {
 		if (entry.SetTo(&base_ref) == B_OK)
-			launch_terminal(&entry, &terminalPath);
+			launch_terminal(entry);
 	}
 }

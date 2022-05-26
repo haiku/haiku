@@ -29,6 +29,7 @@ static area_id sNextAreaID = 1;
 VMArea::VMArea(VMAddressSpace* addressSpace, uint32 wiring, uint32 protection)
 	:
 	protection(protection),
+	protection_max(0),
 	wiring(wiring),
 	memory_type(0),
 	cache(NULL),
@@ -47,11 +48,8 @@ VMArea::VMArea(VMAddressSpace* addressSpace, uint32 wiring, uint32 protection)
 
 VMArea::~VMArea()
 {
-	const uint32 flags = HEAP_DONT_WAIT_FOR_MEMORY
-		| HEAP_DONT_LOCK_KERNEL_SPACE;
-		// TODO: This might be stricter than necessary.
-
-	free_etc(page_protections, flags);
+	free_etc(page_protections, address_space == VMAddressSpace::Kernel()
+		? HEAP_DONT_WAIT_FOR_MEMORY | HEAP_DONT_LOCK_KERNEL_SPACE : 0);
 }
 
 

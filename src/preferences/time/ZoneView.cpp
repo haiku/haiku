@@ -66,7 +66,7 @@ using BPrivate::ObjectDeleter;
 
 
 struct TimeZoneItemLess {
-	bool operator()(const BString& first, const BString& second)
+	bool operator()(const BString& first, const BString& second) const
 	{
 		// sort anything starting with '<' behind anything else
 		if (first.ByteAt(0) == '<') {

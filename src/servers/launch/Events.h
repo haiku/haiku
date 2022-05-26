@@ -56,12 +56,10 @@ public:
 	static	Event*			FromMessage(const BMessenger& target,
 								const BMessage& message);
 	static	Event*			AddOnDemand(const BMessenger& target, Event* event);
-	static	bool			ResolveExternalEvent(Event* event,
+	static	Event*			ResolveExternalEvent(Event* event,
 								const char* name, uint32 flags);
-	static	void			TriggerExternalEvent(Event* event,
-								const char* name);
-	static	void			ResetStickyExternalEvent(Event* event,
-								const char* name);
+	static	void			TriggerExternalEvent(Event* event);
+	static	void			ResetStickyExternalEvent(Event* event);
 	static	bool			TriggerDemand(Event* event, bool testOnly = false);
 };
 

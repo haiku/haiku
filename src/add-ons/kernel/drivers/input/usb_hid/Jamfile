@@ -1,10 +1,13 @@
 SubDir HAIKU_TOP src add-ons kernel drivers input usb_hid ;
 
-SubDirC++Flags -fno-rtti ;
+SubDirC++Flags -fno-rtti -DKEYBOARD_SUPPORTS_KDL -DUSB_KDL ;
 
 SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
+SubDirSysHdrs $(HAIKU_TOP) src add-ons kernel drivers input hid_shared ;
 UsePrivateHeaders [ FDirName kernel util ] input drivers device ;
 UsePrivateKernelHeaders ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel drivers input hid_shared ] ;
 
 KernelAddon usb_hid :
 	DeviceList.cpp

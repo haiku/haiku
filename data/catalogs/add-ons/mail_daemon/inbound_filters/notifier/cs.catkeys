@@ -1,0 +1,14 @@
+1	czech	x-vnd.Haiku-NewMailNotification	1375000288
+Log window	NotifierConfigView		Okno záznamu
+none	NotifierConfigView		žádné
+New mails notification	NotifierFilter		Upozornění na nové zprávy
+Alert	NotifierConfigView		Upozornění
+OK	NotifierFilter		OK
+Central alert	NotifierConfigView		Centrální upozornění
+Beep	NotifierConfigView		Pípnutí
+Central beep	NotifierConfigView		Centrální pípnutí
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Jedna nová zpráva} few{# nové zprávy} other{# nových zpráv}}
+New messages	NotifierFilter		Nové zprávy
+Method:	NotifierConfigView		Metoda:
+Keyboard LEDs	NotifierConfigView		LED klávesnice
+You have {0, plural, one{one new message} other{# new messages}} for %account.	NotifierFilter		Máte {0, plural, one{jednu novou zprávu} few{# nové zprávy} other{# nových zpráv}} na %account.

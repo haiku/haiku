@@ -35,7 +35,7 @@
 
 static const uint32 kFloppyArchiveOffset = BOOT_ARCHIVE_IMAGE_OFFSET * 1024;
 	// defined at build time, see build/jam/BuildSetup
-static const size_t kTarRegionSize = 8 * 1024 * 1024;	// 8 MB
+static const size_t kTarRegionSize = 9 * 1024 * 1024;	// 9 MB
 
 
 using std::nothrow;
@@ -52,19 +52,7 @@ struct RegionDelete {
 	}
 };
 
-struct RegionDeleter : BPrivate::AutoDeleter<void, RegionDelete> {
-	RegionDeleter()
-		:
-		BPrivate::AutoDeleter<void, RegionDelete>()
-	{
-	}
-
-	RegionDeleter(void* memory)
-		:
-		BPrivate::AutoDeleter<void, RegionDelete>(memory)
-	{
-	}
-};
+typedef BPrivate::AutoDeleter<void, RegionDelete> RegionDeleter;
 
 class Directory;
 
@@ -753,10 +741,14 @@ status_t
 TarFS::Volume::_Inflate(boot::Partition* partition, void* cookie, off_t offset,
 	RegionDeleter& regionDeleter, size_t* inflatedBytes)
 {
-	char in[2048];
+	static const int kBufferSize = 2048;
+	char* in = (char*)malloc(kBufferSize);
+	if (in == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter deleter(in);
 	z_stream zStream = {
 		(Bytef*)in,		// next in
-		sizeof(in),		// avail in
+		kBufferSize,	// avail in
 		0,				// total in
 		NULL,			// next out
 		0,				// avail out
@@ -776,7 +768,7 @@ TarFS::Volume::_Inflate(boot::Partition* partition, void* cookie, off_t offset,
 	bool headerRead = false;
 
 	do {
-		ssize_t bytesRead = partition->ReadAt(cookie, offset, in, sizeof(in));
+		ssize_t bytesRead = partition->ReadAt(cookie, offset, in, kBufferSize);
 		if (bytesRead != (ssize_t)sizeof(in)) {
 			if (bytesRead <= 0) {
 				status = Z_STREAM_ERROR;

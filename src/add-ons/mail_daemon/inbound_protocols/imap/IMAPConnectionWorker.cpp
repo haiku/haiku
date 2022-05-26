@@ -513,7 +513,7 @@ struct CommandDeleter : BPrivate::AutoDeleter<WorkerCommand, CommandDelete>
 
 	~CommandDeleter()
 	{
-		if (dynamic_cast<SyncCommand*>(fObject) != NULL)
+		if (dynamic_cast<SyncCommand*>(Get()) != NULL)
 			WorkerPrivate(fWorker).SyncCommandDone();
 	}
 

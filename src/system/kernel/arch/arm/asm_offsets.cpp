@@ -46,6 +46,9 @@ dummy()
 
 	// struct iframe
 	DEFINE_SIZEOF_MACRO(IFRAME, iframe);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, pc);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, usr_sp);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, usr_lr);
 
 	// struct signal_frame_data
 	DEFINE_SIZEOF_MACRO(SIGNAL_FRAME_DATA, signal_frame_data);

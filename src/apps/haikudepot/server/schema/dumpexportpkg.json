@@ -8,6 +8,9 @@
     "name": {
       "type": "string"
     },
+    "createTimestamp": {
+      "type": "integer"
+    },
     "modifyTimestamp": {
       "type": "integer"
     },
@@ -62,6 +65,12 @@
         "type": "object",
         "javaType": "org.haiku.haikudepotserver.pkg.model.dumpexport.DumpExportPkgVersion",
         "properties": {
+          "createTimestamp": {
+            "type": "integer"
+          },
+          "modifyTimestamp": {
+            "type": "integer"
+          },
           "major": {
             "type": "string"
           },

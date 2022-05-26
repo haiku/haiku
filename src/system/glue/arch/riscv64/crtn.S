@@ -9,9 +9,12 @@
  */
 
 .section .init
-	// the image ID and program args are still on the stack
+	ld   ra, 8(sp)
+	addi sp, sp, 16
+	ret
 
 
 .section .fini
-	// the image ID and program args are still on the stack
-
+	ld   ra, 8(sp)
+	addi sp, sp, 16
+	ret

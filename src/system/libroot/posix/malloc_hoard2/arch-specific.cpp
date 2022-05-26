@@ -172,8 +172,8 @@ hoardSbrk(long size)
 
 		// this chunk is large enough to satisfy the request
 
-		SERIAL_PRINT(("HEAP-%ld: found free chunk to hold %ld bytes\n",
-			find_thread(NULL), size));
+		SERIAL_PRINT(("HEAP-%" B_PRId32 ": "
+			"found free chunk to hold %ld bytes\n", find_thread(NULL), size));
 
 		void *address = (void *)chunk;
 
@@ -214,7 +214,7 @@ hoardSbrk(long size)
 		& ~(kHeapIncrement - 1);
 
 	if (incrementAlignedSize <= sHeapAreaSize) {
-		SERIAL_PRINT(("HEAP-%ld: heap area large enough for %ld\n",
+		SERIAL_PRINT(("HEAP-%" B_PRId32 ": heap area large enough for %ld\n",
 			find_thread(NULL), size));
 		// the area is large enough already
 		hoardUnlock(sHeapLock);
@@ -223,8 +223,8 @@ hoardSbrk(long size)
 
 	// We need to grow the area
 
-	SERIAL_PRINT(("HEAP-%ld: need to resize heap area to %ld (%ld requested)\n",
-		find_thread(NULL), incrementAlignedSize, size));
+	SERIAL_PRINT(("HEAP-%" B_PRId32 ": need to resize heap area to %ld "
+		"(%ld requested)\n", find_thread(NULL), incrementAlignedSize, size));
 
 	status_t status = resize_area(sHeapArea, incrementAlignedSize);
 	if (status != B_OK) {

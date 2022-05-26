@@ -1,9 +1,9 @@
 1	turkish	x-vnd.Haiku-WonderBrushTranslator	1289038178
-Version %d.%d.%d, %s	WonderBrushView		Sürüm %d.%d.%d, %s
 WonderBrush image translator	WonderBrushTranslator		WonderBrush görseli çevirmeni
-WBI Settings	WonderBrushTranslator		WBI Ayarları
 WBI Settings	WonderBrushMain		WBI Ayarları
-WonderBrush images	WonderBrushTranslator		WonderBrush görselleri
-WonderBrush image	WonderBrushTranslator		WonderBrush görseli
-WonderBrush image translator	WonderBrushView		WonderBrush görseli çevirmeni
+Version %d.%d.%d, %s	WonderBrushView		Sürüm %d.%d.%d, %s
 written by:	WonderBrushView		yazan:
+WonderBrush images	WonderBrushTranslator		WonderBrush görselleri
+WonderBrush image translator	WonderBrushView		WonderBrush görseli çevirmeni
+WonderBrush image	WonderBrushTranslator		WonderBrush görseli
+WBI Settings	WonderBrushTranslator		WBI Ayarları

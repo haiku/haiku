@@ -1,0 +1,14 @@
+1	russian	application/x-vnd.Cortex.TransportView	189541902
+(none)	TransportView		(нет)
+Start	TransportView		Старт
+No errors.	TransportView		Нет ошибок.
+Offline	TransportView		Офлайн
+Stop	TransportView		Стоп
+(no group)	TransportView		(нет группы)
+Recording	TransportView		Запись
+Increase latency	TransportView		Увеличить задержку
+Time source:	TransportView		Источник времени:
+DAC time source	TransportView		Источник времени ЦАП
+Decrease precision	TransportView		Уменьшить точность
+System clock	TransportView		Системное время
+From:	TransportView		От:

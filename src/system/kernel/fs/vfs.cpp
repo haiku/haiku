@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/file.h>
+#include <sys/ioctl.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -51,6 +52,7 @@
 #include <tracing.h>
 #include <util/atomic.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <vfs.h>
 #include <vm/vm.h>
@@ -327,6 +329,7 @@ typedef BOpenHashTable<MountHash> MountTable;
 
 
 object_cache* sPathNameCache;
+object_cache* sVnodeCache;
 object_cache* sFileDescriptorCache;
 
 #define VNODE_HASH_TABLE_SIZE 1024
@@ -948,7 +951,7 @@ create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
 {
 	FUNCTION(("create_new_vnode_and_lock()\n"));
 
-	struct vnode* vnode = (struct vnode*)malloc(sizeof(struct vnode));
+	struct vnode* vnode = (struct vnode*)object_cache_alloc(sVnodeCache, 0);
 	if (vnode == NULL)
 		return B_NO_MEMORY;
 
@@ -964,7 +967,7 @@ create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
 	rw_lock_write_lock(&sVnodeLock);
 	struct vnode* existingVnode = lookup_vnode(mountID, vnodeID);
 	if (existingVnode != NULL) {
-		free(vnode);
+		object_cache_free(sVnodeCache, vnode, 0);
 		_vnode = existingVnode;
 		_nodeCreated = false;
 		return B_OK;
@@ -976,7 +979,7 @@ create_new_vnode_and_lock(dev_t mountID, ino_t vnodeID, struct vnode*& _vnode,
 	if (!vnode->mount || vnode->mount->unmounting) {
 		rw_lock_read_unlock(&sMountLock);
 		rw_lock_write_unlock(&sVnodeLock);
-		free(vnode);
+		object_cache_free(sVnodeCache, vnode, 0);
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -1053,7 +1056,7 @@ free_vnode(struct vnode* vnode, bool reenter)
 
 	remove_vnode_from_mount_list(vnode, vnode->mount);
 
-	free(vnode);
+	object_cache_free(sVnodeCache, vnode, 0);
 }
 
 
@@ -1258,7 +1261,7 @@ restart:
 			remove_vnode_from_mount_list(vnode, vnode->mount);
 			rw_lock_write_unlock(&sVnodeLock);
 
-			free(vnode);
+			object_cache_free(sVnodeCache, vnode, 0);
 			return status;
 		}
 
@@ -1753,8 +1756,6 @@ acquire_advisory_lock(struct vnode* vnode, io_context* context,
 {
 	FUNCTION(("acquire_advisory_lock(vnode = %p, flock = %p, wait = %s)\n",
 		vnode, flock, wait ? "yes" : "no"));
-	dprintf("acquire_advisory_lock(vnode = %p, flock = %p, wait = %s)\n",
-		vnode, flock, wait ? "yes" : "no");
 
 	bool shared = flock->l_type == F_RDLCK;
 	void* boundTo = descriptor != NULL ? (void*)descriptor : (void*)context;
@@ -2554,7 +2555,7 @@ static status_t
 get_vnode_name(struct vnode* vnode, struct vnode* parent, char* name,
 	size_t nameSize, bool kernel)
 {
-	char buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+	char buffer[offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH + 1];
 	struct dirent* dirent = (struct dirent*)buffer;
 
 	status_t status = get_vnode_name(vnode, parent, dirent, sizeof(buffer),
@@ -2635,7 +2636,7 @@ dir_vnode_to_path(struct vnode* vnode, char* buffer, size_t bufferSize,
 		}
 
 		// get the node's name
-		char nameBuffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+		char nameBuffer[offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH + 1];
 			// also used for fs_read_dir()
 		char* name = &((struct dirent*)nameBuffer)->d_name[0];
 		status = get_vnode_name(vnode, parentVnode, (struct dirent*)nameBuffer,
@@ -3836,7 +3837,7 @@ restart:
 			locker.Lock();
 			sVnodeTable->Remove(vnode);
 			remove_vnode_from_mount_list(vnode, vnode->mount);
-			free(vnode);
+			object_cache_free(sVnodeCache, vnode, 0);
 		}
 	} else {
 		// we still hold the write lock -- mark the node unbusy and published
@@ -3986,47 +3987,6 @@ get_vnode_removed(fs_volume* volume, ino_t vnodeID, bool* _removed)
 	}
 
 	return B_BAD_VALUE;
-}
-
-
-extern "C" status_t
-mark_vnode_busy(fs_volume* volume, ino_t vnodeID, bool busy)
-{
-	ReadLocker locker(sVnodeLock);
-
-	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
-	if (vnode == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	// are we trying to mark an already busy node busy again?
-	if (busy && vnode->IsBusy())
-		return B_BUSY;
-
-	vnode->Lock();
-	vnode->SetBusy(busy);
-	vnode->Unlock();
-
-	return B_OK;
-}
-
-
-extern "C" status_t
-change_vnode_id(fs_volume* volume, ino_t vnodeID, ino_t newID)
-{
-	WriteLocker locker(sVnodeLock);
-
-	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
-	if (vnode == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	sVnodeTable->Remove(vnode);
-	vnode->id = newID;
-	sVnodeTable->Insert(vnode);
-
-	if (vnode->cache != NULL && vnode->cache->type == CACHE_TYPE_VNODE)
-		((VMVnodeCache*)vnode->cache)->SetVnodeID(newID);
-
-	return B_OK;
 }
 
 
@@ -5033,7 +4993,7 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 	// allocate space for FDs and their close-on-exec flag
 	context->fds = (file_descriptor**)malloc(
 		sizeof(struct file_descriptor*) * tableSize
-		+ sizeof(struct select_sync*) * tableSize
+		+ sizeof(struct select_info**) * tableSize
 		+ (tableSize + 7) / 8);
 	if (context->fds == NULL) {
 		free(context);
@@ -5044,7 +5004,7 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 	context->fds_close_on_exec = (uint8*)(context->select_infos + tableSize);
 
 	memset(context->fds, 0, sizeof(struct file_descriptor*) * tableSize
-		+ sizeof(struct select_sync*) * tableSize
+		+ sizeof(struct select_info**) * tableSize
 		+ (tableSize + 7) / 8);
 
 	mutex_init(&context->io_mutex, "I/O context");
@@ -5154,7 +5114,7 @@ vfs_resize_fd_table(struct io_context* context, uint32 newSize)
 	// allocate new tables
 	file_descriptor** newFDs = (file_descriptor**)malloc(
 		sizeof(struct file_descriptor*) * newSize
-		+ sizeof(struct select_sync*) * newSize
+		+ sizeof(struct select_infos**) * newSize
 		+ newCloseOnExitBitmapSize);
 	if (newFDs == NULL)
 		return B_NO_MEMORY;
@@ -5378,6 +5338,11 @@ vfs_init(kernel_args* args)
 		B_PATH_NAME_LENGTH + 1, 8, NULL, NULL, NULL);
 	if (sPathNameCache == NULL)
 		panic("vfs_init: error creating path name object_cache\n");
+
+	sVnodeCache = create_object_cache("vfs vnodes",
+		sizeof(struct vnode), 8, NULL, NULL, NULL);
+	if (sVnodeCache == NULL)
+		panic("vfs_init: error creating vnode object_cache\n");
 
 	sFileDescriptorCache = create_object_cache("vfs fds",
 		sizeof(file_descriptor), 8, NULL, NULL, NULL);
@@ -5856,6 +5821,39 @@ file_seek(struct file_descriptor* descriptor, off_t pos, int seekType)
 				}
 			}
 
+			break;
+		}
+		case SEEK_DATA:
+		case SEEK_HOLE:
+		{
+			status_t status = B_BAD_VALUE;
+			if (HAS_FS_CALL(vnode, ioctl)) {
+				offset = pos;
+				status = FS_CALL(vnode, ioctl, descriptor->cookie,
+					seekType == SEEK_DATA ? FIOSEEKDATA : FIOSEEKHOLE,
+					&offset, sizeof(offset));
+				if (status == B_OK) {
+					if (offset > pos)
+						offset -= pos;
+					break;
+				}
+			}
+			if (status != B_BAD_VALUE && status != B_DEV_INVALID_IOCTL)
+				return status;
+
+			// basic implementation with stat() the node
+			if (!HAS_FS_CALL(vnode, read_stat) || isDevice)
+				return B_BAD_VALUE;
+
+			struct stat stat;
+			status = FS_CALL(vnode, read_stat, &stat);
+			if (status != B_OK)
+				return status;
+
+			off_t end = stat.st_size;
+			if (pos >= end)
+				return ENXIO;
+			offset = seekType == SEEK_HOLE ? end - pos : 0;
 			break;
 		}
 		default:
@@ -6434,6 +6432,48 @@ common_unlock_node(int fd, bool kernel)
 		status = B_BAD_VALUE;
 
 	put_fd(descriptor);
+	return status;
+}
+
+
+static status_t
+common_preallocate(int fd, off_t offset, off_t length, bool kernel)
+{
+	struct file_descriptor* descriptor;
+	struct vnode* vnode;
+
+	if (offset < 0 || length == 0)
+		return B_BAD_VALUE;
+	if (offset > OFF_MAX - length)
+		return B_FILE_TOO_LARGE;
+
+	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
+	if (descriptor == NULL || (descriptor->open_mode & O_RWMASK) == O_RDONLY)
+		return B_FILE_ERROR;
+
+	switch (vnode->Type() & S_IFMT) {
+		case S_IFIFO:
+		case S_IFSOCK:
+			return ESPIPE;
+
+		case S_IFBLK:
+		case S_IFCHR:
+		case S_IFDIR:
+		case S_IFLNK:
+			return B_DEVICE_NOT_FOUND;
+
+		case S_IFREG:
+			break;
+	}
+
+	status_t status = B_OK;
+	if (HAS_FS_CALL(vnode, preallocate)) {
+		status = FS_CALL(vnode, preallocate, offset, length);
+	} else {
+		status = HAS_FS_CALL(vnode, write)
+			? B_UNSUPPORTED : B_READ_ONLY_DEVICE;
+	}
+
 	return status;
 }
 
@@ -8436,6 +8476,13 @@ _kern_unlock_node(int fd)
 
 
 status_t
+_kern_preallocate(int fd, off_t offset, off_t length)
+{
+	return common_preallocate(fd, offset, length, true);
+}
+
+
+status_t
 _kern_create_dir_entry_ref(dev_t device, ino_t inode, const char* name,
 	int perms)
 {
@@ -9212,7 +9259,7 @@ _user_open_parent_dir(int fd, char* userName, size_t nameLength)
 			return B_FILE_ERROR;
 
 		// get the vnode name
-		char _buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+		char _buffer[offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH + 1];
 		struct dirent* buffer = (struct dirent*)_buffer;
 		status_t status = get_vnode_name(dirVNode, parentVNode, buffer,
 			sizeof(_buffer), get_current_io_context(false));
@@ -9316,6 +9363,13 @@ status_t
 _user_unlock_node(int fd)
 {
 	return common_unlock_node(fd, false);
+}
+
+
+status_t
+_user_preallocate(int fd, off_t offset, off_t length)
+{
+	return common_preallocate(fd, offset, length, false);
 }
 
 

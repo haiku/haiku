@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2013, Haiku. All rights reserved.
+ * Copyright 2010-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,6 +35,7 @@
 <li><a href="../../de/applications/webpositive.html">Deutsch</a></li>
 <li><a href="../../en/applications/webpositive.html">English</a></li>
 <li><a href="../../es/applications/webpositive.html">Español</a></li>
+<li><a href="../../eo/applications/webpositive.html">Esperanto</a></li>
 <li><a href="../../fr/applications/webpositive.html">Français</a></li>
 <li><a href="../../fur/applications/webpositive.html">Furlan</a></li>
 <li><a href="../../it/applications/webpositive.html">Italiano</a></li>
@@ -59,6 +60,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Переклад даної сторінки ще неповний. Допоки це так, незавершені частини користайте у англійському варіанті. </div>
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Програми (Applications)</span></td></tr>
@@ -77,10 +79,10 @@
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Налаштування (Settings)</h2>
 <p>З меню <span class="menu">Вікно (Window)</span> Ви можете відкрити панель <span class="menu">Налаштування (Settings)</span> для виконання необхідних змін у WebPositive.</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
-<p>Перша вкладка виконує основні налаштування: перше вікно визначає якою буде <span class="menu">Стартова сторінка (Start page)</span>, друге<span class="menu"> Сторінка пошуку (Search page)</span> яка буде пошукова система, вікно <span class="menu"> Тека завантаження (Download folder)</span> куди зберігати матеріали стягнуті з інтернету.<br />
-Два випадаючі меню визначать що робити при відкриванні нового вікна або нової вкладки.<br />
-За допомогою наступних прапорців ви зможете не показувати панель вкладок, при одній відкритій вкладці. Інтерфейс WebPositive можна заставити ховатись при роботі у  повноекранному режимі, а курсор мишки можна сховати на деякий  час поки він нерухомий.<br />
-І, нарешті, ви можете прийняти рішення про включення кнопки "Домашня сторінка (Home)" у панелі навігації та встановити строк доки браузер пам'ятатиме посилання на сторінки сайтів з історії відвідувань.</p>
+<p>The first tab deals with general settings: What file or URL serves as a <span class="menu">Start page</span>, what's used as a <span class="menu">Search page</span> (if you set a <span class="menu">Custom</span> search engine, "<i>%s</i>" is used for the search term variable), what <span class="menu">Download folder</span> is used for stuff you get from the net.<br />
+Two pop-up menus let you decide what page to load - if any - when opening a new window or tab.<br />
+Via the following checkboxes you can avoid showing the tab bar when there's only one page open anyway. WebPositive's interface can be told to automatically hide in full screen mode, and the mouse pointer can be automatically hidden whenever it's not moved for a while.<br />
+Finally, you can decide to include the "Home" button in the navigation bar and set the number of days the browser remembers the sites you have visited in its history.</p>
 <p>На другій вкладці можна вибрати стандартні  шрифти з зарубками (засічками), без зарубок (засічок) та моноширинний які будуть використовуватись та встановити їх типові розміри.</p>
 <p>Остання вкладка використовується при налаштуванні проксі сервера.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Серфінг</h2>
@@ -92,8 +94,19 @@
 <li><p>З меню <span class="menu">Вигляд (View)</span> ви можете <span class="menu">Збільшити (Zoom in)</span> або <span class="menu">Зменшити (Zoom out)</span> сторінку. Там же є опція <span class="menu">Змінити тільки текст (Zoom text only)</span>, причому всі зображення залишаться оригінального розміру.</p></li>
 <li><p>При перемиканні в повноекранний режим і активуванні приховування інтерфейсу він щезає за секунду, щоб  тимчасово повернути інтерфейс досить пересунути курсор мишки до горішньої межі екрану.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
-<p> При введенні тексту в адресному полі браузер показуватиме відвідувані вами сторінки, у назві яких повністю чи частково присутні набрані символи, нижче цього поля.  Ви можете або продовжувати додавати літери у текст, щоб скоротити список можливих місць, або вибрати запис з допомогою <span class="key">↑</span> or <span class="key">↓</span>. Кнопка <span class="key">ENTER</span> завантажить вибрану сторінку. Для цього також можна використати кнопку біля правої межі поля, крім того вона може перезавантажити вже обрану сторінку.<br />
-Рядки які не визнані як URL-адреси буде запропоновано переглянути у Google, збільшуючи тим самим швидкість пошуку.</p></li>
+<p>While you type in the locator text field, the browser matches the string to sites you have visited in the past and lists them below the text field. You either keep adding more letters to shorten the  list of possible sites, or choose an entry with <span class="key">↑</span> or <span class="key">↓</span>. <span class="key">ENTER</span> will load the page. You can also use the button to the far right which also serves to reload a page.<br />
+Strings not recognized as URLs will get looked up with the search engine set in WebPositive's settings, so the locator field doubles as quick shortcut to web searches.</p>
+<div class="box-info"><p>WebPositive supports quick shortcuts to direct search terms to different search engines. Just enter the one-letter-shortcut followed by your search term.</p>
+<ul>
+<li>"g” for Google</li>
+<li>“b” for Bing</li>
+<li>“w” for Wikipedia</li>
+<li>“d” for DuckDuckGo</li>
+<li>“a” for Baiku</li>
+<li>“y” for Yandex</li>
+<li>“e” for Ecosia</li>
+<li>“q” for Qwant</li>
+</ul></div></li>
 <li><p>Правий двоклік дозволить відкрити контекстне меню яке в залежності від вибору об'єкта запропонує: відкрити посилання, нове вікно, нову вкладку, завантажити вибраний об'єкт ітд.</p></li>
 <li><p><span class="menu">Правка | Знайти (Edit | Find)</span>  при старті пошуку на сторінці покаже поле для введення знизу. Знайдене буде виділено на сторінці.</p></li>
 </ul>

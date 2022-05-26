@@ -1,0 +1,24 @@
+1	czech	x-vnd.Haiku-mixer.media_addon	275473112
+Input mapping	AudioMixer		Mapování vstupu
+High quality (linear interpolation)	AudioMixer		Vysoká kvalita (lineární prokládání)
+To output	AudioMixer		Na výstup
+Gain	AudioMixer		Zesílení
+To master	AudioMixer		Na hlavní
+not connected	AudioMixer		není připojeno
+Master output	AudioMixer		Hlavní výstup
+dB	AudioMixer		dB
+Gain controls	AudioMixer		Ovládání zesílení
+Low quality (drop/repeat samples)	AudioMixer		Nízká kvalita (zahazovat/opakovat vzorky)
+Output channel sources	AudioMixer		Zdroje výstupního kanálu
+Allow input channel remapping	AudioMixer		Povolit přemapování vstupního kanálu
+Display balance control for stereo connections	AudioMixer		Zobrazit ovládání vyvážení při stereo připojeních
+Setup	AudioMixer		Nastavení
+Physical input channels	AudioMixer		Fyzické vstupní kanály
+Input channel destinations	AudioMixer		Cíle vstupního kanálu
+Resampling algorithm:	AudioMixer		Algoritmus převzorkování:
+Mute	AudioMixer		Ztlumit
+Output mapping	AudioMixer		Mapování výstupu
+Virtual output channels	AudioMixer		Virtuální výstupní kanály
+Allow output channel remapping	AudioMixer		Povolit přemapování výstupních kanálů
+Input gain controls represent:	AudioMixer		Vstupní ovládací prvky zesílení představují:
+Attenuate mixer output by 3 dB	AudioMixer		Zmírnit výstup mixéru o 3 dB

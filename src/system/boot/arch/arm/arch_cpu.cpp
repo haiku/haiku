@@ -1,10 +1,13 @@
 /*
- * Copyright 2012-2020, Haiku, Inc. All rights reserved.
+ * Copyright 2012-2022, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ithamar R. Adema <ithamar@upgrade-android.com>
  */
+
+#include <boot/arch/arm/arch_cpu.h>
+#include <kernel/arch/arm/arch_cpu.h>
 
 #include <OS.h>
 #include <boot/platform.h>
@@ -19,9 +22,9 @@
 
 #define TRACE_CPU
 #ifdef TRACE_CPU
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 
@@ -81,34 +84,14 @@ check_cpu_features()
 			break;
 	}
 
-	// We could check for VFP/NEON support here, but for the moment we only
-	// really target ARM CPU's with VFP/NEON built-in (cortex-a7+)
-	if (arch >= ARCH_ARM_v7)
-	{
-		// Enable VFP/NEON. We HAVE to do this before the trace call below,
-		// which is the first time we call vprintf. Otherwise, it will crash
-		// when trying to push floating point registers on the stack.
-		asm volatile(
-		"	MRC p15, #0, r1, c1, c0, #2\n" // r1 = Access Control Register
-		"	ORR r1, r1, #(0xf << 20)\n" // enable full access for p10,11
-		"	MCR p15, #0, r1, c1, c0, #2\n" // Access Control Register = r1
-		"	MOV r1, #0\n"
-		"	MCR p15, #0, r1, c7, c5, #4\n" // flush prefetch buffer because of
-			// FMXR below and CP 10 & 11 were only just enabled
-		"	MOV r0,#0x40000000	\n" // Enable VFP itself
-		"	FMXR FPEXC, r0" //FPEXC = r0
-		:::"r0", "r1");
-	}
-
-
-	TRACE(("%s: implementor=0x%x('%c'), arch=%d, variant=0x%x, part=0x%x, revision=0x%x\n",
-		__func__, implementor, implementor, arch, variant, part, revision));
+	TRACE("%s: implementor=0x%x('%c'), arch=%d, variant=0x%x, part=0x%x, revision=0x%x\n",
+		__func__, implementor, implementor, arch, variant, part, revision);
 
 	return (arch < ARCH_ARM_v5) ? B_ERROR : B_OK;
 }
 
 
-extern "C" status_t
+status_t
 boot_arch_cpu_init(void)
 {
 	status_t err = check_cpu_features();
@@ -121,26 +104,8 @@ boot_arch_cpu_init(void)
 }
 
 
-extern "C" void
+void
 arch_ucode_load(BootVolume& volume)
 {
 	// NOP on arm currently
-}
-
-
-extern "C" bigtime_t
-system_time()
-{
-	#warning Implement system_time in ARM bootloader!
-	return 0;
-}
-
-
-extern "C" void
-spin(bigtime_t microseconds)
-{
-	#warning Implment spin in ARM bootloader!
-	//bigtime_t time = system_time();
-	//while ((system_time() - time) < microseconds)
-	//	asm volatile ("nop;");
 }

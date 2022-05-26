@@ -1,0 +1,16 @@
+1	ukrainian	application/x-vnd.moon-Flanger.media_addon	278353351
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не вдалося отримати інфо про ноду (%ld):\n%s\n
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		FlangerNode в версії доповнення.\nрозробник Eric Moon (16 червня 1999)
+Delay	CortexAddOnsFlanger		Затримка
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: не вдалося знайти ноду (%ld):\n%s\n
+Depth	CortexAddOnsFlanger		Глибина
+Feedback	CortexAddOnsFlanger		Зворотний зв'язок
+Sweep rate	CortexAddOnsFlanger		Частота модуляції
+Mix ratio	CortexAddOnsFlanger		Пропорції змішування
+FlangerNode parameters	CortexAddOnsFlanger		Параметри FlangerNode
+OK	CortexAddOnsCommonMediaNodeControlApp		ОК
+controls	CortexAddOnsCommonMediaNodeControlApp		управління
+Mix output	CortexAddOnsFlanger		Змішаний вихід
+Flanger	CortexAddOnsFlanger		Flanger
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: відсутні параметри для ноди (%ld):\n%s\n
+Audio input	CortexAddOnsFlanger		Аудіовхід

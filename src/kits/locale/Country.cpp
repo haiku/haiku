@@ -98,7 +98,7 @@ BCountry::GetNativeName(BString& name) const
 		return valid;
 
 	UnicodeString string;
-	fICULocale->getDisplayName(*fICULocale, string);
+	fICULocale->getDisplayCountry(*fICULocale, string);
 	string.toTitle(NULL, *fICULocale);
 
 	name.Truncate(0);
@@ -129,13 +129,42 @@ BCountry::GetName(BString& name, const BLanguage* displayLanguage) const
 
 	if (status == B_OK) {
 		UnicodeString uString;
-		fICULocale->getDisplayName(Locale(appLanguage), uString);
+		fICULocale->getDisplayCountry(Locale(appLanguage), uString);
 		name.Truncate(0);
 		BStringByteSink stringConverter(&name);
 		uString.toUTF8(stringConverter);
 	}
 
 	return status;
+}
+
+
+status_t
+BCountry::GetPreferredLanguage(BLanguage& language) const
+{
+#if U_ICU_VERSION_MAJOR_NUM < 63
+	return ENOSYS;
+#else
+	status_t status = InitCheck();
+	if (status != B_OK)
+		return status;
+
+	icu::Locale* languageLocale = fICULocale->clone();
+	if (languageLocale == NULL)
+		return B_NO_MEMORY;
+
+	UErrorCode icuError = U_ZERO_ERROR;
+	languageLocale->addLikelySubtags(icuError);
+
+	if (U_FAILURE(icuError))
+		return B_ERROR;
+
+	status = language.SetTo(languageLocale->getLanguage());
+
+	delete languageLocale;
+
+	return status;
+#endif
 }
 
 

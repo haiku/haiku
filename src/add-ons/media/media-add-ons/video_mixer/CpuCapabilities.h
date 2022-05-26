@@ -33,8 +33,10 @@ class CPUCapabilities {
 	
 	private:
 		uint32		capabilities;
-	
+
+#ifdef __i386__
 		void setIntelCapabilities();
+#endif
 };
 
 #endif	//__CPU_CAPABILITIES__

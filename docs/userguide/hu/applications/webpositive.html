@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2013, Haiku. All rights reserved.
+ * Copyright 2010-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,6 +35,7 @@
 <li><a href="../../de/applications/webpositive.html">Deutsch</a></li>
 <li><a href="../../en/applications/webpositive.html">English</a></li>
 <li><a href="../../es/applications/webpositive.html">Español</a></li>
+<li><a href="../../eo/applications/webpositive.html">Esperanto</a></li>
 <li><a href="../../fr/applications/webpositive.html">Français</a></li>
 <li><a href="../../fur/applications/webpositive.html">Furlan</a></li>
 <li><a href="../../it/applications/webpositive.html">Italiano</a></li>
@@ -59,6 +60,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Asztalsáv:</td><td style="width:15px;"></td><td><span class="menu">Alkalmazások</span></td></tr>
@@ -76,10 +78,10 @@ Az ablak alján pedig az állapotsor található, ami a betöltés állapotáró
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Beállítások</h2>
 <p>Az <span class="menu">Ablak</span> menüből érhető el a <span class="menu">Beállítások</span> panel, amivel a program néhány működési jellemzőjét módosíthatjuk.</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
-<p>Az első fül a főbb beállításokat tartalmazza: melyik oldal legyen a <span class="menu">Kezdőlap</span>, mi legyen a <span class="menu">Keresőoldal</span>, melyik mappát használja a <span class="menu">Letöltések helyé</span>nek.<br />
-Két előugró menüt is találunk, amivel megadható, hogy melyik oldal nyiljon meg új ablak vagy lap megnyitásakor.<br />
-A jelölőnégyzetekkel módosíthatjuk, hogy a fülek egy oldal esetében is megjelenjenek-e vagy sem, továbbá a WebPositive vezérlőfelülete megjelenjen-e teljes képernyős módban és az egér kurzor inaktivitás esetén eltűnjön-e vagy sem.<br />
-Végül pedig eldönthetjük, hogy a "Kezdőlap"-gomb a gombsoron megjelenjen-e, és hogy hány napig tartsa meg az előzményeket.</p>
+<p>The first tab deals with general settings: What file or URL serves as a <span class="menu">Start page</span>, what's used as a <span class="menu">Search page</span> (if you set a <span class="menu">Custom</span> search engine, "<i>%s</i>" is used for the search term variable), what <span class="menu">Download folder</span> is used for stuff you get from the net.<br />
+Two pop-up menus let you decide what page to load - if any - when opening a new window or tab.<br />
+Via the following checkboxes you can avoid showing the tab bar when there's only one page open anyway. WebPositive's interface can be told to automatically hide in full screen mode, and the mouse pointer can be automatically hidden whenever it's not moved for a while.<br />
+Finally, you can decide to include the "Home" button in the navigation bar and set the number of days the browser remembers the sites you have visited in its history.</p>
 <p>A második fülön a böngésző által az oldalon használt betűtípusok és azok méretei adhatóak meg.</p>
 <p>Az utolsó fül pedig a proxy beállításokra vonatkozik.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Böngészés</h2>
@@ -91,8 +93,19 @@ Végül pedig eldönthetjük, hogy a "Kezdőlap"-gomb a gombsoron megjelenjen-e,
 <li><p>A <span class="menu">Nézet</span> menüből a <span class="menu">Méret növelése</span> és a <span class="menu">Méret csökkentése</span> érhető el. Egy másik opciói is a rendelkezésünkre áll: <span class="menu">Csak a szöveg nagyítása</span>, mely esetben a képek mérete nem változik, csak a szövegé.</p></li>
 <li><p>Ha teljes képernyős módba váltunk, és a beállítások szerint a vezérlőfelület eltűnik, akkor egy másodperc múlva már nem látjuk azt. Hogy ideiglenesen visszahozzuk, egyszerűen csak mozgassuk az egeret a képernyő felső részére.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
-<p>Ha a címsorban elkezdünk gépelni, akkor megjelennek azok a címek, melyeket már meglátogattunk, és melyek tartalmazzák a beírt szótöredéket. Ha több betűt is beírunk, akkor szűkíthetjük a megjelenő listát, vagy a <span class="key">↑</span> vagy <span class="key">↓</span> gombok segítségével válasszuk ki a kívánt címet. Majd az <span class="key">ENTER</span> leütésére a böngésző megnyitja azt. Erre a jobb oldalon lévő gombot is használhatjuk.<br />
-Ha címként nem értelmezhető a beírt szöveg, akkor a böngésző megkeresi azt a Google-ben, így a címsor egyben gyors keresésre is használható.</p></li>
+<p>While you type in the locator text field, the browser matches the string to sites you have visited in the past and lists them below the text field. You either keep adding more letters to shorten the  list of possible sites, or choose an entry with <span class="key">↑</span> or <span class="key">↓</span>. <span class="key">ENTER</span> will load the page. You can also use the button to the far right which also serves to reload a page.<br />
+Strings not recognized as URLs will get looked up with the search engine set in WebPositive's settings, so the locator field doubles as quick shortcut to web searches.</p>
+<div class="box-info"><p>WebPositive supports quick shortcuts to direct search terms to different search engines. Just enter the one-letter-shortcut followed by your search term.</p>
+<ul>
+<li>"g” for Google</li>
+<li>“b” for Bing</li>
+<li>“w” for Wikipedia</li>
+<li>“d” for DuckDuckGo</li>
+<li>“a” for Baiku</li>
+<li>“y” for Yandex</li>
+<li>“e” for Ecosia</li>
+<li>“q” for Qwant</li>
+</ul></div></li>
 <li><p>Egy objektumon jobb gombbal kattintva egy helyi menü jelenik meg, mely változik a objektumnak megfelelően (például megnyitás új oldalon, vagy letöltés).</p></li>
 <li><p>A <span class="menu">Szerkesztés | Keresés</span> megjelenít egy kereső mezőt az ablak alján, mellyel az oldalon lévő szövegben kereshetünk. A találatokat a böngésző kiemeli az oldalon.</p></li>
 </ul>

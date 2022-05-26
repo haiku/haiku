@@ -1,0 +1,23 @@
+1	portuguese (brazil)	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Rolar
+(none)	TransportView		(nenhum)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# nó} other{# nós}}
+Start	TransportView		Começar
+No errors.	TransportView		Sem erros.
+to	TransportView		para
+Offline	TransportView		Desligado
+(???)	TransportView		(???)
+Stop	TransportView		Parar
+(no group)	TransportView		(nenhum grupo)
+Drop data	TransportView		Dados de descarte
+To:	TransportView		Para:
+Recording	TransportView		Gravação
+Increase latency	TransportView		Aumente a latência
+Time source:	TransportView		Fonte de tempo:
+DAC time source	TransportView		Fonte de tempo DAC
+Decrease precision	TransportView		Diminuir precisão
+System clock	TransportView		Relógio do sistema
+From:	TransportView		De:
+Roll from	TransportView		Roll from
+Preroll	TransportView		Preroll
+Run mode:	TransportView		Modo corrida:

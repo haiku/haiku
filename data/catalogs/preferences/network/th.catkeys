@@ -1,8 +1,7 @@
-1	thai	x-vnd.Haiku-Network	2923905377
+1	thai	x-vnd.Haiku-Network	3062143965
 Ethernet device	InterfaceListItem		อุปกรณ์อีเธอร์เน็ต
 Link speed:	IntefaceView		ลิงค์ความเร็ว:
 disconnected	IntefaceView		หยุดการเชื่อมต่อ
-IP Address:	IntefaceAddressView		IP Address:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		เครือข่าย:
 Received:	IntefaceView		รับ:

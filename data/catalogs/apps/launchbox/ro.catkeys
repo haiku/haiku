@@ -1,36 +1,36 @@
 1	romanian	x-vnd.Haiku-LaunchBox	1530497419
-Set description…	LaunchBox		Configurează descriere…
-Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sigur închideți acest suport?\n(Suportul nu va fi reținut.)
+Set description…	LaunchBox		Stabilire descriere…
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Sigur închideți acest bloc?\n(Blocul nu va fi reținut.)
 OK	LaunchBox		OK
-Ignore double-click	LaunchBox		Ignoră dublu-clic
-Show on all workspaces	LaunchBox		Afișează toate spațiile de lucru
-Name Panel	LaunchBox		Panou nume
-Autostart	LaunchBox		Start auto
+Ignore double-click	LaunchBox		Ignoră clicul dublu
+Show on all workspaces	LaunchBox		Arată pe toate spațiile de lucru
+Name Panel	LaunchBox		Panou de nume
+Autostart	LaunchBox		Pornire automată
 Clone	LaunchBox		Clonează
-Description for '%3'	LaunchBox		Descriere pentru '%3'
-Show window border	LaunchBox		Afișează margine fereastră
-\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNu s-a putut lansa aplicația cu semnătura '%2'.\n\nEroare:
-Failed to launch 'something', error in Pad data.	LaunchBox		Nu s-a putut lansa 'ceva', eroare în data Pad.
-LaunchBox	System name		CasetăLansare
-Auto-raise	LaunchBox		Auto-lansare
+Description for '%3'	LaunchBox		Descriere pentru „%3”
+Show window border	LaunchBox		Arată marginea ferestrei
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNu s-a putut lansa aplicația cu semnătura „%2”.\n\nEroare:
+Failed to launch 'something', error in Pad data.	LaunchBox		Nu s-a putut lansa „ceva”, eroare în datele blocului.
+LaunchBox	System name		LaunchBox
+Auto-raise	LaunchBox		Lansare automată
 Icon size	LaunchBox		Dimensiune pictogramă
 Open containing folder	LaunchBox		Deschide dosarul conținător
-Add button here	LaunchBox		Adăugați buton aici
+Add button here	LaunchBox		Adaugă un buton aici
 Cancel	LaunchBox		Anulează
 launch popup	LaunchBox		lansează meniul contextual
-Clear button	LaunchBox		Eliberează buton
-Bummer	LaunchBox		Bine
-last chance	LaunchBox		ultima încercare
-You can drag an icon here.	LaunchBox		Puteți să plasați o pictogramă aici.
-Pad 1	LaunchBox		Suport 1
-Failed to launch '%1'.\n\nError:	LaunchBox		Nu s-a putut lansa '%1'.\n\nEroare:
+Clear button	LaunchBox		Eliberează butonul
+Bummer	LaunchBox		Păcat
+last chance	LaunchBox		ultima șansă
+You can drag an icon here.	LaunchBox		Puteți trage o pictogramă aici.
+Pad 1	LaunchBox		Bloc 1
+Failed to launch '%1'.\n\nError:	LaunchBox		Nu s-a putut lansa „%1”.\n\nEroare:
 Settings	LaunchBox		Configurări
 Vertical layout	LaunchBox		Aranjament vertical
-Pad	LaunchBox		Suport
+Pad	LaunchBox		Bloc
 Close	LaunchBox		Închide
-Remove button	LaunchBox		Elimină buton
-Quit	LaunchBox		Închidere
+Remove button	LaunchBox		Elimină butonul
+Quit	LaunchBox		Ieșire
 Horizontal layout	LaunchBox		Aranjament orizontal
 New	LaunchBox		Nou
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Trimiterea comenzii 'deschide dosar' la Tracker a eșuat.\n\nEroare: 
-Pad %1	LaunchBox		Suport %1
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Nu s-a putut trimite comanda „deschide dosarul” la Tracker.\n\nEroare: 
+Pad %1	LaunchBox		Bloc %1

@@ -1,11 +1,11 @@
-1	german	x-vnd.Haiku-StyledEdit	613799227
+1	german	x-vnd.Haiku-StyledEdit	1577675528
 Document statistics	Statistics		Dokument-Statistik
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen unmöglich, die Datei wurde nicht gefunden: \"%s\".
 Cut	Menus		Ausschneiden
 Center	Menus		Zentriert
 Increase size	Menus		Vergrößern
+Page setup…	Menus		Seite einrichten …
 Wrap-around search	FindandReplaceWindow		Gesamtes Dokument durchsuchen
-Page setup…	Menus		Seite einrichten…
 Untitled 	StyledEditWindow		Unbenannt
 OK	Statistics		OK
 Find	FindandReplaceWindow		Suchen
@@ -27,10 +27,10 @@ OK	RevertToSavedAlert		OK
 Unlock file	StatusView		Datei entsperren
 Italic	Menus		Kursiv
 Can't undo	Menus		Rückgängig nicht möglich
-Replace…	Menus		Ersetzen…
+Replace…	Menus		Ersetzen …
 File	Menus		Datei
-Bold	Menus		Fett
 Paste	Menus		Einfügen
+Bold	Menus		Fett
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Die Datei \"%file%\" wurde von einer anderen Anwendung verändert.\nSoll sie neu geladen werden?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Die Datei \"%file%\" wurde von einer anderen Anwendung entfernt. Soll sie wiederhergestellt werden?
 Lines:	Statistics		Zeilen:
@@ -40,7 +40,7 @@ Save	SaveAlert		Speichern
 Default	Open_and_SaveAsPanel		Standard
 Cancel	RevertToSavedAlert		Abbrechen
 Cancel	FindandReplaceWindow		Abbrechen
-Statistics…	Menus		Statistik…
+Statistics…	Menus		Statistik …
 Encoding	Open_and_SaveAsPanel		Kodierung
 Replace all	FindandReplaceWindow		Alle ersetzen
 Close	Menus		Schließen
@@ -50,12 +50,13 @@ Default	Menus		Standard
 OK	SaveAlert		OK
 Color	Menus		Farbe
 Save changes to the document \"%s\"? 	QuitAlert		Geändertes Dokument \"%s\" speichern? 
+Underline	Menus		Unterstrichen
 Find:	FindandReplaceWindow		Suche:
 Undo typing	QuitAlert		Rückgängig: Eingabe
 Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von \"%s\":\n\t%s
 Don't save	SaveAlert		Verwerfen
-Reload…	Menus		Neu laden…
-Print…	Menus		Drucken…
+Reload…	Menus		Neu laden …
+Print…	Menus		Drucken …
 Quit	Menus		Beenden
 Redo typing	QuitAlert		Wiederholen: Eingabe
 Ignore	NodeMonitorAlerts		Ignorieren
@@ -67,23 +68,23 @@ OK	LoadAlert		OK
 Save	QuitAlert		Speichern
 Case-sensitive	FindandReplaceWindow		Groß-/Kleinschreibung beachten
 Find selection	Menus		Auswahl suchen
+Find…	Menus		Suchen …
 Cancel	SaveAlert		Abbrechen
-Find…	Menus		Suchen…
 Revert	RevertToSavedAlert		Wiederherstellen
-Decrease size	Menus		Verkleinern
 Size	Menus		Größe
+Decrease size	Menus		Verkleinern
 Autodetect	Menus		Automatisch
 Replace next	Menus		Weiter ersetzen
 OK	QuitAlert		OK
-Replace with:	FindandReplaceWindow		Ersetzen durch:
 Edit	Menus		Bearbeiten
-Open…	Menus		Öffnen…
-Save as…	Menus		Speichern unter…
+Replace with:	FindandReplaceWindow		Ersetzen durch:
+Open…	Menus		Öffnen …
+Save as…	Menus		Speichern unter …
 Replace	FindandReplaceWindow		Ersetzen
 Characters:	Statistics		Zeichen:
 Don't save	QuitAlert		Verwerfen
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument \"%s\" speichern?
-Align	Menus		Ausrichtung
 Font	Menus		Schrift
+Align	Menus		Ausrichtung
 Select all	Menus		Alles auswählen
 Right	Menus		Rechts

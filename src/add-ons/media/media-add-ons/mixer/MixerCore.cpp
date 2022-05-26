@@ -501,8 +501,8 @@ MixerCore::_MixThread()
 		fOutput->MediaOutput().format.u.raw_audio) / 2;
 
 	TRACE("MixerCore: starting _MixThread at %Ld with latency %Ld and "
-		"downstream latency %Ld, bufferRequestTimeout %Ld\n", start, latency,
-		fDownstreamLatency, bufferRequestTimeout);
+		"downstream latency %Ld, bufferRequestTimeout %Ld\n", start,
+		fEventLatency, fDownstreamLatency, bufferRequestTimeout);
 
 	// We must read from the input buffer at a position (pos) that is always
 	// a multiple of fMixBufferFrameCount.
@@ -557,7 +557,11 @@ MixerCore::_MixThread()
 			BBuffer* buffer = fBufferGroup->RequestBuffer(size,
 				bufferRequestTimeout);
 			if (buffer != NULL) {
-				memset(buffer->Data(), 0, size);
+				int middle = 0;
+				if (fOutput->MediaOutput().format.u.raw_audio.format
+						== media_raw_audio_format::B_AUDIO_UCHAR)
+					middle = 128;
+				memset(buffer->Data(), middle, size);
 				// fill in the buffer header
 				media_header* hdr = buffer->Header();
 				hdr->type = B_MEDIA_RAW_AUDIO;

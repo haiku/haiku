@@ -655,20 +655,6 @@ read_cd(cd_driver_info *info, const scsi_read_cd *readCD)
 }
 
 
-static int
-log2(uint32 x)
-{
-	int y;
-
-	for (y = 31; y >= 0; --y) {
-		if (x == (1UL << y))
-			break;
-	}
-
-	return y;
-}
-
-
 static status_t
 do_io(void* cookie, IOOperation* operation)
 {
@@ -974,12 +960,6 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 	TRACE("cd_set_capacity(info = %p, capacity = %Ld, blockSize = %ld)\n",
 		info, capacity, blockSize);
 
-	// get log2, if possible
-	uint32 blockShift = log2(blockSize);
-
-	if ((1UL << blockShift) != blockSize)
-		blockShift = 0;
-
 	if (info->block_size != blockSize) {
 		if (capacity == 0) {
 			// there is obviously no medium in the drive, don't try to update
@@ -1116,6 +1096,7 @@ cd_register_device(device_node* node)
 
 	// ready to register
 	device_attr attrs[] = {
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "SCSI CD-ROM Drive"}},
 		{"removable", B_UINT8_TYPE, {ui8: deviceInquiry->removable_medium}},
 		{B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, {ui32: maxBlocks}},
 		{ NULL }

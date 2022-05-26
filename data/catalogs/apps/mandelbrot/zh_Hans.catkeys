@@ -1,25 +1,25 @@
 1	english	x-vnd.Haiku-Mandelbrot	3875916167
-Burning Ship	MandelbrotWindow		燃烧船
 Grassland	MandelbrotWindow		草地
+Tricorn	MandelbrotWindow		三角帽
+Orbit Trap	MandelbrotWindow		轨迹陷阱
+Deepfrost	MandelbrotWindow		结冰
+1 (none)	MandelbrotWindow		1（无）
+Quit	MandelbrotWindow		退出
+Fire	MandelbrotWindow		火焰
+High contrast	MandelbrotWindow		高对比度
+Midnight	MandelbrotWindow		午夜
+Burning Ship	MandelbrotWindow		燃烧船
 Lightning	MandelbrotWindow		闪电
 About	MandelbrotWindow		关于
 Palette	MandelbrotWindow		色调
 Set	MandelbrotWindow		集合
-Tricorn	MandelbrotWindow		三角帽
 Royal	MandelbrotWindow		皇室
-Orbit Trap	MandelbrotWindow		轨迹陷阱
-Deepfrost	MandelbrotWindow		结冰
 Subsampling	MandelbrotWindow		亚取样
-1 (none)	MandelbrotWindow		1（无）
-Quit	MandelbrotWindow		退出
 File	MandelbrotWindow		文件
 Julia	MandelbrotWindow		茱莉亚
 Frost	MandelbrotWindow		霜冻
-Fire	MandelbrotWindow		火焰
 Mandelbrot	System name		分型图形
-Iterations	MandelbrotWindow		迭代次数
-High contrast	MandelbrotWindow		高对比度
 Multibrot	MandelbrotWindow		多重曼德布罗特
+Iterations	MandelbrotWindow		迭代次数
 Spring	MandelbrotWindow		春意
-Midnight	MandelbrotWindow		午夜
 Mandelbrot	MandelbrotWindow		曼德布罗特

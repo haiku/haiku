@@ -1,8 +1,7 @@
-1	french	x-vnd.Haiku-Network	2923905377
+1	french	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Périphérique Ethernet
 Link speed:	IntefaceView		Vitesse du lien :
 disconnected	IntefaceView		déconnecté
-IP Address:	IntefaceAddressView		Adresse IP :
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Réseau :
 Received:	IntefaceView		Reçu :
@@ -14,6 +13,7 @@ Gateway:	IntefaceAddressView		Passerelle :
 The netmask defines your local network	IntefaceAddressView		Le masque réseau détermine votre réseau local
 Your IP address	IntefaceAddressView		Votre adresse IP
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		Adresse IP :
 Netmask:	IntefaceAddressView		Masque réseau :
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Services
@@ -46,7 +46,7 @@ Choose automatically	IntefaceView		Choisir automatiquement
 Status:	IntefaceView		État :
 Disable	IntefaceView		Désactiver
 Manage…	NetworkWindow		Gérer…
-open	Open network		ouvrir
+open	Open network		ouvert
 Network	System name		Réseau
 Your gateway to the internet	IntefaceAddressView		Votre passerelle vers l’internet
 Enable	ServiceView		Activer

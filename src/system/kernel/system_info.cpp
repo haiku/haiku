@@ -490,36 +490,57 @@ get_system_info(system_info* info)
 }
 
 
+typedef struct {
+	bigtime_t	active_time;
+	bool		enabled;
+} beta2_cpu_info;
+
+
+extern "C" status_t
+__get_cpu_info(uint32 firstCPU, uint32 cpuCount, beta2_cpu_info* beta2_info)
+{
+	cpu_info info[cpuCount];
+	status_t err = _get_cpu_info_etc(firstCPU, cpuCount, info, sizeof(cpu_info));
+	if (err == B_OK) {
+		for (uint32 i = 0; i < cpuCount; i++) {
+			beta2_info[i].active_time = info[i].active_time;
+			beta2_info[i].enabled = info[i].enabled;
+		}
+	}
+	return err;
+}
+
+
 status_t
-get_cpu_info(uint32 firstCPU, uint32 cpuCount, cpu_info* info)
+_get_cpu_info_etc(uint32 firstCPU, uint32 cpuCount, cpu_info* info, size_t size)
 {
 	if (cpuCount == 0)
 		return B_OK;
+	if (size != sizeof(cpu_info))
+		return B_BAD_VALUE;
 	if (firstCPU >= (uint32)smp_get_num_cpus())
 		return B_BAD_VALUE;
 
-	uint32 count = std::min(cpuCount, smp_get_num_cpus() - firstCPU);
+	const uint32 endCPU = firstCPU + std::min(cpuCount, smp_get_num_cpus() - firstCPU);
 
 	// This function is called very often from userland by applications
 	// that display CPU usage information, so we want to keep this as
-	// optimized and touch as little as possible. Hence, no use of
-	// a temporary buffer.
+	// optimized and touch as little as possible. Hence, we avoid use
+	// of an allocated temporary buffer.
 
-	if (IS_USER_ADDRESS(info)) {
-		if (user_memset(info, 0, sizeof(cpu_info) * count) != B_OK)
+	cpu_info localInfo[8];
+	for (uint32 cpuIdx = firstCPU; cpuIdx < endCPU; ) {
+		uint32 localIdx;
+		for (localIdx = 0; cpuIdx < endCPU && localIdx < B_COUNT_OF(localInfo);
+				cpuIdx++, localIdx++) {
+			localInfo[localIdx].active_time = cpu_get_active_time(cpuIdx);
+			localInfo[localIdx].enabled = !gCPU[cpuIdx].disabled;
+			localInfo[localIdx].current_frequency = cpu_frequency(cpuIdx);
+		}
+
+		if (user_memcpy(info, localInfo, sizeof(cpu_info) * localIdx) != B_OK)
 			return B_BAD_ADDRESS;
-		set_ac();
-	} else {
-		memset(info, 0, sizeof(cpu_info) * count);
-	}
-
-	for (uint32 i = 0; i < count; i++) {
-		info[i].active_time = cpu_get_active_time(firstCPU + i);
-		info[i].enabled = !gCPU[firstCPU + i].disabled;
-	}
-
-	if (IS_USER_ADDRESS(info)) {
-		clear_ac();
+		info += localIdx;
 	}
 
 	return B_OK;
@@ -578,7 +599,7 @@ _user_get_cpu_info(uint32 firstCPU, uint32 cpuCount, cpu_info* userInfo)
 	if (userInfo == NULL || !IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
 
-	return get_cpu_info(firstCPU, cpuCount, userInfo);
+	return _get_cpu_info_etc(firstCPU, cpuCount, userInfo, sizeof(cpu_info));
 }
 
 

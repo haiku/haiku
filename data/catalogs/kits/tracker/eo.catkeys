@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	3669766136
+1	esperanto	x-vnd.Haiku-libtracker	3380227078
 Created	ContainerWindow		Kreita
 Icon	AttributesView		Piktogramo
 Open and make preferred	OpenWithWindow		Uzi kaj igi preferata
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Speco
 Open with…	ContainerWindow		Uzi per…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Eraro de movo de \"%name\" al Rubujo. (%error)
 Or	FindPanel		Aŭ
+MIME Description	AttributesView		Priskribo per MIME
 before	FindPanel		antaŭ
 Volume icons	TrackerSettingsWindow		Piktogramoj de volumoj
 Ignore case	SelectionWindow		Malatenti usklecon
@@ -159,7 +160,7 @@ The target disk does not support creating links.	FSUtils		La cela disko ne subte
 develop	B_SYSTEM_DEVELOP_DIRECTORY		disvolvo
 64-bit integer	AttributesView		64-bita entjero
 Cut more	ContainerWindow		Tondi pli
-The Tracker must be running to see Info windows.	PoseView		Spurilo devas esti rulata por vidi Informajn fenestrojn.
+The Tracker must be running to see Info windows.	PoseView		La Spurilo devas esti rulata por vidi Informajn fenestrojn.
 Tracker preferences	TrackerSettingsWindow		Agordoj de Spurilo
 Read	FilePermissionsView		Legi
 There was an error writing the attribute.	WidgetAttributeText		Eraris skribante la atributon.
@@ -270,6 +271,7 @@ home	B_USER_DIRECTORY		hejmo
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Novaj Ŝablonoj de Spurilo
 Disk mounting during boot	AutoMounterSettings		Surmetado dum praŝargo
 Don't automount	AutoMounterSettings		Ne surmeti aŭtomate
+Node ref	AttributesView		Referenco al nodo
 Could not find application \"%appname\"	OpenWithWindow		Netroviĝis programo \"%appname\"
 Unmatched parenthesis.	libtracker		Nekompareblaj krampoj.
 Extended attribute	AttributesView		Etendita atributo
@@ -288,7 +290,7 @@ Error creating link to \"%name\".	FSUtils		Eraris kreante ligilon al \"%name\".
 Unknown	FilePermissionsView		Nekonata
 Paste links	ContainerWindow		Alglui ligilojn
 Restoring: 	StatusWindow		Restaŭrante: 
-The Tracker must be running to set the default printer.	PoseView		Spurilo devas esti rulata por agordi la defaŭltan presilon.
+The Tracker must be running to set the default printer.	PoseView		Tracker devas esti rulata por agordi la implicitan presilon.
 calculating…	InfoWindow		kalkulante…
 Preferred for file	OpenWithWindow		Preferata por dosiero
 OK	AutoMounterSettings		Bone
@@ -328,6 +330,7 @@ Recent folders	FavoritesMenu		Ĵusaj dosierujoj
 Signed memory size	AttributesView		Signuma memorogrando
 The specified name is illegal. Please choose another name.	FilePanelPriv		La specifita nomo kontraŭleĝas. Bonvolu elekti alian nomon.
 of %items	StatusWindow		de %items
+MIME Path	AttributesView		Itinero de MIME
 less than	FindPanel		malpli ol
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Eraris kopiante dosieron de \"%name\":\n\t%error\n\nĈu vi volas daŭrigi?
 Creating links: 	StatusWindow		Kreante ligilojn: 
@@ -442,6 +445,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Bedaŭron, konse
 Move here	ContainerWindow		Movi ĉi tien
 the config folder	FSUtils		la config dosierujo
 Sorry, could not create a new folder.	FSUtils		Bedaŭron, neeblis krei novan dosierujon.
+MIME Signature	AttributesView		Subskribo de MIME
 Select all	VirtualDirectoryWindow		Elekti ĉion
 Rename	FSUtils	button label	Renomi
 Clean up all	ContainerWindow		Alkradigi ĉion
@@ -520,6 +524,7 @@ Create a Query	FindPanel		Krei Serĉmendon
 Close	QueryContainerWindow		Fermi
 I know what I'm doing	FSUtils	button label	Mi scias kion mi faras
 Preparing to copy items…	StatusWindow		Preparante kopii elementojn…
+Entry ref	AttributesView		Referenco al komencnodo
 Icon view	ContainerWindow		Piktograma vido
 Name	ContainerWindow		Nomo
 Preferred for %type	OpenWithWindow		Preferata por %type

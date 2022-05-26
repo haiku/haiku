@@ -23,7 +23,7 @@ Show all	WindowMenu		Mostre dut
 No windows	WindowMenu		Nissun barcon
 Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		Torne invie
-Large	PreferencesWindow		Grant
+Large	PreferencesWindow		Grandis
 Auto-raise	PreferencesWindow		Tire sù in automatic
 Recent folders:	PreferencesWindow		Cartelis resintis:
 Show application expander	PreferencesWindow		Mostre estensôr aplicazion
@@ -31,7 +31,7 @@ Close all	WindowMenu		Siere dut
 Deskbar preferences	PreferencesWindow		Preferencis Deskbar
 Mount	DeskbarMenu		Monte
 Revert	PreferencesWindow		Torne indaûr
-Small	PreferencesWindow		Piçul
+Small	PreferencesWindow		Piçulis
 Recent applications:	PreferencesWindow		Aplicazions resintis:
 Shutdown…	DeskbarMenu		Jessude di Haiku…
 Tracker always first	PreferencesWindow		Tracker simpri par prin
@@ -44,7 +44,7 @@ Expand new applications	PreferencesWindow		Espandi lis gnovis aplicazions
 Show replicants	DeskbarMenu		Mostre replicants
 Hide application names	PreferencesWindow		Plate i nons des aplicazions
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Dimostrazions
-Icon size	PreferencesWindow		Dimension icone
+Icon size	PreferencesWindow		Dimension iconis
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applet dal scritori
 Hide all	WindowMenu		Plate dut
 Quit application	WindowMenu		Siere la aplicazion

@@ -31,9 +31,11 @@
 #include <Clipboard.h>
 #include <File.h>
 #include <Font.h>
+#include <Locale.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <MessageRunner.h>
+#include <NumberFormat.h>
 #include <Point.h>
 #include <PopUpMenu.h>
 #include <Region.h>
@@ -205,11 +207,7 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	fKeypadDescription(kKeypadDescriptionBasic),
 	fKeypad(NULL),
 
-#ifdef __HAIKU__
 	fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_RGBA32)),
-#else
-	fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_CMAP8)),
-#endif
 
 	fPopUpMenu(NULL),
 	fAutoNumlockItem(NULL),
@@ -243,11 +241,7 @@ CalcView::CalcView(BMessage* archive)
 	fKeypadDescription(kKeypadDescriptionBasic),
 	fKeypad(NULL),
 
-#ifdef __HAIKU__
 	fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_RGBA32)),
-#else
-	fCalcIcon(new BBitmap(BRect(0, 0, 15, 15), 0, B_CMAP8)),
-#endif
 
 	fPopUpMenu(NULL),
 	fAutoNumlockItem(NULL),
@@ -462,8 +456,12 @@ CalcView::MessageReceived(BMessage* message)
 				const char* result;
 				if (message->FindString("error", &result) == B_OK)
 					fExpressionTextView->SetText(result);
-				else if (message->FindString("value", &result) == B_OK)
-					fExpressionTextView->SetValue(result);
+				else if (message->FindString("value", &result) == B_OK) {
+					BLocale locale;
+					BNumberFormat format(&locale);
+
+					fExpressionTextView->SetValue(result, format.GetSeparator(B_DECIMAL_SEPARATOR));
+				}
 
 				// stop the message runner
 				delete fEvaluateMessageRunner;
@@ -496,12 +494,8 @@ CalcView::Draw(BRect updateRect)
 				FillRect(updateRect & expressionRect);
 			}
 
-			if (fCalcIcon->ColorSpace() == B_RGBA32) {
-				SetDrawingMode(B_OP_ALPHA);
-				SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-			} else {
-				SetDrawingMode(B_OP_OVER);
-			}
+			SetDrawingMode(B_OP_ALPHA);
+			SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 
 			BPoint iconPos;
 			iconPos.x = expressionRect.right - (expressionRect.Width()
@@ -1112,8 +1106,14 @@ CalcView::_EvaluateThread(void* data)
 	BString result;
 	status_t status = acquire_sem(calcView->fEvaluateSemaphore);
 	if (status == B_OK) {
+		BLocale locale;
+		BNumberFormat format(&locale);
+
 		ExpressionParser parser;
 		parser.SetDegreeMode(calcView->fOptions->degree_mode);
+		parser.SetSeparators(format.GetSeparator(B_DECIMAL_SEPARATOR),
+			format.GetSeparator(B_GROUPING_SEPARATOR));
+
 		BString expression(calcView->fExpressionTextView->Text());
 		try {
 			result = parser.Evaluate(expression.String());
@@ -1234,10 +1234,10 @@ CalcView::_ParseCalcDesc(const char** keypadDescription)
 		strlcpy(key->label, B_TRANSLATE_NOCOLLECT(p), sizeof(key->label));
 
 		// set code
-		if (strcmp(key->label, "=") == 0)
+		if (strcmp(p, "=") == 0)
 			strlcpy(key->code, "\n", sizeof(key->code));
 		else
-			strlcpy(key->code, key->label, sizeof(key->code));
+			strlcpy(key->code, p, sizeof(key->code));
 
 		// set keymap
 		if (strlen(key->label) == 1)
@@ -1266,37 +1266,35 @@ CalcView::_PressKey(int key)
 	assert(key < (fRows * fColumns));
 	assert(key >= 0);
 
-	if (strcmp(fKeypad[key].label, B_TRANSLATE_COMMENT("BS",
-		"Key label, 'BS' means backspace")) == 0) {
+	if (strcmp(fKeypad[key].code, "BS") == 0) {
 		// BS means backspace
 		fExpressionTextView->BackSpace();
-	} else if (strcmp(fKeypad[key].label, B_TRANSLATE_COMMENT("C",
-		"Key label, 'C' means clear")) == 0) {
+	} else if (strcmp(fKeypad[key].code, "C") == 0) {
 		// C means clear
 		fExpressionTextView->Clear();
-	} else if (strcmp(fKeypad[key].label, B_TRANSLATE("acos")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("asin")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("atan")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("cbrt")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("ceil")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("cos")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("cosh")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("exp")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("floor")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("log")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("ln")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("sin")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("sinh")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("sqrt")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("tan")) == 0
-		|| strcmp(fKeypad[key].label, B_TRANSLATE("tanh")) == 0) {
-		int32 labelLen = strlen(fKeypad[key].label);
+	} else if (strcmp(fKeypad[key].code, "acos") == 0
+		|| strcmp(fKeypad[key].code, "asin") == 0
+		|| strcmp(fKeypad[key].code, "atan") == 0
+		|| strcmp(fKeypad[key].code, "cbrt") == 0
+		|| strcmp(fKeypad[key].code, "ceil") == 0
+		|| strcmp(fKeypad[key].code, "cos") == 0
+		|| strcmp(fKeypad[key].code, "cosh") == 0
+		|| strcmp(fKeypad[key].code, "exp") == 0
+		|| strcmp(fKeypad[key].code, "floor") == 0
+		|| strcmp(fKeypad[key].code, "log") == 0
+		|| strcmp(fKeypad[key].code, "ln") == 0
+		|| strcmp(fKeypad[key].code, "sin") == 0
+		|| strcmp(fKeypad[key].code, "sinh") == 0
+		|| strcmp(fKeypad[key].code, "sqrt") == 0
+		|| strcmp(fKeypad[key].code, "tan") == 0
+		|| strcmp(fKeypad[key].code, "tanh") == 0) {
+		int32 labelLen = strlen(fKeypad[key].code);
 		int32 startSelection = 0;
 		int32 endSelection = 0;
 		fExpressionTextView->GetSelection(&startSelection, &endSelection);
 		if (endSelection > startSelection) {
 			// There is selected text, put it inbetween the parens
-			fExpressionTextView->Insert(startSelection, fKeypad[key].label,
+			fExpressionTextView->Insert(startSelection, fKeypad[key].code,
 				labelLen);
 			fExpressionTextView->Insert(startSelection + labelLen, "(", 1);
 			fExpressionTextView->Insert(endSelection + labelLen + 1, ")", 1);
@@ -1307,7 +1305,7 @@ CalcView::_PressKey(int key)
 				endSelection + labelLen + 2, endSelection + labelLen + 2);
 		} else {
 			// There is no selected text, insert at the cursor location
-			fExpressionTextView->Insert(fKeypad[key].label);
+			fExpressionTextView->Insert(fKeypad[key].code);
 			fExpressionTextView->Insert("()");
 			// Put the cursor inside the parens so you can enter an argument
 			// Need to cast to BTextView because Select() is protected
@@ -1315,6 +1313,11 @@ CalcView::_PressKey(int key)
 			static_cast<BTextView*>(fExpressionTextView)->Select(
 				endSelection + labelLen + 1, endSelection + labelLen + 1);
 		}
+	} else if (strcmp(fKeypad[key].code, ".") == 0) {
+		BLocale locale;
+		BNumberFormat format(&locale);
+
+		fExpressionTextView->Insert(format.GetSeparator(B_DECIMAL_SEPARATOR));
 	} else {
 		// check for evaluation order
 		if (fKeypad[key].code[0] == '\n') {

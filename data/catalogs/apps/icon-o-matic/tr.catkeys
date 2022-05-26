@@ -16,10 +16,10 @@ Rotate	Icon-O-Matic-TransformationBoxStates		Döndür
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Denetim noktalarını kaldır
 Shorten	Icon-O-Matic-PropertyNames		Kısalt
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Yol atamasını kaldır
-The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		İçe aktarmaya çalıştığınız metin baya uzun, emin misiniz?
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		İçe aktarmaya çalıştığınız metin pek uzun, emin misiniz?
 Paste	Icon-O-Matic-Properties		Yapıştır
 Detect Orient.	Icon-O-Matic-PropertyNames		Oryantasyonu algıla
-Click on a shape above	Empty transformers list - 1st line		Yukarıdaki bir şekle tıklayın
+Click on a shape above	Empty transformers list - 1st line		Dönüştürücüleri iliştirmek için
 Close	Icon-O-Matic-Menu-File		Kapat
 Add rect	Icon-O-Matic-PathsList		Dikdörtgen ekle
 Rotation	Icon-O-Matic-PropertyNames		Döndürme
@@ -33,7 +33,7 @@ Assign Path	Icon-O-Matic-AddPathsCmd		Yol ata
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Dönüşümü sıfırla
 Transformation	Transformation		Dönüşüm
 Remove	Icon-O-Matic-StylesList		Kaldır
-Cancel	Icon-O-Matic-Menu-Settings		İptal
+Cancel	Icon-O-Matic-Menu-Settings		Vazgeç
 Assign Style	Icon-O-Matic-AssignStyleCmd		Biçem ata
 Transformation	Icon-O-Matic-TransformationBoxStates		Dönüşüm
 Closed	Icon-O-Matic-PropertyNames		Kapalı
@@ -61,7 +61,7 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Izgaraya hizala
 Opening the document failed!	Icon-O-Matic-Main		Belge açılamadı!
 Shape	Icon-O-Matic-Menus		Şekil
 Add with path & style	Icon-O-Matic-ShapesList		Yol ve biçem ile ekle
-<unavailable>	Icon-O-Matic-StyleTypes		<mevcut değil>
+<unavailable>	Icon-O-Matic-StyleTypes		<yok>
 Min LOD	Icon-O-Matic-PropertyNames		En düşük ayrıntı düzeyi
 Reverse Path	Icon-O-Matic-ReversePathCmd		Yolu tersine çevir
 Move Transformers	Icon-O-Matic-MoveTransformersCmd		Dönüştürücüleri taşı
@@ -80,7 +80,7 @@ Save icon	Dialog title		Simgeyi kaydet
 Move Paths	Icon-O-Matic-MovePathsCmd		Yolları taşı
 Rounding	Icon-O-Matic-PropertyNames		Yuvarlatma
 Joins	Icon-O-Matic-PropertyNames		Ek yerleri
-Cancel	Icon-O-Matic-ColorPicker		İptal
+Cancel	Icon-O-Matic-ColorPicker		Vazgeç
 Duplicate	Icon-O-Matic-PathsList		Çoğalt
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Şekilleri kaldır
 Save	Icon-O-Matic-Menu-Settings		Kaydet
@@ -103,16 +103,16 @@ Icon-O-Matic might not have interpreted all data from the SVG when it was loaded
 Rotate indices backwards	Icon-O-Matic-PathsList		Belirticileri geriye doğru döndür
 Overwrite	Icon-O-Matic-SVGExport		Üzerine yaz
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Denetim noktasını değiştir
-Cancel	Icon-O-Matic-SVGExport		İptal
+Cancel	Icon-O-Matic-SVGExport		Vazgeç
 Open…	Icon-O-Matic-Menu-File		Aç…
 Redo	Icon-O-Matic-Main		Yinele
 Change Color	Icon-O-Matic-SetColorCmd		Renk değiştir
 Remove	Icon-O-Matic-ShapesList		Kaldır
 Drop shapes	Icon-O-Matic-ShapesList		Şekilleri bırak
-PNG Set	Icon-O-Matic-SavePanel		PNG seti
-to attach transformers.	Empty transformers list - 2nd line		dönüştürücüleri iliştirmek için.
+PNG Set	Icon-O-Matic-SavePanel		PNG kümesi
+to attach transformers.	Empty transformers list - 2nd line		bir şekle tıklayın.
 Linear	Icon-O-Matic-StyleTypes		Doğrusal
-any of the other lists to	Empty property list - 2nd line		diğer listeleri
+any of the other lists to	Empty property list - 2nd line		özelliklerini düzenlemek için
 Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Denetim noktalarını yokla
 Flip Control Point	Icon-O-Matic-FlipPointsCmd		Denetim noktasını ters çevir
 Add Paths	Icon-O-Matic-AddPathsCmd		Yol ekle
@@ -153,7 +153,7 @@ Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Renk (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Gradyanı düzenle
 Set 	Set (property name)		Ayarla: 
 Rotate indices forwards	Icon-O-Matic-PathsList		Belirticileri ileri doğru döndür
-Click on an object in	Empty property list - 1st line		Şurada bir nesnenin üzerine tıkla:
+Click on an object in	Empty property list - 1st line		Listelerdeki nesnelerin
 Save	Icon-O-Matic-Menu-File		Kaydet
 No	Icon-O-Matic-StyledTextImport		Hayır
 Add circle	Icon-O-Matic-PathsList		Daire ekle
@@ -196,6 +196,6 @@ Export	Icon-O-Matic-Menu-File		Dışa aktar
 Width	Icon-O-Matic-PropertyNames		Genişlik
 Bummer	Cancel button - error alert		Hay aksi
 Style	Icon-O-Matic-Menus		Biçem
-edit it's properties here.	Empty property list - 3rd line		özelliklerini buradan düzenleyin.
+edit it's properties here.	Empty property list - 3rd line		için üzerine tıklayın.
 Off	Icon-O-Matic-Menu-Settings		Kapalı
 Edit	Icon-O-Matic-Menus		Düzen

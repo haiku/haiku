@@ -289,10 +289,14 @@ int
 ArchUARTPL011::GetChar(bool wait)
 {
 	if (Enabled() == true) {
-		// Wait until a character is received?
 		if (wait) {
+			// Wait until a character is received
 			while ((In32(PL01x_FR) & PL01x_FR_RXFE) != 0)
 				Barrier();
+		} else {
+			// Check if there is any data available in RX fifo
+			if ((In32(PL01x_FR) & PL01x_FR_RXFE) != 0)
+				return -1;
 		}
 		return In32(PL01x_DR);
 	}
@@ -319,7 +323,8 @@ ArchUARTPL011::FlushRx()
 }
 
 
-ArchUARTPL011 *arch_get_uart_pl011(addr_t base, int64 clock)
+ArchUARTPL011*
+arch_get_uart_pl011(addr_t base, int64 clock)
 {
 	static char buffer[sizeof(ArchUARTPL011)];
 	ArchUARTPL011 *uart = new(buffer) ArchUARTPL011(base, clock);

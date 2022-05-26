@@ -1,7 +1,6 @@
-1	lithuanian	x-vnd.Haiku-Time	3968430883
+1	lithuanian	x-vnd.Haiku-Time	908714414
 OK	Time		Gerai
 Message receiving failed	Time		Nepavyko gauti pranešimo
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Laikas ir data. Programos autoriai:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\n© 2004-2012, „Haiku“,
 Australia	Time		Australija
 America	Time		Amerika
 Set time zone	Time		Pakeisti laiko juostą
@@ -35,7 +34,6 @@ Atlantic	Time		Atlanto vandenynas
 Show clock in Deskbar	Time		Rodyti laikrodį pranešimų srityje
 Display time with seconds	Time		Rodyti sekundes
 Time	System name		Laikas
-about	Time		Apie
 Show time zone	Time		Rodyti laiko juostą
 Synchronize at boot	Time		Sinchronizuoti įkeliant sistemą
 Indian	Time		Indijos vandenynas

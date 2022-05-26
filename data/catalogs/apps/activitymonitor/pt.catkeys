@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-ActivityMonitor	4123759361
+1	portuguese	x-vnd.Haiku-ActivityMonitor	826097672
 Teams	DataSource		Equipas
 Semaphores	DataSource		Semáforos
 TX	DataSource	Shorter version for Sending	TX
@@ -24,6 +24,7 @@ Settings…	ActivityWindow		Definições…
 Block cache	DataSource		Reserva em bloco
 Memory	DataSource		Memória
 CPU usage	DataSource		Utilização do processador
+CPU speed	DataSource		Velocidade da CPU
 Quit	ActivityWindow		Sair
 Raw clipboard	DataSource		Área de transferência bruta
 Settings	ActivityWindow		Definições
@@ -31,6 +32,8 @@ Used memory	DataSource		Memória utilizada
 %.1f faults/s	DataSource		%.1f falhas/s
 Show legend	ActivityView		Mostrar legenda
 Cached memory	DataSource		Memória em cache
+CPU %d usage	DataSource		Utilização da CPU %d
+CPU %d speed	DataSource		Velocidade da CPU %d
 File	ActivityWindow		Ficheiro
 Ports	DataSource		Portas
 Page faults	DataSource		Falhas de página

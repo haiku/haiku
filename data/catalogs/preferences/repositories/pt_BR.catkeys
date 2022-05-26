@@ -1,0 +1,42 @@
+1	portuguese (brazil)	x-vnd.Haiku-Repositories	1220143449
+This is not a valid URL.	AddRepoWindow	Add URL error message	Este não é um URL válido.
+Repository URL:	AddRepoWindow	Text box label	URL do repositório:
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	Houve um erro ao atualizar as configurações temporárias do repositório %name%
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	Houve um erro ao desabilitar o repositório %name%
+Unknown	Constants	Unknown repository name	Desconhecido
+Remove all	RepositoriesView	Button label	Remover tudo
+Enable repositories to use with package management:	RepositoriesView	Label text	Habilitar repositórios a serem usados pelo gerenciador de pacotes:
+Disable	RepositoriesView	Button label	Desabilitar
+Cancel task	TaskTimer	Button label	Cancelar tarefa
+Changes completed	RepositoriesView	Status view text	Alterações concluídas
+Details	TaskLooper	Job log details header	Detalhes
+Enabled	RepoRow	Tag in the Status column	Habilitado
+Remove	Constants	Button label	Remover
+There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	Houve um erro ao habilitar o repositório %url%
+Remove this repository?	RepositoriesView	Removal alert confirmation message	Remover este repositório?
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	A tarefa do repositório %name% está demorando muito para terminar.
+Completed	TaskLooper	Completed task status message	Completado
+OK	Constants	Button label	OK
+Status	RepositoriesView	Column title	Estado
+Name	RepositoriesView	Column title	Nome
+Add	AddRepoWindow	Button label	Adicionar
+Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	Os repositórios não podem recuperar os nomes dos repositórios já habilitados.
+Enable all	RepositoriesView	Button label	Habilitar tudo
+Aborted	TaskLooper	Aborted task status message	Cancelado
+URL	RepositoriesView	Column title	URL
+Enable	RepositoriesView	Button label	Habilitar
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	Erro ao obter a configuração de repositório para %name%
+Description	TaskLooper	Failed task error description	Descrição
+Failed	TaskLooper	Failed task status message	Falhou
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	Boas notícias! A tarefa para o repositório %name% foi concluída.
+Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	Algumas tarefas ainda estão rodando. Parar tudo e sair?
+This repository URL already exists.	RepositoriesView	Error message	Este URL de repositório já existe.
+Repositories	System name		Repositórios
+Changes pending:	RepositoriesView	Status view text	Mudanças pendentes:
+Remove	RepositoriesView	Button label	Remover
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	Remover estes repositórios?
+Keep trying	TaskTimer	Button label	Continue tentando
+Cancel	Constants	Button label	Cancelar
+Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	Apenas uma URL para cada repositório é permitida. Por favor mude suas escolhas.
+Stop and quit	RepositoriesWindow	Button label	Parar e sair
+Disable all	RepositoriesView	Button label	Desabilitar tudo

@@ -44,10 +44,15 @@ status_t
 PrimaryPartitionEditor::ParameterChanged(const char* name,
 	const BVariant& variant)
 {
-	if (!strcmp(name, "type")) {
+	if (strcmp(name, "type") == 0) {
 		fActiveCheckBox->SetEnabled(strcmp(variant.ToString(),
 			kPartitionTypeIntelExtended) != 0);
+		fActiveCheckBox->SetValue(false);
 	}
+
+	if (strcmp(name, "active") == 0)
+		fActiveCheckBox->SetValue(variant.ToBool());
+
 	return B_OK;
 }
 

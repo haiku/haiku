@@ -6,6 +6,8 @@ UsePrivateHeaders tracker shared ;
 UsePublicHeaders [ FDirName be_apps Tracker ] ;
 SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 UseHeaders [ FDirName $(HAIKU_TOP) src kits tracker ] : false ;
+ObjectSysHdrs ShowImageWindow.cpp :
+	[ FDirName $(HAIKU_TOP) headers compatibility bsd ] ;
 
 Application ShowImage :
 	Filter.cpp

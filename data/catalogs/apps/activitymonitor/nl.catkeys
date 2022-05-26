@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	3672498538
+1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Teams
 Semaphores	DataSource		Semaforen
 TX	DataSource	Shorter version for Sending	TX
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Verwijder grafiek
 Swap space	DataSource		Swap-ruimte
 CPU	DataSource		CPU
 ActivityMonitor	System name		ActivityMonitor
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Interval bijwerktijd:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Instellingen...
@@ -30,6 +31,7 @@ Used memory	DataSource		Gebruikt geheugen
 %.1f faults/s	DataSource		%.1f fout(en)
 Show legend	ActivityView		Toon legenda
 Cached memory	DataSource		Geheugen in cache
+CPU %d usage	DataSource		CPU %d gebruik
 File	ActivityWindow		Bestand
 Ports	DataSource		Poorten
 Page faults	DataSource		Page-onderbrekingen

@@ -12,6 +12,7 @@
 #include <new>
 #include <set>
 #include <string>
+#include <cstddef>
 
 #include <Directory.h>
 #include <Entry.h>
@@ -109,8 +110,9 @@ BMergedDirectory::GetNextEntry(BEntry* entry, bool traverse)
 status_t
 BMergedDirectory::GetNextRef(entry_ref* ref)
 {
-	BPrivate::Storage::LongDirEntry dirEntry;
-	int32 result = GetNextDirents(&dirEntry, sizeof(dirEntry), 1);
+	BPrivate::Storage::LongDirEntry longEntry;
+	struct dirent* dirEntry = longEntry.dirent();
+	int32 result = GetNextDirents(dirEntry, sizeof(longEntry), 1);
 	if (result < 0)
 		return result;
 	if (result == 0)
@@ -118,7 +120,7 @@ BMergedDirectory::GetNextRef(entry_ref* ref)
 
 	BEntry entry;
 	status_t error
-		= entry.SetTo(fDirectories.ItemAt(fDirectoryIndex), dirEntry.d_name);
+		= entry.SetTo(fDirectories.ItemAt(fDirectoryIndex), dirEntry->d_name);
 	if (error != B_OK)
 		return error;
 
@@ -200,7 +202,7 @@ int32
 BMergedDirectory::CountEntries()
 {
 	int32 count = 0;
-	char buffer[sizeof(dirent) + B_FILE_NAME_LENGTH];
+	char buffer[offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH];
 	while (GetNextDirents((dirent*)&buffer, sizeof(buffer), 1) == 1)
 		count++;
 	return count;

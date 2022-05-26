@@ -442,7 +442,7 @@ ShowImageApp::MessageReceived(BMessage *message)
 /*!
 	\name Locking
 
-	This class provides some utility functions to look the looper associated
+	This class provides some utility functions to lock the looper associated
 	with this handler.
 */
 

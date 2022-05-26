@@ -13,6 +13,8 @@
 
 #include <device_manager.h>
 #include <Drivers.h>
+#include <malloc.h>
+#include <string.h>
 #include <util/AutoLock.h>
 
 #include "yarrow_rng.h"

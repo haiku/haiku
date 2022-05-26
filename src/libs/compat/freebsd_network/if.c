@@ -165,17 +165,6 @@ if_alloc(u_char type)
 	if (ifp->receive_sem < B_OK)
 		goto err1;
 
-	switch (type) {
-		case IFT_ETHER:
-		{
-			ifp->if_l2com = _kernel_malloc(sizeof(struct arpcom), M_ZERO);
-			if (ifp->if_l2com == NULL)
-				goto err2;
-			IFP2AC(ifp)->ac_ifp = ifp;
-			break;
-		}
-	}
-
 	ifp->link_state_sem = -1;
 	ifp->open_count = 0;
 	ifp->flags = 0;
@@ -183,7 +172,7 @@ if_alloc(u_char type)
 	ifq_init(&ifp->receive_queue, semName);
 
 	ifp->scan_done_sem = -1;
-		// WLAN specific, doesn't hurt when initilized for other devices
+		// WLAN specific, doesn't hurt when initialized for other devices
 
 	// Search for the first free device slot, and use that one
 	IFNET_WLOCK();
@@ -846,14 +835,13 @@ ether_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 {
 	struct ifreq *ifr = (struct ifreq *) data;
 
+	//dprintf("ether_ioctl: received %d\n", command);
+
 	switch (command) {
 		case SIOCSIFMTU:
-			if (ifr->ifr_mtu > ETHERMTU)
+			if (ifr->ifr_mtu > ETHERMTU_JUMBO)
 				return EINVAL;
-			else
-				;
-			// need to fix our ifreq to work with C...
-			// ifp->ifr_mtu = ifr->ifr_mtu;
+			ifp->if_mtu = ifr->ifr_mtu;
 			break;
 
 		default:
@@ -1259,6 +1247,38 @@ if_multiaddr_count(if_t ifp, int max)
 			break;
 	}
 	if_maddr_runlock(ifp);
+	return (count);
+}
+
+u_int
+if_llmaddr_count(if_t ifp)
+{
+	struct ifmultiaddr *ifma;
+	int count;
+
+	count = 0;
+	TAILQ_FOREACH(ifma, &ifp->if_multiaddrs, ifma_link) {
+		if (ifma->ifma_addr->sa_family == AF_LINK)
+			count++;
+	}
+
+	return (count);
+}
+
+u_int
+if_foreach_llmaddr(if_t ifp, iflladdr_cb_t cb, void *cb_arg)
+{
+	struct ifmultiaddr *ifma;
+	u_int count;
+
+	count = 0;
+	TAILQ_FOREACH(ifma, &ifp->if_multiaddrs, ifma_link) {
+		if (ifma->ifma_addr->sa_family != AF_LINK)
+			continue;
+		count += (*cb)(cb_arg, (struct sockaddr_dl *)ifma->ifma_addr,
+			count);
+	}
+
 	return (count);
 }
 

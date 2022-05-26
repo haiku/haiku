@@ -1,8 +1,7 @@
-1	friulian	x-vnd.Haiku-Network	2923905377
+1	friulian	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Dispositîf ethernet
 Link speed:	IntefaceView		Velocitât colegament:
 disconnected	IntefaceView		disconetût
-IP Address:	IntefaceAddressView		Direzion IP:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Rêt:
 Received:	IntefaceView		Ricevûts:
@@ -14,6 +13,7 @@ Gateway:	IntefaceAddressView		Gateway:
 The netmask defines your local network	IntefaceAddressView		La mascare di rêt e definìs la tô rêt locâl
 Your IP address	IntefaceAddressView		La tô direzion IP
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		Direzion IP:
 Netmask:	IntefaceAddressView		Mascare di rêt:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servizis

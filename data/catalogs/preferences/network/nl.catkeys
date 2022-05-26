@@ -1,8 +1,7 @@
-1	dutch; flemish	x-vnd.Haiku-Network	2923905377
+1	dutch; flemish	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Ethernet-apparaat
 Link speed:	IntefaceView		Verbindingssnelheid:
 disconnected	IntefaceView		niet verbonden
-IP Address:	IntefaceAddressView		IP-adres:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Netwerk:
 Received:	IntefaceView		Ontvangen:
@@ -14,6 +13,7 @@ Gateway:	IntefaceAddressView		Gateway:
 The netmask defines your local network	IntefaceAddressView		Het netwerkmasker bepaalt uw lokale netwerk
 Your IP address	IntefaceAddressView		Uw IP-adres
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP-adres:
 Netmask:	IntefaceAddressView		Netwerkmasker:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Diensten

@@ -35,7 +35,7 @@ struct xhci_root_hub_configuration_s {
 	usb_configuration_descriptor	configuration;
 	usb_interface_descriptor		interface;
 	usb_endpoint_descriptor			endpoint;
-	usb_endpoint_companion_descriptor endpc;
+	usb_endpoint_ss_companion_descriptor endpoint_ss_companion;
 	usb_hub_descriptor				hub;
 } _PACKED;
 
@@ -77,7 +77,7 @@ static xhci_root_hub_configuration_s sXHCIRootHubConfig =
 
 	{ // endpoint companion descriptor
 		7,
-		USB_DESCRIPTOR_ENDPOINT_COMPANION,
+		USB_DESCRIPTOR_ENDPOINT_SS_COMPANION,
 		0,
 		0,
 		0

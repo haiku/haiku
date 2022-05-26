@@ -1,8 +1,8 @@
 1	romanian	x-vnd.Haiku-SpiderScreensaver	2004357156
 Blue	SpiderView		Albastru
 Gray	SpiderView		Gri
-Max. points per polygon	SpiderView		Număr maxim de puncte per poligon
-Max. polygon count	SpiderView		Număr maxim poligoane
+Max. points per polygon	SpiderView		Număr max. de puncte per poligon
+Max. polygon count	SpiderView		Număr max. de poligoane
 for  bonefish	SpiderView		pentru  bonefish
 Purple	SpiderView		Violet
 Red	SpiderView		Roșu
@@ -11,4 +11,4 @@ Spider by stippi	SpiderView		Păianjen de stippi
 Green	SpiderView		Verde
 Cyan	SpiderView		Cyan
 Yellow	SpiderView		Galben
-Trail depth	SpiderView		Adâncime urmă
+Trail depth	SpiderView		Adâncime traseu

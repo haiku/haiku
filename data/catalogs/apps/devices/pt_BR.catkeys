@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Devices	490380176
+1	portuguese (brazil)	x-vnd.Haiku-Devices	3345509916
 ACPI bus	DevicesView		Barramento ACPI
 Encryption controller	Device		Controlador de criptografia
 Bus Information	Device		Informações de Barramento
@@ -23,7 +23,7 @@ Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Controlador de memória
 Unknown device	DevicesView		Dispositivo desconhecido
 Unknown	DevicePCI		Desconhecido
-ACPI node '%1'	DeviceACPI		módulo ACPI '%1'
+ACPI node '%1'	DeviceACPI		Módulo ACPI '%1'
 Optical Drive	DeviceSCSI		Drive Óptico
 Name	PropertyList		Nome
 Manufacturer	DeviceSCSI		Fabricante
@@ -54,7 +54,9 @@ Device name	DeviceACPI		Nome do dispositivo
 Card Reader	DeviceSCSI		Leitor de cartões
 Display controller	Device		Controlador de Tela
 Basic information	DevicesView		Informações básicas
+ACPI Button '%1'	DeviceACPI		Botão ACPI '%1'
 Bus	DevicesView		Barramento
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nome do dispositivo
 Disk Drive	DeviceSCSI		Drive de Disco
 Other	DeviceSCSI		Outro

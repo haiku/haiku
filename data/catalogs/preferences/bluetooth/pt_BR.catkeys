@@ -1,46 +1,51 @@
-1	portuguese (brazil)	x-vnd.Haiku-BluetoothPrefs	416765820
-Laptop	Settings view		Laptop
-Only from trusted devices	Settings view		Apenas dos dispositivos de confiança
-15 secs	Settings view		15 segs.
-Quit	main		Sair
-Manufacturer: 	Device View		Fabricante
-Desktop	Settings view		Desktop
-Server	Window		Servidor
-Identify host as:	Settings view		Identificar host como:
-Refresh…	Remote devices		Atualizar...
-Local devices found on system:	Settings view		Dispositivos locais encontrados no sistema:
-Service classes: 	Device View		Classes de serviço:
-Remote devices	Window		Dispositivos remotos
-Settings	Window		Configurações
-Stop bluetooth services…	Window		Parar serviços bluetooth…
-61 secs	Settings view		61 segs.
-Add…	Remote devices		Adicionar…
-As blocked	Remote devices		Como bloqueado
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Não existe nenhum dispositivo local Bluetooth registado no sistema.
-Revert	Window		Reverter
-Disconnect	Remote devices		Desconectar
+1	portuguese (brazil)	x-vnd.Haiku-BluetoothPrefs	3945807779
+Start bluetooth services…	Window		Iniciar serviços bluetooth…
 From all devices	Settings view		De todos os dispositivos
 Defaults	Window		Padrões
-Start bluetooth services…	Window		Iniciar serviços bluetooth…
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verifique que as capacidades Bluetooth do seu dispositivo remoto estão ativadas. Pressione o botão 'Consulta' para iniciar a pesquisa. O tempo necessário para a obtenção dos nomes é desconhecido embora não deva demorar mais que 3 segundos para cada dispositivo. Depois você poderá adicioná-los à sua lista principal, onde poderá emparelhá-los.
+Laptop	Settings view		Laptop
 Scanning progress	Inquiry panel		Progresso da varredura
+Only from trusted devices	Settings view		Apenas dos dispositivos de confiança
+Launch now	main		Iniciar agora
 Bluetooth	System name		Bluetooth
 Remove	Remote devices		Remover
+Pick device…	Settings view		Escolha o dispositivo…
 Always ask	Settings view		Sempre perguntar
+Quit	main		Sair
+15 secs	Settings view		15 segs.
 Help	Window		Ajuda
-Pair…	Remote devices		Par...
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Com o suporte de:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nObrigado às pessoas que ajudaram…\n\nEnviando/doando hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomicamente:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nCom patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTestando:\n - Petter H. Juliussen\nQuem me deu todo o conhecimento:\n - a equipe da yellowTAB
+Manufacturer: 	Device View		Fabricante: 
+Pair…	Remote devices		Parear...
+Desktop	Settings view		Desktop
+Server	Window		Servidor
 Retrieving name of %1	Inquiry panel		Buscando nome de %1
+Identify host as:	Settings view		Identificar host como:
 Inquiry	Inquiry panel		Inquérito
+Local devices found on system:	Settings view		Dispositivos locais encontrados no sistema:
+Service classes: 	Device View		Classes de serviço: 
 Incoming connections policy:	Settings view		Política de conexões de entrada:
-Show name	Extended local device view		Exibir nome
+Remote devices	Window		Dispositivos remotos
+Retrieving names…	Inquiry panel		Recuperando nomes…
 Add device to list	Inquiry panel		Adicionar dispositivo à lista
+Show name	Extended local device view		Exibir nome
+Settings	Window		Configurações
 Remaining %1 seconds	Inquiry panel		Restando %1 segundos
-Discoverable	Extended local device view		Visível
+Stop bluetooth services…	Window		Parar serviços bluetooth…
+61 secs	Settings view		61 segs.
 Authenticate	Extended local device view		Autenticar
-Smart phone	Settings view		Smartphone
+Discoverable	Extended local device view		Visível
+The Bluetooth services are not currently running on this system.	main		Os serviços de Bluetooth não estão funcionando neste sistema.
+Add…	Remote devices		Adicionar…
 Scanning completed.	Inquiry panel		Varredura concluída.
+Smart phone	Settings view		Smartphone
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Não existe nenhum dispositivo local Bluetooth registado no sistema.
 Default inquiry time:	Settings view		Tempo de consulta padrão:
+Revert	Window		Reverter
+Refresh local devices…	Window		Atualizar dispositivos locais…
 Server	Settings view		Servidor
-Handheld	Settings view		Handheld
- packets: 	Device View		pacotes:
+ packets: 	Device View		 pacotes: 
+Handheld	Settings view		Portátil
+Disconnect	Remote devices		Desconectar
 About Bluetooth…	Window		Sobre Bluetooth…
+Starting scan…	Inquiry panel		Iniciando varredura…

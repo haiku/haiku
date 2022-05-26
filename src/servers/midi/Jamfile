@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src servers midi ;
 
-UsePrivateHeaders app midi shared storage ;
+UsePrivateHeaders app interface locale midi shared storage ;
 
 Server midi_server :
 	MidiServerApp.cpp
@@ -10,8 +10,16 @@ Server midi_server :
 	# storage
 	NodeMonitorHandler.cpp
 
-	: be midi2 shared libicon.a [ TargetLibstdc++ ]
+	: be midi2 shared libicon.a localestub [ TargetLibstdc++ ]
 	: midi_server.rdef
+;
+
+DoCatalogs midi_server :
+	x-vnd.Haiku-midi_server
+	:
+	DeviceWatcher.cpp
+	MidiServerApp.cpp
+	PortDrivers.cpp
 ;
 
 SEARCH on [ FGristFiles NodeMonitorHandler.cpp ]

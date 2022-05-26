@@ -1,8 +1,10 @@
-1	french	x-vnd.Haiku-libpackage	123157732
+1	french	x-vnd.Haiku-libpackage	134767648
 Fetching repository-cache from %url	RefreshRepositoryRequest		Récupération du cache de dépôt depuis %url
+Validating checksum for %repositoryName	RefreshRepositoryRequest		Vérification d’intégrité de %repositoryName
 Failed to remove transaction directory	PackageManagerKit		Impossible de supprimer le répertoire de transaction
 Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		Impossible d’obtenir la configuration pour le dépôt « %s ». Abandon.
 Refreshing repository \"%s\" failed	PackageManagerKit		Impossible de rafraîchir le dépôt « %s »
+Fetching repository checksum from %url	RefreshRepositoryRequest		Récupération de la somme de contrôle pour %url
 Failed to get repository names	PackageManagerKit		Impossible d’obtenir les noms des dépôts
 Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		Impossible d’obtenir le cache pour le dépôt « %s ». Abandon.
 Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		Le paquet %s-%s n’a aucun paquet de base « %s » qui correspond

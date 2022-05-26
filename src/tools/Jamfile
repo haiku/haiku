@@ -91,6 +91,7 @@ SEARCH on [ FGristFiles
 SubInclude HAIKU_TOP src tools addattr ;
 SubInclude HAIKU_TOP src tools anyboot ;
 SubInclude HAIKU_TOP src tools bfs_shell ;
+SubInclude HAIKU_TOP src tools fat_shell ;
 SubInclude HAIKU_TOP src tools cppunit ;
 SubInclude HAIKU_TOP src tools create_repository_config ;
 SubInclude HAIKU_TOP src tools elfsymbolpatcher ;
@@ -105,6 +106,7 @@ SubInclude HAIKU_TOP src tools hvif2png ;
 SubInclude HAIKU_TOP src tools keymap ;
 SubInclude HAIKU_TOP src tools locale ;
 SubInclude HAIKU_TOP src tools makebootable ;
+SubInclude HAIKU_TOP src tools mbrtool ;
 SubInclude HAIKU_TOP src tools opd_to_package_info ;
 SubInclude HAIKU_TOP src tools package ;
 SubInclude HAIKU_TOP src tools package_repo ;

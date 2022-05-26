@@ -14,7 +14,7 @@ File Name	PoorMan		Dateiname
 Starting up... 	PoorMan		Starte...
 Select	PoorMan		Auswählen
 Logging view	PoorMan		Log-Ansicht
-Save console as…	PoorMan		Konsole speichern als…
+Save console as…	PoorMan		Konsole speichern als …
 Edit	PoorMan		Bearbeiten
 Cancel	PoorMan		Abbrechen
 Directory: 	PoorMan		Ordner:
@@ -34,7 +34,7 @@ Create public_html	PoorMan		public_html erzeugen
 Clear hit counter	PoorMan		Zugriffszähler löschen
 Status: Stopped	PoorMan		Status: Angehalten
 File	PoorMan		Datei
-Settings…	PoorMan		Einstellungen…
+Settings…	PoorMan		Einstellungen …
 Log To File	PoorMan		In Datei loggen
 Connections	PoorMan		Verbindungen
 Controls	PoorMan		Aktionen
@@ -57,7 +57,7 @@ Status: Running	PoorMan		Status: Läuft
 Directory: (none)	PoorMan		Ordner: (keiner)
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Der Standard Web-Ordner \"/boot/home/public_html\" wurde erstellt.\nDarin muss sich eine HTML-Datei mit dem Namen \"index.html\" befinden.
 Dir Created	PoorMan		Ordner erstellt
-Save console selections as…	PoorMan		Auswahl der Konsole speichern als…
+Save console selections as…	PoorMan		Auswahl der Konsole speichern als …
 Quit	PoorMan		Beenden
 Save log console	PoorMan		Logkonsole speichern
 Start page:	PoorMan		Startseite:

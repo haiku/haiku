@@ -50,50 +50,70 @@ CpuStateX8664::CpuStateX8664(const x86_64_debug_cpu_state& state)
 	SetIntRegister(X86_64_REGISTER_GS, state.gs);
 	SetIntRegister(X86_64_REGISTER_SS, state.ss);
 
-	const x86_64_extended_registers& extended = state.extended_registers;
+	const struct savefpu& extended = state.extended_registers;
 
 	SetFloatRegister(X86_64_REGISTER_ST0,
-		(double)(*(long double*)(extended.fp_registers[0].value)));
+		(double)(*(long double*)(extended.fp_fxsave.fp[0].value)));
 	SetFloatRegister(X86_64_REGISTER_ST1,
-		(double)(*(long double*)(extended.fp_registers[1].value)));
+		(double)(*(long double*)(extended.fp_fxsave.fp[1].value)));
 	SetFloatRegister(X86_64_REGISTER_ST2,
-		(double)(*(long double*)(extended.fp_registers[2].value)));
+		(double)(*(long double*)(extended.fp_fxsave.fp[2].value)));
 	SetFloatRegister(X86_64_REGISTER_ST3,
-		(double)(*(long double*)(extended.fp_registers[3].value)));
+		(double)(*(long double*)(extended.fp_fxsave.fp[3].value)));
 	SetFloatRegister(X86_64_REGISTER_ST4,
-		(double)(*(long double*)(extended.fp_registers[4].value)));
+		(double)(*(long double*)(extended.fp_fxsave.fp[4].value)));
 	SetFloatRegister(X86_64_REGISTER_ST5,
-		(double)(*(long double*)(extended.fp_registers[5].value)));
+		(double)(*(long double*)(extended.fp_fxsave.fp[5].value)));
 	SetFloatRegister(X86_64_REGISTER_ST6,
-		(double)(*(long double*)(extended.fp_registers[6].value)));
+		(double)(*(long double*)(extended.fp_fxsave.fp[6].value)));
 	SetFloatRegister(X86_64_REGISTER_ST7,
-		(double)(*(long double*)(extended.fp_registers[7].value)));
+		(double)(*(long double*)(extended.fp_fxsave.fp[7].value)));
 
-	SetMMXRegister(X86_64_REGISTER_MM0, extended.mmx_registers[0].value);
-	SetMMXRegister(X86_64_REGISTER_MM1, extended.mmx_registers[1].value);
-	SetMMXRegister(X86_64_REGISTER_MM2, extended.mmx_registers[2].value);
-	SetMMXRegister(X86_64_REGISTER_MM3, extended.mmx_registers[3].value);
-	SetMMXRegister(X86_64_REGISTER_MM4, extended.mmx_registers[4].value);
-	SetMMXRegister(X86_64_REGISTER_MM5, extended.mmx_registers[5].value);
-	SetMMXRegister(X86_64_REGISTER_MM6, extended.mmx_registers[6].value);
-	SetMMXRegister(X86_64_REGISTER_MM7, extended.mmx_registers[7].value);
+	SetMMXRegister(X86_64_REGISTER_MM0, extended.fp_fxsave.mmx[0].value);
+	SetMMXRegister(X86_64_REGISTER_MM1, extended.fp_fxsave.mmx[1].value);
+	SetMMXRegister(X86_64_REGISTER_MM2, extended.fp_fxsave.mmx[2].value);
+	SetMMXRegister(X86_64_REGISTER_MM3, extended.fp_fxsave.mmx[3].value);
+	SetMMXRegister(X86_64_REGISTER_MM4, extended.fp_fxsave.mmx[4].value);
+	SetMMXRegister(X86_64_REGISTER_MM5, extended.fp_fxsave.mmx[5].value);
+	SetMMXRegister(X86_64_REGISTER_MM6, extended.fp_fxsave.mmx[6].value);
+	SetMMXRegister(X86_64_REGISTER_MM7, extended.fp_fxsave.mmx[7].value);
 
-	SetXMMRegister(X86_64_REGISTER_XMM0, extended.xmm_registers[0].value);
-	SetXMMRegister(X86_64_REGISTER_XMM1, extended.xmm_registers[1].value);
-	SetXMMRegister(X86_64_REGISTER_XMM2, extended.xmm_registers[2].value);
-	SetXMMRegister(X86_64_REGISTER_XMM3, extended.xmm_registers[3].value);
-	SetXMMRegister(X86_64_REGISTER_XMM4, extended.xmm_registers[4].value);
-	SetXMMRegister(X86_64_REGISTER_XMM5, extended.xmm_registers[5].value);
-	SetXMMRegister(X86_64_REGISTER_XMM6, extended.xmm_registers[6].value);
-	SetXMMRegister(X86_64_REGISTER_XMM7, extended.xmm_registers[7].value);
-	SetXMMRegister(X86_64_REGISTER_XMM8, extended.xmm_registers[8].value);
-	SetXMMRegister(X86_64_REGISTER_XMM9, extended.xmm_registers[9].value);
-	SetXMMRegister(X86_64_REGISTER_XMM10, extended.xmm_registers[10].value);
-	SetXMMRegister(X86_64_REGISTER_XMM11, extended.xmm_registers[11].value);
-	SetXMMRegister(X86_64_REGISTER_XMM12, extended.xmm_registers[12].value);
-	SetXMMRegister(X86_64_REGISTER_XMM13, extended.xmm_registers[13].value);
-	SetXMMRegister(X86_64_REGISTER_XMM14, extended.xmm_registers[14].value);
-	SetXMMRegister(X86_64_REGISTER_XMM15, extended.xmm_registers[15].value);
+	// The YMM register value is split in two halves in the saved CPU context,
+	// so we have to reassemble it here.
+	// TODO check extended.xstate_hdr to see if the YMM values are present at
+	// all.
+	SetXMMRegister(X86_64_REGISTER_XMM0, extended.fp_ymm[0].value,
+		extended.fp_fxsave.xmm[0].value);
+	SetXMMRegister(X86_64_REGISTER_XMM1, extended.fp_ymm[1].value,
+		extended.fp_fxsave.xmm[1].value);
+	SetXMMRegister(X86_64_REGISTER_XMM2, extended.fp_ymm[2].value,
+		extended.fp_fxsave.xmm[2].value);
+	SetXMMRegister(X86_64_REGISTER_XMM3, extended.fp_ymm[3].value,
+		extended.fp_fxsave.xmm[3].value);
+	SetXMMRegister(X86_64_REGISTER_XMM4, extended.fp_ymm[4].value,
+		extended.fp_fxsave.xmm[4].value);
+	SetXMMRegister(X86_64_REGISTER_XMM5, extended.fp_ymm[5].value,
+		extended.fp_fxsave.xmm[5].value);
+	SetXMMRegister(X86_64_REGISTER_XMM6, extended.fp_ymm[6].value,
+		extended.fp_fxsave.xmm[6].value);
+	SetXMMRegister(X86_64_REGISTER_XMM7, extended.fp_ymm[7].value,
+		extended.fp_fxsave.xmm[7].value);
+	SetXMMRegister(X86_64_REGISTER_XMM8, extended.fp_ymm[8].value,
+		extended.fp_fxsave.xmm[8].value);
+	SetXMMRegister(X86_64_REGISTER_XMM9, extended.fp_ymm[9].value,
+		extended.fp_fxsave.xmm[9].value);
+	SetXMMRegister(X86_64_REGISTER_XMM10, extended.fp_ymm[10].value,
+		extended.fp_fxsave.xmm[10].value);
+	SetXMMRegister(X86_64_REGISTER_XMM11, extended.fp_ymm[11].value,
+		extended.fp_fxsave.xmm[11].value);
+	SetXMMRegister(X86_64_REGISTER_XMM12, extended.fp_ymm[12].value,
+		extended.fp_fxsave.xmm[12].value);
+	SetXMMRegister(X86_64_REGISTER_XMM13, extended.fp_ymm[13].value,
+		extended.fp_fxsave.xmm[13].value);
+	SetXMMRegister(X86_64_REGISTER_XMM14, extended.fp_ymm[14].value,
+		extended.fp_fxsave.xmm[14].value);
+	SetXMMRegister(X86_64_REGISTER_XMM15, extended.fp_ymm[15].value,
+		extended.fp_fxsave.xmm[15].value);
 
 	fInterruptVector = state.vector;
 }
@@ -160,21 +180,21 @@ CpuStateX8664::UpdateDebugState(void* state, size_t size) const
 	x64State->ss = IntRegisterValue(X86_64_REGISTER_SS);
 
 	for (int32 i = 0; i < 8; i++) {
-		*(long double*)(x64State->extended_registers.fp_registers[i].value)
+		*(long double*)(x64State->extended_registers.fp_fxsave.fp[i].value)
 			= (long double)FloatRegisterValue(X86_64_REGISTER_ST0 + i);
 
 		if (IsRegisterSet(X86_64_REGISTER_MM0 + i)) {
-			memcpy(&x64State->extended_registers.mmx_registers[i],
+			memcpy(&x64State->extended_registers.fp_fxsave.mmx[i],
 				&fMMXRegisters[i], sizeof(x86_64_fp_register));
 		}
 	}
 
 	for (int32 i = 0; i < 16; i++) {
 		if (IsRegisterSet(X86_64_REGISTER_XMM0 + i)) {
-			memcpy(&x64State->extended_registers.xmm_registers[i],
+			memcpy(&x64State->extended_registers.fp_fxsave.xmm[i],
 				&fXMMRegisters[i], sizeof(x86_64_xmm_register));
 		} else {
-			memset(&x64State->extended_registers.xmm_registers[i],
+			memset(&x64State->extended_registers.fp_fxsave.xmm[i],
 				0, sizeof(x86_64_xmm_register));
 		}
 	}
@@ -372,12 +392,14 @@ CpuStateX8664::XMMRegisterValue(int32 index) const
 
 
 void
-CpuStateX8664::SetXMMRegister(int32 index, const uint8* value)
+CpuStateX8664::SetXMMRegister(int32 index, const uint8* highValue, const uint8* lowValue)
 {
 	if (index < X86_64_REGISTER_XMM0 || index >= X86_64_XMM_REGISTER_END)
 		return;
 
-	memcpy(fXMMRegisters[index - X86_64_REGISTER_XMM0].value, value,
+	memcpy(&fXMMRegisters[index - X86_64_REGISTER_XMM0].value[0], lowValue,
+		sizeof(x86_64_xmm_register));
+	memcpy(&fXMMRegisters[index - X86_64_REGISTER_XMM0].value[2], highValue,
 		sizeof(x86_64_xmm_register));
 	fSetRegisters[index] = 1;
 }

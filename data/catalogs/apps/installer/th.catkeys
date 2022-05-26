@@ -1,9 +1,8 @@
-1	thai	x-vnd.Haiku-Installer	4193079864
+1	thai	x-vnd.Haiku-Installer	1075045498
 Performing installation.	InstallProgress		กำลังทำการติดตั้ง
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		เลือกดิสก์ต้นทางจากเมนูป๊อปอัป จากนั้นคลิก \"เริ่มต้น\"
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		โปรดปิดหน้าต่าง DriveSetup ก่อนที่จะปิดหน้าต่างตัวติดตั้ง
 No optional packages available.	PackagesView		ไม่มีแพ็คเกจเสริม
-Restart system	InstallerWindow		รีสตาร์ทระบบ
 The mount point could not be retrieved.	InstallProgress		ไม่สามารถดึงจุดเชื่อมต่อได้
 <none>	InstallerWindow	No partition available	<none>
 Please choose target	InstallerWindow		กรุณาเลือกเป้าหมาย
@@ -19,10 +18,10 @@ README	InstallerApp		อ่าน
 Quit	InstallerWindow		ปิด
 Write boot sector to '%s'	InstallerWindow		เขียนบูตเซกเตอร์ไปที่ '%s'
 Boot sector not written because of an internal error.	InstallProgress		บูตเซกเตอร์ไม่ได้ถูกเขียนเนื่องจากข้อผิดพลาดภายใน
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup แอปพลิเคชันเพื่อกำหนดค่าพาร์ติชันดิสก์ไม่สามารถเปิดใช้งานได้
 Welcome to the Haiku Installer!\n\n	InstallerApp		ยินดีต้อนรับสู่ Haiku Installer! \n\n
 ?? of ??	InstallerWindow	Unknown progress	?? of ??
 Quit Boot Manager	InstallerWindow		ออกจาก Boot Manager
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup แอปพลิเคชันเพื่อกำหนดค่าพาร์ติชันดิสก์ไม่สามารถเปิดใช้งานได้
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		กำลังเรียกใช้ตัวจัดการการบูต… \n\nปิด Boot Manager เพื่อทำการติดตั้งต่อไป
 Quit DriveSetup	InstallerWindow		ออกจาก DriveSetup
 Write boot sector	InstallerWindow		เขียนบูตเซกเตอร์
@@ -55,13 +54,11 @@ Collecting copy information.	InstallProgress		การรวบรวมข้�
 Show optional packages	InstallerWindow		แสดงแพ็คเกจเสริม
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		ดิสก์ปลายทางอาจมีพื้นที่ไม่เพียงพอ ลองเลือกดิสก์อื่นหรือเลือกที่จะไม่ติดตั้งรายการเพิ่มเติม
 Installation canceled.	InstallProgress		การติดตั้งถูกยกเลิก
-Are you sure you want to abort the installation?	InstallerWindow		คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการติดตั้ง?
 Stop	InstallerWindow		หยุด
 Cancel	InstallerWindow		ยกเลิก
 Continue	InstallerWindow	In alert after pressing Stop	ต่อไป
 Scanning for disks…	InstallerWindow		กำลังสแกนหาดิสก์
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		กำลังเรียกใช้งาน DriveSetup … \n\nปิด DriveSetup เพื่อดำเนินการติดตั้งต่อไป
-Abort	InstallerWindow		ยกเลิก
 The partition can't be mounted. Please choose a different partition.	InstallProgress		ไม่สามารถติดตั้งพาร์ติชันได้ โปรดเลือกพาร์ติชันอื่น
 Set up partitions…	InstallerWindow		ตั้งค่าพาร์ติชัน
 Install progress:  	InstallerWindow		ความคืบหน้าการติดตั้ง:
@@ -75,7 +72,5 @@ Onto:	InstallerWindow		บน:
 Quit Boot Manager and DriveSetup	InstallerWindow		ออกจาก Boot Manager และ DriveSetup
 Tools	InstallerWindow		เครื่องมือ
 scanning…	InstallerWindow		กำลังค้นหา
-2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Userguide's topic on the application \"BootManager\".\n\n\n	InstallerApp		ตัวติดตั้งจะทำให้พาร์ติชัน Haiku สามารถบู๊ตได้เอง แต่ไม่ต้องทำตามขั้นตอนใด ๆ เพื่อรวม Haiku เข้าไปในเมนูบู๊ตที่มีอยู่ หากคุณติดตั้ง GRUB แล้วคุณสามารถเพิ่ม Haiku ได้\nสำหรับรายละเอียดโปรดอ่านคำแนะนำเกี่ยวกับการบูต Haiku บนเว็บไซต์ของเราที่ https://www.haiku-os.org/guides/booting\nหรือคุณสามารถตั้งค่าเมนูการบูตจากเมนู\"เครื่องมือ\"ของตัวติดตั้งดูหัวข้อของผู้ใช้งานบนแอปพลิเคชัน\"BootManager\" \n\n\n
 Set up boot menu	InstallerWindow		ตั้งค่าเมนูการเริ่มระบบ
 Continue	InstallerApp		ต่อไป
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการติดตั้งและรีสตาร์ทระบบ?

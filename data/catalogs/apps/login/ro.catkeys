@@ -1,18 +1,18 @@
-1	romanian	x-vnd.Haiku-Login	336867745
-Invalid login!	Login View		Login invalid!
+1	romanian	x-vnd.Haiku-Login	3568987751
+Invalid login!	Login View		Autentificare nevalidă!
 Error	Login App		Eroare
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tLansați în modul de editare raft pentru a permite personalizarea dektopului.\n
+Login application for Haiku\nUsage:	Login App		Aplicație de autentificare pentru Haiku\nUtilizare:
+--nonmodal\tDo not make the window modal	Login App		--nonmodal\tNu face fereastra modală
 Welcome to Haiku	Login Window		Bine ați venit la Haiku
-Halt	Login View		Oprește
-Login application for Haiku\nUsage:\n	Login App		Aplicație de login pentru Haiku\nUtilizare:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNu face fereastra modală\n
+Halt	Login View		Oprire
 Desktop	Desktop Window		Desktop
 Hide password	Login View		Ascunde parola
-Reboot	Login View		Restartează
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Puteți personaliza desktop-ul afișat în spatele aplicației de Autentificare prin plasarea replicanților pe acesta.\n\nCând ați terminat, închideți doar aplicația (Cmd-Q).
+Reboot	Login View		Repornire
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Puteți personaliza desktopul afișat în spatele aplicației de autentificare plasând replicanți pe aceasta.\n\nCând ați terminat, ieșiți din aplicație (Cmd-Q).
 OK	Login View		OK
-Info	Login App		Info
-Login:	Login View		Login:
+Info	Login App		Informații
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tLansează în modul de editare de raft pentru a permite personalizarea desktop-ului.
+Login:	Login View		Autentificare:
 Password:	Login View		Parolă:
 Unimplemented	Login App		Neimplementat
 OK	Login App		OK

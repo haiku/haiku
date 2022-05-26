@@ -14,7 +14,7 @@ wide	GeneralView	Window width: Slider high text	geniş
 narrow	GeneralView	Window width: Slider low text	dar
 Revert	PrefletWin		Eski haline döndür
 Applications	PrefletView		Uygulamalar
-{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Timeout: # saniye}other{Timeout: # saniye}}
+{0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Zaman aşımı: # saniye}other{Zaman aşımı: # saniye}}
 Upper right	GeneralView		Sağ üst
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Tercihler kaydedilirken bir hata oluştu.\nDiskinizde yeterli boş alan olmayabilir.
 Defaults	PrefletWin		Öntanımlılar

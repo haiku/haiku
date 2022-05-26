@@ -1,0 +1,64 @@
+1	portuguese (brazil)	x-vnd.haiku-softwareupdater	369324613
+Updating version	SoftwareUpdaterWindow	List item text	Atualizando versão
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		Clique aqui para instalar {0, plural, one{# pacote atualizado} other{# pacotes atualizados}}.
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	Pacotes a serem desinstalados
+No active network connection was found	UpdateManager	Error message	Sem conexão ativa à rede
+Quit	SoftwareUpdaterWindow	Alert button label	Sair
+There were no updates found.	CheckManager		Nenhuma atualização foi encontrada.
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		As atualizações não foram concluídas, deseja sair mesmo assim?
+Updates found	SoftwareUpdaterWindow		Atualizações encontradas
+Update now	SoftwareUpdaterWindow		Atualizar agora
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		Por algum motivo, não foi possível reiniciar seu computador.
+OK	UpdateManager		OK
+Unrecognized argument	SoftwareUpdaterApp	Error message	Argumento não reconhecido
+There were no updates found.	CheckAction		Nenhuma atualização encontrada.
+No updates available	UpdateAction		Não há atualizações disponíveis
+New packages to be installed	SoftwareUpdaterWindow	List super item label	Novos pacotes serão instalados
+Packages to be updated	SoftwareUpdaterWindow	List super item label	Pacotes a serem atualizados
+to	SoftwareUpdaterWindow	List item text	para
+Attempting to cancel the updates…	SoftwareUpdaterWindow		Tentando cancelar as atualizações…
+Contacting software repositories to check for package updates.	CheckManager		Contatando repositórios de software em busca de atualizações para os pacotes.
+Available updates found	CheckManager		Atualizações disponíveis encontadas
+from repository	SoftwareUpdaterWindow	List item text	do repositório
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		Contatando repositórios de software em busca de atualizações para os pacotes.
+Cancelling updates	SoftwareUpdaterWindow		Cancelando atualizações
+Cancel	SoftwareUpdaterWindow	Alert button label	Cancelar
+There were no updates found.	UpdateAction		Nenhuma atualização encontrada.
+OK	SoftwareUpdaterWindow		OK
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		Escolha uma dessas opções:\n\nAtualização:\n\tAtualiza todos os pacotes instalados.\nSincronização completa:\n\tSincroniza os pacotes instalados com os repositórios.
+The following changes will be made:	SoftwareUpdaterWindow		As seguintes alterações serão feitas:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		Variáveis de argumento não são mais aceitas\n
+Fatal error while checking for updates: %s\n	CheckAction		Ocorreu um erro fatal enquanto buscava atualizações: %s\n
+SoftwareUpdater	System name		Atualizador de Software
+No active network connection was found.\n	CheckManager		Sem conexão ativa à rede.\n
+Applying changes	UpdateManager		Aplicando alterações
+Full sync	SoftwareUpdaterWindow	Alert button label	Sincronizar tudo
+Quit	SoftwareUpdaterWindow	Button label	Sair
+Updates have been successfully installed.	UpdateManager		Atualizações instaladas com sucesso.
+Exception occurred while updating packages : %s\n	UpdateAction		Exceção ocorreu durante a atualização de pacotes: %s\n
+A reboot is necessary to complete the update process.	UpdateManager		É necessário reiniciar para completar o processo de atualização.
+Exception occurred while checking for updates: %s\n	CheckAction		Ocorreu um erro enquanto procurava atualizações: %s\n
+Packages are being updated	UpdateManager		Os pacotes estão sendo atualizados
+Cancel	SoftwareUpdaterWindow		Cancelar
+Don't quit	SoftwareUpdaterWindow		Não sair
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Clique aqui para executar o Atualizador de Softwares. Algumas atualizações necessitam de intervenção para selecionar uma solução para o problema encontrado.
+Checking for updates	SoftwareUpdaterWindow		Procurando atualizações
+Updates completed	UpdateManager		Atualização concluída
+Reboot	SoftwareUpdaterWindow		Reiniciar
+Show more details	SoftwareUpdaterWindow		Mostrar mais informações
+Installing version	SoftwareUpdaterWindow	List item text	Instalando versão
+Checking for updates	CheckManager		Procurando atualizações
+No remote repositories are available	UpdateManager	Error message	Nenhum repositório remoto está disponível
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{Atualização} other{Atualizações}} de software {0, plural, one{disponível} other{disponíveis}}
+Reboot	SoftwareUpdaterWindow	Button label	Reiniciar
+Update	SoftwareUpdaterWindow	Alert button label	Atualizar
+Open Repositories	SoftwareUpdaterWindow	Alert button label	Abrir Repositórios
+Updates did not complete	UpdateAction		As atualizações não foram concluídas
+Invalid update type, cannot continue with updates	UpdateAction		Tipo de atualização inválida, não se pode continuar com as atualizações
+Uninstalling version	SoftwareUpdaterWindow	List item text	Desinstalando versão
+%i of %i	UpdateManager	Do not translate %i	%i de %i
+Quit	SoftwareUpdaterWindow		Sair
+No updates available	CheckManager		Não há atualizações disponíveis
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Uso:  SoftwareUpdater <command> [<option>]\nAtualiza pacotes instalados.\n\nComandos:\n  update     - Buscar nos repositórios por atualizações de todos os pacotes.\n  check      - Verificar por atualizações disponíveis porém somente as exibe em uma notificação.\n  full-sync  - Sincroniza os pacotes instalados com os repositórios.\n\nOpções\n  -h ou --help       Imprima esta tela de ajuda\n  -v ou --verbose    Exibe mais informações na saída do comando\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Nenhum repositório remoto está disponível. Por favor verifique se existem repositórios ativos usando a tela Repositórios nas preferências do sistema ou pelo comando 'pkgman'.
+Downloading packages	UpdateManager		Baixando pacotes

@@ -1,10 +1,10 @@
-1	turkish	x-vnd.Haiku-DriveSetup	1934767996
+1	turkish	x-vnd.Haiku-DriveSetup	4048496535
 Could not unmount partition %s.	MainWindow		%s bölümü bağlantısı kesilemedi.
 Mount all	MainWindow		Hepsini bağla
 Disk	MainWindow		Disk
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\nSeçili bölüm üzerindeki tüm veri geri getirilemeyecek bir biçimde kaybolacak!
 Device	PartitionList		Aygıt
-Initialize	MainWindow		İlkçalıştır
+Initialize	MainWindow		İlklendir
 Could not change the parameters of the selected partition.	MainWindow		Seçili bölümün parametreleri değiştirilemedi.
 PGP encrypted	Encryption utils		PGP şifreli
 Delete partition	MainWindow		Bölümü sil
@@ -18,7 +18,6 @@ Unmount	MainWindow		Bağlantıyı kes
 Failed to format the partition %s!\n	MainWindow		%s bölümünün biçimlendirilmesi başarısız oldu!\n
 Partition size	CreateParametersPanel		Bölüm boyutu
 Validation of the given parameters failed.	MainWindow		Verilen ayarların doğrulaması başarısız oldu.
-The partition %s is currently mounted.	MainWindow		%s bölümü şu anda bağlı
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		\"%s\" bölümünü biçimlendirmek istediğinizden emin misiniz? Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
 DriveSetup	System name		Disk İzlencesi
 Mounted at	PartitionList		Bağlama noktası
@@ -51,6 +50,8 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Sil (işlevsel değil)
 The currently selected partition does not have a parent partition.	MainWindow		Mevcut seçili disk bölümü ana bir disk bölümüne sahip değil.
 Validation of the given initialization parameters failed.	MainWindow		Verilen ilklendirme parametrelerinin doğrulanması başarısız oldu.
+Not formatted (%s)	PartitionList		Biçimlendirilmemiş (%s)
+Failed to create the partition. No changes have been written to disk.	MainWindow		Bölüm oluşturulamadı. Diske herhangi bir değişiklik yazılmadı.
 Shared	PartitionList		Paylaşılan
 MIMEs	PartitionList		MIME'ler
 BitLocker encrypted	Encryption utils		BitLocker şifreli
@@ -63,17 +64,18 @@ Change	ChangeParametersPanel		Değiştir
 Partition name:	ChangeParametersPanel		Bölüm adı:
 LUKS encrypted	Encryption utils		LUKS şifreli
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Değişiklikleri diske şimdi yazmak istediğinizden emin misiniz?\n\n%s bölümü üzerindeki tüm veri geri alınamayacak bir biçimde kaybolacak!
-Cancel	AbstractParametersPanel		İptal
+Empty space	PartitionList		Boş alan
+Cancel	AbstractParametersPanel		Vazgeç
 Format	MainWindow		Biçimlendir
-<empty or unknown>	DiskView		<boş veya bilinmeyen>
 OK	MainWindow		Tamam
+Empty space	DiskView		Boş alan
 Open with DiskProbe	MainWindow		DiskProbe ile aç
 Could not delete the selected partition.	MainWindow		Seçili bölüm silinemedi.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Seçili diski ilklendirmek istediğinizden emin misiniz? Tüm veriler kaybolacak. Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.\n
 There was an error preparing the disk for modifications.	MainWindow		Diski değişikliklere hazırlarken bir hata oluştu.
 The disk has been successfully initialized.\n	MainWindow		Disk başarıyla ilklendirildi.\n
-Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Disk bağlantısı kesilmeye zorlansın mı?\n\nNot: Eğer bir uygulama diske yazmakta ise, disk bağlantısını kesmek veri kaybına neden olabilir.\n
-Cancel	MainWindow		İptal
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Disk bağlantısı kesilmeye zorlansın mı?\n\nNot: Eğer bir uygulama diske yazmaktaysa disk bağlantısını kesmek veri kaybına neden olabilir.\n
+Cancel	MainWindow		Vazgeç
 Free space	PartitionList		Boş alan
 Queries	PartitionList		Sorgular
 Force unmount	MainWindow		Zorla bağlantısını kes
@@ -83,6 +85,7 @@ Rescan	MainWindow		Yeniden tara
 There was an error acquiring the partition row.	MainWindow		Bölüm satırını alırken bir hata oluştu.
 Failed to initialize the disk %s!\n	MainWindow		%s diski ilklendirilemedi!\n
 Disk system \"%s\" not found!	MainWindow		\"%s\" disk sistemi bulunamadı!
+The partition cannot be unmounted.	MainWindow		Bölüm bağlantısı kesilemiyor.
 Delete	MainWindow		Sil
 Partition type:	ChangeParametersPanel		Bölüm türü:
 Parameters	PartitionList		Parametreler
@@ -91,7 +94,6 @@ Cannot delete the selected partition.	MainWindow		Seçili bölüm silinemiyor.
 Continue	MainWindow		Sürdür
 Could not mount partition %s.	MainWindow		%s bölümü bağlanamadı.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Bölümü biçimlendirmek istediğinizden emin misiniz? Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
-<empty or unknown>	PartitionList		<boş veya bilinmeyen>
 The selected disk is read-only.	MainWindow		Seçili disk saltokunur.
 The partition %s is already unmounted.	MainWindow		%s bölümünün bağlantısı zaten kesilmiş.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Seçili bölümün parametrelerini değiştirmek istediğinizden emin misiniz?\n\nBölüm artık başka işletim sistemleri tarafından tanınamayabilir!
@@ -103,7 +105,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Aşağıdaki listeden bir bölüm seçin.
 Active	PartitionList		Etkin
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Seçili bölümü silmek istediğinizden emin misiniz?\n\nBölüm üzerindeki tüm veri geri getirilemeyecek bir biçimde kaybolacak!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Bölüm biçimlendirilemedi. Değişiklikler diske yazılmadı.
 The partition %s has been successfully formatted.\n	MainWindow		%s bölümü başarıyla biçimlendirildi.\n
 The partition %s is already mounted.	MainWindow		%s bölümü zaten bağlı.
 Size	PartitionList		Boyut

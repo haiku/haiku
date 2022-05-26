@@ -1,9 +1,8 @@
-1	belarusian	x-vnd.Haiku-Installer	3085345570
+1	belarusian	x-vnd.Haiku-Installer	49639906
 Performing installation.	InstallProgress		Выконваецца ўсталёўка.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберыце зыходны дыск з усплывальнага меню. Потым націсніце \"Пачаць\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Калі ласка, закройце вакно DriveSetup перад тым як закрыць Усталёўшчык.
 No optional packages available.	PackagesView		Дадатковыя пакункі недаступныя.
-Restart system	InstallerWindow		Перазагрузіць сістэму
 The mount point could not be retrieved.	InstallProgress		Не ўдалося атрымаць пункт мантавання.
 <none>	InstallerWindow	No partition available	<няма>
 Please choose target	InstallerWindow		Калі ласка, выберыце дыск прызначэння
@@ -19,10 +18,10 @@ README	InstallerApp		README
 Quit	InstallerWindow		Выйсці
 Write boot sector to '%s'	InstallerWindow		Запісаць загрузачны сектар на '%s'
 Boot sector not written because of an internal error.	InstallProgress		Загрузачны сектар не запісаны з-за ўнутранай памылкі.
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, праграма для праўкі дыскавых падзелаў, не запусцілася.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Прывітанне! Гэта ўсталёўшчык Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? з ??
 Quit Boot Manager	InstallerWindow		Выйсці з Менеджэра Запуску
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, праграма для праўкі дыскавых падзелаў, не запусцілася.
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Працуе Boot Manager…\n\nЗакрыйце Boot Manager для працягу ўсталёўкі.
 Quit DriveSetup	InstallerWindow		Выйсці з DriveSetup
 Write boot sector	InstallerWindow		Запісаць загрузачны сектар
@@ -49,13 +48,11 @@ Collecting copy information.	InstallProgress		Збіраецца інфарма�
 Show optional packages	InstallerWindow		Паказваць дадатковыя пакункі
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Дыск прызначэння, пэўна, не мае патрэбнага месца. Паспрабуйце выбраць іншы дыск або адмяніце ўсталёўку дадатковых пунктаў.
 Installation canceled.	InstallProgress		Усталёўка адмененая.
-Are you sure you want to abort the installation?	InstallerWindow		Вы насамрэч жадаеце перарваць усталёўку?
 Stop	InstallerWindow		Стоп
 Cancel	InstallerWindow		Адмена
 Continue	InstallerWindow	In alert after pressing Stop	Працяг
 Scanning for disks…	InstallerWindow		Сканіраванне дыскаў…
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		Працуе DriveSetup…\n\nЗакрыйце DriveSetup для працягу ўсталёўкі.
-Abort	InstallerWindow		Перарваць
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Немагчыма змантаваць падзел. Абярыце, калі ласка, іншы.
 Set up partitions…	InstallerWindow		Правіць падзелы…
 Install progress:  	InstallerWindow		Прагрэс усталёўкі:  
@@ -70,4 +67,3 @@ Tools	InstallerWindow		Прылады
 scanning…	InstallerWindow		сканіраванне…
 Set up boot menu	InstallerWindow		Наладзіць меню запуску
 Continue	InstallerApp		Працягваць
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		Сапраўды спыніць усталёўку і перазагрузіць сістэму?

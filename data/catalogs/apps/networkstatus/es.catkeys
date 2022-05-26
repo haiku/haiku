@@ -1,23 +1,24 @@
-1	spanish; castilian	x-vnd.Haiku-NetworkStatus	186344131
-Netmask	NetworkStatusView		Máscara de red
+1	spanish; castilian	x-vnd.Haiku-NetworkStatus	2828540217
+IPv6 address:	NetworkStatusView		Dirección IPv6:
 Quit	NetworkStatusView		Salir
 Unknown	NetworkStatusView		Desconocido
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		lanzamiento de la red falló.\n\nError:
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Hubo un error al ejecutar el diálogo de preferencias de red.\n\nError:
 Install in Deskbar	NetworkStatus		Instalar en la barra de escritorio
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opciones de NetworkStatus:\n\t--deskbar\t agrega automáticamente el replicante al Deskbar\n\t--help\t\t muestra esta información y finaliza
 Open network preferences…	NetworkStatusView		Abrir preferencias de red ...
 NetworkStatus	System name		NetworkStatus
+Broadcast:	NetworkStatusView		Difusión:
 OK	NetworkStatusView		Aceptar
-No link	NetworkStatusView		sin enlace
+No link	NetworkStatusView		Sin enlace
 Could not join wireless network:\n	NetworkStatusView		No se pudo conectar a la red inalámbrica:\n
 Ready	NetworkStatusView		Listo
 Network Status	NetworkStatusView		Estado de la red
-Address	NetworkStatusView		Dirección
 Deskbar is not running, giving up.	NetworkStatus		Deskbar no está en ejecución. Cancelando.
+Netmask:	NetworkStatusView		Máscara de red:
 No stateful configuration	NetworkStatusView		Ninguna configuración con estado
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Puedes arrancar NetworkStatus en una ventana o instalarlo en la Barra de escritorio
-Broadcast	NetworkStatusView		Transmisión
-%ifaceName information:\n	NetworkStatusView		%ifaceName información:\n
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Puedes ejecutar NetworkStatus en una ventana o instalarlo en la Barra de escritorio
+IPv4 address:	NetworkStatusView		Dirección IPv4:
+%ifaceName information:\n	NetworkStatusView		Información de %ifaceName :\n
 Run in window	NetworkStatus		Ejecutar en ventana
 <no wireless networks found>	NetworkStatusView		<no se pudo encontrar redes inalámbricas>
 Configuring	NetworkStatusView		Configurando

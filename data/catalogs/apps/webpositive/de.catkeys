@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	1976607515
+1	german	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Anmeldung erforderlich
 Previous	WebPositive Window		Zurück
 (Finish: %date)	Download Window		(Fertig: %date)
@@ -20,14 +20,14 @@ Open containing folder	Download Window		Speicherort öffnen
 Find previous	WebPositive Window		Vorheriger Treffer
 Full screen	WebPositive Window		Vollbild
 Downloads in progress	WebPositive		Download Warnung
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sollen alle %addedCount Lesezeichen auf einmal geöffnet werden?
 Copy URL to clipboard	Download Window		Adresse kopieren
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sollen alle %addedCount Lesezeichen auf einmal geöffnet werden?
 Clone current page	Settings Window		Aktuelle Seite verwenden
 Start page:	Settings Window		Startseite:
 Cancel	Download Window		Abbrechen
 Settings	Settings Window		Einstellungen
 Downloads	WebPositive Window		Downloads
-Browse…	Settings Window		Auswählen…
+Browse…	Settings Window		Auswählen …
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Für diese Seite existiert bereits ein Lesezeichen (%bookmarkName).
 Resume prior session	Settings Window		Vorige Sitzung fortsetzen
 Match case	WebPositive Window		Groß-/Kleinschreibung beachten
@@ -45,17 +45,19 @@ New tabs:	Settings Window		Neue Reiter:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url fehlgeschlagen
 Open downloads folder	Download Window		Download-Ordner öffnen
 Proxy server	Settings Window		Proxy-Server
+Darn!	WebPositive		Mist!
 Decrease size	WebPositive Window		Verkleinern
 Default fixed font size:	Settings Window		Größe der Schrift fester Breite:
 Sans serif font:	Settings Window		Serifenlose Schrift:
 Clear	WebPositive Window		Leeren
-Cookies for %s	Cookie Manager		Cookies für %s
 The download could not be opened.	Download Window		Die heruntergeladene Datei kann nicht geöffnet werden.
+Cookies for %s	Cookie Manager		Cookies für %s
 Close	Download Window		Schließen
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Suchbegriff
 Reload	WebPositive Window		Aktualisieren
 Expiration	Cookie Manager		Ablaufdatum
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Der Prozessor ist zu alt und unterstützt keine SSE2-Erweiterungen, ohne die WebPositive nicht läuft. Es wird empfohlen NetSurf zu installieren.
 Download finished	Download Window		Download abgeschlossen
 Cookie manager	WebPositive Window		Cookieverwaltung
 OK	Authentication Panel		OK
@@ -94,13 +96,14 @@ OK	Download Window		OK
 Proxy username:	Settings Window		Proxy-Nutzername:
 Manage bookmarks	WebPositive Window		Lesezeichen verwalten
 /s)	Download Window	...as in 'per second'	/s)
-Restart	Download Window		Neustart
+Restart	Download Window		Neustarten
 Serif font:	Settings Window		Serifenschrift:
 Apply	Settings Window		Anwenden
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Der Lesezeichen-Ordner kann nicht angezeigt werden.\n\nFehler: %error
 Revert	Settings Window		Anfangswerte
 Copy	WebPositive Window		Kopieren
 Default standard font size:	Settings Window		Größe der Standard-Schrift:
+Custom	Settings Window		Benutzerdefiniert
 Bookmark this page	WebPositive Window		Lesezeichen für diese Seite anlegen
 Show tabs if only one page is open	Settings Window		Reiter immer anzeigen
 Close tab	WebPositive Window		Reiter schließen
@@ -110,8 +113,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Downloads fortsetzen
 Proxy server requires authentication	Settings Window		Der Proxy-Server verlangt eine Authentifizierung
 Cancel	Settings Window		Abbrechen
-History	WebPositive Window		Verlauf
 Reset size	WebPositive Window		Größe zurücksetzen
+History	WebPositive Window		Verlauf
 Do you really want to clear the browsing history?	WebPositive Window		Soll der Verlauf wirklich gelöscht werden?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Nächster Treffer
 Fixed font:	Settings Window		Schrift fester Breite:
@@ -133,7 +136,7 @@ OK	WebPositive Window		OK
 (%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% von %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Nur Text vergrößern
-Save page as…	WebPositive Window		Seite speichern unter…
+Save page as…	WebPositive Window		Seite speichern unter …
 Page source error	WebPositive Window		Fehler im Quellcode der Seite
 Auto-hide mouse pointer	Settings Window		Mauszeiger automatisch ausblenden
 Requesting %url	WebPositive Window		%url wird angefordert
@@ -148,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Start:
 Confirmation	WebPositive Window		Bestätigung
 Session cookie	Cookie Manager		Sitzungs-Cookie
+No SSE2 support	WebPositive		Keine SSE2-Unterstützung
 Open all	WebPositive Window		Alle öffnen
 Cut	WebPositive Window		Ausschneiden
 Downloads	Download Window		Downloads

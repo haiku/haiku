@@ -53,7 +53,8 @@
 #define	ALIGNED_POINTER(p, t)	((((uintptr_t)(p)) & (sizeof (t) - 1)) == 0)
 #elif defined(__arm__)
 #define	ALIGNED_POINTER(p, t)	((((unsigned)(p)) & (sizeof(t) - 1)) == 0)
-#elif defined(__mips__) || defined(__sparc__) || defined(__riscv64__) \
+#elif defined(__mips__) || defined(__sparc__) \
+	|| (defined(__riscv) && __riscv_xlen == 64) \
 	|| defined(__aarch64__) || defined(__arm64__)
 #define	ALIGNED_POINTER(p, t)	((((unsigned long)(p)) & (sizeof (t) - 1)) == 0)
 #else
@@ -62,7 +63,7 @@
 
 /* defined in arch_cpu.h which we can't include here as it's C++ */
 #if defined(__x86_64__) || defined(__i386__) || defined(__arm__) \
-	|| defined(__sparc__) || defined(__riscv64__) \
+	|| defined(__sparc__) || defined(__riscv) \
 	|| defined(__aarch64__) || defined(__arm64__)
 #define CACHE_LINE_SIZE 64
 #elif defined(__powerpc__)

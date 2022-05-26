@@ -45,7 +45,7 @@ protected:
 private:
 			void				_NotifyPackagesWithIconsInDepots() const;
 			void				_NotifyPackagesWithIconsInDepot(
-									const DepotInfo& depotInfo) const;
+									const DepotInfoRef& depotInfo) const;
 
 private:
 			Model*				fModel;

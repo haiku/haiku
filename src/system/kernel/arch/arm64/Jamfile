@@ -3,6 +3,9 @@ SubDir HAIKU_TOP src system kernel arch arm64 ;
 SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 UsePrivateKernelHeaders ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) arm ] ;
+
 KernelMergeObject kernel_arch_arm64.o :
 	arch_elf.cpp
 	arch_int.cpp
@@ -20,7 +23,17 @@ KernelMergeObject kernel_arch_arm64.o :
 	arch_real_time_clock.cpp
 	arch_platform.cpp
 	arch_asm.S
-	
+
+	VMSAv8TranslationMap.cpp
+	PMAPPhysicalPageMapper.cpp
+
+    # Serial UART and drivers
+	debug_uart.cpp
+	debug_uart_8250.cpp
+#	arch_uart_8250_omap.cpp
+	arch_uart_pl011.cpp
+	arch_uart_linflex.cpp
+
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
 	:

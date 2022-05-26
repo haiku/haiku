@@ -1,9 +1,15 @@
 /*
- * Copyright 2007-2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- * All rights reserved.	Distributed	under the terms	of the MIT License.
- */
-#ifndef	_PINCODE_REQUEST_WINDOW_H
-#define	_PINCODE_REQUEST_WINDOW_H
+* Copyright 2007-2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
+* Copyright 2021, Haiku, Inc.
+* Distributed under the terms of the MIT License.
+*
+* Authors:
+*		Oliver Ruiz Dorantes <oliver.ruiz.dorantes@gmail.com>
+* 		Tri-Edge AI <triedgeai@gmail.com>
+*/
+
+#ifndef	_PINCODE_REQUEST_WINDOW_H_
+#define	_PINCODE_REQUEST_WINDOW_H_
 
 
 #include <View.h>
@@ -12,20 +18,21 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/HCI/btHCI.h>
 
+#include <BluetoothIconView.h>
+
 class BStringView;
 class BButton;
 class BTextControl;
 
-namespace Bluetooth	{
+namespace Bluetooth {
 
 class RemoteDevice;
 
-class PincodeWindow : public BWindow
-{
+class PincodeWindow : public BWindow {
 public:
 							PincodeWindow(bdaddr_t address, hci_id hid);
 							PincodeWindow(RemoteDevice* rDevice);
-	virtual void			MessageReceived(BMessage *msg);
+	virtual void			MessageReceived(BMessage* msg);
 	virtual bool			QuitRequested();
 			void			SetBDaddr(BString address);
 
@@ -39,6 +46,13 @@ private:
 			BButton*		fAcceptButton;
 			BButton*		fCancelButton;
 			BTextControl*	fPincodeText;
+
+			BluetoothIconView* 	fIcon;
+			BStringView*		fMessage2;
+			BStringView*		fDeviceLabel;
+			BStringView*		fDeviceText;
+			BStringView*		fAddressLabel;
+			BStringView*		fAddressText;
 };
 
 }
@@ -47,4 +61,4 @@ private:
 using Bluetooth::PincodeWindow;
 #endif
 
-#endif
+#endif /* _PINCODE_REQUEST_WINDOW_H_ */

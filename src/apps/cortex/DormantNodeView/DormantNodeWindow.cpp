@@ -40,9 +40,16 @@
 
 // Application Kit
 #include <Application.h>
+// Locale Kit
+#undef B_CATALOG
+#define B_CATALOG (&sCatalog)
+#include <Catalog.h>
 // Interface Kit
 #include <Screen.h>
 #include <ScrollBar.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexDormantNodeWindow"
 
 __USE_CORTEX_NAMESPACE
 
@@ -51,6 +58,8 @@ __USE_CORTEX_NAMESPACE
 #define D_HOOK(x) //PRINT (x)		// BWindow impl.
 #define D_MESSAGE(x) //PRINT (x)	// MessageReceived()
 #define D_INTERNAL(x) //PRINT (x)	// internal operations
+
+static BCatalog sCatalog("x-vnd.Cortex.DormantNodeView");
 
 // -------------------------------------------------------- //
 // constants
@@ -65,7 +74,8 @@ const BRect DormantNodeWindow::s_initFrame(500.0, 350.0, 640.0, 480.0);
 
 DormantNodeWindow::DormantNodeWindow(
 	BWindow* parent)
-	: BWindow(s_initFrame, "Media add-ons",
+	: BWindow(s_initFrame,
+			  B_TRANSLATE("Media add-ons"),
 			  B_FLOATING_WINDOW_LOOK,
 			  B_FLOATING_SUBSET_WINDOW_FEEL,
 			  B_WILL_ACCEPT_FIRST_CLICK|B_AVOID_FOCUS|B_ASYNCHRONOUS_CONTROLS),
@@ -86,8 +96,7 @@ DormantNodeWindow::DormantNodeWindow(
 	r.left = r.right + 1.0;
 	r.right = r.left + B_V_SCROLL_BAR_WIDTH;
 	r.InsetBy(0.0, -1.0);
-	BScrollBar *scrollBar;
-	AddChild(scrollBar = new BScrollBar(r, "", m_listView, 0.0, 0.0, B_VERTICAL));
+	AddChild(new BScrollBar(r, "", m_listView, 0.0, 0.0, B_VERTICAL));
 
 	// Add the ListView
 	AddChild(m_listView);

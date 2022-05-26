@@ -6,6 +6,7 @@
 
 #include "debug.h"
 
+#include <limits.h>
 #include <string.h>
 
 #include <boot/platform.h>

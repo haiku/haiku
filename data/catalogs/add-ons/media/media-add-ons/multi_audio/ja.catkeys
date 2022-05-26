@@ -9,26 +9,26 @@ Tone control	MultiAudio		Tone control
 Phone	MultiAudio		Phone
 Aux	MultiAudio		Aux
 Output bass	MultiAudio		Output bass
-Headphones	MultiAudio		Headphones
+Headphones	MultiAudio		ヘッドホン
 Beep	MultiAudio		Beep
 Output mono mix	MultiAudio		Output mono mix
 Output stereo mix	MultiAudio		Output stereo mix
-Input	MultiAudio		Input
+Input	MultiAudio		入力
 Output treble	MultiAudio		Output treble
 Mono mix	MultiAudio		Mono mix
-General	MultiAudio		General
-Input & Output	MultiAudio		Input & Output
+General	MultiAudio		一般
+Input & Output	MultiAudio		入出力
 Enhanced Setup	MultiAudio		高度なセットアップ
 Stereo mix	MultiAudio		Stereo mix
 Output 3D depth	MultiAudio		Output 3D depth
 Volume	MultiAudio		音量
-Output	MultiAudio		Output
-Video	MultiAudio		Video
+Output	MultiAudio		出力
+Video	MultiAudio		ビデオ
 Line	MultiAudio		Line
 Mic	MultiAudio		Mic
  frequency:	MultiAudio		  周波数:
 Enable	MultiAudio		有効にする
-Mute	MultiAudio		Mute
+Mute	MultiAudio		ミュート
 Wave	MultiAudio		Wave
 Setup	MultiAudio		セットアップ
-Level	MultiAudio		Level
+Level	MultiAudio		レベル

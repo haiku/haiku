@@ -9,12 +9,25 @@ local platform ;
 for platform in [ MultiBootSubDirSetup ] {
 	on $(platform) {
 		BootStaticLibrary boot_platform_generic_$(platform:G=) :
+			text_console.cpp
 			text_menu.cpp
 			video_blit.cpp
 			video_splash.cpp
 		;
-
 		Includes [ FGristFiles video_splash.cpp ]
 			: [ BuildFeatureAttribute zlib : headers ] ;
+
+
+		local kernelDebugSources =
+			font.cpp
+			font_spleen.cpp
+			frame_buffer_console.cpp
+		;
+		BootStaticLibrary boot_video_text_console_$(platform:G=) :
+			$(kernelDebugSources)
+			video_text_console.cpp
+		;
+		SEARCH on [ FGristFiles $(kernelDebugSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel debug ] ;
 	}
 }

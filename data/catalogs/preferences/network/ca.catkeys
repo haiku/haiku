@@ -1,8 +1,7 @@
-1	catalan; valencian	x-vnd.Haiku-Network	2923905377
+1	catalan; valencian	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Dispositiu d'Ethernet
 Link speed:	IntefaceView		Velocitat d'enllaç:
 disconnected	IntefaceView		desconnectat
-IP Address:	IntefaceAddressView		Adreça IP:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Xarxa:
 Received:	IntefaceView		Rebut:
@@ -14,6 +13,7 @@ Gateway:	IntefaceAddressView		Passarel·la:
 The netmask defines your local network	IntefaceAddressView		La màscara de xarxa defineix la xarxa local.
 Your IP address	IntefaceAddressView		La vostra adreça IP
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		Adreça IP:
 Netmask:	IntefaceAddressView		Màscara de xarxa:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Serveis

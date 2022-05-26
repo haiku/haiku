@@ -40,7 +40,7 @@ public:
 protected:
 							PowerStatusView(BMessage* archive);
 
-	virtual void			Update(bool force = false);
+	virtual void			Update(bool force = false, bool notify = true);
 
 			void			FromMessage(const BMessage* message);
 			status_t		ToMessage(BMessage* message) const;

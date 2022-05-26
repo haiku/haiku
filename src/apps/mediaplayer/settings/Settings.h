@@ -11,9 +11,9 @@
 
 #include <Entry.h>
 #include <Locker.h>
+#include <SettingsMessage.h>
 
 #include "Notifier.h"
-#include "SettingsMessage.h"
 
 
 #define SETTINGS_FILENAME "MediaPlayer"

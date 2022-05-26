@@ -1,5 +1,6 @@
 /*
  * Copyright 2017 Julian Harnath <julian.harnath@rwth-aachen.de>
+ * Copyright 2021 Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
 #ifndef WORK_STATUS_VIEW_H
@@ -7,8 +8,6 @@
 
 
 #include <View.h>
-
-#include <set>
 
 #include "PackageInfo.h"
 
@@ -31,22 +30,12 @@ public:
 			void				SetProgress(float value);
 			void				SetText(const BString& text);
 
-			void				PackageStatusChanged(
-									const PackageInfoRef& package);
-
-private:
-			void				_SetTextPendingDownloads();
-			void				_SetTextDownloading(const BString& title);
-
 private:
 			BStatusBar*			fProgressBar;
 			BarberPole*			fBarberPole;
 			BCardLayout*		fProgressLayout;
 			BView*				fProgressView;
 			BStringView*		fStatusText;
-
-			BString				fDownloadingPackage;
-			std::set<BString>	fPendingPackages;
 };
 
 

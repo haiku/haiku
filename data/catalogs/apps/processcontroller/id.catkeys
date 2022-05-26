@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-ProcessController	2280875657
+1	indonesian	x-vnd.Haiku-ProcessController	3123774187
 Error saving file	ProcessController		Kesalahan menyimpan file
 Display priority	ProcessController		Prioritas tampilan
 That's no Fun!	ProcessController		Itu tidak seru!
@@ -23,7 +23,6 @@ Usage: %s [-deskbar]\n	ProcessController		Penggunaan: %s [-deskbar]\n
 Please confirm	ProcessController		Mohon konfirmasi
 Urgent priority	ProcessController		Priority penting
 What do you want to do with the thread \"%s\"?	ProcessController		Apa yang ingin Anda lakukan dengan utas \"%s\"?
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 Idle priority	ProcessController		Prioritas menganggur
 Real-time display priority	ProcessController		Prioritas tampilan Real-time
 Threads and CPU usage	ProcessController		Trit dan penggunaan CPU

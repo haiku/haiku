@@ -1,8 +1,7 @@
-1	swedish	x-vnd.Haiku-Network	2923905377
+1	swedish	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Ethernetenhet
 Link speed:	IntefaceView		Länkhastighet:
 disconnected	IntefaceView		frånkopplad
-IP Address:	IntefaceAddressView		IP-adress:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Nätverk:
 Received:	IntefaceView		Mottaget:
@@ -14,6 +13,7 @@ Gateway:	IntefaceAddressView		Förmedlingsnod:
 The netmask defines your local network	IntefaceAddressView		Nätmasken definierar ditt lokala nätverk
 Your IP address	IntefaceAddressView		Din IP-adress
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP-adress:
 Netmask:	IntefaceAddressView		Nätmask:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Tjänster

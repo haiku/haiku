@@ -1,0 +1,163 @@
+/*
+ * Copyright 2020 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Name, email@email.com
+ *
+ * Corresponds to:
+ *		headers/os/interface/GradientLinear.h	hrev32745
+ *		src/kits/interface/GradientLinear.cpp	hrev28564
+ */
+
+
+//! \cond INTERNAL
+
+
+/*!
+	\file GradientRadialFocus.h
+	\ingroup interface
+	\brief Undocumented file.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BGradientRadialFocus
+	\ingroup interface
+	\ingroup libbe
+	\brief Undocumented class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientRadialFocus::BGradientRadialFocus()
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientRadialFocus::BGradientRadialFocus(const BPoint &center, float radius, const BPoint &focal)
+	\brief Undocumented public method
+
+	\param center Undocumented
+	\param radius Undocumented
+	\param focal Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BGradientRadialFocus::BGradientRadialFocus(float cx, float cy, float radius, float fx, float fy)
+	\brief Undocumented public method
+
+	\param cx Undocumented
+	\param cy Undocumented
+	\param radius Undocumented
+	\param fx Undocumented
+	\param fy Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPoint BGradientRadialFocus::Center() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPoint BGradientRadialFocus::Focal() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn float BGradientRadialFocus::Radius() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientRadialFocus::SetCenter(const BPoint &center)
+	\brief Undocumented public method
+
+	\param center Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientRadialFocus::SetCenter(float cx, float cy)
+	\brief Undocumented public method
+
+	\param cx Undocumented
+	\param cy Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientRadialFocus::SetFocal(const BPoint &focal)
+	\brief Undocumented public method
+
+	\param focal Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientRadialFocus::SetFocal(float fx, float fy)
+	\brief Undocumented public method
+
+	\param fx Undocumented
+	\param fy Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BGradientRadialFocus::SetRadius(float radius)
+	\brief Undocumented public method
+
+	\param radius Undocumented
+
+	\since Haiku R1
+*/
+
+//! \endcond INTERNAL

@@ -190,7 +190,7 @@ struct DirCookie {
 			}
 		}
 
-		size_t entrySize = sizeof(dirent) + nameLength;
+		size_t entrySize = sizeof(dirent) + nameLength + 1;
 		if (entrySize > size)
 			return B_BUFFER_OVERFLOW;
 

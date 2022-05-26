@@ -191,7 +191,7 @@ setup_ring_buffer(ring_buffer &ringBuffer, const char* name)
 
 /*! Return number of hardware engines */
 uint32
-intel_accelerant_engine_count(void) 
+intel_accelerant_engine_count(void)
 {
 	CALLED();
 	return 1;
@@ -231,6 +231,12 @@ void
 intel_wait_engine_idle(void)
 {
 	CALLED();
+
+	// Skylake acc engine not yet functional (stalls)
+	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_LAKE)
+			|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SOC0)) {
+		return;
+	}
 
 	{
 		QueueCommands queue(gInfo->shared_info->primary_ring_buffer);

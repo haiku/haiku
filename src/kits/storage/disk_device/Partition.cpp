@@ -1001,7 +1001,7 @@ status_t
 BPartition::ValidateSetType(const char* type) const
 {
 	BPartition* parent = Parent();
-	if (parent == NULL || fDelegate == NULL)
+	if (parent == NULL || parent->fDelegate == NULL || fDelegate == NULL)
 		return B_NO_INIT;
 
 	return parent->fDelegate->ValidateSetType(fDelegate, type);
@@ -1012,7 +1012,7 @@ status_t
 BPartition::SetType(const char* type)
 {
 	BPartition* parent = Parent();
-	if (parent == NULL || fDelegate == NULL)
+	if (parent == NULL || parent->fDelegate == NULL || fDelegate == NULL)
 		return B_NO_INIT;
 
 	return parent->fDelegate->SetType(fDelegate, type);
@@ -1035,10 +1035,22 @@ status_t
 BPartition::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 	BPartitionParameterEditor** editor)
 {
-	if (fDelegate == NULL)
-		return B_NO_INIT;
+	// When creating a new partition, this will be called for parent inside
+	// which we are creating a partition.
+	// When modifying an existing partition, this will be called for the
+	// partition itself, but the parameters are in fact managed by the parent
+	// (see SetParameters)
+	if (type == B_CREATE_PARAMETER_EDITOR) {
+		if (fDelegate == NULL)
+			return B_NO_INIT;
+		return fDelegate->GetParameterEditor(type, editor);
+	} else {
+		BPartition* parent = Parent();
+		if (parent == NULL || parent->fDelegate == NULL)
+			return B_NO_INIT;
 
-	return fDelegate->GetParameterEditor(type, editor);
+		return parent->fDelegate->GetParameterEditor(type, editor);
+	}
 }
 
 
@@ -1046,7 +1058,7 @@ status_t
 BPartition::SetParameters(const char* parameters)
 {
 	BPartition* parent = Parent();
-	if (parent == NULL || fDelegate == NULL)
+	if (parent == NULL || parent->fDelegate == NULL || fDelegate == NULL)
 		return B_NO_INIT;
 
 	return parent->fDelegate->SetParameters(fDelegate, parameters);

@@ -2,7 +2,7 @@
 Lower left	GeneralView		Unten links
 Application does not have a valid signature	NotificationView	Alert message	Die Anwendung besitzt keine gültige Signatur
 Status	NotificationView		Status
-Add…	NotificationView		Hinzu…
+Add…	NotificationView		Hinzu …
 Lower right	GeneralView		Unten rechts
 Muted	NotificationView		Stumm
  is already listed	NotificationView	Alert message	 wurde bereits hinzugefügt.

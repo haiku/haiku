@@ -1,17 +1,17 @@
-1	friulian	x-vnd.Haiku-Login	336867745
+1	friulian	x-vnd.Haiku-Login	3568987751
 Invalid login!	Login View		Acès no valit!
 Error	Login App		Erôr
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tInvie in modalitât 'modifiche plateforme' par permeti la personalizazion dal Scritori.\n
+Login application for Haiku\nUsage:	Login App		Aplicazion di acès par Haiku\nUtilizazion:
+--nonmodal\tDo not make the window modal	Login App		--nonmodal\tNo sta rindi modâl il barcon
 Welcome to Haiku	Login Window		Benvignûts su Haiku!
 Halt	Login View		Distude
-Login application for Haiku\nUsage:\n	Login App		Aplicazion di acès par Haiku\nÛs:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNo sta rindi modâl il barcon\n
 Desktop	Desktop Window		Scritori
 Hide password	Login View		Plate peraule di ordin
 Reboot	Login View		Torne invie
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Si pues modificâ l'aspiet dal scritori, mostrât daûr de aplicazion pal acès, strissinantji i replicants parsore.\n\nCuant che si à finît al baste jessî de aplicazion (Cmd-Q).
 OK	Login View		Va ben
 Info	Login App		Informazions
+--edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tInvie in modalitât modifiche scansie par permeti la personalizazion dal scritori.
 Login:	Login View		Non utent:
 Password:	Login View		Peraule di ordin:
 Unimplemented	Login App		No implementât

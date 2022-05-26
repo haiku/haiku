@@ -489,8 +489,10 @@ DraggableContainerIcon::MouseMoved(BPoint where, uint32, const BMessage*)
 
 	// See if we need to truncate the string
 	BString nameString = model->Name();
-	if (view->StringWidth(model->Name()) > rect.Width())
-		view->TruncateString(&nameString, B_TRUNCATE_END, rect.Width() - 5);
+	if (view->StringWidth(model->Name()) > rect.Width()) {
+		view->TruncateString(&nameString, B_TRUNCATE_MIDDLE,
+			rect.Width() - 5);
+	}
 
 	// Draw the label
 	float leftText = (view->StringWidth(nameString.String())
@@ -1059,6 +1061,7 @@ BContainerWindow::Init(const BMessage* message)
 	SetFlags(Flags() & ~B_NO_WORKSPACE_ACTIVATION);
 }
 
+
 void
 BContainerWindow::InitLayout()
 {
@@ -1096,6 +1099,7 @@ BContainerWindow::InitLayout()
 		fPoseView->CountView()->SetExplicitMinSize(size);
 	}
 }
+
 
 void
 BContainerWindow::RestoreState()
@@ -1502,7 +1506,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 				// The selected item is not a BTextView, so forward the
 				// message to the PoseView.
 				if (fPoseView != NULL)
-					fPoseView->MessageReceived(message);
+					PostMessage(message, fPoseView);
 			} else {
 				// Since we catch the generic clipboard shortcuts in a way that
 				// means the BTextView will never get them, we must
@@ -1513,7 +1517,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 				// recursion.
 				if (message->what == B_CUT || message->what == B_COPY
 						|| message->what == B_PASTE) {
-					view->MessageReceived(message);
+					PostMessage(message, view);
 				}
 			}
 			break;

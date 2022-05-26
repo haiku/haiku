@@ -12,7 +12,7 @@
 #include <boot/vfs.h>
 #include <boot/platform.h>
 #include <boot/heap.h>
-#include <boot/PathBlacklist.h>
+#include <boot/PathBlocklist.h>
 #include <boot/stdio.h>
 #include <boot/net/NetStack.h>
 
@@ -62,7 +62,7 @@ main(stage2_args *args)
 	bool mountedAllVolumes = false;
 
 	BootVolume bootVolume;
-	PathBlacklist pathBlacklist;
+	PathBlocklist pathBlocklist;
 
 	if (get_boot_file_system(args, bootVolume) != B_OK
 		|| (platform_boot_options() & BOOT_OPTION_MENU) != 0) {
@@ -79,7 +79,7 @@ main(stage2_args *args)
 
 		mountedAllVolumes = true;
 
-		if (user_menu(bootVolume, pathBlacklist) < B_OK) {
+		if (user_menu(bootVolume, pathBlocklist) < B_OK) {
 			// user requested to quit the loader
 			goto out;
 		}
@@ -87,8 +87,11 @@ main(stage2_args *args)
 
 	if (bootVolume.IsValid()) {
 		// we got a volume to boot from!
-		load_driver_settings(args, bootVolume.RootDirectory());
 
+		// TODO: fix for riscv64
+#ifndef __riscv
+		load_driver_settings(args, bootVolume.RootDirectory());
+#endif
 		status_t status;
 		while ((status = load_kernel(args, bootVolume)) < B_OK) {
 			// loading the kernel failed, so let the user choose another
@@ -103,7 +106,7 @@ main(stage2_args *args)
 				mountedAllVolumes = true;
 			}
 
-			if (user_menu(bootVolume, pathBlacklist) != B_OK
+			if (user_menu(bootVolume, pathBlocklist) != B_OK
 				|| !bootVolume.IsValid()) {
 				// user requested to quit the loader
 				goto out;
@@ -115,8 +118,8 @@ main(stage2_args *args)
 		// know our boot volume, too
 		if (status == B_OK) {
 			if (bootVolume.IsPackaged()) {
-				packagefs_apply_path_blacklist(bootVolume.SystemDirectory(),
-					pathBlacklist);
+				packagefs_apply_path_blocklist(bootVolume.SystemDirectory(),
+					pathBlocklist);
 			}
 
 			register_boot_file_system(bootVolume);
@@ -130,8 +133,11 @@ main(stage2_args *args)
 			gKernelArgs.ucode_data_size = 0;
 			platform_load_ucode(bootVolume);
 
+			// TODO: fix for riscv64
+#ifndef __riscv
 			// apply boot settings
 			apply_boot_settings();
+#endif
 
 			// set up kernel args version info
 			gKernelArgs.kernel_args_size = sizeof(kernel_args);

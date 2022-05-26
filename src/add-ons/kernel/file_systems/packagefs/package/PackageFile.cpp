@@ -148,18 +148,19 @@ PackageFile::VFSInit(dev_t deviceID, ino_t nodeID)
 	status_t error = PackageNode::VFSInit(deviceID, nodeID);
 	if (error != B_OK)
 		return error;
-	MethodDeleter<PackageNode> baseClassUninit(this,
-		&PackageNode::NonVirtualVFSUninit);
+	MethodDeleter<PackageNode, void, &PackageNode::NonVirtualVFSUninit>
+		baseClassUninit(this);
 
 	// open the package -- that's already done by PackageNode::VFSInit(), so it
 	// shouldn't fail here. We only need to do it again, since we need the FD.
-	int fd = fPackage->Open();
+	BReference<Package> package(GetPackage());
+	int fd = package->Open();
 	if (fd < 0)
 		RETURN_ERROR(fd);
-	PackageCloser packageCloser(fPackage);
+	PackageCloser packageCloser(package);
 
 	// create the data accessor
-	fDataAccessor = new(std::nothrow) DataAccessor(GetPackage(), &fData);
+	fDataAccessor = new(std::nothrow) DataAccessor(package, &fData);
 	if (fDataAccessor == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 

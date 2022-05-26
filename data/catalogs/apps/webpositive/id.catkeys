@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-WebPositive	55235296
+1	indonesian	x-vnd.Haiku-WebPositive	440329287
 Authentication required	Authentication Panel		Otentikasi dibutuhkan
 Previous	WebPositive Window		Sebelumnya
 (Finish: %date)	Download Window		(Selesai: %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		Buka folder yang berisi
 Find previous	WebPositive Window		Cari sebelumnya
 Full screen	WebPositive Window		Layar penuh
 Downloads in progress	WebPositive		Pengunduhan dalam proses
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Apakah Anda ingin membuka %addedCount sekaligus?
 Copy URL to clipboard	Download Window		Salin URL ke papan klip
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Apakah Anda ingin membuka %addedCount sekaligus?
 Clone current page	Settings Window		Gandakan laman saat ini
 Start page:	Settings Window		Halaman awal:
 Cancel	Download Window		Batalkan
@@ -49,10 +49,11 @@ Decrease size	WebPositive Window		Perkecil ukuran
 Default fixed font size:	Settings Window		Ukuran fon tetap standar:
 Sans serif font:	Settings Window		Fon sans serif:
 Clear	WebPositive Window		Bersihkan
-Cookies for %s	Cookie Manager		Kuki untuk %s
 The download could not be opened.	Download Window		Unduhan tidak bisa dibuka.
+Cookies for %s	Cookie Manager		Kuki untuk %s
 Close	Download Window		Tutup
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Istilah pencarian
 Reload	WebPositive Window		Muat ulang
 Expiration	Cookie Manager		Kedaluwarsa
 Download finished	Download Window		Unduhan selesai
@@ -109,8 +110,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Lanjutkan unduhan
 Proxy server requires authentication	Settings Window		Server proksi membutuhkan otentikasi
 Cancel	Settings Window		Batal
-History	WebPositive Window		Riwayat
 Reset size	WebPositive Window		Atur ulang ukuran
+History	WebPositive Window		Riwayat
 Do you really want to clear the browsing history?	WebPositive Window		Apakah anda ingin membersihkan riwayat jelajah?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Temukan kemunculan istilah pencarian selanjutnya
 Fixed font:	Settings Window		Fon tetap:

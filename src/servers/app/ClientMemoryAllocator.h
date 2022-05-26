@@ -83,7 +83,8 @@ public:
 	virtual uint32				AreaOffset();
 
 private:
-			ClientMemoryAllocator*	fAllocator;
+			BReference<ClientMemoryAllocator>
+								fAllocator;
 			block*				fBlock;
 };
 

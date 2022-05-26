@@ -149,6 +149,10 @@ BPackageInfoContentHandler::HandlePackageAttribute(
 		case B_PACKAGE_INFO_POST_INSTALL_SCRIPTS:
 			return fPackageInfo.AddPostInstallScript(value.string);
 
+		case B_PACKAGE_INFO_PRE_UNINSTALL_SCRIPTS:
+			fPackageInfo.AddPreUninstallScript(value.string);
+			break;
+
 		default:
 			if (fErrorOutput != NULL) {
 				fErrorOutput->PrintError(

@@ -4,8 +4,6 @@
  */
 
 
-#include <thread.h>
-
 #include <sys/param.h>
 #include <sys/priv.h>
 
@@ -20,7 +18,7 @@ priv_check(struct thread *thread, int privilegeLevel)
 	// Note: The thread parameter is ignored intentionally (cf. the comment in
 	// pcpu.h). Currently calling this function is only valid for the current
 	// thread.
-	if (thread_get_current_thread()->team->effective_uid == 0)
+	if (geteuid() == 0)
 		return ENOERR;
 
 	return EPERM;

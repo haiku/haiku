@@ -1,0 +1,7 @@
+1	english	x-vnd.Haiku-bluetooth_server	3418434903
+Stopping the Bluetooth server failed.	BluetoothReplicant		停止蓝牙服务失败。
+Bluetooth error	BluetoothReplicant		蓝牙错误
+Settings…	BluetoothReplicant		设置…
+OK	BluetoothReplicant		确定
+Error: %status%	BluetoothReplicant		错误：%status%
+Quit	BluetoothReplicant		退出

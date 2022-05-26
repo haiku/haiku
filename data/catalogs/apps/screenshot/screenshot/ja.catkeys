@@ -9,17 +9,17 @@ The destination path exists but is not a folder.	ScreenshotWindow		保存先の�
 Select	ScreenshotWindow		選択
 Save as:	ScreenshotWindow		名前を付けて保存:
 seconds	ScreenshotWindow		秒
-New screenshot	ScreenshotWindow		新規スクリーンショット
+New screenshot	ScreenshotWindow		新しいスクリーンショット
 Screenshot	System name		スクリーンショット
 Desktop	ScreenshotWindow		デスクトップ
 Artwork folder	ScreenshotWindow		Artwork フォルダー
 Translator Settings	ScreenshotWindow		トランスレーター設定
 Include mouse pointer	ScreenshotWindow		マウスポインターを含める
 overwrite	ScreenshotWindow		上書き
-Settings…	ScreenshotWindow		設定…
-Choose folder	ScreenshotWindow		フォルダーを選択
+Settings…	ScreenshotWindow		設定...
+Choose folder	ScreenshotWindow		フォルダーの選択
 Name:	ScreenshotWindow		ファイル名:
-Choose folder…	ScreenshotWindow		フォルダーを選択…
+Choose folder…	ScreenshotWindow		フォルダーの選択...
 Please select	ScreenshotWindow		選択してください
 Failed to save screenshot	ScreenshotWindow		スクリーンショットの保存に失敗しました
 Cancel	ScreenshotWindow		キャンセル

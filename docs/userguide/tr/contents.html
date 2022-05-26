@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Emir SARI
+ *		Máximo Castañeda
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -23,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Kullanıcı kılavuzu</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +36,7 @@
 <li><a href="../de/contents.html">Deutsch</a></li>
 <li><a href="../en/contents.html">English</a></li>
 <li><a href="../es/contents.html">Español</a></li>
+<li><a href="../eo/contents.html">Esperanto</a></li>
 <li><a href="../fr/contents.html">Français</a></li>
 <li><a href="../fur/contents.html">Furlan</a></li>
 <li><a href="../it/contents.html">Italiano</a></li>
@@ -61,7 +63,7 @@
 
 <h1>Haiku Kullanıcı Kılavuzu'na hoş geldiniz!</h1>
 
-<p>Aşağıda Haiku'nun önemli kısımları hakkında  yazılmış olan belgelendirmeyi bulacaksınız. Bu belgelendirmenin yazılması ve güncellenmesi sürekli işleyen bir süreç olduğundan (güncel sayfalar ve çeviriler için lütfen <a href="http://www.haiku-os.org/docs/userguide/en/contents.html">çevrimiçi sürüme</a> bir göz atın) bulduğunuz yanlışları, eksikleri, eklenmesini önerdiğiniz konuları ve hatta kendiniz katkıda bulunmak istiyorsanız lütfen <a href="http://www.freelists.org/list/haiku-doc">belgelendirme posta listesi</a> üzerinden bizimle iletişime geçin. Çevirilerde yardımcı olmak isterseniz, bununla ilgili bilgiyi <a href="http://dev.haiku-os.org/wiki/i18n/UserGuide">i18n kullanıcı kılavuzu vikisinde</a> bulabilirsiniz.</p>
+<p>Aşağıda Haiku'nun önemli kısımları hakkında  yazılmış olan belgelendirmeyi bulacaksınız. Bu belgelendirmenin yazılması ve güncellenmesi sürekli işleyen bir süreç olduğundan (güncel sayfalar ve çeviriler için lütfen <a href="http://www.haiku-os.org/docs/userguide/tr/contents.html">çevrimiçi sürüme</a> bir göz atın) bulduğunuz yanlışları, eksikleri, eklenmesini önerdiğiniz konuları ve hatta kendiniz katkıda bulunmak istiyorsanız lütfen <a href="http://www.freelists.org/list/haiku-doc">belgelendirme posta listesi</a> üzerinden bizimle iletişime geçin. Çevirilerde yardımcı olmak isterseniz, bununla ilgili bilgiyi <a href="http://dev.haiku-os.org/wiki/i18n/UserGuide">i18n kullanıcı kılavuzu vikisinde</a> bulabilirsiniz.</p>
 <p><br /></p>
 <table summary="contents" border="1" rules="rows" frame="void" cellpadding="10" cellspacing="0" style="border: dotted thin #e0e0e0">
 <!-- Excluded until it's further fleshed out
@@ -74,12 +76,7 @@
 		<li><a href="installation.html#transfer-data">Transfering data to/from a Haiku installation</a></li></ul></td>
 		<td valign="top">Step by step guides covering Haiku installation during the (pre-) alpha release phase.</td></tr>
 -->
-	<tr><td valign="top"><a href="bootloader.html">Açılış Yöneticisi</a></td>
-		<td valign="top">Yapılandırma sorunlarını çözmek için güvenli önyükleme seçenekleri ayarlayın.</td></tr>
-	<tr><td valign="top"><a href="filesystem-layout.html">Dosya sistemi yerleşimi</a><ul>
-		<li><a href="filesystem-layout.html#system">Sistem klasörü</a></li>
-		<li><a href="filesystem-layout.html#home">Ev klasörü</a></li></ul></td>
-		<td valign="top">Dosya sistemi hiyerarşisini anlamak ve önemli dosya konumları ve klasörleri üzerine bilgi almak için buraya bakın.</td></tr>
+
 	<tr><td valign="top"><a href="gui.html">Haiku'nun Grafik Kullanıcı Arabirimi</a><ul>
 		<li><a href="gui.html#move-resize">Kolayca taşıma ve boyutlandırma</a></li>
 		<li><a href="gui.html#stack-tile">Yığma ve Döşeme</a></li>
@@ -88,13 +85,79 @@
 		<a href="gui.html#favorites-recent">- Yer imleri ve son kullanılan klasörler</a></li>
 		<li><a href="gui.html#replicants">Yinelenmişler</a></li></ul></td>
 		<td valign="top">Grafik kullanıcı arabiriminin temel ögelerini öğrenin.</td></tr>
-	<tr><td valign="top"><a href="keyboard-shortcuts.html">Kısayollar ve düğme kombinasyonları</a><ul>
-		<li><a href="keyboard-shortcuts.html#general">Genel kısayollar</a></li>
-		<li><a href="keyboard-shortcuts.html#textediting">Metin düzenleme kısayolları</a></li>
-		<li><a href="keyboard-shortcuts.html#tracker-navigation">İzleyici'de dolaşım için kısayollar</a></li>
-		<li><a href="keyboard-shortcuts.html#terminal">Uçbirim kısayolları</a></li>
-		<li><a href="keyboard-shortcuts.html#other-combos">Diğer düğme kombinasyonları</a></li></ul></td>
-		<td valign="top">Çalışma akışınızı hızlandırmak için çok kullanılan kısayollar.</td></tr>
+
+	<tr><td valign="top"><a href="deskbar.html">Masaüstü Çubuğu</a><ul>
+		<li><a href="deskbar.html#deskbar-menu">Masaüstü Çubuğu Menüsü</a></li>
+		<li><a href="deskbar.html#tray">Tepsi</a></li>
+		<li><a href="deskbar.html#list-of-apps">Çalışan uygulamalar listesi</a></li></ul></td>
+		<td valign="top">Haiku'nun "Başlat" menüsünü nasıl kullanabileceğini ve yapılandırabileceğinizi öğrenin.</td></tr>
+
+	<tr><td valign="top"><a href="tracker.html">İzleyici</a><ul>
+		<li><a href="tracker.html#mounting-volumes">Diskleri bağlama</a></li>
+		<li><a href="tracker.html#navigating">Dolaşım</a></li>
+		<li><a href="tracker.html#appearance">Görünüm</a></li>
+		<li><a href="tracker.html#tracker-preferences">İzleyici tercihleri</a></li>
+		<li><a href="tracker.html#working-with-files">Dosyalarla çalışma</a></li>
+		<li><a href="tracker.html#transaction-status">İşlem Durumu</a></li>
+		<li><a href="tracker-add-ons.html">İzleyici eklentileri</a></li></ul></td>
+		<td valign="top">Haiku'nun dosya yöneticisi ile nasıl dolaşabileceğinizi, dosya ve klasörlerle nasıl çalışabileceğinizi ve onu nasıl yapılandırabileceğinizi öğrenin.</td></tr>
+
+	<tr><td valign="top"><a href="applications.html">Uygulamalar</a><ul>
+		<li><a href="applications.html#hpkg">Haiku paketleri (.hpkg)</a></li>
+		<li><a href="applications.html#beos_apps">Old BeOS arşivleri (.zip and .pkg)</a></li>
+		<li><a href="applications.html#list-of-apps">Haiku uygulamaları</a></li></ul></td>
+		<td>Uygulama yüklemeyi/kaldırmayı öğrenin ve Haiku ile birlikte gelen uygulamaların nasıl çalıştığına bakın.</td></tr>
+
+	<tr><td colspan="2"><table align="center"><tr><td>
+			<a href="applications/activitymonitor.html">Etkinlik Monitörü</a><br />
+			<a href="applications/bootmanager.html">Önyükleme Yöneticisi</a><br />
+			<a href="applications/charactermap.html">Karakter Eşlem</a><br />
+			<a href="applications/codycam.html">CodyCam</a><br />
+			<a href="applications/debugger.html">Debugger</a><br />
+			<a href="applications/deskcalc.html">Hesap Makinesi</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/diskprobe.html">DiskProbe</a><br />
+			<a href="applications/diskusage.html">Disk Kullanımı</a><br />
+			<a href="applications/drivesetup.html">Disk İzlencesi</a><br />
+			<a href="applications/expander.html">Paketaçar</a><br />
+			<a href="applications/haikudepot.html">Haiku Depo</a><br />
+			<a href="applications/icon-o-matic.html">Icon-O-Matic</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/installer.html">Yükleyici</a><br />
+			<a href="applications/magnify.html">Ekranı Büyüt</a><br />
+			<a href="applications/mail.html">Posta</a><br />
+			<a href="applications/mediaplayer.html">Ortam Oynatıcı</a><br />
+			<a href="applications/midiplayer.html">MIDI Oynatıcı</a><br />
+			<a href="applications/packageinstaller.html">Eski Paket Yükleyici</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/people.html">Kişiler</a><br />
+			<a href="applications/poorman.html">PoorMan</a><br />
+			<a href="applications/screenshot.html">Ekran Görüntüsü</a><br />
+			<a href="applications/showimage.html">Resim Görüntüleyici</a><br />
+			<a href="applications/softwareupdater.html">Yazılım Güncelleyici</a><br />
+			<a href="applications/soundrecorder.html">Ses Kaydedici</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/stylededit.html">StyledEdit</a><br />
+			<a href="applications/terminal.html">Uçbirim</a><br />
+			<a href="applications/textsearch.html">Metin Arama</a><br />
+			<a href="applications/tv.html">TV</a><br />
+			<a href="applications/webpositive.html">WebPositive</a></td></tr>
+		</table>
+	</td></tr>
+
+	<tr><td valign="top"><ul>
+		<li><a href="applications.html#cli-apps">Haiku komut satırı uygulamaları</a></li>
+		<li><a href="applications.html#list-of-bundled-apps">Birlikte gelen uygulamalar</a></li>
+		<ul><li><a href="applications/bepdf.html">- BePDF</a></li>
+			<li><a href="applications/pe.html">- Pe</a></li>
+			<li><a href="applications/vision.html">- Vision</a></li>
+			<li><a href="applications/wonderbrush.html">- WonderBrush</a></li></ul>
+	</ul></td><td></td></tr>
+
 	<tr><td valign="top"><a href="workspaces.html">Çalışma Alanları</a><ul>
 		<li><a href="workspaces.html#switching">Çalışma alanlarını değiştirme</a></li>
 		<li><a href="desktop-applets/workspaces.html">Çalışma Alanları Gereci</a></li>
@@ -105,87 +168,15 @@
 		<td valign="top">Çalışan uygulamalar arasında geçiş yapın.</td></tr>
 	<tr><td valign="top"><a href="teammonitor.html">Takım Monitörü</a></td>
 		<td valign="top">Yanıt vermeyen uygulamaları veya sistem bileşenlerini sonlandırın.</td></tr>
-	<tr><td valign="top"><a href="tracker.html">İzleyici</a><ul>
-		<li><a href="tracker.html#mounting-volumes">Diskleri bağlama</a></li>
-		<li><a href="tracker.html#navigating">Dolaşım</a></li>
-		<li><a href="tracker.html#appearance">Görünüm</a></li>
-		<li><a href="tracker.html#tracker-preferences">İzleyici tercihleri</a></li>
-		<li><a href="tracker.html#working-with-files">Dosyalarla çalışma</a></li>
-		<li><a href="tracker.html#transaction-status">İşlem Durumu</a></li>
-		<li><a href="tracker-add-ons.html">İzleyici eklentileri</a></li></ul></td>
-		<td valign="top">Haiku'nun dosya yöneticisi ile nasıl dolaşabileceğinizi, dosya ve klasörlerle nasıl çalışabileceğinizi ve onu nasıl yapılandırabileceğinizi öğrenin.</td></tr>
-	<tr><td valign="top"><a href="deskbar.html">Masaüstü Çubuğu</a><ul>
-		<li><a href="deskbar.html#deskbar-menu">Masaüstü Çubuğu Menüsü</a></li>
-		<li><a href="deskbar.html#tray">Tepsi</a></li>
-		<li><a href="deskbar.html#list-of-apps">Çalışan uygulamalar listesi</a></li></ul></td>
-		<td valign="top">Haiku'nun "Başlat" menüsünü nasıl kullanabileceğini ve yapılandırabileceğinizi öğrenin.</td></tr>
-	<tr><td valign="top"><a href="filetypes.html">Dosya Türleri</a><ul>
-		<li><a href="filetypes.html#filetype">Dosya türü</a></li>
-		<li><a href="filetypes.html#preferred-app">Tercih edilen uygulama</a></li>
-		<li><a href="filetypes.html#icon">Simge</a></li>
-		<li><a href="filetypes.html#settings-apps">Uygulamalar için özel ayarlar</a></li>
-		<li><a href="filetypes.html#filetypes-preferences">Dosya Türleri tercihleri global ayarları</a></li></ul></td>
-		<td valign="top">Öntanımlı uygulamaları ayarlayın, dosya türlerini değiştirin ve kendi dosya türlerinizi oluşturun.</td></tr>
-	<tr><td valign="top"><a href="attributes.html">Öznitelikler</a><ul>
-		<li><a href="attributes.html#attributes-tracker">İzleyici öznitelikleri</a></li>
-		<li><a href="attributes.html#attributes-terminal">Uçbirim öznitelikleri</a></li></ul></td>
-		<td valign="top">Haiku'nun ana özelliklerinden biri olan öznitelikler, herhangi bir dosyaya her türlü veriyi eklemenize ve yönetmenize olanak verir.</td></tr>		
-	<tr><td valign="top"><a href="index.html">İndeks</a></td>
-		<td>Özniteliklerde arama yapabilmek için indekslemeyi kullanın.</td></tr>
-	<tr><td valign="top"><a href="queries.html">Sorgular</a><ul>
-		<li><a href="queries.html#find-window">Bul penceresi</a></li>
-		<li><a href="queries.html#basic-query">Yalın sorgular - "ad ile"</a></li>
-		<li><a href="queries.html#adv-query">Gelişmiş sorgular - "öznitelik ile"</a></li>
-		<li><a href="queries.html#more-adv-query">Çok gelişmiş sorgular - "formül ile"</a></li>
-		<li><a href="queries.html#result-window">Sonuç penceresi</a></li>
-		<li><a href="queries.html#query-template">Sorgu Şablonları</a></li>
-</ul></td>
-		<td valign="top">Aradığınızı bulmak için Haiku'nun yıldırım hızlı sorgularını kullanın.</td></tr>
-	<tr><td valign="top"><a href="workshop-filetypes+attributes.html">Çalıştay: Dosya Türleri, Öznitelikler, İndeks ve Sorgular</a></td>
-		<td valign="top">DVD'lerinizi organize ederek Haiku'nun temel özelliklerini öğrenin.</td></tr>
-	<tr><td valign="top"><a href="workshop-email.html">Çalıştay: E-posta yönetimi</a></td>
-		<td valign="top">Haiku'nun e-posta sistemini kullanmayı öğrenin.</td></tr>
-	<tr><td valign="top"><a href="workshop-wlan.html">Çalıştay: Kablosuz ağ</a></td>
-		<td valign="top">Açık veya şifreli kablosuz ağlar oluşturun.</td></tr>
-	<tr><td valign="top"><a href="applications.html">Uygulamalar</a><ul>
-		<li><a href="applications.html#hpkg">Haiku paketleri (.hpkg)</a></li>
-		<li><a href="applications.html#beos_apps">Old BeOS arşivleri (.zip and .pkg)</a></li>
-		<li><a href="applications.html#list-of-apps">Haiku uygulamaları</a></li>
-		<ul>
-			<li><a href="applications/activitymonitor.html">Etkinlik Monitörü</a></li>
-			<li><a href="applications/bootmanager.html">Önyükleme Yöneticisi</a></li>
-			<li><a href="applications/charactermap.html">Karakter Eşlem</a></li>
-			<li><a href="applications/codycam.html">CodyCam</a></li>
-			<li><a href="applications/debugger.html">Debugger</a></li>
-			<li><a href="applications/deskcalc.html">Hesap Makinesi</a></li>
-			<li><a href="applications/diskprobe.html">DiskProbe</a></li>
-			<li><a href="applications/diskusage.html">Disk Kullanımı</a></li>
-			<li><a href="applications/drivesetup.html">Disk İzlencesi</a></li>
-			<li><a href="applications/expander.html">Paketaçar</a></li>
-			<li><a href="applications/haikudepot.html">Haiku Depo</a></li>
-			<li><a href="applications/icon-o-matic.html">Icon-O-Matic</a></li>
-			<li><a href="applications/installer.html">Yükleyici</a></li>
-			<li><a href="applications/magnify.html">Ekranı Büyüt</a></li>
-			<li><a href="applications/mail.html">Posta</a></li>
-			<li><a href="applications/mediaplayer.html">Ortam Oynatıcısı</a></li>
-			<li><a href="applications/midiplayer.html">MIDI Oynatıcı</a></li>
-			<li><a href="applications/packageinstaller.html">LegacyPackageInstaller</a></li>
-			<li><a href="applications/people.html">Kişiler</a></li>
-			<li><a href="applications/poorman.html">PoorMan</a></li>
-			<li><a href="applications/screenshot.html">Ekran Görüntüsü</a></li>
-			<li><a href="applications/showimage.html">Resim Görüntüleyici</a></li>
-			<li><a href="applications/softwareupdater.html">Yazılım Güncelleyici</a></li>
-			<li><a href="applications/soundrecorder.html">Ses Kaydedici</a></li>
-			<li><a href="applications/stylededit.html">StyledEdit</a></li>
-			<li><a href="applications/terminal.html">Uçbirim</a></li>
-			<li><a href="applications/textsearch.html">Metin Arama</a></li>
-			<li><a href="applications/tv.html">TV</a></li>
-			<li><a href="applications/webpositive.html">WebPositive</a></li>
-		</ul>
-		<li><a href="applications.html#cli-apps">Haiku komut satırı uygulamaları</a></li>
-		<li><a href="applications.html#list-of-bundled-apps">Pakette gelen uygulamalar</a></li>
-		</ul></td>
-		<td>Uygulama yüklemeyi/kaldırmayı öğrenin ve Haiku ile birlikte gelen uygulamaların nasıl çalıştığına bakın.</td></tr>
+
+	<tr><td valign="top"><a href="keyboard-shortcuts.html">Kısayollar ve düğme kombinasyonları</a><ul>
+		<li><a href="keyboard-shortcuts.html#general">Genel kısayollar</a></li>
+		<li><a href="keyboard-shortcuts.html#textediting">Metin düzenleme kısayolları</a></li>
+		<li><a href="keyboard-shortcuts.html#tracker-navigation">İzleyici'de dolaşım için kısayollar</a></li>
+		<li><a href="keyboard-shortcuts.html#terminal">Uçbirim kısayolları</a></li>
+		<li><a href="keyboard-shortcuts.html#other-combos">Diğer düğme kombinasyonları</a></li></ul></td>
+		<td valign="top">Çalışma akışınızı hızlandırmak için çok kullanılan kısayollar.</td></tr>
+
 	<tr><td valign="top"><a href="desktop-applets.html">Masaüstü Gereçleri</a>
 		<ul>
 			<li><a href="desktop-applets/networkstatus.html">Ağ Durumu</a></li>
@@ -195,38 +186,88 @@
 			<li><a href="desktop-applets/processcontroller.html">İşlem Denetimcisi</a></li>
 		</ul></td>
 		<td>Masaüstü'ne veya Masaüstü Çubuğu'na yükleyebileceğiniz yalın gereçler.</td></tr>
-	<tr><td valign="top"><a href="preferences.html">Tercihler</a>
-		<ul>
-			<li><a href="preferences/network.html">Ağ</a></li>
-			<li><a href="preferences/backgrounds.html">Arkaplan</a></li>
-			<li><a href="preferences/repositories.html">Depolar</a></li>
-			<li><a href="preferences/filetypes.html">Dosya Türleri</a></li>
-			<li><a href="preferences/e-mail.html">E-posta</a></li>
-			<li><a href="preferences/screen.html">Ekran</a></li>
-			<li><a href="preferences/screensaver.html">Ekran Koruyucu</a></li>
-			<li><a href="preferences/mouse.html">Girdi Aygıtları</a></li>
-			<li><a href="preferences/appearance.html">Görünüm</a></li>
-			<li><a href="preferences/touchpad.html">İzleme Dörtgeni</a></li>
-			<li><a href="preferences/tracker.html">İzleyici</a></li>
-			<li><a href="preferences/shortcuts.html">Kısayollar</a></li>
-			<li><a href="preferences/keyboard.html">Klavye</a></li>
-			<li><a href="preferences/keymap.html">Klavye Dizilimi</a></li>
-			<li><a href="preferences/deskbar.html">Masaüstü Çubuğu</a></li>
-			<li><a href="preferences/media.html">Ortam</a></li>
-			<li><a href="preferences/virtualmemory.html">Sanal Bellek</a></li>
-			<li><a href="preferences/sounds.html">Ses</a></li>
-			<li><a href="preferences/time.html">Tarih ve Saat</a></li>
-			<li><a href="preferences/datatranslations.html">Veri Çevirileri</a></li>
-			<li><a href="preferences/printers.html">Yazıcılar</a></li>
-			<li><a href="preferences/locale.html">Yerelleştirme</a></li>
-		</ul></td>
+
+	<tr><td valign="top"><a href="preferences.html">Tercihler</a></td>
 		<td>Sisteminizi yapılandırın ve ayarlarını belirleyin.</td></tr>
+	<tr><td colspan="2"><table align="center"><tr><td>
+			<a href="preferences/appearance.html">Görünüm</a><br />
+			<a href="preferences/backgrounds.html">Arka Planlar</a><br />
+			<a href="preferences/datatranslations.html">Veri Çevirileri</a><br />
+			<a href="preferences/deskbar.html">Masaüstü Çubuğu</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/e-mail.html">E-posta</a><br />
+			<a href="preferences/filetypes.html">Dosya Türleri</a><br />
+			<a href="preferences/input.html">Girdi Aygıtları</a><br />
+			<a href="preferences/keymap.html">Klavye Dizilimleri</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/locale.html">Yerelleştirme</a><br />
+			<a href="preferences/media.html">Ortam</a><br />
+			<a href="preferences/network.html">Ağ</a><br />
+			<a href="preferences/printers.html">Yazıcılar</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/repositories.html">Depolar</a><br />
+			<a href="preferences/screen.html">Ekran</a><br />
+			<a href="preferences/screensaver.html">Ekran Koruyucu</a><br />
+			<a href="preferences/shortcuts.html">Kısayollar</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/sounds.html">Ses</a><br />
+			<a href="preferences/time.html">Tarih ve Saat</a><br />
+			<a href="preferences/tracker.html">İzleyici</a><br />
+			<a href="preferences/virtualmemory.html">Sanal Bellek</a></td></tr>
+		</table></td></tr>
 <!--
 	<tr><td valign="top"><a href="demos.html">Demos</a></td>
 		<td>Games and demo applications.</td></tr>
 -->
+	<tr><td valign="top"><a href="queries.html">Sorgular</a><ul>
+		<li><a href="queries.html#find-window">Bul penceresi</a></li>
+		<li><a href="queries.html#basic-query">Yalın sorgular - "ad ile"</a></li>
+		<li><a href="queries.html#adv-query">Gelişmiş sorgular - "öznitelik ile"</a></li>
+		<li><a href="queries.html#more-adv-query">Daha gelişmiş sorgular - "formül ile"</a></li>
+		<li><a href="queries.html#result-window">Sonuç penceresi</a></li>
+		<li><a href="queries.html#query-template">Sorgu Şablonları</a></li>
+</ul></td>
+		<td valign="top">Aradığınızı bulmak için Haiku'nun yıldırım hızlı sorgularını kullanın.</td></tr>
+
+	<tr><td valign="top"><a href="filetypes.html">Dosya Türleri</a><ul>
+		<li><a href="filetypes.html#filetype">Dosya türü</a></li>
+		<li><a href="filetypes.html#preferred-app">Tercih edilen uygulama</a></li>
+		<li><a href="filetypes.html#icon">Simge</a></li>
+		<li><a href="filetypes.html#settings-apps">Uygulamalar için özel ayarlar</a></li>
+		<li><a href="filetypes.html#filetypes-preferences">Dosya Türleri tercihleri global ayarları</a></li></ul></td>
+		<td valign="top">Öntanımlı uygulamaları ayarlayın, dosya türlerini değiştirin ve kendi dosya türlerinizi oluşturun.</td></tr>
+
+	<tr><td valign="top"><a href="attributes.html">Öznitelikler</a><ul>
+		<li><a href="attributes.html#attributes-tracker">İzleyici öznitelikleri</a></li>
+		<li><a href="attributes.html#attributes-terminal">Uçbirim öznitelikleri</a></li></ul></td>
+		<td valign="top">Haiku'nun ana özelliklerinden biri olan öznitelikler, herhangi bir dosyaya her türlü veriyi eklemenize ve yönetmenize olanak verir.</td></tr>
+
+	<tr><td valign="top"><a href="index.html">İndeks</a></td>
+		<td>Özniteliklerde arama yapabilmek için indekslemeyi kullanın.</td></tr>
+
+	<tr><td valign="top"><a href="filesystem-layout.html">Dosya sistemi yerleşimi</a><ul>
+		<li><a href="filesystem-layout.html#system">Sistem klasörü</a></li>
+		<li><a href="filesystem-layout.html#home">Ev klasörü</a></li></ul></td>
+		<td valign="top">Dosya sistemi hiyerarşisini anlamak ve önemli dosya konumları ve klasörleri üzerine bilgi almak için buraya bakın.</td></tr>
+
+	<tr><td valign="top"><a href="workshop-filetypes+attributes.html">Çalıştay: Dosya Türleri, Öznitelikler, İndeks ve Sorgular</a></td>
+		<td valign="top">DVD'lerinizi organize ederek Haiku'nun temel özelliklerini öğrenin.</td></tr>
+
+	<tr><td valign="top"><a href="workshop-email.html">Çalıştay: E-posta yönetimi</a></td>
+		<td valign="top">Haiku'nun e-posta sistemini kullanmayı öğrenin.</td></tr>
+
+	<tr><td valign="top"><a href="workshop-wlan.html">Çalıştay: Kablosuz ağ</a></td>
+		<td valign="top">Açık veya şifreli kablosuz ağlar oluşturun.</td></tr>
+
 	<tr><td valign="top"><a href="bash-scripting.html">Bash ve Betik yazımı</a></td>
 		<td>Sisteminizin kullandığı bazı ilginç betiklere bir göz atın ve kabuk ortamında çalışma ve betik yazımı ile ilgili çevrimiçin kaynaklara bakın.</td></tr>
+
+	<tr><td valign="top"><a href="bootloader.html">Açılış Yöneticisi</a></td>
+		<td valign="top">Yapılandırma sorunlarını çözmek için güvenli önyükleme seçenekleri ayarlayın.</td></tr>
 </table>
 
 </div>

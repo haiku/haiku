@@ -3,7 +3,7 @@
  *
  *      This module is part of ntfs-3g library
  *
- * Copyright (c) 2014-2015 Jean-Pierre Andre
+ * Copyright (c) 2014-2019 Jean-Pierre Andre
  * Copyright (c) 2014      Red Hat, Inc.
  *
  * This program/include file is free software; you can redistribute it and/or
@@ -141,7 +141,8 @@ static int fstrim_limits(ntfs_volume *vol,
 			u64 *discard_max_bytes)
 {
 	struct stat statbuf;
-	char path1[80], path2[80];
+	char path1[40]; /* holds "/sys/dev/block/%d:%d" */
+	char path2[40 + sizeof(path1)]; /* less than 40 bytes more than path1 */
 	int ret;
 
 	/* Stat the backing device.  Caller has ensured it is a block device. */
@@ -225,6 +226,24 @@ not_found:
 	return 0;
 }
 
+static inline LCN align_up(ntfs_volume *vol, LCN lcn, u64 granularity)
+{
+	u64 aligned;
+
+	aligned = (lcn << vol->cluster_size_bits) + granularity - 1;
+	aligned -= aligned % granularity;
+	return (aligned >> vol->cluster_size_bits);
+}
+
+static inline u64 align_down(ntfs_volume *vol, u64 count, u64 granularity)
+{
+	u64 aligned;
+
+	aligned = count << vol->cluster_size_bits;
+	aligned -= aligned % granularity;
+	return (aligned >> vol->cluster_size_bits);
+}
+
 #define FSTRIM_BUFSIZ 4096
 
 /* Trim the filesystem.
@@ -255,11 +274,11 @@ static int fstrim(ntfs_volume *vol, void *data, u64 *trimmed)
 	 * XXX We could fix these limitations in future.
 	 */
 	if (start != 0 || len != (uint64_t)-1) {
-		ntfs_log_debug("fstrim: setting start or length is not supported\n");
+		ntfs_log_error("fstrim: setting start or length is not supported\n");
 		return -EINVAL;
 	}
 	if (minlen > vol->cluster_size) {
-		ntfs_log_debug("fstrim: minlen > cluster size is not supported\n");
+		ntfs_log_error("fstrim: minlen > cluster size is not supported\n");
 		return -EINVAL;
 	}
 
@@ -269,7 +288,7 @@ static int fstrim(ntfs_volume *vol, void *data, u64 *trimmed)
 	 * different.
 	 */
 	if (!NDevBlock(vol->dev)) {
-		ntfs_log_debug("fstrim: not supported for non-block-device\n");
+		ntfs_log_error("fstrim: not supported for non-block-device\n");
 		return -EOPNOTSUPP;
 	}
 
@@ -278,15 +297,12 @@ static int fstrim(ntfs_volume *vol, void *data, u64 *trimmed)
 	if (ret)
 		return ret;
 	if (discard_alignment != 0) {
-		ntfs_log_debug("fstrim: backing device is not aligned for discards\n");
+		ntfs_log_error("fstrim: backing device is not aligned for discards\n");
 		return -EOPNOTSUPP;
 	}
-	if (discard_granularity > vol->cluster_size) {
-		ntfs_log_debug("fstrim: discard granularity of backing device is larger than cluster size\n");
-		return -EOPNOTSUPP;
-	}
+
 	if (discard_max_bytes == 0) {
-		ntfs_log_debug("fstrim: backing device does not support discard (discard_max_bytes == 0)\n");
+		ntfs_log_error("fstrim: backing device does not support discard (discard_max_bytes == 0)\n");
 		return -EOPNOTSUPP;
 	}
 
@@ -323,11 +339,14 @@ static int fstrim(ntfs_volume *vol, void *data, u64 *trimmed)
 		}
 
 		/* Trim the clusters in large as possible blocks, but
-		 * not larger than discard_max_bytes.
+		 * not larger than discard_max_bytes, and compatible
+		 * with the supported trim granularity.
 		 */
 		for (start_lcn = start_buf; start_lcn < end_buf; ++start_lcn) {
 			if (!ntfs_bit_get(buf, start_lcn-start_buf)) {
 				LCN end_lcn;
+				LCN aligned_lcn;
+				u64 aligned_count;
 
 				/* Cluster 'start_lcn' is not in use,
 				 * find end of this run.
@@ -338,14 +357,25 @@ static int fstrim(ntfs_volume *vol, void *data, u64 *trimmed)
 					  < discard_max_bytes &&
 					!ntfs_bit_get(buf, end_lcn-start_buf))
 					end_lcn++;
+				aligned_lcn = align_up(vol, start_lcn,
+						discard_granularity);
+				if (aligned_lcn >= end_lcn)
+					aligned_count = 0;
+				else {
+					aligned_count = 
+						align_down(vol,
+							end_lcn - aligned_lcn,
+							discard_granularity);
+				}
+				if (aligned_count) {
+					ret = fstrim_clusters(vol,
+						aligned_lcn, aligned_count);
+					if (ret)
+						goto free_out;
 
-				ret = fstrim_clusters(vol,
-						start_lcn, end_lcn-start_lcn);
-				if (ret)
-					goto free_out;
-
-				*trimmed += (end_lcn - start_lcn)
+					*trimmed += aligned_count
 						<< vol->cluster_size_bits;
+				}
 				start_lcn = end_lcn-1;
 			}
 		}
@@ -359,7 +389,8 @@ free_out:
 
 #endif /* FITRIM && BLKDISCARD */
 
-int ntfs_ioctl(ntfs_inode *ni, int cmd, void *arg __attribute__((unused)),
+int ntfs_ioctl(ntfs_inode *ni, unsigned long cmd,
+			void *arg __attribute__((unused)),
 			unsigned int flags __attribute__((unused)), void *data)
 {
 	int ret = 0;

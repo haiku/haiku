@@ -287,7 +287,8 @@ main(int argc, char **argv)
 		char *buf = inputStr.LockBuffer(sz);
 		off_t rsz = inFile.Read(buf, sz);
 		if (rsz < sz) {
-			fprintf(stderr, "couldn't read %Ld bytes from %s (got only %Ld)\n",
+			fprintf(stderr, "couldn't read %" B_PRIdOFF " bytes from %s "
+				"(got only %" B_PRIdOFF ")\n",
 				sz, inputFile, rsz);
 			exit(-1);
 		}

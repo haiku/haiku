@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src apps expander ;
 
 UsePrivateHeaders shared ;
+ObjectSysHdrs DirectoryFilePanel.cpp :
+	[ FDirName $(HAIKU_TOP) headers compatibility bsd ] ;
 
 Application Expander :
 	ExpanderApp.cpp

@@ -131,12 +131,18 @@ init_device(device_node* node, void** device_cookie)
 	pci->get_pci_info(device, pciInfo);
 
 	bus->info.base_addr = pciInfo->u.h0.base_registers[0];
+	bus->info.map_size = pciInfo->u.h0.base_register_sizes[0];
 	if ((pciInfo->u.h0.base_register_flags[0] & PCI_address_type)
 			== PCI_address_type_64) {
 		bus->info.base_addr |= (uint64)pciInfo->u.h0.base_registers[1] << 32;
+		bus->info.map_size |= (uint64)pciInfo->u.h0.base_register_sizes[1] << 32;
 	}
 
-	bus->info.map_size = pciInfo->u.h0.base_register_sizes[0];
+	if (bus->info.base_addr == 0) {
+		ERROR("PCI BAR not assigned\n");
+		free(bus);
+		return B_ERROR;
+	}
 
 	// enable power
 	pci->set_powerstate(device, PCI_pm_state_d0);
@@ -361,6 +367,20 @@ supports_device(device_node* parent)
 			case 0xa369:
 			case 0xa36a:
 			case 0xa36b:
+
+			case 0xa3e0:
+			case 0xa3e1:
+			case 0xa3e2:
+			case 0xa3e3:
+
+			case 0x43ad:
+			case 0x43ae:
+			case 0x43d8:
+
+			case 0x43e8:
+			case 0x43e9:
+			case 0x43ea:
+			case 0x43eb:
 				break;
 			default:
 				return 0.0f;
@@ -369,11 +389,13 @@ supports_device(device_node* parent)
 		pci_device* device;
 		gDeviceManager->get_driver(parent, (driver_module_info**)&pci,
 			(void**)&device);
+#ifdef TRACE_PCH_I2C
 		uint8 pciSubDeviceId = pci->read_pci_config(device, PCI_revision,
 			1);
 
-		TRACE("PCH I2C device found! vendor 0x%04x, device 0x%04x\n", vendorID,
-			deviceID);
+		TRACE("PCH I2C device found! vendor 0x%04x, device 0x%04x, subdevice 0x%02x\n", vendorID,
+			deviceID, pciSubDeviceId);
+#endif
 		return 0.8f;
 	}
 

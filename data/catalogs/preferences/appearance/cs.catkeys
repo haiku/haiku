@@ -1,0 +1,79 @@
+1	czech	x-vnd.Haiku-Appearance	663472720
+Control border	Colors tab		Okraj ovládacího prvku
+Control mark	Colors tab		Označení ovládacího prvku
+Off	AntialiasingSettingsView		Vypnuto
+Window border	Colors tab		Okraj okna
+Inactive window tab	Colors tab		Záložka neaktivního okna
+Defaults	APRWindow		Výchozí
+Shadow	Colors tab		Stín
+Document background	Colors tab		Pozadí dokumentu
+List background	Colors tab		Pozadí seznamu
+No effect on running applications	DecorSettingsView		Neovlivní běžící aplikace
+Fixed font:	Font view		Neproporcionální písmo:
+Appearance	System name		Vzhled
+Reduce colored edges filter strength:	AntialiasingSettingsView		Síla filtru pro redukci barevných hran:
+Glyph hinting:	AntialiasingSettingsView		Vyhlazování znaků:
+Default Haiku ControlLook	DecorSettingsView		Výchozí vzhled Haiku
+Menu item text	Colors tab		Text položky nabídky
+About decorator	DecorSettingsView		O dekorátoru
+Antialiasing menu	AntialiasingSettingsView		Nabídka antialiasingu
+Success	Colors tab		Úspěch
+About	DecorSettingsView		O nástroji
+Shine	Colors tab		Lesk
+Arrow style	DecorSettingsView		Styl šipky
+On	AntialiasingSettingsView		Zapnuto
+Decorator:	DecorSettingsView		Dekorátor:
+Menu background	Colors tab		Pozadí nabídky
+Revert	APRWindow		Vrátit
+List item text	Colors tab		Text položky seznamu
+OK	DecorSettingsView		OK
+Control text	Colors tab		Text ovládacího prvků
+Look and feel	APRWindow		Vzhled
+Selected menu item background	Colors tab		Pozadí vybrané položky nabídky
+Link active	Colors tab		Aktivní odkaz
+Antialiasing	APRWindow		Antialiasing
+Menu font:	Font view		Písmo nabídky:
+Bold font:	Font view		Tučné písmo:
+%decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutoři:\n\t%decorAuthors\n\nURL: %decorURL\nLicence: %decorLic\n\n%decorDesc\n
+Choose Decorator	DecorSettingsView		Zvolit dekorátor
+Strong	AntialiasingSettingsView		Silný
+Failure	Colors tab		Chyba
+Double:	DecorSettingsView		Dvojité:
+Selected menu item text	Colors tab		Text vybrané položky nabídky
+Size:	Font Selection view		Velikost:
+Panel background	Colors tab		Pozadí panelu
+Plain font:	Font view		Obyčejné písmo:
+Window tab text	Colors tab		Text záložky okna
+Navigation pulse	Colors tab		Navigační puls
+LCD subpixel	AntialiasingSettingsView		LCD subpixelové
+Window tab	Colors tab		Záložka okna
+Link text	Colors tab		Text odkazu
+Tooltip background	Colors tab		Pozadí nápovědy
+ControlLook:	DecorSettingsView		Vzhled ovládacích prvků:
+Scroll bar thumb	Colors tab		Posuvník
+Default	DecorSettingsView		Výchozí
+Link visited	Colors tab		Navštívený odkaz
+Selected menu item border	Colors tab		Okraj vybrané položky nabídky
+Tooltip text	Colors tab		Text nápovědy
+Control background	Colors tab		Pozadí ovládacího prvku
+Selected list item text	Colors tab		Text vybrané položky seznamu
+Selected list item background	Colors tab		Pozadí vybrané položky seznamu
+Inactive window tab text	Colors tab		Text záložky neaktivního okna
+Navigation base	Colors tab		Výchozí bod navigace
+Fonts	APRWindow		Písma
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Příliš žluťoučký kůň úpěl ďábelské ódy.
+Grayscale	AntialiasingSettingsView		Stupně šedi
+Antialiasing type:	AntialiasingSettingsView		Typ antialiasingu:
+Panel text	Colors tab		Text panelu
+Hinting menu	AntialiasingSettingsView		Nabídka vyhlazování
+Scroll bar:	DecorSettingsView		Posuvník:
+Choose ControlLook	DecorSettingsView		Zvolit vzhled ovládacích prvků
+Monospaced fonts only	AntialiasingSettingsView		Jen neproporcionální písma
+Document text	Colors tab		Text dokumentu
+Inactive window border	Colors tab		Okraj neaktivního okna
+Colors	APRWindow		Barvy
+About control look	DecorSettingsView		O vzhledu ovládacích prvků
+Control highlight	Colors tab		Zvýraznění ovládacího prvku
+Status bar	Colors tab		Stavový řádek
+Link hover	Colors tab		Umístění ukazatele nad odkaz
+Single:	DecorSettingsView		Jednoduchý:

@@ -16,6 +16,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef USES_LIBRAW
+#include <libraw/libraw.h>
+#endif
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ConfigView"
 
@@ -39,13 +43,23 @@ ConfigView::ConfigView(uint32 flags)
 	BStringView *fVersion = new BStringView("version", version);
 
 	BStringView *fCopyright = new BStringView("copyright",
-		B_UTF8_COPYRIGHT "2007-2009 Haiku Inc.");
+		B_UTF8_COPYRIGHT "2007-2021 Haiku Inc.");
 
+#ifdef USES_LIBRAW
+	BString librawInfo = B_TRANSLATE(
+		"Based on libraw %version%");
+	librawInfo.ReplaceAll("%version%", LibRaw::version());
+	BStringView *fCopyright2 = new BStringView("Copyright2",
+		librawInfo.String());
+	BStringView *fCopyright3 = new BStringView("Copyright3",
+		B_TRANSLATE(B_UTF8_COPYRIGHT "Copyright (C) 2008-2021 LibRaw LLC"));
+#else
 	BStringView *fCopyright2 = new BStringView("copyright2",
 		B_TRANSLATE("Based on Dave Coffin's dcraw 8.63"));
 
 	BStringView *fCopyright3 = new BStringView("copyright3",
 		B_UTF8_COPYRIGHT "1997-2007 Dave Coffin");
+#endif
 
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)

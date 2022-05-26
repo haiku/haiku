@@ -1,0 +1,34 @@
+1	spanish; castilian	application/x-vnd.Cortex.MediaRoutingView	3442339205
+Lock group	MediaNodePanel		Bloquear grupo
+%refname% (no file)	MediaNodePanel		%refname% (sin archivo)
+Video output	MediaRoutingView		Salida de video
+Icon view	MediaRoutingView		Vista de ícono
+OK	MediaRoutingView		Aceptar
+Cycle	MediaNodePanel		Ciclo
+Advanced	MediaNodePanel		Más opciones
+Audio input	MediaRoutingView		Entrada de audio
+Run mode	MediaNodePanel		Modo de ejecución
+Could not load '%filename%'	MediaRoutingView		No se pudo cargar '%filename%'
+Stop time source	MediaNodePanel		Parar fuente de tiempo
+Be Audio Mixer	MediaRoutingView		Mezclador de Audio Be
+Video input	MediaRoutingView		Entrada de video
+Release	MediaNodePanel		Liberar
+Disconnect	MediaRoutingView		Desconectar
+Could not disconnect	MediaRoutingView		No se pudo desconectar
+Could not instantiate '%infoname%'	MediaRoutingView		No se pudo concretar '%infoname%'
+Mini icon view	MediaRoutingView		Vista del icono en pequeño
+Select all	MediaRoutingView		Seleccionar todo
+(same as group)	MediaNodePanel		(igual que el grupo)
+Input	MediaJack		Entrada
+Get info	MediaJack		Obtener información
+Start time source	MediaNodePanel		Iniciar fuente de tiempo
+Error	MediaRoutingView		Error
+Could not release '%refname%'	MediaRoutingView		No se pudo liberar '%refname%'
+Output	MediaJack		Salida
+Get info	MediaNodePanel		Obtener información
+Get info	MediaRoutingView		Obtener información
+Clean up	MediaRoutingView		Limpiar
+Start control panel	MediaNodePanel		Iniciar panel de control
+Tweak parameters	MediaNodePanel		Cambiar parámetros
+Could not connect	MediaRoutingView		Conexión fallida
+Unlock group	MediaNodePanel		Desbloquear grupo

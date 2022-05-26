@@ -193,7 +193,8 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 			// TODO: Use 64 bit addresses, if possible!
 #endif
 		buffer->area = create_area_etc(B_SYSTEM_TEAM, "DMA buffer", size,
-			B_CONTIGUOUS, 0, 0, 0, &virtualRestrictions, &physicalRestrictions,
+			B_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, 0,
+			&virtualRestrictions, &physicalRestrictions,
 			(void**)&buffer->address);
 
 		if (buffer->area < 0) {
@@ -207,7 +208,7 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 		// we can live with a fragmented buffer - very nice
 		buffer->area = create_area("DMA buffer",
 			(void **)&buffer->address, B_ANY_KERNEL_ADDRESS, size,
-			B_32_BIT_FULL_LOCK, 0);
+			B_32_BIT_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 				// TODO: Use B_FULL_LOCK, if possible!
 		if (buffer->area < 0) {
 			SHOW_ERROR(2, "Cannot create DMA buffer of %" B_PRIu32 " bytes",
@@ -226,7 +227,7 @@ scsi_alloc_dma_buffer(dma_buffer *buffer, dma_params *dma_params, uint32 size)
 
 	buffer->sg_list_area = create_area("DMA buffer S/G table",
 		(void **)&buffer->sg_list, B_ANY_KERNEL_ADDRESS, sg_list_size,
-		B_32_BIT_FULL_LOCK, 0);
+		B_32_BIT_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 			// TODO: Use B_FULL_LOCK, if possible!
 	if (buffer->sg_list_area < 0) {
 		SHOW_ERROR( 2, "Cannot create DMA buffer S/G list of %" B_PRIuSIZE
@@ -287,7 +288,7 @@ scsi_alloc_dma_buffer_sg_orig(dma_buffer *buffer, size_t size)
 	buffer->sg_orig = create_area("S/G to original data",
 		(void **)&buffer->sg_list_orig,
 		B_ANY_KERNEL_ADDRESS, size,
-		B_NO_LOCK, 0);
+		B_NO_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (buffer->sg_orig < 0) {
 		SHOW_ERROR(2, "Cannot S/G list buffer to original data of %" B_PRIuSIZE
 			" bytes", size);
@@ -364,14 +365,14 @@ scsi_get_dma_buffer(scsi_ccb *request)
 	acquire_sem(device->dma_buffer_owner);
 
 	// make sure, clean-up daemon doesn't bother us
-	ACQUIRE_BEN(&device->dma_buffer_lock);
+	mutex_lock(&device->dma_buffer_lock);
 
 	// there is only one buffer, so no further management
 	buffer = &device->dma_buffer;
 
 	buffer->inuse = true;
 
-	RELEASE_BEN(&device->dma_buffer_lock);
+	mutex_unlock(&device->dma_buffer_lock);
 
 	// memorize buffer for cleanup
 	request->dma_buffer = buffer;
@@ -412,12 +413,12 @@ scsi_get_dma_buffer(scsi_ccb *request)
 err:
 	SHOW_INFO0(3, "error setting up DMA buffer");
 
-	ACQUIRE_BEN(&device->dma_buffer_lock);
+	mutex_lock(&device->dma_buffer_lock);
 
 	// some of this is probably not required, but I'm paranoid
 	buffer->inuse = false;
 
-	RELEASE_BEN(&device->dma_buffer_lock);
+	mutex_unlock(&device->dma_buffer_lock);
 	release_sem(device->dma_buffer_owner);
 
 	return false;
@@ -448,12 +449,12 @@ scsi_release_dma_buffer(scsi_ccb *request)
 	request->sg_count = buffer->orig_sg_count;
 
 	// free buffer
-	ACQUIRE_BEN(&device->dma_buffer_lock);
+	mutex_lock(&device->dma_buffer_lock);
 
 	buffer->last_use = system_time();
 	buffer->inuse = false;
 
-	RELEASE_BEN(&device->dma_buffer_lock);
+	mutex_unlock(&device->dma_buffer_lock);
 
 	release_sem(device->dma_buffer_owner);
 
@@ -469,7 +470,7 @@ scsi_dma_buffer_daemon(void *dev, int counter)
 	scsi_device_info *device = (scsi_device_info*)dev;
 	dma_buffer *buffer;
 
-	ACQUIRE_BEN(&device->dma_buffer_lock);
+	mutex_lock(&device->dma_buffer_lock);
 
 	buffer = &device->dma_buffer;
 
@@ -479,7 +480,7 @@ scsi_dma_buffer_daemon(void *dev, int counter)
 		scsi_free_dma_buffer_sg_orig(buffer);
 	}
 
-	RELEASE_BEN(&device->dma_buffer_lock);
+	mutex_unlock(&device->dma_buffer_lock);
 }
 
 

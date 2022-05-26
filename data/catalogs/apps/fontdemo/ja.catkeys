@@ -1,5 +1,5 @@
 1	japanese	x-vnd.Haiku-FontDemo	3449067186
-Stop cycling	ControlView		循環を中止
+Stop cycling	ControlView		循環の停止
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		回転: %d
 Shear: %d	ControlView		傾斜: %d

@@ -64,7 +64,7 @@ public:
 	virtual	status_t			Wcscoll(const wchar_t* a, const wchar_t* b,
 									int& out);
 	virtual status_t			Wcsxfrm(wchar_t* out, const wchar_t* in,
-									size_t size, size_t& outSize);
+									size_t outSize, size_t& requiredSize);
 
 	virtual status_t			TZSet(const char* timeZoneID, const char* tz);
 	virtual	status_t			Localtime(const time_t* inTime,
@@ -72,6 +72,8 @@ public:
 	virtual status_t			Gmtime(const time_t* inTime, struct tm* tmOut);
 
 	virtual status_t			Mktime(struct tm* inOutTm, time_t& timeOut);
+
+	virtual status_t			Timegm(struct tm* inOutTm, time_t& timeOut);
 
 private:
 			const char*			_QueryLocale(int category);

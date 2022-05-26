@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -42,14 +42,15 @@
 #include "StreamingGameSound.h"
 #include "GSUtility.h"
 
-
 // Sound Buffer Utility functions ----------------------------------------
-template<typename T>
+template<typename T, int32 min, int32 middle, int32 max>
 static inline void
-ApplyMod(T* data, T* buffer, int64 index, float * pan)
+ApplyMod(T* data, int64 index, float* pan)
 {
-	data[index * 2] += T(float(buffer[index * 2]) * pan[0]);
-	data[index * 2 + 1] += T(float(buffer[index * 2 + 1]) * pan[1]);
+	data[index * 2] = clamp<T, min, max>(float(data[index * 2] - middle)
+		* pan[0] + middle);
+	data[index * 2 + 1] = clamp<T, min, max>(float(data[index * 2 + 1] - middle)
+		* pan[1] + middle);
 }
 
 
@@ -256,15 +257,13 @@ GameSoundBuffer::Play(void * data, int64 frames)
 		pan[0] = fPanRight * fGain;
 		pan[1] = fPanLeft * fGain;
 
-		char * buffer = new char[fFrameSize * frames];
-
-		FillBuffer(buffer, frames);
+		FillBuffer(data, frames);
 
 		switch (fFormat.format) {
 			case gs_audio_format::B_GS_U8:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod((uint8*)data, (uint8*)buffer, i, pan);
+					ApplyMod<uint8, 0, 128, UINT8_MAX>((uint8*)data, i, pan);
 					UpdateMods();
 				}
 
@@ -274,7 +273,8 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			case gs_audio_format::B_GS_S16:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod((int16*)data, (int16*)buffer, i, pan);
+					ApplyMod<int16, INT16_MIN, 0, INT16_MAX>((int16*)data, i,
+						pan);
 					UpdateMods();
 				}
 
@@ -284,7 +284,8 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			case gs_audio_format::B_GS_S32:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod((int32*)data, (int32*)buffer, i, pan);
+					ApplyMod<int32, INT32_MIN, 0, INT32_MAX>((int32*)data, i,
+						pan);
 					UpdateMods();
 				}
 
@@ -294,14 +295,13 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			case gs_audio_format::B_GS_F:
 			{
 				for (int64 i = 0; i < frames; i++) {
-					ApplyMod((float*)data, (float*)buffer, i, pan);
+					ApplyMod<float, -1, 0, 1>((float*)data, i, pan);
 					UpdateMods();
 				}
 
 				break;
 			}
 		}
-		delete[] buffer;
 	} else if (fFormat.channel_count == 1) {
 		// FIXME the output should be stereo, and we could pan mono sounds
 		// here. But currently the output has the same number of channels as
@@ -512,15 +512,26 @@ SimpleSoundBuffer::FillBuffer(void * data, int64 frames)
 			size_t remainder = fBufferSize - fPosition;
 			memcpy(buffer, &fBuffer[fPosition], remainder);
 
-			if (fLooping) {
-				// restart the sound from the begging
-				memcpy(&buffer[remainder], fBuffer, bytes - remainder);
-				fPosition = bytes - remainder;
-			} else
-				fPosition = fBufferSize;
-		} else
-			memset(data, 0, bytes);
-			// there is nothing left to play
+			bytes -= remainder;
+			buffer += remainder;
+		}
+
+		if (fLooping) {
+			// restart the sound from the beginning
+			memcpy(buffer, fBuffer, bytes);
+			fPosition = bytes;
+			bytes = 0;
+		} else {
+			fPosition = fBufferSize;
+		}
+
+		if (bytes > 0) {
+			// Fill the rest with silence
+			int middle = 0;
+			if (fFormat.format == gs_audio_format::B_GS_U8)
+				middle = 128;
+			memset(buffer, middle, bytes);
+		}
 	} else {
 		memcpy(buffer, &fBuffer[fPosition], bytes);
 		fPosition += bytes;

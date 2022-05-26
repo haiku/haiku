@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-CharacterMap	2768977330
+1	friulian	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Simbui matematics varis - B
 Latin extended E	UnicodeBlocks		Latin complet E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		Estension C dai ideograms unif
 Ancient Greek musical notation	UnicodeBlocks		Notazion musicâl Grêc Antîc
 Thai	UnicodeBlocks		Thai
 Ethiopic supplement	UnicodeBlocks		Etiop suplementâr
+Only show blocks contained in font	CharacterWindow		Mostre dome i blocs contignûts tal caratar
 Chess symbols	UnicodeBlocks		Simbui dai scacs
 Yijing hexagram symbols	UnicodeBlocks		Simbui a esagrams Yijing
 Ottoman Siyaq numbers	UnicodeBlocks		Numars siyaq otomans
@@ -238,6 +239,7 @@ Supplementary private use area A	UnicodeBlocks		Spazi suplementâr par ûs priv�
 Armenian	UnicodeBlocks		Armen
 Miscellaneous symbols and pictographs	UnicodeBlocks		Simbui e pitograms di varie nature
 Phags-pa	UnicodeBlocks		Phags-pa
+Nabataean	UnicodeBlocks		Nabateu
 Meetei Mayek	UnicodeBlocks		Meetei Mayek
 CJK compatibility ideographs	UnicodeBlocks		Ideograms di compatibilitât CJK
 Show private blocks	CharacterWindow		Mostre blocs privâts
@@ -289,6 +291,7 @@ Elbasan	UnicodeBlocks		Elbasan
 Hangul compatibility Jamo	UnicodeBlocks		Compatibilitât di Hangul Jamo
 Phonetic extensions supplement	UnicodeBlocks		Suplement estensions fonetichis
 CJK unified ideographs extension E	UnicodeBlocks		Estension E dai ideograms unificâts CJK
+Nüshu	UnicodeBlocks		Nüshu
 Old Persian	UnicodeBlocks		Persian antîc
 Malayalam	UnicodeBlocks		Malayalam
 CJK radicals supplement	UnicodeBlocks		Suplement radicâi CJK

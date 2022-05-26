@@ -18,6 +18,7 @@
 #include <ProtocolUtilities.h>
 #include <net_protocol.h>
 #include <net_stack.h>
+#include <condition_variable.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>

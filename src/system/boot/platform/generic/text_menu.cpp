@@ -159,7 +159,9 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 		if (length > width * 2)
 			width += 2 * kOffsetX - 1;
 
-		char buffer[width + 1];
+		char* buffer = (char*)malloc(width + 1);
+		if (buffer == NULL)
+			return;
 		buffer[width] = '\0';
 			// make sure the buffer is always terminated
 
@@ -195,6 +197,8 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 			print_centered(console_height() - kHelpLines + row, buffer);
 			row++;
 		}
+
+		free(buffer);
 	}
 }
 
@@ -412,7 +416,8 @@ run_menu(Menu* menu)
 
 		item = menu->ItemAt(selected);
 
-		if (TEXT_CONSOLE_IS_CURSOR_KEY(key)) {
+		if (TEXT_CONSOLE_IS_CURSOR_KEY(key) || key == 'j' || key == 'J'
+			|| key == 'k' || key == 'K') {
 			if (item == NULL)
 				continue;
 
@@ -420,9 +425,13 @@ run_menu(Menu* menu)
 
 			switch (key) {
 				case TEXT_CONSOLE_KEY_UP:
+				case 'k':
+				case 'K':
 					selected = select_previous_valid_item(menu, selected - 1);
 					break;
 				case TEXT_CONSOLE_KEY_DOWN:
+				case 'j':
+				case 'J':
 					selected = select_next_valid_item(menu, selected + 1);
 					break;
 				case TEXT_CONSOLE_KEY_PAGE_UP:

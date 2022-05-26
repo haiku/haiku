@@ -6,25 +6,25 @@ Sample code copyright 1999, Be Incorporated	PPMTranslator		Sample code copyright
 Something is wrong with the PPMTranslator!	PPMMain		Негаразди з транслятором PPM!
 Grayscale 8 bits	PPMTranslator		8 бітні відтінки сірого
 Based on PPMTranslator sample code	PPMTranslator		Базується на коді Транслятора PPM
-RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 біт big-endian
+RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 біта (big-endian)
 PPM image translator	PPMTranslator		Транслятор зображень PPM
 Bitmap 1 bit	PPMTranslator		Растрове зображення 1 біт
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 біт big-endian
 PPMTranslator Settings	PPMTranslator		Налаштування транслятора PPM
-CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 біт
+CMY 8:8:8 32 bits	PPMTranslator		CMY 8:8:8 32 біта
 OK	PPMMain		ОК
-CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 біт
+CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 біта
 PPM image	PPMTranslator		Зображення PPM
 Input color space:	PPMTranslator		Вхідна палітра кольорів
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 біт big-endian
 RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 біт big-endian
 Write ASCII	PPMTranslator		Записати в ASCII
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 біт
-RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
-RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 біт
+RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 біта (big-endian)
+RGBA 8:8:8:8 32 bits	PPMTranslator		RGBA 8:8:8:8 32 біта
 Version %d.%d.%d, %s	PPMTranslator		Версія %d.%d.%d %s
-CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 біт
-RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 біт
+CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 біта
+RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 біта
 RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 біт
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 біт
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Формат растрових зображень Be (Транслятор PPM)

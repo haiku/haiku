@@ -468,7 +468,7 @@ install_io_interrupt_handler(long vector, interrupt_handler handler, void *data,
 		&& sVectors[vector].assigned_cpu->cpu == -1) {
 
 		int32 cpuID = assign_cpu();
-		arch_int_assign_to_cpu(vector, cpuID);
+		cpuID = arch_int_assign_to_cpu(vector, cpuID);
 		sVectors[vector].assigned_cpu->cpu = cpuID;
 
 		cpu_ent* cpu = &gCPU[cpuID];
@@ -743,10 +743,9 @@ void assign_io_interrupt_to_cpu(long vector, int32 newCPU)
 	list_remove_item(&cpu->irqs, sVectors[vector].assigned_cpu);
 	locker.Unlock();
 
+	newCPU = arch_int_assign_to_cpu(vector, newCPU);
+	sVectors[vector].assigned_cpu->cpu = newCPU;
 	cpu = &gCPU[newCPU];
 	locker.SetTo(cpu->irqs_lock, false);
-	sVectors[vector].assigned_cpu->cpu = newCPU;
-	arch_int_assign_to_cpu(vector, newCPU);
 	list_add_item(&cpu->irqs, sVectors[vector].assigned_cpu);
 }
-

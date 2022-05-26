@@ -73,7 +73,7 @@ void terminate_after(image_id self);
 #define B_APP_IMAGE_SYMBOL		((void*)(addr_t)0)
 	/* value that can be used instead of a pointer to a symbol in the program
 	   image. */
-#define B_CURRENT_IMAGE_SYMBOL	((void*)&__func__)
+#define B_CURRENT_IMAGE_SYMBOL	((void*)__func__)
 	/* pointer to a symbol in the callers image */
 
 

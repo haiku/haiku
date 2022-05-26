@@ -1,0 +1,5 @@
+1	czech	x-vnd.Haiku-cmd-dstconfig	684321431
+Keep this time	dstcheck		Použít tento čas
+Manually adjust time…	dstcheck		Ručně nastavit čas…
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Upozornění!\n\nVzhledem k přechodu z letního času je možné, že jsou hodiny počítače posunuté o hodinu.\nPočítač si myslí, že je teď %current time%.\n\nJe to správný čas?
+Ask me later	dstcheck		Zeptat se později

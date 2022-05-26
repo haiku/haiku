@@ -170,6 +170,12 @@ public:
 			void				SetTrackingHook(menu_tracking_hook hook,
 									void* state);
 
+	// Reorder items
+			void				SortItems(int (*compare)(const BMenuItem*,
+									const BMenuItem*));
+			bool				SwapItems(int32 indexA, int32 indexB);
+			bool				MoveItem(int32 indexFrom, int32 indexTo);
+
 private:
 	friend class BMenuBar;
 	friend class BSeparatorItem;

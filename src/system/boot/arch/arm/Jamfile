@@ -1,13 +1,11 @@
 SubDir HAIKU_TOP src system boot arch arm ;
 
+UsePrivateHeaders [ FDirName kernel arch arm ] ;
+UsePrivateHeaders [ FDirName kernel boot arch arm ] ;
 UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
 
-# These must be recompiled due to differing wchar lengths in EFI
-local librootArchSources =
-	arch_string.S
-;
-
 local librootGenericSources =
+	memcpy.c
 	memset.c
 ;
 
@@ -17,15 +15,11 @@ local kernelLibArchObjects =
 
 local kernelArchSources =
 	arch_elf.cpp
-	arch_uart_8250.cpp
-;
-
-local kernelDebugSources =
-	blue_screen.cpp
-	frame_buffer_console.cpp
+	arch_uart_pl011.cpp
 ;
 
 local kernelGenericDriverSources =
+	debug_uart.cpp
 	debug_uart_8250.cpp
 ;
 
@@ -40,10 +34,6 @@ for platform in [ MultiBootSubDirSetup u-boot efi ] {
 
 			arch_cpu.cpp
 
-			# Reuse a subset of kernel debugging.
-			kernel_stubs.cpp
-			$(kernelDebugSources)
-
 			$(librootGenericSources)
 			$(librootArchSources)
 			:
@@ -52,22 +42,16 @@ for platform in [ MultiBootSubDirSetup u-boot efi ] {
 		;
 
 		SEARCH on [ FGristFiles $(kernelGenericSources) ]
-			= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
+			= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 
 		SEARCH on [ FGristFiles $(kernelArchSources) ]
-			= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
+			= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 
 		SEARCH on [ FGristFiles $(kernelGenericDriverSources) ]
 			= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
 
-		SEARCH on [ FGristFiles $(librootArchSources) ]
-			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch $(TARGET_ARCH) ] ;
-
 		SEARCH on [ FGristFiles $(librootGenericSources) ]
 			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch generic ] ;
-
-		SEARCH on [ FGristFiles $(kernelDebugSources) ]
-			= [ FDirName $(HAIKU_TOP) src system kernel debug ] ;
 	}
 }
 

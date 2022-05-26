@@ -17,8 +17,8 @@
 #include <Input.h>
 #include <InterfaceDefs.h>
 #include <Point.h>
-#include <SupportDefs.h>
 #include <String.h>
+#include <SupportDefs.h>
 
 #include "kb_mouse_settings.h"
 

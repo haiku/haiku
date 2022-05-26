@@ -40,12 +40,9 @@ public:
 			bool			Enabled() const { return fEnabled; }
 
 protected:
-	// default MMIO
-	virtual	void			Out8(int reg, uint8 value)
-								{ *((uint8 *)Base() + reg) = value; }
-	virtual	uint8			In8(int reg)
-								{ return *((uint8 *)Base() + reg); }
-	virtual	void			Barrier() {}
+	virtual	void			Out8(int reg, uint8 value);
+	virtual	uint8			In8(int reg);
+	virtual	void			Barrier();
 
 private:
 			addr_t			fBase;

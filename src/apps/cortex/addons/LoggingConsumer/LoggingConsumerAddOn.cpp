@@ -36,12 +36,17 @@
 #include "LoggingConsumer.h"
 #include "LoggingConsumerAddOn.h"
 #include <Entry.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <cstring>
 #include <cstdlib>
 
 // logfile path
 const char* const		g_pLogPath = "/tmp/node_log";
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexAddOnsLoggingConsumer"
 
 
 // instantiation function
@@ -80,10 +85,10 @@ status_t LoggingConsumerAddOn::GetFlavorAt(
 
 	flavor_info* pInfo = new flavor_info;
 	pInfo->internal_id = n;
-	pInfo->name = (char*)"LoggingConsumer";
-	pInfo->info = (char*)"An add-on version of the LoggingConsumer node.\n"
+	pInfo->name = B_TRANSLATE("LoggingConsumer");
+	pInfo->info = B_TRANSLATE("An add-on version of the LoggingConsumer node.\n"
 		"See the Be Developer Newsletter III.18: 5 May, 1999\n"
-		"adapted by Eric Moon (4 June, 1999)";
+		"adapted by Eric Moon (4 June, 1999)");
 	pInfo->kinds = B_BUFFER_CONSUMER | B_CONTROLLABLE;
 	pInfo->flavor_flags = 0;
 	pInfo->possible_count = 0;

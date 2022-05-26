@@ -24,7 +24,8 @@ BActivationTransaction::BActivationTransaction()
 	fChangeCount(0),
 	fTransactionDirectoryName(),
 	fPackagesToActivate(),
-	fPackagesToDeactivate()
+	fPackagesToDeactivate(),
+	fFirstBootProcessing(false)
 {
 }
 
@@ -36,10 +37,16 @@ BActivationTransaction::BActivationTransaction(BMessage* archive,
 	fChangeCount(0),
 	fTransactionDirectoryName(),
 	fPackagesToActivate(),
-	fPackagesToDeactivate()
+	fPackagesToDeactivate(),
+	fFirstBootProcessing(false)
 {
 	status_t error;
 	int32 location;
+
+	if (archive->FindBool("first boot processing", &fFirstBootProcessing)
+			!= B_OK)
+		fFirstBootProcessing = false; // Field is optional for compatibility.
+
 	if ((error = archive->FindInt32("location", &location)) == B_OK
 		&& (error = archive->FindInt64("change count", &fChangeCount)) == B_OK
 		&& (error = archive->FindString("transaction",
@@ -91,6 +98,7 @@ BActivationTransaction::SetTo(BPackageInstallationLocation location,
 	fTransactionDirectoryName = directoryName;
 	fPackagesToActivate.MakeEmpty();
 	fPackagesToDeactivate.MakeEmpty();
+	fFirstBootProcessing = false;
 
 	return B_OK;
 }
@@ -183,6 +191,20 @@ BActivationTransaction::AddPackageToDeactivate(const BString& package)
 }
 
 
+bool
+BActivationTransaction::FirstBootProcessing() const
+{
+	return fFirstBootProcessing;
+}
+
+
+void
+BActivationTransaction::SetFirstBootProcessing(bool processingIsOn)
+{
+	fFirstBootProcessing = processingIsOn;
+}
+
+
 status_t
 BActivationTransaction::Archive(BMessage* archive, bool deep) const
 {
@@ -197,7 +219,9 @@ BActivationTransaction::Archive(BMessage* archive, bool deep) const
 		|| (error = archive->AddStrings("activate", fPackagesToActivate))
 			!= B_OK
 		|| (error = archive->AddStrings("deactivate", fPackagesToDeactivate))
-			!= B_OK) {
+			!= B_OK
+		|| (error = archive->AddBool("first boot processing",
+			fFirstBootProcessing)) != B_OK) {
 		return error;
 	}
 

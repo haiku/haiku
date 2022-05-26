@@ -151,7 +151,7 @@ Short description:	Application Type Window		Descripción corta:
 Save request	Application Type Window		Petición de guardado
 Could not remove file type: %s\n	FileTypes Window		No se pudo eliminar el tipo de archivo: %s\n
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Presentar como:
-Done	Type List Window		Listo
+Done	Type List Window		Hecho
 Extra attributes	FileTypes Window		Atributos extras
 Group:	New File Type Window		Grupo:
 Alpha	Application Types Window		Alfa

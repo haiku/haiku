@@ -381,7 +381,7 @@ static status_t map_device(device_info *di)
 		di->pcii.u.h0.base_registers[frame_buffer],
 		32768,
 		B_ANY_KERNEL_ADDRESS,
-		B_READ_AREA,
+		B_KERNEL_READ_AREA,
 		(void **)&(rom_temp)
 	);
 
@@ -602,7 +602,7 @@ static void copy_rom(device_info *di)
 		di->pcii.u.h0.base_registers[frame_buffer],
 		32768,
 		B_ANY_KERNEL_ADDRESS,
-		B_READ_AREA,
+		B_KERNEL_READ_AREA,
 		(void **)&(rom_temp)
 	);
 
@@ -769,7 +769,7 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	/* create this area with NO user-space read or write permissions, to prevent accidental dammage */
 	di->shared_area = create_area(shared_name, (void **)&(di->si), B_ANY_KERNEL_ADDRESS,
 		((sizeof(shared_info) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1)), B_FULL_LOCK,
-		B_CLONEABLE_AREA);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA);
 	if (di->shared_area < 0) {
 		/* return the error */
 		result = di->shared_area;
@@ -952,47 +952,60 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 	switch (msg) {
 		/* the only PUBLIC ioctl */
 		case B_GET_ACCELERANT_SIGNATURE: {
-			char *sig = (char *)buf;
-			strcpy(sig, current_settings.accelerant);
+			if (user_strlcpy((char*)buf, current_settings.accelerant,
+				B_FILE_NAME_LENGTH) < B_OK) {
+				return B_BAD_ADDRESS;
+			}
 			result = B_OK;
 		} break;
 
 		/* PRIVATE ioctl from here on */
 		case GX00_GET_PRIVATE_DATA: {
-			gx00_get_private_data *gpd = (gx00_get_private_data *)buf;
-			if (gpd->magic == GX00_PRIVATE_DATA_MAGIC) {
-				gpd->shared_info_area = di->shared_area;
-				result = B_OK;
+			gx00_get_private_data gpd;
+			if (user_memcpy(&gpd, buf, sizeof(gx00_get_private_data)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (gpd.magic == GX00_PRIVATE_DATA_MAGIC) {
+				gpd.shared_info_area = di->shared_area;
+				result = user_memcpy(buf, &gpd, sizeof(gx00_get_private_data));
 			}
 		} break;
 		case GX00_GET_PCI: {
-			gx00_get_set_pci *gsp = (gx00_get_set_pci *)buf;
-			if (gsp->magic == GX00_PRIVATE_DATA_MAGIC) {
+			gx00_get_set_pci gsp;
+			if (user_memcpy(&gsp, buf, sizeof(gx00_get_set_pci)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (gsp.magic == GX00_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
-				gsp->value = get_pci(gsp->offset, gsp->size);
-				result = B_OK;
+				gsp.value = get_pci(gsp.offset, gsp.size);
+				result = user_memcpy(buf, &gsp, sizeof(gx00_get_set_pci));
 			}
 		} break;
 		case GX00_SET_PCI: {
-			gx00_get_set_pci *gsp = (gx00_get_set_pci *)buf;
-			if (gsp->magic == GX00_PRIVATE_DATA_MAGIC) {
+			gx00_get_set_pci gsp;
+			if (user_memcpy(&gsp, buf, sizeof(gx00_get_set_pci)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (gsp.magic == GX00_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
-				set_pci(gsp->offset, gsp->size, gsp->value);
+				set_pci(gsp.offset, gsp.size, gsp.value);
 				result = B_OK;
 			}
 		} break;
 		case GX00_DEVICE_NAME: { // apsed
-			gx00_device_name *dn = (gx00_device_name *)buf;
-			if (dn->magic == GX00_PRIVATE_DATA_MAGIC) {
-				strcpy(dn->name, di->name);
+			gx00_device_name dn;
+			if (user_memcpy(&dn, buf, sizeof(gx00_device_name)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (dn.magic == GX00_PRIVATE_DATA_MAGIC) {
+				if (user_strlcpy(dn.name, di->name, B_OS_NAME_LENGTH) < B_OK)
+					return B_BAD_ADDRESS;
 				result = B_OK;
 			}
 		} break;
 		case GX00_RUN_INTERRUPTS: {
-			gx00_set_bool_state *ri = (gx00_set_bool_state *)buf;
-			if (ri->magic == GX00_PRIVATE_DATA_MAGIC) {
+			gx00_set_bool_state ri;
+			if (user_memcpy(&ri, buf, sizeof(gx00_set_bool_state)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (ri.magic == GX00_PRIVATE_DATA_MAGIC) {
 				vuint32 *regs = di->regs;
-				if (ri->do_it) {
+				if (ri.do_it) {
 					enable_vbi(regs);
 				} else {
 					disable_vbi(regs);

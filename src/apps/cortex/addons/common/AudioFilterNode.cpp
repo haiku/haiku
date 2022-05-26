@@ -42,6 +42,7 @@
 #include <Buffer.h>
 #include <BufferGroup.h>
 #include <ByteOrder.h>
+#include <Catalog.h>
 #include <ParameterWeb.h>
 #include <String.h>
 #include <TimeSource.h>
@@ -51,6 +52,9 @@
 #include <cstdlib>
 #include <cstring>
 //#include <cmath>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexAddOnsCommon"
 
 // -------------------------------------------------------- //
 // constants 
@@ -127,72 +131,25 @@ status_t AudioFilterNode::_validate_raw_audio_format(
 	string_for_format(ioProposedFormat, formatStr, 255);
 	PRINT(("\tincoming proposed format: %s\n", formatStr));
 	
-	status_t err = B_OK;
-	
-	if(ioProposedFormat.type != B_MEDIA_RAW_AUDIO) {
+	if (ioProposedFormat.type != B_MEDIA_RAW_AUDIO) {
 		// out of the ballpark
 		ioProposedFormat = preferredFormat;
 		return B_MEDIA_BAD_FORMAT;
 	}
 
-	// wildcard format
-	media_raw_audio_format& wild = media_raw_audio_format::wildcard;
-	// proposed format
-	media_raw_audio_format& f = ioProposedFormat.u.raw_audio;
-	// template format
-	const media_raw_audio_format& pref = preferredFormat.u.raw_audio;
-		
-	if(pref.frame_rate != wild.frame_rate) {
-		if(f.frame_rate != pref.frame_rate) {
-			if(f.frame_rate != wild.frame_rate)
-				err = B_MEDIA_BAD_FORMAT;
-			f.frame_rate = pref.frame_rate;
-		}
-	}
-
-	if(pref.channel_count != wild.channel_count) {
-		if(f.channel_count != pref.channel_count) {
-			if(f.channel_count != wild.channel_count)
-				err = B_MEDIA_BAD_FORMAT;
-			f.channel_count = pref.channel_count;
-		}
-	}
-		
-	if(pref.format != wild.format) {
-		if(f.format != pref.format) {
-			if(f.format != wild.format)
-				err = B_MEDIA_BAD_FORMAT;
-			f.format = pref.format;
-		}
-	}
-		
-	if(pref.byte_order != wild.byte_order) {
-		if(f.byte_order != pref.byte_order) {
-			if(f.byte_order != wild.byte_order)
-				err = B_MEDIA_BAD_FORMAT;
-			f.byte_order = pref.byte_order;
-		}
-	}
-		
-	if(pref.buffer_size != wild.buffer_size) {
-		if(f.buffer_size != pref.buffer_size) {
-			if(f.buffer_size != wild.buffer_size)
-				err = B_MEDIA_BAD_FORMAT;
-			f.buffer_size = pref.buffer_size;
-		}
-	}
-	
-	if(err != B_OK) {
+	if (!format_is_compatible(preferredFormat, ioProposedFormat)) {
 		string_for_format(ioProposedFormat, formatStr, 255);
 		PRINT((
 			"\tformat conflict; suggesting:\n\tformat %s\n", formatStr));
+		return B_MEDIA_BAD_FORMAT;
 	}
-	else {
-		string_for_format(ioProposedFormat, formatStr, 255);
-		PRINT(("\toutbound proposed format: %s\n", formatStr));
-	}
+
+	ioProposedFormat.SpecializeTo(&preferredFormat);
+
+	string_for_format(ioProposedFormat, formatStr, 255);
+	PRINT(("\toutbound proposed format: %s\n", formatStr));
 	
-	return err;	
+	return B_OK;
 }
 
 status_t AudioFilterNode::validateProposedInputFormat(
@@ -394,7 +351,7 @@ void AudioFilterNode::NodeRegistered() {
 	err = getRequiredInputFormat(m_input.format);
 	ASSERT(err == B_OK);
 
-	strncpy(m_input.name, "Audio Input", B_MEDIA_NAME_LENGTH);
+	strlcpy(m_input.name, B_TRANSLATE("Audio input"), B_MEDIA_NAME_LENGTH);
 	
 	// init output
 	m_output.source.port = ControlPort();
@@ -406,7 +363,7 @@ void AudioFilterNode::NodeRegistered() {
 	err = getRequiredOutputFormat(m_output.format);
 	ASSERT(err == B_OK);
 
-	strncpy(m_output.name, "Audio Output", B_MEDIA_NAME_LENGTH);
+	strlcpy(m_output.name, B_TRANSLATE("Audio output"), B_MEDIA_NAME_LENGTH);
 
 	// init parameters
 	initParameterWeb();
@@ -467,7 +424,19 @@ status_t AudioFilterNode::AcceptFormat(
 		return err;
 		
 	// if an output connection has been made, try to create an operation
-	if(m_output.destination != media_destination::null) {
+	if (m_output.destination != media_destination::null) {
+		// Further specialize the format, in case of any remaining wildcards.
+		// Special case for buffer size: make sure we use the same frame count.
+		const bool setFrameSize = ioFormat->u.raw_audio.buffer_size
+			== media_raw_audio_format::wildcard.buffer_size;
+		ioFormat->SpecializeTo(&m_output.format);
+		if (setFrameSize) {
+			ioFormat->u.raw_audio.buffer_size =
+				bytes_per_frame(ioFormat->u.raw_audio)
+				* (m_output.format.u.raw_audio.buffer_size
+					/ bytes_per_frame(m_output.format.u.raw_audio));
+		}
+
 		ASSERT(m_opFactory);
 		IAudioOp* op = m_opFactory->createOp(
 			this,
@@ -1324,8 +1293,8 @@ void AudioFilterNode::initParameterWeb() {
 	ASSERT(m_parameterSet);
 	
 	BParameterWeb* web = new BParameterWeb();
-	BString groupName = Name();
-	groupName << " Parameters";
+	BString groupName = B_TRANSLATE("%groupname% parameters");
+	groupName.ReplaceFirst("%groupname%", Name());
 	BParameterGroup* group = web->MakeGroup(groupName.String());
 	m_parameterSet->populateGroup(group);
 	
@@ -1529,6 +1498,9 @@ void AudioFilterNode::processBuffer(
 
 		ASSERT(toProcess > 0);
 
+		if (toProcess > framesRemaining)
+			toProcess = framesRemaining;
+
 		uint32 processed = m_op->process(
 			input, output, sourceOffset, destinationOffset, (uint32)toProcess, targetTime);
 		if(processed < toProcess) {
@@ -1537,10 +1509,7 @@ void AudioFilterNode::processBuffer(
 				"*** AudioFilterNode::processBuffer(): insufficient frames filled\n"));
 		}
 			
-		if(toProcess > framesRemaining)
-			framesRemaining = 0;
-		else
-			framesRemaining -= toProcess;
+		framesRemaining -= toProcess;
 			
 		// advance target time
 		targetTime = nextEventTime; // +++++ might this drift from the real frame offset?

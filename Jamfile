@@ -20,25 +20,31 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 # Include required packages:
 # primary architecture
 AddHaikuImageSystemPackages [ FFilterByBuildFeatures
-	bash bc coreutils curl freetype icu libsolv zlib zstd
+	bash bc freetype libsolv zlib
 
+	!gcc2 @{ coreutils icu66 }@
+	gcc2 @{ coreutils_x86 icu icu66_x86@secondary_x86 }@
 	regular_image @{
-		bzip2 diffutils expat ffmpeg findutils gawk glu grep gutenprint8
-		gzip
+		bzip2 diffutils expat ffmpeg findutils glu gutenprint8 gzip
 		lame less libedit libicns
-		mesa mesa_devel mesa_swpipe@!gcc2 mesa_swrast@gcc2
+		mawk mesa mesa_devel mesa_swpipe@!gcc2 mesa_swrast@gcc2
 		netcat
 		sed sharutils
-		tar tcpdump unzip wget which zip
+		tcpdump unzip wget which zip
+
+		!gcc2 @{ grep tar zstd }@
+		gcc2 @{ grep_x86@secondary_x86 tar_x86@secondary_x86 }@
 	}@
 ] ;
 AddHaikuImageSourcePackages [ FFilterByBuildFeatures
-	bash bc coreutils
+	bash bc
+
+	!gcc2 @{ coreutils }@
+	gcc2 @{ coreutils_x86 }@
 
 	regular_image @{
-		expat ffmpeg findutils gawk grep gutenprint8
-		gzip
-		lame less libicns
+		expat ffmpeg findutils grep gutenprint8 gzip
+		lame less libicns mawk
 		sed sharutils
 		tar wget which
 	}@
@@ -54,10 +60,10 @@ if $(HAIKU_PACKAGING_ARCHS[2]) {
 			in [ MultiArchSubDirSetup $(HAIKU_PACKAGING_ARCHS[2-]) ] {
 		on $(architectureObject) {
 			AddHaikuImageSystemPackages [ FFilterByBuildFeatures
-				curl freetype icu libsolv zlib
+				freetype icu libsolv zlib
 
 				regular_image @{
-					ffmpeg glu jasper jpeg libicns libpng16 libwebp mesa
+					ffmpeg glu jasper jpeg libavif libicns libpng16 libwebp mesa
 				}@
 			] ;
 			if $(TARGET_PACKAGING_ARCH) != x86_gcc2 {

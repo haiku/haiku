@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2013, Haiku. All rights reserved.
+ * Copyright 2010-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../../de/applications/webpositive.html">Deutsch</a></li>
 <li><a href="../../en/applications/webpositive.html">English</a></li>
 <li><a href="../../es/applications/webpositive.html">Español</a></li>
+<li><a href="../../eo/applications/webpositive.html">Esperanto</a></li>
 <li><a href="../../fr/applications/webpositive.html">Français</a></li>
 <li><a href="../../fur/applications/webpositive.html">Furlan</a></li>
 <li><a href="../../it/applications/webpositive.html">Italiano</a></li>
@@ -77,9 +78,9 @@
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>設定 (Settings)</h2>
 <p><span class="menu">ウィンドウ (Window)</span> メニューから、<span class="menu">設定 (Settings)</span> パネルを開き、WebPositive の設定を変更できます。</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
-<p>最初のタブは一般設定です。どのようなファイルや URL が<span class="menu">スタートページ (Start page)</span> として提供されるか、<span class="menu">検索ページ (Search page)</span> には何を使うのか、ファイルはどの<span class="menu">ダウンロードフォルダー (Download folder)</span> に保存されるのか、などです。<br />
-2 つのポップアップメニューが新しいウィンドウやタブを開けた時にどのページをロードするかを決めます。<br />
-次のチェックボックスによって、1 ページしか開いていない時にタブバーを隠すことができます。WebPositive  のインターフェースはフルスクリーンモードのときに自動的に隠れるように、マウスポインターはしばらく動いてない時に隠れるように設定できます。<br />
+<p>最初のタブは一般設定を扱います。どのようなファイルや URL が<span class="menu">スタートページ (Start page)</span> になるか、<span class="menu">検索ページ (Search page)</span> には何を使うのか (<span class="menu">カスタム</span> 検索エンジンを設定した場合、"<i>%s</i>" は検索語変数として使われます)、インターネットから得られたファイルはどの<span class="menu">ダウンロードフォルダー (Download folder)</span> に保存されるのか、です。<br />
+2 つのポップアップメニューが新しいウィンドウやタブを開けた時に - もしあれば - どのページをロードするかを決めます。<br />
+続くチェックボックスで、1 ページしか開いていない時にタブバーの表示を避けることができます。WebPositive のインターフェースはフルスクリーンモードのときに自動的に隠れるように、マウスポインターはしばらく動いてない時に隠れるように設定できます。<br />
 最後に、"ホーム"  ボタンをナビゲーションバーに表示するオプションとブラウズ履歴の保存日数を選べます。</p>
 <p>次のタブでは、標準、serif、non-serif および等幅のフォントと標準サイズを設定できます。</p>
 <p>最後のタブはプロキシサーバーを設定するために使われます。</p>
@@ -93,11 +94,19 @@
 <span class="menu">View</span> メニューの、<span class="menu">拡大 (Zoom in)</span> と<span class="menu">縮小 (Zoom out)</span> を使ってページを拡大縮小できます。さらにテキストサイズだけを変更する<span class="menu">文字サイズだけ変更 (Zoom text only)</span> もあります。</p></li>
 <li><p>フルスクリーンモードに入ったときにインターフェースを隠すように設定してあれば、1 秒後に隠れます。一時的にインターフェースを表示するにはマウスポインターをスクリーン上に移動させてください。</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
-<p>
-
-テキストフィールドに入力している間、ブラウザーは過去に訪れたウェブサイトと入力を比べ、テキストフィールドの下にリストします。リストを縮めるためにさらに入力を続けるか、<span class="key">↑</span> や <span class="key">↓</span> を使ってウェブサイトを選択します。<span class="key">ENTER</span> を押すとページをロードします。また、右のボタンを押すことでページをリロードできます。<br />
-URL ではない入力は Google で検索され、リストにウェブサーチのショートカットが載ります。
-</p></li>
+<p>テキストフィールドに入力している間、ブラウザーは過去に訪れたウェブサイトと入力を比べ、テキストフィールドの下にリストします。候補サイトのリストを縮めるためにさらに入力を続けるか、<span class="key">↑</span> や <span class="key">↓</span> を使ってウェブサイトを選択します。<span class="key">ENTER</span> を押すとページをロードします。また、右端のボタンを押すとページをリロードできます。<br />
+URL として認識されない入力は、WebPositive の設定に登録された検索エンジンで検索され、従って、テキストフィールドはウェブサーチの素早いショートカットを兼ねます。</p>
+<div class="box-info"><p>WebPositive は、異なる検索エンジンへ直接検索語を渡す素早いシュートカットをサポートしています。検索語の次に以下の 1 文字のショートカットを入力してください。</p>
+<ul>
+<li>"g” Google</li>
+<li>“b” Bing</li>
+<li>“w” Wikipedia</li>
+<li>“d” DuckDuckGo</li>
+<li>“a” Baiku</li>
+<li>“y” Yandex</li>
+<li>“e” Ecosia</li>
+<li>“q” Qwant</li>
+</ul></div></li>
 <li><p>右クリックはコンテキストメニューを開き、クリックした内容によってリンクを新しいウィンドウやタブで開いたり、ダウンロードして保存したりできます。</p></li>
 <li><p><span class="menu">編集 | 検索 (Edit | Find)</span>
 は、ページの下にページ内検索バーを表示します。検索された文字はページ内でハイライトされます。

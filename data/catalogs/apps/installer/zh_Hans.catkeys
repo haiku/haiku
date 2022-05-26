@@ -1,9 +1,8 @@
-1	english	x-vnd.Haiku-Installer	1576782594
+1	english	x-vnd.Haiku-Installer	2836044226
 Performing installation.	InstallProgress		执行安装。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择源磁盘。然后点击\"开始\"。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		请在关闭系统安装器前关闭磁盘管理器。
 No optional packages available.	PackagesView		无可用附加软件包。
-Restart system	InstallerWindow		重启系统
 The mount point could not be retrieved.	InstallProgress		挂载点无法恢复。
 <none>	InstallerWindow	No partition available	<无>
 Please choose target	InstallerWindow		请选择目标
@@ -19,10 +18,10 @@ README	InstallerApp		README
 Quit	InstallerWindow		退出
 Write boot sector to '%s'	InstallerWindow		引导扇区写入到 '%s'
 Boot sector not written because of an internal error.	InstallProgress		由于内部错误，引导扇区未写入。
-DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		磁盘管理器可用于配置磁盘分区，当前其无法启动。
 Welcome to the Haiku Installer!\n\n	InstallerApp		欢迎使用 Haiku 系统安装器!\n\n
 ?? of ??	InstallerWindow	Unknown progress	??来源于??
 Quit Boot Manager	InstallerWindow		退出引导管理器
+DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		磁盘管理器可用于配置磁盘分区，当前其无法启动。
 Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		引导管理器运行中...\n\n请关闭引导管理器以继续安装。
 Quit DriveSetup	InstallerWindow		退出磁盘管理器
 Write boot sector	InstallerWindow		写入引导扇区
@@ -51,13 +50,11 @@ Collecting copy information.	InstallProgress		收集复制信息。
 Show optional packages	InstallerWindow		显示附加软件包
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		目标磁盘可能没有足够的空间。尝试选择其他的磁盘或者选择不安装附加项目。
 Installation canceled.	InstallProgress		安装已取消。
-Are you sure you want to abort the installation?	InstallerWindow		您确定要取消安装吗？
 Stop	InstallerWindow		停止
 Cancel	InstallerWindow		取消
 Continue	InstallerWindow	In alert after pressing Stop	继续
 Scanning for disks…	InstallerWindow		扫描磁盘...
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		磁盘管理器运行中...\n\n请关闭磁盘管理器以继续安装。
-Abort	InstallerWindow		取消
 The partition can't be mounted. Please choose a different partition.	InstallProgress		分区无法挂载。请选择其他分区。
 Set up partitions…	InstallerWindow		设置分区...
 Install progress:  	InstallerWindow		安装进度：
@@ -73,4 +70,3 @@ Tools	InstallerWindow		工具
 scanning…	InstallerWindow		扫描...
 Set up boot menu	InstallerWindow		设置引导菜单
 Continue	InstallerApp		继续
-Are you sure you want to abort the installation and restart the system?	InstallerWindow		您是否确定终止安装，重新启动系统？

@@ -41,11 +41,10 @@ if [ IsOptionalHaikuImagePackageAdded BeBook ] {
 
 # BeOSCompatibility
 if [ IsOptionalHaikuImagePackageAdded BeOSCompatibility ] {
-	if $(TARGET_ARCH) != x86 {
+	if $(TARGET_ARCH) != x86
+			|| $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_PACKAGING_ARCH)) != 1 {
 		Echo "No optional package BeOSCompatibility available for"
 			"$(TARGET_ARCH)" ;
-	} else if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) >= 4 {
-		Echo "No optional package BeOSCompatibility available for gcc4" ;
 	} else {
 		Echo "Warning: Adding BeOS compatibility symlinks. This will go away."
 			"Please fix your apps!" ;
@@ -77,7 +76,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ] {
 	local architectureObject ;
 	for architectureObject in [ MultiArchSubDirSetup ] {
 		on $(architectureObject) {
-			AddHaikuImageDisabledPackages curl_devel openssl_devel nghttp2_devel
+			AddHaikuImageDisabledPackages openssl_devel
 				libjpeg_turbo_devel libpng16_devel zlib_devel ;
 		}
 	}
@@ -90,13 +89,15 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 	local architectureObject ;
 	for architectureObject in [ MultiArchSubDirSetup ] {
 		on $(architectureObject) {
-			AddHaikuImageDisabledPackages binutils gcc mpc gmp mpfr ;
-			AddHaikuImageSourcePackages binutils gcc mpc gmp mpfr ;
+			AddHaikuImageDisabledPackages binutils gcc !gcc2 @{ mpc mpfr }@ ;
+			AddHaikuImageSystemPackages gmp@!gcc2 ;
+			AddHaikuImageSourcePackages binutils gcc !gcc2 @{ gmp mpc mpfr }@ ;
 		}
 	}
 
 	# other commonly used tools
-	AddHaikuImageDisabledPackages bison cdrtools flex jam m4 make mkdepend nasm patch ;
+	AddHaikuImageDisabledPackages bison cdrtools flex jam m4 make mawk mkdepend
+		nasm@!gcc2 nasm_x86@secondary_x86 patch ;
 	AddHaikuImageSourcePackages bison cdrtools m4 make patch ;
 }
 

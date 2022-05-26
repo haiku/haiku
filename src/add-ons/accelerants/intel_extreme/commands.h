@@ -65,6 +65,10 @@ struct xy_command : command {
 				mode = COMMAND_MODE_RGB32;
 				opcode |= COMMAND_BLIT_RGBA;
 				break;
+			default:
+				debugger("invalid bits_per_pixel for xy_command");
+				mode = 0;
+				break;
 		}
 
 		dest_bytes_per_row = gInfo->shared_info->bytes_per_row;

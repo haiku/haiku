@@ -1,0 +1,13 @@
+1	dutch; flemish	application/x-vnd.moon-Flanger.media_addon	455620896
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Een add-on versie van FlangerNode.\ndoor Eric Moon (16 juni 1999)
+Delay	CortexAddOnsFlanger		Vertraging
+Depth	CortexAddOnsFlanger		Diepte
+Feedback	CortexAddOnsFlanger		Feedback
+Sweep rate	CortexAddOnsFlanger		Uitslagratio
+Mix ratio	CortexAddOnsFlanger		Mixratio
+FlangerNode parameters	CortexAddOnsFlanger		FlangerNode parameters
+OK	CortexAddOnsCommonMediaNodeControlApp		Okee
+controls	CortexAddOnsCommonMediaNodeControlApp		knoppen
+Mix output	CortexAddOnsFlanger		Mix-uitvoer
+Flanger	CortexAddOnsFlanger		Flanger
+Audio input	CortexAddOnsFlanger		Audioinvoer

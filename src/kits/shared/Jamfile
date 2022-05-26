@@ -5,10 +5,6 @@ AddSubDirSupportedPlatforms libbe_test ;
 UseLibraryHeaders agg ;
 UsePrivateHeaders shared locale ;
 
-if [ Glob $(SUBDIR) : DefaultGeolocationServiceKey.h ] {
-	SubDirC++Flags [ FDefines HAVE_DEFAULT_GEOLOCATION_SERVICE_KEY ] ;
-}
-
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
@@ -28,6 +24,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		# for BKeymap
 		UsePrivateHeaders interface ;
 
+		# FIXME: These symbols should be hidden, but too many applications depend
+		# on them at present for that.
+		NO_HIDDEN_VISIBILITY on <$(architecture)>libshared.a = 1 ;
+
 		StaticLibrary <$(architecture)>libshared.a :
 			AboutMenuItem.cpp
 			ArgumentVector.cpp
@@ -36,9 +36,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			CalendarView.cpp
 			ColorQuantizer.cpp
 			CommandPipe.cpp
+			DateTimeEdit.cpp
 			DragTrackingFilter.cpp
 			DriverSettingsMessageAdapter.cpp
-			Geolocation.cpp
 			HashString.cpp
 			IconButton.cpp
 			IconView.cpp
@@ -59,6 +59,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			RWLocker.cpp
 			RWLockManager.cpp
 			SettingsHandler.cpp
+			SettingsMessage.cpp
 			ShakeTrackingFilter.cpp
 			StringForRate.cpp
 			StringForSize.cpp

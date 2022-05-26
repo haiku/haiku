@@ -865,7 +865,7 @@ pll_set(display_mode* mode, uint8 crtcID)
 			}
 			args.v3.ucTransmitterId
 				= gConnector[connectorIndex]->encoder.objectID;
-			args.v3.ucEncoderMode = display_get_encoder_mode(connectorIndex);
+			args.v3.ucEncoderMode = encoderMode;
 			break;
 		case 5:
 			args.v5.ucCRTC = crtcID;
@@ -881,19 +881,25 @@ pll_set(display_mode* mode, uint8 crtcID)
 				&& (pll->ssType & ATOM_EXTERNAL_SS_MASK) != 0) {
 				args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_REF_DIV_SRC;
 			}
-			switch (bitsPerColor) {
-				case 8:
-				default:
-					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_24BPP;
-					break;
-				case 10:
-					args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_30BPP;
-					break;
+			if (encoderMode == ATOM_ENCODER_MODE_HDMI) {
+				switch (bitsPerColor) {
+					case 8:
+					default:
+						args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_24BPP;
+						break;
+					case 10:
+						// AMD notes the atombios define is incorrect here
+						args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_32BPP;
+						break;
+					case 12:
+						// AMD notes the atombios define is incorrect here
+						args.v5.ucMiscInfo |= PIXEL_CLOCK_V5_MISC_HDMI_30BPP;
+						break;
+				}
 			}
 			args.v5.ucTransmitterID
 				= gConnector[connectorIndex]->encoder.objectID;
-			args.v5.ucEncoderMode
-				= display_get_encoder_mode(connectorIndex);
+			args.v5.ucEncoderMode = encoderMode;
 			args.v5.ucPpll = pll->id;
 			break;
 		case 6:
@@ -909,24 +915,26 @@ pll_set(display_mode* mode, uint8 crtcID)
 				&& (pll->ssType & ATOM_EXTERNAL_SS_MASK) != 0) {
 				args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_REF_DIV_SRC;
 			}
-			switch (bitsPerColor) {
-				case 8:
-				default:
-					args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_24BPP;
-					break;
-				case 10:
-					args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_30BPP;
-					break;
-				case 12:
-					args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_36BPP;
-					break;
-				case 16:
-					args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_48BPP;
-					break;
+			if (encoderMode == ATOM_ENCODER_MODE_HDMI) {
+				switch (bitsPerColor) {
+					case 8:
+					default:
+						args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_24BPP;
+						break;
+					case 10:
+						args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_30BPP_V6;
+						break;
+					case 12:
+						args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_36BPP_V6;
+						break;
+					case 16:
+						args.v6.ucMiscInfo |= PIXEL_CLOCK_V6_MISC_HDMI_48BPP;
+						break;
+				}
 			}
 			args.v6.ucTransmitterID
 				= gConnector[connectorIndex]->encoder.objectID;
-			args.v6.ucEncoderMode = display_get_encoder_mode(connectorIndex);
+			args.v6.ucEncoderMode = encoderMode;
 			args.v6.ucPpll = pll->id;
 			break;
 		case 7:
@@ -961,7 +969,7 @@ pll_set(display_mode* mode, uint8 crtcID)
 			}
 			args.v7.ucTransmitterID
 				= gConnector[connectorIndex]->encoder.objectID;
-			args.v7.ucEncoderMode = display_get_encoder_mode(connectorIndex);
+			args.v7.ucEncoderMode = encoderMode;
 			args.v7.ucPpll = pll->id;
 			break;
 		default:

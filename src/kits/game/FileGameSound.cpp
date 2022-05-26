@@ -32,84 +32,21 @@ struct _gs_media_tracker {
 
 
 // Local utility functions -----------------------------------------------
+template<typename T, int32 min, int32 middle, int32 max>
 bool
-FillBuffer(_gs_ramp* ramp, uint8* data, uint8* buffer, size_t* bytes)
+FillBuffer(_gs_ramp* ramp, T* dest, const T* src, size_t* bytes)
 {
-	int32 samples = *bytes / sizeof(uint8);
+	size_t samples = *bytes / sizeof(T);
 
-	for (int32 byte = 0; byte < samples; byte++) {
+	for (size_t sample = 0; sample < samples; sample++) {
 		float gain = *ramp->value;
-		data[byte] = uint8(float(buffer[byte]) * gain);
+		dest[sample] = clamp<T, min, max>(float(src[sample] - middle) * gain
+			+ middle);
 
 		if (ChangeRamp(ramp)) {
-			*bytes = byte * sizeof(uint8);
+			*bytes = sample * sizeof(T);
 			return true;
 		}
-	}
-
-	return false;
-}
-
-
-bool
-FillBuffer(_gs_ramp* ramp, int16* data, int16* buffer, size_t* bytes)
-{
-	int32 samples = *bytes / sizeof(int16);
-
-	for (int32 byte = 0; byte < samples; byte++) {
-		float gain = *ramp->value;
-		data[byte] = int16(float(buffer[byte]) * gain);
-
-		if (ChangeRamp(ramp)) {
-			*bytes = byte * sizeof(int16);
-			return true;
-		}
-	}
-
-	return false;
-}
-
-
-bool
-FillBuffer(_gs_ramp* ramp, int32* data, int32* buffer, size_t* bytes)
-{
-	size_t byte = 0;
-	bool bytesAreReady = (*bytes > 0);
-
-	while (bytesAreReady) {
-		float gain = *ramp->value;
-		data[byte] = int32(float(buffer[byte]) * gain);
-
-		if (ChangeRamp(ramp)) {
-			*bytes = byte;
-			return true;
-		}
-
-		byte++;
-		bytesAreReady = (byte >= *bytes);
-	}
-
-	return false;
-}
-
-
-bool
-FillBuffer(_gs_ramp* ramp, float* data, float* buffer, size_t* bytes)
-{
-	size_t byte = 0;
-	bool bytesAreReady = (*bytes > 0);
-
-	while (bytesAreReady) {
-		float gain = *ramp->value;
-		data[byte] = buffer[byte] * gain;
-
-		if (ChangeRamp(ramp)) {
-			*bytes = byte;
-			return true;
-		}
-
-		byte++;
-		bytesAreReady = (byte >= *bytes);
 	}
 
 	return false;
@@ -249,83 +186,71 @@ BFileGameSound::FillBuffer(void* inBuffer, size_t inByteCount)
 	// Split or combine decoder buffers into mixer buffers
 	// fPlayPosition is where we got up to in the input buffer after last call
 
+	char* buffer = (char*)inBuffer;
 	size_t out_offset = 0;
 
-	while (inByteCount > 0 && !fPaused) {
-		if (!fPaused || fPausing) {
-			if (fPlayPosition == 0 || fPlayPosition >= fBufferSize) {
-				Load();
-			}
-
-			if (fPausing) {
-				Lock();
-
-				bool rampDone = false;
-				size_t bytes = fBufferSize - fPlayPosition;
-
-				if (bytes > inByteCount) {
-					bytes = inByteCount;
-				}
-
-				// Fill the requested buffer, stopping if the paused flag is set
-				char* buffer = (char*)inBuffer;
-
-				switch(Format().format) {
-					case gs_audio_format::B_GS_U8:
-						rampDone = ::FillBuffer(fPausing,
-							(uint8*)&buffer[out_offset],
-							(uint8*)&fBuffer[fPlayPosition], &bytes);
-						break;
-
-					case gs_audio_format::B_GS_S16:
-						rampDone = ::FillBuffer(fPausing,
-							(int16*)&buffer[out_offset],
-							(int16*)&fBuffer[fPlayPosition], &bytes);
-						break;
-
-					case gs_audio_format::B_GS_S32:
-						rampDone = ::FillBuffer(fPausing,
-							(int32*)&buffer[out_offset],
-							(int32*)&fBuffer[fPlayPosition], &bytes);
-						break;
-
-					case gs_audio_format::B_GS_F:
-						rampDone = ::FillBuffer(fPausing,
-							(float*)&buffer[out_offset],
-							(float*)&fBuffer[fPlayPosition], &bytes);
-						break;
-				}
-
-				inByteCount -= bytes;
-				out_offset += bytes;
-				fPlayPosition += bytes;
-
-				// We finished ramping
-				if (rampDone) {
-
-					// Need to be able to stop asap when pause flag is flipped.
-					while (fPlayPosition < fBufferSize && (inByteCount > 0)) {
-						buffer[out_offset++] = fBuffer[fPlayPosition++];
-						inByteCount--;
-					}
-
-					delete fPausing;
-					fPausing = NULL;
-				}
-
-				Unlock();
-			} else {
-
-				char* buffer = (char*)inBuffer;
-
-				// Need to be able to stop asap when the pause flag is flipped.
-				while (fPlayPosition < fBufferSize && (!fPaused || fPausing)
-					&& (inByteCount > 0)) {
-					buffer[out_offset++] = fBuffer[fPlayPosition++];
-					inByteCount--;
-				}
-			}
+	while (inByteCount > 0 && (!fPaused || fPausing != NULL)) {
+		if (fPlayPosition == 0 || fPlayPosition >= fBufferSize) {
+			if (!Load())
+				break;
 		}
+
+		size_t bytes = fBufferSize - fPlayPosition;
+
+		if (bytes > inByteCount)
+			bytes = inByteCount;
+
+		if (fPausing != NULL) {
+			Lock();
+
+			bool rampDone = false;
+
+			switch(Format().format) {
+				case gs_audio_format::B_GS_U8:
+					rampDone = ::FillBuffer<uint8, 0, 128, UINT8_MAX>(
+						fPausing, (uint8*)&buffer[out_offset],
+						(uint8*)&fBuffer[fPlayPosition], &bytes);
+					break;
+
+				case gs_audio_format::B_GS_S16:
+					rampDone = ::FillBuffer<int16, INT16_MIN, 0, INT16_MAX>(
+						fPausing, (int16*)&buffer[out_offset],
+						(int16*)&fBuffer[fPlayPosition], &bytes);
+					break;
+
+				case gs_audio_format::B_GS_S32:
+					rampDone = ::FillBuffer<int32, INT32_MIN, 0, INT32_MAX>(
+						fPausing, (int32*)&buffer[out_offset],
+						(int32*)&fBuffer[fPlayPosition], &bytes);
+					break;
+
+				case gs_audio_format::B_GS_F:
+					rampDone = ::FillBuffer<float, -1, 0, 1>(
+						fPausing, (float*)&buffer[out_offset],
+						(float*)&fBuffer[fPlayPosition], &bytes);
+					break;
+			}
+
+			if (rampDone) {
+				delete fPausing;
+				fPausing = NULL;
+			}
+
+			Unlock();
+		} else
+			memcpy(&buffer[out_offset], &fBuffer[fPlayPosition], bytes);
+
+		inByteCount -= bytes;
+		out_offset += bytes;
+		fPlayPosition += bytes;
+	}
+
+	// Fill the rest with silence
+	if (inByteCount > 0) {
+		int middle = 0;
+		if (Format().format == gs_audio_format::B_GS_U8)
+			middle = 128;
+		memset(&buffer[out_offset], middle, inByteCount);
 	}
 }
 
@@ -442,8 +367,11 @@ BFileGameSound::Init(BDataIO* data)
 		fBufferSize = dformat.buffer_size;
 
 	// create the buffer
+	int middle = 0;
+	if (gsformat.format == gs_audio_format::B_GS_U8)
+		middle = 128;
 	fBuffer = new char[fBufferSize * 2];
-	memset(fBuffer, 0, fBufferSize * 2);
+	memset(fBuffer, middle, fBufferSize * 2);
 
 	fFrameSize = gsformat.channel_count * get_sample_size(gsformat.format);
 	fAudioStream->frames = fAudioStream->stream->CountFrames();
@@ -478,6 +406,7 @@ BFileGameSound::Load()
 			fAudioStream->stream->SeekToFrame(&frame);
 		} else {
 			StopPlaying();
+			return false;
 		}
 	}
 

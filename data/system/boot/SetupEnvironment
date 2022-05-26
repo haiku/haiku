@@ -50,3 +50,6 @@ if [ "$SAFEMODE" != "yes" ]; then
      	. $HOME/config/settings/boot/UserSetupEnvironment
 	fi
 fi
+
+export USER=`id -un`
+export GROUP=`id -gn`

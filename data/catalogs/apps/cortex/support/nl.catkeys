@@ -1,0 +1,145 @@
+1	dutch; flemish	application/x-vnd.Cortex.support	1625162530
+Header has flags	MediaString		De header heeft opties
+32 bit HLS	MediaString		32-bit HLS
+Recording	MediaString		Aan het opnemen
+(unknown format)	MediaString		(onbekend formaat)
+Clean buffers	MediaString		Buffers opschonen
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural, one{# frame vooruit}other{# frames vooruit}}
+Rear-right	MediaString		Achter-rechts
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# pixel} other{# pixels}}
+Mono	MediaString		Mono
+MPEG1	MediaString		MPEG1
+ASF format family	MediaString		ASF-formaat familie
+Encoded video	MediaString		Gecodeerde video
+YUV444	MediaString		YUV444
+Port	MediaString		Poort
+Top-Front-left	MediaString		Boven-voor-links
+24 bit LAB	MediaString		24-bit LAB
+16 bit integer	MediaString		16-bit integer
+32 bit HSVA	MediaString		32-bit HSVA
+YCbCr411	MediaString		YCbCr411
+Offline	MediaString		Offline
+YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		(onbekende video-oriëntatie)
+QuickTime	MediaString		QuickTime
+32 bit HLSA	MediaString		32-bit HLSA
+Top-Front-center	MediaString		Top-voor-midden
+BeOS format family	MediaString		BeOS-formaatfamilie
+24 bit HSV	MediaString		24-bit HSV
+Back-center	MediaString		Achter-midden
+32 bit CMY	MediaString		32-bit CMY
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bit integer}}
+Ambisonic WXYZ	MediaString		Ambisonisch WXYZ
+(unknown video format)	MediaString		(onbekend videoformaat)
+AVI format family	MediaString		AVI-formaatfamilie
+Homogenous buffers	MediaString		Homogene buffers
+Interlaced 	MediaString		Geïnterlinieerd 
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# kanaal}other{# kanalen}}
+15 bit RGBA	MediaString		15-bit RGBA
+Drop data	MediaString		Data laten vervallen
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
+Right	MediaString		Rechts
+32 bit RGB	MediaString		32-bit RGB
+System mixer	MediaString		Systeemmixer
+Physical output	MediaString		Fysieke uitvoer
+Top-Back-center	MediaString		Boven-achter-midden
+YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		Boven naar beneden, links naar rechts
+(unknown run mode)	MediaString		(onbekende uitvoermodus)
+ kb/s	MediaString		 kb/s
+24 bit HSI	MediaString		24-bit HSI
+User-defined media type	MediaString		Gebruikers-gedefinieerd mediatype
+32 bit CMYA	MediaString		32-bit CMYA
+Rear-left	MediaString		Achter-links
+QuickTime format family	MediaString		QuickTime-formaatfamilie
+Any format family	MediaString		Iedere formaatfamilie
+Timecode	MediaString		Tijdscode
+Top-Front-right	MediaString		Boven-voor-rechts
+32 bit float	MediaString		32-bit float
+Controllable	MediaString		Bestuurbaar
+32 bit integer	MediaString		32-bit integer
+Front-right-center	MediaString		Voor-rechts-midden
+Side-right	MediaString		Zijkant-rechts
+ kHz	MediaString		 kHz
+Little endian	MediaString		Little endian
+(unknown matrix mask)	MediaString		(onbekend matrixmasker)
+32 bit LAB	MediaString		32-bit LAB
+Side-left	MediaString		Zijkant-links
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# byte per buffer} other{# bytes per buffer}}
+32 bit CMYK	MediaString		32-bit CMYK
+(unknown multistream format)	MediaString		(onbekende multistream-formaat)
+8 bit integer	MediaString		8-bit integer
+8 bit grayscale-index	MediaString		8-bit grijswaardenindex
+YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		Bufferproducent
+Buffer consumer	MediaString		Bufferconsument
+Increase latency	MediaString		Vertraging vergroten
+Front-left-center	MediaString		Voor-links-midden
+MPEG format family	MediaString		MPEG-formaatfamilie
+(none)	MediaString		(geen)
+Center	MediaString		Midden
+ kb/s (max)	MediaString		 kb/s (max)
+Monochrome	MediaString		Monochroom
+Private Be media type	MediaString		Intern Be-mediatype
+24 bit UVL	MediaString		24-bit UVL
+32 bit HSV	MediaString		32-bit HSV
+ID	MediaString		ID
+AIFF format family	MediaString		AIFF-formaatfamilie
+Top-Back-left	MediaString		Boven-achter-links
+16 bit RGB	MediaString		16-bit RGB
+YCbCr422	MediaString		YCbCr422
+Raw audio	MediaString		Onbewerkte audio
+32 bit LABA	MediaString		32-bit LABA
+24 bit HLS	MediaString		24-bit HLS
+Non-interlaced 	MediaString		Niet-geïnterlineerd 
+{0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# byte (gem.)}other{# bytes (gem.)}}
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		WAV-formaatfamilie
+ (NTSC)	MediaString		 (NTSC)
+Physical input	MediaString		Fysieke invoer
+Big endian	MediaString		Big endian
+Sub	MediaString		Sub
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# byte (max.)}other{# bytes (max.)}}
+YUV411	MediaString		YUV411
+Multistream media	MediaString		Multistroom-media
+Encoded audio	MediaString		Gecodeerde audio
+Decrease precision	MediaString		Precisie verminderen
+File interface	MediaString		Bestandsinterface
+(unknown byte order)	MediaString		(onbekende bytevolgorde)
+32 bit HSI	MediaString		32-bit HSI
+Typeless media	MediaString		Media zonder type
+ (PAL)	MediaString		 (PAL)
+32 bit RGBA	MediaString		32-bit RGBA
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 kb/s (gem.)
+HTML	MediaString		HTML
+Time source	MediaString		Tijdsbron
+15 bit RGB	MediaString		15-bit RGB
+ProLogic LR	MediaString		ProLogic LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# byte per frame}other{# bytes per frame}}
+Parameters	MediaString		Parameters
+Raw data from VBL area	MediaString		Onbewerkte gegevens uit het VBL-gebied
+Top-Back-right	MediaString		Boven-achter-rechts
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# byte per rij}other{# bytes per rij}}
+Left	MediaString		Links
+BeOS video	MediaString		BeOS-video
+24 bit CMY	MediaString		24-bit CMY
+32 bit UVLA	MediaString		32-bit UVLA
+Top-center	MediaString		Boven-midden
+Entity interface	MediaString		Entiteitsinterface
+Stereo	MediaString		Stereo
+8 bit color-index	MediaString		8-bit kleurenindex
+Bottom to top, left to right	MediaString		Van beneden naar boven, van links naar rechts
+32 bit UVL	MediaString		32-bit UVL
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# lijn} other{# lijnen}}
+Text	MediaString		Tekst
+Unknown media type	MediaString		Onbekend mediatype
+MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		Geavanceerde formaatfamilie
+24 bit RGB	MediaString		24-bit RGB
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# frame terug}other{# frames terug}}
+32 bit HSIA	MediaString		32-bit HSIA
+Raw video	MediaString		Onbewerkte video

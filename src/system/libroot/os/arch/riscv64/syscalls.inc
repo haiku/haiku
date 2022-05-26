@@ -3,12 +3,15 @@
 ** Distributed under the terms of the MIT License.
 */
 
-/* TODO actuall syscalls? */
 #define _SYSCALL(name, n) \
 .globl name; \
 .type name,%function; \
 .align 4; \
-name:
+name: \
+	li t0, n; \
+	ecall; \
+	ret; \
+.size	name, .-name
 
 #define SYSCALL0(name, n) _SYSCALL(name, n)
 #define SYSCALL1(name, n) _SYSCALL(name, n)

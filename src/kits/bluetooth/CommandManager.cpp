@@ -627,9 +627,10 @@ const char* bluetoothErrors[] = {
 };
 
 
-const char* hciVersion[] = { "1.0B" , "1.1 " , "1.2 " , "2.0 " , "2.1 "};
-const char* lmpVersion[] = { "1.0 " , "1.1 " , "1.2 " , "2.0 " , "2.1 "};
-
+const char* hciVersion[] = { "1.0B" , "1.1" , "1.2" , "2.0" , "2.1",
+	"3.0", "4.0", "4.1", "4.2", "5.0", "5.1", "5.2"};
+const char* lmpVersion[] = { "1.0" , "1.1" , "1.2" , "2.0" , "2.1",
+	"3.0", "4.0", "4.1", "4.2", "5.0", "5.1", "5.2"};
 
 #if 0
 #pragma mark -

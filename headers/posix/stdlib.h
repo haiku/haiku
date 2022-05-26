@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012 Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2021 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STDLIB_H_
@@ -49,6 +49,7 @@ extern void		*calloc(size_t numElements, size_t size);
 extern void		free(void *pointer);
 extern void		*malloc(size_t size);
 extern int		posix_memalign(void **_pointer, size_t alignment, size_t size);
+extern void 	*aligned_alloc(size_t alignment, size_t size) _ALIGNED_BY_ARG(1);
 extern void		*realloc(void *oldPointer, size_t newSize);
 
 /* process termination */

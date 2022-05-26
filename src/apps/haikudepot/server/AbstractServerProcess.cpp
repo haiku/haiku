@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include <AutoDeleter.h>
+#include <File.h>
 #include <FileIO.h>
 #include <HttpTime.h>
 #include <UrlProtocolRoster.h>
@@ -24,7 +25,10 @@
 #include "ServerSettings.h"
 #include "StandardMetaDataJsonEventListener.h"
 #include "StorageUtils.h"
-#include "ToFileUrlProtocolListener.h"
+#include "LoggingUrlProtocolListener.h"
+
+
+using namespace BPrivate::Network;
 
 
 #define MAX_REDIRECTS 3
@@ -104,7 +108,7 @@ AbstractServerProcess::IfModifiedSinceHeaderValue(BString& headerValue,
 		if (ENOENT != errno)
 			 return B_ERROR;
 
-		return B_FILE_NOT_FOUND;
+		return B_ENTRY_NOT_FOUND;
 	}
 
 	if (s.st_size == 0)
@@ -133,9 +137,9 @@ AbstractServerProcess::SetIfModifiedSinceHeaderValueFromMetaData(
 	// An example of this output would be; 'Fri, 24 Oct 2014 19:32:27 +0000'
 	BDateTime modifiedDateTime = metaData
 		.GetDataModifiedTimestampAsDateTime();
-	BPrivate::BHttpTime modifiedHttpTime(modifiedDateTime);
+	BHttpTime modifiedHttpTime(modifiedDateTime);
 	headerValue.SetTo(modifiedHttpTime
-		.ToString(BPrivate::B_HTTP_TIME_FORMAT_COOKIE));
+		.ToString(B_HTTP_TIME_FORMAT_COOKIE));
 }
 
 
@@ -189,7 +193,7 @@ AbstractServerProcess::ParseJsonFromFileWithListener(
 	if (file == NULL) {
 		HDERROR("[%s] unable to find the meta data file at [%s]", Name(),
 			path.Path());
-		return B_FILE_NOT_FOUND;
+		return B_ENTRY_NOT_FOUND;
 	}
 
 	BFileIO rawInput(file, true); // takes ownership
@@ -327,8 +331,11 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 	HDINFO("[%s] will stream '%s' to [%s]", Name(), url.UrlString().String(),
 		targetFilePath.Path());
 
-	ToFileUrlProtocolListener listener(targetFilePath, Name(),
-		Logger::IsTraceEnabled());
+	LoggingUrlProtocolListener listener(Name(), Logger::IsTraceEnabled());
+	BFile targetFile(targetFilePath.Path(), O_WRONLY | O_CREAT);
+	status_t err = targetFile.InitCheck();
+	if (err != B_OK)
+		return err;
 
 	BHttpHeaders headers;
 	ServerSettings::AugmentHeaders(headers);
@@ -344,14 +351,21 @@ AbstractServerProcess::DownloadToLocalFile(const BPath& targetFilePath,
 
 	thread_id thread;
 
-	{
-		fRequest = dynamic_cast<BHttpRequest *>(
-			BUrlProtocolRoster::MakeRequest(url, &listener));
-		fRequest->SetHeaders(headers);
-		fRequest->SetMaxRedirections(0);
-		fRequest->SetTimeout(TIMEOUT_MICROSECONDS);
-		thread = fRequest->Run();
+	BUrlRequest* request = BUrlProtocolRoster::MakeRequest(url, &targetFile,
+		&listener);
+	if (request == NULL)
+		return B_NO_MEMORY;
+
+	fRequest = dynamic_cast<BHttpRequest *>(request);
+	if (fRequest == NULL) {
+		delete request;
+		return B_ERROR;
 	}
+	fRequest->SetHeaders(headers);
+	fRequest->SetMaxRedirections(0);
+	fRequest->SetTimeout(TIMEOUT_MICROSECONDS);
+	fRequest->SetStopOnError(true);
+	thread = fRequest->Run();
 
 	wait_for_thread(thread, NULL);
 

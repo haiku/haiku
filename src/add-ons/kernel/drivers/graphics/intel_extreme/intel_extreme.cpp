@@ -84,18 +84,137 @@ release_vblank_sem(intel_info &info)
 }
 
 
+static void
+gen8_enable_interrupts(intel_info& info, pipe_index pipe, bool enable)
+{
+	ASSERT(pipe != INTEL_PIPE_ANY);
+	ASSERT(info.device_type.Generation() >= 12 || pipe != INTEL_PIPE_D);
+
+	const uint32 regMask = PCH_INTERRUPT_PIPE_MASK_BDW(pipe);
+	const uint32 regEnabled = PCH_INTERRUPT_PIPE_ENABLED_BDW(pipe);
+	const uint32 regIdentity = PCH_INTERRUPT_PIPE_IDENTITY_BDW(pipe);
+	const uint32 value = enable ? PCH_INTERRUPT_VBLANK_BDW : 0;
+	write32(info, regIdentity, ~0);
+	write32(info, regEnabled, value);
+	write32(info, regMask, ~value);
+}
+
+
+static uint32
+gen11_enable_global_interrupts(intel_info& info, bool enable)
+{
+	write32(info, GEN11_GFX_MSTR_IRQ, enable ? GEN11_MASTER_IRQ : 0);
+	return enable ? 0 : read32(info, GEN11_GFX_MSTR_IRQ);
+}
+
+
+static uint32
+gen8_enable_global_interrupts(intel_info& info, bool enable)
+{
+	write32(info, PCH_MASTER_INT_CTL_BDW, enable ? PCH_MASTER_INT_CTL_GLOBAL_BDW : 0);
+	return enable ? 0 : read32(info, PCH_MASTER_INT_CTL_BDW);
+}
+
+
+/*!
+	Checks interrupt status with provided master interrupt control register.
+	For Gen8 to Gen11.
+*/
+static int32
+gen8_handle_interrupts(intel_info& info, uint32 interrupt)
+{
+	int32 handled = B_HANDLED_INTERRUPT;
+	if ((interrupt & PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_A)) != 0) {
+		const uint32 regIdentity = PCH_INTERRUPT_PIPE_IDENTITY_BDW(INTEL_PIPE_A);
+		uint32 identity = read32(info, regIdentity);
+		if ((identity & PCH_INTERRUPT_VBLANK_BDW) != 0) {
+			handled = release_vblank_sem(info);
+			write32(info, regIdentity, identity | PCH_INTERRUPT_VBLANK_BDW);
+		} else {
+			dprintf("gen8_handle_interrupts unhandled interrupt on pipe A\n");
+		}
+		interrupt &= ~PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_A);
+	}
+	if ((interrupt & PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_B)) != 0) {
+		const uint32 regIdentity = PCH_INTERRUPT_PIPE_IDENTITY_BDW(INTEL_PIPE_B);
+		uint32 identity = read32(info, regIdentity);
+		if ((identity & PCH_INTERRUPT_VBLANK_BDW) != 0) {
+			handled = release_vblank_sem(info);
+			write32(info, regIdentity, identity | PCH_INTERRUPT_VBLANK_BDW);
+		} else {
+			dprintf("gen8_handle_interrupts unhandled interrupt on pipe B\n");
+		}
+		interrupt &= ~PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_B);
+	}
+	if ((interrupt & PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_C)) != 0) {
+		const uint32 regIdentity = PCH_INTERRUPT_PIPE_IDENTITY_BDW(INTEL_PIPE_C);
+		uint32 identity = read32(info, regIdentity);
+		if ((identity & PCH_INTERRUPT_VBLANK_BDW) != 0) {
+			handled = release_vblank_sem(info);
+			write32(info, regIdentity, identity | PCH_INTERRUPT_VBLANK_BDW);
+		} else {
+			dprintf("gen8_handle_interrupts unhandled interrupt on pipe C\n");
+		}
+		interrupt &= ~PCH_MASTER_INT_CTL_PIPE_PENDING_BDW(INTEL_PIPE_C);
+	}
+
+	if ((interrupt & GEN8_DE_PORT_IRQ) != 0) {
+		uint32 iir = read32(info, GEN8_DE_PORT_IIR);
+		if (iir != 0) {
+			write32(info, GEN8_DE_PORT_IIR, iir);
+		}
+		interrupt &= ~GEN8_DE_PORT_IRQ;
+	}
+
+	if (info.device_type.Generation() >= 11 && (interrupt & GEN11_DE_HPD_IRQ) != 0) {
+		dprintf("gen8_handle_interrupts HPD\n");
+		uint32 iir = read32(info, GEN11_DE_HPD_IIR);
+		if (iir != 0) {
+			dprintf("gen8_handle_interrupts HPD_IIR %" B_PRIx32 "\n", iir);
+			write32(info, GEN11_DE_HPD_IIR, iir);
+		}
+		interrupt &= ~GEN11_DE_HPD_IRQ;
+	}
+
+	if ((interrupt & GEN8_DE_PCH_IRQ) != 0) {
+		dprintf("gen8_handle_interrupts PCH\n");
+		uint32 iir = read32(info, SDEIIR);
+		if (iir != 0) {
+			dprintf("gen8_handle_interrupts PCH_IIR %" B_PRIx32 "\n", iir);
+			write32(info, SDEIIR, iir);
+			if (info.shared_info->pch_info >= INTEL_PCH_ICP) {
+				uint32 ddiHotplug = read32(info, SHOTPLUG_CTL_DDI);
+				write32(info, SHOTPLUG_CTL_DDI, ddiHotplug);
+				dprintf("gen8_handle_interrupts PCH_IIR ddiHotplug %" B_PRIx32 "\n", ddiHotplug);
+
+				uint32 tcHotplug = read32(info, SHOTPLUG_CTL_TC);
+				write32(info, SHOTPLUG_CTL_TC, tcHotplug);
+				dprintf("gen8_handle_interrupts PCH_IIR tcHotplug %" B_PRIx32 "\n", tcHotplug);
+			}
+		}
+		interrupt &= ~GEN8_DE_PCH_IRQ;
+	}
+
+	interrupt &= ~PCH_MASTER_INT_CTL_GLOBAL_BDW;
+	if (interrupt != 0)
+		dprintf("gen8_handle_interrupts unhandled %" B_PRIx32 "\n", interrupt);
+	return handled;
+}
+
+
+
 /** Get the appropriate interrupt mask for enabling or testing interrupts on
- * the given pipes.
+ * the given pipe.
  *
  * The bits to test or set are different depending on the hardware generation.
  *
  * \param info Intel_extreme driver information
- * \param pipes bit mask of the pipes to use
+ * \param pipe pipe to use
  * \param enable true to get the mask for enabling the interrupts, false to get
  *               the mask for testing them.
  */
 static uint32
-intel_get_interrupt_mask(intel_info& info, int pipes, bool enable)
+intel_get_interrupt_mask(intel_info& info, pipe_index pipe, bool enable)
 {
 	uint32 mask = 0;
 	bool hasPCH = info.pch_info != INTEL_PCH_NONE;
@@ -105,7 +224,7 @@ intel_get_interrupt_mask(intel_info& info, int pipes, bool enable)
 	// The PCH register itself does not exist in pre-PCH platforms, and the
 	// previous interrupt register of course also had a different mapping.
 
-	if ((pipes & INTEL_PIPE_A) != 0) {
+	if (pipe == INTEL_PIPE_A) {
 		if (info.device_type.InGroup(INTEL_GROUP_SNB)
 				|| info.device_type.InGroup(INTEL_GROUP_ILK))
 			mask |= PCH_INTERRUPT_VBLANK_PIPEA_SNB;
@@ -115,7 +234,7 @@ intel_get_interrupt_mask(intel_info& info, int pipes, bool enable)
 			mask |= INTERRUPT_VBLANK_PIPEA;
 	}
 
-	if ((pipes & INTEL_PIPE_B) != 0) {
+	if (pipe == INTEL_PIPE_B) {
 		if (info.device_type.InGroup(INTEL_GROUP_SNB)
 				|| info.device_type.InGroup(INTEL_GROUP_ILK))
 			mask |= PCH_INTERRUPT_VBLANK_PIPEB_SNB;
@@ -126,7 +245,7 @@ intel_get_interrupt_mask(intel_info& info, int pipes, bool enable)
 	}
 
 #if 0 // FIXME enable when we support the 3rd pipe
-	if ((pipes & INTEL_PIPE_C) != 0) {
+	if (pipe == INTEL_PIPE_C) {
 		// Older generations only had two pipes
 		if (hasPCH && info.device_type.Generation() > 6)
 			mask |= PCH_INTERRUPT_VBLANK_PIPEC;
@@ -142,58 +261,162 @@ intel_get_interrupt_mask(intel_info& info, int pipes, bool enable)
 }
 
 
+static void
+intel_enable_interrupts(intel_info& info, pipes which, bool enable)
+{
+	uint32 finalMask = 0;
+	const uint32 pipeAMask = intel_get_interrupt_mask(info, INTEL_PIPE_A, true);
+	const uint32 pipeBMask = intel_get_interrupt_mask(info, INTEL_PIPE_B, true);
+	if (which.HasPipe(INTEL_PIPE_A))
+		finalMask |= pipeAMask;
+	if (which.HasPipe(INTEL_PIPE_B))
+		finalMask |= pipeBMask;
+
+	const uint32 value = enable ? finalMask : 0;
+
+	// Clear all the interrupts
+	write32(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), ~0);
+
+	// enable interrupts - we only want VBLANK interrupts
+	write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), value);
+	write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~value);
+}
+
+
+static bool
+intel_check_interrupt(intel_info& info, pipes& which)
+{
+	which.ClearPipe(INTEL_PIPE_ANY);
+	const uint32 pipeAMask = intel_get_interrupt_mask(info, INTEL_PIPE_A, false);
+	const uint32 pipeBMask = intel_get_interrupt_mask(info, INTEL_PIPE_B, false);
+	const uint32 regIdentity = find_reg(info, INTEL_INTERRUPT_IDENTITY);
+	const uint32 interrupt = read32(info, regIdentity);
+	if ((interrupt & pipeAMask) != 0)
+		which.SetPipe(INTEL_PIPE_A);
+	if ((interrupt & pipeBMask) != 0)
+		which.SetPipe(INTEL_PIPE_B);
+	return which.HasPipe(INTEL_PIPE_ANY);
+}
+
+
+static void
+g35_clear_interrupt_status(intel_info& info, pipe_index pipe)
+{
+	// These registers do not exist on later GPUs.
+	if (info.device_type.Generation() > 4)
+		return;
+
+	const uint32 value = DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED;
+	switch (pipe) {
+		case INTEL_PIPE_A:
+			write32(info, INTEL_DISPLAY_A_PIPE_STATUS, value);
+			break;
+		case INTEL_PIPE_B:
+			write32(info, INTEL_DISPLAY_B_PIPE_STATUS, value);
+			break;
+		default:
+			break;
+	}
+}
+
+
+static void
+intel_clear_pipe_interrupt(intel_info& info, pipe_index pipe)
+{
+	// On G35/G45, prior to clearing Display Pipe interrupt in IIR
+	// the corresponding interrupt status must first be cleared.
+	g35_clear_interrupt_status(info, pipe);
+
+	const uint32 regIdentity = find_reg(info, INTEL_INTERRUPT_IDENTITY);
+	const uint32 bit = intel_get_interrupt_mask(info, pipe, false);
+	const uint32 identity = read32(info, regIdentity);
+	write32(info, regIdentity, identity | bit);
+}
+
+
+/*!
+	Interrupt routine for Gen8 and Gen9.
+	See Gen12 Display Engine: Interrupt Service Routine chapter.
+*/
+static int32
+gen8_interrupt_handler(void* data)
+{
+	intel_info& info = *(intel_info*)data;
+
+	uint32 interrupt = gen8_enable_global_interrupts(info, false);
+	if (interrupt == 0) {
+		gen8_enable_global_interrupts(info, true);
+		return B_UNHANDLED_INTERRUPT;
+	}
+
+	int32 handled = gen8_handle_interrupts(info, interrupt);
+
+	gen8_enable_global_interrupts(info, true);
+	return handled;
+}
+
+
+/*!
+	Interrupt routine for Gen11.
+	See Gen12 Display Engine: Interrupt Service Routine chapter.
+*/
+static int32
+gen11_interrupt_handler(void* data)
+{
+	intel_info& info = *(intel_info*)data;
+
+	uint32 interrupt = gen11_enable_global_interrupts(info, false);
+
+	if (interrupt == 0) {
+		gen11_enable_global_interrupts(info, true);
+		return B_UNHANDLED_INTERRUPT;
+	}
+
+	int32 handled = B_HANDLED_INTERRUPT;
+	if ((interrupt & GEN11_DISPLAY_IRQ) != 0)
+		handled = gen8_handle_interrupts(info, read32(info, GEN11_DISPLAY_INT_CTL));
+
+	gen11_enable_global_interrupts(info, true);
+	return handled;
+}
+
+
 static int32
 intel_interrupt_handler(void* data)
 {
 	intel_info &info = *(intel_info*)data;
-	uint32 reg = find_reg(info, INTEL_INTERRUPT_IDENTITY);
-	uint32 identity;
 
-	identity = read32(info, reg);
+	pipes which;
+	bool shouldHandle = intel_check_interrupt(info, which);
 
-	if (identity == 0)
+	if (!shouldHandle)
 		return B_UNHANDLED_INTERRUPT;
 
 	int32 handled = B_HANDLED_INTERRUPT;
 
-	while (identity != 0) {
-
-		uint32 mask = intel_get_interrupt_mask(info, INTEL_PIPE_A, false);
-
-		if ((identity & mask) != 0) {
+	while (shouldHandle) {
+		if (which.HasPipe(INTEL_PIPE_A)) {
 			handled = release_vblank_sem(info);
 
-			// make sure we'll get another one of those
-			write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
-				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+			intel_clear_pipe_interrupt(info, INTEL_PIPE_A);
 		}
 
-		mask = intel_get_interrupt_mask(info, INTEL_PIPE_B, false);
-		if ((identity & mask) != 0) {
+		if (which.HasPipe(INTEL_PIPE_B)) {
 			handled = release_vblank_sem(info);
 
-			// make sure we'll get another one of those
-			write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
-				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+			intel_clear_pipe_interrupt(info, INTEL_PIPE_B);
 		}
 
 #if 0
 		// FIXME we don't have support for the 3rd pipe yet
-		mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEC
-			: 0;
-		if ((identity & mask) != 0) {
+		if (which.HasPipe(INTEL_PIPE_C)) {
 			handled = release_vblank_sem(info);
 
-			// make sure we'll get another one of those
-			write32(info, INTEL_DISPLAY_C_PIPE_STATUS,
-				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+			intel_clear_pipe_interrupt(info, INTEL_PIPE_C);
 		}
 #endif
 
-		// setting the bit clears it!
-		write32(info, reg, identity);
-		// update our identity register with the remaining interupts
-		identity = read32(info, reg);
+		shouldHandle = intel_check_interrupt(info, which);
 	}
 
 	return handled;
@@ -242,23 +465,95 @@ init_interrupt_handler(intel_info &info)
 
 		info.fake_interrupts = false;
 
-		status = install_io_interrupt_handler(info.irq,
-			&intel_interrupt_handler, (void*)&info, 0);
-		if (status == B_OK) {
-			write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
-				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
-			write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
-				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+		if (info.device_type.Generation() >= 8) {
+			interrupt_handler handler = &gen8_interrupt_handler;
+			if (info.device_type.Generation() >= 11)
+				handler = &gen11_interrupt_handler;
+			status = install_io_interrupt_handler(info.irq,
+				handler, (void*)&info, 0);
+			if (status == B_OK) {
+				gen8_enable_interrupts(info, INTEL_PIPE_A, true);
+				gen8_enable_interrupts(info, INTEL_PIPE_B, true);
+				if (info.device_type.Generation() >= 11)
+					gen8_enable_interrupts(info, INTEL_PIPE_C, true);
+				gen8_enable_global_interrupts(info, true);
 
-			uint32 enable = intel_get_interrupt_mask(info,
-				INTEL_PIPE_A | INTEL_PIPE_B, true);
+				if (info.device_type.Generation() >= 11) {
+					if (info.shared_info->pch_info >= INTEL_PCH_ICP) {
+						read32(info, SDEIIR);
+						write32(info, SDEIER, 0xffffffff);
+						write32(info, SDEIMR, ~SDE_GMBUS_ICP);
+						read32(info, SDEIMR);
+					}
 
-			// Clear all the interrupts
-			write32(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), ~0);
+					uint32 mask = GEN8_AUX_CHANNEL_A;
+					mask |= GEN9_AUX_CHANNEL_B | GEN9_AUX_CHANNEL_C | GEN9_AUX_CHANNEL_D;
+					mask |= CNL_AUX_CHANNEL_F;
+					mask |= ICL_AUX_CHANNEL_E;
+					read32(info, GEN8_DE_PORT_IIR);
+					write32(info, GEN8_DE_PORT_IER, mask);
+					write32(info, GEN8_DE_PORT_IMR, ~mask);
+					read32(info, GEN8_DE_PORT_IMR);
 
-			// enable interrupts - we only want VBLANK interrupts
-			write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), enable);
-			write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~enable);
+					read32(info, GEN8_DE_MISC_IIR);
+					write32(info, GEN8_DE_MISC_IER, GEN8_DE_EDP_PSR);
+					write32(info, GEN8_DE_MISC_IMR, ~GEN8_DE_EDP_PSR);
+					read32(info, GEN8_DE_MISC_IMR);
+
+					read32(info, GEN11_GU_MISC_IIR);
+					write32(info, GEN11_GU_MISC_IER, GEN11_GU_MISC_GSE);
+					write32(info, GEN11_GU_MISC_IMR, ~GEN11_GU_MISC_GSE);
+					read32(info, GEN11_GU_MISC_IMR);
+
+					read32(info, GEN11_DE_HPD_IIR);
+					write32(info, GEN11_DE_HPD_IER,
+						GEN11_DE_TC_HOTPLUG_MASK | GEN11_DE_TBT_HOTPLUG_MASK);
+					write32(info, GEN11_DE_HPD_IMR, 0xffffffff);
+					read32(info, GEN11_DE_HPD_IMR);
+
+					write32(info, GEN11_TC_HOTPLUG_CTL, 0);
+					write32(info, GEN11_TBT_HOTPLUG_CTL, 0);
+
+					if (info.shared_info->pch_info >= INTEL_PCH_ICP) {
+						if (info.shared_info->pch_info <= INTEL_PCH_TGP)
+							write32(info, SHPD_FILTER_CNT, SHPD_FILTER_CNT_500_ADJ);
+						read32(info, SDEIMR);
+						write32(info, SDEIMR, 0x3f023f07);
+						read32(info, SDEIMR);
+
+						uint32 ctl = read32(info, SHOTPLUG_CTL_DDI);
+						// we enable everything, should come from the VBT
+						ctl |= SHOTPLUG_CTL_DDI_HPD_ENABLE(HPD_PORT_A)
+							| SHOTPLUG_CTL_DDI_HPD_ENABLE(HPD_PORT_B)
+							| SHOTPLUG_CTL_DDI_HPD_ENABLE(HPD_PORT_C)
+							| SHOTPLUG_CTL_DDI_HPD_ENABLE(HPD_PORT_D);
+						write32(info, SHOTPLUG_CTL_DDI, ctl);
+						ctl = read32(info, SHOTPLUG_CTL_TC);
+						// we enable everything, should come from the VBT
+						ctl |= SHOTPLUG_CTL_TC_HPD_ENABLE(HPD_PORT_TC1)
+							| SHOTPLUG_CTL_TC_HPD_ENABLE(HPD_PORT_TC2)
+							| SHOTPLUG_CTL_TC_HPD_ENABLE(HPD_PORT_TC3)
+							| SHOTPLUG_CTL_TC_HPD_ENABLE(HPD_PORT_TC4)
+							| SHOTPLUG_CTL_TC_HPD_ENABLE(HPD_PORT_TC5)
+							| SHOTPLUG_CTL_TC_HPD_ENABLE(HPD_PORT_TC6);
+						write32(info, SHOTPLUG_CTL_TC, ctl);
+					}
+
+					gen11_enable_global_interrupts(info, true);
+				}
+			}
+		} else {
+			status = install_io_interrupt_handler(info.irq,
+				&intel_interrupt_handler, (void*)&info, 0);
+			if (status == B_OK) {
+				g35_clear_interrupt_status(info, INTEL_PIPE_A);
+				g35_clear_interrupt_status(info, INTEL_PIPE_B);
+
+				pipes which;
+				which.SetPipe(INTEL_PIPE_A);
+				which.SetPipe(INTEL_PIPE_B);
+				intel_enable_interrupts(info, which, true);
+			}
 		}
 	}
 	if (status < B_OK) {
@@ -322,6 +617,10 @@ intel_extreme_init(intel_info &info)
 		return info.shared_area;
 	}
 
+	// enable power
+	gPCI->set_powerstate(info.pci->bus, info.pci->device, info.pci->function,
+		PCI_pm_state_d0);
+
 	memset((void*)info.shared_info, 0, sizeof(intel_shared_info));
 
 	int mmioIndex = 1;
@@ -341,10 +640,14 @@ intel_extreme_init(intel_info &info)
 	// TODO: registers are mapped twice (by us and intel_gart), maybe we
 	// can share it between the drivers
 
+	phys_addr_t addr = info.pci->u.h0.base_registers[mmioIndex];
+	uint64 barSize = info.pci->u.h0.base_register_sizes[mmioIndex];
+	if ((info.pci->u.h0.base_register_flags[mmioIndex] & PCI_address_type) == PCI_address_type_64) {
+		addr |= (uint64)info.pci->u.h0.base_registers[mmioIndex + 1] << 32;
+		barSize |= (uint64)info.pci->u.h0.base_register_sizes[mmioIndex + 1] << 32;
+	}
 	AreaKeeper mmioMapper;
-	info.registers_area = mmioMapper.Map("intel extreme mmio",
-		info.pci->u.h0.base_registers[mmioIndex],
-		info.pci->u.h0.base_register_sizes[mmioIndex],
+	info.registers_area = mmioMapper.Map("intel extreme mmio", addr, barSize,
 		B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA,
 		(void**)&info.registers);
@@ -443,17 +746,20 @@ intel_extreme_init(intel_info &info)
 	info.shared_info->graphics_memory_size = apertureInfo.size;
 	info.shared_info->frame_buffer = 0;
 	info.shared_info->dpms_mode = B_DPMS_ON;
+	info.shared_info->min_brightness = 2;
+	info.shared_info->internal_crt_support = true;
+	info.shared_info->pch_info = info.pch_info;
+	info.shared_info->device_type = info.device_type;
 
-	// Pull VBIOS panel mode for later use
-	info.shared_info->got_vbt = get_lvds_mode_from_bios(
-		&info.shared_info->panel_mode);
+	// Pull VBIOS info for later use
+	info.shared_info->got_vbt = parse_vbt_from_bios(info.shared_info);
 
 	/* at least 855gm can't drive more than one head at time */
 	if (info.device_type.InFamily(INTEL_FAMILY_8xx))
 		info.shared_info->single_head_locked = 1;
 
 	if (info.device_type.InFamily(INTEL_FAMILY_SER5)) {
-		info.shared_info->pll_info.reference_frequency = 120000;	// 120 MHz
+		info.shared_info->pll_info.reference_frequency = 120000;// 120 MHz
 		info.shared_info->pll_info.max_frequency = 350000;
 			// 350 MHz RAM DAC speed
 		info.shared_info->pll_info.min_frequency = 20000;		// 20 MHz
@@ -462,6 +768,38 @@ intel_extreme_init(intel_info &info)
 		info.shared_info->pll_info.max_frequency = 400000;
 			// 400 MHz RAM DAC speed
 		info.shared_info->pll_info.min_frequency = 20000;		// 20 MHz
+	} else if (info.device_type.HasDDI() && (info.device_type.Generation() <= 8)) {
+		info.shared_info->pll_info.reference_frequency = 135000;// 135 MHz
+		info.shared_info->pll_info.max_frequency = 350000;
+			// 350 MHz RAM DAC speed
+		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz
+	} else if ((info.device_type.Generation() >= 9) &&
+				info.device_type.InGroup(INTEL_GROUP_SKY)) {
+		info.shared_info->pll_info.reference_frequency = 24000;	// 24 MHz
+		info.shared_info->pll_info.max_frequency = 350000;
+			// 350 MHz RAM DAC speed
+		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz
+	} else if (info.device_type.Generation() >= 9) {
+		uint32 refInfo =
+			(read32(info, ICL_DSSM) & ICL_DSSM_REF_FREQ_MASK) >> ICL_DSSM_REF_FREQ_SHIFT;
+		switch (refInfo) {
+			case ICL_DSSM_24000:
+				info.shared_info->pll_info.reference_frequency = 24000;	// 24 MHz
+				break;
+			case ICL_DSSM_19200:
+				info.shared_info->pll_info.reference_frequency = 19200;	// 19.2 MHz
+				break;
+			case ICL_DSSM_38400:
+				info.shared_info->pll_info.reference_frequency = 38400;	// 38.4 MHz
+				break;
+			default:
+				ERROR("error: unknown ref. freq. strap, using 24Mhz! %" B_PRIx32 "\n", refInfo);
+				info.shared_info->pll_info.reference_frequency = 24000;	// 24 MHz
+				break;
+		}
+		info.shared_info->pll_info.max_frequency = 350000;
+			// 350 MHz RAM DAC speed
+		info.shared_info->pll_info.min_frequency = 25000;		// 25 MHz
 	} else {
 		info.shared_info->pll_info.reference_frequency = 48000;	// 48 MHz
 		info.shared_info->pll_info.max_frequency = 350000;
@@ -471,9 +809,6 @@ intel_extreme_init(intel_info &info)
 
 	info.shared_info->pll_info.divisor_register = INTEL_DISPLAY_A_PLL_DIVISOR_0;
 
-	info.shared_info->pch_info = info.pch_info;
-
-	info.shared_info->device_type = info.device_type;
 #ifdef __HAIKU__
 	strlcpy(info.shared_info->device_identifier, info.device_identifier,
 		sizeof(info.shared_info->device_identifier));
@@ -532,9 +867,37 @@ intel_extreme_init(intel_info &info)
 		} else {
 			info.shared_info->fdi_link_frequency = 2700;
 		}
+		if (info.shared_info->pch_info >= INTEL_PCH_CNP) {
+			// TODO read/write info.shared_info->hraw_clock
+		} else {
+			info.shared_info->hraw_clock = (read32(info, PCH_RAWCLK_FREQ)
+				& RAWCLK_FREQ_MASK) * 1000;
+			TRACE("%s: rawclk rate: %" B_PRIu32 " kHz\n", __func__, info.shared_info->hraw_clock);
+		}
 	} else {
+		// TODO read info.shared_info->hraw_clock
 		info.shared_info->fdi_link_frequency = 0;
 	}
+
+	if (info.device_type.InGroup(INTEL_GROUP_HAS)) {
+		uint32 lcpll = read32(info, LCPLL_CTL);
+		if ((lcpll & LCPLL_CD_SOURCE_FCLK) != 0)
+			info.shared_info->hw_cdclk = 800000;
+		else if ((lcpll & LCPLL_CLK_FREQ_MASK) == LCPLL_CLK_FREQ_450)
+			info.shared_info->hw_cdclk = 450000;
+		/* ULT type is missing
+		else if (IS_ULT)
+			info.shared_info->hw_cdclk = 337500;
+		*/
+		else
+			info.shared_info->hw_cdclk = 540000;
+	} else if (info.device_type.InGroup(INTEL_GROUP_SNB)
+		|| info.device_type.InGroup(INTEL_GROUP_IVB)) {
+		info.shared_info->hw_cdclk = 400000;
+	} else if (info.device_type.InGroup(INTEL_GROUP_ILK)) {
+		info.shared_info->hw_cdclk = 450000;
+	}
+	TRACE("%s: hw_cdclk: %" B_PRIu32 " kHz\n", __func__, info.shared_info->hw_cdclk);
 
 	TRACE("%s: completed successfully!\n", __func__);
 	return B_OK;
@@ -548,10 +911,20 @@ intel_extreme_uninit(intel_info &info)
 
 	if (!info.fake_interrupts && info.shared_info->vblank_sem > 0) {
 		// disable interrupt generation
-		write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
-		write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
-
-		remove_io_interrupt_handler(info.irq, intel_interrupt_handler, &info);
+		if (info.device_type.Generation() >= 8) {
+			if (info.device_type.Generation() >= 11) {
+				gen11_enable_global_interrupts(info, false);
+			}
+			gen8_enable_global_interrupts(info, false);
+			interrupt_handler handler = &gen8_interrupt_handler;
+			if (info.device_type.Generation() >= 11)
+				handler = &gen11_interrupt_handler;
+			remove_io_interrupt_handler(info.irq, handler, &info);
+		} else {
+			write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
+			write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
+			remove_io_interrupt_handler(info.irq, intel_interrupt_handler, &info);
+		}
 
 		if (info.use_msi && gPCIx86Module != NULL) {
 			gPCIx86Module->disable_msi(info.pci->bus,

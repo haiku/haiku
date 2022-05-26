@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DriveSetup	1934767996
+1	swedish	x-vnd.Haiku-DriveSetup	4048496535
 Could not unmount partition %s.	MainWindow		Kunde inte avmontera partition %s.
 Mount all	MainWindow		Montera alla
 Disk	MainWindow		Disk
@@ -18,7 +18,6 @@ Unmount	MainWindow		Avmontera
 Failed to format the partition %s!\n	MainWindow		Misslyckades att formatera partionen %s!\n
 Partition size	CreateParametersPanel		Partitionsstorlek
 Validation of the given parameters failed.	MainWindow		Valideringen av den givna parametern misslyckades.
-The partition %s is currently mounted.	MainWindow		Partitionen %s är monterad.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Är du säker att du vill formatera partitionen \"%s\"? Du kommet att få frågan igen innan ändringarna skrivs till disk.
 DriveSetup	System name		DiskHanterare
 Mounted at	PartitionList		Monterad vid
@@ -51,6 +50,8 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Formatera (inte implementerat)
 The currently selected partition does not have a parent partition.	MainWindow		Den valda partitionen saknar omslutande partition.
 Validation of the given initialization parameters failed.	MainWindow		Utvärdering av de givna initialiseringsparametrarna misslyckades.
+Not formatted (%s)	PartitionList		Ej formaterad (%s)
+Failed to create the partition. No changes have been written to disk.	MainWindow		Det gick inte att skapa partitionen. Inga ändringar har skrivits till disken.
 Shared	PartitionList		Delad
 MIMEs	PartitionList		MIMEs
 BitLocker encrypted	Encryption utils		BitLocker-krypterad
@@ -63,10 +64,11 @@ Change	ChangeParametersPanel		Ändra
 Partition name:	ChangeParametersPanel		Partitionsnamn:
 LUKS encrypted	Encryption utils		LUKS-krypterad
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill skriva ändringarna till disken?\n\nAll data på partitionen %s kommer att gå förlorad!
+Empty space	PartitionList		Tomt utrymme
 Cancel	AbstractParametersPanel		Avbryt
 Format	MainWindow		Format
-<empty or unknown>	DiskView		<tom eller okänd>
 OK	MainWindow		OK
+Empty space	DiskView		Tomt utrymme
 Open with DiskProbe	MainWindow		Öppna med DiskInspekterare
 Could not delete the selected partition.	MainWindow		Kunde inte radera den valda partitionen.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Är du säker att du vill initiera den valda disken? All data kommer att förloras. Du kommet att få frågan igen innan ändringarna skrivs till disk.\n
@@ -83,6 +85,7 @@ Rescan	MainWindow		Uppdatera
 There was an error acquiring the partition row.	MainWindow		Ett fel uppstod när partitionsinformationen skulle hämtas.
 Failed to initialize the disk %s!\n	MainWindow		Misslyckades att initiera partionen %s!\n
 Disk system \"%s\" not found!	MainWindow		Disksystemet \"%s\" hittades ej!
+The partition cannot be unmounted.	MainWindow		Partitionen kan inte avmonteras.
 Delete	MainWindow		Ta bort
 Partition type:	ChangeParametersPanel		Partitionstyp:
 Parameters	PartitionList		Parametrar
@@ -91,7 +94,6 @@ Cannot delete the selected partition.	MainWindow		Kan inte radera den valda part
 Continue	MainWindow		Fortsätt
 Could not mount partition %s.	MainWindow		Kunde inte montera partition %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Är du säker på att du vill formatera partitionen? Du kommer att så frågan igen innan ändringarna skrivs till disk.
-<empty or unknown>	PartitionList		<tom eller okänd>
 The selected disk is read-only.	MainWindow		Den valda disken är inte skrivbar.
 The partition %s is already unmounted.	MainWindow		Partitionen %s är redan avmonterad.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Är du säker på att du vill ändra parametrarna till partionen?\n\nPartionen kommer kanske inte kunna läsas av andra operativsystem!
@@ -103,7 +105,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Välj en partition från listan nedan.
 Active	PartitionList		Aktiv
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Är du säker på att du vill ta bort partitionen?\n\nAll data på partitionen kommer att gå förlorad!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Kunde inte formatera partitionen. Inga ändringar har skrivits till disken.
 The partition %s has been successfully formatted.\n	MainWindow		Partitionen %s har initierats.\n
 The partition %s is already mounted.	MainWindow		Partitionen %s är redan monterad.
 Size	PartitionList		Storlek

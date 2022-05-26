@@ -1,0 +1,146 @@
+1	hungarian	application/x-vnd.Cortex.support	2097798758
+Header has flags	MediaString		A fejlécnek vannak zászlói
+32 bit HLS	MediaString		32 bites HLS
+Recording	MediaString		Felvétel
+(unknown format)	MediaString		(ismeretlen formátum)
+Clean buffers	MediaString		Pufferek kiürítése
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# képkocka előre}other{# képkocka előre}}
+Rear-right	MediaString		Jobb hátsó
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# képpont} other{# képpont}}
+Mono	MediaString		Monó
+MPEG1	MediaString		MPEG1
+ASF format family	MediaString		ASF formátum-család
+Encoded video	MediaString		Kódolt videó
+YUV444	MediaString		YUV444
+Port	MediaString		Port
+Top-Front-left	MediaString		Bal elülső-felső
+24 bit LAB	MediaString		24 bites LAB
+16 bit integer	MediaString		16 bites integer
+32 bit HSVA	MediaString		32 bites HSVA
+YCbCr411	MediaString		YCbCr411
+Offline	MediaString		Offline
+YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		(ismeretlen videó orientáció)
+QuickTime	MediaString		QuickTime
+32 bit HLSA	MediaString		32 bites HLSA
+Top-Front-center	MediaString		Közép elülső-felső
+BeOS format family	MediaString		BeOS formátum-család
+24 bit HSV	MediaString		24 bites HSV
+Back-center	MediaString		Hátsó-közép
+32 bit CMY	MediaString		32 bites CMY
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bites integer}}
+Ambisonic WXYZ	MediaString		Ambisonic WXYZ
+(unknown video format)	MediaString		(ismeretlen videó formátum)
+Video data between line %lu and %lu	MediaString		Videó adat %lu és %lu sor között
+AVI format family	MediaString		AVI formátum-család
+Homogenous buffers	MediaString		Homogén pufferek
+Interlaced 	MediaString		Átlapolt
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# csatorna}other{# csatorna}}
+15 bit RGBA	MediaString		15 bites RGBA
+Drop data	MediaString		Adat eldobása
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
+Right	MediaString		Jobb
+32 bit RGB	MediaString		32 bites RGB
+System mixer	MediaString		Rendszer keverő
+Physical output	MediaString		Fizikai kimenet
+Top-Back-center	MediaString		Közép hátsó-felső
+YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		Fentről lefelé, balról jobbra
+(unknown run mode)	MediaString		(ismeretlen futási mód)
+ kb/s	MediaString		 kb/mp
+24 bit HSI	MediaString		24 bites HSI
+User-defined media type	MediaString		Felhasználó által deffiniált média típus
+32 bit CMYA	MediaString		32 bites CMYA
+Rear-left	MediaString		Bal hátsó
+QuickTime format family	MediaString		QuickTime formátum-család
+Any format family	MediaString		Bármilyen formátum-család
+Timecode	MediaString		Időkód
+Top-Front-right	MediaString		Jobb elülső-felső
+32 bit float	MediaString		32 bites lebegő
+Controllable	MediaString		Vezérelhető
+32 bit integer	MediaString		32 bites integer
+Front-right-center	MediaString		Jobb középső-elülső
+Side-right	MediaString		Jobb oldalsó
+ kHz	MediaString		 kHz
+Little endian	MediaString		Kicsi elől
+(unknown matrix mask)	MediaString		(ismeretlen mátrix maszk)
+32 bit LAB	MediaString		32 bites LAB
+Side-left	MediaString		Bal oldalsó
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# bájt/puffer} other{# bájt/puffer}}
+32 bit CMYK	MediaString		32 bites CMYK
+(unknown multistream format)	MediaString		(ismeretlen többcsatornás formátum)
+8 bit integer	MediaString		8 bites integer
+8 bit grayscale-index	MediaString		8 bites szürkeárnyalat-index
+YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		Buffer létrehozó
+Buffer consumer	MediaString		Buffer fogyasztó
+Increase latency	MediaString		Késleltetés növelése
+Front-left-center	MediaString		Bal középső-elülső
+MPEG format family	MediaString		MPEG formátum-család
+(none)	MediaString		(nincs)
+Center	MediaString		Középső
+ kb/s (max)	MediaString		 kb/mp (max)
+Monochrome	MediaString		Monokróm
+Private Be media type	MediaString		Privát Be média típus
+24 bit UVL	MediaString		24 bites UVL
+32 bit HSV	MediaString		32 bites HSV
+ID	MediaString		Azonosító
+AIFF format family	MediaString		AIFF formátum-család
+Top-Back-left	MediaString		Bal hátsó-felső
+16 bit RGB	MediaString		16 bites RGB
+YCbCr422	MediaString		YCbCr422
+Raw audio	MediaString		Nyers audió
+32 bit LABA	MediaString		32 bites LABA
+24 bit HLS	MediaString		24 bites HLS
+Non-interlaced 	MediaString		Nem átlapolt
+{0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# bájt (átlag)}other{# bájt (átlag)}}
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		WAV formátum-család
+ (NTSC)	MediaString		 (NTSC)
+Physical input	MediaString		Fizikai bemenet
+Big endian	MediaString		Nagy elől
+Sub	MediaString		Mély
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# bájt (max)}other{# bájt (max)}}
+YUV411	MediaString		YUV411
+Multistream media	MediaString		Többcsatornás média
+Encoded audio	MediaString		Kódolt audió
+Decrease precision	MediaString		Pontosság csökkentése
+File interface	MediaString		Fájl interfész
+(unknown byte order)	MediaString		(ismeretlen bájt-sorrend)
+32 bit HSI	MediaString		32 bites HSI
+Typeless media	MediaString		Típus nélküli média
+ (PAL)	MediaString		 (PAL)
+32 bit RGBA	MediaString		32 bites RGBA
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 kb/mp (átlag)
+HTML	MediaString		HTML
+Time source	MediaString		Idő forrás
+15 bit RGB	MediaString		15 bites RGB
+ProLogic LR	MediaString		ProLogic LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# bájt/képkocka}other{# bájt/képkocka}}
+Parameters	MediaString		Paraméterek
+Raw data from VBL area	MediaString		Nyers adat a VBL területről
+Top-Back-right	MediaString		Jobb hátsó-felső
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# bájt/sor}other{# bájt/sor}}
+Left	MediaString		Bal
+BeOS video	MediaString		BeOS videó
+24 bit CMY	MediaString		24 bites CMY
+32 bit UVLA	MediaString		32 bites UVLA
+Top-center	MediaString		Középső felső
+Entity interface	MediaString		Entitás interfész
+Stereo	MediaString		Sztereó
+8 bit color-index	MediaString		8 bites szín-index
+Bottom to top, left to right	MediaString		Lentről felfelé, balról jobbra
+32 bit UVL	MediaString		32 bites UVL
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# sor} other{# sor}}
+Text	MediaString		Szöveg
+Unknown media type	MediaString		Ismeretlen média típus
+MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		Egyéb formátum-család
+24 bit RGB	MediaString		24 bites RGB
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# képkocka hátra}other{# képkocka hátra}}
+32 bit HSIA	MediaString		32 bites HSIA
+Raw video	MediaString		Nyers videó

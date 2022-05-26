@@ -11,20 +11,21 @@
 #include <netinet/in.h>
 
 #include "constants.h" //for rgb_color BLACK
+#include "libhttpd.h" //for httpd_sockaddr
 
 #ifdef __cplusplus
 	extern "C"
 	void poorman_log(
 		const char* msg,
 		bool needTimeHeader = true,
-		in_addr_t addr = INADDR_NONE,
+		httpd_sockaddr* addr = NULL,
 		rgb_color color = BLACK
 	);
 #else //c version is for libhttpd
 	void poorman_log(
 		const char* msg,
 		bool needTimeHeader,
-		in_addr_t addr,
+		httpd_sockaddr* addr,
 		rgb_color color
 	);
 #endif

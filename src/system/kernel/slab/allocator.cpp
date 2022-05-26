@@ -70,7 +70,7 @@ size_to_index(size_t size)
 }
 
 
-void*
+static void*
 block_alloc(size_t size, size_t alignment, uint32 flags)
 {
 	if (alignment > kMinObjectAlignment) {
@@ -143,7 +143,7 @@ block_alloc_early(size_t size)
 }
 
 
-void
+static void
 block_free(void* block, uint32 flags)
 {
 	if (block == NULL)
@@ -229,9 +229,24 @@ posix_memalign(void** _pointer, size_t alignment, size_t size)
 }
 
 
+void *
+aligned_alloc(size_t alignment, size_t size)
+{
+	if ((size % alignment) != 0)
+		return NULL;
+
+	return memalign(alignment, size);
+}
+
+
 void
 free_etc(void *address, uint32 flags)
 {
+	if ((flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
+		deferred_free(address);
+		return;
+	}
+
 	block_free(address, flags & CACHE_ALLOC_FLAGS);
 }
 

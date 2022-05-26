@@ -134,6 +134,58 @@
 	\ingroup libbe
 	\brief Displays and manipulates styled text.
 
+	Each BTextView instance has a TextRect() that keeps track of the bounds
+	of the text inside it. BTextView will resize and reposition TextRect()
+	as the view size changes in FrameResized(). You must set the initial
+	text rect either in the constructor, or using SetTextRect().
+
+	The dynamic layout versions of the constructor set the initial
+	TextRect() to Bounds(). TextRect() uses the view's coordinate system.
+
+	Setting the text rect to Bounds() will add some default insets
+	repositioning the text inside the view. If you do not want this you may
+	override the default insets by calling SetInsets(). It is recommended
+	that you use SetInsets() to offset the initial text rect position
+	instead of offsetting the text rect passed into the constructor.
+	SetInsets() will retain insets with changing alignment and word-wrap
+	while the distance of the initial TextRect() from the view Bounds()
+	is not retained.
+
+	TextRect() can be wider or narrower than the view and it can be taller
+	or shorter. As you type, delete, cut, and paste the width and height of
+	the text rect may change. If word-wrap is on, TextRect() width will
+	always be set to the width of the view minus insets. If word-wrap is off
+	TextRect() width will be set to the width of the longest line of text.
+	The top and bottom of TextRect() will always be set to the top and bottom
+	of the text. Highlight() will highlight multiple lines at least to the
+	edge of the text view even if TextRect() is narrower.
+
+	When TextRect() is made wider or taller than the view scroll bars will
+	activate if present. You may scroll using ScrollToOffset() to scroll
+	the text so that the character at the given offset is visible or you
+	may call ScrollToSelection() to scroll the text so that the character
+	that begins the selection is visible.
+
+	Call SetText() to change the text. This will resize TextRect().
+
+	Call SetWordWrap() to turn word-wrap on and off. This will resize
+	TextRect().
+
+	Call SetAlignment() to change the alignment to \c B_ALIGN_CENTER
+	or \c B_ALIGN_RIGHT. This will reposition TextRect().
+
+	Call SetStylable() to allow multiple font styles.
+
+	Call SetTabWidth() to set the width of hard tabs. You may turn
+	auto-indentation off with SetAutoindent().
+
+	Call MakeSelectable() and MakeEditable() to turn the ability for text
+	to be selectable or editable off. A non-editable, non-selectable text
+	view can be useful as a BStringView that wraps.
+
+	Call MakeResizable() to make the view width track with text width,
+	this can be useful for short single-line text views.
+
 	\since BeOS R3
 */
 

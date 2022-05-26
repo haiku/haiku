@@ -1,10 +1,8 @@
-1	russian	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		Запись аудиотрека: %d%% завершено
+1	russian	x-vnd.Haiku-MediaConverter	1322040280
 Input file not recognized as Audio or Video	MediaConverter		Входной файл не распознан как аудио или видео
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2fкадр/с
 Video quality: %3d%%	MediaConverter		Качество видео: %3d%%
 Source files	MediaConverter		Исходные файлы
-Error writing video frame %ld	MediaConverter		Ошибка при записи видеокадра %ld
 Error converting '%filename'	MediaConverter		Ошибка конвертации '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Выбранная папка не найдена. Выбираем по умолчанию /boot/home
 Conversion completed	MediaConverter		Конвертация завершена
@@ -43,7 +41,6 @@ Error loading files	MediaConverter		Ошибка при загрузке фай�
 End   [ms]: 	MediaConverter		Конец [мс]: 
 Cancel	MediaConverter		Отмена
 OK	MediaConverter-FileInfo		ОК
-Error read audio frame %ld	MediaConverter		Ошибка при чтении аудиокадра %ld
 Video encoding:	MediaConverter		Кодирование видео:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Произошла ошибка при чтении информации о файле.\n\nОшибка: 
 Error	MediaConverter		Ошибка
@@ -57,11 +54,9 @@ Duration:	MediaConverter-FileInfo		Длительность:
 MediaConverter	System name		Медиаконвертер
 Error launching: %strError%	MediaConverter		Ошибка запуска: %strError%
 File format:	MediaConverter		Формат файла:
-Error writing audio frame %ld	MediaConverter		Ошибка при записи аудиокадра %ld
 File	Menu		Файл
 Video quality not supported	MediaConverter		Качество видео не поддерживается
 Select this folder	MediaConverter		Выбрать эту папку
-Error read video frame %ld	MediaConverter		Ошибка при чтении видеокадра %ld
 %.1f kHz %ld channel	MediaFileInfo		%.1f кГц %ld канал
 %d bit 	MediaFileInfo		%d бит 
 No video	Video codecs list		Без видео
@@ -69,6 +64,5 @@ Continue	MediaConverter		Продолжить
 Convert	MediaConverter		Конвертировать
 Audio quality not supported	MediaConverter		Качество звука не поддерживается
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Ошибка записи в папку %strPath%. Записываем в папку по умолчанию: /boot/home
-Writing video track: %d%% complete	MediaConverter		Запись видеотрека: %d%% завершено
 Preview	MediaConverter		Предпросмотр
 Start [ms]: 	MediaConverter		Начало [мс]: 

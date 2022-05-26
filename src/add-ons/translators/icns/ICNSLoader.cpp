@@ -1,7 +1,7 @@
 /*
  * Copyright 2012, Gerasim Troeglazov, 3dEyes@gmail.com. All rights reserved.
  * Distributed under the terms of the MIT License.
- */ 
+ */
 
 #include "ICNSLoader.h"
 #include "BaseTranslator.h"
@@ -24,14 +24,14 @@ ICNSFormat(float width, float height, color_space colors)
 {
 	int imageWidth = (int)ceil(width);
 	int imageHeight = (int)ceil(height);
-	
+
 	if (imageWidth != imageHeight)
 		return ICNS_NULL_TYPE;
-	
+
 	//other colors depth not supported now
 	if (colors != B_RGB32 && colors != B_RGBA32)
 		return ICNS_NULL_TYPE;
-		
+
 	switch (imageWidth) {
 		case 16:
 			return ICNS_16x16_32BIT_DATA;
@@ -56,21 +56,21 @@ ICNSLoader::ICNSLoader(BPositionIO *stream)
 {
 	fLoaded = false;
 	fIconsCount = 0;
-	
+
 	stream->Seek(0, SEEK_END);
 	fStreamSize = stream->Position();
 	stream->Seek(0, SEEK_SET);
-	
+
 	if (fStreamSize <= 0)
 		return;
-		
+
 	uint8* icnsDataBuffer = new uint8[fStreamSize];
 	size_t readedBytes = stream->Read(icnsDataBuffer,fStreamSize);
-	
+
 	fIconFamily = NULL;
 	int status = icns_import_family_data(readedBytes, icnsDataBuffer,
 		&fIconFamily);
-	
+
 	if (status != 0) {
 		delete[] icnsDataBuffer;
 		return;
@@ -91,12 +91,12 @@ ICNSLoader::ICNSLoader(BPositionIO *stream)
 				*newTypeItem = iconElement.elementType;
 				fFormatList.AddItem(newTypeItem);
 				fIconsCount++;
-		}		
+		}
 		dataOffset += iconElement.elementSize;
 	}
-			
+
 	fFormatList.SortItems(compareTypes);
-	
+
 	delete[] icnsDataBuffer;
 
 	fLoaded = true;
@@ -120,8 +120,8 @@ ICNSLoader::IsLoaded(void)
 {
 	return fLoaded;
 }
-	
-	
+
+
 int
 ICNSLoader::IconsCount(void)
 {
@@ -134,18 +134,18 @@ ICNSLoader::GetIcon(BPositionIO *target, int index)
 {
 	if (index < 1 || index > fIconsCount || !fLoaded)
 		return B_NO_TRANSLATOR;
-		
+
 	icns_image_t iconImage;
 	memset(&iconImage, 0, sizeof(icns_image_t));
-			
-	icns_type_t typeItem = *((icns_type_t*)fFormatList.ItemAt(index - 1));	
+
+	icns_type_t typeItem = *((icns_type_t*)fFormatList.ItemAt(index - 1));
 	int status = icns_get_image32_with_mask_from_family(fIconFamily,
 		typeItem, &iconImage);
-		
+
 	if (status != 0)
 		return B_NO_TRANSLATOR;
-											
-	TranslatorBitmap bitsHeader;	
+
+	TranslatorBitmap bitsHeader;
 	bitsHeader.magic = B_TRANSLATOR_BITMAP;
 	bitsHeader.bounds.left = 0;
 	bitsHeader.bounds.top = 0;
@@ -159,11 +159,11 @@ ICNSLoader::GetIcon(BPositionIO *target, int index)
 		icns_free_image(&iconImage);
 		return B_NO_TRANSLATOR;
 	}
-	target->Write(&bitsHeader, sizeof(TranslatorBitmap));			
+	target->Write(&bitsHeader, sizeof(TranslatorBitmap));
 
 	uint8 *rowBuff = new uint8[iconImage.imageWidth * sizeof(uint32)];
 	for (uint32 i = 0; i < iconImage.imageHeight; i++) {
-		uint8 *rowData = iconImage.imageData 
+		uint8 *rowData = iconImage.imageData
 			+ (i * iconImage.imageWidth * sizeof(uint32));
 		uint8 *rowBuffPtr = rowBuff;
 		for (uint32 j=0; j < iconImage.imageWidth; j++) {
@@ -175,25 +175,25 @@ ICNSLoader::GetIcon(BPositionIO *target, int index)
 			rowData += sizeof(uint32);
 		}
 		target->Write(rowBuff, iconImage.imageWidth * sizeof(uint32));
-	}				
-	delete[] rowBuff;	
+	}
+	delete[] rowBuff;
 	icns_free_image(&iconImage);
-	
+
 	return B_OK;
 }
 
 
 ICNSSaver::ICNSSaver(BPositionIO *stream, uint32 rowBytes, icns_type_t type)
 {
-	fCreated = false;	
+	fCreated = false;
 
-	icns_icon_info_t imageTypeInfo = icns_get_image_info_for_type(type);	
+	icns_icon_info_t imageTypeInfo = icns_get_image_info_for_type(type);
 	int iconWidth = imageTypeInfo.iconWidth;
-	int iconHeight = imageTypeInfo.iconWidth;
+	int iconHeight = imageTypeInfo.iconHeight;
 	int bpp = 32;
 
 	uint8 *bits = new uint8[iconWidth * iconHeight * sizeof(uint32)];
-	
+
 	uint8 *rowPtr = bits;
 	for (int i = 0; i < iconHeight; i++) {
 		stream->Read(rowPtr, rowBytes);
@@ -206,16 +206,16 @@ ICNSSaver::ICNSSaver(BPositionIO *stream, uint32 rowBytes, icns_type_t type)
 		}
 		rowPtr += iconWidth * sizeof(uint32);
 	}
-	
+
 	icns_create_family(&fIconFamily);
-	
-	icns_image_t icnsImage;	
+
+	icns_image_t icnsImage;
 	icnsImage.imageWidth = iconWidth;
 	icnsImage.imageHeight = iconHeight;
 	icnsImage.imageChannels = 4;
 	icnsImage.imagePixelDepth = 8;
 	icnsImage.imageDataSize = iconWidth * iconHeight * 4;
-	icnsImage.imageData = bits;		
+	icnsImage.imageData = bits;
 
 	icns_icon_info_t iconInfo;
 	iconInfo.isImage = 1;
@@ -226,7 +226,7 @@ ICNSSaver::ICNSSaver(BPositionIO *stream, uint32 rowBytes, icns_type_t type)
 	iconInfo.iconPixelDepth = bpp / iconInfo.iconChannels;
 
 	icns_type_t iconType = icns_get_type_from_image_info(iconInfo);
-	
+
 	if (iconType == ICNS_NULL_TYPE) {
 		delete[] bits;
 		free(fIconFamily);
@@ -237,7 +237,7 @@ ICNSSaver::ICNSSaver(BPositionIO *stream, uint32 rowBytes, icns_type_t type)
 	icns_element_t *iconElement = NULL;
 	int icnsErr = icns_new_element_from_image(&icnsImage, iconType,
 		&iconElement);
-		
+
 	if (iconElement != NULL) {
 		if (icnsErr == ICNS_STATUS_OK) {
 			icns_set_element_in_family(&fIconFamily, iconElement);
@@ -245,27 +245,27 @@ ICNSSaver::ICNSSaver(BPositionIO *stream, uint32 rowBytes, icns_type_t type)
 		}
 		free(iconElement);
 	}
-	
+
 	if (iconType != ICNS_1024x1024_32BIT_ARGB_DATA
 		&& iconType != ICNS_512x512_32BIT_ARGB_DATA
 		&& iconType != ICNS_256x256_32BIT_ARGB_DATA) {
-		icns_type_t maskType = 
+		icns_type_t maskType =
 			icns_get_mask_type_for_icon_type(iconType);
-		
+
 		icns_image_t icnsMask;
 		icns_init_image_for_type(maskType, &icnsMask);
 
 		uint32 iconDataOffset = 0;
 		uint32 maskDataOffset = 0;
-	
-		while (iconDataOffset < icnsImage.imageDataSize 
+
+		while (iconDataOffset < icnsImage.imageDataSize
 			&& maskDataOffset < icnsMask.imageDataSize) {
 			icnsMask.imageData[maskDataOffset] =
 				icnsImage.imageData[iconDataOffset + 3];
 			iconDataOffset += 4;
 			maskDataOffset += 1;
 		}
-		
+
 		icns_element_t *maskElement = NULL;
 		icnsErr = icns_new_element_from_mask(&icnsMask, maskType,
 			&maskElement);
@@ -277,15 +277,15 @@ ICNSSaver::ICNSSaver(BPositionIO *stream, uint32 rowBytes, icns_type_t type)
 			} else
 				fCreated = false;
 			free(maskElement);
-		}		
+		}
 		icns_free_image(&icnsMask);
-	}	
-		
+	}
+
 	if (!fCreated) {
 		free(fIconFamily);
 		fIconFamily = NULL;
 	}
-	
+
 	delete[] bits;
 }
 
@@ -293,7 +293,7 @@ ICNSSaver::ICNSSaver(BPositionIO *stream, uint32 rowBytes, icns_type_t type)
 ICNSSaver::~ICNSSaver()
 {
 	if (fIconFamily != NULL)
-		free(fIconFamily);	
+		free(fIconFamily);
 }
 
 

@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-WebPositive	1976607515
+1	turkish	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Kimlik doğrulaması gerekli
 Previous	WebPositive Window		Önceki
 (Finish: %date)	Download Window		(Bitiş: %date)
@@ -20,11 +20,11 @@ Open containing folder	Download Window		İndirildiği klasörü aç
 Find previous	WebPositive Window		Öncekini bul
 Full screen	WebPositive Window		Tam ekran
 Downloads in progress	WebPositive		Süren indirmeler
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount yer imini aynı anda açmak istediğinizden emin misiniz?
 Copy URL to clipboard	Download Window		URL'yi panoya kopyala
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount yer imini aynı anda açmak istediğinizden emin misiniz?
 Clone current page	Settings Window		Geçerli sayfadan bir tane daha aç
 Start page:	Settings Window		Başlangıç sayfası:
-Cancel	Download Window		İptal
+Cancel	Download Window		Vazgeç
 Settings	Settings Window		Ayarlar
 Downloads	WebPositive Window		İndirmeler
 Browse…	Settings Window		Göz at…
@@ -45,17 +45,19 @@ New tabs:	Settings Window		Yeni sekmeler:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url yüklenemedi
 Open downloads folder	Download Window		İndirilenler klasörünü aç
 Proxy server	Settings Window		Vekil sunucu
+Darn!	WebPositive		Tüh!
 Decrease size	WebPositive Window		Küçült
-Default fixed font size:	Settings Window		Öntanımlı sabit yazıtipi boyutu:
+Default fixed font size:	Settings Window		Öntanımlı eş aralıklı yazıtipi boyutu:
 Sans serif font:	Settings Window		Sans serif yazıtipi:
 Clear	WebPositive Window		Temizle
-Cookies for %s	Cookie Manager		%s için çerezler
 The download could not be opened.	Download Window		İndirilen öge açılamadı.
+Cookies for %s	Cookie Manager		%s için çerezler
 Close	Download Window		Kapat
 WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Arama terimi
 Reload	WebPositive Window		Yeniden yükle
 Expiration	Cookie Manager		Son kullanım süresi
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		CPU'nuz pek eski ve WebPositive'in çalışması için gerekli olan SSE2 uzantılarını desteklemiyor. Yerine NetSurf kurmanızı öneririz.
 Download finished	Download Window		İndirme bitti
 Cookie manager	WebPositive Window		Çerez yöneticisi
 OK	Authentication Panel		Tamam
@@ -87,7 +89,7 @@ Open	Download Window		Aç
 New window	WebPositive Window		Yeni pencere
 New windows:	Settings Window		Yeni pencereler:
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	İndirilenler klasörü açılamadı.\n\nHata: %error
-Cancel	Authentication Panel		İptal
+Cancel	Authentication Panel		Vazgeç
 Style:	Font Selection view		Biçem:
 There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	Yer imi dosyası oluşturulurken bir hata oluştu.\n\nHata: %error
 OK	Download Window		Tamam
@@ -101,6 +103,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Eski haline döndür
 Copy	WebPositive Window		Kopyala
 Default standard font size:	Settings Window		Öntanımlı standart yazıtipi boyutu:
+Custom	Settings Window		Özel
 Bookmark this page	WebPositive Window		Bu sayfayı yer imlerine ekle
 Show tabs if only one page is open	Settings Window		Tek bir sayfa açıksa bile sekmeleri göster
 Close tab	WebPositive Window		Sekmeyi kapat
@@ -109,12 +112,12 @@ About	WebPositive Window		Hakkında
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Hâlâ süren indirmeler var, WebPositive'den çıkmak istediğinize emin misiniz?
 Continue downloads	WebPositive		İndirmeleri sürdür
 Proxy server requires authentication	Settings Window		Vekil sunucu oturum açma gerektirir
-Cancel	Settings Window		İptal
-History	WebPositive Window		Geçmiş
+Cancel	Settings Window		Vazgeç
 Reset size	WebPositive Window		Orijinal boyut
+History	WebPositive Window		Geçmiş
 Do you really want to clear the browsing history?	WebPositive Window		Tarama geçmişini temizlemek istediğinizden emin misiniz?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Arama dizgisinin bir sonraki oluşumunu bul
-Fixed font:	Settings Window		Sabit yazıtipi
+Fixed font:	Settings Window		Eş aralıklı yazıtipi
 Quit	WebPositive Window		Çık
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Arama dizgisinin önceki oluşumlarını bul
 Remember username and password for this site	Authentication Panel		Bu site için kullanıcı adı ve parolayı hatırla
@@ -148,12 +151,13 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Başlangıç:
 Confirmation	WebPositive Window		Onaylama
 Session cookie	Cookie Manager		Oturum çerezi
+No SSE2 support	WebPositive		SSE2 desteği yok
 Open all	WebPositive Window		Tümünü aç
 Cut	WebPositive Window		Kes
 Downloads	Download Window		İndirmeler
 Open blank page	Settings Window		Boş sayfa aç
 Clear history	WebPositive Window		Geçmişi sil
-Cancel	WebPositive Window		İptal
+Cancel	WebPositive Window		Vazgeç
 Bookmark info	WebPositive Window		Yer imi bilgisi
 Script console	Console Window		Betik konsolu
 Copy	URL Bar		Kopyala

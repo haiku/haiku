@@ -637,7 +637,7 @@ Tab::Tab(SATGroup* group, Variable* variable, orientation_t orientation)
 	fVariable(variable),
 	fOrientation(orientation)
 {
-	
+
 }
 
 
@@ -647,8 +647,6 @@ Tab::~Tab()
 		fGroup->_RemoveVerticalTab(this);
 	else
 		fGroup->_RemoveHorizontalTab(this);
-
-	delete fVariable;
 }
 
 
@@ -806,7 +804,7 @@ SATGroup::~SATGroup()
 		debugger("Deleting a SATGroup which is not empty");
 	//while (fSATWindowList.CountItems() > 0)
 	//	RemoveWindow(fSATWindowList.ItemAt(0));
-	
+
 	fLinearSpec->ReleaseReference();
 }
 
@@ -916,7 +914,7 @@ SATGroup::RemoveWindow(SATWindow* window, bool stayBelowMouse)
 	// We need the area a little bit longer because the area could hold the
 	// last reference to the group.
 	BReference<WindowArea> area = window->GetWindowArea();
-	if (area.Get() != NULL)
+	if (area.IsSet())
 		area->_RemoveWindow(window);
 
 	window->RemovedFromGroup(this, stayBelowMouse);

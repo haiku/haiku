@@ -10,7 +10,7 @@
 struct real_time_data;
 
 enum sparc_platform_type {
-	PPC_PLATFORM_OPEN_FIRMWARE = 0,
+	SPARC_PLATFORM_OPEN_FIRMWARE = 0,
 };
 
 namespace BPrivate {

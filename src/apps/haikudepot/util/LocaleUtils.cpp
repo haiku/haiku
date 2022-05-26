@@ -8,10 +8,13 @@
 
 #include <Catalog.h>
 #include <Collator.h>
+#include <DateFormat.h>
 #include <DateTimeFormat.h>
 #include <Locale.h>
 #include <LocaleRoster.h>
 #include <StringFormat.h>
+
+#include "Logger.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -38,10 +41,8 @@ LocaleUtils::GetCollator(BCollator* collator)
 {
 	const BLocale* locale = BLocaleRoster::Default()->GetDefaultLocale();
 
-	if (B_OK != locale->GetCollator(collator)) {
-		debugger("unable to get the locale's collator");
-		exit(EXIT_FAILURE);
-	}
+	if (locale->GetCollator(collator) != B_OK)
+		HDFATAL("unable to get the locale's collator");
 }
 
 
@@ -54,7 +55,23 @@ LocaleUtils::TimestampToDateTimeString(uint64 millis)
 	BDateTimeFormat format;
 	BString buffer;
 	if (format.Format(buffer, millis / 1000, B_SHORT_DATE_FORMAT,
-		B_SHORT_TIME_FORMAT) != B_OK)
+			B_SHORT_TIME_FORMAT) != B_OK)
+		return "!";
+
+	return buffer;
+}
+
+
+/*static*/ BString
+LocaleUtils::TimestampToDateString(uint64 millis)
+{
+	if (millis == 0)
+		return "?";
+
+	BDateFormat format;
+	BString buffer;
+	if (format.Format(buffer, millis / 1000, B_SHORT_DATE_FORMAT)
+			!= B_OK)
 		return "!";
 
 	return buffer;

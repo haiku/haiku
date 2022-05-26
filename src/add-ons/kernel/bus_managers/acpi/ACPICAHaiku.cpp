@@ -233,13 +233,15 @@ ACPI_PHYSICAL_ADDRESS
 AcpiOsGetRootPointer()
 {
 #ifdef _KERNEL_MODE
-	ACPI_PHYSICAL_ADDRESS address;
-	ACPI_STATUS status = AE_OK;
 	DEBUG_FUNCTION();
 	if (sACPIRoot == 0) {
-		sACPIRoot = (ACPI_PHYSICAL_ADDRESS)get_boot_item("ACPI_ROOT_POINTER", NULL);
+		phys_addr_t* acpiRootPointer = (phys_addr_t*)get_boot_item("ACPI_ROOT_POINTER", NULL);
+		if (acpiRootPointer != NULL)
+			sACPIRoot = *acpiRootPointer;
+
 		if (sACPIRoot == 0) {
-			status = AcpiFindRootPointer(&address);
+			ACPI_PHYSICAL_ADDRESS address;
+			ACPI_STATUS status = AcpiFindRootPointer(&address);
 			if (status == AE_OK)
 				sACPIRoot = address;
 		}
@@ -1199,12 +1201,12 @@ AcpiOsSignal(UINT32 function, void *info)
 	switch (function) {
 		case ACPI_SIGNAL_FATAL:
 #ifdef _KERNEL_MODE
-			panic(info == NULL ? "AcpiOsSignal: fatal" : (const char*)info);
+			panic("%s", info == NULL ? "AcpiOsSignal: fatal" : (const char*)info);
 			break;
 #endif
 		case ACPI_SIGNAL_BREAKPOINT:
 			if (info != NULL)
-				AcpiOsPrintf("AcpiOsBreakpoint: %s ****\n", info);
+				AcpiOsPrintf("AcpiOsBreakpoint: %s ****\n", (const char*)info);
 			else
 				AcpiOsPrintf("At AcpiOsBreakpoint ****\n");
 			break;

@@ -1,0 +1,23 @@
+1	hungarian	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Tekercs
+(none)	TransportView		(nincs)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# csomópont} other{# csomópont}}
+Start	TransportView		Indítás
+No errors.	TransportView		Nincs hiba.
+to	TransportView		eddig:
+Offline	TransportView		Offline
+(???)	TransportView		(???)
+Stop	TransportView		Leállítás
+(no group)	TransportView		(nincs csoport)
+Drop data	TransportView		Adat bedobása
+To:	TransportView		Hova:
+Recording	TransportView		Felvétel
+Increase latency	TransportView		Késleltetés növelése
+Time source:	TransportView		Idő forrása:
+DAC time source	TransportView		DAC idő forrás
+Decrease precision	TransportView		Pontosság csökkentése
+System clock	TransportView		Rendszer idő
+From:	TransportView		Honnan:
+Roll from	TransportView		Görgetés ettől:
+Preroll	TransportView		Előgörgetés
+Run mode:	TransportView		Futás módja:

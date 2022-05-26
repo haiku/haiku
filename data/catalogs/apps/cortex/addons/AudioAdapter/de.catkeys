@@ -1,0 +1,10 @@
+1	german	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		Eingangsformat
+Channels:	CortexAudioAdapter		Kanäle:
+stereo	CortexAudioAdapter		stereo
+mono	CortexAudioAdapter		mono
+Output format	CortexAudioAdapter		Ausgabeformat
+Audio input	CortexAddOnsCommon		Audioeingang
+Sample format:	CortexAudioAdapter		Sample-Format:
+Audio output	CortexAddOnsCommon		Audioausgang
+%groupname% parameters	CortexAddOnsCommon		%groupname% Parameter

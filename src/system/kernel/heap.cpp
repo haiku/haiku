@@ -295,7 +295,7 @@ get_caller()
 		STACK_TRACE_KERNEL);
 	for (int32 i = 0; i < depth; i++) {
 		if (returnAddresses[i] < (addr_t)&get_caller
-			|| returnAddresses[i] > (addr_t)&malloc_referenced_release) {
+			|| returnAddresses[i] > (addr_t)&deferred_delete) {
 			return returnAddresses[i];
 		}
 	}
@@ -1864,7 +1864,7 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 #endif
 
 	// if not, allocate a new chunk of memory
-	*newAddress = memalign(0, newSize);
+	*newAddress = malloc(newSize);
 	T(Reallocate((addr_t)address, (addr_t)*newAddress, newSize));
 	if (*newAddress == NULL) {
 		// we tried but it didn't work out, but still the operation is done
@@ -2349,7 +2349,7 @@ free_etc(void *address, uint32 flags)
 void *
 malloc(size_t size)
 {
-	return memalign(0, size);
+	return memalign_etc(0, size, 0);
 }
 
 
@@ -2410,7 +2410,7 @@ realloc(void *address, size_t newSize)
 	}
 
 	if (address == NULL)
-		return memalign(0, newSize);
+		return malloc(newSize);
 
 	if (newSize == 0) {
 		free(address);
@@ -2455,7 +2455,7 @@ realloc(void *address, size_t newSize)
 			}
 
 			// have to allocate/copy/free - TODO maybe resize the area instead?
-			newAddress = memalign(0, newSize);
+			newAddress = malloc(newSize);
 			if (newAddress == NULL) {
 				dprintf("realloc(): failed to allocate new block of %ld bytes\n",
 					newSize);
@@ -2482,7 +2482,7 @@ realloc(void *address, size_t newSize)
 void *
 calloc(size_t numElements, size_t size)
 {
-	void *address = memalign(0, numElements * size);
+	void *address = malloc(numElements * size);
 	if (address != NULL)
 		memset(address, 0, numElements * size);
 
@@ -2500,42 +2500,6 @@ deferred_free(void *block)
 
 	InterruptsSpinLocker _(sDeferredFreeListLock);
 	sDeferredFreeList.Add(entry);
-}
-
-
-void *
-malloc_referenced(size_t size)
-{
-	int32 *referencedData = (int32 *)malloc(size + 4);
-	if (referencedData == NULL)
-		return NULL;
-
-	*referencedData = 1;
-	return referencedData + 1;
-}
-
-
-void *
-malloc_referenced_acquire(void *data)
-{
-	if (data != NULL) {
-		int32 *referencedData = (int32 *)data - 1;
-		atomic_add(referencedData, 1);
-	}
-
-	return data;
-}
-
-
-void
-malloc_referenced_release(void *data)
-{
-	if (data == NULL)
-		return;
-
-	int32 *referencedData = (int32 *)data - 1;
-	if (atomic_add(referencedData, -1) < 1)
-		free(referencedData);
 }
 
 

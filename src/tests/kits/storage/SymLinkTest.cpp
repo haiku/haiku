@@ -552,7 +552,7 @@ SymLinkTest::ReadLinkTest()
 	CPPUNIT_ASSERT( link.ReadLink(buffer, sizeof(buffer)) == B_BAD_VALUE );
 	// small buffer
 	// R5: returns the size of the contents, not the number of bytes copied
-	// OBOS: ... so do we
+	// Haiku: ... so do we
 	NextSubTest();
 	char smallBuffer[2];
 	CPPUNIT_ASSERT( link.SetTo(dirLink) == B_OK );

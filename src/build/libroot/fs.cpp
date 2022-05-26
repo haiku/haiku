@@ -117,7 +117,7 @@ utimes_helper(File& file, const struct timespec times[2])
 			timeBuffer[1] = now;
 	}
 
-	return file.SetTimes(timeBuffer);	
+	return file.SetTimes(timeBuffer);
 }
 
 #endif	// _HAIKU_BUILD_NO_FUTIMENS || _HAIKU_BUILD_NO_FUTIMENS
@@ -235,6 +235,7 @@ find_dir_entry(DIR *dir, const char *path, NodeRef ref, string &name,
 	return B_OK;
 }
 
+
 // find_dir_entry
 static status_t
 find_dir_entry(const char *path, NodeRef ref, string &name, bool skipDot)
@@ -253,96 +254,50 @@ find_dir_entry(const char *path, NodeRef ref, string &name, bool skipDot)
 }
 
 
-static bool
-guess_normalized_dir_path(string path, NodeRef ref, string& _normalizedPath)
-{
-	// We assume the CWD is normalized and hope that the directory is an
-	// ancestor of it. We just chop off path components until we find a match or
-	// hit root.
-	char cwd[B_PATH_NAME_LENGTH];
-	if (getcwd(cwd, sizeof(cwd)) == NULL)
-		return false;
-
-	while (cwd[0] == '/') {
-		struct stat st;
-		if (stat(cwd, &st) == 0) {
-			if (st.st_dev == ref.device && st.st_ino == ref.node) {
-				_normalizedPath = cwd;
-				return true;
-			}
-		}
-
-		*strrchr(cwd, '/') = '\0';
-	}
-
-	// TODO: If path is absolute, we could also try to work with that, though
-	// the other way around -- trying prefixes until we hit a "." or ".."
-	// component.
-
-	return false;
-}
-
-
-// normalize_dir_path
-static status_t
-normalize_dir_path(string path, NodeRef ref, string &normalizedPath)
-{
-	// get parent path
-	path += "/..";
-
-	// stat the parent dir
-	struct stat st;
-	if (lstat(path.c_str(), &st) < 0)
-		return errno;
-
-	// root dir?
-	NodeRef parentRef(st);
-	if (parentRef == ref) {
-		normalizedPath = "/";
-		return 0;
-	}
-
-	// find the entry
-	string name;
-	status_t error = find_dir_entry(path.c_str(), ref, name, true)				;
-	if (error != B_OK) {
-		if (error != B_ENTRY_NOT_FOUND) {
-			// We couldn't open the directory. This might be because we don't
-			// have read permission. We're OK with not fully normalizing the
-			// path and try to guess the path in this case. Note: We don't check
-			// error for B_PERMISSION_DENIED, since opendir() may clobber the
-			// actual kernel error code with something not helpful.
-			if (guess_normalized_dir_path(path, ref, normalizedPath))
-				return B_OK;
-		}
-
-		return error;
-	}
-
-	// recurse to get the parent dir path, if found
-	error = normalize_dir_path(path, parentRef, normalizedPath);
-	if (error != 0)
-		return error;
-
-	// construct the normalizedPath
-	if (normalizedPath.length() > 1) // don't append "/", if parent is root
-		normalizedPath += '/';
-	normalizedPath += name;
-
-	return 0;
-}
-
-// normalize_dir_path
+// normalize_dir_path: Make path absolute and remove redundant entries.
 static status_t
 normalize_dir_path(const char *path, string &normalizedPath)
 {
-	// stat() the dir
-	struct stat st;
-	if (stat(path, &st) < 0)
-		return errno;
+	const size_t pathLen = strlen(path);
 
-	return normalize_dir_path(path, NodeRef(st), normalizedPath);
+	// Add CWD to relative paths.
+	if (pathLen == 0 || path[0] != '/') {
+		char pwd[PATH_MAX];
+		if (getcwd(pwd, sizeof(pwd)) == NULL)
+			return B_ERROR;
+
+		normalizedPath = pwd;
+	}
+
+	const char *end = &path[pathLen];
+	const char *next;
+	for (const char *ptr = path; ptr < end; ptr = next + 1) {
+		next = (char *)memchr(ptr, '/', end - ptr);
+		if (next == NULL)
+			next = end;
+
+		size_t len = next - ptr;
+		if (len == 2 && ptr[0] == '.' && ptr[1] == '.') {
+			string::size_type pos = normalizedPath.rfind('/');
+			if (pos != string::npos)
+				normalizedPath.resize(pos);
+			continue;
+		} else if (len == 0 || (len == 1 && ptr[0] == '.')) {
+			continue;
+		}
+
+		if (normalizedPath.length() != 1)
+			normalizedPath += '/';
+
+		normalizedPath.append(ptr, len);
+	}
+
+	if (normalizedPath.length() == 0)
+		normalizedPath += '/';
+
+	return B_OK;
 }
+
 
 // normalize_entry_path
 static status_t
@@ -362,7 +317,6 @@ normalize_entry_path(const char *path, string &normalizedPath)
 			dirPathString = string(path, leafName - path);
 			dirPath = dirPathString.c_str();
 		}
-
 	} else {
 		// path contains no slash, so it is a path relative to the current dir
 		dirPath = ".";
@@ -415,7 +369,7 @@ get_path(const NodeRef *ref, const char *name, string &path)
 
 		// stat the path to check, if it is still valid
 		struct stat st;
-		if (lstat(path.c_str(), &st) < 0) {
+		if (stat(path.c_str(), &st) < 0) {
 			sDirPathMap.erase(it);
 			return errno;
 		}
@@ -857,10 +811,12 @@ _kern_dup(int fd)
 		return B_FILE_ERROR;
 
 	// clone it
-	Descriptor *clone;
+	Descriptor *clone = NULL;
 	status_t error = descriptor->Dup(clone);
 	if (error != B_OK)
 		return error;
+	if (clone == NULL)
+		debugger("Dup() succeeded but descriptor is NULL");
 
 	return add_descriptor(clone);
 }
@@ -935,7 +891,6 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 			return errno;
 
 		isSymlink = S_ISLNK(tmpStat.st_mode);
-
 	} else {
 		Descriptor *descriptor = get_descriptor(fd);
 		if (!descriptor)
@@ -944,17 +899,14 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 		if (FileDescriptor *fileFD
 				= dynamic_cast<FileDescriptor*>(descriptor)) {
 			realFD = fileFD->fd;
-
 		} else if (dynamic_cast<DirectoryDescriptor*>(descriptor)) {
 			error = get_path(fd, NULL, realPath);
 			if (error != B_OK)
 				return error;
-
 		} else if (SymlinkDescriptor *linkFD
 				= dynamic_cast<SymlinkDescriptor*>(descriptor)) {
 			realPath = linkFD->path;
 			isSymlink = true;
-
 		} else
 			return B_FILE_ERROR;
 	}
@@ -985,15 +937,29 @@ _kern_write_stat(int fd, const char *path, bool traverseLink,
 				return errno;
 		}
 
-		// The timestamps can only be set via utime(), but that requires a
-		// path we don't have.
-		if (statMask & (B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME
-				| B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME)) {
-			return B_ERROR;
+		if (statMask & (B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME)) {
+			// Grab the previous mod and access times so we only overwrite
+			// the specified time and not both
+			struct stat oldStat;
+			if (~statMask & (B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME)) {
+				if (fstat(realFD, &oldStat) < 0)
+					return errno;
+			}
+
+			struct timespec times[2];
+			times[0] = (statMask & B_STAT_ACCESS_TIME)
+				? HAIKU_HOST_STAT_ATIM(*st) : HAIKU_HOST_STAT_ATIM(oldStat);
+			times[1] = (statMask & B_STAT_MODIFICATION_TIME)
+				? HAIKU_HOST_STAT_MTIM(*st) : HAIKU_HOST_STAT_MTIM(oldStat);
+			if (futimens(realFD, times) < 0)
+				return errno;
 		}
 
-		return 0;
+		// not supported
+		if (statMask & (B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME))
+			return B_ERROR;
 
+		return 0;
 	} else {
 		if (statMask & B_STAT_MODE) {
 			if (chmod(realPath.c_str(), st->st_mode) < 0)
@@ -1155,6 +1121,7 @@ _kern_unlock_node(int fd)
 
 // #pragma mark -
 
+#if !defined(HAIKU_HOST_PLATFORM_HAIKU)
 // read_pos
 ssize_t
 read_pos(int fd, off_t pos, void *buffer, size_t bufferSize)
@@ -1208,7 +1175,7 @@ write_pos(int fd, off_t pos, const void *buffer, size_t bufferSize)
 
 // readv_pos
 ssize_t
-readv_pos(int fd, off_t pos, const struct iovec *vec, size_t count)
+readv_pos(int fd, off_t pos, const struct iovec *vec, int count)
 {
 	// seek
 	off_t result = lseek(fd, pos, SEEK_SET);
@@ -1227,7 +1194,7 @@ readv_pos(int fd, off_t pos, const struct iovec *vec, size_t count)
 
 // writev_pos
 ssize_t
-writev_pos(int fd, off_t pos, const struct iovec *vec, size_t count)
+writev_pos(int fd, off_t pos, const struct iovec *vec, int count)
 {
 	// seek
 	off_t result = lseek(fd, pos, SEEK_SET);
@@ -1243,6 +1210,7 @@ writev_pos(int fd, off_t pos, const struct iovec *vec, size_t count)
 
 	return bytesWritten;
 }
+#endif
 
 
 // #pragma mark -

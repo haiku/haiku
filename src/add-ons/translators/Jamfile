@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src add-ons translators ;
 
+SubInclude HAIKU_TOP src add-ons translators avif ;
 SubInclude HAIKU_TOP src add-ons translators bmp ;
 SubInclude HAIKU_TOP src add-ons translators exr ;
 SubInclude HAIKU_TOP src add-ons translators gif ;

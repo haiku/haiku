@@ -19,26 +19,29 @@ class JobListView;
 class Job;
 class SpoolFolder;
 class PrinterItem;
+class ScreenSettings;
 
 
 class PrintersWindow : public BWindow {
 public:
-	PrintersWindow(BRect frame);
+				PrintersWindow(ScreenSettings *settings);
+	virtual		~PrintersWindow();
 
-	void MessageReceived(BMessage* msg);
-	bool QuitRequested();
+	void		MessageReceived(BMessage* msg);
+	bool		QuitRequested();
 
-	void PrintTestPage(PrinterItem* printer);
+	void		PrintTestPage(PrinterItem* printer);
 
-	void AddJob(SpoolFolder* folder, Job* job);
-	void RemoveJob(SpoolFolder* folder, Job* job);
-	void UpdateJob(SpoolFolder* folder, Job* job);
+	void		AddJob(SpoolFolder* folder, Job* job);
+	void		RemoveJob(SpoolFolder* folder, Job* job);
+	void		UpdateJob(SpoolFolder* folder, Job* job);
 
 private:
-	void _BuildGUI();
-	bool _IsSelected(PrinterItem* printer);
-	void _UpdatePrinterButtons();
-	void _UpdateJobButtons();
+	ScreenSettings*	fSettings;
+	void		_BuildGUI();
+	bool		_IsSelected(PrinterItem* printer);
+	void		_UpdatePrinterButtons();
+	void		_UpdateJobButtons();
 
 	typedef BWindow Inherited;
 
@@ -53,9 +56,9 @@ private:
 
 	BBox*		fJobsBox;
 
-	PrinterItem* fSelectedPrinter;
+	PrinterItem*	fSelectedPrinter;
 
-	bool fAddingPrinter;
+	bool		fAddingPrinter;
 };
 
 #endif	// _PRINTERS_WINDOW_H

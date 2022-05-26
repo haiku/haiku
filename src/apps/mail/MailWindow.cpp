@@ -268,7 +268,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		read_read_attr(file, flag);
 
 		if (flag == B_UNREAD) {
-			subMenu->AddItem(item = new BMenuItem(
+			subMenu->AddItem(new BMenuItem(
 				B_TRANSLATE_COMMENT("Leave as 'New'",
 				"Do not translate New - this is non-localizable e-mail status"),
 				new BMessage(kMsgQuitAndKeepAllStatus), 'W', B_SHIFT_KEY));
@@ -283,7 +283,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			else
 				label = B_TRANSLATE("Leave same");
 
-			subMenu->AddItem(item = new BMenuItem(label.String(),
+			subMenu->AddItem(new BMenuItem(label.String(),
 							new BMessage(B_QUIT_REQUESTED), 'W'));
 			AddShortcut('W', B_COMMAND_KEY | B_SHIFT_KEY,
 				new BMessage(kMsgQuitAndKeepAllStatus));
@@ -407,7 +407,6 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	menu = new BMenu(B_TRANSLATE("Message"));
 
 	if (!resending && fIncoming) {
-		BMenuItem* menuItem;
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Reply"),
 			new BMessage(M_REPLY),'R'));
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Reply to sender"),
@@ -421,9 +420,9 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			new BMessage(M_FORWARD), 'J'));
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Forward without attachments"),
 			new BMessage(M_FORWARD_WITHOUT_ATTACHMENTS)));
-		menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Resend"),
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Resend"),
 			new BMessage(M_RESEND)));
-		menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Copy to new"),
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Copy to new"),
 			new BMessage(M_COPY_TO_NEW), 'D'));
 
 		menu->AddSeparatorItem();
@@ -3087,8 +3086,6 @@ TMailWindow::_RebuildQueryMenu(bool firstTime)
 	fQueryMenu->AddItem(new BMenuItem(kSameSubjectItem,
 			new BMessage(M_QUERY_SUBJECT)));
 
-	bool queryItemsAdded = false;
-
 	BPath queryPath;
 	if (_GetQueryPath(&queryPath) < B_OK)
 		return;
@@ -3109,8 +3106,6 @@ TMailWindow::_RebuildQueryMenu(bool firstTime)
 		char* queryString = _BuildQueryString(&entry);
 		if (queryString == NULL)
 			continue;
-
-		queryItemsAdded = true;
 
 		QueryMenu* queryMenu = new QueryMenu(name, false);
 		queryMenu->SetTargetForItems(be_app);

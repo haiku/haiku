@@ -1,24 +1,27 @@
-1	german	x-vnd.Haiku-GLInfo	2211760527
+1	german	x-vnd.Haiku-GLInfo	1282327690
 Maximum clipping planes	Capabilities		Max. Clipping Ebenen
-Maximum 2D texture size	Capabilities		Max. 2D Texturgröße
-Auxiliary buffer(s)	Capabilities		Zusätzlich(e) Puffer
 Maximum evaluators equation order	Capabilities		Max. Evaluatoren der Formelreihenfolge
 Texture stack size	Capabilities		Stackgröße für Texturen
 GL Info	System name		GL Info
 Information	InfoView		Informationen
-Maximum convolution	Capabilities		Max. Faltung
 Attributes stack size	Capabilities		Stackgröße für Attribute
 Maximum lights	Capabilities		Max. Lichter
-Maximum 3D texture size	Capabilities		Max. 3D Texturgröße
 Extensions	Extensions		Erweiterungen
-Maximum recommended index elements	Capabilities		Max. empfohlene Indexelemente
 Available extensions	Extensions		Verfügbare Erweiterungen
 Maximum recommended vertex elements	Capabilities		Max. empfohlene Vertexelemente
 Value	Capabilities		Wert
-Maximum texture units	Capabilities		Max. Textureinheiten
-Capabilities	Capabilities		Leistungsdaten
 Name stack size	Capabilities		Stackgröße für Namen
-List stack size	Capabilities		Stackgröße für Listen
-Projection stack size	Capabilities		Stackgröße für Projektionen
-Model stack size	Capabilities		Stackgröße für Modelle
+Capabilities	Capabilities		Leistungsdaten
+Maximum texture units	Capabilities		Max. Textureinheiten
+Unknown or missing OpenGL renderer.	InfoView		Unbekannter oder fehlender OpenGL Renderer.
 Capability	Capabilities		Leistungsdaten
+Maximum 2D texture size	Capabilities		Max. 2D Texturgröße
+Auxiliary buffer(s)	Capabilities		Zusätzlich(e) Puffer
+Unknown vendor	InfoView		Unbekannter Hersteller
+Maximum convolution	Capabilities		Max. Faltung
+Maximum 3D texture size	Capabilities		Max. 3D Texturgröße
+Maximum recommended index elements	Capabilities		Max. empfohlene Indexelemente
+Unknown version	InfoView		Unbekannte Version
+List stack size	Capabilities		Stackgröße für Listen
+Model stack size	Capabilities		Stackgröße für Modelle
+Projection stack size	Capabilities		Stackgröße für Projektionen

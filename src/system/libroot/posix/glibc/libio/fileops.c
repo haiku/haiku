@@ -303,6 +303,11 @@ _IO_new_file_fopen(_IO_FILE *fp, const char *filename, const char *mode, int is3
 	case 'm':
 	  fp->_flags2 |= _IO_FLAGS2_MMAP;
 	  continue;
+#ifdef O_CLOEXEC
+	case 'e':
+	  oflags |= O_CLOEXEC;
+	  continue;
+#endif
 	default:
 	  /* Ignore.  */
 	  continue;

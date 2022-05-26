@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Haiku, inc.
+ * Copyright 2014-2021 Haiku, inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -17,7 +17,11 @@
 #include <cppunit/TestSuite.h>
 
 
-class DataTest: public BTestCase, BUrlProtocolListener {
+using BPrivate::Network::BUrlProtocolListener;
+using BPrivate::Network::BUrlRequest;
+
+
+class DataTest: public BTestCase {
 public:
 								DataTest();
 	virtual						~DataTest();
@@ -29,16 +33,11 @@ public:
 			void				Base64Test();
 			void				UrlDecodeTest();
 
-			void				DataReceived(BUrlRequest*, const char* data,
-									off_t, ssize_t size);
-
 	static	void				AddTests(BTestSuite& suite);
 
 private:
 			void				_RunTest(BString url, const char* expected,
 									size_t expectedLength);
-private:
-			std::vector<char>	fReceivedData;
 };
 
 

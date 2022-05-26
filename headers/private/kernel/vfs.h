@@ -211,7 +211,8 @@ status_t	_user_access(int fd, const char *path, int mode,
 				bool effectiveUserGroup);
 ssize_t		_user_select(int numfds, fd_set *readSet, fd_set *writeSet,
 				fd_set *errorSet, bigtime_t timeout, const sigset_t *sigMask);
-ssize_t		_user_poll(struct pollfd *fds, int numfds, bigtime_t timeout);
+ssize_t		_user_poll(struct pollfd *fds, int numfds, bigtime_t timeout,
+				const sigset_t *sigMask);
 int			_user_open_attr_dir(int fd, const char *path,
 				bool traverseLeafLink);
 ssize_t		_user_read_attr(int fd, const char *attribute, off_t pos,
@@ -252,6 +253,7 @@ int			_user_dup(int fd);
 int			_user_dup2(int ofd, int nfd);
 status_t	_user_lock_node(int fd);
 status_t	_user_unlock_node(int fd);
+status_t	_user_preallocate(int fd, off_t offset, off_t length);
 
 /* socket user prototypes (implementation in socket.cpp) */
 int			_user_socket(int family, int type, int protocol);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2022 Haiku, Inc. All rights reserved.
  * Released under the terms of the MIT License.
  */
 
@@ -8,15 +8,55 @@
 #include <boot/stage2.h>
 #include <boot/stdio.h>
 
+#include <arch_cpu_defs.h>
+
+#include "mmu.h"
+#include "serial.h"
+#include "smp.h"
 #include "efi_platform.h"
+#include "arch_traps.h"
 
 
-extern "C" void arch_enter_kernel(struct kernel_args *kernelArgs,
-	addr_t kernelEntry, addr_t kernelStackTop);
+// From entry.S
+extern "C" void arch_enter_kernel(uint64 satp, addr_t kernelArgs,
+        addr_t kernelEntry, addr_t kernelStackTop);
+
+// From arch_mmu.cpp
+extern void arch_mmu_post_efi_setup(size_t memory_map_size,
+    efi_memory_descriptor *memory_map, size_t descriptor_size,
+    uint32_t descriptor_version);
+
+extern uint64_t arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
+    efi_memory_descriptor *memory_map, size_t descriptor_size,
+    uint32_t descriptor_version);
+
+
+#include <arch/riscv64/arch_uart_sifive.h>
+
+
+void
+arch_convert_kernel_args(void)
+{
+	fix_address(gKernelArgs.arch_args.fdt);
+}
+
 
 void
 arch_start_kernel(addr_t kernelEntry)
 {
+	// Allocate virtual memory for kernel args
+	struct kernel_args *kernelArgs = NULL;
+	if (platform_allocate_region((void **)&kernelArgs,
+			sizeof(struct kernel_args), 0, false) != B_OK)
+		panic("Failed to allocate kernel args.");
+
+	addr_t virtKernelArgs;
+	platform_bootloader_address_to_kernel_address((void*)kernelArgs,
+		&virtKernelArgs);
+
+	// EFI assumed to be SBI booted
+	gKernelArgs.arch_args.machine_platform = kPlatformSbi;
+
 	// Prepare to exit EFI boot services.
 	// Read the memory map.
 	// First call is to determine the buffer size.
@@ -27,7 +67,7 @@ arch_start_kernel(addr_t kernelEntry)
 	size_t descriptor_size;
 	uint32_t descriptor_version;
 	if (kBootServices->GetMemoryMap(&memory_map_size, &dummy, &map_key,
-			&descriptor_size, &descriptor_version) != EFI_BUFFER_TOO_SMALL) {
+		&descriptor_size, &descriptor_version) != EFI_BUFFER_TOO_SMALL) {
 		panic("Unable to determine size of system memory map");
 	}
 
@@ -43,7 +83,7 @@ arch_start_kernel(addr_t kernelEntry)
 	// Read (and print) the memory map.
 	memory_map_size = actual_memory_map_size;
 	if (kBootServices->GetMemoryMap(&memory_map_size, memory_map, &map_key,
-			&descriptor_size, &descriptor_version) != EFI_SUCCESS) {
+		&descriptor_size, &descriptor_version) != EFI_SUCCESS) {
 		panic("Unable to fetch system memory map.");
 	}
 
@@ -52,10 +92,28 @@ arch_start_kernel(addr_t kernelEntry)
 	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
 		efi_memory_descriptor *entry
 			= (efi_memory_descriptor *)(addr + i * descriptor_size);
-		dprintf("  %#lx-%#lx  %#lx %#x %#lx\n", entry->PhysicalStart,
-			entry->PhysicalStart + entry->NumberOfPages * B_PAGE_SIZE,
-			entry->VirtualStart, entry->Type, entry->Attribute);
+		dprintf("  phys: %#lx, virt: %#lx, size: %#lx, ",
+			entry->PhysicalStart, entry->VirtualStart,
+			entry->NumberOfPages * B_PAGE_SIZE);
+		switch (entry->Type) {
+		case EfiReservedMemoryType:  dprintf("reservedMemoryType"); break;
+		case EfiLoaderCode:          dprintf("loaderCode"); break;
+		case EfiLoaderData:          dprintf("loaderData"); break;
+		case EfiBootServicesCode:    dprintf("bootServicesCode"); break;
+		case EfiBootServicesData:    dprintf("bootServicesData"); break;
+		case EfiConventionalMemory:  dprintf("conventionalMemory"); break;
+		case EfiACPIReclaimMemory:   dprintf("ACPIReclaimMemory"); break;
+		case EfiRuntimeServicesCode: dprintf("runtimeServicesCode"); break;
+		case EfiRuntimeServicesData: dprintf("runtimeServicesData"); break;
+		default: dprintf("?(%d)", entry->Type);
+		}
+		dprintf(", attrs: %#lx\n", entry->Attribute);
 	}
+
+	// Generate page tables for use after ExitBootServices.
+	uint64_t satp = arch_mmu_generate_post_efi_page_tables(
+		memory_map_size, memory_map, descriptor_size, descriptor_version);
+	dprintf("SATP: 0x%016" B_PRIx64 "\n", satp);
 
 	// Attempt to fetch the memory map and exit boot services.
 	// This needs to be done in a loop, as ExitBootServices can change the
@@ -73,8 +131,10 @@ arch_start_kernel(addr_t kernelEntry)
 			// The console was provided by boot services, disable it.
 			stdout = NULL;
 			stderr = NULL;
-			// Can we adjust gKernelArgs.platform_args.serial_base_ports[0]
-			// to something fixed in qemu for debugging?
+			// Also switch to legacy serial output
+			// (may not work on all systems)
+			serial_switch_to_legacy();
+			dprintf("Switched to legacy serial output\n");
 			break;
 		}
 
@@ -85,13 +145,31 @@ arch_start_kernel(addr_t kernelEntry)
 		}
 	}
 
-	// Update EFI, generate final kernel physical memory map, etc.
-	//arch_mmu_post_efi_setup(memory_map_size, memory_map,
-	//		descriptor_size, descriptor_version);
+	arch_traps_init();
 
-	//smp_boot_other_cpus(final_pml4, kernelEntry);
+	// Update EFI, generate final kernel physical memory map, etc.
+	arch_mmu_post_efi_setup(memory_map_size, memory_map,
+			descriptor_size, descriptor_version);
+
+	dprintf("[PRE] SetSatp()\n");
+	SetSatp(satp);
+	dprintf("[POST] SetSatp()\n");
+	FlushTlbAll();
+	dprintf("[POST] FlushTlbAll()\n");
+
+	// Copy final kernel args
+	// This should be the last step before jumping to the kernel
+	// as there are some fixups happening to kernel_args even in the last minute
+	memcpy(kernelArgs, &gKernelArgs, sizeof(struct kernel_args));
+
+	smp_boot_other_cpus(satp, kernelEntry, virtKernelArgs);
 
 	// Enter the kernel!
-	arch_enter_kernel(&gKernelArgs, kernelEntry,
-		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
+	dprintf("arch_enter_kernel(satp: %#" B_PRIxADDR ", kernelArgs: %#" B_PRIxADDR
+		", kernelEntry: %#" B_PRIxADDR ", sp: %#" B_PRIxADDR ")\n",	satp,
+		(addr_t)&kernelArgs, (addr_t)kernelEntry, kernelArgs->cpu_kstack[0].start
+			+ kernelArgs->cpu_kstack[0].size);
+
+	arch_enter_kernel(satp, virtKernelArgs, kernelEntry,
+		kernelArgs->cpu_kstack[0].start + kernelArgs->cpu_kstack[0].size);
 }

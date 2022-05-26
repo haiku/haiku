@@ -3,7 +3,7 @@
  *
  *      This module is part of ntfs-3g library
  *
- * Copyright (c) 2014 Jean-Pierre Andre
+ * Copyright (c) 2014-2021 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -43,6 +43,12 @@
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
+#ifdef MAJOR_IN_MKDEV
+#include <sys/mkdev.h>
+#endif
+#ifdef MAJOR_IN_SYSMACROS
+#include <sys/sysmacros.h>
+#endif
 
 #include "types.h"
 #include "param.h"
@@ -54,6 +60,10 @@
 #include "misc.h"
 #include "logging.h"
 #include "xattrs.h"
+
+static const char lxdev[] = "$LXDEV";
+static const char lxmod[] = "$LXMOD";
+
 
 /*
  *		Create a needed attribute (EA or EA_INFORMATION)
@@ -284,12 +294,11 @@ int ntfs_set_ntfs_ea(ntfs_inode *ni, const char *value, size_t size, int flags)
 			}
 		}
 		/*
-		 * EA and REPARSE_POINT exclude each other
-		 * see http://msdn.microsoft.com/en-us/library/windows/desktop/aa364404(v=vs.85).aspx
-		 * Also return EINVAL if REPARSE_POINT is present.
+		 * EA and REPARSE_POINT compatibility not checked any more,
+		 * required by Windows 10, but having both may lead to
+		 * problems with earlier versions.
 		 */
-		if (ok
-		    && !ntfs_attr_exist(ni, AT_REPARSE_POINT, AT_UNNAMED,0)) {
+		if (ok) {
 			ea_info.ea_length = cpu_to_le16(ea_packed);
 			ea_info.need_ea_count = cpu_to_le16(ea_count);
 			ea_info.ea_query_length = cpu_to_le32(nextoffs);
@@ -392,4 +401,119 @@ int ntfs_remove_ntfs_ea(ntfs_inode *ni)
 		res = -1;
 	}
 	return (res ? -1 : 0);
+}
+
+/*
+ *		Check for the presence of an EA "$LXDEV" (used by WSL)
+ *	and return its value as a device address
+ *
+ *	Returns zero if successful
+ *		-1 if failed, with errno set
+ */
+
+int ntfs_ea_check_wsldev(ntfs_inode *ni, dev_t *rdevp)
+{
+	const EA_ATTR *p_ea;
+	int bufsize;
+	char *buf;
+	int lth;
+	int res;
+	int offset;
+	int next;
+	BOOL found;
+	struct {
+		le32 major;
+		le32 minor;
+	} device;
+
+	res = -EOPNOTSUPP;
+	bufsize = 256; /* expected to be enough */
+	buf = (char*)malloc(bufsize);
+	if (buf) {
+		lth = ntfs_get_ntfs_ea(ni, buf, bufsize);
+			/* retry if short buf */
+		if (lth > bufsize) {
+			free(buf);
+			bufsize = lth;
+			buf = (char*)malloc(bufsize);
+			if (buf)
+				lth = ntfs_get_ntfs_ea(ni, buf, bufsize);
+		}
+	}
+	if (buf && (lth > 0) && (lth <= bufsize)) {
+		offset = 0;
+		found = FALSE;
+		do {
+			p_ea = (const EA_ATTR*)&buf[offset];
+			next = le32_to_cpu(p_ea->next_entry_offset);
+			found = ((next > (int)(sizeof(lxdev) + sizeof(device)))
+				&& (p_ea->name_length == (sizeof(lxdev) - 1))
+				&& (p_ea->value_length
+					== const_cpu_to_le16(sizeof(device)))
+				&& !memcmp(p_ea->name, lxdev, sizeof(lxdev)));
+			if (!found)
+				offset += next;
+		} while (!found && (next > 0) && (offset < lth));
+		if (found) {
+				/* beware of alignment */
+			memcpy(&device, &p_ea->name[p_ea->name_length + 1],
+					sizeof(device));
+			*rdevp = makedev(le32_to_cpu(device.major),
+					le32_to_cpu(device.minor));
+			res = 0;
+		}
+	}
+	free(buf);
+	return (res);
+}
+
+int ntfs_ea_set_wsl_not_symlink(ntfs_inode *ni, mode_t type, dev_t dev)
+{
+	le32 mode;
+	struct {
+		le32 major;
+		le32 minor;
+	} device;
+	struct EA_WSL {
+		struct EA_LXMOD {	/* always inserted */
+			EA_ATTR base;
+			char name[sizeof(lxmod)];
+			char value[sizeof(mode)];
+			char stuff[3 & -(sizeof(lxmod) + sizeof(mode))];
+		} mod;
+		struct EA_LXDEV {	/* char or block devices only */
+			EA_ATTR base;
+			char name[sizeof(lxdev)];
+			char value[sizeof(device)];
+			char stuff[3 & -(sizeof(lxdev) + sizeof(device))];
+		} dev;
+	} attr;
+	int len;
+	int res;
+
+	memset(&attr, 0, sizeof(attr));
+	mode = cpu_to_le32((u32)(type | 0644));
+	attr.mod.base.next_entry_offset
+			= const_cpu_to_le32(sizeof(attr.mod));
+	attr.mod.base.flags = 0;
+	attr.mod.base.name_length = sizeof(lxmod) - 1;
+	attr.mod.base.value_length = const_cpu_to_le16(sizeof(mode));
+	memcpy(attr.mod.name, lxmod, sizeof(lxmod));
+	memcpy(attr.mod.value, &mode, sizeof(mode));
+	len = sizeof(attr.mod);
+
+	if (S_ISCHR(type) || S_ISBLK(type)) {
+		device.major = cpu_to_le32(major(dev));
+		device.minor = cpu_to_le32(minor(dev));
+		attr.dev.base.next_entry_offset
+			= const_cpu_to_le32(sizeof(attr.dev));
+		attr.dev.base.flags = 0;
+		attr.dev.base.name_length = sizeof(lxdev) - 1;
+		attr.dev.base.value_length = const_cpu_to_le16(sizeof(device));
+		memcpy(attr.dev.name, lxdev, sizeof(lxdev));
+		memcpy(attr.dev.value, &device, sizeof(device));
+		len += sizeof(attr.dev);
+		}
+	res = ntfs_set_ntfs_ea(ni, (char*)&attr, len, 0);
+	return (res);
 }

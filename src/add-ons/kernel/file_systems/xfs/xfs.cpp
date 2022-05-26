@@ -25,7 +25,10 @@ XfsSuperBlock::IsValid() const
 	}
 
 	// Checking version 4 file system
-	ASSERT((Version() & 0x000f) == 4)
+	if ((Version() & 0x000f) > 4) {
+		ERROR("XFS version 5 or later is not yet supported");
+		return false;
+	}
 
 	return true;
 }
@@ -49,6 +52,13 @@ uint32
 XfsSuperBlock::BlockSize() const
 {
 	return sb_blocksize;
+}
+
+
+uint32
+XfsSuperBlock::DirBlockLog() const
+{
+	return sb_dirblklog;
 }
 
 

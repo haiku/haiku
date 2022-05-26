@@ -1,0 +1,23 @@
+1	romanian	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Rulează
+(none)	TransportView		(nespecificat)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# node} other{# nodes}}
+Start	TransportView		Începe
+No errors.	TransportView		Nu sunt erori.
+to	TransportView		către
+Offline	TransportView		Deconectat
+(???)	TransportView		(???)
+Stop	TransportView		Oprește
+(no group)	TransportView		(fără grup)
+Drop data	TransportView		Renunță la date
+To:	TransportView		Către:
+Recording	TransportView		Înregistrare
+Increase latency	TransportView		Crește latența
+Time source:	TransportView		Sursă de timp:
+DAC time source	TransportView		Sursă de timp DAC
+Decrease precision	TransportView		Scade precizia
+System clock	TransportView		Ceas de sistem
+From:	TransportView		De la:
+Roll from	TransportView		Rulează de la
+Preroll	TransportView		Prerulare
+Run mode:	TransportView		Mod de rulare:

@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-FirstBootPrompt	2813539172
+1	thai	x-vnd.Haiku-FirstBootPrompt	585808223
 Japanese	KeymapNames		ญี่ปุ่น
 US	KeymapNames		อังกฤษ (US)
 Esperanto	KeymapNames		แอสเปอรันโต้
@@ -10,10 +10,10 @@ Latin-American	KeymapNames		สเปน (ละติน)
 Ukrainian	KeymapNames		ยูเครน
 Russian (Yawert)	KeymapNames		รัสเซีย (Yawert)
 United-Kingdom	KeymapNames		อังกฤษ (UK)
-Serbian (Cyrillic)	KeymapNames		เซอเบีย (Cyrillic)
 Turkish (Type-F)	KeymapNames		ตุรกี (Type-F)
-Bulgarian (Cyrillic)	KeymapNames		บัลแกเรีย (Cyrillic)
+Serbian (Cyrillic)	KeymapNames		เซอเบีย (Cyrillic)
 Belgian (point)	KeymapNames		เบลเยี่ยม (point)
+Bulgarian (Cyrillic)	KeymapNames		บัลแกเรีย (Cyrillic)
 Finnish	KeymapNames		ฟินแลนด์
 Swedish	KeymapNames		สวีเดน
 Svorak	KeymapNames		สโลวัค
@@ -37,7 +37,6 @@ Belarusian (Mac)	KeymapNames		เบลารุส (Mac)
 Hebrew	KeymapNames		ฮิบบรู
 Greek	KeymapNames		กรีก
 Croatian	KeymapNames		โครเอเชีย
-Run Installer	BootPromptWindow		เรียกใช้โปรแกรมติดตั้ง
 Faeroese	KeymapNames		หมู่เกาะแฟโร
 Polish (Typewriter)	KeymapNames		โปแลนด์ (Typewriter)
 French (Mac)	KeymapNames		ฝรั่งเศส (Mac)
@@ -52,8 +51,8 @@ Italian	KeymapNames		อิตาลี
 Portuguese	KeymapNames		โปรตุเกส
 Swiss-French	KeymapNames		ฝรั่งเศส (สวิส)
 Slovene	KeymapNames		สโลเวเนีย
-Lithuanian	KeymapNames		ลิทัวเนีย
 French (NF Z71-300)	KeymapNames		ฝรั่งเศส (NF Z71-300)
+Lithuanian	KeymapNames		ลิทัวเนีย
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		คาซัค
 Language	BootPromptWindow		ภาษา
@@ -62,16 +61,14 @@ Belgian (comma)	KeymapNames		เบลเยี่ยม (comma)
 Custom	BootPromptWindow		กำหนดเอง
 Norwegian	KeymapNames		นอร์เวย์
 Danish	KeymapNames		เดนมาร์ก
-Boot to Desktop	BootPromptWindow		บูตเครื่องไปที่เดสก์ท็อป
 Bulgarian (Phonetic)	KeymapNames		บัลแกเรีย (Phonetic)
 Canadian-French	KeymapNames		ฝรังเศส (แคนาดา)
-Welcome to Haiku!	BootPromptWindow		ยินดีต้อนรับสู่ Haiku!
 Russian	KeymapNames		รัสเซีย
 Hungarian	KeymapNames		ฮังการี
 Irish	KeymapNames		ไอริช
 Romanian	KeymapNames		โรมาเนีย
-Macedonian	KeymapNames		มาเซโดเนีย
 Czech (Mac)	KeymapNames		เชค (Mac)
+Macedonian	KeymapNames		มาเซโดเนีย
 Brazilian (ABNT2)	KeymapNames		โปรตุเกส (ABNT2)
 Albanian	KeymapNames		อัลแบเนีย
 Dutch	KeymapNames		ดัตช์

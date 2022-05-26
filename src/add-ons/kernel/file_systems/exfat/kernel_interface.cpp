@@ -397,10 +397,13 @@ exfat_lookup(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	status = DirectoryIterator(directory).Lookup(name, strlen(name), _vnodeID);
 	if (status != B_OK) {
 		ERROR("exfat_lookup: name %s (%s)\n", name, strerror(status));
+		if (status == B_ENTRY_NOT_FOUND)
+			entry_cache_add_missing(volume->ID(), directory->ID(), name);
 		return status;
 	}
 
 	TRACE("exfat_lookup: ID %" B_PRIdINO "\n", *_vnodeID);
+	entry_cache_add(volume->ID(), directory->ID(), name, *_vnodeID);
 
 	return get_vnode(volume->FSVolume(), *_vnodeID, NULL);
 }
@@ -587,7 +590,7 @@ exfat_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 	while (count < maxCount && bufferSize > sizeof(struct dirent)) {
 		ino_t id;
-		size_t length = bufferSize - sizeof(struct dirent) + 1;
+		size_t length = bufferSize - offsetof(struct dirent, d_name);
 
 		status_t status = iterator->GetNext(dirent->d_name, &length, &id);
 		if (status == B_ENTRY_NOT_FOUND)
@@ -605,7 +608,7 @@ exfat_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = id;
-		dirent->d_reclen = sizeof(struct dirent) + length;
+		dirent->d_reclen = offsetof(struct dirent, d_name) + length + 1;
 
 		bufferSize -= dirent->d_reclen;
 		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);

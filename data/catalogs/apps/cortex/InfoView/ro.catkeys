@@ -1,0 +1,59 @@
+1	romanian	application/x-vnd.Cortex.InfoView	2382053937
+Offset	InfoView		Decalaj
+Description	DormantNodeInfoView		Descriere
+Byte order	InfoView		Ordine de octeți
+Connection	InfoView		Conexiune
+Output formats	DormantNodeInfoView		Formate de ieșire
+History	InfoView		Istoric
+Input formats	DormantNodeInfoView		Formate de intrare
+Signature	AppNodeInfoView		Semnătură
+Video data between	InfoView		Date video între
+Any number	DormantNodeInfoView	For 'Max. instances' field	Orice număr
+Flags	InfoView		Fanioane
+Media output	InfoView		Ieșire media
+Active lines	InfoView		Linii active
+Buffer size	InfoView		Dimensiune preîncărcare
+\n- Quality:	FileNodeInfoView		\n- Calitate:
+Kinds	LiveNodeInfoView		Feluri
+Application	AppNodeInfoView		Aplicație
+Flavor flags	DormantNodeInfoView		Fanioane de distribuție
+Max. instances	DormantNodeInfoView		Instanțe max.
+\n- Duration:	FileNodeInfoView		\n- Durată:
+Dormant media node	DormantNodeInfoView		Nod media inactiv
+Latency	LiveNodeInfoView		Latență
+Media type	InfoView		Tip de media
+Live media node	LiveNodeInfoView		Nod media activ
+Field rate	InfoView		Rata de câmp
+Kinds	DormantNodeInfoView		Feluri
+%title% info	InfoView		informații %title%
+Node ID	LiveNodeInfoView		ID nod
+Resolution	InfoView		Rezoluție
+Chunk size	InfoView		Dimensiune porție
+File format	AppNodeInfoView		Format de fișier
+Matrix mask	InfoView		Mască de matrice
+Channel mask	InfoView		Mască de canal
+Orientation	InfoView		Orientare
+Live file-interface node	FileNodeInfoView		Nod de interfață de fișier activ
+Channels	InfoView		Canale
+Sample rate	InfoView		Rată de eșantionare
+File format	FileNodeInfoView		Format de fișier
+(no file)	FileNodeInfoView		(niciun fișier)
+Media input	InfoView		Intrare media
+Bit rate	InfoView		Rată de biți
+Input format	DormantNodeInfoView		Format de intrare
+Format	InfoView		Format
+Version	AppNodeInfoView		Versiune
+AddOn ID	DormantNodeInfoView		ID supliment
+Frame size	InfoView		Dimensiune cadru
+Flavor ID	DormantNodeInfoView		ID distribuție
+Run mode	LiveNodeInfoView		Mod de rulare
+\n- Codec:	FileNodeInfoView		\n- Codec:
+Port	LiveNodeInfoView		Port
+Output format	DormantNodeInfoView		Format de ieșire
+Aspect ratio	InfoView		Rată de aspect
+Application-owned node	AppNodeInfoView		Nod deținut de aplicație
+Tracks	FileNodeInfoView		Piste
+Source	InfoView		Sursă
+Destination	InfoView		Destinație
+Copyright	FileNodeInfoView		Drepturi de autor
+ID:	FileNodeInfoView		ID:

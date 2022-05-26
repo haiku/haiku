@@ -26,8 +26,6 @@
 spinlock __haiku_intr_spinlock;
 
 struct net_stack_module_info *gStack;
-pci_module_info *gPci;
-struct pci_x86_module_info *gPCIx86;
 
 static struct list sRootDevices;
 static int sNextUnit;
@@ -196,6 +194,12 @@ device_get_children(device_t dev, device_t **devlistp, int *devcountp)
 	count = 0;
 	while ((child = list_get_next_item(&dev->children, child)) != NULL) {
 		count++;
+	}
+
+	if (count == 0) {
+		*devlistp = NULL;
+		*devcountp = 0;
+		return (0);
 	}
 
 	list = malloc(count * sizeof(device_t));
@@ -618,7 +622,7 @@ printf(const char *format, ...)
 	va_start(vl, format);
 	vsnprintf(buf, sizeof(buf), format, vl);
 	va_end(vl);
-	dprintf(buf);
+	dprintf("%s", buf);
 
 	return 0;
 }

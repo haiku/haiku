@@ -12,7 +12,7 @@ Scan	Status View		スキャン
 Rescan	Status View		再スキャン
 file unavailable	Status View		ファイルは利用できません
 Get info	Pie View		情報を表示
-DiskUsage	System name		DiskUsage
+DiskUsage	System name		ディスク使用率
 Created	Info Window		作成日時
 Modified	Info Window		更新日時
 Abort	Status View		中断

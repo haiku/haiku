@@ -1,0 +1,37 @@
+1	catalan; valencian	x-vnd.haiku.SerialConnect	354154115
+Hardware	SerialWindow	Flowcontrol	Maquinari
+Connection	SerialWindow		Connexió
+Raw send…	SerialWindow		Enviament en cru...
+Baud rate	SerialWindow		Velocitat de transmissió
+Stop bits	SerialWindow		Bits d'aturada
+None	SerialWindow	Flowcontrol	Cap
+Cancel	Custom baudrate window		Cancel·la
+Sending…	XModemStatus		Enviament...
+<no serial port available>	SerialWindow		<no hi ha cap port sèrie disponible>
+Log to file…	SerialWindow		Registra al fitxer...
+Custom baudrate	Custom baudrate window		Velocitat de transmissió personalitzada
+File	SerialWindow		Fitxer
+SerialConnect	System name		Connexió de sèrie
+custom…	SerialWindow	Baudrate	personalitzat...
+Parity	SerialWindow		Paritat
+None	SerialWindow	Parity	Cap
+Disconnect	SerialWindow		Desconnecta
+Everything sent, waiting for acknowledge	XModemStatus		Tot enviat, a l'espera de confirmació.
+Odd	SerialWindow	Parity	Senar
+Flow control	SerialWindow		Control de flux
+file transfer progress	SerialWindow		progrés de la transferència de fitxers
+CRC requested	XModemStatus		CRC sol·licitat
+Data bits	SerialWindow		Bits de dades
+Both	SerialWindow	Flowcontrol	Ambdós
+Edit	SerialWindow		Edita
+XModem send…	SerialWindow		Enviament d'XModem...
+Baudrate:	Custom baudrate window		Velocitat de transmissió:
+OK	Custom baudrate window		D'acord
+Waiting for receiver…	XModemStatus		S'espera el receptor...
+Clear history	SerialWindow		Neteja l'historial
+Checksum error, re-send block	XModemStatus		Error de suma de comprovació, reenvieu el bloc.
+Settings	SerialWindow		Paràmetres
+Even	SerialWindow	Parity	Parell
+Software	SerialWindow	Flowcontrol	Programari
+Line terminator	SerialWindow		Terminador de línia
+Remote cancelled transfer	XModemStatus		Transferència cancel·lada a distància

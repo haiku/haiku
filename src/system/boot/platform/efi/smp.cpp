@@ -48,12 +48,14 @@ smp_init_other_cpus(void)
 
 
 void
-smp_boot_other_cpus(uint32 pml4, uint64 kernel_entry)
+smp_boot_other_cpus(addr_t pageTable,
+	addr_t kernelEntry, addr_t virtKernelArgs)
 {
 	if (gKernelArgs.num_cpus < 2)
 		return;
 
-	arch_smp_boot_other_cpus(pml4, kernel_entry);
+	arch_smp_boot_other_cpus(pageTable,
+		kernelEntry, virtKernelArgs);
 }
 
 

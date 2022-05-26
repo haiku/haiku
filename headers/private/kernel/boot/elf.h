@@ -90,6 +90,9 @@ extern status_t boot_elf_resolve_symbol(preloaded_elf32_image* image,
 	Elf32_Sym* symbol, Elf32_Addr* symbolAddress);
 extern status_t boot_elf_resolve_symbol(preloaded_elf64_image* image,
 	Elf64_Sym* symbol, Elf64_Addr* symbolAddress);
+extern Elf32_Addr boot_elf32_get_relocation(Elf32_Addr resolveAddress);
+extern void boot_elf32_set_relocation(Elf32_Addr resolveAddress,
+	Elf32_Addr finalAddress);
 extern void boot_elf64_set_relocation(Elf64_Addr resolveAddress,
 	Elf64_Addr finalAddress);
 #endif

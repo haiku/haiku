@@ -11,18 +11,9 @@ Includes [ FGristFiles kernel_c++_structs.h ]
 	: <src!system!kernel>kernel_c++_struct_sizes.h ;
 
 SubDirCcFlags [ FDefines _KERNEL=1 ] ;
+SubDirC++Flags [ FDefines _KERNEL=1 ] ;
 
 KernelStaticLibrary libfreebsd_network.a :
-	bus.cpp
-	bus_dma.cpp
-	callout.cpp
-	clock.c
-	condvar.c
-	Condvar.cpp
-	device.c
-	device_hooks.c
-	driver.c
-	eventhandler.c
 	fbsd_ether.c
 	fbsd_if_media.c
 	fbsd_kern_mbuf.c
@@ -34,6 +25,19 @@ KernelStaticLibrary libfreebsd_network.a :
 	fbsd_subr_bufring.c
 	fbsd_subr_sbuf.c
 	fbsd_time.c
+	fbsd_usb_error.c
+	fbsd_usb_util.c
+	fbsd_usb_lookup.c
+
+	bus.cpp
+	bus_dma.cpp
+	callout.cpp
+	clock.c
+	condvar.cpp
+	device.c
+	device_hooks.c
+	driver.c
+	eventhandler.c
 	firmware.c
 	if.c
 	libkern.cpp
@@ -41,14 +45,17 @@ KernelStaticLibrary libfreebsd_network.a :
 	mbuf.c
 	mii.c
 	mutex.c
+	pci.cpp
 	priv.cpp
 	smp.c
 	subr_autoconf.cpp
-	synch.c
+	synch.cpp
 	systm.cpp
 	sysinit.c
 	taskqueue.c
 	unit.cpp
+	usb.cpp
+	usb_util.c
 	;
 
 rule MIIHeaderGen
@@ -57,32 +64,32 @@ rule MIIHeaderGen
 	SEARCH on $(3) = [ FDirName $(SUBDIR) tools ] ;
 
 	Depends $(1) : $(2) $(3) ;
-	MakeLocateArch $(<) ;
+	MakeLocateCommonPlatform $(<) ;
 	MIIHeaderGen1 $(1) : $(2) $(3) ;
 	LocalClean clean : $(<) ;
 }
 
 actions MIIHeaderGen1
 {
-	gawk -v HEADERFILE=$(1) -f $(2[2]) $(2[1])
+	awk -v HEADERFILE=$(1) -f $(2[2]) $(2[1])
 }
 
 MIIHeaderGen [ FGristFiles miidevs.h ] : miidevs : miidevs2h.awk ;
 
 rule USBDevsHeaderGen
 {
-    SEARCH on $(2) = [ FDirName $(SUBDIR) compat dev usb ] ;
+	SEARCH on $(2) = [ FDirName $(SUBDIR) compat dev usb ] ;
 	SEARCH on $(3) = [ FDirName $(SUBDIR) tools ] ;
 
-    Depends $(1) : $(2) $(3) ;
-	MakeLocateArch $(<) ;
+	Depends $(1) : $(2) $(3) ;
+	MakeLocateCommonPlatform $(<) ;
 	USBDevsHeaderGen1 $(1) : $(2) $(3) ;
 	LocalClean clean : $(<) ;
 }
 
 actions USBDevsHeaderGen1
 {
-    gawk -v HEADERFILE=$(1[1]) -v DATAFILE=$(1[2]) -f $(2[2]) $(2[1])
+	awk -v HEADERFILE=$(1[1]) -v DATAFILE=$(1[2]) -f $(2[2]) $(2[1])
 }
 
 USBDevsHeaderGen [ FGristFiles usbdevs.h usbdevs_data.h ] : usbdevs

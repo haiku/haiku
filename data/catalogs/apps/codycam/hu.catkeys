@@ -1,6 +1,7 @@
-1	hungarian	x-vnd.Haiku-CodyCam	2593355250
+1	hungarian	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		nincs megadva célmappa
 reply: '%s'\n	SftpClient		válasz: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <rejtett> (valódi jelszó elküldve)
 JPEG image	CodyCam		JPEG kép
 Remote host has closed the connection.\n	FtpClient		A távoli kiszolgáló megszakította a kapcsolatot.\n
 image file format expected	CodyCam		nincs megadva fájlformátum a képnek
@@ -43,7 +44,6 @@ Locking the window	VideoConsumer.cpp		Ablak zárolása
 Cannot find an available video stream	CodyCam		Nem található elérhető videóadás
 Upload…	VideoConsumer.cpp		Feltöltés…
 password expected	CodyCam		nincs megadva jelszó
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <rejtve>  (itt az igazi jelszó lett elküldve)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Kimenet
 server address expected	CodyCam		kiszolgáló címének megadása szükséges

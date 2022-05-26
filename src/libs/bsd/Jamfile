@@ -5,6 +5,9 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+		SetVersionScript [ MultiArchDefaultGristFiles libbsd.so ] :
+			libbsd_versions ;
+
 		SharedLibrary [ MultiArchDefaultGristFiles libbsd.so ] :
 			daemon.c
 			err.c

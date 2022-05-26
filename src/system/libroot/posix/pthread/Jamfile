@@ -25,7 +25,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			pthread_mutexattr.c
 			pthread_once.cpp
 			pthread_rwlock.cpp
-			pthread_spinlock.c
+			pthread_spinlock.cpp
 			;
 	}
 }

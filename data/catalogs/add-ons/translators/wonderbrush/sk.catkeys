@@ -1,9 +1,5 @@
-1	slovak	x-vnd.Haiku-WonderBrushTranslator	1289038178
-Version %d.%d.%d, %s	WonderBrushView		Verzia %d.%d.%d, %s
-WonderBrush image translator	WonderBrushTranslator		Prekladač obrázkov WonderBrush
-WBI Settings	WonderBrushTranslator		Nastavenia WBI
+1	slovak	x-vnd.Haiku-WonderBrushTranslator	2764474812
 WBI Settings	WonderBrushMain		Nastavenia WBI
-WonderBrush images	WonderBrushTranslator		Obrázky WonderBrush
-WonderBrush image	WonderBrushTranslator		Obrázok WonderBrush
-WonderBrush image translator	WonderBrushView		Prekladač obrázkov WonderBrush
+Version %d.%d.%d, %s	WonderBrushView		Verzia %d.%d.%d, %s
 written by:	WonderBrushView		napísal:
+WonderBrush image translator	WonderBrushView		Prekladač obrázkov WonderBrush

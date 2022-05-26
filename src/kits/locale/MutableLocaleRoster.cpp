@@ -150,14 +150,12 @@ MutableLocaleRoster::CreateCatalog(const char* type, const char* signature,
 	for (int32 i = 0; i < count; ++i) {
 		CatalogAddOnInfo* info = (CatalogAddOnInfo*)
 			fData->fCatalogAddOnInfos.ItemAt(i);
-		if (info->fName.ICompare(type) != 0 || !info->MakeSureItsLoaded()
-			|| !info->fCreateFunc)
+		if (info->fName.ICompare(type) != 0 || !info->fCreateFunc)
 			continue;
 
 		BCatalogData* catalog = info->fCreateFunc(signature, language);
 		if (catalog != NULL) {
 			info->fLoadedCatalogs.AddItem(catalog);
-			info->UnloadIfPossible();
 			return catalog;
 		}
 	}
@@ -189,7 +187,7 @@ MutableLocaleRoster::LoadCatalog(const entry_ref& catalogOwner,
 		CatalogAddOnInfo* info = (CatalogAddOnInfo*)
 			fData->fCatalogAddOnInfos.ItemAt(i);
 
-		if (!info->MakeSureItsLoaded() || !info->fInstantiateFunc)
+		if (!info->fInstantiateFunc)
 			continue;
 		BMessage languages;
 		if (language != NULL) {
@@ -235,7 +233,6 @@ MutableLocaleRoster::LoadCatalog(const entry_ref& catalogOwner,
 			if (catalog != NULL)
 				return catalog;
 		}
-		info->UnloadIfPossible();
 	}
 
 	return NULL;
@@ -277,8 +274,7 @@ MutableLocaleRoster::LoadCatalog(const char* signature,
 	for (int32 i = 0; i < count; ++i) {
 		CatalogAddOnInfo* info = (CatalogAddOnInfo*)
 			fData->fCatalogAddOnInfos.ItemAt(i);
-		if (info->MakeSureItsLoaded()
-			&& info->fInstantiateFunc
+		if (info->fInstantiateFunc
 				== BPrivate::DefaultCatalog::Instantiate) {
 			defaultCatalogInfo = info;
 			break;
@@ -293,16 +289,16 @@ MutableLocaleRoster::LoadCatalog(const char* signature,
 	for (int32 l = 0; languages.FindString("language", l, &lang) == B_OK; ++l) {
 		catalog = new (std::nothrow) BPrivate::DefaultCatalog(NULL, signature,
 			lang);
-		if (catalog == NULL)
-			continue;
 
-		if (catalog->InitCheck() != B_OK
-			|| catalog->ReadFromStandardLocations() != B_OK) {
-			delete catalog;
-			continue;
+		if (catalog != NULL) {
+			if (catalog->InitCheck() != B_OK
+				|| catalog->ReadFromStandardLocations() != B_OK) {
+				delete catalog;
+				catalog = NULL;
+			} else {
+				defaultCatalogInfo->fLoadedCatalogs.AddItem(catalog);
+			}
 		}
-
-		defaultCatalogInfo->fLoadedCatalogs.AddItem(catalog);
 
 		// Chain-load catalogs for languages that depend on
 		// other languages.
@@ -349,7 +345,6 @@ MutableLocaleRoster::LoadCatalog(const char* signature,
 /*
  * unloads the given catalog (or rather: catalog-chain).
  * Every single catalog of the chain will be deleted automatically.
- * Add-ons that have no more current catalogs are unloaded, too.
  */
 status_t
 MutableLocaleRoster::UnloadCatalog(BCatalogData* catalog)
@@ -373,7 +368,6 @@ MutableLocaleRoster::UnloadCatalog(BCatalogData* catalog)
 			if (info->fLoadedCatalogs.HasItem(catalog)) {
 				info->fLoadedCatalogs.RemoveItem(catalog);
 				delete catalog;
-				info->UnloadIfPossible();
 				res = B_OK;
 				break;
 			}

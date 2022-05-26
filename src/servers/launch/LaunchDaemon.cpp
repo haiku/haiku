@@ -11,6 +11,7 @@
 
 #include <errno.h>
 #include <grp.h>
+#include <spawn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -101,20 +102,28 @@ public:
 									const char* name, uint32 flags);
 								~ExternalEventSource();
 
+			const BMessenger&	Source() const
+									{ return fSource; }
+
 			const char*			Name() const;
+			const char*			OwnerName() const;
 			uint32				Flags() const
 									{ return fFlags; }
 
-			int32				CountListeners() const;
-			BaseJob*			ListenerAt(int32 index) const;
+			void				Trigger();
+			bool				StickyTriggered() const
+									{ return fStickyTriggered; }
+			void				ResetSticky();
 
-			status_t			AddListener(BaseJob* job);
-			void				RemoveListener(BaseJob* job);
+			status_t			AddDestination(Event* event);
+			void				RemoveDestination(Event* event);
 
 private:
-			BString				fName;
+			BMessenger			fSource;
+			BString				fName, fOwnerName;
 			uint32				fFlags;
-			BObjectList<BaseJob> fListeners;
+			BObjectList<Event>	fDestinations;
+			bool				fStickyTriggered;
 };
 
 
@@ -128,8 +137,7 @@ typedef std::map<team_id, Job*> TeamMap;
 class LaunchDaemon : public BServer, public Finder, public ConditionContext,
 	public EventRegistrator, public TeamListener {
 public:
-								LaunchDaemon(bool userMode,
-									const EventMap& events, status_t& error);
+								LaunchDaemon(bool userMode, status_t& error);
 	virtual						~LaunchDaemon();
 
 	virtual	Job*				FindJob(const char* name) const;
@@ -206,12 +214,11 @@ private:
 									const BMessage& message);
 
 			ExternalEventSource*
-								_FindEvent(const char* owner,
+								_FindExternalEventSource(const char* owner,
 									const char* name) const;
 			void				_ResolveExternalEvents(
 									ExternalEventSource* event,
 									const BString& name);
-			void				_ResolveExternalEvents(BaseJob* job);
 			void				_GetBaseJobInfo(BaseJob* job, BMessage& info);
 			void				_ForwardEventMessage(uid_t user,
 									BMessage* message);
@@ -272,9 +279,12 @@ Session::Session(uid_t user, const BMessenger& daemon)
 ExternalEventSource::ExternalEventSource(BMessenger& source,
 	const char* ownerName, const char* name, uint32 flags)
 	:
+	fSource(source),
 	fName(name),
+	fOwnerName(ownerName),
 	fFlags(flags),
-	fListeners(5, true)
+	fDestinations(5),
+	fStickyTriggered(false)
 {
 }
 
@@ -291,24 +301,42 @@ ExternalEventSource::Name() const
 }
 
 
-int32
-ExternalEventSource::CountListeners() const
+const char*
+ExternalEventSource::OwnerName() const
 {
-	return fListeners.CountItems();
+	return fOwnerName.String();
 }
 
 
-BaseJob*
-ExternalEventSource::ListenerAt(int32 index) const
+void
+ExternalEventSource::Trigger()
 {
-	return fListeners.ItemAt(index);
+	for (int32 index = 0; index < fDestinations.CountItems(); index++)
+		Events::TriggerExternalEvent(fDestinations.ItemAt(index));
+
+	if ((fFlags & B_STICKY_EVENT) != 0)
+		fStickyTriggered = true;
+}
+
+
+void
+ExternalEventSource::ResetSticky()
+{
+	if ((fFlags & B_STICKY_EVENT) != 0)
+		fStickyTriggered = false;
+
+	for (int32 index = 0; index < fDestinations.CountItems(); index++)
+		Events::ResetStickyExternalEvent(fDestinations.ItemAt(index));
 }
 
 
 status_t
-ExternalEventSource::AddListener(BaseJob* job)
+ExternalEventSource::AddDestination(Event* event)
 {
-	if (fListeners.AddItem(job))
+	if (fStickyTriggered)
+		Events::TriggerExternalEvent(event);
+
+	if (fDestinations.AddItem(event))
 		return B_OK;
 
 	return B_NO_MEMORY;
@@ -316,22 +344,20 @@ ExternalEventSource::AddListener(BaseJob* job)
 
 
 void
-ExternalEventSource::RemoveListener(BaseJob* job)
+ExternalEventSource::RemoveDestination(Event* event)
 {
-	fListeners.RemoveItem(job);
+	fDestinations.RemoveItem(event);
 }
 
 
 // #pragma mark -
 
 
-LaunchDaemon::LaunchDaemon(bool userMode, const EventMap& events,
-	status_t& error)
+LaunchDaemon::LaunchDaemon(bool userMode, status_t& error)
 	:
 	BServer(kLaunchDaemonSignature, NULL,
 		create_port(B_LOOPER_PORT_DEFAULT_CAPACITY,
 			userMode ? "AppPort" : B_LAUNCH_DAEMON_PORT_NAME), false, &error),
-	fEvents(events),
 	fInitTarget(userMode ? NULL : new Target("init")),
 #ifdef TEST_MODE
 	fUserMode(true)
@@ -415,7 +441,23 @@ status_t
 LaunchDaemon::RegisterExternalEvent(Event* event, const char* name,
 	const BStringList& arguments)
 {
-	// TODO: register actual event with event source
+	status_t status = B_NAME_NOT_FOUND;
+	for (EventMap::iterator iterator = fEvents.begin();
+			iterator != fEvents.end(); iterator++) {
+		ExternalEventSource* eventSource = iterator->second;
+		Event* externalEvent = Events::ResolveExternalEvent(event,
+			eventSource->Name(), eventSource->Flags());
+		if (externalEvent != NULL) {
+			status = eventSource->AddDestination(event);
+			break;
+		}
+	}
+
+	TRACE("Register external event '%s': %" B_PRId32 "\n", name, status);
+
+	// Even if we failed to find a matching source, we do not want to return an error,
+	// as that will be propagated up the chain and prevent this job from being instantiated.
+	// Jobs will be re-scanned later for unregistered external events.
 	return B_OK;
 }
 
@@ -423,7 +465,16 @@ LaunchDaemon::RegisterExternalEvent(Event* event, const char* name,
 void
 LaunchDaemon::UnregisterExternalEvent(Event* event, const char* name)
 {
-	// TODO!
+	for (EventMap::iterator iterator = fEvents.begin();
+			iterator != fEvents.end(); iterator++) {
+		ExternalEventSource* eventSource = iterator->second;
+		Event* externalEvent = Events::ResolveExternalEvent(event,
+			eventSource->Name(), eventSource->Flags());
+		if (externalEvent != NULL) {
+			eventSource->RemoveDestination(event);
+			break;
+		}
+	}
 }
 
 
@@ -956,6 +1007,27 @@ LaunchDaemon::_HandleRegisterSessionDaemon(BMessage* message)
 			fSessions.insert(std::make_pair(user, session));
 		else
 			status = B_NO_MEMORY;
+
+		// Send registration messages for all already-known events.
+		for (EventMap::iterator iterator = fEvents.begin(); iterator != fEvents.end();
+				iterator++) {
+			ExternalEventSource* eventSource = iterator->second;
+			if (eventSource->Name() != iterator->first)
+				continue; // skip alternative event names
+
+			BMessage message(B_REGISTER_LAUNCH_EVENT);
+			message.AddInt32("user", 0);
+			message.AddString("name", eventSource->Name());
+			message.AddString("owner", eventSource->OwnerName());
+			message.AddUInt32("flags", eventSource->Flags());
+			message.AddMessenger("source", eventSource->Source());
+			target.SendMessage(&message);
+
+			if (eventSource->StickyTriggered()) {
+				message.what = B_NOTIFY_LAUNCH_EVENT;
+				target.SendMessage(&message);
+			}
+		}
 	}
 
 	BMessage reply((uint32)status);
@@ -1059,16 +1131,10 @@ LaunchDaemon::_HandleNotifyLaunchEvent(BMessage* message)
 		const char* ownerName = message->GetString("owner");
 		// TODO: support arguments (as selectors)
 
-		ExternalEventSource* event = _FindEvent(ownerName, name);
+		ExternalEventSource* event = _FindExternalEventSource(ownerName, name);
 		if (event != NULL) {
 			fLog.ExternalEventTriggered(name);
-
-			// Evaluate all of its jobs
-			int32 count = event->CountListeners();
-			for (int32 index = 0; index < count; index++) {
-				BaseJob* listener = event->ListenerAt(index);
-				Events::TriggerExternalEvent(listener->Event(), name);
-			}
+			event->Trigger();
 		}
 	}
 
@@ -1089,15 +1155,9 @@ LaunchDaemon::_HandleResetStickyLaunchEvent(BMessage* message)
 		const char* ownerName = message->GetString("owner");
 		// TODO: support arguments (as selectors)
 
-		ExternalEventSource* event = _FindEvent(ownerName, name);
-		if (event != NULL) {
-			// Evaluate all of its jobs
-			int32 count = event->CountListeners();
-			for (int32 index = 0; index < count; index++) {
-				BaseJob* listener = event->ListenerAt(index);
-				Events::ResetStickyExternalEvent(listener->Event(), name);
-			}
-		}
+		ExternalEventSource* eventSource = _FindExternalEventSource(ownerName, name);
+		if (eventSource != NULL)
+			eventSource->ResetSticky();
 	}
 
 	_ForwardEventMessage(user, message);
@@ -1844,7 +1904,6 @@ LaunchDaemon::_SetEvent(BaseJob* job, const BMessage& message)
 	if (updated) {
 		TRACE("    event: %s\n", event->ToString().String());
 		job->SetEvent(event);
-		_ResolveExternalEvents(job);
 	}
 }
 
@@ -1859,7 +1918,7 @@ LaunchDaemon::_SetEnvironment(BaseJob* job, const BMessage& message)
 
 
 ExternalEventSource*
-LaunchDaemon::_FindEvent(const char* owner, const char* name) const
+LaunchDaemon::_FindExternalEventSource(const char* owner, const char* name) const
 {
 	if (name == NULL)
 		return NULL;
@@ -1886,30 +1945,15 @@ LaunchDaemon::_FindEvent(const char* owner, const char* name) const
 
 
 void
-LaunchDaemon::_ResolveExternalEvents(ExternalEventSource* event,
+LaunchDaemon::_ResolveExternalEvents(ExternalEventSource* eventSource,
 	const BString& name)
 {
 	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
 			iterator++) {
-		Job* job = iterator->second;
-		if (Events::ResolveExternalEvent(job->Event(), name, event->Flags()))
-			event->AddListener(job);
-	}
-}
-
-
-void
-LaunchDaemon::_ResolveExternalEvents(BaseJob* job)
-{
-	if (job->Event() == NULL)
-		return;
-
-	for (EventMap::iterator iterator = fEvents.begin();
-			iterator != fEvents.end(); iterator++) {
-		ExternalEventSource* event = iterator->second;
-		if (Events::ResolveExternalEvent(job->Event(), event->Name(),
-				event->Flags()))
-			event->AddListener(job);
+		Event* externalEvent = Events::ResolveExternalEvent(iterator->second->Event(),
+			name, eventSource->Flags());
+		if (externalEvent != NULL)
+			eventSource->AddDestination(externalEvent);
 	}
 }
 
@@ -1952,58 +1996,17 @@ LaunchDaemon::_ForwardEventMessage(uid_t user, BMessage* message)
 status_t
 LaunchDaemon::_StartSession(const char* login)
 {
-	// TODO: enable user/group code
-	// The launch_daemon currently cannot talk to the registrar, though
+	char path[B_PATH_NAME_LENGTH];
+	status_t status = get_app_path(path);
+	if (status != B_OK)
+		return status;
 
-	struct passwd* passwd = getpwnam(login);
-	if (passwd == NULL)
-		return B_NAME_NOT_FOUND;
-	if (strcmp(passwd->pw_name, login) != 0)
-		return B_NAME_NOT_FOUND;
+	pid_t pid = -1;
+	const char* argv[] = {path, login, NULL};
+	status = posix_spawn(&pid, path, NULL, NULL, (char* const*)argv, environ);
+	if (status != B_OK)
+		return status;
 
-	// Check if there is a user session running already
-	uid_t user = passwd->pw_uid;
-	gid_t group = passwd->pw_gid;
-
-	Unlock();
-
-	if (fork() == 0) {
-		if (setsid() < 0)
-			exit(EXIT_FAILURE);
-
-		if (initgroups(login, group) == -1)
-			exit(EXIT_FAILURE);
-		if (setgid(group) != 0)
-			exit(EXIT_FAILURE);
-		if (setuid(user) != 0)
-			exit(EXIT_FAILURE);
-
-		if (passwd->pw_dir != NULL && passwd->pw_dir[0] != '\0') {
-			setenv("HOME", passwd->pw_dir, true);
-
-			if (chdir(passwd->pw_dir) != 0) {
-				debug_printf("Could not switch to home dir %s: %s\n",
-					passwd->pw_dir, strerror(errno));
-			}
-		}
-
-		// TODO: This leaks the parent application
-		be_app = NULL;
-
-		// Reinitialize be_roster
-		BRoster::Private().DeleteBeRoster();
-		BRoster::Private().InitBeRoster();
-
-		// TODO: take over system jobs, and reserve their names (or ask parent)
-		status_t status;
-		LaunchDaemon* daemon = new LaunchDaemon(true, fEvents, status);
-		if (status == B_OK)
-			daemon->Run();
-
-		delete daemon;
-		exit(EXIT_SUCCESS);
-	}
-	Lock();
 	return B_OK;
 }
 
@@ -2083,9 +2086,55 @@ open_stdio(int targetFD, int openMode)
 #endif	// TEST_MODE
 
 
-int
-main()
+static int
+user_main(const char* login)
 {
+	struct passwd* passwd = getpwnam(login);
+	if (passwd == NULL)
+		return B_NAME_NOT_FOUND;
+	if (strcmp(passwd->pw_name, login) != 0)
+		return B_NAME_NOT_FOUND;
+
+	// Check if there is a user session running already
+	uid_t user = passwd->pw_uid;
+	gid_t group = passwd->pw_gid;
+
+	if (setsid() < 0)
+		exit(EXIT_FAILURE);
+
+	if (initgroups(login, group) == -1)
+		exit(EXIT_FAILURE);
+	if (setgid(group) != 0)
+		exit(EXIT_FAILURE);
+	if (setuid(user) != 0)
+		exit(EXIT_FAILURE);
+
+	if (passwd->pw_dir != NULL && passwd->pw_dir[0] != '\0') {
+		setenv("HOME", passwd->pw_dir, true);
+
+		if (chdir(passwd->pw_dir) != 0) {
+			debug_printf("Could not switch to home dir %s: %s\n",
+				passwd->pw_dir, strerror(errno));
+		}
+	}
+
+	// TODO: take over system jobs, and reserve their names? (by asking parent)
+	status_t status;
+	LaunchDaemon* daemon = new LaunchDaemon(true, status);
+	if (status == B_OK)
+		daemon->Run();
+
+	delete daemon;
+	return 0;
+}
+
+
+int
+main(int argc, char* argv[])
+{
+	if (argc == 2 && geteuid() == 0)
+		return user_main(argv[1]);
+
 	if (find_port(B_LAUNCH_DAEMON_PORT_NAME) >= 0) {
 		fprintf(stderr, "The launch_daemon is already running!\n");
 		return EXIT_FAILURE;
@@ -2098,9 +2147,8 @@ main()
 	dup2(STDOUT_FILENO, STDERR_FILENO);
 #endif
 
-	EventMap events;
 	status_t status;
-	LaunchDaemon* daemon = new LaunchDaemon(false, events, status);
+	LaunchDaemon* daemon = new LaunchDaemon(false, status);
 	if (status == B_OK)
 		daemon->Run();
 

@@ -1,51 +1,51 @@
-1	english	x-vnd.Haiku-BluetoothPrefs	497027148
-Laptop	Settings view		便携电脑
-Only from trusted devices	Settings view		仅从信任设备
-15 secs	Settings view		15秒
-Quit	main		退出
-Manufacturer: 	Device View		制造商：
-Desktop	Settings view		桌面电脑
-Server	Window		服务器
-Identify host as:	Settings view		识别主机为：
-Refresh…	Remote devices		刷新...
-Local devices found on system:	Settings view		系统本地设备：
-Service classes: 	Device View		服务等级：
-Remote devices	Window		远程设备
-Settings	Window		设置
-Stop bluetooth services…	Window		停止蓝牙服务...
-61 secs	Settings view		61秒
-Add…	Remote devices		添加...
-As blocked	Remote devices		阻塞状态
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		无蓝牙本地设备接入系统。
-Revert	Window		取消
-Refresh local devices…	Window		刷新本地设备...
-Disconnect	Remote devices		断开连接
+1	english	x-vnd.Haiku-BluetoothPrefs	3945807779
+Start bluetooth services…	Window		启动蓝牙服务...
 From all devices	Settings view		从所有设备
 Defaults	Window		默认
-Start bluetooth services…	Window		启动蓝牙服务...
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		检查您的远程设备的蓝牙功能是否开启。按下“查询”开启扫描。尽管每个设备都不会多于3秒的时间，但是设备名检索所需要的时间是未知的。之后，您可能需要把它们添加到您的主列表中，您可以在主列表中对它们进行校核。
+Laptop	Settings view		便携电脑
 Scanning progress	Inquiry panel		扫描进度
-Bluetooth	System name		蓝牙
+Only from trusted devices	Settings view		仅从信任设备
 Launch now	main		立即打开
+Bluetooth	System name		蓝牙
 Remove	Remote devices		删除
+Pick device…	Settings view		选择设备…
 Always ask	Settings view		总是询问
+Quit	main		退出
+15 secs	Settings view		15秒
 Help	Window		帮助
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		支持人员:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\n感谢所有帮助过我们的朋友…\n\n硬件捐赠:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\n资金支持:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\n补丁贡献:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\n测试:\n - Petter H. Juliussen\n给予我知识和经验的:\n - yellowTAB 团队
+Manufacturer: 	Device View		制造商：
 Pair…	Remote devices		校核...
+Desktop	Settings view		桌面电脑
+Server	Window		服务器
 Retrieving name of %1	Inquiry panel		检索 %1 的名称
+Identify host as:	Settings view		识别主机为：
 Inquiry	Inquiry panel		查询
+Local devices found on system:	Settings view		系统本地设备：
+Service classes: 	Device View		服务等级：
 Incoming connections policy:	Settings view		传入连接策略：
+Remote devices	Window		远程设备
 Retrieving names…	Inquiry panel		正在获取名字...
-Show name	Extended local device view		显示名称
 Add device to list	Inquiry panel		添加设备到列表
+Show name	Extended local device view		显示名称
+Settings	Window		设置
 Remaining %1 seconds	Inquiry panel		剩余 %1 秒
-The Bluetooth services are not currently running on this system.	main		Bluetooth 服务未启动
-Discoverable	Extended local device view		显示
+Stop bluetooth services…	Window		停止蓝牙服务...
+61 secs	Settings view		61秒
 Authenticate	Extended local device view		验证
-Smart phone	Settings view		智能手机
+Discoverable	Extended local device view		显示
+The Bluetooth services are not currently running on this system.	main		Bluetooth 服务未启动
+Add…	Remote devices		添加...
 Scanning completed.	Inquiry panel		扫描完成。
+Smart phone	Settings view		智能手机
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		无蓝牙本地设备接入系统。
 Default inquiry time:	Settings view		默认查询时间：
+Revert	Window		取消
+Refresh local devices…	Window		刷新本地设备...
 Server	Settings view		服务器
-Handheld	Settings view		手持设备
  packets: 	Device View		数据包：
+Handheld	Settings view		手持设备
+Disconnect	Remote devices		断开连接
 About Bluetooth…	Window		关于蓝牙...
 Starting scan…	Inquiry panel		开始扫描...

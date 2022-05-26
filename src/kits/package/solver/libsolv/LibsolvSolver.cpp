@@ -560,8 +560,8 @@ LibsolvSolver::GetResult(BSolverResult& _result)
 	_result.MakeEmpty();
 
 	Transaction* transaction = solver_create_transaction(fSolver);
-	CObjectDeleter<Transaction> transactionDeleter(transaction,
-		&transaction_free);
+	CObjectDeleter<Transaction, void, transaction_free>
+		transactionDeleter(transaction);
 
 	if (transaction->steps.count == 0)
 		return B_OK;

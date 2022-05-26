@@ -113,6 +113,8 @@ ServerReferenceDataUpdateProcess::_ProcessData(DumpExportReference* data)
 		result = _ProcessNaturalLanguages(data);
 	if (result == B_OK)
 		result = _ProcessPkgCategories(data);
+	if (result == B_OK)
+		result = _ProcessRatingStabilities(data);
 	return result;
 }
 
@@ -157,12 +159,12 @@ ServerReferenceDataUpdateProcess::_ProcessPkgCategories(
 	HDINFO("[%s] will populate %" B_PRId32 " pkg categories",
 		Name(), data->CountPkgCategories());
 
-	CategoryList result;
+	std::vector<CategoryRef> assembledCategories;
 
 	for (int32 i = 0; i < data->CountPkgCategories(); i++) {
 		DumpExportReferencePkgCategory* pkgCategory =
 			data->PkgCategoriesItemAt(i);
-		result.Add(CategoryRef(
+		assembledCategories.push_back(CategoryRef(
 			new PackageCategory(
 				*(pkgCategory->Code()),
 				*(pkgCategory->Name())
@@ -172,7 +174,37 @@ ServerReferenceDataUpdateProcess::_ProcessPkgCategories(
 
 	{
 		AutoLocker<BLocker> locker(fModel->Lock());
-		fModel->AddCategories(result);
+		fModel->AddCategories(assembledCategories);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+ServerReferenceDataUpdateProcess::_ProcessRatingStabilities(
+	DumpExportReference* data)
+{
+	HDINFO("[%s] will populate %" B_PRId32 " rating stabilities",
+		Name(), data->CountUserRatingStabilities());
+
+	std::vector<RatingStabilityRef> assembledRatingStabilities;
+
+	for (int32 i = 0; i < data->CountUserRatingStabilities(); i++) {
+		DumpExportReferenceUserRatingStability* ratingStability =
+			data->UserRatingStabilitiesItemAt(i);
+		assembledRatingStabilities.push_back(RatingStabilityRef(
+			new RatingStability(
+				*(ratingStability->Code()),
+				*(ratingStability->Name()),
+				ratingStability->Ordering()
+			),
+			true));
+	}
+
+	{
+		AutoLocker<BLocker> locker(fModel->Lock());
+		fModel->AddRatingStabilities(assembledRatingStabilities);
 	}
 
 	return B_OK;

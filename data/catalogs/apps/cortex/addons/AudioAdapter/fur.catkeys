@@ -1,0 +1,10 @@
+1	friulian	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		Formât di jentrade
+Channels:	CortexAudioAdapter		Canâi:
+stereo	CortexAudioAdapter		stereo
+mono	CortexAudioAdapter		mono
+Output format	CortexAudioAdapter		Formât di jessude
+Audio input	CortexAddOnsCommon		Jentrade audio
+Sample format:	CortexAudioAdapter		Formât di campionament:
+Audio output	CortexAddOnsCommon		Jessude audio
+%groupname% parameters	CortexAddOnsCommon		Parametris %groupname%

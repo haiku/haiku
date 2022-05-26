@@ -34,11 +34,14 @@ FileIterator::_ExamineFile(BEntry& entry, char* buffer, bool textFilesOnly)
 
 	strcpy(buffer, path.Path());
 
+	BNode node(&entry);
+	if (!node.IsFile())
+		return false;
+
 	if (!textFilesOnly)
 		return true;
 
 	BMimeType mimeType;
-	BNode node(&entry);
 	BNodeInfo nodeInfo(&node);
 	char mimeTypeString[B_MIME_TYPE_LENGTH];
 

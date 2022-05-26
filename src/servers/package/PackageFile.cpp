@@ -61,12 +61,11 @@ PackageFile::Init(const entry_ref& entryRef, PackageFileManager* owner)
 		RETURN_ERROR(error);
 
 	// get the package info
-	int fd = file.Dup();
-	if (fd < 0)
+	FileDescriptorCloser fd(file.Dup());
+	if (!fd.IsSet())
 		RETURN_ERROR(error);
-	FileDescriptorCloser fdCloser(fd);
 
-	error = fInfo.ReadFromPackageFile(fd);
+	error = fInfo.ReadFromPackageFile(fd.Get());
 	if (error != B_OK)
 		RETURN_ERROR(error);
 

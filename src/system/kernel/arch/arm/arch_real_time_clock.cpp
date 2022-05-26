@@ -18,13 +18,14 @@
 status_t
 arch_rtc_init(kernel_args *args, struct real_time_data *data)
 {
-	return B_OK;
+	return B_NOT_SUPPORTED;
 }
 
 
 uint32
 arch_rtc_get_hw_time(void)
 {
+	return 0;
 }
 
 

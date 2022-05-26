@@ -286,37 +286,124 @@ CharacterView::FrameResized(float width, float height)
 }
 
 
+class PreviewItem: public BMenuItem
+{
+	public:
+		PreviewItem(const char* text, float width, float height)
+			: BMenuItem(text, NULL),
+			fWidth(width * 2),
+			fHeight(height * 2)
+		{
+		}
+
+		void GetContentSize(float* width, float* height)
+		{
+			*width = fWidth;
+			*height = fHeight;
+		}
+
+		void Draw()
+		{
+			BMenu* menu = Menu();
+			BRect box = Frame();
+
+			menu->PushState();
+			menu->SetLowUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+			menu->SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+			menu->SetHighUIColor(B_DOCUMENT_TEXT_COLOR);
+			menu->FillRect(box, B_SOLID_LOW);
+
+			// Draw the character in the center of the menu
+			float charWidth = menu->StringWidth(Label());
+			font_height fontHeight;
+			menu->GetFontHeight(&fontHeight);
+
+			box.left += (box.Width() - charWidth) / 2;
+			box.bottom -= (box.Height() - fontHeight.ascent
+				+ fontHeight.descent) / 2;
+
+			menu->DrawString(Label(), BPoint(box.left, box.bottom));
+
+			menu->PopState();
+		}
+
+	private:
+		float fWidth;
+		float fHeight;
+};
+
+
+class NoMarginMenu: public BPopUpMenu
+{
+	public:
+		NoMarginMenu()
+			: BPopUpMenu(B_EMPTY_STRING, false, false)
+		{
+			// Try to have the size right (should be exactly 2x the cell width)
+			// and the item text centered in it.
+			float left, top, bottom, right;
+			GetItemMargins(&left, &top, &bottom, &right);
+			SetItemMargins(left, top, bottom, left);
+		}
+};
+
+
 void
 CharacterView::MouseDown(BPoint where)
 {
-	int32 buttons;
 	if (!fHasCharacter
-		|| Window()->CurrentMessage() == NULL
-		|| Window()->CurrentMessage()->FindInt32("buttons", &buttons) != B_OK
-		|| (buttons & B_SECONDARY_MOUSE_BUTTON) == 0) {
-		// Memorize click point for dragging
-		fClickPoint = where;
+		|| Window()->CurrentMessage() == NULL)
 		return;
+
+	int32 buttons;
+	if (Window()->CurrentMessage()->FindInt32("buttons", &buttons) == B_OK) {
+		if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
+			// Memorize click point for dragging
+			fClickPoint = where;
+
+			char text[16];
+			UnicodeToUTF8(fCurrentCharacter, text, sizeof(text));
+
+			fMenu = new NoMarginMenu();
+			fMenu->AddItem(new PreviewItem(text, fCharacterWidth,
+				fCharacterHeight));
+			fMenu->SetFont(&fCharacterFont);
+			fMenu->SetFontSize(fCharacterFont.Size() * 2.5);
+
+			uint32 character;
+			BRect rect;
+
+			// Position the menu exactly above the character
+			_GetCharacterAt(where, character, &rect);
+			fMenu->DoLayout();
+			where = rect.LeftTop();
+			where.x += (rect.Width() - fMenu->Frame().Width()) / 2;
+			where.y += (rect.Height() - fMenu->Frame().Height()) / 2;
+
+			ConvertToScreen(&where);
+			fMenu->Go(where, true, true, true);
+		} else {
+			// Show context menu
+			BPopUpMenu* menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
+			menu->SetFont(be_plain_font);
+
+			BMessage* message =  new BMessage(B_COPY);
+			message->AddInt32("character", fCurrentCharacter);
+			menu->AddItem(new BMenuItem(B_TRANSLATE("Copy character"), message,
+				'C'));
+
+			message =  new BMessage(kMsgCopyAsEscapedString);
+			message->AddInt32("character", fCurrentCharacter);
+			menu->AddItem(new BMenuItem(
+				B_TRANSLATE("Copy as escaped byte string"),
+				message, 'C', B_SHIFT_KEY));
+
+			menu->SetTargetForItems(this);
+
+			ConvertToScreen(&where);
+			menu->Go(where, true, true, true);
+		}
 	}
-
-	// Open pop-up menu
-
-	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
-	menu->SetFont(be_plain_font);
-
-	BMessage* message =  new BMessage(B_COPY);
-	message->AddInt32("character", fCurrentCharacter);
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Copy character"), message, 'C'));
-
-	message =  new BMessage(kMsgCopyAsEscapedString);
-	message->AddInt32("character", fCurrentCharacter);
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Copy as escaped byte string"),
-		message, 'C', B_SHIFT_KEY));
-
-	menu->SetTargetForItems(this);
-
-	ConvertToScreen(&where);
-	menu->Go(where, true, true, true);
 }
 
 

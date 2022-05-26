@@ -16,7 +16,7 @@ Available languages	Locale Preflet Window		Verfügbare Sprachen
 Locale	Locale Preflet		Land & Sprache
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Es wurden keine verfügbaren Sprachen gefunden. Dieses Preflet kann daher nicht verwendet werden!
 Formatting	Locale Preflet Window		Formatierung
-Use month/day-names from preferred language	TimeFormatSettings		Monats-/Tagesnamen aus bevorzugter Sprache verwenden
+Use month/day-names from preferred language	TimeFormatSettings		Monats-/Tagesnamen aus bevorzugter Sprache
 already chosen	LanguageListView		bereits ausgewählt
 Preferred languages	Locale Preflet Window		Bevorzugte Sprache
 Full format:	TimeFormatSettings		Volles Format:
@@ -26,5 +26,5 @@ Translate application and folder names	TimeFormatSettings		Übersetzte Programm-
 12 hour	TimeFormatSettings		12 Stunden
 Positive:	TimeFormatSettings		Positiv:
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Damit diese Änderungen sichtbar werden, müssen Deskbar und Tracker neu gestartet werden. Sollen sie jetzt neu gestartet werden?
-Restart	Locale Preflet Window		Neustart
+Restart	Locale Preflet Window		Neustarten
 Currency	TimeFormatSettings		Währung

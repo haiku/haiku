@@ -97,6 +97,81 @@ class AutoFloatingOverlaysHider {
 
 };
 
+class DrawTransaction {
+public:
+	DrawTransaction(DrawingEngine *engine, const BRect &bounds)
+		:
+		fEngine(engine),
+		fOverlaysHidden(false)
+	{
+		fDirty.Set(bounds);
+		fDirty.IntersectWith(fEngine->fPainter->ClippingRegion());
+		if (fDirty.CountRects() == 0)
+			return;
+		fOverlaysHidden
+			= fEngine->fGraphicsCard->HideFloatingOverlays(fDirty.Frame());
+	}
+
+	DrawTransaction(DrawingEngine *engine)
+		:
+		fEngine(engine),
+		fOverlaysHidden(false)
+	{
+		fDirty = *fEngine->fPainter->ClippingRegion();
+		if (fDirty.CountRects() == 0)
+			return;
+		fOverlaysHidden
+			= fEngine->fGraphicsCard->HideFloatingOverlays(fDirty.Frame());
+	}
+
+	DrawTransaction(DrawingEngine *engine, const BRegion &region)
+		:
+		fEngine(engine),
+		fOverlaysHidden(false)
+	{
+		// region is already clipped
+		fDirty = region;
+		if (fDirty.CountRects() == 0)
+			return;
+		fOverlaysHidden
+			= fEngine->fGraphicsCard->HideFloatingOverlays(fDirty.Frame());
+	}
+
+	~DrawTransaction()
+	{
+		if (fEngine->fCopyToFront)
+			fEngine->fGraphicsCard->InvalidateRegion(fDirty);
+		if (fOverlaysHidden)
+			fEngine->fGraphicsCard->ShowFloatingOverlays();
+	}
+
+	bool IsDirty() const
+	{
+		return fDirty.CountRects() > 0;
+	}
+
+	void SetDirty(const BRect &rect)
+	{
+		fDirty.Set(rect);
+		fDirty.IntersectWith(fEngine->fPainter->ClippingRegion());
+	}
+
+	const BRegion &DirtyRegion() const
+	{
+		return fDirty;
+	}
+
+	bool WasOverlaysHidden() const
+	{
+		return fOverlaysHidden;
+	}
+
+private:
+	DrawingEngine *fEngine;
+	bool fOverlaysHidden;
+	BRegion fDirty;
+};
+
 
 //	#pragma mark -
 
@@ -116,7 +191,6 @@ DrawingEngine::DrawingEngine(HWInterface* interface)
 DrawingEngine::~DrawingEngine()
 {
 	SetHWInterface(NULL);
-	delete fPainter;
 }
 
 
@@ -289,7 +363,7 @@ DrawingEngine::SetBlendingMode(source_alpha srcAlpha, alpha_function alphaFunc)
 void
 DrawingEngine::SetPattern(const struct pattern& pattern)
 {
-	fPainter->SetPattern(pattern, false);
+	fPainter->SetPattern(pattern);
 }
 
 
@@ -477,6 +551,7 @@ void
 DrawingEngine::CopyRegion(/*const*/ BRegion* region, int32 xOffset,
 	int32 yOffset)
 {
+	// NOTE: region is already clipped
 	ASSERT_PARALLEL_LOCKED();
 
 	BRect frame = region->Frame();
@@ -605,11 +680,9 @@ DrawingEngine::InvertRect(BRect r)
 
 	make_rect_valid(r);
 	// NOTE: Currently ignores view transformation, so no TransformAndClipRect()
-	r = fPainter->ClipRect(r);
-	if (!r.IsValid())
+	DrawTransaction transaction(this, fPainter->ClipRect(r));
+	if (!transaction.IsDirty())
 		return;
-
-	AutoFloatingOverlaysHider _(fGraphicsCard, r);
 
 	// try hardware optimized version first
 	if (fAvailableHWAccleration & HW_ACC_INVERT_REGION) {
@@ -619,8 +692,6 @@ DrawingEngine::InvertRect(BRect r)
 	} else {
 		fPainter->InvertRect(r);
 	}
-
-	_CopyToFront(r);
 }
 
 
@@ -630,14 +701,9 @@ DrawingEngine::DrawBitmap(ServerBitmap* bitmap, const BRect& bitmapRect,
 {
 	ASSERT_PARALLEL_LOCKED();
 
-	BRect clipped = fPainter->TransformAndClipRect(viewRect);
-	if (clipped.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
-
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(viewRect));
+	if (transaction.IsDirty())
 		fPainter->DrawBitmap(bitmap, bitmapRect, viewRect, options);
-
-		_CopyToFront(clipped);
-	}
 }
 
 
@@ -650,26 +716,22 @@ DrawingEngine::DrawArc(BRect r, const float& angle, const float& span,
 	make_rect_valid(r);
 	fPainter->AlignEllipseRect(&r, filled);
 
+	BRect clipped(r);
 	if (!filled)
-		extend_by_stroke_width(r, fPainter->PenSize());
+		extend_by_stroke_width(clipped, fPainter->PenSize());
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(clipped));
+	if (!transaction.IsDirty())
+		return;
 
-	BRect clipped(fPainter->TransformAndClipRect(r));
+	float xRadius = r.Width() / 2.0;
+	float yRadius = r.Height() / 2.0;
+	BPoint center(r.left + xRadius,
+				  r.top + yRadius);
 
-	if (clipped.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
-
-		float xRadius = r.Width() / 2.0;
-		float yRadius = r.Height() / 2.0;
-		BPoint center(r.left + xRadius,
-					  r.top + yRadius);
-
-		if (filled)
-			fPainter->FillArc(center, xRadius, yRadius, angle, span);
-		else
-			fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
-
-		_CopyToFront(clipped);
-	}
+	if (filled)
+		fPainter->FillArc(center, xRadius, yRadius, angle, span);
+	else
+		fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
 }
 
 
@@ -681,20 +743,16 @@ DrawingEngine::FillArc(BRect r, const float& angle, const float& span,
 
 	make_rect_valid(r);
 	fPainter->AlignEllipseRect(&r, true);
-	BRect clipped(fPainter->TransformAndClipRect(r));
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(r));
+	if (!transaction.IsDirty())
+		return;
 
-	if (clipped.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
+	float xRadius = r.Width() / 2.0;
+	float yRadius = r.Height() / 2.0;
+	BPoint center(r.left + xRadius,
+				  r.top + yRadius);
 
-		float xRadius = r.Width() / 2.0;
-		float yRadius = r.Height() / 2.0;
-		BPoint center(r.left + xRadius,
-					  r.top + yRadius);
-
-		fPainter->FillArc(center, xRadius, yRadius, angle, span, gradient);
-
-		_CopyToFront(clipped);
-	}
+	fPainter->FillArc(center, xRadius, yRadius, angle, span, gradient);
 }
 
 
@@ -704,11 +762,9 @@ DrawingEngine::DrawBezier(BPoint* pts, bool filled)
 	ASSERT_PARALLEL_LOCKED();
 
 	// TODO: figure out bounds and hide cursor depending on that
-	AutoFloatingOverlaysHider _(fGraphicsCard);
+	DrawTransaction transaction(this);
 
-	BRect touched = fPainter->DrawBezier(pts, filled);
-
-	_CopyToFront(touched);
+	transaction.SetDirty(fPainter->DrawBezier(pts, filled));
 }
 
 
@@ -718,11 +774,9 @@ DrawingEngine::FillBezier(BPoint* pts, const BGradient& gradient)
 	ASSERT_PARALLEL_LOCKED();
 
 	// TODO: figure out bounds and hide cursor depending on that
-	AutoFloatingOverlaysHider _(fGraphicsCard);
+	DrawTransaction transaction(this);
 
-	BRect touched = fPainter->FillBezier(pts, gradient);
-
-	_CopyToFront(touched);
+	transaction.SetDirty(fPainter->FillBezier(pts, gradient));
 }
 
 
@@ -743,15 +797,11 @@ DrawingEngine::DrawEllipse(BRect r, bool filled)
 	clipped.right = ceilf(clipped.right);
 	clipped.bottom = ceilf(clipped.bottom);
 
-	clipped = fPainter->TransformAndClipRect(clipped);
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(clipped));
+	if (!transaction.IsDirty())
+		return;
 
-	if (clipped.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
-
-		fPainter->DrawEllipse(r, filled);
-
-		_CopyToFront(clipped);
-	}
+	fPainter->DrawEllipse(r, filled);
 }
 
 
@@ -769,15 +819,11 @@ DrawingEngine::FillEllipse(BRect r, const BGradient& gradient)
 	clipped.right = ceilf(clipped.right);
 	clipped.bottom = ceilf(clipped.bottom);
 
-	clipped = fPainter->TransformAndClipRect(clipped);
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(clipped));
+	if (!transaction.IsDirty())
+		return;
 
-	if (clipped.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
-
-		fPainter->FillEllipse(r, gradient);
-
-		_CopyToFront(clipped);
-	}
+	fPainter->FillEllipse(r, gradient);
 }
 
 
@@ -790,14 +836,11 @@ DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
 	make_rect_valid(bounds);
 	if (!filled)
 		extend_by_stroke_width(bounds, fPainter->PenSize());
-	bounds = fPainter->TransformAndClipRect(bounds);
-	if (bounds.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, bounds);
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(bounds));
+	if (!transaction.IsDirty())
+		return;
 
-		fPainter->DrawPolygon(ptlist, numpts, filled, closed);
-
-		_CopyToFront(bounds);
-	}
+	fPainter->DrawPolygon(ptlist, numpts, filled, closed);
 }
 
 
@@ -808,14 +851,11 @@ DrawingEngine::FillPolygon(BPoint* ptlist, int32 numpts, BRect bounds,
 	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(bounds);
-	bounds = fPainter->TransformAndClipRect(bounds);
-	if (bounds.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, bounds);
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(bounds));
+	if (!transaction.IsDirty())
+		return;
 
-		fPainter->FillPolygon(ptlist, numpts, gradient, closed);
-
-		_CopyToFront(bounds);
-	}
+	fPainter->FillPolygon(ptlist, numpts, gradient, closed);
 }
 
 
@@ -841,7 +881,7 @@ DrawingEngine::StrokeLine(const BPoint& start, const BPoint& end,
 	BRect touched(start, end);
 	make_rect_valid(touched);
 	touched = fPainter->ClipRect(touched);
-	AutoFloatingOverlaysHider _(fGraphicsCard, touched);
+	DrawTransaction transaction(this, touched);
 
 	if (!fPainter->StraightLine(start, end, color)) {
 		rgb_color previousColor = fPainter->HighColor();
@@ -854,8 +894,6 @@ DrawingEngine::StrokeLine(const BPoint& start, const BPoint& end,
 		fPainter->SetDrawingMode(previousMode);
 		fPainter->SetHighColor(previousColor);
 	}
-
-	_CopyToFront(touched);
 }
 
 
@@ -866,14 +904,11 @@ DrawingEngine::StrokeRect(BRect r, const rgb_color& color)
 	ASSERT_PARALLEL_LOCKED();
 
 	make_rect_valid(r);
-	BRect clipped = fPainter->ClipRect(r);
-	if (clipped.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
+	DrawTransaction transaction(this, fPainter->ClipRect(r));
+	if (!transaction.IsDirty())
+		return;
 
-		fPainter->StrokeRect(r, color);
-
-		_CopyToFront(clipped);
-	}
+	fPainter->StrokeRect(r, color);
 }
 
 
@@ -887,22 +922,19 @@ DrawingEngine::FillRect(BRect r, const rgb_color& color)
 	// gut feeling.
 	make_rect_valid(r);
 	r = fPainter->ClipRect(r);
-	if (!r.IsValid())
+	DrawTransaction transaction(this, r);
+	if (!transaction.IsDirty())
 		return;
-
-	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, r);
 
 	// try hardware optimized version first
 	if (fAvailableHWAccleration & HW_ACC_FILL_REGION) {
 		BRegion region(r);
 		region.IntersectWith(fPainter->ClippingRegion());
 		fGraphicsCard->FillRegion(region, color,
-			fSuspendSyncLevel == 0 || overlaysHider.WasHidden());
+			fSuspendSyncLevel == 0 || transaction.WasOverlaysHidden());
 	} else {
 		fPainter->FillRect(r, color);
 	}
-
-	_CopyToFront(r);
 }
 
 
@@ -928,20 +960,18 @@ DrawingEngine::FillRegion(BRegion& r, const rgb_color& color)
 		return;
 	}
 
-	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, frame);
+	DrawTransaction transaction(this, r);
 
 	// try hardware optimized version first
 	if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0
 		&& frame.Width() * frame.Height() > 100) {
 		fGraphicsCard->FillRegion(r, color, fSuspendSyncLevel == 0
-			|| overlaysHider.WasHidden());
+			|| transaction.WasOverlaysHidden());
 	} else {
 		int32 count = r.CountRects();
 		for (int32 i = 0; i < count; i++)
 			fPainter->FillRectNoClipping(r.RectAtInt(i), color);
 	}
-
-	_CopyToFront(frame);
 }
 
 
@@ -957,14 +987,11 @@ DrawingEngine::StrokeRect(BRect r)
 	make_rect_valid(r);
 	BRect clipped(r);
 	extend_by_stroke_width(clipped, fPainter->PenSize());
-	clipped = fPainter->TransformAndClipRect(clipped);
-	if (clipped.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(clipped));
+	if (!transaction.IsDirty())
+		return;
 
-		fPainter->StrokeRect(r);
-
-		_CopyToFront(clipped);
-	}
+	fPainter->StrokeRect(r);
 }
 
 
@@ -977,13 +1004,9 @@ DrawingEngine::FillRect(BRect r)
 
 	r = fPainter->AlignRect(r);
 
-	BRect dirty = fPainter->TransformAndClipRect(r);
-	if (!dirty.IsValid())
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(r));
+	if (!transaction.IsDirty())
 		return;
-
-	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, dirty);
-
-	bool doInSoftware = true;
 
 	if (fPainter->IsIdentityTransform()) {
 		// TODO the accelerated code path may also be used for transforms that
@@ -999,34 +1022,32 @@ DrawingEngine::FillRect(BRect r)
 					BRegion region(r);
 					region.IntersectWith(fPainter->ClippingRegion());
 					fGraphicsCard->FillRegion(region, fPainter->HighColor(),
-						fSuspendSyncLevel == 0 || overlaysHider.WasHidden());
-					doInSoftware = false;
+						fSuspendSyncLevel == 0
+							|| transaction.WasOverlaysHidden());
+					return;
 				} else if (fPainter->Pattern() == B_SOLID_LOW
 						&& fPainter->DrawingMode() == B_OP_COPY) {
 					BRegion region(r);
 					region.IntersectWith(fPainter->ClippingRegion());
 					fGraphicsCard->FillRegion(region, fPainter->LowColor(),
-						fSuspendSyncLevel == 0 || overlaysHider.WasHidden());
-					doInSoftware = false;
+						fSuspendSyncLevel == 0
+							|| transaction.WasOverlaysHidden());
+					return;
 				}
 			}
 		}
 
-		if (doInSoftware
-			&& (fAvailableHWAccleration & HW_ACC_INVERT_REGION) != 0
+		if ((fAvailableHWAccleration & HW_ACC_INVERT_REGION) != 0
 			&& fPainter->Pattern() == B_SOLID_HIGH
 			&& fPainter->DrawingMode() == B_OP_INVERT) {
 			BRegion region(r);
 			region.IntersectWith(fPainter->ClippingRegion());
 			fGraphicsCard->InvertRegion(region);
-			doInSoftware = false;
+			return;
 		}
 	}
 
-	if (doInSoftware)
-		fPainter->FillRect(r);
-
-	_CopyToFront(dirty);
+	fPainter->FillRect(r);
 }
 
 
@@ -1038,15 +1059,11 @@ DrawingEngine::FillRect(BRect r, const BGradient& gradient)
 	make_rect_valid(r);
 	r = fPainter->AlignRect(r);
 
-	BRect dirty = fPainter->TransformAndClipRect(r);
-	if (!dirty.IsValid())
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(r));
+	if (!transaction.IsDirty())
 		return;
 
-	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, dirty);
-
 	fPainter->FillRect(r, gradient);
-
-	_CopyToFront(dirty);
 }
 
 
@@ -1056,12 +1073,9 @@ DrawingEngine::FillRegion(BRegion& r)
 	ASSERT_PARALLEL_LOCKED();
 
 	BRect clipped = fPainter->TransformAndClipRect(r.Frame());
-	if (!clipped.IsValid())
+	DrawTransaction transaction(this, clipped);
+	if (!transaction.IsDirty())
 		return;
-
-	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, clipped);
-
-	bool doInSoftware = true;
 
 	if (fPainter->IsIdentityTransform()) {
 		// try hardware optimized version first
@@ -1071,36 +1085,29 @@ DrawingEngine::FillRegion(BRegion& r)
 					|| fPainter->DrawingMode() == B_OP_OVER)) {
 				r.IntersectWith(fPainter->ClippingRegion());
 				fGraphicsCard->FillRegion(r, fPainter->HighColor(),
-					fSuspendSyncLevel == 0 || overlaysHider.WasHidden());
-				doInSoftware = false;
+					fSuspendSyncLevel == 0 || transaction.WasOverlaysHidden());
+				return;
 			} else if (fPainter->Pattern() == B_SOLID_LOW
 				&& fPainter->DrawingMode() == B_OP_COPY) {
 				r.IntersectWith(fPainter->ClippingRegion());
 				fGraphicsCard->FillRegion(r, fPainter->LowColor(),
-					fSuspendSyncLevel == 0 || overlaysHider.WasHidden());
-				doInSoftware = false;
+					fSuspendSyncLevel == 0 || transaction.WasOverlaysHidden());
+				return;
 			}
 		}
 
-		if (doInSoftware
-			&& (fAvailableHWAccleration & HW_ACC_INVERT_REGION) != 0
+		if ((fAvailableHWAccleration & HW_ACC_INVERT_REGION) != 0
 			&& fPainter->Pattern() == B_SOLID_HIGH
 			&& fPainter->DrawingMode() == B_OP_INVERT) {
 			r.IntersectWith(fPainter->ClippingRegion());
 			fGraphicsCard->InvertRegion(r);
-			doInSoftware = false;
+			return;
 		}
 	}
 
-	if (doInSoftware) {
-		BRect touched = fPainter->FillRect(r.RectAt(0));
-
-		int32 count = r.CountRects();
-		for (int32 i = 1; i < count; i++)
-			touched = touched | fPainter->FillRect(r.RectAt(i));
-	}
-
-	_CopyToFront(r.Frame());
+	int32 count = r.CountRects();
+	for (int32 i = 0; i < count; i++)
+		fPainter->FillRect(r.RectAt(i));
 }
 
 
@@ -1110,18 +1117,13 @@ DrawingEngine::FillRegion(BRegion& r, const BGradient& gradient)
 	ASSERT_PARALLEL_LOCKED();
 
 	BRect clipped = fPainter->TransformAndClipRect(r.Frame());
-	if (!clipped.IsValid())
+	DrawTransaction transaction(this, clipped);
+	if (!transaction.IsDirty())
 		return;
 
-	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, clipped);
-
-	BRect touched = fPainter->FillRect(r.RectAt(0), gradient);
-
 	int32 count = r.CountRects();
-	for (int32 i = 1; i < count; i++)
-		touched = touched | fPainter->FillRect(r.RectAt(i), gradient);
-
-	_CopyToFront(r.Frame());
+	for (int32 i = 0; i < count; i++)
+		fPainter->FillRect(r.RectAt(i), gradient);
 }
 
 
@@ -1140,14 +1142,14 @@ DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad, bool filled)
 	clipped.right = ceilf(clipped.right);
 	clipped.bottom = ceilf(clipped.bottom);
 
-	if (clipped.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
+	DrawTransaction transaction(this, clipped);
+	if (!transaction.IsDirty())
+		return;
 
-		BRect touched = filled ? fPainter->FillRoundRect(r, xrad, yrad)
-			: fPainter->StrokeRoundRect(r, xrad, yrad);
-
-		_CopyToFront(touched);
-	}
+	if (filled)
+		fPainter->FillRoundRect(r, xrad, yrad);
+	else
+		fPainter->StrokeRoundRect(r, xrad, yrad);
 }
 
 
@@ -1165,13 +1167,11 @@ DrawingEngine::FillRoundRect(BRect r, float xrad, float yrad,
 	clipped.right = ceilf(clipped.right);
 	clipped.bottom = ceilf(clipped.bottom);
 
-	if (clipped.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
+	DrawTransaction transaction(this, clipped);
+	if (!transaction.IsDirty())
+		return;
 
-		BRect touched = fPainter->FillRoundRect(r, xrad, yrad, gradient);
-
-		_CopyToFront(touched);
-	}
+	fPainter->FillRoundRect(r, xrad, yrad, gradient);
 }
 
 
@@ -1193,16 +1193,13 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 //	clipped.right = ceilf(clipped.right);
 //	clipped.bottom = ceilf(clipped.bottom);
 //
-//	if (!clipped.IsValid())
+//	DrawTransaction transaction(this, clipped);
+//	if (!transaction.IsDirty())
 //		return;
-//
-//	AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
-	AutoFloatingOverlaysHider _(fGraphicsCard);
+	DrawTransaction transaction(this);
 
-	BRect touched = fPainter->DrawShape(opCount, opList, ptCount, ptList,
-		filled, viewToScreenOffset, viewScale);
-
-	_CopyToFront(touched);
+	transaction.SetDirty(fPainter->DrawShape(opCount, opList, ptCount, ptList,
+		filled, viewToScreenOffset, viewScale));
 }
 
 
@@ -1222,16 +1219,13 @@ DrawingEngine::FillShape(const BRect& bounds, int32 opCount,
 //	clipped.right = ceilf(clipped.right);
 //	clipped.bottom = ceilf(clipped.bottom);
 //
-//	if (!clipped.IsValid())
+//	DrawTransaction transaction(this, clipped);
+//	if (!transaction.IsDirty())
 //		return;
-//
-//	AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
-	AutoFloatingOverlaysHider _(fGraphicsCard);
+	DrawTransaction transaction(this);
 
-	BRect touched = fPainter->FillShape(opCount, opList, ptCount, ptList,
-		gradient, viewToScreenOffset, viewScale);
-
-	_CopyToFront(touched);
+	transaction.SetDirty(fPainter->FillShape(opCount, opList, ptCount, ptList,
+		gradient, viewToScreenOffset, viewScale));
 }
 
 
@@ -1243,17 +1237,14 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds, bool filled)
 	BRect clipped(bounds);
 	if (!filled)
 		extend_by_stroke_width(clipped, fPainter->PenSize());
-	clipped = fPainter->TransformAndClipRect(clipped);
-	if (clipped.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(clipped));
+	if (!transaction.IsDirty())
+		return;
 
-		if (filled)
-			fPainter->FillTriangle(pts[0], pts[1], pts[2]);
-		else
-			fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
-
-		_CopyToFront(clipped);
-	}
+	if (filled)
+		fPainter->FillTriangle(pts[0], pts[1], pts[2]);
+	else
+		fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
 }
 
 
@@ -1263,15 +1254,11 @@ DrawingEngine::FillTriangle(BPoint* pts, const BRect& bounds,
 {
 	ASSERT_PARALLEL_LOCKED();
 
-	BRect clipped(bounds);
-	clipped = fPainter->TransformAndClipRect(clipped);
-	if (clipped.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(bounds));
+	if (!transaction.IsDirty())
+		return;
 
-		fPainter->FillTriangle(pts[0], pts[1], pts[2], gradient);
-
-		_CopyToFront(clipped);
-	}
+	fPainter->FillTriangle(pts[0], pts[1], pts[2], gradient);
 }
 
 
@@ -1283,14 +1270,11 @@ DrawingEngine::StrokeLine(const BPoint& start, const BPoint& end)
 	BRect touched(start, end);
 	make_rect_valid(touched);
 	extend_by_stroke_width(touched, fPainter->PenSize());
-	touched = fPainter->TransformAndClipRect(touched);
-	if (touched.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, touched);
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(touched));
+	if (!transaction.IsDirty())
+		return;
 
-		fPainter->StrokeLine(start, end);
-
-		_CopyToFront(touched);
-	}
+	fPainter->StrokeLine(start, end);
 }
 
 
@@ -1319,33 +1303,30 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 		touched = touched | box;
 	}
 	extend_by_stroke_width(touched, fPainter->PenSize());
-	touched = fPainter->TransformAndClipRect(touched);
-	if (touched.IsValid()) {
-		AutoFloatingOverlaysHider _(fGraphicsCard, touched);
+	DrawTransaction transaction(this, fPainter->TransformAndClipRect(touched));
+	if (!transaction.IsDirty())
+		return;
 
-		data = (const ViewLineArrayInfo*)&(lineData[0]);
+	data = (const ViewLineArrayInfo*)&(lineData[0]);
 
-		// store current graphics state, we mess with the
-		// high color and pattern...
-		rgb_color oldColor = fPainter->HighColor();
-		struct pattern pattern = fPainter->Pattern();
+	// store current graphics state, we mess with the
+	// high color and pattern...
+	rgb_color oldColor = fPainter->HighColor();
+	struct pattern pattern = fPainter->Pattern();
 
+	fPainter->SetHighColor(data->color);
+	fPainter->SetPattern(B_SOLID_HIGH);
+	fPainter->StrokeLine(data->startPoint, data->endPoint);
+
+	for (int32 i = 1; i < numLines; i++) {
+		data = (const ViewLineArrayInfo*)&(lineData[i]);
 		fPainter->SetHighColor(data->color);
-		fPainter->SetPattern(B_SOLID_HIGH);
 		fPainter->StrokeLine(data->startPoint, data->endPoint);
-
-		for (int32 i = 1; i < numLines; i++) {
-			data = (const ViewLineArrayInfo*)&(lineData[i]);
-			fPainter->SetHighColor(data->color);
-			fPainter->StrokeLine(data->startPoint, data->endPoint);
-		}
-
-		// restore correct drawing state highcolor and pattern
-		fPainter->SetHighColor(oldColor);
-		fPainter->SetPattern(pattern);
-
-		_CopyToFront(touched);
 	}
+
+	// restore correct drawing state highcolor and pattern
+	fPainter->SetHighColor(oldColor);
+	fPainter->SetPattern(pattern);
 }
 
 
@@ -1389,17 +1370,13 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	BRect b = fPainter->BoundingBox(string, length, pt, &penLocation, delta,
 		&cacheReference);
 	// stop here if we're supposed to render outside of the clipping
-	b = fPainter->ClipRect(b);
-	if (b.IsValid()) {
+	DrawTransaction transaction(this, fPainter->ClipRect(b));
+	if (transaction.IsDirty()) {
 //printf("bounding box '%s': %lld µs\n", string, system_time() - now);
-		AutoFloatingOverlaysHider _(fGraphicsCard, b);
 
 //now = system_time();
-		BRect touched = fPainter->DrawString(string, length, pt, delta,
-			&cacheReference);
+		fPainter->DrawString(string, length, pt, delta, &cacheReference);
 //printf("drawing string: %lld µs\n", system_time() - now);
-
-		_CopyToFront(touched);
 	}
 
 	return penLocation;
@@ -1420,17 +1397,13 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	BRect b = fPainter->BoundingBox(string, length, offsets, &penLocation,
 		&cacheReference);
 	// stop here if we're supposed to render outside of the clipping
-	b = fPainter->ClipRect(b);
-	if (b.IsValid()) {
+	DrawTransaction transaction(this, fPainter->ClipRect(b));
+	if (transaction.IsDirty()) {
 //printf("bounding box '%s': %lld µs\n", string, system_time() - now);
-		AutoFloatingOverlaysHider _(fGraphicsCard, b);
 
 //now = system_time();
-		BRect touched = fPainter->DrawString(string, length, offsets,
-			&cacheReference);
+		fPainter->DrawString(string, length, offsets, &cacheReference);
 //printf("drawing string: %lld µs\n", system_time() - now);
-
-		_CopyToFront(touched);
 	}
 
 	return penLocation;
@@ -1532,7 +1505,7 @@ DrawingEngine::ReadBitmap(ServerBitmap* bitmap, bool drawCursor, BRect bounds)
 		cursorArea.ImportBits(bitmap->Bits(), bitmap->BitsLength(),
 			bitmap->BytesPerRow(), bitmap->ColorSpace(),
 			cursorPosition,	BPoint(0, 0),
-			cursorWidth, cursorHeight);
+			cursorArea.Bounds().Size());
 
 		uint8* bits = (uint8*)cursorArea.Bits();
 		uint8* cursorBits = (uint8*)cursor->Bits();
@@ -1590,7 +1563,8 @@ DrawingEngine::CopyRect(BRect src, int32 xOffset, int32 yOffset) const
 			uint32 width = src.IntegerWidth() + 1;
 			uint32 height = src.IntegerHeight() + 1;
 
-			_CopyRect(bits, width, height, bytesPerRow, xOffset, yOffset);
+			_CopyRect(buffer->IsGraphicsMemory(), bits, width, height, bytesPerRow,
+				xOffset, yOffset);
 
 			// offset dest again, because it is return value
 			dst.OffsetBy(xOffset, yOffset);
@@ -1608,21 +1582,12 @@ DrawingEngine::SetRendererOffset(int32 offsetX, int32 offsetY)
 
 
 void
-DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
+DrawingEngine::_CopyRect(bool isGraphicsMemory, uint8* src, uint32 width, uint32 height,
 	uint32 bytesPerRow, int32 xOffset, int32 yOffset) const
 {
 	// TODO: assumes drawing buffer is 32 bits (which it currently always is)
-	int32 xIncrement;
 	int32 yIncrement;
-
-	if (yOffset == 0 && xOffset > 0) {
-		// copy from right to left
-		xIncrement = -1;
-		src += (width - 1) * 4;
-	} else {
-		// copy from left to right
-		xIncrement = 1;
-	}
+	const bool needMemmove = (yOffset == 0 && xOffset > 0 && uint32(xOffset) <= width);
 
 	if (yOffset > 0) {
 		// copy from bottom to top
@@ -1635,44 +1600,34 @@ DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
 
 	uint8* dst = src + (ssize_t)yOffset * bytesPerRow + (ssize_t)xOffset * 4;
 
-	if (xIncrement == 1) {
-		uint8 tmpBuffer[width * 4];
-		for (uint32 y = 0; y < height; y++) {
-			// NOTE: read into temporary scanline buffer,
-			// avoid memcpy because it might be graphics card memory
-			gfxcpy32(tmpBuffer, src, width * 4);
-			// write back temporary scanline buffer
-			// NOTE: **don't read and write over the PCI bus
-			// at the same time**
-			memcpy(dst, tmpBuffer, width * 4);
-// NOTE: this (instead of the two pass copy above) might
-// speed up QEMU -> ?!? (would depend on how it emulates
-// the PCI bus...)
-// TODO: would be nice if we actually knew
-// if we're operating in graphics memory or main memory...
-//memcpy(dst, src, width * 4);
-			src += yIncrement;
-			dst += yIncrement;
+	if (!needMemmove) {
+		if (!isGraphicsMemory) {
+			// NOTE: this (instead of the two pass copy below) might
+			// speed up QEMU -> ?!? (would depend on how it emulates
+			// the PCI bus...)
+			for (uint32 y = 0; y < height; y++) {
+				memcpy(dst, src, width * 4);
+				src += yIncrement;
+				dst += yIncrement;
+			}
+		} else {
+			uint8 tmpBuffer[width * 4];
+			for (uint32 y = 0; y < height; y++) {
+				// NOTE: read into temporary scanline buffer,
+				// NOTE: **don't read and write over the PCI bus
+				// at the same time**
+				memcpy(tmpBuffer, src, width * 4);
+				// write back temporary scanline buffer
+				memcpy(dst, tmpBuffer, width * 4);
+				src += yIncrement;
+				dst += yIncrement;
+			}
 		}
 	} else {
 		for (uint32 y = 0; y < height; y++) {
-			uint32* srcHandle = (uint32*)src;
-			uint32* dstHandle = (uint32*)dst;
-			for (uint32 x = 0; x < width; x++) {
-				*dstHandle = *srcHandle;
-				srcHandle += xIncrement;
-				dstHandle += xIncrement;
-			}
+			memmove(dst, src, width * 4);
 			src += yIncrement;
 			dst += yIncrement;
 		}
 	}
-}
-
-
-inline void
-DrawingEngine::_CopyToFront(const BRect& frame)
-{
-	if (fCopyToFront)
-		fGraphicsCard->Invalidate(frame);
 }

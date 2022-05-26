@@ -298,19 +298,16 @@ HaikuControlLook::DrawMenuBackground(BView* view, BRect& rect,
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
-	// surface top color
-	rgb_color background = tint_color(base, 0.75);
-
 	// inner bevel colors
 	rgb_color bevelLightColor;
 	rgb_color bevelShadowColor;
 
 	if ((flags & B_DISABLED) != 0) {
-		bevelLightColor = tint_color(background, 0.80);
-		bevelShadowColor = tint_color(background, 1.07);
+		bevelLightColor = tint_color(base, 0.80);
+		bevelShadowColor = tint_color(base, 1.07);
 	} else {
-		bevelLightColor = tint_color(background, 0.6);
-		bevelShadowColor = tint_color(background, 1.12);
+		bevelLightColor = tint_color(base, 0.6);
+		bevelShadowColor = tint_color(base, 1.12);
 	}
 
 	// draw inner bevel
@@ -320,7 +317,7 @@ HaikuControlLook::DrawMenuBackground(BView* view, BRect& rect,
 		borders);
 
 	// draw surface top
-	view->SetHighColor(background);
+	view->SetHighColor(base);
 	view->FillRect(rect);
 }
 
@@ -1635,33 +1632,23 @@ HaikuControlLook::DrawTabFrame(BView* view, BRect& rect,
 	if (side == BTabView::kTopSide || side == BTabView::kBottomSide) {
 		// draw an inactive tab frame behind all tabs
 		borders = B_TOP_BORDER | B_BOTTOM_BORDER;
-		if (borderStyle == B_NO_BORDER) {
-			// removes left border that is an artifact of DrawInactiveTab()
-			rect.left -= 1;
-		} else
+		if (borderStyle != B_NO_BORDER)
 			borders |= B_LEFT_BORDER | B_RIGHT_BORDER;
 
 		// DrawInactiveTab draws 2px border
-		// draw a little wider tab frame to align B_PLAIN_BORDER with it
-		if (borderStyle == B_PLAIN_BORDER) {
-			rect.left -= 1;
-			rect.right += 1;
-		}
+		// draw tab frame wider to align B_PLAIN_BORDER with it
+		if (borderStyle == B_PLAIN_BORDER)
+			rect.InsetBy(-1, 0);
 	} else if (side == BTabView::kLeftSide || side == BTabView::kRightSide) {
 		// draw an inactive tab frame behind all tabs
 		borders = B_LEFT_BORDER | B_RIGHT_BORDER;
-		if (borderStyle == B_NO_BORDER) {
-			// removes top border that is an artifact of DrawInactiveTab()
-			rect.top -= 1;
-		} else
+		if (borderStyle != B_NO_BORDER)
 			borders |= B_TOP_BORDER | B_BOTTOM_BORDER;
 
 		// DrawInactiveTab draws 2px border
-		// draw a little wider tab frame to align B_PLAIN_BORDER with it
-		if (borderStyle == B_PLAIN_BORDER) {
-			rect.top -= 1;
-			rect.bottom += 1;
-		}
+		// draw tab frame wider to align B_PLAIN_BORDER with it
+		if (borderStyle == B_PLAIN_BORDER)
+			rect.InsetBy(0, -1);
 	}
 
 	DrawInactiveTab(view, rect, rect, base, 0, borders, side);
@@ -1669,8 +1656,9 @@ HaikuControlLook::DrawTabFrame(BView* view, BRect& rect,
 
 
 void
-HaikuControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
-	const rgb_color& base, uint32 flags, uint32 borders, uint32 side)
+HaikuControlLook::DrawActiveTab(BView* view, BRect& rect,
+	const BRect& updateRect, const rgb_color& base, uint32 flags,
+	uint32 borders, uint32 side, int32, int32, int32, int32)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -1848,8 +1836,9 @@ HaikuControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRec
 
 
 void
-HaikuControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateRect,
-	const rgb_color& base, uint32 flags, uint32 borders, uint32 side)
+HaikuControlLook::DrawInactiveTab(BView* view, BRect& rect,
+	const BRect& updateRect, const rgb_color& base, uint32 flags,
+	uint32 borders, uint32 side, int32, int32, int32, int32)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -1885,23 +1874,32 @@ HaikuControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateR
 	}
 
 	BRect background = rect;
+	bool isVertical;
 	switch (side) {
-		case B_TOP_BORDER:
+		default:
+		case BTabView::kTopSide:
 			rect.top += 4;
 			background.bottom = rect.top;
+			isVertical = false;
 			break;
-		case B_BOTTOM_BORDER:
+
+		case BTabView::kBottomSide:
 			rect.bottom -= 4;
 			background.top = rect.bottom;
+			isVertical = false;
 			break;
-		case B_LEFT_BORDER:
+
+		case BTabView::kLeftSide:
 			rect.left += 4;
 			background.right = rect.left;
+			isVertical = true;
 			break;
-		case B_RIGHT_BORDER:
+
+		case BTabView::kRightSide:
 			rect.right -= 4;
 			background.left = rect.right;
-		break;
+			isVertical = true;
+			break;
 	}
 
 	// active tabs stand out at the top, but this is an inactive tab
@@ -1909,6 +1907,8 @@ HaikuControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateR
 	view->FillRect(background);
 
 	// frame and fill
+	// Note that _DrawFrame also insets the rect, so each of the calls here
+	// operate on a smaller rect than the previous ones
 	_DrawFrame(view, rect, edgeShadowColor, edgeShadowColor, edgeLightColor,
 		edgeLightColor, borders);
 
@@ -1916,18 +1916,18 @@ HaikuControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateR
 		frameShadowColor, borders);
 
 	if (rect.IsValid()) {
-		if (side == B_TOP_BORDER || side == B_BOTTOM_BORDER) {
-			_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor,
-				bevelLightColor, bevelLightColor, B_LEFT_BORDER & ~borders);
-		} else if (side == B_LEFT_BORDER || side == B_RIGHT_BORDER) {
+		if (isVertical) {
 			_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor,
 				bevelLightColor, bevelLightColor, B_TOP_BORDER & ~borders);
+		} else {
+			_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor,
+				bevelLightColor, bevelLightColor, B_LEFT_BORDER & ~borders);
 		}
 	} else {
-		if (side == B_TOP_BORDER || side == B_BOTTOM_BORDER) {
+		if (isVertical) {
 			if ((B_LEFT_BORDER & ~borders) != 0)
 				rect.left++;
-		} else if (side == B_LEFT_BORDER || side == B_RIGHT_BORDER) {
+		} else {
 			if ((B_TOP_BORDER & ~borders) != 0)
 				rect.top++;
 		}
@@ -3829,6 +3829,17 @@ HaikuControlLook::_FillGlossyGradient(BView* view, const BRect& rect,
 	_MakeGlossyGradient(gradient, rect, base, topTint, middle1Tint,
 		middle2Tint, bottomTint, orientation);
 	view->FillRect(rect, gradient);
+}
+
+
+float
+HaikuControlLook::GetScrollBarWidth(orientation orientation)
+{
+	// HaikuControlLook does not make a distinction between the
+	// width and height of the scrollbar, but other controllooks may
+	if (be_plain_font->Size() <= 12.0f)
+		return 14.0f;
+	return be_plain_font->Size() / 12.0f * 14.0f;
 }
 
 

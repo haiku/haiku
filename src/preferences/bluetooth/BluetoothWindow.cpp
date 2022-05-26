@@ -41,9 +41,11 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 {
 	fDefaultsButton = new BButton("defaults", B_TRANSLATE("Defaults"),
 		new BMessage(kMsgSetDefaults), B_WILL_DRAW);
+	fDefaultsButton->SetEnabled(false);
 
 	fRevertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevert), B_WILL_DRAW);
+	fRevertButton->SetEnabled(false);
 
 	// Add the menu bar
 	fMenubar = new BMenuBar(Bounds(), "menu_bar");
@@ -71,15 +73,11 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 	tabView->SetBorder(B_NO_BORDER);
 
 	fSettingsView = new BluetoothSettingsView(B_TRANSLATE("Settings"));
-//	fConnChan = new ConnChanView("Connections & Channels", B_WILL_DRAW);
 	fRemoteDevices = new RemoteDevicesView(
 		B_TRANSLATE("Remote devices"), B_WILL_DRAW);
 
 	tabView->AddTab(fRemoteDevices);
-//	tabView->AddTab(fConnChan);
 	tabView->AddTab(fSettingsView);
-
-	fRevertButton->SetEnabled(false);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(0)
@@ -102,7 +100,13 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 void
 BluetoothWindow::MessageReceived(BMessage* message)
 {
+	//message->PrintToStream();
 	switch (message->what) {
+		case kMsgSetConnectionPolicy:
+		case kMsgSetDeviceClass:
+			fSettingsView->MessageReceived(message);
+		break;
+
 		case kMsgSetDefaults:
 /*			fColorsView -> MessageReceived(new BMessage(DEFAULT_SETTINGS));
 			fAntialiasingSettings->SetDefaults();

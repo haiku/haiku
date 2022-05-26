@@ -37,6 +37,7 @@
 #include <app/Application.h>
 #include <interface/Button.h>
 //#include <storage/Entry.h>
+#include <Catalog.h>
 #include <Entry.h>
 #include <media/MediaRoster.h>
 #include <media/MediaAddOn.h>
@@ -44,6 +45,11 @@
 #include <media/MediaTheme.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexAddOnsLoggingConsumerNodeHarnessWin"
+
 
 const int32 BUTTON_CONNECT = 'Cnct';
 const int32 BUTTON_START = 'Strt';
@@ -70,15 +76,18 @@ NodeHarnessWin::NodeHarnessWin(BRect frame, const char *title)
 {
 	// build the UI
 	BRect r(10, 10, 100, 40);
-	mConnectButton = new BButton(r, "Connect", "Connect", new BMessage(BUTTON_CONNECT));
+	mConnectButton = new BButton(r, "Connect", B_TRANSLATE("Connect"),
+		new BMessage(BUTTON_CONNECT));
 	mConnectButton->SetEnabled(true);
 	AddChild(mConnectButton);
 	r.OffsetBy(0, 40);
-	mStartButton = new BButton(r, "Start", "Start", new BMessage(BUTTON_START));
+	mStartButton = new BButton(r, "Start", B_TRANSLATE("Start"),
+		new BMessage(BUTTON_START));
 	mStartButton->SetEnabled(false);
 	AddChild(mStartButton);
 	r.OffsetBy(0, 40);
-	mStopButton = new BButton(r, "Stop", "Stop", new BMessage(BUTTON_STOP));
+	mStopButton = new BButton(r, "Stop", B_TRANSLATE("Stop"),
+		new BMessage(BUTTON_STOP));
 	mStopButton->SetEnabled(false);
 	AddChild(mStopButton);
 }
@@ -160,8 +169,9 @@ NodeHarnessWin::MessageReceived(BMessage *msg)
 			BParameterWeb* web;
 			r->GetParameterWebFor(mConnection.consumer, &web);
 			BView* view = BMediaTheme::ViewFor(web);
-			BWindow* win = new BWindow(BRect(250, 200, 300, 300), "Controls",
-				B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS);
+			BWindow* win = new BWindow(BRect(250, 200, 300, 300),
+				B_TRANSLATE("Controls"), B_TITLED_WINDOW,
+				B_ASYNCHRONOUS_CONTROLS);
 			win->AddChild(view);
 			win->ResizeTo(view->Bounds().Width(), view->Bounds().Height());
 			win->Show();

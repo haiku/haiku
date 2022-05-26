@@ -6,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -39,10 +39,11 @@ static const bool kDefaultHideEsoteric	= true;
 
 // constructor
 Settings::Settings()
-	: fDefaultVolumeName(),
-	  fVolumeName(),
-	  fHideEsoteric(kDefaultHideEsoteric),
-	  fHiddenEntries(5)
+	:
+	fDefaultVolumeName(),
+	fVolumeName(),
+	fHideEsoteric(kDefaultHideEsoteric),
+	fHiddenEntries(5)
 {
 }
 
@@ -74,7 +75,8 @@ Settings::SetTo(const char *volumeName)
 status_t
 Settings::SetTo(off_t volumeOffset, off_t volumeSize)
 {
-PRINT(("Settings::SetTo(%Ld, %Ld)\n", volumeOffset, volumeSize));
+	PRINT(("Settings::SetTo(%" B_PRIdOFF ", %" B_PRIdOFF ")\n", volumeOffset,
+		volumeSize));
 	// unset
 	Unset();
 	// load the driver settings and find the entry for the volume
@@ -86,7 +88,8 @@ PRINT(("Settings::SetTo(%Ld, %Ld)\n", volumeOffset, volumeSize));
 	// init the object and unload the settings
 	_Init(ds, volume);
 	unload_driver_settings(settings);
-PRINT(("Settings::SetTo(%Ld, %Ld) done: B_OK\n", volumeOffset, volumeSize));
+	PRINT(("Settings::SetTo(%" B_PRIdOFF ", %" B_PRIdOFF ") done: B_OK\n",
+		volumeOffset, volumeSize));
 	return B_OK;
 }
 
@@ -143,7 +146,7 @@ Settings::Dump()
 	PRINT(("  default volume name:   `%s'\n", GetDefaultVolumeName()));
 	PRINT(("  volume name:           `%s'\n", GetVolumeName()));
 	PRINT(("  hide esoteric entries: %d\n", GetHideEsoteric()));
-	PRINT(("  %ld hidden entries:\n", fHiddenEntries.CountItems()));
+	PRINT(("  %" B_PRId32 " hidden entries:\n", fHiddenEntries.CountItems()));
 	for (int32 i = 0; const char *entry = HiddenEntryAt(i); i++)
 		PRINT(("    `%s'\n", entry));
 }
@@ -160,17 +163,17 @@ PRINT(("Settings::_Init(%p, %p)\n", settings, volume));
 		"default_volume_name", (const char*)NULL, NULL));
 PRINT(("  default_volume_name is: `%s'\n", fDefaultVolumeName.GetString()));
 	fHideEsoteric = _GetParameterValue(settings, "hide_esoteric_entries",
-									   kDefaultHideEsoteric,
-									   kDefaultHideEsoteric);
+										kDefaultHideEsoteric,
+										kDefaultHideEsoteric);
 PRINT(("  hide_esoteric_entries is: %d\n", fHideEsoteric));
 	// get the per volume settings
 	if (volume) {
 PRINT(("  getting volume parameters:\n"));
 		fVolumeName.SetTo(_GetParameterValue(volume, "name", (const char*)NULL,
-											 NULL));
+												NULL));
 PRINT(("    name is: `%s'\n", fVolumeName.GetString()));
 		fHideEsoteric = _GetParameterValue(volume, "hide_esoteric_entries",
-										   fHideEsoteric, fHideEsoteric);
+											fHideEsoteric, fHideEsoteric);
 PRINT(("    hide_esoteric_entries is: %d\n", fHideEsoteric));
 		int32 cookie = 0;
 		while (const driver_parameter *parameter
@@ -202,7 +205,7 @@ PRINT(("Settings::_Init() done: %s\n", strerror(error)));
 // _FindVolumeParameter
 const driver_parameter *
 Settings::_FindVolumeParameter(const driver_settings *settings,
-							   const char *name)
+								const char *name)
 {
 	if (settings) {
 		int32 cookie = 0;
@@ -220,9 +223,10 @@ Settings::_FindVolumeParameter(const driver_settings *settings,
 // _FindVolumeParameter
 const driver_parameter *
 Settings::_FindVolumeParameter(const driver_settings *settings,
-							   off_t offset, off_t size)
+								off_t offset, off_t size)
 {
-PRINT(("Settings::_FindVolumeParameter(%Ld, %Ld)\n", offset, size));
+	PRINT(("Settings::_FindVolumeParameter(%" B_PRIdOFF ", %" B_PRIdOFF ")\n",
+		offset, size));
 	if (settings) {
 		int32 cookie = 0;
 		while (const driver_parameter *parameter
@@ -231,13 +235,13 @@ PRINT(("Settings::_FindVolumeParameter(%Ld, %Ld)\n", offset, size));
 					== offset
 				&& _GetParameterValue(parameter, "size", size + 1, size + 1)
 					== size) {
-PRINT(("Settings::_FindVolumeParameter() done: found parameter: index: %ld, "
-"(%p)\n", cookie - 1, parameter));
+				PRINT(("Settings::_FindVolumeParameter() done: found parameter:"
+					" index: %" B_PRId32 ", (%p)\n", cookie - 1, parameter));
 				return parameter;
 			}
 		}
 	}
-PRINT(("Settings::_FindVolumeParameter() done: failed\n"));
+	PRINT(("Settings::_FindVolumeParameter() done: failed\n"));
 	return NULL;
 }
 

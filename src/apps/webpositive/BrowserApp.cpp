@@ -104,10 +104,11 @@ BrowserApp::BrowserApp()
 	cookieStorePath << "/Cookies";
 	fCookies = new SettingsMessage(B_USER_SETTINGS_DIRECTORY,
 		cookieStorePath.String());
-	fContext = new BUrlContext();
+	fContext = new BPrivate::Network::BUrlContext();
 	if (fCookies->InitCheck() == B_OK) {
 		BMessage cookieArchive = fCookies->GetValue("cookies", cookieArchive);
-		fContext->SetCookieJar(BNetworkCookieJar(&cookieArchive));
+		fContext->SetCookieJar(
+			BPrivate::Network::BNetworkCookieJar(&cookieArchive));
 	}
 #endif
 
@@ -452,7 +453,7 @@ BrowserApp::QuitRequested()
 	}
 
 	BMessage cookieArchive;
-	BNetworkCookieJar& cookieJar = fContext->GetCookieJar();
+	BPrivate::Network::BNetworkCookieJar& cookieJar = fContext->GetCookieJar();
 	cookieJar.PurgeForExit();
 	if (cookieJar.Archive(&cookieArchive) == B_OK)
 		fCookies->SetValue("cookies", cookieArchive);

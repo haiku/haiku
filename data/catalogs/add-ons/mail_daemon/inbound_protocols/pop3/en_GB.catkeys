@@ -1,3 +1,4 @@
-1	english (united kingdom)	x-vnd.Haiku-POP3	979063546
+1	english (united kingdom)	x-vnd.Haiku-POP3	1165050188
 Error while authenticating user %user	pop3		Error whilst authenticating user %user
+Getting mailbox size…	pop3		Getting postbox size…
 Error while connecting to server %serv	pop3		Error whilst connecting to server %serv

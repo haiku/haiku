@@ -1,0 +1,34 @@
+1	japanese	application/x-vnd.Cortex.MediaRoutingView	3442339205
+Lock group	MediaNodePanel		グループのロック
+%refname% (no file)	MediaNodePanel		%refname% (ファイル無し)
+Video output	MediaRoutingView		ビデオ出力
+Icon view	MediaRoutingView		アイコン表示
+OK	MediaRoutingView		OK
+Cycle	MediaNodePanel		サイクル
+Advanced	MediaNodePanel		高度な設定
+Audio input	MediaRoutingView		オーディオ入力
+Run mode	MediaNodePanel		実行モード
+Could not load '%filename%'	MediaRoutingView		'%filename%'をロードできません
+Stop time source	MediaNodePanel		タイムソースの停止
+Be Audio Mixer	MediaRoutingView		Beオーディオミキサー
+Video input	MediaRoutingView		ビデオ入力
+Release	MediaNodePanel		解放
+Disconnect	MediaRoutingView		切断
+Could not disconnect	MediaRoutingView		切断できません
+Could not instantiate '%infoname%'	MediaRoutingView		'%infoname%'をインスタンス化できません
+Mini icon view	MediaRoutingView		ミニアイコン表示
+Select all	MediaRoutingView		すべて選択
+(same as group)	MediaNodePanel		(グループと同じ)
+Input	MediaJack		入力
+Get info	MediaJack		情報を見る
+Start time source	MediaNodePanel		タイムソースの開始
+Error	MediaRoutingView		エラー
+Could not release '%refname%'	MediaRoutingView		'%refname%'を解放できません
+Output	MediaJack		出力
+Get info	MediaNodePanel		情報を見る
+Get info	MediaRoutingView		情報を見る
+Clean up	MediaRoutingView		クリーンアップ
+Start control panel	MediaNodePanel		コントロールパネルを開く
+Tweak parameters	MediaNodePanel		調整パラメーター
+Could not connect	MediaRoutingView		接続できません
+Unlock group	MediaNodePanel		グループのアンロック

@@ -54,7 +54,7 @@ Device name	DeviceACPI		Nom du périphérique
 Card Reader	DeviceSCSI		Lecteur de cartes
 Display controller	Device		Contrôleur d’affichage
 Basic information	DevicesView		Informations de base
-ACPI Button '%1'	DeviceACPI		ACPI Bouton ‘%1’
+ACPI Button '%1'	DeviceACPI		ACPI Bouton « %1 »
 Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <inconnu>
 Device name	DevicePCI		Nom du périphérique

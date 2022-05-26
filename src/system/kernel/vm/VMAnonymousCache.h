@@ -19,6 +19,7 @@ typedef uint32 swap_addr_t;
 	// TODO: Should be wider, but RadixBitmap supports only a 32 bit type ATM!
 struct swap_block;
 struct system_memory_info;
+namespace BKernel { class Bitmap; }
 
 
 extern "C" {
@@ -38,6 +39,8 @@ public:
 									int32 numPrecommittedPages,
 									int32 numGuardPages,
 									uint32 allocationFlags);
+
+			status_t			SetCanSwapPages(off_t base, size_t size, bool canSwap);
 
 	virtual	status_t			Resize(off_t newSize, int priority);
 	virtual	status_t			Rebase(off_t newBase, int priority);
@@ -102,6 +105,7 @@ private:
 			bool				fHasPrecommitted;
 			uint8				fPrecommittedPages;
 			int32				fGuardedSize;
+			BKernel::Bitmap*	fNoSwapPages;
 			off_t				fCommittedSwapSize;
 			off_t				fAllocatedSwapSize;
 };

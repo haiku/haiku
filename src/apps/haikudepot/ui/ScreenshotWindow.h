@@ -1,5 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef SCREENSHOT_WINDOW_H
@@ -51,6 +52,7 @@ private:
 	static	int32				_DownloadThreadEntry(void* data);
 			void				_DownloadThread();
 
+			BSize				_MaxWidthAndHeightOfAllScreenshots();
 			void				_ResizeToFitAndCenter();
 			void				_UpdateToolBar();
 

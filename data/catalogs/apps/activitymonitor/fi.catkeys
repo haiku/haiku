@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-ActivityMonitor	2601047281
+1	finnish	x-vnd.Haiku-ActivityMonitor	826097672
 Teams	DataSource		Ryhmät
 Semaphores	DataSource		Opastimet
 TX	DataSource	Shorter version for Sending	Läh.
@@ -24,6 +24,7 @@ Settings…	ActivityWindow		Asetukset...
 Block cache	DataSource		Lohkovälimuisti
 Memory	DataSource		Muisti
 CPU usage	DataSource		Suoritinkäyttö
+CPU speed	DataSource		Prosessorinopeus
 Quit	ActivityWindow		Poistu
 Raw clipboard	DataSource		Raakadataleikepöytä
 Settings	ActivityWindow		Asetukset
@@ -32,6 +33,7 @@ Used memory	DataSource		Käytetty muisti
 Show legend	ActivityView		Näytä merkin selitys
 Cached memory	DataSource		Välimuistitettu muisti
 CPU %d usage	DataSource		CPU %d käyttö
+CPU %d speed	DataSource		Prosessori %d-nopeus
 File	ActivityWindow		Tiedosto
 Ports	DataSource		Portit
 Page faults	DataSource		Sivuvirheet

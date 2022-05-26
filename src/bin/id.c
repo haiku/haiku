@@ -1,5 +1,5 @@
 /*
-** Copyright (c) 2004 OBOS
+** Copyright (c) 2004 Haiku
 ** Permission is hereby granted, free of charge, to any person obtaining a copy 
 ** of this software and associated documentation files (the "Software"), to deal 
 ** in the Software without restriction, including without limitation the rights 
@@ -156,7 +156,7 @@ static void
 usage(void)
 {
 	fprintf(stdout, 
-"%s OBOS (http://www.openbeos.org/)
+"%s Haiku (https://www.haiku-os.org/)
 
 Usage: %s [OPTION]... [USERNAME]
 
@@ -177,7 +177,7 @@ Print information for USERNAME, or the current user.
 static void
 version(void)
 {
-	fprintf(stdout, "%s OBOS (http://www.openbeos.org/)\n", progName);
+	fprintf(stdout, "%s Haiku (https://www.haiku-os.org/)\n", progName);
 }
 
 

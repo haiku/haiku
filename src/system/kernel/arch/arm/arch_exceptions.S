@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Haiku Inc. All rights reserved.
+ * Copyright 2012-2022, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -52,6 +52,30 @@
 	ldmia	sp, {sp, lr, pc}^			/* Restore lr and exit */
 .endm
 
+/* The following two macros are adapted from the two macros above, taken from FreeBSD. */
+
+.macro	PUSHFRAMEINSWI
+	str		lr, [sp, #-4]!				/* Push the return address */
+	sub		sp, sp, #(4*17)				/* Adjust the stack pointer */
+	stmia	sp, {r0-r12}				/* Store the general purpose registers */
+	add		r0, sp, #(4*13)				/* Adjust the stack pointer */
+	stmia	r0, {r13-r14}^				/* Store the user mode sp and lr registers */
+	mrs		r0, spsr					/* Store the SPSR */
+	str		r0, [sp, #-4]!
+	mov		r0, #0						/* Fill in svc mode sp and lr with zeroes */
+	str		r0, [sp, #(4*16)]
+	str		r0, [sp, #(4*17)]
+.endm
+
+.macro	PULLFRAMEINSWIANDEXIT
+	ldr		r0, [sp], #4				/* Get SPSR from stack */
+	msr		spsr, r0
+	ldmia	sp, {r0-r14}^				/* Restore user mode registers */
+	add		sp, sp, #(4*17)				/* Adjust the stack pointer */
+	ldr		lr, [sp], #4				/* Pull the return address */
+	movs	pc, lr						/* Return to user mode */
+.endm
+
 .text
 
 .globl _vectors_start
@@ -93,6 +117,9 @@ _arm_fiq:
 
 .globl _vectors_end
 _vectors_end:
+
+.data
+
 	.rept	64
 	.word	0xdeadbeef
 	.endr
@@ -125,6 +152,7 @@ und_stack:
 	.word	. - 4
 	.word	0xccccdddd
 
+.text
 
 FUNCTION(arm_undefined):
 	PUSHFRAMEINSVC
@@ -137,12 +165,12 @@ FUNCTION_END(arm_undefined)
 
 
 FUNCTION(arm_syscall):
-	PUSHFRAMEINSVC
+	PUSHFRAMEINSWI
 
 	mov	r0, sp
 	bl	arch_arm_syscall
 
-	PULLFRAMEFROMSVCANDEXIT
+	PULLFRAMEINSWIANDEXIT
 FUNCTION_END(arm_syscall)
 
 
@@ -151,7 +179,7 @@ FUNCTION(arm_prefetch_abort):
 	nop					/* Make absolutely sure any pending */
 	nop					/* imprecise aborts have occurred. */
 #endif
- 	add	lr, lr, #4
+	sub	lr, lr, #4
 	PUSHFRAMEINSVC
 
 	mov	r0, sp
@@ -212,22 +240,26 @@ FUNCTION(arm_vector_init):
 	mov	r0, r1
 	orr	r0, r0, #CPSR_MODE_FIQ
 	msr	cpsr_c, r0
-	ldr	sp, fiq_stack
+	ldr r2, =fiq_stack
+	ldr sp, [r2]
 
 	mov	r0, r1
 	orr	r0, r0, #CPSR_MODE_IRQ
 	msr	cpsr_c, r0
-	ldr	sp, irq_stack
+	ldr r2, =irq_stack
+	ldr sp, [r2]
 
 	mov	r0, r1
 	orr	r0, r0, #CPSR_MODE_ABT
 	msr	cpsr_c, r0
-	ldr	sp, abort_stack
+	ldr r2, =abort_stack
+	ldr sp, [r2]
 
 	mov	r0, r1
 	orr	r0, r0, #CPSR_MODE_UND
 	msr	cpsr_c, r0
-	ldr	sp, und_stack
+	ldr r2, =und_stack
+	ldr sp, [r2]
 
 	/* ... and return back to supervisor mode */
 	mov	r0, r1

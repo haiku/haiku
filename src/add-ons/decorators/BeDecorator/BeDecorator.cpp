@@ -1204,7 +1204,6 @@ BeDecorator::_GetBitmapForButton(Decorator::Tab* tab, Component item,
 			} else {
 				// draw combined inner and outer shadow
 				data = fBigZoomBitmap->Bits();
-				size = sizeof(kBigOuterShadowBits);
 				for (size_t i = 0; i < sizeof(kBigOuterShadowBits); i++) {
 					offset = i * 4;
 					if (kBigOuterShadowBits[i] == 0) {

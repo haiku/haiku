@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef WEB_APP_INTERFACE_H
@@ -12,7 +12,7 @@
 #include <String.h>
 #include <package/PackageVersion.h>
 
-#include "List.h"
+#include "PackageInfo.h"
 #include "UserCredentials.h"
 #include "UserDetail.h"
 #include "UserUsageConditions.h"
@@ -21,8 +21,6 @@
 class BDataIO;
 class BMessage;
 using BPackageKit::BPackageVersion;
-
-typedef List<BString, false>	StringList;
 
 
 /*! These are error codes that are sent back to the client from the server */
@@ -59,6 +57,7 @@ public:
 			status_t			RetreiveUserRatingsForPackageForDisplay(
 									const BString& packageName,
 									const BString& webAppRepositoryCode,
+									const BString& webAppRepositorySourceCode,
 									int resultOffset, int maxResults,
 									BMessage& message);
 
@@ -66,7 +65,8 @@ public:
 									const BString& packageName,
 									const BPackageVersion& version,
 									const BString& architecture,
-									const BString& repositoryCode,
+									const BString& webAppRepositoryCode,
+									const BString& webAppRepositorySourceCode,
 									const BString& userNickname,
 									BMessage& message);
 
@@ -74,7 +74,8 @@ public:
 									const BString& packageName,
 									const BPackageVersion& version,
 									const BString& architecture,
-									const BString& repositoryCode,
+									const BString& webAppRepositoryCode,
+									const BString& webAppRepositorySourceCode,
 									const BString& languageCode,
 									const BString& comment,
 									const BString& stability,
@@ -123,6 +124,11 @@ public:
 									const BString& passwordClear,
 									BMessage& message);
 
+			status_t			IncrementViewCounter(
+									const PackageInfoRef package,
+									const DepotInfoRef depot,
+									BMessage& message);
+
 	static	int32				ErrorCodeFromResponse(
 									BMessage& responseEnvelopeMessage);
 
@@ -137,18 +143,15 @@ private:
 			status_t			_RetrieveUserUsageConditionsCopy(
 									const BString& code, BDataIO* stream);
 
-			void				_WriteStandardJsonRpcEnvelopeValues(
-									BJsonWriter& writer,
-									const char* methodName);
-			status_t			_SendJsonRequest(const char* domain,
+			status_t			_SendJsonRequest(const char* urlPathComponents,
 									const BString& jsonString, uint32 flags,
 									BMessage& reply) const;
-			status_t			_SendJsonRequest(const char* domain,
+			status_t			_SendJsonRequest(const char* urlPathComponents,
 									UserCredentials credentials,
 									BPositionIO* requestData,
 									size_t requestDataSize, uint32 flags,
 									BMessage& reply) const;
-			status_t			_SendJsonRequest(const char* domain,
+			status_t			_SendJsonRequest(const char* urlPathComponents,
 									BPositionIO* requestData,
 									size_t requestDataSize, uint32 flags,
 									BMessage& reply) const;

@@ -31,6 +31,21 @@ status_t removeFromDeskbar(void *)
 	return B_OK;
 }
 
+
+static status_t
+our_image(image_info& image)
+{
+	int32 cookie = 0;
+	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &image) == B_OK) {
+		if ((char *)our_image >= (char *)image.text
+			&& (char *)our_image <= (char *)image.text + image.text_size)
+			return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
 //**************************************************
 
 ConfigMenu::ConfigMenu(TrayView *tv, bool useMag)
@@ -201,12 +216,9 @@ void TrayView::GetPreferredSize(float *w, float *h)
 void TrayView::_init()
 {
 	thread_info ti;
-	status_t err;
 
 	watching = false;
 	_settings = new AutoRaiseSettings;
-
-	_appPath = _settings->AppPath();
 
 	raise_delay = _settings->Delay();
 	current_window = 0;
@@ -224,16 +236,31 @@ void TrayView::_init()
 	resume_thread(poller_thread = spawn_thread(poller, "AutoRaise desktop "
 		"poller", B_NORMAL_PRIORITY, (void *)this));
 
-	//determine paths to icon files based on app path in settings file
+	image_info info;
+	{
+		status_t result = our_image(info);
+		if (result != B_OK) {
+			printf("Unable to lookup image_info for the AutoRaise image: %s\n",
+				strerror(result));
+			removeFromDeskbar(NULL);
+			return;
+		}
+	}
 
-	BResources res;
-	BFile theapp(&_appPath, B_READ_ONLY);
-	if ((err = res.SetTo(&theapp)) != B_OK) {
+	BFile file(info.name, B_READ_ONLY);
+	if (file.InitCheck() != B_OK) {
+		printf("Unable to access AutoRaise image file: %s\n",
+			strerror(file.InitCheck()));
+		removeFromDeskbar(NULL);
+		return;
+	}
 
-		printf("Unable to find the app to get the resources !!!\n");
-//		removeFromDeskbar(NULL);
-//		delete _settings;
-//		return;
+	BResources res(&file);
+	if (res.InitCheck() != B_OK) {
+		printf("Unable to load image resources: %s\n",
+			strerror(res.InitCheck()));
+		removeFromDeskbar(NULL);
+		return;
 	}
 
 	size_t bmsz;
@@ -242,19 +269,22 @@ void TrayView::_init()
 	p = (char *)res.LoadResource('MICN', ACTIVE_ICON, &bmsz);
 	_activeIcon = new BBitmap(BRect(0, 0, B_MINI_ICON-1, B_MINI_ICON -1),
 		B_CMAP8);
-	if (!p)
+	if (p == NULL) {
 		puts("ERROR loading active icon");
-	else
-		_activeIcon->SetBits(p, B_MINI_ICON*B_MINI_ICON, 0, B_CMAP8);
+		removeFromDeskbar(NULL);
+		return;
+	}
+	_activeIcon->SetBits(p, B_MINI_ICON * B_MINI_ICON, 0, B_CMAP8);
 
 	p = (char *)res.LoadResource('MICN', INACTIVE_ICON, &bmsz);
 	_inactiveIcon = new BBitmap(BRect(0, 0, B_MINI_ICON-1, B_MINI_ICON -1),
 		B_CMAP8);
-	if (!p)
+	if (p == NULL) {
 		puts("ERROR loading inactive icon");
-	else
-		_inactiveIcon->SetBits(p, B_MINI_ICON*B_MINI_ICON, 0, B_CMAP8);
-
+		removeFromDeskbar(NULL);
+		return;
+	}
+	_inactiveIcon->SetBits(p, B_MINI_ICON * B_MINI_ICON, 0, B_CMAP8);
 
 	SetDrawingMode(B_OP_ALPHA);
 	SetFlags(Flags() | B_WILL_DRAW);
@@ -281,12 +311,8 @@ TrayView::~TrayView(){
 
 //Dehydrate into a message (called by the DeskBar)
 status_t TrayView::Archive(BMessage *data, bool deep) const {
-//	BEntry appentry(&_appPath, true);
-//	BPath appPath(&appentry);
 	status_t error=BView::Archive(data, deep);
 	data->AddString("add_on", APP_SIG);
-//	data->AddFlat("_appPath", (BFlattenable *) &_appPath);
-	data->AddRef("_appPath", &_appPath);
 
 	return error;
 }

@@ -44,6 +44,13 @@ arch_debug_call_with_fault_handler(cpu_ent* cpu, jmp_buf jumpBuffer,
 }
 
 
+void
+arch_debug_unset_current_thread(void)
+{
+	asm volatile("mov %g0, %g7");
+}
+
+
 bool
 arch_is_debug_variable_defined(const char* variableName)
 {

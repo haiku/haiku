@@ -244,13 +244,17 @@ low_resource_manager(void*)
 {
 	bigtime_t timeout = kLowResourceInterval;
 	while (true) {
-		acquire_sem_etc(sLowResourceWaitSem, 1, B_RELATIVE_TIMEOUT,
-			timeout);
+		const status_t status = acquire_sem_etc(sLowResourceWaitSem, 1,
+			B_RELATIVE_TIMEOUT, timeout);
 
 		RecursiveLocker _(&sLowResourceLock);
 
-		compute_state();
-		int32 state = low_resource_state_no_update(B_ALL_KERNEL_RESOURCES);
+		// Do not recompute the state if we actually acquired the semaphore,
+		// as in this case, it has likely been set to something specific.
+		if (status == B_TIMED_OUT)
+			compute_state();
+
+		const int32 state = low_resource_state_no_update(B_ALL_KERNEL_RESOURCES);
 
 		TRACE(("low_resource_manager: state = %ld, %ld free pages, %lld free "
 			"memory, %lu free semaphores\n", state, vm_page_num_free_pages(),
@@ -326,13 +330,43 @@ dump_handlers(int argc, char** argv)
 void
 low_resource(uint32 resource, uint64 requirements, uint32 flags, uint32 timeout)
 {
-	// TODO: take requirements into account
-
 	switch (resource) {
 		case B_KERNEL_RESOURCE_PAGES:
-		case B_KERNEL_RESOURCE_MEMORY:
+			if (requirements <= kCriticalPagesLimit)
+				sLowPagesState = B_LOW_RESOURCE_CRITICAL;
+			else if (requirements <= kWarnPagesLimit)
+				sLowPagesState = B_LOW_RESOURCE_WARNING;
+			else
+				sLowPagesState = B_LOW_RESOURCE_NOTE;
+			break;
+
+		case B_KERNEL_RESOURCE_MEMORY: {
+			const off_t required = requirements;
+			if (required <= sCriticalMemoryLimit)
+				sLowMemoryState = B_LOW_RESOURCE_CRITICAL;
+			else if (required <= sWarnMemoryLimit)
+				sLowMemoryState = B_LOW_RESOURCE_WARNING;
+			else
+				sLowMemoryState = B_LOW_RESOURCE_NOTE;
+			break;
+		}
+
 		case B_KERNEL_RESOURCE_SEMAPHORES:
+			if (requirements <= 4)
+				sLowSemaphoresState = B_LOW_RESOURCE_CRITICAL;
+			else if (requirements <= 32)
+				sLowSemaphoresState = B_LOW_RESOURCE_WARNING;
+			else
+				sLowSemaphoresState = B_LOW_RESOURCE_NOTE;
+			break;
+
 		case B_KERNEL_RESOURCE_ADDRESS_SPACE:
+			if (requirements <= (kCriticalPagesLimit * B_PAGE_SIZE))
+				sLowSpaceState = B_LOW_RESOURCE_CRITICAL;
+			else if (requirements <= (kWarnPagesLimit * B_PAGE_SIZE))
+				sLowSpaceState = B_LOW_RESOURCE_WARNING;
+			else
+				sLowSpaceState = B_LOW_RESOURCE_NOTE;
 			break;
 	}
 

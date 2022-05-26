@@ -13,16 +13,15 @@
 #define B_TRANSLATION_CONTEXT "Terminal ToolTips"
 
 
-const char* const kTooTipSetTabTitlePlaceholders = B_TRANSLATE(
+const char* const kToolTipSetTabTitlePlaceholders = B_TRANSLATE(
 	"\t%d\t-\tThe current working directory of the active process.\n"
 	"\t\t\tOptionally the maximum number of path components can be\n"
 	"\t\t\tspecified. E.g. '%2d' for at most two components.\n"
 	"\t%i\t-\tThe index of the tab.\n"
 	"\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n"
-	"\t%p\t-\tThe name of the active process.\n"
-	"\t%%\t-\tThe character '%'.");
+	"\t%p\t-\tThe name of the active process.");
 
-const char* const kTooTipSetWindowTitlePlaceholders = B_TRANSLATE(
+const char* const kToolTipSetWindowTitlePlaceholders = B_TRANSLATE(
 	"\t%d\t-\tThe current working directory of the active process in the\n"
 	"\t\t\tcurrent tab. Optionally the maximum number of path components\n"
 	"\t\t\tcan be specified. E.g. '%2d' for at most two components.\n"

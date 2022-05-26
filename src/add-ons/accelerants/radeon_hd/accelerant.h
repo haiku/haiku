@@ -153,6 +153,24 @@ struct encoder_info {
 
 
 typedef struct {
+	uint32		objectID;
+	// i2c info
+	uint16		i2cPinIndex; // id of gpio pin for i2c router
+	uint32		i2cAddr;     // ?? hwPin??
+	// i2c pin mux
+	bool		ddcValid;
+	uint8		ddcMuxType;
+	uint8		ddcMuxControlPin;
+	uint8		ddcMuxState;
+	// clk / data pin mux
+	bool		cdValid;
+	uint8		cdMuxType;
+	uint8		cdMuxControlPin;
+	uint8		cdMuxState;
+} router_info;
+
+
+typedef struct {
 	bool		valid;
 	uint16		objectID;
 	uint32		type;
@@ -163,6 +181,7 @@ typedef struct {
 	struct encoder_info encoder;
 	struct encoder_info encoderExternal;
 	dp_info		dpInfo;
+	router_info	router;
 } connector_info;
 
 

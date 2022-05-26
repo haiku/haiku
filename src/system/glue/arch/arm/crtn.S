@@ -1,4 +1,7 @@
 /*
+ * Copyright 2022, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
  * Copyright 2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -9,9 +12,12 @@
  */
 
 .section .init
-	// the image ID and program args are still on the stack
-
+	ldr		lr, [sp]
+	add		sp, sp, #8
+	bx		lr
 
 .section .fini
-	// the image ID and program args are still on the stack
+	ldr		lr, [sp]
+	add		sp, sp, #8
+	bx		lr
 

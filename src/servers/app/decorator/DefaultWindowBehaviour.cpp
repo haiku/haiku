@@ -1,15 +1,17 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2020, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		DarkWyrm <bpmagic@columbus.rr.com>
- *		Adi Oanca <adioanca@gmail.com>
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Axel Dörfler <axeld@pinc-software.de>
- *		Brecht Machiels <brecht@mos6581.org>
- *		Clemens Zeidler <haiku@clemens-zeidler.de>
- *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		Adi Oanca, adioanca@gmail.com
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Brecht Machiels, brecht@mos6581.org
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ *		Tri-Edge AI
+ *		Jacob Secunda, secundja@gmail.com
  */
 
 
@@ -17,8 +19,10 @@
 
 #include <math.h>
 
+#include <PortLink.h>
 #include <WindowPrivate.h>
 
+#include "AppServer.h"
 #include "ClickTarget.h"
 #include "Desktop.h"
 #include "DefaultDecorator.h"
@@ -250,11 +254,26 @@ struct DefaultWindowBehaviour::DragState : MouseTrackingState {
 
 
 struct DefaultWindowBehaviour::ResizeState : MouseTrackingState {
+	BPoint fDelta;
+
 	ResizeState(DefaultWindowBehaviour& behavior, BPoint where,
 		bool activateOnMouseUp)
 		:
-		MouseTrackingState(behavior, where, activateOnMouseUp, false)
+		MouseTrackingState(behavior, where, activateOnMouseUp, true)
 	{
+		fDelta = BPoint(0, 0);
+	}
+
+	virtual void EnterState(State* prevState)
+	{
+	}
+
+	virtual void ExitState(State* nextState)
+	{
+		if ((fWindow->Flags() & B_OUTLINE_RESIZE) != 0) {
+			fDesktop->SetWindowOutlinesDelta(fWindow, BPoint(0, 0));
+			fDesktop->ResizeWindowBy(fWindow, fDelta.x, fDelta.y);
+		}
 	}
 
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
@@ -267,7 +286,11 @@ struct DefaultWindowBehaviour::ResizeState : MouseTrackingState {
 
 			BPoint oldRightBottom = fWindow->Frame().RightBottom();
 
-			fDesktop->ResizeWindowBy(fWindow, delta.x, delta.y);
+			if ((fWindow->Flags() & B_OUTLINE_RESIZE) != 0) {
+				fDelta = delta;
+				fDesktop->SetWindowOutlinesDelta(fWindow, delta);
+			} else
+				fDesktop->ResizeWindowBy(fWindow, delta.x, delta.y);
 
 			// constrain delta to true change in size
 			delta = fWindow->Frame().RightBottom() - oldRightBottom;
@@ -348,6 +371,8 @@ struct DefaultWindowBehaviour::SlideTabState : MouseTrackingState {
 
 
 struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
+	BPoint fDelta;
+
 	ResizeBorderState(DefaultWindowBehaviour& behavior, BPoint where,
 		Decorator::Region region)
 		:
@@ -391,6 +416,8 @@ struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
 			default:
 				break;
 		}
+
+		fDelta = B_ORIGIN;
 	}
 
 	ResizeBorderState(DefaultWindowBehaviour& behavior, BPoint where,
@@ -401,6 +428,7 @@ struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
 		fHorizontal(horizontal),
 		fVertical(vertical)
 	{
+		fDelta = B_ORIGIN;
 	}
 
 	virtual void EnterState(State* previousState)
@@ -420,6 +448,11 @@ struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
 	virtual void ExitState(State* nextState)
 	{
 		fBehavior._ResetResizeCursor();
+
+		if (fWindow->Flags() & B_OUTLINE_RESIZE) {
+			fDesktop->SetWindowOutlinesDelta(fWindow, B_ORIGIN);
+			fDesktop->ResizeWindowBy(fWindow, fDelta.x, fDelta.y);
+		}
 	}
 
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
@@ -436,8 +469,14 @@ struct DefaultWindowBehaviour::ResizeBorderState : MouseTrackingState {
 		// to turn out differently from what we request.
 		BPoint oldRightBottom = fWindow->Frame().RightBottom();
 
-		fDesktop->ResizeWindowBy(fWindow, delta.x * fHorizontal,
-			delta.y * fVertical);
+		if (fWindow->Flags() & B_OUTLINE_RESIZE) {
+			fDelta = delta;
+			fDesktop->SetWindowOutlinesDelta(fWindow, BPoint(
+				delta.x * fHorizontal, delta.y * fVertical));
+		} else {
+			fDesktop->ResizeWindowBy(fWindow, delta.x * fHorizontal,
+				delta.y * fVertical);
+		}
 
 		// constrain delta to true change in size
 		delta = fWindow->Frame().RightBottom() - oldRightBottom;
@@ -685,7 +724,6 @@ DefaultWindowBehaviour::DefaultWindowBehaviour(Window* window)
 	:
 	fWindow(window),
 	fDesktop(window->Desktop()),
-	fState(NULL),
 	fLastModifiers(0)
 {
 }
@@ -693,7 +731,6 @@ DefaultWindowBehaviour::DefaultWindowBehaviour(Window* window)
 
 DefaultWindowBehaviour::~DefaultWindowBehaviour()
 {
-	delete fState;
 }
 
 
@@ -726,7 +763,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 	}
 
 	// if a state is active, let it do the job
-	if (fState != NULL) {
+	if (fState.IsSet()) {
 		bool unhandled = false;
 		bool result = fState->MouseDown(message, where, unhandled);
 		if (!unhandled)
@@ -919,7 +956,7 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 void
 DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 {
-	if (fState != NULL)
+	if (fState.IsSet())
 		fState->MouseUp(message, where);
 }
 
@@ -927,7 +964,7 @@ DefaultWindowBehaviour::MouseUp(BMessage* message, BPoint where)
 void
 DefaultWindowBehaviour::MouseMoved(BMessage* message, BPoint where, bool isFake)
 {
-	if (fState != NULL) {
+	if (fState.IsSet()) {
 		fState->MouseMoved(message, where, isFake);
 	} else {
 		// If the window modifiers are hold, enter the window management state.
@@ -954,7 +991,7 @@ DefaultWindowBehaviour::ModifiersChanged(int32 modifiers)
 	int32 buttons;
 	fDesktop->GetLastMouseState(&where, &buttons);
 
-	if (fState != NULL) {
+	if (fState.IsSet()) {
 		fState->ModifiersChanged(where, modifiers);
 	} else {
 		// If the window modifiers are hold, enter the window management state.
@@ -1166,21 +1203,19 @@ void
 DefaultWindowBehaviour::_NextState(State* state)
 {
 	// exit the old state
-	if (fState != NULL)
+	if (fState.IsSet())
 		fState->ExitState(state);
 
 	// set and enter the new state
-	State* oldState = fState;
-	fState = state;
+	ObjectDeleter<State> oldState(fState.Detach());
+	fState.SetTo(state);
 
-	if (fState != NULL) {
-		fState->EnterState(oldState);
+	if (fState.IsSet()) {
+		fState->EnterState(oldState.Get());
 		fDesktop->SetMouseEventWindow(fWindow);
-	} else if (oldState != NULL) {
+	} else if (oldState.IsSet()) {
 		// no state anymore -- reset the mouse event window, if it's still us
 		if (fDesktop->MouseEventWindow() == fWindow)
 			fDesktop->SetMouseEventWindow(NULL);
 	}
-
-	delete oldState;
 }

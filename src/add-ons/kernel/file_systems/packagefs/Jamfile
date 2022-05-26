@@ -5,11 +5,9 @@ UseBuildFeatureHeaders zlib ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders package shared storage support file_systems ;
 
-local zstdSources ;
 local zstdKernelLib ;
 
 if [ FIsBuildFeatureEnabled zstd ] {
-	zstdSources = ZstdCompressionAlgorithm.cpp ;
 	zstdKernelLib = kernel_libzstd.a ;
 	UseBuildFeatureHeaders zstd ;
 	Includes [ FGristFiles $(zstdSources) ]
@@ -112,7 +110,7 @@ local storageKitSources =
 local supportKitSources =
 	CompressionAlgorithm.cpp
 	ZlibCompressionAlgorithm.cpp
-	$(zstdSources)
+	ZstdCompressionAlgorithm.cpp
 ;
 
 KernelAddon packagefs

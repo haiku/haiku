@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-11/2009
+   Rudolf Cornelissen 7/2003-4/2021
 */
 
 #define MODULE_BIT 0x00002000
@@ -3217,6 +3217,16 @@ static void pinsnv30_arch_fake(void)
 	/* not used (yet) because no coldstart will be attempted (yet) */
 	si->ps.std_engine_clock = 190;
 	si->ps.std_memory_clock = 190;
+
+	if ((CFGR(DEVID) & 0xfff0ffff) == 0x024010de) {
+		/* C51 chipset */
+		si->ps.max_system_vco = 1000;
+		si->ps.min_system_vco = 500;
+		si->ps.max_pixel_vco = 1000;
+		si->ps.min_pixel_vco = 500;
+		si->ps.max_video_vco = 1000;
+		si->ps.min_video_vco = 500;
+	}
 }
 
 static void getRAMsize_arch_nv4(void)
@@ -3326,14 +3336,24 @@ static void getstrap_arch_nv10_20_30_40(void)
 	}
 
 	/* determine PLL reference crystal frequency: three types are used... */
-	if (strapinfo & 0x00000040)
-		si->ps.f_ref = 14.31818;
-	else
-		si->ps.f_ref = 13.50000;
-
 	if ((si->ps.secondary_head) && (si->ps.card_type != NV11))
-	{
-		if (strapinfo & 0x00400000) si->ps.f_ref = 27.00000;
+		strapinfo &= 0x00400040;
+	else
+		strapinfo &= 0x00000040;
+
+	switch (strapinfo) {
+	case 0x00000000:
+		si->ps.f_ref = 13.50000;
+		break;
+	case 0x00000040:
+		si->ps.f_ref = 14.31818;
+		break;
+	case 0x00400000:
+		si->ps.f_ref = 27.00000;
+		break;
+	case 0x00400040:
+		si->ps.f_ref = 25.00000;
+		break;
 	}
 }
 

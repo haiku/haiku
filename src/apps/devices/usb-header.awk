@@ -49,7 +49,7 @@ BEGIN {
 	vendor = substr($0, 7)
 	gsub( /\"/, "&&", vendor )
 
-	printf formatting "\t{ 0x" vendorid ", \"" vendor "\" }" > ofile
+	printf "%s", formatting "\t{ 0x" vendorid ", \"" vendor "\" }" > ofile
 }
 
 # matches device 
@@ -83,7 +83,7 @@ END {
 			} else {
 				formatting = ""
 			}
-			printf formatting "\t{ 0x" devices[i, 1] ", 0x" devices[i, 2] ", \"" devices[i, 3] "\" }" > ofile
+			printf "%s", formatting "\t{ 0x" devices[i, 1] ", 0x" devices[i, 2] ", \"" devices[i, 3] "\" }" > ofile
 		}
 		print "\n} ;\n\n// Use this value for loop control during searching:\n#define	USB_DEVTABLE_LEN	(sizeof(UsbDevTable)/sizeof(USB_DEVTABLE))\n" > ofile
 

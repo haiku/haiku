@@ -523,7 +523,7 @@ CommonLaunchTest9(LaunchCaller &caller)
 					with a different signature
 	@results		Should return B_OK and set team to the ID of the team
 					running the application's executable. Should remove the
-					incorrect app hint on the app type. (OBOS: Should set the
+					incorrect app hint on the app type. (Haiku: Should set the
 					correct app hint. Don't even return the wrong app?)
 */
 static
@@ -542,7 +542,7 @@ CommonLaunchTest10(LaunchCaller &caller)
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
 	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_ENTRY_NOT_FOUND);
-// OBOS: We set the app hint for app type 2. There's no reason not to do it.
+// Haiku: We set the app hint for app type 2. There's no reason not to do it.
 #ifdef TEST_R5
 	CHK(BMimeType(appType2).IsInstalled() == false);
 #else
@@ -1341,7 +1341,7 @@ CommonLaunchTest28(LaunchCaller &caller)
 					preferred app type has an app hint pointing to a cyclic
 					link, no app with this signature exists
 	@results		Should return
-					OBOS: B_LAUNCH_FAILED_APP_NOT_FOUND and unset the app
+					Haiku: B_LAUNCH_FAILED_APP_NOT_FOUND and unset the app
 					type's app hint.
 					R5: B_ENTRY_NOT_FOUND or B_LAUNCH_FAILED_NO_RESOLVE_LINK.
 */
@@ -1396,7 +1396,7 @@ CommonLaunchTest30(LaunchCaller &caller)
 	CHK(context(caller, fileType1, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
-// OBOS: We unset the app hint for the app type. R5 leaves it untouched.
+// Haiku: We unset the app hint for the app type. R5 leaves it untouched.
 #ifdef TEST_R5
 	check_app_type(appType1, appFile1);
 #else
@@ -1405,7 +1405,7 @@ CommonLaunchTest30(LaunchCaller &caller)
 	context.WaitForMessage(team, MSG_STARTED, true);
 	app_info appInfo;
 	CHK(roster.GetRunningAppInfo(team, &appInfo) == B_OK);
-// R5 keeps appType1, OBOS updates the signature
+// R5 keeps appType1, Haiku updates the signature
 #ifdef TEST_R5
 	CHK(!strcmp(appInfo.signature, appType1));
 #else

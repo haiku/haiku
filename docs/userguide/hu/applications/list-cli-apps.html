@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Használati útmutató</span></div>
 </div>
 
 <div class="nav">
@@ -36,6 +36,7 @@
 <li><a href="../../de/applications/list-cli-apps.html">Deutsch</a></li>
 <li><a href="../../en/applications/list-cli-apps.html">English</a></li>
 <li><a href="../../es/applications/list-cli-apps.html">Español</a></li>
+<li><a href="../../eo/applications/list-cli-apps.html">Esperanto</a></li>
 <li><a href="../../fr/applications/list-cli-apps.html">Français</a></li>
 <li><a href="../../fur/applications/list-cli-apps.html">Furlan</a></li>
 <li><a href="../../it/applications/list-cli-apps.html">Italiano</a></li>
@@ -61,7 +62,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Parancssori programok listája</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -87,10 +87,10 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>bash</tt></td><td> </td><td>Bourne-again shell</td></tr>
 <tr><td><tt>bc</tt></td><td> </td><td>Egy precíz számológép.</td></tr>
 <tr><td><tt>beep</tt></td><td> </td><td>Figyelmeztető hang megszólaltatása.</td></tr>
-<tr><td><tt>bfsinfo</tt></td><td> </td><td>Analyses the filesystem.</td></tr>
+<tr><td><tt>bfsinfo</tt></td><td> </td><td>A fájlrendszer elemzése.</td></tr>
 <tr><td><tt>bunzip2</tt></td><td> </td><td>Ugyan az, mint a <tt>bzip2</tt>.</td></tr>
 <tr><td><tt>bzip2</tt></td><td> </td><td>Fájl tömörítő.</td></tr>
-<tr><td><tt>c++</tt></td><td> </td><td>C++-Compiler.</td></tr>
+<tr><td><tt>c++</tt></td><td> </td><td>C++ fordító.</td></tr>
 <tr><td><tt>cat</tt></td><td> </td><td>Fájlok összefűzése, illetve a fájlok tartalmának megjelenítése.</td></tr>
 <tr><td><tt>catattr</tt></td><td> </td><td>Egy fájl jellemzőjének megjelenítése. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
 <tr><td><tt>cc</tt></td><td> </td><td>C fordító.</td></tr>
@@ -103,9 +103,9 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>chroot</tt></td><td> </td><td>Egy parancs futtatása egy megadott gyökér-mappában. </td></tr>
 <tr><td><tt>cksum</tt></td><td> </td><td>Egy fájl CRC ellenőrzés eredményét és a bájtok számát jeleníti meg. </td></tr>
 <tr><td><tt>clear</tt></td><td> </td><td>A Terminál ablak ürítése.</td></tr>
-<tr><td><tt>clipboard</tt></td><td> </td><td>Manipulates the system clipboard.</td></tr>
+<tr><td><tt>clipboard</tt></td><td> </td><td>A rendszer vágólapjának módosítása.</td></tr>
 <tr><td><tt>cmp</tt></td><td> </td><td>Fájlok bájtról-bájtra történő összehasolítása.</td></tr>
-<tr><td><tt>collectcatkeys </tt></td><td> </td><td>Collects translatable strings to create catkeys.</td></tr>
+<tr><td><tt>collectcatkeys </tt></td><td> </td><td>A lefordítható szövegek megkeresése a nyelvi fájlok létrehozásához.</td></tr>
 <tr><td><tt>comm</tt></td><td> </td><td>Rendezett fájl sorról-sorra történő összehasonlítása.</td></tr>
 <tr><td><tt>consoled</tt></td><td> </td><td>Konzol szolgáltatás.</td></tr>
 <tr><td><tt>copyattr</tt></td><td> </td><td>A jellemzőket vagy azok egy részét egy vagy több fájlból egy újba másolja. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
@@ -122,12 +122,12 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>dircolors</tt></td><td> </td><td>Az <tt>ls</tt>-hez a színek beállítása.</td></tr>
 <tr><td><tt>dirname</tt></td><td> </td><td>Megadja egy fájl teljes elérési útvonalából a mappa nevét.</td></tr>
 <tr><td><tt>diskimage</tt></td><td> </td><td>Fájl lemezként történő regisztrálása amit így már csatolhatunk. <a href="cli-apps.html">(Haiku specifikus)</a></td></tr>
-<tr><td><tt>dpms</tt></td><td> </td><td>Sets the display power management.</td></tr>
+<tr><td><tt>dpms</tt></td><td> </td><td>A képernyő energiagazdálkodásának megadása.</td></tr>
 <tr><td><tt>draggers</tt></td><td> </td><td>A replikánsok jelölőjének megjelenítése/elrejtése.</td></tr>
 <tr><td><tt>driveinfo</tt></td><td> </td><td>A számítógép összetevőinek információi.</td></tr>
 <tr><td><tt>dstcheck</tt></td><td> </td><td>Óraátállításkor egy üzenetet jelenít meg.</td></tr>
 <tr><td><tt>du</tt></td><td> </td><td>A lemezhasználat kiszámítása mappákra bontva. </td></tr>
-<tr><td><tt>dumpcatalog</tt></td><td> </td><td>Shows the contents of catalog files.</td></tr>
+<tr><td><tt>dumpcatalog</tt></td><td> </td><td>A nyelvi fájlok tartalmának megjelenítése.</td></tr>
 <tr><td><tt>echo</tt></td><td> </td><td>Egy sornyi szöveg megjelenítése.</td></tr>
 <tr><td><tt>egrep</tt></td><td> </td><td>Ugyan az, mint a <tt>grep</tt>.</td></tr>
 <tr><td><tt>eject</tt></td><td> </td><td>Eltávolítható eszköz kiadása.</td></tr>
@@ -144,7 +144,7 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>filepanel</tt></td><td> </td><td>A megnyitás/mentés panel megjelenítése. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
 <tr><td><tt>find</tt></td><td> </td><td>Egy fájl megkeresése a fájlrendszerben.</td></tr>
 <tr><td><tt>finddir</tt></td><td> </td><td>A rendszer által deffiniált mappa megkeresése.</td></tr>
-<tr><td><tt>findpaths</tt></td><td> </td><td>Prints all paths for system defined directory constants.</td></tr>
+<tr><td><tt>findpaths</tt></td><td> </td><td>Minden, a rendszerben meghatározott útvonal kiírása.</td></tr>
 <tr><td><tt>fmt</tt></td><td> </td><td>Egy fájl bekezdéseinek újraformázása.</td></tr>
 <tr><td><tt>fold</tt></td><td> </td><td>Egy fájl bemeneti sorainak tördelése.</td></tr>
 <tr><td><tt>fortune</tt></td><td> </td><td>Véletlenszerű, remélhetőleg érdekes mondatok.</td></tr>
@@ -153,7 +153,7 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>funzip</tt></td><td> </td><td>Egy csomag első elemét megjeleníti.</td></tr>
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire vezérlő program.</td></tr>
 <tr><td><tt>gawk</tt></td><td> </td><td>Mintakereső és feldolgozó.</td></tr>
-<tr><td><tt>getarch</tt></td><td> </td><td>Shows the environment's compiler version. </td></tr>
+<tr><td><tt>getarch</tt></td><td> </td><td>A fordító verziójának megjelenítése.</td></tr>
 <tr><td><tt>grep</tt></td><td> </td><td>Minta keresése.</td></tr>
 <tr><td><tt>groups</tt></td><td> </td><td>A felhasználók csoporttagságát jeleníti meg.</td></tr>
 <tr><td><tt>gunzip</tt></td><td> </td><td>Ugyan az, mint a <tt>gzip</tt>.</td></tr>
@@ -175,12 +175,12 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>kernel_debugger</tt></td><td> </td><td>A kernel hibakeresőjébe lépés.</td></tr>
 <tr><td><tt>keymap</tt></td><td> </td><td>Billentyűzet-kiosztások betöltése/elmentése.</td></tr>
 <tr><td><tt>kill</tt></td><td> </td><td>A kilépés parancs elküldése egy programnak.</td></tr>
-<tr><td><tt>launch_roster</tt></td><td> </td><td>Controls the launch_daemon, e.g. stop and restart services. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>launch_roster</tt></td><td> </td><td>A launch_daemon vezérlése, pl. szolgáltatások elindítása/leállítása. <a href="cli-apps.html">(Haiku specifikus)</a></td></tr>
 <tr><td><tt>less</tt></td><td> </td><td>Egy fájl megjelenítése.</td></tr>
 <tr><td><tt>lessecho</tt></td><td> </td><td>A paraméterek és a helyettesítő karakterek (mint például a * és a ? egy fájlnévben) megjelenítése.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>A less számára a kötelező kulcs megadása.</td></tr>
 <tr><td><tt>link</tt></td><td> </td><td>Hivatkozás létrehozása.</td></tr>
-<tr><td><tt>linkcatkeys</tt></td><td> </td><td>Creates catalogs from catkeys. </td></tr>
+<tr><td><tt>linkcatkeys</tt></td><td> </td><td>A nyelvi fájlokból készít katalógus-fájlt.</td></tr>
 <tr><td><tt>listarea</tt></td><td> </td><td>A jelenleg futó programok terület-információi. </td></tr>
 <tr><td><tt>listattr</tt></td><td> </td><td>Egy fájl jellemzőinek megjelenítése. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
 <tr><td><tt>listdev</tt></td><td> </td><td>A számítógépben található eszközök listája.</td></tr>
@@ -202,7 +202,7 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>makebootable</tt></td><td> </td><td>A megadott BFS lemez/partíció indítható tétele (a boot-kód az első két szektorba másolása).</td></tr>
 <tr><td><tt>mbox2mail</tt></td><td> </td><td>Unix postafiók fájlok BeOS e-mail-fájlokká alakítása.</td></tr>
 <tr><td><tt>md5sum</tt></td><td> </td><td>MD5 ellenőrzés.</td></tr>
-<tr><td><tt>media_client</tt></td><td> </td><td>"media_client play" plays back audio files.</td></tr>
+<tr><td><tt>media_client</tt></td><td> </td><td>A "media_client play" hangfájlokat játszik le.</td></tr>
 <tr><td><tt>message</tt></td><td> </td><td>Egy BMessage fájl megjelenítése.</td></tr>
 <tr><td><tt>mimeset</tt></td><td> </td><td>A fájl MIME típusának megadása.</td></tr>
 <tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile függőség generáló.</td></tr>
@@ -218,7 +218,7 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>mount_nfs</tt></td><td> </td><td>NFS partíció csatolása.</td></tr>
 <tr><td><tt>mountvolume</tt></td><td> </td><td>Egy lemez csatolása név alapján.</td></tr>
 <tr><td><tt>mv</tt></td><td> </td><td>Mozgat/átnevez egy fájlt.</td></tr>
-<tr><td><tt>nano</tt></td><td> </td><td>The default text editor in the Terminal, a clone of 'Pico'. </td></tr>
+<tr><td><tt>nano</tt></td><td> </td><td>Az alapértelmezett szövegszerkesztő a Terminálban, egy 'Pico'-klón.</td></tr>
 <tr><td><tt>netstat</tt></td><td> </td><td>A hálózati kapcsolatok, útválasztó táblák, hálózati kártya-statisztika és további információk megjelenítése. </td></tr>
 <tr><td><tt>nl</tt></td><td> </td><td>Egy fájl tartalmának megjelenítése sorszámokkal együtt.</td></tr>
 <tr><td><tt>nohup</tt></td><td> </td><td>Egy program futtatása a megszakítás-jel figyelmen kívül hagyásával (futtatás a háttérben).</td></tr>
@@ -246,7 +246,7 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>pwd</tt></td><td> </td><td>A jelenlegi mappa megjelenítése.</td></tr>
 <tr><td><tt>query</tt></td><td> </td><td>A Nyomkövető "keresés képlet alapján" parancssori megfelelője.  <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
 <tr><td><tt>quit</tt></td><td> </td><td>Egy program bezárása.</td></tr>
-<tr><td><tt>ramdisk</tt></td><td> </td><td>Creates a ramdisk. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
+<tr><td><tt>ramdisk</tt></td><td> </td><td>Memória-lemez létrehozása. <a href="cli-apps.html">(Haiku specifikus)</a></td></tr>
 <tr><td><tt>rc</tt></td><td> </td><td>Forrás-fordító.</td></tr>
 <tr><td><tt>readlink</tt></td><td> </td><td>Egy hivatkozás céljának megjelenítése.</td></tr>
 <tr><td><tt>reindex</tt></td><td> </td><td>Létező fájlok jellemzőit új indexbe rakja. <a href="cli-apps.html">(Haiku-specifikus)</a></td></tr>
@@ -263,7 +263,7 @@ Ez a lista tartalmazza az összes, a Haiku-val érkező programot. Mindegyikhez 
 <tr><td><tt>screenmode</tt></td><td> </td><td>A monitor módjának megjelenítése/beállítása.</td></tr>
 <tr><td><tt>sdiff</tt></td><td> </td><td>Megjeleníti vagy összefűzi a különbségeket 2 fájl között.</td></tr>
 <tr><td><tt>seq</tt></td><td> </td><td>Számsorozatok.</td></tr>
-<tr><td><tt>setarch</tt></td><td> </td><td>Sets the environment to a specific compiler version. </td></tr>
+<tr><td><tt>setarch</tt></td><td> </td><td>A megadott fordítóhoz a környezet beállítása.</td></tr>
 <tr><td><tt>setdecor</tt></td><td> </td><td>Dekoráció megadása/megjelenítése.</td></tr>
 <tr><td><tt>settype</tt></td><td> </td><td>Egy fájl MIME típusának, aláírásának és az előnyben részesített programjának megadása.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Egy fájl verziójának megjelenítése.</td></tr>

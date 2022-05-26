@@ -1,4 +1,5 @@
-1	portuguese (brazil)	x-vnd.Haiku-cmd-dstconfig	2370635966
+1	portuguese (brazil)	x-vnd.Haiku-cmd-dstconfig	684321431
 Keep this time	dstcheck		Manter este tempo
 Manually adjust time…	dstcheck		Ajustar manualmente o tempo…
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Atenção!\n\nDevido à mudança do horário de verão, o relógio do computador pode estar incorreto em uma hora.\nO computador acha que são %current time%.\n\nEsta hora está correta?
 Ask me later	dstcheck		Perguntar-me mais tarde

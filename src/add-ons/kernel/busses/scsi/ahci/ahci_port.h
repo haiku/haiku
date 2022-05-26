@@ -86,6 +86,7 @@ private:
 	bool							fPortReset;
 	bool							fError;
 	bool							fTrimSupported;
+	bool							fTrimReturnsZeros;
 	uint32							fMaxTrimRangeBlocks;
 
 	volatile fis *					fFIS;

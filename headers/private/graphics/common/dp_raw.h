@@ -36,7 +36,6 @@
 /* *** DPCD Receiver Compatibility Field (0x0000)     *** */
 /* *** VESA DisplayPort Standard, rev 1.1, p112       *** */
 // DPCD Version (0x0)
-#define DP_DPCD_SIZE						0xf			// Size
 #define DP_DPCD_REV							0x0000		// Reg
 #define DP_DPCD_REV_MINOR_MASK				(15 << 0)	// Int
 #define DP_DPCD_REV_MAJOR_MASK				(15 << 4)	// Int
@@ -48,43 +47,40 @@
 // Use DP_LINK_RATE_* for speed.
 // DP Maximum Lane Count (0x2)
 #define DP_MAX_LANE_COUNT					0x0002		// Reg
-#define DP_MAX_LANE_COUNT_MASK				(31 << 0)	// Count
-#define DP_MAX_LANE_COUNT_1					(1 << 0)	// Value
-#define DP_MAX_LANE_COUNT_2					(2 << 0)	// Value
-#define DP_MAX_LANE_COUNT_4					(4 << 0)	// Value
-#define DP_ENHANCED_FRAME_CAP_EN			(1 << 7)	// Bool, Rev 1.1
+#define DP_MAX_LANE_COUNT_MASK				0x1f		// Count
+#define DP_ENHANCED_FRAME_CAP				(1 << 7)	// Bool, Rev 1.1
 // DP Maximum Downspread (0x3)
 #define DP_MAX_DOWNSPREAD					0x0003		// Reg
-#define DP_MAX_DOWNSPREAD_EN				(1 << 0)	// Bool
-#define DP_MAX_DOWNSPREAD_REQ_NO_HANDSHAKE	(1 << 6)	// Bool
+#define DP_MAX_DOWNSPREAD_0_5				(1 << 0)	// Bool
+#define DP_NO_AUX_HANDSHAKE_LINK_TRAINING	(1 << 6)	// Bool
 // DP Number of Receiver Ports (0x4)
 #define DP_NORP								0x0004		// Reg
-#define DP_NORP_MASK						(1 << 0)	// Count
+#define DP_NORP_MASK						0x1			// Count
 // DP Downstream Port Present (0x5)
-#define DP_DOWNSTREAMPORT					0x0005		// Reg
-#define DP_DOWNSTREAMPORT_EN				(1 << 0)	// Bool
-#define DP_DOWNSTREAMPORT_TYPE_MASK			(3 << 1)	// Mask
-#define DP_DOWNSTREAMPORT_TYPE_DP			(0 << 1)	// Value
-#define DP_DOWNSTREAMPORT_TYPE_ANALOG		(1 << 1)	// Value
-#define DP_DOWNSTREAMPORT_TYPE_DIGITAL		(2 << 1)	// Value
-#define DP_DOWNSTREAMPORT_TYPE_OTHER		(3 << 1)	// Value
-#define DP_DOWNSTREAMPORT_FORMAT_EN			(1 << 3)	// Bool
+#define DP_DOWNSTREAMPORT_PRESENT			0x0005		// Reg
+#define DP_DWN_STRM_PORT_PRESENT			(1 << 0)	// Bool
+#define DP_DWN_STRM_PORT_TYPE_MASK			(3 << 1)	// Mask
+#define DP_DWN_STRM_PORT_TYPE_DP			(0 << 1)	// Value
+#define DP_DWN_STRM_PORT_TYPE_ANALOG		(1 << 1)	// Value
+#define DP_DWN_STRM_PORT_TYPE_TMDS			(2 << 1)	// Value
+#define DP_DWN_STRM_PORT_TYPE_OTHER			(3 << 1)	// Value
+#define DP_FORMAT_CONVERSION				(1 << 3)	// Bool
+#define DP_DETAILED_CAP_INFO_AVAILABLE		(1 << 4)	// Bool
 // DP Main Link Channel Coding (0x6)
-#define DP_CURR_MAIN_CHAN_CODE				0x0006		// Reg
-#define DP_CURR_MAIN_CHAN_CODE_ANSIX3_EN	(1 << 0)	// Bool
+#define DP_MAIN_LINK_CHANNEL_CODING_SET		0x0006		// Reg
+#define DP_CAP_ANSI_8B10B					(1 << 0)	// Bool
 // DP Downstream Port Count (0x7) (Only 1.1+)
-#define DP_DOWNSTREAMPORT_COUNT				0x0007		// Reg
-#define DP_DOWNSTREAMPORT_COUNT_MASK		(15 << 0)	// Count
-#define DP_DOWNSTREAMPORT_COUNT_OUI_EN		(1 << 7)	// Bool
+#define DP_DOWN_STREAM_PORT_COUNT			0x0007		// Reg
+#define DP_PORT_COUNT_MASK					0xf			// Count
+#define DP_OUI_SUPPORT						(1 << 7)	// Bool
 // DP Port Capability 0
-#define DP_PORT0_CAPABILITY0				0x0008		// Reg
-#define DP_PORT1_CAPABILITY0				0x000A		// Reg
-#define DP_PORT_CAPABILITY0_EDID_EN			(1 << 1)	// Bool
-#define DP_PORT_CAPABILITY0_SECOND_EN		(1 << 2)	// Bool
-// DP Port Capability 1
-#define DP_PORT0_CAPABILITY1				0x0009		// Reg
-#define DP_PORT1_CAPABILITY1				0x000B		// Reg
-#define DP_PORT_CAPABILITY1_BUF_SIZE_MASK	(255 << 0)	// Size
+#define DP_RECEIVE_PORT_0_CAP_0				0x0008		// Reg
+#define DP_RECEIVE_PORT_1_CAP_0				0x000a		// Reg
+#define DP_LOCAL_EDID_PRESENT				(1 << 1)	// Bool
+#define DP_ASSOCIATED_TO_PRECEDING_PORT		(1 << 2)	// Bool
+// DP Port Buffer Size
+#define DP_RECEIVE_PORT_0_BUFFER_SIZE		0x0009		// Reg
+#define DP_RECEIVE_PORT_1_BUFFER_SIZE		0x000b		// Reg
 	// (value + 1) * 32 bytes per lane
 
 /* *** DPCD Link Configuration Field (0x0100)         *** */
@@ -100,12 +96,12 @@
 #define DP_LANE_COUNT_MASK					(31 << 0)	// Count
 #define DP_ENHANCED_FRAME_EN				(1 << 7)	// Bool, Rev 1.1
 // DP Training Pattern (0x0102)
-#define DP_TRAIN							0x0102		// Reg
-#define DP_TRAIN_PATTERN_MASK				(3 << 0)	// Mask
-#define DP_TRAIN_PATTERN_DISABLED			(0 << 0)	// Value
-#define DP_TRAIN_PATTERN_1					(1 << 0)	// Value
-#define DP_TRAIN_PATTERN_2					(2 << 0)	// Value
-#define DP_TRAIN_PATTERN_3					(3 << 0)	// Value
+#define DP_TRAINING_PATTERN_SET				0x0102		// Reg
+#define DP_TRAINING_PATTERN_MASK			(3 << 0)	// Mask
+#define DP_TRAINING_PATTERN_DISABLE			(0 << 0)	// Value
+#define DP_TRAINING_PATTERN_1				(1 << 0)	// Value
+#define DP_TRAINING_PATTERN_2				(2 << 0)	// Value
+#define DP_TRAINING_PATTERN_3				(3 << 0)	// Value
 
 #define DP_TRAIN_QUAL_MASK					(3 << 2)	// Mask
 #define DP_TRAIN_QUAL_NONE					(0 << 2)	// Value
@@ -120,10 +116,10 @@
 #define DP_TRAIN_SYMBL_ERR_SEL_DISPARITY	(1 << 6)	// Value
 #define DP_TRAIN_SYMBL_ERR_SEL_SYMBOL		(2 << 6)	// Value
 // DP Training Lane n (0x0103 - 0x0106)
-#define DP_TRAIN_LANE0						0x0103		// Reg
-#define DP_TRAIN_LANE1						0x0104		// Reg
-#define DP_TRAIN_LANE2						0x0105		// Reg
-#define DP_TRAIN_LANE3						0x0106		// Reg
+#define DP_TRAINING_LANE0_SET				0x0103		// Reg
+#define DP_TRAINING_LANE1_SET				0x0104		// Reg
+#define DP_TRAINING_LANE2_SET				0x0105		// Reg
+#define DP_TRAINING_LANE3_SET				0x0106		// Reg
 
 #define DP_TRAIN_VCC_SWING_SHIFT			(0 << 0)	// Shift
 #define DP_TRAIN_VCC_SWING_MASK				(3 << 0)	// Mask
@@ -177,10 +173,10 @@
 											| DP_LANE_STATUS_CHEQ_DONE_B \
 											| DP_LANE_STATUS_SYMB_LOCK_B)
 // DP Lane Align Status (0x0204)
-#define DP_LANE_ALIGN						0x0204		// Reg
-#define DP_LANE_ALIGN_DONE					(1 << 0)	// Bool
-#define DP_LANE_ALIGN_PORT_STATUS_CHANGE	(1 << 6)	// Bool
-#define DP_LANE_ALIGN_LINK_STATUS_UPDATE	(1 << 7)	// Bool
+#define DP_LANE_ALIGN_STATUS_UPDATED		0x0204		// Reg
+#define DP_INTERLANE_ALIGN_DONE				(1 << 0)	// Bool
+#define DP_DOWNSTREAM_PORT_STATUS_CHANGED	(1 << 6)	// Bool
+#define DP_LINK_STATUS_UPDATED				(1 << 7)	// Bool
 // DP Sink Status (0x0205)
 #define DP_SINK_STATUS						0x0205		// Reg
 #define DP_SINK_STATUS_IN_SYNC_0			(1 << 0)	// Bool

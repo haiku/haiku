@@ -50,18 +50,21 @@ Stack::Stack()
 		return;
 	}
 
-	// Check for host controller modules
-	// While using a fixed list of names is inflexible it allows us to control
+	// Check for host controller modules.
+	//
+	// While using a fixed list of names is inflexible, it allows us to control
 	// the order in which we try modules. There are controllers/BIOSes that
 	// require UHCI/OHCI to be initialized before EHCI or otherwise they
 	// refuse to publish any high-speed devices.
-	// On other systems the ordering is probably ensured because the EHCI
+	//
+	// On other systems, the ordering is probably ensured because the EHCI
 	// controller is required to have a higher PCI function number than the
 	// companion host controllers (per the EHCI specs) and it would therefore
-	// be enumerated as the last item. As this does not apply to us we have to
+	// be enumerated as the last item. As this does not apply to us, we have to
 	// ensure ordering using another method.
-	// Intel Lynx Point and Panther Point chipsets have ports shared between
-	// EHCI and XHCI, defaulting to EHCI. The XHCI module will switch USB 2.0
+	//
+	// Furthermore, on some systems, there can be ports shared between
+	// EHCI and XHCI, defaulting to EHCI. The XHCI module will switch these
 	// ports before the EHCI module discovers them.
 	const char *moduleNames[] = {
 		"busses/usb/xhci",
@@ -194,6 +197,18 @@ Stack::PutUSBID(Object *object)
 	}
 
 	fObjectArray[id] = NULL;
+
+#if KDEBUG
+	// Validate that no children of this object are still in the stack.
+	for (usb_id i = 0; i < fObjectMaxCount; i++) {
+		if (fObjectArray[i] == NULL)
+			continue;
+
+		ASSERT_PRINT(fObjectArray[i]->Parent() != object,
+			"%s", fObjectArray[i]->TypeName());
+	}
+#endif
+
 	Unlock();
 }
 
@@ -212,6 +227,9 @@ Stack::GetObject(usb_id id)
 
 	Object *result = fObjectArray[id];
 
+	if (result != NULL)
+		result->SetBusy(true);
+
 	Unlock();
 	return result;
 }
@@ -220,6 +238,7 @@ Stack::GetObject(usb_id id)
 Object *
 Stack::GetObjectNoLock(usb_id id) const
 {
+	ASSERT(debug_debugger_running());
 	if (id >= fObjectMaxCount)
 		return NULL;
 	return fObjectArray[id];
@@ -312,7 +331,7 @@ Stack::AllocateArea(void **logicalAddress, phys_addr_t *physicalAddress, size_t 
 	void *logAddress;
 	size = (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 	area_id area = create_area(name, &logAddress, B_ANY_KERNEL_ADDRESS, size,
-		B_32_BIT_CONTIGUOUS, 0);
+		B_32_BIT_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		// TODO: Use B_CONTIGUOUS when the TODOs regarding 64 bit physical
 		// addresses are fixed (if possible).
 

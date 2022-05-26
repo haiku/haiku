@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-libtracker	2730310071
+1	indonesian	x-vnd.Haiku-libtracker	4292131264
 Created	ContainerWindow		Dibuat
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Buka dan buat sebagai yang disukai
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Jenis
 Open with…	ContainerWindow		Buka dengan…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Ada kesalahan saat memindah \"%name\" tempat sampah. (%error)
 Or	FindPanel		Atau
+MIME Description	AttributesView		Deskripsi MIME
 before	FindPanel		sebelum
 Volume icons	TrackerSettingsWindow		Ikon volume
 Ignore case	SelectionWindow		Abaikan huruf kapital/bukan

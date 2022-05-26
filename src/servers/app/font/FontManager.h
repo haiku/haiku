@@ -10,9 +10,11 @@
 #define FONT_MANAGER_H
 
 
+#include <AutoDeleter.h>
 #include <HashMap.h>
 #include <Looper.h>
 #include <ObjectList.h>
+#include <Referenceable.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -140,11 +142,14 @@ private:
 			MappingList			fMappings;
 			FamilyList			fFamilies;
 
-			HashMap<FontKey, FontStyle*> fStyleHashTable;
+			HashMap<FontKey, BReference<FontStyle> > fStyleHashTable;
 
-			ServerFont*			fDefaultPlainFont;
-			ServerFont*			fDefaultBoldFont;
-			ServerFont*			fDefaultFixedFont;
+			ObjectDeleter<ServerFont>
+								fDefaultPlainFont;
+			ObjectDeleter<ServerFont>
+								fDefaultBoldFont;
+			ObjectDeleter<ServerFont>
+								fDefaultFixedFont;
 
 			bool				fScanned;
 			int32				fNextID;

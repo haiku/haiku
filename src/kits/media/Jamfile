@@ -4,6 +4,7 @@ AddResources libmedia.so : libmedia.rdef ;
 
 UsePrivateHeaders app media shared ;
 UsePrivateHeaders [ FDirName media experimental ] ;
+UsePrivateHeaders [ FDirName interface ] ;
 
 if $(CHECK_MALLOC) {
 	SubDirC++Flags -D_NO_INLINE_ASM -fcheck-memory-usage ;

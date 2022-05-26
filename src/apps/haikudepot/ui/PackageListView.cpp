@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020, Andrew Lindesay, <apl@lindesay.co.nz>.
+ * Copyright 2018-2022, Andrew Lindesay, <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath, <julian.harnath@rwth-aachen.de>.
  * Copyright 2015, Axel Dörfler, <axeld@pinc-software.de>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
@@ -15,12 +15,15 @@
 #include <Autolock.h>
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <NumberFormat.h>
 #include <ScrollBar.h>
 #include <StringFormat.h>
 #include <StringForSize.h>
 #include <package/hpkg/Strings.h>
 #include <Window.h>
 
+#include "LocaleUtils.h"
+#include "Logger.h"
 #include "MainWindow.h"
 #include "WorkStatusView.h"
 
@@ -40,6 +43,8 @@ static const char* skPackageStatePending = B_TRANSLATE_MARK(
 inline BString
 package_state_to_string(PackageInfoRef ref)
 {
+	static BNumberFormat numberFormat;
+
 	switch (ref->State()) {
 		case NONE:
 			return B_TRANSLATE(skPackageStateAvailable);
@@ -52,7 +57,11 @@ package_state_to_string(PackageInfoRef ref)
 		case DOWNLOADING:
 		{
 			BString data;
-			data.SetToFormat("%3.2f%%", ref->DownloadProgress() * 100.0);
+			float fraction = ref->DownloadProgress();
+			if (numberFormat.FormatPercent(data, fraction) != B_OK) {
+				HDERROR("unable to format the percentage");
+				data = "???";
+			}
 			return data;
 		}
 		case PENDING:
@@ -104,6 +113,23 @@ private:
 };
 
 
+class DateField : public BStringField {
+public:
+								DateField(uint64 millisSinceEpoc);
+	virtual						~DateField();
+
+			void				SetMillisSinceEpoc(uint64 millisSinceEpoc);
+			uint64				MillisSinceEpoc() const
+									{ return fMillisSinceEpoc; }
+
+private:
+			void				_SetMillisSinceEpoc(uint64 millisSinceEpoc);
+
+private:
+			uint64				fMillisSinceEpoc;
+};
+
+
 // BColumn for PackageListView which knows how to render
 // a PackageIconAndTitleField
 class PackageColumn : public BTitledColumn {
@@ -132,7 +158,7 @@ private:
 };
 
 
-// BRow for the PartitionListView
+// BRow for the PackageListView
 class PackageRow : public BRow {
 	typedef BRow Inherited;
 public:
@@ -151,6 +177,7 @@ public:
 			void				UpdateSize();
 			void				UpdateRepository();
 			void				UpdateVersion();
+			void				UpdateVersionCreateTimestamp();
 
 			PackageRow*&		NextInHash()
 									{ return fNextInHash; }
@@ -289,6 +316,47 @@ SizeField::SetSize(double size)
 }
 
 
+// #pragma mark - DateField
+
+
+DateField::DateField(uint64 millisSinceEpoc)
+	:
+	BStringField(""),
+	fMillisSinceEpoc(0)
+{
+	_SetMillisSinceEpoc(millisSinceEpoc);
+}
+
+
+DateField::~DateField()
+{
+}
+
+
+void
+DateField::SetMillisSinceEpoc(uint64 millisSinceEpoc)
+{
+	if (millisSinceEpoc == fMillisSinceEpoc)
+		return;
+	_SetMillisSinceEpoc(millisSinceEpoc);
+}
+
+
+void
+DateField::_SetMillisSinceEpoc(uint64 millisSinceEpoc)
+{
+	BString dateString;
+
+	if (millisSinceEpoc == 0)
+		dateString = B_TRANSLATE_CONTEXT("-", "no package publish");
+	else
+		dateString = LocaleUtils::TimestampToDateString(millisSinceEpoc);
+
+	fMillisSinceEpoc = millisSinceEpoc;
+	SetString(dateString.String());
+}
+
+
 // #pragma mark - PackageColumn
 
 
@@ -358,7 +426,7 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 			bitmapRef);
 
 		if (bitmapResult == B_OK) {
-			if (bitmapRef.Get() != NULL) {
+			if (bitmapRef.IsSet()) {
 				const BBitmap* bitmap = bitmapRef->Bitmap(BITMAP_SIZE_16);
 				parent->SetDrawingMode(B_OP_ALPHA);
 				BRect viewRect(x, y, x + 15, y + 15);
@@ -447,6 +515,16 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 int
 PackageColumn::CompareFields(BField* field1, BField* field2)
 {
+	DateField* dateField1 = dynamic_cast<DateField*>(field1);
+	DateField* dateField2 = dynamic_cast<DateField*>(field2);
+	if (dateField1 != NULL && dateField2 != NULL) {
+		if (dateField1->MillisSinceEpoc() > dateField2->MillisSinceEpoc())
+			return -1;
+		else if (dateField1->MillisSinceEpoc() < dateField2->MillisSinceEpoc())
+			return 1;
+		return 0;
+	}
+
 	SizeField* sizeField1 = dynamic_cast<SizeField*>(field1);
 	SizeField* sizeField2 = dynamic_cast<SizeField*>(field2);
 	if (sizeField1 != NULL && sizeField2 != NULL) {
@@ -533,6 +611,7 @@ enum {
 	kStatusColumn,
 	kRepositoryColumn,
 	kVersionColumn,
+	kVersionCreateTimestampColumn,
 };
 
 
@@ -544,7 +623,7 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 	fPackageListener(packageListener),
 	fNextInHash(NULL)
 {
-	if (packageRef.Get() == NULL)
+	if (!packageRef.IsSet())
 		return;
 
 	PackageInfo& package = *packageRef.Get();
@@ -553,23 +632,13 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 	// NOTE: The icon BBitmap is referenced by the fPackage member.
 	UpdateIconAndTitle();
 
-	// Rating
 	UpdateRating();
-
-	// Summary
 	UpdateSummary();
-
-	// Size
 	UpdateSize();
-
-	// Status
 	UpdateState();
-
-	// Repository
 	UpdateRepository();
-
-	// Version
 	UpdateVersion();
+	UpdateVersionCreateTimestamp();
 
 	package.AddListener(fPackageListener);
 }
@@ -577,7 +646,7 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 
 PackageRow::~PackageRow()
 {
-	if (fPackage.Get() != NULL)
+	if (fPackage.IsSet())
 		fPackage->RemoveListener(fPackageListener);
 }
 
@@ -585,9 +654,8 @@ PackageRow::~PackageRow()
 void
 PackageRow::UpdateIconAndTitle()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
-
 	SetField(new PackageIconAndTitleField(
 		fPackage->Name(), fPackage->Title()), kTitleColumn);
 }
@@ -596,9 +664,8 @@ PackageRow::UpdateIconAndTitle()
 void
 PackageRow::UpdateState()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
-
 	SetField(new BStringField(package_state_to_string(fPackage)),
 		kStatusColumn);
 }
@@ -607,9 +674,8 @@ PackageRow::UpdateState()
 void
 PackageRow::UpdateSummary()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
-
 	SetField(new BStringField(fPackage->ShortDescription()),
 		kDescriptionColumn);
 }
@@ -618,7 +684,7 @@ PackageRow::UpdateSummary()
 void
 PackageRow::UpdateRating()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
 	RatingSummary summary = fPackage->CalculateRatingSummary();
 	SetField(new RatingField(summary.averageRating), kRatingColumn);
@@ -628,9 +694,8 @@ PackageRow::UpdateRating()
 void
 PackageRow::UpdateSize()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
-
 	SetField(new SizeField(fPackage->Size()), kSizeColumn);
 }
 
@@ -638,9 +703,8 @@ PackageRow::UpdateSize()
 void
 PackageRow::UpdateRepository()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
-
 	SetField(new BStringField(fPackage->DepotName()), kRepositoryColumn);
 }
 
@@ -648,10 +712,19 @@ PackageRow::UpdateRepository()
 void
 PackageRow::UpdateVersion()
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return;
-
 	SetField(new BStringField(fPackage->Version().ToString()), kVersionColumn);
+}
+
+
+void
+PackageRow::UpdateVersionCreateTimestamp()
+{
+	if (!fPackage.IsSet())
+		return;
+	SetField(new DateField(fPackage->VersionCreateTimestamp()),
+		kVersionCreateTimestampColumn);
 }
 
 
@@ -784,7 +857,8 @@ PackageListView::PackageListView(Model* model)
 	fModel(model),
 	fPackageListener(new(std::nothrow) PackageListener(this)),
 	fRowByNameTable(new RowByNameTable()),
-	fWorkStatusView(NULL)
+	fWorkStatusView(NULL),
+	fIgnoreSelectionChanged(false)
 {
 	float scale = be_plain_font->Size() / 12.f;
 	float spacing = be_control_look->DefaultItemSpacing() * 2;
@@ -799,7 +873,7 @@ PackageListView::PackageListView(Model* model)
 		300 * scale, 80 * scale, 1000 * scale,
 		B_TRUNCATE_MIDDLE), kDescriptionColumn);
 	PackageColumn* sizeColumn = new PackageColumn(fModel, B_TRANSLATE("Size"),
-		spacing + StringWidth(B_TRANSLATE("9999.99 KiB")), 50 * scale,
+		spacing + StringWidth("9999.99 KiB"), 50 * scale,
 		140 * scale, B_TRUNCATE_END);
 	sizeColumn->SetAlignment(B_ALIGN_RIGHT);
 	AddColumn(sizeColumn, kSizeColumn);
@@ -813,9 +887,21 @@ PackageListView::PackageListView(Model* model)
 	SetColumnVisible(kRepositoryColumn, false);
 		// invisible by default
 
+	float widthWithPlacboVersion = spacing
+		+ StringWidth("8.2.3176-2");
+		// average sort of version length as model
 	AddColumn(new PackageColumn(fModel, B_TRANSLATE("Version"),
-		50 * scale, 50 * scale, 200 * scale,
+		widthWithPlacboVersion, widthWithPlacboVersion,
+		widthWithPlacboVersion + (50 * scale),
 		B_TRUNCATE_MIDDLE), kVersionColumn);
+
+	float widthWithPlaceboDate = spacing
+		+ StringWidth(LocaleUtils::TimestampToDateString(
+			static_cast<uint64>(1000)));
+	AddColumn(new PackageColumn(fModel, B_TRANSLATE("Date"),
+		widthWithPlaceboDate, widthWithPlaceboDate,
+		widthWithPlaceboDate + (50 * scale),
+		B_TRUNCATE_END), kVersionCreateTimestampColumn);
 
 	fItemCountView = new ItemCountView();
 	AddStatusView(fItemCountView);
@@ -880,6 +966,8 @@ PackageListView::MessageReceived(BMessage* message)
 					row->UpdateRepository();
 				if ((changes & PKG_CHANGED_VERSION) != 0)
 					row->UpdateVersion();
+				if ((changes & PKG_CHANGED_VERSION_CREATE_TIMESTAMP) != 0)
+					row->UpdateVersionCreateTimestamp();
 			}
 			break;
 		}
@@ -895,6 +983,9 @@ void
 PackageListView::SelectionChanged()
 {
 	BColumnListView::SelectionChanged();
+
+	if (fIgnoreSelectionChanged)
+		return;
 
 	BMessage message(MSG_PACKAGE_SELECTED);
 
@@ -961,6 +1052,8 @@ PackageListView::RemovePackage(const PackageInfoRef& package)
 void
 PackageListView::SelectPackage(const PackageInfoRef& package)
 {
+	fIgnoreSelectionChanged = true;
+
 	PackageRow* row = _FindRow(package);
 	BRow* selected = CurrentSelection();
 	if (row != selected)
@@ -970,6 +1063,8 @@ PackageListView::SelectPackage(const PackageInfoRef& package)
 		SetFocusRow(row, false);
 		ScrollTo(row);
 	}
+
+	fIgnoreSelectionChanged = false;
 }
 
 
@@ -983,7 +1078,7 @@ PackageListView::AttachWorkStatusView(WorkStatusView* view)
 PackageRow*
 PackageListView::_FindRow(const PackageInfoRef& package)
 {
-	if (package.Get() == NULL)
+	if (!package.IsSet())
 		return NULL;
 	return fRowByNameTable->Lookup(package->Name().String());
 }

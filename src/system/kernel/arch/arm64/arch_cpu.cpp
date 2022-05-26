@@ -76,22 +76,31 @@ arch_cpu_memory_write_barrier(void)
 void
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
+	arch_cpu_global_TLB_invalidate();
 }
 
 
 void
 arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages)
 {
+	arch_cpu_global_TLB_invalidate();
 }
 
 
 void
 arch_cpu_global_TLB_invalidate(void)
 {
+	asm(
+		"dsb ishst\n"
+		"tlbi vmalle1\n"
+		"dsb ish\n"
+		"isb\n"
+	);
 }
 
 
 void
 arch_cpu_user_TLB_invalidate(void)
 {
+	arch_cpu_global_TLB_invalidate();
 }

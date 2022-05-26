@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	1961774506
+1	finnish	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Poista kappale roskakoriin
 Close	MediaPlayer-PlaylistWindow		Sulje
 Volume of background clips	MediaPlayer-SettingsWindow		Taustavideoleikkeen voimakkuus
@@ -30,6 +30,7 @@ Open file…	MediaPlayer-Main		Avaa tiedosto...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skaalausohjaimet kokonäyttötilassa
 View options	MediaPlayer-SettingsWindow		Katso valitsimia
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Poista laite
 Full volume	MediaPlayer-SettingsWindow		Täysi äänenvoimakkuus
 <untitled>	PlaylistItem-title		<otsikoton>
 Start media server	MediaPlayer-Main		Käynnistä mediapalvelin

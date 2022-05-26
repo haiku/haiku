@@ -55,7 +55,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/bwi/if_bwi.c 337570 2018-08-10 13:06:14Z
 #include <sys/sysctl.h>
 #include <sys/systm.h>
 #include <sys/taskqueue.h>
- 
+
 #include <net/if.h>
 #include <net/if_var.h>
 #include <net/if_dl.h>
@@ -118,7 +118,6 @@ static void	bwi_set_channel(struct ieee80211com *);
 static void	bwi_scan_end(struct ieee80211com *);
 static int	bwi_newstate(struct ieee80211vap *, enum ieee80211_state, int);
 static void	bwi_updateslot(struct ieee80211com *);
-static int	bwi_media_change(struct ifnet *);
 
 static void	bwi_calibrate(void *);
 
@@ -306,9 +305,6 @@ static const struct {
 	[96]	= { 9, 4 },
 	[108]	= { 7, 3 }
 };
-
-static const uint8_t bwi_chan_2ghz[] =
-	{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
 
 #ifdef BWI_DEBUG
 #ifdef BWI_DEBUG_VERBOSE
@@ -610,8 +606,8 @@ bwi_vap_create(struct ieee80211com *ic, const char name[IFNAMSIZ], int unit,
 	ieee80211_ratectl_init(vap);
 
 	/* complete setup */
-	ieee80211_vap_attach(vap, bwi_media_change, ieee80211_media_status,
-	    mac);
+	ieee80211_vap_attach(vap, ieee80211_media_change,
+	    ieee80211_media_status, mac);
 	ic->ic_opmode = opmode;
 	return vap;
 }
@@ -1721,8 +1717,7 @@ bwi_getradiocaps(struct ieee80211com *ic,
 		panic("unknown phymode %d\n", phy->phy_mode);
 	}
 
-	ieee80211_add_channel_list_2ghz(chans, maxchans, nchans,
-	    bwi_chan_2ghz, nitems(bwi_chan_2ghz), bands, 0);
+	ieee80211_add_channels_default_2ghz(chans, maxchans, nchans, bands, 0);
 }
 
 static void
@@ -1739,15 +1734,6 @@ bwi_set_channel(struct ieee80211com *ic)
 	bwi_rf_set_chan(mac, ieee80211_chan2ieee(ic, c), 0);
 
 	sc->sc_rates = ieee80211_get_ratetable(c);
-
-	/*
-	 * Setup radio tap channel freq and flags
-	 */
-	sc->sc_tx_th.wt_chan_freq = sc->sc_rx_th.wr_chan_freq =
-		htole16(c->ic_freq);
-	sc->sc_tx_th.wt_chan_flags = sc->sc_rx_th.wr_chan_flags =
-		htole16(c->ic_flags & 0xffff);
-
 	BWI_UNLOCK(sc);
 }
 
@@ -1823,14 +1809,6 @@ back:
 	BWI_UNLOCK(sc);
 
 	return error;
-}
-
-static int
-bwi_media_change(struct ifnet *ifp)
-{
-	int error = ieee80211_media_change(ifp);
-	/* NB: only the fixed rate can change and that doesn't need a reset */
-	return (error == ENETRESET ? 0 : error);
 }
 
 static int

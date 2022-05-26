@@ -48,6 +48,8 @@ struct arch_thread {
 
 	uintptr_t*		current_stack;
 	uintptr_t		instruction_pointer;
+
+	uint64			user_gs_base;
 #else
 	struct farcall	current_stack;
 	struct farcall	interrupt_stack;

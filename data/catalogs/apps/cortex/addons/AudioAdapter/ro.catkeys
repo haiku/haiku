@@ -1,0 +1,10 @@
+1	romanian	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		Format de intrare
+Channels:	CortexAudioAdapter		Canale:
+stereo	CortexAudioAdapter		stereo
+mono	CortexAudioAdapter		mono
+Output format	CortexAudioAdapter		Format de ieșire
+Audio input	CortexAddOnsCommon		Intrare audio
+Sample format:	CortexAudioAdapter		Format de eșantion:
+Audio output	CortexAddOnsCommon		Ieșire audio
+%groupname% parameters	CortexAddOnsCommon		parametri %groupname%

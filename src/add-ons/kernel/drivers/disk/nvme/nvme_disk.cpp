@@ -14,6 +14,7 @@
 #include <condition_variable.h>
 #include <AutoDeleter.h>
 #include <kernel.h>
+#include <smp.h>
 #include <util/AutoLock.h>
 
 #include <fs/devfs.h>
@@ -71,7 +72,7 @@ static const uint8 kDriveIcon[] = {
 #define NVME_DISK_DEVICE_MODULE_NAME 	"drivers/disk/nvme_disk/device_v1"
 #define NVME_DISK_DEVICE_ID_GENERATOR	"nvme_disk/device_id"
 
-#define NVME_MAX_QPAIRS					(8)
+#define NVME_MAX_QPAIRS					(16)
 
 
 static device_manager_info* sDeviceManager;
@@ -89,18 +90,17 @@ typedef struct {
 	uint32					max_io_blocks;
 	status_t				media_status;
 
-	struct qpair_info {
-		struct nvme_qpair*	qpair;
-	}						qpairs[NVME_MAX_QPAIRS];
-	uint32					qpair_count;
-	uint32					next_qpair;
-
 	DMAResource				dma_resource;
 	sem_id					dma_buffers_sem;
 
 	rw_lock					rounded_write_lock;
 
 	ConditionVariable		interrupt;
+
+	struct qpair_info {
+		struct nvme_qpair*	qpair;
+	}						qpairs[NVME_MAX_QPAIRS];
+	uint32					qpair_count;
 } nvme_disk_driver_info;
 typedef nvme_disk_driver_info::qpair_info qpair_info;
 
@@ -132,32 +132,12 @@ get_geometry(nvme_disk_handle* handle, device_geometry* geometry)
 }
 
 
-static int
-log2(uint32 x)
-{
-	int y;
-
-	for (y = 31; y >= 0; --y) {
-		if (x == ((uint32)1 << y))
-			break;
-	}
-
-	return y;
-}
-
-
 static void
 nvme_disk_set_capacity(nvme_disk_driver_info* info, uint64 capacity,
 	uint32 blockSize)
 {
 	TRACE("set_capacity(device = %p, capacity = %" B_PRIu64 ", blockSize = %" B_PRIu32 ")\n",
 		info, capacity, blockSize);
-
-	// get log2, if possible
-	uint32 blockShift = log2(blockSize);
-
-	if ((1UL << blockShift) != blockSize)
-		blockShift = 0;
 
 	info->capacity = capacity;
 	info->block_size = blockSize;
@@ -175,6 +155,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 {
 	CALLED();
 	nvme_disk_driver_info* info = (nvme_disk_driver_info*)_info;
+	ASSERT(info->ctrlr == NULL);
 
 	pci_device_module_info* pci;
 	pci_device* pcidev;
@@ -197,6 +178,11 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	device->func = info->info.function;
 
 	device->pci_info = &info->info;
+
+	// enable busmaster and memory mapped access
+	uint16 command = pci->read_pci_config(pcidev, PCI_command, 2);
+	command |= PCI_command_master | PCI_command_memory;
+	pci->write_pci_config(pcidev, PCI_command, 2, command);
 
 	// open the controller
 	info->ctrlr = nvme_ctrlr_open(device, NULL);
@@ -224,6 +210,7 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		nvme_ctrlr_close(info->ctrlr);
 		return B_ERROR;
 	}
+	TRACE_ALWAYS("namespace 0\n");
 
 	struct nvme_ns_stat nsstat;
 	err = nvme_ns_stat(info->ns, &nsstat);
@@ -234,63 +221,17 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	}
 
 	// store capacity information
+	TRACE_ALWAYS("\tblock size: %" B_PRIuSIZE ", stripe size: %u\n",
+		nsstat.sector_size, info->ns->stripe_size);
 	nvme_disk_set_capacity(info, nsstat.sectors, nsstat.sector_size);
 
-	TRACE("capacity: %" B_PRIu64 ", block_size %" B_PRIu32 "\n",
-		info->capacity, info->block_size);
-
-	// allocate qpairs
-	info->qpair_count = info->next_qpair = 0;
-	for (uint32 i = 0; i < NVME_MAX_QPAIRS && i < cstat.io_qpairs; i++) {
-		info->qpairs[i].qpair = nvme_ioqp_get(info->ctrlr,
-			(enum nvme_qprio)0, 0);
-		if (info->qpairs[i].qpair == NULL)
-			break;
-
-		info->qpair_count++;
-	}
-	if (info->qpair_count == 0) {
-		TRACE_ERROR("failed to allocate qpairs!\n");
-		nvme_ctrlr_close(info->ctrlr);
-		return B_NO_MEMORY;
-	}
-
-	// allocate DMA buffers
-	int buffers = info->qpair_count * 2;
-
-	dma_restrictions restrictions = {};
-	restrictions.alignment = B_PAGE_SIZE;
-		// Technically, the first and last segments in a transfer can be
-		// unaligned, and the rest only need to have sizes that are a multiple
-		// of the block size.
-	restrictions.max_segment_count = (NVME_MAX_SGL_DESCRIPTORS / 2);
-	restrictions.max_transfer_size = cstat.max_xfer_size;
-	info->max_io_blocks = cstat.max_xfer_size / nsstat.sector_size;
-
-	err = info->dma_resource.Init(restrictions, B_PAGE_SIZE, buffers, buffers);
-	if (err != 0) {
-		TRACE_ERROR("failed to initialize DMA resource!\n");
-		nvme_ctrlr_close(info->ctrlr);
-		return err;
-	}
-
-	info->dma_buffers_sem = create_sem(buffers, "nvme buffers sem");
-	if (info->dma_buffers_sem < 0) {
-		TRACE_ERROR("failed to create DMA buffers semaphore!\n");
-		nvme_ctrlr_close(info->ctrlr);
-		return info->dma_buffers_sem;
-	}
-
-	// set up rounded-write lock
-	rw_lock_init(&info->rounded_write_lock, "nvme rounded writes");
-
-	// set up interrupt
+	// set up interrupts
 	if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module)
 			!= B_OK) {
 		sPCIx86Module = NULL;
 	}
 
-	uint16 command = pci->read_pci_config(pcidev, PCI_command, 2);
+	command = pci->read_pci_config(pcidev, PCI_command, 2);
 	command &= ~(PCI_command_int_disable);
 	pci->write_pci_config(pcidev, PCI_command, 2, command);
 
@@ -332,6 +273,63 @@ nvme_disk_init_device(void* _info, void** _cookie)
 		nvme_admin_set_feature(info->ctrlr, false, NVME_FEAT_INTERRUPT_COALESCING,
 			((microseconds / 100) << 8) | threshold, 0, NULL);
 	}
+
+	// allocate qpairs
+	uint32 try_qpairs = cstat.io_qpairs;
+	try_qpairs = min_c(try_qpairs, NVME_MAX_QPAIRS);
+	if (try_qpairs >= (uint32)smp_get_num_cpus()) {
+		try_qpairs = smp_get_num_cpus();
+	} else {
+		// Find the highest number of qpairs that evenly divides the number of CPUs.
+		while ((smp_get_num_cpus() % try_qpairs) != 0)
+			try_qpairs--;
+	}
+	info->qpair_count = 0;
+	for (uint32 i = 0; i < try_qpairs; i++) {
+		info->qpairs[i].qpair = nvme_ioqp_get(info->ctrlr,
+			(enum nvme_qprio)0, 0);
+		if (info->qpairs[i].qpair == NULL)
+			break;
+
+		info->qpair_count++;
+	}
+	if (info->qpair_count == 0) {
+		TRACE_ERROR("failed to allocate qpairs!\n");
+		nvme_ctrlr_close(info->ctrlr);
+		return B_NO_MEMORY;
+	}
+	if (info->qpair_count != try_qpairs) {
+		TRACE_ALWAYS("warning: did not get expected number of qpairs\n");
+	}
+
+	// allocate DMA buffers
+	int buffers = info->qpair_count * 2;
+
+	dma_restrictions restrictions = {};
+	restrictions.alignment = B_PAGE_SIZE;
+		// Technically, the first and last segments in a transfer can be aligned
+		// only on 32-bits, and the rest only need to have sizes that are a multiple
+		// of the block size.
+	restrictions.max_segment_count = (NVME_MAX_SGL_DESCRIPTORS / 2);
+	restrictions.max_transfer_size = cstat.max_xfer_size;
+	info->max_io_blocks = cstat.max_xfer_size / nsstat.sector_size;
+
+	err = info->dma_resource.Init(restrictions, B_PAGE_SIZE, buffers, buffers);
+	if (err != 0) {
+		TRACE_ERROR("failed to initialize DMA resource!\n");
+		nvme_ctrlr_close(info->ctrlr);
+		return err;
+	}
+
+	info->dma_buffers_sem = create_sem(buffers, "nvme buffers sem");
+	if (info->dma_buffers_sem < 0) {
+		TRACE_ERROR("failed to create DMA buffers semaphore!\n");
+		nvme_ctrlr_close(info->ctrlr);
+		return info->dma_buffers_sem;
+	}
+
+	// set up rounded-write lock
+	rw_lock_init(&info->rounded_write_lock, "nvme rounded writes");
 
 	*_cookie = info;
 	return B_OK;
@@ -411,8 +409,7 @@ nvme_interrupt_handler(void* _info)
 static qpair_info*
 get_qpair(nvme_disk_driver_info* info)
 {
-	return &info->qpairs[atomic_add((int32*)&info->next_qpair, 1)
-		% info->qpair_count];
+	return &info->qpairs[smp_get_current_cpu() % info->qpair_count];
 }
 
 
@@ -705,16 +702,25 @@ nvme_disk_io(void* cookie, io_request* request)
 			bounceAll = true;
 	}
 
-	// See if we need to bounce due to the first or last vec.
+	// See if we need to bounce due to the first or last vecs.
 	if (nvme_request.iovec_count > 1) {
+		// There are middle vecs, so the first and last vecs have different restrictions: they
+		// need only be a multiple of the block size, and must end and start on a page boundary,
+		// respectively, though the start address must always be 32-bit-aligned.
 		physical_entry* entry = &nvme_request.iovecs[0];
 		if (!bounceAll && (((entry->address + entry->size) % B_PAGE_SIZE) != 0
-				|| (entry->size % block_size) != 0))
+				|| (entry->address & 0x3) != 0 || (entry->size % block_size) != 0))
 			bounceAll = true;
 
 		entry = &nvme_request.iovecs[nvme_request.iovec_count - 1];
 		if (!bounceAll && ((entry->address % B_PAGE_SIZE) != 0
 				|| (entry->size % block_size) != 0))
+			bounceAll = true;
+	} else {
+		// There is only one vec. Check that it is a multiple of the block size,
+		// and that its address is 32-bit-aligned.
+		physical_entry* entry = &nvme_request.iovecs[0];
+		if (!bounceAll && ((entry->address & 0x3) != 0 || (entry->size % block_size) != 0))
 			bounceAll = true;
 	}
 
@@ -753,7 +759,7 @@ nvme_disk_io(void* cookie, io_request* request)
 
 		nvme_request.lba_count = 0;
 		for (int i = 0; i < nvme_request.iovec_count; i++) {
-			int32 new_lba_count = nvme_request.lba_count
+			uint32 new_lba_count = nvme_request.lba_count
 				+ (nvme_request.iovecs[i].size / block_size);
 			if (nvme_request.lba_count > 0 && new_lba_count > max_io_blocks) {
 				// We already have a nonzero length, and adding this vec would
@@ -833,6 +839,7 @@ nvme_disk_write(void* cookie, off_t pos, const void* buffer, size_t* length)
 static status_t
 nvme_disk_flush(nvme_disk_driver_info* info)
 {
+	CALLED();
 	status_t status = EINPROGRESS;
 
 	qpair_info* qpinfo = get_qpair(info);
@@ -843,6 +850,77 @@ nvme_disk_flush(nvme_disk_driver_info* info)
 
 	await_status(info, qpinfo->qpair, status);
 	return status;
+}
+
+
+static status_t
+nvme_disk_trim(nvme_disk_driver_info* info, fs_trim_data* trimData)
+{
+	CALLED();
+	trimData->trimmed_size = 0;
+
+	const off_t deviceSize = info->capacity * info->block_size; // in bytes
+	if (deviceSize < 0)
+		return B_BAD_VALUE;
+
+	STATIC_ASSERT(sizeof(deviceSize) <= sizeof(uint64));
+	ASSERT(deviceSize >= 0);
+
+	// Do not trim past device end.
+	for (uint32 i = 0; i < trimData->range_count; i++) {
+		uint64 offset = trimData->ranges[i].offset;
+		uint64& size = trimData->ranges[i].size;
+
+		if (offset >= (uint64)deviceSize)
+			return B_BAD_VALUE;
+		size = std::min(size, (uint64)deviceSize - offset);
+	}
+
+	// We need contiguous memory for the DSM ranges.
+	nvme_dsm_range* dsmRanges = (nvme_dsm_range*)nvme_mem_alloc_node(
+		trimData->range_count * sizeof(nvme_dsm_range), 0, 0, NULL);
+	if (dsmRanges == NULL)
+		return B_NO_MEMORY;
+	CObjectDeleter<void, void, nvme_free> dsmRangesDeleter(dsmRanges);
+
+	uint64 trimmingSize = 0;
+	for (uint32 i = 0; i < trimData->range_count; i++) {
+		uint64 offset = trimData->ranges[i].offset;
+		uint64 length = trimData->ranges[i].size;
+
+		// Round up offset and length to the block size.
+		// (Some space at the beginning and end may thus not be trimmed.)
+		offset = ROUNDUP(offset, info->block_size);
+		length -= offset - trimData->ranges[i].offset;
+		length = ROUNDDOWN(length, info->block_size);
+
+		if (length == 0)
+			continue;
+		if ((length / info->block_size) > UINT32_MAX)
+			length = uint64(UINT32_MAX) * info->block_size;
+			// TODO: Break into smaller trim ranges!
+
+		TRACE("trim %" B_PRIu64 " bytes from %" B_PRIu64 "\n", length, offset);
+
+		dsmRanges[i].attributes = 0;
+		dsmRanges[i].length = length / info->block_size;
+		dsmRanges[i].starting_lba = offset / info->block_size;
+
+		trimmingSize += dsmRanges[i].length;
+	}
+
+	status_t status = EINPROGRESS;
+	qpair_info* qpair = get_qpair(info);
+	if (nvme_ns_deallocate(info->ns, qpair->qpair, dsmRanges, trimData->range_count,
+			(nvme_cmd_cb)io_finished_callback, &status) != 0)
+		return B_IO_ERROR;
+
+	await_status(info, qpair->qpair, status);
+	if (status != B_OK)
+		return status;
+
+	trimData->trimmed_size = trimmingSize;
+	return B_OK;
 }
 
 
@@ -907,6 +985,10 @@ nvme_disk_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 		case B_FLUSH_DRIVE_CACHE:
 			return nvme_disk_flush(info);
+
+		case B_TRIM_DEVICE:
+			ASSERT(IS_KERNEL_ADDRESS(buffer));
+			return nvme_disk_trim(info, (fs_trim_data*)buffer);
 	}
 
 	return B_DEV_INVALID_IOCTL;
@@ -946,6 +1028,7 @@ nvme_disk_register_device(device_node* parent)
 	CALLED();
 
 	device_attr attrs[] = {
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "NVMe Disk" } },
 		{ NULL }
 	};
 
@@ -1016,8 +1099,8 @@ nvme_disk_register_child_devices(void* _cookie)
 
 
 module_dependency module_dependencies[] = {
-	{B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&sDeviceManager},
-	{}
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&sDeviceManager },
+	{ NULL }
 };
 
 struct device_module_info sNvmeDiskDevice = {

@@ -1,11 +1,14 @@
 /*
  * Copyright 2006-2012, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>
  * Distributed under the terms of the MIT License.
  */
 #ifndef EDIT_MANAGER_H
 #define EDIT_MANAGER_H
 
-#include "EditStack.h"
+#include <vector>
+#include <stack>
+
 #include "UndoableEdit.h"
 
 class BString;
@@ -40,7 +43,7 @@ public:
 			void				Save();
 			bool				IsSaved();
 
-			bool				AddListener(Listener* listener);
+			void				AddListener(Listener* listener);
 			void				RemoveListener(Listener* listener);
 
 private:
@@ -49,12 +52,13 @@ private:
 			void				_NotifyListeners();
 
 private:
-			EditStack			fUndoHistory;
-			EditStack			fRedoHistory;
+			std::stack<UndoableEditRef>
+								fUndoHistory;
+			std::stack<UndoableEditRef>
+								fRedoHistory;
 			UndoableEditRef		fEditAtSave;
-
-	typedef List<Listener*, true, 4> ListenerList;
-			ListenerList		fListeners;
+			std::vector<Listener*>
+								fListeners;
 };
 
 #endif // EDIT_MANAGER_H

@@ -27,6 +27,7 @@
  * SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include <string.h>
 
 /*

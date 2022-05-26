@@ -74,6 +74,18 @@ enum bplustree_types {
 struct duplicate_array;
 
 
+template <typename T>
+struct  __attribute__((packed)) Unaligned {
+	T value;
+
+	Unaligned<T>& operator=(const T& newValue)
+	{
+		value = newValue; return *this;
+	}
+	operator T() const { return value; }
+};
+
+
 struct bplustree_node {
 			int64				left_link;
 			int64				right_link;
@@ -97,8 +109,8 @@ struct bplustree_node {
 									{ return BFS_ENDIAN_TO_HOST_INT16(
 										all_key_length); }
 
-	inline	uint16*				KeyLengths() const;
-	inline	off_t*				Values() const;
+	inline	Unaligned<uint16>*	KeyLengths() const;
+	inline	Unaligned<off_t>*   Values() const;
 	inline	uint8*				Keys() const;
 	inline	int32				Used() const;
 			uint8*				KeyAt(int32 index, uint16* keyLength) const;
@@ -559,18 +571,19 @@ bplustree_header::IsValidLink(off_t link) const
 //	#pragma mark - bplustree_node inline functions
 
 
-inline uint16*
+inline Unaligned<uint16>*
 bplustree_node::KeyLengths() const
 {
-	return (uint16*)(((char*)this) + key_align(sizeof(bplustree_node)
+	return (Unaligned<uint16>*)(((char*)this) + key_align(sizeof(bplustree_node)
 		+ AllKeyLength()));
 }
 
 
-inline off_t*
+inline Unaligned<off_t>*
 bplustree_node::Values() const
 {
-	return (off_t*)((char*)KeyLengths() + NumKeys() * sizeof(uint16));
+	return (Unaligned<off_t>*)(
+		(char*)KeyLengths() + NumKeys() * sizeof(uint16));
 }
 
 

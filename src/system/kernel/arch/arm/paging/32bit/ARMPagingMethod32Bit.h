@@ -69,6 +69,10 @@ public:
 	static	page_table_entry	ClearPageTableEntryFlags(
 									page_table_entry* entry, uint32 flags);
 
+	static	uint32				AttributesToPageTableEntryFlags(
+									uint32 attributes);
+	static	uint32				PageTableEntryFlagsToAttributes(
+									uint32 pageTableEntry);
 	static	uint32				MemoryTypeToPageTableEntryFlags(
 									uint32 memoryType);
 
@@ -140,36 +144,94 @@ ARMPagingMethod32Bit::ClearPageTableEntryFlags(page_table_entry* entry, uint32 f
 
 
 /*static*/ inline uint32
+ARMPagingMethod32Bit::AttributesToPageTableEntryFlags(uint32 attributes)
+{
+	int apFlags = 0;
+
+	if ((attributes & B_WRITE_AREA) != 0) {
+		// kernel rw user rw
+		apFlags = ARM_MMU_L2_FLAG_AP1 | ARM_MMU_L2_FLAG_AP0;
+	} else if ((attributes & B_READ_AREA) != 0) {
+		if ((attributes & B_KERNEL_WRITE_AREA) != 0) {
+			// kernel rw user ro
+			apFlags = ARM_MMU_L2_FLAG_AP1;
+		} else {
+			// kernel ro user ro
+			apFlags = ARM_MMU_L2_FLAG_AP2 | ARM_MMU_L2_FLAG_AP1;
+		}
+	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0) {
+		// kernel rw
+		apFlags = ARM_MMU_L2_FLAG_AP0;
+	} else {
+		// kernel ro
+		apFlags = ARM_MMU_L2_FLAG_AP2 | ARM_MMU_L2_FLAG_AP0;
+	}
+
+	if (((attributes & B_KERNEL_EXECUTE_AREA) == 0) &&
+			((attributes & B_EXECUTE_AREA) == 0)) {
+		apFlags |= ARM_MMU_L2_FLAG_XN;
+	}
+
+	return apFlags;
+}
+
+
+/*static*/ inline uint32
+ARMPagingMethod32Bit::PageTableEntryFlagsToAttributes(uint32 pageTableEntry)
+{
+	uint32 attributes;
+
+	if ((pageTableEntry & ARM_MMU_L2_FLAG_AP2) == 0) {
+		if ((pageTableEntry & ARM_MMU_L2_FLAG_AP1) != 0) {
+			if ((pageTableEntry & ARM_MMU_L2_FLAG_AP0) != 0)
+				attributes = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA;
+			else
+				attributes = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA;
+		} else {
+			if ((pageTableEntry & ARM_MMU_L2_FLAG_AP0) != 0)
+				attributes = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
+			else
+				attributes = 0;
+		}
+	} else {
+		if ((pageTableEntry & ARM_MMU_L2_FLAG_AP1) != 0)
+			attributes = B_KERNEL_READ_AREA | B_READ_AREA;
+		else if ((pageTableEntry & ARM_MMU_L2_FLAG_AP0) != 0)
+			attributes = B_KERNEL_READ_AREA;
+		else
+			attributes = 0;
+	}
+
+	if ((pageTableEntry & ARM_MMU_L2_FLAG_XN) == 0) {
+		if ((attributes & B_KERNEL_READ_AREA) != 0)
+			attributes |= B_KERNEL_EXECUTE_AREA;
+		if ((attributes & B_READ_AREA) != 0)
+			attributes |= B_EXECUTE_AREA;
+	}
+
+	return attributes;
+}
+
+
+/*static*/ inline uint32
 ARMPagingMethod32Bit::MemoryTypeToPageTableEntryFlags(uint32 memoryType)
 {
-#if 0 //IRA
-	// ATM we only handle the uncacheable and write-through type explicitly. For
-	// all other types we rely on the MTRRs to be set up correctly. Since we set
-	// the default memory type to write-back and since the uncacheable type in
-	// the PTE overrides any MTRR attribute (though, as per the specs, that is
-	// not recommended for performance reasons), this reduces the work we
-	// actually *have* to do with the MTRRs to setting the remaining types
-	// (usually only write-combining for the frame buffer).
 	switch (memoryType) {
 		case B_MTR_UC:
-			return X86_PTE_CACHING_DISABLED | X86_PTE_WRITE_THROUGH;
-
-		case B_MTR_WC:
-			// ARM_PTE_WRITE_THROUGH would be closer, but the combination with
-			// MTRR WC is "implementation defined" for Pentium Pro/II.
+			// Strongly Ordered
 			return 0;
-
+		case B_MTR_WC:
+			// Shareable Device Memory
+			return ARM_MMU_L2_FLAG_B;
 		case B_MTR_WT:
-			return X86_PTE_WRITE_THROUGH;
-
+			// Outer and Inner Write-Through, no Write-Allocate
+			return ARM_MMU_L2_FLAG_C;
 		case B_MTR_WP:
 		case B_MTR_WB:
 		default:
-			return 0;
+			// Outer and Inner Write-Back, no Write-Allocate
+			return ARM_MMU_L2_FLAG_B | ARM_MMU_L2_FLAG_C;
 	}
-#else
-	return 0;
-#endif
 }
 
 

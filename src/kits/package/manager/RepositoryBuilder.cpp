@@ -18,6 +18,7 @@
 #include <Path.h>
 
 #include <AutoDeleter.h>
+#include <AutoDeleterPosix.h>
 
 #include "PackageManagerUtils.h"
 
@@ -145,7 +146,7 @@ BRepositoryBuilder::AddPackage(const char* path, BSolverPackage** _package)
 	BEntry entry(path, true);
 
 	if (!entry.Exists()) {
-		DIE_DETAILS(errorListener.Errors(), B_FILE_NOT_FOUND,
+		DIE_DETAILS(errorListener.Errors(), B_ENTRY_NOT_FOUND,
 			"the package data file does not exist at \"%s\"", path);
 	}
 
@@ -207,13 +208,12 @@ BRepositoryBuilder&
 BRepositoryBuilder::AddPackagesDirectory(const char* path)
 {
 	// open directory
-	DIR* dir = opendir(path);
-	if (dir == NULL)
+	DirCloser dir(opendir(path));
+	if (!dir.IsSet())
 		DIE(errno, "failed to open package directory \"%s\"", path);
-	CObjectDeleter<DIR, int> dirCloser(dir, &closedir);
 
 	// iterate through directory entries
-	while (dirent* entry = readdir(dir)) {
+	while (dirent* entry = readdir(dir.Get())) {
 		// skip "." and ".."
 		const char* name = entry->d_name;
 		if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)

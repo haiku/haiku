@@ -10,7 +10,7 @@ other files required to run programs build for that architecture."
 packager		"The Haiku build system"
 vendor			"Haiku Project"
 
-copyrights		"2001-2020 Haiku, Inc. et al"
+copyrights		"2001-2021 Haiku, Inc. et al"
 licenses {
 	MIT
 	"GNU LGPL v2.1"
@@ -24,18 +24,18 @@ provides {
 requires {
 	lib:libfreetype_%HAIKU_SECONDARY_PACKAGING_ARCH%
 	lib:libgcc_s_%HAIKU_SECONDARY_PACKAGING_ARCH%
-	lib:libicudata_%HAIKU_SECONDARY_PACKAGING_ARCH%
-	lib:libicui18n_%HAIKU_SECONDARY_PACKAGING_ARCH%
-	lib:libicuio_%HAIKU_SECONDARY_PACKAGING_ARCH%
-	lib:libicutest_%HAIKU_SECONDARY_PACKAGING_ARCH%
-	lib:libicutu_%HAIKU_SECONDARY_PACKAGING_ARCH%
-	lib:libicuuc_%HAIKU_SECONDARY_PACKAGING_ARCH%
+	lib:libicudata_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 66
+	lib:libicui18n_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 66
+	lib:libicuio_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 66
+	lib:libicutest_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 66
+	lib:libicutu_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 66
+	lib:libicuuc_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 66
 #ifdef HAIKU_REGULAR_BUILD
 	lib:libicns_%HAIKU_SECONDARY_PACKAGING_ARCH%
 	lib:libjasper_%HAIKU_SECONDARY_PACKAGING_ARCH%
 	lib:libjpeg_%HAIKU_SECONDARY_PACKAGING_ARCH%
 	lib:libpng16_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 16.0
-	lib:libtiff_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 5.2
+	lib:libtiff_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 5.6
 	lib:libwebp_%HAIKU_SECONDARY_PACKAGING_ARCH%
 
 	lib:libilmimf_2_4_%HAIKU_SECONDARY_PACKAGING_ARCH%
@@ -46,6 +46,7 @@ requires {
 	lib:libavformat_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 58
 	lib:libavutil_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 56
 	lib:libswresample_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 3
+	lib:libzstd_%HAIKU_SECONDARY_PACKAGING_ARCH% >= 1
 #endif
 	lib:libsolv_%HAIKU_SECONDARY_PACKAGING_ARCH%
 	lib:libsolvext_%HAIKU_SECONDARY_PACKAGING_ARCH%

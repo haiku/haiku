@@ -1,3 +1,5 @@
+#include <vm/vm.h>
+
 #include "soc_omap3.h"
 
 enum {
@@ -92,11 +94,12 @@ OMAP3InterruptController::SoftReset()
 }
 
 
-OMAP3InterruptController::OMAP3InterruptController(fdt_module_info *fdt, fdt_device_node node)
-	: InterruptController(fdt, node),
-	fNumPending(3)
+OMAP3InterruptController::OMAP3InterruptController(uint32_t reg_base)
+	: fNumPending(3)
 {
-	fRegArea = fFDT->map_reg_range(node, 0, (void**)&fRegBase);
+	fRegArea = vm_map_physical_memory(B_SYSTEM_TEAM, "intc-omap3", (void**)&fRegBase,
+		B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		reg_base, false);
 	if (fRegArea < 0)
 		panic("OMAP3InterruptController: cannot map registers!");
 
@@ -181,6 +184,7 @@ OMAP3Timer::Clear()
 }
 
 
+#if 0
 OMAP3Timer::OMAP3Timer(fdt_module_info *fdtModule, fdt_device_node node)
 	: HardwareTimer(fdtModule, node),
 	fSystemTime(0)
@@ -202,3 +206,4 @@ OMAP3Timer::OMAP3Timer(fdt_module_info *fdtModule, fdt_device_node node)
 
 	install_io_interrupt_handler(fInterrupt, &OMAP3Timer::_InterruptWrapper, this, 0);
 }
+#endif

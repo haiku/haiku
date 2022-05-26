@@ -56,8 +56,8 @@ CamDevice::CamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 		fFlavorInfoInfoStr = "";
 		fFlavorInfoInfoStr << fCamDeviceAddon.SupportedDevices()[fSupportedDeviceIndex].vendor;
 		fFlavorInfoInfoStr << " (" << fCamDeviceAddon.SupportedDevices()[fSupportedDeviceIndex].product << ") USB Webcam";
-		fFlavorInfo.name = (char *)fFlavorInfoNameStr.String();
-		fFlavorInfo.info = (char *)fFlavorInfoInfoStr.String();
+		fFlavorInfo.name = fFlavorInfoNameStr.String();
+		fFlavorInfo.info = fFlavorInfoInfoStr.String();
 	}
 #ifdef DEBUG_WRITE_DUMP
 	fDumpFD = open("/boot/home/webcam.out", O_CREAT|O_RDWR, 0644);
@@ -571,8 +571,6 @@ CamDevice::DataPumpThread()
 		for (int i = 0; i<numPacketDescriptors; i++)
 			packetDescriptors[i].request_length = 256;	
 
-		int fullPackets = 0;
-		int totalPackets = 0;
 		while (fTransferEnabled) {
 			ssize_t len = -1;
 			BAutolock lock(fLocker);

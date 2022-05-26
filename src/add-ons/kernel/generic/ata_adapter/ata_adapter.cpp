@@ -414,7 +414,7 @@ ata_adapter_init_channel(device_node *node,
 // used.
 	prdt_size = (ATA_ADAPTER_MAX_SG_COUNT * sizeof( prd_entry ) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
 	channel->prd_area = create_area("prd", (void **)&channel->prdt, B_ANY_KERNEL_ADDRESS,
-		prdt_size, B_32_BIT_CONTIGUOUS, 0);
+		prdt_size, B_32_BIT_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (channel->prd_area < B_OK) {
 		res = channel->prd_area;
 		goto err2;

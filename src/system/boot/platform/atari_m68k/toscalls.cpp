@@ -71,7 +71,6 @@ toserror(int32 err)
 	case -32: /* EINVFN - Invalid function */
 		return B_BAD_VALUE;
 	case -33: /* EFILNF - File not found */
-		return B_FILE_NOT_FOUND;
 	case -34: /* EPTHNF - Path not found */
 		return B_ENTRY_NOT_FOUND;
 	case -35: /* ENHNDL - No more handles */

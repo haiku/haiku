@@ -46,8 +46,8 @@ status_t EqualizerAddOn::GetFlavorAt(int32 idx, const flavor_info** info)
 	f_info->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_CONTROLLABLE;
 	f_info->possible_count = 0;
 	f_info->flavor_flags = 0;
-	f_info->info = (char *)"10 Band Equalizer.\nby 3dEyes**";
-	f_info->name = (char *)"Equalizer (10 Band)";
+	f_info->info = "10 Band Equalizer.\nby 3dEyes**";
+	f_info->name = "Equalizer (10 Band)";
 	
 	media_format* format = new media_format;
 	format->type = B_MEDIA_RAW_AUDIO;

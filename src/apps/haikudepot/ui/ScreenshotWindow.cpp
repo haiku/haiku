@@ -1,7 +1,7 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -172,7 +172,7 @@ ScreenshotWindow::SetPackage(const PackageInfoRef& package)
 	fPackage = package;
 
 	BString title = B_TRANSLATE("Screenshot");
-	if (package.Get() != NULL) {
+	if (package.IsSet()) {
 		title = package->Title();
 		_DownloadScreenshot();
 	}
@@ -254,29 +254,33 @@ ScreenshotWindow::_DownloadThreadEntry(void* data)
 void
 ScreenshotWindow::_DownloadThread()
 {
+	ScreenshotInfoRef info;
+
 	if (!Lock()) {
 		HDERROR("failed to lock screenshot window");
 		return;
 	}
 
 	fScreenshotView->UnsetBitmap();
+	_ResizeToFitAndCenter();
 
-	ScreenshotInfoList screenshotInfos;
-	if (fPackage.Get() != NULL)
-		screenshotInfos = fPackage->ScreenshotInfos();
+	if (!fPackage.IsSet())
+		HDINFO("package not set");
+	else {
+		if (fPackage->CountScreenshotInfos() == 0)
+    		HDINFO("package has no screenshots");
+    	else {
+    		int32 index = atomic_get(&fCurrentScreenshotIndex);
+    		info = fPackage->ScreenshotInfoAtIndex(index);
+    	}
+	}
 
 	Unlock();
 
-	if (screenshotInfos.CountItems() == 0) {
-		HDINFO("package has no screenshots");
+	if (!info.IsSet()) {
+		HDINFO("screenshot not set");
 		return;
 	}
-
-	// Obtain the correct code for the screenshot to display
-	// TODO: Once navigation buttons are added, we could use the
-	// ScreenshotInfo at the "current" index.
-	const ScreenshotInfo& info = screenshotInfos.ItemAtFast(
-		atomic_get(&fCurrentScreenshotIndex));
 
 	BMallocIO buffer;
 	WebAppInterface interface;
@@ -288,8 +292,8 @@ ScreenshotWindow::_DownloadThread()
 		kProgressIndicatorDelay, 1);
 
 	// Retrieve screenshot from web-app
-	status_t status = interface.RetrieveScreenshot(info.Code(),
-		info.Width(), info.Height(), &buffer);
+	status_t status = interface.RetrieveScreenshot(info->Code(),
+		info->Width(), info->Height(), &buffer);
 
 	delayedMessenger.SetCount(0);
 	messenger.SendMessage(MSG_DOWNLOAD_STOP);
@@ -305,28 +309,35 @@ ScreenshotWindow::_DownloadThread()
 }
 
 
+BSize
+ScreenshotWindow::_MaxWidthAndHeightOfAllScreenshots()
+{
+	BSize size(0, 0);
+
+	// Find out dimensions of the largest screenshot of this package
+	if (fPackage.IsSet()) {
+		int count = fPackage->CountScreenshotInfos();
+		for(int32 i = 0; i < count; i++) {
+			const ScreenshotInfoRef& info = fPackage->ScreenshotInfoAtIndex(i);
+			if (info.Get() != NULL) {
+				float w = (float) info->Width();
+				float h = (float) info->Height();
+				if (w > size.Width())
+					size.SetWidth(w);
+				if (h > size.Height())
+					size.SetHeight(h);
+			}
+		}
+	}
+
+	return size;
+}
+
+
 void
 ScreenshotWindow::_ResizeToFitAndCenter()
 {
-	// Find out dimensions of the largest screenshot of this package
-	ScreenshotInfoList screenshotInfos;
-	if (fPackage.Get() != NULL)
-		screenshotInfos = fPackage->ScreenshotInfos();
-
-	int32 largestScreenshotWidth = 0;
-	int32 largestScreenshotHeight = 0;
-
-	const uint32 numScreenshots = fPackage->ScreenshotInfos().CountItems();
-	for (uint32 i = 0; i < numScreenshots; i++) {
-		const ScreenshotInfo& info = screenshotInfos.ItemAtFast(i);
-		if (info.Width() > largestScreenshotWidth)
-			largestScreenshotWidth = info.Width();
-		if (info.Height() > largestScreenshotHeight)
-			largestScreenshotHeight = info.Height();
-	}
-
-	fScreenshotView->SetExplicitMinSize(
-		BSize(largestScreenshotWidth, largestScreenshotHeight));
+	fScreenshotView->SetExplicitMinSize(_MaxWidthAndHeightOfAllScreenshots());
 	Layout(false);
 
 	// TODO: Limit window size to screen size (with a little margin),
@@ -343,7 +354,7 @@ ScreenshotWindow::_ResizeToFitAndCenter()
 void
 ScreenshotWindow::_UpdateToolBar()
 {
-	const int32 numScreenshots = fPackage->ScreenshotInfos().CountItems();
+	const int32 numScreenshots = fPackage->CountScreenshotInfos();
 	const int32 currentIndex = atomic_get(&fCurrentScreenshotIndex);
 
 	fToolBar->SetActionEnabled(MSG_PREVIOUS_SCREENSHOT,

@@ -402,6 +402,13 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 			break;
 		case 'CMN\0':
 			strcpy(info.vendor, "Chimei Innolux");
+			break;
+		case 'CMO\0':
+			strcpy(info.vendor, "Chi Mei Optoelectronics");
+			break;
+		case 'COR\0':
+			strcpy(info.vendor, "CPT");
+			break;
 		case 'CPL\0':
 			strcpy(info.vendor, "ALFA");
 			break;
@@ -468,8 +475,11 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		case 'LEN\0':
 			strcpy(info.vendor, "Lenovo");
 			break;
+		case 'LGD\0':
+			strcpy(info.vendor, "LG Display");
+			break;
 		case 'LPL\0':
-			strcpy(info.vendor, "LG Phillips");
+			strcpy(info.vendor, "LG Philips");
 			break;
 		case 'LTN\0':
 			strcpy(info.vendor, "Lite-On");

@@ -569,7 +569,7 @@ EqualizerNode::ValidateFormat(const media_format &preferred_format,
 		return B_MEDIA_BAD_FORMAT;
 	}
 
-	media_raw_audio_format &wild = media_raw_audio_format::wildcard;
+	const media_raw_audio_format &wild = media_raw_audio_format::wildcard;
 	media_raw_audio_format &f = proposed_format.u.raw_audio;
 	const media_raw_audio_format &pref = preferred_format.u.raw_audio;
 
@@ -614,7 +614,7 @@ void
 EqualizerNode::SetOutputFormat(media_format &format)
 {
 	media_raw_audio_format &f = format.u.raw_audio;
-	media_raw_audio_format &w = media_raw_audio_format::wildcard;
+	const media_raw_audio_format &w = media_raw_audio_format::wildcard;
 
 	if (f.frame_rate == w.frame_rate) {
 		f.frame_rate = 44100.0;

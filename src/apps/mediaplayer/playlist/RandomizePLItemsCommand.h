@@ -6,14 +6,16 @@
 #define RANDOMIZE_PL_ITEMS_COMMAND_H
 
 
+#include <List.h>
+
 #include "PLItemsCommand.h"
+
 
 class RandomizePLItemsCommand : public PLItemsCommand {
 public:
 								RandomizePLItemsCommand(
 									Playlist* playlist,
-									const int32* indices,
-									int32 count);
+									BList indices);
 	virtual						~RandomizePLItemsCommand();
 
 	virtual	status_t			InitCheck();
@@ -27,10 +29,10 @@ private:
 			status_t			_Sort(bool random);
 
 			Playlist*			fPlaylist;
+			int32				fCount;
 			PlaylistItem**		fItems;
 			int32*				fListIndices;
 			int32*				fRandomInternalIndices;
-			int32				fCount;
 };
 
 #endif // RANDOMIZE_PL_ITEMS_COMMAND_H

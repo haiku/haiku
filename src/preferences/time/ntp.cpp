@@ -172,7 +172,12 @@ ntp_update_time(const char* hostname, const char** errorString,
 	timeout.tv_usec = 0;
 	// we'll wait 3 seconds for the answer
 
-	if (select(connection + 1, &waitForReceived, NULL, NULL, &timeout) <= 0) {
+	int status;
+	do {
+		status = select(connection + 1, &waitForReceived, NULL, NULL,
+			&timeout);
+	} while (status == -1 && errno == EINTR);
+	if (status <= 0) {
 		*errorString = B_TRANSLATE("Waiting for answer failed");
 		*errorCode = errno;
 		close(connection);

@@ -697,6 +697,11 @@ MemoryManager::FreeRawOrReturnCache(void* pages, uint32 flags)
 
 	T(FreeRawOrReturnCache(pages, flags));
 
+	if ((flags & CACHE_DONT_LOCK_KERNEL_SPACE) != 0) {
+		panic("cannot proceed without locking kernel space!");
+		return NULL;
+	}
+
 	// get the area
 	addr_t areaBase = _AreaBaseAddressForAddress((addr_t)pages);
 
@@ -978,12 +983,7 @@ MemoryManager::_AllocateChunks(size_t chunkSize, uint32 chunkCount,
 		} else
 			break;
 
-		ConditionVariableEntry entry;
-		allocationEntry->condition.Add(&entry);
-
-		mutex_unlock(&sLock);
-		entry.Wait();
-		mutex_lock(&sLock);
+		allocationEntry->condition.Wait(&sLock);
 
 		if (_GetChunks(metaChunkList, chunkSize, chunkCount, _metaChunk,
 				_chunk)) {

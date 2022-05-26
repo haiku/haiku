@@ -42,7 +42,7 @@ Log to console	PoorMan		Выводить лог в консоль
 Advanced	PoorMan		Дополнительно
 Copy	PoorMan		Копировать
 Logging	PoorMan		Логирование
-PoorMan	System name		Веб-сервер
+PoorMan	System name		PoorMan
 Clear console log	PoorMan		Очистить лог консоли
 Run server	PoorMan		Запустить сервер
 Create	PoorMan		Создать

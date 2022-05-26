@@ -89,6 +89,7 @@ MediaConverterApp::MessageReceived(BMessage *msg)
 
 		default:
 			BApplication::MessageReceived(msg);
+			break;
 	}
 }
 

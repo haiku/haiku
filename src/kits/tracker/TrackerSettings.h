@@ -94,6 +94,8 @@ public:
 	void SetHideDotFiles(bool hide);
 	bool TypeAheadFiltering();
 	void SetTypeAheadFiltering(bool enabled);
+	bool GenerateImageThumbnails();
+	void SetGenerateImageThumbnails(bool enabled);
 
 	bool ShowSelectionWhenInactive();
 	void SetShowSelectionWhenInactive(bool);

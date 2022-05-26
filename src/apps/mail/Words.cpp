@@ -525,9 +525,9 @@ suffix_word(char* dst, const char* src, char flag)
 
 	end = stpcpy(dst, src);
 	flag = toupper(flag);
-	switch(flag) {
+	switch (flag) {
 		case 'V':
-			switch(end[-1]) {
+			switch (end[-1]) {
 				case 'e':
 					end = stpcpy(end - 1, "ive");
 					break;
@@ -537,7 +537,7 @@ suffix_word(char* dst, const char* src, char flag)
 			}
 			break;
 		case 'N':
-			switch(end[-1]) {
+			switch (end[-1]) {
 				case 'e':
 					end = stpcpy(end - 1, "ion");
 					break;
@@ -550,7 +550,7 @@ suffix_word(char* dst, const char* src, char flag)
 			}
 			break;
 		case 'X':
-			switch(end[-1]) {
+			switch (end[-1]) {
 				case 'e':
 					end = stpcpy(end - 1, "ions");
 					break;
@@ -563,7 +563,7 @@ suffix_word(char* dst, const char* src, char flag)
 			}
 			break;
 		case 'H':
-			switch(end[-1]) {
+			switch (end[-1]) {
 				case 'y':
 					end = stpcpy(end - 1, "ieth");
 					break;
@@ -576,7 +576,7 @@ suffix_word(char* dst, const char* src, char flag)
 			end = stpcpy(end, "ly");
 			break;
 		case 'G':
-			switch(end[-1]) {
+			switch (end[-1]) {
 				case 'e':
 					end = stpcpy(end - 1, "ing");
 					break;
@@ -586,7 +586,7 @@ suffix_word(char* dst, const char* src, char flag)
 			}
 			break;
 		case 'J':
-			switch(end[-1]) {
+			switch (end[-1]) {
 				case 'e':
 					end = stpcpy(end - 1, "ings");
 					break;
@@ -596,7 +596,7 @@ suffix_word(char* dst, const char* src, char flag)
 			}
 			break;
 		case 'D':
-			switch(end[-1]) {
+			switch (end[-1]) {
 				case 'e':
 					end = stpcpy(end - 1, "ed");
 					break;
@@ -612,7 +612,7 @@ suffix_word(char* dst, const char* src, char flag)
 			}
 			break;
 		case 'T':
-			switch(end[-1]) {
+			switch (end[-1]) {
 				case 'e':
 					end = stpcpy(end - 1, "est");
 					break;
@@ -628,7 +628,7 @@ suffix_word(char* dst, const char* src, char flag)
 			}
 			break;
 		case 'R':
-			switch(end[-1]) {
+			switch (end[-1]) {
 				case 'e':
 					end = stpcpy(end - 1, "er");
 					break;
@@ -644,7 +644,7 @@ suffix_word(char* dst, const char* src, char flag)
 			}
 			break;
 		case 'Z':
-			switch(end[-1]) {
+			switch (end[-1]) {
 				case 'e':
 					end = stpcpy(end - 1, "ers");
 					break;
@@ -660,7 +660,7 @@ suffix_word(char* dst, const char* src, char flag)
 			}
 			break;
 		case 'S':
-			switch(end[-1]) {
+			switch (end[-1]) {
 				case 's':
 				case 'x':
 				case 'z':
@@ -679,7 +679,7 @@ suffix_word(char* dst, const char* src, char flag)
 			}
 			break;
 		case 'P':
-			switch(end[-1]) {
+			switch (end[-1]) {
 				case 'y':
 					if (!strchr("aeiou", end[-2])) {
 						end = stpcpy(end - 1, "iness");

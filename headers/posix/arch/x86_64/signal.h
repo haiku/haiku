@@ -2,74 +2,27 @@
  * Copyright 2002-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _ARCH_SIGNAL_H_
-#define _ARCH_SIGNAL_H_
+#ifndef _ARCH_X86_64_SIGNAL_H_
+#define _ARCH_X86_64_SIGNAL_H_
 
 
 /*
  * Architecture-specific structure passed to signal handlers
  */
 
-#if __x86_64__
 
-
-struct fp_stack {
-	unsigned char		st0[10];
-	unsigned char		_reserved_42_47[6];
-	unsigned char		st1[10];
-	unsigned char		_reserved_58_63[6];
-	unsigned char		st2[10];
-	unsigned char		_reserved_74_79[6];
-	unsigned char		st3[10];
-	unsigned char		_reserved_90_95[6];
-	unsigned char		st4[10];
-	unsigned char		_reserved_106_111[6];
-	unsigned char		st5[10];
-	unsigned char		_reserved_122_127[6];
-	unsigned char		st6[10];
-	unsigned char		_reserved_138_143[6];
-	unsigned char		st7[10];
-	unsigned char		_reserved_154_159[6];
+struct x86_64_fp_register {
+	unsigned char value[10];
+	unsigned char reserved[6];
 };
 
-struct mmx_regs {
-	unsigned char		mm0[10];
-	unsigned char		_reserved_42_47[6];
-	unsigned char		mm1[10];
-	unsigned char		_reserved_58_63[6];
-	unsigned char		mm2[10];
-	unsigned char		_reserved_74_79[6];
-	unsigned char		mm3[10];
-	unsigned char		_reserved_90_95[6];
-	unsigned char		mm4[10];
-	unsigned char		_reserved_106_111[6];
-	unsigned char		mm5[10];
-	unsigned char		_reserved_122_127[6];
-	unsigned char		mm6[10];
-	unsigned char		_reserved_138_143[6];
-	unsigned char		mm7[10];
-	unsigned char		_reserved_154_159[6];
+
+struct x86_64_xmm_register {
+	unsigned char value[16];
 };
 
-struct xmm_regs {
-	unsigned char		xmm0[16];
-	unsigned char		xmm1[16];
-	unsigned char		xmm2[16];
-	unsigned char		xmm3[16];
-	unsigned char		xmm4[16];
-	unsigned char		xmm5[16];
-	unsigned char		xmm6[16];
-	unsigned char		xmm7[16];
-	unsigned char		xmm8[16];
-	unsigned char		xmm9[16];
-	unsigned char		xmm10[16];
-	unsigned char		xmm11[16];
-	unsigned char		xmm12[16];
-	unsigned char		xmm13[16];
-	unsigned char		xmm14[16];
-	unsigned char		xmm15[16];
-};
 
+// The layout of this struct matches the one used by the FXSAVE instruction
 struct fpu_state {
 	unsigned short		control;
 	unsigned short		status;
@@ -81,13 +34,14 @@ struct fpu_state {
 	unsigned int		mscsr_mask;
 
 	union {
-		struct fp_stack	fp;
-		struct mmx_regs	mmx;
+		struct x86_64_fp_register fp[8];
+		struct x86_64_fp_register mmx[8];
 	};
 
-	struct xmm_regs		xmm;
+	struct x86_64_xmm_register		xmm[16];
 	unsigned char		_reserved_416_511[96];
 };
+
 
 struct xstate_hdr {
 	unsigned long		bv;
@@ -95,11 +49,20 @@ struct xstate_hdr {
 	unsigned char		_reserved[48];
 };
 
+
+// The layout of this struct matches the one used by the FXSAVE instruction on
+// an AVX CPU
 struct savefpu {
-	struct fpu_state	fp_fxsave;
-	struct xstate_hdr	fp_xstate;
-	unsigned long		fp_ymm[16][2];
+	struct fpu_state			fp_fxsave;
+	struct xstate_hdr			fp_xstate;
+	struct x86_64_xmm_register	fp_ymm[16];
+		// The high half of the YMM registers, to combine with the low half
+		// found in fp_fxsave.xmm
 };
+
+
+#ifdef __x86_64__
+
 
 struct vregs {
 	unsigned long		rax;
@@ -126,6 +89,7 @@ struct vregs {
 };
 
 
-#endif /* __x86_64__ */
+#endif
 
-#endif /* _ARCH_SIGNAL_H_ */
+
+#endif /* _ARCH_X86_64_SIGNAL_H_ */

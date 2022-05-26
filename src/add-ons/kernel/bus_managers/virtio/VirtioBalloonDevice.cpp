@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <ByteOrder.h>
 #include <util/AutoLock.h>
 
 #include "virtio_balloon.h"

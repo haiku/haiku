@@ -342,15 +342,15 @@ TermApp::_Usage(char *name)
 		"\n"
 		"Usage: %s [OPTION] [SHELL]\n"), name);
 
-	fprintf(stderr, B_TRANSLATE(
+	fputs(B_TRANSLATE(
 			"  -h,     --help               print this help\n"
 			//"  -p,     --preference         load preference file\n"
 			"  -t,     --title              set window title\n"
 			"  -f,     --fullscreen         start fullscreen\n"
-			"  -w,     --working-directory  set initial working directory\n")
+			"  -w,     --working-directory  set initial working directory")
 			//"  -geom,  --geometry           set window geometry\n"
 			//"                               An example of geometry is \"80x25+100+100\"\n"
-		);
+		, stderr);
 }
 
 

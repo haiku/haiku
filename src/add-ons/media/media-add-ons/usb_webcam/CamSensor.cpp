@@ -78,9 +78,9 @@ CamSensor::AcceptVideoFrame(uint32 &width, uint32 &height)
 		width = MaxWidth();
 	if (height < 1)
 		height = MaxHeight();
-	if (width > MaxWidth())
+	if (width > (uint32)MaxWidth())
 		width = MaxWidth();
-	if (height > MaxHeight())
+	if (height > (uint32)MaxHeight())
 		height = MaxHeight();
 	return B_OK;
 }
@@ -130,11 +130,11 @@ status_t
 CamSensor::ProbeByIICSignature(const uint8 *regList, const uint8 *matchList,
 	size_t count)
 {
-	for (int i = 0; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		uint8 value = 0;
 		ssize_t len;
 		len = Device()->ReadIIC8(regList[i], &value);
-		PRINT((CH ": ReadIIC8 = %d val = %d" CT, len, value));
+		PRINT((CH ": ReadIIC8 = %" B_PRIdSSIZE " val = %d" CT, len, value));
 		if (len < 1)
 			return ENODEV;
 		if (value != matchList[i])

@@ -74,9 +74,9 @@ _thread_do_exit_work(void)
 
 	tls_set(TLS_ON_EXIT_THREAD_SLOT, NULL);
 
-	__gRuntimeLoader->destroy_thread_tls();
-
 	__pthread_destroy_thread();
+
+	__gRuntimeLoader->destroy_thread_tls();
 }
 
 
@@ -180,6 +180,13 @@ status_t
 wait_for_thread(thread_id thread, status_t *_returnCode)
 {
 	return _kern_wait_for_thread(thread, _returnCode);
+}
+
+
+status_t
+wait_for_thread_etc(thread_id thread, uint32 flags, bigtime_t timeout, status_t *_returnCode)
+{
+	return _kern_wait_for_thread_etc(thread, flags, timeout, _returnCode);
 }
 
 

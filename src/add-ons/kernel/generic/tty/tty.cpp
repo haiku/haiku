@@ -5,11 +5,6 @@
  */
 
 
-// This file could be moved into a generic tty module.
-// The whole hardware signaling stuff is missing, though - it's currently
-// tailored for pseudo-TTYs. Have a look at Be's TTY includes (drivers/tty/*)
-
-
 #include "tty_private.h"
 
 #include <ctype.h>
@@ -101,9 +96,9 @@ public:
 
 protected:
 	void Lock()
-		{ mutex_lock(&fCookie->tty->lock); }
+		{ recursive_lock_lock(fCookie->tty->lock); }
 	void Unlock()
-		{ mutex_unlock(&fCookie->tty->lock); }
+		{ recursive_lock_unlock(fCookie->tty->lock); }
 
 	tty_cookie*	fCookie;
 	size_t		fBytes;
@@ -839,6 +834,13 @@ tty_readable(struct tty* tty)
 }
 
 
+/** \brief Notify anyone waiting on events for this TTY.
+ *
+ * The TTY lock must be held.
+ *
+ * Otherwise, the select_pool may be modified or deleted (which happens automatically when the last
+ * item is removed from it).
+ */
 static void
 tty_notify_select_event(struct tty* tty, uint8 event)
 {
@@ -1267,92 +1269,48 @@ tty_write_to_tty_slave(tty_cookie* sourceCookie, const void* _buffer,
 }
 
 
-#if 0
-static void
-dump_tty_settings(struct tty_settings& settings)
-{
-	kprintf("  pgrp_id:      %ld\n", settings.pgrp_id);
-	kprintf("  session_id:   %ld\n", settings.session_id);
-
-	kprintf("  termios:\n");
-	kprintf("    c_iflag:    0x%08lx\n", settings.termios.c_iflag);
-	kprintf("    c_oflag:    0x%08lx\n", settings.termios.c_oflag);
-	kprintf("    c_cflag:    0x%08lx\n", settings.termios.c_cflag);
-	kprintf("    c_lflag:    0x%08lx\n", settings.termios.c_lflag);
-	kprintf("    c_line:     %d\n", settings.termios.c_line);
-	kprintf("    c_ispeed:   %u\n", settings.termios.c_ispeed);
-	kprintf("    c_ospeed:   %u\n", settings.termios.c_ospeed);
-	for (int i = 0; i < NCCS; i++)
-		kprintf("    c_cc[%02d]:   %d\n", i, settings.termios.c_cc[i]);
-
-	kprintf("  wsize:        %u x %u c, %u x %u pxl\n",
-		settings.window_size.ws_row, settings.window_size.ws_col,
-		settings.window_size.ws_xpixel, settings.window_size.ws_ypixel);
-}
-
-
-static void
-dump_tty_struct(struct tty& tty)
-{
-	kprintf("  tty @:        %p\n", &tty);
-	kprintf("  is_master:    %s\n", tty.is_master ? "true" : "false");
-	kprintf("  open_count:   %ld\n", tty.open_count);
-	kprintf("  select_pool:  %p\n", tty.select_pool);
-	kprintf("  pending_eof:  %lu\n", tty.pending_eof);
-
-	kprintf("  input_buffer:\n");
-	kprintf("    first:      %ld\n", tty.input_buffer.first);
-	kprintf("    in:         %lu\n", tty.input_buffer.in);
-	kprintf("    size:       %lu\n", tty.input_buffer.size);
-	kprintf("    buffer:     %p\n", tty.input_buffer.buffer);
-
-	kprintf("  reader queue:\n");
-	tty.reader_queue.Dump("    ");
-	kprintf("  writer queue:\n");
-	tty.writer_queue.Dump("    ");
-
-	kprintf("  cookies:     ");
-	TTYCookieList::Iterator it = tty.cookies.GetIterator();
-	while (tty_cookie* cookie = it.Next())
-		kprintf(" %p", cookie);
-	kprintf("\n");
-}
-#endif
-
-
 // #pragma mark - public API
 
 
 struct tty*
-tty_create(tty_service_func func, bool isMaster)
+tty_create(tty_service_func func, struct tty* master)
 {
 	struct tty* tty = new(std::nothrow) (struct tty);
 	if (tty == NULL)
 		return NULL;
 
-	mutex_init(&tty->lock, "tty lock");
+	if (master == NULL) {
+		tty->is_master = true;
+		tty->lock = new(std::nothrow) recursive_lock;
+		if (tty->lock == NULL) {
+			delete tty;
+			return NULL;
+		}
+		recursive_lock_init(tty->lock, "tty lock");
+	} else {
+		tty->is_master = false;
+		tty->lock = master->lock;
+	}
 
 	tty->ref_count = 0;
 	tty->open_count = 0;
 	tty->opened_count = 0;
 	tty->select_pool = NULL;
-	tty->is_master = isMaster;
 	tty->pending_eof = 0;
 	tty->hardware_bits = 0;
 
 	reset_tty_settings(tty->settings);
 
 	if (init_line_buffer(tty->input_buffer, TTY_BUFFER_SIZE) < B_OK) {
+		if (tty->is_master) {
+			recursive_lock_destroy(tty->lock);
+			delete tty->lock;
+		}
 		delete tty;
 		return NULL;
 	}
 
 	tty->service_func = func;
-
-	// construct the queues
-	new(&tty->reader_queue) RequestQueue;
-	new(&tty->writer_queue) RequestQueue;
-	new(&tty->cookies) TTYCookieList;
 
 	return tty;
 }
@@ -1361,12 +1319,13 @@ tty_create(tty_service_func func, bool isMaster)
 void
 tty_destroy(struct tty* tty)
 {
-	// destroy the queues
-	tty->reader_queue.~RequestQueue();
-	tty->writer_queue.~RequestQueue();
-	tty->cookies.~TTYCookieList();
-
+	TRACE(("tty_destroy(%p)\n", tty));
 	uninit_line_buffer(tty->input_buffer);
+	delete_select_sync_pool(tty->select_pool);
+	if (tty->is_master) {
+		recursive_lock_destroy(tty->lock);
+		delete tty->lock;
+	}
 
 	delete tty;
 }
@@ -1392,7 +1351,7 @@ tty_create_cookie(struct tty* tty, struct tty* otherTTY, uint32 openMode)
 	cookie->closed = false;
 
 
-	MutexLocker locker(cookie->tty->lock);
+	RecursiveLocker locker(cookie->tty->lock);
 
 	// add to the TTY's cookie list
 	tty->cookies.Add(cookie);
@@ -1435,7 +1394,7 @@ tty_close_cookie(tty_cookie* cookie)
 	// critical code
 	if (unblock) {
 		TRACE(("tty_close_cookie(): cookie %p, there're still pending "
-			"operations, acquire blocking sem %ld\n", cookie,
+			"operations, acquire blocking sem %" B_PRId32 "\n", cookie,
 			cookie->blocking_semaphore));
 
 		acquire_sem(cookie->blocking_semaphore);
@@ -1444,7 +1403,7 @@ tty_close_cookie(tty_cookie* cookie)
 	// For the removal of the cookie acquire the TTY's lock. This ensures, that
 	// cookies will not be removed from a TTY (or added -- cf. add_tty_cookie())
 	// as long as the TTY's lock is being held.
-	MutexLocker ttyLocker(cookie->tty->lock);
+	RecursiveLocker ttyLocker(cookie->tty->lock);
 
 	// remove the cookie from the TTY's cookie list
 	cookie->tty->cookies.Remove(cookie);
@@ -1493,20 +1452,18 @@ tty_close_cookie(tty_cookie* cookie)
 		}
 
 		requestLocker.Unlock();
+
+		// notify a select write event on the other tty, if we've closed this tty
+		if (cookie->other_tty->open_count > 0)
+			tty_notify_select_event(cookie->other_tty, B_SELECT_WRITE);
 	}
-
-	// notify pending select()s and cleanup the select sync pool
-
-	// notify a select write event on the other tty, if we've closed this tty
-	if (cookie->tty->open_count == 0 && cookie->other_tty->open_count > 0)
-		tty_notify_select_event(cookie->other_tty, B_SELECT_WRITE);
 }
 
 
 void
 tty_destroy_cookie(tty_cookie* cookie)
 {
-	MutexLocker locker(cookie->tty->lock);
+	RecursiveLocker locker(cookie->tty->lock);
 	cookie->tty->ref_count--;
 	locker.Unlock();
 
@@ -1530,7 +1487,8 @@ tty_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 	bigtime_t interCharTimeout = 0;
 	size_t bytesNeeded = 1;
 
-	TRACE(("tty_input_read(tty = %p, length = %lu, mode = %lu)\n", tty, length, mode));
+	TRACE(("tty_input_read(tty = %p, length = %lu, mode = %" B_PRIu32 ")\n",
+		tty, length, mode));
 
 	if (length == 0)
 		return B_OK;
@@ -1549,8 +1507,8 @@ tty_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 			// Non-blocking mode. Handle VMIN and VTIME.
 			bytesNeeded = tty->settings.termios.c_cc[VMIN];
 			bigtime_t vtime = tty->settings.termios.c_cc[VTIME] * 100000;
-			TRACE(("tty_input_read: icanon vmin %lu, vtime %Ldus\n", bytesNeeded,
-				vtime));
+			TRACE(("tty_input_read: icanon vmin %lu, vtime %" B_PRIdBIGTIME
+				"us\n", bytesNeeded, vtime));
 
 			if (bytesNeeded == 0) {
 				// In this case VTIME specifies a relative total timeout. We
@@ -1573,8 +1531,8 @@ tty_read(tty_cookie* cookie, void* _buffer, size_t* _length)
 	*_length = 0;
 
 	do {
-		TRACE(("tty_input_read: AcquireReader(%Ldus, %ld)\n", timeout,
-			bytesNeeded));
+		TRACE(("tty_input_read: AcquireReader(%" B_PRIdBIGTIME "us, %ld)\n",
+			timeout, bytesNeeded));
 		status = locker.AcquireReader(timeout, bytesNeeded);
 		size_t toRead = locker.AvailableBytes();
 		if (status != B_OK && toRead == 0) {
@@ -1646,8 +1604,9 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 	if (!ttyReference.IsLocked())
 		return B_FILE_ERROR;
 
-	TRACE(("tty_ioctl: tty %p, op %lu, buffer %p, length %lu\n", tty, op, buffer, length));
-	MutexLocker locker(tty->lock);
+	TRACE(("tty_ioctl: tty %p, op %" B_PRIu32 ", buffer %p, length %"
+		B_PRIuSIZE "\n", tty, op, buffer, length));
+	RecursiveLocker locker(tty->lock);
 
 	switch (op) {
 		// blocking/non-blocking mode
@@ -1670,9 +1629,10 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 		case TCSETAW:
 		case TCSETAF:
 		{
-			TRACE(("tty: set attributes (iflag = %lx, oflag = %lx, "
-				"cflag = %lx, lflag = %lx)\n", tty->settings.termios.c_iflag,
-				tty->settings.termios.c_oflag, tty->settings.termios.c_cflag,
+			TRACE(("tty: set attributes (iflag = %" B_PRIx32 ", oflag = %"
+				B_PRIx32 ", cflag = %" B_PRIx32 ", lflag = %" B_PRIx32 ")\n",
+				tty->settings.termios.c_iflag, tty->settings.termios.c_oflag,
+				tty->settings.termios.c_cflag,
 				tty->settings.termios.c_lflag));
 
 			status_t status = user_memcpy(&tty->settings.termios, buffer,
@@ -1688,7 +1648,7 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 		// get and set window size
 
 		case TIOCGWINSZ:
-			TRACE(("tty: set window size\n"));
+			TRACE(("tty: get window size\n"));
 			return user_memcpy(buffer, &tty->settings.window_size,
 				sizeof(struct winsize));
 
@@ -1834,7 +1794,7 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 		}
 	}
 
-	TRACE(("tty: unsupported opcode %lu\n", op));
+	TRACE(("tty: unsupported opcode %" B_PRIu32 "\n", op));
 	return B_BAD_VALUE;
 }
 
@@ -1844,8 +1804,8 @@ tty_select(tty_cookie* cookie, uint8 event, uint32 ref, selectsync* sync)
 {
 	struct tty* tty = cookie->tty;
 
-	TRACE(("tty_select(cookie = %p, event = %u, ref = %lu, sync = %p)\n",
-		cookie, event, ref, sync));
+	TRACE(("tty_select(cookie = %p, event = %u, ref = %" B_PRIu32 ", sync = "
+		"%p)\n", cookie, event, ref, sync));
 
 	// we don't support all kinds of events
 	if (event < B_SELECT_READ || event > B_SELECT_ERROR)
@@ -1862,7 +1822,7 @@ tty_select(tty_cookie* cookie, uint8 event, uint32 ref, selectsync* sync)
 
 	// lock the TTY (allows us to freely access the cookie lists of this and
 	// the other TTY)
-	MutexLocker ttyLocker(tty->lock);
+	RecursiveLocker ttyLocker(tty->lock);
 
 	// get the other TTY -- needed for `write' events
 	struct tty* otherTTY = cookie->other_tty;
@@ -1872,8 +1832,8 @@ tty_select(tty_cookie* cookie, uint8 event, uint32 ref, selectsync* sync)
 	// add the event to the TTY's pool
 	status_t error = add_select_sync_pool_entry(&tty->select_pool, sync, event);
 	if (error != B_OK) {
-		TRACE(("tty_select() done: add_select_sync_pool_entry() failed: %lx\n",
-			error));
+		TRACE(("tty_select() done: add_select_sync_pool_entry() failed: %"
+			B_PRIx32 "\n", error));
 
 		return error;
 	}
@@ -1935,7 +1895,7 @@ tty_deselect(tty_cookie* cookie, uint8 event, selectsync* sync)
 		return B_BAD_VALUE;
 
 	// lock the TTY (guards the select sync pool, among other things)
-	MutexLocker ttyLocker(tty->lock);
+	RecursiveLocker ttyLocker(tty->lock);
 
 	return remove_select_sync_pool_entry(&tty->select_pool, sync, event);
 }

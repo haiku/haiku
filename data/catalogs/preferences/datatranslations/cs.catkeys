@@ -1,0 +1,17 @@
+1	czech	x-vnd.Haiku-DataTranslations	4156631142
+Path:	DataTranslations		Cesta:
+Name:	DataTranslations		Jméno:
+DataTranslations - Note	DataTranslations		Překladače dat - Poznámka
+The item '%name' does not appear to be a Translator and will not be installed.	DataTranslations		Položka '%name' jako Překladač nevypadá, a nebude nainstalována.
+Could not install %s:\n%s	DataTranslations		Nepodařilo se nainstalovat %s:\n%s
+OK	DataTranslations		OK
+Cancel	DataTranslations		Zrušit
+Info:	DataTranslations		Informace:
+DataTranslations - Error	DataTranslations		Překladače dat - Chyba
+Use this control panel to set default values for translators, to be used when no other settings are specified by an application.	DataTranslations		Tento ovládací panel použijte na nastavení výchozích hodnot překladačů, které se použijí, pokud aplikace nemá žádná vlastní nastavení.
+The new translator has been installed successfully.	DataTranslations		Nový překladač byl úspěšně nainstalován.
+An item named '%name' already exists in the Translators folder! Shall the existing translator be overwritten?	DataTranslations		V adresáři Překladačů již položka se jménem '%name' existuje! Přepsat existující Překladač?
+DataTranslations	System name		Překladače dat
+Info	DataTranslations		informace
+Overwrite	DataTranslations		Přepsat
+Version:	DataTranslations		Verze:

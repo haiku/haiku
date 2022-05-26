@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.mmu_man.filepanel	1802971238
+1	portuguese	x-vnd.mmu_man.filepanel	1996091223
 display a load/save file panel\n	FilePanelApp		mostrar um painel de carregar/guardar ficheiro\n
 short\tlong\tdescription\n	FilePanelApp		curto\tlongo\tdescrição\n
 %s not a valid option\n	FilePanelApp		%s não é uma opção válida\n
@@ -8,13 +8,10 @@ short\tlong\tdescription\n	FilePanelApp		curto\tlongo\tdescrição\n
 -l\t--load\tuse a load FilePanel (default)\n	FilePanelApp		-l\t--load\tutilizar um FilePanel de carregamento (predefinição)\n
 -n\t--name\tset the default name for saving\n	FilePanelApp		-n\t--name\tdefinir o nome predefinido para guardar\n
 -k\t--kind\tkind of entries that can be opened (flavour): any combination of f, d, s (file (default), directory, symlink)\n	FilePanelApp		-k\t--kind\ttipo de entradas que podem ser abertas: qualquer combinação de f, d, s (ficheiro (por omissão), pasta, ligação simbólica)\n
-%s: UNIMPLEMENTED\n	FilePanelApp		%s: NÃO IMPLEMENTADO\n
+usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]	FilePanelApp		uso: %s [-h]     [-d pasta]              [-l|-s]     [-t ttl]      [-1]       [-m]
+usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal]\n	FilePanelApp		uso: %s [--help] [--directory pasta] [--load|--save] [--title ttl] [--single] [--modal]\n
 -t\t--title\tset the FilePanel window title\n	FilePanelApp		-t\t--title\tdefinir o título da janela do FilePanel\n
--f\t--forbid\tunimplemented\n	FilePanelApp		-f\t--forbid\tnão implementado\n
-usage: %s [-h]     [-d folder]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a pattern]      [-f pattern]\n	FilePanelApp		usage: %s [-h]     [-d pasta]              [-l|-s]     [-t ttl]      [-1]       [-m]      [-a padrão]      [-f padrão]\n
 -1\t--single\tallow only 1 file to be selected\n	FilePanelApp		-1\t--single\tpermitir a seleção apenas de 1 único ficheiro\n
--a\t--allow\tunimplemented\n	FilePanelApp		-a\t--allow\tnão implementado\n
 -m\t--modal\tmakes the FilePanel modal\n	FilePanelApp		-m\t--modal\ttorna o FilePanel modal\n
 options:\n	FilePanelApp		opções:\n
 -d\t--directory\topen at <folder>\n	FilePanelApp		-d\t--directory\tabrir em <pasta>\n
-usage: %s [--help] [--directory folder] [--load|--save] [--title ttl] [--single] [--modal] [--allow pattern] [--forbid pattern]\n	FilePanelApp		utilização: %s [--help] [--directory pasta] [--load|--save] [--title ttl] [--single] [--modal] [--allow padrão] [--forbid padrão]\n

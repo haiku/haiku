@@ -1,6 +1,7 @@
-1	turkish	x-vnd.Haiku-CodyCam	2593355250
+1	turkish	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		hedef dizin bekleniyordu
 reply: '%s'\n	SftpClient		yanıtla: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PAROLA <gizlenmiş>  (gönderilen gerçek parola)
 JPEG image	CodyCam		JPEG görseli
 Remote host has closed the connection.\n	FtpClient		Uzaktaki makine bağlantıyı kapattı.\n
 image file format expected	CodyCam		görsel dosya biçimi bekleniydu
@@ -43,7 +44,6 @@ Locking the window	VideoConsumer.cpp		Pencere kilitleniyor
 Cannot find an available video stream	CodyCam		Uygun bir video akışı bulunamıyor
 Upload…	VideoConsumer.cpp		Yükle…
 password expected	CodyCam		parola bekleniyordu
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed>  (gerçek parola gönderildi)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Çıktı
 server address expected	CodyCam		sunucu adresi bekleniyordu
@@ -60,7 +60,7 @@ Start video	CodyCam		Videoyu başlat
 Connected…	VideoConsumer.cpp		Bağlandı…
 upload client name expected	CodyCam		yüklenecek istemci adı bekleniyordu
 Every 15 seconds	CodyCam		Her 15 saniyede bir
-Error getting initial latency for the capture node	CodyCam		Yakalama ucu için ilk gecikme alınırken hata
+Error getting initial latency for the capture node	CodyCam		Yakalama düğümü için ilk gecikme alınırken hata
 password	CodyCam		parola
 Local	CodyCam		Yerel
 Stop video	CodyCam		Videoyu durdur

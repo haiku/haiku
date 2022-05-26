@@ -81,6 +81,9 @@ periph_register_device(periph_device_cookie periph_device,
 	device->next_tag_action = 0;
 	device->preferred_ccb_size = preferredCcbSize;
 	device->rw10_enabled = true;
+	device->unmap_command = TRIM_NONE;
+	device->max_unmap_lba_count = 0;
+	device->max_unmap_descriptor_count = 0;
 
 	// launch sync daemon
 	status_t status = register_kernel_daemon(periph_sync_queue_daemon, device,

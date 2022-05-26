@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <AppDefs.h>
 #include <NodeMonitor.h>
 
 #include <legacy/cache.h>

@@ -472,7 +472,7 @@ QueryHandle::ReadDir(dirent* entry, int32 count, int32* countRead)
 	}
 	while (fCurrentQuery) {
 		int32 readEntries = fCurrentQuery->GetNextDirents(entry,
-			sizeof(struct dirent) + B_FILE_NAME_LENGTH, 1);
+			offsetof(struct dirent, d_name) + B_FILE_NAME_LENGTH, 1);
 		if (readEntries < 0)
 			return readEntries;
 		if (readEntries > 0) {

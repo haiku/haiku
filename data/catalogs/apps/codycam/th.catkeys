@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-CodyCam	2593355250
+1	thai	x-vnd.Haiku-CodyCam	40716723
 destination directory expected	CodyCam		คาดว่าจะมีไดเรกทอรีปลายทาง
 reply: '%s'\n	SftpClient		ตอบ: '%s'\n
 JPEG image	CodyCam		ภาพ JPEG
@@ -43,7 +43,6 @@ Locking the window	VideoConsumer.cpp		เปิดหน้าต่างค้
 Cannot find an available video stream	CodyCam		ไม่สามารถหาวิดีโอที่ถ่ายทอดได้
 Upload…	VideoConsumer.cpp		อัพโหลด
 password expected	CodyCam		รหัส
-PASS <suppressed>  (real password sent)\n	FtpClient		รหัส <suppressed> (ส่งรหัสที่แท้จริง)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		แสดงผล
 server address expected	CodyCam		ที่อยู่เซิฟเวอร์

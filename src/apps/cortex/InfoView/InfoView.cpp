@@ -36,6 +36,10 @@
 
 #include "array_delete.h"
 
+// Locale Kit
+#undef B_CATALOG
+#define B_CATALOG (&sCatalog)
+#include <Catalog.h>
 // Interface Kit
 #include <Bitmap.h>
 #include <Region.h>
@@ -48,6 +52,9 @@
 // Support Kit
 #include <List.h>
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "InfoView"
+
 __USE_CORTEX_NAMESPACE
 
 #include <Debug.h>
@@ -55,6 +62,8 @@ __USE_CORTEX_NAMESPACE
 #define D_HOOK(X) //PRINT (x)			// BView impl.
 #define D_ACCESS(X) //PRINT (x)			// Accessors
 #define D_METHOD(x) //PRINT (x)
+
+static BCatalog sCatalog("x-vnd.Cortex.InfoView");
 
 // -------------------------------------------------------- //
 // *** internal class: _InfoTextField
@@ -175,10 +184,10 @@ void InfoView::AttachedToWindow() {
 	D_HOOK(("InfoView::AttachedToWindow()\n"));
 
 	// adjust the windows title
-	BString title = m_title;
-	title << " info";
+	BString title = B_TRANSLATE("%title% info");
+	title.ReplaceFirst("%title%", m_title);
 	Window()->SetTitle(title.String());
-	
+
 	// calculate the area occupied by title, subtitle and icon
 	font_height fh;
 	be_bold_font->GetHeight(&fh);

@@ -116,15 +116,33 @@ const struct supported_device {
 	{0x0d04, 0x0d26, INTEL_MODEL_HASM, "Haswell Mobile"},
 	{0x0a04, 0x0a16, INTEL_MODEL_HASM, "Haswell Mobile"},
 
+#if 0
 	// XXX: 0x0f00 only confirmed on 0x0f30, 0x0f31
-	{0x0f00, 0x0155, INTEL_MODEL_VLV, "ValleyView Desktop"},
 	{0x0f00, 0x0f30, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0f31, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0f32, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0f33, INTEL_MODEL_VLVM, "ValleyView Mobile"},
-	{0x0f00, 0x0157, INTEL_MODEL_VLVM, "ValleyView Mobile"},
+#endif
 
-	{0x1604, 0x1616, INTEL_MODEL_BDWM, "HD Graphics 5500 (Broadwell GT2)"},
+	// XXX: 0x1604 only confirmed on 0x1616
+	{0x1604, 0x1606, INTEL_MODEL_BDWM, "Broadwell GT1 ULT"},
+	{0x1604, 0x160b, INTEL_MODEL_BDWM, "Broadwell GT1 Iris"},
+	{0x1604, 0x160e, INTEL_MODEL_BDWM, "Broadwell GT1 ULX"},
+	{0x1604, 0x1602, INTEL_MODEL_BDWM, "Broadwell GT1 ULT"},
+	{0x1604, 0x160a, INTEL_MODEL_BDWS, "Broadwell GT1 Server"},
+	{0x1604, 0x160d, INTEL_MODEL_BDW,  "Broadwell GT1 Workstation"},
+	{0x1604, 0x1616, INTEL_MODEL_BDWM, "Broadwell GT2 ULT"},
+	{0x1604, 0x161b, INTEL_MODEL_BDWM, "Broadwell GT2 ULT"},
+	{0x1604, 0x161e, INTEL_MODEL_BDWM, "Broadwell GT2 ULX"},
+	{0x1604, 0x1612, INTEL_MODEL_BDWM, "Broadwell GT2 Halo"},
+	{0x1604, 0x161a, INTEL_MODEL_BDWS, "Broadwell GT2 Server"},
+	{0x1604, 0x161d, INTEL_MODEL_BDW,  "Broadwell GT2 Workstation"},
+	{0x1604, 0x1626, INTEL_MODEL_BDWM, "Broadwell GT3 ULT"},
+	{0x1604, 0x162b, INTEL_MODEL_BDWM, "Broadwell GT3 Iris"},
+	{0x1604, 0x162e, INTEL_MODEL_BDWM, "Broadwell GT3 ULX"},
+	{0x1604, 0x1622, INTEL_MODEL_BDWM, "Broadwell GT3 ULT"},
+	{0x1604, 0x162a, INTEL_MODEL_BDWS, "Broadwell GT3 Server"},
+	{0x1604, 0x162d, INTEL_MODEL_BDW,  "Broadwell GT3 Workstation"},
 
 	// XXX: 0x1904 only confirmed on 0x1916
 	{0x1904, 0x1902, INTEL_MODEL_SKY,  "Skylake GT1"},
@@ -132,7 +150,7 @@ const struct supported_device {
 	{0x1904, 0x190a, INTEL_MODEL_SKYS, "Skylake GT1"},
 	{0x1904, 0x190b, INTEL_MODEL_SKY,  "Skylake GT1"},
 	{0x1904, 0x190e, INTEL_MODEL_SKYM, "Skylake GT1"},
-	{0x1904, 0x1912, INTEL_MODEL_SKY,  "Skylake GT2"},
+	{0x191f, 0x1912, INTEL_MODEL_SKY,  "Skylake GT2"}, // confirmed
 	{0x1904, 0x1916, INTEL_MODEL_SKYM, "Skylake GT2"},
 	{0x1904, 0x191a, INTEL_MODEL_SKYS, "Skylake GT2"},
 	{0x1904, 0x191b, INTEL_MODEL_SKY,  "Skylake GT2"},
@@ -142,6 +160,59 @@ const struct supported_device {
 	{0x1904, 0x1926, INTEL_MODEL_SKYM, "Skylake GT3"},
 	{0x1904, 0x192a, INTEL_MODEL_SKYS, "Skylake GT3"},
 	{0x1904, 0x192b, INTEL_MODEL_SKY,  "Skylake GT3"},
+
+	{0x5904, 0x5906, INTEL_MODEL_KBY,  "Kabylake ULT GT1"},
+	{0x590f, 0x5902, INTEL_MODEL_KBY,  "Kabylake DT GT1"},
+	{0x5904, 0x5916, INTEL_MODEL_KBYM, "Kabylake ULT GT2"},
+	{0x590c, 0x5916, INTEL_MODEL_KBYM, "Kabylake ULT GT2"},
+	{0x5904, 0x5921, INTEL_MODEL_KBYM, "Kabylake ULT GT2F"},
+	{0x590c, 0x591c, INTEL_MODEL_KBY,  "Kabylake ULX GT2"},
+	{0x590c, 0x591e, INTEL_MODEL_KBY,  "Kabylake ULX GT2"},
+	{0x591f, 0x5912, INTEL_MODEL_KBY,  "Kabylake DT GT2"},
+	{0x5914, 0x5917, INTEL_MODEL_KBYM, "Kabylake Mobile GT2"},
+	{0x5910, 0x591b, INTEL_MODEL_KBYM, "Kabylake Halo GT2"},
+	{0x5918, 0x591d, INTEL_MODEL_KBY,  "Kabylake WKS GT2"},
+	{0x5904, 0x5926, INTEL_MODEL_KBY,  "Kabylake ULT GT3"},
+	{0x5904, 0x5927, INTEL_MODEL_KBY,  "Kabylake ULT GT3"},
+
+	{0x3e0f, 0x3e90, INTEL_MODEL_CFL,  "CoffeeLake GT1"},
+	{0x3e0f, 0x3e93, INTEL_MODEL_CFL,  "CoffeeLake GT1"},
+	{0x3e1f, 0x3e91, INTEL_MODEL_CFL,  "CoffeeLake GT2"},
+	{0x3ec2, 0x3e92, INTEL_MODEL_CFL,  "CoffeeLake GT2"},
+	{0x3e18, 0x3e96, INTEL_MODEL_CFL,  "CoffeeLake GT2"},
+	{0x3e30, 0x3e98, INTEL_MODEL_CFL,  "CoffeeLake GT2"},
+	{0x3e31, 0x3e9a, INTEL_MODEL_CFL,  "CoffeeLake GT2"},
+	{0x3ec4, 0x3e9b, INTEL_MODEL_CFLM, "CoffeeLake Halo GT2"},
+	{0x3e10, 0x3eab, INTEL_MODEL_CFLM, "CoffeeLake Halo GT2"},
+	{0x3ec4, 0x3eab, INTEL_MODEL_CFLM, "CoffeeLake Halo GT2"},
+	{0x3ed0, 0x3ea5, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
+	{0x3ed0, 0x3ea6, INTEL_MODEL_CFL,  "CoffeeLake GT3"},
+
+	{0x9b64, 0x9ba4, INTEL_MODEL_CML,	"CometLake GT1"},
+	{0x9b73, 0x9ba8, INTEL_MODEL_CML,	"CometLake GT1"},
+	{0x9b71, 0x9b21, INTEL_MODEL_CMLM,	"CometLake U GT1"},
+	{0x9b71, 0x9baa, INTEL_MODEL_CMLM,	"CometLake U GT1"},
+	{0x9b54, 0x9bc4, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b43, 0x9bc5, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b53, 0x9bc5, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b33, 0x9bc6, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b53, 0x9bc8, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b63, 0x9bc8, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b53, 0x9be6, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b44, 0x9bf6, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b54, 0x9bf6, INTEL_MODEL_CML,	"CometLake GT2"},
+	{0x9b61, 0x9b41, INTEL_MODEL_CMLM,	"CometLake U GT2"},
+	{0x9b51, 0x9bca, INTEL_MODEL_CMLM,	"CometLake U GT2"},
+	{0x9b61, 0x9bca, INTEL_MODEL_CMLM,	"CometLake U GT2"},
+	{0x9b51, 0x9bcc, INTEL_MODEL_CMLM,	"CometLake U GT2"},
+
+	{0x4e22, 0x4e55, INTEL_MODEL_JSL, "JasperLake"},
+	{0x4e24, 0x4e55, INTEL_MODEL_JSL, "JasperLake"},
+	{0x4e12, 0x4e61, INTEL_MODEL_JSL, "JasperLake"},
+	{0x4e26, 0x4e71, INTEL_MODEL_JSLM, "JasperLake"},
+	{0x4e28, 0x4e71, INTEL_MODEL_JSLM, "JasperLake"},
+
+	{0x9a14, 0x9a49, INTEL_MODEL_TGLM, "TigerLake-LP GT2"},
 };
 
 struct intel_info {
@@ -193,7 +264,7 @@ static uint16
 gtt_memory_config(intel_info &info)
 {
 	uint8 controlRegister = INTEL_GRAPHICS_MEMORY_CONTROL;
-	if (info.type->InGroup(INTEL_GROUP_SNB))
+	if (info.type->Generation() >= 6)
 		controlRegister = SNB_GRAPHICS_MEMORY_CONTROL;
 
 	return get_pci_config(info.bridge, controlRegister, 2);
@@ -223,7 +294,9 @@ determine_gtt_stolen(intel_info &info)
 				memorySize *= 8;
 				break;
 		}
-	} else if (info.type->InGroup(INTEL_GROUP_SNB)) {
+	} else if (info.type->InGroup(INTEL_GROUP_SNB)
+		|| info.type->InGroup(INTEL_GROUP_IVB)
+		|| info.type->InGroup(INTEL_GROUP_HAS)) {
 		switch (memoryConfig & SNB_STOLEN_MEMORY_MASK) {
 			case SNB_STOLEN_MEMORY_32MB:
 				memorySize *= 32;
@@ -274,10 +347,120 @@ determine_gtt_stolen(intel_info &info)
 				memorySize *= 512;
 				break;
 		}
+	} else if (info.type->InGroup(INTEL_GROUP_BDW)
+		|| info.type->InFamily(INTEL_FAMILY_LAKE)) {
+		switch (memoryConfig & BDW_STOLEN_MEMORY_MASK) {
+			case BDW_STOLEN_MEMORY_32MB:
+				memorySize *= 32;
+				break;
+			case BDW_STOLEN_MEMORY_64MB:
+				memorySize *= 64;
+				break;
+			case BDW_STOLEN_MEMORY_96MB:
+				memorySize *= 96;
+				break;
+			case BDW_STOLEN_MEMORY_128MB:
+				memorySize *= 128;
+				break;
+			case BDW_STOLEN_MEMORY_160MB:
+				memorySize *= 160;
+				break;
+			case BDW_STOLEN_MEMORY_192MB:
+				memorySize *= 192;
+				break;
+			case BDW_STOLEN_MEMORY_224MB:
+				memorySize *= 224;
+				break;
+			case BDW_STOLEN_MEMORY_256MB:
+				memorySize *= 256;
+				break;
+			case BDW_STOLEN_MEMORY_288MB:
+				memorySize *= 288;
+				break;
+			case BDW_STOLEN_MEMORY_320MB:
+				memorySize *= 320;
+				break;
+			case BDW_STOLEN_MEMORY_352MB:
+				memorySize *= 352;
+				break;
+			case BDW_STOLEN_MEMORY_384MB:
+				memorySize *= 384;
+				break;
+			case BDW_STOLEN_MEMORY_416MB:
+				memorySize *= 416;
+				break;
+			case BDW_STOLEN_MEMORY_448MB:
+				memorySize *= 448;
+				break;
+			case BDW_STOLEN_MEMORY_480MB:
+				memorySize *= 480;
+				break;
+			case BDW_STOLEN_MEMORY_512MB:
+				memorySize *= 512;
+				break;
+			case BDW_STOLEN_MEMORY_1024MB:
+				memorySize *= 1024;
+				break;
+			case BDW_STOLEN_MEMORY_1536MB:
+				memorySize *= 1536;
+				break;
+		}
+		if(info.type->InGroup(INTEL_GROUP_BDW)) {
+			if((memoryConfig & BDW_STOLEN_MEMORY_MASK) == BDW_STOLEN_MEMORY_2016MB) {
+				memorySize *= 2016;
+			}
+		} else if(info.type->InFamily(INTEL_FAMILY_LAKE)) {
+			switch(memoryConfig & BDW_STOLEN_MEMORY_MASK) {
+				case SKL_STOLEN_MEMORY_4MB:
+					memorySize *= 4;
+					break;
+				case SKL_STOLEN_MEMORY_8MB:
+					memorySize *= 8;
+					break;
+				case SKL_STOLEN_MEMORY_12MB:
+					memorySize *= 12;
+					break;
+				case SKL_STOLEN_MEMORY_16MB:
+					memorySize *= 16;
+					break;
+				case SKL_STOLEN_MEMORY_20MB:
+					memorySize *= 20;
+					break;
+				case SKL_STOLEN_MEMORY_24MB:
+					memorySize *= 24;
+					break;
+				case SKL_STOLEN_MEMORY_28MB:
+					memorySize *= 28;
+					break;
+				case SKL_STOLEN_MEMORY_32MB:
+					memorySize *= 32;
+					break;
+				case SKL_STOLEN_MEMORY_36MB:
+					memorySize *= 36;
+					break;
+				case SKL_STOLEN_MEMORY_40MB:
+					memorySize *= 40;
+					break;
+				case SKL_STOLEN_MEMORY_44MB:
+					memorySize *= 44;
+					break;
+				case SKL_STOLEN_MEMORY_48MB:
+					memorySize *= 48;
+					break;
+				case SKL_STOLEN_MEMORY_52MB:
+					memorySize *= 52;
+					break;
+				case SKL_STOLEN_MEMORY_56MB:
+					memorySize *= 56;
+					break;
+				case SKL_STOLEN_MEMORY_60MB:
+					memorySize *= 60;
+					break;
+			}
+		}
 	} else if (info.type->InGroup(INTEL_GROUP_85x)
 		|| info.type->InFamily(INTEL_FAMILY_9xx)
-		|| info.type->InFamily(INTEL_FAMILY_SER5)
-		|| info.type->InFamily(INTEL_FAMILY_SOC0)) {
+		|| info.type->InGroup(INTEL_GROUP_ILK)) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i855_STOLEN_MEMORY_4M:
 				memorySize *= 4;
@@ -372,7 +555,9 @@ determine_gtt_size(intel_info &info)
 				gttSize = 4 << 20;
 				break;
 		}
-	} else if (info.type->InGroup(INTEL_GROUP_SNB)) {
+	} else if (info.type->InGroup(INTEL_GROUP_SNB)
+			|| info.type->InGroup(INTEL_GROUP_IVB)
+			|| info.type->InGroup(INTEL_GROUP_HAS)) {
 		switch (memoryConfig & SNB_GTT_SIZE_MASK) {
 			case SNB_GTT_SIZE_NONE:
 				gttSize = 0;
@@ -382,6 +567,22 @@ determine_gtt_size(intel_info &info)
 				break;
 			case SNB_GTT_SIZE_2MB:
 				gttSize = 2 << 20;
+				break;
+		}
+	} else if (info.type->InGroup(INTEL_GROUP_BDW)
+			|| info.type->InFamily(INTEL_FAMILY_LAKE)) {
+		switch (memoryConfig & BDW_GTT_SIZE_MASK) {
+			case BDW_GTT_SIZE_NONE:
+				gttSize = 0;
+				break;
+			case BDW_GTT_SIZE_2MB:
+				gttSize = 2 << 20;
+				break;
+			case BDW_GTT_SIZE_4MB:
+				gttSize = 4 << 20;
+				break;
+			case BDW_GTT_SIZE_8MB:
+				gttSize = 8 << 20;
 				break;
 		}
 	} else {
@@ -452,11 +653,16 @@ intel_map(intel_info &info)
 		fbIndex = 2;
 	}
 
+	phys_addr_t addr = info.display.u.h0.base_registers[mmioIndex];
+	uint64 barSize = info.display.u.h0.base_register_sizes[mmioIndex];
+	if ((info.display.u.h0.base_register_flags[mmioIndex] & PCI_address_type) == PCI_address_type_64) {
+		addr |= (uint64)info.display.u.h0.base_registers[mmioIndex + 1] << 32;
+		barSize |= (uint64)info.display.u.h0.base_register_sizes[mmioIndex + 1] << 32;
+	}
+
 	AreaKeeper mmioMapper;
-	info.registers_area = mmioMapper.Map("intel GMCH mmio",
-		info.display.u.h0.base_registers[mmioIndex],
-		info.display.u.h0.base_register_sizes[mmioIndex], B_ANY_KERNEL_ADDRESS,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.registers);
+	info.registers_area = mmioMapper.Map("intel GMCH mmio", addr, barSize,
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.registers);
 
 	if (mmioMapper.InitCheck() < B_OK) {
 		ERROR("could not map memory I/O!\n");
@@ -497,8 +703,7 @@ intel_map(intel_info &info)
 		info.gtt_physical_base = get_pci_config(info.display, i915_GTT_BASE, 4);
 	} else {
 		// 945+?
-		info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
-			+ (2UL << 20);
+		info.gtt_physical_base = addr + (2UL << 20);
 	}
 
 	size_t gttSize = determine_gtt_size(info);
@@ -521,7 +726,13 @@ intel_map(intel_info &info)
 
 	info.aperture_physical_base = info.display.u.h0.base_registers[fbIndex];
 	info.aperture_stolen_size = stolenSize;
-	if (info.aperture_size == 0)
+	if ((info.display.u.h0.base_register_flags[fbIndex] & PCI_address_type) == PCI_address_type_64) {
+		info.aperture_physical_base |= (uint64)info.display.u.h0.base_registers[fbIndex + 1] << 32;
+		if (info.aperture_size == 0) {
+			info.aperture_size = info.display.u.h0.base_register_sizes[fbIndex]
+				|= (uint64)info.display.u.h0.base_register_sizes[fbIndex + 1] << 32;
+		}
+	} else if (info.aperture_size == 0)
 		info.aperture_size = info.display.u.h0.base_register_sizes[fbIndex];
 
 	ERROR("detected %ld MB of stolen memory, aperture size %ld MB, "

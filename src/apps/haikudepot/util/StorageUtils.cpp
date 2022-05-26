@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -41,8 +41,8 @@ StorageUtils::SetWorkingFilesUnavailable()
  * string provided.
  */
 
-status_t
-StorageUtils::AppendToString(BPath& path, BString& result)
+/*static*/ status_t
+StorageUtils::AppendToString(const BPath& path, BString& result)
 {
 	BFile file(path.Path(), O_RDONLY);
 	uint8_t buffer[FILE_TO_STRING_BUFFER_LEN];
@@ -52,6 +52,46 @@ StorageUtils::AppendToString(BPath& path, BString& result)
 		result.Append((char *) buffer, buffer_read);
 
 	return (status_t) buffer_read;
+}
+
+
+/*static*/ status_t
+StorageUtils::AppendToFile(const BString& input, const BPath& path)
+{
+	BFile file(path.Path(), O_WRONLY | O_CREAT | O_APPEND);
+	const char* cstr = input.String();
+	size_t cstrLen = strlen(cstr);
+	return file.WriteExactly(cstr, cstrLen);
+}
+
+
+/*static*/ status_t
+StorageUtils::RemoveWorkingDirectoryContents()
+{
+	BPath path;
+	status_t result = B_OK;
+
+	if (result == B_OK)
+		result = find_directory(B_USER_CACHE_DIRECTORY, &path);
+	if (result == B_OK)
+		result = path.Append(CACHE_DIRECTORY_APP);
+
+	bool exists;
+	bool isDirectory;
+
+	if (result == B_OK)
+		result = ExistsObject(path, &exists, &isDirectory, NULL);
+
+	if (result == B_OK && exists && !isDirectory) {
+		HDERROR("the working directory at [%s] is not a directory",
+			path.Path());
+		result = B_ERROR;
+	}
+
+	if (result == B_OK && exists)
+		result = RemoveDirectoryContents(path);
+
+	return result;
 }
 
 
@@ -85,9 +125,10 @@ StorageUtils::RemoveDirectoryContents(BPath& path)
 			if (isDirectory)
 				RemoveDirectoryContents(directoryEntryPath);
 
-			if (remove(directoryEntryPath.Path()) == 0)
-				HDDEBUG("did delete [%s]", directoryEntryPath.Path());
-			else {
+			if (remove(directoryEntryPath.Path()) == 0) {
+				HDDEBUG("did delete contents under [%s]",
+					directoryEntryPath.Path());
+			} else {
 				HDERROR("unable to delete [%s]", directoryEntryPath.Path());
 				result = B_ERROR;
 			}

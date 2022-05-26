@@ -34,6 +34,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			port.c
 			scheduler.c
 			sem.c
+			stack_protector.cpp
 			system_info.cpp
 			system_revision.c
 			team.c

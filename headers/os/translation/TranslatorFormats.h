@@ -48,6 +48,7 @@ enum {
 	B_TGA_FORMAT			= 'TGA ',
 	B_BMP_FORMAT			= 'BMP ',
 	B_TIFF_FORMAT			= 'TIFF',
+	B_WEBP_FORMAT			= 'WebP',
 
 	// Picture formats
 	B_DXF_FORMAT			= 'DXF ',

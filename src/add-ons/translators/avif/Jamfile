@@ -1,0 +1,38 @@
+SubDir HAIKU_TOP src add-ons translators avif ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
+
+AddResources AVIFTranslator : AVIFTranslator.rdef ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		UseBuildFeatureHeaders libavif ;
+
+		Translator [ MultiArchDefaultGristFiles AVIFTranslator ] :
+
+			main.cpp
+
+			AVIFTranslator.cpp
+			ConfigView.cpp
+
+			:
+			be translation [ MultiArchDefaultGristFiles libtranslatorsutils.a ]
+			[ BuildFeatureAttribute libavif : library ]
+			[ TargetLibsupc++ ]	localestub
+			: true
+		;
+
+		Includes [ FGristFiles ConfigView.cpp AVIFTranslator.cpp ]
+			: [ BuildFeatureAttribute libavif : headers ] ;
+	}
+}
+
+DoCatalogs AVIFTranslator :
+	x-vnd.Haiku-AVIFTranslator
+	:
+	main.cpp
+	ConfigView.cpp
+	AVIFTranslator.cpp
+;
+

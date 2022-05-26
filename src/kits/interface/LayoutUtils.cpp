@@ -12,8 +12,8 @@
 #include <LayoutUtils.h>
 
 #include <algorithm>
-#include <typeinfo>
 
+#include <ClassInfo.h>
 #include <Layout.h>
 #include <View.h>
 
@@ -280,7 +280,7 @@ BLayoutUtils::GetLayoutTreeDump(BLayoutItem* item)
 BLayoutUtils::_GetLayoutTreeDump(BView* view, int level, BString& _output)
 {
 	BString indent;
-	indent.SetTo(' ', level * 2);
+	indent.SetTo(' ', level * 4);
 
 	if (view == NULL) {
 		_output << indent << "<null view>\n";
@@ -289,15 +289,15 @@ BLayoutUtils::_GetLayoutTreeDump(BView* view, int level, BString& _output)
 
 	BRect frame = view->Frame();
 	BSize min = view->MinSize();
-	BSize max = view->MinSize();
+	BSize max = view->MaxSize();
 	BSize preferred = view->PreferredSize();
 	_output << BString().SetToFormat(
-		"%sview %p (%s):\n"
+		"%sview %p (%s %s):\n"
 		"%s  frame: (%f, %f, %f, %f)\n"
 		"%s  min:   (%f, %f)\n"
 		"%s  max:   (%f, %f)\n"
 		"%s  pref:  (%f, %f)\n",
-		indent.String(), view, typeid(*view).name(),
+		indent.String(), view, class_name(view), view->Name(),
 		indent.String(), frame.left, frame.top, frame.right, frame.bottom,
 		indent.String(), min.width, min.height,
 		indent.String(), max.width, max.height,
@@ -310,7 +310,7 @@ BLayoutUtils::_GetLayoutTreeDump(BView* view, int level, BString& _output)
 
 	int32 count = view->CountChildren();
 	for (int32 i = 0; i < count; i++) {
-		_output << indent << "  ---\n";
+		_output << indent << "    ---\n";
 		_GetLayoutTreeDump(view->ChildAt(i), level + 1, _output);
 	}
 }
@@ -326,7 +326,7 @@ BLayoutUtils::_GetLayoutTreeDump(BLayoutItem* item, int level,
 	}
 
 	BString indent;
-	indent.SetTo(' ', level * 2);
+	indent.SetTo(' ', level * 4);
 
 	if (item == NULL) {
 		_output << indent << "<null item>\n";
@@ -336,14 +336,14 @@ BLayoutUtils::_GetLayoutTreeDump(BLayoutItem* item, int level,
 	BLayout* layout = dynamic_cast<BLayout*>(item);
 	BRect frame = item->Frame();
 	BSize min = item->MinSize();
-	BSize max = item->MinSize();
+	BSize max = item->MaxSize();
 	BSize preferred = item->PreferredSize();
 	if (isViewLayout) {
 		_output << indent << BString().SetToFormat("  [layout %p (%s)]\n",
-			layout, typeid(*layout).name());
+			layout, class_name(layout));
 	} else {
 		_output << indent << BString().SetToFormat("item %p (%s):\n",
-			item, typeid(*item).name());
+			item, class_name(item));
 	}
 	_output << BString().SetToFormat(
 		"%s  frame: (%f, %f, %f, %f)\n"
@@ -360,7 +360,7 @@ BLayoutUtils::_GetLayoutTreeDump(BLayoutItem* item, int level,
 
 	int32 count = layout->CountItems();
 	for (int32 i = 0; i < count; i++) {
-		_output << indent << "  ---\n";
+		_output << indent << "    ---\n";
 		_GetLayoutTreeDump(layout->ItemAt(i), level + 1, false, _output);
 	}
 }

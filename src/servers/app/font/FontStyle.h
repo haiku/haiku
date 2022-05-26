@@ -16,11 +16,11 @@
 #include <ObjectList.h>
 #include <Path.h>
 #include <Rect.h>
+#include <Referenceable.h>
 #include <String.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include "ReferenceCounting.h"
 
 
 struct node_ref;
@@ -35,7 +35,7 @@ class ServerFont;
 	FontStyle objects help abstract a lot of the font engine details while
 	still offering plenty of information the style in question.
 */
-class FontStyle : public ReferenceCounting {
+class FontStyle : public BReferenceable {
 	public:
 						FontStyle(node_ref& nodeRef, const char* path,
 							FT_Face face);

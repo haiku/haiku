@@ -7,6 +7,7 @@
 #define GLOBALDATA_H
 
 #include <stdio.h>
+#include <string.h>
 #include <sys/ioctl.h>
 #include "DriverInterface.h"
 #include "mga_globals.h"

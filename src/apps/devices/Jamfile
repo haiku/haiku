@@ -20,7 +20,7 @@ rule ISAPnPHeaderGen
 actions ISAPnPHeaderGen1
 {
 	grep '^PNP[[:xdigit:]][[:xdigit:]][[:xdigit:]][[:xdigit:]] '  $(2[1]) \
-| gawk -f $(2[2]) > $(1) ;
+| awk -f $(2[2]) > $(1) ;
 }
 
 ISAPnPHeaderGen [ FGristFiles isapnpids.h ] : isapnp_devids.txt : devlist2h.awk ;
@@ -37,7 +37,7 @@ rule PCIHeaderGen
 
 actions PCIHeaderGen1
 {
-	gawk -v HEADERFILE=$(1) -f $(2[2]) $(2[1])
+	awk -v HEADERFILE=$(1) -f $(2[2]) $(2[1])
 }
 
 local pciidsFile = pci.ids ;
@@ -57,7 +57,7 @@ rule USBHeaderGen
 
 actions USBHeaderGen1
 {
-	gawk -v HEADERFILE=$(1) -f $(2[2]) $(2[1])
+	awk -v HEADERFILE=$(1) -f $(2[2]) $(2[1])
 }
 
 local usbidsFile = usb.ids ;

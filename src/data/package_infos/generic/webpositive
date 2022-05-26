@@ -13,6 +13,7 @@ licenses		"MIT"
 
 provides {
 	webpositive%HAIKU_SECONDARY_PACKAGING_ARCH_SUFFIX% = %HAIKU_VERSION%
+	app:webpositive = %HAIKU_VERSION%
 }
 
 requires {

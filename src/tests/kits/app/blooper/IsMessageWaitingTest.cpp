@@ -107,7 +107,7 @@ void TIsMessageWaitingTest::IsMessageWaiting4()
 	@case		looper is locked, message is posted, queue is empty
 	@results	IsMessageWaiting() returns true.
 	@note		The first assert always worked under R5 but only sometimes for
-				OBOS.  Answer: the OBOS implementation of BLooper was attempting
+				Haiku.  Answer: the Haiku implementation of BLooper was attempting
 				to lock itself prior to fetching the message from the queue.  I
 				moved the lock attempt after the fetch and it worked the same.
 				I realized that if the system was loaded heavily enough, the
@@ -120,7 +120,7 @@ void TIsMessageWaitingTest::IsMessageWaiting4()
 				if the system is loaded *lightly* enough, the message will not
 				only get fetched, but popped off the queue as well.  Since R5
 				returns the bogus true, the second assert works even when the
-				message has been de-queued.  OBOS, of course, will (correctly)
+				message has been de-queued.  Haiku, of course, will (correctly)
 				fail the assert in that situation.  Unfortunately, that renders
 				this test completely unreliable.  It is pulled until a fully
 				reliable test can be devised.

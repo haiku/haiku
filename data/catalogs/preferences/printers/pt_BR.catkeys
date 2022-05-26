@@ -1,4 +1,5 @@
-1	portuguese (brazil)	x-vnd.Be-PRNT	2786813915
+1	portuguese (brazil)	x-vnd.Be-PRNT	1465107170
+Test page	TestPageView		Página de teste
 Remove	PrintersWindow		Remover
 Red	TestPageView		Vermelho
 Default Printer	PrinterListView		Impressora padrão
@@ -7,13 +8,16 @@ Connected to:	AddPrinterDialog		Conectado a:
 Make default	PrintersWindow		Tornar padrão
 Cyan	TestPageView		Ciano
 Completed	JobListView		Completos
+Test page	PrintersWindow		Página de teste
 Transport: %transport% %transport_address%	PrinterListView		Transporte: %transport% %transport_address%
 Failed	JobListView		Falhou
 Blue	TestPageView		Azul
 Waiting	JobListView		Aguardando
 Processing	JobListView		Processando
 Cancel	AddPrinterDialog		Cancelar
-Unknown status	JobListView		Status desconhecido
+Unknown status	JobListView		Estado desconhecido
+Print jobs for %printer_name%	PrintersWindow		Trabalhos de impressão para %printer_name%
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? páginas}=1{# página}other{# páginas}}
 Add printer	AddPrinterDialog		Adicionar impressora
 Printers	PrintersWindow		Impressoras
 No printer found!	TransportMenu		Nenhuma impressora encontrada!
@@ -27,7 +31,8 @@ Yellow	TestPageView		Amarelo
 Black	TestPageView		Preto
 Printer type:	AddPrinterDialog		Tipo de impressora:
 Printers	System name		Impressoras
-Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impressora: %printer_name%\nDriver: %driver%\n
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{Sem tarefas pendentes}=1{1 tarefa pendente}other{# tarefas pendentes}}
+Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impressora: %printer_name%\nDriver:  %driver%\n
 Green	TestPageView		Verde
 Print test page	PrintersWindow		Imprimir página de teste
 Restart job	PrintersWindow		Reiniciar tarefa

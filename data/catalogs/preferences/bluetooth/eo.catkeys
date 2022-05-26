@@ -1,55 +1,51 @@
-1	esperanto	x-vnd.Haiku-BluetoothPrefs	4276705900
-Laptop	Settings view		Tekkomputilo
-Only from trusted devices	Settings view		Nur de fideblaj aparatoj
-15 secs	Settings view		15 sekundoj
-Quit	main		Ĉesi
-Manufacturer: 	Device View		Fabrikanto: 
-Desktop	Settings view		Labortabla
-Server	Window		Servilo
-Identify host as:	Settings view		Identigi la gastigon kiel:
-Refresh…	Remote devices		Aktualigi…
-Local devices found on system:	Settings view		Lokaj aparatoj trovitaj en la sistemo:
-Service classes: 	Device View		Servaj klasoj: 
-Remote devices	Window		Foraj aparatoj
-Settings	Window		Agordo
-Stop bluetooth services…	Window		Ĉesigi servilojn de Bludento…
-61 secs	Settings view		61 sekundoj
-Add…	Remote devices		Aldoni…
-As blocked	Remote devices		Kiel barita
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Neniu Bludenta loka aparato estas registrita en la sistemo.
-Policy…	Settings view		Regularo…
-Revert	Window		Malfari
-Refresh local devices…	Window		Aktualigi lokajn aparatojn…
-Disconnect	Remote devices		Malkonekti
-Identify us as…	Settings view		Identigi nin kiel…
+1	esperanto	x-vnd.Haiku-BluetoothPrefs	3945807779
+Start bluetooth services…	Window		Ekruli servilojn de Bludento…
 From all devices	Settings view		De ĉiuj aparatoj
 Defaults	Window		Defaŭltoj
-Start bluetooth services…	Window		Ekruli servilojn de Bludento…
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Certiĝu, ke kapabloj de via fora Bludenta aparato estas ŝaltitaj. Klaku al 'Informmendo' por ekskani. La tempo bezonata por ricevi nomojn ne estas konata, sed tio ne devas daŭri pli ol 3 sekundoj po aparato. Poste vi povos aldoni ilin al via ĉefa listo, kie vi povos pariĝi kun ili.
+Laptop	Settings view		Tekkomputilo
 Scanning progress	Inquiry panel		Skanada progreso
-Bluetooth	System name		Bludento
+Only from trusted devices	Settings view		Nur de fideblaj aparatoj
 Launch now	main		Ekruli nun
+Bluetooth	System name		Bludento
 Remove	Remote devices		Forigi
 Pick device…	Settings view		Elekti aparaton…
 Always ask	Settings view		Ĉiam demandi
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Per asisto de:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nDankon al ĉiuj, kiuj helpis…\n\nSendado/Donacado de aparataron:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nEkonomie:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nPer flikaĵoj:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nPer testado:\n- Petter H. Juliussen\nKiu la tutan scion donis al mi:\n- la yellowTAB teamo
+Quit	main		Ĉesi
+15 secs	Settings view		15 sekundoj
 Help	Window		Helpo
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Per asisto de:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nDankon al ĉiuj, kiuj helpis…\n\nSendado/Donacado de aparataron:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nEkonomie:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nPer flikaĵoj:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nPer testado:\n- Petter H. Juliussen\nKiu la tutan scion donis al mi:\n- la yellowTAB teamo
+Manufacturer: 	Device View		Fabrikanto: 
 Pair…	Remote devices		Pariĝi…
+Desktop	Settings view		Labortabla
+Server	Window		Servilo
 Retrieving name of %1	Inquiry panel		Ricevado de nomo por %1
+Identify host as:	Settings view		Identigi la gastigon kiel:
 Inquiry	Inquiry panel		Informmendo
+Local devices found on system:	Settings view		Lokaj aparatoj trovitaj en la sistemo:
+Service classes: 	Device View		Servaj klasoj: 
 Incoming connections policy:	Settings view		Reĝimo de envenaj konektoj:
+Remote devices	Window		Foraj aparatoj
 Retrieving names…	Inquiry panel		Ricevado de nomoj…
-Show name	Extended local device view		Montri nomon
 Add device to list	Inquiry panel		Aldoni aparaton al listo
+Show name	Extended local device view		Montri nomon
+Settings	Window		Agordo
 Remaining %1 seconds	Inquiry panel		%1 restantaj sekundoj
-The Bluetooth services are not currently running on this system.	main		La Bludentaj serviloj nun ne rulas en ĉi sistemo.
-Discoverable	Extended local device view		Trovebla
+Stop bluetooth services…	Window		Ĉesigi servilojn de Bludento…
+61 secs	Settings view		61 sekundoj
 Authenticate	Extended local device view		Aŭtentigi
-Smart phone	Settings view		Saĝtelefono
+Discoverable	Extended local device view		Trovebla
+The Bluetooth services are not currently running on this system.	main		La Bludentaj serviloj nun ne rulas en ĉi sistemo.
+Add…	Remote devices		Aldoni…
 Scanning completed.	Inquiry panel		La skanado finiĝis.
+Smart phone	Settings view		Saĝtelefono
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Neniu Bludenta loka aparato estas registrita en la sistemo.
 Default inquiry time:	Settings view		Defaŭlta informmenda periodo:
+Revert	Window		Malfari
+Refresh local devices…	Window		Aktualigi lokajn aparatojn…
 Server	Settings view		Servilo
-Handheld	Settings view		Poŝkomputilo
  packets: 	Device View		 paketoj: 
+Handheld	Settings view		Poŝkomputilo
+Disconnect	Remote devices		Malkonekti
 About Bluetooth…	Window		Pri la Bludendo…
 Starting scan…	Inquiry panel		Komencas skanadon…

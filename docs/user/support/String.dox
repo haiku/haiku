@@ -40,7 +40,7 @@
 	strings. For all operations that perform on bytes, there is an equivalent
 	that operates on UTF-8 strings. See for example the BString::CopyInto() and
 	BString::CopyCharsInto() methods. The main difference is that if there are
-	any position argumens, the regular method counts the bytes and the 
+	any position argumens, the regular method counts the bytes and the
 	Chars methods counts characters.
 
 	\since BeOS R5
@@ -92,6 +92,21 @@
 
 	\since BeOS R5
 */
+
+
+#if __cplusplus >= 201103L
+/*!
+	\fn BString::BString(BString&& string)
+	\brief Move the data from the \a string to this object.
+
+	Create a new string object with the data of another \a string. The
+	\a string will no longer point to the same contents.
+
+	\note This constructor is only available for modern C++ (C++11 or later).
+
+	\since Haiku R1
+*/
+#endif
 
 
 /*!
@@ -268,6 +283,22 @@
 
 	\since BeOS R5
 */
+
+
+#if __cplusplus >= 201103L
+/*!
+	\fn BString& BString::operator=(BString&& string)
+	\brief Move the contents of \a string to this BString object.
+
+	The \a string will no longer point to the same contents.
+
+	\note This method is only available for modern C++ (C++11 or later).
+
+	\return This method always returns \c *this.
+
+	\since Haiku R1
+*/
+#endif
 
 
 /*!

@@ -67,6 +67,9 @@ namespace BPrivate {
 #define kAttrMiniIcon						"BEOS:M:STD_ICON"
 #define kAttrIcon							"BEOS:ICON"
 
+#define kAttrThumbnail						"Media:Thumbnail"
+#define kAttrThumbnailCreationTime			"Media:Thumbnail:CreationTime"
+
 #define kAttrDisksFrame						"_trk/d_windframe"
 #define kAttrDisksWorkspace					"_trk/d_windwkspc"
 
@@ -114,6 +117,7 @@ namespace BPrivate {
 #define kAttrExtendedDisksPoseInfo_le		"_trk/xt_d_pinfo_le"
 
 #if B_HOST_IS_LENDIAN
+
 #define kEndianSuffix						"_le"
 #define kForeignEndianSuffix				""
 
@@ -149,6 +153,7 @@ namespace BPrivate {
 #define kAttrExtendedDisksPoseInfoForegin	kAttrExtendedDisksPoseInfo_be
 
 #else
+
 #define kEndianSuffix						""
 #define kForeignEndianSuffix				"_le"
 

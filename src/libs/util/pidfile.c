@@ -10,7 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHORS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -38,6 +38,7 @@ __FBSDID("$FreeBSD: src/lib/libutil/pidfile.c,v 1.3 2006/06/23 01:42:03 brian Ex
 #include <string.h>
 #include <err.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <libutil.h>
 
 static int _pidfile_remove(struct pidfh *pfh, int freeit);
@@ -135,7 +136,7 @@ pidfile_open(const char *path, mode_t mode, pid_t *pidptr)
 		free(pfh);
 		return (NULL);
 	}
-	
+
 	ftruncate(fd, 0);
 
 	/*
@@ -187,7 +188,7 @@ pidfile_write(struct pidfh *pfh)
 		return (-1);
 	}
 
-	snprintf(pidstr, sizeof(pidstr), "%lu", getpid());
+	snprintf(pidstr, sizeof(pidstr), "%" PRIu32, getpid());
 	if (pwrite(fd, pidstr, strlen(pidstr), 0) != (ssize_t)strlen(pidstr)) {
 		error = errno;
 		_pidfile_remove(pfh, 0);

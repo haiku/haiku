@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-DriveSetup	1934767996
+1	esperanto	x-vnd.Haiku-DriveSetup	4048496535
 Could not unmount partition %s.	MainWindow		Ne sukcesis demeti subdiskon %s.
 Mount all	MainWindow		Surmeti ĉiujn
 Disk	MainWindow		Disko
@@ -13,13 +13,12 @@ Removable	PartitionList		Demetebla
 Block size	PartitionList		Bloka grando
 The panel experienced a problem!	MainWindow		La panelo spertis problemon!
 Device	DiskView		Aparato
-Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Ĉu vi certas, ke vi volas strukturi la Intel-an Kromsubdisko? Ĉiuj subdiskoj kiujn ĝi enhavas estos anstataŭigitaj se vi daŭros. Ni ankoraŭ demandos vin antaŭ ŝanĝoj estos konservitaj al la disko.
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Ĉu vi certas, ke vi volas strukturi la Intel-an Kromsubdisko? Ĉiuj subdiskoj, kiujn ĝi enhavas, estos anstataŭigitaj se vi daŭros. Ni ankaŭ demandos vin antaŭ ŝanĝoj estos konservitaj al la disko.
 Unmount	MainWindow		Demeti
 Failed to format the partition %s!\n	MainWindow		Ne sukcesis strukturi la subdiskon %s!\n
 Partition size	CreateParametersPanel		Subdiska grandeco
 Validation of the given parameters failed.	MainWindow		Validigo de la donitaj parametroj malsukcesis.
-The partition %s is currently mounted.	MainWindow		La subdisko %s nuntempe estas surmetita.
-Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ĉu vi certas, ke vi volas strukturi la subdiskon \"%s\"? Ni ankoraŭ demandos vin antaŭ ŝanĝoj estos konservitaj al la disko.
+Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ĉu vi certas, ke vi volas strukturi la subdiskon \"%s\"? Ni ankaŭ demandos vin antaŭ ŝanĝoj estos konservitaj al la disko.
 DriveSetup	System name		Diskagordilo
 Mounted at	PartitionList		Surmetita ĉe
 Create…	MainWindow		Krei…
@@ -47,10 +46,12 @@ End: %s	Support		Fino: %s
 Partition type	PartitionList		Subdiska tipo
 Unable to find the selected partition by ID.	MainWindow		Ne povis trovi la elektitan subdiskon per identigilo.
 The currently selected partition is not empty.	MainWindow		La nuntempe elektita subdisko ne estas malplena.
-Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ĉu vi certas, ke vi volas strukturi krudan diskon? (Kutime homoj pravalorizas la diskon per subdiskan sistemon antaŭe) Ni ankoraŭ demandos vin antaŭ ŝanĝoj estos konservitaj al la disko.
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ĉu vi certas, ke vi volas strukturi krudan diskon? (Kutime homoj pravalorizas la diskon per subdiska sistemo antaŭe) Ni ankaŭ demandos vin antaŭ ŝanĝoj estos konservitaj al la disko.
 Wipe (not implemented)	MainWindow		Viŝi (ne estas realigita)
 The currently selected partition does not have a parent partition.	MainWindow		La nuntempe elektita subdisko ne havas patran subdiskon.
 Validation of the given initialization parameters failed.	MainWindow		Validigo de la donitaj pravalorizadaj parametroj malsukcesis.
+Not formatted (%s)	PartitionList		Ne strukturita (%s)
+Failed to create the partition. No changes have been written to disk.	MainWindow		Malsukcesis krei la subdiskon. Neniu ŝanĝo estas konservita al disko.
 Shared	PartitionList		Komuna
 MIMEs	PartitionList		MIME-oj
 BitLocker encrypted	Encryption utils		Ĉifrita per BitLocker
@@ -63,10 +64,11 @@ Change	ChangeParametersPanel		Ŝanĝi
 Partition name:	ChangeParametersPanel		Subdiska nomo:
 LUKS encrypted	Encryption utils		Ĉifrita per LUKS
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Ĉu vi certas, ke vi volas konservi la ŝanĝojn al disko nun?\n\nĈiu datumo en la subdisko %s estos senespere perdita se vi farus tion!
+Empty space	PartitionList		Malplena spaco
 Cancel	AbstractParametersPanel		Nuligi
 Format	MainWindow		Strukturi
-<empty or unknown>	DiskView		<malplena aŭ nekonata>
 OK	MainWindow		Bone
+Empty space	DiskView		Malplena spaco
 Open with DiskProbe	MainWindow		Uzi per la DiskSondilo
 Could not delete the selected partition.	MainWindow		Ne povis forigi la elektitan subdiskon.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Ĉu vi certas, ke vi volas pravalorizi la elektitan diskon? Ĉiu datumo estos perdita. Vi estos pridemandita aldone antaŭ ŝanĝoj estos konservitaj al la disko.\n
@@ -83,6 +85,7 @@ Rescan	MainWindow		Reskani
 There was an error acquiring the partition row.	MainWindow		Estis eraro kiam akiri la vicon de la subdisko.
 Failed to initialize the disk %s!\n	MainWindow		Ne povis pravalorizi la diskon %s!\n
 Disk system \"%s\" not found!	MainWindow		Diska sistemo \"%s\" ne estis trovita!
+The partition cannot be unmounted.	MainWindow		La subdisko ne povas estis demetita.
 Delete	MainWindow		Forigi
 Partition type:	ChangeParametersPanel		Subdiska tipo:
 Parameters	PartitionList		Parametroj
@@ -91,7 +94,6 @@ Cannot delete the selected partition.	MainWindow		Ne povas forigi la elektitan s
 Continue	MainWindow		Daŭri
 Could not mount partition %s.	MainWindow		Ne povis surmeti subdiskon %s.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Ĉu vi certas, ke vi volas strukturi la subdiskon? Ni ankoraŭ demandos vin antaŭ ŝanĝoj estos konservitaj al la disko. 
-<empty or unknown>	PartitionList		<malplena aŭ nekonata>
 The selected disk is read-only.	MainWindow		La elektita disko estas nurlegebla.
 The partition %s is already unmounted.	MainWindow		La subdisko %s jam estas surmetita.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Ĉu vi certas, ke vi volas ŝanĝi la parametrojn de la elektita subdiskon?\n\nLa subdisko eble ne plu estos konata de aliaj operaciumoj!
@@ -103,7 +105,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Elektu subdiskon el la suba listo.
 Active	PartitionList		Aktiva
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ĉu vi certas, ke vi volas forigi la elektitan subdiskon?\n\nĈiu datumo en la subdisko estos senespere perdita se vi farus tion!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Ne sukcesis strukturi la subdiskon. Ŝanĝoj ne estis konservitaj al la disko.
 The partition %s has been successfully formatted.\n	MainWindow		La subdisko %s estis sukcese strukturita.\n
 The partition %s is already mounted.	MainWindow		La subdisko %s jam estas surmetita.
 Size	PartitionList		Grandeco

@@ -387,10 +387,10 @@ MultipleMouseSettings::Defaults()
 void
 MultipleMouseSettings::Dump()
 {
-	std::map<const char*, mouse_settings>::iterator itr;
-	for (itr = fMultipleMouseSettings.begin();
-		itr != fMultipleMouseSettings.end(); ++itr) {
-		printf("mouse_name:\t%ld\n", itr->first);
+	std::map<BString, MouseSettings*>::iterator itr;
+	for (itr = fMouseSettingsObject.begin();
+		itr != fMouseSettingsObject.end(); ++itr) {
+		printf("mouse_name:\t%s\n", itr->first.String());
 		itr->second->Dump();
 		printf("\n");
 	}
@@ -422,12 +422,12 @@ MultipleMouseSettings::AddMouseSettings(BString mouse_name)
 
 	MouseSettings* settings = new (std::nothrow) MouseSettings();
 
-	if(settings !=NULL) {
+	if(settings != NULL) {
 		fMouseSettingsObject.insert(std::pair<BString, MouseSettings*>
 			(mouse_name, settings));
 		return settings;
 	}
-	return B_OK;
+	return NULL;
 }
 
 
@@ -441,5 +441,4 @@ MultipleMouseSettings::GetMouseSettings(BString mouse_name)
 		return itr->second;
 	return NULL;
  }
-
 

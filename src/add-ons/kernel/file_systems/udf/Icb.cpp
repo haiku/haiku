@@ -30,7 +30,7 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 	if (fAtBeginning) {
 		TRACE(("DirectoryIterator::GetNextEntry: .\n"));
 		sprintf(name, ".");
-		*length = 2;
+		*length = 1;
 		*id = Parent()->Id();
 		fAtBeginning = false;
 	} else {
@@ -58,7 +58,7 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, ino_t *id)
 			if (entry->is_parent()) {
 				TRACE(("DirectoryIterator::GetNextEntry: ..\n"));
 				sprintf(name, "..");
-				*length = 3;
+				*length = 2;
 			} else {
 				UdfString string(entry->id(), entry->id_length());
 				TRACE(("DirectoryIterator::GetNextEntry: UfdString id == `%s', "
@@ -303,7 +303,7 @@ Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 	TRACE(("Icb::Read: pos = %" B_PRIdOFF ", buffer = %p, length = (%p)->%ld\n",
 		pos, buffer, length, (length ? *length : 0)));
 
-	DEBUG_INIT_ETC("Icb", ("pos: %lld, length: %ld", pos, *length));
+	DEBUG_INIT_ETC("Icb", ("pos: %" B_PRIdOFF " , length: %ld", pos, *length));
 
 	if (fFileCache != NULL)
 		return file_cache_read(fFileCache, NULL, pos, buffer, length);

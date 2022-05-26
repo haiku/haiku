@@ -34,7 +34,7 @@ get_family_string(media_format_family family)
 			return "AVR";
 		case B_MISC_FORMAT_FAMILY:
 			return "misc";
-// these are OpenBeOS specific:
+// these are Haiku specific:
 //		case B_OGG_FORMAT_FAMILY:
 //			return "OGG";
 //		case B_META_FORMAT_FAMILY:
@@ -59,7 +59,7 @@ get_mpeg_string(int32 id)
 			return "mpeg 1 audio layer 3 (mp3)";
 		case B_MPEG_1_VIDEO:
 			return "mpeg 1 video";
-// these are OpenBeOS specific:
+// these are Haiku specific:
 /*		case B_MPEG_2_AUDIO_LAYER_1:
 			return "mpeg 2 audio layer 1";
 		case B_MPEG_2_AUDIO_LAYER_2:

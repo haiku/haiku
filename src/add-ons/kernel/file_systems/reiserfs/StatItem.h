@@ -6,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -103,61 +103,61 @@ public:
 	uint16 GetMode() const
 	{
 		return (GetVersion() == STAT_DATA_V2 ? le2h(fCurrentData->sd_mode)
-											 : le2h(fOldData->sd_mode));
+											: le2h(fOldData->sd_mode));
 	}
 
 	uint32 GetNLink() const
 	{
 		return (GetVersion() == STAT_DATA_V2 ? le2h(fCurrentData->sd_nlink)
-											 : le2h(fOldData->sd_nlink));
+											: le2h(fOldData->sd_nlink));
 	}
 
 	uint32 GetUID() const
 	{
 		return (GetVersion() == STAT_DATA_V2 ? le2h(fCurrentData->sd_uid)
-											 : le2h(fOldData->sd_uid));
+											: le2h(fOldData->sd_uid));
 	}
 
 	uint32 GetGID() const
 	{
 		return (GetVersion() == STAT_DATA_V2 ? le2h(fCurrentData->sd_gid)
-											 : le2h(fOldData->sd_gid));
+											: le2h(fOldData->sd_gid));
 	}
 
 	uint64 GetSize() const
 	{
 		return (GetVersion() == STAT_DATA_V2 ? le2h(fCurrentData->sd_size)
-											 : le2h(fOldData->sd_size));
+											: le2h(fOldData->sd_size));
 	}
 
 	uint32 GetATime() const
 	{
 		return (GetVersion() == STAT_DATA_V2 ? le2h(fCurrentData->sd_atime)
-											 : le2h(fOldData->sd_atime));
+											: le2h(fOldData->sd_atime));
 	}
 
 	uint32 GetMTime() const
 	{
 		return (GetVersion() == STAT_DATA_V2 ? le2h(fCurrentData->sd_mtime)
-											 : le2h(fOldData->sd_mtime));
+											: le2h(fOldData->sd_mtime));
 	}
 
 	uint32 GetCTime() const
 	{
 		return (GetVersion() == STAT_DATA_V2 ? le2h(fCurrentData->sd_ctime)
-											 : le2h(fOldData->sd_ctime));
+											: le2h(fOldData->sd_ctime));
 	}
 
 	uint32 GetBlocks() const
 	{
 		return (GetVersion() == STAT_DATA_V2 ? le2h(fCurrentData->sd_blocks)
-											 : le2h(fOldData->u.sd_blocks));
+											: le2h(fOldData->u.sd_blocks));
 	}
 
 	uint32 GetRDev() const
 	{
 		return (GetVersion() == STAT_DATA_V2 ? le2h(fCurrentData->u.sd_rdev)
-											 : le2h(fOldData->u.sd_rdev));
+											: le2h(fOldData->u.sd_rdev));
 	}
 
 	uint32 GetGeneration() const
@@ -176,16 +176,16 @@ public:
 	{
 		PRINT(("StatData:\n"));
 		PRINT(("  mode:       %hx\n", GetMode()));
-		PRINT(("  nlink:      %lu\n", GetNLink()));
-		PRINT(("  uid:        %lx\n", GetUID()));
-		PRINT(("  gid:        %lx\n", GetGID()));
-		PRINT(("  size:       %Lu\n", GetSize()));
-		PRINT(("  atime:      %lu\n", GetATime()));
-		PRINT(("  mtime:      %lu\n", GetMTime()));
-		PRINT(("  ctime:      %lu\n", GetCTime()));
-		PRINT(("  blocks:     %lu\n", GetBlocks()));
-		PRINT(("  rdev:       %lu\n", GetRDev()));
-		PRINT(("  generation: %lu\n", GetGeneration()));
+		PRINT(("  nlink:      %" B_PRIu32 "\n", GetNLink()));
+		PRINT(("  uid:        %" B_PRIx32 "\n", GetUID()));
+		PRINT(("  gid:        %" B_PRIx32 "\n", GetGID()));
+		PRINT(("  size:       %" B_PRIu64 "\n", GetSize()));
+		PRINT(("  atime:      %" B_PRIu32 "\n", GetATime()));
+		PRINT(("  mtime:      %" B_PRIu32 "\n", GetMTime()));
+		PRINT(("  ctime:      %" B_PRIu32 "\n", GetCTime()));
+		PRINT(("  blocks:     %" B_PRIu32 "\n", GetBlocks()));
+		PRINT(("  rdev:       %" B_PRIu32 "\n", GetRDev()));
+		PRINT(("  generation: %" B_PRIu32 "\n", GetGeneration()));
 	}
 
 	StatData &operator=(const StatData &data)

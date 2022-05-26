@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	2424331018
+1	greek, modern (1453-)	x-vnd.haiku-icon_o_matic	1805671130
 None	Icon-O-Matic-Properties		Κανένα
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		Περιστροφή μονοπατιού
 Add empty	Icon-O-Matic-ShapesList		Προσθήκη άδειου
@@ -95,7 +95,7 @@ Nudge Control Points	Icon-O-Matic-NudgePointsCommand		Ειδοποίηση ση�
 Move Styles	Icon-O-Matic-MoveStylesCmd		Μετακίνηση Στυλ
 Don't save	Icon-O-Matic-Menu-Settings		Χωρίς αποθήκευση
 Add shape with path	Icon-O-Matic-Menu-Shape		Προσθήκη σχήματος με μονοπάτι
-Translation X	Icon-O-Matic-PropertyNames		Μετάφραση Χ
+Translation X	Icon-O-Matic-PropertyNames		Μετατόπιση στον άξονα Χ
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		Αλλαγή σημείων ελένχου
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Προσθήκη μεταμορφοτών
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Ιδιότητα BEOS:ICON
@@ -164,6 +164,7 @@ Untitled	Icon-O-Matic-Main		Χωρίς τίτλο
 Max LOD	Icon-O-Matic-PropertyNames		Μέγιστο LOD
 Add Path	Icon-O-Matic-AddPathsCmd		Προσθήκη Μονοπατιού
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Να αποθηκευτούν οι αλλαγές στο εικονίδιο πριν το κλείσιμο;
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		Αδύνατο το άνοιγμα του αρχείου '%s' ως εγγράφου SVG.\n\n
 load error	Icon-O-Matic-SVGImport		σφάλμα φόρτωσης
 Transformation	Icon-O-Matic-TransformersList		Μετασχηματισμός
 Save as…	Icon-O-Matic-Menu-File		Αποθήκευση ως…
@@ -173,7 +174,7 @@ HVIF Source Code	Icon-O-Matic-SavePanel		HVIF Πηγαίος Κώδικας
 Icon-O-Matic	System name		Icon-O-Matic
 <nothing to undo>	Icon-O-Matic-Menu-Edit		<τίποτε προς επαναφορά>
 Add	Icon-O-Matic-StylesList		Προσθήκη
-Translation Y	Icon-O-Matic-PropertyNames		Μετάφραση Υ
+Translation Y	Icon-O-Matic-PropertyNames		Μετατόπιση στον άξονα Υ
 Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Πάγωμα Σχήματος
 Scale	Icon-O-Matic-TransformationBoxStates		Κλίμακα
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Αφαίρεση Σχήματος

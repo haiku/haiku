@@ -29,13 +29,21 @@ extern "C" {
 #endif
 
 struct root_device_softc {
+	enum {
+		BUS_INVALID = 0,
+		BUS_pci,
+		BUS_uhub,
+	} bus;
+
 	struct pci_info	pci_info;
 	bool			is_msi;
 	bool			is_msix;
+
+	struct freebsd_usb_device* usb_dev;
 };
 
 enum {
-	DEVICE_OPEN		= 1 << 0,
+	DEVICE_OPEN			= 1 << 0,
 	DEVICE_CLOSED		= 1 << 1,
 	DEVICE_NON_BLOCK	= 1 << 2,
 	DEVICE_DESC_ALLOCED	= 1 << 3,
@@ -74,7 +82,17 @@ void uninit_hard_clock(void);
 status_t init_callout(void);
 void uninit_callout(void);
 
+status_t init_pci();
+void uninit_pci();
+
+status_t init_usb();
+void uninit_usb();
+
+status_t get_next_usb_device(uint32* cookie, struct freebsd_usb_device* result);
+status_t get_usb_device_attach_arg(struct freebsd_usb_device* device, struct usb_attach_arg* uaa);
+
 device_t find_root_device(int);
+pci_info* get_device_pci_info(device_t dev);
 
 void driver_printf(const char *format, ...)
 	__attribute__ ((format (__printf__, 1, 2)));

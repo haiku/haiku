@@ -97,6 +97,14 @@ get_pixel_size_for(color_space space, size_t *pixelChunk, size_t *rowAlignment,
 	int32 pixPerChunk = 0;
 	switch (space) {
 		// supported
+		case B_RGBA64: case B_RGBA64_BIG:
+			bytesPerPixel = 8;
+			pixPerChunk = 2;
+			break;
+		case B_RGB48: case B_RGB48_BIG:
+			bytesPerPixel = 6;
+			pixPerChunk = 2;
+			break;
 		case B_RGB32: case B_RGBA32:
 		case B_RGB32_BIG: case B_RGBA32_BIG:
 		case B_UVL32: case B_UVLA32:
@@ -217,6 +225,8 @@ bitmaps_support_space(color_space space, uint32 *supportFlags)
 			break;
 
 		// supported, but cannot draw
+		case B_RGBA64: case B_RGBA64_BIG:
+		case B_RGB48: case B_RGB48_BIG:
 		case B_YCbCr422: case B_YCbCr411: case B_YCbCr444: case B_YCbCr420:
 		case B_YUV422: case B_YUV411: case B_YUV444: case B_YUV420:
 		case B_UVL24: case B_UVL32: case B_UVLA32:

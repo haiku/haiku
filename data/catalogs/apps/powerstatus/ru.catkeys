@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PowerStatus	3173765686
+1	russian	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Запустить в окне
 Extended battery info	PowerStatus		Расширенная информация о батарее
 Show status icon	PowerStatus		Показать значок статуса
@@ -30,11 +30,13 @@ Serial number: 	PowerStatus		Серийный номер:
 Battery critical	PowerStatus		Критический заряд батареи
 Capacity: 	PowerStatus		Емкость: 
  mW	PowerStatus		 мВт
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Поддерживаемые аккумуляторы не были найдены. PowerStatus невозможно использовать на этой системе.
 Show percent	PowerStatus		Показать в процентах
 Capacity granularity 1: 	PowerStatus		Детализация ёмкости 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Заряд батареи становится слишком низким, пожалуйста, подключите устройство к сети.
 Design capacity warning: 	PowerStatus		Уровень низкого заряда: 
 Capacity granularity 2: 	PowerStatus		Детализация ёмкости 2: 
+Too bad!	PowerStatus		Очень жаль!
 Technology: 	PowerStatus		Технология: 
  mWh	PowerStatus		 мВтч
 PowerStatus	System name		Электропитание

@@ -10,6 +10,7 @@
 #define SERVER_BITMAP_H
 
 
+#include <AutoDeleter.h>
 #include <GraphicsDefs.h>
 #include <Rect.h>
 #include <OS.h>
@@ -39,9 +40,7 @@ public:
 
 	inline	uint8*			Bits() const
 								{ return fBuffer; }
-	inline	uint32			BitsLength() const
-								{ return (uint32)(fBytesPerRow * fHeight); }
-
+	inline	uint32			BitsLength() const;
 	inline	BRect			Bounds() const
 								{ return BRect(0, 0, fWidth - 1, fHeight - 1); }
 	inline	int32			Width() const
@@ -96,7 +95,8 @@ protected:
 protected:
 			ClientMemory	fClientMemory;
 			AreaMemory*		fMemory;
-			::Overlay*		fOverlay;
+			ObjectDeleter< ::Overlay>
+							fOverlay;
 			uint8*			fBuffer;
 
 			int32			fWidth;
@@ -122,6 +122,14 @@ public:
 
 	virtual					~UtilityBitmap();
 };
+
+
+uint32
+ServerBitmap::BitsLength() const
+{
+	int64 length = fBytesPerRow * fHeight;
+	return (length > 0 && length <= UINT32_MAX) ? (uint32)length : 0;
+}
 
 
 //! (only for server bitmaps)

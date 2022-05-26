@@ -40,10 +40,9 @@ HWInterfaceListener::~HWInterfaceListener()
 // #pragma mark - HWInterface
 
 
-HWInterface::HWInterface(bool doubleBuffered, bool enableUpdateQueue)
+HWInterface::HWInterface()
 	:
 	MultiLocker("hw interface lock"),
-	fCursorAreaBackup(NULL),
 	fFloatingOverlaysLock("floating overlays lock"),
 	fCursor(NULL),
 	fDragBitmap(NULL),
@@ -53,24 +52,16 @@ HWInterface::HWInterface(bool doubleBuffered, bool enableUpdateQueue)
 	fCursorObscured(false),
 	fHardwareCursorEnabled(false),
 	fCursorLocation(0, 0),
-	fDoubleBuffered(doubleBuffered),
 	fVGADevice(-1),
 	fUpdateExecutor(NULL),
 	fListeners(20)
 {
-	SetAsyncDoubleBuffered(doubleBuffered && enableUpdateQueue);
 }
 
 
 HWInterface::~HWInterface()
 {
 	SetAsyncDoubleBuffered(false);
-
-	delete fCursorAreaBackup;
-
-	// The standard cursor doesn't belong us - the drag bitmap might
-	if (fCursor != fCursorAndDragBitmap)
-		delete fCursorAndDragBitmap;
 }
 
 
@@ -132,25 +123,14 @@ HWInterface::SetCursor(ServerCursor* cursor)
 	if (!fFloatingOverlaysLock.Lock())
 		return;
 
-	if (fCursor != cursor) {
+	if (fCursor.Get() != cursor) {
 		BRect oldFrame = _CursorFrame();
 
-		if (fCursorAndDragBitmap == fCursor) {
-			// make sure _AdoptDragBitmap doesn't delete a real cursor
-			fCursorAndDragBitmap = NULL;
-		}
-
-		if (fCursor)
-			fCursor->ReleaseReference();
-
-		fCursor = cursor;
-
-		if (fCursor)
-			fCursor->AcquireReference();
+		fCursor.SetTo(cursor);
 
 		Invalidate(oldFrame);
 
-		_AdoptDragBitmap(fDragBitmap, fDragBitmapOffset);
+		_AdoptDragBitmap();
 		Invalidate(_CursorFrame());
 	}
 	fFloatingOverlaysLock.Unlock();
@@ -163,9 +143,8 @@ HWInterface::Cursor() const
 	if (!fFloatingOverlaysLock.Lock())
 		return ServerCursorReference(NULL);
 
-	ServerCursorReference reference(fCursor);
 	fFloatingOverlaysLock.Unlock();
-	return reference;
+	return fCursor;
 }
 
 
@@ -175,9 +154,8 @@ HWInterface::CursorAndDragBitmap() const
 	if (!fFloatingOverlaysLock.Lock())
 		return ServerCursorReference(NULL);
 
-	ServerCursorReference reference(fCursorAndDragBitmap);
 	fFloatingOverlaysLock.Unlock();
-	return reference;
+	return fCursorAndDragBitmap;
 }
 
 
@@ -255,7 +233,7 @@ HWInterface::MoveCursorTo(float x, float y)
 			// anything if the cursor is hidden
 			// (invalid cursor frame), but explicitly
 			// testing for it here saves us some cycles
-			if (fCursorAreaBackup) {
+			if (fCursorAreaBackup.IsSet()) {
 				// means we have a software cursor which we need to draw
 				_RestoreCursorArea();
 				_DrawCursor(_CursorFrame());
@@ -290,7 +268,9 @@ HWInterface::SetDragBitmap(const ServerBitmap* bitmap,
 	const BPoint& offsetFromCursor)
 {
 	if (fFloatingOverlaysLock.Lock()) {
-		_AdoptDragBitmap(bitmap, offsetFromCursor);
+		fDragBitmap.SetTo((ServerBitmap*)bitmap, false);
+		fDragBitmapOffset = offsetFromCursor;
+		_AdoptDragBitmap();
 		fFloatingOverlaysLock.Unlock();
 	}
 }
@@ -312,31 +292,23 @@ void
 HWInterface::SetAsyncDoubleBuffered(bool doubleBuffered)
 {
 	if (doubleBuffered) {
-		if (fUpdateExecutor != NULL)
+		if (fUpdateExecutor.IsSet())
 			return;
-		fUpdateExecutor = new (nothrow) UpdateQueue(this);
-		AddListener(fUpdateExecutor);
+		fUpdateExecutor.SetTo(new (nothrow) UpdateQueue(this));
+		AddListener(fUpdateExecutor.Get());
 	} else {
-		if (fUpdateExecutor == NULL)
+		if (!fUpdateExecutor.IsSet())
 			return;
-		RemoveListener(fUpdateExecutor);
-		delete fUpdateExecutor;
-		fUpdateExecutor = NULL;
+		RemoveListener(fUpdateExecutor.Get());
+		fUpdateExecutor.Unset();
 	}
-}
-
-
-bool
-HWInterface::IsDoubleBuffered() const
-{
-	return fDoubleBuffered;
 }
 
 
 /*! The object needs to be already locked!
 */
 status_t
-HWInterface::InvalidateRegion(BRegion& region)
+HWInterface::InvalidateRegion(const BRegion& region)
 {
 	int32 count = region.CountRects();
 	for (int32 i = 0; i < count; i++) {
@@ -499,7 +471,7 @@ HWInterface::HideFloatingOverlays(const BRect& area)
 		return false;
 	if (!fFloatingOverlaysLock.Lock())
 		return false;
-	if (fCursorAreaBackup && !fCursorAreaBackup->cursor_hidden) {
+	if (fCursorAreaBackup.IsSet() && !fCursorAreaBackup->cursor_hidden) {
 		BRect backupArea(fCursorAreaBackup->left, fCursorAreaBackup->top,
 			fCursorAreaBackup->right, fCursorAreaBackup->bottom);
 		if (area.Intersects(backupArea)) {
@@ -529,7 +501,7 @@ HWInterface::HideFloatingOverlays()
 void
 HWInterface::ShowFloatingOverlays()
 {
-	if (fCursorAreaBackup && fCursorAreaBackup->cursor_hidden)
+	if (fCursorAreaBackup.IsSet() && fCursorAreaBackup->cursor_hidden)
 		_DrawCursor(_CursorFrame());
 
 	fFloatingOverlaysLock.Unlock();
@@ -607,7 +579,7 @@ HWInterface::_DrawCursor(IntRect area) const
 
 		uint8* dst = buffer;
 
-		if (fCursorAreaBackup && fCursorAreaBackup->buffer
+		if (fCursorAreaBackup.IsSet() && fCursorAreaBackup->buffer
 			&& fFloatingOverlaysLock.Lock()) {
 			fCursorAreaBackup->cursor_hidden = false;
 			// remember which area the backup contains
@@ -704,7 +676,7 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR, int32 x, int32 y,
 				// copy
 				for (; y <= bottom; y++) {
 					// bytes is guaranteed to be multiple of 4
-					gfxcpy32(dst, src, bytes);
+					memcpy(dst, src, bytes);
 					dst += dstBPR;
 					src += srcBPR;
 				}
@@ -904,7 +876,7 @@ HWInterface::_CursorFrame() const
 void
 HWInterface::_RestoreCursorArea() const
 {
-	if (fCursorAreaBackup && !fCursorAreaBackup->cursor_hidden) {
+	if (fCursorAreaBackup.IsSet() && !fCursorAreaBackup->cursor_hidden) {
 		_CopyToFront(fCursorAreaBackup->buffer, fCursorAreaBackup->bpr,
 			fCursorAreaBackup->left, fCursorAreaBackup->top,
 			fCursorAreaBackup->right, fCursorAreaBackup->bottom);
@@ -915,11 +887,11 @@ HWInterface::_RestoreCursorArea() const
 
 
 void
-HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
+HWInterface::_AdoptDragBitmap()
 {
 	// TODO: support other colorspaces/convert bitmap
-	if (bitmap && !(bitmap->ColorSpace() == B_RGB32
-		|| bitmap->ColorSpace() == B_RGBA32)) {
+	if (fDragBitmap && !(fDragBitmap->ColorSpace() == B_RGB32
+		|| fDragBitmap->ColorSpace() == B_RGBA32)) {
 		fprintf(stderr, "HWInterface::_AdoptDragBitmap() - bitmap has yet "
 			"unsupported colorspace\n");
 		return;
@@ -928,17 +900,12 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 	_RestoreCursorArea();
 	BRect oldCursorFrame = _CursorFrame();
 
-	if (fCursorAndDragBitmap && fCursorAndDragBitmap != fCursor) {
-		delete fCursorAndDragBitmap;
-		fCursorAndDragBitmap = NULL;
-	}
-
-	if (bitmap != NULL && bitmap->Bounds().Width() > 0 && bitmap->Bounds().Height() > 0) {
-		BRect bitmapFrame = bitmap->Bounds();
+	if (fDragBitmap != NULL && fDragBitmap->Bounds().Width() > 0 && fDragBitmap->Bounds().Height() > 0) {
+		BRect bitmapFrame = fDragBitmap->Bounds();
 		if (fCursor) {
 			// put bitmap frame and cursor frame into the same
 			// coordinate space (the cursor location is the origin)
-			bitmapFrame.OffsetTo(BPoint(-offset.x, -offset.y));
+			bitmapFrame.OffsetTo(BPoint(-fDragBitmapOffset.x, -fDragBitmapOffset.y));
 
 			BRect cursorFrame(fCursor->Bounds());
 			BPoint hotspot(fCursor->GetHotSpot());
@@ -955,14 +922,13 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 			cursorFrame.OffsetBy(shift);
 			bitmapFrame.OffsetBy(shift);
 
-			fCursorAndDragBitmap = new(std::nothrow) ServerCursor(combindedBounds,
-				bitmap->ColorSpace(), 0, shift);
+			fCursorAndDragBitmap.SetTo(new(std::nothrow) ServerCursor(combindedBounds,
+				fDragBitmap->ColorSpace(), 0, shift), true);
 
 			uint8* dst = fCursorAndDragBitmap ? (uint8*)fCursorAndDragBitmap->Bits() : NULL;
 			if (dst == NULL) {
 				// Oops, we could not allocate memory for the drag bitmap.
 				// Let's show the cursor only.
-				delete fCursorAndDragBitmap;
 				fCursorAndDragBitmap = fCursor;
 			} else {
 				// clear the combined buffer
@@ -971,8 +937,8 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 				memset(dst, 0, fCursorAndDragBitmap->BitsLength());
 
 				// put drag bitmap into combined buffer
-				uint8* src = (uint8*)bitmap->Bits();
-				uint32 srcBPR = bitmap->BytesPerRow();
+				uint8* src = (uint8*)fDragBitmap->Bits();
+				uint32 srcBPR = fDragBitmap->BytesPerRow();
 
 				dst += (int32)bitmapFrame.top * dstBPR
 					+ (int32)bitmapFrame.left * 4;
@@ -1055,10 +1021,10 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 				}
 			}
 		} else {
-			fCursorAndDragBitmap = new ServerCursor(bitmap->Bits(),
+			fCursorAndDragBitmap.SetTo(new ServerCursor(fDragBitmap->Bits(),
 				bitmapFrame.IntegerWidth() + 1, bitmapFrame.IntegerHeight() + 1,
-				bitmap->ColorSpace());
-			fCursorAndDragBitmap->SetHotSpot(BPoint(-offset.x, -offset.y));
+				fDragBitmap->ColorSpace()), true);
+			fCursorAndDragBitmap->SetHotSpot(BPoint(-fDragBitmapOffset.x, -fDragBitmapOffset.y));
 		}
 	} else {
 		fCursorAndDragBitmap = fCursor;
@@ -1066,31 +1032,17 @@ HWInterface::_AdoptDragBitmap(const ServerBitmap* bitmap, const BPoint& offset)
 
 	Invalidate(oldCursorFrame);
 
-// NOTE: the EventDispatcher does the reference counting stuff for us
-// TODO: You can not simply call Release() on a ServerBitmap like you
-// can for a ServerCursor... it could be changed, but there are linking
-// troubles with the test environment that need to be solved than.
-//	if (fDragBitmap)
-//		fDragBitmap->Release();
-	fDragBitmap = bitmap;
-	fDragBitmapOffset = offset;
-//	if (fDragBitmap)
-//		fDragBitmap->Acquire();
-
-	delete fCursorAreaBackup;
-	fCursorAreaBackup = NULL;
+	fCursorAreaBackup.Unset();
 
 	if (!fCursorAndDragBitmap)
 		return;
 
 	if (fCursorAndDragBitmap && !IsDoubleBuffered()) {
 		BRect cursorBounds = fCursorAndDragBitmap->Bounds();
-		fCursorAreaBackup = new buffer_clip(cursorBounds.IntegerWidth() + 1,
-			cursorBounds.IntegerHeight() + 1);
-		if (fCursorAreaBackup->buffer == NULL) {
-			delete fCursorAreaBackup;
-			fCursorAreaBackup = NULL;
-		}
+		fCursorAreaBackup.SetTo(new buffer_clip(cursorBounds.IntegerWidth() + 1,
+			cursorBounds.IntegerHeight() + 1));
+		if (fCursorAreaBackup->buffer == NULL)
+			fCursorAreaBackup.Unset();
 	}
  	_DrawCursor(_CursorFrame());
 }

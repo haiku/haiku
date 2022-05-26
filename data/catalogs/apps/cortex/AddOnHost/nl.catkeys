@@ -1,0 +1,5 @@
+1	dutch; flemish	application/x-vnd.Cortex.AddOnHost	1256552338
+Continue	CortexAddOnHost		Doorgaan
+Cortex AddOnHost	CortexAddOnHost		Cortex AddOnHost
+Quit	CortexAddOnHost		Afsluiten
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Deze toepassing draait in de achtergrond en is automatisch opgestart door Cortex als het nodig is. Je zal deze waarschijnlijk niet noodzakelijk handmatig moeten opstarten.

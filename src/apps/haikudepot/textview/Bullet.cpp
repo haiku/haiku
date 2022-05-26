@@ -50,8 +50,8 @@ Bullet::operator==(const Bullet& other) const
 	if (fBulletData == other.fBulletData)
 		return true;
 
-	if (fBulletData.Get() != NULL && other.fBulletData.Get() != NULL)
-		return *fBulletData.Get() == *other.fBulletData.Get();
+	if (fBulletData.IsSet() && other.fBulletData.IsSet())
+		return *fBulletData == *other.fBulletData;
 
 	return false;
 }

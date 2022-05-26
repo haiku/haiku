@@ -166,25 +166,15 @@ ICUTimeConversion::Gmtime(const time_t* inTime, struct tm* tmOut)
 status_t
 ICUTimeConversion::Mktime(struct tm* inOutTm, time_t& timeOut)
 {
-	if (fTimeZone == NULL)
-		return B_NO_INIT;
+	return _Mktime(fTimeZone, inOutTm, timeOut);
+}
 
-	UErrorCode icuStatus = U_ZERO_ERROR;
-	GregorianCalendar calendar(*fTimeZone, fTimeData.ICULocale(),
-		icuStatus);
-	if (!U_SUCCESS(icuStatus))
-		return B_ERROR;
 
-	calendar.setLenient(TRUE);
-	calendar.set(inOutTm->tm_year + 1900, inOutTm->tm_mon, inOutTm->tm_mday,
-		inOutTm->tm_hour, inOutTm->tm_min, inOutTm->tm_sec);
-
-	UDate timeInMillis = calendar.getTime(icuStatus);
-	if (!U_SUCCESS(icuStatus))
-		return B_ERROR;
-	timeOut = (time_t)((int64_t)timeInMillis / 1000);
-
-	return _FillTmValues(fTimeZone, &timeOut, inOutTm);
+status_t
+ICUTimeConversion::Timegm(struct tm* inOutTm, time_t& timeOut)
+{
+	const TimeZone* icuTimeZone = TimeZone::getGMT();
+	return _Mktime(icuTimeZone, inOutTm, timeOut);
 }
 
 
@@ -235,6 +225,32 @@ ICUTimeConversion::_FillTmValues(const TimeZone* icuTimeZone,
 	tmOut->tm_zone = fDataBridge->addrOfTZName[tmOut->tm_isdst ? 1 : 0];
 
 	return B_OK;
+}
+
+
+status_t
+ICUTimeConversion::_Mktime(const TimeZone* icuTimeZone,
+	struct tm* inOutTm, time_t& timeOut)
+{
+	if (icuTimeZone == NULL)
+		return B_NO_INIT;
+
+	UErrorCode icuStatus = U_ZERO_ERROR;
+	GregorianCalendar calendar(*icuTimeZone, fTimeData.ICULocale(),
+		icuStatus);
+	if (!U_SUCCESS(icuStatus))
+		return B_ERROR;
+
+	calendar.setLenient(TRUE);
+	calendar.set(inOutTm->tm_year + 1900, inOutTm->tm_mon, inOutTm->tm_mday,
+		inOutTm->tm_hour, inOutTm->tm_min, inOutTm->tm_sec);
+
+	UDate timeInMillis = calendar.getTime(icuStatus);
+	if (!U_SUCCESS(icuStatus))
+		return B_ERROR;
+	timeOut = (time_t)((int64_t)timeInMillis / 1000);
+
+	return _FillTmValues(icuTimeZone, &timeOut, inOutTm);
 }
 
 

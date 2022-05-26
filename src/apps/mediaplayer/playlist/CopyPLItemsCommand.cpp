@@ -22,16 +22,16 @@ using std::nothrow;
 
 
 CopyPLItemsCommand::CopyPLItemsCommand(Playlist* playlist,
-		 const int32* indices, int32 count, int32 toIndex)
+		 BList indices, int32 toIndex)
 	:
 	PLItemsCommand(),
 	fPlaylist(playlist),
-	fItems(count > 0 ? new (nothrow) PlaylistItem*[count] : NULL),
+	fCount(indices.CountItems()),
+	fItems(fCount > 0 ? new (nothrow) PlaylistItem*[fCount] : NULL),
 	fToIndex(toIndex),
-	fCount(count),
 	fItemsCopied(false)
 {
-	if (!indices || !fPlaylist || !fItems) {
+	if (indices.IsEmpty() || !fPlaylist || !fItems) {
 		// indicate a bad object state
 		delete[] fItems;
 		fItems = NULL;
@@ -42,7 +42,8 @@ CopyPLItemsCommand::CopyPLItemsCommand(Playlist* playlist,
 
 	// init original entries and
 	for (int32 i = 0; i < fCount; i++) {
-		PlaylistItem* item = fPlaylist->ItemAt(indices[i]);
+		PlaylistItem* item =
+			fPlaylist->ItemAt((int32)(addr_t)indices.ItemAt(i));
 		if (item != NULL)
 			fItems[i] = item->Clone();
 		if (fItems[i] == NULL) {

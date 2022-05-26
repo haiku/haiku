@@ -1,22 +1,8 @@
 /*
-	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
-	Copyright (C) 2004 beunited.org
-	Copyright (c) 2006-2018, Haiku, Inc. All rights reserved.
-
-	This library is free software; you can redistribute it and/or
-	modify it under the terms of the GNU Lesser General Public
-	License as published by the Free Software Foundation; either
-	version 2.1 of the License, or (at your option) any later version.
-
-	This library is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-	Lesser General Public License for more details.
-
-	You should have received a copy of the GNU Lesser General Public
-	License along with this library; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ * Copyright 2000, Georges-Edouard Berenger. All rights reserved.
+ * Copyright 2006-2018, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "ProcessController.h"
@@ -131,14 +117,6 @@ layoutT layout[] = {
 	{ 3, 1, 4 },	// 2
 	{ 2, 1, 3 },
 	{ 2, 0, 3 },	// 4
-	{ 1, 1, 1 },
-	{ 1, 1, 2 },
-	{ 1, 1, 1 },
-	{ 1, 0, 3 },	// 8
-	{ 1, 1, 1 },
-	{ 1, 0, 3 },
-	{ 1, 0, 2 },
-	{ 1, 0, 1 }		// 12
 };
 
 
@@ -149,7 +127,23 @@ extern "C" _EXPORT BView*
 instantiate_deskbar_item(float maxWidth, float maxHeight)
 {
 	gInDeskbar = true;
-	return new ProcessController(maxHeight - 1, maxHeight - 1);
+
+	system_info info;
+	get_system_info(&info);
+	int width = 4;
+	if (info.cpu_count > 4)
+		width = info.cpu_count;
+	if (info.cpu_count <= 16)
+		width *= 2;
+
+	// For the memory bar
+	width += 8;
+
+	// Damn, you got a lot of CPU
+	if (width > maxWidth)
+		width = (int)maxWidth;
+
+	return new ProcessController(width - 1, maxHeight - 1);
 }
 
 
@@ -614,8 +608,8 @@ ProcessController::DoDraw(bool force)
 	float barWidth;
 	float barGap;
 	float memWidth;
-	if (gCPUcount <= 12 && bounds.Width() == 15) {
-		// Use fixed sizes for small icon sizes
+	if (gCPUcount <= 4 && bounds.Width() == 15) {
+		// Use fixed sizes for small CPU counts
 		barWidth = layout[gCPUcount].cpu_width;
 		barGap = layout[gCPUcount].cpu_inter;
 		memWidth = layout[gCPUcount].mem_width;

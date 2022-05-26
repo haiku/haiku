@@ -1,6 +1,8 @@
-1	english	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
+1	english	x-vnd.Haiku-KeyboardInputServerDevice	131044710
 If the application will not quit you may have to kill it.	Team monitor		如果该程序无法退出，您可能需要将其杀死。
 Quit application	Team monitor		退出程序
+Open Terminal	Team monitor		打开终端
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{按下 CONTROL+ALT+DELETE 等待 # 秒后重新启动。}other{按下 CONTROL+ALT+DELETE 等待 # 秒后重新启动。}}
 Restart the desktop	Team monitor		重启桌面
 Force reboot	Team monitor		强制重启
 Team monitor	Team monitor		组管理器

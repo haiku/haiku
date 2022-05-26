@@ -264,7 +264,7 @@ ReleaseOverlay(overlay_token overlayToken)
 {
 	SharedInfo& si = *gInfo.sharedInfo;
 
-	if (overlayToken != (overlay_token)si.overlayToken) {
+	if (overlayToken != (overlay_token)(addr_t)si.overlayToken) {
 		TRACE("ReleaseOverlay() error - no overlay previously allocated\n");
 		return B_BAD_VALUE;
 	}
@@ -285,7 +285,7 @@ ConfigureOverlay(overlay_token overlayToken, const overlay_buffer* buffer,
 {
 	SharedInfo& si = *gInfo.sharedInfo;
 
-	if (overlayToken != (overlay_token)si.overlayToken)
+	if (overlayToken != (overlay_token)(addr_t)si.overlayToken)
 		return B_BAD_VALUE;
 
 	if (buffer == NULL)

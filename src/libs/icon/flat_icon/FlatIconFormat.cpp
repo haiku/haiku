@@ -89,9 +89,12 @@ read_float_24(LittleEndianBuffer& buffer, float& _value)
 	if (shortValue == 0)
 		_value = 0.0;
 	else {
-		uint32 value = (sign << 31) | ((exponent + 127) << 23) | mantissa;
-
-		_value = (float&)value;
+		union {
+			uint32 intValue;
+			float floatValue;
+		} i2f;
+		i2f.intValue = (sign << 31) | ((exponent + 127) << 23) | mantissa;
+		_value = i2f.floatValue;
 	}
 
 	return true;
@@ -105,11 +108,15 @@ write_float_24(LittleEndianBuffer& buffer, float _value)
 	// 6 bit exponent
 	// 17 bit mantissa
 	// TODO: fixme for non-IEEE 754 architectures
-	uint32 value = (uint32&)_value;
+	union {
+		float floatValue;
+		uint32 intValue;
+	} f2i;
+	f2i.floatValue = _value;
 
-	int sign = (value & 0x80000000) >> 31;
-	int exponent = ((value & 0x7f800000) >> 23) - 127;
-	int mantissa = value & 0x007fffff;
+	int sign = (f2i.intValue & 0x80000000) >> 31;
+	int exponent = ((f2i.intValue & 0x7f800000) >> 23) - 127;
+	int mantissa = f2i.intValue & 0x007fffff;
 
 	if (exponent >= 32 || exponent < -32) {
 		uint8 zero = 0;

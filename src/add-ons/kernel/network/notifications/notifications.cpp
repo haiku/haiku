@@ -7,6 +7,7 @@
 
 #include <net_notifications.h>
 
+#include <kernel.h>
 #include <generic_syscall.h>
 #include <Notifications.h>
 #include <util/KMessage.h>

@@ -1,10 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		Bezig met het schrijven van het audiospoor: %d%% voltooid
+1	dutch; flemish	x-vnd.Haiku-MediaConverter	1322040280
 Input file not recognized as Audio or Video	MediaConverter		Invoerbestand niet herkend als audio of video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Videokwaliteit: %3d%%
 Source files	MediaConverter		Bronbestanden
-Error writing video frame %ld	MediaConverter		Fout bij het schrijven van het videoframe %ld
 Error converting '%filename'	MediaConverter		Fout bij het omzetten van '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		De geselecteerde map is niet gevonden. De standaard /boot/home wordt gebruikt
 Conversion completed	MediaConverter		Conversie voltooid
@@ -43,7 +41,6 @@ Error loading files	MediaConverter		Fout bij het laden van bestanden
 End   [ms]: 	MediaConverter		Einde [ms]:
 Cancel	MediaConverter		Annuleren
 OK	MediaConverter-FileInfo		OK
-Error read audio frame %ld	MediaConverter		Fout bij het lezen van audioframe %ld
 Video encoding:	MediaConverter		Videocodering:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Er is een fout opgetreden bij het lezen van de bestandsinformatie.\n\nFout:
 Error	MediaConverter		Fout
@@ -57,11 +54,9 @@ Duration:	MediaConverter-FileInfo		Duur:
 MediaConverter	System name		MediaConverter
 Error launching: %strError%	MediaConverter		Fout bij het starten: %strError%
 File format:	MediaConverter		Bestandsformaat:
-Error writing audio frame %ld	MediaConverter		Fout bij het schrijven van audioframe %ld
 File	Menu		Bestand
 Video quality not supported	MediaConverter		Videokwaliteit niet ondersteund
 Select this folder	MediaConverter		Deze map selecteren
-Error read video frame %ld	MediaConverter		Fout bij het lezen van videoframe %ld
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanaal
 %d bit 	MediaFileInfo		%d bit
 No video	Video codecs list		Geen video
@@ -69,6 +64,5 @@ Continue	MediaConverter		Voortzetten
 Convert	MediaConverter		Converteren
 Audio quality not supported	MediaConverter		Geluidskwaliteit wordt niet ondersteund
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Fout bij het schrijven naar: %strPath%. De standaardlocatie /boot/home wordt gebruikt.
-Writing video track: %d%% complete	MediaConverter		Bezig met het schrijven van het videospoor: %d%% voltooid
 Preview	MediaConverter		Voorbeeld
 Start [ms]: 	MediaConverter		Start [ms]:

@@ -3,20 +3,20 @@ Run in window	PowerStatus		Pencere içinde çalış
 Extended battery info	PowerStatus		Ek pil bilgisi
 Show status icon	PowerStatus		Durum simgesini göster
 Battery charging	PowerStatus		Pil doluyor
-Design capacity low warning: 	PowerStatus		Fabrika çıkış kapasite düşük uyarısı: 
+Design capacity low warning: 	PowerStatus		Fabrika çıkış sığası düşük uyarısı: 
 The battery level is critical, please plug in the device immediately.	PowerStatus		Pil düzeyi kritik, lütfen aygıtınızı hemen fişe takın.
 non-rechargeable	PowerStatus		yeniden doldurulamaz
 Last full charge: 	PowerStatus		Son tam dolum: 
  mV	PowerStatus		 mV
 Current rate: 	PowerStatus		Geçerli yüzde: 
-Show text label	PowerStatus		Metin etiketlerini göster
+Show text label	PowerStatus		Metin etiketini göster
 Quit	PowerStatus		Çık
 Battery low	PowerStatus		Pil düşük
 Model number: 	PowerStatus		Model numarası: 
 Battery unused	PowerStatus		Pil kullanılmamış
 Type: 	PowerStatus		Tür: 
 Damaged battery	PowerStatus		Pil hasar görmüş
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Güç Durumu'nu bir pencere içinde çalıştırabilir veya Masaüstü Çubuğu'na yükleyebilirsiniz.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Güç Durumu'nu bir pencere içinde çalıştırabilir veya Masaüstü Çubuğu'na kurabilirsiniz.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Pil boşalıyor
 Design voltage: 	PowerStatus		Fabrika çıkış voltaj: 
@@ -28,21 +28,21 @@ Show time	PowerStatus		Zamanı göster
 About…	PowerStatus		Hakkında…
 Serial number: 	PowerStatus		Seri numarası: 
 Battery critical	PowerStatus		Pil düzeyi kritik
-Capacity: 	PowerStatus		Kapasite: 
+Capacity: 	PowerStatus		Sığa: 
  mW	PowerStatus		 mW
 No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Desteklenen bir pil algılanamadı. Güç Durumu sisteminizde kullanılamıyor.
 Show percent	PowerStatus		Yüzdeyi göster
-Capacity granularity 1: 	PowerStatus		Kapasite tanecikliği 1: 
+Capacity granularity 1: 	PowerStatus		Sığa tanecikliği 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Pil düzeyi düşük, lütfen aygıtınızı fişe takın.
-Design capacity warning: 	PowerStatus		Fabrika çıkış kapasite uyarısı: 
-Capacity granularity 2: 	PowerStatus		Kapasite tanecikliği 2: 
+Design capacity warning: 	PowerStatus		Fabrika çıkış sığası uyarısı: 
+Capacity granularity 2: 	PowerStatus		Sığa tanecikliği 2: 
 Too bad!	PowerStatus		Pek fena!
 Technology: 	PowerStatus		Teknoloji: 
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Güç Durumu
-Design capacity: 	PowerStatus		Fabrika çıkış kapasite: 
+Design capacity: 	PowerStatus		Fabrika çıkış sığası: 
 OEM info: 	PowerStatus		OEM bilgisi: 
 no battery	PowerStatus		pil yok
 Empty battery slot	PowerStatus		Boş pil yuvası
-Install in Deskbar	PowerStatus		Masaüstü Çubuğu'na yükle
+Install in Deskbar	PowerStatus		Masaüstü Çubuğu'na kur
 charging	PowerStatus		doluyor

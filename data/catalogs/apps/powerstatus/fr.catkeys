@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-PowerStatus	3173765686
+1	french	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Exécuter en fenêtre
 Extended battery info	PowerStatus		Informations additionnelles
 Show status icon	PowerStatus		Afficher l’icône d’état
@@ -23,18 +23,20 @@ Design voltage: 	PowerStatus		Voltage nominal :
 discharging	PowerStatus		sur batteries
 rechargeable	PowerStatus		rechargeable
 Battery info…	PowerStatus		Informations batteries…
-Show time	PowerStatus		Monter le temps
+Show time	PowerStatus		Afficher l’autonomie
  mA	PowerStatus		 mA
 About…	PowerStatus		À propos…
 Serial number: 	PowerStatus		Numéro de série : 
 Battery critical	PowerStatus		Batterie épuisée
 Capacity: 	PowerStatus		Capacité : 
  mW	PowerStatus		 mW
-Show percent	PowerStatus		Afficher les pourcentages
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Aucune batterie supportée détectée. « État d’énergie » ne peut pas être utilisé sur votre système.
+Show percent	PowerStatus		Afficher en pourcentages
 Capacity granularity 1: 	PowerStatus		Granularité de charge 1 : 
 The battery level is getting low, please plug in the device.	PowerStatus		La charge de la batterie devient faible. Veuillez brancher l’alimentation.
 Design capacity warning: 	PowerStatus		Avertissement de capacité nominale : 
 Capacity granularity 2: 	PowerStatus		Granularité de charge 2 : 
+Too bad!	PowerStatus		Dommage !
 Technology: 	PowerStatus		Technologie : 
  mWh	PowerStatus		 mWh
 PowerStatus	System name		État d’énergie

@@ -18,7 +18,7 @@ static image_id
 export_load_add_on(char const *name, uint32 flags)
 {
 	void* handle;
-	return load_library(name, flags, true, &handle);
+	return load_library(name, flags, true, NULL, &handle);
 }
 
 
@@ -30,9 +30,10 @@ export_unload_add_on(image_id id)
 
 
 static image_id
-export_load_library(char const *name, uint32 flags, void **_handle)
+export_load_library(char const *name, uint32 flags, void* caller,
+	void **_handle)
 {
-	return load_library(name, flags, false, _handle);
+	return load_library(name, flags, false, caller, _handle);
 }
 
 

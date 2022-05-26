@@ -64,6 +64,18 @@ string_for_color_space(color_space format)
 {
 	const char* name = "<unkown format>";
 	switch (format) {
+		case B_RGBA64:
+			name = "B_RGBA64";
+			break;
+		case B_RGBA64_BIG:
+			name = "B_RGBA64_BIG";
+			break;
+		case B_RGB48:
+			name = "B_RGB48";
+			break;
+		case B_RGB48_BIG:
+			name = "B_RGB48_BIG";
+			break;
 		case B_RGB32:
 			name = "B_RGB32";
 			break;
@@ -393,11 +405,13 @@ CardWindow::Invalidate(const BRect& frame)
 
 ViewHWInterface::ViewHWInterface()
 	:
-	HWInterface(kDefaultDoubleBuffered),
+	HWInterface(),
 	fBackBuffer(NULL),
 	fFrontBuffer(NULL),
 	fWindow(NULL)
 {
+	SetAsyncDoubleBuffered(kDefaultDoubleBuffered);
+
 	fDisplayMode.virtual_width = 640;
 	fDisplayMode.virtual_height = 480;
 	fDisplayMode.space = B_RGBA32;
@@ -410,9 +424,6 @@ ViewHWInterface::~ViewHWInterface()
 		fWindow->Lock();
 		fWindow->Quit();
 	}
-
-	delete fBackBuffer;
-	delete fFrontBuffer;
 
 	be_app->Lock();
 	be_app->Quit();
@@ -440,7 +451,7 @@ ViewHWInterface::SetMode(const display_mode& mode)
 
 	status_t ret = B_OK;
 	// prevent from doing the unnecessary
-	if (fBackBuffer && fFrontBuffer
+	if (fBackBuffer.IsSet() && fFrontBuffer.IsSet()
 		&& fDisplayMode.virtual_width == mode.virtual_width
 		&& fDisplayMode.virtual_height == mode.virtual_height
 		&& fDisplayMode.space == mode.space)
@@ -508,9 +519,8 @@ ViewHWInterface::SetMode(const display_mode& mode)
 
 		// free and reallocate the bitmaps while the window is locked,
 		// so that the view does not accidentally draw a freed bitmap
-		delete fBackBuffer;
-		fBackBuffer = NULL;
-		delete fFrontBuffer;
+		fBackBuffer.Unset();
+		fFrontBuffer.Unset();
 
 		// NOTE: backbuffer is always B_RGBA32, this simplifies the
 		// drawing backend implementation tremendously for the time
@@ -519,19 +529,18 @@ ViewHWInterface::SetMode(const display_mode& mode)
 		// TODO: Above not true anymore for single buffered mode!!!
 		// -> fall back to double buffer for fDisplayMode.space != B_RGB32
 		// as intermediate solution...
-		bool doubleBuffered = HWInterface::IsDoubleBuffered();
+		bool doubleBuffered = true;
 		if ((color_space)fDisplayMode.space != B_RGB32
 			&& (color_space)fDisplayMode.space != B_RGBA32)
 			doubleBuffered = true;
 
 		BBitmap* frontBitmap
 			= new BBitmap(frame, 0, (color_space)fDisplayMode.space);
-		fFrontBuffer = new BBitmapBuffer(frontBitmap);
+		fFrontBuffer.SetTo(new BBitmapBuffer(frontBitmap));
 
 		status_t err = fFrontBuffer->InitCheck();
 		if (err < B_OK) {
-			delete fFrontBuffer;
-			fFrontBuffer = NULL;
+			fFrontBuffer.Unset();
 			ret = err;
 		}
 
@@ -540,12 +549,11 @@ ViewHWInterface::SetMode(const display_mode& mode)
 			// since we override IsDoubleBuffered(), the drawing buffer
 			// is in effect also always B_RGBA32.
 			BBitmap* backBitmap = new BBitmap(frame, 0, B_RGBA32);
-			fBackBuffer = new BBitmapBuffer(backBitmap);
+			fBackBuffer.SetTo(new BBitmapBuffer(backBitmap));
 
 			err = fBackBuffer->InitCheck();
 			if (err < B_OK) {
-				delete fBackBuffer;
-				fBackBuffer = NULL;
+				fBackBuffer.Unset();
 				ret = err;
 			}
 		}
@@ -555,7 +563,7 @@ ViewHWInterface::SetMode(const display_mode& mode)
 		if (ret >= B_OK) {
 			// clear out buffers, alpha is 255 this way
 			// TODO: maybe this should handle different color spaces in different ways
-			if (fBackBuffer)
+			if (fBackBuffer.IsSet())
 				memset(fBackBuffer->Bits(), 255, fBackBuffer->BitsLength());
 			memset(fFrontBuffer->Bits(), 255, fFrontBuffer->BitsLength());
 
@@ -609,7 +617,7 @@ ViewHWInterface::GetDeviceInfo(accelerant_device_info* info)
 status_t
 ViewHWInterface::GetFrameBufferConfig(frame_buffer_config& config)
 {
-	if (fFrontBuffer == NULL)
+	if (!fFrontBuffer.IsSet())
 		return B_ERROR;
 
 	config.frame_buffer = fFrontBuffer->Bits();
@@ -769,24 +777,24 @@ ViewHWInterface::WaitForRetrace(bigtime_t timeout)
 RenderingBuffer*
 ViewHWInterface::FrontBuffer() const
 {
-	return fFrontBuffer;
+	return fFrontBuffer.Get();
 }
 
 
 RenderingBuffer*
 ViewHWInterface::BackBuffer() const
 {
-	return fBackBuffer;
+	return fBackBuffer.Get();
 }
 
 
 bool
 ViewHWInterface::IsDoubleBuffered() const
 {
-	if (fFrontBuffer)
-		return fBackBuffer != NULL;
+	if (fFrontBuffer.IsSet())
+		return fBackBuffer.IsSet();
 
-	return HWInterface::IsDoubleBuffered();
+	return false;
 }
 
 

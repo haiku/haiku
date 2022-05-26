@@ -1,27 +1,19 @@
-1	esperanto	x-vnd.Haiku-mixer.media_addon	3450667169
-Input gain controls represent	AudioMixer		Enigopliigaj stiriloj reprezentas
-Linear interpolation	AudioMixer		Linia interpolado
-Virtual output channels	AudioMixer		Virtualaj eligaj kanaloj
-Refuse output format changes	AudioMixer		Malpermesi eligajn formŝangojn
-Output mapping	AudioMixer		Eliga mapado
-Allow input channel remapping	AudioMixer		Permesi enigkanelan remapadon
-Resampling algorithm	AudioMixer		Resampla algoritmo
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Atenui miksilan eligon per 3dB (kiel BeOS R5)
-Display balance control for stereo connections	AudioMixer		Montri balancstirilon por stereofoniaj konektoj
+1	esperanto	x-vnd.Haiku-mixer.media_addon	3463574286
+Input mapping	AudioMixer		Eniga mapado
 To output	AudioMixer		Al enigo
+Gain	AudioMixer		Pliigo
+To master	AudioMixer		Al majstro
 not connected	AudioMixer		nekonektanta
-Refuse input format changes	AudioMixer		Rifuzi enigformajn ŝanĝojn
-Drop/repeat samples	AudioMixer		Ellasi/ripeti specimenojn
-Output channel sources	AudioMixer		Eligkanalaj fontoj
+Master output	AudioMixer		Majstra eligo
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Pliigaj stiriloj
-Input mapping	AudioMixer		Eniga mapado
-Mute	AudioMixer		Silentigi
-Input channel destinations	AudioMixer		Enigkanalaj celoj
-To master	AudioMixer		Al majstro
-Master output	AudioMixer		Majstra eligo
+Output channel sources	AudioMixer		Eligkanalaj fontoj
+Allow input channel remapping	AudioMixer		Permesi enigkanelan remapadon
+Display balance control for stereo connections	AudioMixer		Montri balancstirilon por stereofoniaj konektoj
 Setup	AudioMixer		Agordi
-Use non linear gain sliders (like BeOS R5)	AudioMixer		Uzu neliniajn pliigstirilojn (kiel BeOS R5)
-Gain	AudioMixer		Pliigo
-Allow output channel remapping	AudioMixer		Permesi eligkanalan remapadon
 Physical input channels	AudioMixer		Fizikaj enigaj kanaloj
+Input channel destinations	AudioMixer		Enigkanalaj celoj
+Mute	AudioMixer		Silentigi
+Output mapping	AudioMixer		Eliga mapado
+Virtual output channels	AudioMixer		Virtualaj eligaj kanaloj
+Allow output channel remapping	AudioMixer		Permesi eligkanalan remapadon

@@ -1,6 +1,5 @@
 /*
  * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Copyright 2016-207, Jessica Hamilton, jessica.l.hamilton@gmail.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,6 +12,8 @@
 #include <unistd.h>
 #include <errno.h>
 #include <syslog.h>
+
+#include <AutoDeleterOS.h>
 
 
 //#define TRACE_ACCELERANT
@@ -27,51 +28,6 @@ extern "C" void _sPrintf(const char *format, ...);
 struct accelerant_info *gInfo;
 
 
-class AreaCloner {
-	public:
-		AreaCloner();
-		~AreaCloner();
-
-		area_id Clone(const char *name, void **_address, uint32 spec,
-					uint32 protection, area_id sourceArea);
-		status_t InitCheck() { return fArea < B_OK ? (status_t)fArea : B_OK; }
-		void Keep();
-
-	private:
-		area_id	fArea;
-};
-
-
-AreaCloner::AreaCloner()
-	:
-	fArea(-1)
-{
-}
-
-
-AreaCloner::~AreaCloner()
-{
-	if (fArea >= B_OK)
-		delete_area(fArea);
-}
-
-
-area_id
-AreaCloner::Clone(const char *name, void **_address, uint32 spec,
-	uint32 protection, area_id sourceArea)
-{
-	fArea = clone_area(name, _address, spec, protection, sourceArea);
-	return fArea;
-}
-
-
-void
-AreaCloner::Keep()
-{
-	fArea = -1;
-}
-
-
 //	#pragma mark -
 
 
@@ -84,6 +40,7 @@ init_common(int device, bool isClone)
 	// initialize global accelerant info structure
 
 	gInfo = (accelerant_info *)malloc(sizeof(accelerant_info));
+	MemoryDeleter infoDeleter(gInfo);
 	if (gInfo == NULL)
 		return B_NO_MEMORY;
 
@@ -96,29 +53,21 @@ init_common(int device, bool isClone)
 	// get basic info from driver
 
 	area_id sharedArea;
-	if (ioctl(device, VESA_GET_PRIVATE_DATA, &sharedArea, sizeof(area_id))
-			!= 0) {
-		free(gInfo);
+	if (ioctl(device, VESA_GET_PRIVATE_DATA, &sharedArea, sizeof(area_id)) != 0)
 		return B_ERROR;
-	}
 
-	AreaCloner sharedCloner;
-	gInfo->shared_info_area = sharedCloner.Clone("vesa shared info",
+	AreaDeleter sharedDeleter(clone_area("vesa shared info",
 		(void **)&gInfo->shared_info, B_ANY_ADDRESS,
-		B_READ_AREA | B_WRITE_AREA, sharedArea);
-	status_t status = sharedCloner.InitCheck();
-	if (status < B_OK) {
-		free(gInfo);
+		B_READ_AREA | B_WRITE_AREA, sharedArea));
+	status_t status = gInfo->shared_info_area = sharedDeleter.Get();
+	if (status < B_OK)
 		return status;
-	}
 
-	if (gInfo->shared_info->vesa_mode_count == 0)
-		gInfo->vesa_modes = NULL;
-	else
-		gInfo->vesa_modes = (vesa_mode *)((uint8 *)gInfo->shared_info
-			+ gInfo->shared_info->vesa_mode_offset);
+	gInfo->vesa_modes = (vesa_mode *)((uint8 *)gInfo->shared_info
+		+ gInfo->shared_info->vesa_mode_offset);
 
-	sharedCloner.Keep();
+	infoDeleter.Detach();
+	sharedDeleter.Detach();
 	return B_OK;
 }
 
@@ -236,19 +185,30 @@ vesa_get_accelerant_device_info(accelerant_device_info *info)
 {
 	info->version = B_ACCELERANT_VERSION;
 
-	// TODO: provide some more insight here...
-	if (gInfo->vesa_modes != NULL) {
-		strcpy(info->name, "VESA driver");
-		strcpy(info->chipset, "VESA");
+	strcpy(info->name, "VESA driver");
+	if (gInfo->shared_info->name[0] != '\0') {
+		strlcpy(info->chipset, gInfo->shared_info->name, 32);
 	} else {
-		strcpy(info->name, "Framebuffer");
-		strcpy(info->chipset, "");
+		switch (gInfo->shared_info->bios_type) {
+			case kIntelBiosType:
+				strcpy(info->chipset, "Intel");
+				break;
+			case kNVidiaBiosType:
+				strcpy(info->chipset, "nVidia");
+				break;
+			case kAtomBiosType1:
+			case kAtomBiosType2:
+				strcpy(info->chipset, "AMD/ATI Atombios");
+				break;
+			default:
+				strcpy(info->chipset, "Generic VESA");
+				break;
+		}
 	}
-
 	strcpy(info->serial_no, "None");
 
+	info->memory = gInfo->shared_info->vram_size;
 #if 0
-	info->memory = ???
 	info->dac_speed = ???
 #endif
 

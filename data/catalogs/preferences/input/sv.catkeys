@@ -1,53 +1,50 @@
-1	swedish	x-vnd.Haiku-Input	1950274171
-Defaults	InputMouse		Förvalt
+1	swedish	x-vnd.Haiku-Input	3312605348
 Scrolling	TouchpadPrefView		Rulla
+Defaults	InputMouse		Förvalt
 Long	KeyboardView		Lång
-Normal	SettingsView		Normal
 Cancel	TouchpadPrefView		Avbryt
+4-Button	SettingsView		4-Knappa
 Slow	TouchpadPrefView		Långsam
-Warp	SettingsView		Varp
+Tapping sensitivity	TouchpadPrefView		Tappningskänslighet
 Device List	InputWindow		Enhetslista
 Double-click speed	SettingsView		Dubbelklicks hastighet
 5-Button	SettingsView		5-Knappar
 Typing test area	KeyboardView		Testskrivningsområde
-Fast	KeyboardView		Snabb
-Please confirm	TouchpadPrefView		Var god bekräfta
-Mouse speed	SettingsView		Mushastighet
-Horizontal scrolling	TouchpadPrefView		Horisontell rullning
-Input	System name		Inmatning
-Quick	TouchpadPrefView		Snabbt
-Short	KeyboardView		Kort
-Revert	InputMouse		Återställ
-Slow	KeyboardView		Långsam
-2-Button	SettingsView		2-Knappar
-Click to focus and raise	SettingsView		Klicka för att fokusera och höja
-Vertical	TouchpadPrefView		Vertikal
-Double-click test area	SettingsView		Dubbelklick testområde
-Focus follows mouse	SettingsView		Fokus följer musen
-Focus mode:	SettingsView		Fokuserat läge:
-Revert	TouchpadPrefView		Återställ
-4-Button	SettingsView		4-Knappa
-Tapping sensitivity	TouchpadPrefView		Tappningskänslighet
-Instant warp	SettingsView		Omedelbar varp
-Revert	InputKeyboard		Återställ
 Mouse type:	SettingsView		Mus typ:
+Revert	InputKeyboard		Återställ
+Fast	KeyboardView		Snabb
 Off	TouchpadPrefView		Av
 Never	TouchpadPrefView		Aldrig
 Fast	TouchpadPrefView		Snabb
 6-Button	SettingsView		6-Knapp
+Please confirm	TouchpadPrefView		Var god bekräfta
 Click to focus	SettingsView		Klicka för att fokusera
 Acceleration	TouchpadPrefView		Acceleration
+Mouse speed	SettingsView		Mushastighet
 Accept first click	SettingsView		Acceptera vid första klickningen
 OK	TouchpadPrefView		OK
-Keyboard Lock Delay	TouchpadPrefView		Fördröjning av tangentbordslås
+Horizontal scrolling	TouchpadPrefView		Horisontell rullning
 Delay until key repeat	KeyboardView		Fördröjning tills upprepning av tangent
+Keyboard Lock Delay	TouchpadPrefView		Fördröjning av tangentbordslås
 Two finger scrolling	TouchpadPrefView		Rulla med två fingrar
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Den nya rullnings området är stort och kommer påverka vanliga mus operationer. Vill du verkligen ändra den?
+Input	System name		Inmatning
 Mouse acceleration	SettingsView		Mus acceleration
-Defaults	TouchpadPrefView		Förvalt
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Den nya rullnings området är stort och kommer påverka vanliga mus operationer. Vill du verkligen ändra den?
 High	TouchpadPrefView		Hög
+Defaults	TouchpadPrefView		Förvalt
 1-Button	SettingsView		1-Knapp
 Defaults	InputKeyboard		Standard
+Quick	TouchpadPrefView		Snabbt
+Short	KeyboardView		Kort
+Slow	KeyboardView		Långsam
+Revert	InputMouse		Återställ
 Key repeat rate	KeyboardView		Tangent upprepningsfrekvens
+2-Button	SettingsView		2-Knappar
+Click to focus and raise	SettingsView		Klicka för att fokusera och höja
+Vertical	TouchpadPrefView		Vertikal
 Horizontal	TouchpadPrefView		Horisontell
+Focus follows mouse	SettingsView		Fokus följer musen
+Focus mode:	SettingsView		Fokuserat läge:
+Double-click test area	SettingsView		Dubbelklick testområde
 3-Button	SettingsView		3-Knappar
+Revert	TouchpadPrefView		Återställ

@@ -40,7 +40,8 @@ DwarfUtils::GetDIEName(const DebugInfoEntry* entry, BString& _name)
 
 
 /*static*/ void
-DwarfUtils::GetDIETypeName(const DebugInfoEntry* entry, BString& _name)
+DwarfUtils::GetDIETypeName(const DebugInfoEntry* entry, BString& _name,
+	const DebugInfoEntry* requestingEntry)
 {
 	const DIEType* type = dynamic_cast<const DIEType*>(entry);
 	if (type == NULL)
@@ -79,7 +80,7 @@ DwarfUtils::GetDIETypeName(const DebugInfoEntry* entry, BString& _name)
 	if (type == NULL)
 		typeName = "void";
 	else
-		GetFullyQualifiedDIEName(type, typeName);
+		GetFullyQualifiedDIEName(type, typeName, requestingEntry);
 
 	if (modifier.Length() > 0) {
 		if (modifier[modifier.Length() - 1] == ' ')
@@ -163,7 +164,7 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 			BString paramName;
 			BString modifier;
 			DIEType* type = parameter->GetType();
-			GetDIETypeName(type, paramName);
+			GetDIETypeName(type, paramName, entry);
 
 			if (firstParameter)
 				firstParameter = false;
@@ -185,7 +186,7 @@ DwarfUtils::GetFullDIEName(const DebugInfoEntry* entry, BString& _name)
 
 /*static*/ void
 DwarfUtils::GetFullyQualifiedDIEName(const DebugInfoEntry* entry,
-	BString& _name)
+	BString& _name, const DebugInfoEntry* requestingEntry)
 {
 	// If we don't seem to have a name but an abstract origin, return the
 	// origin's name.
@@ -207,6 +208,8 @@ DwarfUtils::GetFullyQualifiedDIEName(const DebugInfoEntry* entry,
 	// Get the namespace, if any.
 	DebugInfoEntry* parent = entry->Parent();
 	while (parent != NULL) {
+		if (parent == requestingEntry)
+			break;
 		if (parent->IsNamespace()) {
 			BString parentName;
 			GetFullyQualifiedDIEName(parent, parentName);

@@ -57,6 +57,8 @@ private:
 			RowByNameTable*		fRowByNameTable;
 
 			WorkStatusView*		fWorkStatusView;
+
+			bool				fIgnoreSelectionChanged;
 };
 
 #endif // PACKAGE_LIST_VIEW_H

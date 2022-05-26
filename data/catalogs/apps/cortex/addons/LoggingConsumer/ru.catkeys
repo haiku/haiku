@@ -1,0 +1,14 @@
+1	russian	application/x-vnd.Be.LoggingConsumerApp	3041020332
+Priority	CortexAddOnsLoggingConsumer		Приоритет
+Latency	CortexAddOnsLoggingConsumer		Задержка
+CPU spin percentage	CortexAddOnsLoggingConsumer		Процент спин-блокировок ЦПУ
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Старт
+Thread priority	CortexAddOnsLoggingConsumer		Приоритет потока
+Latency control	CortexAddOnsLoggingConsumer		Управление задержкой
+CPU percentage	CortexAddOnsLoggingConsumer		Нагрузка на CPU
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Стоп
+OK	CortexAddOnsCommonMediaNodeControlApp		ОК
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Элементы управления
+controls	CortexAddOnsCommonMediaNodeControlApp		управление
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Подключить
+percent	CortexAddOnsLoggingConsumer		процент

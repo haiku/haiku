@@ -781,12 +781,12 @@ TermParse::EscParse()
 				case CASE_SGR:
 				{
 					/* SGR */
-					uint32 attributes = fBuffer->GetAttributes();
+					Attributes attributes = fBuffer->GetAttributes();
 					for (row = 0; row < nparam; ++row) {
 						switch (param[row]) {
 							case DEFAULT:
 							case 0: /* Reset attribute */
-								attributes = 0;
+								attributes.Reset();
 								break;
 
 							case 1: /* Bold     */
@@ -831,32 +831,26 @@ TermParse::EscParse()
 							case 35:
 							case 36:
 							case 37:
-								attributes &= ~FORECOLOR;
-								attributes |= FORECOLORED(param[row] - 30);
-								attributes |= FORESET;
+								attributes.SetIndexedForeground(param[row] - 30);
 								break;
 
 							case 38:
 							{
-								int color = -1;
-								if (nparam == 3 && param[1] == 5)
-									color = param[2];
-								else if (nparam == 5 && param[1] == 2)
-									color = fBuffer->GuessPaletteColor(
-										param[2], param[3], param[4]);
-
-								if (color >= 0) {
-									attributes &= ~FORECOLOR;
-									attributes |= FORECOLORED(color);
-									attributes |= FORESET;
+								if (nparam >= 3 && param[row+1] == 5) {
+									attributes.SetIndexedForeground(param[row+2]);
+									row += 2;
+								} else if (nparam >= 5 && param[row+1] == 2) {
+									attributes.SetDirectForeground(param[row+2], param[row+3], param[row+4]);
+									row += 4;
+								} else {
+									row = nparam; // force exit of the parsing
 								}
 
-								row = nparam; // force exit of the parsing
 								break;
 							}
 
 							case 39:
-								attributes &= ~FORESET;
+								attributes.UnsetForeground();
 								break;
 
 							case 100:
@@ -876,32 +870,26 @@ TermParse::EscParse()
 							case 45:
 							case 46:
 							case 47:
-								attributes &= ~BACKCOLOR;
-								attributes |= BACKCOLORED(param[row] - 40);
-								attributes |= BACKSET;
+								attributes.SetIndexedBackground(param[row] - 40);
 								break;
 
 							case 48:
 							{
-								int color = -1;
-								if (nparam == 3 && param[1] == 5)
-									color = param[2];
-								else if (nparam == 5 && param[1] == 2)
-									color = fBuffer->GuessPaletteColor(
-										param[2], param[3], param[4]);
-
-								if (color >= 0) {
-									attributes &= ~BACKCOLOR;
-									attributes |= BACKCOLORED(color);
-									attributes |= BACKSET;
+								if (nparam >= 3 && param[row+1] == 5) {
+									attributes.SetIndexedBackground(param[row+2]);
+									row += 2;
+								} else if (nparam >= 5 && param[row+1] == 2) {
+									attributes.SetDirectBackground(param[row+2], param[row+3], param[row+4]);
+									row += 4;
+								} else {
+									row = nparam; // force exit of the parsing
 								}
 
-								row = nparam; // force exit of the parsing
 								break;
 							}
 
 							case 49:
-								attributes &= ~BACKSET;
+								attributes.UnsetBackground();
 								break;
 						}
 					}
@@ -996,8 +984,11 @@ TermParse::EscParse()
 
 				case CASE_DECALN:
 					/* DECALN */
-					fBuffer->FillScreen(UTF8Char('E'), 0);
-					parsestate = groundtable;
+					{
+						Attributes attr;
+						fBuffer->FillScreen(UTF8Char('E'), attr);
+						parsestate = groundtable;
+					}
 					break;
 
 					//	case CASE_GSETS:
@@ -1213,6 +1204,18 @@ TermParse::EscParse()
 					fBuffer->MoveCursorUp(row);
 					parsestate = groundtable;
 					break;
+
+				case CASE_REP:		// ESC [...b repeat last graphic char
+				{
+					int repetitions = param[0];
+					int maxRepetitions = fBuffer->Width() * fBuffer->Height();
+					if (repetitions > maxRepetitions)
+						repetitions = maxRepetitions;
+					for (int i = 0; i < repetitions; i++)
+						fBuffer->InsertLastChar();
+					parsestate = groundtable;
+					break;
+				}
 				default:
 					break;
 			}
@@ -1555,9 +1558,14 @@ TermParse::_ProcessOperatingSystemControls(uchar* params)
 		// set dynamic colors (10 - 19)
 		case 10: // text foreground
 		case 11: // text background
+		case 12: // cursor back
 			{
 				int32 offset = mode - 10;
 				int32 count = 0;
+				if (strcmp((char*)params, "?") == 0) {
+					fBuffer->GetColor(mode);
+					break;
+				}
 				char* p = strtok((char*)params, ";");
 				do {
 					if (gXColorsTable.LookUpColor(p, &colors[count]) != B_OK) {
@@ -1579,6 +1587,7 @@ TermParse::_ProcessOperatingSystemControls(uchar* params)
 		// reset dynamic colors (10 - 19)
 		case 110: // text foreground
 		case 111: // text background
+		case 112: // cursor back
 			{
 				indexes[0] = mode;
 				fBuffer->ResetColors(indexes, 1, true);

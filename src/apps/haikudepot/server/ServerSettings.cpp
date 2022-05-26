@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#include <AppFileInfo.h>
 #include <Application.h>
 #include <Autolock.h>
 #include <NetworkInterface.h>
@@ -16,6 +15,7 @@
 #include <Roster.h>
 #include <Url.h>
 
+#include "AppUtils.h"
 #include "Logger.h"
 
 
@@ -80,35 +80,11 @@ ServerSettings::_InitUserAgent()
 const BString
 ServerSettings::_GetUserAgentVersionString()
 {
-	app_info info;
-
-	if (be_app->GetAppInfo(&info) != B_OK) {
-		HDERROR("Unable to get the application info");
-		be_app->Quit();
-		return BString(USERAGENT_FALLBACK_VERSION);
-	}
-
-	BFile file(&info.ref, B_READ_ONLY);
-
-	if (file.InitCheck() != B_OK) {
-		HDERROR("Unable to access the application info file");
-		be_app->Quit();
-		return BString(USERAGENT_FALLBACK_VERSION);
-	}
-
-	BAppFileInfo appFileInfo(&file);
-	version_info versionInfo;
-
-	if (appFileInfo.GetVersionInfo(
-			&versionInfo, B_APP_VERSION_KIND) != B_OK) {
-		HDERROR("Unable to establish the application version");
-		be_app->Quit();
-		return BString(USERAGENT_FALLBACK_VERSION);
-	}
-
 	BString result;
-	result.SetToFormat("%" B_PRId32 ".%" B_PRId32 ".%" B_PRId32,
-		versionInfo.major, versionInfo.middle, versionInfo.minor);
+	if (AppUtils::GetAppVersionString(result) != B_OK) {
+		be_app->Quit();
+		return BString(USERAGENT_FALLBACK_VERSION);
+	}
 	return result;
 }
 

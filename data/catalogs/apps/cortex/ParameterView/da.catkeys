@@ -1,0 +1,8 @@
+1	danish	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Temaer
+Start control panel	ParameterWindow		Start kontrolpanel
+%nodeinfo% parameters	ParameterWindow		%nodeinfo%-parametre
+OK	ParameterWindow		OK
+Window	ParameterWindow		Vindue
+Could not start control panel (%error%)	ParameterWindow		Kunne ikke starte kontrolpanel (%error%)
+Close	ParameterWindow		Luk

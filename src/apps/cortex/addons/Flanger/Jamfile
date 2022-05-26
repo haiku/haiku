@@ -13,5 +13,14 @@ Addon cortex_flanger.media_addon :
 	MediaNodeControlApp.cpp
 	RawBuffer.cpp
 	SoundUtils.cpp
-	: be media [ TargetLibsupc++ ]
+	: be media localestub [ TargetLibsupc++ ]
+;
+
+DoCatalogs cortex_flanger.media_addon
+	: x-vnd.moon-Flanger.media_addon
+	:
+	FlangerAddOn.cpp
+	FlangerNode.cpp
+
+	../common/MediaNodeControlApp.cpp
 ;

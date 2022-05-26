@@ -3,14 +3,16 @@ SubDir HAIKU_TOP src apps cortex RouteApp ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) DiagramView ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) DormantNodeView ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) InfoView ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) NodeManager ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) MediaRoutingView ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) Persistence ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) Persistence Wrappers ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ParameterView ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) TipManager ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) TransportView ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ValControl ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) expat xmlparse ] ;
 
 SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
 
@@ -37,8 +39,15 @@ Application Cortex :
 	cortex_val_control.a
 	cortex_diagram_view.a
 	cortex_support.a
-	be media tracker translation
+	be localestub media tracker translation
 	[ BuildFeatureAttribute expat : library ]
 	[ TargetLibstdc++ ]
 	: ../Resource.rdef
 ;
+
+DoCatalogs Cortex :
+	x-vnd.Cortex.Route
+	:
+	RouteAppNodeManager.cpp
+	RouteWindow.cpp
+	;

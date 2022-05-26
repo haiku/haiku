@@ -13,9 +13,11 @@
 
 #include <string.h>
 
+#include <arch_thread_defs.h>
 #include <commpage.h>
 #include <cpu.h>
 #include <debug.h>
+#include <generic_syscall.h>
 #include <kernel.h>
 #include <ksignal.h>
 #include <int.h>
@@ -96,6 +98,7 @@ x86_set_tls_context(Thread* thread)
 {
 	// Set FS segment base address to the TLS segment.
 	x86_write_msr(IA32_MSR_FS_BASE, thread->user_local_storage);
+	x86_write_msr(IA32_MSR_KERNEL_GS_BASE, thread->arch_info.user_gs_base);
 }
 
 
@@ -135,6 +138,32 @@ get_signal_stack(Thread* thread, iframe* frame, struct sigaction* action,
 }
 
 
+static status_t
+arch_thread_control(const char* subsystem, uint32 function, void* buffer,
+	size_t bufferSize)
+{
+	switch (function) {
+		case THREAD_SET_GS_BASE:
+		{
+			uint64 base;
+			if (bufferSize != sizeof(base))
+				return B_BAD_VALUE;
+
+			if (!IS_USER_ADDRESS(buffer)
+				|| user_memcpy(&base, buffer, sizeof(base)) < B_OK) {
+				return B_BAD_ADDRESS;
+			}
+
+			Thread* thread = thread_get_current_thread();
+			thread->arch_info.user_gs_base = base;
+			x86_write_msr(IA32_MSR_KERNEL_GS_BASE, base);
+			return B_OK;
+		}
+	}
+	return B_BAD_HANDLER;
+}
+
+
 //	#pragma mark -
 
 
@@ -144,11 +173,6 @@ arch_thread_init(kernel_args* args)
 	// Save one global valid FPU state; it will be copied in the arch dependent
 	// part of each new thread.
 	if (gHasXsave || gHasXsavec) {
-		if (gFPUSaveLength > sizeof(sInitialState.fpu_state)) {
-			panic("XSAVE FPU context is larger than allowed "
-				"(need at least %" B_PRIu64 " bytes)", gFPUSaveLength);
-			return B_ERROR;
-		}
 		memset(sInitialState.fpu_state, 0, gFPUSaveLength);
 		if (gHasXsavec) {
 			asm volatile (
@@ -177,6 +201,9 @@ arch_thread_init(kernel_args* args)
 			"fxsaveq %0"
 			:: "m" (sInitialState.fpu_state));
 	}
+
+	register_generic_syscall(THREAD_SYSCALLS, arch_thread_control, 1, 0);
+
 	return B_OK;
 }
 
@@ -270,8 +297,7 @@ arch_thread_enter_userspace(Thread* thread, addr_t entry, void* args1,
 	frame.di = (uint64)args1;
 	frame.ip = entry;
 	frame.cs = USER_CODE_SELECTOR;
-	frame.flags = X86_EFLAGS_RESERVED1 | X86_EFLAGS_INTERRUPT
-		| (3 << X86_EFLAGS_IO_PRIVILEG_LEVEL_SHIFT);
+	frame.flags = X86_EFLAGS_RESERVED1 | X86_EFLAGS_INTERRUPT;
 	frame.sp = stackTop;
 	frame.ss = USER_DATA_SELECTOR;
 
@@ -381,6 +407,7 @@ arch_setup_signal_frame(Thread* thread, struct sigaction* action,
 		+ (addr_t)commPageAddress;
 	clear_ac();
 	frame->di = (addr_t)userSignalFrameData;
+	frame->flags &= ~(uint64)(X86_EFLAGS_TRAP | X86_EFLAGS_DIRECTION);
 
 	return B_OK;
 }

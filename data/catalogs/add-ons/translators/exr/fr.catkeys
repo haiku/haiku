@@ -1,9 +1,9 @@
 1	french	x-vnd.Haiku-EXRTranslator	3596882613
-Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
-EXR image translator	EXRTranslator		Traducteur d’images EXR
-EXR Settings	main		Réglages EXR
-EXR images	EXRTranslator		Images EXR
-a division of Lucasfilm Entertainment Company Ltd	ConfigView		une division de Lucasfilm Entertainment Company Ltd
-EXR image	EXRTranslator		Image EXR
 EXR image translator	ConfigView		Traducteur d’images EXR
+a division of Lucasfilm Entertainment Company Ltd	ConfigView		une division de Lucasfilm Entertainment Company Ltd
+Version %d.%d.%d, %s	ConfigView		Version %d.%d.%d, %s
+EXR images	EXRTranslator		Images EXR
+EXR image	EXRTranslator		Image EXR
+EXR image translator	EXRTranslator		Traducteur d’images EXR
 Based on OpenEXR %version%	ConfigView		Basé sur OpenEXR %version%
+EXR Settings	main		Réglages EXR

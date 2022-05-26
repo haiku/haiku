@@ -1,55 +1,51 @@
-1	german	x-vnd.Haiku-BluetoothPrefs	4276705900
+1	german	x-vnd.Haiku-BluetoothPrefs	3945807779
+Start bluetooth services…	Window		Bluetooth-Dienste starten
+From all devices	Settings view		Von allen Geräten
+Defaults	Window		Standardwerte
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Bitte sicherstellen, dass Bluetooth auf dem zu findenden Gerät aktiviert ist. Auf 'Suchen' klicken, um Bluetooth-Geräte zu finden. Für gewöhnlich dauert das Ermitteln des Namens pro Gerät max. 3 Sekunden. Gefundene Bluetooth-Geräte können anschließend der Geräteliste hinzugefügt werden, in der sie verbunden werden können.
 Laptop	Settings view		Laptop
+Scanning progress	Inquiry panel		Suchfortschritt
 Only from trusted devices	Settings view		Nur vertraute Geräte
-15 secs	Settings view		15 s
+Launch now	main		Jetzt starten
+Bluetooth	System name		Bluetooth
+Remove	Remote devices		Entfernen
+Pick device…	Settings view		Gerät wählen …
+Always ask	Settings view		Immer fragen
 Quit	main		Beenden
+15 secs	Settings view		15 s
+Help	Window		Hilfe
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Mit Unterstützung von:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nDanke an alle die geholfen haben …\n\nVersand/Spende von Hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nFinanziell:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nDurch Patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesten:\n - Petter H. Juliussen\nFür mein gesamtes Wissen:\n - das yellowTAB Team
 Manufacturer: 	Device View		Hersteller:
+Pair…	Remote devices		Pair …
 Desktop	Settings view		Desktop
 Server	Window		Server
+Retrieving name of %1	Inquiry panel		Name für %1 wird abgerufen
 Identify host as:	Settings view		Agieren als:
-Refresh…	Remote devices		Aktualisieren…
+Inquiry	Inquiry panel		Suchen
 Local devices found on system:	Settings view		Verwendbare Geräte:
 Service classes: 	Device View		Gerätedienste:
-Remote devices	Window		Bekannte Geräte
-Settings	Window		Einstellungen
-Stop bluetooth services…	Window		Bluetooth-Dienste beenden…
-61 secs	Settings view		61 s
-Add…	Remote devices		Hinzu…
-As blocked	Remote devices		Blockieren
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Es konnte kein Bluetooth-Gerät auf diesem System gefunden werden.
-Policy…	Settings view		Richtlinie…
-Revert	Window		Zurücknehmen
-Refresh local devices…	Window		Lokale Geräte aktualisieren…
-Disconnect	Remote devices		Trennen
-Identify us as…	Settings view		Identifizieren als…
-From all devices	Settings view		Alle
-Defaults	Window		Standardwerte
-Start bluetooth services…	Window		Bluetooth-Dienste starten…
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Bitte sicherstellen, dass Bluetooth auf dem zu suchenden Gerät aktiviert ist. 'Suchen' klicken, um andere Bluetooth-Geräte zu finden. Für gewöhnlich dauert das Ermitteln des Namens pro Gerät max. 3 Sekunden. Gefundene Bluetooth-Geräte können anschließend der Geräteliste hinzugefügt werden, in der man sich mit ihnen verbinden kann.
-Scanning progress	Inquiry panel		Suchfortschritt
-Bluetooth	System name		Bluetooth
-Launch now	main		Jetzt starten
-Remove	Remote devices		Entfernen
-Pick device…	Settings view		Gerät wählen…
-Always ask	Settings view		Immer fragen
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Mit Unterstützung von:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nDanke an alle die geholfen haben…\n\nVersand/Spende von Hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nFinanziell:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nDurch Patche:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesten:\n - Petter H. Juliussen\nFür mein gesamtes Wissen:\n - das yellowTAB Team
-Help	Window		Hilfe
-Pair…	Remote devices		Pair…
-Retrieving name of %1	Inquiry panel		Name für %1 wird abgerufen
-Inquiry	Inquiry panel		Suchen
 Incoming connections policy:	Settings view		Verbindungen annehmen:
-Retrieving names…	Inquiry panel		Abrufen von Namen…
-Show name	Extended local device view		Namen anzeigen
+Remote devices	Window		Bekannte Geräte
+Retrieving names…	Inquiry panel		Abrufen von Namen …
 Add device to list	Inquiry panel		Gerät zur Liste hinzufügen
+Show name	Extended local device view		Namen anzeigen
+Settings	Window		Einstellungen
 Remaining %1 seconds	Inquiry panel		Es verbleiben %1 Sekunden
-The Bluetooth services are not currently running on this system.	main		Im System laufen derzeit keine Bluetooth Dienste.
-Discoverable	Extended local device view		Sichtbar
+Stop bluetooth services…	Window		Bluetooth-Dienste beenden …
+61 secs	Settings view		61 s
 Authenticate	Extended local device view		Authentifizieren
-Smart phone	Settings view		Smartphone
+Discoverable	Extended local device view		Sichtbar
+The Bluetooth services are not currently running on this system.	main		Im System laufen derzeit keine Bluetooth-Dienste.
+Add…	Remote devices		Hinzu …
 Scanning completed.	Inquiry panel		Suche abgeschlossen.
+Smart phone	Settings view		Smartphone
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Es konnte kein Bluetooth-Gerät auf diesem System gefunden werden.
 Default inquiry time:	Settings view		Suchdauer:
+Revert	Window		Anfangswerte
+Refresh local devices…	Window		Lokale Geräte aktualisieren …
 Server	Settings view		Server
-Handheld	Settings view		Handheld
  packets: 	Device View		Pakete:
-About Bluetooth…	Window		Über Bluetooth…
-Starting scan…	Inquiry panel		Starte Scan…
+Handheld	Settings view		Handheld
+Disconnect	Remote devices		Trennen
+About Bluetooth…	Window		Über Bluetooth …
+Starting scan…	Inquiry panel		Starte Suche …

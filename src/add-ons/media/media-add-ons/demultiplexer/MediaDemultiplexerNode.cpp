@@ -1089,7 +1089,7 @@ void MediaDemultiplexerNode::GetFlavor(flavor_info * outInfo, int32 id)
 	if (outInfo == 0) {
 		return;
 	}
-	outInfo->name = "OpenBeOS Demultiplexer";
+	outInfo->name = "Haiku Demultiplexer";
 	outInfo->info = "A MediaDemultiplexerNode node demultiplexes a multistream into its constituent streams.";
 	outInfo->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER;
 	outInfo->flavor_flags = B_FLAVOR_IS_LOCAL;

@@ -2,13 +2,13 @@
 High	JPEG2000Translator		Hög
 Low	JPEG2000Translator		Låg
 Output quality	JPEG2000Translator		Utdatakvalitet
-JPEG2000 images	JPEG2000Translator		JPEG2000-bilder
+JPEG2000 images	JPEG2000Translator		JPEG2000 bilder
 About	JPEG2000Translator		Om
-Write black-and-white images as RGB24	JPEG2000Translator		Skriv svart/vita bilder som RGB24
+Write black-and-white images as RGB24	JPEG2000Translator		Skriv svartvita bilder som RGB24
 Version %d.%d.%d	JPEG2000Translator		Version %d.%d.%d
 Read	JPEG2000Translator		Läs
 Read greyscale images as RGB32	JPEG2000Translator		Läs gråskalebilder som RGB32
-©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBaserad på biblioteket JasPer:\n© 1999-2000, Image Power, Inc. och \nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 kodek användes för \"inspiration\".\n\thttp://www.imagemagick.org/\n
-Write	JPEG2000Translator		Skriv
-Output only codestream (.jpc)	JPEG2000Translator		Endast kodströms-utdata (.jpc)
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be bitmappsformat (JPEG2000 översättning)
+©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBaserat på JasPer-biblioteket:\n© 1999-2000, Image Power, Inc. och\nUniversity of British Columbia, Kanada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagicks jp2-codec användes som \"tutorial\".\n\thttp://www.imagemagick.org/\n
+Write	JPEG2000Translator		Vit
+Output only codestream (.jpc)	JPEG2000Translator		Utdata endast kodström (.jpc)
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be Bitmap Format (JPEG2000Translator)

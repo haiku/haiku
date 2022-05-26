@@ -111,13 +111,8 @@ user_mutex_wait_locked(int32* mutex, addr_t physicalAddress, const char* name,
 	add_user_mutex_entry(&entry);
 
 	// wait
-	ConditionVariableEntry waitEntry;
 	entry.condition.Init((void*)physicalAddress, "user mutex");
-	entry.condition.Add(&waitEntry);
-
-	locker.Unlock();
-	status_t error = waitEntry.Wait(flags, timeout);
-	locker.Lock();
+	status_t error = entry.condition.Wait(locker.Get(), flags, timeout);
 
 	if (error != B_OK && entry.locked)
 		error = B_OK;

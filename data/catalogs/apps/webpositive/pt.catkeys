@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-WebPositive	55235296
+1	portuguese	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Autenticação necessária
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Fim: %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		Mostrar na pasta correspondente
 Find previous	WebPositive Window		Procurar anterior
 Full screen	WebPositive Window		Ecrã completo
 Downloads in progress	WebPositive		Descargas em curso
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Deseja abrir %addedCount marcadores de uma só vez?
 Copy URL to clipboard	Download Window		Copiar URL para a área de transferência
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Deseja abrir %addedCount marcadores de uma só vez?
 Clone current page	Settings Window		Clonar a página atual
 Start page:	Settings Window		Página inicial:
 Cancel	Download Window		Cancelar
@@ -49,10 +49,11 @@ Decrease size	WebPositive Window		Diminuir tamanho
 Default fixed font size:	Settings Window		Tamanho predefinido de tipo de letra mono-espaçado:
 Sans serif font:	Settings Window		Tipo de letra sem serifas:
 Clear	WebPositive Window		Limpar
-Cookies for %s	Cookie Manager		Cookies para %s
 The download could not be opened.	Download Window		Não foi possível abrir o ficheiro descarregado.
+Cookies for %s	Cookie Manager		Cookies para %s
 Close	Download Window		Fechar
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Termo de pesquisa
 Reload	WebPositive Window		Atualizar
 Expiration	Cookie Manager		Validade
 Download finished	Download Window		A descarga finalizou
@@ -100,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Reverter
 Copy	WebPositive Window		Copiar
 Default standard font size:	Settings Window		Tamanho de texto predefinido:
+Custom	Settings Window		Personalizado
 Bookmark this page	WebPositive Window		Adicionar marcador para esta página
 Show tabs if only one page is open	Settings Window		Mostrar separadores se estiver aberta apenas uma página
 Close tab	WebPositive Window		Fechar separador
@@ -109,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Continuar descargas
 Proxy server requires authentication	Settings Window		O servidor proxy requer autenticação
 Cancel	Settings Window		Cancelar
-History	WebPositive Window		Histórico
 Reset size	WebPositive Window		Redefinir tamanho
+History	WebPositive Window		Histórico
 Do you really want to clear the browsing history?	WebPositive Window		Tem a certeza de que pretende apagar o histórico de navegação?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Procurar a ocorrência seguinte dos termos de pesquisa
 Fixed font:	Settings Window		Tipo de letra mono-espaçado:
@@ -129,6 +131,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Faça duplo-clique ou
 Next	WebPositive Window		Seguinte
 Bookmark error	WebPositive Window		Erro de marcador
 OK	WebPositive Window		OK
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% de %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Ampliar apenas o texto
 Save page as…	WebPositive Window		Guardar página como…

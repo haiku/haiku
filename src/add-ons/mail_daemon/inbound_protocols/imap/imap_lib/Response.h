@@ -144,8 +144,7 @@ public:
 								Response();
 								~Response();
 
-			void				Parse(BDataIO& stream, LiteralHandler* handler)
-									throw(ParseException, StreamException);
+			void				Parse(BDataIO& stream, LiteralHandler* handler);
 
 			bool				IsUntagged() const { return fTag == 0; }
 			uint32				Tag() const { return fTag; }
@@ -194,8 +193,7 @@ public:
 			void				SetLiteralHandler(LiteralHandler* handler);
 
 			status_t			NextResponse(Response& response,
-									bigtime_t timeout)
-									throw(ParseException, StreamException);
+									bigtime_t timeout);
 
 private:
 								ResponseParser(const ResponseParser& other);

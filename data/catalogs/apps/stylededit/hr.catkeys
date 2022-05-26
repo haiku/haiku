@@ -26,8 +26,8 @@ Italic	Menus		Italik
 Can't undo	Menus		Nemoguće vratiti korak nazad
 Replace…	Menus		Zamjeni...
 File	Menus		Datoteka
-Bold	Menus		Podebljano
 Paste	Menus		Zalijepi
+Bold	Menus		Podebljano
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Datoteka \"%file%\" je izmjenjena drugom aplikacijom, ponovno je učitati?
 Lines:	Statistics		Linije:
 Replace in all windows	FindandReplaceWindow		Zamjeni u svim prozorima
@@ -58,21 +58,21 @@ OK	LoadAlert		U redu
 Save	QuitAlert		Spremi
 Case-sensitive	FindandReplaceWindow		Osjetljivo na veličinu slova
 Find selection	Menus		Nađi označeno
-Cancel	SaveAlert		Otkaži
 Find…	Menus		Pronađi...
+Cancel	SaveAlert		Otkaži
 Revert	RevertToSavedAlert		Obrnuto
-Decrease size	Menus		Smanji veličinu
 Size	Menus		Veličina
+Decrease size	Menus		Smanji veličinu
 Replace next	Menus		Zamijeni slijedeće
 OK	QuitAlert		U redu
-Replace with:	FindandReplaceWindow		Zamjeni sa:
 Edit	Menus		Uredi
+Replace with:	FindandReplaceWindow		Zamjeni sa:
 Open…	Menus		Otvori...
 Save as…	Menus		Spremi kao...
 Replace	FindandReplaceWindow		Zamijeni
 Characters:	Statistics		Znakovi:
 Don't save	QuitAlert		Nemoj spremiti
-Align	Menus		Poredaj
 Font	Menus		Font
+Align	Menus		Poredaj
 Select all	Menus		Odaberi sve
 Right	Menus		Desno

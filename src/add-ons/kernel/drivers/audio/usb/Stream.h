@@ -42,21 +42,24 @@ public:
 			status_t		SetGlobalFormat(multi_format_info* Format);
 
 protected:
-
 			Device*			fDevice;
 			status_t		fStatus;
 
 			uint8			fTerminalID;
 			usb_pipe		fStreamEndpoint;
+
 			bool			fIsRunning;
-			area_id			fArea;
+			area_id			fArea, fKernelArea;
 			size_t			fAreaSize;
-			usb_iso_packet_descriptor*	fDescriptors;
+			usb_iso_packet_descriptor* fDescriptors;
 			size_t			fDescriptorsCount;
+			uint8*			fBuffers;
+			uint8*			fKernelBuffers;
 			size_t			fCurrentBuffer;
-			uint32			fStartingFrame;
 			size_t			fSamplesCount;
-			size_t			fPacketSize;
+
+			bigtime_t		fRealTime;
+			uint32			fStartingFrame;
 			int32			fProcessedBuffers;
 			int32			fInsideNotify;
 

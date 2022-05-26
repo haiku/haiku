@@ -1392,7 +1392,7 @@ cdda_identify_partition(int fd, partition_data* partition, void** _cookie)
 {
 	scsi_toc_toc* toc = (scsi_toc_toc*)malloc(2048);
 	if (toc == NULL)
-		return B_NO_MEMORY;
+		return -1;
 
 	status_t status = read_table_of_contents(fd, toc, 2048);
 
@@ -1432,7 +1432,7 @@ cdda_identify_partition(int fd, partition_data* partition, void** _cookie)
 
 	if (status != B_OK) {
 		free(toc);
-		return status;
+		return -1;
 	}
 
 	*_cookie = toc;
@@ -1907,7 +1907,7 @@ cdda_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 		buffer->d_dev = volume->FSVolume()->id;
 		buffer->d_ino = childNode->ID();
-		buffer->d_reclen = strlen(name) + sizeof(struct dirent);
+		buffer->d_reclen = offsetof(struct dirent, d_name) + strlen(name) + 1;
 
 		if (buffer->d_reclen > bufferSize) {
 			if (count == 0)
@@ -2041,7 +2041,7 @@ cdda_read_attr_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	size_t length = strlcpy(dirent->d_name, attribute->Name(), bufferSize);
 	dirent->d_dev = volume->FSVolume()->id;
 	dirent->d_ino = inode->ID();
-	dirent->d_reclen = sizeof(struct dirent) + length;
+	dirent->d_reclen = offsetof(struct dirent, d_name) + length + 1;
 
 	cookie->current = attribute->GetDoublyLinkedListLink()->next;
 	*_num = 1;

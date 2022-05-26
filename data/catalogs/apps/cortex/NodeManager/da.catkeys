@@ -1,0 +1,7 @@
+1	danish	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		Systemets lydmixer
+System video output	NodeManager		Systemets videooutput
+System video input	NodeManager		Systemets videoinput
+No name	NodeManager		Intet navn
+System audio input	NodeManager		Systemets lydinput
+Time sources	NodeManager		Tidskilder

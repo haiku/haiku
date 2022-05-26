@@ -278,7 +278,7 @@ struct media_raw_audio_format {
 	uint32		byte_order;		// B_MEDIA_LITTLE_ENDIAN or B_MEDIA_BIG_ENDIAN
 	size_t		buffer_size;	// size of each buffer
 
-	static media_multi_audio_format wildcard;
+	static const media_multi_audio_format wildcard;
 };
 
 
@@ -304,7 +304,7 @@ struct media_multi_audio_info {
 struct media_multi_audio_format : public media_raw_audio_format,
 	public media_multi_audio_info {
 
-	static media_multi_audio_format wildcard;
+	static const media_multi_audio_format wildcard;
 };
 
 
@@ -323,7 +323,7 @@ struct media_encoded_audio_format {
 
 	uint32					_reserved_[3];
 
-	static media_encoded_audio_format wildcard;
+	static const media_encoded_audio_format wildcard;
 };
 
 
@@ -366,7 +366,7 @@ struct media_video_display_info {
 	uint32		flags;
 	uint32		_reserved_[3];
 
-	static media_video_display_info wildcard;
+	static const media_video_display_info wildcard;
 };
 
 
@@ -392,7 +392,7 @@ struct media_raw_video_format {
 
 	media_video_display_info	display;
 
-	static media_raw_video_format wildcard;
+	static const media_raw_video_format wildcard;
 };
 
 
@@ -443,7 +443,7 @@ struct media_encoded_video_format {
 												// more than this (embedded)
 												// in media_format union
 
-	static media_encoded_video_format wildcard;
+	static const media_encoded_video_format wildcard;
 };
 
 
@@ -522,7 +522,7 @@ struct media_multistream_format {
 		avi_info	avi;
 	} 			u;
 
-	static media_multistream_format wildcard;
+	static const media_multistream_format wildcard;
 };
 
 

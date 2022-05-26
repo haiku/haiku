@@ -1,10 +1,10 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
+//  This software is part of the Haiku distribution and is covered
 //  by the MIT License.
 //---------------------------------------------------------------------
 
-#include <algobase.h>
-#include <new.h>
+#include <algorithm>
+#include <new>
 #include <stdio.h>
 #include <string.h>
 
@@ -125,14 +125,14 @@ PartitioningDialog::_Init(BDiskScannerParameterEditor *editor)
 	}
 	// setup views
 	if (error == B_OK) {
-		BView *mainView = new(nothrow) BView(BRect(0, 0, 1, 1), "main",
+		BView *mainView = new(std::nothrow) BView(BRect(0, 0, 1, 1), "main",
 											 B_FOLLOW_ALL, 0);
 		BMessage *okMessage = new BMessage(MSG_OK);
 		BMessage *cancelMessage = new BMessage(MSG_CANCEL);
-		BButton *okButton = new (nothrow) BButton(
+		BButton *okButton = new (std::nothrow) BButton(
 			BRect(0, 0, 1, 1), "ok", "OK", okMessage,
 			B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-		BButton *cancelButton = new (nothrow) BButton(
+		BButton *cancelButton = new (std::nothrow) BButton(
 			BRect(0, 0, 1, 1), "cancel", "Cancel", cancelMessage,
 			B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 		if (okMessage && cancelMessage && okButton && cancelButton) {
@@ -155,12 +155,12 @@ PartitioningDialog::_Init(BDiskScannerParameterEditor *editor)
 			BRect okRect = okButton->Bounds();
 			BRect cancelRect = cancelButton->Bounds();
 			// compute width and size of the main view
-			int32 width = max(editorRect.IntegerWidth() + 1,
+			int32 width = std::max(editorRect.IntegerWidth() + 1,
 							  okRect.IntegerWidth() + 1 + hSpacing
 							  + cancelRect.IntegerWidth() + 1)
 						  + 2 * hSpacing;
 			int32 height = editorRect.IntegerHeight() + 1
-						   + max(okRect.IntegerHeight(),
+						   + std::max(okRect.IntegerHeight(),
 						   		 cancelRect.IntegerHeight()) + 1
 						   + 3 * vSpacing;
 			mainView->ResizeTo(width - 1, height -1);

@@ -331,7 +331,7 @@ query_media(floppy_t *flp, bool forceupdate)
 {
 	status_t err = B_OK;
 	uint8 command[4];
-	uint8 result[7];
+	uint8 result[7] = {0};
 	const floppy_geometry *geom = NULL;
 
 	TRACE("query_media(%d, %s)\n", flp->drive_num, forceupdate?"true":"false");

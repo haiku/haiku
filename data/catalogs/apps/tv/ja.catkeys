@@ -21,7 +21,7 @@ OK	MainWin		OK
 TV	MainWin		TV
 Settings	MainWin		設定
 TV	System name		TV
-Settings…	MainWin		設定…
+Settings…	MainWin		設定...
 None	MainWin		無し
 Error, interface is busy:\n\n	MainWin		エラー、インターフェイスがビジーです:\n\n
 pixel aspect ratio	MainWin		ピクセルのアスペクト比

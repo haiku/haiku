@@ -42,8 +42,9 @@ using namespace boot;
 struct __DIR {
 	Directory*	directory;
 	void*		cookie;
-	dirent		entry;
-	char		nameBuffer[B_FILE_NAME_LENGTH - 1];
+
+	char		_direntBuffer[sizeof(dirent) + B_FILE_NAME_LENGTH + 1];
+	dirent*		entry() { return (dirent*)_direntBuffer; }
 };
 
 
@@ -167,7 +168,7 @@ status_t
 Node::Acquire()
 {
 	fRefCount++;
-	TRACE(("%p::Acquire(), fRefCount = %ld\n", this, fRefCount));
+	TRACE(("%p::Acquire(), fRefCount = %" B_PRId32 "\n", this, fRefCount));
 	return B_OK;
 }
 
@@ -175,7 +176,7 @@ Node::Acquire()
 status_t
 Node::Release()
 {
-	TRACE(("%p::Release(), fRefCount = %ld\n", this, fRefCount));
+	TRACE(("%p::Release(), fRefCount = %" B_PRId32 "\n", this, fRefCount));
 	if (--fRefCount == 0) {
 		TRACE(("delete node: %p\n", this));
 		delete this;
@@ -250,20 +251,30 @@ Directory::Lookup(const char* name, bool traverseLinks)
 		return node;
 
 	// the node is a symbolic link, so we have to resolve the path
-	char linkPath[B_PATH_NAME_LENGTH];
-	status_t error = node->ReadLink(linkPath, sizeof(linkPath));
+	char* linkPath = (char*)malloc(B_PATH_NAME_LENGTH);
+	if (linkPath == NULL) {
+		node->Release();
+		return NULL;
+	}
+
+	status_t error = node->ReadLink(linkPath, B_PATH_NAME_LENGTH);
 
 	node->Release();
 		// we don't need this one anymore
 
-	if (error != B_OK)
+	if (error != B_OK) {
+		free(linkPath);
 		return NULL;
+	}
 
 	// let open_from() do the real work
 	int fd = open_from(this, linkPath, O_RDONLY);
-	if (fd < 0)
+	if (fd < 0) {
+		free(linkPath);
 		return NULL;
+	}
 
+	free(linkPath);
 	node = get_node_from(fd);
 	if (node != NULL)
 		node->Acquire();
@@ -576,8 +587,8 @@ BootVolume::_OpenSystemPackage()
 	Node* packagesNode = fSystemDirectory->Lookup("packages", false);
 	if (packagesNode == NULL)
 		return -1;
-	MethodDeleter<Node, status_t> packagesNodeReleaser(packagesNode,
-		&Node::Release);
+	MethodDeleter<Node, status_t, &Node::Release>
+		packagesNodeReleaser(packagesNode);
 
 	if (!S_ISDIR(packagesNode->Type()))
 		return -1;
@@ -659,28 +670,33 @@ get_boot_file_system(stage2_args* args, BootVolume& _bootVolume)
 		if (error != B_OK)
 			continue;
 
-		Partition *partition;
-		error = platform_get_boot_partition(args, device, &gPartitions, &partition);
+		NodeList bootPartitions;
+		error = platform_get_boot_partitions(args, device, &gPartitions, &bootPartitions);
 		if (error != B_OK)
 			continue;
 
-		Directory *fileSystem;
-		error = partition->Mount(&fileSystem, true);
-		if (error != B_OK) {
-			// this partition doesn't contain any known file system; we
-			// don't need it anymore
-			gPartitions.Remove(partition);
-			delete partition;
-			continue;
+		NodeIterator partitionIterator = bootPartitions.GetIterator();
+		while (partitionIterator.HasNext()) {
+			Partition *partition = (Partition*)partitionIterator.Next();
+
+			Directory *fileSystem;
+			error = partition->Mount(&fileSystem, true);
+			if (error != B_OK) {
+				// this partition doesn't contain any known file system; we
+				// don't need it anymore
+				gPartitions.Remove(partition);
+				delete partition;
+				continue;
+			}
+
+			// init the BootVolume
+			error = _bootVolume.SetTo(fileSystem);
+			if (error != B_OK)
+				continue;
+
+			sBootDevice = device;
+			return B_OK;
 		}
-
-		// init the BootVolume
-		error = _bootVolume.SetTo(fileSystem);
-		if (error != B_OK)
-			continue;
-
-		sBootDevice = device;
-		return B_OK;
 	}
 
 	return B_ERROR;
@@ -986,11 +1002,14 @@ write(int fd, const void *buffer, size_t bufferSize)
 
 
 ssize_t
-writev(int fd, const struct iovec* vecs, size_t count)
+writev(int fd, const struct iovec* vecs, int count)
 {
 	size_t totalWritten = 0;
 
-	for (size_t i = 0; i < count; i++) {
+	if (count < 0)
+		RETURN_AND_SET_ERRNO(B_BAD_VALUE);
+
+	for (int i = 0; i < count; i++) {
 		ssize_t written = write(fd, vecs[i].iov_base, vecs[i].iov_len);
 		if (written < 0)
 			return totalWritten == 0 ? written : totalWritten;
@@ -1031,34 +1050,48 @@ open_from(Directory *directory, const char *name, int mode, mode_t permissions)
 		name++;
 	}
 
-	char path[B_PATH_NAME_LENGTH];
-	if (strlcpy(path, name, sizeof(path)) >= sizeof(path))
+	char* path = (char*)malloc(B_PATH_NAME_LENGTH);
+	if (path == NULL)
+		return B_NO_MEMORY;
+
+	if (strlcpy(path, name, B_PATH_NAME_LENGTH) >= B_PATH_NAME_LENGTH) {
+		free(path);
 		return B_NAME_TOO_LONG;
+	}
 
 	Node *node;
 	status_t error = get_node_for_path(directory, path, &node);
 	if (error != B_OK) {
-		if (error != B_ENTRY_NOT_FOUND)
+		if (error != B_ENTRY_NOT_FOUND) {
+			free(path);
 			return error;
+		}
 
-		if ((mode & O_CREAT) == 0)
+		if ((mode & O_CREAT) == 0) {
+			free(path);
 			return B_ENTRY_NOT_FOUND;
+		}
 
 		// try to resolve the parent directory
-		strlcpy(path, name, sizeof(path));
+		strlcpy(path, name, B_PATH_NAME_LENGTH);
 		if (char* lastSlash = strrchr(path, '/')) {
-			if (lastSlash[1] == '\0')
+			if (lastSlash[1] == '\0') {
+				free(path);
 				return B_ENTRY_NOT_FOUND;
+			}
 
 			*lastSlash = '\0';
 			name = lastSlash + 1;
 
 			// resolve the directory
-			if (get_node_for_path(directory, path, &node) != B_OK)
+			if (get_node_for_path(directory, path, &node) != B_OK) {
+				free(path);
 				return B_ENTRY_NOT_FOUND;
+			}
 
 			if (node->Type() != S_IFDIR) {
 				node->Release();
+				free(path);
 				return B_NOT_A_DIRECTORY;
 			}
 
@@ -1070,16 +1103,20 @@ open_from(Directory *directory, const char *name, int mode, mode_t permissions)
 		error = directory->CreateFile(name, permissions, &node);
 		directory->Release();
 
-		if (error != B_OK)
+		if (error != B_OK) {
+			free(path);
 			return error;
+		}
 	} else if ((mode & O_EXCL) != 0) {
 		node->Release();
+		free(path);
 		return B_FILE_EXISTS;
 	}
 
 	int fd = open_node(node, mode);
 
 	node->Release();
+	free(path);
 	return fd;
 }
 
@@ -1172,7 +1209,7 @@ open_directory(Directory* baseDirectory, const char* path)
 		errno = error;
 		return NULL;
 	}
-	MethodDeleter<Node, status_t> nodeReleaser(node, &Node::Release);
+	MethodDeleter<Node, status_t, &Node::Release> nodeReleaser(node);
 
 	if (!S_ISDIR(node->Type())) {
 		errno = error;
@@ -1222,33 +1259,33 @@ readdir(DIR* dir)
 
 	for (;;) {
 		status_t error = dir->directory->GetNextEntry(dir->cookie,
-			dir->entry.d_name, B_FILE_NAME_LENGTH);
+			dir->entry()->d_name, B_FILE_NAME_LENGTH);
 		if (error != B_OK) {
 			errno = error;
 			return NULL;
 		}
 
-		dir->entry.d_pdev = 0;
+		dir->entry()->d_pdev = 0;
 			// not supported
-		dir->entry.d_pino = dir->directory->Inode();
-		dir->entry.d_dev = dir->entry.d_pdev;
+		dir->entry()->d_pino = dir->directory->Inode();
+		dir->entry()->d_dev = dir->entry()->d_pdev;
 			// not supported
 
-		if (strcmp(dir->entry.d_name, ".") == 0
-				|| strcmp(dir->entry.d_name, "..") == 0) {
+		if (strcmp(dir->entry()->d_name, ".") == 0
+				|| strcmp(dir->entry()->d_name, "..") == 0) {
 			// Note: That's obviously not correct for "..", but we can't
 			// retrieve that information.
-			dir->entry.d_ino = dir->entry.d_pino;
+			dir->entry()->d_ino = dir->entry()->d_pino;
 		} else {
-			Node* node = dir->directory->Lookup(dir->entry.d_name, false);
+			Node* node = dir->directory->Lookup(dir->entry()->d_name, false);
 			if (node == NULL)
 				continue;
 
-			dir->entry.d_ino = node->Inode();
+			dir->entry()->d_ino = node->Inode();
 			node->Release();
 		}
 
-		return &dir->entry;
+		return dir->entry();
 	}
 }
 

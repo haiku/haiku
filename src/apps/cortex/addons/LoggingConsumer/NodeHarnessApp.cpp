@@ -35,6 +35,11 @@
 #include "NodeHarnessApp.h"
 #include "NodeHarnessWin.h"
 
+#include <Catalog.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexAddOnsLoggingConsumers"
+
 NodeHarnessApp::NodeHarnessApp(const char *signature)
 	: BApplication(signature)
 {
@@ -43,6 +48,7 @@ NodeHarnessApp::NodeHarnessApp(const char *signature)
 void
 NodeHarnessApp::ReadyToRun()
 {
-	BWindow* win = new NodeHarnessWin(BRect(100, 200, 210, 330), "NodeLogger");
+	BWindow* win = new NodeHarnessWin(BRect(100, 200, 210, 330),
+		B_TRANSLATE("NodeLogger"));
 	win->Show();
 }

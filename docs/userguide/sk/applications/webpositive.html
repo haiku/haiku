@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2013, Haiku. All rights reserved.
+ * Copyright 2010-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -36,6 +36,7 @@
 <li><a href="../../de/applications/webpositive.html">Deutsch</a></li>
 <li><a href="../../en/applications/webpositive.html">English</a></li>
 <li><a href="../../es/applications/webpositive.html">Español</a></li>
+<li><a href="../../eo/applications/webpositive.html">Esperanto</a></li>
 <li><a href="../../fr/applications/webpositive.html">Français</a></li>
 <li><a href="../../fur/applications/webpositive.html">Furlan</a></li>
 <li><a href="../../it/applications/webpositive.html">Italiano</a></li>
@@ -60,6 +61,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Aplikácie</span></td></tr>
@@ -77,10 +79,10 @@ V dolnej časti okna je stavový riadok, ukazujúci URL adresu načítavanej str
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Nastavenia</h2>
 <p>Z ponuky <span class="menu">Okno</span>môžte otvoriť panel <span class="menu">Nastavenia</span>pre konfiguráciu niektoré základy WebPositive.</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
-<p>Prvá karta sa zaoberá všeobecnými nastaveniami: Aký súbor alebo URL slúži ako <span class="menu">Úvodná stránka</span>, čo je <span class="menu">Vyhľadávacia stránka</span>, aký <span class="menu">Priečinok na sťahovanie</span> je použitý na veci, ktoré stiahnete z internetu.<br />
-Dve roletové menu vám umožnia rozhodnúť, ktorú stránku načítať - ak nejakú - pri otvorení nového okna alebo karty.<br />
-Cez nasledujúce políčka sa môžete vyhnúť zobrazeniu lišty, keď je otvorená len jedna stránka tak či tak. WebPositive rozhraniu môže byť povedané, aby sa automaticky skrývalo v režime celej obrazovky a myš môže byť automaticky skrytá, ak ňou chvíľu nehýbete.<br />
-Na záver sa môžete rozhodnúť či chcete, aby navigačný panel obsahoval tlačidlo „Domov“ a nastaviť počet dní, ktoré si prehliadač pamätá stránky, ktoré ste navštívili v jeho histórii.</p>
+<p>The first tab deals with general settings: What file or URL serves as a <span class="menu">Start page</span>, what's used as a <span class="menu">Search page</span> (if you set a <span class="menu">Custom</span> search engine, "<i>%s</i>" is used for the search term variable), what <span class="menu">Download folder</span> is used for stuff you get from the net.<br />
+Two pop-up menus let you decide what page to load - if any - when opening a new window or tab.<br />
+Via the following checkboxes you can avoid showing the tab bar when there's only one page open anyway. WebPositive's interface can be told to automatically hide in full screen mode, and the mouse pointer can be automatically hidden whenever it's not moved for a while.<br />
+Finally, you can decide to include the "Home" button in the navigation bar and set the number of days the browser remembers the sites you have visited in its history.</p>
 <p>Na druhej karte si môžete vybrať písmo použité pre štandardné, pätkové, bezpätkové a neproporcionálne písma a nastaviť ich predvolené veľkosti.</p>
 <p>Posledná karta je použitá na konfiguráciu proxy servera.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Prehliadanie</h2>
@@ -92,19 +94,19 @@ Na záver sa môžete rozhodnúť či chcete, aby navigačný panel obsahoval tl
 <li><p>Z ponuky <span class="menu">Zobraziť</span> môžte <span class="menu">Priblížiť</span> a <span class="menu">Oddialiť</span> stránku. Tiež je tu možnosť <span class="menu">Priblížiť iba text</span>, ponechávajúc obrázky v ich pôvodnej veľkosti.</p></li>
 <li><p>Ak sa prepnete do režimu celej obrazovky a aktivujete nastavenia skryť rozhranie, zmizne po sekunde. Na jeho dočasné zobrazenie, jednoducho presuňte ukazovateľ myši na hornej časti obrazovky.</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
-
-<p>
-
-Pri písaní v textovom poli Locator, prehliadač priradí reťazce k stránkam, ktoré ste navštívili v minulosti a uvádza ich pod textové pole. Buď budete pridávať viac písmen pre skrátenie zoznamu možných stránok, alebo zvoliť položku s <span class="key">↑</span> alebo <span class="key">↓</span>. <span class="key">ENTER</span> načíta stránku. Môžete tiež použiť tlačidlo úplne vpravo, ktorá slúži tiež na obnovenie stránky.<br />
-Reťazce nerozpoznané ako URL sa vyhľadajú cez Google, takže pole Locator slúži ako zástupca pre rýchle vyhľadávanie na webe.</p>
-
-
-
-
-
-
-
-</li>
+<p>While you type in the locator text field, the browser matches the string to sites you have visited in the past and lists them below the text field. You either keep adding more letters to shorten the  list of possible sites, or choose an entry with <span class="key">↑</span> or <span class="key">↓</span>. <span class="key">ENTER</span> will load the page. You can also use the button to the far right which also serves to reload a page.<br />
+Strings not recognized as URLs will get looked up with the search engine set in WebPositive's settings, so the locator field doubles as quick shortcut to web searches.</p>
+<div class="box-info"><p>WebPositive supports quick shortcuts to direct search terms to different search engines. Just enter the one-letter-shortcut followed by your search term.</p>
+<ul>
+<li>"g” for Google</li>
+<li>“b” for Bing</li>
+<li>“w” for Wikipedia</li>
+<li>“d” for DuckDuckGo</li>
+<li>“a” for Baiku</li>
+<li>“y” for Yandex</li>
+<li>“e” for Ecosia</li>
+<li>“q” for Qwant</li>
+</ul></div></li>
 <li><p>Kliknutie pravým tlačidlom myši otvorí kontextové menu, ktoré v závislosti na objekte, na ktorý ste klikli, ponúka otvoriť odkaz v novom okne alebo novej záložke, stiahnite si objekt atď.</p></li>
 <li><p><span class="menu">Upraviť | Nájsť</span> zobrazí vyhľadávací panel v spodnej časti okna, pre začiatok vyhľadávania na stránke. Zhody sú na stránke zvýraznené.</p></li>
 </ul>

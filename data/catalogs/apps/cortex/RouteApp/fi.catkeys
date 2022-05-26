@@ -1,0 +1,26 @@
+1	finnish	application/x-vnd.Cortex.Route	25925955
+Node '%name%' released	CortexRouteApp		Solmu ’%name%’ julkaistu
+OK	CortexRouteApp		Valmis
+About Cortex/Route…	CortexRouteApp		Ohjelmasta Cortex/Route…
+File	CortexRouteApp		Tiedosto
+Connection '%name%' made	CortexRouteApp		Yhteys ’%name%’ muodostettu
+Save nodes…	CortexRouteApp		Tallenna solmuja…
+%producer% and %consumer%	CortexRouteApp		%producer% ja %consumer%
+Node '%name%' created	CortexRouteApp		Solmu ’%name%’ luotu
+Negotiated format:	CortexRouteApp		Neuvoteltu muoto:
+Window	CortexRouteApp		Ikkuna
+Transport	CortexRouteApp		Siirto
+Connection broken	CortexRouteApp		Yhteys katkennut
+Untitled group	CortexRouteApp		Otsikoton ryhmä
+Connection failed	CortexRouteApp		Yhteys epäonnistui
+Connection '%name%' broken	CortexRouteApp		Yhteys '%name%' katkennut
+Between:	CortexRouteApp		Välillä:
+Cortex	CortexRouteApp		Cortex
+Open…	CortexRouteApp		Avaa…
+Pull palettes	CortexRouteApp		Anna paletit
+Connection made	CortexRouteApp		Yhteys muodostettu
+Show transport	CortexRouteApp		Näytä siirto
+Show add-ons	CortexRouteApp		Näytä lisäosat
+Quit	CortexRouteApp		Poistu
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nCortex-ryhmä:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nKiitokset:\nJohn Ashmun\nJon Watte\nDoug Wright\n<nimesi tähän>\n\nTietyt tässä käytetyt kuvakkeet ovat\nBe, Inc.:n omistamia ja niiden käyttöön on lupa.
+Tried format:	CortexRouteApp		Yritetty muoto:

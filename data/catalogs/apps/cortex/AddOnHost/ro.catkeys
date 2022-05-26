@@ -1,0 +1,5 @@
+1	romanian	application/x-vnd.Cortex.AddOnHost	1256552338
+Continue	CortexAddOnHost		Continuă
+Cortex AddOnHost	CortexAddOnHost		Cortex AddOnHost
+Quit	CortexAddOnHost		Ieșire
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Acest program rulează în fundal și este pornit automat de Cortex când este necesar. Probabil că nu doriți să îl porniți manual.

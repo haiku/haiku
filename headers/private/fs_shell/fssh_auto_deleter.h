@@ -129,41 +129,31 @@ struct MemoryDeleter : AutoDeleter<void, MemoryDelete >
 
 // CObjectDeleter
 
-template<typename Type, typename DestructorReturnType>
+template<typename Type, typename DestructorReturnType,
+	DestructorReturnType (*Destructor)(Type*)>
 struct CObjectDelete
 {
 	inline void operator()(Type *object)
 	{
-		if (fDestructor != NULL && object != NULL)
-			fDestructor(object);
+		if (object != NULL)
+			Destructor(object);
 	}
-
-	template<typename Destructor>
-	inline void operator=(Destructor destructor)
-	{
-		fDestructor = destructor;
-	}
-
-private:
-	DestructorReturnType (*fDestructor)(Type*);
 };
 
-template<typename Type, typename DestructorReturnType = void>
+template<typename Type, typename DestructorReturnType,
+	DestructorReturnType (*Destructor)(Type*)>
 struct CObjectDeleter
-	: AutoDeleter<Type, CObjectDelete<Type, DestructorReturnType> >
+	: AutoDeleter<Type, CObjectDelete<Type, DestructorReturnType, Destructor> >
 {
-	typedef AutoDeleter<Type, CObjectDelete<Type, DestructorReturnType> > Base;
+	typedef AutoDeleter<Type,
+		CObjectDelete<Type, DestructorReturnType, Destructor> > Base;
 
-	template<typename Destructor>
-	CObjectDeleter(Destructor destructor) : Base()
+	CObjectDeleter() : Base()
 	{
-		Base::fDelete = destructor;
 	}
 
-	template<typename Destructor>
-	CObjectDeleter(Type *object, Destructor destructor) : Base(object)
+	CObjectDeleter(Type *object) : Base(object)
 	{
-		Base::fDelete = destructor;
 	}
 };
 

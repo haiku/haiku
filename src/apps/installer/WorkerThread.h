@@ -44,6 +44,8 @@ private:
 
 			status_t			_PerformInstall(partition_id sourcePartitionID,
 									partition_id targetPartitionID);
+			status_t			_PrepareCleanInstall(
+									const BPath& targetDirectory) const;
 			status_t			_InstallationError(status_t error);
 			status_t			_MirrorIndices(const BPath& srcDirectory,
 									const BPath& targetDirectory) const;

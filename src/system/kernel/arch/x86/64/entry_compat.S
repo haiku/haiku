@@ -152,7 +152,6 @@ FUNCTION_END(x86_64_syscall32_entry)
 //	ecx - user esp
 FUNCTION(x86_64_sysenter32_entry):
 	swapgs
-	lfence
 
 	// Set up an iframe on the stack (ECX = saved ESP).
 	push	$USER_DATA_SELECTOR			// ss
@@ -315,7 +314,6 @@ FUNCTION(x86_64_sysenter32_entry):
 
 	// Restore previous GS base and return.
 	swapgs
-	lfence
 	sti
 	sysexit
 

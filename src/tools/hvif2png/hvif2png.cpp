@@ -92,7 +92,7 @@ h2p_close_state(h2p_state* state)
 static bool
 h2p_open_streams(h2p_state* state)
 {
-	CObjectDeleter<h2p_state> stateCloser(state, &h2p_close_state);
+	CObjectDeleter<h2p_state, void, &h2p_close_state> stateCloser(state);
 
 	if (state->params.in_filename != NULL)
 		state->in = fopen(state->params.in_filename, "rb");

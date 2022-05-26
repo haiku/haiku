@@ -7,7 +7,7 @@
  *		Stefano Ceccherini (burton666@libero.it)
  */
 
-//! Methods to initialize and get the system color_map.	
+//! Methods to initialize and get the system color_map.
 
 
 #include "SystemPalette.h"
@@ -50,7 +50,7 @@ color_distance(uint8 red1, uint8 green1, uint8 blue1,
 	int rmean = ((int)red1 + (int)red2) / 2;
 	return (((512 + rmean) * rd * rd) >> 8)
 			+ 4 * gd * gd
-			+ (((767 - rmean) * bd * bd) >> 8); 
+			+ (((767 - rmean) * bd * bd) >> 8);
 }
 
 
@@ -80,13 +80,13 @@ InvertColor(const rgb_color &color)
 	if (color.red == 255 && color.green == 255
 		&& color.blue == 255)
 		return color;
-	
+
 	rgb_color inverted;
 	inverted.red = 255 - color.red;
 	inverted.green = 255 - color.green;
 	inverted.blue = 255 - color.blue;
 	inverted.alpha = 255;
-	
+
 	return inverted;
 }
 
@@ -94,8 +94,8 @@ InvertColor(const rgb_color &color)
 static void
 FillColorMap(const rgb_color *palette, color_map *map)
 {
-	memcpy(map->color_list, palette, sizeof(map->color_list));
-	
+	memcpy((void*)map->color_list, palette, sizeof(map->color_list));
+
 	// init index map
 	for (int32 color = 0; color < 32768; color++) {
 		// get components
@@ -103,14 +103,14 @@ FillColorMap(const rgb_color *palette, color_map *map)
 		rgbColor.red = (color & 0x7c00) >> 7;
 		rgbColor.green = (color & 0x3e0) >> 2;
 		rgbColor.blue = (color & 0x1f) << 3;
-		
+
 		map->index_map[color] = FindClosestColor(rgbColor, palette);
 	}
-	
+
 	// init inversion map
 	for (int32 index = 0; index < 256; index++) {
 		rgb_color inverted = InvertColor(map->color_list[index]);
-		map->inversion_map[index] = FindClosestColor(inverted, palette);	
+		map->inversion_map[index] = FindClosestColor(inverted, palette);
 	}
 }
 

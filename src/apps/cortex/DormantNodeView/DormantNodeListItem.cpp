@@ -41,12 +41,19 @@
 
 // Application Kit
 #include <Application.h>
+// Locale Kit
+#undef B_CATALOG
+#define B_CATALOG (&sCatalog)
+#include <Catalog.h>
 // Interface Kit
 #include <PopUpMenu.h>
 #include <MenuItem.h>
 // Media Kit
 #include <MediaRoster.h>
 #include <MediaAddOn.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexDormantNodeListItem"
 
 __USE_CORTEX_NAMESPACE
 
@@ -55,6 +62,8 @@ __USE_CORTEX_NAMESPACE
 #define D_HOOK(x) //PRINT (x)		// BListItem impl.
 #define D_OPERATION(x) //PRINT (x)	// operations
 #define D_COMPARE(x) //PRINT (x)	// compare functions
+
+static BCatalog sCatalog("x-vnd.Cortex.DormantNodeView");
 
 // -------------------------------------------------------- //
 // constants
@@ -99,21 +108,8 @@ void DormantNodeListItem::DrawItem(
 		r.top += (frame.Height() / 2.0) - (B_MINI_ICON / 2.0);
 		r.right = r.left + B_MINI_ICON - 1.0;
 		r.bottom = r.top + B_MINI_ICON - 1.0;
-		if (IsSelected()) {
-			owner->SetHighColor(255, 255, 255, 255);
-			owner->FillRect(r);
-			owner->SetDrawingMode(B_OP_INVERT);
-			owner->DrawBitmap(m_icon, r.LeftTop());
-			owner->SetDrawingMode(B_OP_ALPHA);
-			owner->SetHighColor(0, 0, 0, 180);
-			owner->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
-			owner->DrawBitmap(m_icon, r.LeftTop());
-			owner->SetDrawingMode(B_OP_OVER);
-		}
-		else {
-			owner->SetDrawingMode(B_OP_OVER);
-			owner->DrawBitmap(m_icon, r.LeftTop());
-		}
+		owner->SetDrawingMode(B_OP_OVER);
+		owner->DrawBitmap(m_icon, r.LeftTop());
 	}
 
 	// Draw label
@@ -267,7 +263,7 @@ void DormantNodeListItem::showContextMenu(
 	
 	// Add the "Get Info" item
 	BMessage *message = new BMessage(InfoWindowManager::M_INFO_WINDOW_REQUESTED);
-	menu->AddItem(new BMenuItem("Get info", message));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Get info"), message));
 
 	menu->SetTargetForItems(owner);
 	owner->ConvertToScreen(&point);

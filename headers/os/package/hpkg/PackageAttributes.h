@@ -82,3 +82,10 @@ B_DEFINE_HPKG_ATTRIBUTE(52, STRING,	"package:post-install-script",
 B_DEFINE_HPKG_ATTRIBUTE(53, UINT,	"package:is-writable-directory",
 	PACKAGE_IS_WRITABLE_DIRECTORY)
 B_DEFINE_HPKG_ATTRIBUTE(54, STRING,	"package",				PACKAGE)
+B_DEFINE_HPKG_ATTRIBUTE(55, STRING,	"package:pre-uninstall-script",
+	PACKAGE_PRE_UNINSTALL_SCRIPT)
+// Note: add new entries at the end to avoid breaking index numbers, which are
+// in previously built .hpkg files the build process downloads from elsewhere.
+// Also remember to bump B_HPKG_MINOR_VERSION and B_HPKG_REPO_MINOR_VERSION.
+// And yes, the build (on Haiku) runs packaging tools compiled using your code,
+// which makes it extra fun to debug :-)

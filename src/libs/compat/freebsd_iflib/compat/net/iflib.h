@@ -48,7 +48,7 @@ typedef uint16_t qidx_t;
 struct iflib_ctx;
 typedef struct iflib_ctx *if_ctx_t;
 struct if_shared_ctx;
-typedef struct if_shared_ctx *if_shared_ctx_t;
+typedef const struct if_shared_ctx *if_shared_ctx_t;
 struct if_int_delay_info;
 typedef struct if_int_delay_info  *if_int_delay_info_t;
 struct if_pseudo;
@@ -94,7 +94,6 @@ typedef struct if_rxd_info {
 
 typedef struct if_rxd_update {
 	uint64_t	*iru_paddrs;
-	caddr_t		*iru_vaddrs;
 	qidx_t		*iru_idxs;
 	qidx_t		iru_pidx;
 	uint16_t	iru_qsidx;
@@ -167,13 +166,13 @@ typedef struct pci_vendor_info {
 	uint32_t	pvi_class_mask;
 	const char	*pvi_name;
 } pci_vendor_info_t;
-
 #define PVID(vendor, devid, name) {vendor, devid, 0, 0, 0, 0, name}
 #define PVID_OEM(vendor, devid, svid, sdevid, revid, name) {vendor, devid, svid, sdevid, revid, 0, name}
 #define PVID_END {0, 0, 0, 0, 0, 0, NULL}
 
-#define IFLIB_PNP_DESCR "U32:vendor;U32:device;U32:subvendor;U32:subdevice;" \
-    "U32:revision;U32:class;D:#"
+/* No drivers in tree currently match on anything except vendor:device. */
+#define IFLIB_PNP_DESCR "U32:vendor;U32:device;U32:#;U32:#;" \
+    "U32:#;U32:#;D:#"
 #define IFLIB_PNP_INFO(b, u, t) \
     MODULE_PNP_INFO(IFLIB_PNP_DESCR, b, u, t, nitems(t) - 1)
 
@@ -219,6 +218,9 @@ typedef struct if_softc_ctx {
 	uint32_t __spare2__;
 
 	iflib_intr_mode_t isc_intr;
+	uint16_t isc_rxd_buf_size[8]; /* set at init time by driver, 0
+				         means use iflib-calculated size
+				         based on isc_max_frame_size */
 	uint16_t isc_max_frame_size; /* set at init time by driver */
 	uint16_t isc_min_frame_size; /* set at init time by driver, only used if
 					IFLIB_NEED_ETHER_PAD is set. */
@@ -285,15 +287,32 @@ typedef struct iflib_dma_info {
 #define IFLIB_MAGIC 0xCAFEF00D
 
 typedef enum {
+	/* Interrupt or softirq handles only receive */
 	IFLIB_INTR_RX,
+
+	/* Interrupt or softirq handles only transmit */
 	IFLIB_INTR_TX,
+
+	/*
+	 * Interrupt will check for both pending receive
+	 * and available tx credits and dispatch a task
+	 * for one or both depending on the disposition
+	 * of the respective queues.
+	 */
 	IFLIB_INTR_RXTX,
+
+	/*
+	 * Other interrupt - typically link status and
+	 * or error conditions.
+	 */
 	IFLIB_INTR_ADMIN,
+
+	/* Softirq (task) for iov handling */
 	IFLIB_INTR_IOV,
 } iflib_intr_type_t;
 
 /*
- * Interface has a separate command queue for RX
+ * Interface has a separate completion queue for RX
  */
 #define IFLIB_HAS_RXCQ		0x01
 /*
@@ -305,7 +324,7 @@ typedef enum {
  */
 #define IFLIB_IS_VF		0x04
 /*
- * Interface has a separate command queue for TX
+ * Interface has a separate completion queue for TX
  */
 #define IFLIB_HAS_TXCQ		0x08
 /*
@@ -365,6 +384,25 @@ typedef enum {
  * Driver will pass the media
  */
 #define IFLIB_DRIVER_MEDIA	0x20000
+/*
+ * When using a single hardware interrupt for the interface, only process RX
+ * interrupts instead of doing combined RX/TX processing.
+ */
+#define	IFLIB_SINGLE_IRQ_RX_ONLY	0x40000
+/*
+ * Don't need/want most of the niceties of
+ * emulating ethernet
+ */
+#define IFLIB_PSEUDO_ETHER	0x80000
+
+/*
+ * These enum values are used in iflib_needs_restart to indicate to iflib
+ * functions whether or not the interface needs restarting when certain events
+ * happen.
+ */
+enum iflib_restart_event {
+	IFLIB_RESTART_VLAN_CONFIG,
+};
 
 /*
  * field accessors

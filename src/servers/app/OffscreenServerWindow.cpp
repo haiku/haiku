@@ -17,14 +17,13 @@ OffscreenServerWindow::OffscreenServerWindow(const char *title, ServerApp *app,
 		port_id clientPort, port_id looperPort, int32 handlerID,
 		ServerBitmap* bitmap)
 	: ServerWindow(title, app, clientPort, looperPort, handlerID),
-	fBitmap(bitmap)
+	fBitmap(bitmap, true)
 {
 }
 
 
 OffscreenServerWindow::~OffscreenServerWindow()
 {
-	fBitmap->ReleaseReference();
 }
 
 

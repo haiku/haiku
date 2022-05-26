@@ -242,7 +242,7 @@ StreamBuffer::Position()
 {
 	off_t position = fStream->Position();
 	if (fToRead)
-		position -= fPos;
+		position -= (fLen - fPos);
 	else
 		position += fLen;
 	return position;

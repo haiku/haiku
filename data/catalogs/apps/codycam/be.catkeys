@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-CodyCam	2534662296
+1	belarusian	x-vnd.Haiku-CodyCam	4276991065
 destination directory expected	CodyCam		каталёг прызначэння чаканы
 reply: '%s'\n	SftpClient		адказ: '%s'\n
 JPEG image	CodyCam		Выява JPEG
@@ -40,7 +40,6 @@ Directory:	CodyCam		Каталёг:
 Error setting type of output file	VideoConsumer.cpp		Памылка пры прызначэнні тыпу выходнага файлу
 Cannot find an available video stream	CodyCam		Немагчыма знайсці даступны відэапаток
 password expected	CodyCam		пароль чаканы
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <схаваны>  (рэальны пароль адпраўлены)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Выхад
 server address expected	CodyCam		адрас сервера чаканы

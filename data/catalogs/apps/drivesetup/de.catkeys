@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	1293367628
+1	german	x-vnd.Haiku-DriveSetup	3407096167
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Mount all	MainWindow		Alle einhängen
 Disk	MainWindow		Datenträger
@@ -18,10 +18,9 @@ Unmount	MainWindow		Aushängen
 Failed to format the partition %s!\n	MainWindow		Formatierung der Partition \"%s\" fehlgeschlagen!\n
 Partition size	CreateParametersPanel		Partitionsgröße
 Validation of the given parameters failed.	MainWindow		Die Überprüfung der angegebenen Parameter ist fehlgeschlagen.
-The partition %s is currently mounted.	MainWindow		Die Partition \"%s\" ist momentan eingehangen.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition \"%s\" wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
 Mounted at	PartitionList		Eingehangen als
-Create…	MainWindow		Anlegen…
+Create…	MainWindow		Anlegen …
 Write changes	MainWindow		Änderungen schreiben
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen. Der Datenträger blieb unverändert.
 Validation of the given creation parameters failed.	MainWindow		Die Überprüfung der zum Anlegen angegebenen Parameter ist fehlgeschlagen.
@@ -36,7 +35,7 @@ There's no space on the partition where a child partition could be created.	Main
 No disk devices have been recognized.	DiskView		Es wurden keine Datenträger erkannt.
 Attributes	PartitionList		Attribute
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Das Löschen der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
-Change parameters…	MainWindow		Parameter ändern…
+Change parameters…	MainWindow		Parameter ändern …
 Format	InitializeParametersPanel		Formatieren
 Could not unmount partition	MainWindow		Partition konnte nicht ausgehangen werden.
 Create	CreateParametersPanel		Anlegen
@@ -50,6 +49,8 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		Löschen (nicht implementiert)
 The currently selected partition does not have a parent partition.	MainWindow		Die ausgewählte Partition hat keine übergeordnete Partition.
 Validation of the given initialization parameters failed.	MainWindow		Die Überprüfung der zum Initialisieren angegebenen Parameter ist fehlgeschlagen.
+Not formatted (%s)	PartitionList		Nicht formatiert (%s)
+Failed to create the partition. No changes have been written to disk.	MainWindow		Die Partition konnte nicht angelegt werden. Es wurden keine Änderungen auf den Datenträger geschrieben.
 Shared	PartitionList		Netzwerk
 MIMEs	PartitionList		MIMEs
 BitLocker encrypted	Encryption utils		BitLocker verschlüsselt
@@ -62,10 +63,11 @@ Change	ChangeParametersPanel		Ändern
 Partition name:	ChangeParametersPanel		Partitionsname:
 LUKS encrypted	Encryption utils		LUKS verschlüsselt
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sollen die Änderungen wirklich auf den Datenträger geschrieben werden?\n\nAlle Daten auf der Partition \"%s\" gehen dabei unwiderruflich verloren!
+Empty space	PartitionList		Freier Platz
 Cancel	AbstractParametersPanel		Abbrechen
 Format	MainWindow		Formatieren
-<empty or unknown>	DiskView		<leer oder unbekannt>
 OK	MainWindow		OK
+Empty space	DiskView		Freier Platz
 Open with DiskProbe	MainWindow		Öffnen mit DiskProbe
 Could not delete the selected partition.	MainWindow		Die gewählte Partition konnte nicht gelöscht werden.
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Soll der ausgewählte Datenträger wirklich formatiert werden? Alle Daten werden verloren gehen. Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.\n
@@ -82,6 +84,7 @@ Rescan	MainWindow		Aktualisieren
 There was an error acquiring the partition row.	MainWindow		Es ist ein interner Fehler aufgetreten.
 Failed to initialize the disk %s!\n	MainWindow		Initialisierung der Partition \"%s\" fehlgeschlagen!\n
 Disk system \"%s\" not found!	MainWindow		Medienschema \"%s\" nicht gefunden!
+The partition cannot be unmounted.	MainWindow		Die Partition kann nicht ausgehangen werden.
 Delete	MainWindow		Löschen
 Partition type:	ChangeParametersPanel		Partitionstyp:
 Parameters	PartitionList		Parameter
@@ -90,7 +93,6 @@ Cannot delete the selected partition.	MainWindow		Gewählte Partition konnte nic
 Continue	MainWindow		Weiter
 Could not mount partition %s.	MainWindow		Die Partition \"%s\" konnte nicht eingehangen werden.
 Are you sure you want to format the partition? You will be asked again before changes are written to the disk.	MainWindow		Soll die Partition wirklich formatiert werden? Die Änderungen werden erst nach einer weiteren Bestätigung geschrieben.
-<empty or unknown>	PartitionList		<leer oder unbekannt>
 The selected disk is read-only.	MainWindow		Vom ausgewählten Datenträger ist schreibgeschützt.
 The partition %s is already unmounted.	MainWindow		Die Partition \"%s\" ist bereits ausgehangen.
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sollen die Parameter der ausgewählten Partition wirklich geändert werden?\n\nAndere Betriebssysteme können die Partition unter Umständen nicht mehr erkennen!
@@ -102,7 +104,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Bitte eine Partition aus der unten stehenden Liste wählen.
 Active	PartitionList		Aktiv
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sollen die gewählte Partition wirklich gelöscht werden?\n\nAlle dort vorhandenen Daten gehen dabei unwiderruflich verloren!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Das Formatieren der Partition ist fehlgeschlagen. Der Datenträger blieb unverändert.
 The partition %s has been successfully formatted.\n	MainWindow		Die Partition \"%s\" wurde erfolgreich formatiert.\n
 The partition %s is already mounted.	MainWindow		Die Partition \"%s\" ist bereits eingehangen.
 Size	PartitionList		Größe

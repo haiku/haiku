@@ -1,11 +1,11 @@
 1	ukrainian	x-vnd.Haiku-PNGTranslator	2504765797
 PNG Settings	PNGTranslator		Налаштування PNG
-None	PNGTranslator		Пусто
+None	PNGTranslator		Немає
 PNG image	PNGTranslator		Зображення PNG
 PNG images	PNGTranslator		Зображення PNG
-Interlacing type:	PNGTranslator		Тип чередування:
-PNG Interlace Menu	PNGTranslator		Меню чередування PNG
+Interlacing type:	PNGTranslator		Алгоритм чередування:
+PNG Interlace Menu	PNGTranslator		Меню чередування рядків PNG
 PNGTranslator Settings	PNGTranslator		Налаштування транслятора PNG
 Version %d.%d.%d, %s	PNGTranslator		Версія %d.%d.%d, %s
-PNG image translator	PNGTranslator		Транслятор зображеннь PNG
-Interlace Option	PNGTranslator		Опції чередування
+PNG image translator	PNGTranslator		Транслятор зображень PNG
+Interlace Option	PNGTranslator		Параметри чередування

@@ -505,12 +505,11 @@ set_mouse_type(int32 type)
 
 
 status_t
-get_mouse_type_by_name(BString mouse_name, int32 *type)
+get_mouse_type(const char* mouse_name, int32 *type)
 {
 	BMessage command(IS_GET_MOUSE_TYPE);
 	BMessage reply;
-	command.AddString("mouse_name", mouse_name.String());
-
+	command.AddString("mouse_name", mouse_name);
 
 	status_t err = _control_input_server_(&command, &reply);
 	if (err != B_OK)
@@ -521,13 +520,12 @@ get_mouse_type_by_name(BString mouse_name, int32 *type)
 
 
 status_t
-set_mouse_type_by_name(BString mouse_name, int32 type)
+set_mouse_type(const char* mouse_name, int32 type)
 {
 	BMessage command(IS_SET_MOUSE_TYPE);
 	BMessage reply;
 
-	status_t err_mouse_name = command.AddString("mouse_name",
-		mouse_name.String());
+	status_t err_mouse_name = command.AddString("mouse_name", mouse_name);
 	if (err_mouse_name != B_OK)
 		return err_mouse_name;
 
@@ -627,11 +625,11 @@ set_mouse_speed(int32 speed)
 
 
 status_t
-get_mouse_speed_by_name(BString mouse_name, int32 *speed)
+get_mouse_speed(const char* mouse_name, int32 *speed)
 {
 	BMessage command(IS_GET_MOUSE_SPEED);
 	BMessage reply;
-	command.AddString("mouse_name", mouse_name.String());
+	command.AddString("mouse_name", mouse_name);
 
 	status_t err = _control_input_server_(&command, &reply);
 	if (err != B_OK)
@@ -646,11 +644,11 @@ get_mouse_speed_by_name(BString mouse_name, int32 *speed)
 
 
 status_t
-set_mouse_speed_by_name(BString mouse_name, int32 speed)
+set_mouse_speed(const char* mouse_name, int32 speed)
 {
 	BMessage command(IS_SET_MOUSE_SPEED);
 	BMessage reply;
-	command.AddString("mouse_name", mouse_name.String());
+	command.AddString("mouse_name", mouse_name);
 
 	command.AddInt32("speed", speed);
 
@@ -679,6 +677,35 @@ set_mouse_acceleration(int32 speed)
 	BMessage command(IS_SET_MOUSE_ACCELERATION);
 	BMessage reply;
 	command.AddInt32("speed", speed);
+	return _control_input_server_(&command, &reply);
+}
+
+
+status_t
+get_mouse_acceleration(const char* mouse_name, int32 *speed)
+{
+	BMessage command(IS_GET_MOUSE_ACCELERATION);
+	BMessage reply;
+	command.AddString("mouse_name", mouse_name);
+
+	_control_input_server_(&command, &reply);
+
+	if (reply.FindInt32("speed", speed) != B_OK)
+		*speed = 65536;
+
+	return B_OK;
+}
+
+
+status_t
+set_mouse_acceleration(const char* mouse_name, int32 speed)
+{
+	BMessage command(IS_SET_MOUSE_ACCELERATION);
+	BMessage reply;
+	command.AddString("mouse_name", mouse_name);
+
+	command.AddInt32("speed", speed);
+
 	return _control_input_server_(&command, &reply);
 }
 
@@ -995,7 +1022,7 @@ void
 set_focus_follows_mouse(bool follow)
 {
 	// obviously deprecated API
-	set_mouse_mode(B_FOCUS_FOLLOWS_MOUSE);
+	set_mouse_mode(follow ? B_FOCUS_FOLLOWS_MOUSE : B_NORMAL_MOUSE);
 }
 
 
@@ -1115,12 +1142,14 @@ get_mouse_bitmap(BBitmap** bitmap, BPoint* hotspot)
 	uint32 size = 0;
 	uint32 cursorWidth = 0;
 	uint32 cursorHeight = 0;
+	color_space colorspace = B_RGBA32;
 
 	// if link.Read() returns an error, the same error will be returned on
 	// subsequent calls, so we'll check only the return value of the last call
 	link.Read<uint32>(&size);
 	link.Read<uint32>(&cursorWidth);
 	link.Read<uint32>(&cursorHeight);
+	link.Read<color_space>(&colorspace);
 	if (hotspot == NULL) {
 		BPoint dummy;
 		link.Read<BPoint>(&dummy);
@@ -1140,7 +1169,7 @@ get_mouse_bitmap(BBitmap** bitmap, BPoint* hotspot)
 	}
 
 	BBitmap* cursorBitmap = new (std::nothrow) BBitmap(BRect(0, 0,
-		cursorWidth - 1, cursorHeight - 1), B_RGBA32);
+		cursorWidth - 1, cursorHeight - 1), colorspace);
 
 	if (cursorBitmap == NULL) {
 		free(data);
@@ -1148,7 +1177,7 @@ get_mouse_bitmap(BBitmap** bitmap, BPoint* hotspot)
 	}
 	status = cursorBitmap->InitCheck();
 	if (status == B_OK)
-		cursorBitmap->SetBits(data, size, 0, B_RGBA32);
+		cursorBitmap->SetBits(data, size, 0, colorspace);
 
 	free(data);
 

@@ -67,6 +67,7 @@ namespace BPrivate {
 class Benaphore;
 class BPose;
 class BPoseView;
+class Model;
 
 // global variables
 static const rgb_color kBlack = {0, 0, 0, 255};
@@ -347,36 +348,6 @@ private:
 };
 
 
-class LooperAutoLocker {
-public:
-	LooperAutoLocker(BHandler* handler)
-	:	fHandler(handler),
-		fHasLock(handler->LockLooper())
-	{
-	}
-
-	~LooperAutoLocker()
-	{
-		if (fHasLock)
-			fHandler->UnlockLooper();
-	}
-
-	bool operator!() const
-	{
-		return !fHasLock;
-	}
-
-	bool IsLocked() const
-	{
-		return fHasLock;
-	}
-
-private:
-	BHandler* fHandler;
-	bool fHasLock;
-};
-
-
 class ShortcutFilter : public BMessageFilter {
 public:
 	ShortcutFilter(uint32 shortcutKey, uint32 shortcutModifier,
@@ -437,18 +408,6 @@ extern void DeleteSubmenu(BMenuItem* submenuItem);
 
 extern bool BootedInSafeMode();
 
-
-inline rgb_color
-Color(int32 r, int32 g, int32 b, int32 alpha = 255)
-{
-	rgb_color result;
-	result.red = (uchar)r;
-	result.green = (uchar)g;
-	result.blue = (uchar)b;
-	result.alpha = (uchar)alpha;
-
-	return result;
-}
 
 void PrintToStream(rgb_color color);
 

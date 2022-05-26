@@ -138,7 +138,7 @@ static const struct partition_type kPartitionTypes[] = {
     { 0xc7, "Syrinx", false }, 
     { 0xe4, "SpeedStor", false }, 
     { 0xee, "GPT", false }, 
-    { 0xef, "EFI", false }, 
+    { 0xef, "EFI system data", true },
     { 0xfb, "VMware VMFS", false },
     { 0xfc, "VMware VMKCORE", false },
     { 0xfd, "Linux raid auto", false },

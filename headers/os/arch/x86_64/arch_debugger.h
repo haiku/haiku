@@ -6,38 +6,11 @@
 #define _ARCH_X86_64_DEBUGGER_H
 
 
-typedef struct x86_64_fp_register {
-	uint8		value[10];
-	uint8		reserved[6];
-} x86_64_fp_register;
-
-
-typedef struct x86_64_xmm_register {
-	uint8		value[16];
-} x86_64_xmm_register;
-
-
-typedef struct x86_64_extended_registers {
-	uint16					control;
-	uint16					status;
-	uint8					tag;
-	uint8					reserved1;
-	uint16					opcode;
-	uint64					instruction_pointer;
-	uint64					data_pointer;
-	uint32					mxcsr;
-	uint32					mxcsr_mask;
-	union {
-		x86_64_fp_register	fp_registers[8];	// st0-st7
-		x86_64_fp_register	mmx_registers[8];	// mm0-mm7
-	};
-	x86_64_xmm_register		xmm_registers[16];	// xmm0-xmm15
-	uint8					reserved2[96];		// 416 - 512
-} x86_64_extended_registers;
+#include <posix/arch/x86_64/signal.h>
 
 
 struct x86_64_debug_cpu_state {
-	x86_64_extended_registers	extended_registers;
+	struct savefpu	extended_registers;
 
 	uint64	gs;
 	uint64	fs;

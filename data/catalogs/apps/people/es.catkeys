@@ -1,20 +1,21 @@
-1	spanish; castilian	x-vnd.Be-PEPL	2332202134
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		La ejecución del preflet FileTypes para configurar los atributos de la Persona ha fallado.\n\nError: 
+1	spanish; castilian	x-vnd.Be-PEPL	2634915100
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		La ejecución del diálogo de preferencias FileTypes para configurar los atributos de la Persona ha fallado.\n\nError: 
+Mobile phone	People		Teléfono móvil
 Unnamed person	People		Persona sin nombre
-New person…	People		Nueva Persona
+New person…	People		Nueva persona…
 Address	People		Dirección
-Zip	People		Zip
+Zip	People		Código postal
 Select all	People		Seleccionar todo
 Could not create %s.	People		No se pudo crear %s.
 Quit	People		Salir
 Company	People		Empresa
 Name	People		Nombre
-The file '%name%' could not be written.	People		El archivo '%name%' no pudo ser escrito.
+The file '%name%' could not be written.	People		No se pudo escribir el archivo '%name%'.
 Contact name	People		Nombre de contacto
 Cancel	People		Cancelar
 Edit	People		Editar
 Save changes before closing?	People		¿Desea guardar los cambios antes de cerrar?
-People	System name		Gente
+People	System name		Personas
 Error	People		Error
 Revert	People		Revertir
 Country	People		País

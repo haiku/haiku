@@ -241,12 +241,16 @@ public:
 									const BRect& updateRect,
 									const rgb_color& base, uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS,
-									uint32 side = B_TOP_BORDER);
+									uint32 side = B_TOP_BORDER,
+									int32 index = 0, int32 selected = -1,
+									int32 first = 0, int32 last = 0);
 	virtual	void				DrawInactiveTab(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base, uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS,
-									uint32 side = B_TOP_BORDER);
+									uint32 side = B_TOP_BORDER,
+									int32 index = 0, int32 selected = -1,
+									int32 first = 0, int32 last = 0);
 
 	virtual	void				DrawSplitter(BView* view, BRect& rect,
 									const BRect& updateRect,
@@ -335,6 +339,8 @@ public:
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS,
 									orientation orientation = B_HORIZONTAL);
+	virtual float				GetScrollBarWidth(
+									orientation orientation = B_VERTICAL);
 
 protected:
 			void				_DrawButtonFrame(BView* view, BRect& rect,

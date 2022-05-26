@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	3672498538
+1	polish	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Zespoły
 Semaphores	DataSource		Semafory
 TX	DataSource	Shorter version for Sending	TX
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Usuń wykres
 Swap space	DataSource		Przestrzeń wymiany
 CPU	DataSource		Procesor
 ActivityMonitor	System name		Monitor Aktywności
+CPU %d	DataSource		Procesor %d
 Update time interval:	SettingsWindow		Częstotliwość odświeżania:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Ustawienia…
@@ -30,6 +31,7 @@ Used memory	DataSource		Używana pamięć
 %.1f faults/s	DataSource		%.1f błędów/s
 Show legend	ActivityView		Pokaż legendę
 Cached memory	DataSource		Pamięć podręczna
+CPU %d usage	DataSource		Użycie procesora %d
 File	ActivityWindow		Plik
 Ports	DataSource		Porty
 Page faults	DataSource		Błędy stronicowania

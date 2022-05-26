@@ -6,5 +6,5 @@ AddResources BeControlLook : BeControlLook.rdef ;
 
 Addon BeControlLook :
 	BeControlLook.cpp
-	: be <nogrist>app_server [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;

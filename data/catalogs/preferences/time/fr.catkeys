@@ -1,11 +1,11 @@
-1	french	x-vnd.Haiku-Time	834234238
+1	french	x-vnd.Haiku-Time	3691539601
 OK	Time		OK
 Message receiving failed	Time		La réception du message a échoué
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Date & Heure, écrit par :\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Australie
 America	Time		Amérique
 Reset to default server list	Time		Restaurer la liste de serveurs par défaut
 Could not resolve server address	Time		Impossible de résoudre l’adresse du serveur
+Time & Date	System name		Heure & Date
 Set time zone	Time		Régler le fuseau horaire
 Waiting for answer failed	Time		L’attente d’une réponse a échoué
 <Other>	Time		<Autre>
@@ -38,7 +38,6 @@ Atlantic	Time		Atlantique
 Show clock in Deskbar	Time		Afficher l’heure dans la Deskbar
 Display time with seconds	Time		Afficher l’heure avec les secondes
 Time	System name		Heure
-about	Time		À propos
 Show time zone	Time		Afficher le fuseau horaire
 Synchronize at boot	Time		Synchroniser au démarrage
 Indian	Time		Indien

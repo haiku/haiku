@@ -25,12 +25,11 @@ options:
                               out HaikuPorts cross-compilation repository.
                               <HaikuPorts repo> is the path to a checked out
                               HaikuPorts repository.
-  --build-cross-tools <arch> [ <build tools dir> ]
-                              Assume cross compilation. <build tools dir>
-                              defines the location of the build tools sources.
-                              They will be compiled and placed in the output
-                              directory under "cross-tools". The HAIKU_* tools
-                              variables will be set accordingly.
+  --build-cross-tools <arch>
+                              Assume cross compilation.
+                              Toolchain will be compiled and placed in the
+                              output directory under "cross-tools". The
+                              HAIKU_* tools variables will be set accordingly.
                               <arch> specifies the target architecture, either
                               "x86_gcc2", "x86", "x86_64", "ppc", "m68k",
                               "arm", "arm64", "riscv64", "sparc"
@@ -38,15 +37,16 @@ options:
                               specified multiple times. The first cross tools
                               specify the primary tools, the subsequent ones the
                               secondary tools (for "hybrid" images).
-                              For the first --build-cross-tools the
-                              <build tools dir> argument must be specified and
-                              for the subsequent ones it must be omitted.
   --cross-tools-prefix <prefix>
                               Assume cross compilation. <prefix> should be a
                               path to the directory where the cross
                               compilation tools are located, plus the platform
                               prefix, e.g. "/path/to/tools/i586-pc-haiku-".
                               This overrides the HAIKU_* tool variables.
+  --cross-tools-source <buildtools dir>
+                              Toolchain sources for cross compilation.
+                              <buildtools dir> defines the location of the
+                              buildtools sources.
   --distro-compatibility <level>
                               The distribution's level of compatibility with
                               the official Haiku distribution. The generated
@@ -92,6 +92,8 @@ options:
   --with-gdb <gdb sources dir>
                               specify the path to a GDB source dir, to build
                               GDB for each arch we build the cross-tools for.
+  --use-stack-protector       Build with stack protection enabled
+  --efi-signing-key           Private keyfile to sign any EFI bootloaders
 
 environment variables:
   CC                          The host compiler. Defaults to "gcc".
@@ -239,6 +241,19 @@ valid_toolchain()
 	return 1
 }
 
+# is_legacy_gcc
+#
+# Determines if the specified GCC version is a "legacy" (i.e. GCC < 4) one.
+#
+is_legacy_gcc()
+{
+	if [ `echo $1 | cut -d'.' -f1` -lt 4 ]; then
+		echo 1
+	else
+		echo 0
+	fi
+}
+
 # standard_gcc_settings
 #
 # Sets the variables for a GCC platform.
@@ -299,18 +314,24 @@ standard_gcc_settings()
 	local bootLibgcc
 	local bootLibSupCxx
 	local bootCxxHeaders
+	local boot32Libgcc
+	local boot32LibSupCxx
+	local boot32CxxHeaders
 	case $gccMachine in
 		x86_64-*)
 			# Boot loader is 32-bit, need the 32-bit libs and c++ config
-			bootLibgcc=`$gcc -m32 -print-file-name=libgcc.a`
-			bootLibSupCxx=`$gcc -m32 -print-file-name=libsupc++.a`
+			boot32Libgcc=`$gcc -m32 -print-file-name=libgcc.a`
+			boot32LibSupCxx=`$gcc -m32 -print-file-name=libsupc++.a`
+			bootLibgcc=`$gcc -print-file-name=libgcc.a`
+			bootLibSupCxx=`$gcc -print-file-name=libsupc++.a`
 
 			local headersBase=$gccdir/../../../..
 			local headers=$headersBase/$gccMachine/include/c++/$gccRawVersion
 			if [ ! -d $headers ]; then
 				headers=$headersBase/include/c++/$gccRawVersion
 			fi
-			bootCxxHeaders="$headers/$gccMachine/32"
+			boot32CxxHeaders="$headers/$gccMachine/32"
+			bootCxxHeaders="$headers/$gccMachine"
 			;;
 	esac
 
@@ -331,6 +352,8 @@ standard_gcc_settings()
 	set_variable HAIKU_CPU_$targetArch $targetCpu
 
 	get_build_tool_path CC_$targetArch "$gcc"
+	set_variable HAIKU_CC_IS_LEGACY_GCC_$targetArch \
+		`is_legacy_gcc $gccRawVersion`
 	set_variable HAIKU_CC_IS_CLANG_$targetArch $useClang
 	set_variable HAIKU_GCC_RAW_VERSION_$targetArch $gccRawVersion
 	set_variable HAIKU_GCC_MACHINE_$targetArch $gccMachine
@@ -338,6 +361,9 @@ standard_gcc_settings()
 	set_variable HAIKU_BOOT_CXX_HEADERS_DIR_$targetArch "$bootCxxHeaders"
 	set_variable HAIKU_BOOT_LIBSUPCXX_$targetArch "$bootLibSupCxx"
 	set_variable HAIKU_BOOT_LIBGCC_$targetArch $bootLibgcc
+	set_variable HAIKU_BOOT_32_CXX_HEADERS_DIR_$targetArch "$boot32CxxHeaders"
+	set_variable HAIKU_BOOT_32_LIBSUPCXX_$targetArch "$boot32LibSupCxx"
+	set_variable HAIKU_BOOT_32_LIBGCC_$targetArch $boot32Libgcc
 	set_variable HAIKU_USE_GCC_GRAPHITE_$targetArch $useGraphite
 
 	standard_gcc_settings_targetArch=$targetArch
@@ -434,7 +460,7 @@ check_native_xattrs()
 			xattr_set="setextattr"; xattr_set_args="user \$NAME \"\$VALUE\""
 			xattr_get="getextattr"; xattr_get_args="user \$NAME"
 			;;
-		linux|msys)
+		linux)
 			xattr_set="setfattr"; xattr_set_args="-n user.\$NAME -v \"\$VALUE\""
 			xattr_get="getfattr"; xattr_get_args="-n user.\$NAME"
 			;;
@@ -585,7 +611,6 @@ case "${platform}" in
 	Haiku)   HOST_PLATFORM=haiku_host ;;
 	Linux)   HOST_PLATFORM=linux ;;
 	OpenBSD) HOST_PLATFORM=openbsd ;;
-	MSYS*)   HOST_PLATFORM=msys ;;
 	*)       echo Unsupported platform: ${platform}
 	         exit 1 ;;
 esac
@@ -608,6 +633,7 @@ fi
 # exported (BuildSetup) default parameter values
 #
 HOST_GCC_RAW_VERSION=`$CC -dumpversion`
+HOST_CC_IS_LEGACY_GCC=`is_legacy_gcc $HOST_GCC_RAW_VERSION`
 HOST_GCC_MACHINE=`$CC -dumpmachine`
 HAIKU_INCLUDE_SOURCES=0
 HAIKU_INCLUDE_3RDPARTY=0
@@ -683,17 +709,15 @@ while [ $# -gt 0 ] ; do
 			)
 			shift 4
 			;;
+		--cross-tools-source)
+			assertparam "$1" $#
+			buildCrossTools=$2
+			shift 2
+			;;
 		--build-cross-tools)
-			if [ -z "$buildCrossTools" ]; then
-				assertparams "$1" 2 $#
-				targetArch=$2
-				buildCrossTools=$3
-				shift 3
-			else
-				assertparam "$1" $#
-				targetArch=$2
-				shift 2
-			fi
+			assertparam "$1" $#
+			targetArch=$2
+			shift 2
 			case "$targetArch" in
 				x86_gcc2)	targetMachine=i586-pc-haiku;;
 				x86)		targetMachine=i586-pc-haiku;;
@@ -789,6 +813,12 @@ while [ $# -gt 0 ] ; do
 		--no-full-xattr)HAIKU_HOST_USE_XATTR=0; shift 1;;
 		--no-xattr)		HAIKU_HOST_USE_XATTR_REF=0; shift 1;;
 		--with-gdb)	gdbSources=$2; shift 2;;
+		--use-stack-protector)	HAIKU_USE_STACK_PROTECTOR=1; shift 1;;
+		--efi-signing-key)
+			assertparam "$1" $#
+			HAIKU_EFI_SIGNING_KEY="$2"
+			shift 2
+			;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
 done
@@ -1024,12 +1054,9 @@ else
 			get_build_tool_path ELFEDIT_$targetArch elfedit
 		elif [ -n "$crossToolsPrefix" ]; then
 			get_build_tool_path LD_$targetArch ${crossToolsPrefix}ld
-			case `get_variable HAIKU_GCC_RAW_VERSION_$targetArch` in
-				4.*|5.*|6.*|7.*|8.*)
-					get_build_tool_path ELFEDIT_$targetArch \
-						${crossToolsPrefix}elfedit
-				;;
-			esac
+			if [ `get_variable HAIKU_CC_IS_LEGACY_GCC_$targetArch` -eq 0 ]; then
+				get_build_tool_path ELFEDIT_$targetArch ${crossToolsPrefix}elfedit
+			fi
 		fi
 		if [ -n "$crossToolsPrefix" ]; then
 			get_build_tool_path AR_$targetArch ${crossToolsPrefix}ar
@@ -1081,10 +1108,10 @@ HAIKU_HOST_USE_XATTR		?= "${HAIKU_HOST_USE_XATTR}" ;
 HAIKU_HOST_USE_XATTR_REF	?= "${HAIKU_HOST_USE_XATTR_REF}" ;
 HAIKU_HOST_BUILD_ONLY		?= "${HAIKU_HOST_BUILD_ONLY}" ;
 
-JAMSHELL					?= ${JAMSHELL} -c ;
+JAMSHELL					?= ${JAMSHELL} -e -c ;
 
 HOST_CC						?= ${CC} ;
-HOST_GCC_RAW_VERSION		?= ${HOST_GCC_RAW_VERSION} ;
+HOST_CC_IS_LEGACY_GCC		?= ${HOST_CC_IS_LEGACY_GCC} ;
 HOST_GCC_MACHINE			?= ${HOST_GCC_MACHINE} ;
 HOST_LD						?= ${HOST_GCC_LD} ;
 HOST_OBJCOPY				?= ${HOST_GCC_OBJCOPY} ;
@@ -1100,19 +1127,22 @@ HAIKU_PORTS					?= ${HAIKU_PORTS} ;
 HAIKU_PORTS_CROSS			?= ${HAIKU_PORTS_CROSS} ;
 HAIKU_IS_BOOTSTRAP			?= ${HAIKU_IS_BOOTSTRAP} ;
 
+HAIKU_BOOT_EFI_PRIVATE_KEYFILE	?= ${HAIKU_EFI_SIGNING_KEY} ;
 EOF
 
 for targetArch in $HAIKU_PACKAGING_ARCHS; do
 	variables="
 		HAIKU_CC					HAIKU_CC
+		HAIKU_CC_IS_LEGACY_GCC		HAIKU_CC_IS_LEGACY_GCC
 		HAIKU_CC_IS_CLANG			HAIKU_CC_IS_CLANG
 		HAIKU_USE_GCC_GRAPHITE		HAIKU_USE_GCC_GRAPHITE
 		HAIKU_CPU					HAIKU_CPU
 		HAIKU_GCC_MACHINE			HAIKU_GCC_MACHINE
-		HAIKU_GCC_RAW_VERSION		HAIKU_GCC_RAW_VERSION
 		HAIKU_GCC_LIB_DIR			HAIKU_GCC_LIB_DIR
 		HAIKU_BOOT_LIBGCC			HAIKU_BOOT_LIBGCC
 		HAIKU_BOOT_LIBSUPC++		HAIKU_BOOT_LIBSUPCXX
+		HAIKU_BOOT_32_LIBGCC		HAIKU_BOOT_32_LIBGCC
+		HAIKU_BOOT_32_LIBSUPC++		HAIKU_BOOT_32_LIBSUPCXX
 		HAIKU_AR					HAIKU_AR
 		HAIKU_LD					HAIKU_LD
 		HAIKU_OBJCOPY				HAIKU_OBJCOPY
@@ -1138,6 +1168,7 @@ for targetArch in $HAIKU_PACKAGING_ARCHS; do
 	# lines so that jam doesn't hit the maximum line length.
 	variables="
 		HAIKU_BOOT_C++_HEADERS_DIR	HAIKU_BOOT_CXX_HEADERS_DIR
+		HAIKU_BOOT_32_C++_HEADERS_DIR	HAIKU_BOOT_32_CXX_HEADERS_DIR
 		"
 	set -- $variables
 	while [ $# -ge 2 ]; do

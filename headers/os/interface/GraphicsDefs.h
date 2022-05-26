@@ -149,6 +149,8 @@ typedef enum {
 	B_NO_COLOR_SPACE	= 0x0000,
 
 	// linear color space (little endian)
+	B_RGBA64			= 0x2012,	// RGBA		RGBA 16:16:16:16
+	B_RGB48				= 0x0011,	// RGB		 RGB 16:16:16
 	B_RGB32				= 0x0008,	// BGR-		-RGB 8:8:8:8
 	B_RGBA32			= 0x2008,	// BGRA		ARGB 8:8:8:8
 	B_RGB24				= 0x0003,	// BGR		 RGB 8:8:8
@@ -160,6 +162,8 @@ typedef enum {
 	B_GRAY1				= 0x0001,	// Each bit represents a single pixel
 
 	// linear color space (big endian)
+	B_RGBA64_BIG		= 0x3012,	// RGBA		RGBA 16:16:16:16
+	B_RGB48_BIG			= 0x1011,	//  RGB		RGB  16:16:16
 	B_RGB32_BIG			= 0x1008,	// -RGB		BGR- 8:8:8:8
 	B_RGBA32_BIG		= 0x3008,	// ARGB		BGRA 8:8:8:8
 	B_RGB24_BIG			= 0x1003,	//  RGB		BGR  8:8:8
@@ -168,6 +172,8 @@ typedef enum {
 	B_RGBA15_BIG		= 0x3010,	// ARGB		BGRA 5:5:5:1
 
 	// linear color space (little endian, for completeness)
+	B_RGBA64_LITTLE		= B_RGBA64,
+	B_RGB48_LITTLE		= B_RGB48,
 	B_RGB32_LITTLE		= B_RGB32,
 	B_RGBA32_LITTLE		= B_RGBA32,
 	B_RGB24_LITTLE		= B_RGB24,

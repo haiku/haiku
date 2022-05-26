@@ -40,6 +40,7 @@
 #include <Buffer.h>
 #include <BufferGroup.h>
 #include <ByteOrder.h>
+#include <Catalog.h>
 #include <Debug.h>
 #include <ParameterWeb.h>
 #include <TimeSource.h>
@@ -48,6 +49,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <cmath>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexAddOnsFlanger"
 
 // -------------------------------------------------------- //
 // local helpers
@@ -241,7 +245,7 @@ void FlangerNode::NodeRegistered() {
 	m_input.node = Node();
 	m_input.source = media_source::null;
 	m_input.format = m_format;
-	strncpy(m_input.name, "Audio Input", B_MEDIA_NAME_LENGTH);
+	strlcpy(m_input.name, B_TRANSLATE("Audio input"), B_MEDIA_NAME_LENGTH);
 
 	// init output
 	m_output.source.port = ControlPort();
@@ -249,7 +253,7 @@ void FlangerNode::NodeRegistered() {
 	m_output.node = Node();
 	m_output.destination = media_destination::null;
 	m_output.format = m_format;
-	strncpy(m_output.name, "Mix Output", B_MEDIA_NAME_LENGTH);
+	strlcpy(m_output.name, B_TRANSLATE("Mix output"), B_MEDIA_NAME_LENGTH);
 
 	// init parameters
 	initParameterValues();
@@ -1139,7 +1143,7 @@ status_t FlangerNode::validateProposedFormat(
 	}
 
 	// wildcard format
-	media_raw_audio_format& wild = media_raw_audio_format::wildcard;
+	const media_raw_audio_format& wild = media_raw_audio_format::wildcard;
 	// proposed format
 	media_raw_audio_format& f = ioProposedFormat.u.raw_audio;
 	// template format
@@ -1208,7 +1212,7 @@ void FlangerNode::specializeOutputFormat(
 
 	// carpal_tunnel_paranoia
 	media_raw_audio_format& f = ioFormat.u.raw_audio;
-	media_raw_audio_format& w = media_raw_audio_format::wildcard;
+	const media_raw_audio_format& w = media_raw_audio_format::wildcard;
 
 	if (f.frame_rate == w.frame_rate)
 		f.frame_rate = 44100.0;
@@ -1251,18 +1255,19 @@ void FlangerNode::initParameterValues() {
 // create and register a parameter web
 void FlangerNode::initParameterWeb() {
 	BParameterWeb* pWeb = new BParameterWeb();
-	BParameterGroup* pTopGroup = pWeb->MakeGroup("FlangerNode Parameters");
+	BParameterGroup* pTopGroup = pWeb->MakeGroup(
+		B_TRANSLATE("FlangerNode parameters"));
 
 	BNullParameter* label;
 	BContinuousParameter* value;
 	BParameterGroup* g;
 
 	// mix ratio
-	g = pTopGroup->MakeGroup("Mix ratio");
+	g = pTopGroup->MakeGroup(B_TRANSLATE("Mix ratio"));
 	label = g->MakeNullParameter(
 		P_MIX_RATIO_LABEL,
 		B_MEDIA_NO_TYPE,
-		"Mix ratio",
+		B_TRANSLATE("Mix ratio"),
 		B_GENERIC);
 
 	value = g->MakeContinuousParameter(
@@ -1274,11 +1279,11 @@ void FlangerNode::initParameterWeb() {
 	value->AddInput(label);
 
 	// sweep rate
-	g = pTopGroup->MakeGroup("Sweep rate");
+	g = pTopGroup->MakeGroup(B_TRANSLATE("Sweep rate"));
 	label = g->MakeNullParameter(
 		P_SWEEP_RATE_LABEL,
 		B_MEDIA_NO_TYPE,
-		"Sweep rate",
+		B_TRANSLATE("Sweep rate"),
 		B_GENERIC);
 
 	value = g->MakeContinuousParameter(
@@ -1290,11 +1295,11 @@ void FlangerNode::initParameterWeb() {
 	value->AddInput(label);
 
 	// sweep range: minimum delay
-	g = pTopGroup->MakeGroup("Delay");
+	g = pTopGroup->MakeGroup(B_TRANSLATE("Delay"));
 	label = g->MakeNullParameter(
 		P_DELAY_LABEL,
 		B_MEDIA_NO_TYPE,
-		"Delay",
+		B_TRANSLATE("Delay"),
 		B_GENERIC);
 
 	value = g->MakeContinuousParameter(
@@ -1306,11 +1311,11 @@ void FlangerNode::initParameterWeb() {
 	value->AddInput(label);
 
 	// sweep range: maximum
-	g = pTopGroup->MakeGroup("Depth");
+	g = pTopGroup->MakeGroup(B_TRANSLATE("Depth"));
 	label = g->MakeNullParameter(
 		P_DEPTH_LABEL,
 		B_MEDIA_NO_TYPE,
-		"Depth",
+		B_TRANSLATE("Depth"),
 		B_GENERIC);
 
 	value = g->MakeContinuousParameter(
@@ -1322,11 +1327,11 @@ void FlangerNode::initParameterWeb() {
 	value->AddInput(label);
 
 	// feedback
-	g = pTopGroup->MakeGroup("Feedback");
+	g = pTopGroup->MakeGroup(B_TRANSLATE("Feedback"));
 	label = g->MakeNullParameter(
 		P_FEEDBACK_LABEL,
 		B_MEDIA_NO_TYPE,
-		"Feedback",
+		B_TRANSLATE("Feedback"),
 		B_GENERIC);
 
 	value = g->MakeContinuousParameter(

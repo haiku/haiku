@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -577,6 +577,7 @@ AcpiOsEnterSleep (
  * Debug print routines
  */
 #ifndef ACPI_USE_ALTERNATE_PROTOTYPE_AcpiOsPrintf
+ACPI_PRINTF_LIKE (1)
 void ACPI_INTERNAL_VAR_XFACE
 AcpiOsPrintf (
     const char              *Format,

@@ -115,8 +115,8 @@ private:
 			ServerPicture*		_FindPicture(int32 token) const;
 
 private:
-	typedef std::map<int32, ServerBitmap*> BitmapMap;
-	typedef std::map<int32, ServerPicture*> PictureMap;
+	typedef std::map<int32, BReference<ServerBitmap> > BitmapMap;
+	typedef std::map<int32, BReference<ServerPicture> > PictureMap;
 
 			port_id				fMessagePort;
 			port_id				fClientReplyPort;
@@ -150,14 +150,16 @@ private:
 			BitmapMap			fBitmapMap;
 			PictureMap			fPictureMap;
 
-			ServerCursor*		fAppCursor;
-			ServerCursor*		fViewCursor;
+			BReference<ServerCursor>
+								fAppCursor;
+			BReference<ServerCursor>
+								fViewCursor;
 			int32				fCursorHideLevel;
 									// 0 = cursor visible
 
 			bool				fIsActive;
 
-			ClientMemoryAllocator* fMemoryAllocator;
+			BReference<ClientMemoryAllocator> fMemoryAllocator;
 };
 
 

@@ -87,6 +87,8 @@ __sysconf(int name)
 			return STREAM_MAX;
 		case _SC_SYMLOOP_MAX:
 			return SYMLOOP_MAX;
+		case _SC_TTY_NAME_MAX:
+			return TTY_NAME_MAX;
 		case _SC_TZNAME_MAX:
 			return TZNAME_MAX;
 		case _SC_VERSION:
@@ -382,13 +384,7 @@ pathconf(const char *path, int name)
 size_t
 confstr(int name, char *buffer, size_t length)
 {
-	size_t stringLength = 0;
 	const char *string = "";
-
-	if (!length || !buffer) {
-		__set_errno(EINVAL);
-		return 0;
-	}
 
 	switch (name) {
 		case _CS_PATH:
@@ -400,13 +396,10 @@ confstr(int name, char *buffer, size_t length)
 			return 0;
 	}
 
-	if (buffer != NULL) {
-		stringLength = strlen(string) + 1;
-		strlcpy(buffer, string,
-			min_c(length - 1, stringLength));
-	}
+	if (buffer != NULL)
+		strlcpy(buffer, string, length);
 
-	return stringLength;
+	return strlen(string) + 1;
 }
 
 

@@ -68,8 +68,7 @@ AddDriversToPackage					: console dprintf null random <driver>tty
 AddDriversToPackage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToPackage audio old		: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
 AddDriversToPackage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
-AddDriversToPackage bus				: usb_raw fw_raw@x86 ;
-AddDriversToPackage disk floppy		: pc_floppy@x86 ;
+AddDriversToPackage bus				: usb_raw ;
 AddDriversToPackage disk usb		: usb_disk ;
 AddDriversToPackage disk virtual	: nbd ;
 AddDriversToPackage graphics		: $(SYSTEM_ADD_ONS_DRIVERS_GRAPHICS) ;
@@ -87,7 +86,7 @@ AddLibrariesToPackage lib
 	: [ HaikuImageGetSystemLibs ] [ HaikuImageGetPrivateSystemLibs ] ;
 
 # libnetwork.so replaces quite a few libraries
-if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
+if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 1 {
 	local libNetworkAliases = libsocket.so libbind.so libnet.so ;
 	local lib ;
 	for lib in $(libNetworkAliases) {
@@ -161,7 +160,7 @@ AddFilesToPackage data KeyboardLayouts ThinkPad
 
 # boot module links
 AddBootModuleSymlinksToPackage
-	acpi@x86,x86_64 ata pci isa@x86,x86_64 config_manager dpc
+	acpi@x86,x86_64 ata pci isa@x86,x86_64 dpc
 	scsi usb
 	openpic@ppc
 	ata_adapter locked_pool scsi_periph

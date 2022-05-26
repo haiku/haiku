@@ -29,6 +29,7 @@
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
 #include <Path.h>
+#include <Screen.h>
 #include <ScrollView.h>
 #include <String.h>
 #include <TextView.h>
@@ -337,6 +338,9 @@ PersonWindow::QuitRequested()
 void
 PersonWindow::Show()
 {
+	BRect screenFrame = BScreen(this).Frame();
+	if (Frame().bottom > screenFrame.bottom)
+		ResizeBy(0, screenFrame.bottom - Frame().bottom - 10);
 	fView->MakeFocus();
 	BWindow::Show();
 }

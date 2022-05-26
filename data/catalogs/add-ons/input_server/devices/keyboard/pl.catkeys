@@ -1,6 +1,8 @@
-1	polish	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
+1	polish	x-vnd.Haiku-KeyboardInputServerDevice	131044710
 If the application will not quit you may have to kill it.	Team monitor		Jeżeli aplikacja nie zakończy działania, być może trzeba będzie ją zabić.
 Quit application	Team monitor		Zakończ aplikację
+Open Terminal	Team monitor		Uruchom Terminal
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Przytrzymaj CONTROL+ALT+DELETE przez # sekundę, aby uruchomić system ponownie.} few{Przytrzymaj CONTROL+ALT+DELETE przez # sekundy, aby uruchomić system ponownie.} many{Przytrzymaj CONTROL+ALT+DELETE przez # sekund, aby uruchomić system ponownie.} other{Przytrzymaj CONTROL+ALT+DELETE przez # sekundy, aby uruchomić system ponownie.}}
 Restart the desktop	Team monitor		Uruchom pulpit ponownie
 Force reboot	Team monitor		Wymuś ponowne uruchomienie komputera
 Team monitor	Team monitor		Monitor zespołów

@@ -19,6 +19,7 @@
 #include <slab/Slab.h>
 #include <smp.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 #include <util/queue.h>
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
@@ -36,6 +37,10 @@
 #else
 #	define TRACE(x...) ;
 #endif
+
+
+#define PAGEDIR_SIZE	ARM_MMU_L1_TABLE_SIZE
+#define PAGEDIR_ALIGN	(4 * B_PAGE_SIZE)
 
 
 ARMVMTranslationMap32Bit::ARMVMTranslationMap32Bit()
@@ -96,7 +101,7 @@ ARMVMTranslationMap32Bit::Init(bool kernel)
 
 		// allocate the page directory
 		page_directory_entry* virtualPageDir = (page_directory_entry*)memalign(
-			B_PAGE_SIZE, B_PAGE_SIZE);
+			PAGEDIR_ALIGN, PAGEDIR_SIZE);
 		if (virtualPageDir == NULL)
 			return B_NO_MEMORY;
 
@@ -631,25 +636,13 @@ ARMVMTranslationMap32Bit::Query(addr_t va, phys_addr_t *_physical,
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
 	if ((entry & ARM_PTE_TYPE_MASK) != 0)
-		*_physical = (entry & ARM_PTE_ADDRESS_MASK) | VADDR_TO_PGOFF(va);
+		*_physical = (entry & ARM_PTE_ADDRESS_MASK);
 
-#if 0 //IRA
-	// read in the page state flags
-	if ((entry & X86_PTE_USER) != 0) {
-		*_flags |= ((entry & X86_PTE_WRITABLE) != 0 ? B_WRITE_AREA : 0)
-			| B_READ_AREA;
-	}
-
-	*_flags |= ((entry & X86_PTE_WRITABLE) != 0 ? B_KERNEL_WRITE_AREA : 0)
-		| B_KERNEL_READ_AREA
-		| ((entry & ARM_PTE_DIRTY) != 0 ? PAGE_MODIFIED : 0)
-		| ((entry & ARM_PTE_ACCESSED) != 0 ? PAGE_ACCESSED : 0)
-		| ((entry & ARM_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
-#else
-	*_flags = B_KERNEL_WRITE_AREA | B_KERNEL_READ_AREA;
+	//TODO: read in the page state flags
+	*_flags = ARMPagingMethod32Bit::PageTableEntryFlagsToAttributes(entry);
 	if (*_physical != 0)
 		*_flags |= PAGE_PRESENT;
-#endif
+
 	pinner.Unlock();
 
 	TRACE("query_tmap: returning pa 0x%lx for va 0x%lx\n", *_physical, va);
@@ -679,25 +672,13 @@ ARMVMTranslationMap32Bit::QueryInterrupt(addr_t va, phys_addr_t *_physical,
 	page_table_entry entry = pt[VADDR_TO_PTENT(va)];
 
 	if ((entry & ARM_PTE_TYPE_MASK) != 0)
-		*_physical = (entry & ARM_PTE_ADDRESS_MASK) | VADDR_TO_PGOFF(va);
+		*_physical = (entry & ARM_PTE_ADDRESS_MASK);
 
-#if 0
-	// read in the page state flags
-	if ((entry & X86_PTE_USER) != 0) {
-		*_flags |= ((entry & X86_PTE_WRITABLE) != 0 ? B_WRITE_AREA : 0)
-			| B_READ_AREA;
-	}
-
-	*_flags |= ((entry & X86_PTE_WRITABLE) != 0 ? B_KERNEL_WRITE_AREA : 0)
-		| B_KERNEL_READ_AREA
-		| ((entry & X86_PTE_DIRTY) != 0 ? PAGE_MODIFIED : 0)
-		| ((entry & X86_PTE_ACCESSED) != 0 ? PAGE_ACCESSED : 0)
-		| ((entry & X86_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
-#else
-	*_flags = B_KERNEL_WRITE_AREA | B_KERNEL_READ_AREA;
+	//TODO: read in the page state flags
+	*_flags = ARMPagingMethod32Bit::PageTableEntryFlagsToAttributes(entry);
 	if (*_physical != 0)
 		*_flags |= PAGE_PRESENT;
-#endif
+
 	return B_OK;
 }
 
@@ -712,15 +693,9 @@ ARMVMTranslationMap32Bit::Protect(addr_t start, addr_t end, uint32 attributes,
 
 	TRACE("protect_tmap: pages 0x%lx to 0x%lx, attributes %lx\n", start, end,
 		attributes);
-#if 0 //IRA
-	// compute protection flags
-	uint32 newProtectionFlags = 0;
-	if ((attributes & B_USER_PROTECTION) != 0) {
-		newProtectionFlags = ARM_PTE_USER;
-		if ((attributes & B_WRITE_AREA) != 0)
-			newProtectionFlags |= ARM_PTE_WRITABLE;
-	} else if ((attributes & B_KERNEL_WRITE_AREA) != 0)
-		newProtectionFlags = ARM_PTE_WRITABLE;
+
+	uint32 newProtectionFlags = ARMPagingMethod32Bit::AttributesToPageTableEntryFlags(attributes);
+	uint32 newMemoryTypeFlags = ARMPagingMethod32Bit::MemoryTypeToPageTableEntryFlags(memoryType);
 
 	page_directory_entry *pd = fPagingStructures->pgdir_virt;
 
@@ -742,7 +717,7 @@ ARMVMTranslationMap32Bit::Protect(addr_t start, addr_t end, uint32 attributes,
 		for (index = VADDR_TO_PTENT(start); index < 256 && start < end;
 				index++, start += B_PAGE_SIZE) {
 			page_table_entry entry = pt[index];
-			if ((entry & ARM_PTE_PRESENT) == 0) {
+			if ((entry & ARM_PTE_TYPE_MASK) == 0) {
 				// page mapping not valid
 				continue;
 			}
@@ -757,24 +732,18 @@ ARMVMTranslationMap32Bit::Protect(addr_t start, addr_t end, uint32 attributes,
 					&pt[index],
 					(entry & ~(ARM_PTE_PROTECTION_MASK
 							| ARM_PTE_MEMORY_TYPE_MASK))
-						| newProtectionFlags
-						| ARMPagingMethod32Bit::MemoryTypeToPageTableEntryFlags(
-							memoryType),
+						| newProtectionFlags | newMemoryTypeFlags,
 					entry);
 				if (oldEntry == entry)
 					break;
 				entry = oldEntry;
 			}
 
-			if ((oldEntry & ARM_PTE_ACCESSED) != 0) {
-				// Note, that we only need to invalidate the address, if the
-				// accessed flag was set, since only then the entry could have
-				// been in any TLB.
-				InvalidatePage(start);
-			}
+			//TODO: invalidate only if the Accessed flag is set
+			InvalidatePage(start);
 		}
 	} while (start != 0 && start < end);
-#endif
+
 	return B_OK;
 }
 

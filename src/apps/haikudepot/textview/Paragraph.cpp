@@ -1,5 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -63,6 +64,20 @@ Paragraph::operator!=(const Paragraph& other) const
 }
 
 
+int32
+Paragraph::CountTextSpans() const
+{
+	return static_cast<int32>(fTextSpans.size());
+}
+
+
+const TextSpan&
+Paragraph::TextSpanAtIndex(int32 index) const
+{
+	return fTextSpans[index];
+}
+
+
 void
 Paragraph::SetStyle(const ParagraphStyle& style)
 {
@@ -76,15 +91,17 @@ Paragraph::Prepend(const TextSpan& span)
 	_InvalidateCachedLength();
 
 	// Try to merge with first span if the TextStyles are equal
-	if (fTextSpans.CountItems() > 0) {
-		const TextSpan& firstSpan = fTextSpans.ItemAtFast(0);
+	if (!fTextSpans.empty()) {
+		const TextSpan& firstSpan = fTextSpans[0];
 		if (firstSpan.Style() == span.Style()) {
 			BString text(span.Text());
 			text.Append(firstSpan.Text());
-			return fTextSpans.Replace(0, TextSpan(text, span.Style()));
+			fTextSpans[0] = TextSpan(text, span.Style());
+			return true;
 		}
 	}
-	return fTextSpans.Add(span, 0);
+	fTextSpans.push_back(span);
+	return true;
 }
 
 
@@ -94,16 +111,18 @@ Paragraph::Append(const TextSpan& span)
 	_InvalidateCachedLength();
 
 	// Try to merge with last span if the TextStyles are equal
-	if (fTextSpans.CountItems() > 0) {
-		const TextSpan& lastSpan = fTextSpans.LastItem();
+	if (!fTextSpans.empty()) {
+		const TextSpan& lastSpan = fTextSpans[fTextSpans.size() - 1];
 		if (lastSpan.Style() == span.Style()) {
 			BString text(lastSpan.Text());
 			text.Append(span.Text());
-			fTextSpans.Remove();
-			return fTextSpans.Add(TextSpan(text, span.Style()));
+			fTextSpans.clear();
+			fTextSpans.push_back(TextSpan(text, span.Style()));
+			return true;
 		}
 	}
-	return fTextSpans.Add(span);
+	fTextSpans.push_back(span);
+	return true;
 }
 
 
@@ -113,44 +132,52 @@ Paragraph::Insert(int32 offset, const TextSpan& newSpan)
 	_InvalidateCachedLength();
 
 	int32 index = 0;
-	while (index < fTextSpans.CountItems()) {
-		const TextSpan& span = fTextSpans.ItemAtFast(index);
-		if (offset - span.CountChars() < 0)
-			break;
-		offset -= span.CountChars();
-		index++;
+
+	{
+		int32 countTextSpans = static_cast<int32>(fTextSpans.size());
+		while (index < countTextSpans) {
+			const TextSpan& span = fTextSpans[index];
+			if (offset - span.CountChars() < 0)
+				break;
+			offset -= span.CountChars();
+			index++;
+		}
+
+		if (countTextSpans == index)
+			return Append(newSpan);
 	}
 
-	if (fTextSpans.CountItems() == index)
-		return Append(newSpan);
-
 	// Try to merge with span at index if the TextStyles are equal
-	TextSpan span = fTextSpans.ItemAtFast(index);
+	TextSpan span = fTextSpans[index];
 	if (span.Style() == newSpan.Style()) {
 		span.Insert(offset, newSpan.Text());
-		return fTextSpans.Replace(index, span);
+		fTextSpans[index] = span;
+		return true;
 	}
 
 	if (offset == 0) {
 		if (index > 0) {
 			// Try to merge with TextSpan before if offset == 0 && index > 0
-			TextSpan span = fTextSpans.ItemAtFast(index - 1);
+			TextSpan span = fTextSpans[index - 1];
 			if (span.Style() == newSpan.Style()) {
 				span.Insert(span.CountChars(), newSpan.Text());
-				return fTextSpans.Replace(index - 1, span);
+				fTextSpans[index - 1] = span;
+				return true;
 			}
 		}
 		// Just insert the new span before the one at index
-		return fTextSpans.Add(newSpan, index);
+		fTextSpans.insert(fTextSpans.begin() + index, newSpan);
+		return true;
 	}
 
 	// Split the span,
 	TextSpan spanBefore = span.SubSpan(0, offset);
 	TextSpan spanAfter = span.SubSpan(offset, span.CountChars() - offset);
 
-	return fTextSpans.Replace(index, spanBefore)
-		&& fTextSpans.Add(newSpan, index + 1)
-		&& fTextSpans.Add(spanAfter, index + 2);
+	fTextSpans[index] = spanBefore;
+	fTextSpans.insert(fTextSpans.begin() + (index + 1), newSpan);
+	fTextSpans.insert(fTextSpans.begin() + (index + 2), spanAfter);
+	return true;
 }
 
 
@@ -163,40 +190,44 @@ Paragraph::Remove(int32 offset, int32 length)
 	_InvalidateCachedLength();
 
 	int32 index = 0;
-	while (index < fTextSpans.CountItems()) {
-		const TextSpan& span = fTextSpans.ItemAtFast(index);
-		if (offset - span.CountChars() < 0)
-			break;
-		offset -= span.CountChars();
-		index++;
+
+	{
+		int32 countTextSpans = static_cast<int32>(fTextSpans.size());
+		while (index < countTextSpans) {
+			const TextSpan& span = fTextSpans[index];
+			if (offset - span.CountChars() < 0)
+				break;
+			offset -= span.CountChars();
+			index++;
+		}
+
+		if (index >= countTextSpans)
+			return false;
 	}
 
-	if (index >= fTextSpans.CountItems())
-		return false;
-
-	TextSpan span(fTextSpans.ItemAtFast(index));
+	TextSpan span(fTextSpans[index]);
 	int32 removeLength = std::min(span.CountChars() - offset, length);
 	span.Remove(offset, removeLength);
 	length -= removeLength;
 	index += 1;
 
 	// Remove more spans if necessary
-	while (length > 0 && index < fTextSpans.CountItems()) {
-		int32 spanLength = fTextSpans.ItemAtFast(index).CountChars();
+	while (length > 0 && index < static_cast<int32>(fTextSpans.size())) {
+		int32 spanLength = fTextSpans[index].CountChars();
 		if (spanLength <= length) {
-			fTextSpans.Remove(index);
+			fTextSpans.erase(fTextSpans.begin() + index);
 			length -= spanLength;
 		} else {
 			// Reached last span
 			removeLength = std::min(length, spanLength);
-			TextSpan lastSpan = fTextSpans.ItemAtFast(index).SubSpan(
+			TextSpan lastSpan = fTextSpans[index].SubSpan(
 				removeLength, spanLength - removeLength);
 			// Try to merge with first span, otherwise replace span at index
 			if (lastSpan.Style() == span.Style()) {
 				span.Insert(span.CountChars(), lastSpan.Text());
-				fTextSpans.Remove(index);
+				fTextSpans.erase(fTextSpans.begin() + index);
 			} else {
-				fTextSpans.Replace(index, lastSpan);
+				fTextSpans[index] = lastSpan;
 			}
 
 			break;
@@ -206,22 +237,22 @@ Paragraph::Remove(int32 offset, int32 length)
 	// See if anything from the TextSpan at offset remained, keep it as empty
 	// span if it is the last remaining span.
 	index--;
-	if (span.CountChars() > 0 || fTextSpans.CountItems() == 1) {
-		fTextSpans.Replace(index, span);
+	if (span.CountChars() > 0 || static_cast<int32>(fTextSpans.size()) == 1) {
+		fTextSpans[index] = span;
 	} else {
-		fTextSpans.Remove(index);
+		fTextSpans.erase(fTextSpans.begin() + index);
 		index--;
 	}
 
 	// See if spans can be merged after one has been removed.
-	if (index >= 0 && index + 1 < fTextSpans.CountItems()) {
-		const TextSpan& span1 = fTextSpans.ItemAtFast(index);
-		const TextSpan& span2 = fTextSpans.ItemAtFast(index + 1);
+	if (index >= 0 && index + 1 < static_cast<int32>(fTextSpans.size())) {
+		const TextSpan& span1 = fTextSpans[index];
+		const TextSpan& span2 = fTextSpans[index + 1];
 		if (span1.Style() == span2.Style()) {
 			span = span1;
 			span.Append(span2.Text());
-			fTextSpans.Replace(index, span);
-			fTextSpans.Remove(index + 1);
+			fTextSpans[index] = span;
+			fTextSpans.erase(fTextSpans.begin() + (index + 1));
 		}
 	}
 
@@ -232,7 +263,7 @@ Paragraph::Remove(int32 offset, int32 length)
 void
 Paragraph::Clear()
 {
-	fTextSpans.Clear();
+	fTextSpans.clear();
 }
 
 
@@ -243,8 +274,9 @@ Paragraph::Length() const
 		return fCachedLength;
 
 	int32 length = 0;
-	for (int32 i = fTextSpans.CountItems() - 1; i >= 0; i--) {
-		const TextSpan& span = fTextSpans.ItemAtFast(i);
+	std::vector<TextSpan>::const_iterator it;
+	for (it = fTextSpans.begin(); it != fTextSpans.end(); it++) {
+		const TextSpan& span = *it;
 		length += span.CountChars();
 	}
 
@@ -256,7 +288,7 @@ Paragraph::Length() const
 bool
 Paragraph::IsEmpty() const
 {
-	return fTextSpans.CountItems() == 0;
+	return fTextSpans.empty();
 }
 
 
@@ -275,11 +307,11 @@ BString
 Paragraph::Text() const
 {
 	BString result;
-
-	int32 count = fTextSpans.CountItems();
-	for (int32 i = 0; i < count; i++)
-		result << fTextSpans.ItemAtFast(i).Text();
-
+	std::vector<TextSpan>::const_iterator it;
+	for (it = fTextSpans.begin(); it != fTextSpans.end(); it++) {
+		const TextSpan& span = *it;
+		result << span.Text();
+	}
 	return result;
 }
 
@@ -303,9 +335,9 @@ Paragraph::SubParagraph(int32 start, int32 length) const
 
 	Paragraph result(fStyle);
 
-	int32 count = fTextSpans.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		const TextSpan& span = fTextSpans.ItemAtFast(i);
+	std::vector<TextSpan>::const_iterator it;
+	for (it = fTextSpans.begin(); it != fTextSpans.end(); it++) {
+		const TextSpan& span = *it;
 		int32 spanLength = span.CountChars();
 		if (spanLength == 0)
 			continue;
@@ -339,14 +371,14 @@ Paragraph::SubParagraph(int32 start, int32 length) const
 void
 Paragraph::PrintToStream() const
 {
-	int32 spanCount = fTextSpans.CountItems();
+	int32 spanCount = static_cast<int32>(fTextSpans.size());
 	if (spanCount == 0) {
 		printf("  <p/>\n");
 		return;
 	}
 	printf("  <p>\n");
 	for (int32 i = 0; i < spanCount; i++) {
-		const TextSpan& span = fTextSpans.ItemAtFast(i);
+		const TextSpan& span = fTextSpans[i];
 		if (span.CountChars() == 0)
 			printf("    <span/>\n");
 		else {

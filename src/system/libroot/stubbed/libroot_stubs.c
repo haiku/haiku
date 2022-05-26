@@ -1895,7 +1895,6 @@ void debug_thread() {}
 void debug_vprintf() {}
 void debugger() {}
 void delete_area() {}
-void delete_driver_settings() {}
 void delete_port() {}
 void delete_sem() {}
 void dev_for_path() {}
@@ -2424,6 +2423,8 @@ void popen() {}
 void port_buffer_size() {}
 void port_buffer_size_etc() {}
 void port_count() {}
+void posix_fadvise() {}
+void posix_fallocate() {}
 void posix_madvise() {}
 void posix_memalign() {}
 void posix_openpt() {}
@@ -2738,6 +2739,8 @@ void srand48() {}
 void srand48_r() {}
 void srandom() {}
 void srandom_r() {}
+void __stack_chk_fail() {}
+void __stack_chk_fail_local() {}
 void sscanf() {}
 void statvfs() {}
 void stime() {}
@@ -2891,6 +2894,7 @@ void wait_for_debugger() {}
 void wait_for_objects() {}
 void wait_for_objects_etc() {}
 void wait_for_thread() {}
+void wait_for_thread_etc() {}
 void waitid() {}
 void waitpid() {}
 void wcpcpy() {}

@@ -20,7 +20,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			USBEndpoint.cpp
 			USBInterface.cpp
 			USBRoster.cpp
-			: be [ TargetLibsupc++ ]
+			: be textencoding [ TargetLibsupc++ ]
 			;
 	}
 }

@@ -163,6 +163,7 @@ struct BMenuField::LayoutData {
 
 // #pragma mark - MouseDownFilter
 
+namespace {
 
 class MouseDownFilter : public BMessageFilter
 {
@@ -191,6 +192,9 @@ MouseDownFilter::Filter(BMessage* message, BHandler** target)
 {
 	return message->what == B_MOUSE_DOWN ? B_SKIP_MESSAGE : B_DISPATCH_MESSAGE;
 }
+
+};
+
 
 
 // #pragma mark - BMenuField

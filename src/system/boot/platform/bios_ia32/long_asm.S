@@ -27,6 +27,9 @@ FUNCTION(long_enter_kernel):
 	movl	8(%esp), %edi
 	movl	12(%esp), %esi
 
+	movl	gLongLA57, %ecx
+	shl		$12, %ecx
+
 	// Currently running with 32-bit paging tables at an identity mapped
 	// address. To switch to 64-bit paging we must first disable 32-bit paging,
 	// otherwise loading the new CR3 will fault.
@@ -34,13 +37,14 @@ FUNCTION(long_enter_kernel):
 	andl	$~(1 << 31), %eax
 	movl	%eax, %cr0
 
-	// Enable PAE and PGE
+	// Enable PAE and PGE, and optionally LA57
 	movl	%cr4, %eax
 	orl		$(1 << 5) | (1 << 7), %eax
+	orl		%ecx, %eax
 	movl	%eax, %cr4
 
-	// Point CR3 to the kernel's PML4.
-	movl	gLongPhysicalPML4, %eax
+	// Point CR3 to the kernel's PMLTop.
+	movl	gLongPhysicalPMLTop, %eax
 	movl	%eax, %cr3
 
 	// Enable long mode by setting EFER.LME.
@@ -97,7 +101,10 @@ long_gdtr:
 SYMBOL(gLongGDT):
 	.long	0
 
-SYMBOL(gLongPhysicalPML4):
+SYMBOL(gLongPhysicalPMLTop):
+	.long	0
+
+SYMBOL(gLongLA57):
 	.long	0
 
 SYMBOL(gLongKernelEntry):

@@ -27,19 +27,22 @@ KernelMergeObject kernel_arch_arm.o :
 	arch_asm.S
 
 	# Serial UART and drivers
+	debug_uart.cpp
 	debug_uart_8250.cpp
-	arch_uart_8250.cpp
 	arch_uart_8250_omap.cpp
 	arch_uart_pl011.cpp
 
 	arch_atomic64.cpp
 	arch_atomic32.cpp
 
+	arch_int_gicv2.cpp
+
 	# SoC minimal kernel-required support
 	# (timers, interrupts, rtc?)
 	soc.cpp
 	soc_pxa.cpp
 	soc_omap3.cpp
+	soc_sun4i.cpp
 
 	# paging
 	arm_physical_page_mapper_large_memory.cpp
@@ -58,5 +61,5 @@ KernelMergeObject kernel_arch_arm.o :
 	kernel_fdt.a
 ;
 
-CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp ;
+CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp : $(TARGET_KERNEL_ARCH) ;
 

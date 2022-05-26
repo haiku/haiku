@@ -182,8 +182,10 @@ reiserfs_lookup(fs_volume* fs, fs_vnode* _dir, const char *entryName,
 //	FUNCTION_START();
 	Volume *volume = (Volume*)fs->private_volume;
 	VNode *dir = (VNode*)_dir->private_node;
-FUNCTION(("dir: (%Ld: %lu, %lu), entry: `%s'\n", dir->GetID(), dir->GetDirID(),
-		  dir->GetObjectID(), entryName));
+	FUNCTION(("dir: (%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 "), "
+			"entry: `%s'\n",
+		dir->GetID(), dir->GetDirID(), dir->GetObjectID(),
+		entryName));
 	status_t error = B_OK;
 	VNode *entryNode = NULL;
 
@@ -236,8 +238,8 @@ reiserfs_read_vnode(fs_volume *fs, ino_t vnid, fs_vnode *node, int *_type,
 {
 	TOUCH(reenter);
 //	FUNCTION_START();
-	FUNCTION(("(%Ld: %lu, %ld)\n", vnid, VNode::GetDirIDFor(vnid),
-			  VNode::GetObjectIDFor(vnid)));
+	FUNCTION(("(%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 ")\n",
+		vnid, VNode::GetDirIDFor(vnid), VNode::GetObjectIDFor(vnid)));
 	Volume *volume = (Volume*)fs->private_volume;
 	status_t error = B_OK;
 	VNode *foundNode = new(nothrow) VNode;
@@ -287,8 +289,8 @@ reiserfs_read_symlink(fs_volume *fs, fs_vnode *_node, char *buffer,
 //	FUNCTION_START();
 	Volume *volume = (Volume*)fs->private_volume;
 	VNode *node = (VNode*)_node->private_node;
-FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
-		  node->GetObjectID()));
+	FUNCTION(("node: (%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 ")\n",
+		node->GetID(), node->GetDirID(), node->GetObjectID()));
 	status_t error = B_OK;
 	// read symlinks only
 	if (!node->IsSymlink())
@@ -305,8 +307,8 @@ reiserfs_access(fs_volume *fs, fs_vnode *_node, int mode)
 {
 	TOUCH(fs);
 	VNode *node = (VNode*)_node->private_node;
-	FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
-		  node->GetObjectID()));
+	FUNCTION(("node: (%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 ")\n",
+		node->GetID(), node->GetDirID(), node->GetObjectID()));
 
 	// write access requested?
 	if (mode & W_OK)
@@ -326,8 +328,8 @@ reiserfs_read_stat(fs_volume *fs, fs_vnode *_node, struct stat *st)
 //	FUNCTION_START();
 	Volume *volume = (Volume*)fs->private_volume;
 	VNode *node = (VNode*)_node->private_node;
-FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
-		  node->GetObjectID()));
+	FUNCTION(("node: (%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 ")\n",
+		node->GetID(), node->GetDirID(), node->GetObjectID()));
 	status_t error = B_OK;
 	StatData *statData = node->GetStatData();
 	st->st_dev = volume->GetID();
@@ -355,8 +357,8 @@ reiserfs_open(fs_volume *fs, fs_vnode *_node, int openMode, void **cookie)
 //	FUNCTION_START();
 	Volume *volume = (Volume*)fs->private_volume;
 	VNode *node = (VNode*)_node->private_node;
-FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
-		  node->GetObjectID()));
+	FUNCTION(("node: (%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 ")\n",
+		node->GetID(), node->GetDirID(), node->GetObjectID()));
 	status_t error = B_OK;
 	// check the open mode
 	if ((openMode & O_RWMASK) == O_WRONLY || (openMode & O_RWMASK) == O_RDWR
@@ -386,8 +388,8 @@ reiserfs_close(fs_volume *fs, fs_vnode *_node, void *cookie)
 	TOUCH(fs); TOUCH(cookie);
 //	FUNCTION_START();
 	VNode *node = (VNode*)_node->private_node;
-FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
-		  node->GetObjectID()));
+	FUNCTION(("node: (%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 ")\n",
+		node->GetID(), node->GetDirID(), node->GetObjectID()));
 	TOUCH(node);
 	return B_OK;
 }
@@ -399,8 +401,8 @@ reiserfs_free_cookie(fs_volume *fs, fs_vnode *_node, void *cookie)
 	TOUCH(fs);
 //	FUNCTION_START();
 	VNode *node = (VNode*)_node->private_node;
-FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
-		  node->GetObjectID()));
+	FUNCTION(("node: (%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 ")\n",
+		node->GetID(), node->GetDirID(), node->GetObjectID()));
 	TOUCH(node);
 	StreamReader *reader = (StreamReader*)cookie;
 	delete reader;
@@ -416,9 +418,10 @@ reiserfs_read(fs_volume *fs, fs_vnode *_node, void *cookie, off_t pos,
 //	FUNCTION_START();
 //	Volume *volume = (Volume*)fs->private_volume;
 	VNode *node = (VNode*)_node->private_node;
-	FUNCTION(("((%Ld: %lu, %lu), %Ld, %p, %lu)\n", node->GetID(),
-			  node->GetDirID(), node->GetObjectID(), pos, buffer,
-			  *bufferSize));
+	FUNCTION(("((%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 "), "
+			"%" B_PRIdOFF ", %p, %lu)\n",
+		node->GetID(), node->GetDirID(), node->GetObjectID(),
+		pos, buffer, *bufferSize));
 	status_t error = B_OK;
 	// don't read anything but files
 	if (!node->IsFile()) {
@@ -446,8 +449,8 @@ public:
 	DirectoryCookie(Tree *tree, uint32 dirID, uint32 objectID,
 					uint64 startOffset = 0, bool fixedHash = false)
 		: DirEntryIterator(tree, dirID, objectID, startOffset,
-						   fixedHash),
-		  fEncounteredDotDot(false)
+					fixedHash),
+		fEncounteredDotDot(false)
 	{
 	}
 
@@ -475,8 +478,8 @@ reiserfs_open_dir(fs_volume *fs, fs_vnode *_node, void **cookie)
 //	FUNCTION_START();
 	Volume *volume = (Volume*)fs->private_volume;
 	VNode *node = (VNode*)_node->private_node;
-FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
-		  node->GetObjectID()));
+	FUNCTION(("node: (%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 ")\n",
+		node->GetID(), node->GetDirID(), node->GetObjectID()));
 	status_t error = (node->IsDir() ? B_OK : B_NOT_A_DIRECTORY);
 	if (error == B_OK) {
 		DirectoryCookie *iterator = new(nothrow) DirectoryCookie(
@@ -497,7 +500,7 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 // set_dirent_name
 static status_t
 set_dirent_name(struct dirent *buffer, size_t bufferSize,
-						 const char *name, int32 nameLen)
+						const char *name, int32 nameLen)
 {
 	size_t length = (buffer->d_name + nameLen + 1) - (char*)buffer;
 	if (length <= bufferSize) {
@@ -516,8 +519,8 @@ reiserfs_close_dir(fs_volume *fs, fs_vnode *_node, void *cookie)
 	TOUCH(fs); TOUCH(cookie);
 //	FUNCTION_START();
 	VNode *node = (VNode*)_node->private_node;
-FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
-		  node->GetObjectID()));
+	FUNCTION(("node: (%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 ")\n",
+		node->GetID(), node->GetDirID(), node->GetObjectID()));
 	TOUCH(node);
 	return B_OK;
 }
@@ -529,8 +532,8 @@ reiserfs_free_dir_cookie(fs_volume *fs, fs_vnode *_node, void *cookie)
 	TOUCH(fs);
 //	FUNCTION_START();
 	VNode *node = (VNode*)_node->private_node;
-FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
-		  node->GetObjectID()));
+	FUNCTION(("node: (%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 ")\n",
+		node->GetID(), node->GetDirID(), node->GetObjectID()));
 	TOUCH(node);
 	DirectoryCookie *iterator = (DirectoryCookie*)cookie;
 	delete iterator;
@@ -545,8 +548,8 @@ reiserfs_read_dir(fs_volume *fs, fs_vnode *_node, void *cookie,
 //	FUNCTION_START();
 	Volume *volume = (Volume*)fs->private_volume;
 	VNode *node = (VNode*)_node->private_node;
-FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
-		  node->GetObjectID()));
+	FUNCTION(("node: (%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 ")\n",
+		node->GetID(), node->GetDirID(), node->GetObjectID()));
 	DirectoryCookie *iterator = (DirectoryCookie*)cookie;
 	status_t error = iterator->Resume();
 	if (error == B_OK) {
@@ -556,7 +559,7 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 		DirEntry *entry = NULL;
 		bool done = false;
 		while (error == B_OK && !done
-			   && (error = iterator->GetNext(&item, &index, &entry)) == B_OK) {
+				&& (error = iterator->GetNext(&item, &index, &entry)) == B_OK) {
 			uint32 dirID = entry->GetDirID();
 			uint32 objectID = entry->GetObjectID();
 			// skip hidden entries and entries the user specified to be hidden
@@ -585,18 +588,22 @@ FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
 				buffer->d_dev = volume->GetID();
 				buffer->d_ino = VNode::GetIDFor(dirID, objectID);
 				*count = 1;
-PRINT(("Successfully read entry: dir: (%Ld: %ld, %ld), name: `%s', "
-   "id: (%Ld, %ld, %ld), reclen: %hu\n", node->GetID(), node->GetDirID(),
-   node->GetObjectID(), buffer->d_name, buffer->d_ino, dirID, objectID,
-   buffer->d_reclen));
+				PRINT(("Successfully read entry: dir: (%" B_PRIdINO ": "
+						"%" B_PRIu32 ", %" B_PRIu32 "), name: `%s', "
+						"id: (%" B_PRIdINO ", %" B_PRIu32 ", %" B_PRIu32 "), "
+						"reclen: %hu\n",
+					node->GetID(),
+					node->GetDirID(), node->GetObjectID(), buffer->d_name,
+					buffer->d_ino, dirID, objectID,
+					buffer->d_reclen));
 				if (!strcmp("..", buffer->d_name))
 					iterator->SetEncounteredDotDot(true);
 				done = true;
 			}
- 		}
- 		if (error == B_ENTRY_NOT_FOUND) {
- 			if (iterator->EncounteredDotDot()) {
-	 			error = B_OK;
+		}
+		if (error == B_ENTRY_NOT_FOUND) {
+			if (iterator->EncounteredDotDot()) {
+				error = B_OK;
 				*count = 0;
 			} else {
 				// this is necessary for the root directory
@@ -614,17 +621,21 @@ PRINT(("Successfully read entry: dir: (%Ld: %ld, %ld), name: `%s', "
 					buffer->d_ino = node->GetID();
 	// < That's not correct!
 					*count = 1;
-PRINT(("faking `..' entry: dir: (%Ld: %ld, %ld), name: `%s', "
-	   "id: (%Ld, %ld, %ld), reclen: %hu\n", node->GetID(), node->GetDirID(),
-	   node->GetObjectID(), buffer->d_name, buffer->d_ino, node->GetDirID(),
-	   node->GetObjectID(), buffer->d_reclen));
+					PRINT(("faking `..' entry: dir: (%" B_PRIdINO ": "
+							"%" B_PRIu32 ", %" B_PRIu32 "), name: `%s', "
+							"id: (%" B_PRIdINO ", %" B_PRIu32 ", %" B_PRIu32
+							"), reclen: %hu\n",
+						node->GetID(),
+						node->GetDirID(), node->GetObjectID(), buffer->d_name,
+						buffer->d_ino, node->GetDirID(), node->GetObjectID(),
+						buffer->d_reclen));
 					iterator->SetEncounteredDotDot(true);
 				}
 			}
- 		}
- 		iterator->Suspend();
+		}
+		iterator->Suspend();
 	}
-PRINT(("returning %ld entries\n", *count));
+	PRINT(("returning %" B_PRIu32 " entries\n", *count));
 	RETURN_ERROR(error);
 }
 
@@ -635,8 +646,8 @@ reiserfs_rewind_dir(fs_volume *fs, fs_vnode *_node, void *cookie)
 	TOUCH(fs);
 //	FUNCTION_START();
 	VNode *node = (VNode*)_node->private_node;
-FUNCTION(("node: (%Ld: %lu, %lu)\n", node->GetID(), node->GetDirID(),
-		  node->GetObjectID()));
+	FUNCTION(("node: (%" B_PRIdINO ": %" B_PRIu32 ", %" B_PRIu32 ")\n",
+		node->GetID(), node->GetDirID(), node->GetObjectID()));
 	TOUCH(node);
 	DirectoryCookie *iterator = (DirectoryCookie*)cookie;
 	status_t error = iterator->Rewind();	// no need to Resume()

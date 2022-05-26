@@ -87,6 +87,7 @@ static const uint32 MSG_MOVE_TAB_LEFT					= 'mvtl';
 static const uint32 MSG_MOVE_TAB_RIGHT					= 'mvtr';
 static const uint32 MSG_ACTIVATE_TERM					= 'msat';
 static const uint32 MSG_SET_CURSOR_STYLE				= 'mscs';
+static const uint32 MSG_GET_TERMINAL_COLOR				= 'getc';
 
 
 // Preference Read/Write Keys
@@ -145,8 +146,8 @@ static const char* const PREF_TAB_TITLE = "Tab title";
 static const char* const PREF_WINDOW_TITLE = "Window title";
 
 // shared strings
-extern const char* const kTooTipSetTabTitlePlaceholders;
-extern const char* const kTooTipSetWindowTitlePlaceholders;
+extern const char* const kToolTipSetTabTitlePlaceholders;
+extern const char* const kToolTipSetWindowTitlePlaceholders;
 extern const char* const kToolTipCommonTitlePlaceholders;
 
 extern const char* const kShellEscapeCharacters;
@@ -204,18 +205,6 @@ enum {
 #define FORECOLOR		0xFF0000
 #define BACKCOLOR		0xFF000000
 #define CHAR_ATTRIBUTES	0xFFFF7700
-
-#define IS_WIDTH(x)	(((x) & A_WIDTH)   )
-#define IS_BOLD(x)	(((x) & BOLD)      )
-#define IS_UNDER(x)	(((x) & UNDERLINE) )
-#define IS_INVERSE(x)	(((x) & INVERSE)   )
-#define IS_MOUSE(x)	(((x) & MOUSE)     )
-#define IS_FORESET(x)	(((x) & FORESET)   )
-#define IS_BACKSET(x)	(((x) & BACKSET)   )
-#define IS_FONT(x)	(((x) & FONT)      )
-#define IS_CR(x)	(((x) & DUMPCR)	   )
-#define IS_FORECOLOR(x) (((x) & FORECOLOR) >> 16)
-#define IS_BACKCOLOR(x) (((x) & BACKCOLOR) >> 24)
 
 #define FORECOLORED(x) ((x) << 16)
 #define BACKCOLORED(x) ((x) << 24)

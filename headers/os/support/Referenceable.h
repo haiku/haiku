@@ -91,6 +91,11 @@ public:
 		}
 	}
 
+	bool IsSet() const
+	{
+		return fObject != NULL;
+	}
+
 	Type* Get() const
 	{
 		return fObject;
@@ -195,6 +200,11 @@ public:
 	void Unset()
 	{
 		fReference.Unset();
+	}
+
+	bool IsSet() const
+	{
+		return fReference.IsSet();
 	}
 
 	const Type* Get() const

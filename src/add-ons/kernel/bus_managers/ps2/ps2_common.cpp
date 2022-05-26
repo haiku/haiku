@@ -18,6 +18,14 @@
 #include "ps2_dev.h"
 
 
+//#define TRACE_PS2_COMMON
+#ifdef TRACE_PS2_COMMON
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...)
+#endif
+
+
 isa_module_info *gIsa = NULL;
 bool gActiveMultiplexingEnabled = false;
 sem_id gControllerSem;

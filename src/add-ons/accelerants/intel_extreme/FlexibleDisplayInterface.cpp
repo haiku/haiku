@@ -44,10 +44,8 @@ static const int gSnbBFDITrainParam[] = {
 
 FDITransmitter::FDITransmitter(pipe_index pipeIndex)
 	:
-	fRegisterBase(PCH_FDI_TX_BASE_REGISTER)
+	fPipeIndex(pipeIndex)
 {
-	if (pipeIndex == INTEL_PIPE_B)
-		fRegisterBase += PCH_FDI_TX_PIPE_OFFSET * 1;
 }
 
 
@@ -60,7 +58,7 @@ void
 FDITransmitter::Enable()
 {
 	CALLED();
-	uint32 targetRegister = fRegisterBase + PCH_FDI_TX_CONTROL;
+	uint32 targetRegister = FDI_TX_CTL(fPipeIndex);
 	uint32 value = read32(targetRegister);
 
 	write32(targetRegister, value | FDI_TX_ENABLE);
@@ -73,7 +71,7 @@ void
 FDITransmitter::Disable()
 {
 	CALLED();
-	uint32 targetRegister = fRegisterBase + PCH_FDI_TX_CONTROL;
+	uint32 targetRegister = FDI_TX_CTL(fPipeIndex);
 	uint32 value = read32(targetRegister);
 
 	write32(targetRegister, value & ~FDI_TX_ENABLE);
@@ -86,8 +84,7 @@ bool
 FDITransmitter::IsPLLEnabled()
 {
 	CALLED();
-	return (read32(fRegisterBase + PCH_FDI_TX_CONTROL) & FDI_TX_PLL_ENABLED)
-		!= 0;
+	return (read32(FDI_TX_CTL(fPipeIndex)) & FDI_TX_PLL_ENABLED) != 0;
 }
 
 
@@ -95,13 +92,20 @@ void
 FDITransmitter::EnablePLL(uint32 lanes)
 {
 	CALLED();
-	uint32 targetRegister = fRegisterBase + PCH_FDI_TX_CONTROL;
+	uint32 targetRegister = FDI_TX_CTL(fPipeIndex);
 	uint32 value = read32(targetRegister);
 	if ((value & FDI_TX_PLL_ENABLED) != 0) {
 		// already enabled, possibly IronLake where it always is
 		TRACE("%s: Already enabled.\n", __func__);
 		return;
 	}
+
+	value &= ~FDI_DP_PORT_WIDTH_MASK;
+	value |= FDI_DP_PORT_WIDTH(lanes);
+
+	//first update config, -then- enable PLL to be sure config is indeed updated
+	write32(targetRegister, value);
+	read32(targetRegister);
 
 	write32(targetRegister, value | FDI_TX_PLL_ENABLED);
 	read32(targetRegister);
@@ -114,11 +118,11 @@ FDITransmitter::DisablePLL()
 {
 	CALLED();
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_ILK)) {
-		// on IronLake the FDI PLL is alaways enabled, so no point in trying...
+		// on IronLake the FDI PLL is always enabled, so no point in trying...
 		return;
 	}
 
-	uint32 targetRegister = fRegisterBase + PCH_FDI_TX_CONTROL;
+	uint32 targetRegister = FDI_TX_CTL(fPipeIndex);
 	write32(targetRegister, read32(targetRegister) & ~FDI_TX_PLL_ENABLED);
 	read32(targetRegister);
 	spin(100);
@@ -130,10 +134,8 @@ FDITransmitter::DisablePLL()
 
 FDIReceiver::FDIReceiver(pipe_index pipeIndex)
 	:
-	fRegisterBase(PCH_FDI_RX_BASE_REGISTER)
+	fPipeIndex(pipeIndex)
 {
-	if (pipeIndex == INTEL_PIPE_B)
-		fRegisterBase += PCH_FDI_RX_PIPE_OFFSET * 1;
 }
 
 
@@ -146,7 +148,7 @@ void
 FDIReceiver::Enable()
 {
 	CALLED();
-	uint32 targetRegister = fRegisterBase + PCH_FDI_RX_CONTROL;
+	uint32 targetRegister = FDI_RX_CTL(fPipeIndex);
 	uint32 value = read32(targetRegister);
 
 	write32(targetRegister, value | FDI_RX_ENABLE);
@@ -159,7 +161,7 @@ void
 FDIReceiver::Disable()
 {
 	CALLED();
-	uint32 targetRegister = fRegisterBase + PCH_FDI_RX_CONTROL;
+	uint32 targetRegister = FDI_RX_CTL(fPipeIndex);
 	uint32 value = read32(targetRegister);
 
 	write32(targetRegister, value & ~FDI_RX_ENABLE);
@@ -172,8 +174,7 @@ bool
 FDIReceiver::IsPLLEnabled()
 {
 	CALLED();
-	return (read32(fRegisterBase + PCH_FDI_RX_CONTROL) & FDI_RX_PLL_ENABLED)
-		!= 0;
+	return (read32(FDI_RX_CTL(fPipeIndex)) & FDI_RX_PLL_ENABLED) != 0;
 }
 
 
@@ -181,7 +182,7 @@ void
 FDIReceiver::EnablePLL(uint32 lanes)
 {
 	CALLED();
-	uint32 targetRegister = fRegisterBase + PCH_FDI_RX_CONTROL;
+	uint32 targetRegister = FDI_RX_CTL(fPipeIndex);
 	uint32 value = read32(targetRegister);
 	if ((value & FDI_RX_PLL_ENABLED) != 0) {
 		// already enabled, possibly IronLake where it always is
@@ -189,9 +190,17 @@ FDIReceiver::EnablePLL(uint32 lanes)
 		return;
 	}
 
-	value &= ~(FDI_DP_PORT_WIDTH_MASK | (0x7 << 16));
+	//Link bit depth: this should be globally known per FDI link (i.e. laptop panel 3x6, rest 3x8)
+	//currently using BIOS preconfigured setup
+	//value &= ~FDI_DP_PORT_WIDTH_MASK;
+	//value |= FDI_RX_LINK_BPC(INTEL_PIPE_8BPC);
+
+	value &= ~FDI_DP_PORT_WIDTH_MASK;
 	value |= FDI_DP_PORT_WIDTH(lanes);
-	//value |= (read32(PIPECONF(pipe)) & PIPECONF_BPC_MASK) << 11;
+
+	//first update config, -then- enable PLL to be sure config is indeed updated
+	write32(targetRegister, value);
+	read32(targetRegister);
 
 	write32(targetRegister, value | FDI_RX_PLL_ENABLED);
 	read32(targetRegister);
@@ -203,7 +212,7 @@ void
 FDIReceiver::DisablePLL()
 {
 	CALLED();
-	uint32 targetRegister = fRegisterBase + PCH_FDI_RX_CONTROL;
+	uint32 targetRegister = FDI_RX_CTL(fPipeIndex);
 	write32(targetRegister, read32(targetRegister) & ~FDI_RX_PLL_ENABLED);
 	read32(targetRegister);
 	spin(100);
@@ -214,7 +223,7 @@ void
 FDIReceiver::SwitchClock(bool toPCDClock)
 {
 	CALLED();
-	uint32 targetRegister = fRegisterBase + PCH_FDI_RX_CONTROL;
+	uint32 targetRegister = FDI_RX_CTL(fPipeIndex);
 	write32(targetRegister, (read32(targetRegister) & ~FDI_RX_CLOCK_MASK)
 		| (toPCDClock ? FDI_RX_CLOCK_PCD : FDI_RX_CLOCK_RAW));
 	read32(targetRegister);
@@ -235,41 +244,105 @@ FDILink::FDILink(pipe_index pipeIndex)
 
 
 status_t
-FDILink::Train(display_mode* target)
+FDILink::PreTrain(display_timing* target, uint32* linkBandwidth, uint32* lanes, uint32* bitsPerPixel)
 {
 	CALLED();
 
-	uint32 bitsPerPixel;
-	switch (target->space) {
-		case B_RGB32_LITTLE:
-			bitsPerPixel = 32;
+	uint32 txControl = FDI_TX_CTL(fPipeIndex);
+	uint32 rxControl = FDI_RX_CTL(fPipeIndex);
+
+	//Link bit depth: this should be globally known per FDI link (i.e. laptop panel 3x6, rest 3x8)
+	*bitsPerPixel = ((read32(rxControl) & FDI_RX_LINK_BPC_MASK) >> FDI_RX_LINK_COLOR_SHIFT);
+	switch (*bitsPerPixel) {
+		case INTEL_PIPE_8BPC:
+			*bitsPerPixel = 24;
 			break;
-		case B_RGB16_LITTLE:
-			bitsPerPixel = 16;
+		case INTEL_PIPE_10BPC:
+			*bitsPerPixel = 30;
 			break;
-		case B_RGB15_LITTLE:
-			bitsPerPixel = 15;
+		case INTEL_PIPE_6BPC:
+			*bitsPerPixel = 18;
 			break;
-		case B_CMAP8:
+		case INTEL_PIPE_12BPC:
+			*bitsPerPixel = 36;
+			break;
 		default:
-			bitsPerPixel = 8;
-			break;
+			*bitsPerPixel = 0;
+			ERROR("%s: FDI illegal link colordepth set.\n", __func__);
+			return B_ERROR;
 	}
+	TRACE("%s: FDI Link %s:\n", __func__, (fPipeIndex == INTEL_PIPE_A) ? "A" : "B");
+	TRACE("%s: FDI Link Colordepth: %" B_PRIu32 "\n", __func__, *bitsPerPixel);
 
 	// Khz / 10. ( each output octet encoded as 10 bits.
-	uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10;
-	uint32 bps = target->timing.pixel_clock * bitsPerPixel * 21 / 20;
+	*linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10;
+	//Reserving 5% bandwidth for possible spread spectrum clock use
+	uint32 bps = target->pixel_clock * *bitsPerPixel * 21 / 20;
 
-	uint32 lanes = bps / (linkBandwidth * 8);
+	//use DIV_ROUND_UP:
+	*lanes = (bps + (*linkBandwidth * 8) - 1) / (*linkBandwidth * 8);
+	//remove below line when link training is to be done
+	*lanes = ((read32(txControl) & FDI_DP_PORT_WIDTH_MASK) >> FDI_DP_PORT_WIDTH_SHIFT) + 1;
 
-	TRACE("%s: FDI Link Lanes: %" B_PRIu32 "\n", __func__, lanes);
+	TRACE("%s: FDI Link Lanes: %" B_PRIu32 "\n", __func__, *lanes);
+	//assuming we'll only use link A and B (not C)
+	if (*lanes > 4) {
+		ERROR("%s: FDI not enough lanes in hardware.\n", __func__);
+		return B_ERROR;
+	}
 
+	TRACE("%s: FDI TX ctrl before: 0x%" B_PRIx32 "\n", __func__, read32(txControl));
+	TRACE("%s: FDI RX ctrl before: 0x%" B_PRIx32 "\n", __func__, read32(rxControl));
+
+#if 0
+	//when link training is to be done re-enable this code
+
+	//The order of handling things is important here..
+	write32(txControl, read32(txControl) & ~FDI_TX_ENABLE);
+	read32(txControl);
+	write32(rxControl, read32(rxControl) & ~FDI_RX_ENABLE);
+	read32(rxControl);
+
+	write32(txControl, (read32(txControl) & ~FDI_LINK_TRAIN_NONE) | FDI_LINK_TRAIN_PATTERN_1);
+	read32(txControl);
+	if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
+		write32(rxControl, (read32(rxControl) & ~FDI_LINK_TRAIN_PATTERN_MASK_CPT) | FDI_LINK_TRAIN_PATTERN_1_CPT);
+	} else {
+		write32(rxControl, (read32(rxControl) & ~FDI_LINK_TRAIN_NONE) | FDI_LINK_TRAIN_PATTERN_1);
+	}
+	read32(rxControl);
+	spin(100);
+
+	// Disable FDI clocks
+	Receiver().SwitchClock(false);
+	Transmitter().DisablePLL();
+	Receiver().DisablePLL();
+#endif
+
+	return B_OK;
+}
+
+
+status_t
+FDILink::Train(display_timing* target, uint32 lanes)
+{
+	CALLED();
+
+	status_t result = B_OK;
+
+	uint32 txControl = FDI_TX_CTL(fPipeIndex);
+	uint32 rxControl = FDI_RX_CTL(fPipeIndex);
+
+	//Set receiving end TU size bits to match sending end's setting
+	write32(FDI_RX_TUSIZE1(fPipeIndex), FDI_RX_TRANS_UNIT_MASK);
+	write32(FDI_RX_TUSIZE2(fPipeIndex), FDI_RX_TRANS_UNIT_MASK);
+
+#if 0
+	//when link training is to be done re-enable this code
 	// Enable FDI clocks
 	Receiver().EnablePLL(lanes);
 	Receiver().SwitchClock(true);
 	Transmitter().EnablePLL(lanes);
-
-	status_t result = B_ERROR;
 
 	// TODO: Only _AutoTrain on IVYB Stepping B or later
 	// otherwise, _ManualTrain
@@ -281,10 +354,13 @@ FDILink::Train(display_mode* target)
 		result = _IlkTrain(lanes);
 	else
 		result = _NormalTrain(lanes);
+#endif
 
-	if (result != B_OK) {
+	TRACE("%s: FDI TX ctrl after: 0x%" B_PRIx32 "\n", __func__, read32(txControl));
+	TRACE("%s: FDI RX ctrl after: 0x%" B_PRIx32 "\n", __func__, read32(rxControl));
+
+	if (result != B_OK)
 		ERROR("%s: FDI training fault.\n", __func__);
-	}
 
 	return result;
 }
@@ -294,8 +370,8 @@ status_t
 FDILink::_NormalTrain(uint32 lanes)
 {
 	CALLED();
-	uint32 txControl = Transmitter().Base() + PCH_FDI_TX_CONTROL;
-	uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
+	uint32 txControl = FDI_TX_CTL(fPipeIndex);
+	uint32 rxControl = FDI_RX_CTL(fPipeIndex);
 
 	// Enable normal link training
 	uint32 tmp = read32(txControl);
@@ -337,14 +413,14 @@ status_t
 FDILink::_IlkTrain(uint32 lanes)
 {
 	CALLED();
-	uint32 txControl = Transmitter().Base() + PCH_FDI_TX_CONTROL;
-	uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
+	uint32 txControl = FDI_TX_CTL(fPipeIndex);
+	uint32 rxControl = FDI_RX_CTL(fPipeIndex);
 
 	// Train 1: unmask FDI RX Interrupt symbol_lock and bit_lock
-	uint32 tmp = read32(Receiver().Base() + PCH_FDI_RX_IMR);
+	uint32 tmp = read32(FDI_RX_IMR(fPipeIndex));
 	tmp &= ~FDI_RX_SYMBOL_LOCK;
 	tmp &= ~FDI_RX_BIT_LOCK;
-	write32(Receiver().Base() + PCH_FDI_RX_IMR, tmp);
+	write32(FDI_RX_IMR(fPipeIndex), tmp);
 	spin(150);
 
 	// Enable CPU FDI TX and RX
@@ -373,7 +449,7 @@ FDILink::_IlkTrain(uint32 lanes)
 			| FDI_RX_PHASE_SYNC_POINTER_EN);
 	}
 
-	uint32 iirControl = Receiver().Base() + PCH_FDI_RX_IIR;
+	uint32 iirControl = FDI_RX_IIR(fPipeIndex);
 	TRACE("%s: FDI RX IIR Control @ 0x%" B_PRIx32 "\n", __func__, iirControl);
 
 	int tries = 0;
@@ -431,11 +507,11 @@ status_t
 FDILink::_SnbTrain(uint32 lanes)
 {
 	CALLED();
-	uint32 txControl = Transmitter().Base() + PCH_FDI_TX_CONTROL;
-	uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
+	uint32 txControl = FDI_TX_CTL(fPipeIndex);
+	uint32 rxControl = FDI_RX_CTL(fPipeIndex);
 
 	// Train 1
-	uint32 imrControl = Receiver().Base() + PCH_FDI_RX_IMR;
+	uint32 imrControl = FDI_RX_IMR(fPipeIndex);
 	uint32 tmp = read32(imrControl);
 	tmp &= ~FDI_RX_SYMBOL_LOCK;
 	tmp &= ~FDI_RX_BIT_LOCK;
@@ -453,7 +529,7 @@ FDILink::_SnbTrain(uint32 lanes)
 	tmp |= FDI_LINK_TRAIN_400MV_0DB_SNB_B;
 	write32(txControl, tmp);
 
-	write32(Receiver().Base() + PCH_FDI_RX_MISC,
+	write32(FDI_RX_MISC(fPipeIndex),
 		FDI_RX_TP1_TO_TP2_48 | FDI_RX_FDI_DELAY_90);
 
 	tmp = read32(rxControl);
@@ -464,10 +540,10 @@ FDILink::_SnbTrain(uint32 lanes)
 		tmp &= ~FDI_LINK_TRAIN_NONE;
 		tmp |= FDI_LINK_TRAIN_PATTERN_1;
 	}
-	write32(rxControl, rxControl);
+	write32(rxControl, tmp);
 	Receiver().Enable();
 
-	uint32 iirControl = Receiver().Base() + PCH_FDI_RX_IIR;
+	uint32 iirControl = FDI_RX_IIR(fPipeIndex);
 	TRACE("%s: FDI RX IIR Control @ 0x%" B_PRIx32 "\n", __func__, iirControl);
 
 	int i = 0;
@@ -574,12 +650,13 @@ status_t
 FDILink::_AutoTrain(uint32 lanes)
 {
 	CALLED();
-	uint32 txControl = Transmitter().Base() + PCH_FDI_TX_CONTROL;
-	uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
+	uint32 txControl = FDI_TX_CTL(fPipeIndex);
+	uint32 rxControl = FDI_RX_CTL(fPipeIndex);
 
 	uint32 buffer = read32(txControl);
 
 	// Clear port width selection and set number of lanes
+	// fixme: does not belong in the train routines (?), (now) sits in FDI EnablePLL() routines
 	buffer &= ~(7 << 19);
 	buffer |= (lanes - 1) << 19;
 
@@ -588,6 +665,8 @@ FDILink::_AutoTrain(uint32 lanes)
 	else
 		buffer &= ~FDI_LINK_TRAIN_NONE;
 	write32(txControl, buffer);
+
+	write32(FDI_RX_MISC(fPipeIndex), FDI_RX_TP1_TO_TP2_48 | FDI_RX_FDI_DELAY_90);
 
 	bool trained = false;
 
@@ -599,10 +678,11 @@ FDILink::_AutoTrain(uint32 lanes)
 			buffer &= ~FDI_LINK_TRAIN_VOL_EMP_MASK;
 			buffer |= gSnbBFDITrainParam[i];
 			write32(txControl, buffer | FDI_TX_ENABLE);
-
+			read32(txControl);
 			write32(rxControl, read32(rxControl) | FDI_RX_ENABLE);
+			read32(rxControl);
 
-			spin(5);
+			spin(50);//looks like datasheet specified 5uS is not enough..?
 
 			buffer = read32(txControl);
 			if ((buffer & FDI_AUTO_TRAIN_DONE) != 0) {
@@ -612,6 +692,7 @@ FDILink::_AutoTrain(uint32 lanes)
 			}
 
 			write32(txControl, read32(txControl) & ~FDI_TX_ENABLE);
+			read32(txControl);
 			write32(rxControl, read32(rxControl) & ~FDI_RX_ENABLE);
 			read32(rxControl);
 
@@ -628,11 +709,14 @@ FDILink::_AutoTrain(uint32 lanes)
 		return B_ERROR;
 	}
 
-	// Enable ecc on IVB
+	// Enable ecc on IVB (and disable test pattern at sending and receiving end)
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IVB)) {
 		write32(rxControl, read32(rxControl)
 			| FDI_FS_ERRC_ENABLE | FDI_FE_ERRC_ENABLE);
 		read32(rxControl);
+		//enable normal pixels (kill testpattern)
+		write32(txControl, read32(txControl) | (0x3 << 8));
+		read32(txControl);
 	}
 
 	return B_OK;

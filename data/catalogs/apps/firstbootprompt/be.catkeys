@@ -1,7 +1,4 @@
-1	belarusian	x-vnd.Haiku-FirstBootPrompt	2791747426
+1	belarusian	x-vnd.Haiku-FirstBootPrompt	564016477
 Keymap	BootPromptWindow		Расклад клавіятуры
-Run Installer	BootPromptWindow		Запусціць Усталёўшчык
 Language	BootPromptWindow		Мова
 Custom	BootPromptWindow		Карыстальніка
-Boot to Desktop	BootPromptWindow		Загрузіць Працоўны Стол
-Welcome to Haiku!	BootPromptWindow		Вітаем!

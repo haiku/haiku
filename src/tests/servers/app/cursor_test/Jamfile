@@ -4,9 +4,15 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UseHeaders [ FDirName os app ] ;
 UseHeaders [ FDirName os interface ] ;
+UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) bitmap_drawing ] ;
 
 Application CursorTest :
 	CursorTest.cpp
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+;
+
+Application CursorBitmapTest :
+	CursorBitmapTest.cpp
 	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
 

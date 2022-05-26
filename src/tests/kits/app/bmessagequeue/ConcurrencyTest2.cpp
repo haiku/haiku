@@ -124,7 +124,7 @@ bigtime_t SNOOZE_TIME = 100000;
 	CPPUNIT_ASSERT(isLocked);
 	if (!unlockTest) {
 		// Be's implementation can cause a segv when NextMessage() is in
-		// progress when a delete occurs.  The OpenBeOS implementation
+		// progress when a delete occurs.  The Haiku implementation
 		// does not segv, but it won't be tested here because Be's fails.
 		return;
 	}
@@ -135,13 +135,13 @@ bigtime_t SNOOZE_TIME = 100000;
 		CPPUNIT_ASSERT(theMessage != NULL);
 		CPPUNIT_ASSERT(theMessage->what == 0);
 	} else {
-		// The following test passes for the OpenBeOS implementation but
+		// The following test passes for the Haiku implementation but
 		// fails for the Be implementation.  If the BMessageQueue is deleted
 		// while another thread is blocking waiting for NextMessage(), the
-		// OpenBeOS implementation detects that the message queue is deleted
+		// Haiku implementation detects that the message queue is deleted
 		// and returns NULL.  The Be implementation actually returns a message.
 		// It must be doing so from freed memory since the queue has been
-		// deleted.  The OpenBeOS implementation will not emulate the Be
+		// deleted.  The Haiku implementation will not emulate the Be
 		// implementation since I consider it a bug.
 		//
 		// CPPUNIT_ASSERT(theMessage==NULL);
@@ -165,7 +165,7 @@ bigtime_t SNOOZE_TIME = 100000;
 	CPPUNIT_ASSERT(isLocked);
 	if (!unlockTest) {
 		// Be's implementation causes a segv when RemoveMessage() is in
-		// progress when a delete occurs.  The OpenBeOS implementation
+		// progress when a delete occurs.  The Haiku implementation
 		// does not segv, but it won't be tested here because Be's fails.
 		return;
 	}
@@ -193,7 +193,7 @@ bigtime_t SNOOZE_TIME = 100000;
 	CPPUNIT_ASSERT(isLocked);
 	if (!unlockTest) {
 		// Be's implementation can cause a segv when AddMessage() is in
-		// progress when a delete occurs.  The OpenBeOS implementation
+		// progress when a delete occurs.  The Haiku implementation
 		// does not segv, but it won't be tested here because Be's fails.
 		return;
 	}

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	55235296
+1	russian	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Требуется авторизация
 Previous	WebPositive Window		Ранее
 (Finish: %date)	Download Window		(Завершение: %date)
@@ -20,14 +20,14 @@ Open containing folder	Download Window		Открыть папку с файло�
 Find previous	WebPositive Window		Найти ранее
 Full screen	WebPositive Window		Полноэкранный режим
 Downloads in progress	WebPositive		Загрузка файлов
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Вы хотите открыть сразу %addedCount закладок?
 Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Вы хотите открыть сразу %addedCount закладок?
 Clone current page	Settings Window		Клонировать текущую страницу
 Start page:	Settings Window		Начальная страница:
 Cancel	Download Window		Отмена
 Settings	Settings Window		Настройки
 Downloads	WebPositive Window		Загрузки
-Browse…	Settings Window		Просмотр…
+Browse…	Settings Window		Выбрать…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка для этой страницы (%bookmarkName) уже существует.
 Resume prior session	Settings Window		Восстановить предыдущую сессию
 Match case	WebPositive Window		Учитывать регистр
@@ -42,17 +42,18 @@ Standard font:	Settings Window		Обычный шрифт:
 Open download error	Download Window		Ошибка при открытии загруженного файла
 General	Settings Window		Общие
 New tabs:	Settings Window		Новые вкладки:
-%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	не удалось обработать %url
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	Не удалось обработать %url
 Open downloads folder	Download Window		Открыть папку загрузок
 Proxy server	Settings Window		Прокси-сервер
 Decrease size	WebPositive Window		Уменьшить размер
 Default fixed font size:	Settings Window		Размер моноширинного шрифта:
 Sans serif font:	Settings Window		Шрифт без засечек:
 Clear	WebPositive Window		Очистить
-Cookies for %s	Cookie Manager		Куки для %s
 The download could not be opened.	Download Window		Невозможно открыть загруженный файл.
+Cookies for %s	Cookie Manager		Куки для %s
 Close	Download Window		Закрыть
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Термин для поиска
 Reload	WebPositive Window		Обновить
 Expiration	Cookie Manager		Срок действия
 Download finished	Download Window		Загрузка завершена
@@ -100,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Вернуть
 Copy	WebPositive Window		Копировать
 Default standard font size:	Settings Window		Размер стандартного шрифта:
+Custom	Settings Window		Вручную
 Bookmark this page	WebPositive Window		Добавить в закладки
 Show tabs if only one page is open	Settings Window		Всегда показывать панель вкладок, даже если открыта только одна вкладка.
 Close tab	WebPositive Window		Закрыть вкладку
@@ -109,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Продолжить загрузку
 Proxy server requires authentication	Settings Window		Прокси требует проверки подлинности
 Cancel	Settings Window		Отмена
-History	WebPositive Window		История
 Reset size	WebPositive Window		Сбросить размер
+History	WebPositive Window		История
 Do you really want to clear the browsing history?	WebPositive Window		Вы действительно хотите очистить историю посещений?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Найти вперед
 Fixed font:	Settings Window		Моноширинный шрифт:
@@ -129,6 +131,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Нажатие сре
 Next	WebPositive Window		Далее
 Bookmark error	WebPositive Window		Ошибка закладки
 OK	WebPositive Window		OK
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% из %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Масштабировать только текст
 Save page as…	WebPositive Window		Сохранить страницу как…

@@ -124,6 +124,8 @@ public:
 
 		usb_id							GetUSBID(Object *object);
 		void							PutUSBID(Object *object);
+
+		// This sets the object as busy; the caller must set it un-busy.
 		Object *						GetObject(usb_id id);
 
 		// only for the kernel debugger
@@ -226,8 +228,10 @@ virtual	status_t						NotifyPipeChange(Pipe *pipe,
 		Hub *							GetRootHub() const { return fRootHub; }
 		void							SetRootHub(Hub *hub) { fRootHub = hub; }
 
-		usb_id							USBID() const { return fUSBID; }
 virtual	const char *					TypeName() const = 0;
+
+protected:
+		usb_id							USBID() const { return fStackIndex; }
 
 protected:
 		bool							fInitOK;
@@ -245,7 +249,7 @@ private:
 		Hub *							fRootHub;
 		Object *						fRootObject;
 
-		usb_id							fUSBID;
+		usb_id							fStackIndex;
 };
 
 
@@ -262,6 +266,9 @@ virtual									~Object();
 		Stack *							GetStack() const { return fStack; }
 
 		usb_id							USBID() const { return fUSBID; }
+		void							SetBusy(bool busy)
+											{ atomic_add(&fBusy, busy ? 1 : -1); }
+
 virtual	uint32							Type() const { return USB_OBJECT_NONE; }
 virtual	const char *					TypeName() const { return "object"; }
 
@@ -271,13 +278,15 @@ virtual	status_t						ClearFeature(uint16 selector);
 virtual	status_t						GetStatus(uint16 *status);
 
 protected:
-		void							PutUSBID();
+		void							PutUSBID(bool waitForUnbusy = true);
+		void							WaitForUnbusy();
 
 private:
 		Object *						fParent;
 		BusManager *					fBusManager;
 		Stack *							fStack;
 		usb_id							fUSBID;
+		int32							fBusy;
 };
 
 
@@ -333,7 +342,7 @@ virtual	void							SetDataToggle(bool toggle)
 											{ fDataToggle = toggle; }
 
 		status_t						SubmitTransfer(Transfer *transfer);
-		status_t						CancelQueuedTransfers(bool force);
+virtual	status_t						CancelQueuedTransfers(bool force);
 
 		void							SetControllerCookie(void *cookie)
 											{ fControllerCookie = cookie; }
@@ -344,6 +353,9 @@ virtual	void							SetDataToggle(bool toggle)
 virtual	status_t						SetFeature(uint16 selector);
 virtual	status_t						ClearFeature(uint16 selector);
 virtual	status_t						GetStatus(uint16 *status);
+
+protected:
+		friend class					Device;
 
 private:
 		int8							fDeviceAddress;
@@ -402,6 +414,8 @@ static	void							SendRequestCallback(void *cookie,
 											void *data, size_t dataLength,
 											usb_callback_func callback,
 											void *callbackCookie);
+
+virtual	status_t						CancelQueuedTransfers(bool force);
 
 private:
 		mutex							fSendRequestLock;
@@ -691,12 +705,12 @@ public:
 										size_t vectorCount);
 		iovec *						Vector() { return fVector; }
 		size_t						VectorCount() const { return fVectorCount; }
-		size_t						VectorLength();
 
 		uint16						Bandwidth() const { return fBandwidth; }
 
 		bool						IsFragmented() const { return fFragmented; }
 		void						AdvanceByFragment(size_t actualLength);
+		size_t						FragmentLength() const;
 
 		status_t					InitKernelAccess();
 		status_t					PrepareKernelAccess();

@@ -1,0 +1,16 @@
+1	japanese	application/x-vnd.moon-Flanger.media_addon	278353351
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ノード (%ld) の情報が得られません:\n%s\n
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)
+Delay	CortexAddOnsFlanger		ディレイ
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ノード (%ld) が見つかりません:\n%s\n
+Depth	CortexAddOnsFlanger		Depth
+Feedback	CortexAddOnsFlanger		フィードバック
+Sweep rate	CortexAddOnsFlanger		Sweep rate
+Mix ratio	CortexAddOnsFlanger		Mix ratio
+FlangerNode parameters	CortexAddOnsFlanger		FlangerNode パラメーター
+OK	CortexAddOnsCommonMediaNodeControlApp		OK
+controls	CortexAddOnsCommonMediaNodeControlApp		コントロール
+Mix output	CortexAddOnsFlanger		Mix 出力
+Flanger	CortexAddOnsFlanger		Flanger
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: ノード (%ld) のパラメーターがありません:\n%s\n
+Audio input	CortexAddOnsFlanger		オーディオ入力

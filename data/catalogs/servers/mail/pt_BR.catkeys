@@ -1,16 +1,19 @@
-1	portuguese (brazil)	x-vnd.Be-POST	825141276
+1	portuguese (brazil)	x-vnd.Be-POST	2949558073
 No new messages	MailDaemon		Sem novas mensagens
 No new messages	DeskbarView		Sem novas mensagens
 Shutdown mail services	DeskbarView		Desligar serviços de correio
-Mail status	MailDaemon		Status do correio
+Mail status	MailDaemon		Estado do correio
 Fetching mail for %name	Notifier		Buscando correio para %name
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# nova mensagem} other{# novas mensagens}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# nova mensagem} other{# novas mensagens}} para %name\n
 Create new message…	DeskbarView		Criar nova mensagem…
-Send pending mails	DeskbarView		Enviar correio pendente
-Settings…	DeskbarView		Definições…
+Send pending mails	DeskbarView		Enviar e-mails pendentes
+Settings…	DeskbarView		Configurações…
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Uma nova mensagem} other{# novas mensagens}}
 New Messages	MailDaemon		Novas Mensagens
 <no accounts>	DeskbarView		<nenhuma conta>
-Mail status	Notifier		Status do correio
-Check for mails only	DeskbarView		Apenas verificar correio
+Mail status	Notifier		Estado do correio
+Check for mails only	DeskbarView		Verificar apenas os e-mails
 Check for mail now	DeskbarView		Verificar correio agora
 Sending mail for %name	Notifier		Enviando correio para %name
-Mail daemon status log	MailDaemon		Registro de status do daemon de correio
+Mail daemon status log	MailDaemon		Registro de estado do daemon de correio

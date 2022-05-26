@@ -1,0 +1,6 @@
+1	esperanto	application/x-vnd.Cortex.support	1501729739
+QuickTime	MediaString		QuickTime
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# kanalo}other{# kanaloj}}
+Right	MediaString		Dekstra
+QuickTime format family	MediaString		Formata genro de QuickTime
+(none)	MediaString		(nenio)

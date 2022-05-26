@@ -1,0 +1,37 @@
+1	turkish	x-vnd.haiku.SerialConnect	354154115
+Hardware	SerialWindow	Flowcontrol	Donanım
+Connection	SerialWindow		Bağlantı
+Raw send…	SerialWindow		Ham gönder…
+Baud rate	SerialWindow		Baud oranı
+Stop bits	SerialWindow		Bitleri durdur
+None	SerialWindow	Flowcontrol	Hiçbiri
+Cancel	Custom baudrate window		Vazgeç
+Sending…	XModemStatus		Gönderiliyor…
+<no serial port available>	SerialWindow		<kullanılabilir seri kapı yok>
+Log to file…	SerialWindow		Dosyaya günlükle…
+Custom baudrate	Custom baudrate window		Özel baud oranı
+File	SerialWindow		Dosya
+SerialConnect	System name		Seri Bağlantı
+custom…	SerialWindow	Baudrate	özel…
+Parity	SerialWindow		Eşlik
+None	SerialWindow	Parity	Hiçbiri
+Disconnect	SerialWindow		Bağlantıyı kes
+Everything sent, waiting for acknowledge	XModemStatus		Tümü gönderildi, alındı bekleniyor
+Odd	SerialWindow	Parity	Tek
+Flow control	SerialWindow		Akış denetimi
+file transfer progress	SerialWindow		dosya aktarım ilerlemesi
+CRC requested	XModemStatus		CRC istendi
+Data bits	SerialWindow		Veri bitleri
+Both	SerialWindow	Flowcontrol	Her ikisi de
+Edit	SerialWindow		Düzen
+XModem send…	SerialWindow		XModem gönder…
+Baudrate:	Custom baudrate window		Baud oranı:
+OK	Custom baudrate window		Tamam
+Waiting for receiver…	XModemStatus		Alıcı bekleniyor…
+Clear history	SerialWindow		Geçmişi temizle
+Checksum error, re-send block	XModemStatus		Sağlama toplamı hatası, bloku yeniden gönder
+Settings	SerialWindow		Ayarlar
+Even	SerialWindow	Parity	Çift
+Software	SerialWindow	Flowcontrol	Yazılım
+Line terminator	SerialWindow		Satır sonlandırıcı
+Remote cancelled transfer	XModemStatus		Uzak konum aktarımı iptal etti

@@ -54,7 +54,7 @@ __FBSDID("$FreeBSD: releng/12.0/sys/dev/ath/ath_dfs/null/dfs_null.c 326255 2017-
 #include <sys/bus.h>
 
 #include <sys/socket.h>
- 
+
 #include <net/if.h>
 #include <net/if_var.h>
 #include <net/if_media.h>

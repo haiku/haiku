@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, Panagiotis Vasilopoulos <hello@alwayslivid.com>
+ * Copyright 2020, Panagiotis "Ivory" Vasilopoulos <git@n0toose.net>
  * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2005-2008, Jérôme DUVAL
  * All rights reserved. Distributed under the terms of the MIT License.
@@ -180,11 +180,16 @@ InstallerWindow::InstallerWindow()
 
 	BSize logoSize = logoView->MinSize();
 	logoView->SetExplicitMaxSize(logoSize);
-	fStatusView->SetExplicitMinSize(BSize(fStatusView->StringWidth("W") * 22,
-		logoSize.height));
 
-	// Explicitly create group view to set the background white in case
-	// height resizing is needed for the status view
+	// Make sure we can display 5 lines of text of 22 about charactrs each in the status view
+	font_height height;
+	fStatusView->GetFontHeight(&height);
+	float fontHeight = height.ascent + height.descent + height.leading;
+	fStatusView->SetExplicitMinSize(BSize(fStatusView->StringWidth("W") * 22,
+		fontHeight * 5 + 8));
+
+	// Create a group view with a white background since the logo and status text won't have the
+	// same height, this background will show in the remaining space
 	fLogoGroup = new BGroupView(B_HORIZONTAL, 10);
 	fLogoGroup->SetViewColor(255, 255, 255);
 	fLogoGroup->GroupLayout()->SetInsets(0, 0, 10, 0);
@@ -629,7 +634,7 @@ InstallerWindow::QuitRequested()
 		}
 	} else if (fInstallStatus == kInstalling) {
 			BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("Installer"),
-				B_TRANSLATE("The installation is not complete yet!"
+				B_TRANSLATE("The installation is not complete yet!\n"
                                 "Are you sure you want to stop it?"),
 				B_TRANSLATE("Cancel"), B_TRANSLATE("Stop"), NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT);

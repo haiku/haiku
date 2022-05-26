@@ -1,6 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef FILTER_VIEW_H
@@ -35,6 +35,7 @@ public:
 			void				AdoptModel(Model& model);
 
 private:
+	static	void				_AddCategoriesToMenu(Model& model, BMenu* menu);
 	static	bool				_SelectCategoryCode(BMenu* menu,
 									const BString& code);
 	static	bool				_MatchesCategoryCode(BMenuItem* item,

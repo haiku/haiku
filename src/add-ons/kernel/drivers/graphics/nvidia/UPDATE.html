@@ -4,7 +4,13 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (Haiku repository 1.10, Rudolf)</h1></p>
+<p><h1>head (Haiku repository 1.16, Rudolf)</h1></p>
+<ul>
+<li>Fixed driver trouble on several Geforce 6000-6200 cards and maybe even more where the refreshrate was not properly calculated causing things like only displaying a part of the screen, a wobbly screen, no screen at all or just displaying at a too low rate. In cases where the GPU and/or RAM PLL is programmed on cards (depending on the nvidia.settings file) this might also solve random 'noise' or flickering across the entire screen(s). It turns out some newer supported cards outthere (notably Nforce 4 and 4xx types) use a new crystal frequency base (25 Mhz) for the GPU chip which was not yet detected by the driver.
+<li>Fixed I2C buses not working and so screen DDC/EDID fetch failing on C51 chips specifically. This makes default startup resolution, screenprefs panel and widescreen modes available without nvidia.settings file tricks on a number of Geforce 6100(Go) and 6150(Go) graphics outthere. Now there should nolonger be cards without functioning (but implemented) I2C channels in this driver.
+<li>Fixed PLL VCO, discriminator and postscaler limits for C51 chips specifically. This fixes (much more) wobbly- or black screens. C51 chips (Geforce 6100(Go) and 6150(Go)) should now work without any problems left.
+</ul>
+<p><h1>Nvidia driver 1.10 (Rudolf)</h1></p>
 <ul>
 <li>Fixed driver assuming enabling AGP mode succeeded on some occasions if it did not block it itself. Blocking AGP mode completely via the AGP busmanager (option 'block_agp') resulted in a crashing acceleration engine because it was setup for AGP transfers instead of using PCI transfers. Error was solved with help from user kraton.
 <li>Fixed shared_info struct problem occuring when 3D 'accelerant' is used (tested Alpha 4.1): the TVencoder type definition list apparantly gets some memory assigned these days when done inside the definition of shared_info. Moved encoder list outside the shared_info definition.

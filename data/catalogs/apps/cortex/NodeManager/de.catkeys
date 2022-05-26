@@ -1,0 +1,7 @@
+1	german	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		System Audiomixer
+System video output	NodeManager		System Videoausgang
+System video input	NodeManager		System Videoeingang
+No name	NodeManager		Unbenannt
+System audio input	NodeManager		System Audioeingang
+Time sources	NodeManager		Zeitquellen

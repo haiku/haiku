@@ -1,7 +1,7 @@
 1	japanese	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		ウィンドウモードで起動
 Extended battery info	PowerStatus		拡張バッテリー情報
-Show status icon	PowerStatus		状態アイコンを表示
+Show status icon	PowerStatus		状態アイコンの表示
 Battery charging	PowerStatus		充電中
 Design capacity low warning: 	PowerStatus		設計容量の低下警告:
 The battery level is critical, please plug in the device immediately.	PowerStatus		バッテリー残量が空に近いので、すぐにデバイスを電源につないでください。
@@ -9,7 +9,7 @@ non-rechargeable	PowerStatus		再充電不能
 Last full charge: 	PowerStatus		前回の完全充電:
  mV	PowerStatus		 mV
 Current rate: 	PowerStatus		電流率:
-Show text label	PowerStatus		テキストラベル表示
+Show text label	PowerStatus		テキストラベルの表示
 Quit	PowerStatus		終了
 Battery low	PowerStatus		バッテリー残量低下
 Model number: 	PowerStatus		モデルナンバー:
@@ -22,16 +22,16 @@ Battery discharging	PowerStatus		放電中
 Design voltage: 	PowerStatus		設計電圧:
 discharging	PowerStatus		放電中
 rechargeable	PowerStatus		再充電可能
-Battery info…	PowerStatus		バッテリー情報…
-Show time	PowerStatus		時間を表示
+Battery info…	PowerStatus		バッテリー情報...
+Show time	PowerStatus		残り時間の表示
  mA	PowerStatus		 mA
-About…	PowerStatus		このソフトウェアについて…
+About…	PowerStatus		このソフトウェアについて...
 Serial number: 	PowerStatus		シリアルナンバー:
 Battery critical	PowerStatus		バッテリー残量が空に近い
 Capacity: 	PowerStatus		容量:
  mW	PowerStatus		 mW
-No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		サポートされたバッテリーが見つかりませんでした。"バッテリーの状態"はこのシステムでは使用できません。
-Show percent	PowerStatus		パーセントを表示
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		サポートされたバッテリーが見つからなかったので、"バッテリーの状態"はこのシステムでは使用できません。
+Show percent	PowerStatus		充電率の表示
 Capacity granularity 1: 	PowerStatus		容量精度 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		バッテリー 残量が低下してきたので、デバイスを電源につないでください。
 Design capacity warning: 	PowerStatus		設計容量警告:

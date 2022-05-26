@@ -361,6 +361,7 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 
 		default:
 			BView::MessageReceived(msg);
+			break;
 	}
 }
 
@@ -566,4 +567,3 @@ TListItem::DrawItem(BView *owner, BRect r, bool /* complete */)
 	} else
 		owner->DrawString("<missing attachment>");
 }
-

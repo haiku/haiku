@@ -1,0 +1,24 @@
+1	german	application/x-vnd.Cortex.Route	51642783
+Node '%name%' released	CortexRouteApp		Node '%name%' freigegeben
+OK	CortexRouteApp		OK
+About Cortex/Route…	CortexRouteApp		Über Cortex/Route …
+File	CortexRouteApp		Datei
+Connection '%name%' made	CortexRouteApp		'%name%' verbunden
+Save nodes…	CortexRouteApp		Nodes speichern …
+%producer% and %consumer%	CortexRouteApp		%producer% und %consumer%
+Node '%name%' created	CortexRouteApp		Node '%name%' erzeugt
+Negotiated format:	CortexRouteApp		Ausgehandeltes Format:
+Window	CortexRouteApp		Fenster
+Connection broken	CortexRouteApp		Verbindung abgebrochen
+Untitled group	CortexRouteApp		Unbenannte Gruppe
+Connection failed	CortexRouteApp		Verbinden fehlgeschlagen
+Connection '%name%' broken	CortexRouteApp		Verbindung '%name%' abgebrochen
+Between:	CortexRouteApp		Zwischen:
+Cortex	CortexRouteApp		Cortex
+Open…	CortexRouteApp		Öffnen …
+Connection made	CortexRouteApp		Verbindung hergestellt
+Show transport	CortexRouteApp		Transport anzeigen
+Show add-ons	CortexRouteApp		Add-ons anzeigen
+Quit	CortexRouteApp		Beenden
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAlle Rechte vorbehalten.\n\nDas Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nDank an:\nJohn Ashmun\nJon Watte\nDoug Wright\n<Dein Name hier>\n\nEinige der verwendeten Icons sind im Besitz von\nBe, Inc. und für die Nutzung freigegeben.
+Tried format:	CortexRouteApp		Probiertes Format:

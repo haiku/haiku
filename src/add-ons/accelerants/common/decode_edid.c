@@ -43,20 +43,33 @@ static void
 decode_version(edid1_version *version, const edid1_version_raw *raw)
 {
 	version->version = raw->version;
-	version->revision = raw->revision;	
+	version->revision = raw->revision;
 }
 
 
 static void
 decode_display(edid1_display *display, const edid1_display_raw *raw)
-{	
-	display->input_type = raw->input_type;
-	display->input_voltage = raw->input_voltage;
-	display->setup = raw->setup;
-	display->sep_sync = raw->sep_sync;
-	display->comp_sync = raw->comp_sync;
-	display->sync_on_green = raw->sync_on_green;
-	display->sync_serr = raw->sync_serr;
+{
+	// We need to dig into one of the union to get the first
+	// bit which should always align. then we can pick the right
+	// data structure to parse.
+	display->input_type = raw->analog_params.input_type;
+
+	if (display->input_type != 0) {
+		// digital
+		display->digital_params.bit_depth = 0;
+		if (raw->digital_params.bit_depth > 0 && raw->digital_params.bit_depth < 7)
+			display->digital_params.bit_depth = raw->digital_params.bit_depth * 2 + 4;
+		display->digital_params.interface = raw->digital_params.interface;
+	} else {
+		// analog
+		display->analog_params.input_voltage = raw->analog_params.input_voltage;
+		display->analog_params.setup = raw->analog_params.setup;
+		display->analog_params.sep_sync = raw->analog_params.sep_sync;
+		display->analog_params.comp_sync = raw->analog_params.comp_sync;
+		display->analog_params.sync_on_green = raw->analog_params.sync_on_green;
+		display->analog_params.sync_serr = raw->analog_params.sync_serr;
+	}
 
 	display->h_size = raw->h_size;
 	display->v_size = raw->v_size;

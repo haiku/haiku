@@ -25,7 +25,7 @@ ImageDebugInfoLoadingState::~ImageDebugInfoLoadingState()
 bool
 ImageDebugInfoLoadingState::HasSpecificDebugInfoLoadingState() const
 {
-	return fSpecificInfoLoadingState.Get() != NULL;
+	return fSpecificInfoLoadingState.IsSet();
 }
 
 

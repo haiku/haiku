@@ -187,6 +187,7 @@ CodyCam::MessageReceived(BMessage* message)
 			status_t err = fMediaRoster->GetParameterWebFor(node, &web);
 			if (err >= B_OK && web != NULL) {
 				view = BMediaTheme::ViewFor(web);
+				view->SetResizingMode(B_FOLLOW_ALL_SIDES);
 				fVideoControlWindow = new ControlWindow(view, node);
 				fMediaRoster->StartWatching(BMessenger(NULL,
 					fVideoControlWindow), node,	B_MEDIA_WEB_CHANGED);
@@ -880,7 +881,8 @@ VideoWindow::ToggleMenuOnOff()
 ControlWindow::ControlWindow(BView* controls,
 	media_node node)
 	:
-	BWindow(BRect(), B_TRANSLATE("Video settings"), B_TITLED_WINDOW,
+	BWindow(controls->Bounds().OffsetToSelf(100, 100),
+		B_TRANSLATE("Video settings"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS)
 {
 	fView = controls;

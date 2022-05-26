@@ -14,6 +14,8 @@ const char* const kAdminDirectoryName = PACKAGES_DIRECTORY_ADMIN_DIRECTORY;
 const char* const kActivationFileName = PACKAGES_DIRECTORY_ACTIVATION_FILE;
 const char* const kTemporaryActivationFileName
 	= PACKAGES_DIRECTORY_ACTIVATION_FILE ".tmp";
+const char* const kFirstBootProcessingNeededFileName
+	= "FirstBootProcessingNeeded";
 const char* const kWritableFilesDirectoryName = "writable-files";
 const char* const kPackageFileAttribute = "SYS:PACKAGE";
 const char* const kQueuedScriptsDirectoryName = "queued-scripts";

@@ -618,7 +618,7 @@ BWindowScreen::_InitData(uint32 space, uint32 attributes)
 		if (fDebugSem < B_OK)
 			throw (status_t)fDebugSem;
 
-		memcpy(fPalette, screen.ColorMap()->color_list, sizeof(fPalette));
+		memcpy((void*)fPalette, screen.ColorMap()->color_list, sizeof(fPalette));
 		fActivateState = false;
 		fWorkState = true;
 

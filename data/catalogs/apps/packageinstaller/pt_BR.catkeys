@@ -1,4 +1,5 @@
-1	portuguese (brazil)	x-vnd.Haiku-PackageInstaller	169659395
+1	portuguese (brazil)	x-vnd.Haiku-PackageInstaller	2472572058
+Package description	UninstallView		Descrição do pacote
 none	PackageView		nenhum
 Continue	PackageInstall		Continuar
 Running post-installation scripts	PackageInstall		Executando scripts pós-instalação
@@ -15,7 +16,12 @@ Skip all	PackageView		Ignorar tudo
 The installation of the package has been aborted.	PackageView		A instalação do pacote foi cancelada.
 No installation type selected	PackageView		Nenhum tipo de instalação selecionado
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Você quer guardar esta decisão pelo resto da instalação?\n
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		O pacote selecionado não foi removido do seu sistema. O arquivo de informações do pacote instalado pode ter sido corrompido.
+Install…	UninstallView		Instalar…
+The item named '%s' already exists in the given path.\nReplace the item with the one from this package or skip it?	PackageView		O item chamado '%s' já existe no caminho fornecido.\nSubstituir o item por este pacote ou ignorar?
 Installing files and folders	PackageInstall		Instalando arquivos e pastas
+Installed packages	UninstallWindow		Pacotes instalados
+Remove	UninstallView		Remover
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		O pacote selecionado não pode ser instalado em seu sistema. Provavelmente, houve um problema com o arquivo. Consulte o distribuidor do pacote.
 OK	UninstallView		OK
 Accept	PackageTextViewer		Aceitar
@@ -34,15 +40,20 @@ No package selected.	UninstallView		Nenhum pacote selecionado.
 Error while installing the package\n	PackageView		Erro instalando o pacote\n
 Finishing installation	PackageInstall		Finalizando instalação
 No package available.	PackageInfo		Nenhum pacote disponível.
+The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		O script chamado '%s' já existe no caminho fornecido.\nSubstituir o script por este pacote ou ignorar?
 Installation type:	PackageView		Tipo de instalação:
+The package you selected has been successfully removed from your system.	UninstallView		O pacote selecionado foi removido com sucesso do sistema.
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Parece haver um erro no tamanho do arquivo do pacote. O pacote pode estar quebrado ou ter sido modificado após sua criação. Quer continuar?
 %name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		Cancelar
+The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		O arquivo chamado '%s' já existe no caminho fornecido.\nSubstituir o arquivo por este pacote ou ignorar?
 Replace all	PackageView		Substituir tudo
-The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		O arquivo do pacote é ilegível.\nUma das possíveis razões é que este não é um arquivo .pkg do BeOS válido.
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		O arquivo do pacote não é legível.\nUma das razões possíveis é que este não é um pacote .pkg válido do BeOS.
 Continue	PackageInfo		Continuar
 No package selected.	PackageInfo		Nenhum pacote selecionado.
-Error! \"%s\" is not a valid path.\n	Packageinstaller main		Opa! Erro! \"%s\" não é um caminho válido.\n
+Error! \"%s\" is not a valid path.\n	Packageinstaller main		Erro! \"%s\" não é um destino válido.\n
+The directory named '%s' already exists in the given path.\nReplace the directory with one from this package or skip it?	PackageView		O diretório chamado '%s' já existe no caminho fornecido.\nSubstituir o diretório por este pacote ou ignorar?
+LegacyPackageInstaller	System name		InstaladorDePacoteLegado
 Ask again	PackageView		Perguntar novamente
 Begin	PackageView		Começar
 OK	PackageView		OK

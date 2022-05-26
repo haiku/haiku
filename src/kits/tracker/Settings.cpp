@@ -234,7 +234,7 @@ ScalarValueSetting::Handle(const char* const* argv)
 void
 ScalarValueSetting::SaveSettingValue(Settings* settings)
 {
-	settings->Write("%ld", fValue);
+	settings->Write("%" B_PRId32, fValue);
 }
 
 

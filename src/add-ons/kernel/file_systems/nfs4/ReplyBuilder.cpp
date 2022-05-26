@@ -114,7 +114,7 @@ ReplyBuilder::_HaikuErrorToNFS4(status_t error)
 {
 	switch (error) {
 		case B_OK:				return NFS4_OK;
-		case B_FILE_NOT_FOUND:	return NFS4ERR_BADHANDLE;
+		case B_ENTRY_NOT_FOUND:	return NFS4ERR_BADHANDLE;
 		case B_NOT_SUPPORTED:	return NFS4ERR_OP_ILLEGAL;
 		default:				return NFS4ERR_RESOURCE;
 	}

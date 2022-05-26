@@ -1,5 +1,6 @@
 /*
  * Copyright 2006-2112, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>
  * Distributed under the terms of the MIT License.
  */
 
@@ -33,10 +34,10 @@ CompoundEdit::Perform(EditContext& context)
 {
 	status_t status = B_OK;
 
-	int32 count = fEdits.CountItems();
+	int32 count = static_cast<int32>(fEdits.size());
 	int32 i = 0;
 	for (; i < count; i++) {
-		status = fEdits.ItemAtFast(i)->Perform(context);
+		status = fEdits[i]->Perform(context);
 		if (status != B_OK)
 			break;
 	}
@@ -45,7 +46,7 @@ CompoundEdit::Perform(EditContext& context)
 		// roll back
 		i--;
 		for (; i >= 0; i--) {
-			fEdits.ItemAtFast(i)->Undo(context);
+			fEdits[i]->Undo(context);
 		}
 	}
 
@@ -58,10 +59,10 @@ CompoundEdit::Undo(EditContext& context)
 {
 	status_t status = B_OK;
 
-	int32 count = fEdits.CountItems();
+	int32 count = static_cast<int32>(fEdits.size());
 	int32 i = count - 1;
 	for (; i >= 0; i--) {
-		status = fEdits.ItemAtFast(i)->Undo(context);
+		status = fEdits[i]->Undo(context);
 		if (status != B_OK)
 			break;
 	}
@@ -70,7 +71,7 @@ CompoundEdit::Undo(EditContext& context)
 		// roll back
 		i++;
 		for (; i < count; i++) {
-			fEdits.ItemAtFast(i)->Redo(context);
+			fEdits[i]->Redo(context);
 		}
 	}
 
@@ -83,10 +84,10 @@ CompoundEdit::Redo(EditContext& context)
 {
 	status_t status = B_OK;
 
-	int32 count = fEdits.CountItems();
+	int32 count = static_cast<int32>(fEdits.size());
 	int32 i = 0;
 	for (; i < count; i++) {
-		status = fEdits.ItemAtFast(i)->Redo(context);
+		status = fEdits[i]->Redo(context);
 		if (status != B_OK)
 			break;
 	}
@@ -95,7 +96,7 @@ CompoundEdit::Redo(EditContext& context)
 		// roll back
 		i--;
 		for (; i >= 0; i--) {
-			fEdits.ItemAtFast(i)->Undo(context);
+			fEdits[i]->Undo(context);
 		}
 	}
 
@@ -110,8 +111,8 @@ CompoundEdit::GetName(BString& name)
 }
 
 
-bool
+void
 CompoundEdit::AppendEdit(const UndoableEditRef& edit)
 {
-	return fEdits.Add(edit);
+	fEdits.push_back(edit);
 }

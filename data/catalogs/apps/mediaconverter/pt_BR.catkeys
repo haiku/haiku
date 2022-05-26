@@ -1,15 +1,19 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	481999996
+1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	1322040280
+Input file not recognized as Audio or Video	MediaConverter		Arquivo de entrada não reconhecido como Áudio ou Vídeo
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Qualidade de vídeo: %3d%%
 Source files	MediaConverter		Arquivos fonte
 Error converting '%filename'	MediaConverter		Erro ao converter '%filename'
+Selected directory not found. Defaulting to /boot/home	MediaConverter		Diretório selecionado não encontrado. Padronizando em /boot/home
 Conversion completed	MediaConverter		Conversão concluída
 Audio:	MediaConverter-FileInfo		Áudio:
 MediaConverter+:SaveDirectory	MediaConverter		Conversor de Mídia+:Salvar Diretório
+Error creating video.	MediaConverter		Erro ao criar vídeo.
 Cancelling	MediaConverter		Cancelando
 None available	Audio codecs		Nenhum disponível
 No file selected	MediaConverter-FileInfo		Nenhum arquivo selecionado
 High	MediaConverter		Alto
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{O arquivo não foi reconhecido como um arquivo de mídia suportado:} other{# arquivos não foram reconhecidos como arquivos de mídia suportados:}}
 File Error	MediaConverter-FileInfo		Erro no Arquivo
 None available	Video codecs		Nenhum disponível
 Output format	MediaConverter		Formato de saída
@@ -25,23 +29,27 @@ Audio quality: %3d%%	MediaConverter		Qualidade de áudio: %3d%%
 Cancelling…	MediaConverter		Cancelando…
 Output file '%filename' created	MediaConverter		Criado arquivo de saída '%filename'
 Output folder	MediaConverter		Pasta de saída
+Error creating track.	MediaConverter		Erro ao criar faixa.
  seconds	MediaFileInfo		 segundos
-Video using parameters form settings	MediaConverter		Vídeo utilizando definições de forma de parâmetros
+Video using parameters form settings	MediaConverter		Vídeo utilizando parâmetros das configurações
 Video:	MediaConverter-FileInfo		Vídeo:
 Select	MediaConverter		Selecionar
 Conversion cancelled	MediaConverter		Conversão cancelada
 Low	MediaConverter		Baixo
 Error loading files	MediaConverter		Erro ao carregar arquivos
-End   [ms]: 	MediaConverter		Fim [ms]:
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
+End   [ms]: 	MediaConverter		Fim [ms]: 
 Cancel	MediaConverter		Cancelar
 OK	MediaConverter-FileInfo		OK
 Video encoding:	MediaConverter		Codificação de vídeo:
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Um erro ocorreu lendo as informações do arquivo.\n\nErro :
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Ocorreu um erro ao ler as informações do arquivo.\n\nErro: 
 Error	MediaConverter		Erro
 File details	MediaConverter		Detalhes do arquivo
 No audio	Audio codecs list		Sem áudio
 Drop media files onto this window	MediaConverter		Soltar arquivos de mídia sobre esta janela
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# quadro} other{# quadros}}
 Quit	Menu		Sair
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
 Duration:	MediaConverter-FileInfo		Duração:
 MediaConverter	System name		Conversor de Mídia
 Error launching: %strError%	MediaConverter		Erro ao lançar: %strError%
@@ -50,10 +58,11 @@ File	Menu		Arquivo
 Video quality not supported	MediaConverter		Qualidade de vídeo não suportada
 Select this folder	MediaConverter		Selecionar esta pasta
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canal
-%d bit 	MediaFileInfo		%d bit
+%d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Nenhum vídeo
 Continue	MediaConverter		Continuar
 Convert	MediaConverter		Converter
 Audio quality not supported	MediaConverter		Qualidade de áudio não suportada
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Erro ao escrever no local: %strPath%. Padronizando em: /boot/home
 Preview	MediaConverter		Pré-visualização
-Start [ms]: 	MediaConverter		Início [ms]:
+Start [ms]: 	MediaConverter		Início [ms]: 

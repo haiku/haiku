@@ -1,6 +1,6 @@
 /*
  * Copyright 2013, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -23,6 +23,7 @@
 
 #include "support.h"
 
+#include "AppUtils.h"
 #include "FeaturedPackagesView.h"
 #include "Logger.h"
 #include "MainWindow.h"
@@ -87,11 +88,12 @@ App::ReadyToRun()
 	BMessage settings;
 	_LoadSettings(settings);
 
-	if (!_CheckTestFile())
-	{
+	if (!_CheckTestFile()) {
 		Quit();
 		return;
 	}
+
+	_ClearCacheOnVersionChange();
 
 	fMainWindow = new MainWindow(settings);
 	_ShowWindow(fMainWindow);
@@ -340,6 +342,7 @@ App::_AlertSimpleError(BMessage* message)
 {
 	BString alertTitle;
 	BString alertText;
+	int32 typeInt;
 
 	if (message->FindString(KEY_ALERT_TEXT, &alertText) != B_OK)
 		alertText = "?";
@@ -347,7 +350,11 @@ App::_AlertSimpleError(BMessage* message)
 	if (message->FindString(KEY_ALERT_TITLE, &alertTitle) != B_OK)
 		alertTitle = B_TRANSLATE("Error");
 
-	BAlert* alert = new BAlert(alertTitle, alertText, B_TRANSLATE("OK"));
+	if (message->FindInt32(KEY_ALERT_TYPE, &typeInt) != B_OK)
+		typeInt = B_INFO_ALERT;
+
+	BAlert* alert = new BAlert(alertTitle, alertText, B_TRANSLATE("OK"),
+		NULL, NULL, B_WIDTH_AS_USUAL, static_cast<alert_type>(typeInt));
 
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
@@ -377,7 +384,7 @@ App::_Open(const BEntry& entry)
 
 	// Transfer information into PackageInfo
 	PackageInfoRef package(new(std::nothrow) PackageInfo(info), true);
-	if (package.Get() == NULL) {
+	if (!package.IsSet()) {
 		fprintf(stderr, "Could not allocate PackageInfo\n");
 		return;
 	}
@@ -490,7 +497,7 @@ App::_CheckPackageDaemonRuns()
 		alert->SetShortcut(0, B_ESCAPE);
 
 		if (alert->Go() == 0)
-			exit(1);
+			HDFATAL("unable to start without the package daemon running");
 
 		if (!_LaunchPackageDaemon())
 			break;
@@ -581,4 +588,63 @@ App::_CheckTestFile()
 	}
 
 	return true;
+}
+
+
+/*!	This method will check to see if the version of the application has changed.
+	If it has changed then it will delete all of the contents of the cache
+	directory.  This will mean that when application logic changes, it need not
+	bother to migrate the cached files.  Also any old cached files will be
+	cleared out that no longer serve any purpose.
+
+	Errors arising in this logic need not prevent the application from failing
+	to start as this is just a clean-up.
+*/
+
+void
+App::_ClearCacheOnVersionChange()
+{
+	BString version;
+
+	if (AppUtils::GetAppVersionString(version) != B_OK) {
+		HDERROR("clear cache; unable to get the application version");
+		return;
+	}
+
+	BPath lastVersionPath;
+	if (StorageUtils::LocalWorkingFilesPath(
+			"version.txt", lastVersionPath) != B_OK) {
+		HDERROR("clear cache; unable to get version file path");
+		return;
+	}
+
+	bool exists;
+	off_t size;
+
+	if (StorageUtils::ExistsObject(
+		lastVersionPath, &exists, NULL, &size) != B_OK) {
+		HDERROR("clear cache; unable to check version file exists");
+		return;
+	}
+
+	BString lastVersion;
+
+	if (exists && StorageUtils::AppendToString(lastVersionPath, lastVersion)
+			!= B_OK) {
+		HDERROR("clear cache; unable to read the version from [%s]",
+			lastVersionPath.Path());
+		return;
+	}
+
+	if (lastVersion != version) {
+		HDINFO("last version [%s] and current version [%s] do not match"
+			" -> will flush cache", lastVersion.String(), version.String());
+		StorageUtils::RemoveWorkingDirectoryContents();
+		HDINFO("will write version [%s] to [%s]",
+			version.String(), lastVersionPath.Path());
+		StorageUtils::AppendToFile(version, lastVersionPath);
+	} else {
+		HDINFO("last version [%s] and current version [%s] match"
+		 	" -> cache retained", lastVersion.String(), version.String());
+	}
 }

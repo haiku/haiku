@@ -1,7 +1,9 @@
 /*
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "PackageIconTarRepository.h"
 
 #include <Autolock.h>
@@ -11,6 +13,9 @@
 
 #include "Logger.h"
 #include "TarArchiveService.h"
+
+
+#define LIMIT_ICON_CACHE 50
 
 
 BitmapRef
@@ -123,13 +128,21 @@ IconTarPtrEntryListener::_LeafNameToBitmapSize(BString& leafName,
 
 PackageIconTarRepository::PackageIconTarRepository()
 	:
-	fTarIo(NULL)
+	fTarIo(NULL),
+	fIconCache(LIMIT_ICON_CACHE)
 {
 }
 
 
 PackageIconTarRepository::~PackageIconTarRepository()
 {
+}
+
+
+void
+PackageIconTarRepository::Clear() {
+	BAutolock locker(&fLock);
+	fIconCache.Clear();
 }
 
 
@@ -189,10 +202,10 @@ PackageIconTarRepository::Init(BPath& tarPath)
 void
 PackageIconTarRepository::_Close()
 {
+	fIconCache.Clear();
 	delete fTarIo;
 	fTarIo = NULL;
 	fIconTarPtrs.Clear();
-	fIconCache.Clear();
 }
 
 
@@ -229,7 +242,7 @@ PackageIconTarRepository::GetIcon(const BString& pkgName, BitmapSize size,
 	off_t iconDataTarOffset = -1;
 	const IconTarPtrRef tarPtrRef = _GetIconTarPtr(pkgName);
 
-	if (tarPtrRef.Get() != NULL) {
+	if (tarPtrRef.IsSet()) {
 		iconDataTarOffset = _OffsetToBestRepresentation(tarPtrRef, size,
 			&actualSize);
 	}
@@ -239,16 +252,13 @@ PackageIconTarRepository::GetIcon(const BString& pkgName, BitmapSize size,
 	else {
 		HashString key = _ToIconCacheKey(pkgName, actualSize);
 
-		// TODO; need to implement an LRU cache so that not too many icons are
-		// in memory at the same time.
-
 		if (!fIconCache.ContainsKey(key)) {
 			result = _CreateIconFromTarOffset(iconDataTarOffset, bitmap);
 			if (result == B_OK)
 				fIconCache.Put(key, bitmap);
 			else {
 				HDERROR("failure to read image for package [%s] at offset %"
-					B_PRIdSSIZE, pkgName.String(), iconDataTarOffset);
+					B_PRIdOFF, pkgName.String(), iconDataTarOffset);
 				fIconCache.Put(key, sDefaultIcon);
 			}
 		}
@@ -280,8 +290,7 @@ PackageIconTarRepository::_ToIconCacheKeySuffix(BitmapSize size)
 		case BITMAP_SIZE_ANY:
 			return "any";
 		default:
-			HDERROR("unsupported bitmap size");
-			exit(1);
+			HDFATAL("unsupported bitmap size");
 			break;
 	}
 }

@@ -11,6 +11,9 @@
  */
 
 
+//! \cond INTERNAL
+
+
 /*!
 	\file LaunchRoster.h
 	\ingroup app
@@ -29,7 +32,7 @@
 	\link launch_intro Introduction to the Launch Daemon \endlink.
 
 	\warning This class is not yet finalized, if you use it in your software
-	         assume that it will break some time in the future.
+			 assume that it will break some time in the future.
 
 	\since Haiku R1
 */
@@ -85,7 +88,7 @@
 	if any.
 
 	\param signature The app \a signature.
-    \param data BMessage object to store the launch data in.
+	\param data BMessage object to store the launch data in.
 	\return \c B_OK if the launch data has been received successfully.
 
 	\since Haiku R1
@@ -284,3 +287,153 @@ on {
 
 
 //! @}
+
+
+/*!
+	\fn status_t BLaunchRoster::GetJobInfo(const char *name, BMessage &info)
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param info Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::GetJobs(const char *target, BStringList &jobs)
+	\brief Undocumented public method
+
+	\param target Undocumented
+	\param jobs Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::GetLog(BMessage &info)
+	\brief Undocumented public method
+
+	\param info Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::GetLog(const BMessage &filter, BMessage &info)
+	\brief Undocumented public method
+
+	\param filter Undocumented
+	\param info Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::GetTargetInfo(const char *name, BMessage &info)
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param info Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::GetTargets(BStringList &targets)
+	\brief Undocumented public method
+
+	\param targets Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::InitCheck() const
+	\brief Undocumented public method
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::SetEnabled(const char *name, bool enabled)
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param enabled Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::Start(const char *name)
+	\brief Undocumented public method
+
+	\param name Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::Stop(const char *name, bool force=false)
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param force Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::StopTarget(const char *name, bool force=false)
+	\brief Undocumented public method
+
+	\param name Undocumented
+	\param force Undocumented
+
+	\return Undocumented
+	\retval <value> Undocumented
+
+	\since Haiku R1
+*/
+
+
+//! \endcond INTERNAL

@@ -389,7 +389,8 @@ is_successful_reply(struct XDRInPacket *reply)
 	} else {
 		rpc_auth_flavor flavor = (rpc_auth_flavor)XDRInPacketGetInt32(reply);
 		char body[400];
-		size_t bodyLength = XDRInPacketGetDynamic(reply, body);
+		size_t bodyLength;
+		XDRInPacketGetDynamic(reply, body, &bodyLength);
 
 		rpc_accept_stat acceptStat = (rpc_accept_stat)XDRInPacketGetInt32(reply);
 		(void)flavor;
@@ -484,17 +485,18 @@ nfs_mount(fs_nspace *ns, const char *path, nfs_fhandle *fhandle)
 
 	fhstatus = XDRInPacketGetInt32(&reply);
 
-	if (fhstatus != 0) {
+	if (fhstatus != NFS_OK) {
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
 		return map_nfs_to_system_error(fhstatus);
 	}
 
-	XDRInPacketGetFixed(&reply, fhandle->opaque, NFS_FHSIZE);
+	fhstatus = XDRInPacketGetFixed(&reply, fhandle->opaque, NFS_FHSIZE);
 
 	XDRInPacketDestroy(&reply);
 	XDROutPacketDestroy(&call);
-	return B_OK;
+
+	return map_nfs_to_system_error(fhstatus);
 }
 
 
@@ -538,7 +540,13 @@ nfs_lookup (fs_nspace *ns, const nfs_fhandle *dir, const char *filename,
 		return map_nfs_to_system_error(status);
 	}
 
-	XDRInPacketGetFixed(&reply, fhandle->opaque, NFS_FHSIZE);
+	status = XDRInPacketGetFixed(&reply, fhandle->opaque, NFS_FHSIZE);
+
+	if (status != NFS_OK) {
+		XDRInPacketDestroy(&reply);
+		XDROutPacketDestroy(&call);
+		return map_nfs_to_system_error(status);
+	}
 
 	if (st)
 		get_nfs_attr(&reply, st);
@@ -1002,7 +1010,11 @@ fs_readdir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 			vnid=XDRInPacketGetInt32(&reply);
 			filename=XDRInPacketGetString(&reply);
 
-			XDRInPacketGetFixed(&reply, newCookie.opaque, NFS_COOKIESIZE);
+			status = XDRInPacketGetFixed(&reply, newCookie.opaque,
+				NFS_COOKIESIZE);
+
+			if (status != NFS_OK)
+				return map_nfs_to_system_error(status);
 
 			//if (strcmp(".",filename)&&strcmp("..",filename))
 			//if ((ns->rootid != node->vnid) || (strcmp(".",filename)&&strcmp("..",filename)))
@@ -1037,9 +1049,8 @@ fs_readdir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 				buf->d_pdev = ns->nsid;
 				buf->d_ino = vnid;
 				buf->d_pino = node->vnid;
-				buf->d_reclen = 2 * (sizeof(dev_t) + sizeof(ino_t))
-					+ sizeof(unsigned short) + strlen(filename) + 1;
-				strcpy (buf->d_name,filename);
+				buf->d_reclen = offsetof(struct dirent, d_name) + strlen(filename) + 1;
+				strcpy(buf->d_name,filename);
 //				if ((ns->rootid == node->vnid))//XXX:mmu_man:test
 //					dprintf("nfs: dirent %d {d:%ld pd:%ld i:%lld pi:%lld '%s'}\n", *num, buf->d_dev, buf->d_pdev, buf->d_ino, buf->d_pino, buf->d_name);
 
@@ -1544,7 +1555,9 @@ fs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 		get_nfs_attr(&reply, &st);
 		cookie->st = st;
 
-		readbytes = XDRInPacketGetDynamic(&reply, buf);
+		status_t err = XDRInPacketGetDynamic(&reply, buf, &readbytes);
+		if (err != B_OK)
+			return err;
 
 		buf = (char *)buf + readbytes;
 		(*len) += readbytes;
@@ -1595,7 +1608,9 @@ fs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 		XDROutPacketAddInt32(&call, 0);
 		XDROutPacketAddInt32(&call, pos + bytesWritten);
 		XDROutPacketAddInt32(&call, 0);
-		XDROutPacketAddDynamic(&call, (const char *)buf + bytesWritten, count);
+		status_t err = XDROutPacketAddDynamic(&call, (const char *)buf + bytesWritten, count);
+		if (err != B_OK)
+			return err;
 
 		replyBuf = send_rpc_call(ns, &ns->nfsAddr, NFS_PROGRAM, NFS_VERSION,
 			NFSPROC_WRITE, &call);
@@ -1810,7 +1825,13 @@ fs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode,
 			return map_nfs_to_system_error(status);
 		}
 
-		XDRInPacketGetFixed(&reply, fhandle.opaque, NFS_FHSIZE);
+		status = XDRInPacketGetFixed(&reply, fhandle.opaque, NFS_FHSIZE);
+
+		if (status != NFS_OK) {
+			XDRInPacketDestroy(&reply);
+			XDROutPacketDestroy(&call);
+			return map_nfs_to_system_error(status);
+		}
 
 		get_nfs_attr(&reply,&st);
 
@@ -1837,8 +1858,8 @@ fs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode,
 		(*cookie)->original_size = st.st_size;
 		(*cookie)->st = st;
 
-		result = new_vnode(_volume, *vnid, newNode, &sNFSVnodeOps);
-
+		result = publish_vnode(_volume, *vnid, newNode, &sNFSVnodeOps,
+			S_IFREG, 0);
 		if (result < B_OK) {
 			XDRInPacketDestroy(&reply);
 			XDROutPacketDestroy(&call);
@@ -2041,7 +2062,12 @@ fs_mkdir(fs_volume *_volume, fs_vnode *_dir, const char *name, int perms)
 		return map_nfs_to_system_error(status);
 	}
 
-	XDRInPacketGetFixed(&reply, fhandle.opaque, NFS_FHSIZE);
+	status = XDRInPacketGetFixed(&reply, fhandle.opaque, NFS_FHSIZE);
+
+	if (status != NFS_OK) {
+		XDROutPacketDestroy(&call);
+		return map_nfs_to_system_error(status);
+	}
 
 	get_nfs_attr(&reply, &st);
 
@@ -2288,7 +2314,7 @@ fs_readlink(fs_volume *_volume, fs_vnode *_node, char *buf, size_t *bufsize)
 		return map_nfs_to_system_error(status);
 	}
 
-	length = XDRInPacketGetDynamic(&reply, data);
+	XDRInPacketGetDynamic(&reply, data, &length);
 
 	memcpy(buf, data, min_c(length, *bufsize));
 	*bufsize = length;

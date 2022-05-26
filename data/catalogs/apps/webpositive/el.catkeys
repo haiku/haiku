@@ -1,7 +1,8 @@
-1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	2389041372
+1	greek, modern (1453-)	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Απαιτείται ταυτοποίηση
 Previous	WebPositive Window		Προηγούμενο
 (Finish: %date)	Download Window		(Ολοκλήρωση: %date)
+Open bookmarks confirmation	WebPositive Window		Άνοιγμα επιβεβαίωσης σελιδοδεικτών
 Download folder:	Settings Window		Φάκελος λήψεων:
 Close window	WebPositive Window		Κλείσιμο παραθύρου
 Find:	WebPositive Window		Εύρεση:
@@ -19,8 +20,8 @@ Open containing folder	Download Window		Άνοιγμα εμπεριεχόμεν�
 Find previous	WebPositive Window		Εύρεση προηγούμενου
 Full screen	WebPositive Window		Πλήρης οθόνη
 Downloads in progress	WebPositive		Λήψεις σε εξέλιξη
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Είστε σίγουρος πως θέλετε να ανοίξετε %addedCount σελιδοδείκτες ταυτόχρονα;
 Copy URL to clipboard	Download Window		Αντιγραφή υπερσυνδέσμου στο πρόχειρο
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Είστε σίγουρος πως θέλετε να ανοίξετε %addedCount σελιδοδείκτες ταυτόχρονα;
 Clone current page	Settings Window		Αντίγραφο καρτέλας
 Start page:	Settings Window		Αρχική σελίδα:
 Cancel	Download Window		Ακύρωση
@@ -44,16 +45,19 @@ New tabs:	Settings Window		Νέες καρτέλες:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url απέτυχε
 Open downloads folder	Download Window		Άνοιγμα φακέλου λήψεων
 Proxy server	Settings Window		Μεσολαβητής
+Darn!	WebPositive		Κατάρα!
 Decrease size	WebPositive Window		Σμίκρυνση
 Default fixed font size:	Settings Window		Προεπιλεγμένο μέγεθος γραμματοσειράς σταθερού πλάτους:
 Sans serif font:	Settings Window		Γραμματοσειρά Sans serif:
 Clear	WebPositive Window		Εκκαθάριση
-Cookies for %s	Cookie Manager		Cookies για %s
 The download could not be opened.	Download Window		Δεν ήταν δυνατό το άνοιγμα της λήψης.
+Cookies for %s	Cookie Manager		Cookies για %s
 Close	Download Window		Κλείσιμο
 WebPositive	System name		Περιηγητής Ιστού
+%s - Search term	Settings Window		%s – όρος αναζήτησης
 Reload	WebPositive Window		Ανανέωση
 Expiration	Cookie Manager		Λήξη
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Η ΚΜΕ σας είναι πολύ παλιά και δεν υποστηρίζει τις επεκτάσεις SSE2, χωρίς τις οποίες δεν μπορεί να τρέξει ο WebPositive. Συνιστούμε να εγκαταστήσετε την εφαρμογή NetSurf για την πλοήγηση στο Διαδίκτυο.
 Download finished	Download Window		Η λήψη ολοκληρώθηκε
 Cookie manager	WebPositive Window		Διαχειριστής Cookie
 OK	Authentication Panel		Εντάξει
@@ -99,6 +103,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Επαναφορά
 Copy	WebPositive Window		Αντιγραφή
 Default standard font size:	Settings Window		Προεπιλεγμένο μέγεθος γραμματοσειράς:
+Custom	Settings Window		Προσαρμογή
 Bookmark this page	WebPositive Window		Προσθήκη στους σελιδοδείκτες
 Show tabs if only one page is open	Settings Window		Να εμφανίζονται οι καρτέλες όταν μόνο μία σελίδα είναι ανοιχτή
 Close tab	WebPositive Window		Κλείσιμο καρτέλας
@@ -108,8 +113,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Συνέχιση λήψεων
 Proxy server requires authentication	Settings Window		Ο μεσολαβητής απαιτεί ταυτοποίηση
 Cancel	Settings Window		Άκυρο
-History	WebPositive Window		Ιστορικό
 Reset size	WebPositive Window		Επαναφορά μεγέθους
+History	WebPositive Window		Ιστορικό
 Do you really want to clear the browsing history?	WebPositive Window		Είστε σίγουρος ότι θέλετε να διαγράψετε το ιστορικό περιήγησης σας;
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Εύρεση επόμενης εμφάνισης των όρων αναζήτησης
 Fixed font:	Settings Window		Γραμματοσειρά σταθερού πλάτους:
@@ -128,6 +133,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Κάντε διπλό
 Next	WebPositive Window		Επόμενο
 Bookmark error	WebPositive Window		Σφάλμα σελιδοδείκτη
 OK	WebPositive Window		Εντάξει
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% από %expectedSize%, %rate%/δευτ.)
 WebPositive	Download Window		Περιηγητής Ιστού
 Zoom text only	WebPositive Window		Να μεγενθυθεί το κείμενο μόνο
 Save page as…	WebPositive Window		Αποθήκευση σελίδας ως…
@@ -145,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Εκκίνηση:
 Confirmation	WebPositive Window		Επιβεβαίωση
 Session cookie	Cookie Manager		Cookie συνεδρίας
+No SSE2 support	WebPositive		Χωρίς υποστήριξη SSE2
 Open all	WebPositive Window		Άνοιγμα όλων
 Cut	WebPositive Window		Αποκοπή
 Downloads	Download Window		Λήψεις

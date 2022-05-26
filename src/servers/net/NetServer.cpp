@@ -66,7 +66,6 @@ public:
 								NetServer(status_t& status);
 	virtual						~NetServer();
 
-	virtual	void				AboutRequested();
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
 
@@ -118,11 +117,9 @@ static status_t
 set_80211(const char* name, int32 type, void* data,
 	int32 length = 0, int32 value = 0)
 {
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
+	FileDescriptorCloser socket(::socket(AF_INET, SOCK_DGRAM, 0));
+	if (!socket.IsSet())
 		return errno;
-
-	FileDescriptorCloser closer(socket);
 
 	struct ieee80211req ireq;
 	strlcpy(ireq.i_name, name, IF_NAMESIZE);
@@ -131,7 +128,8 @@ set_80211(const char* name, int32 type, void* data,
 	ireq.i_len = length;
 	ireq.i_data = data;
 
-	if (ioctl(socket, SIOCS80211, &ireq, sizeof(struct ieee80211req)) < 0)
+	if (ioctl(socket.Get(), SIOCS80211, &ireq, sizeof(struct ieee80211req))
+		< 0)
 		return errno;
 
 	return B_OK;
@@ -151,26 +149,6 @@ NetServer::NetServer(status_t& error)
 NetServer::~NetServer()
 {
 	BPrivate::BPathMonitor::StopWatching("/dev/net", this);
-}
-
-
-void
-NetServer::AboutRequested()
-{
-	BAlert *alert = new BAlert("about", "Networking Server\n"
-		"\tCopyright " B_UTF8_COPYRIGHT "2006, Haiku.\n", "OK");
-	BTextView *view = alert->TextView();
-	BFont font;
-
-	view->SetStylable(true);
-
-	view->GetFont(&font);
-	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE);
-	view->SetFontAndColor(0, 17, &font);
-
-	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-	alert->Go(NULL);
 }
 
 
@@ -888,8 +866,16 @@ NetServer::_ConfigureIPv6LinkLocal(const char* name)
 	addressRaw.s6_addr[15] = mac[5];
 
 	BNetworkAddress localLinkAddress(addressRaw, 0);
-	BNetworkAddress localLinkMask("ffff:ffff:ffff:ffff::"); // 64
-	BNetworkAddress localLinkBroadcast("fe80::ffff:ffff:ffff:ffff");
+	BNetworkAddress localLinkMask(
+		AF_INET6,
+		"ffff:ffff:ffff:ffff::", // 64
+		(uint16)0,
+		B_UNCONFIGURED_ADDRESS_FAMILIES);
+	BNetworkAddress localLinkBroadcast(
+		AF_INET6,
+		"fe80::ffff:ffff:ffff:ffff",
+		(uint16)0,
+		B_UNCONFIGURED_ADDRESS_FAMILIES);
 
 	if (interface.FindAddress(localLinkAddress) >= 0) {
 		// uhoh... already has a local link address

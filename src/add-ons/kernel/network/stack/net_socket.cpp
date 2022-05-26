@@ -323,8 +323,9 @@ socket_receive_no_buffer(net_socket* socket, msghdr* header, void* data,
 	if (bytesRead < 0)
 		return bytesRead;
 
-	CObjectDeleter<ancillary_data_container> ancillaryDataDeleter(ancillaryData,
-		&delete_ancillary_data_container);
+	CObjectDeleter<
+		ancillary_data_container, void, delete_ancillary_data_container>
+		ancillaryDataDeleter(ancillaryData);
 
 	// process ancillary data
 	if (header != NULL) {
@@ -351,7 +352,7 @@ print_socket_line(net_socket_private* socket, const char* prefix)
 	kprintf("%s%p %2d.%2d.%2d %6" B_PRId32 " %p %p  %p%s\n", prefix, socket,
 		socket->family, socket->type, socket->protocol, socket->owner,
 		socket->first_protocol, socket->first_info, parent.Get(),
-		parent.Get() != NULL ? socket->is_connected ? " (c)" : " (p)" : "");
+		parent.IsSet() ? socket->is_connected ? " (c)" : " (p)" : "");
 }
 
 
@@ -835,7 +836,7 @@ socket_connected(net_socket* _socket)
 	}
 
 	BReference<net_socket_private> parent = socket->parent.GetReference();
-	if (parent.Get() == NULL)
+	if (!parent.IsSet())
 		return B_BAD_VALUE;
 
 	MutexLocker _(parent->lock);
@@ -863,7 +864,7 @@ socket_aborted(net_socket* _socket)
 	TRACE("socket_aborted(%p)\n", socket);
 
 	BReference<net_socket_private> parent = socket->parent.GetReference();
-	if (parent.Get() == NULL)
+	if (!parent.IsSet())
 		return B_BAD_VALUE;
 
 	MutexLocker _(parent->lock);
@@ -912,6 +913,9 @@ socket_request_notification(net_socket* _socket, uint8 event, selectsync* sync)
 		}
 		case B_SELECT_WRITE:
 		{
+			if ((socket->options & SO_ACCEPTCONN) != 0)
+				break;
+
 			ssize_t available = socket_send_avail(socket);
 			if ((ssize_t)socket->send.low_water_mark <= available
 				|| available < B_OK)
@@ -1346,8 +1350,9 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 		return B_BAD_VALUE;
 
 	ancillary_data_container* ancillaryData = NULL;
-	CObjectDeleter<ancillary_data_container> ancillaryDataDeleter(NULL,
-		&delete_ancillary_data_container);
+	CObjectDeleter<
+		ancillary_data_container, void, delete_ancillary_data_container>
+		ancillaryDataDeleter;
 
 	if (header != NULL) {
 		address = (const sockaddr*)header->msg_name;

@@ -10,6 +10,7 @@
 
 #include "HWInterface.h"
 
+#include <AutoDeleter.h>
 #include <Locker.h>
 #include <ObjectList.h>
 
@@ -75,13 +76,14 @@ virtual	RenderingBuffer*			FrontBuffer() const;
 virtual	RenderingBuffer*			BackBuffer() const;
 virtual	bool						IsDoubleBuffered() const;
 
-virtual	status_t					InvalidateRegion(BRegion& region);
+virtual	status_t					InvalidateRegion(const BRegion& region);
 virtual	status_t					Invalidate(const BRect& frame);
 virtual	status_t					CopyBackToFront(const BRect& frame);
 
 		// drawing engine interface
-		StreamingRingBuffer*		ReceiveBuffer() { return fReceiveBuffer; }
-		StreamingRingBuffer*		SendBuffer() { return fSendBuffer; }
+		StreamingRingBuffer*		ReceiveBuffer()
+										{ return fReceiveBuffer.Get(); }
+		StreamingRingBuffer*		SendBuffer() { return fSendBuffer.Get(); }
 
 typedef bool (*CallbackFunction)(void* cookie, RemoteMessage& message);
 
@@ -116,15 +118,18 @@ static	status_t					_NewConnectionCallback(void *cookie,
 		display_mode				fClientMode;
 		uint16						fListenPort;
 
-		BNetEndpoint*				fListenEndpoint;
-		StreamingRingBuffer*		fSendBuffer;
-		StreamingRingBuffer*		fReceiveBuffer;
+		ObjectDeleter<BNetEndpoint>	fListenEndpoint;
+		ObjectDeleter<StreamingRingBuffer>
+									fSendBuffer;
+		ObjectDeleter<StreamingRingBuffer>
+									fReceiveBuffer;
 
-		NetSender*					fSender;
-		NetReceiver*				fReceiver;
+		ObjectDeleter<NetSender>	fSender;
+		ObjectDeleter<NetReceiver>	fReceiver;
 
 		thread_id					fEventThread;
-		RemoteEventStream*			fEventStream;
+		ObjectDeleter<RemoteEventStream>
+									fEventStream;
 
 		BLocker						fCallbackLocker;
 		BObjectList<callback_info>	fCallbacks;

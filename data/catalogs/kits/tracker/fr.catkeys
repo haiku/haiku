@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3152164236
+1	french	x-vnd.Haiku-libtracker	535392087
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Nature
 Open with…	ContainerWindow		Ouvrir avec…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Erreur en envoyant « %name » à la Corbeille. (%error)
 Or	FindPanel		Ou
+MIME Description	AttributesView		Description MIME
 before	FindPanel		avant
 Volume icons	TrackerSettingsWindow		Icônes des volumes
 Ignore case	SelectionWindow		Ignorer la casse
@@ -84,6 +85,7 @@ GiB	WidgetAttributeText		Gio
 Clean up	ContainerWindow		Nettoyer
 Modified	FindPanel		Modifié
 Select all	QueryContainerWindow		Sélectionner tout
+Generate image thumbnails	SettingsView		Générer des vignettes d’images
 Select…	FilePanelPriv		Sélectionner…
 preferences	B_PREFERENCES_DIRECTORY		préférences
 Name	Person Query Columns		Nom
@@ -111,6 +113,7 @@ Edit templates…	TemplatesMenu		Éditer les modèles…
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# octet} other{# octets}}
 8-bit integer	AttributesView		Entier 8-bits
 8-bit unsigned integer	AttributesView		Entier non-signé 8-bits
+%s info	InfoWindow	window title	Information sur %s
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used utilisés -- %free libres)
 Hide dotfiles	SettingsView		Masquer les fichiers cachés
 Trash	Model		Corbeille
@@ -267,6 +270,7 @@ home	B_USER_DIRECTORY		personnel
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Nouveaux modèles
 Disk mounting during boot	AutoMounterSettings		Montage des disques au démarrage
 Don't automount	AutoMounterSettings		Ne pas monter automatiquement
+Node ref	AttributesView		Référence de nœud
 Could not find application \"%appname\"	OpenWithWindow		Impossible de trouver l’application « %appname »
 Unmatched parenthesis.	libtracker		Parenthèses non appariées.
 Extended attribute	AttributesView		Attribut étendu
@@ -325,6 +329,7 @@ Recent folders	FavoritesMenu		Dossiers récents
 Signed memory size	AttributesView		Taille de mémoire signée
 The specified name is illegal. Please choose another name.	FilePanelPriv		Le nom indiqué n’est pas valide. Veuillez choisir un autre nom.
 of %items	StatusWindow		de %items
+MIME Path	AttributesView		Chemin MIME
 less than	FindPanel		inférieur à
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erreur à la copie du fichier « %name » :\n\t%error\n\nVoulez-vous continuer ?
 Creating links: 	StatusWindow		Création des liens : 
@@ -438,6 +443,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Désolé, il n�
 Move here	ContainerWindow		Déplacer ici
 the config folder	FSUtils		le dossier de configuration
 Sorry, could not create a new folder.	FSUtils		Désolé, impossible de créer un nouveau dossier.
+MIME Signature	AttributesView		Signature MIME
 Select all	VirtualDirectoryWindow		Sélectionner tout
 Rename	FSUtils	button label	Renommer
 Clean up all	ContainerWindow		Nettoyer tout

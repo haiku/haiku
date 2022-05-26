@@ -1,7 +1,4 @@
-1	lithuanian	x-vnd.Haiku-FirstBootPrompt	2791747426
+1	lithuanian	x-vnd.Haiku-FirstBootPrompt	564016477
 Keymap	BootPromptWindow		Klaviatūros išdėstymas
-Run Installer	BootPromptWindow		Paleisti įdiegimo programą
 Language	BootPromptWindow		Kalba
 Custom	BootPromptWindow		Pasirinktinė
-Boot to Desktop	BootPromptWindow		Paleisti darbalaukį
-Welcome to Haiku!	BootPromptWindow		Sveiki, čia – „Haiku“!

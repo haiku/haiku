@@ -1,11 +1,10 @@
-1	indonesian	x-vnd.Haiku-Terminal	2664488407
+1	indonesian	x-vnd.Haiku-Terminal	307289061
 Close other tabs	Terminal TermWindow		Tutup tab yang lain
 Insert path	Terminal TermView		Sisipkan jalur
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal tidak dapat memulai shell. Maaf.
 Text encoding	Terminal TermWindow		Pengodean Teks
 OK	Terminal SetTitleWindow		OKE
 Edit	Terminal TermWindow		Sunting
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               cetek pertolongan ini\n  -t,     --title              atur judul jendela\n  -f,     --fullscreen         mulai layar penuh\n  -w,     --working-directory  mengatur direktori kerja awal\n
 Select all	Terminal TermWindow		Pilih semua
 Confirm exit if active programs exist	Terminal AppearancePrefView		Konfirmasi keluar jika ada program aktif
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDirektori aktif saat ini dari proses aktif di\n\t\t\ttab saat ini. Secara opsional jumlah komponen jalur maksimum\n\t\t\tdapat ditentukan. Misal. '%2d' untuk paling banyak dua komponen.\n\t%T\t-\tNama aplikasi Terminal untuk lokal saat ini.\n\t%e\t-\tPengkodean tab saat ini. Tidak ditampilkan untuk UTF-8.\n\t%i\t-\tIndeks jendela.\n\t%p\t-\tNama proses aktif di tab saat ini.\n\t%t\t-\tJudul tab saat ini.
@@ -13,8 +12,8 @@ Solarized Dark	Terminal colors scheme		Gelap terpartisi
 Copy	Terminal TermWindow		Salin
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Edit judul tab ...
-Print	Terminal TermWindow		Cetak
 Settings	Terminal TermWindow		Pengaturan
+Print	Terminal TermWindow		Cetak
 %app% settings	Terminal PrefWindow	window title	%app% pengaturan
 Use default	Terminal SetTitleWindow		Gunakan standar
 Close tab	Terminal TermWindow		Tutup tab
@@ -33,8 +32,8 @@ Defaults	Terminal PrefWindow		Bawaan
 Cancel	Terminal TermView		Batalkan
 Revert	Terminal PrefWindow		Pulih
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
-Use selection	Terminal FindWindow		Gunakan seleksi
 Find next	Terminal TermWindow		Cari selanjutnya
+Use selection	Terminal FindWindow		Gunakan seleksi
 Copy link location	Terminal TermView		Salin lokasi tautan
 Window title:	Terminal AppearancePrefView		Judul jendela:
 New tab	Terminal TermWindow		Tab baru
@@ -53,12 +52,12 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Opsi tak-dikenal \"%s\"
 Tab title:	Terminal AppearancePrefView		Judul tab:
 Text not found.	Terminal TermWindow		Teks tak ditemukan
 Find failed	Terminal TermWindow		Pencarian gagal
-Match word	Terminal FindWindow		Kata cocok
 Color scheme:	Terminal AppearancePrefView		Skema warna:
+Match word	Terminal FindWindow		Kata cocok
 New Terminal	Terminal TermWindow		Terminal Baru
 Quit	Terminal TermWindow		Keluar
-Match case	Terminal FindWindow		Sesuaikan besar kecil huruf
 Find previous	Terminal TermWindow		Cari sebelumnya
+Match case	Terminal FindWindow		Sesuaikan besar kecil huruf
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Pola menentukan judul tab. Tempat penampung berikut\ndapat digunakan:
 Close	Terminal TermWindow		Tutup
 Save to file…	Terminal PrefWindow		Simpan ke file...
@@ -80,11 +79,11 @@ Window size:	Terminal AppearancePrefView		Ukuran jendela:
 Switch Terminals	Terminal TermWindow		Beralih Terminal
 Decrease	Terminal TermWindow		Menurunkan
 Settings…	Terminal TermWindow		Pengaturan...
-Cancel	Terminal SetTitleWindow		Batalkan
 Blinking cursor	Terminal AppearancePrefView		Kursor berkedip
+Cancel	Terminal SetTitleWindow		Batalkan
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pola menentukan judul jendela. Penampung berikut\ndapat digunakan:\n
-Use text:	Terminal FindWindow		Gunakan teks:
 Close active tab	Terminal TermWindow		Tutup tab aktif
+Use text:	Terminal FindWindow		Gunakan teks:
 Save as default	Terminal TermWindow		Simpan sebagai bawaan
 Nothing is selected.	Terminal TermWindow		Tidak ada yang dipilih
 Use left Option as Meta key	Terminal AppearancePrefView		Gunakan Opsi kiri sebagai kunci Meta
@@ -105,13 +104,12 @@ No search string was entered.	Terminal TermWindow		Tidak ada kata pencarian yang
 Text under cursor	Terminal AppearancePrefView		Teks di bawah kursor
 Move here	Terminal TermView		Pindah ke sini
 Abort	Terminal Shell		Gugurkan
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tDirektori kerja saat ini dari proses aktif.\n\t\t\tSecara opsional, jumlah maksimum komponen jalur dapat\n\t\t\tditentukan.misal. '%2d' paling banyak dua komponen.\n\t%i\t-\tIndeks tab.\n\t%e\t-\tPengkodean tab saat ini. Tidak diperlihatkan untuk UTF-8.\n\t%p\t-\tNama proses aktif.\n\t%%\t-\tKarakter '%'.
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Proses berikut masih berjalan:\n\n\t%1\n\nJika Anda menutup Terminal, proses akan dibunuh.
 Set window title	Terminal TermWindow		Setel judul jendela
 Increase	Terminal TermWindow		Meningkat
 OK	Terminal TermWindow		OKE
 Close window	Terminal TermWindow		Tutup jendela
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nHak Cipta 2001-2019 Haiku, Inc.\nHak Cipta(C) 1999 Kazuho Okui and Takashi Murai.\n\npenggunaan: %s [OPTION] [SHELL]\n
-Solarized Light	Terminal colors scheme		Cahaya tersolarisasi
 Clear all	Terminal TermWindow		Bersihkan semua
+Solarized Light	Terminal colors scheme		Cahaya tersolarisasi
 Search forward	Terminal FindWindow		Pencarian selanjutnya

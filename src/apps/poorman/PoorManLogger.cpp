@@ -17,10 +17,11 @@
 
 #include "PoorManApplication.h"
 #include "PoorManWindow.h"
+#include "libhttpd.h"
 
 void
 poorman_log(const char* msg, bool needTimeHeader,
-	in_addr_t addr, rgb_color color)
+	httpd_sockaddr* addr, rgb_color color)
 {
 	time_t now = time(NULL);
 	
@@ -38,8 +39,8 @@ poorman_log(const char* msg, bool needTimeHeader,
 		if(message.AddData("time_t", B_TIME_TYPE, &now, sizeof(time_t)) != B_OK)
 			return;
 	}
-	if(addr != INADDR_NONE)
-		message.AddData("in_addr_t", B_ANY_TYPE, &addr, sizeof(in_addr_t));
+	if(addr != NULL)
+		message.AddString("addr", httpd_ntoa(addr));
 	
 	if(color != BLACK)
 		message.AddData("rgb_color", B_RGB_COLOR_TYPE, &color, sizeof(rgb_color));

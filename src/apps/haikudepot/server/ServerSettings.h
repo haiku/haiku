@@ -13,6 +13,8 @@
 #include <Url.h>
 
 
+using BPrivate::Network::BHttpHeaders;
+
 class ServerSettings {
 public:
 		static status_t					SetBaseUrl(const BUrl& baseUrl);

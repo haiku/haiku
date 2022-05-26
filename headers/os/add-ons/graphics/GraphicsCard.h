@@ -146,22 +146,6 @@ int32 control_graphics_card(uint32, void*);
 #endif
 
 
-/* #pragma mark - debugging functions */
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void dprintf(const char *format, ...);
-bool set_dprintf_enabled(bool);
-	/* returns old enable flag */
-
-#ifdef __cplusplus
-}
-#endif
-
-
 /* #pragma mark - deprecated */
 #define B_HOOK_COUNT  B_GRAPHICS_HOOK_COUNT
 

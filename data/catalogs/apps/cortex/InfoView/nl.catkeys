@@ -1,0 +1,59 @@
+1	dutch; flemish	application/x-vnd.Cortex.InfoView	2382053937
+Offset	InfoView		Startpunt
+Description	DormantNodeInfoView		Omschrijving
+Byte order	InfoView		Byte-volgorde
+Connection	InfoView		Verbinding
+Output formats	DormantNodeInfoView		Uitvoerformaten
+History	InfoView		Geschiedenis
+Input formats	DormantNodeInfoView		Invoerformaten
+Signature	AppNodeInfoView		Handtekening
+Video data between	InfoView		Videogegevens tussen
+Any number	DormantNodeInfoView	For 'Max. instances' field	Elk mogelijk getal
+Flags	InfoView		Opties
+Media output	InfoView		Mediauitvoer
+Active lines	InfoView		Actieve lijnen
+Buffer size	InfoView		Buffergrootte
+\n- Quality:	FileNodeInfoView		\n- Kwaliteit:
+Kinds	LiveNodeInfoView		Soorten
+Application	AppNodeInfoView		Toepassing
+Flavor flags	DormantNodeInfoView		Smaakopties
+Max. instances	DormantNodeInfoView		Max. instanties
+\n- Duration:	FileNodeInfoView		\n- Duur:
+Dormant media node	DormantNodeInfoView		Inactieve medianode
+Latency	LiveNodeInfoView		Vertraging
+Media type	InfoView		Mediatype
+Live media node	LiveNodeInfoView		Actieve medianode
+Field rate	InfoView		Veldratio
+Kinds	DormantNodeInfoView		Soorten
+%title% info	InfoView		%title% info
+Node ID	LiveNodeInfoView		Node-ID
+Resolution	InfoView		Resolutie
+Chunk size	InfoView		Blokgrootte
+File format	AppNodeInfoView		Bestandsformaat
+Matrix mask	InfoView		Matrixmasker
+Channel mask	InfoView		Kanaalmasker
+Orientation	InfoView		Oriëntatie
+Live file-interface node	FileNodeInfoView		Live bestandsinterface node
+Channels	InfoView		Kanalen
+Sample rate	InfoView		Sample-ratio
+File format	FileNodeInfoView		Bestandsformaat
+(no file)	FileNodeInfoView		(geen bestand)
+Media input	InfoView		Mediainvoer
+Bit rate	InfoView		Bitratio
+Input format	DormantNodeInfoView		Invoerformaat
+Format	InfoView		Formaat
+Version	AppNodeInfoView		Versie
+AddOn ID	DormantNodeInfoView		AddOn-ID
+Frame size	InfoView		Framegrootte
+Flavor ID	DormantNodeInfoView		Flavor-ID
+Run mode	LiveNodeInfoView		Uitvoermodus
+\n- Codec:	FileNodeInfoView		\n- Codec:
+Port	LiveNodeInfoView		Poort
+Output format	DormantNodeInfoView		Uitvoerformaat
+Aspect ratio	InfoView		Aspect-ratio
+Application-owned node	AppNodeInfoView		Node eigendom van applicatie
+Tracks	FileNodeInfoView		Sporen
+Source	InfoView		Bron
+Destination	InfoView		Bestemming
+Copyright	FileNodeInfoView		Copyright
+ID:	FileNodeInfoView		ID:

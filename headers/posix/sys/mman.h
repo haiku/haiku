@@ -61,6 +61,9 @@ int		msync(void* address, size_t length, int flags);
 int		madvise(void* address, size_t length, int advice);
 int		posix_madvise(void* address, size_t length, int advice);
 
+int		mlock(const void* address, size_t length);
+int		munlock(const void* address, size_t length);
+
 int		shm_open(const char* name, int openMode, mode_t permissions);
 int		shm_unlink(const char* name);
 

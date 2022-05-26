@@ -21,12 +21,12 @@
 
 #define FIRST_USER_PGDIR_ENT    (VADDR_TO_PDENT(USER_BASE))
 #define NUM_USER_PGDIR_ENTS     (VADDR_TO_PDENT(ROUNDUP(USER_SIZE, \
-									B_PAGE_SIZE * 1024)))
+					B_PAGE_SIZE * ARM_MMU_L2_COARSE_ENTRY_COUNT)))
 #define FIRST_KERNEL_PGDIR_ENT  (VADDR_TO_PDENT(KERNEL_BASE))
 #define NUM_KERNEL_PGDIR_ENTS   (VADDR_TO_PDENT(KERNEL_SIZE))
 
 
-static const size_t kPageTableAlignment = 1024 * B_PAGE_SIZE;
+static const size_t kPageTableAlignment = ARM_MMU_L2_COARSE_ENTRY_COUNT * B_PAGE_SIZE;
 
 
 typedef uint32 page_table_entry;

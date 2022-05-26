@@ -1,11 +1,9 @@
-1	portuguese	x-vnd.Haiku-Login	336867745
+1	portuguese	x-vnd.Haiku-Login	1901424173
 Invalid login!	Login View		Acesso inválido!
 Error	Login App		Erro
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tIniciar no modo de edição de shell para permitir personalizar a área de trabalho.\n
+Login application for Haiku\nUsage:	Login App		Aplicação de início de sessão para Haiku\nUtilização:
 Welcome to Haiku	Login Window		Bem-vindo ao Haiku
 Halt	Login View		Suspender
-Login application for Haiku\nUsage:\n	Login App		Aplicação de autenticação para Haiku\nUtilização:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNão tornar modal a janela\n
 Desktop	Desktop Window		Área de Trabalho
 Hide password	Login View		Esconder palavra-passe
 Reboot	Login View		Reiniciar

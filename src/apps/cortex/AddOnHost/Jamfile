@@ -7,6 +7,12 @@ SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
 
 Application CortexAddOnHost :
 	AddOnHostApp.cpp
-	: be media [ TargetLibstdc++ ] cortex_support.a
+	: be media localestub [ TargetLibstdc++ ] cortex_support.a
 	: AddOnHost_Resource.rdef
+;
+
+DoCatalogs CortexAddOnHost :
+	x-vnd.Cortex.AddOnHost
+	:
+	AddOnHostApp.cpp
 ;

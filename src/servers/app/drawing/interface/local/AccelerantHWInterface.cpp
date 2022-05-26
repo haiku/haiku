@@ -177,9 +177,6 @@ AccelerantHWInterface::AccelerantHWInterface()
 
 AccelerantHWInterface::~AccelerantHWInterface()
 {
-	delete fBackBuffer;
-	delete fFrontBuffer;
-
 	delete[] fRectParams;
 	delete[] fBlitParams;
 
@@ -244,14 +241,14 @@ AccelerantHWInterface::_OpenGraphicsDevice(int deviceNumber)
 	int device = -1;
 	int count = 0;
 	if (!use_fail_safe_video_mode()) {
-		// TODO: We do not need to avoid the "vesa" driver this way once it has
-		// been ported to the new driver architecture - the special case here
+		// TODO: We do not need to avoid the "vesa" or "framebuffer" drivers this way
+		// once they been ported to the new driver architecture - the special case here
 		// can then be removed.
 		struct dirent *entry;
 		char path[PATH_MAX];
 		while (count < deviceNumber && (entry = readdir(directory)) != NULL) {
 			if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")
-				|| !strcmp(entry->d_name, "vesa"))
+				|| !strcmp(entry->d_name, "vesa") || !strcmp(entry->d_name, "framebuffer"))
 				continue;
 
 			if (device >= 0) {
@@ -266,12 +263,16 @@ AccelerantHWInterface::_OpenGraphicsDevice(int deviceNumber)
 		}
 	}
 
-	// Open VESA driver if we were not able to get a better one
+	// Open VESA or Framebuffer driver if we were not able to get a better one.
 	if (count < deviceNumber) {
 		if (deviceNumber == 1) {
 			device = open("/dev/graphics/vesa", B_READ_WRITE);
-			fVGADevice = device;
+			if (device > 0) {
 				// store the device, so that we can access the planar blitter
+				fVGADevice = device;
+			} else {
+				device = open("/dev/graphics/framebuffer", B_READ_WRITE);
+			}
 		} else {
 			close(device);
 			device = B_ENTRY_NOT_FOUND;
@@ -567,7 +568,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 	// error.
 
 	// prevent from doing the unnecessary
-	if (fModeCount > 0 && fFrontBuffer && fDisplayMode == mode) {
+	if (fModeCount > 0 && fFrontBuffer.IsSet() && fDisplayMode == mode) {
 		// TODO: better comparison of display modes
 		return B_OK;
 	}
@@ -577,7 +578,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 	if (!_IsValidMode(mode))
 		return B_BAD_VALUE;
 
-	if (fFrontBuffer == NULL)
+	if (!fFrontBuffer.IsSet())
 		return B_NO_INIT;
 
 	// just try to set the mode - we let the graphics driver
@@ -683,22 +684,21 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 		fOffscreenBackBuffer = false;
 
 	// update backbuffer if neccessary
-	if (!fBackBuffer || fBackBuffer->Width() != fFrontBuffer->Width()
+	if (!fBackBuffer.IsSet()
+		|| fBackBuffer->Width() != fFrontBuffer->Width()
 		|| fBackBuffer->Height() != fFrontBuffer->Height()
 		|| fOffscreenBackBuffer
-		|| (fFrontBuffer->ColorSpace() == B_RGB32 && fBackBuffer != NULL
-			&& !HWInterface::IsDoubleBuffered())) {
+		|| (fFrontBuffer->ColorSpace() == B_RGB32 && fBackBuffer.IsSet())) {
 		// NOTE: backbuffer is always B_RGBA32, this simplifies the
 		// drawing backend implementation tremendously for the time
 		// being. The color space conversion is handled in CopyBackToFront()
 
-		delete fBackBuffer;
-		fBackBuffer = NULL;
+		fBackBuffer.Unset();
 
 		// TODO: Above not true anymore for single buffered mode!!!
 		// -> fall back to double buffer for fDisplayMode.space != B_RGB32
 		// as intermediate solution...
-		bool doubleBuffered = HWInterface::IsDoubleBuffered();
+		bool doubleBuffered = false;
 		if ((fFrontBuffer->ColorSpace() != B_RGB32
 			&& fFrontBuffer->ColorSpace() != B_RGBA32)
 			|| fVGADevice >= 0 || fOffscreenBackBuffer)
@@ -709,17 +709,17 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 
 		if (doubleBuffered) {
 			if (fOffscreenBackBuffer) {
-				fBackBuffer = new(nothrow) AccelerantBuffer(*fFrontBuffer,
-					true);
+				fBackBuffer.SetTo(
+					new(nothrow) AccelerantBuffer(*fFrontBuffer.Get(), true));
 			} else {
-				fBackBuffer = new(nothrow) MallocBuffer(fFrontBuffer->Width(),
-					fFrontBuffer->Height());
+				fBackBuffer.SetTo(new(nothrow) MallocBuffer(
+					fFrontBuffer->Width(), fFrontBuffer->Height()));
 			}
 
-			status = fBackBuffer ? fBackBuffer->InitCheck() : B_NO_MEMORY;
+			status = fBackBuffer.IsSet()
+				? fBackBuffer->InitCheck() : B_NO_MEMORY;
 			if (status < B_OK) {
-				delete fBackBuffer;
-				fBackBuffer = NULL;
+				fBackBuffer.Unset();
 				fOffscreenBackBuffer = false;
 				return status;
 			}
@@ -1519,21 +1519,21 @@ AccelerantHWInterface::MoveCursorTo(float x, float y)
 RenderingBuffer*
 AccelerantHWInterface::FrontBuffer() const
 {
-	return fFrontBuffer;
+	return fFrontBuffer.Get();
 }
 
 
 RenderingBuffer*
 AccelerantHWInterface::BackBuffer() const
 {
-	return fBackBuffer;
+	return fBackBuffer.Get();
 }
 
 
 bool
 AccelerantHWInterface::IsDoubleBuffered() const
 {
-	return fBackBuffer != NULL;
+	return fBackBuffer.IsSet();
 }
 
 

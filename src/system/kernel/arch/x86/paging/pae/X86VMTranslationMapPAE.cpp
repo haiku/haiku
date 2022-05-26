@@ -15,6 +15,7 @@
 #include <thread.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 #include <vm/vm_page.h>
 #include <vm/VMAddressSpace.h>
 #include <vm/VMCache.h>

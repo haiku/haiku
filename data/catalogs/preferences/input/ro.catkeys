@@ -1,53 +1,50 @@
-1	romanian	x-vnd.Haiku-Input	1950274171
+1	romanian	x-vnd.Haiku-Input	3312605348
+Scrolling	TouchpadPrefView		Derulare
 Defaults	InputMouse		Implicite
-Scrolling	TouchpadPrefView		Se derulează
 Long	KeyboardView		Lung
-Normal	SettingsView		Normal
 Cancel	TouchpadPrefView		Anulează
-Slow	TouchpadPrefView		Încet
-Warp	SettingsView		Deviere
+4-Button	SettingsView		Buton-4
+Slow	TouchpadPrefView		Lent
+Tapping sensitivity	TouchpadPrefView		Sensibilitate la atingere
 Device List	InputWindow		Listă de dispozitive
-Double-click speed	SettingsView		Viteză de clic dublu
-5-Button	SettingsView		5-Buton
-Typing test area	KeyboardView		Zonă de testare de tastare
-Fast	KeyboardView		Rapid
-Please confirm	TouchpadPrefView		Confirmați
-Mouse speed	SettingsView		Viteză maus
-Horizontal scrolling	TouchpadPrefView		Derulare orizontală
-Input	System name		Intrare
-Quick	TouchpadPrefView		Repede
-Short	KeyboardView		Scund
-Revert	InputMouse		Revenire
-Slow	KeyboardView		Încet
-2-Button	SettingsView		2-Buton
-Click to focus and raise	SettingsView		Dați clic pentru a focaliza și a înălța
-Vertical	TouchpadPrefView		Vertical
-Double-click test area	SettingsView		Zonă de testare a clicului dublu
-Focus follows mouse	SettingsView		Focalizarea urmărește mausul
-Focus mode:	SettingsView		Mod de focalizare:
-Revert	TouchpadPrefView		Revenire
-4-Button	SettingsView		4-Buton
-Tapping sensitivity	TouchpadPrefView		Senzitivitate la atingere
-Instant warp	SettingsView		Deviere instantă
-Revert	InputKeyboard		Revenire
+Double-click speed	SettingsView		Viteză de dublu clic
+5-Button	SettingsView		Buton-5
+Typing test area	KeyboardView		Zonă de test a tastării
 Mouse type:	SettingsView		Tip de maus:
+Revert	InputKeyboard		Revenire
+Fast	KeyboardView		Rapid
 Off	TouchpadPrefView		Oprit
 Never	TouchpadPrefView		Niciodată
 Fast	TouchpadPrefView		Rapid
-6-Button	SettingsView		Butonul-6
-Click to focus	SettingsView		Dați clic pentru a focaliza
+6-Button	SettingsView		Buton-6
+Please confirm	TouchpadPrefView		Confirmați
+Click to focus	SettingsView		Clic pentru a focaliza
 Acceleration	TouchpadPrefView		Accelerare
+Mouse speed	SettingsView		Viteză de maus
 Accept first click	SettingsView		Acceptă primul clic
 OK	TouchpadPrefView		OK
-Keyboard Lock Delay	TouchpadPrefView		Amânare de blocare de tastatură
-Delay until key repeat	KeyboardView		Amânare până la repetarea tastei
+Horizontal scrolling	TouchpadPrefView		Derulare orizontală
+Delay until key repeat	KeyboardView		Întârziere până la repetarea tastei
+Keyboard Lock Delay	TouchpadPrefView		Întârziere de blocare a tastaturii
 Two finger scrolling	TouchpadPrefView		Derulare cu două degete
+Input	System name		Intrare
+Mouse acceleration	SettingsView		Accelerare de maus
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Noua zonă de derulare este foarte mare și poate să împiedice operația normală a mausului. Sigur doriți să o modificați?
-Mouse acceleration	SettingsView		Accelerare maus
+High	TouchpadPrefView		Ridicat
 Defaults	TouchpadPrefView		Implicite
-High	TouchpadPrefView		Înalt
-1-Button	SettingsView		1-Buton
+1-Button	SettingsView		Buton-1
 Defaults	InputKeyboard		Implicite
-Key repeat rate	KeyboardView		Rata de repetiție a tastei
+Quick	TouchpadPrefView		Rapid
+Short	KeyboardView		Scurt
+Slow	KeyboardView		Lent
+Revert	InputMouse		Revenire
+Key repeat rate	KeyboardView		Rata de repetiție a tastelor
+2-Button	SettingsView		Buton-2
+Click to focus and raise	SettingsView		Clic pentru a focaliza și a ridica
+Vertical	TouchpadPrefView		Vertical
 Horizontal	TouchpadPrefView		Orizontal
-3-Button	SettingsView		3-Buton
+Focus follows mouse	SettingsView		Focalizarea urmărește mausul
+Focus mode:	SettingsView		Mod de focalizare:
+Double-click test area	SettingsView		Zonă de test al dublu clicului
+3-Button	SettingsView		Buton-3
+Revert	TouchpadPrefView		Revenire

@@ -1,0 +1,4 @@
+1	esperanto	application/x-vnd.Cortex.AddOnHost	826663209
+Continue	CortexAddOnHost		Daŭrigi
+Quit	CortexAddOnHost		Ĉesi
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Ĉi tiu programo ruliĝas fone, kaj memage startiĝas de Cortex laŭnecese. Vi probable ne volus ruli ĝin permane.

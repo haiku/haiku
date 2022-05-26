@@ -157,7 +157,7 @@ PixelFormat::~PixelFormat()
 // SetDrawingMode
 void
 PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
-							alpha_function alphaFncMode, bool text)
+							alpha_function alphaFncMode)
 {
 	switch (mode) {
 		// These drawing modes discard source pixels

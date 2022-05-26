@@ -19,8 +19,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <iostream>
-
 #include <ControlLook.h>
 #include <Bitmap.h>
 #include <TextControl.h>

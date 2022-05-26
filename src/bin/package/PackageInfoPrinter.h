@@ -96,9 +96,9 @@ public:
 		for (int32 i = 0; i < count; i++)
 			PrintPostInstallScript(info.PostInstallScripts().StringAt(i));
 
-		count = info.PostInstallScripts().CountStrings();
+		count = info.PreUninstallScripts().CountStrings();
 		for (int32 i = 0; i < count; i++)
-			PrintPostInstallScript(info.PostInstallScripts().StringAt(i));
+			PrintPreUninstallScript(info.PreUninstallScripts().StringAt(i));
 
 		if (!info.InstallPath().IsEmpty())
 			PrintInstallPath(info.InstallPath());
@@ -201,6 +201,10 @@ public:
 
 			case B_PACKAGE_INFO_POST_INSTALL_SCRIPTS:
 				PrintPostInstallScript(value.string);
+				break;
+
+			case B_PACKAGE_INFO_PRE_UNINSTALL_SCRIPTS:
+				PrintPreUninstallScript(value.string);
 				break;
 
 			case B_PACKAGE_INFO_INSTALL_PATH:
@@ -379,7 +383,12 @@ public:
 
 	void PrintPostInstallScript(const char* script) const
 	{
-		printf("\tpost install script: %s\n", script);
+		printf("\tpost-install script: %s\n", script);
+	}
+
+	void PrintPreUninstallScript(const char* script) const
+	{
+		printf("\tpre-uninstall script: %s\n", script);
 	}
 
 	void PrintInstallPath(const char* path) const

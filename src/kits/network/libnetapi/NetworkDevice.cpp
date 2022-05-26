@@ -50,11 +50,9 @@ struct ie_data {
 static status_t
 get_80211(const char* name, int32 type, void* data, int32& length)
 {
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
+	FileDescriptorCloser socket(::socket(AF_INET, SOCK_DGRAM, 0));
+	if (!socket.IsSet())
 		return errno;
-
-	FileDescriptorCloser closer(socket);
 
 	struct ieee80211req ireq;
 	strlcpy(ireq.i_name, name, IF_NAMESIZE);
@@ -63,7 +61,8 @@ get_80211(const char* name, int32 type, void* data, int32& length)
 	ireq.i_len = length;
 	ireq.i_data = data;
 
-	if (ioctl(socket, SIOCG80211, &ireq, sizeof(struct ieee80211req)) < 0)
+	if (ioctl(socket.Get(), SIOCG80211, &ireq, sizeof(struct ieee80211req))
+		< 0)
 		return errno;
 
 	length = ireq.i_len;
@@ -75,11 +74,9 @@ static status_t
 set_80211(const char* name, int32 type, void* data,
 	int32 length = 0, int32 value = 0)
 {
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
+	FileDescriptorCloser socket(::socket(AF_INET, SOCK_DGRAM, 0));
+	if (!socket.IsSet())
 		return errno;
-
-	FileDescriptorCloser closer(socket);
 
 	struct ieee80211req ireq;
 	strlcpy(ireq.i_name, name, IF_NAMESIZE);
@@ -88,7 +85,8 @@ set_80211(const char* name, int32 type, void* data,
 	ireq.i_len = length;
 	ireq.i_data = data;
 
-	if (ioctl(socket, SIOCS80211, &ireq, sizeof(struct ieee80211req)) < 0)
+	if (ioctl(socket.Get(), SIOCS80211, &ireq, sizeof(struct ieee80211req))
+		< 0)
 		return errno;
 
 	return B_OK;
@@ -98,15 +96,13 @@ set_80211(const char* name, int32 type, void* data,
 template<typename T> status_t
 do_request(T& request, const char* name, int option)
 {
-	int socket = ::socket(AF_LINK, SOCK_DGRAM, 0);
-	if (socket < 0)
+	FileDescriptorCloser socket(::socket(AF_LINK, SOCK_DGRAM, 0));
+	if (!socket.IsSet())
 		return errno;
-
-	FileDescriptorCloser closer(socket);
 
 	strlcpy(((struct ifreq&)request).ifr_name, name, IF_NAMESIZE);
 
-	if (ioctl(socket, option, &request, sizeof(T)) < 0)
+	if (ioctl(socket.Get(), option, &request, sizeof(T)) < 0)
 		return errno;
 
 	return B_OK;
@@ -116,15 +112,13 @@ do_request(T& request, const char* name, int option)
 template<> status_t
 do_request<ieee80211req>(ieee80211req& request, const char* name, int option)
 {
-	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
-	if (socket < 0)
+	FileDescriptorCloser socket(::socket(AF_INET, SOCK_DGRAM, 0));
+	if (!socket.IsSet())
 		return errno;
-
-	FileDescriptorCloser closer(socket);
 
 	strlcpy(((struct ieee80211req&)request).i_name, name, IFNAMSIZ);
 
-	if (ioctl(socket, option, &request, sizeof(request)) < 0)
+	if (ioctl(socket.Get(), option, &request, sizeof(request)) < 0)
 		return errno;
 
 	return B_OK;

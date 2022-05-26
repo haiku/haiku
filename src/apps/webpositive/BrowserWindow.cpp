@@ -344,8 +344,8 @@ private:
 
 
 BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
-		const BString& url, BUrlContext* context, uint32 interfaceElements,
-		BWebView* webView)
+		const BString& url, BPrivate::Network::BUrlContext* context,
+		uint32 interfaceElements, BWebView* webView)
 	:
 	BWebWindow(frame, kApplicationName,
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
@@ -380,7 +380,6 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		kDefaultStartPageURL);
 	fSearchPageURL = fAppSettings->GetValue(kSettingsKeySearchPageURL,
 		kDefaultSearchPageURL);
-	_InitSearchEngines();
 
 	// Create the interface elements
 	BMessage* newTabMessage = new BMessage(NEW_TAB);
@@ -548,7 +547,9 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	fLoadingProgressBar = new BStatusBar("progress");
 	fLoadingProgressBar->SetMaxValue(100);
 	fLoadingProgressBar->Hide();
-	fLoadingProgressBar->SetBarHeight(12);
+	font_height height;
+	font.GetHeight(&height);
+	fLoadingProgressBar->SetBarHeight(height.ascent + height.descent);
 
 	const float kInsetSpacing = 3;
 	const float kElementSpacing = 5;
@@ -699,7 +700,6 @@ BrowserWindow::~BrowserWindow()
 	delete fTabManager;
 	delete fPulseRunner;
 	delete fSavePanel;
-	delete[] fSearchEngines;
 }
 
 
@@ -1505,7 +1505,7 @@ BrowserWindow::LoadCommitted(const BString& url, BWebView* view)
 	if (view != CurrentWebView())
 		return;
 
-	// This hook is invoked when the load is commited.
+	// This hook is invoked when the load is committed.
 	fURLInputGroup->SetText(url.String());
 
 	BString status(B_TRANSLATE("Loading %url"));
@@ -2481,30 +2481,6 @@ BrowserWindow::_EncodeURIComponent(const BString& search)
 
 
 void
-BrowserWindow::_InitSearchEngines()
-{
-	// TODO make these configurable
-	fSearchEngines = new SearchEngine[kSearchEngineCount];
-	fSearchEngines[0].url="https://google.com/search?q=%s";
-	fSearchEngines[0].shortcut="g ";
-	fSearchEngines[1].url="https://bing.com/search?q=%s";
-	fSearchEngines[1].shortcut="b ";
-	fSearchEngines[2].url="https://en.wikipedia.org/w/index.php?search=%s";
-	fSearchEngines[2].shortcut="w ";
-	fSearchEngines[3].url="https://duckduckgo.com/?q=%s";
-	fSearchEngines[3].shortcut="d ";
-	fSearchEngines[4].url="https://www.baidu.com/s?wd=%s";
-	fSearchEngines[4].shortcut="a ";
-	fSearchEngines[5].url="https://yandex.com/search/?text=%s";
-	fSearchEngines[5].shortcut="y ";
-	fSearchEngines[6].url="https://www.ecosia.org/search?q=%s";
-	fSearchEngines[6].shortcut="e ";
-	fSearchEngines[7].url="https://www.qwant.com/?q=%s";
-	fSearchEngines[7].shortcut="q ";
-}
-
-
-void
 BrowserWindow::_VisitURL(const BString& url)
 {
 	// fURLInputGroup->TextView()->SetText(url);
@@ -2519,19 +2495,19 @@ BrowserWindow::_VisitSearchEngine(const BString& search)
 
 	BString searchPrefix;
 	search.CopyCharsInto(searchPrefix, 0, 2);
-	
+
 	// Default search URL
 	BString engine(fSearchPageURL);
 
 	// Check if the string starts with one of the search engine shortcuts
-	for (int i = 0; i < kSearchEngineCount; i++) {
-		if (fSearchEngines[i].shortcut == searchPrefix) {
-			engine = fSearchEngines[i].url;
+	for (int i = 0; kSearchEngines[i].url != NULL; i++) {
+		if (kSearchEngines[i].shortcut == searchPrefix) {
+			engine = kSearchEngines[i].url;
 			searchQuery.Remove(0, 2);
 			break;
 		}
 	}
-	
+
 	engine.ReplaceAll("%s", _EncodeURIComponent(searchQuery));
 	_VisitURL(engine);
 }

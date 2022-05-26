@@ -171,7 +171,7 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 
 	// Create the tool bar
 	BRect viewFrame = contentView->Bounds();
-	viewFrame.right -= B_V_SCROLL_BAR_WIDTH;
+	viewFrame.right -= be_control_look->GetScrollBarWidth(B_VERTICAL);
 	fToolBar = new BToolBar(viewFrame);
 
 	// Add the tool icons.
@@ -222,7 +222,7 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	fToolBarVisible = fShowToolBar;
 
 	viewFrame.bottom = contentView->Bounds().bottom;
-	viewFrame.bottom -= B_H_SCROLL_BAR_HEIGHT;
+	viewFrame.bottom -= be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 
 	// create the image view
 	fImageView = new ShowImageView(viewFrame, "image_view", B_FOLLOW_ALL,
@@ -494,9 +494,9 @@ ShowImageWindow::_ResizeWindowToImage()
 
 	// TODO: use View::GetPreferredSize() instead?
 	BRect r(bitmap->Bounds());
-	float width = r.Width() + B_V_SCROLL_BAR_WIDTH;
+	float width = r.Width() + be_control_look->GetScrollBarWidth(B_VERTICAL);
 	float height = r.Height() + 1 + fBar->Frame().Height()
-		+ B_H_SCROLL_BAR_HEIGHT;
+		+ be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 
 	BRect frame = screen.Frame();
 	const float windowBorder = 5;
@@ -1299,8 +1299,8 @@ ShowImageWindow::_ToggleFullScreen()
 		fWindowFrame = Frame();
 		frame = screen.Frame();
 		frame.top -= fBar->Bounds().Height() + 1;
-		frame.right += B_V_SCROLL_BAR_WIDTH;
-		frame.bottom += B_H_SCROLL_BAR_HEIGHT;
+		frame.right += be_control_look->GetScrollBarWidth(B_VERTICAL);
+		frame.bottom += be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 
 		SetFlags(Flags() | B_NOT_RESIZABLE | B_NOT_MOVABLE);
 

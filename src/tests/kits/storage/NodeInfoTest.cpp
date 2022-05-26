@@ -423,7 +423,7 @@ NodeInfoTest::TypeTest()
 		// remove attr first
 		CHK(nodeInfo.SetType(NULL) == B_OK);
 // R5: Doesn't complain when setting a too long string.
-// OBOS: Handles this as an error case.
+// Haiku: Handles this as an error case.
 #ifdef TEST_R5
 		CHK(nodeInfo.SetType(tooLongTestType) == B_OK);
 		// get

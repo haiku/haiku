@@ -65,6 +65,11 @@ IconsSaver::IconsSaver(BMessage* archive, image_id image)
 
 IconsSaver::~IconsSaver()
 {
+	vector_icon* icon;
+	while ((icon = fVectorIcons.RemoveItemAt((int32)0)) != NULL) {
+		delete[] icon->data;
+		free(icon);
+	}
 }
 
 
@@ -119,6 +124,8 @@ IconsSaver::StopSaver()
 {
 	delete[] fIcons;
 	fIcons = NULL;
+	delete fBackBitmap;
+	fBackBitmap = NULL;
 }
 
 

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-FirstBootPrompt	2813539172
+1	indonesian	x-vnd.Haiku-FirstBootPrompt	585808223
 Japanese	KeymapNames		Jepang
 US	KeymapNames		AS
 Esperanto	KeymapNames		Esperanto
@@ -10,10 +10,10 @@ Latin-American	KeymapNames		Amerika-latin
 Ukrainian	KeymapNames		Ukraina
 Russian (Yawert)	KeymapNames		Rusia (Yawert)
 United-Kingdom	KeymapNames		Britania Raya
-Serbian (Cyrillic)	KeymapNames		Serbia (sirilik)
 Turkish (Type-F)	KeymapNames		Turki(Type-F)
-Bulgarian (Cyrillic)	KeymapNames		Bulgaria (Sirilik)
+Serbian (Cyrillic)	KeymapNames		Serbia (sirilik)
 Belgian (point)	KeymapNames		Belgia (point)
+Bulgarian (Cyrillic)	KeymapNames		Bulgaria (Sirilik)
 Finnish	KeymapNames		Finlandia
 Swedish	KeymapNames		Swedia
 Svorak	KeymapNames		Svorak
@@ -37,7 +37,6 @@ Belarusian (Mac)	KeymapNames		Belarusia (Mac)
 Hebrew	KeymapNames		Ibrani
 Greek	KeymapNames		Yunani
 Croatian	KeymapNames		Kroasia
-Run Installer	BootPromptWindow		Jalankan Installer
 Faeroese	KeymapNames		Faero
 Polish (Typewriter)	KeymapNames		Polandia (Typewriter)
 French (Mac)	KeymapNames		Perancis (Mac)
@@ -52,8 +51,8 @@ Italian	KeymapNames		Itali
 Portuguese	KeymapNames		Portugis
 Swiss-French	KeymapNames		Swis-Perancis
 Slovene	KeymapNames		Slovene
-Lithuanian	KeymapNames		Lithuania
 French (NF Z71-300)	KeymapNames		Perancis (NF Z71-300)
+Lithuanian	KeymapNames		Lithuania
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Kazakhtan
 Language	BootPromptWindow		Bahasa
@@ -62,16 +61,14 @@ Belgian (comma)	KeymapNames		Belgia (koma)
 Custom	BootPromptWindow		Gubahan
 Norwegian	KeymapNames		Norwegia
 Danish	KeymapNames		Denmark
-Boot to Desktop	BootPromptWindow		Boot ke Desktop
 Bulgarian (Phonetic)	KeymapNames		Bulgaria (Fonetik)
 Canadian-French	KeymapNames		Kanada-Perancis
-Welcome to Haiku!	BootPromptWindow		Selamat datang di Haiku!
 Russian	KeymapNames		Rusia
 Hungarian	KeymapNames		Hunggaria
 Irish	KeymapNames		Irlandia
 Romanian	KeymapNames		Rumania
-Macedonian	KeymapNames		Makedonia
 Czech (Mac)	KeymapNames		Ceko (Mac)
+Macedonian	KeymapNames		Makedonia
 Brazilian (ABNT2)	KeymapNames		Brazil (ABNT2)
 Albanian	KeymapNames		Albania
 Dutch	KeymapNames		Belanda

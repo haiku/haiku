@@ -59,6 +59,8 @@ public:
 
 			btrfs_super_block&	SuperBlock() { return fSuperBlock; }
 
+			mutex&				GetLock() { return fLock; }
+
 			status_t			LoadSuperBlock();
 			status_t			WriteSuperBlock();
 

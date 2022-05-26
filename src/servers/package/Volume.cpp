@@ -1,9 +1,10 @@
 /*
- * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2021, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Andrew Lindesay <apl@lindesay.co.nz>
  */
 
 
@@ -230,13 +231,12 @@ Volume::Init(const node_ref& rootDirectoryRef, node_ref& _packageRootRef)
 		RETURN_ERROR(B_NO_MEMORY);
 
 	// get a volume info from the FS
-	int fd = directory.Dup();
-	if (fd < 0) {
+	FileDescriptorCloser fd(directory.Dup());
+	if (!fd.IsSet()) {
 		ERROR("Volume::Init(): failed to get root directory FD: %s\n",
-			strerror(fd));
-		RETURN_ERROR(fd);
+			strerror(fd.Get()));
+		RETURN_ERROR(fd.Get());
 	}
-	FileDescriptorCloser fdCloser(fd);
 
 	// get the volume info from packagefs
 	uint32 maxPackagesDirCount = 16;
@@ -251,7 +251,7 @@ Volume::Init(const node_ref& rootDirectoryRef, node_ref& _packageRootRef)
 			RETURN_ERROR(B_NO_MEMORY);
 		infoDeleter.SetTo(info);
 
-		if (ioctl(fd, PACKAGE_FS_OPERATION_GET_VOLUME_INFO, info,
+		if (ioctl(fd.Get(), PACKAGE_FS_OPERATION_GET_VOLUME_INFO, info,
 				bufferSize) != 0) {
 			ERROR("Volume::Init(): failed to get volume info: %s\n",
 				strerror(errno));
@@ -310,13 +310,12 @@ Volume::InitPackages(Listener* listener)
 	}
 
 	// read the packages directory and get the active packages
-	int fd = OpenRootDirectory();
-	if (fd < 0) {
+	FileDescriptorCloser fd(OpenRootDirectory());
+	if (!fd.IsSet()) {
 		ERROR("Volume::InitPackages(): failed to open root directory: %s\n",
-			strerror(fd));
-		RETURN_ERROR(fd);
+			strerror(fd.Get()));
+		RETURN_ERROR(fd.Get());
 	}
-	FileDescriptorCloser fdCloser(fd);
 
 	error = _ReadPackagesDirectory();
 	if (error != B_OK)
@@ -326,15 +325,81 @@ Volume::InitPackages(Listener* listener)
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
-	error = _GetActivePackages(fd);
+	error = _GetActivePackages(fd.Get());
 	if (error != B_OK)
 		RETURN_ERROR(error);
 
 	// create the admin directory, if it doesn't exist yet
 	BDirectory packagesDirectory;
+	bool createdAdminDirectory = false;
 	if (packagesDirectory.SetTo(&PackagesDirectoryRef()) == B_OK) {
-		if (!BEntry(&packagesDirectory, kAdminDirectoryName).Exists())
+		if (!BEntry(&packagesDirectory, kAdminDirectoryName).Exists()) {
 			packagesDirectory.CreateDirectory(kAdminDirectoryName, NULL);
+			createdAdminDirectory = true;
+		}
+	}
+	BDirectory adminDirectory(&packagesDirectory, kAdminDirectoryName);
+	error = adminDirectory.InitCheck();
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	// First boot processing requested by a magic file left by the OS installer?
+	BEntry flagFileEntry(&adminDirectory, kFirstBootProcessingNeededFileName);
+	if (createdAdminDirectory || flagFileEntry.Exists()) {
+		INFORM("Volume::InitPackages Requesting delayed first boot processing "
+			"for packages dir %s.\n", BPath(&packagesDirectory).Path());
+		if (flagFileEntry.Exists())
+			flagFileEntry.Remove(); // Remove early on to avoid an error loop.
+
+		// Are there any packages needing processing?  Don't want to create an
+		// empty transaction directory and then never have it cleaned up when
+		// the empty transaction gets rejected.
+		bool anyPackages = false;
+		for (PackageNodeRefHashTable::Iterator it =
+				fActiveState->ByNodeRefIterator(); it.HasNext();) {
+			Package* package = it.Next();
+			if (package->IsActive()) {
+				anyPackages = true;
+				break;
+			}
+		}
+
+		if (anyPackages) {
+			// Create first boot processing special transaction for current
+			// volume, which also creates an empty transaction directory.
+			BPackageInstallationLocation location = Location();
+			BDirectory transactionDirectory;
+			BActivationTransaction transaction;
+			error = CreateTransaction(location, transaction,
+				transactionDirectory);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+
+			// Add all package files in currently active state to transaction.
+			for (PackageNodeRefHashTable::Iterator it =
+					fActiveState->ByNodeRefIterator(); it.HasNext();) {
+				Package* package = it.Next();
+				if (package->IsActive()) {
+					if (!transaction.AddPackageToActivate(
+							package->FileName().String()))
+						RETURN_ERROR(B_NO_MEMORY);
+				}
+			}
+			transaction.SetFirstBootProcessing(true);
+
+			// Queue up the transaction as a BMessage for processing a bit
+			// later, once the package daemon has finished initialising.
+			BMessage commitMessage(B_MESSAGE_COMMIT_TRANSACTION);
+			error = transaction.Archive(&commitMessage);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+			BLooper *myLooper = Looper() ;
+			if (myLooper == NULL)
+				RETURN_ERROR(B_NOT_INITIALIZED);
+			error = myLooper->PostMessage(&commitMessage);
+			if (error != B_OK)
+				RETURN_ERROR(error);
+		}
 	}
 
 	return B_OK;
@@ -1003,8 +1068,14 @@ Volume::_InitLatestStateFromActivatedPackages()
 	BFile file;
 	error = file.SetTo(&entryRef, B_READ_ONLY);
 	if (error != B_OK) {
-		INFORM("Failed to open packages activation file: %s\n",
-			strerror(error));
+		BEntry activationEntry(&entryRef);
+		BPath activationPath;
+		const char *activationFilePathName = "Unknown due to errors";
+		if (activationEntry.InitCheck() == B_OK &&
+		activationEntry.GetPath(&activationPath) == B_OK)
+			activationFilePathName = activationPath.Path();
+		INFORM("Failed to open packages activation file %s: %s\n",
+			activationFilePathName, strerror(error));
 		RETURN_ERROR(error);
 	}
 
@@ -1250,6 +1321,21 @@ void
 Volume::_SetLatestState(VolumeState* state, bool isActive)
 {
 	AutoLocker<BLocker> locker(fLock);
+
+	bool sendNotification = fRoot->IsSystemRoot();
+		// Send a notification, if this is a system root volume.
+	BStringList addedPackageNames;
+	BStringList removedPackageNames;
+
+	// If a notification should be sent then assemble the latest and incoming
+	// set of the packages' names.  This can be used to figure out which
+	// packages are added and which are removed.
+
+	if (sendNotification) {
+		_CollectPackageNamesAdded(fLatestState, state, addedPackageNames);
+		_CollectPackageNamesAdded(state, fLatestState, removedPackageNames);
+	}
+
 	if (isActive) {
 		if (fLatestState != fActiveState)
 			delete fActiveState;
@@ -1264,13 +1350,40 @@ Volume::_SetLatestState(VolumeState* state, bool isActive)
 	locker.Unlock();
 
 	// Send a notification, if this is a system root volume.
-	if (fRoot->IsSystemRoot()) {
+	if (sendNotification) {
 		BMessage message(B_PACKAGE_UPDATE);
 		if (message.AddInt32("event",
 				(int32)B_INSTALLATION_LOCATION_PACKAGES_CHANGED) == B_OK
+			&& message.AddStrings("added package names",
+				addedPackageNames) == B_OK
+			&& message.AddStrings("removed package names",
+				removedPackageNames) == B_OK
 			&& message.AddInt32("location", (int32)Location()) == B_OK
 			&& message.AddInt64("change count", fChangeCount) == B_OK) {
 			BRoster::Private().SendTo(&message, NULL, false);
+		}
+	}
+}
+
+
+/*static*/ void
+Volume::_CollectPackageNamesAdded(const VolumeState* oldState,
+	const VolumeState* newState, BStringList& addedPackageNames)
+{
+	if (newState == NULL)
+		return;
+
+	for (PackageFileNameHashTable::Iterator it
+			= newState->ByFileNameIterator(); it.HasNext();) {
+		Package* package = it.Next();
+		BString packageName = package->Info().Name();
+		if (oldState == NULL)
+			addedPackageNames.Add(packageName);
+		else {
+			Package* oldStatePackage = oldState->FindPackage(
+				package->FileName());
+			if (oldStatePackage == NULL)
+				addedPackageNames.Add(packageName);
 		}
 	}
 }

@@ -1,15 +1,15 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	1546691996
+1	friulian	x-vnd.Haiku-HaikuDepot	3139226371
 Repository update error	LocalRepositoryUpdateProcess		Erôr di inzornament dal dipuesit
 Network error	ServerHelper		Erôr di rêt
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Si è verificât un erôr intal inzornâ il dipuesit: %error%
 User Created	UserLoginWindow		Utent creât
 Check for updates…	MainWindow		Controle inzornaments…
-Uninstall	PackageManager		Disinstale
 Uninstalled	PackageListView		Disinstalât
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
 Available packages	MainWindow		Pachets disponibii
+An unexpected error has been sent from the server [%li]	ServerHelper		Al è rivât un erôr inspietât dal servidôr [%li]
 Create account	UserLoginWindow		Cree account
-Mostly stable	RatePackageWindow		Pal plui stabil
+Install %PackageTitle%	PackageManager		Instale %PackageTitle%
 OK	App		Va ben
 The response to the captcha was incorrect.	ServerHelper		La rispueste al captcha e jere sbaliade.
 Develop packages	MainWindow		Pachets di svilup
@@ -18,21 +18,17 @@ Starting the package daemon failed:\n\n%Error%	App		Inviament dal demoni dai pac
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Tu ti sês autenticât cun sucès come utent %Nickname%.
 <no info>	PackageInfoView		<nessune informazion>
 No user ratings available.	PackageInfoView		Nissune valutazion dai utents disponibile.
-Downloading package '%name%'	WorkStatusView		Daûr a discjariâ il pachet '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nol è stât pussibil tirâ fûr lis informazions captcha necessaris dai dâts restituîts dal servidôr.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Al è vignût fûr un erôr di traspuart de rêt tal comunicâ cul servidôr: %s
 Rating	PackageListView		Valutazion
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizazion iconis
-Does not start	RatePackageWindow		No si invie
 Show	MainWindow		Mostre
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Si è verificât un erôr intal otignî la liste dai pachets: %message%
-Unstable but usable	RatePackageWindow		Instabil, ma che si pues doprâ
-Not specified	RatePackageWindow		No specificât
+Settings…	MainWindow		Impostazions…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Cheste aplicazion, par funzionâ ben, e scrîf e e lei cualchi file di lavôr tal to computer. Al semee che a sedin problemis tal scrivi un file di prove su [%TestFilePath%]. Controle di no vê fastidis cul to disc locâl o cun permès che a impedissin a cheste aplicazion di scrivi file in chê posizion. Tu puedis sielzi di no risolvi il probleme e di continuâ, ma cualchi funzionalitât e podarès jessi disabilitade.
 Active	PackageListView		Atîf
 Login or Create account	MainWindow		Jentre o Regjistriti
-<Package contents not available for remote packages>	PackageContentsView		<Contignûts dal pachet no disponibii pai pachets rimots>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 pachet di discjariâ}other{# pachets di discjariâ}}
+<Package contents not available for remote packages>	PackageContentsView		<Contignûts dal pachet no disponibii pai pachets esternis>
 Ratings	PackageInfoView		Valutazions
 Switch account…	MainWindow		Cambie account…
 Preferred language:	UserLoginWindow		Lenghe preferide:
@@ -42,15 +38,14 @@ Local	LocalPkgDataLoadProcess		Locâl
 Rate %Package%	RatePackageWindow		Vote %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Si è verificât un erôr intal inizializâ il gjestôr dal pachet: %message%
 Quit HaikuDepot	App		Siere HaikuDepot
+Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Acetaressistu di inviâ dâts anonims sul ûs di chest computer al sisteme HaikuDepotServer? Plui indenant tu podarâs modificâ lis tôs preferencis tal barcon \"Impostazions\".
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Al è vignût fûr un erôr '%Message%' inspietât cun proprietât '%Property%'
 A response to the captcha question must be provided.	UserLoginWindow		Si scugne dâ une rispueste ae domande captcha.
 Category	FilterView		Categorie
 User rating	RatePackageWindow		Valutazion utents
 Installed packages	MainWindow		Pachets instalâts
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un ogjet domandât o un ogjet che al centrave cu la richieste nol è stât cjatât sul servidôr.
-Stable	RatePackageWindow		Stabile
-Fatal error	PackageManager		Erôr fatâl
-Package action failed	PackageInfoView		Azion pachet falide
+Date	PackageListView		Date
 No changelog available.	PackageInfoView		Nissun regjistri des modifichis disponibil.
 Error	App		Erôr
 There was a puzzling response from the web service.	UserLoginWindow		La rispueste dal servizi web e jere ambigue.
@@ -62,10 +57,12 @@ The supplied response to the captcha is incorrect. A new captcha will be generat
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nol è stât pussibil comunicâ cul servidôr par otignî une imagjin captcha necessarie par creâ un gnûf utent.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		La tô valutazion e je stade cjariade cun sucès. Tu puedis modificâle o gjavâle sul sît web dal servidôr di HaikuDepot.
 Available	PackageListView		Disponibil
+-	no package publish		-
 Cancel	UserLoginWindow		Anule
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot al à bisugne dal demoni dai pachets par funzionâ, ma pal moment al semee che nol sedi in esecuzion.\nInviâlu cumò?
 Click a package to view information	PackageInfoView		Fâs clic suntun pachet par viodi plui informazions
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		La peraule d'ordin e scugne jessi di almancul vot caratars e e à di vê almancul doi numars e un caratar maiuscul.
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Condivît dâts anonims sul ûs cun HaikuDepotServer
 Contents	PackageInfoView		Contignût
 Close	PackageManager		Siere
 Changelog	PackageInfoView		Regjistri modifichis
@@ -74,7 +71,6 @@ Package update error	MainWindow		Erôr di inzornament dal pachet
 About	PackageInfoView		Informazions su
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procès} other{# procès}}
 Reboot required	PackageManager		Tornâ a inviâ necessari
-Very unstable	RatePackageWindow		Une vore instabil
 Password:	UserLoginWindow		Peraule d'ordin:
 All packages	PackageListView		Ducj i pachets
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Cheste aplicazion e je masse vecje par comunicâ cul servidôr. Oten une version plui resinte inzornant il sisteme. La version minime domandade e je la \"%s\".
@@ -82,7 +78,7 @@ Stability	RatePackageWindow		Stabilitât
 Send	RatePackageWindow		Invie
 Start package daemon	App		Invie demoni dai pachets
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Si scugne ripeti la peraule d'ordin par podê diminuî lis pussibilitâts di inserîle sbaliade.
-The package action could not be scheduled: %Error%	PackageInfoView		Nol è stât pussibil programâ la azion sul pachet: %Error%
+Cancel	SettingsWindow		Anule
 Cancel	RatePackageWindow		Anule
 Inactive	PackageListView		Inatîf
 Nickname:	UserLoginWindow		Sorenon:
@@ -91,9 +87,10 @@ There are problems in the supplied data:	UserLoginWindow		Si à problemis tai d�
 OK	MainWindow		Va ben
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
 Usage conditions download problem	UserLoginWindow		Probleme tal discjariament des condizions di ûs
-OK	PackageInfoView		Va ben
 Downloading:	PackageInfoView		Ricezion:
+Quit	MainWindow		Jes
 Success	UserLoginWindow		Lât a bon fin
+No	MainWindow		No
 Package daemon problem	App		Probleme cul demoni dai pachets
 (%Votes%)	PackageInfoView		(%Votes%)
 Repository	PackageListView		Dipuesit
@@ -101,26 +98,27 @@ Repository	PackageListView		Dipuesit
 The email is malformed.	UserLoginWindow		La direzion e-mail e je malformade.
 Close	UserLoginWindow		Siere
 Close	RatePackageWindow		Siere
-An unexpected error has been sent from the server [%i]	ServerHelper		Al è stât inviât dal servidôr [%i] un erôr inspietât
-Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizazion dâts pachet pal dipuesit '%REPO_NAME%'
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizazion dâts dai pachets pal dipuesit '%REPO_NAME%'
+Settings	SettingsWindow		Impostazions
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Al è vignût fûr un erôr discjariant lis condizions di ûs necessaris par creâ un gnûf utent. Controle il regjistri pai detais e torne prove. \nLis informazions su ce mût viodi i regjistris a son disponibilis inte sezion di HaikuDepot  de Vuide utent di Haiku.
 View the usage conditions	UserLoginWindow		Viôt lis condizions di ûs
 Login issue	MainWindow		Probleme di acès
-Size	PackageListView		Dimension
 Your rating:	RatePackageWindow		La tô valutazion:
+Size	PackageListView		Dimension
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'utent %Nickname% al è stât creât cun sucès tal sisteme di HaikuDepotServer. Tu puedis gjestî i tiei detais-utent doprant la interface web. Tu sês cumò jentrât come chest utent gnûf.
 Your rating was updated.	RatePackageWindow		La tô valutazion e je stade inzornade.
 All categories	FilterView		Dutis lis categoriis
 Repositories	MainWindow		Dipuesits
 n/a	PackageInfoView		n/d
 This rating is visible to other users	RatePackageWindow		Altris utents a puedin viodi cheste valutazion
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Intant che si inzornave i dâts di un pachet, al è vignût fûr un probleme che al podarès fâ pierdi i dâts o rindiju obsolets rispiet ae visualizazion de aplicazion. Detais adizionâi in merit si puedin otignî dai regjistris de aplicazion.\nLis informazions su ce mût viodi i regjistris a son disponibilis te sezion di HaikuDepot de Vuide utent di Haiku.
 View agreed usage conditions…	MainWindow		Viôt lis cundizions di ûs acetadis…
 Cancel	MainWindow		Anule
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(ancjemò 1 discjariament)}other{(ancjemò # discjariaments)}}
 Refresh repositories	MainWindow		Inzorne dipuesits
-Tools	MainWindow		Struments
 Continue	App		Continue
 A password is required.	UserLoginWindow		E je necessarie une peraule d'ordin.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Chest pachet nol semee esisti sul servidôr HaikuDepot, duncje nol è pussibil creâ une gnove valutazion o modificâ une esistente.
+Apply	SettingsWindow		Apliche
 Language	RatePackageWindow		Lenghe
 Log out	MainWindow		Termine session
 Comment language:	RatePackageWindow		Lenghe dal coment:
@@ -128,6 +126,7 @@ Status	PackageListView		Stât
 The password has been incorrectly repeated.	UserLoginWindow		La peraule d'ordin e je stade ripetude sbaliade.
 Network transport error	ServerHelper		Erôr di traspuart de rêt
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		La peraule d'ordin furnide in precedence pal utent [%Nickname%] no je pal moment valide. L'utent al vignarà disconetût di cheste aplicazion e tu varâs di jentrâ di gnûf cu la peraule d'ordin inzornade.
+Uninstall %PackageTitle%	PackageManager		Disinstale %PackageTitle%
 Update	RatePackageWindow		Inzorne
 OK	ServerHelper		Va ben
 Language	UserLoginWindow		Lenghe
@@ -137,22 +136,23 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Sincr
 Stability:	RatePackageWindow		Stabilitât:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		L'acuardi di utilizazion al scugne jessi acetât e si scugne confermâ che la persone che e cree l'utent e vedi i recuisîts minims pe etât.
 A validation error has occurred	ServerHelper		Si è verificât un erôr di convalide
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		Intant che si inzornave i dâts dal pachet, al è vignût fûr un probleme che al podarès fâ in mût che i dâts de aplicazion a sedin obsolets opûr mancjants. Detais adizionâi in merit a chest probleme al è pussibil che si podedin cjatâ tai regjistris de aplicazion.\nLis informazions su ce mût visualizâ i regjistris a son disponibilis te sezion di HaikuDepot de vuide pal utent.
 The nickname is required.	UserLoginWindow		Il sorenon al è necessari.
 Source packages	MainWindow		Pachets sorzint
 -	no package size		-
 Problem with working files	App		Probleme cui file di lavôr de aplicazion
 Server error	ServerHelper		Erôr dal servidôr
-Try again	App		Torne prove
 Rate package	RatePackageWindow		Valute pachet
+Try again	App		Torne prove
 Unknown	PackageListView		No cognossût
 I agree to the usage conditions	UserLoginWindow		O aceti lis condizions di ûs
 Log in	UserLoginWindow		Jentre
+Sending anonymous usage data	MainWindow		Daûr a inviâ dâts anonim sul ûs
 Logged in as %User%	MainWindow		Jentrât come %User%
 Email address:	UserLoginWindow		Direzion email:
 Screenshot	ScreenshotWindow		Istantanie
 HaikuDepot	System name		HaikuDepot
 A reboot is necessary to complete the installation process.	PackageManager		Al covente tornâ a inviâ il sisteme par completâ la instalazion.
+Yes	MainWindow		Sì
 {0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{O ai almancul un an}other{O ai # agns di etât o plui}}
 View latest usage conditions…	MainWindow		Viôt lis ultimis condizions di ûs…
 Quit	App		Siere
@@ -164,18 +164,15 @@ Authentication failed	UserLoginWindow		Autenticazion falide
 Captcha error	UserLoginWindow		Erôr captcha
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Il sorenon al scugne jessi unic, ma il sorenon indicât al è za doprât. Sielç un sorenon diviers.
 Manage repositories…	MainWindow		Gjestìs dipuesits…
-Fetching remote repository data	LocalRepositoryUpdateProcess		Daûr a recuperâ i dâts dal dipuesit rimot
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		Al è vignût fûr un erôr intant che si discjariave lis condiizons di ûs necessaris par creâ un gnûf utent. Controle il regjistri par vê plui detais e torne prove. \nLis informazions su ce mût visualizâ i regjistris a son disponibilis te sezion di HaikuDepot de vuide pal utent.
+Fetching remote repository data	LocalRepositoryUpdateProcess		Daûr a recuperâ i dâts dal dipuesit lontan
 Description	PackageListView		Descrizion
 Open %DeskbarLink%	PackageManager		Vierç %DeskbarLink%
 User creation error	UserLoginWindow		Erôr di creazion dal utent
-Install	PackageManager		Instale
 Input validation	UserLoginWindow		Convalide input
 Log in…	MainWindow		Acès…
 You need to be logged into an account before you can rate packages.	MainWindow		Si scugne jessi jentrâts intun account prime di podê valutâ i pachets.
 Client version too old	ServerHelper		Version dal client masse vecje
 Local repository load error	LocalPkgDataLoadProcess		Erôr tal cjariament dal dipuesit locâl
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		L'utent nol esist o la peraule d'ordin dade e je sbaliade. Controle lis tôs credenziâls e torne prove.
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		Ripet peraule d'ordin:
 All repositories	MainWindow		Ducj i dipuesits

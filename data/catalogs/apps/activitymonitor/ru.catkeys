@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ActivityMonitor	3672498538
+1	russian	x-vnd.Haiku-ActivityMonitor	2601047281
 Teams	DataSource		Процессы
 Semaphores	DataSource		Семафоры
 TX	DataSource	Shorter version for Sending	Передача
@@ -17,6 +17,7 @@ Remove graph	ActivityView		Удалить график
 Swap space	DataSource		Размер файла подкачки
 CPU	DataSource		Процессор
 ActivityMonitor	System name		Монитор активности
+CPU %d	DataSource		Процессор %d
 Update time interval:	SettingsWindow		Интервал обновления:
 RX	DataSource	Shorter version for Receiving.	Прием
 Settings…	ActivityWindow		Настройки…
@@ -30,6 +31,7 @@ Used memory	DataSource		Используемая память
 %.1f faults/s	DataSource		%.1f отказов/с
 Show legend	ActivityView		Показать легенду
 Cached memory	DataSource		Кэшируемая память
+CPU %d usage	DataSource		Используется %d ЦП
 File	ActivityWindow		Файл
 Ports	DataSource		Порты
 Page faults	DataSource		Отказы страниц

@@ -7,7 +7,7 @@ System Translators	ActiveTranslatorsWindow		System-Translatoren
 \nType: '%1' (%2)\nGroup: '%3' (%4)\nQuality: %5\nCapability: %6\nMIME Type: %7\nName: %8\n	ImageView		\nTyp: '%1' (%2)\nGruppe: '%3' (%4)\nQualität: %5\nFähigkeiten: %6\nMIME Typ: %7\nName: %8\n
 OK	ImageWindow		OK
 View	ImageWindow		Ansicht
-Open…	ImageWindow		Öffnen…
+Open…	ImageWindow		Öffnen …
 Save feature not implemented yet.	ImageWindow		Speichern wird noch nicht unterstützt.
 Active Translators	ImageWindow		Aktive Translatoren
 Info	ImageWindow		Info
@@ -27,6 +27,6 @@ File	ImageWindow		Datei
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Ausgewähltes Dokument: %1\n\nBenutzter Translator:\nName: %2\nInfo: %3\nVersion: %4\n
 Quit	ImageWindow		Beenden
 Sorry, unable to write the image file.	ImageView		Die Bilddatei konnte leider nicht gespeichert werden.
-Save…	ImageWindow		Speichern…
+Save…	ImageWindow		Speichern …
 Window	ImageWindow		Fenster
 First Page	ImageWindow		Erste Seite

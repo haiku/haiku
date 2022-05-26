@@ -1,9 +1,10 @@
 /*
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_ICON_TAR_REPOSITORY_H
 #define PACKAGE_ICON_TAR_REPOSITORY_H
+
 
 #include <DataIO.h>
 #include <HashMap.h>
@@ -12,8 +13,9 @@
 #include <Path.h>
 #include <Referenceable.h>
 
-#include "PackageIconRepository.h"
 #include "IconTarPtr.h"
+#include "LRUCache.h"
+#include "PackageIconRepository.h"
 
 typedef BReference<IconTarPtr> IconTarPtrRef;
 
@@ -30,6 +32,7 @@ public:
 	virtual	status_t			GetIcon(const BString& pkgName, BitmapSize size,
 									BitmapRef& bitmap);
 	virtual	bool				HasAnyIcon(const BString& pkgName);
+	virtual	void				Clear();
 
 	static	void				CleanupDefaultIcon();
 
@@ -54,7 +57,7 @@ private:
 private:
 			BLocker				fLock;
 			BPositionIO*		fTarIo;
-			HashMap<HashString, BitmapRef>
+			LRUCache<HashString, BitmapRef>
 								fIconCache;
 			HashMap<HashString, IconTarPtrRef>
 								fIconTarPtrs;

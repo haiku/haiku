@@ -446,7 +446,7 @@ BLocaleRoster::GetAvailableCatalogs(BMessage*  languageList,
 		CatalogAddOnInfo* info
 			= (CatalogAddOnInfo*)fData->fCatalogAddOnInfos.ItemAt(i);
 
-		if (!info->MakeSureItsLoaded() || !info->fLanguagesFunc)
+		if (!info->fLanguagesFunc)
 			continue;
 
 		info->fLanguagesFunc(languageList, sigPattern, langPattern,

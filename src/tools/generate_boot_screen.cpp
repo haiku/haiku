@@ -21,6 +21,7 @@
 
 #include <zlib.h>
 
+#include <AutoDeleterPosix.h>
 #include <ColorQuantizer.h>
 
 // TODO: Create 4 bit palette version of these
@@ -51,23 +52,6 @@ new_line_if_required()
 	if (sOffset % 12 == 0)
 		fprintf(sOutput, "\n\t");
 }
-
-
-// #pragma mark -
-
-
-class AutoFileCloser {
-public:
-	AutoFileCloser(FILE* file)
-		: fFile(file)
-	{}
-	~AutoFileCloser()
-	{
-		fclose(fFile);
-	}
-private:
-	FILE* fFile;
-};
 
 
 // #pragma mark -
@@ -162,13 +146,11 @@ read_png(const char* filename, int& width, int& height, png_bytep*& rowPtrs,
 	png_structp& pngPtr, png_infop& infoPtr)
 {
 	char header[8];
-	FILE* input = fopen(filename, "rb");
-	if (!input)
+	FileCloser input(fopen(filename, "rb"));
+	if (!input.IsSet())
 		error("[read_png] File %s could not be opened for reading", filename);
 
-	AutoFileCloser _(input);
-
-	fread(header, 1, 8, input);
+	fread(header, 1, 8, input.Get());
 	if (png_sig_cmp((png_byte *)header, 0, 8 ))
 		error("[read_png] File %s is not recognized as a PNG file", filename);
 
@@ -187,7 +169,7 @@ read_png(const char* filename, int& width, int& height, png_bytep*& rowPtrs,
 		error("[read_png] Error during init_io");
 #endif
 
-	png_init_io(pngPtr, input);
+	png_init_io(pngPtr, input.Get());
 	png_set_sig_bytes(pngPtr, 8);
 
 	// make sure we automatically get RGB data with 8 bits per channel

@@ -243,6 +243,16 @@ memalign(size_t alignment, size_t size)
 
 
 extern "C" void*
+aligned_alloc(size_t alignment, size_t size)
+{
+	if ((size % alignment) != 0)
+		return NULL;
+
+	return sCurrentHeap->memalign(alignment, size);
+}
+
+
+extern "C" void*
 malloc(size_t size)
 {
 	return sCurrentHeap->malloc(size);

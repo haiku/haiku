@@ -10,7 +10,7 @@ Written by the Haiku Translation Kit Team	TGAView		Ditulis oleh Tim Translation 
 Targa image (%d bits RLE truecolor)	TGATranslator		Gambar targa (%d bita RLE warna-asli)
 TGA images	TGATranslator		Gambar TGA
 Version %d.%d.%d, %s	TGAView		Versi %d.%d.%d, %s
-TGATranslator Settings	TGATranslator		Pengaturan TGATranslator 
+TGATranslator Settings	TGATranslator		Pengaturan TGATranslator
 TGA image translator	TGATranslator		Penerjemah gambar TGA
 Targa image (%d bits RLE gray)	TGATranslator		Gambar targa (%d bita RLE abu-abu)
 TGA Settings	TGAMain		Pengaturan TGA

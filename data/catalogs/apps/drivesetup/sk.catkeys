@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-DriveSetup	2981446742
+1	slovak	x-vnd.Haiku-DriveSetup	1552940342
 Could not unmount partition %s.	MainWindow		Nepodarilo sa odpojiť oblasť %s.
 Mount all	MainWindow		Pripojiť všetky
 Disk	MainWindow		Disk
@@ -14,7 +14,6 @@ Unmount	MainWindow		Odpojiť
 Failed to format the partition %s!\n	MainWindow		Nepodarilo sa naformátovať oblasť %s!\n
 Partition size	CreateParametersPanel		Veľkosť oblasti
 Validation of the given parameters failed.	MainWindow		Overenie zadaných parametrov zlyhalo.
-The partition %s is currently mounted.	MainWindow		Oblasť %s je momentálne pripojená.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ste si istí, že chcete naformátovať oblasť „%s“? Pred zapísaním zmien na disk sa vás program znova spýta.
 DriveSetup	System name		Nastavenie diskových oblastí
 Mounted at	PartitionList		Pripojené na
@@ -83,7 +82,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Vyberte oblasť zo zoznamu dolu.
 Active	PartitionList		Aktívna
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ste si istí, že chcete zmazať vybranú diskovú oblasť?\n\nAk tak urobíte, všetky údaje na vybranej diskovej oblasti budú nenávratne stratené!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Nepodarilo sa naformátovať oblasť. Žiadne zmeny neboli zapísané na disk.
 The partition %s has been successfully formatted.\n	MainWindow		Oblasť %s bola úspešne naformátovaná.\n
 The partition %s is already mounted.	MainWindow		Oblasť %s je už pripojená.
 Size	PartitionList		Veľkosť

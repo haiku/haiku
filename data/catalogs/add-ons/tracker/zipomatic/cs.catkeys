@@ -1,0 +1,17 @@
+1	czech	x-vnd.haiku.zip-o-matic	2032806096
+Drop files here.	file:ZipOMaticWindow.cpp		Zde přetáhněte soubory.
+Filename: %s	file:ZipOMaticWindow.cpp		Soubor: %s
+Do you want to stop them?	file:ZipOMatic.cpp		Chcete je zastavit?
+Error creating archive	file:ZipOMaticWindow.cpp		Chyba při vytváření archivu
+Stop them	file:ZipOMatic.cpp		Zastavit
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Opravdu si přejete zastavit vytváření tohoto archívu?
+Preparing to archive	file:ZipperThread.cpp		Příprava archivace
+Let them continue	file:ZipOMatic.cpp		Nechat běžet
+Continue	file:ZipOMaticWindow.cpp		Pokračovat
+Archive created OK	file:ZipOMaticWindow.cpp		Archiv byl úspěšně vytvořen
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# soubor přidaný} few{# soubory přidány} other{# souborů přidáno}}.
+Stop	file:ZipOMaticWindow.cpp		Zastavit
+Stopped	file:ZipOMaticWindow.cpp		Zastaveno
+Archive	file:ZipperThread.cpp		Archív
+Creating archive: %s	file:ZipOMaticWindow.cpp		Vytvářím archív: %s
+You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Už běží {0, plural, one{jedna další instance} few{# další instance} other{# dalších inštancí}} Zip-O-Maticu.\n\n

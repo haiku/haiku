@@ -15,8 +15,8 @@
 #include <CheckBox.h>
 #include <GroupView.h>
 #include <Invoker.h>
-#include <StringView.h>
 #include <Slider.h>
+#include <StringView.h>
 #include <View.h>
 
 #include "InputTouchpadPref.h"

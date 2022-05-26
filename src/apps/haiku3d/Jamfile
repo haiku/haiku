@@ -6,7 +6,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) mesh ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) texture ] ;
 
 # For GCC2
-if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) < 3 {
+if $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_PACKAGING_ARCH)) = 1 {
 	SubDirC++Flags --no-warnings ;
 }
 

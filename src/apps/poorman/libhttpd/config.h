@@ -309,13 +309,6 @@
 */
 #define DESIRED_MAX_MAPPED_BYTES 1000000000
 
-/* CONFIGURE: Minimum and maximum intervals between child-process reaping,
-** in seconds.
-*/
-#define MIN_REAP_TIME 30
-#define MAX_REAP_TIME 900
-
-
 /* You almost certainly don't want to change anything below here. */
 
 /* CONFIGURE: When throttling CGI programs, we don't know how many bytes

@@ -1,5 +1,4 @@
-1	belarusian	x-vnd.Haiku-HaikuDepot	1476139633
-Uninstall	PackageManager		Выдаліць
+1	belarusian	x-vnd.Haiku-HaikuDepot	2848065911
 Uninstalled	PackageListView		Выдаленныя
 Rate package…	PackageInfoView		Ацаніць пакунак…
 <no info>	PackageInfoView		<няма інфармацыі>
@@ -8,7 +7,6 @@ Rating	PackageListView		Рэйтынг
 Active	PackageListView		Актыўны
 Ratings	PackageInfoView		Рэйтынг
 Name	PackageListView		Імя
-Fatal error	PackageManager		Фатальная памылка
 No changelog available.	PackageInfoView		Спіс змен не існуе
 Available	PackageListView		Даступна
 Click a package to view information	PackageInfoView		Клікніце пакет каб пабачыць інфарамацыю пра яго
@@ -22,11 +20,9 @@ Downloading:	PackageInfoView		Спампоўваецца:
 Close	UserLoginWindow		Закрыць
 Close	RatePackageWindow		Закрыць
 n/a	PackageInfoView		н/н
-Tools	MainWindow		Прылады
 Status	PackageListView		Стан
 Unknown	PackageListView		Невядомы
 HaikuDepot	System name		HaikuDepot
 Search terms:	FilterView		Умовы пошуку:
 Pending…	PackageListView		Чакае…
 Description	PackageListView		Апісанне
-Install	PackageManager		Усталяваць

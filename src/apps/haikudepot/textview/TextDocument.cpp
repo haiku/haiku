@@ -1,5 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -7,6 +8,7 @@
 
 #include <algorithm>
 #include <stdio.h>
+#include <vector>
 
 
 TextDocument::TextDocument()
@@ -128,7 +130,7 @@ TextDocument::Replace(int32 textOffset, int32 length, const BString& text,
 {
 	TextDocumentRef document = NormalizeText(text, characterStyle,
 		paragraphStyle);
-	if (document.Get() == NULL || document->Length() != text.CountChars())
+	if (!document.IsSet() || document->Length() != text.CountChars())
 		return B_NO_MEMORY;
 	return Replace(textOffset, length, document);
 }
@@ -139,9 +141,9 @@ TextDocument::Replace(int32 textOffset, int32 length, TextDocumentRef document)
 {
 	int32 firstParagraph = 0;
 	int32 paragraphCount = 0;
-	
+
 	// TODO: Call _NotifyTextChanging() before any change happened
-	
+
 	status_t ret = _Remove(textOffset, length, firstParagraph, paragraphCount);
 	if (ret != B_OK)
 		return ret;
@@ -164,15 +166,14 @@ TextDocument::CharacterStyleAt(int32 textOffset) const
 	const Paragraph& paragraph = ParagraphAt(textOffset, paragraphOffset);
 
 	textOffset -= paragraphOffset;
-	const TextSpanList& spans = paragraph.TextSpans();
+	int32 index;
+	int32 count = paragraph.CountTextSpans();
 
-	int32 index = 0;
-	while (index < spans.CountItems()) {
-		const TextSpan& span = spans.ItemAtFast(index);
+	for (index = 0; index < count; index++) {
+		const TextSpan& span = paragraph.TextSpanAtIndex(index);
 		if (textOffset - span.CountChars() < 0)
 			return span.Style();
 		textOffset -= span.CountChars();
-		index++;
 	}
 
 	return fDefaultCharacterStyle;
@@ -193,7 +194,14 @@ TextDocument::ParagraphStyleAt(int32 textOffset) const
 int32
 TextDocument::CountParagraphs() const
 {
-	return fParagraphs.CountItems();
+	return fParagraphs.size();
+}
+
+
+const Paragraph&
+TextDocument::ParagraphAtIndex(int32 index) const
+{
+	return fParagraphs[index];
 }
 
 
@@ -204,9 +212,9 @@ TextDocument::ParagraphIndexFor(int32 textOffset, int32& paragraphOffset) const
 	// that knew there text offset in the document.
 	int32 textLength = 0;
 	paragraphOffset = 0;
-	int32 count = fParagraphs.CountItems();
+	int32 count = fParagraphs.size();
 	for (int32 i = 0; i < count; i++) {
-		const Paragraph& paragraph = fParagraphs.ItemAtFast(i);
+		const Paragraph& paragraph = fParagraphs[i];
 		int32 paragraphLength = paragraph.Length();
 		textLength += paragraphLength;
 		if (textLength > textOffset
@@ -224,7 +232,7 @@ TextDocument::ParagraphAt(int32 textOffset, int32& paragraphOffset) const
 {
 	int32 index = ParagraphIndexFor(textOffset, paragraphOffset);
 	if (index >= 0)
-		return fParagraphs.ItemAtFast(index);
+		return fParagraphs[index];
 
 	return fEmptyLastParagraph;
 }
@@ -233,8 +241,8 @@ TextDocument::ParagraphAt(int32 textOffset, int32& paragraphOffset) const
 const Paragraph&
 TextDocument::ParagraphAt(int32 index) const
 {
-	if (index >= 0 && index < fParagraphs.CountItems())
-		return fParagraphs.ItemAtFast(index);
+	if (index >= 0 && index < static_cast<int32>(fParagraphs.size()))
+		return fParagraphs[index];
 	return fEmptyLastParagraph;
 }
 
@@ -242,7 +250,15 @@ TextDocument::ParagraphAt(int32 index) const
 bool
 TextDocument::Append(const Paragraph& paragraph)
 {
-	return fParagraphs.Add(paragraph);
+	try {
+		fParagraphs.push_back(paragraph);
+	}
+	catch (std::bad_alloc& ba) {
+		fprintf(stderr, "bad_alloc when adding a paragraph to a text "
+			"document\n");
+		return false;
+	}
+	return true;
 }
 
 
@@ -252,9 +268,9 @@ TextDocument::Length() const
 	// TODO: Could be O(1) if the Paragraphs were wrapped in classes that
 	// knew their text offset in the document.
 	int32 textLength = 0;
-	int32 count = fParagraphs.CountItems();
+	int32 count = fParagraphs.size();
 	for (int32 i = 0; i < count; i++) {
-		const Paragraph& paragraph = fParagraphs.ItemAtFast(i);
+		const Paragraph& paragraph = fParagraphs[i];
 		textLength += paragraph.Length();
 	}
 	return textLength;
@@ -276,9 +292,9 @@ TextDocument::Text(int32 start, int32 length) const
 
 	BString text;
 
-	int32 count = fParagraphs.CountItems();
+	int32 count = fParagraphs.size();
 	for (int32 i = 0; i < count; i++) {
-		const Paragraph& paragraph = fParagraphs.ItemAtFast(i);
+		const Paragraph& paragraph = fParagraphs[i];
 		int32 paragraphLength = paragraph.Length();
 		if (paragraphLength == 0)
 			continue;
@@ -312,15 +328,15 @@ TextDocument::SubDocument(int32 start, int32 length) const
 	TextDocumentRef result(new(std::nothrow) TextDocument(
 		fDefaultCharacterStyle, fEmptyLastParagraph.Style()), true);
 
-	if (result.Get() == NULL)
+	if (!result.IsSet())
 		return result;
 
 	if (start < 0)
 		start = 0;
 
-	int32 count = fParagraphs.CountItems();
+	int32 count = fParagraphs.size();
 	for (int32 i = 0; i < count; i++) {
-		const Paragraph& paragraph = fParagraphs.ItemAtFast(i);
+		const Paragraph& paragraph = fParagraphs[i];
 		int32 paragraphLength = paragraph.Length();
 		if (paragraphLength == 0)
 			continue;
@@ -354,14 +370,14 @@ TextDocument::SubDocument(int32 start, int32 length) const
 void
 TextDocument::PrintToStream() const
 {
-	int32 paragraphCount = fParagraphs.CountItems();
+	int32 paragraphCount = fParagraphs.size();
 	if (paragraphCount == 0) {
 		printf("<document/>\n");
 		return;
 	}
 	printf("<document>\n");
 	for (int32 i = 0; i < paragraphCount; i++) {
-		fParagraphs.ItemAtFast(i).PrintToStream();
+		fParagraphs[i].PrintToStream();
 	}
 	printf("</document>\n");
 }
@@ -373,7 +389,7 @@ TextDocument::NormalizeText(const BString& text,
 {
 	TextDocumentRef document(new(std::nothrow) TextDocument(characterStyle,
 			paragraphStyle), true);
-	if (document.Get() == NULL)
+	if (!document.IsSet())
 		throw B_NO_MEMORY;
 
 	Paragraph paragraph(paragraphStyle);
@@ -412,28 +428,48 @@ TextDocument::NormalizeText(const BString& text,
 bool
 TextDocument::AddListener(TextListenerRef listener)
 {
-	return fTextListeners.Add(listener);
+	try {
+		fTextListeners.push_back(listener);
+	}
+	catch (std::bad_alloc& ba) {
+		fprintf(stderr, "bad_alloc when adding a listener to a text "
+			"document\n");
+		return false;
+	}
+	return true;
 }
 
 
 bool
 TextDocument::RemoveListener(TextListenerRef listener)
 {
-	return fTextListeners.Remove(listener);
+	fTextListeners.erase(std::remove(fTextListeners.begin(), fTextListeners.end(),
+		listener), fTextListeners.end());
+	return true;
 }
 
 
 bool
 TextDocument::AddUndoListener(UndoableEditListenerRef listener)
 {
-	return fUndoListeners.Add(listener);
+	try {
+		fUndoListeners.push_back(listener);
+	}
+	catch (std::bad_alloc& ba) {
+		fprintf(stderr, "bad_alloc when adding an undo listener to a text "
+			"document\n");
+		return false;
+	}
+	return true;
 }
 
 
 bool
 TextDocument::RemoveUndoListener(UndoableEditListenerRef listener)
 {
-	return fUndoListeners.Remove(listener);
+	fUndoListeners.erase(std::remove(fUndoListeners.begin(), fUndoListeners.end(),
+		listener), fUndoListeners.end());
+	return true;
 }
 
 
@@ -468,10 +504,10 @@ TextDocument::_Insert(int32 textOffset, TextDocumentRef document,
 		Paragraph paragraph2(document->ParagraphAt(
 			document->CountParagraphs() - 1).Style());
 		{
-			const TextSpanList& textSpans = ParagraphAt(index).TextSpans();
-			int32 spanCount = textSpans.CountItems();
+			const Paragraph& paragraphAtIndex = ParagraphAt(index);
+			int32 spanCount = paragraphAtIndex.CountTextSpans();
 			for (int32 i = 0; i < spanCount; i++) {
-				const TextSpan& span = textSpans.ItemAtFast(i);
+				const TextSpan& span = paragraphAtIndex.TextSpanAtIndex(i);
 				int32 spanLength = span.CountChars();
 				if (textOffset >= spanLength) {
 					if (!paragraph1.Append(span))
@@ -493,33 +529,41 @@ TextDocument::_Insert(int32 textOffset, TextDocumentRef document,
 			}
 		}
 
-		fParagraphs.Remove(index);
+		fParagraphs.erase(fParagraphs.begin() + index);
 
 		// Append first paragraph in other document to first part of
 		// paragraph at insert position
 		{
 			const Paragraph& otherParagraph = document->ParagraphAt(0);
-			const TextSpanList& textSpans = otherParagraph.TextSpans();
-			int32 spanCount = textSpans.CountItems();
+			int32 spanCount = otherParagraph.CountTextSpans();
 			for (int32 i = 0; i < spanCount; i++) {
-				const TextSpan& span = textSpans.ItemAtFast(i);
+				const TextSpan& span = otherParagraph.TextSpanAtIndex(i);
 				// TODO: Import/map CharacterStyles
 				if (!paragraph1.Append(span))
 					return B_NO_MEMORY;
 			}
 		}
 
-		// Insert the first paragraph-part again to the document		
-		if (!fParagraphs.Add(paragraph1, index))
+		// Insert the first paragraph-part again to the document
+		try {
+			fParagraphs.insert(fParagraphs.begin() + index, paragraph1);
+		}
+		catch (std::bad_alloc& ba) {
 			return B_NO_MEMORY;
+		}
 		paragraphCount++;
 
 		// Insert the other document's paragraph save for the last one
 		for (int32 i = 1; i < document->CountParagraphs() - 1; i++) {
 			const Paragraph& otherParagraph = document->ParagraphAt(i);
 			// TODO: Import/map CharacterStyles and ParagraphStyle
-			if (!fParagraphs.Add(otherParagraph, ++index))
+			index++;
+			try {
+				fParagraphs.insert(fParagraphs.begin() + index, otherParagraph);
+			}
+			catch (std::bad_alloc& ba) {
 				return B_NO_MEMORY;
+			}
 			paragraphCount++;
 		}
 
@@ -528,13 +572,17 @@ TextDocument::_Insert(int32 textOffset, TextDocumentRef document,
 			const Paragraph& otherParagraph = document->ParagraphAt(lastIndex);
 			if (otherParagraph.EndsWith("\n")) {
 				// TODO: Import/map CharacterStyles and ParagraphStyle
-				if (!fParagraphs.Add(otherParagraph, ++index))
+				index++;
+				try {
+					fParagraphs.insert(fParagraphs.begin() + index, otherParagraph);
+				}
+				catch (std::bad_alloc& ba) {
 					return B_NO_MEMORY;
+				}
 			} else {
-				const TextSpanList& textSpans = otherParagraph.TextSpans();
-				int32 spanCount = textSpans.CountItems();
+				int32 spanCount = otherParagraph.CountTextSpans();
 				for (int32 i = 0; i < spanCount; i++) {
-					const TextSpan& span = textSpans.ItemAtFast(i);
+					const TextSpan& span = otherParagraph.TextSpanAtIndex(i);
 					// TODO: Import/map CharacterStyles
 					if (!paragraph2.Prepend(span))
 						return B_NO_MEMORY;
@@ -548,31 +596,33 @@ TextDocument::_Insert(int32 textOffset, TextDocumentRef document,
 			// if its empty. This handles the case of inserting a
 			// line-break at the end of the document. It than needs to
 			// have a new, empty paragraph at the end.
-			const TextSpanList& spans = paragraph1.TextSpans();
-			const TextSpan& span = spans.LastItem();
+			const int32 indexLastSpan = paragraph1.CountTextSpans() - 1;
+			const TextSpan& span = paragraph1.TextSpanAtIndex(indexLastSpan);
 			if (!paragraph2.Append(TextSpan("", span.Style())))
 				return B_NO_MEMORY;
 		}
 
-		if (!fParagraphs.Add(paragraph2, ++index))
+		index++;
+		try {
+			fParagraphs.insert(fParagraphs.begin() + index, paragraph2);
+		}
+		catch (std::bad_alloc& ba) {
 			return B_NO_MEMORY;
+		}
 
 		paragraphCount++;
 	} else {
 		Paragraph paragraph(ParagraphAt(index));
 		const Paragraph& otherParagraph = document->ParagraphAt(0);
 
-		const TextSpanList& textSpans = otherParagraph.TextSpans();
-		int32 spanCount = textSpans.CountItems();
+		int32 spanCount = otherParagraph.CountTextSpans();
 		for (int32 i = 0; i < spanCount; i++) {
-			const TextSpan& span = textSpans.ItemAtFast(i);
+			const TextSpan& span = otherParagraph.TextSpanAtIndex(i);
 			paragraph.Insert(textOffset, span);
 			textOffset += span.CountChars();
 		}
 
-		if (!fParagraphs.Replace(index, paragraph))
-			return B_NO_MEMORY;
-
+		fParagraphs[index] = paragraph;
 		paragraphCount++;
 	}
 
@@ -614,23 +664,23 @@ TextDocument::_Remove(int32 textOffset, int32 length, int32& index,
 	}
 
 	if (textOffset == paragraphLength && length == 0
-		&& index + 1 < fParagraphs.CountItems()) {
+		&& index + 1 < static_cast<int32>(fParagraphs.size())) {
 		// Line break between paragraphs got removed. Shift the next
 		// paragraph's text spans into the resulting one.
 
-		const TextSpanList&	textSpans = ParagraphAt(index + 1).TextSpans();
-		int32 spanCount = textSpans.CountItems();
+		const Paragraph& paragraph = ParagraphAt(index + 1);
+		int32 spanCount = paragraph.CountTextSpans();
 		for (int32 i = 0; i < spanCount; i++) {
-			const TextSpan& span = textSpans.ItemAtFast(i);
+			const TextSpan& span = paragraph.TextSpanAtIndex(i);
 			resultParagraph.Append(span);
 		}
-		fParagraphs.Remove(index + 1);
+		fParagraphs.erase(fParagraphs.begin() + (index + 1));
 		paragraphCount++;
 	}
 
 	textOffset = 0;
 
-	while (length > 0 && index + 1 < fParagraphs.CountItems()) {
+	while (length > 0 && index + 1 < static_cast<int32>(fParagraphs.size())) {
 		paragraphCount++;
 		const Paragraph& paragraph = ParagraphAt(index + 1);
 		paragraphLength = paragraph.Length();
@@ -639,21 +689,20 @@ TextDocument::_Remove(int32 textOffset, int32 length, int32& index,
 		// transfered to the result parahraph.
 		if (length >= paragraphLength) {
 			length -= paragraphLength;
-			fParagraphs.Remove(index);
+			fParagraphs.erase(fParagraphs.begin() + index);
 		} else {
 			// Last paragraph reached
 			int32 removedLength = std::min(length, paragraphLength);
 			Paragraph newParagraph(paragraph);
-			fParagraphs.Remove(index + 1);
+			fParagraphs.erase(fParagraphs.begin() + (index + 1));
 
 			if (!newParagraph.Remove(0, removedLength))
 				return B_NO_MEMORY;
 
 			// Transfer remaining spans to resultParagraph
-			const TextSpanList&	textSpans = newParagraph.TextSpans();
-			int32 spanCount = textSpans.CountItems();
+			int32 spanCount = newParagraph.CountTextSpans();
 			for (int32 i = 0; i < spanCount; i++) {
-				const TextSpan& span = textSpans.ItemAtFast(i);
+				const TextSpan& span = newParagraph.TextSpanAtIndex(i);
 				resultParagraph.Append(span);
 			}
 
@@ -661,7 +710,7 @@ TextDocument::_Remove(int32 textOffset, int32 length, int32& index,
 		}
 	}
 
-	fParagraphs.Replace(index, resultParagraph);
+	fParagraphs[index] = resultParagraph;
 
 	return B_OK;
 }
@@ -675,11 +724,12 @@ TextDocument::_NotifyTextChanging(TextChangingEvent& event) const
 {
 	// Copy listener list to have a stable list in case listeners
 	// are added/removed from within the notification hook.
-	TextListenerList listeners(fTextListeners);
-	int32 count = listeners.CountItems();
+	std::vector<TextListenerRef> listeners(fTextListeners);
+
+	int32 count = listeners.size();
 	for (int32 i = 0; i < count; i++) {
-		const TextListenerRef& listener = listeners.ItemAtFast(i);
-		if (listener.Get() == NULL)
+		const TextListenerRef& listener = listeners[i];
+		if (!listener.IsSet())
 			continue;
 		listener->TextChanging(event);
 		if (event.IsCanceled())
@@ -693,11 +743,11 @@ TextDocument::_NotifyTextChanged(const TextChangedEvent& event) const
 {
 	// Copy listener list to have a stable list in case listeners
 	// are added/removed from within the notification hook.
-	TextListenerList listeners(fTextListeners);
-	int32 count = listeners.CountItems();
+	std::vector<TextListenerRef> listeners(fTextListeners);
+	int32 count = listeners.size();
 	for (int32 i = 0; i < count; i++) {
-		const TextListenerRef& listener = listeners.ItemAtFast(i);
-		if (listener.Get() == NULL)
+		const TextListenerRef& listener = listeners[i];
+		if (!listener.IsSet())
 			continue;
 		listener->TextChanged(event);
 	}
@@ -709,11 +759,11 @@ TextDocument::_NotifyUndoableEditHappened(const UndoableEditRef& edit) const
 {
 	// Copy listener list to have a stable list in case listeners
 	// are added/removed from within the notification hook.
-	UndoListenerList listeners(fUndoListeners);
-	int32 count = listeners.CountItems();
+	std::vector<UndoableEditListenerRef> listeners(fUndoListeners);
+	int32 count = listeners.size();
 	for (int32 i = 0; i < count; i++) {
-		const UndoableEditListenerRef& listener = listeners.ItemAtFast(i);
-		if (listener.Get() == NULL)
+		const UndoableEditListenerRef& listener = listeners[i];
+		if (!listener.IsSet())
 			continue;
 		listener->UndoableEditHappened(this, edit);
 	}

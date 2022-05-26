@@ -28,6 +28,7 @@
 #	undef _KERNEL_MODE
 #endif
 
+#include <BeBuild.h>
 #include <directories.h>
 #include <driver_settings.h>
 #include <FindDirectory.h>
@@ -954,8 +955,11 @@ get_driver_settings(void *handle)
 }
 
 
-status_t
-delete_driver_settings(void *_handle)
-{
-	return unload_driver_settings(_handle);
-}
+#if defined(HAIKU_TARGET_PLATFORM_HAIKU) \
+	&& (defined(__i386__) || defined(__x86_64__))
+
+// Obsolete function, use unload_driver_settings instead. Introduced by
+// accident in hrev3530 (2003) and present in public headers for a long time.
+B_DEFINE_WEAK_ALIAS(unload_driver_settings, delete_driver_settings);
+
+#endif

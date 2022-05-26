@@ -19,6 +19,7 @@
 #include <Select.h>
 
 #include <AutoDeleter.h>
+#include <StackOrHeapArray.h>
 
 #include <fs/fd.h>
 #include <port.h>
@@ -475,15 +476,21 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	// set new signal mask
 	sigset_t oldSigMask;
-	if (sigMask != NULL)
+	if (sigMask != NULL) {
 		sigprocmask(SIG_SETMASK, sigMask, &oldSigMask);
+		if (!kernel) {
+			Thread *thread = thread_get_current_thread();
+			thread->old_sig_block_mask = oldSigMask;
+			thread->flags |= THREAD_FLAGS_OLD_SIGMASK;
+		}
+	}
 
 	// wait for something to happen
 	status = acquire_sem_etc(sync->sem, 1,
 		B_CAN_INTERRUPT | (timeout >= 0 ? B_ABSOLUTE_TIMEOUT : 0), timeout);
 
 	// restore the old signal mask
-	if (sigMask != NULL)
+	if (sigMask != NULL && kernel)
 		sigprocmask(SIG_SETMASK, &oldSigMask, NULL);
 
 	PRINT(("common_select(): acquire_sem_etc() returned: %lx\n", status));
@@ -544,7 +551,8 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 
 static int
-common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
+common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout,
+	const sigset_t *sigMask, bool kernel)
 {
 	// allocate sync object
 	select_sync* sync;
@@ -574,10 +582,25 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 		}
 	}
 
+	// set new signal mask
+	sigset_t oldSigMask;
+	if (sigMask != NULL) {
+		sigprocmask(SIG_SETMASK, sigMask, &oldSigMask);
+		if (!kernel) {
+			Thread *thread = thread_get_current_thread();
+			thread->old_sig_block_mask = oldSigMask;
+			thread->flags |= THREAD_FLAGS_OLD_SIGMASK;
+		}
+	}
+
 	if (!invalid) {
 		status = acquire_sem_etc(sync->sem, 1,
 			B_CAN_INTERRUPT | (timeout >= 0 ? B_ABSOLUTE_TIMEOUT : 0), timeout);
 	}
+
+	// restore the old signal mask
+	if (sigMask != NULL && kernel)
+		sigprocmask(SIG_SETMASK, &oldSigMask, NULL);
 
 	// deselect file descriptors
 
@@ -886,12 +909,13 @@ _kern_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 
 ssize_t
-_kern_poll(struct pollfd *fds, int numFDs, bigtime_t timeout)
+_kern_poll(struct pollfd *fds, int numFDs, bigtime_t timeout,
+	const sigset_t *sigMask)
 {
 	if (timeout >= 0)
 		timeout += system_time();
 
-	return common_poll(fds, numFDs, timeout, true);
+	return common_poll(fds, numFDs, timeout, sigMask, true);
 }
 
 
@@ -922,12 +946,15 @@ ssize_t
 _user_select(int numFDs, fd_set *userReadSet, fd_set *userWriteSet,
 	fd_set *userErrorSet, bigtime_t timeout, const sigset_t *userSigMask)
 {
-	fd_set *readSet = NULL, *writeSet = NULL, *errorSet = NULL;
 	uint32 bytes = _howmany(numFDs, NFDBITS) * sizeof(fd_mask);
-	sigset_t sigMask;
 	int result;
 
-	syscall_restart_handle_timeout_pre(timeout);
+	if (timeout >= 0) {
+		timeout += system_time();
+		// deal with overflow
+		if (timeout < 0)
+			timeout = B_INFINITE_TIMEOUT;
+	}
 
 	if (numFDs < 0 || !check_max_fds(numFDs))
 		return B_BAD_VALUE;
@@ -940,45 +967,43 @@ _user_select(int numFDs, fd_set *userReadSet, fd_set *userWriteSet,
 
 	// copy parameters
 
-	if (userReadSet != NULL) {
-		readSet = (fd_set *)malloc(bytes);
-		if (readSet == NULL)
-			return B_NO_MEMORY;
+	BStackOrHeapArray<char, 128> sets(bytes * (
+		((userReadSet != NULL) ? 1 : 0) +
+		((userWriteSet != NULL) ? 1 : 0) +
+		((userErrorSet != NULL) ? 1 : 0)));
+	if (!sets.IsValid())
+		return B_NO_MEMORY;
 
-		if (user_memcpy(readSet, userReadSet, bytes) < B_OK) {
-			result = B_BAD_ADDRESS;
-			goto err;
-		}
+	char *nextSet = &sets[0];
+	fd_set *readSet = NULL, *writeSet = NULL, *errorSet = NULL;
+
+	if (userReadSet != NULL) {
+		readSet = (fd_set *)nextSet;
+		nextSet += bytes;
+
+		if (user_memcpy(readSet, userReadSet, bytes) != B_OK)
+			return B_BAD_ADDRESS;
 	}
 
 	if (userWriteSet != NULL) {
-		writeSet = (fd_set *)malloc(bytes);
-		if (writeSet == NULL) {
-			result = B_NO_MEMORY;
-			goto err;
-		}
-		if (user_memcpy(writeSet, userWriteSet, bytes) < B_OK) {
-			result = B_BAD_ADDRESS;
-			goto err;
-		}
+		writeSet = (fd_set *)nextSet;
+		nextSet += bytes;
+
+		if (user_memcpy(writeSet, userWriteSet, bytes) != B_OK)
+			return B_BAD_ADDRESS;
 	}
 
 	if (userErrorSet != NULL) {
-		errorSet = (fd_set *)malloc(bytes);
-		if (errorSet == NULL) {
-			result = B_NO_MEMORY;
-			goto err;
-		}
-		if (user_memcpy(errorSet, userErrorSet, bytes) < B_OK) {
-			result = B_BAD_ADDRESS;
-			goto err;
-		}
+		errorSet = (fd_set *)nextSet;
+
+		if (user_memcpy(errorSet, userErrorSet, bytes) != B_OK)
+			return B_BAD_ADDRESS;
 	}
 
+	sigset_t sigMask;
 	if (userSigMask != NULL
-		&& user_memcpy(&sigMask, userSigMask, sizeof(sigMask)) < B_OK) {
-		result = B_BAD_ADDRESS;
-		goto err;
+			&& user_memcpy(&sigMask, userSigMask, sizeof(sigMask)) != B_OK) {
+		return B_BAD_ADDRESS;
 	}
 
 	result = common_select(numFDs, readSet, writeSet, errorSet, timeout,
@@ -994,64 +1019,54 @@ _user_select(int numFDs, fd_set *userReadSet, fd_set *userWriteSet,
 			|| (errorSet != NULL
 				&& user_memcpy(userErrorSet, errorSet, bytes) < B_OK))) {
 		result = B_BAD_ADDRESS;
-	} else
-		syscall_restart_handle_timeout_post(result, timeout);
-
-err:
-	free(readSet);
-	free(writeSet);
-	free(errorSet);
+	}
 
 	return result;
 }
 
 
 ssize_t
-_user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout)
+_user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout,
+	const sigset_t *userSigMask)
 {
-	struct pollfd *fds;
-	size_t bytes;
-	int result;
-
-	syscall_restart_handle_timeout_pre(timeout);
-
-	if (numFDs < 0)
-		return B_BAD_VALUE;
-
-	if (numFDs == 0) {
-		// special case: no FDs
-		result = common_poll(NULL, 0, timeout, false);
-		return result < 0
-			? syscall_restart_handle_timeout_post(result, timeout) : result;
+	if (timeout >= 0) {
+		timeout += system_time();
+		// deal with overflow
+		if (timeout < 0)
+			timeout = B_INFINITE_TIMEOUT;
 	}
 
-	if (!check_max_fds(numFDs))
+	if (numFDs < 0 || !check_max_fds(numFDs))
 		return B_BAD_VALUE;
 
-	// copy parameters
-	if (userfds == NULL || !IS_USER_ADDRESS(userfds))
-		return B_BAD_ADDRESS;
-
-	fds = (struct pollfd *)malloc(bytes = numFDs * sizeof(struct pollfd));
-	if (fds == NULL)
+	BStackOrHeapArray<struct pollfd, 16> fds(numFDs);
+	if (!fds.IsValid())
 		return B_NO_MEMORY;
 
-	if (user_memcpy(fds, userfds, bytes) < B_OK) {
-		result = B_BAD_ADDRESS;
-		goto err;
+	const size_t bytes = numFDs * sizeof(struct pollfd);
+	if (numFDs != 0) {
+		if (userfds == NULL || !IS_USER_ADDRESS(userfds))
+			return B_BAD_ADDRESS;
+
+		if (user_memcpy(fds, userfds, bytes) < B_OK)
+			return B_BAD_ADDRESS;
 	}
 
-	result = common_poll(fds, numFDs, timeout, false);
+	sigset_t sigMask;
+	if (userSigMask != NULL
+		&& (!IS_USER_ADDRESS(userSigMask)
+			|| user_memcpy(&sigMask, userSigMask, sizeof(sigMask)) < B_OK)) {
+		return B_BAD_ADDRESS;
+	}
+
+	status_t result = common_poll(fds, numFDs, timeout,
+		userSigMask != NULL ? &sigMask : NULL, false);
 
 	// copy back results
 	if (numFDs > 0 && user_memcpy(userfds, fds, bytes) != 0) {
 		if (result >= 0)
 			result = B_BAD_ADDRESS;
-	} else
-		syscall_restart_handle_timeout_post(result, timeout);
-
-err:
-	free(fds);
+	}
 
 	return result;
 }
@@ -1079,27 +1094,21 @@ _user_wait_for_objects(object_wait_info* userInfos, int numInfos, uint32 flags,
 	if (userInfos == NULL || !IS_USER_ADDRESS(userInfos))
 		return B_BAD_ADDRESS;
 
-	int bytes = sizeof(object_wait_info) * numInfos;
-	object_wait_info* infos = (object_wait_info*)malloc(bytes);
-	if (infos == NULL)
+	BStackOrHeapArray<object_wait_info, 16> infos(numInfos);
+	if (!infos.IsValid())
 		return B_NO_MEMORY;
+	const int bytes = sizeof(object_wait_info) * numInfos;
 
-	// copy parameters to kernel space, call the function, and copy the results
-	// back
-	ssize_t result;
-	if (user_memcpy(infos, userInfos, bytes) == B_OK) {
-		result = common_wait_for_objects(infos, numInfos, flags, timeout,
-			false);
+	if (user_memcpy(infos, userInfos, bytes) != B_OK)
+		return B_BAD_ADDRESS;
 
-		if (result >= 0 && user_memcpy(userInfos, infos, bytes) != B_OK) {
-			result = B_BAD_ADDRESS;
-		} else
-			syscall_restart_handle_timeout_post(result, timeout);
-	} else
+	ssize_t result = common_wait_for_objects(infos, numInfos, flags, timeout, false);
+
+	if (result >= 0 && user_memcpy(userInfos, infos, bytes) != B_OK) {
 		result = B_BAD_ADDRESS;
-
-	free(infos);
+	} else {
+		syscall_restart_handle_timeout_post(result, timeout);
+	}
 
 	return result;
 }
-

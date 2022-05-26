@@ -8,6 +8,7 @@
  */
 
 #include <signal.h>
+#define _KERNEL_MODE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -143,7 +144,7 @@ dump_block(const char *buffer, int size, const char *prefix)
 	for (i = 0; i < size;) {
 		int start = i;
 
-		dprintf(prefix);
+		dprintf("%s", prefix);
 		for (; i < start + DUMPED_BLOCK_SIZE; i++) {
 			if (!(i % 4))
 				dprintf(" ");

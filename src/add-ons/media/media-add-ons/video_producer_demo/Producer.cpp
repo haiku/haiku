@@ -219,7 +219,8 @@ VideoProducer::HandleEvent(const media_timed_event *event,
 		case BTimedEventQueue::B_DATA_STATUS:
 		case BTimedEventQueue::B_PARAMETER:
 		default:
-			PRINTF(-1, ("HandleEvent: Unhandled event -- %lx\n", event->type));
+			PRINTF(-1, ("HandleEvent: Unhandled event -- %" B_PRIx32 "\n",
+				event->type));
 			break;
 	}
 }
@@ -354,7 +355,7 @@ VideoProducer::PrepareToConnect(const media_source &source,
 		const media_destination &destination, media_format *format,
 		media_source *out_source, char *out_name)
 {
-	PRINTF(1, ("PrepareToConnect() %ldx%ld\n", \
+	PRINTF(1, ("PrepareToConnect() %" B_PRIu32 "x%" B_PRIu32 "\n", \
 			format->u.raw_video.display.line_width, \
 			format->u.raw_video.display.line_count));
 
@@ -396,7 +397,7 @@ VideoProducer::Connect(status_t error, const media_source &source,
 		const media_destination &destination, const media_format &format,
 		char *io_name)
 {
-	PRINTF(1, ("Connect() %ldx%ld\n", \
+	PRINTF(1, ("Connect() %" B_PRIu32 "x%" B_PRIu32 "\n", \
 			format.u.raw_video.display.line_width, \
 			format.u.raw_video.display.line_count));
 
@@ -439,8 +440,8 @@ VideoProducer::Connect(status_t error, const media_source &source,
 		return;
 	}
 	bigtime_t now = system_time();
-	for (int y = 0; y < (int)fConnectedFormat.display.line_count; y++)
-		for (int x = 0; x < (int)fConnectedFormat.display.line_width; x++)
+	for (uint32 y = 0; y < fConnectedFormat.display.line_count; y++)
+		for (uint32 x = 0; x < fConnectedFormat.display.line_width; x++)
 			*(p++) = ((((x+y)^0^x)+f) & 0xff) * (0x01010101 & fColor);
 	fProcessingLatency = system_time() - now;
 	free(buffer);
@@ -577,7 +578,7 @@ VideoProducer::HandleStart(bigtime_t performance_time)
 {
 	/* Start producing frames, even if the output hasn't been connected yet. */
 
-	PRINTF(1, ("HandleStart(%Ld)\n", performance_time));
+	PRINTF(1, ("HandleStart(%" B_PRIdBIGTIME ")\n", performance_time));
 
 	if (fRunning) {
 		PRINTF(-1, ("HandleStart: Node already started\n"));
@@ -723,8 +724,8 @@ VideoProducer::FrameGenerator()
 		if (fColor == 0xff000000) {
 			// display a gray block that moves
 			uint32 *p = (uint32 *)buffer->Data();
-			for (int y = 0; y < (int)fConnectedFormat.display.line_count; y++)
-				for (int x = 0; x < (int)fConnectedFormat.display.line_width; x++) {
+			for (uint32 y = 0; y < fConnectedFormat.display.line_count; y++)
+				for (uint32 x = 0; x < fConnectedFormat.display.line_width; x++) {
 					if (x > (fFrame & 0xff) && x < (fFrame & 0xff) + 60 && y > 90 && y < 150) {
 						*(p++) = 0xff777777;
 					} else {
@@ -735,8 +736,8 @@ VideoProducer::FrameGenerator()
 
 			/* Fill in a pattern */
 			uint32 *p = (uint32 *)buffer->Data();
-			for (int y = 0; y < (int)fConnectedFormat.display.line_count; y++)
-				for (int x = 0; x < (int)fConnectedFormat.display.line_width; x++)
+			for (uint32 y = 0; y < fConnectedFormat.display.line_count; y++)
+				for (uint32 x = 0; x < fConnectedFormat.display.line_width; x++)
 					*(p++) = ((((x+y)^0^x)+fFrame) & 0xff) * (0x01010101 & fColor);
 		}
 		

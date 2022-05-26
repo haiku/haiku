@@ -1,6 +1,7 @@
-1	danish	x-vnd.Haiku-CodyCam	2593355250
-destination directory expected	CodyCam		destination folder forventet
+1	danish	x-vnd.Haiku-CodyCam	12021044
+destination directory expected	CodyCam		destinationsmappe forventet
 reply: '%s'\n	SftpClient		svar: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <udeladt>  (rigtige adgangskode sendt)
 JPEG image	CodyCam		JPEG billede
 Remote host has closed the connection.\n	FtpClient		Modpart har lukket forbindelsen.\n
 image file format expected	CodyCam		billedfilformat forventet
@@ -37,13 +38,12 @@ Send to…	CodyCam		Send til…
 Password:	CodyCam		Adgangskode:
 still image filename expected	CodyCam		billedfilnavn forventet
 File name:	CodyCam		Filnavn:
-Directory:	CodyCam		Folder:
+Directory:	CodyCam		Mappe:
 Error setting type of output file	VideoConsumer.cpp		Fejl ved indstilling af typen på outputfil
 Locking the window	VideoConsumer.cpp		Låser vinduet
 Cannot find an available video stream	CodyCam		Kunne ikke finde tilgængelig video strøm
 Upload…	VideoConsumer.cpp		Upload…
 password expected	CodyCam		adgangskode forventet
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <skjult>  (rigtige adgangskode sendt)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Output
 server address expected	CodyCam		server adresse forventet
@@ -66,8 +66,8 @@ Local	CodyCam		Lokal
 Stop video	CodyCam		Stop video
 Last Capture: 	VideoConsumer.cpp		Sidste optagelse: 
 Rate:	CodyCam		Frekvens:
-Couldn't find requested directory on server	VideoConsumer.cpp		Kunne ikke finde folder på serveren
-Cannot find the media roster	CodyCam		Kan ikke finde medie listen
+Couldn't find requested directory on server	VideoConsumer.cpp		Kunne ikke finde mappe på serveren
+Cannot find the media roster	CodyCam		Kan ikke finde medielisten
 Type:	CodyCam		Type:
 Rename failed	VideoConsumer.cpp		Omdøbning mislykkedes
 unrecognized upload client specified	CodyCam		ikke identificeret upload klient specificeret

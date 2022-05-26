@@ -6,12 +6,13 @@ rule Link
 {
 	# Note: RESFILES must be set before invocation.
 
+	local architecture = [ on $(1) return $(TARGET_PACKAGING_ARCH) ] ;
 	if [ on $(1) return $(PLATFORM) ] = host {
 		LINK on $(1) = $(HOST_LINK) ;
 	 	LINKFLAGS on $(1) = $(HOST_LINKFLAGS) [ on $(1) return $(LINKFLAGS) ] ;
 	} else {
-		LINK on $(1) = $(TARGET_LINK_$(TARGET_PACKAGING_ARCH)) ;
-	 	LINKFLAGS on $(1) = $(TARGET_LINKFLAGS_$(TARGET_PACKAGING_ARCH))
+		LINK on $(1) = $(TARGET_LINK_$(architecture)) ;
+		LINKFLAGS on $(1) = $(TARGET_LINKFLAGS_$(architecture))
 			[ on $(1) return $(LINKFLAGS) ] ;
 	}
 
@@ -172,38 +173,41 @@ rule Object
 
 rule As
 {
-	local flags ;
-	local includesSeparator ;
-	local localIncludesOption ;
-	local systemIncludesOption ;
-	if [ on $(1) return $(PLATFORM) ] = host {
-		flags = [ on $(1) return $(HOST_ASFLAGS) $(ASFLAGS) ] ;
-
-		CC on $(1) = $(HOST_CC) ;
-
-		includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
-		localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
-		systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
-	} else {
-		flags = [ on $(1) return $(TARGET_ASFLAGS_$(TARGET_PACKAGING_ARCH))
-			$(ASFLAGS) ] ;
-
-		CC on $(1) = $(TARGET_CC_$(TARGET_PACKAGING_ARCH)) ;
-
-		includesSeparator
-			= $(TARGET_INCLUDES_SEPARATOR_$(TARGET_PACKAGING_ARCH)) ;
-		localIncludesOption
-			= $(TARGET_LOCAL_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
-		systemIncludesOption
-			= $(TARGET_SYSTEM_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
-	}
-
 	Depends $(<) : $(>) [ on $(1) return $(PLATFORM) ] ;
-	ASFLAGS on $(<) += $(flags) $(SUBDIRASFLAGS) ;
-	ASHDRS on $(<) = [ on $(<) FIncludes $(HDRS) : $(localIncludesOption) ]
-		$(includesSeparator)
-		[ on $(<) FSysIncludes $(SYSHDRS) : $(systemIncludesOption) ] ;
-	ASDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
+
+	on $(1) {
+		local flags ;
+		local includesSeparator ;
+		local localIncludesOption ;
+		local systemIncludesOption ;
+
+		if $(PLATFORM) = host {
+			flags = $(HOST_ASFLAGS) $(ASFLAGS) ;
+
+			CC on $(1) = $(HOST_CC) ;
+
+			includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
+			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
+			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
+		} else {
+			flags = $(TARGET_ASFLAGS_$(TARGET_PACKAGING_ARCH)) $(ASFLAGS) ;
+
+			CC on $(1) = $(TARGET_CC_$(TARGET_PACKAGING_ARCH)) ;
+
+			includesSeparator
+				= $(TARGET_INCLUDES_SEPARATOR_$(TARGET_PACKAGING_ARCH)) ;
+			localIncludesOption
+				= $(TARGET_LOCAL_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
+			systemIncludesOption
+				= $(TARGET_SYSTEM_INCLUDES_OPTION_$(TARGET_PACKAGING_ARCH)) ;
+		}
+
+		ASFLAGS on $(<) += $(flags) $(SUBDIRASFLAGS) ;
+		ASHDRS on $(<) = [ on $(<) FIncludes $(HDRS) : $(localIncludesOption) ]
+			$(includesSeparator)
+			[ on $(<) FSysIncludes $(SYSHDRS) : $(systemIncludesOption) ] ;
+		ASDEFS on $(<) = [ on $(<) FDefines $(DEFINES) ] ;
+	}
 }
 
 actions As

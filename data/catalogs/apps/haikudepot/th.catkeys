@@ -1,14 +1,12 @@
-1	thai	x-vnd.Haiku-HaikuDepot	3833361367
+1	thai	x-vnd.Haiku-HaikuDepot	2640598917
 Repository update error	LocalRepositoryUpdateProcess		ข้อผิดพลาดการอัพเดตที่เก็บ
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		เกิดข้อผิดพลาดขณะรีเฟรชที่เก็บ: %error%
 User Created	UserLoginWindow		ผู้ใช้ถูกสร้างแล้ว
 Check for updates…	MainWindow		ตรวจสอบสำหรับการอัพเดท
-Uninstall	PackageManager		ยกเลิกการติดตั้ง
 Uninstalled	PackageListView		ยกเลิกการติดตั้งแล้ว
 It was not possible to create the new user.	UserLoginWindow		ไม่สามารถสร้างผู้ใช้ใหม่ได้
 Available packages	MainWindow		แพ็คเกจที่มี
 Create account	UserLoginWindow		สร้างบัญชี
-Mostly stable	RatePackageWindow		ค่อนข้างเสถียร
 OK	App		ตกลง
 The response to the captcha was incorrect.	ServerHelper		การตอบกลับไปที่ captcha ไม่ถูกต้อง
 Develop packages	MainWindow		แพ็คเกจสำหรับการพัฒนา
@@ -17,20 +15,15 @@ Starting the package daemon failed:\n\n%Error%	App		การสตาร์ท�
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		คุณตรวจสอบสิทธิ์เป็นผู้ใช้สำเร็จแล้ว %Nickname%
 <no info>	PackageInfoView		<no info>
 No user ratings available.	PackageInfoView		ไม่มีการให้คะแนนผู้ใช้
-Downloading package '%name%'	WorkStatusView		กำลังดาวน์โหลดแพ็คเกจ '%name%'
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		ไม่สามารถดึงข้อมูล captcha ที่จำเป็นจากข้อมูลที่ส่งกลับจากเซิร์ฟเวอร์
 Rating	PackageListView		อัตรา
 Synchronizing icons	ServerIconExportUpdateProcess		การซิงโครไนซ์ไอคอน
-Does not start	RatePackageWindow		ไม่เริ่ม
 Show	MainWindow		แสดง
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		เกิดข้อผิดพลาดขณะรับรายการแพ็กเกจ: %message%
-Unstable but usable	RatePackageWindow		ไม่เสถียร แต่ใช้งานได้
-Not specified	RatePackageWindow		ไม่ได้ระบุ
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		แอปพลิเคชันนี้เขียนและอ่านไฟล์ทำงานบางไฟล์ในคอมพิวเตอร์ของคุณเพื่อให้สามารถใช้งานได้ ดูเหมือนว่ามีปัญหาในการเขียนไฟล์ทดสอบที่ [%TestFilePath%] ตรวจสอบว่าไม่มีปัญหากับดิสก์ภายในเครื่องหรือการอนุญาตที่อาจป้องกันไม่ให้แอปพลิเคชันนี้เขียนไฟล์ลงในตำแหน่งไดเรกทอรีนั้น คุณอาจเลือกที่จะรับทราบปัญหานี้และดำเนินการต่อ แต่ฟังก์ชั่นบางอย่างอาจถูกปิดการใช้งาน
 Active	PackageListView		เปิดใช้
 Login or Create account	MainWindow		เข้าสู่ระบบหรือสร้างบัญชี
 <Package contents not available for remote packages>	PackageContentsView		<เนื้อหาแพ็คเกจไม่พร้อมใช้งานสำหรับแพ็คเกจแบบรีโมต>
-{0, plural,one{1 package to download}other{# packages to download}}	WorkStatusView		{0, plural,one{1 package to download}อื่นๆ{# packages to download}}
 Ratings	PackageInfoView		อัตรา
 Switch account…	MainWindow		เปลี่ยนบัญชีผู้ใช้งาน
 Preferred language:	UserLoginWindow		ภาษาที่ต้องการ:
@@ -46,9 +39,6 @@ Category	FilterView		หมวดหมู่
 User rating	RatePackageWindow		คะแนนจากผู้ใช้
 Installed packages	MainWindow		แพคเกจที่ติดตั้ง
 A requested object or an object involved in the request was not found on the server.	ServerHelper		ไม่พบวัตถุที่ร้องขอหรือวัตถุที่เกี่ยวข้องในคำขอบนเซิร์ฟเวอร์
-Stable	RatePackageWindow		เสถียร
-Fatal error	PackageManager		ข้อผิดพลาดร้ายแรง
-Package action failed	PackageInfoView		การกระทำของแพคเกจล้มเหลว
 No changelog available.	PackageInfoView		ไม่มีการเปลี่ยนแปลง
 Error	App		ผิดพลาด
 There was a puzzling response from the web service.	UserLoginWindow		มีการตอบสนองที่น่าสงสัยจากบริการบนเว็บ
@@ -72,14 +62,12 @@ Package update error	MainWindow		ข้อผิดพลาดในการ�
 About	PackageInfoView		เกี่ยวกับ
 %FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}
 Reboot required	PackageManager		ต้องรีบูต
-Very unstable	RatePackageWindow		ไม่เสถียรมากๆ
 Password:	UserLoginWindow		รหัส:
 All packages	PackageListView		แพ็คเกจทั้งหมด
 Stability	RatePackageWindow		ความเสถียร
 Send	RatePackageWindow		ส่ง
 Start package daemon	App		เริ่มแพคเกจ daemon
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		ต้องทำซ้ำรหัสผ่านเพื่อลดโอกาสในการป้อนรหัสผ่านไม่ถูกต้อง
-The package action could not be scheduled: %Error%	PackageInfoView		ไม่สามารถกำหนดเวลาการทำงานของแพ็คเกจได้: %Error%
 Cancel	RatePackageWindow		ยกเลิก
 Inactive	PackageListView		ไม่ใช้งาน
 Nickname:	UserLoginWindow		ชื่อเล่น:
@@ -88,7 +76,6 @@ There are problems in the supplied data:	UserLoginWindow		มีปัญหา�
 OK	MainWindow		ตกลง
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} อื่นๆ{# items}}
 Usage conditions download problem	UserLoginWindow		ปัญหาการดาวน์โหลดเงื่อนไขการใช้งาน
-OK	PackageInfoView		ตกลง
 Downloading:	PackageInfoView		กำลังดาวน์โหลด:
 Success	UserLoginWindow		สำเร็จ
 Package daemon problem	App		ปัญหาแพคเกจ daemon
@@ -101,8 +88,8 @@ Close	RatePackageWindow		ปิด
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		การซิงโครไนซ์ข้อมูลแพ็คเกจสำหรับที่เก็บ '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		ดูเงื่อนไขการใช้งาน
 Login issue	MainWindow		ปัญหาการเข้าสู่ระบบ
-Size	PackageListView		ขนาด
 Your rating:	RatePackageWindow		คะแนนของคุณ:
+Size	PackageListView		ขนาด
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		ผู้ใช้ %Nickname% ถูกสร้างขึ้นสำเร็จในระบบ Haiku Depot Server คุณสามารถจัดการรายละเอียดผู้ใช้ของคุณโดยใช้เว็บอินเตอร์เฟส ตอนนี้คุณเข้าสู่ระบบในฐานะผู้ใช้ใหม่นี้
 Your rating was updated.	RatePackageWindow		คะแนนของคุณได้รับการอัพเดท
 All categories	FilterView		ทุกประเภท
@@ -111,9 +98,7 @@ n/a	PackageInfoView		n/a
 This rating is visible to other users	RatePackageWindow		การให้คะแนนนี้จะปรากฏให้ผู้ใช้รายอื่นเห็น
 View agreed usage conditions…	MainWindow		ดูเงื่อนไขการใช้งานที่ตกลงกันไว้
 Cancel	MainWindow		ยกเลิก
-{0, plural,one{(1 more to download)}other{(# more to download)}}	WorkStatusView		{0, plural,one{(1 more to download)}อื่นๆ{(# more to download)}}
 Refresh repositories	MainWindow		รีเฟรชการจัดเก็บ
-Tools	MainWindow		เครื่องมือ
 Continue	App		ต่อไป
 A password is required.	UserLoginWindow		ต้องการรหัสผ่าน
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		แพ็คเกจนี้ดูเหมือนจะไม่ได้อยู่ในเซิร์ฟเวอร์ HaikuDepot ดังนั้นจึงไม่สามารถสร้างการจัดอันดับใหม่หรือแก้ไขการจัดอันดับที่มีอยู่
@@ -132,13 +117,12 @@ Synchronizing reference data from server	ServerReferenceDataUpdateProcess		ก�
 Stability:	RatePackageWindow		ความเสถียร:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		ข้อตกลงการใช้งานจะต้องได้รับการยอมรับและควรทำการยืนยันว่าบุคคลที่สร้างผู้ใช้เป็นไปตามข้อกำหนดอายุขั้นต่ำ
 A validation error has occurred	ServerHelper		เกิดข้อผิดพลาดในการตรวจสอบความถูกต้อง
-While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	MainWindow		ขณะอัปเดตข้อมูลแพ็คเกจมีปัญหาเกิดขึ้นซึ่งอาจทำให้ข้อมูลล้าสมัยหรือหายไปจากการแสดงผลของแอปพลิเคชัน รายละเอียดเพิ่มเติมเกี่ยวกับปัญหานี้อาจหาได้จากบันทึกของแอปพลิเคชัน\nข้อมูลเกี่ยวกับวิธีดูบันทึกมีอยู่ในส่วน HaikuDepot ของคู่มือผู้ใช้
 The nickname is required.	UserLoginWindow		ต้องระบุชื่อเล่น
 Source packages	MainWindow		แพ็คเกจต้นทาง
 -	no package size		-
 Problem with working files	App		ปัญหาเกี่ยวกับไฟล์ทำงาน
-Try again	App		ลองใหม่อีกครั้ง
 Rate package	RatePackageWindow		Rate package
+Try again	App		ลองใหม่อีกครั้ง
 Unknown	PackageListView		ไม่ทราบ
 I agree to the usage conditions	UserLoginWindow		ฉันเห็นด้วยกับเงื่อนไขการใช้งาน
 Log in	UserLoginWindow		เข้าสู่ระบบ
@@ -159,17 +143,14 @@ Captcha error	UserLoginWindow		ข้อผิดพลาด Captcha
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		ชื่อเล่นจะต้องไม่ซ้ำกัน แต่ชื่อเล่นที่ให้มาได้ถูกใช้ไปแล้ว เลือกชื่อเล่นอื่น
 Manage repositories…	MainWindow		จัดการที่เก็บ
 Fetching remote repository data	LocalRepositoryUpdateProcess		กำลังดึงข้อมูลที่เก็บข้อมูลระยะไกล
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the user guide.	UserLoginWindow		เกิดข้อผิดพลาดในการดาวน์โหลดเงื่อนไขการใช้งานที่จำเป็นในการสร้างผู้ใช้ใหม่ ตรวจสอบบันทึกเพื่อดูรายละเอียดแล้วลองอีกครั้ง \nข้อมูลเกี่ยวกับวิธีดูบันทึกมีอยู่ในส่วน HaikuDepot ของคู่มือผู้ใช้
 Description	PackageListView		ลักษณะ
 Open %DeskbarLink%	PackageManager		เปิด %DeskbarLink%
 User creation error	UserLoginWindow		ข้อผิดพลาดในการสร้างผู้ใช้
-Install	PackageManager		ติดตั้ง
 Input validation	UserLoginWindow		การตรวจสอบอินพุต
 Log in…	MainWindow		เข้าใช้งาน
 You need to be logged into an account before you can rate packages.	MainWindow		คุณต้องเข้าสู่ระบบบัญชีก่อนจึงจะสามารถให้คะแนนแพ็คเกจได้
 Client version too old	ServerHelper		รุ่นไคลเอ็นต์เก่าเกินไป
 Local repository load error	LocalPkgDataLoadProcess		ข้อผิดพลาดในการโหลดที่เก็บในเครื่อง
 The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		ผู้ใช้ไม่มีอยู่หรือระบุรหัสผ่านผิด ตรวจสอบข้อมูลรับรองของคุณแล้วลองอีกครั้ง
-9999.99 KiB	PackageListView		9999.99 KiB
 Repeat password:	UserLoginWindow		ใส่รหัสผ่านอีกครั้ง:
 All repositories	MainWindow		ที่จัดเก็บทั้งหมด

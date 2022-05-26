@@ -9,13 +9,15 @@
 #define INTEL_FITTER_H
 
 
+#include "intel_extreme.h"
+
 class PanelFitter {
 public:
-									PanelFitter(int32 pipeIndex);
+									PanelFitter(pipe_index pipeIndex);
 virtual								~PanelFitter();
 
 		bool						IsEnabled();
-		void						Enable(const display_mode& mode);
+		void						Enable(const display_timing& timing);
 		void						Disable();
 
 private:

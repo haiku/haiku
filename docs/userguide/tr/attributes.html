@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Kullanıcı kılavuzu</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +35,7 @@
 <li><a href="../de/attributes.html">Deutsch</a></li>
 <li><a href="../en/attributes.html">English</a></li>
 <li><a href="../es/attributes.html">Español</a></li>
+<li><a href="../eo/attributes.html">Esperanto</a></li>
 <li><a href="../fr/attributes.html">Français</a></li>
 <li><a href="../fur/attributes.html">Furlan</a></li>
 <li><a href="../it/attributes.html">Italiano</a></li>
@@ -53,44 +54,43 @@
 </ul>
 <span>
  «  <a href="filetypes.html">Dosya Türleri</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">İçerik</a> 
 ::  <a href="index.html">İçindekiler</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h1>Öznitelikler</h1>
 
-<p>Attributes are data fields that belong to a file but aren't part of that file, e.g. they are not computed into the file size and can be copied or changed without touching the file itself. The system uses these attributes to store e.g. file size, file type or date of the last modification. This is similar to other operating systems and their filesystems.</p>
-<p>What's different is that you can add any kind of attribute to any file and display it or make it editable in a Tracker window. You just have to define the kind of attribute you want to add to a file type (e.g. string, integer or time) and give it a name and description.</p>
-<p>The file itself doesn't even need any contents at all. Take a look at these People files for example:</p>
+<p>Öznitelikler, bir dosyaya iye olan; ancak o dosyanın bir parçası olmayan veri alanlarıdır. Dosya boyutuna dahil değildirler ve dosyanın kendisine dokunmadan kopyalanabilir veya değiştirilebilirler. Sistem, bu öznitelikleri dosya boyutu, dosya türü, tarih veya son değiştirilme gibi verileri depolamak için kullanır. Bu işlemler diğer işletim sistemleri ve onların dosya sistemleri ile benzerlik gösterir.</p>
+<p>Buradaki ayrım, herhangi bir dosyaya herhangi bir tür özniteliği ekleyebilir ve bunları bir İzleyici penceresinde görüntüleyebilir veya düzenleyebilirsiniz. Yapmanız gereken tek şey, eklemek istediğiniz öznitelik türünü belirtmek (örn. dizi, tamsayı veya zaman) ve bir ad ve açıklama vermektir.</p>
+<p>Dosyanın herhangi bir içeriğe iye olmasına gerek bile yoktur. Örneğin aşağıdaki Kişiler dosyalarına bir göz atın:</p>
 <img src="images/attributes-images/people.png" alt="people.png" />
 <br />
-<p>As you can see, these are all 0-sized files with attached attributes, the E-mail attribute of "John Nox" being edited right in Tracker.</p>
-<p>If you index these attributes, as People, Email or audio files are by default, they are also searchable with Haiku's fast query system.</p>
+<p>Görebileceğiniz gibi, bunların hepsi kendilerine öznitelikler iliştirilmiş sıfır boyutlu dosyalardır. Bu örnekte John Nox kişisinin e-posta adresi düzenlenmektedir.</p>
+<p>Öznitelikler, indekslendikleri takdirde, Haiku'nun hızlı sorgulama sisteminde aranabilirler. Kişiler, E-posta veya ses dosyaları öntanımlı olarak indekslenirler.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="attributes-tracker" name="attributes-tracker">Attributes in Tracker</a></h2>
-<p>Attributes are displayed quite similar to a database or spreadsheet. Using Tracker you can choose which attributes to display (columns) and sort file listings (rows) accordingly.</p>
-<p>To do this, open a Tracker window, click on the <span class="menu">Attributes</span> menu, and select the attributes you want to display. Alternatively, simply right-click onto a column heading and mark the items in the context menu. You can rearrange the columns by a simple drag &amp; drop of the column heading. Moving a column out of a window, is a fast way to get rid of columns you don't need.</p>
-<p>Double-click on the line between two attributes in the heading to automatically resize a column to its optimal width.</p>
-<p>Click on a column heading to toggle the sorting order from ascending to descending. You can establish a secondary sort order by pressing the <span class="key">SHIFT</span> key while clicking on a column heading. You can sort your People files by company and within that order sort by contact name, for instance. See the above screenshot as an example. The secondary sort order is marked by a lighter colored indicator beside the heading.</p>
-<p>Editing these attributes is as simple as renaming a file: Either click on an entry or press <span class="key">ALT</span> <span class="key">E</span> and move between the attributes with <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span>. <span class="key">ESC</span> leaves the editing mode without applying the changes.</p>
+<a id="attributes-tracker" name="attributes-tracker">Öznitelikleri İzleyici'de Görüntüleme</a></h2>
+<p>Öznitelikler, bir veritabanı veya hesap tablosuna benzer bir biçimde görüntülenirler. İzleyici'yi kullanarak hangi özniteliklerin görüntüleneceğini (sütunlar) seçebilir ve dosya listelemelerini (satırlar) buna göre sıralayabilirsiniz.</p>
+<p>Bunu yapmak için, bir İzleyici penceresi açın,  <span class="menu">Öznitelikler</span> menüsüne tıklayın ve görüntülemek istediğiniz öznitelikleri seçin. Alternatif olarak, bir stun başlığına sağ tıklayın ve bağlam menüsündeki girdileri imleyin. Sütunları sürükle-bırak yöntemiyle yeniden düzenleyebilirsiniz. Bir sütunu pencere dışına taşımak o sütunu kolay yoldan kaldırmanızı sağlar.</p>
+<p>İki öznitelik başlığı arasındaki çizgiye sağ tıklamak sütunu kendiliğinden olabilecek en iyi genişliğe ayarlamanızı sağlar.</p>
+<p>Bir sütun başlığına tıklamak içeriği çoktan aza doğru sıralar. <span class="key">SHIFT</span> düğmesine basılı tutup tıklamak ikincil sıralama düzenini işletir. Yukarıdaki ekran görüntüsünde görebileceğiniz üzere, "Company" sütun başlığına tıklamak girdileri şirkete göre sıralarken, "Contact name" sütununun ikincil sıralama girdisi olarak kullanıldığını görebilirsiniz. İkincil sıralama düzenini belirten simge daha hafif bir tonda belirtilir.</p>
+<p>Bu öznitelikleri düzenlemek bir dosyayı yeniden adlandırmak kadar kolaydır: Ya bir girdinin üzerine tıklayın ya da <span class="key">ALT</span> <span class="key">E</span> düğmelerine basın ve öznitelikler arasında <span class="key">TAB</span> ve <span class="key">SHIFT</span> <span class="key">TAB</span> düğmeleri ile gezinin. <span class="key">ESC</span> düğmesine basmak değişikliklerinizi kaydetmeden düzenleme kipinden çıkmanızı sağlar.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="attributes-terminal" name="attributes-terminal">Attributes in Terminal</a></h2>
-<p>If you prefer to use the commandline or plan to work with many files using scripting, there are several commands for controlling attributes from Terminal.</p>
+<a id="attributes-terminal" name="attributes-terminal">Öznitelikleri Uçbirimde Görüntüleme</a></h2>
+<p>Komut satırını kullanmayı yeğliyorsanız veya betikler kullanarak birden çok dosya üzerinde çalışacaksanız öznitelikleri uçbirimden denetlemek için birkaç komut bulunmaktadır.         </p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="listattr" name="listattr">listattr</a></h3>
-<p><span class="cli">listattr</span> lists a file's attributes, but doesn't show the contents of the attributes.</p>
+<p><span class="cli">listattr</span> bir dosyanın özniteliklerini listeler; ancak özniteliklerin içeriğini göstermez.</p>
 <pre>usage: listattr 'filename' ['filename' ...]</pre>
-<p>From our screenshot example above:</p>
+<p>Yukarıdaki ekran görüntüsünden örnekle:</p>
 <pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
 File: Clara Botters
    Type         Size                 Name
@@ -116,25 +116,25 @@ MIME String         21  "BEOS:TYPE"
     Raw Data         20  "_trk/pinfo_le"
  
 131 bytes total in attributes.</pre>
-<p>Besides all the "<tt>META:*</tt>" attributes that hold the contact's information, there are two attributes that are managed by the system:</p>
+<p>Kişinin bilgisini tutan "<tt>META:*</tt>" özniteliklerinin yanında, sistem tarafından yönetilen iki öznitelik vardır:</p>
 <ul>
-<li><p><tt>BEOS:TYPE</tt> holds the file type as a <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> string, here "<tt>application/x-person</tt>". It determines the default icon and the application that opens the file when you e.g. double click it.</p></li>
-<li><p>"<tt>_trk/pinfo_le</tt>" is the attribute with which Tracker keeps track of a file's icon position.</p></li></ul>
-<div class="box-info">Note the backslash after "Clara". In Terminal you have to "escape" special characters like <tt>'"*\$?!</tt>. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</div>
+<li><p><tt>BEOS:TYPE</tt>, dosya türünü bir <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> dizisi olarak tutar, burada "<tt>application/x-person</tt>". Öntanımlı simge ve çift tıkladığınızda bu dosyayı açacak uygulamanın bilgisini saklar.</p></li>
+<li><p>"<tt>_trk/pinfo_le</tt>" İzleyici'nin bir dosyanın simge konumunu tuttuğu özniteliktir.</p></li></ul>
+<div class="box-info">"Clara"nın ardından gelen ters eğik çizgiye dikkat edin. Uçbirim'de <tt>'"*\$?!</tt> gibi "özel" karakterleri kaçırmanız gerekir. "Clara" ve "Botters" arasındaki boşluk da bunlardan biridir. Böylece, ters eğik çizginin "Clara"nın ardında değil de boşluğun önünde olduğunu söyleyebiliriz.</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="catattr" name="catattr">catattr</a></h3>
-<p><span class="cli">catattr</span> displays the contents of a specific attribute of a file.</p>
+<p><span class="cli">catattr</span> bir dosyanın belirtilen özniteliğinin içeriğini listeler.</p>
 <pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
-<p>Again our example:</p>
+<p>Yine örneğimize bakacak olursak:</p>
 <pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="addattr" name="addattr">addattr</a></h3>
-<p><span class="cli">addattr</span> adds an attribute to a file and/or fills it with a value.</p>
+<p><span class="cli">addattr</span> bir özniteliği dosyaya ekler ve/veya ona bir değer verir.</p>
 <pre>usage: addattr [-t type] attr value file1 [file2...]
     or: addattr [-f value-from-file] [-t type] attr file1 [file2...]
  
@@ -142,30 +142,30 @@ Clara Botters : string : Whelton</pre>
                  string, mime, int, llong, float, double, bool, icon, raw
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          The default is "string"</pre>
-<p>So, say dear Clara took a job with the multi-national Barkelbaer Inc., you fill the formerly empty "Company" attribute with that data (which is of type "string"):</p>
+<p>Diyelim ki, Clara, Barkelbaer Inc. şirketinde yeni bir işe başladı ve siz de daha önceden boş olan "Company" özniteliğini bir veriyle doldurmak istiyorsunuz (dizi türünde):</p>
 <pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rmattr" name="rmattr">rmattr</a></h3>
-<p><span class="cli">rmattr</span> completely removes an attribute from a file.</p>
+<p><span class="cli">rmattr</span> bir özniteliği dosyadan tümüyle kaldırır.</p>
 
 <pre>usage: rmattr [-p] attr filename1 [filename2...]
          'attr' is the name of an attribute of the file
          If '-p' is specified, 'attr' is regarded as a pattern.</pre>
-<p>Though in all practicality it would be enough to just not fill the "Fax" attribute, you can completely remove it from Clara's file by typing:</p>
+<p>Clara'nın dosyasından "Fax" özniteliğini kaldırmak için:</p>
 <pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="copyattr" name="copyattr">copyattr</a></h3>
-<p><span class="cli">copyattr</span> copies attributes from one or more files to another. By default, the actual contents of the file is <b>not</b> copied.</p>
+<p><span class="cli">copyattr</span> öznitelikleri bir dosyadan diğerine kopyalar. Öntanımlı olarak, dosyanın gerçek içeriği <b>kopyalanmaz</b>.</p>
 <pre>Usage: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
 
-<p>If you do want to copy the attributes plus the data of the file itself, you can add the option "<span class="cli">-d</span>" or "<span class="cli">--data</span>".</p>
+<p>Hem öznitelikleri hem de dosya verisini kopyalamak isterseniz  "<span class="cli">-d</span>" veya "<span class="cli">--data</span>" değişkenlerini ekleyebilirsiniz.</p>
 
 <p><br /></p>
-<p>More information on these commands and their options can be found by typing the command name followed by "<span class="cli">-h</span>" or "<span class="cli">--help</span>".</p>
+<p>Bu komutlar ve seçenekleri üzerine daha çok bilgiyi "<span class="cli">-h</span>" or "<span class="cli">--help</span>" özellikleri ile görüntüleyebilirsiniz.</p>
 
 </div>
 </div>
@@ -173,7 +173,7 @@ Clara Botters : string : Whelton</pre>
 <div class="nav">
 <div class="inner"><span>
  «  <a href="filetypes.html">Dosya Türleri</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="contents.html" class="uplink">İçerik</a> 
 ::  <a href="index.html">İçindekiler</a>  »
 </span></div>
 </div>

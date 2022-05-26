@@ -19,7 +19,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			UseBuildFeatureHeaders zstd ;
 			Includes [ FGristFiles ZstdCompressionAlgorithm.cpp ]
 				: [ BuildFeatureAttribute zstd : headers ] ;
-			SetupFeatureObjectsDir zstd ;
 		}
 
 		# BUrl uses ICU to perform IDNA conversions (unicode domain names)

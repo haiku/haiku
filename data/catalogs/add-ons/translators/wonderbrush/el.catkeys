@@ -1,9 +1,9 @@
 1	greek, modern (1453-)	x-vnd.Haiku-WonderBrushTranslator	1289038178
-Version %d.%d.%d, %s	WonderBrushView		Έκδοση %d.%d.%d, %s
-WonderBrush image translator	WonderBrushTranslator		Μετατροπέας εικόνας WonderBrush
-WBI Settings	WonderBrushTranslator		WBI Ρυθμίσεις
+WonderBrush image translator	WonderBrushTranslator		Μεταφραστής εικόνων WonderBrush
 WBI Settings	WonderBrushMain		WBI Ρυθμίσεις
-WonderBrush images	WonderBrushTranslator		WonderBrush εικόνες
-WonderBrush image	WonderBrushTranslator		WonderBrush εικόνα
-WonderBrush image translator	WonderBrushView		Μετατροπέας εικόνας WonderBrush
+Version %d.%d.%d, %s	WonderBrushView		Έκδοση %d.%d.%d, %s
 written by:	WonderBrushView		αναπτύχθηκε από:
+WonderBrush images	WonderBrushTranslator		Εικόνες WonderBrush
+WonderBrush image translator	WonderBrushView		Μετατροπέας εικόνας WonderBrush
+WonderBrush image	WonderBrushTranslator		Εικόνα WonderBrush
+WBI Settings	WonderBrushTranslator		Ρυθμίσεις εικόνων WonderBrush

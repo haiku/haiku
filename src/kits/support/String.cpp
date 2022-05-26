@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2021 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -193,10 +193,18 @@ BString::BString(const char* string, int32 maxLength)
 }
 
 
+#if __cplusplus >= 201103L
+BString::BString(BString&& string)
+{
+	fPrivateData = string.fPrivateData;
+	string.fPrivateData = NULL;
+}
+#endif
+
+
 BString::~BString()
 {
-	if (!_IsShareable() || atomic_add(&_ReferenceCount(), -1) == 1)
-		_FreePrivateData();
+	_ReleasePrivateData();
 }
 
 
@@ -263,6 +271,20 @@ BString::operator=(char c)
 }
 
 
+#if __cplusplus >= 201103L
+BString&
+BString::operator=(BString&& string)
+{
+	if (this != &string) {
+		_ReleasePrivateData();
+		fPrivateData = string.fPrivateData;
+		string.fPrivateData = NULL;
+	}
+	return *this;
+}
+#endif
+
+
 BString&
 BString::SetTo(const char* string, int32 maxLength)
 {
@@ -285,15 +307,7 @@ BString::SetTo(const BString& string)
 	if (fPrivateData == string.fPrivateData)
 		return *this;
 
-	bool freeData = true;
-
-	if (_IsShareable() && atomic_add(&_ReferenceCount(), -1) > 1) {
-		// there is still someone who shares our data
-		freeData = false;
-	}
-
-	if (freeData)
-		_FreePrivateData();
+	_ReleasePrivateData();
 
 	// if source is sharable share, otherwise clone
 	if (string._IsShareable()) {
@@ -2269,10 +2283,7 @@ BString::_MakeWritable()
 	if (atomic_get(&_ReferenceCount()) > 1) {
 		// It might be shared, and this requires special treatment
 		char* newData = _Clone(fPrivateData, Length());
-		if (atomic_add(&_ReferenceCount(), -1) == 1) {
-			// someone else left, we were the last owner
-			_FreePrivateData();
-		}
+		_ReleasePrivateData();
 		if (newData == NULL)
 			return B_NO_MEMORY;
 
@@ -2304,10 +2315,7 @@ BString::_MakeWritable(int32 length, bool copy)
 		if (newData == NULL)
 			return B_NO_MEMORY;
 
-		if (atomic_add(&_ReferenceCount(), -1) == 1) {
-			// someone else left, we were the last owner
-			_FreePrivateData();
-		}
+		_ReleasePrivateData();
 	} else {
 		// we don't share our data with someone else
 		newData = _Resize(length);
@@ -2442,6 +2450,15 @@ BString::_FreePrivateData()
 		free(fPrivateData - kPrivateDataOffset);
 		fPrivateData = NULL;
 	}
+}
+
+
+void
+BString::_ReleasePrivateData()
+{
+	if (!_IsShareable() || atomic_add(&_ReferenceCount(), -1) == 1)
+		_FreePrivateData();
+	fPrivateData = NULL;
 }
 
 

@@ -8,6 +8,7 @@
  *		Marc Flerackers, mflerackers@androme.be
  *		Hiroshi Lockheimer (BTextView is based on his STEEngine)
  *		Oliver Tappe, zooey@hirschkaefer.de
+ *      Andrew Lindesay, apl@lindesay.co.nz
  */
 
 #include "ParagraphLayout.h"
@@ -94,9 +95,9 @@ get_char_classification(uint32 charCode)
 
 
 inline bool
-can_end_line(const GlyphInfoList& glyphInfos, int offset)
+can_end_line(const std::vector<GlyphInfo>& glyphInfos, int offset)
 {
-	int count = glyphInfos.CountItems();
+	int count = static_cast<int>(glyphInfos.size());
 
 	if (offset == count - 1)
 		return true;
@@ -104,14 +105,14 @@ can_end_line(const GlyphInfoList& glyphInfos, int offset)
 	if (offset < 0 || offset > count)
 		return false;
 
-	uint32 charCode = glyphInfos.ItemAtFast(offset).charCode;
+	uint32 charCode = glyphInfos[offset].charCode;
 	uint32 classification = get_char_classification(charCode);
 
 	// wrapping is always allowed at end of text and at newlines
 	if (classification == CHAR_CLASS_END_OF_TEXT || charCode == '\n')
 		return true;
 
-	uint32 nextCharCode = glyphInfos.ItemAtFast(offset + 1).charCode;
+	uint32 nextCharCode = glyphInfos[offset + 1].charCode;
 	uint32 nextClassification = get_char_classification(nextCharCode);
 
 	// never separate a punctuation char from its preceding word
@@ -177,7 +178,7 @@ ParagraphLayout::ParagraphLayout()
 
 ParagraphLayout::ParagraphLayout(const Paragraph& paragraph)
 	:
-	fTextSpans(paragraph.TextSpans()),
+	fTextSpans(),
 	fParagraphStyle(paragraph.Style()),
 
 	fWidth(0.0f),
@@ -186,6 +187,7 @@ ParagraphLayout::ParagraphLayout(const Paragraph& paragraph)
 	fGlyphInfos(),
 	fLineInfos()
 {
+	_AppendTextSpans(paragraph);
 	_Init();
 }
 
@@ -212,7 +214,8 @@ ParagraphLayout::~ParagraphLayout()
 void
 ParagraphLayout::SetParagraph(const Paragraph& paragraph)
 {
-	fTextSpans = paragraph.TextSpans();
+	fTextSpans.clear();
+	_AppendTextSpans(paragraph);
 	fParagraphStyle = paragraph.Style();
 
 	_Init();
@@ -238,8 +241,8 @@ ParagraphLayout::Height()
 
 	float height = 0.0f;
 
-	if (fLineInfos.CountItems() > 0) {
-		const LineInfo& lastLine = fLineInfos.LastItem();
+	if (!fLineInfos.empty()) {
+		const LineInfo& lastLine = fLineInfos[fLineInfos.size() - 1];
 		height = lastLine.y + lastLine.height;
 	}
 
@@ -252,9 +255,9 @@ ParagraphLayout::Draw(BView* view, const BPoint& offset)
 {
 	_ValidateLayout();
 
-	int lineCount = fLineInfos.CountItems();
+	int lineCount = static_cast<int>(fLineInfos.size());
 	for (int i = 0; i < lineCount; i++) {
-		const LineInfo& line = fLineInfos.ItemAtFast(i);
+		const LineInfo& line = fLineInfos[i];
 		_DrawLine(view, offset, line);
 	}
 
@@ -265,7 +268,7 @@ ParagraphLayout::Draw(BView* view, const BPoint& offset)
 		BPoint bulletPos(offset);
 		bulletPos.x += fParagraphStyle.FirstLineInset()
 			+ fParagraphStyle.LineInset();
-		bulletPos.y += fLineInfos.ItemAt(0).maxAscent;
+		bulletPos.y += fLineInfos[0].maxAscent;
 		view->DrawString(bullet.String(), bulletPos);
 	}
 }
@@ -274,7 +277,7 @@ ParagraphLayout::Draw(BView* view, const BPoint& offset)
 int32
 ParagraphLayout::CountGlyphs() const
 {
-	return fGlyphInfos.CountItems();
+	return static_cast<int32>(fGlyphInfos.size());
 }
 
 
@@ -282,7 +285,7 @@ int32
 ParagraphLayout::CountLines()
 {
 	_ValidateLayout();
-	return fLineInfos.CountItems();
+	return static_cast<int32>(fLineInfos.size());
 }
 
 
@@ -291,18 +294,18 @@ ParagraphLayout::LineIndexForOffset(int32 textOffset)
 {
 	_ValidateLayout();
 
-	if (fGlyphInfos.CountItems() == 0)
+	if (fGlyphInfos.empty())
 		return 0;
 
-	if (textOffset >= fGlyphInfos.CountItems()) {
-		const GlyphInfo& glyph = fGlyphInfos.LastItem();
+	if (textOffset >= static_cast<int32>(fGlyphInfos.size())) {
+		const GlyphInfo& glyph = fGlyphInfos[fGlyphInfos.size() - 1];
 		return glyph.lineIndex;
 	}
 
 	if (textOffset < 0)
 		textOffset = 0;
 
-	const GlyphInfo& glyph = fGlyphInfos.ItemAtFast(textOffset);
+	const GlyphInfo& glyph = fGlyphInfos[textOffset];
 	return glyph.lineIndex;
 }
 
@@ -314,10 +317,11 @@ ParagraphLayout::FirstOffsetOnLine(int32 lineIndex)
 
 	if (lineIndex < 0)
 		lineIndex = 0;
-	if (lineIndex >= fLineInfos.CountItems())
-		lineIndex = fLineInfos.CountItems() - 1;
+	int32 countLineInfos = static_cast<int32>(fLineInfos.size());
+	if (lineIndex >= countLineInfos)
+		lineIndex = countLineInfos - 1;
 
-	return fLineInfos.ItemAt(lineIndex).textOffset;
+	return fLineInfos[lineIndex].textOffset;
 }
 
 
@@ -329,10 +333,10 @@ ParagraphLayout::LastOffsetOnLine(int32 lineIndex)
 	if (lineIndex < 0)
 		lineIndex = 0;
 
-	if (lineIndex >= fLineInfos.CountItems() - 1)
+	if (lineIndex >= static_cast<int32>(fLineInfos.size()) - 1)
 		return CountGlyphs() - 1;
 
-	return fLineInfos.ItemAt(lineIndex + 1).textOffset - 1;
+	return fLineInfos[lineIndex + 1].textOffset - 1;
 }
 
 
@@ -342,27 +346,28 @@ ParagraphLayout::GetLineBounds(int32 lineIndex, float& x1, float& y1,
 {
 	_ValidateLayout();
 
-	if (fGlyphInfos.CountItems() == 0) {
+	if (fGlyphInfos.empty()) {
 		_GetEmptyLayoutBounds(x1, y1, x2, y2);
 		return;
 	}
 
 	if (lineIndex < 0)
 		lineIndex = 0;
-	if (lineIndex >= fLineInfos.CountItems())
-		lineIndex = fLineInfos.CountItems() - 1;
+	int32 countLineInfos = static_cast<int32>(fLineInfos.size());
+	if (lineIndex >= countLineInfos)
+		lineIndex = countLineInfos - 1;
 
-	const LineInfo& lineInfo = fLineInfos.ItemAt(lineIndex);
+	const LineInfo& lineInfo = fLineInfos[lineIndex];
 	int32 firstGlyphIndex = lineInfo.textOffset;
 
 	int32 lastGlyphIndex;
-	if (lineIndex < fLineInfos.CountItems() - 1)
-		lastGlyphIndex = fLineInfos.ItemAt(lineIndex + 1).textOffset - 1;
+	if (lineIndex < countLineInfos - 1)
+		lastGlyphIndex = fLineInfos[lineIndex + 1].textOffset - 1;
 	else
-		lastGlyphIndex = fGlyphInfos.CountItems() - 1;
+		lastGlyphIndex = static_cast<int32>(fGlyphInfos.size()) - 1;
 
-	const GlyphInfo& firstInfo = fGlyphInfos.ItemAtFast(firstGlyphIndex);
-	const GlyphInfo& lastInfo = fGlyphInfos.ItemAtFast(lastGlyphIndex);
+	const GlyphInfo& firstInfo = fGlyphInfos[firstGlyphIndex];
+	const GlyphInfo& lastInfo = fGlyphInfos[lastGlyphIndex];
 
 	x1 = firstInfo.x;
 	y1 = lineInfo.y;
@@ -377,14 +382,14 @@ ParagraphLayout::GetTextBounds(int32 textOffset, float& x1, float& y1,
 {
 	_ValidateLayout();
 
-	if (fGlyphInfos.CountItems() == 0) {
+	if (fGlyphInfos.empty()) {
 		_GetEmptyLayoutBounds(x1, y1, x2, y2);
 		return;
 	}
 
-	if (textOffset >= fGlyphInfos.CountItems()) {
-		const GlyphInfo& glyph = fGlyphInfos.LastItem();
-		const LineInfo& line = fLineInfos.ItemAt(glyph.lineIndex);
+	if (textOffset >= static_cast<int32>(fGlyphInfos.size())) {
+		const GlyphInfo& glyph = fGlyphInfos[fGlyphInfos.size() - 1];
+		const LineInfo& line = fLineInfos[glyph.lineIndex];
 
 		x1 = glyph.x + glyph.width;
 		x2 = x1;
@@ -397,8 +402,8 @@ ParagraphLayout::GetTextBounds(int32 textOffset, float& x1, float& y1,
 	if (textOffset < 0)
 		textOffset = 0;
 
-	const GlyphInfo& glyph = fGlyphInfos.ItemAtFast(textOffset);
-	const LineInfo& line = fLineInfos.ItemAt(glyph.lineIndex);
+	const GlyphInfo& glyph = fGlyphInfos[textOffset];
+	const LineInfo& line = fLineInfos[glyph.lineIndex];
 
 	x1 = glyph.x;
 	x2 = x1 + glyph.width;
@@ -414,19 +419,19 @@ ParagraphLayout::TextOffsetAt(float x, float y, bool& rightOfCenter)
 
 	rightOfCenter = false;
 
-	int32 lineCount = fLineInfos.CountItems();
-	if (fGlyphInfos.CountItems() == 0 || lineCount == 0
-		|| fLineInfos.ItemAtFast(0).y > y) {
+	int32 lineCount = static_cast<int32>(fLineInfos.size());
+	if (fGlyphInfos.empty() || lineCount == 0
+		|| fLineInfos[0].y > y) {
 		// Above first line or empty text
 		return 0;
 	}
 
 	int32 lineIndex = 0;
-	if (floorf(fLineInfos.LastItem().y
-			+ fLineInfos.LastItem().height + 0.5) > y) {
+	LineInfo lastLineInfo = fLineInfos[fLineInfos.size() - 1];
+	if (floorf(lastLineInfo.y + lastLineInfo.height + 0.5) > y) {
 		// TODO: Optimize, can binary search line here:
 		for (; lineIndex < lineCount; lineIndex++) {
-			const LineInfo& line = fLineInfos.ItemAtFast(lineIndex);
+			const LineInfo& line = fLineInfos[lineIndex];
 			float lineBottom = floorf(line.y + line.height + 0.5);
 			if (lineBottom > y)
 				break;
@@ -436,17 +441,17 @@ ParagraphLayout::TextOffsetAt(float x, float y, bool& rightOfCenter)
 	}
 
 	// Found line
-	const LineInfo& line = fLineInfos.ItemAtFast(lineIndex);
+	const LineInfo& line = fLineInfos[lineIndex];
 	int32 textOffset = line.textOffset;
 	int32 end;
 	if (lineIndex < lineCount - 1)
-		end = fLineInfos.ItemAtFast(lineIndex + 1).textOffset - 1;
+		end = fLineInfos[lineIndex + 1].textOffset - 1;
 	else
-		end = fGlyphInfos.CountItems() - 1;
+		end = fGlyphInfos.size() - 1;
 
 	// TODO: Optimize, can binary search offset here:
 	for (; textOffset <= end; textOffset++) {
-		const GlyphInfo& glyph = fGlyphInfos.ItemAtFast(textOffset);
+		const GlyphInfo& glyph = fGlyphInfos[textOffset];
 		float x1 = glyph.x;
 		if (x1 > x)
 			return textOffset;
@@ -458,7 +463,7 @@ ParagraphLayout::TextOffsetAt(float x, float y, bool& rightOfCenter)
 		// x2 in case the line is justified.
 		float x3;
 		if (textOffset < end - 1)
-			x3 = fGlyphInfos.ItemAtFast(textOffset + 1).x;
+			x3 = fGlyphInfos[textOffset + 1].x;
 		else
 			x3 = x2;
 
@@ -470,7 +475,7 @@ ParagraphLayout::TextOffsetAt(float x, float y, bool& rightOfCenter)
 
 	// Account for trailing line break at end of line, the
 	// returned offset should be before that.
-	rightOfCenter = fGlyphInfos.ItemAtFast(end).charCode != '\n';
+	rightOfCenter = fGlyphInfos[end].charCode != '\n';
 
 	return end;
 }
@@ -482,11 +487,11 @@ ParagraphLayout::TextOffsetAt(float x, float y, bool& rightOfCenter)
 void
 ParagraphLayout::_Init()
 {
-	fGlyphInfos.Clear();
+	fGlyphInfos.clear();
 
-	int spanCount = fTextSpans.CountItems();
-	for (int i = 0; i < spanCount; i++) {
-		const TextSpan& span = fTextSpans.ItemAtFast(i);
+	std::vector<TextSpan>::const_iterator it;
+	for (it = fTextSpans.begin(); it != fTextSpans.end(); it++) {
+		const TextSpan& span = *it;
 		if (!_AppendGlyphInfos(span)) {
 			fprintf(stderr, "%p->ParagraphLayout::_Init() - Out of memory\n",
 				this);
@@ -509,7 +514,7 @@ ParagraphLayout::_ValidateLayout()
 void
 ParagraphLayout::_Layout()
 {
-	fLineInfos.Clear();
+	fLineInfos.clear();
 
 	const Bullet& bullet = fParagraphStyle.Bullet();
 
@@ -519,9 +524,9 @@ ParagraphLayout::_Layout()
 	int lineIndex = 0;
 	int lineStart = 0;
 
-	int glyphCount = fGlyphInfos.CountItems();
+	int glyphCount = static_cast<int>(fGlyphInfos.size());
 	for (int i = 0; i < glyphCount; i++) {
-		GlyphInfo glyph = fGlyphInfos.ItemAtFast(i);
+		GlyphInfo glyph = fGlyphInfos[i];
 
 		uint32 charClassification = get_char_classification(glyph.charCode);
 
@@ -562,9 +567,9 @@ ParagraphLayout::_Layout()
 			nextLine = true;
 			lineBreak = true;
 			glyph.x = x;
-			fGlyphInfos.Replace(i, glyph);
+			fGlyphInfos[i] = glyph;
 		} else if (fWidth > 0.0f && x + advanceX > fWidth) {
-			fGlyphInfos.Replace(i, glyph);
+			fGlyphInfos[i] = glyph;
 			if (charClassification == CHAR_CLASS_WHITESPACE) {
 				advanceX = 0.0f;
 			} else if (i > lineStart) {
@@ -584,7 +589,7 @@ ParagraphLayout::_Layout()
 
 					// Adjust the glyph info to point at the changed buffer
 					// position
-					glyph = fGlyphInfos.ItemAtFast(i);
+					glyph = fGlyphInfos[i];
 					advanceX = glyph.width;
 				} else {
 					// Just break where we are.
@@ -620,7 +625,7 @@ ParagraphLayout::_Layout()
 
 		if (!lineBreak && i < glyphCount) {
 			glyph.x = x;
-			fGlyphInfos.Replace(i, glyph);
+			fGlyphInfos[i] = glyph;
 		}
 
 		x += advanceX;
@@ -646,7 +651,7 @@ ParagraphLayout::_ApplyAlignment()
 	if (alignment == ALIGN_LEFT && !justify)
 		return;
 
-	int glyphCount = fGlyphInfos.CountItems();
+	int glyphCount = static_cast<int>(fGlyphInfos.size());
 	if (glyphCount == 0)
 		return;
 
@@ -660,7 +665,7 @@ ParagraphLayout::_ApplyAlignment()
 	// the position of the character determines the available space to be
 	// distributed (spaceLeft).
 	for (int i = glyphCount - 1; i >= 0; i--) {
-		GlyphInfo glyph = fGlyphInfos.ItemAtFast(i);
+		GlyphInfo glyph = fGlyphInfos[i];
 
 		if (glyph.lineIndex != lineIndex) {
 			bool lineBreak = glyph.charCode == '\n' || i == glyphCount - 1;
@@ -692,7 +697,7 @@ ParagraphLayout::_ApplyAlignment()
 				int charCount = 0;
 				int spaceCount = 0;
 				for (int j = i; j >= 0; j--) {
-					const GlyphInfo& previousGlyph = fGlyphInfos.ItemAtFast(j);
+					const GlyphInfo& previousGlyph = fGlyphInfos[j];
 					if (previousGlyph.lineIndex != lineIndex) {
 						j++;
 						break;
@@ -734,11 +739,11 @@ ParagraphLayout::_ApplyAlignment()
 				if (charCount > 0)
 					charSpace = spaceLeftForChars / charCount;
 
-				LineInfo line = fLineInfos.ItemAtFast(lineIndex);
+				LineInfo line = fLineInfos[lineIndex];
 				line.extraGlyphSpacing = charSpace;
 				line.extraWhiteSpacing = whiteSpace;
 
-				fLineInfos.Replace(lineIndex, line);
+				fLineInfos[lineIndex] = line;
 			}
 		}
 
@@ -751,7 +756,7 @@ ParagraphLayout::_ApplyAlignment()
 		unsigned classification = get_char_classification(glyph.charCode);
 
 		if (i < glyphCount - 1) {
-			GlyphInfo nextGlyph = fGlyphInfos.ItemAtFast(i + 1);
+			GlyphInfo nextGlyph = fGlyphInfos[i + 1];
 			if (nextGlyph.lineIndex == lineIndex) {
 				uint32 nextClassification
 					= get_char_classification(nextGlyph.charCode);
@@ -762,12 +767,12 @@ ParagraphLayout::_ApplyAlignment()
 					// character
 					float shift = (nextGlyph.x - glyph.x) - glyph.width;
 					nextGlyph.x -= shift;
-					fGlyphInfos.Replace(i + 1, nextGlyph);
+					fGlyphInfos[i + 1] = nextGlyph;
 				}
 			}
 		}
 
-		fGlyphInfos.Replace(i, glyph);
+		fGlyphInfos[i] = glyph;
 
 		// The shift (spaceLeft) is reduced depending on the character
 		// classification.
@@ -827,7 +832,16 @@ ParagraphLayout::_AppendGlyphInfo(uint32 charCode, float width,
 
 	width += style.GlyphSpacing();
 
-	return fGlyphInfos.Add(GlyphInfo(charCode, 0.0f, width, 0));
+	try {
+		fGlyphInfos.push_back(GlyphInfo(charCode, 0.0f, width, 0));
+	}
+	catch (std::bad_alloc& ba) {
+		fprintf(stderr, "bad_alloc occurred adding glyph info to a "
+			"paragraph\n");
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -843,42 +857,50 @@ ParagraphLayout::_FinalizeLine(int lineStart, int lineEnd, int lineIndex,
 
 	for (int i = lineStart; i <= lineEnd; i++) {
 		// Mark line index in glyph
-		GlyphInfo glyph = fGlyphInfos.ItemAtFast(i);
+		GlyphInfo glyph = fGlyphInfos[i];
 		glyph.lineIndex = lineIndex;
-		fGlyphInfos.Replace(i, glyph);
+		fGlyphInfos[i] = glyph;
 
 		// See if the next sub-span needs to be added to the LineInfo
 		bool addSpan = false;
 
 		while (i >= spanEnd) {
 			spanIndex++;
-			const TextSpan& span = fTextSpans.ItemAt(spanIndex);
+			const TextSpan& span = fTextSpans[spanIndex];
 			spanStart = spanEnd;
 			spanEnd += span.CountChars();
 			addSpan = true;
 		}
 
 		if (addSpan) {
-			const TextSpan& span = fTextSpans.ItemAt(spanIndex);
+			const TextSpan& span = fTextSpans[spanIndex];
 			TextSpan subSpan = span.SubSpan(i - spanStart,
 				(lineEnd - spanStart + 1) - (i - spanStart));
-			line.layoutedSpans.Add(subSpan);
+			line.layoutedSpans.push_back(subSpan);
 			_IncludeStyleInLine(line, span.Style());
 		}
 	}
 
-	if (fGlyphInfos.CountItems() == 0 && fTextSpans.CountItems() > 0) {
+	if (fGlyphInfos.empty() && !fTextSpans.empty()) {
 		// When the layout contains no glyphs, but there is at least one
 		// TextSpan in the paragraph, use the font info from that span
 		// to calculate the height of the first LineInfo.
-		const TextSpan& span = fTextSpans.ItemAtFast(0);
-		line.layoutedSpans.Add(span);
+		const TextSpan& span = fTextSpans[0];
+		line.layoutedSpans.push_back(span);
 		_IncludeStyleInLine(line, span.Style());
 	}
 
 	lineHeight = line.height;
 
-	return fLineInfos.Add(line);
+	try {
+		fLineInfos.push_back(line);
+	}
+	catch (std::bad_alloc& ba) {
+		fprintf(stderr, "bad_alloc occurred adding line to line infos\n");
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -908,9 +930,9 @@ ParagraphLayout::_DrawLine(BView* view, const BPoint& offset,
 	const LineInfo& line) const
 {
 	int textOffset = line.textOffset;
-	int spanCount = line.layoutedSpans.CountItems();
+	int spanCount = static_cast<int>(line.layoutedSpans.size());
 	for (int i = 0; i < spanCount; i++) {
-		const TextSpan& span = line.layoutedSpans.ItemAtFast(i);
+		const TextSpan& span = line.layoutedSpans[i];
 		_DrawSpan(view, offset, span, textOffset);
 		textOffset += span.CountChars();
 	}
@@ -925,8 +947,8 @@ ParagraphLayout::_DrawSpan(BView* view, BPoint offset,
 	if (text.Length() == 0)
 		return;
 
-	const GlyphInfo& glyph = fGlyphInfos.ItemAtFast(textOffset);
-	const LineInfo& line = fLineInfos.ItemAtFast(glyph.lineIndex);
+	const GlyphInfo& glyph = fGlyphInfos[textOffset];
+	const LineInfo& line = fLineInfos[glyph.lineIndex];
 
 	offset.x += glyph.x;
 	offset.y += line.y + line.maxAscent;
@@ -954,7 +976,7 @@ void
 ParagraphLayout::_GetEmptyLayoutBounds(float& x1, float& y1, float& x2,
 	float& y2) const
 {
-	if (fLineInfos.CountItems() == 0) {
+	if (fLineInfos.empty()) {
 		x1 = 0.0f;
 		y1 = 0.0f;
 		x2 = 0.0f;
@@ -969,7 +991,16 @@ ParagraphLayout::_GetEmptyLayoutBounds(float& x1, float& y1, float& x2,
 	x1 = fParagraphStyle.LineInset() + fParagraphStyle.FirstLineInset()
 		+ bullet.Spacing();
 	x2 = x1;
-	const LineInfo& lineInfo = fLineInfos.ItemAt(0);
+	const LineInfo& lineInfo = fLineInfos[0];
 	y1 = lineInfo.y;
 	y2 = lineInfo.y + lineInfo.height;
+}
+
+
+void
+ParagraphLayout::_AppendTextSpans(const Paragraph& paragraph)
+{
+	int32 countTextSpans = paragraph.CountTextSpans();
+	for (int32 i = 0; i< countTextSpans; i++)
+		fTextSpans.push_back(paragraph.TextSpanAtIndex(i));
 }

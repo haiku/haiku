@@ -5,14 +5,6 @@
 #include <lock.h>
 
 
-// benaphores
-
-#define INIT_BEN(x, prefix)	(mutex_init_etc(x, prefix, MUTEX_FLAG_CLONE_NAME), \
-								B_OK)
-#define	DELETE_BEN(x)		mutex_destroy(x)
-#define ACQUIRE_BEN(x)		mutex_lock(x)
-#define RELEASE_BEN(x)		mutex_unlock(x)
-
 // debug output
 
 #ifdef DEBUG_WAIT_ON_MSG

@@ -34,8 +34,11 @@
 	_v; \
 })
 
-#define x86_write_cr3(value) \
-	__asm__("mov    %0,%%cr3" : : "r" (value))
+static inline void
+x86_write_cr3(size_t value)
+{
+	__asm__("mov %0,%%cr3" : : "r" (value) : "memory");
+}
 
 #define x86_read_cr4() ({ \
 	size_t _v; \

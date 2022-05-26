@@ -162,7 +162,7 @@ BNetworkAddress::SetTo(const char* host, uint16 port, uint32 flags)
 {
 	BReference<const BNetworkAddressResolver> resolver
 		= BNetworkAddressResolver::Resolve(host, port, flags);
-	if (resolver.Get() == NULL)
+	if (!resolver.IsSet())
 		return B_NO_MEMORY;
 	status_t status = resolver->InitCheck();
 	if (status != B_OK)
@@ -189,7 +189,7 @@ BNetworkAddress::SetTo(const char* host, const char* service, uint32 flags)
 {
 	BReference<const BNetworkAddressResolver> resolver
 		= BNetworkAddressResolver::Resolve(host, service, flags);
-	if (resolver.Get() == NULL)
+	if (!resolver.IsSet())
 		return B_NO_MEMORY;
 	status_t status = resolver->InitCheck();
 	if (status != B_OK)
@@ -223,7 +223,7 @@ BNetworkAddress::SetTo(int family, const char* host, uint16 port, uint32 flags)
 
 	BReference<const BNetworkAddressResolver> resolver
 		= BNetworkAddressResolver::Resolve(family, host, port, flags);
-	if (resolver.Get() == NULL)
+	if (!resolver.IsSet())
 		return B_NO_MEMORY;
 	status_t status = resolver->InitCheck();
 	if (status != B_OK)
@@ -252,7 +252,7 @@ BNetworkAddress::SetTo(int family, const char* host, const char* service,
 
 	BReference<const BNetworkAddressResolver> resolver
 		= BNetworkAddressResolver::Resolve(family, host, service, flags);
-	if (resolver.Get() == NULL)
+	if (!resolver.IsSet())
 		return B_NO_MEMORY;
 	status_t status = resolver->InitCheck();
 	if (status != B_OK)

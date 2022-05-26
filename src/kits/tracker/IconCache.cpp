@@ -74,6 +74,7 @@ All rights reserved.
 #include "IconCache.h"
 #include "MimeTypes.h"
 #include "Model.h"
+#include "Thumbnails.h"
 
 
 //#if DEBUG
@@ -291,18 +292,24 @@ void
 IconCacheEntry::SetIcon(BBitmap* bitmap, IconDrawMode mode, icon_size size,
 	bool /*create*/)
 {
+	BBitmap** icon = NULL;
 	if (mode == kNormalIcon) {
 		if (size == B_MINI_ICON)
-			fMiniIcon = bitmap;
+			icon = &fMiniIcon;
 		else
-			fLargeIcon = bitmap;
+			icon = &fLargeIcon;
 	} else if (mode == kSelectedIcon) {
 		if (size == B_MINI_ICON)
-			fHighlightedMiniIcon = bitmap;
+			icon = &fHighlightedMiniIcon;
 		else
-			fHighlightedLargeIcon = bitmap;
-	} else
+			icon = &fHighlightedLargeIcon;
+	}
+	if (icon == NULL)
 		TRESPASS();
+
+	if ((*icon) != NULL)
+		delete *icon;
+	*icon = bitmap;
 }
 
 
@@ -773,20 +780,23 @@ IconCache::GetNodeIcon(ModelNodeLazyOpener* modelOpener,
 	if (entry == NULL || !entry->HaveIconBitmap(NORMAL_ICON_ONLY, size)) {
 		modelOpener->OpenNode();
 
-		BFile* file = NULL;
+		PRINT_DISK_HITS(("File %s; Line %d # hitting disk for node %s\n",
+			__FILE__, __LINE__, model->Name()));
 
 		// if we are dealing with an application, use the BAppFileInfo
 		// superset of node; this makes GetIcon grab the proper icon for
 		// an app
-		if (model->IsExecutable())
-			file = dynamic_cast<BFile*>(model->Node());
 
-		PRINT_DISK_HITS(("File %s; Line %d # hitting disk for node %s\n",
-			__FILE__, __LINE__, model->Name()));
-
-		status_t result = file != NULL
-			? GetAppIconFromAttr(file, lazyBitmap->Get(), size)
-			: GetFileIconFromAttr(model->Node(), lazyBitmap->Get(), size);
+		BFile* file = NULL;
+		status_t result = B_ERROR;
+		if (model->IsExecutable()
+			&& (file = dynamic_cast<BFile*>(model->Node())) != NULL) {
+			result = GetAppIconFromAttr(file, lazyBitmap->Get(), size);
+		} else {
+			result = GetThumbnailFromAttr(model, lazyBitmap->Get(), size);
+			if (result != B_OK && result != B_BUSY)
+				result = GetFileIconFromAttr(model->Node(), lazyBitmap->Get(), size);
+		}
 
 		if (result == B_OK) {
 			// node has its own icon, use it

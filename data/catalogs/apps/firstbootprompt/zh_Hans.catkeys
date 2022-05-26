@@ -1,7 +1,6 @@
-1	english	x-vnd.Haiku-FirstBootPrompt	2791747426
+1	english	x-vnd.Haiku-FirstBootPrompt	2477122091
+Cancel	BootPromptWindow		取消
 Keymap	BootPromptWindow		键盘映射
-Run Installer	BootPromptWindow		运行系统安装器
+Restart system	BootPromptWindow		重启系统
 Language	BootPromptWindow		语言
 Custom	BootPromptWindow		自定义
-Boot to Desktop	BootPromptWindow		开机进入桌面
-Welcome to Haiku!	BootPromptWindow		欢迎使用 Haiku!

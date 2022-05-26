@@ -36,7 +36,12 @@
 	To ease list handling, the list anchor itself is a free chunk with
 	size 0 that can't be allocated.
 */
+#if __cplusplus >= 201103L
+#include <cstddef>
+const static size_t kAlignment = alignof(max_align_t);
+#else
 const static size_t kAlignment = 8;
+#endif
 	// all memory chunks will be a multiple of this
 
 const static size_t kInitialHeapSize = 64 * 1024;

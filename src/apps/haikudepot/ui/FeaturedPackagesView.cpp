@@ -1,7 +1,7 @@
 /*
  * Copyright 2013-214, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2020-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -22,6 +22,7 @@
 
 #include "BitmapView.h"
 #include "HaikuDepotConstants.h"
+#include "LocaleUtils.h"
 #include "Logger.h"
 #include "MainWindow.h"
 #include "MarkupTextView.h"
@@ -41,8 +42,9 @@
 #define X_POSITION_RATING 350.0f
 #define X_POSITION_SUMMARY 500.0f
 #define WIDTH_RATING 100.0f
-#define Y_PROPORTION_TITLE 0.4f
-#define Y_PROPORTION_PUBLISHER 0.7f
+#define Y_PROPORTION_TITLE 0.35f
+#define Y_PROPORTION_PUBLISHER 0.60f
+#define Y_PROPORTION_CHRONOLOGICAL_DATA 0.75f
 #define PADDING 8.0f
 
 
@@ -61,7 +63,8 @@ public:
 		fModel(model),
 		fSelectedIndex(-1),
 		fPackageListener(
-			new(std::nothrow) OnePackageMessagePackageListener(this))
+			new(std::nothrow) OnePackageMessagePackageListener(this)),
+		fLowestIndexAddedOrRemoved(-1)
 	{
 		SetEventMask(B_POINTER_EVENTS);
 		Clear();
@@ -124,11 +127,14 @@ public:
 		switch (key) {
 			case B_RIGHT_ARROW:
 			case B_DOWN_ARROW:
+			{
+				int32 lastIndex = static_cast<int32>(fPackages.size()) - 1;
 				if (!IsEmpty() && fSelectedIndex != -1
-						&& fSelectedIndex < fPackages.size() - 1) {
+						&& fSelectedIndex < lastIndex) {
 					_MessageSelectIndex(fSelectedIndex + 1);
 				}
 				break;
+			}
 			case B_LEFT_ARROW:
 			case B_UP_ARROW:
 				if (fSelectedIndex > 0)
@@ -165,7 +171,8 @@ public:
 	{
 		if (index != -1) {
 			BMessage message(MSG_PACKAGE_SELECTED);
-			message.AddString("name", fPackages[index]->Name());
+			BString packageName = fPackages[index]->Name();
+			message.AddString("name", packageName);
 			Window()->PostMessage(&message);
 		}
 	}
@@ -224,6 +231,20 @@ public:
 	}
 
 
+	static int _CmpProminences(int64 a, int64 b)
+	{
+		if (a <= 0)
+			a = PROMINANCE_ORDERING_MAX;
+		if (b <= 0)
+			b = PROMINANCE_ORDERING_MAX;
+		if (a == b)
+			return 0;
+		if (a > b)
+			return 1;
+		return -1;
+	}
+
+
 	/*! This method will return true if the packageA is ordered before
 		packageB.
 	*/
@@ -231,13 +252,36 @@ public:
 	static bool _IsPackageBefore(const PackageInfoRef& packageA,
 		const PackageInfoRef& packageB)
 	{
-		if (packageA.Get() == NULL || packageB.Get() == NULL)
-			debugger("unexpected NULL reference in a referencable");
-		int c = packageA->Title().ICompare(packageB->Title());
+		if (!packageA.IsSet() || !packageB.IsSet())
+			HDFATAL("unexpected NULL reference in a referencable");
+		int c = _CmpProminences(packageA->Prominence(), packageB->Prominence());
+		if (c == 0)
+			c = packageA->Title().ICompare(packageB->Title());
 		if (c == 0)
 			c = packageA->Name().Compare(packageB->Name());
 		return c < 0;
 	}
+
+
+	void BeginAddRemove()
+	{
+		fLowestIndexAddedOrRemoved = INT32_MAX;
+	}
+
+
+	void EndAddRemove()
+	{
+		if (fLowestIndexAddedOrRemoved < INT32_MAX) {
+			if (fPackages.empty())
+				Invalidate();
+			else {
+				BRect invalidRect = Bounds();
+				invalidRect.top = _YOfIndex(fLowestIndexAddedOrRemoved);
+				Invalidate(invalidRect);
+			}
+		}
+	}
+
 
 	void AddPackage(const PackageInfoRef& package)
 	{
@@ -257,9 +301,9 @@ public:
 			if (fSelectedIndex >= insertionIndex)
 				fSelectedIndex++;
 			fPackages.insert(itInsertionPt, package);
-			Invalidate(_RectOfIndex(insertionIndex)
-				| _RectOfIndex(fPackages.size() - 1));
 			package->AddListener(fPackageListener);
+			if (insertionIndex < fLowestIndexAddedOrRemoved)
+				fLowestIndexAddedOrRemoved = insertionIndex;
 		}
 	}
 
@@ -274,12 +318,8 @@ public:
 				fSelectedIndex--;
 			fPackages[index]->RemoveListener(fPackageListener);
 			fPackages.erase(fPackages.begin() + index);
-			if (fPackages.empty())
-				Invalidate();
-			else {
-				Invalidate(_RectOfIndex(index)
-					| _RectOfIndex(fPackages.size() - 1));
-			}
+			if (index < fLowestIndexAddedOrRemoved)
+				fLowestIndexAddedOrRemoved = index;
 		}
 	}
 
@@ -369,6 +409,7 @@ public:
 		_DrawPackageIcon(updateRect, pkg, y, selected);
 		_DrawPackageTitle(updateRect, pkg, y, selected);
 		_DrawPackagePublisher(updateRect, pkg, y, selected);
+		_DrawPackageCronologicalInfo(updateRect, pkg, y, selected);
 		_DrawPackageRating(updateRect, pkg, y, selected);
 		_DrawPackageSummary(updateRect, pkg, y, selected);
 	}
@@ -382,7 +423,7 @@ public:
 			pkg->Name(), BITMAP_SIZE_64, icon);
 
 		if (iconResult == B_OK) {
-			if (icon.Get() != NULL) {
+			if (icon.IsSet()) {
 				float inset = (HEIGHT_PACKAGE - SIZE_ICON) / 2.0;
 				BRect targetRect = BRect(inset, y + inset, SIZE_ICON + inset,
 					y + SIZE_ICON + inset);
@@ -430,8 +471,8 @@ public:
 	}
 
 
-	void _DrawPackagePublisher(BRect updateRect, PackageInfoRef pkg, float y,
-		bool selected)
+	void _DrawPackageGenericTextSlug(BRect updateRect, PackageInfoRef pkg,
+		const BString& text, float y, float yProportion, bool selected)
 	{
 		static BFont* sFont = NULL;
 
@@ -450,11 +491,30 @@ public:
 		SetFont(sFont);
 
 		float maxTextWidth = (X_POSITION_RATING - HEIGHT_PACKAGE) - PADDING;
-		BString publisherName(pkg->Publisher().Name());
-		TruncateString(&publisherName, B_TRUNCATE_END, maxTextWidth);
+		BString renderedText(text);
+		TruncateString(&renderedText, B_TRUNCATE_END, maxTextWidth);
 
-		DrawString(publisherName, BPoint(HEIGHT_PACKAGE,
-			y + (HEIGHT_PACKAGE * Y_PROPORTION_PUBLISHER)));
+		DrawString(renderedText, BPoint(HEIGHT_PACKAGE,
+			y + (HEIGHT_PACKAGE * yProportion)));
+	}
+
+
+	void _DrawPackagePublisher(BRect updateRect, PackageInfoRef pkg, float y,
+		bool selected)
+	{
+		_DrawPackageGenericTextSlug(updateRect, pkg, pkg->Publisher().Name(), y,
+			Y_PROPORTION_PUBLISHER, selected);
+	}
+
+
+	void _DrawPackageCronologicalInfo(BRect updateRect, PackageInfoRef pkg,
+		float y, bool selected)
+	{
+		BString versionCreateTimestampPresentation
+			= LocaleUtils::TimestampToDateString(pkg->VersionCreateTimestamp());
+		_DrawPackageGenericTextSlug(updateRect, pkg,
+			versionCreateTimestampPresentation, y,
+			Y_PROPORTION_CHRONOLOGICAL_DATA, selected);
 	}
 
 
@@ -542,7 +602,7 @@ public:
 
 	float TopOfPackage(const PackageInfoRef& package)
 	{
-		if (package.Get() != NULL) {
+		if (package.IsSet()) {
 			int index = _IndexOfPackage(package);
 			if (-1 != index)
 				return _YOfIndex(index);
@@ -572,8 +632,8 @@ public:
 	{
 		if (fPackages.empty())
 			return -1;
-		int32 i = y / HEIGHT_PACKAGE;
-		if (i < 0 || i >= fPackages.size())
+		int32 i = static_cast<int32>(y / HEIGHT_PACKAGE);
+		if (i < 0 || i >= static_cast<int32>(fPackages.size()))
 			return -1;
 		return i;
 	}
@@ -589,7 +649,7 @@ public:
 	{
 		if (fPackages.empty())
 			return -1;
-		int32 i = y / HEIGHT_PACKAGE;
+		int32 i = static_cast<int32>(y / HEIGHT_PACKAGE);
 		if (i < 0)
 			return 0;
 		return std::min(i, (int32) (fPackages.size() - 1));
@@ -609,6 +669,7 @@ private:
 			int32				fSelectedIndex;
 			OnePackageMessagePackageListener*
 								fPackageListener;
+			int32				fLowestIndexAddedOrRemoved;
 };
 
 
@@ -635,6 +696,21 @@ FeaturedPackagesView::~FeaturedPackagesView()
 }
 
 
+void
+FeaturedPackagesView::BeginAddRemove()
+{
+	fPackagesView->BeginAddRemove();
+}
+
+
+void
+FeaturedPackagesView::EndAddRemove()
+{
+	fPackagesView->EndAddRemove();
+	_AdjustViews();
+}
+
+
 /*! This method will add the package into the list to be displayed.  The
     insertion will occur in alphabetical order.
 */
@@ -643,7 +719,6 @@ void
 FeaturedPackagesView::AddPackage(const PackageInfoRef& package)
 {
 	fPackagesView->AddPackage(package);
-	_AdjustViews();
 }
 
 
@@ -651,7 +726,6 @@ void
 FeaturedPackagesView::RemovePackage(const PackageInfoRef& package)
 {
 	fPackagesView->RemovePackage(package);
-	_AdjustViews();
 }
 
 

@@ -115,8 +115,8 @@ const int32 operators[] = {
 	B_NE,
 	B_BEGINS_WITH,
 	B_ENDS_WITH,
-	B_GE,
-	B_LE
+	B_GT,
+	B_LT
 };
 
 static const char* operatorLabels[] = {
@@ -1167,12 +1167,6 @@ FindPanel::MessageReceived(BMessage* message)
 
 		case kMIMETypeItem:
 		{
-			if (fMode == kByAttributeItem) {
-				// the attributes for this type may be different
-				RemoveAttrViewItems(false);
-				AddAttrRow();
-			}
-
 			BMenuItem* item;
 			if (message->FindPointer("source", (void**)&item) == B_OK) {
 				// don't add the "All files and folders" to the list
@@ -1180,6 +1174,11 @@ FindPanel::MessageReceived(BMessage* message)
 					gMostUsedMimeTypes.AddName(item->Label());
 
 				SetCurrentMimeType(item);
+			}
+			if (fMode == kByAttributeItem) {
+				// the attributes for this type may be different
+				RemoveAttrViewItems(false);
+				AddAttrRow();
 			}
 
 			break;
@@ -2628,12 +2627,12 @@ FindPanel::AddAttributeControls(int32 gridRow)
 	menu->AddItem(item);
 
 	message = new BMessage(kAttributeItem);
-	message->AddInt32("operator", B_GE);
+	message->AddInt32("operator", B_GT);
 	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[5]),
 		message));
 
 	message = new BMessage(kAttributeItem);
-	message->AddInt32("operator", B_LE);
+	message->AddInt32("operator", B_LT);
 	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[6]),
 		message));
 
@@ -2653,12 +2652,12 @@ FindPanel::AddAttributeControls(int32 gridRow)
 	menu->AddItem(item);
 
 	message = new BMessage(kAttributeItem);
-	message->AddInt32("operator", B_LE);
+	message->AddInt32("operator", B_LT);
 	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[7]),
 		message));
 
 	message = new BMessage(kAttributeItem);
-	message->AddInt32("operator", B_GE);
+	message->AddInt32("operator", B_GT);
 	submenu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(operatorLabels[8]),
 		message));
 
@@ -2924,21 +2923,21 @@ FindPanel::AddAttributes(BMenu* menu, const BMimeType &mimeType)
 				submenu->AddItem(new BMenuItem(operatorLabels[1], message));
 
 				message = new BMessage(kAttributeItem);
-				message->AddInt32("operator", B_GE);
+				message->AddInt32("operator", B_GT);
 				submenu->AddItem(new BMenuItem(operatorLabels[5], message));
 
 				message = new BMessage(kAttributeItem);
-				message->AddInt32("operator", B_LE);
+				message->AddInt32("operator", B_LT);
 				submenu->AddItem(new BMenuItem(operatorLabels[6], message));
 				break;
 
 			case B_TIME_TYPE:
 				message = new BMessage(kAttributeItem);
-				message->AddInt32("operator", B_LE);
+				message->AddInt32("operator", B_LT);
 				submenu->AddItem(new BMenuItem(operatorLabels[7], message));
 
 				message = new BMessage(kAttributeItem);
-				message->AddInt32("operator", B_GE);
+				message->AddInt32("operator", B_GT);
 				submenu->AddItem(new BMenuItem(operatorLabels[8], message));
 				break;
 		}

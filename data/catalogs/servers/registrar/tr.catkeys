@@ -1,5 +1,5 @@
 1	turkish	x-vnd.haiku-registrar	2599857937
-Cancel	ShutdownProcess		İptal
+Cancel	ShutdownProcess		Vazgeç
 OK	ShutdownProcess		Tamam
 Do you really want to shut down the system?	ShutdownProcess		Sistemi kapatmak istediğinizden emin misiniz?
 Shutdown status	ShutdownProcess		Kapanma Durumu
@@ -12,7 +12,7 @@ Asking background applications to quit.	ShutdownProcess		Arka plan uygulamaları
 Do you really want to restart the system?	ShutdownProcess		Sistemi yeniden başlatmak istediğinizden emin misiniz?
 Restart	ShutdownProcess		Yeniden başlat
 It's now safe to turn off the computer.	ShutdownProcess		Bilgisayarınızı şimdi kapatabilirsiniz. Hoşça kalın!
-Asking other processes to quit.	ShutdownProcess		Diğer işlemlere kapanmaları söyleniyor…
+Asking other processes to quit.	ShutdownProcess		Diğer süreçlere kapanmaları söyleniyor…
 Cancel shutdown	ShutdownProcess		Kapanmayı iptal et
 Restarting…	ShutdownProcess		Yeniden başlatılıyor…
 %action%?	ShutdownProcess		%action%?

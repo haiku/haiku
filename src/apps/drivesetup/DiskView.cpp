@@ -421,7 +421,7 @@ public:
 				partition_id id
 					= fSpaceIDMap.SpaceIDFor(partition->ID(), offset);
 				PartitionView* view = new PartitionView(
-					B_TRANSLATE("<empty or unknown>"), scale, offset,
+					B_TRANSLATE("Empty space"), scale, offset,
 					parentView->Level() + 1, id, partition);
 
 				fViewMap.Put(id, view);

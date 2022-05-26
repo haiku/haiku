@@ -291,8 +291,8 @@ UnixFifo::Init()
 void
 UnixFifo::Shutdown(uint32 shutdown)
 {
-	TRACE("[%ld] %p->UnixFifo::Shutdown(0x%lx)\n", find_thread(NULL), this,
-		shutdown);
+	TRACE("[%" B_PRId32 "] %p->UnixFifo::Shutdown(0x%" B_PRIx32 ")\n",
+		find_thread(NULL), this, shutdown);
 
 	fShutdown |= shutdown;
 
@@ -308,8 +308,8 @@ ssize_t
 UnixFifo::Read(const iovec* vecs, size_t vecCount,
 	ancillary_data_container** _ancillaryData, bigtime_t timeout)
 {
-	TRACE("[%ld] %p->UnixFifo::Read(%p, %ld, %lld)\n", find_thread(NULL),
-		this, vecs, vecCount, timeout);
+	TRACE("[%" B_PRId32 "] %p->UnixFifo::Read(%p, %ld, %" B_PRIdBIGTIME ")\n",
+		find_thread(NULL), this, vecs, vecCount, timeout);
 
 	if (IsReadShutdown() && fBuffer.Readable() == 0)
 		RETURN_ERROR(UNIX_FIFO_SHUTDOWN);
@@ -353,8 +353,9 @@ ssize_t
 UnixFifo::Write(const iovec* vecs, size_t vecCount,
 	ancillary_data_container* ancillaryData, bigtime_t timeout)
 {
-	TRACE("[%ld] %p->UnixFifo::Write(%p, %ld, %p, %lld)\n", find_thread(NULL),
-		this, vecs, vecCount, ancillaryData, timeout);
+	TRACE("[%" B_PRId32 "] %p->UnixFifo::Write(%p, %ld, %p, %" B_PRIdBIGTIME
+		")\n", find_thread(NULL), this, vecs, vecCount, ancillaryData,
+		timeout);
 
 	if (IsWriteShutdown())
 		RETURN_ERROR(UNIX_FIFO_SHUTDOWN);

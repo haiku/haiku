@@ -1,11 +1,11 @@
-1	italian	x-vnd.Haiku-Time	834234238
+1	italian	x-vnd.Haiku-Time	3691539601
 OK	Time		OK
 Message receiving failed	Time		Ricezione del messaggio fallita
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Data e Ora, a cura di:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Australia
 America	Time		America
 Reset to default server list	Time		Reimposta la lista dei server predefinita
 Could not resolve server address	Time		Impossibile risolvere l'indirizzo del server
+Time & Date	System name		Ora e Data
 Set time zone	Time		Imposta fuso orario
 Waiting for answer failed	Time		Nessuna risposta pervenuta
 <Other>	Time		<Altro>
@@ -38,7 +38,6 @@ Atlantic	Time		Atlantico
 Show clock in Deskbar	Time		Mostra l'orologio nella Deskbar
 Display time with seconds	Time		Mostra i secondi
 Time	System name		Data e Ora
-about	Time		informazioni
 Show time zone	Time		Mostra fuso orario
 Synchronize at boot	Time		Sincronizza all'avvio
 Indian	Time		Indiano

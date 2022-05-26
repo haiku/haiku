@@ -10,13 +10,13 @@
 
 #include "CalendarViewTest.h"
 #include "DriverSettingsMessageAdapterTest.h"
-#include "GeolocationTest.h"
 #include "NaturalCompareTest.h"
 #include "JsonEndToEndTest.h"
 #include "JsonErrorHandlingTest.h"
 #include "JsonTextWriterTest.h"
 #include "JsonToMessageTest.h"
 #include "KeymapTest.h"
+#include "LRUCacheTest.h"
 
 
 BTestSuite*
@@ -26,13 +26,13 @@ getTestSuite()
 
 	CalendarViewTest::AddTests(*suite);
 	DriverSettingsMessageAdapterTest::AddTests(*suite);
-	GeolocationTest::AddTests(*suite);
 	NaturalCompareTest::AddTests(*suite);
 	JsonEndToEndTest::AddTests(*suite);
 	JsonErrorHandlingTest::AddTests(*suite);
 	JsonTextWriterTest::AddTests(*suite);
 	JsonToMessageTest::AddTests(*suite);
 	KeymapTest::AddTests(*suite);
+	LRUCacheTest::AddTests(*suite);
 
 	return suite;
 }

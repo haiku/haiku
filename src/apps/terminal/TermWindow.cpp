@@ -57,6 +57,7 @@
 #include "ActiveProcessInfo.h"
 #include "Arguments.h"
 #include "AppearPrefView.h"
+#include "Colors.h"
 #include "FindWindow.h"
 #include "Globals.h"
 #include "PrefWindow.h"
@@ -1206,6 +1207,29 @@ TermWindow::_SetTermColors(TermViewContainerView* containerView)
 		handler->getRGB(PREF_CURSOR_BACK_COLOR));
 	termView->SetSelectColor(handler->getRGB(PREF_SELECT_FORE_COLOR),
 		handler->getRGB(PREF_SELECT_BACK_COLOR));
+
+	// taken from TermApp::_InitDefaultPalette()
+	const char * keys[kANSIColorCount] = {
+		PREF_ANSI_BLACK_COLOR,
+		PREF_ANSI_RED_COLOR,
+		PREF_ANSI_GREEN_COLOR,
+		PREF_ANSI_YELLOW_COLOR,
+		PREF_ANSI_BLUE_COLOR,
+		PREF_ANSI_MAGENTA_COLOR,
+		PREF_ANSI_CYAN_COLOR,
+		PREF_ANSI_WHITE_COLOR,
+		PREF_ANSI_BLACK_HCOLOR,
+		PREF_ANSI_RED_HCOLOR,
+		PREF_ANSI_GREEN_HCOLOR,
+		PREF_ANSI_YELLOW_HCOLOR,
+		PREF_ANSI_BLUE_HCOLOR,
+		PREF_ANSI_MAGENTA_HCOLOR,
+		PREF_ANSI_CYAN_HCOLOR,
+		PREF_ANSI_WHITE_HCOLOR
+	};
+
+	for (uint i = 0; i < kANSIColorCount; i++)
+		termView->SetTermColor(i, handler->getRGB(keys[i]), false);
 }
 
 
@@ -1889,7 +1913,8 @@ TermWindow::_OpenSetTabTitleDialog(int32 index)
 	BString toolTip = BString(B_TRANSLATE(
 		"The pattern specifying the current tab title. The following "
 			"placeholders\n"
-		"can be used:\n")) << kTooTipSetTabTitlePlaceholders;
+		"can be used:\n")) << kToolTipSetTabTitlePlaceholders << "\n"
+		<< kToolTipCommonTitlePlaceholders;
 	fSetTabTitleDialog = new SetTitleDialog(
 		B_TRANSLATE("Set tab title"), B_TRANSLATE("Tab title:"),
 		toolTip);
@@ -1918,7 +1943,8 @@ TermWindow::_OpenSetWindowTitleDialog()
 
 	BString toolTip = BString(B_TRANSLATE(
 		"The pattern specifying the window title. The following placeholders\n"
-		"can be used:\n")) << kTooTipSetTabTitlePlaceholders;
+		"can be used:\n")) << kToolTipSetWindowTitlePlaceholders << "\n"
+		<< kToolTipCommonTitlePlaceholders;
 	fSetWindowTitleDialog = new SetTitleDialog(B_TRANSLATE("Set window title"),
 		B_TRANSLATE("Window title:"), toolTip);
 

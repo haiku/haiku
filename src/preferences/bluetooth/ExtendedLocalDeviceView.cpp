@@ -1,7 +1,12 @@
 /*
- * Copyright 2008-09, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes_at_gmail.com>
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2008-2009, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes@gmail.com>
+ * Copyright 2021, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Fredrik Modéen <fredrik_at_modeen.se>
  */
+
 #include "ExtendedLocalDeviceView.h"
 
 #include <bluetooth/bdaddrUtils.h>
@@ -34,6 +39,7 @@ ExtendedLocalDeviceView::ExtendedLocalDeviceView(LocalDevice* bDevice,
 		B_TRANSLATE("Show name"), new BMessage(SET_VISIBLE));
 	fAuthentication = new BCheckBox("Authenticate",
 		B_TRANSLATE("Authenticate"), new BMessage(SET_AUTHENTICATION));
+	fAuthentication->SetEnabled(false);
 
 	SetEnabled(false);
 
@@ -42,11 +48,10 @@ ExtendedLocalDeviceView::ExtendedLocalDeviceView(LocalDevice* bDevice,
 		.Add(fDeviceView)
 		.AddGroup(B_HORIZONTAL, 0)
 			.SetInsets(5)
-			.AddGlue()
 			.Add(fDiscoverable)
 			.Add(fVisible)
+			.Add(fAuthentication)
 		.End()
-		.Add(fAuthentication)
 	.End();
 }
 
@@ -67,7 +72,6 @@ ExtendedLocalDeviceView::SetLocalDevice(LocalDevice* lDevice)
 		ClearDevice();
 
 		int value = fDevice->GetDiscoverable();
-		printf("ExtendedLocalDeviceView::SetLocalDevice value = %d\n", value);
 		if (value == 1)
 			fDiscoverable->SetValue(true);
 		else if (value == 2)
@@ -76,6 +80,11 @@ ExtendedLocalDeviceView::SetLocalDevice(LocalDevice* lDevice)
 			fDiscoverable->SetValue(true);
 			fVisible->SetValue(true);
 		}
+#if 0
+//		TODO implement GetAuthentication in LocalDevice
+		if (fDevice->GetAuthentication())
+			fAuthentication->SetValue(true);
+#endif
 	}
 }
 
@@ -115,16 +124,14 @@ ExtendedLocalDeviceView::MessageReceived(BMessage* message)
 		case SET_VISIBLE:
 			fScanMode = 0;
 
-			if (fDiscoverable->Value()) {
+			if (fDiscoverable->Value())
 				fScanMode = 1;
-				fVisible->SetEnabled(true);
-			} else {
-				fVisible->SetValue(false);
-				fVisible->SetEnabled(false);
-			}
 
 			if (fVisible->Value())
-				fScanMode |= 2;
+				fScanMode = 2;
+
+			if (fVisible->Value() && fDiscoverable->Value())
+				fScanMode = 3;
 
 			if (fDevice != NULL)
 				fDevice->SetDiscoverable(fScanMode);

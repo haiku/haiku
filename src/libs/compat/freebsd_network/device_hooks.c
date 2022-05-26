@@ -244,10 +244,13 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 
 			if ((ifp->if_flags & IFF_MULTICAST) == 0)
 				return B_NOT_SUPPORTED;
+			if (length != ETHER_ADDR_LEN)
+				return B_BAD_VALUE;
 
 			memset(&address, 0, sizeof(address));
 			address.sdl_family = AF_LINK;
-			memcpy(LLADDR(&address), arg, ETHER_ADDR_LEN);
+			if (user_memcpy(LLADDR(&address), arg, ETHER_ADDR_LEN) < B_OK)
+				return B_BAD_ADDRESS;
 
 			if (op == ETHER_ADDMULTI)
 				return if_addmulti(ifp, (struct sockaddr *)&address, NULL);
@@ -284,6 +287,12 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 				return B_BAD_ADDRESS;
 			}
 			return B_OK;
+
+		case SIOCSIFFLAGS:
+		case SIOCSIFMEDIA:
+		case SIOCGIFMEDIA:
+		case SIOCSIFMTU:
+			return ifp->if_ioctl(ifp, op, (caddr_t)arg);
 	}
 
 	return wlan_control(cookie, op, arg, length);

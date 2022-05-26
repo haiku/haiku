@@ -20,10 +20,14 @@
 #include <HttpRequest.h>
 #include <NetworkKit.h>
 #include <UrlProtocolListener.h>
+#include <UrlProtocolRoster.h>
 
 #include <tools/cppunit/ThreadedTestCaller.h>
 
 #include "TestServer.h"
+
+
+using namespace BPrivate::Network;
 
 
 namespace {
@@ -31,7 +35,7 @@ namespace {
 typedef std::map<std::string, std::string> HttpHeaderMap;
 
 
-class TestListener : public BUrlProtocolListener {
+class TestListener : public BUrlProtocolListener, public BDataIO {
 public:
 	TestListener(const std::string& expectedResponseBody,
 				 const HttpHeaderMap& expectedResponseHeaders)
@@ -41,24 +45,22 @@ public:
 	{
 	}
 
-	virtual void DataReceived(
-		BUrlRequest *caller,
-		const char *data,
-		off_t position,
-		ssize_t size)
+	virtual ssize_t Write(
+		const void *data,
+		size_t size)
 	{
 		std::copy_n(
-			data + position,
+			(const char*)data,
 			size,
 			std::back_inserter(fActualResponseBody));
+		return size;
 	}
 
 	virtual void HeadersReceived(
-		BUrlRequest* caller,
-		const BUrlResult& result)
+		BUrlRequest* caller)
 	{
 		const BHttpResult& http_result
-			= dynamic_cast<const BHttpResult&>(result);
+			= dynamic_cast<const BHttpResult&>(caller->Result());
 		const BHttpHeaders& headers = http_result.Headers();
 
 		for (int32 i = 0; i < headers.CountHeaders(); ++i) {
@@ -125,22 +127,24 @@ void SendAuthenticatedRequest(
 {
 	TestListener listener(expectedResponseBody, expectedResponseHeaders);
 
-	BHttpRequest request(testUrl, testUrl.Protocol() == "https");
-	request.SetContext(&context);
-	request.SetListener(&listener);
+	ObjectDeleter<BUrlRequest> requestDeleter(
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &listener,
+			&context));
+	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
+	CPPUNIT_ASSERT(request != NULL);
 
-	request.SetUserName("walter");
-	request.SetPassword("secret");
+	request->SetUserName("walter");
+	request->SetPassword("secret");
 
-	CPPUNIT_ASSERT(request.Run());
+	CPPUNIT_ASSERT(request->Run());
 
-	while (request.IsRunning())
+	while (request->IsRunning())
 		snooze(1000);
 
-	CPPUNIT_ASSERT_EQUAL(B_OK, request.Status());
+	CPPUNIT_ASSERT_EQUAL(B_OK, request->Status());
 
 	const BHttpResult &result =
-		dynamic_cast<const BHttpResult &>(request.Result());
+		dynamic_cast<const BHttpResult &>(request->Result());
 	CPPUNIT_ASSERT_EQUAL(200, result.StatusCode());
 	CPPUNIT_ASSERT_EQUAL(BString("OK"), result.StatusText());
 
@@ -164,9 +168,12 @@ template <typename T>
 void AddCommonTests(BThreadedTestCaller<T>& testCaller)
 {
 	testCaller.addThread("GetTest", &T::GetTest);
+	testCaller.addThread("HeadTest", &T::HeadTest);
+	testCaller.addThread("NoContentTest", &T::NoContentTest);
 	testCaller.addThread("UploadTest", &T::UploadTest);
 	testCaller.addThread("BasicAuthTest", &T::AuthBasicTest);
 	testCaller.addThread("DigestAuthTest", &T::AuthDigestTest);
+	testCaller.addThread("AutoRedirectTest", &T::AutoRedirectTest);
 }
 
 }
@@ -197,20 +204,18 @@ HttpTest::setUp()
 void
 HttpTest::GetTest()
 {
+	_GetTest("/");
+}
+
+
+void
+HttpTest::HeadTest()
+{
 	BUrl testUrl(fTestServer.BaseUrl(), "/");
 	BUrlContext* context = new BUrlContext();
 	context->AcquireReference();
 
-	std::string expectedResponseBody(
-		"Path: /\r\n"
-		"\r\n"
-		"Headers:\r\n"
-		"--------\r\n"
-		"Host: 127.0.0.1:PORT\r\n"
-		"Accept: */*\r\n"
-		"Accept-Encoding: gzip\r\n"
-		"Connection: close\r\n"
-		"User-Agent: Services Kit (Haiku)\r\n");
+	std::string expectedResponseBody("");
 	HttpHeaderMap expectedResponseHeaders;
 	expectedResponseHeaders["Content-Encoding"] = "gzip";
 	expectedResponseHeaders["Content-Length"] = "144";
@@ -220,22 +225,69 @@ HttpTest::GetTest()
 
 	TestListener listener(expectedResponseBody, expectedResponseHeaders);
 
-	BHttpRequest request(testUrl, testUrl.Protocol() == "https");
-	request.SetContext(context);
-	request.SetListener(&listener);
+	ObjectDeleter<BUrlRequest> requestDeleter(
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &listener,
+			context));
+	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
+	CPPUNIT_ASSERT(request != NULL);
 
-	CPPUNIT_ASSERT(request.Run());
-	while (request.IsRunning())
+	request->SetAutoReferrer(false);
+	request->SetMethod("HEAD");
+
+	CPPUNIT_ASSERT(request->Run());
+	while (request->IsRunning())
 		snooze(1000);
 
-	CPPUNIT_ASSERT_EQUAL(B_OK, request.Status());
+	CPPUNIT_ASSERT_EQUAL(B_OK, request->Status());
 
 	const BHttpResult& result
-		= dynamic_cast<const BHttpResult&>(request.Result());
+		= dynamic_cast<const BHttpResult&>(request->Result());
 	CPPUNIT_ASSERT_EQUAL(200, result.StatusCode());
 	CPPUNIT_ASSERT_EQUAL(BString("OK"), result.StatusText());
 
 	CPPUNIT_ASSERT_EQUAL(144, result.Length());
+
+	listener.Verify();
+
+	CPPUNIT_ASSERT(!context->GetCookieJar().GetIterator().HasNext());
+		// This page should not set cookies
+
+	context->ReleaseReference();
+}
+
+
+void
+HttpTest::NoContentTest()
+{
+	BUrl testUrl(fTestServer.BaseUrl(), "/204");
+	BUrlContext* context = new BUrlContext();
+	context->AcquireReference();
+
+	std::string expectedResponseBody("");
+	HttpHeaderMap expectedResponseHeaders;
+	expectedResponseHeaders["Date"] = "Sun, 09 Feb 2020 19:32:42 GMT";
+	expectedResponseHeaders["Server"] = "Test HTTP Server for Haiku";
+
+	TestListener listener(expectedResponseBody, expectedResponseHeaders);
+
+	ObjectDeleter<BUrlRequest> requestDeleter(
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &listener,
+			context));
+	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
+	CPPUNIT_ASSERT(request != NULL);
+
+	request->SetAutoReferrer(false);
+
+	CPPUNIT_ASSERT(request->Run());
+	while (request->IsRunning())
+		snooze(1000);
+
+	CPPUNIT_ASSERT_EQUAL(B_OK, request->Status());
+
+	const BHttpResult& result
+		= dynamic_cast<const BHttpResult&>(request->Result());
+	CPPUNIT_ASSERT_EQUAL(204, result.StatusCode());
+	CPPUNIT_ASSERT_EQUAL(BString("No Content"), result.StatusText());
 
 	listener.Verify();
 
@@ -282,19 +334,21 @@ HttpTest::ProxyTest()
 
 	TestListener listener(expectedResponseBody, expectedResponseHeaders);
 
-	BHttpRequest request(testUrl);
-	request.SetContext(context);
-	request.SetListener(&listener);
+	ObjectDeleter<BUrlRequest> requestDeleter(
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &listener,
+			context));
+	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
+	CPPUNIT_ASSERT(request != NULL);
 
-	CPPUNIT_ASSERT(request.Run());
+	CPPUNIT_ASSERT(request->Run());
 
-	while (request.IsRunning())
+	while (request->IsRunning())
 		snooze(1000);
 
-	CPPUNIT_ASSERT_EQUAL(B_OK, request.Status());
+	CPPUNIT_ASSERT_EQUAL(B_OK, request->Status());
 
 	const BHttpResult& response
-		= dynamic_cast<const BHttpResult&>(request.Result());
+		= dynamic_cast<const BHttpResult&>(request->Result());
 	CPPUNIT_ASSERT_EQUAL(200, response.StatusCode());
 	CPPUNIT_ASSERT_EQUAL(BString("OK"), response.StatusText());
 	CPPUNIT_ASSERT_EQUAL(169, response.Length());
@@ -373,9 +427,11 @@ HttpTest::UploadTest()
 
 	BUrlContext context;
 
-	BHttpRequest request(testUrl, testUrl.Protocol() == "https");
-	request.SetContext(&context);
-	request.SetListener(&listener);
+	ObjectDeleter<BUrlRequest> requestDeleter(
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &listener,
+			&context));
+	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
+	CPPUNIT_ASSERT(request != NULL);
 
 	BHttpForm form;
 	form.AddString("hello", "world");
@@ -383,17 +439,17 @@ HttpTest::UploadTest()
 		B_OK,
 		form.AddFile("_uploadfile", BPath(testFilePath.c_str())));
 
-	request.SetPostFields(form);
+	request->SetPostFields(form);
 
-	CPPUNIT_ASSERT(request.Run());
+	CPPUNIT_ASSERT(request->Run());
 
-	while (request.IsRunning())
+	while (request->IsRunning())
 		snooze(1000);
 
-	CPPUNIT_ASSERT_EQUAL(B_OK, request.Status());
+	CPPUNIT_ASSERT_EQUAL(B_OK, request->Status());
 
 	const BHttpResult &result =
-		dynamic_cast<const BHttpResult &>(request.Result());
+		dynamic_cast<const BHttpResult &>(request->Result());
 	CPPUNIT_ASSERT_EQUAL(200, result.StatusCode());
 	CPPUNIT_ASSERT_EQUAL(BString("OK"), result.StatusText());
 	CPPUNIT_ASSERT_EQUAL(913, result.Length());
@@ -499,6 +555,13 @@ HttpTest::AuthDigestTest()
 }
 
 
+void
+HttpTest::AutoRedirectTest()
+{
+	_GetTest("/302");
+}
+
+
 /* static */ void
 HttpTest::AddTests(BTestSuite& parent)
 {
@@ -531,6 +594,62 @@ HttpTest::AddTests(BTestSuite& parent)
 		suite.addTest(httpsTestCaller);
 		parent.addTest("HttpsTest", &suite);
 	}
+}
+
+
+void
+HttpTest::_GetTest(const BString& path)
+{
+	BUrl testUrl(fTestServer.BaseUrl(), path);
+	BUrlContext* context = new BUrlContext();
+	context->AcquireReference();
+
+	std::string expectedResponseBody(
+		"Path: /\r\n"
+		"\r\n"
+		"Headers:\r\n"
+		"--------\r\n"
+		"Host: 127.0.0.1:PORT\r\n"
+		"Accept: */*\r\n"
+		"Accept-Encoding: gzip\r\n"
+		"Connection: close\r\n"
+		"User-Agent: Services Kit (Haiku)\r\n");
+	HttpHeaderMap expectedResponseHeaders;
+	expectedResponseHeaders["Content-Encoding"] = "gzip";
+	expectedResponseHeaders["Content-Length"] = "144";
+	expectedResponseHeaders["Content-Type"] = "text/plain";
+	expectedResponseHeaders["Date"] = "Sun, 09 Feb 2020 19:32:42 GMT";
+	expectedResponseHeaders["Server"] = "Test HTTP Server for Haiku";
+
+	TestListener listener(expectedResponseBody, expectedResponseHeaders);
+
+	ObjectDeleter<BUrlRequest> requestDeleter(
+		BUrlProtocolRoster::MakeRequest(testUrl, &listener, &listener,
+			context));
+	BHttpRequest* request = dynamic_cast<BHttpRequest*>(requestDeleter.Get());
+	CPPUNIT_ASSERT(request != NULL);
+
+	request->SetAutoReferrer(false);
+
+	CPPUNIT_ASSERT(request->Run());
+	while (request->IsRunning())
+		snooze(1000);
+
+	CPPUNIT_ASSERT_EQUAL(B_OK, request->Status());
+
+	const BHttpResult& result
+		= dynamic_cast<const BHttpResult&>(request->Result());
+	CPPUNIT_ASSERT_EQUAL(200, result.StatusCode());
+	CPPUNIT_ASSERT_EQUAL(BString("OK"), result.StatusText());
+
+	CPPUNIT_ASSERT_EQUAL(144, result.Length());
+
+	listener.Verify();
+
+	CPPUNIT_ASSERT(!context->GetCookieJar().GetIterator().HasNext());
+		// This page should not set cookies
+
+	context->ReleaseReference();
 }
 
 

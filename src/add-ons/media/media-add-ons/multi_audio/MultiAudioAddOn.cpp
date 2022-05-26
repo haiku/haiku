@@ -94,7 +94,7 @@ MultiAudioAddOn::GetFlavorAt(int32 index, const flavor_info** _info)
 		return B_NO_MEMORY;
 
 	MultiAudioNode::GetFlavor(info, index);
-	info->name = (char*)device->Description().friendly_name;
+	info->name = device->Description().friendly_name;
 
 	*_info = info;
 	return B_OK;

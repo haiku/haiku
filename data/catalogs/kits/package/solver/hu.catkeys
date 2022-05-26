@@ -1,10 +1,38 @@
-1	hungarian	x-vnd.Haiku-libsolvsolver	3201338525
+1	hungarian	x-vnd.Haiku-libsolvsolver	3404387783
 allow architecture change of %source% to %target%	SolverProblemSolution		Architektúra váltás %source% -> %target% engedélyezése.
 install %source% from excluded repository	SolverProblemSolution		%source% telepítése a letiltott tárolóból
 unspecified problem	SolverProblem		meghatározatlan hiba
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		%source% csomagnak előfeltétele %dependency%, de egyik szolgáltató sem tudja telepíteni azt
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		%target% által közzétett előfeltételt (%dependency%) érvényteleníti %package% csomag
 nothing provides requested %dependency%	SolverProblem		semmi sem nyújta az igényelt %dependency% függőséget
+do not keep %source% installed	SolverProblemSolution		%source% ne maradjon telepítve
+do not deinstall \"%selection%\"	SolverProblemSolution		\"%selection%\" ne kerüljön eltávolításra
+install %source% despite its inferior architecture	SolverProblemSolution		%source% telepítése a gyengébb architektúra ellenére
 conflicting requests	SolverProblem		ellentmondó kérések
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		\"%selection%\" csomaghoz ne telepítse a legújabb verziót
+allow replacement of %source% with %target%	SolverProblemSolution		%source% lecserélése %target% csomaggal
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		%target% által közzétett előfeltételt (%dependency%) érvényteleníti %package% csomag
+do not forbid installation of %source%	SolverProblemSolution		ne tiltsa meg %source% telepítését
+allow downgrade of %source% to %target%	SolverProblemSolution		%source% lebutításának engedélyezése %target% csomaghoz
+dependency problem	SolverProblem		előfeltétel probléma
 %dependency% is provided by the system	SolverProblem		%dependency% függőséget a rendszer nyújtja
+keep %source% despite its inferior architecture	SolverProblemSolution		%source% megtartása az gyengébb architecktúra ellenére
 %source% does not belong to a distupgrade repository	SolverProblem		%source% nem része a tárolónak
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		%target% által közzétett előfeltételt (%dependency%) érvényteleníti a telepített %package% csomag
+allow name change of %source% to %target%	SolverProblemSolution		%source% átnevezésének engedélyezése %target% csomagra
 package %source% conflicts with %dependency% provided by %target%	SolverProblem		%source% csomag ütközik a %target% által nyújtott %dependency% függősggel
+do something	SolverProblemSolution		csináljon valamit
+install %selection% despite its old version	SolverProblemSolution		%selection% telepítése a régebbi verzió ellenére
+cannot install both %source% and %target%	SolverProblem		nem telepíthető mindkét csomag: %source% és %target%
+package %source% is not installable	SolverProblem		%source% csomag nem telepíthető
+problem with installed package %source%	SolverProblem		%source% csomag telepítése közben hiba történt
+allow deinstallation of %source%	SolverProblemSolution		%source% eltávolításának engedélyezése
 keep %source% from excluded repository	SolverProblemSolution		%source% megtartása a letiltott tárolóból
+keep old %source%	SolverProblemSolution		régi %source% csomag megtartása
+package %source% conflicts with %dependency% provided by itself	SolverProblem		%source% csomag ütközik az általa biztosított %dependency% csomaggal
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		\"%sourceVendor%\" (%source%) gyártó cseréjének engedélyezése \"%targetVendor%\" (%target%) gyártóra
+do not lock \"%selection%\"	SolverProblemSolution		\"%selection%\" zárolásának mellőzése
+do not install \"%selection%\"	SolverProblemSolution		\"%selection%\" telepítésének mellőzése
+nothing provides %dependency% needed by %source%	SolverProblem		%source% előfeltéte (%dependency%) nem található
+%source% has inferior architecture	SolverProblem		%source% alacsonyabb architektúrával rendelkezik
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		ne távolítsa el az összes feloldható elemet: \"%selection%\"

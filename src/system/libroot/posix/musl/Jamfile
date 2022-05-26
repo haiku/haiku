@@ -8,7 +8,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		MergeObjectFromObjects <$(architecture)>posix_musl.o :
 			:
 			<$(architecture)>posix_musl_math.o
+			<$(architecture)>posix_musl_misc.o
 			<$(architecture)>posix_musl_regex.o
+			<$(architecture)>posix_musl_search.o
 			<$(architecture)>posix_musl_string.o
 			;
 	}
@@ -19,5 +21,7 @@ for arch in $(TARGET_ARCHS) {
 	HaikuSubInclude math $(arch) ;
 }
 
+HaikuSubInclude misc ;
 HaikuSubInclude regex ;
+HaikuSubInclude search ;
 HaikuSubInclude string ;

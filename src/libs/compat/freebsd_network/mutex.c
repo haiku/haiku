@@ -57,6 +57,58 @@ mtx_destroy(struct mtx *mutex)
 }
 
 
+void
+mtx_lock_spin(struct mtx* mutex)
+{
+	KASSERT(mutex->type == MTX_SPIN, ("not a spin mutex"));
+
+	cpu_status status = disable_interrupts();
+	acquire_spinlock(&mutex->u.spinlock.lock);
+	mutex->u.spinlock.state = status;
+}
+
+
+void
+mtx_unlock_spin(struct mtx* mutex)
+{
+	KASSERT(mutex->type == MTX_SPIN, ("not a spin mutex"));
+
+	cpu_status status = mutex->u.spinlock.state;
+	release_spinlock(&mutex->u.spinlock.lock);
+	restore_interrupts(status);
+}
+
+
+void
+_mtx_assert(struct mtx *m, int what, const char *file, int line)
+{
+	switch (what) {
+	case MA_OWNED:
+	case MA_OWNED | MA_RECURSED:
+	case MA_OWNED | MA_NOTRECURSED:
+		if (!mtx_owned(m))
+			panic("mutex %p not owned at %s:%d",
+				m, file, line);
+		if (mtx_recursed(m)) {
+			if ((what & MA_NOTRECURSED) != 0)
+				panic("mutex %p recursed at %s:%d",
+					m, file, line);
+		} else if ((what & MA_RECURSED) != 0) {
+			panic("mutex %p unrecursed at %s:%d",
+				m, file, line);
+		}
+		break;
+	case MA_NOTOWNED:
+		if (mtx_owned(m))
+			panic("mutex %p owned at %s:%d",
+				m, file, line);
+		break;
+	default:
+		panic("unknown mtx_assert at %s:%d", file, line);
+	}
+}
+
+
 status_t
 init_mutexes()
 {

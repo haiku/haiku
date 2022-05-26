@@ -1,3 +1,8 @@
+service x-vnd.Haiku-app_server {
+	env /system/boot/SetupEnvironment
+	launch /system/servers/app_server
+}
+
 target desktop {
 	env /system/boot/SetupEnvironment
 

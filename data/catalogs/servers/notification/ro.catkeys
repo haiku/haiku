@@ -2,4 +2,4 @@
 Warning	NotificationWindow		Avertisment
 Notification	NotificationWindow		Notificare
 OK	NotificationWindow		OK
-Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Nu s-a putut porni monitorul de configurări generale.\nModificările directe ale filtrului sunt dezactivate.
+Couldn't start general settings monitor.\nLive filter changes disabled.	NotificationWindow		Nu s-a putut porni programul de monitorizare al configurărilor generale.\nModificările live ale filtrului sunt dezactivate.

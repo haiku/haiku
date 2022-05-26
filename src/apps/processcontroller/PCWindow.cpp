@@ -1,21 +1,7 @@
 /*
-	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
-	Copyright (C) 2004 beunited.org 
-
-	This library is free software; you can redistribute it and/or 
-	modify it under the terms of the GNU Lesser General Public 
-	License as published by the Free Software Foundation; either 
-	version 2.1 of the License, or (at your option) any later version. 
-
-	This library is distributed in the hope that it will be useful, 
-	but WITHOUT ANY WARRANTY; without even the implied warranty of 
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-	Lesser General Public License for more details. 
-
-	You should have received a copy of the GNU Lesser General Public 
-	License along with this library; if not, write to the Free Software 
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
-*/
+ * Copyright 2000, Georges-Edouard Berenger. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "PCWorld.h"
@@ -43,7 +29,17 @@ PCWindow::PCWindow()
 	preferences.SaveInt32(kCurrentVersion, kVersionName);
 	preferences.LoadWindowPosition(this, kPosPrefName);
 
-	SetSizeLimits(Bounds().Width(), Bounds().Width(), 31, 32767);
+	system_info info;
+	get_system_info(&info);
+	int width = 4;
+	if (info.cpu_count > 4)
+		width = info.cpu_count;
+	if (info.cpu_count <= 16)
+		width *= 2;
+
+	// For the memory bar
+	width += 8;
+
 	BRect rect = Bounds();
 
 	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
@@ -52,8 +48,11 @@ PCWindow::PCWindow()
 
 	// set up a rectangle && instantiate a new view
 	// view rect should be same size as window rect but with left top at (0, 0)
-	rect.Set(0, 0, 15, 15);
+	rect.Set(0, 0, width - 1, 15);
+	SetSizeLimits(rect.Width() + 21, rect.Width() + 21, 15 + 21, 15 + 21);
+
 	rect.OffsetTo((Bounds().Width() - 16) / 2, (Bounds().Height() - 16) / 2);
+
 	topView->AddChild(new ProcessController(rect));
 
 	// make window visible

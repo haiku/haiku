@@ -1261,6 +1261,9 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
+	// Careful! The mapping of ucHPD_ID differs between atombios calls
+	uint16 hpdID = connector_pick_atom_hpdid(connectorIndex);
+
 	bool isDP = connector_is_dp(connectorIndex);
 	bool linkB = gConnector[connectorIndex]->encoder.linkEnumeration
 		== GRAPH_OBJECT_ENUM_ID2 ? true : false;
@@ -1577,6 +1580,8 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 							else
 								args.v5.ucPhyId = ATOM_PHY_ID_UNIPHYE;
 							break;
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY3:
+							args.v5.ucPhyId = ATOM_PHY_ID_UNIPHYG;
 					}
 					if (isDP) {
 						args.v5.ucLaneNum = dpLaneCount;
@@ -1611,8 +1616,10 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 						args.v5.asConfig.ucCoherentMode = 1;
 					}
 
-					// TODO: hpd_id, for now RADEON_HPD_NONE.
-					args.v5.asConfig.ucHPDSel = 0;
+					if (hpdID == 0xff)
+						args.v5.asConfig.ucHPDSel = 0;
+					else
+						args.v5.asConfig.ucHPDSel = hpdID + 1;
 
 					args.v5.ucDigEncoderSel = 1 << digEncoderID;
 					args.v5.ucDPLaneSet = laneSet;
@@ -1666,8 +1673,11 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 						args.v6.ucDigMode
 							= display_get_encoder_mode(connectorIndex);
 					}
-					// TODO: hpd_id, for now RADEON_HPD_NONE.
-					args.v6.ucHPDSel = 0;
+
+					if (hpdID == 0xff)
+						args.v6.ucHPDSel = 0;
+					else
+						args.v6.ucHPDSel = hpdID + 1;
 
 					args.v6.ucDigEncoderSel = 1 << digEncoderID;
 					break;

@@ -13,6 +13,18 @@
 #include <InterfaceDefs.h>
 
 
+struct ansi_color_scheme {
+	rgb_color black;
+	rgb_color red;
+	rgb_color green;
+	rgb_color yellow;
+	rgb_color blue;
+	rgb_color magenta;
+	rgb_color cyan;
+	rgb_color white;
+	bool operator==(const ansi_color_scheme& color);
+};
+
 struct color_scheme {
 	const char* name;
 	rgb_color text_fore_color;
@@ -21,6 +33,8 @@ struct color_scheme {
 	rgb_color cursor_back_color;
 	rgb_color select_fore_color;
 	rgb_color select_back_color;
+	ansi_color_scheme ansi_colors;
+	ansi_color_scheme ansi_colors_h;
 	bool operator==(const color_scheme& color);
 };
 

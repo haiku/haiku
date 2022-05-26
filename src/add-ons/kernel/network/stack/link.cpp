@@ -455,7 +455,7 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 		case SIOCGIFMEDIA:
 		{
 			// get media
-			if (*_length < sizeof(ifmediareq))
+			if (*_length > 0 && *_length < sizeof(ifmediareq))
 				return B_BAD_VALUE;
 
 			net_device_interface* interface;

@@ -3,8 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
-#ifndef _ARCH_SIGNAL_H_
-#define _ARCH_SIGNAL_H_
+#ifndef _ARCH_ARM64_SIGNAL_H_
+#define _ARCH_ARM64_SIGNAL_H_
 
 
 /*
@@ -26,4 +26,4 @@ struct vregs
 #endif /* defined(__aarch64__) */
 
 
-#endif /* _ARCH_SIGNAL_H_ */
+#endif /* _ARCH_ARM64_SIGNAL_H_ */

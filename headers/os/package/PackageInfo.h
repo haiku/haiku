@@ -96,6 +96,7 @@ public:
 			const BStringList&	Groups() const;
 
 			const BStringList&	PostInstallScripts() const;
+			const BStringList&	PreUninstallScripts() const;
 
 			const BObjectList<BPackageResolvable>&	ProvidesList() const;
 			const BObjectList<BPackageResolvableExpression>&
@@ -158,6 +159,9 @@ public:
 
 			void				ClearPostInstallScripts();
 			status_t			AddPostInstallScript(const BString& path);
+
+			void				ClearPreUninstallScripts();
+			status_t			AddPreUninstallScript(const BString& path);
 
 			void				ClearProvidesList();
 			status_t			AddProvides(const BPackageResolvable& provides);
@@ -297,6 +301,7 @@ private:
 			BStringList			fGroups;
 
 			BStringList			fPostInstallScripts;
+			BStringList			fPreUninstallScripts;
 
 			ResolvableList		fProvidesList;
 

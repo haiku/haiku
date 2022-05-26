@@ -66,7 +66,7 @@ static struct option const kLongOptions[] = {
 extern const char *__progname;
 static const char *kProgramName = __progname;
 
-static const char* kDefaultServerAddress = "freedb.freedb.org:80";
+static const char* kDefaultServerAddress = "gnudb.gnudb.org:80";
 static const char* kCddaFsName = "cdda";
 static const int kMaxTocSize = 1024;
 

@@ -20,9 +20,10 @@
 
 #include "console.h"
 #include "machine.h"
+#include "real_time_clock.h"
 
 
-#define HEAP_SIZE 65536
+#define HEAP_SIZE (512 * 1024)
 
 
 // GCC defined globals
@@ -44,13 +45,27 @@ call_ctors(void)
 }
 
 
+static addr_t
+get_kernel_entry(void)
+{
+	if (gKernelArgs.kernel_image->elf_class == ELFCLASS64) {
+		preloaded_elf64_image *image = static_cast<preloaded_elf64_image *>(
+			gKernelArgs.kernel_image.Pointer());
+		return image->elf_header.e_entry;
+	} else if (gKernelArgs.kernel_image->elf_class == ELFCLASS32) {
+		preloaded_elf32_image *image = static_cast<preloaded_elf32_image *>(
+			gKernelArgs.kernel_image.Pointer());
+		return image->elf_header.e_entry;
+	}
+	panic("Unknown kernel format! Not 32-bit or 64-bit!");
+	return 0;
+}
+
+
 extern "C" void
 platform_start_kernel(void)
 {
-	preloaded_elf32_image* image = static_cast<preloaded_elf32_image*>(
-		gKernelArgs.kernel_image.Pointer());
-
-	addr_t kernelEntry = image->elf_header.e_entry;
+	addr_t kernelEntry = get_kernel_entry();
 	addr_t stackTop = gKernelArgs.cpu_kstack[0].start
 		+ gKernelArgs.cpu_kstack[0].size;
 
@@ -85,7 +100,7 @@ platform_boot_options(void)
 extern "C" void
 start(void *openFirmwareEntry)
 {
-	char bootargs[512];
+	static char bootargs[512];
 
 	// stage2 args - might be set via the command line one day
 	stage2_args args;
@@ -124,6 +139,8 @@ start(void *openFirmwareEntry)
 
 	if (boot_arch_cpu_init() != B_OK)
 		of_exit();
+
+	init_real_time_clock();
 
 	// check for key presses once
 	sBootOptions = 0;

@@ -8,8 +8,10 @@
 
 extern const char* const kReturnTypeAlignmentType;
 extern const char* const kParameterAlignmentType;
+extern const char* const kLongParameterAlignmentType;
 extern const int kReturnTypeAlignmentSize;
 extern const int kParameterAlignmentSize;
+extern const int kLongParameterAlignmentSize;
 
 
 // Type

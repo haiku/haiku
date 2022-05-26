@@ -603,9 +603,9 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 						&& windowActive;
 
 					if (index == 0 && selectDuringDraw) {
-						// draw with dark background to select text
+						// draw with "reverse video" to select text
 						drawView->PushState();
-						drawView->SetLowColor(0, 0, 0);
+						drawView->SetLowColor(ui_color(B_DOCUMENT_TEXT_COLOR));
 					}
 
 					if (index == 0) {
@@ -969,9 +969,12 @@ BPose::CalcRect(const BPoseView* poseView) const
 	} else {
 		// MINI_ICON_MODE rect calc
 		rect.left = location.x;
-		rect.top = location.y;
 		rect.right = rect.left + B_MINI_ICON + kMiniIconSeparator;
-		rect.bottom = rect.top + poseView->IconPoseHeight();
+
+		// big font sizes can push top above icon location top
+		rect.bottom = location.y
+			+ roundf((B_MINI_ICON + poseView->FontHeight()) / 2);
+		rect.top = rect.bottom - floorf(poseView->FontHeight());
 		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
 		if (widget != NULL)
 			rect.right += ceil(widget->TextWidth(poseView) + 1);

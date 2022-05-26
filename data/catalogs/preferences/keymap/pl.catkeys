@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Keymap	1075970008
+1	polish	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Klawisz
 Japanese	KeymapNames		Japoński
 US	KeymapNames		Amerykański
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PG ↑
 Brazilian	KeymapNames		Brazylijski
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (amerykański)
 Right control	Keyboard Layout View		Prawy Ctrl
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Dvorak
 Option:	Modifier keys window	Option key role name	Opcja:
 Cancel	Modifier keys window		Anuluj
@@ -22,8 +23,8 @@ Belgian (point)	KeymapNames		Belgijski (point)
 Finnish	KeymapNames		Fiński
 Num lock	Keyboard Layout View		Num Lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Zmień klawisze skrótów w tryb Windows/Linuks
-Option	Keyboard Layout View	Option key	Opcja
 Spanish (Dvorak)	KeymapNames		Hiszpański (Dvorak)
+Option	Keyboard Layout View	Option key	Opcja
 Scroll lock	Keyboard Layout View		Scroll Lock
 US-International	KeymapNames		Amerykański (międzynarodowy)
 Right option	Keyboard Layout View		Prawy Option
@@ -45,8 +46,8 @@ Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium (międzynarod
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Klawisz Win/Cmd 
 PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (amerykański)
-Apple Aluminum	KeyboardLayoutNames		Apple Aluminium
 Spanish	KeymapNames		Hiszpański
+Apple Aluminum	KeyboardLayoutNames		Apple Aluminium
 HOME	Keyboard Layout View		HOME
 COMMAND	Keyboard Layout View		COMMAND
 Ukrainian (Mac)	KeymapNames		Ukraiński (Mac)
@@ -54,10 +55,10 @@ Command:	Modifier keys window	Command key role name	Polecenie:
 French (Bépo)	KeymapNames		Francuski (Bépo)
 Russian (Typewriter)	KeymapNames		Rosyjski (maszynistki)
 Acute trigger	Keymap window		Wywołanie ostre
-Italian	KeymapNames		Włoski
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s (międzynarodowy)
-Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminium (amerykański)
+Italian	KeymapNames		Włoski
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan (międzynarodowy)
+Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminium (amerykański)
 French (NF Z71-300)	KeymapNames		Francuski (NF Z71-300)
 Modifier keys	Modifier keys window		Klawisze modyfikujące
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 (międzynarodowy)
@@ -89,6 +90,7 @@ Esperanto	KeymapNames		Esperanto
 Belarusian	KeymapNames		Białoruski
 Warning: left and right key roles do not match	Modifier keys window		Uwaga: przeznaczenie klawiszy lewego i prawego się nie zgadzają
 Circumflex trigger	Keymap window		Wywołanie akcentu
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps Lock
 Left shift	Keyboard Layout View		Lewy Shift
 Russian (Yawert)	KeymapNames		Rosyjski (Yawert)
@@ -155,8 +157,8 @@ Font	Keymap window		Font
 Danish	KeymapNames		Duński
 Generic 104-key	KeyboardLayoutNames		Podstawowy 104-klawiszowy
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Klawisz Shift
-PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		Rosyjski
+PAUSE	Keyboard Layout View		PAUSE
 TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Rumuński
 CMD	Keyboard Layout View	Very short for 'command'	CMD

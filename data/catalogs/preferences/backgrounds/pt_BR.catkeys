@@ -1,24 +1,28 @@
-1	portuguese (brazil)	x-vnd.Haiku-Backgrounds	5390252
+1	portuguese (brazil)	x-vnd.Haiku-Backgrounds	681978856
 Backgrounds	System name		Planos de fundo
 X:	Main View		X:
+Setting the background image failed:	Main View		A configuração de plano de fundo falhou:
 Resolution: 	Image Filepanel		Resolução: 
 pick one	Main View		selecione um
 Default	Main View		Padrão
 Center	Main View		Centralizado
+Folder: %path	Main View		Pasta: %path
 Manual	Main View		Manual
-Default folder	Main View		Pasta padão
+Set background image error	Main View		Erro ao aplicar a imagem de fundo
+Default folder	Main View		Pasta padrão
 Revert	Main View		Reverter
 None	Main View		Nenhum
-All workspaces	Main View		Todos os Ambientes de Trabalho
+All workspaces	Main View		Todas as áreas de trabalho
 Icon label outline	Main View		Contorno no rótulo dos ícones
 Other…	Main View		Outro...
-Current workspace	Main View		Ambiente de Trabalho atual
+Current workspace	Main View		Área de trabalho atual
 Apply	Main View		Aplicar
 Other folder…	Main View		Outra pasta…
 Y:	Main View		Y:
 Tile	Main View		Ladrilho
 Select	Main View		Selecionar
 Scale to fit	Main View		Ajustar para caber
-Placement:	Main View		Disposição:
+OK	Main View		OK
+Placement:	Main View		Posicionamento:
 Preview	Main View		Visualização
 Image:	Main View		Imagem:

@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // PNGTranslator
-// Written by Michael Wilber, OBOS Translation Kit Team
+// Written by Michael Wilber, Haiku Translation Kit Team
 //
 // PNGTranslator.cpp
 //
@@ -8,7 +8,7 @@
 // PNG images.
 //
 //
-// Copyright (c) 2003, OpenBeOS Project
+// Copyright (c) 2003, Haiku Project
 // Copyright (c) 2009, Haiku, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a

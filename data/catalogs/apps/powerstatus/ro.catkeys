@@ -1,46 +1,48 @@
-1	romanian	x-vnd.Haiku-PowerStatus	3173765686
+1	romanian	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Rulează în fereastră
-Extended battery info	PowerStatus		Info extins baterie
-Show status icon	PowerStatus		Afișează pictogramă de stare
+Extended battery info	PowerStatus		Informații extinse despre baterie
+Show status icon	PowerStatus		Arată pictograma de stare
 Battery charging	PowerStatus		Se încarcă bateria
-Design capacity low warning: 	PowerStatus		Avertisment de capacitate redusă model: 
-The battery level is critical, please plug in the device immediately.	PowerStatus		Nivelul bateriei este critic, puneți în priză dispozitivul acum.
+Design capacity low warning: 	PowerStatus		Avertisment de capacitate de model redusă: 
+The battery level is critical, please plug in the device immediately.	PowerStatus		Nivelul bateriei este critic, conectați imediat dispozitivul.
 non-rechargeable	PowerStatus		nu este reîncărcabilă
-Last full charge: 	PowerStatus		Ultima încărcate completă: 
+Last full charge: 	PowerStatus		Ultima încărcare completă: 
  mV	PowerStatus		 mV
-Current rate: 	PowerStatus		Cotă curentă: 
-Show text label	PowerStatus		Afișează etichetă text
-Quit	PowerStatus		Închidere
-Battery low	PowerStatus		Baterie scăzută
-Model number: 	PowerStatus		Număr model: 
+Current rate: 	PowerStatus		Rata curentă: 
+Show text label	PowerStatus		Arată eticheta text
+Quit	PowerStatus		Ieșire
+Battery low	PowerStatus		Baterie descărcată
+Model number: 	PowerStatus		Număr de model: 
 Battery unused	PowerStatus		Baterie neutilizată
 Type: 	PowerStatus		Tip: 
 Damaged battery	PowerStatus		Baterie deteriorată
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Puteți să rulați StareConsum într-o ferestră sau să îl instalați pe bara de desktop.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Puteți rula PowerStatus într-o fereastră sau îl puteți instala în deskbar.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Se descarcă bateria
-Design voltage: 	PowerStatus		Voltaj model: 
+Design voltage: 	PowerStatus		Voltajul modelului: 
 discharging	PowerStatus		se descarcă
 rechargeable	PowerStatus		reîncărcabilă
-Battery info…	PowerStatus		Info baterie…
-Show time	PowerStatus		Afișează oră
+Battery info…	PowerStatus		Informații baterie…
+Show time	PowerStatus		Arată ora
  mA	PowerStatus		 mA
 About…	PowerStatus		Despre…
 Serial number: 	PowerStatus		Număr de serie: 
 Battery critical	PowerStatus		Baterie critică
 Capacity: 	PowerStatus		Capacitate: 
  mW	PowerStatus		 mW
-Show percent	PowerStatus		Afișează procentaj
-Capacity granularity 1: 	PowerStatus		Capacitate de granulozitate 1: 
-The battery level is getting low, please plug in the device.	PowerStatus		Nivelul bateriei devine scăzut, puneți în priză dispozitivul.
-Design capacity warning: 	PowerStatus		Avertisment capacitate model: 
-Capacity granularity 2: 	PowerStatus		Capacitate de granulozitate 2: 
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Nu a fost detectată nicio baterie suportată. PowerStatus nu poate fi utilizat pe sistem.
+Show percent	PowerStatus		Arată procentul
+Capacity granularity 1: 	PowerStatus		Capacitatea de granularitate 1: 
+The battery level is getting low, please plug in the device.	PowerStatus		Nivelul bateriei scade, conectați dispozitivul.
+Design capacity warning: 	PowerStatus		Avertisment de capacitate de model: 
+Capacity granularity 2: 	PowerStatus		Capacitatea de granularitate 2: 
+Too bad!	PowerStatus		Păcat!
 Technology: 	PowerStatus		Tehnologie: 
  mWh	PowerStatus		 mWh
-PowerStatus	System name		StareConsum
-Design capacity: 	PowerStatus		Capacitate model: 
-OEM info: 	PowerStatus		Info OEM: 
+PowerStatus	System name		PowerStatus
+Design capacity: 	PowerStatus		Capacitate de model: 
+OEM info: 	PowerStatus		Informații OEM: 
 no battery	PowerStatus		fără baterie
-Empty battery slot	PowerStatus		Fantă liberă de baterie
-Install in Deskbar	PowerStatus		Instalează pe bara de desktop
+Empty battery slot	PowerStatus		Eliberează slotul de baterie
+Install in Deskbar	PowerStatus		Instalează în deskbar
 charging	PowerStatus		se încarcă

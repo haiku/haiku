@@ -6,13 +6,13 @@
  *  mccall@digitalparadise.co.uk
  *  Jérôme Duval
  *  Marcus Overhagen
-*/
+ */
 
 
 #include "KeyboardSettings.h"
 
-#include <FindDirectory.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <Path.h>
 #include <stdio.h>
 
@@ -33,10 +33,9 @@ KeyboardSettings::KeyboardSettings()
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	if (status == B_OK) {
 		status = path.Append(kb_settings_file);
-		if (status == B_OK) {
+		if (status == B_OK)
 			status = file.SetTo(path.Path(), B_READ_ONLY);
-				}
-			}
+	}
 }
 
 
@@ -56,6 +55,7 @@ KeyboardSettings::~KeyboardSettings()
 		return;
 }
 
+
 void
 KeyboardSettings::SetKeyboardRepeatRate(int32 rate)
 {
@@ -72,6 +72,7 @@ KeyboardSettings::SetKeyboardRepeatDelay(bigtime_t delay)
 		fprintf(stderr, "error while set_key_repeat_delay!\n");
 	fSettings.key_repeat_delay = delay;
 }
+
 
 void
 KeyboardSettings::Revert()

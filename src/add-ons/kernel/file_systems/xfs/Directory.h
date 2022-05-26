@@ -6,8 +6,11 @@
 #define _DIRECTORY_H_
 
 
+#include "BPlusTree.h"
 #include "Extent.h"
 #include "Inode.h"
+#include "LeafDirectory.h"
+#include "Node.h"
 #include "ShortDirectory.h"
 
 
@@ -32,6 +35,11 @@ private:
 				// Short form Directory type
 			Extent*				fExtentDir;
 				// Extent form Directory type
+				// TODO: Rename all to block type
+			LeafDirectory*		fLeafDir;
+				// Extent based leaf directory
+			NodeDirectory*		fNodeDir;
+			TreeDirectory*		fTreeDir;
 };
 
 

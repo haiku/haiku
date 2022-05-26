@@ -84,7 +84,11 @@ arch_vm_translation_map_init(kernel_args *args,
 #endif
 
 #ifdef __x86_64__
-	gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethod64Bit;
+	bool la57Available = x86_check_feature(IA32_FEATURE_LA57, FEATURE_7_ECX);
+	bool enabled = la57Available && (x86_read_cr4() & IA32_CR4_LA57) != 0;
+	if (enabled)
+		dprintf("using LA57 paging\n");
+	gX86PagingMethod = new(&sPagingMethodBuffer) X86PagingMethod64Bit(enabled);
 #elif B_HAIKU_PHYSICAL_BITS == 64
 	bool paeAvailable = x86_check_feature(IA32_FEATURE_PAE, FEATURE_COMMON);
 	bool paeNeeded = x86_check_feature(IA32_FEATURE_AMD_EXT_NX,

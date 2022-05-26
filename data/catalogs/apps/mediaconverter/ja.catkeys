@@ -1,10 +1,9 @@
-1	japanese	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		オーディトラックの書込み: %d%% 完了
+1	japanese	x-vnd.Haiku-MediaConverter	2816184527
 Input file not recognized as Audio or Video	MediaConverter		入力ファイルはオーディオまたはビデオとして認識できません。
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		ビデオ品質: %3d%%
 Source files	MediaConverter		ソースファイル
-Error writing video frame %ld	MediaConverter		ビデオフレーム %ld の書込みに失敗しました
+Error writing video frame %lld	MediaConverter		ビデオフレーム %lld の書き込みに失敗しました
 Error converting '%filename'	MediaConverter		'%filename'の変換中にエラーが発生しました
 Selected directory not found. Defaulting to /boot/home	MediaConverter		選択されたディレクトリが見つかりません。初期設定の /boot/home を使用します。
 Conversion completed	MediaConverter		変換が完了しました
@@ -15,7 +14,7 @@ Cancelling	MediaConverter		中止中
 None available	Audio codecs		利用できません
 No file selected	MediaConverter-FileInfo		ファイルが選択されていません
 High	MediaConverter		高い
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{ファイルはサポートされたメディアファイルとして認識されませんでした:} other{#個のファイルがサポートされたメディアファイルとして認識されませんでした:}}
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{ファイルはサポートされたメディアファイルとして認識されません:} other{#個のファイルがサポートされたメディアファイルとして認識されません:}}
 File Error	MediaConverter-FileInfo		ファイルエラー
 None available	Video codecs		利用できません
 Output format	MediaConverter		出力フォーマット
@@ -25,10 +24,10 @@ OK	MediaConverter		OK
 Error creating '%filename'	MediaConverter		'%filename' の作成中にエラーが発生しました
 Error loading a file	MediaConverter		ファイルのロード中にエラーが発生しました
 Encoder parameters	MediaConverter-EncoderWindow		エンコーターパラメーター
-Open…	Menu		開く…
+Open…	Menu		開く...
 Audio encoding:	MediaConverter		オーディオエンコーディング
 Audio quality: %3d%%	MediaConverter		オーディオ品質: %3d%%
-Cancelling…	MediaConverter		中止中…
+Cancelling…	MediaConverter		中止しています...
 Output file '%filename' created	MediaConverter		出力ファイル '%filename' が作成されました
 Output folder	MediaConverter		出力先フォルダー
 Error creating track.	MediaConverter		トラックの作成に失敗しました。
@@ -43,25 +42,26 @@ Error loading files	MediaConverter		ファイルのロード中にエラーが�
 End   [ms]: 	MediaConverter		終了 [ms]:
 Cancel	MediaConverter		中止
 OK	MediaConverter-FileInfo		OK
-Error read audio frame %ld	MediaConverter		オーディオフレーム %ld の読込みに失敗しました
 Video encoding:	MediaConverter		ビデオエンコーディング:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		ファイル情報を読み取る際にエラーが発生しました。\n\nError : 
 Error	MediaConverter		エラー
 File details	MediaConverter		ファイルの詳細
 No audio	Audio codecs list		オーディオ無し
 Drop media files onto this window	MediaConverter		メディアファイルをこのウィンドウにドロップしてください
+Writing video track: %ld%% complete	MediaConverter		ビデオトラックの書き込み: %ld%% 完了
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# フレーム} other{# フレーム}}
+Error read audio frame %lld	MediaConverter		オーディオフレーム %lld の読み取りに失敗しました
 Quit	Menu		終了
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# バイト} other{# バイト}}
 Duration:	MediaConverter-FileInfo		再生時間:
 MediaConverter	System name		メディアコンバーター
 Error launching: %strError%	MediaConverter		起動時にエラーが発生しました: %strError%
+Error writing audio frame %lld	MediaConverter		オーディオフレーム %lld の書き込みに失敗しました
+Writing audio track: %ld%% complete	MediaConverter		オーディトラックの書き込み: %ld%% 完了
 File format:	MediaConverter		ファイルフォーマット:
-Error writing audio frame %ld	MediaConverter		オーディオフレーム %ld の書込みに失敗しました
 File	Menu		ファイル
 Video quality not supported	MediaConverter		ビデオ品質はサポートされていません
 Select this folder	MediaConverter		このフォルダーを選択
-Error read video frame %ld	MediaConverter		ビデオフレーム %ld の読込みに失敗しました
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld チャンネル
 %d bit 	MediaFileInfo		%d ビット
 No video	Video codecs list		ビデオ無し
@@ -69,6 +69,6 @@ Continue	MediaConverter		続ける
 Convert	MediaConverter		変換
 Audio quality not supported	MediaConverter		オーディオ品質がサポートされていません
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		%strPath% への書き込み時にエラーが発生しました。初期設定の /boot/home を使用します。
-Writing video track: %d%% complete	MediaConverter		ビデオトラックの書込み: %d%% 完了
+Error read video frame %lld	MediaConverter		ビデオフレーム %lld の読み込みに失敗しました
 Preview	MediaConverter		プレビュー
 Start [ms]: 	MediaConverter		開始 [ms]:

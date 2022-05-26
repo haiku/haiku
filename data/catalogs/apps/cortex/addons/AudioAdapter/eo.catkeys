@@ -1,0 +1,9 @@
+1	esperanto	application/x-vnd.moon-AudioAdapter.media_addon	3562210970
+Input format	CortexAudioAdapter		Eniga formo
+Channels:	CortexAudioAdapter		Kanaloj:
+stereo	CortexAudioAdapter		stereofonio
+Output format	CortexAudioAdapter		Eliga formo
+Audio input	CortexAddOnsCommon		Aŭdenigo
+Sample format:	CortexAudioAdapter		Ekzempla formo:
+Audio output	CortexAddOnsCommon		Aŭdeliro
+%groupname% parameters	CortexAddOnsCommon		%groupname% parametroj

@@ -22,6 +22,7 @@
 #include <kernel.h>
 #include <slab/Slab.h>
 #include <smp.h>
+#include <thread.h>
 #include <tracing.h>
 #include <util/AutoLock.h>
 #include <vfs.h>
@@ -1454,7 +1455,7 @@ VMCache::Dump(bool showPages) const
 	kprintf("  type:         %s\n", vm_cache_type_to_string(type));
 	kprintf("  virtual_base: 0x%" B_PRIx64 "\n", virtual_base);
 	kprintf("  virtual_end:  0x%" B_PRIx64 "\n", virtual_end);
-	kprintf("  temporary:    %" B_PRIu32 "\n", temporary);
+	kprintf("  temporary:    %" B_PRIu32 "\n", uint32(temporary));
 	kprintf("  lock:         %p\n", &fLock);
 #if KDEBUG
 	kprintf("  lock.holder:  %" B_PRId32 "\n", fLock.holder);

@@ -169,7 +169,7 @@ static int		tmcomp P((const struct tm * atmp,
 */
 struct tm* __gmtime_r_fallback(const time_t* timep, struct tm* tmp);
 time_t __mktime_fallback(struct tm* tmp);
-time_t timegm(struct tm* const tmp);
+time_t __timegm_fallback(struct tm* const tmp);
 
 static struct state	lclmem;
 static struct state	gmtmem;
@@ -831,10 +831,8 @@ __mktime_fallback(struct tm* tmp)
 }
 
 
-
 time_t
-timegm(tmp)
-struct tm * const	tmp;
+__timegm_fallback(struct tm* const tmp)
 {
 	tmp->tm_isdst = 0;
 	return time1(tmp, gmtsub, 0L);

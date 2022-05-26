@@ -1,0 +1,12 @@
+1	portuguese (brazil)	x-vnd.Haiku-libmedia	1819860668
+Cleaning up.	MediaDefs		Limpando.
+Starting media_services.	MediaDefs		Iniciando media_services.
+Stopping media_addon_server.	MediaDefs		Parando media_addon_server.
+Waiting for media_addon_server to quit.	MediaDefs		Aguardando por media_addon_server para sair.
+Telling media_addon_server to quit.	MediaDefs		Dizendo media_addon_server para sair.
+Ready for use.	MediaDefs		Esperando para usar.
+Stopping media server…	MediaDefs		Parando servidor de mídia…
+Waiting for media_server to quit.	MediaDefs		Esperando por media_server sair.
+Done shutting down.	MediaDefs		Encerramento concluído.
+Error occurred starting media services.	MediaDefs		Ocorreu um erro ao iniciar os serviços de mídia.
+Media Service	MediaDefs		Serviço de Mídia

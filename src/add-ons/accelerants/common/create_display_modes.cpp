@@ -18,7 +18,7 @@
 	(B_POSITIVE_HSYNC | B_POSITIVE_VSYNC)
 #define MODE_FLAGS \
 	(B_8_BIT_DAC | B_HARDWARE_CURSOR | B_PARALLEL_ACCESS | B_DPMS \
-		| B_SUPPORTS_OVERLAYS)
+		| B_SUPPORTS_OVERLAYS | B_SCROLL)
 
 // TODO: move this list into the app_server
 static const display_mode kBaseModeList[] = {
@@ -77,7 +77,8 @@ static const display_mode kBaseModeList[] = {
 
 	{{147100, 1680, 1784, 1968, 2256, 1050, 1051, 1054, 1087, POSITIVE_SYNC}, B_CMAP8, 1680, 1050, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1680X1050) */
 
-	{{172000, 1920, 2040, 2248, 2576, 1080, 1081, 1084, 1118, POSITIVE_SYNC}, B_CMAP8, 1920, 1080, 0, 0, MODE_FLAGS}, /* 1920x1080 60Hz */
+	//{{172000, 1920, 2040, 2248, 2576, 1080, 1081, 1084, 1118, POSITIVE_SYNC}, B_CMAP8, 1920, 1080, 0, 0, MODE_FLAGS}, /* 1920x1080 60Hz */
+	{{148500, 1920, 2008, 2052, 2200, 1080, 1084, 1089, 1125, POSITIVE_SYNC}, B_CMAP8, 1920, 1080, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1080) */
 	//{{160000, 1920, 2010, 2060, 2110, 1200, 1202, 1208, 1235, POSITIVE_SYNC}, B_CMAP8, 1920, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1200) */
 	{{193160, 1920, 2048, 2256, 2592, 1200, 1201, 1204, 1242, POSITIVE_SYNC}, B_CMAP8, 1920, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1920X1200) */
 };
@@ -521,7 +522,7 @@ create_display_modes(const char* name, edid1_info* edid,
 		& ~(B_PAGE_SIZE - 1);
 	display_mode *list;
 	area_id area = create_area(name, (void **)&list, B_ANY_ADDRESS,
-		size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA | B_CLONEABLE_AREA);
 	if (area < B_OK)
 		return area;
 

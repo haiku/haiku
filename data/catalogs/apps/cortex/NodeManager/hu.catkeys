@@ -1,0 +1,7 @@
+1	hungarian	application/x-vnd.Cortex.NodeManager	1301322433
+System audio mixer	NodeManager		Rendszer hangkeverő
+System video output	NodeManager		Rendszer videó kimenet
+System video input	NodeManager		Rendszer videó bemenet
+No name	NodeManager		Névtelen
+System audio input	NodeManager		Rendszer audió bemenet
+Time sources	NodeManager		Idő források

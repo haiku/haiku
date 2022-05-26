@@ -25,13 +25,18 @@ public:
 	virtual	void		setUp();
 
 			void		GetTest();
+			void		HeadTest();
+			void		NoContentTest();
 			void		UploadTest();
 			void		AuthBasicTest();
 			void		AuthDigestTest();
 			void		ProxyTest();
+			void		AutoRedirectTest();
 
 	static	void		AddTests(BTestSuite& suite);
 
+private:
+			void		_GetTest(const BString& path);
 private:
 			TestServer	fTestServer;
 };

@@ -37,7 +37,6 @@
 #include <Locale.h>
 #include <MenuItem.h>
 #include <MessageRunner.h>
-#include <NetworkDevice.h>
 #include <NetworkInterface.h>
 #include <NetworkRoster.h>
 #include <PopUpMenu.h>
@@ -75,20 +74,7 @@ const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
 
 
-//	#pragma mark -
-
-
-static bool
-signal_strength_compare(const wireless_network &a,
-	const wireless_network &b)
-{
-	if (a.signal_strength == b.signal_strength)
-		return strcmp(a.name, b.name) > 0;
-	return a.signal_strength > b.signal_strength;
-}
-
-
-//	#pragma mark -
+//	#pragma mark - NetworkStatusView
 
 
 NetworkStatusView::NetworkStatusView(BRect frame, int32 resizingMode,
@@ -299,6 +285,7 @@ NetworkStatusView::MessageReceived(BMessage* message)
 
 		default:
 			BView::MessageReceived(message);
+			break;
 	}
 }
 
@@ -341,18 +328,35 @@ NetworkStatusView::_ShowConfiguration(BMessage* message)
 	if (!networkInterface.Exists())
 		return;
 
-	BNetworkInterfaceAddress address;
-	networkInterface.GetAddressAt(0, address);
-		// TODO: We should get all addresses,
-		// not just the first one.
 	BString text(B_TRANSLATE("%ifaceName information:\n"));
 	text.ReplaceFirst("%ifaceName", name);
 
 	size_t boldLength = text.Length();
 
-	text << "\n" << B_TRANSLATE("Address") << ": " << address.Address().ToString();
-	text << "\n" << B_TRANSLATE("Broadcast") << ": " << address.Broadcast().ToString();
-	text << "\n" << B_TRANSLATE("Netmask") << ": " << address.Mask().ToString();
+	int32 numAddrs = networkInterface.CountAddresses();
+	for (int32 i = 0; i < numAddrs; i++) {
+		BNetworkInterfaceAddress address;
+		networkInterface.GetAddressAt(i, address);
+		switch (address.Address().Family()) {
+			case AF_INET:
+				text << "\n" << B_TRANSLATE("IPv4 address:") << " "
+					<< address.Address().ToString()
+					<< "\n" << B_TRANSLATE("Broadcast:") << " "
+					<< address.Broadcast().ToString()
+					<< "\n" << B_TRANSLATE("Netmask:") << " "
+					<< address.Mask().ToString()
+					<< "\n";
+				break;
+			case AF_INET6:
+				text << "\n" << B_TRANSLATE("IPv6 address:") << " "
+					<< address.Address().ToString()
+					<< "/" << address.Mask().PrefixLength()
+					<< "\n";
+				break;
+			default:
+				break;
+		}
+	}
 
 	BAlert* alert = new BAlert(name, text.String(), B_TRANSLATE("OK"));
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
@@ -375,79 +379,60 @@ NetworkStatusView::MouseDown(BPoint point)
 	menu->SetAsyncAutoDestruct(true);
 	menu->SetFont(be_plain_font);
 	BString wifiInterface;
-	BNetworkDevice wifiDevice;
+	BNetworkDevice device;
 
-	// Add interfaces
+	if (!fInterfaceStatuses.empty()) {
+		for (std::map<BString, int32>::const_iterator it
+				= fInterfaceStatuses.begin(); it != fInterfaceStatuses.end();
+				++it) {
+			const BString& name = it->first;
 
-	for (std::map<BString, int32>::const_iterator it
-		= fInterfaceStatuses.begin(); it != fInterfaceStatuses.end(); ++it) {
-		const BString& name = it->first;
-
-		BString label = name;
-		label += ": ";
-		label += kStatusDescriptions[
-			_DetermineInterfaceStatus(name.String())];
-
-		BMessage* info = new BMessage(kMsgShowConfiguration);
-		info->AddString("interface", name.String());
-		menu->AddItem(new BMenuItem(label.String(), info));
-
-		// We only show the networks of the first wireless device we find.
-		if (wifiInterface.IsEmpty()) {
-			wifiDevice.SetTo(name);
-			if (wifiDevice.IsWireless())
-				wifiInterface = name;
+			// we only show network of the first wireless device we find
+			if (wifiInterface.IsEmpty()) {
+				device.SetTo(name);
+				if (device.IsWireless())
+					wifiInterface = name;
+			}
 		}
 	}
 
-	if (!fInterfaceStatuses.empty())
-		menu->AddSeparatorItem();
-
-	// Add wireless networks, if any
+	// Add wireless networks, if any, first so that we can sort the menu
 
 	if (!wifiInterface.IsEmpty()) {
 		std::set<BNetworkAddress> associated;
 		BNetworkAddress address;
+		wireless_network network;
 		uint32 cookie = 0;
-		while (wifiDevice.GetNextAssociatedNetwork(cookie, address) == B_OK)
+		while (device.GetNextAssociatedNetwork(cookie, address) == B_OK)
 			associated.insert(address);
 
+		int32 wifiCount = 0;
 		cookie = 0;
-		wireless_network network;
-		typedef std::vector<wireless_network> WirelessNetworkVector;
-		WirelessNetworkVector wirelessNetworks;
-		while (wifiDevice.GetNextNetwork(cookie, network) == B_OK)
-			wirelessNetworks.push_back(network);
-
-		std::sort(wirelessNetworks.begin(), wirelessNetworks.end(),
-			signal_strength_compare);
-
-		int32 count = 0;
-		for (WirelessNetworkVector::iterator it = wirelessNetworks.begin();
-				it != wirelessNetworks.end(); it++) {
-			wireless_network &network = *it;
-
+		while (device.GetNextNetwork(cookie, network) == B_OK) {
 			BMessage* message = new BMessage(kMsgJoinNetwork);
 			message->AddString("device", wifiInterface);
 			message->AddString("name", network.name);
 			message->AddFlat("address", &network.address);
 
-			BMenuItem* item = new WirelessNetworkMenuItem(network.name,
-				network.signal_strength, network.authentication_mode, message);
+			BMenuItem* item = new WirelessNetworkMenuItem(network, message);
 			menu->AddItem(item);
+			wifiCount++;
 			if (associated.find(network.address) != associated.end())
 				item->SetMarked(true);
-
-			count++;
 		}
-		if (count == 0) {
+
+		if (wifiCount == 0) {
 			BMenuItem* item = new BMenuItem(
 				B_TRANSLATE("<no wireless networks found>"), NULL);
 			item->SetEnabled(false);
 			menu->AddItem(item);
-		}
+		} else
+			menu->SortItems(WirelessNetworkMenuItem::CompareSignalStrength);
+
 		menu->AddSeparatorItem();
 	}
+
+	// add action menu items
 
 	menu->AddItem(new BMenuItem(B_TRANSLATE(
 		"Open network preferences" B_UTF8_ELLIPSIS),
@@ -457,6 +442,32 @@ NetworkStatusView::MouseDown(BPoint point)
 		menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 			new BMessage(B_QUIT_REQUESTED)));
 	}
+
+	// Add wired interfaces to top of menu
+	if (!fInterfaceStatuses.empty()) {
+		int32 wiredCount = 0;
+		for (std::map<BString, int32>::const_iterator it
+				= fInterfaceStatuses.begin(); it != fInterfaceStatuses.end();
+				++it) {
+			const BString& name = it->first;
+
+			BString label = name;
+			label += ": ";
+			label += kStatusDescriptions[
+				_DetermineInterfaceStatus(name.String())];
+
+			BMessage* info = new BMessage(kMsgShowConfiguration);
+			info->AddString("interface", name.String());
+			menu->AddItem(new BMenuItem(label.String(), info), wiredCount);
+			wiredCount++;
+		}
+
+		// add separator item between wired and wireless networks
+		// (or between wired networks and actions if no wireless found)
+		if (wiredCount > 0)
+			menu->AddItem(new BSeparatorItem(), wiredCount);
+	}
+
 	menu->SetTargetForItems(this);
 
 	ConvertToScreen(&point);
@@ -569,4 +580,3 @@ instantiate_deskbar_item(float maxWidth, float maxHeight)
 	return new NetworkStatusView(BRect(0, 0, maxHeight - 1, maxHeight - 1),
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, true);
 }
-

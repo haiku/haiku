@@ -1,8 +1,22 @@
 # Haiku bootstrap in a container
 
+In Haiku, "bootstrap" is the process of building an Haiku disk image without
+any pre-compiled dependencies. Everything is built from sources instead. This
+is useful in the following cases:
+- Bringing up a new CPU architecture or ABI, for which no packages are yet
+  available,
+- You do not trust our precompiled binaries used for a normal build.
+
+The resulting image is a very minimal one, containing just enough parts of
+Haiku to be able to run haikuporter inside it and generate package files that
+can then be used for a normal build of Haiku.
+
 The Haiku bootstrap process is highly dependant on what tools are installed
-on the host machine.  Bootstraped haikuporter builds can pick up on things
-like the locally installed clang vs the gcc toolchain we are providing.
+on the host machine. Bootstraped haikuporter builds can pick up on things
+like the locally installed clang vs the gcc toolchain we are providing,
+the shell being used (bash works, mksh is known to cause problems), or even
+the way the host distribution compiled Python. This makes the process
+unreliable when running it outside of a well-knwon environment.
 
 By running bootstrap within a container, we can better isolate the process
 from the end users host and create more-reproduceable bootstrap builds.

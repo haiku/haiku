@@ -12,12 +12,11 @@
 
 #include <vfs.h>
 
-#include <AutoDeleter.h>
+#include <AutoDeleterDrivers.h>
 
 #include "DebugSupport.h"
 #include "kernel_interface.h"
 #include "Node.h"
-#include "Utils.h"
 #include "Volume.h"
 
 
@@ -63,7 +62,8 @@ static status_t
 bindfs_mount(fs_volume* fsVolume, const char* device, uint32 flags,
 	const char* parameters, ino_t* _rootID)
 {
-	FUNCTION("fsVolume: %p, device: \"%s\", flags: %#lx, parameters: \"%s\"\n",
+	FUNCTION("fsVolume: %p, device: \"%s\", flags: %#" B_PRIx32 ", "
+			"parameters: \"%s\"\n",
 		fsVolume, device, flags, parameters);
 
 	// create a Volume object
@@ -138,8 +138,8 @@ bindfs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* entryName,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsDir->private_node;
 
-	FUNCTION("volume: %p, dir: %p (%lld), entry: \"%s\"\n", volume, node,
-		node->ID(), entryName);
+	FUNCTION("volume: %p, dir: %p (%" B_PRIdINO "), entry: \"%s\"\n",
+		volume, node, node->ID(), entryName);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -164,7 +164,7 @@ bindfs_get_vnode(fs_volume* fsVolume, ino_t vnid, fs_vnode* fsNode,
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
 
-	FUNCTION("volume: %p, vnid: %lld\n", volume, vnid);
+	FUNCTION("volume: %p, vnid: %" B_PRIdINO "\n", volume, vnid);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, vnid);
 
@@ -244,8 +244,8 @@ bindfs_can_page(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume,
-		node, node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -260,8 +260,8 @@ bindfs_read_pages(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, pos: %lld, vecs: %p, "
-			"count: %ld\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p, "
+			"pos: %" B_PRIdOFF ", vecs: %p, count: %ld\n",
 		volume, node, node->ID(), cookie, pos, vecs, count);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -278,8 +278,8 @@ bindfs_write_pages(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, pos: %lld, vecs: %p, "
-			"count: %ld\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p, "
+			"pos: %" B_PRIdOFF ", vecs: %p, count: %ld\n",
 		volume, node, node->ID(), cookie, pos, vecs, count);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -302,8 +302,8 @@ bindfs_io(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, request: %p\n", volume,
-		node, node->ID(), cookie, request);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p, request: %p\n",
+		volume, node, node->ID(), cookie, request);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -318,8 +318,8 @@ bindfs_cancel_io(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, request: %p\n", volume,
-		node, node->ID(), cookie, request);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p, request: %p\n",
+		volume, node, node->ID(), cookie, request);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -338,7 +338,8 @@ bindfs_get_file_map(fs_volume* fsVolume, fs_vnode* fsNode, off_t offset,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), offset: %lld, size: %ld, vecs: %p\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), offset: %" B_PRIdOFF ", "
+			"size: %ld, vecs: %p\n",
 		volume, node, node->ID(), offset, size, vecs);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -358,8 +359,8 @@ bindfs_ioctl(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie, uint32 op,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, op: %lx, buffer: %p, "
-			"length: %ld\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p, "
+			"op: %" B_PRIx32 ", buffer: %p, length: %ld\n",
 		volume, node, node->ID(), cookie, op, buffer, length);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -375,7 +376,7 @@ bindfs_set_flags(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie, int flags)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, flags: %x\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p, flags: %x\n",
 		volume, node, node->ID(), cookie, flags);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -391,7 +392,8 @@ bindfs_select(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie, uint8 event,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, event: %x, sync: %p\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p, event: %x, "
+			"sync: %p\n",
 		volume, node, node->ID(), cookie, event, sync);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -408,7 +410,8 @@ bindfs_deselect(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, event: %x, sync: %p\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p, event: %x, "
+			"sync: %p\n",
 		volume, node, node->ID(), cookie, event, sync);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -424,7 +427,8 @@ bindfs_fsync(fs_volume* fsVolume, fs_vnode* fsNode)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO ")\n",
+		volume, node, node->ID());
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -442,7 +446,8 @@ bindfs_read_symlink(fs_volume* fsVolume, fs_vnode* fsNode, char* buffer,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO ")\n",
+		volume, node, node->ID());
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -458,7 +463,8 @@ bindfs_create_symlink(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), name: %s, path: %s, mode: %x\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), "
+			"name: %s, path: %s, mode: %x\n",
 		volume, node, node->ID(), name, path, mode);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -475,7 +481,8 @@ bindfs_link(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), name: %s, tonode: %p\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), "
+			"name: %s, tonode: %p\n",
 		volume, node, node->ID(), name, toNode);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -490,7 +497,7 @@ bindfs_unlink(fs_volume* fsVolume, fs_vnode* fsNode, const char* name)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), name: %s\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), name: %s\n",
 		volume, node, node->ID(), name);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -506,7 +513,8 @@ bindfs_rename(fs_volume* fsVolume, fs_vnode* fsNode, const char* fromName,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), from: %s, toDir: %p, to: %s\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), "
+			"from: %s, toDir: %p, to: %s\n",
 		volume, node, node->ID(), fromName, toDir, toName);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -522,7 +530,8 @@ bindfs_access(fs_volume* fsVolume, fs_vnode* fsNode, int mode)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO" )\n",
+		volume, node, node->ID());
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -536,7 +545,8 @@ bindfs_read_stat(fs_volume* fsVolume, fs_vnode* fsNode, struct stat* st)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO ")\n",
+		volume, node, node->ID());
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -557,7 +567,8 @@ bindfs_write_stat(fs_volume* fsVolume, fs_vnode* fsNode,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO ")\n",
+		volume, node, node->ID());
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -576,7 +587,8 @@ bindfs_preallocate(fs_volume* fsVolume, fs_vnode* fsNode, off_t pos,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), pos: %lld, length: %lld\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), pos: %" B_PRIdOFF ", "
+			"length: %" B_PRIdOFF "\n",
 		volume, node, node->ID(), pos, length);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -595,7 +607,8 @@ bindfs_create(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), name: %s, openMode %#x, perms: %x\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), "
+			"name: %s, openMode %#x, perms: %x\n",
 		volume, node, node->ID(), name, openMode, perms);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -630,8 +643,8 @@ bindfs_open(fs_volume* fsVolume, fs_vnode* fsNode, int openMode,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), openMode %#x\n", volume, node,
-		node->ID(), openMode);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), openMode %#x\n",
+		volume, node, node->ID(), openMode);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -645,8 +658,8 @@ bindfs_close(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -660,8 +673,8 @@ bindfs_free_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -676,9 +689,9 @@ bindfs_read(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, offset: %lld, "
-		"buffer: %p, size: %lu\n", volume, node, node->ID(), cookie, offset,
-		buffer, *bufferSize);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p, "
+			"offset: %" B_PRIdOFF ", buffer: %p, size: %lu\n",
+		volume, node, node->ID(), cookie, offset, buffer, *bufferSize);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -694,9 +707,9 @@ bindfs_write(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p, offset: %lld, "
-		"buffer: %p, size: %lu\n", volume, node, node->ID(), cookie, offset,
-		buffer, *bufferSize);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p, "
+			"offset: %" B_PRIdOFF ", buffer: %p, size: %lu\n",
+		volume, node, node->ID(), cookie, offset, buffer, *bufferSize);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -715,8 +728,8 @@ bindfs_create_dir(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), name: %s, perms: %x\n", volume, node,
-		node->ID(), name, perms);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), name: %s, perms: %x\n",
+		volume, node, node->ID(), name, perms);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -730,7 +743,7 @@ bindfs_remove_dir(fs_volume* fsVolume, fs_vnode* fsNode, const char* name)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), name: %s\n", volume, node,
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), name: %s\n", volume, node,
 		node->ID(), name);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -745,7 +758,8 @@ bindfs_open_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO ")\n",
+		volume, node, node->ID());
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -759,8 +773,8 @@ bindfs_close_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -774,8 +788,8 @@ bindfs_free_dir_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -790,8 +804,8 @@ bindfs_read_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -806,8 +820,8 @@ bindfs_rewind_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -824,7 +838,8 @@ bindfs_open_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** _cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld)\n", volume, node, node->ID());
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO ")\n",
+		volume, node, node->ID());
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -838,8 +853,8 @@ bindfs_close_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -854,8 +869,8 @@ bindfs_free_attr_dir_cookie(fs_volume* fsVolume, fs_vnode* fsNode,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -871,8 +886,8 @@ bindfs_read_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -887,8 +902,8 @@ bindfs_rewind_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -906,8 +921,8 @@ bindfs_create_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), name: \"%s\", type: %lx, "
-			"openMode %#x\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), name: \"%s\", "
+			"type: %" B_PRIx32 ", openMode %#x\n",
 		volume, node, node->ID(), name, type, openMode);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -924,7 +939,8 @@ bindfs_open_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), name: \"%s\", openMode %#x\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), name: \"%s\", "
+			"openMode %#x\n",
 		volume, node, node->ID(), name, openMode);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -940,8 +956,8 @@ bindfs_close_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -955,8 +971,8 @@ bindfs_free_attr_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -971,8 +987,8 @@ bindfs_read_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -988,8 +1004,8 @@ bindfs_write_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -1005,8 +1021,8 @@ bindfs_read_attr_stat(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -1028,8 +1044,8 @@ bindfs_write_attr_stat(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), cookie: %p\n", volume, node,
-		node->ID(), cookie);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO"), cookie: %p\n",
+		volume, node, node->ID(), cookie);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 
@@ -1049,7 +1065,8 @@ bindfs_rename_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* fromName,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), from: %s, toDir: %p, to: %s\n",
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), from: %s, toDir: %p, "
+			"to: %s\n",
 		volume, node, node->ID(), fromName, toDir, toName);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
@@ -1065,8 +1082,8 @@ bindfs_remove_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	Node* node = (Node*)fsNode->private_node;
 
-	FUNCTION("volume: %p, node: %p (%lld), name: %s\n", volume, node,
-		node->ID(), name);
+	FUNCTION("volume: %p, node: %p (%" B_PRIdINO "), name: %s\n",
+		volume, node, node->ID(), name);
 
 	FETCH_SOURCE_VOLUME_AND_NODE(volume, node->ID());
 

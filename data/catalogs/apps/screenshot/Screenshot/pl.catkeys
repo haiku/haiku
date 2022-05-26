@@ -14,7 +14,7 @@ Screenshot	System name		Zrzut ekranu
 Desktop	ScreenshotWindow		Pulpit
 Artwork folder	ScreenshotWindow		Katalog na obrazki
 Translator Settings	ScreenshotWindow		Ustawienia translatora
-Include mouse pointer	ScreenshotWindow		Pokaż wskaźnik myszy
+Include mouse pointer	ScreenshotWindow		Dołącz wskaźnik myszy
 overwrite	ScreenshotWindow		nadpisz
 Settings…	ScreenshotWindow		Ustawienia…
 Choose folder	ScreenshotWindow		Wybierz katalog

@@ -5,7 +5,7 @@ PNG image	PNGTranslator		PNG-kuva
 PNG images	PNGTranslator		PNG-kuvat
 Interlacing type:	PNGTranslator		Limitystyyppi:
 PNG Interlace Menu	PNGTranslator		PNG-limitysvalikko
-PNGTranslator Settings	PNGTranslator		PNG-muunninasetukset
+PNGTranslator Settings	PNGTranslator		PNGTranslator-asetukset
 Version %d.%d.%d, %s	PNGTranslator		Versio %d.%d.%d, %s
 PNG image translator	PNGTranslator		PNG-kuvamuunnin
 Interlace Option	PNGTranslator		Limitysvalitsin

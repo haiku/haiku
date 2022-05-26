@@ -27,6 +27,7 @@ typedef enum {
 
 typedef struct {
     uint32_t Type;
+    uint32_t Padding;
     efi_physical_addr PhysicalStart;
     efi_virtual_addr VirtualStart;
     uint64_t NumberOfPages;

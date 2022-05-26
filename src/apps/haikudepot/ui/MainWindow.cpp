@@ -3,7 +3,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * Copyright 2017, Julian Harnath <julian.harnath@rwth-aachen.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -47,6 +47,8 @@
 #include "RatePackageWindow.h"
 #include "support.h"
 #include "ScreenshotWindow.h"
+#include "SettingsWindow.h"
+#include "ShuttingDownWindow.h"
 #include "ToLatestUserUsageConditionsWindow.h"
 #include "UserLoginWindow.h"
 #include "UserUsageConditionsWindow.h"
@@ -61,6 +63,7 @@ enum {
 	MSG_REFRESH_REPOS						= 'mrrp',
 	MSG_MANAGE_REPOS						= 'mmrp',
 	MSG_SOFTWARE_UPDATER					= 'mswu',
+	MSG_SETTINGS							= 'stgs',
 	MSG_LOG_IN								= 'lgin',
 	MSG_AUTHORIZATION_CHANGED				= 'athc',
 	MSG_CATEGORIES_LIST_CHANGED				= 'clic',
@@ -76,7 +79,6 @@ enum {
 };
 
 #define KEY_ERROR_STATUS				"errorStatus"
-#define KEY_PACKAGE_LIST_VIEW_MODE		"packageListViewMode"
 
 #define TAB_PROMINENT_PACKAGES	0
 #define TAB_ALL_PACKAGES		1
@@ -132,12 +134,14 @@ MainWindow::MainWindow(const BMessage& settings)
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fScreenshotWindow(NULL),
+	fShuttingDownWindow(NULL),
 	fUserMenu(NULL),
 	fLogInItem(NULL),
 	fLogOutItem(NULL),
 	fUsersUserUsageConditionsMenuItem(NULL),
 	fModelListener(new MainWindowModelListener(BMessenger(this)), true),
 	fCoordinator(NULL),
+	fShouldCloseWhenNoProcessesToCoordinate(false),
 	fSinglePackageMode(false)
 {
 	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
@@ -195,6 +199,7 @@ MainWindow::MainWindow(const BMessage& settings)
 		fPackageListView->LoadState(&columnSettings);
 
 	_RestoreModelSettings(settings);
+	_MaybePromptCanShareAnonymousUserData(settings);
 
 	if (fModel.PackageListViewMode() == PROMINENT)
 		fListTabs->Select(TAB_PROMINENT_PACKAGES);
@@ -215,7 +220,7 @@ MainWindow::MainWindow(const BMessage& settings)
 }
 
 
-MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
+MainWindow::MainWindow(const BMessage& settings, PackageInfoRef& package)
 	:
 	BWindow(BRect(50, 50, 650, 350), B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
@@ -224,12 +229,14 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 	fPackageListView(NULL),
 	fWorkStatusView(NULL),
 	fScreenshotWindow(NULL),
+	fShuttingDownWindow(NULL),
 	fUserMenu(NULL),
 	fLogInItem(NULL),
 	fLogOutItem(NULL),
 	fUsersUserUsageConditionsMenuItem(NULL),
 	fModelListener(new MainWindowModelListener(BMessenger(this)), true),
 	fCoordinator(NULL),
+	fShouldCloseWhenNoProcessesToCoordinate(false),
 	fSinglePackageMode(true)
 {
 	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
@@ -247,12 +254,22 @@ MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 
 	fModel.AddListener(fModelListener);
 
+	// add the single package into the model so that any internal
+	// business logic is able to find the package.
+	DepotInfoRef depot(new DepotInfo("single-pkg-depot"), true);
+	depot->AddPackage(package);
+	fModel.MergeOrAddDepot(depot);
+
 	// Restore settings
 	_RestoreNickname(settings);
 	_UpdateAuthorization();
 	_RestoreWindowFrame(settings);
 
 	fPackageInfoView->SetPackage(package);
+
+	// start worker threads
+	BPackageRoster().StartWatching(this,
+		B_WATCH_PACKAGE_INSTALLATION_LOCATIONS);
 
 	_InitWorkerThreads();
 }
@@ -266,27 +283,62 @@ MainWindow::~MainWindow()
 
 	BPackageRoster().StopWatching(this);
 
-	delete_sem(fPendingActionsSem);
-	if (fPendingActionsWorker >= 0)
-		wait_for_thread(fPendingActionsWorker, NULL);
+	if (fScreenshotWindow != NULL) {
+		if (fScreenshotWindow->Lock())
+			fScreenshotWindow->Quit();
+	}
 
-	if (fScreenshotWindow != NULL && fScreenshotWindow->Lock())
-		fScreenshotWindow->Quit();
+	if (fShuttingDownWindow != NULL) {
+		if (fShuttingDownWindow->Lock())
+			fShuttingDownWindow->Quit();
+	}
+
+	delete_sem(fPackageToPopulateSem);
+	wait_for_thread(fPopulatePackageWorker, NULL);
+
+	// We must clear the model early to release references.
+	fModel.Clear();
 }
 
 
 bool
 MainWindow::QuitRequested()
 {
-	BMessage settings;
-	StoreSettings(settings);
-
-	BMessage message(MSG_MAIN_WINDOW_CLOSED);
-	message.AddMessage(KEY_WINDOW_SETTINGS, &settings);
-
-	be_app->PostMessage(&message);
 
 	_StopProcessCoordinators();
+
+	// If there are any processes in flight we need to be careful to make
+	// sure that they are cleanly completed before actually quitting.  By
+	// turning on the `fShouldCloseWhenNoProcessesToCoordinate` flag, when
+	// the process coordination has completed then it will detect this and
+	// quit again.
+
+	{
+		AutoLocker<BLocker> lock(&fCoordinatorLock);
+		fShouldCloseWhenNoProcessesToCoordinate = true;
+
+		if (fCoordinator.IsSet()) {
+			HDINFO("a coordinator is running --> will wait before quitting...");
+
+			if (fShuttingDownWindow == NULL)
+				fShuttingDownWindow = new ShuttingDownWindow(this);
+			fShuttingDownWindow->Show();
+
+			return false;
+		}
+	}
+
+	BMessage settings;
+	StoreSettings(settings);
+	BMessage message(MSG_MAIN_WINDOW_CLOSED);
+	message.AddMessage(KEY_WINDOW_SETTINGS, &settings);
+	be_app->PostMessage(&message);
+
+	if (fShuttingDownWindow != NULL) {
+		if (fShuttingDownWindow->Lock())
+			fShuttingDownWindow->Quit();
+		fShuttingDownWindow = NULL;
+	}
 
 	return true;
 }
@@ -311,12 +363,7 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 
 		case B_PACKAGE_UPDATE:
-			// TODO: see ticket #15879
-			// work needs to be done here to selectively update package data in
-			// the running HaikuDepot application when there are changes on the
-			// system.  There is now too much data to just load everything when
-			// there is a change.
-			//_StartBulkLoad(false);
+			_HandleExternalPackageUpdateMessageReceived(message);
 			break;
 
 		case MSG_REFRESH_REPOS:
@@ -341,6 +388,10 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_LOG_IN:
 			_OpenLoginWindow(BMessage());
+			break;
+
+		case MSG_SETTINGS:
+			_OpenSettingsWindow();
 			break;
 
 		case MSG_LOG_OUT:
@@ -429,10 +480,12 @@ MainWindow::MessageReceived(BMessage* message)
 					BAutolock locker(fModel.Lock());
 					package = fModel.PackageForName(name);
 				}
-				if (package.Get() == NULL)
+				if (!package.IsSet() || name != package->Name())
 					debugger("unable to find the named package");
-				else
+				else {
 					_AdoptPackage(package);
+					_IncrementViewCounter(package);
+				}
 			} else {
 				_ClearPackage();
 			}
@@ -485,18 +538,9 @@ MainWindow::MessageReceived(BMessage* message)
 			PackageInfo* info;
 			if (message->FindPointer("package", (void**)&info) == B_OK) {
 				PackageInfoRef ref(info, true);
-				uint32 changes;
-				if (message->FindUInt32("changes", &changes) != B_OK)
-					changes = 0;
-				if ((changes & PKG_CHANGED_STATE) != 0) {
-					BAutolock locker(fModel.Lock());
-					fModel.SetPackageState(ref, ref->State());
-				}
+				fFeaturedPackagesView->BeginAddRemove();
 				_AddRemovePackageFromLists(ref);
-				if ((changes & PKG_CHANGED_STATE) != 0
-						&& fCoordinator.Get() == NULL) {
-					fWorkStatusView->PackageStatusChanged(ref);
-				}
+				fFeaturedPackagesView->EndAddRemove();
 			}
 			break;
 		}
@@ -573,18 +617,29 @@ MainWindow::StoreSettings(BMessage& settings) const
 
 		settings.AddMessage("column settings", &columnSettings);
 
-		settings.AddString(KEY_PACKAGE_LIST_VIEW_MODE,
+		settings.AddString(SETTING_PACKAGE_LIST_VIEW_MODE,
 			main_window_package_list_view_mode_str(
 				fModel.PackageListViewMode()));
-		settings.AddBool("show available packages",
+		settings.AddBool(SETTING_SHOW_AVAILABLE_PACKAGES,
 			fModel.ShowAvailablePackages());
-		settings.AddBool("show installed packages",
+		settings.AddBool(SETTING_SHOW_INSTALLED_PACKAGES,
 			fModel.ShowInstalledPackages());
-		settings.AddBool("show develop packages", fModel.ShowDevelopPackages());
-		settings.AddBool("show source packages", fModel.ShowSourcePackages());
+		settings.AddBool(SETTING_SHOW_DEVELOP_PACKAGES,
+			fModel.ShowDevelopPackages());
+		settings.AddBool(SETTING_SHOW_SOURCE_PACKAGES,
+			fModel.ShowSourcePackages());
+		settings.AddBool(SETTING_CAN_SHARE_ANONYMOUS_USER_DATA,
+			fModel.CanShareAnonymousUsageData());
 	}
 
 	settings.AddString("username", fModel.Nickname());
+}
+
+
+void
+MainWindow::Consume(ProcessCoordinator *item)
+{
+	_AddProcessCoordinator(item);
 }
 
 
@@ -596,7 +651,6 @@ MainWindow::PackageChanged(const PackageInfoEvent& event)
 		PackageInfoRef ref(event.Package());
 		BMessage message(MSG_PACKAGE_CHANGED);
 		message.AddPointer("package", ref.Get());
-		message.AddUInt32("changes", event.Changes());
 		ref.Detach();
 			// reference needs to be released by MessageReceived();
 		PostMessage(&message);
@@ -604,30 +658,10 @@ MainWindow::PackageChanged(const PackageInfoEvent& event)
 }
 
 
-status_t
-MainWindow::SchedulePackageActions(PackageActionList& list)
-{
-	AutoLocker<BLocker> lock(&fPendingActionsLock);
-	for (int32 i = 0; i < list.CountItems(); i++) {
-		if (!fPendingActions.Add(list.ItemAtFast(i)))
-			return B_NO_MEMORY;
-	}
-
-	return release_sem_etc(fPendingActionsSem, list.CountItems(), 0);
-}
-
-
-Model*
-MainWindow::GetModel()
-{
-	return &fModel;
-}
-
-
 void
 MainWindow::_BuildMenu(BMenuBar* menuBar)
 {
-	BMenu* menu = new BMenu(B_TRANSLATE("Tools"));
+	BMenu* menu = new BMenu(B_TRANSLATE_SYSTEM_NAME("HaikuDepot"));
 	fRefreshRepositoriesItem = new BMenuItem(
 		B_TRANSLATE("Refresh repositories"), new BMessage(MSG_REFRESH_REPOS));
 	menu->AddItem(fRefreshRepositoriesItem);
@@ -635,7 +669,11 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 		B_UTF8_ELLIPSIS), new BMessage(MSG_MANAGE_REPOS)));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Check for updates"
 		B_UTF8_ELLIPSIS), new BMessage(MSG_SOFTWARE_UPDATER)));
-
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS),
+		new BMessage(MSG_SETTINGS), ','));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
+		new BMessage(B_QUIT_REQUESTED), 'Q'));
 	menuBar->AddItem(menu);
 
 	fRepositoryMenu = new BMenu(B_TRANSLATE("Repositories"));
@@ -756,36 +794,58 @@ void
 MainWindow::_RestoreModelSettings(const BMessage& settings)
 {
 	BString packageListViewMode;
-	if (settings.FindString(KEY_PACKAGE_LIST_VIEW_MODE,
+	if (settings.FindString(SETTING_PACKAGE_LIST_VIEW_MODE,
 			&packageListViewMode) == B_OK) {
 		fModel.SetPackageListViewMode(
 			main_window_str_to_package_list_view_mode(packageListViewMode));
 	}
 
 	bool showOption;
-	if (settings.FindBool("show available packages", &showOption) == B_OK)
+	if (settings.FindBool(SETTING_SHOW_AVAILABLE_PACKAGES, &showOption) == B_OK)
 		fModel.SetShowAvailablePackages(showOption);
-	if (settings.FindBool("show installed packages", &showOption) == B_OK)
+	if (settings.FindBool(SETTING_SHOW_INSTALLED_PACKAGES, &showOption) == B_OK)
 		fModel.SetShowInstalledPackages(showOption);
-	if (settings.FindBool("show develop packages", &showOption) == B_OK)
+	if (settings.FindBool(SETTING_SHOW_DEVELOP_PACKAGES, &showOption) == B_OK)
 		fModel.SetShowDevelopPackages(showOption);
-	if (settings.FindBool("show source packages", &showOption) == B_OK)
+	if (settings.FindBool(SETTING_SHOW_SOURCE_PACKAGES, &showOption) == B_OK)
 		fModel.SetShowSourcePackages(showOption);
+	if (settings.FindBool(SETTING_CAN_SHARE_ANONYMOUS_USER_DATA,
+			&showOption) == B_OK) {
+		fModel.SetCanShareAnonymousUsageData(showOption);
+	}
+}
+
+
+void
+MainWindow::_MaybePromptCanShareAnonymousUserData(const BMessage& settings)
+{
+	bool showOption;
+	if (settings.FindBool(SETTING_CAN_SHARE_ANONYMOUS_USER_DATA,
+			&showOption) == B_NAME_NOT_FOUND) {
+		_PromptCanShareAnonymousUserData();
+	}
+}
+
+
+void
+MainWindow::_PromptCanShareAnonymousUserData()
+{
+	BAlert* alert = new(std::nothrow) BAlert(
+		B_TRANSLATE("Sending anonymous usage data"),
+		B_TRANSLATE("Would it be acceptable to send anonymous usage data to the"
+			" HaikuDepotServer system from this computer? You can change your"
+			" preference in the \"Settings\" window later."),
+		B_TRANSLATE("No"),
+		B_TRANSLATE("Yes"));
+
+	int32 result = alert->Go();
+	fModel.SetCanShareAnonymousUsageData(1 == result);
 }
 
 
 void
 MainWindow::_InitWorkerThreads()
 {
-	fPendingActionsSem = create_sem(0, "PendingPackageActions");
-	if (fPendingActionsSem >= 0) {
-		fPendingActionsWorker = spawn_thread(&_PackageActionWorker,
-			"Planet Express", B_NORMAL_PRIORITY, this);
-		if (fPendingActionsWorker >= 0)
-			resume_thread(fPendingActionsWorker);
-	} else
-		fPendingActionsWorker = -1;
-
 	fPackageToPopulateSem = create_sem(0, "PopulatePackage");
 	if (fPackageToPopulateSem >= 0) {
 		fPopulatePackageWorker = spawn_thread(&_PopulatePackageWorker,
@@ -826,16 +886,20 @@ MainWindow::_AdoptModel()
 	if (fSinglePackageMode)
 		return;
 
-	fModel.Lock()->Lock();
-	const DepotList& depots = fModel.Depots();
-	fModel.Lock()->Unlock();
+	std::vector<DepotInfoRef> depots = _CreateSnapshotOfDepots();
+	std::vector<DepotInfoRef>::iterator it;
 
-	for (int32 d = 0; d < depots.CountItems(); d++) {
-		const DepotInfo& depot = depots.ItemAtFast(d);
-		const PackageList& packages = depot.Packages();
-		for (int32 p = 0; p < packages.CountItems(); p++)
-			_AddRemovePackageFromLists(packages.ItemAtFast(p));
+	fFeaturedPackagesView->BeginAddRemove();
+
+	for (it = depots.begin(); it != depots.end(); it++) {
+		DepotInfoRef depotInfoRef = *it;
+		for (int i = 0; i < depotInfoRef->CountPackages(); i++) {
+			PackageInfoRef package = depotInfoRef->PackageAtIndex(i);
+			_AddRemovePackageFromLists(package);
+		}
 	}
+
+	fFeaturedPackagesView->EndAddRemove();
 
 	_AdoptModelControls();
 }
@@ -859,6 +923,32 @@ MainWindow::_AddRemovePackageFromLists(const PackageInfoRef& package)
 		fFeaturedPackagesView->RemovePackage(package);
 		fPackageListView->RemovePackage(package);
 	}
+}
+
+
+void
+MainWindow::_IncrementViewCounter(const PackageInfoRef& package)
+{
+	// Temporarily disabled, see tickets #16879 and #17689.
+#if 0
+	bool shouldIncrementViewCounter = false;
+
+	{
+		AutoLocker<BLocker> modelLocker(fModel.Lock());
+		bool canShareAnonymousUsageData = fModel.CanShareAnonymousUsageData();
+		if (canShareAnonymousUsageData && !package->Viewed()) {
+			package->SetViewed();
+			shouldIncrementViewCounter = true;
+		}
+	}
+
+	if (shouldIncrementViewCounter) {
+		ProcessCoordinator* incrementViewCoordinator =
+			ProcessCoordinatorFactory::CreateIncrementViewCounter(
+				&fModel, package);
+		_AddProcessCoordinator(incrementViewCoordinator);
+	}
+#endif
 }
 
 
@@ -900,8 +990,6 @@ MainWindow::_StartBulkLoad(bool force)
 		ProcessCoordinatorFactory::CreateBulkLoadCoordinator(
 			this,
 				// PackageInfoListener
-			this,
-				// ProcessCoordinatorListener
 			&fModel, force);
 	_AddProcessCoordinator(bulkLoadCoordinator);
 }
@@ -974,6 +1062,31 @@ MainWindow::_NotifyWorkStatusChange(const BString& text, float progress)
 
 
 void
+MainWindow::_HandleExternalPackageUpdateMessageReceived(const BMessage* message)
+{
+	BStringList addedPackageNames;
+	BStringList removedPackageNames;
+
+	if (message->FindStrings("added package names",
+			&addedPackageNames) == B_OK) {
+		addedPackageNames.Sort();
+		AutoLocker<BLocker> locker(fModel.Lock());
+		fModel.SetStateForPackagesByName(addedPackageNames, ACTIVATED);
+	}
+	else
+		HDINFO("no [added package names] key in inbound message");
+
+	if (message->FindStrings("removed package names",
+			&removedPackageNames) == B_OK) {
+		removedPackageNames.Sort();
+		AutoLocker<BLocker> locker(fModel.Lock());
+		fModel.SetStateForPackagesByName(addedPackageNames, UNINSTALLED);
+	} else
+		HDINFO("no [removed package names] key in inbound message");
+}
+
+
+void
 MainWindow::_HandleWorkStatusChangeMessageReceived(const BMessage* message)
 {
 	if (fWorkStatusView == NULL)
@@ -985,38 +1098,15 @@ MainWindow::_HandleWorkStatusChangeMessageReceived(const BMessage* message)
 	if (message->FindString(KEY_WORK_STATUS_TEXT, &text) == B_OK)
 		fWorkStatusView->SetText(text);
 
-	if (message->FindFloat(KEY_WORK_STATUS_PROGRESS, &progress) == B_OK)
-		fWorkStatusView->SetProgress(progress);
-}
-
-
-status_t
-MainWindow::_PackageActionWorker(void* arg)
-{
-	MainWindow* window = reinterpret_cast<MainWindow*>(arg);
-
-	while (acquire_sem(window->fPendingActionsSem) == B_OK) {
-		PackageActionRef ref;
-		{
-			AutoLocker<BLocker> lock(&window->fPendingActionsLock);
-			ref = window->fPendingActions.ItemAt(0);
-			if (ref.Get() == NULL)
-				break;
-			window->fPendingActions.Remove(0);
-		}
-
-		BMessenger messenger(window);
-		BMessage busyMessage(MSG_PACKAGE_WORKER_BUSY);
-		BString text(ref->Label());
-		text << B_UTF8_ELLIPSIS;
-		busyMessage.AddString("reason", text);
-
-		messenger.SendMessage(&busyMessage);
-		ref->Perform();
-		messenger.SendMessage(MSG_PACKAGE_WORKER_IDLE);
+	if (message->FindFloat(KEY_WORK_STATUS_PROGRESS, &progress) == B_OK) {
+		if (progress < 0.0f)
+			fWorkStatusView->SetBusy();
+		else
+			fWorkStatusView->SetProgress(progress);
+	} else {
+		HDERROR("work status change missing progress on update message");
+		fWorkStatusView->SetProgress(0.0f);
 	}
-
-	return 0;
 }
 
 
@@ -1060,7 +1150,7 @@ MainWindow::_PopulatePackageWorker(void* arg)
 			force = window->fForcePopulatePackage;
 		}
 
-		if (package.Get() != NULL) {
+		if (package.IsSet()) {
 			uint32 populateFlags = Model::POPULATE_USER_RATINGS
 				| Model::POPULATE_SCREEN_SHOTS
 				| Model::POPULATE_CHANGELOG;
@@ -1075,6 +1165,14 @@ MainWindow::_PopulatePackageWorker(void* arg)
 	}
 
 	return 0;
+}
+
+
+void
+MainWindow::_OpenSettingsWindow()
+{
+	SettingsWindow* window = new SettingsWindow(this, &fModel);
+	window->Show();
 }
 
 
@@ -1099,8 +1197,6 @@ MainWindow::_StartUserVerify()
 			ProcessCoordinatorFactory::CreateUserDetailVerifierCoordinator(
 				this,
 					// UserDetailVerifierListener
-				this,
-					// ProcessCoordinatorListener
 				&fModel) );
 	}
 }
@@ -1147,17 +1243,23 @@ MainWindow::_UpdateAvailableRepositories()
 	fRepositoryMenu->AddItem(new BSeparatorItem());
 
 	bool foundSelectedDepot = false;
-	const DepotList& depots = fModel.Depots();
-	for (int i = 0; i < depots.CountItems(); i++) {
-		const DepotInfo& depot = depots.ItemAtFast(i);
+	std::vector<DepotInfoRef> depots = _CreateSnapshotOfDepots();
+	std::vector<DepotInfoRef>::iterator it;
 
-		if (depot.Name().Length() != 0) {
+	for (it = depots.begin(); it != depots.end(); it++) {
+		DepotInfoRef depot = *it;
+
+		if (depot->Name().Length() != 0) {
 			BMessage* message = new BMessage(MSG_DEPOT_SELECTED);
-			message->AddString("name", depot.Name());
-			BMenuItem* item = new BMenuItem(depot.Name(), message);
+			message->AddString("name", depot->Name());
+			BMenuItem* item = new(std::nothrow) BMenuItem(depot->Name(), message);
+
+			if (item == NULL)
+				HDFATAL("memory exhaustion");
+
 			fRepositoryMenu->AddItem(item);
 
-			if (depot.Name() == fModel.Depot()) {
+			if (depot->Name() == fModel.Depot()) {
 				item->SetMarked(true);
 				foundSelectedDepot = true;
 			}
@@ -1320,17 +1422,25 @@ MainWindow::_HandleUserUsageConditionsNotLatest(
 void
 MainWindow::_AddProcessCoordinator(ProcessCoordinator* item)
 {
+	BReference<ProcessCoordinator> itemRef(item, true);
 	AutoLocker<BLocker> lock(&fCoordinatorLock);
 
-	if (fCoordinator.Get() == NULL) {
+	if (fShouldCloseWhenNoProcessesToCoordinate) {
+		HDINFO("system shutting down --> new process coordinator [%s] rejected",
+			item->Name().String());
+		return;
+	}
+
+	item->SetListener(this);
+
+	if (!fCoordinator.IsSet()) {
 		if (acquire_sem(fCoordinatorRunningSem) != B_OK)
 			debugger("unable to acquire the process coordinator sem");
 		HDINFO("adding and starting a process coordinator [%s]",
 			item->Name().String());
-		fCoordinator = BReference<ProcessCoordinator>(item);
+		fCoordinator = itemRef;
 		fCoordinator->Start();
-	}
-	else {
+	} else {
 		HDINFO("adding process coordinator [%s] to the queue",
 			item->Name().String());
 		fCoordinatorQueue.push(item);
@@ -1348,7 +1458,7 @@ MainWindow::_SpinUntilProcessCoordinatorComplete()
 			debugger("unable to release the process coordinator sem");
 		{
 			AutoLocker<BLocker> lock(&fCoordinatorLock);
-			if (fCoordinator.Get() == NULL)
+			if (!fCoordinator.IsSet())
 				return;
 		}
 	}
@@ -1358,29 +1468,19 @@ MainWindow::_SpinUntilProcessCoordinatorComplete()
 void
 MainWindow::_StopProcessCoordinators()
 {
-	HDINFO("will stop all process coordinators");
+	HDINFO("will stop all queued process coordinators");
+	AutoLocker<BLocker> lock(&fCoordinatorLock);
 
-	{
-		AutoLocker<BLocker> lock(&fCoordinatorLock);
-
-		while (!fCoordinatorQueue.empty()) {
-			BReference<ProcessCoordinator> processCoordinator
-				= fCoordinatorQueue.front();
-			HDINFO("will drop queued process coordinator [%s]",
-				processCoordinator->Name().String());
-			fCoordinatorQueue.pop();
-		}
-
-		if (fCoordinator.Get() != NULL) {
-			fCoordinator->Stop();
-		}
+	while (!fCoordinatorQueue.empty()) {
+		BReference<ProcessCoordinator> processCoordinator
+			= fCoordinatorQueue.front();
+		HDINFO("will drop queued process coordinator [%s]",
+			processCoordinator->Name().String());
+		fCoordinatorQueue.pop();
 	}
 
-	HDINFO("will wait until the process coordinator has stopped");
-
-	_SpinUntilProcessCoordinatorComplete();
-
-	HDINFO("did stop all process coordinators");
+	if (fCoordinator.IsSet())
+		fCoordinator->RequestStop();
 }
 
 
@@ -1427,6 +1527,11 @@ MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 			}
 			else {
 				_NotifyWorkStatusClear();
+				if (fShouldCloseWhenNoProcessesToCoordinate) {
+					HDINFO("no more processes to coord --> will quit");
+					BMessage message(B_QUIT_REQUESTED);
+					PostMessage(&message);
+				}
 			}
 		}
 		else {
@@ -1434,8 +1539,10 @@ MainWindow::CoordinatorChanged(ProcessCoordinatorState& coordinatorState)
 				coordinatorState.Progress());
 				// show the progress to the user.
 		}
-	} else
+	} else {
+		_NotifyWorkStatusClear();
 		HDINFO("! unknown process coordinator changed");
+	}
 }
 
 
@@ -1459,4 +1566,16 @@ MainWindow::_HandleChangePackageListViewMode()
 		BAutolock locker(fModel.Lock());
 		fModel.SetPackageListViewMode(tabMode);
 	}
+}
+
+
+std::vector<DepotInfoRef>
+MainWindow::_CreateSnapshotOfDepots()
+{
+	std::vector<DepotInfoRef> result;
+	BAutolock locker(fModel.Lock());
+	int32 countDepots = fModel.CountDepots();
+	for(int32 i = 0; i < countDepots; i++)
+		result.push_back(fModel.DepotAtIndex(i));
+	return result;
 }

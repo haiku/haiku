@@ -443,6 +443,17 @@ memalign(size_t alignment, size_t size)
 }
 
 
+extern "C" void *
+aligned_alloc(size_t alignment, size_t size)
+{
+	if (size % alignment != 0) {
+		__set_errno(B_BAD_VALUE);
+		return NULL;
+	}
+	return memalign(alignment, size);
+}
+
+
 extern "C" int
 posix_memalign(void **_pointer, size_t alignment, size_t size)
 {

@@ -124,8 +124,11 @@ FontManager::FontManager()
 
 		if (fInitStatus == B_OK) {
 			// Precache the plain and bold fonts
-			_PrecacheFontFile(fDefaultPlainFont);
-			_PrecacheFontFile(fDefaultBoldFont);
+			_PrecacheFontFile(fDefaultPlainFont.Get());
+			_PrecacheFontFile(fDefaultBoldFont.Get());
+
+			// Post a message so we scan the initial paths.
+			PostMessage(B_PULSE);
 		}
 	}
 }
@@ -134,9 +137,9 @@ FontManager::FontManager()
 //! Frees items allocated in the constructor and shuts down FreeType
 FontManager::~FontManager()
 {
-	delete fDefaultPlainFont;
-	delete fDefaultBoldFont;
-	delete fDefaultFixedFont;
+	fDefaultPlainFont.Unset();
+	fDefaultBoldFont.Unset();
+	fDefaultFixedFont.Unset();
 
 	// free families before we're done with FreeType
 
@@ -154,8 +157,6 @@ FontManager::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_NODE_MONITOR:
 		{
-			// TODO: support removing fonts!
-
 			int32 opcode;
 			if (message->FindInt32("opcode", &opcode) != B_OK)
 				return;
@@ -294,7 +295,14 @@ FontManager::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+
+		default:
+			BLooper::MessageReceived(message);
+			break;
 	}
+
+	// Scan fonts here if we need to, preventing other threads from having to do so.
+	_ScanFontsIfNecessary();
 }
 
 
@@ -408,7 +416,7 @@ FontManager::_RemoveStyle(font_directory& directory, FontStyle* style)
 
 	fStyleHashTable.Remove(FontKey(style->Family()->ID(), style->ID()));
 
-	style->Release();
+	style->ReleaseReference();
 }
 
 
@@ -467,27 +475,27 @@ FontManager::_SetDefaultFonts()
 	if (style == NULL)
 		return B_ERROR;
 
-	fDefaultPlainFont = new (std::nothrow) ServerFont(*style,
-		DEFAULT_PLAIN_FONT_SIZE);
-	if (fDefaultPlainFont == NULL)
+	fDefaultPlainFont.SetTo(new (std::nothrow) ServerFont(*style,
+		DEFAULT_PLAIN_FONT_SIZE));
+	if (!fDefaultPlainFont.IsSet())
 		return B_NO_MEMORY;
 
 	// bold font
 	style = _GetDefaultStyle(DEFAULT_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE,
 		FALLBACK_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE, B_BOLD_FACE);
 
-	fDefaultBoldFont = new (std::nothrow) ServerFont(*style,
-		DEFAULT_BOLD_FONT_SIZE);
-	if (fDefaultBoldFont == NULL)
+	fDefaultBoldFont.SetTo(new (std::nothrow) ServerFont(*style,
+		DEFAULT_BOLD_FONT_SIZE));
+	if (!fDefaultBoldFont.IsSet())
 		return B_NO_MEMORY;
 
 	// fixed font
 	style = _GetDefaultStyle(DEFAULT_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE,
 		FALLBACK_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE, B_REGULAR_FACE);
 
-	fDefaultFixedFont = new (std::nothrow) ServerFont(*style,
-		DEFAULT_FIXED_FONT_SIZE);
-	if (fDefaultFixedFont == NULL)
+	fDefaultFixedFont.SetTo(new (std::nothrow) ServerFont(*style,
+		DEFAULT_FIXED_FONT_SIZE));
+	if (!fDefaultFixedFont.IsSet())
 		return B_NO_MEMORY;
 
 	fDefaultFixedFont->SetSpacing(B_FIXED_SPACING);
@@ -1121,21 +1129,21 @@ FontManager::RemoveStyle(FontStyle* style)
 const ServerFont*
 FontManager::DefaultPlainFont() const
 {
-	return fDefaultPlainFont;
+	return fDefaultPlainFont.Get();
 }
 
 
 const ServerFont*
 FontManager::DefaultBoldFont() const
 {
-	return fDefaultBoldFont;
+	return fDefaultBoldFont.Get();
 }
 
 
 const ServerFont*
 FontManager::DefaultFixedFont() const
 {
-	return fDefaultFixedFont;
+	return fDefaultFixedFont.Get();
 }
 
 

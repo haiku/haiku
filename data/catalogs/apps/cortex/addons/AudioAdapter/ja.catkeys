@@ -1,0 +1,10 @@
+1	japanese	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		入力フォーマット
+Channels:	CortexAudioAdapter		チャンネル:
+stereo	CortexAudioAdapter		ステレオ
+mono	CortexAudioAdapter		モノラル
+Output format	CortexAudioAdapter		出力フォーマット
+Audio input	CortexAddOnsCommon		オーディオ入力
+Sample format:	CortexAudioAdapter		サンプルフォーマット:
+Audio output	CortexAddOnsCommon		オーディオ出力
+%groupname% parameters	CortexAddOnsCommon		%groupname% パラメーター

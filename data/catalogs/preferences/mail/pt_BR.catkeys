@@ -1,51 +1,52 @@
-1	portuguese (brazil)	x-vnd.Haiku-Mail	4163271735
-Account settings	AutoConfigWindow		Definições de conta
-\t\t· Outgoing	Config Window		\t \t · Enviado
+1	portuguese (brazil)	x-vnd.Haiku-Mail	2750130554
+Account settings	AutoConfigWindow		Configurações da conta
+\t\t· Outgoing	Config Window		\t\t· Saída
 An error occurred while creating the config view: %error.	Config Views		Ocorreu um erro durante a criação de visão de configuração: %erro.
-E-mail address:	E-Mail		Endereço de correio eletrônico:
+E-mail address:	E-Mail		Endereço de e-mail:
 Create new account	AutoConfigWindow		Criar nova conta
 While sending and receiving	Config Window		Enquanto envia e recebe
 Error!	Config Views		Erro!
 Apply	Config Window		Aplicar
-Incoming mail filters	Config Views		Filtros de mail recebidos
-Outgoing mail filters	Config Views		Filtros de mail enviados
+Incoming mail filters	Config Views		Filtros de e-mail recebidos
+Outgoing mail filters	Config Views		Filtros de e-mail enviados
 Server name:	E-Mail		Nome do servidor:
 Add	Config Window		Adicionar
 Back	AutoConfigWindow		Voltar
-Real name:	E-Mail		Nome verdadeiro:
+Real name:	E-Mail		Nome real:
 Real name:	Config Views		Nome real:
-\t\t· E-mail filters	Config Window		\t \t · Filtros de correio
-Outgoing	E-Mail		Enviado
+\t\t· E-mail filters	Config Window		\t\t· Filtros de e-mail
+Outgoing	E-Mail		Saída
 Accounts	Config Window		Contas
-Outgoing	Config Window		Enviado
+Outgoing	Config Window		Saída
 Remove	Config Views		Remover
 Show notifications:	Config Window		Mostrar notificações:
 Settings	Config Window		Configurações
 Never	Config Window	show status window	Nunca
 Account name:	Config Views		Nome da conta
-\t\t· Incoming	Config Window		\t \t· Recebido
-Enter a valid e-mail address.	AutoConfigWindow		Digite um endereço de correio válido.
-Incoming	E-Mail		Recebido
+\t\t· Incoming	Config Window		\t\t· Entrada
+Enter a valid e-mail address.	AutoConfigWindow		Digite um endereço de e-mail válido.
+\nThe general settings couldn't be reverted.\n\nError retrieving general settings:\n%s\n	Config Window		\nNão foi possível reverter as configurações gerais.\n\nErro ao obter as configurações gerais:\n%s\n
+Incoming	E-Mail		Entrada
 Choose Protocol	E-Mail		Escolher Protocolo
 Return address:	Config Views		Endereço de retorno:
 Password:	E-Mail		Senha:
 Error retrieving general settings: %s\n	Config Window		Erro ao ler as configurações gerais: %s\n
-The filter could not be moved. Deleting filter.	Config Views		O filtro não pode ser movido. Deletando filtro.
+The filter could not be moved. Deleting filter.	Config Views		O filtro não pôde ser movido. Deletando filtro.
 OK	Config Views		OK
 Revert	Config Window		Reverter
-Incoming	Config Window		Recebido
+Incoming	Config Window		Entrada
 Finish	AutoConfigWindow		Concluir
 Add filter	Config Views		Adicionar filtro
 Account settings	Config Views		Configurações da conta
 minutes	Config Window		minutos
-E-mail	System name		Correio eletrônico
-Check every	Config Window		Checar periodicamente
-Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Crie uma nova conta com o botão Adicionar.\n\nRemova uma conta com o botão Remover no item selecionado.\n\nSelecione um item na lista para alterar suas definções.
+E-mail	System name		E-mail
+Check every	Config Window		Checar a cada
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Crie uma nova conta com o botão Adicionar.\n\nRemova uma conta com o botão Remover no item selecionado.\n\nSelecione um item na lista para alterar suas configurações.
 Account name:	E-Mail		Nome da conta:
-Edit mailbox menu…	Config Window		Editar menu da caixa de mail...
-Server Name:	E-Mail		Nome do servidor:
+Edit mailbox menu…	Config Window		Editar menu da caixa de correio...
+Server Name:	E-Mail		Nome do Servidor:
 Remove	Config Window		Remover
-Login name:	E-Mail		Nome de login
+Login name:	E-Mail		Nome de login:
 While sending	Config Window		Enquanto envia
 OK	Config Window		OK
 OK	AutoConfigWindow		OK

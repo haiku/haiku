@@ -1,7 +1,7 @@
 /*
 	$Id: PropertyConstructionTest.cpp 851 2002-08-22 03:15:35Z jrand $
 	
-	This file implements the construction test for the OpenBeOS BPropertyInfo
+	This file implements the construction test for the Haiku BPropertyInfo
 	code.  This class tests the following usecases:
 	  - Construction 1 to 4
 	  - Destruction

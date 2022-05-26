@@ -74,6 +74,9 @@ private:
 			BTab&				operator=(const BTab&);
 
 private:
+			uint32				_Borders(BView* owner, BRect frame);
+
+private:
 			bool 				fEnabled;
 			bool				fSelected;
 			bool				fFocus;
@@ -179,6 +182,8 @@ public:
 
 			int32				CountTabs() const;
 			BView*				ViewForTab(int32 tabIndex) const;
+
+			int32				IndexOf(BTab* tab) const;
 
 private:
 	// FBC padding and forbidden methods

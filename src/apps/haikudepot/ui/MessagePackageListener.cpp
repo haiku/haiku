@@ -76,12 +76,12 @@ OnePackageMessagePackageListener::SetPackage(const PackageInfoRef& package)
 
 	PackageInfoListenerRef listener(this);
 
-	if (fPackage.Get() != NULL)
+	if (fPackage.IsSet())
 		fPackage->RemoveListener(listener);
 
 	fPackage = package;
 
-	if (fPackage.Get() != NULL)
+	if (fPackage.IsSet())
 		fPackage->AddListener(listener);
 }
 

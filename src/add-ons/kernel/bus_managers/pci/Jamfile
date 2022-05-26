@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src add-ons kernel bus_managers pci ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders [ FDirName kernel util ] ;
-UseHeaders [ FDirName $(SUBDIR) arch $(TARGET_KERNEL_ARCH) ] ;
+UseHeaders [ FDirName $(SUBDIR) arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 
 KernelAddon pci :
 	pci.cpp
@@ -22,4 +22,4 @@ ObjectHdrs [ FGristFiles pci_info$(SUFOBJ) ]
 Includes [ FGristFiles pci_info.cpp ] : <src!apps!devices>pcihdr.h ;
 
 SubInclude HAIKU_TOP src add-ons kernel bus_managers pci arch
-	$(TARGET_KERNEL_ARCH) ;
+	$(TARGET_KERNEL_ARCH_DIR) ;

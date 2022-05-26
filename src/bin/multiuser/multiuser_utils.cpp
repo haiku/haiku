@@ -12,7 +12,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-#include <AutoDeleter.h>
+#include <AutoDeleterPosix.h>
 
 #include <user_group.h>
 
@@ -25,19 +25,19 @@ read_password(const char* prompt, char* password, size_t bufferSize,
 	FILE* out = stdout;
 
 	// open tty
-	FILE* tty = NULL;
+	FileCloser tty;
 	if (!useStdio) {
 // TODO: Open tty with O_NOCTTY!
-		tty = fopen("/dev/tty", "w+");
-		if (tty == NULL) {
-			fprintf(stderr, "Error: Failed to open tty: %s\n", strerror(errno));
+		tty.SetTo(fopen("/dev/tty", "w+"));
+		if (!tty.IsSet()) {
+			fprintf(stderr, "Error: Failed to open tty: %s\n",
+				strerror(errno));
 			return errno;
 		}
 
-		in = tty;
-		out = tty;
+		in = tty.Get();
+		out = tty.Get();
 	}
-	CObjectDeleter<FILE, int> ttyCloser(tty, fclose);
 
 	// disable echo
 	int inFD = fileno(in);
@@ -60,11 +60,12 @@ read_password(const char* prompt, char* password, size_t bufferSize,
 	status_t error = B_OK;
 
 	// prompt and read pwd
-	fprintf(out, prompt);
+	fputs(prompt, out);
 	fflush(out);
 
 	if (fgets(password, bufferSize, in) == NULL) {
-		fprintf(out, "\nError: Failed to read from tty: %s\n", strerror(errno));
+		fprintf(out, "\nError: Failed to read from tty: %s\n",
+			strerror(errno));
 		error = errno != 0 ? errno : B_ERROR;
 	} else
 		fputc('\n', out);

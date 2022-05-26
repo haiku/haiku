@@ -421,7 +421,7 @@ OffscreenBitmap::NewBitmap(BRect bounds)
 {
 	delete fBitmap;
 	fBitmap = new(std::nothrow) BBitmap(bounds, B_RGB32, true);
-	if (fBitmap && fBitmap->Lock()) {
+	if (fBitmap != NULL && fBitmap->Lock()) {
 		BView* view = new BView(fBitmap->Bounds(), "", B_FOLLOW_NONE, 0);
 		fBitmap->AddChild(view);
 
@@ -555,7 +555,7 @@ FadeRGBA32Vertical(uint32* bits, int32 width, int32 height, int32 from,
 
 
 DraggableIcon::DraggableIcon(BRect rect, const char* name,
-	const char* mimeType, icon_size which, const BMessage* message,
+	const char* type, icon_size which, const BMessage* message,
 	BMessenger target, uint32 resizingMode, uint32 flags)
 	:
 	BView(rect, name, resizingMode, flags),
@@ -563,11 +563,11 @@ DraggableIcon::DraggableIcon(BRect rect, const char* name,
 	fTarget(target)
 {
 	fBitmap = new BBitmap(Bounds(), kDefaultIconDepth);
-	BMimeType mime(mimeType);
+	BMimeType mime(type);
 	status_t result = mime.GetIcon(fBitmap, which);
 	ASSERT(mime.IsValid());
 	if (result != B_OK) {
-		PRINT(("failed to get icon for %s, %s\n", mimeType, strerror(result)));
+		PRINT(("failed to get icon for %s, %s\n", type, strerror(result)));
 		BMimeType mime(B_FILE_MIMETYPE);
 		ASSERT(mime.IsInstalled());
 		mime.GetIcon(fBitmap, which);
@@ -1487,9 +1487,13 @@ GetAppIconFromAttr(BFile* file, BBitmap* icon, icon_size which)
 status_t
 GetFileIconFromAttr(BNode* node, BBitmap* icon, icon_size which)
 {
-	BNodeInfo fileInfo(node);
-	return fileInfo.GetIcon(icon, which);
+	// get icon from the node info
+	BNodeInfo nodeInfo(node);
+	return nodeInfo.GetIcon(icon, which);
 }
+
+
+//	#pragma mark - PrintToStream
 
 
 void
@@ -1498,6 +1502,9 @@ PrintToStream(rgb_color color)
 	printf("r:%x, g:%x, b:%x, a:%x\n",
 		color.red, color.green, color.blue, color.alpha);
 }
+
+
+//	#pragma mark - EachMenuItem
 
 
 extern BMenuItem*
@@ -1612,7 +1619,7 @@ PositionPassingMenuItem::Invoke(BMessage* message)
 	// use the window position only, if the item was invoked from the menu
 	// menu->Window() points to the window the item was invoked from
 	if (dynamic_cast<BContainerWindow*>(menu->Window()) == NULL) {
-		LooperAutoLocker lock(menu);
+		AutoLocker<BLooper> lock(menu->Looper());
 		if (lock.IsLocked()) {
 			BPoint invokeOrigin(menu->Window()->Frame().LeftTop());
 			clone.AddPoint("be:invoke_origin", invokeOrigin);

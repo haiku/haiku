@@ -1,55 +1,51 @@
-1	romanian	x-vnd.Haiku-BluetoothPrefs	4276705900
-Laptop	Settings view		Laptop
-Only from trusted devices	Settings view		Numai de la dispozitivele de încredere
-15 secs	Settings view		15 secunde
-Quit	main		Închidere
-Manufacturer: 	Device View		Producător: 
-Desktop	Settings view		Desktop
-Server	Window		Server
-Identify host as:	Settings view		Identifică gazda ca:
-Refresh…	Remote devices		Reîmprospătează…
-Local devices found on system:	Settings view		Dispozitivele locale găsite în sistem:
-Service classes: 	Device View		Clase de servicii: 
-Remote devices	Window		Dispozitive la distanță
-Settings	Window		Configurări
-Stop bluetooth services…	Window		Oprește servicii bluetooth…
-61 secs	Settings view		61 secunde
-Add…	Remote devices		Adaugă…
-As blocked	Remote devices		Ca blocat
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nu există niciun dispozitiv local Bluetooth înregistrat pe sistem.
-Policy…	Settings view		Politică…
-Revert	Window		Revenire
-Refresh local devices…	Window		Reactualizare dispozitive locale…
-Disconnect	Remote devices		Deconectează
-Identify us as…	Settings view		Identifică-ne ca…
+1	romanian	x-vnd.Haiku-BluetoothPrefs	3945807779
+Start bluetooth services…	Window		Pornire servicii bluetooth…
 From all devices	Settings view		De la toate dispozitivele
 Defaults	Window		Implicite
-Start bluetooth services…	Window		Pornește servicii bluetooth…
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verificați dacă toate capacitățile Bluetooth ale dispozitivului la distanță sunt activate. Apăsați 'Întrebare' pentru a începe scanarea. Timpul implicit necesar obținerii numelor nu este cunoscut, deși nu ar trebui să dureze mai mult de 3 secunde per dispozitiv. După aceea veți avea posibilitatea de a le adăuga în lista principală, de unde vă puteți conecta la acestea.
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Verificați dacă toate capacitățile Bluetooth ale dispozitivului de la distanță sunt activate. Apăsați „Solicită” pentru a începe scanarea. Timpul implicit necesar obținerii numelor nu este cunoscut, deși nu ar trebui să dureze mai mult de 3 secunde per dispozitiv. După aceea, veți avea posibilitatea de a le adăuga în lista principală, de unde vă puteți conecta la acestea.
+Laptop	Settings view		Laptop
 Scanning progress	Inquiry panel		Progresul scanării
-Bluetooth	System name		Bluetooth
+Only from trusted devices	Settings view		Doar de la dispozitivele de încredere
 Launch now	main		Lansează acum
+Bluetooth	System name		Bluetooth
 Remove	Remote devices		Elimină
-Pick device…	Settings view		Alege dispozitivul…
+Pick device…	Settings view		Alegere dispozitiv…
 Always ask	Settings view		Întreabă întotdeauna
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Cu suportul al:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nMulțumim persoanelor care au ajutat…\n\nLivrare/donare de hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomic:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nCu patch-uri:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTestare:\n - Petter H. Juliussen\nCine mi-a dat toate cunoștințele:\n - echipa yellowTAB
+Quit	main		Ieșire
+15 secs	Settings view		15 sec
 Help	Window		Ajutor
-Pair…	Remote devices		Asociază…
-Retrieving name of %1	Inquiry panel		Se obține numele lui %1
-Inquiry	Inquiry panel		Întrebare
-Incoming connections policy:	Settings view		Regula conexiunilor de primire:
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Cu suportul:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nMulțumim persoanelor care au ajutat…\n\nLivrare/donare de hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomic:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nCu petice:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTestare:\n - Petter H. Juliussen\nCine mi-a dat toate cunoștințele:\n - echipa yellowTAB
+Manufacturer: 	Device View		Producător: 
+Pair…	Remote devices		Asociere…
+Desktop	Settings view		Desktop
+Server	Window		Server
+Retrieving name of %1	Inquiry panel		Se obține numele al %1
+Identify host as:	Settings view		Identifică gazda ca:
+Inquiry	Inquiry panel		Solicită
+Local devices found on system:	Settings view		Dispozitive locale găsite pe sistem:
+Service classes: 	Device View		Clase de servicii: 
+Incoming connections policy:	Settings view		Regula conexiunilor primite:
+Remote devices	Window		Dispozitive de la distanță
 Retrieving names…	Inquiry panel		Se obțin numele…
-Show name	Extended local device view		Afișează nume
-Add device to list	Inquiry panel		Adaugă dispozitiv la listă
+Add device to list	Inquiry panel		Adaugă un dispozitiv la listă
+Show name	Extended local device view		Arată numele
+Settings	Window		Configurări
 Remaining %1 seconds	Inquiry panel		Au rămas %1 secunde
-The Bluetooth services are not currently running on this system.	main		Serviciile Bluetooth nu rulează în prezent pe acest sistem.
-Discoverable	Extended local device view		Poate fi descoperit
+Stop bluetooth services…	Window		Oprire servicii bluetooth…
+61 secs	Settings view		61 de sec
 Authenticate	Extended local device view		Autentificare
-Smart phone	Settings view		Telefon inteligent
+Discoverable	Extended local device view		Descoperibil
+The Bluetooth services are not currently running on this system.	main		Serviciile Bluetooth nu rulează în prezent pe acest sistem.
+Add…	Remote devices		Adăugare…
 Scanning completed.	Inquiry panel		Scanarea a fost completată.
-Default inquiry time:	Settings view		Timp implicit de întrebare:
+Smart phone	Settings view		Smartphone
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nu există niciun LocalDevice Bluetooth înregistrat pe sistem.
+Default inquiry time:	Settings view		Timp implicit de solicitare:
+Revert	Window		Revenire
+Refresh local devices…	Window		Reactualizare dispozitive locale…
 Server	Settings view		Server
-Handheld	Settings view		Calculator de buzunar
  packets: 	Device View		 pachete: 
+Handheld	Settings view		Portabil
+Disconnect	Remote devices		Deconectare
 About Bluetooth…	Window		Despre Bluetooth…
 Starting scan…	Inquiry panel		Se începe scanarea…

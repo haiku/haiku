@@ -10,6 +10,7 @@
 #include "BufferQueue.h"
 
 #include <KernelExport.h>
+#include <arpa/inet.h>
 
 
 //#define TRACE_BUFFER_QUEUE
@@ -59,7 +60,7 @@ BufferQueue::SetMaxBytes(size_t maxBytes)
 void
 BufferQueue::SetInitialSequence(tcp_sequence sequence)
 {
-	TRACE(("BufferQueue@%p::SetInitialSequence(%lu)\n", this,
+	TRACE(("BufferQueue@%p::SetInitialSequence(%" B_PRIu32 ")\n", this,
 		sequence.Number()));
 
 	fFirstSequence = fLastSequence = sequence;
@@ -77,10 +78,10 @@ BufferQueue::Add(net_buffer *buffer)
 void
 BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 {
-	TRACE(("BufferQueue@%p::Add(buffer %p, size %lu, sequence %lu)\n",
-		this, buffer, buffer->size, sequence.Number()));
-	TRACE(("  in: first: %lu, last: %lu, num: %lu, cont: %lu\n",
-		fFirstSequence.Number(), fLastSequence.Number(), fNumBytes,
+	TRACE(("BufferQueue@%p::Add(buffer %p, size %" B_PRIu32 ", sequence %"
+		B_PRIu32 ")\n", this, buffer, buffer->size, sequence.Number()));
+	TRACE(("  in: first: %" B_PRIu32 ", last: %" B_PRIu32 ", num: %lu, cont: "
+		"%lu\n", fFirstSequence.Number(), fLastSequence.Number(), fNumBytes,
 		fContiguousBytes));
 	VERIFY();
 
@@ -112,9 +113,9 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 		fLastSequence = sequence + buffer->size;
 		fNumBytes += buffer->size;
 
-		TRACE(("  out0: first: %lu, last: %lu, num: %lu, cont: %lu\n",
-			fFirstSequence.Number(), fLastSequence.Number(), fNumBytes,
-			fContiguousBytes));
+		TRACE(("  out0: first: %" B_PRIu32 ", last: %" B_PRIu32 ", num: %"
+			B_PRIuSIZE ", cont: %" B_PRIuSIZE "\n",	fFirstSequence.Number(),
+			fLastSequence.Number(), fNumBytes, fContiguousBytes));
 		VERIFY();
 		return;
 	}
@@ -190,9 +191,9 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 	}
 
 	if (buffer == NULL) {
-		TRACE(("  out1: first: %lu, last: %lu, num: %lu, cont: %lu\n",
-			fFirstSequence.Number(), fLastSequence.Number(), fNumBytes,
-			fContiguousBytes));
+		TRACE(("  out1: first: %" B_PRIu32 ", last: %" B_PRIu32 ", num: %"
+			B_PRIuSIZE ", cont: %" B_PRIuSIZE "\n", fFirstSequence.Number(),
+			fLastSequence.Number(), fNumBytes, fContiguousBytes));
 		VERIFY();
 		return;
 	}
@@ -217,8 +218,8 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 			&& fFirstSequence + fContiguousBytes == buffer->sequence);
 	}
 
-	TRACE(("  out2: first: %lu, last: %lu, num: %lu, cont: %lu\n",
-		fFirstSequence.Number(), fLastSequence.Number(), fNumBytes,
+	TRACE(("  out2: first: %" B_PRIu32 ", last: %" B_PRIu32 ", num: %lu, cont: "
+		"%lu\n", fFirstSequence.Number(), fLastSequence.Number(), fNumBytes,
 		fContiguousBytes));
 	VERIFY();
 }
@@ -232,7 +233,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 status_t
 BufferQueue::RemoveUntil(tcp_sequence sequence)
 {
-	TRACE(("BufferQueue@%p::RemoveUntil(sequence %lu)\n", this,
+	TRACE(("BufferQueue@%p::RemoveUntil(sequence %" B_PRIu32 ")\n", this,
 		sequence.Number()));
 	VERIFY();
 
@@ -282,7 +283,7 @@ BufferQueue::RemoveUntil(tcp_sequence sequence)
 status_t
 BufferQueue::Get(net_buffer *buffer, tcp_sequence sequence, size_t bytes)
 {
-	TRACE(("BufferQueue@%p::Get(sequence %lu, bytes %lu)\n", this,
+	TRACE(("BufferQueue@%p::Get(sequence %" B_PRIu32 ", bytes %lu)\n", this,
 		sequence.Number(), bytes));
 	VERIFY();
 
@@ -436,6 +437,44 @@ BufferQueue::SetPushPointer()
 		fPushPointer = fList.Tail()->sequence + fList.Tail()->size;
 }
 
+
+int
+BufferQueue::PopulateSackInfo(tcp_sequence sequence, int maxSackCount,
+	tcp_sack* sacks)
+{
+	SegmentList::ReverseIterator iterator = fList.GetReverseIterator();
+	net_buffer* buffer = iterator.Next();
+
+	int sackCount = 0;
+	TRACE(("BufferQueue::PopulateSackInfo() %" B_PRIu32 "\n",
+		sequence.Number()));
+	while (buffer != NULL && buffer->sequence > sequence) {
+		if (buffer->sequence + buffer->size < sacks[sackCount].left_edge) {
+			if (sackCount + 1 == maxSackCount)
+				break;
+			++sackCount;
+			sacks[sackCount].left_edge = buffer->sequence;
+			sacks[sackCount].right_edge = buffer->sequence + buffer->size;
+		} else {
+			sacks[sackCount].left_edge = buffer->sequence;
+			if (sacks[sackCount].right_edge == 0)
+				sacks[sackCount].right_edge = buffer->sequence + buffer->size;
+		}
+
+		buffer = iterator.Next();
+	}
+
+	if (sacks[0].left_edge != 0) {
+		for (int i = 0; i <= sackCount; ++i) {
+			sacks[i].left_edge = htonl(sacks[i].left_edge);
+			sacks[i].right_edge = htonl(sacks[i].right_edge);
+		}
+		++sackCount;
+	}
+
+	return sackCount;
+}
+
 #if DEBUG_TCP_BUFFER_QUEUE
 
 /*!	Perform a sanity check of the whole queue.
@@ -481,8 +520,9 @@ BufferQueue::Dump() const
 	SegmentList::ConstIterator iterator = fList.GetIterator();
 	int32 number = 0;
 	while (net_buffer* buffer = iterator.Next()) {
-		kprintf("      %" B_PRId32 ". buffer %p, sequence %" B_PRIu32 ", size %"
-			B_PRIu32 "\n", ++number, buffer, buffer->sequence, buffer->size);
+		kprintf("      %" B_PRId32 ". buffer %p, sequence %" B_PRIu32
+			", size %" B_PRIu32 "\n", ++number, buffer, buffer->sequence,
+			buffer->size);
 	}
 }
 

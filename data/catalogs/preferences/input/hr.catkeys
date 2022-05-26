@@ -1,27 +1,26 @@
-1	croatian	x-vnd.Haiku-Input	406154614
+1	croatian	x-vnd.Haiku-Input	2621911666
 Defaults	InputMouse		Zadano
-Normal	SettingsView		Normalno
 Cancel	TouchpadPrefView		Otkaži
 Slow	TouchpadPrefView		Sporo
 Device List	InputWindow		Lista uređaja
 Double-click speed	SettingsView		Brzina dvostrukog klika
 Typing test area	KeyboardView		Područje testiranja tipkanja
-Fast	KeyboardView		Brzo
-Please confirm	TouchpadPrefView		Molim potvrdite
-Mouse speed	SettingsView		Brzina miša
-Short	KeyboardView		Kratko
-Revert	InputMouse		Obrnuto
-Slow	KeyboardView		Sporo
-Vertical	TouchpadPrefView		Okomito
-Revert	TouchpadPrefView		Obrnuto
-Revert	InputKeyboard		Obrnuto
 Mouse type:	SettingsView		Vrsta miša:
+Revert	InputKeyboard		Obrnuto
+Fast	KeyboardView		Brzo
 Fast	TouchpadPrefView		Brzo
+Please confirm	TouchpadPrefView		Molim potvrdite
 Acceleration	TouchpadPrefView		Ubrzanje
+Mouse speed	SettingsView		Brzina miša
 Accept first click	SettingsView		Prihvati prvi klik
 OK	TouchpadPrefView		U redu
 Mouse acceleration	SettingsView		Ubrzanje miša
-Defaults	TouchpadPrefView		Zadani
 High	TouchpadPrefView		Visoko
+Defaults	TouchpadPrefView		Zadani
 Defaults	InputKeyboard		Zadani
+Short	KeyboardView		Kratko
+Slow	KeyboardView		Sporo
+Revert	InputMouse		Obrnuto
+Vertical	TouchpadPrefView		Okomito
 Horizontal	TouchpadPrefView		Vodoravno
+Revert	TouchpadPrefView		Obrnuto

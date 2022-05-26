@@ -1,8 +1,9 @@
 /*
  * Copyright 2010, Stephan Aßmus <superstippi@gmx.de>
- * Copyright 2010, Adrien Destugues <pulkomandy@pulkomandy.ath.cx>
+ * Copyright 2010-2021, Adrien Destugues, pulkomandy@pulkomandy.tk.
  * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2020, Panagiotis Vasilopoulos <hello@alwayslivid.com>
+ * Copyright 2020-2021, Panagiotis "Ivory" Vasilopoulos <git@n0toose.net>
+ *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -136,7 +137,8 @@ BootPromptWindow::BootPromptWindow()
 	:
 	BWindow(BRect(0, 0, 530, 400), "",
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
-			| B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES),
+			| B_AUTO_UPDATE_SIZE_LIMITS | B_QUIT_ON_WINDOW_CLOSE,
+		B_ALL_WORKSPACES),
 	fDefaultKeymapItem(NULL)
 {
 	SetSizeLimits(450, 16384, 350, 16384);
@@ -251,13 +253,6 @@ BootPromptWindow::BootPromptWindow()
 	fInfoTextView->SetText("x\n\n\n\n\n\n\n\n\n\n\n\n\n\nx");
 	ResizeToPreferred();
 
-	// Minimizing will not be possible, unless if the user is
-	// able to bring the window back up. That means that the
-	// Desktop must be running, in order for the window to be
-	// minimizable.
-	if (!be_roster->IsRunning(kDeskbarSignature))
-		SetFlags(Flags() | B_NOT_MINIMIZABLE);
-
 	_UpdateStrings();
 	CenterOnScreen();
 	Show();
@@ -305,36 +300,36 @@ BootPromptWindow::MessageReceived(BMessage* message)
 bool
 BootPromptWindow::QuitRequested()
 {
-	if (!be_roster->IsRunning(kDeskbarSignature) &&
-		!CurrentMessage()->GetBool("dont_reboot"))
-	{
-		// If the Deskbar is not running, then FirstBootPrompt is
-		// is the only thing visible on the screen and that we won't
-		// have anything else to show. In that case, it would make
-		// sense to reboot the machine instead, but doing so without
-		// a warning could be confusing.
-		//
-		// Rebooting is managed by BootPrompt.cpp.
+	// If the Deskbar is not running, then FirstBootPrompt is
+	// is the only thing visible on the screen and that we won't
+	// have anything else to show. In that case, it would make
+	// sense to reboot the machine instead, but doing so without
+	// a warning could be confusing.
+	//
+	// Rebooting is managed by BootPrompt.cpp.
 
-		BAlert* alert = new BAlert(B_TRANSLATE_SYSTEM_NAME("Quit Haiku"),
-			B_TRANSLATE("Are you sure you want to close this window? This will "
-				"restart your system!"),
-			B_TRANSLATE("Cancel"), B_TRANSLATE("Restart system"), NULL,
-			B_WIDTH_AS_USUAL, B_STOP_ALERT);
+	BAlert* alert = new(std::nothrow) BAlert(
+		B_TRANSLATE_SYSTEM_NAME("Quit Haiku"),
+		B_TRANSLATE("Are you sure you want to close this window? This will "
+			"restart your system!"),
+		B_TRANSLATE("Cancel"), B_TRANSLATE("Restart system"), NULL,
+		B_WIDTH_AS_USUAL, B_STOP_ALERT);
+
+	// If there is not enough memory to create the alert here, we may as
+	// well try to reboot. There probably isn't much else to do anyway.
+	if (alert != NULL) {
 		alert->SetShortcut(0, B_ESCAPE);
 
 		if (alert->Go() == 0) {
+			// User doesn't want to exit after all
 			return false;
 		}
-
-		be_app->PostMessage(MSG_REBOOT_REQUESTED);
-
-	} else {
-		// The aforementioned warning is only shown if the condition
-		// is true, because if FirstBootPrompt is running on the Desktop,
-		// the system will not reboot upon closing the window.
-		be_app->PostMessage(B_QUIT_REQUESTED);
 	}
+
+	// If deskbar is running, don't actually reboot: we are in test mode
+	// (probably run by a developer manually).
+	if (!be_roster->IsRunning(kDeskbarSignature))
+		be_app->PostMessage(MSG_REBOOT_REQUESTED);
 
 	return true;
 }
@@ -365,25 +360,53 @@ BootPromptWindow::_InitCatalog(bool saveSettings)
 void
 BootPromptWindow::_UpdateStrings()
 {
-	SetTitle(B_TRANSLATE("Welcome to Haiku!"));
-
-	fInfoTextView->SetText(B_TRANSLATE_COMMENT(
+	BString titleTextHaiku = B_TRANSLATE("Welcome to Haiku!");
+	BString mainTextHaiku = B_TRANSLATE_COMMENT(
 		"Thank you for trying out Haiku! We hope you'll like it!\n\n"
-		"Select your preferred language and keymap from the list on "
-		"the left which will then be used instantly. Both settings can be "
-		"changed from the Desktop later on on the fly.\n\n"
+		"Please select your preferred language and keymap. Both settings can "
+		"also be changed later when running Haiku.\n\n"
 
-		"Do you wish to run the Installer or continue booting to the "
-		"Desktop?",
+		"Do you wish to install Haiku now, or try it out first?",
 
 		"For other languages, a note could be added: \""
 		"Note: Localization of Haiku applications and other components is "
 		"an on-going effort. You will frequently encounter untranslated "
 		"strings, but if you like, you can join in the work at "
-		"<www.haiku-os.org>.\""));
+		"<www.haiku-os.org>.\"");
+	BString desktopTextHaiku = B_TRANSLATE("Try Haiku");
+	BString installTextHaiku = B_TRANSLATE("Install Haiku");
 
-	fDesktopButton->SetLabel(B_TRANSLATE("Boot to Desktop"));
-	fInstallerButton->SetLabel(B_TRANSLATE("Run Installer"));
+	BString titleTextDebranded = B_TRANSLATE("Welcome!");
+	BString mainTextDebranded = B_TRANSLATE_COMMENT(
+			"Thank you for trying out our operating system! We hope you'll "
+			"like it!\n\n"
+			"Please select your preferred language and keymap. Both settings "
+			"can also be changed later.\n\n"
+
+			"Do you wish to install the operating system now, or try it out "
+			"first?",
+
+			"This notice appears when the build of Haiku that's currently "
+			"being used is unofficial, as in, not distributed by Haiku itself."
+			"For other languages, a note could be added: \""
+			"Note: Localization of Haiku applications and other components is "
+			"an on-going effort. You will frequently encounter untranslated "
+			"strings, but if you like, you can join in the work at "
+			"<www.haiku-os.org>.\"");
+	BString desktopTextDebranded = B_TRANSLATE("Try it out");
+	BString installTextDebranded = B_TRANSLATE("Install");
+
+#ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
+	SetTitle(titleTextHaiku);
+	fInfoTextView->SetText(mainTextHaiku);
+	fDesktopButton->SetLabel(desktopTextHaiku);
+	fInstallerButton->SetLabel(installTextHaiku);
+#else
+	SetTitle(titleTextDebranded);
+	fInfoTextView->SetText(mainTextDebranded);
+	fDesktopButton->SetLabel(desktopTextDebranded);
+	fInstallerButton->SetLabel(installTextDebranded);
+#endif
 
 	fLanguagesLabelView->SetText(B_TRANSLATE("Language"));
 	fKeymapsMenuLabel->SetText(B_TRANSLATE("Keymap"));

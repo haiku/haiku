@@ -15,3 +15,9 @@ StaticLibrary cortex_support.a :
 	SoundUtils.cpp
 	TextControlFloater.cpp
 ;
+
+DoCatalogs cortex_support.a :
+	x-vnd.Cortex.support
+	:
+	MediaString.cpp
+;

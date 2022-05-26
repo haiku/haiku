@@ -1,0 +1,26 @@
+1	japanese	application/x-vnd.Cortex.Route	25925955
+Node '%name%' released	CortexRouteApp		ノード '%name%' が解放された
+OK	CortexRouteApp		OK
+About Cortex/Route…	CortexRouteApp		Cortex/Routeについて...
+File	CortexRouteApp		ファイル
+Connection '%name%' made	CortexRouteApp		接続 '%name%' が作成されました
+Save nodes…	CortexRouteApp		ノードの保存...
+%producer% and %consumer%	CortexRouteApp		%producer% および %consumer%
+Node '%name%' created	CortexRouteApp		ノード '%name%' が生成されました
+Negotiated format:	CortexRouteApp		ネゴシエートされたフォーマット:
+Window	CortexRouteApp		ウィンドウ
+Transport	CortexRouteApp		トランスポート
+Connection broken	CortexRouteApp		接続が壊れています
+Untitled group	CortexRouteApp		名称未設定グループ
+Connection failed	CortexRouteApp		接続が失敗しました
+Connection '%name%' broken	CortexRouteApp		接続 '%name%' は壊れています
+Between:	CortexRouteApp		以下の間:
+Cortex	CortexRouteApp		Cortex
+Open…	CortexRouteApp		開く...
+Pull palettes	CortexRouteApp		パレットの抽出
+Connection made	CortexRouteApp		接続が生成された
+Show transport	CortexRouteApp		トランスポートの表示
+Show add-ons	CortexRouteApp		Add-on の表示
+Quit	CortexRouteApp		終了
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.
+Tried format:	CortexRouteApp		信頼できるフォーマット:

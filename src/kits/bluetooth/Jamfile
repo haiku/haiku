@@ -25,6 +25,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			#UI
 			PincodeWindow.cpp
 			ConnectionIncoming.cpp
+			ConnectionView.cpp
+			BluetoothIconView.cpp
 			:
 			be localestub [ TargetLibstdc++ ]
 		;

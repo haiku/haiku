@@ -98,17 +98,22 @@ struct TypeHandlerFactory<const char*> {
 	} \
 
 struct fd_set;
+struct flock;
 struct ifconf;
 struct ifreq;
 struct message_args;
+struct pollfd;
 struct sockaddr_args;
 struct socket_args;
 struct sockopt_args;
 
 DEFINE_FACTORY(fdset_ptr, fd_set *);
+DEFINE_FACTORY(flock_ptr, flock *);
 DEFINE_FACTORY(ifconf_ptr, ifconf *);
 DEFINE_FACTORY(ifreq_ptr, ifreq *);
 DEFINE_FACTORY(message_args_ptr, message_args *);
+DEFINE_FACTORY(pollfd_ptr, pollfd *);
+DEFINE_FACTORY(siginfo_t_ptr, siginfo_t *);
 DEFINE_FACTORY(sockaddr_args_ptr, sockaddr_args *);
 DEFINE_FACTORY(socket_args_ptr, socket_args *);
 DEFINE_FACTORY(sockopt_args_ptr, sockopt_args *);

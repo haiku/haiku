@@ -21,5 +21,13 @@ Addon cortex_audioadapter.media_addon :
 	RawBuffer.cpp
 	SoundUtils.cpp
 
-	: be media [ TargetLibsupc++ ]
+	: be media localestub [ TargetLibsupc++ ]
+;
+
+DoCatalogs cortex_audioadapter.media_addon
+	: x-vnd.moon-AudioAdapter.media_addon
+	:
+	AudioAdapterParams.cpp
+
+	../common/AudioFilterNode.cpp
 ;

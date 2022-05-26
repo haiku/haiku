@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -650,10 +650,6 @@ AcpiExPrepFieldValue (
                     (UINT8) AccessByteWidth;
             }
         }
-
-        /* An additional reference for the container */
-
-        AcpiUtAddReference (ObjDesc->Field.RegionObj);
 
         ACPI_DEBUG_PRINT ((ACPI_DB_BFIELD,
             "RegionField: BitOff %X, Off %X, Gran %X, Region %p\n",

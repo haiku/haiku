@@ -1,7 +1,7 @@
 /*
 	$Id: PropertyFlattenTest.cpp 1218 2002-09-28 00:19:49Z shatty $
 	
-	This file implements the flatten test for the OpenBeOS BPropertyInfo code.
+	This file implements the flatten test for the Haiku BPropertyInfo code.
 	This class tests the following usecases:
 	  - Fixed Size
 	  - Type Code

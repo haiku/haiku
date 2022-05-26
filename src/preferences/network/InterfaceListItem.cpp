@@ -37,6 +37,9 @@ InterfaceListItem::InterfaceListItem(const char* name,
 	BListItem(0, false),
 	fType(type),
 	fIcon(NULL),
+	fIconOffline(NULL),
+	fIconPending(NULL),
+	fIconOnline(NULL),
 	fFirstLineOffset(0),
 	fLineOffset(0),
 	fDisabled(false),
@@ -51,6 +54,9 @@ InterfaceListItem::InterfaceListItem(const char* name,
 InterfaceListItem::~InterfaceListItem()
 {
 	delete fIcon;
+	delete fIconOffline;
+	delete fIconPending;
+	delete fIconOnline;
 }
 
 
@@ -194,6 +200,9 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType)
 	const uint8* onlineHVIF;
 
 	BBitmap* interfaceBitmap = NULL;
+	BBitmap* offlineBitmap = NULL;
+	BBitmap* pendingBitmap = NULL;
+	BBitmap* onlineBitmap = NULL;
 
 	BResources* resources = BApplication::AppResources();
 
@@ -212,12 +221,12 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType)
 		interfaceHVIF = (const uint8*)resources->LoadResource(
 			B_VECTOR_ICON_TYPE, "ether", &iconSize);
 
-	if (interfaceHVIF) {
+	if (interfaceHVIF != NULL) {
 		// Now build the bitmap
-		interfaceBitmap = new BBitmap(BRect(0, 0, ICON_SIZE, ICON_SIZE),
-			0, B_RGBA32);
+		interfaceBitmap = new(std::nothrow) BBitmap(
+			BRect(0, 0, ICON_SIZE, ICON_SIZE), 0, B_RGBA32);
 		if (BIconUtils::GetVectorIcon(interfaceHVIF,
-			iconSize, interfaceBitmap) == B_OK)
+				iconSize, interfaceBitmap) == B_OK)
 			fIcon = interfaceBitmap;
 		else
 			delete interfaceBitmap;
@@ -227,28 +236,40 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType)
 	offlineHVIF = (const uint8*)resources->LoadResource(
 		B_VECTOR_ICON_TYPE, "offline", &iconSize);
 
-	if (offlineHVIF) {
-		fIconOffline = new BBitmap(BRect(0, 0, ICON_SIZE, ICON_SIZE),
-			0, B_RGBA32);
-		BIconUtils::GetVectorIcon(offlineHVIF, iconSize, fIconOffline);
+	if (offlineHVIF != NULL) {
+		offlineBitmap = new(std::nothrow) BBitmap(
+			BRect(0, 0, ICON_SIZE, ICON_SIZE), 0, B_RGBA32);
+		if (BIconUtils::GetVectorIcon(offlineHVIF,
+				iconSize, offlineBitmap) == B_OK)
+			fIconOffline = offlineBitmap;
+		else
+			delete offlineBitmap;
 	}
 
 	pendingHVIF = (const uint8*)resources->LoadResource(
 		B_VECTOR_ICON_TYPE, "pending", &iconSize);
 
-	if (pendingHVIF) {
-		fIconPending = new BBitmap(BRect(0, 0, ICON_SIZE, ICON_SIZE),
-			0, B_RGBA32);
-		BIconUtils::GetVectorIcon(pendingHVIF, iconSize, fIconPending);
+	if (pendingHVIF != NULL) {
+		pendingBitmap = new(std::nothrow) BBitmap(
+			BRect(0, 0, ICON_SIZE, ICON_SIZE), 0, B_RGBA32);
+		if (BIconUtils::GetVectorIcon(pendingHVIF,
+				iconSize, pendingBitmap) == B_OK)
+			fIconPending = pendingBitmap;
+		else
+			delete pendingBitmap;
 	}
 
 	onlineHVIF = (const uint8*)resources->LoadResource(
 		B_VECTOR_ICON_TYPE, "online", &iconSize);
 
-	if (onlineHVIF) {
-		fIconOnline = new BBitmap(BRect(0, 0, ICON_SIZE, ICON_SIZE),
-			0, B_RGBA32);
-		BIconUtils::GetVectorIcon(onlineHVIF, iconSize, fIconOnline);
+	if (onlineHVIF != NULL) {
+		onlineBitmap = new(std::nothrow) BBitmap(
+			BRect(0, 0, ICON_SIZE, ICON_SIZE), 0, B_RGBA32);
+		if (BIconUtils::GetVectorIcon(onlineHVIF,
+				iconSize, onlineBitmap) == B_OK)
+			fIconOnline = onlineBitmap;
+		else
+			delete onlineBitmap;
 	}
 }
 

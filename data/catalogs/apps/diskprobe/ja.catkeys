@@ -8,24 +8,24 @@ Block size	ProbeView	Menu item. This is in the same menu window than 'Base' and 
 MIME type editor	TypeEditors		MIME タイプエディター
 Hexadecimal	FindWindow	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	16 進
 16 bit unsigned value:	TypeEditors		符号無し 16 ビット値:
-8 bit signed value:	TypeEditors		符号つき 8 ビット値:
+8 bit signed value:	TypeEditors		符号付き 8 ビット値:
  (native)	ProbeView		(ネイティブ)
 Attribute offset: 	ProbeView		属性のオフセット:
 Text	TypeEditors	This is the type of editor	テキスト
 File offset: 	ProbeView		ファイルオフセット:
 Add	ProbeView		追加
-64 bit signed value:	TypeEditors		符号無し 64 ビット値:
+64 bit signed value:	TypeEditors		符号付き 64 ビット値:
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		本当に属性 \"%s\" をファイル \"%s\"から削除しますか?\n\nこの動作は元に戻せません。
 No type editor available	AttributeWindow		タイプエディターはありません
-Print…	ProbeView		印刷…
-New…	FileWindow		新規…
+Print…	ProbeView		印刷...
+New…	FileWindow		新規...
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	what: '%.4s'\n\n
 OK	DiskProbe		OK
 DiskProbe	System name		DiskProbe
 Back	ProbeView		戻る
 Device: 	ProbeView		デバイス:
 Base	ProbeView	A menu item, the number that is basis for a system of calculation. The base 10 system is a decimal system. This is in the same menu window than 'Font size' and 'BlockSize'	基数
-Open file…	FileWindow		ファイルを開く…
+Open file…	FileWindow		ファイルを開く...
 32 bit unsigned pointer:	TypeEditors		符号無し 32 ビットポインタ:
 DiskProbe request	DiskProbe		DiskProbe リクエスト
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	16 進
@@ -44,7 +44,7 @@ File: 	ProbeView		ファイル:
 Swapped: %Ld (0x%0*Lx)	ProbeView		スワップ: %Ld (0x%0*Lx)
 Stop	ProbeView		中断
 Cancel	ProbeView		中止
-Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	\"%s\"を開けませんでした:\n%s
+Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	\"%s\"を開けません:\n%s
 Font size	ProbeView		フォントサイズ
 Type editor not supported	ProbeView		タイプエディターはサポートされていません。
 Native: 0x%0*Lx	ProbeView		ネイティブ: 0x%0*Lx
@@ -52,12 +52,12 @@ Copy	ProbeView		コピー
 Redo	ProbeView		やり直し
 Floating-point value:	TypeEditors		浮動小数点値:
 Cancel	AttributeWindow		中止
-16 bit signed value:	TypeEditors		符号つき 16 ビット値:
+16 bit signed value:	TypeEditors		符号付き 16 ビット値:
 DiskProbe request	AttributeWindow		DiskProbe リクエスト
 Next	ProbeView		次へ
-64 bit signed offset:	TypeEditors		符号つき 64 ビットオフセット値:
-32 bit signed value:	TypeEditors		符号つき 32 ビット値:
-Could not find search string.	ProbeView		検索文字列が見つかりませんでした。
+64 bit signed offset:	TypeEditors		符号付き 64 ビットオフセット値:
+32 bit signed value:	TypeEditors		符号付き 32 ビット値:
+Could not find search string.	ProbeView		検索文字列が見つからなかった。
 Close	FileWindow		閉じる
 Unknown type	TypeEditors		不明なタイプ
 Open device	FileWindow		デバイスを開く
@@ -71,8 +71,8 @@ Mode:	FindWindow		モード:
 32 bit size or status:	TypeEditors		32 ビットのサイズまたはステータス:
 of 	ProbeView		/
 Contents:	TypeEditors		内容:
-Could not open file \"%s\": %s\n	DiskProbe		ファイル \"%s\" を開けませんでした: %s\n
-Probe file…	OpenWindow		ファイルを調べる…
+Could not open file \"%s\": %s\n	DiskProbe		ファイル \"%s\" を開けません: %s\n
+Probe file…	OpenWindow		ファイルを調べる...
 Block: 	ProbeView		ブロック:
 Bookmarks	ProbeView		ブックマーク
 Probe device	OpenWindow		デバイスを調べる
@@ -99,7 +99,7 @@ Save	ProbeView		保存
 of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	/ 0x0
 Attribute type: 	ProbeView		属性タイプ:
 15 bit	TypeEditors		15 ビット
-Page setup…	ProbeView		ページ設定…
+Page setup…	ProbeView		ページ設定...
 Boolean	TypeEditors	This is the type of editor	ブール値
 Icon view	TypeEditors		アイコン表示
 Select all	ProbeView		すべて選択
@@ -114,7 +114,7 @@ Attribute: 	ProbeView		属性:
 Block	ProbeView		ブロック
 Find again	ProbeView		次を検索
 View	ProbeView	This is the last menubar item 'File Edit Block View'	表示
-Could not read image	TypeEditors	Image means here a picture file, not a disk image.	イメージを読み込めませんでした
+Could not read image	TypeEditors	Image means here a picture file, not a disk image.	イメージを読み込めません
 DiskProbe request	ProbeView		DiskProbe リクエスト
 Double precision floating-point value:	TypeEditors		倍精度浮動小数点値:
 Image	TypeEditors	This is the type of view	イメージ
@@ -125,7 +125,7 @@ Edit	ProbeView		編集
 String editor	TypeEditors		文字列エディター
 Boolean editor	TypeEditors		ブール値エディター
 Device offset: 	ProbeView		デバイスオフセット:
-Find…	ProbeView		検索…
+Find…	ProbeView		検索...
 8 bit palette	TypeEditors		8 ビットパレット
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	10 進
 Image view	TypeEditors	Image means here a picture file, not a disk image.	イメージ表示

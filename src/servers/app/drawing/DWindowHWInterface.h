@@ -12,6 +12,7 @@
 
 #include "HWInterface.h"
 
+#include <AutoDeleter.h>
 #include <Accelerant.h>
 #include <image.h>
 #include <Region.h>
@@ -81,7 +82,8 @@ public:
 			void				SetOffset(int32 left, int32 top);
 
 private:
-			DWindowBuffer*		fFrontBuffer;
+			ObjectDeleter<DWindowBuffer>
+								fFrontBuffer;
 
 			DWindow*			fWindow;
 

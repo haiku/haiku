@@ -1,0 +1,23 @@
+1	czech	x-vnd.haiku-registrar	2599857937
+Cancel	ShutdownProcess		Zrušit
+OK	ShutdownProcess		OK
+Do you really want to shut down the system?	ShutdownProcess		Opravdu si přejete vypnout systém?
+Shutdown status	ShutdownProcess		Průběh vypínání
+Shut down	ShutdownProcess		Vypnout
+The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		Aplikace \"%appName%\" může být zablokována na pomocném panelu.
+System is shut down	ShutdownProcess		Systém je vypnutý
+Restart system	ShutdownProcess		Restartovat systém
+Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Aplikace \"%appName%\" zrušila proces vypínání.
+Asking background applications to quit.	ShutdownProcess		Žádost o vypnutí aplikací na pozadí.
+Do you really want to restart the system?	ShutdownProcess		Určitě si přejete restartovat systém?
+Restart	ShutdownProcess		Restartovat
+It's now safe to turn off the computer.	ShutdownProcess		Nyní není bezpečné vypínat počítač.
+Asking other processes to quit.	ShutdownProcess		Žádost o vypnutí ostatní procesů.
+Cancel shutdown	ShutdownProcess		Zrušit vypínání
+Restarting…	ShutdownProcess		Restartování...
+%action%?	ShutdownProcess		%action%?
+Tidying things up a bit.	ShutdownProcess		Trocha uklízení.
+Kill application	ShutdownProcess		Zabít aplikaci
+Shutdown aborted	ShutdownProcess		Vypnutí zrušeno
+Shutting down…	ShutdownProcess		Vypínání...
+Asking \"%appName%\" to quit.	ShutdownProcess		Žádost o vypnutí \"%appName%\".

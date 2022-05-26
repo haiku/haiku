@@ -113,6 +113,78 @@ struct tm;
 __BEGIN_DECLS
 
 
+__BEGIN_NAMESPACE_STD
+/* Search N wide characters of S for C.  */
+extern wchar_t *wmemchr (__const wchar_t *__s, wchar_t __c, size_t __n)
+     __THROW;
+
+/* Compare N wide characters of S1 and S2.  */
+extern int wmemcmp (__const wchar_t *__s1, __const wchar_t *__s2, size_t __n)
+     __THROW;
+/* Copy N wide characters of SRC to DEST.  */
+extern wchar_t *wmemcpy (wchar_t *__restrict __s1,
+			__const wchar_t *__restrict __s2, size_t __n) __THROW;
+
+/* Copy N wide characters of SRC to DEST, guaranteeing
+   correct behavior for overlapping strings.  */
+extern wchar_t *wmemmove (wchar_t *__s1, __const wchar_t *__s2, size_t __n)
+     __THROW;
+
+/* Set N wide characters of S to C.  */
+extern wchar_t *wmemset (wchar_t *__s, wchar_t __c, size_t __n) __THROW;
+
+#ifdef __USE_GNU
+/* Copy N wide characters of SRC to DEST and return pointer to following
+   wide character.  */
+extern wchar_t *wmempcpy (wchar_t *__restrict __s1,
+			  __const wchar_t *__restrict __s2, size_t __n)
+     __THROW;
+#endif
+
+__BEGIN_NAMESPACE_STD
+/* Determine whether C constitutes a valid (one-byte) multibyte
+   character.  */
+extern wint_t btowc (int __c) __THROW;
+
+/* Determine whether C corresponds to a member of the extended
+   character set whose multibyte representation is a single byte.  */
+extern int wctob (wint_t __c) __THROW;
+
+/* Determine whether PS points to an object representing the initial
+   state.  */
+extern int mbsinit (__const mbstate_t *__ps) __THROW __attribute_pure__;
+
+/* Write wide character representation of multibyte character pointed
+   to by S to PWC.  */
+extern size_t mbrtowc (wchar_t *__restrict __pwc,
+		       __const char *__restrict __s, size_t __n,
+		       mbstate_t *__restrict __p) __THROW;
+
+/* Write multibyte representation of wide character WC to S.  */
+extern size_t wcrtomb (char *__restrict __s, wchar_t __wc,
+		       mbstate_t *__restrict __ps) __THROW;
+
+/* Return number of bytes in multibyte character pointed to by S.  */
+extern size_t __mbrlen (__const char *__restrict __s, size_t __n,
+			mbstate_t *__restrict __ps) __THROW;
+extern size_t mbrlen (__const char *__restrict __s, size_t __n,
+		      mbstate_t *__restrict __ps) __THROW;
+__END_NAMESPACE_STD
+
+__BEGIN_NAMESPACE_STD
+/* Write wide character representation of multibyte character string
+   SRC to DST.  */
+extern size_t mbsrtowcs (wchar_t *__restrict __dst,
+			 __const char **__restrict __src, size_t __len,
+			 mbstate_t *__restrict __ps) __THROW;
+
+/* Write multibyte character representation of wide character string
+   SRC to DST.  */
+extern size_t wcsrtombs (char *__restrict __dst,
+			 __const wchar_t **__restrict __src, size_t __len,
+			 mbstate_t *__restrict __ps) __THROW;
+__END_NAMESPACE_STD
+
 
 /* Convert initial portion of the wide string NPTR to `double'
    representation.  */

@@ -64,7 +64,7 @@
 #if CPPUNIT_HAVE_SSTREAM
 #   include <sstream>
     namespace CppUnit {
-      class OStringStream : public ostringstream
+      class OStringStream : public std::ostringstream
       {
       };
     }

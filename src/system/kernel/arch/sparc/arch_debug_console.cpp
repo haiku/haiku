@@ -7,6 +7,7 @@
  */
 
 
+#include <arch_platform.h>
 #include <arch/debug_console.h>
 #include <boot/kernel_args.h>
 #include <kernel.h>
@@ -30,7 +31,8 @@ arch_debug_install_interrupt_handlers(void)
 int
 arch_debug_blue_screen_try_getchar(void)
 {
-	return 0;
+	// TODO: Implement correctly!
+	return arch_debug_blue_screen_getchar();
 }
 
 
@@ -52,13 +54,14 @@ arch_debug_serial_try_getchar(void)
 char
 arch_debug_serial_getchar(void)
 {
-	return 0;
+	return SparcPlatform::Default()->SerialDebugGetChar();
 }
 
 
 void
 arch_debug_serial_putchar(const char c)
 {
+	return SparcPlatform::Default()->SerialDebugPutChar(c);
 }
 
 
@@ -82,7 +85,7 @@ arch_debug_serial_early_boot_message(const char *string)
 status_t
 arch_debug_console_init(kernel_args *args)
 {
-	return B_OK;
+	return SparcPlatform::Default()->InitSerialDebug(args);
 }
 
 
@@ -91,5 +94,4 @@ arch_debug_console_init_settings(kernel_args *args)
 {
 	return B_OK;
 }
-
 

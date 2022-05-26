@@ -90,3 +90,16 @@ Below are links to source code related to Haiku's package management.
 - haikuporter_ is the tool to create binary packages from build recipes.
 
   .. _haikuporter: https://github.com/haikuports/haikuporter
+
+
+.. toctree::
+   /packages/BuildingPackages
+   /packages/DirectoryStructure
+   /packages/FileFormat
+   /packages/HybridBuilds
+   /packages/Infrastructure
+   /packages/Migration
+   /packages/PackagingPolicy
+   /packages/Bootstrapping
+   /packages/TODO
+   /packages/OldIdeas

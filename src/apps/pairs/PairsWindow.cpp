@@ -100,13 +100,13 @@ PairsWindow::_MakeMenuBar()
 	difficultyMessage = new BMessage(MENU_DIFFICULTY);
 	difficultyMessage->AddInt32("rows", 6);
 	difficultyMessage->AddInt32("cols", 6);
-	newMenu->AddItem(menuItem = new BMenuItem(
-		B_TRANSLATE("Intermediate (6x6)"), difficultyMessage));
+	newMenu->AddItem(new BMenuItem(B_TRANSLATE("Intermediate (6x6)"),
+		difficultyMessage));
 
 	difficultyMessage = new BMessage(MENU_DIFFICULTY);
 	difficultyMessage->AddInt32("rows", 8);
 	difficultyMessage->AddInt32("cols", 8);
-	newMenu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Expert (8x8)"),
+	newMenu->AddItem(new BMenuItem(B_TRANSLATE("Expert (8x8)"),
 		difficultyMessage));
 
 	menuItem = new BMenuItem(newMenu, new BMessage(MENU_NEW));
@@ -115,7 +115,7 @@ PairsWindow::_MakeMenuBar()
 
 	gameMenu->AddSeparatorItem();
 
-	gameMenu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Quit"),
+	gameMenu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
 		new BMessage(MENU_QUIT), 'Q'));
 
 	fIconSizeMenu = new BMenu(B_TRANSLATE("Size"));
@@ -124,7 +124,7 @@ PairsWindow::_MakeMenuBar()
 
 	BMessage* iconSizeMessage = new BMessage(MENU_ICON_SIZE);
 	iconSizeMessage->AddInt32("size", kSmallIconSize);
-	fIconSizeMenu->AddItem(menuItem = new BMenuItem(
+	fIconSizeMenu->AddItem(new BMenuItem(
 		B_TRANSLATE("Small"), iconSizeMessage), 0);
 
 	iconSizeMessage = new BMessage(MENU_ICON_SIZE);
@@ -135,7 +135,7 @@ PairsWindow::_MakeMenuBar()
 
 	iconSizeMessage = new BMessage(MENU_ICON_SIZE);
 	iconSizeMessage->AddInt32("size", kLargeIconSize);
-	fIconSizeMenu->AddItem(menuItem = new BMenuItem(
+	fIconSizeMenu->AddItem(new BMenuItem(
 		B_TRANSLATE("Large"), iconSizeMessage), 2);
 }
 
@@ -178,6 +178,7 @@ PairsWindow::NewGame()
 {
 	fButtonClicks = 0;
 	fFinishPairs = 0;
+	fIsFirstClick = true;
 	fPairsView->CreateGameBoard();
 }
 

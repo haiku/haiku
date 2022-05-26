@@ -1,5 +1,4 @@
-1	belarusian	x-vnd.Haiku-NetworkStatus	3823341665
-Netmask	NetworkStatusView		Маска сеткі
+1	belarusian	x-vnd.Haiku-NetworkStatus	504030701
 Quit	NetworkStatusView		Выйсці
 Unknown	NetworkStatusView		Невядомае
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Не ўдалося запусціць сеткавыя наладкі.\n\nПамылка: 
@@ -11,10 +10,8 @@ No link	NetworkStatusView		Няма спасылкі
 Could not join wireless network:\n	NetworkStatusView		Не ўдалося далучыцца да бесшнуравой сеткі:\n
 Ready	NetworkStatusView		Гатовы
 Network Status	NetworkStatusView		Статус сеткі
-Address	NetworkStatusView		Адрас
 No stateful configuration	NetworkStatusView		Няма канфігурацыі для ўліку стану пратакола
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Вы можаце запусціць NetworkStatus у вакне або усталяваць на Deskbar.
-Broadcast	NetworkStatusView		Вяшчанне
 %ifaceName information:\n	NetworkStatusView		Інфармацыя пра %ifaceName:\n
 Run in window	NetworkStatus		Запускаць у вакне
 <no wireless networks found>	NetworkStatusView		<бесшнуравыя сеткі не знойдзеныя>

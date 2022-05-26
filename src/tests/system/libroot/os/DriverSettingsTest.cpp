@@ -136,7 +136,7 @@ print_settings(void *handle)
 	const driver_settings *settings = get_driver_settings(reparsedHandle);
 	dump_settings(*settings);
 
-	delete_driver_settings(reparsedHandle);
+	unload_driver_settings(reparsedHandle);
 
 	bufferSize = sizeof(buffer);
 	if (get_driver_settings_string(handle, buffer, &bufferSize, true) < B_OK) {
@@ -155,7 +155,7 @@ print_settings(void *handle)
 	settings = get_driver_settings(reparsedHandle);
 	dump_settings(*settings);
 
-	delete_driver_settings(reparsedHandle);
+	unload_driver_settings(reparsedHandle);
 }
 
 
@@ -181,7 +181,7 @@ check_settings_string(uint32 num)
 	}
 
 	print_settings(handle);
-	delete_driver_settings(handle);
+	unload_driver_settings(handle);
 }
 
 

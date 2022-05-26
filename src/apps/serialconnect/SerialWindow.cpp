@@ -492,7 +492,7 @@ void SerialWindow::MessageReceived(BMessage* message)
 			}
 			return;
 		}
+		default:
+			BWindow::MessageReceived(message);
 	}
-
-	BWindow::MessageReceived(message);
 }

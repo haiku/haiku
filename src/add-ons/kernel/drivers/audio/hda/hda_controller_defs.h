@@ -151,8 +151,11 @@
 #define NVIDIA_HDA_TRANSREG				0x4e
 #define NVIDIA_HDA_TRANSREG_MASK		0xf0
 #define NVIDIA_HDA_ENABLE_COHBITS		0x0f
+
+#define INTEL_SCH_HDA_CGCTL				0x48
+#define INTEL_SCH_HDA_CGCTL_MISCBDCGE	(1 << 6)
 #define INTEL_SCH_HDA_DEVC				0x78
-#define INTEL_SCH_HDA_DEVC_SNOOP		0x800
+#define INTEL_SCH_HDA_DEVC_SNOOP		(1 << 11)
 
 
 typedef uint32 corb_t;

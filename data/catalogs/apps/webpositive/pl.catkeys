@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	55235296
+1	polish	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Wymagane uwierzytelnienie
 Previous	WebPositive Window		Poprzedni
 (Finish: %date)	Download Window		(Koniec: %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		Otwórz katalog zawierający
 Find previous	WebPositive Window		Znajdź poprzednie
 Full screen	WebPositive Window		Pełny ekran
 Downloads in progress	WebPositive		Pobieranie jest w toku
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Czy naprawdę chcesz otworzyć wszystkie zakładki %addedCount na raz?
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Czy naprawdę chcesz otworzyć wszystkie zakładki %addedCount na raz?
 Clone current page	Settings Window		Sklonuj bieżącą stronę
 Start page:	Settings Window		Strona startowa:
 Cancel	Download Window		Anuluj
@@ -49,10 +49,11 @@ Decrease size	WebPositive Window		Zmniejsz wielkość
 Default fixed font size:	Settings Window		Domyślny rozmiar fontu o stałej szerokości:
 Sans serif font:	Settings Window		Font bezszeryfowy:
 Clear	WebPositive Window		Wyczyść
-Cookies for %s	Cookie Manager		Ciasteczka dla %s
 The download could not be opened.	Download Window		Pobrania nie można otworzyć.
+Cookies for %s	Cookie Manager		Ciasteczka dla %s
 Close	Download Window		Zamknij
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s – Wyszukiwane hasło
 Reload	WebPositive Window		Odśwież
 Expiration	Cookie Manager		Data ważności
 Download finished	Download Window		Pobieranie zakończone
@@ -100,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Cofnij
 Copy	WebPositive Window		Kopiuj
 Default standard font size:	Settings Window		Domyślny rozmiar fontu standardowego:
+Custom	Settings Window		Własne
 Bookmark this page	WebPositive Window		Dodaj zakładkę
 Show tabs if only one page is open	Settings Window		Pokaż karty, nawet jeśli tylko jedna strona jest otwarta
 Close tab	WebPositive Window		Zamknij kartę
@@ -109,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Kontynuowanie pobierania
 Proxy server requires authentication	Settings Window		Serwer proxy wymaga uwierzytelnienia
 Cancel	Settings Window		Anuluj
-History	WebPositive Window		Historia
 Reset size	WebPositive Window		Resetuj rozmiar
+History	WebPositive Window		Historia
 Do you really want to clear the browsing history?	WebPositive Window		Na pewno chcesz wyczyścić całą historię przeglądania?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Wyszukuje następne wystąpienie tekstu
 Fixed font:	Settings Window		Font o stałej szerokości:
@@ -129,6 +131,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Dwuklik lub wciśnię
 Next	WebPositive Window		Następna
 Bookmark error	WebPositive Window		Błąd zakładki
 OK	WebPositive Window		OK
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% z %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Powiększaj tylko tekst
 Save page as…	WebPositive Window		Zapisz stronę jako…

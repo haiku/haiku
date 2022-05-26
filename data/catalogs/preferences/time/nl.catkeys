@@ -1,11 +1,11 @@
-1	dutch; flemish	x-vnd.Haiku-Time	834234238
+1	dutch; flemish	x-vnd.Haiku-Time	3691539601
 OK	Time		Oké
 Message receiving failed	Time		Ontvangen van het bericht mislukt
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, geschreven door:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nAlle rechten voorbehouden, 2004-2012, Haiku.
 Australia	Time		Australië
 America	Time		Amerika
 Reset to default server list	Time		Herstel standaard-serverlijst
 Could not resolve server address	Time		Het serveradres opzoeken is mislukt
+Time & Date	System name		Tijd & Datum
 Set time zone	Time		Tijdzone instellen
 Waiting for answer failed	Time		Wachten op antwoord mislukt
 <Other>	Time		<Anders>
@@ -38,7 +38,6 @@ Atlantic	Time		Atlantic
 Show clock in Deskbar	Time		Klok in Deskbar tonen
 Display time with seconds	Time		Tijd met seconden tonen
 Time	System name		Tijd
-about	Time		over
 Show time zone	Time		Tijdzone tonen
 Synchronize at boot	Time		Synchroniseren bij het opstarten
 Indian	Time		Indisch

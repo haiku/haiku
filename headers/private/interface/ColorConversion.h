@@ -4,6 +4,9 @@
 
 #include <GraphicsDefs.h>
 
+#include <math.h>
+
+
 class BPoint;
 
 
@@ -60,6 +63,20 @@ private:
 	color_map		*fOwnColorMap;
 	status_t		fCStatus;
 };
+
+
+static inline uint8 perceptual_brightness(rgb_color color)
+{
+	// From http://alienryderflex.com/hsp.html
+	// Useful in particular to decide if the color is "light" or "dark"
+	// by checking if the perceptual brightness is > 127.
+	int r = color.red;
+	int g = color.green;
+	int b = color.blue;
+
+	return (uint8)roundf(sqrtf(
+		0.299f * r * r + 0.587f * g * g + 0.114 * b * b));
+}
 
 }	// namespace BPrivate
 

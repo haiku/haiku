@@ -7,7 +7,7 @@ Revert to saved	ShortcutsWindow		前回保存したときの状態に戻す
 Don't save	ShortcutsWindow		保存しない
 *MouseDown	ShortcutsWindow		*MouseDown
 *Beep	ShortcutsWindow		*Beep
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		キーセットを保存できませんでした。
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		キーセットを保存できません。
 Save	ShortcutsWindow		保存
 Either	ShortcutsSpec		どちらか
 Oh no	ShortcutsWindow		Oh no
@@ -21,27 +21,27 @@ Cancel	ShortcutsWindow		中止
 *MoveMouse +20 +0	ShortcutsWindow		*MoveMouse +20 +0
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
 Left	ShortcutsSpec		左
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		キーセットファイルを解析できませんでした。
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		キーセットファイルを保存できませんでした!
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		キーセットファイルを解析できません。
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		キーセットファイルを保存できません!
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InsertString \"テキストをここに\"
-Remove selected shortcut	ShortcutsWindow		選択部を削除
+Remove selected shortcut	ShortcutsWindow		選択部の削除
 Error, NULL state description?	ShortcutsSpec		エラー、記述がありません?\n
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		キーセットファイルを開けませんでした!
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		キーセットファイルを開けません!
 Save & apply	ShortcutsWindow		保存して適用
 Open	ShortcutsWindow		開く
 Append	ShortcutsWindow		追加
 Both	ShortcutsSpec		両方
-Save KeySet as…	ShortcutsWindow		キーセットを名前を付けて保存…
-Append KeySet…	ShortcutsWindow		キーセットの追加…
+Save KeySet as…	ShortcutsWindow		キーセットを名前を付けて保存...
+Append KeySet…	ShortcutsWindow		キーセットの追加...
 *MouseButton 1	ShortcutsWindow		*MouseButton 1
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"
 Right	ShortcutsSpec		右
 OK	ShortcutsWindow		OK
-Add new shortcut	ShortcutsWindow		新規ショートカット
+Add new shortcut	ShortcutsWindow		新しいショートカット
 (None)	ShortcutsSpec		(無し)
 Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
-Open KeySet…	ShortcutsWindow		キーセットを開く…
+Open KeySet…	ShortcutsWindow		キーセットを開く...
 File	ShortcutsWindow		ファイル
 *LaunchHandler text/html	ShortcutsWindow		*LaunchHandler text/html
 *MoveMouseTo 50% 50%	ShortcutsWindow		*MoveMouseTo 50% 50%

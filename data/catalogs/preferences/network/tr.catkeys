@@ -1,8 +1,7 @@
-1	turkish	x-vnd.Haiku-Network	2923905377
+1	turkish	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Ethernet aygıtı
 Link speed:	IntefaceView		Bağlanma hızı:
 disconnected	IntefaceView		bağlantı kesildi
-IP Address:	IntefaceAddressView		IP adresi:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Ağ:
 Received:	IntefaceView		Alınan:
@@ -14,10 +13,11 @@ Gateway:	IntefaceAddressView		Ağ geçidi:
 The netmask defines your local network	IntefaceAddressView		Ağ maskesi sizin yerel ağınızı tanımlar
 Your IP address	IntefaceAddressView		IP adresiniz
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP adresi:
 Netmask:	IntefaceAddressView		Ağ maskesi:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servisler
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Ağ Durumu Masaüstü Çubuğu'na yüklenemedi: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Ağ Durumu Masaüstü Çubuğu'na kurulamadı: %s
 Revert	NetworkWindow		Eski haline döndür
 off	ServiceListItem		kapalı
 WEP	WEP protected network		WEP

@@ -23,8 +23,15 @@ struct vesa_mode {
 	uint8			bits_per_pixel;
 };
 
+enum bios_type_enum {
+	kUnknownBiosType = 0,
+	kIntelBiosType,
+	kNVidiaBiosType,
+	kAtomBiosType1,
+	kAtomBiosType2
+};
+
 struct vesa_shared_info {
-	int32			type;
 	area_id			mode_list_area;		// area containing display mode list
 	uint32			mode_count;
 	display_mode	current_mode;
@@ -40,7 +47,14 @@ struct vesa_shared_info {
 
 	edid1_info		edid_info;
 	bool			has_edid;
+	bios_type_enum	bios_type;
+	uint16			mode_table_offset;
+		// Atombios only: offset to the table of video modes in the bios, used for patching in
+		// extra video modes.
 	uint32			dpms_capabilities;
+
+	char			name[32];
+	uint32			vram_size;
 };
 
 //----------------- ioctl() interface ----------------
@@ -53,6 +67,7 @@ enum {
 	VESA_GET_DPMS_MODE,
 	VESA_SET_DPMS_MODE,
 	VESA_SET_INDEXED_COLORS,
+	VESA_SET_CUSTOM_DISPLAY_MODE,
 
 	VGA_PLANAR_BLIT,
 };

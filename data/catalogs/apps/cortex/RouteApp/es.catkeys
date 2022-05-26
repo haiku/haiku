@@ -1,0 +1,26 @@
+1	spanish; castilian	application/x-vnd.Cortex.Route	25925955
+Node '%name%' released	CortexRouteApp		Liberado el nodo '%name%'
+OK	CortexRouteApp		Aceptar
+About Cortex/Route…	CortexRouteApp		Acerca de Cortex/Route…
+File	CortexRouteApp		Archivo
+Connection '%name%' made	CortexRouteApp		Establecida la conexión '%name%'
+Save nodes…	CortexRouteApp		Guardar nodos…
+%producer% and %consumer%	CortexRouteApp		%producer% y %consumer%
+Node '%name%' created	CortexRouteApp		Creado el nodo '%name%'
+Negotiated format:	CortexRouteApp		Formato de negociación:
+Window	CortexRouteApp		Ventana
+Transport	CortexRouteApp		Transporte
+Connection broken	CortexRouteApp		Conexión rota
+Untitled group	CortexRouteApp		Grupo sin título
+Connection failed	CortexRouteApp		Conexión fallida
+Connection '%name%' broken	CortexRouteApp		Rota la conexión '%name%'
+Between:	CortexRouteApp		Entre:
+Cortex	CortexRouteApp		Cortex
+Open…	CortexRouteApp		Abrir…
+Pull palettes	CortexRouteApp		Extraer paletas
+Connection made	CortexRouteApp		Conexión establecida
+Show transport	CortexRouteApp		Mostrar transporte
+Show add-ons	CortexRouteApp		Mostrar complementos
+Quit	CortexRouteApp		Salir
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\nDerechos de autor 1999-2000 Eric Moon\nTodos los derechos reservados.\nEl equipo de Cortex:\n\nChristopher Lenz: interfaz de usuario\nEric Moon: interfaz de usuario, funcionamiento de fondo\n\nAgradecimientos:\nJohn Ashmun\nJon Watte\nDoug Wright\n<usted>\n\nAlgunos íconos usados aquí son la propiedad de\nBe, Inc. y se utilizan con su permiso.
+Tried format:	CortexRouteApp		Formato probado:

@@ -1249,6 +1249,80 @@ pm_set_type(int fd, partition_id partitionID, const char* type, disk_job_id job)
 }
 
 
+// pm_set_parameters
+status_t
+pm_set_parameters(int fd, partition_id partitionID, const char* parameters,
+	disk_job_id job)
+{
+	TRACE(("intel: pm_set_parameters\n"));
+
+	if (fd < 0)
+		return B_BAD_VALUE;
+
+	// Nothing to do if there are no parameters provided
+	if (parameters == NULL)
+		return B_OK;
+
+	PartitionWriteLocker locker(partitionID);
+	if (!locker.IsLocked())
+		return B_ERROR;
+
+	// get parent partition, child and partition map structure
+	partition_data* partition = get_parent_partition(partitionID);
+	partition_data* child = get_partition(partitionID);
+	if (partition == NULL || child == NULL)
+		return B_BAD_VALUE;
+	PartitionMap* map = (PartitionMap*)partition->content_cookie;
+	PrimaryPartition* primary = (PrimaryPartition*)child->cookie;
+	if (map ==NULL || primary == NULL)
+		return B_BAD_VALUE;
+
+	// check parameters
+	void* handle = parse_driver_settings_string(parameters);
+	if (handle == NULL)
+		return B_ERROR;
+
+	bool active = get_driver_boolean_parameter(handle, "active", false, true);
+	unload_driver_settings(handle);
+
+	// if the old type is the same, there is nothing to do
+	if (primary->Active() == active) {
+		TRACE(("intel: pm_set_parameters: no changes required.\n"));
+		return B_OK;
+	}
+
+	update_disk_device_job_progress(job, 0.0);
+
+	// set the active flags to false for other partitions
+	if (active) {
+		for (int i = 0; i < 4; i++) {
+			PrimaryPartition* partition = map->PrimaryPartitionAt(i);
+			partition->SetActive(false);
+		}
+	}
+
+	bool oldActive = primary->Active();
+	primary->SetActive(active);
+
+	// TODO: The partition is not supposed to be locked at this point!
+	PartitionMapWriter writer(fd, primary->BlockSize());
+		// TODO: disk size?
+	status_t error = writer.WriteMBR(map, false);
+	if (error != B_OK) {
+		TRACE(("intel: pm_set_parameters: Failed to rewrite MBR: %s\n",
+			strerror(error)));
+		// something went wrong - putting into previous state
+		primary->SetType(oldActive);
+		return error;
+	}
+
+	// all changes applied
+	update_disk_device_job_progress(job, 1.0);
+	partition_modified(partitionID);
+	return B_OK;
+}
+
+
 // pm_initialize
 status_t
 pm_initialize(int fd, partition_id partitionID, const char* name,
@@ -1376,7 +1450,7 @@ pm_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 		return B_ERROR;
 
 	bool active = get_driver_boolean_parameter(handle, "active", false, true);
-	delete_driver_settings(handle);
+	unload_driver_settings(handle);
 
 	// set the active flags to false
 	if (active) {
@@ -2152,10 +2226,10 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	if (buffer != NULL)
 		ptsOffset = strtoull(buffer, NULL, 10);
 	else {
-		delete_driver_settings(handle);
+		unload_driver_settings(handle);
 		return B_BAD_VALUE;
 	}
-	delete_driver_settings(handle);
+	unload_driver_settings(handle);
 
 	// check the partition location
 	if (!check_partition_location_ep(partition, offset, size, ptsOffset))

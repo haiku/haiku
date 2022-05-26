@@ -51,6 +51,8 @@ int pci_find_extcap(device_t dev, int capability, int *capreg);
 int pci_msi_count(device_t dev);
 int pci_alloc_msi(device_t dev, int *count);
 int pci_release_msi(device_t dev);
+
+int pci_msix_table_bar(device_t dev);
 int pci_msix_count(device_t dev);
 int pci_alloc_msix(device_t dev, int *count);
 

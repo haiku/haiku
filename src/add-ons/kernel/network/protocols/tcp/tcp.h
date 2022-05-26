@@ -231,6 +231,7 @@ enum {
 	TCP_HAS_WINDOW_SCALE	= 1 << 0,
 	TCP_HAS_TIMESTAMPS		= 1 << 1,
 	TCP_SACK_PERMITTED		= 1 << 2,
+	TCP_HAS_SACK			= 1 << 3,
 };
 
 struct tcp_segment_header {
@@ -239,7 +240,7 @@ struct tcp_segment_header {
 		flags(_flags),
 		window_shift(0),
 		max_segment_size(0),
-		sack_count(0),
+		sackCount(0),
 		options(0)
 	{}
 
@@ -254,8 +255,9 @@ struct tcp_segment_header {
 	uint32	timestamp_value;
 	uint32	timestamp_reply;
 
-	tcp_sack	*sacks;
-	int			sack_count;
+#define MAX_SACK_BLKS 4
+	tcp_sack	sacks[MAX_SACK_BLKS];
+	int			sackCount;
 
 	uint32	options;
 

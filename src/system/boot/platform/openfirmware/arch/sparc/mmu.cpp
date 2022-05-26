@@ -100,7 +100,7 @@ find_physical_memory_ranges(size_t &total)
 		return B_ERROR;
 	}
 
-	struct of_region<uint64, uint64> regions[64];
+	static struct of_region<uint64, uint64> regions[64];
 	int count = of_getprop(package, "reg", regions, sizeof(regions));
 	if (count == OF_FAILED)
 		count = of_getprop(sMemoryInstance, "reg", regions, sizeof(regions));
@@ -185,7 +185,7 @@ find_allocated_ranges(void **_exceptionHandlers)
 	// we have proper driver support for the target hardware).
 	intptr_t mmu = of_instance_to_package(sMmuInstance);
 
-	struct translation_map {
+	static struct translation_map {
 		void *PhysicalAddress() {
 			int64_t p = data;
 #if 0
@@ -299,8 +299,7 @@ find_physical_memory_range(size_t size)
 static void *
 find_free_physical_range(size_t size)
 {
-	// just do a simple linear search at the end of the allocated
-	// ranges (dumb memory allocation)
+	// If nothing is allocated, just return the first address in RAM
 	if (gKernelArgs.num_physical_allocated_ranges == 0) {
 		if (gKernelArgs.num_physical_memory_ranges == 0)
 			return PHYSINVAL;
@@ -308,6 +307,7 @@ find_free_physical_range(size_t size)
 		return find_physical_memory_range(size);
 	}
 
+	// Try to find space after an already allocated range
 	for (uint32 i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
 		void *address
 			= (void *)(addr_t)(gKernelArgs.physical_allocated_range[i].start
@@ -317,6 +317,20 @@ find_free_physical_range(size_t size)
 			return address;
 		}
 	}
+
+	// Check if there is enough space at the start of one of the physical ranges
+	// (that memory isn't after an already allocated range so it wouldn't be
+	// found by the method above for ranges where there isn't already an initial
+	// allocation at the start)
+	for (uint32 i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
+		void *address = (void *)gKernelArgs.physical_memory_range[i].start;
+		if (gKernelArgs.physical_memory_range[i].size > size
+			&& !is_physical_allocated(address, size)) {
+			return address;
+		}
+	}
+
+	// We're really out of memory
 	return PHYSINVAL;
 }
 

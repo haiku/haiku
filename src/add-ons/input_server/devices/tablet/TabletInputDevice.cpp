@@ -327,6 +327,10 @@ TabletDevice::_ControlThread()
 		if (movements.has_contact) {
 			// Send single messages for each event
 
+			movements.buttons |= (movements.switches & B_TIP_SWITCH);
+			movements.buttons |= (movements.switches & B_BARREL_SWITCH) >> 1;
+			bool eraser = (movements.switches & B_ERASER) != 0;
+
 			uint32 buttons = lastButtons ^ movements.buttons;
 			if (buttons != 0) {
 				bool pressedButton = (buttons & movements.buttons) > 0;
@@ -355,7 +359,8 @@ TabletDevice::_ControlThread()
 					message->AddFloat("be:tablet_x", movements.xpos);
 					message->AddFloat("be:tablet_y", movements.ypos);
 					message->AddFloat("be:tablet_pressure", movements.pressure);
-					message->AddInt32("be:tablet_eraser", movements.eraser);
+					message->AddInt32("be:tablet_eraser", eraser);
+
 					if (movements.tilt_x != 0.0 || movements.tilt_y != 0.0) {
 						message->AddFloat("be:tablet_tilt_x", movements.tilt_x);
 						message->AddFloat("be:tablet_tilt_y", movements.tilt_y);

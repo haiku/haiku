@@ -1,66 +1,51 @@
 /*
  * Copyright 2007-2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2021, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Tri-Edge AI <triedgeai@gmail.com>
  */
 
 
 #include <ConnectionIncoming.h>
+#include <ConnectionView.h>
 
+namespace Bluetooth
+{
 
-#define B_PULSES_BY_SECOND(x) (2*x)
-
-
-namespace Bluetooth {
-
-
-ConnectionView::ConnectionView(BRect frame, const char *name)
+ConnectionIncoming::ConnectionIncoming(bdaddr_t address)
 	:
-	BView(BRect(0, 0, 400, 400), "MyViewName", B_FOLLOW_LEFT | B_FOLLOW_TOP,
-		B_WILL_DRAW | B_PULSE_NEEDED)
+	BWindow(BRect(600, 100, 1000, 180), "Incoming Connection..",
+		B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+			B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
+					// 400x80
 {
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetPulseRate(1 * 1000 * 1000);
+		// 1 second
+	fView = new ConnectionView(BRect(0, 0, 400, 80), "<unknown_device>",
+		bdaddrUtils::ToString(address));
+	AddChild(fView);
 }
-
-
-ConnectionView::~ConnectionView()
-{
-}
-
-
-void ConnectionView::MessageReceived(BMessage *message)
-{
-}
-
-
-void ConnectionView::Draw(BRect update)
-{
-}
-
-
-void ConnectionView::Pulse()
-{
-	static int a = 0;
-	
-	if (a++ == B_PULSES_BY_SECOND(5)) {
-		// BUG: for some reason the window is not being removed...
-		Window()->PostMessage(B_QUIT_REQUESTED);
-		Window()->Quit();
-	}
-}
-
-
-//#pragma mark -
 
 
 ConnectionIncoming::ConnectionIncoming(RemoteDevice* rDevice)
 	:
-	BWindow(BRect(700, 100, 900, 150), "Connection completed",
+	BWindow(BRect(600, 100, 1000, 180), "Incoming Connection",
 		B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
-	_ConnectionView = new ConnectionView(BRect(0, 0, 400, 400),"mViewName");
+	SetPulseRate(1 * 1000 * 1000);
+		// 1 second
 
-	AddChild(_ConnectionView);
+	if (rDevice != NULL)
+		fView = new ConnectionView(BRect(0, 0, 400, 80), rDevice->GetFriendlyName(),
+					bdaddrUtils::ToString(rDevice->GetBluetoothAddress()));
+	else
+		fView = new ConnectionView(BRect(0, 0, 400, 80), "<unknown_device>",
+					bdaddrUtils::ToString(bdaddrUtils::NullAddress()));
+
+	AddChild(fView);
 }
 
 
@@ -69,12 +54,14 @@ ConnectionIncoming::~ConnectionIncoming()
 }
 
 
-void ConnectionIncoming::MessageReceived(BMessage *message)
+void
+ConnectionIncoming::MessageReceived(BMessage* message)
 {
 }
 
 
-bool ConnectionIncoming::QuitRequested()
+bool
+ConnectionIncoming::QuitRequested()
 {
 	return BWindow::QuitRequested();
 }

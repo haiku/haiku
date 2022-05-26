@@ -79,6 +79,9 @@ uint32 gTimeConversionFactor;
 	// if the TSC just isn't stable and we can't get our desired error range.
 
 
+#ifdef __SIZEOF_INT128__
+typedef unsigned __int128 uint128;
+#else
 struct uint128 {
 	uint128(uint64 low, uint64 high = 0)
 		:
@@ -178,6 +181,7 @@ private:
 	uint64	low;
 	uint64	high;
 };
+#endif
 
 
 static inline void
@@ -350,11 +354,10 @@ ucode_load(BootVolume& volume)
 	}
 
 	ssize_t length = stat.st_size;
-	const uint32 alignment = 16;
-#define ALIGN(size, align)	(((size) + align - 1) & ~(align - 1))
-	void *buffer = kernel_args_malloc(length + alignment - 1);
+
+	// 16-byte alignment required
+	void *buffer = kernel_args_malloc(length, 16);
 	if (buffer != NULL) {
-		buffer = (void*)ALIGN((addr_t)buffer, alignment);
 		if (read(fd, buffer, length) != length) {
 			dprintf("ucode_load: couldn't read microcode file\n");
 			kernel_args_free(buffer);

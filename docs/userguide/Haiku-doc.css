@@ -221,7 +221,9 @@ table.index {
 	border-width: 1px;
 	border-style: dotted;
 	border-color: #e0e0e0;
-	float:right;
+	float: right;
+	position: relative;
+	z-index: 10;
 }
 table.index tr.heading {
 	background-color: #e0e0e0;

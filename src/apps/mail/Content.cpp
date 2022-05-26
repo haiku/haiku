@@ -1371,7 +1371,7 @@ TTextView::MessageReceived(BMessage *msg)
 		case B_INPUT_METHOD_EVENT:
 		{
 			int32 im_op;
-			if (msg->FindInt32("be:opcode", &im_op) == B_OK){
+			if (msg->FindInt32("be:opcode", &im_op) == B_OK) {
 				switch (im_op) {
 					case B_INPUT_METHOD_STARTED:
 						fInputMethodUndoState.replace = true;
@@ -1382,7 +1382,7 @@ TTextView::MessageReceived(BMessage *msg)
 						if (fInputMethodUndoBuffer.CountItems() > 0) {
 							KUndoItem *undo = fInputMethodUndoBuffer.ItemAt(
 								fInputMethodUndoBuffer.CountItems() - 1);
-							if (undo->History == K_INSERTED){
+							if (undo->History == K_INSERTED) {
 								fUndoBuffer.MakeNewUndoItem();
 								fUndoBuffer.AddUndo(undo->RedoText, undo->Length,
 									undo->Offset, undo->History, undo->CursorPos);
@@ -3047,7 +3047,7 @@ TTextView::WindowActivated(bool flag)
 		// WindowActivated(false) は、IM も Inactive になり、そのまま確定される。
 		// しかしこの場合、input_server が B_INPUT_METHOD_EVENT(B_INPUT_METHOD_STOPPED)
 		// を送ってこないまま矛盾してしまうので、やむを得ずここでつじつまあわせ処理している。
-		// OpenBeOSで修正されることを願って暫定処置としている。
+		// Haikuで修正されることを願って暫定処置としている。
 		fInputMethodUndoState.active = false;
 		// fInputMethodUndoBufferに溜まっている最後のデータがK_INSERTEDなら（確定）正規のバッファへ追加
 		if (fInputMethodUndoBuffer.CountItems() > 0) {

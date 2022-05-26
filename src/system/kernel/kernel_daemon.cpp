@@ -122,15 +122,7 @@ KernelDaemon::Unregister(daemon_hook function, void* arg)
 				// wait if it's busy
 				while (daemon->executing) {
 					fUnregisterWaiters++;
-
-					ConditionVariableEntry entry;
-					fUnregisterCondition.Add(&entry);
-
-					locker.Unlock();
-
-					entry.Wait();
-
-					locker.Lock();
+					fUnregisterCondition.Wait(locker.Get());
 				}
 			}
 

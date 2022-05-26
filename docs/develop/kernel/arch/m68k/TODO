@@ -1,3 +1,0 @@
-- optimization: remove M68KPagingStructures[*]::UpdateAllPageDirs() and just allocate all the kernel page root entries at boot and be done with it. It's not very big anyway.
-- possibly other optimizations in the VM code due to not supporting SMP?
-

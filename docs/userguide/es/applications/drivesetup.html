@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  *		Kacper Kasper <kacperkasper@gmail.com>
  * Translators:
+ *		'
  *		CapitanPico
  *
 -->
@@ -24,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guía del usuario</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +36,7 @@
 <li><a href="../../ca/applications/drivesetup.html">Català</a></li>
 <li><a href="../../de/applications/drivesetup.html">Deutsch</a></li>
 <li><a href="../../en/applications/drivesetup.html">English</a></li>
+<li><a href="../../eo/applications/drivesetup.html">Esperanto</a></li>
 <li><a href="../../fr/applications/drivesetup.html">Français</a></li>
 <li><a href="../../fur/applications/drivesetup.html">Furlan</a></li>
 <li><a href="../../it/applications/drivesetup.html">Italiano</a></li>
@@ -61,49 +63,48 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/drivesetup-icon_64.png" alt="drivesetup-icon_64.png" width="64" height="64" />DriveSetup</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
+<tr><td>Barra de escritorio:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Ubicación:</td><td></td><td><span class="path">/boot/system/apps/DriveSetup</span></td></tr>
-<tr><td>Configuración:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
+<tr><td>Configuraciones:</td><td></td><td><span class="path">~/config/settings/DriveSetup</span></td></tr>
 </table>
 <p><br /></p>
-<p>DriveSetup is a tool to create, delete and format partitions. At this time it can't resize or move existing partitions, so that you'll either need an unpartitioned volume (perhaps an external USB drive or another harddisk) or do the initial setup with a tool like the <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a> to provide the space for another partition.</p>
+<p>DriveSetup es una herramienta para crear, borrar y formatear particiones. Por ahora no puede redimensionar ni mover particiones existentes, así que para hacer espacio para otra partición será necesario contar con un volumen sin particionar (tal vez un disco externo USB u otro disco duro) o si no, realizar la configuración inicial con una herramienta como <a href="http://gparted.sourceforge.net/livecd.php">GParted LiveCD</a>.</p>
 <img src="../images/apps-images/drivesetup.png" alt="drivesetup.png" />
-<p>At the top is a graphical representation of all partitions inside the device chosen in the list below it. Each device, by default, can hold a maximum of 4 <i>primary</i> partitions. This limit can be removed by making one of those an <i>extended</i> partition, which in turn can hold theoretically an unlimited number of <i>logical</i> partitions (practical limitations depend on, for example, other OSes installed).<br />
-You may have to expand such a list with the +/- widget that appears in that case in front of that device to see the details of every logical partition.</p>
-<p>Colors and icons provide some more information about the available volumes and partitions.<br />
-Besides the familiar icons for harddisks, CD drives and USB sticks etc., there are a few that indicate a their mount mode:</p>
+<p>En la zona superior se muestra una repesentación gráfica de todas las particiones existentes dentro del dispositivo elegido de la lista de abajo. De forma predeterminada, cada dispositivo puede poseer un máximo de 4 particiones <i>primarias</i>. Este límite se puede evitar haciendo que una de estas sea una partición <i>extendida</i>, que a su vez puede alojar un número ilimitado de particiones <i>lógicas</i> (el límite práctico depende de, por ejemplo, otros sistemas operativos instalados).<br />
+Es posible extender la lista con el control +/- que en ese caso aparece frente al dispositivo en cuestión para visualizar los detalles de cada partición lógica.</p>
+<p>Los colores e íconos ofrecen un poco más de información sobre los volúmenes y particiones disponibles.<br />
+Además de los ya conocidos íconos para discos duros, unidades de CD y unidades USB, etc., hay otros que indica su modo de montaje:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">
 <tr><td><img src="../../images/apps-images/drivesetup-icon_boot.png" alt="drivesetup-icon_boot.png" width="16" height="16" /></td><td style="width:10px;"> </td>
-<td>The /boot partition</td></tr>
+<td>La partición de /boot</td></tr>
 <tr><td><img src="../../images/apps-images/drivesetup-icon_encrypted.png" alt="drivesetup-icon_encrypted.png" width="16" height="16" /></td><td> </td>
-<td>An encrypted partition</td></tr>
+<td>Una partición cifrada</td></tr>
 <tr><td><img src="../../images/apps-images/drivesetup-icon_shared.png" alt="drivesetup-icon_shared.png" width="16" height="16" /></td><td> </td>
-<td>A partition shared through SMB/NFS etc.</td></tr>
+<td>Una partición compartida mediante SMB, NFS, etc.</td></tr>
 <tr><td><img src="../../images/apps-images/drivesetup-icon_read-only.png" alt="drivesetup-icon_read-only.png" width="16" height="16" /></td><td> </td>
-<td>A partition that was mounted read-only</td></tr>
+<td>Una partición montada como de sólo lectura</td></tr>
 <tr><td><img src="../../images/apps-images/drivesetup-icon_virtual.png" alt="drivesetup-icon_virtual.png" width="16" height="16" /></td><td> </td>
-<td>A mounted image file (see also the <a href="./cli-apps.html">diskimage command</a>)</td></tr>
+<td>Un archivo de imagen montado (véase también el <a href="./cli-apps.html">comando diskimage</a>)</td></tr>
 </table>
-<p>When mounted, a colored bar shows the used space of a partition. The color depends on the kind of partition:</p>
+<p>Al ser montada, una barra de color mostrará el espacio usado de la partición. El color depende del tipo de partición:</p>
 <table summary="layout" border="0" cellspacing="2" cellpadding="4">
-<tr><td style="background-color:#BEFFBE" width="20"></td><td width="3"></td><td>A BFS formatted partition</td></tr>
-<tr><td style="background-color:#ACACFF"></td><td></td><td>A non-BFS formatted partition</td></tr>
-<tr><td style="background-color:#FFACAC"></td><td></td><td>A read-only partition</td></tr>
-<tr><td style="background-image: repeating-linear-gradient(135deg, #E0E000 1%, #C0C0C0 15%)"></td><td></td><td>An encrypted partition</td></tr>
+<tr><td style="background-color:#BEFFBE" width="20"></td><td width="3"></td><td>Una partición con formato BFS</td></tr>
+<tr><td style="background-color:#ACACFF"></td><td></td><td>Una partición con formato distinto a BFS</td></tr>
+<tr><td style="background-color:#FFACAC"></td><td></td><td>Una partición de sólo lectura</td></tr>
+<tr><td style="background-image: repeating-linear-gradient(135deg, #E0E000 1%, #C0C0C0 15%)"></td><td></td><td>Una partición cifrada</td></tr>
 </table>
-<p>You can select a partition and choose various commands from the context or <span class="menu">Partition</span> menu, like <span class="menu">Mount</span>/<span class="menu">Unmount</span>, or to <span class="menu">Open in DiskProbe</span>.</p>
-<p>You can also <span class="menu">Format</span> or completely <span class="menu">Delete</span> a partition.</p>
-<div class="box-stop">Dealing with creating/deleting/formatting partitions is very dangerous business. Always check twice to be sure you're working with the right one and always keep an up-to-date backup of your data in case something goes wrong!</div>
+<p>Se puede seleccionar una partición de la lista y realizar varias operaciones desde el menú contextual o desde el menú <span class="menu">Partición</span>, como <span class="menu">Montar</span>, <span class="menu">Desmontar</span>, o <span class="menu">Abrir en Examinador de disco</span>.</p>
+<p>También se puede formatear una partición con la opción <span class="menu">Formato</span> o borrarla definitivamente con la opción <span class="menu">Eliminar</span>.</p>
+<div class="box-stop">Realizar operaciones de creación, borrado o formato de particiones es una tarea sumamente peligrosa. Asegúrese siempre varias veces de que está trabajando con la partición deseada y siempre mantenga una copia de seguridad actualizada de sus datos en caso de que algo salga mal.</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="initializing" name="initializing">Initializing a disk</a></h2>
-<p>If you don't plan to use just one of the partitions of a larger disk, but the entire drive as one partition, e.g. a USB stick or a Compact Flash card, you'll have to initialize the disk first.</p>
-<p>You do this by selecting the raw disk from list of devices and choose a partition map from the <span class="menu">Disk | Initialize</span> menu. The <span class="menu">Intel Partition Map</span> is the right choice for classical booting via a BIOS.</p>
-<div class="box-stop">Initializing will destroy all data on the drive!</div>
+<a id="initializing" name="initializing">Inicializar un disco</a></h2>
+<p>Si no planea usar una partición de un disco más extenso sino toda la unidad como una sola partición, por ejemplo el caso de un disco USB o una tarjeta de Compact Flash, primero deberá inicializar el disco.</p>
+<p>Podrá realizar esto seleccionando el disco sin formato desde la lista de dispositivos y elegir el tipo de mapa de particiones desde el menú <span class="menu">Disco | Inicializar</span>. La opción <span class="menu">Mapa de particiones Intel</span> es la más adecuada para arrancar de forma clásica desde un sistema con BIOS.</p>
+<div class="box-stop">Inicializar un disco eliminará todos los datos contenidos en él.</div>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="creating" name="creating">Creación de una nueva partición</a></h2>
@@ -111,16 +112,16 @@ Besides the familiar icons for harddisks, CD drives and USB sticks etc., there a
 <img src="../images/apps-images/drivesetup-create.png" alt="drivesetup-create.png" />
 <p>Este cuadro de diálogo permite ajustar el tamaño y el tipo de la partición. Seleccione <span class="menu">Be File System</span> 
 Si se desea usar la partición para una instalación de Haiku o si se quieren usar sobre ella todas las características interesantes de Haiku, como atributos y consultas. Tenga en cuenta que otros sistemas operativos a lo mejor no son capaces de acceder a tal partición.</p>
-<p>The <span class="menu">Active partition</span> checkbox is only available if you have created a primary partition instead of just another logical partition within an extended one. You'll have to tick that checkbox if you plan to use that partition to boot a Haiku installation.</p>
-<p>Before you can use, or even mount the newly created partition, it has to be formatted with a filesystem.</p>
+<p>Si crea una partición primaria en vez de una partición lógica dentro de una extendida, aparecerá la opción <span class="menu">Partición activa</span>. Deberá activar esta casilla de verificación si pretende usar la partición como unidad de arranque de una instalación de Haiku.</p>
+<p>Antes de que se pueda usar, o incluso montar la nueva partición, debe ser formateada con un sistema de archivos.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="initializing" name="formatting">Formatting a partition</a></h2>
-<p>Only unmounted partitions can be formatted by choosing a filesystem from the sub-menu of <span class="menu">Partition | Format</span>. The <span class="menu">Be File System</span> (BFS) is mandatory for a Haiku boot partition and recommended for data partitions to be used with Haiku. Only BFS formatted partitions can be queried and fully support Haiku's file attributes.</p>
+<a id="initializing" name="formatting">Formatear una partición</a></h2>
+<p>Las particiones sólo se pueden formatear si están desmontadas, a través del menú <span class="menu">Partición | Formato</span>. El obligatorio el uso de <span class="menu">Be File System</span> (BFS) para la partición de arranque de Haiku y también es la opción recomendada para particiones de datos a utilizar con Haiku. Únicamente tienen soporte para consultas y contener atributos de archivo de Haiku las particiones formateadas con BFS.</p>
 <img src="../images/apps-images/drivesetup-initialize.png" alt="drivesetup-initialize.png" />
 <p>Aquí se selecciona el nombre para la partición y el tamaño de sus bloques de datos. Se recomiendan 2048 bytes por bloque, pero es posible escoger un tamaño inferior o superior si es necesario por alguna razón concreta.<br />
 ¡La Inicialización eliminará todos los datos de la partición!</p>
-<div class="box-stop">Formatting will destroy all data on the partition!</div>
+<div class="box-stop">Formatear una partición eliminará todos sus contenidos.</div>
 </div>
 </div>
 

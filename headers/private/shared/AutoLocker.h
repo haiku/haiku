@@ -26,6 +26,21 @@ public:
 	}
 };
 
+// AutoLockerHandlerLocking
+template<typename Lockable>
+class AutoLockerHandlerLocking {
+public:
+	inline bool Lock(Lockable* lockable)
+	{
+		return lockable->LockLooper();
+	}
+
+	inline void Unlock(Lockable* lockable)
+	{
+		lockable->UnlockLooper();
+	}
+};
+
 // AutoLockerReadLocking
 template<typename Lockable>
 class AutoLockerReadLocking {
@@ -140,10 +155,17 @@ public:
 		}
 	}
 
-	inline void Detach()
+	inline Lockable* Get()
 	{
+		return fLockable;
+	}
+
+	inline Lockable* Detach()
+	{
+		Lockable* res = fLockable;
 		fLockable = NULL;
 		fLocked = false;
+		return res;
 	}
 
 	inline AutoLocker<Lockable, Locking>& operator=(Lockable* lockable)
@@ -172,6 +194,7 @@ protected:
 }	// namespace BPrivate
 
 using ::BPrivate::AutoLocker;
+using ::BPrivate::AutoLockerHandlerLocking;
 using ::BPrivate::AutoLockerReadLocking;
 using ::BPrivate::AutoLockerWriteLocking;
 

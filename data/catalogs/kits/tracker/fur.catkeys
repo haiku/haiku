@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	3669766136
+1	friulian	x-vnd.Haiku-libtracker	2915475646
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -6,6 +6,7 @@ Kind	ContainerWindow		Gjenar
 Open with…	ContainerWindow		Vierç cun…
 Error moving \"%name\" to Trash. (%error)	FSUtils		Erôr tal spostâ \"%name\" te Scovacere. (%error)
 Or	FindPanel		O
+MIME Description	AttributesView		Descrizion MIME
 before	FindPanel		prime
 Volume icons	TrackerSettingsWindow		Iconis volums
 Ignore case	SelectionWindow		Ignore maiusculis/minusculis
@@ -84,6 +85,7 @@ GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Met a puest
 Modified	FindPanel		Modificât
 Select all	QueryContainerWindow		Selezione dutis
+Generate image thumbnails	SettingsView		Gjenere miniaturis di imagjins
 Select…	FilePanelPriv		Selezione…
 preferences	B_PREFERENCES_DIRECTORY		preferencis
 Name	Person Query Columns		Non
@@ -270,6 +272,7 @@ home	B_USER_DIRECTORY		home
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Gnûfs Modei Tracker
 Disk mounting during boot	AutoMounterSettings		Montaç discs dilunc l'inviament
 Don't automount	AutoMounterSettings		No sta montâ in automatic
+Node ref	AttributesView		Rif grop
 Could not find application \"%appname\"	OpenWithWindow		Nol è stât pussibil cjatâ la aplicazion \"%appname\"
 Unmatched parenthesis.	libtracker		Parentesis no imbinadis.
 Extended attribute	AttributesView		Atribût estês
@@ -328,6 +331,7 @@ Recent folders	FavoritesMenu		Cartelis resintis
 Signed memory size	AttributesView		Dimension memorie cun segn
 The specified name is illegal. Please choose another name.	FilePanelPriv		Il non specificât al è illegâl. Par plasê, sielç un altri non.
 of %items	StatusWindow		di %items
+MIME Path	AttributesView		Percors MIME
 less than	FindPanel		mancul di
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erôr tal copiâ il file \"%name\":\n\t%error\n\nContinuâ?
 Creating links: 	StatusWindow		Creazion colegaments: 
@@ -442,6 +446,7 @@ Sorry, saving more than one item is not allowed.	FilePanelPriv		Mi displâs, sal
 Move here	ContainerWindow		Sposte chi
 the config folder	FSUtils		la cartele di configurazion
 Sorry, could not create a new folder.	FSUtils		Nol è stât pussibil creâ une gnove cartele
+MIME Signature	AttributesView		Firme MIME
 Select all	VirtualDirectoryWindow		Selezione dut
 Rename	FSUtils	button label	Cambie non
 Clean up all	ContainerWindow		Met a puest dut
@@ -520,6 +525,7 @@ Create a Query	FindPanel		Cree une interogazion
 Close	QueryContainerWindow		Siere
 I know what I'm doing	FSUtils	button label	O sai ce che o fâs
 Preparing to copy items…	StatusWindow		Daûr a prontâ la copie dai elements…
+Entry ref	AttributesView		Rif vôs
 Icon view	ContainerWindow		Viodude a iconis
 Name	ContainerWindow		Non
 Preferred for %type	OpenWithWindow		Preferît par %type

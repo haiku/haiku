@@ -1,6 +1,6 @@
 /* program the DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003-10/2009
+   Rudolf Cornelissen 12/2003-5/2021
 */
 
 #define MODULE_BIT 0x00010000
@@ -329,7 +329,7 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 	display_mode target, float* calc_pclk, uint8* m_result, uint8* n_result,
 	uint8* p_result, uint8 test)
 {
-	int m = 0, n = 0, p = 0/*, m_max*/;
+	int m = 0, n = 0, p = 0, m_min = 7, p_max = 0x10;
 	float error, error_best = INFINITY;
 	int best[3] = {0, 0, 0};
 	float f_vco, max_pclk;
@@ -358,17 +358,22 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 			max_pclk = si->ps.max_dac1_clock_32;
 			break;
 	}
+	/* update PLL divider specs for C51 chipset */
+	if ((CFGR(DEVID) & 0xfff0ffff) == 0x024010de) {
+		m_min = 4;
+		p_max = 0x20;
+	}
 	/* if some dualhead mode is active, an extra restriction might apply */
 	if ((target.flags & DUALHEAD_BITS) && (target.space == B_RGB32_LITTLE))
 		max_pclk = si->ps.max_dac1_clock_32dh;
 
 	/* Make sure the requested pixelclock is within the PLL's operational limits */
 	/* lower limit is min_pixel_vco divided by highest postscaler-factor */
-	if (req_pclk < (si->ps.min_pixel_vco / 16.0))
+	if (req_pclk < (si->ps.min_pixel_vco / p_max))
 	{
 		LOG(4,("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
-										req_pclk, (float)(si->ps.min_pixel_vco / 16.0)));
-		req_pclk = (si->ps.min_pixel_vco / 16.0);
+										req_pclk, (float)(si->ps.min_pixel_vco / p_max)));
+		req_pclk = (si->ps.min_pixel_vco / p_max);
 	}
 	/* upper limit is given by pins in combination with current active mode */
 	if (req_pclk > max_pclk)
@@ -379,7 +384,7 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 	}
 
 	/* iterate through all valid PLL postscaler settings */
-	for (p=0x01; p < 0x20; p = p<<1)
+	for (p=0x01; p <= p_max; p = p<<1)
 	{
 		/* calculate the needed VCO frequency for this postscaler setting */
 		f_vco = req_pclk * p;
@@ -391,17 +396,19 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 			if (si->ps.ext_pll) f_vco /= 4;
 
 			/* iterate trough all valid reference-frequency postscaler settings */
-			for (m = 7; m <= 14; m++)
+			for (m = m_min; m <= 14; m++)
 			{
 				/* check if phase-discriminator will be within operational limits */
 				//fixme: PLL calcs will be resetup/splitup/updated...
-				if (si->ps.card_type == NV36)
-				{
+				if (si->ps.card_type == NV36) {
 					if (((si->ps.f_ref / m) < 3.2) || ((si->ps.f_ref / m) > 6.4)) continue;
-				}
-				else
-				{
-					if (((si->ps.f_ref / m) < 1.0) || ((si->ps.f_ref / m) > 2.0)) continue;
+				} else {
+					if ((CFGR(DEVID) & 0xfff0ffff) == 0x024010de) {
+						/* C51 chipset */
+						if (((si->ps.f_ref / m) < 1.7) || ((si->ps.f_ref / m) > 6.4)) continue;
+					} else {
+						if (((si->ps.f_ref / m) < 1.0) || ((si->ps.f_ref / m) > 2.0)) continue;
+					}
 				}
 
 				/* calculate VCO postscaler setting for current setup.. */
@@ -463,6 +470,9 @@ static status_t nv4_nv10_nv20_dac_pix_pll_find(
 		break;
 	case 16:
 		p = 0x04;
+		break;
+	case 32:
+		p = 0x05;
 		break;
 	}
 	*p_result = p;

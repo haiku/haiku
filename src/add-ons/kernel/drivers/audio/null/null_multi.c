@@ -344,7 +344,10 @@ buffer_force_stop(device_t* device)
 {
 	dprintf("null_audio: %s\n" , __func__ );
 
-	if (device && device->running)
+	if (device == NULL)
+		return B_ERROR;
+
+	if (device->running)
 		null_stop_hardware(device);
 
 	delete_area(device->playback_stream.buffer_area);

@@ -40,8 +40,15 @@
 // NodeManager
 #include "Connection.h"
 
+// Locale Kit
+#undef B_CATALOG
+#define B_CATALOG (&sCatalog)
+#include <Catalog.h>
 // MediaKit
 #include <MediaDefs.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "InfoView"
 
 __USE_CORTEX_NAMESPACE
 
@@ -49,19 +56,21 @@ __USE_CORTEX_NAMESPACE
 #define D_METHOD(x) //PRINT (x)
 #define D_MESSAGE(x) //PRINT (x)
 
+static BCatalog sCatalog("x-vnd.Cortex.InfoView");
+
 // -------------------------------------------------------- //
 // *** ctor/dtor (public)
 // -------------------------------------------------------- //
 
 ConnectionInfoView::ConnectionInfoView(
 	const Connection &connection)
-	: InfoView("Connection", "", 0),
+	: InfoView(B_TRANSLATE("Connection"), "", 0),
 	  m_source(connection.source()),
 	  m_destination(connection.destination())
 {
 	D_METHOD(("ConnectionInfoView::ConnectionInfoView()\n"));
 
-	setSideBarWidth(be_plain_font->StringWidth(" Destination ")
+	setSideBarWidth(be_plain_font->StringWidth(B_TRANSLATE("Destination"))
 					+ 2 * InfoView::M_H_MARGIN);
 	media_input input;
 	media_output output;
@@ -72,7 +81,7 @@ ConnectionInfoView::ConnectionInfoView(
 		if (s.Length() > 0)
 			s << " ";
 		s << "(" << MediaString::getStringFor(output.source) << ")";
-		addField("Source", s);
+		addField(B_TRANSLATE("Source"), s);
 	}
 	if (connection.getInput(&input) == B_OK) {
 		// add "Destination" field
@@ -81,14 +90,15 @@ ConnectionInfoView::ConnectionInfoView(
 		if (s.Length() > 0)
 			s << " ";
 		s << "(" << MediaString::getStringFor(input.destination) << ")";
-		addField("Destination", s);
+		addField(B_TRANSLATE("Destination"), s);
 	}
 
 	// add a separator field
 	addField("", "");
 
 	// add "Media Type" field
-	addField("Media Type", MediaString::getStringFor(connection.format().type));
+	addField(B_TRANSLATE("Media type"),
+		MediaString::getStringFor(connection.format().type));
 
 	// add the format fields
 	_addFormatFields(connection.format());
@@ -110,111 +120,116 @@ void ConnectionInfoView::_addFormatFields(
 	switch (format.type) {
 		case B_MEDIA_RAW_AUDIO: {
 			// adjust view properties
-			setSideBarWidth(be_plain_font->StringWidth(" Sample Rate ") + 2 * InfoView::M_H_MARGIN);
+			setSideBarWidth(be_plain_font->StringWidth(
+				B_TRANSLATE("Sample rate")) + 2 * InfoView::M_H_MARGIN);
 			BString s;
 			// add "Format" field
 			s = MediaString::forAudioFormat(format.u.raw_audio.format,
 											format.u.raw_audio.valid_bits);
-			addField("Format", s);
+			addField(B_TRANSLATE("Format"), s);
 			// add "Sample Rate" field
 			s = MediaString::forAudioFrameRate(format.u.raw_audio.frame_rate);
-			addField("Sample Rate", s);
+			addField(B_TRANSLATE("Sample rate"), s);
 			// add "Channels" field
 			s = MediaString::forAudioChannelCount(format.u.raw_audio.channel_count);
-			addField("Channels", s);
+			addField(B_TRANSLATE("Channels"), s);
 			// add "Channel Mask" field
 			s = MediaString::forAudioChannelMask(format.u.raw_audio.channel_mask);
-			addField("Channel Mask", s);
+			addField(B_TRANSLATE("Channel mask"), s);
 			// add "Matrix Mask" field
 			s = MediaString::forAudioMatrixMask(format.u.raw_audio.matrix_mask);
-			addField("Matrix Mask", s);
+			addField(B_TRANSLATE("Matrix mask"), s);
 			// add the "Byte Order" field
 			s = MediaString::forAudioByteOrder(format.u.raw_audio.byte_order);
-			addField("Byte Order", s);
+			addField(B_TRANSLATE("Byte order"), s);
 			// add the "Buffer Size" field
 			s = MediaString::forAudioBufferSize(format.u.raw_audio.buffer_size);
-			addField("Buffer Size", s);
+			addField(B_TRANSLATE("Buffer size"), s);
 			break;
 		}
 		case B_MEDIA_RAW_VIDEO: {
 			// adjust view properties
-			setSideBarWidth(be_plain_font->StringWidth(" Video Data Between ") + 2 * InfoView::M_H_MARGIN);
+			setSideBarWidth(be_plain_font->StringWidth(
+				B_TRANSLATE("Video data between")) + 2 * InfoView::M_H_MARGIN);
 			BString s;
 			// add the "Format" field
 			s = MediaString::forVideoFormat(format.u.raw_video.display.format);
-			addField("Format", s);
+			addField(B_TRANSLATE("Format"), s);
 			// add the "Resolution" field
 			s = MediaString::forVideoResolution(format.u.raw_video.display.line_width,
 												format.u.raw_video.display.line_count);
-			addField("Resolution", s);
+			addField(B_TRANSLATE("Resolution"), s);
 			// add the "Field Rate" field
 			s = MediaString::forVideoFieldRate(format.u.raw_video.field_rate,
 											   format.u.raw_video.interlace);
-			addField("Field Rate", s);
+			addField(B_TRANSLATE("Field rate"), s);
 			// add the "Orientation" field
 			s = MediaString::forVideoOrientation(format.u.raw_video.orientation);
-			addField("Orientation", s);
+			addField(B_TRANSLATE("Orientation"), s);
 			// add the "Aspect Ratio" field
 			s = MediaString::forVideoAspectRatio(format.u.raw_video.pixel_width_aspect,
 												 format.u.raw_video.pixel_height_aspect);
-			addField("Aspect Ratio", s);
+			addField(B_TRANSLATE("Aspect ratio"), s);
 			// add the "Active Lines" field
 			s = MediaString::forVideoActiveLines(format.u.raw_video.first_active,
 												 format.u.raw_video.last_active);
-			addField("Active Lines", s);
+			addField(B_TRANSLATE("Active lines"), s);
 			// add the "Offset" field
 			s = MediaString::forVideoOffset(format.u.raw_video.display.pixel_offset,
 											format.u.raw_video.display.line_offset);			
-			addField("Offset", s);
+			addField(B_TRANSLATE("Offset"), s);
 			break;
 		}
 		case B_MEDIA_ENCODED_AUDIO: {
 			// adjust view properties
-			setSideBarWidth(be_plain_font->StringWidth(" Frame Size ") + 2 * InfoView::M_H_MARGIN);
+			setSideBarWidth(be_plain_font->StringWidth(
+				B_TRANSLATE("Frame size")) + 2 * InfoView::M_H_MARGIN);
 			BString s;
 			// add the "Bit Rate" field
 			s = MediaString::forAudioBitRate(format.u.encoded_audio.bit_rate);
-			addField("Bit Rate", s);
+			addField(B_TRANSLATE("Bit rate"), s);
 			// add the "Frame Size" field
 			s = MediaString::forAudioFrameSize(format.u.encoded_audio.frame_size);
-			addField("Frame Size", s);
+			addField(B_TRANSLATE("Frame size"), s);
 			break;
 		}
 		case B_MEDIA_ENCODED_VIDEO: {
 			// adjust view properties
-			setSideBarWidth(be_plain_font->StringWidth(" Frame Size ") + 2 * InfoView::M_H_MARGIN);
+			setSideBarWidth(be_plain_font->StringWidth(
+				B_TRANSLATE("Frame size")) + 2 * InfoView::M_H_MARGIN);
 			BString s;
 			// add the "Bit Rate" field
 			s = MediaString::forVideoBitRate(format.u.encoded_video.avg_bit_rate,
 											 format.u.encoded_video.max_bit_rate);
-			addField("Bit Rate", s);
+			addField(B_TRANSLATE("Bit rate"), s);
 			// add the "Frame Size" field
 			s = MediaString::forVideoFrameSize(format.u.encoded_video.frame_size);
-			addField("Frame Size", s);
+			addField(B_TRANSLATE("Frame size"), s);
 			// add the "History" field
 			s = MediaString::forVideoHistory(format.u.encoded_video.forward_history,
 											 format.u.encoded_video.backward_history);
-			addField("History", s);
+			addField(B_TRANSLATE("History"), s);
 			break;
 		}
 		case B_MEDIA_MULTISTREAM: {
 			// adjust view properties
-			setSideBarWidth(be_plain_font->StringWidth(" Chunk Size ") + 2 * InfoView::M_H_MARGIN);
+			setSideBarWidth(be_plain_font->StringWidth(
+				B_TRANSLATE("Chunk size")) + 2 * InfoView::M_H_MARGIN);
 			BString s;
 			// add the "Format" field
 			s = MediaString::forMultistreamFormat(format.u.multistream.format);
-			addField("Format", s);
+			addField(B_TRANSLATE("Format"), s);
 			// add the "Bit Rate" field
 			s = MediaString::forMultistreamBitRate(format.u.multistream.avg_bit_rate,
 												   format.u.multistream.max_bit_rate);
-			addField("Bit Rate", s);
+			addField(B_TRANSLATE("Bit rate"), s);
 			// add the "Chunk Size" field
 			s = MediaString::forMultistreamChunkSize(format.u.multistream.avg_chunk_size,
 													 format.u.multistream.max_chunk_size);
-			addField("Chunk Size", s);
+			addField(B_TRANSLATE("Chunk size"), s);
 			// add the "Flags" field
 			s = MediaString::forMultistreamFlags(format.u.multistream.flags);
-			addField("Flags", s);
+			addField(B_TRANSLATE("Flags"), s);
 			break;
 		}
 		default: {

@@ -14,7 +14,6 @@
 #include <stdio.h>
 #include <string>
 
-#include <iostream>
 #include <new>
 
 #include <Application.h>

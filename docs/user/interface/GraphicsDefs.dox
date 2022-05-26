@@ -1,13 +1,14 @@
 /*
- * Copyright 2013 Haiku, Inc. All rights reserved.
+ * Copyright 2013, 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/GraphicsDefs.h	hrev45737
- *		src/kits/interface/GraphicsDefs.cpp	hrev45737
+ *		headers/os/interface/GraphicsDefs.h	hrev54374
+ *		src/kits/interface/GraphicsDefs.cpp	hrev49977
  */
 
 
@@ -19,6 +20,17 @@
 */
 
 
+///// Pattern /////
+
+
+/*!
+	\name Patterns
+*/
+
+
+//! @{
+
+
 /*!
 	\struct pattern
 	\ingroup interface
@@ -26,6 +38,28 @@
 	\brief A pattern to use when drawing.
 
 	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool operator==(const pattern &a, const pattern &b)
+	\brief Comparison operator for two patterns
+
+	\retval true The patterns match
+	\retval false The patterns do not match
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool operator!=(const pattern &a, const pattern &b)
+	\brief Comparison operator for two patterns
+
+	\retval true The patterns do not match
+	\retval false The patterns match
+
+	\since Haiku R1
 */
 
 
@@ -54,6 +88,262 @@
 
 	\since BeOS R3
 */
+
+//! @}
+
+
+///// struct rgb_color /////
+
+
+/*!
+	\name RGB Colors
+*/
+
+
+//! @{
+
+
+/*!
+	\struct rgb_color
+	\ingroup interface
+	\ingroup libbe
+	\brief Structure representing a 32 bit RGBA color.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var uint8 rgb_color::red
+	\brief Red value for the color.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var uint8 rgb_color::green
+	\brief Green value for the color.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var uint8 rgb_color::blue
+	\brief Blue value for the color.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var uint8 rgb_color::alpha
+	\brief Alpha value for the color.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn rgb_color& rgb_color::set_to(uint8 r, uint8 g, uint8 b, uint8 a=255)
+	\brief Helper method to set all values of the color.
+
+	\param r Red value.
+	\param g Green value.
+	\param b Blue value.
+	\param a Alpha value.
+
+	\return A reference to this object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool rgb_color::operator==(const rgb_color &other) const
+	\brief Comparison operator.
+
+	\param other The other color to compare to.
+
+	\retval true The colors match.
+	\retval false The colors are different.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool rgb_color::operator!=(const rgb_color &other) const
+	\brief Comparison operator.
+
+	\param other The other color to compare to.
+
+	\retval true The colors are different.
+	\retval false The colors match.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn rgb_color& rgb_color::operator=(const rgb_color &other)
+	\brief Assign values from another color object.
+
+	\param other The other color to copy.
+
+	\return A reference to this object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 rgb_color::Brightness() const
+	\brief Calculates a value representing the brightness of this color.
+
+	This method uses a fast algorithm to calculate the brightness in Luma of
+	the color.
+
+	\return A value representing the brightness.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn rgb_color make_color(uint8 red, uint8 green, uint8 blue, uint8 alpha=255)
+	\brief Create a \a rgb_color from RGBA values.
+
+	\param red The value for red.
+	\param green The value for green.
+	\param blue The value for blue.
+	\param alpha The alpha value. Set to opaque by default.
+
+	\return A new rgb_color set to the selected colors.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn rgb_color mix_color(rgb_color color1, rgb_color color2, uint8 amount)
+	\brief Mix two colors without respect for their alpha values.
+
+	\param color1 First color.
+	\param color2 Second color.
+	\param amount The relative weight of \a color1 to mix in.
+
+	\return The newly-mixed \ref rgb_color.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn rgb_color blend_color(rgb_color color1, rgb_color color2, uint8 amount)
+	\brief Mix two colors, respecting their alpha values.
+
+	\param color1 First color.
+	\param color2 Second color.
+	\param amount The relative weight of \a color1 to mix in.
+
+	\return The newly-mixed \ref rgb_color.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn rgb_color disable_color(rgb_color color, rgb_color background)
+	\brief Calculate a color for a disabled look.
+
+	\param color The color that it would be if the use of your color is \em not
+		disabled.
+	\param background The background on which will be drawn.
+
+	\return A newly-mixed \ref rgb_color.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const rgb_color B_TRANSPARENT_COLOR
+	\brief A transparent color.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const uint8 B_TRANSPARENT_MAGIC_CMAP8
+	\brief Transparent color.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const uint16 B_TRANSPARENT_MAGIC_RGBA15
+	\brief Transparent color.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const uint16 B_TRANSPARENT_MAGIC_RGBA15_BIG
+	\brief Transparent color.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const uint32 B_TRANSPARENT_MAGIC_RGBA32
+	\brief Transparent color.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const uint32 B_TRANSPARENT_MAGIC_RGBA32_BIG
+	\brief Transparent color.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const uint8 B_TRANSPARENT_8_BIT
+	\brief Transparent color.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var const rgb_color B_TRANSPARENT_32_BIT
+	\brief Transparent color.
+
+	\since BeOS R3
+*/
+
+
+//! @}
+
+
+///// Drawing modes /////
+
+
+/*!
+	\name Drawing Modes
+*/
+
+
+//! @{
 
 
 /*!
@@ -312,3 +602,6 @@
 
 	\since Haiku R1
 */
+
+
+//! @}

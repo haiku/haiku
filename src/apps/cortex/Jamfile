@@ -1,8 +1,5 @@
 SubDir HAIKU_TOP src apps cortex ;
 
-SubInclude HAIKU_TOP src apps cortex RouteApp ;
-SubInclude HAIKU_TOP src apps cortex AddOnHost ;
-
 SubInclude HAIKU_TOP src apps cortex DiagramView ;
 SubInclude HAIKU_TOP src apps cortex DormantNodeView ;
 SubInclude HAIKU_TOP src apps cortex InfoView ;
@@ -14,5 +11,8 @@ SubInclude HAIKU_TOP src apps cortex TipManager ;
 SubInclude HAIKU_TOP src apps cortex TransportView ;
 SubInclude HAIKU_TOP src apps cortex ValControl ;
 SubInclude HAIKU_TOP src apps cortex support ;
+
+SubInclude HAIKU_TOP src apps cortex RouteApp ;
+SubInclude HAIKU_TOP src apps cortex AddOnHost ;
 
 SubInclude HAIKU_TOP src apps cortex addons ;

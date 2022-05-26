@@ -19,7 +19,7 @@ public:
 							int32 handlerID, ServerBitmap* bitmap);
 	virtual				~OffscreenServerWindow();
 
-			// util methods.	
+			// util methods.
 	virtual	void		SendMessageToClient(const BMessage* msg,
 							int32 target = B_NULL_TOKEN,
 							bool usePreferred = false) const;
@@ -29,7 +29,7 @@ public:
 							uint32 workspace);
 
 private:
-	ServerBitmap*		fBitmap;
+	BReference<ServerBitmap> fBitmap;
 };
 
 #endif	// OFFSCREEN_SERVER_WINDOW_H

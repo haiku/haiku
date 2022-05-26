@@ -30,8 +30,6 @@ status_t	dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node,
 status_t	dosfs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file,
 				ino_t *_vnid);
 status_t	dosfs_access(fs_volume *_vol, fs_vnode *_node, int mode);
-status_t	dosfs_readlink(fs_volume *_vol, fs_vnode *_node, char *buf,
-				size_t *bufsize);
 status_t	dosfs_opendir(fs_volume *_vol, fs_vnode *_node, void **cookie);
 status_t	dosfs_readdir(fs_volume *_vol, fs_vnode *_node, void *cookie,
 				struct dirent *buf, size_t bufsize, uint32 *num);

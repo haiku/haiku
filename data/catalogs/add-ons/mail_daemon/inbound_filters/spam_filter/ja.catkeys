@@ -2,6 +2,6 @@
 or empty e-mail	SpamFilterConfig		または空メール
 Genuine below and uncertain above:	SpamFilterConfig		次の値未満は正規メール、それ以外は不明:
 Spam above:	SpamFilterConfig		次の値以上はスパム:
-Add spam rating to start of subject	SpamFilterConfig		件名の最初にスパムの評価を加える
+Add spam rating to start of subject	SpamFilterConfig		件名の先頭にスパム評価を加える
 Bayesian Spam Filter	SpamFilter		ベイジアンスパムフィルター
 Learn from all incoming e-mail	SpamFilterConfig		受信メールすべてから学習する

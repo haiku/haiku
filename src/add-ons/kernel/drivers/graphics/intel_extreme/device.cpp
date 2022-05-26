@@ -337,6 +337,27 @@ device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 			break;
 		}
 
+		case INTEL_GET_BRIGHTNESS_LEGACY:
+		case INTEL_SET_BRIGHTNESS_LEGACY:
+		{
+			intel_brightness_legacy brightnessLegacy;
+			if (user_memcpy(&brightnessLegacy, buffer,
+					sizeof(brightnessLegacy)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			if (brightnessLegacy.magic != INTEL_PRIVATE_DATA_MAGIC)
+				break;
+			if (op == INTEL_GET_BRIGHTNESS_LEGACY) {
+				brightnessLegacy.lpc = get_pci_config(info->pci, LEGACY_BACKLIGHT_BRIGHTNESS, 1);
+				// copy result
+				if (user_memcpy(buffer, &brightnessLegacy, sizeof(brightnessLegacy)) < B_OK)
+					return B_BAD_ADDRESS;
+			} else {
+				set_pci_config(info->pci, LEGACY_BACKLIGHT_BRIGHTNESS, 1, brightnessLegacy.lpc);
+			}
+			return B_OK;
+		}
+
 		default:
 			ERROR("ioctl() unknown message %" B_PRIu32 " (length = %"
 				B_PRIuSIZE ")\n", op, bufferLength);

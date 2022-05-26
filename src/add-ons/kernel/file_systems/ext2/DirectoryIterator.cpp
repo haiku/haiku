@@ -17,6 +17,8 @@
 #include "Inode.h"
 
 
+#undef ASSERT
+
 //#define TRACE_EXT2
 #ifdef TRACE_EXT2
 #	define TRACE(x...) dprintf("\33[34mext2:\33[0m " x)
@@ -97,7 +99,7 @@ DirectoryIterator::Get(char* name, size_t* _nameLength, ino_t* _id)
 	if (block == NULL)
 		return B_IO_ERROR;
 
-	ASSERT(_CheckBlock(block));
+	ASSERT(_CheckBlock(block) == B_OK);
 
 	TRACE("DirectoryIterator::Get(): Displacement: %" B_PRIu32 "\n",
 		fDisplacement);
@@ -166,8 +168,7 @@ DirectoryIterator::Next()
 	if (block == NULL)
 		return B_IO_ERROR;
 
-	ASSERT(_CheckBlock(block));
-	uint32 maxSize = _MaxSize();
+	ASSERT(_CheckBlock(block) == B_OK);
 
 	entry = (ext2_dir_entry*)(block + fDisplacement);
 
@@ -184,9 +185,9 @@ DirectoryIterator::Next()
 			fPreviousDisplacement = fDisplacement;
 			fDisplacement += entry->Length();
 		} else 
-			fDisplacement = maxSize;
+			fDisplacement = fBlockSize;
 
-		if (fDisplacement == maxSize) {
+		if (fDisplacement == fBlockSize) {
 			TRACE("Reached end of block\n");
 
 			fDisplacement = 0;
@@ -207,9 +208,9 @@ DirectoryIterator::Next()
 			block = cached.SetTo(fPhysicalBlock);
 			if (block == NULL)
 				return B_IO_ERROR;
-			ASSERT(_CheckBlock(block));
+			ASSERT(_CheckBlock(block) == B_OK);
 
-		} else if (fDisplacement > maxSize) {
+		} else if (fDisplacement > fBlockSize) {
 			TRACE("The entry isn't block aligned.\n");
 			// TODO: Is block alignment obligatory?
 			return B_BAD_DATA;
@@ -381,7 +382,7 @@ DirectoryIterator::RemoveEntry(Transaction& transaction)
 
 		fDirectory->SetDirEntryChecksum(block);
 
-		ASSERT(_CheckBlock(block));
+		ASSERT(_CheckBlock(block) == B_OK);
 
 		return B_OK;
 	}
@@ -414,7 +415,7 @@ DirectoryIterator::RemoveEntry(Transaction& transaction)
 
 	fDirectory->SetDirEntryChecksum(block);
 
-	ASSERT(_CheckBlock(block));
+	ASSERT(_CheckBlock(block) == B_OK);
 
 	return B_OK;
 }
@@ -436,7 +437,7 @@ DirectoryIterator::ChangeEntry(Transaction& transaction, ino_t id,
 
 	fDirectory->SetDirEntryChecksum(block);
 
-	ASSERT(_CheckBlock(block));
+	ASSERT(_CheckBlock(block) == B_OK);
 
 	return B_OK;
 }
@@ -450,7 +451,7 @@ DirectoryIterator::_AllocateBestEntryInBlock(uint8 nameLength, uint16& pos,
 	CachedBlock cached(fVolume);
 	const uint8* block = cached.SetTo(fPhysicalBlock);
 
-	ASSERT(_CheckBlock(block));
+	ASSERT(_CheckBlock(block) == B_OK);
 
 	uint16 requiredLength = EXT2_DIR_REC_LEN(nameLength);
 	uint32 maxSize = _MaxSize();
@@ -532,7 +533,7 @@ DirectoryIterator::_AddEntry(Transaction& transaction, const char* name,
 
 	fDirectory->SetDirEntryChecksum(block);
 
-	ASSERT(_CheckBlock(block));
+	ASSERT(_CheckBlock(block) == B_OK);
 
 	TRACE("DirectoryIterator::_AddEntry(): Done\n");
 
@@ -798,8 +799,8 @@ DirectoryIterator::_SplitIndexedBlock(Transaction& transaction,
 
 	fDirectory->SetDirEntryChecksum(secondBlock);
 
-	ASSERT(_CheckBlock(firstBlock));
-	ASSERT(_CheckBlock(secondBlock));
+	ASSERT(_CheckBlock(firstBlock) == B_OK);
+	ASSERT(_CheckBlock(secondBlock) == B_OK);
 
 	TRACE("DirectoryIterator::_SplitIndexedBlock(): Done\n");
 	return B_OK;
@@ -840,10 +841,12 @@ DirectoryIterator::_CheckDirEntry(const ext2_dir_entry* dirEntry, const uint8* b
 		errmsg = "Length is not a multiple of 4";
 	else if (dirEntry->Length() < EXT2_DIR_REC_LEN(dirEntry->NameLength()))
 		errmsg = "Length is too short for the name";
-	else if (((uint8*)dirEntry - buffer) + dirEntry->Length() > fBlockSize)
+	else if (((uint8*)dirEntry - buffer) + dirEntry->Length()
+	         > (ptrdiff_t)fBlockSize) {
 		errmsg = "Length is too big for the blocksize";
+	}
 
-	TRACE("DirectoryIterator::_CheckDirEntry() %s\n", errmsg);
+	TRACE("DirectoryIterator::_CheckDirEntry() %s\n", errmsg != NULL ? errmsg : "null");
 	return errmsg == NULL;
 }
 
@@ -894,7 +897,8 @@ DirectoryIterator::_HTreeRootChecksum(uint8* block, uint16 offset, uint16 count)
 	checksum = calculate_crc32c(checksum, (uint8*)&gen, sizeof(gen));
 	checksum = calculate_crc32c(checksum, block,
 		offset + count * sizeof(HTreeEntry));
-	TRACE("HTreeEntryIterator::_HTreeRootChecksum() size %u\n", offset + count * sizeof(HTreeEntry));
+	TRACE("HTreeEntryIterator::_HTreeRootChecksum() size %" B_PRIu64 "\n",
+		offset + count * sizeof(HTreeEntry));
 	ext2_htree_tail dummy;
 	dummy.reserved = 0;
 	checksum = calculate_crc32c(checksum, (uint8*)&dummy, sizeof(dummy));

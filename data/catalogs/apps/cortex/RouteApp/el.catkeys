@@ -1,0 +1,26 @@
+1	greek, modern (1453-)	application/x-vnd.Cortex.Route	25925955
+Node '%name%' released	CortexRouteApp		Ο κόμβος "%name%" ελευθερώθηκε.
+OK	CortexRouteApp		Εντάξει
+About Cortex/Route…	CortexRouteApp		Σχετικά με το Cortex/Route...
+File	CortexRouteApp		Αρχείο
+Connection '%name%' made	CortexRouteApp		Η σύνδεση "%name%" έγινε
+Save nodes…	CortexRouteApp		Αποθήκευση κόμβων...
+%producer% and %consumer%	CortexRouteApp		%producer% και %consumer%
+Node '%name%' created	CortexRouteApp		Ο κόμβος "%name%" δημιουργήθηκε
+Negotiated format:	CortexRouteApp		Συμφωνημένο μορφότυπο:
+Window	CortexRouteApp		Παράθυρο
+Transport	CortexRouteApp		Μεταφορά
+Connection broken	CortexRouteApp		Η σύνδεση διαλύθηκε
+Untitled group	CortexRouteApp		Ομάδα χωρίς όνομα
+Connection failed	CortexRouteApp		Η σύνδεση απέτυχε
+Connection '%name%' broken	CortexRouteApp		Η σύνδεση "%name%" διαλύθηκε
+Between:	CortexRouteApp		Μεταξύ των:
+Cortex	CortexRouteApp		Cortex
+Open…	CortexRouteApp		Άνοιγμα...
+Pull palettes	CortexRouteApp		Έλξη παλεττών
+Connection made	CortexRouteApp		Η σύνδεση έγινε
+Show transport	CortexRouteApp		Εμφάνιση μεταφοράς
+Show add-ons	CortexRouteApp		Εμφάνιση προσθέτων
+Quit	CortexRouteApp		Έξοδος
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2Copyright 1999-2000 Eric MoonΜε επιφύλαξη παντός δικαιώματος.Η ομάδα του Cortex:Christopher Lenz: Γραφική διεπαφή χρήστηEric Moon: Γραφική διεπαφή χρήστη, παρασκήνιοΕυχαριστούμε τους:John AshmunJon WatteDoug WrightΚάποια εικονίδια που βρίσκονται σε χρήση στο παρόν λογισμικόαποτελούν ιδιοκτησία της Be, Inc. και χρησιμοποιούνται με άδειά της.
+Tried format:	CortexRouteApp		Μορφότυπο που δοκιμάστηκε:

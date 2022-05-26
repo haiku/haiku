@@ -1,0 +1,37 @@
+1	danish	application/x-vnd.Cortex.InfoView	4133381354
+Offset	InfoView		Forskydning
+Description	DormantNodeInfoView		Beskrivelse
+Byte order	InfoView		Byterækkefølge
+Connection	InfoView		Forbindelse
+Output formats	DormantNodeInfoView		Outputformater
+History	InfoView		Historik
+Input formats	DormantNodeInfoView		Inputformater
+Signature	AppNodeInfoView		Underskrift
+Flags	InfoView		Flag
+Media output	InfoView		Medieoutput
+Active lines	InfoView		Aktive linjer
+Buffer size	InfoView		Bufferstørrelse
+\n- Quality:	FileNodeInfoView		\n- Kvalitet:
+Kinds	LiveNodeInfoView		Slags
+Application	AppNodeInfoView		Program
+\n- Duration:	FileNodeInfoView		\n- Varighed:
+Media type	InfoView		Medietype
+Resolution	InfoView		Opløsning
+File format	AppNodeInfoView		Filformat
+Channel mask	InfoView		Kanalmaske
+Channels	InfoView		Kanaler
+File format	FileNodeInfoView		Filformat
+(no file)	FileNodeInfoView		(ingen fil)
+Media input	InfoView		Medieinput
+Input format	DormantNodeInfoView		Inputformat
+Format	InfoView		Format
+Version	AppNodeInfoView		Version
+AddOn ID	DormantNodeInfoView		Tilføjelses-id
+Run mode	LiveNodeInfoView		Kørselstilstand
+Port	LiveNodeInfoView		Port
+Output format	DormantNodeInfoView		Outputformat
+Aspect ratio	InfoView		Højde-bredde-forhold
+Tracks	FileNodeInfoView		Spor
+Source	InfoView		Kilde
+Destination	InfoView		Destination
+Copyright	FileNodeInfoView		Ophavsret

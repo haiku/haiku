@@ -1,0 +1,22 @@
+1	indonesian	x-vnd.haiku.SerialConnect	540213078
+Hardware	SerialWindow	Flowcontrol	Perangkat kasar
+Connection	SerialWindow		Koneksi
+Raw send…	SerialWindow		Kirim mentah…
+Baud rate	SerialWindow		Rasio baud
+Stop bits	SerialWindow		Bit stop
+None	SerialWindow	Flowcontrol	Tiada
+Cancel	Custom baudrate window		Batal
+Sending…	XModemStatus		Mengirim…
+Log to file…	SerialWindow		Catat log ke file…
+Custom baudrate	Custom baudrate window		Baudrate kustom
+File	SerialWindow		Berkas
+SerialConnect	System name		SerialConnect
+custom…	SerialWindow	Baudrate	kustom…
+Parity	SerialWindow		Paritas
+None	SerialWindow	Parity	Tiada
+Disconnect	SerialWindow		Memutus
+Everything sent, waiting for acknowledge	XModemStatus		Semuanya terkirim, menunggu pengakuan
+Odd	SerialWindow	Parity	Ganjil
+Flow control	SerialWindow		Alur kontrol
+file transfer progress	SerialWindow		kemajuan transfer file
+CRC requested	XModemStatus		CRC diminta

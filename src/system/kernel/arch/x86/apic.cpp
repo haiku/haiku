@@ -13,6 +13,7 @@
 #include <arch/x86/msi.h>
 
 #include <debug.h>
+#include <kernel/cpu.h>
 #include <safemode.h>
 #include <vm/vm.h>
 #include <util/AutoLock.h>

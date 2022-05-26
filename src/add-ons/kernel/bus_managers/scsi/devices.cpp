@@ -55,7 +55,7 @@ scsi_free_device(scsi_device_info *device)
 
 	scsi_dma_buffer_free(&device->dma_buffer);
 
-	DELETE_BEN(&device->dma_buffer_lock);
+	mutex_destroy(&device->dma_buffer_lock);
 	delete_sem(device->dma_buffer_owner);
 
 	free(device);
@@ -178,20 +178,18 @@ scsi_create_device(device_node *node, scsi_bus_info *bus,
 
 	scsi_dma_buffer_init(&device->dma_buffer);
 
-	if (INIT_BEN(&device->dma_buffer_lock, "dma_buffer") < 0)
-		goto err;
+	mutex_init(&device->dma_buffer_lock, "dma_buffer");
 
 	device->dma_buffer_owner = create_sem(1, "dma_buffer");
 	if (device->dma_buffer_owner < 0)
-		goto err2;
+		goto err;
 
 	register_kernel_daemon(scsi_dma_buffer_daemon, device, 5 * 10);
 
 	return device;
 
-err2:
-	DELETE_BEN(&device->dma_buffer_lock);
 err:
+	mutex_destroy(&device->dma_buffer_lock);
 	free(device);
 	return NULL;
 }
@@ -221,7 +219,8 @@ scsi_create_autosense_request(scsi_device_info *device)
 
 	// allocate buffer for space sense data and S/G list
 	device->auto_sense_area = create_area("auto_sense", (void**)&buffer,
-		B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_32_BIT_FULL_LOCK, 0);
+		B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_32_BIT_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		// TODO: Use B_FULL_LOCK, if addresses >= 4 GB are supported!
 	if (device->auto_sense_area < 0)
 		goto err;

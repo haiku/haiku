@@ -1,0 +1,37 @@
+1	danish	x-vnd.haiku.SerialConnect	354154115
+Hardware	SerialWindow	Flowcontrol	Hardware
+Connection	SerialWindow		Forbindelse
+Raw send…	SerialWindow		Rå-send…
+Baud rate	SerialWindow		Baudhastighed
+Stop bits	SerialWindow		Stopbits
+None	SerialWindow	Flowcontrol	Ingen
+Cancel	Custom baudrate window		Annuller
+Sending…	XModemStatus		Sender…
+<no serial port available>	SerialWindow		<ingen seriel port tilgænglig>
+Log to file…	SerialWindow		Log til fil…
+Custom baudrate	Custom baudrate window		Tilpasset baudhastighed
+File	SerialWindow		Fil
+SerialConnect	System name		Serielforbindelse
+custom…	SerialWindow	Baudrate	tilpas…
+Parity	SerialWindow		Paritet
+None	SerialWindow	Parity	Ingen
+Disconnect	SerialWindow		Afbryd forbindelse
+Everything sent, waiting for acknowledge	XModemStatus		Alt sendt — venter på bekræftelse
+Odd	SerialWindow	Parity	Ulige
+Flow control	SerialWindow		Flowstyring
+file transfer progress	SerialWindow		filoverførelsesforløb
+CRC requested	XModemStatus		CRC anmodet
+Data bits	SerialWindow		Databit
+Both	SerialWindow	Flowcontrol	Begge
+Edit	SerialWindow		Rediger
+XModem send…	SerialWindow		XModem-send…
+Baudrate:	Custom baudrate window		Baudhastighed:
+OK	Custom baudrate window		OK
+Waiting for receiver…	XModemStatus		Venter på modtager…
+Clear history	SerialWindow		Ryd historik
+Checksum error, re-send block	XModemStatus		Fejl ved tjeksum — send blok igen
+Settings	SerialWindow		Indstillinger
+Even	SerialWindow	Parity	Lige
+Software	SerialWindow	Flowcontrol	Software
+Line terminator	SerialWindow		Linjeafslutning
+Remote cancelled transfer	XModemStatus		Fjern annullerede overførsel

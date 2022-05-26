@@ -1,22 +1,22 @@
 1	romanian	x-vnd.Haiku-PSDTranslator	3654055550
 Lab	PSDLoader		Laborator
-Uncompressed	PSDConfig		Necomprimat
+Uncompressed	PSDConfig		Necompresat
 Indexed	PSDLoader		Indexat
 Grayscale	PSDLoader		Scală de gri
-Photoshop image translator	PSDConfig		Traducător imagine Photoshop
-Photoshop image translator	PSDTranslator		Traducător imagine Photoshop
+Photoshop image translator	PSDConfig		Traducător de imagine Photoshop
+Photoshop image translator	PSDTranslator		Traducător de imagine Photoshop
 Version %d.%d.%d, %s	PSDConfig		Versiunea %d.%d.%d, %s
-Photoshop Document (PSD file)	PSDConfig		Document Photoshop (Fișier PSD)
+Photoshop Document (PSD file)	PSDConfig		Document Photoshop (fișier PSD)
 Photoshop image	PSDTranslator		Imagine Photoshop
 RLE	PSDConfig		RLE
-Photoshop Big Document (PSB file)	PSDConfig		Document Photoshop (Fișier PSB)
+Photoshop Big Document (PSB file)	PSDConfig		Document mare Photoshop (fișier PSB)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Imagine Photoshop (%s)
 PSDTranslator Settings	PSDConfig		Configurări PSDTranslator
 RGB	PSDLoader		RGB
 Bitmap	PSDLoader		Bitmap
 CMYK	PSDLoader		CMYK
-Compression: 	PSDConfig		Comprimare: 
+Compression: 	PSDConfig		Compresie: 
 Format: 	PSDConfig		Format: 
 Multichannel	PSDLoader		Multicanal
 Duotone	PSDLoader		Duoton

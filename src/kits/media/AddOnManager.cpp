@@ -519,13 +519,9 @@ AddOnManager::_RegisterWriter(WriterPlugin* writer, const entry_ref& ref)
 		return;
 	}
 	for (uint i = 0 ; i < count ; i++) {
-		media_file_format fileFormat = fileFormats[i];
-		// Ignore non-writable formats
-		if ((fileFormat.capabilities & media_file_format::B_WRITABLE) == 0)
-			continue;
-
 		// Generate a proper ID before inserting this format, this encodes
 		// the specific plugin in the media_file_format.
+		media_file_format fileFormat = fileFormats[i];
 		fileFormat.id.node = ref.directory;
 		fileFormat.id.device = ref.device;
 		fileFormat.id.internal_id = info.internalID;

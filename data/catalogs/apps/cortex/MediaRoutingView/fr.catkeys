@@ -1,0 +1,24 @@
+1	french	application/x-vnd.Cortex.MediaRoutingView	2928155087
+Lock group	MediaNodePanel		Verrouiller le groupe
+%refname% (no file)	MediaNodePanel		%refname% (pas de fichier)
+Video output	MediaRoutingView		Sortie vidéo
+OK	MediaRoutingView		OK
+Advanced	MediaNodePanel		Avancé
+Audio input	MediaRoutingView		Entrée audio
+Could not load '%filename%'	MediaRoutingView		Impossible de charger « %filename% »
+Video input	MediaRoutingView		Entrée vidéo
+Release	MediaNodePanel		Libérer
+Disconnect	MediaRoutingView		Déconnecter
+Could not disconnect	MediaRoutingView		Déconnexion impossible
+Could not instantiate '%infoname%'	MediaRoutingView		Impossible d’instancier « %infoname% »
+Select all	MediaRoutingView		Sélectionner tout
+(same as group)	MediaNodePanel		(identique au groupe)
+Input	MediaJack		Entrée
+Error	MediaRoutingView		Erreur
+Could not release '%refname%'	MediaRoutingView		Impossible de libérer « %refname% »
+Output	MediaJack		Sortie
+Clean up	MediaRoutingView		Nettoyer
+Start control panel	MediaNodePanel		Démarrer le panneau de contrôle
+Tweak parameters	MediaNodePanel		Affiner les paramètres
+Could not connect	MediaRoutingView		Connexion impossible
+Unlock group	MediaNodePanel		Déverrouiller le groupe

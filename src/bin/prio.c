@@ -1,12 +1,12 @@
 /* prio.c - prio command for BeOs, change priority of a given thread
- * (c) 2001, 2002, François Revol (mmu_man) for OpenBeOS
+ * (c) 2001, 2002, François Revol (mmu_man) for Haiku
  * released under the MIT licence.
  *
  * ChangeLog:
  * 04-26-2002 v1.2
  *  fixed a typo on error (Priority changed failed.)
  * 04-25-2002 v1.1
- *  Initial. Used my renice.c code to rewrite 'prio' BeOS command for OpenBeOS.
+ *  Initial. Used my renice.c code to rewrite 'prio' BeOS command for Haiku.
  * 
  * prio is a stripped-down version of renice
  * seems to behave the same way as the original BeOS version. :)

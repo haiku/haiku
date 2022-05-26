@@ -97,8 +97,10 @@ private:
 			void				_RevertUserGroupChanges();
 
 			void				_RunPostInstallScripts();
-			void				_RunPostInstallScript(Package* package,
-									const BString& script);
+			void				_RunPreUninstallScripts();
+			void				_RunPostOrPreScript(Package* package,
+									const BString& script,
+									bool postNotPre);
 
 			void				_QueuePostInstallScripts();
 
@@ -137,6 +139,7 @@ private:
 									const PackageSet& packagesToActivate,
 									const PackageSet& packagesToDeactivate);
 									// throws Exception
+			void				_PrepareFirstBootPackages();
 			void				_FillInActivationChangeItem(
 									PackageFSActivationChangeItem* item,
 									PackageFSActivationChangeType type,
@@ -154,6 +157,9 @@ private:
 									BDirectory& directory, const BString& value,
 									bool nonDirectoriesOnly);
 
+	static	status_t			_AssertEntriesAreEqual(const BEntry& entry,
+									const BDirectory* directory);
+
 private:
 			Volume*				fVolume;
 			PackageFileManager*	fPackageFileManager;
@@ -169,6 +175,7 @@ private:
 			node_ref			fOldStateDirectoryRef;
 			BString				fOldStateDirectoryName;
 			node_ref			fTransactionDirectoryRef;
+			bool				fFirstBootProcessing;
 			BDirectory			fWritableFilesDirectory;
 			StringSet			fAddedGroups;
 			StringSet			fAddedUsers;

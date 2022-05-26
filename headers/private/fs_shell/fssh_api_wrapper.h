@@ -387,7 +387,6 @@
 #define unload_driver_settings			fssh_unload_driver_settings
 #define parse_driver_settings_string	fssh_parse_driver_settings_string
 #define get_driver_settings_string		fssh_get_driver_settings_string
-#define delete_driver_settings			fssh_delete_driver_settings
 #define get_driver_parameter			fssh_get_driver_parameter
 #define get_driver_boolean_parameter	fssh_get_driver_boolean_parameter
 #define get_driver_settings				fssh_get_driver_settings
@@ -565,7 +564,6 @@
 
 /* Storage Kit/File System Errors */
 #define B_FILE_ERROR			FSSH_B_FILE_ERROR
-#define B_FILE_NOT_FOUND		FSSH_B_FILE_NOT_FOUND
 #define B_FILE_EXISTS			FSSH_B_FILE_EXISTS
 #define B_ENTRY_NOT_FOUND		FSSH_B_ENTRY_NOT_FOUND
 #define B_NAME_TOO_LONG			FSSH_B_NAME_TOO_LONG
@@ -947,8 +945,6 @@
 #define remove_vnode				fssh_remove_vnode
 #define unremove_vnode				fssh_unremove_vnode
 #define get_vnode_removed			fssh_get_vnode_removed
-#define mark_vnode_busy				fssh_mark_vnode_busy
-#define change_vnode_id				fssh_change_vnode_id
 #define volume_for_vnode			fssh_volume_for_vnode
 #define check_access_permissions	fssh_check_access_permissions
 #define read_pages					fssh_read_pages
@@ -1402,6 +1398,8 @@
 #define index		fssh_index
 #define rindex		fssh_rindex
 
+/* SMAP-specific functions */
+#define user_strlcpy	fssh_strlcpy
 
 ////////////////////////////////////////////////////////////////////////////////
 // #pragma mark - fssh_time.h

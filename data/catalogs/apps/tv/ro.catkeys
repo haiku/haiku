@@ -1,27 +1,27 @@
 1	romanian	x-vnd.Haiku.TV	1995288111
 No menu	MainWin		Fără meniu
 No border	MainWin		Fără margine
-force 704 x 576, display aspect 4:3	MainWin		forțează 704 x 576, aspect afișare 4:3
+force 704 x 576, display aspect 4:3	MainWin		forțează 704 x 576, aspect de afișaj 4:3
 Error, connecting to interface failed:\n\n	MainWin		Eroare, conectarea la interfață a eșuat:\n\n
-force 544 x 576, display aspect 4:3	MainWin		forțează 544 x 576, aspect afișare 4:3
+force 544 x 576, display aspect 4:3	MainWin		forțează 544 x 576, aspect de afișaj 4:3
 Full screen	MainWin		Ecran complet
 Scale to native size	MainWin		Scalează la dimensiunea nativă
 unknown	MainWin		necunoscut
 Next channel	MainWin		Canalul următor
-Keep aspect ratio	MainWin		Păstrează proporție aspect
-DVB - Digital Video Broadcasting TV	MainWin		DVB - Difuzare Video Digital TV
+Keep aspect ratio	MainWin		Păstrează raportul de aspect
+DVB - Digital Video Broadcasting TV	MainWin		DVB - Difuzare video digitală TV
 Always on top	MainWin		Întotdeauna deasupra
 Debug	MainWin		Depanare
 Interface	MainWin		Interfață
-force 720 x 576, display aspect 4:3	MainWin		forțează 720 x 576, aspect afișare 4:3
-Quit	MainWin		Închidere
+force 720 x 576, display aspect 4:3	MainWin		forțează 720 x 576, aspect de afișaj 4:3
+Quit	MainWin		Ieșire
 Channel	MainWin		Canal
-Previous channel	MainWin		Canalul precedent
+Previous channel	MainWin		Canalul anterior
 OK	MainWin		OK
 TV	MainWin		TV
 Settings	MainWin		Configurări
 TV	System name		TV
 Settings…	MainWin		Configurări…
-None	MainWin		Nimic
+None	MainWin		Nespecificat
 Error, interface is busy:\n\n	MainWin		Eroare, interfața este ocupată:\n\n
-pixel aspect ratio	MainWin		proporție aspect pixel
+pixel aspect ratio	MainWin		raportul de aspect al pixelilor

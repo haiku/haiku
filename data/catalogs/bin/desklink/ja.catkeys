@@ -1,14 +1,14 @@
-1	japanese	x-vnd.Haiku-desklink	3568085956
+1	japanese	x-vnd.Haiku-desklink	2223625451
 desklink	MediaReplicant	Title of an alert box	desklink
-Sound preferences…	MediaReplicant		サウンドの設定…
 Muted	MediaReplicant		ミュート
 %g dB	MediaReplicant		%g dB
 OK	MediaReplicant		OK
-Couldn't launch 	MediaReplicant		起動できませんでした
+Sounds preferences…	MediaReplicant		サウンド設定…
+Couldn't launch 	MediaReplicant		起動できません
 Volume	VolumeControl		音量
 Open MediaPlayer	MediaReplicant		メディアプレーヤーを開く
-%d dB	VolumeControl		%d dB
-Media preferences…	MediaReplicant		メディアの設定…
+%ld dB	VolumeControl		%ld dB
+Media preferences…	MediaReplicant		メディアの設定...
 Options	MediaReplicant		オプション
 Beep	MediaReplicant		ビープ音
 Open %name	DeskButton	Don't translate variable %name	%name を開く

@@ -1,55 +1,51 @@
-1	indonesian	x-vnd.Haiku-BluetoothPrefs	4276705900
-Laptop	Settings view		Leptop
-Only from trusted devices	Settings view		Hanya dari perangkat terpercaya
-15 secs	Settings view		15 detik
-Quit	main		Berhenti
-Manufacturer: 	Device View		Pabrikan: 
-Desktop	Settings view		Desktop
-Server	Window		Server
-Identify host as:	Settings view		Identifikas host sebagai:
-Refresh…	Remote devices		Refres…
-Local devices found on system:	Settings view		Perangkat lokal ditemukan pada sistem:
-Service classes: 	Device View		Kelas layanan: 
-Remote devices	Window		Perangkat remote
-Settings	Window		Pengaturan
-Stop bluetooth services…	Window		Menghentikan layanan bluetooth...
-61 secs	Settings view		61 detik
-Add…	Remote devices		Tambah...
-As blocked	Remote devices		Sebagai diblokir
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Tidak ada perangkat lokal Bluetooth terdaftar pada sistem.
-Policy…	Settings view		Kebijakan…
-Revert	Window		Pulihkan
-Refresh local devices…	Window		Refresh perangkat lokal...
-Disconnect	Remote devices		Memutuskan
-Identify us as…	Settings view		Identifikasi kami sebagai…
+1	indonesian	x-vnd.Haiku-BluetoothPrefs	3945807779
+Start bluetooth services…	Window		Mulai layanan bluetooth ...
 From all devices	Settings view		Dari semua perangkat
 Defaults	Window		Bawaan
-Start bluetooth services…	Window		Mulai layanan bluetooth ...
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Periksa bahwa kemampuan Bluetooth dari perangkat remote Anda diaktifkan. Tekan 'Selidiki' untuk memulai pemindaian. Waktu yang dibutuhkan untuk pengambilan nama-nama tidak diketahui, meskipun seharusnya tidak lebih dari 3 detik per perangkat. Setelah itu Anda akan dapat menambahkannya ke daftar utama anda, di mana anda akan dapat memasangkan dengan mereka.
+Laptop	Settings view		Leptop
 Scanning progress	Inquiry panel		Proses pemindaian
-Bluetooth	System name		Bluetooth
+Only from trusted devices	Settings view		Hanya dari perangkat terpercaya
 Launch now	main		Luncurkan sekarang
+Bluetooth	System name		Bluetooth
 Remove	Remote devices		Melepaskan
 Pick device…	Settings view		Pilih perangkat…
 Always ask	Settings view		Selalu tanya
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Dengan dukungan dari:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nTerima kasih secara khusu pada individu berikut…\n\nDonasi/mengirim perangkat kasar:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nSecara ekonomi:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nDengan tambalan:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nYang memberikan kepada saya banyak pengetahuan:\n - the yellowTAB team
+Quit	main		Berhenti
+15 secs	Settings view		15 detik
 Help	Window		Tolong
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Dengan dukungan dari:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nTerima kasih secara khusu pada individu berikut…\n\nDonasi/mengirim perangkat kasar:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nSecara ekonomi:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nDengan tambalan:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nYang memberikan kepada saya banyak pengetahuan:\n - the yellowTAB team
+Manufacturer: 	Device View		Pabrikan: 
 Pair…	Remote devices		Pasangkan...
+Desktop	Settings view		Desktop
+Server	Window		Server
 Retrieving name of %1	Inquiry panel		Mengambil nama dari %1
+Identify host as:	Settings view		Identifikas host sebagai:
 Inquiry	Inquiry panel		Selidiki
+Local devices found on system:	Settings view		Perangkat lokal ditemukan pada sistem:
+Service classes: 	Device View		Kelas layanan: 
 Incoming connections policy:	Settings view		Kebijakan koneksi masuk:
+Remote devices	Window		Perangkat remote
 Retrieving names…	Inquiry panel		Mengambil nama…
-Show name	Extended local device view		Tampilkan nama
 Add device to list	Inquiry panel		Tambah alat ke daftar
+Show name	Extended local device view		Tampilkan nama
+Settings	Window		Pengaturan
 Remaining %1 seconds	Inquiry panel		Sisa %1 detik
-The Bluetooth services are not currently running on this system.	main		Layanan Bluetooth saat ini tidak berjalan pada sistem ini.
-Discoverable	Extended local device view		Dapat dicari
+Stop bluetooth services…	Window		Menghentikan layanan bluetooth...
+61 secs	Settings view		61 detik
 Authenticate	Extended local device view		Otentifikasi
-Smart phone	Settings view		Ponsel pintar
+Discoverable	Extended local device view		Dapat dicari
+The Bluetooth services are not currently running on this system.	main		Layanan Bluetooth saat ini tidak berjalan pada sistem ini.
+Add…	Remote devices		Tambah...
 Scanning completed.	Inquiry panel		Pemindaian selesai.
+Smart phone	Settings view		Ponsel pintar
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Tidak ada perangkat lokal Bluetooth terdaftar pada sistem.
 Default inquiry time:	Settings view		Waktu penyelidikan bawaan:
+Revert	Window		Pulihkan
+Refresh local devices…	Window		Refresh perangkat lokal...
 Server	Settings view		Server
-Handheld	Settings view		Perangkat genggam
  packets: 	Device View		 paket: 
+Handheld	Settings view		Perangkat genggam
+Disconnect	Remote devices		Memutuskan
 About Bluetooth…	Window		Tentang Bluetooth…
 Starting scan…	Inquiry panel		Mulai memindai…

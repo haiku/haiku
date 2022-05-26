@@ -1,0 +1,59 @@
+1	czech	application/x-vnd.Cortex.InfoView	2382053937
+Offset	InfoView		Ofset
+Description	DormantNodeInfoView		Popis
+Byte order	InfoView		Pořadí bajtů
+Connection	InfoView		Připojení
+Output formats	DormantNodeInfoView		Výstupní formáty
+History	InfoView		Historie
+Input formats	DormantNodeInfoView		Vstupní formáty
+Signature	AppNodeInfoView		Podpis
+Video data between	InfoView		Video data mezi
+Any number	DormantNodeInfoView	For 'Max. instances' field	Jakékoli číslo
+Flags	InfoView		Příznaky
+Media output	InfoView		Výstup média
+Active lines	InfoView		Aktivní linky
+Buffer size	InfoView		Velikost bufferu
+\n- Quality:	FileNodeInfoView		\n- Kvalita:
+Kinds	LiveNodeInfoView		Druhy
+Application	AppNodeInfoView		Aplikace
+Flavor flags	DormantNodeInfoView		Příznaky
+Max. instances	DormantNodeInfoView		Maximum instancí
+\n- Duration:	FileNodeInfoView		\n- Délka trvání:
+Dormant media node	DormantNodeInfoView		Uzel multimédií Dormant
+Latency	LiveNodeInfoView		Prodleva
+Media type	InfoView		Typ média
+Live media node	LiveNodeInfoView		Uzel živých médií
+Field rate	InfoView		Rychlost polí
+Kinds	DormantNodeInfoView		Druhy
+%title% info	InfoView		%title% informace
+Node ID	LiveNodeInfoView		ID uzlu
+Resolution	InfoView		Rozlišení
+Chunk size	InfoView		Velikost bloku
+File format	AppNodeInfoView		Formát souboru
+Matrix mask	InfoView		Maticová maska
+Channel mask	InfoView		Kanálová maska
+Orientation	InfoView		Orientace
+Live file-interface node	FileNodeInfoView		Uzel živého rozhraní souboru
+Channels	InfoView		Kanály
+Sample rate	InfoView		Vzorkovací frekvence
+File format	FileNodeInfoView		Formát souboru
+(no file)	FileNodeInfoView		(žádný soubor)
+Media input	InfoView		Vstup média
+Bit rate	InfoView		Datový tok
+Input format	DormantNodeInfoView		Vstupní formát
+Format	InfoView		Formát
+Version	AppNodeInfoView		Verze
+AddOn ID	DormantNodeInfoView		ID doplňku
+Frame size	InfoView		Velikost snímku
+Flavor ID	DormantNodeInfoView		ID příchutě
+Run mode	LiveNodeInfoView		Mód běhu
+\n- Codec:	FileNodeInfoView		\n- Kodek:
+Port	LiveNodeInfoView		Port
+Output format	DormantNodeInfoView		Výstupní formát
+Aspect ratio	InfoView		Poměr stran
+Application-owned node	AppNodeInfoView		Uzel vlastněn aplikací
+Tracks	FileNodeInfoView		Stopy
+Source	InfoView		Zdroj
+Destination	InfoView		Cíl
+Copyright	FileNodeInfoView		Autorská práva
+ID:	FileNodeInfoView		ID:

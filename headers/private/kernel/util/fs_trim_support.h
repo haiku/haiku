@@ -6,7 +6,9 @@
 #define _FS_TRIM_SUPPORT_H
 
 
+#include <AutoDeleter.h>
 #include <KernelExport.h>
+#include <SupportDefs.h>
 
 #include <kernel.h>
 #include <syscall_restart.h>
@@ -62,7 +64,7 @@ copy_trim_data_to_user(void* buffer, fs_trim_data* trimData)
 		return B_BAD_ADDRESS;
 
 	// Do not copy any ranges
-	return user_memcpy(buffer, trimData, sizeof(uint64) * 2);
+	return user_memcpy(buffer, trimData, offsetof(fs_trim_data, ranges));
 }
 
 

@@ -33,14 +33,19 @@
 // TODO: the retrieval/copy of the original data could be delayed until the
 //		new data must be written, ie. in low memory situations.
 
+#ifdef _KERNEL_MODE
+#	define TRACE_ALWAYS(x...) dprintf(x)
+#else
+#	define TRACE_ALWAYS(x...) printf(x)
+#endif
+
 //#define TRACE_BLOCK_CACHE
 #ifdef TRACE_BLOCK_CACHE
-#	define TRACE(x)	dprintf x
+#	define TRACE(x)	TRACE_ALWAYS(x)
 #else
 #	define TRACE(x) ;
 #endif
 
-#define TRACE_ALWAYS(x) dprintf x
 
 // This macro is used for fatal situations that are acceptable in a running
 // system, like out of memory situations - should only panic for debugging.
@@ -1281,8 +1286,8 @@ BlockWriter::_WriteBlock(cached_block* block)
 
 	if (written != (ssize_t)blockSize) {
 		TB(Error(fCache, block->block_number, "write failed", written));
-		TRACE_ALWAYS(("could not write back block %" B_PRIdOFF " (%s)\n", block->block_number,
-			strerror(errno)));
+		TRACE_ALWAYS("could not write back block %" B_PRIdOFF " (%s)\n",
+			block->block_number, strerror(errno));
 		if (written < 0)
 			return errno;
 
@@ -1515,7 +1520,7 @@ block_cache::NewBlock(off_t blockNumber)
 			}
 		} else {
 			TB(Error(this, blockNumber, "allocation failed"));
-			dprintf("block allocation failed, unused list is %sempty.\n",
+			TRACE_ALWAYS("block allocation failed, unused list is %sempty.\n",
 				unused_blocks.IsEmpty() ? "" : "not ");
 
 			// allocation failed, try to reuse an unused block
@@ -1831,9 +1836,9 @@ put_cached_block(block_cache* cache, cached_block* block)
 #if BLOCK_CACHE_DEBUG_CHANGED
 	if (!block->is_dirty && block->compare != NULL
 		&& memcmp(block->current_data, block->compare, cache->block_size)) {
-		dprintf("new block:\n");
+		TRACE_ALWAYS("new block:\n");
 		dump_block((const char*)block->current_data, 256, "  ");
-		dprintf("unchanged block:\n");
+		TRACE_ALWAYS("unchanged block:\n");
 		dump_block((const char*)block->compare, 256, "  ");
 		BlockWriter::WriteBlock(cache, block);
 		panic("block_cache: supposed to be clean block was changed!\n");
@@ -1949,8 +1954,8 @@ retry:
 			cache->RemoveBlock(block);
 			TB(Error(cache, blockNumber, "read failed", bytesRead));
 
-			TRACE_ALWAYS(("could not read block %" B_PRIdOFF ": bytesRead: %zd, error: %s\n",
-				blockNumber, bytesRead, strerror(errno)));
+			TRACE_ALWAYS("could not read block %" B_PRIdOFF ": bytesRead: %zd,"
+				" error: %s\n", blockNumber, bytesRead, strerror(errno));
 			return errno;
 		}
 		TB(Read(cache, block));
@@ -3054,11 +3059,11 @@ cache_detach_sub_transaction(void* _cache, int32 id,
 				// The block has only been changed in the parent
 				block->original_data = NULL;
 			}
+			block->parent_data = NULL;
 
 			// move the block to the previous transaction list
 			transaction->blocks.Add(block);
 			block->previous_transaction = transaction;
-			block->parent_data = NULL;
 		}
 
 		if (block->original_data != NULL) {
@@ -3216,6 +3221,8 @@ cache_start_sub_transaction(void* _cache, int32 id)
 			if (block->original_data != NULL) {
 				memcpy(block->current_data, block->original_data,
 					cache->block_size);
+
+				cache->Free(block->original_data);
 				block->original_data = NULL;
 			}
 			continue;

@@ -98,14 +98,21 @@ typedef struct {
 } mouse_movement;
 
 
+#define B_TIP_SWITCH			0x01
+#define B_SECONDARY_TIP_SWITCH	0x02
+#define B_BARREL_SWITCH			0x04
+#define B_ERASER				0x08
+#define B_TABLET_PICK			0x0F
+
+
 typedef struct {
 	uint32		buttons;
+	uint32		switches;
 	float		xpos;
 	float		ypos;
 	bool		has_contact;
 	float		pressure;
 	int32		clicks;
-	bool		eraser;
 	bigtime_t	timestamp;
 	int32		wheel_ydelta;
 	int32		wheel_xdelta;

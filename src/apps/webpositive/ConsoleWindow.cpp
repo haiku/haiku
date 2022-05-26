@@ -1,13 +1,15 @@
 /*
- * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Copyright 2014-2021 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Zhuowei Zhang
+ *		Humdinger
  */
 #include "ConsoleWindow.h"
 
 #include <Catalog.h>
+#include <Clipboard.h>
 #include <Message.h>
 #include <Button.h>
 #include <GroupLayout.h>
@@ -41,19 +43,19 @@ ConsoleWindow::ConsoleWindow(BRect frame)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL, 0.0));
 
-	fMessagesListView = new BListView("Console messages");
+	fMessagesListView = new BListView("Console messages",
+		B_MULTIPLE_SELECTION_LIST);
 	fClearMessagesButton = new BButton(B_TRANSLATE("Clear"),
 		new BMessage(CLEAR_CONSOLE_MESSAGES));
-	
+
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0.0)
-		.Add(new BScrollView("Console messages scroll", 
+		.Add(new BScrollView("Console messages scroll",
 			fMessagesListView, 0, true, true))
-		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, B_USE_SMALL_SPACING)
 			.Add(fClearMessagesButton)
-			.SetInsets(0, 5, 0, 5)
-		)
-		.SetInsets(5, 5, 5, 5)
+			.SetInsets(0, B_USE_SMALL_SPACING, 0, 0))
+		.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING,
+			B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
 	);
 	if (!frame.IsValid())
 		CenterOnScreen();
@@ -84,6 +86,11 @@ ConsoleWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		case B_COPY:
+		{
+			_CopyToClipboard();
+			break;
+		}
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -97,4 +104,31 @@ ConsoleWindow::QuitRequested()
 	if (!IsHidden())
 		Hide();
 	return false;
+}
+
+
+void
+ConsoleWindow::_CopyToClipboard()
+{
+	if (fMessagesListView->CurrentSelection() == -1)
+		return;
+
+	BString text;
+	int32 index;
+	for (int32 i = 0; (index = fMessagesListView->CurrentSelection(i)) >= 0;
+			i++) {
+		BStringItem* item = (BStringItem*)fMessagesListView->ItemAt(index);
+		text << item->Text();
+	}
+
+	ssize_t textLen = text.Length();
+	if (be_clipboard->Lock()) {
+		be_clipboard->Clear();
+		BMessage* clip = be_clipboard->Data();
+		if (clip != NULL) {
+			clip->AddData("text/plain", B_MIME_TYPE, text.String(), textLen);
+			be_clipboard->Commit();
+		}
+		be_clipboard->Unlock();
+	}
 }

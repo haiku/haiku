@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _LIBC_LIMITS_H_
@@ -10,6 +10,9 @@
 #include <config/types.h>
 
 #include <float.h>		/* for DBL_DIG, FLT_DIG, etc */
+
+#include __HAIKU_ARCH_HEADER(limits.h)
+
 
 #define LONGLONG_MIN    (-9223372036854775807LL - 1)  /* these are Be specific */
 #define LONGLONG_MAX    (9223372036854775807LL)
@@ -38,7 +41,6 @@
 #define NAME_MAX				(256)
 #define NGROUPS_MAX		 		(32)
 #define OPEN_MAX				(128)
-#define PAGESIZE				(4096)
 #define PATH_MAX				(1024)
 #define PIPE_BUF				(4 * 1024)
 #define PIPE_MAX				(512)

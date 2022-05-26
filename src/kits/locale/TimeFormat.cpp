@@ -67,7 +67,7 @@ BTimeFormat::Format(char* string, size_t maxSize, time_t time,
 	BTimeFormatStyle style) const
 {
 	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
-	if (timeFormatter.Get() == NULL)
+	if (!timeFormatter.IsSet())
 		return B_NO_MEMORY;
 
 	UnicodeString icuString;
@@ -88,13 +88,13 @@ BTimeFormat::Format(BString& string, const time_t time,
 	const BTimeFormatStyle style, const BTimeZone* timeZone) const
 {
 	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
-	if (timeFormatter.Get() == NULL)
+	if (!timeFormatter.IsSet())
 		return B_NO_MEMORY;
 
 	if (timeZone != NULL) {
 		ObjectDeleter<TimeZone> icuTimeZone(
 			TimeZone::createTimeZone(timeZone->ID().String()));
-		if (icuTimeZone.Get() == NULL)
+		if (!icuTimeZone.IsSet())
 			return B_NO_MEMORY;
 		timeFormatter->setTimeZone(*icuTimeZone.Get());
 	}
@@ -115,7 +115,7 @@ BTimeFormat::Format(BString& string, int*& fieldPositions, int& fieldCount,
 	time_t time, BTimeFormatStyle style) const
 {
 	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
-	if (timeFormatter.Get() == NULL)
+	if (!timeFormatter.IsSet())
 		return B_NO_MEMORY;
 
 	fieldPositions = NULL;
@@ -155,7 +155,7 @@ BTimeFormat::GetTimeFields(BDateElement*& fields, int& fieldCount,
 	BTimeFormatStyle style) const
 {
 	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
-	if (timeFormatter.Get() == NULL)
+	if (!timeFormatter.IsSet())
 		return B_NO_MEMORY;
 
 	fields = NULL;
@@ -210,7 +210,7 @@ status_t
 BTimeFormat::Parse(BString source, BTimeFormatStyle style, BTime& output)
 {
 	ObjectDeleter<DateFormat> timeFormatter(_CreateTimeFormatter(style));
-	if (timeFormatter.Get() == NULL)
+	if (!timeFormatter.IsSet())
 		return B_NO_MEMORY;
 
 	// If no timezone is specified in the time string, assume GMT

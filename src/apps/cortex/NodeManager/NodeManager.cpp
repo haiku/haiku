@@ -46,6 +46,13 @@
 #include <functional>
 #include <list>
 #include <set>
+// Locale Kit
+#undef B_CATALOG
+#define B_CATALOG (&sCatalog)
+#include <Catalog.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "NodeManager"
 
 #include "set_tools.h"
 #include "functional_tools.h"
@@ -60,6 +67,8 @@ __USE_CORTEX_NAMESPACE
 #define D_MESSAGE(x) //PRINT (x)
 #define D_ROSTER(x) //PRINT (x)
 #define D_LOCK(x) //PRINT (x)
+
+static BCatalog sCatalog("x-vnd.Cortex.NodeManager");
 
 // -------------------------------------------------------- //
 // messaging constants
@@ -406,12 +415,18 @@ NodeManager::~NodeManager() {
 //
 }
 
-const char* const			NodeManager::s_defaultGroupPrefix = "No Name";
-const char* const			NodeManager::s_timeSourceGroup = "Time Sources";
-const char* const			NodeManager::s_audioInputGroup = "System Audio Input";
-const char* const			NodeManager::s_videoInputGroup = "System Video Input";
-const char* const			NodeManager::s_audioMixerGroup = "System Audio Mixer";
-const char* const			NodeManager::s_videoOutputGroup = "System Video Output";
+const char* const
+NodeManager::s_defaultGroupPrefix = B_TRANSLATE("No name");
+const char* const
+NodeManager::s_timeSourceGroup = B_TRANSLATE("Time sources");
+const char* const
+NodeManager::s_audioInputGroup = B_TRANSLATE("System audio input");
+const char* const
+NodeManager::s_videoInputGroup = B_TRANSLATE("System video input");
+const char* const
+NodeManager::s_audioMixerGroup = B_TRANSLATE("System audio mixer");
+const char* const
+NodeManager::s_videoOutputGroup = B_TRANSLATE("System video output");
 
 NodeManager::NodeManager(
 	bool													useAddOnHost) :

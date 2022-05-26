@@ -1,5 +1,7 @@
 /*
  * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2021, Jacob Secunda.
+ *
  * Distributed under the terms of the MIT License.
  *
  * Manages the shutdown process.
@@ -63,6 +65,8 @@ private:
 			void				_SetShutdownWindowCancelButtonEnabled(
 									bool enabled);
 			void				_SetShutdownWindowKillButtonEnabled(
+									bool enabled);
+			void				_SetShutdownWindowWaitAnimationEnabled(
 									bool enabled);
 			void				_SetShutdownWindowWaitForShutdown();
 			void				_SetShutdownWindowWaitForAbortedOK();

@@ -1,6 +1,8 @@
 #!/bin/sh
 
-# Check for fresh install and run post install scripts.
+# Check for fresh install and run oddball system post install stuff that the
+# package_daemon doesn't handle.  All Home and other post install scripts
+# get run the old way here (probably won't be any, unless you reinstalled?).
 
 title=$1
 freshInstallIndicator=$2
@@ -8,13 +10,29 @@ postInstallDir=$3
 
 if [ -e $freshInstallIndicator ]; then
 	# execute scripts
-	for f in $postInstallDir/*.sh
-	do
-		if [ -f $f ]; then
-			echo "Running $title script $f ..." > /dev/dprintf
-			$f
+
+	if [ "$postInstallDir" == "/boot/system/boot/post-install" ]; then
+		# Special case for one script file that isn't in a package.  Rest
+		# of the files in there will be run by package_daemon when
+		# doing first boot processing.  Can be removed when Gerrit
+		# Change #3751 is done.
+		specialCaseFile="$postInstallDir/add_catalog_entry_attributes.sh"
+		if [ -e "$specialCaseFile" ]; then
+			echo "Running $title special case $specialCaseFile first boot processing." > /dev/dprintf
+			"$specialCaseFile"
+		else
+			echo "Skipping $title obsolete first boot processing, files:" > /dev/dprintf
+			ls "$postInstallDir" > /dev/dprintf
 		fi
-	done
+	else
+		for f in $postInstallDir/*.sh
+		do
+			if [ -f $f ]; then
+				echo "Running $title script $f ..." > /dev/dprintf
+				$f
+			fi
+		done
+	fi
 
 	sync
 	rm $freshInstallIndicator

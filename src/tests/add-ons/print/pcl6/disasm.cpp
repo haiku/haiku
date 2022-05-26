@@ -2,7 +2,7 @@
 
 PCL6 Disassembler
 
-Copyright (c) 2003 OpenBeOS. 
+Copyright (c) 2003 Haiku.
 
 Author: 
 	Michael Pfeiffer

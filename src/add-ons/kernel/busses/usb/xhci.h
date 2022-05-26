@@ -132,12 +132,17 @@ private:
 	static	int32				InterruptHandler(void *data);
 			int32				Interrupt();
 
+			// Device management
+			void				CleanupDevice(xhci_device *device);
+
 			// Endpoint management
 			status_t			ConfigureEndpoint(xhci_endpoint* ep, uint8 slot,
 									uint8 number, uint8 type, bool directionIn,
 									uint16 interval, uint16 maxPacketSize,
 									usb_speed speed, uint8 maxBurst,
 									uint16 bytesPerInterval);
+			uint8				_GetEndpointState(xhci_endpoint* ep);
+
 			status_t			_InsertEndpointForPipe(Pipe *pipe);
 			status_t			_RemoveEndpointForPipe(Pipe *pipe);
 
@@ -185,10 +190,8 @@ private:
 									bool deconfigure, uint8 slot);
 			status_t			EvaluateContext(uint64 inputContext,
 									uint8 slot);
-			status_t			ResetEndpoint(bool preserve, uint8 endpoint,
-									uint8 slot);
-			status_t			StopEndpoint(bool suspend, uint8 endpoint,
-									uint8 slot);
+			status_t			ResetEndpoint(bool preserve, xhci_endpoint* endpoint);
+			status_t			StopEndpoint(bool suspend, xhci_endpoint* endpoint);
 			status_t			SetTRDequeue(uint64 dequeue, uint16 stream,
 									uint8 endpoint, uint8 slot);
 			status_t			ResetDevice(uint8 slot);
@@ -252,13 +255,11 @@ private:
 
 			// Root Hub
 			XHCIRootHub *		fRootHub;
-			uint8				fRootHubAddress;
 
 			// Port management
 			uint8				fPortCount;
 			uint8				fSlotCount;
 			usb_speed			fPortSpeeds[XHCI_MAX_PORTS];
-			uint8				fPortSlots[XHCI_MAX_PORTS];
 
 			// Scratchpad
 			uint32				fScratchpadCount;

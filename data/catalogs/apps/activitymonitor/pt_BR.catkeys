@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-ActivityMonitor	3672498538
+1	portuguese (brazil)	x-vnd.Haiku-ActivityMonitor	448101400
 Teams	DataSource		Equipes
 Semaphores	DataSource		Semáforos
 TX	DataSource	Shorter version for Sending	TX
@@ -16,13 +16,15 @@ Receiving	DataSource		Recebendo
 Remove graph	ActivityView		Remover grafo
 Swap space	DataSource		Espaço Swap
 CPU	DataSource		CPU
-ActivityMonitor	System name		Monitor Ativo
+ActivityMonitor	System name		Monitor de Atividade
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Intervalo entre atualizações
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Configurações...
 Block cache	DataSource		Bloquear cache
 Memory	DataSource		Memória
 CPU usage	DataSource		Utilização da CPU
+CPU speed	DataSource		Velocidade da CPU
 Quit	ActivityWindow		Sair
 Raw clipboard	DataSource		Área de transferência bruta
 Settings	ActivityWindow		Configurações
@@ -30,6 +32,7 @@ Used memory	DataSource		Memória utilizada
 %.1f faults/s	DataSource		%.1f falhas/s
 Show legend	ActivityView		Exibir legendas
 Cached memory	DataSource		Memória em cache
+CPU %d usage	DataSource		Uso de CPU %d
 File	ActivityWindow		Arquivo
 Ports	DataSource		Portas
 Page faults	DataSource		Falha de página

@@ -1,6 +1,8 @@
-1	belarusian	x-vnd.Haiku-KeyboardInputServerDevice	2228550365
+1	belarusian	x-vnd.Haiku-KeyboardInputServerDevice	131044710
 If the application will not quit you may have to kill it.	Team monitor		Калі праграма не спыніцца вам магчыма прыдзецца знішчыць яе.
 Quit application	Team monitor		Спыніць праграму
+Open Terminal	Team monitor		Адчыніць Тэрмінал
+{0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Трымайце CONTROL+ALT+DELETE # секунду каб перазагрузіць.}other{Трымайце CONTROL+ALT+DELETE # секунд каб перазагрузіць.}}
 Restart the desktop	Team monitor		Перазапусціць дэсктоп
 Force reboot	Team monitor		Перагрузіць
 Team monitor	Team monitor		Манітор працэсаў

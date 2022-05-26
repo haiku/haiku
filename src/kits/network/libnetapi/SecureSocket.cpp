@@ -199,7 +199,7 @@ BSecureSocket::Private::ErrorCode(int returnValue)
 			return B_NO_ERROR;
 		case SSL_ERROR_ZERO_RETURN:
 			// Socket is closed
-			return B_CANCELED;
+			return B_IO_ERROR;
 		case SSL_ERROR_SSL:
 			// Probably no certificate
 			return B_NOT_ALLOWED;
@@ -365,15 +365,7 @@ BSecureSocket::Private::_CreateContext()
 	SSL_CTX_set_cipher_list(sContext, "HIGH:!aNULL:!PSK:!SRP:!MD5:!RC4");
 
 	// Setup certificate verification
-	BPath certificateStore;
-	find_directory(B_SYSTEM_DATA_DIRECTORY, &certificateStore);
-	certificateStore.Append("ssl/CARootCertificates.pem");
-
-	BPath userCertificateStore;
-	find_directory(B_SYSTEM_NONPACKAGED_DATA_DIRECTORY, &userCertificateStore);
-	userCertificateStore.Append("ssl/certs/");
-	SSL_CTX_load_verify_locations(sContext, certificateStore.Path(), userCertificateStore.Path());
-	SSL_CTX_set_verify(sContext, SSL_VERIFY_PEER, VerifyCallback);
+	SSL_CTX_set_default_verify_file(sContext);
 
 	// OpenSSL 1.0.2 and later: use the alternate "trusted first" algorithm to
 	// validate certificate chains. This makes the validation stop as soon as a
@@ -548,7 +540,7 @@ BSecureSocket::Read(void* buffer, size_t size)
 	int retry;
 	do {
 		bytesRead = SSL_read(fPrivate->fSSL, buffer, size);
-		if (bytesRead >= 0)
+		if (bytesRead > 0)
 			return bytesRead;
 
 		if (errno != EINTR) {

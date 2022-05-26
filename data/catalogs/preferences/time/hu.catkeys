@@ -1,11 +1,11 @@
-1	hungarian	x-vnd.Haiku-Time	834234238
+1	hungarian	x-vnd.Haiku-Time	3691539601
 OK	Time		Rendben
 Message receiving failed	Time		Sikertelen üzenetfogadás
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Dátum és idő, készítette:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\n Copyright 2004-2012, Haiku.
 Australia	Time		Ausztrália
 America	Time		Amerika
 Reset to default server list	Time		Eredeti kiszolgálólista visszaállìtása
 Could not resolve server address	Time		Nem sikerült feloldani a kiszolgáló címét
+Time & Date	System name		Dátum és idő
 Set time zone	Time		Időzóna beállítása
 Waiting for answer failed	Time		Nem érkezett válasz
 <Other>	Time		<Egyéb>
@@ -38,7 +38,6 @@ Atlantic	Time		Atlanti-óceán
 Show clock in Deskbar	Time		Óra az Asztalsávon
 Display time with seconds	Time		Másodpercek megjelenítése
 Time	System name		Dátum és idő
-about	Time		névjegy
 Show time zone	Time		Időzóna megjelenítése
 Synchronize at boot	Time		Szinkronizálás indításkor
 Indian	Time		India

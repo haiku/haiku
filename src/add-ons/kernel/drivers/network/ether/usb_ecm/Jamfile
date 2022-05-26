@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network ether usb_ecm ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders net ;
+
+KernelAddon usb_ecm :
+	Driver.cpp
+	ECMDevice.cpp
+	;

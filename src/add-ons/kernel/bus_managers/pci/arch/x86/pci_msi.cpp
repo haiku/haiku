@@ -361,9 +361,14 @@ pci_configure_msix(uint8 virtualBus, uint8 _device, uint8 function,
 	// map the table bar
 	size_t tableSize = info->message_count * 16;
 	addr_t address;
+	phys_addr_t barAddr = device->info.u.h0.base_registers[info->table_bar];
+	uchar flags = device->info.u.h0.base_register_flags[info->table_bar];
+	if ((flags & PCI_address_type) == PCI_address_type_64) {
+		barAddr |= (uint64)device->info.u.h0.base_registers[
+			info->table_bar + 1] << 32;
+	}
 	area_id area = map_physical_memory("msi table map",
-		device->info.u.h0.base_registers[info->table_bar],
-		tableSize + info->table_offset,
+		barAddr, tableSize + info->table_offset,
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void**)&address);
 	if (area < 0)
@@ -373,9 +378,14 @@ pci_configure_msix(uint8 virtualBus, uint8 _device, uint8 function,
 
 	// and the pba bar if necessary
 	if (info->table_bar != info->pba_bar) {
+		barAddr = device->info.u.h0.base_registers[info->pba_bar];
+		flags = device->info.u.h0.base_register_flags[info->pba_bar];
+		if ((flags & PCI_address_type) == PCI_address_type_64) {
+			barAddr |= (uint64)device->info.u.h0.base_registers[
+				info->pba_bar + 1] << 32;
+		}
 		area = map_physical_memory("msi pba map",
-			device->info.u.h0.base_registers[info->pba_bar],
-			tableSize + info->pba_offset,
+			barAddr, tableSize + info->pba_offset,
 			B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 			(void**)&address);
 		if (area < 0) {

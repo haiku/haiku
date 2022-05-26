@@ -26,7 +26,7 @@
  *             is a test suite.  A series of tests are added to
  *             the suite.  Each test appears twice, once for
  *             the Be implementation of BMessageQueue, once for the
- *             OpenBeOS implementation.
+ *             Haiku implementation.
  */
 
 Test *addonTestFunc(void)

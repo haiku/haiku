@@ -1,0 +1,15 @@
+1	czech	x-vnd.Haiku-desklink	618383392
+desklink	MediaReplicant	Title of an alert box	odkaz na plochu
+Muted	MediaReplicant		Ztlumeno
+%g dB	MediaReplicant		%g dB
+OK	MediaReplicant		OK
+Couldn't launch 	MediaReplicant		Nelze spustit 
+Volume	VolumeControl		Hlasitost
+Open MediaPlayer	MediaReplicant		Otevřít Přehrávač multimédií
+%ld dB	VolumeControl		%ld dB
+Media preferences…	MediaReplicant		Nastavení multimédií…
+Options	MediaReplicant		Možnosti
+Beep	MediaReplicant		Pípnutí
+Open %name	DeskButton	Don't translate variable %name	Otevřít %name
+Control physical output	MediaReplicant		Ovládání fyzického výstupu
+No media server running	VolumeControl		Neběží žádný multimediální server

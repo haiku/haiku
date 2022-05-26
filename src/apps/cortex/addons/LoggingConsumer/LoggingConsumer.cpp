@@ -43,7 +43,11 @@
 #include <string.h>
 
 // e.moon [11jun99]
+#include <Catalog.h>
 #include <Debug.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexAddOnsLoggingConsumer"
 
 // id's of the node's BParameters
 const int32 INPUT_NULL_PARAM = 1;
@@ -59,24 +63,31 @@ static BParameterWeb* build_parameter_web()
 {
 	BParameterWeb* web = new BParameterWeb;
 
-	BParameterGroup* mainGroup = web->MakeGroup("LoggingConsumer Parameters");
-	BParameterGroup* group = mainGroup->MakeGroup("Latency control");
-	BParameter* nullParam = group->MakeNullParameter(INPUT_NULL_PARAM, B_MEDIA_NO_TYPE, "Latency", B_GENERIC);
-	BParameter* latencyParam = group->MakeContinuousParameter(LATENCY_PARAM, B_MEDIA_NO_TYPE, "",
-		B_GAIN, "ms", 5, 100, 5);
+	BParameterGroup* mainGroup = web->MakeGroup(
+		B_TRANSLATE("LoggingConsumer parameters"));
+	BParameterGroup* group = mainGroup->MakeGroup(
+		B_TRANSLATE("Latency control"));
+	BParameter* nullParam = group->MakeNullParameter(INPUT_NULL_PARAM,
+		B_MEDIA_NO_TYPE, B_TRANSLATE("Latency"), B_GENERIC);
+	BParameter* latencyParam = group->MakeContinuousParameter(LATENCY_PARAM,
+		B_MEDIA_NO_TYPE, "", B_GAIN, "ms", 5, 100, 5);
 	nullParam->AddOutput(latencyParam);
 	latencyParam->AddInput(nullParam);
 
-	group = mainGroup->MakeGroup("CPU percentage");
-	nullParam = group->MakeNullParameter(CPU_NULL_PARAM, B_MEDIA_NO_TYPE, "CPU spin percentage", B_GENERIC);
-	BContinuousParameter* cpuParam = group->MakeContinuousParameter(CPU_SPIN_PARAM, B_MEDIA_NO_TYPE, "",
-		B_GAIN, "percent", 5, 80, 5);
+	group = mainGroup->MakeGroup(B_TRANSLATE("CPU percentage"));
+	nullParam = group->MakeNullParameter(CPU_NULL_PARAM, B_MEDIA_NO_TYPE,
+		B_TRANSLATE("CPU spin percentage"), B_GENERIC);
+	BContinuousParameter* cpuParam = group->MakeContinuousParameter(
+		CPU_SPIN_PARAM, B_MEDIA_NO_TYPE, "",
+		B_GAIN, B_TRANSLATE("percent"), 5, 80, 5);
 	nullParam->AddOutput(cpuParam);
 	cpuParam->AddInput(nullParam);
 
-	group = mainGroup->MakeGroup("Priority");
-	nullParam = group->MakeNullParameter(PRIO_NULL_PARAM, B_MEDIA_NO_TYPE, "Thread priority", B_GENERIC);
-	BDiscreteParameter* prioParam = group->MakeDiscreteParameter(PRIORITY_PARAM, B_MEDIA_NO_TYPE, "", B_GENERIC);
+	group = mainGroup->MakeGroup(B_TRANSLATE("Priority"));
+	nullParam = group->MakeNullParameter(PRIO_NULL_PARAM, B_MEDIA_NO_TYPE,
+		B_TRANSLATE("Thread priority"), B_GENERIC);
+	BDiscreteParameter* prioParam = group->MakeDiscreteParameter(PRIORITY_PARAM,
+		B_MEDIA_NO_TYPE, "", B_GENERIC);
 	prioParam->AddItem(5, "B_LOW_PRIORITY");
 	prioParam->AddItem(10, "B_NORMAL_PRIORITY");
 	prioParam->AddItem(15, "B_DISPLAY_PRIORITY");
@@ -521,7 +532,7 @@ LoggingConsumer::NodeRegistered()
 	mInput.destination.port = ControlPort();
 	mInput.destination.id = 0;
 	mInput.node = Node();
-	strcpy(mInput.name, "Logged input");
+	strcpy(mInput.name, B_TRANSLATE("Logged input"));
 }
 
 void

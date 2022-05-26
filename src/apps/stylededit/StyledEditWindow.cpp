@@ -33,6 +33,7 @@
 #include <File.h>
 #include <FilePanel.h>
 #include <fs_attr.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Menu.h>
 #include <MenuBar.h>
@@ -84,7 +85,8 @@ bs_printf(BString* string, const char* format, ...)
 
 StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 	:
-	BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
+	BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS
+		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fFindWindow(NULL),
 	fReplaceWindow(NULL)
 {
@@ -100,7 +102,8 @@ StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 
 StyledEditWindow::StyledEditWindow(BRect frame, entry_ref* ref, uint32 encoding)
 	:
-	BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
+	BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS
+		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fFindWindow(NULL),
 	fReplaceWindow(NULL)
 {
@@ -177,6 +180,12 @@ StyledEditWindow::MessageReceived(BMessage* message)
 	}
 
 	switch (message->what) {
+		case MENU_NEW:
+			 // this is because of the layout menu change,
+			 // it is too early to connect to a different looper there
+			 // so either have to redirect it here, or change the invocation
+			be_app->PostMessage(message);
+			break;
 		// File menu
 		case MENU_SAVE:
 			if (!fSaveMessage)
@@ -230,13 +239,10 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			fTextView->Undo(be_clipboard);
 			break;
 		case B_CUT:
-			fTextView->Cut(be_clipboard);
-			break;
 		case B_COPY:
-			fTextView->Copy(be_clipboard);
-			break;
 		case B_PASTE:
-			fTextView->Paste(be_clipboard);
+		case B_SELECT_ALL:
+			fTextView->MessageReceived(message);
 			break;
 		case MENU_CLEAR:
 			fTextView->Clear();
@@ -370,6 +376,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			font.SetFamilyAndStyle(fontFamily, fontStyle);
 			fItalicItem->SetMarked((font.Face() & B_ITALIC_FACE) != 0);
 			fBoldItem->SetMarked((font.Face() & B_BOLD_FACE) != 0);
+			fUnderlineItem->SetMarked((font.Face() & B_UNDERSCORE_FACE) != 0);
 
 			_SetFontStyle(fontFamily, fontStyle);
 			break;
@@ -394,6 +401,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			font.SetFamilyAndStyle(fontFamily, fontStyle);
 			fItalicItem->SetMarked((font.Face() & B_ITALIC_FACE) != 0);
 			fBoldItem->SetMarked((font.Face() & B_BOLD_FACE) != 0);
+			fUnderlineItem->SetMarked((font.Face() & B_UNDERSCORE_FACE) != 0);
 
 			_SetFontStyle(fontFamily, fontStyle);
 			break;
@@ -460,6 +468,23 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			if (fBoldItem->IsMarked())
 				font.SetFace(B_REGULAR_FACE);
 			fBoldItem->SetMarked(!fBoldItem->IsMarked());
+
+			font_family family;
+			font_style style;
+			font.GetFamilyAndStyle(&family, &style);
+
+			_SetFontStyle(family, style);
+			break;
+		}
+		case kMsgSetUnderline:
+		{
+			uint32 sameProperties;
+			BFont font;
+			fTextView->GetFontAndColor(&font, &sameProperties);
+
+			if (fUnderlineItem->IsMarked())
+				font.SetFace(B_REGULAR_FACE);
+			fUnderlineItem->SetMarked(!fUnderlineItem->IsMarked());
 
 			font_family family;
 			font_style style;
@@ -736,6 +761,7 @@ StyledEditWindow::MenusBeginning()
 
 	fBoldItem->SetMarked((font.Face() & B_BOLD_FACE) != 0);
 	fItalicItem->SetMarked((font.Face() & B_ITALIC_FACE) != 0);
+	fUnderlineItem->SetMarked((font.Face() & B_UNDERSCORE_FACE) != 0);
 
 	switch (fTextView->Alignment()) {
 		case B_ALIGN_LEFT:
@@ -1122,129 +1148,66 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 
 	fNagOnNodeChange = true;
 
-	// add menubar
-	fMenuBar = new BMenuBar(BRect(0, 0, 0, 0), "menubar");
-	AddChild(fMenuBar);
 
 	// add textview and scrollview
 
 	BRect viewFrame = Bounds();
-	viewFrame.top = fMenuBar->Bounds().Height() + 1;
-	viewFrame.right -=  B_V_SCROLL_BAR_WIDTH;
-	viewFrame.left = 0;
-	viewFrame.bottom -= B_H_SCROLL_BAR_HEIGHT;
-
 	BRect textBounds = viewFrame;
 	textBounds.OffsetTo(B_ORIGIN);
-	textBounds.InsetBy(TEXT_INSET, TEXT_INSET);
 
 	fTextView = new StyledEditView(viewFrame, textBounds, this);
+	fTextView->SetInsets(TEXT_INSET, TEXT_INSET, TEXT_INSET, TEXT_INSET);
 	fTextView->SetDoesUndo(true);
 	fTextView->SetStylable(true);
 	fTextView->SetEncoding(encoding);
 
 	fScrollView = new BScrollView("scrollview", fTextView, B_FOLLOW_ALL, 0,
 		true, true, B_PLAIN_BORDER);
-	AddChild(fScrollView);
 	fTextView->MakeFocus(true);
 
 	fStatusView = new StatusView(fScrollView);
 	fScrollView->AddChild(fStatusView);
 
-	// Add "File"-menu:
-	BMenu* menu = new BMenu(B_TRANSLATE("File"));
-	fMenuBar->AddItem(menu);
-
-	BMenuItem* menuItem;
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("New"),
-		new BMessage(MENU_NEW), 'N'));
-	menuItem->SetTarget(be_app);
-
-	menu->AddItem(menuItem = new BMenuItem(BRecentFilesList::NewFileListMenu(
+	BMenuItem* openItem = new BMenuItem(BRecentFilesList::NewFileListMenu(
 		B_TRANSLATE("Open" B_UTF8_ELLIPSIS), NULL, NULL, be_app, 9, true,
-		NULL, APP_SIGNATURE), new BMessage(MENU_OPEN)));
-	menuItem->SetShortcut('O', 0);
-	menuItem->SetTarget(be_app);
-	menu->AddSeparatorItem();
+		NULL, APP_SIGNATURE), new BMessage(MENU_OPEN));
+	openItem->SetShortcut('O', 0);
+	openItem->SetTarget(be_app);
 
-	menu->AddItem(fSaveItem = new BMenuItem(B_TRANSLATE("Save"),
-		new BMessage(MENU_SAVE), 'S'));
+	fSaveItem = new BMenuItem(B_TRANSLATE("Save"),new BMessage(MENU_SAVE), 'S');
 	fSaveItem->SetEnabled(false);
-	menu->AddItem(menuItem = new BMenuItem(
-		B_TRANSLATE("Save as" B_UTF8_ELLIPSIS), new BMessage(MENU_SAVEAS)));
-	menuItem->SetShortcut('S', B_SHIFT_KEY);
-	menuItem->SetEnabled(true);
 
-	menu->AddItem(fReloadItem
-		= new BMenuItem(B_TRANSLATE("Reload" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_RELOAD), 'L'));
+	fReloadItem = new BMenuItem(B_TRANSLATE("Reload" B_UTF8_ELLIPSIS),
+	new BMessage(MENU_RELOAD), 'L');
 	fReloadItem->SetEnabled(false);
 
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Close"),
-		new BMessage(MENU_CLOSE), 'W'));
-
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_PAGESETUP)));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Print" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_PRINT), 'P'));
-
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
-		new BMessage(MENU_QUIT), 'Q'));
-
-	// Add the "Edit"-menu:
-	menu = new BMenu(B_TRANSLATE("Edit"));
-	fMenuBar->AddItem(menu);
-
-	menu->AddItem(fUndoItem = new BMenuItem(B_TRANSLATE("Can't undo"),
-		new BMessage(B_UNDO), 'Z'));
+	fUndoItem = new BMenuItem(B_TRANSLATE("Can't undo"),
+		new BMessage(B_UNDO), 'Z');
 	fUndoItem->SetEnabled(false);
 
-	menu->AddSeparatorItem();
-	menu->AddItem(fCutItem = new BMenuItem(B_TRANSLATE("Cut"),
-		new BMessage(B_CUT), 'X'));
+	fCutItem = new BMenuItem(B_TRANSLATE("Cut"),
+		new BMessage(B_CUT), 'X');
 	fCutItem->SetEnabled(false);
-	fCutItem->SetTarget(fTextView);
 
-	menu->AddItem(fCopyItem = new BMenuItem(B_TRANSLATE("Copy"),
-		new BMessage(B_COPY), 'C'));
+	fCopyItem = new BMenuItem(B_TRANSLATE("Copy"),
+		new BMessage(B_COPY), 'C');
 	fCopyItem->SetEnabled(false);
-	fCopyItem->SetTarget(fTextView);
 
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Paste"),
-		new BMessage(B_PASTE), 'V'));
-	menuItem->SetTarget(fTextView);
-
-	menu->AddSeparatorItem();
-	menu->AddItem(menuItem = new BMenuItem(B_TRANSLATE("Select all"),
-		new BMessage(B_SELECT_ALL), 'A'));
-	menuItem->SetTarget(fTextView);
-
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_FIND), 'F'));
-	menu->AddItem(fFindAgainItem= new BMenuItem(B_TRANSLATE("Find again"),
-		new BMessage(MENU_FIND_AGAIN), 'G'));
+	fFindAgainItem = new BMenuItem(B_TRANSLATE("Find again"),
+		new BMessage(MENU_FIND_AGAIN), 'G');
 	fFindAgainItem->SetEnabled(false);
 
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Find selection"),
-		new BMessage(MENU_FIND_SELECTION), 'H'));
-	menu->AddItem(fReplaceItem = new BMenuItem(B_TRANSLATE("Replace" B_UTF8_ELLIPSIS),
-		new BMessage(MENU_REPLACE), 'R'));
-	menu->AddItem(fReplaceSameItem = new BMenuItem(B_TRANSLATE("Replace next"),
-		new BMessage(MENU_REPLACE_SAME), 'T'));
+	fReplaceItem = new BMenuItem(B_TRANSLATE("Replace" B_UTF8_ELLIPSIS),
+		new BMessage(MENU_REPLACE), 'R');
+
+	fReplaceSameItem = new BMenuItem(B_TRANSLATE("Replace next"),
+		new BMessage(MENU_REPLACE_SAME), 'T');
 	fReplaceSameItem->SetEnabled(false);
 
-	// Add the "Font"-menu:
-	fFontMenu = new BMenu(B_TRANSLATE("Font"));
-	fMenuBar->AddItem(fFontMenu);
-
-	// "Size"-subMenu
 	fFontSizeMenu = new BMenu(B_TRANSLATE("Size"));
 	fFontSizeMenu->SetRadioMode(true);
-	fFontMenu->AddItem(fFontSizeMenu);
 
+	BMenuItem* menuItem;
 	for (uint32 i = 0; i < sizeof(fontSizes) / sizeof(fontSizes[0]); i++) {
 		BMessage* fontMessage = new BMessage(FONT_SIZE);
 		fontMessage->AddFloat("size", fontSizes[i]);
@@ -1257,37 +1220,39 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 			menuItem->SetMarked(true);
 	}
 
-	// "Color"-subMenu
 	fFontColorMenu = new BMenu(B_TRANSLATE("Color"), 0, 0);
 	fFontColorMenu->SetRadioMode(true);
-	fFontMenu->AddItem(fFontColorMenu);
 
 	_BuildFontColorMenu(fFontColorMenu);
 
-	fFontMenu->AddSeparatorItem();
-
-	BMenuItem* fontSizeUpItem = new BMenuItem(B_TRANSLATE("Increase size"),
-		new BMessage(kMsgSetFontUp));
-	BMenuItem* fontSizeDownItem = new BMenuItem(B_TRANSLATE("Decrease size"),
-		new BMessage(kMsgSetFontDown));
-	fFontMenu->AddItem(fontSizeUpItem);
-	fFontMenu->AddItem(fontSizeDownItem);
-	fontSizeUpItem->SetShortcut('+', 0);
-	fontSizeDownItem->SetShortcut('-', 0);
-
-	// "Bold" & "Italic" menu items
-	fFontMenu->AddItem(fBoldItem = new BMenuItem(B_TRANSLATE("Bold"),
-		new BMessage(kMsgSetBold)));
-	fFontMenu->AddItem(fItalicItem = new BMenuItem(B_TRANSLATE("Italic"),
-		new BMessage(kMsgSetItalic)));
+	fBoldItem = new BMenuItem(B_TRANSLATE("Bold"),
+		new BMessage(kMsgSetBold));
 	fBoldItem->SetShortcut('B', 0);
+
+	fItalicItem = new BMenuItem(B_TRANSLATE("Italic"),
+		new BMessage(kMsgSetItalic));
 	fItalicItem->SetShortcut('I', 0);
-	fFontMenu->AddSeparatorItem();
 
-	// Available fonts
+	fUnderlineItem = new BMenuItem(B_TRANSLATE("Underline"),
+		new BMessage(kMsgSetUnderline));
+	fUnderlineItem->SetShortcut('U', 0);
 
+	fFontMenu = new BMenu(B_TRANSLATE("Font"));
 	fCurrentFontItem = 0;
 	fCurrentStyleItem = 0;
+
+	// premake font menu since we cant add members dynamically later
+	BLayoutBuilder::Menu<>(fFontMenu)
+		.AddItem(fFontSizeMenu)
+		.AddItem(fFontColorMenu)
+		.AddSeparator()
+		.AddItem(B_TRANSLATE("Increase size"), kMsgSetFontUp, '+')
+		.AddItem(B_TRANSLATE("Decrease size"), kMsgSetFontDown, '-')
+		.AddItem(fBoldItem)
+		.AddItem(fItalicItem)
+		.AddItem(fUnderlineItem)
+		.AddSeparator()
+	.End();
 
 	BMenu* subMenu;
 	int32 numFamilies = count_font_families();
@@ -1311,47 +1276,91 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 		}
 	}
 
-	// Add the "Document"-menu:
-	menu = new BMenu(B_TRANSLATE("Document"));
-	fMenuBar->AddItem(menu);
-
 	// "Align"-subMenu:
-	subMenu = new BMenu(B_TRANSLATE("Align"));
-	subMenu->SetRadioMode(true);
+	BMenu* alignMenu = new BMenu(B_TRANSLATE("Align"));
+	alignMenu->SetRadioMode(true);
 
-	subMenu->AddItem(fAlignLeft = new BMenuItem(B_TRANSLATE("Left"),
+	alignMenu->AddItem(fAlignLeft = new BMenuItem(B_TRANSLATE("Left"),
 		new BMessage(ALIGN_LEFT)));
 	fAlignLeft->SetMarked(true);
 	fAlignLeft->SetShortcut('L', B_OPTION_KEY);
 
-	subMenu->AddItem(fAlignCenter = new BMenuItem(B_TRANSLATE("Center"),
+	alignMenu->AddItem(fAlignCenter = new BMenuItem(B_TRANSLATE("Center"),
 		new BMessage(ALIGN_CENTER)));
 	fAlignCenter->SetShortcut('C', B_OPTION_KEY);
 
-	subMenu->AddItem(fAlignRight = new BMenuItem(B_TRANSLATE("Right"),
+	alignMenu->AddItem(fAlignRight = new BMenuItem(B_TRANSLATE("Right"),
 		new BMessage(ALIGN_RIGHT)));
 	fAlignRight->SetShortcut('R', B_OPTION_KEY);
 
-	menu->AddItem(subMenu);
-	menu->AddItem(fWrapItem = new BMenuItem(B_TRANSLATE("Wrap lines"),
-		new BMessage(WRAP_LINES)));
+	fWrapItem = new BMenuItem(B_TRANSLATE("Wrap lines"),
+		new BMessage(WRAP_LINES));
 	fWrapItem->SetMarked(true);
 	fWrapItem->SetShortcut('W', B_OPTION_KEY);
 
 	BMessage *message = new BMessage(MENU_RELOAD);
 	message->AddString("encoding", "auto");
-	menu->AddItem(fEncodingItem = new BMenuItem(_PopulateEncodingMenu(
+	fEncodingItem = new BMenuItem(_PopulateEncodingMenu(
 		new BMenu(B_TRANSLATE("Text encoding")), "UTF-8"),
-		message));
+		message);
 	fEncodingItem->SetEnabled(false);
 
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Statistics" B_UTF8_ELLIPSIS),
-		new BMessage(SHOW_STATISTICS)));
+	BMenuBar* mainMenu = new BMenuBar("mainMenu");
+
+	BLayoutBuilder::Menu<>(mainMenu)
+		.AddMenu(B_TRANSLATE("File"))
+			.AddItem(B_TRANSLATE("New"), MENU_NEW, 'N')
+			.AddItem(openItem)
+			.AddSeparator()
+			.AddItem(fSaveItem)
+			.AddItem(B_TRANSLATE("Save as" B_UTF8_ELLIPSIS),
+				MENU_SAVEAS, 'S', B_SHIFT_KEY)
+			.AddItem(fReloadItem)
+			.AddItem(B_TRANSLATE("Close"), MENU_CLOSE, 'W')
+			.AddSeparator()
+			.AddItem(B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS), MENU_PAGESETUP)
+			.AddItem(B_TRANSLATE("Print" B_UTF8_ELLIPSIS), MENU_PRINT, 'P')
+			.AddSeparator()
+			.AddItem(B_TRANSLATE("Quit"), MENU_QUIT, 'Q')
+		.End()
+		.AddMenu(B_TRANSLATE("Edit"))
+			.AddItem(fUndoItem)
+			.AddSeparator()
+			.AddItem(fCutItem)
+			.AddItem(fCopyItem)
+			.AddItem(B_TRANSLATE("Paste"), B_PASTE, 'V')
+			.AddSeparator()
+			.AddItem(B_TRANSLATE("Select all"), B_SELECT_ALL, 'A')
+			.AddSeparator()
+			.AddItem(B_TRANSLATE("Find" B_UTF8_ELLIPSIS), MENU_FIND, 'F')
+			.AddItem(fFindAgainItem)
+			.AddItem(B_TRANSLATE("Find selection"), MENU_FIND_SELECTION, 'H')
+			.AddItem(fReplaceItem)
+			.AddItem(fReplaceSameItem)
+		.End()
+		.AddItem(fFontMenu)
+		.AddMenu(B_TRANSLATE("Document"))
+			.AddItem(alignMenu)
+			.AddItem(fWrapItem)
+			.AddItem(fEncodingItem)
+			.AddSeparator()
+			.AddItem(B_TRANSLATE("Statistics" B_UTF8_ELLIPSIS), SHOW_STATISTICS)
+		.End();
+
 
 	fSavePanel = NULL;
 	fSavePanelEncodingMenu = NULL;
-		// build lazily
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.Add(mainMenu)
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(-1)
+			.Add(fScrollView)
+		.End()
+	.End();
+
+	SetKeyMenuBar(mainMenu);
+
 }
 
 
@@ -1895,9 +1904,12 @@ StyledEditWindow::_SetFontStyle(const char* fontFamily, const char* fontStyle)
 	if (fItalicItem->IsMarked())
 		face |= B_ITALIC_FACE;
 
+	if (fUnderlineItem->IsMarked())
+		face |= B_UNDERSCORE_FACE;
+
 	font.SetFace(face);
 
-	fTextView->SetFontAndColor(&font, B_FONT_FAMILY_AND_STYLE);
+	fTextView->SetFontAndColor(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_FACE);
 
 	BMenuItem* superItem;
 	superItem = fFontMenu->FindItem(fontFamily);

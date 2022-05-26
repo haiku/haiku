@@ -30,12 +30,12 @@ static const uint32 kMsgUpdateControls = 'UCTL';
 
 // labels
 static const char *kLabelIPCP = "TCP/IP";
-static const char *kLabelIPAddress = "IP Address: ";
+static const char *kLabelIPAddress = "IP address: ";
 static const char *kLabelPrimaryDNS = "Primary DNS: ";
 static const char *kLabelSecondaryDNS = "Secondary DNS: ";
 static const char *kLabelOptional = "(Optional)";
-static const char *kLabelExtendedOptions = "Extended Options:";
-static const char *kLabelEnabled = "Enable TCP/IP Protocol";
+static const char *kLabelExtendedOptions = "Extended options:";
+static const char *kLabelEnabled = "Enable TCP/IP protocol";
 
 // add-on descriptions
 static const char *kKernelModuleName = "ipcp";

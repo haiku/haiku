@@ -5,6 +5,7 @@ AddResources libpackage.so : libpackage.rdef ;
 UsePrivateHeaders
 	app
 	kernel
+	netservices
 	shared
 	libroot
 	storage
@@ -63,9 +64,6 @@ HPKG_SOURCES =
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
-		if [ FIsBuildFeatureEnabled zstd ] {
-			SubDirC++Flags -DZSTD_ENABLED ;
-		}
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg ] ;
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package hpkg v1 ] ;
 		SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits package manager ] ;
@@ -84,6 +82,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			DownloadFileRequest.cpp
 			DropRepositoryRequest.cpp
 			FetchFileJob.cpp
+			FetchUtils.cpp
 			InstallationLocationInfo.cpp
 			Job.cpp
 			PackageInfo.cpp
@@ -129,6 +128,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			shared
 			bnetapi
 			be localestub
+			[ MultiArchDefaultGristFiles libnetservices.a ]
 			[ TargetLibstdc++ ]
 			$(TARGET_NETWORK_LIBS)
 			;

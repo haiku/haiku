@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Haiku, Inc. All rights reserved.
+ * Copyright 2012-2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,6 +17,17 @@
 
 #include "Request.h"
 #include "RootInode.h"
+
+
+#define ERROR(x...) dprintf("nfs4: " x)
+
+#ifdef DEBUG
+#define TRACE(x...) dprintf("nfs4: " x)
+#define CALLED() dprintf("nfs4: called %s", __func__)
+#else
+#define TRACE(x...)
+#define CALLED()
+#endif
 
 
 extern RPC::ServerManager* gRPCServerManager;
@@ -70,6 +81,8 @@ FileSystem::~FileSystem()
 static InodeNames*
 GetInodeNames(const char** root, const char* _path)
 {
+	CALLED();
+
 	ASSERT(_path != NULL);
 
 	int i;
@@ -132,6 +145,8 @@ status_t
 FileSystem::Mount(FileSystem** _fs, RPC::Server* serv, const char* serverName,
 	const char* fsPath, dev_t id, const MountConfiguration& configuration)
 {
+	CALLED();
+
 	ASSERT(_fs != NULL);
 	ASSERT(serv != NULL);
 	ASSERT(fsPath != NULL);
@@ -255,6 +270,8 @@ FileSystem::Mount(FileSystem** _fs, RPC::Server* serv, const char* serverName,
 status_t
 FileSystem::GetInode(ino_t id, Inode** _inode)
 {
+	CALLED();
+
 	ASSERT(_inode != NULL);
 
 	FileInfo fi;
@@ -277,6 +294,8 @@ FileSystem::GetInode(ino_t id, Inode** _inode)
 status_t
 FileSystem::Migrate(const RPC::Server* serv)
 {
+	CALLED();
+
 	ASSERT(serv != NULL);
 
 	MutexLocker _(fOpenLock);
@@ -344,6 +363,8 @@ FileSystem::Migrate(const RPC::Server* serv)
 DoublyLinkedList<OpenState>&
 FileSystem::OpenFilesLock()
 {
+	CALLED();
+
 	mutex_lock(&fOpenLock);
 	return fOpenFiles;
 }
@@ -352,6 +373,8 @@ FileSystem::OpenFilesLock()
 void
 FileSystem::OpenFilesUnlock()
 {
+	CALLED();
+
 	mutex_unlock(&fOpenLock);
 }
 
@@ -359,6 +382,8 @@ FileSystem::OpenFilesUnlock()
 void
 FileSystem::AddOpenFile(OpenState* state)
 {
+	CALLED();
+
 	ASSERT(state != NULL);
 
 	MutexLocker _(fOpenLock);
@@ -372,6 +397,8 @@ FileSystem::AddOpenFile(OpenState* state)
 void
 FileSystem::RemoveOpenFile(OpenState* state)
 {
+	CALLED();
+
 	ASSERT(state != NULL);
 
 	MutexLocker _(fOpenLock);
@@ -385,6 +412,8 @@ FileSystem::RemoveOpenFile(OpenState* state)
 DoublyLinkedList<Delegation>&
 FileSystem::DelegationsLock()
 {
+	CALLED();
+
 	mutex_lock(&fDelegationLock);
 	return fDelegationList;
 }
@@ -393,6 +422,8 @@ FileSystem::DelegationsLock()
 void
 FileSystem::DelegationsUnlock()
 {
+	CALLED();
+
 	mutex_unlock(&fDelegationLock);
 }
 
@@ -400,6 +431,8 @@ FileSystem::DelegationsUnlock()
 void
 FileSystem::AddDelegation(Delegation* delegation)
 {
+	CALLED();
+
 	ASSERT(delegation != NULL);
 
 	MutexLocker _(fDelegationLock);
@@ -414,6 +447,8 @@ FileSystem::AddDelegation(Delegation* delegation)
 void
 FileSystem::RemoveDelegation(Delegation* delegation)
 {
+	CALLED();
+
 	ASSERT(delegation != NULL);
 
 	MutexLocker _(fDelegationLock);
@@ -426,6 +461,8 @@ FileSystem::RemoveDelegation(Delegation* delegation)
 Delegation*
 FileSystem::GetDelegation(const FileHandle& handle)
 {
+	CALLED();
+
 	MutexLocker _(fDelegationLock);
 
 	AVLTreeMap<FileHandle, Delegation*>::Iterator it;
@@ -440,6 +477,8 @@ FileSystem::GetDelegation(const FileHandle& handle)
 status_t
 FileSystem::_ParsePath(RequestBuilder& req, uint32& count, const char* _path)
 {
+	CALLED();
+
 	ASSERT(_path != NULL);
 
 	char* path = strdup(_path);

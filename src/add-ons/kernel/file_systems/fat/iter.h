@@ -6,7 +6,11 @@
 #define _DOSFS_ITER_H_
 
 
-#include <SupportDefs.h>
+#ifdef FS_SHELL
+#	include "system_dependencies.h"
+#else
+#	include <SupportDefs.h>
+#endif
 
 
 struct _nspace;
@@ -30,14 +34,15 @@ status_t csi_write_block(struct csi *csi, uint8 *buffer);
 
 /* directory entry iterator */
 struct diri {
-	struct csi csi;
+	struct csi csi = {};
 	uint32 starting_cluster;
 	uint32 current_index;
-	uint8 *current_block;
+	uint8 *current_block = NULL;
+
+	~diri();
 };
 
 uint8 *diri_init(struct _nspace *vol, uint32 cluster, uint32 index, struct diri *diri);
-int diri_free(struct diri *diri);
 uint8 *diri_current_entry(struct diri *diri);
 uint8 *diri_next_entry(struct diri *diri);
 uint8 *diri_rewind(struct diri *diri);

@@ -3,6 +3,7 @@
  * Copyright 2010-2011, Oliver Tappe, zooey@hirschkaefer.de.
  * Copyright 2012, John Scipione, jscipione@gmail.com
  * Copyright 2017, Adrien Destugues, pulkomandy@pulkomandy.tk
+ * Copyright 2021, Andrew Lindesay, apl@lindesay.co.nz
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -32,11 +33,18 @@ public:
 	NumberFormat*	GetInteger(BFormattingConventions* convention);
 	NumberFormat*	GetFloat(BFormattingConventions* convention);
 	NumberFormat*	GetCurrency(BFormattingConventions* convention);
+	NumberFormat*	GetPercent(BFormattingConventions* convention);
+
+	ssize_t			ApplyFormatter(NumberFormat* formatter, char* string,
+						size_t maxSize, const double value);
+	status_t		ApplyFormatter(NumberFormat* formatter, BString& string,
+						const double value);
 
 private:
 	NumberFormat*	fIntegerFormat;
 	NumberFormat*	fFloatFormat;
 	NumberFormat*	fCurrencyFormat;
+	NumberFormat*	fPercentFormat;
 };
 
 
@@ -46,6 +54,7 @@ BNumberFormatImpl::BNumberFormatImpl()
 	fIntegerFormat = NULL;
 	fFloatFormat = NULL;
 	fCurrencyFormat = NULL;
+	fPercentFormat = NULL;
 }
 
 
@@ -54,6 +63,7 @@ BNumberFormatImpl::~BNumberFormatImpl()
 	delete fIntegerFormat;
 	delete fFloatFormat;
 	delete fCurrencyFormat;
+	delete fPercentFormat;
 }
 
 
@@ -123,8 +133,68 @@ BNumberFormatImpl::GetCurrency(BFormattingConventions* convention)
 }
 
 
+NumberFormat*
+BNumberFormatImpl::GetPercent(BFormattingConventions* convention)
+{
+	if (fPercentFormat == NULL) {
+		UErrorCode err = U_ZERO_ERROR;
+		fPercentFormat = NumberFormat::createInstance(
+			*BFormattingConventions::Private(convention).ICULocale(),
+			UNUM_PERCENT, err);
+
+		if (fPercentFormat == NULL)
+			return NULL;
+		if (U_FAILURE(err)) {
+			delete fPercentFormat;
+			fPercentFormat = NULL;
+			return NULL;
+		}
+	}
+
+	return fPercentFormat;
+}
+
+
+ssize_t
+BNumberFormatImpl::ApplyFormatter(NumberFormat* formatter, char* string,
+	size_t maxSize, const double value)
+{
+	BString fullString;
+	status_t status = ApplyFormatter(formatter, fullString, value);
+	if (status != B_OK)
+		return status;
+
+	return strlcpy(string, fullString.String(), maxSize);
+}
+
+
+status_t
+BNumberFormatImpl::ApplyFormatter(NumberFormat* formatter, BString& string,
+	const double value)
+{
+	if (formatter == NULL)
+		return B_NO_MEMORY;
+
+	UnicodeString icuString;
+	formatter->format(value, icuString);
+
+	string.Truncate(0);
+	BStringByteSink stringConverter(&string);
+	icuString.toUTF8(stringConverter);
+
+	return B_OK;
+}
+
+
 BNumberFormat::BNumberFormat()
 	: BFormat()
+{
+	fPrivateData = new BNumberFormatImpl();
+}
+
+
+BNumberFormat::BNumberFormat(const BLocale* locale)
+	: BFormat(locale)
 {
 	fPrivateData = new BNumberFormatImpl();
 }
@@ -211,31 +281,32 @@ BNumberFormat::Format(BString& string, const int32 value)
 ssize_t
 BNumberFormat::FormatMonetary(char* string, size_t maxSize, const double value)
 {
-	BString fullString;
-	status_t status = FormatMonetary(fullString, value);
-	if (status != B_OK)
-		return status;
-
-	return strlcpy(string, fullString.String(), maxSize);
+	return fPrivateData->ApplyFormatter(
+		fPrivateData->GetCurrency(&fConventions), string, maxSize, value);
 }
 
 
 status_t
 BNumberFormat::FormatMonetary(BString& string, const double value)
 {
-	NumberFormat* formatter = fPrivateData->GetCurrency(&fConventions);
+	return fPrivateData->ApplyFormatter(
+		fPrivateData->GetCurrency(&fConventions), string, value);
+}
 
-	if (formatter == NULL)
-		return B_NO_MEMORY;
 
-	UnicodeString icuString;
-	formatter->format(value, icuString);
+ssize_t
+BNumberFormat::FormatPercent(char* string, size_t maxSize, const double value)
+{
+	return fPrivateData->ApplyFormatter(
+		fPrivateData->GetPercent(&fConventions), string, maxSize, value);
+}
 
-	string.Truncate(0);
-	BStringByteSink stringConverter(&string);
-	icuString.toUTF8(stringConverter);
 
-	return B_OK;
+status_t
+BNumberFormat::FormatPercent(BString& string, const double value)
+{
+	return fPrivateData->ApplyFormatter(
+		fPrivateData->GetPercent(&fConventions), string, value);
 }
 
 

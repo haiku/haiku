@@ -348,20 +348,21 @@ BQuery::GetNextRef(entry_ref* ref)
 	if (error == B_OK && !_HasFetched())
 		error = B_FILE_ERROR;
 	if (error == B_OK) {
-		BPrivate::Storage::LongDirEntry entry;
+		BPrivate::Storage::LongDirEntry longEntry;
+		struct dirent* entry = longEntry.dirent();
 		bool next = true;
 		while (error == B_OK && next) {
-			if (GetNextDirents(&entry, sizeof(entry), 1) != 1) {
+			if (GetNextDirents(entry, sizeof(longEntry), 1) != 1) {
 				error = B_ENTRY_NOT_FOUND;
 			} else {
-				next = (!strcmp(entry.d_name, ".")
-						|| !strcmp(entry.d_name, ".."));
+				next = (!strcmp(entry->d_name, ".")
+						|| !strcmp(entry->d_name, ".."));
 			}
 		}
 		if (error == B_OK) {
-			ref->device = entry.d_pdev;
-			ref->directory = entry.d_pino;
-			error = ref->set_name(entry.d_name);
+			ref->device = entry->d_pdev;
+			ref->directory = entry->d_pino;
+			error = ref->set_name(entry->d_name);
 		}
 	}
 	return error;

@@ -1,0 +1,22 @@
+SubDir HAIKU_TOP src system libroot posix musl search ;
+
+SubDirSysHdrs [ FDirName $(SUBDIR) .. include ] ;
+UseHeaders [ FDirName $(SUBDIR) .. internal ] ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		MergeObject <$(architecture)>posix_musl_search.o :
+			hsearch.c
+			insque.c
+			lsearch.c
+			tdelete.c
+			tdestroy.c
+			tfind.c
+			tsearch.c
+			twalk.c
+			;
+	}
+}

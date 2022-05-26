@@ -56,7 +56,7 @@ struct pch_i2c_crs {
 	uint8	irq;
     uint8	irq_triggering;
 	uint8	irq_polarity;
-	uint8	irq_sharable;
+	uint8	irq_shareable;
 
 	uint32	addr_bas;
 	uint32	addr_len;
@@ -72,7 +72,7 @@ typedef enum {
 
 typedef struct {
 	phys_addr_t base_addr;
-	size_t map_size;
+	uint64 map_size;
 	uint8 irq;
 	i2c_bus sim;
 

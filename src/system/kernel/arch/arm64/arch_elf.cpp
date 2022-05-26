@@ -86,11 +86,42 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 		// Calculate the relocation value.
 		Elf64_Addr relocValue;
 		switch (type) {
+			case R_AARCH64_NONE:
+				continue;
+			case R_AARCH64_ABS64:
+				relocValue = symAddr + rel[i].r_addend;
+				break;
+			case R_AARCH64_ABS32:
+			case R_AARCH64_ABS16:
+			case R_AARCH64_PREL64:
+			case R_AARCH64_PREL32:
+			case R_AARCH64_PREL16:
+			case R_AARCH64_TSTBR14:
+			case R_AARCH64_CONDBR19:
+			case R_AARCH64_JUMP26:
+			case R_AARCH64_CALL26:
+			case R_AARCH64_COPY:
+				dprintf("arch_elf_relocate_rela: unhandled relocation type %d\n",
+					type);
+				return B_BAD_DATA;
+			case R_AARCH64_GLOB_DAT:
+			case R_AARCH64_JUMP_SLOT:
+				relocValue = symAddr + rel[i].r_addend;
+				break;
+			case R_AARCH64_RELATIVE:
+				relocValue = image->text_region.delta + rel[i].r_addend;
+				break;
+			case R_AARCH64_TLS_DTPREL64:
+			case R_AARCH64_TLS_DTPMOD64:
+			case R_AARCH64_TLS_TPREL64:
+			case R_AARCH64_TLSDESC:
+			case R_AARCH64_IRELATIVE:
 			default:
 				dprintf("arch_elf_relocate_rela: unhandled relocation type %d\n",
 					type);
 				return B_BAD_DATA;
 		}
+
 #ifdef _BOOT_MODE
 		boot_elf64_set_relocation(relocAddr, relocValue);
 #else
@@ -99,6 +130,7 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 				rel[i].r_offset);
 			return B_BAD_ADDRESS;
 		}
+		*(Elf64_Addr *)relocAddr = relocValue;
 #endif
 	}
 

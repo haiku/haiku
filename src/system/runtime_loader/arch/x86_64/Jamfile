@@ -10,6 +10,8 @@ for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 
 		SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
 
+		DEFINES += _LOADER_MODE ;
+
 		StaticLibrary <$(architecture)>libruntime_loader_$(TARGET_ARCH).a :
 			arch_relocate.cpp
 			:

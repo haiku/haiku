@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-ProcessController	2280875657
+1	thai	x-vnd.Haiku-ProcessController	3123774187
 Error saving file	ProcessController		การบันทึกไฟล์ผิดพลาด
 Display priority	ProcessController		แสดงลำดับความสำคัญ
 That's no Fun!	ProcessController		ไม่สนุกเลย!
@@ -23,7 +23,6 @@ Usage: %s [-deskbar]\n	ProcessController		การใช้งาน: %s [-desk
 Please confirm	ProcessController		กรุณายืนยัน
 Urgent priority	ProcessController		ลำดับความสำคัญเร่งด่วน
 What do you want to do with the thread \"%s\"?	ProcessController		คุณต้องการทำอะไรกับเธรด \"%s\"?
-(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr\n
 Idle priority	ProcessController		ลำดับความสำคัญที่ไม่ได้ใช้งาน
 Real-time display priority	ProcessController		แสดงลำดับความสำคัญตามเวลาจริง
 Threads and CPU usage	ProcessController		เธรดและการใช้งาน CPU

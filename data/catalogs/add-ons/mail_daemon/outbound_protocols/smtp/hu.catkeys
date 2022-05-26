@@ -8,7 +8,7 @@ Unencrypted	ConfigView		Titkosítatlan
 Error while opening connection to %serv	smtp		Hiba történt a %serv kiszolgálóval való kapcsolat nyitása közben
 . The server said:\n	smtp		. A kiszolgáló válasza:\n
 None	ConfigView		Nincs
-SMTP server:	ConfigView		Kiszolgáló:
+SMTP server:	ConfigView		SMTP kiszolgáló:
 ESMTP	ConfigView		ESMTP
 POP3 before SMTP	ConfigView		POP3 az SMTP előtt
 SSL	ConfigView		SSL

@@ -103,7 +103,7 @@ DumpRegs();
 ssize_t
 QuickCamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
 {
-	PRINT((CH "(%u, @%p, %u)" CT, address, data, count));
+	PRINT((CH "(%u, @%p, %" B_PRIuSIZE ")" CT, address, data, count));
 	return SendCommand(USB_REQTYPE_DEVICE_OUT, 0x04, address, 0, count, data);
 }
 
@@ -111,7 +111,8 @@ QuickCamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
 ssize_t
 QuickCamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
 {
-	PRINT((CH "(%u, @%p, %u, %d)" CT, address, data, count, cached));
+	PRINT((CH "(%u, @%p, %" B_PRIuSIZE ", %d)" CT, address, data, count,
+		cached));
 	memset(data, 0xaa, count); // linux drivers do that without explaining why !?
 	return SendCommand(USB_REQTYPE_DEVICE_IN, 0x04, address, 0, count, data);
 }
@@ -122,7 +123,7 @@ QuickCamDevice::GetStatusIIC()
 {
 	status_t err = B_ERROR;
 	uint8 status = 0;
-#warning WRITEME
+	// TODO: WRITEME
 	//dprintf(ID "i2c_status: error 0x%08lx, status = %02x\n", err, status);
 	if (err < 0)
 		return err;
@@ -133,7 +134,7 @@ QuickCamDevice::GetStatusIIC()
 status_t
 QuickCamDevice::WaitReadyIIC()
 {
-#warning WRITEME
+	// TODO: WRITEME
 	return EBUSY;
 }
 
@@ -141,7 +142,7 @@ QuickCamDevice::WaitReadyIIC()
 ssize_t
 QuickCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 {
-	int i;
+	size_t i;
 	uint8 buffer[0x23];
 	if (count > 16)
 		return EINVAL;

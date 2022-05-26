@@ -1,20 +1,15 @@
-1	english	x-vnd.Haiku-HaikuDepot	2850854294
+1	english	x-vnd.Haiku-HaikuDepot	3602839024
 Check for updates…	MainWindow		检查更新…
-Uninstall	PackageManager		卸载
 Uninstalled	PackageListView		已卸载
 Available packages	MainWindow		可用软件包
 Create account	UserLoginWindow		创建账号
-Mostly stable	RatePackageWindow		基本稳定
 Develop packages	MainWindow		开发软件包
 Rate package…	PackageInfoView		软件包评分…
 Starting the package daemon failed:\n\n%Error%	App		包管理服务启动失败:\n\n%Error%
 <no info>	PackageInfoView		<无信息>
 No user ratings available.	PackageInfoView		未发现用户评分。
 Rating	PackageListView		评级
-Does not start	RatePackageWindow		未开始
 Show	MainWindow		显示
-Unstable but usable	RatePackageWindow		不稳定，但是可用
-Not specified	RatePackageWindow		未指定
 Active	PackageListView		激活
 Login or Create account	MainWindow		登录或者新建账户
 <Package contents not available for remote packages>	PackageContentsView		<软件包内容对于远程包不可用>
@@ -27,9 +22,6 @@ Quit HaikuDepot	App		退出 HaikuDepot
 Category	FilterView		分类
 User rating	RatePackageWindow		用户评分
 Installed packages	MainWindow		已安装软件包
-Stable	RatePackageWindow		稳定
-Fatal error	PackageManager		严重错误
-Package action failed	PackageInfoView		软件包操作失败
 No changelog available.	PackageInfoView		未发现更新记录。
 There was a puzzling response from the web service.	UserLoginWindow		网络服务响应异常。
 Not logged in	MainWindow		未登陆
@@ -44,15 +36,12 @@ Close	PackageManager		关闭
 Changelog	PackageInfoView		更新记录
 Rating not possible	MainWindow		无法评价
 About	PackageInfoView		关于
-Very unstable	RatePackageWindow		非常不稳定
 Stability	RatePackageWindow		稳定性
 Send	RatePackageWindow		发送
 Start package daemon	App		启动软件包管理后台
-The package action could not be scheduled: %Error%	PackageInfoView		软件包操作无法预订执行：%Error%
 Cancel	RatePackageWindow		取消
 Inactive	PackageListView		未激活
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
-OK	PackageInfoView		确定
 Downloading:	PackageInfoView		下载中：
 Success	UserLoginWindow		成功
 Package daemon problem	App		软件包守护进程问题
@@ -61,15 +50,14 @@ Repository	PackageListView		仓库
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp%（版本 %hd.version%）
 Close	UserLoginWindow		关闭
 Close	RatePackageWindow		关闭
-Size	PackageListView		大小
 Your rating:	RatePackageWindow		您的评分:
+Size	PackageListView		大小
 Your rating was updated.	RatePackageWindow		您的评价已被更新。
 All categories	FilterView		所有分类
 Repositories	MainWindow		仓库
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		取消
 Refresh repositories	MainWindow		刷新仓库
-Tools	MainWindow		工具
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		该软件包似乎并不在 HaikuDepot Server 中，所以无法创建一个新的评分或者编辑已有的评分。
 Language	RatePackageWindow		语言
 Log out	MainWindow		注销
@@ -81,8 +69,8 @@ OK	UserLoginWindow		确定
 Stability:	RatePackageWindow		稳定性:
 Source packages	MainWindow		源代码包
 -	no package size		-
-Try again	App		请重试
 Rate package	RatePackageWindow		软件包评分
+Try again	App		请重试
 Unknown	PackageListView		未知
 Log in	UserLoginWindow		登陆
 Logged in as %User%	MainWindow		登录 as %User%
@@ -96,9 +84,7 @@ Authentication failed	UserLoginWindow		认证失败
 Manage repositories…	MainWindow		管理仓库…
 Description	PackageListView		描述
 Open %DeskbarLink%	PackageManager		打开 %DeskbarLink%
-Install	PackageManager		安装
 Input validation	UserLoginWindow		输入无效
 Log in…	MainWindow		登录…
 You need to be logged into an account before you can rate packages.	MainWindow		在对软件包进行评级之前，您需要进行账户登录。
-9999.99 KiB	PackageListView		9999.99 KiB
 All repositories	MainWindow		确定

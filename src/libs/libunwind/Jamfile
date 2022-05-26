@@ -1,8 +1,0 @@
-SubDir HAIKU_TOP src libs libunwind ;
-
-SubInclude HAIKU_TOP src libs libunwind $(TARGET_ARCH) ;
-#SubInclude HAIKU_TOP src libs libunwind mi ;
-#SubInclude HAIKU_TOP src libs libunwind unwind ;
-
-UseLibraryHeaders libunwind ;
-SubDirCcFlags [ FDefines HAVE_CONFIG_H=1 ] ;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2020, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,6 +9,8 @@
 
 
 #include <package/manager/PackageManager.h>
+
+#include <glob.h>
 
 #include <Catalog.h>
 #include <Directory.h>
@@ -31,6 +33,8 @@
 #include <package/ValidateChecksumJob.h>
 
 #include "FetchFileJob.h"
+#include "FetchUtils.h"
+using BPackageKit::BPrivate::FetchUtils;
 #include "PackageManagerUtils.h"
 
 #undef B_TRANSLATION_CONTEXT
@@ -560,15 +564,72 @@ BPackageManager::_PreparePackageChanges(
 		RemoteRepository* remoteRepository
 			= dynamic_cast<RemoteRepository*>(package->Repository());
 		if (remoteRepository != NULL) {
-			// download the package
+			bool reusingDownload = false;
+
+			// Check for matching files in already existing transaction
+			// directories
+			BPath path(&transaction->TransactionDirectory());
+			BPath parent;
+			if (path.GetParent(&parent) == B_OK) {
+				BString globPath = parent.Path();
+				globPath << "/*/" << fileName;
+				glob_t globbuf;
+				if (glob(globPath.String(), GLOB_NOSORT, NULL, &globbuf) == 0) {
+					off_t bestSize = 0;
+					const char* bestFile = NULL;
+
+					// If there are multiple matching files, pick the largest
+					// one (the others are most likely partial downloads)
+					for (size_t i = 0; i < globbuf.gl_pathc; i++) {
+						off_t size = 0;
+						BNode node(globbuf.gl_pathv[i]);
+						if (node.GetSize(&size) == B_OK && size > bestSize) {
+							bestSize = size;
+							bestFile = globbuf.gl_pathv[i];
+						}
+					}
+
+					// Copy the selected file into our own transaction directory
+					path.Append(fileName);
+					if (bestFile != NULL && BCopyEngine().CopyEntry(bestFile,
+						path.Path()) == B_OK) {
+						reusingDownload = true;
+						printf("Re-using download '%s' from previous "
+							"transaction%s\n", bestFile,
+							FetchUtils::IsDownloadCompleted(
+								path.Path()) ? "" : " (partial)");
+					}
+					globfree(&globbuf);
+				}
+			}
+
+			// download the package (this will resume the download if the
+			// file already exists)
 			BString url = remoteRepository->Config().PackagesURL();
 			url << '/' << fileName;
 
-			status_t error = DownloadPackage(url, entry,
+			status_t error;
+retryDownload:
+			error = DownloadPackage(url, entry,
 				package->Info().Checksum());
-			if (error != B_OK)
+			if (error != B_OK) {
+				if (error == B_BAD_DATA || error == ERANGE) {
+					// B_BAD_DATA is returned when there is a checksum
+					// mismatch. Make sure this download is not re-used.
+					entry.Remove();
+
+					if (reusingDownload) {
+						// Maybe the download we reused had some problem.
+						// Try again, this time without reusing the download.
+						printf("\nPrevious download '%s' was invalid. Redownloading.\n",
+							path.Path());
+						reusingDownload = false;
+						goto retryDownload;
+					}
+				}
 				DIE(error, "Failed to download package %s",
 					package->Info().Name().String());
+			}
 		} else if (package->Repository() != &installationRepository) {
 			// clone the existing package
 			LocalRepository* localRepository

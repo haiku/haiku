@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-ShowImage	575555985
+1	portuguese (brazil)	x-vnd.Haiku-ShowImage	3998703664
 Use as background…	Menus		Utilizar como plano de fundo…
 File	Menus		Arquivo
 Slide delay	Menus		Atraso de deslizamento
@@ -6,7 +6,8 @@ Selection mode	Menus		Modo de seleção
 Zoom in	Menus		Ampliar
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		O documento '%s' foi modificado. Deseja fechar o documento?
 Page setup…	Menus		Configurar página...
-Print…	Menus		Imprimir..
+Print…	Menus		Imprimir…
+Get info…	Menus		Obter informação...
 OK	SaveToFile		OK
 Previous page	Menus		Página anterior
 View	Menus		Visualizar

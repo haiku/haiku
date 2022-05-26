@@ -80,7 +80,11 @@ cstates_idle(void)
 	bigtime_t idleTime = sIdleTime[cpu];
 	int state = min_c(idleTime / timeStep, sCStateCount - 1);
 
-	ASSERT(state >= 0 && state < sCStateCount);
+	if(state < 0 || state >= sCStateCount) {
+		panic("State %d of CPU %" B_PRId32 " is out of range (0 to %d), "
+			"idleTime %" B_PRIdBIGTIME "/%" B_PRIdBIGTIME, state, cpu,
+			sCStateCount, idleTime, timeStep);
+	}
 
 	int subState = idleTime % timeStep;
 	subState *= sCStates[state].fSubStatesCount;
@@ -96,7 +100,9 @@ cstates_idle(void)
 	bigtime_t delta = system_time() - start;
 	locker.Unlock();
 
-	sIdleTime[cpu] = (idleTime + delta) / 2;
+	// Negative delta shouldn't happen, but apparently it does...
+	if (delta >= 0)
+		sIdleTime[cpu] = (idleTime + delta) / 2;
 }
 
 

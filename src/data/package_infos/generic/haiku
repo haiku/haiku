@@ -1,0 +1,131 @@
+name 			haiku
+version			%HAIKU_VERSION%
+architecture	%HAIKU_PACKAGING_ARCH%
+summary			"The Haiku base system"
+
+description		"The Haiku base system includes all system core software, like
+boot loader, kernel, the system libraries, servers, and applications."
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2021 Haiku, Inc. et al"
+licenses {
+	MIT
+	"GNU LGPL v2.1"
+}
+flags			system_package
+
+provides {
+#if defined(HAIKU_PACKAGING_ARCH_x86_64)
+	haiku=%HAIKU_VERSION% compat>=R1~alpha4_pm_hrev51198
+#elif defined(HAIKU_PACKAGING_ARCH_x86_gcc2)
+	haiku=%HAIKU_VERSION% compat>=R1~alpha1
+#else
+	haiku=%HAIKU_VERSION% compat>=R1~beta1
+#endif
+	cmd:arp
+	cmd:chop
+	cmd:clear
+	cmd:df
+	cmd:ftpd
+	cmd:hd
+	cmd:hey
+	cmd:login
+	cmd:more
+	cmd:passwd
+	cmd:ping
+	cmd:ping6
+	cmd:prio
+	cmd:ps
+	cmd:renice
+	cmd:resattr
+	cmd:su
+	cmd:telnet
+	cmd:telnetd
+	cmd:top
+	cmd:traceroute
+	cmd:trash
+	cmd:unchop
+	cmd:useradd
+	cmd:watch
+	cmd:xres
+
+#if defined(HAIKU_PACKAGING_ARCH_x86_gcc2)
+	lib:libstdc++
+#endif
+}
+
+requires {
+	haiku_datatranslators
+
+	noto >= 2.7
+#ifdef HAIKU_REGULAR_BUILD
+	noto_sans_cjk_jp
+#endif
+
+#ifdef HAIKU_REGULAR_BUILD
+	intel_wifi_firmwares
+	ralink_wifi_firmwares
+	realtek_wifi_firmwares
+#endif
+
+	coreutils
+	cmd:sh
+#ifdef HAIKU_REGULAR_BUILD
+	cmd:bunzip2
+	cmd:gunzip
+	cmd:tar
+	cmd:unzip
+#endif
+
+#if !defined(HAIKU_PACKAGING_ARCH_x86_gcc2)
+	lib:libgcc_s
+	lib:libstdc++
+	lib:libsupc++
+#endif
+
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libedit_ENABLED
+	lib:libedit
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_fontconfig_ENABLED
+	lib:libfontconfig
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_freetype_ENABLED
+	lib:libfreetype
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_icu_ENABLED
+	lib:libicudata
+	lib:libicui18n
+	lib:libicuio
+	lib:libicutest
+	lib:libicutu
+	lib:libicuuc
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_ncurses_ENABLED
+	lib:libncurses >= 6.0
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libsolv_ENABLED
+	lib:libsolv
+	lib:libsolvext
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_openssl_ENABLED
+	lib:libssl
+	lib:libcrypto
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_zlib_ENABLED
+	lib:libz
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_zstd_ENABLED
+	lib:libzstd >= 1
+#endif
+
+#ifdef HAIKU_REGULAR_BUILD
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_expat_ENABLED
+	lib:libexpat
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_gutenprint_ENABLED
+	lib:libgutenprint >= 8
+#endif
+#endif
+}

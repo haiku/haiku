@@ -584,6 +584,34 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "avx512bw ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EBX] & IA32_FEATURE_AVX512VI)
 		strlcat(features, "avx512vi ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512VMBI)
+		strlcat(features, "avx512vmbi ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_UMIP)
+		strlcat(features, "umip ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_PKU)
+		strlcat(features, "pku ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_OSPKE)
+		strlcat(features, "ospke ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512VMBI2)
+		strlcat(features, "avx512vmbi2 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_GFNI)
+		strlcat(features, "gfni ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_VAES)
+		strlcat(features, "vaes ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_VPCLMULQDQ)
+		strlcat(features, "vpclmulqdq ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512_VNNI)
+		strlcat(features, "avx512vnni ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512_BITALG)
+		strlcat(features, "avx512bitalg ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_AVX512_VPOPCNTDQ)
+		strlcat(features, "avx512vpopcntdq ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_LA57)
+		strlcat(features, "la57 ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_RDPID)
+		strlcat(features, "rdpid ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_SGX_LC)
+		strlcat(features, "sgx_lc ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_IBRS)
 		strlcat(features, "ibrs ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_STIBP)
@@ -727,23 +755,34 @@ get_intel_cpu_initial_x2apic_id(int /* currentCPU */)
 static inline status_t
 detect_intel_cpu_topology_x2apic(uint32 maxBasicLeaf)
 {
-	if (maxBasicLeaf < 11)
+
+	uint32 leaf = 0;
+	cpuid_info cpuid;
+	if (maxBasicLeaf >= 0x1f) {
+		get_current_cpuid(&cpuid, 0x1f, 0);
+		if (cpuid.regs.ebx != 0)
+			leaf = 0x1f;
+	}
+	if (maxBasicLeaf >= 0xb && leaf == 0) {
+		get_current_cpuid(&cpuid, 0xb, 0);
+		if (cpuid.regs.ebx != 0)
+			leaf = 0xb;
+	}
+	if (leaf == 0)
 		return B_UNSUPPORTED;
 
 	uint8 hierarchyLevels[CPU_TOPOLOGY_LEVELS] = { 0 };
 
 	int currentLevel = 0;
-	int levelType;
 	unsigned int levelsSet = 0;
-
 	do {
 		cpuid_info cpuid;
-		get_current_cpuid(&cpuid, 11, currentLevel);
-		if (currentLevel == 0 && cpuid.regs.ebx == 0)
-			return B_UNSUPPORTED;
-
-		levelType = (cpuid.regs.ecx >> 8) & 0xff;
+		get_current_cpuid(&cpuid, leaf, currentLevel++);
+		int levelType = (cpuid.regs.ecx >> 8) & 0xff;
 		int levelValue = cpuid.regs.eax & 0x1f;
+
+		if (levelType == 0)
+			break;
 
 		switch (levelType) {
 			case 1:	// SMT
@@ -756,8 +795,7 @@ detect_intel_cpu_topology_x2apic(uint32 maxBasicLeaf)
 				break;
 		}
 
-		currentLevel++;
-	} while (levelType != 0 && levelsSet != 3);
+	} while (levelsSet != 3);
 
 	sGetCPUTopologyID = get_intel_cpu_initial_x2apic_id;
 
@@ -1387,6 +1425,12 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 		x86_write_msr(IA32_MSR_TSC_AUX, cpu);
 #endif
 
+	if (x86_check_feature(IA32_FEATURE_APERFMPERF, FEATURE_6_ECX)) {
+		gCPU[cpu].arch.mperf_prev = x86_read_msr(IA32_MSR_MPERF);
+		gCPU[cpu].arch.aperf_prev = x86_read_msr(IA32_MSR_APERF);
+		gCPU[cpu].arch.frequency = 0;
+		gCPU[cpu].arch.perf_timestamp = 0;
+	}
 	return __x86_patch_errata_percpu(cpu);
 }
 
@@ -1526,6 +1570,8 @@ arch_cpu_init_post_vm(kernel_args* args)
 		call_all_cpus_sync(&enable_xsavemask, NULL);
 		get_current_cpuid(&cpuid, 0xd, 0);
 		gFPUSaveLength = cpuid.regs.ebx;
+		if (gFPUSaveLength > sizeof(((struct arch_thread *)0)->fpu_state))
+			gFPUSaveLength = 832;
 
 		arch_altcodepatch_replace(ALTCODEPATCH_TAG_XSAVE,
 			gHasXsavec ? &_xsavec : &_xsave, 4);

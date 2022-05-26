@@ -11,6 +11,7 @@
 
 #include <team.h>
 
+#include "tty_driver.h"
 #include "tty_private.h"
 
 
@@ -114,8 +115,6 @@ slave_open(const char *name, uint32 flags, void **_cookie)
 		gSlaveTTYs[index].settings->pgrp_id = sessionID;
 		team_set_controlling_tty(gSlaveTTYs[index].index);
 	}
-
-	add_tty_cookie(cookie);
 
 	*_cookie = cookie;
 

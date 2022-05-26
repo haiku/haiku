@@ -123,6 +123,7 @@ private:
 	BCheckBox* fSortFolderNamesFirstCheckBox;
 	BCheckBox* fHideDotFilesCheckBox;
 	BCheckBox* fTypeAheadFilteringCheckBox;
+	BCheckBox* fGenerateImageThumbnailsCheckBox;
 
 	bool fShowFullPathInTitleBar;
 	bool fSingleWindowBrowse;
@@ -131,6 +132,7 @@ private:
 	bool fSortFolderNamesFirst;
 	bool fHideDotFiles;
 	bool fTypeAheadFiltering;
+	bool fGenerateImageThumbnails;
 
 	typedef SettingsView _inherited;
 };

@@ -26,7 +26,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -38,6 +38,7 @@
 <li><a href="../de/contents.html">Deutsch</a></li>
 <li><a href="../en/contents.html">English</a></li>
 <li><a href="../es/contents.html">Español</a></li>
+<li><a href="../eo/contents.html">Esperanto</a></li>
 <li><a href="../fur/contents.html">Furlan</a></li>
 <li><a href="../it/contents.html">Italiano</a></li>
 <li><a href="../hu/contents.html">Magyar</a></li>
@@ -61,7 +62,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">La traduction de cette page n'est pas achevée. Les parties non encore traduites apparaîtrons en anglais.</div>
 
 <h1>Bienvenue sur le Guide de l'utilisateur Haiku</h1>
 
@@ -79,12 +80,7 @@ Si vous êtes intéressé pour contribuer à la traduction, vous trouverez sur <
 		<li><a href="installation.html#transfer-data">Transfering data to/from a Haiku installation</a></li></ul></td>
 		<td valign="top">Step by step guides covering Haiku installation during the (pre-) alpha release phase.</td></tr>
 -->
-	<tr><td valign="top"><a href="bootloader.html">Chargeur de démarrage</a></td>
-		<td valign="top">Réglez des options de démarrage sans échec pour résoudre des problèmes de configuration.</td></tr>
-	<tr><td valign="top"><a href="filesystem-layout.html">Structure du système de fichiers</a><ul>
-		<li><a href="filesystem-layout.html#system">Le dossier « system »</a></li>
-		<li><a href="filesystem-layout.html#home">Le dossier « home »</a></li></ul></td>
-		<td valign="top">Comprenez la hiérarchie du système de fichiers et familiarisez-vous avec l'emplacement des fichiers et dossiers importants.</td></tr>
+
 	<tr><td valign="top"><a href="gui.html">Interface graphique de Haiku</a><ul>
 	<li><a href="gui.html#move-resize">Déplacer et retailler facilement</a></li>
 	<li><a href="gui.html#stack-tile">Empiler &amp; juxtaposer</a></li>
@@ -93,13 +89,79 @@ Si vous êtes intéressé pour contribuer à la traduction, vous trouverez sur <
 	<a href="gui.html#favorites-recent">- Favoris et dossiers récents</a></li>
 	<li><a href="gui.html#replicants">Réplicants</a></li></ul></td>
 		<td valign="top">Familiarisez-vous avec les éléments principaux de l'interface graphique.</td></tr>
-	<tr><td valign="top"><a href="keyboard-shortcuts.html">Shortcuts and key combinations</a><ul>
-		<li><a href="keyboard-shortcuts.html#general">General shortcuts</a></li>
-		<li><a href="keyboard-shortcuts.html#textediting">Textediting shortcuts</a></li>
-		<li><a href="keyboard-shortcuts.html#tracker-navigation">Shortcuts for Tracker navigation</a></li>
-		<li><a href="keyboard-shortcuts.html#terminal">Shortcuts in Terminal</a></li>
-		<li><a href="keyboard-shortcuts.html#other-combos">Other key combinations</a></li></ul></td>
-		<td valign="top">Les raccourcis clavier les plus courants pour accélérer votre travail.</td></tr>
+
+	<tr><td valign="top"><a href="deskbar.html">Deskbar</a><ul>
+		<li><a href="deskbar.html#deskbar-menu">Le menu de la Deskbar</a></li>
+		<li><a href="deskbar.html#tray">La barre d'icônes</a></li>
+		<li><a href="deskbar.html#list-of-apps">La liste des programmes exécutés</a></li></ul></td>
+		<td valign="top">Utilisez et configurez l'équivalent Haiku du menu «Démarrer» et de la barre des tâches.</td></tr>
+
+	<tr><td valign="top"><a href="tracker.html">Tracker</a><ul>
+		<li><a href="tracker.html#mounting-volumes">Montage de volumes</a></li>
+		<li><a href="tracker.html#navigating">Navigation</a></li>
+		<li><a href="tracker.html#appearance">Apparence</a></li>
+		<li><a href="tracker.html#tracker-preferences">Préférences du Tracker</a></li>
+		<li><a href="tracker.html#working-with-files">Gérer vos fichiers</a></li>
+		<li><a href="tracker.html#transaction-status">Statut de la transaction</a></li>
+		<li><a href="tracker-add-ons.html">Extensions du Tracker</a></li></ul></td>
+		<td valign="top">Apprenez comment naviguer, travailler avec des fichiers et des dossiers et comment configurer le gestionnaire de fichiers de Haiku.</td></tr>
+
+	<tr><td valign="top"><a href="applications.html">Applications</a><ul>
+		<li><a href="applications.html#hpkg">Haiku packages (.hpkg)</a></li>
+		<li><a href="applications.html#beos_apps">Old BeOS archives (.zip and .pkg)</a></li>
+		<li><a href="applications.html#list-of-apps">Haiku's applications</a></li></ul></td>
+		<td>Apprenez comment installer et désinstaller des applications et comment travailler avec celles fournies avec Haiku.</td></tr>
+
+	<tr><td colspan="2"><table align="center"><tr><td>
+			<a href="applications/activitymonitor.html">ActivityMonitor</a><br />
+			<a href="applications/bootmanager.html">BootManager</a><br />
+			<a href="applications/charactermap.html">CharacterMap</a><br />
+			<a href="applications/codycam.html">CodyCam</a><br />
+			<a href="applications/debugger.html">Debugger</a><br />
+			<a href="applications/deskcalc.html">DeskCalc</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/diskprobe.html">DiskProbe</a><br />
+			<a href="applications/diskusage.html">DiskUsage</a><br />
+			<a href="applications/drivesetup.html">DriveSetup</a><br />
+			<a href="applications/expander.html">Expander</a><br />
+			<a href="applications/haikudepot.html">HaikuDepot</a><br />
+			<a href="applications/icon-o-matic.html">Icon-O-Matic</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/installer.html">Installer</a><br />
+			<a href="applications/magnify.html">Magnify</a><br />
+			<a href="applications/mail.html">Mail</a><br />
+			<a href="applications/mediaplayer.html">MediaPlayer</a><br />
+			<a href="applications/midiplayer.html">MidiPlayer</a><br />
+			<a href="applications/packageinstaller.html">LegacyPackageInstaller</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/people.html">People</a><br />
+			<a href="applications/poorman.html">PoorMan</a><br />
+			<a href="applications/screenshot.html">Screenshot</a><br />
+			<a href="applications/showimage.html">ShowImage</a><br />
+			<a href="applications/softwareupdater.html">SoftwareUpdater</a><br />
+			<a href="applications/soundrecorder.html">SoundRecorder</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/stylededit.html">StyledEdit</a><br />
+			<a href="applications/terminal.html">Terminal</a><br />
+			<a href="applications/textsearch.html">TextSearch</a><br />
+			<a href="applications/tv.html">TV</a><br />
+			<a href="applications/webpositive.html">WebPositive</a></td></tr>
+		</table>
+	</td></tr>
+
+	<tr><td valign="top"><ul>
+		<li><a href="applications.html#cli-apps">Haiku's commandline applications</a></li>
+		<li><a href="applications.html#list-of-bundled-apps">Bundled applications</a></li>
+		<ul><li><a href="applications/bepdf.html">- BePDF</a></li>
+			<li><a href="applications/pe.html">- Pe</a></li>
+			<li><a href="applications/vision.html">- Vision</a></li>
+			<li><a href="applications/wonderbrush.html">- WonderBrush</a></li></ul>
+	</ul></td><td></td></tr>
+
 	<tr><td valign="top"><a href="workspaces.html">Espaces de travail</a><ul>
 		<li><a href="workspaces.html#switching">Changer d'espace de travail</a></li>
 		<li><a href="desktop-applets/workspaces.html#applet">L'appliquette Workspaces</a></li>
@@ -110,20 +172,69 @@ Si vous êtes intéressé pour contribuer à la traduction, vous trouverez sur <
 		<td valign="top">Basculez entre les applications lancées.</td></tr>
 	<tr><td valign="top"><a href="teammonitor.html">Team Monitor</a></td>
 		<td valign="top">Terminez les applications ou composants système qui ne répondent plus.</td></tr>
-	<tr><td valign="top"><a href="tracker.html">Tracker</a><ul>
-		<li><a href="tracker.html#mounting-volumes">Montage de volumes</a></li>
-		<li><a href="tracker.html#navigating">Navigation</a></li>
-		<li><a href="tracker.html#appearance">Apparence</a></li>
-		<li><a href="tracker.html#tracker-preferences">Préférences du Tracker</a></li>
-		<li><a href="tracker.html#working-with-files">Gérer vos fichiers</a></li>
-		<li><a href="tracker.html#transaction-status">Statut de la transaction</a></li>
-		<li><a href="tracker-add-ons.html">Extensions du Tracker</a></li></ul></td>
-		<td valign="top">Apprenez comment naviguer, travailler avec des fichiers et des dossiers et comment configurer le gestionnaire de fichiers de Haiku.</td></tr>
-	<tr><td valign="top"><a href="deskbar.html">Deskbar</a><ul>
-		<li><a href="deskbar.html#deskbar-menu">Le menu de la Deskbar</a></li>
-		<li><a href="deskbar.html#tray">La barre d'icônes</a></li>
-		<li><a href="deskbar.html#list-of-apps">La liste des programmes exécutés</a></li></ul></td>
-		<td valign="top">Utilisez et configurez l'équivalent Haiku du menu «Démarrer» et de la barre des tâches.</td></tr>
+
+	<tr><td valign="top"><a href="keyboard-shortcuts.html">Shortcuts and key combinations</a><ul>
+		<li><a href="keyboard-shortcuts.html#general">General shortcuts</a></li>
+		<li><a href="keyboard-shortcuts.html#textediting">Textediting shortcuts</a></li>
+		<li><a href="keyboard-shortcuts.html#tracker-navigation">Shortcuts for Tracker navigation</a></li>
+		<li><a href="keyboard-shortcuts.html#terminal">Shortcuts in Terminal</a></li>
+		<li><a href="keyboard-shortcuts.html#other-combos">Other key combinations</a></li></ul></td>
+		<td valign="top">Les raccourcis clavier les plus courants pour accélérer votre travail.</td></tr>
+
+	<tr><td valign="top"><a href="desktop-applets.html">Desktop Applets</a><ul>
+			<li><a href="desktop-applets/launchbox.html">LaunchBox</a></li>
+			<li><a href="desktop-applets/networkstatus.html">NetworkStatus</a></li>
+			<li><a href="desktop-applets/powerstatus.html">PowerStatus</a></li>
+			<li><a href="desktop-applets/processcontroller.html">ProcessController</a></li>
+			<li><a href="desktop-applets/workspaces.html">Workspaces</a></li></ul></td>
+		<td>Outils simples à placer sur le Bureau ou dans la Deskbar.</td></tr>
+
+	<tr><td valign="top"><a href="preferences.html">Preferences</a></td>
+		<td>Configurez votre système.</td></tr>
+	<tr><td colspan="2"><table align="center"><tr><td>
+			<a href="preferences/appearance.html">Appearance</a><br />
+			<a href="preferences/backgrounds.html">Backgrounds</a><br />
+			<a href="preferences/datatranslations.html">DataTranslations</a><br />
+			<a href="preferences/deskbar.html">Deskbar</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/e-mail.html">E-mail</a><br />
+			<a href="preferences/filetypes.html">FileTypes</a><br />
+			<a href="preferences/input.html">Input</a><br />
+			<a href="preferences/keymap.html">Keymap</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/locale.html">Locale</a><br />
+			<a href="preferences/media.html">Media</a><br />
+			<a href="preferences/network.html">Network</a><br />
+			<a href="preferences/printers.html">Printers</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/repositories.html">Repositories</a><br />
+			<a href="preferences/screen.html">Screen</a><br />
+			<a href="preferences/screensaver.html">ScreenSaver</a><br />
+			<a href="preferences/shortcuts.html">Shortcuts</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/sounds.html">Sounds</a><br />
+			<a href="preferences/time.html">Time</a><br />
+			<a href="preferences/tracker.html">Tracker</a><br />
+			<a href="preferences/virtualmemory.html">VirtualMemory</a></td></tr>
+		</table>
+		</td></tr>
+<!--
+	<tr><td valign="top"><a href="demos.html">Demos</a></td>
+		<td>Games and demo applications.</td></tr>
+-->
+	<tr><td valign="top"><a href="queries.html">Queries</a><ul>
+		<li><a href="queries.html#find-window">The Find window</a></li>
+		<li><a href="queries.html#basic-query">Basic queries - "by Name"</a></li>
+		<li><a href="queries.html#adv-query">Advanced queries - "by Attribute"</a></li>
+		<li><a href="queries.html#more-adv-query">Even more advanced queries - "by Formula"</a></li>
+		<li><a href="queries.html#result-window">The result window</a></li>
+		<li><a href="queries.html#query-template">Query Templates</a></li></ul></td>
+		<td valign="top">Utilisez le système ultra-rapide de requêtes de Haiku pour trouver rapidement ce que vous cherchez.</td></tr>
+
 	<tr><td valign="top"><a href="filetypes.html">Types de fichiers</a><ul>
 		<li><a href="filetypes.html#filetype">Le type du fichier</a></li>
 		<li><a href="filetypes.html#preferred-app">L'application préférée</a></li>
@@ -131,106 +242,34 @@ Si vous êtes intéressé pour contribuer à la traduction, vous trouverez sur <
 		<li><a href="filetypes.html#settings-apps">Réglages supplémentaires pour les applications</a></li>
 		<li><a href="filetypes.html#filetypes-preferences">Réglages généraux avec les préférences des types de fichiers</a></li></ul></td>
 		<td valign="top">Définissez les applications par défaut, modifiez les types de fichiers, ou créez le vôtre.</td></tr>
+
 	<tr><td valign="top"><a href="attributes.html">Attributs</a><ul>
 		<li><a href="attributes.html#attributes-tracker">Attributs dans le Tracker</a></li>
 		<li><a href="attributes.html#attributes-terminal">Attributs dans le Terminal</a></li></ul></td>
-		<td valign="top">Cette fonctionnalité, une des principales de Haiku, vous permet de gérer et d'ajouter n'importe quels types de données à n'importe quel fichier.</td></tr>		
+		<td valign="top">Cette fonctionnalité, une des principales de Haiku, vous permet de gérer et d'ajouter n'importe quels types de données à n'importe quel fichier.</td></tr>
+
 	<tr><td valign="top"><a href="index.html">Indexation</a></td>
 		<td>Utilisez l'indexation pour effectuer des recherches sur les attributs.</td></tr>
-	<tr><td valign="top"><a href="queries.html">Requêtes</a><ul>
-		<li><a href="queries.html#find-window">La fenêtre de recherche</a></li>
-		<li><a href="queries.html#basic-query">Requêtes basiques - « par nom »</a></li>
-		<li><a href="queries.html#adv-query">Requêtes améliorées - « par attribut »</a></li>
-		<li><a href="queries.html#more-adv-query">Requêtes avancées - « par formule »</a></li>
-		<li><a href="queries.html#result-window">La fenêtre de résultats</a></li>
-		<li><a href="queries.html#query-template">Les modèles de requêtes</a></li></ul></td>
-		<td valign="top">Utilisez le système ultra-rapide de requêtes de Haiku pour trouver rapidement ce que vous cherchez.</td></tr>
+
+	<tr><td valign="top"><a href="filesystem-layout.html">Structure du système de fichiers</a><ul>
+		<li><a href="filesystem-layout.html#system">Le dossier « system »</a></li>
+		<li><a href="filesystem-layout.html#home">Le dossier « home »</a></li></ul></td>
+		<td valign="top">Comprenez la hiérarchie du système de fichiers et familiarisez-vous avec l'emplacement des fichiers et dossiers importants.</td></tr>
+
 	<tr><td valign="top"><a href="workshop-filetypes+attributes.html">Atelier : Types de fichiers, attributs, index et requêtes</a></td>
 		<td valign="top">Apprenez à utiliser certaines fonctionnalités centrales de Haiku en organisant vos DVD.</td></tr>
+
 	<tr><td valign="top"><a href="workshop-email.html">Atelier : Gérer son courrier</a></td>
 		<td valign="top">Apprenez à exploiter les statuts et les requêtes personnalisés du système de messagerie électronique de Haiku.</td></tr>
+
 	<tr><td valign="top"><a href="workshop-wlan.html">Atelier : Réseaux sans-fils</a></td>
 		<td valign="top">Installez votre réseau sans-fils ouvert ou chiffré.</td></tr>
-	<tr><td valign="top"><a href="applications.html">Applications</a><ul>
-		<li><a href="applications.html#hpkg">Haiku packages (.hpkg)</a></li>
-		<li><a href="applications.html#beos_apps">Old BeOS archives (.zip and .pkg)</a></li>
-		<li><a href="applications.html#list-of-apps">Haiku's applications</a></li>
-		<ul>
-			<li><a href="applications/activitymonitor.html">ActivityMonitor</a></li>
-			<li><a href="applications/bootmanager.html">BootManager</a></li>
-			<li><a href="applications/charactermap.html">CharacterMap</a></li>
-			<li><a href="applications/codycam.html">CodyCam</a></li>
-			<li><a href="applications/debugger.html">Debugger</a></li>
-			<li><a href="applications/deskcalc.html">DeskCalc</a></li>
-			<li><a href="applications/diskprobe.html">DiskProbe</a></li>
-			<li><a href="applications/diskusage.html">DiskUsage</a></li>
-			<li><a href="applications/drivesetup.html">DriveSetup</a></li>
-			<li><a href="applications/expander.html">Expander</a></li>
-			<li><a href="applications/haikudepot.html">HaikuDepot</a></li>
-			<li><a href="applications/icon-o-matic.html">Icon-O-Matic</a></li>
-			<li><a href="applications/installer.html">Installer</a></li>
-			<li><a href="applications/magnify.html">Magnify</a></li>
-			<li><a href="applications/mail.html">Mail</a></li>
-			<li><a href="applications/mediaplayer.html">MediaPlayer</a></li>
-			<li><a href="applications/midiplayer.html">MidiPlayer</a></li>
-			<li><a href="applications/packageinstaller.html">LegacyPackageInstaller</a></li>
-			<li><a href="applications/people.html">People</a></li>
-			<li><a href="applications/poorman.html">PoorMan</a></li>
-			<li><a href="applications/screenshot.html">Screenshot</a></li>
-			<li><a href="applications/showimage.html">ShowImage</a></li>
-			<li><a href="applications/softwareupdater.html">SoftwareUpdater</a></li>
-			<li><a href="applications/soundrecorder.html">SoundRecorder</a></li>
-			<li><a href="applications/stylededit.html">StyledEdit</a></li>
-			<li><a href="applications/terminal.html">Terminal</a></li>
-			<li><a href="applications/textsearch.html">TextSearch</a></li>
-			<li><a href="applications/tv.html">TV</a></li>
-			<li><a href="applications/webpositive.html">WebPositive</a></li>
-		</ul>
-		<li><a href="applications.html#cli-apps">Haiku's commandline applications</a></li>
-		<li><a href="applications.html#list-of-bundled-apps">Bundled applications</a></li>
-		</ul></td>
-		<td>Apprenez comment installer et désinstaller des applications et comment travailler avec celles fournies avec Haiku.</td></tr>
-	<tr><td valign="top"><a href="desktop-applets.html">Appliquettes du bureau</a>
-		<ul>
-			<li><a href="desktop-applets/launchbox.html">LaunchBox</a></li>
-			<li><a href="desktop-applets/networkstatus.html">NetworkStatus</a></li>
-			<li><a href="desktop-applets/powerstatus.html">PowerStatus</a></li>
-			<li><a href="desktop-applets/processcontroller.html">ProcessController</a></li>
-			<li><a href="desktop-applets/workspaces.html">Workspaces</a></li>
-		</ul></td>
-		<td>Outils simples à placer sur le Bureau ou dans la Deskbar.</td></tr>
-	<tr><td valign="top"><a href="preferences.html">Preferences</a>
-		<ul>
-			<li><a href="preferences/appearance.html">Appearance</a></li>
-			<li><a href="preferences/backgrounds.html">Backgrounds</a></li>
-			<li><a href="preferences/datatranslations.html">DataTranslations</a></li>
-			<li><a href="preferences/deskbar.html">Deskbar</a></li>
-			<li><a href="preferences/e-mail.html">E-mail</a></li>
-			<li><a href="preferences/filetypes.html">FileTypes</a></li>
-			<li><a href="preferences/keyboard.html">Keyboard</a></li>
-			<li><a href="preferences/keymap.html">Keymap</a></li>
-			<li><a href="preferences/locale.html">Locale</a></li>
-			<li><a href="preferences/media.html">Media</a></li>
-			<li><a href="preferences/mouse.html">Mouse</a></li>
-			<li><a href="preferences/network.html">Network</a></li>
-			<li><a href="preferences/printers.html">Printers</a></li>
-			<li><a href="preferences/repositories.html">Repositories</a></li>
-			<li><a href="preferences/screen.html">Screen</a></li>
-			<li><a href="preferences/screensaver.html">ScreenSaver</a></li>
-			<li><a href="preferences/shortcuts.html">Shortcuts</a></li>
-			<li><a href="preferences/sounds.html">Sounds</a></li>
-			<li><a href="preferences/time.html">Time</a></li>
-			<li><a href="preferences/tracker.html">Tracker</a></li>
-			<li><a href="preferences/touchpad.html">Touchpad</a></li>
-			<li><a href="preferences/virtualmemory.html">VirtualMemory</a></li>
-		</ul></td>
-		<td>Configurez votre système.</td></tr>
-<!--
-	<tr><td valign="top"><a href="demos.html">Demos</a></td>
-		<td>Games and demo applications.</td></tr>
--->
+
 	<tr><td valign="top"><a href="bash-scripting.html">Bash et les scripts</a></td>
 		<td>Comprenez certains scripts utilisez par le système et trouvez des ressource en lignes pour travailler dans un shell et écrire des scripts.</td></tr>
+
+	<tr><td valign="top"><a href="bootloader.html">Chargeur de démarrage</a></td>
+		<td valign="top">Réglez des options de démarrage sans échec pour résoudre des problèmes de configuration.</td></tr>
 </table>
 
 </div>

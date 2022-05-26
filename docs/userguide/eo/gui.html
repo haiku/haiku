@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="eo" xml:lang="eo">
+<head>
+<!-- 
+ *
+ * Copyright 2008-2017, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Va Miluŝnikov
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Grafika uzantinterfaco de la Hajko</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>User guide</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now">Esperanto&nbsp;<span class="dropdown-caret">&#9660;</span></li>
+<li><a href="../id/gui.html">Bahasa Indonesia</a></li>
+<li><a href="../ca/gui.html">Català</a></li>
+<li><a href="../de/gui.html">Deutsch</a></li>
+<li><a href="../en/gui.html">English</a></li>
+<li><a href="../es/gui.html">Español</a></li>
+<li><a href="../fr/gui.html">Français</a></li>
+<li><a href="../fur/gui.html">Furlan</a></li>
+<li><a href="../it/gui.html">Italiano</a></li>
+<li><a href="../hu/gui.html">Magyar</a></li>
+<li><a href="../pl/gui.html">Polski</a></li>
+<li><a href="../pt_PT/gui.html">Português</a></li>
+<li><a href="../pt_BR/gui.html">Português (Brazil)</a></li>
+<li><a href="../ro/gui.html">Română</a></li>
+<li><a href="../sk/gui.html">Slovenčina</a></li>
+<li><a href="../fi/gui.html">Suomi</a></li>
+<li><a href="../sv_SE/gui.html">Svenska</a></li>
+<li><a href="../tr/gui.html">Türkçe</a></li>
+<li><a href="../zh_CN/gui.html"> 中文 ［中文］</a></li>
+<li><a href="../ru/gui.html">Русский</a></li>
+<li><a href="../uk/gui.html">Українська</a></li>
+<li><a href="../jp/gui.html">日本語</a></li>
+</ul>
+<span>
+ «  <a href="filesystem-layout.html">Filesystem layout</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="workspaces.html">Workspaces</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<table class="index" id="index" summary="index">
+<tr class="heading"><td>Enhavtabelo</td></tr>
+<tr class="index"><td>
+		<a href="#move-resize">Rapida movado kaj regrandigado</a><br />
+                <a href="#stack-tile">Staplo &amp; pavimo</a><br />
+                <a href="#open-save-panel">Fenestretoj por ekuzi kaj konservi</a><br />
+                <a href="#replicants">Replikiloj</a></td></tr>
+</table>
+
+<h1>Grafika uzantinterfaco de la Hajko</h1>
+
+<p>Grafika uzantinterfaco de la Hajko estas neseparebla parto de la sistemo. Diference de aliaj uniksosimilaj sistemoj, ĉi tie forestas aparta administrilo por fenestroj kaj oni ne povas ŝargi sistemon nur kun ŝelo de komanda lineo ĉar la Hajko celas uzantojn de surtablaj komputiloj, tiu reĝimo ne estas supozata kiel necesa.</p>
+<p>Ĉar vi, verŝajne, jam havas sperton pri aliaj grafikaj interfacoj, ni preterpasu priskribojn por menuoj, kuntekstaj menuoj, operacioj treni &amp; ĵeti k.t.p. Anstataŭ tio ni rigardu kelkajn unikajn proprecojn de interfaco de la Hajko.</p>
+<img src="images/gui-images/gui.png" alt="gui.png" />
+<p>Nur kelkaj detaloj de la interfaco bezonas apartan eksplikon.</p>
+<ol>
+<li><p>La Laborstrio (Deskbar) de la Hajko similas al menuo "Lanĉi" kun panelo de rulantaj programoj. Pli detale legu en ĉapitro <a href="deskbar.html">La Laborstrio</a>.</p></li>
+<li>La flava titola langeto proponas pli ol nur nomo de programo aŭ dokumenta dosiernomo:
+<ul><li>Vi povas movi ĝin premtenante <span class="key">MAJUSKLIGKLAVON</span> dum trenado al alia loko por stapli iom da fenestroj celante komforte atingi ilin per titolaj langetoj.</li>
+<li>Vi povas kaŝi fenestron per duobla alklako sur langeto (aŭ per <span class="key">STIRKLAVO</span> <span class="key">ALTERNATIVKLAVO</span> <span class="key">M</span>). Kaŝitajn fenestrojn vi povas atingi per ĝiaj etikedoj en <a href="deskbar.html">La Laborstrio</a> aŭ per <a href="twitcher.html">La Taskturnilo</a>.</li>
+<li>Vi povas ŝovi fenestro malantaŭen per dekstra alklako sur langeto (aŭ bordero).</li></ul></li>
+<li><p>Fermanta butono</p></li>
+<li><p>Zomanta butono (aŭ <span class="key">STIRKLAVO</span> <span class="key">ALTERNATIVKLAVO</span> <span class="key">Z</span>). Por pleja parto da programoj ĝi etendas fenestron ĝis maksimuma grando ne kovrante la Laborstrion (premtenu <span class="key">MAJSKLIGKLAVON</span> por kovri eĉ la Laborstrion). Tamen tio ne estas nepra konduto. Fenestroj de la Spurilo, porekzemple, regrandiĝas por la plej bone montri entenon.</p></li>
+<li><p>Fenestra bordero. Maldektrbutona trenado movas fenestron, dektrbutona trenado ŝanĝas grandon.</p></li>
+<li><p>Grandŝanĝilo</p></li>
+</ol>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="move-resize" name="move-resize">Maniero rapide movi aŭ regrandigi fenestrojn</a></h2>
+<p>Movado kaj regrandigado de fenestroj estas granda parto de interagado kun samtempe rulantaj programoj. Ekzistas pli komforta ago ol kapti malgrandajn flavajn langetojn aŭ malvastajn fenestrajn borderojn. Krom malgrandeco, ankaŭ la angula regrandigilo havas aldonan limigon - ĝi permesas regrandigon nur direktite al masupra dekstra angulo.<br />Treni borderon per deksta klako por regrandigi - ankaŭ funkscias, tamen vi devas deliĝente celi.</p>
+<p>La Hajko proponas komfortan solvon por la problemo per klavkombinaĵo por mastrumi fenestrojn <span class="key">STIRKLAVO</span> <span class="key">ALTERNATIVKLAVO</span> plus musumo. Ankaŭ rigardu ĉapitron <a href="keyboard-shortcuts.html#general">Ŝparklavoj kaj klavkombinaĵoj</a> pri mastrumado por fenestroj.</p>
+<img src="images/gui-images/resizing.png" alt="resizing.png" />
+<p>Dum premtenado de <span class="key">STIRKLAVO</span> <span class="key">ALTERNATIVKLAVO</span> estas kolormenciataj la fenestraj borderoj la plej proksimaj al musmontrilo. Movu muson derekte al alia bordero por ŝanĝi celon. Trenu per premo de <i>dekstra musbutono</i> por regrandigi la fenestron je menciitaj borderoj.</p>
+<p>Premtenu <span class="key">STIRKLAVON</span> <span class="key">ALTERNATIVKLAVON</span> kaj  premu <i>maldekstran musbutonon</i> en ajna loko en la fenestro por relokigi ĝin. La sola rapida klako per <i>dekstra musbutono</i> dronigos fenestron - malantaŭigos ĝin.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="stack-tile" name="stack-tile">Stapli &amp; pavimi</a></h2>
+<p>Grafika uzantinterfaco de la Hajko havas unikan trajton pro fenestroj havas flavan langeton anstaŭ plenvastan titolan panelon. Tiu mastruma rimedo estas  "staplo &amp; pavimo".<br />
+En suba ekzemplo, fenestro de la Spurilo (Tracker) kun legosignoj estas kunpavimita dekstroflanke kun fenestro de la Retprospero (WebPositive), kiu mem estas staplita kun alia fenestro de la Spurilo, montranta entenon de la dosierujo <tt>haiku</tt>. La movbildo montras kiel uzanto alklakas la titollangetojn de staplitaj fenestroj por antaŭigi iun el ili.</p> 
+<img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
+<p>Kunigita tielmaniere grupo de fenestroj povas esti movata kaj regrandigata samtempe - la komforta rimedo por labori en projektorientita medio. Anstataŭ aparte serĉi necesajn fenestrojn kun dokumentoj, de redaktado, de la Spurilo, de poŝto koncernanta nunan projekton, - simple "staplu&amp;pavimu" ilin kune.</p>
+<p>Aranĝado de fenestroj estas simpla: premtenu <span class="key">OPCIKLAVON</span> kaj trenu per titollangeto la fenstron ĝis bordero aŭ titollangeto de alia fenestro, kiam celo kolormarkigos maltenu musbutonon.</p>
+<p>Stapli &amp; pavimi havas du eblecojn.</p>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2">
+<tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
+<td><p>"<i>Staplado</i>" estas metado de fenestro sur pinton de aliaj fenestoj kun aŭtomata relokigo de iliaj titollangetoj.<br />
+Kun premtenata <span class="key">OPCIKLAVO</span>, langetoj ŝanĝas koloron dum interkovrado; ĵetu la fenestron al subaj por stapli ĝin.</p></td></tr></table>
+<table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
+<tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
+<td><p>"<i>Pavimado</i>" signifas kungluadon de fenestroj horizontale aŭ vertikale.<br />
+Ankaŭ, dum premtenado de <span class="key">OPCIKLAVON</span> la kunglueblaj borderoj ŝanĝas koloron kiam estas proksime.</p></td></tr></table>
+<p>Por disigi vi ankaŭ devas premteni <span class="key">OPCIKLAVON</span> kaj treni per titollangeto la fenestron for de la grupo.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="open-save-panel" name="open-save-panel">Fenestretoj por ekuzi kaj konservi</a></h2>
+<p>Kiam vi ekuzas aŭ konservas iun dosieron per iu programo, aperas la fenestretoj similaj al la:</p>
+<img src="images/gui-images/open-save.png" alt="open-save.png" />
+<p>Ĝi havas kutimajn erojn: liston de dosieroj de nuna dosierujo por elekto, se tio estas konserva dialogo, do tekstan kampon por tajpi dosiernomon, iam tirmenuon  por diversaj formatoj k.t.p.<br />
+Ankaŭ vi povas elekti suprajn dosierujojn per tirmenuo lokiĝanta super la listo de dosieroj.</p>
+<p>Se vi jam havas fenestron de la Spurilo kun iu intinero, vi povas tiri iun ajn dosieron, dosierujon aŭ doserujan ankron (la specialan piktogramon videblan en dekstra fenestro sur la bildo)
+el ĝi en la fenestreton kaj tio rezultos ŝanĝon de itenero al nova loko.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="open-save-shortcuts" name="open-save-shortcuts">Ŝparklavoj</a></h3>
+<p>La ŝparklavoj en fenestretoj por ekuzi kaj konservi estas preskaŭ samaj kiel en la Spurilo. Krom komandoj jam atingeblaj per la menuo <span class="menu">Dosieroj</span> ne evidentaj estas:</p>
+<table summary="shortcuts" border="0" cellspacing="0" cellpadding="2">
+<tr><td><span class="key">ALTERNATIVKLAVO</span> <span class="key">N</span></td><td></td><td>Kreas dosierujon.</td></tr>
+<tr><td><span class="key">ALTERNATIVKLAVO</span> <span class="key">E</span></td><td></td><td>Renomigas elektitan elementon.</td></tr>
+<tr><td><span class="key">ALTERNATIVKLAVO</span> <span class="key">↑</span></td><td style="width:24px;"></td><td>Relokigas en supran dosierujon.</td></tr>
+<tr><td class="onelinetop"><span class="key">ALTERNATIVKLAVO</span> <span class="key">↓</span> aŭ <span class="key">SENDI</span></td><td></td><td>Relokigas en elektitan dosierujon.</td></tr>
+<tr><td><span class="key">ALTERNATIVKLAVO</span> <span class="key">D</span></td><td></td><td>Relokigas en dosierujon de la labortablo.</td></tr>
+<tr><td><span class="key">ALTERNATIVKLAVO</span> <span class="key">H</span></td><td></td><td>Relokigas en hejman dosierujon.</td></tr>
+</table>
+<p>Pri uzo de ŝparklavoj en la Hajko entute legu la ĉapitron <a href="keyboard-shortcuts.html">Ŝparklavoj kaj klavkombinaĵoj</a>.</p>
+
+<h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="favorites-recent" name="favorites-recent">Preferaĵoj kaj ĵusaj dosierujoj</a></h3>
+<p>La menuo <span class="menu">Preferaĵoj</span> en fenestretoj por ekuzi kaj konservi proponas ĵus vizititajn  dosierujojn kaj preferatajn lokojn, kiujn vi povas atribui mem. La sagetoj montras ke vi ankaŭ povas translokiĝi pli profunde tra hierarkio per submenuoj.</p>
+<img src="images/gui-images/favorites.png" alt="favorites.png" />
+<p>Por aldoni ion en Preferaĵojn vi devas simple viziti deziratan dosierujon kaj plenumi menuon <span class="menu">Preferaĵoj | Aldoni nunan dosierujon</span>. La loko aperos en ĉiuj fenestretoj de uzado/konservado. 
+Por forigi iun preferatan lokon plenumu menuon <span class="menu">Preferaĵoj | Redakti preferaĵojn...</span> kaj forigu la elementon.<br />
+Ĉiuj Preferaĵoj estas stokitaj en <span class="path">/boot/home/config/settings/Tracker/Go/</span>. Do vi povas ankaŭ krei aŭ forigi ligilojn al dosieroj kaj dosierujo senpere tie.</p>
+
+<h2>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="replicants" name="replicants">Replikiloj</a></h2>
+<p>Replikiloj estas malgrandaj memstaraj partoj de programoj,  integrigeblaj en aliajn programojn. Se ŝalti opcion de la Laborstrio <span class="menu">Montri replikilojn</span> do vi povos rekoni replikeblajn partojn de programoj per speciala piktogramo, lokiĝanta kutime en malsupra dekstra angulo.</p>
+<img src="../images/gui-images/replicant.png" alt="replicant.png" />
+<p>La plej taŭga loko kapabla uzi replikilojn estas la labortablo: simple trenu &amp; ĵetu la piktogramon sur ĝin. La replikilo fariĝos parto de la labortablo kaj vi plu ne bezonos lanĉi patran programon por funkciigi la replikilon.<br />
+La dekstra alklako sur la replikilo vokos kuntekstan menuon de patra programo entenantan punkton <span class="menu">Pri</span> por kompreni fonton de la replikilo kaj punkton <span class="menu">Forigi replikilon</span>.</p>
+<div class="box-info">Okaze de problemo kun iu replikilo kaj se vi ne povas ĝin forigi for de labortablo - simple forigu la dosieron <span class="path">~/config/settings/Tracker/tracker_shelf</span>. Bedaŭrinde, sed tio forigos <i>ĉiujn</i> replikiloj for de la labortablo.</div>
+<p>La ekzemploj de replikiloj estas la grafikaĵo de <a href="applications/activitymonitor.html">la ObserviloDeAktiveco</a>, la <a href="workspaces.html">Aplikaĵeto de la Laborspacoj</a> aŭ <a href="applications/deskcalc.html">la Ĉetablkalkulilo</a>.</p>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="filesystem-layout.html">Filesystem layout</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="workspaces.html">Workspaces</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

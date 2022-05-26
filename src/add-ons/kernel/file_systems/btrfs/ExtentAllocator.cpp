@@ -413,7 +413,7 @@ BlockGroup::Initialize(uint64 flag)
 
 	while (true) {
 		status = fCurrentExtentTree->FindNext(&path, fKey, (void**)&fItem);
-		if ((Flags() & flag) == flag || status != B_OK)
+		if (status != B_OK || (Flags() & flag) == flag)
 			break;
 		fKey.SetObjectID(End());
 		fKey.SetOffset(0);

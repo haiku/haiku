@@ -497,7 +497,7 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 	\fn status_t BBitmap::ImportBits(const BBitmap* bitmap)
 	\brief Assigns another bitmap's data to this bitmap.
 
-	The supplied bitmap must have the exactly same dimensions as this bitmap.
+	The supplied bitmap must have the exact same dimensions as this bitmap.
 	Its data is converted to the color space of this bitmap.
 
 	The currently supported source/target color spaces are
@@ -600,7 +600,7 @@ appFileInfo.GetIcon(iconBitmap, B_LARGE_ICON);
 
 /*!
 	\fn BView* BBitmap::FindView(const char* viewName) const
-	\brief Accesses a bitmap's child BView with a the name \a viewName.
+	\brief Accesses a bitmap's child BView with the name \a viewName.
 
 	\param viewName The name of the BView to be returned.
 	\returns The BView with the name \a name or \c NULL if the bitmap doesn't

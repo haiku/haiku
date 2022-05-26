@@ -51,6 +51,7 @@ All rights reserved.
 #include <Application.h>
 #include <Catalog.h>
 #include <Clipboard.h>
+#include <ColorConversion.h>
 #include <Debug.h>
 #include <Dragger.h>
 #include <fs_attr.h>
@@ -276,9 +277,10 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fLastKeyTime(0),
 	fLastDeskbarFrameCheckTime(LONGLONG_MIN),
 	fDeskbarFrame(0, 0, -1, -1),
-	fTextWidgetToCheck(NULL)
+	fTextWidgetToCheck(NULL),
+	fActiveTextWidget(NULL)
 {
-	fListElemHeight = be_plain_font->Size() * 1.65f;
+	fListElemHeight = ceilf(be_plain_font->Size() * 1.65f);
 
 	fViewState->SetViewMode(viewMode);
 	fShowSelectionWhenInactive
@@ -1018,8 +1020,7 @@ BPoseView::SetIconPoseHeight()
 
 		case kMiniIconMode:
 			fViewState->SetIconSize(B_MINI_ICON);
-			fIconPoseHeight = ceilf(sFontHeight <
-				IconSizeInt() ? IconSizeInt() : sFontHeight + 1);
+			fIconPoseHeight = std::max((float)IconSizeInt(), sFontHeight + 1);
 			break;
 
 		case kListMode:
@@ -8443,7 +8444,8 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 	// check if model is a trash dir, if so
 	// update ContainerWindow's fIsTrash, etc.
 	// variables to indicate new state
-	ContainerWindow()->UpdateIfTrash(model);
+	if (ContainerWindow() != NULL)
+		ContainerWindow()->UpdateIfTrash(model);
 
 	StopWatching();
 	ClearPoses();
@@ -8462,14 +8464,14 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 
 	if (viewStateRestored) {
 		if (ViewMode() == kListMode && oldMode != kListMode) {
-			if (ContainerWindow())
+			if (ContainerWindow() != NULL)
 				ContainerWindow()->ShowAttributeMenu();
 
 			fTitleView->Show();
 		} else if (ViewMode() != kListMode && oldMode == kListMode) {
 			fTitleView->Hide();
 
-			if (ContainerWindow())
+			if (ContainerWindow() != NULL)
 				ContainerWindow()->HideAttributeMenu();
 		} else if (ViewMode() == kListMode && oldMode == kListMode)
 			fTitleView->Invalidate();
@@ -8501,7 +8503,7 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 	// be sure this happens after origin is set and window is sized
 	// properly for proper icon caching!
 
-	if (ContainerWindow()->IsTrash())
+	if (ContainerWindow() != NULL && ContainerWindow()->IsTrash())
 		AddTrashPoses();
 	else
 		AddPoses(TargetModel());
@@ -9034,20 +9036,38 @@ BPoseView::DrawPose(BPose* pose, int32 index, bool fullDraw)
 rgb_color
 BPoseView::DeskTextColor() const
 {
-	rgb_color color = ViewColor();
-	float thresh = color.red + (color.green * 1.25f) + (color.blue * 0.45f);
+	// The desktop color is chosen independently for the desktop.
+	// The text color is chosen globally for all directories.
+	// It's fairly easy to get something unreadable (even with the default
+	// settings, it's expected that text will be black on white in Tracker
+	// folders, but white on blue on the desktop).
+	// So here we check if the colors are different enough, and otherwise,
+	// force the text to be either white or black.
+	rgb_color textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+	rgb_color viewColor;
+	if (IsDesktopWindow())
+		viewColor = ViewColor();
+	else
+		viewColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 
-	if (thresh >= 360) {
-		color.red = 0;
-		color.green = 0;
-		color.blue = 0;
- 	} else {
-		color.red = 255;
-		color.green = 255;
-		color.blue = 255;
+	int textBrightness = BPrivate::perceptual_brightness(textColor);
+	int viewBrightness = BPrivate::perceptual_brightness(viewColor);
+	if (abs(viewBrightness - textBrightness) > 127) {
+		// The colors are different enough, we can use them as is
+		return textColor;
+	} else {
+		if (viewBrightness > 127) {
+			textColor.red = 0;
+			textColor.green = 0;
+			textColor.blue = 0;
+		} else {
+			textColor.red = 255;
+			textColor.green = 255;
+			textColor.blue = 255;
+		}
+
+		return textColor;
 	}
-
-	return color;
 }
 
 

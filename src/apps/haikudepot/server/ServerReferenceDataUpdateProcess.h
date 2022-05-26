@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef SERVER_REFERENCE_DATA_UPDATE_PROCESS_H
@@ -47,6 +47,8 @@ private:
 			status_t			_ProcessNaturalLanguages(
 									DumpExportReference* data);
 			status_t			_ProcessPkgCategories(
+									DumpExportReference* data);
+			status_t			_ProcessRatingStabilities(
 									DumpExportReference* data);
 
 private:

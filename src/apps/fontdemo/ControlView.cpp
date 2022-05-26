@@ -294,10 +294,12 @@ ControlView::MessageReceived(BMessage* msg)
 					const_cast<char*>(currentFamilyItem->Label()));
 
 				BMenu* submenu = currentFamilyItem->Submenu();
-				if (submenu) {
-					BMenuItem* markedStyle = submenu->FindMarked();
-					fFontStyleindex = submenu->IndexOf(markedStyle);
+				if (submenu == NULL) {
+					printf("Failed to get style.\n");
+					return;
 				}
+				BMenuItem* markedStyle = submenu->FindMarked();
+				fFontStyleindex = submenu->IndexOf(markedStyle);
 
 				if (fFontStyleindex < installedStyles - 1)
 					fFontStyleindex++;

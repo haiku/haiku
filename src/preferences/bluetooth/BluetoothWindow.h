@@ -16,7 +16,6 @@
 
 class BluetoothSettingsView;
 class RemoteDevicesView;
-class ConnChanView;
 
 class BluetoothWindow : public BWindow {
 public:
@@ -26,7 +25,6 @@ public:
 
 private:
 			RemoteDevicesView*		fRemoteDevices;
-			ConnChanView*			fConnChan;
 			BButton*				fDefaultsButton;
 			BButton*				fRevertButton;
 			BMenuBar*				fMenubar;

@@ -494,8 +494,8 @@ static partition_module_info intel_partition_map_module =
 	NULL,								// set_name
 	NULL,								// set_content_name
 	pm_set_type,						// set_type
-	NULL,								// set_parameters
-	NULL,								// set_content_parameters
+	pm_set_parameters,					// set_parameters
+	pm_set_parameters,					// set_content_parameters
 	pm_initialize,						// initialize
 	pm_uninitialize,					// uninitialize
 	pm_create_child,					// create_child

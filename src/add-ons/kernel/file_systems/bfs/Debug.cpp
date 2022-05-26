@@ -227,7 +227,7 @@ dump_bplustree_node(const bplustree_node* node, const bplustree_header* header,
 		memcpy(buffer, key, length);
 		buffer[length] = '\0';
 
-		off_t* value = node->Values() + i;
+		Unaligned<off_t>* value = node->Values() + i;
 		if ((addr_t)value < (addr_t)node
 			|| (addr_t)value > (addr_t)node + header->node_size)
 			kprintf("  %2d. Invalid Offset!!\n", (int)i);

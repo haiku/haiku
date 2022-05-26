@@ -1,0 +1,57 @@
+1	friulian	application/x-vnd.Cortex.InfoView	3788145961
+Offset	InfoView		Deviazion
+Description	DormantNodeInfoView		Descrizion
+Byte order	InfoView		Ordin dai bytes
+Connection	InfoView		Conession
+Output formats	DormantNodeInfoView		Formâts di jessude
+History	InfoView		Cronologjie
+Input formats	DormantNodeInfoView		Formâts di jentrade
+Signature	AppNodeInfoView		Firme
+Video data between	InfoView		Dâts video tra
+Any number	DormantNodeInfoView	For 'Max. instances' field	Cualsisei numar
+Flags	InfoView		Opzions
+Media output	InfoView		Jessude multimediâl
+Active lines	InfoView		Liniis ativis
+Buffer size	InfoView		Dimension memorie tampon
+\n- Quality:	FileNodeInfoView		\n- Cualitât:
+Kinds	LiveNodeInfoView		Gjenars
+Application	AppNodeInfoView		Aplicazion
+Max. instances	DormantNodeInfoView		Istancis massimis
+\n- Duration:	FileNodeInfoView		\n- Durade:
+Dormant media node	DormantNodeInfoView		Grop multimediâl inatîf
+Latency	LiveNodeInfoView		Latence
+Media type	InfoView		Gjenar multimediâl
+Live media node	LiveNodeInfoView		Grop multimediâl Live
+Field rate	InfoView		Frecuence di cjamps
+Kinds	DormantNodeInfoView		Gjenars
+%title% info	InfoView		Informazion su %title%
+Node ID	LiveNodeInfoView		ID dal grop
+Resolution	InfoView		Risoluzion
+Chunk size	InfoView		Dimension dal toc
+File format	AppNodeInfoView		Formât dal file
+Matrix mask	InfoView		Mascare de Matriç
+Channel mask	InfoView		Mascare dal canâl
+Orientation	InfoView		Orientament
+Live file-interface node	FileNodeInfoView		Grop di interface-flle Live
+Channels	InfoView		Canâi
+Sample rate	InfoView		Frecuence di campionament
+File format	FileNodeInfoView		Formât file
+(no file)	FileNodeInfoView		(nissun file)
+Media input	InfoView		Jentrade multimediâl
+Bit rate	InfoView		Frecuence di cifre
+Input format	DormantNodeInfoView		Formât di jentrade
+Format	InfoView		Formât
+Version	AppNodeInfoView		Version
+AddOn ID	DormantNodeInfoView		ID de zonte
+Frame size	InfoView		Dimension ricuadri
+Run mode	LiveNodeInfoView		Modalitât di esecuzion
+\n- Codec:	FileNodeInfoView		\n- Codec:
+Port	LiveNodeInfoView		Puarte
+Output format	DormantNodeInfoView		Formât di jessude
+Aspect ratio	InfoView		Proporzions di aspiet
+Application-owned node	AppNodeInfoView		Grop di proprietât de aplicazion
+Tracks	FileNodeInfoView		Liniis
+Source	InfoView		Sorzint
+Destination	InfoView		Destinazion
+Copyright	FileNodeInfoView		Copyright
+ID:	FileNodeInfoView		ID:

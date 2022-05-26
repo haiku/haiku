@@ -11,7 +11,7 @@
 // BPositionIO, optimizations for buffered reading.
 //
 //
-// Copyright (c) 2003 OpenBeOS Project
+// Copyright (c) 2003 Haiku Project
 // Portions Copyright 1997-1998 Michael Sweet (mike@easysw.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a

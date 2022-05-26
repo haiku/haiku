@@ -7,6 +7,7 @@
 
 #include <boot/platform.h>
 #include <boot/stage2.h>
+#include <boot/platform/generic/text_console.h>
 #include <boot/platform/generic/video.h>
 #include <edid.h>
 #include <platform/openfirmware/openfirmware.h>
@@ -15,7 +16,7 @@
 //#define TRACE_VIDEO
 
 
-static int sScreen;
+static intptr_t sScreen;
 
 
 void
@@ -58,10 +59,10 @@ platform_switch_to_logo(void)
 	if (sScreen == OF_FAILED)
 		return;
 
-	int package = of_instance_to_package(sScreen);
+	intptr_t package = of_instance_to_package(sScreen);
 	if (package == OF_FAILED)
 		return;
-	uint32 width, height;
+	uintptr_t width, height;
 	if (of_call_method(sScreen, "dimensions", 0, 2, &height, &width)
 			== OF_FAILED) {
 		if (of_getprop(package, "width", &width, sizeof(int32)) == OF_FAILED)
@@ -86,6 +87,10 @@ platform_switch_to_logo(void)
 	gKernelArgs.frame_buffer.height = height;
 	gKernelArgs.frame_buffer.depth = depth;
 	gKernelArgs.frame_buffer.bytes_per_row = lineBytes;
+
+	// Move text to top of display so we don't scroll the boot logo out as soon
+	// as we display some text
+	console_set_cursor(0, 0);
 
 	dprintf("video mode: %ux%ux%u\n", gKernelArgs.frame_buffer.width,
 		gKernelArgs.frame_buffer.height, gKernelArgs.frame_buffer.depth);

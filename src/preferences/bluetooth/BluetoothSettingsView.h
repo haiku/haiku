@@ -19,6 +19,7 @@ class BBox;
 class BMenuField;
 class BPopUpMenu;
 class BSlider;
+class BOptionPopUp;
 
 class BluetoothSettingsView : public BView {
 public:
@@ -30,22 +31,19 @@ public:
 
 
 private:
-			void				_BuildConnectionPolicy();
-			void				_BuildClassMenu();
 			void				_BuildLocalDevicesMenu();
 			bool				_SetDeviceClass(uint8 major, uint8 minor,
 									uint16 service);
 			void				_MarkLocalDevice(LocalDevice* lDevice);
+			int					_GetClassForMenu();
 
 protected:
 			BluetoothSettings	fSettings;
 
 			float				fDivider;
 
-			BMenuField*			fPolicyMenuField;
-			BPopUpMenu*			fPolicyMenu;
-			BMenuField*			fClassMenuField;
-			BPopUpMenu*			fClassMenu;
+			BOptionPopUp*		fPolicyMenu;
+			BOptionPopUp*		fClassMenu;
 			BMenuField*			fLocalDevicesMenuField;
 			BPopUpMenu*			fLocalDevicesMenu;
 

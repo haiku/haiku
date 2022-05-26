@@ -10,6 +10,7 @@
 #include <Referenceable.h>
 
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 
 #include <system_profiler_defs.h>
 

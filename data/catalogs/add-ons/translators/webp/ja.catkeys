@@ -1,25 +1,25 @@
 1	japanese	x-vnd.Haiku-WebPTranslator	828165164
-©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
-Compression method:	ConfigView		圧縮方式:
-WebP image translator	ConfigView		WebP イメージトランスレーター
-Preset	ConfigView		プリセット:
-WebP images	WebPTranslator		WebP イメージ
+High	ConfigView		高品質
 WebPTranslator Settings	ConfigView		WebP トランスレーター設定
-Output quality:	ConfigView		出力品質:
-©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
-WebP Settings	main		WebP 設定
-Text	ConfigView		テキスト
-Slower but better	ConfigView		遅いが高圧縮
-WebP image	WebPTranslator		WebP イメージ
-Output preset:	ConfigView		出力プリセット:
-Picture	ConfigView		ピクチャ
-Low	ConfigView		低い
-High	ConfigView		高い
-Drawing	ConfigView		図面
-Based on libwebp %version%	ConfigView		libwebp %version% に基づく
-Default	ConfigView		デフォルト
-Fast	ConfigView		速い
+Low	ConfigView		低品質
+WebP image translator	ConfigView		WebP イメージトランスレーター
 Photo	ConfigView		写真
-Preprocessing filter	ConfigView		前処理フィルター
 WebP image translator	WebPTranslator		WebP イメージトランスレーター
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Picture	ConfigView		ピクチャ
+Default	ConfigView		デフォルト
+Text	ConfigView		テキスト
+Preprocessing filter	ConfigView		前処理フィルター
+Compression method:	ConfigView		圧縮方式:
+Preset	ConfigView		プリセット
+Drawing	ConfigView		図面
+Output preset:	ConfigView		出力プリセット:
+WebP Settings	main		WebP 設定
 Icon	ConfigView		アイコン
+WebP image	WebPTranslator		WebP イメージ
+Output quality:	ConfigView		出力品質:
+Slower but better	ConfigView		遅いが高圧縮
+Based on libwebp %version%	ConfigView		libwebp %version% に基づく
+Fast	ConfigView		速い
+WebP images	WebPTranslator		WebP イメージ

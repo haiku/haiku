@@ -31,7 +31,7 @@ parse_initialize_parameters(const char* parameterString,
 	if (string != NULL)
 		blockSize = strtoul(string, NULL, 0);
 
-	delete_driver_settings(handle);
+	unload_driver_settings(handle);
 
 	if (blockSize != 1024 && blockSize != 2048 && blockSize != 4096
 		&& blockSize != 8192) {

@@ -1,0 +1,38 @@
+1	portuguese (brazil)	x-vnd.Haiku-libsolvsolver	3404387783
+allow architecture change of %source% to %target%	SolverProblemSolution		permitir a mudança de arquitetura de %source% para %target%
+install %source% from excluded repository	SolverProblemSolution		instalar a %source% do repositório excluído
+unspecified problem	SolverProblem		problema não especificado
+package %source% requires %dependency%, but none of the providers can be installed	SolverProblem		o pacote %source% requer a %dependency%, mas nenhum dos fornecedores podem ser instalados
+package %source% implicitly obsoletes %dependency% provided by %target%	SolverProblem		o pacote %source% deixa obsoleto a %dependency% fornecida por %target%
+nothing provides requested %dependency%	SolverProblem		ninguém fornece a %dependency% requerida
+do not keep %source% installed	SolverProblemSolution		não mantenha o %source% instalado
+do not deinstall \"%selection%\"	SolverProblemSolution		não desinstale \"%selection%\"
+install %source% despite its inferior architecture	SolverProblemSolution		instalar %source% em que pese sua arquitetura inferior
+conflicting requests	SolverProblem		solicitações de conflitos
+do not install the most recent version of \"%selection%\"	SolverProblemSolution		não instale a versão mais recente de \"%selection%\"
+allow replacement of %source% with %target%	SolverProblemSolution		permitir a substituição de %source% por %target%
+package %source% obsoletes %dependency% provided by %target%	SolverProblem		o pacote %source% deixará obsoleto a %dependency% fornecida por %target%
+do not forbid installation of %source%	SolverProblemSolution		não proíba a instalação de %source%
+allow downgrade of %source% to %target%	SolverProblemSolution		permitir downgrade do %source% do %target%
+dependency problem	SolverProblem		problema de dependência
+%dependency% is provided by the system	SolverProblem		%dependency% é fornecida pelo sistema
+keep %source% despite its inferior architecture	SolverProblemSolution		mantenha o %source% em que pese sua arquitetura inferior
+%source% does not belong to a distupgrade repository	SolverProblem		%source% não pertence a este repositório de atualização de distribuição
+installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		o pacote instalado %source% deixará obsoleto a %dependency% fornecida por %target%
+allow name change of %source% to %target%	SolverProblemSolution		permitir a mudança de nome de %source% para %target%
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		o pacote %source% está em conflito com a %dependency% fornecido por %target%
+do something	SolverProblemSolution		faça alguma coisa
+install %selection% despite its old version	SolverProblemSolution		instalar %selection% de qualquer forma se tiver versão mais velha
+cannot install both %source% and %target%	SolverProblem		você não pode instalar %source% e %target% ao mesmo tempo
+package %source% is not installable	SolverProblem		o pacote %source% não é instalável
+problem with installed package %source%	SolverProblem		problema na instalação do pacote %source%
+allow deinstallation of %source%	SolverProblemSolution		permitir a desinstalação de %source%
+keep %source% from excluded repository	SolverProblemSolution		manter o %source% do repositório excluído
+keep old %source%	SolverProblemSolution		manter a antiga %source%
+package %source% conflicts with %dependency% provided by itself	SolverProblem		o pacote %source% conflita com a %dependency% fornecida por si mesma
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		permitir a mudança de fornecedor de \"%sourceVendor%\" (%source%) para \"%targetVendor%\" (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		não bloquear \"%selection%\"
+do not install \"%selection%\"	SolverProblemSolution		não instale \"%selection%\"
+nothing provides %dependency% needed by %source%	SolverProblem		ninguém fornece a %dependency% necessária para a %source%
+%source% has inferior architecture	SolverProblem		%source% tem uma arquitetura inferior
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		não desinstale todos os recebíveis \"%selection%\"

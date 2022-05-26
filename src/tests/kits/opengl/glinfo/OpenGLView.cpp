@@ -52,8 +52,6 @@ OpenGLView::OpenGLView()
 	tabView->AddTab(new CapabilitiesView());
 	tabView->AddTab(new ExtensionsView());
 
-	glView->UnlockGL();
-
 	GroupLayout()->SetSpacing(0);
 	BLayoutBuilder::Group<>(this)
 		.AddGroup(B_HORIZONTAL, 0)
@@ -66,6 +64,8 @@ OpenGLView::OpenGLView()
 				.End()
 			.AddGlue()
 			.End();
+
+	glView->UnlockGL();
 }
 
 OpenGLView::~OpenGLView()

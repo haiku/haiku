@@ -116,8 +116,8 @@ void dbg_printf_end();
 #define DEBUG_CONTEXT_LINE(x)												\
 {																			\
 	dbg_printf_begin();														\
-	__out(DEBUG_APP " [%Ld: %5ld] %s:%d: ", system_time(), DEBUG_THREAD,	\
-		__PRETTY_FUNCTION__, __LINE__);										\
+	__out(DEBUG_APP " [%" B_PRId64 ": %5" B_PRId32 "] %s:%d: ",				\
+		system_time(), DEBUG_THREAD, __PRETTY_FUNCTION__, __LINE__);		\
 	x;																		\
 	dbg_printf_end();														\
 }

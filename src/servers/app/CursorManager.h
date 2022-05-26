@@ -35,6 +35,9 @@ public:
 
 			ServerCursor*		CreateCursor(team_id clientTeam,
 									 const uint8* cursorData);
+			ServerCursor*		CreateCursor(team_id clientTeam,
+									BRect r, color_space format, int32 flags,
+									BPoint hotspot, int32 bytesPerRow = -1);
 
 			int32				AddCursor(ServerCursor* cursor,
 									int32 token = -1);

@@ -1,11 +1,11 @@
-1	danish	x-vnd.Haiku-StyledEdit	2796309255
+1	danish	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Dokumentets statistiker
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan ikke tilbageføre, fil ikke fundet: \"%s\".
 Cut	Menus		Klip
 Center	Menus		Centrér
 Increase size	Menus		Større
-Wrap-around search	FindandReplaceWindow		Indpak-omkring søgning
 Page setup…	Menus		Sideopsætning…
+Wrap-around search	FindandReplaceWindow		Indpak-omkring søgning
 Untitled 	StyledEditWindow		Unavngivet 
 OK	Statistics		OK
 Find	FindandReplaceWindow		Find
@@ -29,8 +29,8 @@ Italic	Menus		Skrå
 Can't undo	Menus		Kan ikke fortryde
 Replace…	Menus		Erstat…
 File	Menus		Fil
-Bold	Menus		Tyk
 Paste	Menus		Indsæt
+Bold	Menus		Tyk
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Filen \"%file%\" blev ændret af et andet program, genindlæs den?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Filen \"%file%\" blev fjernet af et andet program, gendan den?
 Lines:	Statistics		Linjer:
@@ -51,6 +51,7 @@ OK	SaveAlert		OK
 Color	Menus		Farve
 Save changes to the document \"%s\"? 	QuitAlert		Gem ændringer til dokumentet \"%s\"? 
 StyledEdit	System name		StyledEdit
+Underline	Menus		Understreget
 Find:	FindandReplaceWindow		Find:
 Undo typing	QuitAlert		Fortryd skrivning
 Error loading \"%s\":\n\t%s	LoadAlert		Fejl ved indlæsning af \"%s\":\n\t%s
@@ -68,23 +69,23 @@ OK	LoadAlert		OK
 Save	QuitAlert		Gem
 Case-sensitive	FindandReplaceWindow		Versalfølsom
 Find selection	Menus		Find valgte
-Cancel	SaveAlert		Annuller
 Find…	Menus		Find…
+Cancel	SaveAlert		Annuller
 Revert	RevertToSavedAlert		Tilbagefør
-Decrease size	Menus		Mindre
 Size	Menus		Størrelse
+Decrease size	Menus		Mindre
 Autodetect	Menus		Automatisk registrering
 Replace next	Menus		Erstat næste
 OK	QuitAlert		OK
-Replace with:	FindandReplaceWindow		Erstat med:
 Edit	Menus		Rediger
+Replace with:	FindandReplaceWindow		Erstat med:
 Open…	Menus		Åbn…
 Save as…	Menus		Gem som…
 Replace	FindandReplaceWindow		Erstat
 Characters:	Statistics		Tegn:
 Don't save	QuitAlert		Gem ikke
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Filen er markeret som skrivebeskyttet. Gem ændringer til dokumentet \"%s\"? 
-Align	Menus		Tilpas
 Font	Menus		Skrifttype
+Align	Menus		Tilpas
 Select all	Menus		Vælg alt
 Right	Menus		Højre

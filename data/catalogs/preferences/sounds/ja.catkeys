@@ -3,7 +3,7 @@ Sounds	System name		サウンド
 Sounds\n  Brought to you by :\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL.\n  Original work from Atsushi Takamatsu.\nCopyright ©2003-2006 Haiku	SoundsHApp		Sounds\n次の作者が提供します:\n\tOliver Ruiz Dorantes\n\tJérôme DUVAL\n 原作: Atsushi Takamatsu\nCopyright ©2003-2006 Haiku
 No such file or directory	HEventList		ファイルまたはフォルダーがありません
 OK	HWindow		OK
-Other…	HWindow		その他…
+Other…	HWindow		その他...
 OK	SoundsHApp		OK
 Sound file:	HWindow		サウンドファイル:
 This is not an audio file.	HWindow		オーディオファイルではありません。

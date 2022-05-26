@@ -1,14 +1,16 @@
 /*
- * Copyright 2001-2011, Haiku, Inc.
+ * Copyright 2001-2020, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		DarkWyrm <bpmagic@columbus.rr.com>
- *		Adi Oanca <adioanca@gmail.com>
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Axel Dörfler <axeld@pinc-software.de>
- *		Brecht Machiels <brecht@mos6581.org>
- *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		DarkWyrm, bpmagic@columbus.rr.com
+ *		Adi Oanca, adioanca@gmail.com
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Brecht Machiels, brecht@mos6581.org
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Tri-Edge AI
+ *		Jacob Secunda, secundja@gmail.com
  */
 #ifndef WINDOW_H
 #define WINDOW_H
@@ -19,6 +21,7 @@
 #include "View.h"
 #include "WindowList.h"
 
+#include <AutoDeleter.h>
 #include <ObjectList.h>
 #include <Referenceable.h>
 #include <Region.h>
@@ -53,7 +56,8 @@ public:
 			bool				MoveToTopLayer(Window* window);
 			bool				Move(int32 from, int32 to);
 private:
-			::Decorator*		fDecorator;
+			ObjectDeleter< ::Decorator>
+								fDecorator;
 
 			StackWindows		fWindowList;
 			StackWindows		fWindowLayerOrder;
@@ -129,11 +133,13 @@ public:
 			void				ResizeBy(int32 x, int32 y,
 									BRegion* dirtyRegion,
 									bool resizeStack = true);
+			void				SetOutlinesDelta(BPoint delta,
+									BRegion* dirtyRegion);
 
 			void				ScrollViewBy(View* view, int32 dx, int32 dy);
 
 			void				SetTopView(View* topView);
-			View*				TopView() const { return fTopView; }
+			View*				TopView() const { return fTopView.Get(); }
 			View*				ViewAt(const BPoint& where);
 
 	virtual	bool				IsOffscreenWindow() const { return false; }
@@ -167,7 +173,7 @@ public:
 									{ return fUpdateRequested; }
 
 			DrawingEngine*		GetDrawingEngine() const
-									{ return fDrawingEngine; }
+									{ return fDrawingEngine.Get(); }
 
 			// managing a region pool
 			::RegionPool*		RegionPool()
@@ -362,10 +368,12 @@ protected:
 
 			BObjectList<Window> fSubsets;
 
-			WindowBehaviour*	fWindowBehaviour;
-			View*				fTopView;
+			ObjectDeleter<WindowBehaviour>
+								fWindowBehaviour;
+			ObjectDeleter<View>	fTopView;
 			::ServerWindow*		fWindow;
-			DrawingEngine*		fDrawingEngine;
+			ObjectDeleter<DrawingEngine>
+								fDrawingEngine;
 			::Desktop*			fDesktop;
 
 			// The synchronization, which client drawing commands

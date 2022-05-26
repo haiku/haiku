@@ -1,6 +1,10 @@
 /*
- * Copyright 2008-09, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes_at_gmail.com>
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2008-2009, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes@gmail.com>
+ * Copyright 2021, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Fredrik Modéen <fredrik_at_modeen.se>
  */
 
 #include <Alert.h>
@@ -63,9 +67,7 @@ public:
 	DeviceDiscovered(RemoteDevice* btDevice, DeviceClass cod)
 	{
 		BMessage* message = new BMessage(kMsgAddListDevice);
-
 		message->AddPointer("remoteItem", new DeviceListItem(btDevice));
-
 		fInquiryPanel->PostMessage(message);
 	}
 
@@ -149,11 +151,11 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 	fRetrieveMessage = new BMessage(kMsgRetrieve);
 	fSecondsMessage = new BMessage(kMsgSecond);
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 10)
-		.SetInsets(15)
-		.Add(fMessage)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_SMALL_SPACING)
+		.Add(fMessage, 0)
 		.Add(fScanProgress, 10)
-		.Add(fScrollView)
+		.Add(fScrollView, 20)
 		.AddGroup(B_HORIZONTAL, 10)
 			.Add(fAddButton)
 			.AddGlue()

@@ -79,6 +79,7 @@ private:
 			void				_RecycleLastChunk(stream_info& info);
 	static	int32				_ExtractorEntry(void* arg);
 			void				_ExtractorThread();
+			size_t				_CalculateChunkBuffer(int32 stream);
 
 private:
 			status_t			fInitStatus;

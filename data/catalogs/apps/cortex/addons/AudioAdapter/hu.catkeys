@@ -1,0 +1,10 @@
+1	hungarian	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		Bemeneti formátum
+Channels:	CortexAudioAdapter		Csatornák:
+stereo	CortexAudioAdapter		sztereó
+mono	CortexAudioAdapter		monó
+Output format	CortexAudioAdapter		Kimeneti formátum
+Audio input	CortexAddOnsCommon		Audió bemenet
+Sample format:	CortexAudioAdapter		Minta formátuma:
+Audio output	CortexAddOnsCommon		Audió kimenet
+%groupname% parameters	CortexAddOnsCommon		%groupname% paraméterek

@@ -1,15 +1,15 @@
-1	romanian	x-vnd.Haiku-Time	834234238
+1	romanian	x-vnd.Haiku-Time	3691539601
 OK	Time		OK
 Message receiving failed	Time		Primirea mesajului a eșuat
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Oră și Dată, scris de:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Australia
 America	Time		America
 Reset to default server list	Time		Restabilește la lista de server implicită
 Could not resolve server address	Time		Nu s-a putut rezolva adresa serverului
-Set time zone	Time		Configurează fusul orar
-Waiting for answer failed	Time		Așteptarea pentru răspuns a eșuat
-<Other>	Time		<Altele>
-Received invalid time	Time		S-a primit o oră invalidă
+Time & Date	System name		Oră și dată
+Set time zone	Time		Stabilește fusul orar
+Waiting for answer failed	Time		Așteptarea răspunsului a eșuat
+<Other>	Time		<Other>
+Received invalid time	Time		S-a primit o oră nevalidă
 Remove	Time		Elimină
 Synchronize again	Time		Sincronizează din nou
 Asia	Time		Asia
@@ -20,7 +20,7 @@ The following error occured while synchronizing:\n%s: %s	Time		Următoarea eroar
 Europe	Time		Europa
 Show day of week	Time		Afișează ziua săptămânii
 Local time (Windows compatible)	Time		Ora locală (compatibil cu Windows)
-Hardware clock set to:	Time		Ceasul hardware stabilit la:
+Hardware clock set to:	Time		Ceasul hardware este stabilit la:
 Arctic	Time		Arctic
 Antarctica	Time		Antarctica
 GMT (UNIX compatible)	Time		GMT (compatibil cu UNIX)
@@ -28,21 +28,20 @@ Africa	Time		Africa
 Stop	Time		Oprește
 Time zone	Time		Fus orar
 Clock	Time		Ceas
-Network time	Time		Oră rețea
+Network time	Time		Oră de rețea
 Sending request failed	Time		Trimiterea cererii a eșuat
-Preview time:	Time		Previzualizare oră:
+Preview time:	Time		Timp de previzualizare:
 \nNow: 	Time		\nAcum: 
-Could not create socket	Time		Nu s-a putut crea socketul
+Could not create socket	Time		Nu s-a putut crea soclul
 Pacific	Time		Pacific
 Atlantic	Time		Atlantic
-Show clock in Deskbar	Time		Afișează ceasul pe Deskbar
-Display time with seconds	Time		Afișează ceasul cu secunde
+Show clock in Deskbar	Time		Arată ceasul pe Deskbar
+Display time with seconds	Time		Afișează ora cu secunde
 Time	System name		Oră
-about	Time		despre
-Show time zone	Time		Afișează fusul orar
-Synchronize at boot	Time		Sincronizează la pornirea sistemului
+Show time zone	Time		Arată fusul orar
+Synchronize at boot	Time		Sincronizează la boot
 Indian	Time		Indian
-Revert	Time		Inversează
+Revert	Time		Revenire
 Date and time	Time		Dată și oră
 The following error occured while synchronizing:\n%s	Time		Următoarea eroare a apărut în timpul sincronizării:\n%s
 Synchronize	Time		Sincronizează

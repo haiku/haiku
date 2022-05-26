@@ -1,27 +1,24 @@
-1	japanese	x-vnd.Haiku-mixer.media_addon	3450667169
-Input gain controls represent	AudioMixer		入力ゲインコントロール表示
-Linear interpolation	AudioMixer		線形補完
-Virtual output channels	AudioMixer		仮想出力チャンネル
-Refuse output format changes	AudioMixer		出力フォーマットの変更を許可しない
-Output mapping	AudioMixer		出力マッピング
-Allow input channel remapping	AudioMixer		入力チャンネルの再マッピングを許可する
-Resampling algorithm	AudioMixer		リサンプリングアルゴリズム
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		ミキサー出力を 3dB 下げる ( BeOS R5 と同様)
-Display balance control for stereo connections	AudioMixer		ステレオ接続に対してバランスコントロールを表示
+1	japanese	x-vnd.Haiku-mixer.media_addon	275473112
+Input mapping	AudioMixer		入力再マッピング
+High quality (linear interpolation)	AudioMixer		高品質 (線形補間)
 To output	AudioMixer		出力へ
+Gain	AudioMixer		ゲイン
+To master	AudioMixer		マスターへ
 not connected	AudioMixer		接続されていません
-Refuse input format changes	AudioMixer		入力フォーマットの変更を許可しない
-Drop/repeat samples	AudioMixer		サンプルを下げる/繰り返す
-Output channel sources	AudioMixer		出力チャンネルソース
+Master output	AudioMixer		マスター出力
 dB	AudioMixer		dB
 Gain controls	AudioMixer		ゲインコントロール
-Input mapping	AudioMixer		入力再マッピング
-Mute	AudioMixer		ミュート
-Input channel destinations	AudioMixer		入力チャンネルの接続先
-To master	AudioMixer		マスターへ
-Master output	AudioMixer		マスター出力
+Low quality (drop/repeat samples)	AudioMixer		低品質 (drop/repeat samples)
+Output channel sources	AudioMixer		出力チャンネルソース
+Allow input channel remapping	AudioMixer		入力チャンネルの再マッピングを許可
+Display balance control for stereo connections	AudioMixer		ステレオ接続にバランスコントロールを表示
 Setup	AudioMixer		設定
-Use non linear gain sliders (like BeOS R5)	AudioMixer		非線形ゲインスライダーを使用 (BeOS R5と同様)
-Gain	AudioMixer		ゲイン
-Allow output channel remapping	AudioMixer		出力チャンネルの再マッピングを許可する
 Physical input channels	AudioMixer		物理入力チャンネル
+Input channel destinations	AudioMixer		入力チャンネルの接続先
+Resampling algorithm:	AudioMixer		リサンプリングアルゴリズム:
+Mute	AudioMixer		ミュート
+Output mapping	AudioMixer		出力マッピング
+Virtual output channels	AudioMixer		仮想出力チャンネル
+Allow output channel remapping	AudioMixer		出力チャンネルの再マッピングを許可
+Input gain controls represent:	AudioMixer		入力ゲインコントロール表示:
+Attenuate mixer output by 3 dB	AudioMixer		ミキサー出力を 3 dB 減衰

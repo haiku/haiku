@@ -1,15 +1,15 @@
-1	japanese	x-vnd.Haiku-Time	834234238
+1	japanese	x-vnd.Haiku-Time	3691539601
 OK	Time		OK
 Message receiving failed	Time		メッセージの取得に失敗しました
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		日付と時刻 作者:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		オーストラリア
 America	Time		アメリカ
 Reset to default server list	Time		デフォルトのサーバーリストにリセット
-Could not resolve server address	Time		サーバーアドレスを解決できませんでした
+Could not resolve server address	Time		サーバーアドレスを解決できません
+Time & Date	System name		日付と時刻
 Set time zone	Time		タイムゾーンを設定
 Waiting for answer failed	Time		返答待ちに失敗しました
 <Other>	Time		<その他>
-Received invalid time	Time		不正な時刻を受け取りました
+Received invalid time	Time		無効な時刻を受け取りました
 Remove	Time		削除
 Synchronize again	Time		再同期
 Asia	Time		アジア
@@ -18,7 +18,7 @@ Time	Time		日付と時刻
 Current time:	Time		現在時刻:
 The following error occured while synchronizing:\n%s: %s	Time		時刻の同期中に、次のエラーが発生しました:\n%s: %s
 Europe	Time		ヨーロッパ
-Show day of week	Time		曜日を表示
+Show day of week	Time		曜日の表示
 Local time (Windows compatible)	Time		現地時刻 (Windows 互換)
 Hardware clock set to:	Time		ハードウェアクロックを設定:
 Arctic	Time		北極
@@ -32,14 +32,13 @@ Network time	Time		ネットワークタイム
 Sending request failed	Time		リクエストの送信に失敗しました
 Preview time:	Time		プレビュー:
 \nNow: 	Time		 \n現在:
-Could not create socket	Time		ソケットを作成できませんでした。
+Could not create socket	Time		ソケットを作成できません。
 Pacific	Time		太平洋
 Atlantic	Time		大西洋
 Show clock in Deskbar	Time		Deskbar に時計を表示
-Display time with seconds	Time		秒を表示
+Display time with seconds	Time		秒の表示
 Time	System name		日付と時刻
-about	Time		このソフトウェアについて
-Show time zone	Time		タイムゾーンを表示
+Show time zone	Time		タイムゾーンの表示
 Synchronize at boot	Time		起動時に同期
 Indian	Time		インド
 Revert	Time		戻す

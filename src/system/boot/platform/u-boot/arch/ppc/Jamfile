@@ -2,10 +2,10 @@ SubDir HAIKU_TOP src system boot platform u-boot arch ppc ;
 
 SubDirHdrs $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) ;
 UsePrivateSystemHeaders ;
-UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_KERNEL_ARCH) ] 
+UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_KERNEL_ARCH_DIR) ]
 	[ FDirName kernel boot platform $(HAIKU_BOOT_PLATFORM) ] ;
 
-UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) board $(TARGET_BOOT_BOARD) ] ;
+UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH_DIR) board $(TARGET_BOOT_BOARD) ] ;
 
 UseLibraryHeaders [ FDirName libfdt ] ;
 
@@ -30,4 +30,4 @@ BootMergeObject boot_platform_u-boot_ppc.o :
 ;
 
 SEARCH on [ FGristFiles arch_cpu_asm.S ]
-    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
+    = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;

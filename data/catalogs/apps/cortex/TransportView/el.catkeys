@@ -1,0 +1,23 @@
+1	greek, modern (1453-)	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Βολή
+(none)	TransportView		(καμία)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# κόμβος} other{# κόμβοι}}
+Start	TransportView		Αρχή
+No errors.	TransportView		Δεν υπήρξαν σφάλματα.
+to	TransportView		ως
+Offline	TransportView		Εκτός σύνδεσης
+(???)	TransportView		(???)
+Stop	TransportView		Σταμάτημα
+(no group)	TransportView		(εκτός ομάδας)
+Drop data	TransportView		Απόθεση δεδομένων
+To:	TransportView		Ως:
+Recording	TransportView		Εγγραφή
+Increase latency	TransportView		Αύξηση καθυστέρησης
+Time source:	TransportView		Πηγή χρόνου:
+DAC time source	TransportView		Πηγή χρόνου DAC
+Decrease precision	TransportView		Μείωση ακρίβειας
+System clock	TransportView		Ρολόι συστήματος
+From:	TransportView		Από:
+Roll from	TransportView		Βολή από
+Preroll	TransportView		Βολή εκ των προτέρων
+Run mode:	TransportView		Λειτουργία:

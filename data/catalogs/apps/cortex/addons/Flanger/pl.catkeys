@@ -1,0 +1,13 @@
+1	polish	application/x-vnd.moon-Flanger.media_addon	455620896
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		FlangerNode w formie dodatku.\nEric Moon (16 czerwca 1999)
+Delay	CortexAddOnsFlanger		Opóźnienie
+Depth	CortexAddOnsFlanger		Głębia
+Feedback	CortexAddOnsFlanger		Sprzężenie zwrotne
+Sweep rate	CortexAddOnsFlanger		Szybkość przemiatania
+Mix ratio	CortexAddOnsFlanger		Proporcje miksu
+FlangerNode parameters	CortexAddOnsFlanger		Parametry FlangerNode
+OK	CortexAddOnsCommonMediaNodeControlApp		OK
+controls	CortexAddOnsCommonMediaNodeControlApp		kontrolki
+Mix output	CortexAddOnsFlanger		Wejście miksu
+Flanger	CortexAddOnsFlanger		Flanger
+Audio input	CortexAddOnsFlanger		Wejście audio

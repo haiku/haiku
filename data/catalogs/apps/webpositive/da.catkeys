@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-WebPositive	1591513524
+1	danish	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Autentifikation kræves
 Previous	WebPositive Window		Forrige
 (Finish: %date)	Download Window		(færdig: %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		Åbn indeholdende mappe
 Find previous	WebPositive Window		Find forrige
 Full screen	WebPositive Window		Fuldskærm
 Downloads in progress	WebPositive		Igangværende downloads
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vil du åbne %addedCount bogmærker samtidigt?
 Copy URL to clipboard	Download Window		Kopiér URL til udklipsholder
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vil du åbne %addedCount bogmærker samtidigt?
 Clone current page	Settings Window		Klon nuværende side
 Start page:	Settings Window		Startside:
 Cancel	Download Window		Annuller
@@ -49,10 +49,11 @@ Decrease size	WebPositive Window		Mindre
 Default fixed font size:	Settings Window		Standard skiftstørrelse med fast bredde:
 Sans serif font:	Settings Window		Skrifttype for sans serif:
 Clear	WebPositive Window		Ryd
-Cookies for %s	Cookie Manager		Cookies til %s
 The download could not be opened.	Download Window		Downloaden kunne ikke åbnes.
+Cookies for %s	Cookie Manager		Cookies til %s
 Close	Download Window		Luk
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Søgeterm
 Reload	WebPositive Window		Genindlæs
 Expiration	Cookie Manager		Udløb
 Download finished	Download Window		Download fuldført
@@ -100,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Tilbagefør
 Copy	WebPositive Window		Kopiér
 Default standard font size:	Settings Window		Standard standardskriftstørrelse:
+Custom	Settings Window		Tilpasset
 Bookmark this page	WebPositive Window		Sæt bogmærke for siden
 Show tabs if only one page is open	Settings Window		Vis faneblade hvis der kun er én side åben
 Close tab	WebPositive Window		Luk faneblad
@@ -109,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Fortsæt downloads
 Proxy server requires authentication	Settings Window		Proxy-server kræver autentifikation
 Cancel	Settings Window		Annuller
-History	WebPositive Window		Historik
 Reset size	WebPositive Window		Nulstil størrelse
+History	WebPositive Window		Historik
 Do you really want to clear the browsing history?	WebPositive Window		Vil du virkelig rydde browserhistorikken?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Find næste forekomst af søgetermer
 Fixed font:	Settings Window		Skrifttype med fast bredde:

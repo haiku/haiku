@@ -22,7 +22,7 @@
 #ifdef _LOADER_MODE
 #	define panic printf
 #	define dprintf printf
-#	define kernel_debugger printf
+#	define kernel_debugger(x) printf("%s", x)
 #endif
 
 

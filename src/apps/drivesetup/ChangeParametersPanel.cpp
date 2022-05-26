@@ -41,7 +41,7 @@ ChangeParametersPanel::ChangeParametersPanel(BWindow* window,
 	:
 	AbstractParametersPanel(window)
 {
-	CreateChangeControls(partition);
+	CreateChangeControls(partition, partition->Parent());
 
 	Init(B_PROPERTIES_PARAMETER_EDITOR, "", partition);
 }
@@ -109,24 +109,35 @@ ChangeParametersPanel::Go(BString& name, BString& type, BString& parameters,
 
 
 void
-ChangeParametersPanel::CreateChangeControls(BPartition* parent)
+ChangeParametersPanel::CreateChangeControls(BPartition* partition,
+	BPartition* parent)
 {
+	const char* name = "";
+	if (partition != NULL)
+		name = partition->Name();
+
 	fNameTextControl = new BTextControl("Name Control",
-		B_TRANSLATE("Partition name:"),	"", NULL);
-	fSupportsName = parent->SupportsChildName();
+		B_TRANSLATE("Partition name:"), name, NULL);
+	if (partition != NULL)
+		fSupportsName = partition->CanSetName();
+	else if (parent != NULL)
+		fSupportsName = parent->SupportsChildName();
 
 	fTypePopUpMenu = new BPopUpMenu("Partition Type");
 
 	int32 cookie = 0;
 	BString supportedType;
-	while (parent->GetNextSupportedChildType(&cookie, &supportedType) == B_OK) {
-		BMessage* message = new BMessage(MSG_PARTITION_TYPE);
-		message->AddString("type", supportedType);
-		BMenuItem* item = new BMenuItem(supportedType, message);
-		fTypePopUpMenu->AddItem(item);
+	if (parent != NULL) {
+		while (parent->GetNextSupportedChildType(&cookie, &supportedType)
+			== B_OK) {
+			BMessage* message = new BMessage(MSG_PARTITION_TYPE);
+			message->AddString("type", supportedType);
+			BMenuItem* item = new BMenuItem(supportedType, message);
+			fTypePopUpMenu->AddItem(item);
 
-		if (strcmp(supportedType, kPartitionTypeBFS) == 0)
-			item->SetMarked(true);
+			if (strcmp(supportedType, kPartitionTypeBFS) == 0)
+				item->SetMarked(true);
+		}
 	}
 
 	fTypeMenuField = new BMenuField(B_TRANSLATE("Partition type:"),

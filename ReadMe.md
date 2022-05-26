@@ -33,7 +33,8 @@ Contributing
 -------------------
 Haiku is a meritocratic open source project with a large variety of tasks. Even
 if you can't write code, *you can still help*! Haiku needs designers,
-(technical) writers, translators, testers... Get involved and help out!
+(technical) writers, translators, testers... [Get involved](https://www.haiku-os.org/community/getting-involved/)
+and help out!
 
 ### Contributing code
 If you're submitting a patch to us, please make sure you're following the

@@ -9,7 +9,7 @@
 
 
 /*!
-	\page layout_intro Introducing the Layout API.
+	\page layout_intro Introduction to the Layout API
 
 	Haiku's Layout API is centered around the BLayoutItem and BLayout classes.
 	The BLayoutItem class represents thing that can be managed by a BLayout,

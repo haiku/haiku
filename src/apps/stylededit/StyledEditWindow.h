@@ -104,7 +104,6 @@ private:
 									entry_ref* ref = NULL);
 
 private:
-			BMenuBar*			fMenuBar;
 			BMessage*			fPrintSettings;
 			BMessage*			fSaveMessage;
 
@@ -127,6 +126,7 @@ private:
 
 			BMenuItem*			fBoldItem;
 			BMenuItem*			fItalicItem;
+			BMenuItem*			fUnderlineItem;
 
 			BMenuItem*			fWrapItem;
 			BMenuItem*			fAlignLeft;

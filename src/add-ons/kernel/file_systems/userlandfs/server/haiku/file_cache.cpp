@@ -31,7 +31,8 @@ struct FileCache {
 void*
 file_cache_create(dev_t mountID, ino_t vnodeID, off_t size)
 {
-	PRINT(("file_cache_create(%ld, %lld, %lld)\n", mountID, vnodeID, size));
+	PRINT(("file_cache_create(%" B_PRIdDEV ", %" B_PRIdINO ", %"
+		B_PRIdOFF ")\n", mountID, vnodeID, size));
 
 	// create the client-side object
 	FileCache* fileCache = new(std::nothrow) FileCache(mountID, vnodeID);
@@ -150,8 +151,8 @@ status_t
 file_cache_read(void *cacheRef, void *cookie, off_t offset, void *bufferBase,
 	size_t *_size)
 {
-	PRINT(("file_cache_read(%p, %p, %lld, %p, %lu)\n", cacheRef, cookie, offset,
-		bufferBase, *_size));
+	PRINT(("file_cache_read(%p, %p, %" B_PRIdOFF ", %p, %lu)\n",
+		cacheRef, cookie, offset, bufferBase, *_size));
 
 	FileCache* fileCache = (FileCache*)cacheRef;
 
@@ -164,8 +165,8 @@ status_t
 file_cache_write(void *cacheRef, void *cookie, off_t offset, const void *buffer,
 	size_t *_size)
 {
-	PRINT(("file_cache_write(%p, %p, %lld, %p, %lu)\n", cacheRef, cookie,
-		offset, buffer, *_size));
+	PRINT(("file_cache_write(%p, %p, %" B_PRIdOFF ", %p, %lu)\n",
+		cacheRef, cookie, offset, buffer, *_size));
 
 	FileCache* fileCache = (FileCache*)cacheRef;
 

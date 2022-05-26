@@ -9,7 +9,7 @@
  *
  *	Legal stuff follows:
 
-	Copyright (c) 2002 Oliver Siebenmarck <olli@ithome.de>, OpenBeOS project
+	Copyright (c) 2002 Oliver Siebenmarck <olli@ithome.de>, Haiku project
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy of
 	this software and associated documentation files (the "Software"), to deal in

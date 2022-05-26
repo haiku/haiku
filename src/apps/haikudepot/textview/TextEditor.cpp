@@ -105,7 +105,7 @@ TextEditor::SetEditingEnabled(bool enabled)
 void
 TextEditor::SetCaret(BPoint location, bool extendSelection)
 {
-	if (fDocument.Get() == NULL || fLayout.Get() == NULL)
+	if (!fDocument.IsSet() || !fLayout.IsSet())
 		return;
 
 	bool rightOfChar = false;
@@ -122,7 +122,7 @@ TextEditor::SetCaret(BPoint location, bool extendSelection)
 void
 TextEditor::SelectAll()
 {
-	if (fDocument.Get() == NULL)
+	if (!fDocument.IsSet())
 		return;
 
 	SetSelection(TextSelection(0, fDocument->Length()));
@@ -153,7 +153,7 @@ TextEditor::SetCharacterStyle(::CharacterStyle style)
 void
 TextEditor::KeyDown(KeyEvent event)
 {
-	if (fDocument.Get() == NULL)
+	if (!fDocument.IsSet())
 		return;
 
 	bool select = (event.modifiers & B_SHIFT_KEY) != 0;
@@ -250,7 +250,7 @@ TextEditor::KeyDown(KeyEvent event)
 status_t
 TextEditor::Insert(int32 offset, const BString& string)
 {
-	if (!fEditingEnabled || fDocument.Get() == NULL)
+	if (!fEditingEnabled || !fDocument.IsSet())
 		return B_ERROR;
 
 	status_t ret = fDocument->Insert(offset, string, fStyleAtCaret);
@@ -266,7 +266,7 @@ TextEditor::Insert(int32 offset, const BString& string)
 status_t
 TextEditor::Remove(int32 offset, int32 length)
 {
-	if (!fEditingEnabled || fDocument.Get() == NULL)
+	if (!fEditingEnabled || !fDocument.IsSet())
 		return B_ERROR;
 
 	status_t ret = fDocument->Remove(offset, length);
@@ -282,7 +282,7 @@ TextEditor::Remove(int32 offset, int32 length)
 status_t
 TextEditor::Replace(int32 offset, int32 length, const BString& string)
 {
-	if (!fEditingEnabled || fDocument.Get() == NULL)
+	if (!fEditingEnabled || !fDocument.IsSet())
 		return B_ERROR;
 
 	status_t ret = fDocument->Replace(offset, length, string);
@@ -301,7 +301,7 @@ TextEditor::Replace(int32 offset, int32 length, const BString& string)
 void
 TextEditor::LineUp(bool select)
 {
-	if (fLayout.Get() == NULL)
+	if (!fLayout.IsSet())
 		return;
 
 	int32 lineIndex = fLayout->LineIndexForOffset(fSelection.Caret());
@@ -312,7 +312,7 @@ TextEditor::LineUp(bool select)
 void
 TextEditor::LineDown(bool select)
 {
-	if (fLayout.Get() == NULL)
+	if (!fLayout.IsSet())
 		return;
 
 	int32 lineIndex = fLayout->LineIndexForOffset(fSelection.Caret());
@@ -323,7 +323,7 @@ TextEditor::LineDown(bool select)
 void
 TextEditor::LineStart(bool select)
 {
-	if (fLayout.Get() == NULL)
+	if (!fLayout.IsSet())
 		return;
 
 	int32 lineIndex = fLayout->LineIndexForOffset(fSelection.Caret());
@@ -335,7 +335,7 @@ TextEditor::LineStart(bool select)
 void
 TextEditor::LineEnd(bool select)
 {
-	if (fLayout.Get() == NULL)
+	if (!fLayout.IsSet())
 		return;
 
 	int32 lineIndex = fLayout->LineIndexForOffset(fSelection.Caret());
@@ -418,7 +418,7 @@ void
 TextEditor::_SetCaretOffset(int32 offset, bool updateAnchor,
 	bool lockSelectionAnchor, bool updateSelectionStyle)
 {
-	if (fDocument.Get() == NULL)
+	if (!fDocument.IsSet())
 		return;
 
 	if (offset < 0)
@@ -437,7 +437,7 @@ void
 TextEditor::_SetSelection(int32 caret, int32 anchor, bool updateAnchor,
 	bool updateSelectionStyle)
 {
-	if (fLayout.Get() == NULL)
+	if (!fLayout.IsSet())
 		return;
 
 	if (caret == fSelection.Caret() && anchor == fSelection.Anchor())
@@ -464,7 +464,7 @@ TextEditor::_SetSelection(int32 caret, int32 anchor, bool updateAnchor,
 void
 TextEditor::_UpdateStyleAtCaret()
 {
-	if (fDocument.Get() == NULL)
+	if (!fDocument.IsSet())
 		return;
 
 	int32 offset = fSelection.Caret() - 1;

@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-DriveSetup	639226483
+1	lithuanian	x-vnd.Haiku-DriveSetup	3505687379
 Could not unmount partition %s.	MainWindow		Skaidinio „%s“ atjungti nepavyko.
 Mount all	MainWindow		Prijungti visus
 Disk	MainWindow		Diskas
@@ -14,7 +14,6 @@ Unmount	MainWindow		Atjungti
 Failed to format the partition %s!\n	MainWindow		Skaidinio „%s“ suženklinti nepavyko!\n
 Partition size	CreateParametersPanel		Skaidinio dydis
 Validation of the given parameters failed.	MainWindow		Pateiktų savybių patikra nepavyko.
-The partition %s is currently mounted.	MainWindow		Skaidinys „%s“ jau yra prijungtas.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Ar tikrai norite suženklinti skaidinį „%s“? Prieš įrašant pakeitimus į diską, Jūsų bus paklausta dar kartą.
 DriveSetup	System name		Diskų ženklintuvas
 Mounted at	PartitionList		Prijungtas kaip
@@ -80,7 +79,6 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Select a partition from the list below.	DiskView		Pasirinkite skaidinį iš žemiau esančio sąrašo.
 Active	PartitionList		Aktyvus
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Ar tikrai norite pašalinti pasirinktą skaidinį?\n\nJei tęsite toliau – visi duomenys, esantys skaidinyje, bus negrįžtamai prarasti!
-Failed to format the partition. No changes have been written to disk.	MainWindow		Skaidinio suženklinti nepavyko. Pakeitimai į diską neįrašyti.
 The partition %s has been successfully formatted.\n	MainWindow		Skaidinys „%s“ sėkmingai suženklintas.\n
 The partition %s is already mounted.	MainWindow		Skaidinys „%s“ jau yra prijungtas.
 Size	PartitionList		Dydis

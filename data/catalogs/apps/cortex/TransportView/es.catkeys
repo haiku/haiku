@@ -1,0 +1,23 @@
+1	spanish; castilian	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Saltar
+(none)	TransportView		(ninguno)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# nodo} other{# nodos}}
+Start	TransportView		Empezar
+No errors.	TransportView		Sin errores.
+to	TransportView		a
+Offline	TransportView		Sin conexión
+(???)	TransportView		(???)
+Stop	TransportView		Parar
+(no group)	TransportView		(sin grupo)
+Drop data	TransportView		Descartar datos
+To:	TransportView		Hasta:
+Recording	TransportView		Grabando
+Increase latency	TransportView		Aumentar latencia
+Time source:	TransportView		Fuente de tiempo:
+DAC time source	TransportView		Fuente de tiempo del conversor digital analógico
+Decrease precision	TransportView		Reducir precisión
+System clock	TransportView		Reloj del sistema
+From:	TransportView		Desde:
+Roll from	TransportView		Saltar de
+Preroll	TransportView		Forzar salto
+Run mode:	TransportView		Modo de ejecución:

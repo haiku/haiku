@@ -10,6 +10,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers build os storage ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 
 UsePrivateBuildHeaders kernel libroot system ;
+UsePrivateHeaders system ;
 
 {
 	local defines = [ FDefines
@@ -92,6 +93,7 @@ BuildPlatformStaticLibrary libroot_build.a :
 
 USES_BE_API on [ FGristFiles function_remapper$(SUFOBJ) ] = true ;
 
+NO_HIDDEN_VISIBILITY on <build>libroot_build_function_remapper.a = 1 ;
 BuildPlatformStaticLibraryPIC libroot_build_function_remapper.a :
 	function_remapper.cpp
 ;

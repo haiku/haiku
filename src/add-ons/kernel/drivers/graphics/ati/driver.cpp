@@ -418,14 +418,19 @@ Mach64_GetBiosParameters(DeviceInfo& di, uint8& clockType)
 
 	uint8* romAddr;
 	area_id romArea = map_physical_memory("ATI Mach64 ROM",
+#if defined(__x86__) || defined(__x86_64__)
 		0x000c0000,
+#else
+		di.pciInfo.u.h0.rom_base,
+#endif
 		M64_BIOS_SIZE,
 		B_ANY_KERNEL_ADDRESS,
-		B_READ_AREA,
+		B_KERNEL_READ_AREA,
 		(void**)&(romAddr));
 
 	if (romArea < 0) {
-		TRACE("Mach64_GetBiosParameters(), ROM mapping error: %ld\n", romArea);
+		TRACE("Mach64_GetBiosParameters(), ROM mapping error: %" B_PRId32 "\n",
+			romArea);
 		return romArea;		// ROM mapping failed; return error code
 	}
 
@@ -497,14 +502,19 @@ Rage128_GetBiosParameters(DeviceInfo& di)
 
 	uint8* romAddr;
 	area_id romArea = map_physical_memory("ATI Rage128 ROM",
+#if defined(__x86__) || defined(__x86_64__)
 		0x000c0000,
+#else
+		di.pciInfo.u.h0.rom_base,
+#endif
 		R128_BIOS_SIZE,
 		B_ANY_KERNEL_ADDRESS,
-		B_READ_AREA,
+		B_KERNEL_READ_AREA,
 		(void**)&(romAddr));
 
 	if (romArea < 0) {
-		TRACE("Rage128_GetBiosParameters(), ROM mapping error: %ld\n", romArea);
+		TRACE("Rage128_GetBiosParameters(), ROM mapping error: %" B_PRId32
+			"\n", romArea);
 		return romArea;		// ROM mapping failed; return error code
 	}
 
@@ -527,7 +537,8 @@ Rage128_GetBiosParameters(DeviceInfo& di)
 	pll.max_pll_freq = BIOS32(pllInfoBlock + 0x16);
 	pll.xclk = BIOS16(pllInfoBlock + 0x08);
 
-	TRACE("PLL parameters: rf=%d rd=%d min=%ld max=%ld; xclk=%d\n",
+	TRACE("PLL parameters: rf=%d rd=%d min=%" B_PRId32 " max=%" B_PRId32
+		"; xclk=%d\n",
 		pll.reference_freq, pll.reference_div, pll.min_pll_freq,
 		pll.max_pll_freq, pll.xclk);
 
@@ -588,6 +599,13 @@ MapDevice(DeviceInfo& di)
 	SetPCI(pciInfo, PCI_command, 2, GetPCI(pciInfo, PCI_command, 2)
 		| PCI_command_io | PCI_command_memory | PCI_command_master);
 
+	// Enable ROM decoding
+
+	if (di.pciInfo.u.h0.rom_size > 0) {
+		SetPCI(pciInfo, PCI_rom_base, 4,
+			GetPCI(pciInfo, PCI_rom_base, 4) | 0x00000001);
+	}
+
 	// Map the video memory.
 
 	phys_addr_t videoRamAddr = pciInfo.u.h0.base_registers[0];
@@ -627,7 +645,7 @@ MapDevice(DeviceInfo& di)
 
 	if (MACH64_FAMILY(si.chipType) && (regsBase == 0 || regAreaSize == 0)) {
 		uint32 regsOffset = 0x7ff000;	// offset to regs area in video memory
-		uint32 regs = uint32(si.videoMemAddr) + regsOffset;
+		addr_t regs = addr_t(si.videoMemAddr) + regsOffset;
 		uint32 chipInfo = *((vuint32*)(regs + M64_CONFIG_CHIP_ID));
 
 		if (si.deviceID != (chipInfo & M64_CFG_CHIP_TYPE)) {
@@ -643,8 +661,8 @@ MapDevice(DeviceInfo& di)
 
 		regsBase = videoRamAddr + regsOffset;
 		regAreaSize = 0x1000;
-		TRACE("Register address is at end of frame buffer memory at 0x%lx\n",
-			uint32(regsBase));
+		TRACE("Register address is at end of frame buffer memory at 0x%"
+			B_PRIxPHYSADDR "\n", regsBase);
 	}
 
 	si.regsArea = map_physical_memory("ATI mmio registers",
@@ -969,7 +987,7 @@ init_driver(void)
 
 	gDeviceNames[count] = NULL;	// terminate list with null pointer
 
-	TRACE("init_driver() %ld supported devices\n", count);
+	TRACE("init_driver() %" B_PRIu32 " supported devices\n", count);
 
 	return B_OK;
 }
@@ -1040,7 +1058,7 @@ device_open(const char* name, uint32 /*flags*/, void** cookie)
 		*cookie = &di;		// send cookie to opener
 	}
 
-	TRACE("device_open() returning 0x%lx,  open count: %ld\n", status,
+	TRACE("device_open() returning 0x%" B_PRIx32 ",  open count: %" B_PRIu32 "\n", status,
 		di.openCount);
 	return status;
 }
@@ -1122,7 +1140,7 @@ device_free(void* dev)
 
 	gLock.Release();	// unlock driver
 
-	TRACE("exit device_free() openCount: %ld\n", di.openCount);
+	TRACE("exit device_free() openCount: %" B_PRIu32 "\n", di.openCount);
 	return B_OK;
 }
 
@@ -1132,25 +1150,35 @@ device_ioctl(void* dev, uint32 msg, void* buffer, size_t bufferLength)
 {
 	DeviceInfo& di = *((DeviceInfo*)dev);
 
-//	TRACE("device_ioctl(); ioctl: %lu, buffer: 0x%08lx, bufLen: %lu\n", msg,
-//		(uint32)buffer, bufferLength);
+	TRACE("device_ioctl(); ioctl: %" B_PRIu32 ", buffer: %#08" B_PRIxADDR
+		", bufLen: %" B_PRIuSIZE "\n", msg, (addr_t)buffer, bufferLength);
 
 	switch (msg) {
 		case B_GET_ACCELERANT_SIGNATURE:
-			strcpy((char*)buffer, ATI_ACCELERANT_NAME);
+		{
+			status_t status = user_strlcpy((char*)buffer, ATI_ACCELERANT_NAME,
+				bufferLength);
+			if (status < B_OK)
+				return status;
+
 			return B_OK;
+		}
 
 		case ATI_DEVICE_NAME:
-			strncpy((char*)buffer, di.name, B_OS_NAME_LENGTH);
-			((char*)buffer)[B_OS_NAME_LENGTH -1] = '\0';
+		{
+			status_t status = user_strlcpy((char*)buffer, di.name,
+				B_OS_NAME_LENGTH);
+			if (status < B_OK)
+				return status;
+
 			return B_OK;
+		}
 
 		case ATI_GET_SHARED_DATA:
 			if (bufferLength != sizeof(area_id))
 				return B_BAD_DATA;
 
-			*((area_id*)buffer) = di.sharedArea;
-			return B_OK;
+			return user_memcpy(buffer, &di.sharedArea, sizeof(area_id));
 
 		case ATI_GET_EDID:
 		{
@@ -1159,27 +1187,42 @@ device_ioctl(void* dev, uint32 msg, void* buffer, size_t bufferLength)
 
 			edid1_raw rawEdid;
 			status_t status = GetEdidFromBIOS(rawEdid);
-			if (status == B_OK)
-				user_memcpy((edid1_raw*)buffer, &rawEdid, sizeof(rawEdid));
-			return status;
+			if (status != B_OK)
+				return status;
+
+			return user_memcpy((edid1_raw*)buffer, &rawEdid, sizeof(rawEdid));
 		}
 
 		case ATI_SET_VESA_DISPLAY_MODE:
+		{
 			if (bufferLength != sizeof(uint16))
 				return B_BAD_DATA;
 
-			return SetVesaDisplayMode(*((uint16*)buffer));
+			uint16 value;
+			status_t status = user_memcpy(&value, buffer, sizeof(uint16));
+			if (status < B_OK)
+				return status;
+
+			return SetVesaDisplayMode(value);
+		}
 
 		case ATI_RUN_INTERRUPTS:
+		{
 			if (bufferLength != sizeof(bool))
 				return B_BAD_DATA;
 
-			if (*((bool*)buffer))
+			bool value;
+			status_t res = user_memcpy(&value, buffer, sizeof(bool));
+			if (res < B_OK)
+				return res;
+
+			if (value)
 				EnableVBI();
 			else
 				DisableVBI();
 
 			return B_OK;
+		}
 	}
 
 	return B_DEV_INVALID_IOCTL;

@@ -13,11 +13,11 @@ Defaults	PrefsWindow		デフォルト
 Mini mode	PrefsWindow		ミニモード
 CPU progress bar	NormalPulseView		CPU プログレスバー
 Fade colors	ConfigView		バーの色をフェードさせる
-About Pulse…	PulseView		Pulse について…
+About Pulse…	PulseView		Pulse について...
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Deskbar モード
 Pulse settings	PulseApp		Pulse 設定
-Remove replicant	CPUButton		レプリカントを削除
+Remove replicant	CPUButton		レプリカントの削除
 You can't disable the last active CPU.	PulseView		最後の CPU は無効にできません。
 Width of icon:	ConfigView		アイコンの幅:
 Deskbar mode	MiniPulseView		Deskbar モード
@@ -27,13 +27,13 @@ OK	PrefsWindow		OK
 Pulse	PulseApp		Pulse
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Deskbar からの削除に失敗しました。\n%s
 OK	PulseApp		OK
-About Pulse…	CPUButton		Pulse について…
+About Pulse…	CPUButton		Pulse について...
 Deskbar mode	PrefsWindow		Deskbar モード
 Mini mode	DeskbarPulseView		ミニモード
 You can't disable the last active CPU.	CPUButton		最後の CPU は無効にできません。
 OK	CPUButton		OK
 Deskbar	CPUButton		Deskbar
-Settings…	PulseView		設定…
+Settings…	PulseView		設定...
 Deskbar menu	CPUButton		Deskbar メニュー
 Mini mode	NormalPulseView		ミニモード
 Quit	MiniPulseView		終了

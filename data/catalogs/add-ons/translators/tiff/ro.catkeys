@@ -1,16 +1,2 @@
-1	romanian	x-vnd.Haiku-TIFFTranslator	2234713102
-TIFF Library:	TIFFView		Bibliotecă TIFF:
-RLE (Packbits)	TIFFView		RLE (Packbits)
-ZIP (Deflate)	TIFFView		ZIP (Dezumflare)
-identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: indice de document nevalid\n
-Use compression:	TIFFView		Utilizează comprimarea:
-TIFF image translator	TIFFView		Traducător imagine TIFF
-TIFF image	TIFFTranslator		Imagine TIFF
+1	romanian	x-vnd.Haiku-TIFFTranslator	2591143631
 TIFF Settings	TIFFMain		Configurări TIFF
-TIFF image translator	TIFFTranslator		Traducător imagine TIFF
-identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nu s-a putut configura dosarul\n
-Version %d.%d.%d, %s	TIFFView		Versiune %d.%d.%d, %s
-TIFFTranslator Settings	TIFFTranslator		Configurări TraducătorTIFF
-LZW	TIFFView		LZW
-TIFF images	TIFFTranslator		Imagini TIFF
-None	TIFFView		Nimic

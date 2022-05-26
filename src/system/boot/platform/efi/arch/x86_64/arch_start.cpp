@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2020 Haiku, Inc. All rights reserved.
+ * Copyright 2014-2022 Haiku, Inc. All rights reserved.
  * Copyright 2013-2014, Fredrik Holmqvist, fredrik.holmqvist@gmail.com.
  * Copyright 2014, Henry Harrington, henry.harrington@gmail.com.
  * All rights reserved.
@@ -32,6 +32,15 @@ extern void arch_mmu_post_efi_setup(size_t memory_map_size,
 extern uint64_t arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
     efi_memory_descriptor *memory_map, size_t descriptor_size,
     uint32_t descriptor_version);
+
+
+void
+arch_convert_kernel_args(void)
+{
+	fix_address(gKernelArgs.ucode_data);
+	fix_address(gKernelArgs.arch_args.apic);
+	fix_address(gKernelArgs.arch_args.hpet);
+}
 
 
 void
@@ -116,7 +125,7 @@ arch_start_kernel(addr_t kernelEntry)
 	arch_mmu_post_efi_setup(memory_map_size, memory_map,
 			descriptor_size, descriptor_version);
 
-	smp_boot_other_cpus(final_pml4, kernelEntry);
+	smp_boot_other_cpus(final_pml4, kernelEntry, (addr_t)&gKernelArgs);
 
 	// Enter the kernel!
 	arch_enter_kernel(final_pml4, kernelEntry,

@@ -17,6 +17,8 @@
 #include <util/OpenHashTable.h>
 
 
+struct mutex;
+struct recursive_lock;
 struct ConditionVariable;
 
 
@@ -31,16 +33,13 @@ public:
 			status_t			Wait(const void* object, uint32 flags = 0,
 									bigtime_t timeout = 0);
 
-	inline	status_t			WaitStatus() const { return fWaitStatus; }
-
-	inline	ConditionVariable*	Variable() const { return fVariable; }
+			ConditionVariable*	Variable() const;
 
 private:
 	inline	void				_AddToLockedVariable(ConditionVariable* variable);
 			void				_RemoveFromVariable();
 
 private:
-			spinlock			fLock;
 			ConditionVariable*	fVariable;
 			Thread*				fThread;
 			status_t			fWaitStatus;
@@ -64,15 +63,13 @@ public:
 
 	static	void				NotifyOne(const void* object, status_t result);
 	static	void				NotifyAll(const void* object, status_t result);
-									// (both methods) caller must ensure that
-									// the variable is not unpublished
-									// concurrently
 
 			void				Add(ConditionVariableEntry* entry);
 
+	// Convenience methods, no ConditionVariableEntry required.
 			status_t			Wait(uint32 flags = 0, bigtime_t timeout = 0);
-									// all-in one, i.e. doesn't need a
-									// ConditionVariableEntry
+			status_t			Wait(mutex* lock, uint32 flags = 0, bigtime_t timeout = 0);
+			status_t			Wait(recursive_lock* lock, uint32 flags = 0, bigtime_t timeout = 0);
 
 			const void*			Object() const		{ return fObject; }
 			const char*			ObjectType() const	{ return fObjectType; }
@@ -81,6 +78,7 @@ public:
 			void				Dump() const;
 
 private:
+	static 	void				_Notify(const void* object, bool all, status_t result);
 			void				_Notify(bool all, status_t result);
 			void				_NotifyLocked(bool all, status_t result);
 
@@ -92,6 +90,8 @@ protected:
 
 			spinlock			fLock;
 			EntryList			fEntries;
+			int32				fEntriesCount;
+
 			ConditionVariable*	fNext;
 
 			friend struct ConditionVariableEntry;

@@ -21,3 +21,12 @@ StaticLibrary cortex_media_routing_view.a :
 	MediaRoutingView.cpp
 	MediaWire.cpp
 ;
+
+DoCatalogs cortex_media_routing_view.a :
+	x-vnd.Cortex.MediaRoutingView
+	:
+	MediaJack.cpp
+	MediaNodePanel.cpp
+	MediaRoutingView.cpp
+	MediaWire.cpp
+;

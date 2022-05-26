@@ -21,6 +21,8 @@
 
 #include <sys/libkern.h>
 
+__BEGIN_DECLS
+
 
 #define printf freebsd_printf
 int printf(const char *format, ...) __printflike(1, 2);
@@ -97,8 +99,6 @@ extern int vsnprintf(char *, size_t, const char *, __va_list)
 int msleep(void *, struct mtx *, int, const char *, int);
 int _pause(const char *, int);
 #define pause(waitMessage, timeout) _pause((waitMessage), (timeout))
-#define tsleep(channel, priority, waitMessage, timeout) \
-	msleep((channel), NULL, (priority), (waitMessage), (timeout))
 #define msleep_spin(chan, mtx, wmesg, timo) \
 	msleep(chan, mtx, PZERO, wmesg, timo)
 #define mtx_sleep msleep
@@ -115,5 +115,7 @@ void free_unr(struct unrhdr *, u_int);
 extern char *getenv(const char *name);
 extern void    freeenv(char *env);
 extern char *kern_getenv(const char *name);
+
+__END_DECLS
 
 #endif	/* _FBSD_COMPAT_SYS_SYSTM_H_ */

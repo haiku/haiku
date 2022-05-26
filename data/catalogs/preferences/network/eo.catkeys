@@ -1,8 +1,7 @@
-1	esperanto	x-vnd.Haiku-Network	2923905377
+1	esperanto	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Eterreta aparato
 Link speed:	IntefaceView		Konekta rapido:
 disconnected	IntefaceView		diskonektita
-IP Address:	IntefaceAddressView		IP-adreso:
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Reto:
 Received:	IntefaceView		Ricevita:
@@ -14,10 +13,11 @@ Gateway:	IntefaceAddressView		Defaŭlta kluzo:
 The netmask defines your local network	IntefaceAddressView		La subreta masko precizigas vian lokan reton
 Your IP address	IntefaceAddressView		Via IP-adreso
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP adreso:
 Netmask:	IntefaceAddressView		Retmasko:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servoj
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instaligo de la Retstato en Laborstrion malsukcesis: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instaligo de Retstato al Laborstrio malsukcesis: %s
 Revert	NetworkWindow		Malfari
 off	ServiceListItem		malŝaltita
 WEP	WEP protected network		WEP

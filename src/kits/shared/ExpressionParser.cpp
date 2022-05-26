@@ -97,7 +97,9 @@ class ExpressionParser::Tokenizer {
 		  fCurrentChar(NULL),
 		  fCurrentToken(),
 		  fReuseToken(false),
-		  fHexSupport(false)
+		  fHexSupport(false),
+		  fDecimalSeparator("."),
+		  fGroupSeparator(",")
 	{
 	}
 
@@ -128,12 +130,13 @@ class ExpressionParser::Tokenizer {
 		while (*fCurrentChar != 0 && isspace(*fCurrentChar))
 			fCurrentChar++;
 
-		if (*fCurrentChar == 0)
+		int32 decimalLen = fDecimalSeparator.Length();
+		int32 groupLen = fGroupSeparator.Length();
+
+		if (*fCurrentChar == 0 || decimalLen == 0)
 			return fCurrentToken = Token("", 0, _CurrentPos(), TOKEN_END_OF_LINE);
 
-		bool decimal = *fCurrentChar == '.' || *fCurrentChar == ',';
-
-		if (decimal || isdigit(*fCurrentChar)) {
+		if (*fCurrentChar == fDecimalSeparator[0] || isdigit(*fCurrentChar)) {
 			if (fHexSupport && *fCurrentChar == '0' && fCurrentChar[1] == 'x')
 				return _ParseHexNumber();
 
@@ -142,16 +145,30 @@ class ExpressionParser::Tokenizer {
 			const char* begin = fCurrentChar;
 
 			// optional digits before the comma
-			while (isdigit(*fCurrentChar)) {
-				temp << *fCurrentChar;
-				fCurrentChar++;
+			while (isdigit(*fCurrentChar) ||
+				(groupLen > 0 && *fCurrentChar == fGroupSeparator[0])) {
+				if (groupLen > 0 && *fCurrentChar == fGroupSeparator[0]) {
+					int i = 0;
+					while (i < groupLen && *fCurrentChar == fGroupSeparator[i]) {
+						fCurrentChar++;
+						i++;
+					}
+				} else {
+					temp << *fCurrentChar;
+					fCurrentChar++;
+				}
 			}
 
 			// optional post comma part
 			// (required if there are no digits before the comma)
-			if (*fCurrentChar == '.' || *fCurrentChar == ',') {
+			if (*fCurrentChar == fDecimalSeparator[0]) {
+				int i = 0;
+				while (i < decimalLen && *fCurrentChar == fDecimalSeparator[i]) {
+					fCurrentChar++;
+					i++;
+				}
+
 				temp << '.';
-				fCurrentChar++;
 
 				// optional post comma digits
 				while (isdigit(*fCurrentChar)) {
@@ -258,6 +275,22 @@ class ExpressionParser::Tokenizer {
 		fReuseToken = true;
 	}
 
+	BString DecimalSeparator()
+	{
+		return fDecimalSeparator;
+	}
+
+	BString GroupSeparator()
+	{
+		return fGroupSeparator;
+	}
+
+	void SetSeparators(BString decimal, BString group)
+	{
+		fDecimalSeparator = decimal;
+		fGroupSeparator = group;
+	}
+
  private:
 	static bool _IsHexDigit(char c)
 	{
@@ -306,6 +339,8 @@ class ExpressionParser::Tokenizer {
 	Token		fCurrentToken;
 	bool		fReuseToken;
 	bool		fHexSupport;
+	BString		fDecimalSeparator;
+	BString		fGroupSeparator;
 };
 
 
@@ -356,7 +391,9 @@ ExpressionParser::Evaluate(const char* expressionString)
 	if (value == 0)
 		return BString("0");
 
-	char* buffer = value.toFixPtStringExp(kMaxDecimalPlaces, '.', 0, 0);
+	char* buffer = value.toFixPtStringExp(kMaxDecimalPlaces,
+						'.', 0, 0);
+
 	if (buffer == NULL)
 		throw ParseException("out of memory", 0);
 
@@ -365,11 +402,13 @@ ExpressionParser::Evaluate(const char* expressionString)
 	if (strchr(buffer, '.')) {
 		while (buffer[lastChar] == '0')
 			lastChar--;
+
 		if (buffer[lastChar] == '.')
 			lastChar--;
 	}
 
 	BString result(buffer, lastChar + 1);
+	result.Replace(".", fTokenizer->DecimalSeparator(), 1);
 	free(buffer);
 	return result;
 }
@@ -791,4 +830,16 @@ ExpressionParser::_EatToken(int32 type)
 		temp << "Expected " << expected.String() << " got '" << token.string << "'";
 		throw ParseException(temp.String(), token.position);
 	}
+}
+
+
+status_t
+ExpressionParser::SetSeparators(BString decimal, BString group)
+{
+	if (decimal == group)
+		return B_ERROR;
+
+	fTokenizer->SetSeparators(decimal, group);
+
+	return B_OK;
 }

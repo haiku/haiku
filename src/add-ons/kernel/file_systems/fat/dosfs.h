@@ -6,16 +6,10 @@
 #define _DOSFS_H_
 
 
-#include <KernelExport.h>
-#include <fs_interface.h>
-#include <lock.h>
+#include "system_dependencies.h"
 
 
 //#define DEBUG 1
-
-
-#define	LOCK(l)		recursive_lock_lock(&l);
-#define	UNLOCK(l)	recursive_lock_unlock(&l);
 
 
 /* Unfortunately, ino_t's are defined as signed. This causes problems with
@@ -94,9 +88,7 @@ typedef struct vnode {
 
 	bool		dirty;			// track if vnode had been written to
 
-#if TRACK_FILENAME
 	char		*filename;
-#endif
 } vnode;
 
 // mode bits
@@ -168,14 +160,6 @@ typedef struct _nspace {
 
 #define FS_FLAGS_OP_SYNC		0x1
 #define FS_FLAGS_LOCK_DOOR		0x2
-
-#define LOCK_VOL(vol) \
-	if (vol == NULL) { dprintf("null vol\n"); return EINVAL; } else LOCK((vol)->vlock)
-
-#define UNLOCK_VOL(vol) \
-	UNLOCK((vol)->vlock)
-
-#define TOUCH(x) ((void)(x))
 
 extern fs_vnode_ops gFATVnodeOps;
 extern fs_volume_ops gFATVolumeOps;

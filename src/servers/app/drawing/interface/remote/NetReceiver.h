@@ -8,6 +8,7 @@
 #ifndef NET_RECEIVER_H
 #define NET_RECEIVER_H
 
+#include <AutoDeleter.h>
 #include <OS.h>
 #include <SupportDefs.h>
 
@@ -25,7 +26,7 @@ public:
 									void *newConnectionCookie = NULL);
 								~NetReceiver();
 
-		BNetEndpoint *			Endpoint() { return fEndpoint; }
+		BNetEndpoint *			Endpoint() { return fEndpoint.Get(); }
 
 private:
 static	int32					_NetworkReceiverEntry(void *data);
@@ -41,7 +42,8 @@ static	int32					_NetworkReceiverEntry(void *data);
 		NewConnectionCallback	fNewConnectionCallback;
 		void *					fNewConnectionCookie;
 
-		BNetEndpoint *			fEndpoint;
+		ObjectDeleter<BNetEndpoint>
+								fEndpoint;
 };
 
 #endif // NET_RECEIVER_H

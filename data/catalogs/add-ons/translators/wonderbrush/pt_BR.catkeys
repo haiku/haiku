@@ -1,9 +1,5 @@
-1	portuguese (brazil)	x-vnd.Haiku-WonderBrushTranslator	1289038178
-Version %d.%d.%d, %s	WonderBrushView		Versão %d.%d.%d, %s
-WonderBrush image translator	WonderBrushTranslator		Tradutor de imagem do Wonderbrush
-WBI Settings	WonderBrushTranslator		Configurações WBI
+1	portuguese (brazil)	x-vnd.Haiku-WonderBrushTranslator	2764474812
 WBI Settings	WonderBrushMain		Configurações WBI
-WonderBrush images	WonderBrushTranslator		Imagens WonderBrush
-WonderBrush image	WonderBrushTranslator		Imagem WonderBrush
-WonderBrush image translator	WonderBrushView		Tradutor de imagem do Wonderbrush
-written by:	WonderBrushView		escrito por
+Version %d.%d.%d, %s	WonderBrushView		Versão %d.%d.%d, %s
+written by:	WonderBrushView		escrito por:
+WonderBrush image translator	WonderBrushView		Tradutor de imagens WonderBrush

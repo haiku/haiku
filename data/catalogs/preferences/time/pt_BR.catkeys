@@ -1,10 +1,11 @@
-1	portuguese (brazil)	x-vnd.Haiku-Time	563137575
+1	portuguese (brazil)	x-vnd.Haiku-Time	3691539601
 OK	Time		OK
 Message receiving failed	Time		Falha ao receber a mensagem
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Hora & Data, escrito por:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nDireitos reservados 2004-2012, Haiku.
 Australia	Time		Austrália
 America	Time		América
-Reset to default server list	Time		Restaura à lista de servidor padrão
+Reset to default server list	Time		Restaurar para lista de padrão de servidores
+Could not resolve server address	Time		Não foi possível determinar o endereço do servidor
+Time & Date	System name		Hora e Data
 Set time zone	Time		Definir fuso horário
 Waiting for answer failed	Time		Espera por resposta falhou
 <Other>	Time		<Outro>
@@ -15,6 +16,7 @@ Asia	Time		Ásia
 Try all servers	Time		Tentar todos os servidores
 Time	Time		Hora
 Current time:	Time		Hora atual:
+The following error occured while synchronizing:\n%s: %s	Time		Ocorreu o seguinte erro ao sincronizar:\n%s: %s
 Europe	Time		Europa
 Show day of week	Time		Exibir dia da semana
 Local time (Windows compatible)	Time		Hora local (compatível com Windows)
@@ -28,19 +30,19 @@ Time zone	Time		Fuso horário
 Clock	Time		Relógio
 Network time	Time		Hora da rede
 Sending request failed	Time		Falha ao enviar solicitação
-Preview time:	Time		Pré-visualização de tempo:
-\nNow: 	Time		\nAgora:
+Preview time:	Time		Prévia da hora:
+\nNow: 	Time		\nAgora: 
 Could not create socket	Time		Não foi possível criar o socket
 Pacific	Time		Pacífico
 Atlantic	Time		Atlântico
 Show clock in Deskbar	Time		Exibir relógio na Deskbar
 Display time with seconds	Time		Mostrar a hora com os segundos
 Time	System name		Hora
-about	Time		sobre
 Show time zone	Time		Mostrar fuso horário
 Synchronize at boot	Time		Sincronizar ao inicializar
 Indian	Time		Índico
 Revert	Time		Reverter
 Date and time	Time		Data e hora
+The following error occured while synchronizing:\n%s	Time		Ocorreu o seguinte erro ao sincronizar:\n%s
 Synchronize	Time		Sincronizar
 Add	Time		Adicionar

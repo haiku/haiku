@@ -17,3 +17,15 @@ StaticLibrary cortex_info_view.a :
 	InfoWindowManager.cpp
 	LiveNodeInfoView.cpp
 ;
+
+DoCatalogs cortex_info_view.a :
+	x-vnd.Cortex.InfoView
+	:
+	AppNodeInfoView.cpp
+	ConnectionInfoView.cpp
+	DormantNodeInfoView.cpp
+	EndPointInfoView.cpp
+	FileNodeInfoView.cpp
+	InfoView.cpp
+	LiveNodeInfoView.cpp
+;

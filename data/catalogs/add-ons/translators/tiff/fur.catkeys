@@ -1,16 +1,16 @@
 1	friulian	x-vnd.Haiku-TIFFTranslator	2234713102
 TIFF Library:	TIFFView		Librarie TIFF:
-RLE (Packbits)	TIFFView		RLE (Packbits)
-ZIP (Deflate)	TIFFView		ZIP (Deflate)
-identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: tabele dal document no valide\n
+RLE (Packbits)	TIFFView		RLE (bits impachetâts)
+ZIP (Deflate)	TIFFView		ZIP (Disglonfe)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: tabele di document no valide\n
 Use compression:	TIFFView		Dopre compression:
-TIFF image translator	TIFFView		Tradutôr imagjin TIFF
+TIFF image translator	TIFFView		Tradutôr di imagjin TIFF
 TIFF image	TIFFTranslator		Imagjin TIFF
 TIFF Settings	TIFFMain		Impostazions TIFF
-TIFF image translator	TIFFTranslator		Tradutôr imagjin TIFF
+TIFF image translator	TIFFTranslator		Tradutôr di imagjin TIFF
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: impussibil stabilî la cartele\n
 Version %d.%d.%d, %s	TIFFView		Version %d.%d.%d, %s
-TIFFTranslator Settings	TIFFTranslator		Impostazions TIFFTranslator
+TIFFTranslator Settings	TIFFTranslator		Impostazions tradutôr TIFF
 LZW	TIFFView		LZW
 TIFF images	TIFFTranslator		Imagjins TIFF
-None	TIFFView		Nissun
+None	TIFFView		Nissune

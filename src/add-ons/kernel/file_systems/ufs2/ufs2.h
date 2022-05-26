@@ -359,6 +359,14 @@ struct ufs2_super_block {
 CTASSERT(sizeof(struct fs) == 1376);
 #endif
 
+
+struct file_cookie {
+	bigtime_t	last_notification;
+	off_t		last_size;
+	int 		open_mode;
+};
+
+
 /*
  * Filesystem identification
  */

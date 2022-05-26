@@ -10,6 +10,7 @@
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		Máximo Castañeda
  *		mt
  *
 -->
@@ -37,6 +38,7 @@
 <li><a href="../de/quicktour.html">Deutsch</a></li>
 <li><a href="../en/quicktour.html">English</a></li>
 <li><a href="../es/quicktour.html">Español</a></li>
+<li><a href="../eo/quicktour.html">Esperanto</a></li>
 <li><a href="../fr/quicktour.html">Français</a></li>
 <li><a href="../fur/quicktour.html">Furlan</a></li>
 <li><a href="../it/quicktour.html">Italiano</a></li>
@@ -56,7 +58,8 @@
 
 
 <span class="navdots">
-<a href="#start"><acronym title="Start" class="current-page">◉</acronym></a> 
+<a class="hide-no-js" id="prevtopic" title="Previous topic">◀</a>
+<a href="#start"><acronym title="Start">◉</acronym></a> 
 <a href="#deskbar"><acronym title="The Deskbar">◉</acronym></a> 
 <a href="#window"><acronym title="The window widgets">◉</acronym></a> 
 <a href="#shortcutkey"><acronym title="The shortcut key">◉</acronym></a> 
@@ -75,16 +78,22 @@
 <a href="#wireless"><acronym title="Wireless connection">◉</acronym></a> 
 <a href="#moresoftware"><acronym title="Getting more and updating software">◉</acronym></a> 
 <a href="#end"><acronym title="End">◉</acronym></a> 
+<a class="hide-no-js" id="nexttopic" title="Next topic">▶</a>
 </span>
 
+<span class="hide-no-js"><a id="toggle" title="Toggle slides view">▤</a></span>
+
 <span>
-<a href="#topics" class="uplink">Topics</a> 
+<a href="#index" class="uplink">Topics</a> 
 </span>
 </div>
 </div>
 
 <div id="content">
-<div>
+<div></div>
+<!-- Please keep the previous empty div there so that the tool can add the "not fully translated" notice on export -->
+
+<div class="topic">
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>インデックス</td></tr>
@@ -112,12 +121,17 @@
 <h1><a id="start" name="start">Haiku クイックツアーへようこそ</a></h1>
 
 <p>Haikuは、多くのアイデアをほかのOSと共有していますが、確かに注目すべき独自のアプローチをいくつか持っています。このツアーで、もっとも重要なHaikuの特徴と独自性を学びます。それは、Haikuを始めるのに役立つでしょう。</p>
-<p>各ページの右下は、”参考文献”へのリンクです。それらは、<a href="https://www.haiku-os.org/docs/userguide/jp/contents.html" target="_blank">ユーザーガイド</a>の関連する章のような追加のリソースを指します。</p>
+<p>各章に、”参考文献” へのリンク付きのボックスがあります。それらは、<a href="https://www.haiku-os.org/docs/userguide/jp/contents.html" target="_blank">ユーザーガイド</a>の関連する章のような追加のリソースを指します。</p>
 
 </div>
 
 <div class="topic">
 <h1><a id="deskbar" name="deskbar">Deskbar</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/deskbar.html" target="_blank">Deskbar</a></td></tr>
+</table>
 
 <p>デフォルトではデスクトップの右上にあるDeskbarは、Haiku操作の中心となります。例えばここからアプリケーション、アプレットおよびプリファレンスの起動や実行中のアプリケーションの切り替えができます。</p>
 
@@ -125,14 +139,16 @@
 <div class="shot">
 <img src="./images/quicktour/deskbar.png" alt="The Deskbar" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/deskbar.html" target="_blank">Deskbar</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="window" name="window">ウィンドウの詳細</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/gui.html" target="_blank">Haikuのグラフィカルユーザーインターフェース</a></td></tr>
+</table>
 
 <p>ここに、普通のGUI部品を備えた典型的なHaikuウィンドウがあります。</p>
 
@@ -140,14 +156,16 @@
 <div class="shot">
 <img src="./images/quicktour/window.png" alt="A window and its widgets" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/gui.html" target="_blank">Haikuのグラフィカルユーザーインターフェース</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="shortcutkey" name="shortcutkey">ショートカットキー</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/keyboard-shortcuts.html" target="_blank">ショートカットやキーの組み合わせ</a></td></tr>
+</table>
 
 <p><span class="app">キーマップ</span>プレファレンスで、Haiku標準の<span class="key">ALT</span>キーから<span class="key">CTRL</span> (Windows/Linuxモード)へ切り替わります。これは全体的な切り替えなので、例えばシェル中でのプログラムの終了が通常の<span class="key">CTRL</span> <span class="key">C</span>の代わりに<span class="key">ALT</span> <span class="key">C</span>で実行されます。<br />この不一致が、Haikuのデフォルトショートカットが <span class="key">ALT</span>である理由のひとつです。</p>
 
@@ -155,14 +173,16 @@
 <div class="shot">
 <img src="./images/quicktour/alt-ctrl.png" alt="Shortcut key: ALT vs. CTRL" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/keyboard-shortcuts.html" target="_blank">ショートカットやキーの組み合わせ</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="twitcher" name="twitcher">Twitcher</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/twitcher.html" target="_blank">Twitcher</a></td></tr>
+</table>
 
 <p><span class="key">CTRL</span> <span class="key">TAB</span> を押すと、<span class="app">Twitcher</span>を呼び出します。そこで実行中アプリケーションを切り替えます。<br />
 <span class="key">CTRL</span>を押しながら、<span class="key">TAB</span>を素早くタップすると、最後に使ったアプリケーションと切り替えます。</p>
@@ -170,14 +190,16 @@
 <div class="shot">
 <img src="../images/quicktour/twitcher.png" alt="The Twitcher switching between apps" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/twitcher.html" target="_blank">Twitcher</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="teammonitor" name="teammonitor">チームモニター</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/teammonitor.html" target="_blank">チームモニター</a></td></tr>
+</table>
 
 <p>一部のアプリケーションがひどくクラッシュして、Deskbarのアプリケーションのリストから消せなくなったら、<span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span>を押して<span class="app">チームモニター</span>を起動します。そこで項目を選んで不正なアプリケーションを強制終了できます。</p>
 
@@ -188,13 +210,16 @@
 <p>Vulcan Death Gripは、クラッシュしたアプリケーションをDeskbar内で素早く取り除く素晴らしい方法です。<br />
 <span class="key">SHIFT</span> <span class="key">CTRL</span> <span class="key">ALT</span>を押しながら、Deskbar 内で問題となる項目をクリックします。Poof!
 </p>
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/teammonitor.html" target="_blank">チームモニター</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="move-resize" name="move-resize">ウィンドウ管理: 移動とリサイズ </a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/gui.html#move-resize" target="_blank">ウィンドウを素早く移動/リサイズする方法</a></td></tr>
+</table>
 
 <p>Haikuには、ウィンドウを素早く移動 / リサイズする素敵な方法があります。<br />
 <span class="key">CTRL</span> <span class="key">ALT</span>を押すと、マウスポインターに一番近いウィンドウ枠がハイライトします。<br />
@@ -204,14 +229,16 @@
 <div class="shot">
 <img src="./images/quicktour/move-resize.png" alt="Move with CTRL+ALT+left mouse button" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/gui.html#move-resize" target="_blank">ウィンドウを素早く移動/リサイズする方法</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="stack" name="stack">ウィンドウ管理: スタック</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/gui.html#stack-tile" target="_blank">スタック&amp;タイル</a></td></tr>
+</table>
 
 <p>"スタック"とは、ウィンドウを互いに重ね合わせて、黄色いタブを自動的に再配置することです。<br />
 <span class="key">OPT</span> キー (通常キーボード上の <span class="key">WIN</span> です)を押していると、重なったタブの色が替わるので、ウィンドウをドロップしてスタックが確立します。<br />
@@ -222,14 +249,16 @@ Delay time 200 (= 2 secs), option "Don't stack frames" -->
 <div class="shot">
 <img src="./images/quicktour/stack.gif" alt="Stacking windows" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/gui.html#stack-tile" target="_blank">スタック&amp;タイル</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="tile" name="tile">ウィンドウ管理: タイル</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/gui.html#stack-tile" target="_blank">スタック&amp;タイル</a></td></tr>
+</table>
 
 <p>"タイル"はウィンドウを互いに水平または垂直にくっつけることです。<br />
 <span class="key">OPT</span> を押しながら、ウィンドウを別のウィンドウの近くへ移動すると色が替わるので、ドロップするとくっつきます。<br />
@@ -240,14 +269,17 @@ Delay time 200 (= 2 secs), option "Don't stack frames" -->
 <div class="shot">
 <img src="./images/quicktour/tile.gif" alt="Tiling windows" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/gui.html#stack-tile" target="_blank">スタック&amp;タイル</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="workspaces" name="workspaces">ワークスペース</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/workspaces.html" target="_blank">ワークスペース</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/jp/preferences/screen.html" target="_blank">画面設定</a></td></tr>
+</table>
 
 <p>ワークスペースは独自の解像度、色深度および背景を備えた仮想デスクトップです。<br />
 これらのワークスペースは、32 個まで<span class="app">画面</span>設定から設定できます。</p>
@@ -258,15 +290,16 @@ Delay time 200 (= 2 secs), option "Don't stack frames" -->
 <div class="shot">
 <img src="./images/quicktour/workspaces.png" alt="The Workspaces applet" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/workspaces.html" target="_blank">ワークスペース</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/preferences/screen.html" target="_blank">画面設定</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="replicants" name="replicants">レプリカント</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/gui.html#replicants" target="_blank">レプリカント</a></td></tr>
+</table>
 
 <p>レプリカントは、アプリケーションの小さな内蔵パーツで、デスクトップ(やその他のプログラム)に組み込めます。<br />
 Deskbarの<span class="menu">レプリカントを表示</span>オプションが有効なら、レプリカントは小さなハンドルで表示されます。<br />
@@ -278,14 +311,16 @@ Deskbarの<span class="menu">レプリカントを表示</span>オプション�
 </div>
 
 <p>ハンドルでレプリカントを移動でき、ハンドルの左クリックで<span class="menu">レプリカントを削除</span>を選ぶとレプリカントを削除できます。</p>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/gui.html#replicants" target="_blank">レプリカント</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="singlewindow" name="singlewindow">シングルウィンドウナビゲーション</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/tracker.html" target="_blank">Tracker</a></td></tr>
+</table>
 
 <p>ダブルクリックでフォルダーを次々に下っていくやり方では、すぐにTrackerウィンドウをたくさん開いてしまいます。<br />
 <span class="key">OPT</span>キー(通常、キーボード上の<span class="key">WIN</span>です)を押すと、自動で親フォルダーを閉じるのでこれを防げます。<br />
@@ -296,14 +331,16 @@ Deskbarの<span class="menu">レプリカントを表示</span>オプション�
 <div class="shot">
 <img src="./images/quicktour/singlewindow.png" alt="Using Single window navigation" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/tracker.html" target="_blank">Tracker</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="drilldown" name="drilldown">ドリルダウンナビゲーション</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/tracker.html#navigating" target="_blank">Trackerナビゲーション</a></td></tr>
+</table>
 
 <p>フォルダーの深い階層を開くもうひとつの素敵な方法は、"ドリルダウンナビゲーション"と呼ばれています。フォルダーか、Trackerウィンドウのどこか(またはデスクトップ)の右クリックでコンテキストメニューが開きます。いろいろなコマンドの中に、サブフォルダーを含む現在のフォルダーのメニューがあります。<br />
 開きたいフォルダーかファイルが見つかるまでドリルダウンします。</p>
@@ -311,14 +348,16 @@ Deskbarの<span class="menu">レプリカントを表示</span>オプション�
 <div class="shot">
 <img src="./images/quicktour/drilldown.png" alt="Drilling down folder hierarchies" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/tracker.html#navigating" target="_blank">Trackerナビゲーション</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="mounting" name="mounting">ボリュームのマウント</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/tracker.html#mounting-volumes" target="_blank">ボリュームのマウント</a></td></tr>
+</table>
 
 <p>ハードディスク、CD、USBメモリなどにアクセスするには、まずボリュームをマウントする必要があります。マウンドされれば、アイコンがデスクトップ上に現れます。<br />
 これは、デスクトップやマウント済のボリューム(起動ディスクのような)を右クリックして、<span class="menu">マウント</span>サブメニューからボリュームを選ぶことで実行されます。同じ<span class="menu">マウント</span>メニューは、Deskbarにもあります。ISOイメージは、ダブルクリックでマウントできます。</p>
@@ -328,14 +367,18 @@ Deskbarの<span class="menu">レプリカントを表示</span>オプション�
 <div class="shot">
 <img src="./images/quicktour/mount.png" alt="Mounting a volume" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/tracker.html#mounting-volumes" target="_blank">ボリュームのマウント</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="filesystem" name="filesystem">ファイルシステムレイアウト</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/filesystem-layout.html" target="_blank">ファイルシステムレイアウト</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/jp/applications.html" target="_blank">アプリケーション</a><br />
+<a href="https://git.haiku-os.org/haiku/tree/docs/develop/packages/DirectoryStructure.rst" target="_blank">ディレクトリ構成</a></td></tr>
+</table>
 
 <p>現在、Haikuはマルチユーザーではありませんが、ファイルシステムツリーにはすでに2つの階層があります:</p>
 
@@ -356,16 +399,17 @@ Deskbarの<span class="menu">レプリカントを表示</span>オプション�
 
 <p>書込み可能な<i>non-packaged</i>フォルダーは、/system階層または~/config/階層(<i>add-ons</i>、<i>apps</i>、<i>bin</i>…)のコピーです。<br />
 HPKGパッケージの形で供給されないソフトウェアはここにインストールされます。</p>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/filesystem-layout.html" target="_blank">ファイルシステムレイアウト</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/applications.html" target="_blank">アプリケーション</a><br />
-<a href="https://git.haiku-os.org/haiku/tree/docs/develop/packages/DirectoryStructure.rst" target="_blank">ディレクトリ構成</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="queries" name="queries">クエリでファイルを探す</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/queries.html" target="_blank">クエリ</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/jp/workshop-filetypes+attributes.html" target="_blank">ファイルタイプ、属性、インデックス、およびクエリ</a></td></tr>
+</table>
 
 <p>Haikuフォーマット(BFS)ボリューム上のファイルは、Deskbarからの<span class="menu">検索…</span>で素早く検索されます。ファイルやフォルダの名前の代わりに、ファイルタイプに特有な属性、
 たとえば、MP3コレクション内のアーティスト名も検索できます。</p>
@@ -374,34 +418,39 @@ HPKGパッケージの形で供給されないソフトウェアはここにイ�
 <div class="shot">
 <img src="./images/quicktour/query.png" alt="Finding all MP3s of an artist" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/queries.html" target="_blank">クエリ</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/workshop-filetypes+attributes.html" target="_blank">ファイルタイプ、属性、インデックス、およびクエリ</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="wireless" name="wireless">ワイヤレス接続</a></h1>
 
-<p>WLANルーターへの接続は、Deskbarトレイ内の<span class="app">ネットワークの状態</span>をクリックでできます。<br />
-または、<span class="app">ネットワーク</span>設定からネットワークを選択することでできます。<br />
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/workshop-wlan.html" target="_blank">ワイヤレスネットワーク</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/jp/desktop-applets/networkstatus.html" target="_blank">ネットワークの状態</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/jp/preferences/network.html" target="_blank">ネットワーク設定</a></td></tr>
+</table>
+
+<p>WLANルーターへは、Deskbarトレイ内の<span class="app">ネットワークの状態</span>のクリックで接続できます。<br />
+または、<span class="app">ネットワーク</span>設定からネットワークを選択することでもできます。<br />
 接続が確立すると、ネットワークの暗号化とパスワードについて質問されます。</p>
 
 <!-- [screenshot of Network prefs, context menu of icon in deskbar] -->
 <div class="shot">
 <img src="./images/quicktour/wireless.png" alt="Connecting with a wireless network" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/workshop-wlan.html" target="_blank">ワイヤレスネットワーク</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/desktop-applets/networkstatus.html" target="_blank">ネットワークの状態</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/preferences/network.html" target="_blank">ネットワーク設定</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="moresoftware" name="moresoftware">ソフトウェアの入手と更新</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>参考文献</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/jp/applications/haikudepot.html" target="_blank">HaikuDepot</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/jp/applications/softwareupdater.html" target="_blank">ソフトウェアの更新</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/jp/preferences/repositories.html" target="_blank">リポジトリ設定</a></td></tr>
+</table>
 
 <p>Deskbarのアプリケーションメニューにある<span class="app">HaikuDepot</span>は、ソフトウェアパッケージを検索、インストール及びアンインストールする場所です。<br />
 <span class="app">ソフトウェアの更新</span>は、インストール済ソフトウェアおよびHaiku自体をアップデートするために時々起動されるべきです。</p>
@@ -410,18 +459,14 @@ HPKGパッケージの形で供給されないソフトウェアはここにイ�
 <div class="shot">
 <img src="./images/quicktour/moresoftware.png" alt="Installing and updating apps" />
 </div>
-
-<div class="further">参考文献:<br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/applications/haikudepot.html" target="_blank">HaikuDepot</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/applications/softwareupdater.html" target="_blank">ソフトウェアの更新</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/jp/preferences/repositories.html" target="_blank">リポジトリ設定</a></div>
 </div>
 
-<div>
+
+<div class="topic">
 <h1><a id="end" name="end">終わりに</a></h1>
 
 <p>これでツアーは終わりです。このツアーが新しいOSにすぐに慣れる手助けになることを期待します!</p>
-<p>さらに詳しくは、 <a href="https://www.haiku-os.org/docs/welcome/welcome_jp.html" target="_blank">Haiku へようこそ！</a>および<a href="https://www.haiku-os.org/docs/userguide/en/contents.html" target="_blank">ユーザーガイド</a>を調べてください。<br />
+<p>さらに詳しくは、 <a href="https://www.haiku-os.org/docs/welcome/welcome_jp.html" target="_blank">Haiku へようこそ！</a>および<a href="https://www.haiku-os.org/docs/userguide/jp/contents.html" target="_blank">ユーザーガイド</a>を調べてください。<br />
 <a href="https://discuss.haiku-os.org/" target="_blank">ウェブフォーラム</a>や<a href="https://www.haiku-os.org/community/irc/" target="_blank">メインのIRCチャンネル#haiku</a>に参加して、助けを得たり考えを議論することもできます。</p>
 <p>Haikuウェブサイトには、Haikuの前進に<a href="https://www.haiku-os.org/community/getting-involved/" target="_blank">参加</a>するための情報があります。また、<a href="https://www.haiku-os.org/community/donating_to_haiku" target="_blank">金銭的な支援</a>もできます。</p>
 
@@ -433,5 +478,10 @@ HPKGパッケージの形で供給されないソフトウェアはここにイ�
 </div>
 </div>
 
+<div id="bottom-nav" class="slide-only">
+<a id="prevtopic-bottom" class="navbutton" title="Previous">◀</a>
+<a id="nexttopic-bottom" class="navbutton" title="Next">▶</a>
+</div>
+<script type="text/javascript" src="../Haiku-tour.js"></script>
 </body>
 </html>

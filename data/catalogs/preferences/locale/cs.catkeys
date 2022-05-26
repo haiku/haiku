@@ -1,0 +1,30 @@
+1	czech	x-vnd.Haiku-Locale	1081217032
+Medium format:	TimeFormatSettings		Střední formát:
+Negative:	TimeFormatSettings		Záporná čísla:
+Language	Locale Preflet Window		Jazyk
+Short format:	TimeFormatSettings		Krátký formát:
+24 hour	TimeFormatSettings		24 hodinový
+Locale	Locale Preflet Window		Lokalita
+Time	TimeFormatSettings		Čas
+Defaults	Locale Preflet Window		Původní
+Locale	System name		Lokalita
+Date	TimeFormatSettings		Datum
+OK	Locale Preflet Window		OK
+Long format:	TimeFormatSettings		Dlouhý formát:
+Numbers	TimeFormatSettings		Čísla
+Available languages	Locale Preflet Window		Dostupné jazyky
+Locale	Locale Preflet		Lokalita
+Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Nemohu najít dostupné jazyky! Nemůžete použít toto okno voleb!
+Formatting	Locale Preflet Window		Formátování
+Use month/day-names from preferred language	TimeFormatSettings		Použít názvy měsíců/dnů v týdnu z preferovaného jazyka
+already chosen	LanguageListView		již vybráno
+Preferred languages	Locale Preflet Window		Preferované jazyky
+Full format:	TimeFormatSettings		Plný formát:
+Cancel	Locale Preflet Window		Zrušit
+Revert	Locale Preflet Window		Vzít zpět
+Translate application and folder names	TimeFormatSettings		Překládat jména aplikací a složek
+12 hour	TimeFormatSettings		12 hodinový
+Positive:	TimeFormatSettings		Kladná čísla:
+Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		Aby se změna projevila, je nutno restartovat Panel i Tracker. Přejete si je restartovat nyní?
+Restart	Locale Preflet Window		Restartovat
+Currency	TimeFormatSettings		Měna

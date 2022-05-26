@@ -1,46 +1,44 @@
-1	belarusian	x-vnd.Haiku-BluetoothPrefs	416765820
-Laptop	Settings view		Ноўтбук
-Only from trusted devices	Settings view		Толькі ад надзейных прылад
-15 secs	Settings view		15 сек
-Quit	main		Выйсці
-Manufacturer: 	Device View		Вытворца: 
-Desktop	Settings view		Рабочы стол
-Server	Window		Сервер
-Identify host as:	Settings view		Ідэнтыфікаваць хост як:
-Refresh…	Remote devices		Абнавіць…
-Local devices found on system:	Settings view		Лакальныя прылады, знойдзеныя ў сістэме:
-Service classes: 	Device View		Класы сервісу: 
-Remote devices	Window		Падаленыя прылады
-Settings	Window		Налады
-Stop bluetooth services…	Window		Спыніць службы Bluetooth…
-61 secs	Settings view		61 сек
-Add…	Remote devices		Дадаць…
-As blocked	Remote devices		Як блакаваны
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		У сістэме не зарэгістравана ніякіх прылад (LocalDevice).
-Revert	Window		Вярнуць
-Disconnect	Remote devices		Адключыцца
+1	belarusian	x-vnd.Haiku-BluetoothPrefs	1584242861
+Start bluetooth services…	Window		Запусціць сервісы Bluetooth…
 From all devices	Settings view		Ад усіх прылад
 Defaults	Window		Прадвызначаныя
-Start bluetooth services…	Window		Запусціць сервісы Bluetooth…
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Праверце, ці актыўныя Bluetooth магчымасці вашай прылады. Націсніце 'Запыт' каб пачаць сканіраванне. Час, патрэбны на атрыманне імёнаў прылад, невядомы, але не павінны перавышаць 3 секунды для кожнай прылады. Пасля вы зможаце дадаць іх да вашага асноўнага спісу, дзе можна задаць іх сапражэнні.
+Laptop	Settings view		Ноўтбук
 Scanning progress	Inquiry panel		Прагрэс пошуку
+Only from trusted devices	Settings view		Толькі ад надзейных прылад
 Bluetooth	System name		Bluetooth
 Remove	Remote devices		Выдаліць
 Always ask	Settings view		Заўсёды пытаць
+Quit	main		Выйсці
+15 secs	Settings view		15 сек
 Help	Window		Даведка
+Manufacturer: 	Device View		Вытворца: 
 Pair…	Remote devices		Дадаць сапражэнне…
+Desktop	Settings view		Рабочы стол
+Server	Window		Сервер
 Retrieving name of %1	Inquiry panel		Атрымліваем імя %1
+Identify host as:	Settings view		Ідэнтыфікаваць хост як:
 Inquiry	Inquiry panel		Запыт
+Local devices found on system:	Settings view		Лакальныя прылады, знойдзеныя ў сістэме:
+Service classes: 	Device View		Класы сервісу: 
 Incoming connections policy:	Settings view		Палітыка уваходных падключэнняў:
-Show name	Extended local device view		Паказаць імя
+Remote devices	Window		Падаленыя прылады
 Add device to list	Inquiry panel		Дадаць прыладу ў спіс
+Show name	Extended local device view		Паказаць імя
+Settings	Window		Налады
 Remaining %1 seconds	Inquiry panel		Засталося %1 секунд
-Discoverable	Extended local device view		Бачны для іншых
+Stop bluetooth services…	Window		Спыніць службы Bluetooth…
+61 secs	Settings view		61 сек
 Authenticate	Extended local device view		Аўтэнтыфікаваць
-Smart phone	Settings view		Смартфон
+Discoverable	Extended local device view		Бачны для іншых
+Add…	Remote devices		Дадаць…
 Scanning completed.	Inquiry panel		Пошук скончаны.
+Smart phone	Settings view		Смартфон
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		У сістэме не зарэгістравана ніякіх прылад (LocalDevice).
 Default inquiry time:	Settings view		Час стандартнага запыту:
+Revert	Window		Вярнуць
 Server	Settings view		Сервер
-Handheld	Settings view		Наладоннік
  packets: 	Device View		 пакетаў: 
+Handheld	Settings view		Наладоннік
+Disconnect	Remote devices		Адключыцца
 About Bluetooth…	Window		Пра праграму Bluetooth…

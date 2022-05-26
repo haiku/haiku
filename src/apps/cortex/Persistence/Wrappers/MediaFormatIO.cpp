@@ -545,7 +545,7 @@ void export_raw_audio_attr(
 	const media_raw_audio_format& f,
 	ExportContext& context) {
 
-	media_raw_audio_format& w = media_raw_audio_format::wildcard;
+	const media_raw_audio_format& w = media_raw_audio_format::wildcard;
 
 	if(f.frame_rate != w.frame_rate)
 		context.writeAttr(gKey_frame_rate, f.frame_rate);
@@ -587,7 +587,7 @@ void export_multi_audio_info_attr(
 	const media_multi_audio_info& f,
 	ExportContext& context) {
 
-	media_multi_audio_format& w = media_multi_audio_format::wildcard;
+	const media_multi_audio_format& w = media_multi_audio_format::wildcard;
 
 	if(f.channel_mask != w.channel_mask)
 		context.writeAttr(gKey_channel_mask, f.channel_mask);
@@ -603,7 +603,7 @@ void export_video_display_info_attr(
 	const media_video_display_info& d,
 	ExportContext& context) {
 
-	media_video_display_info& w = media_video_display_info::wildcard;
+	const media_video_display_info& w = media_video_display_info::wildcard;
 
 	if(d.line_width != w.line_width)
 		context.writeAttr(gKey_line_width, d.line_width);
@@ -625,7 +625,7 @@ void export_raw_video_attr(
 	const media_raw_video_format& f,
 	ExportContext& context) {
 
-	media_raw_video_format& w = media_raw_video_format::wildcard;
+	const media_raw_video_format& w = media_raw_video_format::wildcard;
 
 	// attributes
 	if(f.field_rate != w.field_rate)
@@ -743,7 +743,7 @@ void export_multistream_attr(
 	const media_multistream_format& f,
 	ExportContext& context) {
 
-	media_multistream_format& w = media_multistream_format::wildcard;
+	const media_multistream_format& w = media_multistream_format::wildcard;
 
 	// attributes
 	switch(f.format) {
@@ -813,7 +813,7 @@ void export_encoded_audio_attr(
 	const media_encoded_audio_format& f,
 	ExportContext& context) {
 
-	media_encoded_audio_format& w = media_encoded_audio_format::wildcard;
+	const media_encoded_audio_format& w = media_encoded_audio_format::wildcard;
 
 	switch(f.encoding) {
 		case media_encoded_audio_format::B_ANY:
@@ -848,7 +848,7 @@ void export_encoded_video_attr(
 	const media_encoded_video_format& f,
 	ExportContext& context) {
 
-	media_encoded_video_format& w = media_encoded_video_format::wildcard;
+	const media_encoded_video_format& w = media_encoded_video_format::wildcard;
 
 	switch(f.encoding) {
 		case media_encoded_video_format::B_ANY:

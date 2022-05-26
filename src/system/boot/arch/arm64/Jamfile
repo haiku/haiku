@@ -1,41 +1,60 @@
 SubDir HAIKU_TOP src system boot arch arm64 ;
 
-UseLibraryHeaders [ FDirName libfdt ] ;
-UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
-SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers fdt ;
-
-# TODO: Is there any reason to recompile arch_string.S here?
-local librootArchObjects =
-#	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>arch_string.o
-	arch_string.S
-;
-
-local kernelLibArchObjects =
-	<src!system!kernel!lib!arch!$(TARGET_ARCH)>byteorder.o
-	<src!system!kernel!lib!arch!$(TARGET_ARCH)>memset.o
-;
-
 local platform ;
-for platform in [ MultiBootSubDirSetup u-boot efi ] {
-    on $(platform) {
+
+local kernelArchSources =
+	arch_elf.cpp
+	arch_uart_linflex.cpp
+;
+
+local kernelArchReusableSources =
+	arch_uart_pl011.cpp
+;
+
+local kernelGenericDriverSources =
+	debug_uart.cpp
+	debug_uart_8250.cpp
+;
+
+kernelLibGenericSources =
+	memcpy.c
+	memset.c
+;
+
+local kernelLibArchSources = ;
+
+local librootOsArchSources =
+	byteorder.S
+;
+
+for platform in [ MultiBootSubDirSetup efi ] {
+	on $(platform) {
 		DEFINES += _BOOT_MODE ;
+
+
 		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
-			# Reuse a subset of kernel debugging.
-			$(librootArchObjects)
-			:
-			:
-			$(kernelLibArchObjects)
+			$(kernelGenericDriverSources)
+			$(kernelArchSources)
+			$(kernelArchReusableSources)
+			$(kernelLibArchSources)
+			$(kernelLibGenericSources)
+			$(librootOsArchSources)
+
+			arch_cpu.cpp
+			: # additional flags
 		;
-		SEARCH on [ FGristFiles arch_elf.cpp $(kernelArchDriverSources) ]
-			= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH) ] ;
 
 		SEARCH on [ FGristFiles $(kernelGenericDriverSources) ]
 			= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
-
-		SEARCH on [ FGristFiles $(librootArchObjects) ]
-			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch $(TARGET_ARCH) ] ;
-
-		SEARCH on [ FGristFiles $(kernelDebugSources) ]
-			= [ FDirName $(HAIKU_TOP) src system kernel debug ] ;
+		SEARCH on [ FGristFiles $(kernelArchSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;
+		SEARCH on [ FGristFiles $(kernelArchReusableSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel arch arm ] ;
+		SEARCH on [ FGristFiles $(kernelLibGenericSources) ]
+			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch generic ] ;
+		SEARCH on [ FGristFiles $(kernelLibArchSources) ]
+			= [ FDirName $(HAIKU_TOP) src system libroot posix string arch arm64 ] ;
+		SEARCH on [ FGristFiles $(librootOsArchSources) ]
+			= [ FDirName $(HAIKU_TOP) src system libroot os arch arm64 ] ;
 	}
 }

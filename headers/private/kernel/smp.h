@@ -182,7 +182,7 @@ CPUSet::IsEmpty() const
 static inline bool
 try_acquire_spinlock_inline(spinlock* lock)
 {
-	return atomic_get_and_set((int32*)lock, 1) == 0;
+	return atomic_get_and_set(&lock->lock, 1) == 0;
 }
 
 
@@ -198,7 +198,7 @@ acquire_spinlock_inline(spinlock* lock)
 static inline void
 release_spinlock_inline(spinlock* lock)
 {
-	atomic_set((int32*)lock, 0);
+	atomic_set(&lock->lock, 0);
 }
 
 

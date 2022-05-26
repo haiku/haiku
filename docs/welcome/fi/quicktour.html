@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Jorma Karvonen
+ *		Máximo Castañeda
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -37,6 +38,7 @@
 <li><a href="../de/quicktour.html">Deutsch</a></li>
 <li><a href="../en/quicktour.html">English</a></li>
 <li><a href="../es/quicktour.html">Español</a></li>
+<li><a href="../eo/quicktour.html">Esperanto</a></li>
 <li><a href="../fr/quicktour.html">Français</a></li>
 <li><a href="../fur/quicktour.html">Furlan</a></li>
 <li><a href="../it/quicktour.html">Italiano</a></li>
@@ -56,7 +58,8 @@
 
 
 <span class="navdots">
-<a href="#start"><acronym title="Start" class="current-page">◉</acronym></a> 
+<a class="hide-no-js" id="prevtopic" title="Previous topic">◀</a>
+<a href="#start"><acronym title="Start">◉</acronym></a> 
 <a href="#deskbar"><acronym title="The Deskbar">◉</acronym></a> 
 <a href="#window"><acronym title="The window widgets">◉</acronym></a> 
 <a href="#shortcutkey"><acronym title="The shortcut key">◉</acronym></a> 
@@ -75,17 +78,23 @@
 <a href="#wireless"><acronym title="Wireless connection">◉</acronym></a> 
 <a href="#moresoftware"><acronym title="Getting more and updating software">◉</acronym></a> 
 <a href="#end"><acronym title="End">◉</acronym></a> 
+<a class="hide-no-js" id="nexttopic" title="Next topic">▶</a>
 </span>
 
+<span class="hide-no-js"><a id="toggle" title="Toggle slides view">▤</a></span>
+
 <span>
-<a href="#topics" class="uplink">Topics</a> 
+<a href="#index" class="uplink">Topics</a> 
 </span>
 </div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div></div>
+<!-- Please keep the previous empty div there so that the tool can add the "not fully translated" notice on export -->
+
+<div class="topic">
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
@@ -115,12 +124,19 @@
 <h1><a id="start" name="start">Tervetuloa Haikun pikaoppaaseen</a></h1>
 
 <p>Vaikka Haiku jakaa muiden käyttöjärjestemien monia ajatuksia, siinä on joillakin alueilla ainutlaatuisia ominaisuuksia, jotka on hyvä mainita. Muutamalla kalvolla opit tärkeimmistä Haiku-ominaisuuksista ja erikoisuuksista, jotka helpottavat nopeaa käyttöäsi.</p>
-<p>At the bottom right of each page, are links for "further reading" that point to additional resources, like related topics in the <a href="https://www.haiku-os.org/docs/userguide/en/contents.html" target="_blank">Userguide</a>.</p>
+<p>For each topic you can find a box with links for "further reading" that point to additional resources, like related topics in the <a href="https://www.haiku-os.org/docs/userguide/fi/contents.html" target="_blank">Userguide</a>.</p>
 
 </div>
 
 <div class="topic">
 <h1><a id="deskbar" name="deskbar">Työpöytäpalkki</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/deskbar.html" target="_blank">Deskbar</a>
+</td></tr>
+</table>
 
 <p>Oletuksena työpöydän oikeassa yläkulmassa on Työpöytäpalkki-käyttöliittymäkomponentti vuorovaikutukseen Haikun kanssa. Voit käynnistää siitä esimerkiksi sovelluksia, sovelmia ja asetusohjelmia ja vaihtaa suoritettavasta sovelluksesta toiseen.</p>
 
@@ -128,14 +144,18 @@
 <div class="shot">
 <img src="./images/quicktour/deskbar.png" alt="The Deskbar" />
 </div>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/deskbar.html" target="_blank">Deskbar</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="window" name="window">Ikkunakäyttöliittymäkomponentit</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/gui.html" target="_blank">Haiku's GUI</a>
+</td></tr>
+</table>
 
 <p>Tässä on tyypillinen Haiku-ikkuna käyttöliittymäkomponentteineen:</p>
 
@@ -143,14 +163,18 @@
 <div class="shot">
 <img src="./images/quicktour/window.png" alt="A window and its widgets" />
 </div>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html" target="_blank">Haiku's GUI</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="shortcutkey" name="shortcutkey">Pikanäppäin</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/keyboard-shortcuts.html" target="_blank">Shortcuts and key combinations</a>
+</td></tr>
+</table>
 
 <p><span class="app">Näppäimistöasetukset</span>-sovellus mahdollistaa vaihtamisen Haikun vakiosta <span class="key">ALT</span>-näppäimestä <span class="key">CTRL</span> (Windows/Linux-tila)-näppäimeen. Tämä on yleiskytkin, joten esimerkiksi ohjelmasta poistuminen pääteikkunassa tehdään sen jälkeen <span class="key">ALT</span> <span class="key">C</span>-näppäimillä eikä tavallisilla <span class="key">CTRL</span> <span class="key">C</span>-näppäimillä.<br />
 Tämä epäjohdonmukaisuus on yksi syy siihen, että <span class="key">ALT</span>-painike on pikanäppäin Haikussa.</p>
@@ -159,14 +183,18 @@ Tämä epäjohdonmukaisuus on yksi syy siihen, että <span class="key">ALT</span
 <div class="shot">
 <img src="./images/quicktour/alt-ctrl.png" alt="Shortcut key: ALT vs. CTRL" />
 </div>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/keyboard-shortcuts.html" target="_blank">Shortcuts and key combinations</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="twitcher" name="twitcher">Vaihtaja</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/twitcher.html" target="_blank">Twitcher</a>
+</td></tr>
+</table>
 
 <p>Pitämällä alhaalla näppäimiä <span class="key">CTRL</span> <span class="key">TAB</span> kutsutaan <span class="app">Vaihtaja</span> jossa voit vaihtaa käynnissä olevien sovelluksien suoritusta.<br />
 Nopea napauttaminen <span class="key">TAB</span>-näppäimeen samalla kun pidetään alhaalla <span class="key">CTRL</span>-näppäintä vaihtaa viimeksi käytettyyn sovellukseen.</p>
@@ -174,14 +202,18 @@ Nopea napauttaminen <span class="key">TAB</span>-näppäimeen samalla kun pidet�
 <div class="shot">
 <img src="../images/quicktour/twitcher.png" alt="The Twitcher switching between apps" />
 </div>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/twitcher.html" target="_blank">Twitcher</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="teammonitor" name="teammonitor">Ryhmävalvonta</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/teammonitor.html" target="_blank">Team monitor</a>
+</td></tr>
+</table>
 
 <p>Jos jotkut sovellukset kaatuvat pahasti eivätkä katoa Seuraajan käynnissä olevien sovellusten luettelosta, paina <span class="key">CTRL</span> <span class="key">ALT</span> <span class="key">DEL</span> <span class="app">Ryhmävalvonta</span>-sovelluksen kutsumiseksi. Siinä voit valita rivin ja nitistää väärin käyttäytyvän sovelluksen.</p>
 
@@ -191,13 +223,18 @@ Nopea napauttaminen <span class="key">TAB</span>-näppäimeen samalla kun pidet�
 
 <p>Näppärä tapa päästä eroon kaatuneesta sovelluksesta Työpöytäpalkissa on Vulcan-kuolo-ote.<br />
 Pidä alhaalla näppäimet <span class="key">VAIHTO</span> <span class="key">CTRL</span> <span class="key">ALT</span> ja napsauta virheellisesti toimivan sovelluksen riviä Työpöytäpalkissa. Puff!</p>
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/teammonitor.html" target="_blank">Team monitor</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="move-resize" name="move-resize">Ikkunahallinta: Siirrä &amp; Muuta kokoa</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/gui.html#move-resize" target="_blank">A quick way to move or resize windows</a>
+</td></tr>
+</table>
 
 <p>Haiku tarjoaa näppärän tavan ikkunoiden nopeaan siirtoon tai koon muuttamiseen:<br />
 Pitämällä alhaalla näppäimiä <span class="key">CTRL</span> <span class="key">ALT</span> korostetaan ikkunarajoja, jotka sijaitsevat lähinnä hiiren kohdistinta.<br />
@@ -206,14 +243,18 @@ Hiiren <i>kakkospainikkeen (yleensä oikea painike)</i> napsautus ja raahaus muu
 <div class="shot">
 <img src="./images/quicktour/move-resize.png" alt="Move with CTRL+ALT+left mouse button" />
 </div>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html#move-resize" target="_blank">A quick way to move or resize windows</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="stack" name="stack">Ikkunahallinta: Pino</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/gui.html#stack-tile" target="_blank">Stack &amp; Tile</a>
+</td></tr>
+</table>
 
 <p>"Pinomalla" laitetaan ikkunoita toistensa päälle, mikä siirtää automaattisesti keltaisen välilehden paikkaa.<br />
 Pitämällä alhaalla <span class="key">OPT</span>-näppäintä (tavallisesti se on <span class="key">WIN</span>-näppäimistössä), välilehdet vaihtavat väriä, kun ikkuna sijoitetaan toisensa päälle; ikkunan pudottaminen saa aikaan pinoamisen.<br />
@@ -224,14 +265,18 @@ Delay time 200 (= 2 secs), option "Don't stack frames" -->
 <div class="shot">
 <img src="./images/quicktour/stack.gif" alt="Stacking windows" />
 </div>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html#stack-tile" target="_blank">Stack &amp; Tile</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="tile" name="tile">Ikkunahallinta: Laatoitus</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/gui.html#stack-tile" target="_blank">Stack &amp; Tile</a>
+</td></tr>
+</table>
 
 <p>"Laatoitus" tarkoittaa ikkunoiden liimaamista yhteen vaakasuoraan tai pystysuoraan.<br />
 Pitämällä alhaalla <span class="key">OPT</span>-näppäintä yhteen liimattavien ikkunoiden rajat vaihtavat väriä, kun ne tuodaan toistensa lähelle.<br />
@@ -242,14 +287,19 @@ Delay time 200 (= 2 secs), option "Don't stack frames" -->
 <div class="shot">
 <img src="./images/quicktour/tile.gif" alt="Tiling windows" />
 </div>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html#stack-tile" target="_blank">Stack &amp; Tile</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="workspaces" name="workspaces">Työtilat</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/workspaces.html" target="_blank">Workspaces</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/fi/preferences/screen.html" target="_blank">Screen</a>
+</td></tr>
+</table>
 
 <p>Työtilat ovat virtuaalisia työpöytiä, täysin omilla resoluutioilla, värisyvyydellä ja taustalla.<br />
 Tällaisia työtiloja voidaan asettaa enintään 32 kappaletta <span class="app">Näyttöasetukset</span>-sovelluksesta.</p>
@@ -260,15 +310,18 @@ Jos lisäät noihin <span class="key">VAIHTO</span>-näppäimen, niin aktiivinen
 <div class="shot">
 <img src="./images/quicktour/workspaces.png" alt="The Workspaces applet" />
 </div>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/workspaces.html" target="_blank">Workspaces</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/preferences/screen.html" target="_blank">Screen</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="replicants" name="replicants">Kopiot</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/gui.html#replicants" target="_blank">Replicants</a>
+</td></tr>
+</table>
 
 <p>Kopiot ovat pieniä itsensä sisältäviä sovellusten osia, jotka voidaan integroida Työpöytään (ja muihin ohjelmiin).<br />
 Jos tarjottu Työpöytäpalkin valitsin <span class="menu">Näytä kopiot</span> on aktivoitu, pieni kahva ilmaisee kopioita.<br />
@@ -280,14 +333,18 @@ Voit raahata &amp; pudottaa ne kahvasta Työpöydälle, missä ne ovat täysin t
 </div>
 
 <p>Voit siirtää kopiota kahvasta ja poistaa se napsauttamalla hiiren kakkospainikkeella siihen ja valitsemalla valikkorivin <span class="menu">Poista kopio</span>.</p>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/gui.html#replicants" target="_blank">Replicants</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="singlewindow" name="singlewindow">Yksittäisikkunan navigointi</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/tracker.html" target="_blank">Tracker</a>
+</td></tr>
+</table>
 
 <p>Kaksoisnapsauttamalla kansiosta kansioon huomaat saaneesi näkyviin monia avoimia Seuraaja-ikkunoita.<br />
 Pitämällä alhaalla <span class="key">OPT</span>-näppäintä (normaalisti <span class="key">WIN</span>-näppäimistössä) estät sen, koska se sulkee automaattisesti isäntäkansion.<br />
@@ -298,14 +355,18 @@ Vaihtoehtoisesti voit aktivoida <span class="menu">Yksittäisikkunanavigointi</s
 <div class="shot">
 <img src="./images/quicktour/singlewindow.png" alt="Using Single window navigation" />
 </div>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/tracker.html" target="_blank">Tracker</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="drilldown" name="drilldown">Porrasnavigointi</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/tracker.html#navigating" target="_blank">Tracker navigation</a>
+</td></tr>
+</table>
 
 <p>Näppärää vaihtoehtoa syvän kansiohierarkian avaamiseksi kutsutaan "porrasnavigoinniksi". Napsauttamalla hiiren kakkospainikeella (tavallisesti oikea painike) kansiota tai mitä kohtaa tahansa Seuraaja-ikkunassa (tai Työpöydällä) avaat asiayhteysvalikon. Erilaisten odotettujen komentojen lisäksi siinä on ylimmäisenä nykyisen kansion valikkorivi, joka sisältää kaikki sen alikansiot.<br />
 Askella alas valikkoa kunnes löydät haluamasi kansion tai tiedoston avattavaksi.</p>
@@ -313,14 +374,18 @@ Askella alas valikkoa kunnes löydät haluamasi kansion tai tiedoston avattavaks
 <div class="shot">
 <img src="./images/quicktour/drilldown.png" alt="Drilling down folder hierarchies" />
 </div>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/tracker.html#navigating" target="_blank">Tracker navigation</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="mounting" name="mounting">Taltioiden liittäminen</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/tracker.html#mounting-volumes" target="_blank">Mounting volumes</a>
+</td></tr>
+</table>
 
 <p>Kiitolevyn, CD:n, USB-tikun jne. käyttämiseksi taltio on ensin liitettävä. Kun taltio on liitetty, sen kuvake ilmestyy Työpöydälle.<br />
 Tämä tehdään Työpöydällä napsauttamalla hiiren kakkospainikkeella (yleensä oikea painike) Työpöytää tai jo liitettyä taltiota (kuten käynnistyslevy) ja valitsemalla taltio <span class="menu">Liitä</span>-alivalikosta. Löydät saman <span class="menu">Liitä</span>-valikon Työpöytäpalkista. ISO-levykuvat voidaan liittää kaksoisnapsautuksella.</p>
@@ -330,14 +395,20 @@ Tämä tehdään Työpöydällä napsauttamalla hiiren kakkospainikkeella (yleen
 <div class="shot">
 <img src="./images/quicktour/mount.png" alt="Mounting a volume" />
 </div>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/tracker.html#mounting-volumes" target="_blank">Mounting volumes</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="filesystem" name="filesystem">Tiedostojärjestelmäsijoittelu</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/filesystem-layout.html" target="_blank">Filesystem layout</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/fi/applications.html" target="_blank">Applications</a><br />
+<a href="https://git.haiku-os.org/haiku/tree/docs/develop/packages/DirectoryStructure.rst" target="_blank">Directory structure</a>
+</td></tr>
+</table>
 
 <p>Vaikka Haiku ei nykyisin ole monikäyttäjäjärjestelmä, tiedostojärjestelmäpuussa on jo kaksi haaraa:</p>
 
@@ -359,16 +430,17 @@ Kansiot siellä (kuten <i>add-ons</i>, <i>apps</i>, <i>bin</i> jne.) ovat vain a
 
 <p>Kirjoitettavat <i>non-packaged</i>-kansiot peilaavat /system-hierarkiaa tai ~/config/-hierarkiaa (<i>add-ons</i>, <i>apps</i>, <i>bin</i>…).<br />
 Tähän voidaan asentaa ohjelmistot, jotka eivät tule HPKG-pakkausmuodossa.</p>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/filesystem-layout.html" target="_blank">Filesystem layout</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/applications.html" target="_blank">Applications</a><br />
-<a href="https://git.haiku-os.org/haiku/tree/docs/develop/packages/DirectoryStructure.rst" target="_blank">Directory structure</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="queries" name="queries">Tiedostojen etsintä kyselyillä</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td><a href="https://www.haiku-os.org/docs/userguide/fi/queries.html" target="_blank">Kyselyt</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/fi/workshop-filetypes+attributes.html" target="_blank">Työpaja:Tiedostotyypit, attribuutit, indeksi ja kyselyt</a></td></tr>
+</table>
 
 <p>Tiedostot Haiku-alustetussa (BFS)-taltiossa etsitään nopeasti Työpöytäpalkin <span class="menu">Etsi…</span>-valikolla. Tiedosto- ja kansionimien sijasta voit etsiä myös tiedostotyyppisten attribuuttien kautta, esim. artisti MP3-kokoelmassasi.</p>
 
@@ -376,15 +448,20 @@ Tähän voidaan asentaa ohjelmistot, jotka eivät tule HPKG-pakkausmuodossa.</p>
 <div class="shot">
 <img src="./images/quicktour/query.png" alt="Finding all MP3s of an artist" />
 </div>
-
-<div class="further">Lisälukemista:<br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/queries.html" target="_blank">Kyselyt</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/{LANG}/workshop-filetypes+attributes.html" target="_blank">Työpaja:Tiedostotyypit, attribuutit, indeksi ja kyselyt</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="wireless" name="wireless">Langaton yhteys</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/workshop-wlan.html" target="_blank">Wireless networking</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/fi/desktop-applets/networkstatus.html" target="_blank">NetworkStatus</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/fi/preferences/network.html" target="_blank">Network preferences</a>
+</td></tr>
+</table>
 
 <p>Voit yhdistää WLAN-reitittimesi joko napsauttamalla hiiren kakkospainikkeella (useimmiten oikea painike) <span class="app">Verkkotila</span>-kuvaketta Seuraajan tarjottimessa,<br />
 tai valitsemalla verkkosi <span class="app">Verkkoasetukset</span>-sovelluksesta.<br />
@@ -394,16 +471,20 @@ Kun yhteys on muodostettu, sinulta kysytään verkon salausta ja salasanaa.</p>
 <div class="shot">
 <img src="./images/quicktour/wireless.png" alt="Connecting with a wireless network" />
 </div>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/workshop-wlan.html" target="_blank">Wireless networking</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/desktop-applets/networkstatus.html" target="_blank">NetworkStatus</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/preferences/network.html" target="_blank">Network preferences</a></div>
 </div>
 
 
 <div class="topic">
 <h1><a id="moresoftware" name="moresoftware">Kuinka saada lisää ohjelmia ja päivittää niitä</a></h1>
+
+<table class="index further">
+<tr class="heading"><td>Lisälukemista</td></tr>
+<tr class="index"><td>
+<a href="https://www.haiku-os.org/docs/userguide/fi/applications/haikudepot.html" target="_blank">HaikuDepot</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/fi/applications/softwareupdater.html" target="_blank">SoftwareUpdater</a><br />
+<a href="https://www.haiku-os.org/docs/userguide/fi/preferences/repositories.html" target="_blank">Repositories</a>
+</td></tr>
+</table>
 
 <p><span class="app">HaikuVarasto</span> Työpöytäpalkin sovellusvalikossa on paikka, josta voit etsiä, asentaa ja poistaa ohjelmapakkauksia.<br />
 <span class="app">Ohjelmistopäivittäjä</span> käynnistettäisiin aika ajoin päivittämään asennettuja ohjelmia ja itse Haikua.</p>
@@ -412,18 +493,14 @@ Kun yhteys on muodostettu, sinulta kysytään verkon salausta ja salasanaa.</p>
 <div class="shot">
 <img src="./images/quicktour/moresoftware.png" alt="Installing and updating apps" />
 </div>
-
-<div class="further">Further reading:<br />
-<a href="https://www.haiku-os.org/docs/userguide/en/applications/haikudepot.html" target="_blank">HaikuDepot</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/applications/softwareupdater.html" target="_blank">SoftwareUpdater</a><br />
-<a href="https://www.haiku-os.org/docs/userguide/en/preferences/repositories.html" target="_blank">Repositories</a></div>
 </div>
 
-<div>
+
+<div class="topic">
 <h1><a id="end" name="end">Loppu</a></h1>
 
 <p>Tämä on opaskiertueen loppu. Toivomme, että se auttoi sinua kotiutumaan nopeasi uuteen käyttöjärjestelmääsi!</p>
-<p>For more detailed information, check out the <a href="https://www.haiku-os.org/docs/welcome/welcome_en.html" target="_blank">Welcome page</a> and the <a href="https://www.haiku-os.org/docs/userguide/en/contents.html" target="_blank">User Guide</a>.<br />
+<p>For more detailed information, check out the <a href="https://www.haiku-os.org/docs/welcome/welcome_fi.html" target="_blank">Welcome page</a> and the <a href="https://www.haiku-os.org/docs/userguide/fi/contents.html" target="_blank">User Guide</a>.<br />
 You can also join our <a href="https://discuss.haiku-os.org/" target="_blank">Webforum</a> and <a href="https://www.haiku-os.org/community/irc/" target="_blank">main IRC channel #haiku</a> to get help or discuss your ideas.</p>
 <p>Haiku-webbisivulla on tietoja siitä kuinka  <a href="https://www.haiku-os.org/community/getting-involved/" target="_blank">liitytään mukaan</a> Haikun ajamiseksi edelleen. Voit myös tehdä <a href="https://www.haiku-os.org/community/donating_to_haiku" target="_blank">taloudellisia lahjoituksia</a>.</p>
 
@@ -435,5 +512,10 @@ You can also join our <a href="https://discuss.haiku-os.org/" target="_blank">We
 </div>
 </div>
 
+<div id="bottom-nav" class="slide-only">
+<a id="prevtopic-bottom" class="navbutton" title="Previous">◀</a>
+<a id="nexttopic-bottom" class="navbutton" title="Next">▶</a>
+</div>
+<script type="text/javascript" src="../Haiku-tour.js"></script>
 </body>
 </html>

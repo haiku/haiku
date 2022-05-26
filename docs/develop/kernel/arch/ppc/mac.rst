@@ -1,0 +1,17 @@
+The Apple Macintosh port
+======================================
+
+The current target is "new world" machines, which have a more complete and reliable implementation
+of Open Firmware.
+
+* http://www.debian.org/releases/stable/powerpc/ch05s01.html.en
+* http://www.kernelthread.com/mac/osx/arch_boot.html
+* http://playground.sun.com/1275/mejohnson/
+* http://homepages.gold.ac.uk/suzanne/startup.html
+* http://www.netbsd.org/ports/macppc/SystemDisk-tutorial/
+* http://www.netneurotic.net/mac/openfirmware.html
+* http://www.netbsd.org/ports/macppc/faq.html
+* http://mail-index.netbsd.org/port-macppc/1999/03/21/0001.html
+* http://mail-index.netbsd.org/port-macppc/1999/06/25/0006.html
+* http://ps-2.kev009.com/solinno.co.uk/7043-140/files/docs/ {OF,PReP}
+* http://www.openfirmware.org/1275/bindings/chrp/

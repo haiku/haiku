@@ -14,5 +14,16 @@ Addon cortex_logging_consumer.media_addon :
 	# common/
 	MediaNodeControlApp.cpp
 
-	: be media [ TargetLibstdc++ ]
+	: be media localestub [ TargetLibstdc++ ]
+;
+
+DoCatalogs cortex_logging_consumer.media_addon
+	: x-vnd.Be.LoggingConsumerApp
+	:
+	LoggingConsumer.cpp
+	LoggingConsumerAddOn.cpp
+	NodeHarnessApp.cpp
+	NodeHarnessWin.cpp
+
+	../common/MediaNodeControlApp.cpp
 ;

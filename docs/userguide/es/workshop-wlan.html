@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guía del usuario</span></div>
 </div>
 
 <div class="nav">
@@ -34,6 +34,7 @@
 <li><a href="../ca/workshop-wlan.html">Català</a></li>
 <li><a href="../de/workshop-wlan.html">Deutsch</a></li>
 <li><a href="../en/workshop-wlan.html">English</a></li>
+<li><a href="../eo/workshop-wlan.html">Esperanto</a></li>
 <li><a href="../fr/workshop-wlan.html">Français</a></li>
 <li><a href="../fur/workshop-wlan.html">Furlan</a></li>
 <li><a href="../it/workshop-wlan.html">Italiano</a></li>
@@ -61,11 +62,11 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">La traducción de esta página aún no está completa. Hasta que lo esté, las partes sin traducir se muestran en el original en inglés.</div>
 
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Contenido</td></tr>
+<tr class="heading"><td>Índice</td></tr>
 <tr class="index"><td>
 	<a href="#gui">Joining a wireless network</a><br />
 	<a href="#commandline">Joining from the command line</a><br />
@@ -76,7 +77,7 @@
 <h1>Taller: Redes inalámbricas</h1>
 
 <p>Getting the networking to run is essential in today's need for permanent internet connection. As keeping up to date with all the different and ever changing hardware and drivers is quite impossible for a small project, Haiku relies on a <a href="http://www.freebsd.org">FreeBSD</a> compatibility layer for its networking drivers.<br />
-This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="http://www.freebsd.org/releases/12.0R/hardware.html#wlan">FreeBSD 12.0's release hardware notes</a> for a list of supported models.</p>
+This ensures a massive amount of supported hardware, though probably not 100% of what's out there. See <a href="https://www.freebsd.org/releases/13.0R/hardware#wlan">FreeBSD 13.0's release hardware notes</a> for a list of supported models.</p>
 <div class="box-info">Actualmente sólo está previsto que funcionen los dispositivos PCI, PCI-X, PCI-Express, Mini PCI, y Mini PCI-Express.<br />
 Los dispositivos PCMCIA, CardBus, ExpressCard, ISA y USB todavía requieren de trabajo adicional para que puedan ser funcionales.</div>
 
@@ -108,9 +109,9 @@ La salida muestra el nombre público (SSID), dirección MAC, intensidad de la se
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="firmware" name="firmware">Como hacer funcionar hardware compatible</a></h2>
-<p>All supported modern wireless hardware works out of the box.</p>
+<p>All supported modern wireless hardware works out of the box and you don't have to download/install any additional firmware.</p>
 
-<p>A few quite old chipsets (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) require binary firmware modules that Haiku cannot include due to licensing issues, though. To get these wireless cards to work, a simple script is included which will retrieve and install all of the needed proprietary bits for you.</p>
+<p>Only a few quite old chipsets (Intel 2100/2200/2225/2915, Broadcom 43xx, Marvell 88w8335) require binary firmware modules that Haiku cannot include due to licensing issues, though. To get these wireless cards to work, a simple script is included which will retrieve and install all of the needed proprietary bits for you.</p>
 <p>Abra una Terminal y escriba:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>Ahora repase la licencia y aceptela si está de acuerdo para instalar todos los archivos de firmware disponibles.</p>
@@ -126,8 +127,8 @@ Con esto se descargaran los archivos requeridos, y se creará una archivo zip qu
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="workshop-email.html">Workshop: Managing Email</a> 
-::  <a href="contents.html" class="uplink">Contents</a> 
+ «  <a href="workshop-email.html">Taller: Administrando el Correo Electrónico</a> 
+::  <a href="contents.html" class="uplink">Contenido</a> 
 ::  <a href="applications.html">Aplicaciones</a>  »
 </span></div>
 </div>

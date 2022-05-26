@@ -64,6 +64,14 @@
 #include "ps2_standard_mouse.h"
 
 
+//#define TRACE_PS2_MOUSE
+#ifdef TRACE_PS2_MOUSE
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...)
+#endif
+
+
 const char* kStandardMousePath[4] = {
 	"input/mouse/ps2/standard_0",
 	"input/mouse/ps2/standard_1",

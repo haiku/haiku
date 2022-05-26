@@ -10,6 +10,7 @@
 #include <boot/stage2.h>
 #include <boot/stdio.h>
 
+#include "debug.h"
 #include "efi_platform.h"
 #include "serial.h"
 
@@ -67,6 +68,18 @@ panic(const char *format, ...)
 
 	while (true)
 		kBootServices->Stall(1000000);
+}
+
+
+void
+debug_cleanup(void)
+{
+	gKernelArgs.keep_debug_output_buffer = false;
+	gKernelArgs.debug_output = kernel_args_malloc(sBufferPosition);
+	if (gKernelArgs.debug_output != NULL) {
+		memcpy(gKernelArgs.debug_output, sBuffer, sBufferPosition);
+		gKernelArgs.debug_size = sBufferPosition;
+	}
 }
 
 

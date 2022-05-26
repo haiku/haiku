@@ -369,7 +369,7 @@
 <title>Avoid Hardcoded File Paths</title>
 
 <para>Whenever your program needs to specify a particular location on the
-	system, use of the find_directory() function to generate it. If and when the
+	system, use the find_directory() function to generate it. If and when the
 	day comes that Haiku supports multiple users, your application will make a
 	smooth transition to the new architecture. This will also allow for backward
 	compatibility with older versions of BeOS, such as the change in locations
@@ -378,7 +378,7 @@
 </sect1>
 
 <sect1>
-<title>Make Your App's Look Fits in with Others</title>
+<title>Make Your App's Look Fit in with Others</title>
 
 <para>Certain function calls have been provided in the API to aid in making sure
 	that your software shares the same general look as other applications and
@@ -479,10 +479,10 @@
 	use them. If just a certain type of entry is needed, such as a
 	folder or specific type of file, make a filter that shows only those types
 	of entries. By removing unneeded items from the file navigation window, you
-	are reducing the number of choices the user must pick from and also
-	preventing him from opening the wrong kinds of files. Keep in mind that
+	are reducing the number of choices the users must pick from and also
+	preventing them from opening the wrong kinds of files. Keep in mind that
 	there may be files that may not have had their MIME type identified, so do
-	not exclude them, either. You can also make Tracker show a window for a
+	not exclude them either. You can also make Tracker show a window for a
 	particular folder in order to show the user where a particular file has been
 	stored and give them access to it directly.</para>
 </sect1>
@@ -632,8 +632,8 @@
 	away that something is and how big it is. While it might seem obvious, this
 	is often overlooked when a program is designed. The easiest places for a
 	user to click are the four corners of the screen and the pixel directly
-	under the cursor. The reason for this is because the mouse need not be moved
-	for to click on the pixel under it and the user does not have to think much
+	under the cursor. The reason for this is because the mouse does not need to be
+	moved to click on the pixel under it. The user also does not have to think much
 	when moving the cursor to a corner because as soon as it reaches an edge, it
 	can go no farther in that direction regardless of how much the mouse is
 	moved. The Deskbar is in one corner of the screen for this reason.</para>
@@ -760,7 +760,7 @@ better understand how to use your program to get something done.</para>
 		the clipboard is in as generalized a form as possible.
 
 	<segmentedlist>
-	<segtitle>Field Type</segtitle><segtitle>Name</segtitle><segtitle>Descriptions</segtitle>
+	<segtitle>Field Type</segtitle><segtitle>Name</segtitle><segtitle>Description</segtitle>
 	<seglistitem><seg>B_STRING_TYPE</seg><seg>class</seg><seg>"BBitmap"</seg></seglistitem>
 	<seglistitem><seg>B_RECT_TYPE</seg><seg>_frame</seg><seg>A BRect containing the bounds of the bitmap data in pixels</seg></seglistitem>
 	<seglistitem><seg>B_INT32_TYPE</seg><seg>_cspace</seg><seg>The color_space constant for the image data, such as B_RGBA32</seg></seglistitem>
@@ -787,15 +787,15 @@ better understand how to use your program to get something done.</para>
 	some guidelines for using them, however.
 
 <orderedlist>
-<listitem>It is appropriate for program to be a replicant if it is a lightweight
+<listitem>It is appropriate for a program to be a replicant if it is a lightweight
 	program which provides information or a feature which the user will want to
 	be able to access frequently.</listitem>
 
-<listitem>Allow for the size of the dragger handle when computing layout</listitem>
+<listitem>Allow for the size of the dragger handle when computing layout.</listitem>
 
 <listitem>Be sure it is big enough to not get lost when placed on a busy desktop
-	background. At the same time, do not take over the user's desktop unless he
-	wants this to happen. 32 pixels square is a good minimum size, for
+	background. At the same time, do not take over the user's desktop unless they
+	want this to happen. 32 pixels square is a good minimum size, for
 	example.</listitem>
 
 <listitem>Provide a reliable way for the user to control your replicant. Do not
@@ -805,7 +805,7 @@ better understand how to use your program to get something done.</para>
 	(with either button) and there are no other clickable controls.</listitem>
 
 <listitem>Place a frame around the replicant's border so that it stands out from
-	its surroundings</listitem>
+	its surroundings.</listitem>
 
 <listitem>Do not make it too visually distracting. This mainly amounts to
 	avoiding lots of bright colors for the controls and limiting the amount of

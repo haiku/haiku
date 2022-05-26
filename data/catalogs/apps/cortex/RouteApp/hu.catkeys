@@ -1,0 +1,26 @@
+1	hungarian	application/x-vnd.Cortex.Route	25925955
+Node '%name%' released	CortexRouteApp		'%name%' csomópont feloldva
+OK	CortexRouteApp		Rendben
+About Cortex/Route…	CortexRouteApp		Cortex/Route névjegy…
+File	CortexRouteApp		Fájl
+Connection '%name%' made	CortexRouteApp		'%name%' kapcsolat létrehozva
+Save nodes…	CortexRouteApp		Csomópontok mentése…
+%producer% and %consumer%	CortexRouteApp		%producer% és %consumer%
+Node '%name%' created	CortexRouteApp		'%name%' csomópont létrehozva
+Negotiated format:	CortexRouteApp		Formátum:
+Window	CortexRouteApp		Ablak
+Transport	CortexRouteApp		Átvitel
+Connection broken	CortexRouteApp		Kapcsolat megszakítva
+Untitled group	CortexRouteApp		Névtelen csoport
+Connection failed	CortexRouteApp		Sikertelen csatlakozás
+Connection '%name%' broken	CortexRouteApp		'%name%' kapcsolat megszakítva
+Between:	CortexRouteApp		Között:
+Cortex	CortexRouteApp		Cortex
+Open…	CortexRouteApp		Megnyitás…
+Pull palettes	CortexRouteApp		Teljes paletta
+Connection made	CortexRouteApp		Kapcsolat létrehozva
+Show transport	CortexRouteApp		Átvitel megjelenítése
+Show add-ons	CortexRouteApp		Kiegészítők megjelenítése
+Quit	CortexRouteApp		Kilépés
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\n© 1999-2000 Eric Moon\nMinden jog fenntartva.\n\nA Cortex csapat:\n\nChristopher Lenz: UI\nEric Moon: felület, háttér\n\nKöszönet:\nJohn Ashmun\nJon Watte\nDoug Wright\n\nTöbb felhasznált ikon a Be, Inc. tulajdona\nés engedéllyel felhasznált.
+Tried format:	CortexRouteApp		Kipróbált formátum:

@@ -63,9 +63,6 @@ public:
 };
 
 
-typedef List<ParagraphLayoutInfo, false> ParagraphLayoutList;
-
-
 class TextDocumentLayout : public BReferenceable {
 public:
 								TextDocumentLayout();
@@ -125,7 +122,8 @@ private:
 
 			TextDocumentRef		fDocument;
 			TextListenerRef		fTextListener;
-			ParagraphLayoutList	fParagraphLayouts;
+			std::vector<ParagraphLayoutInfo>
+								fParagraphLayouts;
 };
 
 

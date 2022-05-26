@@ -1,11 +1,11 @@
-1	portuguese	x-vnd.Haiku-StyledEdit	2796309255
+1	portuguese	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Estatísticas do documento
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, ficheiro não encontrado: \"%s\".
 Cut	Menus		Cortar
 Center	Menus		Ao centro
 Increase size	Menus		Aumentar tamanho
-Wrap-around search	FindandReplaceWindow		Pesquisar em todo o documento
 Page setup…	Menus		Configuração de página…
+Wrap-around search	FindandReplaceWindow		Pesquisar em todo o documento
 Untitled 	StyledEditWindow		Sem título 
 OK	Statistics		OK
 Find	FindandReplaceWindow		Procurar
@@ -29,8 +29,8 @@ Italic	Menus		Itálico
 Can't undo	Menus		Impossível desfazer
 Replace…	Menus		Substituir…
 File	Menus		Ficheiro
-Bold	Menus		Negrito
 Paste	Menus		Colar
+Bold	Menus		Negrito
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		O ficheiro \"%file%\" foi modificado por outra aplicação. Voltar a carregar?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		O ficheiro \"%file%\" foi eliminado por outra aplicação. Recuperar?
 Lines:	Statistics		Linhas:
@@ -51,6 +51,7 @@ OK	SaveAlert		OK
 Color	Menus		Cor
 Save changes to the document \"%s\"? 	QuitAlert		Guardar alterações ao documento \"%s\"? 
 StyledEdit	System name		StyledEdit
+Underline	Menus		Sublinhar
 Find:	FindandReplaceWindow		Procurar:
 Undo typing	QuitAlert		Desfazer digitação
 Error loading \"%s\":\n\t%s	LoadAlert		Erro ao abrir \"%s\":\n\t%s
@@ -68,23 +69,23 @@ OK	LoadAlert		OK
 Save	QuitAlert		Guardar
 Case-sensitive	FindandReplaceWindow		Sensível a minúsculas e maiúsculas
 Find selection	Menus		Procurar selecção
-Cancel	SaveAlert		Cancelar
 Find…	Menus		Procurar…
+Cancel	SaveAlert		Cancelar
 Revert	RevertToSavedAlert		Reverter
-Decrease size	Menus		Diminuir tamanho
 Size	Menus		Tamanho
+Decrease size	Menus		Diminuir tamanho
 Autodetect	Menus		Detetar automaticamente
 Replace next	Menus		Substituir seguinte
 OK	QuitAlert		OK
-Replace with:	FindandReplaceWindow		Substituir por:
 Edit	Menus		Editar
+Replace with:	FindandReplaceWindow		Substituir por:
 Open…	Menus		Abrir…
 Save as…	Menus		Guardar como…
 Replace	FindandReplaceWindow		Substituir
 Characters:	Statistics		Personagens:
 Don't save	QuitAlert		Não guardar
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Este ficheiro está marcado como só de leitura. Guardar as alterações ao documento \"%s\"? 
-Align	Menus		Alinhar
 Font	Menus		Tipo de letra
+Align	Menus		Alinhar
 Select all	Menus		Seleccionar tudo
 Right	Menus		À Direita

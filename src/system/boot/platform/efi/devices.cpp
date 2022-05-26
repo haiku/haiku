@@ -8,8 +8,13 @@
 #include <boot/platform.h>
 #include <boot/stage2.h>
 
+#include "Header.h"
+
 #include "efi_platform.h"
 #include <efi/protocol/block-io.h>
+
+#include "gpt.h"
+#include "gpt_known_guids.h"
 
 
 //#define TRACE_DEVICES
@@ -37,7 +42,6 @@ class EfiDevice : public Node
 			return (fBlockIo->Media->LastBlock + 1) * BlockSize(); }
 
 		uint32 BlockSize() const { return fBlockIo->Media->BlockSize; }
-		bool ReadOnly() const { return fBlockIo->Media->ReadOnly; }
 	private:
 		efi_block_io_protocol*		fBlockIo;
 };
@@ -64,12 +68,19 @@ EfiDevice::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 	off_t offset = pos % BlockSize();
 	pos /= BlockSize();
 
-	uint32 numBlocks = (offset + bufferSize + BlockSize()) / BlockSize();
-	char readBuffer[numBlocks * BlockSize()];
+	uint32 numBlocks = (offset + bufferSize + BlockSize() - 1) / BlockSize();
+
+	// TODO: We really should implement memalign and align all requests to
+	// fBlockIo->Media->IoAlign. This static alignment is large enough though
+	// to catch most required alignments.
+	char readBuffer[numBlocks * BlockSize()]
+		__attribute__((aligned(2048)));
 
 	if (fBlockIo->ReadBlocks(fBlockIo, fBlockIo->Media->MediaId,
-		pos, sizeof(readBuffer), readBuffer) != EFI_SUCCESS)
+		pos, sizeof(readBuffer), readBuffer) != EFI_SUCCESS) {
+		dprintf("%s: blockIo error reading from device!\n", __func__);
 		return B_ERROR;
+	}
 
 	memcpy(buffer, readBuffer + offset, bufferSize);
 
@@ -115,6 +126,53 @@ compute_check_sum(Node *device, off_t offset)
 }
 
 
+static bool
+device_contains_partition(EfiDevice *device, boot::Partition *partition)
+{
+	EFI::Header *header = (EFI::Header*)partition->content_cookie;
+	if (header != NULL && header->InitCheck() == B_OK) {
+		// check if device is GPT, and contains partition entry
+		uint32 blockSize = device->BlockSize();
+		gpt_table_header *deviceHeader =
+			(gpt_table_header*)malloc(blockSize);
+		ssize_t bytesRead = device->ReadAt(NULL, blockSize, deviceHeader,
+			blockSize);
+		if (bytesRead != (ssize_t)blockSize)
+			return false;
+
+		if (memcmp(deviceHeader, &header->TableHeader(),
+				sizeof(gpt_table_header)) != 0)
+			return false;
+
+		// partition->cookie == int partition entry index
+		uint32 index = (uint32)(addr_t)partition->cookie;
+		uint32 size = sizeof(gpt_partition_entry) * (index + 1);
+		gpt_partition_entry *entries = (gpt_partition_entry*)malloc(size);
+		bytesRead = device->ReadAt(NULL,
+			deviceHeader->entries_block * blockSize, entries, size);
+		if (bytesRead != (ssize_t)size)
+			return false;
+
+		if (memcmp(&entries[index], &header->EntryAt(index),
+				sizeof(gpt_partition_entry)) != 0)
+			return false;
+
+		for (size_t i = 0; i < sizeof(kTypeMap) / sizeof(struct type_map); ++i)
+			if (strcmp(kTypeMap[i].type, BFS_NAME) == 0)
+				if (kTypeMap[i].guid == header->EntryAt(index).partition_type)
+					return true;
+
+		// Our partition has an EFI header, but we couldn't find one, so bail
+		return false;
+	}
+
+	if ((partition->offset + partition->size) <= device->Size())
+			return true;
+
+	return false;
+}
+
+
 status_t
 platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 {
@@ -145,7 +203,7 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 			panic("Cannot get block device handle!");
 
 		TRACE("%s: %p: present: %s, logical: %s, removeable: %s, "
-			"blocksize: %" B_PRIuSIZE ", lastblock: %" B_PRIu64 "\n",
+			"blocksize: %" PRIu32 ", lastblock: %" PRIu64 "\n",
 			__func__, blockIo,
 			blockIo->Media->MediaPresent ? "true" : "false",
 			blockIo->Media->LogicalPartition ? "true" : "false",
@@ -170,22 +228,30 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 	return devicesList->Count() > 0 ? B_OK : B_ENTRY_NOT_FOUND;
 }
 
+
 status_t
 platform_add_block_devices(struct stage2_args *args, NodeList *devicesList)
 {
 	TRACE("%s: called\n", __func__);
 
 	//TODO: Currently we add all in platform_add_boot_device
-	return B_ENTRY_NOT_FOUND;
+	return devicesList->Count() > 0 ? B_OK : B_ENTRY_NOT_FOUND;
 }
 
+
 status_t
-platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
-		NodeList *partitions, boot::Partition **_partition)
+platform_get_boot_partitions(struct stage2_args *args, Node *bootDevice,
+		NodeList *partitions, NodeList *bootPartitions)
 {
-	TRACE("%s: called\n", __func__);
-	*_partition = (boot::Partition*)partitions->GetIterator().Next();
-	return *_partition != NULL ? B_OK : B_ENTRY_NOT_FOUND;
+	NodeIterator iterator = partitions->GetIterator();
+	boot::Partition *partition = NULL;
+	while ((partition = (boot::Partition*)iterator.Next()) != NULL) {
+		if (device_contains_partition((EfiDevice*)bootDevice, partition)) {
+			bootPartitions->Insert(partition);
+		}
+	}
+
+	return bootPartitions->Count() > 0 ? B_OK : B_ENTRY_NOT_FOUND;
 }
 
 
@@ -194,7 +260,6 @@ platform_register_boot_device(Node *device)
 {
 	TRACE("%s: called\n", __func__);
 
-	EfiDevice *efiDevice = (EfiDevice *)device;
 	disk_identifier identifier;
 
 	identifier.bus_type = UNKNOWN_BUS;
@@ -208,9 +273,8 @@ platform_register_boot_device(Node *device)
 			offset);
 	}
 
-	gBootVolume.SetInt32(BOOT_METHOD, efiDevice->ReadOnly() ? BOOT_METHOD_CD:
-		BOOT_METHOD_HARD_DISK);
-	gBootVolume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, efiDevice->ReadOnly());
+	// ...HARD_DISK, as we pick partition and have checksum (no need to use _CD)
+	gBootVolume.SetInt32(BOOT_METHOD, BOOT_METHOD_HARD_DISK);
 	gBootVolume.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
 		&identifier, sizeof(disk_identifier));
 

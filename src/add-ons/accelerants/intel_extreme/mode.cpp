@@ -10,6 +10,7 @@
  */
 
 
+#include <algorithm>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -48,23 +49,39 @@ get_color_space_format(const display_mode &mode, uint32 &colorMode,
 
 	switch (mode.space) {
 		case B_RGB32_LITTLE:
-			colorMode = DISPLAY_CONTROL_RGB32;
+			if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_LAKE)) {
+				colorMode = DISPLAY_CONTROL_RGB32_SKY;
+			} else {
+				colorMode = DISPLAY_CONTROL_RGB32;
+			}
 			bytesPerPixel = 4;
 			bitsPerPixel = 32;
 			break;
 		case B_RGB16_LITTLE:
-			colorMode = DISPLAY_CONTROL_RGB16;
+			if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_LAKE)) {
+				colorMode = DISPLAY_CONTROL_RGB16_SKY;
+			} else {
+				colorMode = DISPLAY_CONTROL_RGB16;
+			}
 			bytesPerPixel = 2;
 			bitsPerPixel = 16;
 			break;
 		case B_RGB15_LITTLE:
-			colorMode = DISPLAY_CONTROL_RGB15;
+			if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_LAKE)) {
+				colorMode = DISPLAY_CONTROL_RGB15_SKY;
+			} else {
+				colorMode = DISPLAY_CONTROL_RGB15;
+			}
 			bytesPerPixel = 2;
 			bitsPerPixel = 15;
 			break;
 		case B_CMAP8:
 		default:
-			colorMode = DISPLAY_CONTROL_CMAP8;
+			if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_LAKE)) {
+				colorMode = DISPLAY_CONTROL_CMAP8_SKY;
+			} else {
+				colorMode = DISPLAY_CONTROL_CMAP8;
+			}
 			bytesPerPixel = 1;
 			bitsPerPixel = 8;
 			break;
@@ -111,26 +128,37 @@ sanitize_display_mode(display_mode& mode)
 
 
 static void
-set_frame_buffer_registers(uint32 baseRegister, uint32 surfaceRegister)
+set_frame_buffer_registers(uint32 offset)
 {
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
-	display_mode &mode = gInfo->current_mode;
+	display_mode &mode = sharedInfo.current_mode;
+	uint32 bytes_per_pixel = (sharedInfo.bits_per_pixel + 7) / 8;
 
 	if (sharedInfo.device_type.InGroup(INTEL_GROUP_96x)
 		|| sharedInfo.device_type.InGroup(INTEL_GROUP_G4x)
 		|| sharedInfo.device_type.InGroup(INTEL_GROUP_ILK)
 		|| sharedInfo.device_type.InFamily(INTEL_FAMILY_SER5)
+		|| sharedInfo.device_type.InFamily(INTEL_FAMILY_LAKE)
 		|| sharedInfo.device_type.InFamily(INTEL_FAMILY_SOC0)) {
-		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
-			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
-		read32(baseRegister);
-		write32(surfaceRegister, sharedInfo.frame_buffer_offset);
-		read32(surfaceRegister);
+		if (sharedInfo.device_type.InGroup(INTEL_GROUP_HAS)) {
+//			|| sharedInfo.device_type.InGroup(INTEL_GROUP_SKY)) {
+			write32(INTEL_DISPLAY_A_OFFSET_HAS + offset,
+				((uint32)mode.v_display_start << 16)
+					| (uint32)mode.h_display_start);
+			read32(INTEL_DISPLAY_A_OFFSET_HAS + offset);
+		} else {
+			write32(INTEL_DISPLAY_A_BASE + offset,
+				mode.v_display_start * sharedInfo.bytes_per_row
+				+ mode.h_display_start * bytes_per_pixel);
+			read32(INTEL_DISPLAY_A_BASE + offset);
+		}
+		write32(INTEL_DISPLAY_A_SURFACE + offset, sharedInfo.frame_buffer_offset);
+		read32(INTEL_DISPLAY_A_SURFACE + offset);
 	} else {
-		write32(baseRegister, sharedInfo.frame_buffer_offset
+		write32(INTEL_DISPLAY_A_BASE + offset, sharedInfo.frame_buffer_offset
 			+ mode.v_display_start * sharedInfo.bytes_per_row
-			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
-		read32(baseRegister);
+			+ mode.h_display_start * bytes_per_pixel);
+		read32(INTEL_DISPLAY_A_BASE + offset);
 	}
 }
 
@@ -140,8 +168,8 @@ set_frame_buffer_base()
 {
 	// TODO we always set both displays to the same address. When we support
 	// multiple framebuffers, they should get different addresses here.
-	set_frame_buffer_registers(INTEL_DISPLAY_A_BASE, INTEL_DISPLAY_A_SURFACE);
-	set_frame_buffer_registers(INTEL_DISPLAY_B_BASE, INTEL_DISPLAY_B_SURFACE);
+	set_frame_buffer_registers(0);
+	set_frame_buffer_registers(INTEL_DISPLAY_OFFSET);
 }
 
 
@@ -152,9 +180,9 @@ limit_modes_for_gen3_lvds(display_mode* mode)
 	// display.
 	// FIXME do this only for that display. The whole display mode logic
 	// needs to be adjusted to know which display we're talking about.
-	if (gInfo->shared_info->panel_mode.virtual_width < mode->virtual_width)
+	if (gInfo->shared_info->panel_timing.h_display < mode->timing.h_display)
 		return false;
-	if (gInfo->shared_info->panel_mode.virtual_height < mode->virtual_height)
+	if (gInfo->shared_info->panel_timing.v_display < mode->timing.v_display)
 		return false;
 
 	return true;
@@ -173,8 +201,19 @@ create_mode_list(void)
 			continue;
 
 		status_t status = gInfo->ports[i]->GetEDID(&gInfo->edid_info);
-		if (status == B_OK)
+		if (status == B_OK) {
 			gInfo->has_edid = true;
+			break;
+		}
+	}
+	// use EDID found at boot time if there since we don't have any ourselves
+	if (!gInfo->has_edid && gInfo->shared_info->has_vesa_edid_info) {
+		TRACE("%s: Using VESA edid info\n", __func__);
+		memcpy(&gInfo->edid_info, &gInfo->shared_info->vesa_edid_info,
+			sizeof(edid1_info));
+		// show in log what we got
+		edid_dump(&gInfo->edid_info);
+		gInfo->has_edid = true;
 	}
 
 	display_mode* list;
@@ -203,9 +242,17 @@ create_mode_list(void)
 		if (gInfo->shared_info->device_type.Generation() < 4)
 			limitModes = limit_modes_for_gen3_lvds;
 
+		display_mode mode;
+		mode.timing = gInfo->shared_info->panel_timing;
+		mode.space = B_RGB32;
+		mode.virtual_width = mode.timing.h_display;
+		mode.virtual_height = mode.timing.v_display;
+		mode.h_display_start = 0;
+		mode.v_display_start = 0;
+		mode.flags = 0;
+
 		// TODO: support lower modes via scaling and windowing
-		gInfo->mode_list_area = create_display_modes("intel extreme modes",
-			NULL, &gInfo->shared_info->panel_mode, 1,
+		gInfo->mode_list_area = create_display_modes("intel extreme modes", NULL, &mode, 1,
 			supportedSpaces, colorSpaceCount, limitModes, &list, &count);
 	} else {
 		// Otherwise return the 'real' list of modes
@@ -264,27 +311,24 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 {
 	CALLED();
 
-	// first search for the specified mode in the list, if no mode is found
-	// try to fix the target mode in sanitize_display_mode
-	// TODO: Only sanitize_display_mode should be used. However, at the moment
-	// the mode constraints are not optimal and do not work for all
-	// configurations.
-	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {
-		display_mode *mode = &gInfo->mode_list[i];
+	display_mode mode = *target;
 
-		// TODO: improve this, ie. adapt pixel clock to allowed values!!!
-
-		if (target->virtual_width != mode->virtual_width
-			|| target->virtual_height != mode->virtual_height
-			|| target->space != mode->space) {
-			continue;
-		}
-
-		*target = *mode;
-		return B_OK;
+	if (sanitize_display_mode(*target)) {
+		TRACE("Video mode was adjusted by sanitize_display_mode\n");
+		TRACE("Initial mode: Hd %d Hs %d He %d Ht %d Vd %d Vs %d Ve %d Vt %d\n",
+			mode.timing.h_display, mode.timing.h_sync_start,
+			mode.timing.h_sync_end, mode.timing.h_total,
+			mode.timing.v_display, mode.timing.v_sync_start,
+			mode.timing.v_sync_end, mode.timing.v_total);
+		TRACE("Sanitized: Hd %d Hs %d He %d Ht %d Vd %d Vs %d Ve %d Vt %d\n",
+			target->timing.h_display, target->timing.h_sync_start,
+			target->timing.h_sync_end, target->timing.h_total,
+			target->timing.v_display, target->timing.v_sync_start,
+			target->timing.v_sync_end, target->timing.v_total);
 	}
-
-	sanitize_display_mode(*target);
+	// (most) modeflags are outputs from us (the driver). So we should
+	// set them depending on the mode and the current hardware config
+	target->flags |= B_SCROLL;
 
 	return is_display_mode_within_bounds(*target, *low, *high)
 		? B_OK : B_BAD_VALUE;
@@ -297,24 +341,13 @@ intel_set_display_mode(display_mode* mode)
 	if (mode == NULL)
 		return B_BAD_VALUE;
 
-	TRACE("%s(%" B_PRIu16 "x%" B_PRIu16 ")\n", __func__,
-		mode->virtual_width, mode->virtual_height);
+	TRACE("%s(%" B_PRIu16 "x%" B_PRIu16 ", virtual: %" B_PRIu16 "x%" B_PRIu16 ")\n", __func__,
+		mode->timing.h_display, mode->timing.v_display, mode->virtual_width, mode->virtual_height);
 
 	display_mode target = *mode;
 
-	if (sanitize_display_mode(target)) {
-		TRACE("Video mode was adjusted by sanitize_display_mode\n");
-		TRACE("Initial mode: Hd %d Hs %d He %d Ht %d Vd %d Vs %d Ve %d Vt %d\n",
-			mode->timing.h_display, mode->timing.h_sync_start,
-			mode->timing.h_sync_end, mode->timing.h_total,
-			mode->timing.v_display, mode->timing.v_sync_start,
-			mode->timing.v_sync_end, mode->timing.v_total);
-		TRACE("Sanitized: Hd %d Hs %d He %d Ht %d Vd %d Vs %d Ve %d Vt %d\n",
-			target.timing.h_display, target.timing.h_sync_start,
-			target.timing.h_sync_end, target.timing.h_total,
-			target.timing.v_display, target.timing.v_sync_start,
-			target.timing.v_sync_end, target.timing.v_total);
-	}
+	if (intel_propose_display_mode(&target, &target, &target) != B_OK)
+		return B_BAD_VALUE;
 
 	uint32 colorMode, bytesPerRow, bitsPerPixel;
 	get_color_space_format(target, colorMode, bytesPerRow, bitsPerPixel);
@@ -341,7 +374,7 @@ intel_set_display_mode(display_mode* mode)
 			base) < B_OK) {
 		// oh, how did that happen? Unfortunately, there is no really good way
 		// back. Try to restore a framebuffer for the previous mode, at least.
-		if (intel_allocate_memory(gInfo->current_mode.virtual_height
+		if (intel_allocate_memory(sharedInfo.current_mode.virtual_height
 				* sharedInfo.bytes_per_row, 0, base) == B_OK) {
 			sharedInfo.frame_buffer = base;
 			sharedInfo.frame_buffer_offset = base
@@ -468,18 +501,22 @@ intel_set_display_mode(display_mode* mode)
 	// Always set both pipes, just in case
 	// TODO rework this when we get multiple head support with different
 	// resolutions
-	write32(INTEL_DISPLAY_A_BYTES_PER_ROW, bytesPerRow);
-	write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow);
+	if (sharedInfo.device_type.InFamily(INTEL_FAMILY_LAKE)) {
+		write32(INTEL_DISPLAY_A_BYTES_PER_ROW, bytesPerRow >> 6);
+		write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow >> 6);
+	} else {
+		write32(INTEL_DISPLAY_A_BYTES_PER_ROW, bytesPerRow);
+		write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow);
+	}
 
 	// update shared info
-	gInfo->current_mode = target;
-
-	// TODO: move to gInfo
+	sharedInfo.current_mode = target;
 	sharedInfo.bytes_per_row = bytesPerRow;
 	sharedInfo.bits_per_pixel = bitsPerPixel;
 
 	set_frame_buffer_base();
 		// triggers writing back double-buffered registers
+		// which is INTEL_DISPLAY_X_BYTES_PER_ROW only apparantly
 
 	// Second register dump
 	//dump_registers();
@@ -493,10 +530,33 @@ intel_get_display_mode(display_mode* _currentMode)
 {
 	CALLED();
 
-	*_currentMode = gInfo->current_mode;
+	*_currentMode = gInfo->shared_info->current_mode;
 
 	// This seems unreliable. We should always know the current_mode
 	//retrieve_current_mode(*_currentMode, INTEL_DISPLAY_A_PLL);
+	return B_OK;
+}
+
+
+status_t
+intel_get_preferred_mode(display_mode* preferredMode)
+{
+	TRACE("%s\n", __func__);
+	display_mode mode;
+
+	if (gInfo->has_edid || !gInfo->shared_info->got_vbt
+			|| !gInfo->shared_info->device_type.IsMobile()) {
+		return B_ERROR;
+	}
+
+	mode.timing = gInfo->shared_info->panel_timing;
+	mode.space = B_RGB32;
+	mode.virtual_width = mode.timing.h_display;
+	mode.virtual_height = mode.timing.v_display;
+	mode.h_display_start = 0;
+	mode.v_display_start = 0;
+	mode.flags = 0;
+	memcpy(preferredMode, &mode, sizeof(mode));
 	return B_OK;
 }
 
@@ -515,14 +575,29 @@ intel_get_edid_info(void* info, size_t size, uint32* _version)
 }
 
 
+// Get the backlight registers. We need the backlight frequency (we never write it, but we ned to
+// know it's value as the duty cycle/brihtness level is proportional to it), and the duty cycle
+// register (read to get the current backlight value, written to set it). On older generations,
+// the two values are in the same register (16 bits each), on newer ones there are two separate
+// registers.
 static int32_t
-intel_get_backlight_register(bool read)
+intel_get_backlight_register(bool period)
 {
+	if (gInfo->shared_info->pch_info >= INTEL_PCH_CNP) {
+		if (period)
+			return PCH_SOUTH_BLC_PWM_PERIOD;
+		else
+			return PCH_SOUTH_BLC_PWM_DUTY_CYCLE;
+	} else if (gInfo->shared_info->pch_info >= INTEL_PCH_SPT)
+		return BLC_PWM_PCH_CTL2;
+
 	if (gInfo->shared_info->pch_info == INTEL_PCH_NONE)
 		return MCH_BLC_PWM_CTL;
-	
-	if (read)
-		return PCH_SBLC_PWM_CTL2;
+
+	// FIXME this mixup of south and north registers seems very strange; it should either be
+	// a single register with both period and duty in it, or two separate registers.
+	if (period)
+		return PCH_SOUTH_BLC_PWM_PERIOD;
 	else
 		return PCH_BLC_PWM_CTL;
 }
@@ -536,10 +611,69 @@ intel_set_brightness(float brightness)
 	if (brightness < 0 || brightness > 1)
 		return B_BAD_VALUE;
 
-	uint32_t period = read32(intel_get_backlight_register(true)) >> 16;
-	uint32_t duty = (uint32_t)(period * brightness) & 0xfffe;
-		/* Setting the low bit seems to give strange results on some Atom machines */
-	write32(intel_get_backlight_register(false), duty | (period << 16));
+	// The "duty cycle" is a proportion of the period (0 = backlight off,
+	// period = maximum brightness).
+	// Additionally we don't want it to be completely 0 here, because then
+	// it becomes hard to turn the display on again (at least until we get
+	// working ACPI keyboard shortcuts for this). So always keep the backlight
+	// at least a little bit on for now.
+
+	if (gInfo->shared_info->pch_info >= INTEL_PCH_CNP) {
+		uint32_t period = read32(intel_get_backlight_register(true));
+
+		uint32_t duty = (uint32_t)(period * brightness);
+		duty = std::max(duty, (uint32_t)gInfo->shared_info->min_brightness);
+
+		write32(intel_get_backlight_register(false), duty);
+	} else 	if (gInfo->shared_info->pch_info >= INTEL_PCH_SPT) {
+		uint32_t period = read32(intel_get_backlight_register(true)) >> 16;
+
+		uint32_t duty = (uint32_t)(period * brightness) & 0xffff;
+		duty = std::max(duty, (uint32_t)gInfo->shared_info->min_brightness);
+
+		write32(intel_get_backlight_register(false), duty | (period << 16));
+	} else {
+		// On older devices there is a single register with both period and duty cycle
+		uint32 tmp = read32(intel_get_backlight_register(true));
+		bool legacyMode = false;
+		if (gInfo->shared_info->device_type.Generation() == 2
+			|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_915M)
+			|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_945M)) {
+			legacyMode = (tmp & BLM_LEGACY_MODE) != 0;
+		}
+
+		uint32_t period = tmp >> 16;
+
+		uint32_t mask = 0xffff;
+		uint32_t shift = 0;
+		if (gInfo->shared_info->device_type.Generation() < 4) {
+			// The low bit must be masked out because
+			// it is apparently used for something else on some Atom machines (no
+			// reference to that in the documentation that I know of).
+			mask = 0xfffe;
+			shift = 1;
+			period = tmp >> 17;
+		}
+		if (legacyMode)
+			period *= 0xfe;
+		uint32_t duty = (uint32_t)(period * brightness);
+		if (legacyMode) {
+			uint8 lpc = duty / 0xff + 1;
+			duty /= lpc;
+
+			// set pci config reg with lpc
+			intel_brightness_legacy brightnessLegacy;
+			brightnessLegacy.magic = INTEL_PRIVATE_DATA_MAGIC;
+			brightnessLegacy.lpc = lpc;
+			ioctl(gInfo->device, INTEL_SET_BRIGHTNESS_LEGACY, &brightnessLegacy,
+				sizeof(brightnessLegacy));
+		}
+
+		duty = std::max(duty, (uint32_t)gInfo->shared_info->min_brightness);
+		duty <<= shift;
+
+		write32(intel_get_backlight_register(false), (duty & mask) | (tmp & ~mask));
+	}
 
 	return B_OK;
 }
@@ -553,8 +687,37 @@ intel_get_brightness(float* brightness)
 	if (brightness == NULL)
 		return B_BAD_VALUE;
 
-	uint16_t period = read32(intel_get_backlight_register(true)) >> 16;
-	uint16_t   duty = read32(intel_get_backlight_register(false)) & 0xffff;
+	uint32_t duty;
+	uint32_t period;
+
+	if (gInfo->shared_info->pch_info >= INTEL_PCH_CNP) {
+		period = read32(intel_get_backlight_register(true));
+		duty = read32(intel_get_backlight_register(false));
+	} else {
+		uint32 tmp = read32(intel_get_backlight_register(true));
+		bool legacyMode = false;
+		if (gInfo->shared_info->device_type.Generation() == 2
+			|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_915M)
+			|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_945M)) {
+			legacyMode = (tmp & BLM_LEGACY_MODE) != 0;
+		}
+		period = tmp >> 16;
+		duty = read32(intel_get_backlight_register(false)) & 0xffff;
+		if (legacyMode) {
+			period *= 0xff;
+
+			// get lpc from pci config reg
+			intel_brightness_legacy brightnessLegacy;
+			brightnessLegacy.magic = INTEL_PRIVATE_DATA_MAGIC;
+			ioctl(gInfo->device, INTEL_GET_BRIGHTNESS_LEGACY, &brightnessLegacy,
+				sizeof(brightnessLegacy));
+			duty *= brightnessLegacy.lpc;
+		}
+		if (gInfo->shared_info->device_type.Generation() < 4) {
+			period >>= 1;
+			duty >>= 1;
+		}
+	}
 	*brightness = (float)duty / period;
 
 	return B_OK;
@@ -605,12 +768,10 @@ intel_get_pixel_clock_limits(display_mode* mode, uint32* _low, uint32* _high)
 status_t
 intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 {
-	CALLED();
-
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	Autolock locker(sharedInfo.accelerant_lock);
 
-	display_mode &mode = gInfo->current_mode;
+	display_mode &mode = sharedInfo.current_mode;
 
 	if (horizontalStart + mode.timing.h_display > mode.virtual_width
 		|| verticalStart + mode.timing.v_display > mode.virtual_height)

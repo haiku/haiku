@@ -1,6 +1,6 @@
 /*
  * Copyright 2015, TigerKid001.
- * Copyright 2020, Andrew Lindesay <apl@lindesay.co.nz>
+ * Copyright 2020-2022, Andrew Lindesay <apl@lindesay.co.nz>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -21,7 +21,9 @@
 #include <StringFormat.h>
 #include <StringItem.h>
 
+#include "GeneralContentScrollView.h"
 #include "Logger.h"
+#include "PackageUtils.h"
 
 #include <package/PackageDefs.h>
 #include <package/hpkg/NoErrorOutput.h>
@@ -41,40 +43,6 @@ using BPackageKit::BHPKG::BPackageReader;
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PackageContentsView"
 
-
-//! Layouts the scrollbar so it looks nice with no border and the document
-// window look.
-class CustomScrollView : public BScrollView {
-public:
-	CustomScrollView(const char* name, BView* target)
-		:
-		BScrollView(name, target, 0, false, true, B_NO_BORDER)
-	{
-	}
-
-	virtual void DoLayout()
-	{
-		BRect innerFrame = Bounds();
-		innerFrame.right -= B_V_SCROLL_BAR_WIDTH + 1;
-
-		BView* target = Target();
-		if (target != NULL) {
-			Target()->MoveTo(innerFrame.left, innerFrame.top);
-			Target()->ResizeTo(innerFrame.Width(), innerFrame.Height());
-		}
-
-		BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
-		if (scrollBar != NULL) {
-			BRect rect = innerFrame;
-			rect.left = rect.right + 1;
-			rect.right = rect.left + B_V_SCROLL_BAR_WIDTH;
-			rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
-
-			scrollBar->MoveTo(rect.left, rect.top);
-			scrollBar->ResizeTo(rect.Width(), rect.Height());
-		}
-	}
-};
 
 // #pragma mark - PackageEntryItem
 
@@ -237,8 +205,8 @@ PackageContentsView::PackageContentsView(const char* name)
 	fContentListView = new BOutlineListView("content list view",
 		B_SINGLE_SELECTION_LIST);
 
-	BScrollView* scrollView = new CustomScrollView("contents scroll view",
-		fContentListView);
+	BScrollView* scrollView = new GeneralContentScrollView(
+		"contents scroll view", fContentListView);
 
 	BLayoutBuilder::Group<>(this)
 		.Add(scrollView, 1.0f)
@@ -281,7 +249,7 @@ PackageContentsView::SetPackage(const PackageInfoRef& package)
 	// to read contents where we previously could not. (For example, the
 	// package has been installed.)
 	if (fPackage == package
-		&& (package.Get() == NULL || package->State() == fLastPackageState)) {
+		&& (!package.IsSet() || package->State() == fLastPackageState)) {
 		return;
 	}
 
@@ -290,13 +258,13 @@ PackageContentsView::SetPackage(const PackageInfoRef& package)
 	{
 		BAutolock lock(&fPackageLock);
 		fPackage = package;
-		fLastPackageState = package.Get() != NULL ? package->State() : NONE;
+		fLastPackageState = package.IsSet() ? package->State() : NONE;
 	}
 
 	// if the package is not installed and is not a local file on disk then
 	// there is no point in attempting to populate data for it.
 
-	if (package.Get() != NULL
+	if (package.IsSet()
 			&& (package->State() == ACTIVATED || package->IsLocalFile())) {
 		release_sem_etc(fContentPopulatorSem, 1, 0);
 	}
@@ -344,7 +312,7 @@ PackageContentsView::_ContentPopulatorThread(void* arg)
 			package = view->fPackage;
 		}
 
-		if (package.Get() != NULL) {
+		if (package.IsSet()) {
 			if (!view->_PopulatePackageContents(*package.Get())) {
 				if (view->LockLooperWithTimeout(1000000) == B_OK) {
 					view->fContentListView->AddItem(
@@ -365,29 +333,9 @@ PackageContentsView::_PopulatePackageContents(const PackageInfo& package)
 {
 	BPath packagePath;
 
-	// Obtain path to the package file
-	if (package.IsLocalFile()) {
-		BString pathString = package.LocalFilePath();
-		packagePath.SetTo(pathString.String());
-	} else {
-		int32 installLocation = _InstallLocation(package);
-		if (installLocation == B_PACKAGE_INSTALLATION_LOCATION_SYSTEM) {
-			if (find_directory(B_SYSTEM_PACKAGES_DIRECTORY, &packagePath)
-				!= B_OK) {
-				return false;
-			}
-		} else if (installLocation == B_PACKAGE_INSTALLATION_LOCATION_HOME) {
-			if (find_directory(B_USER_PACKAGES_DIRECTORY, &packagePath)
-				!= B_OK) {
-				return false;
-			}
-		} else {
-			HDINFO("PackageContentsView::_PopulatePackageContents(): "
-				"unknown install location");
-			return false;
-		}
-
-		packagePath.Append(package.FileName());
+	if (PackageUtils::DeriveLocalFilePath(&package, packagePath) != B_OK) {
+		HDDEBUG("unable to obtain local file path");
+		return false;
 	}
 
 	// Setup a BPackageReader
@@ -414,18 +362,4 @@ PackageContentsView::_PopulatePackageContents(const PackageInfo& package)
 		// populating the contents early.
 	}
 	return true;
-}
-
-
-int32
-PackageContentsView::_InstallLocation(const PackageInfo& package) const
-{
-	const PackageInstallationLocationSet& locations
-		= package.InstallationLocations();
-
-	// If the package is already installed, return its first installed location
-	if (locations.size() != 0)
-		return *locations.begin();
-
-	return B_PACKAGE_INSTALLATION_LOCATION_SYSTEM;
 }

@@ -1,9 +1,5 @@
-1	esperanto	x-vnd.Haiku-WonderBrushTranslator	1289038178
-Version %d.%d.%d, %s	WonderBrushView		Versio %d.%d.%d, %s
-WonderBrush image translator	WonderBrushTranslator		WonderBrush bildotradukilo
-WBI Settings	WonderBrushTranslator		Agordo de WBI
+1	esperanto	x-vnd.Haiku-WonderBrushTranslator	2764474812
 WBI Settings	WonderBrushMain		Agordo de WBI
-WonderBrush images	WonderBrushTranslator		WonderBrush bildoj
-WonderBrush image	WonderBrushTranslator		WonderBrush bildo
-WonderBrush image translator	WonderBrushView		WonderBrush bildotradukilo
+Version %d.%d.%d, %s	WonderBrushView		Versio %d.%d.%d, %s
 written by:	WonderBrushView		verkis:
+WonderBrush image translator	WonderBrushView		WonderBrush bildotradukilo

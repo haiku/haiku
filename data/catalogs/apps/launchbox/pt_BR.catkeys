@@ -1,16 +1,17 @@
-1	portuguese (brazil)	x-vnd.Haiku-LaunchBox	3692177981
+1	portuguese (brazil)	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		Editar descrição...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Deseja fechar esta barra?\n(A barra não será lembrada.)
 OK	LaunchBox		OK
 Ignore double-click	LaunchBox		Ignorar clique duplo
-Show on all workspaces	LaunchBox		Mostrar em todos os espaços de trabalho
+Show on all workspaces	LaunchBox		Mostrar em todas as áreas de trabalho
 Name Panel	LaunchBox		Nome do painel
+Autostart	LaunchBox		Iniciar automaticamente
 Clone	LaunchBox		Clonar
 Description for '%3'	LaunchBox		Descrição para '%3'
 Show window border	LaunchBox		Mostrar borda da janela
 \n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nFalhou ao lançar aplicação com assinatura '%2'.\n\nErro:
 Failed to launch 'something', error in Pad data.	LaunchBox		Falhou ao lançar 'algo', erro nos dados da Plataforma.
-LaunchBox	System name		LaunchBox
+LaunchBox	System name		Caixa de lançamento
 Auto-raise	LaunchBox		Auto sobrepor
 Icon size	LaunchBox		Tamanho do ícone
 Open containing folder	LaunchBox		Abrir conteúdo da pasta
@@ -31,5 +32,5 @@ Remove button	LaunchBox		Remover botão
 Quit	LaunchBox		Sair
 Horizontal layout	LaunchBox		Orientação horizontal
 New	LaunchBox		Novo
-Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Falha em enviar o comando 'open folder' para o Tracker.\n\nErro:
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Falha em enviar o comando 'open folder' para o Tracker.\n\nErro: 
 Pad %1	LaunchBox		Plataforma %1

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Keymap	1075970008
+1	russian	x-vnd.Haiku-Keymap	2850776429
 Key	Modifier keys window	As in a computer keyboard key	Клавиша
 Japanese	KeymapNames		Японская
 US	KeymapNames		США
@@ -6,6 +6,7 @@ PG ↑	Keyboard Layout View	Very short for 'page up'	PgUp
 Brazilian	KeymapNames		Бразильская
 ThinkPad (US)	KeyboardLayoutNames		ThinkPad (US)
 Right control	Keyboard Layout View		Правый control
+X-Bows Nature	KeyboardLayoutNames		X-Bows Nature
 Dvorak	KeymapNames		Дворак
 Option:	Modifier keys window	Option key role name	Option:
 Cancel	Modifier keys window		Отмена
@@ -22,8 +23,8 @@ Belgian (point)	KeymapNames		Бельгийская с точкой
 Finnish	KeymapNames		Финская
 Num lock	Keyboard Layout View		Num lock
 Switch shortcut keys to Windows/Linux mode	Keymap window		Переключить раскладку в режим Windows/Linux
-Option	Keyboard Layout View	Option key	Option
 Spanish (Dvorak)	KeymapNames		Испанская (Дворак)
+Option	Keyboard Layout View	Option key	Option
 Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		США-международная
 Right option	Keyboard Layout View		Правый option
@@ -45,8 +46,8 @@ Apple Aluminium International	KeyboardLayoutNames		Apple Aluminium междун�
 Win/Cmd key	Modifier keys window	Label of the \"Windows\" key (PC)/Command key (Mac)	Клавиша Win/Cmd
 PG ↓	Keyboard Layout View	Very short for 'page down'	PgDn
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (US)
-Apple Aluminum	KeyboardLayoutNames		Apple Aluminium
 Spanish	KeymapNames		Испанская
+Apple Aluminum	KeyboardLayoutNames		Apple Aluminium
 HOME	Keyboard Layout View		HOME
 COMMAND	Keyboard Layout View		COMMAND
 Ukrainian (Mac)	KeymapNames		Украинская (Mac)
@@ -54,10 +55,10 @@ Command:	Modifier keys window	Command key role name	Command:
 French (Bépo)	KeymapNames		Французская (Bépo)
 Russian (Typewriter)	KeymapNames		Русская (машинопись)
 Acute trigger	Keymap window		Аксант эгю
-Italian	KeymapNames		Итальянская
 ThinkPad T400s International	KeyboardLayoutNames		ThinkPad T400s International
-Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (US)
+Italian	KeymapNames		Итальянская
 Kinesis Ergo Elan International	KeyboardLayoutNames		Kinesis Ergo Elan международная
+Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (US)
 French (NF Z71-300)	KeymapNames		Французский (NF Z71-300)
 Modifier keys	Modifier keys window		Клавиши-модификаторы
 ThinkPad X1 International	KeyboardLayoutNames		ThinkPad X1 международная
@@ -89,6 +90,7 @@ Esperanto	KeymapNames		Эсперанто
 Belarusian	KeymapNames		Беларуская
 Warning: left and right key roles do not match	Modifier keys window		Внимание: роль левой и правой клавиши не совпадают
 Circumflex trigger	Keymap window		Циркумфлекс
+Fizzbook NL2	KeyboardLayoutNames		Fizzbook NL2
 Caps lock	Keyboard Layout View		Caps lock
 Left shift	Keyboard Layout View		Левый shift
 Russian (Yawert)	KeymapNames		Русская (фонетическая)
@@ -155,8 +157,8 @@ Font	Keymap window		Шрифт
 Danish	KeymapNames		Датская
 Generic 104-key	KeyboardLayoutNames		Типовая 104-клавиши
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Клавиша Shift
-PAUSE	Keyboard Layout View		PAUSE
 Russian	KeymapNames		Русская
+PAUSE	Keyboard Layout View		PAUSE
 TypeMatrix 2030	KeyboardLayoutNames		TypeMatrix 2030
 Romanian	KeymapNames		Румынская
 CMD	Keyboard Layout View	Very short for 'command'	CMD

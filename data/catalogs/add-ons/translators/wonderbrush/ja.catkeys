@@ -1,9 +1,9 @@
 1	japanese	x-vnd.Haiku-WonderBrushTranslator	1289038178
-Version %d.%d.%d, %s	WonderBrushView		バージョン %d.%d.%d, %s
 WonderBrush image translator	WonderBrushTranslator		WonderBrush イメージトランスレーター
-WBI Settings	WonderBrushTranslator		WBI 設定
 WBI Settings	WonderBrushMain		WBI 設定
-WonderBrush images	WonderBrushTranslator		WonderBrush イメージ
-WonderBrush image	WonderBrushTranslator		WonderBrush イメージ
-WonderBrush image translator	WonderBrushView		WonderBrush イメージトランスレーター
+Version %d.%d.%d, %s	WonderBrushView		バージョン %d.%d.%d, %s
 written by:	WonderBrushView		作者:
+WonderBrush images	WonderBrushTranslator		WonderBrush イメージ
+WonderBrush image translator	WonderBrushView		WonderBrush イメージトランスレーター
+WonderBrush image	WonderBrushTranslator		WonderBrush イメージ
+WBI Settings	WonderBrushTranslator		WBI 設定

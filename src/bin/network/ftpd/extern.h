@@ -46,7 +46,7 @@ void	fatalerror(char *);
 void    ftpd_logwtmp(char *, char *, struct sockaddr *addr);
 int	ftpd_pclose(FILE *);
 FILE   *ftpd_popen(char *, char *);
-char   *ftpd_getline(char *, int, FILE *);
+int   *ftpd_getline(char *, int, FILE *);
 void	lreply(int, const char *, ...) __printflike(2, 3);
 void	makedir(char *);
 void	nack(char *);
@@ -61,9 +61,6 @@ char   *renamefrom(char *);
 void	reply(int, const char *, ...) __printflike(2, 3);
 void	retrieve(char *, char *);
 void	send_file_list(char *);
-#ifdef OLD_SETPROCTITLE
-void	setproctitle(const char *, ...);
-#endif
 void	statcmd(void);
 void	statfilecmd(char *);
 void	store(char *, char *, int);

@@ -1,0 +1,33 @@
+1	german	application/x-vnd.Cortex.MediaRoutingView	510650492
+Lock group	MediaNodePanel		Gruppe sperren
+%refname% (no file)	MediaNodePanel		%refname% (keine Datei)
+Video output	MediaRoutingView		Videoausgang
+Icon view	MediaRoutingView		Icon-Ansicht
+OK	MediaRoutingView		OK
+Advanced	MediaNodePanel		Erweitert
+Audio input	MediaRoutingView		Audioeingang
+Run mode	MediaNodePanel		Laufmodus
+Could not load '%filename%'	MediaRoutingView		'%filename%' konnte nicht geladen werden
+Stop time source	MediaNodePanel		Zeitquelle stoppen
+Be Audio Mixer	MediaRoutingView		Be Audiomixer
+Video input	MediaRoutingView		Videoeingang
+Release	MediaNodePanel		Freigeben
+Disconnect	MediaRoutingView		Trennen
+Could not disconnect	MediaRoutingView		Trennen fehlgeschlagen
+Could not instantiate '%infoname%'	MediaRoutingView		'%infoname%' konnte nicht instanziiert werden
+Mini icon view	MediaRoutingView		Mini Icon-Ansicht
+Select all	MediaRoutingView		Alle auswählen
+(same as group)	MediaNodePanel		(wie Gruppe)
+Input	MediaJack		Eingang
+Get info	MediaJack		Infos anzeigen
+Start time source	MediaNodePanel		Zeitquelle starten
+Error	MediaRoutingView		Fehler
+Could not release '%refname%'	MediaRoutingView		'%refname%' konnte nicht freigegeben werden
+Output	MediaJack		Ausgang
+Get info	MediaNodePanel		Infos anzeigen
+Get info	MediaRoutingView		Infos anzeigen
+Clean up	MediaRoutingView		Icons ordnen
+Start control panel	MediaNodePanel		Steuerpanel starten
+Tweak parameters	MediaNodePanel		Parameter ändern
+Could not connect	MediaRoutingView		Verbinden fehlgeschlagen
+Unlock group	MediaNodePanel		Gruppe entsperren

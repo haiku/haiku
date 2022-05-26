@@ -6,7 +6,11 @@
 #define _DOSFS_UTIL_H_
 
 
-#include <ByteOrder.h>
+#include "system_dependencies.h"
+
+
+const char sAcceptable[]="!#$%&'()-0123456789@ABCDEFGHIJKLMNOPQRSTUVWXYZ^_`{}~";
+const char sIllegal[] = "\\/:*?\"<>|";
 
 
 // debugging functions

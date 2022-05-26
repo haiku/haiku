@@ -31,6 +31,11 @@ const uint32 kItemSpace = 7;
 static const uint32 kMsgAddToRemoteList = 'aDdL';
 static const uint32 kMsgRefresh = 'rFLd';
 
+static const int32 kMsgSetConnectionPolicy = 'sCpo';
+static const int32 kMsgSetDeviceClass = 'sDC0';
+static const int32 kMsgSetInquiryTime = 'afEa';
+static const int32 kMsgLocalSwitched = 'lDsW';
+
 extern LocalDevice* ActiveLocalDevice;
 
 #endif

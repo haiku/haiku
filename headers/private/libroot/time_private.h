@@ -67,6 +67,14 @@ timeval_to_timespec(const timeval& val, timespec& spec)
 }
 
 
+static inline bool
+timeval_to_bigtime(const timeval& val, bigtime_t& _time)
+{
+	 timespec spec;
+	 return timeval_to_timespec(val, spec) && timespec_to_bigtime(spec, _time);
+}
+
+
 static inline void
 timespec_to_timeval(const timespec& spec, timeval& val)
 {

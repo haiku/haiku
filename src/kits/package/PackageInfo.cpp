@@ -55,7 +55,8 @@ const char* const BPackageInfo::kElementNames[B_PACKAGE_INFO_ENUM_COUNT] = {
 	"user-settings-files",
 	"users",
 	"groups",
-	"post-install-scripts"
+	"post-install-scripts",
+	"pre-uninstall-scripts"
 };
 
 
@@ -180,6 +181,7 @@ BPackageInfo::BPackageInfo()
 	fUsers(4, true),
 	fGroups(4),
 	fPostInstallScripts(4),
+	fPreUninstallScripts(4),
 	fProvidesList(20, true),
 	fRequiresList(20, true),
 	fSupplementsList(20, true),
@@ -204,6 +206,7 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 	fUsers(4, true),
 	fGroups(4),
 	fPostInstallScripts(4),
+	fPreUninstallScripts(4),
 	fProvidesList(20, true),
 	fRequiresList(20, true),
 	fSupplementsList(20, true),
@@ -237,6 +240,8 @@ BPackageInfo::BPackageInfo(BMessage* archive, status_t* _error)
 		&& (error = _ExtractStringList(archive, "groups", fGroups)) == B_OK
 		&& (error = _ExtractStringList(archive, "post-install-scripts",
 			fPostInstallScripts)) == B_OK
+		&& (error = _ExtractStringList(archive, "pre-uninstall-scripts",
+			fPreUninstallScripts)) == B_OK
 		&& (error = _ExtractResolvables(archive, "provides", fProvidesList))
 			== B_OK
 		&& (error = _ExtractResolvableExpressions(archive, "requires",
@@ -554,6 +559,13 @@ BPackageInfo::PostInstallScripts() const
 }
 
 
+const BStringList&
+BPackageInfo::PreUninstallScripts() const
+{
+	return fPreUninstallScripts;
+}
+
+
 const BObjectList<BPackageResolvable>&
 BPackageInfo::ProvidesList() const
 {
@@ -852,10 +864,24 @@ BPackageInfo::ClearPostInstallScripts()
 }
 
 
+void
+BPackageInfo::ClearPreUninstallScripts()
+{
+	fPreUninstallScripts.MakeEmpty();
+}
+
+
 status_t
 BPackageInfo::AddPostInstallScript(const BString& path)
 {
 	return fPostInstallScripts.Add(path) ? B_OK : B_NO_MEMORY;
+}
+
+
+status_t
+BPackageInfo::AddPreUninstallScript(const BString& path)
+{
+	return fPreUninstallScripts.Add(path) ? B_OK : B_NO_MEMORY;
 }
 
 
@@ -992,6 +1018,7 @@ BPackageInfo::Clear()
 	fUsers.MakeEmpty();
 	fGroups.MakeEmpty();
 	fPostInstallScripts.MakeEmpty();
+	fPreUninstallScripts.MakeEmpty();
 	fRequiresList.MakeEmpty();
 	fProvidesList.MakeEmpty();
 	fSupplementsList.MakeEmpty();
@@ -1031,6 +1058,8 @@ BPackageInfo::Archive(BMessage* archive, bool deep) const
 		|| (error = archive->AddStrings("groups", fGroups)) != B_OK
 		|| (error = archive->AddStrings("post-install-scripts",
 			fPostInstallScripts)) != B_OK
+		|| (error = archive->AddStrings("pre-uninstall-scripts",
+			fPreUninstallScripts)) != B_OK
 		|| (error = _AddResolvables(archive, "provides", fProvidesList)) != B_OK
 		|| (error = _AddResolvableExpressions(archive, "requires",
 			fRequiresList)) != B_OK
@@ -1080,6 +1109,7 @@ BPackageInfo::GetConfigString(BString& _string) const
 		.Write("users", fUsers)
 		.Write("groups", fGroups)
 		.Write("post-install-scripts", fPostInstallScripts)
+		.Write("pre-uninstall-scripts", fPreUninstallScripts)
 		.Write("provides", fProvidesList)
 		.BeginRequires(fBasePackage)
 			.Write("requires", fRequiresList)

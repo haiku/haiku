@@ -271,14 +271,20 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 		$(installTargetsVar) on $(target) += $(destTarget) ;
 		TARGETS_TO_INSTALL on $(directory) += $(destTarget) ;
 
-		# If the target is associated with catalog files, add those, too.
-		local catalogs = [ on $(target) return $(HAIKU_CATALOG_FILES) ] ;
-		if $(catalogs) {
-			local signature
-				= [ on $(target) return $(HAIKU_CATALOG_SIGNATURE) ] ;
-			AddFilesToContainer $(container)
-				: $(systemDirTokens) data locale catalogs $(signature)
-				: $(catalogs) ;
+		# If the target and its static libraries are associated with catalog
+		# files, add those, too.
+		local catalogTargets = $(target) + [ on $(target) return $(NEEDLIBS) ] ;
+		for catalogTarget in $(catalogTargets) {
+			local catalogs
+				= [ on $(catalogTarget) return $(HAIKU_CATALOG_FILES) ] ;
+			if $(catalogs) {
+				local signature
+					= [ on $(catalogTarget)
+						return $(HAIKU_CATALOG_SIGNATURE) ] ;
+				AddFilesToContainer $(container)
+					: $(systemDirTokens) data locale catalogs $(signature)
+					: $(catalogs) ;
+			}
 		}
 
 		# If the target is associated with MIME DB entries, add those, too.
@@ -1525,6 +1531,16 @@ rule BuildFloppyBootImage image : haikuLoader : archive
 	#MakeLocateDebug $(image) ;
 	FLOPPY_IMAGE_SIZE on $(image) = $(HAIKU_BOOT_FLOPPY_IMAGE_SIZE) ;
 	ARCHIVE_IMAGE_OFFSET on $(image) = $(HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET) ;
+
+	# FreeBSD's stat command doesn't support -c/--format option
+	# and use %z specifier for file size
+	if $(HOST_PLATFORM) = freebsd || $(HOST_PLATFORM) = darwin
+		|| $(HOST_PLATFORM) = openbsd {
+		STAT_GET_SIZE = "stat -f %z" ;
+	} else {
+		STAT_GET_SIZE = "stat -c %s" ;
+	}
+
 	BuildFloppyBootImage1 $(image) : $(haikuLoader) $(archive) ;
 	if $(HAIKU_KERNEL_PLATFORM) = atari_m68k {
 		Depends $(image) : <build>fixup_tos_boot_checksum ;
@@ -1540,14 +1556,9 @@ rule BuildFloppyBootImage image : haikuLoader : archive
 
 actions BuildFloppyBootImage1
 {
-	haiku_loader_size=`stat -c %s "$(>[1])"`
-	drivers_tgz_size=`stat -c %s "$(>[2])"`
-	if [ $? -ne 0 ] ; then
-		# FreeBSD's stat command don't support -c/--format option
-		# and use %z specifier for file size
-		haiku_loader_size=`stat -f %z "$(>[1])"`
-		drivers_tgz_size=`stat -f %z "$(>[2])"`
-	fi
+	haiku_loader_size=`$(STAT_GET_SIZE) "$(>[1])"`
+	drivers_tgz_size=`$(STAT_GET_SIZE) "$(>[2])"`
+
 	archive_image_offset=`echo "$(ARCHIVE_IMAGE_OFFSET) * 1024" | bc`
 	floppy_tgz_size=\
 		`echo "($(FLOPPY_IMAGE_SIZE) - $(ARCHIVE_IMAGE_OFFSET)) * 1024" | bc`
@@ -1563,7 +1574,7 @@ actions BuildFloppyBootImage1
 	fi
 	$(RM) $(<)
 	# make an empty image
-	dd if=/dev/zero of=$(<) bs=1k count=$(FLOPPY_IMAGE_SIZE)
+	dd if=/dev/zero of=$(<) bs=1024 count=$(FLOPPY_IMAGE_SIZE)
 	# add haiku_loader
 	dd if=$(>[1]) of=$(<) conv=notrunc
 	# add the boot drivers tgz archive
@@ -1638,6 +1649,7 @@ rule BuildCDBootPPCImage image : hfsmaps : elfloader : coffloader : chrpscript
 actions BuildCDBootPPCImage1 bind MAPS
 {
 	$(RM) $(<)
+
 	mkdir -p $(HAIKU_OUTPUT_DIR)/cd/ppc
 	mkdir -p $(HAIKU_OUTPUT_DIR)/cd/boot
 	# CHRP Boot script
@@ -1651,9 +1663,10 @@ actions BuildCDBootPPCImage1 bind MAPS
 
 	# Xorriso doesn't have map and some other required tools
 	# to make bootable PowerPC images
-	genisoimage -v -hfsplus -map $(MAPS) \
+	genisoimage -v -hfs -map $(MAPS) \
 		-hfs-bless $(HAIKU_OUTPUT_DIR)/cd/boot -part -no-desktop \
 		-hfs-parms MAX_XTCSIZE=2656248 -hfs-volid Haiku \
+		--prep-boot boot/haikuloader.elf \
 		--chrp-boot -r -J -o $(<) $(HAIKU_OUTPUT_DIR)/cd
 
 	$(RM) -r $(HAIKU_OUTPUT_DIR)/cd
@@ -1665,11 +1678,15 @@ rule BuildEfiSystemPartition image : efiLoader
 {
 	local macVolumeIcon = [ FDirName
 		$(HAIKU_TOP) data artwork VolumeIcon.icns ] ;
+	local fatshell = <build>fat_shell ;
 
 	Depends $(image) : $(efiLoader) ;
 	Depends $(image) : $(macVolumeIcon) ;
+	Depends $(image) : $(fatshell) ;
 
 	switch $(TARGET_ARCH) {
+		case x86 :
+			EFINAME on $(image) = "BOOTIA32.EFI" ;
 		case x86_64 :
 			EFINAME on $(image) = "BOOTX64.EFI" ;
 		case arm :
@@ -1684,18 +1701,37 @@ rule BuildEfiSystemPartition image : efiLoader
 			Exit "Error: Unknown EFI architecture!" ;
 	}
 
-	EFIICON on $(image) = $(macVolumeIcon) ;
+	# public efi keys for efi bios trust
+	EFIKEYS on $(image) = [ FDirName $(HAIKU_TOP) data boot efi keys ] ;
 
-	BuildEfiSystemPartition1 $(image) : $(efiLoader) ;
+	BuildEfiSystemPartition1 $(image) : $(fatshell) $(macVolumeIcon) $(efiLoader) ;
 }
 
+# Usage:
+#  out : fatshell volumeIcon loader
 actions BuildEfiSystemPartition1
 {
 	$(RM) $(<)
+
+	export $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+
 	dd if=/dev/zero of=$(<) bs=1024 count=2880
-	mformat -i $(<) -f 2880
-	mmd -D s -i $(<) ::/EFI
-	mmd -D s -i $(<) ::/EFI/BOOT
-	mcopy -D o -i $(<) $(EFIICON) ::/.VolumeIcon.icns
-	mcopy -D o -i $(<) $(>) ::/EFI/BOOT/$(EFINAME)
+
+	FATFS="$(2[1])"
+	EFIICON="$(2[2])"
+	LOADER="$(2[3])"
+
+	${FATFS} --initialize "$(<)" 'Haiku ESP'
+	echo "mkdir myfs/EFI" | ${FATFS} $(<)
+	echo "mkdir myfs/KEYS" | ${FATFS} $(<)
+	echo "mkdir myfs/EFI/BOOT" | ${FATFS} $(<)
+
+	echo "cp :${LOADER} myfs/EFI/BOOT/$(EFINAME)" | ${FATFS} $(<)
+	echo "cp :${EFIICON} myfs/.VolumeIcon.icns" | ${FATFS} $(<)
+
+	# Copy UEFI signing keys and a README for end users
+	echo "cp :$(EFIKEYS)/README.md myfs/KEYS/README.md" | ${FATFS} $(<)
+	for i in auth cer crt; do
+		echo "cp :$(EFIKEYS)/DB.$i myfs/KEYS/DB.$i" | ${FATFS} $(<)
+	done
 }

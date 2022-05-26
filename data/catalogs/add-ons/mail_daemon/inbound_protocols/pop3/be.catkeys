@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-POP3	924806949
+1	belarusian	x-vnd.Haiku-POP3	3335299031
 Sending username…	pop3		Дасыланне імя карыстальніка…
 Connect to server…	pop3		Далучэнне да сервера…
 APOP	ConfigView		APOP
@@ -12,5 +12,7 @@ Getting mailbox size…	pop3		Вылічэнне памеру паштовай �
 Error while connecting to server %serv	pop3		Памылка падчас далучэння %serv да сервера
 Getting UniqueIDs…	pop3		Атрыманне ідэнтыфікатараў…
 Sending password…	pop3		Дасыланне пароля…
+No encryption	ConfigView		Без кадавання
+SSL	ConfigView		SSL
 : No reply.\n	pop3		: Няма адказу.\n
 Sending APOP authentication…	pop3		Дасыланне APOP аўтэнтыфікацыі…

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	1591513524
+1	hungarian	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Azonosítás szükséges
 Previous	WebPositive Window		Előző
 (Finish: %date)	Download Window		(Befejezés: %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		Tartalmazó mappa megnyitása
 Find previous	WebPositive Window		Előző találat
 Full screen	WebPositive Window		Teljes képernyő
 Downloads in progress	WebPositive		Folyamatban lévő letöltések
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Biztosan meg szeretnél nyitni %addedCount könyvjelzőt?
 Copy URL to clipboard	Download Window		URL vágólapra másolása
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Biztosan meg szeretnél nyitni %addedCount könyvjelzőt?
 Clone current page	Settings Window		Jelenlegi oldal megkettőzése
 Start page:	Settings Window		Nyitó oldal:
 Cancel	Download Window		Mégse
@@ -45,16 +45,19 @@ New tabs:	Settings Window		Új fülek:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url betöltése meghiúsult
 Open downloads folder	Download Window		Letöltések megnyitása
 Proxy server	Settings Window		Proxy kiszolgáló
+Darn!	WebPositive		Fenébe!
 Decrease size	WebPositive Window		Méret csökkentése
 Default fixed font size:	Settings Window		Alapértelmezett betűméret:
 Sans serif font:	Settings Window		Sans serif betű:
 Clear	WebPositive Window		Töröl
-Cookies for %s	Cookie Manager		%s sütik
 The download could not be opened.	Download Window		A letöltött fájl nem nyitható meg.
+Cookies for %s	Cookie Manager		%s sütik
 Close	Download Window		Bezár
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Keresési feltétel
 Reload	WebPositive Window		Újratöltés
 Expiration	Cookie Manager		Érvényesség
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		A processzor túl régi, és nem támogatja az SSE2 kiterjesztést, amelyek nélkül a WebPositive nem futhat. Javasoljuk a NetSurf telepítését helyette.
 Download finished	Download Window		Elkészült a letöltés
 Cookie manager	WebPositive Window		Süti kezelő
 OK	Authentication Panel		Rendben
@@ -100,6 +103,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Visszaállít
 Copy	WebPositive Window		Másolás
 Default standard font size:	Settings Window		Alapértelmezett betűméret:
+Custom	Settings Window		Egyéni
 Bookmark this page	WebPositive Window		Könyvjelző az oldalhoz
 Show tabs if only one page is open	Settings Window		Fülek megjelenítése egy oldal esetén is
 Close tab	WebPositive Window		Fül bezárása
@@ -109,8 +113,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Letöltések folytatása
 Proxy server requires authentication	Settings Window		A proxy szerver azonosítást igényel
 Cancel	Settings Window		Mégse
-History	WebPositive Window		Előzmények
 Reset size	WebPositive Window		Méret visszaállítása
+History	WebPositive Window		Előzmények
 Do you really want to clear the browsing history?	WebPositive Window		Biztosan törölni akarod az előzményekez?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Következő találat
 Fixed font:	Settings Window		Rögzített szélességű betű:
@@ -147,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Indítás:
 Confirmation	WebPositive Window		Megerősítés
 Session cookie	Cookie Manager		Folyamat-süti
+No SSE2 support	WebPositive		Az SSE2 nem támogatott
 Open all	WebPositive Window		Összes megnyitása
 Cut	WebPositive Window		Kivág
 Downloads	Download Window		Letöltések

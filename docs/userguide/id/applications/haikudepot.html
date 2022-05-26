@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2020 Haiku. All rights reserved.
+ * Copyright 2013-2021 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Panduan pengguna</span></div>
 </div>
 
 <div class="nav">
@@ -35,6 +35,7 @@
 <li><a href="../../de/applications/haikudepot.html">Deutsch</a></li>
 <li><a href="../../en/applications/haikudepot.html">English</a></li>
 <li><a href="../../es/applications/haikudepot.html">Español</a></li>
+<li><a href="../../eo/applications/haikudepot.html">Esperanto</a></li>
 <li><a href="../../fr/applications/haikudepot.html">Français</a></li>
 <li><a href="../../fur/applications/haikudepot.html">Furlan</a></li>
 <li><a href="../../it/applications/haikudepot.html">Italiano</a></li>
@@ -61,17 +62,18 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">Terjemahan halaman ini belum lengkap. Sampai saat itu, bagian yang belum selesai menggunakan aslinya bahasa Inggris.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Indeks</td></tr>
-<tr class="index"><td><a href="#filter">Filter</a><br />
-                <a href="#list">Daftar</a><br />
-                <a href="#info">Area Info</a><br />
-                <a href="#menu">Perkakas dan tunjukkan menu</a><br />
-                <a href="#account">Membuat akun pengguna</a><br />
-                <a href="#rating">Peringkat dan komentar</a><br />
-                <a href="#logs">Log diagnosa</a><br />
+<tr class="index"><td><a href="#filter">The Filter</a><br />
+                <a href="#list">The List</a><br />
+                <a href="#info">The Info Area</a><br />
+                <a href="#menu">HaikuDepot and Show menu</a><br />
+                <a href="#account">Creating a User Account</a><br />
+                <a href="#rating">Rating and Commenting</a><br />
+                <a href="#logs">Diagnostic Logs</a><br />
+                <a href="#tips">Tips</a><br />
 </td></tr>
 </table>
 
@@ -133,10 +135,11 @@ Di tengah adalah komentar pengguna dengan nama panggilan mereka, jumlah bintang 
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Perkakas dan tunjukkan menu</a></h2>
-<p>Di menu <span class="menu">Perkakas </span> di bagian atas jendela, Anda akan menemukan item untuk <span class="menu">Refresh repositories</span>. Ini akan meminta daftar terbaru dari semua paket yang tersedia dari repositori.<br />
-Item kedua adalah untuk <span class="menu">Mengelola repositori...</span>. Ini membuka preferensi <a href="../preferences/repositories.html">Repositori</a> , untuk menambah/menghapus atau menonaktifkan dan mengaktifkan repositori. <br />
-<span class="menu">Periksa pembaruan...</span> buka <a href="../apps/softwareupdater.html">SoftwareUpdater</a> untuk mencari dan menginstal paket yang diperbarui.</p>
+<a id="menu" name="menu">HaikuDepot and Show menu</a></h2>
+<p>In the <span class="menu">HaikuDepot</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories.<br />
+The second item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.<br />
+<span class="menu">Check for updates...</span> opens the <a href="../apps/softwareupdater.html">SoftwareUpdater</a> to search and install updated packages.<br />
+<span class="menu">Settings...</span> opens a window with the currently only option: <span class="menu">Share anonymous usage data with HaikuDepotServer</span>. The data is used to, for example, increase a counter on how often a package is viewed and installed, which then can determine if a package is promoted to the "Featured packages" list.</p>
 <p>Di bawah <span class="menu">Menunjukkan</span> Anda dapat memilih untuk juga menampilkan <span class="menu">Paket pengembangan </span> dan <span class="menu">Paket sumber </span> dalam daftar paket. Untuk pengguna normal, hal itu tidak menarik dan hanya akan mengacaukan daftar. Tetapi penting bagi orang-orang yang membutuhkan perpustakaan, header, dll. paket untuk mengembangkan dan menyusun program tergantung pada mereka. </p>
 <p>Yang lebih menarik adalah pilihan untuk hanya menampilkan <span class="menu">paket yang tersedia</span> dan <span class="menu">paket-paket terpasang</span>.</p>
 
@@ -149,8 +152,9 @@ Item kedua adalah untuk <span class="menu">Mengelola repositori...</span>. Ini m
 <li>gunakan kata sandi yang panjangnya minimal 8 karakter dengan setidaknya 2 huruf kapital dan 2 angka</li>
 <li>berikan alamat email yang valid (jika Anda ingin kata sandi baru dikirimkan kepada Anda seandainya Anda lupa)</li>
 <li>Menyelesaikan captcha</li>
-<li>centang tanda centang untuk mengonfirmasi bahwa Anda berusia di atas 16 dan telah membaca kondisi penggunaan yang tertaut di bawahnya.</li></ul>
+<li>tick the checkboxes to confirm you're over 16 and have read the usage conditions linked below them.</li></ul>
 <p>Setelah masuk, menu kanan-atas jendela  HaikuDepot akan mengatakan <span class="menu">Masuk sebagai (...)</span>, menunjukkan nama pengguna Anda. Menu sekarang menawarkan Anda untuk <span class="menu">Beralih akun...</span> atau  <span class="menu">Keluar</span>.</p>
+<p>As a reminder of what you actually agreed to when you ticked the above mentioned checkbox, there are menu items to <span class="menu">View latest/agreed usage conditions...</span></p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rating" name="rating">Penilaian dan komentar</a></h2>
@@ -160,7 +164,7 @@ Item kedua adalah untuk <span class="menu">Mengelola repositori...</span>. Ini m
 Setelah Anda mengklik <span class="button">Kirim </span> data ditransmisikan ke server. Anda mungkin harus pergi ke menu <span class="menu">Tools</span> menu to <span class="menu">Muat ulang repositori </span> sebelum Anda dapat melihat perubahan Anda.</p>
 <p>At any time, you can come back and edit your comment and re-rate it. You can also hide your rating from other users by deactivating a checkbox <span class="menu">This rating is visible to other users</span>, that appears in this window once you've rated a package.</p>
 
- <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="logs" name="logs">Log Diagnosa</a></h2>
 <p>Karena HaikuDepot digunakan, ia berinteraksi dengan jaringan dan juga layanan lokal. Bisa terjadi kesalahan, kadang-kadang dengan cara yang tidak diantisipasi ketika aplikasi ditulis. Dalam kasus-kasus itu pesan kesalahan mungkin sangat tidak spesifik. Untuk membantu mendiagnosis masalah yang diberikan , HaikuDepot dapat memberikan log tentang apa yang dilakukan aplikasi.</p>
 <p>Pesan kesalahan mungkin menyarankan untuk melihat log untuk mendapatkan informasi mendalam lebih lanjut atau Anda mungkin diminta untuk memberikan log ketika Anda mengajukan masalah di <a href="https://dev.haiku-os.org/">sistem pelacakan bug Haiku</a>.</p>
@@ -168,6 +172,11 @@ Setelah Anda mengklik <span class="button">Kirim </span> data ditransmisikan ke 
 <pre>HaikuDepot -v debug</pre>
 <p>Perintah ini menggunakan bendera <span class="cli">-v</span> untuk mengontrol verbositas dari log diagnostik. Nilai yang mungkin: <span class="cli">off</span>, <span class="cli">info</span>, <span class="cli">debug</span> dan <span class="cli">trace</span>. Menggunakan <span class="cli">off</span> hanya akan melakukan sejumlah kecil logging, while <span class="cli">trace</span> melakukannya dengan detail tertinggi.</p>
 <p>Ketika HaikuDepot memulai dan ketika berinteraksi dengan aplikasi, Anda akan melihat teks bergulir di jendela Terminal, ini adalah log diagnostik.</p>
+
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="tips" name="tips">Tips</a></h2>
+<p>Not directly from within the HaikuDepot application, but there is a way to keep track of new and updated packages. For that, you need to create an RSS ATOM feed at the <a href="https://depot.haiku-os.org">Haiku Depot Server</a> website. Click the "hamburger" widget at the top right, and choose <span class="menu">Build Feed URL</span> under Data.<br />
+Most interesting of the few settings on that page: Besides getting a feed for all new/updated packages, you are also able to add just the names of the packages you're interested in. Click the <span class="button">Build Feed URL</span> button and you get an RSS URL that you can paste into an RSS feed reader like BePodder, QuiteRSS, fRiSS etc.</p>
 </div>
 </div>
 

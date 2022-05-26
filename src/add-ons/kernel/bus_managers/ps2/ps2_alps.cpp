@@ -18,6 +18,14 @@
 #include "ps2_service.h"
 
 
+//#define TRACE_PS2_ALPS
+#ifdef TRACE_PS2_APLS
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...)
+#endif
+
+
 static int32 generate_event(timer* timer);
 
 

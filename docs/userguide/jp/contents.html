@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Humdinger
+ *		Máximo Castañeda
  *		mt
  *		Kentaro Ozeki
  *		satashun
@@ -26,7 +27,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -38,6 +39,7 @@
 <li><a href="../de/contents.html">Deutsch</a></li>
 <li><a href="../en/contents.html">English</a></li>
 <li><a href="../es/contents.html">Español</a></li>
+<li><a href="../eo/contents.html">Esperanto</a></li>
 <li><a href="../fr/contents.html">Français</a></li>
 <li><a href="../fur/contents.html">Furlan</a></li>
 <li><a href="../it/contents.html">Italiano</a></li>
@@ -64,7 +66,7 @@
 
 <h1>Haiku ユーザーガイドへようこそ</h1>
 
-<p>以下に、Haiku のもっとも重要な一面に関するドキュメントが見つかるでしょう。もちろん、ドキュメントの完成および拡張は継続して行われます (アップデートされたページや翻訳は、<a href="http://www.haiku-os.org/docs/userguide/en/contents.html">オンラインバージョン</a>を参照してください)。エラーを見つけた場合、トピックを提案する場合、あるいはあなた自身が貢献する場合には、<a href="http://www.freelists.org/list/haiku-doc">ドキュメンテーションメーリングリスト</a>で連絡を取ってください。翻訳に協力する場合は、<a href="http://dev.haiku-os.org/wiki/i18n/UserGuide">i18n user guide wiki</a> で情報が得られます。</p>
+<p>以下に、Haiku のもっとも重要な一面に関するドキュメントが見つかるでしょう。もちろん、ドキュメントの完成および拡張は継続して行われます (アップデートされたページや翻訳は、<a href="http://www.haiku-os.org/docs/userguide/jp/contents.html">オンラインバージョン</a>を参照してください)。エラーを見つけた場合、トピックを提案する場合、あるいはあなた自身が貢献する場合には、<a href="http://www.freelists.org/list/haiku-doc">ドキュメンテーションメーリングリスト</a>で連絡を取ってください。翻訳に協力する場合は、<a href="http://dev.haiku-os.org/wiki/i18n/UserGuide">i18n user guide wiki</a> で情報が得られます。</p>
 <p><br /></p>
 <table summary="contents" border="1" rules="rows" frame="void" cellpadding="10" cellspacing="0" style="border: dotted thin #e0e0e0">
 <!-- Excluded until it's further fleshed out
@@ -77,12 +79,7 @@
 		<li><a href="installation.html#transfer-data">Transfering data to/from a Haiku installation</a></li></ul></td>
 		<td valign="top">Step by step guides covering Haiku installation during the (pre-) alpha release phase.</td></tr>
 -->
-	<tr><td valign="top"><a href="bootloader.html">ブートローダー</a></td>
-		<td valign="top">セーフブートオプションを設定して構成の問題を解決します。</td></tr>
-	<tr><td valign="top"><a href="filesystem-layout.html">ファイルシステムレイアウト</a><ul>
-		<li><a href="filesystem-layout.html#system">システムフォルダー</a></li>
-		<li><a href="filesystem-layout.html#home">ホームフォルダー</a></li></ul></td>
-		<td valign="top">ファイルシステム階層を理解し、重要なファイルとフォルダーの場所に慣れましょう。</td></tr>
+
 	<tr><td valign="top"><a href="gui.html">Haiku のグラフィカルユーザーインターフェース</a><ul>
 		<li><a href="gui.html#move-resize">ウィンドウを素早く移動 / リサイズする方法</a></li>
 		<li><a href="gui.html#stack-tile">スタック &amp; タイル</a></li>
@@ -91,15 +88,78 @@
 		<a href="gui.html#favorites-recent">- Favorites および Recent フォルダー</a></li>
 		<li><a href="gui.html#replicants">レプリカント</a></li></ul></td>
 		<td valign="top">グラフィカルユーザーインターフェースの基本的要素について学習します。</td></tr>
-	<tr><td valign="top"><a href="keyboard-shortcuts.html">ショートカットやキーの組み合わせ</a><ul>
-		<li><a href="keyboard-shortcuts.html#general">一般的なショートカット</a></li>
-		<li><a href="keyboard-shortcuts.html#textediting">テキスト編集のショートカット</a></li>
-		<li><a href="keyboard-shortcuts.html#tracker-navigation">Tracker ナビゲーションのショートカット</a></li>
-		<li><a href="keyboard-shortcuts.html#terminal">ターミナルのショートカット</a></li>
-		<li><a href="keyboard-shortcuts.html#other-combos">その他のキーの組み合わせ</a></li></ul>
 
-</td>
-		<td valign="top">ワークフローをスピードアップするもっとも一般的なショートカット。</td></tr>
+	<tr><td valign="top"><a href="deskbar.html">Deskbar</a><ul>
+		<li><a href="deskbar.html#deskbar-menu">Deskbar メニュー</a></li>
+		<li><a href="deskbar.html#tray">トレイ</a></li>
+		<li><a href="deskbar.html#list-of-apps">実行中プログラムの一覧</a></li></ul></td>
+		<td valign="top">Haiku 版の「スタート」メニューとタスクバーの使い方と設定。</td></tr>
+
+	<tr><td valign="top"><a href="tracker.html">Tracker</a><ul>
+		<li><a href="tracker.html#mounting-volumes">ボリュームのマウント</a></li>
+		<li><a href="tracker.html#navigating">ナビゲーション</a></li>
+		<li><a href="tracker.html#appearance">外観</a></li>
+		<li><a href="tracker.html#tracker-preferences">Tracker 環境設定</a></li>
+		<li><a href="tracker.html#working-with-files">ファイル操作</a></li>
+		<li><a href="tracker.html#transaction-status">処理状況</a></li>
+		<li><a href="tracker-add-ons.html">Tracker アドオン</a></li></ul></td>
+		<td valign="top">ナビゲーション、ファイルとフォルダーの操作および Haiku のファイルマネージャーの設定に関するすべてを学習します。</td></tr>
+
+	<tr><td valign="top"><a href="applications.html">アプリケーション</a><ul>
+		<li><a href="applications.html#hpkg">Haiku パッケージ (.hpkg)</a></li>
+		<li><a href="applications.html#beos_apps">古い BeOS アーカイブ (.zip and .pkg)</a></li>
+		<li><a href="applications.html#list-of-apps">Haiku のアプリケーション</a></li></ul></td>
+		<td>一般的なアプリケーションのアンインストール / インストール方法と、Haiku 付属のアプリケーションの操作方法を学習します。</td></tr>
+
+	<tr><td colspan="2"><table align="center"><tr><td>
+			<a href="applications/activitymonitor.html">アクティビティモニター</a><br />
+			<a href="applications/bootmanager.html">ブートマネージャー</a><br />
+			<a href="applications/charactermap.html">文字表</a><br />
+			<a href="applications/codycam.html">CodyCam</a><br />
+			<a href="applications/debugger.html">デバッガー</a><br />
+			<a href="applications/deskcalc.html">電卓</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/diskprobe.html">DiskProbe</a><br />
+			<a href="applications/diskusage.html">DiskUsage</a><br />
+			<a href="applications/drivesetup.html">DriveSetup</a><br />
+			<a href="applications/expander.html">ファイル解凍</a><br />
+			<a href="applications/haikudepot.html">HaikuDepot</a><br />
+			<a href="applications/icon-o-matic.html">Icon-O-Matic</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/installer.html">インストーラー</a><br />
+			<a href="applications/magnify.html">拡大鏡</a><br />
+			<a href="applications/mail.html">メール</a><br />
+			<a href="applications/mediaplayer.html">メディアプレーヤー</a><br />
+			<a href="applications/midiplayer.html">MIDI プレーヤー</a><br />
+			<a href="applications/packageinstaller.html">パッケージインストーラー</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/people.html">People</a><br />
+			<a href="applications/poorman.html">PoorMan</a><br />
+			<a href="applications/screenshot.html">スクリーンショット</a><br />
+			<a href="applications/showimage.html">画像ビューワ</a><br />
+			<a href="applications/softwareupdater.html">ソフトウェアの更新</a><br />
+			<a href="applications/soundrecorder.html">サウンドレコーダー</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="applications/stylededit.html">StyledEdit</a><br />
+			<a href="applications/terminal.html">ターミナル</a><br />
+			<a href="applications/textsearch.html">テキスト検索</a><br />
+			<a href="applications/tv.html">TV</a><br />
+			<a href="applications/webpositive.html">WebPositive</a></td></tr>
+		</table></td></tr>
+
+	<tr><td valign="top"><ul>
+		<li><a href="applications.html#cli-apps">Haiku のコマンドラインアプリケーション</a></li>
+		<li><a href="applications.html#list-of-bundled-apps">同梱されているアプリケーション</a></li>
+		<ul><li><a href="applications/bepdf.html">- BePDF</a></li>
+			<li><a href="applications/pe.html">- Pe</a></li>
+			<li><a href="applications/vision.html">- Vision</a></li>
+			<li><a href="applications/wonderbrush.html">- WonderBrush</a></li></ul>
+	</ul></td><td></td></tr>
+
 	<tr><td valign="top"><a href="workspaces.html">ワークスペース</a><ul>
 		<li><a href="./workspaces.html#switching">ワークスペースの切り替え</a></li>
 		<li><a href="./desktop-applets/workspaces.html#applet">ワークスペースアプレット</a></li>
@@ -110,20 +170,71 @@
 		<td valign="top">実行中のアプリケーションを切り替えます。</td></tr>
 	<tr><td valign="top"><a href="teammonitor.html">チームモニター</a></td>
 		<td valign="top">反応のないアプリケーションやシステムコンポーネントを強制終了します。</td></tr>
-	<tr><td valign="top"><a href="tracker.html">Tracker</a><ul>
-		<li><a href="tracker.html#mounting-volumes">ボリュームのマウント</a></li>
-		<li><a href="tracker.html#navigating">ナビゲーション</a></li>
-		<li><a href="tracker.html#appearance">外観</a></li>
-		<li><a href="tracker.html#tracker-preferences">Tracker 環境設定</a></li>
-		<li><a href="tracker.html#working-with-files">ファイル操作</a></li>
-		<li><a href="tracker.html#transaction-status">処理状況</a></li>
-		<li><a href="tracker-add-ons.html">Tracker アドオン</a></li></ul></td>
-		<td valign="top">ナビゲーション、ファイルとフォルダーの操作および Haiku のファイルマネージャーの設定に関するすべてを学習します。</td></tr>
-	<tr><td valign="top"><a href="deskbar.html">Deskbar</a><ul>
-		<li><a href="deskbar.html#deskbar-menu">Deskbar メニュー</a></li>
-		<li><a href="deskbar.html#tray">トレイ</a></li>
-		<li><a href="deskbar.html#list-of-apps">実行中プログラムの一覧</a></li></ul></td>
-		<td valign="top">Haiku 版の「スタート」メニューとタスクバーの使い方と設定。</td></tr>
+
+	<tr><td valign="top"><a href="keyboard-shortcuts.html">ショートカットやキーの組み合わせ</a><ul>
+		<li><a href="keyboard-shortcuts.html#general">一般的なショートカット</a></li>
+		<li><a href="keyboard-shortcuts.html#textediting">テキスト編集のショートカット</a></li>
+		<li><a href="keyboard-shortcuts.html#tracker-navigation">Tracker ナビゲーションのショートカット</a></li>
+		<li><a href="keyboard-shortcuts.html#terminal">ターミナルのショートカット</a></li>
+		<li><a href="keyboard-shortcuts.html#other-combos">その他のキーの組み合わせ</a></li></ul>
+
+</td>
+		<td valign="top">ワークフローをスピードアップするもっとも一般的なショートカット。</td></tr>
+
+	<tr><td valign="top"><a href="desktop-applets.html">デスクトップアプレット</a><ul>
+			<li><a href="desktop-applets/launchbox.html">ランチャー</a></li>
+			<li><a href="desktop-applets/networkstatus.html">ネットワークの状態</a></li>
+			<li><a href="desktop-applets/powerstatus.html">バッテリーの状態</a></li>
+			<li><a href="desktop-applets/processcontroller.html">プロセスコントローラー</a></li>
+			<li><a href="desktop-applets/workspaces.html">ワークスペース</a></li></ul>		
+</td>
+		<td>デスクトップや Deskbar にインストールするシンプルなツール。</td></tr>
+
+	<tr><td valign="top"><a href="preferences.html">プレファレンス</a></td>
+		<td>システムを設定または構成します。</td></tr>
+	<tr><td colspan="2"><table align="center"><tr><td>
+			<a href="preferences/appearance.html">外観</a><br />
+			<a href="preferences/backgrounds.html">背景</a><br />
+			<a href="preferences/datatranslations.html">データ変換</a><br />
+			<a href="preferences/deskbar.html">Deskbar</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/e-mail.html">メール</a><br />
+			<a href="preferences/filetypes.html">FileTypes</a><br />
+			<a href="preferences/input.html">入力機器</a><br />
+			<a href="preferences/keymap.html">キーマップ</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/locale.html">言語と書式</a><br />
+			<a href="preferences/media.html">メディア</a><br />
+			<a href="preferences/network.html">ネットワーク</a><br />
+			<a href="preferences/printers.html">プリンター</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/repositories.html">リポジトリ</a><br />
+			<a href="preferences/screen.html">画面</a><br />
+			<a href="preferences/screensaver.html">スクリーンセーバー</a><br />
+			<a href="preferences/shortcuts.html">キーボードショートカット</a></td>
+		<td width="32px"></td>
+		<td valign="top">
+			<a href="preferences/sounds.html">サウンド</a><br />
+			<a href="preferences/time.html">日付と時刻</a><br />
+			<a href="preferences/tracker.html">Tracker</a><br />
+			<a href="preferences/virtualmemory.html">仮想メモリ</a></td></tr>
+		</table></td></tr>
+<!--
+	<tr><td valign="top"><a href="demos.html">Demos</a></td>
+		<td>Games and demo applications.</td></tr>
+-->
+	<tr><td valign="top"><a href="queries.html">クエリ</a><ul>
+		<li><a href="queries.html#find-window">検索ウィンドウ</a></li>
+		<li><a href="queries.html#basic-query">基本クエリ - "名前で検索"</a></li>
+		<li><a href="queries.html#adv-query">高度なクエリ - "属性で検索"</a></li>
+		<li><a href="queries.html#more-adv-query">さらに高度なクエリ - "式で検索"</a></li>
+		<li><a href="queries.html#result-window">結果ウィンドウ</a></li>
+		<li><a href="queries.html#query-template">クエリテンプレート</a></li></ul></td>
+		<td valign="top">Haiku のきわめて高速なクエリを使って、探しものをすばやく見つけます。</td></tr>
+
 	<tr><td valign="top"><a href="filetypes.html">ファイルタイプ</a><ul>
 		<li><a href="filetypes.html#filetype">ファイルタイプ</a></li>
 		<li><a href="filetypes.html#preferred-app">優先アプリケーション</a></li>
@@ -131,107 +242,34 @@
 		<li><a href="filetypes.html#settings-apps">アプリケーション用の特別な設定</a></li>
 		<li><a href="filetypes.html#filetypes-preferences">Filetypes プレファレンスの全体設定</a></li></ul></td>
 		<td valign="top">デフォルトアプリケーションの設定、ファイルタイプの変更、および独自のファイルタイプの作成。</td></tr>
+
 	<tr><td valign="top"><a href="attributes.html">属性</a><ul>
 		<li><a href="attributes.html#attributes-tracker">Tracker での属性</a></li>
 		<li><a href="attributes.html#attributes-terminal">ターミナルでの属性</a></li></ul></td>
-		<td valign="top">Haiku の主な特徴の 1 つは、あらゆる種類のデータを扱い、任意のファイルへ追加できることです。</td></tr>		
+		<td valign="top">Haiku の主な特徴の 1 つは、あらゆる種類のデータを扱い、任意のファイルへ追加できることです。</td></tr>
+
 	<tr><td valign="top"><a href="index.html">インデックス</a></td>
 		<td>インデックスを付けて、属性を検索できるようにします。</td></tr>
-	<tr><td valign="top"><a href="queries.html">クエリ</a><ul>
-		<li><a href="queries.html#find-window">検索ウィンドウ</a></li>
-		<li><a href="queries.html#basic-query">基本クエリ - "名前で検索"</a></li>
-		<li><a href="queries.html#adv-query">高度なクエリ - "属性で検索"</a></li>
-		<li><a href="queries.html#more-adv-query">さらに高度なクエリ - "式で検索"</a></li>
-		<li><a href="queries.html#result-window">結果ウィンドウ</a></li>
-		<li><a href="queries.html#query-template">クエリテンプレート</a></li>
-</ul></td>
-		<td valign="top">Haiku のきわめて高速なクエリを使って、探しものをすばやく見つけます。</td></tr>
+
+	<tr><td valign="top"><a href="filesystem-layout.html">ファイルシステムレイアウト</a><ul>
+		<li><a href="filesystem-layout.html#system">システムフォルダー</a></li>
+		<li><a href="filesystem-layout.html#home">ホームフォルダー</a></li></ul></td>
+		<td valign="top">ファイルシステム階層を理解し、重要なファイルとフォルダーの場所に慣れましょう。</td></tr>
+
 	<tr><td valign="top"><a href="workshop-filetypes+attributes.html">ワークショップ: ファイルタイプ、属性、インデックス、クエリ</a></td>
 		<td valign="top">Haiku の重要な特徴の使い方のいくつかを DVD の整理を通じて学習します。</td></tr>
+
 	<tr><td valign="top"><a href="workshop-email.html">ワークショップ: メールの管理</a></td>
 		<td valign="top">カスタムステータスやクエリで Haiku のメールシステムの使い方を学習します。</td></tr>
+
 	<tr><td valign="top"><a href="workshop-wlan.html">ワークショップ: ワイヤレスネットワーク</a></td>
 		<td valign="top">暗号化されていない、または暗号化されたワイヤレスネットワークを設定します。</td></tr>
-	<tr><td valign="top"><a href="applications.html">アプリケーション</a><ul>
-		<li><a href="applications.html#hpkg">Haiku パッケージ (.hpkg)</a></li>
-		<li><a href="applications.html#beos_apps">以前の BeOS アーカイブ (.zip および .pkg)</a></li>
-		<li><a href="applications.html#list-of-apps">Haiku のアプリケーション</a></li>
-		<ul>
-			<li><a href="applications/activitymonitor.html">利用状況モニター</a></li>
-			<li><a href="applications/bootmanager.html">ブートマネージャー</a></li>
-			<li><a href="applications/charactermap.html">文字表</a></li>
-			<li><a href="applications/codycam.html">CodyCam</a></li>
-			<li><a href="applications/debugger.html">Debugger</a></li>
-			<li><a href="applications/deskcalc.html">	電卓</a></li>
-			<li><a href="applications/diskprobe.html">DiskProbe</a></li>
-			<li><a href="applications/diskusage.html">DiskUsage</a></li>
-			<li><a href="applications/drivesetup.html">DriveSetup</a></li>
-			<li><a href="applications/expander.html">ファイル解凍</a></li>
-			<li><a href="applications/haikudepot.html">HaikuDepot</a></li>
-			<li><a href="applications/icon-o-matic.html">Icon-O-Matic</a></li>
-			<li><a href="applications/installer.html">	インストーラー</a></li>
-			<li><a href="applications/magnify.html">拡大鏡</a></li>
-			<li><a href="applications/mail.html">メール</a></li>
-			<li><a href="applications/mediaplayer.html">メディアプレーヤー</a></li>
-			<li><a href="applications/midiplayer.html">MIDI プレーヤー</a></li>
-			<li><a href="applications/packageinstaller.html">パッケージインストーラー</a></li>
-			<li><a href="applications/people.html">People</a></li>
-			<li><a href="applications/poorman.html">PoorMan</a></li>
-			<li><a href="applications/screenshot.html">スクリーンショット</a></li>
-			<li><a href="applications/showimage.html">画像ビューワ</a></li>
-			<li><a href="applications/softwareupdater.html">ソフトウェアの更新</a></li>
-			<li><a href="applications/soundrecorder.html">サウンドレコーダー</a></li>
-			<li><a href="applications/stylededit.html">StyledEdit</a></li>
-			<li><a href="applications/terminal.html">ターミナル</a></li>
-			<li><a href="applications/textsearch.html">テキスト検索</a></li>
-			<li><a href="applications/tv.html">TV</a></li>
-			<li><a href="applications/webpositive.html">WebPositive</a></li>
-		</ul>
-		<li><a href="applications.html#cli-apps">Haiku のコマンドラインアプリケーション</a></li>
-		<li><a href="applications.html#list-of-bundled-apps">同梱されているアプリケーション</a></li>
-		</ul></td>
-		<td>一般的なアプリケーションのアンインストール / インストール方法と、Haiku 付属のアプリケーションの操作方法を学習します。</td></tr>
-	<tr><td valign="top"><a href="desktop-applets.html">デスクトップアプレット</a>
-		<ul>
-			<li><a href="desktop-applets/launchbox.html">ランチャー</a></li>
-			<li><a href="desktop-applets/networkstatus.html">ネットワークの状態</a></li>
-			<li><a href="desktop-applets/powerstatus.html">バッテリーの状態</a></li>
-			<li><a href="desktop-applets/processcontroller.html">プロセスコントローラー</a></li>
-			<li><a href="desktop-applets/workspaces.html">ワークスペース</a></li>
-		</ul></td>
-		<td>デスクトップや Deskbar にインストールするシンプルなツール。</td></tr>
-	<tr><td valign="top"><a href="preferences.html">プレファレンス (Preferences)</a>
-		<ul>
-			<li><a href="preferences/appearance.html">外観</a></li>
-			<li><a href="preferences/backgrounds.html">背景</a></li>
-			<li><a href="preferences/datatranslations.html">DataTranslations</a></li>
-			<li><a href="preferences/deskbar.html">Deskbar</a></li>
-			<li><a href="preferences/e-mail.html">メール</a></li>
-			<li><a href="preferences/filetypes.html">FileTypes</a></li>
-			<li><a href="preferences/keyboard.html">キーボード</a></li>
-			<li><a href="preferences/keymap.html">キーマップ</a></li>
-			<li><a href="preferences/locale.html">ロケール</a></li>
-			<li><a href="preferences/media.html">メディア</a></li>
-			<li><a href="preferences/mouse.html">マウス</a></li>
-			<li><a href="preferences/network.html">ネットワーク</a></li>
-			<li><a href="preferences/printers.html">プリンター</a></li>
-			<li><a href="preferences/repositories.html">リポジトリ</a></li>
-			<li><a href="preferences/screen.html">画面</a></li>
-			<li><a href="preferences/screensaver.html">スクリーンセーバー</a></li>
-			<li><a href="preferences/shortcuts.html">キーボードショートカット </a></li>
-			<li><a href="preferences/sounds.html">サウンド</a></li>
-			<li><a href="preferences/time.html">日付と時刻</a></li>
-			<li><a href="preferences/tracker.html">Tracker</a></li>
-			<li><a href="preferences/touchpad.html">タッチパッド</a></li>
-			<li><a href="preferences/virtualmemory.html">仮想メモリ</a></li>
-		</ul></td>
-		<td>システムを設定または構成します。</td></tr>
-<!--
-	<tr><td valign="top"><a href="demos.html">Demos</a></td>
-		<td>Games and demo applications.</td></tr>
--->
+
 	<tr><td valign="top"><a href="bash-scripting.html">Bash とスクリプト処理</a></td>
 		<td>システムで使ういくつかの興味深いスクリプトと、シェル操作やスクリプティングに関するオンラインリソースについて学習します。</td></tr>
+
+	<tr><td valign="top"><a href="bootloader.html">ブートローダー</a></td>
+		<td valign="top">セーフブートオプションを設定して構成の問題を解決します。</td></tr>
 </table>
 
 </div>

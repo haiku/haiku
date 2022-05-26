@@ -1,0 +1,8 @@
+1	turkish	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Temalar
+Start control panel	ParameterWindow		Denetim panelini başlat
+%nodeinfo% parameters	ParameterWindow		%nodeinfo% parametreleri
+OK	ParameterWindow		Tamam
+Window	ParameterWindow		Pencere
+Could not start control panel (%error%)	ParameterWindow		Denetim paneli başlatılamadı (%error%)
+Close	ParameterWindow		Kapat

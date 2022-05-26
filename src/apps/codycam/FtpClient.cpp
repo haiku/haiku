@@ -448,10 +448,11 @@ FtpClient::_SendRequest(const string& cmd)
 	string ccmd = cmd;
 
 	if (fControl != 0) {
-		if (cmd.find("PASS") != string::npos)
-			printf(B_TRANSLATE("PASS <suppressed>  (real password sent)\n"));
-		else
-			printf("%s\n", ccmd.c_str());
+		if (cmd.find("PASS") != string::npos) {
+			puts(B_TRANSLATE("PASS <suppressed>  (real password sent)"));
+		} else {
+			puts(ccmd.c_str());
+		}
 
 		ccmd += "\r\n";
 		if (fControl->Send(ccmd.c_str(), ccmd.length()) >= 0)
@@ -549,8 +550,8 @@ FtpClient::_GetReply(string& outString, int& outCode, int& codeType)
 	rc = _GetReplyLine(line);
 	if (rc == true) {
 		outString = line;
+		puts(outString.c_str());
 		outString += '\n';
-		printf(outString.c_str());
 		tempString = line.substr(0, 3);
 		outCode = atoi(tempString.c_str());
 
@@ -558,8 +559,8 @@ FtpClient::_GetReply(string& outString, int& outCode, int& codeType)
 			rc = _GetReplyLine(line);
 			while (rc == true) {
 				outString += line;
+				puts(outString.c_str());
 				outString += '\n';
-				printf(outString.c_str());
 				// we're done with nnn when we get to a "nnn blahblahblah"
 				if ((line.find(tempString) == 0) && line[3] == ' ')
 					break;
@@ -609,8 +610,8 @@ FtpClient::_OpenDataConnection()
 			if (_GetReply(replyString, code, codeType)) {
 
 				if (codeType == 2) {
-					 //  It should give us something like:
-			 		 // "227 Entering Passive Mode (192,168,1,1,10,187)"
+					//  It should give us something like:
+					// "227 Entering Passive Mode (192,168,1,1,10,187)"
 					int paddr[6];
 					unsigned char ucaddr[6];
 

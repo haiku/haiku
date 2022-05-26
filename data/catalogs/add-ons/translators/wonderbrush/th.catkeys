@@ -1,9 +1,5 @@
-1	thai	x-vnd.Haiku-WonderBrushTranslator	1289038178
-Version %d.%d.%d, %s	WonderBrushView		เวอร์ชั่น %d.%d.%d, %s
-WonderBrush image translator	WonderBrushTranslator		โปรแกรมแปลรูปภาพ WonderBrush
-WBI Settings	WonderBrushTranslator		ตั้งค่า WBI
+1	thai	x-vnd.Haiku-WonderBrushTranslator	2764474812
 WBI Settings	WonderBrushMain		ตั้งค่า WBI
-WonderBrush images	WonderBrushTranslator		ภาพ WonderBrush
-WonderBrush image	WonderBrushTranslator		ภาพ WonderBrush
-WonderBrush image translator	WonderBrushView		ตัวแปลภาพ WonderBrush
+Version %d.%d.%d, %s	WonderBrushView		เวอร์ชั่น %d.%d.%d, %s
 written by:	WonderBrushView		เขียนโดย:
+WonderBrush image translator	WonderBrushView		ตัวแปลภาพ WonderBrush

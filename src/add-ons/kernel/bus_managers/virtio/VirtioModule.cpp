@@ -24,6 +24,7 @@ virtio_device_init(device_node *node, void **_device)
 	status_t result = device->InitCheck();
 	if (result != B_OK) {
 		ERROR("failed to set up virtio device object\n");
+		delete device;
 		return result;
 	}
 

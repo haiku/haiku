@@ -1,6 +1,6 @@
 /*
  * iroster.cpp
- * (c) 2002, Carlos Hasan, for OpenBeOS.
+ * (c) 2002, Carlos Hasan, for Haiku.
  * Compile: gcc -Wall -Wno-multichar -O2 -o iroster iroster.cpp -lbe
  */
 

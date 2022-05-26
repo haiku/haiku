@@ -2,7 +2,7 @@
 Quit	Workspaces		Afslut
 Invalid argument: %s\n	Workspaces		Ugyldigt argument: %s\n
 Change workspace count…	Workspaces		Vælg arbejdsplads antal…
-Always on top	Workspaces		Altid på top
+Always on top	Workspaces		Altid øverst
 Show window border	Workspaces		Vis vindueskant
 Show window tab	Workspaces		Vis vinduesfaneblad
 Auto-raise	Workspaces		Auto-hæv

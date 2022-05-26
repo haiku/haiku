@@ -1,6 +1,7 @@
-1	russian	x-vnd.Haiku-FirstBootPrompt	2813539172
+1	russian	x-vnd.Haiku-FirstBootPrompt	2131367349
 Japanese	KeymapNames		Японский
 US	KeymapNames		США
+Cancel	BootPromptWindow		Отмена
 Esperanto	KeymapNames		Эсперанто
 Belarusian	KeymapNames		Белорусский
 Brazilian	KeymapNames		Бразильский
@@ -10,10 +11,11 @@ Latin-American	KeymapNames		Латиноамериканский
 Ukrainian	KeymapNames		Украинский
 Russian (Yawert)	KeymapNames		Русская (фонетическая)
 United-Kingdom	KeymapNames		Британская
-Serbian (Cyrillic)	KeymapNames		Сербская (Кириллица)
+Quit Haiku	System name		Выйти из Haiku
 Turkish (Type-F)	KeymapNames		Турецкая (Тип-F)
-Bulgarian (Cyrillic)	KeymapNames		Болгарская (Кириллица)
+Serbian (Cyrillic)	KeymapNames		Сербская (Кириллица)
 Belgian (point)	KeymapNames		Бельгийская (point)
+Bulgarian (Cyrillic)	KeymapNames		Болгарская (Кириллица)
 Finnish	KeymapNames		Финская
 Swedish	KeymapNames		Шведская
 Svorak	KeymapNames		Сворак
@@ -37,7 +39,6 @@ Belarusian (Mac)	KeymapNames		Белорусская (Mac)
 Hebrew	KeymapNames		Иврит
 Greek	KeymapNames		Греческая
 Croatian	KeymapNames		Хорватская
-Run Installer	BootPromptWindow		Запустить Установщик
 Faeroese	KeymapNames		Фарерская
 Polish (Typewriter)	KeymapNames		Польская (Печатная)
 French (Mac)	KeymapNames		Французская (Mac)
@@ -45,6 +46,7 @@ Spanish	KeymapNames		Испанская
 Ukrainian (Mac)	KeymapNames		Украинская (Mac)
 Estonian	KeymapNames		Эстонская 
 French (Bépo)	KeymapNames		Французская (Bépo)
+Restart system	BootPromptWindow		Перезагрузить систему
 Serbian (Latin)	KeymapNames		Сербская (Латиница)
 Russian (Typewriter)	KeymapNames		Русская (Печатная)
 French	KeymapNames		Французская
@@ -52,8 +54,8 @@ Italian	KeymapNames		Итальянская
 Portuguese	KeymapNames		Португальская
 Swiss-French	KeymapNames		Швейцарско-Французский
 Slovene	KeymapNames		Словенская
-Lithuanian	KeymapNames		Литовская
 French (NF Z71-300)	KeymapNames		Французская (NF Z71-300)
+Lithuanian	KeymapNames		Литовская
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Казахская
 Language	BootPromptWindow		Язык
@@ -62,16 +64,15 @@ Belgian (comma)	KeymapNames		Бельгийская (comma)
 Custom	BootPromptWindow		Пользовательская
 Norwegian	KeymapNames		Норвежская
 Danish	KeymapNames		Датская
-Boot to Desktop	BootPromptWindow		Загрузить рабочий стол
 Bulgarian (Phonetic)	KeymapNames		Болгарская (Фонетическая)
 Canadian-French	KeymapNames		Канадо-Французская
-Welcome to Haiku!	BootPromptWindow		Добро пожаловать в Haiku!
 Russian	KeymapNames		Русская
 Hungarian	KeymapNames		Венгерская
 Irish	KeymapNames		Ирландская
 Romanian	KeymapNames		Румынская
-Macedonian	KeymapNames		Македонская
+Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Вы уверены, что хотите закрыть это окно? Это приведет к перезагрузке компьютера!
 Czech (Mac)	KeymapNames		Чешская (Mac)
+Macedonian	KeymapNames		Македонская
 Brazilian (ABNT2)	KeymapNames		Бразильская (ABNT2)
 Albanian	KeymapNames		Албанская
 Dutch	KeymapNames		Датская

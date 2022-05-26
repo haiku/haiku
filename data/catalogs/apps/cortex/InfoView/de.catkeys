@@ -1,0 +1,59 @@
+1	german	application/x-vnd.Cortex.InfoView	2382053937
+Offset	InfoView		Versatz
+Description	DormantNodeInfoView		Beschreibung
+Byte order	InfoView		Byte-Reihenfolge
+Connection	InfoView		Verbindung
+Output formats	DormantNodeInfoView		Ausgangeformate
+History	InfoView		Historie
+Input formats	DormantNodeInfoView		Eingangsformate
+Signature	AppNodeInfoView		Signatur
+Video data between	InfoView		Videodaten zwischen
+Any number	DormantNodeInfoView	For 'Max. instances' field	beliebig viele
+Flags	InfoView		Flags
+Media output	InfoView		Media-Ausgang
+Active lines	InfoView		Aktive Zeilen
+Buffer size	InfoView		Puffergröße
+\n- Quality:	FileNodeInfoView		\n- Qualität:
+Kinds	LiveNodeInfoView		Arten
+Application	AppNodeInfoView		Anwendung
+Flavor flags	DormantNodeInfoView		Variante
+Max. instances	DormantNodeInfoView		Max. Instanzen
+\n- Duration:	FileNodeInfoView		\n- Dauer:
+Dormant media node	DormantNodeInfoView		Schlafende Media-Node
+Latency	LiveNodeInfoView		Latenz
+Media type	InfoView		Mediatyp
+Live media node	LiveNodeInfoView		Live Media-Node
+Field rate	InfoView		Feldrate
+Kinds	DormantNodeInfoView		Arten
+%title% info	InfoView		%title% Info
+Node ID	LiveNodeInfoView		Node ID
+Resolution	InfoView		Auflösung
+Chunk size	InfoView		Chunk-Größe
+File format	AppNodeInfoView		Dateiformat
+Matrix mask	InfoView		Matrixmaske
+Channel mask	InfoView		Kanalmaske
+Orientation	InfoView		Ausrichtung
+Live file-interface node	FileNodeInfoView		Live Datei-Interface Node
+Channels	InfoView		Kanäle
+Sample rate	InfoView		Abtastrate
+File format	FileNodeInfoView		Dateiformat
+(no file)	FileNodeInfoView		(keine Datei)
+Media input	InfoView		Media-Eingang
+Bit rate	InfoView		Bitrate
+Input format	DormantNodeInfoView		Eingangsformat
+Format	InfoView		Format
+Version	AppNodeInfoView		Version
+AddOn ID	DormantNodeInfoView		Add-on ID
+Frame size	InfoView		Rahmengröße
+Flavor ID	DormantNodeInfoView		Variaten ID
+Run mode	LiveNodeInfoView		Laufmodus
+\n- Codec:	FileNodeInfoView		\n- Codec:
+Port	LiveNodeInfoView		Port
+Output format	DormantNodeInfoView		Ausgangsformat
+Aspect ratio	InfoView		Seitenverhältnis
+Application-owned node	AppNodeInfoView		Anwendungs-Node
+Tracks	FileNodeInfoView		Spuren
+Source	InfoView		Quelle
+Destination	InfoView		Ziel
+Copyright	FileNodeInfoView		Copyright
+ID:	FileNodeInfoView		ID:

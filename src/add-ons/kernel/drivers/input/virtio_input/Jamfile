@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons kernel drivers input virtio_input ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders drivers virtio input ;
+SubDirHdrs $(HAIKU_TOP) src system kernel device_manager ;
+
+KernelAddon virtio_input :
+	virtio_input.cpp
+;

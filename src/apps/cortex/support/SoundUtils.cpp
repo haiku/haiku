@@ -64,7 +64,7 @@ bytes_per_frame(
 	//	bytes-per-sample value in the low nybble. Having a fixed
 	//	number of bytes-per-sample, and no inter-sample relationships,
 	//	is what makes a format "raw".
-	int bytesPerSample = format.format & 0xf;
+	int bytesPerSample = format.format & media_raw_audio_format::B_AUDIO_SIZE_MASK;
 	return bytesPerSample * format.channel_count;
 }
 

@@ -1,19 +1,20 @@
-1	romanian	x-vnd.Be-PEPL	2332202134
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Lansarea preferinței FileTypes pentru a configura atributele persoanei a eșuat.\n\nEroare: 
+1	romanian	x-vnd.Be-PEPL	2634915100
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Lansarea mini-aplicației de preferințe FileTypes pentru a configura atributele Person a eșuat.\n\nEroare: 
+Mobile phone	People		Telefon mobil
 Unnamed person	People		Persoană fără nume
 New person…	People		Persoană nouă…
 Address	People		Adresă
 Zip	People		Cod poștal
-Select all	People		Selectează tot
+Select all	People		Selectează toate
 Could not create %s.	People		Nu s-a putut crea %s.
-Quit	People		Închidere
+Quit	People		Ieșire
 Company	People		Companie
 Name	People		Nume
-The file '%name%' could not be written.	People		Nu a putut fi scris fișierul '%name%'.
+The file '%name%' could not be written.	People		Fișierul „%name%” nu a putut fi scris.
 Contact name	People		Nume de contact
 Cancel	People		Anulează
 Edit	People		Editează
-Save changes before closing?	People		Doriți să salvați modificările înainte de a închide?
+Save changes before closing?	People		Salvați modificările înainte de a închide?
 People	System name		People
 Error	People		Eroare
 Revert	People		Revenire
@@ -23,9 +24,9 @@ New person	People		Persoană nouă
 Save	People		Salvează
 Fax	People		Fax
 URL	People		URL
-%name% picture	People		%name% imagine
+%name% picture	People		Imagine %name%
 Home phone	People		Telefon de acasă
-none	Groups list		nimic
+none	Groups list		nespecificat
 Save as…	People		Salvează ca…
 Cut	People		Taie
 Contact information for a person.	Long mimetype description		Informațiile de contact pentru o persoană.
@@ -33,9 +34,9 @@ Remove image	People		Elimină imaginea
 City	People		Oraș
 Undo	People		Refă
 Don't save	People		Nu salva
-Configure attributes	People		Configurează atribute
+Configure attributes	People		Configurează atributele
 Work phone	People		Telefon de serviciu
-State	People		Stare
+State	People		Stat
 Nickname	People		Pseudonim
 OK	People		OK
 File	People		Fișier
@@ -45,6 +46,6 @@ Copy	People		Copiază
 Paste	People		Lipește
 E-mail	People		Email
 Group	People		Grup
-Drop an image here,\nor use the contextual menu.	People		Plasează o imagine aici,\nsau utilizează meniul contextual.
-Load image…	People		Încarcă imagine…
-Sorry	People		Îmi pare rău
+Drop an image here,\nor use the contextual menu.	People		Plasați o imagine aici,\nsau utilizați meniul contextual.
+Load image…	People		Încărcare imagine…
+Sorry	People		Scuze

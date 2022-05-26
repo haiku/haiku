@@ -67,6 +67,7 @@ class ModelNodeLazyOpener;
 class LazyBitmapAllocator;
 class SharedIconCache;
 class SharedCacheEntry;
+class GenerateThumbnailJob;
 
 enum IconDrawMode {
 	// Different states of icon drawing
@@ -477,6 +478,8 @@ private:
 	int32 fHighlightTable[kColorTransformTableSize];
 	bool fInitHighlightTable;
 		// whether or not we need to initialize the highlight table
+
+	friend class BPrivate::GenerateThumbnailJob;
 };
 
 

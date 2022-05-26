@@ -237,7 +237,7 @@ UdfString::SetTo(const char *utf8)
 void
 UdfString::SetTo(const char *cs0, uint32 length)
 {
-	DEBUG_INIT_ETC("UdfString", ("cs0: %p, length: %ld", cs0, length));
+	DEBUG_INIT_ETC("UdfString", ("cs0: %p, length: %" B_PRIu32, cs0, length));
 
 	_Clear();
 	if (length == 0)
@@ -253,7 +253,7 @@ UdfString::SetTo(const char *cs0, uint32 length)
 		memcpy(fCs0String, cs0, length);
 		fCs0Length = length;
 	} else {
-		PRINT(("new fCs0String[%ld] allocation failed\n", length));
+		PRINT(("new fCs0String[%" B_PRIu32 "] allocation failed\n", length));
 		return;
 	}
 
@@ -281,7 +281,8 @@ UdfString::SetTo(const char *cs0, uint32 length)
 				}
 				outputString[0] = 0;
 			} else {
-				PRINT(("new fUtf8String[%ld] allocation failed\n", allocationLength));
+				PRINT(("new fUtf8String[%" B_PRId32 "] allocation failed\n",
+					allocationLength));
 			}
 
 			break;
@@ -302,7 +303,8 @@ UdfString::SetTo(const char *cs0, uint32 length)
 				}
 				outputString[0] = 0;
 			} else {
-				PRINT(("new fUtf8String[%ld] allocation failed\n", allocationLength));
+				PRINT(("new fUtf8String[%" B_PRId32 "] allocation failed\n",
+					allocationLength));
 			}
 
 			break;

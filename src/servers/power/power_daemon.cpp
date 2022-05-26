@@ -10,12 +10,12 @@
 #include "lid_monitor.h"
 #include "power_button_monitor.h"
 
-#include <Application.h>
+#include <Server.h>
 
 #include <map>
 
 
-class PowerManagementDaemon : public BApplication {
+class PowerManagementDaemon : public BServer {
 public:
 								PowerManagementDaemon();
 	virtual 					~PowerManagementDaemon();
@@ -43,7 +43,7 @@ main(void)
 
 PowerManagementDaemon::PowerManagementDaemon()
 	:
-	BApplication("application/x-vnd.Haiku-powermanagement"),
+	BServer("application/x-vnd.Haiku-powermanagement", false, NULL),
 	fMonitorCount(0),
 	fQuitRequested(false)
 {

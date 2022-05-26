@@ -1,7 +1,7 @@
-1	spanish; castilian	x-vnd.Haiku-CharacterMap	2417544138
+1	spanish; castilian	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Variado de símbolos matemáticos B
-Latin extended E	UnicodeBlocks		Latin extendido E
+Latin extended E	UnicodeBlocks		Latín extendido E
 Dogra	UnicodeBlocks		Dogra
 Javanese	UnicodeBlocks		Javanés
 Saurashtra	UnicodeBlocks		Saurashtra
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		Ideogramas CJK unificados exte
 Ancient Greek musical notation	UnicodeBlocks		Notación musical griega antigua
 Thai	UnicodeBlocks		Tailandés
 Ethiopic supplement	UnicodeBlocks		Suplemento de etíope
+Only show blocks contained in font	CharacterWindow		Mostrar solamente bloques contenidos en la fuente
 Chess symbols	UnicodeBlocks		Símbolos de ajedrez
 Yijing hexagram symbols	UnicodeBlocks		Hexagramas de Yijing
 Ottoman Siyaq numbers	UnicodeBlocks		Números otomanos siyaq
@@ -209,6 +210,7 @@ Old Permic	UnicodeBlocks		Pérmico antiguo
 Supplemental mathematical operators	UnicodeBlocks		Operadores matemáticos suplementarios
 Sinhala	UnicodeBlocks		Cingalés
 Bhaiksuki	UnicodeBlocks		Bhaiksuki
+Dives Akuru	UnicodeBlocks		Dives Akuru
 Ugaritic	UnicodeBlocks		Ugarítico
 Old North Arabian	UnicodeBlocks		Nordarábigo antiguo
 Mende Kikakui	UnicodeBlocks		Kikakui de Mende
@@ -226,15 +228,19 @@ Myanmar extended A	UnicodeBlocks		Birmano extendido A
 Ancient symbols	UnicodeBlocks		Símbolos antiguos
 Arabic mathematical alphabetic symbols	UnicodeBlocks		Símbolos matemáticos alfabéticos arábigos
 Miscellaneous symbols and arrows	UnicodeBlocks		Variado de símbolos y flechas
+Common Indic number forms	UnicodeBlocks		Formas numéricas comunes índicas
 Kharoshthi	UnicodeBlocks		Kharoshthi
 Buginese	UnicodeBlocks		Buginés
 Telugu	UnicodeBlocks		Telugú
 Cyrillic supplement	UnicodeBlocks		Suplemento cirílico
+Grantha	UnicodeBlocks		Grantha
 Yi Radicals	UnicodeBlocks		Carácteres de Yi
 Supplementary private use area A	UnicodeBlocks		Espacio suplementario para utilización privada A
 Armenian	UnicodeBlocks		Armenio
 Miscellaneous symbols and pictographs	UnicodeBlocks		Símbolos y pictogramas misceláneos
 Phags-pa	UnicodeBlocks		Phags-pa
+Nabataean	UnicodeBlocks		Nabateo
+Meetei Mayek	UnicodeBlocks		Mayek de meitei
 CJK compatibility ideographs	UnicodeBlocks		Ideogramas de compatibilidad de CJK
 Show private blocks	CharacterWindow		Mostrar bloques privados
 Samaritan	UnicodeBlocks		Samaritano
@@ -243,13 +249,17 @@ Tibetan	UnicodeBlocks		Tibetana
 Combining diacritical marks	UnicodeBlocks		Combinar signos diacríticos
 Tags	UnicodeBlocks		Etiquetas
 Khmer	UnicodeBlocks		Camboyano
+Hangul Jamo extended B	UnicodeBlocks		Hangul Jamo extendido B
+Tai Viet	UnicodeBlocks		Taï viêt
 Georgian supplement	UnicodeBlocks		Suplemento georgiano
 Tagalog	UnicodeBlocks		Tagalo
+CJK unified ideographs extension F	UnicodeBlocks		Ideogramas unificados CJK extensión F
 Supplemental Symbols and Pictographs	UnicodeBlocks		Símbolos y pictogramaas suplementarios
 Devanagari	UnicodeBlocks		Devanagari
 Runic	UnicodeBlocks		Rúnico
 General punctuation	UnicodeBlocks		Puntuación general
 Mongolian supplement	UnicodeBlocks		Suplemento mongol
+Khudawadi	UnicodeBlocks		Judawadi
 Glagotic	UnicodeBlocks		Glagolítico
 Cyrillic extended B	UnicodeBlocks		Cirílico extendido B
 Anatolian hieroglyphs	UnicodeBlocks		Jeroglíficos anatolios
@@ -263,6 +273,8 @@ Kangxi radicals	UnicodeBlocks		Carácteres de Kangxi
 Copy character	CharacterView		Copiar carácter
 Hangul Jamo	UnicodeBlocks		Hangul Jamo
 Font	CharacterWindow		Tipo de letra
+Ornamental dingbats	UnicodeBlocks		Viñetas ornamentadas
+Egyptian hieroglyph format controls	UnicodeBlocks		Caracteres de formato para jeroglíficos egipcios
 Manichaean	UnicodeBlocks		Maniqueo
 Phaistos disc	UnicodeBlocks		Disco de Festos
 Miscellaneous technical	UnicodeBlocks		Variado técnico
@@ -279,6 +291,7 @@ Elbasan	UnicodeBlocks		Elbasanés
 Hangul compatibility Jamo	UnicodeBlocks		Compatibilidad de Hangul Jamo
 Phonetic extensions supplement	UnicodeBlocks		Suplemento de extensiones fonéticas
 CJK unified ideographs extension E	UnicodeBlocks		Ideogramas de CJK unificados extendidos E
+Nüshu	UnicodeBlocks		Nü shu
 Old Persian	UnicodeBlocks		Persa antiguo
 Malayalam	UnicodeBlocks		Malayalam
 CJK radicals supplement	UnicodeBlocks		Suplemento carácteres de CJK

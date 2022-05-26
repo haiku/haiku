@@ -1,7 +1,7 @@
 /*
-* Copyright 2020, Haiku, Inc. All rights reserved.
-* Distributed under the terms of the MIT License.
-*/
+ * Copyright 2020, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 enum {
 	mouse_icon = 1,

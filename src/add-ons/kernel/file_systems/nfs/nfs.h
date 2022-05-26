@@ -4,8 +4,8 @@
 
 #include <SupportDefs.h>
 
-const int32 NFS_VERSION=2;
-const int32 NFS_PROGRAM=100003;
+#define NFS_VERSION 2
+#define NFS_PROGRAM 100003
 
 typedef enum nfs_stat 
 { 

@@ -30,6 +30,7 @@ class BCursorTester : public TestCase
 		void BCursor3();
 		void BCursor4();
 		void BCursor5();
+		void BCursor6();
 		void Instantiate1();
 		void Instantiate2();
 		void Archive1();

@@ -1,6 +1,7 @@
-1	portuguese	x-vnd.Haiku-CodyCam	2593355250
+1	portuguese	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		pasta de destino esperada
 reply: '%s'\n	SftpClient		resposta: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <suprimida>  (palavra-passe real enviada)
 JPEG image	CodyCam		Imagem JPEG
 Remote host has closed the connection.\n	FtpClient		O anfitrião remoto fechou a ligação.\n
 image file format expected	CodyCam		formato de imagem de arquivo esperado
@@ -43,7 +44,6 @@ Locking the window	VideoConsumer.cpp		A bloquear a janela
 Cannot find an available video stream	CodyCam		Fonte de video não disponível
 Upload…	VideoConsumer.cpp		Carregar…
 password expected	CodyCam		palavra-passe esperada
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suprimida>   (enviada palavra-passe real)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		Emissor
 server address expected	CodyCam		endereço esperado do servidor

@@ -192,6 +192,7 @@ void FindPanel::MessageReceived(BMessage* msg)
 		}
 		default:
 			BView::MessageReceived(msg);
+			break;
 	}
 }
 
@@ -271,4 +272,3 @@ const char* FindWindow::GetFindString()
 {
 	return sPreviousFind.String();
 }
-

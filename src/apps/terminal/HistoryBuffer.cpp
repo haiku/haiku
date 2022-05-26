@@ -84,7 +84,7 @@ HistoryBuffer::GetTerminalLineAt(int32 index, TerminalLine* buffer) const
 	int32 charCount = 0;
 	const char* chars = line->Chars();
 	buffer->length = 0;
-	uint32 attributes = 0;
+	Attributes attributes;
 	AttributesRun* attributesRun = line->AttributesRuns();
 	int32 attributesRunCount = line->attributesRunCount;
 	int32 nextAttributesAt = attributesRunCount > 0
@@ -95,7 +95,7 @@ HistoryBuffer::GetTerminalLineAt(int32 index, TerminalLine* buffer) const
 		if (charCount == nextAttributesAt) {
 			if (charCount < attributesRun->offset) {
 				// the "hole" in attributes run
-				attributes = 0;
+				attributes.Reset();
 				nextAttributesAt = attributesRun->offset;
 			} else if (attributesRunCount > 0) {
 				attributes = attributesRun->attributes;
@@ -104,7 +104,7 @@ HistoryBuffer::GetTerminalLineAt(int32 index, TerminalLine* buffer) const
 				attributesRun++;
 				attributesRunCount--;
 			} else {
-				attributes = 0;
+				attributes.Reset();
 				nextAttributesAt = INT_MAX;
 			}
 		}
@@ -120,10 +120,10 @@ HistoryBuffer::GetTerminalLineAt(int32 index, TerminalLine* buffer) const
 
 		// full width char?
 		if (cell.character.IsFullWidth()) {
-			cell.attributes |= A_WIDTH;
+			cell.attributes.state |= A_WIDTH;
 			// attributes of the second, "invisible" cell must be
 			// cleared to let full-width chars detection work properly
-			buffer->cells[charCount++].attributes = 0;
+			buffer->cells[charCount++].attributes.Reset();
 		}
 	}
 
@@ -140,18 +140,20 @@ HistoryBuffer::AddLine(const TerminalLine* line)
 {
 //debug_printf("HistoryBuffer::AddLine(%p): length: %d\n", line, line->length);
 	// determine the amount of memory we need for the line
-	uint32 attributes = 0;
+	Attributes attributes;
 	int32 attributesRuns = 0;
 	int32 byteLength = 0;
 	for (int32 i = 0; i < line->length; i++) {
 		const TerminalCell& cell = line->cells[i];
 		byteLength += cell.character.ByteCount();
-		if ((cell.attributes & CHAR_ATTRIBUTES) != attributes) {
-			attributes = cell.attributes & CHAR_ATTRIBUTES;
-			if (attributes != 0)
+		if (cell != attributes) {
+			attributes.state = cell.attributes.state & CHAR_ATTRIBUTES;
+			attributes.foreground = cell.attributes.foreground;
+			attributes.background = cell.attributes.background;
+			if (attributes.state != 0)
 				attributesRuns++;
 		}
-		if (IS_WIDTH(cell.attributes))
+		if (cell.attributes.IsWidth())
 			i++;
 	}
 
@@ -160,7 +162,7 @@ HistoryBuffer::AddLine(const TerminalLine* line)
 	// allocate and translate the line
 	HistoryLine* historyLine = _AllocateLine(attributesRuns, byteLength);
 
-	attributes = 0;
+	attributes.Reset();
 	AttributesRun* attributesRun = historyLine->AttributesRuns();
 
 	char* chars = historyLine->Chars();
@@ -173,28 +175,30 @@ HistoryBuffer::AddLine(const TerminalLine* line)
 		chars += charLength;
 
 		// deal with attributes
-		if ((cell.attributes & CHAR_ATTRIBUTES) != attributes) {
+		if (cell != attributes) {
 			// terminate the previous attributes run
-			if (attributes != 0) {
+			if (attributes.state != 0) {
 				attributesRun->length = i - attributesRun->offset;
 				attributesRun++;
 			}
 
-			attributes = cell.attributes & CHAR_ATTRIBUTES;
+			attributes.state = cell.attributes.state & CHAR_ATTRIBUTES;
+			attributes.foreground = cell.attributes.foreground;
+			attributes.background = cell.attributes.background;
 
 			// init the new one
-			if (attributes != 0) {
+			if (attributes.state != 0) {
 				attributesRun->attributes = attributes;
 				attributesRun->offset = i;
 			}
 		}
 
-		if (IS_WIDTH(cell.attributes))
+		if (cell.attributes.IsWidth())
 			i++;
 	}
 
 	// set the last attributes run's length
-	if (attributes != 0)
+	if (attributes.state != 0)
 		attributesRun->length = line->length - attributesRun->offset;
 
 	historyLine->softBreak = line->softBreak;

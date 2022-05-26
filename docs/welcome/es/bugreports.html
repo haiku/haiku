@@ -12,13 +12,14 @@
  *		http://dev.haiku-os.org/wiki/ and http://dev.haiku-os.org/wiki/ReportingBugs
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
+ *		'
  *		kervas
  *		miguel~1.mx
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta name="robots" content="all" />
-	<title>Como Reportar fallos</title>
+	<title>Cómo reportar fallos</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
@@ -36,6 +37,7 @@
 <li><a href="../ca/bugreports.html">Català</a></li>
 <li><a href="../de/bugreports.html">Deutsch</a></li>
 <li><a href="../en/bugreports.html">English</a></li>
+<li><a href="../eo/bugreports.html">Esperanto</a></li>
 <li><a href="../fr/bugreports.html">Français</a></li>
 <li><a href="../fur/bugreports.html">Furlan</a></li>
 <li><a href="../it/bugreports.html">Italiano</a></li>
@@ -60,10 +62,9 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traducción de esta página aún no está completa. Hasta que lo esté, las partes sin traducir se muestran en el inglés original.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Contenido</td></tr>
+<tr class="heading"><td>Índice</td></tr>
 <tr class="index"><td><a href="#account">Obtener una cuenta de Trac</a><br />
                 <a href="#report">Creación de un reporte de fallo</a><br />
                 <a href="#app">Fallos de programas</a><br />
@@ -76,7 +77,7 @@
                   <a href="#next">¿Qué sigue?</a></td></tr>
 </table>
 
-<h1>Como Reportar fallos</h1>
+<h1>Cómo reportar fallos</h1>
 
 <p>Debido a que nuestros desarrolladores no pueden verificar todas las combinaciones de hardware, ni todas las posibles maneras de interactuar con el sistema operativo, estamos contando con que los usuarios nos den retroalimentación sobre cómo funcionan las cosas de su lado. Dado que Haiku todavía es muy joven, es probable que vaya a encontrar fallos. Le agradecemos por tomarse el tiempo para reportar estos fallos. Juntos podemos mejorar a Haiku, poco a poco.</p>
 <p>Para mantener nuestro rastreador de fallos efectivo, es esencial supeditarse a la <a href="http://dev.haiku-os.org/wiki/BugTrackerEtiquette">Etiqueta del rastreador de fallos</a>.</p>
@@ -102,7 +103,7 @@ Tras haber establecido que es un fallo nuevo, haga que su información sea lo m�
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="app" name="app">Fallos de programas</a></h2>
 <p>Cuando una aplicación deja de responder, puede guardar un informe o archivo de volcado de memoria (core file), ambos guardados en el Escritorio, y puede adjuntar estos archivos a un informe de fallos, o puede invocar el <a href="../../userguide/es/applications/debugger.html">Depurador</a>.</p>
-<p>If it's not a crashing bug, you may get useful information when starting the application from Terminal. Some applications provide logging and other options when started with certain parameters; try <tt>-h</tt> or <tt>--help</tt> to see if that is the case. As example, see the different logging levels of <a href="../../userguide/es/applications/haikudepot.html#logs">HaikuDepot</a>.</p>
+<p>Si no se trata de un error que haga fallar a la aplicación, es posible obtener información útil si se la inicia desde la terminal. Algunas aplicaciones cuentan con registros de eventos y otras opciones al inicio mediante ciertos parámetros; intente utilizar como parámetros <tt>-h</tt> or <tt>--help</tt> para ver si ese es el caso. Como ejemplo, inténtelo con <a href="../../userguide/es/applications/haikudepot.html#logs">HaikuDepot</a> para ver los diferentes niveles de registro.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">Fallos de servidor</a></h2>
@@ -161,7 +162,7 @@ Una o más páginas de texto se mostrarán en la pantalla, solamente las última
 <tr><td>- <span class="cli">listusb -v</span></td><td> </td><td>asumiendo que el conflicto se relacione con USB, esto es similar a <span class="cli">lsusb</span>.</td></tr>
 <tr><td>- <span class="cli">open /var/log/syslog</span></td><td> </td><td>vea <a href="#syslog">Registro de sistema</a> arriba, parecido al depurador en pantalla cuando se arranca. Con la orden <span class="cli">open</span> puede acortar a la parte relevante del registro de sistema en un editor de texto.</td></tr>
 <tr><td class="onelinetop">- <span class="cli">listimage | grep drivers/</span></td><td> </td><td>muestra una lista de todos los controladores utilizados.</td></tr>
-<tr><td>- <span class="cli">usb_hid_report</span></td><td> </td><td>In case of USB input devices, add the <span class="cli">/tmp/usb_hid_report_descriptor_*.bin</span> file.</td></tr>
+<tr><td>- <span class="cli">usb_hid_report</span></td><td> </td><td>En caso de dispositivos de entrada USB, agregue el archivo <span class="cli">/tmp/usb_hid_report_descriptor_*.bin</span>.</td></tr>
 <tr><td>- <span class="cli">ints</span></td><td> </td><td>sólo disponible en la <i>Zona de depuración del núcleo (kernel)</i> (vea abajo). Muestra el uso de interruptores. No deberían haber muchos que esten compartidos por diferentes dispositivos.</td></tr>
 <tr><td colspan="3">Salida de depuración a pantalla (una opción de modo a prueba de fallas en el momento de arranque, vea <a href="#onscreen">arriba</a>)</td></tr>
 </table>

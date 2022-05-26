@@ -95,10 +95,11 @@ arch_int_disable_io_interrupt(int irq)
 /* arch_int_*_interrupts() and friends are in arch_asm.S */
 
 
-void
+int32
 arch_int_assign_to_cpu(int32 irq, int32 cpu)
 {
-	// intentionally left blank; no SMP support (yet)
+	// Not yet supported.
+	return 0;
 }
 
 

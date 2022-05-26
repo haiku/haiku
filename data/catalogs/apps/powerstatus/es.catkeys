@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-PowerStatus	3173765686
+1	spanish; castilian	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Ejecutar en ventana
 Extended battery info	PowerStatus		Información sobre la batería más extenso
 Show status icon	PowerStatus		Mostrar icono de estado
@@ -30,11 +30,13 @@ Serial number: 	PowerStatus		Número en serie:
 Battery critical	PowerStatus		Batería críticamente baja
 Capacity: 	PowerStatus		Capacidad:
  mW	PowerStatus		 mW
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		No se detectó una batería compatible. No se puede usar PowerStatus en su sistema.
 Show percent	PowerStatus		Mostrar porcentaje
 Capacity granularity 1: 	PowerStatus		Granulación de capacidad 1:
 The battery level is getting low, please plug in the device.	PowerStatus		El nivel de batería es bajo, por favor conecte el dispositivo a la corriente.
 Design capacity warning: 	PowerStatus		Advertencia de la capacidad de diseño:
 Capacity granularity 2: 	PowerStatus		Granulación de capacidad 2:
+Too bad!	PowerStatus		¡Qué mal!
 Technology: 	PowerStatus		Tecnología:
  mWh	PowerStatus		 mWh
 PowerStatus	System name		PowerStatus

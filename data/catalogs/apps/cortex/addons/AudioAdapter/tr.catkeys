@@ -1,0 +1,10 @@
+1	turkish	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		Giriş biçimi
+Channels:	CortexAudioAdapter		Kanallar:
+stereo	CortexAudioAdapter		çift kanallı
+mono	CortexAudioAdapter		tek kanallı
+Output format	CortexAudioAdapter		Çıkış biçimi
+Audio input	CortexAddOnsCommon		Ses girişi
+Sample format:	CortexAudioAdapter		Örnek biçim:
+Audio output	CortexAddOnsCommon		Ses çıkışı
+%groupname% parameters	CortexAddOnsCommon		%groupname% parametreleri

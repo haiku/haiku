@@ -9,6 +9,7 @@
 
 #include "OpenSoundNode.h"
 
+#include <AutoDeleter.h>
 #include <Autolock.h>
 #include <Buffer.h>
 #include <BufferGroup.h>
@@ -2232,7 +2233,10 @@ OpenSoundNode::_PlayThread(NodeInput* input)
 	}
 
 	// cache a silence buffer
-	uint8 silenceBuffer[bufferSize];
+	uint8* silenceBuffer = (uint8*)malloc(bufferSize);
+	if (silenceBuffer == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter deleter(silenceBuffer);
 	uint8 formatSilence = 0;
 	if (input->fInput.format.u.raw_audio.format
 			== media_raw_audio_format::B_AUDIO_UCHAR)
@@ -2677,9 +2681,8 @@ OpenSoundNode::GetFlavor(flavor_info* outInfo, int32 id)
 	outInfo->out_formats = 0;
 	outInfo->internal_id = id;
 
-	outInfo->name = (char *)"OpenSoundNode Node";
-	outInfo->info = (char *)"The OpenSoundNode outputs to OpenSound System v4 "
-		"drivers.";
+	outInfo->name = "OpenSoundNode Node";
+	outInfo->info = "The OpenSoundNode outputs to OpenSound System v4 drivers.";
 	outInfo->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_TIME_SOURCE
 		| B_PHYSICAL_OUTPUT | B_PHYSICAL_INPUT | B_CONTROLLABLE;
 	// TODO: If the OSS engine supports outputing encoded audio,

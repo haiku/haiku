@@ -39,11 +39,23 @@ public:
 								MMCBus(device_node *node);
 								~MMCBus();
 				status_t		InitCheck();
+				void			Rescan();
 
-private:
-				status_t		ExecuteCommand(uint8_t command,
+				status_t		ExecuteCommand(uint16_t rca, uint8_t command,
 									uint32_t argument, uint32_t* response);
-		static	status_t		WorkerThread(void*);
+				status_t		DoIO(uint16_t rca, uint8_t command,
+									IOOperation* operation,
+									bool offsetAsSectors);
+
+				void			SetClock(int frequency);
+				void			SetBusWidth(int width);
+
+				void			AcquireBus() { acquire_sem(fLockSemaphore); }
+				void			ReleaseBus() { release_sem(fLockSemaphore); }
+private:
+				status_t		_ActivateDevice(uint16_t rca);
+				void			_AcquireScanSemaphore();
+		static	status_t		_WorkerThread(void*);
 
 private:
 
@@ -52,6 +64,9 @@ private:
 		void* 					fCookie;
 		status_t				fStatus;
 		thread_id				fWorkerThread;
+		sem_id					fScanSemaphore;
+		sem_id					fLockSemaphore;
+		uint16					fActiveDevice;
 };
 
 

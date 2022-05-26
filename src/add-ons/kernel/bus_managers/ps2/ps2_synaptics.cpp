@@ -21,6 +21,13 @@
 #include "ps2_service.h"
 
 
+//#define TRACE_PS2_SYNAPTICS
+#ifdef TRACE_PS2_SYNAPTICS
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...)
+#endif
+
 // synaptics touchpad proportions
 #define SYN_EDGE_MOTION_WIDTH	50
 #define SYN_AREA_OFFSET			40
@@ -605,9 +612,9 @@ synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 
 	switch (op) {
 		case MS_READ:
-			TRACE("SYNAPTICS: MS_READ get event\n");
 			if ((status = get_synaptics_movment(cookie, &movement)) != B_OK)
 				return status;
+			TRACE("SYNAPTICS: MS_READ get event\n");
 			return user_memcpy(buffer, &movement, sizeof(movement));
 
 		case MS_IS_TOUCHPAD:

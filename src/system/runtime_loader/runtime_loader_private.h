@@ -72,7 +72,7 @@ status_t get_executable_architecture(const char* path,
 void terminate_program(void);
 image_id load_program(char const* path, void** entry);
 image_id load_library(char const* path, uint32 flags, bool addOn,
-	void** _handle);
+	void* caller, void** _handle);
 status_t unload_library(void* handle, image_id imageID, bool addOn);
 status_t get_nth_symbol(image_id imageID, int32 num, char* nameBuffer,
 	int32* _nameLength, int32* _type, void** _location);

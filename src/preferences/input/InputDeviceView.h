@@ -10,15 +10,14 @@
 #ifndef _INPUT_DEVICE_VIEW_H
 #define _INPUT_DEVICE_VIEW_H
 
-#include <ListView.h>
 #include <ListItem.h>
+#include <ListView.h>
 #include <Message.h>
-#include <StringItem.h>
 #include <ScrollBar.h>
-#include <String.h>
 #include <ScrollView.h>
+#include <String.h>
+#include <StringItem.h>
 #include <View.h>
-
 
 #include "InputIcons.h"
 #include "InputTouchpadPref.h"

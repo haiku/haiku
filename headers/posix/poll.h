@@ -6,6 +6,10 @@
 #define _POLL_H
 
 
+#include <signal.h>
+#include <sys/time.h>
+
+
 typedef unsigned long nfds_t;
 
 struct pollfd {
@@ -29,10 +33,18 @@ struct pollfd {
 #define	POLLNVAL	0x1000		/* invalid file descriptor */
 
 
-extern
 #ifdef __cplusplus
-"C"
+extern "C" {
 #endif
-int poll(struct pollfd *fds, nfds_t numfds, int timeout);
+
+extern int poll(struct pollfd *fds, nfds_t numfds, int timeout);
+extern int ppoll(struct pollfd *fds, nfds_t numfds,
+	const struct timespec *timeout, const sigset_t *sigMask);
+
+#ifdef __cplusplus
+}
+#endif
+
+
 
 #endif /* _POLL_H */

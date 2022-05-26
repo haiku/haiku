@@ -302,6 +302,7 @@ private:
 									int32 scrollTo = INT32_MIN);
 			void				_RecalculateLineBreaks(int32* startLine,
 									int32* endLine);
+			void				_ValidateTextRect();
 			int32				_FindLineBreak(int32 fromOffset,
 									float* _ascent, float* _descent,
 									float* inOutWidth);
@@ -390,12 +391,14 @@ private:
 			int32				_PreviousWordStart(int32 offset);
 			int32				_NextWordEnd(int32 offset);
 
-			bool				_GetProperty(BMessage* specifier, int32 form,
+			bool				_GetProperty(BMessage* message,
+									BMessage* specifier,
 									const char* property, BMessage* reply);
-			bool				_SetProperty(BMessage* specifier, int32 form,
+			bool				_SetProperty(BMessage* message,
+									BMessage* specifier,
 									const char* property, BMessage* reply);
-			bool				_CountProperties(BMessage* specifier,
-									int32 form, const char* property,
+			bool				_CountProperties(BMessage* message,
+									BMessage* specifier, const char* property,
 									BMessage* reply);
 
 			void				_HandleInputMethodChanged(BMessage* message);

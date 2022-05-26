@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	1313616492
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	1961774506
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Onderdeel verwijderen naar Trash
 Close	MediaPlayer-PlaylistWindow		Afsluiten
 Volume of background clips	MediaPlayer-SettingsWindow		Volume van achtergrondclips
@@ -35,6 +35,7 @@ Full volume	MediaPlayer-SettingsWindow		Maximaal volume
 Start media server	MediaPlayer-Main		Start mediaserver
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Het lijkt erop dat de mediaserver niet actief is.\nWilt u hem starten ?
 Location	MediaPlayer-InfoWin		Locatie
+Opening '%s'.	MediaPlayer-Main		Openen '%s'.
 Medium	MediaPlayer-SettingsWindow		Gemiddeld
 Play mode	MediaPlayer-SettingsWindow		Afspeelmodus
 Playlist	MediaPlayer-PlaylistWindow		Afspeellijst

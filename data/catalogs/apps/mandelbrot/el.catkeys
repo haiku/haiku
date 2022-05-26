@@ -1,25 +1,28 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Mandelbrot	3875916167
-Burning Ship	MandelbrotWindow		Φλεγόμενο Πλοίο
+1	greek, modern (1453-)	x-vnd.Haiku-Mandelbrot	2302392624
 Grassland	MandelbrotWindow		Λιβάδι
+Tricorn	MandelbrotWindow		Τρίκορν
+Orbit Trap	MandelbrotWindow		Διαστημική Παγίδα
+Deepfrost	MandelbrotWindow		Παγετώνας
+1 (none)	MandelbrotWindow		1 (καμία)
+Quit	MandelbrotWindow		Έξοδος
+Save as image…	MandelbrotWindow		Αποθήκευση ως εικόνα...
+Fire	MandelbrotWindow		Φωτιά
+High contrast	MandelbrotWindow		Υψηλή αντίθεση
+Full screen	MandelbrotWindow		Πλήρης οθόνη 
+Midnight	MandelbrotWindow		Μεσάνυχτα
+Burning Ship	MandelbrotWindow		Φλεγόμενο Πλοίο
 Lightning	MandelbrotWindow		Αστραπή
 About	MandelbrotWindow		Σχετικά
 Palette	MandelbrotWindow		Χρώματα
 Set	MandelbrotWindow		Σχήμα
-Tricorn	MandelbrotWindow		Τρίκορν
 Royal	MandelbrotWindow		Βασιλικό
-Orbit Trap	MandelbrotWindow		Διαστημική Παγίδα
-Deepfrost	MandelbrotWindow		Παγετώνας
 Subsampling	MandelbrotWindow		Δειγματοληψία
-1 (none)	MandelbrotWindow		1 (καμία)
-Quit	MandelbrotWindow		Έξοδος
 File	MandelbrotWindow		Αρχείο
 Julia	MandelbrotWindow		Τζούλια
 Frost	MandelbrotWindow		Χιονοθύελλα
-Fire	MandelbrotWindow		Φωτιά
+View	MandelbrotWindow		Εμφάνιση
 Mandelbrot	System name		Mandelbrot
-Iterations	MandelbrotWindow		Ποιότητα
-High contrast	MandelbrotWindow		Υψηλή αντίθεση
 Multibrot	MandelbrotWindow		Χάμπουργκερ
+Iterations	MandelbrotWindow		Ποιότητα
 Spring	MandelbrotWindow		Άνοιξη
-Midnight	MandelbrotWindow		Μεσάνυχτα
 Mandelbrot	MandelbrotWindow		Mandelbrot

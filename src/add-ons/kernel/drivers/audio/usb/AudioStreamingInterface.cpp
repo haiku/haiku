@@ -476,7 +476,7 @@ AudioStreamingInterface::~AudioStreamingInterface()
 uint8
 AudioStreamingInterface::TerminalLink()
 {
-	if (fAlternates[fActiveAlternate]->Interface() != 0)
+	if (fAlternates[fActiveAlternate]->Interface() != NULL)
 		return fAlternates[fActiveAlternate]->Interface()->fTerminalLink;
 	return 0;
 }

@@ -217,10 +217,6 @@ int	swaitmax = SWAITMAX;
 int	swaitint = SWAITINT;
 
 #ifdef SETPROCTITLE
-#ifdef OLD_SETPROCTITLE
-char	**Argv = NULL;		/* pointer to argument vector */
-char	*LastArgv = NULL;	/* end of argv */
-#endif /* OLD_SETPROCTITLE */
 char	proctitle[LINE_MAX];	/* initial part of title */
 #endif /* SETPROCTITLE */
 
@@ -291,16 +287,6 @@ main(int argc, char *argv[], char **envp)
 	tzset();		/* in case no timezone database in ~ftp */
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = SA_RESTART;
-
-#ifdef OLD_SETPROCTITLE
-	/*
-	 *  Save start and extent of argv for setproctitle.
-	 */
-	Argv = argv;
-	while (*envp)
-		envp++;
-	LastArgv = envp[-1] + strlen(envp[-1]);
-#endif /* OLD_SETPROCTITLE */
 
 	/*
 	 * Prevent diagnostic messages from appearing on stderr.
@@ -1083,7 +1069,7 @@ user(char *name)
 		}
 	}
 	if (logging)
-		strncpy(curname, name, sizeof(curname)-1);
+		strlcpy(curname, name, sizeof(curname));
 
 	pwok = 0;
 #ifdef USE_PAM
@@ -1515,7 +1501,7 @@ skip:
 		    (struct sockaddr *)&his_addr);
 	logged_in = 1;
 
-	if (guest && stats && statfd < 0)
+	if (guest && stats && statfd < 0) {
 #ifdef VIRTUAL_HOSTING
 		statfd = open(thishost->statfile, O_WRONLY|O_APPEND);
 #else
@@ -1523,6 +1509,7 @@ skip:
 #endif
 		if (statfd < 0)
 			stats = 0;
+	}
 
 	dochroot =
 		checkuser(_PATH_FTPCHROOT, pw->pw_name, 1, &residue)
@@ -2173,7 +2160,7 @@ send_data(FILE *instr, FILE *outstr, size_t blksize, off_t filesize, int isreg)
 				}
 			}
 			ENDXFER;
-			reply(226, msg);
+			reply(226, "%s", msg);
 			return (0);
 		}
 
@@ -2371,6 +2358,10 @@ statfilecmd(char *filename)
 	code = lstat(filename, &st) == 0 && S_ISDIR(st.st_mode) ? 212 : 213;
 	(void)snprintf(line, sizeof(line), _PATH_LS " -lgA %s", filename);
 	fin = ftpd_popen(line, "r");
+	if (fin == NULL) {
+			perror_reply(551, filename);
+			return;
+	}
 	lreply(code, "Status of %s:", filename);
 	atstart = 1;
 	while ((c = getc(fin)) != EOF) {
@@ -2832,15 +2823,20 @@ static int
 myoob(void)
 {
 	char *cp;
+	int ret;
 
 	if (!transflag) {
 		syslog(LOG_ERR, "Internal: myoob() while no transfer");
 		return (0);
 	}
 	cp = tmpline;
-	if (ftpd_getline(cp, 7, stdin) == NULL) {
+	ret = getline(cp, 7, stdin);
+	if (ret == -1) {
 		reply(221, "You could at least say goodbye.");
 		dologout(0);
+	} else if (ret == -2) {
+			/* Ignore truncated command. */
+			return (0);
 	}
 	upper(cp);
 	if (strcmp(cp, "ABOR\r\n") == 0) {
@@ -3319,41 +3315,6 @@ reapchild(int signo)
 {
 	while (waitpid(-1, NULL, WNOHANG) > 0);
 }
-
-#ifdef OLD_SETPROCTITLE
-/*
- * Clobber argv so ps will show what we're doing.  (Stolen from sendmail.)
- * Warning, since this is usually started from inetd.conf, it often doesn't
- * have much of an environment or arglist to overwrite.
- */
-void
-setproctitle(const char *fmt, ...)
-{
-	int i;
-	va_list ap;
-	char *p, *bp, ch;
-	char buf[LINE_MAX];
-
-	va_start(ap, fmt);
-	(void)vsnprintf(buf, sizeof(buf), fmt, ap);
-
-	/* make ps print our process name */
-	p = Argv[0];
-	*p++ = '-';
-
-	i = strlen(buf);
-	if (i > LastArgv - p - 2) {
-		i = LastArgv - p - 2;
-		buf[i] = '\0';
-	}
-	bp = buf;
-	while (ch = *bp++)
-		if (ch != '\n' && ch != '\r')
-			*p++ = ch;
-	while (p < LastArgv)
-		*p++ = ' ';
-}
-#endif /* OLD_SETPROCTITLE */
 
 static void
 appendf(char **strp, char *fmt, ...)

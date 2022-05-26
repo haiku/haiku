@@ -20,11 +20,17 @@ UsePrivateHeaders shared ;
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
 		local sourceDir ;
 		for sourceDir in $(sourceDirs) {
 			SEARCH_SOURCE
 				+= [ FDirName $(HAIKU_TOP) src libs icon $(sourceDir) ] ;
 		}
+
+		# Too many applications depend on libicon APIs being visible in libbe;
+		# so for now, prevent -fvisiblity=hidden from being set.
+		NO_HIDDEN_VISIBILITY on [ MultiArchDefaultGristFiles libicon.a ] = 1 ;
 
 		StaticLibrary [ MultiArchDefaultGristFiles libicon.a ] :
 			# flat_icon

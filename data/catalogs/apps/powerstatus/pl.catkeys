@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-PowerStatus	3173765686
+1	polish	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Uruchom w oknie
 Extended battery info	PowerStatus		Szczegółowe informacje o baterii
 Show status icon	PowerStatus		Pokaż ikonę statusu
@@ -30,11 +30,13 @@ Serial number: 	PowerStatus		Numer seryjny:
 Battery critical	PowerStatus		Krytycznie niski poziom naładowania akumulatora
 Capacity: 	PowerStatus		Pojemność: 
  mW	PowerStatus		 mW
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Nie wykryto obsługiwanej baterii. PowerStatus nie będzie działać na tym komputerze.
 Show percent	PowerStatus		Pokaż procent
 Capacity granularity 1: 	PowerStatus		Jednostka pojemności 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Poziom naładowania baterii jest niski, podłącz urządzenie do prądu.
 Design capacity warning: 	PowerStatus		Ostrzeżenie o pojemności nominalnej: 
 Capacity granularity 2: 	PowerStatus		Jednostka pojemności 2: 
+Too bad!	PowerStatus		Klops!
 Technology: 	PowerStatus		Technologia: 
  mWh	PowerStatus		 mWh
 PowerStatus	System name		PowerStatus

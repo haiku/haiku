@@ -753,6 +753,29 @@ publish_device(device_node *node, const char *path, const char *moduleName)
 	}
 
 	node->AddDevice(device);
+
+	device_attr_private* attr;
+
+	attr = new(std::nothrow) device_attr_private();
+	if (attr != NULL) {
+		char buf[256];
+		sprintf(buf, "dev/%" B_PRIdINO "/path", device->ID());
+		attr->name = strdup(buf);
+		attr->type = B_STRING_TYPE;
+		attr->value.string = strdup(path);
+		node->Attributes().Add(attr);
+	}
+
+	attr = new(std::nothrow) device_attr_private();
+	if (attr != NULL) {
+		char buf[256];
+		sprintf(buf, "dev/%" B_PRIdINO "/driver", device->ID());
+		attr->name = strdup(buf);
+		attr->type = B_STRING_TYPE;
+		attr->value.string = strdup(moduleName);
+		node->Attributes().Add(attr);
+	}
+
 	return B_OK;
 }
 
@@ -767,7 +790,8 @@ unpublish_device(device_node *node, const char *path)
 	status_t error = devfs_get_device(path, baseDevice);
 	if (error != B_OK)
 		return error;
-	CObjectDeleter<BaseDevice> baseDevicePutter(baseDevice, &devfs_put_device);
+	CObjectDeleter<BaseDevice, void, devfs_put_device>
+		baseDevicePutter(baseDevice);
 
 	Device* device = dynamic_cast<Device*>(baseDevice);
 	if (device == NULL || device->Node() != node)
@@ -1258,6 +1282,14 @@ device_node::device_node(const char* moduleName, const device_attr* attrs)
 		attrs++;
 	}
 
+	device_attr_private* attr = new(std::nothrow) device_attr_private();
+	if (attr != NULL) {
+		attr->name = strdup("device/driver");
+		attr->type = B_STRING_TYPE;
+		attr->value.string = strdup(fModuleName);
+		fAttributes.Add(attr);
+	}
+
 	get_attr_uint32(this, B_DEVICE_FLAGS, &fFlags, false);
 	fFlags &= NODE_FLAG_PUBLIC_MASK;
 }
@@ -1661,6 +1693,10 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 					case PCI_sd_host:
 						_AddPath(*stack, "busses", "mmc");
 						break;
+					case PCI_system_peripheral_other:
+						_AddPath(*stack, "busses", "mmc");
+						_AddPath(*stack, "drivers");
+						break;
 					default:
 						_AddPath(*stack, "drivers");
 						break;
@@ -1696,6 +1732,7 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 					_AddPath(*stack, "busses/i2c");
 					_AddPath(*stack, "busses/scsi");
 					_AddPath(*stack, "busses/random");
+					_AddPath(*stack, "bus_managers/pci");
 				}
 				break;
 		}
@@ -1951,8 +1988,7 @@ device_node::Probe(const char* devicePath, uint32 updateCycle)
 	if (status < B_OK)
 		return status;
 
-	MethodDeleter<device_node, bool> uninit(this,
-		&device_node::UninitDriver);
+	MethodDeleter<device_node, bool, &device_node::UninitDriver> uninit(this);
 
 	if ((fFlags & B_FIND_CHILD_ON_DEMAND) != 0) {
 		bool matches = false;
@@ -1964,7 +2000,9 @@ device_node::Probe(const char* devicePath, uint32 updateCycle)
 			// TODO: maybe make this extendible via settings file?
 			if (!strcmp(devicePath, "disk")) {
 				matches = type == PCI_mass_storage
-					|| (type == PCI_base_peripheral && subType == PCI_sd_host);
+					|| (type == PCI_base_peripheral
+						&& (subType == PCI_sd_host
+							|| subType == PCI_system_peripheral_other));
 			} else if (!strcmp(devicePath, "audio")) {
 				matches = type == PCI_multimedia
 					&& (subType == PCI_audio || subType == PCI_hd_audio);
@@ -2020,8 +2058,7 @@ device_node::Reprobe()
 	if (status < B_OK)
 		return status;
 
-	MethodDeleter<device_node, bool> uninit(this,
-		&device_node::UninitDriver);
+	MethodDeleter<device_node, bool, &device_node::UninitDriver> uninit(this);
 
 	// If this child has been probed already, probe it again
 	status = _Probe();
@@ -2048,8 +2085,7 @@ device_node::Rescan()
 	if (status < B_OK)
 		return status;
 
-	MethodDeleter<device_node, bool> uninit(this,
-		&device_node::UninitDriver);
+	MethodDeleter<device_node, bool, &device_node::UninitDriver> uninit(this);
 
 	if (DriverModule()->rescan_child_devices != NULL) {
 		status = DriverModule()->rescan_child_devices(DriverData());
@@ -2165,6 +2201,23 @@ device_node::AddDevice(Device* device)
 void
 device_node::RemoveDevice(Device* device)
 {
+	char attrName[256];
+	device_attr_private* attr;
+
+	sprintf(attrName, "dev/%" B_PRIdINO "/path", device->ID());
+	attr = find_attr(this, attrName, false, B_STRING_TYPE);
+	if (attr != NULL) {
+		fAttributes.Remove(attr);
+		delete attr;
+	}
+
+	sprintf(attrName, "dev/%" B_PRIdINO "/driver", device->ID());
+	attr = find_attr(this, attrName, false, B_STRING_TYPE);
+	if (attr != NULL) {
+		fAttributes.Remove(attr);
+		delete attr;
+	}
+
 	fDevices.Remove(device);
 }
 

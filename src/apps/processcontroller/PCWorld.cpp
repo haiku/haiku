@@ -1,23 +1,7 @@
 /*
-	PCWorld.cpp
-
-	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
-	Copyright (C) 2004 beunited.org
-
-	This library is free software; you can redistribute it and/or
-	modify it under the terms of the GNU Lesser General Public
-	License as published by the Free Software Foundation; either
-	version 2.1 of the License, or (at your option) any later version.
-
-	This library is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-	Lesser General Public License for more details.
-
-	You should have received a copy of the GNU Lesser General Public
-	License along with this library; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*/
+ * Copyright 2000, Georges-Edouard Berenger. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "PCWorld.h"
@@ -119,8 +103,7 @@ PCApplication::ReadyToRun()
 	if (count > 1) {
 		for (int32 i = 0; i < count - 1; i++) {
 			BMessenger otherme(NULL, (addr_t)list.ItemAt(i));
-			BMessage message(B_QUIT_REQUESTED);
-			otherme.SendMessage(&message);
+			otherme.SendMessage(B_QUIT_REQUESTED);
 		}
 	}
 }
@@ -156,8 +139,8 @@ PCApplication::ArgvReceived(int32 argc, char **argv)
 	} else if (argc > 1) {
 		// print a simple usage string
 		printf(B_TRANSLATE("Usage: %s [-deskbar]\n"), argv[0]);
-		printf(B_TRANSLATE("(c) 1996-2001 Georges-Edouard Berenger, "
-		"berenger@francenet.fr\n"));
+		puts(B_TRANSLATE("(c) 1996-2001 Georges-Edouard Berenger, "
+		"berenger@francenet.fr"));
 	}
 
 	Quit();

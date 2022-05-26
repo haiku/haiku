@@ -1,53 +1,50 @@
-1	french	x-vnd.Haiku-Input	1950274171
-Defaults	InputMouse		Par défaut
+1	french	x-vnd.Haiku-Input	3312605348
 Scrolling	TouchpadPrefView		Défilement
+Defaults	InputMouse		Par défaut
 Long	KeyboardView		Long
-Normal	SettingsView		Normal
 Cancel	TouchpadPrefView		Annuler
+4-Button	SettingsView		4-Boutons
 Slow	TouchpadPrefView		Lent
-Warp	SettingsView		Téléportation
+Tapping sensitivity	TouchpadPrefView		Sensibilité au toucher
 Device List	InputWindow		Liste des périphériques
 Double-click speed	SettingsView		Vitesse du double clic
 5-Button	SettingsView		5-Boutons
 Typing test area	KeyboardView		Zone de test de frappe
-Fast	KeyboardView		Rapide
-Please confirm	TouchpadPrefView		Merci de confirmer
-Mouse speed	SettingsView		Vitesse de la souris
-Horizontal scrolling	TouchpadPrefView		Défilement horizontal
-Input	System name		Entrées
-Quick	TouchpadPrefView		Rapide
-Short	KeyboardView		Court
-Revert	InputMouse		Rétablir
-Slow	KeyboardView		Lent
-2-Button	SettingsView		2-Boutons
-Click to focus and raise	SettingsView		Cliquer pour activer et remonter
-Vertical	TouchpadPrefView		Vertical
-Double-click test area	SettingsView		Zone de test du double clic
-Focus follows mouse	SettingsView		L’activation suit le pointeur
-Focus mode:	SettingsView		Mode de focus :
-Revert	TouchpadPrefView		Rétablir
-4-Button	SettingsView		4-Boutons
-Tapping sensitivity	TouchpadPrefView		Sensibilité au toucher
-Instant warp	SettingsView		Téléportation instantanée
-Revert	InputKeyboard		Rétablir
 Mouse type:	SettingsView		Type de souris :
+Revert	InputKeyboard		Rétablir
+Fast	KeyboardView		Rapide
 Off	TouchpadPrefView		Désactivé
 Never	TouchpadPrefView		Jamais
 Fast	TouchpadPrefView		Rapide
 6-Button	SettingsView		6-Boutons
+Please confirm	TouchpadPrefView		Merci de confirmer
 Click to focus	SettingsView		Cliquer pour activer
 Acceleration	TouchpadPrefView		Accélération
+Mouse speed	SettingsView		Vitesse de la souris
 Accept first click	SettingsView		Accepter le premier clic
 OK	TouchpadPrefView		OK
-Keyboard Lock Delay	TouchpadPrefView		Délai de verrouillage du clavier
+Horizontal scrolling	TouchpadPrefView		Défilement horizontal
 Delay until key repeat	KeyboardView		Délai avant répétition des touches
+Keyboard Lock Delay	TouchpadPrefView		Délai de verrouillage du clavier
 Two finger scrolling	TouchpadPrefView		Défilement à deux doigts
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Une zone de défilement aussi large pourrait empêcher le fonctionnement normal du pointeur de souris. Est-ce vraiment ce que vous voulez?
+Input	System name		Entrées
 Mouse acceleration	SettingsView		Accélération de la souris
-Defaults	TouchpadPrefView		Par défaut
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Une zone de défilement aussi large pourrait empêcher le fonctionnement normal du pointeur de souris. Est-ce vraiment ce que vous voulez ?
 High	TouchpadPrefView		Haut
+Defaults	TouchpadPrefView		Par défaut
 1-Button	SettingsView		1-Bouton
 Defaults	InputKeyboard		Par défaut
+Quick	TouchpadPrefView		Rapide
+Short	KeyboardView		Court
+Slow	KeyboardView		Lent
+Revert	InputMouse		Rétablir
 Key repeat rate	KeyboardView		Vitesse de répétition
+2-Button	SettingsView		2-Boutons
+Click to focus and raise	SettingsView		Cliquer pour activer et remonter
+Vertical	TouchpadPrefView		Vertical
 Horizontal	TouchpadPrefView		Horizontal
+Focus follows mouse	SettingsView		L’activation suit le pointeur
+Focus mode:	SettingsView		Mode de focus :
+Double-click test area	SettingsView		Zone de test du double clic
 3-Button	SettingsView		3-Boutons
+Revert	TouchpadPrefView		Rétablir

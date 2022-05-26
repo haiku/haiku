@@ -1,0 +1,10 @@
+1	greek, modern (1453-)	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		Μορφή εισόδου
+Channels:	CortexAudioAdapter		Κανάλια:
+stereo	CortexAudioAdapter		στερεοφωνικό
+mono	CortexAudioAdapter		μονοφωνικό
+Output format	CortexAudioAdapter		Μορφή εξόδου
+Audio input	CortexAddOnsCommon		Είσοδος ήχου
+Sample format:	CortexAudioAdapter		Μορφή δείγματος:
+Audio output	CortexAddOnsCommon		Έξοδος ήχου
+%groupname% parameters	CortexAddOnsCommon		Ρυθμίσεις %groupname%

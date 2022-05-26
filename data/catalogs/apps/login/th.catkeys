@@ -1,11 +1,8 @@
-1	thai	x-vnd.Haiku-Login	336867745
+1	thai	x-vnd.Haiku-Login	3033693897
 Invalid login!	Login View		เข้าสู่ระบบไม่ถูกต้อง!
 Error	Login App		ผิดพลาด
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--แก้ไข\tเรียกใช้ในโหมดการแก้ไขชั้นวางเพื่ออนุญาตให้ปรับแต่งเดสก์ท็อป\n
 Welcome to Haiku	Login Window		ยินดีต้อนรับสู่ Haiku
 Halt	Login View		หยุด
-Login application for Haiku\nUsage:\n	Login App		แอปพลิเคชันเข้าสู่ระบบสำหรับ Haiku\nการใช้งาน:\n
---nonmodal\tDo not make the window modal\n	Login App		-nonmodal\tอย่าทำหน้าต่าง\n
 Desktop	Desktop Window		เดสก์ท็อป
 Hide password	Login View		ซ่อนรหัสผ่าน
 Reboot	Login View		รีบูธ

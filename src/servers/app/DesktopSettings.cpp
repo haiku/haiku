@@ -79,7 +79,7 @@ DesktopSettingsPrivate::_SetDefaults()
 	fWorkspacesColumns = 2;
 	fWorkspacesRows = 2;
 
-	memcpy(fShared.colors, BPrivate::kDefaultColors,
+	memcpy((void*)fShared.colors, BPrivate::kDefaultColors,
 		sizeof(rgb_color) * kColorWhichCount);
 
 	gSubpixelAntialiasing = true;
@@ -830,7 +830,7 @@ DesktopSettingsPrivate::_ValidateWorkspacesLayout(int32& columns,
 
 DesktopSettings::DesktopSettings(Desktop* desktop)
 	:
-	fSettings(desktop->fSettings)
+	fSettings(desktop->fSettings.Get())
 {
 
 }

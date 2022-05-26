@@ -38,12 +38,12 @@ Don't save	ProbeView		Kaydetme
 Undo	ProbeView		Geri al
 Flattened bitmap	TypeEditors		Düzleştirilmiş biteşlem
 Block %Ld (0x%Lx)	ProbeView		Blok: %Ld (0x%Lx)
-Cancel	OpenWindow		İptal
+Cancel	OpenWindow		Vazgeç
 Unknown format	TypeEditors		Bilinmeyen biçim
 File: 	ProbeView		Dosya: 
 Swapped: %Ld (0x%0*Lx)	ProbeView		Takas edildi: %Ld (0x%0*Lx)
 Stop	ProbeView		Durdur
-Cancel	ProbeView		İptal
+Cancel	ProbeView		Vazgeç
 Could not open \"%s\":\n%s	DiskProbe	Opening of entry reference buffer for a DiskProbe request Alert message. The name of entry reference and error message is shown.	\"%s\" açılamadı:\n%s
 Font size	ProbeView		Yazıtipi boyutu
 Type editor not supported	ProbeView		Tür düzenleyicisi desteklenmiyor
@@ -51,7 +51,7 @@ Native: 0x%0*Lx	ProbeView		Yerel: 0x%0*Lx
 Copy	ProbeView		Kopyala
 Redo	ProbeView		Yinele
 Floating-point value:	TypeEditors		Kayan nokta değeri:
-Cancel	AttributeWindow		İptal
+Cancel	AttributeWindow		Vazgeç
 16 bit signed value:	TypeEditors		16 bit imzalanmış değer:
 DiskProbe request	AttributeWindow		DiskProbe isteği
 Next	ProbeView		Sonraki

@@ -1,0 +1,8 @@
+1	ukrainian	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Оформлення
+Start control panel	ParameterWindow		Запустити панель управління
+%nodeinfo% parameters	ParameterWindow		Параметри %nodeinfo%
+OK	ParameterWindow		ОК
+Window	ParameterWindow		Вікно
+Could not start control panel (%error%)	ParameterWindow		Не вдалося запустити панель управління (%error%)
+Close	ParameterWindow		Закрити

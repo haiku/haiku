@@ -112,7 +112,7 @@ BStatable::GetOwner(uid_t *owner) const
 status_t 
 BStatable::SetOwner(uid_t owner)
 {
-	struct stat statData;
+	struct stat statData = {};
 	statData.st_uid = owner;
 	return set_stat(statData, B_STAT_UID);
 }
@@ -140,7 +140,7 @@ BStatable::GetGroup(gid_t *group) const
 status_t
 BStatable::SetGroup(gid_t group)
 {
-	struct stat statData;
+	struct stat statData = {};
 	statData.st_gid = group;
 	return set_stat(statData, B_STAT_GID);
 }
@@ -168,7 +168,7 @@ BStatable::GetPermissions(mode_t *perms) const
 status_t
 BStatable::SetPermissions(mode_t perms)
 {
-	struct stat statData;
+	struct stat statData = {};
 	// the FS should do the correct masking -- only the S_IUMSK part is
 	// modifiable
 	statData.st_mode = perms;
@@ -183,7 +183,7 @@ status_t
 BStatable::GetSize(off_t *size) const
 {
 	status_t error = (size ? B_OK : B_BAD_VALUE);
-	struct stat statData;
+	struct stat statData = {};
 	if (error == B_OK)
 		error = GetStat(&statData);
 	if (error == B_OK)
@@ -214,7 +214,7 @@ BStatable::GetModificationTime(time_t *mtime) const
 status_t
 BStatable::SetModificationTime(time_t mtime)
 {
-	struct stat statData;
+	struct stat statData = {};
 	statData.st_mtime = mtime;
 	return set_stat(statData, B_STAT_MODIFICATION_TIME);
 }
@@ -244,7 +244,7 @@ BStatable::GetAccessTime(time_t *atime) const
 status_t
 BStatable::SetAccessTime(time_t atime)
 {
-	struct stat statData;
+	struct stat statData = {};
 	statData.st_atime = atime;
 	return set_stat(statData, B_STAT_ACCESS_TIME);
 }

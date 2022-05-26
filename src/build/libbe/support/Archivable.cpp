@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2002, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -82,7 +82,7 @@ Log entries graciously coughed up by the Be implementation:
 	Nov 28 01:40:45 instantiate_object failed: Failed to find exported Instantiate static function for class TInvalidClassName. 
 	Nov 28 01:40:45 instantiate_object failed: Invalid argument (80000005) 
 	Nov 28 01:40:45 instantiate_object failed: No signature specified in archive, looking for class "TRemoteTestObject". 
-	Nov 28 01:40:45 instantiate_object - couldn't get mime sig for /boot/home/src/projects/OpenBeOS/app_kit/test/lib/support/BArchivable/./BArchivableSystemTester 
+	Nov 28 01:40:45 instantiate_object - couldn't get mime sig for /boot/home/src/projects/Haiku/app_kit/test/lib/support/BArchivable/./BArchivableSystemTester
 	Nov 28 01:40:45 instantiate_object failed: Error finding app with signature "application/x-vnd.InvalidSignature" (Application could not be found) 
 	Nov 28 01:40:45 instantiate_object failed: Application could not be found (8000200b) 
 	Nov 28 01:40:45 instantiate_object failed: Error finding app with signature "application/x-vnd.InvalidSignature" (Application could not be found) 
@@ -153,7 +153,7 @@ void BuildFuncName(const char* className, BString& funcName)
 	funcName = "";
 
 	//	This is what we're after:
-	//		Instantiate__Q28OpenBeOS11BArchivableP8BMessage
+	//		Instantiate__Q28Haiku11BArchivableP8BMessage
 	Mangle(className, funcName);
 	funcName.Prepend("Instantiate__");
 	funcName.Append("P8BMessage");

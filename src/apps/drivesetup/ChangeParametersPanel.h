@@ -35,7 +35,8 @@ protected:
 
 			status_t			Go(BString& name, BString& type,
 									BString& parameters, BMessage& storage);
-			void 				CreateChangeControls(BPartition* parent);
+			void 				CreateChangeControls(BPartition* partition,
+									BPartition* parent);
 
 	virtual bool				NeedsEditor() const;
 	virtual bool				ValidWithoutEditor() const;

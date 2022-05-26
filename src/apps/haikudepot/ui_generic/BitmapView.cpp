@@ -140,7 +140,7 @@ BitmapView::SetBitmap(SharedBitmap* bitmap, BitmapSize bitmapSize)
 void
 BitmapView::UnsetBitmap()
 {
-	if (fReference.Get() == NULL)
+	if (!fReference.IsSet())
 		return;
 
 	fBitmap = NULL;

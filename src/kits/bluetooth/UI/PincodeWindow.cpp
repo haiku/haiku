@@ -1,6 +1,10 @@
 /*
  * Copyright 2007-2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2021, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Tri-Edge AI <triedgeai@gmail.com>
  */
 
 
@@ -41,20 +45,15 @@ static const uint32 skMessageAcceptButton = 'acCp';
 static const uint32 skMessageCancelButton = 'mVch';
 
 
-namespace Bluetooth {
-
-
-#if 0
-#pragma mark -
-#endif
-
+namespace Bluetooth
+{
 
 PincodeWindow::PincodeWindow(bdaddr_t address, hci_id hid)
-	: BWindow(BRect(800, 200, 900, 300), "Pincode request",
-		B_FLOATING_WINDOW,
-		B_WILL_ACCEPT_FIRST_CLICK | B_NOT_RESIZABLE|  B_NOT_ZOOMABLE
-		| B_AUTO_UPDATE_SIZE_LIMITS,
-		B_ALL_WORKSPACES), fBdaddr(address), fHid(hid)
+	: BWindow(BRect(700, 200, 1000, 400), "PIN Code Request",
+		B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
+		fBdaddr(address),
+		fHid(hid)
 {
 	InitUI();
 
@@ -65,12 +64,12 @@ PincodeWindow::PincodeWindow(bdaddr_t address, hci_id hid)
 
 
 PincodeWindow::PincodeWindow(RemoteDevice* rDevice)
-	: BWindow(BRect(800, 200, 900, 300), "Pincode request",
-		B_FLOATING_WINDOW,
-		B_WILL_ACCEPT_FIRST_CLICK | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
-		| B_AUTO_UPDATE_SIZE_LIMITS,
-		B_ALL_WORKSPACES)
+	: BWindow(BRect(700, 200, 1000, 400), "PIN Code Request",
+		B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+		B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
 {
+	InitUI();
+
 	// TODO: Get more info about device" ote name/features/encry/auth... etc
 	SetBDaddr(bdaddrUtils::ToString(rDevice->GetBluetoothAddress()));
 	fHid = (rDevice->GetLocalDeviceOwner())->ID();
@@ -82,14 +81,24 @@ PincodeWindow::InitUI()
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
-	fMessage = new BStringView("Pincode", "Please enter the pincode ...");
-	fMessage->SetFont(be_bold_font);
+	fIcon = new BluetoothIconView();
 
-	fRemoteInfo = new BStringView("bdaddr","BD_ADDR: ");
+	fMessage = new BStringView("fMessage", "Input the PIN code to pair with");
+	fMessage2 = new BStringView("fMessage2", "the following Bluetooth device.");
 
-	// TODO: Pincode cannot be more than 16 bytes
-	fPincodeText = new BTextControl("pincode TextControl", "PIN code:",
-		"5555", NULL);
+	fDeviceLabel = new BStringView("fDeviceLabel","Device Name: ");
+	fDeviceLabel->SetFont(be_bold_font);
+
+	fDeviceText = new BStringView("fDeviceText", "<unknown_device>");
+
+	fAddressLabel = new BStringView("fAddressLabel", "MAC Address: ");
+	fAddressLabel->SetFont(be_bold_font);
+
+	fAddressText = new BStringView("fAddressText", "<mac_address>");
+
+	fPincodeText = new BTextControl("fPINCode", "PIN Code:", "0000", NULL);
+	fPincodeText->TextView()->SetMaxBytes(16 * sizeof(fPincodeText->Text()[0]));
+	fPincodeText->MakeFocus();
 
 	fAcceptButton = new BButton("fAcceptButton", "Pair",
 		new BMessage(skMessageAcceptButton));
@@ -97,27 +106,44 @@ PincodeWindow::InitUI()
 	fCancelButton = new BButton("fCancelButton", "Cancel",
 		new BMessage(skMessageCancelButton));
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 8)
+				.Add(fIcon)
+			)
+			.Add(BGroupLayoutBuilder(B_VERTICAL, 0)
 				.Add(fMessage)
-				.Add(fRemoteInfo)
-				.Add(fPincodeText)
-				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
-					.AddGlue()
-					.Add(fCancelButton)
-					.Add(fAcceptButton)
-					.SetInsets(5, 5, 5, 5)
-				)
-			.SetInsets(15, 15, 15, 15)
+				.Add(fMessage2)
+				.AddGlue()
+			)
+		)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+			.Add(fDeviceLabel)
+			.AddGlue()
+			.Add(fDeviceText)
+		)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+			.Add(fAddressLabel)
+			.AddGlue()
+			.Add(fAddressText)
+		)
+		.AddGlue()
+		.Add(fPincodeText)
+		.AddGlue()
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 10)
+			.AddGlue()
+			.Add(fCancelButton)
+			.Add(fAcceptButton)
+		)
+		.SetInsets(8, 8, 8, 8)
 	);
 }
 
 
 void
-PincodeWindow::MessageReceived(BMessage *msg)
+PincodeWindow::MessageReceived(BMessage* msg)
 {
-//	status_t err = B_OK;
-
-	switch(msg->what)
+	switch (msg->what)
 	{
 		case skMessageAcceptButton:
 		{
@@ -142,7 +168,7 @@ PincodeWindow::MessageReceived(BMessage *msg)
 
 			// we reside in the server
 			if (be_app_messenger.SendMessage(&request, &reply) == B_OK) {
-				if (reply.FindInt8("status", &bt_status ) == B_OK ) {
+				if (reply.FindInt8("status", &bt_status ) == B_OK) {
 					PostMessage(B_QUIT_REQUESTED);
 				}
 				// TODO: something failed here
@@ -185,23 +211,17 @@ PincodeWindow::MessageReceived(BMessage *msg)
 }
 
 
-bool PincodeWindow::QuitRequested()
+bool
+PincodeWindow::QuitRequested()
 {
 	return BWindow::QuitRequested();
 }
 
 
-void PincodeWindow::SetBDaddr(BString address)
+void
+PincodeWindow::SetBDaddr(BString address)
 {
-	BString label;
-
-	label << BD_ADDR_LABEL << address;
-	printf("++ %s\n",label.String());
-	fRemoteInfo->SetText(label.String());
-	fRemoteInfo->ResizeToPreferred();
-	//Invalidate();
-
+	fAddressText->SetText(address);
 }
-
 
 } /* end namespace Bluetooth */

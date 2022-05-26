@@ -14,6 +14,9 @@
 #include <boot/stage2.h>
 
 
+static phys_addr_t sACPIRootPointer = 0;
+
+
 status_t
 arch_platform_init(struct kernel_args *args)
 {
@@ -25,8 +28,9 @@ status_t
 arch_platform_init_post_vm(struct kernel_args *args)
 {
 	// Now we can add boot items; pass on the ACPI root pointer
+	sACPIRootPointer = args->arch_args.acpi_root.Get();
 	add_boot_item("ACPI_ROOT_POINTER",
-		args->arch_args.acpi_root.Pointer(), sizeof(void*));
+		&sACPIRootPointer, sizeof(sACPIRootPointer));
 
 	return B_OK;
 }

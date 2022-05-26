@@ -47,6 +47,7 @@ KernelMergeObject kernel_core.o :
 	sem.cpp
 	shutdown.cpp
 	signal.cpp
+	stack_protector.cpp
 	system_info.cpp
 	smp.cpp
 	syscalls.cpp
@@ -77,12 +78,12 @@ KernelMergeObject kernel_core.o :
 
 # Generate the header defining macros for C++ structure sizes.
 local kernelC++StructSizesHeader = [ FGristFiles kernel_c++_struct_sizes.h ] ;
-TARGET_HDRS_$(TARGET_PACKAGING_ARCH) on $(kernelC++StructSizesHeader)
+TARGET_HDRS_$(TARGET_KERNEL_ARCH) on $(kernelC++StructSizesHeader)
 	= [ on $(kernelC++StructSizesHeader)
-			return $(TARGET_HDRS_$(TARGET_PACKAGING_ARCH)) ]
+			return $(TARGET_HDRS_$(TARGET_KERNEL_ARCH)) ]
 		$(TARGET_PRIVATE_KERNEL_HEADERS) ;
 CreateAsmStructOffsetsHeader $(kernelC++StructSizesHeader)
-	: kernel_c++_structs.cpp ;
+	: kernel_c++_structs.cpp : $(TARGET_KERNEL_ARCH) ;
 
 # We need to specify the dependency on the generated syscalls files explicitly.
 Includes [ FGristFiles syscalls.cpp ]
@@ -126,14 +127,14 @@ KernelLd kernel_$(TARGET_ARCH) :
 
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/kernel.ld
 	: -Bdynamic -export-dynamic -dynamic-linker /foo/bar
-	  $(TARGET_KERNEL_PIC_LINKFLAGS)
+	  $(TARGET_KERNEL_PIC_LINKFLAGS) --no-undefined
 	:
 ;
 
 if $(HAIKU_ARCH) in x86_64 arm {
 	# Cannot relink everything as a shared object on x86_64 as shared library
 	# code is required to be position-independent. Instead create a copy of the
-	# executable kernel image and change the ELF header type to DYN. A bit of
+	# executable kernel image and change the ELF header type to DYN. A bit of
 	# a hack, but avoids having to recompile a PIC copy of the kernel code.
 	# kernel.so is only used when linking modules to provide symbol information,
 	# this is sufficient for that purpose.

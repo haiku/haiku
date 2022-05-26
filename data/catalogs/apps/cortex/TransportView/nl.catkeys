@@ -1,0 +1,23 @@
+1	dutch; flemish	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Rollen
+(none)	TransportView		(geen)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# node} other{# nodes}}
+Start	TransportView		Start
+No errors.	TransportView		Geen fouten.
+to	TransportView		naar
+Offline	TransportView		Offline
+(???)	TransportView		(???)
+Stop	TransportView		Stoppen
+(no group)	TransportView		(geen groep)
+Drop data	TransportView		Data laten vervallen
+To:	TransportView		Naar:
+Recording	TransportView		Opname
+Increase latency	TransportView		Latentie verhogen
+Time source:	TransportView		Tijdsbron:
+DAC time source	TransportView		DAC tijdsbron
+Decrease precision	TransportView		Precisie verlagen
+System clock	TransportView		Systeem klok
+From:	TransportView		Van:
+Roll from	TransportView		Rollen van
+Preroll	TransportView		Voorrollen
+Run mode:	TransportView		Uitvoermodus:

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2020, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef LANGUAGE_MENU_UTILS_H
@@ -23,11 +23,6 @@ public:
 								BMenu* menu);
 
 private:
-	static	int32			_IndexOfLanguageInMenu(
-								const BString& languageCode,
-								BMenu* menu);
-	static	status_t		_GetLanguageAtIndexInMenu(BMenu* menu,
-								int32 index, BString* result);
 	static	int32			_AddLanguagesToMenu(
 								const LanguageModel* languagesModel,
 								BMenu* menu, bool isPopular);

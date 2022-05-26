@@ -161,7 +161,7 @@ PRINT(("InsecureConnection::Init\n"));
 	// open the remaining channels
 	int32 allChannels = upStreamChannels + downStreamChannels;
 	for (int32 i = 1; i < allChannels; i++) {
-		PRINT("  creating channel %ld\n", i);
+		PRINT("  creating channel %" B_PRId32 "\n", i);
 		// open the channel
 		error = _OpenClientChannel(serverAddr, port, &channel);
 		if (error != B_OK)
@@ -292,7 +292,7 @@ PRINT(("InsecureConnection::FinishInitialization()\n"));
 			}
 			RETURN_ERROR(error);
 		}
-		PRINT("  accepting channel %ld\n", i);
+		PRINT("  accepting channel %" B_PRId32 "\n", i);
 		// create a channel
 		channel = new(std::nothrow) InsecureChannel(channelFD);
 		if (!channel) {

@@ -6,7 +6,7 @@ Battery charging	PowerStatus		Pengisian baterai
 Design capacity low warning: 	PowerStatus		Desain peringatan kapasitas rendah: 
 The battery level is critical, please plug in the device immediately.	PowerStatus		Level baterai sangat genting, harap sambungkan perangkat segera.
 non-rechargeable	PowerStatus		tidak dapat diisi ulang
-Last full charge: 	PowerStatus		Pengisian penuh terakhir:
+Last full charge: 	PowerStatus		Pengisian penuh terakhir: 
  mV	PowerStatus		 mV
 Current rate: 	PowerStatus		Arus saat ini: 
 Show text label	PowerStatus		Tampilkan label teks

@@ -330,7 +330,7 @@ try_acquire_spinlock(spinlock* lock)
 	if (atomic_add(&lock->lock, 1) != 0)
 		return false;
 #else
-	if (atomic_get_and_set((int32*)lock, 1) != 0)
+	if (atomic_get_and_set(&lock->lock, 1) != 0)
 		return false;
 
 #	if DEBUG_SPINLOCKS

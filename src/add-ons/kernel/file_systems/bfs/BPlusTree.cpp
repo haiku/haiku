@@ -1055,7 +1055,7 @@ BPlusTree::_FindKey(const bplustree_node* node, const uint8* key,
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	off_t* values = node->Values();
+	Unaligned<off_t>* values = node->Values();
 	int16 saveIndex = -1;
 
 	// binary search in the key array
@@ -1157,7 +1157,7 @@ BPlusTree::_FindFreeDuplicateFragment(Transaction& transaction,
 	const bplustree_node* node, CachedNode& cached,
 	off_t* _offset, bplustree_node** _fragment, uint32* _index)
 {
-	off_t* values = node->Values();
+	Unaligned<off_t>* values = node->Values();
 	for (int32 i = 0; i < node->NumKeys(); i++) {
 		off_t value = BFS_ENDIAN_TO_HOST_INT64(values[i]);
 
@@ -1199,7 +1199,7 @@ BPlusTree::_InsertDuplicate(Transaction& transaction, CachedNode& cached,
 	const bplustree_node* node, uint16 index, off_t value)
 {
 	CachedNode cachedDuplicate(this);
-	off_t* values = node->Values();
+	Unaligned<off_t>* values = node->Values();
 	off_t oldValue = BFS_ENDIAN_TO_HOST_INT64(values[index]);
 	status_t status;
 	off_t offset;
@@ -1369,16 +1369,16 @@ BPlusTree::_InsertKey(bplustree_node* node, uint16 index, uint8* key,
 	if (index > node->NumKeys())
 		return;
 
-	off_t* values = node->Values();
-	uint16* keyLengths = node->KeyLengths();
+	Unaligned<off_t>* values = node->Values();
+	Unaligned<uint16>* keyLengths = node->KeyLengths();
 	uint8* keys = node->Keys();
 
 	node->all_key_count = HOST_ENDIAN_TO_BFS_INT16(node->NumKeys() + 1);
 	node->all_key_length = HOST_ENDIAN_TO_BFS_INT16(node->AllKeyLength()
 		+ keyLength);
 
-	off_t* newValues = node->Values();
-	uint16* newKeyLengths = node->KeyLengths();
+	Unaligned<off_t>* newValues = node->Values();
+	Unaligned<uint16>* newKeyLengths = node->KeyLengths();
 
 	// move values and copy new value into them
 	memmove(newValues + index + 1, values + index,
@@ -1421,8 +1421,8 @@ BPlusTree::_SplitNode(bplustree_node* node, off_t nodeOffset,
 	if (*_keyIndex > node->NumKeys() + 1)
 		return B_BAD_VALUE;
 
-	uint16* inKeyLengths = node->KeyLengths();
-	off_t* inKeyValues = node->Values();
+	Unaligned<uint16>* inKeyLengths = node->KeyLengths();
+	Unaligned<off_t>* inKeyValues = node->Values();
 	uint8* inKeys = node->Keys();
 	uint8* outKeys = other->Keys();
 	int32 keyIndex = *_keyIndex;	// can become less than zero!
@@ -1484,8 +1484,8 @@ BPlusTree::_SplitNode(bplustree_node* node, off_t nodeOffset,
 		+ bytesAfter);
 	other->all_key_count = HOST_ENDIAN_TO_BFS_INT16(out);
 
-	uint16* outKeyLengths = other->KeyLengths();
-	off_t* outKeyValues = other->Values();
+	Unaligned<uint16>* outKeyLengths = other->KeyLengths();
+	Unaligned<off_t>* outKeyValues = other->Values();
 	int32 keys = out > keyIndex ? keyIndex : out;
 
 	if (bytesBefore) {
@@ -1829,7 +1829,7 @@ BPlusTree::_RemoveDuplicate(Transaction& transaction,
 	const bplustree_node* node, CachedNode& cached, uint16 index,
 	off_t value)
 {
-	off_t* values = node->Values();
+	Unaligned<off_t>* values = node->Values();
 	off_t oldValue = BFS_ENDIAN_TO_HOST_INT64(values[index]);
 
 	CachedNode cachedDuplicate(this);
@@ -2040,7 +2040,7 @@ BPlusTree::_RemoveKey(bplustree_node* node, uint16 index)
 		return;
 	}
 
-	off_t* values = node->Values();
+	Unaligned<off_t>* values = node->Values();
 
 	// if we would have to drop the overflow link, drop
 	// the last key instead and update the overflow link
@@ -2058,15 +2058,15 @@ BPlusTree::_RemoveKey(bplustree_node* node, uint16 index)
 		return;
 	}
 
-	uint16* keyLengths = node->KeyLengths();
+	Unaligned<uint16>* keyLengths = node->KeyLengths();
 	uint8* keys = node->Keys();
 
 	node->all_key_count = HOST_ENDIAN_TO_BFS_INT16(node->NumKeys() - 1);
 	node->all_key_length = HOST_ENDIAN_TO_BFS_INT64(
 		node->AllKeyLength() - length);
 
-	off_t* newValues = node->Values();
-	uint16* newKeyLengths = node->KeyLengths();
+	Unaligned<off_t>* newValues = node->Values();
+	Unaligned<uint16>* newKeyLengths = node->KeyLengths();
 
 	// move key data
 	memmove(key, key + length, node->AllKeyLength() - (key - keys));
@@ -2357,7 +2357,7 @@ BPlusTree::_ValidateChildren(TreeCheck& check, uint32 level, off_t offset,
 	check.SetVisited(offset);
 
 	uint32 count = parent->NumKeys();
-	off_t* values = parent->Values();
+	Unaligned<off_t>* values = parent->Values();
 	off_t lastOffset = check.PreviousOffset(level);
 	CachedNode cached(this);
 
@@ -2934,7 +2934,7 @@ bplustree_node::KeyAt(int32 index, uint16* keyLength) const
 		return NULL;
 
 	uint8* keyStart = Keys();
-	uint16* keyLengths = KeyLengths();
+	Unaligned<uint16>* keyLengths = KeyLengths();
 
 	*keyLength = BFS_ENDIAN_TO_HOST_INT16(keyLengths[index])
 		- (index != 0 ? BFS_ENDIAN_TO_HOST_INT16(keyLengths[index - 1]) : 0);
@@ -3008,7 +3008,7 @@ bplustree_node::CheckIntegrity(uint32 nodeSize) const
 		}
 		if (Values()[i] == -1) {
 			dprintf("invalid node %p, value %d: %" B_PRIdOFF ": values "
-				"corrupted\n", this, (int)i, Values()[i]);
+				"corrupted\n", this, (int)i, Values()[i].value);
 			return B_BAD_DATA;
 		}
 	}

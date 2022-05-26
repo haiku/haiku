@@ -84,6 +84,7 @@
 #include <slab/Slab.h>
 #include <smp.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 #include <util/queue.h>
 #include <vm/vm_page.h>
 #include <vm/vm_priv.h>
@@ -108,7 +109,7 @@
 // The VSID is a 24 bit number. The lower three bits are defined by the
 // (effective) segment number, which leaves us with a 21 bit space of
 // VSID bases (= 2 * 1024 * 1024).
-#define MAX_VSID_BASES (PAGE_SIZE * 8)
+#define MAX_VSID_BASES (B_PAGE_SIZE * 8)
 static uint32 sVSIDBaseBitmap[MAX_VSID_BASES / (sizeof(uint32) * 8)];
 static spinlock sVSIDBaseBitmapLock;
 

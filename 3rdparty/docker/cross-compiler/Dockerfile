@@ -1,4 +1,4 @@
-FROM ubuntu:17.04
+FROM debian:buster-slim
 
 # docker build --no-cache --tag docker.io/haiku/cross-compiler:x86_64 .
 # docker push docker.io/haiku/cross-compiler:x86_64

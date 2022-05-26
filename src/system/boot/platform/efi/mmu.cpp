@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Haiku, Inc. All rights reserved.
+ * Copyright 2016-2022 Haiku, Inc. All rights reserved.
  * Copyright 2014, Jessica Hamilton, jessica.l.hamilton@gmail.com.
  * Copyright 2014, Henry Harrington, henry.harrington@gmail.com.
  * Distributed under the terms of the MIT License.
@@ -25,25 +25,25 @@
 #endif
 
 
-struct allocated_memory_region {
-	allocated_memory_region *next;
+struct memory_region {
+	memory_region *next;
 	addr_t vaddr;
 	phys_addr_t paddr;
 	size_t size;
-	bool released;
+
+	void dprint(const char * msg) {
+ 	  dprintf("%s memory_region v: %#" B_PRIxADDR " p: %#" B_PRIxPHYSADDR " size: %lu\n", msg, vaddr,
+			paddr, size);
+	}
+
+	bool matches(phys_addr_t expected_paddr, size_t expected_size) {
+		return paddr == expected_paddr && size == expected_size;
+	}
 };
 
 
-#if defined(KERNEL_LOAD_BASE_64_BIT)
-static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE_64_BIT + 32 * 1024 * 1024;
-#elif defined(KERNEL_LOAD_BASE)
 static addr_t sNextVirtualAddress = KERNEL_LOAD_BASE + 32 * 1024 * 1024;
-#else
-#error Unable to find kernel load base on this architecture!
-#endif
-
-
-static allocated_memory_region *allocated_memory_regions = NULL;
+static memory_region *allocated_regions = NULL;
 
 
 extern "C" phys_addr_t
@@ -77,7 +77,6 @@ extern "C" addr_t
 get_current_virtual_address()
 {
 	TRACE("%s: called\n", __func__);
-
 	return sNextVirtualAddress;
 }
 
@@ -97,24 +96,22 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
 {
 	TRACE("%s: called\n", __func__);
 
-	// We don't have any control over the page tables, give up right away if an
-	// exactAddress is wanted.
-	if (exactAddress)
-		return B_NO_MEMORY;
-
 	efi_physical_addr addr;
-	size_t aligned_size = ROUNDUP(size, B_PAGE_SIZE);
-	allocated_memory_region *region = new(std::nothrow) allocated_memory_region;
+	size_t pages = ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE;
+	efi_status status;
 
-	if (region == NULL)
-		return B_NO_MEMORY;
-
-	efi_status status = kBootServices->AllocatePages(AllocateAnyPages,
-		EfiLoaderData, aligned_size / B_PAGE_SIZE, &addr);
-	if (status != EFI_SUCCESS) {
-		delete region;
-		return B_NO_MEMORY;
+	if (exactAddress) {
+		addr = (efi_physical_addr)(addr_t)*_address;
+		status = kBootServices->AllocatePages(AllocateAddress,
+			EfiLoaderData, pages, &addr);
+	} else {
+		addr = 0;
+		status = kBootServices->AllocatePages(AllocateAnyPages,
+			EfiLoaderData, pages, &addr);
 	}
+
+	if (status != EFI_SUCCESS)
+		return B_NO_MEMORY;
 
 	// Addresses above 512GB not supported.
 	// Memory map regions above 512GB can be ignored, but if EFI returns pages
@@ -122,21 +119,58 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */,
 	if (addr + size > (512ull * 1024 * 1024 * 1024))
 		panic("Can't currently support more than 512GB of RAM!");
 
-	region->next = allocated_memory_regions;
-	allocated_memory_regions = region;
-	region->vaddr = 0;
-	region->paddr = addr;
-	region->size = size;
-	region->released = false;
+	memory_region *region = new(std::nothrow) memory_region {
+		next: allocated_regions,
+#ifdef __riscv
+		// Disables allocation at fixed virtual address
+		vaddr: 0,
+#else
+		vaddr: *_address == NULL ? 0 : (addr_t)*_address,
+#endif
+		paddr: (phys_addr_t)addr,
+		size: size
+	};
 
-	if (*_address != NULL) {
-		region->vaddr = (addr_t)*_address;
+	if (region == NULL) {
+		kBootServices->FreePages(addr, pages);
+		return B_NO_MEMORY;
 	}
 
-	//dprintf("Allocated region %#lx (requested %p) %#lx %lu\n", region->vaddr, *_address, region->paddr, region->size);
-
+#ifdef TRACE_MMU
+	//region->dprint("Allocated");
+#endif
+	allocated_regions = region;
 	*_address = (void *)region->paddr;
+	return B_OK;
+}
 
+
+extern "C" status_t
+platform_allocate_lomem(void **_address, size_t size)
+{
+	TRACE("%s: called\n", __func__);
+
+	efi_physical_addr addr = KERNEL_LOAD_BASE - B_PAGE_SIZE;
+	size_t pages = ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE;
+	efi_status status = kBootServices->AllocatePages(AllocateMaxAddress,
+		EfiLoaderData, pages, &addr);
+	if (status != EFI_SUCCESS)
+		return B_NO_MEMORY;
+
+	memory_region *region = new(std::nothrow) memory_region {
+		next: allocated_regions,
+		vaddr: (addr_t)addr,
+		paddr: (phys_addr_t)addr,
+		size: size
+	};
+
+	if (region == NULL) {
+		kBootServices->FreePages(addr, pages);
+		return B_NO_MEMORY;
+	}
+
+	allocated_regions = region;
+	*_address = (void *)region->paddr;
 	return B_OK;
 }
 
@@ -158,49 +192,10 @@ mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags)
 	size += pageOffset;
 
 	if (insert_physical_allocated_range(physicalAddress,
-		ROUNDUP(size, B_PAGE_SIZE)) != B_OK) {
+			ROUNDUP(size, B_PAGE_SIZE)) != B_OK)
 		return B_NO_MEMORY;
-	}
 
 	return physicalAddress + pageOffset;
-}
-
-
-extern "C" void
-mmu_free(void *virtualAddress, size_t size)
-{
-	TRACE("%s: called\n", __func__);
-
-	addr_t physicalAddress = (addr_t)virtualAddress;
-	addr_t pageOffset = physicalAddress & (B_PAGE_SIZE - 1);
-
-	physicalAddress -= pageOffset;
-	size += pageOffset;
-
-	size_t aligned_size = ROUNDUP(size, B_PAGE_SIZE);
-
-	for (allocated_memory_region *region = allocated_memory_regions; region;
-		region = region->next) {
-		if (region->paddr == physicalAddress && region->size == aligned_size) {
-			region->released = true;
-			return;
-		}
-	}
-}
-
-
-static allocated_memory_region *
-get_region(void *address, size_t size)
-{
-	TRACE("%s: called\n", __func__);
-
-	for (allocated_memory_region *region = allocated_memory_regions; region;
-		region = region->next) {
-		if (region->paddr == (phys_addr_t)address && region->size == size) {
-			return region;
-		}
-	}
-	return 0;
 }
 
 
@@ -213,24 +208,23 @@ convert_physical_ranges()
 	uint32 num_ranges = gKernelArgs.num_physical_allocated_ranges;
 
 	for (uint32 i = 0; i < num_ranges; ++i) {
-		allocated_memory_region *region
-			= new(std::nothrow) allocated_memory_region;
-
-		if (!region)
-			panic("Couldn't add allocated region");
-
 		// Addresses above 512GB not supported.
 		// Memory map regions above 512GB can be ignored, but if EFI returns
 		// pages above that there's nothing that can be done to fix it.
 		if (range[i].start + range[i].size > (512ull * 1024 * 1024 * 1024))
 			panic("Can't currently support more than 512GB of RAM!");
 
-		region->next = allocated_memory_regions;
-		allocated_memory_regions = region;
-		region->vaddr = 0;
-		region->paddr = range[i].start;
-		region->size = range[i].size;
-		region->released = false;
+		memory_region *region = new(std::nothrow) memory_region {
+			next: allocated_regions,
+			vaddr: 0,
+			paddr: (phys_addr_t)range[i].start,
+			size: (size_t)range[i].size
+		};
+
+		if (!region)
+			panic("Couldn't add allocated region");
+
+		allocated_regions = region;
 
 		// Clear out the allocated range
 		range[i].start = 0;
@@ -248,10 +242,11 @@ platform_bootloader_address_to_kernel_address(void *address, addr_t *_result)
 	// Convert any physical ranges prior to looking up address
 	convert_physical_ranges();
 
-	phys_addr_t addr = (phys_addr_t)address;
+	// Double cast needed to avoid sign extension issues on 32-bit architecture
+	phys_addr_t addr = (phys_addr_t)(addr_t)address;
 
-	for (allocated_memory_region *region = allocated_memory_regions; region;
-		region = region->next) {
+	for (memory_region *region = allocated_regions; region;
+			region = region->next) {
 		if (region->paddr <= addr && addr < region->paddr + region->size) {
 			// Lazily allocate virtual memory.
 			if (region->vaddr == 0) {
@@ -273,8 +268,10 @@ platform_kernel_address_to_bootloader_address(addr_t address, void **_result)
 {
 	TRACE("%s: called\n", __func__);
 
-	for (allocated_memory_region *region = allocated_memory_regions; region; region = region->next) {
-		if (region->vaddr != 0 && region->vaddr <= address && address < region->vaddr + region->size) {
+	for (memory_region *region = allocated_regions; region;
+			region = region->next) {
+		if (region->vaddr != 0 && region->vaddr <= address
+				&& address < region->vaddr + region->size) {
 			*_result = (void *)(region->paddr + (address - region->vaddr));
 			//dprintf("Converted kernel address %#lx in region %#lx-%#lx to %p\n",
 			//	address, region->vaddr, region->vaddr + region->size, *_result);
@@ -292,11 +289,46 @@ platform_free_region(void *address, size_t size)
 	TRACE("%s: called to release region %p (%" B_PRIuSIZE ")\n", __func__,
 		address, size);
 
-	allocated_memory_region *region = get_region(address, size);
-	if (!region)
-		panic("Unknown region??");
+	for (memory_region **ref = &allocated_regions; *ref;
+			ref = &(*ref)->next) {
+		// Double cast needed to avoid sign extension issues on 32-bit architecture
+		if ((*ref)->matches((phys_addr_t)(addr_t)address, size)) {
+			efi_status status;
+			status = kBootServices->FreePages((efi_physical_addr)(addr_t)address,
+				ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE);
+			ASSERT_ALWAYS(status == EFI_SUCCESS);
+			memory_region* old = *ref;
+			//pointer to current allocated_memory_region* now points to next
+			*ref = (*ref)->next;
+#ifdef TRACE_MMU
+			old->dprint("Freeing");
+#endif
+			delete old;
+			return B_OK;
+		}
+	}
+	panic("platform_free_region: Unknown region to free??");
+	return B_ERROR; // NOT Reached
+}
 
-	kBootServices->FreePages((efi_physical_addr)address, ROUNDUP(size, B_PAGE_SIZE) / B_PAGE_SIZE);
 
-	return B_OK;
+bool
+mmu_next_region(void** cookie, addr_t* vaddr, phys_addr_t* paddr, size_t* size)
+{
+	if (*cookie == NULL)
+		*cookie = allocated_regions;
+	else
+		*cookie = ((memory_region*)*cookie)->next;
+
+	memory_region* region = (memory_region*)*cookie;
+	if (region == NULL)
+		return false;
+
+	if (region->vaddr == 0)
+		region->vaddr = get_next_virtual_address(region->size);
+
+	*vaddr = region->vaddr;
+	*paddr = region->paddr;
+	*size = region->size;
+	return true;
 }

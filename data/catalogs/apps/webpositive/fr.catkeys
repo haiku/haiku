@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	1591513524
+1	french	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Authentification requise
 Previous	WebPositive Window		Précédent
 (Finish: %date)	Download Window		(Fin : %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		Ouvrir le dossier contenant le fichier
 Find previous	WebPositive Window		Rechercher le précédent
 Full screen	WebPositive Window		Plein écran
 Downloads in progress	WebPositive		Téléchargement en cours
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Souhaitez-vous ouvrir %addedCount signets en même temps ?
 Copy URL to clipboard	Download Window		Copier l’URL dans le presse-papiers
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Souhaitez-vous ouvrir %addedCount signets en même temps ?
 Clone current page	Settings Window		Cloner la page actuelle
 Start page:	Settings Window		Page d’accueil :
 Cancel	Download Window		Annuler
@@ -45,16 +45,19 @@ New tabs:	Settings Window		Nouvel onglet :
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url a échoué
 Open downloads folder	Download Window		Ouvrir le dossier des téléchargements
 Proxy server	Settings Window		Serveur mandataire
+Darn!	WebPositive		Fâcheux !
 Decrease size	WebPositive Window		Réduire la taille
 Default fixed font size:	Settings Window		Taille par défaut de la police à chasse fixe :
 Sans serif font:	Settings Window		Police sans empattement :
 Clear	WebPositive Window		Vider
-Cookies for %s	Cookie Manager		Cookies pour %s
 The download could not be opened.	Download Window		Impossible d’ouvrir l’objet téléchargé.
+Cookies for %s	Cookie Manager		Cookies pour %s
 Close	Download Window		Fermer
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Terme à rechercher
 Reload	WebPositive Window		Recharger
 Expiration	Cookie Manager		Expiration
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Votre CPU est trop vieux et ne supporte pas les extensions SSE2, sans lesquelles WebPositive ne peut pas fonctionner. À la place, nous vous recommandons d’installer NetSurf.
 Download finished	Download Window		Téléchargement terminé
 Cookie manager	WebPositive Window		Gestionnaire de cookies
 OK	Authentication Panel		OK
@@ -100,6 +103,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Restaurer
 Copy	WebPositive Window		Copier
 Default standard font size:	Settings Window		Taille par défaut de la police standard :
+Custom	Settings Window		Personnalisé
 Bookmark this page	WebPositive Window		Placer un signet sur cette page
 Show tabs if only one page is open	Settings Window		Afficher les onglets même s’il n’y a qu’une page ouverte
 Close tab	WebPositive Window		Fermer l’onglet
@@ -109,8 +113,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Continuer les téléchargements
 Proxy server requires authentication	Settings Window		Le serveur mandataire requière une authentification
 Cancel	Settings Window		Annuler
-History	WebPositive Window		Historique
 Reset size	WebPositive Window		Réinitialiser la taille
+History	WebPositive Window		Historique
 Do you really want to clear the browsing history?	WebPositive Window		Souhaitez-vous vraiment effacer l’historique de navigation ?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Rechercher la prochaine occurrence de la chaîne
 Fixed font:	Settings Window		Police à chasse fixe :
@@ -147,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Démarrage :
 Confirmation	WebPositive Window		Confirmation
 Session cookie	Cookie Manager		Cookie de session
+No SSE2 support	WebPositive		Aucun support SSE2
 Open all	WebPositive Window		Tout ouvrir
 Cut	WebPositive Window		Couper
 Downloads	Download Window		Téléchargements

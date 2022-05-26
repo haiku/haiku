@@ -1,0 +1,10 @@
+1	indonesian	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		Format masukan
+Channels:	CortexAudioAdapter		Kanal:
+stereo	CortexAudioAdapter		stereo
+mono	CortexAudioAdapter		mono
+Output format	CortexAudioAdapter		Format keluaran
+Audio input	CortexAddOnsCommon		Masukan Audio
+Sample format:	CortexAudioAdapter		Contoh format:
+Audio output	CortexAddOnsCommon		Keluaran Audio
+%groupname% parameters	CortexAddOnsCommon		Parameter %groupname%

@@ -23,6 +23,7 @@
 #include <kscheduler.h>
 #include <thread_types.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 
 
 /* global per-cpu structure */

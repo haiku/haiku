@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-MediaPlayer	1961774506
+1	friulian	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Sposte element te Scovacere
 Close	MediaPlayer-PlaylistWindow		Siere
 Volume of background clips	MediaPlayer-SettingsWindow		Volum des riproduzions di sotfont
@@ -30,6 +30,7 @@ Open file…	MediaPlayer-Main		Vierç file…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Ridimensione controi in modalitât plen visôr
 View options	MediaPlayer-SettingsWindow		Opzions di visualizazion
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Pare fûr il dispositîf
 Full volume	MediaPlayer-SettingsWindow		Volum massim
 <untitled>	PlaylistItem-title		<cence titul>
 Start media server	MediaPlayer-Main		Invie servidôr multimediâl

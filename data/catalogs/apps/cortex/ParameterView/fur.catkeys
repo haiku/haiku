@@ -1,0 +1,8 @@
+1	friulian	application/x-vnd.Cortex.ParameterView	1295152157
+Themes	ParameterWindow		Temis
+Start control panel	ParameterWindow		Invie panel di control
+%nodeinfo% parameters	ParameterWindow		Parametris di %nodeinfo%
+OK	ParameterWindow		Va ben
+Window	ParameterWindow		Barcon
+Could not start control panel (%error%)	ParameterWindow		Impussibil inviâ il panel di control (%error%)
+Close	ParameterWindow		Siere

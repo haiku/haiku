@@ -43,13 +43,14 @@ Addon catalogTestAddOn
 	: be
 	;
 
-UnitTestLib localekittest.so :
+UnitTestLib liblocaletest.so :
 	LocaleKitTestAddon.cpp
 
 	CollatorTest.cpp
 	DateFormatTest.cpp
 	DurationFormatTest.cpp
 	LanguageTest.cpp
+	NumberFormatTest.cpp
 	RelativeDateTimeFormatTest.cpp
 	StringFormatTest.cpp
 	UnicodeCharTest.cpp

@@ -775,8 +775,12 @@ VideoProducer::_FrameGeneratorThread()
 						// to color space!
 						memset(buffer->Data(), 0, h->size_used);
 						err = B_OK;
-					} else if (err == B_LAST_BUFFER_ERROR)
+					} else if (err == B_LAST_BUFFER_ERROR) {
+						wasCached = true;
+							// Don't send the buffer: we don't have a buffer
+						err = B_OK;
 						running = false;
+					}
 					// Send the buffer on down to the consumer
 					if (wasCached || ((err = SendBuffer(buffer, fOutput.source,
 							fOutput.destination)) != B_OK)) {
@@ -815,6 +819,7 @@ VideoProducer::_FrameGeneratorThread()
 				break;
 		}
 	}
+	fManager->SetCurrentVideoTime(INT64_MAX);
 	TRACE("_FrameGeneratorThread: frame generator thread done.\n");
 	return B_OK;
 }

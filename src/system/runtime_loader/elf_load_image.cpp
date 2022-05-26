@@ -85,6 +85,9 @@ count_regions(const char* imagePath, char const* buff, int phnum, int phentsize)
 			case PT_TLS:
 				// will be handled at some other place
 				break;
+			case PT_ARM_UNWIND:
+				// will be handled in libgcc_s.so.1
+				break;
 			default:
 				FATAL("%s: Unhandled pheader type in count 0x%" B_PRIx32 "\n",
 					imagePath, pheaders->p_type);
@@ -212,6 +215,9 @@ parse_program_headers(image_t* image, char* buff, int phnum, int phentsize)
 					= TLSBlockTemplates::Get().Register(
 						TLSBlockTemplate((void*)pheader->p_vaddr,
 							pheader->p_filesz, pheader->p_memsz));
+				break;
+			case PT_ARM_UNWIND:
+				// will be handled in libgcc_s.so.1
 				break;
 			default:
 				FATAL("%s: Unhandled pheader type in parse 0x%" B_PRIx32 "\n",
@@ -526,7 +532,7 @@ load_image(char const* name, image_type type, const char* rpath,
 	fd = open_executable(path, type, rpath, get_program_path(),
 		requestingObjectPath, sSearchPathSubDir);
 	if (fd < 0) {
-		FATAL("Cannot open file %s: %s\n", name, strerror(fd));
+		FATAL("Cannot open file %s (needed by %s): %s\n", name, requestingObjectPath, strerror(fd));
 		KTRACE("rld: load_container(\"%s\"): failed to open file", name);
 		return fd;
 	}

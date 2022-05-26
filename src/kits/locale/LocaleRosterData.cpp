@@ -335,6 +335,7 @@ LocaleRosterData::_InitializeCatalogAddOns()
 	if (!defaultCatalogAddOnInfo)
 		return B_NO_MEMORY;
 
+	defaultCatalogAddOnInfo->MakeSureItsLoaded();
 	defaultCatalogAddOnInfo->fInstantiateFunc = DefaultCatalog::Instantiate;
 	defaultCatalogAddOnInfo->fCreateFunc = DefaultCatalog::Create;
 	fCatalogAddOnInfos.AddItem((void*)defaultCatalogAddOnInfo);
@@ -402,8 +403,12 @@ LocaleRosterData::_InitializeCatalogAddOns()
 						CatalogAddOnInfo* addOnInfo
 							= new(std::nothrow) CatalogAddOnInfo(dent->d_name,
 								addOnFolderName, priority);
-						if (addOnInfo)
-							fCatalogAddOnInfos.AddItem((void*)addOnInfo);
+						if (addOnInfo != NULL) {
+							if (addOnInfo->MakeSureItsLoaded())
+								fCatalogAddOnInfos.AddItem((void*)addOnInfo);
+							else
+								delete addOnInfo;
+						}
 					}
 				}
 				// Bump the dirent-pointer by length of the dirent just handled:

@@ -2,7 +2,7 @@
 Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		\"%server%\" sunucusuna bağlanılamadı:\n%error%
 Updating subscriptions to IMAP folders, please be patient…	IMAPFolderConfig		IMAP klasörlerine olan abonelikler güncelleniyor, lütfen bekleyin…
 Failed to fetch available storage.	IMAPFolderConfig		Kullanılabilir depolama alanı getirilemedi.
-Cancel	IMAPFolderConfig		İptal
+Cancel	IMAPFolderConfig		Vazgeç
 OK	IMAPFolderConfig		Tamam
 Server storage: %s / %s used.	IMAPFolderConfig		Sunucu depolaması: %s/%s kullanılıyor.
 No encryption	imap_config		Şifreleme yok

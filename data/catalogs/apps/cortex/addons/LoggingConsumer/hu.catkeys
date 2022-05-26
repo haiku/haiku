@@ -1,0 +1,22 @@
+1	hungarian	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nem sikerült lekérni a csomóponti információkat (%ld):\n%s\n
+Priority	CortexAddOnsLoggingConsumer		Prioritás
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nem található a csomópont (%ld):\n%s\n
+Latency	CortexAddOnsLoggingConsumer		Késleltetés
+Logged input	CortexAddOnsLoggingConsumer		Naplózott bemenet
+CPU spin percentage	CortexAddOnsLoggingConsumer		CPU kihasználtsága
+NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Indítás
+Thread priority	CortexAddOnsLoggingConsumer		Szál prioritása
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		LoggingConsumer paraméterek
+Latency control	CortexAddOnsLoggingConsumer		Késleltetés vezérlése
+CPU percentage	CortexAddOnsLoggingConsumer		CPU százalék
+LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Leállítás
+An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		LoggingConsumer csomópont egy kiegészítő verziója.\nTovábbi részletek: Be Developer Newsletter III.18: 5 May, 1999\nkészítette: Eric Moon (4 June, 1999)
+OK	CortexAddOnsCommonMediaNodeControlApp		Rendben
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Vezérlők
+controls	CortexAddOnsCommonMediaNodeControlApp		vezérlők
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Csatlakozás
+percent	CortexAddOnsLoggingConsumer		százalék
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nincs paraméter a csomóponthoz (%ld):\n%s\n

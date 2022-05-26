@@ -48,9 +48,11 @@ UnixEndpoint::UnixEndpoint(net_socket* socket)
 	fReceiveFifo(NULL),
 	fState(UNIX_ENDPOINT_CLOSED),
 	fAcceptSemaphore(-1),
-	fIsChild(false)
+	fIsChild(false),
+	fWasConnected(false)
 {
-	TRACE("[%ld] %p->UnixEndpoint::UnixEndpoint()\n", find_thread(NULL), this);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::UnixEndpoint()\n",
+		find_thread(NULL), this);
 
 	mutex_init(&fLock, "unix endpoint");
 }
@@ -58,7 +60,8 @@ UnixEndpoint::UnixEndpoint(net_socket* socket)
 
 UnixEndpoint::~UnixEndpoint()
 {
-	TRACE("[%ld] %p->UnixEndpoint::~UnixEndpoint()\n", find_thread(NULL), this);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::~UnixEndpoint()\n",
+		find_thread(NULL), this);
 
 	mutex_destroy(&fLock);
 }
@@ -67,7 +70,8 @@ UnixEndpoint::~UnixEndpoint()
 status_t
 UnixEndpoint::Init()
 {
-	TRACE("[%ld] %p->UnixEndpoint::Init()\n", find_thread(NULL), this);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Init()\n", find_thread(NULL),
+		this);
 
 	RETURN_ERROR(B_OK);
 }
@@ -76,7 +80,8 @@ UnixEndpoint::Init()
 void
 UnixEndpoint::Uninit()
 {
-	TRACE("[%ld] %p->UnixEndpoint::Uninit()\n", find_thread(NULL), this);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Uninit()\n", find_thread(NULL),
+		this);
 
 	// check whether we're closed
 	UnixEndpointLocker locker(this);
@@ -97,7 +102,8 @@ UnixEndpoint::Uninit()
 status_t
 UnixEndpoint::Open()
 {
-	TRACE("[%ld] %p->UnixEndpoint::Open()\n", find_thread(NULL), this);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Open()\n", find_thread(NULL),
+		this);
 
 	status_t error = ProtocolSocket::Open();
 	if (error != B_OK)
@@ -112,7 +118,8 @@ UnixEndpoint::Open()
 status_t
 UnixEndpoint::Close()
 {
-	TRACE("[%ld] %p->UnixEndpoint::Close()\n", find_thread(NULL), this);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Close()\n", find_thread(NULL),
+		this);
 
 	UnixEndpointLocker locker(this);
 
@@ -138,7 +145,8 @@ UnixEndpoint::Close()
 status_t
 UnixEndpoint::Free()
 {
-	TRACE("[%ld] %p->UnixEndpoint::Free()\n", find_thread(NULL), this);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Free()\n", find_thread(NULL),
+		this);
 
 	UnixEndpointLocker locker(this);
 
@@ -154,7 +162,8 @@ UnixEndpoint::Bind(const struct sockaddr *_address)
 	if (_address->sa_family != AF_UNIX)
 		RETURN_ERROR(EAFNOSUPPORT);
 
-	TRACE("[%ld] %p->UnixEndpoint::Bind(\"%s\")\n", find_thread(NULL), this,
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Bind(\"%s\")\n",
+		find_thread(NULL), this,
 		ConstSocketAddress(&gAddressModule, _address).AsString().Data());
 
 	const sockaddr_un* address = (const sockaddr_un*)_address;
@@ -221,7 +230,8 @@ UnixEndpoint::Bind(const struct sockaddr *_address)
 status_t
 UnixEndpoint::Unbind()
 {
-	TRACE("[%ld] %p->UnixEndpoint::Unbind()\n", find_thread(NULL), this);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Unbind()\n", find_thread(NULL),
+		this);
 
 	UnixEndpointLocker endpointLocker(this);
 
@@ -232,8 +242,8 @@ UnixEndpoint::Unbind()
 status_t
 UnixEndpoint::Listen(int backlog)
 {
-	TRACE("[%ld] %p->UnixEndpoint::Listen(%d)\n", find_thread(NULL), this,
-		backlog);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Listen(%d)\n", find_thread(NULL),
+		this, backlog);
 
 	UnixEndpointLocker endpointLocker(this);
 
@@ -269,7 +279,8 @@ UnixEndpoint::Connect(const struct sockaddr *_address)
 	if (_address->sa_family != AF_UNIX)
 		RETURN_ERROR(EAFNOSUPPORT);
 
-	TRACE("[%ld] %p->UnixEndpoint::Connect(\"%s\")\n", find_thread(NULL), this,
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Connect(\"%s\")\n",
+		find_thread(NULL), this,
 		ConstSocketAddress(&gAddressModule, _address).AsString().Data());
 
 	const sockaddr_un* address = (const sockaddr_un*)_address;
@@ -373,6 +384,7 @@ UnixEndpoint::Connect(const struct sockaddr *_address)
 	peerFifoDeleter.Detach();
 
 	fState = UNIX_ENDPOINT_CONNECTED;
+	fWasConnected = true;
 
 	gSocketModule->set_connected(newSocket);
 
@@ -389,7 +401,8 @@ UnixEndpoint::Connect(const struct sockaddr *_address)
 status_t
 UnixEndpoint::Accept(net_socket **_acceptedSocket)
 {
-	TRACE("[%ld] %p->UnixEndpoint::Accept()\n", find_thread(NULL), this);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Accept()\n", find_thread(NULL),
+		this);
 
 	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
 	if (gStackModule->is_restarted_syscall())
@@ -425,8 +438,8 @@ ssize_t
 UnixEndpoint::Send(const iovec *vecs, size_t vecCount,
 	ancillary_data_container *ancillaryData)
 {
-	TRACE("[%ld] %p->UnixEndpoint::Send(%p, %ld, %p)\n", find_thread(NULL),
-		this, vecs, vecCount, ancillaryData);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Send(%p, %ld, %p)\n",
+		find_thread(NULL), this, vecs, vecCount, ancillaryData);
 
 	bigtime_t timeout = absolute_timeout(socket->send.timeout);
 	if (gStackModule->is_restarted_syscall())
@@ -516,8 +529,8 @@ UnixEndpoint::Receive(const iovec *vecs, size_t vecCount,
 	ancillary_data_container **_ancillaryData, struct sockaddr *_address,
 	socklen_t *_addressLength)
 {
-	TRACE("[%ld] %p->UnixEndpoint::Receive(%p, %ld)\n", find_thread(NULL),
-		this, vecs, vecCount);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Receive(%p, %ld)\n",
+		find_thread(NULL), this, vecs, vecCount);
 
 	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
 	if (gStackModule->is_restarted_syscall())
@@ -608,7 +621,8 @@ UnixEndpoint::Receive(const iovec *vecs, size_t vecCount,
 ssize_t
 UnixEndpoint::Sendable()
 {
-	TRACE("[%ld] %p->UnixEndpoint::Sendable()\n", find_thread(NULL), this);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Sendable()\n", find_thread(NULL),
+		this);
 
 	UnixEndpointLocker locker(this);
 	UnixEndpointLocker peerLocker;
@@ -628,7 +642,8 @@ UnixEndpoint::Sendable()
 ssize_t
 UnixEndpoint::Receivable()
 {
-	TRACE("[%ld] %p->UnixEndpoint::Receivable()\n", find_thread(NULL), this);
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Receivable()\n", find_thread(NULL),
+		this);
 
 	UnixEndpointLocker locker(this);
 
@@ -640,8 +655,10 @@ UnixEndpoint::Receivable()
 
 	UnixFifoLocker fifoLocker(fReceiveFifo);
 	ssize_t readable = fReceiveFifo->Readable();
-	if (readable == 0 && fReceiveFifo->IsWriteShutdown())
+	if (readable == 0 && (fReceiveFifo->IsWriteShutdown()
+			|| fReceiveFifo->IsReadShutdown())) {
 		RETURN_ERROR(ENOTCONN);
+	}
 	RETURN_ERROR(readable);
 }
 
@@ -649,7 +666,7 @@ UnixEndpoint::Receivable()
 status_t
 UnixEndpoint::SetReceiveBufferSize(size_t size)
 {
-	TRACE("[%ld] %p->UnixEndpoint::SetReceiveBufferSize(%lu)\n",
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::SetReceiveBufferSize(%lu)\n",
 		find_thread(NULL), this, size);
 
 	UnixEndpointLocker locker(this);
@@ -681,7 +698,7 @@ UnixEndpoint::GetPeerCredentials(ucred* credentials)
 status_t
 UnixEndpoint::Shutdown(int direction)
 {
-	TRACE("[%ld] %p->UnixEndpoint::Shutdown(%d)\n",
+	TRACE("[%" B_PRId32 "] %p->UnixEndpoint::Shutdown(%d)\n",
 		find_thread(NULL), this, direction);
 
 	uint32 shutdown;
@@ -787,7 +804,7 @@ UnixEndpoint::_LockConnectedEndpoints(UnixEndpointLocker& locker,
 	UnixEndpointLocker& peerLocker)
 {
 	if (fState != UNIX_ENDPOINT_CONNECTED)
-		RETURN_ERROR(ENOTCONN);
+		RETURN_ERROR(fWasConnected ? EPIPE : ENOTCONN);
 
 	// We need to lock the peer, too. Get a reference -- we might need to
 	// unlock ourselves to get the locking order right.

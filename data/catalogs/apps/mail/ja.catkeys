@@ -9,7 +9,7 @@ Next message	Mail		次のメッセージ
 Mailing	Mail		メールの設定
 Unread	Mail		未読
 Same sender	Mail		差出人が同じ
-Copy to new	Mail		新規メッセージにコピー
+Copy to new	Mail		新しいメッセージにコピー
 Save as draft	Mail		下書きとして保存
 Encoding:	Mail		文字コード:
 Print	Mail		印刷
@@ -24,9 +24,9 @@ Undo	Mail		元に戻す
 Button bar:	Mail		ボタンバー:
 %e wrote:\\n	Mail		%e は書きました:\\n
 Save changes to this signature?	Mail		署名の変更を確定し保存しますか?
-Save attachment…	Mail		添付ファイルを保存…
+Save attachment…	Mail		添付ファイルの保存...
 Paste	Mail		貼り付け
-E-mail draft could not be saved!	Mail		下書きが保存できませんでした。
+E-mail draft could not be saved!	Mail		下書きが保存できません。
 Don't send	Mail		送信しない
 sent	B_USER_DIRECTORY/mail/sent		送信済みメール
 Only files can be added as attachments.	Mail		添付できるのは、ファイルのみです。
@@ -40,7 +40,7 @@ Mail	System name		メール
 Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	添付ファイル: %name% (タイプ: %type%)
 Copy link location	Mail		このリンクのアドレスをコピー
 Attachments: 	Mail		添付ファイル:
-Remove enclosure	Mail		添付ファイルを削除
+Remove enclosure	Mail		添付ファイルの削除
 Next	Mail		次へ
 Attachments:	Mail		添付ファイル:
 Show icons only	Mail		アイコンのみ
@@ -58,12 +58,12 @@ Cut	Mail		切り取り
 Reply to sender	Mail		差出人に返信
 \\n - Newline	Mail		\\n - 改行
 Copy	Mail		コピー
-Add signature	Mail		署名を追加
+Add signature	Mail		署名の追加
 %n - Full name	Mail		%n - 名前
 Signature	Mail		署名
 Use default account	Mail		標準アカウントを使う
 draft	B_USER_DIRECTORY/mail/draft		下書き
-Really delete this signature? This cannot be undone.	Mail		署名を削除しますか?削除した書名は復元できませんので、ご注意ください。
+Really delete this signature? This cannot be undone.	Mail		署名を削除しますか?削除した書名は復元できないので、ご注意ください。
 spam	B_USER_DIRECTORY/mail/spam		スパム
 Reply to all	Mail		全員に返信
 Cancel	Mail		中止
@@ -76,7 +76,7 @@ View	Mail		表示
 Signatures	Mail		署名
 On	Mail		オン
 Find	Mail		検索
-Sorry, could not find an application that supports the 'Person' data type.	Mail		People データ形式をサポートするアプリケーションが見つかりませんでした。
+Sorry, could not find an application that supports the 'Person' data type.	Mail		People データ形式をサポートするアプリケーションが見つかりません。
 Date:	Mail		日付:
 Expert	Mail		上級者
 Automatically mark mail as read:	Mail		メールを自動的に既読に設定:
@@ -95,14 +95,14 @@ Find again	Mail		次を検索
 Size:	Mail		サイズ:
 To:	Mail		To:
 Need Tracker to move items to trash	Mail		メッセージを削除するには Tracker が必要です。
-The mail_daemon could not be started:\n\t	Mail		メールサービス (mail_daemon) を起動できませんでした。\n\t
+The mail_daemon could not be started:\n\t	Mail		メールサービス (mail_daemon) を起動できません。\n\t
 <no account found>	Mail		<アカウントが見つかりません>
 Mail couldn't find its dictionary.	Mail		スペルチェック用辞書データが見つかりません。
 Mail preferences	Mail		メールの設定
 helpful message	Mail		有益なメッセージ
  Read 	Mail		既読
 Font:	Mail		フォント:
-Accounts…	Mail		アカウントを設定…
+Accounts…	Mail		アカウントの設定...
 Previous	Mail		前
 Include file attributes in attachments	Mail		添付ファイルにファイル属性を含む
 Start now	Mail		ただちに起動
@@ -113,14 +113,14 @@ Move to trash	Mail		ごみ箱に捨てる
 Check spelling	Mail		スペルチェック
 Redo	Mail		やり直し
 Leave as '%s'	Mail		「%s」のままにする
-Print…	Mail		印刷…
-Settings…	Mail		設定…
+Print…	Mail		印刷...
+Settings…	Mail		設定...
 Warn unencodable:	Mail		文字コード不一致警告:
 Trash	Mail		ごみ箱
 Show raw message	Mail		生のメッセージを表示
-Find…	Mail		検索…
+Find…	Mail		検索...
 Select all	Mail		すべて選択
-Show header	Mail		ヘッダーを表示
+Show header	Mail		ヘッダーの表示
 Reply account:	Mail		返信アカウント:
 Sorry	Mail		失礼
 Forward	Mail		転送
@@ -141,29 +141,29 @@ Open	Mail		開く
 Don't save	Mail		保存しない
 Leave same	Mail		変更しません
 An error occurred trying to save the attachment.	Mail		添付ファイルの保存の際にエラーが発生しました。 
-Save address	Mail		アドレスを保存
+Save address	Mail		アドレスの保存
 Initial spell check mode:	Mail		スペルチェックモード:
-Edit queries…	Mail		クエリフォルダーを開く…
+Edit queries…	Mail		クエリフォルダーを開く...
 There is no installed handler for URL links.	Mail		URL リンク用ハンドラがインストールされていません。
 File	Mail		ファイル
 Reply preamble:	Mail		返信の前書き:
-New mail message	Mail		新規メッセージ
+New mail message	Mail		新しいメッセージ
 An error occurred trying to open this signature.	Mail		この署名を開くときにエラーが発生しました。
-Edit signatures…	Mail		署名を編集…
+Edit signatures…	Mail		署名の編集...
 User interface	Mail		インターフェイスの設定
 Inconsistency occurred in the undo/redo buffer.	Mail		Undo/Redo バッファに不一致が発生しました。
-Remove attachment	Mail		添付ファイルを削除
-Set to…	Mail		他の属性に変更…
+Remove attachment	Mail		添付ファイルの削除
+Set to…	Mail		他の属性に変更...
 Edit	Mail		編集
-Page setup…	Mail		ページ設定…
+Page setup…	Mail		ページ設定...
 An error occurred trying to save this signature.	Mail		署名の保存の際にエラーが発生しました。 
 Beginner	Mail		初心者
-Send message	Mail		メッセージを送信
+Send message	Mail		メッセージの送信
 Delete	Mail		削除
 Put your favorite e-mail queries and query templates in this folder.	Mail		お気に入りの電子メールクエリとクエリテンプレートをこのフォルダーに入れてください。
 Spam	Mail		スパム
-Couldn't open this signature. Sorry.	Mail		この署名を開くことはできませんでした。
+Couldn't open this signature. Sorry.	Mail		この署名を開くことはできません。
 Revert	Mail		戻す
 Unknown	Mail		不明
 Increase quote level	Mail		引用レベルを上げる
-Add enclosure…	Mail		添付ファイルを追加…
+Add enclosure…	Mail		添付ファイルの追加...

@@ -17,6 +17,7 @@
 #include "FilePlaylistItem.h"
 #include "PlaylistItem.h"
 #include "UrlPlaylistItem.h"
+#include "PlaylistFileReader.h"
 
 class BDataIO;
 class BMessage;
@@ -95,13 +96,12 @@ public:
 			// support functions
 			void				AppendItems(const BMessage* refsReceivedMessage,
 									int32 appendIndex
-										= APPEND_INDEX_REPLACE_PLAYLIST);
+										= APPEND_INDEX_REPLACE_PLAYLIST,
+									bool sortItems = false);
 
 	static	void				AppendToPlaylistRecursive(const entry_ref& ref,
 									Playlist* playlist);
 	static	void				AppendPlaylistToPlaylist(const entry_ref& ref,
-									Playlist* playlist);
-	static	void				AppendM3uToPlaylist(const entry_ref& ref,
 									Playlist* playlist);
 	static	void				AppendQueryToPlaylist(const entry_ref& ref,
 									Playlist* playlist);
@@ -125,7 +125,6 @@ private:
 	static	bool				_IsTextPlaylist(const BString& mimeString);
 	static	bool				_IsBinaryPlaylist(const BString& mimeString);
 	static	bool				_IsPlaylist(const BString& mimeString);
-	static	bool				_IsM3u(const entry_ref& ref);
 	static	bool				_IsQuery(const BString& mimeString);
 	static	BString				_MIMEString(const entry_ref* ref);
 	static	void				_BindExtraMedia(PlaylistItem* item);

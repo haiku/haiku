@@ -1,10 +1,12 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MODEL_H
 #define MODEL_H
+
+#include <vector>
 
 #include <Locker.h>
 
@@ -12,6 +14,7 @@
 #include "PackageIconTarRepository.h"
 #include "LanguageModel.h"
 #include "PackageInfo.h"
+#include "RatingStability.h"
 #include "WebAppInterface.h"
 
 
@@ -46,13 +49,6 @@ public:
 };
 
 
-class DepotMapper {
-public:
-	virtual DepotInfo			MapDepot(const DepotInfo& depot,
-									void* context) = 0;
-};
-
-
 class PackageConsumer {
 public:
 	virtual	bool				ConsumePackage(
@@ -62,7 +58,6 @@ public:
 
 
 typedef BReference<ModelListener> ModelListenerRef;
-typedef List<ModelListenerRef, false> ModelListenerList;
 
 
 class Model {
@@ -78,28 +73,35 @@ public:
 			BLocker*			Lock()
 									{ return &fLock; }
 
-			bool				AddListener(const ModelListenerRef& listener);
+			void				AddListener(const ModelListenerRef& listener);
 
 			PackageInfoRef		PackageForName(const BString& name);
 			bool				MatchesFilter(
 									const PackageInfoRef& package) const;
 
-			bool				AddDepot(const DepotInfo& depot);
+			void				MergeOrAddDepot(const DepotInfoRef& depot);
 			bool				HasDepot(const BString& name) const;
-			const DepotList&	Depots() const
-									{ return fDepots; }
-			const DepotInfo*	DepotForName(const BString& name) const;
-			bool				SyncDepot(const DepotInfo& depot);
+			int32				CountDepots() const;
+			DepotInfoRef		DepotAtIndex(int32 index) const;
+			const DepotInfoRef	DepotForName(const BString& name) const;
 			bool				HasAnyProminentPackages();
 
 			void				Clear();
 
-			void				AddCategories(const CategoryList& categories);
-			const CategoryList&	Categories() const
-									{ return fCategories; }
+			int32				CountCategories() const;
+			CategoryRef			CategoryByCode(BString& code) const;
+			CategoryRef			CategoryAtIndex(int32 index) const;
+			void				AddCategories(
+									std::vector<CategoryRef>& values);
 
-			void				SetPackageState(
-									const PackageInfoRef& package,
+			int32				CountRatingStabilities() const;
+			RatingStabilityRef	RatingStabilityByCode(BString& code) const;
+			RatingStabilityRef	RatingStabilityAtIndex(int32 index) const;
+			void				AddRatingStabilities(
+									std::vector<RatingStabilityRef>& values);
+
+			void				SetStateForPackagesByName(
+									BStringList& packageNames,
 									PackageState state);
 
 			// Configure PackageFilters
@@ -127,6 +129,9 @@ public:
 			void				SetShowDevelopPackages(bool show);
 			bool				ShowDevelopPackages() const
 									{ return fShowDevelopPackages; }
+			void				SetCanShareAnonymousUsageData(bool value);
+			bool				CanShareAnonymousUsageData() const
+									{ return fCanShareAnonymousUsageData; }
 
 			// Retrieve package information
 	static	const uint32		POPULATE_CACHED_RATING	= 1 << 0;
@@ -137,6 +142,8 @@ public:
 	static	const uint32		POPULATE_CATEGORIES		= 1 << 5;
 	static	const uint32		POPULATE_FORCE			= 1 << 6;
 
+			bool				CanPopulatePackage(
+									const PackageInfoRef& package);
 			void				PopulatePackage(const PackageInfoRef& package,
 									uint32 flags);
 
@@ -146,14 +153,9 @@ public:
 									const BString& passwordClear,
 									bool storePassword);
 
-			const WebAppInterface&
-								GetWebAppInterface() const
+			WebAppInterface&
+								GetWebAppInterface()
 									{ return fWebAppInterface; }
-
-			void				ReplaceDepotByIdentifier(
-									const BString& identifier,
-									DepotMapper* depotMapper,
-									void* context);
 
 			status_t			IconTarPath(BPath& path) const;
 			status_t			DumpExportReferenceDataPath(BPath& path);
@@ -161,10 +163,11 @@ public:
 			status_t			DumpExportPkgDataPath(BPath& path,
 									const BString& repositorySourceCode);
 
-			void				LogDepotsWithNoWebAppRepositoryCode() const;
-
 private:
 			void				_AddCategory(const CategoryRef& category);
+
+			void				_AddRatingStability(
+									const RatingStabilityRef& value);
 
 			void				_MaybeLogJsonRpcError(
 									const BMessage &responsePayload,
@@ -177,7 +180,7 @@ private:
 
 			void				_PopulatePackageScreenshot(
 									const PackageInfoRef& package,
-									const ScreenshotInfo& info,
+									const ScreenshotInfoRef& info,
 									int32 scaledWidth, bool fromCacheOnly);
 
 			void				_NotifyAuthorizationChanged();
@@ -186,16 +189,14 @@ private:
 private:
 			BLocker				fLock;
 
-			DepotList			fDepots;
+			std::vector<DepotInfoRef>
+								fDepots;
+			std::vector<CategoryRef>
+								fCategories;
+			std::vector<RatingStabilityRef>
+								fRatingStabilities;
 
-			CategoryList		fCategories;
-
-			PackageList			fInstalledPackages;
-			PackageList			fActivatedPackages;
-			PackageList			fUninstalledPackages;
-			PackageList			fDownloadingPackages;
-			PackageList			fUpdateablePackages;
-			PackageList			fPopulatedPackages;
+			BStringList			fPopulatedPackageNames;
 
 			PackageFilterRef	fCategoryFilter;
 			BString				fDepotFilter;
@@ -207,13 +208,15 @@ private:
 			bool				fShowInstalledPackages;
 			bool				fShowSourcePackages;
 			bool				fShowDevelopPackages;
+			bool				fCanShareAnonymousUsageData;
 
 			LanguageModel		fLanguageModel;
 			PackageIconTarRepository
 								fPackageIconRepository;
 			WebAppInterface		fWebAppInterface;
 
-			ModelListenerList	fListeners;
+			std::vector<ModelListenerRef>
+								fListeners;
 };
 
 

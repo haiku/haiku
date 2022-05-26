@@ -37,7 +37,7 @@ rule BuildAoutLoader {
 }
 
 actions BuildAoutLoader bind ELF2AOUT {
-	rm -f $(1)
+	$(RM) -f $(1)
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) \
 	$(ELF2AOUT) -o $(1) $(2)
 }
@@ -61,13 +61,13 @@ rule BuildCoffLoader {
 }
 
 actions BuildCoffLoader bind HACK_COFF {
-	rm -f $(1)
+	$(RM) -f $(1)
 	# get the address of the COFF entry
-	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O symbolsrec $(2) $(2).syms
+	$(TARGET_OBJCOPY_$(TARGET_KERNEL_ARCH)) -O symbolsrec $(2) $(2).syms
 	EP=`grep _coff_start $(2).syms | tr -d '\r' | cut -d'$' -f2`
-	rm -f $(2).syms
+	$(RM) -f $(2).syms
 	# copy to XCOFF format and patch the entry point
-	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O $(COFF_FORMAT) --set-start="0x${EP}" $(2) $(1)
+	$(TARGET_OBJCOPY_$(TARGET_KERNEL_ARCH)) -O $(COFF_FORMAT) --set-start="0x${EP}" $(2) $(1)
 	#$(CP) $(2) $(1)
 	# fill-in some fields objcopy missed
 	$(HACK_COFF) $(1)
@@ -92,8 +92,8 @@ rule BuildBiosLoader {
 }
 
 actions BuildBiosLoader {
-	rm -f $(1)
-	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O binary $(2) $(1)
+	$(RM) -f $(1)
+	$(TARGET_OBJCOPY_$(TARGET_KERNEL_ARCH)) -O binary $(2) $(1)
 }
 
 
@@ -107,6 +107,8 @@ rule BuildEFILoader {
 	Depends $(efiLoader) : $(bootLoader) ;
 
 	switch $(TARGET_ARCH) {
+		case x86 :
+			OUTPUT_TARGET on $(efiLoader) = pei-i386 ;
 		case x86_64 :
 			OUTPUT_TARGET on $(efiLoader) = pei-x86-64 ;
 		case arm :
@@ -124,19 +126,52 @@ rule BuildEFILoader {
 
 actions BuildEFILoader
 {
-	rm -f $(1)
+	$(RM) -f $(1)
 	if [ "$(OUTPUT_TARGET)" = "binary" ]; then
 		# no bfd support, fake efi Pe header
-		$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -j .text -j .sdata -j .data \
-			-j .dynamic -j .dynsym -j .rel -j .rela -j .reloc -j .dynstr \
+		$(TARGET_OBJCOPY_$(TARGET_KERNEL_ARCH)) -j .text -j .sdata -j .data \
+			-j .dynamic -j .dynsym -j .rel* -j .rela* -j .reloc -j .dynstr \
 			--output-target=$(OUTPUT_TARGET) $(2) $(1)
 	else
 		# bfd supports pe + efi for arch
-		$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -j .text -j .sdata -j .data \
-			-j .dynamic -j .dynsym -j .rel -j .rela -j .reloc -j .dynstr \
+		$(TARGET_OBJCOPY_$(TARGET_KERNEL_ARCH)) -j .text -j .sdata -j .data \
+			-j .dynamic -j .dynsym -j .rel* -j .rela* -j .reloc -j .dynstr \
 			--output-target=$(OUTPUT_TARGET) \
 			--subsystem=efi-app $(2) $(1)
 	fi
+}
+
+#
+# Sign our EFI Bootloader if a key has been provided
+# SignEFILoader <output> : <input> : <public_cert_file> : <private_key_file> ;
+#
+rule SignEFILoader
+{
+	local signedEFILoader = $(1) ;
+	local unsignedEFILoader = $(2) ;
+	local publicCert = $(3) ;
+	local privateKey = $(4) ;
+
+	Depends $(signedEFILoader) : $(unsignedEFILoader) ;
+
+	DB_CERT_FILE on $(signedEFILoader) = $(publicCert) ;
+	DB_KEY_FILE on $(signedEFILoader) = $(privateKey) ;
+}
+
+actions SignEFILoader
+{
+	$(RM) -f $(1)
+	echo "Signing EFI bootloader..."
+	sbsign --key $(DB_KEY_FILE) --cert $(DB_CERT_FILE) --output $(1) $(2)
+}
+
+#
+# Verify our EFI bootloader has been properly signed
+# VerifyEFILoader <loader> : <cert>
+#
+actions VerifyEFILoader
+{
+	sbverify --cert $(2) $(1)
 }
 
 
@@ -178,7 +213,7 @@ rule BuildUImageScript script : source
 
 actions BuildUImageScript1
 {
-	rm -f $(1)
+	$(RM) -f $(1)
 	mkimage -A $(ARCH) -O $(FAKEOS) -T script -C none -n $(SCRIPTNAME) \
 		-d $(2) $(1)
 }
@@ -222,7 +257,7 @@ rule AtariBootPrgLd
 {
 	# AtariBootPrgLd <name> : <objs> : <linkerscript> : <args> ;
 
-	LINK on $(1) = $(TARGET_LD_$(TARGET_PACKAGING_ARCH)) ;
+	LINK on $(1) = $(TARGET_LD_$(TARGET_KERNEL_ARCH)) ;
 
 	LINKFLAGS on $(1) = $(4) ;
 	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
@@ -250,7 +285,7 @@ actions AtariBootPrgLd
 
 
 local extraSources = ;
-if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) = 2 {
+if $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_KERNEL_ARCH)) = 1 {
 	extraSources += atomic.S ;
 }
 
@@ -261,7 +296,7 @@ for platform in [ MultiBootSubDirSetup ] {
 								x86_64 ] ;
 		} else {
 			SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot os arch
-									$(TARGET_KERNEL_ARCH) ] ;
+									$(TARGET_KERNEL_ARCH_DIR) ] ;
 		}
 
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix string ] ;
@@ -299,15 +334,25 @@ for platform in [ MultiBootSubDirSetup ] {
 
 		AddResources haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader.rdef ;
 
-		local archGrist = [ FGrist src system boot arch $(TARGET_KERNEL_ARCH) $(platform:G=) ] ;
+		local archGrist = [ FGrist src system boot arch $(TARGET_KERNEL_ARCH_DIR) $(platform:G=) ] ;
 		local archObject = boot_arch_$(TARGET_KERNEL_ARCH).o ;
 		local ldflags = $(HAIKU_BOOT_LDFLAGS) $(HAIKU_BOOT_$(platform:G=:U)_LDFLAGS) ;
 		ldflags ?= $(TARGET_BOOT_LDFLAGS) ;
 
+		# needed by tarfs, packagefs, and video_splash.cpp
+		local supportLibs = [ FGrist boot_zlib.a ] ;
+		if [ FIsBuildFeatureEnabled zstd ] {
+			supportLibs += boot_zstd.a ;
+		}
+
 		# efi loader needs to be shared.
 		if $(TARGET_BOOT_PLATFORM) = efi {
 			ldflags += -shared ;
-			ldflags += -Map=efi.map ;
+			ldflags += -Map=$(HAIKU_OUTPUT_DIR)/efi.map ;
+		}
+
+		if $(TARGET_BOOT_PLATFORM) = riscv {
+			ldflags += -z notext ;
 		}
 
 		BootLd boot_loader_$(platform:G=) :
@@ -328,10 +373,9 @@ for platform in [ MultiBootSubDirSetup ] {
 				boot_loader.a
 					# a second time, so undefined references in the file systems can be
 					# resolved
-
-				# needed by tarfs, packagefs, and video_splash.cpp
-				boot_zlib.a
+				$(supportLibs)
 			]
+
 			# libroot functions needed by the stage2 boot loader
 			boot_libroot_$(platform:G=).o
 
@@ -341,8 +385,21 @@ for platform in [ MultiBootSubDirSetup ] {
 
 		switch $(TARGET_BOOT_PLATFORM) {
 			case efi :
-				BuildEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
-				if $(TARGET_ARCH) = arm || $(TARGET_ARCH) = arm64 || $(TARGET_ARCH) = riscv64 {
+				if $(HAIKU_BOOT_$(platform:G=:U)_PRIVATE_KEYFILE) {
+					BuildEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM).unsigned
+						: boot_loader_$(TARGET_BOOT_PLATFORM) ;
+					SignEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM)
+						: haiku_loader.$(TARGET_BOOT_PLATFORM).unsigned
+						: [ FDirName $(HAIKU_TOP) data boot efi keys DB.crt ]
+						: $(HAIKU_BOOT_$(platform:G=:U)_PRIVATE_KEYFILE) ;
+					VerifyEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM)
+						: [ FDirName $(HAIKU_TOP) data boot efi keys DB.crt ] ;
+				} else {
+					BuildEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM)
+						: boot_loader_$(TARGET_BOOT_PLATFORM) ;
+				}
+
+				if $(TARGET_ARCH) = arm || $(TARGET_ARCH) = riscv64 {
 					# These EFI platforms need u-boot to get them going
 					BuildUImageScript boot.scr
 						: [ FDirName $(HAIKU_TOP) data boot u-boot boot-$(TARGET_ARCH).scr.txt ] ;
@@ -384,6 +441,9 @@ for platform in [ MultiBootSubDirSetup ] {
 					: -Bstatic
 				;
 
+			case riscv :
+				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+
 			case next_m68k :
 				BuildAoutLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
@@ -393,6 +453,7 @@ for platform in [ MultiBootSubDirSetup ] {
 	}
 }
 
-SubInclude HAIKU_TOP src system boot arch $(TARGET_KERNEL_ARCH) ;
+SubInclude HAIKU_TOP src system boot arch $(TARGET_KERNEL_ARCH_DIR) ;
+SubInclude HAIKU_TOP src system boot libs ;
 SubInclude HAIKU_TOP src system boot loader ;
 SubInclude HAIKU_TOP src system boot platform ;

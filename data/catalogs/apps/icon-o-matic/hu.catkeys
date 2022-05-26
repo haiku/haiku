@@ -181,7 +181,7 @@ Remove Shape	Icon-O-Matic-RemoveShapesCmd		Alakzat eltávolítása
 All	Icon-O-Matic-Properties		Összes
 Transformer	Icon-O-Matic-Menus		Átalaktító
 Invert selection	Icon-O-Matic-Properties		Kijelölés megfordítása
-<unkown property>	Icon-O-Matic-PropertyNames		<ismeretlen tulajdonság> 
+<unkown property>	Icon-O-Matic-PropertyNames		<ismeretlen tulajdonság>
 Pick a color	Icon-O-Matic-ColorPicker		Szín kiválasztása
 Multi Set 	Multi Set (property name)		Többszörös beállítás
 Settings…	Icon-O-Matic-SavePanel		Beállítások…

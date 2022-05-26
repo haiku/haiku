@@ -1,0 +1,37 @@
+1	finnish	x-vnd.haiku.SerialConnect	354154115
+Hardware	SerialWindow	Flowcontrol	Laitteisto
+Connection	SerialWindow		Yhteys
+Raw send…	SerialWindow		Raakalähetys…
+Baud rate	SerialWindow		Baudinopeus
+Stop bits	SerialWindow		Pysäytysbitit
+None	SerialWindow	Flowcontrol	Ei mitään
+Cancel	Custom baudrate window		Peru
+Sending…	XModemStatus		Lähetetään…
+<no serial port available>	SerialWindow		<sarjaporttia ei ole saatavilla>
+Log to file…	SerialWindow		Kirjaa lokitiedostoon…
+Custom baudrate	Custom baudrate window		Oma baudinopeus
+File	SerialWindow		Tiedosto
+SerialConnect	System name		SerialConnect
+custom…	SerialWindow	Baudrate	oma…
+Parity	SerialWindow		Pariteetti
+None	SerialWindow	Parity	Ei mitään
+Disconnect	SerialWindow		Katkaise yhteys
+Everything sent, waiting for acknowledge	XModemStatus		Kaikki on lähetetty, odotetaan kuittausta
+Odd	SerialWindow	Parity	Pariton
+Flow control	SerialWindow		Vuo-ohjaus
+file transfer progress	SerialWindow		tiedostosiirto käynnissä
+CRC requested	XModemStatus		CRC pyydetty
+Data bits	SerialWindow		Databitit
+Both	SerialWindow	Flowcontrol	Molemmat
+Edit	SerialWindow		Muokkaa
+XModem send…	SerialWindow		XModem lähettää…
+Baudrate:	Custom baudrate window		Baudinopeus:
+OK	Custom baudrate window		Valmis
+Waiting for receiver…	XModemStatus		Odotetaan vastaanottajaa…
+Clear history	SerialWindow		Tyhjennä historia
+Checksum error, re-send block	XModemStatus		Tarkistussummavirhe, lähetä lohko uudelleen
+Settings	SerialWindow		Asetukset
+Even	SerialWindow	Parity	Parillinen
+Software	SerialWindow	Flowcontrol	Ohjelmisto
+Line terminator	SerialWindow		Rivipääte
+Remote cancelled transfer	XModemStatus		Etäperuttu siirto

@@ -6,8 +6,10 @@
  *		Michael Lotz <mmlr@mlotz.ch>
  */
 
+#include <ByteOrder.h>
 #include <USBKit.h>
 #include <usb_raw.h>
+#include <UTF8.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -269,21 +271,40 @@ BUSBDevice::DecodeStringDescriptor(uint32 index) const
 	usb_string_descriptor *stringDescriptor;
 	stringDescriptor = (usb_string_descriptor *)&buffer;
 
-	size_t stringLength = GetStringDescriptor(index, stringDescriptor,
-		sizeof(buffer) - sizeof(usb_string_descriptor));
+	int32 stringLength = GetStringDescriptor(index, stringDescriptor,
+		sizeof(buffer) - sizeof(usb_string_descriptor)) - 1;
 
 	if (stringLength < 3)
 		return NULL;
 
-	// pseudo convert unicode string
-	stringLength = (stringLength - 2) / 2;
-	char *result = new(std::nothrow) char[stringLength + 1];
+	int32 resultLength = 0;
+
+	// USB is always little-endian, UCS-2 is big-endian.
+	uint16* ustr = (uint16*)stringDescriptor->string;
+	for (int32 i = 0; i < (stringLength / 2); i++) {
+		// Increase size of result as needed by source character.
+		const uint16 character = B_LENDIAN_TO_HOST_INT16(ustr[i]);
+		resultLength++;
+		if (character >= 0x80)
+			resultLength++;
+		if (character >= 0x800)
+			resultLength++;
+
+		ustr[i] = B_SWAP_INT16(ustr[i]);
+	}
+
+	char *result = new(std::nothrow) char[resultLength + 1];
 	if (result == NULL)
 		return NULL;
 
-	for (size_t i = 0; i < stringLength; i++)
-		result[i] = stringDescriptor->string[i * 2];
-	result[stringLength] = 0;
+	status_t status = convert_to_utf8(B_UNICODE_CONVERSION,
+		(const char*)stringDescriptor->string, &stringLength,
+		result, &resultLength, NULL);
+	if (status != B_OK) {
+		delete[] result;
+		return NULL;
+	}
+	result[resultLength] = 0;
 	return result;
 }
 

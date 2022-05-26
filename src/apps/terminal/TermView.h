@@ -23,6 +23,7 @@
 #include <String.h>
 #include <View.h>
 
+#include "TerminalLine.h"
 #include "TermPos.h"
 #include "TermViewHighlight.h"
 
@@ -94,6 +95,7 @@ public:
 			void				SetSelectColor(rgb_color fore, rgb_color back);
 			void				SetTermColor(uint index, rgb_color color,
 									bool dynamic = false);
+			status_t			GetTermColor(uint index, rgb_color* color);
 
 			int					Encoding() const;
 			void				SetEncoding(int encoding);
@@ -201,7 +203,7 @@ private:
 			void				_Activate();
 			void				_Deactivate();
 
-			void				_DrawLinePart(float x1, float y1, uint32 attr,
+			void				_DrawLinePart(float x1, float y1, Attributes attr,
 									char* buffer, int32 width,
 									Highlight* highlight, bool cursor,
 									BView* inView);
@@ -253,7 +255,8 @@ private:
 			void				_ScrollToRange(TermPos start, TermPos end);
 
 			void				_SendMouseEvent(int32 button, int32 mode,
-									int32 x, int32 y, bool motion);
+									int32 x, int32 y, bool motion,
+									bool upEvent = false);
 
 			void				_DrawInlineMethodString();
 			void				_HandleInputMethodChanged(BMessage* message);
@@ -313,7 +316,7 @@ private:
 			BScrollBar*			fScrollBar;
 			InlineInput*		fInline;
 
-			// Color and Attribute.
+			// Color and Attributes.
 			rgb_color			fTextForeColor;
 			rgb_color			fTextBackColor;
 			rgb_color			fCursorForeColor;

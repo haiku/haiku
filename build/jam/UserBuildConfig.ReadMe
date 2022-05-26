@@ -212,7 +212,7 @@ switch $(HAIKU_BUILD_PROFILE) {
 	case "disk" : {
 		AddOptionalHaikuImagePackages BeBook BeHappy Bluetooth Development
 			OpenSSH OpenSSL Welcome ;
-		AddHaikuImageSystemPackages bepdf cvs p7zip pe subversion vision wonderbrush ;
+		AddHaikuImageSystemPackages bepdf git p7zip pe vision wonderbrush ;
 	}
 
 	case "qemu" : {

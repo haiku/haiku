@@ -1,0 +1,48 @@
+1	czech	x-vnd.Haiku-Pulse	559379362
+Normal mode	DeskbarPulseView		Běžný režim
+Info	CPUButton		Info
+Quit	DeskbarPulseView		Ukončit
+Info	DeskbarPulseView		Info
+Normal mode	MiniPulseView		Běžný režim
+Frame color	ConfigView		Barva rámečku
+Error	PulseApp		Chyba
+Bar colors	ConfigView		Barvy panelu
+%.2f GHz	NormalPulseView		%.2f GHz
+Defaults	PrefsWindow		Výchozí
+%ld MHz	NormalPulseView		%ld MHz
+Mini mode	PrefsWindow		Mini režim
+CPU progress bar	NormalPulseView		Panel využití CPU
+Fade colors	ConfigView		Barvy stínu
+About Pulse…	PulseView		O programu Pulse...
+Pulse	NormalPulseView		Pulse
+Deskbar mode	NormalPulseView		Deskbar režim
+Pulse settings	PulseApp		Nastavení Pulsu
+Remove replicant	CPUButton		Odebrat replikant
+You can't disable the last active CPU.	PulseView		Nelze zakázat poslední aktivní CPU.
+Width of icon:	ConfigView		Šířka ikony:
+Deskbar mode	MiniPulseView		Deskbar režim
+OK	PulseView		OK
+%s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nOd Davida Ramseye a Arveye Hjønnevåga\nUpraveno Danielem Switkinem\n
+OK	PrefsWindow		OK
+Pulse	PulseApp		Pulse
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Odstraňování z lišty selhalo.\n%s
+OK	PulseApp		OK
+About Pulse…	CPUButton		O programu Pulse...
+Deskbar mode	PrefsWindow		Deskbar režim
+Mini mode	DeskbarPulseView		Mini režim
+You can't disable the last active CPU.	CPUButton		Nelze zakázat poslední aktivní CPU.
+OK	CPUButton		OK
+Deskbar	CPUButton		Deskbar
+Settings…	PulseView		Nastavení...
+Deskbar menu	CPUButton		Nabídka Deskbar
+Mini mode	NormalPulseView		Mini režim
+Quit	MiniPulseView		Ukončit
+Info	PulseView		Info
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Použití: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
+OK	DeskbarPulseView		OK
+Info	PulseApp		Info
+Pulse	System name		Pulse
+Active color	ConfigView		Aktivní barva
+Installing in Deskbar failed\n%s	PulseApp		Instalace do lišty selhala.\n%s
+Idle color	ConfigView		Barva nečinnosti
+Normal mode	PrefsWindow		Běžný režim

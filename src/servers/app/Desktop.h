@@ -1,26 +1,30 @@
 /*
- * Copyright 2001-2015, Haiku.
+ * Copyright 2001-2020, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Adrian Oanca <adioanca@cotty.iren.ro>
- *		Stephan Aßmus <superstippi@gmx.de>
- *		Axel Dörfler <axeld@pinc-software.de>
- *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
- *		Brecht Machiels <brecht@mos6581.org>
- *		Clemens Zeidler <haiku@clemens-zeidler.de>
- *		Joseph Groover <looncraz@looncraz.net>
+ *		Adrian Oanca, adioanca@cotty.iren.ro
+ *		Stephan Aßmus, superstippi@gmx.de
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Andrej Spielmann, andrej.spielmann@seh.ox.ac.uk
+ *		Brecht Machiels, brecht@mos6581.org
+ *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Joseph Groover, looncraz@looncraz.net
+ *		Tri-Edge AI
+ *		Jacob Secunda, secundja@gmail.com
  */
 #ifndef DESKTOP_H
 #define DESKTOP_H
 
 
+#include <AutoDeleter.h>
 #include <Autolock.h>
 #include <InterfaceDefs.h>
 #include <List.h>
 #include <Menu.h>
 #include <ObjectList.h>
 #include <Region.h>
+#include <String.h>
 #include <Window.h>
 
 #include <ServerProtocolStructs.h>
@@ -125,6 +129,8 @@ public:
 									BRect& frame);
 			void				RevertScreenModes(uint32 workspaces);
 
+			status_t			SetBrightness(int32 id, float brightness);
+
 			MultiLocker&		ScreenLocker() { return fScreenLock; }
 
 			status_t			LockDirectScreen(team_id team);
@@ -183,6 +189,8 @@ public:
 									int32 workspace = -1);
 			void				ResizeWindowBy(Window* window, float x,
 									float y);
+			void				SetWindowOutlinesDelta(Window* window,
+									BPoint delta);
 			bool				SetWindowTabLocation(Window* window,
 									float location, bool isShifting);
 			bool				SetWindowDecoratorSettings(Window* window,
@@ -324,7 +332,8 @@ private:
 			uid_t				fUserID;
 			char*				fTargetScreen;
 			::VirtualScreen		fVirtualScreen;
-			DesktopSettingsPrivate*	fSettings;
+			ObjectDeleter<DesktopSettingsPrivate>
+								fSettings;
 			port_id				fMessagePort;
 			::EventDispatcher	fEventDispatcher;
 			area_id				fSharedReadOnlyArea;

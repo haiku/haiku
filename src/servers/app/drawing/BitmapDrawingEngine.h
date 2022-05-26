@@ -2,6 +2,9 @@
 #define BITMAP_DRAWING_ENGINE_H
 
 #include "DrawingEngine.h"
+
+#include <AutoDeleter.h>
+#include <Referenceable.h>
 #include <Region.h>
 
 class BitmapHWInterface;
@@ -24,8 +27,10 @@ virtual							~BitmapDrawingEngine();
 
 private:
 			color_space			fColorSpace;
-			BitmapHWInterface*	fHWInterface;
-			UtilityBitmap*		fBitmap;
+			ObjectDeleter<BitmapHWInterface>
+								fHWInterface;
+			BReference<UtilityBitmap>
+								fBitmap;
 			BRegion				fClipping;
 };
 

@@ -550,7 +550,7 @@ MimeTypeTest::setUp()
 	BasicTest::setUp();
 	execCommand(string("mkdir ") + testDir);
 /*	// Better not to play with fire, so we'll make a copy of the
-	// local mime database which we'll use for certain OpenBeOS tests
+	// local mime database which we'll use for certain Haiku tests
 	execCommand(string("mkdir ") + testDir
 				+ " ; copyattr -d -r -- " + mimeDatabaseDir + "/\* " + testDir
 				); */
@@ -1362,7 +1362,7 @@ MimeTypeTest::IconTest(IconHelper &helper) {
 		CHK(helper.GetIcon(mime, NULL) != B_OK);	// B_BAD_VALUE
 		CHK(!mime.IsInstalled());
 		CHK(helper.SetIcon(mime, NULL) != B_OK);	// R5 == Installs, B_ENTRY_NOT_FOUND
-													// OBOS == Doesn't install, B_ENTRY_NOT_FOUND
+													// Haiku == Doesn't install, B_ENTRY_NOT_FOUND
 #if TEST_R5
 		CHK(mime.IsInstalled());
 #else
@@ -1485,7 +1485,7 @@ MimeTypeTest::IconTest(IconHelper &helper) {
 		CHK(helper.SetIcon(mime, &testBmp) == B_OK);
 			// R5 == B_OK, despite being invalid color depth; however, icon is not actually set,
 			// and any subsequent call to GetIcon() will cause the application to crash...
-		CHK(helper.GetIcon(mime, bmp) == B_OK);	// R5 == CRASH!, OBOS == Damn right I can handle that shit
+		CHK(helper.GetIcon(mime, bmp) == B_OK);	// R5 == CRASH!, Haiku == Damn right I can handle that shit
 		CHK(*bmp != *helper.Bitmap1());
 		CHK(*bmp != testBmp);				// Shouldn't match, since SetIcon() reduces to B_CMAP8
 		CHK(*bmp == testBmp8);				// *Should* match, since it's the result of a similar reduction
@@ -1794,22 +1794,22 @@ MimeTypeTest::InstalledTypesTest() {
 		NextSubTest();
 
 #if !TEST_R5
-		CHK(BMimeType::GetInstalledTypes(NULL) != B_OK);			// R5 == CRASH!!!, OBOS == B_BAD_VALUE
+		CHK(BMimeType::GetInstalledTypes(NULL) != B_OK);			// R5 == CRASH!!!, Haiku == B_BAD_VALUE
 #endif
 		NextSubTest();
 #if !TEST_R5
-		CHK(BMimeType::GetInstalledTypes("text", NULL) != B_OK);	// R5 == CRASH!!!, OBOS == B_BAD_VALUE
+		CHK(BMimeType::GetInstalledTypes("text", NULL) != B_OK);	// R5 == CRASH!!!, Haiku == B_BAD_VALUE
 #endif
 		NextSubTest();
 		CHK(BMimeType::GetInstalledTypes(NULL, &msg) == B_OK);		// Same as GetInstalledTypes(&msg)
 // 		msg.PrintToStream();
 		NextSubTest();
 #if !TEST_R5
-		CHK(BMimeType::GetInstalledTypes(NULL, NULL) != B_OK);		// R5 == CRASH!!!, OBOS == B_BAD_VALUE
+		CHK(BMimeType::GetInstalledTypes(NULL, NULL) != B_OK);		// R5 == CRASH!!!, Haiku == B_BAD_VALUE
 #endif
 		NextSubTest();
 #if !TEST_R5
-		CHK(BMimeType::GetInstalledSupertypes(NULL) != B_OK);		// R5 == CRASH!!!, OBOS == B_BAD_VALUE
+		CHK(BMimeType::GetInstalledSupertypes(NULL) != B_OK);		// R5 == CRASH!!!, Haiku == B_BAD_VALUE
 #endif
 	}
 	// Invalid supertype param to GetInstalledTypes(char *super, BMessage*)
@@ -2051,9 +2051,9 @@ MimeTypeTest::PreferredAppTest() {
 		CHK(mime.GetPreferredApp(str) == B_ENTRY_NOT_FOUND);
 #else
 		CHK(!mime.IsInstalled());
-		CHK(mime.GetPreferredApp(NULL) != B_OK);		// OBOS == B_BAD_VALUE
+		CHK(mime.GetPreferredApp(NULL) != B_OK);		// Haiku == B_BAD_VALUE
 		CHK(!mime.IsInstalled());
-		CHK(mime.SetPreferredApp(NULL) != B_OK);		// OBOS == B_ENTRY_NOT_FOUND
+		CHK(mime.SetPreferredApp(NULL) != B_OK);		// Haiku == B_ENTRY_NOT_FOUND
 		CHK(!mime.IsInstalled());
 		CHK(mime.SetPreferredApp(testSig) == B_OK);
 		CHK(mime.IsInstalled());
@@ -2063,7 +2063,7 @@ MimeTypeTest::PreferredAppTest() {
 		CHK(mime.SetPreferredApp(NULL) == B_OK);
 		CHK(mime.IsInstalled());
 		str[0] = 0;
-		CHK(mime.GetPreferredApp(str) != B_OK);			// OBOS == B_ENTRY_NOT_FOUND
+		CHK(mime.GetPreferredApp(str) != B_OK);			// Haiku == B_ENTRY_NOT_FOUND
 #endif // !TEST_R5
 	}
 	// Installed type, NULL params
@@ -2230,7 +2230,7 @@ MimeTypeTest::InstallDeleteTest() {
 		BMimeType mime(testType);
 		CHK(mime.InitCheck() == B_OK);
 		CHK(!mime.IsInstalled());
-		CHK(mime.Delete() != B_OK);	// R5 == B_ENTRY_NOT_FOUND, OBOS == B_ENTRY_NOT_FOUND
+		CHK(mime.Delete() != B_OK);	// R5 == B_ENTRY_NOT_FOUND, Haiku == B_ENTRY_NOT_FOUND
 		CHK(!type_exists(testType));
 		CHK(mime.Install() == B_OK);
 		CHK(type_exists(testType));
@@ -2558,7 +2558,7 @@ MimeTypeTest::SupportingAppsTest() {
 		std::set<std::string> typeList;							// Stores all installed MIME types
 		std::set<std::string> appList;							// Stores all installed application subtypes
 		std::map< std::string, std::set<std::string> > typeAppMap;	// Stores mapping of types to apps that support them
-		std::map< std::string, std::set<std::string> > fakeTypeAppMap;	// Used to keep timing info for R5 and OBOS tests orthogonal
+		std::map< std::string, std::set<std::string> > fakeTypeAppMap;	// Used to keep timing info for R5 and Haiku tests orthogonal
 
 		// Get a list of all the types in the database
 		{
@@ -2748,7 +2748,7 @@ void
 init_long_types(char *notTooLongType, char *tooLongType)
 {
 // R5: Allows buffer sizes up to `B_MIME_TYPE_LENGTH + 1'
-// OBOS: We stay consistent: `*_LENGTH' defines the buffer size.
+// Haiku: We stay consistent: `*_LENGTH' defines the buffer size.
 #ifdef TEST_R5
 	const int notTooLongLength = B_MIME_TYPE_LENGTH;
 #else
@@ -2945,11 +2945,11 @@ MimeTypeTest::InitTest()
 	{
 		BMimeType type(NULL);
 		CHK(type.Type() == NULL);
-		CHK(type.InitCheck() != B_OK);		// R5 == B_NO_INIT, OBOS == B_BAD_VALUE
+		CHK(type.InitCheck() != B_OK);		// R5 == B_NO_INIT, Haiku == B_BAD_VALUE
 		CHK(type.Type() == NULL);
-		CHK(type.SetTo(NULL) != B_OK);		// R5 == B_NO_INIT, OBOS == B_BAD_VALUE
+		CHK(type.SetTo(NULL) != B_OK);		// R5 == B_NO_INIT, Haiku == B_BAD_VALUE
 		CHK(type.Type() == NULL);
-		CHK(type.SetType(NULL) != B_OK);	// R5 == B_NO_INIT, OBOS == B_BAD_VALUE
+		CHK(type.SetType(NULL) != B_OK);	// R5 == B_NO_INIT, Haiku == B_BAD_VALUE
 		CHK(type.Type() == NULL);
 	}
 }
@@ -3418,7 +3418,7 @@ MimeTypeTest::MonitoringTest()
 #if !TEST_R5
 	CHK(BMimeType::StopWatching(target3) == B_BAD_VALUE);
 #endif
-	CHK(BMimeType::StopWatching(target2) != B_OK);	// R5 == B_BAD_VALUE, OBOS == B_ENTRY_NOT_FOUND
+	CHK(BMimeType::StopWatching(target2) != B_OK);	// R5 == B_BAD_VALUE, Haiku == B_ENTRY_NOT_FOUND
 	CHK(BMimeType::StopWatching(target) == B_OK);
 	// delete
 	CHK(type.Delete() == B_OK);
@@ -4786,7 +4786,7 @@ printf("type: %s, should be: %s (file == '%s')\n", type.Type(), realType, filena
 		string filename = string(testDir) + "/file100.cpp";
 		BMimeType type;
 		entry_ref ref;
-// invalid entry_ref: R5: Is fine! OBOS: no dice
+// invalid entry_ref: R5: Is fine! Haiku: no dice
 #if TEST_R5
 		CHK(BMimeType::GuessMimeType(&ref, &type) == B_OK);
 		CHK(type == "application/octet-stream");
@@ -4795,7 +4795,7 @@ printf("type: %s, should be: %s (file == '%s')\n", type.Type(), realType, filena
 #endif
 		// abstract entry_ref
 		CHK(get_ref_for_path(filename.c_str(), &ref) == B_OK);
-		// R5: B_NAME_NOT_FOUND, OBOS:
+		// R5: B_NAME_NOT_FOUND, Haiku:
 		CHK(BMimeType::GuessMimeType(&ref, &type) != B_OK);
 	}
 

@@ -220,7 +220,11 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
 			case R_ARM_ABS32:
 			case R_ARM_RELATIVE:
+#ifndef _BOOT_MODE
 				A = *(addr_t *)(image->text_region.delta + rel[i].r_offset);
+#else
+				A = boot_elf32_get_relocation(image->text_region.delta + rel[i].r_offset);
+#endif
 				TRACE(("A %p\n", (void *)A));
 				break;
 		}
@@ -252,8 +256,10 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 				rel[i].r_offset);
 			return B_BAD_ADDRESS;
 		}
-#endif
 		*resolveAddress = finalAddress;
+#else
+		boot_elf32_set_relocation((Elf32_Addr)resolveAddress, finalAddress);
+#endif
 		TRACE(("-> offset %#lx = %#lx\n",
 			(image->text_region.delta + rel[i].r_offset), finalAddress));
 	}

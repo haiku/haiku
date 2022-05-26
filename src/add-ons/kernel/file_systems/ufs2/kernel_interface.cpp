@@ -3,7 +3,6 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-
 #include "DirectoryIterator.h"
 #include "Inode.h"
 #include "system_dependencies.h"
@@ -26,6 +25,7 @@ struct identify_cookie
 };
 
 
+#if 0
 //!	ufs2_io() callback hook
 static status_t
 iterative_io_get_vecs_hook(void *cookie, io_request *request, off_t offset,
@@ -38,24 +38,25 @@ iterative_io_get_vecs_hook(void *cookie, io_request *request, off_t offset,
 //!	ufs2_io() callback hook
 static status_t
 iterative_io_finished_hook(void *cookie, io_request *request, status_t status,
-						   bool partialTransfer, size_t bytesTransferred)
+	bool partialTransfer, size_t bytesTransferred)
 {
 	return B_NOT_SUPPORTED;
 }
+#endif
 
 
 //	#pragma mark - Scanning
 static float
 ufs2_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
-		ufs2_super_block superBlock;
-		status_t status = Volume::Identify(fd, &superBlock);
-		if (status != B_OK)
-			return -1;
+	ufs2_super_block superBlock;
+	status_t status = Volume::Identify(fd, &superBlock);
+	if (status != B_OK)
+		return -1;
 
-		identify_cookie* cookie = new identify_cookie;
-		memcpy(&cookie->super_block, &superBlock, sizeof(ufs2_super_block));
-		*_cookie = cookie;
+	identify_cookie* cookie = new identify_cookie;
+	memcpy(&cookie->super_block, &superBlock, sizeof(ufs2_super_block));
+	*_cookie = cookie;
 
 	return 0.8f;
 }
@@ -64,14 +65,26 @@ ufs2_identify_partition(int fd, partition_data *partition, void **_cookie)
 static status_t
 ufs2_scan_partition(int fd, partition_data *partition, void *_cookie)
 {
-	return B_NOT_SUPPORTED;
+	identify_cookie* cookie = (identify_cookie*)_cookie;
+
+	partition->status = B_PARTITION_VALID;
+	partition->flags |= B_PARTITION_FILE_SYSTEM | B_PARTITION_READ_ONLY;
+	partition->block_size = cookie->super_block.fs_bsize;
+	partition->content_size = partition->block_size
+		* cookie->super_block.fs_size;
+	partition->content_name = strdup(cookie->super_block.fs_volname);
+	if (partition->content_name == NULL)
+		return B_NO_MEMORY;
+
+	return B_OK;
 }
 
 
 static void
 ufs2_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 {
-	dprintf("Unsupported in ufs2 currently.\n");
+	identify_cookie* cookie = (identify_cookie*)_cookie;
+	delete cookie;
 	return;
 }
 
@@ -196,7 +209,6 @@ static status_t
 ufs2_lookup(fs_volume *_volume, fs_vnode *_directory, const char *name,
 		   ino_t *_vnodeID)
 {
-	TRACE("UFS2_LOOKUP: %p (%s)\n", name, name);
 	Volume* volume = (Volume*)_volume->private_volume;
 	Inode* directory = (Inode*)_directory->private_node;
 
@@ -207,7 +219,6 @@ ufs2_lookup(fs_volume *_volume, fs_vnode *_directory, const char *name,
 		return status;
 
 	status = get_vnode(volume->FSVolume(), *_vnodeID, NULL);
-	TRACE("get_vnode status: %s\n", strerror(status));
 	return status;
 }
 
@@ -223,11 +234,9 @@ ufs2_ioctl(fs_volume *_volume, fs_vnode *_node, void *_cookie, uint32 cmd,
 static status_t
 ufs2_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 {
-	TRACE("Reading stat...\n");
 	Inode* inode = (Inode*)_node->private_node;
 	stat->st_dev = inode->GetVolume()->ID();
 	stat->st_ino = inode->ID();
-	TRACE("stat->st_ino %ld\n",stat->st_ino);
 //	TODO handle hardlinks which will have nlink > 1. Maybe linkCount in inode
 //	structure may help?
 	stat->st_nlink = 1;
@@ -251,10 +260,26 @@ ufs2_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 
 
 static status_t
-ufs2_open(fs_volume * /*_volume*/, fs_vnode *_node, int openMode,
+ufs2_open(fs_volume * _volume, fs_vnode *_node, int openMode,
 		 void **_cookie)
 {
-	return B_NOT_SUPPORTED;
+	//Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
+	if (inode->IsDirectory())
+		return B_IS_A_DIRECTORY;
+
+	file_cookie* cookie = new(std::nothrow) file_cookie;
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<file_cookie> cookieDeleter(cookie);
+
+	cookie->last_size = inode->Size();
+	cookie->last_notification = system_time();
+
+//	fileCacheEnabler.Detach();
+	cookieDeleter.Detach();
+	*_cookie = cookie;
+	return B_OK;
 }
 
 
@@ -262,7 +287,14 @@ static status_t
 ufs2_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 		 void *buffer, size_t *_length)
 {
-	return B_NOT_SUPPORTED;
+	Inode* inode = (Inode*)_node->private_node;
+
+	if (!inode->IsFile()) {
+		*_length = 0;
+		return inode->IsDirectory() ? B_IS_A_DIRECTORY : B_BAD_VALUE;
+	}
+
+	return inode->ReadAt(pos, (uint8*)buffer, _length);
 }
 
 
@@ -282,7 +314,6 @@ ufs2_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 static status_t
 ufs2_access(fs_volume *_volume, fs_vnode *_node, int accessMode)
 {
-	TRACE("In access\n");
 	return B_OK;
 }
 
@@ -291,7 +322,9 @@ static status_t
 ufs2_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 			  size_t *_bufferSize)
 {
-	return B_NOT_SUPPORTED;
+	Inode* inode = (Inode*)_node->private_node;
+
+	return inode->ReadLink(buffer, _bufferSize);
 }
 
 
@@ -340,15 +373,15 @@ static status_t
 ufs2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 			 struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
-	TRACE("read dir \n");
 	DirectoryIterator* iterator = (DirectoryIterator*)_cookie;
 	Volume* volume = (Volume*)_volume->private_volume;
 
 	uint32 maxCount = *_num;
 	uint32 count = 0;
 
-	while (count < maxCount and (bufferSize > sizeof(struct dirent))) {
-		size_t length = bufferSize - sizeof(struct dirent) + 1;
+	while (count < maxCount
+			&& (bufferSize >= sizeof(struct dirent) + B_FILE_NAME_LENGTH)) {
+		size_t length = bufferSize - offsetof(struct dirent, d_name);
 		ino_t iNodeNo;
 
 		status_t status = iterator->GetNext(dirent->d_name, &length, &iNodeNo);
@@ -364,14 +397,13 @@ ufs2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = iNodeNo;
-		dirent->d_reclen = sizeof(dirent) + length;
+		dirent->d_reclen = offsetof(struct dirent, d_name) + length + 1;
 		bufferSize -= dirent->d_reclen;
 		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
 		count++;
 	}
 
 	*_num = count;
-	TRACE("count is %d\n", count);
 	return B_OK;
 
 }

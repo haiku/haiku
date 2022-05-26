@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // ActiveTranslatorsWindow
-// Written by Michael Wilber, OBOS Translation Kit Team
+// Written by Michael Wilber, Haiku Translation Kit Team
 //
 // ActiveTranslatorsWindow.cpp
 //
@@ -8,7 +8,7 @@
 // document
 //
 //
-// Copyright (c) 2003 OpenBeOS Project
+// Copyright (c) 2003 Haiku Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),

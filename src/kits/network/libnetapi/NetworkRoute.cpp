@@ -256,15 +256,13 @@ status_t
 BNetworkRoute::GetRoutes(int family, const char* interfaceName,
 	uint32 filterFlags, BObjectList<BNetworkRoute>& routes)
 {
-	int socket = ::socket(family, SOCK_DGRAM, 0);
-	if (socket < 0)
+	FileDescriptorCloser socket(::socket(family, SOCK_DGRAM, 0));
+	if (!socket.IsSet())
 		return errno;
-
-	FileDescriptorCloser fdCloser(socket);
 
 	ifconf config;
 	config.ifc_len = sizeof(config.ifc_value);
-	if (ioctl(socket, SIOCGRTSIZE, &config, sizeof(struct ifconf)) < 0)
+	if (ioctl(socket.Get(), SIOCGRTSIZE, &config, sizeof(struct ifconf)) < 0)
 		return errno;
 
 	uint32 size = (uint32)config.ifc_value;
@@ -279,7 +277,7 @@ BNetworkRoute::GetRoutes(int family, const char* interfaceName,
 	config.ifc_len = size;
 	config.ifc_buf = buffer;
 
-	if (ioctl(socket, SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0)
+	if (ioctl(socket.Get(), SIOCGRTTABLE, &config, sizeof(struct ifconf)) < 0)
 		return errno;
 
 	ifreq* interface = (ifreq*)buffer;

@@ -2,8 +2,8 @@
  * Copyright 2008-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _ARCH_SIGNAL_H_
-#define _ARCH_SIGNAL_H_
+#ifndef _ARCH_MIPSEL_SIGNAL_H_
+#define _ARCH_MIPSEL_SIGNAL_H_
 
 
 /*
@@ -21,4 +21,4 @@ struct vregs
 #endif /* __MIPSEL__ */
 
 
-#endif /* _ARCH_SIGNAL_H_ */
+#endif /* _ARCH_MIPSEL_SIGNAL_H_ */

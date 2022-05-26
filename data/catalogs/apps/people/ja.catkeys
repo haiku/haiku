@@ -1,15 +1,16 @@
-1	japanese	x-vnd.Be-PEPL	2332202134
+1	japanese	x-vnd.Be-PEPL	2634915100
 Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Person 属性を設定する FileTypes の起動に失敗しました。\n\nエラー:
+Mobile phone	People		携帯電話
 Unnamed person	People		名無し
-New person…	People		新規連絡先…
+New person…	People		新しい連絡先...
 Address	People		住所
 Zip	People		郵便番号
 Select all	People		すべて選択
-Could not create %s.	People		%s を作成できませんでした。
+Could not create %s.	People		%s を作成できません。
 Quit	People		終了
 Company	People		会社
 Name	People		名前
-The file '%name%' could not be written.	People		ファイル '%name%' を書き込めませんでした。
+The file '%name%' could not be written.	People		ファイル '%name%' を書き込めません。
 Contact name	People		担当者名
 Cancel	People		中止
 Edit	People		編集
@@ -19,21 +20,21 @@ Error	People		エラー
 Revert	People		戻す
 Country	People		国
 Person	Short mimetype description		人物
-New person	People		新規連絡先
+New person	People		新しい連絡先
 Save	People		保存
 Fax	People		ファックス
 URL	People		URL
 %name% picture	People		%name% の画像
 Home phone	People		自宅の電話番号
 none	Groups list		無し
-Save as…	People		名前を付けて保存…
+Save as…	People		名前を付けて保存...
 Cut	People		切り取り
 Contact information for a person.	Long mimetype description		連絡先情報
-Remove image	People		イメージを削除する
+Remove image	People		イメージの削除
 City	People		市町村
 Undo	People		元に戻す
 Don't save	People		保存しない
-Configure attributes	People		属性を編集
+Configure attributes	People		属性の編集
 Work phone	People		勤務先の電話番号
 State	People		都道府県
 Nickname	People		ニックネーム
@@ -46,5 +47,5 @@ Paste	People		貼り付け
 E-mail	People		E-mail
 Group	People		グループ
 Drop an image here,\nor use the contextual menu.	People		画像をここにドロップしてください。\nまたは、コンテクストメニューを使ってください。
-Load image…	People		イメージを読み込む…
+Load image…	People		イメージを読み込む...
 Sorry	People		すみません

@@ -8,6 +8,7 @@
 
 #include <util/AutoLock.h>
 
+#include <thread.h>
 #include <fs/node_monitor.h>
 #include <Notifications.h>
 

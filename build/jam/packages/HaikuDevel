@@ -28,12 +28,12 @@ AddFilesToPackage lib : $(developmentLibs) ;
 # library symlinks
 local lib ;
 for lib in [ HaikuImageGetSystemLibs ] $(developmentLibs) {
-	AddSymlinkToPackage develop lib : /system/lib $(lib:BS) ;
+	AddSymlinkToPackage develop lib : ../../lib $(lib:BS) ;
 	local abiVersion = [ on $(lib) return $(HAIKU_LIB_ABI_VERSION) ] ;
 	if $(abiVersion) {
 		local abiVersionedLib = $(lib:BS).$(abiVersion) ;
 		AddSymlinkToPackage develop lib
-			: /system/lib $(abiVersionedLib) ;
+			: ../../lib $(abiVersionedLib) ;
 	}
 }
 
@@ -41,8 +41,8 @@ for lib in [ HaikuImageGetSystemLibs ] $(developmentLibs) {
 AddFilesToPackage develop lib :
 	libc.a libcolumnlistview.a
 	<$(architecture)>liblocalestub.a
-	libm.a libpthread.a
-	libprint.a libprintutils.a
+	libm.a libnetservices.a
+	libpthread.a libprint.a libprintutils.a
 	<$(architecture)>libshared.a ;
 
 # the POSIX error code mapper library
@@ -79,7 +79,7 @@ AddHeaderDirectoryToPackage compatibility bsd : bsd ;
 AddHeaderDirectoryToPackage compatibility gnu : gnu ;
 
 # cpp headers
-if $(HAIKU_GCC_VERSION_$(architecture)[1]) = 2 {
+if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 1 {
 	# GCC 2 only -- for GCC 4 they come with the gcc package
 	CopyDirectoryToPackage develop headers c++
 		: [ FDirName $(HAIKU_TOP) headers cpp ] : 2.95.3 ;

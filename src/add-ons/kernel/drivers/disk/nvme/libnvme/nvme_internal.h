@@ -311,6 +311,12 @@ struct nvme_tracker {
 	LIST_ENTRY(nvme_tracker)	list;
 
 	struct nvme_request		*req;
+#if INTPTR_MAX == INT32_MAX
+	int32_t __pad[3];
+#elif !defined(INTPTR_MAX)
+#	error Need definition of INTPTR_MAX!
+#endif
+
 	uint16_t			cid;
 
 	uint16_t			rsvd1: 15;

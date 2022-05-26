@@ -5,14 +5,14 @@ Bus Information	Device		バス情報
 Devices	System name		デバイス
 Graphics Peripheral	DeviceSCSI		グラフィック装置
 Processor	Device		プロセッサ
-Generate system information	DevicesView		システム情報を作成
+Generate system information	DevicesView		システム情報の作成
 Class info	DevicePCI		クラス情報
 ACPI Information	DeviceACPI		ACPI 情報
 Detailed	DevicesView		詳細
 Computer	DevicesView		コンピューター
 Communications	DeviceSCSI		通信
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		クラス情報:\t\t\t\t: %classInfo%
-Mass storage controller	Device		大容量記憶コントローラー
+Mass storage controller	Device		大容量記憶域コントローラー
 Connection	DevicesView		接続順
 Printer	DeviceSCSI		プリンター
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI プロセッサネームスペース '%2'
@@ -27,7 +27,7 @@ ACPI node '%1'	DeviceACPI		ACPI ノード '%1'
 Optical Drive	DeviceSCSI		光学ドライブ
 Name	PropertyList		名前
 Manufacturer	DeviceSCSI		製造元
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		デバイス名\t\t\t\t: %Name%\n製造元\t\t\t: %Manufacturer%\n使用されているドライバー\t\t\t\t: %DriverUsed%\nデバイスパス\t: %DevicePaths%
+Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		デバイス名\t\t\t\t: %Name%\n製造元\t\t\t: %Manufacturer%\n使用中のドライバー\t\t\t\t: %DriverUsed%\nデバイスパス\t: %DevicePaths%
 Device name	Device		デバイス名
 Satellite communications controller	Device		衛星通信コントローラー
 Device class	DeviceSCSI		デバイスクラス
@@ -40,14 +40,14 @@ PCI Information	DevicePCI		PCI 情報
 Tape Drive	DeviceSCSI		テープドライブ
 Changer	DeviceSCSI		チェンジャー
 Serial bus controller	Device		シリアルバスコントローラー
-Refresh devices	DevicesView		デバイスを更新
+Refresh devices	DevicesView		デバイスの更新
 Category	DevicesView		カテゴリー順
 RBC	DeviceSCSI		RBC
 None	Device		無し
 Device paths	Device		デバイスパス
 Unknown device	Device		不明なデバイス
 Wireless controller	Device		ワイヤレスコントローラー
-Generic system peripheral	Device		システム周辺機器
+Generic system peripheral	Device		汎用システム周辺機器
 Value	PropertyList		値
 Devices	DevicesView		デバイス
 Device name	DeviceACPI		デバイス名
@@ -63,27 +63,27 @@ Other	DeviceSCSI		その他
 Report compatibility	DevicesView		互換性レポート
 Computer	Device		コンピューター
 PCI bus	Device		PCI バス
-Enclosure	DeviceSCSI		エンクロージャー
+Enclosure	DeviceSCSI		格納装置
 Order by:	DevicesView		並び順:
-ACPI Thermal Zone	DeviceACPI		ACPI サーマルゾーン
+ACPI Thermal Zone	DeviceACPI		ACPI 温度管理ゾーン
 Intelligent controller	Device		インテリジェントコントローラー
 Multimedia controller	Device		マルチメディアコントローラー
 Quit	DevicesView		終了
 ISA bus	Device		ISA バス
 ISA bus	DevicesView		ISA バス
 Processor	DeviceSCSI		プロセッサ
-Manufacturer:	Device		メーカー:
+Manufacturer:	Device		製造元:
 Class Info:\t\t\t\t: %classInfo%	DeviceACPI		クラス情報:\t\t\t\t: %classInfo%
 Bridge	Device		ブリッジ
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM
 Manufacturer	DevicePCI		製造元
 Bridge	DeviceSCSI		ブリッジ
-Signal processing controller	Device		信号処理コントローラー
+Signal processing controller	Device		シグナル処理コントローラー
 Device name	DeviceSCSI		デバイス名
 Docking station	Device		ドッキングステーション
 Array	DeviceSCSI		アレイ
-Unclassified device	Device		未登録のデバイス
+Unclassified device	Device		未分類のデバイス
 ACPI controller	Device		ACPI コントローラー
 Network controller	Device		ネットワークコントローラー
 Driver used	Device		使用ドライバー

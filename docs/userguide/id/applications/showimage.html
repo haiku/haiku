@@ -23,7 +23,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Panduan pengguna</span></div>
 </div>
 
 <div class="nav">
@@ -34,6 +34,7 @@
 <li><a href="../../de/applications/showimage.html">Deutsch</a></li>
 <li><a href="../../en/applications/showimage.html">English</a></li>
 <li><a href="../../es/applications/showimage.html">Español</a></li>
+<li><a href="../../eo/applications/showimage.html">Esperanto</a></li>
 <li><a href="../../fr/applications/showimage.html">Français</a></li>
 <li><a href="../../fur/applications/showimage.html">Furlan</a></li>
 <li><a href="../../it/applications/showimage.html">Italiano</a></li>
@@ -60,7 +61,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 <h2><img src="../../images/apps-images/showimage-icon_64.png" alt="showimage-icon_64.png" width="64" height="64" />ShowImage</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -69,53 +69,59 @@
 <tr><td>Pengaturan:</td><td></td><td><span class="path">~/config/settings/ShowImage_settings</span></td></tr>
 </table>
 <p><br /></p>
-<p>ShowImage allows you to view images in all formats that are supported through <a href="../preferences/datatranslations.html">DataTranslators</a>. New formats are automatically recognized when their translator is added to the system. This has been done for Haiku's vector icon files, WonderBrush images or when WebP images became available, for example.<br />
-ShowImage provides minimal editing features to crop, rotate and flip images and to save them in another format.</p>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Viewing</h2>
+<p>ShowImage memungkinkan Anda untuk melihat gambar dalam semua format yang didukung melalui <a href="../preferences/datatranslations.html">DataTranslators</a>. Format baru secara otomatis dikenali ketika penerjemahnya ditambahkan ke sistem. Ini telah dilakukan untuk file ikon vektor Haiku, gambar WonderBrush atau ketika gambar WebP tersedia, misalnya.<br />
+ShowImage menyediakan fitur pengeditan minimal untuk memotong, memutar dan membalik gambar dan menyimpannya dalam format lain.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Menampilkan</h2>
 <img src="../images/apps-images/showimage-view.jpg" alt="showimage-view.jpg" />
-<p>The <span class="menu">View</span> menu offers to start a <span class="menu">Slide show</span> of all images in a folder (or query result window) and set a <span class="menu">Slide delay</span> from 2 to 20 seconds.</p>
-<p>Other commands apply to the currently displayed image (without changing the size of the window):<br />
-<span class="menu">Original size</span> shows the image with a 100% zoom factor.<br />
-<span class="menu">Fit to window</span> shrinks the image back into the window frame, e.g. after having zoomed into it or after resizing the window.<br />
-<span class="menu">Zoom in</span> and <span class="menu">Zoom out</span> move into and out of the image in 10% steps. Zooming is also done with the mouse wheel; to pan an image bigger than the window, simply left-click and drag your mouse around.</p>
-<p>Two settings don't just apply to the currently displayed image and are remembered when browsing from one image to the next:<br />
-<span class="menu">High quality zooming</span> applies a very fast filter when zooming to reduce jagged lines and produce a smoother result.<br />
-<span class="menu">Stretch to window</span> will stretch smaller images to fill the current window frame.</p>
-<p>Then there's a <span class="menu">Full screen</span> mode with an option to <span class="menu">Show caption in full screen mode</span> which overlays the file name at the bottom of the image.</p>
-<p>Lastly, <span class="menu">Show tool bar</span> will show/hide the graphical controls:</p>
+<p>Menu <span class="menu">View</span> menawarkan untuk memulai pertunjukan slide semua gambar dalam folder (atau jendela hasil query) dan mengatur <span class="menu">penundaan Slide</span> from 2 to 20 seconds. dari 2 hingga 20 detik.</p>
+<p>Perintah lain berlaku untuk gambar yang sedang ditampilkan (tanpa mengubah ukuran jendela):<br />
+<span class="menu">Ukuran asli</span> menunjukkan gambar dengan faktor zoom 100%.<br />
+<span class="menu">Paskan dengan jendela</span> menyusutkan gambar kembali ke bingkai jendela, mis. setelah memperbesar atau setelah mengubah ukuran jendela.<br />
+<span class="menu">Zoom in</span> and <span class="menu">Zoom out</span> bergerak masuk dan keluar dari gambar dalam 10% langkah. Zooming juga dilakukan dengan roda mouse; untuk menggeser gambar lebih besar dari jendela, cukup klik kiri dan seret mouse Anda.</p>
+<p>Dua pengaturan berikut tidak hanya berlaku untuk gambar yang saat ini ditampilkan dan diingat ketika browsing dari satu gambar ke yang berikutnya:<br />
+<span class="menu">Zooming berkualitas tinggi </span> menerapkan filter yang sangat cepat ketika zoom untuk mengurangi garis bergerigi dan menghasilkan hasil yang lebih halus.<br />
+<span class="menu">Regangkan ke jendela</span> akan meregangkan gambar yang lebih kecil untuk mengisi bingkai jendela saat ini.
+ </p>
+<p>Lalu ada mode <span class="menu">Layar penuh</span> dengan opsi untuk <span class="menu">menampilkan teks dalam mode layar penuh</span> yang menimpa nama file di bagian bawah gambar.
+
+    </p>
+<p>Terakhir, <span class="menu"> Tampilkan bilah alat </span> akan menampilkan / menyembunyikan kontrol grafis:
+
+</p>
 <img src="../../images/apps-images/showimage-toolbar.png" alt="showimage-toolbar.png" />
-<p>From left to right: Previous image, next image, start slide show (in full screen mode), selection mode, original size, fit to window, zoom in, zoom out, previous and next page (when an image format like TIFF allows multiple pages in one file, see below).</p>
-<p>Most of the more often used commands are also available from a right-click context menu on the image. Convenient when in full-screen mode.</p>
+<p>Dari kiri ke kanan: Gambar sebelumnya, gambar berikutnya, mulai peragaan slide (dalam mode layar penuh), mode pemilihan, ukuran asli, pas ke jendela, perbesar, perkecil, halaman sebelumnya dan berikutnya (ketika format gambar seperti TIFF memungkinkan banyak halaman dalam satu file, lihat di bawah).</p>
+<p>Sebagian besar perintah yang lebih sering digunakan juga tersedia dari menu konteks klik kanan pada gambar. Nyaman saat dalam mode layar penuh.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Menjelajah</h2>
 <img src="../images/apps-images/showimage-browse.jpg" alt="showimage-browse.jpg" />
-<p>After opening an image you can quickly browse through all the other images in its folder (or query result window) by pressing <span class="key">↑</span>/<span class="key">↓</span> or <span class="key">←</span>/<span class="key">→</span>. You can see the selection change accordingly in the Tracker window.</p>
-<p>There is a quick way to open the folder of the current image and even navigate to its parent and subfolders. It works just like with <a href="../tracker.html#drill-down">drill-down navigating</a> in Tracker by clicking in the info area in the status bar that shows size and format of the current image.</p>
-<p>Looking at the <span class="menu">Browse</span> menu, shows another type of browsing: Some image formats, like TIFF, can contain several pages in one file. Commands like <span class="menu">First page</span> and <span class="menu">Next page</span> let you navigate those pages.</p>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Editing</h2>
+<p>Setelah membuka gambar, Anda dapat dengan cepat menelusuri semua gambar lain di foldernya (atau jendela hasil kueri) dengan menekan <span class="key">↑</span>/<span class="key">↓</span> atau <span class="key">←</span>/<span class="key">→</span>. Anda dapat melihat perubahan pilihan sesuai di jendela Tracker 
+ window.</p>
+<p>Ada cara cepat untuk membuka folder gambar saat ini dan bahkan menavigasi ke induk dan subfoldernya. Ini berfungsi seperti halnya dengan <a href="../tracker.html#drill-down">navigasi drill-down </a> di Tracker dengan mengklik area info di bilah status yang menunjukkan ukuran dan format gambar saat ini.</p>
+<p>Melihat menu <span class="menu">Browse</span> menunjukkan jenis penelusuran lainnya: Beberapa format gambar, seperti TIFF, dapat berisi beberapa halaman dalam satu file. Perintah seperti  <span class="menu">halaman Pertama</span> dan <span class="menu">Halaman Berikutnya </span> dan memungkinkan Anda menavigasi halaman-halaman itu.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Penyuntingan</h2>
 <img src="../images/apps-images/showimage-edit.jpg" alt="showimage-edit.jpg" />
-<p>The <span class="menu">Image</span> menu offers the few image manipulations necessary for an image viewer: rotating and flipping the image. Note however, that the actual image data won't be changed. Only an attribute is added to the file so it'll be shown rotated or flipped the next time you open it.</p>
-<p><span class="menu">Use as backgroud...</span> will open the <a href="../preferences/backgrounds.html">Backgrounds</a> preferences to set the current picture as image for your workspaces.</p>
-<p>Cropping is another feature that's needed sometimes. To define the frame to cut to, you can switch to <span class="menu">Selection mode</span> from the <span class="menu">Edit</span> menu and drag out a box with your left mouse button. If you don't want to change modes first, you can create this box in "normal mode" by simply holding <span class="key">CTRL</span> while left-click-dragging, which otherwise would just pan the image around.<br />
-<span class="menu">Clear selection</span> or <span class="key">ESC</span> will remove the selection box.</p>
-<p>The following chapter shows how to actually save the cropped area.</p>
-<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Saving and converting</h2>
-<p>To save or convert an image into any available format, you can invoke the normal <span class="menu">Save as...</span> item from the <span class="menu">File</span> menu, select the format and choose a file name.<br />
-Often quicker, especially when the Tracker window with the destination folder is already open, is using drag &amp; drop.</p>
+<p>Menu <span class="menu">Gambar </span>  menawarkan beberapa manipulasi gambar yang diperlukan untuk penampil gambar: memutar dan membalik gambar. Namun perlu dicatat, bahwa data gambar aktual tidak akan berubah. Hanya atribut yang ditambahkan ke file sehingga akan ditampilkan diputar atau dibalik saat Anda membukanya.</p>
+<p><span class="menu">Gunakan sebagai latar...</span> akan membuka preferensi <a href="../preferences/backgrounds.html">Latar</a> untuk mengatur gambar saat ini sebagai gambar untuk ruang kerja Anda.</p>
+<p>Memotong adalah fitur lain yang kadang-kadang dibutuhkan. Untuk menentukan bingkai yang akan dipotong, Anda dapat beralih ke  <span class="menu">mode Pilihan</span> dari menu   <span class="menu">Edit</span> dan seret kotak dengan tombol kiri mouse Anda. Jika Anda tidak ingin mengubah mode terlebih dahulu, Anda dapat membuat kotak ini dalam "mode normal" hanya dengan menahan <span class="key">CTRL</span> sambil meng-klik-seret kiri, yang sebaliknya hanya akan menggeser gambar di sekitar.<br />
+<span class="menu">Hapus pilihan</span> atau <span class="key">ESC</span> akan menghapus kotak pilihan.</p>
+<p>Bab berikut menunjukkan bagaimana sebenarnya menyimpan area yang dipangkas.</p>
+<h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Menyimpan dan menkonversi</h2>
+<p>Untuk menyimpan atau mengonversi gambar ke dalam format apa pun yang tersedia, Anda dapat menggunakan item <span class="menu">Simpan sebagai...</span> dari menu <span class="menu">File</span> pilih format dan pilih nama file.<br />
+Seringkali lebih cepat, terutama ketika jendela Pelacak dengan folder tujuan sudah terbuka, menggunakan seret &amp; lepas.</p>
 <img src="../images/apps-images/showimage-dnd.jpg" alt="showimage-dnd.jpg" />
-<p>This is also how the above mentioned cropping is finalized. Either select a frame as described above, or choose <span class="menu">Edit | Select all</span> for the whole image. Then drag &amp; drop the selection onto the Desktop or any Tracker window to create a new image clipping in the same format of the original image.</p>
-<p>To save in another file format, do the dragging with the right mouse button and choose a format from the context menu when dropping the image.</p>
+<p>Ini juga bagaimana pemangkasan yang disebutkan di atas diselesaikan. Pilih bingkai seperti dijelaskan di atas, atau pilih <span class="menu">Sunting | Pilih semua</span> untuk seluruh gambar. Lalu seret &amp; datuhkan pilihan ke Desktop atau jendela Pelacak apa saja untuk membuat kliping gambar baru dalam format yang sama dengan gambar asli.</p>
+<p>Untuk menyimpan dalam format file lain, seret dengan tombol kanan mouse dan pilih format dari menu konteks saat menjatuhkan gambar.</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Pintasan keyboard</h2>
-<p>Here's a list of the most useful shortcuts:</p>
+<p>Berikut daftar cara pintas yang paling berguna:</p>
 <table summary="keycombos" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="key">←</span> / <span class="key">↑</span></td><td style="width:15px;"></td><td>Previous image</td></tr>
-<tr><td><span class="key">→</span> / <span class="key">↓</span></td><td></td><td>Next image</td></tr>
-<tr><td><span class="key">DEL</span></td><td></td><td>Move to Trash</td></tr>
-<tr><td><span class="key">+</span></td><td></td><td>Zoom in</td></tr>
-<tr><td><span class="key">-</span></td><td></td><td>Zoom out</td></tr>
-<tr><td><span class="key">0</span></td><td></td><td>Original size (100% zoom)</td></tr>
-<tr><td><span class="key">1</span></td><td></td><td>Fit to window</td></tr>
-<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Toggle full screen mode (also via double-click)</td></tr>
-<tr><td><span class="key">CTRL</span></td><td></td><td>While holding <span class="key">CTRL</span> you can create a selection frame without explicitly switching to selection mode.</td></tr>
+<tr><td><span class="key">←</span> / <span class="key">↑</span></td><td style="width:15px;"></td><td>Gambar sebelumnya</td></tr>
+<tr><td><span class="key">→</span> / <span class="key">↓</span></td><td></td><td>Gambar selanjutnya</td></tr>
+<tr><td><span class="key">DEL</span></td><td></td><td>Pindah ke Tempat sampah</td></tr>
+<tr><td><span class="key">+</span></td><td></td><td>Perbesar</td></tr>
+<tr><td><span class="key">-</span></td><td></td><td>Perkecil</td></tr>
+<tr><td><span class="key">0</span></td><td></td><td>Ukiran asli (zoom 100% )</td></tr>
+<tr><td><span class="key">1</span></td><td></td><td>Sesuaikan dengan jendela</td></tr>
+<tr><td><span class="key">ALT</span> <span class="key">ENTER</span></td><td></td><td>Mengalihkan mode layar penuh (juga melalui klik dua kali)</td></tr>
+<tr><td><span class="key">CTRL</span></td><td></td><td>Sambil memegang <span class="key">CTRL</span> Anda dapat membuat bingkai pilihan tanpa secara eksplisit beralih ke mode pemilihan.</td></tr>
 </table>
 
 </div>

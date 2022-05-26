@@ -1,0 +1,10 @@
+1	czech	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		Vstupní formát
+Channels:	CortexAudioAdapter		Kanály:
+stereo	CortexAudioAdapter		stereo
+mono	CortexAudioAdapter		mono
+Output format	CortexAudioAdapter		Výstupní formát
+Audio input	CortexAddOnsCommon		Zvukový vstup
+Sample format:	CortexAudioAdapter		Formát vzorku:
+Audio output	CortexAddOnsCommon		Zvukový výstup
+%groupname% parameters	CortexAddOnsCommon		%groupname% parametry

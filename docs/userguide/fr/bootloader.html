@@ -26,7 +26,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>Guide de l’utilisateur</span></div>
 </div>
 
 <div class="nav">
@@ -38,6 +38,7 @@
 <li><a href="../de/bootloader.html">Deutsch</a></li>
 <li><a href="../en/bootloader.html">English</a></li>
 <li><a href="../es/bootloader.html">Español</a></li>
+<li><a href="../eo/bootloader.html">Esperanto</a></li>
 <li><a href="../fur/bootloader.html">Furlan</a></li>
 <li><a href="../it/bootloader.html">Italiano</a></li>
 <li><a href="../hu/bootloader.html">Magyar</a></li>
@@ -57,14 +58,14 @@
 <span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+    <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="filesystem-layout.html">Structure du système de fichiers</a>  »
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
+<div class="box-info">La traduction de cette page n'est pas achevée. Les parties non encore traduites apparaîtrons en anglais.</div>
 
 <h1>Chargeur de démarrage</h1>
 
@@ -72,7 +73,8 @@
 <p>Pour accéder aux options du chargeur de démarrage, vous devez garder la touche <span class="key">Maj</span> appuyé jusqu'à l'amorce du processus de démarrage d'Haiku.
 Si un gestionnaire d'amorce est installé, vous pouvez commencer à presser la touche <span class="key">Maj</span> avant d'invoquer le démarrage d'Haiku.
 Si Haiku est le seul système d'exploitation de votre machine, Vous pouvez commencer à presser la touche même si le BIOS n'a pas fini d'afficher ses messages de démarrage.</p>
-<div class="box-info">Sur les ordinateurs qui utilisent l'UEFI pour démarrer au lieu du BIOS classique, vous devez utiliser la <span class="key">Barre d'espace</span> à la place.</div>
+<div class="box-info">With some hardware, you'll have to make sure USB keyboards are enabled in the BIOS.<br />
+On computers that use UEFI for booting instead of the classic BIOS, you need to use the <span class="key">SPACEBAR</span> instead of <span class="key">SHIFT</span>.</div>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Les options d'amorçage</a></h2>
@@ -108,7 +110,7 @@ Si Haiku est le seul système d'exploitation de votre machine, Vous pouvez comme
 		Disables Advanced Power Management hardware support, overriding the APM setting in the kernel settings file.</p>
 	<p><span class="menu">Disable ACPI</span><br />
 		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
-	<p><span class="menu">Blacklist entries</span><br />
+	<p><span class="menu">Disable system components</span><br />
 		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
 <tr><td><b>Select debug options</b>
 </td><td> </td><td>Ici, vous trouverez plusieurs options qui vous aideront à déboguer ou à récuperer le détail pour un <a href="../../welcome/fr/bugreports.html">rapport de bogue</a>.
@@ -145,8 +147,8 @@ Voici, une courte explication pour chaque option affichée ci-dessous.</td></tr>
 <li><p>Activer <span class="menu">Safe mode</span> empêchera la plupart des serveurs, des daemons et du UserBootScript de se lancer.</p></li>
 <li><p>Activer <span class="menu">Disable user add-ons</span> empêchera l’utilisation de toute extension (pilote, traducteur, etc…) que vous avez installée dans votre dossier personnel.</p></li>
 <li><p>If activating <span class="menu">Use fail-safe graphics driver</span> solves your troubles by falling back to VESA graphics, you can make the setting permanent by removing the <tt>#</tt> of the line <i>#fail_safe_video_mode true</i> in the text file <span class="path">/boot/home/config/settings/kernel/drivers/kernel</span>.</p></li>
-<li><p>Si le pilote ou l’extension en cause est installé dans un dossier système, cela devient plus complexe car cette partie est en lecture-seule. C’est à cela que sert <span class="menu">Blacklist entries</span>. Vous pourrez alors naviguer dans les dossiers système et désactiver les composants fautifs en cochant une entrée avec la touche <span class="key">Espace</span> ou <span class="key">Entrée</span>. La touche <span class="key">Esc</span> permet de retourner au dossier parent.</p>
-<p>L’article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> (en anglais) vous montrera comment rendre ce réglage permanent.</p></li>
+<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Disable system components</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
+<p>Online, there's the guide <a href="https://www.haiku-os.org/guides/daily-tasks/blacklist-packages">Disabling components of packages</a> showing how to make that setting stick.</p></li>
 <li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
 So, if you encounter boot problems after installing some package, boot a Haiku state from before that time and uninstall the offending package.</p></li>
 </ul>
@@ -175,8 +177,8 @@ Ces symboles correspondent grossièrement aux étapes de démarrage suivantes :
 <div class="inner"><span>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
-    <a href="contents.html" class="uplink">Contents</a> 
-::  <a href="filesystem-layout.html">Filesystem layout</a>  »
+    <a href="contents.html" class="uplink">Sommaire</a> 
+::  <a href="filesystem-layout.html">Structure du système de fichiers</a>  »
 </span></div>
 </div>
 

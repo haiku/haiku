@@ -490,7 +490,13 @@ BNetEndpoint::IsDataPending(bigtime_t timeout)
 		tv.tv_usec = (timeout % 1000000);
 	}
 
-	if (select(fSocket + 1, &fds, NULL, NULL, timeout >= 0 ? &tv : NULL) < 0) {
+	int status;
+	do {
+		status = select(fSocket + 1, &fds, NULL, NULL,
+			timeout >= 0 ? &tv : NULL);
+	} while (status == -1 && errno == EINTR);
+
+	if (status < 0) {
 		fStatus = errno;
 		return false;
 	}

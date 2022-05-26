@@ -6,8 +6,8 @@
 #define _USBKIT_H
 
 #include <SupportDefs.h>
-#include <USB3.h>
 #include <USB_spec.h>
+#include <USB_isochronous.h>
 
 
 class BUSBRoster;

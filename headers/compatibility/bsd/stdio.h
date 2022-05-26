@@ -10,7 +10,7 @@
 #include <features.h>
 
 
-#ifdef _DEFAULT_SOURCE
+#if defined(_DEFAULT_SOURCE) || defined(_GNU_SOURCE)
 
 
 #ifdef __cplusplus
@@ -18,6 +18,10 @@ extern "C" {
 #endif
 
 char *fgetln(FILE *stream, size_t *_length);
+
+int asprintf(char **ret, char const *format, ...) __PRINTFLIKE(2,3);
+int vasprintf(char **ret, char const *format, va_list ap);
+
 
 #ifdef __cplusplus
 }

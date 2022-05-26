@@ -1,0 +1,34 @@
+1	dutch; flemish	application/x-vnd.Cortex.MediaRoutingView	3442339205
+Lock group	MediaNodePanel		Vergrendelgroep
+%refname% (no file)	MediaNodePanel		%refname% (geen bestand)
+Video output	MediaRoutingView		Videouitvoer
+Icon view	MediaRoutingView		Icoonweergave
+OK	MediaRoutingView		Okee
+Cycle	MediaNodePanel		Cyclus
+Advanced	MediaNodePanel		Geavanceerd
+Audio input	MediaRoutingView		Audioinvoer
+Run mode	MediaNodePanel		Uitvoermodus
+Could not load '%filename%'	MediaRoutingView		Kan %filename% niet laden
+Stop time source	MediaNodePanel		Stoptijdbron
+Be Audio Mixer	MediaRoutingView		Be Audio Mixer
+Video input	MediaRoutingView		Videoinvoer
+Release	MediaNodePanel		Loslaten
+Disconnect	MediaRoutingView		Verbinding verbreken
+Could not disconnect	MediaRoutingView		Kan de verbinding niet verbreken
+Could not instantiate '%infoname%'	MediaRoutingView		Kan %infoname% niet aanmaken
+Mini icon view	MediaRoutingView		Mini-icoonweergave
+Select all	MediaRoutingView		Alles selecteren
+(same as group)	MediaNodePanel		(zelfde als groep)
+Input	MediaJack		Invoer
+Get info	MediaJack		Info opvragen
+Start time source	MediaNodePanel		Starttijdbron
+Error	MediaRoutingView		Fout
+Could not release '%refname%'	MediaRoutingView		Kan %refname% niet vrijgeven
+Output	MediaJack		Uitvoer
+Get info	MediaNodePanel		Info opvragen
+Get info	MediaRoutingView		Info opvragen
+Clean up	MediaRoutingView		Opschonen
+Start control panel	MediaNodePanel		Controlepaneel starten
+Tweak parameters	MediaNodePanel		Parameters aanpassen
+Could not connect	MediaRoutingView		Kan niet vervinden
+Unlock group	MediaNodePanel		Groep ontgrendelen

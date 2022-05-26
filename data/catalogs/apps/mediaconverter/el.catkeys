@@ -1,10 +1,9 @@
-1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	2251404027
-Writing audio track: %d%% complete	MediaConverter		Γίνεται εγγραφή κομματιού ήχου: Έχει ολοκληρωθεί το %d%%
+1	greek, modern (1453-)	x-vnd.Haiku-MediaConverter	2816184527
 Input file not recognized as Audio or Video	MediaConverter		Το αρχείο εισόδου δεν αναγνωρίζεται ως ήχο ή βίντεο
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Ποιότητα βίντεο: %3d%%
 Source files	MediaConverter		Πηγαία αρχεία
-Error writing video frame %ld	MediaConverter		Σφάλμα εγγραφής καρέ βίντεο %ld
+Error writing video frame %lld	MediaConverter		Σφάλμα κατά την εγγραφή του βίντεο-κάδρου %lld
 Error converting '%filename'	MediaConverter		Σφάλμα κατά τη μετατροπή του '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Δεν βρέθηκε ο επιλεγμένος φάκελος. Θα χρησιμοποιηθεί ο φάκελος /boot/home
 Conversion completed	MediaConverter		Η μετατροπή ολοκληρώθηκε
@@ -43,25 +42,26 @@ Error loading files	MediaConverter		Σφάλμα κατά τη φόρτωση τ
 End   [ms]: 	MediaConverter		Τέλος   [ms]: 
 Cancel	MediaConverter		Ακύρωση
 OK	MediaConverter-FileInfo		Εντάξει
-Error read audio frame %ld	MediaConverter		Σφάλμα ανάγνωσης πλαισίου ήχου %ld
 Video encoding:	MediaConverter		Κωδικοποίηση βίντεο:
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Προέκυψε ένα σφάλμα κατά την ανάγνωση των πληροφοριών του αρχείου.\n\nΣφάλμα : 
 Error	MediaConverter		Σφάλμα
 File details	MediaConverter		Λεπτομέρειες αρχείου
 No audio	Audio codecs list		Χωρίς ήχο
 Drop media files onto this window	MediaConverter		Σύρετε αρχεία πολυμέσων σε αυτό το παράθυρο
+Writing video track: %ld%% complete	MediaConverter		Εγγραφή βίντεο: %ld%%
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# καρέ} other{# καρέ}}
+Error read audio frame %lld	MediaConverter		Σφάλμα κατά την ανάνγωση του ηχητικού κάδρου %lld
 Quit	Menu		Έξοδος
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
 Duration:	MediaConverter-FileInfo		Διάρκεια:
 MediaConverter	System name		Μετατροπέας Πολυμέσων
 Error launching: %strError%	MediaConverter		Σφάλμα κατά την εκτέλεση του: %strError%
+Error writing audio frame %lld	MediaConverter		Σφάλμα κατά την εγγραφή του ηχητικού κάδρου %lld
+Writing audio track: %ld%% complete	MediaConverter		Εγγραφή ήχου: %ld%%
 File format:	MediaConverter		Μορφή αρχείου:
-Error writing audio frame %ld	MediaConverter		Σφάλμα εγγραφής πλαισίου ήχου %ld
 File	Menu		Αρχείο
 Video quality not supported	MediaConverter		Η ποιότητα βίντεο δεν υποστηρίζεται
 Select this folder	MediaConverter		Επιλέξτε αυτό τον φάκελο
-Error read video frame %ld	MediaConverter		Σφάλμα εγγραφής πλαισίου βίντεο %ld
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld-κάναλο
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Χωρίς βίντεο
@@ -69,6 +69,6 @@ Continue	MediaConverter		Συνέχεια
 Convert	MediaConverter		Μετατροπή
 Audio quality not supported	MediaConverter		Η ποιότητα ήχου δεν υποστηρίζεται
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Σφάλμα εγγραφής στην τοποθεσία: %strPath%. Θα χρησιμοποιηθεί η τοποθεσία: /boot/home
-Writing video track: %d%% complete	MediaConverter		Γίνεται εγγραφή κομματιού βίντεο: Έχει ολοκληρωθεί το %d%%
+Error read video frame %lld	MediaConverter		Σφάλμα κατά την ανάνγωση του βίντεο-κάδρου %lld
 Preview	MediaConverter		Προεπισκόπηση
 Start [ms]: 	MediaConverter		Αρχή [ms]: 

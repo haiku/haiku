@@ -25,7 +25,6 @@
 #include <Drivers.h>
 #include <ByteOrder.h>
 #include <SupportDefs.h>
-#include <config_manager.h>
 #include <stdio.h>
 #include <string.h>
 

@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-PowerStatus	3173765686
+1	danish	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Kør i vindue
 Extended battery info	PowerStatus		Udviddet batteriinfo
 Show status icon	PowerStatus		Vis statusikon
@@ -30,16 +30,18 @@ Serial number: 	PowerStatus		Serienummer:
 Battery critical	PowerStatus		Batteri kritisk
 Capacity: 	PowerStatus		Kapacitet: 
  mW	PowerStatus		 mW
+No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Der er ikke registreret noget understøttet batteri. Strømstatus kan ikke bruges på dit system.
 Show percent	PowerStatus		Vis procent
 Capacity granularity 1: 	PowerStatus		Kapacitet kornethed 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Batteriniveauet er ved at være lavt, sæt venligst strømstikket i enheden.
 Design capacity warning: 	PowerStatus		Advarsel om designkapacitet: 
 Capacity granularity 2: 	PowerStatus		Kapacitet kornethed 2: 
+Too bad!	PowerStatus		Øv!
 Technology: 	PowerStatus		Teknologi: 
  mWh	PowerStatus		 mWh
 PowerStatus	System name		Strømstatus
 Design capacity: 	PowerStatus		Designkapacitet: 
-OEM info: 	PowerStatus		OEM-info: 
+OEM info: 	PowerStatus		Information om OEM: 
 no battery	PowerStatus		intet batteri
 Empty battery slot	PowerStatus		Tom batteri plads
 Install in Deskbar	PowerStatus		Installer i skrivebordslinje

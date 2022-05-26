@@ -309,7 +309,10 @@ BAbstractSocket::_WaitFor(int flags, bigtime_t timeout) const
 	entry.fd = Socket();
 	entry.events = flags;
 
-	int result = poll(&entry, 1, millis);
+	int result;
+	do {
+		result = poll(&entry, 1, millis);
+	} while (result == -1 && errno == EINTR);
 	if (result < 0)
 		return errno;
 	if (result == 0)

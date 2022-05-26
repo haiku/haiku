@@ -1,0 +1,16 @@
+1	czech	application/x-vnd.moon-Flanger.media_addon	278353351
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		AplikaceŘídícíMediálníUzly: nelze získat informace uzlu (%ld):\n%s\n
+An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Doplněk verze FlangerNode.\nvytvořena Ericem Moonem (16 June, 1999)
+Delay	CortexAddOnsFlanger		Zpoždění
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		AplikaceŘídícíMediálníUzly: nelze najít uzel (%ld):\n%s\n
+Depth	CortexAddOnsFlanger		Hloubka
+Feedback	CortexAddOnsFlanger		Zpětná vazba
+Sweep rate	CortexAddOnsFlanger		Rychlost zametání
+Mix ratio	CortexAddOnsFlanger		Poměr směšování
+FlangerNode parameters	CortexAddOnsFlanger		FlangerNode parametery
+OK	CortexAddOnsCommonMediaNodeControlApp		OK
+controls	CortexAddOnsCommonMediaNodeControlApp		ovládací prvky
+Mix output	CortexAddOnsFlanger		Směšování výstupu
+Flanger	CortexAddOnsFlanger		Chvění (flanger)
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		AplikaceŘídícíMediálníUzly: žádné parametry uzlu (%ld):\n%s\n
+Audio input	CortexAddOnsFlanger		Zvukový vstup

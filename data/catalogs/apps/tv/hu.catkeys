@@ -18,9 +18,9 @@ Quit	MainWin		Kilépés
 Channel	MainWin		Csatorna
 Previous channel	MainWin		Előző csatorna
 OK	MainWin		Rendben
-TV	MainWin		Tv
+TV	MainWin		TV
 Settings	MainWin		Beállítások
-TV	System name		Tv
+TV	System name		TV
 Settings…	MainWin		Beállítások…
 None	MainWin		Nincs
 Error, interface is busy:\n\n	MainWin		Hiba, a felület foglalt:\n\n

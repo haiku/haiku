@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-ActivityMonitor	3672498538
+1	indonesian	x-vnd.Haiku-ActivityMonitor	826097672
 Teams	DataSource		Tim
 Semaphores	DataSource		Semaphore
 TX	DataSource	Shorter version for Sending	TX
@@ -17,12 +17,14 @@ Remove graph	ActivityView		Menghapus grafik
 Swap space	DataSource		Ruang swap
 CPU	DataSource		CPU
 ActivityMonitor	System name		MonitorAktifitas
+CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Memperbarui interval waktu:
 RX	DataSource	Shorter version for Receiving.	RX
 Settings…	ActivityWindow		Pengaturan…
 Block cache	DataSource		Blok cache
 Memory	DataSource		Memory
 CPU usage	DataSource		Penggunaan CPU
+CPU speed	DataSource		kecepatan CPU
 Quit	ActivityWindow		Keluar
 Raw clipboard	DataSource		Clipboard mentah
 Settings	ActivityWindow		Pengaturan
@@ -30,6 +32,8 @@ Used memory	DataSource		Memori yang digunakan
 %.1f faults/s	DataSource		%.1f kesalahan/s
 Show legend	ActivityView		Tampilkan legenda
 Cached memory	DataSource		Memori cache
+CPU %d usage	DataSource		Penggunaan CPU %d
+CPU %d speed	DataSource		Kecepatan CPU %d
 File	ActivityWindow		Berkas
 Ports	DataSource		Ports
 Page faults	DataSource		Kesalahan halaman

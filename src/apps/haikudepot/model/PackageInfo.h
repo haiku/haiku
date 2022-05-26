@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_INFO_H
@@ -8,6 +8,7 @@
 
 
 #include <set>
+#include <vector>
 
 #include <Language.h>
 #include <Referenceable.h>
@@ -63,7 +64,7 @@ private:
 };
 
 
-class UserRating {
+class UserRating : public BReferenceable {
 public:
 								UserRating();
 								UserRating(const UserInfo& userInfo,
@@ -101,7 +102,7 @@ private:
 };
 
 
-typedef List<UserRating, false> UserRatingList;
+typedef BReference<UserRating> UserRatingRef;
 
 
 class RatingSummary {
@@ -119,31 +120,6 @@ public:
 
 			int					ratingCountByStar[5];
 };
-
-
-class StabilityRating {
-public:
-								StabilityRating();
-								StabilityRating(
-									const BString& label,
-									const BString& name);
-								StabilityRating(const StabilityRating& other);
-
-			StabilityRating&	operator=(const StabilityRating& other);
-			bool				operator==(const StabilityRating& other) const;
-			bool				operator!=(const StabilityRating& other) const;
-
-			const BString&		Label() const
-									{ return fLabel; }
-			const BString&		Name() const
-									{ return fName; }
-private:
-			BString				fLabel;
-			BString				fName;
-};
-
-
-typedef List<StabilityRating, false> StabilityRatingList;
 
 
 class PublisherInfo {
@@ -191,6 +167,9 @@ public:
 									{ return fCode; }
 			const BString&		Name() const
 									{ return fName; }
+
+			int					Compare(const PackageCategory& other) const;
+
 private:
 			BString				fCode;
 			BString				fName;
@@ -198,10 +177,13 @@ private:
 
 
 typedef BReference<PackageCategory> CategoryRef;
-typedef List<CategoryRef, false> CategoryList;
 
 
-class ScreenshotInfo {
+extern bool IsPackageCategoryBefore(const CategoryRef& c1,
+	const CategoryRef& c2);
+
+
+class ScreenshotInfo : public BReferenceable {
 public:
 								ScreenshotInfo();
 								ScreenshotInfo(const BString& code,
@@ -229,10 +211,9 @@ private:
 };
 
 
-typedef List<ScreenshotInfo, false, 2> ScreenshotInfoList;
+typedef BReference<ScreenshotInfo> ScreenshotInfoRef;
 
 
-typedef List<PackageInfoListenerRef, false, 2> PackageListenerList;
 typedef std::set<int32> PackageInstallationLocationSet;
 
 
@@ -244,6 +225,9 @@ enum PackageState {
 	UNINSTALLED	= 4,
 	PENDING		= 5,
 };
+
+
+const char* package_state_to_string(PackageState state);
 
 
 using BPackageKit::BPackageInfo;
@@ -272,7 +256,8 @@ public:
 									{ return fName; }
 			void				SetTitle(const BString& title);
 			const BString&		Title() const;
-			const BPackageVersion& Version() const
+			const BPackageVersion&
+								Version() const
 									{ return fVersion; }
 			void				SetShortDescription(const BString& description);
 			const BString&		ShortDescription() const
@@ -309,6 +294,7 @@ public:
 								InstallationLocations() const
 									{ return fInstallationLocations; }
 			void				AddInstallationLocation(int32 location);
+			void				ClearInstallationLocations();
 
 			float				DownloadProgress() const
 									{ return fDownloadProgress; }
@@ -323,36 +309,45 @@ public:
 
 			void				ClearCategories();
 			bool				AddCategory(const CategoryRef& category);
-			const CategoryList&	Categories() const
-									{ return fCategories; }
+			int32				CountCategories() const;
+			CategoryRef			CategoryAtIndex(int32 index) const;
 
 			void				ClearUserRatings();
-			bool				AddUserRating(const UserRating& rating);
-			const UserRatingList& UserRatings() const
-									{ return fUserRatings; }
+			void				AddUserRating(const UserRatingRef& rating);
+			int32				CountUserRatings() const;
+			UserRatingRef		UserRatingAtIndex(int32 index) const;
 			void				SetRatingSummary(const RatingSummary& summary);
 			RatingSummary		CalculateRatingSummary() const;
 
-			void				SetProminence(float prominence);
-			float				Prominence() const
+			void				SetProminence(int64 prominence);
+			int64				Prominence() const
 									{ return fProminence; }
 			bool				HasProminence() const
-									{ return fProminence != 0.0f; }
+									{ return fProminence != 0; }
 			bool				IsProminent() const;
 
 			void				ClearScreenshotInfos();
-			bool				AddScreenshotInfo(const ScreenshotInfo& info);
-			const ScreenshotInfoList& ScreenshotInfos() const
-									{ return fScreenshotInfos; }
+			void				AddScreenshotInfo(
+									const ScreenshotInfoRef& info);
+			int32				CountScreenshotInfos() const;
+			ScreenshotInfoRef	ScreenshotInfoAtIndex(int32 index) const;
 
 			void				ClearScreenshots();
 			bool				AddScreenshot(const BitmapRef& screenshot);
-			const BitmapList&	Screenshots() const
-									{ return fScreenshots; }
+			int32				CountScreenshots() const;
+			const BitmapRef		ScreenshotAtIndex(int32 index) const;
 
-			void				SetSize(int64 size);
-			int64				Size() const
+			void				SetSize(off_t size);
+			off_t				Size() const
 									{ return fSize; }
+
+			void				SetViewed();
+			bool				Viewed() const
+									{ return fViewed; }
+
+			void				SetVersionCreateTimestamp(uint64 value);
+			uint64				VersionCreateTimestamp() const
+									{ return fVersionCreateTimestamp; }
 
 			void				SetDepotName(const BString& depotName);
 			const BString&		DepotName() const
@@ -371,6 +366,8 @@ private:
 			void				_NotifyListeners(uint32 changes);
 			void				_NotifyListenersImmediate(uint32 changes);
 
+			bool				_HasScreenshot(const BitmapRef& screenshot);
+
 private:
 			BString				fName;
 			BString				fTitle;
@@ -380,37 +377,43 @@ private:
 			BString				fFullDescription;
 			bool				fHasChangelog;
 			BString				fChangelog;
-			CategoryList		fCategories;
-			UserRatingList		fUserRatings;
+			std::vector<CategoryRef>
+								fCategories;
+			std::vector<UserRatingRef>
+								fUserRatings;
 			RatingSummary		fCachedRatingSummary;
-			float				fProminence;
-			ScreenshotInfoList	fScreenshotInfos;
-			BitmapList			fScreenshots;
+			int64				fProminence;
+			std::vector<ScreenshotInfoRef>
+								fScreenshotInfos;
+			std::vector<BitmapRef>
+								fScreenshots;
 			PackageState		fState;
 			PackageInstallationLocationSet
 								fInstallationLocations;
 			float				fDownloadProgress;
-			PackageListenerList	fListeners;
+			std::vector<PackageInfoListenerRef>
+								fListeners;
 			int32				fFlags;
 			bool				fSystemDependency;
 			BString				fArchitecture;
 			BString				fLocalFilePath;
 			BString				fFileName;
-			int64				fSize;
+			off_t				fSize;
 			BString				fDepotName;
+			bool				fViewed;
 
 			bool				fIsCollatingChanges;
 			uint32				fCollatedChanges;
+
+			uint64				fVersionCreateTimestamp;
+				// milliseconds since epoc
 };
 
 
 typedef BReference<PackageInfo> PackageInfoRef;
 
 
-typedef List<PackageInfoRef, false> PackageList;
-
-
-class DepotInfo {
+class DepotInfo : public BReferenceable {
 public:
 								DepotInfo();
 								DepotInfo(const BString& name);
@@ -423,15 +426,14 @@ public:
 			const BString&		Name() const
 									{ return fName; }
 
-			const PackageList&	Packages() const
-									{ return fPackages; }
+			int32				CountPackages() const;
+			PackageInfoRef		PackageAtIndex(int32 index);
+			void				AddPackage(PackageInfoRef& package);
+			PackageInfoRef		PackageByName(const BString& packageName);
+			bool				HasPackage(const BString& packageName);
 
-			bool				AddPackage(const PackageInfoRef& package);
-
-			int32				PackageIndexByName(const BString& packageName)
-									const;
-
-			void				SyncPackages(const PackageList& packages);
+			void				SyncPackagesFromDepot(
+									const BReference<DepotInfo>& other);
 
 			bool				HasAnyProminentPackages() const;
 
@@ -450,7 +452,8 @@ public:
 
 private:
 			BString				fName;
-			PackageList			fPackages;
+			std::vector<PackageInfoRef>
+								fPackages;
 			BString				fWebAppRepositoryCode;
 			BString				fWebAppRepositorySourceCode;
 			BString				fURL;
@@ -458,10 +461,7 @@ private:
 };
 
 
-typedef List<DepotInfo, false> DepotList;
-
-
-typedef List<BString, false> StringList;
+typedef BReference<DepotInfo> DepotInfoRef;
 
 
 #endif // PACKAGE_INFO_H

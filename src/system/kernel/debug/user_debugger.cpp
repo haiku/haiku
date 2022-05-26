@@ -34,6 +34,7 @@
 
 #include <AutoDeleter.h>
 #include <util/AutoLock.h>
+#include <util/ThreadAutoLock.h>
 
 #include "BreakpointManager.h"
 
@@ -817,7 +818,8 @@ thread_hit_serious_debug_event(debug_debugger_message event,
 	if (error != B_OK) {
 		Thread *thread = thread_get_current_thread();
 		dprintf("thread_hit_serious_debug_event(): Failed to install debugger: "
-			"thread: %" B_PRId32 ": %s\n", thread->id, strerror(error));
+			"thread: %" B_PRId32 " (%s): %s\n", thread->id, thread->name,
+			strerror(error));
 		return error;
 	}
 
@@ -2966,7 +2968,7 @@ _user_debug_thread(thread_id threadID)
 void
 _user_wait_for_debugger(void)
 {
-	debug_thread_debugged message;
+	debug_thread_debugged message = {};
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_DEBUGGED, &message,
 		sizeof(message), false);
 }

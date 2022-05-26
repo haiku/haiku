@@ -54,9 +54,10 @@ init_syscall_registers(void* dummy, int cpuNum)
 	x86_write_msr(IA32_MSR_EFER, x86_read_msr(IA32_MSR_EFER)
 		| IA32_MSR_EFER_SYSCALL);
 
-	// Flags to clear upon entry. Want interrupts disabled and the direction
-	// flag cleared.
+	// Flags to clear upon entry. Want interrupts disabled and the carry, trap,
+	// nested task, direction and alignment check flags cleared.
 	x86_write_msr(IA32_MSR_FMASK, X86_EFLAGS_INTERRUPT | X86_EFLAGS_DIRECTION
+		| X86_EFLAGS_NESTED_TASK | X86_EFLAGS_CARRY | X86_EFLAGS_TRAP
 		| X86_EFLAGS_ALIGNMENT_CHECK);
 
 	// Entry point address.

@@ -25,7 +25,7 @@ OK	PulseView		Bone
 %s\n\nBy David Ramsey and Arve Hjønnevåg\nRevised by Daniel Switkin\n	PulseApp		%s\n\nDe David Ramsey kaj Arve Hjønnevåg\nReviziite per Daniel Switkin\n
 OK	PrefsWindow		Bone
 Pulse	PulseApp		Pulso
-Removing from Deskbar failed.\n%s	DeskbarPulseView		Forigo el Laborstrio malsukcesis.\n%s
+Removing from Deskbar failed.\n%s	DeskbarPulseView		Foriĝo el Laborstrio malsukcesis.\n%s
 OK	PulseApp		Bone
 About Pulse…	CPUButton		Pri Pulso…
 Deskbar mode	PrefsWindow		Reĝimo de Laborstrio
@@ -43,6 +43,6 @@ OK	DeskbarPulseView		Bone
 Info	PulseApp		Informo
 Pulse	System name		Pulso
 Active color	ConfigView		Koloro por aktiva stato
-Installing in Deskbar failed\n%s	PulseApp		Instaligo al Laborstrio malsukcesis\n%s
+Installing in Deskbar failed\n%s	PulseApp		Instaliĝo ĉe Laborstrio malsukcesis\n%s
 Idle color	ConfigView		Koloro por senokupa stato
 Normal mode	PrefsWindow		Norma reĝimo

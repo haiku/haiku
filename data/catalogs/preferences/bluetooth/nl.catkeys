@@ -1,55 +1,51 @@
-1	dutch; flemish	x-vnd.Haiku-BluetoothPrefs	4276705900
-Laptop	Settings view		Laptop
-Only from trusted devices	Settings view		Alleen van vertrouwde apparaten
-15 secs	Settings view		15 sec.
-Quit	main		Afsluiten
-Manufacturer: 	Device View		Fabrikant:
-Desktop	Settings view		Bureaublad
-Server	Window		Server
-Identify host as:	Settings view		Identificeer host als:
-Refresh…	Remote devices		Vernieuwen…
-Local devices found on system:	Settings view		Lokale apparaten, gevonden op systeem:
-Service classes: 	Device View		Service-klassen:
-Remote devices	Window		Externe apparaten
-Settings	Window		Instellingen
-Stop bluetooth services…	Window		Bluetooth-diensten stoppen…
-61 secs	Settings view		61 sec.
-Add…	Remote devices		Toevoegen…
-As blocked	Remote devices		Als geblokkeerd
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Er is geen lokaal Bluetooth-apparaat geregistreerd op het systeem.
-Policy…	Settings view		Beleid…
-Revert	Window		Herstellen
-Refresh local devices…	Window		Lokale apparaten vernieuwen…
-Disconnect	Remote devices		Verbreek verbinding
-Identify us as…	Settings view		Maak ons kenbaar als…
+1	dutch; flemish	x-vnd.Haiku-BluetoothPrefs	3945807779
+Start bluetooth services…	Window		Start bluetooth-diensten…
 From all devices	Settings view		Van alle apparaten
 Defaults	Window		Standaardwaarden
-Start bluetooth services…	Window		Start bluetooth-diensten…
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Controleer of de Bluetoothmogelijkheden van uw externe apparaat zijn ingeschakeld. Klik op 'Onderzoek' om het afzoeken te starten. De benodigde tijd voor het ophalen van de namen is onbekend, al zou dat korter dan 3 seconden per apparaat moeten zijn. Daarna kunt u ze toevoegen aan uw hoofdlijst, waarvandaan u eraan kunt koppelen.
+Laptop	Settings view		Laptop
 Scanning progress	Inquiry panel		Afzoek-voortgang
-Bluetooth	System name		Bluetooth
+Only from trusted devices	Settings view		Alleen van vertrouwde apparaten
 Launch now	main		Nu uitvoeren
+Bluetooth	System name		Bluetooth
 Remove	Remote devices		Verwijderen
 Pick device…	Settings view		Apparaat kiezen…
 Always ask	Settings view		Altijd vragen
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Met steun van:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nDank aan de individuen die geholpen hebben…\n\nHardware donaties:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomisch:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nMet patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesten:\n - Petter H. Juliussen\nZij die me alle kennis gegeven hebben:\n - het yellowTAB team
+Quit	main		Afsluiten
+15 secs	Settings view		15 sec.
 Help	Window		Help
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Met steun van:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nDank aan de individuen die geholpen hebben…\n\nHardware donaties:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomisch:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nMet patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesten:\n - Petter H. Juliussen\nZij die me alle kennis gegeven hebben:\n - het yellowTAB team
+Manufacturer: 	Device View		Fabrikant:
 Pair…	Remote devices		Koppelen...
+Desktop	Settings view		Bureaublad
+Server	Window		Server
 Retrieving name of %1	Inquiry panel		Ophalen van de naam van %1
+Identify host as:	Settings view		Identificeer host als:
 Inquiry	Inquiry panel		Onderzoek
+Local devices found on system:	Settings view		Lokale apparaten, gevonden op systeem:
+Service classes: 	Device View		Service-klassen:
 Incoming connections policy:	Settings view		Beleid inkomende verbindingen:
+Remote devices	Window		Externe apparaten
 Retrieving names…	Inquiry panel		Namen ophalen…
-Show name	Extended local device view		Toon naam
 Add device to list	Inquiry panel		Apparaat aan lijst toevoegen
+Show name	Extended local device view		Toon naam
+Settings	Window		Instellingen
 Remaining %1 seconds	Inquiry panel		%1 seconden resterend
-The Bluetooth services are not currently running on this system.	main		De Bluetooth services zijn momenteel niet actief op dit systeem.
-Discoverable	Extended local device view		Zichtbaar
+Stop bluetooth services…	Window		Bluetooth-diensten stoppen…
+61 secs	Settings view		61 sec.
 Authenticate	Extended local device view		Verifieer
-Smart phone	Settings view		Smartphone
+Discoverable	Extended local device view		Zichtbaar
+The Bluetooth services are not currently running on this system.	main		De Bluetooth services zijn momenteel niet actief op dit systeem.
+Add…	Remote devices		Toevoegen…
 Scanning completed.	Inquiry panel		Afzoeken voltooid.
+Smart phone	Settings view		Smartphone
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Er is geen lokaal Bluetooth-apparaat geregistreerd op het systeem.
 Default inquiry time:	Settings view		Standaard onderzoekstijd:
+Revert	Window		Herstellen
+Refresh local devices…	Window		Lokale apparaten vernieuwen…
 Server	Settings view		Server
-Handheld	Settings view		Handheld
  packets: 	Device View		pakketten:
+Handheld	Settings view		Handheld
+Disconnect	Remote devices		Verbreek verbinding
 About Bluetooth…	Window		Over Bluetooth…
 Starting scan…	Inquiry panel		Scan starten…

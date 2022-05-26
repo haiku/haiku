@@ -8,7 +8,7 @@ Start again	SudokuWindow		Von vorn beginnen
 New	SudokuWindow		Neu
 Easy	SudokuWindow		Einfach
 Undo	SudokuWindow		Rückgängig
-Export as…	SudokuWindow		Exportieren als…
+Export as…	SudokuWindow		Exportieren als …
 Quit	SudokuWindow		Beenden
 Redo	SudokuWindow		Wiederholen
 Could not open \"%s\":\n%s\n	SudokuWindow		\"%s\" konnte nicht geöffnet werden:\n%s\n
@@ -32,4 +32,4 @@ View	SudokuWindow		Ansicht
 Snapshot current	SudokuWindow		Spielstand merken
 Mark valid hints	SudokuWindow		Gültige Zahlen hervorheben
 Sudoku request	SudokuWindow		Sudoku Anfrage
-Open file…	SudokuWindow		Datei öffnen…
+Open file…	SudokuWindow		Datei öffnen …

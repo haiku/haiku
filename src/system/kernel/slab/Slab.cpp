@@ -88,7 +88,7 @@ static const addr_t kSlabCodeAddressRanges[] = {
 };
 
 static const uint32 kSlabCodeAddressRangeCount
-	= sizeof(kSlabCodeAddressRanges) / sizeof(kSlabCodeAddressRanges[0]) / 2;
+	= B_COUNT_OF(kSlabCodeAddressRanges) / 2;
 
 #endif	// SLAB_ALLOCATION_TRACKING_AVAILABLE
 
@@ -135,10 +135,11 @@ class Create : public ObjectCacheTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("object cache create: name: \"%s\", object size: %lu, "
-				"alignment: %lu, max usage: %lu, flags: 0x%lx, cookie: %p "
-				"-> cache: %p", fName, fObjectSize, fAlignment, fMaxByteUsage,
-					fFlags, fCookie, fCache);
+			out.Print("object cache create: name: \"%s\", object size: "
+				"%" B_PRIuSIZE ", alignment: %" B_PRIuSIZE ", max usage: "
+				"%" B_PRIuSIZE ", flags: 0x%" B_PRIx32 ", cookie: %p -> cache: %p",
+					fName, fObjectSize, fAlignment, fMaxByteUsage, fFlags,
+					fCookie, fCache);
 		}
 
 	private:
@@ -180,8 +181,8 @@ class Alloc : public ObjectCacheTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("object cache alloc: cache: %p, flags: 0x%lx -> "
-				"object: %p", fCache, fFlags, fObject);
+			out.Print("object cache alloc: cache: %p, flags: 0x%" B_PRIx32
+				" -> object: %p", fCache, fFlags, fObject);
 		}
 
 	private:
@@ -224,8 +225,8 @@ class Reserve : public ObjectCacheTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("object cache reserve: cache: %p, count: %lu, "
-				"flags: 0x%lx", fCache, fCount, fFlags);
+			out.Print("object cache reserve: cache: %p, count: %" B_PRIu32 ", "
+				"flags: 0x%" B_PRIx32, fCache, fCount, fFlags);
 		}
 
 	private:
@@ -783,8 +784,8 @@ dump_allocations_per_caller(int argc, char **argv)
 	qsort(sCallerInfoTable, sCallerInfoCount, sizeof(caller_info),
 		sortBySize ? &caller_info_compare_size : &caller_info_compare_count);
 
-	kprintf("%ld different callers, sorted by %s...\n\n", sCallerInfoCount,
-		sortBySize ? "size" : "count");
+	kprintf("%" B_PRId32 " different callers, sorted by %s...\n\n",
+		sCallerInfoCount, sortBySize ? "size" : "count");
 
 	size_t totalAllocationSize = 0;
 	size_t totalAllocationCount = 0;
@@ -919,12 +920,7 @@ object_cache_reserve_internal(ObjectCache* cache, size_t objectCount,
 		} else
 			break;
 
-		ConditionVariableEntry entry;
-		resizeEntry->condition.Add(&entry);
-
-		cache->Unlock();
-		entry.Wait();
-		cache->Lock();
+		resizeEntry->condition.Wait(&cache->lock);
 	}
 
 	// prepare the resize entry others can wait on
@@ -1071,11 +1067,7 @@ object_cache_maintainer(void*)
 				continue;
 			}
 
-			ConditionVariableEntry entry;
-			sMaintenanceCondition.Add(&entry);
-			locker.Unlock();
-			entry.Wait();
-			locker.Lock();
+			sMaintenanceCondition.Wait(locker.Get());
 		}
 
 		ObjectCache* cache = sMaintenanceQueue.RemoveHead();

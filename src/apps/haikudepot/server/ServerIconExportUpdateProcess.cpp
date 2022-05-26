@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "ServerIconExportUpdateProcess.h"
@@ -236,25 +236,22 @@ ServerIconExportUpdateProcess::UrlPathComponent()
 void
 ServerIconExportUpdateProcess::_NotifyPackagesWithIconsInDepots() const
 {
-	const DepotList& depots = fModel->Depots();
-	for (int32 d = 0; d < depots.CountItems(); d++) {
-		const DepotInfo& depot = depots.ItemAtFast(d);
-		_NotifyPackagesWithIconsInDepot(depot);
+	for (int32 d = 0; d < fModel->CountDepots(); d++) {
+		_NotifyPackagesWithIconsInDepot(fModel->DepotAtIndex(d));
 	}
 }
 
 
 void
 ServerIconExportUpdateProcess::_NotifyPackagesWithIconsInDepot(
-	const DepotInfo& depot) const
+	const DepotInfoRef& depot) const
 {
 	PackageIconRepository& packageIconRepository
 		= fModel->GetPackageIconRepository();
-	const PackageList& packages = depot.Packages();
-	for (int32 p = 0; p < packages.CountItems(); p++) {
+	for (int32 p = 0; p < depot->CountPackages(); p++) {
 		AutoLocker<BLocker> locker(fModel->Lock());
-		const PackageInfoRef& packageInfoRef = packages.ItemAtFast(p);
+		const PackageInfoRef& packageInfoRef = depot->PackageAtIndex(p);
 		if (packageIconRepository.HasAnyIcon(packageInfoRef->Name()))
-			packages.ItemAtFast(p)->NotifyChangedIcon();
+			packageInfoRef->NotifyChangedIcon();
 	}
 }

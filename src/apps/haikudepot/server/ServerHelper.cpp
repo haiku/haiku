@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2021, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -15,6 +15,7 @@
 #include <NetworkInterface.h>
 #include <NetworkRoster.h>
 
+#include "Logger.h"
 #include "HaikuDepotConstants.h"
 #include "ServerSettings.h"
 #include "WebAppInterface.h"
@@ -115,20 +116,20 @@ ServerHelper::NotifyTransportError(status_t error)
 /*static*/ void
 ServerHelper::AlertTransportError(BMessage* message)
 {
-	status_t errno = B_OK;
+	status_t error = B_OK;
 	int64 errnoInt64;
 	message->FindInt64("errno", &errnoInt64);
-	errno = (status_t) errnoInt64;
+	error = (status_t) errnoInt64;
 
 	BString errorDescription("?");
 	BString alertText;
 
-	switch (errno) {
+	switch (error) {
 		case HD_NETWORK_INACCESSIBLE:
 			errorDescription = B_TRANSLATE("Network error");
 			break;
 		default:
-			errorDescription.SetTo(strerror(errno));
+			errorDescription.SetTo(strerror(error));
 			break;
 	}
 
@@ -224,11 +225,7 @@ ServerHelper::IsPlatformNetworkAvailable()
  *   ...
  *   "error": {
  *     "code": -32800,
- *     "data": {
-         "validationfailures": [
-           { "property": "nickname", "message": "required" },
-           ...
-         ]
+ *     "data": { "nickname": "required" }
        },
        ...
  *   }
@@ -237,7 +234,7 @@ ServerHelper::IsPlatformNetworkAvailable()
  *
  * \param failures is the object into which the validation failures are to be
  *   written.
- * \param responseEnvelopeMessage is a representation of the entire JSON-RPC
+ * \param responseEnvelopeMessage is a representation of the entire
  *   response sent back from the server when the error occurred.
  *
  */
@@ -247,42 +244,31 @@ ServerHelper::GetFailuresFromJsonRpcError(
 	ValidationFailures& failures, BMessage& responseEnvelopeMessage)
 {
 	BMessage errorMessage;
-	int32 errorCode = WebAppInterface::ErrorCodeFromResponse(
-		responseEnvelopeMessage);
 
 	if (responseEnvelopeMessage.FindMessage("error", &errorMessage) == B_OK) {
 		BMessage dataMessage;
 
 		if (errorMessage.FindMessage("data", &dataMessage) == B_OK) {
-			BMessage validationFailuresMessage;
 
-			if (dataMessage.FindMessage("validationfailures",
-					&validationFailuresMessage) == B_OK) {
-				_GetFailuresFromJsonRpcFailures(failures,
-					validationFailuresMessage);
+			// the names and values (strings) are key-value pairs indicating
+			// the error.
+
+			int32 i = 0;
+			BMessage dataItemMessage;
+
+			while (dataMessage.FindMessage(BString() << i, &dataItemMessage)
+					== B_OK) {
+				BString key;
+				BString value;
+				if (dataItemMessage.FindString("key", &key) == B_OK
+					&& dataItemMessage.FindString("value", &value) == B_OK) {
+					failures.AddFailure(key, value);
+				} else {
+					HDERROR("possibly corrupt validation message missing key "
+						"or value");
+				}
+				i++;
 			}
-		}
-	}
-}
-
-
-/*static*/ void
-ServerHelper::_GetFailuresFromJsonRpcFailures(
-	ValidationFailures& failures, BMessage& jsonRpcFailures)
-{
-	int32 index = 0;
-	while (true) {
-		BString name;
-		name << index++;
-		BMessage failure;
-		if (jsonRpcFailures.FindMessage(name, &failure) != B_OK)
-			break;
-
-		BString property;
-		BString message;
-		if (failure.FindString("property", &property) == B_OK
-				&& failure.FindString("message", &message) == B_OK) {
-			failures.AddFailure(property, message);
 		}
 	}
 }

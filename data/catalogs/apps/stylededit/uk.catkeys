@@ -1,12 +1,12 @@
-1	ukrainian	x-vnd.Haiku-StyledEdit	2796309255
+1	ukrainian	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Статистика документу
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Неможливо зробити відкат, файл не знайдено: \"%s\".
 Cut	Menus		Вирізати
 Center	Menus		Центр
 Increase size	Menus		Збільшити розмір
-Wrap-around search	FindandReplaceWindow		Шукати по всьому документу
 Page setup…	Menus		Налаштування сторінки…
-Untitled 	StyledEditWindow		Неназваний 
+Wrap-around search	FindandReplaceWindow		Шукати по всьому документу
+Untitled 	StyledEditWindow		Без назви 
 OK	Statistics		ОК
 Find	FindandReplaceWindow		Знайти
 New	Menus		Новий
@@ -29,8 +29,8 @@ Italic	Menus		Курсив
 Can't undo	Menus		Неможливо відмінити
 Replace…	Menus		Замінити…
 File	Menus		Файл
-Bold	Menus		Жирний
 Paste	Menus		Вставити
+Bold	Menus		Жирний
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \"%file%\" був змінений іншою програмою, перезавантажити його?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" був вилучений іншою програмою, відновити його?
 Lines:	Statistics		Рядків:
@@ -51,8 +51,9 @@ OK	SaveAlert		ОК
 Color	Menus		Колір
 Save changes to the document \"%s\"? 	QuitAlert		Зберегти зміни в документі \"%s\" ? 
 StyledEdit	System name		StyledEdit
+Underline	Menus		Підкреслений
 Find:	FindandReplaceWindow		Знайти:
-Undo typing	QuitAlert		Відміна друку
+Undo typing	QuitAlert		Відмінити набір тексту
 Error loading \"%s\":\n\t%s	LoadAlert		Помилка завантаження \"%s\":\n\t%s
 Don't save	SaveAlert		Не зберігати
 Reload…	Menus		Перезавантажити…
@@ -68,23 +69,23 @@ OK	LoadAlert		ОК
 Save	QuitAlert		Зберегти
 Case-sensitive	FindandReplaceWindow		Чутливий до регістра
 Find selection	Menus		Знайти вибране
-Cancel	SaveAlert		Скасувати
 Find…	Menus		Знайти…
+Cancel	SaveAlert		Скасувати
 Revert	RevertToSavedAlert		Без змін
-Decrease size	Menus		Зменшити розмір
 Size	Menus		Розмір
+Decrease size	Menus		Зменшити розмір
 Autodetect	Menus		Автовизначення
 Replace next	Menus		Замінити наступний
 OK	QuitAlert		ОК
-Replace with:	FindandReplaceWindow		Замінити на:
 Edit	Menus		Редагувати
+Replace with:	FindandReplaceWindow		Замінити на:
 Open…	Menus		Відкрити…
 Save as…	Menus		Зберегти як…
 Replace	FindandReplaceWindow		Замінити
 Characters:	Statistics		Символів:
 Don't save	QuitAlert		Не зберігати
-This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Цей файл помічений тільки для читання. Зберегти зміни в документі \"%s\"? 
-Align	Menus		Вирівняти
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Для цього файлу встановлений атрибут тільки читання. Зберегти зміни в документі \"%s\"?  
 Font	Menus		Шрифт
+Align	Menus		Вирівняти
 Select all	Menus		Вибрати все
 Right	Menus		Вправо

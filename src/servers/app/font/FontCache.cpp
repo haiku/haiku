@@ -36,9 +36,6 @@ FontCache::FontCache()
 // destructor
 FontCache::~FontCache()
 {
-	FontMap::Iterator iterator = fFontCacheEntries.GetIterator();
-	while (iterator.HasNext())
-		iterator.Next().value->ReleaseReference();
 }
 
 // Default
@@ -59,13 +56,12 @@ FontCache::FontCacheEntryFor(const ServerFont& font, bool forceVector)
 
 	AutoReadLocker readLocker(this);
 
-	FontCacheEntry* entry = fFontCacheEntries.Get(signature);
+	BReference<FontCacheEntry> entry = fFontCacheEntries.Get(signature);
 
 	if (entry) {
 		// the entry was already there
-		entry->AcquireReference();
 //printf("FontCacheEntryFor(%ld): %p\n", font.GetFamilyAndStyle(), entry);
-		return entry;
+		return entry.Detach();
 	}
 
 	readLocker.Unlock();
@@ -85,19 +81,17 @@ FontCache::FontCacheEntryFor(const ServerFont& font, bool forceVector)
 	if (!entry) {
 		// remove old entries, keep entries below certain count
 		_ConstrainEntryCount();
-		entry = new (nothrow) FontCacheEntry();
+		entry.SetTo(new (nothrow) FontCacheEntry(), true);
 		if (!entry || !entry->Init(font, forceVector)
 			|| fFontCacheEntries.Put(signature, entry) < B_OK) {
 			fprintf(stderr, "FontCache::FontCacheEntryFor() - "
 				"out of memory or no font file\n");
-			delete entry;
 			return NULL;
 		}
 	}
 //printf("FontCacheEntryFor(%ld): %p (insert)\n", font.GetFamilyAndStyle(), entry);
 
-	entry->AcquireReference();
-	return entry;
+	return entry.Detach();
 }
 
 // Recycle
@@ -153,9 +147,8 @@ FontCache::_ConstrainEntryCount()
 
 	iterator = fFontCacheEntries.GetIterator();
 	while (iterator.HasNext()) {
-		if (iterator.Next().value == leastUsedEntry) {
+		if (iterator.Next().value.Get() == leastUsedEntry) {
 			fFontCacheEntries.Remove(iterator);
-			leastUsedEntry->ReleaseReference();
 			break;
 		}
 	}

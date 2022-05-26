@@ -31,7 +31,7 @@
 #include <stdarg.h>
 
 #ifndef EOF
-#	define EOF -1
+#	define EOF (-1)
 #endif
 
 #define _IO_pos_t		off_t /* obsolete */

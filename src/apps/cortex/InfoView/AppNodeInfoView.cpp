@@ -40,6 +40,10 @@
 
 // Application Kit
 #include <Roster.h>
+// Locale Kit
+#undef B_CATALOG
+#define B_CATALOG (&sCatalog)
+#include <Catalog.h>
 // Media Kit
 #include <MediaNode.h>
 #include <MediaRoster.h>
@@ -49,10 +53,15 @@
 #include <File.h>
 #include <Path.h>
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AppNodeInfoView"
+
 __USE_CORTEX_NAMESPACE
 
 #include <Debug.h>
 #define D_METHOD(x) //PRINT (x)
+
+static BCatalog sCatalog("x-vnd.Cortex.InfoView");
 
 // -------------------------------------------------------- //
 // *** ctor/dtor (public)
@@ -65,8 +74,9 @@ AppNodeInfoView::AppNodeInfoView(
 	D_METHOD(("AppNodeInfoView::AppNodeInfoView()\n"));
 
 	// adjust view properties
-	setSideBarWidth(be_plain_font->StringWidth(" File Format ") + 2 * InfoView::M_H_MARGIN);
-	setSubTitle("Application-Owned Node");
+	setSideBarWidth(be_plain_font->StringWidth(B_TRANSLATE("File format"))
+		+ 2 * InfoView::M_H_MARGIN);
+	setSubTitle(B_TRANSLATE("Application-owned node"));
 
 	// add separator
 	addField("", "");
@@ -82,7 +92,7 @@ AppNodeInfoView::AppNodeInfoView(
 		if ((appEntry.InitCheck() == B_OK)
 		 && (appEntry.GetName(appName) == B_OK))
 		{
-			addField("Application", appName);
+			addField(B_TRANSLATE("Application"), appName);
 		}
 		BFile appFile(&appInfo.ref, B_READ_ONLY);
 		if (appFile.InitCheck() == B_OK)
@@ -93,11 +103,11 @@ AppNodeInfoView::AppNodeInfoView(
 				version_info appVersion;
 				if (appFileInfo.GetVersionInfo(&appVersion, B_APP_VERSION_KIND) == B_OK)
 				{
-					addField("Version", appVersion.long_info);
+					addField(B_TRANSLATE("Version"), appVersion.long_info);
 				}
 			}
 		}
-		addField("Signature", appInfo.signature);
+		addField(B_TRANSLATE("Signature"), appInfo.signature);
 	}
 }
 

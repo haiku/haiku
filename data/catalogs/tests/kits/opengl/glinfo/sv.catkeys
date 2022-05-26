@@ -1,24 +1,27 @@
-1	swedish	x-vnd.Haiku-GLInfo	2211760527
+1	swedish	x-vnd.Haiku-GLInfo	1282327690
 Maximum clipping planes	Capabilities		Maximal klippnings nivåer
-Maximum 2D texture size	Capabilities		Maximal 2D-strukturstorlek
-Auxiliary buffer(s)	Capabilities		Hjälpbuffert (er)
 Maximum evaluators equation order	Capabilities		Maximal utvärderingsekvationsordning
 Texture stack size	Capabilities		Textur stapelstorlek
 GL Info	System name		GL Info
 Information	InfoView		Information
-Maximum convolution	Capabilities		Maximal convolution
 Attributes stack size	Capabilities		Attribut stapelstorlek
 Maximum lights	Capabilities		Maxbelysning
-Maximum 3D texture size	Capabilities		Maximal 3D-strukturstorlek
 Extensions	Extensions		Tillägg
-Maximum recommended index elements	Capabilities		Högsta rekommenderade indexelement
 Available extensions	Extensions		Tillgängliga tillägg
 Maximum recommended vertex elements	Capabilities		Maximal rekommenderad toppunktelement
 Value	Capabilities		Värde
-Maximum texture units	Capabilities		Maximala strukturenheter
-Capabilities	Capabilities		Kapaciteter
 Name stack size	Capabilities		Namn på stapelstorlek
-List stack size	Capabilities		Lista stapelstorlek
-Projection stack size	Capabilities		Projektionsstapelstorlek
-Model stack size	Capabilities		Modellstapelstorlek
+Capabilities	Capabilities		Kapaciteter
+Maximum texture units	Capabilities		Maximala strukturenheter
+Unknown or missing OpenGL renderer.	InfoView		Okänd eller saknad OpenGL-renderare.
 Capability	Capabilities		Kapacitet
+Maximum 2D texture size	Capabilities		Maximal 2D-strukturstorlek
+Auxiliary buffer(s)	Capabilities		Hjälpbuffert (er)
+Unknown vendor	InfoView		Okänd leverantör
+Maximum convolution	Capabilities		Maximal convolution
+Maximum 3D texture size	Capabilities		Maximal 3D-strukturstorlek
+Maximum recommended index elements	Capabilities		Högsta rekommenderade indexelement
+Unknown version	InfoView		Okänd version
+List stack size	Capabilities		Lista stapelstorlek
+Model stack size	Capabilities		Modellstapelstorlek
+Projection stack size	Capabilities		Projektionsstapelstorlek

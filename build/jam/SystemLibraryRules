@@ -103,7 +103,7 @@ rule TargetKernelLibsupc++ asPath
 			flags += path ;
 		}
 		return [
-			BuildFeatureAttribute gcc_syslibs_devel
+			BuildFeatureAttribute QUALIFIED $(TARGET_KERNEL_ARCH):gcc_syslibs_devel
 				: libsupc++-kernel.a : $(flags)
 		] ;
 	} else {
@@ -121,9 +121,13 @@ rule TargetBootLibsupc++ asPath
 
 	if $(TARGET_PLATFORM) = haiku {
 		if $(TARGET_PACKAGING_ARCH) = x86_64 {
-			# we need to use the 32-bit libsupc++.a built by the cross-compiler
-			return $(TARGET_BOOT_LIBSUPC++) ;
-
+			if $(TARGET_BOOT_PLATFORM) = efi {
+				# we need to use the 64-bit libsupc++.a built by the cross-compiler
+				return $(TARGET_BOOT_LIBSUPC++) ;
+			} else {
+				# we need to use the 32-bit libsupc++.a built by the cross-compiler
+				return $(TARGET_BOOT_32_LIBSUPC++) ;
+			}
 			# TODO: ideally, we would build this as part of gcc_syslibs_devel,
 			#       but that isn't currently possible, as that would require
 			#       32-bit support (libraries and glue-code) on x86_64-Haiku.
@@ -133,6 +137,12 @@ rule TargetBootLibsupc++ asPath
 		local flags ;
 		if $(asPath) = true {
 			flags += path ;
+		}
+		if $(TARGET_PACKAGING_ARCH) = arm {
+			return [
+				BuildFeatureAttribute gcc_syslibs_devel
+					: libsupc++-boot.a : $(flags)
+			] ;
 		}
 		return [
 			BuildFeatureAttribute gcc_syslibs_devel
@@ -215,7 +225,7 @@ rule TargetKernelLibgcc asPath
 			flags += path ;
 		}
 		return [
-			BuildFeatureAttribute gcc_syslibs_devel
+			BuildFeatureAttribute QUALIFIED $(TARGET_KERNEL_ARCH):gcc_syslibs_devel
 				: libgcc-kernel.a : $(flags)
 		] ;
 	} else {
@@ -224,18 +234,22 @@ rule TargetKernelLibgcc asPath
 }
 
 
-rule TargetBootLibgcc asPath
+rule TargetBootLibgcc architecture : asPath
 {
-	# TargetBootLibgcc [ <asPath> ]
+	# TargetBootLibgcc [ architecture ] : [ <asPath> ]
 	#
 	# Returns the static bootloader libgcc for the target.
 	# Invoking with <asPath> = true will return the full library path.
 
 	if $(TARGET_PLATFORM) = haiku {
-		if $(TARGET_PACKAGING_ARCH) = x86_64 {
-			# we need to use the 32-bit libgcc.a built by the cross-compiler
-			return $(TARGET_BOOT_LIBGCC) ;
-
+		if $(architecture) = x86_64 {
+			if $(TARGET_BOOT_PLATFORM) = efi {
+				# we need to use the 64-bit libgcc.a built by the cross-compiler
+				return $(TARGET_BOOT_LIBGCC) ;
+			} else {
+				# we need to use the 32-bit libgcc.a built by the cross-compiler
+				return $(TARGET_BOOT_32_LIBGCC) ;
+			}
 			# TODO: ideally, we would build this as part of gcc_syslibs_devel,
 			#       but that isn't currently possible, as that would require
 			#       32-bit support (libraries and glue-code) on x86_64-Haiku.
@@ -246,8 +260,14 @@ rule TargetBootLibgcc asPath
 		if $(asPath) = true {
 			flags += path ;
 		}
+		if $(architecture) = arm {
+			return [
+				BuildFeatureAttribute QUALIFIED $(architecture):gcc_syslibs_devel
+					: libgcc-boot.a : $(flags)
+			] ;
+		}
 		return [
-			BuildFeatureAttribute gcc_syslibs_devel
+			BuildFeatureAttribute QUALIFIED $(architecture):gcc_syslibs_devel
 				: libgcc-kernel.a : $(flags)
 		] ;
 	} else {
@@ -292,7 +312,7 @@ rule TargetKernelLibgcceh asPath
 			flags += path ;
 		}
 		return [
-			BuildFeatureAttribute gcc_syslibs_devel
+			BuildFeatureAttribute QUALIFIED $(TARGET_KERNEL_ARCH):gcc_syslibs_devel
 				: libgcc_eh-kernel.a : $(flags)
 		] ;
 	} else {

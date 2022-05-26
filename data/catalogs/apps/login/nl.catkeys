@@ -1,11 +1,8 @@
-1	dutch; flemish	x-vnd.Haiku-Login	336867745
+1	dutch; flemish	x-vnd.Haiku-Login	3033693897
 Invalid login!	Login View		Ongeldige inloggegevens!
 Error	Login App		Fout
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\t Start in onderhoudsmodus om het bureaublad aan te passen.\n
 Welcome to Haiku	Login Window		Welkom bij Haiku
 Halt	Login View		Stoppen
-Login application for Haiku\nUsage:\n	Login App		Loginapplicatie voor Haiku\nGebruik:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\t Maak een venster niet modaal\n
 Desktop	Desktop Window		Bureaublad
 Hide password	Login View		Wachtwoord verbergen
 Reboot	Login View		Herstarten

@@ -1,11 +1,8 @@
-1	esperanto	x-vnd.Haiku-Login	336867745
+1	esperanto	x-vnd.Haiku-Login	3033693897
 Invalid login!	Login View		Nevalida salutvorto!
 Error	Login App		Eraro
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tEkruli en bretredakta reĝimo por permesi agordi la labortablon.\n
 Welcome to Haiku	Login Window		Bonvenon al Haiku
 Halt	Login View		Ĉesigi
-Login application for Haiku\nUsage:\n	Login App		Ensaluta programo por Haiku\nUzado:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tNe fari la fenestron neevitebla\n
 Desktop	Desktop Window		Labortablo
 Hide password	Login View		Kaŝi pasvorton
 Reboot	Login View		Restartigi

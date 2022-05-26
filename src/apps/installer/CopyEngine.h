@@ -37,6 +37,8 @@ public:
 									sem_id cancelSemaphore = -1,
 									bool copyAttributes = true);
 
+	static	status_t			RemoveFolder(BEntry& entry);
+
 private:
 			status_t			_CollectCopyInfo(const char* source,
 									sem_id cancelSemaphore, off_t& bytesToCopy,
@@ -47,8 +49,6 @@ private:
 			status_t			_CopyData(const BEntry& entry,
 									const BEntry& destination,
 									sem_id cancelSemaphore = -1);
-
-			status_t			_RemoveFolder(BEntry& entry);
 
 			const char*			_RelativeEntryPath(
 									const char* absoluteSourcePath) const;
@@ -116,9 +116,6 @@ public:
 	virtual						~EntryFilter();
 
 	virtual	bool				ShouldCopyEntry(const BEntry& entry,
-									const char* path,
-									const struct stat& statInfo) const = 0;
-	virtual	bool				ShouldClobberFolder(const BEntry& entry,
 									const char* path,
 									const struct stat& statInfo) const = 0;
 };

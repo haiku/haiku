@@ -24,6 +24,14 @@
 #include <string.h>
 
 
+//#define TRACE_PS2_DEV
+#ifdef TRACE_PS2_DEV
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...)
+#endif
+
+
 ps2_dev ps2_device[PS2_DEVICE_COUNT];
 
 

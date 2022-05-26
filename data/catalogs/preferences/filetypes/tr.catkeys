@@ -16,12 +16,12 @@ Icon	FileTypes Window		Simge
 Add…	Application Type Window		Ekle…
 Attribute name:	Attribute Window		Öznitelik adı:
 Long description:	Application Type Window		Uzun açıklama:
-Cancel	Preferred App Menu		İptal
+Cancel	Preferred App Menu		Vazgeç
 Remove	FileTypes Window		Kaldır
 The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		\"%s\" uygulaması bu dosya türünü desteklemiyor.\nYine de ayarlamak istiyor musunuz?
 Remove	Application Type Window		Kaldır
 Gamma	Application Type Window		Gama
-Cancel	Application Type Window		İptal
+Cancel	Application Type Window		Vazgeç
 Attribute	Attribute Window		Öznitelik
 Multiple launch	Application Type Window		Çoklu çalıştırma
 {0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, other{# uygulama türü kaldırılabilir}}
@@ -33,9 +33,9 @@ None	FileTypes Window		Yok
 Exclusive launch	Application Type Window		Özel çalıştır
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Dosya türü kaldırma geri alınamaz.\nKaldırmak istediğinizden emin misiniz?
 Integer 64 bit	Attribute ListView		64 bit tamsayı
-Cancel	New File Type Window		İptal
+Cancel	New File Type Window		Vazgeç
 Select same preferred application as	FileType Window		Aynı tercih edilen uygulamayı seç
-Cancel	Type List Window		İptal
+Cancel	Type List Window		Vazgeç
 Don't save	Application Type Window		Kaydetme
 Center	Attribute Window	Attribute column alignment in Tracker	Merkez
 Done	Extension Window		Tamam
@@ -91,7 +91,7 @@ Visible	Attribute Window		Görünür
 Select preferred application	FileTypes Window		Tercih edilen uygulamayı seç
 Path:	Application Types Window		Yol:
 rating	Attribute ListView		derecelendirme
-Could not install file type	New File Type Window		Dosya türü yüklenemedi
+Could not install file type	New File Type Window		Dosya türü kurulamadı
 Same as…	FileTypes Window		Şununla aynı…
 Golden master	Application Type Window		Altın kopya
 Checkbox	Attribute ListView		Denetim kutusu
@@ -105,7 +105,7 @@ String	Attribute ListView		Dizi
 Add type	New File Type Window		Tür ekle
 Remove icon	Icon View		Simgeyi kaldır
 Boolean	Attribute ListView		Boolean
-Cancel	Extension Window		İptal
+Cancel	Extension Window		Vazgeç
 Alignment:	Attribute Window		Hizalama
 Icon	FileType Window		Simge
 Signature:	Application Type Window		İmza:
@@ -121,14 +121,14 @@ Select…	FileTypes Window		Seç…
 File recognition	FileTypes Window		Dosya tanımlanması
 Application types…	FileTypes Window		Uygulama türleri…
 Add icon…	Icon View		Simge ekle…
-Cancel	FileTypes Window		İptal
+Cancel	FileTypes Window		Vazgeç
 Save into resource file…	Application Type Window		Kaynak dosyasına kaydet…
 Special:	Attribute Window		Özel:
 Type:	Attribute Window		Tür:
 Could not retrieve application signature	Preferred App Menu		Uygulama imzası bulunup getirilemedi
 Beta	Application Types Window		Beta
 Add group	New File Type Window		Grup ekle
-Cancel	Attribute Window		İptal
+Cancel	Attribute Window		Vazgeç
 Gamma	Application Types Window		Gama
 Supported types	Application Type Window		Desteklenen türler
 Integer 32 bit	Attribute ListView		32 bit tamsayı

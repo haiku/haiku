@@ -14,7 +14,7 @@ struct X86PagingStructures64Bit;
 
 
 struct X86VMTranslationMap64Bit final : X86VMTranslationMap {
-								X86VMTranslationMap64Bit();
+								X86VMTranslationMap64Bit(bool la57);
 	virtual						~X86VMTranslationMap64Bit();
 
 			status_t			Init(bool kernel);
@@ -63,6 +63,7 @@ struct X86VMTranslationMap64Bit final : X86VMTranslationMap {
 
 private:
 			X86PagingStructures64Bit* fPagingStructures;
+			bool				fLA57;
 };
 
 

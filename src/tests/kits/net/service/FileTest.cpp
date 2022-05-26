@@ -19,14 +19,29 @@
 #include "TestServer.h"
 
 
-class StopTestListener : public BUrlProtocolListener {
-public:
-	StopTestListener() {}
+using namespace BPrivate::Network;
 
-	void DataReceived(BUrlRequest *caller, const char*, off_t, ssize_t)
+
+class StopTestListener : public BDataIO {
+public:
+	StopTestListener(BUrlRequest* request = NULL)
 	{
-		caller->Stop();
+		SetRequest(request);
 	}
+
+	ssize_t Write(const void*, size_t size)
+	{
+		fRequest->Stop();
+		return size;
+	}
+
+	void SetRequest(BUrlRequest* request)
+	{
+		fRequest = request;
+	}
+
+private:
+	BUrlRequest* fRequest;
 };
 
 
@@ -52,6 +67,7 @@ FileTest::StopTest()
 	BUrlRequest *request = BUrlProtocolRoster::MakeRequest(url, &listener);
 	CHK(request != NULL);
 
+	listener.SetRequest(request);
 	thread_id thr = request->Run();
 	status_t dummy;
 	wait_for_thread(thr, &dummy);
@@ -63,6 +79,7 @@ FileTest::StopTest()
 	request = BUrlProtocolRoster::MakeRequest("file:///", &listener);
 	CHK(request != NULL);
 
+	listener.SetRequest(request);
 	thr = request->Run();
 	wait_for_thread(thr, &dummy);
 

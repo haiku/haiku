@@ -78,7 +78,6 @@ FontFamily::~FontFamily()
 		// we remove us before deleting the style, so that the font manager
 		// is not contacted to remove the style from us
 		style->_SetFontFamily(NULL, -1);
-		delete style;
 	}
 }
 
@@ -261,9 +260,12 @@ FontFamily::GetStyleByID(uint16 id) const
 FontStyle*
 FontFamily::GetStyleMatchingFace(uint16 face) const
 {
-	// TODO: support other faces (strike through, underlined, outlines...)
+	// Other face flags do not impact the font selection (they are applied
+	// during drawing)
 	face &= B_BOLD_FACE | B_ITALIC_FACE | B_REGULAR_FACE | B_CONDENSED_FACE
 		| B_LIGHT_FACE | B_HEAVY_FACE;
+	if (face == 0)
+		face = B_REGULAR_FACE;
 
 	int32 count = fStyles.CountItems();
 	for (int32 i = 0; i < count; i++) {

@@ -1,0 +1,23 @@
+1	turkish	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		Döndür
+(none)	TransportView		(yok)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# düğüm} other{# düğüm}}
+Start	TransportView		Başlat
+No errors.	TransportView		Hata yok.
+to	TransportView		->
+Offline	TransportView		Çevrimdışı
+(???)	TransportView		(???)
+Stop	TransportView		Durdur
+(no group)	TransportView		(grup yok)
+Drop data	TransportView		Veriyi bırak
+To:	TransportView		Kime:
+Recording	TransportView		Kaydediliyor
+Increase latency	TransportView		Gecikmeyi artır
+Time source:	TransportView		Zaman kaynağı:
+DAC time source	TransportView		DAC zaman kaynağı
+Decrease precision	TransportView		Kesinliği azalt
+System clock	TransportView		Sistem saati
+From:	TransportView		Kimden:
+Roll from	TransportView		Şuradan döndür:
+Preroll	TransportView		Ön döndürme
+Run mode:	TransportView		Çalıştırma kipi:

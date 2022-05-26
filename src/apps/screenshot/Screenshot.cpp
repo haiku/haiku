@@ -224,20 +224,16 @@ Screenshot::_New(bigtime_t delay)
 
 	// Put the mouse area in a bitmap
 	BRect bounds = fUtility->cursorBitmap->Bounds();
-	int cursorWidth = bounds.IntegerWidth() + 1;
-	int cursorHeight = bounds.IntegerHeight() + 1;
 	fUtility->cursorAreaBitmap = new BBitmap(bounds, B_RGBA32);
 
-	fUtility->cursorAreaBitmap->ImportBits(fUtility->wholeScreen->Bits(),
-		fUtility->wholeScreen->BitsLength(),
-		fUtility->wholeScreen->BytesPerRow(),
-		fUtility->wholeScreen->ColorSpace(),
-		fUtility->cursorPosition, BPoint(0, 0),
-		cursorWidth, cursorHeight);
+	fUtility->cursorAreaBitmap->ImportBits(fUtility->wholeScreen,
+		fUtility->cursorPosition, BPoint(0, 0), bounds.Size());
 
 	// Fill in the background of the mouse bitmap
 	uint8* bits = (uint8*)fUtility->cursorBitmap->Bits();
 	uint8* areaBits = (uint8*)fUtility->cursorAreaBitmap->Bits();
+	int cursorWidth = bounds.IntegerWidth() + 1;
+	int cursorHeight = bounds.IntegerHeight() + 1;
 	for (int32 i = 0; i < cursorHeight; i++) {
 		for (int32 j = 0; j < cursorWidth; j++) {
 			uint8 alpha = 255 - bits[3];

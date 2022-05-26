@@ -1054,6 +1054,10 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				_ParseStringList(&packageInfo->fPostInstallScripts);
 				break;
 
+			case B_PACKAGE_INFO_PRE_UNINSTALL_SCRIPTS:
+				_ParseStringList(&packageInfo->fPreUninstallScripts);
+				break;
+
 			case B_PACKAGE_INFO_PROVIDES:
 				_ParseResolvableList(&packageInfo->fProvidesList);
 				break;

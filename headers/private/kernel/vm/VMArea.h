@@ -100,6 +100,7 @@ public:
 	area_id					id;
 	char					name[B_OS_NAME_LENGTH];
 	uint32					protection;
+	uint32					protection_max;
 	uint16					wiring;
 
 private:

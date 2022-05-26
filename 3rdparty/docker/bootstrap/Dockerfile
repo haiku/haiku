@@ -1,4 +1,4 @@
-FROM debian
+FROM docker.io/debian:bullseye-slim
 
 ENV DEBIAN_FRONTEND="noninteractive"
 
@@ -7,8 +7,8 @@ RUN apt-get update
 # Base Haiku requirements
 RUN apt-get install -y git nasm autoconf automake autopoint texinfo \
 	flex bison gawk build-essential unzip wget zip less zlib1g-dev \
-	libcurl4-openssl-dev genisoimage libtool mtools gcc-multilib \
-	u-boot-tools util-linux device-tree-compiler bc
+	libzstd-dev libcurl4-openssl-dev genisoimage libtool \
+	mtools gcc-multilib u-boot-tools util-linux device-tree-compiler bc
 
 # GCC requirements
 RUN apt-get install -y python3

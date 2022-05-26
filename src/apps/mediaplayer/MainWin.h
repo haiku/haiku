@@ -47,7 +47,7 @@ public:
 
 			void				OpenPlaylist(const BMessage* playlistArchive);
 			void				OpenPlaylistItem(const PlaylistItemRef& item);
-
+			void				Eject();
 			void				ShowFileInfo();
 			void				ShowPlaylistWindow();
 			void				ShowSettingsWindow();

@@ -1,0 +1,146 @@
+1	catalan; valencian	application/x-vnd.Cortex.support	2097798758
+Header has flags	MediaString		La capçalera té banderes.
+32 bit HLS	MediaString		HLS de 32 bits
+Recording	MediaString		Gravació
+(unknown format)	MediaString		(format desconegut)
+Clean buffers	MediaString		Neteja la memòria intermèdia
+{0, plural,one{# frame forward}other{# frames forward}}	MediaString		{0, plural,one{# marc cap endavant}other{# marcs cap endavant}}
+Rear-right	MediaString		Darrere-dreta
+{0, plural, one{# pixel} other{# pixels}}	MediaString		{0, plural, one{# píxel} other{# píxels}}
+Mono	MediaString		Mono
+MPEG1	MediaString		MPEG1
+ASF format family	MediaString		Família de formats ASF
+Encoded video	MediaString		Vídeo codificat
+YUV444	MediaString		YUV444
+Port	MediaString		Port
+Top-Front-left	MediaString		Dalt-davant-esquerra
+24 bit LAB	MediaString		LAB de 24 bits
+16 bit integer	MediaString		Enter de 16 bits
+32 bit HSVA	MediaString		HSVA de 32 bits
+YCbCr411	MediaString		YCbCr411
+Offline	MediaString		Fora de línia
+YUV422	MediaString		YUV422
+(unkown video orientation)	MediaString		(orientació del vídeo desconeguda)
+QuickTime	MediaString		QuickTime
+32 bit HLSA	MediaString		HLSA de 32 bits
+Top-Front-center	MediaString		Dalt-davant-centre
+BeOS format family	MediaString		Família dels formats del BeOS
+24 bit HSV	MediaString		HSV de 24 bits
+Back-center	MediaString		Darrere-centre
+32 bit CMY	MediaString		CMY de 32 bits
+{0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bit enter}}
+Ambisonic WXYZ	MediaString		Ambisonic WXYZ
+(unknown video format)	MediaString		(format de vídeo desconegut)
+Video data between line %lu and %lu	MediaString		Dades de vídeo entre les línies %lu i %lu
+AVI format family	MediaString		Família de formats AVI
+Homogenous buffers	MediaString		Memòria intermèdia homogènia
+Interlaced 	MediaString		Entrellaçament 
+{0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# canal}other{# canals}}
+15 bit RGBA	MediaString		RGBA de 15 bits
+Drop data	MediaString		Eliminació de dades
+AVI	MediaString		AVI
+YUV9	MediaString		YUV9
+ Hz	MediaString		 Hz
+Right	MediaString		Dreta
+32 bit RGB	MediaString		RGB de 32 bits
+System mixer	MediaString		Mesclador del sistema
+Physical output	MediaString		Sortida física
+Top-Back-center	MediaString		Dalt-darrere-centre
+YUV420	MediaString		YUV420
+Top to bottom, left to right	MediaString		De dalt a baix, d’esquerra a dreta
+(unknown run mode)	MediaString		(mode d'execució desconegut)
+ kb/s	MediaString		 kb/s
+24 bit HSI	MediaString		HSI de 24 bits
+User-defined media type	MediaString		Tipus de mitjà definit per l'usuari
+32 bit CMYA	MediaString		CMYA de 32 bits
+Rear-left	MediaString		Darrere-esquerra
+QuickTime format family	MediaString		Família de formats de QuickTime
+Any format family	MediaString		Qualsevol família de formats
+Timecode	MediaString		Codi de temps
+Top-Front-right	MediaString		Dalt-davant-dreta
+32 bit float	MediaString		Flotador de 32 bits
+Controllable	MediaString		Controlable
+32 bit integer	MediaString		Enter de 32 bits
+Front-right-center	MediaString		Davant-dreta-centre
+Side-right	MediaString		Costat-dret
+ kHz	MediaString		 kHz
+Little endian	MediaString		Petit endian
+(unknown matrix mask)	MediaString		(màscara de matriu desconeguda)
+32 bit LAB	MediaString		LAB de 32 bits
+Side-left	MediaString		Costat-esquerre
+{0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# byte per memòria intermèdia} other{# bytes per memòries intermèdies}}
+32 bit CMYK	MediaString		CMYK de 32 bits
+(unknown multistream format)	MediaString		(format multicorrent desconegut)
+8 bit integer	MediaString		Enter de 8 bits
+8 bit grayscale-index	MediaString		Índex d’escala de grisos de 8 bits
+YCbCr444	MediaString		YCbCr444
+Buffer producer	MediaString		Productor de memòria intermèdia
+Buffer consumer	MediaString		Consumidor de memòria intermèdia
+Increase latency	MediaString		Augmenta la latència
+Front-left-center	MediaString		Davant-esquerra-centre
+MPEG format family	MediaString		Família de formats MPEG
+(none)	MediaString		(cap)
+Center	MediaString		Centre
+ kb/s (max)	MediaString		 kb/s (màx.)
+Monochrome	MediaString		Monocrom
+Private Be media type	MediaString		Tipus de mitjà de Be privat
+24 bit UVL	MediaString		UVL de 24 bits
+32 bit HSV	MediaString		HSV de 32 bits
+ID	MediaString		ID
+AIFF format family	MediaString		Família de formats AIFF
+Top-Back-left	MediaString		Dalt-darrere-esquerra
+16 bit RGB	MediaString		RGB de 16 bits
+YCbCr422	MediaString		YCbCr422
+Raw audio	MediaString		Àudio en brut
+32 bit LABA	MediaString		LABA de 32 bits
+24 bit HLS	MediaString		HLS de 24 bits
+Non-interlaced 	MediaString		No entrellaçat 
+{0, plural,one{# byte (avg)}other{# bytes (avg)}}	MediaString		{0, plural,one{# byte (avg)}other{# bytes (avg)}}
+MIDI	MediaString		MIDI
+YUV12	MediaString		YUV12
+WAV format family	MediaString		Família de formats WAV
+ (NTSC)	MediaString		 (NTSC)
+Physical input	MediaString		Entrada física
+Big endian	MediaString		Gran endian
+Sub	MediaString		Sub
+{0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# byte (màx.)}other{# bytes (màx.)}}
+YUV411	MediaString		YUV411
+Multistream media	MediaString		Mitjà multicorrent
+Encoded audio	MediaString		Àudio codificat
+Decrease precision	MediaString		Disminueix la precisió
+File interface	MediaString		Interfície de fitxers
+(unknown byte order)	MediaString		(ordre de bytes desconegut)
+32 bit HSI	MediaString		HSI de 32 bits
+Typeless media	MediaString		Mitjà sense tipus
+ (PAL)	MediaString		 (PAL)
+32 bit RGBA	MediaString		RGBA de 32 bits
+YCbCr420	MediaString		YCbCr420
+ kb/s (avg)	MediaString		 kb/s (avg)
+HTML	MediaString		HTML
+Time source	MediaString		Font del temps
+15 bit RGB	MediaString		RGB de 15 bits
+ProLogic LR	MediaString		ProLogic LR
+{0, plural,one{# byte per frame}other{# bytes per frame}}	MediaString		{0, plural,one{# byte per marc}other{# bytes per marc}}
+Parameters	MediaString		Paràmetres
+Raw data from VBL area	MediaString		Dades en cru de l'àrea VBL
+Top-Back-right	MediaString		Dalt-darrere-dreta
+{0, plural, one{# byte per row}other{# bytes per row}}	MediaString		{0, plural, one{# byte per fila}other{# bytes per fila}}
+Left	MediaString		Esquerra
+BeOS video	MediaString		Vídeo de BeOS
+24 bit CMY	MediaString		CMY de 24 bits
+32 bit UVLA	MediaString		UVLA de 32 bits
+Top-center	MediaString		Dalt-centre
+Entity interface	MediaString		Interfície d'entitat
+Stereo	MediaString		Estèreo
+8 bit color-index	MediaString		Índex de color de 8 bits
+Bottom to top, left to right	MediaString		De baix a dalt, d’esquerra a dreta
+32 bit UVL	MediaString		UVL de 32 bits
+{0, plural, one{# line} other{# lines}}	MediaString		{0, plural, one{# línia} other{# línies}}
+Text	MediaString		Text
+Unknown media type	MediaString		Mitjà desconegut
+MPEG2	MediaString		MPEG2
+Miscellaneous format family	MediaString		Família de formats diversos
+24 bit RGB	MediaString		RGB de 24 bits
+{0, plural,one{# frame backward}other{# frames backward}}	MediaString		{0, plural,one{# marc cap enrere}other{# marcs cap enrere}}
+32 bit HSIA	MediaString		HSIA de 32 bits
+Raw video	MediaString		Vídeo en cru

@@ -221,7 +221,7 @@ void FractalEngine::Render(double locationX, double locationY, double size)
 	fLocationY = locationY;
 	fSize = size;
 
-	TRACE("Location: %g;%g;%g\n", fLocationX, fLocationY, fSize);
+	TRACE("Location (%%.100g): %.100g;%.100g;%.100g\n", fLocationX, fLocationY, fSize);
 
 	for (uint8 i = 0; i < fThreadCount; i++) {
 		release_sem(fRenderSem);

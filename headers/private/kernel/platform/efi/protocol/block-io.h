@@ -43,8 +43,10 @@ struct efi_block_io_media {
     bool LogicalPartition;
     bool ReadOnly;
     bool WriteCaching;
+    uint8_t pad1[3];
     uint32_t BlockSize;
     uint32_t IoAlign;
+    uint8_t pad2[4];
     uint64_t LastBlock;
 
     // present in rev2

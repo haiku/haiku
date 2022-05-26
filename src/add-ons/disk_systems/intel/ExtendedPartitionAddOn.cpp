@@ -141,6 +141,7 @@ ExtendedPartitionAddOn::Initialize(BMutablePartition* partition,
 	partition->SetContentParameters(NULL);
 	partition->SetContentSize(
 		sector_align(partition->Size(), partition->BlockSize()));
+	partition->Changed(B_PARTITION_CHANGED_INITIALIZATION);
 
 	*_handle = handleDeleter.Detach();
 
@@ -200,10 +201,10 @@ ExtendedPartitionHandle::Init()
 		if (buffer != NULL)
 			ptsOffset = strtoull(buffer, NULL, 10);
 		else {
-			delete_driver_settings(handle);
+			unload_driver_settings(handle);
 			return B_BAD_VALUE;
 		}
-		delete_driver_settings(handle);
+		unload_driver_settings(handle);
 
 		LogicalPartition* logical = new(nothrow) LogicalPartition;
 		if (!logical)

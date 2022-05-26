@@ -814,7 +814,7 @@ create_data_header(size_t headerSpace)
 		- headerSpace;
 	header->first_free = NULL;
 
-	TRACE(("%ld:   create new data header %p\n", find_thread(NULL), header));
+	TRACE(("%d:   create new data header %p\n", find_thread(NULL), header));
 	T2(CreateDataHeader(header));
 	return header;
 }
@@ -828,7 +828,7 @@ release_data_header(data_header* header)
 	if (refCount != 1)
 		return;
 
-	TRACE(("%ld:   free header %p\n", find_thread(NULL), header));
+	TRACE(("%d:   free header %p\n", find_thread(NULL), header));
 	free_data_header(header);
 }
 
@@ -943,7 +943,7 @@ add_first_data_node(data_header* header)
 	if (node == NULL)
 		return NULL;
 
-	TRACE(("%ld:   add first data node %p to header %p\n", find_thread(NULL),
+	TRACE(("%d:   add first data node %p to header %p\n", find_thread(NULL),
 		node, header));
 
 	acquire_data_header(header);
@@ -969,7 +969,7 @@ add_data_node(net_buffer_private* buffer, data_header* header)
 	if (node == NULL)
 		return NULL;
 
-	TRACE(("%ld:   add data node %p to header %p\n", find_thread(NULL), node,
+	TRACE(("%d:   add data node %p to header %p\n", find_thread(NULL), node,
 		header));
 
 	acquire_data_header(header);
@@ -989,7 +989,7 @@ remove_data_node(data_node* node)
 {
 	data_header* located = node->located;
 
-	TRACE(("%ld:   remove data node %p from header %p (located %p)\n",
+	TRACE(("%d:   remove data node %p from header %p (located %p)\n",
 		find_thread(NULL), node, node->header, located));
 
 	// Move all used and tail space to the header space, which is useful in case
@@ -1094,7 +1094,7 @@ create_buffer(size_t headerSpace)
 	if (buffer == NULL)
 		return NULL;
 
-	TRACE(("%ld: create buffer %p\n", find_thread(NULL), buffer));
+	TRACE(("%d: create buffer %p\n", find_thread(NULL), buffer));
 
 	// Make sure headerSpace is valid and at least the initial node fits.
 	headerSpace = _ALIGN(headerSpace);
@@ -1145,7 +1145,7 @@ free_buffer(net_buffer* _buffer)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 
-	TRACE(("%ld: free buffer %p\n", find_thread(NULL), buffer));
+	TRACE(("%d: free buffer %p\n", find_thread(NULL), buffer));
 	T(Free(buffer));
 
 	CHECK_BUFFER(buffer);
@@ -1177,7 +1177,7 @@ duplicate_buffer(net_buffer* _buffer)
 
 	ParanoiaChecker _(buffer);
 
-	TRACE(("%ld: duplicate_buffer(buffer %p)\n", find_thread(NULL), buffer));
+	TRACE(("%d: duplicate_buffer(buffer %p)\n", find_thread(NULL), buffer));
 
 	// TODO: We might want to choose a better header space. The minimal
 	// one doesn't allow to prepend any data without allocating a new header.
@@ -1186,7 +1186,7 @@ duplicate_buffer(net_buffer* _buffer)
 	if (duplicate == NULL)
 		return NULL;
 
-	TRACE(("%ld:   duplicate: %p)\n", find_thread(NULL), duplicate));
+	TRACE(("%d:   duplicate: %p)\n", find_thread(NULL), duplicate));
 
 	// copy the data from the source buffer
 
@@ -1249,13 +1249,13 @@ clone_buffer(net_buffer* _buffer, bool shareFreeSpace)
 #if 0
 	ParanoiaChecker _(buffer);
 
-	TRACE(("%ld: clone_buffer(buffer %p)\n", find_thread(NULL), buffer));
+	TRACE(("%d: clone_buffer(buffer %p)\n", find_thread(NULL), buffer));
 
 	net_buffer_private* clone = allocate_net_buffer();
 	if (clone == NULL)
 		return NULL;
 
-	TRACE(("%ld:   clone: %p\n", find_thread(NULL), buffer));
+	TRACE(("%d:   clone: %p\n", find_thread(NULL), buffer));
 
 	data_node* sourceNode = (data_node*)list_get_first_item(&buffer->buffers);
 	if (sourceNode == NULL) {
@@ -1342,7 +1342,7 @@ split_buffer(net_buffer* from, uint32 offset)
 	ParanoiaChecker _(from);
 	ParanoiaChecker _2(buffer);
 
-	TRACE(("%ld: split_buffer(buffer %p -> %p, offset %ld)\n",
+	TRACE(("%d: split_buffer(buffer %p -> %p, offset %" B_PRIu32 ")\n",
 		find_thread(NULL), from, buffer, offset));
 
 	if (append_data_from_buffer(buffer, from, offset) == B_OK) {
@@ -1373,7 +1373,7 @@ merge_buffer(net_buffer* _buffer, net_buffer* _with, bool after)
 	if (with == NULL)
 		return B_BAD_VALUE;
 
-	TRACE(("%ld: merge buffer %p with %p (%s)\n", find_thread(NULL), buffer,
+	TRACE(("%d: merge buffer %p with %p (%s)\n", find_thread(NULL), buffer,
 		with, after ? "after" : "before"));
 	T(Merge(buffer, with, after));
 	//dump_buffer(buffer);
@@ -1569,7 +1569,7 @@ prepend_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 
 	ParanoiaChecker _(buffer);
 
-	TRACE(("%ld: prepend_size(buffer %p, size %ld) [has %u]\n",
+	TRACE(("%d: prepend_size(buffer %p, size %ld) [has %u]\n",
 		find_thread(NULL), buffer, size, node->HeaderSpace()));
 	//dump_buffer(buffer);
 
@@ -1693,7 +1693,7 @@ append_size(net_buffer* _buffer, size_t size, void** _contiguousBuffer)
 
 	ParanoiaChecker _(buffer);
 
-	TRACE(("%ld: append_size(buffer %p, size %ld)\n", find_thread(NULL),
+	TRACE(("%d: append_size(buffer %p, size %ld)\n", find_thread(NULL),
 		buffer, size));
 	//dump_buffer(buffer);
 
@@ -1813,7 +1813,7 @@ remove_header(net_buffer* _buffer, size_t bytes)
 	if (bytes > buffer->size)
 		return B_BAD_VALUE;
 
-	TRACE(("%ld: remove_header(buffer %p, %ld bytes)\n", find_thread(NULL),
+	TRACE(("%d: remove_header(buffer %p, %ld bytes)\n", find_thread(NULL),
 		buffer, bytes));
 	//dump_buffer(buffer);
 
@@ -1889,7 +1889,7 @@ static status_t
 trim_data(net_buffer* _buffer, size_t newSize)
 {
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
-	TRACE(("%ld: trim_data(buffer %p, newSize = %ld, buffer size = %ld)\n",
+	TRACE(("%d: trim_data(buffer %p, newSize = %ld, buffer size = %" B_PRIu32 ")\n",
 		find_thread(NULL), buffer, newSize, buffer->size));
 	T(Trim(buffer, newSize));
 	//dump_buffer(buffer);
@@ -1946,7 +1946,7 @@ append_cloned_data(net_buffer* _buffer, net_buffer* _source, uint32 offset,
 
 	net_buffer_private* buffer = (net_buffer_private*)_buffer;
 	net_buffer_private* source = (net_buffer_private*)_source;
-	TRACE(("%ld: append_cloned_data(buffer %p, source %p, offset = %ld, "
+	TRACE(("%d: append_cloned_data(buffer %p, source %p, offset = %" B_PRIu32 ", "
 		"bytes = %ld)\n", find_thread(NULL), buffer, source, offset, bytes));
 	T(AppendCloned(buffer, source, offset, bytes));
 

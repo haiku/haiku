@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-WebPositive	55235296
+1	dutch; flemish	x-vnd.Haiku-WebPositive	250728390
 Authentication required	Authentication Panel		Aanmelding is vereist
 Previous	WebPositive Window		Vorige
 (Finish: %date)	Download Window		(Voltooid: %date)
@@ -20,8 +20,8 @@ Open containing folder	Download Window		Bijbehorende map openen
 Find previous	WebPositive Window		Vorige zoeken
 Full screen	WebPositive Window		Volledig scherm
 Downloads in progress	WebPositive		Actieve downloads
-Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Wilt u %addedCount bladwijzers tegelijkertijd openen?
 Copy URL to clipboard	Download Window		URL naar klembord kopiëren
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Wilt u %addedCount bladwijzers tegelijkertijd openen?
 Clone current page	Settings Window		Huidige pagina klonen
 Start page:	Settings Window		Startpagina:
 Cancel	Download Window		Annuleren
@@ -49,10 +49,11 @@ Decrease size	WebPositive Window		Grootte verkleinen
 Default fixed font size:	Settings Window		Standaardgrootte van proportioneel lettertype:
 Sans serif font:	Settings Window		Schreefloos lettertype:
 Clear	WebPositive Window		Wissen
-Cookies for %s	Cookie Manager		Cookies voor %s
 The download could not be opened.	Download Window		De download kan niet worden geöpend.
+Cookies for %s	Cookie Manager		Cookies voor %s
 Close	Download Window		Sluiten
 WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - Zoek term
 Reload	WebPositive Window		Herladen
 Expiration	Cookie Manager		Vervaldatum
 Download finished	Download Window		Download gereed
@@ -100,6 +101,7 @@ There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPosi
 Revert	Settings Window		Ongedaan maken
 Copy	WebPositive Window		Kopiëren
 Default standard font size:	Settings Window		Standaard lettertypegrootte:
+Custom	Settings Window		Aangepast
 Bookmark this page	WebPositive Window		Bladwijzer van deze pagina maken
 Show tabs if only one page is open	Settings Window		Tabbladen ook tonen als slechts een pagina open is
 Close tab	WebPositive Window		Tabblad sluiten
@@ -109,8 +111,8 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		Downloads hervatten
 Proxy server requires authentication	Settings Window		Proxyserver vereist authenticatie
 Cancel	Settings Window		Annuleren
-History	WebPositive Window		Geschiedenis
 Reset size	WebPositive Window		Grootte opnieuw instellen
+History	WebPositive Window		Geschiedenis
 Do you really want to clear the browsing history?	WebPositive Window		Wilt u echt de browsergeschiedenis wissen?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Naar de volgende plek met deze zoektermen gaan
 Fixed font:	Settings Window		Lettertype met vaste breedte:
@@ -129,6 +131,7 @@ Double-click or middle-click to open new tab.	Tab Manager		Dubbelklik of middel-
 Next	WebPositive Window		Volgende
 Bookmark error	WebPositive Window		Bladwijzerfout
 OK	WebPositive Window		Ok
+(%currentSize% of %expectedSize%, %rate%/s)	Download Window		(%currentSize% van %expectedSize%, %rate%/s)
 WebPositive	Download Window		WebPositive
 Zoom text only	WebPositive Window		Alleen tekst inzoomen
 Save page as…	WebPositive Window		Pagina opslaan als…

@@ -33,8 +33,12 @@
 
 #include "AudioAdapterParams.h"
 
+#include <Catalog.h>
 #include <Debug.h>
 #include <ParameterWeb.h>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "CortexAudioAdapter"
 
 status_t
 _AudioAdapterParams::store(int32 parameterID, const void* data, size_t size)
@@ -110,18 +114,18 @@ status_t _AudioAdapterParams::retrieve(
 void _AudioAdapterParams::populateGroup(
 	BParameterGroup* 				group) {
 	
-	BParameterGroup* inputGroup = group->MakeGroup("Input Format");
+	BParameterGroup* inputGroup = group->MakeGroup(B_TRANSLATE("Input format"));
 	
 	BNullParameter* groupName;
 	BDiscreteParameter* param;
 
 	groupName = inputGroup->MakeNullParameter(
-		0, B_MEDIA_NO_TYPE, "Input Format", B_GENERIC);
+		0, B_MEDIA_NO_TYPE, B_TRANSLATE("Input format"), B_GENERIC);
 
 	param = inputGroup->MakeDiscreteParameter(
 		P_INPUT_FORMAT,
 		B_MEDIA_NO_TYPE,
-		"Sample format:",
+		B_TRANSLATE("Sample format:"),
 		B_GENERIC);
 	param->AddItem(
 		0,
@@ -142,17 +146,17 @@ void _AudioAdapterParams::populateGroup(
 	param = inputGroup->MakeDiscreteParameter(
 		P_INPUT_CHANNEL_COUNT,
 		B_MEDIA_NO_TYPE,
-		"Channels:",
+		B_TRANSLATE("Channels:"),
 		B_GENERIC);
 	param->AddItem(
 		0,
 		"*");
 	param->AddItem(
 		1,
-		"mono");
+		B_TRANSLATE("mono"));
 	param->AddItem(
 		2,
-		"stereo");
+		B_TRANSLATE("stereo"));
 	param->AddItem(
 		4,
 		"4");
@@ -160,15 +164,15 @@ void _AudioAdapterParams::populateGroup(
 		8,
 		"8");
 
-	BParameterGroup* outputGroup = group->MakeGroup("Output Format");
+	BParameterGroup* outputGroup = group->MakeGroup(B_TRANSLATE("Output format"));
 
 	groupName = outputGroup->MakeNullParameter(
-		0, B_MEDIA_NO_TYPE, "Output Format", B_GENERIC);
+		0, B_MEDIA_NO_TYPE, B_TRANSLATE("Output format"), B_GENERIC);
 
 	param = outputGroup->MakeDiscreteParameter(
 		P_OUTPUT_FORMAT,
 		B_MEDIA_NO_TYPE,
-		"Sample format:",
+		B_TRANSLATE("Sample format:"),
 		B_GENERIC);
 	param->AddItem(
 		0,
@@ -189,17 +193,17 @@ void _AudioAdapterParams::populateGroup(
 	param = outputGroup->MakeDiscreteParameter(
 		P_OUTPUT_CHANNEL_COUNT,
 		B_MEDIA_NO_TYPE,
-		"Channels:",
+		B_TRANSLATE("Channels:"),
 		B_GENERIC);
 	param->AddItem(
 		0,
 		"*");
 	param->AddItem(
 		1,
-		"mono");
+		B_TRANSLATE("mono"));
 	param->AddItem(
 		2,
-		"stereo");
+		B_TRANSLATE("stereo"));
 	param->AddItem(
 		4,
 		"4");

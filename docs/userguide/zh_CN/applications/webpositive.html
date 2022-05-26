@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2013, Haiku. All rights reserved.
+ * Copyright 2010-2021, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -35,6 +35,7 @@
 <li><a href="../../de/applications/webpositive.html">Deutsch</a></li>
 <li><a href="../../en/applications/webpositive.html">English</a></li>
 <li><a href="../../es/applications/webpositive.html">Español</a></li>
+<li><a href="../../eo/applications/webpositive.html">Esperanto</a></li>
 <li><a href="../../fr/applications/webpositive.html">Français</a></li>
 <li><a href="../../fur/applications/webpositive.html">Furlan</a></li>
 <li><a href="../../it/applications/webpositive.html">Italiano</a></li>
@@ -60,6 +61,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">本节的翻译还未完成。在未完成之前，所有的未完成部分都将使用英语原文。</div>
 <h2><img src="../../images/apps-images/webpositive-icon_64.png" alt="webpositive-icon_64.png" width="64" height="64" />WebPositive</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>桌面栏:</td><td style="width:15px;"></td><td><span class="menu">应用程序</span></td></tr>
@@ -77,10 +79,10 @@
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>设置</h2>
 <p>您可以从 <span class="menu">窗口</span> 菜单中打开 <span class="menu">设置</span> 面板以配置 WebPositive 的一些组件。</p>
 <img src="../images/apps-images/webpositive-settings.png" alt="webpositive-settings.png" />
-<p>第一个标签用于常规设置：作为 <span class="menu">起始页面</span> 的文件或网址， <span class="menu">搜索页面</span>， 用于放置网络下载文件的 <span class="menu">Download 目录</span>。<br />
-两个弹出菜单可用于设置载入页面 - 当打开新窗口或标签时。<br />
-通过下面的选择框，您可以避免在打开单个页面时显示标签栏。 WebPositive 的界面在全屏模式时可以自动隐藏，并且在停止移动一段时间后，鼠标也会自动隐藏。<br />
-最后，您可以决定是否在导航栏中包含 “Home” 按钮，并且可以设置浏览器记录的访问历史保存时间。</p>
+<p>The first tab deals with general settings: What file or URL serves as a <span class="menu">Start page</span>, what's used as a <span class="menu">Search page</span> (if you set a <span class="menu">Custom</span> search engine, "<i>%s</i>" is used for the search term variable), what <span class="menu">Download folder</span> is used for stuff you get from the net.<br />
+Two pop-up menus let you decide what page to load - if any - when opening a new window or tab.<br />
+Via the following checkboxes you can avoid showing the tab bar when there's only one page open anyway. WebPositive's interface can be told to automatically hide in full screen mode, and the mouse pointer can be automatically hidden whenever it's not moved for a while.<br />
+Finally, you can decide to include the "Home" button in the navigation bar and set the number of days the browser remembers the sites you have visited in its history.</p>
 <p>在第二个标签中，您可以选择标准，加粗，未加粗以及等宽字体，并且设置它们的默认尺寸。</p>
 <p>最后一个标签用于配置代理服务器。</p>
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>浏览</h2>
@@ -92,8 +94,19 @@
 <li><p>您可以从 <span class="menu">视图</span> 菜单中 <span class="menu">放大</span> 和 <span class="menu">缩小</span> 页面。还有一个选项用于 <span class="menu">只缩放文本</span> ，而所有的图像都保持原始尺寸。</p></li>
 <li><p>如果您切换到了全屏模式，并且激活了隐藏界面的设置，在一秒钟之后，界面将自动隐藏。为了将其暂时显示，您只需要移动鼠标指针到屏幕顶部即可。</p></li>
 <li><img src="../images/apps-images/webpositive-locator.png" alt="webpositive-locator.png" />
-<p>当您地址栏中输入时，浏览器将会在地址栏下显示并列出匹配您曾经输入内容的项目。您可以输入更多字符来缩小匹配站点，或者使用 <span class="key">↑</span> 或 <span class="key">↓</span> 来选中某个站点。按下 <span class="key">ENTER</span> 将会载入该页面。您也可以使用地址栏最右侧的控件重新载入页面。<br />
-未匹配为 URL 的字符串将会在 Google 中进行搜索。因此地址栏还可以作为网络搜索的快捷方式。</p></li>
+<p>While you type in the locator text field, the browser matches the string to sites you have visited in the past and lists them below the text field. You either keep adding more letters to shorten the  list of possible sites, or choose an entry with <span class="key">↑</span> or <span class="key">↓</span>. <span class="key">ENTER</span> will load the page. You can also use the button to the far right which also serves to reload a page.<br />
+Strings not recognized as URLs will get looked up with the search engine set in WebPositive's settings, so the locator field doubles as quick shortcut to web searches.</p>
+<div class="box-info"><p>WebPositive supports quick shortcuts to direct search terms to different search engines. Just enter the one-letter-shortcut followed by your search term.</p>
+<ul>
+<li>"g” for Google</li>
+<li>“b” for Bing</li>
+<li>“w” for Wikipedia</li>
+<li>“d” for DuckDuckGo</li>
+<li>“a” for Baiku</li>
+<li>“y” for Yandex</li>
+<li>“e” for Ecosia</li>
+<li>“q” for Qwant</li>
+</ul></div></li>
 <li><p>右键点击打开菜单，根据所点击对象的不同，其可以选择在新窗口或标签中打开链接，或者下载对象等。</p></li>
 <li><p><span class="menu">编辑 | 查找</span> 在底部显示一个查找栏用于启动页内搜索。匹配项将会在页面内高亮显示。</p></li>
 </ul>

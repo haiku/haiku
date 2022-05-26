@@ -1,11 +1,8 @@
-1	indonesian	x-vnd.Haiku-Login	336867745
+1	indonesian	x-vnd.Haiku-Login	3033693897
 Invalid login!	Login View		Login tidak valid!
 Error	Login App		Kesalahan
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tLuncurkan dalam mode edit rak untuk memungkinkan penyesuaian desktop.\n
 Welcome to Haiku	Login Window		Selamat datang di Haiku
 Halt	Login View		Berhenti
-Login application for Haiku\nUsage:\n	Login App		Aplikasi login untuk Haiku\nPenggunaan:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tJangan membuat jendela menjadi modal\n
 Desktop	Desktop Window		Desktop
 Hide password	Login View		Sembunyikan kata sandi
 Reboot	Login View		Reboot

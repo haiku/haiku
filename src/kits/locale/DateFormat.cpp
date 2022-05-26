@@ -83,7 +83,7 @@ BDateFormat::Format(char* string, const size_t maxSize, const time_t time,
 	const BDateFormatStyle style) const
 {
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
-	if (dateFormatter.Get() == NULL)
+	if (!dateFormatter.IsSet())
 		return B_NO_MEMORY;
 
 	UnicodeString icuString;
@@ -104,13 +104,13 @@ BDateFormat::Format(BString& string, const time_t time,
 	const BDateFormatStyle style, const BTimeZone* timeZone) const
 {
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
-	if (dateFormatter.Get() == NULL)
+	if (!dateFormatter.IsSet())
 		return B_NO_MEMORY;
 
 	if (timeZone != NULL) {
 		ObjectDeleter<TimeZone> icuTimeZone(
 			TimeZone::createTimeZone(timeZone->ID().String()));
-		if (icuTimeZone.Get() == NULL)
+		if (!icuTimeZone.IsSet())
 			return B_NO_MEMORY;
 		dateFormatter->setTimeZone(*icuTimeZone.Get());
 	}
@@ -134,7 +134,7 @@ BDateFormat::Format(BString& string, const BDate& time,
 		return B_BAD_DATA;
 
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
-	if (dateFormatter.Get() == NULL)
+	if (!dateFormatter.IsSet())
 		return B_NO_MEMORY;
 
 	UErrorCode err = U_ZERO_ERROR;
@@ -145,7 +145,7 @@ BDateFormat::Format(BString& string, const BDate& time,
 	if (timeZone != NULL) {
 		ObjectDeleter<TimeZone> icuTimeZone(
 			TimeZone::createTimeZone(timeZone->ID().String()));
-		if (icuTimeZone.Get() == NULL)
+		if (!icuTimeZone.IsSet())
 			return B_NO_MEMORY;
 		dateFormatter->setTimeZone(*icuTimeZone.Get());
 		calendar->setTimeZone(*icuTimeZone.Get());
@@ -172,7 +172,7 @@ BDateFormat::Format(BString& string, int*& fieldPositions, int& fieldCount,
 	const time_t time, const BDateFormatStyle style) const
 {
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
-	if (dateFormatter.Get() == NULL)
+	if (!dateFormatter.IsSet())
 		return B_NO_MEMORY;
 
 	fieldPositions = NULL;
@@ -213,7 +213,7 @@ BDateFormat::GetFields(BDateElement*& fields, int& fieldCount,
 	BDateFormatStyle style) const
 {
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
-	if (dateFormatter.Get() == NULL)
+	if (!dateFormatter.IsSet())
 		return B_NO_MEMORY;
 
 	fields = NULL;
@@ -385,7 +385,7 @@ BDateFormat::Parse(BString source, BDateFormatStyle style, BDate& output)
 	// timezone aware so things like BDate::Difference can work for dates in
 	// different timezones.
 	ObjectDeleter<DateFormat> dateFormatter(_CreateDateFormatter(style));
-	if (dateFormatter.Get() == NULL)
+	if (!dateFormatter.IsSet())
 		return B_NO_MEMORY;
 
 	ParsePosition p(0);

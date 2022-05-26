@@ -27,8 +27,11 @@ fssh_recursive_lock_get_recursion(fssh_recursive_lock *lock)
 
 
 extern "C" void
-fssh_recursive_lock_init(fssh_recursive_lock *lock, const char *name)
+fssh_recursive_lock_init_etc(fssh_recursive_lock *lock, const char *name,
+	uint32_t flags)
 {
+	// TODO: No fssh_create_sem_etc for flags?
+
 	if (lock == NULL)
 		return;
 
@@ -40,6 +43,13 @@ fssh_recursive_lock_init(fssh_recursive_lock *lock, const char *name)
 	lock->sem = fssh_create_sem(1, name);
 	if (lock->sem < FSSH_B_OK)
 		fssh_panic("could not create recursive lock");
+}
+
+
+extern "C" void
+fssh_recursive_lock_init(fssh_recursive_lock *lock, const char *name)
+{
+	fssh_recursive_lock_init_etc(lock, name, 0);
 }
 
 

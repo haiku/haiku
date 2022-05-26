@@ -1,0 +1,17 @@
+1	esperanto	application/x-vnd.Be.LoggingConsumerApp	2571282333
+Priority	CortexAddOnsLoggingConsumer		Antaŭeco
+Latency	CortexAddOnsLoggingConsumer		Prokrasto
+Logged input	CortexAddOnsLoggingConsumer		Protokolita enigo
+NodeLogger	CortexAddOnsLoggingConsumers		NodeLogger
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		Komenci
+Thread priority	CortexAddOnsLoggingConsumer		Antaŭeco de fadeno
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		LoggingConsumer parametroj
+Latency control	CortexAddOnsLoggingConsumer		Prokrasta stirilo
+LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		Ĉesi
+An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		Aldonaĵa versio de la LoggingConsumer nodo.\nReferenci la Be Developer Newsletter II.18: 5a de majo, 1999\naranĝita de Eric Moon (4a de junio, 1999)
+OK	CortexAddOnsCommonMediaNodeControlApp		Bone
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Stiriloj
+controls	CortexAddOnsCommonMediaNodeControlApp		stiriloj
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Konekti
+percent	CortexAddOnsLoggingConsumer		kvociento

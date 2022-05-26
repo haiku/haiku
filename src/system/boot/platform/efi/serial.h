@@ -9,6 +9,10 @@
 #include <SupportDefs.h>
 
 
+class DebugUART;
+extern DebugUART* gUART;
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif

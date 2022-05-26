@@ -9,6 +9,16 @@
 #include <OS.h>
 
 
+// PML5 entry bits.
+#define X86_64_PML5E_PRESENT			(1LL << 0)
+#define X86_64_PML5E_WRITABLE			(1LL << 1)
+#define X86_64_PML5E_USER				(1LL << 2)
+#define X86_64_PML5E_WRITE_THROUGH		(1LL << 3)
+#define X86_64_PML5E_CACHING_DISABLED	(1LL << 4)
+#define X86_64_PML5E_ACCESSED			(1LL << 5)
+#define X86_64_PML5E_NOT_EXECUTABLE		(1LL << 63)
+#define X86_64_PML5E_ADDRESS_MASK		0x000ffffffffff000L
+
 // PML4 entry bits.
 #define X86_64_PML4E_PRESENT			(1LL << 0)
 #define X86_64_PML4E_WRITABLE			(1LL << 1)
@@ -69,11 +79,13 @@
 static const size_t k64BitPageTableRange = 0x200000L;
 static const size_t k64BitPageDirectoryRange = 0x40000000L;
 static const size_t k64BitPDPTRange = 0x8000000000L;
+static const size_t k64BitPML4TRange = 0x1000000000000L;
 
 static const size_t k64BitTableEntryCount = 512;
 
 
-#define VADDR_TO_PML4E(va)	(((va) & 0x0000fffffffff000L) / k64BitPDPTRange)
+#define VADDR_TO_PML5E(va)	(((va) & 0x01fffffffffff000L) / k64BitPML4TRange)
+#define VADDR_TO_PML4E(va)	(((va) % k64BitPML4TRange) / k64BitPDPTRange)
 #define VADDR_TO_PDPTE(va)	(((va) % k64BitPDPTRange) / k64BitPageDirectoryRange)
 #define VADDR_TO_PDE(va)	(((va) % k64BitPageDirectoryRange) / k64BitPageTableRange)
 #define VADDR_TO_PTE(va)	(((va) % k64BitPageTableRange) / B_PAGE_SIZE)

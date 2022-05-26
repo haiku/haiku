@@ -1,8 +1,8 @@
 1	portuguese (brazil)	x-vnd.Haiku-BFSAddOn	1570987954
 Enable query support	BFS_Initialize_Parameter		Habilitar suporte a consultas
-Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Desabilitar o suporte a consulta pode aumentar a velocidade de certas operações do sistema de arquivos, mas deveria\nser usado somente se estiver absolutamente certo que não irá precisar de consultas.\nQualquer volume que estiver designado para inicializar o Haiku deve ter suporte a consulta habilitado.
+Disabling query support may speed up certain file system operations, but should\nonly be used if one is absolutely certain that one will not need queries.\nAny volume that is intended for booting Haiku must have query support enabled.	BFS_Initialize_Parameter		Desativar o suporte a consultas pode acelerar certas operações do sistema de arquivos, mas\nsó deve ser usado se houver certeza absoluta de que não será necessário fazer consultas.\nQualquer volume destinado a inicializar o Haiku deve ter o suporte a consultas habilitado.
 Name:	BFS_Initialize_Parameter		Nome:
 8192 (Mostly large files)	BFS_Initialize_Parameter		8192 (Majoritariamente arquivos grandes)
 2048 (Recommended)	BFS_Initialize_Parameter		2048 (Recomendado)
-1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Na maioria arquivos pequenos)
+1024 (Mostly small files)	BFS_Initialize_Parameter		1024 (Majoritariamente arquivos pequenos)
 Blocksize:	BFS_Initialize_Parameter		Tamanho do bloco:

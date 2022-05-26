@@ -1,20 +1,21 @@
-1	japanese	x-vnd.Haiku-CodyCam	2593355250
+1	japanese	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		出力先ディレクトリを入力してください
 reply: '%s'\n	SftpClient		返信: '%s'\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <非表示>  (本物のパスワードが送られます)
 JPEG image	CodyCam		JPEG 画像
 Remote host has closed the connection.\n	FtpClient		リモートホストが接続を切断しました。\n
 image file format expected	CodyCam		画像ファイルのフォーマットを入力してください
 Every 30 minutes	CodyCam		30 分ごと
-Capturing Image…	VideoConsumer.cpp		画像を取得中…
+Capturing Image…	VideoConsumer.cpp		画像の取得中...
 Cannot start time source!	CodyCam		タイムソースを開始できません
-Waiting…	CodyCam		待機中…
+Waiting…	CodyCam		待機中...
 Passive FTP	CodyCam		パッシブ FTP
 Every 10 minutes	CodyCam		10 分ごと
 Every minute	CodyCam		1 分ごと
 Capture Rate Menu	CodyCam		キャプチャ頻度メニュー
 Cannot seek time source!	CodyCam		タイムソースをシークできません!
 Server login failed	VideoConsumer.cpp		サーバーへのログインに失敗しました
-on or off expected	Settings	Do not translate 'on' and 'off'	on か off かを入力してください
+on or off expected	Settings	Do not translate 'on' and 'off'	on か off を入力してください
 invalid upload client %ld\n	VideoConsumer.cpp		アップロードクライアント %ld が正しくありません\n
 Every 30 seconds	CodyCam		30 秒ごと
 Cannot create a video window	CodyCam		ビデオウィンドウを作成できません
@@ -32,8 +33,8 @@ Never	CodyCam		中止
 Every 8 hours	CodyCam		8 時間ごと
 Cannot start the video source	CodyCam		ビデオソースを開始できません
 Cannot set the time source for the video source	CodyCam		ビデオソースにタイムソースをセットできません
-Renaming…	VideoConsumer.cpp		名前の変更中…
-Send to…	CodyCam		送る…
+Renaming…	VideoConsumer.cpp		名前の変更中...
+Send to…	CodyCam		送る...
 Password:	CodyCam		パスワード:
 still image filename expected	CodyCam		イメージのファイル名を入力してください
 File name:	CodyCam		ファイル名:
@@ -41,9 +42,8 @@ Directory:	CodyCam		ディレクトリ:
 Error setting type of output file	VideoConsumer.cpp		出力ファイルの形式の設定に失敗
 Locking the window	VideoConsumer.cpp		ウィンドウをロックする
 Cannot find an available video stream	CodyCam		有効なビデオストリームが見つかりません
-Upload…	VideoConsumer.cpp		アップロード…
+Upload…	VideoConsumer.cpp		アップロード...
 password expected	CodyCam		パスワードを入力してください
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed> (パスワードを送信しました)\n
 SFTP	CodyCam		SFTP
 Output	CodyCam		出力
 server address expected	CodyCam		サーバーアドレスを入力してください
@@ -56,17 +56,17 @@ Image Format Menu	CodyCam		画像形式メニュー
 Every 5 minutes	CodyCam		5 分ごと
 File upload failed	VideoConsumer.cpp		ファイルのアップロードに失敗しました
 Format:	CodyCam		ファイル形式:
-Start video	CodyCam		ビデオを開始
-Connected…	VideoConsumer.cpp		接続しました…
+Start video	CodyCam		ビデオの開始
+Connected…	VideoConsumer.cpp		接続しました...
 upload client name expected	CodyCam		アップロードクライアントの名前を入力してください
 Every 15 seconds	CodyCam		15 秒ごと
 Error getting initial latency for the capture node	CodyCam		キャプチャーノードの初期の待ち時間の取得に失敗しました
 password	CodyCam		パスワード
 Local	CodyCam		ローカル
-Stop video	CodyCam		ビデオを停止
+Stop video	CodyCam		ビデオの停止
 Last Capture: 	VideoConsumer.cpp		最後のキャプチャ:
 Rate:	CodyCam		頻度:
-Couldn't find requested directory on server	VideoConsumer.cpp		要求されたディレクトリがサーバー上にみつかりませんでした
+Couldn't find requested directory on server	VideoConsumer.cpp		要求されたディレクトリがサーバー上にみつかりません
 Cannot find the media roster	CodyCam		media roster が見つかりません。
 Type:	CodyCam		形式:
 Rename failed	VideoConsumer.cpp		名前の変更に失敗しました
@@ -81,8 +81,8 @@ Video settings	CodyCam		ビデオ設定
 Can't find an available connection to the video window	CodyCam		有効な接続がビデオウィンドウ上に見つかりません
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		ファイルの出力に失敗しました
-Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		ビデオソースが見つかりません。\nCodyCam を使うには webcam が必要です。
-Logging in…	VideoConsumer.cpp		ログイン中…
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		ビデオソースが見つかりません。\nCodyCam には webcam が必要です。
+Logging in…	VideoConsumer.cpp		ログイン中...
 CodyCam	System name		CodyCam
-Error writing output file	VideoConsumer.cpp		ファイルの書き込みに失敗した
+Error writing output file	VideoConsumer.cpp		ファイルの書き込みに失敗しました
 Capture controls	CodyCam		キャプチャ制御

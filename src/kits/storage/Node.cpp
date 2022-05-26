@@ -319,15 +319,16 @@ BNode::GetNextAttrName(char* buffer)
 	if (InitAttrDir() != B_OK)
 		return B_FILE_ERROR;
 
-	BPrivate::Storage::LongDirEntry entry;
-	ssize_t result = _kern_read_dir(fAttrFd, &entry, sizeof(entry), 1);
+	BPrivate::Storage::LongDirEntry longEntry;
+	struct dirent* entry = longEntry.dirent();
+	ssize_t result = _kern_read_dir(fAttrFd, entry, sizeof(longEntry), 1);
 	if (result < 0)
 		return result;
 
 	if (result == 0)
 		return B_ENTRY_NOT_FOUND;
 
-	strlcpy(buffer, entry.d_name, B_ATTR_NAME_LENGTH);
+	strlcpy(buffer, entry->d_name, B_ATTR_NAME_LENGTH);
 
 	return B_OK;
 }

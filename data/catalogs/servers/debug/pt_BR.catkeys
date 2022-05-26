@@ -1,5 +1,8 @@
-1	portuguese (brazil)	x-vnd.Haiku-debug_server	1440673937
-The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		A aplicação:\n\n      %app\n\nencontrou um erro que a impede de continuar. Haiku irá fechar a aplicação.
+1	portuguese (brazil)	x-vnd.Haiku-debug_server	3188340596
+The application:\n\n      %app\n\nhas encountered an error which prevents it from continuing. Haiku will terminate the application and clean up.	DebugServer		O aplicativo:\n\n      %app\n\nencontrou um erro que o impede de continuar. O Haiku irá fechar o aplicativo e liberar os recursos.
+Oh yeah!	DebugServer		Ah, sim!
 Debug	DebugServer		Depurar
 Terminate	DebugServer		Finalizar
 Save report	DebugServer		Salvar relatório
+Write core file	DebugServer		Escrever o arquivo principal
+Oh no!	DebugServer		Oh, não!

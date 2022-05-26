@@ -1,19 +1,23 @@
-1	greek, modern (1453-)	x-vnd.Haiku-FirstBootPrompt	2813539172
+1	greek, modern (1453-)	x-vnd.Haiku-FirstBootPrompt	189132197
 Japanese	KeymapNames		Ιαπωνικό
 US	KeymapNames		ΗΠΑ
+Cancel	BootPromptWindow		Άκυρο
 Esperanto	KeymapNames		Εσπεράντο
 Belarusian	KeymapNames		Λευκορώσικο
 Brazilian	KeymapNames		Βραζιλιάνικο
 Dvorak	KeymapNames		Dvorak
 Polish	KeymapNames		Πολωνικό
+Try Haiku	BootPromptWindow		Δοκιμάστε το Haiku
 Latin-American	KeymapNames		Λατινοαμερικάνικο
 Ukrainian	KeymapNames		Ουκρανικό
 Russian (Yawert)	KeymapNames		Ρώσικο (Yawert)
 United-Kingdom	KeymapNames		Ηνωμένου Βασιλείου
-Serbian (Cyrillic)	KeymapNames		Σέρβικο (Κυριλλικό)
+Welcome!	BootPromptWindow		Καλώς ήρθατε!
+Quit Haiku	System name		Έξοδος από το Haiku
 Turkish (Type-F)	KeymapNames		Τούρκικο (Τύπου-F)
-Bulgarian (Cyrillic)	KeymapNames		Βουλγαρικό (Κυριλλικό)
+Serbian (Cyrillic)	KeymapNames		Σέρβικο (Κυριλλικό)
 Belgian (point)	KeymapNames		Βελγικό (point)
+Bulgarian (Cyrillic)	KeymapNames		Βουλγαρικό (Κυριλλικό)
 Finnish	KeymapNames		Φινλαδικό
 Swedish	KeymapNames		Σουηδικό
 Svorak	KeymapNames		Svorak
@@ -37,14 +41,16 @@ Belarusian (Mac)	KeymapNames		Λευκορώσικο (Mac)
 Hebrew	KeymapNames		Εβραϊκό
 Greek	KeymapNames		Ελληνικό
 Croatian	KeymapNames		Κροατικό
-Run Installer	BootPromptWindow		Έναρξη Εγκατάστασης
 Faeroese	KeymapNames		Φεροϊκό
 Polish (Typewriter)	KeymapNames		Πολωνικό (Γραφομηχανής)
 French (Mac)	KeymapNames		Γαλλικό (Mac)
 Spanish	KeymapNames		Ισπανικό
+Try it out	BootPromptWindow		Δοκιμή
 Ukrainian (Mac)	KeymapNames		Ουκρανικό (Mac)
 Estonian	KeymapNames		Εσθονικό
+Install Haiku	BootPromptWindow		Εγκατάσταση Haiku
 French (Bépo)	KeymapNames		Γαλλικό (Bépo)
+Restart system	BootPromptWindow		Επανεκκίνηση
 Serbian (Latin)	KeymapNames		Σέρβικο (Λατινικό)
 Russian (Typewriter)	KeymapNames		Ρώσικο (Γραφομηχανής)
 French	KeymapNames		Γαλλικό
@@ -52,8 +58,8 @@ Italian	KeymapNames		Ιταλικό
 Portuguese	KeymapNames		Πορτογαλικό
 Swiss-French	KeymapNames		Ελβετικό-Γαλλικό
 Slovene	KeymapNames		Σλοβενικό
-Lithuanian	KeymapNames		Λιθουανικό
 French (NF Z71-300)	KeymapNames		Γαλλικό (NF Z71-300)
+Lithuanian	KeymapNames		Λιθουανικό
 ISO-9995	KeymapNames		ISO-9995
 Kazakh	KeymapNames		Καζακστανικό
 Language	BootPromptWindow		Γλώσσα
@@ -62,18 +68,21 @@ Belgian (comma)	KeymapNames		Βελγικό (κόμμα)
 Custom	BootPromptWindow		Προσαρμοσμένο
 Norwegian	KeymapNames		Νορβηγικό
 Danish	KeymapNames		Δανικό
-Boot to Desktop	BootPromptWindow		Μετάβαση σε Επιφάνεια Εργασίας
 Bulgarian (Phonetic)	KeymapNames		Βουλγαρικό (Φωνητικό)
 Canadian-French	KeymapNames		Καναδικό-Γαλλικό
 Welcome to Haiku!	BootPromptWindow		Καλωσορίσατε στο Haiku!
 Russian	KeymapNames		Ρώσικο
 Hungarian	KeymapNames		Ουγγρικό
+Install	BootPromptWindow		Εγκατάσταση
 Irish	KeymapNames		Ιρλανδικό
 Romanian	KeymapNames		Ρουμανικό
-Macedonian	KeymapNames		Βόρειο Μακεδονικό
+Are you sure you want to close this window? This will restart your system!	BootPromptWindow		Είστε σίγουρος/η ότι θέλετε να κλείσετε αυτό το παράθυρο; Αυτό θα προκαλέσει επανεκκίνηση.
+Thank you for trying out Haiku! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later when running Haiku.\n\nDo you wish to install Haiku now, or try it out first?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Ευχαριστούμε που δοκιμάζετε το Haiku! Ελπίζουμε ότι θα σας αρέσει!\n\nΠαρακαλώ επιλέξτε τη γλώσσα προτίμησής σας και τη διάταξη του πληκτρολογίου. Και οι δυο αυτές ρυθμίσεις θα είναι διαθέσιμες αργότερα μέσα από το Haiku.\n\nΘα θέλατε να εγκαταστήσετε το Haiku ή να το δοκιμάσετε πρώτα;
 Czech (Mac)	KeymapNames		Τσέχικο (Mac)
+Macedonian	KeymapNames		Βόρειο Μακεδονικό
 Brazilian (ABNT2)	KeymapNames		Βραζιλιάνικο (ABNT2)
 Albanian	KeymapNames		Αλβανικό
 Dutch	KeymapNames		Ολλανδικό
+Thank you for trying out our operating system! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later.\n\nDo you wish to install the operating system now, or try it out first?	BootPromptWindow	This notice appears when the build of Haiku that's currently being used is unofficial, as in, not distributed by Haiku itself.For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	Ευχαριστούμε που δοκιμάζετε το λειτουργικό μας σύστημα! Ελπίζουμε ότι θα σας αρέσει!\n\nΠαρακαλώ επιλέξτε τη γλώσσα προτίμησής σας και τη διάταξη του πληκτρολογίου. Και οι δυο αυτές ρυθμίσεις θα είναι διαθέσιμες αργότερα.\n\nΘα θέλατε να εγκαταστήσετε το σύστημα ή να το δοκιμάσετε πρώτα;
 Friulian	KeymapNames		Φριουλιανό
 Icelandic	KeymapNames		Ισλανδικό

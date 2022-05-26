@@ -1,11 +1,8 @@
-1	lithuanian	x-vnd.Haiku-Login	2683778354
+1	lithuanian	x-vnd.Haiku-Login	1085637210
 Invalid login!	Login View		Netinkamas naudotojo vardas!
 Error	Login App		Klaida
---edit\tLaunch in shelf editting mode to allow customizing the desktop.\n	Login App		--edit\tPaleisti nuostatų keitimo veiksena, leidžiančia tinkinti darbalaukį.\n
 Welcome to Haiku	Login Window		Sveiki! Čia „Haiku“
 Halt	Login View		Išjungti
-Login application for Haiku\nUsage:\n	Login App		Prisijungimo prie „Haiku“ programa\nNaudojimas:\n
---nonmodal\tDo not make the window modal\n	Login App		--nonmodal\t Nepaversti lango modaliniu\n
 Desktop	Desktop Window		Darbalaukis
 Hide password	Login View		Nerodyti slaptažodžio
 Reboot	Login View		Paleisti iš naujo

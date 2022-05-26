@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2009-2021, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -24,7 +24,8 @@
 
 #include <bluetoothserver_p.h>
 
-extern "C" _EXPORT BView *instantiate_deskbar_item(void);
+
+extern "C" _EXPORT BView *instantiate_deskbar_item(float maxWidth, float maxHeight);
 status_t our_image(image_info& image);
 
 const uint32 kMsgOpenBluetoothPreferences = 'obtp';
@@ -43,7 +44,7 @@ const char* kClassName = "DeskbarReplicant";
 
 DeskbarReplicant::DeskbarReplicant(BRect frame, int32 resizingMode)
 	: BView(frame, kDeskbarItemName, resizingMode,
-		B_WILL_DRAW | B_FRAME_EVENTS)
+		B_WILL_DRAW | B_TRANSPARENT_BACKGROUND | B_FRAME_EVENTS)
 {
 	_Init();
 }
@@ -122,7 +123,10 @@ DeskbarReplicant::AttachedToWindow()
 	BView::AttachedToWindow();
 	AdoptParentColors();
 
-	SetLowColor(ViewColor());
+	if (ViewUIColor() == B_NO_COLOR)
+		SetLowColor(ViewColor());
+	else
+		SetLowUIColor(ViewUIColor());
 }
 
 
@@ -220,15 +224,17 @@ DeskbarReplicant::_ShowErrorAlert(BString msg, status_t status)
 	alert->Go(NULL);
 }
 
+
 //	#pragma mark -
 
 
 extern "C" _EXPORT BView *
-instantiate_deskbar_item(void)
+instantiate_deskbar_item(float maxWidth, float maxHeight)
 {
-	return new DeskbarReplicant(BRect(0, 0, 15, 15),
-		B_FOLLOW_LEFT | B_FOLLOW_TOP);
+	return new DeskbarReplicant(BRect(0, 0, maxHeight - 1, maxHeight - 1),
+		B_FOLLOW_NONE);
 }
+
 
 //	#pragma mark -
 

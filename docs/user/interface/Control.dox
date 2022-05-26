@@ -1,13 +1,13 @@
 /*
- * Copyright 2011-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2014, 2020 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
- *		headers/os/interface/Control.h	 hrev47274
- *		src/kits/interface/Control.cpp	 hrev47274
+ *		headers/os/interface/Control.h	 hrev47369
+ *		src/kits/interface/Control.cpp	 hrev51550
  */
 
 
@@ -507,6 +507,74 @@
 		- \c B_KEEP_ICON_BITMAP Transfer ownership of the bitmap to the control.
 
 	\return \c B_OK if the icon was set or an error code otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BBitmap* BControl::IconBitmap(uint32 which) const
+	\brief Get the currently set bitmap for a specific state.
+
+	\param which The state to retrieve the icon for.
+
+	\return A pointer to the icon set for the state, or \c NULL in case there
+		is no icon set for that state.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BControl::IsFocusChanging() const
+	\brief Check if the control is changing focus
+
+	Many controls have different looks depending on whether they have focus or
+	not. You can use this method within your Draw() call to determine whether
+	you are asked to redraw because the focus is changing, meaning your control
+	is getting in or out of focus, so that you can conditionally run the
+	drawing code.
+
+	\retval true The Draw() method was called because of a focus change for
+		this control.
+	\retval false The Draw() method was not called because of a focus change
+		for this control.
+
+	\since BeOS R5
+*/
+
+
+/*!
+	\fn bool BControl::IsTracking() const
+	\brief Check whether this control is set to tracking
+
+	See SetTracking() for the usage pattern. By default, the control wil return
+	\c false.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BControl::SetTracking(bool state)
+	\brief Modify the control's tracking state
+
+	The tracking state is a feature of this BControl class, that allows you to
+	set a flag when you are watching the behavior of users when they interact
+	with your control.
+
+	For example, a button may have a draw state when it is not pressed, and
+	when it is pressed. When the user presses their mouse down, within the
+	control, the control will be drawn in the pressed state. The code can set
+	the tracking flag, so that in the case of the mouse up event, the control
+	knows it has to redraw.
+
+	This flag does not affect anything within this class, other than the return
+	value of the \ref IsTracking() method, so it can be used at will by custom
+	implementations of this class.
+
+	\param state Pass \c true if the control is in a tracking state, or
+		\c false if it is not.
 
 	\since Haiku R1
 */

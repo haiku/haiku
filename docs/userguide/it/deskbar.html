@@ -39,6 +39,7 @@
 <li><a href="../de/deskbar.html">Deutsch</a></li>
 <li><a href="../en/deskbar.html">English</a></li>
 <li><a href="../es/deskbar.html">Español</a></li>
+<li><a href="../eo/deskbar.html">Esperanto</a></li>
 <li><a href="../fr/deskbar.html">Français</a></li>
 <li><a href="../fur/deskbar.html">Furlan</a></li>
 <li><a href="../hu/deskbar.html">Magyar</a></li>
@@ -79,7 +80,7 @@
 
 <p>La Deskbar è il piccolo pannello che si trova normalmente in alto a destra sullo schermo. La Deskbar di Haiku corrisponde alla barra delle applicazioni di Windows con il pulsante Start. Contiene il menu dal quale si possono avviare le applicazioni e gestire le varie preferenze, una tray con un orologio ed altri strumenti come una lista dei programmi in esecuzione.</p>
 <img src="images/deskbar-images/positions.png" alt="positions" />
-<p>Puoi spostare la Deskbar in ogni angolo dello schermo oppure ad occupare l'intero bordo superiore o inferiore inferiore trascinando con il mouse sulla zona a puntini a lato della tray e trascinandola nella nuova posizione<br /> Può essere anche modificata con un layout più compatto trascinando la zona a puntini sulla "foglia" del menu della Deskbar. Avendo la stessa altezza della tab del titolo di una normale finestra di applicazione, anche se le finestre prendono tutto lo schermo non potranno mai oscurare la tray della Deskbar, le sue icone, l'orologio, ecc.</p>
+<p>Puoi spostare la Deskbar in ogni angolo dello schermo oppure far si che occupi l'intero bordo superiore o inferiore trascinando con il mouse sui puntini a lato della tray nella nuova posizione<br /> Può essere anche modificata con un layout più compatto trascinando i puntini sulla "foglia" del menu della Deskbar. Avendo la stessa altezza della tab del titolo di una normale finestra di applicazione, anche se le finestre prendono tutto lo schermo non potranno mai oscurare la tray della Deskbar, le sue icone, l'orologio, ecc.</p>
 <p>Trascinando l'area con i puntini sul lato sinistro della tray, puoi modificare la larghezza della Deskbar, ingrandendola o rimpicciolendola.</p>
 <img src="images/deskbar-images/width.png" alt="width" />
 <p>Una Deskbar più larga consente di avere più icone nella tray disposte su di un'unica riga. È, inoltre, meno probabile che i nomi delle applicazioni siano troncati, soprattutto se usi icone molto grandi.</p>
@@ -92,17 +93,17 @@
 <ul>
 <li><p><b>Informazioni sul sistema...</b> - Mostra alcune informazioni di base sul sistema le licenze e i crediti del progetto Haiku.</p></li>
 
-<li><p><b>Trova...</b> - Apre la finestra che permette di effettuare le <a href="queries.html">Query</a>.</p></li>
-<li><p><b>Mostra i replicanti</b> - Mostra e nasconde il piccolo widget <a href="gui.html#replicants">Replicant</a> che si utilizza per rimuovere o accedere al menu contestuale.</p></li>
+<li><p><b>Trova...</b> - Apre la finestra che permette di effettuare le <a href="queries.html">Interrogazioni</a>.</p></li>
+<li><p><b>Mostra i replicanti</b> - Mostra e nasconde il piccolo widget <a href="gui.html#replicants">Replicante</a> che si utilizza per rimuovere o accedere al menu contestuale.</p></li>
 <li><p><b>Monta</b> - Offre le stesse opzioni di quando si clicca con il tasto destro sul desktop (consultare la pagina <a href="tracker.html#mounting-volumes">Montaggio Volumi</a>).</p></li>
-<li><p><b>Preferenze della deskbar...</b> - Apre il pannello per configurare la deskbar (per maggiori informazioni consultare sotto).</p></li>
-<li><p><b>Arresto</b> - E' presente sia l'opzione per <span class="menu">Riavviare il sistema</span> che per <span class="menu">Spegere il Sistema</span>.</p></li>
-<li><p><b>Documenti, Cartelle e Applicazioni recenti</b> - Una lista delle ultime cartelle, documenti e applicazioni aperte (per maggiori informazioni consultare sotto alle <span class="menu">Deskbar Preferences</span> ).</p></li>
+<li><p><b>Preferenze di Deskbar...</b> - Apre il pannello per configurare la Deskbar (per maggiori informazioni consultare sotto).</p></li>
+<li><p><b>Uscita da Haiku...</b> - È presente sia l'opzione <span class="menu">Riavvia</span> che <span class="menu">Spegni</span>.</p></li>
+<li><p><b>Documenti, Cartelle e Applicazioni recenti</b> - Una lista delle ultime cartelle, documenti e applicazioni aperte (per maggiori informazioni consultare l'argomento <span class="menu">Preferenze di Deskbar</span> qui sotto ).</p></li>
 <li><p><b>Applicazioni, Demo, Deskbar Applet e Preferenze</b> - Una lista delle applicazioni installate, le demo, gli applet e i pannelli di preferenze.<br /> Puoi aggiungere collegamenti ad altre applicazioni (o cartelle, documenti, interrogazioni, ecc.) creandoli sul percorso <span class="path">~/config/settings/deskbar/menu/</span>.</p></li>
 </ul>
 
 <h3>
-<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Preferenze della Deskbar</h3>
+<a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>Preferenze di Deskbar</h3>
 <img src="images/deskbar-images/prefs-deskbar.png" alt="prefs-deskbar.png" />
 <p>Il pannello di preferenze della Deskbar si divide in tre sezioni.</p>
 
@@ -118,10 +119,10 @@
 </table>
 
 <h4>Menu</h4>
-<p>While the first couple of menu items of the Deskbar are fixed, you can customized the ones below <span class="menu">Shutdown...</span>.<br />
-Here you can set the number of recent documents, folders and applications that are shown in their menu in the Deskbar, or if you want to see them at all.<br />
-The button <span class="button">Edit in Tracker...</span> opens the folder <span class="path">~/config/settings/deskbar/menu/</span>. In it you'll find the files and folders that appear in the Deskbar, by default these are <span class="menu">Applications</span>, <span class="menu">Demos</span>, <span class="menu">Deskbar applets</span>, and <span class="menu">Preferences</span>.<br />
-You can delete or add entries like links to applications, documents or even queries by simply copying/deleting them to/from this folder.</p>
+<p>Per quanto alcuni elementi mostrati nella Deskbar non siano modificabili, quelli sotto la voce <span class="menu">Uscita da Haiku...</span> possono, invece, essere modificati.<br />
+In questa sezione, è possibile scegliere il numero di documenti, cartelle e applicazioni recenti da mostrare nell'apposita voce di menu, così come di mostrarli tutti.<br />
+Il pulsante <span class="button">Modifica...</span> mostra nel Tracker la cartella <span class="path">~/config/settings/deskbar/menu/</span>, dove si trovano tutti i file e le cartelle che compaiono nella Deskbar stessa. Quelle predefinite sono <span class="menu">Applicazioni</span>, <span class="menu">Demo</span>, <span class="menu">Applet della Scrivania</span> e <span class="menu">Preferenze</span>.<br />
+È possibile aggiungere o rimuovere applicazioni, documenti o persino interrogazioni semplicemente copiando/cancellando i file in quella cartella.</p>
 <!-- <p _translation_id="432">It's even easier to simply drag a file, folder or saved query and drop it where you want it into the Deskbar.</p> -->
 <div class="box-info"><p>Programs installed from a package automatically put an entry into the Deskbar. Depending on the number of packages you have installed, this can become a bit crowded. If you prefer to have total control, and only want to see applications you link there yourself (possibly in categorizing sub-folders), here's how to do it:<br />
 You create a link of the <span class="path">menu</span> folder in <span class="path">~/config/settings/deskbar/</span> and rename to <span class="path">menu_entries</span>. From Terminal that is achieved with:</p>

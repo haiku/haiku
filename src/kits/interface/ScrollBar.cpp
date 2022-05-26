@@ -13,6 +13,8 @@
 
 #include <ScrollBar.h>
 
+#include <algorithm>
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -993,10 +995,9 @@ BScrollBar::SetBorderHighlighted(bool highlight)
 void
 BScrollBar::GetPreferredSize(float* _width, float* _height)
 {
-	const float scale = be_plain_font->Size() / 12.0f;
 	if (fOrientation == B_VERTICAL) {
 		if (_width)
-			*_width = B_V_SCROLL_BAR_WIDTH * scale;
+			*_width = be_control_look->GetScrollBarWidth(B_VERTICAL);
 
 		if (_height)
 			*_height = _MinSize().Height();
@@ -1005,7 +1006,7 @@ BScrollBar::GetPreferredSize(float* _width, float* _height)
 			*_width = _MinSize().Width();
 
 		if (_height)
-			*_height = B_H_SCROLL_BAR_HEIGHT * scale;
+			*_height = be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 	}
 }
 

@@ -19,19 +19,6 @@
 #include <string.h>
 // ('foo'<>"bar\"")&&!(()||())
 
-static void free_query_tree(query_exp *tree)
-{
-	if (!tree)
-		return;
-	if (tree->op >= B_AND) {
-		free_query_tree(tree->lv.exp);
-		free_query_tree(tree->rv.exp);
-	}
-	free(tree->lv.str);
-	free(tree->rv.str);
-	free(tree);
-}
-
 char *query_unescape_string(const char *q, const char **newq, char delim)
 {
 	int backslash = 0;

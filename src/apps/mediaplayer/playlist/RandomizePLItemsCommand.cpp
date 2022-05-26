@@ -24,16 +24,16 @@ using std::nothrow;
 
 
 RandomizePLItemsCommand::RandomizePLItemsCommand(Playlist* playlist,
-		 const int32* indices, int32 count)
+		 BList indices)
 	:
 	PLItemsCommand(),
 	fPlaylist(playlist),
-	fItems(count > 0 ? new (nothrow) PlaylistItem*[count] : NULL),
-	fListIndices(count > 0 ? new (nothrow) int32[count] : NULL),
-	fRandomInternalIndices(count > 0 ? new (nothrow) int32[count] : NULL),
-	fCount(count)
+	fCount(indices.CountItems()),
+	fItems(fCount > 0 ? new (nothrow) PlaylistItem*[fCount] : NULL),
+	fListIndices(fCount > 0 ? new (nothrow) int32[fCount] : NULL),
+	fRandomInternalIndices(fCount > 0 ? new (nothrow) int32[fCount] : NULL)
 {
-	if (!indices || !fPlaylist || !fItems || !fListIndices
+	if (indices.IsEmpty() || !fPlaylist || !fItems || !fListIndices
 			|| !fRandomInternalIndices) {
 		// indicate a bad object state
 		delete[] fItems;
@@ -41,12 +41,12 @@ RandomizePLItemsCommand::RandomizePLItemsCommand(Playlist* playlist,
 		return;
 	}
 
-	memcpy(fListIndices, indices, fCount * sizeof(int32));
 	memset(fItems, 0, fCount * sizeof(PlaylistItem*));
 
 	// put the available indices into a "set"
 	BList indexSet;
 	for (int32 i = 0; i < fCount; i++) {
+		fListIndices[i] = (int32)(addr_t)indices.ItemAt(i);
 		fItems[i] = fPlaylist->ItemAt(fListIndices[i]);
 		if (fItems[i] == NULL || !indexSet.AddItem((void*)(addr_t)i)) {
 			// indicate a bad object state

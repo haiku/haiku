@@ -1,5 +1,6 @@
 /*
  * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2021, Jerome Duval, jerome.duval@gmail.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -20,7 +21,7 @@
 #include "demangle.h"
 
 
-// C++ ABI: http://www.codesourcery.com/public/cxx-abi/abi.html
+// C++ ABI: https://itanium-cxx-abi.github.io/cxx-abi/abi.html
 
 
 //#define TRACE_GCC3_DEMANGLER
@@ -1297,6 +1298,83 @@ private:
 };
 
 
+class ClonedNode : public ObjectNode {
+public:
+	ClonedNode(Node* clone, ObjectNode* node)
+		:
+		ObjectNode(NULL),
+		fNode(node),
+		fCloneNode(clone)
+	{
+		fNode->SetParent(this);
+		fCloneNode->SetParent(this);
+	}
+
+	virtual bool GetName(NameBuffer& buffer) const
+	{
+		if (!fNode->GetName(buffer))
+			return false;
+		buffer.Append(" ", 1);
+		return _AppendCloneName(buffer);
+	}
+
+	virtual bool GetObjectName(NameBuffer& buffer,
+		const DemanglingParameters& parameters)
+	{
+		if (parameters.objectNameOnly) {
+			if (!fNode->GetObjectName(buffer, parameters))
+				return false;
+			if (!_AppendCloneName(buffer))
+				return false;
+			return buffer.Append(" ", 1);
+		}
+
+		return ObjectNode::GetObjectName(buffer, parameters);
+	}
+
+	virtual Node* GetUnqualifiedNode(Node* beforeNode)
+	{
+		return beforeNode == fCloneNode
+			? fNode->GetUnqualifiedNode(beforeNode)
+			: fCloneNode->GetUnqualifiedNode(beforeNode);
+	}
+
+	virtual bool IsNoReturnValueFunction() const
+	{
+		return fNode->IsNoReturnValueFunction();
+	}
+
+	virtual object_type ObjectType() const
+	{
+		return fNode->ObjectType();
+	}
+
+	virtual prefix_type PrefixType() const
+	{
+		return PREFIX_UNKNOWN;
+	}
+
+	virtual Node* ParameterAt(uint32 index) const
+	{
+		return fNode->ParameterAt(index);
+	}
+
+private:
+	bool _AppendCloneName(NameBuffer& buffer) const
+	{
+		buffer.Append("[clone ");
+		if (!fCloneNode->GetName(buffer))
+			return false;
+		buffer.Append("]");
+		return true;
+	}
+
+private:
+	ObjectNode*	fNode;
+	Node*		fCloneNode;
+};
+
+
 typedef PrefixedNode DependentNameNode;
 
 
@@ -1843,6 +1921,7 @@ private:
 									const char*& versionSuffix,
 									ObjectNode*& _node);
 
+			bool				_ParseClone(ObjectNode*& _node);
 			bool				_ParseEncoding(ObjectNode*& _node);
 			bool				_ParseSpecialName(Node*& _node);
 			bool				_ParseCallOffset(bool& nonVirtual,
@@ -2135,12 +2214,12 @@ Demangler::_Parse(const char* mangledName, const char*& versionSuffix,
 		versionSuffix != NULL
 			? versionSuffix - mangledName : strlen(mangledName));
 
-	// <mangled-name> ::= _Z <encoding>
+	// <mangled-name> ::= _Z <encoding> [<clone-suffix>]*
 
 	if (!fInput.SkipPrefix("_Z"))
 		return ERROR_NOT_MANGLED;
 
-	if (!_ParseEncoding(_node))
+	if (!_ParseEncoding(_node) || !_ParseClone(_node))
 		return fError;
 
 	if (fInput.CharsRemaining() != 0) {
@@ -2149,6 +2228,34 @@ Demangler::_Parse(const char* mangledName, const char*& versionSuffix,
 	}
 
 	return ERROR_OK;
+}
+
+
+bool
+Demangler::_ParseClone(ObjectNode*& _node)
+{
+	DEBUG_SCOPE("_ParseClone");
+
+	while (fInput.HasPrefix('.')) {
+		int count = fInput.CharsRemaining();
+		int i = 1;
+		while (true) {
+			for (; i < count && fInput[i] != '.'; i++)
+				;
+			if (i + 1 >= count || fInput[i + 1] < '0' || fInput[i + 1] > '9')
+				break;
+			i++;
+		}
+		if (i == 1)
+			break;
+		Node* clone;
+		if (!_CreateNodeAndSkip(fInput.String(), i, i, clone))
+			return false;
+
+		if (!NodeCreator<ClonedNode>(this)(clone, _node, _node))
+			return false;
+	}
+	return true;
 }
 
 
@@ -2176,7 +2283,8 @@ Demangler::_ParseEncoding(ObjectNode*& _node)
 	if (!_ParseName(name))
 		return false;
 
-	if (fInput.CharsRemaining() == 0 || fInput.HasPrefix('E')) {
+	if (fInput.CharsRemaining() == 0 || fInput.HasPrefix('E')
+		|| fInput.HasPrefix('.')) {
 		// <data name>
 		return NodeCreator<ObjectNode>(this)(name, _node);
 	}
@@ -3225,8 +3333,9 @@ Demangler::_ParseBareFunctionType(FunctionNode* node)
 			return false;
 
 		node->AddType(typeNode);
-	} while (fInput.CharsRemaining() > 0 && fInput[0] != 'E');
-		// 'E' delimits <function-type>
+	} while (fInput.CharsRemaining() > 0 && fInput[0] != 'E'
+		&& fInput[0] != '.');
+		// 'E' und '.' delimit <function-type>
 
 	return true;
 }
@@ -3885,7 +3994,6 @@ get_next_argument_gcc3(uint32* _cookie, const char* mangledName, char* name,
 const char*
 demangle_name_gcc3(const char* mangledName, char* buffer, size_t bufferSize)
 {
-
 	Demangler demangler;
 	DemanglingInfo info(false);
 	if (demangler.Demangle(mangledName, buffer, bufferSize, info) != ERROR_OK)

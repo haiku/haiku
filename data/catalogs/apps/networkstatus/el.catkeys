@@ -1,5 +1,5 @@
-1	greek, modern (1453-)	x-vnd.Haiku-NetworkStatus	186344131
-Netmask	NetworkStatusView		Μάσκα Δικτύου
+1	greek, modern (1453-)	x-vnd.Haiku-NetworkStatus	2828540217
+IPv6 address:	NetworkStatusView		Διεύθυνση IPv6:
 Quit	NetworkStatusView		Έξοδος
 Unknown	NetworkStatusView		Άγνωστο
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Η εκκίνηση του βοηθητικού προγράμματος δικτύου απέτυχε.\n\nΣφάλμα: 
@@ -7,16 +7,17 @@ Install in Deskbar	NetworkStatus		Εγκατάσταση στην Γραμμή �
 NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Ρυθμίσεις Κατάστασης Δικτύου :\n\t--deskbar\tαυτόματη προσθήκη ρέπλικας στην γραμμή εργασιών\n\t--help\t\tεκτύπωση του μηνύματος αυτού και έξοδος
 Open network preferences…	NetworkStatusView		Άνοιγμα ρυθμίσεων δικτύου…
 NetworkStatus	System name		Κατάσταση Δικτύου
+Broadcast:	NetworkStatusView		Διεύθυνση broadcast:
 OK	NetworkStatusView		Εντάξει
 No link	NetworkStatusView		Χωρίς σύνδεσμο
 Could not join wireless network:\n	NetworkStatusView		Αδυναμία σύνδεσης στο ασύρματο δίκτυο:\n
 Ready	NetworkStatusView		Έτοιμο
 Network Status	NetworkStatusView		Κατάσταση Δικτύου
-Address	NetworkStatusView		Διεύθυνση
 Deskbar is not running, giving up.	NetworkStatus		Η Γραμμή Εργασιών δεν εκτελείται, δεν είναι δυνατή η λειτουργία αυτή.
+Netmask:	NetworkStatusView		Μάσκα δικτύου:
 No stateful configuration	NetworkStatusView		Καμία stateful ρύθμιση
 You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Μπορείτε να εκτελέσετε την εφαρμογή Κατάστασης Δικτύου σε ένα παράθυρο ή να το τοποθετήσετε στην Γραμμή Εργασιών.
-Broadcast	NetworkStatusView		Αναμετάδοση
+IPv4 address:	NetworkStatusView		Διεύθυνση IPv4:
 %ifaceName information:\n	NetworkStatusView		%ifaceΠληροφορίες ονόματος:\n
 Run in window	NetworkStatus		Εκτέλεση σε παράθυρο
 <no wireless networks found>	NetworkStatusView		<δεν βρέθηκαν ασύρματα δίκτυα>

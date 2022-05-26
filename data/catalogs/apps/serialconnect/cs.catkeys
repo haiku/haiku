@@ -1,0 +1,37 @@
+1	czech	x-vnd.haiku.SerialConnect	354154115
+Hardware	SerialWindow	Flowcontrol	Hardwarový
+Connection	SerialWindow		Připojení
+Raw send…	SerialWindow		Odeslat syrová data…
+Baud rate	SerialWindow		Přenosová rychlost
+Stop bits	SerialWindow		Stop bitů
+None	SerialWindow	Flowcontrol	Žádné
+Cancel	Custom baudrate window		Zrušit
+Sending…	XModemStatus		Odesílám…
+<no serial port available>	SerialWindow		<žádný sériový port není dostupný>
+Log to file…	SerialWindow		Zapisovat do souboru…
+Custom baudrate	Custom baudrate window		Vlastní přenosová rychlost
+File	SerialWindow		Soubor
+SerialConnect	System name		Konzole sériového portu
+custom…	SerialWindow	Baudrate	vlastní…
+Parity	SerialWindow		Parita
+None	SerialWindow	Parity	Žádná
+Disconnect	SerialWindow		Odpojit
+Everything sent, waiting for acknowledge	XModemStatus		Vše odesláno, čekám na potvrzení
+Odd	SerialWindow	Parity	Lichá
+Flow control	SerialWindow		Řízení toku
+file transfer progress	SerialWindow		postup přenosu souboru
+CRC requested	XModemStatus		vyžádáno CRC
+Data bits	SerialWindow		Datové bity
+Both	SerialWindow	Flowcontrol	Obojí
+Edit	SerialWindow		Upravit
+XModem send…	SerialWindow		Odeslat přes XModem…
+Baudrate:	Custom baudrate window		Přenosová rychlost:
+OK	Custom baudrate window		OK
+Waiting for receiver…	XModemStatus		Čekám na příjemce…
+Clear history	SerialWindow		Smazat historii
+Checksum error, re-send block	XModemStatus		Neplatný kontrolní součet, blok přeposílám znovu
+Settings	SerialWindow		Nastavení
+Even	SerialWindow	Parity	Sudá
+Software	SerialWindow	Flowcontrol	Softwarový
+Line terminator	SerialWindow		Konec řádku
+Remote cancelled transfer	XModemStatus		Přenos vzdáleně přerušen

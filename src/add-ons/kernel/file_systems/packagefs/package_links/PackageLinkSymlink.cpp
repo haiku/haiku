@@ -187,7 +187,7 @@ status_t
 PackageLinkSymlink::OpenAttribute(const StringKey& name, int openMode,
 	AttributeCookie*& _cookie)
 {
-	if (fPackage.Get() == NULL)
+	if (!fPackage.IsSet())
 		return B_ENTRY_NOT_FOUND;
 
 	return AutoPackageAttributes::OpenCookie(fPackage, name, openMode, _cookie);

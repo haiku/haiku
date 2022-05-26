@@ -1,0 +1,20 @@
+1	german	application/x-vnd.Cortex.TransportView	830089250
+(none)	TransportView		(kein)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# Node} other{# Nodes}}
+Start	TransportView		Start
+No errors.	TransportView		Keine Fehler
+to	TransportView		zu
+Offline	TransportView		Offline
+(???)	TransportView		(???)
+Stop	TransportView		Stopp
+(no group)	TransportView		(keine Gruppe)
+Drop data	TransportView		Daten verwefen
+To:	TransportView		Zu:
+Recording	TransportView		Aufnahme
+Increase latency	TransportView		Latenz erhöhen
+Time source:	TransportView		Zeitquelle:
+DAC time source	TransportView		DAC Zeitquelle
+Decrease precision	TransportView		Genauigkeit verringern
+System clock	TransportView		Systemuhr
+From:	TransportView		Von:
+Run mode:	TransportView		Laufmodus:

@@ -59,7 +59,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			VideoSupplier.cpp
 			VideoTarget.cpp
 
-			# plylist
+			# playlist
 			CopyPLItemsCommand.cpp
 			FilePlaylistItem.cpp
 			ImportPLItemsCommand.cpp
@@ -69,6 +69,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			PlaylistItem.cpp
 			PlaylistListView.cpp
 			PlaylistObserver.cpp
+			PlaylistFileReader.cpp
 			PlaylistWindow.cpp
 			PLItemsCommand.cpp
 			RandomizePLItemsCommand.cpp
@@ -105,7 +106,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ListenerAdapter.cpp
 			MessageEvent.cpp
 			Notifier.cpp
-			SettingsMessage.cpp
 			StackBlurFilter.cpp
 
 			# .

@@ -1,0 +1,34 @@
+1	romanian	application/x-vnd.Cortex.MediaRoutingView	3442339205
+Lock group	MediaNodePanel		Blochează grupul
+%refname% (no file)	MediaNodePanel		%refname% (niciun fișier)
+Video output	MediaRoutingView		Ieșire video
+Icon view	MediaRoutingView		Vizualizare pictogramă
+OK	MediaRoutingView		OK
+Cycle	MediaNodePanel		Ciclu
+Advanced	MediaNodePanel		Avansat
+Audio input	MediaRoutingView		Intrare audio
+Run mode	MediaNodePanel		Mod de rulare
+Could not load '%filename%'	MediaRoutingView		Nu s-a putut încărca „%filename%”
+Stop time source	MediaNodePanel		Oprește sursa de timp
+Be Audio Mixer	MediaRoutingView		Mixer audio Be
+Video input	MediaRoutingView		Intrare video
+Release	MediaNodePanel		Eliberează
+Disconnect	MediaRoutingView		Deconectează
+Could not disconnect	MediaRoutingView		Nu s-a putut deconecta
+Could not instantiate '%infoname%'	MediaRoutingView		Nu s-a putut instanția „%infoname%”
+Mini icon view	MediaRoutingView		Vizualizare mini-pictogramă
+Select all	MediaRoutingView		Selectează toate
+(same as group)	MediaNodePanel		(la fel ca grup)
+Input	MediaJack		Intrare
+Get info	MediaJack		Obține informații
+Start time source	MediaNodePanel		Pornește sursa de timp
+Error	MediaRoutingView		Eroare
+Could not release '%refname%'	MediaRoutingView		Nu s-a putut elibera „%refname%”
+Output	MediaJack		Ieșire
+Get info	MediaNodePanel		Obține informații
+Get info	MediaRoutingView		Obține informații
+Clean up	MediaRoutingView		Curăță
+Start control panel	MediaNodePanel		Pornește panoul de control
+Tweak parameters	MediaNodePanel		Ajustează parametrii
+Could not connect	MediaRoutingView		Nu s-a putut conecta
+Unlock group	MediaNodePanel		Deblochează grupul

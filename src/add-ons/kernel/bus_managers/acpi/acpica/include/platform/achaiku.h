@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -165,8 +165,8 @@ struct mutex;
 #define ACPI_MUTEX_TYPE             ACPI_OSL_MUTEX
 #define ACPI_MUTEX                  struct mutex *
 
-#define ACPI_USE_NATIVE_MATH64
 #define ACPI_USE_NATIVE_DIVIDE
+#define ACPI_USE_NATIVE_MATH64
 
 /* #define ACPI_THREAD_ID               thread_id */
 
@@ -182,12 +182,6 @@ struct mutex;
 #define ACPI_MACHINE_WIDTH          64
 #else
 #define ACPI_MACHINE_WIDTH          32
-/* Note: Previously we used to force 32 bit addressing:
-   #define ACPI_32BIT_PHYSICAL_ADDRESS
-   Currently causes ACPI to fail and may not be needed
-   anymore.
-   See #13929 and #12377
-*/
 #endif
 
 
@@ -199,10 +193,7 @@ struct mutex;
 
 #define ACPI_FLUSH_CPU_CACHE() __asm __volatile("wbinvd");
 
-/* Based on FreeBSD's due to lack of documentation
-   DO NOT REMOVE, the fallback is no ops, which means
-   HW <-> OS sync is not done => garbled data..
-*/
+/* Based on FreeBSD's due to lack of documentation */
 extern int AcpiOsAcquireGlobalLock(uint32 *lock);
 extern int AcpiOsReleaseGlobalLock(uint32 *lock);
 

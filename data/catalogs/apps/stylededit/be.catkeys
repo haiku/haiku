@@ -3,8 +3,8 @@ Document statistics	Statistics		Статыстыка дакументу
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Немагчыма вярнуцца, файл \"%s\" ня знойдзены.
 Cut	Menus		Выразаць
 Center	Menus		Цэнтар
-Wrap-around search	FindandReplaceWindow		Пошук з пераходам
 Page setup…	Menus		Наладкі старонкі…
+Wrap-around search	FindandReplaceWindow		Пошук з пераходам
 Untitled 	StyledEditWindow		Без назвы 
 OK	Statistics		ОК
 Find	FindandReplaceWindow		Шукаць
@@ -28,8 +28,8 @@ Italic	Menus		Нахілены
 Can't undo	Menus		Немагчыма адмяніць
 Replace…	Menus		Замяняць…
 File	Menus		Файл
-Bold	Menus		Тлусты
 Paste	Menus		Уставіць
+Bold	Menus		Тлусты
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Файл \"%file%\" быў мадыфікаваны іншай праграмай, перачытаць?
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Файл \"%file%\" быў выдалены іншай праграмай, аднавіць яго?
 Lines:	Statistics		Радкоў:
@@ -67,22 +67,22 @@ OK	LoadAlert		Так
 Save	QuitAlert		Захаваць
 Case-sensitive	FindandReplaceWindow		З улікам рэгістру
 Find selection	Menus		Шукаць пазначанае
-Cancel	SaveAlert		Адмена
 Find…	Menus		Пошук…
+Cancel	SaveAlert		Адмена
 Revert	RevertToSavedAlert		Вярнуць
 Size	Menus		Памер
 Autodetect	Menus		Аўтаматычна
 Replace next	Menus		Замяніць наступны
 OK	QuitAlert		Так
-Replace with:	FindandReplaceWindow		Змяніць на:
 Edit	Menus		Рэдагаваць
+Replace with:	FindandReplaceWindow		Змяніць на:
 Open…	Menus		Адкрыць…
 Save as…	Menus		Захаваць як…
 Replace	FindandReplaceWindow		Замяніць
 Characters:	Statistics		Знакаў:
 Don't save	QuitAlert		Не захоўваць
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Гэты файл пазначаны толькі для чытання. Захаваць змены ў дакумент \"%s\"? 
-Align	Menus		Раўнаванне
 Font	Menus		Шрыфт
+Align	Menus		Раўнаванне
 Select all	Menus		Абраць усё
 Right	Menus		Права

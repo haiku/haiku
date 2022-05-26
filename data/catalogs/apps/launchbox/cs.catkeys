@@ -1,0 +1,36 @@
+1	czech	x-vnd.Haiku-LaunchBox	1530497419
+Set description…	LaunchBox		Nastavit popis...
+Really close this pad?\n(The pad will not be remembered.)	LaunchBox		Určitě chcete tento blok zavřít?\n(Nebude zapamatován.)
+OK	LaunchBox		OK
+Ignore double-click	LaunchBox		Ignorovat dvojklik
+Show on all workspaces	LaunchBox		Zobrazit na všech plochách
+Name Panel	LaunchBox		Panel názvu
+Autostart	LaunchBox		Automatické spuštění
+Clone	LaunchBox		Klonovat
+Description for '%3'	LaunchBox		Popis pro '%3'
+Show window border	LaunchBox		Zobrazit okraj okna
+\n\nFailed to launch application with signature '%2'.\n\nError:	LaunchBox		\n\nNepodařilo se spustit aplikaci s podpisem '%2'.\n\nChyba:
+Failed to launch 'something', error in Pad data.	LaunchBox		Nepodařilo se spustit 'something', chyba v datové oblasti.
+LaunchBox	System name		Spouštěč
+Auto-raise	LaunchBox		Automaticky vyvolat
+Icon size	LaunchBox		Velikost ikony
+Open containing folder	LaunchBox		Otevřít složku obsahující
+Add button here	LaunchBox		Přidat sem tlačítko
+Cancel	LaunchBox		Zrušit
+launch popup	LaunchBox		spustit popup
+Clear button	LaunchBox		Vymazat tlačítko
+Bummer	LaunchBox		OK
+last chance	LaunchBox		poslední možnost
+You can drag an icon here.	LaunchBox		Můžete přetáhnout ikonu sem.
+Pad 1	LaunchBox		Blok 1
+Failed to launch '%1'.\n\nError:	LaunchBox		Spuštění selhalo '%1'.\n\nChyba:
+Settings	LaunchBox		Volby
+Vertical layout	LaunchBox		Vertikální rozložení
+Pad	LaunchBox		Blok
+Close	LaunchBox		Zavřít
+Remove button	LaunchBox		Odstranit tlačítko
+Quit	LaunchBox		Ukončit
+Horizontal layout	LaunchBox		Horizontální rozvržení
+New	LaunchBox		Nový
+Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Příkaz 'open folder' se nepodařilo odeslat do Trackeru.\n\nChyba: 
+Pad %1	LaunchBox		Blok %1

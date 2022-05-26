@@ -1,0 +1,33 @@
+/*
+ * Copyright 2019 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
+ */
+
+/*!
+\page libroot C, POSIX, GNU and BSD functions
+
+Haiku implements a standard library containing the standard functions from C
+(https://www.iso.org/standard/29237.html) and POSIX
+(https://pubs.opengroup.org/onlinepubs/9699919799/). These functions are
+available in libroot, which is linked in by default.
+
+For convenience and POSIX compatibility, empty "m" and "pthread" libraries are
+also provided, but the math and thread functions are also defined in libroot.
+
+The C library also contains a number of GNU and BSD extensions to the C and
+POSIX standards. The BSD extensions are enabled by default unless a specific
+version of the C standard is requested from the compiler command line (for
+example by using the --std=c99 switch). In case you want to set the compiler
+to strict C99 but still use these extensions, you need to define _DEFAULT_SOURCE
+(with a \#define preprocessor directive, or from the command line).
+
+The GNU extensions are not enabled by default, but can be enabled by defining
+_GNU_SOURCE.
+
+The GNU and BSD extensions are in a separate library, so the -lbsd linker flag
+may be needed to use them.
+
+*/

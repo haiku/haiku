@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaPlayer	1961774506
+1	ukrainian	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Видалити запис до смітника
 Close	MediaPlayer-PlaylistWindow		Закрити
 Volume of background clips	MediaPlayer-SettingsWindow		Гучність фонових кліпів
@@ -6,15 +6,15 @@ Use hardware video overlays if available	MediaPlayer-SettingsWindow		Апара�
 Audio	MediaPlayer-InfoWin		Аудіо
 Subtitle placement:	MediaPlayer-SettingsWindow		Розміщення субтитрів:
 MediaPlayer	System name		MediaPlayer
-Audio track	MediaPlayer-Main		Аудіо трек
-Muted	MediaPlayer-SettingsWindow		Приглушений
+Audio track	MediaPlayer-Main		Аудіотрек
+Muted	MediaPlayer-SettingsWindow		Без звуку
 OK	MediaPlayer-RemovePLItemsCmd		ОК
 Open Playlist	MediaPlayer-PlaylistWindow		Відкрити список відтворення
 Subtitles	MediaPlayer-Main		Субтитри
 %app% encountered an internal error. The file could not be opened.	MediaPlayer-Main		%app% викликав внутрішню помилку. Файл неможливо відкрити.
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
 File info	MediaPlayer-InfoWin		Інформація про файл
-raw audio	MediaPlayer-InfoWin		raw аудіо
+raw audio	MediaPlayer-InfoWin		необроблене аудіо
 Select all	MediaPlayer-PlaylistWindow		Вибрати все
 New player…	MediaPlayer-Main		Новий програвач…
 Move Entries	MediaPlayer-MovePLItemsCmd		Перемістити записи
@@ -27,13 +27,14 @@ Import Entries	MediaPlayer-ImportPLItemsCmd		Імпортувати записи
 Open network stream	MediaPlayer-Main		Відкрити мережевий потік
 Move file to Trash	MediaPlayer-PlaylistWindow		Перемістити до смітника
 Open file…	MediaPlayer-Main		Відкрити файл…
-Scale controls in full screen mode	MediaPlayer-SettingsWindow		Управління маштабом в повноекранному режимі
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Масштабувати кнопки управління в повноекранному режимі
 View options	MediaPlayer-SettingsWindow		Опції перегляду
 %d kHz	MediaPlayer-InfoWin		%d кГц
+Eject Device	MediaPlayer-Main		Вийняти пристрій
 Full volume	MediaPlayer-SettingsWindow		Повна гучність
 <untitled>	PlaylistItem-title		<без імені>
 Start media server	MediaPlayer-Main		Запустити Медіа сервер
-It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Схоже медіа сервер не працює.\nБажаєте запустити його?
+It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Схоже, медіа сервер не працює.\nБажаєте запустити його?
 Location	MediaPlayer-InfoWin		Шлях
 Opening '%s'.	MediaPlayer-Main		Відкриття '%s'.
 Medium	MediaPlayer-SettingsWindow		Середній
@@ -50,10 +51,10 @@ Copyright	MediaPlayer-InfoWin		Авторське право
 Invalid URL inserted!	MediaPlayer-NetworkStream		Помилка введення URL!
 Aspect ratio	MediaPlayer-Main		Співідношення сторін
 Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Збій збереження списку відтворення.\n\nПомилка: 
-<no media>	MediaPlayer-InfoWin		<немає даних>
+<no media>	MediaPlayer-InfoWin		<відсутні медіа>
 Hide interface	MediaPlayer-Main		Приховати інтерфейс
 Error: 	MediaPlayer-Main		Помилка: 
-Video track	MediaPlayer-Main		Відео трек
+Video track	MediaPlayer-Main		Відеокліп
 Playlist…	MediaPlayer-Main		Список відтворення…
 <unnamed media>	MediaPlayer-InfoWin		<неназване медіа>
 Save	MediaPlayer-PlaylistWindow		Зберегти
@@ -84,7 +85,7 @@ Total duration: %s	MediaPlayer-PlaylistWindow		Загальна триваліс
 %.3f kHz	MediaPlayer-InfoWin		%.3f кГц
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Помилка переміщення до смітника
 50% scale	MediaPlayer-Main		Масштаб 50%
-Drop files to play	MediaPlayer-Main		Скинути файли для відтворення
+Drop files to play	MediaPlayer-Main		Перетягніть файли для відтворення
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Копіювати запис
 Close window after playing audio	MediaPlayer-SettingsWindow		Закрити вікно після відтворення звуку
 Edit	MediaPlayer-PlaylistWindow		Редагувати
@@ -103,7 +104,7 @@ Overlay	MediaPlayer-InfoWin		Накладання
 Rating	MediaPlayer-Main		Рейтинг
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (нестача памяті). Збій збереження списку відтворення.
 Video	MediaPlayer-Main		Відео
-There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Не встановлено декодера для підтримки файла цього формату, або у декодера є проблема з спеціальною версією формату.
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Відсутній декодер для обробки файлів такого типу, або декодер не розпізнає конкретну версію формату.
 Lock Peaks	MediaPlayer-PeakView		Блокувати піки
 none	Audio track menu		пусто
 Open network stream	MediaPlayer-NetworkStream		Відкрити мережевий потік
@@ -117,7 +118,7 @@ min	MediaPlayer-InfoWin	Minutes	хв
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Збій збереження списку відтворення:\n\nПомилка: 
 Video	MediaPlayer-InfoWin		Відео
 File info…	MediaPlayer-Main		Інформація про файл…
-1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амер.)
+1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американський)
 <unnamed>	PlaylistItem-name		<неназваний>
 Track	Video Track Menu		Трек
 Full screen	MediaPlayer-Main		Повний екран
@@ -125,17 +126,17 @@ OK	MediaPlayer-NetworkStream		ОК
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (збій блокування). Збій збереження списку відтворення.
 100% scale	MediaPlayer-Main		Масштаб 100%
 <nothing to redo>	MediaPlayer-PlaylistWindow		<нічого повторити>
-Bad URL	MediaPlayer-NetworkStream		Невірний URL
+Bad URL	MediaPlayer-NetworkStream		Недійсний URL
 Save	MediaPlayer-Main		Зберегти
 Close window after playing video	MediaPlayer-SettingsWindow		Закрити вікно після відтворення відео
-Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Масштаб зображення зглажений (без режиму накладання)
+Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Плавно масштабувати відео (без режиму накладання)
 200% scale	MediaPlayer-Main		Масштаб 200%
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' неможливо відкрити.\n\n
-None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Жоден з файлів, які Ви хотіли відкрити не є медіа файлом.
+None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Жоден із файлів, які Ви хотіли відтворити не є файлом медіа.
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Видалити запис
 Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Вилучити записи до смітника
 Subtitle size:	MediaPlayer-SettingsWindow		Розмір субтитрів:
-No aspect correction	MediaPlayer-Main		Немає корекції погляду
+No aspect correction	MediaPlayer-Main		Без корекції формату
 raw video	MediaPlayer-InfoWin		необроблене відео
 Container	MediaPlayer-InfoWin		Контейнер
 none	MediaPlayer-Main		пусто

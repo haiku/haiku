@@ -1,0 +1,25 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network ether intel22x ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_iflib compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev igc ] ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ] ;
+
+KernelAddon intel22x :
+	glue.c
+	if_igc.c
+	igc_api.c
+	igc_base.c
+	igc_i225.c
+	igc_mac.c
+	igc_nvm.c
+	igc_phy.c
+	igc_txrx.c
+	: freebsd_iflib.a libfreebsd_network.a
+	;

@@ -2,8 +2,8 @@
  * Copyright 2002-2012 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _ARCH_SIGNAL_H_
-#define _ARCH_SIGNAL_H_
+#ifndef _ARCH_X86_SIGNAL_H_
+#define _ARCH_X86_SIGNAL_H_
 
 
 /*
@@ -148,4 +148,4 @@ struct vregs {
 
 #endif /* __i386__ */
 
-#endif /* _ARCH_SIGNAL_H_ */
+#endif /* _ARCH_X86_SIGNAL_H_ */

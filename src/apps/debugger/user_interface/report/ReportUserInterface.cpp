@@ -38,7 +38,8 @@ ReportUserInterface::~ReportUserInterface()
 	if (fShowSemaphore >= 0)
 		delete_sem(fShowSemaphore);
 
-	fTeam->RemoveListener(this);
+	if (fTeam != NULL)
+		fTeam->RemoveListener(this);
 }
 
 

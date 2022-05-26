@@ -25,7 +25,7 @@
 <body>
 
 <div id="banner">
-<div><span>User guide</span></div>
+<div><span>ユーザーガイド</span></div>
 </div>
 
 <div class="nav">
@@ -37,6 +37,7 @@
 <li><a href="../../de/preferences/appearance.html">Deutsch</a></li>
 <li><a href="../../en/preferences/appearance.html">English</a></li>
 <li><a href="../../es/preferences/appearance.html">Español</a></li>
+<li><a href="../../eo/preferences/appearance.html">Esperanto</a></li>
 <li><a href="../../fr/preferences/appearance.html">Français</a></li>
 <li><a href="../../fur/preferences/appearance.html">Furlan</a></li>
 <li><a href="../../it/preferences/appearance.html">Italiano</a></li>
@@ -80,7 +81,7 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="installing_fonts" name="installing_fonts">新しいフォントのインストール</a></h3>
-<p>正規の .hpkg パッケージではない新しいフォントをインストールするには、フォントの種類 (<tt>psfonts</tt> または <tt>ttfonts</tt>) に応じた<tt>non-packaged</tt> フォルダーのサブフォルダーへコピーします (<a href="../filesystem-layout.html">ファイルシステムレイアウト</a>のトピックを参照ください)。TrueType フォントでは、コピー先は以下のようになるでしょう。</p>
+<p>正規の .hpkg パッケージではない新しいフォントは、<tt>non-packaged</tt> フォルダーのフォントの種類 (<tt>psfonts</tt> または <tt>ttfonts</tt>) に応じたサブフォルダーへコピーすることでインストールできます。 (<a href="../filesystem-layout.html">ファイルシステムレイアウト</a>のトピックを参照ください)。TrueType フォントでは、コピー先は以下のようになるでしょう。</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>すべてのユーザー用フォント</td></tr>
 <tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>ユーザーの専用フォント</td></tr>
@@ -90,12 +91,12 @@
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">色 (Colors)</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p><span class="menu">色 (Colors)</span> タブで、ユーザーインターフェースの各部の色を変更できます。カラーウェルは、ほかのアプリケーションからのドラッグ＆ドロップを受け付けるので、たとえば、<span class="app">WonderBrush</span>、<span class="app">Icon-O-Matic</span>、または<span class="app">背景</span>パネルなどから色をドラッグできます。</p>
+<p><span class="menu">色 (Colors)</span> タブで、ユーザーインターフェースの各部の色を変更できます。カラーウェルは、ほかのアプリケーションからのドラッグ＆ドロップを受け付けます。たとえば、<span class="app">WonderBrush</span>、<span class="app">Icon-O-Matic</span>、または<span class="app">背景</span>パネルなどから色をドラッグできます。</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="decorators" name="decorators">ウィンドウデコレーター (Window decorators)</a></h2>
 <img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
-<p>デコレーターは、ウィンドウや GUI 要素のルックアンドフィールを決定します。現在、Haiku にはデフォルトデコレーターが 1 つだけ付属しています。ほかのデコレーターを探してインストールすれば、ポップアップメニューからべつのデコレーターを選択できるでしょう。</p>
+<p>デコレーターは、ウィンドウや GUI 要素のルックアンドフィールを決定します。現在、Haiku にはデフォルトデコレーター 1 つだけが付属しています。ほかのデコレーターを探してインストールすれば、ポップアップメニューからべつのデコレーターを選択できるでしょう。</p>
 <p>デフォルトデコレーターでは、スクロールバーの矢印スタイルを設定できます。スクロールバーの終端を、スペースを節約できる単独の矢印にするか、上下左右にスクロールする際にマウスの移動を潜在的にいくらか減らせる— 伝統的な BeOS の方法 —上下矢印にするかを設定できます。</p>
 
 <h2>
@@ -133,7 +134,7 @@
 <p><br /></p>
 <p>設定パネルの下に、次の 2 つのボタンがあります。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">デフォルト (Defaults)</span></td><td> </td><td>すべてをデフォルト値にリセット。</td></tr>
+<tr><td><span class="button">デフォルト (Defaults)</span></td><td> </td><td>すべての設定をデフォルト値にリセットします。</td></tr>
 <tr><td><span class="button">元に戻す (Revert)</span></td><td> </td><td>外観プレファレンスを起動したときの設定に戻します。</td></tr>
 </table>
 

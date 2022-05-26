@@ -1,20 +1,41 @@
-1	russian	x-vnd.Haiku-CharacterMap	124574598
+1	russian	x-vnd.Haiku-CharacterMap	3635187938
+Tirhuta	UnicodeBlocks		Тирхута
 Miscellaneous mathematical symbols B	UnicodeBlocks		Разнообразные математические символы B
+Latin extended E	UnicodeBlocks		Расширенная латиница E
+Dogra	UnicodeBlocks		Догра
+Javanese	UnicodeBlocks		Яванский
 Saurashtra	UnicodeBlocks		Саураштра
 Arabic supplement	UnicodeBlocks		Арабский дополнительные
 Hanunoo	UnicodeBlocks		Хануноо
 Ogham	UnicodeBlocks		Огамический
+Inscriptional Pahlavi	UnicodeBlocks		Пехлеви с надписью
 Hebrew	UnicodeBlocks		Иврит
 Katakana	UnicodeBlocks		Катакана
+Miao	UnicodeBlocks		Мяо
+Mro	UnicodeBlocks		Мро
 Mongolian	UnicodeBlocks		Монгольский
+Pau Cin Hau	UnicodeBlocks		По Чин Хау
+Yezidi	UnicodeBlocks		Езидское письмо
 Linear B ideograms	UnicodeBlocks		Идеограммы линейного письма Б
+Caucasian Albanian	UnicodeBlocks		Кавказско-албанский
+CJK unified ideographs extension D	UnicodeBlocks		Объединенные иероглифы CJK блок D
+Sharada	UnicodeBlocks		Шарада
 Multani	UnicodeBlocks		Мултани
+Linear A	UnicodeBlocks		Линейное А
 CJK compatibility ideographs Supplement	UnicodeBlocks		Дополнительные CJK совместимые иероглифы
+Pahawh Hmong	UnicodeBlocks		Пахау хмонг
 Bopomofo extended	UnicodeBlocks		Расширенный бопомото
+Bassa Vah	UnicodeBlocks		Басса
+Georgian extended	UnicodeBlocks		Грузинский расширенный
 Mathematical alphanumeric symbols	UnicodeBlocks		Математические буквенно-цифровые символы
 Coptic	UnicodeBlocks		Коптский
+Masaram Gondi	UnicodeBlocks		Масарам Гонди
 Cuneiform numbers and punctuation	UnicodeBlocks		Клинописные цифры и знаки пунктуации
 Miscellaneous symbols	UnicodeBlocks		Разнообразные символы
+Kana supplement	UnicodeBlocks		Дополнение кана
+Medefaidrin	UnicodeBlocks		Медефайдрин
+Enclosed ideographic supplement	UnicodeBlocks		Дополнение к обрамлённым идеографическим символам
+Warang Citi	UnicodeBlocks		Варанг-кшити
 Vertical forms	UnicodeBlocks		Вертикальные формы
 Miscellaneous mathematical symbols A	UnicodeBlocks		Различные математические символы A
 CharacterMap	System name		Карта символов
@@ -22,23 +43,33 @@ Latin extended D	UnicodeBlocks		Расширенная латиница D
 Aegean numbers	UnicodeBlocks		Эгейские цифры
 Hangul syllables	UnicodeBlocks		Хангулийские слоги
 Modifier tone letters	UnicodeBlocks		Модификаторы тона
+Kaithi	UnicodeBlocks		Кайтхи
+Psalter Pahlavi	UnicodeBlocks		Псалтирь Пехлеви
 Newa	UnicodeBlocks		Нева
 View	CharacterWindow		Вид
+Rumi numeral symbols	UnicodeBlocks		Цифры системы руми
 Enclosed CJK letters and months	UnicodeBlocks		Вложенные буквы и месяцы CJK
 Deseret	UnicodeBlocks		Дезерет
 Cham	UnicodeBlocks		Чамская письменность
 Cyrillic	UnicodeBlocks		Кириллица
+Makasar	UnicodeBlocks		Макасарское письмо
+Palmyrene	UnicodeBlocks		Пальмирен
 Shavian	UnicodeBlocks		Шавианский
 Tangut	UnicodeBlocks		Тангутское письмо
+CJK unified ideographs extension C	UnicodeBlocks		Объединенные иероглифы CJK блок С
 Ancient Greek musical notation	UnicodeBlocks		Древнегреческие музыкальные символы
 Thai	UnicodeBlocks		Тайский
 Ethiopic supplement	UnicodeBlocks		Эфиопские дополнения
+Chess symbols	UnicodeBlocks		Шахматные символы
 Yijing hexagram symbols	UnicodeBlocks		Гексаграммы Ицзин
+Ottoman Siyaq numbers	UnicodeBlocks		Османские числа Cиак
 Ideographic symbols and punctuation	UnicodeBlocks		Идеографические символы и пунктуация
 File	CharacterWindow		Файл
+Sudanese supplement	UnicodeBlocks		Суданское дополнение
 Myanmar	UnicodeBlocks		Мьянма
 Tifinagh	UnicodeBlocks		Тифинаг
 Musical symbols	UnicodeBlocks		Музыкальные символы
+Bamum supplement	UnicodeBlocks		Дополнение Бамум
 Arabic presentation forms B	UnicodeBlocks		Арабские формы представления B
 Cypriot syllabary	UnicodeBlocks		Кипрский алфавит
 IPA extensions	UnicodeBlocks		Расширения IPA
@@ -47,7 +78,12 @@ N'Ko	UnicodeBlocks		Н'ко
 Cherokee supplement	UnicodeBlocks		Дополнения чероки
 Halfwidth and fullwidth forms	UnicodeBlocks		Полуширинные и полноширинные формы
 Counting rod numerals	UnicodeBlocks		Цифры счетных палочек
+Sora Sompeng	UnicodeBlocks		Сора Сомпенг
+Supplemental arrows C	UnicodeBlocks		Дополнительные стрелки C
+Alchemical symbols	UnicodeBlocks		Алхимические символы
 Latin extended C	UnicodeBlocks		Латинский расширение C
+Old Turkic	UnicodeBlocks		Древнетюркский
+Meroitic hieroglyphs	UnicodeBlocks		Меройские иероглифы
 Combining diacritical marks for symbols	UnicodeBlocks		Комбинируемые диакритические знаки для символов
 Osage	UnicodeBlocks		Осейдж
 Combining diacritical marks supplement	UnicodeBlocks		Дополнительные комбинированные диакритические знаки
@@ -57,111 +93,170 @@ Georgian	UnicodeBlocks		Грузинский
 CJK compatibility forms	UnicodeBlocks		Формы совместимости CJK
 Old Hungarian	UnicodeBlocks		Старый венгерский
 CJK unified ideographs extension B	UnicodeBlocks		CJK объединённые иероглифы расширение B
+Meroitic cursive	UnicodeBlocks		Мероитский курсив
 Ahom	UnicodeBlocks		Ахом
+Nyiakeng Puachue Hmong	UnicodeBlocks		Ньиэкэнг пуэцым хмонг
+Duployan	UnicodeBlocks		Дюплойе
 Early Dynastic Cuneiform	UnicodeBlocks		Раннединастическая клинопись
+Kana extended A	UnicodeBlocks		Расширенная кана A
 Arabic presentation forms A	UnicodeBlocks		Формы арабского представления A
 Filter:	CharacterWindow		Фильтр:
+Small Kana extension	UnicodeBlocks		Малое расширение кана
 Kannada	UnicodeBlocks		Каннада
+Brahmi	UnicodeBlocks		Брахми
 Lydian	UnicodeBlocks		Лидийский
 Hatran	UnicodeBlocks		Хатран
 Glagolitic supplement	UnicodeBlocks		Дополнение Глаголицы
+Elymaic	UnicodeBlocks		Элимайское письмо
 Gurmukhi	UnicodeBlocks		Гурмухи
 Supplemental arrows B	UnicodeBlocks		Дополнительные стрелки B
 CJK unified ideographs	UnicodeBlocks		Унифицированные иероглифы CJK
+Enclosed alphanumeric supplement	UnicodeBlocks		Дополнение к обрамлённым буквам и цифрам
 Latin extended B	UnicodeBlocks		Латинский расширение B
 Phonetic extensions	UnicodeBlocks		Фонетические расширения
+Indic Siyaq numbers	UnicodeBlocks		Индийские цифры сийяк
+Batak	UnicodeBlocks		Батакское письмо
 Code	CharacterWindow		Код
 Block elements	UnicodeBlocks		Блочные элементы
+Ethiopic extended A	UnicodeBlocks		Расширенное эфиопское письмо A
 Mahjong tiles	UnicodeBlocks		Маджонгские плитки
 Carian	UnicodeBlocks		Карианский
 Gothic	UnicodeBlocks		Готический
 Specials	UnicodeBlocks		Специальные символы
+Sinhala Archaic numbers	UnicodeBlocks		Сингальские архаические цифры
 Syloti Nagri	UnicodeBlocks		Силоти Нагри
 Latin-1 supplement	UnicodeBlocks		Дополнение латиницы 1
 CJK unified ideographs extension A	UnicodeBlocks		Унифицированные иероглифы CJK расширение A
 Linear B syllabary	UnicodeBlocks		Линейные слоги B
 Yi syllables	UnicodeBlocks		Слоги Юи
+Khojki	UnicodeBlocks		Ходжики
 Currency symbols	UnicodeBlocks		Символы валют
+Soyombo	UnicodeBlocks		Соёмбо
+Khitan small script	UnicodeBlocks		Малое киданьское письмо
+Imperial Aramaic	UnicodeBlocks		Имперское арамейское письмо
 Domino tiles	UnicodeBlocks		Плитки домино
 Kayah Li	UnicodeBlocks		Кайях Ли
 Oriya	UnicodeBlocks		Ория
 Ancient Greek numbers	UnicodeBlocks		Древнегреческие цифры
 Superscripts and subscripts	UnicodeBlocks		Надстрочные и подстрочные
 Osmanya	UnicodeBlocks		Сомалийский
+Modi	UnicodeBlocks		Моди
 Small form variants	UnicodeBlocks		Варианты малого размера
 Arrows	UnicodeBlocks		Стрелки
+Tangut supplement	UnicodeBlocks		Дополнение к тангутскому письму
 Bengali	UnicodeBlocks		Бенгали
 Phoenician	UnicodeBlocks		Финикийский
 Ideographic description characters	UnicodeBlocks		Символы описания иероглифов
 Supplemental arrows A	UnicodeBlocks		Дополнительные стрелки A
 Rejang	UnicodeBlocks		Реджанг
 Number forms	UnicodeBlocks		Формы чисел
+Avestan	UnicodeBlocks		Авестийское письмо
 Latin extended A	UnicodeBlocks		Расширенная латиница A
+Zanabazar Square	UnicodeBlocks		Квадратное письмо Дзанабадзара
 Sundanese	UnicodeBlocks		Сунданский
 Geometric shapes	UnicodeBlocks		Геометрические фигуры
 Clear	CharacterWindow		Очистить
+Symbols and pictographs extended A	UnicodeBlocks		Расширенные символы и пиктограммы A
 Adlam	UnicodeBlocks		Адлам
 Arabic	UnicodeBlocks		Арабский
 Khmer symbols	UnicodeBlocks		Кхмерские символы
 Ol Chiki	UnicodeBlocks		Алфавит сантали
+Wancho	UnicodeBlocks		Ванчо
 Box drawing	UnicodeBlocks		Символы рисования рамок
+Egyptian hieroglyphs	UnicodeBlocks		Египетские иероглифы
 Vai	UnicodeBlocks		Ваи
 Ethiopic extended	UnicodeBlocks		Расширенный эфиопский
 CJK compatibility	UnicodeBlocks		Символы совместимости CJK
 Tai Le	UnicodeBlocks		Тай Лы
+Devanagari extended	UnicodeBlocks		Расширенное деванагари
 Lao	UnicodeBlocks		Лаосский
+Chorasmian	UnicodeBlocks		Хорезмийское письмо
+Lisu supplement	UnicodeBlocks		Дополнение к лису
+Takri	UnicodeBlocks		Такри
+Shorthand format controls	UnicodeBlocks		Форматирующие символы стенографии
+Inscriptional Parthian	UnicodeBlocks		Парфянское письмо
 Optical character recognition	UnicodeBlocks		Оптическое распознавание символов
 Tamil	UnicodeBlocks		Тамильский
+Lisu	UnicodeBlocks		Лису
+Nandingari	UnicodeBlocks		Нандингари
 Greek extended	UnicodeBlocks		Расширенный греческий
+Myanmar extended B	UnicodeBlocks		Расширенное бирманское письмо B
+Mahajani	UnicodeBlocks		Махаджани
 Lepcha	UnicodeBlocks		Лепча
+Mandaic	UnicodeBlocks		Мандейское письмо
 Old italic	UnicodeBlocks		Этрусский алфавит
 Quit	CharacterWindow		Выход
+Playing cards	UnicodeBlocks		Игральные карты
+Chakma	UnicodeBlocks		Чакма
 Buhid	UnicodeBlocks		Бухид
 Supplementary private use area B	UnicodeBlocks		Дополнительная область-B для частного использования
 Cuneiform	UnicodeBlocks		Клинопись
 Alphabetic presentation forms	UnicodeBlocks		Формы алфавитного представления
+Mayan numerals	UnicodeBlocks		Цифры майя
 Tangut components	UnicodeBlocks		Элементы тангутского письма
 Letterlike symbols	UnicodeBlocks		Буквоподобные символы
 Spacing modifier letters	UnicodeBlocks		Символы изменения пробела
 Unified Canadian Aboriginal syllabics	UnicodeBlocks		Объединённое слоговое письмо канадских аборигенов
+Hanifi Rohingya	UnicodeBlocks		Ханифи Рохинджа
 Dingbats	UnicodeBlocks		Знаки орнамента
 Mathematical operators	UnicodeBlocks		Математические операторы
 Bopomofo	UnicodeBlocks		Бопомофо
 Variation selectors	UnicodeBlocks		Селекторы вариантов начертания
 Variation selectors supplement	UnicodeBlocks		Дополнительные селекторы вариантов начертания
+Old Permic	UnicodeBlocks		Древнепермское письмо
 Supplemental mathematical operators	UnicodeBlocks		Дополнительные математические операторы
 Sinhala	UnicodeBlocks		Сингальский
 Bhaiksuki	UnicodeBlocks		Бхайкшуки
+Dives Akuru	UnicodeBlocks		Дивес акуру
 Ugaritic	UnicodeBlocks		Угаритский
+Old North Arabian	UnicodeBlocks		Древнее североаравийское письмо
+Mende Kikakui	UnicodeBlocks		Письмо кикакуи для языка менде
+Geometric shapes extended	UnicodeBlocks		Расширенные геометрические фигуры
+Transport and map symbols	UnicodeBlocks		Транспортные и картографические символы
+Tamil supplement	UnicodeBlocks		Дополнение к тамильскому письму
+Combining diacritical marks extended	UnicodeBlocks		Расширенные комбинируемые диакритические знаки
 Cyrillic extended C	UnicodeBlocks		Кириллица расширенная A
 Syriac	UnicodeBlocks		Сирийский
 Private use area	UnicodeBlocks		Область для частного использования
+Vedic extensions	UnicodeBlocks		Расширенные ведические символы
 Supplement punctuation	UnicodeBlocks		Дополнительные знаки пунктуации
 Lycian	UnicodeBlocks		Ликийский
+Myanmar extended A	UnicodeBlocks		Мьянманское расширенное письмо A
 Ancient symbols	UnicodeBlocks		Древние символы
+Arabic mathematical alphabetic symbols	UnicodeBlocks		Арабские математические алфавитные символы
 Miscellaneous symbols and arrows	UnicodeBlocks		Разнообразные символы и стрелки
+Common Indic number forms	UnicodeBlocks		Общеиндийские числовые символы
 Kharoshthi	UnicodeBlocks		Кхароштхи
 Buginese	UnicodeBlocks		Бугийский
 Telugu	UnicodeBlocks		Телугу
 Cyrillic supplement	UnicodeBlocks		Кириллица дополнительные
+Grantha	UnicodeBlocks		Грантха
 Yi Radicals	UnicodeBlocks		Корни Юи
 Supplementary private use area A	UnicodeBlocks		Дополнительная область-A для частного использования
 Armenian	UnicodeBlocks		Армянский
+Miscellaneous symbols and pictographs	UnicodeBlocks		Разные символы и пиктограммы
 Phags-pa	UnicodeBlocks		Фагс-па
+Nabataean	UnicodeBlocks		Набатейское письмо
+Meetei Mayek	UnicodeBlocks		Мейтей-маек
 CJK compatibility ideographs	UnicodeBlocks		Совместимые иероглифы CJK
 Show private blocks	CharacterWindow		Отображать частные блоки
+Samaritan	UnicodeBlocks		Самаритянское письмо
 Latin extended additional	UnicodeBlocks		Дополнительная расширенная латиница
 Tibetan	UnicodeBlocks		Тибетский
 Combining diacritical marks	UnicodeBlocks		Объединяющие диакритические метки
 Tags	UnicodeBlocks		Теги
 Khmer	UnicodeBlocks		Кхмерский
+Hangul Jamo extended B	UnicodeBlocks		Расширенные элементы хангыля B
+Tai Viet	UnicodeBlocks		Тай-вьет
 Georgian supplement	UnicodeBlocks		Грузинские дополнения
 Tagalog	UnicodeBlocks		Тагальский
+CJK unified ideographs extension F	UnicodeBlocks		Унифицированные идеограммы CJK. Расширение F
 Supplemental Symbols and Pictographs	UnicodeBlocks		Дополнение к символам и пиктограммам
 Devanagari	UnicodeBlocks		Деванагари
 Runic	UnicodeBlocks		Рунический
 General punctuation	UnicodeBlocks		Знаки пунктуации
 Mongolian supplement	UnicodeBlocks		Дополнение к старомонгольскому письму
+Khudawadi	UnicodeBlocks		Худабади
 Glagotic	UnicodeBlocks		Глаголический
 Cyrillic extended B	UnicodeBlocks		Кириллица расширение B
 Anatolian hieroglyphs	UnicodeBlocks		Анатолийские иероглифы
@@ -175,6 +270,9 @@ Kangxi radicals	UnicodeBlocks		Корни Канси
 Copy character	CharacterView		Скопировать символ
 Hangul Jamo	UnicodeBlocks		Хангыль Чамо
 Font	CharacterWindow		Шрифт
+Ornamental dingbats	UnicodeBlocks		Орнаментные символы
+Egyptian hieroglyph format controls	UnicodeBlocks		Управляющие символы форматирования египетских иероглифов
+Manichaean	UnicodeBlocks		Манихейское письмо
 Phaistos disc	UnicodeBlocks		Фестский диск
 Miscellaneous technical	UnicodeBlocks		Прочие технические
 Braille patterns	UnicodeBlocks		Шрифт Брейля
@@ -183,19 +281,29 @@ Thaana	UnicodeBlocks		Тана
 Ethiopic	UnicodeBlocks		Эфиопский
 Byzantine musical symbols	UnicodeBlocks		Византийские музыкальные символы
 Gujarati	UnicodeBlocks		Гуджарати
+Symbols for legacy computing	UnicodeBlocks		Символы наследия вычислительной техники
+Gunjala Gondi	UnicodeBlocks		Гунджала гонди
+Hangul Jamo extended A	UnicodeBlocks		Расширенные элементы хангыля A
+Elbasan	UnicodeBlocks		Эльбасанское письмо
 Hangul compatibility Jamo	UnicodeBlocks		Хангыль, совместимый с Чамо
 Phonetic extensions supplement	UnicodeBlocks		Дополнительные фонетические расширения
 CJK unified ideographs extension E	UnicodeBlocks		Расширение E унифицированных идеограмм CJK
+Nüshu	UnicodeBlocks		Нюй-шу
 Old Persian	UnicodeBlocks		Древнеперсидский
 Malayalam	UnicodeBlocks		Малайялам
 CJK radicals supplement	UnicodeBlocks		Дополнительные иероглифические ключи CJK
+Old South Arabian	UnicodeBlocks		Древнее южноаравийское письмо
 Marchen	UnicodeBlocks		Марчен
+Sogdian	UnicodeBlocks		Древнесогдийское письмо
 Control pictures	UnicodeBlocks		Изображения управления
+Tai Tham	UnicodeBlocks		Тай Тхам
 Cyrillic extended A	UnicodeBlocks		Кириллица расширенная A
 New Tai Lue	UnicodeBlocks		Новый тай лю
 Sutton SignWriting	UnicodeBlocks		Жестовое письмо Саттон
 Limbu	UnicodeBlocks		Лимбу
 Kanbun	UnicodeBlocks		Канбун
+Emoticons	UnicodeBlocks		Эмотиконы
+Siddham	UnicodeBlocks		Сиддхаматрика
 CJK symbols and punctuation	UnicodeBlocks		Символы и пунктуация CJK
 CJK strokes	UnicodeBlocks		Черты Иероглифов Восточной Азии
 Combining half marks	UnicodeBlocks		Комбинируемые половины символов

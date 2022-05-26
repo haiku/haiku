@@ -1,11 +1,11 @@
-1	swedish	x-vnd.Haiku-Time	834234238
+1	swedish	x-vnd.Haiku-Time	3691539601
 OK	Time		OK
 Message receiving failed	Time		Kunde inte ta emot meddelandet
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date, Skriven av:\n\n\t Andrew Edward McCall\n\t Mike Berg\n\t Julun\n\t Philippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Australien
 America	Time		Amerika
 Reset to default server list	Time		Återställ till förinställt värde
 Could not resolve server address	Time		Det gick inte att namnupplösa serveradressen
+Time & Date	System name		Tid och datum
 Set time zone	Time		Ange tidzon
 Waiting for answer failed	Time		Fick inget svar
 <Other>	Time		<Annan>
@@ -38,7 +38,6 @@ Atlantic	Time		Atlanten
 Show clock in Deskbar	Time		Visa klockan i deskbaren
 Display time with seconds	Time		Visa tid med sekunder
 Time	System name		Tid
-about	Time		om
 Show time zone	Time		Ange tidzon
 Synchronize at boot	Time		Synkronisera vid uppstart
 Indian	Time		Indien

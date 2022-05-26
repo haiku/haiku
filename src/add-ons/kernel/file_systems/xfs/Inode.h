@@ -5,6 +5,7 @@
 #ifndef _INODE_H_
 #define _INODE_H_
 
+
 #include "system_dependencies.h"
 #include "Volume.h"
 #include "xfs_types.h"
@@ -32,10 +33,50 @@
 	// Gets the offset into the block from the inode number
 #define DIR_DFORK_PTR(dir_ino_ptr) (void*) \
 		((char*) dir_ino_ptr + DATA_FORK_OFFSET)
-#define DIR_AFORK_PTR(dir_ino_ptr) \
-					(void*)((char*)XFS_DFORK_PTR + \
-					((uint32)dir_ino_ptr->di_forkoff<<3))
+#define DIR_AFORK_PTR(dir_ino_ptr, forkoff) \
+					(void*)((char*)DIR_DFORK_PTR(dir_ino_ptr) + \
+					(((uint32)forkoff)<<3))
 #define DIR_AFORK_EXIST(dir_ino_ptr) dir_ino_ptr->di_forkoff!=0
+#define MASK(n) ((1UL << n) - 1)
+#define FSBLOCKS_TO_AGNO(n, volume) ((n) >> volume->AgBlocksLog())
+#define FSBLOCKS_TO_AGBLOCKNO(n, volume) ((n) & MASK(volume->AgBlocksLog()))
+#define BLOCKNO_FROM_POSITION(n, volume) \
+	((n) >> (volume->BlockLog()))
+#define BLOCKOFFSET_FROM_POSITION(n, inode) ((n) & (inode->BlockSize() - 1))
+
+
+// xfs_bmdr_block
+struct BlockInDataFork {
+			uint16				Levels()
+									{ return
+										B_BENDIAN_TO_HOST_INT16(bb_level); }
+			uint16				NumRecords()
+									{ return
+										B_BENDIAN_TO_HOST_INT16(bb_numrecs); }
+			uint16				bb_level;
+			uint16				bb_numrecs;
+};
+
+
+// xfs_da_blkinfo_t
+struct BlockInfo {
+			uint32				forw;
+			uint32				back;
+			uint16				magic;
+			uint16				pad;
+};
+
+
+struct ExtentMapEntry {
+			xfs_fileoff_t		br_startoff;
+				// logical file block offset
+			xfs_fsblock_t		br_startblock;
+				// absolute block number
+			xfs_filblks_t		br_blockcount;
+				// # of blocks
+			uint8				br_state;
+				// state of the extent
+};
 
 
 uint32
@@ -68,7 +109,6 @@ enum xfs_dinode_fmt_t {
 struct xfs_inode_t {
 			void				SwapEndian();
 			int8				Version() const;
-				//TODO: Check
 			mode_t				Mode() const;
 			void				GetModificationTime(struct timespec&
 									timestamp);
@@ -77,12 +117,13 @@ struct xfs_inode_t {
 			int8				Format() const;
 				// The format of the inode
 			xfs_fsize_t			Size() const;
-			xfs_rfsblock_t		NoOfBlocks() const;
+			xfs_rfsblock_t		BlockCount() const;
 			uint32				NLink() const;
 			uint16				Flags() const;
 			uint32				UserId() const;
 			uint32				GroupId() const;
-
+			xfs_extnum_t		DataExtentsCount() const;
+			uint8				ForkOffset() const;
 			uint16				di_magic;
 			uint16				di_mode;
 				// uses standard S_Ixxx
@@ -118,7 +159,6 @@ struct xfs_inode_t {
 			uint16				di_dmstate;
 			uint16				di_flags;
 			uint32				di_gen;
-
 			uint32				di_next_unlinked;
 };
 
@@ -154,8 +194,8 @@ public:
 
 			int8				Version() const { return fNode->Version(); }
 
-			xfs_rfsblock_t		NoOfBlocks() const
-									{ return fNode->NoOfBlocks(); }
+			xfs_rfsblock_t		BlockCount() const
+									{ return fNode->BlockCount(); }
 
 			char*				Buffer() { return fBuffer; }
 
@@ -165,6 +205,9 @@ public:
 
 			uint32				DirBlockSize() const
 									{ return fVolume->DirBlockSize(); }
+
+			uint32				BlockSize() const
+									{ return fVolume->BlockSize(); }
 
 			void				GetChangeTime(struct timespec& timestamp) const
 								{ fNode->GetChangeTime(timestamp); }
@@ -176,9 +219,32 @@ public:
 			void				GetAccessTime(struct timespec& timestamp) const
 								{ fNode->GetAccessTime(timestamp); }
 
+			status_t			CheckPermissions(int accessMode) const;
 			uint32				UserId() const { return fNode->UserId(); }
 			uint32				GroupId() const { return fNode->GroupId(); }
-
+			bool				HasFileTypeField() const;
+			xfs_extnum_t		DataExtentsCount() const
+									{ return fNode->DataExtentsCount(); }
+			uint64				FileSystemBlockToAddr(uint64 block);
+			uint8				ForkOffset() const
+									{ return fNode->ForkOffset(); }
+			status_t			ReadExtents();
+			status_t			ReadAt(off_t pos, uint8* buffer, size_t* length);
+			status_t			GetNodefromTree(uint16& levelsInTree,
+									Volume* volume, ssize_t& len,
+									size_t DirBlockSize, char* block);
+			int					SearchMapInAllExtent(uint64 blockNo);
+			void				UnWrapExtentFromWrappedEntry(
+									uint64 wrappedExtent[2],
+									ExtentMapEntry* entry);
+			status_t			ReadExtentsFromExtentBasedInode();
+			status_t			ReadExtentsFromTreeInode();
+			size_t				MaxRecordsPossibleInTreeRoot();
+			size_t				MaxRecordsPossibleNode();
+			TreePointer*		GetPtrFromRoot(int pos);
+			TreePointer*		GetPtrFromNode(int pos, void* buffer);
+			size_t				GetPtrOffsetIntoRoot(int pos);
+			size_t				GetPtrOffsetIntoNode(int pos);
 private:
 			status_t			GetFromDisk();
 			xfs_inode_t*		fNode;
@@ -186,6 +252,7 @@ private:
 			Volume*				fVolume;
 			char*				fBuffer;
 				// Contains the disk inode in BE format
+			ExtentMapEntry*		fExtents;
 };
 
 #endif

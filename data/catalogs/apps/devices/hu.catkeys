@@ -56,7 +56,7 @@ Display controller	Device		Kijelző vezérlő
 Basic information	DevicesView		Alapvető információk
 ACPI Button '%1'	DeviceACPI		ACPI gomb '%1'
 Bus	DevicesView		Busz
-ACPI <unknown>	DeviceACPI		ACPI <unknown>
+ACPI <unknown>	DeviceACPI		ACPI <ismeretlen>
 Device name	DevicePCI		Eszköznév
 Disk Drive	DeviceSCSI		Lemezmeghajtó
 Other	DeviceSCSI		Egyéb

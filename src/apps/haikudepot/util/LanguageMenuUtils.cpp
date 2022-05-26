@@ -10,6 +10,7 @@
 #include <MenuItem.h>
 #include <Messenger.h>
 
+#include "AppUtils.h"
 #include "HaikuDepotConstants.h"
 #include "Logger.h"
 
@@ -44,22 +45,7 @@ LanguageMenuUtils::AddLanguagesToMenu(
 /* static */ void
 LanguageMenuUtils::MarkLanguageInMenu(
 	const BString& languageCode, BMenu* menu) {
-	if (menu->CountItems() == 0) {
-		debugger("menu contains no items; not able to set the "
-			"language");
-		return;
-	}
-
-	int32 index = LanguageMenuUtils::_IndexOfLanguageInMenu(
-		languageCode, menu);
-
-	if (index == -1) {
-		HDINFO("unable to find the language [%s] in the menu",
-			languageCode.String());
-		menu->ItemAt(0)->SetMarked(true);
-	}
-	else
-		menu->ItemAt(index)->SetMarked(true);
+	AppUtils::MarkItemWithCodeInMenuOrFirst(languageCode, menu);
 }
 
 
@@ -101,35 +87,4 @@ LanguageMenuUtils::_AddLanguagesToMenu(const LanguageModel* languageModel,
 	}
 
 	return count;
-}
-
-
-/* static */ status_t
-LanguageMenuUtils::_GetLanguageAtIndexInMenu(BMenu* menu, int32 index,
-	BString* result)
-{
-	BMessage *itemMessage = menu->ItemAt(index)->Message();
-
-	if (itemMessage == NULL)
-		return B_ERROR;
-
-	return itemMessage->FindString("code", result);
-}
-
-
-/* static */ int32
-LanguageMenuUtils::_IndexOfLanguageInMenu(
-	const BString& languageCode, BMenu* menu)
-{
-	BString itemLanguageCode;
-	for (int32 i = 0; i < menu->CountItems(); i++) {
-		if (_GetLanguageAtIndexInMenu(
-			menu, i, &itemLanguageCode) == B_OK) {
-			if (itemLanguageCode == languageCode) {
-				return i;
-			}
-		}
-	}
-
-	return -1;
 }

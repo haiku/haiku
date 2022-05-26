@@ -134,7 +134,7 @@ get_interface_name_or_index(net_domain* domain, int32 option, void* value,
 	ASSERT(option == SIOCGIFINDEX || option == SIOCGIFNAME);
 
 	size_t expected = option == SIOCGIFINDEX ? IF_NAMESIZE : sizeof(ifreq);
-	if (*_length < expected)
+	if (*_length > 0 && *_length < expected)
 		return B_BAD_VALUE;
 
 	ifreq request;
@@ -215,7 +215,7 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 		case SIOCAIFADDR:	/* same as B_SOCKET_ADD_ALIAS */
 		{
 			// add new interface address
-			if (*_length < sizeof(struct ifaliasreq))
+			if (*_length > 0 && *_length < sizeof(struct ifaliasreq))
 				return B_BAD_VALUE;
 
 			struct ifaliasreq request;
@@ -320,10 +320,9 @@ datalink_control(net_domain* _domain, int32 option, void* value,
 		default:
 		{
 			// We also accept partial ifreqs as long as the name is complete.
-			if (*_length < IF_NAMESIZE)
-				return B_BAD_VALUE;
-
-			size_t length = min_c(sizeof(struct ifreq), *_length);
+			size_t length = sizeof(struct ifreq);
+			if (*_length > 0 && *_length >= IF_NAMESIZE)
+				length = min_c(length, *_length);
 
 			// try to pass the request to an existing interface
 			struct ifreq request;
@@ -754,7 +753,9 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 		case SIOCGIFBRDADDR:
 		case SIOCGIFDSTADDR:
 		{
-			if (length < sizeof(ifreq))
+			if (length == 0)
+				length = sizeof(ifreq);
+			else if (length < sizeof(ifreq))
 				return B_BAD_VALUE;
 
 			ifreq request;
@@ -920,7 +921,7 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 		case SIOCGIFMEDIA:
 		{
 			// get media
-			if (length < sizeof(ifmediareq))
+			if (length > 0 && length < sizeof(ifmediareq))
 				return B_BAD_VALUE;
 
 			struct ifmediareq request;

@@ -15,7 +15,7 @@ Preference Bluetooth :
 	ExtendedLocalDeviceView.cpp
 	InquiryPanel.cpp
 	RemoteDevicesView.cpp
-	: be libbluetooth.so [ TargetLibsupc++ ] localestub
+	: be shared libbluetooth.so [ TargetLibsupc++ ] localestub
 	;
 
 DoCatalogs Bluetooth :

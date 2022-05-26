@@ -25,7 +25,8 @@ additionalMakeArgs=$*
 gdbSourceDir="$HAIKU_USE_GDB"
 
 ccFlags="-O2"
-cxxFlags="-O2"
+#CLang needs c++14 to build ISL: https://dev.haiku-os.org/ticket/16434
+cxxFlags="-O2 -std=c++14"
 binutilsTargets="$haikuMachine"
 gdbTarget="$haikuMachine"
 case $haikuMachine in
@@ -36,10 +37,8 @@ i586-*)
 	gdbConfigureArgs="--disable-multilib"
 	;;
 x86_64-*)
-	# GCC's default is to enable multilib, but there is a bug when
-	# explicitly using --enable-multilib that causes a build
-	# failure
-	binutilsConfigureArgs=""
+	binutilsConfigureArgs="--enable-multilib"
+	gccConfigureArgs="--enable-multilib"
 	binutilsTargets="$binutilsTargets,i386-efi-pe,x86_64-efi-pe"
 	gdbConfigureArgs="--disable-multilib"
 	;;
@@ -64,13 +63,13 @@ arm-*)
 	gdbTarget="arm-unknown-elf"
 	;;
 riscv*-*)
-	binutilsConfigureArgs="--disable-multilib"
-	gccConfigureArgs="--disable-multilib"
-	gdbConfigureArgs="--disable-multilib"
+	binutilsConfigureArgs=" --with-arch=rv64gc"
+	gccConfigureArgs=" --with-arch=rv64gc"
+	gdbConfigureArgs=""
 
-	# TODO: Disable building with TLS support for riscv until implemented.
-	binutilsConfigureArgs="$binutilsConfigureArgs --disable-tls"
-	gccConfigureArgs="$gccConfigureArgs --disable-tls"
+	binutilsConfigureArgs="$binutilsConfigureArgs --disable-multilib"
+	gccConfigureArgs="$gccConfigureArgs --disable-multilib"
+	gdbConfigureArgs="$gdbConfigureArgs --disable-multilib"
 	;;
 powerpc-*)
 	binutilsConfigureArgs="--disable-multilib"
@@ -241,6 +240,8 @@ CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$gccSourceDir/configure" \
 	--with-default-libstdcxx-abi=gcc4-compatible \
 	--with-sysroot="$sysrootDir" \
 	--disable-maintainer-mode \
+	--disable-libgomp \
+	--disable-libatomic \
 	$gccConfigureArgs \
 	|| exit 1
 

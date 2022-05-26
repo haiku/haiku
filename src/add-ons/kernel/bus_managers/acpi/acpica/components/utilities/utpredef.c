@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2018, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2021, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -237,7 +237,7 @@ AcpiUtMatchPredefinedMethod (
     ThisName = AcpiGbl_PredefinedMethods;
     while (ThisName->Info.Name[0])
     {
-        if (ACPI_COMPARE_NAME (Name, ThisName->Info.Name))
+        if (ACPI_COMPARE_NAMESEG (Name, ThisName->Info.Name))
         {
             return (ThisName);
         }
@@ -317,7 +317,7 @@ AcpiUtGetArgumentTypes (
 
 static const char   *UtExternalTypeNames[] = /* Indexed by ACPI_TYPE_* */
 {
-    ", UNSUPPORTED-TYPE",
+    ", Type_ANY",
     ", Integer",
     ", String",
     ", Buffer",
@@ -374,7 +374,7 @@ AcpiUtMatchResourceName (
     ThisName = AcpiGbl_ResourceNames;
     while (ThisName->Info.Name[0])
     {
-        if (ACPI_COMPARE_NAME (Name, ThisName->Info.Name))
+        if (ACPI_COMPARE_NAMESEG (Name, ThisName->Info.Name))
         {
             return (ThisName);
         }
@@ -499,7 +499,7 @@ AcpiUtGetArgumentTypes (
     {
         ThisArgumentType = METHOD_GET_NEXT_TYPE (ArgumentTypes);
 
-        if (!ThisArgumentType || (ThisArgumentType > METHOD_MAX_ARG_TYPE))
+        if (ThisArgumentType > METHOD_MAX_ARG_TYPE)
         {
             printf ("**** Invalid argument type (%u) "
                 "in predefined info structure\n", ThisArgumentType);

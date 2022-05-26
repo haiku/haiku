@@ -1,7 +1,6 @@
-1	slovak	x-vnd.Haiku-Time	752043118
+1	slovak	x-vnd.Haiku-Time	1987293945
 OK	Time		OK
 Message receiving failed	Time		Prijatie správy zlyhalo
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Čas a dátum, napísali:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Australia	Time		Austrália
 America	Time		Amerika
 Reset to default server list	Time		Obnoviť predvolený zoznam serverov
@@ -37,7 +36,6 @@ Atlantic	Time		Atlantik
 Show clock in Deskbar	Time		Zobraziť hodiny v Paneli
 Display time with seconds	Time		Zobraziť sekundy v čase
 Time	System name		Čas
-about	Time		O aplikácii
 Show time zone	Time		Zobraziť časové pásmo
 Synchronize at boot	Time		Synchronizovať pri štarte
 Indian	Time		Indický

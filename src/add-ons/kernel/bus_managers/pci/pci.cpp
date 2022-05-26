@@ -123,10 +123,6 @@ pci_reserve_device(uchar virtualBus, uchar device, uchar function,
 	//TRACE(("%s(%d [%d:%d], %d, %d, %s, %p)\n", __FUNCTION__, virtualBus,
 	//	domain, bus, device, function, driverName, nodeCookie));
 
-	device_attr matchPCIRoot[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "PCI"}},
-		{NULL}
-	};
 	device_attr matchThis[] = {
 		// info about device
 		{B_DEVICE_BUS, B_STRING_TYPE, {string: "pci"}},
@@ -147,24 +143,22 @@ pci_reserve_device(uchar virtualBus, uchar device, uchar function,
 	device_attr drvAttrs[] = {
 		// info about device
 		{B_DEVICE_BUS, B_STRING_TYPE, {string: "legacy_driver"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: driverName}},
 		{"legacy_driver", B_STRING_TYPE, {string: driverName}},
 		{"legacy_driver_cookie", B_UINT64_TYPE, {ui64: (uint64)nodeCookie}},
 		{NULL}
 	};
-	device_node *root, *pci, *node, *legacy;
+	device_node *node, *legacy;
 
 	status = B_DEVICE_NOT_FOUND;
-	root = gDeviceManager->get_root_node();
-	if (!root)
-		return status;
-
-	pci = NULL;
-	if (gDeviceManager->get_next_child_node(root, matchPCIRoot, &pci) < B_OK)
-		goto err0;
+	if (gPCIRootNode == NULL)
+		goto err1;
 
 	node = NULL;
-	if (gDeviceManager->get_next_child_node(pci, matchThis, &node) < B_OK)
+	if (gDeviceManager->get_next_child_node(gPCIRootNode,
+		matchThis, &node) < B_OK) {
 		goto err1;
+	}
 
 	// common API for all legacy modules ?
 	//status = legacy_driver_register(node, driverName, nodeCookie, PCI_LEGACY_DRIVER_MODULE_NAME);
@@ -180,8 +174,6 @@ pci_reserve_device(uchar virtualBus, uchar device, uchar function,
 		goto err3;
 
 	gDeviceManager->put_node(node);
-	gDeviceManager->put_node(pci);
-	gDeviceManager->put_node(root);
 
 	return B_OK;
 
@@ -190,9 +182,6 @@ err3:
 err2:
 	gDeviceManager->put_node(node);
 err1:
-	gDeviceManager->put_node(pci);
-err0:
-	gDeviceManager->put_node(root);
 	TRACE(("pci_reserve_device for driver %s failed: %s\n", driverName,
 		strerror(status)));
 	return status;
@@ -308,6 +297,30 @@ pci_update_interrupt_line(uchar virtualBus, uchar device, uchar function,
 
 	return gPCI->UpdateInterruptLine(domain, bus, device, function,
 		newInterruptLineValue);
+}
+
+
+status_t
+pci_get_powerstate(uchar virtualBus, uint8 device, uint8 function, uint8* state)
+{
+	uint8 bus;
+	uint8 domain;
+	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
+		return B_ERROR;
+
+	return gPCI->GetPowerstate(domain, bus, device, function, state);
+}
+
+
+status_t
+pci_set_powerstate(uchar virtualBus, uint8 device, uint8 function, uint8 newState)
+{
+	uint8 bus;
+	uint8 domain;
+	if (gPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
+		return B_ERROR;
+
+	return gPCI->SetPowerstate(domain, bus, device, function, newState);
 }
 
 
@@ -466,6 +479,12 @@ pci_init(void)
 {
 	gPCI = new PCI;
 
+	// pci_controller_init may setup things needed by pci_io_init like mmio addresses
+	if (pci_controller_init() != B_OK) {
+		TRACE(("PCI: pci_controller_init failed\n"));
+		return B_ERROR;
+	}
+
 	if (pci_io_init() != B_OK) {
 		TRACE(("PCI: pci_io_init failed\n"));
 		return B_ERROR;
@@ -484,12 +503,6 @@ pci_init(void)
 	add_debugger_command("out16", &write_io, "write io shorts (16-bit)");
 	add_debugger_command("outb", &write_io, "write io bytes (8-bit)");
 	add_debugger_command("out8", &write_io, "write io bytes (8-bit)");
-
-	if (pci_controller_init() != B_OK) {
-		TRACE(("PCI: pci_controller_init failed\n"));
-		panic("PCI: pci_controller_init failed\n");
-		return B_ERROR;
-	}
 
 	gPCI->InitDomainData();
 	gPCI->InitBus();
@@ -1847,5 +1860,31 @@ PCI::SetPowerstate(PCIDev *device, uint8 newState)
 				snooze(10);
 		}
 	}
+}
+
+
+status_t
+PCI::GetPowerstate(uint8 domain, uint8 bus, uint8 _device, uint8 function,
+	uint8* state)
+{
+	PCIDev *device = FindDevice(domain, bus, _device, function);
+	if (device == NULL)
+		return B_ERROR;
+
+	*state = GetPowerstate(device);
+	return B_OK;
+}
+
+
+status_t
+PCI::SetPowerstate(uint8 domain, uint8 bus, uint8 _device, uint8 function,
+	uint8 newState)
+{
+	PCIDev *device = FindDevice(domain, bus, _device, function);
+	if (device == NULL)
+		return B_ERROR;
+
+	SetPowerstate(device, newState);
+	return B_OK;
 }
 

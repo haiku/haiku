@@ -33,7 +33,7 @@ class FontCache : public MultiLocker {
 
 	static	FontCache			sDefaultInstance;
 
-	typedef HashMap<HashString, FontCacheEntry*> FontMap;
+	typedef HashMap<HashString, BReference<FontCacheEntry> > FontMap;
 
 			FontMap				fFontCacheEntries;
 };

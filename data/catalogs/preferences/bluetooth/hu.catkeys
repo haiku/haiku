@@ -1,55 +1,51 @@
-1	hungarian	x-vnd.Haiku-BluetoothPrefs	4276705900
-Laptop	Settings view		Laptop
-Only from trusted devices	Settings view		Csak biztonságos eszközöktől
-15 secs	Settings view		15 mp
-Quit	main		Kilépés
-Manufacturer: 	Device View		Gyártó:
-Desktop	Settings view		Asztal
-Server	Window		Kiszolgáló
-Identify host as:	Settings view		Gazdagép azonosítása mint
-Refresh…	Remote devices		Frissítés…
-Local devices found on system:	Settings view		Helyi megtalált eszközök a rendszerben
-Service classes: 	Device View		Szervizosztályok:
-Remote devices	Window		Távoli eszközök
-Settings	Window		Beállítások
-Stop bluetooth services…	Window		Bluetooth-szolgáltatások leállítása…
-61 secs	Settings view		61 mp
-Add…	Remote devices		Hozzáadás…
-As blocked	Remote devices		Blokkoltként
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nincs egy regisztrált Bluetooth eszköz sem a rendszerben
-Policy…	Settings view		Irányelv…
-Revert	Window		Visszaállít
-Refresh local devices…	Window		Helyi eszközök frissítése…
-Disconnect	Remote devices		Kapcsolatbontás
-Identify us as…	Settings view		Azonosítás, mint…
+1	hungarian	x-vnd.Haiku-BluetoothPrefs	3945807779
+Start bluetooth services…	Window		Bluetooth-szolgáltatások elindítása…
 From all devices	Settings view		Minden eszköztől
 Defaults	Window		Alapértékek
-Start bluetooth services…	Window		Bluetooth-szolgáltatások elindítása…
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Bizonyosodj meg afelől, hogy az eszközöd Bluetooth-funkciója be van kapcsolva! Nyomd meg a „Lekérdezés” gombot a keresés megkezdéséhez. A nevek lekérdezéséhez szükséges időt nem lehet pontosan meghatározni, de általában 3 másodpercnél tovább ez nem szokott tartani. A névlekérdezés után megjelenik a körzetben elérhető összes eszköz listája, ahonnan kiválaszthatod melyiket szeretnéd párosítani a számítógéppel.
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Bizonyosodj meg afelől, hogy az eszközöd Bluetooth-funkciója be van kapcsolva! Nyomd meg a 'Lekérdezés' gombot a keresés megkezdéséhez. A nevek lekérdezéséhez szükséges időt nem lehet pontosan meghatározni, de általában 3 másodpercnél tovább ez nem szokott tartani. A névlekérdezés után megjelenik a körzetben elérhető összes eszköz listája, ahonnan kiválaszthatod melyiket szeretnéd párosítani a számítógéppel.
+Laptop	Settings view		Laptop
 Scanning progress	Inquiry panel		Keresés folyamatban
-Bluetooth	System name		Bluetooth
+Only from trusted devices	Settings view		Csak biztonságos eszközöktől
 Launch now	main		Indítás
+Bluetooth	System name		Bluetooth
 Remove	Remote devices		Eltávolítás
 Pick device…	Settings view		Eszköz kiválasztása…
 Always ask	Settings view		Mindig kérdezze
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Fejlesztők:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nKöszönet az önkénteseknek…\n\nEszköz-adományok:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nAnyagi segítség:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nJavítások:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nTesztelés:\n- Petter H. Juliussen\nMentor:\n- a yellowTAB csapata
+Quit	main		Kilépés
+15 secs	Settings view		15 mp
 Help	Window		Segítség
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped…\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Fejlesztők:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nKöszönet az önkénteseknek…\n\nEszköz-adományok:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nAnyagi segítség:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nJavítások:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nTesztelés:\n- Petter H. Juliussen\nMentor:\n- a yellowTAB csapata
+Manufacturer: 	Device View		Gyártó:
 Pair…	Remote devices		Párosítás…
+Desktop	Settings view		Asztal
+Server	Window		Kiszolgáló
 Retrieving name of %1	Inquiry panel		%1 nevének fogadása
+Identify host as:	Settings view		Gazdagép azonosítása mint
 Inquiry	Inquiry panel		Lekérdezés
+Local devices found on system:	Settings view		Helyi megtalált eszközök a rendszerben
+Service classes: 	Device View		Szervizosztályok:
 Incoming connections policy:	Settings view		Bejövő kapcsolatokra vonatkozó szabály
+Remote devices	Window		Távoli eszközök
 Retrieving names…	Inquiry panel		Nevek beolvasása…
-Show name	Extended local device view		Név mutatása
 Add device to list	Inquiry panel		Eszköz hozzáadása
+Show name	Extended local device view		Név mutatása
+Settings	Window		Beállítások
 Remaining %1 seconds	Inquiry panel		%1 másodperc van hátra
-The Bluetooth services are not currently running on this system.	main		A bluetooth szolgáltatás jelenleg nem fut a számítógépen.
-Discoverable	Extended local device view		Felfedezhető
+Stop bluetooth services…	Window		Bluetooth-szolgáltatások leállítása…
+61 secs	Settings view		61 mp
 Authenticate	Extended local device view		Hitelesítés
-Smart phone	Settings view		Okostelefon
+Discoverable	Extended local device view		Felfedezhető
+The Bluetooth services are not currently running on this system.	main		A bluetooth szolgáltatás jelenleg nem fut a számítógépen.
+Add…	Remote devices		Hozzáadás…
 Scanning completed.	Inquiry panel		Keresés befejezve.
+Smart phone	Settings view		Okostelefon
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nincs egy regisztrált Bluetooth eszköz sem a rendszerben
 Default inquiry time:	Settings view		Alapértelmezett lekérdezési időkorlát
+Revert	Window		Visszaállít
+Refresh local devices…	Window		Helyi eszközök frissítése…
 Server	Settings view		Kiszolgáló
-Handheld	Settings view		Mobiltelefon
  packets: 	Device View		csomagok:
+Handheld	Settings view		Mobiltelefon
+Disconnect	Remote devices		Kapcsolatbontás
 About Bluetooth…	Window		Bluetooth névjegye…
 Starting scan…	Inquiry panel		Keresés indítása…
