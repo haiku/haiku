@@ -10,6 +10,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		SharedLibrary [ MultiArchDefaultGristFiles libbsd.so ] :
 			daemon.c
+			dl_iterate_phdr.c
 			err.c
 			explicit_bzero.c
 			fgetln.c
