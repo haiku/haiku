@@ -112,7 +112,7 @@ compat_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 	uint32 semFlags = B_CAN_INTERRUPT;
 	status_t status;
 	struct mbuf *mb;
-	size_t length;
+	size_t length = *numBytes;
 
 	//if_printf(ifp, "compat_read(%lld, %p, [%lu])\n", position,
 	//	buffer, *numBytes);
@@ -134,18 +134,17 @@ compat_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 		} else if (status < B_OK)
 			return status;
 
-		IF_DEQUEUE(&ifp->receive_queue, mb);
+		IF_LOCK(&ifp->receive_queue);
+		if (ifp->receive_queue.ifq_head != NULL
+				&& ifp->receive_queue.ifq_head->m_pkthdr.len >= length) {
+			IF_UNLOCK(&ifp->receive_queue);
+			return E2BIG;
+		}
+		_IF_DEQUEUE(&ifp->receive_queue, mb);
+		IF_UNLOCK(&ifp->receive_queue);
 	} while (mb == NULL);
 
-	length = min_c(max_c((size_t)mb->m_pkthdr.len, 0), *numBytes);
-
-#if 0
-	mb = m_defrag(mb, 0);
-	if (mb == NULL) {
-		*numBytes = 0;
-		return B_NO_MEMORY;
-	}
-#endif
+	length = min_c(max_c((size_t)mb->m_pkthdr.len, 0), length);
 
 	m_copydata(mb, 0, length, buffer);
 	*numBytes = length;
@@ -161,24 +160,28 @@ compat_write(void *cookie, off_t position, const void *buffer,
 {
 	struct ifnet *ifp = cookie;
 	struct mbuf *mb;
+	int length = *numBytes;
 
 	//if_printf(ifp, "compat_write(%lld, %p, [%lu])\n", position,
 	//	buffer, *numBytes);
 
-	if (*numBytes > MHLEN) {
-		mb = m_getcl(0, MT_DATA, M_PKTHDR);
-		*numBytes = min_c(*numBytes, (size_t)MCLBYTES);
-	} else {
+	if (length <= MHLEN) {
 		mb = m_gethdr(0, MT_DATA);
-	}
+		if (mb == NULL)
+			return ENOBUFS;
+	} else {
+		mb = m_get2(length, 0, MT_DATA, M_PKTHDR);
+		if (mb == NULL)
+			return E2BIG;
 
-	if (mb == NULL)
-		return ENOBUFS;
+		length = min_c(length, mb->m_ext.ext_size);
+	}
 
 	// if we waited, check after if the ifp is still valid
 
-	mb->m_pkthdr.len = mb->m_len = *numBytes;
+	mb->m_pkthdr.len = mb->m_len = length;
 	memcpy(mtod(mb, void *), buffer, mb->m_len);
+	*numBytes = length;
 
 	return ifp->if_output(ifp, mb, NULL, NULL);
 }
