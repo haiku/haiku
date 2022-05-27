@@ -875,7 +875,7 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 		{
 			// get MTU
 			struct ifreq request;
-			request.ifr_mtu = interface->mtu;
+			request.ifr_mtu = interface->device->mtu;
 
 			return user_memcpy(&((struct ifreq*)argument)->ifr_mtu,
 				&request.ifr_mtu, sizeof(request.ifr_mtu));
@@ -884,17 +884,14 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 		{
 			// set MTU
 			struct ifreq request;
-			if (user_memcpy(&request, argument, sizeof(struct ifreq)) < B_OK)
+			if (user_memcpy(&request, argument, sizeof(struct ifreq)) != B_OK)
 				return B_BAD_ADDRESS;
 
-			// check for valid bounds
-			if (request.ifr_mtu < 100
-				|| (uint32)request.ifr_mtu > interface->device->mtu)
-				return B_BAD_VALUE;
-
-			interface->mtu = request.ifr_mtu;
-			notify_interface_changed(interface);
-			return B_OK;
+			status_t status = interface->device->module->set_mtu(
+				interface->device, request.ifr_mtu);
+			if (status == B_OK)
+				notify_interface_changed(interface);
+			return status;
 		}
 
 		case SIOCSIFMEDIA:

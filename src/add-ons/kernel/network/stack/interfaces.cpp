@@ -464,7 +464,6 @@ Interface::Interface(const char* interfaceName,
 	index = ++sInterfaceIndex;
 	flags = 0;
 	type = 0;
-	mtu = deviceInterface->device->mtu;
 	metric = 0;
 
 	fDeviceInterface = acquire_device_interface(deviceInterface);
@@ -1049,7 +1048,6 @@ Interface::Dump() const
 	kprintf("index:               %" B_PRIu32 "\n", index);
 	kprintf("flags:               %#" B_PRIx32 "\n", flags);
 	kprintf("type:                %u\n", type);
-	kprintf("mtu:                 %" B_PRIu32 "\n", mtu);
 	kprintf("metric:              %" B_PRIu32 "\n", metric);
 	kprintf("ref count:           %" B_PRId32 "\n", CountReferences());
 

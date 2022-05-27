@@ -1330,7 +1330,7 @@ ipv6_send_routed_data(net_protocol* _protocol, struct net_route* route,
 	ip6_sprintf(&destination.sin6_addr, addrbuf);
 	TRACE_SK(protocol, "  SendRoutedData(): destination: %s", addrbuf);
 
-	uint32 mtu = route->mtu ? route->mtu : interface->mtu;
+	uint32 mtu = route->mtu ? route->mtu : interface->device->mtu;
 	if (buffer->size > mtu) {
 		// we need to fragment the packet
 		return send_fragments(protocol, route, buffer, mtu);
@@ -1428,7 +1428,7 @@ ipv6_get_mtu(net_protocol* protocol, const struct sockaddr* address)
 	if (route->mtu != 0)
 		mtu = route->mtu;
 	else
-		mtu = route->interface_address->interface->mtu;
+		mtu = route->interface_address->interface->device->mtu;
 
 	sDatalinkModule->put_route(sDomain, route);
 	// TODO: what about extension headers?
