@@ -236,7 +236,18 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 			if (length < 4)
 				return B_BAD_VALUE;
 
-			frameSize = ifp->if_mtu + ETHER_HDR_LEN;
+			// This is (usually) only invoked during initialization to get the
+			// maximum frame size. Thus we try to set the largest possible one,
+			// as there is no way to determine what the driver might support.
+			struct ifreq ifr;
+			ifr.ifr_mtu = ETHERMTU_JUMBO;
+			if (compat_control(cookie, SIOCSIFMTU, &ifr, sizeof(ifr)) != 0) {
+				// Try again with 4K at least.
+				ifr.ifr_mtu = 4096 - (ETHER_HDR_LEN + ETHER_CRC_LEN);
+				compat_control(cookie, SIOCSIFMTU, &ifr, sizeof(ifr));
+			}
+
+			frameSize = ifp->if_mtu + (ETHER_HDR_LEN + ETHER_CRC_LEN);
 			return user_memcpy(arg, &frameSize, 4);
 		}
 
