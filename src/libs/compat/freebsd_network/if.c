@@ -839,7 +839,7 @@ ether_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 
 	switch (command) {
 		case SIOCSIFMTU:
-			if (ifr->ifr_mtu > ETHERMTU_JUMBO)
+			if (ifr->ifr_mtu < ETHERMIN || ifr->ifr_mtu > ETHERMTU)
 				return EINVAL;
 			ifp->if_mtu = ifr->ifr_mtu;
 			break;
