@@ -152,6 +152,52 @@ BNetworkRequestError::ErrorCode() const noexcept
 }
 
 
+// #pragma mark -- Public functions
+
+
+static const char* kBase64Symbols
+	= "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
+
+BString
+encode_to_base64(const BString& string)
+{
+	BString result;
+	BString tmpString = string;
+
+	while (tmpString.Length()) {
+		char in[3] = { 0, 0, 0 };
+		char out[4] = { 0, 0, 0, 0 };
+		int8 remaining = tmpString.Length();
+
+		tmpString.MoveInto(in, 0, 3);
+
+		out[0] = (in[0] & 0xFC) >> 2;
+		out[1] = ((in[0] & 0x03) << 4) | ((in[1] & 0xF0) >> 4);
+		out[2] = ((in[1] & 0x0F) << 2) | ((in[2] & 0xC0) >> 6);
+		out[3] = in[2] & 0x3F;
+
+		for (int i = 0; i < 4; i++)
+			out[i] = kBase64Symbols[(int)out[i]];
+
+		//  Add padding if the input length is not a multiple
+		// of 3
+		switch (remaining) {
+			case 1:
+				out[2] = '=';
+				// Fall through
+			case 2:
+				out[3] = '=';
+				break;
+		}
+
+		result.Append(out, 4);
+	}
+
+	return result;
+}
+
+
 // #pragma mark -- Private functions and data
 
 

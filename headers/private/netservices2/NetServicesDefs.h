@@ -75,6 +75,9 @@ private:
 };
 
 
+BString encode_to_base64(const BString& string);
+
+
 }
 
 }

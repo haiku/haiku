@@ -80,6 +80,12 @@ struct BHttpRedirectOptions {
 };
 
 
+struct BHttpAuthentication {
+	BString	username;
+	BString	password;
+};
+
+
 class BHttpRequest {
 public:
 	// Constructors and Destructor
@@ -95,12 +101,14 @@ public:
 
 	// Access
 			bool					IsEmpty() const noexcept;
+	const	BHttpAuthentication*	Authentication() const noexcept;
 	const	BHttpFields&			Fields() const noexcept;
 	const	BHttpMethod&			Method() const noexcept;
 	const	BHttpRedirectOptions&	Redirect() const noexcept;
 	const	BUrl&					Url() const noexcept;
 
 	// Named Setters
+			void					SetAuthentication(const BHttpAuthentication& authentication);
 			void					SetFields(const BHttpFields& fields);
 			void					SetMethod(const BHttpMethod& method);
 			void					SetRedirect(const BHttpRedirectOptions& redirectOptions);

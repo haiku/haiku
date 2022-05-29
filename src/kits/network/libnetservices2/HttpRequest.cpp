@@ -160,11 +160,28 @@ static const BHttpRedirectOptions kDefaultRedirectOptions = BHttpRedirectOptions
 static const BHttpFields kDefaultOptionalFields = BHttpFields();
 
 struct BHttpRequest::Data {
-	BUrl					url = kDefaultUrl;
-	BHttpMethod				method	= kDefaultMethod;
-	BHttpRedirectOptions	redirectOptions;
-	BHttpFields				optionalFields;
+	BUrl								url = kDefaultUrl;
+	BHttpMethod							method	= kDefaultMethod;
+	BHttpRedirectOptions				redirectOptions;
+	BHttpFields							optionalFields;
+	std::optional<BHttpAuthentication>	authentication;
 };
+
+
+// #pragma mark -- BHttpRequest helper functions
+
+
+/*!
+	\brief Build basic authentication header
+*/
+static inline BString
+build_basic_http_header(const BString& username, const BString& password)
+{
+	BString basicEncode, result;
+	basicEncode << username << ":" << password;
+	result << "Basic " << encode_to_base64(basicEncode);
+	return result;
+}
 
 
 // #pragma mark -- BHttpRequest
@@ -201,6 +218,15 @@ BHttpRequest::IsEmpty() const noexcept
 }
 
 
+const BHttpAuthentication*
+BHttpRequest::Authentication() const noexcept
+{
+	if (fData && fData->authentication)
+		return std::addressof(*fData->authentication);
+	return nullptr;
+}
+
+
 const BHttpFields&
 BHttpRequest::Fields() const noexcept
 {
@@ -234,6 +260,16 @@ BHttpRequest::Url() const noexcept
 	if (!fData)
 		return kDefaultUrl;
 	return fData->url;
+}
+
+
+void
+BHttpRequest::SetAuthentication(const BHttpAuthentication& authentication)
+{
+	if (!fData)
+		fData = std::make_unique<Data>();
+
+	fData->authentication = authentication;
 }
 
 
@@ -355,6 +391,13 @@ BHttpRequest::SerializeHeaderTo(BDataIO* target) const
 				// Let the remote server close the connection after response since
 				// we don't handle multiple request on a single connection
 		});
+	}
+
+	if (fData->authentication) {
+		// This request will add a Basic authorization header
+		BString authorization = build_basic_http_header(fData->authentication->username,
+			fData->authentication->password);
+		outputFields.AddField("Authorization"sv, std::string_view(authorization.String()));
 	}
 
 	for (const auto& field: outputFields) {

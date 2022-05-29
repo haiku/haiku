@@ -494,6 +494,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 		testCaller->addThread("HeadTest", &HttpIntegrationTest::HeadTest);
 		testCaller->addThread("NoContentTest", &HttpIntegrationTest::NoContentTest);
 		testCaller->addThread("AutoRedirectTest", &HttpIntegrationTest::AutoRedirectTest);
+		testCaller->addThread("BasicAuthTest", &HttpIntegrationTest::BasicAuthTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpIntegrationTest", &suite);
@@ -514,6 +515,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 		testCaller->addThread("HeadTest", &HttpIntegrationTest::HeadTest);
 		testCaller->addThread("NoContentTest", &HttpIntegrationTest::NoContentTest);
 		testCaller->addThread("AutoRedirectTest", &HttpIntegrationTest::AutoRedirectTest);
+		testCaller->addThread("BasicAuthTest", &HttpIntegrationTest::BasicAuthTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpsIntegrationTest", &suite);
@@ -679,4 +681,21 @@ HttpIntegrationTest::AutoRedirectTest()
 	} catch (const BPrivate::Network::BError& e) {
 		CPPUNIT_FAIL(e.DebugMessage().String());
 	}
+}
+
+
+void
+HttpIntegrationTest::BasicAuthTest()
+{
+	// Basic Authentication
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/auth/basic/walter/secret"));
+	request.SetAuthentication({"walter", "secret"});
+	auto result = fSession.Execute(std::move(request));
+	CPPUNIT_ASSERT(result.Status().code == 200);
+
+	// Basic Authentication with incorrect credentials
+	request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/auth/basic/walter/secret"));
+	request.SetAuthentication({"invaliduser", "invalidpassword"});
+	result = fSession.Execute(std::move(request));
+	CPPUNIT_ASSERT(result.Status().code == 401);
 }

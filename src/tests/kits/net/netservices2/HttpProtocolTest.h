@@ -43,6 +43,7 @@ public:
 			void	HeadTest();
 			void	NoContentTest();
 			void	AutoRedirectTest();
+			void	BasicAuthTest();
 
 	static	void	AddTests(BTestSuite& suite);
 

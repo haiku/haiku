@@ -309,6 +309,34 @@ namespace Network {
 
 
 /*!
+	\struct BHttpAuthentication
+	\ingroup netservices
+	\brief Describe username and password for basic authentication for the request.
+
+	\see These options are used by \ref BHttpRequest::Authentication() and
+		\ref BHttpRequest::SetAuthentication()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BString BHttpAuthentication::username
+	\brief The username for the request.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BString BHttpAuthentication::password
+	\brief The password for the request.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\class BHttpRequest
 	\ingroup netservices
 	\brief Represent a HTTP request.
@@ -479,6 +507,18 @@ namespace Network {
 
 
 /*!
+	\fn const BHttpAuthentication* BHttpRequest::Authentication() const noexcept
+	\brief Get the credentials for the authentication for the request.
+
+	\return When no credentials are set for this request, the method returns a \c nullptr.
+		Otherwise, it will return a pointer to the current BHttpAuthentication data set for this
+		request.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn const BHttpFields& BHttpRequest::Fields() const noexcept
 	\brief Get the additional header fields set for the request.
 
@@ -529,6 +569,21 @@ namespace Network {
 
 
 //! @{
+
+
+/*!
+	\fn void BHttpRequest::SetAuthentication(const BHttpAuthentication &authentication)
+	\brief Set the credentials to enable basic authentication for the request.
+
+	The Basic authorization line is added to the request upon setting the request details. There is
+	no support for other authentication schemes, like digest authentication.
+
+	\param authentication The credentials to apply to the request.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
 
 
 /*!
