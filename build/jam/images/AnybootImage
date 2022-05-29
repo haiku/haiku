@@ -50,7 +50,7 @@ for platform in [ MultiBootSubDirSetup ] {
 		if $(TARGET_BOOT_PLATFORM) = efi {
 			local efiLoader = haiku_loader.efi ;
 			local efiPartition = esp.image ;
-			MakeLocate $(efiPartition) ;
+			MakeLocateDebug $(efiPartition) : system boot ;
 			BuildEfiSystemPartition $(efiPartition) : $(efiLoader) ;
 			BuildAnybootImageEfi $(HAIKU_ANYBOOT) : $(baseMBR)
 				: $(efiPartition) : $(HAIKU_CD_BOOT_IMAGE)
