@@ -1,10 +1,12 @@
 /*
-** Copyright 2010, Oliver Tappe, zooey@hirschkaefer.de. All rights reserved.
-** Distributed under the terms of the MIT License.
-*/
+ * Copyright 2022, Trung Nguyen, trungnt282910@gmail.com
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
+
 
 #include <ctype.h>
 #include <errno.h>
+#include <locale.h>
 #include <string.h>
 #include <wctype.h>
 
@@ -15,20 +17,14 @@
 
 using BPrivate::Libroot::GetCurrentLocaleBackend;
 using BPrivate::Libroot::LocaleBackend;
+using BPrivate::Libroot::LocaleBackendData;
 
-
-/*
- * In many of the following functions, we make use of the fact that with
- * gLocaleBackend == NULL, the POSIX locale is active. Since the POSIX locale
- * only contains chars 0-127 and those ASCII chars are compatible with the
- * UTF32 values used in wint_t, we can delegate to the respective ctype
- * function.
- */
 
 int
-iswctype(wint_t wc, wctype_t charClass)
+iswctype_l(wint_t wc, wctype_t charClass, locale_t l)
 {
-	LocaleBackend* backend = GetCurrentLocaleBackend();
+	LocaleBackendData* locale = (LocaleBackendData*)l;
+	LocaleBackend* backend = locale->backend;
 
 	if (backend == NULL) {
 		if (wc < 0 || wc > 127)
@@ -41,93 +37,94 @@ iswctype(wint_t wc, wctype_t charClass)
 
 
 int
-iswalnum(wint_t wc)
+iswalnum_l(wint_t wc, locale_t locale)
 {
-	return iswctype(wc, _ISalnum);
+	return iswctype_l(wc, _ISalnum, locale);
 }
 
 
 int
-iswalpha(wint_t wc)
+iswalpha_l(wint_t wc, locale_t locale)
 {
-	return iswctype(wc, _ISalpha);
+	return iswctype_l(wc, _ISalpha, locale);
 }
 
 
 int
-iswblank(wint_t wc)
+iswblank_l(wint_t wc, locale_t locale)
 {
-	return iswctype(wc, _ISblank);
+	return iswctype_l(wc, _ISblank, locale);
 }
 
 
 int
-iswcntrl(wint_t wc)
+iswcntrl_l(wint_t wc, locale_t locale)
 {
-	return iswctype(wc, _IScntrl);
+	return iswctype_l(wc, _IScntrl, locale);
 }
 
 
 int
-iswdigit(wint_t wc)
+iswdigit_l(wint_t wc, locale_t locale)
 {
-	return iswctype(wc, _ISdigit);
+	return iswctype_l(wc, _ISdigit, locale);
 }
 
 
 int
-iswgraph(wint_t wc)
+iswgraph_l(wint_t wc, locale_t locale)
 {
-	return iswctype(wc, _ISgraph);
+	return iswctype_l(wc, _ISgraph, locale);
 }
 
 
 int
-iswlower(wint_t wc)
+iswlower_l(wint_t wc, locale_t locale)
 {
-	return iswctype(wc, _ISlower);
+	return iswctype_l(wc, _ISlower, locale);
 }
 
 
 int
-iswprint(wint_t wc)
+iswprint_l(wint_t wc, locale_t locale)
 {
-	return iswctype(wc, _ISprint);
+	return iswctype_l(wc, _ISprint, locale);
 }
 
 
 int
-iswpunct(wint_t wc)
+iswpunct_l(wint_t wc, locale_t locale)
 {
-	return iswctype(wc, _ISpunct);
+	return iswctype_l(wc, _ISpunct, locale);
 }
 
 
 int
-iswspace(wint_t wc)
+iswspace_l(wint_t wc, locale_t locale)
 {
-	return iswctype(wc, _ISspace);
+	return iswctype_l(wc, _ISspace, locale);
 }
 
 
 int
-iswupper(wint_t wc)
+iswupper_l(wint_t wc, locale_t locale)
 {
-	return iswctype(wc, _ISupper);
+	return iswctype_l(wc, _ISupper, locale);
 }
 
 
 int
-iswxdigit(wint_t wc)
+iswxdigit_l(wint_t wc, locale_t locale)
 {
-	return iswctype(wc, _ISxdigit);
+	return iswctype_l(wc, _ISxdigit, locale);
 }
 
 
 wint_t
-towlower(wint_t wc)
+towlower_l(wint_t wc, locale_t l)
 {
-	LocaleBackend* backend = GetCurrentLocaleBackend();
+	LocaleBackendData* locale = (LocaleBackendData*)l;
+	LocaleBackend* backend = locale->backend;
 
 	if (backend == NULL) {
 		if (wc < 0 || wc > 127)
@@ -143,9 +140,10 @@ towlower(wint_t wc)
 
 
 wint_t
-towupper(wint_t wc)
+towupper_l(wint_t wc, locale_t l)
 {
-	LocaleBackend* backend = GetCurrentLocaleBackend();
+	LocaleBackendData* locale = (LocaleBackendData*)l;
+	LocaleBackend* backend = locale->backend;
 
 	if (backend == NULL) {
 		if (wc < 0 || wc > 127)
@@ -161,9 +159,10 @@ towupper(wint_t wc)
 
 
 wint_t
-towctrans(wint_t wc, wctrans_t transition)
+towctrans_l(wint_t wc, wctrans_t transition, locale_t l)
 {
-	LocaleBackend* backend = GetCurrentLocaleBackend();
+	LocaleBackendData* locale = (LocaleBackendData*)l;
+	LocaleBackend* backend = locale->backend;
 
 	if (backend == NULL) {
 		if (transition == _ISlower)
@@ -185,8 +184,10 @@ towctrans(wint_t wc, wctrans_t transition)
 
 
 wctrans_t
-wctrans(const char *charClass)
+wctrans_l(const char *charClass, locale_t locale)
 {
+	(void)locale;
+
 	if (charClass != NULL) {
 		// we do not know any locale-specific character classes
 		if (strcmp(charClass, "tolower") == 0)
@@ -201,8 +202,10 @@ wctrans(const char *charClass)
 
 
 wctype_t
-wctype(const char *property)
+wctype_l(const char *property, locale_t locale)
 {
+	(void)locale;
+
 	// currently, we do not support any locale-specific properties
 	if (strcmp(property, "alnum") == 0)
 		return _ISalnum;

@@ -21,22 +21,25 @@
 #endif
 
 
-using BPrivate::Libroot::gLocaleBackend;
+using BPrivate::Libroot::GetCurrentLocaleBackend;
+using BPrivate::Libroot::LocaleBackend;
 
 
 extern "C" size_t
 __wcsnrtombs(char* dst, const wchar_t** src, size_t nwc, size_t len,
 	mbstate_t* ps)
 {
+	LocaleBackend* backend = GetCurrentLocaleBackend();
+
 	TRACE(("wcsnrtombs(%p, %p, %lu, %lu) - lb:%p\n", dst, *src, nwc, len,
-		gLocaleBackend));
+		backend));
 
 	if (ps == NULL) {
 		static mbstate_t internalMbState;
 		ps = &internalMbState;
 	}
 
-	if (gLocaleBackend == NULL) {
+	if (backend == NULL) {
 		/*
 		 * The POSIX locale is active. Since the POSIX locale only contains
 		 * chars 0-127 and those ASCII chars are compatible with the UTF32
@@ -83,7 +86,7 @@ __wcsnrtombs(char* dst, const wchar_t** src, size_t nwc, size_t len,
 	}
 
 	size_t result = 0;
-	status_t status = gLocaleBackend->WcharStringToMultibyte(dst, len, src, nwc,
+	status_t status = backend->WcharStringToMultibyte(dst, len, src, nwc,
 		ps, result);
 
 	if (status == B_BAD_DATA) {

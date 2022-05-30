@@ -583,3 +583,11 @@ strerror_r(int error, char *buffer, size_t bufferSize)
 		// TODO: could return ERANGE if buffer is too small
 }
 
+
+char *
+strerror_l(int error, locale_t locale)
+{
+	// Don't have error messages in other locales yet.
+	(void)locale;
+	return strerror(error);
+}

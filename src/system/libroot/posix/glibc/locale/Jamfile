@@ -13,6 +13,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			generic ;
 		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
 		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ctype ;
 		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
 
 		MergeObject <$(architecture)>posix_gnu_locale.o :
@@ -24,6 +25,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			C-time.c
 			C_name.c
 			coll-lookup.c
+			global-locale.c
 			lc-collate.c
 			lc-ctype.c
 			lc-messages.c

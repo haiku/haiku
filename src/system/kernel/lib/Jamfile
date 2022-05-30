@@ -64,6 +64,8 @@ KernelMergeObject kernel_lib_posix.o :
 	poll.cpp
 	utime.c
 	# locale
+	ctype_loc.cpp
+	ctype_l.cpp
 	ctype.cpp
 	localeconv.cpp
 	LocaleData.cpp

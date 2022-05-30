@@ -6,6 +6,7 @@
 #define _TIME_H_
 
 
+#include <locale_t.h>
 #include <sys/types.h>
 
 
@@ -92,6 +93,8 @@ extern struct tm	*localtime_r(const time_t *timer, struct tm *tm);
 extern int			nanosleep(const struct timespec *, struct timespec *);
 extern size_t		strftime(char *buffer, size_t maxSize, const char *format,
 						const struct tm *tm);
+extern size_t		strftime_l(char *buffer, size_t maxSize, const char *format,
+						const struct tm *tm, locale_t locale);
 extern char 		*strptime(const char *buf, const char *format, struct tm *tm);
 
 /* clock functions */

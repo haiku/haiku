@@ -8,11 +8,11 @@
 
 #include <SupportDefs.h>
 
+#include <locale.h>
 #include <time.h>
 #include <wctype.h>
 
 
-struct lconv;
 struct lc_time_t;
 struct locale_data;		// glibc
 
@@ -22,29 +22,38 @@ namespace Libroot {
 
 
 struct LocaleCtypeDataBridge {
-	const unsigned short**	addrOfClassInfoTable;
-	const int**				addrOfToLowerTable;
-	const int**				addrOfToUpperTable;
+private:
+	const unsigned short*		localClassInfoTable;
+	const int*					localToLowerTable;
+	const int*					localToUpperTable;
 
-	const unsigned short*	posixClassInfo;
-	const int*				posixToLowerMap;
-	const int*				posixToUpperMap;
+public:
+	const unsigned short**		addrOfClassInfoTable;
+	const int**					addrOfToLowerTable;
+	const int**					addrOfToUpperTable;
 
-	LocaleCtypeDataBridge();
+	const unsigned short* const	posixClassInfo;
+	const int* const			posixToLowerMap;
+	const int* const			posixToUpperMap;
+
+	bool						isGlobal;
+
+	LocaleCtypeDataBridge(bool isGlobal);
 
 	void setMbCurMax(unsigned short mbCurMax);
+	void ApplyToCurrentThread();
 };
 
 
 struct LocaleMessagesDataBridge {
-	const char** posixLanginfo;
+	const char** const 	posixLanginfo;
 
 	LocaleMessagesDataBridge();
 };
 
 
 struct LocaleMonetaryDataBridge {
-	const struct lconv* posixLocaleConv;
+	const struct lconv* const posixLocaleConv;
 
 	LocaleMonetaryDataBridge();
 };
@@ -71,29 +80,42 @@ private:
 		values[6];
 	};
 	locale_data* originalGlibcLocale;
+	GlibcNumericLocale  		glibcNumericLocaleData;
 
 public:
-	const struct lconv* posixLocaleConv;
-	GlibcNumericLocale  glibcNumericLocale;
+	const struct lconv* const 	posixLocaleConv;
+	GlibcNumericLocale*  		glibcNumericLocale;
+	bool						isGlobal;
 
-	LocaleNumericDataBridge();
+	LocaleNumericDataBridge(bool isGlobal);
 	~LocaleNumericDataBridge();
+
+	void ApplyToCurrentThread();
 };
 
 
 struct LocaleTimeDataBridge {
-	const struct lc_time_t* posixLCTimeInfo;
+	const struct lc_time_t* const posixLCTimeInfo;
 
 	LocaleTimeDataBridge();
 };
 
 
 struct TimeConversionDataBridge {
+private:
+	int						localDaylight;
+	long					localTimezone;
+	char*					localTZName[2];
+	char					localTZName0[64];
+	char					localTZName1[64];
+
+public:
 	int*					addrOfDaylight;
 	long*					addrOfTimezone;
 	char**					addrOfTZName;
+	bool					isGlobal;
 
-	TimeConversionDataBridge();
+	TimeConversionDataBridge(bool isGlobal);
 };
 
 
@@ -104,9 +126,12 @@ struct LocaleDataBridge {
 	LocaleNumericDataBridge		numericDataBridge;
 	LocaleTimeDataBridge		timeDataBridge;
 	TimeConversionDataBridge	timeConversionDataBridge;
-	const char**				posixLanginfo;
+	const char** const			posixLanginfo;
+	bool						isGlobal;
 
-	LocaleDataBridge();
+	LocaleDataBridge(bool isGlobal);
+
+	void ApplyToCurrentThread();
 };
 
 
@@ -162,11 +187,24 @@ public:
 	virtual void				Initialize(LocaleDataBridge* dataBridge) = 0;
 
 	static	status_t			LoadBackend();
+	static  LocaleBackend*		CreateBackend();
+	static  void				DestroyBackend(LocaleBackend* instance);
 };
 
 
-extern LocaleBackend* gLocaleBackend;
+// The real struct behind locale_t
+struct LocaleBackendData {
+	int magic;
+	LocaleBackend* backend;
+	LocaleDataBridge* databridge;
+};
 
+
+LocaleBackendData* GetCurrentLocaleInfo();
+void SetCurrentLocaleInfo(LocaleBackendData* newLocale);
+LocaleBackend* GetCurrentLocaleBackend();
+extern LocaleBackend* gGlobalLocaleBackend;
+extern LocaleDataBridge gGlobalLocaleDataBridge;
 
 }	// namespace Libroot
 }	// namespace BPrivate

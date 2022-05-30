@@ -30,6 +30,13 @@ CreateInstance()
 }
 
 
+extern "C" void
+DestroyInstance(LocaleBackend* instance)
+{
+	delete instance;
+}
+
+
 ICULocaleBackend::ICULocaleBackend()
 	:
 	fThreadLocalStorageKey(_CreateThreadLocalStorageKey()),

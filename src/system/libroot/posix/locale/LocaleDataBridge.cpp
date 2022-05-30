@@ -15,30 +15,60 @@
 #include <PosixLanginfo.h>
 #include <PosixLCTimeInfo.h>
 #include <PosixLocaleConv.h>
+#include <ThreadLocale.h>
 
 
-extern locale_data* _nl_current_LC_NUMERIC;
+extern const unsigned short* __ctype_b;
+extern const int* __ctype_tolower;
+extern const int* __ctype_toupper;
 
 
 namespace BPrivate {
 namespace Libroot {
 
 
-LocaleCtypeDataBridge::LocaleCtypeDataBridge()
+extern "C" GlibcLocaleStruct* _nl_current_locale();
+extern "C" GlibcLocaleStruct _nl_global_locale;
+#define _NL_CURRENT_DATA(category) \
+	((locale_data*&)(_nl_current_locale()->__locales[category]))
+#define _NL_GLOBAL_DATA(category) \
+	((locale_data*&)(_nl_global_locale.__locales[category]))
+
+
+LocaleCtypeDataBridge::LocaleCtypeDataBridge(bool isGlobal)
 	:
-	addrOfClassInfoTable(&__ctype_b),
-	addrOfToLowerTable(&__ctype_tolower),
-	addrOfToUpperTable(&__ctype_toupper),
+	localClassInfoTable(__ctype_b),
+	localToLowerTable(__ctype_tolower),
+	localToUpperTable(__ctype_toupper),
 	posixClassInfo(gPosixClassInfo),
 	posixToLowerMap(gPosixToLowerMap),
-	posixToUpperMap(gPosixToUpperMap)
+	posixToUpperMap(gPosixToUpperMap),
+	isGlobal(isGlobal)
 {
+	if (isGlobal) {
+		addrOfClassInfoTable = &__ctype_b;
+		addrOfToLowerTable = &__ctype_tolower;
+		addrOfToUpperTable = &__ctype_toupper;
+	} else {
+		addrOfClassInfoTable = &localClassInfoTable;
+		addrOfToLowerTable = &localToLowerTable;
+		addrOfToUpperTable = &localToUpperTable;
+	}
 }
 
 
 void LocaleCtypeDataBridge::setMbCurMax(unsigned short mbCurMax)
 {
 	__ctype_mb_cur_max = mbCurMax;
+}
+
+
+void
+LocaleCtypeDataBridge::ApplyToCurrentThread()
+{
+	*__ctype_b_loc() = *addrOfClassInfoTable;
+	*__ctype_tolower_loc() = *addrOfToLowerTable;
+	*__ctype_toupper_loc() = *addrOfToUpperTable;
 }
 
 
@@ -56,20 +86,36 @@ LocaleMonetaryDataBridge::LocaleMonetaryDataBridge()
 }
 
 
-LocaleNumericDataBridge::LocaleNumericDataBridge()
+LocaleNumericDataBridge::LocaleNumericDataBridge(bool isGlobal)
 	:
-	originalGlibcLocale(_nl_current_LC_NUMERIC),
-	posixLocaleConv(&gPosixLocaleConv)
+	posixLocaleConv(&gPosixLocaleConv),
+	glibcNumericLocale(&glibcNumericLocaleData)
 {
-	memcpy(&glibcNumericLocale, _nl_current_LC_NUMERIC,
-		sizeof(glibcNumericLocale));
-	_nl_current_LC_NUMERIC = (locale_data*)&glibcNumericLocale;
+
+	memcpy(glibcNumericLocale, _NL_GLOBAL_DATA(GLIBC_LC_NUMERIC),
+		sizeof(GlibcNumericLocale));
+
+	if (isGlobal) {
+		originalGlibcLocale = _NL_GLOBAL_DATA(GLIBC_LC_NUMERIC);
+		_NL_GLOBAL_DATA(GLIBC_LC_NUMERIC) = (locale_data*)glibcNumericLocale;
+	}
 }
 
 
 LocaleNumericDataBridge::~LocaleNumericDataBridge()
 {
-	_nl_current_LC_NUMERIC = originalGlibcLocale;
+	if (isGlobal) {
+		_NL_GLOBAL_DATA(GLIBC_LC_NUMERIC) = originalGlibcLocale;
+	} else if (_NL_CURRENT_DATA(GLIBC_LC_NUMERIC) == (locale_data*)glibcNumericLocale) {
+		_NL_CURRENT_DATA(GLIBC_LC_NUMERIC) = _NL_GLOBAL_DATA(GLIBC_LC_NUMERIC);
+	}
+}
+
+
+void
+LocaleNumericDataBridge::ApplyToCurrentThread()
+{
+	_NL_CURRENT_DATA(GLIBC_LC_NUMERIC) = (locale_data*)glibcNumericLocale;
 }
 
 
@@ -80,19 +126,50 @@ LocaleTimeDataBridge::LocaleTimeDataBridge()
 }
 
 
-TimeConversionDataBridge::TimeConversionDataBridge()
+TimeConversionDataBridge::TimeConversionDataBridge(bool isGlobal)
 	:
-	addrOfDaylight(&daylight),
-	addrOfTimezone(&timezone),
-	addrOfTZName(tzname)
+	localDaylight(daylight),
+	localTimezone(timezone),
+	isGlobal(isGlobal)
+{
+	if (isGlobal) {
+		addrOfDaylight = &daylight;
+		addrOfTimezone = &timezone;
+		addrOfTZName = tzname;
+	} else {
+		addrOfDaylight = &localDaylight;
+		addrOfTimezone = &localTimezone;
+		addrOfTZName = localTZName;
+		addrOfTZName[0] = localTZName0;
+		addrOfTZName[1] = localTZName1;
+		strlcpy(localTZName0, tzname[0], sizeof(localTZName0));
+		strlcpy(localTZName1, tzname[1], sizeof(localTZName1));
+	}
+}
+
+
+LocaleDataBridge::LocaleDataBridge(bool isGlobal)
+	:
+	ctypeDataBridge(isGlobal),
+	numericDataBridge(isGlobal),
+	timeConversionDataBridge(isGlobal),
+	posixLanginfo(gPosixLanginfo),
+	isGlobal(isGlobal)
 {
 }
 
 
-LocaleDataBridge::LocaleDataBridge()
-	:
-	posixLanginfo(gPosixLanginfo)
+void
+LocaleDataBridge::ApplyToCurrentThread()
 {
+	ctypeDataBridge.ApplyToCurrentThread();
+	numericDataBridge.ApplyToCurrentThread();
+	// While timeConverstionDataBridge stores read-write variables,
+	// these variables are global (by POSIX definition). Furthermore,
+	// none of the backends seem to access these variables
+	// directly. The values are set in the bridge mostly for
+	// synchronization purposes. Therefore, don't call
+	// ApplyToCurrentThread for this object.
 }
 
 

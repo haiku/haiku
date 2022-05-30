@@ -17,7 +17,7 @@
 #include "LocaleBackend.h"
 
 
-using BPrivate::Libroot::gLocaleBackend;
+using BPrivate::Libroot::GetCurrentLocaleBackend;
 using BPrivate::Libroot::LocaleBackend;
 
 
@@ -43,13 +43,13 @@ extern "C" time_t __timegm_fallback(struct tm* tmp);
 extern "C" void
 tzset(void)
 {
-	if (gLocaleBackend == NULL && LocaleBackend::LoadBackend() != B_OK)
+	if (GetCurrentLocaleBackend() == NULL && LocaleBackend::LoadBackend() != B_OK)
 		return;
 
 	char timeZoneID[B_FILE_NAME_LENGTH] = { "GMT" };
 	_kern_get_timezone(NULL, timeZoneID, sizeof(timeZoneID));
 
-	gLocaleBackend->TZSet(timeZoneID, getenv("TZ"));
+	GetCurrentLocaleBackend()->TZSet(timeZoneID, getenv("TZ"));
 }
 
 
@@ -71,8 +71,11 @@ localtime_r(const time_t* inTime, struct tm* tmOut)
 	}
 
 	tzset();
-	if (gLocaleBackend != NULL) {
-		status_t status = gLocaleBackend->Localtime(inTime, tmOut);
+
+	LocaleBackend* backend = GetCurrentLocaleBackend();
+
+	if (backend != NULL) {
+		status_t status = backend->Localtime(inTime, tmOut);
 
 		if (status != B_OK)
 			__set_errno(EOVERFLOW);
@@ -104,8 +107,11 @@ gmtime_r(const time_t* inTime, struct tm* tmOut)
 	}
 
 	tzset();
-	if (gLocaleBackend != NULL) {
-		status_t status = gLocaleBackend->Gmtime(inTime, tmOut);
+
+	LocaleBackend* backend = GetCurrentLocaleBackend();
+
+	if (backend != NULL) {
+		status_t status = backend->Gmtime(inTime, tmOut);
 
 		if (status != B_OK)
 			__set_errno(EOVERFLOW);
@@ -128,9 +134,12 @@ mktime(struct tm* inTm)
 	}
 
 	tzset();
-	if (gLocaleBackend != NULL) {
+
+	LocaleBackend* backend = GetCurrentLocaleBackend();
+
+	if (backend != NULL) {
 		time_t timeOut;
-		status_t status = gLocaleBackend->Mktime(inTm, timeOut);
+		status_t status = backend->Mktime(inTm, timeOut);
 
 		if (status != B_OK) {
 			__set_errno(EOVERFLOW);
@@ -154,9 +163,12 @@ timegm(struct tm* inTm)
 		return -1;
 	}
 	tzset();
-	if (gLocaleBackend != NULL) {
+
+	LocaleBackend* backend = GetCurrentLocaleBackend();
+
+	if (backend != NULL) {
 		time_t timeOut;
-		status_t status = gLocaleBackend->Timegm(inTm, timeOut);
+		status_t status = backend->Timegm(inTm, timeOut);
 
 		if (status != B_OK) {
 			__set_errno(EOVERFLOW);

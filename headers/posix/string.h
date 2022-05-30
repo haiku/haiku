@@ -6,6 +6,7 @@
 #define _STRING_H_
 
 
+#include <locale_t.h>
 #include <sys/types.h>
 
 
@@ -73,6 +74,11 @@ extern char		*strupr(char *string);
 /* extern char		*strsep(char **stringPointer, const char *delimiter); */
 
 extern const char	*strsignal(int signum);
+
+/* locale versions of string functions */
+extern int		strcoll_l(const char *string1, const char *string2, locale_t locale);
+extern char		*strerror_l(int errorCode, locale_t locale);
+extern size_t	strxfrm_l(char *string1, const char *string2, size_t length, locale_t locale);
 
 /* for compatibility, pull in functions declared in strings.h */
 #include <strings.h>

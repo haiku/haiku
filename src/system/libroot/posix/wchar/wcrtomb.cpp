@@ -20,12 +20,15 @@
 #endif
 
 
-using BPrivate::Libroot::gLocaleBackend;
+using BPrivate::Libroot::GetCurrentLocaleBackend;
+using BPrivate::Libroot::LocaleBackend;
 
 
 extern "C" size_t
 __wcrtomb(char* s, wchar_t wc, mbstate_t* ps)
 {
+	LocaleBackend* backend = GetCurrentLocaleBackend();
+
 	if (ps == NULL) {
 		static mbstate_t internalMbState;
 		ps = &internalMbState;
@@ -34,7 +37,7 @@ __wcrtomb(char* s, wchar_t wc, mbstate_t* ps)
 	if (s == NULL)
 		wc = 0;
 
-	if (gLocaleBackend == NULL) {
+	if (backend == NULL) {
 		/*
 		 * The POSIX locale is active. Since the POSIX locale only contains
 		 * chars 0-127 and those ASCII chars are compatible with the UTF32
@@ -54,7 +57,7 @@ __wcrtomb(char* s, wchar_t wc, mbstate_t* ps)
 	}
 
 	size_t lengthUsed;
-	status_t status = gLocaleBackend->WcharToMultibyte(s, wc, ps, lengthUsed);
+	status_t status = backend->WcharToMultibyte(s, wc, ps, lengthUsed);
 
 	if (status == B_BAD_INDEX)
 		return (size_t)-2;

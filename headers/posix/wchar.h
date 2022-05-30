@@ -7,6 +7,7 @@
 
 
 #include <limits.h>
+#include <locale.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <time.h>
@@ -93,6 +94,7 @@ extern wchar_t	*wcpcpy(wchar_t *dest, const wchar_t *src);
 extern wchar_t	*wcpncpy(wchar_t *dest, const wchar_t *src, size_t srcLength);
 extern size_t   wcrtomb(char *dest, wchar_t wc, mbstate_t *mbState);
 extern int		wcscasecmp(const wchar_t *wcs1, const wchar_t *wcs2);
+extern int		wcscasecmp_l(const wchar_t *wcs1, const wchar_t *wcs2, locale_t locale);
 extern wchar_t	*wcscat(wchar_t *dest, const wchar_t *src);
 extern wchar_t	*wcschr(const wchar_t *wcs, wchar_t wc);
 #ifdef _GNU_SOURCE
@@ -100,6 +102,7 @@ extern wchar_t	*wcschrnul(const wchar_t *wcs, wchar_t wc);
 #endif
 extern int      wcscmp(const wchar_t *wcs1, const wchar_t *wcs2);
 extern int      wcscoll(const wchar_t *wcs1, const wchar_t *wcs2);
+extern int		wcscoll_l(const wchar_t *wcs1, const wchar_t *wcs2, locale_t locale);
 extern wchar_t	*wcscpy(wchar_t *dest, const wchar_t *src);
 extern size_t	wcscspn(const wchar_t *wcs, const wchar_t *reject);
 extern wchar_t	*wcsdup(const wchar_t *wcs);
@@ -110,6 +113,8 @@ extern size_t	wcslcpy(wchar_t *dest, const wchar_t *src, size_t maxLength);
 extern size_t	wcslen(const wchar_t *wcs);
 extern int		wcsncasecmp(const wchar_t *wcs1, const wchar_t *wcs2,
 					size_t maxLength);
+extern int		wcsncasecmp_l(const wchar_t *wcs1, const wchar_t *wcs2,
+					size_t maxLength, locale_t locale);
 extern wchar_t 	*wcsncat(wchar_t *dest, const wchar_t *src, size_t srcLength);
 extern int		wcsncmp(const wchar_t *wcs1, const wchar_t *wcs2,
 					size_t length);
@@ -136,6 +141,8 @@ extern unsigned long long	wcstoull(const wchar_t *wcs, wchar_t **endPtr,
 extern wchar_t	*wcswcs(const wchar_t *haystack, const wchar_t *needle);
 extern int		wcswidth(const wchar_t *wcs, size_t length);
 extern size_t	wcsxfrm(wchar_t *dest, const wchar_t *src, size_t destLength);
+extern size_t	wcsxfrm_l(wchar_t *dest, const wchar_t *src, size_t destLength,
+					locale_t locale);
 extern int		wctob(wint_t wc);
 extern int		wcwidth(wchar_t wc);
 extern wchar_t	*wmemchr(const wchar_t *wcs, wchar_t wc, size_t n);

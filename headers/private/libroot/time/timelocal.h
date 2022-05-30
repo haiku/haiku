@@ -29,6 +29,7 @@
 #define	_TIMELOCAL_H_
 
 
+#include <locale.h>
 #include <sys/cdefs.h>
 
 
@@ -54,6 +55,7 @@ struct lc_time_t {
 
 __BEGIN_DECLS
 const struct lc_time_t* __get_current_time_locale(void);
+const struct lc_time_t* __get_time_locale(locale_t);
 __END_DECLS
 
 
