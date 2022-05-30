@@ -232,9 +232,11 @@ _bus_dmamap_load_buffer(bus_dma_tag_t dmat, bus_dmamap_t /* map */, void* buf,
 	while (buflen > 0) {
 		const bus_addr_t phys_addr = pmap_kextract(virtual_addr);
 
-		bus_size_t segment_size = B_PAGE_SIZE - (phys_addr & (B_PAGE_SIZE - 1));
+		bus_size_t segment_size = B_PAGE_SIZE - (phys_addr & PAGE_MASK);
 		if (segment_size > buflen)
 			segment_size = buflen;
+		if (segment_size > dmat->maxsegsz)
+			segment_size = dmat->maxsegsz;
 
 		if (dmat->boundary > 0) {
 			// Make sure we don't cross a boundary.
