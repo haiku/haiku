@@ -11,7 +11,7 @@ KernelAddon ext2 :
 	Attribute.cpp
 	BitmapBlock.cpp
 	BlockAllocator.cpp
-	crc32.c
+	crc32.cpp
 	CRCTable.cpp
 	DataStream.cpp
 	DeviceOpener.cpp
@@ -34,7 +34,7 @@ KernelAddon ext2 :
 SEARCH on [ FGristFiles DeviceOpener.cpp ]
 	= [ FDirName  $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
-SEARCH on [ FGristFiles crc32.c ]
+SEARCH on [ FGristFiles crc32.cpp ]
 	= [ FDirName  $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
 SEARCH on [ FGristFiles CRCTable.cpp ]

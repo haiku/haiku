@@ -543,7 +543,7 @@ Inode::GetFromDisk()
 	xfs_fsblock_t blockToRead = FSBLOCKS_TO_BASICBLOCKS(fVolume->BlockLog(),
 		((uint64)(agNo * numberOfBlocksInAg) + agBlock));
 
-	xfs_daddr_t readPos = blockToRead * BASICBLOCKSIZE + offset * len;
+	xfs_daddr_t readPos = blockToRead * XFS_MIN_BLOCKSIZE + offset * len;
 
 	if (read_pos(fVolume->Device(), readPos, fBuffer, len) != len) {
 		ERROR("Inode::Inode(): IO Error");
@@ -570,7 +570,7 @@ Inode::FileSystemBlockToAddr(uint64 block)
 			((uint64)(agNo * numberOfBlocksInAg) + agBlockNo));
 	TRACE("blockToRead:(%" B_PRIu64 ")\n", actualBlockToRead);
 
-	uint64 readPos = actualBlockToRead * (BASICBLOCKSIZE);
+	uint64 readPos = actualBlockToRead * (XFS_MIN_BLOCKSIZE);
 	return readPos;
 }
 

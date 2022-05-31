@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src tests add-ons kernel file_systems xfs xfs_shell ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems xfs ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
 # prevent inclusion of HaikuBuildCompatibility.h and _BSD_SOURCE headers
 DEFINES += HAIKU_BUILD_COMPATIBILITY_H __STRICT_ANSI__ ;
@@ -37,10 +38,10 @@ UsePrivateHeaders fs_shell ;
 UsePrivateHeaders file_systems ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers private ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src tools fs_shell ] ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] : true ;
 
 local xfsSource =
 	BPlusTree.cpp
-	DeviceOpener.cpp
 	Directory.cpp
 	Extent.cpp
 	Inode.cpp
@@ -51,8 +52,13 @@ local xfsSource =
 	Volume.cpp
 	xfs.cpp
 ;
+local sharedSources =
+	crc32.cpp
+	CRCTable.cpp
+	DeviceOpener.cpp
+;
 
-BuildPlatformMergeObject <build>xfs_shell.o : $(xfsSource) ;
+BuildPlatformMergeObject <build>xfs_shell.o : $(xfsSource) $(sharedSources) ;
 
 BuildPlatformMain <build>xfs_shell
 	:
@@ -74,5 +80,3 @@ BuildPlatformMain <build>xfs_fuse
 SEARCH on [ FGristFiles QueryParserUtils.cpp ]
 	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
-SEARCH on [ FGristFiles DeviceOpener.cpp ]
-	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

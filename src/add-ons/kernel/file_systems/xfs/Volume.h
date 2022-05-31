@@ -11,7 +11,7 @@
 #include "xfs.h"
 
 
-#define FSBLOCK_SHIFT(fsBlockLog) (fsBlockLog - BASICBLOCKLOG);
+#define FSBLOCK_SHIFT(fsBlockLog) (fsBlockLog - XFS_MIN_BLOCKSIZE_LOG);
 #define FSBLOCKS_TO_BASICBLOCKS(fsBlockLog, x) x << FSBLOCK_SHIFT(fsBlockLog);
 	// Converting the FS Blocks to Basic Blocks
 
