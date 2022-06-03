@@ -440,6 +440,7 @@ bus_dmamap_load_mbuf_sg(bus_dma_tag_t dmat, bus_dmamap_t map, struct mbuf* mb,
 	int nsegs = 0, error = 0;
 	bool first = true;
 	bus_addr_t lastaddr = 0;
+	flags |= BUS_DMA_NOWAIT;
 
 	for (struct mbuf* m = mb; m != NULL && error == 0; m = m->m_next) {
 		if (m->m_len <= 0)
