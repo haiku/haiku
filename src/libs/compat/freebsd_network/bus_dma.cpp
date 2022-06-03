@@ -73,7 +73,7 @@ struct bus_dmamap {
 // #pragma mark - functions
 
 
-void
+extern "C" void
 busdma_lock_mutex(void* arg, bus_dma_lock_op_t op)
 {
 	struct mtx* dmtx = (struct mtx*)arg;
@@ -90,7 +90,7 @@ busdma_lock_mutex(void* arg, bus_dma_lock_op_t op)
 }
 
 
-int
+extern "C" int
 bus_dma_tag_create(bus_dma_tag_t parent, bus_size_t alignment, bus_addr_t boundary,
 	bus_addr_t lowaddr, bus_addr_t highaddr, bus_dma_filter_t* filter,
 	void* filterarg, bus_size_t maxsize, int nsegments, bus_size_t maxsegsz,
@@ -151,7 +151,7 @@ bus_dma_tag_create(bus_dma_tag_t parent, bus_size_t alignment, bus_addr_t bounda
 }
 
 
-int
+extern "C" int
 bus_dma_tag_destroy(bus_dma_tag_t dmat)
 {
 	if (dmat == NULL)
@@ -176,7 +176,7 @@ bus_dma_tag_destroy(bus_dma_tag_t dmat)
 }
 
 
-int
+extern "C" int
 bus_dmamap_create(bus_dma_tag_t dmat, int flags, bus_dmamap_t* mapp)
 {
 	*mapp = (bus_dmamap_t)calloc(sizeof(**mapp), 1);
@@ -229,7 +229,7 @@ _prepare_bounce_buffer(bus_dmamap_t map, bus_size_t reqsize, int flags)
 }
 
 
-int
+extern "C" int
 bus_dmamap_destroy(bus_dma_tag_t dmat, bus_dmamap_t map)
 {
 	if (map == NULL)
@@ -245,7 +245,7 @@ bus_dmamap_destroy(bus_dma_tag_t dmat, bus_dmamap_t map)
 }
 
 
-int
+extern "C" int
 bus_dmamem_alloc(bus_dma_tag_t dmat, void** vaddr, int flags,
 	bus_dmamap_t* mapp)
 {
@@ -301,7 +301,7 @@ bus_dmamem_alloc(bus_dma_tag_t dmat, void** vaddr, int flags,
 }
 
 
-void
+extern "C" void
 bus_dmamem_free(bus_dma_tag_t dmat, void* vaddr, bus_dmamap_t map)
 {
 	kernel_contigfree(vaddr, dmat->maxsize, M_DEVBUF);
@@ -388,7 +388,7 @@ _bus_load_buffer(bus_dma_tag_t dmat, void* buf, bus_size_t buflen,
 }
 
 
-int
+extern "C" int
 bus_dmamap_load(bus_dma_tag_t dmat, bus_dmamap_t map, void *buf,
 	bus_size_t buflen, bus_dmamap_callback_t *callback,
 	void *callback_arg, int flags)
@@ -428,7 +428,7 @@ bus_dmamap_load(bus_dma_tag_t dmat, bus_dmamap_t map, void *buf,
 }
 
 
-int
+extern "C" int
 bus_dmamap_load_mbuf_sg(bus_dma_tag_t dmat, bus_dmamap_t map, struct mbuf* mb,
 	bus_dma_segment_t* segs, int* _nsegs, int flags)
 {
@@ -469,7 +469,7 @@ bus_dmamap_load_mbuf_sg(bus_dma_tag_t dmat, bus_dmamap_t map, struct mbuf* mb,
 }
 
 
-int
+extern "C" int
 bus_dmamap_load_mbuf(bus_dma_tag_t dmat, bus_dmamap_t map, struct mbuf* mb,
 	bus_dmamap_callback2_t* callback, void* callback_arg, int flags)
 {
@@ -486,7 +486,7 @@ bus_dmamap_load_mbuf(bus_dma_tag_t dmat, bus_dmamap_t map, struct mbuf* mb,
 }
 
 
-void
+extern "C" void
 bus_dmamap_unload(bus_dma_tag_t dmat, bus_dmamap_t map)
 {
 	if (map == NULL)
@@ -498,7 +498,7 @@ bus_dmamap_unload(bus_dma_tag_t dmat, bus_dmamap_t map)
 }
 
 
-void
+extern "C" void
 bus_dmamap_sync(bus_dma_tag_t dmat, bus_dmamap_t map, bus_dmasync_op_t op)
 {
 	if (map == NULL)
