@@ -495,6 +495,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 		testCaller->addThread("NoContentTest", &HttpIntegrationTest::NoContentTest);
 		testCaller->addThread("AutoRedirectTest", &HttpIntegrationTest::AutoRedirectTest);
 		testCaller->addThread("BasicAuthTest", &HttpIntegrationTest::BasicAuthTest);
+		testCaller->addThread("StopOnErrorTest", &HttpIntegrationTest::StopOnErrorTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpIntegrationTest", &suite);
@@ -516,6 +517,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 		testCaller->addThread("NoContentTest", &HttpIntegrationTest::NoContentTest);
 		testCaller->addThread("AutoRedirectTest", &HttpIntegrationTest::AutoRedirectTest);
 		testCaller->addThread("BasicAuthTest", &HttpIntegrationTest::BasicAuthTest);
+		testCaller->addThread("StopOnErrorTest", &HttpIntegrationTest::StopOnErrorTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpsIntegrationTest", &suite);
@@ -698,4 +700,17 @@ HttpIntegrationTest::BasicAuthTest()
 	request.SetAuthentication({"invaliduser", "invalidpassword"});
 	result = fSession.Execute(std::move(request));
 	CPPUNIT_ASSERT(result.Status().code == 401);
+}
+
+
+void
+HttpIntegrationTest::StopOnErrorTest()
+{
+	// Test the Stop on Error functionality
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/400"));
+	request.SetStopOnError(true);
+	auto result = fSession.Execute(std::move(request));
+	CPPUNIT_ASSERT(result.Status().code == 400);
+	CPPUNIT_ASSERT(result.Fields().CountFields() == 0);
+	CPPUNIT_ASSERT(result.Body().text.Length() == 0);
 }

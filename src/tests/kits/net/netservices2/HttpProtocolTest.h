@@ -44,6 +44,7 @@ public:
 			void	NoContentTest();
 			void	AutoRedirectTest();
 			void	BasicAuthTest();
+			void	StopOnErrorTest();
 
 	static	void	AddTests(BTestSuite& suite);
 

@@ -594,10 +594,7 @@ BHttpSession::Request::Request(BHttpRequest&& request, std::unique_ptr<BDataIO> 
 	auto identifier = get_netservices_request_identifier();
 
 	// interpret the remaining redirects
-	if (fRequest.Redirect().followRedirect)
-		fRemainingRedirects = fRequest.Redirect().maxRedirections;
-	else
-		fRemainingRedirects = 0;
+	fRemainingRedirects = fRequest.MaxRedirections();
 
 	// create shared data
 	fResult = std::make_shared<HttpResultPrivate>(identifier);
@@ -661,6 +658,9 @@ BHttpSession::Request::OpenConnection()
 	} else {
 		fSocket = std::make_unique<BSocket>();
 	}
+
+	// Set timeout
+	fSocket->SetTimeout(fRequest.Timeout());
 
 	// Open connection
 	if (auto status = fSocket->Connect(fRemoteAddress); status != B_OK) {
@@ -779,6 +779,17 @@ BHttpSession::Request::ReceiveResult()
 
 				fResult->SetStatus(std::move(status));
 				// TODO: inform listeners of receiving the status code
+			}
+
+			if ((status.StatusClass() == BHttpStatusClass::ClientError
+					|| status.StatusClass() == BHttpStatusClass::ServerError)
+				&& fRequest.StopOnError())
+			{
+				fRequestStatus = ContentReceived;
+				fResult->SetStatus(std::move(status));
+				fResult->SetFields(BHttpFields());
+				fResult->SetBody();
+				return true;
 			}
 
 			// TODO: handle the case where we have an error code and we want to stop on error

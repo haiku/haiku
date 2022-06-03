@@ -74,12 +74,6 @@ private:
 };
 
 
-struct BHttpRedirectOptions {
-	bool	followRedirect = true;
-	uint8	maxRedirections = 8;
-};
-
-
 struct BHttpAuthentication {
 	BString	username;
 	BString	password;
@@ -103,15 +97,19 @@ public:
 			bool					IsEmpty() const noexcept;
 	const	BHttpAuthentication*	Authentication() const noexcept;
 	const	BHttpFields&			Fields() const noexcept;
+			uint8					MaxRedirections() const noexcept;
 	const	BHttpMethod&			Method() const noexcept;
-	const	BHttpRedirectOptions&	Redirect() const noexcept;
+			bool					StopOnError() const noexcept;
+			bigtime_t				Timeout() const noexcept;
 	const	BUrl&					Url() const noexcept;
 
 	// Named Setters
 			void					SetAuthentication(const BHttpAuthentication& authentication);
 			void					SetFields(const BHttpFields& fields);
+			void					SetMaxRedirections(uint8 maxRedirections);
 			void					SetMethod(const BHttpMethod& method);
-			void					SetRedirect(const BHttpRedirectOptions& redirectOptions);
+			void					SetStopOnError(bool stopOnError);
+			void					SetTimeout(bigtime_t timeout);
 			void					SetUrl(const BUrl& url);
 
 	// Serialization

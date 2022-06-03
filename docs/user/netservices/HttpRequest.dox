@@ -275,40 +275,6 @@ namespace Network {
 
 
 /*!
-	\struct BHttpRedirectOptions
-	\ingroup netservices
-	\brief Describe redirection options for a \ref BHttpRequest.
-
-	\see These options are used by \ref BHttpRequest::Redirect() and
-		\ref BHttpRequest::SetRedirect()
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\var bool BHttpRedirectOptions::followRedirect
-	\brief Describe whether the request should follow redirects.
-
-	\see These options are used by \ref BHttpRequest::Redirect() and
-		\ref BHttpRequest::SetRedirect()
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\var uint8 BHttpRedirectOptions::maxRedirections
-	\brief The maximum number of redirects that should be followed.
-
-	\see These options are used by \ref BHttpRequest::Redirect() and
-		\ref BHttpRequest::SetRedirect()
-
-	\since Haiku R1
-*/
-
-
-/*!
 	\struct BHttpAuthentication
 	\ingroup netservices
 	\brief Describe username and password for basic authentication for the request.
@@ -370,10 +336,22 @@ namespace Network {
 			<td> Defaults to \ref BHttpMethod::Get </td>
 		</tr>
 		<tr>
-			<td> \ref Redirect() </td>
-			<td> \ref SetRedirect() </td>
-			<td> Whether redirects should be followed, and if so, how many </td>
-			<td> By default redirects are followed, up to 8 redirects for one request </td>
+			<td> \ref MaxRedirections() </td>
+			<td> \ref SetMaxRedirections() </td>
+			<td> How many redirections should be followed. Set to 0 to disable. </td>
+			<td> Defaults to 8 redirections per request </td>
+		</tr>
+		<tr>
+			<td> \ref StopOnError() </td>
+			<td> \ref SetStopOnError() </td>
+			<td> Stop parsing the server response when there is a client or server error. </td>
+			<td> Defaults to \a false </td>
+		</tr>
+		<tr>
+			<td> \ref Timeout() </td>
+			<td> \ref SetTimeout() </td>
+			<td> The timeout determines how long is waited for the server to respond </td>
+			<td> \c B_INFINITE_TIMEOUT </td>
 		</tr>
 	</table>
 
@@ -540,10 +518,30 @@ namespace Network {
 
 
 /*!
-	\fn const BHttpRedirectOptions& BHttpRequest::Redirect() const noexcept
+	\fn uint8 BHttpRequest::MaxRedirections() const noexcept
 	\brief Get the current redirection options for this request.
 
-	\see \ref BHttpRequest::SetRedirect() for details on the options.
+	\see \ref BHttpRequest::SetMaxRedirections() for details on the options.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BHttpRequest::StopOnError() const noexcept
+	\brief Is the request set to parse the full response on error.
+
+	\retval true When encountering a HTTP status of the client error class (4xx) or server error
+		class (5xx), then the response will not be parsed.
+	\retval false The full response will be parsed, even with an error status code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bigtime_t BHttpRequest::Timeout() const noexcept
+	\brief Get the current timeout for the server to respond.
 
 	\since Haiku R1
 */
@@ -623,22 +621,57 @@ namespace Network {
 
 
 /*!
-	\fn void BHttpRequest::SetRedirect(const BHttpRedirectOptions &redirectOptions)
+	\fn void BHttpRequest::SetMaxRedirections(uint8 maxRedirections)
 	\brief Set the redirection options for this request.
 
 	The HTTP protocol allows the server to redirect requests if the resources have moved to a new
 	location. For your convenience, you can instruct the network services kit to follow these
-	redirections.
+	redirections. You can set how many redirects should be followed. The maximum value is that of
+	an unsigned 8 bit int, so maximum is 256 redirects. This prevents the request from staying
+	stuck in a redirection loop.
 
-	The \ref BHttpRedirectOptions allows you to set what the redirection policy should be. You can
-	set whether redirects should be followed at all, and if so, how many redirects should be
-	followed. The maximum value is that of an unsigned 8 bit int, so maximum is 256 redirects. This
-	prevents the request from staying stuck in a redirection loop.
-
-	If redirects are disabled, or the maximum number of redirects have been processed, then the
+	If redirects are set to 0, or the maximum number of redirects have been processed, then the
 	response will be set to the actual (last) received redirection response.
 
-	\param redirectOptions The options for redirections.
+	\param maxRedirections The number of redirections to follow. Set to 0 to disable.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpRequest::SetStopOnError(bool stopOnError)
+	\brief Set whether the entire response will be parsed on a client or server error.
+
+	When the server encounters an error processing a request, it may respond with an error code.
+	Error responses can be either an error with the request, like the 404 Not Found error, or
+	errors on the server side, like a 500 Internal Server Error. Error responses may still have
+	header fields and bodies.
+
+	If your application is not interested in the rest of the response in case a client error or
+	a server error occurs, you can set this option to stop parsing. This will allow you to use the
+	\ref BHttpResult object as normal, but the response fields will be empty, and there will be no
+	body data.
+
+	\param stopOnError Set to \c true to stop parsing the HTTP response when a client error or
+		server error occurs.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpRequest::SetTimeout(bigtime_t timeout)
+	\brief Set the maximum time waiting for the server to respond.
+
+	If the request times out, then the response will hold the \ref BNetworkRequestError of the
+	\c NetworkError type. By default, the request does not time out.
+
+	\param timeout The timeout in milliseconds. 
 
 	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
 

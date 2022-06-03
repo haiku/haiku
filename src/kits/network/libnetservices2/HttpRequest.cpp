@@ -156,15 +156,16 @@ BHttpMethod::Method() const noexcept
 // #pragma mark -- BHttpRequest::Data
 static const BUrl kDefaultUrl = BUrl();
 static const BHttpMethod kDefaultMethod = BHttpMethod::Get;
-static const BHttpRedirectOptions kDefaultRedirectOptions = BHttpRedirectOptions();
 static const BHttpFields kDefaultOptionalFields = BHttpFields();
 
 struct BHttpRequest::Data {
 	BUrl								url = kDefaultUrl;
 	BHttpMethod							method	= kDefaultMethod;
-	BHttpRedirectOptions				redirectOptions;
+	uint8								maxRedirections = 8;
 	BHttpFields							optionalFields;
 	std::optional<BHttpAuthentication>	authentication;
+	bool								stopOnError = false;
+	bigtime_t							timeout = B_INFINITE_TIMEOUT;
 };
 
 
@@ -236,6 +237,15 @@ BHttpRequest::Fields() const noexcept
 }
 
 
+uint8
+BHttpRequest::MaxRedirections() const noexcept
+{
+	if (!fData)
+		return 8;
+	return fData->maxRedirections;
+}
+
+
 const BHttpMethod&
 BHttpRequest::Method() const noexcept
 {
@@ -245,12 +255,21 @@ BHttpRequest::Method() const noexcept
 }
 
 
-const BHttpRedirectOptions&
-BHttpRequest::Redirect() const noexcept
+bool
+BHttpRequest::StopOnError() const noexcept
 {
 	if (!fData)
-		return kDefaultRedirectOptions;
-	return fData->redirectOptions;
+		return false;
+	return fData->stopOnError;
+}
+
+
+bigtime_t
+BHttpRequest::Timeout() const noexcept
+{
+	if (!fData)
+		return B_INFINITE_TIMEOUT;
+	return fData->timeout;
 }
 
 
@@ -300,6 +319,15 @@ BHttpRequest::SetFields(const BHttpFields& fields)
 
 
 void
+BHttpRequest::SetMaxRedirections(uint8 maxRedirections)
+{
+	if (!fData)
+		fData = std::make_unique<Data>();
+	fData->maxRedirections = maxRedirections;
+}
+
+
+void
 BHttpRequest::SetMethod(const BHttpMethod& method)
 {
 	if (!fData)
@@ -309,11 +337,20 @@ BHttpRequest::SetMethod(const BHttpMethod& method)
 
 
 void
-BHttpRequest::SetRedirect(const BHttpRedirectOptions& redirectOptions)
+BHttpRequest::SetStopOnError(bool stopOnError)
 {
 	if (!fData)
 		fData = std::make_unique<Data>();
-	fData->redirectOptions = redirectOptions;
+	fData->stopOnError = stopOnError;
+}
+
+
+void
+BHttpRequest::SetTimeout(bigtime_t timeout)
+{
+	if (!fData)
+		fData = std::make_unique<Data>();
+	fData->timeout = timeout;
 }
 
 
