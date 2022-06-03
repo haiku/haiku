@@ -127,6 +127,7 @@ bus_dma_tag_create(bus_dma_tag_t parent, bus_size_t alignment, bus_size_t bounda
 
 		newtag->lowaddr = max_c(parent->lowaddr, newtag->lowaddr);
 		newtag->highaddr = min_c(parent->highaddr, newtag->highaddr);
+		newtag->alignment = max_c(parent->alignment, newtag->alignment);
 
 		if (newtag->boundary == 0) {
 			newtag->boundary = parent->boundary;
