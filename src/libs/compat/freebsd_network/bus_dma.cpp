@@ -491,7 +491,8 @@ bus_dmamap_unload(bus_dma_tag_t dmat, bus_dmamap_t map)
 	if (map == NULL)
 		return;
 
-	map->buffer_type = bus_dmamap::BUFFER_NONE;
+	if (map->buffer_type != bus_dmamap::BUFFER_PROHIBITED)
+		map->buffer_type = bus_dmamap::BUFFER_NONE;
 	map->buffer = NULL;
 }
 
