@@ -759,7 +759,7 @@ common_user_io(int fd, off_t pos, void* buffer, size_t length, bool write)
 	if (length == 0)
 		return 0;
 
-	if (!IS_USER_ADDRESS(buffer))
+	if (!is_user_address_range(buffer, length))
 		return B_BAD_ADDRESS;
 
 	SyscallRestartWrapper<status_t> status;
