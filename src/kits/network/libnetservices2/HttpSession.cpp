@@ -151,6 +151,7 @@ public:
 			BHttpResult							Execute(BHttpRequest&& request,
 													std::unique_ptr<BDataIO> target,
 													BMessenger observer);
+			void								Cancel(int32 identifier);
 
 private:
 	// Thread functions
@@ -239,6 +240,30 @@ BHttpSession::Impl::Execute(BHttpRequest&& request, std::unique_ptr<BDataIO> tar
 }
 
 #include <iostream>
+void
+BHttpSession::Impl::Cancel(int32 identifier)
+{
+	std::cout << "BHttpSession::Impl::Cancel for " << identifier << std::endl;
+	auto lock = AutoLocker<BLocker>(fLock);
+	// Check if the item is on the control queue
+	auto item = std::find_if(fControlQueue.begin(), fControlQueue.end(),
+		[&identifier](const auto& arg){ return arg.Id() == identifier; });
+	if (item != fControlQueue.end()) {
+		try {
+			throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::Canceled);
+		} catch (...) {
+			item->SetError(std::current_exception());
+		}
+		fControlQueue.erase(item);
+		return;
+	}
+
+	// Get it on the list for deletion in the data queue
+	fCancelList.push_back(identifier);
+	release_sem(fDataQueueSem);
+}
+
+
 /*static*/ status_t
 BHttpSession::Impl::ControlThreadFunc(void* arg)
 {
@@ -389,6 +414,7 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 				for (auto it = data->connectionMap.cbegin(); it != data->connectionMap.cend(); it++) {
 					offset++;
 					if (it->second.Id() == id) {
+					std::cout << "DataThreadFunc() [" << id << "] cancelling request" << std::endl;
 						data->objectList[offset].events = EVENT_CANCELLED;
 						break;
 					}
@@ -582,6 +608,20 @@ BHttpResult
 BHttpSession::Execute(BHttpRequest&& request, std::unique_ptr<BDataIO> target, BMessenger observer)
 {
 	return fImpl->Execute(std::move(request), std::move(target), observer);
+}
+
+
+void
+BHttpSession::Cancel(int32 identifier)
+{
+	fImpl->Cancel(identifier);
+}
+
+
+void
+BHttpSession::Cancel(const BHttpResult& request)
+{
+	fImpl->Cancel(request.Identity());
 }
 
 

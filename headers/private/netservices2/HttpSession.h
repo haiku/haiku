@@ -37,6 +37,8 @@ public:
 	BHttpResult				Execute(BHttpRequest&& request,
 								std::unique_ptr<BDataIO> target = nullptr,
 								BMessenger observer = BMessenger());
+	void					Cancel(int32 identifier);
+	void					Cancel(const BHttpResult& request);
 
 private:
 	struct Redirect;

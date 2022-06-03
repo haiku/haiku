@@ -496,6 +496,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 		testCaller->addThread("AutoRedirectTest", &HttpIntegrationTest::AutoRedirectTest);
 		testCaller->addThread("BasicAuthTest", &HttpIntegrationTest::BasicAuthTest);
 		testCaller->addThread("StopOnErrorTest", &HttpIntegrationTest::StopOnErrorTest);
+		testCaller->addThread("RequestCancelTest", &HttpIntegrationTest::RequestCancelTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpIntegrationTest", &suite);
@@ -518,6 +519,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 		testCaller->addThread("AutoRedirectTest", &HttpIntegrationTest::AutoRedirectTest);
 		testCaller->addThread("BasicAuthTest", &HttpIntegrationTest::BasicAuthTest);
 		testCaller->addThread("StopOnErrorTest", &HttpIntegrationTest::StopOnErrorTest);
+		testCaller->addThread("RequestCancelTest", &HttpIntegrationTest::RequestCancelTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpsIntegrationTest", &suite);
@@ -713,4 +715,23 @@ HttpIntegrationTest::StopOnErrorTest()
 	CPPUNIT_ASSERT(result.Status().code == 400);
 	CPPUNIT_ASSERT(result.Fields().CountFields() == 0);
 	CPPUNIT_ASSERT(result.Body().text.Length() == 0);
+}
+
+
+void
+HttpIntegrationTest::RequestCancelTest()
+{
+	// Test the cancellation functionality
+	// TODO: this test potentially fails if the case is executed before the cancellation is
+	//       processed. In practise, the cancellation always comes first. When the server
+	//       supports a wait parameter, then this test can be made more robust.
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/"));
+	auto result = fSession.Execute(std::move(request));
+	fSession.Cancel(result);
+	try {
+		result.Body();
+		CPPUNIT_FAIL("Expected exception because request was cancelled");
+	} catch (const BNetworkRequestError& e) {
+		CPPUNIT_ASSERT(e.Type() == BNetworkRequestError::Canceled);
+	}
 }
