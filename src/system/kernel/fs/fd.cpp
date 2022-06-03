@@ -23,6 +23,7 @@
 #include <syscall_restart.h>
 #include <slab/Slab.h>
 #include <util/AutoLock.h>
+#include <util/iovec_support.h>
 #include <vfs.h>
 #include <wait_for_objects.h>
 
@@ -785,15 +786,14 @@ static ssize_t
 common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 	bool write)
 {
-	if (!IS_USER_ADDRESS(userVecs))
-		return B_BAD_ADDRESS;
-
 	if (pos < -1)
 		return B_BAD_VALUE;
 
-	// prevent integer overflow exploit in malloc()
-	if (count > IOV_MAX)
-		return B_BAD_VALUE;
+	iovec* vecs;
+	status_t error = get_iovecs_from_user(userVecs, count, vecs, true);
+	if (error != B_OK)
+		return error;
+	MemoryDeleter _(vecs);
 
 	FDGetter fdGetter;
 	struct file_descriptor* descriptor = fdGetter.SetTo(fd, false);
@@ -804,14 +804,6 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 			: (descriptor->open_mode & O_RWMASK) == O_WRONLY) {
 		return B_FILE_ERROR;
 	}
-
-	iovec* vecs = (iovec*)malloc(sizeof(iovec) * count);
-	if (vecs == NULL)
-		return B_NO_MEMORY;
-	MemoryDeleter _(vecs);
-
-	if (user_memcpy(vecs, userVecs, sizeof(iovec) * count) != B_OK)
-		return B_BAD_ADDRESS;
 
 	bool movePosition = false;
 	if (pos == -1) {
@@ -830,12 +822,6 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 	for (uint32 i = 0; i < count; i++) {
 		if (vecs[i].iov_base == NULL)
 			continue;
-		if (!IS_USER_ADDRESS(vecs[i].iov_base)) {
-			status = B_BAD_ADDRESS;
-			if (bytesTransferred == 0)
-				return status;
-			break;
-		}
 
 		size_t length = vecs[i].iov_len;
 		if (write) {
