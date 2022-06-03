@@ -30,6 +30,8 @@
 		((addr_t)(x) >= KERNEL_BASE && (addr_t)(x) <= KERNEL_TOP)
 #endif
 
+#ifndef _BOOT_MODE
+
 // Buffers passed in from user-space shouldn't point into the kernel.
 #if USER_BASE == 0
 #	define IS_USER_ADDRESS(x)		((addr_t)(x) <= USER_TOP)
@@ -56,6 +58,7 @@ is_user_address_range(const void* addr, size_t size)
 }
 #endif
 
+#endif // !_BOOT_MODE
 
 #define DEBUG_KERNEL_STACKS
 	// Note, debugging kernel stacks doesn't really work yet. Since the
