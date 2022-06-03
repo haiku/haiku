@@ -103,6 +103,114 @@ bus_space_write_8(bus_space_tag_t tag, bus_space_handle_t bsh,
 }
 
 
+static __inline void
+bus_space_read_region_1(bus_space_tag_t tag, bus_space_handle_t bsh,
+	bus_size_t offset, u_int8_t *addr, size_t count)
+{
+	for (; count > 0; offset += 1, addr++, count--)
+		*addr = bus_space_read_1(tag, bsh, offset);
+}
+
+
+static __inline void
+bus_space_read_region_2(bus_space_tag_t tag, bus_space_handle_t bsh,
+	bus_size_t offset, u_int16_t *addr, size_t count)
+{
+	for (; count > 0; offset += 2, addr++, count--)
+		*addr = bus_space_read_2(tag, bsh, offset);
+}
+
+
+static __inline void
+bus_space_read_region_4(bus_space_tag_t tag, bus_space_handle_t bsh,
+	bus_size_t offset, u_int32_t *addr, size_t count)
+{
+	for (; count > 0; offset += 4, addr++, count--)
+		*addr = bus_space_read_4(tag, bsh, offset);
+}
+
+
+static __inline void
+bus_space_write_multi_1(bus_space_tag_t tag, bus_space_handle_t bsh,
+	bus_size_t offset, const u_int8_t *addr, size_t count)
+{
+	for (; count > 0; addr++, count--)
+		bus_space_write_1(tag, bsh, offset, *addr);
+}
+
+
+static __inline void
+bus_space_write_multi_2(bus_space_tag_t tag, bus_space_handle_t bsh,
+	bus_size_t offset, const u_int16_t *addr, size_t count)
+{
+	for (; count > 0; addr++, count--)
+		bus_space_write_2(tag, bsh, offset, *addr);
+}
+
+
+static __inline void
+bus_space_write_multi_4(bus_space_tag_t tag, bus_space_handle_t bsh,
+	bus_size_t offset, const u_int32_t *addr, size_t count)
+{
+	for (; count > 0; addr++, count--)
+		bus_space_write_4(tag, bsh, offset, *addr);
+}
+
+
+static __inline void
+bus_space_write_region_1(bus_space_tag_t tag, bus_space_handle_t bsh,
+	bus_size_t offset, const u_int8_t *addr, size_t count)
+{
+	for (; count > 0; offset += 1, addr++, count--)
+		bus_space_write_1(tag, bsh, offset, *addr);
+}
+
+
+static __inline void
+bus_space_write_region_2(bus_space_tag_t tag, bus_space_handle_t bsh,
+	bus_size_t offset, const u_int16_t *addr, size_t count)
+{
+	for (; count > 0; offset += 2, addr++, count--)
+		bus_space_write_2(tag, bsh, offset, *addr);
+}
+
+
+static __inline void
+bus_space_write_region_4(bus_space_tag_t tag, bus_space_handle_t bsh,
+	bus_size_t offset, const u_int32_t *addr, size_t count)
+{
+	for (; count > 0; offset += 4, addr++, count--)
+		bus_space_write_4(tag, bsh, offset, *addr);
+}
+
+
+static __inline void
+bus_space_set_region_1(bus_space_tag_t tag, bus_space_handle_t bsh,
+	bus_size_t offset, u_int8_t value, size_t count)
+{
+	for (; count > 0; count--)
+		bus_space_write_1(tag, bsh, offset, value);
+}
+
+
+static __inline void
+bus_space_set_region_2(bus_space_tag_t tag, bus_space_handle_t bsh,
+	bus_size_t offset, u_int16_t value, size_t count)
+{
+	for (; count > 0; count--)
+		bus_space_write_2(tag, bsh, offset, value);
+}
+
+
+static __inline void
+bus_space_set_region_4(bus_space_tag_t tag, bus_space_handle_t bsh,
+	bus_size_t offset, u_int32_t value, size_t count)
+{
+	for (; count > 0; count--)
+		bus_space_write_4(tag, bsh, offset, value);
+}
+
+
 #define	BUS_SPACE_BARRIER_READ	0x01		/* force read barrier */
 #define	BUS_SPACE_BARRIER_WRITE	0x02		/* force write barrier */
 
@@ -114,6 +222,8 @@ bus_space_barrier(bus_space_tag_t tag __unused, bus_space_handle_t bsh __unused,
 	__compiler_membar();
 }
 
+
+#include <machine/bus_dma.h>
 
 /* Assume stream accesses are the same as normal accesses. */
 #define	bus_space_read_stream_1(t, h, o)	bus_space_read_1((t), (h), (o))
