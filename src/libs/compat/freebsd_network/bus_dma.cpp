@@ -339,9 +339,6 @@ _bus_load_buffer(bus_dma_tag_t dmat, void* buf, bus_size_t buflen,
 	bus_addr_t last_phys_addr = *lastaddrp;
 	const bus_addr_t boundary_mask = ~(dmat->boundary - 1);
 
-	if (buflen > dmat->maxsize)
-		return EINVAL;
-
 	while (buflen > 0) {
 		const bus_addr_t phys_addr = pmap_kextract(virtual_addr);
 		if (!_validate_address(dmat, phys_addr))
@@ -399,10 +396,13 @@ bus_dmamap_load(bus_dma_tag_t dmat, bus_dmamap_t map, void *buf,
 	bus_addr_t lastaddr = 0;
 	int error, nsegs = 0;
 
+	if (buflen > dmat->maxsize)
+		return EINVAL;
+
 	error = _bus_load_buffer(dmat, buf, buflen, flags,
 		&lastaddr, map->segments, nsegs, true);
 
-	if (error == ERANGE) {
+	if (error != 0) {
 		// Try again using a bounce buffer.
 		error = _prepare_bounce_buffer(map, buflen, flags);
 		if (error != 0)
@@ -450,7 +450,7 @@ bus_dmamap_load_mbuf_sg(bus_dma_tag_t dmat, bus_dmamap_t map, struct mbuf* mb,
 		first = false;
 	}
 
-	if (error == ERANGE) {
+	if (error != 0) {
 		// Try again using a bounce buffer.
 		error = _prepare_bounce_buffer(map, mb->m_pkthdr.len, flags);
 		if (error != 0)
