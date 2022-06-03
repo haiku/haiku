@@ -5433,21 +5433,6 @@ validate_memory_range(const void* addr, size_t size)
 }
 
 
-/** Validate that a memory range is fully in userspace. */
-static inline bool
-validate_user_memory_range(const void* addr, size_t size)
-{
-	addr_t address = (addr_t)addr;
-
-	// Check for overflows on all addresses.
-	if ((address + size) < address)
-		return false;
-
-	// Validate that both the start and end address are in userspace
-	return IS_USER_ADDRESS(address) && IS_USER_ADDRESS(address + size - 1);
-}
-
-
 //	#pragma mark - kernel public API
 
 
@@ -6626,7 +6611,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 
 	if ((address % B_PAGE_SIZE) != 0)
 		return B_BAD_VALUE;
-	if (!validate_user_memory_range(_address, size)) {
+	if (!is_user_address_range(_address, size)) {
 		// weird error code required by POSIX
 		return ENOMEM;
 	}
@@ -6777,7 +6762,7 @@ _user_sync_memory(void* _address, size_t size, uint32 flags)
 	// check params
 	if ((address % B_PAGE_SIZE) != 0)
 		return B_BAD_VALUE;
-	if (!validate_user_memory_range(_address, size)) {
+	if (!is_user_address_range(_address, size)) {
 		// weird error code required by POSIX
 		return ENOMEM;
 	}
@@ -6855,7 +6840,7 @@ _user_memory_advice(void* _address, size_t size, uint32 advice)
 		return B_BAD_VALUE;
 
 	size = PAGE_ALIGN(size);
-	if (!validate_user_memory_range(_address, size)) {
+	if (!is_user_address_range(_address, size)) {
 		// weird error code required by POSIX
 		return B_NO_MEMORY;
 	}
@@ -6932,7 +6917,7 @@ user_set_memory_swappable(const void* _address, size_t size, bool swappable)
 
 	if ((address % B_PAGE_SIZE) != 0)
 		return EINVAL;
-	if (!validate_user_memory_range(_address, size))
+	if (!is_user_address_range(_address, size))
 		return EINVAL;
 
 	const addr_t endAddress = address + size;

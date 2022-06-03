@@ -40,6 +40,23 @@
 		((addr_t)(x) >= USER_BASE && (addr_t)(x) <= USER_TOP)
 #endif
 
+#ifdef __cplusplus
+// Validate that an address range is fully in userspace.
+static inline bool
+is_user_address_range(const void* addr, size_t size)
+{
+	addr_t address = (addr_t)addr;
+
+	// Check for overflows on all addresses.
+	if ((address + size) < address)
+		return false;
+
+	// Validate that both the start and end address are in userspace
+	return IS_USER_ADDRESS(address) && IS_USER_ADDRESS(address + size - 1);
+}
+#endif
+
+
 #define DEBUG_KERNEL_STACKS
 	// Note, debugging kernel stacks doesn't really work yet. Since the
 	// interrupt will also try to use the stack on a page fault, all
