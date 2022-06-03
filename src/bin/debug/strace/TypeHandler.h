@@ -113,6 +113,7 @@ DEFINE_FACTORY(flock_ptr, flock *);
 DEFINE_FACTORY(ifconf_ptr, ifconf *);
 DEFINE_FACTORY(ifreq_ptr, ifreq *);
 DEFINE_FACTORY(msghdr_ptr, msghdr *);
+DEFINE_FACTORY(msghdr_ptr, const msghdr *);
 DEFINE_FACTORY(message_args_ptr, message_args *);
 DEFINE_FACTORY(pollfd_ptr, pollfd *);
 DEFINE_FACTORY(siginfo_t_ptr, siginfo_t *);
