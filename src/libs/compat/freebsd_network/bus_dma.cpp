@@ -234,7 +234,7 @@ bus_dmamap_destroy(bus_dma_tag_t dmat, bus_dmamap_t map)
 {
 	if (map == NULL)
 		return 0;
-	if (map->buffer_type != bus_dmamap::BUFFER_NONE)
+	if (map->buffer_type > bus_dmamap::BUFFER_PROHIBITED)
 		return EBUSY;
 
 	atomic_add(&map->dmat->map_count, -1);
