@@ -923,6 +923,8 @@ struct intel_brightness_legacy {
 #define LCPLL_CTL						0x130040
 #define LCPLL_CLK_FREQ_MASK				(3 << 26)
 #define LCPLL_CLK_FREQ_450				(0 << 26)
+#define LCPLL_CLK_FREQ_54O_BDW			(1 << 26)
+#define LCPLL_CLK_FREQ_337_5_BDW		(2 << 26)
 #define LCPLL_CD_SOURCE_FCLK			(1 << 21)
 
 // display
