@@ -98,6 +98,10 @@ private:
 			void				_AdoptPackage(const PackageInfoRef& package);
 			void				_ClearPackage();
 
+			void				_SetupDelayedIncrementViewCounter(
+									const PackageInfoRef package);
+			void				_HandleIncrementViewCounter(
+									const BMessage* message);
 			void				_IncrementViewCounter(
 									const PackageInfoRef package);
 
@@ -185,6 +189,8 @@ private:
 
 			PackageInfoListenerRef
 								fPackageInfoListener;
+
+			BMessageRunner*		fIncrementViewCounterDelayedRunner;
 };
 
 

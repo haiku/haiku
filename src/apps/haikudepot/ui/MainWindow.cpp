@@ -24,6 +24,7 @@
 #include <LayoutBuilder.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <MessageRunner.h>
 #include <Messenger.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -71,6 +72,7 @@ enum {
 	MSG_PROCESS_COORDINATOR_CHANGED			= 'pccd',
 	MSG_WORK_STATUS_CHANGE					= 'wsch',
 	MSG_WORK_STATUS_CLEAR					= 'wscl',
+	MSG_INCREMENT_VIEW_COUNTER				= 'icrv',
 
 	MSG_CHANGE_PACKAGE_LIST_VIEW_MODE		= 'cplm',
 	MSG_SHOW_AVAILABLE_PACKAGES				= 'savl',
@@ -80,6 +82,8 @@ enum {
 };
 
 #define KEY_ERROR_STATUS				"errorStatus"
+
+const bigtime_t kIncrementViewCounterDelayMicros = 3 * 1000 * 1000;
 
 #define TAB_PROMINENT_PACKAGES	0
 #define TAB_ALL_PACKAGES		1
@@ -167,7 +171,8 @@ MainWindow::MainWindow(const BMessage& settings)
 	fModelListener(new MainWindowModelListener(BMessenger(this)), true),
 	fCoordinator(NULL),
 	fShouldCloseWhenNoProcessesToCoordinate(false),
-	fSinglePackageMode(false)
+	fSinglePackageMode(false),
+	fIncrementViewCounterDelayedRunner(NULL)
 {
 	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
 		debugger("unable to create the process coordinator semaphore");
@@ -265,7 +270,8 @@ MainWindow::MainWindow(const BMessage& settings, PackageInfoRef& package)
 	fModelListener(new MainWindowModelListener(BMessenger(this)), true),
 	fCoordinator(NULL),
 	fShouldCloseWhenNoProcessesToCoordinate(false),
-	fSinglePackageMode(true)
+	fSinglePackageMode(true),
+	fIncrementViewCounterDelayedRunner(NULL)
 {
 	if ((fCoordinatorRunningSem = create_sem(1, "ProcessCoordinatorSem")) < B_OK)
 		debugger("unable to create the process coordinator semaphore");
@@ -499,8 +505,12 @@ MainWindow::MessageReceived(BMessage* message)
 						name.String());
 				}
 			}
-        	break;
-        }
+			break;
+		}
+
+		case MSG_INCREMENT_VIEW_COUNTER:
+			_HandleIncrementViewCounter(message);
+			break;
 
 		case MSG_PACKAGE_SELECTED:
 		{
@@ -515,7 +525,7 @@ MainWindow::MessageReceived(BMessage* message)
 					debugger("unable to find the named package");
 				else {
 					_AdoptPackage(package);
-					_IncrementViewCounter(package);
+					_SetupDelayedIncrementViewCounter(package);
 				}
 			} else {
 				_ClearPackage();
@@ -961,6 +971,46 @@ MainWindow::_AddRemovePackageFromLists(const PackageInfoRef& package)
 		fFeaturedPackagesView->RemovePackage(package);
 		fPackageListView->RemovePackage(package);
 	}
+}
+
+
+void
+MainWindow::_SetupDelayedIncrementViewCounter(const PackageInfoRef package) {
+	if (fIncrementViewCounterDelayedRunner != NULL) {
+		fIncrementViewCounterDelayedRunner->SetCount(0);
+		delete fIncrementViewCounterDelayedRunner;
+	}
+	BMessage message(MSG_INCREMENT_VIEW_COUNTER);
+	message.SetString("name", package->Name());
+	fIncrementViewCounterDelayedRunner =
+		new BMessageRunner(BMessenger(this), &message,
+			kIncrementViewCounterDelayMicros, 1);
+	if (fIncrementViewCounterDelayedRunner->InitCheck()
+			!= B_OK) {
+		HDERROR("unable to init the increment view counter");
+	}
+}
+
+
+void
+MainWindow::_HandleIncrementViewCounter(const BMessage* message)
+{
+	BString name;
+	if (message->FindString("name", &name) == B_OK) {
+		const PackageInfoRef& viewedPackage =
+			fPackageInfoView->Package();
+		if (viewedPackage.IsSet()) {
+			if (viewedPackage->Name() == name)
+				_IncrementViewCounter(viewedPackage);
+			else
+				HDINFO("incr. view counter; name mismatch");
+		} else
+			HDINFO("incr. view counter; no viewed pkg");
+	} else
+		HDERROR("incr. view counter; no name");
+	fIncrementViewCounterDelayedRunner->SetCount(0);
+	delete fIncrementViewCounterDelayedRunner;
+	fIncrementViewCounterDelayedRunner = NULL;
 }
 
 
