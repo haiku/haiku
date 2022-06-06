@@ -1722,6 +1722,7 @@ nfe_ioctl(if_t ifp, u_long cmd, caddr_t data)
 	error = 0;
 	init = 0;
 	switch (cmd) {
+#ifndef __HAIKU__
 	case SIOCSIFMTU:
 		if (ifr->ifr_mtu < ETHERMIN || ifr->ifr_mtu > NFE_JUMBO_MTU)
 			error = EINVAL;
@@ -1741,6 +1742,7 @@ nfe_ioctl(if_t ifp, u_long cmd, caddr_t data)
 			}
 		}
 		break;
+#endif
 	case SIOCSIFFLAGS:
 		NFE_LOCK(sc);
 		if (if_getflags(ifp) & IFF_UP) {
