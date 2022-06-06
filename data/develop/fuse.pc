@@ -1,5 +1,5 @@
 Name: fuse
 Description: File System Userspace Executor
-Version: 2.7-Haiku
-Libs: -luserlandfs_fuse
-CFlags: -I/system/develop/headers/userlandfs/fuse/
+Version: 2.9-Haiku
+Libs: -lposix_error_mapper -luserlandfs_fuse
+CFlags: -I/system/develop/headers/userlandfs/fuse/ -DB_USE_POSITIVE_POSIX_ERRORS

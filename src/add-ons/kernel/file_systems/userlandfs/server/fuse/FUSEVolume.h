@@ -12,6 +12,7 @@
 
 #include "fuse_fs.h"
 #include "FUSEEntry.h"
+#include "FUSEFileSystem.h"
 
 #include "../Volume.h"
 
@@ -143,7 +144,8 @@ private:
 	friend struct MultiNodeLocker;
 
 private:
-	inline	FUSEFileSystem*		_FileSystem() const;
+	inline	FUSEFileSystem*		_FileSystem() const
+									{ return static_cast<FUSEFileSystem*>(fFileSystem); }
 
 			ino_t				_GenerateNodeID();
 
@@ -205,13 +207,13 @@ private:
 private:
 			RWLockManager		fLockManager;
 			Locker				fLock;
+	const	fuse_lowlevel_ops*	fOps;
 			fuse_fs*			fFS;
 			FUSEEntryTable		fEntries;
 			FUSENodeTable		fNodes;
 			FUSENode*			fRootNode;
 			ino_t				fNextNodeID;
-			bool				fUseNodeIDs;	// TODO: Actually read the
-												// option!
+			bool				fUseNodeIDs;
 			char				fName[B_OS_NAME_LENGTH];
 };
 

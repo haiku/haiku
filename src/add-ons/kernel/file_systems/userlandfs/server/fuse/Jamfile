@@ -20,6 +20,7 @@ DEFINES += USER=1 ;
 DEFINES += DEBUG_APP="\\\"libuserlandfs_fuse\\\"" ;
 DEFINES += BUILDING_USERLAND_FS_SERVER=1 ;
 DEFINES += _FILE_OFFSET_BITS=64 ;
+DEFINES += PACKAGE_VERSION=\\\"2.9.9\\\" ;
 
 # the library providing the FUSE interface for add-ons
 SharedLibrary libuserlandfs_fuse.so
@@ -28,7 +29,10 @@ SharedLibrary libuserlandfs_fuse.so
 	fuse_fs.cpp
 	fuse_main.cpp
 	fuse_opt.c
+	fuse_signals.c
+	helper.c
 	FUSEFileSystem.cpp
+	FUSELowLevel.cpp
 	FUSEVolume.cpp
 	mime_ext_table.c
 	:
