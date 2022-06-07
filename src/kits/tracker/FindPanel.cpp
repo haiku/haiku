@@ -935,9 +935,12 @@ FindPanel::AttachedToWindow()
 	}
 	fMimeTypeMenu->SetTargetForItems(this);
 
-	BMenuItem* firstItem = fMimeTypeMenu->ItemAt(0);
-	if (firstItem != NULL)
-		firstItem->SetMarked(true);
+	// set the MIME type to the default value, if no value is already selected
+	if (fMimeTypeMenu->FindMarked() == NULL) {
+		BMenuItem* firstItem = fMimeTypeMenu->ItemAt(0);
+		if (firstItem != NULL)
+			firstItem->SetMarked(true);
+	}
 
 	if (fDraggableIcon != NULL)
 		fDraggableIcon->SetTarget(BMessenger(this));
