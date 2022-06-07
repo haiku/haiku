@@ -186,7 +186,7 @@ callout_reset(struct callout *c, int _ticks, void (*func)(void *), void *arg)
 
 	TRACE("callout_reset %p, func %p, arg %p\n", c, c->c_func, c->c_arg);
 
-	if (ticks >= 0) {
+	if (_ticks >= 0) {
 		// reschedule or add this timer
 		if (c->due <= 0)
 			list_add_item(&sTimers, c);
