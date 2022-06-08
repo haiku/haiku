@@ -134,15 +134,16 @@ compat_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 		} else if (status < B_OK)
 			return status;
 
-		IF_LOCK(&ifp->receive_queue);
-		if (ifp->receive_queue.ifq_head != NULL
-				&& ifp->receive_queue.ifq_head->m_pkthdr.len >= length) {
-			IF_UNLOCK(&ifp->receive_queue);
-			return E2BIG;
-		}
-		_IF_DEQUEUE(&ifp->receive_queue, mb);
-		IF_UNLOCK(&ifp->receive_queue);
+		IF_DEQUEUE(&ifp->receive_queue, mb);
 	} while (mb == NULL);
+
+	if (mb->m_pkthdr.len > length) {
+		if_printf(ifp, "error reading packet: too large! (%d > %" B_PRIuSIZE ")\n",
+			mb->m_pkthdr.len, length);
+		m_freem(mb);
+		*numBytes = 0;
+		return E2BIG;
+	}
 
 	length = min_c(max_c((size_t)mb->m_pkthdr.len, 0), length);
 
