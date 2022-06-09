@@ -7423,6 +7423,11 @@ iwx_bgscan(struct ieee80211com *ic)
 	if (sc->sc_flags & IWX_FLAG_SCANNING)
 		return 0;
 
+#ifdef __HAIKU__
+	// Stops working after 40 scans and crashes the firmware, so let's not do it.
+	return EOPNOTSUPP;
+#endif
+
 	err = iwx_umac_scan_v14(sc, 1);
 	if (err) {
 		printf("%s: could not initiate scan\n", DEVNAME(sc));
