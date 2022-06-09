@@ -768,6 +768,23 @@ struct ieee80211req {
 */
 #define IEEE80211_IOC_HAIKU_COMPAT_WLAN_UP		0x6000
 #define IEEE80211_IOC_HAIKU_COMPAT_WLAN_DOWN	0x6001
+
+/*
+	Haiku extension: initiate join of network, potentially encrypted.
+*/
+#define IEEE80211_IOC_HAIKU_JOIN				0x6002
+struct ieee80211_haiku_join_req {
+	uint8 i_nwid[IEEE80211_NWID_LEN];
+	uint8 i_nwid_len;
+
+	uint32 i_authentication_mode;
+	uint32 i_ciphers;
+	uint32 i_group_ciphers;
+	uint32 i_key_mode;
+
+	uint32 i_key_len;
+	uint8 i_key[];
+};
 #endif /* __HAIKU__ */
 
 /*

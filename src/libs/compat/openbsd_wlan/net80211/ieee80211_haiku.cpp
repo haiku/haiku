@@ -37,6 +37,7 @@ extern "C" {
 #include <shared.h>
 
 #include <ether_driver.h>
+#include <NetworkDevice.h>
 #include <net_notifications.h>
 
 
@@ -143,6 +144,22 @@ fbsd_capinfo_from_obsd(uint16_t obsd_capinfo)
 	// FreeBSD only exposes the first 8 bits of the capinfo,
 	// and these are identical in OpenBSD. Makes things easy.
 	return uint8_t(obsd_capinfo);
+}
+
+
+static uint32
+obsd_ciphers_from_haiku(uint32 ciphers)
+{
+	uint32 obsd_ciphers = 0;
+	if ((ciphers & B_NETWORK_CIPHER_WEP_40) != 0)
+		obsd_ciphers |= IEEE80211_WPA_CIPHER_WEP40;
+	if ((ciphers & B_NETWORK_CIPHER_WEP_104) != 0)
+		obsd_ciphers |= IEEE80211_WPA_CIPHER_WEP104;
+	if ((ciphers & B_NETWORK_CIPHER_TKIP) != 0)
+		obsd_ciphers |= IEEE80211_WPA_CIPHER_TKIP;
+	if ((ciphers & B_NETWORK_CIPHER_CCMP) != 0)
+		obsd_ciphers |= IEEE80211_WPA_CIPHER_CCMP;
+	return obsd_ciphers;
 }
 
 
@@ -300,6 +317,97 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 						return B_BAD_ADDRESS;
 				}
 			}
+
+			break;
+		}
+
+		case IEEE80211_IOC_HAIKU_JOIN: {
+			if (op != SIOCS80211)
+				return B_BAD_VALUE;
+
+			struct ieee80211_haiku_join_req* haiku_join =
+				(struct ieee80211_haiku_join_req*)calloc(1, ireq.i_len);
+			MemoryDeleter haikuJoinDeleter(haiku_join);
+			if (!haikuJoinDeleter.IsSet())
+				return B_NO_MEMORY;
+
+			if (user_memcpy(haiku_join, ireq.i_data, ireq.i_len) != B_OK)
+				return B_BAD_ADDRESS;
+
+			struct ifreq ifr;
+			struct ieee80211_nwid nwid;
+			struct ieee80211_wpaparams wpaparams;
+			struct ieee80211_wpapsk wpapsk;
+			memset(&wpaparams, 0, sizeof(wpaparams));
+			memset(&wpapsk, 0, sizeof(wpapsk));
+
+			// Convert join information.
+			ifr.ifr_data = (uint8_t*)&nwid;
+			nwid.i_len = haiku_join->i_nwid_len;
+			memcpy(nwid.i_nwid, haiku_join->i_nwid, nwid.i_len);
+
+			switch (haiku_join->i_authentication_mode) {
+				case B_NETWORK_AUTHENTICATION_NONE:
+					break;
+
+				case B_NETWORK_AUTHENTICATION_WPA:
+				case B_NETWORK_AUTHENTICATION_WPA2:
+					wpaparams.i_enabled = 1;
+					wpaparams.i_protos |=
+						(haiku_join->i_authentication_mode == B_NETWORK_AUTHENTICATION_WPA2) ?
+							IEEE80211_WPA_PROTO_WPA2 : IEEE80211_WPA_PROTO_WPA1;
+
+					// NOTE: i_wpaparams.i_groupcipher is not a flags field!
+					wpaparams.i_ciphers = obsd_ciphers_from_haiku(haiku_join->i_ciphers);
+					wpaparams.i_groupcipher =
+						fls(obsd_ciphers_from_haiku(haiku_join->i_group_ciphers));
+
+					if ((haiku_join->i_key_mode & B_KEY_MODE_IEEE802_1X) != 0)
+						wpaparams.i_akms |= IEEE80211_WPA_AKM_8021X;
+					if ((haiku_join->i_key_mode & B_KEY_MODE_PSK) != 0)
+						wpaparams.i_akms |= IEEE80211_WPA_AKM_PSK;
+					if ((haiku_join->i_key_mode & B_KEY_MODE_IEEE802_1X_SHA256) != 0)
+						wpaparams.i_akms |= IEEE80211_WPA_AKM_SHA256_8021X;
+					if ((haiku_join->i_key_mode & B_KEY_MODE_PSK_SHA256) != 0)
+						wpaparams.i_akms |= IEEE80211_WPA_AKM_SHA256_PSK;
+
+					if (haiku_join->i_key_len != 0) {
+						wpapsk.i_enabled = 1;
+						memcpy(wpapsk.i_psk, haiku_join->i_key, haiku_join->i_key_len);
+						memset(&wpapsk.i_psk[haiku_join->i_key_len], 0,
+							sizeof(wpapsk.i_psk) - haiku_join->i_key_len);
+					}
+					break;
+
+				default:
+					TRACE("openbsd wlan_control: unsupported authentication mode %" B_PRIu32 "\n",
+						haiku_join->i_authentication_mode);
+					return EOPNOTSUPP;
+			}
+
+			IFF_LOCKGIANT(ifp);
+			status_t status = ifp->if_ioctl(ifp, SIOCS80211NWID, (caddr_t)&ifr);
+			if (status != B_OK) {
+				IFF_UNLOCKGIANT(ifp);
+				return status;
+			}
+			if (wpapsk.i_enabled) {
+				status = ifp->if_ioctl(ifp, SIOCS80211WPAPSK, (caddr_t)&wpapsk);
+				if (status != B_OK) {
+					IFF_UNLOCKGIANT(ifp);
+					return status;
+				}
+			}
+			if (wpaparams.i_enabled) {
+				status = ifp->if_ioctl(ifp, SIOCS80211WPAPARMS, (caddr_t)&wpaparams);
+				if (status != B_OK) {
+					IFF_UNLOCKGIANT(ifp);
+					return status;
+				}
+			}
+			IFF_UNLOCKGIANT(ifp);
+			if (status != B_OK)
+				return status;
 
 			break;
 		}
