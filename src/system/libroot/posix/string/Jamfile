@@ -20,7 +20,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			bcmp.c
 			bcopy.c
 			bzero.c
-			ffs.cpp
 			memccpy.c
 			memchr.c
 			memcmp.c
