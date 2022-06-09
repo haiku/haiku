@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel drivers network wlan idualwifi7260 ;
+SubDir HAIKU_TOP src add-ons kernel drivers network wlan iaxwifi200 ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat openbsd_network compat ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat openbsd_wlan ] : true ;
@@ -13,8 +13,8 @@ UseHeaders [ FDirName $(SUBDIR) ] : true ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev pci ] ;
 
-KernelAddon idualwifi7260 :
-	if_iwm.c
+KernelAddon iaxwifi200 :
+	if_iwx.c
 	glue.c
 	:
 	openbsd_wlan.a

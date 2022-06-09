@@ -106,7 +106,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "bpfilter.h"
+//#include "bpfilter.h"
 
 #include <sys/param.h>
 #include <sys/conf.h>
@@ -124,11 +124,11 @@
 #include <sys/refcnt.h>
 #include <sys/task.h>
 #include <machine/bus.h>
-#include <machine/intr.h>
+//#include <machine/intr.h>
 
 #include <dev/pci/pcireg.h>
 #include <dev/pci/pcivar.h>
-#include <dev/pci/pcidevs.h>
+//#include <dev/pci/pcidevs.h>
 
 #if NBPFILTER > 0
 #include <net/bpf.h>
@@ -136,6 +136,7 @@
 #include <net/if.h>
 #include <net/if_dl.h>
 #include <net/if_media.h>
+#include <net/if_types.h>
 
 #include <netinet/in.h>
 #include <netinet/if_ether.h>
@@ -148,7 +149,16 @@
 #include <net80211/ieee80211_priv.h> /* for SEQ_LT */
 #undef DPRINTF /* defined in ieee80211_priv.h */
 
+#ifdef __FreeBSD_version
+#include <sys/device.h>
+#define DEVNAME(_s) "iwm"
+#define SC_DEV_FOR_PCI sc->sc_dev
+#define ifq_is_oactive(IFQ) ((if_getdrvflags(ifp) & IFF_DRV_OACTIVE) != 0)
+#define ifq_set_oactive(IFQ) if_setdrvflagbits(ifp, IFF_DRV_OACTIVE, 0)
+#define ifq_clr_oactive(IFQ) if_setdrvflagbits(ifp, 0, IFF_DRV_OACTIVE)
+#else
 #define DEVNAME(_s)	((_s)->sc_dev.dv_xname)
+#endif
 
 #define IC2IFP(_ic_) (&(_ic_)->ic_if)
 
@@ -558,7 +568,7 @@ int	iwm_intr_msix(void *);
 int	iwm_match(struct device *, void *, void *);
 int	iwm_preinit(struct iwm_softc *);
 void	iwm_attach_hook(struct device *);
-void	iwm_attach(struct device *, struct device *, void *);
+//void	iwm_attach(struct device *, struct device *, void *);
 void	iwm_init_task(void *);
 int	iwm_activate(struct device *, int);
 void	iwm_resume(struct iwm_softc *);
@@ -1217,6 +1227,17 @@ iwm_dma_contig_alloc(bus_dma_tag_t tag, struct iwm_dma_info *dma,
 	dma->tag = tag;
 	dma->size = size;
 
+#ifdef __FreeBSD_version
+	err = bus_dmamap_create_obsd(tag, size, 1, size, 0, alignment, BUS_DMA_NOWAIT,
+		&dma->map, 1);
+	if (err)
+		goto fail;
+
+	err = bus_dmamem_alloc(dma->map->_dmat, (void **)&dma->vaddr,
+		BUS_DMA_NOWAIT | BUS_DMA_ZERO | BUS_DMA_COHERENT, &dma->map->_dmamp);
+	if (err)
+		goto fail;
+#else
 	err = bus_dmamap_create(tag, size, 1, size, 0, BUS_DMA_NOWAIT,
 	    &dma->map);
 	if (err)
@@ -1232,6 +1253,7 @@ iwm_dma_contig_alloc(bus_dma_tag_t tag, struct iwm_dma_info *dma,
 	if (err)
 		goto fail;
 	dma->vaddr = va;
+#endif
 
 	err = bus_dmamap_load(tag, dma->map, dma->vaddr, size, NULL,
 	    BUS_DMA_NOWAIT);
@@ -1256,8 +1278,13 @@ iwm_dma_contig_free(struct iwm_dma_info *dma)
 			bus_dmamap_sync(dma->tag, dma->map, 0, dma->size,
 			    BUS_DMASYNC_POSTREAD | BUS_DMASYNC_POSTWRITE);
 			bus_dmamap_unload(dma->tag, dma->map);
+#ifdef __FreeBSD_version
+			bus_dmamem_free(dma->tag, dma->vaddr, dma->map->_dmamp);
+			dma->map->_dmamp = NULL;
+#else
 			bus_dmamem_unmap(dma->tag, dma->vaddr, dma->size);
 			bus_dmamem_free(dma->tag, &dma->seg, 1);
+#endif
 			dma->vaddr = NULL;
 		}
 		bus_dmamap_destroy(dma->tag, dma->map);
@@ -6315,7 +6342,11 @@ iwm_send_cmd(struct iwm_softc *sc, struct iwm_host_cmd *hcmd)
 			err = EINVAL;
 			goto out;
 		}
+#ifdef __FreeBSD_version
+		m = m_getjcl(M_NOWAIT, MT_DATA, M_PKTHDR, IWM_RBUF_SIZE);
+#else
 		m = MCLGETL(NULL, M_DONTWAIT, totlen);
+#endif
 		if (m == NULL) {
 			printf("%s: could not get fw cmd mbuf (%zd bytes)\n",
 			    DEVNAME(sc), totlen);
@@ -6906,11 +6937,23 @@ iwm_tx(struct iwm_softc *sc, struct mbuf *m, struct ieee80211_node *ni, int ac)
 		return err;
 	}
 	if (err) {
+#ifdef __FreeBSD_version
+		/* Too many DMA segments, linearize mbuf. */
+		struct mbuf* m1 = m_collapse(m, M_NOWAIT, IWM_NUM_OF_TBS - 2);
+		if (m1 == NULL) {
+			device_printf(sc->sc_dev,
+				"%s: could not defrag mbuf\n", __func__);
+			m_freem(m);
+			return (ENOBUFS);
+		}
+		m = m1;
+#else
 		/* Too many DMA segments, linearize mbuf. */
 		if (m_defrag(m, M_DONTWAIT)) {
 			m_freem(m);
 			return ENOBUFS;
 		}
+#endif
 		err = bus_dmamap_load_mbuf(sc->sc_dmat, data->map, m,
 		    BUS_DMA_NOWAIT | BUS_DMA_WRITE);
 		if (err) {
@@ -11534,6 +11577,25 @@ iwm_intr_msix(void *arg)
 typedef void *iwm_match_t;
 
 static const struct pci_matchid iwm_devices[] = {
+#ifdef __FreeBSD_version
+#define	PCI_VENDOR_INTEL			0x8086
+#define	PCI_PRODUCT_INTEL_WL_3160_1	0x08b3
+#define	PCI_PRODUCT_INTEL_WL_3160_2	0x08b4
+#define	PCI_PRODUCT_INTEL_WL_3165_1	0x3165
+#define	PCI_PRODUCT_INTEL_WL_3165_2	0x3166
+#define	PCI_PRODUCT_INTEL_WL_3168_1	0x24fb
+#define	PCI_PRODUCT_INTEL_WL_7260_1	0x08b1
+#define	PCI_PRODUCT_INTEL_WL_7260_2	0x08b2
+#define	PCI_PRODUCT_INTEL_WL_7265_1	0x095a
+#define	PCI_PRODUCT_INTEL_WL_7265_2	0x095b
+#define	PCI_PRODUCT_INTEL_WL_8260_1	0x24f3
+#define	PCI_PRODUCT_INTEL_WL_8260_2	0x24f4
+#define	PCI_PRODUCT_INTEL_WL_8265_1	0x24fd
+#define	PCI_PRODUCT_INTEL_WL_9560_1	0x9df0
+#define	PCI_PRODUCT_INTEL_WL_9560_2	0xa370
+#define	PCI_PRODUCT_INTEL_WL_9560_3	0x31dc
+#define	PCI_PRODUCT_INTEL_WL_9260_1	0x2526
+#endif
 	{ PCI_VENDOR_INTEL, PCI_PRODUCT_INTEL_WL_3160_1 },
 	{ PCI_VENDOR_INTEL, PCI_PRODUCT_INTEL_WL_3160_2 },
 	{ PCI_VENDOR_INTEL, PCI_PRODUCT_INTEL_WL_3165_1 },
@@ -11552,12 +11614,29 @@ static const struct pci_matchid iwm_devices[] = {
 	{ PCI_VENDOR_INTEL, PCI_PRODUCT_INTEL_WL_9560_3 },
 };
 
+#ifdef __FreeBSD_version
+static int
+iwm_probe(device_t dev)
+{
+	int i;
+
+	for (i = 0; i < nitems(iwm_devices); i++) {
+		if (pci_get_vendor(dev) == iwm_devices[i].pm_vid &&
+			pci_get_device(dev) == iwm_devices[i].pm_pid) {
+			return (BUS_PROBE_DEFAULT);
+		}
+	}
+
+	return (ENXIO);
+}
+#else
 int
 iwm_match(struct device *parent, iwm_match_t match __unused, void *aux)
 {
 	return pci_matchbyid((struct pci_attach_args *)aux, iwm_devices,
 	    nitems(iwm_devices));
 }
+#endif
 
 int
 iwm_preinit(struct iwm_softc *sc)
@@ -11573,9 +11652,11 @@ iwm_preinit(struct iwm_softc *sc)
 	}
 
 	if (sc->attached) {
+#ifndef __FreeBSD_version
 		/* Update MAC in case the upper layers changed it. */
 		IEEE80211_ADDR_COPY(sc->sc_ic.ic_myaddr,
 		    ((struct arpcom *)ifp)->ac_enaddr);
+#endif
 		return 0;
 	}
 
@@ -11607,11 +11688,15 @@ iwm_preinit(struct iwm_softc *sc)
 	/* Configure channel information obtained from firmware. */
 	ieee80211_channel_init(ifp);
 
+#ifdef __HAIKU__
+	IEEE80211_ADDR_COPY(IF_LLADDR(ifp), ic->ic_myaddr);
+#else
 	/* Configure MAC address. */
 	err = if_setlladdr(ifp, ic->ic_myaddr);
 	if (err)
 		printf("%s: could not set MAC address (error %d)\n",
 		    DEVNAME(sc), err);
+#endif
 
 	ieee80211_media_init(ifp, iwm_media_change, ieee80211_media_status);
 
@@ -11628,11 +11713,21 @@ iwm_attach_hook(struct device *self)
 	iwm_preinit(sc);
 }
 
+#ifdef __FreeBSD_version
+static int
+iwm_attach(device_t dev)
+#else
 void
 iwm_attach(struct device *parent, struct device *self, void *aux)
+#endif
 {
+#ifdef __FreeBSD_version
+#define pa dev
+	struct iwm_softc *sc = device_get_softc(dev);
+#else
 	struct iwm_softc *sc = (void *)self;
 	struct pci_attach_args *pa = aux;
+#endif
 	pci_intr_handle_t ih;
 	pcireg_t reg, memtype;
 	struct ieee80211com *ic = &sc->sc_ic;
@@ -11641,9 +11736,20 @@ iwm_attach(struct device *parent, struct device *self, void *aux)
 	int err;
 	int txq_i, i, j;
 
+#ifdef __FreeBSD_version
+	sc->sc_dev = dev;
+	sc->sc_dmat = bus_get_dma_tag(sc->sc_dev);
+	bus_dma_tag_create(sc->sc_dmat, 1, 0,
+		BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
+		BUS_SPACE_MAXSIZE_32BIT, BUS_SPACE_UNRESTRICTED, BUS_SPACE_MAXSIZE_32BIT, 0, NULL, NULL,
+		&sc->sc_dmat);
+
+	if_alloc_inplace(ifp, IFT_ETHER);
+#else
 	sc->sc_pct = pa->pa_pc;
 	sc->sc_pcitag = pa->pa_tag;
 	sc->sc_dmat = pa->pa_dmat;
+#endif
 
 	rw_init(&sc->ioctl_rwl, "iwmioctl");
 
@@ -11652,7 +11758,7 @@ iwm_attach(struct device *parent, struct device *self, void *aux)
 	if (err == 0) {
 		printf("%s: PCIe capability structure not found!\n",
 		    DEVNAME(sc));
-		return;
+		goto fail;
 	}
 
 	/*
@@ -11667,15 +11773,19 @@ iwm_attach(struct device *parent, struct device *self, void *aux)
 	    &sc->sc_st, &sc->sc_sh, NULL, &sc->sc_sz, 0);
 	if (err) {
 		printf("%s: can't map mem space\n", DEVNAME(sc));
-		return;
+		goto fail;
 	}
 
 	if (pci_intr_map_msix(pa, 0, &ih) == 0) {
 		sc->sc_msix = 1;
 	} else if (pci_intr_map_msi(pa, &ih)) {
+#ifndef __HAIKU__
 		if (pci_intr_map(pa, &ih)) {
+#else
+		{
+#endif
 			printf("%s: can't map interrupt\n", DEVNAME(sc));
-			return;
+			goto fail;
 		}
 		/* Hardware bug workaround. */
 		reg = pci_conf_read(sc->sc_pct, sc->sc_pcitag,
@@ -11700,11 +11810,15 @@ iwm_attach(struct device *parent, struct device *self, void *aux)
 		if (intrstr != NULL)
 			printf(" at %s", intrstr);
 		printf("\n");
-		return;
+		goto fail;
 	}
 	printf(", %s\n", intrstr);
 
 	sc->sc_hw_rev = IWM_READ(sc, IWM_CSR_HW_REV);
+#ifdef __FreeBSD_version
+#undef PCI_PRODUCT
+#define PCI_PRODUCT(pa) pci_get_device(dev)
+#endif
 	switch (PCI_PRODUCT(pa->pa_id)) {
 	case PCI_PRODUCT_INTEL_WL_3160_1:
 	case PCI_PRODUCT_INTEL_WL_3160_2:
@@ -11793,8 +11907,11 @@ iwm_attach(struct device *parent, struct device *self, void *aux)
 		break;
 	default:
 		printf("%s: unknown adapter type\n", DEVNAME(sc));
-		return;
+		goto fail;
 	}
+#ifdef __FreeBSD_version
+#undef PCI_PRODUCT
+#endif
 
 	/*
 	 * In the 8000 HW family the format of the 4 bytes of CSR_HW_REV have
@@ -11811,7 +11928,7 @@ iwm_attach(struct device *parent, struct device *self, void *aux)
 		if (iwm_prepare_card_hw(sc) != 0) {
 			printf("%s: could not initialize hardware\n",
 			    DEVNAME(sc));
-			return;
+			goto fail;
 		}
 
 		/*
@@ -11828,7 +11945,7 @@ iwm_attach(struct device *parent, struct device *self, void *aux)
 				   25000);
 		if (!err) {
 			printf("%s: Failed to wake up the nic\n", DEVNAME(sc));
-			return;
+			goto fail;
 		}
 
 		if (iwm_nic_lock(sc)) {
@@ -11843,7 +11960,7 @@ iwm_attach(struct device *parent, struct device *self, void *aux)
 			iwm_nic_unlock(sc);
 		} else {
 			printf("%s: Failed to lock the nic\n", DEVNAME(sc));
-			return;
+			goto fail;
 		}
 	}
 
@@ -11856,7 +11973,7 @@ iwm_attach(struct device *parent, struct device *self, void *aux)
 	if (err) {
 		printf("%s: could not allocate memory for firmware\n",
 		    DEVNAME(sc));
-		return;
+		goto fail;
 	}
 
 	/* Allocate "Keep Warm" page, used internally by the card. */
@@ -12006,13 +12123,19 @@ iwm_attach(struct device *parent, struct device *self, void *aux)
 	ic->ic_ampdu_rx_stop = iwm_ampdu_rx_stop;
 	ic->ic_ampdu_tx_start = iwm_ampdu_tx_start;
 	ic->ic_ampdu_tx_stop = iwm_ampdu_tx_stop;
+#ifdef __HAIKU__
+	mtx_lock(&Giant);
+	iwm_preinit(sc);
+	mtx_unlock(&Giant);
+#else
 	/*
 	 * We cannot read the MAC address without loading the
 	 * firmware from disk. Postpone until mountroot is done.
 	 */
 	config_mountroot(self, iwm_attach_hook);
+#endif
 
-	return;
+	return 0;
 
 fail4:	while (--txq_i >= 0)
 		iwm_free_tx_ring(sc, &sc->txq[txq_i]);
@@ -12023,7 +12146,11 @@ fail3:	if (sc->ict_dma.vaddr != NULL)
 	
 fail2:	iwm_dma_contig_free(&sc->kw_dma);
 fail1:	iwm_dma_contig_free(&sc->fw_dma);
-	return;
+#ifdef __HAIKU__
+fail:
+	if_free_inplace(ifp);
+#endif
+	return -1;
 }
 
 #if NBPFILTER > 0
@@ -12123,6 +12250,30 @@ iwm_wakeup(struct iwm_softc *sc)
 	return 0;
 }
 
+#ifdef __FreeBSD_version
+static device_method_t iwm_pci_methods[] = {
+	/* Device interface */
+	DEVMETHOD(device_probe,         iwm_probe),
+	DEVMETHOD(device_attach,        iwm_attach),
+#if 0
+	DEVMETHOD(device_detach,        iwm_detach),
+	DEVMETHOD(device_suspend,       iwm_suspend),
+	DEVMETHOD(device_resume,        iwm_resume),
+#endif
+
+	DEVMETHOD_END
+};
+
+static driver_t iwm_pci_driver = {
+	"iwm",
+	iwm_pci_methods,
+	sizeof (struct iwm_softc)
+};
+
+static devclass_t iwm_devclass;
+
+DRIVER_MODULE(iwm, pci, iwm_pci_driver, iwm_devclass, NULL, NULL);
+#else
 int
 iwm_activate(struct device *self, int act)
 {
@@ -12162,3 +12313,4 @@ const struct cfattach iwm_ca = {
 	sizeof(struct iwm_softc), iwm_match, iwm_attach,
 	NULL, iwm_activate
 };
+#endif

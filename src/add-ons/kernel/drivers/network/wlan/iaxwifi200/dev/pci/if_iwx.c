@@ -93,7 +93,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "bpfilter.h"
+//#include "bpfilter.h"
 
 #include <sys/param.h>
 #include <sys/conf.h>
@@ -111,11 +111,11 @@
 #include <sys/refcnt.h>
 #include <sys/task.h>
 #include <machine/bus.h>
-#include <machine/intr.h>
+//#include <machine/intr.h>
 
 #include <dev/pci/pcireg.h>
 #include <dev/pci/pcivar.h>
-#include <dev/pci/pcidevs.h>
+//#include <dev/pci/pcidevs.h>
 
 #if NBPFILTER > 0
 #include <net/bpf.h>
@@ -123,6 +123,7 @@
 #include <net/if.h>
 #include <net/if_dl.h>
 #include <net/if_media.h>
+#include <net/if_types.h>
 
 #include <netinet/in.h>
 #include <netinet/if_ether.h>
@@ -132,7 +133,17 @@
 #include <net80211/ieee80211_priv.h> /* for SEQ_LT */
 #undef DPRINTF /* defined in ieee80211_priv.h */
 
+#ifdef __FreeBSD_version
+#include <sys/device.h>
+#define DEVNAME(_s) "iwx"
+#define SC_DEV_FOR_PCI sc->sc_dev
+#define ifq_is_oactive(IFQ) ((if_getdrvflags(ifp) & IFF_DRV_OACTIVE) != 0)
+#define ifq_set_oactive(IFQ) if_setdrvflagbits(ifp, IFF_DRV_OACTIVE, 0)
+#define ifq_clr_oactive(IFQ) if_setdrvflagbits(ifp, 0, IFF_DRV_OACTIVE)
+#define mallocarray(nmemb, size, type, flags) malloc((size) * (nmemb), (type), (flags))
+#else
 #define DEVNAME(_s)	((_s)->sc_dev.dv_xname)
+#endif
 
 #define IC2IFP(_ic_) (&(_ic_)->ic_if)
 
@@ -507,7 +518,7 @@ int	iwx_match(struct device *, void *, void *);
 int	iwx_preinit(struct iwx_softc *);
 void	iwx_attach_hook(struct device *);
 const struct iwx_device_cfg *iwx_find_device_cfg(struct iwx_softc *);
-void	iwx_attach(struct device *, struct device *, void *);
+//void	iwx_attach(struct device *, struct device *, void *);
 void	iwx_init_task(void *);
 int	iwx_activate(struct device *, int);
 void	iwx_resume(struct iwx_softc *);
@@ -1803,6 +1814,17 @@ iwx_dma_contig_alloc(bus_dma_tag_t tag, struct iwx_dma_info *dma,
 	dma->tag = tag;
 	dma->size = size;
 
+#ifdef __FreeBSD_version
+	err = bus_dmamap_create_obsd(tag, size, 1, size, 0, alignment, BUS_DMA_NOWAIT,
+		&dma->map, 1);
+	if (err)
+		goto fail;
+
+	err = bus_dmamem_alloc(dma->map->_dmat, (void **)&dma->vaddr,
+		BUS_DMA_NOWAIT | BUS_DMA_ZERO | BUS_DMA_COHERENT, &dma->map->_dmamp);
+	if (err)
+		goto fail;
+#else
 	err = bus_dmamap_create(tag, size, 1, size, 0, BUS_DMA_NOWAIT,
 	    &dma->map);
 	if (err)
@@ -1812,7 +1834,9 @@ iwx_dma_contig_alloc(bus_dma_tag_t tag, struct iwx_dma_info *dma,
 	    BUS_DMA_NOWAIT | BUS_DMA_ZERO);
 	if (err)
 		goto fail;
+#endif
 
+#ifndef __FreeBSD_version
 	if (nsegs > 1) {
 		err = ENOMEM;
 		goto fail;
@@ -1823,11 +1847,19 @@ iwx_dma_contig_alloc(bus_dma_tag_t tag, struct iwx_dma_info *dma,
 	if (err)
 		goto fail;
 	dma->vaddr = va;
+#endif
 
 	err = bus_dmamap_load(tag, dma->map, dma->vaddr, size, NULL,
 	    BUS_DMA_NOWAIT);
 	if (err)
 		goto fail;
+
+#ifdef __FreeBSD_version
+	if (dma->map->dm_nsegs > 1) {
+		err = ENOMEM;
+		goto fail;
+	}
+#endif
 
 	bus_dmamap_sync(tag, dma->map, 0, size, BUS_DMASYNC_PREWRITE);
 	dma->paddr = dma->map->dm_segs[0].ds_addr;
@@ -1846,8 +1878,13 @@ iwx_dma_contig_free(struct iwx_dma_info *dma)
 			bus_dmamap_sync(dma->tag, dma->map, 0, dma->size,
 			    BUS_DMASYNC_POSTREAD | BUS_DMASYNC_POSTWRITE);
 			bus_dmamap_unload(dma->tag, dma->map);
+#ifdef __FreeBSD_version
+			bus_dmamem_free(dma->tag, dma->vaddr, dma->map->_dmamp);
+			dma->map->_dmamp = NULL;
+#else
 			bus_dmamem_unmap(dma->tag, dma->vaddr, dma->size);
 			bus_dmamem_free(dma->tag, &dma->seg, 1);
+#endif
 			dma->vaddr = NULL;
 		}
 		bus_dmamap_destroy(dma->tag, dma->map);
@@ -5635,7 +5672,11 @@ iwx_send_cmd(struct iwx_softc *sc, struct iwx_host_cmd *hcmd)
 			err = EINVAL;
 			goto out;
 		}
+#ifdef __FreeBSD_version
+		m = m_getjcl(M_NOWAIT, MT_DATA, M_PKTHDR, IWX_RBUF_SIZE);
+#else
 		m = MCLGETL(NULL, M_DONTWAIT, totlen);
+#endif
 		if (m == NULL) {
 			printf("%s: could not get fw cmd mbuf (%zd bytes)\n",
 			    DEVNAME(sc), totlen);
@@ -6096,11 +6137,23 @@ iwx_tx(struct iwx_softc *sc, struct mbuf *m, struct ieee80211_node *ni)
 		return err;
 	}
 	if (err) {
+#ifdef __FreeBSD_version
+		/* Too many DMA segments, linearize mbuf. */
+		struct mbuf* m1 = m_collapse(m, M_NOWAIT, IWX_TFH_NUM_TBS - 2);
+		if (m1 == NULL) {
+			device_printf(sc->sc_dev,
+				"%s: could not defrag mbuf\n", __func__);
+			m_freem(m);
+			return (ENOBUFS);
+		}
+		m = m1;
+#else
 		/* Too many DMA segments, linearize mbuf. */
 		if (m_defrag(m, M_DONTWAIT)) {
 			m_freem(m);
 			return ENOBUFS;
 		}
+#endif
 		err = bus_dmamap_load_mbuf(sc->sc_dmat, data->map, m,
 		    BUS_DMA_NOWAIT | BUS_DMA_WRITE);
 		if (err) {
@@ -9981,6 +10034,25 @@ iwx_intr_msix(void *arg)
 typedef void *iwx_match_t;
 
 static const struct pci_matchid iwx_devices[] = {
+#ifdef __FreeBSD_version
+#define	PCI_VENDOR_INTEL			0x8086
+#define	PCI_PRODUCT_INTEL_WL_22500_1	0x2723		/* Wi-Fi 6 AX200 */
+#define	PCI_PRODUCT_INTEL_WL_22500_2	0x02f0		/* Wi-Fi 6 AX201 */
+#define	PCI_PRODUCT_INTEL_WL_22500_3	0xa0f0		/* Wi-Fi 6 AX201 */
+#define	PCI_PRODUCT_INTEL_WL_22500_4	0x34f0		/* Wi-Fi 6 AX201 */
+#define	PCI_PRODUCT_INTEL_WL_22500_5	0x06f0		/* Wi-Fi 6 AX201 */
+#define	PCI_PRODUCT_INTEL_WL_22500_6	0x43f0		/* Wi-Fi 6 AX201 */
+#define	PCI_PRODUCT_INTEL_WL_22500_7	0x3df0		/* Wi-Fi 6 AX201 */
+#define	PCI_PRODUCT_INTEL_WL_22500_8	0x4df0		/* Wi-Fi 6 AX201 */
+#define	PCI_PRODUCT_INTEL_WL_22500_9	0x2725		/* Wi-Fi 6 AX210 */
+#define	PCI_PRODUCT_INTEL_WL_22500_10	0x2726		/* Wi-Fi 6 AX211 */
+#define	PCI_PRODUCT_INTEL_WL_22500_11	0x51f0		/* Wi-Fi 6 AX211 */
+#define	PCI_PRODUCT_INTEL_WL_22500_12	0x7a70		/* Wi-Fi 6 AX211 */
+#define	PCI_PRODUCT_INTEL_WL_22500_13	0x7af0		/* Wi-Fi 6 AX211 */
+#define	PCI_PRODUCT_INTEL_WL_22500_14	0x7e40		/* Wi-Fi 6 AX210 */
+#define	PCI_PRODUCT_INTEL_WL_22500_15	0x7f70		/* Wi-Fi 6 AX211 */
+#define	PCI_PRODUCT_INTEL_WL_22500_16	0x54f0		/* Wi-Fi 6 AX211 */
+#endif
 	{ PCI_VENDOR_INTEL, PCI_PRODUCT_INTEL_WL_22500_1 },
 	{ PCI_VENDOR_INTEL, PCI_PRODUCT_INTEL_WL_22500_2 },
 	{ PCI_VENDOR_INTEL, PCI_PRODUCT_INTEL_WL_22500_3 },
@@ -9999,13 +10071,29 @@ static const struct pci_matchid iwx_devices[] = {
 	{ PCI_VENDOR_INTEL, PCI_PRODUCT_INTEL_WL_22500_16,},
 };
 
+#ifdef __FreeBSD_version
+static int
+iwx_probe(device_t dev)
+{
+	int i;
 
+	for (i = 0; i < nitems(iwx_devices); i++) {
+		if (pci_get_vendor(dev) == iwx_devices[i].pm_vid &&
+			pci_get_device(dev) == iwx_devices[i].pm_pid) {
+			return (BUS_PROBE_DEFAULT);
+		}
+	}
+
+	return (ENXIO);
+}
+#else
 int
 iwx_match(struct device *parent, iwx_match_t match __unused, void *aux)
 {
 	struct pci_attach_args *pa = aux;
 	return pci_matchbyid(pa, iwx_devices, nitems(iwx_devices));
 }
+#endif
 
 /*
  * The device info table below contains device-specific config overrides.
@@ -10380,9 +10468,11 @@ iwx_preinit(struct iwx_softc *sc)
 	}
 
 	if (sc->attached) {
+#ifndef __FreeBSD_version
 		/* Update MAC in case the upper layers changed it. */
 		IEEE80211_ADDR_COPY(sc->sc_ic.ic_myaddr,
 		    ((struct arpcom *)ifp)->ac_enaddr);
+#endif
 		return 0;
 	}
 
@@ -10424,11 +10514,15 @@ iwx_preinit(struct iwx_softc *sc)
 	/* Configure channel information obtained from firmware. */
 	ieee80211_channel_init(ifp);
 
+#ifdef __HAIKU__
+	IEEE80211_ADDR_COPY(IF_LLADDR(ifp), ic->ic_myaddr);
+#else
 	/* Configure MAC address. */
 	err = if_setlladdr(ifp, ic->ic_myaddr);
 	if (err)
 		printf("%s: could not set MAC address (error %d)\n",
 		    DEVNAME(sc), err);
+#endif
 
 	ieee80211_media_init(ifp, iwx_media_change, ieee80211_media_status);
 
@@ -10516,11 +10610,21 @@ iwx_find_device_cfg(struct iwx_softc *sc)
 }
 
 
+#ifdef __FreeBSD_version
+static int
+iwx_attach(device_t dev)
+#else
 void
 iwx_attach(struct device *parent, struct device *self, void *aux)
+#endif
 {
+#ifdef __FreeBSD_version
+#define pa dev
+	struct iwx_softc *sc = device_get_softc(dev);
+#else
 	struct iwx_softc *sc = (void *)self;
 	struct pci_attach_args *pa = aux;
+#endif
 	pci_intr_handle_t ih;
 	pcireg_t reg, memtype;
 	struct ieee80211com *ic = &sc->sc_ic;
@@ -10531,10 +10635,22 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 	int txq_i, i, j;
 	size_t ctxt_info_size;
 
+#ifdef __FreeBSD_version
+	sc->sc_dev = dev;
+	sc->sc_pid = pci_get_device(dev);
+	sc->sc_dmat = bus_get_dma_tag(sc->sc_dev);
+	bus_dma_tag_create(sc->sc_dmat, 1, 0,
+		BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
+		BUS_SPACE_MAXSIZE_32BIT, BUS_SPACE_UNRESTRICTED, BUS_SPACE_MAXSIZE_32BIT, 0, NULL, NULL,
+		&sc->sc_dmat);
+
+	if_alloc_inplace(ifp, IFT_ETHER);
+#else
 	sc->sc_pid = PCI_PRODUCT(pa->pa_id);
 	sc->sc_pct = pa->pa_pc;
 	sc->sc_pcitag = pa->pa_tag;
 	sc->sc_dmat = pa->pa_dmat;
+#endif
 
 	rw_init(&sc->ioctl_rwl, "iwxioctl");
 
@@ -10543,7 +10659,7 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 	if (err == 0) {
 		printf("%s: PCIe capability structure not found!\n",
 		    DEVNAME(sc));
-		return;
+		return -1;
 	}
 
 	/*
@@ -10558,15 +10674,19 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 	    &sc->sc_st, &sc->sc_sh, NULL, &sc->sc_sz, 0);
 	if (err) {
 		printf("%s: can't map mem space\n", DEVNAME(sc));
-		return;
+		return -1;
 	}
 
 	if (pci_intr_map_msix(pa, 0, &ih) == 0) {
 		sc->sc_msix = 1;
 	} else if (pci_intr_map_msi(pa, &ih)) {
+#ifndef __HAIKU__
 		if (pci_intr_map(pa, &ih)) {
+#else
+		{
+#endif
 			printf("%s: can't map interrupt\n", DEVNAME(sc));
-			return;
+			return -1;
 		}
 		/* Hardware bug workaround. */
 		reg = pci_conf_read(sc->sc_pct, sc->sc_pcitag,
@@ -10591,7 +10711,7 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 		if (intrstr != NULL)
 			printf(" at %s", intrstr);
 		printf("\n");
-		return;
+		return -1;
 	}
 	printf(", %s\n", intrstr);
 
@@ -10612,6 +10732,10 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 	sc->sc_hw_rev = (sc->sc_hw_rev & 0xfff0) |
 			(IWX_CSR_HW_REV_STEP(sc->sc_hw_rev << 2) << 2);
 
+#ifdef __FreeBSD_version
+#undef PCI_PRODUCT
+#define PCI_PRODUCT(pa) pci_get_device(dev)
+#endif
 	switch (PCI_PRODUCT(pa->pa_id)) {
 	case PCI_PRODUCT_INTEL_WL_22500_1:
 		sc->sc_fwname = IWX_CC_A_FW;
@@ -10628,7 +10752,7 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 		/* These devices should be QuZ only. */
 		if (sc->sc_hw_rev != IWX_CSR_HW_REV_TYPE_QUZ) {
 			printf("%s: unsupported AX201 adapter\n", DEVNAME(sc));
-			return;
+			return -1;
 		}
 		sc->sc_fwname = IWX_QUZ_A_HR_B_FW;
 		sc->sc_device_family = IWX_DEVICE_FAMILY_22000;
@@ -10706,8 +10830,11 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 		break;
 	default:
 		printf("%s: unknown adapter type\n", DEVNAME(sc));
-		return;
+		return -1;
 	}
+#ifdef __FreeBSD_version
+#undef PCI_PRODUCT
+#endif
 
 	cfg = iwx_find_device_cfg(sc);
 	if (cfg) {
@@ -10739,7 +10866,7 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 	if (err) {
 		printf("%s: could not allocate memory for loading firmware\n",
 		    DEVNAME(sc));
-		return;
+		return -1;
 	}
 
 	if (sc->sc_device_family >= IWX_DEVICE_FAMILY_AX210) {
@@ -10894,13 +11021,20 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 	ic->ic_ampdu_rx_stop = iwx_ampdu_rx_stop;
 	ic->ic_ampdu_tx_start = iwx_ampdu_tx_start;
 	ic->ic_ampdu_tx_stop = NULL;
+
+#ifdef __HAIKU__
+	mtx_lock(&Giant);
+	iwx_preinit(sc);
+	mtx_unlock(&Giant);
+#else
 	/*
 	 * We cannot read the MAC address without loading the
 	 * firmware from disk. Postpone until mountroot is done.
 	 */
 	config_mountroot(self, iwx_attach_hook);
+#endif
 
-	return;
+	return 0;
 
 fail4:	while (--txq_i >= 0)
 		iwx_free_tx_ring(sc, &sc->txq[txq_i]);
@@ -10911,7 +11045,7 @@ fail4:	while (--txq_i >= 0)
 fail1:	iwx_dma_contig_free(&sc->ctxt_info_dma);
 	iwx_dma_contig_free(&sc->prph_scratch_dma);
 	iwx_dma_contig_free(&sc->prph_info_dma);
-	return;
+	return -1;
 }
 
 #if NBPFILTER > 0
@@ -11011,6 +11145,30 @@ iwx_wakeup(struct iwx_softc *sc)
 	return 0;
 }
 
+#ifdef __FreeBSD_version
+static device_method_t iwx_pci_methods[] = {
+	/* Device interface */
+	DEVMETHOD(device_probe,         iwx_probe),
+	DEVMETHOD(device_attach,        iwx_attach),
+#if 0
+	DEVMETHOD(device_detach,        iwx_detach),
+	DEVMETHOD(device_suspend,       iwx_suspend),
+	DEVMETHOD(device_resume,        iwx_resume),
+#endif
+
+	DEVMETHOD_END
+};
+
+static driver_t iwx_pci_driver = {
+	"iwx",
+	iwx_pci_methods,
+	sizeof (struct iwx_softc)
+};
+
+static devclass_t iwx_devclass;
+
+DRIVER_MODULE(iwx, pci, iwx_pci_driver, iwx_devclass, NULL, NULL);
+#else
 int
 iwx_activate(struct device *self, int act)
 {
@@ -11050,3 +11208,4 @@ const struct cfattach iwx_ca = {
 	sizeof(struct iwx_softc), iwx_match, iwx_attach,
 	NULL, iwx_activate
 };
+#endif

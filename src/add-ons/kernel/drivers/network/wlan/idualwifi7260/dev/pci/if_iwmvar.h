@@ -295,7 +295,6 @@ struct iwm_rx_ring {
 	struct iwm_dma_info	free_desc_dma;
 	struct iwm_dma_info	stat_dma;
 	struct iwm_dma_info	used_desc_dma;
-	struct iwm_dma_info	buf_dma;
 	void			*desc;
 	struct iwm_rb_status	*stat;
 	struct iwm_rx_data	data[IWM_RX_MQ_RING_COUNT];
@@ -472,7 +471,11 @@ struct iwm_ba_task_data {
 };
 
 struct iwm_softc {
+#ifdef __FreeBSD_version
+	device_t sc_dev;
+#else
 	struct device sc_dev;
+#endif
 	struct ieee80211com sc_ic;
 	int (*sc_newstate)(struct ieee80211com *, enum ieee80211_state, int);
 	int sc_newstate_pending;
@@ -503,8 +506,10 @@ struct iwm_softc {
 	bus_space_handle_t sc_sh;
 	bus_size_t sc_sz;
 	bus_dma_tag_t sc_dmat;
+#ifndef __FreeBSD_version
 	pci_chipset_tag_t sc_pct;
 	pcitag_t sc_pcitag;
+#endif
 	const void *sc_ih;
 	int sc_msix;
 

@@ -612,7 +612,11 @@ const struct iwx_device_cfg iwx_2ax_cfg_so_jf_b0 = {
 #define IWX_SUBDEVICE_CORES(subdevice)	((uint16_t)((subdevice) & 0x1c00) >> 10)
 
 struct iwx_softc {
+#ifdef __FreeBSD_version
+	device_t sc_dev;
+#else
 	struct device sc_dev;
+#endif
 	struct ieee80211com sc_ic;
 	int (*sc_newstate)(struct ieee80211com *, enum ieee80211_state, int);
 	int sc_newstate_pending;
@@ -654,8 +658,10 @@ struct iwx_softc {
 	bus_size_t sc_sz;
 	bus_dma_tag_t sc_dmat;
 	pci_product_id_t sc_pid;
+#ifndef __FreeBSD_version
 	pci_chipset_tag_t sc_pct;
 	pcitag_t sc_pcitag;
+#endif
 	const void *sc_ih;
 	int sc_msix;
 
