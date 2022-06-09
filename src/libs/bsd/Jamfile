@@ -13,6 +13,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			err.c
 			explicit_bzero.c
 			fgetln.c
+			fts.c
 			getpass.c
 			issetugid.c
 			lutimes.c

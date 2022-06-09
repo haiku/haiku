@@ -32,7 +32,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			dirent.c
 			errno.c
 			fcntl.cpp
-			fts.c
 			glob.c
 			inttypes.c
 			libgen.cpp

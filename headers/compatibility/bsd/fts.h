@@ -33,6 +33,10 @@
 #ifndef	_FTS_H_
 #define	_FTS_H_
 
+#include <features.h>
+
+#ifdef _DEFAULT_SOURCE
+
 #include <sys/cdefs.h>
 
 typedef struct {
@@ -134,5 +138,7 @@ FTSENT	*fts_read(FTS *);
 int	 fts_set(FTS *, FTSENT *, int);
 void	 fts_set_clientptr(FTS *, void *);
 __END_DECLS
+
+#endif /* _DEFAULT_SOURCE */
 
 #endif /* !_FTS_H_ */
