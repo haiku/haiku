@@ -299,6 +299,8 @@ struct ieee80211req_del_key {
 	uint8_t		idk_macaddr[IEEE80211_ADDR_LEN];
 };
 
+#endif /* IEEE80211_IOCTLS_ABBREVIATED */
+
 /*
  * MLME state manipulation request.  IEEE80211_MLME_ASSOC
  * only makes sense when operating as a station.  The other
@@ -318,6 +320,8 @@ struct ieee80211req_mlme {
 	uint8_t		im_macaddr[IEEE80211_ADDR_LEN];
 	uint8_t		im_ssid[IEEE80211_NWID_LEN];
 };
+
+#ifndef IEEE80211_IOCTLS_ABBREVIATED
 
 /*
  * MAC ACL operations.
@@ -382,7 +386,6 @@ struct ieee80211req_chanlist {
 	uint8_t		ic_channels[32];	/* NB: can be variable length */
 };
 
-#ifndef IEEE80211_IOCTLS_ABBREVIATED
 /*
  * Get the active channel list info.
  */
@@ -395,7 +398,6 @@ struct ieee80211req_chaninfo {
 	 (((_nchan)-1) * sizeof(struct ieee80211_channel)))
 #define	IEEE80211_CHANINFO_SPACE(_ci) \
 	IEEE80211_CHANINFO_SIZE((_ci)->ic_nchans)
-#endif
 
 /*
  * Retrieve the WPA/RSN information element for an associated station.

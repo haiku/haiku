@@ -321,6 +321,39 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 			break;
 		}
 
+		case IEEE80211_IOC_MLME: {
+			if (op != SIOCS80211)
+				return B_BAD_VALUE;
+
+			struct ieee80211req_mlme mlme;
+			if (user_memcpy(&mlme, ireq.i_data, min_c(sizeof(mlme), ireq.i_len)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			switch (mlme.im_op) {
+				case IEEE80211_MLME_DISASSOC:
+				case IEEE80211_MLME_DEAUTH: {
+					struct ifreq ifr;
+					struct ieee80211_nwid nwid;
+					ifr.ifr_data = (uint8_t*)&nwid;
+					nwid.i_len = 0;
+
+					IFF_LOCKGIANT(ifp);
+					status_t status = ifp->if_ioctl(ifp, SIOCS80211NWID, (caddr_t)&ifr);
+					IFF_UNLOCKGIANT(ifp);
+					if (status != 0)
+						return status;
+					break;
+				}
+
+				default:
+					TRACE("openbsd wlan_control: unsupported MLME operation %" B_PRIu8 "\n",
+						mlme.im_op);
+					return EOPNOTSUPP;
+			}
+
+			break;
+		}
+
 		case IEEE80211_IOC_HAIKU_JOIN: {
 			if (op != SIOCS80211)
 				return B_BAD_VALUE;
