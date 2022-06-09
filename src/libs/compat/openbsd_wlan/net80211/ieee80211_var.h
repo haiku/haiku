@@ -273,6 +273,9 @@ struct ieee80211com {
 				    size_t);
 	struct timeout		ic_bgscan_timeout;
 	uint32_t		ic_bgscan_fail;
+#ifdef __HAIKU__
+	bigtime_t		ic_last_raise_inact;
+#endif
 	u_int8_t		ic_myaddr[IEEE80211_ADDR_LEN];
 	struct ieee80211_rateset ic_sup_rates[IEEE80211_MODE_MAX];
 	struct ieee80211_channel ic_channels[IEEE80211_CHAN_MAX+1];

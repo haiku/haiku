@@ -30,6 +30,7 @@
 #ifndef _NET80211_IEEE80211_IOCTL_H_
 #define _NET80211_IEEE80211_IOCTL_H_
 
+#ifndef IEEE80211_IOCTLS_ABBREVIATED
 /*
  * IEEE 802.11 ioctls.
  */
@@ -381,6 +382,7 @@ struct ieee80211req_chanlist {
 	uint8_t		ic_channels[32];	/* NB: can be variable length */
 };
 
+#ifndef IEEE80211_IOCTLS_ABBREVIATED
 /*
  * Get the active channel list info.
  */
@@ -393,6 +395,7 @@ struct ieee80211req_chaninfo {
 	 (((_nchan)-1) * sizeof(struct ieee80211_channel)))
 #define	IEEE80211_CHANINFO_SPACE(_ci) \
 	IEEE80211_CHANINFO_SIZE((_ci)->ic_nchans)
+#endif
 
 /*
  * Retrieve the WPA/RSN information element for an associated station.
@@ -418,6 +421,7 @@ struct ieee80211req_sta_stats {
 	} is_u;
 	struct ieee80211_nodestats is_stats;
 };
+#endif
 
 /*
  * Station information block; the mac address is used
@@ -443,6 +447,7 @@ struct ieee80211req_sta_info {
 	uint16_t	isi_associd;		/* assoc response */
 	uint16_t	isi_txpower;		/* current tx power */
 	uint16_t	isi_vlan;		/* vlan tag */
+#ifndef IEEE80211_IOCTLS_ABBREVIATED
 	/* NB: [IEEE80211_NONQOS_TID] holds seq#'s for non-QoS stations */
 	uint16_t	isi_txseqs[IEEE80211_TID_SIZE];/* tx seq #/TID */
 	uint16_t	isi_rxseqs[IEEE80211_TID_SIZE];/* rx seq#/TID */
@@ -456,6 +461,7 @@ struct ieee80211req_sta_info {
 	uint16_t	isi_localid;
 	uint8_t		isi_peerstate;
 	/* XXX frag state? */
+#endif
 	/* variable length IE data */
 };
 
@@ -514,6 +520,7 @@ struct ieee80211req_sta_txpow {
 	(IEEE80211_FC0_TYPE_MGT | IEEE80211_FC0_SUBTYPE_BEACON | \
 	 IEEE80211_FC0_SUBTYPE_PROBE_RESP)
 
+#ifndef IEEE80211_IOCTLS_ABBREVIATED
 /*
  * Station mode roaming parameters.  These are maintained
  * per band/mode and control the roaming algorithm.
@@ -569,6 +576,7 @@ struct ieee80211_devcaps_req {
 	 (((_nchan)-1) * sizeof(struct ieee80211_channel)))
 #define	IEEE80211_DEVCAPS_SPACE(_dc) \
 	IEEE80211_DEVCAPS_SIZE((_dc)->dc_chaninfo.ic_nchans)
+#endif
 
 struct ieee80211_chanswitch_req {
 	struct ieee80211_channel csa_chan;	/* new channel */
@@ -843,6 +851,9 @@ struct ieee80211req_scan_result {
 	uint8_t		isr_bssid[IEEE80211_ADDR_LEN];
 	uint8_t		isr_nrates;
 	uint8_t		isr_rates[IEEE80211_RATE_MAXSIZE];
+#if defined(__HAIKU__) && defined(_KERNEL_MODE)
+STATIC_ASSERT(IEEE80211_RATE_MAXSIZE == 15);
+#endif
 	uint8_t		isr_ssid_len;		/* SSID length */
 	uint8_t		isr_meshid_len;		/* MESH ID length */
 	/* variable length SSID, followed by variable length MESH ID,

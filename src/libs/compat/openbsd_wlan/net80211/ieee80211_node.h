@@ -672,4 +672,9 @@ int ieee80211_ess_cmp(const struct ieee80211_ess_rbt *,
 RBT_PROTOTYPE(ieee80211_tree, ieee80211_node, ni_node, ieee80211_node_cmp);
 RBT_PROTOTYPE(ieee80211_ess_tree, ieee80211_ess_rbt, ess_rbt, ieee80211_ess_cmp);
 
+#ifdef __FreeBSD_version
+void ieee80211_node_raise_inact(void *arg, struct ieee80211_node *ni);
+void ieee80211_clean_inactive_nodes(struct ieee80211com *ic, int inact_max);
+#endif
+
 #endif /* _NET80211_IEEE80211_NODE_H_ */

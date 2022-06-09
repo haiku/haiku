@@ -339,6 +339,9 @@ struct ieee80211_nodereq {
 	u_int		nr_rsnprotos;
 	u_int		nr_rsnciphers;
 	u_int		nr_rsnakms;
+#ifdef __FreeBSD_version
+	uint8_t		nr_rsnie[257];
+#endif
 
 	/* Node flags */
 	u_int8_t	nr_flags;
@@ -394,6 +397,9 @@ struct ieee80211_nodereq_all {
 
 	int				na_nodes;	/* returned count */
 	size_t				na_size;	/* size of node buffer */
+#ifdef __FreeBSD_version
+	int				na_startnode;
+#endif
 	struct ieee80211_nodereq	*na_node;	/* allocated node buffer */
 
 	/* Match nodes by flag */

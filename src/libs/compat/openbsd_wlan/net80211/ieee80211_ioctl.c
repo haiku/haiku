@@ -129,6 +129,12 @@ ieee80211_node2req(struct ieee80211com *ic, const struct ieee80211_node *ni,
 		nr->nr_rsnakms |= IEEE80211_WPA_AKM_SHA256_8021X;
 	if (ni->ni_supported_rsnakms & IEEE80211_AKM_SHA256_PSK)
 		nr->nr_rsnakms |= IEEE80211_WPA_AKM_SHA256_PSK;
+#ifdef __FreeBSD_version
+	if (ni->ni_rsnie != NULL)
+		memcpy(nr->nr_rsnie, ni->ni_rsnie, 2 + ni->ni_rsnie[1]);
+	else
+		nr->nr_rsnie[1] = 0;
+#endif
 
 	/* Node flags */
 	nr->nr_flags = 0;
@@ -934,6 +940,12 @@ ieee80211_ioctl(struct ifnet *ifp, u_long cmd, caddr_t data)
 		na = (struct ieee80211_nodereq_all *)data;
 		na->na_nodes = i = 0;
 		ni = RBT_MIN(ieee80211_tree, &ic->ic_tree);
+#ifdef __FreeBSD_version
+		while (ni && na->na_startnode) {
+			ni = RBT_NEXT(ieee80211_tree, ni);
+			na->na_startnode--;
+		}
+#endif
 		while (ni && na->na_size >=
 		    i + sizeof(struct ieee80211_nodereq)) {
 			ieee80211_node2req(ic, ni, &nrbuf);
