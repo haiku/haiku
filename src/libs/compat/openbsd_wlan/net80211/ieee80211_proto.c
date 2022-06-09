@@ -1062,7 +1062,11 @@ ieee80211_newstate(struct ieee80211com *ic, enum ieee80211_state nstate,
 #endif
 
 	ostate = ic->ic_state;
+#ifdef __FreeBSD_version
+	if (bootverbose || ifp->if_flags & IFF_DEBUG)
+#else
 	if (ifp->if_flags & IFF_DEBUG)
+#endif
 		printf("%s: %s -> %s\n", ifp->if_xname,
 		    ieee80211_state_name[ostate], ieee80211_state_name[nstate]);
 	ic->ic_state = nstate;			/* state transition */
