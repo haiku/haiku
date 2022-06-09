@@ -9,39 +9,6 @@
 #include <net/if.h>
 #include <string.h>
 
-#include <NetworkAddress.h>
-
-
-class BNetworkAddress;
-
-
-struct wireless_network {
-	char				name[32];
-	BNetworkAddress		address;
-	uint8				noise_level;
-	uint8				signal_strength;
-	uint32				flags;
-	uint32				authentication_mode;
-	uint32				cipher;
-	uint32				group_cipher;
-	uint32				key_mode;
-
-	bool operator==(const wireless_network& other) {
-		return strncmp(name, other.name, 32) == 0
-			// ignore address difference
-			&& noise_level == other.noise_level
-			&& signal_strength == other.signal_strength
-			&& flags == other.flags
-			&& authentication_mode == other.authentication_mode
-			&& cipher == other.cipher
-			&& group_cipher == other.group_cipher
-			&& key_mode == other.key_mode;
-	}
-};
-
-// flags
-#define B_NETWORK_IS_ENCRYPTED			0x01
-#define B_NETWORK_IS_PERSISTENT			0x02
 
 // authentication modes
 enum {
@@ -80,6 +47,40 @@ enum {
 	B_NETWORK_EAP_ENCAPSULATION_PEAP	= 0x0001,
 	B_NETWORK_EAP_ENCAPSULATION_TLS		= 0x0002
 };
+
+
+#if defined(__cplusplus) && !defined(_KERNEL_MODE)
+
+#include <NetworkAddress.h>
+
+
+struct wireless_network {
+	char				name[32];
+	BNetworkAddress		address;
+	uint8				noise_level;
+	uint8				signal_strength;
+	uint32				flags;
+	uint32				authentication_mode;
+	uint32				cipher;
+	uint32				group_cipher;
+	uint32				key_mode;
+
+	bool operator==(const wireless_network& other) {
+		return strncmp(name, other.name, 32) == 0
+			// ignore address difference
+			&& noise_level == other.noise_level
+			&& signal_strength == other.signal_strength
+			&& flags == other.flags
+			&& authentication_mode == other.authentication_mode
+			&& cipher == other.cipher
+			&& group_cipher == other.group_cipher
+			&& key_mode == other.key_mode;
+	}
+};
+
+// flags
+#define B_NETWORK_IS_ENCRYPTED			0x01
+#define B_NETWORK_IS_PERSISTENT			0x02
 
 
 class BNetworkDevice {
@@ -141,5 +142,6 @@ private:
 			char				fName[IF_NAMESIZE];
 };
 
+#endif	// __cplusplus && !_KERNEL_MODE
 
 #endif	// _NETWORK_DEVICE_H
