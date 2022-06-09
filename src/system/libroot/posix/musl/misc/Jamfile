@@ -12,7 +12,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		MergeObject <$(architecture)>posix_musl_misc.o :
 			a64l.c
 			ffs.c
+			ftw.c
 			getsubopt.c
+			nftw.c
 			;
 	}
 }
