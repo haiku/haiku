@@ -563,7 +563,7 @@ map_device(device_info *di)
 		di->pcii.u.h0.base_registers_pci[registers],
 		di->pcii.u.h0.base_register_sizes[registers],
 		B_ANY_KERNEL_ADDRESS,
-		B_CLONEABLE_AREA | (si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
+		B_CLONEABLE_AREA | B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void **)&(di->regs));
 	si->clone_bugfix_regs = (uint32 *) di->regs;
 
