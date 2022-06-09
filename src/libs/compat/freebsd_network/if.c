@@ -175,7 +175,7 @@ if_alloc_inplace(struct ifnet *ifp, u_char type)
 	if (ifindex_alloc_locked(&index) != ENOERR) {
 		IFNET_WUNLOCK();
 		panic("too many devices");
-		goto err3;
+		goto err2;
 	}
 	ifnet_setbyindex_locked(index, IFNET_HOLD);
 	IFNET_WUNLOCK();
@@ -185,13 +185,6 @@ if_alloc_inplace(struct ifnet *ifp, u_char type)
 
 	IF_ADDR_LOCK_INIT(ifp);
 	return 0;
-
-err3:
-	switch (type) {
-		case IFT_ETHER:
-			_kernel_free(ifp->if_l2com);
-			break;
-	}
 
 err2:
 	delete_sem(ifp->receive_sem);
@@ -229,11 +222,6 @@ if_free_inplace(struct ifnet *ifp)
 	IFNET_WUNLOCK();
 
 	IF_ADDR_LOCK_DESTROY(ifp);
-	switch (ifp->if_type) {
-		case IFT_ETHER:
-			_kernel_free(ifp->if_l2com);
-			break;
-	}
 
 	delete_sem(ifp->receive_sem);
 	ifq_uninit(&ifp->receive_queue);
