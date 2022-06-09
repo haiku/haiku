@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src system libroot posix musl misc ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) .. include ] ;
 UseHeaders [ FDirName $(SUBDIR) .. internal ] ;
-UseHeaders [ FDirName $(SUBDIR) .. arch $(TARGET_KERNEL_ARCH_DIR) ] ;
+UseHeaders [ FDirName $(SUBDIR) .. arch $(TARGET_ARCH) ] ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
