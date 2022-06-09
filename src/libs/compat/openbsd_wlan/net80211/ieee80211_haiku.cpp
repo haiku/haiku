@@ -181,20 +181,15 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 			if (op != SIOCG80211)
 				return B_BAD_VALUE;
 
-			const int32 count = ireq.i_len / sizeof(struct ieee80211req_scan_result);
-				// ieee80211req_scan_result is variable-length, this will get us the max count
-
-			void* req_scan_result = calloc(1, ireq.i_len);
-			MemoryDeleter resultDeleter(req_scan_result);
-			if (!resultDeleter.IsSet())
-				return B_NO_MEMORY;
-
 			struct ieee80211_nodereq nodereq;
 			struct ieee80211_nodereq_all nodereq_all = {};
 
-			uint8* out = (uint8*)req_scan_result;
-			uint16 remaining = ireq.i_len;
-			for (int i = 0; ; i++) {
+			// We need a scan_result of maximum possible size to work with.
+			struct ieee80211req_scan_result* sr = (struct ieee80211req_scan_result*)
+				alloca(sizeof(struct ieee80211req_scan_result) + IEEE80211_NWID_LEN + 257);
+
+			uint16 remaining = ireq.i_len, offset = 0;
+			for (int i = 0; remaining > 0; i++) {
 				nodereq_all.na_node = &nodereq;
 				nodereq_all.na_size = sizeof(struct ieee80211_nodereq);
 				nodereq_all.na_startnode = i;
@@ -207,16 +202,16 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 				if (nodereq_all.na_nodes == 0)
 					break;
 
-				int32 required = sizeof(struct ieee80211req_scan_result) + nodereq.nr_nwid_len;
+				int32 size = sizeof(struct ieee80211req_scan_result) + nodereq.nr_nwid_len;
 				uint16_t ieLen = 0;
 				if (nodereq.nr_rsnie[1] != 0) {
 					ieLen = 2 + nodereq.nr_rsnie[1];
-					required += ieLen;
+					size += ieLen;
 				}
-				if (remaining < (sizeof(struct ieee80211req_scan_result) + nodereq.nr_nwid_len))
+				const int32 roundedSize = roundup(size, 4);
+				if (remaining < roundedSize)
 					break;
 
-				struct ieee80211req_scan_result* sr = (struct ieee80211req_scan_result*)out;
 				sr->isr_ie_off = sizeof(struct ieee80211req_scan_result);
 				sr->isr_ie_len = ieLen;
 				sr->isr_freq = ieee80211_ieee2mhz(nodereq.nr_channel, nodereq.nr_chan_flags);
@@ -231,15 +226,17 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 				memcpy(sr->isr_rates, nodereq.nr_rates, IEEE80211_RATE_MAXSIZE);
 				sr->isr_ssid_len = nodereq.nr_nwid_len;
 				sr->isr_meshid_len = 0;
-				memcpy(out + sr->isr_ie_off, nodereq.nr_nwid, sr->isr_ssid_len);
-				memcpy(out + sr->isr_ie_off + sr->isr_ssid_len,
-					nodereq.nr_rsnie, ieLen);
+				memcpy((uint8*)sr + sr->isr_ie_off, nodereq.nr_nwid, sr->isr_ssid_len);
+				memcpy((uint8*)sr + sr->isr_ie_off + sr->isr_ssid_len, nodereq.nr_rsnie, ieLen);
 
-				sr->isr_len = roundup(sr->isr_ie_off + sr->isr_ssid_len + sr->isr_ie_len, 4);
-				out += sr->isr_len;
+				sr->isr_len = roundedSize;
+				if (user_memcpy((uint8*)ireq.i_data + offset, sr, size) != B_OK)
+					return B_BAD_ADDRESS;
+
+				offset += sr->isr_len;
 				remaining -= sr->isr_len;
 			}
-			ireq.i_len = (out - (uint8*)req_scan_result);
+			ireq.i_len = offset;
 
 			IFF_LOCKGIANT(ifp);
 			const bigtime_t RAISE_INACT_INTERVAL = 5 * 1000 * 1000 /* 5s */;
@@ -254,9 +251,6 @@ wlan_control(void* cookie, uint32 op, void* arg, size_t length)
 				ic->ic_last_raise_inact = system_time();
 			}
 			IFF_UNLOCKGIANT(ifp);
-
-			if (user_memcpy(ireq.i_data, req_scan_result, ireq.i_len) != B_OK)
-				return B_BAD_ADDRESS;
 
 			break;
 		}
