@@ -93,6 +93,14 @@ pci_intr_map_msi(device_t dev, pci_intr_handle_t* ihp)
 	return pci_alloc_msi(dev, &count);
 }
 
+static int
+pci_intr_map(device_t dev, pci_intr_handle_t* ihp)
+{
+	// No need to map legacy interrupts.
+	ihp->rid = 0;
+	return 0;
+}
+
 static void*
 pci_intr_establish_openbsd(device_t dev, pci_intr_handle_t ih, int level,
 	int(*func)(void*), void* arg, const char* what)
