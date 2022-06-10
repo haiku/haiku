@@ -117,6 +117,10 @@
 #define BUS_SPACE_MAXSIZE	0xFFFFFFFF
 #define BUS_SPACE_MAXADDR_24BIT	0xFFFFFF
 #define BUS_SPACE_MAXADDR_32BIT 0xFFFFFFFF
+
+#if defined(__HAIKU_ARCH_PHYSICAL_64_BIT) && defined(__i386__)
+#define PAE 1
+#endif
 #if defined(__amd64__) || defined(PAE)
 #define BUS_SPACE_MAXADDR	0xFFFFFFFFFFFFFFFFULL
 #else
