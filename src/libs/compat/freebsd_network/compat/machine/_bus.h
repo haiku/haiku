@@ -10,7 +10,7 @@
 
 
 typedef phys_addr_t bus_addr_t;
-typedef phys_size_t bus_size_t;
+typedef size_t bus_size_t;
 typedef addr_t bus_space_handle_t;
 
 
