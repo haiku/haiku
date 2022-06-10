@@ -171,6 +171,8 @@ struct mbuf *
 m_get2(int size, int how, short type, int flags)
 {
 	if (size <= MHLEN || (size <= MLEN && (flags & M_PKTHDR) == 0)) {
+		return _m_get(how, type, flags);
+	} else if (size <= MCLBYTES) {
 		size = MCLBYTES;
 	} else if (size <= MJUMPAGESIZE) {
 		size = MJUMPAGESIZE;
