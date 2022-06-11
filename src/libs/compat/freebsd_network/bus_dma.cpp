@@ -410,6 +410,7 @@ bus_dmamap_load(bus_dma_tag_t dmat, bus_dmamap_t map, void *buf,
 
 		map->buffer_type = bus_dmamap::BUFFER_TYPE_SIMPLE;
 		map->buffer = buf;
+		map->buffer_length = buflen;
 
 		nsegs = lastaddr = 0;
 		error = _bus_load_buffer(dmat, map->bounce_buffer, buflen, flags,
