@@ -316,7 +316,9 @@ RNDISDevice::Read(uint8 *buffer, size_t *numBytes)
 		fReadHeader[1], fReadHeader[2], fReadHeader[3]);
 
 	// Advance to next packet
-	fReadHeader += fReadHeader[1];
+	fReadHeader = (uint32*)((uint8*)fReadHeader + fReadHeader[1]);
+
+	// Are we past the end of the buffer? If so, prepare to receive another one on the next read
 	if ((uint32)((uint8*)fReadHeader - fReadBuffer) >= fActualLengthRead)
 		fReadHeader = NULL;
 
