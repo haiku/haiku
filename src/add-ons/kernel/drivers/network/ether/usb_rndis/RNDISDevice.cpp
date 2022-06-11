@@ -290,8 +290,8 @@ RNDISDevice::Read(uint8 *buffer, size_t *numBytes)
 	}
 
 	if (fReadHeader[2] + fReadHeader[3] > fReadHeader[1]) {
-		TRACE_ALWAYS("Received frame data goes past end of frame: %d + %d > %d", fReadHeader[2],
-			fReadHeader[3], fReadHeader[1]);
+		TRACE_ALWAYS("Received frame data goes past end of frame: %" B_PRIu32 " + %" B_PRIu32
+			" > %" B_PRIu32, fReadHeader[2], fReadHeader[3], fReadHeader[1]);
 	}
 
 	if (fReadHeader[4] != 0 || fReadHeader[5] != 0 || fReadHeader[6] != 0) {
