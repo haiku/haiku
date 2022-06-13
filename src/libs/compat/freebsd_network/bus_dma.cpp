@@ -340,8 +340,6 @@ _bus_load_buffer(bus_dma_tag_t dmat, void* buf, bus_size_t buflen,
 
 	while (buflen > 0) {
 		const bus_addr_t phys_addr = pmap_kextract(virtual_addr);
-		if (!_validate_address(dmat, phys_addr))
-			return ERANGE;
 
 		bus_size_t segment_size = PAGESIZE - (phys_addr & PAGE_MASK);
 		if (segment_size > buflen)
@@ -356,25 +354,25 @@ _bus_load_buffer(bus_dma_tag_t dmat, void* buf, bus_size_t buflen,
 				segment_size = (boundary_addr - phys_addr);
 		}
 
-		// Insert chunk into a segment.
-		if (first) {
+		// If possible, coalesce into the previous segment.
+		if (!first && phys_addr == last_phys_addr
+				&& (segs[seg].ds_len + segment_size) <= dmat->maxsegsz
+				&& (dmat->boundary == 0
+					|| (segs[seg].ds_addr & boundary_mask)
+						== (phys_addr & boundary_mask))) {
+			// No need to validate the address here.
+			segs[seg].ds_len += segment_size;
+		} else {
+			if (first)
+				first = false;
+			else if (++seg >= dmat->maxsegments)
+				break;
+
+			if (!_validate_address(dmat, phys_addr))
+				return ERANGE;
+
 			segs[seg].ds_addr = phys_addr;
 			segs[seg].ds_len = segment_size;
-			first = false;
-		} else {
-			// If possible, coalesce into the previous segment.
-			if (phys_addr == last_phys_addr
-			        && (segs[seg].ds_len + segment_size) <= dmat->maxsegsz
-					&& (dmat->boundary == 0
-						|| (segs[seg].ds_addr & boundary_mask)
-							== (phys_addr & boundary_mask))) {
-				segs[seg].ds_len += segment_size;
-			} else {
-				if (++seg >= dmat->maxsegments)
-					break;
-				segs[seg].ds_addr = phys_addr;
-				segs[seg].ds_len = segment_size;
-			}
 		}
 
 		last_phys_addr = phys_addr + segment_size;
