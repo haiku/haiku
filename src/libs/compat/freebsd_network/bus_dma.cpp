@@ -332,11 +332,10 @@ _validate_address(bus_dma_tag_t dmat, bus_addr_t paddr)
 
 static int
 _bus_load_buffer(bus_dma_tag_t dmat, void* buf, bus_size_t buflen,
-	int flags, bus_addr_t* lastaddrp, bus_dma_segment_t* segs,
+	int flags, bus_addr_t& last_phys_addr, bus_dma_segment_t* segs,
 	int& seg, bool first)
 {
 	vm_offset_t virtual_addr = (vm_offset_t)buf;
-	bus_addr_t last_phys_addr = *lastaddrp;
 	const bus_addr_t boundary_mask = ~(dmat->boundary - 1);
 
 	while (buflen > 0) {
@@ -344,7 +343,7 @@ _bus_load_buffer(bus_dma_tag_t dmat, void* buf, bus_size_t buflen,
 		if (!_validate_address(dmat, phys_addr))
 			return ERANGE;
 
-		bus_size_t segment_size = B_PAGE_SIZE - (phys_addr & PAGE_MASK);
+		bus_size_t segment_size = PAGESIZE - (phys_addr & PAGE_MASK);
 		if (segment_size > buflen)
 			segment_size = buflen;
 		if (segment_size > dmat->maxsegsz)
@@ -383,7 +382,6 @@ _bus_load_buffer(bus_dma_tag_t dmat, void* buf, bus_size_t buflen,
 		buflen -= segment_size;
 	}
 
-	*lastaddrp = last_phys_addr;
 	return (buflen != 0 ? EFBIG : 0);
 }
 
@@ -394,13 +392,13 @@ bus_dmamap_load(bus_dma_tag_t dmat, bus_dmamap_t map, void *buf,
 	void *callback_arg, int flags)
 {
 	bus_addr_t lastaddr = 0;
-	int error, nsegs = 0;
+	int error, seg = 0;
 
 	if (buflen > dmat->maxsize)
 		return EINVAL;
 
 	error = _bus_load_buffer(dmat, buf, buflen, flags,
-		&lastaddr, map->segments, nsegs, true);
+		lastaddr, map->segments, seg, true);
 
 	if (error != 0) {
 		// Try again using a bounce buffer.
@@ -412,15 +410,15 @@ bus_dmamap_load(bus_dma_tag_t dmat, bus_dmamap_t map, void *buf,
 		map->buffer = buf;
 		map->buffer_length = buflen;
 
-		nsegs = lastaddr = 0;
+		seg = lastaddr = 0;
 		error = _bus_load_buffer(dmat, map->bounce_buffer, buflen, flags,
-			&lastaddr, map->segments, nsegs, true);
+			lastaddr, map->segments, seg, true);
 	}
 
 	if (error)
 		(*callback)(callback_arg, map->segments, 0, error);
 	else
-		(*callback)(callback_arg, map->segments, nsegs + 1, 0);
+		(*callback)(callback_arg, map->segments, seg + 1, 0);
 
 	// ENOMEM is returned; all other errors are only sent to the callback.
 	if (error == ENOMEM)
@@ -438,7 +436,7 @@ bus_dmamap_load_mbuf_sg(bus_dma_tag_t dmat, bus_dmamap_t map, struct mbuf* mb,
 	if (mb->m_pkthdr.len > dmat->maxsize)
 		return EINVAL;
 
-	int nsegs = 0, error = 0;
+	int seg = 0, error = 0;
 	bool first = true;
 	bus_addr_t lastaddr = 0;
 	flags |= BUS_DMA_NOWAIT;
@@ -448,7 +446,7 @@ bus_dmamap_load_mbuf_sg(bus_dma_tag_t dmat, bus_dmamap_t map, struct mbuf* mb,
 			continue;
 
 		error = _bus_load_buffer(dmat, m->m_data, m->m_len,
-			flags, &lastaddr, segs, nsegs, first);
+			flags, lastaddr, segs, seg, first);
 		first = false;
 	}
 
@@ -461,12 +459,12 @@ bus_dmamap_load_mbuf_sg(bus_dma_tag_t dmat, bus_dmamap_t map, struct mbuf* mb,
 		map->buffer_type = bus_dmamap::BUFFER_TYPE_MBUF;
 		map->mbuf = mb;
 
-		nsegs = lastaddr = 0;
+		seg = lastaddr = 0;
 		error = _bus_load_buffer(dmat, map->bounce_buffer, mb->m_pkthdr.len, flags,
-			&lastaddr, segs, nsegs, true);
+			lastaddr, segs, seg, true);
 	}
 
-	*_nsegs = nsegs + 1;
+	*_nsegs = seg + 1;
 	return error;
 }
 
