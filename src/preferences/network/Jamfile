@@ -24,10 +24,8 @@ Preference Network :
 	RadioView.cpp
 	WirelessNetworkMenuItem.cpp
 
-	# from ifconfig
-	MediaTypes.cpp
-
-	: be bnetapi shared [ TargetLibstdc++ ] localestub
+	: <src!bin!network!ifconfig>MediaTypes.o
+	be bnetapi shared [ TargetLibstdc++ ] localestub
 	: Network.rdef InterfaceIcons.rdef
 ;
 
