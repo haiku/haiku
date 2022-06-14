@@ -4587,7 +4587,7 @@ iwm_rx_addbuf(struct iwm_softc *sc, int size, int idx)
 	if (err) {
 		/* XXX */
 		if (fatal)
-			panic("iwm: could not load RX mbuf");
+			panic("iwm: could not load RX mbuf: %d", err);
 		m_freem(m);
 		return err;
 	}
