@@ -299,7 +299,6 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 		{
 			struct ifmediareq mediareq;
 			ether_link_state_t state;
-			status_t status;
 
 			if (length < sizeof(ether_link_state_t))
 				return EINVAL;
