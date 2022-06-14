@@ -64,17 +64,6 @@ struct ifaliasreq {
 	uint32_t		ifra_flags;
 };
 
-/* used with SIOCGIFMEDIA */
-struct ifmediareq {
-	char			ifm_name[IF_NAMESIZE];
-	int				ifm_current;
-	int				ifm_mask;
-	int				ifm_status;
-	int				ifm_active;
-	int				ifm_count;
-	int*			ifm_ulist;
-};
-
 
 /* interface flags */
 #define IFF_UP				0x0001

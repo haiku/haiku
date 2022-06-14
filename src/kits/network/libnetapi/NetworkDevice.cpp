@@ -618,38 +618,13 @@ BNetworkDevice::HasLink() const
 
 
 int32
-BNetworkDevice::CountMedia() const
-{
-	ifmediareq request;
-	request.ifm_count = 0;
-	request.ifm_ulist = NULL;
-
-	if (do_request(request, Name(), SIOCGIFMEDIA) != B_OK)
-		return -1;
-
-	return request.ifm_count;
-}
-
-
-int32
 BNetworkDevice::Media() const
 {
-	ifmediareq request;
-	request.ifm_count = 0;
-	request.ifm_ulist = NULL;
-
+	ifreq request;
 	if (do_request(request, Name(), SIOCGIFMEDIA) != B_OK)
 		return -1;
 
-	return request.ifm_current;
-}
-
-
-int32
-BNetworkDevice::GetMediaAt(int32 index) const
-{
-	// TODO: this could do some caching
-	return 0;
+	return request.ifr_media;
 }
 
 

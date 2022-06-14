@@ -918,19 +918,16 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 		case SIOCGIFMEDIA:
 		{
 			// get media
-			if (length > 0 && length < sizeof(ifmediareq))
+			const size_t copylen = offsetof(ifreq, ifr_media) + sizeof(ifreq::ifr_media);
+			if (length > 0 && length < copylen)
 				return B_BAD_VALUE;
 
-			struct ifmediareq request;
-			if (user_memcpy(&request, argument, sizeof(request)) != B_OK)
+			struct ifreq request;
+			if (user_memcpy(&request, argument, copylen) != B_OK)
 				return B_BAD_ADDRESS;
 
-			// TODO: Support retrieving the media list?
-			memset(&request, 0, sizeof(struct ifmediareq));
-			request.ifm_active = request.ifm_current
-				= interface->device->media;
-
-			return user_memcpy(argument, &request, sizeof(request));
+			request.ifr_media = interface->device->media;
+			return user_memcpy(argument, &request, copylen);
 		}
 
 		case SIOCGIFMETRIC:

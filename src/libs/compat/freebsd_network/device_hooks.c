@@ -328,7 +328,6 @@ compat_control(void *cookie, uint32 op, void *arg, size_t length)
 
 		case SIOCSIFFLAGS:
 		case SIOCSIFMEDIA:
-		case SIOCGIFMEDIA:
 		case SIOCSIFMTU:
 		{
 			IFF_LOCKGIANT(ifp);

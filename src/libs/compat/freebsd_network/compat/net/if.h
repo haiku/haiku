@@ -117,6 +117,16 @@ struct if_data {
 	struct	timeval ifi_lastchange;	/* time of last administrative change */
 };
 
+struct ifmediareq {
+	char	ifm_name[IFNAMSIZ];	/* if name, e.g. "en0" */
+	int	ifm_current;		/* current media options */
+	int	ifm_mask;		/* don't care mask */
+	int	ifm_status;		/* media status */
+	int	ifm_active;		/* active options */
+	int	ifm_count;		/* # entries in ifm_ulist array */
+	int	*ifm_ulist;		/* media words */
+};
+
 struct  ifdrv {
 	char			ifd_name[IFNAMSIZ];     /* if name, e.g. "en0" */
 	unsigned long	ifd_cmd;

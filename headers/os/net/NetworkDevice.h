@@ -99,9 +99,6 @@ public:
 			uint32				Flags() const;
 			bool				HasLink() const;
 
-			int32				CountMedia() const;
-			int32				GetMediaAt(int32 index) const;
-
 			int32				Media() const;
 			status_t			SetMedia(int32 media);
 

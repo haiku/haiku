@@ -257,14 +257,11 @@ BNetworkInterface::MTU() const
 int32
 BNetworkInterface::Media() const
 {
-	ifmediareq request;
-	request.ifm_count = 0;
-	request.ifm_ulist = NULL;
-
+	ifreq request;
 	if (do_request(AF_INET, request, Name(), SIOCGIFMEDIA) != B_OK)
 		return -1;
 
-	return request.ifm_current;
+	return request.ifr_media;
 }
 
 
