@@ -310,7 +310,7 @@ bus_dmamem_free(bus_dma_tag_t dmat, void* vaddr, bus_dmamap_t map)
 
 
 static bool
-_validate_address(bus_dma_tag_t dmat, bus_addr_t paddr)
+_validate_address(bus_dma_tag_t dmat, bus_addr_t paddr, bool validate_alignment = true)
 {
 	do {
 		if (dmat->filter != NULL) {
@@ -319,7 +319,7 @@ _validate_address(bus_dma_tag_t dmat, bus_addr_t paddr)
 		} else {
 			if (paddr > dmat->lowaddr && paddr <= dmat->highaddr)
 				return false;
-			if (!vm_addr_align_ok(paddr, dmat->alignment))
+			if (validate_alignment && !vm_addr_align_ok(paddr, dmat->alignment))
 				return false;
 		}
 
@@ -360,7 +360,9 @@ _bus_load_buffer(bus_dma_tag_t dmat, void* buf, bus_size_t buflen,
 				&& (dmat->boundary == 0
 					|| (segs[seg].ds_addr & boundary_mask)
 						== (phys_addr & boundary_mask))) {
-			// No need to validate the address here.
+			if (!_validate_address(dmat, phys_addr, false))
+				return ERANGE;
+
 			segs[seg].ds_len += segment_size;
 		} else {
 			if (first)
