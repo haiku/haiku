@@ -472,14 +472,10 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 				return B_BAD_ADDRESS;
 			}
 
-			// TODO: see above.
-			if (interface->device->module->control(interface->device,
-					SIOCGIFMEDIA, &request,
-					sizeof(struct ifmediareq)) != B_OK) {
-				memset(&request, 0, sizeof(struct ifmediareq));
-				request.ifm_active = request.ifm_current
-					= interface->device->media;
-			}
+			// We do not support SIOCSIFMEDIA here, so ignore the media list.
+			memset(&request, 0, sizeof(struct ifmediareq));
+			request.ifm_active = request.ifm_current = interface->device->media;
+
 			put_device_interface(interface);
 
 			return user_memcpy(value, &request, sizeof(struct ifmediareq));

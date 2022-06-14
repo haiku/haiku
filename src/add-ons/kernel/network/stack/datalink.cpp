@@ -922,19 +922,15 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 				return B_BAD_VALUE;
 
 			struct ifmediareq request;
-			if (user_memcpy(&request, argument, sizeof(ifmediareq)) != B_OK)
+			if (user_memcpy(&request, argument, sizeof(request)) != B_OK)
 				return B_BAD_ADDRESS;
 
-			// TODO: see above.
-			if (interface->device->module->control(interface->device,
-					SIOCGIFMEDIA, &request,
-					sizeof(struct ifmediareq)) != B_OK) {
-				memset(&request, 0, sizeof(struct ifmediareq));
-				request.ifm_active = request.ifm_current
-					= interface->device->media;
-			}
+			// TODO: Support retrieving the media list?
+			memset(&request, 0, sizeof(struct ifmediareq));
+			request.ifm_active = request.ifm_current
+				= interface->device->media;
 
-			return user_memcpy(argument, &request, sizeof(struct ifmediareq));
+			return user_memcpy(argument, &request, sizeof(request));
 		}
 
 		case SIOCGIFMETRIC:
