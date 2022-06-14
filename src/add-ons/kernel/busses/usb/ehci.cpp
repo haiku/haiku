@@ -1887,11 +1887,13 @@ EHCI::FinishTransfers()
 						// data to read out
 						iovec *vector = transfer->transfer->Vector();
 						size_t vectorCount = transfer->transfer->VectorCount();
-						transfer->transfer->PrepareKernelAccess();
-						actualLength = ReadDescriptorChain(
-							transfer->data_descriptor,
-							vector, vectorCount,
-							&nextDataToggle);
+						callbackStatus = transfer->transfer->PrepareKernelAccess();
+						if (callbackStatus == B_OK) {
+							actualLength = ReadDescriptorChain(
+								transfer->data_descriptor,
+								vector, vectorCount,
+								&nextDataToggle);
+						}
 					} else if (transfer->data_descriptor) {
 						// calculate transfered length
 						actualLength = ReadActualLength(
@@ -1900,36 +1902,36 @@ EHCI::FinishTransfers()
 
 					transfer->transfer->TransferPipe()->SetDataToggle(
 						nextDataToggle);
+				}
 
-					if (transfer->transfer->IsFragmented()) {
-						// this transfer may still have data left
-						transfer->transfer->AdvanceByFragment(actualLength);
-						if (transfer->transfer->FragmentLength() > 0) {
-							FreeDescriptorChain(transfer->data_descriptor);
-							status_t result = FillQueueWithData(
-								transfer->transfer,
-								transfer->queue_head,
-								&transfer->data_descriptor, NULL, true);
+				if (callbackStatus == B_OK && transfer->transfer->IsFragmented()) {
+					// this transfer may still have data left
+					transfer->transfer->AdvanceByFragment(actualLength);
+					if (transfer->transfer->FragmentLength() > 0) {
+						FreeDescriptorChain(transfer->data_descriptor);
+						status_t result = FillQueueWithData(
+							transfer->transfer,
+							transfer->queue_head,
+							&transfer->data_descriptor, NULL, true);
 
-							if (result == B_OK && Lock()) {
-								// reappend the transfer
-								if (fLastTransfer)
-									fLastTransfer->link = transfer;
-								if (!fFirstTransfer)
-									fFirstTransfer = transfer;
+						if (result == B_OK && Lock()) {
+							// reappend the transfer
+							if (fLastTransfer)
+								fLastTransfer->link = transfer;
+							if (!fFirstTransfer)
+								fFirstTransfer = transfer;
 
-								fLastTransfer = transfer;
-								Unlock();
+							fLastTransfer = transfer;
+							Unlock();
 
-								transfer = next;
-								continue;
-							}
+							transfer = next;
+							continue;
 						}
-
-						// the transfer is done, but we already set the
-						// actualLength with AdvanceByFragment()
-						actualLength = 0;
 					}
+
+					// the transfer is done, but we already set the
+					// actualLength with AdvanceByFragment()
+					actualLength = 0;
 				}
 
 				transfer->transfer->Finished(callbackStatus, actualLength);
@@ -2057,9 +2059,11 @@ EHCI::FinishIsochronousTransfers()
 				if (transfer && transfer->is_active) {
 					TRACE("FinishIsochronousTransfers active transfer\n");
 					size_t actualLength = 0;
+					status_t status = B_OK;
 					if (((itd->buffer_phy[1] >> EHCI_ITD_DIR_SHIFT) & 1) != 0) {
-						transfer->transfer->PrepareKernelAccess();
-						actualLength = ReadIsochronousDescriptorChain(transfer);
+						status = transfer->transfer->PrepareKernelAccess();
+						if (status == B_OK)
+							actualLength = ReadIsochronousDescriptorChain(transfer);
 					}
 
 					// Remove the transfer
@@ -2080,7 +2084,7 @@ EHCI::FinishIsochronousTransfers()
 					}
 					transfer->link = NULL;
 
-					transfer->transfer->Finished(B_OK, actualLength);
+					transfer->transfer->Finished(status, actualLength);
 
 					itd = itd->prev;
 
@@ -2344,8 +2348,14 @@ EHCI::FillQueueWithRequest(Transfer *transfer, ehci_qh *queueHead,
 		}
 
 		if (!directionIn) {
-			if (prepareKernelAccess)
-				transfer->PrepareKernelAccess();
+			if (prepareKernelAccess) {
+				result = transfer->PrepareKernelAccess();
+				if (result != B_OK) {
+					FreeDescriptor(setupDescriptor);
+					FreeDescriptor(statusDescriptor);
+					return result;
+				}
+			}
 			WriteDescriptorChain(dataDescriptor, transfer->Vector(),
 				transfer->VectorCount());
 		}
@@ -2386,8 +2396,13 @@ EHCI::FillQueueWithData(Transfer *transfer, ehci_qh *queueHead,
 
 	lastDescriptor->token |= EHCI_QTD_IOC;
 	if (!directionIn) {
-		if (prepareKernelAccess)
-			transfer->PrepareKernelAccess();
+		if (prepareKernelAccess) {
+			result = transfer->PrepareKernelAccess();
+			if (result != B_OK) {
+				FreeDescriptorChain(firstDescriptor);
+				return result;
+			}
+		}
 		WriteDescriptorChain(firstDescriptor, transfer->Vector(),
 			transfer->VectorCount());
 	}
