@@ -11028,9 +11028,7 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 	ic->ic_ampdu_tx_stop = NULL;
 
 #ifdef __HAIKU__
-	mtx_lock(&Giant);
 	iwx_preinit(sc);
-	mtx_unlock(&Giant);
 #else
 	/*
 	 * We cannot read the MAC address without loading the
