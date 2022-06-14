@@ -66,9 +66,6 @@ update_link_state(ethernet_device *device, bool notify = true)
 		return B_NOT_SUPPORTED;
 	}
 
-	state.media |= IFM_ETHER;
-		// make sure the media type is returned correctly
-
 	if (device->media != state.media
 		|| device->link_quality != state.quality
 		|| device->link_speed != state.speed) {
