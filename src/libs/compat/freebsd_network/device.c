@@ -481,9 +481,6 @@ device_attach(device_t device)
 		|| device->methods.attach == NULL)
 		return B_ERROR;
 
-	// Always hold the giant lock during attach.
-	mtx_lock(&Giant);
-
 	result = device->methods.attach(device);
 
 	if (result == 0)
@@ -492,7 +489,6 @@ device_attach(device_t device)
 	if (result == 0 && HAIKU_DRIVER_REQUIRES(FBSD_WLAN_FEATURE))
 		result = start_wlan(device);
 
-	mtx_unlock(&Giant);
 	return result;
 }
 
