@@ -40,23 +40,6 @@ struct media_type {
 
 const media_type kMediaTypes[] = {
 	{
-		0, // for generic options
-		"all",
-		"All",
-		IFM_TMASK,
-		{
-			{ IFM_AUTO, "auto", "Auto-select" },
-			{ -1, NULL, NULL }
-		},
-		{
-			{ IFM_FDX, true, "fullduplex", "Full Duplex" },
-			{ IFM_HDX, true, "halfduplex", "Half Duplex" },
-			{ IFM_LOOP, true, "loop", "Loop" },
-			//{ IFM_ACTIVE, false, "active", "Active" },
-			{ -1, false, NULL, NULL }
-		}
-	},
-	{
 		IFM_ETHER,
 		"ether",
 		"Ethernet",
@@ -96,6 +79,23 @@ const media_type kMediaTypes[] = {
 			{ -1, NULL, NULL }
 		},
 		{
+			{ -1, false, NULL, NULL }
+		}
+	},
+	{
+		0, // for generic options
+		"all",
+		"All",
+		IFM_TMASK,
+		{
+			{ IFM_AUTO, "auto", "Auto-select" },
+			{ -1, NULL, NULL }
+		},
+		{
+			{ IFM_FDX, true, "fullduplex", "Full Duplex" },
+			{ IFM_HDX, true, "halfduplex", "Half Duplex" },
+			{ IFM_LOOP, true, "loop", "Loop" },
+			//{ IFM_ACTIVE, false, "active", "Active" },
 			{ -1, false, NULL, NULL }
 		}
 	},
