@@ -424,7 +424,7 @@ frame_buffer_update(addr_t baseAddress, int32 width, int32 height, int32 depth,
 	if (width <= 1920 || height <= 1080) {
 		sConsole.font = &smallFont;
 	} else {
-		sConsole.font = &spleen12Font;
+		sConsole.font = &bigFont;
 	}
 
 	sConsole.frame_buffer = baseAddress;
