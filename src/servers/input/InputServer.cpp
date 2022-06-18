@@ -577,14 +577,8 @@ InputServer::MessageReceived(BMessage* message)
 
 		case B_SOME_APP_LAUNCHED:
 		{
-			const char *signature;
+			// The message contains a be:signature with the app signature
 			// TODO: what's this for?
-			if (message->FindString("be:signature", &signature)==B_OK) {
-				PRINT(("input_server : %s\n", signature));
-				if (strcmp(signature, "application/x-vnd.Be-TSKB")==0) {
-
-				}
-			}
 			return;
 		}
 
