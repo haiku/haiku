@@ -28,14 +28,15 @@
 // control words
 #define PS2_CTRL_READ_CMD				0x20
 #define PS2_CTRL_WRITE_CMD				0x60
+#define PS2_CTRL_AUX_LOOPBACK			0xd3
 #define PS2_CTRL_WRITE_AUX				0xd4
 #define PS2_CTRL_MOUSE_DISABLE			0xa7
 #define PS2_CTRL_MOUSE_ENABLE			0xa8
 #define PS2_CTRL_MOUSE_TEST				0xa9
 #define PS2_CTRL_SELF_TEST				0xaa
 #define PS2_CTRL_KEYBOARD_TEST			0xab
-#define PS2_CTRL_KEYBOARD_ACTIVATE		0xae
-#define PS2_CTRL_KEYBOARD_DEACTIVATE	0xad
+#define PS2_CTRL_KEYBOARD_DISABLE		0xad
+#define PS2_CTRL_KEYBOARD_ENABLE		0xae
 
 // command bytes
 #define PS2_CMD_DEV_INIT				0x43
