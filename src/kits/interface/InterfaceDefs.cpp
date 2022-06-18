@@ -716,10 +716,15 @@ get_key_repeat_rate(int32 *rate)
 	BMessage command(IS_GET_KEY_REPEAT_RATE);
 	BMessage reply;
 
-	_control_input_server_(&command, &reply);
+	status_t err = _control_input_server_(&command, &reply);
 
-	if (reply.FindInt32("rate", rate) != B_OK)
+	if (err == B_OK)
+		err = reply.FindInt32("rate", rate);
+
+	if (err != B_OK) {
 		*rate = 250000;
+		return err;
+	}
 
 	return B_OK;
 }
@@ -741,10 +746,15 @@ get_key_repeat_delay(bigtime_t *delay)
 	BMessage command(IS_GET_KEY_REPEAT_DELAY);
 	BMessage reply;
 
-	_control_input_server_(&command, &reply);
+	status_t err = _control_input_server_(&command, &reply);
 
-	if (reply.FindInt64("delay", delay) != B_OK)
+	if (err == B_OK)
+		err = reply.FindInt64("delay", delay);
+
+	if (err != B_OK) {
 		*delay = 200;
+		return err;
+	}
 
 	return B_OK;
 }
