@@ -567,7 +567,7 @@ synaptics_close(void *_cookie)
 	// without a complete shutdown.
 	status = ps2_reset_mouse(cookie->dev);
 	if (status != B_OK) {
-		INFO("ps2: reset failed\n");
+		INFO("ps2_synaptics: reset failed\n");
 		return B_ERROR;
 	}
 

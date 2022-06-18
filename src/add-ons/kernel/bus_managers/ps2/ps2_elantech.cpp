@@ -683,7 +683,7 @@ elantech_close(void *_cookie)
 	// without a complete shutdown.
 	status_t status = ps2_reset_mouse(cookie->dev);
 	if (status != B_OK) {
-		INFO("ps2: reset failed\n");
+		INFO("ps2_elantech: reset failed\n");
 		return B_ERROR;
 	}
 
