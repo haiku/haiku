@@ -26,7 +26,6 @@ KernelAddon marvell88w8363 :
 	libfreebsd_network.a
 	;
 
-HAIKU_WIFI_FIRMWARE_PACKAGE on marvell88w8363 = "" ;
 HAIKU_WIFI_FIRMWARE_ARCHIVE on marvell88w8363 = 88w8363-fw-3.6.2.2.zip ;
 HAIKU_WIFI_FIRMWARE_DO_EXTRACT on marvell88w8363 = true ;
 

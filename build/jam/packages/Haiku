@@ -8,20 +8,10 @@ HaikuPackage $(haikuPackage) ;
 # wifi firmware
 local driver ;
 for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
-	local package = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGE) ] ;
 	local archive = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVE) ] ;
 	local extract = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_DO_EXTRACT) ] ;
 	if $(archive) {
-		AddWifiFirmwareToPackage $(driver) : $(package) : $(archive)
-			: $(extract) ;
-	}
-	local packages = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGES) ] ;
-	local archives = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVES) ] ;
-	local archive ;
-	for archive in $(archives) {
-		AddWifiFirmwareToPackage $(driver) : $(packages[1]) : $(archive)
-			: $(extract) ;
-		packages = $(packages[2-]) ;
+		AddWifiFirmwareToPackage $(driver) :  : $(archive) : $(extract) ;
 	}
 }
 

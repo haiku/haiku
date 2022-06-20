@@ -29,6 +29,5 @@ KernelAddon iprowifi2200 :
 
 # Note: Due to licensing restrictions, we can only distribute the archive.
 # The end-user must extract and install it themselves.
-HAIKU_WIFI_FIRMWARE_PACKAGE on iprowifi2200 = "" ;
 HAIKU_WIFI_FIRMWARE_ARCHIVE on iprowifi2200 = ipw2200-fw-3.1.tgz ;
 HAIKU_WIFI_FIRMWARE_DO_EXTRACT on iprowifi2200 = false ;
