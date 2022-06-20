@@ -12125,7 +12125,7 @@ iwm_attach(struct device *parent, struct device *self, void *aux)
 	ic->ic_ampdu_tx_stop = iwm_ampdu_tx_stop;
 #ifdef __HAIKU__
 	if (iwm_preinit(sc) != 0)
-		return -1;
+		goto fail4;
 #else
 	/*
 	 * We cannot read the MAC address without loading the
