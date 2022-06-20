@@ -210,7 +210,7 @@ put_fd(struct file_descriptor* descriptor)
 
 	TFD(PutFD(descriptor));
 
-	TRACE(("put_fd(descriptor = %p [ref = %ld, cookie = %p])\n",
+	TRACE(("put_fd(descriptor = %p [ref = %" B_PRId32 ", cookie = %p])\n",
 		descriptor, descriptor->ref_count, descriptor->cookie));
 
 	// free the descriptor if we don't need it anymore
@@ -568,7 +568,7 @@ deselect_select_infos(file_descriptor* descriptor, select_info* infos,
 status_t
 select_fd(int32 fd, struct select_info* info, bool kernel)
 {
-	TRACE(("select_fd(fd = %ld, info = %p (%p), 0x%x)\n", fd, info,
+	TRACE(("select_fd(fd = %" B_PRId32 ", info = %p (%p), 0x%x)\n", fd, info,
 		info->sync, info->selected_events));
 
 	FDGetter fdGetter;
@@ -647,7 +647,7 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 status_t
 deselect_fd(int32 fd, struct select_info* info, bool kernel)
 {
-	TRACE(("deselect_fd(fd = %ld, info = %p (%p), 0x%x)\n", fd, info,
+	TRACE(("deselect_fd(fd = %" B_PRId32 ", info = %p (%p), 0x%x)\n", fd, info,
 		info->sync, info->selected_events));
 
 	FDGetter fdGetter;
@@ -945,7 +945,7 @@ _user_read_dir(int fd, struct dirent* userBuffer, size_t bufferSize,
 	uint32 maxCount)
 {
 	TRACE(("user_read_dir(fd = %d, userBuffer = %p, bufferSize = %ld, count = "
-		"%lu)\n", fd, userBuffer, bufferSize, maxCount));
+		"%" B_PRIu32 ")\n", fd, userBuffer, bufferSize, maxCount));
 
 	if (maxCount == 0)
 		return 0;
@@ -1272,7 +1272,7 @@ _kern_read_dir(int fd, struct dirent* buffer, size_t bufferSize,
 	ssize_t retval;
 
 	TRACE(("sys_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = "
-		"%lu)\n",fd, buffer, bufferSize, maxCount));
+		"%" B_PRIu32 ")\n",fd, buffer, bufferSize, maxCount));
 
 	struct io_context* ioContext = get_current_io_context(true);
 	descriptor = get_fd(ioContext, fd);

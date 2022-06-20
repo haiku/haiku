@@ -656,11 +656,11 @@ Inode::Open(int openMode)
 void
 Inode::Close(file_cookie* cookie)
 {
-	TRACE("Inode %p::Close(openMode = %d)\n", this, openMode);
 
 	MutexLocker locker(RequestLock());
 
 	int openMode = cookie->open_mode;
+	TRACE("Inode %p::Close(openMode = %" B_PRId32 ")\n", this, openMode);
 
 	// Notify all currently reading file descriptors
 	ReadRequestList::Iterator iterator = fReadRequests.GetIterator();
@@ -1065,8 +1065,8 @@ fifo_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 op,
 	file_cookie* cookie = (file_cookie*)_cookie;
 	Inode* inode = (Inode*)_node->private_node;
 
-	TRACE("fifo_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",
-		_vnode, _cookie, op, buffer, length);
+	TRACE("fifo_ioctl: vnode %p, cookie %p, op %" B_PRId32 ", buf %p, len %ld\n",
+		_node, _cookie, op, buffer, length);
 
 	switch (op) {
 		case FIONBIO:
@@ -1129,7 +1129,7 @@ fifo_set_flags(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	Inode* inode = (Inode*)_node->private_node;
 	file_cookie* cookie = (file_cookie*)_cookie;
 
-	TRACE("fifo_set_flags(vnode = %p, flags = %x)\n", _vnode, flags);
+	TRACE("fifo_set_flags(vnode = %p, flags = %x)\n", _node, flags);
 
 	MutexLocker locker(inode->RequestLock());
 	cookie->open_mode = (cookie->open_mode & ~(O_APPEND | O_NONBLOCK)) | flags;
