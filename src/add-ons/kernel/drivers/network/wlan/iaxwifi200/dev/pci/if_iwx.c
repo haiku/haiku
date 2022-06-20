@@ -135,7 +135,7 @@
 
 #ifdef __FreeBSD_version
 #include <sys/device.h>
-#define DEVNAME(_s) "iwx"
+#define DEVNAME(_s) gDriverName
 #define SC_DEV_FOR_PCI sc->sc_dev
 #define ifq_is_oactive(IFQ) ((if_getdrvflags(ifp) & IFF_DRV_OACTIVE) != 0)
 #define ifq_set_oactive(IFQ) if_setdrvflagbits(ifp, IFF_DRV_OACTIVE, 0)
