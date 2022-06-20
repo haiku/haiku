@@ -10648,6 +10648,7 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 		BUS_SPACE_MAXADDR_32BIT, BUS_SPACE_MAXADDR, NULL, NULL,
 		BUS_SPACE_MAXSIZE_32BIT, BUS_SPACE_UNRESTRICTED, BUS_SPACE_MAXSIZE_32BIT, 0, NULL, NULL,
 		&sc->sc_dmat);
+	pci_enable_busmaster(sc->sc_dev);
 
 	if_alloc_inplace(ifp, IFT_ETHER);
 #else
