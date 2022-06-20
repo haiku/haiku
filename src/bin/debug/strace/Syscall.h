@@ -19,7 +19,7 @@ using std::vector;
 class Type {
 public:
 	Type(string typeName, TypeHandler *handler)
-		: fTypeName(typeName), fHandler(handler) {}
+		: fTypeName(typeName), fHandler(handler), fCount(1) {}
 
 	const string &TypeName() const	{ return fTypeName; }
 
@@ -31,9 +31,13 @@ public:
 
 	TypeHandler	*Handler() const	{ return fHandler; }
 
+	uint32 Count() const			{ return fCount; }
+	void SetCount(uint32 count)		{ fCount = count; }
+
 private:
 	string		fTypeName;
 	TypeHandler	*fHandler;
+	uint32		fCount;
 };
 
 // Parameter

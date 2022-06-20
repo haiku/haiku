@@ -282,6 +282,14 @@ patch_syscalls()
 	Syscall *wait = get_syscall("_kern_wait_for_child");
 	wait->ParameterAt(2)->SetOut(true);
 	wait->ParameterAt(3)->SetOut(true);
+
+	Syscall *createPipe = get_syscall("_kern_create_pipe");
+	createPipe->ParameterAt(0)->SetOut(true);
+	createPipe->ParameterAt(0)->SetCount(2);
+
+	Syscall *socketPair = get_syscall("_kern_socketpair");
+	socketPair->ParameterAt(3)->SetOut(true);
+	socketPair->ParameterAt(3)->SetCount(2);
 }
 
 
