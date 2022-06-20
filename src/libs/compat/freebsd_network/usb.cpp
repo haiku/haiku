@@ -26,6 +26,7 @@ extern "C" {
 #include <USB3.h>
 
 
+struct mtx sUSBLock;
 usb_module_info* sUSB = NULL;
 struct taskqueue* sUSBTaskqueue = NULL;
 
@@ -40,6 +41,8 @@ init_usb()
 		dprintf("cannot get module \"%s\"\n", B_USB_MODULE_NAME);
 		return B_ERROR;
 	}
+
+	mtx_init(&sUSBLock, "fbsd usb", NULL, MTX_DEF);
 	return B_OK;
 }
 
@@ -54,6 +57,7 @@ uninit_usb()
 
 	sUSB = NULL;
 	sUSBTaskqueue = NULL;
+	mtx_destroy(&sUSBLock);
 }
 
 
@@ -247,13 +251,13 @@ usbd_transfer_setup(struct freebsd_usb_device* udev,
 
 	// Make sure the taskqueue exists.
 	if (sUSBTaskqueue == NULL) {
-		mtx_lock(&Giant);
+		mtx_lock(&sUSBLock);
 		if (sUSBTaskqueue == NULL) {
 			sUSBTaskqueue = taskqueue_create("usb taskq", 0,
 				taskqueue_thread_enqueue, &sUSBTaskqueue);
 			taskqueue_start_threads(&sUSBTaskqueue, 1, PZERO, "usb taskq");
 		}
-		mtx_unlock(&Giant);
+		mtx_unlock(&sUSBLock);
 	}
 
 	const usb_configuration_info* device_config = sUSB->get_configuration(
