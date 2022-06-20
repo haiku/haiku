@@ -10664,7 +10664,7 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 	if (err == 0) {
 		printf("%s: PCIe capability structure not found!\n",
 		    DEVNAME(sc));
-		return -1;
+		goto fail;
 	}
 
 	/*
@@ -10679,7 +10679,7 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 	    &sc->sc_st, &sc->sc_sh, NULL, &sc->sc_sz, 0);
 	if (err) {
 		printf("%s: can't map mem space\n", DEVNAME(sc));
-		return -1;
+		goto fail;
 	}
 
 	if (pci_intr_map_msix(pa, 0, &ih) == 0) {
@@ -10691,7 +10691,7 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 		{
 #endif
 			printf("%s: can't map interrupt\n", DEVNAME(sc));
-			return -1;
+			goto fail;
 		}
 		/* Hardware bug workaround. */
 		reg = pci_conf_read(sc->sc_pct, sc->sc_pcitag,
@@ -10716,7 +10716,7 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 		if (intrstr != NULL)
 			printf(" at %s", intrstr);
 		printf("\n");
-		return -1;
+		goto fail;
 	}
 	printf(", %s\n", intrstr);
 
@@ -10757,7 +10757,7 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 		/* These devices should be QuZ only. */
 		if (sc->sc_hw_rev != IWX_CSR_HW_REV_TYPE_QUZ) {
 			printf("%s: unsupported AX201 adapter\n", DEVNAME(sc));
-			return -1;
+			goto fail;
 		}
 		sc->sc_fwname = IWX_QUZ_A_HR_B_FW;
 		sc->sc_device_family = IWX_DEVICE_FAMILY_22000;
@@ -10835,7 +10835,7 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 		break;
 	default:
 		printf("%s: unknown adapter type\n", DEVNAME(sc));
-		return -1;
+		goto fail;
 	}
 #ifdef __FreeBSD_version
 #undef PCI_PRODUCT
@@ -10871,7 +10871,7 @@ iwx_attach(struct device *parent, struct device *self, void *aux)
 	if (err) {
 		printf("%s: could not allocate memory for loading firmware\n",
 		    DEVNAME(sc));
-		return -1;
+		goto fail;
 	}
 
 	if (sc->sc_device_family >= IWX_DEVICE_FAMILY_AX210) {
@@ -11049,6 +11049,10 @@ fail4:	while (--txq_i >= 0)
 fail1:	iwx_dma_contig_free(&sc->ctxt_info_dma);
 	iwx_dma_contig_free(&sc->prph_scratch_dma);
 	iwx_dma_contig_free(&sc->prph_info_dma);
+#ifdef __HAIKU__
+fail:
+	if_free_inplace(ifp);
+#endif
 	return -1;
 }
 
