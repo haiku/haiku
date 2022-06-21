@@ -127,7 +127,7 @@ find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo, bool allowLocal)
 			uint32 type = symbol->Type();
 			if ((lookupInfo.type == B_SYMBOL_TYPE_TEXT && type != STT_FUNC)
 				|| (lookupInfo.type == B_SYMBOL_TYPE_DATA
-					&& type != STT_OBJECT)) {
+					&& type != STT_OBJECT && type != STT_FUNC)) {
 				continue;
 			}
 
@@ -495,8 +495,6 @@ resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 	int32 type = B_SYMBOL_TYPE_ANY;
 	if (sym->Type() == STT_FUNC)
 		type = B_SYMBOL_TYPE_TEXT;
-	else if (sym->Type() == STT_OBJECT)
-		type = B_SYMBOL_TYPE_DATA;
 
 	if (sym->Bind() == STB_LOCAL) {
 		// Local symbols references are always resolved to the given symbol.
@@ -537,8 +535,9 @@ resolve_symbol(image_t* rootImage, image_t* image, elf_sym* sym,
 			sharedImage = NULL;
 		}
 	} else if (sym->Type() != STT_NOTYPE
-		&& sym->Type() != sharedSym->Type()) {
-		// symbol not of the requested type
+		&& sym->Type() != sharedSym->Type()
+		&& (sym->Type() != STT_OBJECT || sharedSym->Type() != STT_FUNC)) {
+		// symbol not of the requested type, except object which can match function
 		lookupError = ERROR_WRONG_TYPE;
 		sharedImage = NULL;
 	} else if (sharedSym->Bind() != STB_GLOBAL
