@@ -20,9 +20,7 @@ struct taskq {
 static void
 task_set(struct task *t, void (*fn)(void *), void *arg)
 {
-	t->ta_priority = 0;
-	t->ta_handler = fn;
-	t->ta_argument = arg;
+	TASK_INIT(t, 0, fn, arg);
 }
 
 
@@ -41,7 +39,7 @@ task_add(struct taskq* tasq, struct task *w)
 		w->ta_flags |= TASK_NEEDSGIANT;
 	if (task_pending(w))
 		return 0;
-	return (taskqueue_enqueue_fast(tq, w) == 0);
+	return (taskqueue_enqueue(tq, w) == 0);
 }
 
 
