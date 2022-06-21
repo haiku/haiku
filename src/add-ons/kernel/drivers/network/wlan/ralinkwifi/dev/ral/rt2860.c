@@ -18,7 +18,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/ral/rt2860.c 327479 2018-01-02 00:07:28Z adrian $");
+__FBSDID("$FreeBSD$");
 
 /*-
  * Ralink Technology RT2860/RT3090/RT3390/RT3562/RT5390/RT5392 chipset driver
@@ -503,7 +503,6 @@ rt2860_dma_map_addr(void *arg, bus_dma_segment_t *segs, int nseg, int error)
 
 	*(bus_addr_t *)arg = segs[0].ds_addr;
 }
-
 
 static int
 rt2860_alloc_tx_ring(struct rt2860_softc *sc, struct rt2860_tx_ring *ring)
@@ -1092,9 +1091,8 @@ rt2860_drain_stats_fifo(struct rt2860_softc *sc)
 		DPRINTFN(4, ("tx stat 0x%08x\n", stat));
 
 		wcid = (stat >> RT2860_TXQ_WCID_SHIFT) & 0xff;
-		if (wcid == 0xFF)
+		if (wcid > RT2860_WCID_MAX)
 			continue;
-
 		ni = sc->wcid2ni[wcid];
 
 		/* if no ACK was requested, no feedback is available */
@@ -2225,7 +2223,7 @@ static void
 rt2860_enable_mrr(struct rt2860_softc *sc)
 {
 #define CCK(mcs)	(mcs)
-#define OFDM(mcs)	(1 << 3 | (mcs))
+#define	OFDM(mcs)	(1U << 3 | (mcs))
 	RAL_WRITE(sc, RT2860_LG_FBK_CFG0,
 	    OFDM(6) << 28 |	/* 54->48 */
 	    OFDM(5) << 24 |	/* 48->36 */
@@ -2593,7 +2591,7 @@ rt5390_set_chan(struct rt2860_softc *sc, u_int chan)
 	rf = MIN(rf, 0x5f);
 	if (tmp != rf)
 		rt2860_mcu_cmd(sc, 0x74, (tmp << 8 ) | rf, 0);
-	
+
 	if (sc->mac_ver == 0x5390) {
 		if (chan <= 4)
 			rf = 0x73;
@@ -3330,7 +3328,7 @@ b4inc(uint32_t b32, int8_t delta)
 			b4 = 0;
 		else if (b4 > 0xf)
 			b4 = 0xf;
-		b32 = b32 >> 4 | b4 << 28;
+		b32 = b32 >> 4 | (uint32_t)b4 << 28;
 	}
 	return b32;
 }
