@@ -1454,7 +1454,7 @@ device_node::AddChild(device_node* node)
 	device_node* before = NULL;
 	while (iterator.HasNext()) {
 		device_node* child = iterator.Next();
-		if (child->Priority() <= priority) {
+		if (child->Priority() < priority) {
 			before = child;
 			break;
 		}
