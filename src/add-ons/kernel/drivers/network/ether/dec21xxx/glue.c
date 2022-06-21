@@ -18,7 +18,7 @@
 
 
 HAIKU_FBSD_DRIVERS_GLUE(dec21xxx);
-HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES);
+HAIKU_DRIVER_REQUIREMENTS(0);
 
 
 int check_disable_interrupts_dc(device_t dev);
