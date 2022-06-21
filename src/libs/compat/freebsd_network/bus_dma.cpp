@@ -36,9 +36,6 @@ struct bus_dma_tag {
 	phys_addr_t		lowaddr;
 	phys_addr_t		highaddr;
 
-	bus_dma_filter_t* filter;
-	void*			filterarg;
-
 	phys_size_t		maxsize;
 	uint32			maxsegments;
 	phys_size_t		maxsegsz;
@@ -96,23 +93,25 @@ bus_dma_tag_create(bus_dma_tag_t parent, bus_size_t alignment, bus_addr_t bounda
 	void* filterarg, bus_size_t maxsize, int nsegments, bus_size_t maxsegsz,
 	int flags, bus_dma_lock_t* lockfunc, void* lockfuncarg, bus_dma_tag_t* dmat)
 {
-	if (boundary != 0 && boundary < maxsegsz)
-		maxsegsz = boundary;
-
-	*dmat = NULL;
+	if (maxsegsz == 0)
+		return EINVAL;
+	if (filter != NULL) {
+		panic("bus_dma_tag_create: error: filters not supported!");
+		return EOPNOTSUPP;
+	}
 
 	bus_dma_tag_t newtag = (bus_dma_tag_t)kernel_malloc(sizeof(*newtag),
 		M_DEVBUF, M_ZERO | M_NOWAIT);
 	if (newtag == NULL)
 		return ENOMEM;
 
-	newtag->parent = parent;
+	if (boundary != 0 && boundary < maxsegsz)
+		maxsegsz = boundary;
+
 	newtag->alignment = alignment;
 	newtag->boundary = boundary;
 	newtag->lowaddr = lowaddr;
 	newtag->highaddr = highaddr;
-	newtag->filter = filter;
-	newtag->filterarg = filterarg;
 	newtag->maxsize = maxsize;
 	newtag->maxsegments = nsegments;
 	newtag->maxsegsz = maxsegsz;
@@ -122,7 +121,8 @@ bus_dma_tag_create(bus_dma_tag_t parent, bus_size_t alignment, bus_addr_t bounda
 
 	// lockfunc is only needed if callbacks will be invoked asynchronously.
 
-	if (newtag->parent != NULL) {
+	if (parent != NULL) {
+		newtag->parent = parent;
 		atomic_add(&parent->ref_count, 1);
 
 		newtag->lowaddr = max_c(parent->lowaddr, newtag->lowaddr);
@@ -132,12 +132,7 @@ bus_dma_tag_create(bus_dma_tag_t parent, bus_size_t alignment, bus_addr_t bounda
 		if (newtag->boundary == 0) {
 			newtag->boundary = parent->boundary;
 		} else if (parent->boundary != 0) {
-			newtag->boundary = min_c(parent->boundary, newtag->boundary);
-		}
-
-		if (newtag->filter == NULL) {
-			newtag->filter = parent->filter;
-			newtag->filterarg = parent->filterarg;
+			newtag->boundary = MIN(parent->boundary, newtag->boundary);
 		}
 	}
 
@@ -312,19 +307,10 @@ bus_dmamem_free(bus_dma_tag_t dmat, void* vaddr, bus_dmamap_t map)
 static bool
 _validate_address(bus_dma_tag_t dmat, bus_addr_t paddr, bool validate_alignment = true)
 {
-	do {
-		if (dmat->filter != NULL) {
-			if ((*dmat->filter)(dmat->filterarg, paddr) != 0)
-				return false;
-		} else {
-			if (paddr > dmat->lowaddr && paddr <= dmat->highaddr)
-				return false;
-			if (validate_alignment && !vm_addr_align_ok(paddr, dmat->alignment))
-				return false;
-		}
-
-		dmat = dmat->parent;
-	} while (dmat != NULL);
+	if (paddr > dmat->lowaddr && paddr <= dmat->highaddr)
+		return false;
+	if (validate_alignment && !vm_addr_align_ok(paddr, dmat->alignment))
+		return false;
 
 	return true;
 }
