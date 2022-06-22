@@ -111,7 +111,10 @@ taskqueue_terminate(struct thread **pp, struct taskqueue *tq)
 	if (tq->tq_sem == -1)
 		return;
 
+	TQ_UNLOCK(tq);
+
 	delete_sem(tq->tq_sem);
+	tq->tq_sem = -1;
 
 	for (int i = 0; i < tq->tq_threadcount; i++) {
 		status_t status;
@@ -120,6 +123,9 @@ taskqueue_terminate(struct thread **pp, struct taskqueue *tq)
 
 	if (tq->tq_threadcount > 1)
 		free(tq->tq_threads);
+	tq->tq_threads = NULL;
+
+	TQ_LOCK(tq);
 }
 
 
