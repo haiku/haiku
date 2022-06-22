@@ -84,7 +84,7 @@ static int
 bus_dmamap_load_mbuf_obsd(bus_dma_tag_t tag, bus_dmamap_t dmam, struct mbuf *chain, int flags)
 {
 	return bus_dmamap_load_mbuf_sg(dmam->_dmat, dmam->_dmamp, chain,
-		&dmam->dm_segs, &dmam->dm_nsegs, flags);
+		dmam->dm_segs, &dmam->dm_nsegs, flags);
 }
 #define bus_dmamap_load_mbuf bus_dmamap_load_mbuf_obsd
 
