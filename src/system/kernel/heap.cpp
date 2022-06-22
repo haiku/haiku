@@ -2493,6 +2493,16 @@ calloc(size_t numElements, size_t size)
 }
 
 
+void *
+aligned_alloc(size_t alignment, size_t size)
+{
+	if ((size % alignment) != 0)
+		return NULL;
+
+	return memalign(alignment, size);
+}
+
+
 void
 deferred_free(void *block)
 {

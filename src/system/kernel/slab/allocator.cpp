@@ -229,16 +229,6 @@ posix_memalign(void** _pointer, size_t alignment, size_t size)
 }
 
 
-void *
-aligned_alloc(size_t alignment, size_t size)
-{
-	if ((size % alignment) != 0)
-		return NULL;
-
-	return memalign(alignment, size);
-}
-
-
 void
 free_etc(void *address, uint32 flags)
 {
