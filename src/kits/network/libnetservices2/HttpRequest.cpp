@@ -15,6 +15,7 @@
 
 #include <DataIO.h>
 #include <HttpFields.h>
+#include <MimeType.h>
 #include <NetServicesDefs.h>
 #include <Url.h>
 
@@ -166,6 +167,7 @@ struct BHttpRequest::Data {
 	std::optional<BHttpAuthentication>	authentication;
 	bool								stopOnError = false;
 	bigtime_t							timeout = B_INFINITE_TIMEOUT;
+	std::optional<Body>					requestBody;
 };
 
 
@@ -255,6 +257,15 @@ BHttpRequest::Method() const noexcept
 }
 
 
+const BHttpRequest::Body*
+BHttpRequest::RequestBody() const noexcept
+{
+	if (fData && fData->requestBody)
+		return std::addressof(*fData->requestBody);
+	return nullptr;
+}
+
+
 bool
 BHttpRequest::StopOnError() const noexcept
 {
@@ -292,11 +303,13 @@ BHttpRequest::SetAuthentication(const BHttpAuthentication& authentication)
 }
 
 
-static constexpr std::array<std::string_view, 4> fReservedOptionalFieldNames = {
+static constexpr std::array<std::string_view, 6> fReservedOptionalFieldNames = {
 	"Host"sv,
 	"Accept"sv,
 	"Accept-Encoding"sv,
-	"Connection"sv
+	"Connection"sv,
+	"Content-Type"sv,
+	"Content-Length"sv
 };
 
 
@@ -337,6 +350,33 @@ BHttpRequest::SetMethod(const BHttpMethod& method)
 
 
 void
+BHttpRequest::SetRequestBody(std::unique_ptr<BDataIO> input, BString mimeType,
+	std::optional<off_t> size)
+{
+	if (input == nullptr)
+		throw std::invalid_argument("input cannot be null");
+
+	// TODO: support optional mimetype arguments like type/subtype;parameter=value
+	if (!BMimeType::IsValid(mimeType.String()))
+		throw std::invalid_argument("mimeType must be a valid mimetype");
+
+	// TODO: review if there should be complex validation between the method and whether or not
+	// there is a request body. The current implementation does the validation at the request
+	// generation stage, where GET, HEAD, OPTIONS, CONNECT and TRACE will not submit a body.
+
+	if (!fData)
+		fData = std::make_unique<Data>();
+	fData->requestBody = {std::move(input), std::move(mimeType), size};
+
+	// Check if the input is a BPositionIO, and if so, store the current position, so that it can
+	// be rewinded in case of a redirect.
+	auto inputPositionIO = dynamic_cast<BPositionIO*>(fData->requestBody->input.get());
+	if (inputPositionIO != nullptr)
+		fData->requestBody->startPosition = inputPositionIO->Position();
+}
+
+
+void
 BHttpRequest::SetStopOnError(bool stopOnError)
 {
 	if (!fData)
@@ -370,6 +410,26 @@ BHttpRequest::SetUrl(const BUrl& url)
 		throw BUnsupportedProtocol(__PRETTY_FUNCTION__, BUrl(url), list);
 	}
 	fData->url = url;
+}
+
+
+void
+BHttpRequest::ClearAuthentication() noexcept
+{
+	if (fData)
+		fData->authentication = std::nullopt;
+}
+
+
+std::unique_ptr<BDataIO>
+BHttpRequest::ClearRequestBody() noexcept
+{
+	if (fData && fData->requestBody) {
+		auto body = std::move(fData->requestBody->input);
+		fData->requestBody = std::nullopt;
+		return body;
+	}
+	return nullptr;
 }
 
 
@@ -437,6 +497,14 @@ BHttpRequest::SerializeHeaderTo(BDataIO* target) const
 		outputFields.AddField("Authorization"sv, std::string_view(authorization.String()));
 	}
 
+	if (fData->requestBody) {
+		outputFields.AddField("Content-Type"sv, std::string_view(fData->requestBody->mimeType.String()));
+		if (fData->requestBody->size)
+			outputFields.AddField("Content-Length"sv, std::to_string(*fData->requestBody->size));
+		else
+			throw BRuntimeError(__PRETTY_FUNCTION__, "Transfer body with unknown content length; chunked transfer not supported");
+	}
+
 	for (const auto& field: outputFields) {
 		bytesWritten += _write_to_dataio(target, field.RawField());
 		bytesWritten += _write_to_dataio(target, "\r\n"sv);
@@ -459,4 +527,22 @@ BHttpRequest::HeaderToString() const
 	auto size = SerializeHeaderTo(&buffer);
 
 	return BString(static_cast<const char*>(buffer.Buffer()), size);
+}
+
+
+/*!
+	\brief Private method used by BHttpSession::Request to rewind the content in case of redirect
+
+	\retval true Content was rewinded successfully. Also the case if there is no content
+	\retval false Cannot/could not rewind content.
+*/
+bool
+BHttpRequest::RewindBody() noexcept
+{
+	if (fData && fData->requestBody && fData->requestBody->startPosition) {
+		auto inputData = dynamic_cast<BPositionIO*>(fData->requestBody->input.get());
+		return *fData->requestBody->startPosition
+			== inputData->Seek(*fData->requestBody->startPosition, SEEK_SET);
+	}
+	return true;
 }

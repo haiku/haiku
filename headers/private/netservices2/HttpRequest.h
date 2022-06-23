@@ -7,6 +7,7 @@
 #define _B_HTTP_REQUEST_H_
 
 #include <memory>
+#include <optional>
 #include <string_view>
 #include <variant>
 
@@ -82,6 +83,14 @@ struct BHttpAuthentication {
 
 class BHttpRequest {
 public:
+	// Aggregate parameter types
+	struct Body {
+		std::unique_ptr<BDataIO>	input;
+		BString						mimeType;
+		std::optional<off_t>		size;
+		std::optional<off_t>		startPosition;
+	};
+
 	// Constructors and Destructor
 									BHttpRequest();
 									BHttpRequest(const BUrl& url);
@@ -99,6 +108,7 @@ public:
 	const	BHttpFields&			Fields() const noexcept;
 			uint8					MaxRedirections() const noexcept;
 	const	BHttpMethod&			Method() const noexcept;
+	const	Body*					RequestBody() const noexcept;
 			bool					StopOnError() const noexcept;
 			bigtime_t				Timeout() const noexcept;
 	const	BUrl&					Url() const noexcept;
@@ -108,9 +118,15 @@ public:
 			void					SetFields(const BHttpFields& fields);
 			void					SetMaxRedirections(uint8 maxRedirections);
 			void					SetMethod(const BHttpMethod& method);
+			void					SetRequestBody(std::unique_ptr<BDataIO> input,
+										BString mimeType, std::optional<off_t> size);
 			void					SetStopOnError(bool stopOnError);
 			void					SetTimeout(bigtime_t timeout);
 			void					SetUrl(const BUrl& url);
+
+	// Clearing Options
+			void					ClearAuthentication() noexcept;
+			std::unique_ptr<BDataIO> ClearRequestBody() noexcept;
 
 	// Serialization
 			ssize_t					SerializeHeaderTo(BDataIO* target) const;
@@ -119,6 +135,9 @@ public:
 private:
 	friend class BHttpSession;
 	struct Data;
+
+			bool					RewindBody() noexcept;
+
 	std::unique_ptr<Data>			fData;
 };
 

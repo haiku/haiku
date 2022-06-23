@@ -7,6 +7,7 @@
 #define _HTTP_STREAM_H_
 
 #include <memory>
+#include <vector>
 
 class BDataIO;
 class BMallocIO;
@@ -29,7 +30,12 @@ public:
 		bool complete;
 	};
 
-	virtual	TransferInfo	Transfer(BDataIO*) = 0;
+	virtual	TransferInfo			Transfer(BDataIO*) = 0;
+
+protected:
+			ssize_t					BufferData(BDataIO* source, size_t maxSize);
+
+			std::vector<std::byte>	fBuffer;
 };
 
 
@@ -41,11 +47,11 @@ public:
 	virtual	TransferInfo	Transfer(BDataIO* target) override;
 
 private:
-	std::unique_ptr<BMallocIO>		fHeader;
-	BDataIO*						fBody;
-	off_t							fTotalSize = 0;
-	off_t							fBodyOffset = 0;
-	off_t							fCurrentPos = 0;
+	off_t							fRemainingHeaderSize = 0;
+	BDataIO*						fBody = nullptr;
+	off_t							fTotalBodySize = 0;
+	off_t							fBufferedBodySize = 0;
+	off_t							fTransferredBodySize = 0;
 };
 
 

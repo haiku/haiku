@@ -8,19 +8,122 @@
 
 #include <HttpStream.h>
 
+#include <optional>
+
 #include <DataIO.h>
 #include <HttpRequest.h>
 
 using namespace BPrivate::Network;
 
 
+// Buffer size constant
+constexpr std::size_t kBufferSize = 64 * 1024;
+
+
+// #pragma mark -- ByteIOHelper base class
+
+
+class ByteIOHelper : public BDataIO {
+public:
+							ByteIOHelper(std::vector<std::byte>& buffer);
+
+	virtual	ssize_t			Read(void* buffer, size_t size) override;
+	virtual	ssize_t			Write(const void* buffer, size_t size) override;
+
+private:
+	std::vector<std::byte>&	fBuffer;
+};
+
+
+ByteIOHelper::ByteIOHelper(std::vector<std::byte>& buffer)
+	: fBuffer(buffer)
+{
+	if (buffer.size() != 0)
+		throw BRuntimeError(__PRETTY_FUNCTION__, "Target buffer with size > 0");
+}
+
+
+ssize_t
+ByteIOHelper::Read(void* buffer, size_t size)
+{
+	throw BRuntimeError(__PRETTY_FUNCTION__, "Unexpected Read() call");
+}
+
+
+ssize_t
+ByteIOHelper::Write(const void* buffer, size_t size)
+{
+	auto remainingSize = kBufferSize - fBuffer.size();
+	if (remainingSize < 0)
+		return 0;
+
+	if (size > remainingSize)
+		size = remainingSize;
+
+	auto bufferCast = static_cast<const std::byte*>(buffer);
+	fBuffer.insert(fBuffer.end(), bufferCast, bufferCast + size);
+	return size;
+}
+
+
+// #pragma mark -- BAbstractDataStream (helper methods)
+
+
+/*!
+	\brief Load data from \a source into the internal buffer.
+
+	The buffer will be filled up to the maximum size (64kB). Partial reads are supported; it will
+	not do a retry.
+
+	\return The return value of the underlying BDataIO::Read() call.
+*/
+ssize_t
+BAbstractDataStream::BufferData(BDataIO* source, size_t maxSize)
+{
+	auto currentSize = fBuffer.size();
+	auto remainingSize = kBufferSize - currentSize;
+	if (remainingSize < 0)
+		return B_OK;
+
+	if (remainingSize > maxSize)
+		remainingSize = maxSize;
+
+	fBuffer.resize(currentSize + remainingSize);
+	ssize_t readSize = B_INTERRUPTED;
+	while (readSize == B_INTERRUPTED)
+		readSize = source->Read(fBuffer.data() + currentSize, remainingSize);
+
+	if (readSize <= 0) {
+		fBuffer.resize(currentSize); // resize back to the original size
+		return readSize;
+	}
+
+	if (readSize > 0)
+		fBuffer.resize(currentSize + readSize);
+
+	return readSize;
+}
+
+
+// #pragma mark -- BHttpRequestStream
+
+
 BHttpRequestStream::BHttpRequestStream(const BHttpRequest& request)
-	: fHeader(std::make_unique<BMallocIO>()), fBody(nullptr)
+	: fBody(nullptr)
 {
 	// Serialize the header of the request to text
-	fTotalSize = request.SerializeHeaderTo(fHeader.get());
-	fBodyOffset = fTotalSize;
-	// TODO: add size of request body to total size
+	ByteIOHelper helper(fBuffer);
+	fRemainingHeaderSize = request.SerializeHeaderTo(&helper);
+
+	// Check if there is a body
+	if (auto requestBody = request.RequestBody()) {
+		fBody = requestBody->input.get();
+		if (!requestBody->size) {
+			throw BRuntimeError(__PRETTY_FUNCTION__,
+				"BHttpRequestStream: chunked transfer not implemented");
+		}
+		fTotalBodySize += *requestBody->size;
+	}
 }
 
 
@@ -30,32 +133,64 @@ BHttpRequestStream::~BHttpRequestStream() = default;
 BHttpRequestStream::TransferInfo
 BHttpRequestStream::Transfer(BDataIO* target)
 {
-	if (fCurrentPos == fTotalSize)
-		return TransferInfo{0, fTotalSize, fTotalSize, true};
+	if (fBuffer.size() == 0 && fTotalBodySize == fBufferedBodySize) {
+		// all done; header was written and no more body left
+		return TransferInfo{0, fTotalBodySize, fTotalBodySize, true};
+	}
 
-	off_t bytesWritten = 0;
+	if (fBody != nullptr && fBuffer.size() < kBufferSize) {
+		// buffer additional data from the body in the buffer
+		auto remainingBodySize = fTotalBodySize - fBufferedBodySize;
+		auto bufferedSize = BufferData(fBody, remainingBodySize);
 
-	if (fCurrentPos < fBodyOffset) {
-		// Writing the header
-		auto remainingSize = fBodyOffset - fCurrentPos;
-		bytesWritten = target->Write(
-			static_cast<const char*>(fHeader->Buffer()) + fCurrentPos, remainingSize);
-		if (bytesWritten == B_WOULD_BLOCK)
-			return TransferInfo{0, 0, fTotalSize, false};
-		else if (bytesWritten < 0)
-			throw BSystemError("BDataIO::Write()", bytesWritten);
-
-		fCurrentPos += bytesWritten;
-
-		if (bytesWritten < remainingSize) {
-			return TransferInfo{bytesWritten, fCurrentPos, fTotalSize, false};
+		if (bufferedSize == B_WOULD_BLOCK) {
+			// do nothing; try again next round
+		} else if (bufferedSize == 0) {
+			// no remaining data; throw error
+			throw BRuntimeError(__PRETTY_FUNCTION__,
+				"No more data in request input body while more data is expected");
+		} else if (bufferedSize < 0) {
+			throw BSystemError(__PRETTY_FUNCTION__, bufferedSize);
+		} else {
+			// update counters
+			fBufferedBodySize += bufferedSize;
+			if (fBufferedBodySize == fTotalBodySize) {
+				// no more body to load
+				fBody = nullptr;
+			}
 		}
 	}
 
-	// Write the body
-	if (fBody) {
-		// TODO
-		throw BRuntimeError(__PRETTY_FUNCTION__, "Not implemented");
+	if (fBuffer.size() == 0) {
+		// nothing this round
+		return TransferInfo{0, fTransferredBodySize, fTotalBodySize, false};
 	}
-	return TransferInfo{bytesWritten, fTotalSize, fTotalSize, true};
+
+	auto bytesWritten = target->Write(fBuffer.data(), fBuffer.size());
+	if (bytesWritten == B_WOULD_BLOCK || bytesWritten == 0)
+		return TransferInfo{0, fTransferredBodySize, fTotalBodySize, false};
+	else if (bytesWritten < 0)
+		throw BSystemError("BDataIO::Write()", bytesWritten);
+
+	// Adjust the buffer
+	if (static_cast<size_t>(bytesWritten) == fBuffer.size())
+		fBuffer.clear();
+	else
+		fBuffer.erase(fBuffer.begin(), fBuffer.begin() + bytesWritten);
+
+	// Update the stats and return
+	if (fRemainingHeaderSize > 0){
+		if (bytesWritten >= fRemainingHeaderSize) {
+			bytesWritten -= fRemainingHeaderSize;
+			fRemainingHeaderSize = 0;
+		} else {
+			fRemainingHeaderSize -= bytesWritten;
+			bytesWritten = 0;
+		}
+	}
+
+	fTransferredBodySize += bytesWritten;
+
+	auto complete = fRemainingHeaderSize == 0 && fTransferredBodySize == fTotalBodySize;
+	return TransferInfo{bytesWritten, fTransferredBodySize, fTotalBodySize, complete};
 }

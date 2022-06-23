@@ -134,7 +134,7 @@ private:
 	bool							fNoContent = false;
 
 	// Redirection
-	BHttpStatus						fRedirectStatus;
+	std::optional<BHttpStatus>		fRedirectStatus;
 	int8							fRemainingRedirects;
 
 	// Optional decompression
@@ -652,7 +652,7 @@ BHttpSession::Request::Request(Request& original, const BHttpSession::Redirect& 
 	if (redirect.redirectToGet
 		&& (fRequest.Method() != BHttpMethod::Head && fRequest.Method() != BHttpMethod::Get)) {
 		fRequest.SetMethod(BHttpMethod::Get);
-		// TODO: clear Post fields/Update Data when that is supported.
+		fRequest.ClearRequestBody();
 	}
 
 	fRemainingRedirects = original.fRemainingRedirects--;
@@ -809,17 +809,32 @@ BHttpSession::Request::ReceiveResult()
 		if (status.code != 0) {
 			// the status headers are now received, decide what to do next
 
-			// Handle redirects
-			if (status.StatusClass() == BHttpStatusClass::Redirection && fRemainingRedirects > 0) {
-				fRedirectStatus = std::move(status);
-			} else {
-				// Register NoContent before moving the status to the result
-				if (status.StatusCode() == BHttpStatusCode::NoContent)
-					fNoContent = true;
-
-				fResult->SetStatus(std::move(status));
-				// TODO: inform listeners of receiving the status code
+			// Determine if we can handle redirects; else notify of receiving status
+			if (fRemainingRedirects > 0) {
+				switch (status.StatusCode()) {
+					case BHttpStatusCode::MovedPermanently:
+					case BHttpStatusCode::TemporaryRedirect:
+					case BHttpStatusCode::PermanentRedirect:
+						// These redirects require the request body to be sent again. It this is
+						// possible, BHttpRequest::RewindBody() will return true in which case we can
+						// handle the redirect.
+						if (!fRequest.RewindBody())
+							break;
+						[[fallthrough]];
+					case BHttpStatusCode::Found:
+					case BHttpStatusCode::SeeOther:
+						// These redirects redirect to GET, so we don't care if we can rewind the
+						// body; in this case redirect
+						fRedirectStatus = std::move(status);
+						break;
+					default:
+						break;
+				}
 			}
+
+			// Register NoContent before moving the status to the result
+			if (status.StatusCode() == BHttpStatusCode::NoContent)
+				fNoContent = true;
 
 			if ((status.StatusClass() == BHttpStatusClass::ClientError
 					|| status.StatusClass() == BHttpStatusClass::ServerError)
@@ -832,7 +847,10 @@ BHttpSession::Request::ReceiveResult()
 				return true;
 			}
 
-			// TODO: handle the case where we have an error code and we want to stop on error
+			if (!fRedirectStatus) {
+				// we are not redirecting and there is no error, so inform listeners
+				fResult->SetStatus(std::move(status));
+			}
 
 			fRequestStatus = StatusReceived;
 		} else {
@@ -863,9 +881,9 @@ BHttpSession::Request::ReceiveResult()
 		// The headers have been received, now set up the rest of the response handling
 
 		// Handle redirects
-		if (fRedirectStatus.StatusClass() == BHttpStatusClass::Redirection) {
+		if (fRedirectStatus) {
 			auto redirectToGet = false;
-			switch (fRedirectStatus.StatusCode()) {
+			switch (fRedirectStatus->StatusCode()) {
 			case BHttpStatusCode::Found:
 			case BHttpStatusCode::SeeOther:
 				// 302 and 303 redirections convert all requests to GET request, except for HEAD
@@ -875,7 +893,7 @@ BHttpSession::Request::ReceiveResult()
 			case BHttpStatusCode::TemporaryRedirect:
 			case BHttpStatusCode::PermanentRedirect:
 			{
-				std::cout << "ReceiveResult() [" << Id() << "] Handle redirect with status: " << fRedirectStatus.code << std::endl;
+				std::cout << "ReceiveResult() [" << Id() << "] Handle redirect with status: " << fRedirectStatus->code << std::endl;
 				auto locationField = fFields.FindField("Location");
 				if (locationField == fFields.end()) {
 					throw BNetworkRequestError(__PRETTY_FUNCTION__,

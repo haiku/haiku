@@ -106,6 +106,39 @@ namespace Network {
 
 
 /*!
+	\fn ssize_t BAbstractDataStream::BufferData(BDataIO* source, size_t maxSize)
+	\brief Internal method to append data to the internal buffer.
+
+	This is a helper method that reads data from a \a source into the internal \ref fBuffer.
+
+	The number of bytes depends loaded depends on the following properties:
+		- The maximum number of bytes for the fBuffer is set to 65kB. If there already is data in
+			the buffer, only additional bytes up to the maximum buffer size are read.
+		- If \a maxSize is larger than 65kB, or if \a maxSize plus the current size of the input
+			buffer is larger than 65kB, only a maximum of 65kB will be loaded.
+		- If the \a source has fewer than \a maxSize bytes, then fewer bytes will be loaded.
+
+	\param source The data source to read from.
+	\param maxSize The maximum size to read from the source.
+
+	\return The output of the \ref BDataIO::Read() call that is executed on the source. When actual
+		data is read, this will be the number of bytes that are read. If it is an error, all errors
+		will be returned, except for \c B_INTERRUPTED, as interrupted \ref BDataIO::Read() calls
+		are retried. It is up to the calling implementation to do further error handling.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var std::vector<std::byte> BAbstractDataStream::fBuffer
+	\brief Internal buffer that can be used by implementations to buffer data.
+*/
+
+
+/*!
 	\class BHttpRequestStream
 	\ingroup netservices
 	\brief Stream a \ref BHttpRequest to an IO output.

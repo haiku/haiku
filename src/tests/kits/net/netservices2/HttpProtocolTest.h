@@ -46,6 +46,7 @@ public:
 			void	BasicAuthTest();
 			void	StopOnErrorTest();
 			void	RequestCancelTest();
+			void	PostTest();
 
 	static	void	AddTests(BTestSuite& suite);
 

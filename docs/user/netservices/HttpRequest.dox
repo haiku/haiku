@@ -303,6 +303,52 @@ namespace Network {
 
 
 /*!
+	\struct BHttpRequest::Body
+	\ingroup netservices
+	\brief Describe the body for a network request
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var std::unique_ptr<BDataIO> BHttpRequest::Body::input
+	\brief The \ref BDataIO object that holds the contents of the body.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BString BHttpRequest::Body::mimeType
+	\brief The mimetype of the body.
+
+	The \c Content-Type header field of the request is set to this value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var std::optional<off_t> BHttpRequest::Body::size
+	\brief The size of the content, if known.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var std::optional<off_t> BHttpRequest::Body::startPosition
+	\brief If the input is a \ref BPositionIO, this is the current position when the body was set.
+
+	This value is used to rewind the input when it needs to be resubmitted, for example in the case
+	of a redirection.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\class BHttpRequest
 	\ingroup netservices
 	\brief Represent a HTTP request.
@@ -310,7 +356,6 @@ namespace Network {
 	This class can be used to construct HTTP requests that can be executed by the Network Services
 	Kit. A request has two states, either it is is a valid request, or it is an empty request. The
 	criterium is whether or not the request has a URL.
-
 	This class has all kinds of convenience methods set and retrieve particular options. Most
 	options are wrapped in specialized container classes that do some form of validation.
 
@@ -340,6 +385,12 @@ namespace Network {
 			<td> \ref SetMaxRedirections() </td>
 			<td> How many redirections should be followed. Set to 0 to disable. </td>
 			<td> Defaults to 8 redirections per request </td>
+		</tr>
+		<tr>
+			<td> \ref RequestBody() </td>
+			<td> \ref SetRequestBody() </td>
+			<td> Body contents that is sent with the request. </td>
+			<td> Defaults to an empty body </td>
 		</tr>
 		<tr>
 			<td> \ref StopOnError() </td>
@@ -528,6 +579,17 @@ namespace Network {
 
 
 /*!
+	\fn const BHttpRequest::Body* BHttpRequest::RequestBody() const noexcept
+	\brief Get the details of the custom body set for the request.
+
+	\return When no body is set for this request, the method returns a \c nullptr.
+		Otherwise, it will return a pointer to a struct that describes the current body.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn bool BHttpRequest::StopOnError() const noexcept
 	\brief Is the request set to parse the full response on error.
 
@@ -593,6 +655,8 @@ namespace Network {
 	* \c Accept
 	* \c Accept-Encoding
 	* \c Connection
+	* \c Content-Type
+	* \c Content-Length
 
 	\param fields Additional fields for the header of the request.
 
@@ -636,6 +700,31 @@ namespace Network {
 	\param maxRedirections The number of redirections to follow. Set to 0 to disable.
 
 	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpRequest::SetRequestBody(std::unique_ptr<BDataIO> input, BString mimeType,
+		std::optional<off_t> size)
+	\brief Set a body for this request.
+
+	When the requests needs a body, this method can be used to set the contents of that body.
+
+	\param input The input is an owned pointer to an input. The lifetime of the input is guaranteed
+		up to the point that the request is sent for execution.
+	\param mimeType A valid mimetype, with a class and a subtype. For example \c text/plain is a
+		valid mime type.
+	\param size When the content size is set, the request will have a \c Content-Length header
+		field. If the \a input has less data in the buffer, this will cause the request to
+		error out. However, if the input has more data, it is only read up to size. If the actual
+		size of the data is unknown, this can be made optional. The request body will
+		then be sent as a so-called chunked transfer, sending data until the input is at the end.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+	\exception std::invalid_argument This exception is raised when the \a mimeType is invalid or
+		when \a input is a \c nullptr.
 
 	\since Haiku R1
 */
@@ -689,6 +778,38 @@ namespace Network {
 	\exception BUnsupportedProtocol This exception is raised when the protocol of the URL cannot be
 		handled.
 	\exception BInvalidUrl This exception is raised when the \a url is invalid.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Clearing options
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BHttpRequest::ClearAuthentication() noexcept
+	\brief Clear any authentication details previously set with \ref SetAuthentication().
+
+	If there is no authentication data set, this method does nothing.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn std::unique_ptr<BDataIO> BHttpRequest::ClearRequestBody() noexcept
+	\brief Clear any request body previously set with \ref SetRequestBody().
+
+	\return Returns the previously set input \ref BDataIO object. If there is no request body set,
+		this method returns \c nullptr.
 
 	\since Haiku R1
 */

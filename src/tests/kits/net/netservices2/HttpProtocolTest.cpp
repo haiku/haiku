@@ -360,31 +360,10 @@ HttpProtocolTest::HttpRequestStreamTest()
 	BHttpRequestStream requestStream(request);
 	RequestStreamTestIO testIO(kExpectedStreamText.data());
 	bool finished = false;
-	ssize_t expectedBytesWritten = 8;
-	ssize_t expectedTotalBytesWritten = 8;
-	const ssize_t expectedTotalSize = kExpectedStreamText.size();
-	if (expectedTotalSize < 8) {
-		expectedBytesWritten = expectedTotalSize;
-		expectedTotalBytesWritten = expectedTotalSize;
-	}
 	while (!finished) {
 		auto [currentBytesWritten, totalBytesWritten, totalSize, complete]
 			= requestStream.Transfer(&testIO);
-		CPPUNIT_ASSERT_EQUAL(expectedBytesWritten, currentBytesWritten);
-		CPPUNIT_ASSERT_EQUAL(expectedTotalBytesWritten, totalBytesWritten);
-		CPPUNIT_ASSERT_EQUAL(expectedTotalSize, totalSize);
-		if (expectedTotalBytesWritten == expectedTotalSize) {
-			// loop should be finished
-			CPPUNIT_ASSERT_EQUAL(true, complete);
-			finished = true;
-		} else {
-			// prepare for next loop
-			if (totalSize - totalBytesWritten < 8) {
-				expectedBytesWritten = totalSize - totalBytesWritten;
-			}
-			expectedTotalBytesWritten += expectedBytesWritten;
-			CPPUNIT_ASSERT_EQUAL(false, complete);
-		}
+		finished = complete;
 	}
 }
 
@@ -497,6 +476,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 		testCaller->addThread("BasicAuthTest", &HttpIntegrationTest::BasicAuthTest);
 		testCaller->addThread("StopOnErrorTest", &HttpIntegrationTest::StopOnErrorTest);
 		testCaller->addThread("RequestCancelTest", &HttpIntegrationTest::RequestCancelTest);
+		testCaller->addThread("PostTest", &HttpIntegrationTest::PostTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpIntegrationTest", &suite);
@@ -520,6 +500,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 		testCaller->addThread("BasicAuthTest", &HttpIntegrationTest::BasicAuthTest);
 		testCaller->addThread("StopOnErrorTest", &HttpIntegrationTest::StopOnErrorTest);
 		testCaller->addThread("RequestCancelTest", &HttpIntegrationTest::RequestCancelTest);
+		testCaller->addThread("PostTest", &HttpIntegrationTest::PostTest);
 
 		suite.addTest(testCaller);
 		parent.addTest("HttpsIntegrationTest", &suite);
@@ -734,4 +715,64 @@ HttpIntegrationTest::RequestCancelTest()
 	} catch (const BNetworkRequestError& e) {
 		CPPUNIT_ASSERT(e.Type() == BNetworkRequestError::Canceled);
 	}
+}
+
+
+static const BString kPostText =
+	"The MIT License\n"
+	"\n"
+	"Copyright (c) <year> <copyright holders>\n"
+	"\n"
+	"Permission is hereby granted, free of charge, to any person obtaining a copy\n"
+	"of this software and associated documentation files (the \"Software\"), to deal\n"
+	"in the Software without restriction, including without limitation the rights\n"
+	"to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n"
+	"copies of the Software, and to permit persons to whom the Software is\n"
+	"furnished to do so, subject to the following conditions:\n"
+	"\n"
+	"The above copyright notice and this permission notice shall be included in\n"
+	"all copies or substantial portions of the Software.\n"
+	"\n"
+	"THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n"
+	"IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n"
+	"FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n"
+	"AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n"
+	"LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n"
+	"OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n"
+	"THE SOFTWARE.\n"
+	"\n";
+
+
+static BString kExpectedPostBody
+	= BString().SetToFormat(
+		"Path: /post\r\n"
+		"\r\n"
+		"Headers:\r\n"
+		"--------\r\n"
+		"Host: 127.0.0.1:PORT\r\n"
+		"Accept: *\r\n"
+		"Accept-Encoding: gzip\r\n"
+		"Connection: close\r\n"
+		"Content-Type: text/plain\r\n"
+		"Content-Length: 1083\r\n"
+		"\r\n"
+		"Request body:\r\n"
+		"-------------\r\n"
+		"%s\r\n", kPostText.String());
+
+
+void
+HttpIntegrationTest::PostTest()
+{
+	auto postBody = std::make_unique<BMallocIO>();
+	postBody->Write(kPostText.String(), kPostText.Length());
+	postBody->Seek(0, SEEK_SET);
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/post"));
+	request.SetMethod(BHttpMethod::Post);
+	request.SetRequestBody(std::move(postBody), "text/plain", kPostText.Length());
+
+	auto result = fSession.Execute(std::move(request));
+
+	CPPUNIT_ASSERT_EQUAL(kExpectedPostBody.Length(), result.Body().text.Length());
+	CPPUNIT_ASSERT(result.Body().text == kExpectedPostBody);
 }
