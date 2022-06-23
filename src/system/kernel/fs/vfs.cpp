@@ -2179,7 +2179,9 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 		for (nextPath = path + 1; *nextPath != '\0' && *nextPath != '/';
 				nextPath++);
 
+		bool directoryFound = false;
 		if (*nextPath == '/') {
+			directoryFound = true;
 			*nextPath = '\0';
 			do
 				nextPath++;
@@ -2226,7 +2228,7 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 		// If the new node is a symbolic link, resolve it (if we've been told
 		// to do it)
 		if (S_ISLNK(nextVnode->Type())
-			&& (traverseLeafLink || nextPath[0] != '\0')) {
+			&& (traverseLeafLink || directoryFound)) {
 			size_t bufferSize;
 			char* buffer;
 
