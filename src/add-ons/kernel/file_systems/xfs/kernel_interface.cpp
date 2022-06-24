@@ -251,11 +251,13 @@ xfs_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 	inode->GetModificationTime(stat->st_mtim);
 	inode->GetChangeTime(stat->st_ctim);
 
-	/* TODO: Can we obtain the Creation Time in v4 system? */
-	inode->GetChangeTime(stat->st_crtim);
+	// Only version 3 Inodes has creation time
+	if(inode->Version() == 3)
+		inode->GetCreationTime(stat->st_crtim);
+	else
+		inode->GetChangeTime(stat->st_crtim);
 
 	return B_OK;
-
 }
 
 

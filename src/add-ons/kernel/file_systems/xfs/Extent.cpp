@@ -70,7 +70,7 @@ Extent::Init()
 		return B_NO_MEMORY;
 
 	ASSERT(IsBlockType() == true);
-	void* pointerToMap = DIR_DFORK_PTR(fInode->Buffer());
+	void* pointerToMap = DIR_DFORK_PTR(fInode->Buffer(), fInode->CoreInodeSize());
 	FillMapEntry(pointerToMap);
 	ASSERT(fMap->br_blockcount == 1);
 		//TODO: This is always true for block directories

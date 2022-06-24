@@ -74,7 +74,7 @@ LeafDirectory::IsLeafType()
 void
 LeafDirectory::FillMapEntry(int num, ExtentMapEntry* fMap)
 {
-	void* directoryFork = DIR_DFORK_PTR(fInode->Buffer());
+	void* directoryFork = DIR_DFORK_PTR(fInode->Buffer(), fInode->CoreInodeSize());
 
 	uint64* pointerToMap = (uint64*)((char*)directoryFork + num * EXTENT_SIZE);
 	uint64 firstHalf = pointerToMap[0];

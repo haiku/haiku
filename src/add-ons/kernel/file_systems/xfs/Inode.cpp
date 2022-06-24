@@ -1,4 +1,5 @@
 /*
+ * Copyright 2022, Raghav Sharma, raghavself28@gmail.com
  * Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -6,6 +7,7 @@
 
 #include "Inode.h"
 #include "BPlusTree.h"
+#include "Checksum.h"
 
 void
 xfs_inode_t::SwapEndian()
@@ -34,6 +36,13 @@ xfs_inode_t::SwapEndian()
 	di_flags = B_BENDIAN_TO_HOST_INT16(di_flags);
 	di_gen = B_BENDIAN_TO_HOST_INT32(di_gen);
 	di_next_unlinked = B_BENDIAN_TO_HOST_INT32(di_next_unlinked);
+	di_changecount = B_BENDIAN_TO_HOST_INT64(di_changecount);
+	di_lsn = B_BENDIAN_TO_HOST_INT64(di_lsn);
+	di_flags2 = B_BENDIAN_TO_HOST_INT64(di_flags2);
+	di_cowextsize = B_BENDIAN_TO_HOST_INT64(di_cowextsize);
+	di_crtime.t_sec = B_BENDIAN_TO_HOST_INT32(di_crtime.t_sec);
+	di_crtime.t_nsec = B_BENDIAN_TO_HOST_INT32(di_crtime.t_nsec);
+	di_ino = B_BENDIAN_TO_HOST_INT64(di_ino);
 }
 
 
@@ -103,6 +112,14 @@ xfs_inode_t::GetChangeTime(struct timespec& stamp)
 }
 
 
+void
+xfs_inode_t::GetCreationTime(struct timespec& stamp)
+{
+	stamp.tv_sec = di_crtime.t_sec;
+	stamp.tv_nsec = di_crtime.t_nsec;
+}
+
+
 uint32
 xfs_inode_t::NLink() const
 {
@@ -148,6 +165,201 @@ Inode::Inode(Volume* volume, xfs_ino_t id)
 }
 
 
+//Convert inode mode to directory entry filetype
+unsigned char
+Inode::XfsModeToFtype() const
+{
+	switch (Mode() & S_IFMT) {
+	case S_IFREG:
+		return XFS_DIR3_FT_REG_FILE;
+	case S_IFDIR:
+		return XFS_DIR3_FT_DIR;
+	case S_IFCHR:
+		return XFS_DIR3_FT_CHRDEV;
+	case S_IFBLK:
+		return XFS_DIR3_FT_BLKDEV;
+	case S_IFIFO:
+		return XFS_DIR3_FT_FIFO;
+	case S_IFSOCK:
+		return XFS_DIR3_FT_SOCK;
+	case S_IFLNK:
+		return XFS_DIR3_FT_SYMLINK;
+	default:
+		return XFS_DIR3_FT_UNKNOWN;
+	}
+}
+
+bool
+Inode::VerifyFork(int whichFork) const
+{
+	uint32 di_nextents = XFS_DFORK_NEXTENTS(fNode, whichFork);
+
+	switch (XFS_DFORK_FORMAT(fNode, whichFork)) {
+	case XFS_DINODE_FMT_LOCAL:
+		if (whichFork == XFS_DATA_FORK) {
+			if (S_ISREG(Mode()))
+				return false;
+			if (Size() > (xfs_fsize_t) DFORK_SIZE(fNode, fVolume, whichFork))
+				return false;
+		}
+		if (di_nextents)
+			return false;
+		break;
+	case XFS_DINODE_FMT_EXTENTS:
+		if (di_nextents > DFORK_MAXEXT(fNode, fVolume, whichFork))
+			return false;
+		break;
+	case XFS_DINODE_FMT_BTREE:
+		if (whichFork == XFS_ATTR_FORK) {
+			if (di_nextents > MAXAEXTNUM)
+				return false;
+		} else if (di_nextents > MAXEXTNUM) {
+			return false;
+		}
+		break;
+	default:
+		return false;
+	}
+
+	return true;
+}
+
+bool
+Inode::VerifyForkoff() const
+{
+	switch(Format()) {
+		case XFS_DINODE_FMT_DEV:
+			if (fNode->di_forkoff != (ROUNDUP(sizeof(uint32), 8) >> 3))
+			return false;
+		break;
+		case XFS_DINODE_FMT_LOCAL:
+		case XFS_DINODE_FMT_EXTENTS:
+		case XFS_DINODE_FMT_BTREE:
+			if (fNode->di_forkoff >= (LITINO(fVolume) >> 3))
+				return false;
+		break;
+	default:
+		return false;
+	}
+
+	return true;
+}
+
+
+bool
+Inode::VerifyInode() const
+{
+	if(fNode->di_magic != INODE_MAGIC) {
+		ERROR("Bad inode magic number");
+		return false;
+	}
+
+	// check if inode version is valid
+	if(fNode->Version() < 1 || fNode->Version() > 3) {
+		ERROR("Bad inode version");
+		return false;
+	}
+
+	// verify version 3 inodes first
+	if(fNode->Version() == 3) {
+
+		if(!HAS_V3INODES(fVolume)) {
+			ERROR("xfs v4 doesn't have v3 inodes");
+			return false;
+		}
+
+		if(!xfs_verify_cksum(fBuffer, fVolume->InodeSize(), INODE_CRC_OFF)) {
+			ERROR("Inode is corrupted");
+			return false;
+		}
+
+		if(fNode->di_ino != fId) {
+			ERROR("Incorrect inode number");
+			return false;
+		}
+
+		// TODO : uuid verification
+	}
+
+	if(fNode->di_size & (1ULL << 63)) {
+		ERROR("Invalid EOF of inode");
+		return false;
+	}
+
+	if (Mode() && XfsModeToFtype() == XFS_DIR3_FT_UNKNOWN) {
+		 ERROR("Entry points to an unknown inode type");
+		 return false;
+	}
+
+	if(!VerifyForkoff()) {
+		ERROR("Invalid inode fork offset");
+		return false;
+	}
+
+	// Check for appropriate data fork formats for the mode
+	switch (Mode() & S_IFMT) {
+	case S_IFIFO:
+	case S_IFCHR:
+	case S_IFBLK:
+	case S_IFSOCK:
+		if (fNode->di_format != XFS_DINODE_FMT_DEV)
+			return false;
+		break;
+	case S_IFREG:
+	case S_IFLNK:
+	case S_IFDIR:
+		if (!VerifyFork(XFS_DATA_FORK)) {
+			ERROR("Invalid data fork in inode");
+			return false;
+		}
+		break;
+	case 0:
+		// Uninitialized inode is fine
+		break;
+	default:
+		return false;
+	}
+
+	if (fNode->di_forkoff) {
+		if (!VerifyFork(XFS_ATTR_FORK)) {
+			ERROR("Invalid attribute fork in inode");
+			return false;
+		}
+	} else {
+		/*
+			If there is no fork offset, this may be a freshly-made inode
+			in a new disk cluster, in which case di_aformat is zeroed.
+			Otherwise, such an inode must be in EXTENTS format; this goes
+			for freed inodes as well.
+		 */
+		switch (fNode->di_aformat) {
+		case 0:
+		case XFS_DINODE_FMT_EXTENTS:
+			break;
+		default:
+			return false;
+		}
+
+		if (fNode->di_anextents)
+			return false;
+	}
+
+	// TODO : Add reflink and big-timestamps check using di_flags2
+
+	return true;
+}
+
+
+uint32
+Inode::CoreInodeSize() const
+{
+	if (Version() == 3)
+		return sizeof(struct xfs_inode_t);
+
+	return offsetof(struct xfs_inode_t, di_crc);
+}
+
+
 status_t
 Inode::Init()
 {
@@ -162,7 +374,7 @@ Inode::Init()
 
 	status_t status = GetFromDisk();
 	if (status == B_OK) {
-		if (fNode->di_magic == INODE_MAGIC) {
+		if (VerifyInode()) {
 			TRACE("Init(): Inode successfully read.\n");
 			status = B_OK;
 		} else {
@@ -186,7 +398,11 @@ Inode::~Inode()
 bool
 Inode::HasFileTypeField() const
 {
-	return fVolume->SuperBlockFeatures2() & XFS_SB_VERSION2_FTYPE;
+	if((fNode->Version() == 3 && fVolume->XfsHasIncompatFeature())
+			|| (fVolume->SuperBlockFeatures2() & XFS_SB_VERSION2_FTYPE))
+		return true;
+
+	return false;
 }
 
 
@@ -219,7 +435,7 @@ status_t
 Inode::ReadExtentsFromExtentBasedInode()
 {
 	fExtents = new(std::nothrow) ExtentMapEntry[DataExtentsCount()];
-	char* dataStart = (char*) DIR_DFORK_PTR(Buffer());
+	char* dataStart = (char*) DIR_DFORK_PTR(Buffer(), CoreInodeSize());
 	uint64 wrappedExtent[2];
 	for (int i = 0; i < DataExtentsCount(); i++) {
 		wrappedExtent[0] = *(uint64*)(dataStart);
@@ -239,7 +455,7 @@ Inode::MaxRecordsPossibleInTreeRoot()
 		lengthOfDataFork = ForkOffset() << 3;
 	else if(ForkOffset() == 0) {
 		lengthOfDataFork = GetVolume()->InodeSize()
-			- INODE_CORE_UNLINKED_SIZE;
+			- CoreInodeSize();
 	}
 
 	lengthOfDataFork -= sizeof(BlockInDataFork);
@@ -260,7 +476,7 @@ TreePointer*
 Inode::GetPtrFromRoot(int pos)
 {
 	return (TreePointer*)
-		((char*)DIR_DFORK_PTR(Buffer()) + GetPtrOffsetIntoRoot(pos));
+		((char*)DIR_DFORK_PTR(Buffer(), CoreInodeSize()) + GetPtrOffsetIntoRoot(pos));
 }
 
 
@@ -342,7 +558,7 @@ Inode::ReadExtentsFromTreeInode()
 	if (root == NULL)
 		return B_NO_MEMORY;
 	memcpy((void*)root,
-		DIR_DFORK_PTR(Buffer()), sizeof(BlockInDataFork));
+		DIR_DFORK_PTR(Buffer(), CoreInodeSize()), sizeof(BlockInDataFork));
 
 	size_t maxRecords = MaxRecordsPossibleInTreeRoot();
 	TRACE("Maxrecords: (%" B_PRIuSIZE ")\n", maxRecords);
@@ -550,7 +766,11 @@ Inode::GetFromDisk()
 		return B_IO_ERROR;
 	}
 
-	memcpy(fNode, fBuffer, INODE_CORE_UNLINKED_SIZE);
+	if(fVolume->IsVersion5())
+		memcpy(fNode, fBuffer, sizeof(xfs_inode_t));
+	else
+		memcpy(fNode, fBuffer, INODE_CRC_OFF);
+
 	fNode->SwapEndian();
 
 	return B_OK;

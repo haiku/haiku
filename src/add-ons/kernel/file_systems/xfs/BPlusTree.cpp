@@ -32,7 +32,7 @@ TreeDirectory::TreeDirectory(Inode* inode)
 	}
 
 	memcpy((void*)fRoot,
-		DIR_DFORK_PTR(fInode->Buffer()), sizeof(BlockInDataFork));
+		DIR_DFORK_PTR(fInode->Buffer(), fInode->CoreInodeSize()), sizeof(BlockInDataFork));
 
 	for (int i = 0; i < MAX_TREE_DEPTH; i++) {
 		fPathForLeaves[i].blockData = NULL;
@@ -85,7 +85,7 @@ TreeDirectory::MaxRecordsPossibleRoot()
 		lengthOfDataFork = fInode->ForkOffset() << 3;
 	if (fInode->ForkOffset() == 0) {
 		lengthOfDataFork = fInode->GetVolume()->InodeSize()
-			- INODE_CORE_UNLINKED_SIZE;
+			- fInode->CoreInodeSize();
 	}
 
 	lengthOfDataFork -= sizeof(BlockInDataFork);
@@ -122,7 +122,8 @@ TreePointer*
 TreeDirectory::GetPtrFromRoot(int pos)
 {
 	return (TreePointer*)
-		((char*)DIR_DFORK_PTR(fInode->Buffer()) + GetPtrOffsetIntoRoot(pos));
+		((char*)DIR_DFORK_PTR(fInode->Buffer(), fInode->CoreInodeSize())
+			+ GetPtrOffsetIntoRoot(pos));
 }
 
 
@@ -146,7 +147,7 @@ TreeKey*
 TreeDirectory::GetKeyFromRoot(int pos)
 {
 	off_t offset = (pos - 1) * KeySize();
-	char* base = (char*)DIR_DFORK_PTR(fInode->Buffer())
+	char* base = (char*)DIR_DFORK_PTR(fInode->Buffer(), fInode->CoreInodeSize())
 		+ sizeof(BlockInDataFork);
 	return (TreeKey*) (base + offset);
 }

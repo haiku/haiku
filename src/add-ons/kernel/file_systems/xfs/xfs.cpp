@@ -74,6 +74,7 @@ XfsSuperBlock::IsValidFeatureMask() const
 	return true;
 }
 
+
 bool
 XfsSuperBlock::IsValid() const
 {
@@ -151,6 +152,20 @@ XfsSuperBlock::IsValid() const
 
 	// Valid V5 Superblock
 	return true;
+}
+
+
+bool
+XfsSuperBlock::IsVersion5() const
+{
+	return (Version() & XFS_SB_VERSION_NUMBITS) == 5;
+}
+
+
+bool
+XfsSuperBlock::XfsHasIncompatFeature() const
+{
+	return (sb_features_incompat & XFS_SB_FEAT_INCOMPAT_FTYPE) != 0;
 }
 
 

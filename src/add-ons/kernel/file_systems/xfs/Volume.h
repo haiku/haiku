@@ -31,6 +31,8 @@ public:
 									uint32 blockSize, uint32 sectorSize);
 
 			bool				IsValidSuperBlock() const;
+			bool				IsVersion5() const
+									{ return fSuperBlock.IsVersion5(); }
 			bool				IsReadOnly() const
 									{ return
 										(fFlags & VOLUME_READ_ONLY) != 0; }
@@ -84,6 +86,9 @@ public:
 
 			uint32				SuperBlockFeatures2() const
 									{ return fSuperBlock.Features2(); }
+
+			bool				XfsHasIncompatFeature() const
+									{ return fSuperBlock.XfsHasIncompatFeature(); }
 
 	#if 0
 			off_t				NumBlocks() const
