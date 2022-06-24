@@ -68,7 +68,7 @@ struct device_lun_s {
 	// device information through read capacity/inquiry
 	bool		media_present;
 	bool		media_changed;
-	uint32		block_count;
+	uint64		block_count;
 	uint32		block_size;
 	uint8		device_type;
 	bool		removable;
