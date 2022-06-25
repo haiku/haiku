@@ -171,9 +171,9 @@ struct ext2_super_block {
 
 #define EXT2_MAX_REVISION		EXT2_DYNAMIC_REVISION
 
-#define EXT2_FS_STATE_VALID		1	// File system was cleanly unmounted
-#define EXT2_FS_STATE_ERROR		2	// File system has errors
-#define EXT2_FS_STATE_ORPHAN	3	// Orphans are being recovered
+#define EXT2_FS_STATE_VALID		0x1	// File system was cleanly unmounted
+#define EXT2_FS_STATE_ERROR		0x2	// File system has errors
+#define EXT2_FS_STATE_ORPHAN	0x4	// Orphans are being recovered
 
 // compatible features
 #define EXT2_FEATURE_DIRECTORY_PREALLOCATION	0x0001

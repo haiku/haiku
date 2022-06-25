@@ -168,6 +168,16 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	if (!_VerifySuperBlock())
 		return B_ERROR;
 
+	if ((fSuperBlock.State() & EXT2_FS_STATE_VALID) == 0
+		|| (fSuperBlock.State() & EXT2_FS_STATE_ERROR) != 0) {
+		if (!IsReadOnly()) {
+			FATAL("Volume::Mount(): can't mount R/W, volume not clean\n");
+			return B_NOT_ALLOWED;
+		} else {
+			FATAL("Volume::Mount(): warning: volume not clean\n");
+		}
+	}
+
 	// initialize short hands to the superblock (to save byte swapping)
 	fBlockShift = fSuperBlock.BlockShift();
 	if (fBlockShift < 10 || fBlockShift > 16)
