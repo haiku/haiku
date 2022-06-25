@@ -233,8 +233,10 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	status = opener.GetSize(&diskSize);
 	if (status != B_OK)
 		return status;
-	if (diskSize < ((off_t)NumBlocks() << BlockShift()))
+	if ((diskSize + fBlockSize) <= ((off_t)NumBlocks() << BlockShift())) {
+		FATAL("diskSize is too small for the number of blocks!\n");
 		return B_BAD_VALUE;
+	}
 
 	fBlockCache = opener.InitCache(NumBlocks(), fBlockSize);
 	if (fBlockCache == NULL)
