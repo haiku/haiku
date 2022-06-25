@@ -2254,13 +2254,14 @@ void
 devfs_compute_geometry_size(device_geometry* geometry, uint64 blockCount,
 	uint32 blockSize)
 {
-	if (blockCount > UINT32_MAX)
-		geometry->head_count = (blockCount + UINT32_MAX - 1) / UINT32_MAX;
-	else
-		geometry->head_count = 1;
+	geometry->head_count = 1;
+	while (blockCount > UINT32_MAX) {
+		geometry->head_count <<= 1;
+		blockCount >>= 1;
+	}
 
 	geometry->cylinder_count = 1;
-	geometry->sectors_per_track = blockCount / geometry->head_count;
+	geometry->sectors_per_track = blockCount;
 	geometry->bytes_per_sector = blockSize;
 }
 
