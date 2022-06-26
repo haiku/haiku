@@ -950,6 +950,8 @@ BHttpSession::Request::ReceiveResult()
 			try {
 				auto contentLength = std::string(header->Value());
 				fBodyBytesTotal = std::stol(contentLength);
+				if (fBodyBytesTotal == 0)
+					fNoContent = true;
 			} catch (const std::logic_error& e) {
 				throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
 			}
