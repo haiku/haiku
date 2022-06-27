@@ -268,11 +268,15 @@ StyledEditWindow::MessageReceived(BMessage* message)
 		case MSG_FIND_WINDOW_QUIT:
 		{
 			fFindWindow = NULL;
+			Activate();
+				// In case any 'always on top' application tries to make its
+				// window active after fFindWindow is closed.
 			break;
 		}
 		case MSG_REPLACE_WINDOW_QUIT:
 		{
 			fReplaceWindow = NULL;
+			Activate();
 			break;
 		}
 		case MSG_SEARCH:
@@ -283,6 +287,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			message->FindBool("backsearch", &fBackSearch);
 
 			_Search(fStringToFind, fCaseSensitive, fWrapAround, fBackSearch);
+			Activate();
 			break;
 		case MENU_FIND_AGAIN:
 			_Search(fStringToFind, fCaseSensitive, fWrapAround, fBackSearch);
@@ -323,6 +328,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 
 			_Replace(fStringToFind, fReplaceString, fCaseSensitive, fWrapAround,
 				fBackSearch);
+			Activate();
 			break;
 		}
 		case MENU_REPLACE_SAME:
@@ -346,6 +352,7 @@ StyledEditWindow::MessageReceived(BMessage* message)
 				SearchAllWindows(fStringToFind, fReplaceString, fCaseSensitive);
 			else
 				_ReplaceAll(fStringToFind, fReplaceString, fCaseSensitive);
+			Activate();
 			break;
 		}
 
@@ -1163,7 +1170,6 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 
 	fScrollView = new BScrollView("scrollview", fTextView, B_FOLLOW_ALL, 0,
 		true, true, B_PLAIN_BORDER);
-	fTextView->MakeFocus(true);
 
 	fStatusView = new StatusView(fScrollView);
 	fScrollView->AddChild(fStatusView);
@@ -1360,6 +1366,7 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	.End();
 
 	SetKeyMenuBar(mainMenu);
+	fTextView->MakeFocus(true);
 
 }
 
