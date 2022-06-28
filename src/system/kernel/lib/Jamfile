@@ -52,6 +52,7 @@ local muslSources =
 	;
 
 SourceHdrs $(muslSources) :
+	[ FDirName $(posixSources) musl include ]
 	[ FDirName $(posixSources) musl internal ]
 	[ FDirName $(posixSources) musl arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 
