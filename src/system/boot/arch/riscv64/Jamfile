@@ -32,7 +32,7 @@ local kernelGenericDriverSources =
 ;
 
 local platform ;
-for platform in [ MultiBootSubDirSetup u-boot efi riscv ] {
+for platform in [ MultiBootSubDirSetup efi riscv ] {
 	on $(platform) {
 		DEFINES += _BOOT_MODE ;
 		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
