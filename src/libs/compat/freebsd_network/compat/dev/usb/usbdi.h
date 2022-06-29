@@ -353,13 +353,28 @@ void	usb_pause_mtx(struct mtx *mtx, int _ticks);
 enum usb_dev_speed usbd_get_speed(struct usb_device* udev);
 
 void*	usbd_xfer_softc(struct usb_xfer *xfer);
+void*	usbd_xfer_get_priv(struct usb_xfer* xfer);
+void	usbd_xfer_set_priv(struct usb_xfer* xfer, void* ptr);
 uint8_t	usbd_xfer_state(struct usb_xfer *xfer);
 usb_frlength_t usbd_xfer_max_len(struct usb_xfer *xfer);
+struct usb_page_cache *usbd_xfer_get_frame(struct usb_xfer *, usb_frcount_t);
+void	usbd_xfer_set_frames(struct usb_xfer *xfer, usb_frcount_t n);
 void	usbd_xfer_set_frame_data(struct usb_xfer *xfer, usb_frcount_t frindex,
 		void *ptr, usb_frlength_t len);
+void	usbd_xfer_set_frame_len(struct usb_xfer *xfer, usb_frcount_t frindex,
+		usb_frlength_t len);
 void	usbd_xfer_set_stall(struct usb_xfer *xfer);
 void	usbd_xfer_status(struct usb_xfer *xfer, int *actlen, int *sumlen,
 		int *aframes, int *nframes);
+
+void	usbd_frame_zero(struct usb_page_cache *cache, usb_frlength_t offset,
+		usb_frlength_t len);
+void	usbd_copy_in(struct usb_page_cache *cache, usb_frlength_t offset,
+		const void *ptr, usb_frlength_t len);
+void	usbd_copy_out(struct usb_page_cache *cache, usb_frlength_t offset,
+		void *ptr, usb_frlength_t len);
+void	usbd_m_copy_in(struct usb_page_cache *cache, usb_frlength_t dst_offset,
+		struct mbuf *m, usb_size_t src_offset, usb_frlength_t src_len);
 
 void	usbd_transfer_submit(struct usb_xfer *xfer);
 void	usbd_transfer_start(struct usb_xfer *xfer);
