@@ -596,7 +596,7 @@ BlockAllocator::InitializeAndClearBitmap(Transaction& transaction)
 	free(buffer);
 
 	// reserve the boot block, the log area, and the block bitmap itself
-	uint32 reservedBlocks = fVolume->Log().Start() + fVolume->Log().Length();
+	uint32 reservedBlocks = fVolume->ToBlock(fVolume->Log()) + fVolume->Log().Length();
 	uint32 blocksToReserve = reservedBlocks;
 	for (int32 i = 0; i < fNumGroups; i++) {
 		int32 reservedBlocksInGroup = min_c(blocksToReserve, numBits);
@@ -680,7 +680,7 @@ BlockAllocator::_Initialize(BlockAllocator* allocator)
 	free(buffer);
 
 	// check if block bitmap and log area are reserved
-	uint32 reservedBlocks = volume->Log().Start() + volume->Log().Length();
+	uint32 reservedBlocks = volume->ToBlock(volume->Log()) + volume->Log().Length();
 
 	if (allocator->CheckBlocks(0, reservedBlocks) != B_OK) {
 		if (volume->IsReadOnly()) {
@@ -1023,8 +1023,9 @@ BlockAllocator::Free(Transaction& transaction, block_run run)
 	}
 	// check if someone tries to free reserved areas at the beginning of the
 	// drive
-	if (group == 0
-		&& start < uint32(fVolume->Log().Start() + fVolume->Log().Length())) {
+	if (group < fVolume->Log().AllocationGroup()
+		|| (group == fVolume->Log().AllocationGroup()
+			&& start < uint32(fVolume->Log().Start()) + fVolume->Log().Length())) {
 		FATAL(("tried to free a reserved block_run"
 			" (%" B_PRId32 ", %" B_PRIu16 ", %" B_PRIu16")\n",
 			group, start, length));
