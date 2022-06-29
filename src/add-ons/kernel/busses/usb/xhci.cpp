@@ -766,12 +766,14 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 	descriptor->trbs[index].address = 0;
 	descriptor->trbs[index].status = TRB_2_IRQ(0);
 	descriptor->trbs[index].flags = TRB_3_TYPE(TRB_TYPE_STATUS_STAGE)
-			| ((directionIn && requestData->Length > 0) ? 0 : TRB_3_DIR_IN)
 			| TRB_3_CHAIN_BIT | TRB_3_ENT_BIT | TRB_3_CYCLE_BIT;
-		// Status Stage is an OUT transfer when the device is sending data
-		// (XHCI 1.2 § 4.11.2.2 Table 4-7 p213), and the CHAIN bit must be
-		// set when using an Event Data TRB (as _LinkDescriptorForPipe does)
-		// (XHCI 1.2 § 6.4.1.2.3 Table 6-31 p472)
+		// The CHAIN bit must be set when using an Event Data TRB
+		// (XHCI 1.2 § 6.4.1.2.3 Table 6-31 p472).
+
+	// Status Stage is an OUT transfer when the device is sending data
+	// (XHCI 1.2 § 4.11.2.2 Table 4-7 p213), otherwise set the IN bit.
+	if (requestData->Length == 0 || !directionIn)
+		descriptor->trbs[index].flags |= TRB_3_DIR_IN;
 
 	descriptor->trb_used = index + 1;
 
