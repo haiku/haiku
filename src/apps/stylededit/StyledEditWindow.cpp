@@ -1366,8 +1366,9 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	.End();
 
 	SetKeyMenuBar(mainMenu);
-	fTextView->MakeFocus(true);
 
+	// must focus text view after window layout is built
+	fTextView->MakeFocus(true);
 }
 
 
