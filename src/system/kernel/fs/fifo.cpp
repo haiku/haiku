@@ -634,7 +634,7 @@ Inode::Open(int openMode)
 {
 	MutexLocker locker(RequestLock());
 
-	if ((openMode & O_ACCMODE) == O_WRONLY)
+	if ((openMode & O_ACCMODE) == O_WRONLY || (openMode & O_ACCMODE) == O_RDWR)
 		fWriterCount++;
 
 	if ((openMode & O_ACCMODE) == O_RDONLY || (openMode & O_ACCMODE) == O_RDWR)
@@ -669,11 +669,12 @@ Inode::Close(file_cookie* cookie)
 			request->Notify(B_FILE_ERROR);
 	}
 
-	if ((openMode & O_ACCMODE) == O_WRONLY && --fWriterCount == 0)
-		NotifyEndClosed(true);
+	if ((openMode & O_ACCMODE) == O_WRONLY || (openMode & O_ACCMODE) == O_RDWR) {
+		if (--fWriterCount == 0)
+			NotifyEndClosed(true);
+	}
 
-	if ((openMode & O_ACCMODE) == O_RDONLY
-		|| (openMode & O_ACCMODE) == O_RDWR) {
+	if ((openMode & O_ACCMODE) == O_RDONLY || (openMode & O_ACCMODE) == O_RDWR) {
 		if (--fReaderCount == 0)
 			NotifyEndClosed(false);
 	}
@@ -697,7 +698,7 @@ Inode::Select(uint8 event, selectsync* sync, int openMode)
 {
 	bool writer = true;
 	select_sync_pool** pool;
-	if ((openMode & O_RWMASK) == O_RDONLY) {
+	if (event == B_SELECT_READ || (openMode & O_RWMASK) == O_RDONLY) {
 		pool = &fReadSelectSyncPool;
 		writer = false;
 	} else if ((openMode & O_RWMASK) == O_WRONLY) {
@@ -938,9 +939,6 @@ fifo_read(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 	MutexLocker locker(inode->RequestLock());
 
-	if ((cookie->open_mode & O_RWMASK) != O_RDONLY)
-		return B_NOT_ALLOWED;
-
 	if (inode->IsActive() && inode->WriterCount() == 0) {
 		// as long there is no writer, and the pipe is empty,
 		// we always just return 0 to indicate end of file
@@ -986,9 +984,6 @@ fifo_write(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 		_node, cookie, *_length);
 
 	MutexLocker locker(inode->RequestLock());
-
-	if ((cookie->open_mode & O_RWMASK) != O_WRONLY)
-		return B_NOT_ALLOWED;
 
 	size_t length = *_length;
 	if (length == 0)
