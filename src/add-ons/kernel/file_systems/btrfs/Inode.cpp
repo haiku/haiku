@@ -269,9 +269,10 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 	}
 
 	*_length = min_c(extent_data->Size() - diff, *_length);
-	if (compression == BTRFS_EXTENT_COMPRESS_NONE)
-		memcpy(buffer, extent_data->inline_data, *_length);
-	else if (compression == BTRFS_EXTENT_COMPRESS_ZLIB) {
+	if (compression == BTRFS_EXTENT_COMPRESS_NONE) {
+		if (user_memcpy(buffer, extent_data->inline_data, *_length) < B_OK)
+			return B_BAD_ADDRESS;
+	} else if (compression == BTRFS_EXTENT_COMPRESS_ZLIB) {
 		char in[2048];
 		z_stream zStream = {
 			(Bytef*)in,		// next in
