@@ -26,11 +26,11 @@ RemotePackageRepository HaikuPorts
 	freetype-2.6.3-1
 	freetype_devel-2.6.3-1
 	gawk-3.1.8-2
-	gcc_syslibs_devel-11.2.0_2021_07_28-4
-	gcc_syslibs-11.2.0_2021_07_28-4
+	gcc_syslibs_devel-11.2.0_2021_07_28-5
+	gcc_syslibs-11.2.0_2021_07_28-5
 	grep-2.14-1
-	icu-67.1-2
-	icu_devel-67.1-2
+	icu-57.2-1
+	icu_devel-57.2-1
 	less-451-1
 	libsolv-0.3.0_haiku_2014_12_22-1
 	libsolv_devel-0.3.0_haiku_2014_12_22-1
