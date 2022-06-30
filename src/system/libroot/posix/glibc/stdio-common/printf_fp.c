@@ -186,7 +186,7 @@ __printf_fp (FILE *fp,
   /* Digit which is result of last hack_digit() call.  */
   wchar_t digit;
 
-  /* The type of output format that will be used: 'e'/'E' or 'f'.  */
+  /* The type of output format that will be used: 'e'/'E' or 'f'/'F'.  */
   int type;
 
   /* Counter for number of written characters.	*/
@@ -206,7 +206,7 @@ __printf_fp (FILE *fp,
       mp_limb_t hi;
 
 hack_digit:
-      if (expsign != 0 && type == 'f' && exponent-- > 0)
+      if (expsign != 0 && _tolower (type) == 'f' && exponent-- > 0)
 	hi = 0;
       else if (scalesize == 0)
 	{
@@ -815,9 +815,9 @@ hack_digit_end:
 	dig_max = INT_MAX;		/* Unlimited.  */
 	significant = 1;		/* Does not matter here.  */
       }
-    else if (info->spec == 'f')
+    else if (_tolower (info->spec) == 'f')
       {
-	type = 'f';
+	type = info->spec;
 	fracdig_min = fracdig_max = info->prec < 0 ? 6 : info->prec;
 	if (expsign == 0)
 	  {
@@ -888,7 +888,7 @@ hack_digit_end:
     wcp = wstartp = wbuffer + 2;	/* Let room for rounding.  */
 
     /* Do the real work: put digits in allocated buffer.  */
-    if (expsign == 0 || type != 'f')
+    if (expsign == 0 || _tolower (type) != 'f')
       {
 	assert (expsign == 0 || intdig_max == 1);
 	while (intdig_no < intdig_max)
@@ -992,7 +992,7 @@ hack_digit_callee3:
 	    else
 	      /* It is more critical.  All digits were 9's.  */
 	      {
-		if (type != 'f')
+		if (_tolower (type) != 'f')
 		  {
 		    *wstartp = '1';
 		    exponent += expsign == 0 ? 1 : -1;
@@ -1057,7 +1057,7 @@ hack_digit_callee3:
 			  ngroups);
 
     /* Write the exponent if it is needed.  */
-    if (type != 'f')
+    if (_tolower (type) != 'f')
       {
 	*wcp++ = (wchar_t) type;
 	*wcp++ = expsign ? L'-' : L'+';
