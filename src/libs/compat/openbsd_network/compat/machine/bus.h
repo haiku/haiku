@@ -18,6 +18,7 @@ struct bus_dmamap_obsd {
 	bus_dmamap_t _dmamp;
 	int _error;
 
+	bus_size_t dm_mapsize;
 	int dm_nsegs;
 	bus_dma_segment_t dm_segs[];
 };
@@ -75,6 +76,7 @@ bus_dmamap_load_obsd(bus_dma_tag_t tag, bus_dmamap_t dmam, void *buf, bus_size_t
 		bus_dmamap_load_obsd_callback, dmam, flags | BUS_DMA_NOWAIT);
 	if (error != 0)
 		return error;
+	dmam->dm_mapsize = buflen;
 	return dmam->_error;
 }
 #define bus_dmamap_load bus_dmamap_load_obsd
@@ -83,6 +85,7 @@ bus_dmamap_load_obsd(bus_dma_tag_t tag, bus_dmamap_t dmam, void *buf, bus_size_t
 static int
 bus_dmamap_load_mbuf_obsd(bus_dma_tag_t tag, bus_dmamap_t dmam, struct mbuf *chain, int flags)
 {
+	dmam->dm_mapsize = chain->m_pkthdr.len;
 	return bus_dmamap_load_mbuf_sg(dmam->_dmat, dmam->_dmamp, chain,
 		dmam->dm_segs, &dmam->dm_nsegs, flags);
 }
@@ -93,16 +96,19 @@ static void
 bus_dmamap_unload_obsd(bus_dma_tag_t tag, bus_dmamap_t dmam)
 {
 	bus_dmamap_unload(dmam->_dmat, dmam->_dmamp);
+	dmam->dm_mapsize = 0;
+	dmam->dm_nsegs = 0;
 }
 #define bus_dmamap_unload bus_dmamap_unload_obsd
 
 
 static void
-bus_dmamap_sync_obsd(bus_dma_tag_t tag, bus_dmamap_t dmam, int ops)
+bus_dmamap_sync_obsd(bus_dma_tag_t tag, bus_dmamap_t dmam,
+	bus_addr_t offset, bus_size_t length, int ops)
 {
-	bus_dmamap_sync(dmam->_dmat, dmam->_dmamp, ops);
+	bus_dmamap_sync_etc(dmam->_dmat, dmam->_dmamp, offset, length, ops);
 }
-#define bus_dmamap_sync(tag, dmam, offset, size, ops) bus_dmamap_sync_obsd(tag, dmam, ops)
+#define bus_dmamap_sync bus_dmamap_sync_obsd
 
 
 #endif	/* _OBSD_COMPAT_MACHINE_BUS_H_ */
