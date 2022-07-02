@@ -490,6 +490,36 @@ bus_dmamap_sync(bus_dma_tag_t dmat, bus_dmamap_t map, bus_dmasync_op_t op)
 	if (map == NULL)
 		return;
 
+	bus_size_t length = 0;
+	switch (map->buffer_type) {
+		case bus_dmamap::BUFFER_NONE:
+		case bus_dmamap::BUFFER_PROHIBITED:
+			// Nothing to do.
+			return;
+
+		case bus_dmamap::BUFFER_TYPE_SIMPLE:
+			length = map->buffer_length;
+			break;
+
+		case bus_dmamap::BUFFER_TYPE_MBUF:
+			length = map->mbuf->m_pkthdr.len;
+			break;
+
+		default:
+			panic("unknown buffer type");
+	}
+
+	bus_dmamap_sync_etc(dmat, map, 0, length, op);
+}
+
+
+extern "C" void
+bus_dmamap_sync_etc(bus_dma_tag_t dmat, bus_dmamap_t map,
+	bus_addr_t offset, bus_size_t length, bus_dmasync_op_t op)
+{
+	if (map == NULL)
+		return;
+
 	if ((op & BUS_DMASYNC_PREWRITE) != 0) {
 		// "Pre-write": after CPU writes, before device reads.
 		switch (map->buffer_type) {
@@ -499,13 +529,14 @@ bus_dmamap_sync(bus_dma_tag_t dmat, bus_dmamap_t map, bus_dmasync_op_t op)
 				break;
 
 			case bus_dmamap::BUFFER_TYPE_SIMPLE:
-				memcpy(map->bounce_buffer,
-					map->buffer, map->buffer_length);
+				KASSERT((offset + length) <= map->buffer_length, ("mis-sized sync"));
+				memcpy((caddr_t)map->bounce_buffer + offset,
+					(caddr_t)map->buffer + offset, length);
 				break;
 
 			case bus_dmamap::BUFFER_TYPE_MBUF:
-				m_copydata(map->mbuf, 0, map->mbuf->m_pkthdr.len,
-					(caddr_t)map->bounce_buffer);
+				m_copydata(map->mbuf, offset, length,
+					(caddr_t)map->bounce_buffer + offset);
 				break;
 
 			default:
@@ -526,13 +557,14 @@ bus_dmamap_sync(bus_dma_tag_t dmat, bus_dmamap_t map, bus_dmasync_op_t op)
 				break;
 
 			case bus_dmamap::BUFFER_TYPE_SIMPLE:
-				memcpy(map->buffer,
-					map->bounce_buffer, map->buffer_length);
+				KASSERT((offset + length) <= map->buffer_length, ("mis-sized sync"));
+				memcpy((caddr_t)map->buffer + offset,
+					(caddr_t)map->bounce_buffer + offset, length);
 				break;
 
 			case bus_dmamap::BUFFER_TYPE_MBUF:
-				m_copyback(map->mbuf, 0, map->mbuf->m_pkthdr.len,
-					(caddr_t)map->bounce_buffer);
+				m_copyback(map->mbuf, offset, length,
+					(caddr_t)map->bounce_buffer + offset);
 				break;
 
 			default:

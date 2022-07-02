@@ -245,6 +245,8 @@ int bus_dmamap_load_uio(bus_dma_tag_t dmat, bus_dmamap_t map,
  * is NULL we have a fully IO-coherent system.
  */
 void bus_dmamap_sync(bus_dma_tag_t dmat, bus_dmamap_t dmamap, bus_dmasync_op_t op);
+void bus_dmamap_sync_etc(bus_dma_tag_t dmat, bus_dmamap_t dmamap,
+	bus_addr_t offset, bus_size_t length, bus_dmasync_op_t op); /* Haiku extension */
 
 /*
  * Release the mapping held by map.
