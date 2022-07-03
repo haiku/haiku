@@ -43,11 +43,11 @@
 #include "soc_omap3.h"
 #include "soc_sun4i.h"
 
-#define TRACE_ARCH_INT
+//#define TRACE_ARCH_INT
 #ifdef TRACE_ARCH_INT
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 #define VECTORPAGE_SIZE		64
@@ -71,7 +71,7 @@ struct iframe_stack gBootFrameStack;
 void
 arch_int_enable_io_interrupt(int irq)
 {
-	TRACE(("arch_int_enable_io_interrupt(%d)\n", irq));
+	TRACE("arch_int_enable_io_interrupt(%d)\n", irq);
 	InterruptController *ic = InterruptController::Get();
 	if (ic != NULL)
 		ic->EnableInterrupt(irq);
@@ -81,7 +81,7 @@ arch_int_enable_io_interrupt(int irq)
 void
 arch_int_disable_io_interrupt(int irq)
 {
-	TRACE(("arch_int_disable_io_interrupt(%d)\n", irq));
+	TRACE("arch_int_disable_io_interrupt(%d)\n", irq);
 	InterruptController *ic = InterruptController::Get();
 	if (ic != NULL)
 		ic->DisableInterrupt(irq);
@@ -251,13 +251,13 @@ arch_arm_syscall(struct iframe *iframe)
 #endif
 
 	uint32_t syscall = *(uint32_t *)(iframe->pc-4) & 0x00ffffff;
-	TRACE(("syscall number: %d\n", syscall));
+	TRACE("syscall number: %d\n", syscall);
 
 	uint32_t args[20];
 	if (syscall < kSyscallCount) {
-		TRACE(("syscall(%s,%d)\n",
+		TRACE("syscall(%s,%d)\n",
 			kExtendedSyscallInfos[syscall].name,
-			kExtendedSyscallInfos[syscall].parameter_count));
+			kExtendedSyscallInfos[syscall].parameter_count);
 
 		int argSize = kSyscallInfos[syscall].parameter_size;
 		memcpy(args, &iframe->r0, std::min<int>(argSize, 4 * sizeof(uint32)));
@@ -277,7 +277,7 @@ arch_arm_syscall(struct iframe *iframe)
 	uint64 returnValue = 0;
 	syscall_dispatcher(syscall, (void*)args, &returnValue);
 
-	TRACE(("returning %" B_PRId64 "\n", returnValue));
+	TRACE("returning %" B_PRId64 "\n", returnValue);
 	iframe->r0 = returnValue;
 }
 
