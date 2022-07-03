@@ -1196,7 +1196,7 @@ add_boot_volume_item(Menu* menu, Directory* volume, const char* name)
 	Menu* subMenu = NULL;
 
 	if (volumeInfo != NULL && volumeInfo->LoadOldStates() == B_OK) {
-		subMenu = new(std::nothrow) Menu(CHOICE_MENU, "Select Haiku version");
+		subMenu = new(std::nothrow) Menu(CHOICE_MENU, "Select package activation state");
 
 		for (PackageVolumeStateList::ConstIterator it
 				= volumeInfo->States().GetIterator();
@@ -1238,7 +1238,7 @@ add_boot_volume_item(Menu* menu, Directory* volume, const char* name)
 static Menu*
 add_boot_volume_menu()
 {
-	Menu* menu = new(std::nothrow) Menu(CHOICE_MENU, "Select Boot Volume");
+	Menu* menu = new(std::nothrow) Menu(CHOICE_MENU, "Select Boot Volume/State");
 	MenuItem* item;
 	void* cookie;
 	int32 count = 0;
@@ -1606,7 +1606,7 @@ user_menu(BootVolume& _bootVolume, PathBlocklist& _pathBlocklist)
 	TRACE(("user_menu: enter\n"));
 
 	// Add boot volume
-	menu->AddItem(item = new(std::nothrow) MenuItem("Select boot volume",
+	menu->AddItem(item = new(std::nothrow) MenuItem("Select boot volume/state",
 		add_boot_volume_menu()));
 
 	// Add safe mode
