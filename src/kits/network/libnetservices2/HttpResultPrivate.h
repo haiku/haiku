@@ -59,7 +59,7 @@ struct HttpResultPrivate {
 			void						SetStatus(BHttpStatus&& s);
 			void						SetFields(BHttpFields&& f);
 			void						SetBody();
-			ssize_t						WriteToBody(const void* buffer, ssize_t size);
+			size_t						WriteToBody(const void* buffer, size_t size);
 };
 
 
@@ -131,8 +131,8 @@ HttpResultPrivate::SetBody()
 }
 
 
-inline ssize_t
-HttpResultPrivate::WriteToBody(const void* buffer, ssize_t size)
+inline size_t
+HttpResultPrivate::WriteToBody(const void* buffer, size_t size)
 {
 	// TODO: when the support for a shared BMemoryRingIO is here, choose
 	// between one or the other depending on which one is available.
@@ -140,7 +140,10 @@ HttpResultPrivate::WriteToBody(const void* buffer, ssize_t size)
 		bodyText.Append(static_cast<const char*>(buffer), size);
 		return size;
 	}
-	return ownedBody->Write(buffer, size);
+	auto result = ownedBody->Write(buffer, size);
+	if (result < 0)
+		throw BSystemError("BDataIO::Write()", result);
+	return result;
 }
 
 

@@ -8,16 +8,35 @@
 
 #include <HttpStream.h>
 
+#include <algorithm>
 #include <optional>
 
 #include <DataIO.h>
 #include <HttpRequest.h>
+#include <NetServicesDefs.h>
 
 using namespace BPrivate::Network;
 
 
-// Buffer size constant
-constexpr std::size_t kBufferSize = 64 * 1024;
+/*!
+	\brief Size of the internal buffer for reads/writes
+
+	Curl 7.82.0 sets the default to 512 kB (524288 bytes)
+		https://github.com/curl/curl/blob/64db5c575d9c5536bd273a890f50777ad1ca7c13/include/curl/curl.h#L232
+	Libsoup sets it to 8 kB, though the buffer may grow beyond that if there are leftover bytes.
+	The absolute maximum seems to be 64 kB (HEADER_SIZE_LIMIT)
+		https://gitlab.gnome.org/GNOME/libsoup/-/blob/master/libsoup/http1/soup-client-message-io-http1.c#L58
+	The previous iteration set it to 4 kB, though the input buffer would dynamically grow.
+*/
+static constexpr ssize_t kMaxBufferSize = 8192;
+
+
+/*!
+	\brief Newline sequence
+
+	As per the RFC, defined as \r\n
+*/
+static constexpr std::array<std::byte, 2> kNewLine = {std::byte('\r'), std::byte('\n')};
 
 
 // #pragma mark -- ByteIOHelper base class
@@ -53,7 +72,7 @@ ByteIOHelper::Read(void* buffer, size_t size)
 ssize_t
 ByteIOHelper::Write(const void* buffer, size_t size)
 {
-	auto remainingSize = kBufferSize - fBuffer.size();
+	auto remainingSize = kMaxBufferSize - fBuffer.size();
 	if (remainingSize < 0)
 		return 0;
 
@@ -81,7 +100,7 @@ ssize_t
 BAbstractDataStream::BufferData(BDataIO* source, size_t maxSize)
 {
 	auto currentSize = fBuffer.size();
-	auto remainingSize = kBufferSize - currentSize;
+	auto remainingSize = kMaxBufferSize - currentSize;
 	if (remainingSize < 0)
 		return B_OK;
 
@@ -138,7 +157,7 @@ BHttpRequestStream::Transfer(BDataIO* target)
 		return TransferInfo{0, fTotalBodySize, fTotalBodySize, true};
 	}
 
-	if (fBody != nullptr && fBuffer.size() < kBufferSize) {
+	if (fBody != nullptr && fBuffer.size() < kMaxBufferSize) {
 		// buffer additional data from the body in the buffer
 		auto remainingBodySize = fTotalBodySize - fBufferedBodySize;
 		auto bufferedSize = BufferData(fBody, remainingBodySize);
@@ -193,4 +212,156 @@ BHttpRequestStream::Transfer(BDataIO* target)
 
 	auto complete = fRemainingHeaderSize == 0 && fTransferredBodySize == fTotalBodySize;
 	return TransferInfo{bytesWritten, fTransferredBodySize, fTotalBodySize, complete};
+}
+
+
+/*!
+	\brief Create a new HTTP buffer with \a capacity.
+*/
+HttpBuffer::HttpBuffer(size_t capacity)
+{
+	fBuffer.reserve(capacity);
+};
+
+
+/*!
+	\brief Load data from \a source into the spare capacity of this buffer.
+
+	\exception BNetworkRequestError When BDataIO::Read() returns any error other than B_WOULD_BLOCK
+
+	\retval B_WOULD_BLOCK The read call on the \a source was unsuccessful because it would block.
+	\retval >=0 The actual number of bytes read.
+*/
+ssize_t
+HttpBuffer::ReadFrom(BDataIO* source)
+{
+	// Remove any unused bytes at the beginning of the buffer
+	Flush();
+
+	auto currentSize = fBuffer.size();
+	auto remainingBufferSize = fBuffer.capacity() - currentSize;
+
+	// Adjust the buffer to the maximum size
+	fBuffer.resize(fBuffer.capacity());
+
+	ssize_t bytesRead = B_INTERRUPTED;
+	while (bytesRead == B_INTERRUPTED)
+		bytesRead = source->Read(fBuffer.data() + currentSize, remainingBufferSize);
+
+	if (bytesRead == B_WOULD_BLOCK || bytesRead == 0) {
+		fBuffer.resize(currentSize);
+		return bytesRead;
+	} else if (bytesRead < 0) {
+		throw BNetworkRequestError("BDataIO::Read()", BNetworkRequestError::NetworkError,
+			bytesRead);
+	}
+
+	// Adjust the buffer to the current size
+	fBuffer.resize(currentSize + bytesRead);
+
+	return bytesRead;
+}
+
+
+/*!
+	\brief Use BDataIO::WriteExactly() on target to write the contents of the buffer.
+*/
+void
+HttpBuffer::WriteExactlyTo(BDataIO* target)
+{
+	if (RemainingBytes() == 0)
+		return;
+
+	auto status = target->WriteExactly(fBuffer.data() + fCurrentOffset, RemainingBytes());
+	if (status != B_OK) {
+		throw BNetworkRequestError("BDataIO::WriteExactly()", BNetworkRequestError::SystemError,
+			status);
+	}
+
+	// Entire buffer is written; reset internal buffer
+	Clear();
+}
+
+
+/*!
+	\brief Write the contents of the buffer through the helper \a func.
+
+	\param func Handle the actual writing. The function accepts a pointer and a size as inputs
+		and should return the number of actual written bytes, which may be fewer than the number
+		of available bytes.
+*/
+void
+HttpBuffer::WriteTo(WriteFunction func)
+{
+	if (RemainingBytes() == 0)
+		return;
+
+	auto bytesWritten = func(fBuffer.data() + fCurrentOffset, RemainingBytes());
+	if (bytesWritten > RemainingBytes())
+		throw BRuntimeError(__PRETTY_FUNCTION__, "More bytes written than were remaining");
+
+	fCurrentOffset += bytesWritten;
+}
+
+
+/*!
+	\brief Get the next line from this buffer.
+
+	This can be called iteratively until all lines in the current data are read. After using this
+	method, you should use Flush() to make sure that the read lines are cleared from the beginning
+	of the buffer.
+
+	\retval std::nullopt There are no more lines in the buffer.
+	\retval BString The next line.
+*/
+std::optional<BString>
+HttpBuffer::GetNextLine()
+{
+	auto offset = fBuffer.cbegin() + fCurrentOffset;
+	auto result = std::search(offset, fBuffer.cend(), kNewLine.cbegin(), kNewLine.cend());
+	if (result == fBuffer.cend())
+		return std::nullopt;
+
+	BString line(reinterpret_cast<const char*>(std::addressof(*offset)), std::distance(offset, result));
+	fCurrentOffset = std::distance(fBuffer.cbegin(), result) + 2;
+	return line;
+}
+
+
+/*!
+	\brief Get the number of remaining bytes in this buffer.
+*/
+size_t
+HttpBuffer::RemainingBytes() noexcept
+{
+	return fBuffer.size() - fCurrentOffset;
+}
+
+
+/*!
+	\brief Move data to the beginning of the buffer to clear at the back.
+
+	The GetNextLine() increases the offset of the internal buffer. This call moves remaining data
+	to the beginning of the buffer sets the correct size, making the remainder of the capacity
+	available for further reading.
+*/
+void
+HttpBuffer::Flush() noexcept
+{
+	if (fCurrentOffset > 0) {
+		auto end = fBuffer.cbegin() + fCurrentOffset;
+		fBuffer.erase(fBuffer.cbegin(), end);
+		fCurrentOffset = 0;
+	}
+}
+
+
+/*!
+	\brief Clear the internal buffer
+*/
+void
+HttpBuffer::Clear() noexcept
+{
+	fBuffer.clear();
+	fCurrentOffset = 0;
 }

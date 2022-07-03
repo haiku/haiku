@@ -103,7 +103,6 @@ public:
 	bool							CanCancel() const noexcept { return fResult->CanCancel(); }
  
 private:
-	std::optional<BString>			_GetLine(std::vector<std::byte>::const_iterator& offset);
 	BHttpStatus						_ParseStatus(BString&& statusLine);
 
 private:
@@ -125,7 +124,7 @@ private:
 									fDataStream;
 
 	// Receive buffers
-	std::vector<std::byte>			fInputBuffer;
+	HttpBuffer						fBuffer;
 
 	// Receive state
 	off_t							fBodyBytesTotal = 0;
@@ -761,36 +760,22 @@ BHttpSession::Request::TransferRequest()
 bool
 BHttpSession::Request::ReceiveResult()
 {
-	ssize_t bytesRead = 0;
 	bool receiveEnd = false;
 
 	// First: stream data from the socket
-	auto newDataOffset = fInputBuffer.size();
-	std::cout << "ReceiveResult() [" << Id() << "] before receive fInputBuffer.size() " << fInputBuffer.size() << std::endl;
-
-	fInputBuffer.resize(newDataOffset + kMaxReadSize);
-	bytesRead = fSocket->Read(fInputBuffer.data() + newDataOffset, kMaxReadSize);
+	auto bytesRead = fBuffer.ReadFrom(fSocket.get());
 
 	if (bytesRead == B_WOULD_BLOCK || bytesRead == B_INTERRUPTED) {
-		fInputBuffer.resize(newDataOffset); // revert to previous size of the data in the buffer
 		return false;
-	}
-
-	if (bytesRead < 0) {
-		std::cout << "ReceiveResult() [" << Id() << "] BSocket::Read error " << bytesRead << std::endl;
-		throw BNetworkRequestError("BSocket::Read()", BNetworkRequestError::NetworkError,
-			bytesRead);
 	} else if (bytesRead == 0) {
 		// This may occur when the connection is closed (and the transfer is finished).
 		// Later on, there is a check to determine whether the request is finished as expected.
 		receiveEnd = true;
-		fInputBuffer.resize(newDataOffset); // revert to previous size of the data in buffer
 	}
-	fInputBuffer.resize(newDataOffset + bytesRead);
-	std::cout << "ReceiveResult() [" << Id() << "] after fInputBuffer.size() " << fInputBuffer.size() << std::endl;
+
+	std::cout << "ReceiveResult() [" << Id() << "] read " << bytesRead << " from socket" << std::endl;
 
 	// Parse the content in the buffer
-	auto bufferStart = fInputBuffer.cbegin();
 	switch (fRequestStatus) {
 	case InitialState:
 	[[fallthrough]];
@@ -799,7 +784,7 @@ BHttpSession::Request::ReceiveResult()
 			"Read function called for object that is not yet connected or sent");
 	case RequestSent:
 	{
-		auto statusLine = _GetLine(bufferStart);
+		auto statusLine = fBuffer.GetNextLine();
 		BHttpStatus status;
 
 		if (statusLine) {
@@ -862,12 +847,12 @@ BHttpSession::Request::ReceiveResult()
 	}
 	case StatusReceived:
 	{
-		auto fieldLine = _GetLine(bufferStart);
+		auto fieldLine = fBuffer.GetNextLine();
 		while (fieldLine && !fieldLine.value().IsEmpty()){
 			std::cout << "ReceiveResult() [" << Id() << "] StatusReceived; adding header " << fieldLine.value() << std::endl;
 			// Parse next header line
 			fFields.AddField(fieldLine.value());
-			fieldLine = _GetLine(bufferStart);
+			fieldLine = fBuffer.GetNextLine();
 		}
 
 		if (fieldLine && fieldLine.value().IsEmpty()){
@@ -974,7 +959,7 @@ BHttpSession::Request::ReceiveResult()
 	{
 		// TODO: handle chunked transfer
 
-		bytesRead = std::distance(bufferStart, fInputBuffer.cend());
+		bytesRead = fBuffer.RemainingBytes();
 		fBodyBytesReceived += bytesRead;
 		std::cout << "ReceiveResult() [" << Id() << "] body bytes current read/total received/total expected: " << 
 			bytesRead << "/" << fBodyBytesReceived << "/" << fBodyBytesTotal  << std::endl;
@@ -997,16 +982,11 @@ BHttpSession::Request::ReceiveResult()
 		// Process the incoming data and write to body
 		if (bytesRead > 0) {
 			if (fDecompressingStream) {
-				auto status = fDecompressingStream->WriteExactly(std::addressof(*bufferStart),
-					bytesRead);
-				if (status != B_OK) {
-					throw BNetworkRequestError("BZlibDecompressionStream::WriteExactly()",
-						BNetworkRequestError::SystemError, status);
-				}
+				fBuffer.WriteExactlyTo(fDecompressingStream.get());
 
 				if (receiveEnd) {
 					// No more bytes expected so flush out the final bytes
-					if (auto s = fDecompressingStream->Flush(); s != B_OK)
+					if (auto status = fDecompressingStream->Flush(); status != B_OK)
 						throw BNetworkRequestError("BZlibDecompressionStream::Flush()",
 							BNetworkRequestError::SystemError, status);
 				}
@@ -1016,10 +996,10 @@ BHttpSession::Request::ReceiveResult()
 					fResult->WriteToBody(fDecompressorStorage->Buffer(), bodySize);
 					fDecompressorStorage->Seek(0, SEEK_SET);
 				}
-				bufferStart = fInputBuffer.cend();
 			} else {
-				fResult->WriteToBody(std::addressof(*bufferStart), bytesRead);
-				bufferStart = fInputBuffer.cend();
+				fBuffer.WriteTo([this](const std::byte* buffer, size_t size) {
+					return fResult->WriteToBody(buffer, size);
+				});
 			}
 		}
 
@@ -1050,17 +1030,6 @@ BHttpSession::Request::ReceiveResult()
 		throw BRuntimeError(__PRETTY_FUNCTION__, "To do");
 	}
 
-	// Check if there are any remaining bytes in the inputbuffer
-	if (bufferStart != fInputBuffer.cend()) {
-		// move those bytes to the beginning and resize
-		auto bytesleft = std::distance(bufferStart, fInputBuffer.cend());
-		std::cout << "ReceiveResult() [" << Id() << "] fInputBuffer bytes left at end: " << bytesleft << std::endl;
-		std::copy(bufferStart, fInputBuffer.cend(), fInputBuffer.begin());
-		fInputBuffer.resize(bytesleft);
-	} else {
-		fInputBuffer.resize(0);
-	}
-
 	// There is more to receive
 	return false;
 }
@@ -1076,25 +1045,6 @@ BHttpSession::Request::Disconnect() noexcept
 	fSocket->Disconnect();
 
 	// TODO: inform listeners that the request has ended
-}
-
-
-/*!
-	\brief Get a line from the input buffer
-
-	If succesful, the offset will be updated to the next byte after the line
-*/
-std::optional<BString>
-BHttpSession::Request::_GetLine(std::vector<std::byte>::const_iterator& offset)
-{
-	auto result = std::search(offset, fInputBuffer.cend(), kNewLine.cbegin(), kNewLine.cend());
-	if (result == fInputBuffer.cend())
-		return std::nullopt;
-
-	BString line(reinterpret_cast<const char*>(std::addressof(*offset)), std::distance(offset, result));
-	offset = result + 2;
-	std::cout << "_GetLine() [" << Id() << "] " << line << std::endl;
-	return line;
 }
 
 

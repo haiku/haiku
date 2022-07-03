@@ -6,7 +6,9 @@
 #ifndef _HTTP_STREAM_H_
 #define _HTTP_STREAM_H_
 
+#include <functional>
 #include <memory>
+#include <optional>
 #include <vector>
 
 class BDataIO;
@@ -47,11 +49,34 @@ public:
 	virtual	TransferInfo	Transfer(BDataIO* target) override;
 
 private:
-	off_t							fRemainingHeaderSize = 0;
-	BDataIO*						fBody = nullptr;
-	off_t							fTotalBodySize = 0;
-	off_t							fBufferedBodySize = 0;
-	off_t							fTransferredBodySize = 0;
+	off_t					fRemainingHeaderSize = 0;
+	BDataIO*				fBody = nullptr;
+	off_t					fTotalBodySize = 0;
+	off_t					fBufferedBodySize = 0;
+	off_t					fTransferredBodySize = 0;
+};
+
+
+class HttpBuffer {
+public:
+	using WriteFunction = std::function<size_t (const std::byte*, size_t)>;
+
+public:
+							HttpBuffer(size_t capacity = 8*1024);
+
+	ssize_t					ReadFrom(BDataIO* source);
+	void					WriteExactlyTo(BDataIO* target);
+	void					WriteTo(WriteFunction func);
+	std::optional<BString>	GetNextLine();
+
+	size_t					RemainingBytes() noexcept;
+
+	void					Flush() noexcept;
+	void					Clear() noexcept;
+
+private:
+	std::vector<std::byte>	fBuffer;
+	size_t					fCurrentOffset = 0;
 };
 
 
