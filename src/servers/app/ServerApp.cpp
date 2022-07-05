@@ -1951,18 +1951,34 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 		case AS_GET_FONT_BOUNDING_BOX:
 		{
-			FTRACE(("ServerApp %s: AS_GET_BOUNDING_BOX unimplemented\n",
+			FTRACE(("ServerApp %s: AS_GET_BOUNDING_BOX\n",
 				Signature()));
 
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
+			// 3) float - font size
 
 			// Returns:
 			// 1) BRect - box holding entire font
 
-			// ToDo: implement me!
-			fLink.StartMessage(B_ERROR);
+			uint16 familyID, styleID;
+			float size;
+
+			link.Read<uint16>(&familyID);
+			link.Read<uint16>(&styleID);
+			link.Read<float>(&size);
+
+			ServerFont font;
+
+			if (font.SetFamilyAndStyle(familyID, styleID) == B_OK && size > 0) {
+				font.SetSize(size);
+
+				fLink.StartMessage(B_OK);
+				fLink.Attach<BRect>(font.BoundingBox());
+			} else
+				fLink.StartMessage(B_BAD_VALUE);
+
 			fLink.Flush();
 			break;
 		}

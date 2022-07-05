@@ -826,6 +826,7 @@ BFont::BoundingBox() const
 	link.StartMessage(AS_GET_FONT_BOUNDING_BOX);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
+	link.Attach<float>(fSize);
 
 	int32 code;
 	if (link.FlushWithReply(code) != B_OK
