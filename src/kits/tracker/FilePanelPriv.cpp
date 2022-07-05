@@ -179,7 +179,8 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target,
 	fSelectionIterator(0),
 	fMessage(NULL),
 	fHideWhenDone(hideWhenDone),
-	fIsTrackingMenu(false)
+	fIsTrackingMenu(false),
+	fDefaultStateRestored(false)
 {
 	InitIconPreloader();
 
@@ -902,9 +903,11 @@ TFilePanel::RestoreState()
 		AttributeStreamFileNode streamNodeSource(&defaultingNode);
 		RestoreWindowState(&streamNodeSource);
 		PoseView()->Init(&streamNodeSource);
+		fDefaultStateRestored = true;
 	} else {
 		RestoreWindowState(NULL);
 		PoseView()->Init(NULL);
+		fDefaultStateRestored = false;
 	}
 
 	// Finish UI creation now that the PoseView is initialized

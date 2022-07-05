@@ -105,13 +105,17 @@ BFilePanel::Show()
 		fWindow->SetWorkspaces(workspace);
 	}
 
-	// Position the file panel like an alert
+	// Position like an alert, unless the parent is NULL and a position was
+	// already restored from saved settings.
 	BWindow* parent = dynamic_cast<BWindow*>(
 		BLooper::LooperForThread(find_thread(NULL)));
-	const BRect frame = parent != NULL ? parent->Frame()
-		: BScreen(fWindow).Frame();
+	if (parent != NULL)
+		fWindow->MoveTo(fWindow->AlertPosition(parent->Frame()));
+	else {
+		if (!static_cast<TFilePanel*>(fWindow)->DefaultStateRestored())
+			fWindow->MoveTo(fWindow->AlertPosition(BScreen(fWindow).Frame()));
+	}
 
-	fWindow->MoveTo(fWindow->AlertPosition(frame));
 	if (!IsShowing())
 		fWindow->Show();
 
