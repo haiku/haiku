@@ -40,13 +40,6 @@ extern fs_volume_ops gxfsVolumeOps;
 #define	XFS_SB_VERSION_NUMBITS	0x000f
 #define	XFS_SB_VERSION_ALLFBITS	0xfff0
 
-/*
-	Inode minimum and maximum sizes.
-*/
-#define	XFS_DINODE_MIN_LOG	8
-#define	XFS_DINODE_MAX_LOG	11
-#define	XFS_DINODE_MIN_SIZE	(1 << XFS_DINODE_MIN_LOG)
-#define	XFS_DINODE_MAX_SIZE	(1 << XFS_DINODE_MAX_LOG)
 
 /* B+Tree related macros
 */
@@ -74,6 +67,7 @@ public:
 			bool 				IsValidFeatureMask() const;
 			bool				IsVersion5() const;
 			bool				XfsHasIncompatFeature() const;
+			bool				UuidEquals(const uuid_t *u1);
 			const char*			Name() const;
 			uint32				BlockSize() const;
 			uint8				BlockLog() const;

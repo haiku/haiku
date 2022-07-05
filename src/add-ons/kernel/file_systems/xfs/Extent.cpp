@@ -1,10 +1,13 @@
 /*
+ * Copyright 2022, Raghav Sharma, raghavself28@gmail.com
  * Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 
 #include "Extent.h"
+
+#include "Checksum.h"
 
 
 Extent::Extent(Inode* inode)
@@ -62,6 +65,48 @@ Extent::FillBlockBuffer()
 }
 
 
+bool
+Extent::VerifyHeader(ExtentDataHeader* header)
+{
+	TRACE("VerifyDataHeader\n");
+
+	if (header->Magic() != DIR2_BLOCK_HEADER_MAGIC
+		&& header->Magic() != DIR3_BLOCK_HEADER_MAGIC) {
+			ERROR("Bad magic number");
+			return false;
+		}
+
+	if (fInode->Version() == 1 || fInode->Version() == 2)
+		return true;
+
+	if (!xfs_verify_cksum(fBlockBuffer, fInode->DirBlockSize(),
+			XFS_EXTENT_CRC_OFF - XFS_EXTENT_V5_VPTR_OFF)) {
+			ERROR("Directory block is corrupted");
+			return false;
+	}
+
+	uint64 actualBlockToRead =
+		fInode->FileSystemBlockToAddr(fMap->br_startblock) / XFS_MIN_BLOCKSIZE;
+
+	if (actualBlockToRead != header->Blockno()) {
+		ERROR("Wrong Block number");
+		return false;
+	}
+
+	if (!fInode->GetVolume()->UuidEquals(header->Uuid())) {
+		ERROR("UUID is incorrect");
+		return false;
+	}
+
+	if (fInode->ID() != header->Owner()) {
+		ERROR("Wrong data owner");
+		return false;
+	}
+
+	return true;
+}
+
+
 status_t
 Extent::Init()
 {
@@ -77,8 +122,11 @@ Extent::Init()
 		//If we use this implementation for leaf directories, this is not
 		//always true
 	status_t status = FillBlockBuffer();
-	ExtentDataHeader* header = (ExtentDataHeader*)fBlockBuffer;
-	if (B_BENDIAN_TO_HOST_INT32(header->magic) == DIR2_BLOCK_HEADER_MAGIC) {
+
+	ExtentDataHeader* header = CreateDataHeader(fInode, fBlockBuffer);
+	if (header == NULL)
+		return B_NO_MEMORY;
+	if (VerifyHeader(header)) {
 		status = B_OK;
 		TRACE("Extent:Init(): Block read successfully\n");
 	} else {
@@ -86,6 +134,7 @@ Extent::Init()
 		TRACE("Extent:Init(): Bad Block!\n");
 	}
 
+	delete header;
 	return status;
 }
 
@@ -122,16 +171,18 @@ Extent::IsBlockType()
 		status = false;
 	if (fInode->Size() != fInode->DirBlockSize())
 		status = false;
+	void* pointerToMap = DIR_DFORK_PTR(fInode->Buffer(), fInode->CoreInodeSize());
+	xfs_fileoff_t startoff = (*((uint64*)pointerToMap) & MASK(63)) >> 9;
+	if (startoff != 0)
+		status = false;
 	return status;
-	//TODO: Checks: Fileoffset must be 0 and
-	//length = directory block size / filesystem block size
 }
 
 
 int
 Extent::EntrySize(int len) const
 {
-	int entrySize= sizeof(xfs_ino_t) + sizeof(uint8) + len + sizeof(uint16);
+	int entrySize = sizeof(xfs_ino_t) + sizeof(uint8) + len + sizeof(uint16);
 			// uint16 is for the tag
 	if (fInode->HasFileTypeField())
 		entrySize += sizeof(uint8);
@@ -145,8 +196,10 @@ status_t
 Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 {
 	TRACE("Extend::GetNext\n");
-	void* entry = (void*)((ExtentDataHeader*)fBlockBuffer + 1);
-		// This could be an unused entry so we should check
+
+	void* entry; // This could be unused entry so we should check
+
+	entry = (void*)(fBlockBuffer + SizeOfDataHeader(fInode));
 
 	int numberOfEntries = B_BENDIAN_TO_HOST_INT32(BlockTail()->count);
 	int numberOfStaleEntries = B_BENDIAN_TO_HOST_INT32(BlockTail()->stale);
@@ -157,7 +210,6 @@ Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 	uint16 currentOffset = (char*)entry - fBlockBuffer;
 
 	for (int i = 0; i < numberOfEntries; i++) {
-		TRACE("EntryNumber:(%" B_PRId32 ")\n", i);
 		ExtentUnusedEntry* unusedEntry = (ExtentUnusedEntry*)entry;
 
 		if (B_BENDIAN_TO_HOST_INT16(unusedEntry->freetag) == DIR2_FREE_TAG) {
@@ -169,9 +221,6 @@ Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 			continue;
 		}
 		ExtentDataEntry* dataEntry = (ExtentDataEntry*) entry;
-
-		TRACE("GetNext: fOffset:(%" B_PRIu32 "), currentOffset:(%" B_PRIu16 ")\n",
-			fOffset, currentOffset);
 
 		if (fOffset >= currentOffset) {
 			entry = (void*)((char*)entry + EntrySize(dataEntry->namelen));
@@ -255,3 +304,179 @@ Extent::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 	return B_ENTRY_NOT_FOUND;
 }
 
+
+ExtentDataHeader::~ExtentDataHeader()
+{
+}
+
+
+void
+ExtentDataHeaderV4::SwapEndian()
+{
+	magic	=	B_BENDIAN_TO_HOST_INT32(magic);
+}
+
+
+ExtentDataHeaderV4::ExtentDataHeaderV4(const char* buffer)
+{
+	uint32 offset = 0;
+
+	magic = *(uint32*)(buffer + offset);
+	offset += sizeof(uint32);
+
+	memcpy(bestfree, buffer + offset, XFS_DIR2_DATA_FD_COUNT * sizeof(FreeRegion));
+
+	SwapEndian();
+}
+
+
+ExtentDataHeaderV4::~ExtentDataHeaderV4()
+{
+}
+
+
+uint32
+ExtentDataHeaderV4::Magic()
+{
+	return magic;
+}
+
+
+uint64
+ExtentDataHeaderV4::Blockno()
+{
+	return B_BAD_VALUE;
+}
+
+
+uint64
+ExtentDataHeaderV4::Lsn()
+{
+	return B_BAD_VALUE;
+}
+
+
+uint64
+ExtentDataHeaderV4::Owner()
+{
+	return B_BAD_VALUE;
+}
+
+
+uuid_t*
+ExtentDataHeaderV4::Uuid()
+{
+	return NULL;
+}
+
+
+void
+ExtentDataHeaderV5::SwapEndian()
+{
+	magic	=	B_BENDIAN_TO_HOST_INT32(magic);
+	blkno	=	B_BENDIAN_TO_HOST_INT64(blkno);
+	lsn		=	B_BENDIAN_TO_HOST_INT64(lsn);
+	owner	=	B_BENDIAN_TO_HOST_INT64(owner);
+	pad		=	B_BENDIAN_TO_HOST_INT32(pad);
+}
+
+
+ExtentDataHeaderV5::ExtentDataHeaderV5(const char* buffer)
+{
+	uint32 offset = 0;
+
+	magic = *(uint32*)(buffer + offset);
+	offset += sizeof(uint32);
+
+	crc = *(uint32*)(buffer + offset);
+	offset += sizeof(uint32);
+
+	blkno = *(uint64*)(buffer + offset);
+	offset += sizeof(uint64);
+
+	lsn = *(uint64*)(buffer + offset);
+	offset += sizeof(uint64);
+
+	memcpy(&uuid, buffer + offset, sizeof(uuid_t));
+	offset += sizeof(uuid_t);
+
+	owner = *(uint64*)(buffer + offset);
+	offset += sizeof(uint64);
+
+	memcpy(bestfree, buffer + offset, XFS_DIR2_DATA_FD_COUNT * sizeof(FreeRegion));
+	offset += XFS_DIR2_DATA_FD_COUNT * sizeof(FreeRegion);
+
+	pad = *(uint32*)(buffer + offset);
+
+	SwapEndian();
+}
+
+
+ExtentDataHeaderV5::~ExtentDataHeaderV5()
+{
+}
+
+
+uint32
+ExtentDataHeaderV5::Magic()
+{
+	return magic;
+}
+
+
+uint64
+ExtentDataHeaderV5::Blockno()
+{
+	return blkno;
+}
+
+
+uint64
+ExtentDataHeaderV5::Lsn()
+{
+	return lsn;
+}
+
+
+uint64
+ExtentDataHeaderV5::Owner()
+{
+	return owner;
+}
+
+
+uuid_t*
+ExtentDataHeaderV5::Uuid()
+{
+	return &uuid;
+}
+
+
+//Function to get V4 or V5 data header instance
+ExtentDataHeader*
+CreateDataHeader(Inode* inode, const char* buffer)
+{
+	if (inode->Version() == 1 || inode->Version() == 2) {
+		ExtentDataHeaderV4* header = new (std::nothrow) ExtentDataHeaderV4(buffer);
+		return header;
+	} else {
+		ExtentDataHeaderV5* header = new (std::nothrow) ExtentDataHeaderV5(buffer);
+		return header;
+	}
+}
+
+
+/*
+	This Function returns Actual size of data header
+	in all forms of directory.
+	Never use sizeof() operator because we now have
+	vtable as well and it will give wrong results
+*/
+uint32
+SizeOfDataHeader(Inode* inode)
+{
+	if (inode->Version() == 1 || inode->Version() == 2)
+		return sizeof(ExtentDataHeaderV4) - XFS_EXTENT_V4_VPTR_OFF;
+	else
+		return sizeof(ExtentDataHeaderV5) - XFS_EXTENT_V5_VPTR_OFF;
+}

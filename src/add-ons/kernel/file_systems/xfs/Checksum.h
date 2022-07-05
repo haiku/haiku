@@ -42,7 +42,7 @@ xfs_start_cksum_safe(const char *buffer, size_t length, uint32 cksum_offset)
    access to the buffer while the calculation takes place.
 */
 static inline uint32
-xfs_start_cksum_update(char *buffer, size_t length, uint32 cksum_offset)
+xfs_start_cksum_update(const char *buffer, size_t length, uint32 cksum_offset)
 {
 	// zero the CRC field
 	*(uint32 *)(buffer + cksum_offset) = 0;
@@ -59,7 +59,7 @@ xfs_start_cksum_update(char *buffer, size_t length, uint32 cksum_offset)
    access to the buffer while the calculation takes place.
 */
 static inline void
-xfs_update_cksum(char *buffer, size_t length, uint32 cksum_offset)
+xfs_update_cksum(const char *buffer, size_t length, uint32 cksum_offset)
 {
 	uint32 crc = xfs_start_cksum_update(buffer, length, cksum_offset);
 
@@ -71,7 +71,7 @@ xfs_update_cksum(char *buffer, size_t length, uint32 cksum_offset)
    Helper to verify the checksum for a buffer.
 */
 static inline int
-xfs_verify_cksum(char *buffer, size_t length, uint32 cksum_offset)
+xfs_verify_cksum(const char *buffer, size_t length, uint32 cksum_offset)
 {
 	uint32 crc = xfs_start_cksum_safe(buffer, length, cksum_offset);
 

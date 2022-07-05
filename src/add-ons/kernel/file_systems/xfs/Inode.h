@@ -101,13 +101,32 @@ struct BlockInDataFork {
 };
 
 
-// xfs_da_blkinfo_t
+//xfs_da_blkinfo_t
 struct BlockInfo {
 			uint32				forw;
 			uint32				back;
 			uint16				magic;
 			uint16				pad;
 };
+
+
+// xfs_da3_blkinfo_t
+struct BlockInfoV5 {
+			uint32				forw;
+			uint32				back;
+			uint16				magic;
+			uint16				pad;
+
+			// version 5
+
+			uint32				crc;
+			uint64				blkno;
+			uint64				lsn;
+			uuid_t				uuid;
+			uint64				owner;
+};
+
+#define XFS_BLOCK_CRC_OFF offsetof(struct BlockInfo, crc)
 
 
 struct ExtentMapEntry {

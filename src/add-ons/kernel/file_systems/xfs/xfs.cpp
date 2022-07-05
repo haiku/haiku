@@ -5,6 +5,8 @@
 
 #include "xfs.h"
 
+#include "Inode.h"
+
 
 uint8
 XfsSuperBlock::Flags() const
@@ -128,23 +130,23 @@ XfsSuperBlock::IsValid() const
 	*/
 
 	// Sanity Checking
-	if( sb_agcount <= 0											||
-		sb_sectsize < XFS_MIN_SECTORSIZE						||
-	    sb_sectsize > XFS_MAX_SECTORSIZE						||
-	    sb_sectlog < XFS_MIN_SECTORSIZE_LOG						||
-	    sb_sectlog > XFS_MAX_SECTORSIZE_LOG						||
-	    sb_sectsize != (1 << sb_sectlog)						||
-	    sb_blocksize < XFS_MIN_BLOCKSIZE						||
-	    sb_blocksize > XFS_MAX_BLOCKSIZE						||
-	    sb_blocklog < XFS_MIN_BLOCKSIZE_LOG						||
-	    sb_blocklog > XFS_MAX_BLOCKSIZE_LOG						||
-	    sb_blocksize != (uint32)(1 << sb_blocklog)				||
-	    sb_dirblklog + sb_blocklog > XFS_MAX_BLOCKSIZE_LOG		||
-	    sb_inodesize < XFS_DINODE_MIN_SIZE						||
-	    sb_inodesize > XFS_DINODE_MAX_SIZE						||
-	    sb_inodelog < XFS_DINODE_MIN_LOG						||
-	    sb_inodelog > XFS_DINODE_MAX_LOG						||
-	    sb_inodesize != (1 << sb_inodelog)						) {
+	if(sb_agcount <= 0
+		||	sb_sectsize < XFS_MIN_SECTORSIZE
+	    ||	sb_sectsize > XFS_MAX_SECTORSIZE
+	    ||	sb_sectlog < XFS_MIN_SECTORSIZE_LOG
+	    ||	sb_sectlog > XFS_MAX_SECTORSIZE_LOG
+	    ||	sb_sectsize != (1 << sb_sectlog)
+	    ||	sb_blocksize < XFS_MIN_BLOCKSIZE
+	    ||	sb_blocksize > XFS_MAX_BLOCKSIZE
+	    ||	sb_blocklog < XFS_MIN_BLOCKSIZE_LOG
+	    ||	sb_blocklog > XFS_MAX_BLOCKSIZE_LOG
+	    ||	sb_blocksize != (uint32)(1 << sb_blocklog)
+	    ||	sb_dirblklog + sb_blocklog > XFS_MAX_BLOCKSIZE_LOG
+	    ||	sb_inodesize < INODE_MIN_SIZE
+	    ||	sb_inodesize > INODE_MAX_SIZE
+	    ||	sb_inodelog < INODE_MINSIZE_LOG
+	    ||	sb_inodelog > INODE_MAXSIZE_LOG
+	    ||	sb_inodesize != (1 << sb_inodelog)) {
 
 		ERROR("Sanity checking failed");
 		return false;
@@ -308,10 +310,25 @@ XfsSuperBlock::Crc() const
 	return sb_crc;
 }
 
+
 uint32
 XfsSuperBlock::MagicNum() const
 {
 	return sb_magicnum;
+}
+
+
+bool
+XfsSuperBlock::UuidEquals(const uuid_t *u1)
+{
+	if((sb_features_incompat & XFS_SB_FEAT_INCOMPAT_META_UUID) != 0) {
+		uuid_t *u2 = &sb_meta_uuid;
+		return memcmp(u1, u2, sizeof(uuid_t)) == 0;
+	} else {
+		uuid_t *u2 = &sb_uuid;
+		return memcmp(u1, u2, sizeof(uuid_t)) == 0;
+	}
+	return false;
 }
 
 

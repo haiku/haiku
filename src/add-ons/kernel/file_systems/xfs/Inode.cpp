@@ -278,7 +278,10 @@ Inode::VerifyInode() const
 			return false;
 		}
 
-		// TODO : uuid verification
+		if(!fVolume->UuidEquals(&fNode->di_uuid)) {
+			ERROR("UUID is incorrect");
+			return false;
+		}
 	}
 
 	if(fNode->di_size & (1ULL << 63)) {
