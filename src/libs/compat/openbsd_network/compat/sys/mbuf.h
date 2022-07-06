@@ -22,9 +22,8 @@
 
 #define ph_cookie PH_loc.ptr
 
-#define M_READONLY(m) (0)
-#define M_DATABUF(m)	((m)->m_flags & M_EXT ? (m)->m_ext.ext_buf : \
-			(m)->m_flags & M_PKTHDR ? (m)->m_pktdat : (m)->m_dat)
+#define M_DATABUF(m)	M_START(m)
+#define M_READONLY(m)	(!M_WRITABLE(m))
 
 #define MAXMCLBYTES MJUM16BYTES
 
