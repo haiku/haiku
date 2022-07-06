@@ -731,7 +731,7 @@ status_t
 Inode::Deselect(uint8 event, selectsync* sync, int openMode)
 {
 	select_sync_pool** pool;
-	if ((openMode & O_RWMASK) == O_RDONLY) {
+	if (event == B_SELECT_READ || (openMode & O_RWMASK) == O_RDONLY) {
 		pool = &fReadSelectSyncPool;
 	} else if ((openMode & O_RWMASK) == O_WRONLY) {
 		pool = &fWriteSelectSyncPool;
