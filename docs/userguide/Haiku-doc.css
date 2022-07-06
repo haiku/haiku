@@ -33,7 +33,7 @@
 	--WarningBackground: #fffbc6;
 	--StopBackground: #ffeae6;
 	--SecondaryCanvas: #e0e0e0;
-	--TertiaryCanvas: #efefef;
+	--TertiaryCanvas: #eeeeee;
 }
 
 
@@ -157,7 +157,7 @@ h5 a:hover, a:active {
 	left: 0;
 	top: 0;
 	height: 84px;
-	background: var(--SecondaryCanvas);
+	background: var(--TertiaryCanvas);
 }
 
 #banner div {
