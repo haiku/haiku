@@ -182,6 +182,9 @@ taskqueue_free(struct taskqueue *queue)
 	taskqueue_terminate(queue->tq_threads, queue);
 	KASSERT(TAILQ_EMPTY(&queue->tq_active), ("Tasks still running?"));
 	KASSERT(queue->tq_callouts == 0, ("Armed timeout tasks"));
+#ifdef __HAIKU__
+	TQ_UNLOCK(queue);
+#endif
 	mtx_destroy(&queue->tq_mutex);
 	free(queue->tq_threads, M_TASKQUEUE);
 	free(queue->tq_name, M_TASKQUEUE);
