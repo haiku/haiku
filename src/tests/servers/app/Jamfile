@@ -47,6 +47,7 @@ SEARCH_SOURCE += [ FDirName $(appServerDir) decorator ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) drawing ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) drawing Painter ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) drawing interface remote ] ;
+SEARCH_SOURCE += [ FDirName $(appServerDir) drawing interface virtual ] ;
 SEARCH_SOURCE += [ FDirName $(appServerDir) font ] ;
 
 SharedLibrary libhwinterface.so :
