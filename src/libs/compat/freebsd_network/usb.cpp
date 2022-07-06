@@ -50,8 +50,10 @@ init_usb()
 void
 uninit_usb()
 {
-	if (sUSB != NULL)
-		put_module(B_USB_MODULE_NAME);
+	if (sUSB == NULL)
+		return;
+
+	put_module(B_USB_MODULE_NAME);
 	if (sUSBTaskqueue != NULL)
 		taskqueue_free(sUSBTaskqueue);
 
