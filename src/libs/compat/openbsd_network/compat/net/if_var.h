@@ -20,7 +20,7 @@ if_input_openbsd(if_t ifp, struct mbuf_list* ml)
 	while (mb != NULL) {
 		// if_input takes only the first packet, it ignores mb->m_nextpkt.
 		next = mb->m_nextpkt;
-		int status = if_input(ifp, mb);
+		status = if_input(ifp, mb);
 		if (status != 0)
 			break;
 
