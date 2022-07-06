@@ -72,11 +72,19 @@
  * Research Laboratory (NRL).
  */
 
-#define	mq_len(_mq)		ml_len(&(_mq)->mq_list)
-#define	mq_empty(_mq)		ml_empty(&(_mq)->mq_list)
-#define	mq_full(_mq)		(mq_len((_mq)) >= (_mq)->mq_maxlen)
-#define	mq_drops(_mq)		((_mq)->mq_drops)
-#define	mq_set_maxlen(_mq, _l)	((_mq)->mq_maxlen = (_l))
+struct mbuf_list {
+	struct mbuf		*ml_head;
+	struct mbuf		*ml_tail;
+	u_int			ml_len;
+};
+
+struct mbuf_queue {
+	struct mutex		mq_mtx;
+	struct mbuf_list	mq_list;
+	u_int			mq_maxlen;
+	u_int			mq_drops;
+};
+
 
 static struct mbuf *
 m_dup_pkt(struct mbuf *m0, unsigned int adj, int wait)
@@ -128,6 +136,23 @@ m_trailingspace(struct mbuf *m)
 	return M_DATABUF(m) + M_SIZE(m) - (m->m_data + m->m_len);
 }
 
+
+/*
+ * mbuf lists
+ */
+
+#define MBUF_LIST_INITIALIZER() { NULL, NULL, 0 }
+
+#define	ml_len(_ml)		((_ml)->ml_len)
+#define	ml_empty(_ml)		((_ml)->ml_len == 0)
+
+#define MBUF_LIST_FIRST(_ml)	((_ml)->ml_head)
+#define MBUF_LIST_NEXT(_m)	((_m)->m_nextpkt)
+
+#define MBUF_LIST_FOREACH(_ml, _m)					\
+	for ((_m) = MBUF_LIST_FIRST(_ml);				\
+		(_m) != NULL;						\
+		(_m) = MBUF_LIST_NEXT(_m))
 
 static void
 ml_init(struct mbuf_list *ml)
@@ -229,6 +254,15 @@ ml_hdatalen(struct mbuf_list *ml)
 /*
  * mbuf queues
  */
+
+#define MBUF_QUEUE_INITIALIZER(_maxlen, _ipl) \
+	{ MUTEX_INITIALIZER(_ipl), MBUF_LIST_INITIALIZER(), (_maxlen), 0 }
+
+#define	mq_len(_mq)		ml_len(&(_mq)->mq_list)
+#define	mq_empty(_mq)		ml_empty(&(_mq)->mq_list)
+#define	mq_full(_mq)		(mq_len((_mq)) >= (_mq)->mq_maxlen)
+#define	mq_drops(_mq)		((_mq)->mq_drops)
+#define	mq_set_maxlen(_mq, _l)	((_mq)->mq_maxlen = (_l))
 
 static void
 mq_init(struct mbuf_queue *mq, u_int maxlen, int ipl)
