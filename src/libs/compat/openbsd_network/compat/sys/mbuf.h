@@ -30,6 +30,21 @@
 #define MCLGETL m_cljget
 
 
+static int
+m_dup_pkthdr_openbsd(struct mbuf* to, const struct mbuf* from, int how)
+{
+	return !m_dup_pkthdr(to, from, how);
+}
+#define m_dup_pkthdr m_dup_pkthdr_openbsd
+
+static int
+m_tag_copy_chain_openbsd(struct mbuf* to, const struct mbuf* from, int how)
+{
+	return !m_tag_copy_chain(to, from, how);
+}
+#define m_tag_copy_chain m_tag_copy_chain_openbsd
+
+
 /* FreeBSD methods not compatible with their OpenBSD counterparts */
 #define m_defrag(mbuf, how) __m_defrag_unimplemented()
 
