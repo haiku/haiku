@@ -12,9 +12,8 @@
 
 
 struct callout {
-	struct list_link	link;
-	bigtime_t			due;
-	uint32				flags;
+	struct list_link	c_link;
+	bigtime_t			c_due;
 
 	void *				c_arg;
 	void				(*c_func)(void *);
