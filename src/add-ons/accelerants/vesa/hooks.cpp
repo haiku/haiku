@@ -256,20 +256,6 @@ get_accelerant_hook(uint32 feature, void* data)
 			return (void*)vesa_set_cursor_bitmap;
 #endif
 
-		/* engine/synchronization */
-		case B_ACCELERANT_ENGINE_COUNT:
-			return (void*)vesa_accelerant_engine_count;
-		case B_ACQUIRE_ENGINE:
-			return (void*)vesa_acquire_engine;
-		case B_RELEASE_ENGINE:
-			return (void*)vesa_release_engine;
-		case B_WAIT_ENGINE_IDLE:
-			return (void*)vesa_wait_engine_idle;
-		case B_GET_SYNC_TOKEN:
-			return (void*)vesa_get_sync_token;
-		case B_SYNC_TO_TOKEN:
-			return (void*)vesa_sync_to_token;
-
 #if FAKE_OVERLAY_SUPPORT
 		// overlay
 		case B_OVERLAY_COUNT:

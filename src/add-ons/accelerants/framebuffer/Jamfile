@@ -7,7 +7,6 @@ UsePrivateHeaders shared ;
 
 Addon framebuffer.accelerant :
 	accelerant.cpp
-	engine.cpp
 	hooks.cpp
 	mode.cpp
 	: libaccelerantscommon.a

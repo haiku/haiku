@@ -3,8 +3,8 @@
  * Copyright 2016, Jessica Hamilton, jessica.l.hamilton@gmail.com.
  * Distributed under the terms of the MIT License.
  */
-#ifndef VESA_ACCELERANT_H
-#define VESA_ACCELERANT_H
+#ifndef FRAMEBUFFER_ACCELERANT_H
+#define FRAMEBUFFER_ACCELERANT_H
 
 
 #include "vesa_info.h"
@@ -27,4 +27,4 @@ extern accelerant_info *gInfo;
 
 extern status_t create_mode_list(void);
 
-#endif	/* VESA_ACCELERANT_H */
+#endif	/* FRAMEBUFFER_ACCELERANT_H */
