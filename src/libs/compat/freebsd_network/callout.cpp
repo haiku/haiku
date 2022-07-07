@@ -176,7 +176,7 @@ callout_init_mtx(struct callout *c, struct mtx *mtx, int flags)
 int
 callout_reset(struct callout *c, int _ticks, void (*func)(void *), void *arg)
 {
-	int canceled = callout_drain(c);
+	int canceled = callout_stop(c);
 
 	MutexLocker locker(sLock);
 
