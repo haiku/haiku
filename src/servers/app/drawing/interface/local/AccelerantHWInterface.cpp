@@ -107,9 +107,6 @@ AccelerantHWInterface::AccelerantHWInterface()
 	fSyncToken(),
 
 	// required hooks
-	fAccAcquireEngine(NULL),
-	fAccReleaseEngine(NULL),
-	fAccSyncToToken(NULL),
 	fAccGetModeCount(NULL),
 	fAccGetModeList(NULL),
 	fAccGetFrameBufferConfig(NULL),
@@ -118,6 +115,9 @@ AccelerantHWInterface::AccelerantHWInterface()
 	fAccGetPixelClockLimits(NULL),
 
 	// optional accelerant hooks
+	fAccAcquireEngine(NULL),
+	fAccReleaseEngine(NULL),
+	fAccSyncToToken(NULL),
 	fAccGetTimingConstraints(NULL),
 	fAccProposeDisplayMode(NULL),
 	fAccFillRect(NULL),
@@ -353,9 +353,6 @@ status_t
 AccelerantHWInterface::_SetupDefaultHooks()
 {
 	// required
-	fAccAcquireEngine = (acquire_engine)fAccelerantHook(B_ACQUIRE_ENGINE, NULL);
-	fAccReleaseEngine = (release_engine)fAccelerantHook(B_RELEASE_ENGINE, NULL);
-	fAccSyncToToken = (sync_to_token)fAccelerantHook(B_SYNC_TO_TOKEN, NULL);
 	fAccGetModeCount
 		= (accelerant_mode_count)fAccelerantHook(B_ACCELERANT_MODE_COUNT, NULL);
 	fAccGetModeList = (get_mode_list)fAccelerantHook(B_GET_MODE_LIST, NULL);
@@ -368,13 +365,16 @@ AccelerantHWInterface::_SetupDefaultHooks()
 	fAccGetPixelClockLimits = (get_pixel_clock_limits)fAccelerantHook(
 		B_GET_PIXEL_CLOCK_LIMITS, NULL);
 
-	if (!fAccAcquireEngine || !fAccReleaseEngine || !fAccGetFrameBufferConfig
-		|| !fAccGetModeCount || !fAccGetModeList || !fAccSetDisplayMode
-		|| !fAccGetDisplayMode || !fAccGetPixelClockLimits) {
+	if (!fAccGetFrameBufferConfig || !fAccGetModeCount || !fAccGetModeList
+			|| !fAccSetDisplayMode || !fAccGetDisplayMode || !fAccGetPixelClockLimits) {
 		return B_ERROR;
 	}
 
 	// optional
+	fAccAcquireEngine = (acquire_engine)fAccelerantHook(B_ACQUIRE_ENGINE, NULL);
+	fAccReleaseEngine = (release_engine)fAccelerantHook(B_RELEASE_ENGINE, NULL);
+	fAccSyncToToken = (sync_to_token)fAccelerantHook(B_SYNC_TO_TOKEN, NULL);
+
 	fAccGetTimingConstraints = (get_timing_constraints)fAccelerantHook(
 		B_GET_TIMING_CONSTRAINTS, NULL);
 	fAccProposeDisplayMode = (propose_display_mode)fAccelerantHook(
