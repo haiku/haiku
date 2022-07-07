@@ -17,7 +17,7 @@ struct timeout {
 static inline void
 timeout_set(struct timeout *to, void (*fn)(void *), void *arg)
 {
-	callout_init(&to->c, 0);
+	callout_init_mtx(&to->c, &Giant, 0);
 	callout_reset(&to->c, -1, fn, arg);
 }
 
@@ -32,7 +32,7 @@ timeout_pending(struct timeout *to)
 static inline int
 timeout_add_usec(struct timeout *to, int usec)
 {
-	return callout_schedule(&to->c, USEC_2_TICKS(usec));
+	return (callout_schedule(&to->c, USEC_2_TICKS(usec)) ? 0 : 1);
 }
 
 
@@ -53,7 +53,7 @@ timeout_add_sec(struct timeout *to, int sec)
 static inline int
 timeout_del(struct timeout *to)
 {
-	return callout_stop(&to->c);
+	return ((callout_stop(&to->c) == 1) ? 1 : 0);
 }
 
 
