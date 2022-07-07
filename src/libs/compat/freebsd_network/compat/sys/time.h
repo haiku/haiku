@@ -51,7 +51,7 @@
 #define TICKS_2_MSEC(t) ((1000*(bigtime_t)t) / hz)
 #define MSEC_2_TICKS(t) (((bigtime_t)t*hz) / 1000)
 
-#define time_uptime		USEC_2_TICKS(system_time())
+#define time_uptime		(system_time()/(1000*1000))
 
 
 /* Operations on timevals. */
