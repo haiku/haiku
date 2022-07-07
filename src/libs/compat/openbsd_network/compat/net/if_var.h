@@ -12,25 +12,14 @@
 static inline int
 if_input_openbsd(if_t ifp, struct mbuf_list* ml)
 {
-	if (ml_empty(ml))
-		return 0;
-
-	struct mbuf* mb = ml->ml_head, *next = NULL;
+	struct mbuf* m;
 	int status = 0;
-	while (mb != NULL) {
-		// if_input takes only the first packet, it ignores mb->m_nextpkt.
-		next = mb->m_nextpkt;
-		status = if_input(ifp, mb);
+	while ((m = ml_dequeue(ml)) != NULL) {
+		status = if_input(ifp, m);
 		if (status != 0)
 			break;
-
-		mb = next;
-		next = NULL;
 	}
 
-	if (next != NULL)
-		m_freem(next);
-	ml_init(ml);
 	return status;
 }
 #define if_input if_input_openbsd
