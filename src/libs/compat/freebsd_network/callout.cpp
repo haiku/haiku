@@ -219,9 +219,6 @@ _callout_stop_safe(struct callout *c, int safe)
 
 	MutexLocker locker(sLock);
 
-	if (c->due <= 0)
-		return -1;
-
 	if (callout_active(c)) {
 		if (safe) {
 			locker.Unlock();
@@ -230,6 +227,9 @@ _callout_stop_safe(struct callout *c, int safe)
 		}
 		return 0;
 	}
+
+	if (c->due <= 0)
+		return -1;
 
 	// this timer is scheduled, cancel it
 	list_remove_item(&sTimers, c);
