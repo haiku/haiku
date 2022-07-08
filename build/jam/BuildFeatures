@@ -630,7 +630,7 @@ if [ IsPackageAvailable libraw_devel ] {
 			runtime: lib
 		file: devel libraw_devel
 			depends: base
-			libraries: $(developLibDir)/libraw.so.19
+			libraries: $(developLibDir)/libraw.so
 			headers: $(developHeadersDir)
 		;
 
@@ -675,7 +675,7 @@ if [ IsPackageAvailable libavif_devel ] {
 			runtime: lib
 		file: devel libavif_devel
 			depends: base
-			library: $(developLibDir)/libavif.so.9
+			library: $(developLibDir)/libavif.so
 			headers: $(developHeadersDir) $(developHeadersDir)/avif
 		;
 	EnableBuildFeatures libavif ;
