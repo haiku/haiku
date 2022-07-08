@@ -92,7 +92,7 @@ enum {
 };
 
 static int32
-_fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N)
+_fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, uint32 N)
 {
 	int32 result = 0;
 	uint32 n = 0, first = 0, last = 0;
@@ -413,7 +413,7 @@ get_nth_fat_entry(nspace *vol, int32 cluster, uint32 n)
 uint32
 count_clusters(nspace *vol, int32 cluster)
 {
-	int32 count = 0;
+	uint32 count = 0;
 
 	DPRINTF(2, ("count_clusters %" B_PRId32 "\n", cluster));
 
@@ -509,7 +509,7 @@ allocate_n_fat_entries(nspace *vol, int32 n, int32 *start)
 		return c;
 
 	ASSERT(IS_DATA_CLUSTER(c));
-	ASSERT(count_clusters(vol, c) == n);
+	ASSERT(count_clusters(vol, c) == (uint32)n);
 
 	DPRINTF(2, ("allocated %" B_PRId32 " fat entries at %" B_PRId32 "\n", n,
 		c));
@@ -524,7 +524,8 @@ set_fat_chain_length(nspace *vol, vnode *node, uint32 clusters,
 	bool discardBlockCache)
 {
 	status_t result;
-	int32 i, c, n;
+	int32 c, n;
+	uint32 i;
 
 	DPRINTF(1, ("set_fat_chain_length: %" B_PRIdINO " to %" B_PRIu32
 		" clusters (%" B_PRIu32 ")\n", node->vnid, clusters, node->cluster));

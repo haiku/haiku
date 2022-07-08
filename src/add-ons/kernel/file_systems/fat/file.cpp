@@ -400,7 +400,7 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	}
 
 	// extend file size if needed
-	if (pos + *len > node->st_size) {
+	if (pos + (off_t)*len > (off_t)node->st_size) {
 		uint32 clusters = (pos + *len + vol->bytes_per_sector*vol->sectors_per_cluster - 1) / vol->bytes_per_sector / vol->sectors_per_cluster;
 		if (node->st_size <= (clusters - 1) * vol->sectors_per_cluster * vol->bytes_per_sector) {
 			if ((result = set_fat_chain_length(vol, node, clusters, false))
@@ -1255,7 +1255,7 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t position,
 	}
 
 	// Truncate to file size, taking overflow into account.
-	if (position + length >= node->st_size || position + length < position)
+	if (position + (off_t)length >= node->st_size || position + (off_t)length < position)
 		length = node->st_size - position;
 
 	result = init_csi(vol, node->cluster, 0, &iter);
@@ -1274,7 +1274,7 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t position,
 		}
 	}
 
-	ASSERT(iter.cluster == get_nth_fat_entry(vol, node->cluster,
+	ASSERT(iter.cluster == (uint32)get_nth_fat_entry(vol, node->cluster,
 			position / vol->bytes_per_sector / vol->sectors_per_cluster));
 
 	offset = position % vol->bytes_per_sector;
@@ -1282,7 +1282,7 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t position,
 		off_t block = csi_to_block(&iter);
 		uint32 sectors = 1;
 
-		length -= min_c(length, vol->bytes_per_sector - offset);
+		length -= min_c((off_t)length, vol->bytes_per_sector - offset);
 
 		while (length > 0) {
 			result = iter_csi(&iter, 1);

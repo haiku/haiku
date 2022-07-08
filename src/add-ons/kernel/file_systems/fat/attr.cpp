@@ -38,8 +38,6 @@ status_t set_mime_type(vnode *node, const char *filename)
 status_t
 dosfs_open_attrdir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 {
-	nspace *vol = (nspace *)_vol->private_volume;
-
 	DPRINTF(0, ("dosfs_open_attrdir called\n"));
 
 	if ((*_cookie = malloc(sizeof(uint32))) == NULL) {
@@ -54,8 +52,6 @@ dosfs_open_attrdir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 status_t
 dosfs_close_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
-	nspace *vol = (nspace *)_vol->private_volume;
-
 	DPRINTF(0, ("dosfs_close_attrdir called\n"));
 
 	*(int32 *)_cookie = 1;
@@ -203,14 +199,14 @@ dosfs_read_attr(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	if (node->mime == NULL)
 		return ENOENT;
 
-	if ((pos < 0) || (pos > strlen(node->mime)))
+	if ((pos < 0) || (pos > (off_t)strlen(node->mime)))
 		return EINVAL;
 
 	length = user_strlcpy((char*)buffer, node->mime + pos, *_length);
 	if (length < B_OK)
 		return B_BAD_ADDRESS;
 
-	if (length < *_length)
+	if ((size_t)length < *_length)
 		*_length = length + 1;
 
 	return 0;
