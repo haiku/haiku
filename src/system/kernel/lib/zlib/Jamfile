@@ -4,6 +4,8 @@ local zlibSourceDirectory = [ BuildFeatureAttribute zlib : sources : path ] ;
 UseHeaders $(zlibSourceDirectory) ;
 UseHeaders $(zlibSourceDirectory) : true ;
 
+SubDirCcFlags -Wno-error=missing-prototypes ;
+
 local zlibSources =
 	adler32.c
 	crc32.c
