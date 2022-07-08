@@ -1324,7 +1324,7 @@ StreamReader::ReadAt(off_t position, void *buffer, size_t bufferSize,
 	// compute the number of bytes that acually have to be read
 	if (error == B_OK) {
 		if (position < fStreamSize) {
-			if (position + bufferSize > fStreamSize)
+			if (position + (off_t)bufferSize > fStreamSize)
 				bufferSize = fStreamSize - position;
 		} else
 			bufferSize = 0;

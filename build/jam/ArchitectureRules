@@ -734,7 +734,7 @@ rule ArchitectureSetupWarnings architecture
 #	EnableWerror src add-ons kernel file_systems ntfs ;
 	EnableWerror src add-ons kernel file_systems packagefs ;
 #	EnableWerror src add-ons kernel file_systems ramfs ;
-#	EnableWerror src add-ons kernel file_systems reiserfs ;
+	EnableWerror src add-ons kernel file_systems reiserfs ;
 	EnableWerror src add-ons kernel file_systems udf ;
 	EnableWerror src add-ons kernel file_systems userlandfs ;
 	EnableWerror src add-ons kernel file_systems xfs ;

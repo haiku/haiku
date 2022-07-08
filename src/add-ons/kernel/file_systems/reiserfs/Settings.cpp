@@ -142,6 +142,7 @@ Settings::HiddenEntryAt(int32 index) const
 void
 Settings::Dump()
 {
+#if DEBUG
 	PRINT(("Settings:\n"));
 	PRINT(("  default volume name:   `%s'\n", GetDefaultVolumeName()));
 	PRINT(("  volume name:           `%s'\n", GetVolumeName()));
@@ -149,6 +150,7 @@ Settings::Dump()
 	PRINT(("  %" B_PRId32 " hidden entries:\n", fHiddenEntries.CountItems()));
 	for (int32 i = 0; const char *entry = HiddenEntryAt(i); i++)
 		PRINT(("    `%s'\n", entry));
+#endif
 }
 
 // _Init
