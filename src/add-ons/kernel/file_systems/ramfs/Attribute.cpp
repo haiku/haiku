@@ -72,7 +72,7 @@ Attribute::WriteAt(off_t offset, const void *buffer, size_t size,
 {
 	// get the current key for the attribute
 	uint8 oldKey[kMaxIndexKeyLength];
-	size_t oldLength;
+	size_t oldLength = kMaxIndexKeyLength;
 	GetKey(oldKey, &oldLength);
 
 	// write the new value
@@ -80,12 +80,12 @@ Attribute::WriteAt(off_t offset, const void *buffer, size_t size,
 
 	// If there is an index and a change has been made within the key, notify
 	// the index.
-	if (offset < kMaxIndexKeyLength && size > 0 && fIndex)
+	if (offset < (off_t)kMaxIndexKeyLength && size > 0 && fIndex)
 		fIndex->Changed(this, oldKey, oldLength);
 
 	// update live queries
 	uint8 newKey[kMaxIndexKeyLength];
-	size_t newLength;
+	size_t newLength = kMaxIndexKeyLength;
 	GetKey(newKey, &newLength);
 	GetVolume()->UpdateLiveQueries(NULL, fNode, GetName(), fType, oldKey,
 		oldLength, newKey, newLength);
