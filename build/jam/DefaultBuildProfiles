@@ -192,7 +192,6 @@ rule DefineDefaultBuildProfiles
 				haikuporter
 				less
 				libedit
-				m4
 				make
 				mawk
 				ncurses6

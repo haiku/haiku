@@ -96,9 +96,10 @@ if [ IsOptionalHaikuImagePackageAdded DevelopmentBase ] {
 	}
 
 	# other commonly used tools
-	AddHaikuImageDisabledPackages bison cdrtools flex jam m4 make mawk mkdepend
-		nasm@!gcc2 nasm_x86@secondary_x86 patch ;
-	AddHaikuImageSourcePackages bison cdrtools m4 make patch ;
+	AddHaikuImageDisabledPackages bison cdrtools flex jam make mawk mkdepend
+		m4@!gcc2 m4_x86@secondary_x86 nasm@!gcc2 nasm_x86@secondary_x86 patch ;
+	AddHaikuImageSourcePackages bison cdrtools make patch
+		m4@!gcc2 m4_x86@secondary_x86 ;
 }
 
 
