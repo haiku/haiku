@@ -1176,7 +1176,7 @@ dprintf("%ld\n", v);
 		return EINVAL;
 
 	e = strchr(p, ',');
-	i = (e) ? (e - p) : (strlen(p));
+	i = (e) ? (e - p) : ((int)strlen(p));
 
 	params->_export = malloc(i + 1);
 	params->_export[i] = '\0';
@@ -1188,7 +1188,7 @@ dprintf("%ld\n", v);
 dprintf("nfs:hn!\n");
 	p += 9;
 	e = strchr(p, ',');
-	i = (e) ? (e - p) : (strlen(p));
+	i = (e) ? (e - p) : ((int)strlen(p));
 
 	params->hostname = malloc(i + 1);
 	params->hostname[i] = '\0';
@@ -1670,14 +1670,14 @@ fs_wstat(fs_volume *_volume, fs_vnode *_node, const struct stat *st, uint32 mask
 
 	XDROutPacketAddFixed(&call,node->fhandle.opaque,NFS_FHSIZE);
 
-	XDROutPacketAddInt32(&call, (mask & WSTAT_MODE) ? st->st_mode : -1);
-	XDROutPacketAddInt32(&call, (mask & WSTAT_UID) ? st->st_uid : -1);
-	XDROutPacketAddInt32(&call, (mask & WSTAT_GID) ? st->st_gid : -1);
-	XDROutPacketAddInt32(&call, (mask & WSTAT_SIZE) ? st->st_size : -1);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_MODE) ? st->st_mode : UINT32_MAX);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_UID) ? st->st_uid : UINT32_MAX);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_GID) ? st->st_gid : UINT32_MAX);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_SIZE) ? st->st_size : UINT32_MAX);
 	XDROutPacketAddInt32(&call, (mask & WSTAT_ATIME) ? st->st_atime : -1);
-	XDROutPacketAddInt32(&call, (mask & WSTAT_ATIME) ? 0 : -1);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_ATIME) ? 0 : UINT32_MAX);
 	XDROutPacketAddInt32(&call, (mask & WSTAT_MTIME) ? st->st_mtime : -1);
-	XDROutPacketAddInt32(&call, (mask & WSTAT_MTIME) ? 0 : -1);
+	XDROutPacketAddInt32(&call, (mask & WSTAT_MTIME) ? 0 : UINT32_MAX);
 
 	replyBuf = send_rpc_call(ns, &ns->nfsAddr, NFS_PROGRAM, NFS_VERSION,
 		NFSPROC_SETATTR, &call);
