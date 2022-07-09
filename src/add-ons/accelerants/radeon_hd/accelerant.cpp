@@ -41,6 +41,8 @@
 #	define TRACE(x...) ;
 #endif
 
+#define ERROR(x...) _sPrintf("radeon_hd: " x)
+
 
 struct accelerant_info* gInfo;
 display_info* gDisplay[MAX_DISPLAY];
@@ -228,7 +230,8 @@ radeon_init_accelerant(int device)
 	}
 
 	if (status != B_OK) {
-		TRACE("%s: couldn't detect supported connectors!\n", __func__);
+		ERROR("%s: couldn't detect supported connectors!\n", __func__);
+		radeon_uninit_accelerant();
 		return status;
 	}
 
@@ -246,18 +249,20 @@ radeon_init_accelerant(int device)
 
 	// detect attached displays
 	status = detect_displays();
-	//if (status != B_OK)
-	//	return status;
+	if (status != B_OK) {
+		radeon_uninit_accelerant();
+		return status;
+	}
 
 	// print found displays
 	debug_displays();
 
 	// create initial list of video modes
 	status = create_mode_list();
-	//if (status != B_OK) {
-	//	radeon_uninit_accelerant();
-	//	return status;
-	//}
+	if (status != B_OK) {
+		radeon_uninit_accelerant();
+		return status;
+	}
 
 	radeon_gpu_mc_setup();
 
