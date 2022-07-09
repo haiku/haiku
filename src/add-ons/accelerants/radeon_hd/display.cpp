@@ -382,7 +382,7 @@ detect_displays()
 		// TODO: In the future we might want to accept this condition.. however
 		// without monitor hot plugging, we're most likely going to fail to bring
 		// up a display here.
-		ERROR("%s: ERROR: 0 attached monitors were found on display connectors.",
+		ERROR("%s: ERROR: 0 attached monitors were found on display connectors.\n",
 			__func__);
 		return B_ERROR;
 	}
