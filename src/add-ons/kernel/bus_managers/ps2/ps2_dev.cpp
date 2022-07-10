@@ -354,7 +354,7 @@ pass_to_handler:
 
 	if (!dev->active) {
 		TRACE("ps2: %s not active, data 0x%02x dropped\n", dev->name, data);
-		if (data != 0x00 && data != 0xaa) {
+		if (gSetupComplete && data != 0x00 && data != 0xaa) {
 			INFO("ps2: possibly a hot plugin of %s\n", dev->name);
 			ps2_service_notify_device_added(dev);
 			return B_INVOKE_SCHEDULER;

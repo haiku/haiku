@@ -28,6 +28,7 @@
 
 isa_module_info *gIsa = NULL;
 bool gActiveMultiplexingEnabled = false;
+bool gSetupComplete = false;
 sem_id gControllerSem;
 
 static int32 sIgnoreInterrupts = 0;
@@ -421,6 +422,8 @@ ps2_init(void)
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_KEYB]);
 	}
+
+	gSetupComplete = true;
 
 	TRACE("ps2: init done!\n");
 	return B_OK;

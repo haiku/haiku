@@ -51,6 +51,7 @@ extern device_hooks gKeyboardDeviceHooks;
 extern device_hooks gPointingDeviceHooks;
 
 extern bool gActiveMultiplexingEnabled;
+extern bool gSetupComplete;
 extern sem_id gControllerSem;
 
 
