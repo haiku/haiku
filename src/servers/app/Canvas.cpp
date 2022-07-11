@@ -114,13 +114,7 @@ Canvas::SetDrawingOrigin(BPoint origin)
 BPoint
 Canvas::DrawingOrigin() const
 {
-	BPoint origin(fDrawState->Origin());
-	float scale = Scale();
-
-	origin.x *= scale;
-	origin.y *= scale;
-
-	return origin;
+	return fDrawState->Origin();
 }
 
 
