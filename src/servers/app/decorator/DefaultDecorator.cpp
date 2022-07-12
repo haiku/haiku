@@ -207,7 +207,7 @@ DefaultDecorator::_DrawFrame(BRect rect)
 		return;
 
 	// TODO: While this works, it does not look so crisp at higher resolutions.
-#define COLORS_INDEX(i, borderWidth, nominalLimit) ((float(i) / float(borderWidth)) * nominalLimit)
+#define COLORS_INDEX(i, borderWidth, nominalLimit) int32((float(i) / float(borderWidth)) * nominalLimit)
 
 	// Draw the border frame
 	BRect border = BRect(fTopBorder.LeftTop(), fBottomBorder.RightBottom());
@@ -231,7 +231,7 @@ DefaultDecorator::_DrawFrame(BRect rect)
 				if (fTitleBarRect.IsValid()) {
 					// grey along the bottom of the tab
 					// (overwrites "white" from frame)
-					const int overdraw = ceilf(fBorderWidth / 5.0f);
+					const int overdraw = (int)ceilf(fBorderWidth / 5.0f);
 					for (int i = 1; i <= overdraw; i++) {
 						fDrawingEngine->StrokeLine(
 							BPoint(fTitleBarRect.left + 2, fTitleBarRect.bottom + i),
@@ -300,7 +300,7 @@ DefaultDecorator::_DrawFrame(BRect rect)
 				if (fTitleBarRect.IsValid() && fTopTab->look != kLeftTitledWindowLook) {
 					// grey along the bottom of the tab
 					// (overwrites "white" from frame)
-					const int overdraw = ceilf(fBorderWidth / 5.0f);
+					const int overdraw = (int)ceilf(fBorderWidth / 5.0f);
 					for (int i = 1; i <= overdraw; i++) {
 						fDrawingEngine->StrokeLine(
 							BPoint(fTitleBarRect.left + 2, fTitleBarRect.bottom + i),

@@ -262,7 +262,7 @@ TabDecorator::_DoLayout()
 			fBorderWidth = 0;
 	}
 
-	fBorderWidth *= scaleFactor;
+	fBorderWidth = int32(fBorderWidth * scaleFactor);
 	fResizeKnobSize = kResizeKnobSize * scaleFactor;
 	fBorderResizeLength = kBorderResizeLength * scaleFactor;
 
