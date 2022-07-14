@@ -19,6 +19,7 @@
 #include "ALMLayout.h"
 #include "ALMLayoutBuilder.h"
 
+#include <ctype.h>
 
 static int
 StringItemComp(const BListItem* first, const BListItem* second)
