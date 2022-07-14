@@ -108,8 +108,8 @@ public:
 	static BViewState* InstantiateFromStream(BMallocIO* stream,
 		bool endianSwap = false);
 	static BViewState* InstantiateFromMessage(const BMessage &message);
-	void ArchiveToStream(BMallocIO* stream) const;
-	void ArchiveToMessage(BMessage &message) const;
+	void ArchiveToStream(BMallocIO* stream);
+	void ArchiveToMessage(BMessage &message);
 
 	uint32 ViewMode() const;
 	uint32 LastIconMode() const;
@@ -139,6 +139,9 @@ public:
 
 private:
 	static BViewState* _Sanitize(BViewState* state, bool fixOnly = false);
+
+	void _ArchiveToStream(BMallocIO* stream) const;
+	void _ArchiveToMessage(BMessage &message) const;
 
 	uint32 fViewMode;
 	uint32 fLastIconMode;

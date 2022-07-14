@@ -373,50 +373,18 @@ BViewState::BViewState(const BMessage &message)
 
 
 void
-BViewState::ArchiveToStream(BMallocIO* stream) const
+BViewState::ArchiveToStream(BMallocIO* stream)
 {
-	// write class identifier and verison info
-	uint32 key = AttrHashString("BViewState", B_OBJECT_TYPE);
-	stream->Write(&key, sizeof(key));
-	int32 version = kViewStateArchiveVersion;
-	stream->Write(&version, sizeof(version));
-
-	stream->Write(&fViewMode, sizeof(uint32));
-	stream->Write(&fLastIconMode, sizeof(uint32));
-	stream->Write(&fListOrigin, sizeof(BPoint));
-	stream->Write(&fIconOrigin, sizeof(BPoint));
-	stream->Write(&fPrimarySortAttr, sizeof(uint32));
-	stream->Write(&fPrimarySortType, sizeof(uint32));
-	stream->Write(&fSecondarySortAttr, sizeof(uint32));
-	stream->Write(&fSecondarySortType, sizeof(uint32));
-	stream->Write(&fReverseSort, sizeof(bool));
-	stream->Write(&fIconSize, sizeof(uint32));
-	stream->Write(&fLastIconSize, sizeof(uint32));
+	_ArchiveToStream(stream);
+	_StorePreviousState();
 }
 
 
 void
-BViewState::ArchiveToMessage(BMessage &message) const
+BViewState::ArchiveToMessage(BMessage &message)
 {
-	message.AddInt32(kViewStateVersionName, kViewStateArchiveVersion);
-
-	message.AddInt32(kViewStateViewModeName, static_cast<int32>(fViewMode));
-	message.AddInt32(kViewStateLastIconModeName,
-		static_cast<int32>(fLastIconMode));
-	message.AddPoint(kViewStateListOriginName, fListOrigin);
-	message.AddPoint(kViewStateIconOriginName, fIconOrigin);
-	message.AddInt32(kViewStatePrimarySortAttrName,
-		static_cast<int32>(fPrimarySortAttr));
-	message.AddInt32(kViewStatePrimarySortTypeName,
-		static_cast<int32>(fPrimarySortType));
-	message.AddInt32(kViewStateSecondarySortAttrName,
-		static_cast<int32>(fSecondarySortAttr));
-	message.AddInt32(kViewStateSecondarySortTypeName,
-		static_cast<int32>(fSecondarySortType));
-	message.AddBool(kViewStateReverseSortName, fReverseSort);
-	message.AddInt32(kViewStateIconSizeName, static_cast<int32>(fIconSize));
-	message.AddInt32(kViewStateLastIconSizeName,
-		static_cast<int32>(fLastIconSize));
+	_ArchiveToMessage(message);
+	_StorePreviousState();
 }
 
 
@@ -540,4 +508,52 @@ BViewState::_Sanitize(BViewState* state, bool fixOnly)
 #endif
 
 	return state;
+}
+
+
+void
+BViewState::_ArchiveToStream(BMallocIO* stream) const
+{
+	// write class identifier and verison info
+	uint32 key = AttrHashString("BViewState", B_OBJECT_TYPE);
+	stream->Write(&key, sizeof(key));
+	int32 version = kViewStateArchiveVersion;
+	stream->Write(&version, sizeof(version));
+
+	stream->Write(&fViewMode, sizeof(uint32));
+	stream->Write(&fLastIconMode, sizeof(uint32));
+	stream->Write(&fListOrigin, sizeof(BPoint));
+	stream->Write(&fIconOrigin, sizeof(BPoint));
+	stream->Write(&fPrimarySortAttr, sizeof(uint32));
+	stream->Write(&fPrimarySortType, sizeof(uint32));
+	stream->Write(&fSecondarySortAttr, sizeof(uint32));
+	stream->Write(&fSecondarySortType, sizeof(uint32));
+	stream->Write(&fReverseSort, sizeof(bool));
+	stream->Write(&fIconSize, sizeof(uint32));
+	stream->Write(&fLastIconSize, sizeof(uint32));
+}
+
+
+void
+BViewState::_ArchiveToMessage(BMessage &message) const
+{
+	message.AddInt32(kViewStateVersionName, kViewStateArchiveVersion);
+
+	message.AddInt32(kViewStateViewModeName, static_cast<int32>(fViewMode));
+	message.AddInt32(kViewStateLastIconModeName,
+		static_cast<int32>(fLastIconMode));
+	message.AddPoint(kViewStateListOriginName, fListOrigin);
+	message.AddPoint(kViewStateIconOriginName, fIconOrigin);
+	message.AddInt32(kViewStatePrimarySortAttrName,
+		static_cast<int32>(fPrimarySortAttr));
+	message.AddInt32(kViewStatePrimarySortTypeName,
+		static_cast<int32>(fPrimarySortType));
+	message.AddInt32(kViewStateSecondarySortAttrName,
+		static_cast<int32>(fSecondarySortAttr));
+	message.AddInt32(kViewStateSecondarySortTypeName,
+		static_cast<int32>(fSecondarySortType));
+	message.AddBool(kViewStateReverseSortName, fReverseSort);
+	message.AddInt32(kViewStateIconSizeName, static_cast<int32>(fIconSize));
+	message.AddInt32(kViewStateLastIconSizeName,
+		static_cast<int32>(fLastIconSize));
 }

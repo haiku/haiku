@@ -586,6 +586,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	fArrangeByMenu(NULL),
 	fSelectionWindow(NULL),
 	fTaskLoop(NULL),
+	fStateNeedsSaving(false),
 	fIsTrash(false),
 	fInTrash(false),
 	fIsPrinters(false),
@@ -596,7 +597,6 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	fContextMenu(NULL),
 	fDragMessage(NULL),
 	fCachedTypesList(NULL),
-	fStateNeedsSaving(false),
 	fSaveStateIsEnabled(true),
 	fIsWatchingPath(false)
 {
@@ -1219,21 +1219,24 @@ BContainerWindow::FrameResized(float, float)
 	}
 
 	fPreviousBounds = Bounds();
-	fStateNeedsSaving = true;
+	if (IsActive())
+		fStateNeedsSaving = true;
 }
 
 
 void
 BContainerWindow::FrameMoved(BPoint)
 {
-	fStateNeedsSaving = true;
+	if (IsActive())
+		fStateNeedsSaving = true;
 }
 
 
 void
 BContainerWindow::WorkspacesChanged(uint32, uint32)
 {
-	fStateNeedsSaving = true;
+	if (IsActive())
+		fStateNeedsSaving = true;
 }
 
 
@@ -4075,6 +4078,9 @@ BContainerWindow::RestoreWindowState(const BMessage& message)
 		&& message.FindMessage(kAttrWindowDecor, &decorSettings) == B_OK) {
 		SetDecoratorSettings(decorSettings);
 	}
+
+	fStateNeedsSaving = false;
+		// Undo the effect of the above MoveTo and ResizeTo calls
 }
 
 

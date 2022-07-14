@@ -270,6 +270,12 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target,
 	BHandler::StartWatching(tracker, kDesktopFilePanelRootChanged);
 
 	Init();
+
+	// Avoid the need to save state later just because of changes made
+	// during setup. This prevents unnecessary saving by Quit that can
+	// overwrite user's changes previously saved from another panel object.
+	if (StateNeedsSaving())
+		SaveState(false);
 }
 
 
@@ -924,6 +930,7 @@ TFilePanel::SaveState(bool)
 		AttributeStreamFileNode streamNodeDestination(&defaultingNode);
 		SaveWindowState(&streamNodeDestination);
 		PoseView()->SaveState(&streamNodeDestination);
+		fStateNeedsSaving = false;
 	}
 }
 
@@ -949,6 +956,7 @@ TFilePanel::RestoreWindowState(AttributeStreamNode* node)
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
 	}
+	fStateNeedsSaving = false;
 }
 
 
