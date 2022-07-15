@@ -402,6 +402,13 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 			start, start + size, size));
 	}
 
+	TRACE(("virt memory ranges to keep:\n"));
+	for (uint32_t i = 0; i < gKernelArgs.arch_args.num_virtual_ranges_to_keep; i++) {
+		uint64 start = gKernelArgs.arch_args.virtual_ranges_to_keep[i].start;
+		uint64 size = gKernelArgs.arch_args.virtual_ranges_to_keep[i].size;
+		TRACE(("    0x%08" B_PRIx32 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+			start, start + size, size));
+	}
 }
 
 
