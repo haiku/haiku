@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haiku, Inc. All Rights Reserved.
+ * Copyright 2019-2022 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #include <KernelExport.h>
@@ -12,10 +12,18 @@
 #include <vm/vm_types.h>
 
 
+//#define TRACE_ARCH_VM
+#ifdef TRACE_ARCH_VM
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
 status_t
 arch_vm_init(kernel_args* args)
 {
-	dprintf("arch_vm_init\n");
+	TRACE("arch_vm_init\n");
 	return B_OK;
 }
 
@@ -23,7 +31,7 @@ arch_vm_init(kernel_args* args)
 status_t
 arch_vm_init2(kernel_args* args)
 {
-	dprintf("arch_vm_init2\n");
+	TRACE("arch_vm_init2\n");
 	return B_OK;
 }
 
@@ -31,7 +39,7 @@ arch_vm_init2(kernel_args* args)
 status_t
 arch_vm_init_post_area(kernel_args* args)
 {
-	dprintf("arch_vm_init_post_area\n");
+	TRACE("arch_vm_init_post_area\n");
 	return B_OK;
 }
 
@@ -39,7 +47,7 @@ arch_vm_init_post_area(kernel_args* args)
 status_t
 arch_vm_init_end(kernel_args* args)
 {
-	dprintf("arch_vm_init_end\n");
+	TRACE("arch_vm_init_end\n");
 	return B_OK;
 }
 
@@ -47,7 +55,7 @@ arch_vm_init_end(kernel_args* args)
 status_t
 arch_vm_init_post_modules(kernel_args* args)
 {
-	dprintf("arch_vm_init_post_modules\n");
+	TRACE("arch_vm_init_post_modules\n");
 	return B_OK;
 }
 
@@ -55,7 +63,7 @@ arch_vm_init_post_modules(kernel_args* args)
 void
 arch_vm_aspace_swap(struct VMAddressSpace* from, struct VMAddressSpace* to)
 {
-	dprintf("arch_vm_aspace_swap\n");
+	TRACE("arch_vm_aspace_swap\n");
 }
 
 
