@@ -24,16 +24,16 @@
 
 //#define TRACE_ARCH_VM
 #ifdef TRACE_ARCH_VM
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 
 status_t
 arch_vm_init(kernel_args *args)
 {
-	TRACE(("arch_vm_init: entry\n"));
+	TRACE("arch_vm_init: entry\n");
 	return B_OK;
 }
 
@@ -48,7 +48,7 @@ arch_vm_init2(kernel_args *args)
 status_t
 arch_vm_init_post_area(kernel_args *args)
 {
-	TRACE(("arch_vm_init_post_area: entry\n"));
+	TRACE("arch_vm_init_post_area: entry\n");
 	return B_OK;
 }
 
@@ -56,17 +56,17 @@ arch_vm_init_post_area(kernel_args *args)
 status_t
 arch_vm_init_end(kernel_args *args)
 {
-	TRACE(("arch_vm_init_end(): %" B_PRIu32 " virtual ranges to keep:\n",
-		args->arch_args.num_virtual_ranges_to_keep));
+	TRACE("arch_vm_init_end(): %" B_PRIu32 " virtual ranges to keep:\n",
+		args->arch_args.num_virtual_ranges_to_keep);
 
 	for (int i = 0; i < (int)args->arch_args.num_virtual_ranges_to_keep; i++) {
 		addr_range &range = args->arch_args.virtual_ranges_to_keep[i];
 
-		TRACE(("  start: %p, size: %#" B_PRIxSIZE "\n", (void*)range.start, range.size));
+		TRACE("  start: %p, size: %#" B_PRIxSIZE "\n", (void*)range.start, range.size);
 
 		// skip ranges outside the kernel address space
 		if (!IS_KERNEL_ADDRESS(range.start)) {
-			TRACE(("    no kernel address, skipping...\n"));
+			TRACE("    no kernel address, skipping...\n");
 			continue;
 		}
 
