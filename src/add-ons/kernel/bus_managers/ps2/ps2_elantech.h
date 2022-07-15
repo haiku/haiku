@@ -14,9 +14,6 @@
 
 #include <KernelExport.h>
 
-#include <touchpad_settings.h>
-
-#include "movement_maker.h"
 #include "packet_buffer.h"
 #include "ps2_dev.h"
 
@@ -28,9 +25,6 @@ typedef struct {
 	struct	packet_buffer*		ring_buffer;
 			size_t				packet_index;
 
-			TouchpadMovement	movementMaker;
-
-			touchpad_settings	settings;
 			uint32				version;
 			uint32				fwVersion;
 
@@ -46,7 +40,6 @@ typedef struct {
 
 			uint8				mode;
 			bool				crcEnabled;
-
 
 	status_t (*send_command)(ps2_dev* dev, uint8 cmd, uint8 *in, int in_count);
 } elantech_cookie;

@@ -11,9 +11,6 @@
 
 #include <KernelExport.h>
 
-#include <touchpad_settings.h>
-
-#include "movement_maker.h"
 #include "packet_buffer.h"
 #include "ps2_service.h"
 
@@ -65,10 +62,6 @@ struct packet_buffer*	synaptics_ring_buffer;
 	size_t				packet_index;
 	uint8				buffer[PS2_PACKET_SYNAPTICS];
 	uint8				mode;
-
-	TouchpadMovement	movementMaker;
-
-	touchpad_settings	settings;
 } synaptics_cookie;
 
 

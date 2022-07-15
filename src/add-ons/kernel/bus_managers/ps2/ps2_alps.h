@@ -10,9 +10,6 @@
 
 #include <KernelExport.h>
 
-#include <touchpad_settings.h>
-
-#include "movement_maker.h"
 #include "packet_buffer.h"
 #include "ps2_dev.h"
 
@@ -27,9 +24,6 @@ typedef struct {
 			uint8				mode;
 
 			uint8				previousZ;
-			TouchpadMovement	movementMaker;
-
-			touchpad_settings	settings;
 } alps_cookie;
 
 
