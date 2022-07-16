@@ -9,6 +9,7 @@
 #include <boot/stdio.h>
 
 #include "efi_platform.h"
+#include "mmu.h"
 #include "serial.h"
 
 #include "aarch64.h"
@@ -71,7 +72,7 @@ memory_region_type_str(int type)
 void
 arch_convert_kernel_args(void)
 {
-	// empty
+	fix_address(gKernelArgs.arch_args.fdt);
 }
 
 
