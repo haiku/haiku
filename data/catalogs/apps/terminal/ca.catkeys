@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Terminal	247549485
+1	catalan; valencian	x-vnd.Haiku-Terminal	3702716692
 ANSI cyan color	Terminal AppearancePrefView		Color cian ANSI
 Close other tabs	Terminal TermWindow		Tanca altres pestanyes
 Insert path	Terminal TermView		Insereix un camí
@@ -13,7 +13,6 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmeu-ne 
 Solarized Dark	Terminal colors scheme		Fosc solaritzat
 Copy	Terminal TermWindow		Copia
 ANSI bright green color	Terminal AppearancePrefView		Color verd brillant ANSI
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               Imprimeix aquesta ajuda.\n  -t,     --title              Estableix el títol de la finestra.\n  -f,     --fullscreen         Pantalla completa\n  -w,     --working-directory  Estableix el directori de treball inicial.
 ANSI white color	Terminal AppearancePrefView		Color blanc ANSI
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Edita el títol de la pestanya...

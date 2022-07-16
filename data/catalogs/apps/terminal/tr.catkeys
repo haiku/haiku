@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Terminal	247549485
+1	turkish	x-vnd.Haiku-Terminal	3702716692
 ANSI cyan color	Terminal AppearancePrefView		ANSI camgöbeği
 Close other tabs	Terminal TermWindow		Diğer sekmeleri kapat
 Insert path	Terminal TermView		Yolu ekle
@@ -13,7 +13,6 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Etkin program
 Solarized Dark	Terminal colors scheme		Solmuş Koyu
 Copy	Terminal TermWindow		Kopyala
 ANSI bright green color	Terminal AppearancePrefView		ANSI açık yeşil
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h     --help               yardımı göster\n  -t     --title              pencere başlığını ayarla\n  -f     --fullscreen         tam ekran yap\n  -w     --working-directory  başlangıç çalışma dizinini ayarla
 ANSI white color	Terminal AppearancePrefView		ANSI beyaz
 Retro	Terminal colors scheme		Eski Moda
 Edit tab title…	Terminal TermWindow		Sekme başlığını düzenle…

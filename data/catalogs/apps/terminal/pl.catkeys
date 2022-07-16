@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Terminal	1147089150
+1	polish	x-vnd.Haiku-Terminal	307289061
 Close other tabs	Terminal TermWindow		Zamknij pozostałe karty
 Insert path	Terminal TermView		Wstaw ścieżkę
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nie może uruchomić powłoki. Przepraszamy.
@@ -10,7 +10,6 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Potwierdź wy
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t–\tAktualny katalog roboczy bieżącego procesu na aktywnej\n\t\t\tkarcie. Opcjonalnie może zostać podana maksymalna liczba\n\t\t\telementów ścieżki. Np. „%2d” dla maksymalnie dwóch elementów.\n\t%T\t–\tZlokalizowana nazwa aplikacji Terminal.\n\t%e\t–\tKodowanie aktywnej karty. Niewidoczne dla UTF-8.\n\t%i\t–\tIndeks okna.\n\t%t\t–\tTytuł aktywnej karty.
 Solarized Dark	Terminal colors scheme		Solarized Dark
 Copy	Terminal TermWindow		Kopiuj
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               wypisz tę pomoc\n  -t,     --title              ustaw tytuł okna\n  -f,     --fullscreen         uruchom w trybie pełnego ekranu\n  -w,     --working-directory  ustaw początkowy katalog roboczy
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Edytuj tytuł karty…
 Settings	Terminal TermWindow		Ustawienia

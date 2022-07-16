@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	247549485
+1	hungarian	x-vnd.Haiku-Terminal	3702716692
 ANSI cyan color	Terminal AppearancePrefView		ANSI cián
 Close other tabs	Terminal TermWindow		Többi lap bezárása
 Insert path	Terminal TermView		Útvonal beszúrása
@@ -13,7 +13,6 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Kilépés meg
 Solarized Dark	Terminal colors scheme		Erős sötét színek
 Copy	Terminal TermWindow		Másolás
 ANSI bright green color	Terminal AppearancePrefView		ANSI fényes zöld
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		-h, --help a súgó kiírása\n-t, --title ablak címének megadása\n-f, --fullscreen indítás teljesképernyős módban\n-w, --working-directory kezdő mappa megadása
 ANSI white color	Terminal AppearancePrefView		ANSI fehér
 Retro	Terminal colors scheme		Retró
 Edit tab title…	Terminal TermWindow		Lap címének szerkesztése…

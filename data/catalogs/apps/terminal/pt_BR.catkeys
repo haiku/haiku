@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	1800966473
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	961166384
 Close other tabs	Terminal TermWindow		Fechar outras guias
 Insert path	Terminal TermView		Inserir caminho
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal não pôde iniciar o shell. Desculpe.
@@ -10,7 +10,6 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmar sa�
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tO diretório atual de trabalho do processo ativo na aba atual.\n\t\t\tOpcionalmente, o número máximo componentes de caminho podem\n\t\t\tser especificados. Ex.: '%2d' para até dois componentes.\n\t%T\t-\tO nome do aplicativo Terminal para o idioma atual.\n\t%e\t-\tA codificação da aba atual. Não mostrado para UTF-8.\n\t%i\t-\tO índice da janela.\n\t%p\t-\tO nome do processo ativo na aba atual.\n\t%t\t-\tO título da aba atual.
 Solarized Dark	Terminal colors scheme		Solarizado Escuro
 Copy	Terminal TermWindow		Copiar
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               exibe esta ajuda\n  -t,     --title              define o título da janela\n  -f,     --fullscreen         inicia em tela cheia\n  -w,     --working-directory  define o diretório inicial de trabalho
 Retro	Terminal colors scheme		Retrô
 Edit tab title…	Terminal TermWindow		Editar título da aba…
 Settings	Terminal TermWindow		Configurações

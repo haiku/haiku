@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Terminal	1147089150
+1	esperanto	x-vnd.Haiku-Terminal	307289061
 Close other tabs	Terminal TermWindow		Fermi aliajn langetojn
 Insert path	Terminal TermView		Enigi itineron
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Pardonu, sed la terminalo ne povis komenci la ŝelon.
@@ -10,7 +10,6 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Konfirmi ĉes
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLa nuna labora dosierujo de la aktiva procezo en la\n\t\t\taktuala langeto. Nedevige la maksimuma kvanto de eroj de itinero\n\t\t\tpovas esti donita. Ekz. '%2d' por almenaŭ du eroj.\n\t%T\t-\tLa nomo de la programo en terminalo por la aktuala lokaĵaro.\n\t%e\t-\tLa kodprezento de la aktuala langeto. Ne montrata por UTF-8.\n\t%i\t-\tLa indekso de la fenestro.\n\t%p\t-\tLa nomo de la aktiva procezo en la aktuala langeto.\n\t%t\t-\tLa titolo de la aktuala langeto.
 Solarized Dark	Terminal colors scheme		Sunuma Malhelo
 Copy	Terminal TermWindow		Kopii
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               montri ĉi helpon\n  -t,     --title              atribui fenestran titolon\n  -f,     --fullscreen         lanĉi plenekrane\n  -w,     --working-directory  atribui komencan laboran dosierujon
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Redakti la titolon de la langeto…
 Settings	Terminal TermWindow		Agordo

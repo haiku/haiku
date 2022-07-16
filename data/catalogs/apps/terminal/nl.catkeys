@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Terminal	1147089150
+1	dutch; flemish	x-vnd.Haiku-Terminal	307289061
 Close other tabs	Terminal TermWindow		Andere tabs sluiten
 Insert path	Terminal TermView		Voeg pad in
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kon de shell niet starten. Sorry.
@@ -10,7 +10,6 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Afsluiten bev
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDe huidige werkmap van het actieve proces in de\n\t\t\thuidige tab. Optioneel kan het maximum aantal componenten\n\t\t\tvan het pad gespecificeerd worden. Bijvoorbeeld '%2d' voor\n\t\t\tmaximaal twee componenten.\n\t%T\t-\tDe naam van de Terminaltoepassing in de huidige taal.\n\t%e\t-\tDe tekstcodering van de huidige tab. Bij UTF-8 wordt er niets getoond.\n\t%i\t-\tDe index van het venster.\n\t%p\t-\tDe naam van het proces dat actief is in de huidige tab.\n\t%t\t-\tDe titel van de huidige tab.
 Solarized Dark	Terminal colors scheme		Zonnig donker
 Copy	Terminal TermWindow		Kopiëren
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               dit helpbericht weergeven\n  -t,     --title              een venstertitel instellen\n  -f,     --fullscreen         in volledig scherm starten\n  -w,     --working-directory  initiële werkmap instellen
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Tabtitel aanpassen...
 Settings	Terminal TermWindow		Instellingen
