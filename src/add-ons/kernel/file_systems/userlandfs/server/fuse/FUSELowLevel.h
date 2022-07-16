@@ -12,6 +12,9 @@
 #include "fuse_api.h"
 
 
+typedef	int	(*ReadDirBufferFiller) (void* buffer, char* buf, size_t bufsize, const char* name,
+	const struct stat* st, off_t offset);
+
 void fuse_ll_init(const fuse_lowlevel_ops* ops, void* userdata, struct fuse_conn_info* conn);
 void fuse_ll_destroy(const fuse_lowlevel_ops* ops, void *userdata);
 int fuse_ll_lookup(const fuse_lowlevel_ops* ops, fuse_ino_t parent, const char *name,
@@ -41,7 +44,7 @@ int fuse_ll_fsync(const fuse_lowlevel_ops* ops, fuse_ino_t ino, int datasync,
 	struct fuse_file_info *fi);
 int fuse_ll_opendir(const fuse_lowlevel_ops* ops, fuse_ino_t inode, struct fuse_file_info* ffi);
 int fuse_ll_readdir(const fuse_lowlevel_ops* ops, fuse_ino_t ino, void* cookie,
-	fuse_fill_dir_t filler, off_t pos, fuse_file_info* ffi);
+	char* buffer, size_t bufferSize, ReadDirBufferFiller filler, off_t pos, fuse_file_info* ffi);
 int fuse_ll_releasedir(const fuse_lowlevel_ops* ops, fuse_ino_t ino, struct fuse_file_info *fi);
 int fuse_ll_statfs(const fuse_lowlevel_ops* ops, fuse_ino_t inode, struct statvfs* stat);
 int fuse_ll_getxattr(const fuse_lowlevel_ops* ops, fuse_ino_t ino, const char *name,

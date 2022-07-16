@@ -6,10 +6,15 @@
 #include "FUSELowLevel.h"
 
 #include <assert.h>
+#include <dirent.h>
 #include <stdio.h>
 #include <string.h>
 
 #include <Errors.h>
+
+#define ROUNDDOWN(a, b) (((a) / (b)) * (b))
+#define ROUNDUP(a, b)   ROUNDDOWN((a) + (b) - 1, b)
+
 
 
 // Reimplement fuse_req in our own way. In libfuse, the requests are communicated to the kernel,
@@ -38,7 +43,8 @@ struct fuse_req {
 
 	sem_t fSyncSem;
 	ssize_t fReplyResult;
-	fuse_fill_dir_t fRequestFiller; // callback function to fill buffer for directory reads
+
+	ReadDirBufferFiller fRequestFiller;
 	void* fRequestCookie;
 
 	// The reply can contain various things, depending on which function was called
@@ -127,7 +133,6 @@ fuse_ll_readlink(const fuse_lowlevel_ops* ops, fuse_ino_t ino, char* buffer, siz
 
 	fuse_req request;
 	request.fReplyBuf = buffer;
-	request.fReplyResult = size;
 	ops->readlink(&request, ino);
 	request.Wait();
 	return request.fReplyResult;
@@ -319,25 +324,21 @@ fuse_ll_opendir(const fuse_lowlevel_ops* ops, fuse_ino_t inode, struct fuse_file
 
 
 int
-fuse_ll_readdir(const fuse_lowlevel_ops* ops, fuse_ino_t ino, void* cookie, fuse_fill_dir_t filler,
-	off_t pos, fuse_file_info* ffi)
+fuse_ll_readdir(const fuse_lowlevel_ops* ops, fuse_ino_t ino, void* cookie, char* buffer,
+	size_t bufferSize, ReadDirBufferFiller filler, off_t pos, fuse_file_info* ffi)
 {
 	if (ops->readdir == NULL)
 		return B_NOT_SUPPORTED;
 
 	fuse_req request;
+	request.fReplyBuf = buffer;
+
 	request.fRequestFiller = filler;
 	request.fRequestCookie = cookie;
-	request.fReplyBuf = NULL;
 
-	do {
-		request.fReplyResult = 0;
-		ops->readdir(&request, ino, UINT32_MAX, pos, ffi);
-		request.Wait();
-		if (request.fReplyResult > 0)
-			pos += request.fReplyResult;
-	} while (request.fReplyResult > 0);
+	ops->readdir(&request, ino, bufferSize, pos, ffi);
 
+	request.Wait();
 	return request.fReplyResult;
 }
 
@@ -377,7 +378,6 @@ fuse_ll_getxattr(const fuse_lowlevel_ops* ops, fuse_ino_t ino, const char *name,
 		return B_NOT_SUPPORTED;
 
 	fuse_req request;
-	request.fReplyResult = size;
 	request.fReplyBuf = buffer;
 	ops->getxattr(&request, ino, name, size);
 	request.Wait();
@@ -392,7 +392,6 @@ fuse_ll_listxattr(const fuse_lowlevel_ops* ops, fuse_ino_t ino, char* buffer, si
 		return B_NOT_SUPPORTED;
 
 	fuse_req request;
-	request.fReplyResult = size;
 	request.fReplyBuf = (char*)buffer;
 	ops->listxattr(&request, ino, size);
 	request.Wait();
@@ -472,9 +471,11 @@ fuse_reply_open(fuse_req_t req, const struct fuse_file_info* f)
 int
 fuse_reply_buf(fuse_req_t req, const char *buf, size_t size)
 {
-	if (req->fReplyBuf)
+	if (req->fReplyBuf && req->fReplyBuf != buf)
 		memcpy(req->fReplyBuf, buf, size);
+
 	req->fReplyResult = size;
+
 	req->Notify();
 	return 0;
 }
@@ -517,18 +518,20 @@ fuse_reply_write(fuse_req_t req, size_t count)
 }
 
 
+// return: size of the entry (no matter if it was added to the buffer or not)
+// params: pointer to where to store the entry, size
 size_t fuse_add_direntry(fuse_req_t req, char *buf, size_t bufsize, const char *name,
 	const struct stat *stbuf, off_t off)
 {
-	// Special case where the client wants to know how much space an entry will use (it's always
-	// 1 slot in our case)
-	if ((buf == NULL) && (bufsize == 0))
-		return 1;
+	size_t entryLen = offsetof(struct dirent, d_name) + strlen(name) + 1;
+	// align the entry length, so the next dirent will be aligned
+	entryLen = ROUNDUP(entryLen, 8);
 
-	int ret = req->fRequestFiller(req->fRequestCookie, name, stbuf, off);
-	if (ret != 0)
-		return 0;
-	return 1;
+	if (stbuf != NULL) {
+		req->fRequestFiller(req->fRequestCookie, buf, bufsize, name, stbuf, off);
+	}
+
+	return entryLen;
 }
 
 

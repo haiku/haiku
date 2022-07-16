@@ -2135,8 +2135,7 @@ FUSEVolume::ReadDir(void* _node, void* _cookie, void* buffer, size_t bufferSize,
 
 		locker.Lock();
 
-		ReadDirBuffer readDirBuffer(this, node, cookie, buffer, bufferSize,
-			count);
+		ReadDirBuffer readDirBuffer(this, node, cookie, buffer, bufferSize, count);
 		off_t offset = cookie->currentEntryOffset;
 
 		// read the dir
@@ -2145,8 +2144,28 @@ FUSEVolume::ReadDir(void* _node, void* _cookie, void* buffer, size_t bufferSize,
 			locker.Unlock();
 
 			// TODO pass the cookie from opendir here instead of NULL
-			fuseError = fuse_ll_readdir(fOps, node->id, &readDirBuffer, &_AddReadDirEntry,
-				offset, NULL);
+			fuseError = fuse_ll_readdir(fOps, node->id, &readDirBuffer, (char*)buffer, bufferSize,
+				&_AddReadDirEntryLowLevel, offset, NULL);
+
+			// The request filler may or may not be used. If the filesystem decides that it has
+			// already cached the directory, it can reply with an already filled buffer from a
+			// previous run. So, we can't rely on any updates done to the cookie by that function.
+			// So we need to check the number of entries in the buffer, and advance the
+			// currentEntryOffset.
+			if (fuseError > 0) {
+				struct dirent* dirent = (struct dirent*)buffer;
+				countRead = 0;
+				while ((char*)dirent + dirent->d_reclen <= (char*)buffer + fuseError) {
+					countRead++;
+					dirent = (struct dirent*)(((char*)dirent) + dirent->d_reclen);
+					if (dirent->d_reclen == 0)
+						break;
+				}
+				cookie->currentEntryOffset += (char*)dirent - (char*)buffer;
+
+				fuseError = 0;
+			}
+			readDirError = 0;
 		} else {
 			// get a path for the node
 			char path[B_PATH_NAME_LENGTH];
@@ -2166,6 +2185,9 @@ PRINT(("  using readdir() interface\n"));
 				fuseError = fuse_fs_readdir(fFS, path, &readDirBuffer,
 					&_AddReadDirEntry, offset, cookie);
 			}
+
+			countRead = readDirBuffer.entriesRead;
+			readDirError = readDirBuffer.error;
 		}
 
 		if (fuseError != 0)
@@ -2173,8 +2195,6 @@ PRINT(("  using readdir() interface\n"));
 
 		locker.Lock();
 
-		countRead = readDirBuffer.entriesRead;
-		readDirError = readDirBuffer.error;
 	}
 
 	if (cookie->entryCache != NULL) {
@@ -3166,6 +3186,18 @@ FUSEVolume::_BuildPath(FUSENode* node, char* path, size_t& pathLen)
 
 
 /*static*/ int
+FUSEVolume::_AddReadDirEntryLowLevel(void* _buffer, char* buf, size_t bufsize, const char* name,
+	const struct stat* st, off_t offset)
+{
+	ReadDirBuffer* buffer = (ReadDirBuffer*)_buffer;
+
+	ino_t nodeID = st != NULL ? st->st_ino : 0;
+	int type = st != NULL ? st->st_mode & S_IFMT : 0;
+	return buffer->volume->_AddReadDirEntryLowLevel(buffer, buf, bufsize, name, type, nodeID, offset);
+}
+
+
+/*static*/ int
 FUSEVolume::_AddReadDirEntry(void* _buffer, const char* name,
 	const struct stat* st, off_t offset)
 {
@@ -3182,14 +3214,135 @@ FUSEVolume::_AddReadDirEntryGetDir(fuse_dirh_t handle, const char* name,
 	int type, ino_t nodeID)
 {
 	ReadDirBuffer* buffer = (ReadDirBuffer*)handle;
-	return buffer->volume->_AddReadDirEntry(buffer, name, type << 12, nodeID,
-		0);
+	return buffer->volume->_AddReadDirEntry(buffer, name, type << 12, nodeID, 0);
 }
 
 
 int
-FUSEVolume::_AddReadDirEntry(ReadDirBuffer* buffer, const char* name, int type,
-	ino_t nodeID, off_t offset)
+FUSEVolume::_AddReadDirEntryLowLevel(ReadDirBuffer* buffer, char* buf, size_t bufsize, const char* name,
+	int type, ino_t nodeID, off_t offset)
+{
+	PRINT(("FUSEVolume::_AddReadDirEntryLowLevel(%p, \"%s\", %#x, %" B_PRId64 ", %"
+		B_PRId64 "\n", buffer, name, type, nodeID, offset));
+
+	AutoLocker<Locker> locker(fLock);
+
+	size_t entryLen = 0;
+
+	// create a node and an entry, if necessary
+	ino_t dirID = buffer->directory->id;
+	FUSEEntry* entry;
+	if (strcmp(name, ".") == 0) {
+		// current dir entry
+		nodeID = dirID;
+		type = S_IFDIR;
+	} else if (strcmp(name, "..") == 0) {
+		// parent dir entry
+		FUSEEntry* parentEntry = buffer->directory->entries.Head();
+		if (parentEntry == NULL) {
+			ERROR(("FUSEVolume::_AddReadDirEntry(): dir %" B_PRId64
+				" has no entry!\n", dirID));
+			return 0;
+		}
+		nodeID = parentEntry->parent->id;
+		type = S_IFDIR;
+	} else if ((entry = fEntries.Lookup(FUSEEntryRef(dirID, name))) == NULL) {
+		// get the node
+		FUSENode* node = NULL;
+		if (fUseNodeIDs)
+			node = fNodes.Lookup(nodeID);
+		else
+			nodeID = _GenerateNodeID();
+
+		if (node == NULL) {
+			// no node yet -- create one
+
+			// If we don't have a valid type, we need to stat the node first.
+			if (type == 0) {
+				struct stat st;
+				int fuseError;
+				if (fOps != NULL) {
+					fuseError = fuse_ll_getattr(fOps, node->id, &st);
+				} else {
+					char path[B_PATH_NAME_LENGTH];
+					size_t pathLen;
+					status_t error = _BuildPath(buffer->directory, name, path,
+							pathLen);
+					if (error != B_OK) {
+						buffer->error = error;
+						return 0;
+					}
+
+					locker.Unlock();
+
+					// stat the path
+					fuseError = fuse_fs_getattr(fFS, path, &st);
+				}
+
+				locker.Lock();
+
+				if (fuseError != 0) {
+					buffer->error = fuseError;
+					return 0;
+				}
+
+				type = st.st_mode & S_IFMT;
+			}
+
+			node = new(std::nothrow) FUSENode(nodeID, type);
+			if (node == NULL) {
+				buffer->error = B_NO_MEMORY;
+				return 1;
+			}
+			PRINT(("  -> create node: %p, id: %" B_PRId64 "\n", node, nodeID));
+
+			fNodes.Insert(node);
+		} else {
+			// get a node reference for the entry
+			node->refCount++;
+		}
+
+		// create the entry
+		entry = FUSEEntry::Create(buffer->directory, name, node);
+		if (entry == NULL) {
+			_PutNode(node);
+			buffer->error = B_NO_MEMORY;
+			return 1;
+		}
+
+		buffer->directory->refCount++;
+			// dir reference for the entry
+
+		fEntries.Insert(entry);
+		node->entries.Add(entry);
+	} else {
+		// TODO: Check whether the node's ID matches the one we got (if any)!
+		nodeID = entry->node->id;
+		type = entry->node->type;
+	}
+
+	// fill in the dirent
+	dirent* dirEntry = (dirent*)(buf);
+	dirEntry->d_dev = fID;
+	dirEntry->d_ino = nodeID;
+	strcpy(dirEntry->d_name, name);
+
+	// align the entry length, so the next dirent will be aligned
+	entryLen = offsetof(struct dirent, d_name) + strlen(name) + 1;
+	entryLen = ROUNDUP(entryLen, 8);
+
+	dirEntry->d_reclen = entryLen;
+
+	// update the buffer
+	buffer->usedSize += entryLen;
+
+	return 0;
+}
+
+
+int
+FUSEVolume::_AddReadDirEntry(ReadDirBuffer* buffer, const char* name,
+	int type, ino_t nodeID, off_t offset)
 {
 	PRINT(("FUSEVolume::_AddReadDirEntry(%p, \"%s\", %#x, %" B_PRId64 ", %"
 		B_PRId64 "\n", buffer, name, type, nodeID, offset));

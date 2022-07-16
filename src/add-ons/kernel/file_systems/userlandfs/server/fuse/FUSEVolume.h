@@ -196,10 +196,15 @@ private:
 			status_t			_BuildPath(FUSENode* node, char* path,
 									size_t& pathLen);
 
+	static	int					_AddReadDirEntryLowLevel(void* buffer, char* buf, size_t bufsize,
+									const char* name, const struct stat* st, off_t offset);
 	static	int					_AddReadDirEntry(void* buffer, const char* name,
 									const struct stat* st, off_t offset);
 	static	int					_AddReadDirEntryGetDir(fuse_dirh_t handle,
 									const char* name, int type, ino_t nodeID);
+			int					_AddReadDirEntryLowLevel(ReadDirBuffer* buffer,
+									char* buf, size_t bufSize, const char* name, int type,
+									ino_t nodeID, off_t offset);
 			int					_AddReadDirEntry(ReadDirBuffer* buffer,
 									const char* name, int type, ino_t nodeID,
 									off_t offset);
