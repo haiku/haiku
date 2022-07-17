@@ -506,8 +506,7 @@ FUSEFileSystem::_InitCapabilities()
 		bool hasAttributes = fLowLevelOps.listxattr != NULL;
 		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR_DIR, hasAttributes);
 		// not needed: FS_VNODE_CAPABILITY_CLOSE_ATTR_DIR
-		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_DIR_COOKIE,
-				hasAttributes);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_DIR_COOKIE, hasAttributes);
 		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_DIR, hasAttributes);
 		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_ATTR_DIR, hasAttributes);
 
@@ -521,8 +520,7 @@ FUSEFileSystem::_InitCapabilities()
 		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR, fLowLevelOps.getxattr);
 		// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_ATTR, fLowLevelOps.write_attr);
 
-		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_STAT,
-		fLowLevelOps.getxattr);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_STAT, fLowLevelOps.getxattr);
 // 		// missing: FS_VNODE_CAPABILITY_WRITE_ATTR_STAT
 // 		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_RENAME_ATTR, fLowLevelOps.rename_attr);
 	} else {

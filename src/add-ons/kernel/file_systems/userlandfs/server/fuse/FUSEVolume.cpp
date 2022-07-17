@@ -1654,12 +1654,14 @@ FUSEVolume::Open(void* _node, int openMode, void** _cookie)
 	size_t pathLen;
 
 	int fuseError;
-	struct fuse_file_info llCookie;
+	struct fuse_file_info llCookie = { 0 };
 		// FIXME store this in the FileCookie for lowlevel streams, we'll need it in read, write...
 	if (fOps != NULL) {
 		llCookie.flags = openMode;
-			// TODO do we need to perform a conversion here?
-		fuseError = fuse_ll_open(fOps, node->id, &llCookie);
+		if (S_ISDIR(node->type))
+			fuseError = fuse_ll_opendir(fOps, node->id, &llCookie);
+		else
+			fuseError = fuse_ll_open(fOps, node->id, &llCookie);
 	} else {
 		AutoLocker<Locker> locker(fLock);
 
@@ -2154,8 +2156,8 @@ FUSEVolume::ReadDir(void* _node, void* _cookie, void* buffer, size_t bufferSize,
 			// currentEntryOffset.
 			if (fuseError > 0) {
 				struct dirent* dirent = (struct dirent*)buffer;
-				countRead = 0;
-				while ((char*)dirent + dirent->d_reclen <= (char*)buffer + fuseError) {
+				while (countRead < count
+					&& (char*)dirent + dirent->d_reclen <= (char*)buffer + fuseError) {
 					countRead++;
 					dirent = (struct dirent*)(((char*)dirent) + dirent->d_reclen);
 					if (dirent->d_reclen == 0)
