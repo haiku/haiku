@@ -24,6 +24,8 @@ KernelMergeObject kernel_arch_arm64.o :
 	arch_platform.cpp
 	arch_asm.S
 
+	soc.cpp
+
 	VMSAv8TranslationMap.cpp
 	PMAPPhysicalPageMapper.cpp
 

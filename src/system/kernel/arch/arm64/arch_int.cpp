@@ -23,6 +23,8 @@
 #include "VMSAv8TranslationMap.h"
 #include <string.h>
 
+#include "soc.h"
+
 #define TRACE_ARCH_INT
 #ifdef TRACE_ARCH_INT
 #	define TRACE(x) dprintf x
