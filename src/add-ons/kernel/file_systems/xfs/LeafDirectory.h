@@ -26,14 +26,17 @@ enum ContentType { DATA, LEAF };
 class ExtentLeafHeader {
 public:
 
-			virtual			~ExtentLeafHeader()		=	0;
-			virtual	uint16				Magic()		=	0;
-			virtual	uint64				Blockno()	=	0;
-			virtual	uint64				Lsn()		=	0;
-			virtual	uint64				Owner()		=	0;
-			virtual	uuid_t*				Uuid()		=	0;
-			virtual	uint16				Count()		=	0;
-			virtual	uint32				Forw()		=	0;
+			virtual						~ExtentLeafHeader()		=	0;
+			virtual	uint16				Magic()					=	0;
+			virtual	uint64				Blockno()				=	0;
+			virtual	uint64				Lsn()					=	0;
+			virtual	uint64				Owner()					=	0;
+			virtual	uuid_t*				Uuid()					=	0;
+			virtual	uint16				Count()					=	0;
+			virtual	uint32				Forw()					=	0;
+			static	uint32				ExpectedMagic(int8 WhichDirectory,
+										Inode* inode);
+			static	uint32				CRCOffset();
 
 };
 
@@ -100,8 +103,6 @@ public:
 								~LeafDirectory();
 			status_t			Init();
 			bool				IsLeafType();
-			bool				VerifyDataHeader(ExtentDataHeader* header);
-			bool				VerifyLeafHeader(ExtentLeafHeader* header);
 			void				FillMapEntry(int num, ExtentMapEntry* map);
 			status_t			FillBuffer(int type, char* buffer,
 									int howManyBlocksFurthur);

@@ -43,11 +43,8 @@ extern fs_volume_ops gxfsVolumeOps;
 
 /* B+Tree related macros
 */
-#define XFS_BTREE_SBLOCK_SIZE	18
-	// Header for Short Format btree
-#define XFS_BTREE_LBLOCK_SIZE	24
-	// Header for Long Format btree
 #define XFS_BMAP_MAGIC 0x424d4150
+#define XFS_BMAP_CRC_MAGIC 0x424d4133
 #define MAX_TREE_DEPTH 5
 #define XFS_KEY_SIZE sizeof(xfs_fileoff_t)
 #define XFS_PTR_SIZE sizeof(xfs_fsblock_t)

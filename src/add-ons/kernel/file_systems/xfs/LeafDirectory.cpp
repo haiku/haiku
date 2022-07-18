@@ -7,7 +7,7 @@
 
 #include "LeafDirectory.h"
 
-#include "Checksum.h"
+#include "VerifyHeader.h"
 
 
 LeafDirectory::LeafDirectory(Inode* inode)
@@ -32,90 +32,6 @@ LeafDirectory::~LeafDirectory()
 }
 
 
-bool
-LeafDirectory::VerifyDataHeader(ExtentDataHeader* header)
-{
-	TRACE("VerifyDataHeader\n");
-
-	if (header->Magic() != V4_DATA_HEADER_MAGIC
-		&& header->Magic() != V5_DATA_HEADER_MAGIC) {
-			ERROR("Bad magic number");
-			return false;
-		}
-
-	if (fInode->Version() == 1 || fInode->Version() == 2)
-		return true;
-
-	if (!xfs_verify_cksum(fDataBuffer, fInode->DirBlockSize(),
-			XFS_EXTENT_CRC_OFF - XFS_EXTENT_V5_VPTR_OFF)) {
-			ERROR("Data block is corrupted");
-			return false;
-	}
-
-	uint64 actualBlockToRead =
-		fInode->FileSystemBlockToAddr(fDataMap->br_startblock) / XFS_MIN_BLOCKSIZE;
-
-	if (actualBlockToRead != header->Blockno()) {
-		ERROR("Wrong Block number");
-		return false;
-	}
-
-	if (!fInode->GetVolume()->UuidEquals(header->Uuid())) {
-		ERROR("UUID is incorrect");
-		return false;
-	}
-
-	if (fInode->ID() != header->Owner()) {
-		ERROR("Wrong data owner");
-		return false;
-	}
-
-	return true;
-}
-
-
-bool
-LeafDirectory::VerifyLeafHeader(ExtentLeafHeader* header)
-{
-	TRACE("VerifyLeafHeader\n");
-
-	if (header->Magic() != V4_LEAF_HEADER_MAGIC
-		&& header->Magic() != V5_LEAF_HEADER_MAGIC) {
-			ERROR("Bad magic number");
-			return false;
-		}
-
-	if (fInode->Version() == 1 || fInode->Version() == 2)
-		return true;
-
-	if (!xfs_verify_cksum(fLeafBuffer, fInode->DirBlockSize(),
-			XFS_LEAF_CRC_OFF - XFS_LEAF_V5_VPTR_OFF)) {
-			ERROR("Leaf block is corrupted");
-			return false;
-	}
-
-	uint64 actualBlockToRead =
-		fInode->FileSystemBlockToAddr(fLeafMap->br_startblock) / XFS_MIN_BLOCKSIZE;
-
-	if (actualBlockToRead != header->Blockno()) {
-		ERROR("Wrong Block number");
-		return false;
-	}
-
-	if (!fInode->GetVolume()->UuidEquals(header->Uuid())) {
-		ERROR("UUID is incorrect");
-		return false;
-	}
-
-	if (fInode->ID() != header->Owner()) {
-		ERROR("Wrong leaf owner");
-		return false;
-	}
-
-	return true;
-}
-
-
 status_t
 LeafDirectory::Init()
 {
@@ -137,7 +53,7 @@ LeafDirectory::Init()
 	ExtentDataHeader* data = CreateDataHeader(fInode, fDataBuffer);
 	if (data == NULL)
 		return B_NO_MEMORY;
-	if (!VerifyDataHeader(data)) {
+	if (!VerifyHeader<ExtentDataHeader>(data, fDataBuffer, fInode, 0, fDataMap, XFS_LEAF)) {
 		ERROR("Invalid data header");
 		delete data;
 		return B_BAD_VALUE;
@@ -151,7 +67,7 @@ LeafDirectory::Init()
 	ExtentLeafHeader* leaf = CreateLeafHeader(fInode, fLeafBuffer);
 	if (leaf == NULL)
 		return B_NO_MEMORY;
-	if (!VerifyLeafHeader(leaf)) {
+	if (!VerifyHeader<ExtentLeafHeader>(leaf, fLeafBuffer, fInode, 0, fLeafMap, XFS_LEAF)) {
 		ERROR("Invalid leaf header");
 		delete leaf;
 		return B_BAD_VALUE;
@@ -175,12 +91,14 @@ LeafDirectory::IsLeafType()
 	if (status == false)
 		return status;
 
-	FillMapEntry(fInode->DataExtentsCount() - 1, fLeafMap);
-	TRACE("leaf_Startoffset:(%" B_PRIu64 ")\n",
-		LEAF_STARTOFFSET(fInode->GetVolume()->BlockLog()));
+	void* directoryFork = DIR_DFORK_PTR(fInode->Buffer(), fInode->CoreInodeSize());
 
-	if (fLeafMap->br_startoff
-		!= LEAF_STARTOFFSET(fInode->GetVolume()->BlockLog()))
+	uint64* pointerToMap = (uint64*)((char*)directoryFork
+		+ (fInode->DataExtentsCount() - 1) * EXTENT_SIZE);
+
+	xfs_fileoff_t startoff = (B_BENDIAN_TO_HOST_INT64(*pointerToMap) & MASK(63)) >> 9;
+
+	if (startoff != LEAF_STARTOFFSET(fInode->GetVolume()->BlockLog()))
 		status = false;
 
 	return status;
@@ -465,7 +383,7 @@ LeafDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 			status = FillBuffer(DATA, fDataBuffer,
 				dataBlockNumber - fDataMap->br_startoff);
 			if (status != B_OK)
-				return B_OK;
+				return status;
 		}
 
 		TRACE("offset:(%" B_PRIu32 ")\n", offset);
@@ -488,6 +406,34 @@ LeafDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 
 ExtentLeafHeader::~ExtentLeafHeader()
 {
+}
+
+
+/*
+	First see which type of directory we reading then
+	return magic number as per Inode Version.
+*/
+uint32
+ExtentLeafHeader::ExpectedMagic(int8 WhichDirectory, Inode* inode)
+{
+	if (WhichDirectory == XFS_LEAF) {
+		if (inode->Version() == 1 || inode->Version() == 2)
+			return V4_LEAF_HEADER_MAGIC;
+		else
+			return V5_LEAF_HEADER_MAGIC;
+	} else {
+		if (inode->Version() == 1 || inode->Version() == 2)
+			return XFS_DIR2_LEAFN_MAGIC;
+		else
+			return XFS_DIR3_LEAFN_MAGIC;
+	}
+}
+
+
+uint32
+ExtentLeafHeader::CRCOffset()
+{
+	return XFS_LEAF_CRC_OFF - XFS_LEAF_V5_VPTR_OFF;
 }
 
 

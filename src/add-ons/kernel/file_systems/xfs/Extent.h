@@ -33,6 +33,15 @@ enum ExtentState {
 };
 
 
+// Enum values to check which directory we are reading
+enum DirectoryType {
+	XFS_BLOCK,
+	XFS_LEAF,
+	XFS_NODE,
+	XFS_BTREE,
+};
+
+
 // xfs_dir2_data_free_t
 struct FreeRegion {
 			uint16				offset;
@@ -44,12 +53,15 @@ struct FreeRegion {
 class ExtentDataHeader {
 public:
 
-			virtual			~ExtentDataHeader()		=	0;
-			virtual uint32				Magic()		=	0;
-			virtual uint64				Blockno()	=	0;
-			virtual uint64				Lsn()		=	0;
-			virtual uint64				Owner()		=	0;
-			virtual uuid_t*				Uuid()		=	0;
+			virtual						~ExtentDataHeader()			=	0;
+			virtual uint32				Magic()						=	0;
+			virtual uint64				Blockno()					=	0;
+			virtual uint64				Lsn()						=	0;
+			virtual uint64				Owner()						=	0;
+			virtual uuid_t*				Uuid()						=	0;
+			static	uint32				ExpectedMagic(int8 WhichDirectory,
+										Inode* inode);
+			static	uint32				CRCOffset();
 };
 
 
@@ -145,7 +157,6 @@ public:
 								~Extent();
 			status_t			Init();
 			bool				IsBlockType();
-			bool				VerifyHeader(ExtentDataHeader* header);
 			void				FillMapEntry(void* pointerToMap);
 			status_t			FillBlockBuffer();
 			ExtentBlockTail*	BlockTail();

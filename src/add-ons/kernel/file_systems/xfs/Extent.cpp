@@ -7,7 +7,7 @@
 
 #include "Extent.h"
 
-#include "Checksum.h"
+#include "VerifyHeader.h"
 
 
 Extent::Extent(Inode* inode)
@@ -65,48 +65,6 @@ Extent::FillBlockBuffer()
 }
 
 
-bool
-Extent::VerifyHeader(ExtentDataHeader* header)
-{
-	TRACE("VerifyDataHeader\n");
-
-	if (header->Magic() != DIR2_BLOCK_HEADER_MAGIC
-		&& header->Magic() != DIR3_BLOCK_HEADER_MAGIC) {
-			ERROR("Bad magic number");
-			return false;
-		}
-
-	if (fInode->Version() == 1 || fInode->Version() == 2)
-		return true;
-
-	if (!xfs_verify_cksum(fBlockBuffer, fInode->DirBlockSize(),
-			XFS_EXTENT_CRC_OFF - XFS_EXTENT_V5_VPTR_OFF)) {
-			ERROR("Directory block is corrupted");
-			return false;
-	}
-
-	uint64 actualBlockToRead =
-		fInode->FileSystemBlockToAddr(fMap->br_startblock) / XFS_MIN_BLOCKSIZE;
-
-	if (actualBlockToRead != header->Blockno()) {
-		ERROR("Wrong Block number");
-		return false;
-	}
-
-	if (!fInode->GetVolume()->UuidEquals(header->Uuid())) {
-		ERROR("UUID is incorrect");
-		return false;
-	}
-
-	if (fInode->ID() != header->Owner()) {
-		ERROR("Wrong data owner");
-		return false;
-	}
-
-	return true;
-}
-
-
 status_t
 Extent::Init()
 {
@@ -122,16 +80,15 @@ Extent::Init()
 		//If we use this implementation for leaf directories, this is not
 		//always true
 	status_t status = FillBlockBuffer();
+	if (status != B_OK)
+		return status;
 
 	ExtentDataHeader* header = CreateDataHeader(fInode, fBlockBuffer);
 	if (header == NULL)
 		return B_NO_MEMORY;
-	if (VerifyHeader(header)) {
-		status = B_OK;
-		TRACE("Extent:Init(): Block read successfully\n");
-	} else {
+	if (!VerifyHeader<ExtentDataHeader>(header, fBlockBuffer, fInode, 0, fMap, XFS_BLOCK)) {
 		status = B_BAD_VALUE;
-		TRACE("Extent:Init(): Bad Block!\n");
+		ERROR("Extent:Init(): Bad Block!\n");
 	}
 
 	delete header;
@@ -307,6 +264,34 @@ Extent::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 
 ExtentDataHeader::~ExtentDataHeader()
 {
+}
+
+
+/*
+	First see which type of directory we reading then
+	return magic number as per Inode Version.
+*/
+uint32
+ExtentDataHeader::ExpectedMagic(int8 WhichDirectory, Inode* inode)
+{
+	if (WhichDirectory == XFS_BLOCK) {
+		if (inode->Version() == 1 || inode->Version() == 2)
+			return DIR2_BLOCK_HEADER_MAGIC;
+		else
+			return DIR3_BLOCK_HEADER_MAGIC;
+	} else {
+		if (inode->Version() == 1 || inode->Version() == 2)
+			return V4_DATA_HEADER_MAGIC;
+		else
+			return V5_DATA_HEADER_MAGIC;
+	}
+}
+
+
+uint32
+ExtentDataHeader::CRCOffset()
+{
+	return XFS_EXTENT_CRC_OFF - XFS_EXTENT_V5_VPTR_OFF;
 }
 
 

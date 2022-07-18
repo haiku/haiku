@@ -6,8 +6,10 @@
 
 
 #include "Inode.h"
+
 #include "BPlusTree.h"
 #include "Checksum.h"
+
 
 void
 xfs_inode_t::SwapEndian()
@@ -421,6 +423,50 @@ Inode::CheckPermissions(int accessMode) const
 }
 
 
+uint32
+Inode::SizeOfLongBlock()
+{
+	if (Version() == 3)
+		return sizeof(LongBlock);
+	else
+		return offsetof(struct LongBlock, bb_blkno);
+}
+
+
+bool
+Inode::VerifyBlockHeader(LongBlock* header, char* buffer)
+{
+	TRACE("VerifyBlockHeader\n");
+
+	if (header->Magic() != XFS_BMAP_MAGIC
+		&& header->Magic() != XFS_BMAP_CRC_MAGIC) {
+		ERROR("Bad magic number");
+		return false;
+	}
+
+	if (Version() == 1 || Version() == 2)
+		return true;
+
+	if (!xfs_verify_cksum(buffer, DirBlockSize(),
+			XFS_LBLOCK_CRC_OFF)) {
+		ERROR("Block is corrupted");
+		return false;
+	}
+
+	if (!GetVolume()->UuidEquals(header->Uuid())) {
+		ERROR("UUID is incorrect");
+		return false;
+	}
+
+	if (ID() != header->Owner()) {
+		ERROR("Wrong Block owner");
+		return false;
+	}
+
+	return true;
+}
+
+
 void
 Inode::UnWrapExtentFromWrappedEntry(uint64 wrappedExtent[2],
 	ExtentMapEntry* entry)
@@ -486,7 +532,7 @@ Inode::GetPtrFromRoot(int pos)
 size_t
 Inode::MaxRecordsPossibleNode()
 {
-	size_t availableSpace = GetVolume()->BlockSize() - XFS_BTREE_LBLOCK_SIZE;
+	size_t availableSpace = GetVolume()->BlockSize();
 	return availableSpace / (XFS_KEY_SIZE + XFS_PTR_SIZE);
 }
 
@@ -495,7 +541,8 @@ size_t
 Inode::GetPtrOffsetIntoNode(int pos)
 {
 	size_t maxRecords = MaxRecordsPossibleNode();
-	return XFS_BTREE_LBLOCK_SIZE + maxRecords * XFS_KEY_SIZE
+
+	return SizeOfLongBlock() + maxRecords * XFS_KEY_SIZE
 		+ (pos - 1) * XFS_PTR_SIZE;
 }
 
@@ -534,7 +581,10 @@ Inode::GetNodefromTree(uint16& levelsInTree, Volume* volume,
 			return B_IO_ERROR;
 		}
 		LongBlock* curLongBlock = (LongBlock*)node;
-		ASSERT(curLongBlock->Magic() == XFS_BMAP_MAGIC);
+		if (!VerifyBlockHeader(curLongBlock, node)) {
+			TRACE("Invalid Long Block");
+			return B_BAD_VALUE;
+		}
 		ptrToNode = GetPtrFromNode(1, (void*)curLongBlock);
 			// Get's the first pointer. This points to next node.
 		levelsInTree--;
@@ -589,8 +639,12 @@ Inode::ReadExtentsFromTreeInode()
 	while (1) {
 		// Run till you have leaf blocks to checkout
 		char* leafBuffer = block;
-		ASSERT(((LongBlock*)leafBuffer)->Magic() == XFS_BMAP_MAGIC);
-		uint32 offset = sizeof(LongBlock);
+		if (!VerifyBlockHeader((LongBlock*)leafBuffer, leafBuffer)) {
+			TRACE("Invalid Long Block");
+			return B_BAD_VALUE;
+		}
+
+		uint32 offset = SizeOfLongBlock();
 		int numRecs = ((LongBlock*)leafBuffer)->NumRecs();
 
 		for (int i = 0; i < numRecs; i++) {
