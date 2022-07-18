@@ -237,10 +237,8 @@ GenerateThumbnailJob::Execute()
 	if (!thumbnailWritten) {
 		// send Tracker a message to tell it to update the thumbnail
 		BMessage message(kUpdateThumbnail);
-		if (message.AddInt32("device", fNodeRef.device) == B_OK
-				&& message.AddUInt64("node", fNodeRef.node) == B_OK) {
+		if (message.AddNodeRef("noderef", &fNodeRef) == B_OK)
 			be_app->PostMessage(&message);
-		}
 	}
 
 	return B_OK;
