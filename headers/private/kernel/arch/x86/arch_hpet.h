@@ -5,7 +5,7 @@
 #ifndef _KERNEL_ARCH_x86_HPET_H
 #define _KERNEL_ARCH_x86_HPET_H
 
-#include <arch/x86/arch_acpi.h>
+#include <acpi.h>
 
 /* All masks are 32 bits wide to represent relative bit locations */
 /* Doing it this way is Required since the HPET only supports 32/64-bit aligned reads. */

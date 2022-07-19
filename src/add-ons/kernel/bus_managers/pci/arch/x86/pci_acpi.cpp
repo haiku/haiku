@@ -17,7 +17,7 @@
 #include <KernelExport.h>
 
 #include <boot_item.h>
-#include <arch/x86/arch_acpi.h>
+#include <acpi.h>
 
 
 //#define TRACE_ACPI

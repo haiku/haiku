@@ -17,7 +17,6 @@
 #include <boot/stage2.h>
 #include <boot/arch/x86/arch_cpu.h>
 #include <boot/arch/x86/arch_hpet.h>
-#include <kernel/arch/x86/arch_acpi.h>
 #include <kernel/arch/x86/arch_hpet.h>
 
 #include <string.h>

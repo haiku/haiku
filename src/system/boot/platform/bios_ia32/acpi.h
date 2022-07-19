@@ -6,7 +6,7 @@
 #define ACPI_H
 
 #include <SupportDefs.h>
-#include <arch/x86/arch_acpi.h>
+#include <kernel/acpi.h>
 
 #ifdef __cplusplus
 extern "C" {

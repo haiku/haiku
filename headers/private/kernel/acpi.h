@@ -3,8 +3,8 @@
  * Copyright 2007, Michael Lotz, mmlr@mlotz.ch. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _KERNEL_ARCH_x86_ARCH_ACPI_H
-#define _KERNEL_ARCH_x86_ARCH_ACPI_H
+#ifndef _KERNEL_ACPI_H
+#define _KERNEL_ACPI_H
 
 #define ACPI_RSDP_SIGNATURE		"RSD PTR "
 #define ACPI_RSDT_SIGNATURE		"RSDT"
@@ -203,4 +203,4 @@ typedef struct acpi_local_x2_apic_nmi {
 } _PACKED acpi_local_x2_apic_nmi;
 
 
-#endif	/* _KERNEL_ARCH_x86_ARCH_ACPI_H */
+#endif	/* _KERNEL_ACPI_H */
