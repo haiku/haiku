@@ -68,7 +68,8 @@ public:
 
 	ssize_t					ReadFrom(BDataIO* source);
 	void					WriteExactlyTo(BDataIO* target);
-	void					WriteTo(HttpTransferFunction func);
+	void					WriteTo(HttpTransferFunction func,
+								std::optional<size_t> maxSize = std::nullopt);
 	std::optional<BString>	GetNextLine();
 
 	size_t					RemainingBytes() noexcept;
@@ -79,6 +80,15 @@ public:
 private:
 	std::vector<std::byte>	fBuffer;
 	size_t					fCurrentOffset = 0;
+};
+
+
+enum class HttpBodyInputStreamState {
+	ChunkSize,
+	ChunkEnd,
+	Chunk,
+	Trailers,
+	Done
 };
 
 
@@ -100,6 +110,8 @@ public:
 	bool					Complete() const noexcept;
 
 private:
+	size_t					_ParseBodyRaw(HttpBuffer& buffer, HttpTransferFunction writeToBody);
+	size_t					_ParseBodyChunked(HttpBuffer& buffer, HttpTransferFunction writeToBody);
 	size_t					_ReadChunk(HttpBuffer& buffer, HttpTransferFunction writeToBody,
 								size_t maxSize, bool flush);
 	bool					_IsChunked() const noexcept;
@@ -108,8 +120,9 @@ private:
 	off_t					fHeaderBytes = 0;
 
 	// Support for chunked transfers
-	std::optional<off_t>	fRemainingChunkSize;
-	bool					fChunkedTransferComplete = false;
+	HttpBodyInputStreamState fBodyState = HttpBodyInputStreamState::ChunkSize;
+	off_t					fRemainingChunkSize = 0;
+	bool					fLastChunk = false;
 
 	// Receive stats
 	std::optional<off_t>	fBodyBytesTotal = 0;

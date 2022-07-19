@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <optional>
+#include <stdexcept>
 #include <string>
 
 #include <DataIO.h>
@@ -295,14 +296,18 @@ HttpBuffer::WriteExactlyTo(BDataIO* target)
 		of available bytes.
 */
 void
-HttpBuffer::WriteTo(HttpTransferFunction func)
+HttpBuffer::WriteTo(HttpTransferFunction func , std::optional<size_t> maxSize)
 {
 	if (RemainingBytes() == 0)
 		return;
 
-	auto bytesWritten = func(fBuffer.data() + fCurrentOffset, RemainingBytes());
-	if (bytesWritten > RemainingBytes())
-		throw BRuntimeError(__PRETTY_FUNCTION__, "More bytes written than were remaining");
+	auto size = RemainingBytes();
+	if (maxSize.has_value() && *maxSize < size)
+		size = *maxSize;
+
+	auto bytesWritten = func(fBuffer.data() + fCurrentOffset, size);
+	if (bytesWritten > size)
+		throw BRuntimeError(__PRETTY_FUNCTION__, "More bytes written than were made available");
 
 	fCurrentOffset += bytesWritten;
 }
@@ -488,26 +493,132 @@ HttpParser::SetContentLength(std::optional<off_t> contentLength) noexcept
 size_t
 HttpParser::ParseBody(HttpBuffer& buffer, HttpTransferFunction writeToBody)
 {
-	if (fBodyBytesTotal && (fTransferredBodySize + buffer.RemainingBytes()) > fBodyBytesTotal)
+	if (fBodyBytesTotal.has_value()) {
+		return _ParseBodyRaw(buffer, writeToBody);
+	} else {
+		return _ParseBodyChunked(buffer, writeToBody);
+	}
+}
+
+
+/*!
+	\brief Parse the body from the \a buffer and use \a writeToBody function to save.
+*/
+size_t
+HttpParser::_ParseBodyRaw(HttpBuffer& buffer, HttpTransferFunction writeToBody)
+{
+	if (fBodyBytesTotal && (fTransferredBodySize + static_cast<off_t>(buffer.RemainingBytes()))
+		> *fBodyBytesTotal)
 		throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
 
-	size_t bytesRead = 0;
-	size_t bytesToRead = 0;
-	bool readEnd = false;
-	while (buffer.RemainingBytes() > 0) {
-		if (_IsChunked()) {
-			bytesToRead = 100;
-			readEnd = false;
-		} else {
-			bytesToRead = buffer.RemainingBytes();
-			readEnd = fBodyBytesTotal.value()
-				== (fTransferredBodySize + static_cast<off_t>(bytesToRead));
-		}
+	auto bytesToRead = buffer.RemainingBytes();
+	auto readEnd = fBodyBytesTotal.value()
+		== (fTransferredBodySize + static_cast<off_t>(bytesToRead));
 
-		bytesRead += _ReadChunk(buffer, writeToBody, bytesToRead, readEnd);
-	}
+	auto bytesRead = _ReadChunk(buffer, writeToBody, bytesToRead, readEnd);
 	fTransferredBodySize += bytesRead;
 	return bytesRead;
+}
+
+
+/*!
+	\brief Parse the body from the \a buffer and use \a writeToBody function to save.
+*/
+size_t
+HttpParser::_ParseBodyChunked(HttpBuffer& buffer, HttpTransferFunction writeToBody)
+{
+	size_t totalBytesRead = 0;
+	while (buffer.RemainingBytes() > 0) {
+		switch (fBodyState) {
+		case HttpBodyInputStreamState::ChunkSize:
+		{
+			// Read the next chunk size from the buffer; if unsuccesful wait for more data
+			auto chunkSizeString = buffer.GetNextLine();
+			if (!chunkSizeString)
+				return totalBytesRead;
+			auto chunkSizeStr = std::string(chunkSizeString.value().String());
+			try {
+				size_t pos = 0;
+				fRemainingChunkSize = std::stoll(chunkSizeStr, &pos, 16);
+				if (pos < chunkSizeStr.size() && chunkSizeStr[pos] != ';'){
+					throw BNetworkRequestError(__PRETTY_FUNCTION__,
+						BNetworkRequestError::ProtocolError);
+				}
+			} catch (const std::invalid_argument&) {
+				throw BNetworkRequestError(__PRETTY_FUNCTION__,
+					BNetworkRequestError::ProtocolError);
+			} catch (const std::out_of_range&) {
+				throw BNetworkRequestError(__PRETTY_FUNCTION__,
+					BNetworkRequestError::ProtocolError);
+			}
+
+			if (fRemainingChunkSize > 0)
+				fBodyState = HttpBodyInputStreamState::Chunk;
+			else
+				fBodyState = HttpBodyInputStreamState::Trailers;
+			break;
+		}
+
+		case HttpBodyInputStreamState::Chunk:
+		{
+			size_t bytesToRead;
+			bool readEnd = false;
+			if (fRemainingChunkSize > static_cast<off_t>(buffer.RemainingBytes()))
+				bytesToRead = buffer.RemainingBytes();
+			else {
+				readEnd = true;
+				bytesToRead = fRemainingChunkSize;
+			}
+
+			auto bytesRead = _ReadChunk(buffer, writeToBody, bytesToRead, readEnd);
+			fTransferredBodySize += bytesRead;
+			totalBytesRead += bytesRead;
+			fRemainingChunkSize -= bytesRead;
+			if (fRemainingChunkSize == 0)
+				fBodyState = HttpBodyInputStreamState::ChunkEnd;
+			break;
+		}
+
+		case HttpBodyInputStreamState::ChunkEnd:
+		{
+			if (buffer.RemainingBytes() < 2) {
+				// not enough data in the buffer to finish the chunk
+				return totalBytesRead;
+			}
+			auto chunkEndString = buffer.GetNextLine();
+			if (!chunkEndString || chunkEndString.value().Length() != 0) {
+				// There should have been an empty chunk
+				throw BNetworkRequestError(__PRETTY_FUNCTION__,
+					BNetworkRequestError::ProtocolError);
+			}
+
+			fBodyState = HttpBodyInputStreamState::ChunkSize;
+			break;
+		}
+
+		case HttpBodyInputStreamState::Trailers:
+		{
+			auto trailerString = buffer.GetNextLine();
+			if (!trailerString)  {
+				// More data to come
+				return totalBytesRead;
+			}
+
+			if (trailerString.value().Length() > 0) {
+				// Ignore empty trailers for now
+				// TODO: review if the API should support trailing headers
+			} else {
+				fBodyState = HttpBodyInputStreamState::Done;
+				return totalBytesRead;
+			}
+			break;
+		}
+
+		case HttpBodyInputStreamState::Done:
+			return totalBytesRead;
+		}
+	}
+	return totalBytesRead;
 }
 
 
@@ -518,7 +629,7 @@ bool
 HttpParser::Complete() const noexcept
 {
 	if (_IsChunked())
-		return fChunkedTransferComplete;
+		return fBodyState == HttpBodyInputStreamState::Done;
 
 	return fBodyBytesTotal.value() == fTransferredBodySize;
 }
@@ -548,16 +659,14 @@ HttpParser::_ReadChunk(HttpBuffer& buffer, HttpTransferFunction writeToBody, siz
 		size = buffer.RemainingBytes();
 
 	if (fDecompressingStream) {
-		buffer.WriteTo([this, &size](const std::byte* buffer, size_t bufferSize){
-			if (size < bufferSize)
-				bufferSize = size;
+		buffer.WriteTo([this](const std::byte* buffer, size_t bufferSize){
 			auto status = fDecompressingStream->WriteExactly(buffer, bufferSize);
 			if (status != B_OK) {
 				throw BNetworkRequestError("BDataIO::WriteExactly()",
 					BNetworkRequestError::SystemError, status);
 			}
 			return bufferSize;
-		});
+		}, size);
 
 		if (flush) {
 			// No more bytes expected so flush out the final bytes
@@ -578,7 +687,7 @@ HttpParser::_ReadChunk(HttpBuffer& buffer, HttpTransferFunction writeToBody, siz
 		} 
 	} else {
 		// Write the body directly to the target
-		buffer.WriteTo(writeToBody);
+		buffer.WriteTo(writeToBody, size);
 	}
 	return size;
 }
