@@ -125,7 +125,6 @@ BrowserApp::~BrowserApp()
 	delete fSettings;
 	delete fCookies;
 	delete fSession;
-	delete fContext;
 }
 
 

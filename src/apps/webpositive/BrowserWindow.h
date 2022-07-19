@@ -266,7 +266,7 @@ private:
 			bigtime_t			fLastMouseMovedTime;
 			BPoint				fLastMousePos;
 
-			BPrivate::Network::BUrlContext*	fContext;
+			BReference<BPrivate::Network::BUrlContext>	fContext;
 
 			// cached settings
 			SettingsMessage*	fAppSettings;
