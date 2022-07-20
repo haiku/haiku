@@ -279,7 +279,6 @@ HttpProtocolTest::HttpMethodTest()
 constexpr std::string_view kExpectedRequestText =
 	"GET / HTTP/1.1\r\n"
 	"Host: www.haiku-os.org\r\n"
-	"Accept: *\r\n"
 	"Accept-Encoding: gzip\r\n"
 	"Connection: close\r\n"
 	"Api-Key: 01234567890abcdef\r\n\r\n";
@@ -343,7 +342,6 @@ private:
 constexpr std::string_view kExpectedStreamText =
 	"GET / HTTP/1.1\r\n"
 	"Host: www.haiku-os.org\r\n"
-	"Accept: *\r\n"
 	"Accept-Encoding: gzip\r\n"
 	"Connection: close\r\n\r\n";
 
@@ -542,7 +540,7 @@ static const BHttpFields kExpectedGetFields = {
 	{"Server"sv, "Test HTTP Server for Haiku"sv},
 	{"Date"sv, "Sun, 09 Feb 2020 19:32:42 GMT"sv},
 	{"Content-Type"sv, "text/plain"sv},
-	{"Content-Length"sv, "110"sv},
+	{"Content-Length"sv, "107"sv},
 	{"Content-Encoding"sv, "gzip"sv},
 };
 
@@ -553,7 +551,6 @@ constexpr std::string_view kExpectedGetBody = {
 	"Headers:\r\n"
 	"--------\r\n"
 	"Host: 127.0.0.1:PORT\r\n"
-	"Accept: *\r\n"
 	"Accept-Encoding: gzip\r\n"
 	"Connection: close\r\n"
 };
@@ -750,7 +747,6 @@ static BString kExpectedPostBody
 		"Headers:\r\n"
 		"--------\r\n"
 		"Host: 127.0.0.1:PORT\r\n"
-		"Accept: *\r\n"
 		"Accept-Encoding: gzip\r\n"
 		"Connection: close\r\n"
 		"Content-Type: text/plain\r\n"

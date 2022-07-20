@@ -305,7 +305,6 @@ BHttpRequest::SetAuthentication(const BHttpAuthentication& authentication)
 
 static constexpr std::array<std::string_view, 6> fReservedOptionalFieldNames = {
 	"Host"sv,
-	"Accept"sv,
 	"Accept-Encoding"sv,
 	"Connection"sv,
 	"Content-Type"sv,
@@ -477,7 +476,6 @@ BHttpRequest::SerializeHeaderTo(BDataIO* target) const
 
 		outputFields.AddFields({
 			{"Host"sv, std::string_view(host.String())},
-			{"Accept"sv, "*"sv},
 			{"Accept-Encoding"sv, "gzip"sv},
 				// Allows the server to compress data using the "gzip" format.
 				// "deflate" is not supported, because there are two interpretations

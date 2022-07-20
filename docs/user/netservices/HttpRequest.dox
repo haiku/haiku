@@ -652,7 +652,6 @@ namespace Network {
 
 	There are a few reserved fields, which cannot be set as optional fields. These currently are:
 	* \c Host
-	* \c Accept
 	* \c Accept-Encoding
 	* \c Connection
 	* \c Content-Type
