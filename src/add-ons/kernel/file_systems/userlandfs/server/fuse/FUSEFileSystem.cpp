@@ -376,6 +376,8 @@ fNodeCapabilities.Dump();
 	fConnectionInfo.async_read = false;
 	fConnectionInfo.max_write = 64 * 1024;
 	fConnectionInfo.max_readahead = 64 * 1024;
+	fConnectionInfo.capable = FUSE_CAP_ATOMIC_O_TRUNC | FUSE_CAP_BIG_WRITES | FUSE_CAP_IOCTL_DIR
+		| FUSE_CAP_HAIKU_FUSE_EXTENSIONS;
 
 	fuse_fs_init(fFS, &fConnectionInfo);
 

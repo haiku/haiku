@@ -882,8 +882,9 @@ FUSEVolume::Sync()
 status_t
 FUSEVolume::ReadFSInfo(fs_info* info)
 {
-	if (gHasHaikuFuseExtensions == 1 && fFS->ops.get_fs_info != NULL) {
-		int fuseError = fuse_fs_get_fs_info(fFS, info);
+	if (_FileSystem()->HasHaikuFuseExtensions() && fFS->ops.ioctl != NULL) {
+		int fuseError = fuse_fs_ioctl(fFS, "/", FUSE_HAIKU_GET_DRIVE_INFO, info, NULL,
+			sizeof(fs_info), NULL);
 		if (fuseError != 0)
 			return fuseError;
 		return B_OK;

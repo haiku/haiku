@@ -37,11 +37,6 @@
 extern "C" {
 #endif
 
-#ifdef HAS_FUSE_HAIKU_EXTENSIONS
-struct fs_info;
-extern int gHasHaikuFuseExtensions;
-#endif
-
 
 /* ----------------------------------------------------------- *
  * Basic FUSE API					       *
@@ -458,10 +453,6 @@ struct fuse_operations {
 	 * Introduced in version 2.6
 	 */
 	int (*bmap) (const char *, size_t blocksize, uint64_t *idx);
-
-#ifdef HAS_FUSE_HAIKU_EXTENSIONS
-	int (*get_fs_info) (struct fs_info*);
-#endif
 
 	/**
 	 * Flag indicating that the filesystem can accept a NULL path
@@ -902,10 +893,6 @@ void fuse_fs_init(struct fuse_fs *fs, struct fuse_conn_info *conn);
 void fuse_fs_destroy(struct fuse_fs *fs);
 
 int fuse_notify_poll(struct fuse_pollhandle *ph);
-
-#ifdef HAS_FUSE_HAIKU_EXTENSIONS
-int fuse_fs_get_fs_info(struct fuse_fs* fs, struct fs_info* info);
-#endif
 
 /**
  * Create a new fuse filesystem object
