@@ -13,7 +13,7 @@
 
 #include "FontCache.h"
 #include "FontCacheEntry.h"
-#include "FontManager.h"
+#include "GlobalFontManager.h"
 #include "ServerFont.h"
 
 #include <Autolock.h>

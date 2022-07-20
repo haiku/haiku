@@ -82,7 +82,7 @@ class FontEngine {
 									FT_Encoding char_map,
 									glyph_rendering ren_type,
 									bool hinting,
-									const char* fontFileBuffer = NULL,
+									const void* fontFileBuffer = NULL,
 									const long fontFileBufferSize = 0);
 
 			int					LastError() const

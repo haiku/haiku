@@ -29,6 +29,8 @@ local font_src =
 	FontFamily.cpp
 	FontManager.cpp
 	FontStyle.cpp
+	GlobalFontManager.cpp
+	AppFontManager.cpp
 	;
 
 UseBuildFeatureHeaders freetype ;

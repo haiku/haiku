@@ -15,7 +15,7 @@
 #include <stdio.h>
 
 #include "DrawState.h"
-#include "FontManager.h"
+#include "GlobalFontManager.h"
 #include "Layer.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"

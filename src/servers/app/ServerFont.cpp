@@ -13,8 +13,9 @@
 #include "ServerFont.h"
 
 #include "Angle.h"
+#include "AppFontManager.h"
 #include "GlyphLayoutEngine.h"
-#include "FontManager.h"
+#include "GlobalFontManager.h"
 #include "truncate_string.h"
 #include "utf8_functions.h"
 
@@ -272,8 +273,10 @@ ServerFont::SetStyle(FontStyle* style)
 	\return B_OK if successful, B_ERROR if not
 */
 status_t
-ServerFont::SetFamilyAndStyle(uint16 familyID, uint16 styleID)
+ServerFont::SetFamilyAndStyle(uint16 familyID, uint16 styleID,
+	AppFontManager* fontManager)
 {
+
 	BReference<FontStyle> style;
 
 	if (gFontManager->Lock()) {
@@ -282,8 +285,16 @@ ServerFont::SetFamilyAndStyle(uint16 familyID, uint16 styleID)
 		gFontManager->Unlock();
 	}
 
-	if (style == NULL)
-		return B_ERROR;
+	if (style == NULL) {
+		if (fontManager != NULL && fontManager->Lock()) {
+			style.SetTo(fontManager->GetStyle(familyID, styleID), false);
+
+			fontManager->Unlock();
+		}
+
+		if (style == NULL)
+			return B_ERROR;
+	}
 
 	SetStyle(style);
 
@@ -300,12 +311,12 @@ ServerFont::SetFamilyAndStyle(uint16 familyID, uint16 styleID)
 	\return B_OK if successful, B_ERROR if not
 */
 status_t
-ServerFont::SetFamilyAndStyle(uint32 fontID)
+ServerFont::SetFamilyAndStyle(uint32 fontID, AppFontManager* fontManager)
 {
 	uint16 style = fontID & 0xFFFF;
 	uint16 family = (fontID & 0xFFFF0000) >> 16;
 
-	return SetFamilyAndStyle(family, style);
+	return SetFamilyAndStyle(family, style, fontManager);
 }
 
 
@@ -369,6 +380,9 @@ ServerFont::SetFace(uint16 face)
 uint32
 ServerFont::GetFamilyAndStyle() const
 {
+	if (fStyle == NULL || fStyle->Family() == NULL)
+		return 0;
+
 	return (FamilyID() << 16) | StyleID();
 }
 
@@ -1188,3 +1202,10 @@ ServerFont::EmbeddedTransformation() const
 	return transform;
 }
 
+
+void
+ServerFont::SetFontData(FT_Byte* location, uint32 size)
+{
+	if (fStyle != NULL)
+		fStyle->SetFontData(location, size);
+}

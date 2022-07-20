@@ -1299,7 +1299,8 @@ fDesktop->LockSingleWindow();
 			DTRACE(("ServerWindow %s: Message AS_VIEW_SET_FONT_STATE: "
 				"View name: %s\n", fTitle, fCurrentView->Name()));
 
-			fCurrentView->CurrentState()->ReadFontFromLink(link);
+			fCurrentView->CurrentState()->ReadFontFromLink(link,
+				fServerApp->FontManager());
 			fWindow->GetDrawingEngine()->SetFont(
 				fCurrentView->CurrentState());
 			break;

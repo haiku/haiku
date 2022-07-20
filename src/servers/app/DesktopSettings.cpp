@@ -23,7 +23,9 @@
 #include <ServerReadOnlyMemory.h>
 
 #include "Desktop.h"
-#include "FontManager.h"
+#include "FontCache.h"
+#include "FontCacheEntry.h"
+#include "GlobalFontManager.h"
 #include "GlobalSubpixelSettings.h"
 #include "ServerConfig.h"
 

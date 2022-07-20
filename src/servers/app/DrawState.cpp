@@ -145,7 +145,8 @@ DrawState::PopState()
 
 
 uint16
-DrawState::ReadFontFromLink(BPrivate::LinkReceiver& link)
+DrawState::ReadFontFromLink(BPrivate::LinkReceiver& link,
+	AppFontManager* fontManager)
 {
 	uint16 mask;
 	link.Read<uint16>(&mask);
@@ -153,7 +154,7 @@ DrawState::ReadFontFromLink(BPrivate::LinkReceiver& link)
 	if ((mask & B_FONT_FAMILY_AND_STYLE) != 0) {
 		uint32 fontID;
 		link.Read<uint32>(&fontID);
-		fFont.SetFamilyAndStyle(fontID);
+		fFont.SetFamilyAndStyle(fontID, fontManager);
 	}
 
 	if ((mask & B_FONT_SIZE) != 0) {

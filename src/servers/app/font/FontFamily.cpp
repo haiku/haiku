@@ -12,7 +12,7 @@
 
 #include "FontFamily.h"
 
-#include "FontManager.h"
+#include "GlobalFontManager.h"
 
 #include <FontPrivate.h>
 
@@ -78,6 +78,8 @@ FontFamily::~FontFamily()
 		// we remove us before deleting the style, so that the font manager
 		// is not contacted to remove the style from us
 		style->_SetFontFamily(NULL, -1);
+
+		style->ReleaseReference();
 	}
 }
 
@@ -98,7 +100,7 @@ FontFamily::Name() const
 	\param style pointer to FontStyle object to be added
 */
 bool
-FontFamily::AddStyle(FontStyle *style)
+FontFamily::AddStyle(FontStyle* style, AppFontManager* fontManager)
 {
 	if (!style)
 		return false;
@@ -115,6 +117,7 @@ FontFamily::AddStyle(FontStyle *style)
 		return false;
 
 	style->_SetFontFamily(this, fNextID++);
+	style->_SetFontManager(fontManager);
 
 	// force a refresh if a request for font flags is needed
 	fFlags = kInvalidFamilyFlags;
@@ -129,9 +132,9 @@ FontFamily::AddStyle(FontStyle *style)
 	The font style will not be deleted.
 */
 bool
-FontFamily::RemoveStyle(FontStyle* style)
+FontFamily::RemoveStyle(FontStyle* style, AppFontManager* fontManager)
 {
-	if (!gFontManager->IsLocked()) {
+	if (!gFontManager->IsLocked() && fontManager == NULL) {
 		debugger("FontFamily::RemoveStyle() called without having the font manager locked!");
 		return false;
 	}

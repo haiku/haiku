@@ -13,6 +13,7 @@
 #define SERVER_APP_H
 
 
+#include "AppFontManager.h"
 #include "ClientMemoryAllocator.h"
 #include "MessageLooper.h"
 #include "ServerFont.h"
@@ -96,6 +97,7 @@ public:
 			BPrivate::BTokenSpace& ViewTokens() { return fViewTokens; }
 
 			void				NotifyDeleteClientArea(area_id serverArea);
+			AppFontManager*		FontManager() { return fAppFontManager; }
 
 private:
 	virtual	void				_GetLooperName(char* name, size_t size);
@@ -160,6 +162,8 @@ private:
 			bool				fIsActive;
 
 			BReference<ClientMemoryAllocator> fMemoryAllocator;
+
+			AppFontManager*		fAppFontManager;
 };
 
 

@@ -158,12 +158,20 @@ FontCacheEntry::Init(const ServerFont& font, bool forceVector)
 	FT_Encoding charMap = FT_ENCODING_NONE;
 	bool hinting = font.Hinting();
 
-	if (!fEngine.Init(font.Path(), 0, font.Size(), charMap,
-			renderingType, hinting)) {
+	bool success;
+	if (font.FontData() != NULL)
+		success = fEngine.Init(NULL, 0, font.Size(), charMap,
+			renderingType, hinting, (const void*)font.FontData(), font.FontDataSize());
+	else
+		success = fEngine.Init(font.Path(), 0, font.Size(), charMap,
+			renderingType, hinting);
+
+	if (!success) {
 		fprintf(stderr, "FontCacheEntry::Init() - some error loading font "
 			"file %s\n", font.Path());
 		return false;
 	}
+
 	if (fGlyphCache->Init() != B_OK) {
 		fprintf(stderr, "FontCacheEntry::Init() - failed to allocate "
 			"GlyphCache table for font file %s\n", font.Path());
