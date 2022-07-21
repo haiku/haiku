@@ -8,6 +8,8 @@
 #include <KernelExport.h>
 #include "vnidpool.h"
 
+#include <stdio.h>
+
 /* primary type for the bitmap */
 #define BMT uint32
 
@@ -33,14 +35,14 @@ status_t vnidpool_alloc(struct vnidpool **pool, size_t size)
 	p->bitmap = (BMT *)(p + 1);
 	p->bmsize = size;
 	memset(p->bitmap, 0, size / sizeof(BMT));
-	dprintf("vnidpool_alloc: pool @ %p, bitmap @ %p, size %ld\n", p, p->bitmap, p->bmsize);
+	fprintf(stderr, "vnidpool_alloc: pool @ %p, bitmap @ %p, size %ld\n", p, p->bitmap, p->bmsize);
 	*pool = p;
 	return B_OK;
 }
 
 status_t vnidpool_free(struct vnidpool *pool) {
 	unsigned int i;
-	dprintf("vnidpool_free: pool @ %p\n", pool);
+	fprintf(stderr, "vnidpool_free: pool @ %p\n", pool);
 	if (!pool)
 		return EINVAL;
 	if (LOCK(&pool->lock) < B_OK)
@@ -48,7 +50,7 @@ status_t vnidpool_free(struct vnidpool *pool) {
 	/* make sure no vnid is left in use */
 	for (i = 0; i < (pool->bmsize % sizeof(BMT)); i++) {
 		if (pool->bitmap[i])
-			dprintf("WARNING: vnidpool_free called with vnids still in use!!!\n");
+			fprintf(stderr, "WARNING: vnidpool_free called with vnids still in use!!!\n");
 			//panic("vnidpool_free: vnids still in use");
 	}
 	free_lock(&pool->lock);

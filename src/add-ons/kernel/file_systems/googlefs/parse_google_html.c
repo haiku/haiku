@@ -266,7 +266,7 @@ err0:
 int main(int argc, char **argv)
 {
 	struct google_result *results;
-	struct google_result *tag1 = 0xaaaa5555, *res = NULL, *tag2 = 0x5555aaaa;
+	struct google_result *tag1 = (void*)0xaaaa5555, *res = NULL, *tag2 = (void*)0x5555aaaa;
 	size_t len;
 	char *p;
 	int err;
@@ -278,7 +278,7 @@ int main(int argc, char **argv)
 	*(uint32 *)p = 0xa5a5a5a5;
 	*(uint32 *)(&p[BUFSZ+4]) = 0x5a5a5a5a;
 	err = google_parse_results(p+4, len, &nextid, &results);
-	printf("error 0x%08lx\n", err);
+	printf("error 0x%08x\n", err);
 	if (err < 0)
 		return 1;
 	res = results;
@@ -286,8 +286,8 @@ int main(int argc, char **argv)
 		printf("[%ld]:\nURL='%s'\nNAME='%s'\nSNIPSET='%s'\nCACHE='%s'\nSIMILAR='%s'\n\n", res->id, res->url, res->name, res->snipset, res->cache_url, res->similar_url);
 		res = res->next;
 	}
-	printf("before = 0x%08lx:0x%08lx, after = 0x%08lx:0x%08lx\n", 0xa5a5a5a5, *(uint32 *)p, 0x5a5a5a5a, *(uint32 *)(&p[BUFSZ+4]));
-	printf("before = 0x%08lx:0x%08lx, after = 0x%08lx:0x%08lx\n", 0xaaaa5555, tag1, 0x5555aaaa, tag2);
+	printf("before = 0x%08x:0x%08x, after = 0x%08x:0x%08x\n", 0xa5a5a5a5, *(uint32 *)p, 0x5a5a5a5a, *(uint32 *)(&p[BUFSZ+4]));
+	printf("before = 0x%08x:%p, after = 0x%08x:%p\n", 0xaaaa5555, tag1, 0x5555aaaa, tag2);
 	return 0;
 }
 #endif

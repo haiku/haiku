@@ -95,7 +95,7 @@ status_t google_request_process(struct google_request *req)
 		goto err_cnx;
 	sin.sin_port = htons(google_server_port);
 	err = http_connect(cnx, &sin);
-	dprintf("google_request: http_connect: error 0x%08" B_PRIx32 "\n", err);
+	fprintf(stderr, "google_request: http_connect: error 0x%08" B_PRIx32 "\n", err);
 	if (err)
 		goto err_cnx;
 	
@@ -112,16 +112,16 @@ status_t google_request_process(struct google_request *req)
 	sprintf(url+strlen(url), FMT_NUM, (unsigned int)max_results);
 	sprintf(url+strlen(url), FMT_Q, p);
 	
-	dprintf("google_request: final URL: %s\n", url);
+	fprintf(stderr, "google_request: final URL: %s\n", url);
 	
 	err = http_get(cnx, url);
-	dprintf("google_request: http_get: error 0x%08" B_PRIx32 "\n", err);
+	fprintf(stderr, "google_request: http_get: error 0x%08" B_PRIx32 "\n", err);
 	if (err < 0)
 		goto err_url2;
-	dprintf("google_request: http_get: HEADERS %ld:%s\n", cnx->headerslen, cnx->headers);
-	//dprintf("DATA: %d:%s\n", cnx->datalen, cnx->data);
+	fprintf(stderr, "google_request: http_get: HEADERS %ld:%s\n", cnx->headerslen, cnx->headers);
+	//fprintf(stderr, "DATA: %d:%s\n", cnx->datalen, cnx->data);
 	
-	dprintf("google_request: buffer @ %p, len %ld\n", cnx->data, cnx->datalen);
+	fprintf(stderr, "google_request: buffer @ %p, len %ld\n", cnx->data, cnx->datalen);
 	{
 		int fd;
 		// debug output

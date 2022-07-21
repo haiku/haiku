@@ -73,7 +73,7 @@ status_t http_delete(struct http_cnx *cnx)
 	if (!cnx)
 		return EINVAL;
 	if ((unsigned long)cnx < 0x40) {
-		dprintf("http: WARNING: cnx ptr = %p\n", cnx);
+		fprintf(stderr, "http: WARNING: cnx ptr = %p\n", cnx);
 		return B_OK;
 	}	
 	if (cnx->sock >= 0) {
@@ -93,12 +93,12 @@ status_t http_connect(struct http_cnx *cnx, struct sockaddr_in *sin)
 	uint32 ip;
 	uint16 port;
 	if (!sin) {
-		dprintf("http_connect(, NULL)!!\n");
+		fprintf(stderr, "http_connect(, NULL)!!\n");
 		return EINVAL;
 	}
 	ip = sin->sin_addr.s_addr;
 	port = sin->sin_port;
-	dprintf("http_connect(, %"B_PRId32".%"B_PRId32".%" B_PRId32 ".%" B_PRId32 ":%d), sock = %d\n", ip & 0xff, (ip >> 8) & 0xff, (ip >> 16) & 0xff, (ip >> 24) & 0xff, ntohs(port), cnx->sock);
+	fprintf(stderr, "http_connect(, %"B_PRId32".%"B_PRId32".%" B_PRId32 ".%" B_PRId32 ":%d), sock = %d\n", ip & 0xff, (ip >> 8) & 0xff, (ip >> 16) & 0xff, (ip >> 24) & 0xff, ntohs(port), cnx->sock);
 	err = kconnect(cnx->sock, (struct sockaddr *)sin, sin->sin_len);
 	cnx->err = 0;
 	if (err == -1)

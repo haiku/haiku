@@ -1,12 +1,14 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems googlefs ;
 
-UsePrivateKernelHeaders ;
+local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems
+	userlandfs ] ;
+local userlandFSIncludes = [ PrivateHeaders userlandfs ] ;
 
 #SubDirCcFlags -DTRACK_FILENAME ;
 #SubDirCcFlags -DDEBUG_GOOGLEFS=1 ;
 SubDirCcFlags -D_IMPEXP_KERNEL= ;
 
-KernelAddon googlefs :
+Addon googlefs :
 	attrs.c
 	google_request.c
 	googlefs.c
@@ -17,4 +19,5 @@ KernelAddon googlefs :
 	settings.c
 	string_utils.c
 	vnidpool.c
+	: libuserlandfs_haiku_kernel.so network
 ;

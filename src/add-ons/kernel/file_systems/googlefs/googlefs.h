@@ -9,8 +9,8 @@
 #ifdef __HAIKU__
 
 #include <fs_interface.h>
-#include <kernel/lock.h>
 #include <fs_info.h>
+#include <private/shared/locks.h>
 #include <NodeMonitor.h>
 #define lock mutex
 #define new_lock mutex_init
