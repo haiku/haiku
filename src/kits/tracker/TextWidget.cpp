@@ -399,7 +399,7 @@ TextViewPasteFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 							(const void**)&text, &length) == B_OK) {
 						textWidth += textView->StringWidth(text);
 					}
-				}	
+				}
 
 				be_clipboard->Unlock();
 			}
