@@ -6,6 +6,10 @@
 #ifndef _LISTS2_H
 #define _LISTS2_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef int (*sll_compare_func)(const void *item, void *id);
 
 extern void *sll_find(long nextoff, void *head, sll_compare_func func, void *id);
@@ -26,5 +30,9 @@ extern void *sll_next(long nextoff, void *item);
 #define SLL_INSERT_TAIL(_head,_nextp,_item) sll_insert_head(offsetof(typeof(*_head),_nextp), (void **)&(_head), _item)
 #define SLL_DEQUEUE(_head,_nextp) (typeof(_head))sll_dequeue_tail(offsetof(typeof(*_head),_nextp), (void **)&(_head))
 #define SLL_REMOVE(_head,_nextp,_item) sll_remove(offsetof(typeof(*_head),_nextp), (void **)&(_head), _item)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _LISTS2_H */

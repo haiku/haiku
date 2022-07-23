@@ -133,10 +133,6 @@ static status_t googlefs_mount(fs_volume *_vol, const char *devname, uint32 flag
 
 	err = load_settings();
 
-	err = google_request_init();
-	if (err)
-		goto err_http;
-
 	ns = malloc(sizeof(fs_nspace));
 	if (!ns)
 		return B_NO_MEMORY;
@@ -184,7 +180,6 @@ static status_t googlefs_mount(fs_volume *_vol, const char *devname, uint32 flag
 	}
 	free_lock(&ns->l);
 	free(ns);
-err_http:
 	atomic_add(&refcount, -1);
 	return err;
 }
@@ -210,8 +205,6 @@ static status_t googlefs_unmount(fs_volume *_volume)
 	free_lock(&ns->l);
 	vnidpool_free(ns->vnids);
 	free(ns);
-
-	google_request_uninit();
 
 	atomic_add(&refcount, -1);
 

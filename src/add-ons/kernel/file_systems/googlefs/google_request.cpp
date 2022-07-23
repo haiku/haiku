@@ -12,12 +12,17 @@
 #include <arpa/inet.h>
 #include <malloc.h>
 #include <sys/socket.h>
-#include "http_cnx.h"
-#include "googlefs.h"
 #include "google_request.h"
+
+#include "googlefs.h"
 #include "lists2.h"
 #include "settings.h"
 #include "string_utils.h"
+
+#include <UrlProtocolRoster.h>
+#include <UrlRequest.h>
+
+using namespace BPrivate::Network;
 
 #define DO_PUBLISH
 //#define FAKE_INPUT "/boot/home/devel/drivers/googlefs/log2.html"
@@ -29,83 +34,34 @@
 //#define EXTRAURL "&num=50&hl=en&ie=ISO-8859-1&btnG=Google+Search&as_epq=frequently+asked&as_oq=help&as_eq=plop&lr=lang_en&as_ft=i&as_filetype=&as_qdr=m3&as_nlo=&as_nhi=&as_occt=any&as_dt=i&as_sitesearch="
 
 #define TESTURL "http://www.google.com/search?hl=en&ie=UTF-8&num=50&q=beos"
-//#define BASEURL "http://www.google.com/search?hl=en&ie=UTF-8&num=50&q="
-#define BASEURL "/search?hl=en&ie=UTF-8&oe=UTF-8&gws_rd=cr"
+#define BASEURL "https://www.google.com/search?hl=en&ie=UTF-8&oe=UTF-8&gws_rd=cr"
 #define FMT_NUM "&num=%u"
 #define FMT_Q "&q=%s"
 
 /* parse_google_html.c */
 extern int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct google_result **results);
 
-// move that to ksocket inlined
-static int kinet_aton(const char *in, struct in_addr *addr)
-{
-	int i;
-	unsigned long a;
-	uint32 inaddr = 0L;
-	const char *p = in;
-	for (i = 0; i < 4; i++) {
-		a = strtoul(p, (char **)&p, 10);
-		if (!p)
-			return -1;
-		inaddr = (inaddr >> 8) | ((a & 0x0ff) << 24);
-		*(uint32 *)addr = inaddr;
-		if (!*p)
-			return 0;
-		p++;
-	}
-	return 0;
-}
-
-
-status_t google_request_init(void)
-{
-	status_t err;
-	err = http_init();
-	return err;
-}
-
-status_t google_request_uninit(void)
-{
-	status_t err;
-	err = http_uninit();
-	return err;
-}
 
 status_t google_request_process(struct google_request *req)
 {
-	struct sockaddr_in sin;
-	struct http_cnx *cnx = NULL;
+	struct BUrlRequest *cnx = NULL;
 	struct google_result *res;
 	status_t err;
 	int count;
 	char *p = NULL;
 	char *url = NULL;
+	BMallocIO output;
+	thread_id t;
 	
-	err = http_create(&cnx);
-	if (err)
-		return err;
 	err = ENOMEM;
 	req->cnx = cnx;
 #ifndef FAKE_INPUT
-	sin.sin_len = sizeof(struct sockaddr_in);
-	sin.sin_family = AF_INET;
-	sin.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-	if (kinet_aton(google_server, &sin.sin_addr) < 0)
-		goto err_cnx;
-	sin.sin_port = htons(google_server_port);
-	err = http_connect(cnx, &sin);
-	fprintf(stderr, "google_request: http_connect: error 0x%08" B_PRIx32 "\n", err);
-	if (err)
-		goto err_cnx;
-	
-	err = ENOMEM;
 	p = urlify_string(req->query_string);
 	if (!p)
 		goto err_con;
 	
 	err = ENOMEM;
-	url = malloc(strlen(BASEURL)+strlen(FMT_NUM)+10+strlen(FMT_Q)+strlen(p)+2);
+	url = (char*)malloc(strlen(BASEURL)+strlen(FMT_NUM)+10+strlen(FMT_Q)+strlen(p)+2);
 	if (!url)
 		goto err_url;
 	strcpy(url, BASEURL);
@@ -114,19 +70,19 @@ status_t google_request_process(struct google_request *req)
 	
 	fprintf(stderr, "google_request: final URL: %s\n", url);
 	
-	err = http_get(cnx, url);
-	fprintf(stderr, "google_request: http_get: error 0x%08" B_PRIx32 "\n", err);
-	if (err < 0)
-		goto err_url2;
-	fprintf(stderr, "google_request: http_get: HEADERS %ld:%s\n", cnx->headerslen, cnx->headers);
-	//fprintf(stderr, "DATA: %d:%s\n", cnx->datalen, cnx->data);
+	cnx = BUrlProtocolRoster::MakeRequest(url, &output, NULL);
+	if (cnx == NULL)
+		return ENOMEM;
+
+	t = cnx->Run();
+	wait_for_thread(t, &err);
 	
-	fprintf(stderr, "google_request: buffer @ %p, len %ld\n", cnx->data, cnx->datalen);
+	fprintf(stderr, "google_request: buffer @ %p, len %ld\n", output.Buffer(), output.BufferLength());
 	{
 		int fd;
 		// debug output
 		fd = open("/tmp/google.html", O_CREAT|O_TRUNC|O_RDWR, 0644);
-		write(fd, cnx->data, cnx->datalen);
+		write(fd, output.Buffer(), output.BufferLength());
 		close(fd);
 	}
 #else
@@ -150,7 +106,8 @@ status_t google_request_process(struct google_request *req)
 		close(fd);
 	}
 #endif /* FAKE_INPUT */	
-	err = count = google_parse_results(req->cnx->data, req->cnx->datalen, &req->nextid, &req->results);
+	err = count = google_parse_results((const char*)output.Buffer(), output.BufferLength(),
+		&req->nextid, &req->results);
 	if (err < 0)
 		goto err_get;
 #ifdef DO_PUBLISH
@@ -161,21 +118,16 @@ status_t google_request_process(struct google_request *req)
 #endif
 	free(url);
 	free(p);
-	/* close now */
-	http_close(cnx);
-	
+	// request is kept and deleted in google_request_close
 	return B_OK;
 
 
 err_get:
-err_url2:
 	free(url);
 err_url:
 	free(p);
 err_con:
-	http_close(cnx);
-err_cnx:
-	http_delete(cnx);
+	delete cnx;
 	req->cnx = NULL;
 	return err;
 }
@@ -191,8 +143,7 @@ status_t google_request_close(struct google_request *req)
 		return EINVAL;
 	if (!req->cnx)
 		return B_OK;
-	http_close(req->cnx);
-	http_delete(req->cnx);
+	delete(req->cnx);
 	req->cnx = NULL;
 	return B_OK;
 }
@@ -202,7 +153,7 @@ status_t google_request_open(const char *query_string, struct fs_volume *volume,
 	struct google_request *r;
 	if (!req)
 		return EINVAL;
-	r = malloc(sizeof(struct google_request));
+	r = (google_request*)malloc(sizeof(struct google_request));
 	if (!r)
 		return ENOMEM;
 	memset(r, 0, sizeof(struct google_request));

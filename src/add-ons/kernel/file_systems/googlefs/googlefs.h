@@ -44,6 +44,9 @@ typedef dev_t nspace_id;
 
 #define MAX_VNIDS 5000
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct attr_entry {
 	const char *name;
@@ -131,5 +134,9 @@ int googlefs_event(fs_nspace *ns, fs_node *node, int flags);
  * result = NULL to notify end of list
  */
 extern int googlefs_push_result_to_query(struct google_request *request, struct google_result *result);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
