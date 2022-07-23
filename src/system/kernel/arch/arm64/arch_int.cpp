@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haiku, Inc. All Rights Reserved.
+ * Copyright 2019-2022 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #include <int.h>
@@ -56,6 +56,7 @@ arch_int_assign_to_cpu(int32 irq, int32 cpu)
 status_t
 arch_int_init(kernel_args *args)
 {
+	reserve_io_interrupt_vectors(128, 32, INTERRUPT_TYPE_IRQ);
 	return B_OK;
 }
 

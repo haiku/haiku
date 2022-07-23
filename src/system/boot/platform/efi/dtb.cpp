@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2022 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -38,6 +38,15 @@ extern "C" {
 
 #include "efi_platform.h"
 #include "serial.h"
+
+
+#define GIC_INTERRUPT_CELL_TYPE		0
+#define GIC_INTERRUPT_CELL_ID		1
+#define GIC_INTERRUPT_CELL_FLAGS	2
+#define GIC_INTERRUPT_TYPE_SPI		0
+#define GIC_INTERRUPT_TYPE_PPI		1
+#define GIC_INTERRUPT_BASE_SPI		32
+#define GIC_INTERRUPT_BASE_PPI		16
 
 
 #define INFO(x...) dprintf("efi/fdt: " x)
@@ -455,10 +464,19 @@ dtb_get_interrupt(const void* fdt, int node)
 		return fdt32_to_cpu(*(prop + 1));
 	}
 	if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "interrupts", NULL)) {
-		if (interruptCells == 3) {
-			return fdt32_to_cpu(*(prop + 1));
-		} else {
+		if ((interruptCells == 1) || (interruptCells == 2)) {
 			return fdt32_to_cpu(*prop);
+		} else if (interruptCells == 3) {
+			uint32 interruptType = fdt32_to_cpu(prop[GIC_INTERRUPT_CELL_TYPE]);
+			uint32 interruptNumber = fdt32_to_cpu(prop[GIC_INTERRUPT_CELL_ID]);
+			if (interruptType == GIC_INTERRUPT_TYPE_SPI)
+				interruptNumber += GIC_INTERRUPT_BASE_SPI;
+			else if (interruptType == GIC_INTERRUPT_TYPE_PPI)
+				interruptNumber += GIC_INTERRUPT_BASE_PPI;
+
+			return interruptNumber;
+		} else {
+			panic("unsupported interruptCells");
 		}
 	}
 	dprintf("[!] no interrupt field\n");

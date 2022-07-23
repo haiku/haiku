@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Haiku, Inc. All rights reserved.
+ * Copyright 2021-2022 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #include <int.h>
@@ -9,8 +9,6 @@
 
 #include "arch_int_gicv2.h"
 #include "gicv2_regs.h"
-
-#define GIC_SPI_IRQ_START	32
 
 
 GICv2InterruptController::GICv2InterruptController(uint32_t gicd_addr, uint32_t gicc_addr)
@@ -56,8 +54,6 @@ GICv2InterruptController::GICv2InterruptController(uint32_t gicd_addr, uint32_t 
 
 void GICv2InterruptController::EnableInterrupt(int irq)
 {
-	irq += GIC_SPI_IRQ_START;
-
 	uint32_t ena_reg = GICD_REG_ISENABLER + irq / 32;
 	uint32_t ena_val = 1 << (irq % 32);
 	fGicdRegs[ena_reg] = ena_val;
@@ -71,7 +67,6 @@ void GICv2InterruptController::EnableInterrupt(int irq)
 
 void GICv2InterruptController::DisableInterrupt(int irq)
 {
-	irq += GIC_SPI_IRQ_START;
 	fGicdRegs[GICD_REG_ICENABLER + irq / 32] = 1 << (irq % 32);
 }
 
@@ -83,7 +78,7 @@ void GICv2InterruptController::HandleInterrupt()
 	if ((irqnr == 1022) || (irqnr == 1023)) {
 		dprintf("spurious interrupt\n");
 	} else {
-		int_io_interrupt_handler(irqnr-GIC_SPI_IRQ_START, true);
+		int_io_interrupt_handler(irqnr, true);
 	}
 
 	fGiccRegs[GICC_REG_EOIR] = iar;

@@ -2,7 +2,7 @@
  * Copyright 2014, Ithamar R. Adema <ithamar@upgrade-android.com>
  * All rights reserved. Distributed under the terms of the MIT License.
  *
- * Copyright 2015-2021, Haiku, Inc. All rights reserved.
+ * Copyright 2015-2022, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -30,6 +30,15 @@ extern "C" {
 #else
 #define TRACE(x...)
 #endif
+
+
+#define GIC_INTERRUPT_CELL_TYPE     0
+#define GIC_INTERRUPT_CELL_ID       1
+#define GIC_INTERRUPT_CELL_FLAGS    2
+#define GIC_INTERRUPT_TYPE_SPI      0
+#define GIC_INTERRUPT_TYPE_PPI      1
+#define GIC_INTERRUPT_BASE_SPI      32
+#define GIC_INTERRUPT_BASE_PPI      16
 
 
 extern void* gFDT;
@@ -403,7 +412,7 @@ fdt_get_interrupt_cells(uint32 interrupt_parent_phandle)
 
 
 static bool
-fdt_device_get_interrupt(fdt_device* dev, uint32 ord,
+fdt_device_get_interrupt(fdt_device* dev, uint32 index,
 	device_node** interruptController, uint64* interrupt)
 {
 	ASSERT(dev != NULL);
@@ -413,29 +422,39 @@ fdt_device_get_interrupt(fdt_device* dev, uint32 ord,
 		dev->node, "fdt/node", &fdtNode, false) >= B_OK);
 
 	int propLen;
-	const void* prop = fdt_getprop(gFDT, (int)fdtNode, "interrupts-extended",
+	const uint32 *prop = (uint32*)fdt_getprop(gFDT, (int)fdtNode, "interrupts-extended",
 		&propLen);
 	if (prop == NULL) {
 		uint32 interruptParent = fdt_get_interrupt_parent(dev, fdtNode);
 		uint32 interruptCells = fdt_get_interrupt_cells(interruptParent);
 
-		prop = fdt_getprop(gFDT, (int)fdtNode, "interrupts",
+		prop = (uint32*)fdt_getprop(gFDT, (int)fdtNode, "interrupts",
 			&propLen);
 		if (prop == NULL)
 			return false;
 
-		if ((ord + 1) * interruptCells * sizeof(uint32) > (uint32)propLen)
+		if ((index + 1) * interruptCells * sizeof(uint32) > (uint32)propLen)
 			return false;
 
-		uint32 offs;
-		if (interruptCells == 3) {
-			offs = 3 * ord + 1;
+		uint32 offset = interruptCells * index;
+		uint32 interruptNumber = 0;
+
+		if ((interruptCells == 1) || (interruptCells == 2)) {
+			 interruptNumber = fdt32_to_cpu(*(prop + offset));
+		} else if (interruptCells == 3) {
+			uint32 interruptType = fdt32_to_cpu(prop[offset + GIC_INTERRUPT_CELL_TYPE]);
+			interruptNumber = fdt32_to_cpu(prop[offset + GIC_INTERRUPT_CELL_ID]);
+
+			if (interruptType == GIC_INTERRUPT_TYPE_SPI)
+				interruptNumber += GIC_INTERRUPT_BASE_SPI;
+			else if (interruptType == GIC_INTERRUPT_TYPE_PPI)
+				interruptNumber += GIC_INTERRUPT_BASE_PPI;
 		} else {
-			offs = interruptCells * ord;
+			panic("unsupported interruptCells");
 		}
 
 		if (interrupt != NULL)
-			*interrupt = fdt32_to_cpu(*(((uint32*)prop) + offs));
+			*interrupt = interruptNumber;
 
 		if (interruptController != NULL && interruptParent != 0) {
 			fdt_bus* bus;
@@ -446,11 +465,11 @@ fdt_device_get_interrupt(fdt_device* dev, uint32 ord,
 		return true;
 	}
 
-	if ((ord + 1) * 8 > (uint32)propLen)
+	if ((index + 1) * 8 > (uint32)propLen)
 		return false;
 
 	if (interruptController != NULL) {
-		uint32 phandle = fdt32_to_cpu(*(((uint32*)prop) + 2 * ord));
+		uint32 phandle = fdt32_to_cpu(*(prop + 2 * index));
 
 		fdt_bus* bus;
 		ASSERT(gDeviceManager->get_driver(
@@ -460,7 +479,7 @@ fdt_device_get_interrupt(fdt_device* dev, uint32 ord,
 	}
 
 	if (interrupt != NULL)
-		*interrupt = fdt32_to_cpu(*(((uint32*)prop) + 2*ord + 1));
+		*interrupt = fdt32_to_cpu(*(prop + 2 * index + 1));
 
 	return true;
 }
