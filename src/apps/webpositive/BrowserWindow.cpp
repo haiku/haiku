@@ -390,7 +390,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 
 	// Menu
 #if INTEGRATE_MENU_INTO_TAB_BAR
-	BMenu* mainMenu = fTabManager->Menu();
+	BMenu* mainMenu = new BMenu("≡");
 #else
 	BMenu* mainMenu = new BMenuBar("Main menu");
 #endif
@@ -612,8 +612,16 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		new BMessage(TOGGLE_FULLSCREEN));
 	toggleFullscreenButton->SetBackgroundMode(BBitmapButton::MENUBAR_BACKGROUND);
 
-	BGroupLayout* menuBarGroup = BLayoutBuilder::Group<>(B_HORIZONTAL, 0.0)
-		.Add(mainMenu)
+#if !INTEGRATE_MENU_INTO_TAB_BAR
+	BMenu* mainMenuItem = mainMenu;
+	fMenuGroup = (new BGroupView(B_HORIZONTAL, 0))->GroupLayout();
+#else
+	BMenu* mainMenuItem = new BMenuBar("Main menu");
+	mainMenuItem->AddItem(mainMenu);
+	fMenuGroup = fTabManager->MenuContainerLayout();
+#endif
+	BLayoutBuilder::Group<>(fMenuGroup)
+		.Add(mainMenuItem)
 		.Add(toggleFullscreenButton, 0.0f)
 	;
 
@@ -629,7 +637,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	BGroupView* topView = new BGroupView(B_VERTICAL, 0.0);
 
 #if !INTEGRATE_MENU_INTO_TAB_BAR
-	topView->AddChild(menuBarGroup);
+	topView->AddChild(fMenuGroup);
 #endif
 	topView->AddChild(fTabManager->TabGroup());
 	topView->AddChild(navigationGroup);
@@ -643,7 +651,6 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 
 	fURLInputGroup->MakeFocus(true);
 
-	fMenuGroup = menuBarGroup;
 	fTabGroup = fTabManager->TabGroup()->GetLayout();
 	fNavigationGroup = navigationGroup;
 	fFindGroup = findGroup;

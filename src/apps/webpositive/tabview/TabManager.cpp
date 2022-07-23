@@ -731,12 +731,9 @@ TabManager::TabManager(const BMessenger& target, BMessage* newTabMessage)
 	fController->SetTabContainerGroup(fTabContainerGroup);
 
 #if INTEGRATE_MENU_INTO_TAB_BAR
-	fMenu = new BMenu("Menu");
-	BMenuBar* menuBar = new BMenuBar("Menu bar");
-	menuBar->AddItem(fMenu);
-	TabButtonContainer* menuBarContainer = new TabButtonContainer();
-	menuBarContainer->GroupLayout()->AddView(menuBar);
-	fTabContainerGroup->GroupLayout()->AddView(menuBarContainer, 0.0f);
+	fMenuContainer = new BGroupView(B_HORIZONTAL, 0);
+	fMenuContainer->GroupLayout()->SetInsets(0, -3, 0, -3);
+	fTabContainerGroup->GroupLayout()->AddView(fMenuContainer, 0.0f);
 #endif
 
 	fTabContainerGroup->GroupLayout()->AddView(fTabContainerView);
@@ -773,10 +770,10 @@ TabManager::Target() const
 
 
 #if INTEGRATE_MENU_INTO_TAB_BAR
-BMenu*
-TabManager::Menu() const
+BGroupLayout*
+TabManager::MenuContainerLayout() const
 {
-	return fMenu;
+	return fMenuContainer->GroupLayout();
 }
 #endif
 
@@ -938,5 +935,3 @@ TabManager::SetCloseButtonsAvailable(bool available)
 	fController->SetCloseButtonsAvailable(available);
 	fTabContainerView->Invalidate();
 }
-
-
