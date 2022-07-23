@@ -27,14 +27,8 @@ using namespace BPrivate::Network;
 #define DO_PUBLISH
 //#define FAKE_INPUT "/boot/home/devel/drivers/googlefs/log2.html"
 
-//#define TESTURL "http://www.google.com/search?as_q=google+api+&num=50&hl=en&ie=ISO-8859-1&btnG=Google+Search&as_epq=frequently+asked&as_oq=help&as_eq=plop&lr=lang_en&as_ft=i&as_filetype=&as_qdr=m3&as_nlo=&as_nhi=&as_occt=any&as_dt=i&as_sitesearch="
-
-//#define BASEURL "http://www.google.com/search?as_q="
-//#define Q "google+api+"
-//#define EXTRAURL "&num=50&hl=en&ie=ISO-8859-1&btnG=Google+Search&as_epq=frequently+asked&as_oq=help&as_eq=plop&lr=lang_en&as_ft=i&as_filetype=&as_qdr=m3&as_nlo=&as_nhi=&as_occt=any&as_dt=i&as_sitesearch="
-
 #define TESTURL "http://www.google.com/search?hl=en&ie=UTF-8&num=50&q=beos"
-#define BASEURL "https://www.google.com/search?hl=en&ie=UTF-8&oe=UTF-8&gws_rd=cr"
+#define BASEURL "https://html.duckduckgo.com/html/?kd=-1"
 #define FMT_NUM "&num=%u"
 #define FMT_Q "&q=%s"
 

@@ -31,20 +31,14 @@ int dbgstep = 0;
 #define PRST {}
 #endif
 
-//old
-//#define G_BEGIN_URL "<p class=g><a class=l href=\""
-//#define G_BEGIN_URL "<div class=g><a class=l href=\""
-//#define G_BEGIN_URL "<div class=g><a href=\""
-#define G_BEGIN_URL "<h3 class=\"r\"><a href=\""
-//#define G_END_URL "\">"
+#define G_BEGIN_URL "<a rel=\"nofollow\" class=\"result__a\" href=\""
 #define G_END_URL "\">"
 //#define G_BEGIN_NAME 
 #define G_END_NAME "</a>"
-#define G_BEGIN_SNIPSET /*"<td class=j>"*/"<font size=-1>"
-#define G_END_SNIPSET "<br>"
+#define G_BEGIN_SNIPSET "<a class=\"result__snippet\""
+#define G_END_SNIPSET "</a>"
 #define G_BEGIN_CACHESIM " <a class=fl href=\""
 #define G_END_CACHESIM "\">"
-#define G_URL_PREFIX "http://www.google.com"
 
 int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct google_result **results)
 {
@@ -62,16 +56,12 @@ int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct
 	/* sanity checks */
 	printf(DBG"sanity check...\n");
 	PRST;
-	/* google now sends <!doctype html><head> sometimes... */
-	if (strstr(html, "<!doctype html><head>") != html) {
-		if (strstr(html, "<html><head>") != html) {
-			if (strstr(html, "<!doctype html><html ") != html)
-				return EINVAL;
-		}
+	if (strstr(html, "<!DOCTYPE html PUBLIC") != html) {
+		return EINVAL;
 	}
 	PRST;
 //	p = strstr(html, "<title>Google Search:");
-	p = strstr(html, "Google");
+	p = strstr(html, "DuckDuckGo");
 	if (!p) return EINVAL;
 	PRST;
 	p = strstr(html, "<body");
@@ -124,12 +114,6 @@ int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct
 		//printf(DBG"[%ld] found token 2\n", numres);
 		itemlen = GR_MAX_URL-1;
 		urlp = nres->url;
-		if (!strncmp(item, "/url?", 5)) {
-			strcpy(urlp, G_URL_PREFIX);
-			itemlen -= strlen(G_URL_PREFIX);
-			urlp += strlen(G_URL_PREFIX);
-			printf("plop\n");
-		}
 		itemlen = MIN(itemlen, p - item - strlen(G_END_URL));
 		strncpy(urlp, item, itemlen);
 		urlp[itemlen] = '\0';
