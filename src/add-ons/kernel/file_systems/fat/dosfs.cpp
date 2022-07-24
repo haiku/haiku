@@ -710,7 +710,7 @@ dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	if (buf[0x15] != 0xf0 && buf[0x15] < 0xf8)
 		return -1;
 
-	strcpy(name, "no name");
+	name[0] = 0;
 	sectors_per_fat = read16(buf, 0x16);
 	if (sectors_per_fat == 0) {
 		total_sectors = read32(buf, 0x20);
@@ -995,8 +995,10 @@ dosfs_read_fs_stat(fs_volume *_vol, struct fs_info * fss)
 
 	if (vol->vol_entry > -2)
 		strlcpy(fss->volume_name, vol->vol_label, sizeof(fss->volume_name));
-	else
-		strcpy(fss->volume_name, "no name");
+	else {
+		// No name defined, let userspace decide of one
+		fss->volume_name[0] = 0;
+	}
 
 	sanitize_name(fss->volume_name, 12);
 

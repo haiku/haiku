@@ -6,9 +6,10 @@
 
 #include <fs_info.h>
 
-#include <stdlib.h>
-#include <fcntl.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <errno_private.h>
 #include <syscalls.h>
@@ -39,6 +40,28 @@ int
 fs_stat_dev(dev_t device, fs_info *info)
 {
 	status_t status = _kern_read_fs_info(device, info);
+
+	if (info != NULL) {
+		if (info->volume_name[0] == 0) {
+			// Give a default name to unnamed volumes
+			off_t divisor = 1ULL << 40;
+			off_t diskSize = info->total_blocks * info->block_size;
+
+			char unit = 'T';
+			if (diskSize < divisor) {
+				divisor = 1UL << 30;
+				unit = 'G';
+				if (diskSize < divisor) {
+					divisor = 1UL << 20;
+					unit = 'M';
+				}
+			}
+
+			double size = double((10 * diskSize + divisor - 1) / divisor);
+
+			sprintf(info->volume_name, "%g %ciB %s volume", size / 10, unit, info->fsh_name);
+		}
+	}
 
 	RETURN_AND_SET_ERRNO(status);
 }

@@ -109,10 +109,8 @@ Volume::HasExtendedAttributes() const
 const char*
 Volume::Name() const
 {
-	if (fSuperBlock.name[0])
-		return fSuperBlock.name;
-
-	return fName;
+	// The name may be empty, in that case, userspace will generate one.
+	return fSuperBlock.name;
 }
 
 
@@ -332,26 +330,6 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	// all went fine
 	opener.Keep();
-
-	if (!fSuperBlock.name[0]) {
-		// generate a more or less descriptive volume name
-		off_t divisor = 1ULL << 40;
-		char unit = 'T';
-		if (diskSize < divisor) {
-			divisor = 1UL << 30;
-			unit = 'G';
-			if (diskSize < divisor) {
-				divisor = 1UL << 20;
-				unit = 'M';
-			}
-		}
-
-		double size = double((10 * diskSize + divisor - 1) / divisor);
-			// %g in the kernel does not support precision...
-
-		snprintf(fName, sizeof(fName), "%g %cB Ext2 Volume",
-			size / 10, unit);
-	}
 
 	return B_OK;
 }
