@@ -219,6 +219,71 @@ namespace Network {
 */
 
 
+/*!
+	\var UrlEvent::HttpStatus
+	\brief The HTTP status code has been received, and can be accessed through the result object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::HttpFields
+	\brief The HTTP header block has been received, and the status and fields can be accessed
+		through the result object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::CertificateError
+	\brief There was an error communicating with the server because of an SSL certificate issue.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::HttpRedirect
+	\brief The Http request was redirected, and this redirect was handled by the kit.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::HttpStatusCode
+	\brief An \c int16 value that contains the HTTP status code for this request.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::SSLCertificate
+	\brief The SSL certificate that causes the issue.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::SSLMessage
+	\brief A \ref BString message about the error while processing the SSL certificate.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::HttpRedirectUrl
+	\brief A \ref BString with the URL that the HTTP request was redirected to.
+
+	\since Haiku R1
+*/
+
+
 } // namespace Network
 
 } // namespace BPrivate

@@ -48,6 +48,23 @@ private:
 };
 
 
+namespace UrlEvent {
+	enum {
+		HttpStatus = '_HST',
+		HttpFields = '_HHF',
+		CertificateError = '_CER',
+		HttpRedirect = '_HRE'
+	};
+}
+
+
+namespace UrlEventData {
+	extern const char* HttpStatusCode;
+	extern const char* SSLCertificate;
+	extern const char* SSLMessage;
+	extern const char* HttpRedirectUrl;
+}
+
 } // namespace Network
 
 } // namespace BPrivate

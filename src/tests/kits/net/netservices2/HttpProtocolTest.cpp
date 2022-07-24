@@ -19,6 +19,7 @@
 #include <HttpResult.h>
 #include <HttpStream.h>
 #include <HttpTime.h>
+#include <Looper.h>
 #include <NetServicesDefs.h>
 #include <Url.h>
 
@@ -432,6 +433,21 @@ HttpProtocolTest::AddTests(BTestSuite& parent)
 }
 
 
+// Observer test
+
+#include <iostream>
+class ObserverHelper : public BLooper {
+public:
+	ObserverHelper()
+		: BLooper("ObserverHelper") {}
+
+	void MessageReceived(BMessage* msg) override {
+		messages.emplace_back(*msg);
+	}
+
+	std::vector<BMessage>	messages;
+};
+
 
 // HttpIntegrationTest
 
@@ -760,6 +776,9 @@ static BString kExpectedPostBody
 void
 HttpIntegrationTest::PostTest()
 {
+	using namespace BPrivate::Network::UrlEvent;
+	using namespace BPrivate::Network::UrlEventData;
+
 	auto postBody = std::make_unique<BMallocIO>();
 	postBody->Write(kPostText.String(), kPostText.Length());
 	postBody->Seek(0, SEEK_SET);
@@ -767,8 +786,106 @@ HttpIntegrationTest::PostTest()
 	request.SetMethod(BHttpMethod::Post);
 	request.SetRequestBody(std::move(postBody), "text/plain", kPostText.Length());
 
-	auto result = fSession.Execute(std::move(request));
+	auto observer = new ObserverHelper();
+	observer->Run();
+
+	auto result = fSession.Execute(std::move(request), nullptr, BMessenger(observer));
 
 	CPPUNIT_ASSERT_EQUAL(kExpectedPostBody.Length(), result.Body().text.Length());
 	CPPUNIT_ASSERT(result.Body().text == kExpectedPostBody);
+
+	usleep(1000); // give some time to catch up on receiving all messages
+
+	observer->Lock();
+	// Assert that the messages have the right contents.
+	CPPUNIT_ASSERT_MESSAGE("Expected at least 8 observer messages for this request.",
+		observer->messages.size() >= 8);
+
+	uint32 previousMessage = 0;
+	for (const auto& message: observer->messages) {
+		auto id = observer->messages[0].GetInt32(BPrivate::Network::UrlEventData::Id, -1);
+		CPPUNIT_ASSERT_EQUAL_MESSAGE("message Id does not match", result.Identity(), id);
+
+		switch(previousMessage) {
+			case 0:
+				CPPUNIT_ASSERT_MESSAGE("message should be HostNameResolved",
+					HostNameResolved == message.what);
+				break;
+
+			case HostNameResolved:
+				CPPUNIT_ASSERT_MESSAGE("message should be ConnectionOpened",
+					ConnectionOpened == message.what);
+				break;
+
+			case ConnectionOpened:
+				CPPUNIT_ASSERT_MESSAGE("message should be UploadProgress",
+					UploadProgress == message.what);
+				[[fallthrough]];
+
+			case UploadProgress:
+				switch (message.what) {
+					case UploadProgress:
+						CPPUNIT_ASSERT_MESSAGE("message must have UrlEventData::NumBytes data",
+							message.HasInt64(NumBytes));
+						CPPUNIT_ASSERT_MESSAGE("message must have UrlEventData::TotalBytes data",
+							message.HasInt64(TotalBytes));
+						CPPUNIT_ASSERT_MESSAGE("UrlEventData::TotalBytes size does not match",
+							kPostText.Length() == message.GetInt64(TotalBytes, 0));
+						break;
+					case ResponseStarted:
+						break;
+					default:
+						CPPUNIT_FAIL("Expected UploadProgress or ResponseStarted message");
+				}
+				break;
+
+			case ResponseStarted:
+				CPPUNIT_ASSERT_MESSAGE("message should be HttpStatus",
+					HttpStatus == message.what);
+				CPPUNIT_ASSERT_MESSAGE("message must have UrlEventData::HttpStatusCode data",
+					message.HasInt16(HttpStatusCode));
+				break;
+
+			case HttpStatus:
+				CPPUNIT_ASSERT_MESSAGE("message should be HttpFields",
+					HttpFields == message.what);
+				break;
+
+			case HttpFields:
+				CPPUNIT_ASSERT_MESSAGE("message should be DownloadProgress",
+					DownloadProgress == message.what);
+				[[fallthrough]];
+
+			case DownloadProgress:
+			case BytesWritten:
+				switch (message.what) {
+					case DownloadProgress:
+						CPPUNIT_ASSERT_MESSAGE("message must have UrlEventData::NumBytes data",
+							message.HasInt64(NumBytes));
+						CPPUNIT_ASSERT_MESSAGE("message must have UrlEventData::TotalBytes data",
+							message.HasInt64(TotalBytes));
+						break;
+					case BytesWritten:
+						CPPUNIT_ASSERT_MESSAGE("message must have UrlEventData::NumBytes data",
+							message.HasInt64(NumBytes));
+						break;
+					case RequestCompleted:
+						CPPUNIT_ASSERT_MESSAGE("message must have UrlEventData::Success data",
+							message.HasBool(Success));
+						CPPUNIT_ASSERT_MESSAGE("UrlEventData::Success must be true",
+							message.GetBool(Success));
+						break;
+					default:
+						CPPUNIT_FAIL("Expected DownloadProgress, BytesWritten or HttpStatus "
+							"message");
+				}
+				break;
+
+			default:
+				CPPUNIT_FAIL("Unexpected message");
+		}
+		previousMessage = message.what;
+	}
+
+	observer->Quit();
 }

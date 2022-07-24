@@ -198,6 +198,18 @@ encode_to_base64(const BString& string)
 }
 
 
+// #pragma mark -- message constants
+namespace UrlEventData {
+	const char* Id = "url:identifier";
+	const char* HostName = "url:hostname";
+	const char* NumBytes = "url:numbytes";
+	const char* TotalBytes = "url:totalbytes";
+	const char* Success = "url:success";
+	const char* DebugType = "url:debugtype";
+	const char* DebugMessage = "url:debugmessage";
+}
+
+
 // #pragma mark -- Private functions and data
 
 

@@ -78,6 +78,30 @@ private:
 BString encode_to_base64(const BString& string);
 
 
+namespace UrlEvent {
+	enum {
+		HostNameResolved = '_NHR',
+		ConnectionOpened = '_NCO',
+		UploadProgress = '_NUP',
+		ResponseStarted = '_NRS',
+		DownloadProgress = '_NDP',
+		BytesWritten = '_NBW',
+		RequestCompleted = '_NRC',
+		DebugMessage = '_NDB'
+	};
+}
+
+
+namespace UrlEventData {
+	extern const char* Id;
+	extern const char* HostName;
+	extern const char* NumBytes;
+	extern const char* TotalBytes;
+	extern const char* Success;
+	extern const char* DebugType;
+	extern const char* DebugMessage;
+}
+
 }
 
 }
