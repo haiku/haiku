@@ -187,7 +187,7 @@ Svg2PictureView::AttachedToWindow()
 	BeginPicture(fPicture);
 
 	bool done = false;
-	FILE *file = fopen(fFileName.String(), "rb");
+	FILE *file = fopen(fFileName.String(), "rb");
 	if (file) {
 		XML_Parser parser = XML_ParserCreate("UTF-8");
 		XML_SetUserData(parser, this);
