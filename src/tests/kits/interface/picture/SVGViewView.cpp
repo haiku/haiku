@@ -251,7 +251,7 @@ rgb_color Svg2PictureView::GetColorAttribute(const XML_Char **attributes, const 
 	if (!attr)
 		return colors[0].color;
 
-	int32 red, green, blue;
+	int red, green, blue;
 
 	if (attr[0] == '#') {
 		if (strlen(attr) == 4) {

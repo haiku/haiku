@@ -201,6 +201,7 @@ ScreenManager::_ScanDrivers()
 	// ToDo: to make monitoring the driver directory useful, we need more
 	//	power and data here, and should do the scanning on our own
 
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 	bool initDrivers = true;
 	while (initDrivers) {
 		interface = new AccelerantHWInterface();
@@ -208,6 +209,7 @@ ScreenManager::_ScanDrivers()
 		_AddHWInterface(interface);
 		initDrivers = false;
 	}
+#endif
 }
 
 
