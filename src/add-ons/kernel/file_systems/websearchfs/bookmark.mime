@@ -8,7 +8,7 @@
 	-attribute "META:title" -attrName "Title" \
 		-attrType 'CSTR' -attrWidth 130 -attrAlignment left \
 		-attrViewable 1 -attrEditable 1 -attrExtra 0 \
-	-attribute "GOOGLE:order" -attrName "Google order" \
+	-attribute "WEBSEARCH:order" -attrName "Search result order" \
 		-attrType 'LONG' -attrWidth 40 -attrAlignment right \
 		-attrViewable 1 -attrEditable 1 -attrExtra 0 \
 	-miniIcon ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000ffffffffffffffffffffffff00003f1b0000ffffffff\

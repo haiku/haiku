@@ -10,7 +10,7 @@
 #include <sys/param.h>
 #ifndef TEST_RB
 //#include "lock.h"
-#include "googlefs.h"
+#include "websearchfs.h"
 #endif
 
 #ifdef TEST_RB

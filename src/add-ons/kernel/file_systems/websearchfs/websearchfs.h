@@ -2,8 +2,8 @@
  * Copyright 2004-2008, François Revol, <revol@free.fr>.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _GOOGLEFS_H
-#define _GOOGLEFS_H
+#ifndef _WEBSEARCHFS_H
+#define _WEBSEARCHFS_H
 
 /* wrappers */
 #ifdef __HAIKU__
@@ -34,13 +34,13 @@ typedef dev_t nspace_id;
 #include <SupportDefs.h>
 
 /* should be more than enough */
-//#define GOOGLEFS_NAME_LEN B_OS_NAME_LENGTH
-//#define GOOGLEFS_NAME_LEN 64 /* GR_MAX_NAME */
-/* some google results are a bit more than 64 */
-#define GOOGLEFS_NAME_LEN 70 /* GR_MAX_NAME */
+//#define WEBSEARCHFS_NAME_LEN B_OS_NAME_LENGTH
+//#define WEBSEARCHFS_NAME_LEN 64 /* GR_MAX_NAME */
+/* some DuckDuckGo results are a bit more than 64 */
+#define WEBSEARCHFS_NAME_LEN 70 /* GR_MAX_NAME */
 
-#define GOOGLEFS_NAME "googlefs"
-#define GOOGLEFS_PRETTY_NAME "Google Bookmark File System"
+#define WEBSEARCHFS_NAME "websearchfs"
+#define WEBSEARCHFS_PRETTY_NAME "Web Search Bookmark File System"
 
 #define MAX_VNIDS 5000
 
@@ -73,7 +73,7 @@ struct fs_node
 	struct fs_node *parent, *children;
 	struct fs_file_cookie *opened; /* opened on this node */
 	
-	char name[GOOGLEFS_NAME_LEN];
+	char name[WEBSEARCHFS_NAME_LEN];
 	ino_t vnid;
 	lock l;
 	
@@ -82,8 +82,8 @@ struct fs_node
 	int qcompleted:1;
 	int hidden:1;	/* don't list in readdir */
 	struct stat st; /* including S_IFDIR in st_mode */
-	struct google_request *request; /* set on root folder for a query */
-	struct google_result *result; /* for query results */
+	struct duckduckgo_request *request; /* set on root folder for a query */
+	struct duckduckgo_result *result; /* for query results */
 	struct attr_entry *attrs_indirect;
 	struct attr_entry attrs[10];
 	void *data;
@@ -128,12 +128,13 @@ typedef struct fs_file_cookie fs_file_cookie;
 
 ino_t new_vnid(fs_nspace *ns);
 
-int googlefs_event(fs_nspace *ns, fs_node *node, int flags);
+int websearchfs_event(fs_nspace *ns, fs_node *node, int flags);
 
 /* used by the requester to publish entries in queries
  * result = NULL to notify end of list
  */
-extern int googlefs_push_result_to_query(struct google_request *request, struct google_result *result);
+extern int websearchfs_push_result_to_query(struct duckduckgo_request *request,
+	struct duckduckgo_result *result);
 
 #ifdef __cplusplus
 }

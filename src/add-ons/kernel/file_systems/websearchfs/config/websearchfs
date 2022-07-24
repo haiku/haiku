@@ -1,10 +1,5 @@
-# googlefs configuration file
+# websearchfs configuration file
 #
-
-# IP of the google server to query
-server 66.102.11.99
-# alternative one:
-#server 74.125.45.100
 
 # max number of vnodes allowed in the fs (to limit RAM usage)
 # 10 <= allowed <= 1000000

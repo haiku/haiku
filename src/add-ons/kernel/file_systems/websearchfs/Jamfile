@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons kernel file_systems googlefs ;
+SubDir HAIKU_TOP src add-ons kernel file_systems websearchfs ;
 
 local userlandFSTop = [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems
 	userlandfs ] ;
@@ -8,15 +8,14 @@ UsePrivateHeaders shared ;
 UsePrivateHeaders netservices ;
 
 #SubDirCcFlags -DTRACK_FILENAME ;
-#SubDirCcFlags -DDEBUG_GOOGLEFS=1 ;
 SubDirCcFlags -D_IMPEXP_KERNEL= ;
 
-Addon googlefs :
+Addon websearchfs :
 	attrs.c
-	google_request.cpp
-	googlefs.c
+	duckduckgo_request.cpp
+	websearchfs.c
 	lists2.c
-	parse_google_html.c
+	parse_duckduckgo_html.c
 	query.c
 	settings.c
 	string_utils.c

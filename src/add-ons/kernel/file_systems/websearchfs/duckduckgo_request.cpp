@@ -12,9 +12,9 @@
 #include <arpa/inet.h>
 #include <malloc.h>
 #include <sys/socket.h>
-#include "google_request.h"
+#include "duckduckgo_request.h"
 
-#include "googlefs.h"
+#include "websearchfs.h"
 #include "lists2.h"
 #include "settings.h"
 #include "string_utils.h"
@@ -25,21 +25,23 @@
 using namespace BPrivate::Network;
 
 #define DO_PUBLISH
-//#define FAKE_INPUT "/boot/home/devel/drivers/googlefs/log2.html"
+//#define FAKE_INPUT "/boot/home/devel/drivers/websearchfs/log2.html"
 
-#define TESTURL "http://www.google.com/search?hl=en&ie=UTF-8&num=50&q=beos"
+#define TESTURL "http://www.duckduckgo.com/search?hl=en&ie=UTF-8&num=50&q=beos"
 #define BASEURL "https://html.duckduckgo.com/html/?kd=-1"
+	// kd=-1 disables redirection of all URLs through duckduckgo servers
 #define FMT_NUM "&num=%u"
+	// TODO remove this, duckduckgo does not have this option
 #define FMT_Q "&q=%s"
 
-/* parse_google_html.c */
-extern int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct google_result **results);
+/* parse_duckduckgo_html.c */
+extern int duckduckgo_parse_results(const char *html, size_t htmlsize, long *nextid, struct duckduckgo_result **results);
 
 
-status_t google_request_process(struct google_request *req)
+status_t duckduckgo_request_process(struct duckduckgo_request *req)
 {
 	struct BUrlRequest *cnx = NULL;
-	struct google_result *res;
+	struct duckduckgo_result *res;
 	status_t err;
 	int count;
 	char *p = NULL;
@@ -62,7 +64,7 @@ status_t google_request_process(struct google_request *req)
 	sprintf(url+strlen(url), FMT_NUM, (unsigned int)max_results);
 	sprintf(url+strlen(url), FMT_Q, p);
 	
-	fprintf(stderr, "google_request: final URL: %s\n", url);
+	fprintf(stderr, "duckduckgo_request: final URL: %s\n", url);
 	
 	cnx = BUrlProtocolRoster::MakeRequest(url, &output, NULL);
 	if (cnx == NULL)
@@ -71,11 +73,11 @@ status_t google_request_process(struct google_request *req)
 	t = cnx->Run();
 	wait_for_thread(t, &err);
 	
-	fprintf(stderr, "google_request: buffer @ %p, len %ld\n", output.Buffer(), output.BufferLength());
+	fprintf(stderr, "duckduckgo_request: buffer @ %p, len %ld\n", output.Buffer(), output.BufferLength());
 	{
 		int fd;
 		// debug output
-		fd = open("/tmp/google.html", O_CREAT|O_TRUNC|O_RDWR, 0644);
+		fd = open("/tmp/duckduckgo.html", O_CREAT|O_TRUNC|O_RDWR, 0644);
 		write(fd, output.Buffer(), output.BufferLength());
 		close(fd);
 	}
@@ -100,19 +102,19 @@ status_t google_request_process(struct google_request *req)
 		close(fd);
 	}
 #endif /* FAKE_INPUT */	
-	err = count = google_parse_results((const char*)output.Buffer(), output.BufferLength(),
+	err = count = duckduckgo_parse_results((const char*)output.Buffer(), output.BufferLength(),
 		&req->nextid, &req->results);
 	if (err < 0)
 		goto err_get;
 #ifdef DO_PUBLISH
 	while ((res = SLL_DEQUEUE(req->results, next))) {
 		res->next = NULL;
-		googlefs_push_result_to_query(req, res);
+		websearchfs_push_result_to_query(req, res);
 	}
 #endif
 	free(url);
 	free(p);
-	// request is kept and deleted in google_request_close
+	// request is kept and deleted in duckduckgo_request_close
 	return B_OK;
 
 
@@ -126,12 +128,12 @@ err_con:
 	return err;
 }
 
-status_t google_request_process_async(struct google_request *req)
+status_t duckduckgo_request_process_async(struct duckduckgo_request *req)
 {
 	return ENOSYS;
 }
 
-status_t google_request_close(struct google_request *req)
+status_t duckduckgo_request_close(struct duckduckgo_request *req)
 {
 	if (!req)
 		return EINVAL;
@@ -142,15 +144,15 @@ status_t google_request_close(struct google_request *req)
 	return B_OK;
 }
 
-status_t google_request_open(const char *query_string, struct fs_volume *volume, struct fs_node *query_node, struct google_request **req)
+status_t duckduckgo_request_open(const char *query_string, struct fs_volume *volume, struct fs_node *query_node, struct duckduckgo_request **req)
 {
-	struct google_request *r;
+	struct duckduckgo_request *r;
 	if (!req)
 		return EINVAL;
-	r = (google_request*)malloc(sizeof(struct google_request));
+	r = (duckduckgo_request*)malloc(sizeof(struct duckduckgo_request));
 	if (!r)
 		return ENOMEM;
-	memset(r, 0, sizeof(struct google_request));
+	memset(r, 0, sizeof(struct duckduckgo_request));
 	r->query_string = strdup(query_string);
 	r->volume = volume;
 	r->query_node = query_node;
@@ -158,7 +160,7 @@ status_t google_request_open(const char *query_string, struct fs_volume *volume,
 	return B_OK;
 }
 
-status_t google_request_free(struct google_request *req)
+status_t duckduckgo_request_free(struct duckduckgo_request *req)
 {
 	if (!req)
 		return EINVAL;

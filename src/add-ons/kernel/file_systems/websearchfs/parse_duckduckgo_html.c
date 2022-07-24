@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include <OS.h>
 #include <KernelExport.h>
-#include "google_request.h"
+#include "duckduckgo_request.h"
 #include "string_utils.h"
 
 #define TESTME
@@ -21,7 +21,7 @@
 #undef TESTME
 #endif
 
-#define DBG "googlefs: parse_html: "
+#define DBG "duckduckgofs: parse_html: "
 
 #ifdef TESTME
 #define BUFSZ (128*1024)
@@ -40,9 +40,9 @@ int dbgstep = 0;
 #define G_BEGIN_CACHESIM " <a class=fl href=\""
 #define G_END_CACHESIM "\">"
 
-int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct google_result **results)
+int duckduckgo_parse_results(const char *html, size_t htmlsize, long *nextid, struct duckduckgo_result **results)
 {
-	struct google_result *res = NULL, *nres = NULL, *prev = NULL;
+	struct duckduckgo_result *res = NULL, *nres = NULL, *prev = NULL;
 	char *p, *q;
 	char *nextresult = NULL;
 	long numres = 0;
@@ -60,7 +60,6 @@ int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct
 		return EINVAL;
 	}
 	PRST;
-//	p = strstr(html, "<title>Google Search:");
 	p = strstr(html, "DuckDuckGo");
 	if (!p) return EINVAL;
 	PRST;
@@ -85,12 +84,12 @@ int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct
 #ifdef TESTME
 		dbgstep = 0;
 #endif
-		nres = malloc(sizeof(struct google_result));
+		nres = malloc(sizeof(struct duckduckgo_result));
 		if (!nres) {
 			// XXX: cleanup!
 			goto err0;
 		}
-		memset(nres, 0, sizeof(struct google_result));
+		memset(nres, 0, sizeof(struct duckduckgo_result));
 		nres->id = (*nextid)++; //- 1;
 
 		PRST;
@@ -119,7 +118,6 @@ int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct
 		urlp[itemlen] = '\0';
 		
 		/* find name */
-		//<b>Google</b> Web APIs - FAQ</a><table
 		item = p;
 		p = strstr(p, G_END_NAME);
 		if (!p) break;
@@ -158,7 +156,6 @@ int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct
 		
 #if 0
 		/* find snipset */
-		//<td class=j><font size=-1><b>...</b> a custom Java client library, documentation on <b>how</b> <b>to</b> use the <b>...</b> You can find it at http://<b>api</b>.<b>google</b>.com/GoogleSearch.wsdl <b>...</b> need to get started is in <b>googleapi</b>.jar <b>...</b> <br>
 		if (!p) break;
 		q = strstr(p, G_BEGIN_SNIPSET);
 		if (q && (!nextresult || (q < nextresult))) {
@@ -194,7 +191,6 @@ int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct
 
 #endif
 		/* find cache/similar url */
-		//  <a class=fl href="http://216.239.59.104/search?q=cache:vR7BaPWutnkJ:www.google.com/apis/api_faq.html+google+api++help+%22frequently+asked%22+-plop&hl=en&lr=lang_en&ie=UTF-8">Cached</a> 
 		for (i = 0; i < 2; i++) {
 			if (!p) break;
 			q = strstr(p, G_BEGIN_CACHESIM);
@@ -249,8 +245,8 @@ err0:
 #ifdef TESTME
 int main(int argc, char **argv)
 {
-	struct google_result *results;
-	struct google_result *tag1 = (void*)0xaaaa5555, *res = NULL, *tag2 = (void*)0x5555aaaa;
+	struct duckduckgo_result *results;
+	struct duckduckgo_result *tag1 = (void*)0xaaaa5555, *res = NULL, *tag2 = (void*)0x5555aaaa;
 	size_t len;
 	char *p;
 	int err;
@@ -261,7 +257,7 @@ int main(int argc, char **argv)
 	p[BUFSZ+4-1] = '\0';
 	*(uint32 *)p = 0xa5a5a5a5;
 	*(uint32 *)(&p[BUFSZ+4]) = 0x5a5a5a5a;
-	err = google_parse_results(p+4, len, &nextid, &results);
+	err = duckduckgo_parse_results(p+4, len, &nextid, &results);
 	printf("error 0x%08x\n", err);
 	if (err < 0)
 		return 1;

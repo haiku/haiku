@@ -5,7 +5,7 @@
 #ifndef _VNIDPOOL_H
 #define _VNIDPOOL_H
 
-#include "googlefs.h"
+#include "websearchfs.h"
 
 typedef struct vnidpool {
 	lock lock;
