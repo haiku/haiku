@@ -53,14 +53,13 @@ duplocale(locale_t l)
         return (locale_t)newObj;
     }
 
-    BPrivate::ErrnoMaintainer errnoMaintainer;
-
     LocaleBackend*& newBackend = newObj->backend;
     LocaleDataBridge*& newDataBridge = newObj->databridge;
-    newBackend = LocaleBackend::CreateBackend();
+
+    status_t status = LocaleBackend::CreateBackend(newBackend);
 
     if (newBackend == NULL) {
-        errno = ENOMEM;
+		errno = status;
         delete newObj;
         return (locale_t)0;
     }
@@ -69,7 +68,7 @@ duplocale(locale_t l)
 
     if (newDataBridge == NULL) {
         errno = ENOMEM;
-        delete newBackend;
+        LocaleBackend::DestroyBackend(newBackend);
         delete newObj;
         return (locale_t)0;
     }
@@ -164,9 +163,9 @@ newlocale(int category_mask, const char* locale, locale_t base)
 			}
 		}
 		if (needBackend) {
-			backend = LocaleBackend::CreateBackend();
+			status_t status = LocaleBackend::CreateBackend(backend);
 			if (backend == NULL) {
-				errno = ENOMEM;
+				errno = status;
 				if (newObject) {
 					delete localeObject;
 				}
@@ -175,7 +174,7 @@ newlocale(int category_mask, const char* locale, locale_t base)
 			databridge = new (std::nothrow) LocaleDataBridge(false);
 			if (databridge == NULL) {
 				errno = ENOMEM;
-				delete backend;
+				LocaleBackend::DestroyBackend(backend);
 				if (newObject) {
 					delete localeObject;
 				}
@@ -228,7 +227,32 @@ uselocale(locale_t newLoc)
         SetCurrentLocaleInfo((LocaleBackendData*)appliedLoc);
 
         if (appliedLoc != NULL) {
-            ((LocaleBackendData*)appliedLoc)->databridge->ApplyToCurrentThread();
+			LocaleDataBridge*& databridge = ((LocaleBackendData*)appliedLoc)->databridge;
+			// Happens when appliedLoc represents the C locale.
+			if (databridge == NULL) {
+				LocaleBackend*& backend = ((LocaleBackendData*)appliedLoc)->backend;
+				status_t status = LocaleBackend::CreateBackend(backend);
+				if (backend == NULL) {
+					if (status == B_MISSING_LIBRARY) {
+						// This means libroot-addon-icu is not available.
+						// Therefore, the global locale is still the C locale
+						// and cannot be set to any other locale. Do nothing.
+						return oldLoc;
+					}
+					errno = status;
+					return (locale_t)0;
+				}
+
+				databridge = new (std::nothrow) LocaleDataBridge(false);
+				if (databridge == NULL) {
+					LocaleBackend::DestroyBackend(backend);
+					errno = ENOMEM;
+					return (locale_t)0;
+				}
+
+				backend->Initialize(databridge);
+			}
+			databridge->ApplyToCurrentThread();
         } else {
             gGlobalLocaleDataBridge.ApplyToCurrentThread();
         }

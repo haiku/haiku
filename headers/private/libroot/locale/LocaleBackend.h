@@ -187,7 +187,7 @@ public:
 	virtual void				Initialize(LocaleDataBridge* dataBridge) = 0;
 
 	static	status_t			LoadBackend();
-	static  LocaleBackend*		CreateBackend();
+	static  status_t			CreateBackend(LocaleBackend*& backendOut);
 	static  void				DestroyBackend(LocaleBackend* instance);
 };
 

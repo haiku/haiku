@@ -52,7 +52,7 @@ LoadFunctions()
 static void
 LoadBackend()
 {
-	gGlobalLocaleBackend = LocaleBackend::CreateBackend();
+	LocaleBackend::CreateBackend(gGlobalLocaleBackend);
 	if (gGlobalLocaleBackend != NULL) {
 		gGlobalLocaleBackend->Initialize(&gGlobalLocaleDataBridge);
 	}
@@ -81,19 +81,20 @@ LocaleBackend::LoadBackend()
 }
 
 
-LocaleBackend*
-LocaleBackend::CreateBackend()
+status_t
+LocaleBackend::CreateBackend(LocaleBackend*& backendOut)
 {
 	if (sCreateInstanceFunc == NULL) {
 		pthread_once(&sFunctionsInitOnce, &BPrivate::Libroot::LoadFunctions);
 	}
 
 	if (sCreateInstanceFunc != NULL) {
-		LocaleBackend* backend = sCreateInstanceFunc();
-		return backend;
+		backendOut = sCreateInstanceFunc();
+		return backendOut != NULL ? B_OK : B_NO_MEMORY;
 	}
 
-	return NULL;
+	backendOut = NULL;
+	return B_MISSING_LIBRARY;
 }
 
 
