@@ -455,7 +455,8 @@ public:
 HttpIntegrationTest::HttpIntegrationTest(TestServerMode mode)
 	: fTestServer(mode)
 {
-
+	// increase number of concurrent connections to 4 (from 2)
+	fSession.SetMaxConnectionsPerHost(4);
 }
 
 
@@ -692,10 +693,14 @@ HttpIntegrationTest::BasicAuthTest()
 	CPPUNIT_ASSERT(result.Status().code == 200);
 
 	// Basic Authentication with incorrect credentials
+	try {
 	request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/auth/basic/walter/secret"));
 	request.SetAuthentication({"invaliduser", "invalidpassword"});
 	result = fSession.Execute(std::move(request));
 	CPPUNIT_ASSERT(result.Status().code == 401);
+	} catch (const BPrivate::Network::BError& e) {
+		CPPUNIT_FAIL(e.DebugMessage().String());
+	}
 }
 
 

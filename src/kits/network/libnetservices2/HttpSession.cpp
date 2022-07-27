@@ -7,6 +7,7 @@
  */
 
 #include <algorithm>
+#include <atomic>
 #include <deque>
 #include <list>
 #include <map>
@@ -46,6 +47,14 @@ using namespace BPrivate::Network;
 static constexpr ssize_t kMaxHeaderLineSize = 64 * 1024;
 
 
+struct CounterDeleter {
+	void operator()(int32* counter) const noexcept
+	{
+		atomic_add(counter, -1);
+	}
+};
+
+
 class BHttpSession::Request {
 public:
 									Request(BHttpRequest&& request,
@@ -70,6 +79,10 @@ public:
 	std::shared_ptr<HttpResultPrivate>
 									Result() { return fResult; }
 	void							SetError(std::exception_ptr e);
+
+	// Helpers for maintaining the connection count
+	std::pair<BString, int>			GetHost() const;
+	void							SetCounter(int32* counter) noexcept;
 
 	// Operational methods
 	void							ResolveHostName();
@@ -116,6 +129,10 @@ private:
 	// Redirection
 	std::optional<BHttpStatus>		fRedirectStatus;
 	int8							fRemainingRedirects;
+
+	// Connection counter
+	std::unique_ptr<int32, CounterDeleter>
+									fConnectionCounter;
 };
 
 
@@ -128,6 +145,8 @@ public:
 													std::unique_ptr<BDataIO> target,
 													BMessenger observer);
 			void								Cancel(int32 identifier);
+			void								SetMaxConnectionsPerHost(size_t maxConnections);
+			void								SetMaxHosts(size_t maxConnections);
 
 private:
 	// Thread functions
@@ -145,12 +164,20 @@ private:
 
 	// locking mechanism
 			BLocker								fLock;
-			int32								fQuitting;
+			std::atomic<bool>					fQuitting = false;
 
 	// queues & shared data
 			std::list<BHttpSession::Request>	fControlQueue;
 			std::deque<BHttpSession::Request>	fDataQueue;
 			std::vector<int32>					fCancelList;
+
+	// data owned by the controlThread
+	using Host = std::pair<BString, int>;
+			std::map<Host, int32>				fConnectionCount;
+
+	// data that can only be accessed atomically
+			std::atomic<size_t>					fMaxConnectionsPerHost = 2;
+			std::atomic<size_t>					fMaxHosts = 10;
 
 	// data owned by the dataThread
 			std::map<int,BHttpSession::Request>	connectionMap;
@@ -195,7 +222,7 @@ BHttpSession::Impl::Impl()
 
 BHttpSession::Impl::~Impl() noexcept
 {
-	atomic_set(&fQuitting, 1);
+	fQuitting.store(true);
 	delete_sem(fControlQueueSem);
 	delete_sem(fDataQueueSem);
 	status_t threadResult;
@@ -242,6 +269,26 @@ BHttpSession::Impl::Cancel(int32 identifier)
 }
 
 
+void
+BHttpSession::Impl::SetMaxConnectionsPerHost(size_t maxConnections)
+{
+	if (maxConnections <= 0 || maxConnections >= INT32_MAX) {
+		throw BRuntimeError(__PRETTY_FUNCTION__,
+			"MaxConnectionsPerHost must be between 1 and INT32_MAX");
+	}
+	fMaxConnectionsPerHost.store(maxConnections, std::memory_order_relaxed);
+}
+
+
+void
+BHttpSession::Impl::SetMaxHosts(size_t maxConnections)
+{
+	if (maxConnections <= 0)
+		throw BRuntimeError(__PRETTY_FUNCTION__, "MaxHosts must be 1 or more");
+	fMaxHosts.store(maxConnections, std::memory_order_relaxed);
+}
+
+
 /*static*/ status_t
 BHttpSession::Impl::ControlThreadFunc(void* arg)
 {
@@ -257,7 +304,7 @@ BHttpSession::Impl::ControlThreadFunc(void* arg)
 		}
 
 		// Check if we have woken up because we are quitting
-		if (atomic_get(&impl->fQuitting) == 1)
+		if (impl->fQuitting.load())
 			break;
 
 		// Get items to process (locking done by the helper)
@@ -279,7 +326,10 @@ BHttpSession::Impl::ControlThreadFunc(void* arg)
 			}
 
 			if (hasError) {
-				// Do not add the request back to the queue
+				// Do not add the request back to the queue; release the sem to do another round
+				// in case there is another item waiting because the limits of concurrent requests
+				// were reached
+				release_sem(impl->fControlQueueSem);
 				continue;
 			}
 
@@ -291,7 +341,7 @@ BHttpSession::Impl::ControlThreadFunc(void* arg)
 	}
 
 	// Clean up and make sure we are quitting
-	if (atomic_get(&impl->fQuitting) == 1) {
+	if (impl->fQuitting.load()) {
 		// First wait for the data thread to complete
 		status_t threadResult;
 		wait_for_thread(impl->fDataThread, &threadResult);
@@ -406,6 +456,8 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 				if (error) {
 					request.Disconnect();
 					data->connectionMap.erase(item.object);
+					release_sem(data->fControlQueueSem);
+						// wake up control thread; there may queued requests unblocked.
 					resizeObjectList = true;
 				}
 			} else if ((item.events & B_EVENT_READ) == B_EVENT_READ) {
@@ -436,6 +488,8 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 					// Clean up finished requests; including redirected requests
 					request.Disconnect();
 					data->connectionMap.erase(item.object);
+					release_sem(data->fControlQueueSem);
+						// wake up control thread; there may queued requests unblocked.
 					resizeObjectList = true;
 				}
 			} else if ((item.events & B_EVENT_DISCONNECTED) == B_EVENT_DISCONNECTED) {
@@ -456,6 +510,8 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 					request.SetError(std::current_exception());
 				}
 				data->connectionMap.erase(item.object);
+				release_sem(data->fControlQueueSem);
+					// wake up control thread; there may queued requests unblocked.
 				resizeObjectList = true;
 			} else if (item.events == 0) {
 				// No events for this item, skip
@@ -492,7 +548,7 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 		}
 	}
 	// Clean up and make sure we are quitting
-	if (atomic_get(&data->fQuitting) == 1) {
+	if (data->fQuitting.load()) {
 		// Cancel all requests
 		for (auto it = data->connectionMap.begin(); it != data->connectionMap.end(); it++) {
 			try {
@@ -522,8 +578,46 @@ std::vector<BHttpSession::Request>
 BHttpSession::Impl::GetRequestsForControlThread()
 {
 	std::vector<BHttpSession::Request> requests;
+	std::cout << __PRETTY_FUNCTION__ << ": number of items in fConnectionCount: " << fConnectionCount.size() << std::endl;
+
+	// Clean up connection list if it is at the max number of hosts
+	if (fConnectionCount.size() >= fMaxHosts.load()) {
+		for (auto it = fConnectionCount.begin(); it != fConnectionCount.end(); ) {
+			if (atomic_get(std::addressof(it->second)) == 0) {
+				it = fConnectionCount.erase(it);
+			} else {
+				it++;
+			}
+		}
+	}
+
+	// Process the list of pending requests and review if they can be started.
 	auto lock = AutoLocker<BLocker>(fLock);
 	fControlQueue.remove_if([this, &requests](auto& request){
+		auto host = request.GetHost();
+		auto it = fConnectionCount.find(host);
+		if (it != fConnectionCount.end()) {
+			std::cout << __PRETTY_FUNCTION__ << ": found connnections for host, count: " << it->second << std::endl;
+			if (static_cast<size_t>(atomic_get(std::addressof(it->second)))
+					>= fMaxConnectionsPerHost.load(std::memory_order_relaxed)) {
+				std::cout << "\tskip loading this request as max connections per host is reached" << std::endl;
+				return false;
+			} else {
+				atomic_add(std::addressof(it->second), 1);
+				request.SetCounter(std::addressof(it->second));
+			}
+		} else {
+			if (fConnectionCount.size() == fMaxHosts.load()) {
+				std::cout << "\tskip loading this request as max hosts is reached" << std::endl;
+				return false;
+			}
+			auto[newIt, success] = fConnectionCount.insert({host, 1});
+			if (!success) {
+				throw BRuntimeError(__PRETTY_FUNCTION__,
+					"Cannot insert into fConnectionCount");
+			}
+			request.SetCounter(std::addressof(newIt->second));
+		}
 		requests.emplace_back(std::move(request));
 		return true;
 	});
@@ -571,6 +665,20 @@ BHttpSession::Cancel(const BHttpResult& request)
 }
 
 
+void
+BHttpSession::SetMaxConnectionsPerHost(size_t maxConnections)
+{
+	fImpl->SetMaxConnectionsPerHost(maxConnections);
+}
+
+
+void
+BHttpSession::SetMaxHosts(size_t maxConnections)
+{
+	fImpl->SetMaxHosts(maxConnections);
+}
+
+
 // #pragma mark -- BHttpSession::Request (helpers)
 
 BHttpSession::Request::Request(BHttpRequest&& request, std::unique_ptr<BDataIO> target,
@@ -615,6 +723,20 @@ BHttpSession::Request::SetError(std::exception_ptr e)
 	SendMessage(UrlEvent::RequestCompleted, [](BMessage& msg){
 		msg.AddBool(UrlEventData::Success, false);
 	});
+}
+
+
+std::pair<BString, int>
+BHttpSession::Request::GetHost() const
+{
+	return {fRequest.Url().Host(), fRequest.Url().Port()};
+}
+
+
+void
+BHttpSession::Request::SetCounter(int32* counter) noexcept
+{
+	fConnectionCounter = std::unique_ptr<int32, CounterDeleter>(counter);
 }
 
 

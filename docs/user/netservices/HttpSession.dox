@@ -220,6 +220,47 @@ namespace Network {
 
 
 /*!
+	\fn void BHttpSession::SetMaxConnectionsPerHost(size_t maxConnections)
+	\brief Set the maximum number of connections per host.
+
+	A host is identified by the domain name and the port. You can limit the number of concurrent
+	connections to a host by tweaking this value.
+
+	The default value is 2 connections per host.
+
+	If the value is decreased, any requests that already started will not be affected. The new
+	value will only be applied when any new requests are added.
+
+	\param maxConnections The maximum number of connections per host. This value must between 1
+		and \c INT32_MAX.
+
+	\exception BRuntimeError In case the \a maxConnections is invalid.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::Network::BHttpSession::SetMaxHosts(size_t maxConnections)
+	\brief Set the maximum number of concurrent hosts that can be connected to.
+
+	A host is identified by the domain name and the port. You can limit the number of concurrent
+	hosts by tweaking this value.
+
+	The default value is 10 concurrent hosts.
+
+	If the value is decreased, any requests that already started will not be affected. The new
+	value will only be applied when any new requests are added.
+
+	\param maxConnections The maximum number of hosts. The value must be at least 1.
+
+	\exception BRuntimeError In case the \a maxConnections is 0.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\var UrlEvent::HttpStatus
 	\brief The HTTP status code has been received, and can be accessed through the result object.
 

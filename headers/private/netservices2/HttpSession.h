@@ -40,6 +40,10 @@ public:
 	void					Cancel(int32 identifier);
 	void					Cancel(const BHttpResult& request);
 
+	// Concurrency limits
+	void					SetMaxConnectionsPerHost(size_t maxConnections);
+	void					SetMaxHosts(size_t maxConnections);
+
 private:
 	struct Redirect;
 	class Request;
