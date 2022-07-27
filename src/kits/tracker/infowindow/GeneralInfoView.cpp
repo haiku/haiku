@@ -176,6 +176,7 @@ GeneralInfoView::GeneralInfoView(Model* model)
 		B_TRANSLATE("Kind:"),
 		B_TRANSLATE("Link to:"),
 		B_TRANSLATE("Version:"),
+		B_TRANSLATE("Filesystem:"),
 		NULL
 	};
 
@@ -353,6 +354,19 @@ GeneralInfoView::InitStrings(const Model* model)
 			fDescStr.ReplaceAll('\t', ' ');
 		} else
 			fDescStr = "-";
+	} else if (model->IsVolume()) {
+		const node_ref* modelNodeRef = fModel->NodeRef();
+		fs_info modelInfo;
+		if (fs_stat_dev(modelNodeRef->device, &modelInfo) == B_OK)
+		{
+			fFileSystemStr = modelInfo.fsh_name;
+			fFileSystemStr << B_TRANSLATE(" (block size: ")
+				<< modelInfo.block_size;
+			if ((modelInfo.flags & B_FS_HAS_QUERY) != 0)
+				fFileSystemStr += B_TRANSLATE(", indexed");
+			fFileSystemStr += ")";
+		} else
+			fFileSystemStr = B_TRANSLATE("(unknown)");
 	}
 
 	if (mime.SetType(model->MimeType()) == B_OK
@@ -969,6 +983,27 @@ GeneralInfoView::Draw(BRect)
 		fDescRect.right = fDescRect.left + StringWidth(fDescStr.String()) + 3;
 
 		// No link field
+		fLinkRect = BRect(-1, -1, -1, -1);
+	} else if (fModel->IsVolume()) {
+		//Filesystem
+		MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Filesystem:"))),
+			lineBase));
+		SetHighColor(labelColor);
+		DrawString(B_TRANSLATE("Filesystem:"));
+		MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
+		SetHighColor(attributeColor);
+		// Check for truncation
+		if (StringWidth(fFileSystemStr.String()) > (Bounds().Width()
+				- (fDivider + kBorderMargin))) {
+			BString nameString(fFileSystemStr.String());
+			TruncateString(&nameString, B_TRUNCATE_MIDDLE,
+				Bounds().Width() - (fDivider + kBorderMargin));
+			DrawString(nameString.String());
+		} else
+			DrawString(fFileSystemStr.String());
+
+		// No description field or link field
+		fDescRect = BRect(-1, -1, -1, -1);
 		fLinkRect = BRect(-1, -1, -1, -1);
 	}
 }
