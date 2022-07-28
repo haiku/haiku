@@ -264,8 +264,10 @@ detect_displays()
 			continue;
 		}
 
-		if (gConnector[id]->type == VIDEO_CONNECTOR_DP) {
-			TRACE("%s: connector(%" B_PRIu32 "): Checking DP.\n", __func__, id);
+		if (gConnector[id]->type == VIDEO_CONNECTOR_DP
+			|| gConnector[id]->type == VIDEO_CONNECTOR_EDP) {
+			TRACE("%s: connector(%" B_PRIu32 "): Checking %sDP.\n", __func__, id,
+				gConnector[id]->type == VIDEO_CONNECTOR_EDP ? "e" : "");
 
 			if (gConnector[id]->encoderExternal.valid == true) {
 				// If this has a valid external encoder (dp bridge)
@@ -284,6 +286,8 @@ detect_displays()
 			if (gDisplay[displayIndex]->attached) {
 				TRACE("%s: connector(%" B_PRIu32 "): Found DisplayPort EDID!\n",
 					__func__, id);
+				gInfo->shared_info->has_edid = true;
+				edid_dump(edid);
 			}
 		}
 

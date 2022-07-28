@@ -37,8 +37,8 @@ dp_aux_speak(uint32 connectorIndex, uint8* send, int sendBytes,
 	uint8* recv, int recvBytes, uint8 delay, uint8* ack)
 {
 	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
-	if (dpInfo->auxPin == 0) {
-		ERROR("%s: cannot speak on invalid GPIO pin!\n", __func__);
+	if (!dpInfo->valid) {
+		ERROR("%s: cannot speak on invalid dpInfo!\n", __func__);
 		return B_IO_ERROR;
 	}
 
