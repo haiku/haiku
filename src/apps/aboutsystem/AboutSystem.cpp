@@ -237,7 +237,7 @@ public:
 private:
 			void			_AdjustColors();
 			void			_AdjustTextColors() const;
-			rgb_color		_DesktopTextColor() const;
+			rgb_color		_DesktopTextColor(int32 workspace = -1) const;
 			bool			_OnDesktop() const;
 
 			BStringView*	_CreateLabel(const char*, const char*);
@@ -858,6 +858,40 @@ SysInfoView::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case B_WORKSPACE_ACTIVATED:
+		{
+			if (!_OnDesktop())
+				break;
+
+			bool active;
+			int32 workspace;
+			if (message->FindBool("active", &active) == B_OK && active
+				&& message->FindInt32("workspace", &workspace) == B_OK) {
+				BLayout* layout = GetLayout();
+				int32 itemCount = layout->CountItems() - 2;
+					// leave out dragger and uptime
+
+				fDesktopTextColor = _DesktopTextColor(workspace);
+				SetHighColor(fDesktopTextColor);
+
+				for (int32 index = 0; index < itemCount; index++) {
+					BView* view = layout->ItemAt(index)->View();
+					if (view == NULL)
+						continue;
+
+					view->SetDrawingMode(B_OP_ALPHA);
+					view->SetHighColor(fDesktopTextColor);
+				}
+
+				fUptimeView->SetDrawingMode(B_OP_ALPHA);
+				fUptimeView->SetFontAndColor(NULL, 0, &fDesktopTextColor);
+
+				Invalidate();
+			}
+
+			break;
+		}
+
 		default:
 			BView::MessageReceived(message);
 			break;
@@ -965,12 +999,15 @@ SysInfoView::_AdjustTextColors() const
 
 
 rgb_color
-SysInfoView::_DesktopTextColor() const
+SysInfoView::_DesktopTextColor(int32 workspace) const
 {
 	// set text color to black or white depending on desktop background color
 	rgb_color textColor;
 	BScreen screen(Window());
-	rgb_color viewColor = screen.DesktopColor();
+	if (workspace < 0)
+		workspace = current_workspace();
+
+	rgb_color viewColor = screen.DesktopColor(workspace);
 	int viewBrightness = BPrivate::perceptual_brightness(viewColor);
 	textColor.blue = textColor.green = textColor.red = viewBrightness > 127
 		? 0 : 255;
