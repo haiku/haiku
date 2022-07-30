@@ -109,6 +109,9 @@ static const char* kRalinkFirmware = B_TRANSLATE_MARK("Ralink WiFi Firmware");
 #endif
 
 
+//	#pragma mark - TranslationComparator function
+
+
 static int
 TranslationComparator(const void* left, const void* right)
 {
@@ -136,6 +139,9 @@ TranslationComparator(const void* left, const void* right)
 	BLocale::Default()->GetCollator(&collator);
 	return collator.Compare(leftName.String(), rightName.String());
 }
+
+
+//	#pragma mark - class definitions
 
 
 class AboutApp : public BApplication {
@@ -200,9 +206,8 @@ public:
 	virtual void			AttachedToWindow();
 	virtual	void			AllAttached();
 	virtual void			Pulse();
-
-	virtual void			MessageReceived(BMessage* msg);
-	virtual void			MouseDown(BPoint point);
+	virtual void			MessageReceived(BMessage* message);
+	virtual void			MouseDown(BPoint where);
 
 			void			AddCopyrightEntry(const char* name,
 								const char* text,
@@ -252,16 +257,17 @@ private:
 };
 
 
-//	#pragma mark -
+//	#pragma mark - AboutApp
 
 
 AboutApp::AboutApp()
-	: BApplication("application/x-vnd.Haiku-About")
+	:
+	BApplication("application/x-vnd.Haiku-About")
 {
 	B_TRANSLATE_MARK_SYSTEM_NAME_VOID("AboutSystem");
 
-	AboutWindow *window = new(std::nothrow) AboutWindow();
-	if (window)
+	AboutWindow* window = new(std::nothrow) AboutWindow();
+	if (window != NULL)
 		window->Show();
 }
 
@@ -279,11 +285,12 @@ AboutApp::MessageReceived(BMessage* message)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - AboutWindow
 
 
 AboutWindow::AboutWindow()
-	: BWindow(BRect(0, 0, 500, 300), B_TRANSLATE("About this system"),
+	:
+	BWindow(BRect(0, 0, 500, 300), B_TRANSLATE("About this system"),
 		B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
@@ -311,9 +318,10 @@ AboutWindow::QuitRequested()
 
 
 LogoView::LogoView()
-	: BView("logo", B_WILL_DRAW)
+	:
+	BView("logo", B_WILL_DRAW),
+	fLogo(BTranslationUtils::GetBitmap(B_PNG_FORMAT, "logo.png"))
 {
-	fLogo = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "logo.png");
 	SetViewColor(255, 255, 255);
 }
 
@@ -347,10 +355,10 @@ LogoView::MaxSize()
 void
 LogoView::Draw(BRect updateRect)
 {
-	if (fLogo != NULL) {
-		DrawBitmap(fLogo,
-			BPoint((Bounds().Width() - fLogo->Bounds().Width()) / 2, 0));
-	}
+	if (fLogo == NULL)
+		return;
+
+	DrawBitmap(fLogo, BPoint((Bounds().Width() - fLogo->Bounds().Width()) / 2, 0));
 }
 
 
@@ -358,8 +366,9 @@ LogoView::Draw(BRect updateRect)
 
 
 CropView::CropView(BView* target, int32 left, int32 top, int32 right,
-		int32 bottom)
-	: BView("crop view", 0),
+	int32 bottom)
+	:
+	BView("crop view", 0),
 	fTarget(target),
 	fCropLeft(left),
 	fCropTop(top),
@@ -427,7 +436,8 @@ CropView::DoLayout()
 #define B_TRANSLATION_CONTEXT "AboutView"
 
 AboutView::AboutView()
-	: BView("aboutview", B_WILL_DRAW | B_PULSE_NEEDED),
+	:
+	BView("aboutview", B_WILL_DRAW | B_PULSE_NEEDED),
 	fLastActionTime(system_time()),
 	fScrollRunner(NULL)
 {
@@ -654,13 +664,13 @@ AboutView::AllAttached()
 
 
 void
-AboutView::MouseDown(BPoint point)
+AboutView::MouseDown(BPoint where)
 {
-	BRect r(92, 26, 105, 31);
-	if (r.Contains(point))
+	BRect rect(92, 26, 105, 31);
+	if (rect.Contains(where))
 		BMessenger(this).SendMessage('eegg');
 
-	if (Bounds().Contains(point)) {
+	if (Bounds().Contains(where)) {
 		fLastActionTime = system_time();
 		delete fScrollRunner;
 		fScrollRunner = NULL;
@@ -686,23 +696,23 @@ AboutView::Pulse()
 
 
 void
-AboutView::MessageReceived(BMessage* msg)
+AboutView::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case B_COLORS_UPDATED:
 		{
-			if (msg->HasColor(ui_color_name(B_PANEL_TEXT_COLOR)))
+			if (message->HasColor(ui_color_name(B_PANEL_TEXT_COLOR)))
 				_AdjustTextColors();
 
 			break;
 		}
 		case SCROLL_CREDITS_VIEW:
 		{
-			BScrollBar* scrollBar =
-				fCreditsView->ScrollBar(B_VERTICAL);
+			BScrollBar* scrollBar = fCreditsView->ScrollBar(B_VERTICAL);
 			if (scrollBar == NULL)
 				break;
-			float max, min;
+			float min;
+			float max;
 			scrollBar->GetRange(&min, &max);
 			if (scrollBar->Value() < max)
 				fCreditsView->ScrollBy(0, 1);
@@ -718,7 +728,7 @@ AboutView::MessageReceived(BMessage* msg)
 		}
 
 		default:
-			BView::MessageReceived(msg);
+			BView::MessageReceived(message);
 			break;
 	}
 }
@@ -829,8 +839,9 @@ AboutView::PickRandomHaiku()
 		return;
 
 	char* buff = (char*)malloc((size_t)st.st_size + 1);
-	if (!buff)
+	if (buff == NULL)
 		return;
+
 	buff[(size_t)st.st_size] = '\0';
 	BList haikuList;
 	if (fortunes.Read(buff, (size_t)st.st_size) == (ssize_t)st.st_size) {
@@ -847,6 +858,7 @@ AboutView::PickRandomHaiku()
 		}
 	}
 	free(buff);
+
 	if (haikuList.CountItems() < 1)
 		return;
 
@@ -859,9 +871,8 @@ AboutView::PickRandomHaiku()
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &fTextColor);
 	fCreditsView->Insert(s->String());
 	fCreditsView->Insert("\n");
-	while ((s = (BString*)haikuList.RemoveItem((int32)0))) {
+	while ((s = (BString*)haikuList.RemoveItem((int32)0)))
 		delete s;
-	}
 }
 
 
@@ -1074,7 +1085,6 @@ AboutView::_CreateCreditsView()
 	font.SetFace(B_BOLD_FACE);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &fHaikuGreenColor);
 	fCreditsView->Insert(B_TRANSLATE("\nCopyrights\n\n"));
-
 
 	// Haiku license
 	BString haikuLicense = B_TRANSLATE_COMMENT("The code that is unique to "
@@ -1642,11 +1652,14 @@ UptimeToString(char string[], size_t size)
 }
 
 
+//	#pragma mark - main
+
+
 int
 main()
 {
 	AboutApp app;
 	app.Run();
+
 	return 0;
 }
-
