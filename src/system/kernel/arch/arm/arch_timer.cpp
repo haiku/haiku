@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2021, Haiku Inc. All rights reserved.
+ * Copyright 2007-2022, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,6 +20,7 @@
 #include <arch/cpu.h>
 
 #include <drivers/bus/FDT.h>
+#include "arch_timer_generic.h"
 #include "soc.h"
 
 #include "soc_pxa.h"
@@ -27,12 +28,11 @@
 
 //#define TRACE_ARCH_TIMER
 #ifdef TRACE_ARCH_TIMER
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
-//static fdt_module_info *sFdtModule;
 
 #if 0
 static struct fdt_device_info intc_table[] = {
@@ -68,7 +68,15 @@ arch_timer_clear_hardware_timer()
 int
 arch_init_timer(kernel_args *args)
 {
-	TRACE(("%s\n", __func__));
+	TRACE("%s\n", __func__);
+
+	if (ARMGenericTimer::IsAvailable()) {
+		TRACE("init ARMv7 generic timer\n");
+		ARMGenericTimer::Init();
+	}
+
+	//TODO: use SoC-specific timer as a fallback
+	//if the generic timer is not available
 
 #if 0
 	status_t rc = get_module(B_FDT_MODULE_NAME, (module_info**)&sFdtModule);
@@ -77,11 +85,12 @@ arch_init_timer(kernel_args *args)
 
 	rc = sFdtModule->setup_devices(intc_table, intc_count, NULL);
 	if (rc != B_OK)
-		panic("No interrupt controllers found!\n");
+		panic("No hardware timer found!\n");
 #endif
 
 	return B_OK;
 }
+
 
 bigtime_t
 system_time(void)

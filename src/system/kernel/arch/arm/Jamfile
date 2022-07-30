@@ -36,6 +36,7 @@ KernelMergeObject kernel_arch_arm.o :
 	arch_atomic32.cpp
 
 	arch_int_gicv2.cpp
+	arch_timer_generic.cpp
 
 	# SoC minimal kernel-required support
 	# (timers, interrupts, rtc?)
