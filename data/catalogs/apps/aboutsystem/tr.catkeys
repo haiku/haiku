@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-About	2473434391
+1	turkish	x-vnd.Haiku-About	610468518
 Revision	AboutView		Revizyon
 The Haikuware team and their bounty program\n	AboutView		Haikuware takımı ve onların ödül programı\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Telif hakkı © 1999-2007 Michael C. Ring. Tüm hakları saklıdır.
@@ -81,7 +81,6 @@ Memory:	AboutView		Bellek:
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Telif hakkı © 2006-2015 Intel Corporation. Tüm hakları saklıdır.
 BSD (2-clause)	AboutWindow		BSD (2 koşullu)
 Website & marketing:\n	AboutView		Web sayfası & pazarlama:\n
-Copyright © 2018-2021, Frederic Cambus	AboutView		Telif hakkı © 2018-2021, Frederic Cambus
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001, Generalized Timing Formula temel alınarak Andy Ritger tarafından yazılmıştır.
 …and the many people making donations!\n\n	AboutView		…ve bağış yapan birçok kişi!\n\n
 Marvell (firmware)	AboutWindow		Marvell (firmware)

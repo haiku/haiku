@@ -1,4 +1,4 @@
-1	friulian	application/x-vnd.Cortex.InfoView	3788145961
+1	friulian	application/x-vnd.Cortex.InfoView	2382053937
 Offset	InfoView		Deviazion
 Description	DormantNodeInfoView		Descrizion
 Byte order	InfoView		Ordin dai bytes
@@ -16,6 +16,7 @@ Buffer size	InfoView		Dimension memorie tampon
 \n- Quality:	FileNodeInfoView		\n- Cualitât:
 Kinds	LiveNodeInfoView		Gjenars
 Application	AppNodeInfoView		Aplicazion
+Flavor flags	DormantNodeInfoView		Opzions dai savôrs
 Max. instances	DormantNodeInfoView		Istancis massimis
 \n- Duration:	FileNodeInfoView		\n- Durade:
 Dormant media node	DormantNodeInfoView		Grop multimediâl inatîf
@@ -44,6 +45,7 @@ Format	InfoView		Formât
 Version	AppNodeInfoView		Version
 AddOn ID	DormantNodeInfoView		ID de zonte
 Frame size	InfoView		Dimension ricuadri
+Flavor ID	DormantNodeInfoView		ID dai savôrs
 Run mode	LiveNodeInfoView		Modalitât di esecuzion
 \n- Codec:	FileNodeInfoView		\n- Codec:
 Port	LiveNodeInfoView		Puarte
