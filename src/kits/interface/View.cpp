@@ -5122,13 +5122,19 @@ BView::MessageReceived(BMessage* message)
 				break;
 
 			case B_SCREEN_CHANGED:
+			case B_WORKSPACE_ACTIVATED:
+			case B_WORKSPACES_CHANGED:
 			{
-				// propegate message to child views
+				BWindow* window = Window();
+				if (window == NULL)
+					break;
+
+				// propagate message to child views
 				int32 childCount = CountChildren();
 				for (int32 i = 0; i < childCount; i++) {
 					BView* view = ChildAt(i);
 					if (view != NULL)
-						view->MessageReceived(message);
+						window->PostMessage(message, view);
 				}
 				break;
 			}

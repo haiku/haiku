@@ -1113,13 +1113,7 @@ FrameMoved(origin);
 				uint32 mode;
 				if (message->FindRect("frame", &frame) == B_OK
 					&& message->FindInt32("mode", (int32*)&mode) == B_OK) {
-					// propegate message to child views
-					int32 childCount = CountChildren();
-					for (int32 i = 0; i < childCount; i++) {
-						BView* view = ChildAt(i);
-						if (view != NULL)
-							view->MessageReceived(message);
-					}
+					_PropagateMessageToChildViews(message);
 					// call hook method
 					ScreenChanged(frame, (color_space)mode);
 				}
@@ -1132,18 +1126,25 @@ FrameMoved(origin);
 				uint32 workspace;
 				bool active;
 				if (message->FindInt32("workspace", (int32*)&workspace) == B_OK
-					&& message->FindBool("active", &active) == B_OK)
+					&& message->FindBool("active", &active) == B_OK) {
+					_PropagateMessageToChildViews(message);
+					// call hook method
 					WorkspaceActivated(workspace, active);
+				}
 			} else
 				target->MessageReceived(message);
 			break;
 
 		case B_WORKSPACES_CHANGED:
 			if (target == this) {
-				uint32 oldWorkspace, newWorkspace;
+				uint32 oldWorkspace;
+				uint32 newWorkspace;
 				if (message->FindInt32("old", (int32*)&oldWorkspace) == B_OK
-					&& message->FindInt32("new", (int32*)&newWorkspace) == B_OK)
+					&& message->FindInt32("new", (int32*)&newWorkspace) == B_OK) {
+					_PropagateMessageToChildViews(message);
+					// call hook method
 					WorkspacesChanged(oldWorkspace, newWorkspace);
+				}
 			} else
 				target->MessageReceived(message);
 			break;
@@ -4080,6 +4081,18 @@ BWindow::_SendShowOrHideMessage()
 	fLink->StartMessage(AS_SHOW_OR_HIDE_WINDOW);
 	fLink->Attach<int32>(fShowLevel);
 	fLink->Flush();
+}
+
+
+void
+BWindow::_PropagateMessageToChildViews(BMessage* message)
+{
+	int32 childrenCount = CountChildren();
+	for (int32 index = 0; index < childrenCount; index++) {
+		BView* view = ChildAt(index);
+		if (view != NULL)
+			PostMessage(message, view);
+	}
 }
 
 
