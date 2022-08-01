@@ -19,7 +19,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		StaticLibrary [ MultiArchDefaultGristFiles libnetservices2.a ] :
 			ErrorsExt.cpp
+			HttpBuffer.cpp
 			HttpFields.cpp
+			HttpParser.cpp
 			HttpRequest.cpp
 			HttpResult.cpp
 			HttpSession.cpp

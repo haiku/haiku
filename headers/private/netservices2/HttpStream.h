@@ -23,6 +23,7 @@ namespace Network {
 class BHttpFields;
 class BHttpRequest;
 class BHttpStatus;
+class HttpBuffer;
 
 
 class BAbstractDataStream {
@@ -62,77 +63,6 @@ private:
 using HttpTransferFunction = std::function<size_t (const std::byte*, size_t)>;
 
 
-class HttpBuffer {
-public:
-							HttpBuffer(size_t capacity = 8*1024);
-
-	ssize_t					ReadFrom(BDataIO* source);
-	void					WriteExactlyTo(BDataIO* target);
-	void					WriteTo(HttpTransferFunction func,
-								std::optional<size_t> maxSize = std::nullopt);
-	std::optional<BString>	GetNextLine();
-
-	size_t					RemainingBytes() noexcept;
-
-	void					Flush() noexcept;
-	void					Clear() noexcept;
-
-private:
-	std::vector<std::byte>	fBuffer;
-	size_t					fCurrentOffset = 0;
-};
-
-
-enum class HttpBodyInputStreamState {
-	ChunkSize,
-	ChunkEnd,
-	Chunk,
-	Trailers,
-	Done
-};
-
-
-class HttpParser {
-public:
-							HttpParser() {};
-
-	// HTTP Header
-	bool					ParseStatus(HttpBuffer& buffer, BHttpStatus& status);
-	bool					ParseFields(HttpBuffer& buffer, BHttpFields& fields);
-
-	// HTTP Body
-	void					SetGzipCompression(bool compression = true);
-	void					SetContentLength(std::optional<off_t> contentLength) noexcept;
-
-	size_t					ParseBody(HttpBuffer& buffer, HttpTransferFunction writeToBody);
-	std::optional<off_t>	BodyBytesTotal() const noexcept { return fBodyBytesTotal; };
-	off_t					BodyBytesTransferred() const noexcept { return fTransferredBodySize; };
-	bool					Complete() const noexcept;
-
-private:
-	size_t					_ParseBodyRaw(HttpBuffer& buffer, HttpTransferFunction writeToBody);
-	size_t					_ParseBodyChunked(HttpBuffer& buffer, HttpTransferFunction writeToBody);
-	size_t					_ReadChunk(HttpBuffer& buffer, HttpTransferFunction writeToBody,
-								size_t maxSize, bool flush);
-	bool					_IsChunked() const noexcept;
-
-private:
-	off_t					fHeaderBytes = 0;
-
-	// Support for chunked transfers
-	HttpBodyInputStreamState fBodyState = HttpBodyInputStreamState::ChunkSize;
-	off_t					fRemainingChunkSize = 0;
-	bool					fLastChunk = false;
-
-	// Receive stats
-	std::optional<off_t>	fBodyBytesTotal = 0;
-	off_t					fTransferredBodySize = 0;
-
-	// Optional decompression
-	std::unique_ptr<BMallocIO>		fDecompressorStorage = nullptr;
-	std::unique_ptr<BDataIO>		fDecompressingStream = nullptr;
-
-};
 
 
 } // namespace Network

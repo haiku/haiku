@@ -32,6 +32,8 @@
 #include <Socket.h>
 #include <ZlibCompressionAlgorithm.h>
 
+#include "HttpBuffer.h"
+#include "HttpParser.h"
 #include "HttpResultPrivate.h"
 #include "NetServicesPrivate.h"
 
