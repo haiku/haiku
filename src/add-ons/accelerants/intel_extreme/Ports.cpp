@@ -759,7 +759,7 @@ Port::_DpAuxTransfer(uint8* transmitBuffer, uint8 transmitSize,
 		for (int i = 0; i < 5; i++)
 			channelData[i] = PCH_DP_AUX_CH_DATA(channel, i);
 	} else {
-		ERROR("DigitalDisplayInterface::_DpAuxTransfer() unknown register config\n");
+		ERROR("Port::_DpAuxTransfer() unknown register config\n");
 		return B_BUSY;
 	}
 	if (transmitSize > 20 || receiveSize > 20)
@@ -2296,14 +2296,18 @@ DigitalDisplayInterface::IsConnected()
 	uint32 pipeState = 0;
 	if ((gInfo->shared_info->device_type.IsMobile() || _IsEDPPort())
 		&& (PortIndex() == INTEL_PORT_A)) {
-		pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
-		TRACE("%s: PIPE_DDI_FUNC_CTL_EDP: 0x%" B_PRIx32 "\n", __func__, pipeState);
-		if (!(pipeState & PIPE_DDI_FUNC_CTL_ENABLE)) {
-			TRACE("%s: Laptop, but eDP port down\n", __func__);
-			return false;
+		if (gInfo->shared_info->device_type.Generation() < 12) {
+			// TODO: the pipe state isn't reliable after gen11
+			pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
+			TRACE("%s: PIPE_DDI_FUNC_CTL_EDP: 0x%" B_PRIx32 "\n", __func__, pipeState);
+			if (!(pipeState & PIPE_DDI_FUNC_CTL_ENABLE)) {
+				TRACE("%s: Laptop, but eDP port down\n", __func__);
+				return false;
+			}
 		}
-
-		if (gInfo->shared_info->has_vesa_edid_info) {
+		if (edidDetected)
+			return true;
+		else if (gInfo->shared_info->has_vesa_edid_info) {
 			TRACE("%s: Laptop. Using VESA edid info\n", __func__);
 			memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,	sizeof(edid1_info));
 			if (fEDIDState != B_OK) {
