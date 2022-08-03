@@ -7,6 +7,7 @@
 #include "EntryCache.h"
 
 #include <new>
+#include <vm/vm.h>
 
 
 static const int32 kEntryNotInArray = -1;
@@ -78,8 +79,15 @@ EntryCache::Init()
 	if (error != B_OK)
 		return error;
 
-	fGenerationCount = 8;
 	int32 entriesSize = 1024;
+	fGenerationCount = 8;
+
+	// TODO: Choose generation size/count more scientifically?
+	// TODO: Add low_resource handler hook?
+	if (vm_available_memory() >= (1024*1024*1024)) {
+		entriesSize = 8096;
+		fGenerationCount = 16;
+	}
 
 	fGenerations = new(std::nothrow) EntryCacheGeneration[fGenerationCount];
 	for (int32 i = 0; i < fGenerationCount; i++) {
