@@ -189,7 +189,7 @@ EntryCache::Lookup(ino_t dirID, const char* name, ino_t& _nodeID,
 	entry->index = kEntryNotInArray;
 
 	// add to the current generation
-	const int32 index = atomic_add(&fGenerations[oldGeneration].next_index, 1);
+	const int32 index = atomic_add(&fGenerations[fCurrentGeneration].next_index, 1);
 	if (index < fGenerations[fCurrentGeneration].entries_size) {
 		fGenerations[fCurrentGeneration].entries[index] = entry;
 		entry->index = index;
