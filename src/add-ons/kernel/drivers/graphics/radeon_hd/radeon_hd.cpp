@@ -750,21 +750,36 @@ radeon_hd_init(radeon_info &info)
 		}
 	}
 
-	uint32 barSize = info.pci->u.h0.base_register_sizes[PCI_BAR_FB] / 1024;
+	phys_addr_t fbAddr = info.pci->u.h0.base_registers[PCI_BAR_FB];
+	uint64 fbBarSize = info.pci->u.h0.base_register_sizes[PCI_BAR_FB];
+	if ((info.pci->u.h0.base_register_flags[PCI_BAR_FB] & PCI_address_type)
+			== PCI_address_type_64) {
+		fbAddr |= (uint64)info.pci->u.h0.base_registers[PCI_BAR_FB + 1] << 32;
+		fbBarSize |= (uint64)info.pci->u.h0.base_register_sizes[PCI_BAR_FB + 1] << 32;
+	}
+
+	// Make KiB
+	fbBarSize /= 1024;
 
 	// if graphics memory is larger then PCI bar, just map bar
 	if (info.shared_info->graphics_memory_size == 0) {
 		// we can recover as we have PCI FB bar, but this should be fixed
 		ERROR("%s: Error: found 0MB video ram, using PCI bar size...\n",
 			__func__);
-		info.shared_info->frame_buffer_size = barSize;
-	} else if (info.shared_info->graphics_memory_size > barSize) {
+		info.shared_info->frame_buffer_size = fbBarSize;
+	} else if (info.shared_info->graphics_memory_size > fbBarSize) {
 		TRACE("%s: shrinking frame buffer to PCI bar...\n",
 			__func__);
-		info.shared_info->frame_buffer_size = barSize;
+		info.shared_info->frame_buffer_size = fbBarSize;
 	} else {
 		info.shared_info->frame_buffer_size
 			= info.shared_info->graphics_memory_size;
+	}
+
+	if (info.shared_info->frame_buffer_size < 8192) {
+		ERROR("%s: Error: frame buffer is less than 8 MiB. I give up.\n",
+			__func__);
+		return B_ERROR;
 	}
 
 	TRACE("%s: mapping a frame buffer of %" B_PRIu32 "MB out of %" B_PRIu32
@@ -772,17 +787,11 @@ radeon_hd_init(radeon_info &info)
 		info.shared_info->graphics_memory_size / 1024);
 
 	// *** Framebuffer mapping
-	phys_addr_t physicalAddress = info.pci->u.h0.base_registers[PCI_BAR_FB];
-	if ((info.pci->u.h0.base_register_flags[PCI_BAR_FB] & PCI_address_type)
-			== PCI_address_type_64) {
-		physicalAddress
-			|= (uint64)info.pci->u.h0.base_registers[PCI_BAR_FB + 1] << 32;
-	}
 
-	TRACE("framebuffer paddr: %#" B_PRIxPHYSADDR "\n", physicalAddress);
+	TRACE("framebuffer paddr: %#" B_PRIxPHYSADDR "\n", fbAddr);
 	AreaKeeper frambufferMapper;
 	info.framebuffer_area = frambufferMapper.Map("radeon hd frame buffer",
-		physicalAddress, info.shared_info->frame_buffer_size * 1024,
+		fbAddr, info.shared_info->frame_buffer_size * 1024,
 		B_ANY_KERNEL_ADDRESS, B_READ_AREA | B_WRITE_AREA,
 		(void**)&info.shared_info->frame_buffer);
 
@@ -797,12 +806,12 @@ radeon_hd_init(radeon_info &info)
 		(size_t)info.shared_info->frame_buffer_size * 1024);
 
 	// Turn on write combining for the frame buffer area
-	vm_set_area_memory_type(info.framebuffer_area, physicalAddress, B_MTR_WC);
+	vm_set_area_memory_type(info.framebuffer_area, fbAddr, B_MTR_WC);
 
 	frambufferMapper.Detach();
 
 	info.shared_info->frame_buffer_area = info.framebuffer_area;
-	info.shared_info->frame_buffer_phys = physicalAddress;
+	info.shared_info->frame_buffer_phys = fbAddr;
 
 	// Pass common information to accelerant
 	info.shared_info->deviceIndex = info.id;
