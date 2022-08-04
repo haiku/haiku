@@ -68,7 +68,7 @@ public:
 						void			PushBack(ThreadData* thread,
 											int32 priority);
 						void			Remove(ThreadData* thread);
-	inline				ThreadData*		PeekThread() const;
+						ThreadData*		PeekThread() const;
 						ThreadData*		PeekIdleThread() const;
 
 						void			UpdatePriority(int32 priority);
@@ -147,7 +147,7 @@ public:
 						void			PushBack(ThreadData* thread,
 											int32 priority);
 						void			Remove(ThreadData* thread);
-	inline				ThreadData*		PeekThread() const;
+						ThreadData*		PeekThread() const;
 
 	inline				bigtime_t		GetActiveTime() const;
 	inline				void			IncreaseActiveTime(
