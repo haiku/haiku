@@ -705,16 +705,24 @@ radeon_hd_init(radeon_info &info)
 	mmioMapper.Detach();
 
 	// *** Populate frame buffer information
-	if (info.chipsetID >= RADEON_CEDAR) {
-		if ((info.chipsetFlags & CHIP_APU) != 0
-			|| (info.chipsetFlags & CHIP_IGP) != 0) {
-			// Evergreen+ fusion in bytes
-			info.shared_info->graphics_memory_size
-				= read32(info.registers + CONFIG_MEMSIZE) / 1024;
-		} else {
-			// Evergreen+ has memory stored in MB
-			info.shared_info->graphics_memory_size
-				= read32(info.registers + CONFIG_MEMSIZE) * 1024;
+	if (info.chipsetID >= RADEON_TAHITI) {
+		// Tahiti+ has memory stored in MB
+		info.shared_info->graphics_memory_size
+			= read32(info.registers + CONFIG_MEMSIZE_TAHITI) * 1024;
+	} else if (info.chipsetID >= RADEON_CEDAR) {
+		switch (info.chipsetID) {
+			default:
+				// Evergreen+ has memory stored in MB
+				info.shared_info->graphics_memory_size
+					= read32(info.registers + CONFIG_MEMSIZE) * 1024;
+				break;
+			case RADEON_PALM:
+			case RADEON_SUMO:
+			case RADEON_SUMO2:
+				// Fusion in bytes
+				info.shared_info->graphics_memory_size
+					= read32(info.registers + CONFIG_MEMSIZE) / 1024;
+				break;
 		}
 	} else if (info.chipsetID >= RADEON_R600) {
 		// R600-R700 has memory stored in bytes
