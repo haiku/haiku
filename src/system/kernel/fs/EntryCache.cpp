@@ -49,6 +49,8 @@ EntryCacheGeneration::Init(int32 entriesSize)
 
 EntryCache::EntryCache()
 	:
+	fGenerationCount(0),
+	fGenerations(NULL),
 	fCurrentGeneration(0)
 {
 	rw_lock_init(&fLock, "entry cache");
