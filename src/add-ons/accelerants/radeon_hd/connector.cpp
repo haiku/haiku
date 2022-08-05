@@ -746,6 +746,15 @@ connector_probe()
 
 			radeon_shared_info &info = *gInfo->shared_info;
 
+			// protect kConnectorConvert
+			if (connectorObjectID >= B_COUNT_OF(kConnectorConvert)) {
+				// This can happen when new atombios revisions introduce
+				// new CONNECTOR_OBJECT_ID_* defines (rare)
+				ERROR("%s: Path #%" B_PRId32 ": Unknown connector object ID!\n",
+					__func__, i);
+				continue;
+			}
+
 			uint16 igpLaneInfo;
 			if ((info.chipsetFlags & CHIP_IGP) != 0) {
 				ERROR("%s: TODO: IGP chip connector detection\n", __func__);
