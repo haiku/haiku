@@ -35,6 +35,29 @@ extern "C" void _sPrintf(const char* format, ...);
 #define ERROR(x...) _sPrintf("radeon_hd: " x)
 
 
+static uint32
+encoder_get_bpc()
+{
+	/*
+	switch (8) {
+		case 0:
+			return PANEL_BPC_UNDEFINE;
+		case 6:
+			return PANEL_6BIT_PER_COLOR;
+		case 8:
+			return PANEL_8BIT_PER_COLOR;
+		case 10:
+			return PANEL_10BIT_PER_COLOR;
+		case 12:
+			return PANEL_12BIT_PER_COLOR;
+		case 16:
+			return PANEL_16BIT_PER_COLOR;
+	}
+	*/
+	return PANEL_8BIT_PER_COLOR;
+}
+
+
 void
 encoder_init()
 {
@@ -92,6 +115,7 @@ encoder_assign_crtc(uint8 crtcID)
 	union crtcSourceParam {
 		SELECT_CRTC_SOURCE_PS_ALLOCATION v1;
 		SELECT_CRTC_SOURCE_PARAMETERS_V2 v2;
+		SELECT_CRTC_SOURCE_PARAMETERS_V3 v3;
 	};
 	union crtcSourceParam args;
 	memset(&args, 0, sizeof(args));
@@ -205,6 +229,74 @@ encoder_assign_crtc(uint8 crtcID)
 							break;
 					}
 					break;
+				case 3:
+					args.v3.ucCRTC = crtcID;
+					// TODO: Better bridge logic
+					args.v2.ucEncodeMode
+						= display_get_encoder_mode(connectorIndex);
+					args.v3.ucDstBpc = encoder_get_bpc();
+					switch (encoderID) {
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY:
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY1:
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
+						case ENCODER_OBJECT_ID_INTERNAL_UNIPHY3:
+						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_LVTMA:
+							switch (encoder_pick_dig(connectorIndex)) {
+								case 0:
+									args.v3.ucEncoderID
+										= ASIC_INT_DIG1_ENCODER_ID;
+									break;
+								case 1:
+									args.v3.ucEncoderID
+										= ASIC_INT_DIG2_ENCODER_ID;
+									break;
+								case 2:
+									args.v3.ucEncoderID
+										= ASIC_INT_DIG3_ENCODER_ID;
+									break;
+								case 3:
+									args.v3.ucEncoderID
+										= ASIC_INT_DIG4_ENCODER_ID;
+									break;
+								case 4:
+									args.v3.ucEncoderID
+										= ASIC_INT_DIG5_ENCODER_ID;
+									break;
+								case 5:
+									args.v3.ucEncoderID
+										= ASIC_INT_DIG6_ENCODER_ID;
+									break;
+								case 6:
+									args.v3.ucEncoderID
+										= ASIC_INT_DIG7_ENCODER_ID;
+									break;
+							}
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
+							args.v3.ucEncoderID = ASIC_INT_DVO_ENCODER_ID;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC1:
+							if ((connectorFlags
+								& ATOM_DEVICE_TV_SUPPORT) != 0) {
+								args.v3.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
+							} else if ((connectorFlags
+								& ATOM_DEVICE_CV_SUPPORT) != 0) {
+								args.v3.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
+							} else
+								args.v3.ucEncoderID = ASIC_INT_DAC1_ENCODER_ID;
+							break;
+						case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DAC2:
+							if ((connectorFlags
+								& ATOM_DEVICE_TV_SUPPORT) != 0) {
+								args.v3.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
+							} else if ((connectorFlags
+								& ATOM_DEVICE_CV_SUPPORT) != 0) {
+								args.v3.ucEncoderID = ASIC_INT_TV_ENCODER_ID;
+							} else
+								args.v3.ucEncoderID = ASIC_INT_DAC2_ENCODER_ID;
+							break;
+					}
+					break;
 			}
 			break;
 		default:
@@ -258,6 +350,8 @@ encoder_pick_dig(uint32 connectorIndex)
 				return linkB ? 3 : 2;
 			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY2:
 				return linkB ? 5 : 4;
+			case ENCODER_OBJECT_ID_INTERNAL_UNIPHY3:
+				return 6;
 		}
 	}
 
@@ -548,29 +642,6 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 		return B_ERROR;
 	}
 	return atom_execute_table(gAtomContext, index, (uint32*)&args);
-}
-
-
-static uint32
-encoder_get_bpc()
-{
-	/*
-	switch (8) {
-		case 0:
-			return PANEL_BPC_UNDEFINE;
-		case 6:
-			return PANEL_6BIT_PER_COLOR;
-		case 8:
-			return PANEL_8BIT_PER_COLOR;
-		case 10:
-			return PANEL_10BIT_PER_COLOR;
-		case 12:
-			return PANEL_12BIT_PER_COLOR;
-		case 16:
-			return PANEL_16BIT_PER_COLOR;
-	}
-	*/
-	return PANEL_8BIT_PER_COLOR;
 }
 
 
