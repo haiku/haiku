@@ -283,9 +283,9 @@ no supporting apps	OpenWithWindow		brak obsługujących aplikacji
 32-bit unsigned integer	AttributesView		32-bitowa liczba całkowita bez znaku
 Preparing to empty Trash…	StatusWindow		Przygotowanie do opróżnienia Kosza…
 Deleting: 	StatusWindow		Usuwanie: 
+label too long	PoseView		opis jest zbyt długi
 the MIME settings	FSUtils		ustawienia MIME
 You can't move or copy the trash.	FSUtils		Nie możesz przenieść ani skopiować kosza.
-label too long	PoseView		opis jest zbyt długi
 Error creating link to \"%name\".	FSUtils		Błąd przy tworzeniu dowiązania do „%name”.
 Unknown	FilePermissionsView		Nieznany
 Paste links	ContainerWindow		Wklej odnośniki
@@ -334,8 +334,8 @@ MIME Path	AttributesView		Ścieżka MIME
 less than	FindPanel		mniej niż
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Błąd przy kopiowaniu pliku „%name”:\n\t%error\n\nCzy chcesz kontynuować?
 Creating links: 	StatusWindow		Tworzenie dowiązań: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nie można otworzyć „%document” z aplikacją „%app” (%error). 
 Create %s clipping	PoseView		Utwórz wycinek %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nie można otworzyć „%document” z aplikacją „%app” (%error). 
 Error moving \"%name\"	FSUtils		Błąd przy przenoszeniu „%name”
 To: %dir	StatusWindow		Do: %dir
 Paste layout	ContainerWindow		Wklej układ
@@ -507,8 +507,8 @@ Add-ons	FilePanelPriv		Dodatki
 Empty folder	SlowContextPopup		Pusty katalog
 Alignment	AttributesView		Wyrównanie
 Move to Trash	FSUtils		Przenieś do kosza
-Handles %type	OpenWithWindow		Obsługuje %type
 Cancel	PoseView		Anuluj
+Handles %type	OpenWithWindow		Obsługuje %type
 Delete	PoseView		Usuń
 Media parameter	AttributesView		Parametr mediów
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jeżeli podmienisz katalog „home”, %osName może nie działać poprawnie!\n\nJesteś pewien, że chcesz to zrobić?\n\nJeżeli nadal chcesz podmienić katalog „home”, naciśnij klawisz Shift i kliknij „Wiem co robię”.

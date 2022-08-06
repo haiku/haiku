@@ -206,8 +206,8 @@ Empty Trash	ContainerWindow		Isprazni smeće
 no supporting apps	OpenWithWindow		nema podržanih programa
 Preparing to empty Trash…	StatusWindow		Priprema za pražnjenje smeća...
 Deleting: 	StatusWindow		Brisanje: 
-You can't move or copy the trash.	FSUtils		Ne možeš pomicati ili kopirati smeće.
 label too long	PoseView		naljepnica je preduga
+You can't move or copy the trash.	FSUtils		Ne možeš pomicati ili kopirati smeće.
 Error creating link to \"%name\".	FSUtils		Greška pri stvaranju poveznice ka \"%name\".
 Unknown	FilePermissionsView		Nepoznato
 Paste links	ContainerWindow		Zalijepi poveznice

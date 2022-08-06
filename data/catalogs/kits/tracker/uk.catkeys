@@ -284,9 +284,9 @@ no supporting apps	OpenWithWindow		програми не підтримують�
 32-bit unsigned integer	AttributesView		32-бітове ціле беззнакове
 Preparing to empty Trash…	StatusWindow		Підготовка смітника до спорожнення …
 Deleting: 	StatusWindow		Видалення: 
+label too long	PoseView		мітка задовга
 the MIME settings	FSUtils		налаштування MIME
 You can't move or copy the trash.	FSUtils		Ви не можете копіювати або переміщати смітник.
-label too long	PoseView		мітка задовга
 Error creating link to \"%name\".	FSUtils		Помилка створення посилання на \"%name\".
 Unknown	FilePermissionsView		Невідомий
 Paste links	ContainerWindow		Вставити посилання
@@ -335,8 +335,8 @@ MIME Path	AttributesView		MIME Шлях
 less than	FindPanel		менше ніж
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Помилка копіювання файлу \"%name\":\n\t%error\n\nБажаєте продовжити?
 Creating links: 	StatusWindow		Створення посилань: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Не вдалося відкрити \"%document\" програмою \"%app\" (%error). 
 Create %s clipping	PoseView		Створити %s вирізку
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Не вдалося відкрити \"%document\" програмою \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Помилка переміщення \"%name\"
 To: %dir	StatusWindow		До: %dir
 Paste layout	ContainerWindow		Вставити макет
@@ -508,8 +508,8 @@ Add-ons	FilePanelPriv		Доповнення
 Empty folder	SlowContextPopup		Порожня папка
 Alignment	AttributesView		Вирівнювання
 Move to Trash	FSUtils		До смітника
-Handles %type	OpenWithWindow		Підтримує %type
 Cancel	PoseView		Скасувати
+Handles %type	OpenWithWindow		Підтримує %type
 Delete	PoseView		Видалити
 Media parameter	AttributesView		Параметри медіа
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		При зміні папки home %osName може вести себе неналежним чином!\n\nВи впевнені що бажаєте цього? \n\nЩоб все рівно змінити папку home, затисніть кнопку Shift та натисніть \"Я знаю що роблю\".

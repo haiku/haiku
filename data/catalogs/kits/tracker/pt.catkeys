@@ -283,9 +283,9 @@ no supporting apps	OpenWithWindow		sem aplicações que ofereçam suporte
 32-bit unsigned integer	AttributesView		Inteiro sem sinal de 32 bits
 Preparing to empty Trash…	StatusWindow		A preparar para esvaziar o Lixo…
 Deleting: 	StatusWindow		A eliminar: 
+label too long	PoseView		rótulo demasiado longo
 the MIME settings	FSUtils		configurações MIME
 You can't move or copy the trash.	FSUtils		Não é possível mover ou copiar o lixo.
-label too long	PoseView		rótulo demasiado longo
 Error creating link to \"%name\".	FSUtils		Erro ao criar atalho para \"%name\".
 Unknown	FilePermissionsView		Desconhecido
 Paste links	ContainerWindow		Colar atalhos
@@ -334,8 +334,8 @@ MIME Path	AttributesView		Caminho MIME
 less than	FindPanel		menor que
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ocorreu um erro ao copiar o ficheiro \"%name\":\n\t%error\n\nPretende continuar?
 Creating links: 	StatusWindow		A criar atalhos: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Não foi possível abrir \"%document\" com a aplicação \"%app\" (%error). 
 Create %s clipping	PoseView		Criar recorte %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Não foi possível abrir \"%document\" com a aplicação \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Erro ao mover \"%name\"
 To: %dir	StatusWindow		Para: %dir
 Paste layout	ContainerWindow		Colar a disposição
@@ -507,8 +507,8 @@ Add-ons	FilePanelPriv		Extensões
 Empty folder	SlowContextPopup		Pasta vazia
 Alignment	AttributesView		Alinhamento
 Move to Trash	FSUtils		Mover para o Lixo
-Handles %type	OpenWithWindow		Suporta %tipo
 Cancel	PoseView		Cancelar
+Handles %type	OpenWithWindow		Suporta %tipo
 Delete	PoseView		Apagar
 Media parameter	AttributesView		Parâmetro de multimédia
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se alterar a pasta pessoal, o %osName poderá não funcionar corretamente!\n\nTem a certeza de que quer fazer isso?\n\nPara alterar de qualquer modo a pasta pessoal, mantenha premida a tecla Maiúsculas (Shift) e clique \"Eu sei o que estou a fazer\".

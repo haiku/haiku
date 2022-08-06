@@ -284,9 +284,9 @@ no supporting apps	OpenWithWindow		nissune aplicazion supuartade
 32-bit unsigned integer	AttributesView		Intîr cence segn a 32 bit
 Preparing to empty Trash…	StatusWindow		Preparazions par disvuedâ la Scovacere…
 Deleting: 	StatusWindow		Eliminazion: 
+label too long	PoseView		etichete masse lungje
 the MIME settings	FSUtils		lis impostazions MIME
 You can't move or copy the trash.	FSUtils		No si pues spostâ o copiâ la Scovacere.
-label too long	PoseView		etichete masse lungje
 Error creating link to \"%name\".	FSUtils		Erôr tal creâ il colegament a \"%name\".
 Unknown	FilePermissionsView		No cognossût
 Paste links	ContainerWindow		Tache colegaments
@@ -335,8 +335,8 @@ MIME Path	AttributesView		Percors MIME
 less than	FindPanel		mancul di
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erôr tal copiâ il file \"%name\":\n\t%error\n\nContinuâ?
 Creating links: 	StatusWindow		Creazion colegaments: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nol è stât pussibil vierzi \"%document\" cu la aplicazion \"%app\" (%error). 
 Create %s clipping	PoseView		Cree ritai %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nol è stât pussibil vierzi \"%document\" cu la aplicazion \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Erôr tal spostâ \"%name\"
 To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Tache disposizion
@@ -508,8 +508,8 @@ Add-ons	FilePanelPriv		Components adizionâi
 Empty folder	SlowContextPopup		Cartele vueide
 Alignment	AttributesView		Inliniament
 Move to Trash	FSUtils		Sposte te Scovacere
-Handles %type	OpenWithWindow		Al gjestìs %type
 Cancel	PoseView		Anule
+Handles %type	OpenWithWindow		Al gjestìs %type
 Delete	PoseView		Elimine
 Media parameter	AttributesView		Parametri multimediâl
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se si modifiche la cartele home (chê personâl), %osName al funzionarà mâl!\n\nContinuâ pardabon?\n\nPar modificâ distès la cartele home, ten fracât il tast Maiusc e fâs clic su \"O sai ce che o fâs\".

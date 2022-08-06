@@ -284,9 +284,9 @@ no supporting apps	OpenWithWindow		fără aplicații suport
 32-bit unsigned integer	AttributesView		întreg fără semn pe 32 de biți
 Preparing to empty Trash…	StatusWindow		Se pregătește curățarea gunoiului…
 Deleting: 	StatusWindow		Se șterge: 
+label too long	PoseView		etichetă prea lungă
 the MIME settings	FSUtils		configurările MIME
 You can't move or copy the trash.	FSUtils		Nu puteți muta sau copia gunoiul.
-label too long	PoseView		etichetă prea lungă
 Error creating link to \"%name\".	FSUtils		Eroare la crearea legăturii la \„%name\”.
 Unknown	FilePermissionsView		Necunoscut
 Paste links	ContainerWindow		Lipește legăturile
@@ -335,8 +335,8 @@ MIME Path	AttributesView		Cale MIME
 less than	FindPanel		mai puțin decât
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Eroare la copierea fișierului \„%name\”:\n\t%error\n\nDoriți să continuați?
 Creating links: 	StatusWindow		Se creează legăturile: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nu s-a putut deschide \„%document\” cu aplicația \„%app\” (%error). 
 Create %s clipping	PoseView		Creează tăierea %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nu s-a putut deschide \„%document\” cu aplicația \„%app\” (%error). 
 Error moving \"%name\"	FSUtils		Eroare la mutarea \„%name\”
 To: %dir	StatusWindow		La: %dir
 Paste layout	ContainerWindow		Lipește aranjamentul
@@ -508,8 +508,8 @@ Add-ons	FilePanelPriv		Suplimente
 Empty folder	SlowContextPopup		Dosar gol
 Alignment	AttributesView		Aliniere
 Move to Trash	FSUtils		Mută la gunoi
-Handles %type	OpenWithWindow		Gestionează %type
 Cancel	PoseView		Anulează
+Handles %type	OpenWithWindow		Gestionează %type
 Delete	PoseView		Șterge
 Media parameter	AttributesView		Parametru media
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Dacă alterați dosarul home, este posibil ca %osName să nu funcționeze corespunzător!\n\nSigur doriți să faceți asta?\n\nPentru a altera dosarul home oricum, țineți apăsată tasta Shift și dați clic pe \„Știu ce fac\”.

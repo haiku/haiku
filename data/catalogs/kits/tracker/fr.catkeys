@@ -282,9 +282,9 @@ no supporting apps	OpenWithWindow		aucune application apte
 32-bit unsigned integer	AttributesView		Entier non-signé 32-bits
 Preparing to empty Trash…	StatusWindow		Préparation au vidage de la Corbeille…
 Deleting: 	StatusWindow		Suppression : 
+label too long	PoseView		label trop long
 the MIME settings	FSUtils		les réglages MIME
 You can't move or copy the trash.	FSUtils		Vous ne pouvez ni déplacer, ni copier la Corbeille.
-label too long	PoseView		label trop long
 Error creating link to \"%name\".	FSUtils		Erreur à la création du lien vers « %name ».
 Unknown	FilePermissionsView		Inconnu
 Paste links	ContainerWindow		Coller les liens
@@ -333,8 +333,8 @@ MIME Path	AttributesView		Chemin MIME
 less than	FindPanel		inférieur à
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erreur à la copie du fichier « %name » :\n\t%error\n\nVoulez-vous continuer ?
 Creating links: 	StatusWindow		Création des liens : 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Impossible d’ouvrir « %document » avec l’application « %app » (%error). 
 Create %s clipping	PoseView		Créer un extrait de %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Impossible d’ouvrir « %document » avec l’application « %app » (%error). 
 Error moving \"%name\"	FSUtils		Erreur lors du déplacement de « %name »
 To: %dir	StatusWindow		Vers : %dir
 Paste layout	ContainerWindow		Coller la disposition
@@ -505,8 +505,8 @@ Add-ons	FilePanelPriv		Extensions
 Empty folder	SlowContextPopup		Dossier vide
 Alignment	AttributesView		Alignement
 Move to Trash	FSUtils		Envoyer à la corbeille
-Handles %type	OpenWithWindow		Support de « %type »
 Cancel	PoseView		Annuler
+Handles %type	OpenWithWindow		Support de « %type »
 Delete	PoseView		Supprimer
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si vous altérer votre dossier d’accueil, %osName pourrait ne plus se comporter correctement!\n\nÊtes vous sûr de vouloir le faire ?\n\nPour altérer quand-même d’accueil, maintenez la touche Majuscule enfoncée et cliquez sur « Je sais ce que je fais ».
 Sorry, you can't copy items to the Trash.	PoseView		Désolé, vous ne pouvez pas copier des éléments dans la Corbeille.

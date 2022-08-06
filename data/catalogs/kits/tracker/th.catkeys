@@ -277,9 +277,9 @@ no supporting apps	OpenWithWindow		ไม่มีแอพที่รองร
 32-bit unsigned integer	AttributesView		32-bit unsigned integer
 Preparing to empty Trash…	StatusWindow		กำลังเตรียมที่จะล้างถังขยะ
 Deleting: 	StatusWindow		กำลังลบ:
+label too long	PoseView		ป้ายกำกับยาวเกินไป
 the MIME settings	FSUtils		ตั้งค่า MIME
 You can't move or copy the trash.	FSUtils		คุณไม่สามารถย้ายหรือคัดลอกถังขยะ
-label too long	PoseView		ป้ายกำกับยาวเกินไป
 Error creating link to \"%name\".	FSUtils		เกิดข้อผิดพลาดในการสร้างลิงก์ไปยัง \"%name\"
 Unknown	FilePermissionsView		ไม่รู้จัก
 Paste links	ContainerWindow		วางลิงค์
@@ -327,8 +327,8 @@ of %items	StatusWindow		ของ %items
 less than	FindPanel		น้อยกว่า
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		เกิดข้อผิดพลาดในการคัดลอกไฟล์ \"%name\":\n\t%error\n\nคุณต้องการที่จะดำเนินการต่อไป?
 Creating links: 	StatusWindow		สร้างลิงค์:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		ไม่สามารถเปิด \"%document\" ด้วยแอปพลิเคชัน \"%app\" (%error)
 Create %s clipping	PoseView		สร้าง %s การตัด
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		ไม่สามารถเปิด \"%document\" ด้วยแอปพลิเคชัน \"%app\" (%error)
 Error moving \"%name\"	FSUtils		เกิดข้อผิดพลาดในการย้าย \"%name\"
 To: %dir	StatusWindow		ไปที่: %dir
 Paste layout	ContainerWindow		วางเลย์เอาต์
@@ -498,8 +498,8 @@ Add-ons	FilePanelPriv		เพิ่มเติม
 Empty folder	SlowContextPopup		โฟลเดอร์ว่างเปล่า
 Alignment	AttributesView		การวางแนว
 Move to Trash	FSUtils		ย้ายไปที่ถังขยะ
-Handles %type	OpenWithWindow		จัดการ %type
 Cancel	PoseView		ยกเลิก
+Handles %type	OpenWithWindow		จัดการ %type
 Delete	PoseView		ลบ
 Media parameter	AttributesView		พารามิเตอร์สื่อ
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		หากคุณเปลี่ยนโฟลเดอร์หลัก %osName อาจทำงานไม่ถูกต้อง!\n\nคุณแน่ใจหรือว่าต้องการทำสิ่งนี้\n\nหากต้องการแก้ไขโฟลเดอร์หลักให้กดแป้น Shift ค้างไว้แล้วคลิก \"ฉันรู้ว่าฉันกำลังทำอะไร\"

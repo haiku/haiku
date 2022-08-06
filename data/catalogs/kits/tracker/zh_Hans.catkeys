@@ -230,8 +230,8 @@ Empty Trash	ContainerWindow		清空垃圾箱
 no supporting apps	OpenWithWindow		无支持应用程序
 Preparing to empty Trash…	StatusWindow		准备清空垃圾箱...
 Deleting: 	StatusWindow		删除：
-You can't move or copy the trash.	FSUtils		您无法移动或复制垃圾箱。
 label too long	PoseView		标签太长
+You can't move or copy the trash.	FSUtils		您无法移动或复制垃圾箱。
 Error creating link to \"%name\".	FSUtils		创建至 \"%name\" 的链接出错。
 Unknown	FilePermissionsView		未知
 Paste links	ContainerWindow		粘贴链接
@@ -270,8 +270,8 @@ of %items	StatusWindow		of %items
 less than	FindPanel		少于
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		复制文件 \"%name\" 出错：\n\t%error\n\n是否继续？
 Creating links: 	StatusWindow		创建链接：
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		无法打开 \"%document\"，使用 \"%app\" 应用程序出错 (%error)。
 Create %s clipping	PoseView		创建 %s 片段
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		无法打开 \"%document\"，使用 \"%app\" 应用程序出错 (%error)。
 Error moving \"%name\"	FSUtils		移动 \"%name\" 出错。
 To: %dir	StatusWindow		到：%dir
 Paste layout	ContainerWindow		粘贴布局
@@ -406,8 +406,8 @@ Add-ons	FilePanelPriv		附加组件
 96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		清空目录
 Move to Trash	FSUtils		移动到垃圾箱
-Handles %type	OpenWithWindow		处理 %type
 Cancel	PoseView		取消
+Handles %type	OpenWithWindow		处理 %type
 Delete	PoseView		删除
 Sorry, you can't copy items to the Trash.	PoseView		对不起，您无法复制项目至垃圾箱。
 New folder	FilePanelPriv		新建文件夹

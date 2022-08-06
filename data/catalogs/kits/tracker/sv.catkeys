@@ -284,9 +284,9 @@ no supporting apps	OpenWithWindow		program saknas
 32-bit unsigned integer	AttributesView		32-bitars osignerad integer
 Preparing to empty Trash…	StatusWindow		Förbereder inför tömning av Papperskorgen...
 Deleting: 	StatusWindow		Tar bort:
+label too long	PoseView		etiketten är för lång
 the MIME settings	FSUtils		MIME-inställningarna
 You can't move or copy the trash.	FSUtils		Du kan inte flytta eller kopiera Papperskorgen.
-label too long	PoseView		etiketten är för lång
 Error creating link to \"%name\".	FSUtils		Fel vid skapande av länk till \"%name\".
 Unknown	FilePermissionsView		Okänd
 Paste links	ContainerWindow		Klistra in länkar
@@ -335,8 +335,8 @@ MIME Path	AttributesView		MIME-sökväg
 less than	FindPanel		mindre än
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fel vid kopiering av filen \"%name\":\n\t%error\n\nVill du fortsätta?
 Creating links: 	StatusWindow		Skapar länkar:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunde inte öppna \"%document\" med programmet \"%app\" (%error). 
 Create %s clipping	PoseView		Skapa %s förkortning
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunde inte öppna \"%document\" med programmet \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Fel vid flyttande av \"%name\"
 To: %dir	StatusWindow		Till: %dir
 Paste layout	ContainerWindow		Klistra in layout
@@ -508,8 +508,8 @@ Add-ons	FilePanelPriv		Tillägg
 Empty folder	SlowContextPopup		Tom mapp
 Alignment	AttributesView		Orientation
 Move to Trash	FSUtils		Flytta till Papperskorgen
-Handles %type	OpenWithWindow		Hanterar %type
 Cancel	PoseView		Avbryt
+Handles %type	OpenWithWindow		Hanterar %type
 Delete	PoseView		Ta bort
 Media parameter	AttributesView		Mediaparameter
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Om du gör ändringar i hemmappen kommer kanske inte %osName fungera som det ska!\n\nÄr du säker på att du vill göra detta?\n\nFör att göra ändringar ändå, håll nere Shift-tangenten samtidigt som du trycker på \"Jag vet vad jag håller på med\".

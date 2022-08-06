@@ -284,9 +284,9 @@ no supporting apps	OpenWithWindow		destekleyen uygulama yok
 32-bit unsigned integer	AttributesView		32 bit imzalanmamış tamsayı
 Preparing to empty Trash…	StatusWindow		Çöp'ü boşaltmaya hazırlanıyor…
 Deleting: 	StatusWindow		Siliniyor: 
+label too long	PoseView		etiket çok uzun
 the MIME settings	FSUtils		MIME ayarları
 You can't move or copy the trash.	FSUtils		Çöp kopyalanamaz veya taşınamaz.
-label too long	PoseView		etiket çok uzun
 Error creating link to \"%name\".	FSUtils		\"%name\" ögesine bağlantı yaratılırken hata.
 Unknown	FilePermissionsView		Bilinmeyen
 Paste links	ContainerWindow		Bağlantıları yapıştır
@@ -335,8 +335,8 @@ MIME Path	AttributesView		MIME Yolu
 less than	FindPanel		daha az
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" dosyasını kopyalarken hata:\n\t%error\n\nİşlem sürdürülsün mü?
 Creating links: 	StatusWindow		Bağlantılar oluşturuluyor: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" \"%app\" uygulaması ile açılamıyor (%error). 
 Create %s clipping	PoseView		%s kırpma oluştur
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" \"%app\" uygulaması ile açılamıyor (%error). 
 Error moving \"%name\"	FSUtils		\"%name\" taşınırken hata
 To: %dir	StatusWindow		Konum: %dir
 Paste layout	ContainerWindow		Yerleşimi yapıştır
@@ -507,8 +507,8 @@ Add-ons	FilePanelPriv		Eklentiler
 Empty folder	SlowContextPopup		Boş klasör
 Alignment	AttributesView		Hizalama
 Move to Trash	FSUtils		Çöp'e taşı
-Handles %type	OpenWithWindow		%type işler
 Cancel	PoseView		Vazgeç
+Handles %type	OpenWithWindow		%type işler
 Delete	PoseView		Sil
 Media parameter	AttributesView		Ortam parametresi
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ev klasörünü değiştirirseniz %osName düzgün çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Shift düğmesini basılı tutun ve \"Ne yaptığımı biliyorum\"a tıklayın.

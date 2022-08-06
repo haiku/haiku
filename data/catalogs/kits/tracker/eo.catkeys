@@ -283,9 +283,9 @@ no supporting apps	OpenWithWindow		nesubtenantaj aplikaĵoj
 32-bit unsigned integer	AttributesView		32-bita sensignuma entjero
 Preparing to empty Trash…	StatusWindow		Preparante malplenigi la Rubujon…
 Deleting: 	StatusWindow		Forigante: 
+label too long	PoseView		etikedo tro longa
 the MIME settings	FSUtils		agordo de la MIME
 You can't move or copy the trash.	FSUtils		Vi ne povas movi aŭ kopii la Rubujon.
-label too long	PoseView		etikedo tro longa
 Error creating link to \"%name\".	FSUtils		Eraris kreante ligilon al \"%name\".
 Unknown	FilePermissionsView		Nekonata
 Paste links	ContainerWindow		Alglui ligilojn
@@ -334,8 +334,8 @@ MIME Path	AttributesView		Itinero de MIME
 less than	FindPanel		malpli ol
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Eraris kopiante dosieron de \"%name\":\n\t%error\n\nĈu vi volas daŭrigi?
 Creating links: 	StatusWindow		Kreante ligilojn: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Malsukcesis uzi \"%document\"-on per programo \"%app\" (%error). 
 Create %s clipping	PoseView		Krei %s tondado
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Malsukcesis uzi \"%document\"-on per programo \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Eraris movante \"%name\"
 To: %dir	StatusWindow		Al: %dir
 Paste layout	ContainerWindow		Alglui aranĝon
@@ -507,8 +507,8 @@ Add-ons	FilePanelPriv		Aldonaĵoj
 Empty folder	SlowContextPopup		Malplena dosierujo
 Alignment	AttributesView		Vicigo
 Move to Trash	FSUtils		Movi al la Rubujo
-Handles %type	OpenWithWindow		Traktas %type
 Cancel	PoseView		Nuligi
+Handles %type	OpenWithWindow		Traktas %type
 Delete	PoseView		Forigi
 Media parameter	AttributesView		Parametro de plurmedio
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se vi redaktos la hejman dosierujon, %osName eble ne kondutos dece!\n\nĈu vi certas, ke vi deziras fari tion?\n\nPor redakti la hejman dosierujon senkondiĉe, premu la majuskligklavon kaj klaku \"Mi scias kion mi faras\".
