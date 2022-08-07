@@ -23,7 +23,6 @@ public:
 			void	HttpFieldsTest();
 			void	HttpMethodTest();
 			void	HttpRequestTest();
-			void	HttpRequestStreamTest();
 			void	HttpTimeTest();
 
 	static	void	AddTests(BTestSuite& suite);

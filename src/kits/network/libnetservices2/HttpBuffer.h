@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <optional>
+#include <string_view>
 #include <vector>
 
 class BDataIO;
@@ -25,7 +26,7 @@ class HttpBuffer {
 public:
 							HttpBuffer(size_t capacity = 8*1024);
 
-	ssize_t					ReadFrom(BDataIO* source);
+	ssize_t					ReadFrom(BDataIO* source, std::optional<size_t> maxSize = std::nullopt);
 	void					WriteExactlyTo(BDataIO* target);
 	void					WriteTo(HttpTransferFunction func,
 								std::optional<size_t> maxSize = std::nullopt);
@@ -35,6 +36,9 @@ public:
 
 	void					Flush() noexcept;
 	void					Clear() noexcept;
+
+	// load data into the buffer
+	HttpBuffer&				operator<<(const std::string_view& data);
 
 private:
 	std::vector<std::byte>	fBuffer;

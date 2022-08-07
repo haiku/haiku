@@ -19,6 +19,7 @@
 #include <NetServicesDefs.h>
 #include <Url.h>
 
+#include "HttpBuffer.h"
 #include "HttpPrivate.h"
 
 using namespace std::literals;
@@ -543,4 +544,68 @@ BHttpRequest::RewindBody() noexcept
 			== inputData->Seek(*fData->requestBody->startPosition, SEEK_SET);
 	}
 	return true;
+}
+
+
+/*!
+	\brief Private method used by HttpSerializer::SetTo() to serialize the header data into a
+		buffer.
+*/
+void
+BHttpRequest::SerializeHeaderTo(HttpBuffer& buffer) const
+{
+	// Method & URL
+	//	TODO: proxy
+	buffer << fData->method.Method() << " "sv;
+	if (fData->url.HasPath() && fData->url.Path().Length() > 0)
+		buffer << std::string_view(fData->url.Path().String());
+	else
+		buffer << "/"sv;
+
+	// TODO: switch between HTTP 1.0 and 1.1 based on configuration
+	buffer << " HTTP/1.1\r\n"sv;
+
+	BHttpFields outputFields;
+	if (true /* http == 1.1 */) {
+		BString host = fData->url.Host();
+		int defaultPort = fData->url.Protocol() == "http" ? 80 : 443;
+		if (fData->url.HasPort() && fData->url.Port() != defaultPort)
+			host << ':' << fData->url.Port();
+
+		outputFields.AddFields({
+			{"Host"sv, std::string_view(host.String())},
+			{"Accept-Encoding"sv, "gzip"sv},
+				// Allows the server to compress data using the "gzip" format.
+				// "deflate" is not supported, because there are two interpretations
+				// of what it means (the RFC and Microsoft products), and we don't
+				// want to handle this. Very few websites support only deflate,
+				// and most of them will send gzip, or at worst, uncompressed data.
+			{"Connection"sv, "close"sv}
+				// Let the remote server close the connection after response since
+				// we don't handle multiple request on a single connection
+		});
+	}
+
+	if (fData->authentication) {
+		// This request will add a Basic authorization header
+		BString authorization = build_basic_http_header(fData->authentication->username,
+			fData->authentication->password);
+		outputFields.AddField("Authorization"sv, std::string_view(authorization.String()));
+	}
+
+	if (fData->requestBody) {
+		outputFields.AddField("Content-Type"sv, std::string_view(fData->requestBody->mimeType.String()));
+		if (fData->requestBody->size)
+			outputFields.AddField("Content-Length"sv, std::to_string(*fData->requestBody->size));
+		else
+			throw BRuntimeError(__PRETTY_FUNCTION__, "Transfer body with unknown content length; chunked transfer not supported");
+	}
+
+	for (const auto& field: outputFields)
+		buffer << field.RawField() << "\r\n"sv;
+
+	for (const auto& field: fData->optionalFields)
+		buffer << field.RawField() << "\r\n"sv;
+
+	buffer << "\r\n"sv;
 }

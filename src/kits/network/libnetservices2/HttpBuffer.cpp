@@ -41,13 +41,16 @@ HttpBuffer::HttpBuffer(size_t capacity)
 	\retval >=0 The actual number of bytes read.
 */
 ssize_t
-HttpBuffer::ReadFrom(BDataIO* source)
+HttpBuffer::ReadFrom(BDataIO* source, std::optional<size_t> maxSize)
 {
 	// Remove any unused bytes at the beginning of the buffer
 	Flush();
 
 	auto currentSize = fBuffer.size();
 	auto remainingBufferSize = fBuffer.capacity() - currentSize;
+
+	if (maxSize && maxSize.value() < remainingBufferSize)
+		remainingBufferSize = maxSize.value();
 
 	// Adjust the buffer to the maximum size
 	fBuffer.resize(fBuffer.capacity());
@@ -176,4 +179,22 @@ HttpBuffer::Clear() noexcept
 {
 	fBuffer.clear();
 	fCurrentOffset = 0;
+}
+
+
+/*!
+	\brief Load data into the buffer
+
+	\exception BNetworkRequestError in case of a buffer overflow
+*/
+HttpBuffer&
+HttpBuffer::operator<<(const std::string_view& data)
+{
+	if (data.size() > (fBuffer.capacity() - fBuffer.size()))
+		throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+
+	for (const auto& character: data)
+		fBuffer.push_back(static_cast<const std::byte>(character));
+
+	return *this;
 }

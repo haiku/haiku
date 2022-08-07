@@ -25,6 +25,8 @@ namespace Network {
 
 
 class BHttpFields;
+class HttpBuffer;
+class HttpSerializer;
 
 
 class BHttpMethod {
@@ -134,9 +136,11 @@ public:
 
 private:
 	friend class BHttpSession;
+	friend class HttpSerializer;
 	struct Data;
 
 			bool					RewindBody() noexcept;
+			void					SerializeHeaderTo(HttpBuffer& buffer) const;
 
 	std::unique_ptr<Data>			fData;
 };

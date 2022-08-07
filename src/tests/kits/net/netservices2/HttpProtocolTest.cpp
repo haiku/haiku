@@ -17,7 +17,6 @@
 #include <HttpFields.h>
 #include <HttpRequest.h>
 #include <HttpResult.h>
-#include <HttpStream.h>
 #include <HttpTime.h>
 #include <Looper.h>
 #include <NetServicesDefs.h>
@@ -27,7 +26,6 @@ using BPrivate::BDateTime;
 using BPrivate::Network::BHttpFields;
 using BPrivate::Network::BHttpMethod;
 using BPrivate::Network::BHttpRequest;
-using BPrivate::Network::BHttpRequestStream;
 using BPrivate::Network::BHttpResult;
 using BPrivate::Network::BHttpSession;
 using BPrivate::Network::BHttpTime;
@@ -314,59 +312,6 @@ HttpProtocolTest::HttpRequestTest()
 }
 
 
-class RequestStreamTestIO : public BDataIO
-{
-public:
-	RequestStreamTestIO(const std::string_view expectedOutput)
-		: fExpectedOutput(expectedOutput)
-	{
-		
-	}
-
-	// Accept maximum of 8 bytes at a time.
-	ssize_t Write(const void* buffer, size_t size) {
-		ssize_t bytesWritten = (size < 8) ? size : 8;
-		CPPUNIT_ASSERT_MESSAGE("RequestStreamTestIO: bytes written larger than expected output",
-			fExpectedOutput.size() >= (fPos + bytesWritten));
-		CPPUNIT_ASSERT(fExpectedOutput.substr(fPos, bytesWritten)
-			== std::string_view(static_cast<const char*>(buffer), bytesWritten));
-		fPos += bytesWritten;
-		return bytesWritten;
-	};
-
-private:
-	const std::string_view fExpectedOutput;
-	ssize_t fPos = 0;
-};
-
-
-constexpr std::string_view kExpectedStreamText =
-	"GET / HTTP/1.1\r\n"
-	"Host: www.haiku-os.org\r\n"
-	"Accept-Encoding: gzip\r\n"
-	"Connection: close\r\n\r\n";
-
-
-void
-HttpProtocolTest::HttpRequestStreamTest()
-{
-	// Set up basic GET for https://www.haiku-os.org/
-	BHttpRequest request;
-	auto url = BUrl("https://www.haiku-os.org");
-	request.SetUrl(url);
-
-	// Test streaming the request
-	BHttpRequestStream requestStream(request);
-	RequestStreamTestIO testIO(kExpectedStreamText.data());
-	bool finished = false;
-	while (!finished) {
-		auto [currentBytesWritten, totalBytesWritten, totalSize, complete]
-			= requestStream.Transfer(&testIO);
-		finished = complete;
-	}
-}
-
-
 void
 HttpProtocolTest::HttpTimeTest()
 {
@@ -424,8 +369,6 @@ HttpProtocolTest::AddTests(BTestSuite& parent)
 		"HttpProtocolTest::HttpMethodTest", &HttpProtocolTest::HttpMethodTest));
 	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
 		"HttpProtocolTest::HttpRequestTest", &HttpProtocolTest::HttpRequestTest));
-	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
-		"HttpProtocolTest::HttpRequestStreamTest", &HttpProtocolTest::HttpRequestStreamTest));
 	suite.addTest(new CppUnit::TestCaller<HttpProtocolTest>(
 		"HttpProtocolTest::HttpTimeTest", &HttpProtocolTest::HttpTimeTest));
 

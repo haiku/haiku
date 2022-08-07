@@ -21,7 +21,6 @@
 #include <HttpRequest.h>
 #include <HttpResult.h>
 #include <HttpSession.h>
-#include <HttpStream.h>
 #include <Locker.h>
 #include <Messenger.h>
 #include <NetBuffer.h>
@@ -34,6 +33,7 @@
 
 #include "HttpBuffer.h"
 #include "HttpParser.h"
+#include "HttpSerializer.h"
 #include "HttpResultPrivate.h"
 #include "NetServicesPrivate.h"
 
@@ -116,12 +116,9 @@ private:
 	BNetworkAddress					fRemoteAddress;
 	std::unique_ptr<BSocket>		fSocket;
 
-	// Transfer state
-	std::unique_ptr<BAbstractDataStream>
-									fDataStream;
-
-	// Receive buffers
+	// Sending and receiving
 	HttpBuffer						fBuffer;
+	HttpSerializer					fSerializer;
 	HttpParser						fParser;
 
 	// Receive state
@@ -820,26 +817,25 @@ BHttpSession::Request::TransferRequest()
 		throw BRuntimeError(__PRETTY_FUNCTION__,
 			"Write request for object that is not in the Connected state");
 
-	if (!fDataStream)
-		fDataStream = std::make_unique<BHttpRequestStream>(fRequest);
-	
-	auto [currentBytesWritten, totalBytesWritten, totalSize, complete]
-		= fDataStream->Transfer(fSocket.get());
+	if (!fSerializer.IsInitialized())
+		fSerializer.SetTo(fBuffer, fRequest);
 
-	// TODO: make nicer after replacing transferinfo
-	off_t vTotalBytesWritten = totalBytesWritten;
-	off_t vTotalSize = totalSize;
-	SendMessage(UrlEvent::UploadProgress, [vTotalBytesWritten, vTotalSize](BMessage& msg) {
-		msg.AddInt64(UrlEventData::NumBytes, vTotalBytesWritten);
-		msg.AddInt64(UrlEventData::TotalBytes, vTotalSize);
-			// TODO: handle case with unknown total size
-	});
+	auto currentBytesWritten = fSerializer.Serialize(fBuffer, fSocket.get());
 
-	if (complete)
+	if (currentBytesWritten > 0) {
+		SendMessage(UrlEvent::UploadProgress, [this](BMessage& msg) {
+			msg.AddInt64(UrlEventData::NumBytes, fSerializer.BodyBytesTransferred());
+			if (auto totalSize = fSerializer.BodyBytesTotal())
+				msg.AddInt64(UrlEventData::TotalBytes, totalSize.value());
+		});
+	}
+
+	if (fSerializer.Complete())
 		fRequestStatus = RequestSent;
 
 	std::cout << "TransferRequest() [" << Id() << "] currentBytesWritten: " << currentBytesWritten << " totalBytesWritten: " <<
-		totalBytesWritten << " totalSize: " << totalSize << " complete: " << complete << std::endl;
+		fSerializer.BodyBytesTransferred() << " totalSize: " << fSerializer.BodyBytesTotal().value_or(0) << " complete: "
+		<< fSerializer.Complete() << std::endl;
 }
 
 
