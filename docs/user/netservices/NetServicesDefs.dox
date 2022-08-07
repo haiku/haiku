@@ -212,15 +212,31 @@ namespace Network {
 
 /*!
 	\fn BNetworkRequestError::BNetworkRequestError(const char *origin, ErrorType type,
-		status_t errorCode=B_OK)
+		status_t errorCode, const BString& customMessage = BString())
 	\brief Create a new network request error.
 
 	\param origin A string representing where this error occured. It is advised
 		to initialize it to \c __PRETTY_FUNCTION__ by default.
 	\param type The error type that describes what the issue was that prevented the completion of
 		the request.
-	\param errorCode Optional underlying system error. See the \ref BNetworkRequestError::ErrorType
+	\param errorCode The underlying system error. See the \ref BNetworkRequestError::ErrorType
 		documentation on which error types expect a system error.
+	\param customMessage Optional custom message describing the reason or cause for the error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkRequestError::BNetworkRequestError(const char *origin, ErrorType type,
+		const BString& customMessage = BString())
+	\brief Create a new network request error.
+
+	\param origin A string representing where this error occured. It is advised
+		to initialize it to \c __PRETTY_FUNCTION__ by default.
+	\param type The error type that describes what the issue was that prevented the completion of
+		the request.
+	\param customMessage Optional custom message describing the reason or cause for the error.
 
 	\since Haiku R1
 */
@@ -243,6 +259,16 @@ namespace Network {
 
 	\return Get the \ref BNetworkRequestError::ErrorType that describes the cause for the request
 		to fail.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BNetworkRequestError::CustomMessage() const noexcept
+	\brief Get the custom error message.
+
+	\return Get the custom error message. This may be an empty string if it was not set.
 
 	\since Haiku R1
 */

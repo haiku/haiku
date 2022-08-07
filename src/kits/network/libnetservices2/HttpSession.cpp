@@ -954,13 +954,18 @@ BHttpSession::Request::ReceiveResult()
 				auto locationField = fFields.FindField("Location");
 				if (locationField == fFields.end()) {
 					throw BNetworkRequestError(__PRETTY_FUNCTION__,
-						BNetworkRequestError::ProtocolError);
+						BNetworkRequestError::ProtocolError,
+						"Redirect; the Location field must be present and cannot be found");
 				}
 				auto locationString = BString((*locationField).Value().data(),
 					(*locationField).Value().size());
-				auto redirect = BHttpSession::Redirect{BUrl(fRequest.Url(), locationString), redirectToGet};
-				if (!redirect.url.IsValid())
-					throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+				auto redirect =
+					BHttpSession::Redirect{BUrl(fRequest.Url(), locationString), redirectToGet};
+				if (!redirect.url.IsValid()) {
+					throw BNetworkRequestError(__PRETTY_FUNCTION__,
+						BNetworkRequestError::ProtocolError,
+						"Redirect; invalid URL in the Location field");
+				}
 
 				// Notify of redirect
 				SendMessage(UrlEvent::HttpRedirect, [&locationString](BMessage& msg) {
@@ -1009,12 +1014,16 @@ BHttpSession::Request::ReceiveResult()
 						fNoContent = true;
 					fParser.SetContentLength(bodyBytesTotal);
 				} catch (const std::logic_error& e) {
-					throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+					throw BNetworkRequestError(__PRETTY_FUNCTION__,
+						BNetworkRequestError::ProtocolError,
+						"Cannot parse Content-Length field value (logic_error)");
 				}
 			}
 
-			if (bodyBytesTotal  == std::nullopt)
-				throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+			if (bodyBytesTotal  == std::nullopt) {
+				throw BNetworkRequestError(__PRETTY_FUNCTION__,
+					BNetworkRequestError::ProtocolError, "Expected Content-Length field");
+			}
 		}
 
 		// Move headers to the result and inform listener

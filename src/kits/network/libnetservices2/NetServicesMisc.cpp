@@ -98,8 +98,17 @@ BInvalidUrl::Url() const
 // #pragma mark -- BNetworkRequestError
 
 
-BNetworkRequestError::BNetworkRequestError(const char* origin, ErrorType type, status_t errorCode)
-	: BError(origin), fErrorType(type), fErrorCode(errorCode)
+BNetworkRequestError::BNetworkRequestError(const char* origin, ErrorType type, status_t errorCode,
+		const BString& customMessage)
+	: BError(origin), fErrorType(type), fErrorCode(errorCode), fCustomMessage(customMessage)
+{
+
+}
+
+
+BNetworkRequestError::BNetworkRequestError(const char* origin, ErrorType type,
+		const BString& customMessage)
+	: BError(origin), fErrorType(type), fCustomMessage(customMessage)
 {
 
 }
@@ -134,6 +143,9 @@ BNetworkRequestError::DebugMessage() const
 		debugMessage << "\n\tUnderlying System Error: " << fErrorCode << " ("
 			<< strerror(fErrorCode) << ")";
 	}
+	if (fCustomMessage.Length() > 0) {
+		debugMessage << "\n\tAdditional Info: " << fCustomMessage;
+	}
 	return debugMessage;
 }
 
@@ -149,6 +161,13 @@ status_t
 BNetworkRequestError::ErrorCode() const noexcept
 {
 	return fErrorCode;
+}
+
+
+const char*
+BNetworkRequestError::CustomMessage() const noexcept
+{
+	return fCustomMessage.String();
 }
 
 

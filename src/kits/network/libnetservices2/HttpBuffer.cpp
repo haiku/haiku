@@ -204,8 +204,10 @@ HttpBuffer::Data() const noexcept
 HttpBuffer&
 HttpBuffer::operator<<(const std::string_view& data)
 {
-	if (data.size() > (fBuffer.capacity() - fBuffer.size()))
-		throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+	if (data.size() > (fBuffer.capacity() - fBuffer.size())) {
+		throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError,
+			"No capacity left in buffer to append data.");
+	}
 
 	for (const auto& character: data)
 		fBuffer.push_back(static_cast<const std::byte>(character));

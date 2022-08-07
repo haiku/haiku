@@ -61,7 +61,9 @@ public:
 	};
 
 							BNetworkRequestError(const char* origin, ErrorType type,
-								status_t errorCode = B_OK);
+								status_t errorCode, const BString& customMessage = BString());
+							BNetworkRequestError(const char* origin, ErrorType type,
+								const BString& customMessage = BString());
 
 	virtual	const char*		Message() const noexcept override;
 	virtual	BString			DebugMessage() const override;
@@ -69,9 +71,12 @@ public:
 			ErrorType		Type() const noexcept;
 			status_t		ErrorCode() const noexcept;
 
+	const	char*			CustomMessage() const noexcept;
+
 private:
 			ErrorType		fErrorType;
 			status_t		fErrorCode = B_OK;
+			BString			fCustomMessage;
 };
 
 
