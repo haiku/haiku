@@ -6647,7 +6647,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 			if ((area->protection & B_KERNEL_AREA) != 0)
 				return B_NOT_ALLOWED;
 			if (area->protection_max != 0
-				&& (protection & area->protection_max) != protection) {
+				&& (protection & area->protection_max) != (protection & B_USER_PROTECTION)) {
 				return B_NOT_ALLOWED;
 			}
 
