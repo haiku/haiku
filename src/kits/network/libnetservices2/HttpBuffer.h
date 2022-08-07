@@ -32,10 +32,12 @@ public:
 								std::optional<size_t> maxSize = std::nullopt);
 	std::optional<BString>	GetNextLine();
 
-	size_t					RemainingBytes() noexcept;
+	size_t					RemainingBytes() const noexcept;
 
 	void					Flush() noexcept;
 	void					Clear() noexcept;
+
+	std::string_view		Data() const noexcept;
 
 	// load data into the buffer
 	HttpBuffer&				operator<<(const std::string_view& data);

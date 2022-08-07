@@ -147,7 +147,7 @@ HttpBuffer::GetNextLine()
 	\brief Get the number of remaining bytes in this buffer.
 */
 size_t
-HttpBuffer::RemainingBytes() noexcept
+HttpBuffer::RemainingBytes() const noexcept
 {
 	return fBuffer.size() - fCurrentOffset;
 }
@@ -179,6 +179,20 @@ HttpBuffer::Clear() noexcept
 {
 	fBuffer.clear();
 	fCurrentOffset = 0;
+}
+
+
+/*!
+	\brief Get a view over the current data
+*/
+std::string_view
+HttpBuffer::Data() const noexcept
+{
+	if (RemainingBytes() > 0) {
+		return std::string_view(reinterpret_cast<const char*>(fBuffer.data()) + fCurrentOffset,
+			RemainingBytes());
+	} else
+		return std::string_view();
 }
 
 

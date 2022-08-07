@@ -826,26 +826,6 @@ namespace Network {
 
 
 /*!
-	\fn ssize_t BHttpRequest::SerializeHeaderTo(BDataIO *target) const
-	\brief Serialize the HTTP Header of this request to the \a target.
-
-	The HTTP header consists of the request line, and the fields, serialized as text according to
-	the HTTP specification.
-
-	\param target The \ref BDataIO object to write the header to
-
-	\return The total number of byte size of the header.
-
-	\exception BSystemError In case there is an error when calling the \ref BDataIO::Write() call
-		of the provided \a target. Note that writing the string is \em not transactional, and that
-		the error can occur while a part of the header has already been written.
-	\exception std::bad_alloc In case it is not possible to allocate internal buffers.
-
-	\since Haiku R1
-*/
-
-
-/*!
 	\fn BString BHttpRequest::HeaderToString() const
 	\brief Serialize the HTTP Header of this request to a string.
 

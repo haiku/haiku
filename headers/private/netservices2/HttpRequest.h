@@ -131,7 +131,6 @@ public:
 			std::unique_ptr<BDataIO> ClearRequestBody() noexcept;
 
 	// Serialization
-			ssize_t					SerializeHeaderTo(BDataIO* target) const;
 			BString					HeaderToString() const;
 
 private:
