@@ -605,6 +605,19 @@ namespace Network {
 */
 
 
+/*!
+	\fn size_t BHttpFields::CountFields(const std::string_view &name) const noexcept
+	\brief Cound the number of fields that have this \a name.
+
+	\param name The name of the field you are looking for. Name matching will be done case
+		insensitively.
+
+	\return The number of field with the \a name.
+
+	\since Haiku R1
+*/
+
+
 //! @}
 
 

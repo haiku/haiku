@@ -115,6 +115,7 @@ public:
 	// Querying
 			ConstIterator		FindField(const std::string_view& name) const noexcept;
 			size_t				CountFields() const noexcept;
+			size_t				CountFields(const std::string_view& name) const noexcept;
 
 	// Range-based iteration
 			ConstIterator		begin() const noexcept;

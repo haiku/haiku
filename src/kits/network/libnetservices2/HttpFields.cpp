@@ -461,6 +461,18 @@ BHttpFields::CountFields() const noexcept
 }
 
 
+size_t
+BHttpFields::CountFields(const std::string_view& name) const noexcept
+{
+	size_t count = 0;
+	for (auto it = fFields.cbegin(); it != fFields.cend(); it++) {
+		if ((*it).Name() == name)
+			count += 1;
+	}
+	return count;
+}
+
+
 BHttpFields::ConstIterator
 BHttpFields::begin() const noexcept
 {

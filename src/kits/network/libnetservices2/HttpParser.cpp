@@ -15,6 +15,7 @@
 #include <NetServicesDefs.h>
 #include <ZlibCompressionAlgorithm.h>
 
+using namespace std::literals;
 using namespace BPrivate::Network;
 
 
@@ -52,6 +53,7 @@ HttpParser::ParseStatus(HttpBuffer& buffer, BHttpStatus& status)
 	}
 
 	status.text = std::move(statusLine.value());
+	fStatus.code = status.code; // cache the status code
 	return true;
 }
 
@@ -61,6 +63,10 @@ HttpParser::ParseStatus(HttpBuffer& buffer, BHttpStatus& status)
 
 	The fields are parsed incrementally, meaning that even if the full header is not yet in the
 	\a buffer, it will still parse all complete fields and store them in the \a fields.
+
+	After all fields have been parsed, it will determine the properties of the request body.
+	This means it will determine whether there is any content compression, if there is a body,
+	and if so if it has a fixed size or not.
 
 	\retval true All fields were succesfully parsed
 	\retval false There is not enough data in the buffer to complete parsing of fields.
@@ -78,12 +84,83 @@ HttpParser::ParseFields(HttpBuffer& buffer, BHttpFields& fields)
 		fieldLine = buffer.GetNextLine();
 	}
 
-	if (fieldLine && fieldLine.value().IsEmpty()){
-		// end of the header section of the message
-		return true;
-	} else {
+	if (!fieldLine || (fieldLine && !fieldLine.value().IsEmpty())){
 		// there is more to parse
 		return false;
+	}
+
+	// Determine the properties for the body
+	// RFC 7230 section 3.3.3 has a prioritized list of 7 rules around determining the body:
+	if (fBodyType == HttpBodyType::NoContent
+		|| fStatus.StatusCode() == BHttpStatusCode::NoContent
+		|| fStatus.StatusCode() == BHttpStatusCode::NotModified) {
+		// [1] In case of HEAD (set previously), status codes 1xx (TODO!), status code 204 or 304, no content
+		// [2] NOT SUPPORTED: when doing a CONNECT request, no content
+		fBodyType = HttpBodyType::NoContent;
+	} else if (auto header = fields.FindField("Transfer-Encoding"sv);
+		header != fields.end() && header->Value() == "chunked"sv) {
+		// [3] If there is a Transfer-Encoding heading set to 'chunked'
+		// TODO: support the more advanced rules in the RFC around the meaning of this field
+		fBodyType = HttpBodyType::Chunked;
+	} else if (fields.CountFields("Content-Length"sv) > 0) {
+		// [4] When there is no Transfer-Encoding, then look for Content-Encoding:
+		//	- If there are more than one, the values must match
+		//	- The value must be a valid number
+		// [5] If there is a valid value, then that is the expected size of the body
+		try {
+			auto contentLength = std::string();
+			for (const auto& field: fields) {
+				if (field.Name() == "Content-Length"sv) {
+					if (contentLength.size() == 0)
+						contentLength = field.Value();
+					else if (contentLength != field.Value()) {
+						throw BNetworkRequestError(__PRETTY_FUNCTION__,
+							BNetworkRequestError::ProtocolError,
+							"Multiple Content-Length fields with differing values");
+					}
+				}
+			}
+			auto bodyBytesTotal = std::stol(contentLength);
+			if (bodyBytesTotal == 0)
+				fBodyType = HttpBodyType::NoContent;
+			else {
+				fBodyType = HttpBodyType::FixedSize;
+				fBodyBytesTotal = bodyBytesTotal;
+			}
+		} catch (const std::logic_error& e) {
+			throw BNetworkRequestError(__PRETTY_FUNCTION__,
+				BNetworkRequestError::ProtocolError,
+				"Cannot parse Content-Length field value (logic_error)");
+		}
+	} else {
+		// [6] Applies to request messages only (this is a response)
+		// [7] If nothing else then the received message is all data until connection close
+		// (this is the default)
+	}
+
+	// Content-Encoding
+	auto header = fields.FindField("Content-Encoding"sv);
+	if (header != fields.end()
+		&& (header->Value() == "gzip" || header->Value() == "deflate"))
+	{
+		_SetGzipCompression();
+	}
+	return true;
+}
+
+
+/*!
+	\brief Parse the body from the \a buffer and use \a writeToBody function to save.
+*/
+size_t
+HttpParser::ParseBody(HttpBuffer& buffer, HttpTransferFunction writeToBody)
+{
+	if (fBodyType == HttpBodyType::NoContent) {
+		return 0;
+	} else if (fBodyType == HttpBodyType::Chunked) {
+		return _ParseBodyChunked(buffer, writeToBody);
+	} else {
+		return _ParseBodyRaw(buffer, writeToBody);
 	}
 }
 
@@ -94,52 +171,21 @@ HttpParser::ParseFields(HttpBuffer& buffer, BHttpFields& fields)
 	\exception std::bad_alloc in case there is an error allocating memory.
 */
 void
-HttpParser::SetGzipCompression(bool compression)
+HttpParser::_SetGzipCompression()
 {
-	if (compression) {
-		fDecompressorStorage = std::make_unique<BMallocIO>();
+	fDecompressorStorage = std::make_unique<BMallocIO>();
 
-		BDataIO* stream = nullptr;
-		auto result = BZlibCompressionAlgorithm()
-			.CreateDecompressingOutputStream(fDecompressorStorage.get(), nullptr, stream);
-		
-		if (result != B_OK) {
-			throw BNetworkRequestError(
-				"BZlibCompressionAlgorithm().CreateCompressingOutputStream",
-				BNetworkRequestError::SystemError, result);
-		}
+	BDataIO* stream = nullptr;
+	auto result = BZlibCompressionAlgorithm()
+		.CreateDecompressingOutputStream(fDecompressorStorage.get(), nullptr, stream);
 
-		fDecompressingStream = std::unique_ptr<BDataIO>(stream);
-	} else {
-		fDecompressingStream = nullptr;
-		fDecompressorStorage = nullptr;
+	if (result != B_OK) {
+		throw BNetworkRequestError(
+			"BZlibCompressionAlgorithm().CreateCompressingOutputStream",
+			BNetworkRequestError::SystemError, result);
 	}
-}
 
-
-/*!
-	\brief Set the content length of the body.
-
-	If a content length is set, the body will not be handled as a chunked transfer.
-*/
-void
-HttpParser::SetContentLength(std::optional<off_t> contentLength) noexcept
-{
-	fBodyBytesTotal = contentLength;
-}
-
-
-/*!
-	\brief Parse the body from the \a buffer and use \a writeToBody function to save.
-*/
-size_t
-HttpParser::ParseBody(HttpBuffer& buffer, HttpTransferFunction writeToBody)
-{
-	if (fBodyBytesTotal.has_value()) {
-		return _ParseBodyRaw(buffer, writeToBody);
-	} else {
-		return _ParseBodyChunked(buffer, writeToBody);
-	}
+	fDecompressingStream = std::unique_ptr<BDataIO>(stream);
 }
 
 
@@ -270,10 +316,14 @@ HttpParser::_ParseBodyChunked(HttpBuffer& buffer, HttpTransferFunction writeToBo
 bool
 HttpParser::Complete() const noexcept
 {
-	if (_IsChunked())
+	if (fBodyType == HttpBodyType::Chunked)
 		return fBodyState == HttpBodyInputStreamState::Done;
-
-	return fBodyBytesTotal.value() == fTransferredBodySize;
+	else if (fBodyType == HttpBodyType::FixedSize)
+		return fBodyBytesTotal.value() == fTransferredBodySize;
+	else if (fBodyType == HttpBodyType::NoContent)
+		return true;
+	else
+		return false;
 }
 
 
@@ -332,14 +382,4 @@ HttpParser::_ReadChunk(HttpBuffer& buffer, HttpTransferFunction writeToBody, siz
 		buffer.WriteTo(writeToBody, size);
 	}
 	return size;
-}
-
-
-/*!
-	\brief Internal helper to determine if the body is sent as a chunked transfer.
-*/
-bool
-HttpParser::_IsChunked() const noexcept
-{
-	return fBodyBytesTotal == std::nullopt;
 }

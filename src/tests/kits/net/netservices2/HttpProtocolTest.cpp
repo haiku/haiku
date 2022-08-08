@@ -742,7 +742,7 @@ HttpIntegrationTest::PostTest()
 	CPPUNIT_ASSERT_EQUAL(kExpectedPostBody.Length(), result.Body().text.Length());
 	CPPUNIT_ASSERT(result.Body().text == kExpectedPostBody);
 
-	usleep(1000); // give some time to catch up on receiving all messages
+	usleep(2000); // give some time to catch up on receiving all messages
 
 	observer->Lock();
 	// Assert that the messages have the right contents.

@@ -37,6 +37,7 @@
 #include "HttpResultPrivate.h"
 #include "NetServicesPrivate.h"
 
+using namespace std::literals;
 using namespace BPrivate::Network;
 
 
@@ -122,11 +123,11 @@ private:
 	HttpParser						fParser;
 
 	// Receive state
+	BHttpStatus						fStatus;
 	BHttpFields						fFields;
-	bool							fNoContent = false;
 
 	// Redirection
-	std::optional<BHttpStatus>		fRedirectStatus;
+	bool							fMightRedirect = false;
 	int8							fRemainingRedirects;
 
 	// Connection counter
@@ -692,6 +693,10 @@ BHttpSession::Request::Request(BHttpRequest&& request, std::unique_ptr<BDataIO> 
 	// create shared data
 	fResult = std::make_shared<HttpResultPrivate>(identifier);
 	fResult->ownedBody = std::move(target);
+
+	// inform the parser when we do a HEAD request, so not to expect content
+	if (fRequest.Method() == BHttpMethod::Head)
+		fParser.SetNoContent();
 }
 
 
@@ -709,6 +714,10 @@ BHttpSession::Request::Request(Request& original, const BHttpSession::Redirect& 
 	}
 
 	fRemainingRedirects = original.fRemainingRedirects--;
+
+	// inform the parser when we do a HEAD request, so not to expect content
+	if (fRequest.Method() == BHttpMethod::Head)
+		fParser.SetNoContent();
 }
 
 
@@ -871,13 +880,12 @@ BHttpSession::Request::ReceiveResult()
 			SendMessage(UrlEvent::ResponseStarted);
 		}
 
-		BHttpStatus status;
-		if (fParser.ParseStatus(fBuffer, status)) {
+		if (fParser.ParseStatus(fBuffer, fStatus)) {
 			// the status headers are now received, decide what to do next
 
 			// Determine if we can handle redirects; else notify of receiving status
 			if (fRemainingRedirects > 0) {
-				switch (status.StatusCode()) {
+				switch (fStatus.StatusCode()) {
 					case BHttpStatusCode::MovedPermanently:
 					case BHttpStatusCode::TemporaryRedirect:
 					case BHttpStatusCode::PermanentRedirect:
@@ -891,34 +899,30 @@ BHttpSession::Request::ReceiveResult()
 					case BHttpStatusCode::SeeOther:
 						// These redirects redirect to GET, so we don't care if we can rewind the
 						// body; in this case redirect
-						fRedirectStatus = std::move(status);
+						fMightRedirect = true;
 						break;
 					default:
 						break;
 				}
 			}
 
-			// Register NoContent before moving the status to the result
-			if (status.StatusCode() == BHttpStatusCode::NoContent)
-				fNoContent = true;
-
-			if ((status.StatusClass() == BHttpStatusClass::ClientError
-					|| status.StatusClass() == BHttpStatusClass::ServerError)
+			if ((fStatus.StatusClass() == BHttpStatusClass::ClientError
+					|| fStatus.StatusClass() == BHttpStatusClass::ServerError)
 				&& fRequest.StopOnError())
 			{
 				fRequestStatus = ContentReceived;
-				fResult->SetStatus(std::move(status));
+				fResult->SetStatus(std::move(fStatus));
 				fResult->SetFields(BHttpFields());
 				fResult->SetBody();
 				return true;
 			}
 
-			if (!fRedirectStatus) {
+			if (!fMightRedirect) {
 				// we are not redirecting and there is no error, so inform listeners
-				SendMessage(UrlEvent::HttpStatus, [&status](BMessage& msg) {
-					msg.AddInt16(UrlEventData::HttpStatusCode, status.code);
+				SendMessage(UrlEvent::HttpStatus, [this](BMessage& msg) {
+					msg.AddInt16(UrlEventData::HttpStatusCode, fStatus.code);
 				});
-				fResult->SetStatus(std::move(status));
+				fResult->SetStatus(BHttpStatus{fStatus.code, std::move(fStatus.text)});
 			}
 
 			fRequestStatus = StatusReceived;
@@ -938,9 +942,9 @@ BHttpSession::Request::ReceiveResult()
 		// The headers have been received, now set up the rest of the response handling
 
 		// Handle redirects
-		if (fRedirectStatus) {
+		if (fMightRedirect) {
 			auto redirectToGet = false;
-			switch (fRedirectStatus->StatusCode()) {
+			switch (fStatus.StatusCode()) {
 			case BHttpStatusCode::Found:
 			case BHttpStatusCode::SeeOther:
 				// 302 and 303 redirections convert all requests to GET request, except for HEAD
@@ -950,7 +954,7 @@ BHttpSession::Request::ReceiveResult()
 			case BHttpStatusCode::TemporaryRedirect:
 			case BHttpStatusCode::PermanentRedirect:
 			{
-				std::cout << "ReceiveResult() [" << Id() << "] Handle redirect with status: " << fRedirectStatus->code << std::endl;
+				std::cout << "ReceiveResult() [" << Id() << "] Handle redirect with status: " << fStatus.code << std::endl;
 				auto locationField = fFields.FindField("Location");
 				if (locationField == fFields.end()) {
 					throw BNetworkRequestError(__PRETTY_FUNCTION__,
@@ -976,63 +980,22 @@ BHttpSession::Request::ReceiveResult()
 			default:
 				// ignore other status codes and continue regular processing
 				SendMessage(UrlEvent::HttpStatus, [this](BMessage& msg) {
-					msg.AddInt16(UrlEventData::HttpStatusCode, fRedirectStatus->code);
+					msg.AddInt16(UrlEventData::HttpStatusCode, fStatus.code);
 				});
-				fResult->SetStatus(std::move(fRedirectStatus.value()));
+				fResult->SetStatus(BHttpStatus{fStatus.code, std::move(fStatus.text)});
 				break;
 			}
 		}
 
 		// TODO: Parse received cookies
 
-		// Handle Chunked Transfers
-		auto chunked = false;
-		auto header = fFields.FindField("Transfer-Encoding");
-		if (header != fFields.end() && header->Value() == "chunked") {
-			fParser.SetContentLength(std::nullopt);
-			chunked = true;
-		}
-
-		// Content-encoding
-		header = fFields.FindField("Content-Encoding");
-		if (header != fFields.end()
-			&& (header->Value() == "gzip" || header->Value() == "deflate"))
-		{
-			std::cout << "ReceiveResult() [" << Id() << "] Content-Encoding has compression: " <<  header->Value() << std::endl;
-			fParser.SetGzipCompression(true);
-		}
-
-		// Content-length
-		if (!chunked && !fNoContent && fRequest.Method() != BHttpMethod::Head) {
-			std::optional<off_t> bodyBytesTotal = std::nullopt;
-			header = fFields.FindField("Content-Length");
-			if (header != fFields.end()) {
-				try {
-					auto contentLength = std::string(header->Value());
-					bodyBytesTotal = std::stol(contentLength);
-					if (bodyBytesTotal.value() == 0)
-						fNoContent = true;
-					fParser.SetContentLength(bodyBytesTotal);
-				} catch (const std::logic_error& e) {
-					throw BNetworkRequestError(__PRETTY_FUNCTION__,
-						BNetworkRequestError::ProtocolError,
-						"Cannot parse Content-Length field value (logic_error)");
-				}
-			}
-
-			if (bodyBytesTotal  == std::nullopt) {
-				throw BNetworkRequestError(__PRETTY_FUNCTION__,
-					BNetworkRequestError::ProtocolError, "Expected Content-Length field");
-			}
-		}
-
 		// Move headers to the result and inform listener
 		fResult->SetFields(std::move(fFields));
 		SendMessage(UrlEvent::HttpFields);
 		fRequestStatus = HeadersReceived;
 
-		if (fRequest.Method() == BHttpMethod::Head || fNoContent) {
-			// HEAD requests and requests with status 204 (No content) are finished
+		if (!fParser.HasContent()) {
+			// Any requests with not content are finished
 			std::cout << "ReceiveResult() [" << Id() << "] Request is completing without content" << std::endl;
 			fResult->SetBody();
 			SendMessage(UrlEvent::RequestCompleted, [](BMessage& msg) {

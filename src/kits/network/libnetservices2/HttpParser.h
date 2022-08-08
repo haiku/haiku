@@ -32,32 +32,48 @@ enum class HttpBodyInputStreamState {
 };
 
 
+enum class HttpBodyType {
+	NoContent,
+	Chunked,
+	FixedSize,
+	VariableSize
+};
+
+
 class HttpParser {
 public:
 							HttpParser() {};
+
+	// Explicitly mark request as having no content
+	void					SetNoContent() { fBodyType = HttpBodyType::NoContent; };
 
 	// HTTP Header
 	bool					ParseStatus(HttpBuffer& buffer, BHttpStatus& status);
 	bool					ParseFields(HttpBuffer& buffer, BHttpFields& fields);
 
 	// HTTP Body
-	void					SetGzipCompression(bool compression = true);
-	void					SetContentLength(std::optional<off_t> contentLength) noexcept;
-
 	size_t					ParseBody(HttpBuffer& buffer, HttpTransferFunction writeToBody);
+	void					SetConnectionClosed();
+
+	// Details on the body status
+	bool					HasContent() const noexcept { return fBodyType != HttpBodyType::NoContent; };
 	std::optional<off_t>	BodyBytesTotal() const noexcept { return fBodyBytesTotal; };
 	off_t					BodyBytesTransferred() const noexcept { return fTransferredBodySize; };
 	bool					Complete() const noexcept;
 
 private:
+	void					_SetGzipCompression();
 	size_t					_ParseBodyRaw(HttpBuffer& buffer, HttpTransferFunction writeToBody);
 	size_t					_ParseBodyChunked(HttpBuffer& buffer, HttpTransferFunction writeToBody);
 	size_t					_ReadChunk(HttpBuffer& buffer, HttpTransferFunction writeToBody,
 								size_t maxSize, bool flush);
-	bool					_IsChunked() const noexcept;
 
 private:
 	off_t					fHeaderBytes = 0;
+	BHttpStatus				fStatus;
+
+	// Body type
+	HttpBodyType			fBodyType = HttpBodyType::VariableSize;
 
 	// Support for chunked transfers
 	HttpBodyInputStreamState fBodyState = HttpBodyInputStreamState::ChunkSize;
