@@ -94,4 +94,5 @@ src/tests/add-ons/kernel/file_systems/ for the fat and ext2 filesystems.
 
    /file_systems/userlandfs
    /file_systems/ufs2
+   /file_systems/xfs
    /file_systems/befs/resources
