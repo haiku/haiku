@@ -234,20 +234,76 @@ dump_fdt(const void *fdt)
 			} else if (strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "interrupt-map") == 0) {
 				dprintf("\n");
 				depth++;
-				for (uint32_t *it = (uint32_t*)property->data; (uint8_t*)it - (uint8_t*)property->data < fdt32_to_cpu(property->len); it += 6) {
+
+				int addressCells = 3;
+				int interruptCells = 1;
+				int phandleCells = 1;
+
+				uint32 *prop;
+
+				prop = (uint32*)fdt_getprop(fdt, node, "#address-cells", NULL);
+				if (prop != NULL)
+					addressCells = fdt32_to_cpu(*prop);
+
+				prop = (uint32*)fdt_getprop(fdt, node, "#interrupt-cells", NULL);
+				if (prop != NULL)
+					interruptCells = fdt32_to_cpu(*prop);
+
+				uint32_t *it = (uint32_t*)property->data;
+				while ((uint8_t*)it - (uint8_t*)property->data < fdt32_to_cpu(property->len)) {
 					for (int i = 0; i < depth; i++)
 						dprintf("  ");
-					// child unit address
-					dprintf("0x%08" PRIx32 ", 0x%08" PRIx32 ", 0x%08" PRIx32 ", 0x%08" PRIx32
-						", bus: %" PRId32 ", dev: %" PRId32 ", fn: %" PRId32,
-						fdt32_to_cpu(*(it + 0)), fdt32_to_cpu(*(it + 1)), fdt32_to_cpu(*(it + 2)), fdt32_to_cpu(*(it + 3)),
-						fdt32_to_cpu(*(it + 0)) / (1 << 16) % (1 << 8),
-						fdt32_to_cpu(*(it + 0)) / (1 << 11) % (1 << 5),
-						fdt32_to_cpu(*(it + 0)) % (1 << 3));
-					dprintf(", childIrq: %" PRId32 ", parentIrq: (%" PRId32 ", %" PRId32 ")\n",
-						fdt32_to_cpu(*(it + 3)), fdt32_to_cpu(*(it + 4)), fdt32_to_cpu(*(it + 5)));
-					if (((it - (uint32_t*)property->data) / 6) % 4 == 3 && ((uint8_t*)(it + 6) - (uint8_t*)property->data < fdt32_to_cpu(property->len)))
-						dprintf("\n");
+
+					uint32 childAddr = fdt32_to_cpu(*it);
+					dprintf("childAddr: ");
+					for (int i = 0; i < addressCells; i++) {
+						dprintf("0x%08" PRIx32 " ", fdt32_to_cpu(*it));
+						it++;
+					}
+
+					uint8 bus = childAddr / (1 << 16) % (1 << 8);
+					uint8 dev = childAddr / (1 << 11) % (1 << 5);
+					uint8 func = childAddr % (1 << 3);
+					dprintf("(bus: %" PRId32 ", dev: %" PRId32 ", fn: %" PRId32 "), ",
+						bus, dev, func);
+
+					dprintf("childIrq: ");
+					for (int i = 0; i < interruptCells; i++) {
+						dprintf("%" PRIu32 " ", fdt32_to_cpu(*it));
+						it++;
+					}
+
+					uint32 parentPhandle = fdt32_to_cpu(*it);
+					it += phandleCells;
+					dprintf("parentPhandle: %" PRId32 ", ", parentPhandle);
+
+					int parentAddressCells = 0;
+					int parentInterruptCells = 1;
+
+					int parentNode = fdt_node_offset_by_phandle(fdt, parentPhandle);
+					if (parentNode >= 0) {
+						prop = (uint32*)fdt_getprop(fdt, parentNode, "#address-cells", NULL);
+						if (prop != NULL)
+							parentAddressCells = fdt32_to_cpu(*prop);
+
+						prop = (uint32*)fdt_getprop(fdt, parentNode, "#interrupt-cells", NULL);
+						if (prop != NULL)
+							parentInterruptCells = fdt32_to_cpu(*prop);
+					}
+
+					dprintf("parentAddress: ");
+					for (int i = 0; i < parentAddressCells; i++) {
+						dprintf("%" PRIu32 " ", fdt32_to_cpu(*it));
+						it++;
+					}
+
+					dprintf("parentIrq: ");
+					for (int i = 0; i < parentInterruptCells; i++) {
+						dprintf("%" PRIu32 " ", fdt32_to_cpu(*it));
+						it++;
+					}
+
+					dprintf("\n");
 				}
 				for (int i = 0; i < depth; i++)
 					dprintf("  ");
