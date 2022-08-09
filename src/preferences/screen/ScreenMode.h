@@ -60,6 +60,7 @@ public:
 									color_space space);
 			status_t			GetRefreshLimits(const screen_mode& mode,
 									float& min, float& max);
+			const char*			GetManufacturerFromID(const char* id) const;
 			status_t			GetMonitorInfo(monitor_info& info,
 									float* _diagonalInches = NULL);
 
