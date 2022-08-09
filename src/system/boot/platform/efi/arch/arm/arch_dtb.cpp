@@ -32,6 +32,16 @@ const struct supported_interrupt_controllers {
 };
 
 
+const struct supported_timers {
+	const char* dtb_compat;
+	const char* kind;
+} kSupportedTimers[] = {
+	{ "arm,armv7-timer",	TIMER_KIND_ARMV7 },
+	{ "ti,omap3430-timer",	TIMER_KIND_OMAP3 },
+	{ "marvell,pxa-timers",	TIMER_KIND_PXA },
+};
+
+
 void
 arch_handle_fdt(const void* fdt, int node)
 {
@@ -73,6 +83,21 @@ arch_handle_fdt(const void* fdt, int node)
 			}
 		}
 	}
+
+	boot_timer_info &timer = gKernelArgs.arch_args.timer;
+	if (timer.kind[0] == 0) {
+		for (uint32 i = 0; i < B_COUNT_OF(kSupportedTimers); i++) {
+			if (dtb_has_fdt_string(compatible, compatibleLen,
+				kSupportedTimers[i].dtb_compat)) {
+
+				memcpy(timer.kind, kSupportedTimers[i].kind,
+					sizeof(timer.kind));
+
+				dtb_get_reg(fdt, node, 0, timer.regs);
+				timer.interrupt = dtb_get_interrupt(fdt, node);
+			}
+		}
+	}
 }
 
 
@@ -91,5 +116,17 @@ arch_dtb_set_kernel_args(void)
 		dprintf("        %#" B_PRIx64 ", %#" B_PRIx64 "\n",
 			interrupt_controller.regs2.start,
 			interrupt_controller.regs2.size);
+	}
+
+	boot_timer_info &timer = gKernelArgs.arch_args.timer;
+	dprintf("Chosen timer:\n");
+	if (timer.kind[0] == 0) {
+		dprintf("kind: None!\n");
+	} else {
+		dprintf("  kind: %s\n", timer.kind);
+		dprintf("  regs: %#" B_PRIx64 ", %#" B_PRIx64 "\n",
+			timer.regs.start,
+			timer.regs.size);
+		dprintf("  irq: %" B_PRIu32 "\n", timer.interrupt);
 	}
 }

@@ -92,7 +92,7 @@ PXATimer::SetTimeout(bigtime_t timeout)
 		}
 	}
 
-	dprintf("arch_timer_set_hardware_timer(val=%lu, res=%lu)\n", val, res);
+	dprintf("arch_timer_set_hardware_timer(val=%" B_PRIu32 ", res=%" B_PRIu32 ")\n", val, res);
 	fRegBase[PXA_OIER] |= (1 << 4);
 	fRegBase[PXA_OMCR4] = res;
 	fRegBase[PXA_OSMR4] = val;
@@ -143,11 +143,11 @@ PXATimer::HandleInterrupt()
 }
 
 
-#if 0
-PXATimer::PXATimer(fdt_module_info *fdt, fdt_device_node node)
-	: HardwareTimer(fdt, node)
+PXATimer::PXATimer(uint32_t reg_base)
 {
-	fRegArea = fFDT->map_reg_range(node, 0, (void**)&fRegBase);
+	fRegArea = vm_map_physical_memory(B_SYSTEM_TEAM, "pxa-timer", (void**)&fRegBase,
+		B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		reg_base, false);
 	if (fRegArea < 0)
 		panic("Cannot map PXATimer registers!");
 
@@ -158,4 +158,3 @@ PXATimer::PXATimer(fdt_module_info *fdt, fdt_device_node node)
 
 	install_io_interrupt_handler(PXA_TIMERS_INTERRUPT, &PXATimer::_InterruptWrapper, NULL, 0);
 }
-#endif

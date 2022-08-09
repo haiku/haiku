@@ -34,20 +34,6 @@
 #endif
 
 
-#if 0
-static struct fdt_device_info intc_table[] = {
-	{
-		.compatible = "marvell,pxa-timers",	// XXX not in FDT (also not in upstream!)
-		.init = PXATimer::Init,
-	}, {
-		.compatible = "ti,omap3430-timer",
-		.init = OMAP3Timer::Init,
-	}
-};
-static int intc_count = sizeof(intc_table) / sizeof(struct fdt_device_info);
-#endif
-
-
 void
 arch_timer_set_hardware_timer(bigtime_t timeout)
 {
@@ -73,20 +59,16 @@ arch_init_timer(kernel_args *args)
 	if (ARMGenericTimer::IsAvailable()) {
 		TRACE("init ARMv7 generic timer\n");
 		ARMGenericTimer::Init();
-	}
-
-	//TODO: use SoC-specific timer as a fallback
-	//if the generic timer is not available
-
-#if 0
-	status_t rc = get_module(B_FDT_MODULE_NAME, (module_info**)&sFdtModule);
-	if (rc != B_OK)
-		panic("Unable to get FDT module: %08lx!\n", rc);
-
-	rc = sFdtModule->setup_devices(intc_table, intc_count, NULL);
-	if (rc != B_OK)
+	} else if (strncmp(args->arch_args.timer.kind, TIMER_KIND_OMAP3,
+		sizeof(args->arch_args.timer.kind)) == 0) {
+		OMAP3Timer::Init(args->arch_args.timer.regs.start,
+			args->arch_args.timer.interrupt);
+	} else if (strncmp(args->arch_args.timer.kind, TIMER_KIND_PXA,
+		sizeof(args->arch_args.timer.kind)) == 0) {
+		PXATimer::Init(args->arch_args.timer.regs.start);
+	} else {
 		panic("No hardware timer found!\n");
-#endif
+	}
 
 	return B_OK;
 }

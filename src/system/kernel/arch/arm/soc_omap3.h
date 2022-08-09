@@ -29,10 +29,9 @@ public:
 	bigtime_t Time();
 	void Clear();
 
-#if 0
-	static status_t Init(fdt_module_info *fdt, fdt_device_node node, void *cookie) {
+	static status_t Init(uint32_t reg_base, uint32_t interrupt) {
 		if (sInstance == NULL) {
-			OMAP3Timer *timer = new(std::nothrow) OMAP3Timer(fdt, node);
+			OMAP3Timer *timer = new(std::nothrow) OMAP3Timer(reg_base, interrupt);
 			// XXX implement InitCheck() functionality
 			return timer != NULL ? B_OK : B_NO_MEMORY;
 		} else {
@@ -41,10 +40,9 @@ public:
 			return B_OK;
 		}
 	}
-#endif
 
 private:
-	//OMAP3Timer(fdt_module_info *fdtModule, fdt_device_node node);
+	OMAP3Timer(uint32_t reg_base, uint32_t interrupt);
 
 	static int32 _InterruptWrapper(void *data);
 	int32 HandleInterrupt();

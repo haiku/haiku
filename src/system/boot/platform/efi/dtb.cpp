@@ -482,7 +482,7 @@ dtb_get_interrupt_cells(const void* fdt, int node)
 }
 
 
-static uint32
+uint32
 dtb_get_interrupt(const void* fdt, int node)
 {
 	uint32 interruptCells = dtb_get_interrupt_cells(fdt, node);
