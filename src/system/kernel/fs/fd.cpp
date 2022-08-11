@@ -819,7 +819,7 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 	SyscallRestartWrapper<status_t> status;
 
 	ssize_t bytesTransferred = 0;
-	for (uint32 i = 0; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		if (vecs[i].iov_base == NULL)
 			continue;
 
@@ -1090,7 +1090,6 @@ _kern_readv(int fd, off_t pos, const iovec* vecs, size_t count)
 {
 	bool movePosition = false;
 	status_t status;
-	uint32 i;
 
 	if (pos < -1)
 		return B_BAD_VALUE;
@@ -1115,7 +1114,7 @@ _kern_readv(int fd, off_t pos, const iovec* vecs, size_t count)
 
 	ssize_t bytesRead = 0;
 
-	for (i = 0; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		size_t length = vecs[i].iov_len;
 		status = descriptor->ops->fd_read(descriptor, pos, vecs[i].iov_base,
 			&length);
@@ -1185,7 +1184,6 @@ _kern_writev(int fd, off_t pos, const iovec* vecs, size_t count)
 {
 	bool movePosition = false;
 	status_t status;
-	uint32 i;
 
 	if (pos < -1)
 		return B_BAD_VALUE;
@@ -1210,7 +1208,7 @@ _kern_writev(int fd, off_t pos, const iovec* vecs, size_t count)
 
 	ssize_t bytesWritten = 0;
 
-	for (i = 0; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		size_t length = vecs[i].iov_len;
 		status = descriptor->ops->fd_write(descriptor, pos,
 			vecs[i].iov_base, &length);
