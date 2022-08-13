@@ -1,4 +1,4 @@
-1	french	application/x-vnd.Cortex.support	1081380755
+1	french	application/x-vnd.Cortex.support	2769580762
 Header has flags	MediaString		L’en-tête comporte des drapeaux
 Recording	MediaString		Enregistrement
 (unknown format)	MediaString		(format inconnu)
@@ -24,6 +24,7 @@ Back-center	MediaString		Arrière-centre
 32 bit CMY	MediaString		32 bits CMJ
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{Entier # bits}}
 (unknown video format)	MediaString		(format vidéo inconnu)
+Video data between line %lu and %lu	MediaString		Données vidéo entre les lignes %lu et %lu
 AVI format family	MediaString		Famille de format AVI
 Homogenous buffers	MediaString		Tampons homogènes
 Interlaced 	MediaString		Entrelacé 
@@ -54,9 +55,11 @@ Front-right-center	MediaString		Avant-droit-centre
 Side-right	MediaString		Côté-droit
  kHz	MediaString		 kHz
 Little endian	MediaString		Petit-boutien
+(unknown matrix mask)	MediaString		(masque de matrice inconnu)
 Side-left	MediaString		Côté-gauche
 {0, plural, one{# byte per buffer} other{# bytes per buffer}}	MediaString		{0, plural, one{# octet par tampon} other{# octets par tampon}}
 32 bit CMYK	MediaString		32 bits CMJN
+(unknown multistream format)	MediaString		(format multi-flux inconnu)
 8 bit integer	MediaString		Entier 8 bits
 8 bit grayscale-index	MediaString		Palette de gris 8 bits
 YCbCr444	MediaString		YCbCr444

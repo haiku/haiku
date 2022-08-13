@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2915475646
+1	hungarian	x-vnd.Haiku-libtracker	464753347
 Created	ContainerWindow		Létrehozva
 Icon	AttributesView		Ikon
 Open and make preferred	OpenWithWindow		Megnyitás és előnyben részesítés
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Kis bittérkép ikon
 Would you like to find a suitable application to open the file?	FSUtils		Szeretne találni egy programot ami kezeli ezt a fájltípust?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Nem lehet mappát vagy szimbolikus linket fájllal felülírni.
+(unknown)	InfoWindow		(ismeretlen)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# dátum>}}
 Trailing \\.	libtracker		Záró \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Ennél: %func \nsikertelen volt a find_directory(). \nOka: %error
@@ -84,6 +85,7 @@ Include trash	FindPanel		A Szemetesben is
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Rendrakás
 Modified	FindPanel		Módosítva
+ (block size: 	InfoWindow		 (blokk-méret: 
 Select all	QueryContainerWindow		Összes kijelölése
 Generate image thumbnails	SettingsView		Képek előnézetének létrehozása
 Select…	FilePanelPriv		Kijelölés…
@@ -167,6 +169,7 @@ Read	FilePermissionsView		Olvasás
 There was an error writing the attribute.	WidgetAttributeText		Hiba történt a jellemző írása közben.
 Path	Default Query Columns		Útvonal
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target átnevezésekor nem biztos, hogy megfelelően működik a %osName!\n\nBiztosan ezt akarod tenni?
+Filesystem:	InfoWindow		Fájlrendszer:
 Could not open \"%name\" (%error). 	FSUtils		Nem sikerült megnyitni: \"%name\" (%error).
 Media parameter group	AttributesView		Média paraméter csoport
 %name info	InfoWindow	InfoWindow Title	%name
@@ -493,6 +496,7 @@ Duplicate	ContainerWindow		Megkettőzés
 16-bit integer	AttributesView		16-bites egész
 Untitled clipping	PoseView		Névtelen kivágás
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		A megadott mappában már létezik egy ilyen nevű fájl: \"%name\". Szeretnéd felülírni?
+, indexed	InfoWindow		, indexelt
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Húzzon elemeket a \"Lemezek\" ablakban az egyik lemez ikonjára.
 Version:	InfoWindow		Verzió:
 OK	PoseView		Rendben

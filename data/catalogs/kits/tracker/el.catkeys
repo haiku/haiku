@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-libtracker	2915475646
+1	greek, modern (1453-)	x-vnd.Haiku-libtracker	464753347
 Created	ContainerWindow		Δημιουργήθηκε
 Icon	AttributesView		Εικονίδιο
 Open and make preferred	OpenWithWindow		'Ανοιγμα και ορισμός προεπιλεγμένου
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Μικρό εικονίδιο bitmap
 Would you like to find a suitable application to open the file?	FSUtils		Θα θέλατε να πραγματοποιηθεί η έυρεση μιας κατάλληλης εφαρμογής για το άνοιγμα του αρχείου;
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Δεν μπορείται να αντικαταστήσετε έναν φάκελο ή έναν συμβολικό δεσμό με ένα αρχείο.
+(unknown)	InfoWindow		(άγνωστο)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# ημερομηνίες>}}
 Trailing \\.	libtracker		Περισσευούμενο \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Στην %func \nαπέτυχε η find_directory(). \nΑιτία: %error
@@ -84,6 +85,7 @@ Include trash	FindPanel		Συμπερίληψη Κάδου
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Καθαρισμός
 Modified	FindPanel		Τροποποιήθηκε
+ (block size: 	InfoWindow		 (μέγεθος block: 
 Select all	QueryContainerWindow		Επιλογή όλων
 Generate image thumbnails	SettingsView		Παραγωγή μικρογραφιών εικόνων
 Select…	FilePanelPriv		Επιλογή…
@@ -167,6 +169,7 @@ Read	FilePermissionsView		Ανάγνωση
 There was an error writing the attribute.	WidgetAttributeText		Υπήρξε ένα σφάλμα κατά την εγγραφή της ιδιότητας.
 Path	Default Query Columns		Τοποθεσία
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Αν μετονομάσετε το %target, το %osName ενδέχεται να μην λειτουργήσει σωστά!\n\nΕίστε σίγουρος;
+Filesystem:	InfoWindow		Σύστημα αρχείων:
 Could not open \"%name\" (%error). 	FSUtils		Αδυναμία ανοίγματος του \"%name\" (%error). 
 Media parameter group	AttributesView		Ομάδα παραμέτρων πολυμέσων
 %name info	InfoWindow	InfoWindow Title	%name πληροφορίες
@@ -493,6 +496,7 @@ Duplicate	ContainerWindow		Διπλότυπο
 16-bit integer	AttributesView		Ακέραιος αριθμός 16-bit
 Untitled clipping	PoseView		Άτιτλο απόκομμα
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		το αρχείο \"%name\" υπάρχει ήδη στον προσδιορισμένο φάκελο. Θέλετε σίγουρα να το αντικαταστήσετε;
+, indexed	InfoWindow		, με ίνδικα
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Πρέπει να αφήσετε τα αντικείμενα σε ένα από τα εικονίδια δίσκων στο παράθυρο \"Δίσκοι\".
 Version:	InfoWindow		Έκδοση:
 OK	PoseView		Εντάξει

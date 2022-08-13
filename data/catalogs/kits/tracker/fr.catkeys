@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	535392087
+1	french	x-vnd.Haiku-libtracker	2379637084
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Petite icône bitmap
 Would you like to find a suitable application to open the file?	FSUtils		Souhaitez-vous rechercher une application appropriée pour ouvrir le fichier ?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Vous ne pouvez pas remplacer un dossier ou un lien symbolique par un fichier.
+(unknown)	InfoWindow		(inconnu)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, one{<# date>} other{<# dates>}}
 Trailing \\.	libtracker		Les \\ à la fin.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Dans %func\nfind_directory() a échoué.\nMotif : %error
@@ -84,6 +85,7 @@ Include trash	FindPanel		Inclure la corbeille
 GiB	WidgetAttributeText		Gio
 Clean up	ContainerWindow		Nettoyer
 Modified	FindPanel		Modifié
+ (block size: 	InfoWindow		 (taille de bloc : 
 Select all	QueryContainerWindow		Sélectionner tout
 Generate image thumbnails	SettingsView		Générer des vignettes d’images
 Select…	FilePanelPriv		Sélectionner…
@@ -167,6 +169,7 @@ Read	FilePermissionsView		Lire
 There was an error writing the attribute.	WidgetAttributeText		Il y a eu une erreur à l’écriture de l’attribut.
 Path	Default Query Columns		Chemin
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si vous renommez %target, %osName pourrait ne plus se comporter correctement !\n\nÊtes vous sûr de vouloir le faire ?
+Filesystem:	InfoWindow		Système de fichiers :
 Could not open \"%name\" (%error). 	FSUtils		Impossible d’ouvrir « %name » (%error). 
 %name info	InfoWindow	InfoWindow Title	Informations sur %name
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Si vous déplacez le dossier d’accueil, %osName pourrait ne plus fonctionner normalement !\n\nÊtes-vous sûr de vouloir le faire ?\n\nPour déplacer quand même le dossier d’accueil, maintenez la touche « Maj » enfoncée et cliquez sur « Déplacer ».
@@ -490,6 +493,7 @@ Duplicate	ContainerWindow		Dupliquer
 16-bit integer	AttributesView		Entier 16-bits
 Untitled clipping	PoseView		Extrait sans titre
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Le fichier « %name » existe déjà dans le dossier indiqué. Voulez-vous le remplacer ?
+, indexed	InfoWindow		, indexé
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Vous devez déposer les éléments sur une des icônes disques de la fenêtre « Disques ».
 Version:	InfoWindow		Version :
 OK	PoseView		OK
