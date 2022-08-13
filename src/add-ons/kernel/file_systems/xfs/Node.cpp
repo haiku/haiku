@@ -379,82 +379,85 @@ NodeDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 
 	TRACE("rightMapOffset:(%" B_PRIu32 ")\n", rightMapOffset);
 
-	FillMapEntry(fFirstLeafMapIndex + 1, fLeafMap);
-	fCurLeafMapNumber = 2;
-	status = FillBuffer(LEAF, fLeafBuffer,
-		rightMapOffset - fLeafMap->br_startoff);
-	if (status != B_OK)
-		return status;
-	fCurLeafBufferNumber = 2;
-	ExtentLeafHeader* leafHeader = CreateLeafHeader(fInode, fLeafBuffer);
-	if(leafHeader == NULL)
-		return B_NO_MEMORY;
-	ExtentLeafEntry* leafEntry =
-		(ExtentLeafEntry*)(void*)(fLeafBuffer + SizeOfLeafHeader(fInode));
-	if (leafEntry == NULL)
-		return B_NO_MEMORY;
+	for(int i = fFirstLeafMapIndex; i < fInode->DataExtentsCount(); i++)
+	{
+		FillMapEntry(i, fLeafMap);
+		fCurLeafMapNumber = 2;
+		status = FillBuffer(LEAF, fLeafBuffer,
+			rightMapOffset - fLeafMap->br_startoff);
+		if (status != B_OK)
+			return status;
+		fCurLeafBufferNumber = 2;
+		ExtentLeafHeader* leafHeader = CreateLeafHeader(fInode, fLeafBuffer);
+		if(leafHeader == NULL)
+			return B_NO_MEMORY;
+		ExtentLeafEntry* leafEntry =
+			(ExtentLeafEntry*)(void*)(fLeafBuffer + SizeOfLeafHeader(fInode));
+		if (leafEntry == NULL)
+			return B_NO_MEMORY;
 
-	int numberOfLeafEntries = leafHeader->Count();
-	TRACE("numberOfLeafEntries:(%" B_PRId32 ")\n", numberOfLeafEntries);
-	int left = 0;
-	int mid;
-	int right = numberOfLeafEntries - 1;
-	Volume* volume = fInode->GetVolume();
+		int numberOfLeafEntries = leafHeader->Count();
+		TRACE("numberOfLeafEntries:(%" B_PRId32 ")\n", numberOfLeafEntries);
+		int left = 0;
+		int mid;
+		int right = numberOfLeafEntries - 1;
+		Volume* volume = fInode->GetVolume();
 
-	/*
-	* Trying to find the lowerbound of hashValueOfRequest
-	* This is slightly different from bsearch(), as we want the first
-	* instance of hashValueOfRequest and not any instance.
-	*/
-	while (left < right) {
-		mid = (left + right) / 2;
-		uint32 hashval = B_BENDIAN_TO_HOST_INT32(leafEntry[mid].hashval);
-		if (hashval >= hashValueOfRequest) {
-			right = mid;
-			continue;
+		/*
+		* Trying to find the lowerbound of hashValueOfRequest
+		* This is slightly different from bsearch(), as we want the first
+		* instance of hashValueOfRequest and not any instance.
+		*/
+		while (left < right) {
+			mid = (left + right) / 2;
+			uint32 hashval = B_BENDIAN_TO_HOST_INT32(leafEntry[mid].hashval);
+			if (hashval >= hashValueOfRequest) {
+				right = mid;
+				continue;
+			}
+			if (hashval < hashValueOfRequest) {
+				left = mid + 1;
+			}
 		}
-		if (hashval < hashValueOfRequest) {
-			left = mid + 1;
-		}
-	}
-	TRACE("left:(%" B_PRId32 "), right:(%" B_PRId32 ")\n", left, right);
+		TRACE("left:(%" B_PRId32 "), right:(%" B_PRId32 ")\n", left, right);
 
-	while (B_BENDIAN_TO_HOST_INT32(leafEntry[left].hashval)
-			== hashValueOfRequest) {
+		while (B_BENDIAN_TO_HOST_INT32(leafEntry[left].hashval)
+				== hashValueOfRequest) {
 
-		uint32 address = B_BENDIAN_TO_HOST_INT32(leafEntry[left].address);
-		if (address == 0) {
+			uint32 address = B_BENDIAN_TO_HOST_INT32(leafEntry[left].address);
+			if (address == 0) {
+				left++;
+				continue;
+			}
+
+			uint32 dataBlockNumber = BLOCKNO_FROM_ADDRESS(address * 8, volume);
+			uint32 offset = BLOCKOFFSET_FROM_ADDRESS(address * 8, fInode);
+
+			TRACE("DataBlockNumber:(%" B_PRIu32 "), offset:(%" B_PRIu32 ")\n",
+				dataBlockNumber, offset);
+			if (dataBlockNumber != fCurBlockNumber) {
+				fCurBlockNumber = dataBlockNumber;
+				SearchAndFillDataMap(dataBlockNumber);
+				status = FillBuffer(DATA, fDataBuffer,
+					dataBlockNumber - fDataMap->br_startoff);
+				if (status != B_OK)
+					return status;
+			}
+
+			TRACE("offset:(%" B_PRIu32 ")\n", offset);
+			ExtentDataEntry* entry = (ExtentDataEntry*)(fDataBuffer + offset);
+
+			int retVal = strncmp(name, (char*)entry->name, entry->namelen);
+			if (retVal == 0) {
+				*ino = B_BENDIAN_TO_HOST_INT64(entry->inumber);
+				TRACE("ino:(%" B_PRIu64 ")\n", *ino);
+				return B_OK;
+			}
 			left++;
-			continue;
 		}
-
-		uint32 dataBlockNumber = BLOCKNO_FROM_ADDRESS(address * 8, volume);
-		uint32 offset = BLOCKOFFSET_FROM_ADDRESS(address * 8, fInode);
-
-		TRACE("DataBlockNumber:(%" B_PRIu32 "), offset:(%" B_PRIu32 ")\n",
-			dataBlockNumber, offset);
-		if (dataBlockNumber != fCurBlockNumber) {
-			fCurBlockNumber = dataBlockNumber;
-			SearchAndFillDataMap(dataBlockNumber);
-			status = FillBuffer(DATA, fDataBuffer,
-				dataBlockNumber - fDataMap->br_startoff);
-			if (status != B_OK)
-				return status;
-		}
-
-		TRACE("offset:(%" B_PRIu32 ")\n", offset);
-		ExtentDataEntry* entry = (ExtentDataEntry*)(fDataBuffer + offset);
-
-		int retVal = strncmp(name, (char*)entry->name, entry->namelen);
-		if (retVal == 0) {
-			*ino = B_BENDIAN_TO_HOST_INT64(entry->inumber);
-			TRACE("ino:(%" B_PRIu64 ")\n", *ino);
-			return B_OK;
-		}
-		left++;
+		delete leafHeader;
 	}
 
-	delete leafHeader;
 	return B_ENTRY_NOT_FOUND;
 }
 

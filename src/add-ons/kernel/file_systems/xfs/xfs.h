@@ -49,6 +49,7 @@ extern fs_volume_ops gxfsVolumeOps;
 #define XFS_KEY_SIZE sizeof(xfs_fileoff_t)
 #define XFS_PTR_SIZE sizeof(xfs_fsblock_t)
 
+
 struct file_cookie {
 	bigtime_t last_notification;
 	off_t	last_size;

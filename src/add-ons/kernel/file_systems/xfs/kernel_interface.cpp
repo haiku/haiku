@@ -102,8 +102,14 @@ xfs_read_fs_info(fs_volume *_volume, struct fs_info *info)
 	info->total_blocks = volume->SuperBlock().TotalBlocks();
 	info->free_blocks = volume->SuperBlock().FreeBlocks();
 
+	// Volume name
 	strlcpy(info->volume_name, volume->Name(), sizeof(info->volume_name));
-	strlcpy(info->fsh_name, "xfs", sizeof(info->fsh_name));
+
+	// Filesystem name
+	if(volume->IsVersion5())
+		strlcpy(info->fsh_name, "xfs V5", sizeof(info->fsh_name));
+	else
+		strlcpy(info->fsh_name, "xfs V4", sizeof(info->fsh_name));
 
 	return B_OK;
 }

@@ -80,40 +80,6 @@ TreeDirectory::PtrSize()
 }
 
 
-bool
-TreeDirectory::VerifyBlockHeader(LongBlock* header, char* buffer)
-{
-	TRACE("VerifyBlockHeader\n");
-
-	if (header->Magic() != XFS_BMAP_MAGIC
-		&& header->Magic() != XFS_BMAP_CRC_MAGIC) {
-		ERROR("Bad magic number");
-		return false;
-	}
-
-	if (fInode->Version() == 1 || fInode->Version() == 2)
-		return true;
-
-	if (!xfs_verify_cksum(buffer, fInode->DirBlockSize(),
-			XFS_LBLOCK_CRC_OFF)) {
-		ERROR("Block is corrupted");
-		return false;
-	}
-
-	if (!fInode->GetVolume()->UuidEquals(header->Uuid())) {
-		ERROR("UUID is incorrect");
-		return false;
-	}
-
-	if (fInode->ID() != header->Owner()) {
-		ERROR("Wrong Block owner");
-		return false;
-	}
-
-	return true;
-}
-
-
 size_t
 TreeDirectory::MaxRecordsPossibleRoot()
 {
@@ -322,9 +288,6 @@ TreeDirectory::GetAllExtents()
 
 	ArrayDeleter<ExtentMapUnwrap> extentsWrappedDeleter(extentsWrapped);
 
-	size_t maxRecords = MaxRecordsPossibleRoot();
-	TRACE("Maxrecords: (%" B_PRIuSIZE ")\n", maxRecords);
-
 	Volume* volume = fInode->GetVolume();
 	ssize_t len = volume->BlockSize();
 
@@ -340,7 +303,8 @@ TreeDirectory::GetAllExtents()
 	while (1) {
 		// Run till you have leaf blocks to checkout
 		char* leafBuffer = fSingleDirBlock;
-		if (!VerifyBlockHeader((LongBlock*)leafBuffer, leafBuffer)) {
+		if (!VerifyHeader<LongBlock>((LongBlock*)leafBuffer, leafBuffer, fInode,
+				0, NULL, XFS_BTREE)) {
 			TRACE("Invalid Long Block");
 			return B_BAD_VALUE;
 		}
@@ -724,7 +688,8 @@ TreeDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 		LongBlock* curDirBlock
 			= (LongBlock*)fPathForLeaves[pathIndex].blockData;
 
-		if (!VerifyBlockHeader(curDirBlock, fPathForLeaves[pathIndex].blockData)) {
+		if (!VerifyHeader<LongBlock>(curDirBlock, fPathForLeaves[pathIndex].blockData, fInode,
+				0, NULL, XFS_BTREE)) {
 			TRACE("Invalid Long Block");
 			return B_BAD_VALUE;
 		}
@@ -873,4 +838,21 @@ TreeDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 		delete leafHeader;
 	}
 	return B_ENTRY_NOT_FOUND;
+}
+
+
+uint32
+LongBlock::ExpectedMagic(int8 WhichDirectory, Inode* inode)
+{
+	if(inode->Version() == 3)
+		return XFS_BMAP_CRC_MAGIC;
+	else
+		return XFS_BMAP_MAGIC;
+}
+
+
+uint32
+LongBlock::CRCOffset()
+{
+	return offsetof(LongBlock, bb_crc);
 }

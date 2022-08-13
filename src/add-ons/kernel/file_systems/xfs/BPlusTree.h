@@ -17,7 +17,8 @@
  * Headers(here, the LongBlock) are the "nodes" really and are called "blocks".
  * The records, keys and ptrs are calculated using helpers
  */
-struct LongBlock {
+class LongBlock {
+public:
 
 			uint32				Magic()
 								{ return B_BENDIAN_TO_HOST_INT32(bb_magic); }
@@ -46,6 +47,13 @@ struct LongBlock {
 			uint64				Owner()
 								{ return B_BENDIAN_TO_HOST_INT64(bb_owner); }
 
+	static	uint32				ExpectedMagic(int8 WhichDirectory,
+										Inode* inode);
+
+	static	uint32				CRCOffset();
+
+private:
+
 			uint32				bb_magic;
 			uint16				bb_level;
 			uint16				bb_numrecs;
@@ -53,7 +61,7 @@ struct LongBlock {
 			uint64				bb_rightsib;
 
 			// Version 5 fields start here
-
+public:
 			uint64				bb_blkno;
 			uint64				bb_lsn;
 			uuid_t				bb_uuid;
@@ -62,7 +70,6 @@ struct LongBlock {
 			uint32				bb_pad;
 };
 
-#define XFS_LBLOCK_CRC_OFF offsetof(struct LongBlock, bb_crc)
 
 /* We have an array of extent records in
  * the leaf node along with above headers
@@ -104,7 +111,6 @@ public:
 									xfs_ino_t* ino);
 			status_t			Lookup(const char* name, size_t length,
 									xfs_ino_t* id);
-			bool				VerifyBlockHeader(LongBlock* header, char* buffer);
 			int					EntrySize(int len) const;
 			uint32				BlockLen();
 			size_t				PtrSize();

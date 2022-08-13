@@ -425,8 +425,6 @@ public:
 			TreePointer*		GetPtrFromNode(int pos, void* buffer);
 			size_t				GetPtrOffsetIntoRoot(int pos);
 			size_t				GetPtrOffsetIntoNode(int pos);
-			bool				VerifyBlockHeader(LongBlock* header,
-									char* buffer);
 			uint32				SizeOfLongBlock();
 private:
 			status_t			GetFromDisk();

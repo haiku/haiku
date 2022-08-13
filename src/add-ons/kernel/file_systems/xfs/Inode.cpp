@@ -8,43 +8,43 @@
 #include "Inode.h"
 
 #include "BPlusTree.h"
-#include "Checksum.h"
+#include "VerifyHeader.h"
 
 
 void
 xfs_inode_t::SwapEndian()
 {
-	di_magic = B_BENDIAN_TO_HOST_INT16(di_magic);
-	di_mode = B_BENDIAN_TO_HOST_INT16(di_mode);
-	di_onlink = B_BENDIAN_TO_HOST_INT16(di_onlink);
-	di_uid = B_BENDIAN_TO_HOST_INT32(di_uid);
-	di_gid = B_BENDIAN_TO_HOST_INT32(di_gid);
-	di_nlink = B_BENDIAN_TO_HOST_INT32(di_nlink);
-	di_projid = B_BENDIAN_TO_HOST_INT16(di_projid);
-	di_flushiter = B_BENDIAN_TO_HOST_INT16(di_flushiter);
-	di_atime.t_sec = B_BENDIAN_TO_HOST_INT32(di_atime.t_sec);
-	di_atime.t_nsec = B_BENDIAN_TO_HOST_INT32(di_atime.t_nsec);
-	di_mtime.t_sec = B_BENDIAN_TO_HOST_INT32(di_mtime.t_sec);
-	di_mtime.t_nsec = B_BENDIAN_TO_HOST_INT32(di_mtime.t_nsec);
-	di_ctime.t_sec = B_BENDIAN_TO_HOST_INT32(di_ctime.t_sec);
-	di_ctime.t_nsec = B_BENDIAN_TO_HOST_INT32(di_ctime.t_nsec);
-	di_size = B_BENDIAN_TO_HOST_INT64(di_size);
-	di_nblocks =  B_BENDIAN_TO_HOST_INT64(di_nblocks);
-	di_extsize = B_BENDIAN_TO_HOST_INT32(di_extsize);
-	di_nextents = B_BENDIAN_TO_HOST_INT32(di_nextents);
-	di_anextents = B_BENDIAN_TO_HOST_INT16(di_anextents);
-	di_dmevmask = B_BENDIAN_TO_HOST_INT32(di_dmevmask);
-	di_dmstate = B_BENDIAN_TO_HOST_INT16(di_dmstate);
-	di_flags = B_BENDIAN_TO_HOST_INT16(di_flags);
-	di_gen = B_BENDIAN_TO_HOST_INT32(di_gen);
-	di_next_unlinked = B_BENDIAN_TO_HOST_INT32(di_next_unlinked);
-	di_changecount = B_BENDIAN_TO_HOST_INT64(di_changecount);
-	di_lsn = B_BENDIAN_TO_HOST_INT64(di_lsn);
-	di_flags2 = B_BENDIAN_TO_HOST_INT64(di_flags2);
-	di_cowextsize = B_BENDIAN_TO_HOST_INT64(di_cowextsize);
-	di_crtime.t_sec = B_BENDIAN_TO_HOST_INT32(di_crtime.t_sec);
-	di_crtime.t_nsec = B_BENDIAN_TO_HOST_INT32(di_crtime.t_nsec);
-	di_ino = B_BENDIAN_TO_HOST_INT64(di_ino);
+	di_magic			=	B_BENDIAN_TO_HOST_INT16(di_magic);
+	di_mode				=	B_BENDIAN_TO_HOST_INT16(di_mode);
+	di_onlink			=	B_BENDIAN_TO_HOST_INT16(di_onlink);
+	di_uid				=	B_BENDIAN_TO_HOST_INT32(di_uid);
+	di_gid				=	B_BENDIAN_TO_HOST_INT32(di_gid);
+	di_nlink			=	B_BENDIAN_TO_HOST_INT32(di_nlink);
+	di_projid			=	B_BENDIAN_TO_HOST_INT16(di_projid);
+	di_flushiter		=	B_BENDIAN_TO_HOST_INT16(di_flushiter);
+	di_atime.t_sec		=	B_BENDIAN_TO_HOST_INT32(di_atime.t_sec);
+	di_atime.t_nsec		=	B_BENDIAN_TO_HOST_INT32(di_atime.t_nsec);
+	di_mtime.t_sec		=	B_BENDIAN_TO_HOST_INT32(di_mtime.t_sec);
+	di_mtime.t_nsec		=	B_BENDIAN_TO_HOST_INT32(di_mtime.t_nsec);
+	di_ctime.t_sec		=	B_BENDIAN_TO_HOST_INT32(di_ctime.t_sec);
+	di_ctime.t_nsec		=	B_BENDIAN_TO_HOST_INT32(di_ctime.t_nsec);
+	di_size				=	B_BENDIAN_TO_HOST_INT64(di_size);
+	di_nblocks			=	B_BENDIAN_TO_HOST_INT64(di_nblocks);
+	di_extsize			=	B_BENDIAN_TO_HOST_INT32(di_extsize);
+	di_nextents			=	B_BENDIAN_TO_HOST_INT32(di_nextents);
+	di_anextents		=	B_BENDIAN_TO_HOST_INT16(di_anextents);
+	di_dmevmask			=	B_BENDIAN_TO_HOST_INT32(di_dmevmask);
+	di_dmstate			=	B_BENDIAN_TO_HOST_INT16(di_dmstate);
+	di_flags			=	B_BENDIAN_TO_HOST_INT16(di_flags);
+	di_gen				=	B_BENDIAN_TO_HOST_INT32(di_gen);
+	di_next_unlinked	=	B_BENDIAN_TO_HOST_INT32(di_next_unlinked);
+	di_changecount		=	B_BENDIAN_TO_HOST_INT64(di_changecount);
+	di_lsn				=	B_BENDIAN_TO_HOST_INT64(di_lsn);
+	di_flags2			=	B_BENDIAN_TO_HOST_INT64(di_flags2);
+	di_cowextsize		=	B_BENDIAN_TO_HOST_INT64(di_cowextsize);
+	di_crtime.t_sec		=	B_BENDIAN_TO_HOST_INT32(di_crtime.t_sec);
+	di_crtime.t_nsec	=	B_BENDIAN_TO_HOST_INT32(di_crtime.t_nsec);
+	di_ino				=	B_BENDIAN_TO_HOST_INT64(di_ino);
 }
 
 
@@ -433,40 +433,6 @@ Inode::SizeOfLongBlock()
 }
 
 
-bool
-Inode::VerifyBlockHeader(LongBlock* header, char* buffer)
-{
-	TRACE("VerifyBlockHeader\n");
-
-	if (header->Magic() != XFS_BMAP_MAGIC
-		&& header->Magic() != XFS_BMAP_CRC_MAGIC) {
-		ERROR("Bad magic number");
-		return false;
-	}
-
-	if (Version() == 1 || Version() == 2)
-		return true;
-
-	if (!xfs_verify_cksum(buffer, DirBlockSize(),
-			XFS_LBLOCK_CRC_OFF)) {
-		ERROR("Block is corrupted");
-		return false;
-	}
-
-	if (!GetVolume()->UuidEquals(header->Uuid())) {
-		ERROR("UUID is incorrect");
-		return false;
-	}
-
-	if (ID() != header->Owner()) {
-		ERROR("Wrong Block owner");
-		return false;
-	}
-
-	return true;
-}
-
-
 void
 Inode::UnWrapExtentFromWrappedEntry(uint64 wrappedExtent[2],
 	ExtentMapEntry* entry)
@@ -581,7 +547,8 @@ Inode::GetNodefromTree(uint16& levelsInTree, Volume* volume,
 			return B_IO_ERROR;
 		}
 		LongBlock* curLongBlock = (LongBlock*)node;
-		if (!VerifyBlockHeader(curLongBlock, node)) {
+		if (!VerifyHeader<LongBlock>(curLongBlock, node, this,
+				0, NULL, XFS_BTREE)) {
 			TRACE("Invalid Long Block");
 			return B_BAD_VALUE;
 		}
@@ -613,9 +580,6 @@ Inode::ReadExtentsFromTreeInode()
 	memcpy((void*)root,
 		DIR_DFORK_PTR(Buffer(), CoreInodeSize()), sizeof(BlockInDataFork));
 
-	size_t maxRecords = MaxRecordsPossibleInTreeRoot();
-	TRACE("Maxrecords: (%" B_PRIuSIZE ")\n", maxRecords);
-
 	uint16 levelsInTree = root->Levels();
 	delete root;
 
@@ -639,7 +603,8 @@ Inode::ReadExtentsFromTreeInode()
 	while (1) {
 		// Run till you have leaf blocks to checkout
 		char* leafBuffer = block;
-		if (!VerifyBlockHeader((LongBlock*)leafBuffer, leafBuffer)) {
+		if (!VerifyHeader<LongBlock>((LongBlock*)leafBuffer, leafBuffer, this,
+				0, NULL, XFS_BTREE)) {
 			TRACE("Invalid Long Block");
 			return B_BAD_VALUE;
 		}
@@ -746,6 +711,17 @@ Inode::ReadAt(off_t pos, uint8* buffer, size_t* length)
 		// As long as you can read full blocks, read.
 		lengthLeftInFile = Size() - pos;
 		lengthLeftInBlock = lengthOfBlock - offsetIntoBlock;
+
+		/*
+			We will read file in blocks of size 4096 bytes, if that
+			is not possible we will read file of remaining bytes.
+			This meathod will change when we will add file cache for xfs.
+		*/
+		if(lengthLeftInFile >= 4096) {
+			*length = 4096;
+		} else {
+			*length = lengthLeftInFile;
+		}
 
 		// We could be almost at the end of the file
 		if (lengthLeftInFile <= lengthLeftInBlock)
