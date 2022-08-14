@@ -428,10 +428,12 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 		if (bitmapResult == B_OK) {
 			if (bitmapRef.IsSet()) {
 				const BBitmap* bitmap = bitmapRef->Bitmap(BITMAP_SIZE_16);
-				parent->SetDrawingMode(B_OP_ALPHA);
-				BRect viewRect(x, y, x + 15, y + 15);
-				parent->DrawBitmap(bitmap, bitmap->Bounds(), viewRect);
-				parent->SetDrawingMode(B_OP_OVER);
+				if (bitmap != NULL && bitmap->IsValid()) {
+					parent->SetDrawingMode(B_OP_ALPHA);
+					BRect viewRect(x, y, x + 15, y + 15);
+					parent->DrawBitmap(bitmap, bitmap->Bounds(), viewRect);
+					parent->SetDrawingMode(B_OP_OVER);
+				}
 			}
 		}
 
