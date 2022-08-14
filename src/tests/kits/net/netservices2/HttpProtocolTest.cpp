@@ -36,6 +36,10 @@ using BPrivate::Network::parse_http_time;
 
 using namespace std::literals;
 
+// Logger settings
+constexpr bool LOG_ENABLED = true;
+constexpr bool LOG_TO_CONSOLE = false;
+
 
 HttpProtocolTest::HttpProtocolTest()
 {
@@ -400,6 +404,17 @@ HttpIntegrationTest::HttpIntegrationTest(TestServerMode mode)
 {
 	// increase number of concurrent connections to 4 (from 2)
 	fSession.SetMaxConnectionsPerHost(4);
+
+	if constexpr (LOG_ENABLED) {
+		fLogger = new HttpDebugLogger();
+		fLogger->SetConsoleLogging(LOG_TO_CONSOLE);
+		if (mode == TestServerMode::Http)
+			fLogger->SetFileLogging("http-messages.log");
+		else
+			fLogger->SetFileLogging("https-messages.log");
+		fLogger->Run();
+		fLoggerMessenger.SetTo(fLogger);
+	}
 }
 
 
@@ -410,6 +425,16 @@ HttpIntegrationTest::setUp()
 		"Starting up test server",
 		B_OK,
 		fTestServer.Start());
+}
+
+
+void
+HttpIntegrationTest::tearDown()
+{
+	if (fLogger) {
+		fLogger->Lock();
+		fLogger->Quit();
+	}
 }
 
 
@@ -485,7 +510,7 @@ HttpIntegrationTest::HostAndNetworkFailTest()
 	{
 		// FIXME: find a better way to get an unused local port, instead of hardcoding one
 		auto request = BHttpRequest(BUrl("http://localhost:59445/"));
-		auto result = fSession.Execute(std::move(request));
+		auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 		try {
 			result.Status();
 			CPPUNIT_FAIL("Expecting exception when trying to connect to invalid hostname");
@@ -520,7 +545,7 @@ void
 HttpIntegrationTest::GetTest()
 {
 	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/"));
-	auto result = fSession.Execute(std::move(request));
+	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	try {
 		auto receivedFields = result.Fields();
 
@@ -546,7 +571,7 @@ HttpIntegrationTest::HeadTest()
 {
 	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/"));
 	request.SetMethod(BHttpMethod::Head);
-	auto result = fSession.Execute(std::move(request));
+	auto result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
 	try {
 		auto receivedFields = result.Fields();
 		CPPUNIT_ASSERT_EQUAL_MESSAGE("Mismatch in number of headers",
@@ -577,7 +602,7 @@ void
 HttpIntegrationTest::NoContentTest()
 {
 	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/204"));
-	auto result = fSession.Execute(std::move(request));
+	auto result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
 	try {
 		auto receivedStatus = result.Status();
 		CPPUNIT_ASSERT_EQUAL(204, receivedStatus.code);
@@ -605,7 +630,7 @@ void
 HttpIntegrationTest::AutoRedirectTest()
 {
 	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/302"));
-	auto result = fSession.Execute(std::move(request));
+	auto result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
 	try {
 		auto receivedFields = result.Fields();
 
@@ -632,14 +657,14 @@ HttpIntegrationTest::BasicAuthTest()
 	// Basic Authentication
 	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/auth/basic/walter/secret"));
 	request.SetAuthentication({"walter", "secret"});
-	auto result = fSession.Execute(std::move(request));
+	auto result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
 	CPPUNIT_ASSERT(result.Status().code == 200);
 
 	// Basic Authentication with incorrect credentials
 	try {
 	request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/auth/basic/walter/secret"));
 	request.SetAuthentication({"invaliduser", "invalidpassword"});
-	result = fSession.Execute(std::move(request));
+	result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
 	CPPUNIT_ASSERT(result.Status().code == 401);
 	} catch (const BPrivate::Network::BError& e) {
 		CPPUNIT_FAIL(e.DebugMessage().String());
@@ -653,7 +678,7 @@ HttpIntegrationTest::StopOnErrorTest()
 	// Test the Stop on Error functionality
 	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/400"));
 	request.SetStopOnError(true);
-	auto result = fSession.Execute(std::move(request));
+	auto result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
 	CPPUNIT_ASSERT(result.Status().code == 400);
 	CPPUNIT_ASSERT(result.Fields().CountFields() == 0);
 	CPPUNIT_ASSERT(result.Body().text.Length() == 0);
@@ -668,7 +693,7 @@ HttpIntegrationTest::RequestCancelTest()
 	//       processed. In practise, the cancellation always comes first. When the server
 	//       supports a wait parameter, then this test can be made more robust.
 	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/"));
-	auto result = fSession.Execute(std::move(request));
+	auto result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
 	fSession.Cancel(result);
 	try {
 		result.Body();
@@ -745,6 +770,13 @@ HttpIntegrationTest::PostTest()
 	usleep(2000); // give some time to catch up on receiving all messages
 
 	observer->Lock();
+	while (observer->IsMessageWaiting())
+	{
+		observer->Unlock();
+		usleep(1000); // give some time to catch up on receiving all messages
+		observer->Lock();
+	}
+
 	// Assert that the messages have the right contents.
 	CPPUNIT_ASSERT_MESSAGE("Expected at least 8 observer messages for this request.",
 		observer->messages.size() >= 8);

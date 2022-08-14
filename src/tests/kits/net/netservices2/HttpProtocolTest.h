@@ -11,6 +11,7 @@
 #include <TestSuite.h>
 #include <tools/cppunit/ThreadedTestCase.h>
 
+#include "HttpDebugLogger.h"
 #include "TestServer.h"
 
 using BPrivate::Network::BHttpSession;
@@ -35,7 +36,7 @@ public:
 					HttpIntegrationTest(TestServerMode mode);
 
 	virtual	void		setUp() override;
-
+	virtual void		tearDown() override;
 
 			void	HostAndNetworkFailTest();
 			void	GetTest();
@@ -50,8 +51,10 @@ public:
 	static	void	AddTests(BTestSuite& suite);
 
 private:
-			TestServer		fTestServer;
-			BHttpSession	fSession;
+			TestServer			fTestServer;
+			BHttpSession		fSession;
+			HttpDebugLogger*	fLogger;
+			BMessenger			fLoggerMessenger;
 };
 
 #endif
