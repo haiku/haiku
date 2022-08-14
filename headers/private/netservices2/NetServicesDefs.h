@@ -105,6 +105,12 @@ namespace UrlEventData {
 	extern const char* Success;
 	extern const char* DebugType;
 	extern const char* DebugMessage;
+
+	enum {
+		DebugInfo = '_DBI',
+		DebugWarning = '_DBW',
+		DebugError = '_DBE'
+	};
 }
 
 }

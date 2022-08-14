@@ -678,7 +678,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 			</td>
 		</tr>
 		<tr>
-			<td>\ref BPrivate::Network::UrlEvent::HttpRedirect "UrlEvent::HttpRedirect</td>
+			<td>\ref BPrivate::Network::UrlEvent::HttpRedirect "UrlEvent::HttpRedirect"</td>
 			<td>
 				The network services kit is handling a HTTP redirect. The request will be repeated
 				for a new URL.
@@ -768,7 +768,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 			<td>
 				\ref BPrivate::Network::UrlEventData::Id "UrlEventData::Id" \c int32 <br/>
 				\ref BPrivate::Network::UrlEventData::DebugType "UrlEventData::DebugType"
-					\c int32 <br/>
+					\c uint32 <br/>
 				\ref BPrivate::Network::UrlEventData::DebugMessage "UrlEventData::DebugMessage"
 					\ref BString
 			</td>

@@ -410,7 +410,10 @@ namespace Network {
 
 /*!
 	\var const char* UrlEventData::DebugType
-	\brief An \c int32 representing a debug type constant.
+	\brief An \c uint32 representing a debug type constant.
+
+	The value is one of \ref UrlEventData::DebugError, \ref UrlEventData::DebugWarning or
+	\ref UrlEventData::DebugInfo.
 
 	\since Haiku R1
 */
@@ -419,6 +422,31 @@ namespace Network {
 /*!
 	\var const char* UrlEventData::DebugMessage
 	\brief A \ref BString that contains the debug message.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEventData::DebugInfo
+	\brief Value for \ref UrlEventData::DebugType indicating that the message is an info messsage.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEventData::DebugWarning
+	\brief Value for \ref UrlEventData::DebugType indicating that the message is a warning
+		messsage.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEventData::DebugError
+	\brief Value for \ref UrlEventData::DebugType indicating that the message is an error messsage.
 
 	\since Haiku R1
 */

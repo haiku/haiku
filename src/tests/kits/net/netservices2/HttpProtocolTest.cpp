@@ -786,6 +786,11 @@ HttpIntegrationTest::PostTest()
 		auto id = observer->messages[0].GetInt32(BPrivate::Network::UrlEventData::Id, -1);
 		CPPUNIT_ASSERT_EQUAL_MESSAGE("message Id does not match", result.Identity(), id);
 
+		if (message.what == BPrivate::Network::UrlEvent::DebugMessage) {
+			// ignore debug messages
+			continue;
+		}
+
 		switch(previousMessage) {
 			case 0:
 				CPPUNIT_ASSERT_MESSAGE("message should be HostNameResolved",

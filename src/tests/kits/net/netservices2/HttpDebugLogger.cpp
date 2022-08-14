@@ -113,8 +113,7 @@ HttpDebugLogger::MessageReceived(BMessage* message)
 	}
 	case UrlEvent::RequestCompleted:
 	{
-		bool success = false;
-		message->FindBool(UrlEventData::Success, &success);
+		bool success = message->GetBool(UrlEventData::Success, false);
 		output << "<RequestCompleted> success: ";
 		if (success)
 			output << "true";
@@ -124,7 +123,25 @@ HttpDebugLogger::MessageReceived(BMessage* message)
 	}
 	case UrlEvent::DebugMessage:
 	{
-		output << "UrlEvent::DebugMessage";
+		uint32 debugType = message->GetUInt32(UrlEventData::DebugType, 0);
+		BString debugMessage;
+		message->FindString(UrlEventData::DebugMessage, &debugMessage);
+		output << "<DebugMessage> ";
+		switch (debugType) {
+			case UrlEventData::DebugInfo:
+				output << "INFO: ";
+				break;
+			case UrlEventData::DebugWarning:
+				output << "WARNING: ";
+				break;
+			case UrlEventData::DebugError:
+				output << "ERROR: ";
+				break;
+			default:
+				output << "UNKNOWN: ";
+				break;
+		}
+		output << debugMessage;
 		break;
 	}
 	default:

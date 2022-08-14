@@ -244,11 +244,10 @@ BHttpSession::Impl::Execute(BHttpRequest&& request, std::unique_ptr<BDataIO> tar
 	return retval;
 }
 
-#include <iostream>
+
 void
 BHttpSession::Impl::Cancel(int32 identifier)
 {
-	std::cout << "BHttpSession::Impl::Cancel for " << identifier << std::endl;
 	auto lock = AutoLocker<BLocker>(fLock);
 	// Check if the item is on the control queue
 	fControlQueue.remove_if([&identifier](auto& request){
@@ -313,14 +312,11 @@ BHttpSession::Impl::ControlThreadFunc(void* arg)
 			continue;
 
 		for (auto& request: requests) {
-			std::cout << "ControlThreadFunc(): processing request " << request.Id() << std::endl;
-
 			bool hasError = false;
 			try {
 				request.ResolveHostName();
 				request.OpenConnection();
 			} catch (...) {
-				std::cout << "ControlThreadFunc()[" << request.Id() << "] error resolving/connecting" << std::endl;
 				request.SetError(std::current_exception());
 				hasError = true;
 			}
@@ -347,7 +343,6 @@ BHttpSession::Impl::ControlThreadFunc(void* arg)
 		wait_for_thread(impl->fDataThread, &threadResult);
 		// Cancel all requests
 		for (auto& request: impl->fControlQueue) {
-			std::cout << "ControlThreadFunc()[" << request.Id() << "] canceling request because the session is quitting" << std::endl;
 			try {
 				throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::Canceled);
 			} catch (...) {
@@ -382,7 +377,6 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 			continue;
 		else if (status < 0) {
 			// Something went inexplicably wrong
-			std::cout << "BSystemError wait_for_objects() " << status << std::endl;
 			throw BSystemError("wait_for_objects()", status);
 		}
 
@@ -422,7 +416,6 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 				for (auto it = data->connectionMap.cbegin(); it != data->connectionMap.cend(); it++) {
 					offset++;
 					if (it->second.Id() == id) {
-					std::cout << "DataThreadFunc() [" << id << "] cancelling request" << std::endl;
 						data->objectList[offset].events = EVENT_CANCELLED;
 						break;
 					}
@@ -442,12 +435,10 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 				continue;
 			if ((item.events & B_EVENT_WRITE) == B_EVENT_WRITE) {
 				auto& request = data->connectionMap.find(item.object)->second;
-				std::cout << "DataThreadFunc() [" << request.Id() << "] ready for sending the request" << std::endl;
 				auto error = false;
 				try {
 					request.TransferRequest();
 				} catch (...) {
-					std::cout << "DataThreadFunc() [" << request.Id() << "] error sending the request" << std::endl;
 					request.SetError(std::current_exception());
 					error = true;
 				}
@@ -462,7 +453,6 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 				}
 			} else if ((item.events & B_EVENT_READ) == B_EVENT_READ) {
 				auto& request = data->connectionMap.find(item.object)->second;
-				std::cout << "DataThreadFunc() [" << request.Id() << "] ready for receiving the response" << std::endl;
 				auto finished = false;
 				try {
 					if (request.CanCancel())
@@ -471,8 +461,6 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 						finished = request.ReceiveResult();
 				} catch (const Redirect& r) {
 					// Request is redirected, send back to the controlThread
-					std::cout << "DataThreadFunc() [" << request.Id() << "] will be redirected to " << r.url.UrlString().String() << std::endl;
-
 					// Move existing request into a new request and hand over to the control queue
 					auto lock = AutoLocker<BLocker>(data->fLock);
 					data->fControlQueue.emplace_back(request, r);
@@ -519,31 +507,29 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 			} else {
 				// Likely to be B_EVENT_INVALID. This should not happen
 				auto& request = data->connectionMap.find(item.object)->second;
-				std::cout << "DataThreadFunc() [" << request.Id() << "] other event " << item.events << std::endl;
-				throw BRuntimeError(__PRETTY_FUNCTION__, "Socket was deleted at an unexpected time");
+				request.SendMessage(UrlEvent::DebugMessage, [](BMessage& msg){
+					msg.AddUInt32(UrlEventData::DebugType, UrlEventData::DebugError);
+					msg.AddString(UrlEventData::DebugMessage, "Unexpected event; socket deleted?");
+				});
+				throw BRuntimeError(__PRETTY_FUNCTION__,
+					"Socket was deleted at an unexpected time");
 			}
 		}
 
 		// Reset objectList
 		data->objectList[0].events = B_EVENT_ACQUIRE_SEMAPHORE;
-		if (resizeObjectList) {
-			std::cout << "DataThreadFunc() resizing objectlist to " << data->connectionMap.size() + 1 << std::endl;
+		if (resizeObjectList)
 			data->objectList.resize(data->connectionMap.size() + 1);
-		}
+
 		auto i = 1;
 		for (auto it = data->connectionMap.cbegin(); it != data->connectionMap.cend(); it++) {
 			data->objectList[i].object = it->first;
-			if (it->second.State() == Request::InitialState) {
-				std::cout << "DataThreadFunc() [" << it->second.Id() << "] in Request::InitialState" << std::endl;
+			if (it->second.State() == Request::InitialState)
 				throw BRuntimeError(__PRETTY_FUNCTION__, "Invalid state of request");
-			}
-			else if (it->second.State() == Request::Connected) {
+			else if (it->second.State() == Request::Connected)
 				data->objectList[i].events = B_EVENT_WRITE | B_EVENT_DISCONNECTED;
-				std::cout << "DataThreadFunc() [ " << it->second.Id() << "] wait for B_EVENT_WRITE" << std::endl;
-			} else {
-				std::cout << "DataThreadFunc() [ " << it->second.Id() << "] wait for B_EVENT_READ" << std::endl;
+			else
 				data->objectList[i].events = B_EVENT_READ | B_EVENT_DISCONNECTED;
-			}
 			i++;
 		}
 	}
@@ -552,14 +538,12 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 		// Cancel all requests
 		for (auto it = data->connectionMap.begin(); it != data->connectionMap.end(); it++) {
 			try {
-				std::cout << "DataThreadFunc() [ " << it->second.Id() << "] canceling request because we are quitting" << std::endl;
 				throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::Canceled);
 			} catch (...) {
 				it->second.SetError(std::current_exception());
 			}
 	 	}
 	} else {
-		std::cout << "DataThreadFunc(): Unknown reason that the dataQueueSem is deleted" << std::endl;
 		throw BRuntimeError(__PRETTY_FUNCTION__,
 			"Unknown reason that the dataQueueSem is deleted");
 	}
@@ -578,7 +562,6 @@ std::vector<BHttpSession::Request>
 BHttpSession::Impl::GetRequestsForControlThread()
 {
 	std::vector<BHttpSession::Request> requests;
-	std::cout << __PRETTY_FUNCTION__ << ": number of items in fConnectionCount: " << fConnectionCount.size() << std::endl;
 
 	// Clean up connection list if it is at the max number of hosts
 	if (fConnectionCount.size() >= fMaxHosts.load()) {
@@ -597,10 +580,13 @@ BHttpSession::Impl::GetRequestsForControlThread()
 		auto host = request.GetHost();
 		auto it = fConnectionCount.find(host);
 		if (it != fConnectionCount.end()) {
-			std::cout << __PRETTY_FUNCTION__ << ": found connnections for host, count: " << it->second << std::endl;
 			if (static_cast<size_t>(atomic_get(std::addressof(it->second)))
 					>= fMaxConnectionsPerHost.load(std::memory_order_relaxed)) {
-				std::cout << "\tskip loading this request as max connections per host is reached" << std::endl;
+				request.SendMessage(UrlEvent::DebugMessage, [](BMessage& msg){
+					msg.AddUInt32(UrlEventData::DebugType, UrlEventData::DebugWarning);
+					msg.AddString(UrlEventData::DebugMessage,
+						"Request is queued: too many active connections for host");
+				});
 				return false;
 			} else {
 				atomic_add(std::addressof(it->second), 1);
@@ -608,7 +594,11 @@ BHttpSession::Impl::GetRequestsForControlThread()
 			}
 		} else {
 			if (fConnectionCount.size() == fMaxHosts.load()) {
-				std::cout << "\tskip loading this request as max hosts is reached" << std::endl;
+				request.SendMessage(UrlEvent::DebugMessage, [](BMessage& msg){
+					msg.AddUInt32(UrlEventData::DebugType, UrlEventData::DebugWarning);
+					msg.AddString(UrlEventData::DebugMessage,
+						"Request is queued: maximum number of concurrent hosts");
+				});
 				return false;
 			}
 			auto[newIt, success] = fConnectionCount.insert({host, 1});
@@ -728,6 +718,18 @@ void
 BHttpSession::Request::SetError(std::exception_ptr e)
 {
 	fResult->SetError(e);
+	SendMessage(UrlEvent::DebugMessage, [&e](BMessage& msg){
+		msg.AddUInt32(UrlEventData::DebugType, UrlEventData::DebugError);
+		try {
+			std::rethrow_exception(e);
+		} catch (BError& error) {
+			msg.AddString(UrlEventData::DebugMessage, error.DebugMessage());
+		} catch (std::exception& error) {
+			msg.AddString(UrlEventData::DebugMessage, error.what());
+		} catch (...) {
+			msg.AddString(UrlEventData::DebugMessage, "Unknown exception");
+		}
+	});
 	SendMessage(UrlEvent::RequestCompleted, [](BMessage& msg){
 		msg.AddBool(UrlEventData::Success, false);
 	});
@@ -819,8 +821,6 @@ BHttpSession::Request::OpenConnection()
 void
 BHttpSession::Request::TransferRequest()
 {
-	std::cout << "TransferRequest() [" << Id() << "] Starting sending of request" << std::endl;
-
 	// Assert that we are in the right state
 	if (fRequestStatus != Connected)
 		throw BRuntimeError(__PRETTY_FUNCTION__,
@@ -841,10 +841,6 @@ BHttpSession::Request::TransferRequest()
 
 	if (fSerializer.Complete())
 		fRequestStatus = RequestSent;
-
-	std::cout << "TransferRequest() [" << Id() << "] currentBytesWritten: " << currentBytesWritten << " totalBytesWritten: " <<
-		fSerializer.BodyBytesTransferred() << " totalSize: " << fSerializer.BodyBytesTotal().value_or(0) << " complete: "
-		<< fSerializer.Complete() << std::endl;
 }
 
 
@@ -859,11 +855,8 @@ BHttpSession::Request::ReceiveResult()
 	// First: stream data from the socket
 	auto bytesRead = fBuffer.ReadFrom(fSocket.get());
 
-	if (bytesRead == B_WOULD_BLOCK || bytesRead == B_INTERRUPTED) {
+	if (bytesRead == B_WOULD_BLOCK || bytesRead == B_INTERRUPTED)
 		return false;
-	}
-
-	std::cout << "ReceiveResult() [" << Id() << "] read " << bytesRead << " from socket" << std::endl;
 
 	// Parse the content in the buffer
 	switch (fRequestStatus) {
@@ -954,7 +947,6 @@ BHttpSession::Request::ReceiveResult()
 			case BHttpStatusCode::TemporaryRedirect:
 			case BHttpStatusCode::PermanentRedirect:
 			{
-				std::cout << "ReceiveResult() [" << Id() << "] Handle redirect with status: " << fStatus.code << std::endl;
 				auto locationField = fFields.FindField("Location");
 				if (locationField == fFields.end()) {
 					throw BNetworkRequestError(__PRETTY_FUNCTION__,
@@ -996,7 +988,6 @@ BHttpSession::Request::ReceiveResult()
 
 		if (!fParser.HasContent()) {
 			// Any requests with not content are finished
-			std::cout << "ReceiveResult() [" << Id() << "] Request is completing without content" << std::endl;
 			fResult->SetBody();
 			SendMessage(UrlEvent::RequestCompleted, [](BMessage& msg) {
 				msg.AddBool(UrlEventData::Success, true);
@@ -1016,9 +1007,6 @@ BHttpSession::Request::ReceiveResult()
 			return bytesWrittenToBody;
 		});
 
-		std::cout << "ReceiveResult() [" << Id() << "] body bytes current read/total received/total expected: " << 
-			bytesRead << "/" << fParser.BodyBytesTransferred() << "/" << fParser.BodyBytesTotal().value_or(0) << std::endl;
-
 		SendMessage(UrlEvent::DownloadProgress, [this, bytesRead](BMessage& msg) {
 			msg.AddInt64(UrlEventData::NumBytes, bytesRead);
 			if (fParser.BodyBytesTotal())
@@ -1032,7 +1020,6 @@ BHttpSession::Request::ReceiveResult()
 		}
 
 		if (fParser.Complete()) {
-			std::cout << "ReceiveResult() [" << Id() << "] received all body bytes: " << fParser.BodyBytesTransferred() << std::endl;
 			fResult->SetBody();
 			SendMessage(UrlEvent::RequestCompleted, [](BMessage& msg) {
 				msg.AddBool(UrlEventData::Success, true);
