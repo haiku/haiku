@@ -476,6 +476,9 @@ BHttpRequest::SerializeHeaderTo(HttpBuffer& buffer) const
 	else
 		buffer << "/"sv;
 
+	if (fData->url.HasRequest())
+		buffer << "?"sv << Url().Request().String();
+
 	// TODO: switch between HTTP 1.0 and 1.1 based on configuration
 	buffer << " HTTP/1.1\r\n"sv;
 
