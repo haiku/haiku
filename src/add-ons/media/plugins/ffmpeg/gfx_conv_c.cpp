@@ -17,15 +17,15 @@ gfx_conv_yuv410p_ycbcr422_c(AVFrame *in, AVFrame *out, int width, int height)
 	int i;
 //	bool toggle=false;
 	unsigned long *po_eol;
-	register unsigned long *p;
-	register unsigned long y1;
-	register unsigned long y2;
-	register unsigned short u;
-	register unsigned short v;
-	register unsigned long a;
-	register unsigned long b;
-	register unsigned long c;
-	register unsigned long d;
+	unsigned long *p;
+	unsigned long y1;
+	unsigned long y2;
+	unsigned short u;
+	unsigned short v;
+	unsigned long a;
+	unsigned long b;
+	unsigned long c;
+	unsigned long d;
 //	printf("[%ld, %ld, %ld] -> [%ld, %ld, %ld]\n", in->linesize[0],
 //		in->linesize[1], in->linesize[2], out->linesize[0], out->linesize[1],
 //		out->linesize[2]);
@@ -87,15 +87,15 @@ void
 gfx_conv_yuv420p_ycbcr422_c(AVFrame *in, AVFrame *out, int width, int height)
 {
 	unsigned long *po_eol;
-	register unsigned long *p;
-	register unsigned long y1;
-	register unsigned long y2;
-	register unsigned long u;
-	register unsigned long v;
-	register unsigned long a;
-	register unsigned long b;
-	register unsigned long c;
-	register unsigned long d;
+	unsigned long *p;
+	unsigned long y1;
+	unsigned long y2;
+	unsigned long u;
+	unsigned long v;
+	unsigned long a;
+	unsigned long b;
+	unsigned long c;
+	unsigned long d;
 //	printf("[%ld, %ld, %ld] -> [%ld, %ld, %ld]\n", in->linesize[0],
 //		in->linesize[1], in->linesize[2], out->linesize[0], out->linesize[1],
 //		out->linesize[2]);

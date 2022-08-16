@@ -71,8 +71,8 @@ static inline void
 attach(OCTET *y, const OCTET *x, const uint32 anyA, const uint32 anyB,
 	const uint32 oddC, const uint32 oddD)
 {
-	register OCTET _x;
-	register OCTET _y;
+	OCTET _x;
+	OCTET _y;
 
 	_x.D[0] = x->D[0];
 	_x.D[1] = x->D[1];
@@ -95,8 +95,8 @@ static inline void
 detach(OCTET *y, const OCTET *x, const uint32 sameA, const uint32 sameB,
 	const uint32 invoddC, const uint32 invoddD)
 {
-	register OCTET _x;
-	register OCTET _y;
+	OCTET _x;
+	OCTET _y;
 
 	_x.D[0] = x->D[0];
 	_x.D[1] = x->D[1];
