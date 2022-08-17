@@ -16,6 +16,7 @@
 
 #include <ACPI.h> // module
 #include <acpi.h>
+#include <drivers/bus/FDT.h>
 
 #include "acpi_irq_routing_table.h"
 
@@ -119,6 +120,79 @@ pci_controller_init(void)
 	const char *bus;
 	if (gDeviceManager->get_attr_string(parent.Get(), B_DEVICE_BUS, &bus, false) < B_OK)
 		return B_ERROR;
+
+	if (strcmp(bus, "fdt") == 0) {
+		dprintf("initialize PCI controller from FDT\n");
+
+		status_t res;
+		fdt_device_module_info* parentModule;
+		fdt_device* parentDev;
+
+		res = gDeviceManager->get_driver(parent.Get(),
+			(driver_module_info**)&parentModule, (void**)&parentDev);
+		if (res != B_OK) {
+			dprintf("can't get parent node driver\n");
+			return B_ERROR;
+		}
+
+		uint64 configRegs = 0;
+		uint64 configRegsLen = 0;
+
+		parentModule->get_reg(parentDev, 0, &configRegs, &configRegsLen);
+		dprintf("  configRegs: (0x%" B_PRIx64 ", 0x%" B_PRIx64 ")\n",
+			configRegs, configRegsLen);
+
+		area_id area = map_physical_memory("pci config",
+			configRegs, configRegsLen, B_ANY_KERNEL_ADDRESS,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&gPCIeBase);
+
+		if (area < 0)
+			return B_ERROR;
+
+		sRanges = new Vector<PciRange>();
+		int rangesLen;
+		const void* rangesAddr = parentModule->get_prop(parentDev, "ranges",
+			&rangesLen);
+		if (rangesAddr == NULL) {
+			dprintf("  ranges property not found\n");
+			return B_ERROR;
+		}
+
+		for (uint32_t *it = (uint32_t*)rangesAddr;
+				(uint8_t*)it - (uint8_t*)rangesAddr < rangesLen; it += 7) {
+			uint32_t kind = B_BENDIAN_TO_HOST_INT32(*(it + 0));
+			uint64_t childAddr = B_BENDIAN_TO_HOST_INT64(*(uint64_t*)(it + 1));
+			uint64_t parentAddr = B_BENDIAN_TO_HOST_INT64(*(uint64_t*)(it + 3));
+			uint64_t len = B_BENDIAN_TO_HOST_INT64(*(uint64_t*)(it + 5));
+
+			PciRange range;
+			range.type = ((kind & 0x03000000) == 0x01000000) ? RANGE_IO : RANGE_MEM;
+			range.hostAddr = parentAddr;
+			range.pciAddr = childAddr;
+			range.length = len;
+			sRanges->PushBack(range);
+
+			if ((kind & 0x03000000) != 0x01000000)
+				continue;
+
+			dprintf(" (0x%08" B_PRIx32 "): ", kind);
+			dprintf("child: %08" B_PRIx64, childAddr);
+			dprintf(", parent: %08" B_PRIx64, parentAddr);
+			dprintf(", len: %" B_PRIx64 "\n", len);
+
+			area_id area = map_physical_memory("pci io",
+				parentAddr, len, B_ANY_KERNEL_ADDRESS,
+				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&gPCIioBase);
+
+			if (area < 0)
+				return B_ERROR;
+		}
+
+		gStartBusNumber = 0;
+		gEndBusNumber = 0xff;
+
+		return pci_controller_add(&pci_controller_ecam, NULL);
+	}
 
 	if (strcmp(bus, "acpi") == 0) {
 		dprintf("initialize PCI controller from ACPI\n");

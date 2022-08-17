@@ -43,6 +43,15 @@ pci_root_supports_device(device_node* parent)
 		}
 	}
 #elif defined(__aarch64__)
+	if (strcmp(bus, "fdt") == 0) {
+		const char* compatible;
+		if (gDeviceManager->get_attr_string(parent, "fdt/compatible", &compatible, false) < B_OK)
+			return -1.0f;
+
+		if (strcmp(compatible, "pci-host-ecam-generic") == 0)
+			return 1.0f;
+	}
+
 	if (strcmp(bus, "acpi") == 0) {
 		const char* hid;
 		if (gDeviceManager->get_attr_string(parent, ACPI_DEVICE_HID_ITEM, &hid, false) < B_OK)
