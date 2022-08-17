@@ -42,7 +42,7 @@ pci_root_supports_device(device_node* parent)
 			return 1.0f;
 		}
 	}
-#elif defined(__aarch64__)
+#elif defined(__arm__) || defined(__aarch64__)
 	if (strcmp(bus, "fdt") == 0) {
 		const char* compatible;
 		if (gDeviceManager->get_attr_string(parent, "fdt/compatible", &compatible, false) < B_OK)

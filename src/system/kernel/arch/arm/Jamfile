@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src system kernel arch arm ;
 
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica include ;
 SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 UsePrivateKernelHeaders ;
 
@@ -8,6 +9,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 32bit ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 KernelMergeObject kernel_arch_arm.o :
+	acpi_irq_routing_table.cpp
 	arch_commpage.cpp
 	arch_cpu.cpp
 	arch_debug_console.cpp
