@@ -13,6 +13,7 @@
 #include <AutoDeleterDrivers.h>
 
 #include "pci_private.h"
+#include "pci.h"
 
 #include <ACPI.h> // module
 #include <acpi.h>
@@ -275,35 +276,108 @@ pci_controller_init(void)
 }
 
 
+static void
+pci_controller_finalize_interrupts(fdt_device_module_info* fdtModule, struct fdt_interrupt_map* interruptMap,
+	int bus, int device, int function)
+{
+	uint32 childAddr = ((bus & 0xff) << 16) | ((device & 0x1f) << 11) | ((function & 0x07) << 8);
+	uint32 interruptPin = pci_read_config(bus, device, function, PCI_interrupt_pin, 1);
+
+	if (interruptPin == 0xffffffff) {
+		dprintf("Error: Unable to read interrupt pin!\n");
+		return;
+	}
+
+	uint32 irq = fdtModule->lookup_interrupt_map(interruptMap, childAddr, interruptPin);
+	if (irq == 0xffffffff) {
+		dprintf("no interrupt mapping for childAddr: (%d:%d:%d), childIrq: %d)\n",
+			bus, device, function, interruptPin);
+	} else {
+		dprintf("configure interrupt (%d,%d,%d) --> %d\n",
+			bus, device, function, irq);
+		pci_update_interrupt_line(bus, device, function, irq);
+	}
+}
+
+
 status_t
 pci_controller_finalize(void)
 {
-	status_t res;
+	DeviceNodePutter<&gDeviceManager>
+		parent(gDeviceManager->get_parent_node(gPCIRootNode));
 
-	acpi_module_info *acpiModule;
-	res = get_module(B_ACPI_MODULE_NAME, (module_info**)&acpiModule);
-	if (res != B_OK)
+	if (parent.Get() == NULL)
 		return B_ERROR;
 
-	IRQRoutingTable table;
-	res = prepare_irq_routing(acpiModule, table, &is_interrupt_available);
-	if (res != B_OK) {
-		dprintf("PCI: irq routing preparation failed\n");
+	const char* bus;
+	if (gDeviceManager->get_attr_string(parent.Get(), B_DEVICE_BUS, &bus, false) < B_OK)
 		return B_ERROR;
+
+	if (strcmp(bus, "fdt") == 0) {
+		dprintf("finalize PCI controller from FDT\n");
+
+		status_t res;
+		fdt_device_module_info* parentModule;
+		fdt_device* parentDev;
+
+		res = gDeviceManager->get_driver(parent.Get(),
+			(driver_module_info**)&parentModule, (void**)&parentDev);
+		if (res != B_OK) {
+			dprintf("can't get parent node driver\n");
+			return B_ERROR;
+		}
+
+		struct fdt_interrupt_map* interruptMap = parentModule->get_interrupt_map(parentDev);
+		parentModule->print_interrupt_map(interruptMap);
+
+		for (int bus = 0; bus < 8; bus++) {
+			for (int device = 0; device < 32; device++) {
+				uint32 vendorID = pci_read_config(bus, device, 0, PCI_vendor_id, 2);
+				if ((vendorID != 0xffffffff) && (vendorID != 0xffff)) {
+					uint32 headerType = pci_read_config(bus, device, 0, PCI_header_type, 1);
+					if ((headerType & 0x80) != 0) {
+						for (int function = 0; function < 8; function++) {
+							pci_controller_finalize_interrupts(parentModule, interruptMap, bus, device, function);
+						}
+					} else {
+						pci_controller_finalize_interrupts(parentModule, interruptMap, bus, device, 0);
+					}
+				}
+			}
+		}
+
+		return B_OK;
 	}
 
-	for (Vector<irq_routing_entry>::Iterator it = table.Begin(); it != table.End(); it++)
-		reserve_io_interrupt_vectors(1, it->irq, INTERRUPT_TYPE_IRQ);
+	if (strcmp(bus, "acpi") == 0) {
+		dprintf("finalize PCI controller from ACPI\n");
 
-	res = enable_irq_routing(acpiModule, table);
-	if (res != B_OK) {
-		dprintf("PCI: irq routing failed\n");
-		return B_ERROR;
+		status_t res;
+
+		acpi_module_info *acpiModule;
+		res = get_module(B_ACPI_MODULE_NAME, (module_info**)&acpiModule);
+		if (res != B_OK)
+			return B_ERROR;
+
+		IRQRoutingTable table;
+		res = prepare_irq_routing(acpiModule, table, &is_interrupt_available);
+		if (res != B_OK) {
+			dprintf("PCI: irq routing preparation failed\n");
+			return B_ERROR;
+		}
+
+		res = enable_irq_routing(acpiModule, table);
+		if (res != B_OK) {
+			dprintf("PCI: irq routing failed\n");
+			return B_ERROR;
+		}
+
+		print_irq_routing_table(table);
+
+		return B_OK;
 	}
 
-	print_irq_routing_table(table);
-
-	return B_OK;
+	return B_ERROR;
 }
 
 
