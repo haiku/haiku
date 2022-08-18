@@ -14,6 +14,7 @@ SimpleTest calloc_test : calloc_test.c ;
 SimpleTest <test>chmod : chmod.cpp ;
 SimpleTest clearenv : clearenv.cpp ;
 SimpleTest dirent_test : dirent_test.cpp ;
+SimpleTest fifo_test : fifo_test.cpp ;
 SimpleTest flock_test : flock_test.cpp ;
 SimpleTest fseek_test : fseek_test.cpp ;
 SimpleTest getsubopt_test : getsubopt_test.cpp ;
