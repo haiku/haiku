@@ -87,19 +87,19 @@
 #	define FS_CALL(vnode, op, params...) \
 		( HAS_FS_CALL(vnode, op) ? \
 			vnode->ops->op(vnode->mount->volume, vnode, params) \
-			: (panic("FS_CALL op " #op " is NULL"), 0))
+			: (panic("FS_CALL: vnode %p op " #op " is NULL", vnode), 0))
 #	define FS_CALL_NO_PARAMS(vnode, op) \
 		( HAS_FS_CALL(vnode, op) ? \
 			vnode->ops->op(vnode->mount->volume, vnode) \
-			: (panic("FS_CALL_NO_PARAMS op " #op " is NULL"), 0))
+			: (panic("FS_CALL_NO_PARAMS: vnode %p op " #op " is NULL", vnode), 0))
 #	define FS_MOUNT_CALL(mount, op, params...) \
 		( HAS_FS_MOUNT_CALL(mount, op) ? \
 			mount->volume->ops->op(mount->volume, params) \
-			: (panic("FS_MOUNT_CALL op " #op " is NULL"), 0))
+			: (panic("FS_MOUNT_CALL: mount %p op " #op " is NULL", mount), 0))
 #	define FS_MOUNT_CALL_NO_PARAMS(mount, op) \
 		( HAS_FS_MOUNT_CALL(mount, op) ? \
 			mount->volume->ops->op(mount->volume) \
-			: (panic("FS_MOUNT_CALL_NO_PARAMS op " #op " is NULL"), 0))
+			: (panic("FS_MOUNT_CALL_NO_PARAMS: mount %p op " #op " is NULL", mount), 0))
 #else
 #	define FS_CALL(vnode, op, params...) \
 			vnode->ops->op(vnode->mount->volume, vnode, params)
