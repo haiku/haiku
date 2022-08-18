@@ -33,10 +33,6 @@
 #include <sys/cdefs.h>
 
 
-/*
- * Private header file for the strftime and strptime localization
- * stuff.
- */
 struct lc_time_t {
 	const char* mon[12];
 	const char* month[12];
@@ -52,11 +48,6 @@ struct lc_time_t {
 	const char* md_order;
 	const char* ampm_fmt;
 };
-
-__BEGIN_DECLS
-const struct lc_time_t* __get_current_time_locale(void);
-const struct lc_time_t* __get_time_locale(locale_t);
-__END_DECLS
 
 
 #endif /* !_TIMELOCAL_H_ */

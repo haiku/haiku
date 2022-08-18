@@ -12,6 +12,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			<$(architecture)>posix_musl_regex.o
 			<$(architecture)>posix_musl_search.o
 			<$(architecture)>posix_musl_string.o
+			<$(architecture)>posix_musl_time.o
 			;
 	}
 }
@@ -25,3 +26,4 @@ HaikuSubInclude misc ;
 HaikuSubInclude regex ;
 HaikuSubInclude search ;
 HaikuSubInclude string ;
+HaikuSubInclude time ;

@@ -260,3 +260,13 @@ uselocale(locale_t newLoc)
 
     return oldLoc;
 }
+
+
+extern "C" locale_t
+__current_locale_t()
+{
+	locale_t locale = (locale_t)GetCurrentLocaleInfo();
+	if (locale == NULL)
+		locale = LC_GLOBAL_LOCALE;
+	return locale;
+}
