@@ -5534,6 +5534,9 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 static int
 open_dir_vnode(struct vnode* vnode, bool kernel)
 {
+	if (!HAS_FS_CALL(vnode, open_dir))
+		return B_UNSUPPORTED;
+
 	void* cookie;
 	status_t status = FS_CALL(vnode, open_dir, &cookie);
 	if (status != B_OK)
