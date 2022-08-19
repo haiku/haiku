@@ -19,7 +19,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		UsePrivateSystemHeaders ;
 
 		MergeObject <$(architecture)>posix_time.o :
-			asctime.cpp
 			clock.cpp
 			clock_support.cpp
 			ctime.c

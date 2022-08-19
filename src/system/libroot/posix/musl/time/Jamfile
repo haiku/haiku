@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src system libroot posix musl time ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) .. include ] ;
 UseHeaders [ FDirName $(SUBDIR) .. internal ] ;
+UseHeaders [ FDirName $(SUBDIR) .. arch $(TARGET_ARCH) ] ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
@@ -9,6 +10,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
 		MergeObject <$(architecture)>posix_musl_time.o :
+			asctime.c
+			asctime_r.c
 			difftime.c
 			strftime.c
 			strptime.c
