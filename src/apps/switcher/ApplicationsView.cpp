@@ -36,7 +36,7 @@ ApplicationsView::AttachedToWindow()
 
 	for (int32 i = 0; i < teamList.CountItems(); i++) {
 		app_info appInfo;
-		team_id team = (team_id)teamList.ItemAt(i);
+		team_id team = (uintptr_t)teamList.ItemAt(i);
 		if (be_roster->GetRunningAppInfo(team, &appInfo) == B_OK)
 			_AddTeam(appInfo);
 	}

@@ -105,19 +105,19 @@ GroupListView::SetModel(GroupListModel* model)
 		groupItem->SetVisible(false);
 		AddChild(groupItem);
 
-		void* group = model->GroupAt(groupIndex);
-		groupMap[(addr_t)group] = groupItem;
-		groupItem->AddItem(new RendererLayoutItem(this, groupIndex, group,
+		addr_t group = model->GroupAt(groupIndex);
+		groupMap[group] = groupItem;
+		groupItem->AddItem(new RendererLayoutItem(this, groupIndex, (void*)group,
 			fGroupRenderer));
 	}
 
 	int32 itemCount = model->CountItems();
 	for (int itemIndex = 0; itemIndex < itemCount; itemIndex++) {
-		void* group = model->GroupForItemAt(itemIndex);
-		if (group == NULL)
+		addr_t group = model->GroupForItemAt(itemIndex);
+		if (group == 0)
 			continue;
 
-		BGroupLayout* groupItem = groupMap[(addr_t)group];
+		BGroupLayout* groupItem = groupMap[group];
 		if (groupItem == NULL)
 			continue;
 

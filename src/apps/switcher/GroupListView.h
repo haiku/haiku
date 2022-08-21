@@ -12,17 +12,19 @@
 
 class GroupListModel {
 public:
+	virtual						~GroupListModel() {};
 	virtual	int32				CountItems() = 0;
 	virtual void*				ItemAt(int32 index) = 0;
 
 	virtual int32				CountGroups() = 0;
-	virtual void*				GroupAt(int32 index) = 0;
-	virtual void*				GroupForItemAt(int32 index) = 0;
+	virtual addr_t				GroupAt(int32 index) = 0;
+	virtual addr_t				GroupForItemAt(int32 index) = 0;
 };
 
 
 class ListItemRenderer {
 public:
+	virtual						~ListItemRenderer() {};
 	virtual void				SetTo(BView* owner, void* item) = 0;
 
 	virtual BSize				MinSize() = 0;

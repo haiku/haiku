@@ -96,15 +96,15 @@ public:
 		return fWorkspaceCount;
 	}
 
-	virtual void* GroupAt(int32 index)
+	virtual addr_t GroupAt(int32 index)
 	{
-		return (void*)(_NthSetBit(index, fWorkspaces) + 1);
+		return _NthSetBit(index, fWorkspaces) + 1;
 	}
 
-	virtual void* GroupForItemAt(int32 index)
+	virtual addr_t GroupForItemAt(int32 index)
 	{
 		client_window_info* info = fWindows.ItemAt(index);
-		return (void*)(_NthSetBit(0, info->workspaces) + 1);
+		return _NthSetBit(0, info->workspaces) + 1;
 	}
 
 private:
@@ -116,7 +116,7 @@ private:
 			&& (info->show_hide_level <= 0 || info->is_mini);
 	}
 
-	int32 _NthSetBit(int32 index, uint32 mask)
+	uint32 _NthSetBit(int32 index, uint32 mask)
 	{
 		for (uint32 i = 0; i < 32; i++) {
 			if ((mask & (1UL << i)) != 0) {
@@ -221,7 +221,7 @@ class WorkspaceRenderer : public StringItemRenderer {
 public:
 	virtual void SetTo(BView* owner, void* item)
 	{
-		fWorkspace = (uint32)item;
+		fWorkspace = (uintptr_t)item;
 
 		if ((uint32)current_workspace() == fWorkspace - 1)
 			SetText(owner, "Current workspace");
