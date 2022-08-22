@@ -687,11 +687,12 @@ ServerFont::GetHasGlyphs(const char* string, int32 numBytes, int32 numChars,
 	FontCacheEntry* entry = NULL;
 	FontCacheReference cacheReference;
 	BObjectList<FontCacheReference> fallbacks(21, true);
-	int32 fallbacksCount = -1;
 
 	entry = GlyphLayoutEngine::FontCacheEntryFor(*this, false);
-	if (entry == NULL || !cacheReference.SetTo(entry, false))
+	if (entry == NULL)
 		return B_ERROR;
+
+	cacheReference.SetTo(entry);
 
 	uint32 charCode;
 	int32 charIndex = 0;
@@ -700,20 +701,11 @@ ServerFont::GetHasGlyphs(const char* string, int32 numBytes, int32 numChars,
 		hasArray[charIndex] = entry->CanCreateGlyph(charCode);
 
 		if (hasArray[charIndex] == false) {
-			if (fallbacksCount < 0) {
-				GlyphLayoutEngine::PopulateAndLockFallbacks(
-					fallbacks, *this, false, false);
-				fallbacksCount = fallbacks.CountItems();
-			}
+			if (fallbacks.IsEmpty())
+				GlyphLayoutEngine::PopulateFallbacks(fallbacks, *this, false);
 
-			for (int32 index = 0; index < fallbacksCount; index++) {
-				FontCacheEntry* fallbackEntry
-					= fallbacks.ItemAt(index)->Entry();
-				if (fallbackEntry->CanCreateGlyph(charCode)) {
-					hasArray[charIndex] = true;
-					break;
-				}
-			}
+			if (GlyphLayoutEngine::GetFallbackReference(fallbacks, charCode) != NULL)
+				hasArray[charIndex] = true;
 		}
 
 		charIndex++;
