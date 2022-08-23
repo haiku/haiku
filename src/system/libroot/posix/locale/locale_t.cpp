@@ -266,7 +266,12 @@ extern "C" locale_t
 __current_locale_t()
 {
 	locale_t locale = (locale_t)GetCurrentLocaleInfo();
-	if (locale == NULL)
-		locale = LC_GLOBAL_LOCALE;
+	if (locale == NULL) {
+		static LocaleBackendData global_locale_t;
+		global_locale_t.backend = gGlobalLocaleBackend;
+		global_locale_t.databridge = &gGlobalLocaleDataBridge;
+		return (locale_t)&global_locale_t;
+	}
+
 	return locale;
 }
