@@ -14,6 +14,8 @@
 GICv2InterruptController::GICv2InterruptController(uint32_t gicd_addr, uint32_t gicc_addr)
 : InterruptController()
 {
+	reserve_io_interrupt_vectors(1020, 0, INTERRUPT_TYPE_IRQ);
+
 	area_id gicd_area = vm_map_physical_memory(B_SYSTEM_TEAM, "intc-gicv2-gicd",
 		(void**)&fGicdRegs, B_ANY_KERNEL_ADDRESS, GICD_REG_SIZE,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,

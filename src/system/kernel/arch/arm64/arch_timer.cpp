@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haiku, Inc. All Rights Reserved.
+ * Copyright 2019-2022 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #include <boot/stage2.h>
@@ -53,7 +53,6 @@ arch_init_timer(kernel_args *args)
 	sTimerMaxInterval = INT32_MAX / sTimerTicksUS;
 
 	WRITE_SPECIALREG(CNTP_CTL_EL0, TIMER_MASKED);
-	reserve_io_interrupt_vectors(1, TIMER_IRQ, INTERRUPT_TYPE_IRQ);
 	install_io_interrupt_handler(TIMER_IRQ, &arch_timer_interrupt, NULL, 0);
 
 	return B_OK;

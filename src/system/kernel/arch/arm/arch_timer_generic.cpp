@@ -81,7 +81,6 @@ ARMGenericTimer::ARMGenericTimer()
 {
 	Clear();
 
-	reserve_io_interrupt_vectors(1, TIMER_IRQ, INTERRUPT_TYPE_IRQ);
 	install_io_interrupt_handler(TIMER_IRQ,
 		&ARMGenericTimer::_InterruptWrapper, this, 0);
 

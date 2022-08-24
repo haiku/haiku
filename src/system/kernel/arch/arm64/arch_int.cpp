@@ -63,7 +63,6 @@ arch_int_assign_to_cpu(int32 irq, int32 cpu)
 status_t
 arch_int_init(kernel_args *args)
 {
-	reserve_io_interrupt_vectors(128, 32, INTERRUPT_TYPE_IRQ);
 	return B_OK;
 }
 
