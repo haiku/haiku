@@ -108,7 +108,14 @@ case "$ARCH" in
 	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 	echo "+++ Testing $PLATFORM boot..."
 	cp $IMAGE $TEST_FILE
-	$EMULATOR -device ati-vga -drive file=$TEST_FILE,format=raw,if=virtio
+	$EMULATOR -device ati-vga \
+		-global virtio-mmio.force-legacy=false \
+		-device virtio-tablet-device,bus=virtio-mmio-bus.0 \
+		-device virtio-keyboard-device,bus=virtio-mmio-bus.1 \
+		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.2 \
+		-device virtio-net-device,netdev=usernet,bus=virtio-mmio-bus.3 \
+		-drive file=$TEST_FILE,format=raw,if=none,id=x0 \
+		-netdev user,id=usernet
 	check_logs $TEST_SERIALLOG
 	rm -f $TEST_FILE $TEST_SERIALLOG
 	;;
