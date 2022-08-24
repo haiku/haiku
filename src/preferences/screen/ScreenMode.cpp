@@ -37,11 +37,11 @@
 
 // Vendors.h is generated using this commands:
 /*
- * wget https://uefi.org/uefi-pnp-export -O pnp_ids_temp.tmp
+ * wget https://uefi.org/uefi-pnp-export -O Vendors.h.tmp
  * if [ $? -eq 0 ]; then
- *	sed -E -e 's:<thead>::g' -e 's:<tr.*="(.+)"><td>:{ ":g' -e 's:<td>[[:digit:]]{2}/[[:digit:]]{2}/[[:digit:]]{4}</td>::g' -e 's:(<\/td><td>):\", \":g' -e 's:<\/td>.<\/tr>:\" },:g' -e 's/"(.*?)", "(.*?)"/\"\2\", \"\1\"/' -e 's/&amp;/\&/' -e "s/&#039;/'/" Vendors_temp.tmp | grep -v '<' | sort > Vendors.h
+ *	sed -E -e 's:<thead>::g' -e 's:<tr.*="(.+)"><td>:{ ":g' -e 's:<td>[[:digit:]]{2}/[[:digit:]]{2}/[[:digit:]]{4}</td>::g' -e 's: *(<\/td><td>):\", \":g' -e 's: *<\/td>.<\/tr>:\" },:g' -e 's/"(.*?)", "(.*?)"/\"\2\", \"\1\"/' -e 's/&amp;/\&/' -e "s/&#039;/'/" Vendors.h.tmp | grep -v '<' | sort > Vendors.h
  * fi
- * rm Vendors_temp.tmp
+ * rm Vendors.h.tmp
  */
 
 struct pnp_id {
