@@ -382,6 +382,8 @@ ScreenMode::GetManufacturerFromID(const char* id) const
 	const size_t numElements = sizeof(kPNPIDs) / sizeof(kPNPIDs[0]);
 	const struct pnp_id key = { id, "dummy" };
 	const pnp_id* element = std::find(kPNPIDs, kPNPIDs + numElements, key);
+	if (element == NULL)
+		return NULL;
 
 	return element->manufacturer;
 }
@@ -411,7 +413,9 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 
 	char vendor[4];
 	strlcpy(vendor, info.vendor, sizeof(vendor));
-	strlcpy(info.vendor, GetManufacturerFromID(vendor), sizeof(info.vendor));
+	const char* vendorString = GetManufacturerFromID(vendor);
+	if (vendorString != NULL)
+		strlcpy(info.vendor, vendorString, sizeof(info.vendor));
 
 	// Remove extraneous vendor strings and whitespace
 
