@@ -254,9 +254,6 @@ BMenu::BMenu(const char* name, menu_layout layout)
 	fHasSubmenus(false),
 	fAttachAborted(false)
 {
-	const float fontSize = be_plain_font->Size();
-	fPad = BRect(fontSize * 1.15f, fontSize / 6.0f, fontSize * 1.7f, 0.0f);
-
 	_InitData(NULL);
 }
 
@@ -265,7 +262,6 @@ BMenu::BMenu(const char* name, float width, float height)
 	:
 	BView(BRect(0.0f, 0.0f, 0.0f, 0.0f), name, 0, B_WILL_DRAW),
 	fChosenItem(NULL),
-	fPad(14.0f, 2.0f, 20.0f, 0.0f),
 	fSelected(NULL),
 	fCachedMenuWindow(NULL),
 	fSuper(NULL),
@@ -300,7 +296,6 @@ BMenu::BMenu(BMessage* archive)
 	:
 	BView(archive),
 	fChosenItem(NULL),
-	fPad(14.0f, 2.0f, 20.0f, 0.0f),
 	fSelected(NULL),
 	fCachedMenuWindow(NULL),
 	fSuper(NULL),
@@ -1507,6 +1502,10 @@ BMenu::_InitData(BMessage* archive)
 	SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
 
 	fExtraMenuData = new (nothrow) BPrivate::ExtraMenuData();
+
+	const float labelSpacing = be_control_look->DefaultLabelSpacing();
+	fPad = BRect(ceilf(labelSpacing * 2.3f), ceilf(labelSpacing / 3.0f),
+		ceilf((labelSpacing / 3.0f) * 10.0f), 0.0f);
 
 	fLayoutData = new LayoutData;
 	fLayoutData->lastResizingMode = ResizingMode();
