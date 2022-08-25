@@ -8,6 +8,7 @@
 #include "system_dependencies.h"
 #include "Directory.h"
 #include "Inode.h"
+#include "ShortAttribute.h"
 #include "Utility.h"
 #include "Volume.h"
 
@@ -471,21 +472,35 @@ xfs_free_dir_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 static status_t
 xfs_open_attr_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 {
-	return B_NOT_SUPPORTED;
+	Inode* inode = (Inode*)_node->private_node;
+	TRACE("%s()\n", __FUNCTION__);
+
+	// Attributes are only on files
+	if (!inode->IsFile())
+		return B_NOT_SUPPORTED;
+
+	Attribute* iterator = Attribute::Init(inode);
+	if (iterator == NULL)
+		return B_BAD_VALUE;
+
+	*_cookie = iterator;
+	return B_OK;
 }
 
 
 static status_t
 xfs_close_attr_dir(fs_volume *_volume, fs_vnode *_node, void *cookie)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("%s()\n", __FUNCTION__);
+	return B_OK;
 }
 
 
 static status_t
 xfs_free_attr_dir_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
-	return B_NOT_SUPPORTED;
+	delete (Attribute*)_cookie;
+	return B_OK;
 }
 
 
@@ -493,7 +508,27 @@ static status_t
 xfs_read_attr_dir(fs_volume *_volume, fs_vnode *_node,
 	void *_cookie, struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("%s()\n", __FUNCTION__);
+	Attribute* iterator = (Attribute*)_cookie;
+
+	size_t length = bufferSize;
+	status_t status = iterator->GetNext(dirent->d_name, &length);
+	if (status == B_ENTRY_NOT_FOUND) {
+		*_num = 0;
+		return B_OK;
+	}
+
+	if (status != B_OK)
+		return status;
+
+	Volume* volume = (Volume*)_volume->private_volume;
+	Inode* inode = (Inode*)_node->private_node;
+	dirent->d_dev = volume->ID();
+	dirent->d_ino = inode->ID();
+	dirent->d_reclen = offsetof(struct dirent, d_name) + length + 1;
+	*_num = 1;
+
+	return B_OK;
 }
 
 
@@ -517,7 +552,26 @@ static status_t
 xfs_open_attr(fs_volume *_volume, fs_vnode *_node, const char *name,
 	int openMode, void **_cookie)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("%s()\n", __FUNCTION__);
+
+	status_t status;
+
+	Inode* inode = (Inode*)_node->private_node;
+
+	int accessMode = open_mode_to_access(openMode) | (openMode & O_TRUNC ? W_OK : 0);
+	status = inode->CheckPermissions(accessMode);
+	if (status < B_OK)
+		return status;
+
+	Attribute* attribute = Attribute::Init(inode);
+
+	if (attribute == NULL)
+		return B_BAD_VALUE;
+
+	status = attribute->Open(name, openMode, (attr_cookie**)_cookie);
+	delete attribute;
+
+	return status;
 }
 
 
@@ -525,14 +579,15 @@ static status_t
 xfs_close_attr(fs_volume *_volume, fs_vnode *_node,
 	void *cookie)
 {
-	return B_NOT_SUPPORTED;
+	return B_OK;
 }
 
 
 static status_t
 xfs_free_attr_cookie(fs_volume *_volume, fs_vnode *_node, void *cookie)
 {
-	return B_NOT_SUPPORTED;
+	delete (attr_cookie*)cookie;
+	return B_OK;
 }
 
 
@@ -540,7 +595,20 @@ static status_t
 xfs_read_attr(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	off_t pos, void *buffer, size_t *_length)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("%s()\n", __FUNCTION__);
+
+	attr_cookie* cookie = (attr_cookie*)_cookie;
+	Inode* inode = (Inode*)_node->private_node;
+
+	Attribute* attribute = Attribute::Init(inode);
+
+	if (attribute == NULL)
+		return B_BAD_VALUE;
+
+	status_t status = attribute->Read(cookie, pos, (uint8*)buffer, _length);
+	delete attribute;
+
+	return status;
 }
 
 
@@ -556,7 +624,20 @@ static status_t
 xfs_read_attr_stat(fs_volume *_volume, fs_vnode *_node,
 	void *_cookie, struct stat *stat)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("%s()\n", __FUNCTION__);
+
+	attr_cookie* cookie = (attr_cookie*)_cookie;
+	Inode* inode = (Inode*)_node->private_node;
+
+	Attribute* attribute = Attribute::Init(inode);
+
+	if (attribute == NULL)
+		return B_BAD_VALUE;
+
+	status_t status = attribute->Stat(cookie, *stat);
+	delete attribute;
+
+	return status;
 }
 
 
@@ -762,6 +843,7 @@ file_system_module_info sxfsFileSystem = {
 	NULL,				// set_content_parameters
 	xfs_initialize,
 	xfs_uninitialize};
+
 
 module_info *modules[] = {
 	(module_info *)&sxfsFileSystem,

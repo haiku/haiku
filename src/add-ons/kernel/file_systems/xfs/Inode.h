@@ -210,6 +210,7 @@ struct xfs_inode_t {
 
 			int8				Format() const;
 				// The format of the inode
+			int8				AttrFormat() const;
 			xfs_fsize_t			Size() const;
 			xfs_rfsblock_t		BlockCount() const;
 			uint32				NLink() const;
@@ -359,6 +360,8 @@ public:
 			Volume*				GetVolume() { return fVolume;}
 
 			int8				Format() const { return fNode->Format(); }
+
+			int8				AttrFormat() const { return fNode->AttrFormat(); }
 
 			bool				IsLocal() const
 									{ return

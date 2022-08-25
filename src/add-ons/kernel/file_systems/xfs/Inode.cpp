@@ -150,6 +150,13 @@ xfs_inode_t::Format() const
 }
 
 
+int8
+xfs_inode_t::AttrFormat() const
+{
+	return di_aformat;
+}
+
+
 xfs_extnum_t
 xfs_inode_t::DataExtentsCount() const
 {
