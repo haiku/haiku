@@ -112,7 +112,7 @@ namespace BPrivate {
 
 class DraggableContainerIcon : public BView {
 	public:
-		DraggableContainerIcon();
+		DraggableContainerIcon(BSize iconSize);
 
 		virtual void MouseDown(BPoint where);
 		virtual void MouseUp(BPoint);
@@ -120,6 +120,7 @@ class DraggableContainerIcon : public BView {
 		virtual void Draw(BRect updateRect);
 
 	private:
+		BSize	fIconSize;
 		uint32	fDragButton;
 		BPoint	fClickPoint;
 		bool	fDragStarted;
@@ -386,12 +387,15 @@ AddMimeTypeString(BStringList& list, Model* model)
 //	#pragma mark - DraggableContainerIcon
 
 
-DraggableContainerIcon::DraggableContainerIcon()
+DraggableContainerIcon::DraggableContainerIcon(BSize iconSize)
 	:
 	BView("DraggableContainerIcon", B_WILL_DRAW),
+	fIconSize(iconSize),
 	fDragButton(0),
 	fDragStarted(false)
 {
+	SetExplicitMinSize(BSize(iconSize.Width() + 5, iconSize.Height()));
+	SetExplicitMaxSize(BSize(iconSize.Width() + 5, B_SIZE_UNSET));
 }
 
 
@@ -410,7 +414,7 @@ DraggableContainerIcon::MouseDown(BPoint where)
 	window->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 
 	if (IconCache::sIconCache->IconHitTest(where, window->TargetModel(),
-			kNormalIcon, B_MINI_ICON)) {
+			kNormalIcon, (icon_size)(fIconSize.IntegerWidth() + 1))) {
 		// The click hit the icon, initiate a drag
 		fDragButton = buttons
 			& (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON);
@@ -483,7 +487,7 @@ DraggableContainerIcon::MouseMoved(BPoint where, uint32, const BMessage*)
 	// Draw the icon
 	float hIconOffset = (rect.Width() - Bounds().Width()) / 2;
 	IconCache::sIconCache->Draw(model, view, BPoint(hIconOffset, 0),
-		kNormalIcon, B_MINI_ICON, true);
+		kNormalIcon, (icon_size)(fIconSize.IntegerWidth() + 1), true);
 
 	// See if we need to truncate the string
 	BString nameString = model->Name();
@@ -542,10 +546,11 @@ DraggableContainerIcon::Draw(BRect updateRect)
 	// Draw the icon, straddling the border
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	float iconOffsetX = (Bounds().Width() - B_MINI_ICON) / 2;
-	float iconOffsetY = (Bounds().Height() - B_MINI_ICON) / 2;
+	float iconOffsetX = (Bounds().Width() - fIconSize.Width()) / 2;
+	float iconOffsetY = (Bounds().Height() - fIconSize.Height()) / 2;
 	IconCache::sIconCache->Draw(window->TargetModel(), this,
-		BPoint(iconOffsetX, iconOffsetY), kNormalIcon, B_MINI_ICON, true);
+		BPoint(iconOffsetX, iconOffsetY), kNormalIcon, (icon_size)(fIconSize.IntegerWidth() + 1),
+		true);
 }
 
 
@@ -3412,13 +3417,10 @@ BContainerWindow::_AddFolderIcon()
 	if (iconSize < 16)
 		iconSize = 16;
 
-	fDraggableIcon = new(std::nothrow) DraggableContainerIcon();
+	fDraggableIcon = new(std::nothrow)
+		DraggableContainerIcon(be_control_look->ComposeIconSize(iconSize));
 	if (fDraggableIcon != NULL) {
-		BLayoutItem* item = fMenuContainer->GroupLayout()->AddView(
-			fDraggableIcon);
-		item->SetExplicitMinSize(BSize(iconSize + 5, iconSize));
-		item->SetExplicitMaxSize(BSize(iconSize + 5, item->MaxSize().Height()));
-
+		fMenuContainer->GroupLayout()->AddView(fDraggableIcon);
 		fMenuBar->SetBorders(
 			BControlLook::B_ALL_BORDERS & ~BControlLook::B_RIGHT_BORDER);
 	}

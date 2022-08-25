@@ -45,6 +45,7 @@ All rights reserved.
 
 #include <BitmapStream.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Font.h>
 #include <IconUtils.h>
@@ -1260,8 +1261,8 @@ StringToScalar(const char* text)
 int32
 ListIconSize()
 {
-	static int32 sIconSize = std::max((int32)B_MINI_ICON,
-		(int32)ceilf(B_MINI_ICON * be_plain_font->Size() / 12));
+	static int32 sIconSize = be_control_look->ComposeIconSize(B_MINI_ICON)
+		.IntegerWidth() + 1;
 	return sIconSize;
 }
 
