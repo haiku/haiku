@@ -54,7 +54,6 @@ All rights reserved.
 #include "Attributes.h"
 #include "Commands.h"
 #include "FSUtils.h"
-#include "IconMenuItem.h"
 #include "InfoWindow.h"
 #include "Model.h"
 #include "NavMenu.h"

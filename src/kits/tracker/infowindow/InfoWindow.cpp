@@ -71,7 +71,6 @@ All rights reserved.
 #include "FSUtils.h"
 #include "GeneralInfoView.h"
 #include "IconCache.h"
-#include "IconMenuItem.h"
 #include "Model.h"
 #include "NavMenu.h"
 #include "PoseView.h"
