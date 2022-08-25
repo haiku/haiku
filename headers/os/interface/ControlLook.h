@@ -102,6 +102,7 @@ public:
 	virtual	float				DefaultItemSpacing() const = 0;
 
 	static	float				ComposeSpacing(float spacing);
+	static	BSize				ComposeIconSize(int32 size);
 
 	virtual uint32				Flags(BControl* control) const = 0;
 
