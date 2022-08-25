@@ -142,7 +142,7 @@ TReplicantTray::TReplicantTray(TBarView* barView)
 {
 	// scale replicants by font size
 	fMaxReplicantHeight = std::max(kMinReplicantHeight,
-		floorf(kMinReplicantHeight * be_plain_font->Size() / 12));
+		float(((TBarApp*)be_app)->IconSize()));
 	// but not bigger than TabHeight which depends on be_bold_font
 	// TODO this should only apply to mini-mode but we set it once here for all
 	fMaxReplicantHeight = std::min(fMaxReplicantHeight,
@@ -193,7 +193,8 @@ TReplicantTray::AttachedToWindow()
 
 	AddChild(fTime);
 
-	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - kTrayPadding, 2);
+	const int32 trayPadding = ceilf(be_control_look->ComposeSpacing(kTrayPadding) / 2);
+	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - trayPadding, 2);
 		// will be moved into place later
 
 	if (!((TBarApp*)be_app)->Settings()->showClock)
@@ -231,6 +232,7 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 {
 	float width = 0;
 	float height = fMinTrayHeight;
+	const int32 trayPadding = ceilf(be_control_look->ComposeSpacing(kTrayPadding) / 2);
 
 	if (fBarView->Vertical()) {
 		width = static_cast<TBarApp*>(be_app)->Settings()->width
@@ -249,11 +251,11 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 	} else {
 		// if last replicant overruns clock then resize to accomodate
 		if (ReplicantCount() > 0) {
-			if (!fTime->IsHidden(fTime) && Bounds().right - kTrayPadding - 2
+			if (!fTime->IsHidden(fTime) && Bounds().right - trayPadding - 2
 						- fTime->Frame().Width() - kClockMargin
 					< fRightBottomReplicant.right + kClockMargin) {
 				width = fRightBottomReplicant.right + kClockMargin
-					+ fTime->Frame().Width() + kTrayPadding + 2;
+					+ fTime->Frame().Width() + trayPadding + 2;
 			} else
 				width = fRightBottomReplicant.right + kIconGap + kGutter;
 		}
@@ -1173,7 +1175,8 @@ TReplicantTray::AcceptAddon(BRect replicantFrame, BMessage* message)
 BPoint
 TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 {
-	BPoint loc(kTrayPadding, 0);
+	const int32 trayPadding = ceilf(be_control_look->ComposeSpacing(kTrayPadding) / 2);
+	BPoint loc(trayPadding, 0);
 	if (fBarView->Vertical() || fBarView->MiniState()) {
 		if (fBarView->Vertical() && !fBarView->Left())
 			loc.x += kDragWidth; // move past dragger on left
@@ -1196,7 +1199,7 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 	}
 
 	// move clock vertically centered in first row next to replicants
-	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - kTrayPadding,
+	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - trayPadding,
 		loc.y + floorf((fMaxReplicantHeight - fTime->fHeight) / 2));
 
 	if (fBarView->Vertical()) {
@@ -1205,7 +1208,7 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 			// determine free space in this row
 			BRect rowRect(loc.x, loc.y,
 				loc.x + static_cast<TBarApp*>(be_app)->Settings()->width
-					- (kTrayPadding + kDragWidth + kGutter) * 2,
+					- (trayPadding + kDragWidth + kGutter) * 2,
 				loc.y + fMaxReplicantHeight);
 			if (row == 0 && !fTime->IsHidden(fTime))
 				rowRect.right -= kClockMargin + fTime->Frame().Width();

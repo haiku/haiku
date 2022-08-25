@@ -43,6 +43,7 @@ All rights reserved.
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <Dragger.h>
@@ -901,7 +902,14 @@ TBarApp::ResizeTeamIcons()
 int32
 TBarApp::IconSize()
 {
-	return fSettings.iconSize;
+	static int32 iconSize = 0, composedIconSize = 0;
+	if (iconSize != fSettings.iconSize) {
+		composedIconSize = be_control_look->ComposeIconSize(fSettings.iconSize)
+			.IntegerWidth() + 1;
+		iconSize = fSettings.iconSize;
+	}
+
+	return composedIconSize;
 }
 
 
@@ -939,8 +947,8 @@ TBarApp::QuitPreferencesWindow()
 void
 TBarApp::FetchAppIcon(BarTeamInfo* barInfo)
 {
-	int32 width = IconSize();
-	int32 index = (width - kMinimumIconSize) / kIconSizeInterval;
+	const int32 width = IconSize();
+	const int32 index = (fSettings.iconSize - kMinimumIconSize) / kIconSizeInterval;
 
 	// first look in the icon cache
 	barInfo->icon = barInfo->iconCache[index];

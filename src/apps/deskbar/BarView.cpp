@@ -38,6 +38,7 @@ All rights reserved.
 
 #include <AppFileInfo.h>
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <LocaleRoster.h>
@@ -65,8 +66,6 @@ const int32 kDefaultRecentAppCount = 10;
 
 const int32 kMenuTrackMargin = 20;
 const float kMinTeamItemHeight = 20.0f;
-const float kVPad = 2.0f;
-const float kIconPadding = 8.0f;
 const float kScrollerDimension = 12.0f;
 
 const uint32 kUpdateOrientation = 'UpOr';
@@ -474,7 +473,7 @@ TBarView::PlaceDeskbarMenu()
 			height = std::max(fTabHeight,
 				kGutter + fReplicantTray->MaxReplicantHeight() + kGutter);
 		} else {
-			width = gMinimumWindowWidth / 2 + kIconPadding;
+			width = gMinimumWindowWidth / 2 + be_control_look->ComposeSpacing(kIconPadding);
 			height = std::max(TeamMenuItemHeight(),
 				kGutter + fReplicantTray->MaxReplicantHeight() + kGutter);
 		}
@@ -618,7 +617,7 @@ TBarView::PlaceApplicationBar()
 		// top or bottom
 		expandoFrame.top = 0;
 		expandoFrame.bottom = TeamMenuItemHeight();
-		expandoFrame.left = gMinimumWindowWidth / 2 + kIconPadding;
+		expandoFrame.left = gMinimumWindowWidth / 2 + be_control_look->ComposeSpacing(kIconPadding);
 		expandoFrame.right = screenFrame.Width();
 		if (fTrayLocation != 0 && fDragRegion != NULL)
 			expandoFrame.right -= fDragRegion->Frame().Width() + 1;
@@ -1265,7 +1264,8 @@ float
 TBarView::TeamMenuItemHeight() const
 {
 	const int32 iconSize = fBarApp->IconSize();
-	float iconSizePadded = kVPad + iconSize + kVPad;
+	float iconSizePadded = iconSize +
+		ceilf(be_control_look->ComposeSpacing(B_USE_SMALL_SPACING) / 2);
 
 	font_height fontHeight;
 	if (fExpandoMenuBar != NULL)

@@ -41,6 +41,7 @@ All rights reserved.
 
 #include <Application.h>
 #include <Collator.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Mime.h>
 #include <Roster.h>
@@ -51,9 +52,6 @@ All rights reserved.
 #include "DeskbarUtils.h"
 #include "StatusView.h"
 #include "TeamMenuItem.h"
-
-
-const float kIconPadding = 8.0f;
 
 
 //	#pragma mark - TTeamMenuItem
@@ -94,7 +92,7 @@ TTeamMenu::AttachedToWindow()
 	bool dragging = fBarView != NULL && fBarView->Dragging();
 	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
-	float iconOnlyWidth = iconSize + kIconPadding;
+	float iconOnlyWidth = iconSize + be_control_look->ComposeSpacing(kIconPadding);
 
 	// calculate the minimum item width based on font and icon size
 	float minItemWidth = 0;

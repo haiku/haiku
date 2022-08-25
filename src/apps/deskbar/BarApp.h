@@ -67,6 +67,7 @@ const uint32 kRebootSystem = 302;
 const uint32 kSuspendSystem = 304;
 
 // icon size constants
+const int32 kIconPadding = B_USE_SMALL_SPACING;
 const int32 kMinimumIconSize = 16;
 const int32 kMaximumIconSize = 96;
 const int32 kIconSizeInterval = 8;
