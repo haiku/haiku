@@ -35,7 +35,7 @@ get_counter(void)
 void
 ARMGenericTimer::SetTimeout(bigtime_t timeout)
 {
-	uint32_t timeout_ticks = timeout * fTimerFrequency / 1000000;
+	uint32_t timeout_ticks = timeout * fTimerFrequencyMHz;
 	asm volatile ("ISB\n"
 		"MCR p15, 0, %0, c14, c2, 0"
 		: : "r"(timeout_ticks));
@@ -58,7 +58,7 @@ ARMGenericTimer::Clear()
 bigtime_t
 ARMGenericTimer::Time()
 {
-	return get_counter() / fTimerFrequency;
+	return get_counter() / fTimerFrequencyMHz;
 }
 
 
@@ -85,6 +85,7 @@ ARMGenericTimer::ARMGenericTimer()
 		&ARMGenericTimer::_InterruptWrapper, this, 0);
 
 	fTimerFrequency = get_counter_freq();
+	fTimerFrequencyMHz = fTimerFrequency / 1000000;
 }
 
 

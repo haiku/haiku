@@ -30,6 +30,7 @@ private:
 	int32 HandleInterrupt();
 
 	uint32_t fTimerFrequency;
+	uint32_t fTimerFrequencyMHz;
 };
 
 #endif /* ARCH_ARM_TIMER_GENERIC_H */
