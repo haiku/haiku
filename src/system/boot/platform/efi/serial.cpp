@@ -39,9 +39,7 @@ enum serial_register_offsets {
 	SERIAL_MODEM_STATUS			= 6,
 };
 
-#if defined(__i386__) || defined(__x86_64__)
 static uint16 sSerialBasePort = 0x3f8;
-#endif
 
 
 DebugUART* gUART = NULL;
@@ -127,7 +125,6 @@ serial_init(void)
 
 	if (status != EFI_SUCCESS || sSerial == NULL) {
 		sSerial = NULL;
-		sSerialUsesEFI = false;
 		return;
 	}
 
