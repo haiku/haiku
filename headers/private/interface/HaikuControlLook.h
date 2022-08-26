@@ -28,8 +28,6 @@ public:
 
 	virtual	float				DefaultItemSpacing() const;
 
-	static	float				ComposeSpacing(float spacing);
-
 	virtual uint32				Flags(BControl* control) const;
 
 	virtual	void				DrawButtonFrame(BView* view, BRect& rect,
