@@ -206,18 +206,17 @@ StringEditor::StringEditor(DataEditor& editor)
 	: TypeEditorView(B_TRANSLATE("String editor"), 0, editor)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	BStringView *stringView = new BStringView(B_EMPTY_STRING,
 		B_TRANSLATE("Contents:"));
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
 
 	fTextView = new BTextView(B_EMPTY_STRING, B_WILL_DRAW);
+	BScrollView* scrollView = new BScrollView("scroller", fTextView, 0, true, true);
 
-	BScrollView* scrollView = new BScrollView("scroller", fTextView,
-		B_WILL_DRAW, true, true);
-	AddChild(scrollView);
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.Add(stringView)
+		.Add(scrollView)
+	.End();
 }
 
 
