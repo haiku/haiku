@@ -1019,17 +1019,15 @@ BPoseView::SetIconPoseHeight()
 			break;
 
 		case kMiniIconMode:
-			fViewState->SetIconSize(B_MINI_ICON);
+			fViewState->SetIconSize(IconCache::sMiniIconSize.IntegerWidth() + 1);
 			fIconPoseHeight = std::max((float)IconSizeInt(), sFontHeight + 1);
 			break;
 
 		case kListMode:
 		default:
-		{
 			fViewState->SetIconSize(ListIconSize());
 			fIconPoseHeight = fListElemHeight;
 			break;
-		}
 	}
 }
 
@@ -1039,8 +1037,8 @@ BPoseView::GetLayoutInfo(uint32 mode, BPoint* grid, BPoint* offset) const
 {
 	switch (mode) {
 		case kMiniIconMode:
-			grid->Set(96, 20);
-			offset->Set(10, 5);
+			grid->Set(IconSizeInt() * 6, ceilf(IconSizeInt() * 1.25f));
+			offset->Set(ceilf(IconSizeInt() * 0.6f), ceilf(IconSizeInt() * 0.3f));
 			break;
 
 		case kIconMode:

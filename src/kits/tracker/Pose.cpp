@@ -741,7 +741,7 @@ BPose::MoveTo(BPoint point, BPoseView* poseView, bool invalidate)
 
 	float scale = 1.0;
 	if (poseView->ViewMode() == kIconMode) {
-		scale = poseView->IconSize() / 32.0;
+		scale = (float)poseView->IconSizeInt() / 32.0;
 	}
 	fLocation.x = point.x / scale;
 	fLocation.y = point.y / scale;
@@ -799,17 +799,8 @@ BPose::WidgetFor(BColumn* column, BPoseView* poseView,
 }
 
 
-// the following method is deprecated
-bool
-BPose::TestLargeIconPixel(BPoint point) const
-{
-	return IconCache::sIconCache->IconHitTest(point, ResolvedModel(),
-		kNormalIcon, B_LARGE_ICON);
-}
-
-
 void
-BPose::DrawIcon(BPoint where, BView* view, icon_size which, bool direct,
+BPose::DrawIcon(BPoint where, BView* view, BSize size, bool direct,
 	bool drawUnselected)
 {
 	if (fClipboardMode == kMoveSelectionTo) {
@@ -821,22 +812,22 @@ BPose::DrawIcon(BPoint where, BView* view, icon_size which, bool direct,
 		view->SetDrawingMode(B_OP_OVER);
 
 	IconCache::sIconCache->Draw(ResolvedModel(), view, where,
-		fIsSelected && !drawUnselected ? kSelectedIcon : kNormalIcon, which,
+		fIsSelected && !drawUnselected ? kSelectedIcon : kNormalIcon, size,
 		true);
 
 	if (fPercent != -1)
-		DrawBar(where, view, which);
+		DrawBar(where, view, size);
 }
 
 
 void
-BPose::DrawBar(BPoint where, BView* view, icon_size which)
+BPose::DrawBar(BPoint where, BView* view, BSize iconSize)
 {
 	view->PushState();
 
-	int32 size = which - 1;
+	int32 size = iconSize.IntegerWidth();
 	int32 yOffset;
-	int32 barWidth = (int32)(7.0f / 32.0f * (float)which);
+	int32 barWidth = (int32)(7.0f / 32.0f * (float)(size + 1));
 	if (barWidth < 4) {
 		barWidth = 4;
 		yOffset = 0;
@@ -899,7 +890,7 @@ BPose::Location(const BPoseView* poseView) const
 {
 	float scale = 1.0;
 	if (poseView->ViewMode() == kIconMode)
-		scale = poseView->IconSize() / 32.0;
+		scale = (float)poseView->IconSizeInt() / 32.0;
 
 	return BPoint(fLocation.x * scale, fLocation.y * scale);
 }
@@ -910,7 +901,7 @@ BPose::SetLocation(BPoint point, const BPoseView* poseView)
 {
 	float scale = 1.0;
 	if (poseView->ViewMode() == kIconMode)
-		scale = poseView->IconSize() / 32.0;
+		scale = (float)poseView->IconSizeInt() / 32.0;
 
 	fLocation = BPoint(floorf(point.x / scale), floorf(point.y / scale));
 	if (isinff(fLocation.x) || isinff(fLocation.y))

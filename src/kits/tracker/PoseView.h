@@ -205,7 +205,7 @@ public:
 	void SetIconPoseHeight();
 	float IconPoseHeight() const;
 	uint32 IconSizeInt() const;
-	icon_size IconSize() const;
+	BSize IconSize() const;
 
 	BRect Extent() const;
 	void GetLayoutInfo(uint32 viewMode, BPoint* grid,
@@ -889,10 +889,10 @@ BPoseView::IconSizeInt() const
 }
 
 
-inline icon_size
+inline BSize
 BPoseView::IconSize() const
 {
-	return (icon_size)fViewState->IconSize();
+	return BSize(fViewState->IconSize() - 1, fViewState->IconSize() - 1);
 }
 
 

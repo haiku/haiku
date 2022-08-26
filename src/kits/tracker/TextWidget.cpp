@@ -190,13 +190,11 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 			// icon mode
 			result.left = poseLoc.x
 				+ roundf((view->IconSizeInt() - viewWidth) / 2);
-			result.bottom = poseLoc.y + view->IconPoseHeight();
 		} else {
 			// mini icon mode
-			result.left = poseLoc.x + B_MINI_ICON + kMiniIconSeparator;
-			result.bottom = poseLoc.y
-				+ roundf((B_MINI_ICON + view->FontHeight()) / 2);
+			result.left = poseLoc.x + view->IconSizeInt() + kMiniIconSeparator;
 		}
+		result.bottom = poseLoc.y + view->IconPoseHeight();
 
 		result.right = result.left + viewWidth;
 	}

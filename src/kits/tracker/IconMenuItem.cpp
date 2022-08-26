@@ -165,12 +165,12 @@ ModelMenuItem::DrawIcon()
 	// draw small icon, synchronously
 	if (IsEnabled()) {
 		IconCache::sIconCache->Draw(fModel.ResolveIfLink(), Menu(), where,
-			kNormalIcon, (icon_size)ListIconSize());
+			kNormalIcon, BSize(ListIconSize() - 1, ListIconSize() - 1));
 	} else {
 		// dimmed, for now use a special blitter; icon cache should
 		// know how to blit one eventually
 		IconCache::sIconCache->SyncDraw(fModel.ResolveIfLink(), Menu(), where,
-			kNormalIcon, (icon_size)ListIconSize(), DimmedIconBlitter);
+			kNormalIcon, BSize(ListIconSize() - 1, ListIconSize() - 1), DimmedIconBlitter);
 	}
 
 	Menu()->PopState();

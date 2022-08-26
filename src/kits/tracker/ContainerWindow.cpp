@@ -414,7 +414,7 @@ DraggableContainerIcon::MouseDown(BPoint where)
 	window->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 
 	if (IconCache::sIconCache->IconHitTest(where, window->TargetModel(),
-			kNormalIcon, (icon_size)(fIconSize.IntegerWidth() + 1))) {
+			kNormalIcon, fIconSize)) {
 		// The click hit the icon, initiate a drag
 		fDragButton = buttons
 			& (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON);
@@ -487,7 +487,7 @@ DraggableContainerIcon::MouseMoved(BPoint where, uint32, const BMessage*)
 	// Draw the icon
 	float hIconOffset = (rect.Width() - Bounds().Width()) / 2;
 	IconCache::sIconCache->Draw(model, view, BPoint(hIconOffset, 0),
-		kNormalIcon, (icon_size)(fIconSize.IntegerWidth() + 1), true);
+		kNormalIcon, fIconSize, true);
 
 	// See if we need to truncate the string
 	BString nameString = model->Name();
@@ -549,8 +549,7 @@ DraggableContainerIcon::Draw(BRect updateRect)
 	float iconOffsetX = (Bounds().Width() - fIconSize.Width()) / 2;
 	float iconOffsetY = (Bounds().Height() - fIconSize.Height()) / 2;
 	IconCache::sIconCache->Draw(window->TargetModel(), this,
-		BPoint(iconOffsetX, iconOffsetY), kNormalIcon, (icon_size)(fIconSize.IntegerWidth() + 1),
-		true);
+		BPoint(iconOffsetX, iconOffsetY), kNormalIcon, fIconSize, true);
 }
 
 

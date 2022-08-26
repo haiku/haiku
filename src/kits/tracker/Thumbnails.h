@@ -20,7 +20,7 @@ namespace BPrivate {
 class Model;
 
 
-status_t GetThumbnailFromAttr(Model* model, BBitmap* icon, icon_size which);
+status_t GetThumbnailFromAttr(Model* model, BBitmap* icon, BSize size);
 bool ShouldGenerateThumbnail(const char* type);
 
 

@@ -296,7 +296,7 @@ HeaderView::Draw(BRect)
 	// Draw the icon, straddling the border
 	SetDrawingMode(B_OP_OVER);
 	IconCache::sIconCache->Draw(fIconModel, this, fIconRect.LeftTop(),
-		kNormalIcon, B_LARGE_ICON, true);
+		kNormalIcon, fIconRect.Size(), true);
 	SetDrawingMode(B_OP_COPY);
 
 	// Font information
@@ -387,7 +387,7 @@ HeaderView::MouseDown(BPoint where)
 			offsetPoint.x = where.x - fIconRect.left;
 			offsetPoint.y = where.y - fIconRect.top;
 			if (IconCache::sIconCache->IconHitTest(offsetPoint, fIconModel,
-					kNormalIcon, B_LARGE_ICON)) {
+					kNormalIcon, fIconRect.Size())) {
 				// Can't drag the trash anywhere..
 				fTrackingState = fModel->IsTrash()
 					? open_only_track : icon_track;
@@ -405,7 +405,7 @@ HeaderView::MouseDown(BPoint where)
 						offsetPoint.y = fClickPoint.y - fIconRect.top;
 						fDoubleClick
 							= IconCache::sIconCache->IconHitTest(offsetPoint,
-							fIconModel, kNormalIcon, B_LARGE_ICON);
+							fIconModel, kNormalIcon, fIconRect.Size());
 					}
 				}
 			}
@@ -430,7 +430,7 @@ HeaderView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 		SetDrawingMode(B_OP_OVER);
 		if (overTarget != fIsDropTarget) {
 			IconCache::sIconCache->Draw(fIconModel, this, fIconRect.LeftTop(),
-				overTarget ? kSelectedIcon : kNormalIcon, B_LARGE_ICON, true);
+				overTarget ? kSelectedIcon : kNormalIcon, fIconRect.Size(), true);
 			fIsDropTarget = overTarget;
 		}
 	}
@@ -473,7 +473,7 @@ HeaderView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 				// Draw the icon
 				float hIconOffset = (rect.Width() - fIconRect.Width()) / 2;
 				IconCache::sIconCache->Draw(fIconModel, view,
-					BPoint(hIconOffset, 0), kNormalIcon, B_LARGE_ICON, true);
+					BPoint(hIconOffset, 0), kNormalIcon, fIconRect.Size(), true);
 
 				// See if we need to truncate the string
 				BString nameString(fModel->Name());

@@ -38,6 +38,7 @@ All rights reserved.
 #include "MountMenu.h"
 
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Locale.h>
 #include <MenuItem.h>
@@ -119,16 +120,13 @@ AddMenuItemVisitor::Visit(BPartition* partition, int32 level)
 				unit = 'M';
 			}
 
-			char* buffer = name.LockBuffer(256);
-			snprintf(buffer, 256, "(%.1f %cB %s)",
+			name.SetToFormat("(%.1f %cB %s)",
 				1.0 * partition->Size() / divisor, unit, type);
-
-			name.UnlockBuffer();
 		}
 	}
 
 	// get icon
-	BBitmap* icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1),
+	BBitmap* icon = new BBitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_MINI_ICON)),
 		B_RGBA32);
 	if (partition->GetIcon(icon, B_MINI_ICON) != B_OK) {
 		delete icon;
@@ -206,7 +204,7 @@ MountMenu::AddDynamicItem(add_state)
 				continue;
 			}
 			// Use the shared icon instead of the device icon
-			if (get_device_icon(info.device_name, icon->Bits(), B_MINI_ICON)
+			if (get_device_icon(info.device_name, icon, B_MINI_ICON)
 					!= B_OK) {
 				GetTrackerResources()->GetIconResource(R_ShareIcon,
 					B_MINI_ICON, icon);
