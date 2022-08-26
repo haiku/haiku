@@ -421,7 +421,7 @@ IconMenuItem::GetContentSize(float* width, float* height)
 
 	int32 iconHeight = fWhich;
 	if (fDeviceIcon != NULL)
-		iconHeight = fDeviceIcon->Bounds().Height() + 1;
+		iconHeight = fDeviceIcon->Bounds().IntegerHeight() + 1;
 
 	fHeightDelta = iconHeight - *height;
 	if (*height < iconHeight)

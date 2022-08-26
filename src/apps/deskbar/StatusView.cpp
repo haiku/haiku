@@ -193,7 +193,7 @@ TReplicantTray::AttachedToWindow()
 
 	AddChild(fTime);
 
-	const int32 trayPadding = ceilf(be_control_look->ComposeSpacing(kTrayPadding) / 2);
+	const float trayPadding = ceilf(be_control_look->ComposeSpacing(kTrayPadding) / 2);
 	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - trayPadding, 2);
 		// will be moved into place later
 
@@ -232,7 +232,7 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 {
 	float width = 0;
 	float height = fMinTrayHeight;
-	const int32 trayPadding = ceilf(be_control_look->ComposeSpacing(kTrayPadding) / 2);
+	const float trayPadding = ceilf(be_control_look->ComposeSpacing(kTrayPadding) / 2);
 
 	if (fBarView->Vertical()) {
 		width = static_cast<TBarApp*>(be_app)->Settings()->width
@@ -1175,7 +1175,7 @@ TReplicantTray::AcceptAddon(BRect replicantFrame, BMessage* message)
 BPoint
 TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 {
-	const int32 trayPadding = ceilf(be_control_look->ComposeSpacing(kTrayPadding) / 2);
+	const float trayPadding = ceilf(be_control_look->ComposeSpacing(kTrayPadding) / 2);
 	BPoint loc(trayPadding, 0);
 	if (fBarView->Vertical() || fBarView->MiniState()) {
 		if (fBarView->Vertical() && !fBarView->Left())

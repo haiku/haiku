@@ -52,7 +52,7 @@ BControlLook::ComposeIconSize(int32 size)
 	if (scale < 1.0f)
 		scale = 1.0f;
 
-	const int32 scaled = size * scale;
+	const int32 scaled = (int32)(size * scale);
 	return BSize(scaled - 1, scaled - 1);
 }
 

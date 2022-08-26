@@ -310,8 +310,8 @@ BIconButton::SetIcon(int32 resourceID)
 	const void* data = resources.LoadResource(B_VECTOR_ICON_TYPE, resourceID,
 		&size);
 	if (data != NULL) {
-		BBitmap bitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(32)),
-			B_BITMAP_NO_SERVER_LINK, B_RGBA32);
+		const BRect bitmapRect(BPoint(0, 0), be_control_look->ComposeIconSize(32));
+		BBitmap bitmap(bitmapRect, B_BITMAP_NO_SERVER_LINK, B_RGBA32);
 		status = bitmap.InitCheck();
 		if (status != B_OK)
 			return status;
