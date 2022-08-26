@@ -45,12 +45,10 @@ static const pref_defaults kTermDefaults[] = {
 	{ PREF_COLS,				"80" },
 	{ PREF_ROWS,				"25" },
 
-//	No need for PREF_HALF_FONT_FAMILY/_STYLE defaults here,
+//	No need for PREF_HALF_FONT_FAMILY/_STYLE/_SIZE defaults here,
 //	these entries will be filled with corresponding params
 //	of the current system fixed font if they are not
 //	available in the settings file
-
-	{ PREF_HALF_FONT_SIZE,		"12" },
 
 	{ PREF_TEXT_FORE_COLOR,		"  0,   0,   0" },
 	{ PREF_TEXT_BACK_COLOR,		"255, 255, 255" },
@@ -438,6 +436,7 @@ PrefHandler::_ConfirmFont(const BFont *fallbackFont)
 	fallbackFont->GetFamilyAndStyle(&family, &style);
 	setString(PREF_HALF_FONT_FAMILY, family);
 	setString(PREF_HALF_FONT_STYLE, style);
+	setInt32(PREF_HALF_FONT_SIZE, fallbackFont->Size());
 }
 
 
