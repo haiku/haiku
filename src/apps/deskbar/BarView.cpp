@@ -527,10 +527,10 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 		if (fLeft) {
 			// move replicant tray past dragger width on left
 			// also down 1px so it won't cover the border
-			fReplicantTray->MoveTo(kDragWidth + kGutter, kGutter);
+			fReplicantTray->MoveTo(gDragWidth + kGutter, kGutter);
 
 			// shrink width by same amount
-			fReplicantTray->ResizeBy(-(kDragWidth + kGutter), 0);
+			fReplicantTray->ResizeBy(-(gDragWidth + kGutter), 0);
 		} else {
 			// move replicant tray down 1px so it won't cover the border
 			fReplicantTray->MoveTo(0, kGutter);
@@ -547,7 +547,7 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 
 			// move past dragger and top border
 			// and make room for the top and bottom borders
-			fReplicantTray->MoveTo(fLeft ? kDragWidth : 0, kGutter);
+			fReplicantTray->MoveTo(fLeft ? gDragWidth : 0, kGutter);
 			fReplicantTray->ResizeBy(0, -4);
 		} else {
 			// move tray right and down to not cover border, resize by same
@@ -562,12 +562,12 @@ TBarView::PlaceTray(bool vertSwap, bool leftSwap)
 	fDragRegion->MoveTo(statusLoc);
 
 	// make room for top and bottom border
-	fResizeControl->ResizeTo(kDragWidth, fDragRegion->Bounds().Height() - 2);
+	fResizeControl->ResizeTo(gDragWidth, fDragRegion->Bounds().Height() - 2);
 
 	if (fVertical) {
 		// move resize control into place based on width setting
 		fResizeControl->MoveTo(
-			fLeft ? fBarApp->Settings()->width - kDragWidth : 0, 1);
+			fLeft ? fBarApp->Settings()->width - gDragWidth : 0, 1);
 		if (fResizeControl->IsHidden())
 			fResizeControl->Show();
 	} else {

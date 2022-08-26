@@ -152,7 +152,7 @@ TTeamMenuItem::GetContentSize(float* width, float* height)
 			if (hideLabels)
 				*width = iconOnlyWidth;
 			else
-				*width = gMinimumWindowWidth - (kDragRegionWidth + kGutter) * 2;
+				*width = gMinimumWindowWidth - (gDragRegionWidth + kGutter) * 2;
 		} else if (!fBarView->Vertical()) {
 			TExpandoMenuBar* menu = static_cast<TExpandoMenuBar*>(Menu());
 			*width = menu->MaxHorizontalItemWidth();

@@ -49,25 +49,14 @@ All rights reserved.
 
 //#define FULL_MODE
 
-const float kDragWidth = 4.0f;
-const float kMinReplicantHeight = 16.0f;
-const float kMinReplicantWidth = 16.0f;
 const int32 kMinimumReplicantCount = 6;
-const int32 kIconGap = 2;
 const int32 kGutter = 1;
-const int32 kDragRegionWidth = 6;
 const int32 kTrayPadding = B_USE_HALF_ITEM_SPACING;
 const int32 kClockMargin = 12;
 
-// 1 pixel for left gutter
-// space for replicant tray (6 items)
-// 6 pixel drag region
-const float kMinimumTrayWidth = kIconGap + kMinReplicantWidth
-	+ (kMinimumReplicantCount * kIconGap)
-	+ (kMinimumReplicantCount * kMinReplicantWidth) + kGutter;
-
-extern float gMinimumWindowWidth;
-extern float gMaximumWindowWidth;
+extern float gDragWidth, gDragRegionWidth;
+extern float gMinReplicantHeight, gMinReplicantWidth;
+extern float gMinimumTrayWidth, gMinimumWindowWidth, gMaximumWindowWidth;
 
 #ifdef DB_ADDONS
 struct DeskbarItemInfo {

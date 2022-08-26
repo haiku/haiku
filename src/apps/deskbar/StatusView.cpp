@@ -79,6 +79,11 @@ All rights reserved.
 
 static const float kVerticalMiniMultiplier = 2.9f;
 
+static float sIconGap = 0.0f;
+float gDragWidth, gDragRegionWidth = 0.0f;
+float gMinReplicantHeight, gMinReplicantWidth = 0.0f;
+float gMinimumTrayWidth, gMinimumWindowWidth, gMaximumWindowWidth = 0.0f;
+
 
 #ifdef DB_ADDONS
 // Add-on support
@@ -91,9 +96,6 @@ const char* const kInstantiateItemCFunctionName = "instantiate_deskbar_item";
 const char* const kInstantiateEntryCFunctionName = "instantiate_deskbar_entry";
 const char* const kReplicantSettingsFile = "replicants";
 const char* const kReplicantPathField = "replicant_path";
-
-float gMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
-float gMaximumWindowWidth = gMinimumWindowWidth * 2;
 
 
 static void
@@ -140,8 +142,28 @@ TReplicantTray::TReplicantTray(TBarView* barView)
 	fShelf(new TReplicantShelf(this)),
 	fAlignmentSupport(false)
 {
+	if (sIconGap == 0.0f) {
+		sIconGap = ceilf(be_control_look->DefaultLabelSpacing() / 3.0f);
+
+		gDragRegionWidth = be_control_look->ComposeSpacing(B_USE_HALF_ITEM_SPACING);
+		gDragWidth = ceilf(gDragRegionWidth * 0.6f);
+
+		gMinReplicantHeight = gMinReplicantWidth =
+			be_control_look->ComposeIconSize(B_MINI_ICON).IntegerWidth() + 1;
+
+		// 1 pixel for left gutter
+		// space for replicant tray (6 items)
+		// 6 pixel drag region
+		gMinimumTrayWidth = sIconGap + gMinReplicantWidth
+			+ (kMinimumReplicantCount * sIconGap)
+			+ (kMinimumReplicantCount * gMinReplicantWidth) + kGutter;
+
+		gMinimumWindowWidth = kGutter + gMinimumTrayWidth + gDragRegionWidth;
+		gMaximumWindowWidth = gMinimumWindowWidth * 2;
+	}
+
 	// scale replicants by font size
-	fMaxReplicantHeight = std::max(kMinReplicantHeight,
+	fMaxReplicantHeight = std::max(gMinReplicantHeight,
 		float(((TBarApp*)be_app)->IconSize()));
 	// but not bigger than TabHeight which depends on be_bold_font
 	// TODO this should only apply to mini-mode but we set it once here for all
@@ -155,9 +177,9 @@ TReplicantTray::TReplicantTray(TBarView* barView)
 	fMinTrayHeight = kGutter + fMaxReplicantHeight + kGutter;
 	if (fBarView != NULL && fBarView->Vertical()
 		&& (fBarView->ExpandoState() || fBarView->FullState())) {
-		fMinimumTrayWidth = gMinimumWindowWidth - kGutter - kDragRegionWidth;
+		fMinimumTrayWidth = gMinimumWindowWidth - kGutter - gDragRegionWidth;
 	} else
-		fMinimumTrayWidth = kMinimumTrayWidth;
+		fMinimumTrayWidth = gMinimumTrayWidth;
 
 	// Create the time view
 	fTime = new TTimeView(fMinimumTrayWidth, fMaxReplicantHeight - 1.0,
@@ -236,7 +258,9 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 
 	if (fBarView->Vertical()) {
 		width = static_cast<TBarApp*>(be_app)->Settings()->width
-			- kDragWidth - kGutter;
+			- gDragWidth - kGutter;
+		width = std::max(gMinimumTrayWidth, width);
+
 		if (fRightBottomReplicant.IsValid())
 			height = fRightBottomReplicant.bottom;
 		else if (ReplicantCount() > 0) {
@@ -244,7 +268,7 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 			// to show all the replicants and gutters.
 			int32 rowCount = (int32)(height / fMaxReplicantHeight);
 			height = kGutter + (rowCount * fMaxReplicantHeight)
-				+ ((rowCount - 1) * kIconGap) + kGutter;
+				+ ((rowCount - 1) * sIconGap) + kGutter;
 			height = std::max(fMinTrayHeight, height);
 		} else
 			height = fMinTrayHeight;
@@ -257,11 +281,11 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 				width = fRightBottomReplicant.right + kClockMargin
 					+ fTime->Frame().Width() + trayPadding + 2;
 			} else
-				width = fRightBottomReplicant.right + kIconGap + kGutter;
+				width = fRightBottomReplicant.right + sIconGap + kGutter;
 		}
 
 		// this view has a fixed minimum width
-		width = std::max(kMinimumTrayWidth, width);
+		width = std::max(gMinimumTrayWidth, width);
 
 		// if mini-mode set to tab height
 		// else if horizontal mode set to team menu item height
@@ -1179,7 +1203,7 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 	BPoint loc(trayPadding, 0);
 	if (fBarView->Vertical() || fBarView->MiniState()) {
 		if (fBarView->Vertical() && !fBarView->Left())
-			loc.x += kDragWidth; // move past dragger on left
+			loc.x += gDragWidth; // move past dragger on left
 
 		loc.y = floorf((fBarView->TabHeight() - fMaxReplicantHeight) / 2) - 1;
 	} else {
@@ -1204,11 +1228,10 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 
 	if (fBarView->Vertical()) {
 		// try to find free space in every row
-		for (int32 row = 0; ; loc.y += fMaxReplicantHeight + kIconGap, row++) {
+		for (int32 row = 0; ; loc.y += fMaxReplicantHeight + sIconGap, row++) {
 			// determine free space in this row
 			BRect rowRect(loc.x, loc.y,
-				loc.x + static_cast<TBarApp*>(be_app)->Settings()->width
-					- (trayPadding + kDragWidth + kGutter) * 2,
+				loc.x + Bounds().Width() - trayPadding,
 				loc.y + fMaxReplicantHeight);
 			if (row == 0 && !fTime->IsHidden(fTime))
 				rowRect.right -= kClockMargin + fTime->Frame().Width();
@@ -1221,7 +1244,7 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 					continue;
 
 				// push this replicant placement past the last one
-				replicantRect.left = view->Frame().right + kIconGap + 1;
+				replicantRect.left = view->Frame().right + sIconGap + 1;
 			}
 
 			// calculated left position, add replicantWidth to get the
@@ -1245,7 +1268,7 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 			fShelf->ReplicantAt(index - 1, &view);
 			if (view != NULL) {
 				// push this replicant placement past the last one
-				loc.x = view->Frame().right + kIconGap + 1;
+				loc.x = view->Frame().right + sIconGap + 1;
 			}
 		}
 	}
@@ -1389,7 +1412,7 @@ TDragRegion::GetPreferredSize(float* width, float* height)
 	*height = fReplicantTray->Bounds().Height();
 
 	if (fDragLocation != kNoDragRegion)
-		*width += kDragWidth + kGutter;
+		*width += gDragWidth + kGutter;
 	else
 		*width += 6;
 
@@ -1501,9 +1524,9 @@ TDragRegion::DragRegion() const
 		placeOnLeft = fDragLocation == kDragRegionLeft;
 
 	if (placeOnLeft)
-		dragRegion.right = dragRegion.left + kDragWidth;
+		dragRegion.right = dragRegion.left + gDragWidth;
 	else
-		dragRegion.left = dragRegion.right - kDragWidth;
+		dragRegion.left = dragRegion.right - gDragWidth;
 
 	return dragRegion;
 }
@@ -1771,7 +1794,7 @@ TDragRegion::SetDragRegionLocation(int32 location)
 */
 TResizeControl::TResizeControl(TBarView* barView)
 	:
-	BControl(BRect(0, kDragWidth, 0, kMenuBarHeight), "", "", NULL,
+	BControl(BRect(0, gDragWidth, 0, kMenuBarHeight), "", "", NULL,
 		B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS),
 	fBarView(barView)
 {
