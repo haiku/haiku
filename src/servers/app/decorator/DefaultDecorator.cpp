@@ -450,7 +450,8 @@ DefaultDecorator::_DrawResizeKnob(BRect rect, bool full,
 
 	fDrawingEngine->FillRect(rect, gradient);
 
-	BPoint offset1(15, 15), offset2(14, 14);
+	BPoint offset1(rect.Width(), rect.Height()),
+		offset2(rect.Width() - 1, rect.Height() - 1);
 	fDrawingEngine->StrokeLine(BPoint(x, y) - offset1,
 		BPoint(x - offset1.x, y - 2), colors[0]);
 	fDrawingEngine->StrokeLine(BPoint(x, y) - offset2,
