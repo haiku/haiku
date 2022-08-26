@@ -139,10 +139,8 @@ struct StaggerOneParams {
 };
 
 
-const int32 kWindowStaggerBy = 17;
-
-
-BRect BContainerWindow::sNewWindRect(85, 50, 548, 280);
+BRect BContainerWindow::sNewWindRect;
+static int32 sWindowStaggerBy;
 
 LockingList<AddonShortcut>* BContainerWindow::fAddonsList
 	= new LockingList<struct AddonShortcut>(10, true);
@@ -360,7 +358,7 @@ OffsetFrameOne(const char* DEBUG_ONLY(name), uint32, off_t, void* castToRect,
 	if (!castToRect)
 		return false;
 
-	((BRect*)castToRect)->OffsetBy(kWindowStaggerBy, kWindowStaggerBy);
+	((BRect*)castToRect)->OffsetBy(sWindowStaggerBy, sWindowStaggerBy);
 
 	return true;
 }
@@ -682,6 +680,14 @@ BContainerWindow::~BContainerWindow()
 BRect
 BContainerWindow::InitialWindowRect(window_feel feel)
 {
+	if (!sNewWindRect.IsValid()) {
+		const float labelSpacing = be_control_look->DefaultLabelSpacing();
+		// approximately (85, 50, 548, 280) with default spacing
+		sNewWindRect = BRect(labelSpacing * 14, labelSpacing * 8,
+			labelSpacing * 91, labelSpacing * 46);
+		sWindowStaggerBy = (int32)(labelSpacing * 3.0f);
+	}
+
 	if (feel != kDesktopWindowFeel)
 		return sNewWindRect;
 
@@ -4007,10 +4013,16 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 	BRect frame(Frame());
 	if (node->Read(rectAttributeName, 0, B_RECT_TYPE, sizeof(BRect), &frame)
 			== sizeof(BRect)) {
+		const float scalingFactor = be_plain_font->Size() / 12.0f;
+		frame.left *= scalingFactor;
+		frame.top *= scalingFactor;
+		frame.right *= scalingFactor;
+		frame.bottom *= scalingFactor;
+
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
 	} else
-		sNewWindRect.OffsetBy(kWindowStaggerBy, kWindowStaggerBy);
+		sNewWindRect.OffsetBy(sWindowStaggerBy, sWindowStaggerBy);
 
 	fPreviousBounds = Bounds();
 
@@ -4058,10 +4070,16 @@ BContainerWindow::RestoreWindowState(const BMessage& message)
 
 	BRect frame(Frame());
 	if (message.FindRect(rectAttributeName, &frame) == B_OK) {
+		const float scalingFactor = be_plain_font->Size() / 12.0f;
+		frame.left *= scalingFactor;
+		frame.top *= scalingFactor;
+		frame.right *= scalingFactor;
+		frame.bottom *= scalingFactor;
+
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
 	} else
-		sNewWindRect.OffsetBy(kWindowStaggerBy, kWindowStaggerBy);
+		sNewWindRect.OffsetBy(sWindowStaggerBy, sWindowStaggerBy);
 
 	uint32 workspace;
 	if ((fContainerWindowFlags & kRestoreWorkspace)
@@ -4107,6 +4125,11 @@ BContainerWindow::SaveWindowState(AttributeStreamNode* node)
 
 	// node is null if it already got deleted
 	BRect frame(Frame());
+	const float scalingFactor = be_plain_font->Size() / 12.0f;
+	frame.left /= scalingFactor;
+	frame.top /= scalingFactor;
+	frame.right /= scalingFactor;
+	frame.bottom /= scalingFactor;
 	node->Write(rectAttributeName, 0, B_RECT_TYPE, sizeof(BRect), &frame);
 
 	uint32 workspaces = Workspaces();
@@ -4140,6 +4163,11 @@ BContainerWindow::SaveWindowState(BMessage& message) const
 
 	// node is null if it already got deleted
 	BRect frame(Frame());
+	const float scalingFactor = be_plain_font->Size() / 12.0f;
+	frame.left /= scalingFactor;
+	frame.top /= scalingFactor;
+	frame.right /= scalingFactor;
+	frame.bottom /= scalingFactor;
 	message.AddRect(rectAttributeName, frame);
 	message.AddInt32(workspaceAttributeName, (int32)Workspaces());
 
