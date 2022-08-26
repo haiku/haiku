@@ -24,9 +24,6 @@
 #include <String.h>
 
 
-#define ICON_SIZE 32
-
-
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "InterfaceListItem"
 
@@ -81,6 +78,7 @@ InterfaceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 	}
 
 	BBitmap* stateIcon = _StateIcon();
+	const int32 stateIconWidth = stateIcon->Bounds().IntegerWidth() + 1;
 	const char* stateText = _StateText();
 
 	// Set the initial bounds of item contents
@@ -90,8 +88,8 @@ InterfaceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 		- BPoint(be_plain_font->StringWidth(stateText)
 			+ be_control_look->DefaultLabelSpacing(), 0);
 	BPoint namePoint = bounds.LeftTop()
-		+ BPoint(ICON_SIZE + (be_control_look->DefaultLabelSpacing() * 2),
-		fFirstLineOffset);
+		+ BPoint(stateIconWidth	+ (be_control_look->DefaultLabelSpacing() * 2),
+			fFirstLineOffset);
 
 	if (fDisabled) {
 		owner->SetDrawingMode(B_OP_ALPHA);
@@ -128,7 +126,7 @@ InterfaceListItem::DrawItem(BView* owner, BRect bounds, bool complete)
 	owner->DrawString(stateText, statePoint);
 
 	BPoint linePoint = bounds.LeftTop()
-		+ BPoint(ICON_SIZE + (be_control_look->DefaultLabelSpacing() * 2),
+		+ BPoint(stateIconWidth + (be_control_look->DefaultLabelSpacing() * 2),
 		fFirstLineOffset + fLineOffset);
 	owner->DrawString(fSubtitle, linePoint);
 
@@ -206,27 +204,28 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType)
 
 	BResources* resources = BApplication::AppResources();
 
-	size_t iconSize;
+	size_t iconDataSize;
 
 	// Try specific interface icon?
 	interfaceHVIF = (const uint8*)resources->LoadResource(
-		B_VECTOR_ICON_TYPE, Name(), &iconSize);
+		B_VECTOR_ICON_TYPE, Name(), &iconDataSize);
 
 	if (interfaceHVIF == NULL && mediaType != NULL)
 		// Not found, try interface media type?
 		interfaceHVIF = (const uint8*)resources->LoadResource(
-			B_VECTOR_ICON_TYPE, mediaType, &iconSize);
+			B_VECTOR_ICON_TYPE, mediaType, &iconDataSize);
 	if (interfaceHVIF == NULL)
 		// Not found, try default interface icon?
 		interfaceHVIF = (const uint8*)resources->LoadResource(
-			B_VECTOR_ICON_TYPE, "ether", &iconSize);
+			B_VECTOR_ICON_TYPE, "ether", &iconDataSize);
 
+	const BSize iconSize = be_control_look->ComposeIconSize(B_LARGE_ICON);
 	if (interfaceHVIF != NULL) {
 		// Now build the bitmap
 		interfaceBitmap = new(std::nothrow) BBitmap(
-			BRect(0, 0, ICON_SIZE, ICON_SIZE), 0, B_RGBA32);
+			BRect(BPoint(0, 0), iconSize), 0, B_RGBA32);
 		if (BIconUtils::GetVectorIcon(interfaceHVIF,
-				iconSize, interfaceBitmap) == B_OK)
+				iconDataSize, interfaceBitmap) == B_OK)
 			fIcon = interfaceBitmap;
 		else
 			delete interfaceBitmap;
@@ -234,39 +233,39 @@ InterfaceListItem::_PopulateBitmaps(const char* mediaType)
 
 	// Load possible state icons
 	offlineHVIF = (const uint8*)resources->LoadResource(
-		B_VECTOR_ICON_TYPE, "offline", &iconSize);
+		B_VECTOR_ICON_TYPE, "offline", &iconDataSize);
 
 	if (offlineHVIF != NULL) {
 		offlineBitmap = new(std::nothrow) BBitmap(
-			BRect(0, 0, ICON_SIZE, ICON_SIZE), 0, B_RGBA32);
+			BRect(BPoint(0, 0), iconSize), 0, B_RGBA32);
 		if (BIconUtils::GetVectorIcon(offlineHVIF,
-				iconSize, offlineBitmap) == B_OK)
+				iconDataSize, offlineBitmap) == B_OK)
 			fIconOffline = offlineBitmap;
 		else
 			delete offlineBitmap;
 	}
 
 	pendingHVIF = (const uint8*)resources->LoadResource(
-		B_VECTOR_ICON_TYPE, "pending", &iconSize);
+		B_VECTOR_ICON_TYPE, "pending", &iconDataSize);
 
 	if (pendingHVIF != NULL) {
 		pendingBitmap = new(std::nothrow) BBitmap(
-			BRect(0, 0, ICON_SIZE, ICON_SIZE), 0, B_RGBA32);
+			BRect(BPoint(0, 0), iconSize), 0, B_RGBA32);
 		if (BIconUtils::GetVectorIcon(pendingHVIF,
-				iconSize, pendingBitmap) == B_OK)
+				iconDataSize, pendingBitmap) == B_OK)
 			fIconPending = pendingBitmap;
 		else
 			delete pendingBitmap;
 	}
 
 	onlineHVIF = (const uint8*)resources->LoadResource(
-		B_VECTOR_ICON_TYPE, "online", &iconSize);
+		B_VECTOR_ICON_TYPE, "online", &iconDataSize);
 
 	if (onlineHVIF != NULL) {
 		onlineBitmap = new(std::nothrow) BBitmap(
-			BRect(0, 0, ICON_SIZE, ICON_SIZE), 0, B_RGBA32);
+			BRect(BPoint(0, 0), iconSize), 0, B_RGBA32);
 		if (BIconUtils::GetVectorIcon(onlineHVIF,
-				iconSize, onlineBitmap) == B_OK)
+				iconDataSize, onlineBitmap) == B_OK)
 			fIconOnline = onlineBitmap;
 		else
 			delete onlineBitmap;
