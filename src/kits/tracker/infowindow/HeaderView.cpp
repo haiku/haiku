@@ -38,6 +38,7 @@ All rights reserved.
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Locale.h>
 #include <PopUpMenu.h>
 #include <ScrollView.h>
@@ -59,11 +60,6 @@ All rights reserved.
 #define B_TRANSLATION_CONTEXT "InfoWindow"
 
 
-// Offsets taken from TAlertView::Draw in BAlert.cpp
-const float kIconHorizOffset = 18.0f;
-const float kIconVertOffset = 6.0f;
-const float kBorderWidth = 32.0f;
-
 // Amount you have to move the mouse before a drag starts
 const float kDragSlop = 3.0f;
 
@@ -80,11 +76,10 @@ HeaderView::HeaderView(Model* model)
 	fDoubleClick(false),
 	fDragging(false)
 {
-	// Create the rect for displaying the icon
-	fIconRect.Set(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1);
-	// Offset taken from BAlert
-	fIconRect.OffsetBy(kIconHorizOffset, kIconVertOffset);
-	SetExplicitSize(BSize(B_SIZE_UNSET, B_LARGE_ICON + 2 * kIconVertOffset));
+	const float labelSpacing = be_control_look->DefaultLabelSpacing();
+	fIconRect = BRect(BPoint(labelSpacing * 3.0f, labelSpacing),
+		be_control_look->ComposeIconSize(B_LARGE_ICON));
+	SetExplicitSize(BSize(B_SIZE_UNSET, fIconRect.Width() + 2 * fIconRect.top));
 
 	// The title rect
 	// The magic numbers are used to properly calculate the rect so that
@@ -95,12 +90,12 @@ HeaderView::HeaderView(Model* model)
 	GetFont(&currentFont);
 	currentFont.GetHeight(&fontMetrics);
 
-	fTitleRect.left = fIconRect.right + 5;
+	fTitleRect.left = fIconRect.right + labelSpacing;
 	fTitleRect.top = 0;
 	fTitleRect.bottom = fontMetrics.ascent + 1;
 	fTitleRect.right = min_c(
 		fTitleRect.left + currentFont.StringWidth(fModel->Name()),
-		Bounds().Width() - 5);
+		Bounds().Width() - labelSpacing);
 	// Offset so that it centers with the icon
 	fTitleRect.OffsetBy(0,
 		fIconRect.top + ((fIconRect.Height() - fTitleRect.Height()) / 2));
