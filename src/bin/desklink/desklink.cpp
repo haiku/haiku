@@ -18,6 +18,7 @@
 
 #include <Alert.h>
 #include <Application.h>
+#include <ControlLook.h>
 #include <Deskbar.h>
 #include <MimeType.h>
 #include <Roster.h>
@@ -34,7 +35,7 @@ const char *kAppSignature = "application/x-vnd.Haiku-desklink";
 
 int
 main(int, char **argv)
-{	
+{
 	BApplication app(kAppSignature);
 	bool atLeastOnePath = false;
 	BList titleList;
@@ -45,7 +46,7 @@ main(int, char **argv)
 	for (int32 i = 1; argv[i]!=NULL; i++) {
 		if (strcmp(argv[i], "--help") == 0)
 			break;
-		
+
 		if (strcmp(argv[i], "--list") == 0) {
 			int32 count = deskbar.CountItems();
 			int32 found = 0;
@@ -124,7 +125,7 @@ main(int, char **argv)
 
 		BEntry entry(argv[i], true);
 		entry_ref ref;
-		
+
 		if (entry.Exists()) {
 			entry.GetRef(&ref);
 		} else if (BMimeType::IsValid(argv[i])) {
@@ -136,10 +137,11 @@ main(int, char **argv)
 			printf("desklink: cannot find '%s'\n", argv[i]);
 			return 1;
 		}
-		
+
 		err = deskbar.AddItem(&ref);
 		if (err != B_OK) {
-			err = deskbar.AddItem(new DeskButton(BRect(0, 0, 15, 15),
+			err = deskbar.AddItem(new DeskButton(BRect(BPoint(0, 0),
+					be_control_look->ComposeIconSize(B_MINI_ICON)),
 				&ref, ref.name, titleList, actionList));
 			if (err != B_OK) {
 				printf("desklink: Deskbar refuses link to '%s': %s\n", argv[i], strerror(err));

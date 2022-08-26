@@ -13,6 +13,7 @@
 #include <Alert.h>
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Dragger.h>
 #include <MenuItem.h>
 #include <Message.h>
@@ -42,17 +43,13 @@ DeskButton::DeskButton(BRect frame, entry_ref* ref, const char* name,
 	fActionList(actions),
 	fTitleList(titles)
 {
-#ifdef __HAIKU__
-	fSegments = new BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
-#else
-	fSegments = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
-#endif
-	BNodeInfo::GetTrackerIcon(&fRef, fSegments, B_MINI_ICON);
+	fSegments = new BBitmap(frame, B_RGBA32);
+	BNodeInfo::GetTrackerIcon(&fRef, fSegments, (icon_size)(frame.IntegerWidth() + 1));
 }
 
 
 DeskButton::DeskButton(BMessage *message)
-	:	BView(message)	
+	: BView(message)
 {
 	message->FindRef("ref", &fRef);
 	
@@ -65,12 +62,10 @@ DeskButton::DeskButton(BMessage *message)
 		index++;
 	}
 	
-#ifdef __HAIKU__
-	fSegments = new BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
-#else
-	fSegments = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
-#endif
-	BNodeInfo::GetTrackerIcon(&fRef, fSegments, B_MINI_ICON);
+	fSegments = new BBitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_MINI_ICON)),
+		B_RGBA32);
+	BNodeInfo::GetTrackerIcon(&fRef, fSegments,
+		(icon_size)(fSegments->Bounds().IntegerWidth() + 1));
 }
 
 
