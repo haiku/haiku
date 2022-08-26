@@ -18,6 +18,7 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Clipboard.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -235,7 +236,9 @@ IconView::IconView(const entry_ref* ref, bool isDevice)
 	fBitmap(NULL)
 {
 	UpdateIcon();
-	SetExplicitSize(BSize(32, 32));
+
+	if (fBitmap != NULL)
+		SetExplicitSize(fBitmap->Bounds().Size());
 }
 
 
@@ -270,8 +273,10 @@ IconView::Draw(BRect updateRect)
 void
 IconView::UpdateIcon()
 {
-	if (fBitmap == NULL)
-		fBitmap = new BBitmap(BRect(0, 0, 31, 31), B_RGBA32);
+	if (fBitmap == NULL) {
+		fBitmap = new BBitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_LARGE_ICON)),
+			B_RGBA32);
+	}
 
 	if (fBitmap != NULL) {
 		status_t status = B_ERROR;
@@ -279,8 +284,10 @@ IconView::UpdateIcon()
 		if (fIsDevice) {
 			BPath path(&fRef);
 			status = get_device_icon(path.Path(), fBitmap, B_LARGE_ICON);
-		} else
-			status = BNodeInfo::GetTrackerIcon(&fRef, fBitmap);
+		} else {
+			status = BNodeInfo::GetTrackerIcon(&fRef, fBitmap,
+				(icon_size)(fBitmap->Bounds().IntegerWidth() + 1));
+		}
 
 		if (status != B_OK) {
 			// Try to get generic icon
@@ -412,8 +419,8 @@ HeaderView::HeaderView(const entry_ref* ref, DataEditor& editor)
 
 	BFont boldFont = *be_bold_font;
 	BFont plainFont = *be_plain_font;
-	boldFont.SetSize(plainFont.Size() * 0.83);
-	plainFont.SetSize(plainFont.Size() * 0.83);
+	boldFont.SetSize(ceilf(plainFont.Size() * 0.83));
+	plainFont.SetSize(ceilf(plainFont.Size() * 0.83));
 
 	BStringView* stringView = new BStringView(
 		B_EMPTY_STRING, editor.IsAttribute()
@@ -1078,7 +1085,7 @@ ProbeView::ProbeView(entry_ref* ref, const char* attribute,
 	fEditor.SetTo(*ref, attribute);
 
 	int32 baseType = kHexBase;
-	float fontSize = 12.0f;
+	float fontSize = be_plain_font->Size();
 	if (settings != NULL) {
 		settings->FindInt32("base_type", &baseType);
 		settings->FindFloat("font_size", &fontSize);
