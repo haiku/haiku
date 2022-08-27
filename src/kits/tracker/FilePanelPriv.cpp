@@ -40,6 +40,7 @@ All rights reserved.
 #include <Alert.h>
 #include <Application.h>
 #include <Button.h>
+#include <ControlLook.h>
 #include <Catalog.h>
 #include <Debug.h>
 #include <Directory.h>
@@ -186,7 +187,10 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target,
 
 	fIsSavePanel = (mode == B_SAVE_PANEL);
 
-	BRect windRect(85, 50, 568, 296);
+	const float labelSpacing = be_control_look->DefaultLabelSpacing();
+	// approximately (84, 50, 568, 296) with default sizing
+	BRect windRect(labelSpacing * 14.0f, labelSpacing * 8.0f,
+		labelSpacing * 95.0f, labelSpacing * 49.0f);
 	MoveTo(windRect.LeftTop());
 	ResizeTo(windRect.Width(), windRect.Height());
 
@@ -700,12 +704,13 @@ TFilePanel::Init(const BMessage*)
 
 	font_height ht;
 	be_plain_font->GetHeight(&ht);
-	float f_height = ht.ascent + ht.descent + ht.leading;
+	const float f_height = ht.ascent + ht.descent + ht.leading;
+	const float spacing = be_control_look->ComposeSpacing(B_USE_SMALL_SPACING);
 
 	BRect rect;
-	rect.top = fMenuBar->Bounds().Height() + 8;
-	rect.left = windRect.left + 8;
-	rect.right = rect.left + 300;
+	rect.top = fMenuBar->Bounds().Height() + spacing;
+	rect.left = spacing;
+	rect.right = rect.left + (spacing * 50);
 	rect.bottom = rect.top + (f_height > 22 ? f_height : 22);
 
 	fDirMenuField = new BMenuField(rect, "DirMenuField", "", fDirMenu);
@@ -727,13 +732,34 @@ TFilePanel::Init(const BMessage*)
 
 	fBackView->AddChild(fDirMenuField);
 
+	// add buttons
+	fButtonText = fIsSavePanel ? B_TRANSLATE("Save") : B_TRANSLATE("Open");
+	BButton* default_button = new BButton(BRect(), "default button",
+		fButtonText.String(), new BMessage(kDefaultButton),
+		B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
+	BSize preferred = default_button->PreferredSize();
+	const BRect defaultButtonRect = BRect(BPoint(
+		windRect.Width() - (preferred.Width() + spacing + be_control_look->GetScrollBarWidth()),
+		windRect.Height() - (preferred.Height() + spacing)),
+		preferred);
+	default_button->MoveTo(defaultButtonRect.LeftTop());
+	default_button->ResizeTo(preferred);
+	fBackView->AddChild(default_button);
+
+	BButton* cancel_button = new BButton(BRect(), "cancel button",
+		B_TRANSLATE("Cancel"), new BMessage(kCancelButton),
+		B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
+	preferred = cancel_button->PreferredSize();
+	cancel_button->MoveTo(defaultButtonRect.LeftTop()
+		- BPoint(preferred.Width() + spacing, 0));
+	cancel_button->ResizeTo(preferred);
+	fBackView->AddChild(cancel_button);
+
 	// add file name text view
 	if (fIsSavePanel) {
-		BRect rect(windRect);
-		rect.top = rect.bottom - 35;
-		rect.left = 8;
-		rect.right = rect.left + 170;
-		rect.bottom = rect.top + 13;
+		BRect rect(defaultButtonRect);
+		rect.left = spacing;
+		rect.right = rect.left + spacing * 28;
 
 		fTextControl = new BTextControl(rect, "text view",
 			B_TRANSLATE("save text"), "", NULL,
@@ -743,10 +769,7 @@ TFilePanel::Init(const BMessage*)
 		fBackView->AddChild(fTextControl);
 		fTextControl->SetDivider(0.0f);
 		fTextControl->TextView()->SetMaxBytes(B_FILE_NAME_LENGTH - 1);
-
-		fButtonText.SetTo(B_TRANSLATE("Save"));
-	} else
-		fButtonText.SetTo(B_TRANSLATE("Open"));
+	}
 
 	// Add PoseView
 	PoseView()->SetName("ActualPoseView");
@@ -754,12 +777,12 @@ TFilePanel::Init(const BMessage*)
 	fPoseContainer->SetResizingMode(B_FOLLOW_ALL);
 	fBorderedView->EnableBorderHighlight(true);
 
-	rect = windRect;
-	rect.OffsetTo(10, fDirMenuField->Frame().bottom + 10);
-	rect.bottom = windRect.bottom - 46;
-	rect.right -= 20;
+	rect.left = spacing;
+	rect.top = fDirMenuField->Frame().bottom + spacing;
+	rect.right = windRect.Width() - spacing;
+	rect.bottom = defaultButtonRect.top - spacing;
 	fPoseContainer->MoveTo(rect.LeftTop());
-	fPoseContainer->ResizeTo(rect.Width(), rect.Height());
+	fPoseContainer->ResizeTo(rect.Size());
 
 	PoseView()->AddScrollBars();
 	PoseView()->SetDragEnabled(false);
@@ -787,32 +810,6 @@ TFilePanel::Init(const BMessage*)
 	AddShortcut(B_UP_ARROW, B_COMMAND_KEY, new BMessage(kOpenParentDir));
 	AddShortcut(B_UP_ARROW, B_COMMAND_KEY | B_OPTION_KEY,
 		new BMessage(kOpenParentDir));
-
-	// New code to make buttons font sensitive
-	rect = windRect;
-	rect.top = rect.bottom - 35;
-	rect.bottom -= 10;
-	rect.right -= 25;
-	float default_width
-		= be_plain_font->StringWidth(fButtonText.String()) + 20;
-	rect.left = default_width > 75
-		? rect.right - default_width : rect.right - 75;
-
-	BButton* default_button = new BButton(rect, "default button",
-		fButtonText.String(), new BMessage(kDefaultButton),
-		B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
-	fBackView->AddChild(default_button);
-
-	rect.right = rect.left -= 10;
-	float cancel_width
-		= be_plain_font->StringWidth(B_TRANSLATE("Cancel")) + 20;
-	rect.left = cancel_width > 75
-		? rect.right - cancel_width : rect.right - 75;
-
-	BButton* cancel_button = new BButton(rect, "cancel button",
-		B_TRANSLATE("Cancel"), new BMessage(kCancelButton),
-		B_FOLLOW_RIGHT + B_FOLLOW_BOTTOM);
-	fBackView->AddChild(cancel_button);
 
 	if (!fIsSavePanel && (fNodeFlavors & B_DIRECTORY_NODE) == 0)
 		default_button->SetEnabled(false);
@@ -896,7 +893,7 @@ TFilePanel::Init(const BMessage*)
 
 	SetTitle(title.String());
 
-	SetSizeLimits(370, 10000, 200, 10000);
+	SetSizeLimits(spacing * 60, 10000, spacing * 33, 10000);
 }
 
 
