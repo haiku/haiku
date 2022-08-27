@@ -750,7 +750,7 @@ TAlertView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width != NULL) {
 		if (fIconBitmap != NULL) {
-			*_width = (be_control_look->DefaultLabelSpacing() * 2)
+			*_width = (be_control_look->DefaultLabelSpacing() * 3)
 				+ fIconBitmap->Bounds().Width();
 		} else {
 			*_width = 0;
