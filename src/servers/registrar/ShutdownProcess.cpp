@@ -22,6 +22,7 @@
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Button.h>
+#include <ControlLook.h>
 #include <Catalog.h>
 #include <File.h>
 #include <Message.h>
@@ -30,8 +31,6 @@
 #include <Roster.h>		// for B_REQUEST_QUIT
 #include <Screen.h>
 #include <String.h>
-#include <TextView.h>
-#include <View.h>
 #include <Window.h>
 
 #include <TokenSpace.h>
@@ -73,13 +72,9 @@ static const bigtime_t kNonAppQuitTimeout = 500000; // 0.5 s
 // the shutdown window before closing it automatically.
 static const bigtime_t kDisplayAbortingAppTimeout = 3000000; // 3 s
 
-static const int kStripeWidth = 30;
-static const int kIconVSpacing = 6;
-static const int kIconSize = 32;
-
 // The speed of the animation played when an application is blocked on a modal
 // panel.
-static const bigtime_t kIconAnimateInterval = 50000; // 0.05 s
+static const bigtime_t kIconAnimateInterval = 50000 * B_LARGE_ICON; // 0.05 s
 
 // message what fields (must not clobber the registrar's message namespace)
 enum {
@@ -233,20 +228,39 @@ private:
 };
 
 
-class ShutdownProcess::ShutdownWindow : public BWindow {
+class ShutdownProcess::ShutdownWindow : public BAlert {
 public:
 	ShutdownWindow()
-		: BWindow(BRect(0, 0, 200, 100), B_TRANSLATE("Shutdown status"),
-			B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-			B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_MINIMIZABLE
-				| B_NOT_ZOOMABLE | B_NOT_CLOSABLE, B_ALL_WORKSPACES),
+		:
+		BAlert(),
 		fKillAppMessage(NULL),
-		fCurrentApp(-1)
+		fCurrentApp(-1),
+
+		fCurrentIconBitmap(NULL),
+		fNormalIconBitmap(NULL),
+		fTintedIconBitmap(NULL),
+		fAnimationActive(false),
+		fAnimationWorker(-1),
+		fCurrentAnimationRow(-1),
+		fAnimationLightenPhase(true)
 	{
+		SetTitle(B_TRANSLATE("Shutdown status"));
+		SetWorkspaces(B_ALL_WORKSPACES);
+		SetLook(B_TITLED_WINDOW_LOOK);
+		SetFlags(Flags() | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE);
+
+		SetButtonWidth(B_WIDTH_AS_USUAL);
+		SetType(B_EMPTY_ALERT);
 	}
 
 	~ShutdownWindow()
 	{
+		atomic_set(&fAnimationActive, false);
+		wait_for_thread(fAnimationWorker, NULL);
+
+		delete fNormalIconBitmap;
+		delete fTintedIconBitmap;
+
 		for (int32 i = 0; AppInfo* info = (AppInfo*)fAppInfos.ItemAt(i); i++) {
 			delete info;
 		}
@@ -259,35 +273,9 @@ public:
 
 	status_t Init(BMessenger target)
 	{
-		// create the views
-
-		// root view
-		fRootView = new(nothrow) TAlertView(BRect(0, 0, 10,  10), "app icons",
-			B_FOLLOW_NONE, 0);
-		if (!fRootView)
-			return B_NO_MEMORY;
-		fRootView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-		AddChild(fRootView);
-
-		// text view
-		fTextView = new(nothrow) BTextView(BRect(0, 0, 10, 10), "text",
-			BRect(0, 0, 10, 10), B_FOLLOW_NONE);
-		if (!fTextView)
-			return B_NO_MEMORY;
-		fTextView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
-		fTextView->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
-		fTextView->MakeEditable(false);
-		fTextView->MakeSelectable(false);
-		fTextView->SetWordWrap(false);
-		fRootView->AddChild(fTextView);
-
 		// kill app button
-		fKillAppButton = new(nothrow) BButton(BRect(0, 0, 10, 10), "kill app",
-			B_TRANSLATE("Kill application"), NULL, B_FOLLOW_NONE);
-		if (!fKillAppButton)
-			return B_NO_MEMORY;
-		fRootView->AddChild(fKillAppButton);
+		AddButton(B_TRANSLATE("Kill application"));
+		fKillAppButton = ButtonAt(CountButtons() - 1);
 
 		BMessage* message = new BMessage(MSG_KILL_APPLICATION);
 		if (!message)
@@ -298,12 +286,8 @@ public:
 		fKillAppButton->SetTarget(target);
 
 		// cancel shutdown button
-		fCancelShutdownButton = new(nothrow) BButton(BRect(0, 0, 10, 10),
-			"cancel shutdown", B_TRANSLATE("Cancel shutdown"), NULL,
-			B_FOLLOW_NONE);
-		if (!fCancelShutdownButton)
-			return B_NO_MEMORY;
-		fRootView->AddChild(fCancelShutdownButton);
+		AddButton(B_TRANSLATE("Cancel shutdown"));
+		fCancelShutdownButton = ButtonAt(CountButtons() - 1);
 
 		message = new BMessage(MSG_CANCEL_SHUTDOWN);
 		if (!message)
@@ -312,12 +296,9 @@ public:
 		fCancelShutdownButton->SetTarget(target);
 
 		// reboot system button
-		fRebootSystemButton = new(nothrow) BButton(BRect(0, 0, 10, 10),
-			"reboot", B_TRANSLATE("Restart system"), NULL, B_FOLLOW_NONE);
-		if (!fRebootSystemButton)
-			return B_NO_MEMORY;
+		AddButton(B_TRANSLATE("Restart system"));
+		fRebootSystemButton = ButtonAt(CountButtons() - 1);
 		fRebootSystemButton->Hide();
-		fRootView->AddChild(fRebootSystemButton);
 
 		message = new BMessage(MSG_REBOOT_SYSTEM);
 		if (!message)
@@ -326,95 +307,15 @@ public:
 		fRebootSystemButton->SetTarget(target);
 
 		// aborted OK button
-		fAbortedOKButton = new(nothrow) BButton(BRect(0, 0, 10, 10),
-			"ok", B_TRANSLATE("OK"), NULL, B_FOLLOW_NONE);
-		if (!fAbortedOKButton)
-			return B_NO_MEMORY;
+		AddButton(B_TRANSLATE("OK"));
+		fAbortedOKButton = ButtonAt(CountButtons() - 1);
 		fAbortedOKButton->Hide();
-		fRootView->AddChild(fAbortedOKButton);
 
 		message = new BMessage(MSG_CANCEL_SHUTDOWN);
 		if (!message)
 			return B_NO_MEMORY;
 		fAbortedOKButton->SetMessage(message);
 		fAbortedOKButton->SetTarget(target);
-
-		// compute the sizes
-		static const int kHSpacing = 10;
-		static const int kVSpacing = 10;
-		static const int kInnerHSpacing = 5;
-		static const int kInnerVSpacing = 8;
-
-		// buttons
-		fKillAppButton->ResizeToPreferred();
-		fCancelShutdownButton->ResizeToPreferred();
-		fRebootSystemButton->MakeDefault(true);
-		fRebootSystemButton->ResizeToPreferred();
-		fAbortedOKButton->MakeDefault(true);
-		fAbortedOKButton->ResizeToPreferred();
-
-		BRect rect(fKillAppButton->Frame());
-		int buttonWidth = rect.IntegerWidth() + 1;
-		int buttonHeight = rect.IntegerHeight() + 1;
-
-		rect = fCancelShutdownButton->Frame();
-		if (rect.IntegerWidth() >= buttonWidth)
-			buttonWidth = rect.IntegerWidth() + 1;
-
-		int defaultButtonHeight
-			= fRebootSystemButton->Frame().IntegerHeight() + 1;
-
-		// text view
-		fTextView->SetText("two\nlines");
-		int textHeight = (int)fTextView->TextHeight(0, 1) + 1;
-
-		int rightPartX = kStripeWidth + kIconSize / 2 + 1;
-		int textX = rightPartX + kInnerHSpacing;
-		int textY = kVSpacing;
-		int buttonsY = textY + textHeight + kInnerVSpacing;
-		int nonDefaultButtonsY = buttonsY
-			+ (defaultButtonHeight - buttonHeight) / 2;
-		int rightPartWidth = 2 * buttonWidth + kInnerHSpacing;
-		int width = rightPartX + rightPartWidth + kHSpacing;
-		int height = buttonsY + defaultButtonHeight + kVSpacing;
-
-		// now layout the views
-
-		// text view
-		fTextView->MoveTo(textX, textY);
-		fTextView->ResizeTo(rightPartWidth + rightPartX - textX - 1,
-			textHeight - 1);
-		fTextView->SetTextRect(fTextView->Bounds());
-
-		fTextView->SetWordWrap(true);
-
-		// buttons
-		fKillAppButton->MoveTo(rightPartX, nonDefaultButtonsY);
-		fKillAppButton->ResizeTo(buttonWidth - 1, buttonHeight - 1);
-
-		fCancelShutdownButton->MoveTo(
-			rightPartX + buttonWidth + kInnerVSpacing - 1,
-			nonDefaultButtonsY);
-		fCancelShutdownButton->ResizeTo(buttonWidth - 1, buttonHeight - 1);
-
-		fRebootSystemButton->MoveTo(
-			(width - fRebootSystemButton->Frame().IntegerWidth()) / 2,
-			buttonsY);
-
-		fAbortedOKButton->MoveTo(
-			(width - fAbortedOKButton->Frame().IntegerWidth()) / 2,
-			buttonsY);
-
-		// set the root view and window size
-		fRootView->ResizeTo(width - 1, height - 1);
-		ResizeTo(width - 1, height - 1);
-
-		// move the window to the same position as BAlerts
-		BScreen screen(this);
-	 	BRect screenFrame = screen.Frame();
-
-		MoveTo(screenFrame.left + (screenFrame.Width() - width) / 2.0,
-			screenFrame.top + screenFrame.Height() / 4.0 - ceilf(height / 3.0));
 
 		return B_OK;
 	}
@@ -456,14 +357,9 @@ public:
 		AppInfo* info = (team >= 0 ? _AppInfoFor(team) : NULL);
 
 		fCurrentApp = team;
-		fRootView->SetAppInfo(info);
+		SetAppInfo(info);
 
 		fKillAppMessage->ReplaceInt32("team", team);
-	}
-
-	void SetText(const char* text)
-	{
-		fTextView->SetText(text);
 	}
 
 	void SetCancelShutdownButtonEnabled(bool enable)
@@ -480,12 +376,13 @@ public:
 				fKillAppButton->Show();
 			else
 				fKillAppButton->Hide();
+			ResizeToPreferred();
 		}
 	}
 
 	void SetWaitAnimationEnabled(bool enable)
 	{
-		fRootView->IconWaitAnimationEnabled(enable);
+		IconWaitAnimationEnabled(enable);
 	}
 
 	void SetWaitForShutdown()
@@ -496,8 +393,9 @@ public:
 		fRebootSystemButton->Show();
 
 		SetTitle(B_TRANSLATE("System is shut down"));
-		fTextView->SetText(
+		SetText(
 			B_TRANSLATE("It's now safe to turn off the computer."));
+		ResizeToPreferred();
 	}
 
 	void SetWaitForAbortedOK()
@@ -506,8 +404,7 @@ public:
 		fCancelShutdownButton->Hide();
 		fAbortedOKButton->MakeDefault(true);
 		fAbortedOKButton->Show();
-		// TODO: Temporary work-around for a Haiku bug.
-		fAbortedOKButton->Invalidate();
+		ResizeToPreferred();
 
 		SetTitle(B_TRANSLATE("Shutdown aborted"));
 	}
@@ -542,238 +439,190 @@ private:
 		return (index >= 0 ? (AppInfo*)fAppInfos.ItemAt(index) : NULL);
 	}
 
-	class TAlertView : public BView {
-	  public:
-		TAlertView(BRect frame, const char* name, uint32 resizeMask,
-			uint32 flags)
-			:
-			BView(frame, name, resizeMask, flags | B_WILL_DRAW),
-			fCurrentIconBitmap(NULL),
-			fNormalIconBitmap(NULL),
-			fTintedIconBitmap(NULL),
-			fAnimationActive(false),
-			fAnimationWorker(-1),
-			fCurrentAnimationRow(-1),
-			fAnimationLightenPhase(true)
-		{
+private:
+	void SetAppInfo(AppInfo* info)
+	{
+		IconWaitAnimationEnabled(false);
+
+		BAutolock lock(this);
+		if (!lock.IsLocked())
+			return;
+
+		delete fNormalIconBitmap;
+		fNormalIconBitmap = NULL;
+
+		delete fTintedIconBitmap;
+		fTintedIconBitmap = NULL;
+
+		// We do not delete the present fCurrentIconBitmap as the BAlert owns it.
+		fCurrentIconBitmap = NULL;
+
+		if (info != NULL && info->appIcon != NULL
+			&& info->appIcon->IsValid()) {
+			fCurrentIconBitmap = new BBitmap(info->appIcon->Bounds(), B_RGBA32);
+
+			if (fCurrentIconBitmap == NULL
+				|| fCurrentIconBitmap->ImportBits(info->appIcon) != B_OK) {
+				delete fCurrentIconBitmap;
+				fCurrentIconBitmap = NULL;
+			} else
+				SetIcon(fCurrentIconBitmap);
 		}
+	}
 
-		~TAlertView()
-		{
-			atomic_set(&fAnimationActive, false);
-			wait_for_thread(fAnimationWorker, NULL);
+	void IconWaitAnimationEnabled(bool enable)
+	{
+		if (atomic_get(&fAnimationActive) == enable)
+			return;
 
-			delete fCurrentIconBitmap;
-			delete fNormalIconBitmap;
-			delete fTintedIconBitmap;
-		}
+		BAutolock lock(this);
+		if (!lock.IsLocked())
+			return;
 
-		virtual void Draw(BRect updateRect)
-		{
-			BRect stripeRect = Bounds();
-			stripeRect.right = kStripeWidth;
-			SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-			FillRect(stripeRect);
-
-			if (fCurrentIconBitmap != NULL && fCurrentIconBitmap->IsValid()) {
-				if (fCurrentIconBitmap->ColorSpace() == B_RGBA32) {
-					SetDrawingMode(B_OP_ALPHA);
-					SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-				} else
-					SetDrawingMode(B_OP_OVER);
-
-				DrawBitmap(fCurrentIconBitmap,
-					BPoint(kStripeWidth - kIconSize / 2, kIconVSpacing));
-			}
-		}
-
-		void SetAppInfo(AppInfo* info)
-		{
-			IconWaitAnimationEnabled(false);
-
-			BAutolock lock(Window());
-			if (!lock.IsLocked())
+		if (enable) {
+			if (fCurrentIconBitmap == NULL
+				|| !fCurrentIconBitmap->IsValid())
 				return;
 
-			delete fCurrentIconBitmap;
-			fCurrentIconBitmap = NULL;
+			if (fNormalIconBitmap == NULL
+				|| !fNormalIconBitmap->IsValid()) {
+				delete fNormalIconBitmap;
+				fNormalIconBitmap = NULL;
 
-			delete fNormalIconBitmap;
-			fNormalIconBitmap = NULL;
-
-			delete fTintedIconBitmap;
-			fTintedIconBitmap = NULL;
-
-			if (info != NULL && info->appIcon != NULL
-				&& info->appIcon->IsValid()) {
-				fCurrentIconBitmap = new BBitmap(BRect(0, 0, 31, 31), B_RGBA32);
-
-				if (fCurrentIconBitmap == NULL
-					|| fCurrentIconBitmap->ImportBits(info->appIcon) != B_OK) {
-					delete fCurrentIconBitmap;
-					fCurrentIconBitmap = NULL;
-				}
-			}
-
-			Invalidate();
-		}
-
-		void IconWaitAnimationEnabled(bool enable)
-		{
-			if (atomic_get(&fAnimationActive) == enable)
-				return;
-
-			BAutolock lock(Window());
-			if (!lock.IsLocked())
-				return;
-			
-			if (enable) {
-				if (fCurrentIconBitmap == NULL
-					|| !fCurrentIconBitmap->IsValid())
-					return;
+				fNormalIconBitmap = new BBitmap(fCurrentIconBitmap->Bounds(),
+					B_BITMAP_NO_SERVER_LINK, B_RGBA32);
 
 				if (fNormalIconBitmap == NULL
-					|| !fNormalIconBitmap->IsValid()) {
+					|| fNormalIconBitmap->ImportBits(fCurrentIconBitmap)
+						!= B_OK) {
 					delete fNormalIconBitmap;
 					fNormalIconBitmap = NULL;
 
-					fNormalIconBitmap = new BBitmap(BRect(0, 0, 31, 31),
-						B_BITMAP_NO_SERVER_LINK, B_RGBA32);
-
-					if (fNormalIconBitmap == NULL
-						|| fNormalIconBitmap->ImportBits(fCurrentIconBitmap)
-							!= B_OK) {
-						delete fNormalIconBitmap;
-						fNormalIconBitmap = NULL;
-
-						return;
-					}
+					return;
 				}
+			}
+
+			if (fTintedIconBitmap == NULL
+				|| !fTintedIconBitmap->IsValid()) {
+				delete fTintedIconBitmap;
+				fTintedIconBitmap = NULL;
+
+				fTintedIconBitmap = new BBitmap(fNormalIconBitmap->Bounds(),
+					B_BITMAP_NO_SERVER_LINK, B_RGBA32);
 
 				if (fTintedIconBitmap == NULL
-					|| !fTintedIconBitmap->IsValid()) {
+					|| fTintedIconBitmap->ImportBits(fNormalIconBitmap)
+						!= B_OK) {
 					delete fTintedIconBitmap;
 					fTintedIconBitmap = NULL;
 
-					fTintedIconBitmap = new BBitmap(BRect(0, 0, 31, 31),
-						B_BITMAP_NO_SERVER_LINK, B_RGBA32);
-
-					if (fTintedIconBitmap == NULL
-						|| fTintedIconBitmap->ImportBits(fNormalIconBitmap)
-							!= B_OK) {
-						delete fTintedIconBitmap;
-						fTintedIconBitmap = NULL;
-
-						return;
-					}
-
-					int32 width =
-						fTintedIconBitmap->Bounds().IntegerWidth() + 1;
-					int32 height =
-						fTintedIconBitmap->Bounds().IntegerHeight() + 1;
-					int32 rowLength = fTintedIconBitmap->BytesPerRow();
-
-					uint8* iconBits = (uint8*)fTintedIconBitmap->Bits();
-
-					for (int32 y = 0; y < height; y++) {
-						for (int32 x = 0; x < width; x++) {
-							int32 offset = (y * rowLength) + (x * 4);
-
-							rgb_color pixelColor = make_color(iconBits[offset],
-								iconBits[offset + 1], iconBits[offset + 2],
-								iconBits[offset + 3]);
-
-							pixelColor = tint_color(pixelColor,
-								B_DARKEN_2_TINT);
-
-							iconBits[offset] = pixelColor.red;
-							iconBits[offset + 1] = pixelColor.green;
-							iconBits[offset + 2] = pixelColor.blue;
-							iconBits[offset + 3] = pixelColor.alpha;
-						}
-					}
-				}
-				
-				fAnimationWorker = spawn_thread(&_AnimateWaitIconWorker,
-					"thumb twiddling", B_DISPLAY_PRIORITY, this);
-
-				if (fAnimationWorker < B_NO_ERROR)
 					return;
-
-				atomic_set(&fAnimationActive, true);
-				if (resume_thread(fAnimationWorker) != B_OK)
-					atomic_set(&fAnimationActive, false);
-			} else {
-				atomic_set(&fAnimationActive, false);
-				wait_for_thread(fAnimationWorker, NULL);
-
-				fCurrentAnimationRow = -1;
-				fAnimationLightenPhase = true;
-
-				if (fCurrentIconBitmap != NULL && fNormalIconBitmap != NULL)
-					fCurrentIconBitmap->ImportBits(fNormalIconBitmap);
-			}
-		}
-
-	  private:
-		status_t _AnimateWaitIcon()
-		{
-			while (atomic_get(&fAnimationActive)) {
-				if (LockLooperWithTimeout(kIconAnimateInterval) != B_OK)
-					continue;
-
-				if (fCurrentAnimationRow < 0) {
-					fCurrentAnimationRow =
-						fCurrentIconBitmap->Bounds().IntegerHeight();
-					fAnimationLightenPhase = !fAnimationLightenPhase;
 				}
 
-				BBitmap* sourceBitmap = fAnimationLightenPhase ?
-					fNormalIconBitmap : fTintedIconBitmap;
+				int32 width =
+					fTintedIconBitmap->Bounds().IntegerWidth() + 1;
+				int32 height =
+					fTintedIconBitmap->Bounds().IntegerHeight() + 1;
+				int32 rowLength = fTintedIconBitmap->BytesPerRow();
 
-				fCurrentIconBitmap->ImportBits(sourceBitmap,
-					BPoint(0, fCurrentAnimationRow),
-					BPoint(0, fCurrentAnimationRow),
-					BSize(sourceBitmap->Bounds().IntegerWidth() - 1, 0));
+				uint8* iconBits = (uint8*)fTintedIconBitmap->Bits();
 
-				fCurrentAnimationRow--;
+				for (int32 y = 0; y < height; y++) {
+					for (int32 x = 0; x < width; x++) {
+						int32 offset = (y * rowLength) + (x * 4);
 
-				Invalidate();
+						rgb_color pixelColor = make_color(iconBits[offset],
+							iconBits[offset + 1], iconBits[offset + 2],
+							iconBits[offset + 3]);
 
-				UnlockLooper();
+						pixelColor = tint_color(pixelColor,
+							B_DARKEN_2_TINT);
 
-				snooze(kIconAnimateInterval);
+						iconBits[offset] = pixelColor.red;
+						iconBits[offset + 1] = pixelColor.green;
+						iconBits[offset + 2] = pixelColor.blue;
+						iconBits[offset + 3] = pixelColor.alpha;
+					}
+				}
 			}
 
-			return B_OK;
+			fAnimationWorker = spawn_thread(&_AnimateWaitIconWorker,
+				"thumb twiddling", B_DISPLAY_PRIORITY, this);
+
+			if (fAnimationWorker < B_NO_ERROR)
+				return;
+
+			atomic_set(&fAnimationActive, true);
+			if (resume_thread(fAnimationWorker) != B_OK)
+				atomic_set(&fAnimationActive, false);
+		} else {
+			atomic_set(&fAnimationActive, false);
+			wait_for_thread(fAnimationWorker, NULL);
+
+			fCurrentAnimationRow = -1;
+			fAnimationLightenPhase = true;
+
+			if (fCurrentIconBitmap != NULL && fNormalIconBitmap != NULL)
+				fCurrentIconBitmap->ImportBits(fNormalIconBitmap);
+		}
+	}
+
+private:
+	status_t _AnimateWaitIcon()
+	{
+		int32 lastHeight = 1;
+		while (atomic_get(&fAnimationActive)) {
+			if (LockWithTimeout(kIconAnimateInterval / lastHeight) != B_OK)
+				continue;
+
+			lastHeight = fCurrentIconBitmap->Bounds().IntegerHeight();
+			if (fCurrentAnimationRow < 0) {
+				fCurrentAnimationRow = lastHeight;
+				fAnimationLightenPhase = !fAnimationLightenPhase;
+			}
+
+			BBitmap* sourceBitmap = fAnimationLightenPhase ?
+				fNormalIconBitmap : fTintedIconBitmap;
+
+			fCurrentIconBitmap->ImportBits(sourceBitmap,
+				BPoint(0, fCurrentAnimationRow),
+				BPoint(0, fCurrentAnimationRow),
+				BSize(sourceBitmap->Bounds().IntegerWidth() - 1, 0));
+
+			fCurrentAnimationRow--;
+
+			ChildAt(0)->Invalidate();
+
+			Unlock();
+			snooze(kIconAnimateInterval / lastHeight);
 		}
 
-		static status_t _AnimateWaitIconWorker(void* cookie)
-		{
-			TAlertView* ourView = (TAlertView*)cookie;
-			return ourView->_AnimateWaitIcon();
-		}
+		return B_OK;
+	}
 
-	  private:
-		BBitmap*		fCurrentIconBitmap;
-		BBitmap*		fNormalIconBitmap;
-		BBitmap*		fTintedIconBitmap;
-		int32			fAnimationActive;
-		thread_id		fAnimationWorker;
-		int32			fCurrentAnimationRow;
-		bool			fAnimationLightenPhase;
-	};
+	static status_t _AnimateWaitIconWorker(void* cookie)
+	{
+		ShutdownWindow* ourView = (ShutdownWindow*)cookie;
+		return ourView->_AnimateWaitIcon();
+	}
 
 private:
 	BList				fAppInfos;
-	TAlertView*			fRootView;
-	BTextView*			fTextView;
 	BButton*			fKillAppButton;
 	BButton*			fCancelShutdownButton;
 	BButton*			fRebootSystemButton;
 	BButton*			fAbortedOKButton;
 	BMessage*			fKillAppMessage;
 	team_id				fCurrentApp;
+
+private:
+	BBitmap*		fCurrentIconBitmap;
+	BBitmap*		fNormalIconBitmap;
+	BBitmap*		fTintedIconBitmap;
+	int32			fAnimationActive;
+	thread_id		fAnimationWorker;
+	int32			fCurrentAnimationRow;
+	bool			fAnimationLightenPhase;
 };
 
 
@@ -1132,7 +981,7 @@ ShutdownProcess::_SetShowShutdownWindow(bool show)
 
 		if (show == fWindow->IsHidden()) {
 			if (show)
-				fWindow->Show();
+				fWindow->Go(NULL);
 			else
 				fWindow->Hide();
 		}
@@ -1197,12 +1046,15 @@ ShutdownProcess::_AddShutdownWindowApps(AppInfoList& infos)
 		}
 
 		// get the application icon
-		BBitmap* appIcon = new(nothrow) BBitmap(BRect(0, 0, 31, 31),
+		BBitmap* appIcon = new(nothrow) BBitmap(
+			BRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_LARGE_ICON)),
 			B_BITMAP_NO_SERVER_LINK, B_RGBA32);
 		if (appIcon != NULL) {
 			error = appIcon->InitCheck();
-			if (error == B_OK)
-				error = appFileInfo.GetTrackerIcon(appIcon, B_LARGE_ICON);
+			if (error == B_OK) {
+				error = appFileInfo.GetTrackerIcon(appIcon,
+					(icon_size)(appIcon->Bounds().IntegerWidth() + 1));
+			}
 			if (error != B_OK) {
 				delete appIcon;
 				appIcon = NULL;
