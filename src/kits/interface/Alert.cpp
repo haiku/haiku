@@ -57,8 +57,7 @@ public:
 	virtual	BSize				MaxSize();
 	virtual	void				Draw(BRect updateRect);
 
-			void				SetBitmap(BBitmap* Icon)
-									{ fIconBitmap = Icon; }
+			void				SetBitmap(BBitmap* icon);
 			BBitmap*			Bitmap()
 									{ return fIconBitmap; }
 
@@ -742,6 +741,22 @@ status_t
 TAlertView::Archive(BMessage* archive, bool deep) const
 {
 	return BView::Archive(archive, deep);
+}
+
+
+void
+TAlertView::SetBitmap(BBitmap* icon)
+{
+	BBitmap* oldBitmap = fIconBitmap;
+	fIconBitmap = icon;
+
+	if (oldBitmap == NULL
+			|| (icon != NULL && oldBitmap->Bounds() != icon->Bounds())) {
+		InvalidateLayout();
+	} else
+		Invalidate();
+
+	delete oldBitmap;
 }
 
 
