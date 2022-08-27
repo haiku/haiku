@@ -46,9 +46,11 @@ BButton::BButton(BRect frame, const char* name, const char* label,
 	fPopUpMessage(NULL)
 {
 	// Resize to minimum height if needed
+	BFont font;
+	GetFont(&font);
 	font_height fh;
-	GetFontHeight(&fh);
-	float minHeight = 12.0f + (float)ceil(fh.ascent + fh.descent);
+	font.GetHeight(&fh);
+	float minHeight = font.Size() + (float)ceil(fh.ascent + fh.descent);
 	if (Bounds().Height() < minHeight)
 		ResizeTo(Bounds().Width(), minHeight);
 }
@@ -649,12 +651,13 @@ BButton::_ValidatePreferredSize()
 			left, top, right, bottom);
 
 		// width
-		float width = left + right + be_control_look->DefaultLabelSpacing() - 1;
+		const float labelSpacing = be_control_look->DefaultLabelSpacing();
+		float width = left + right + labelSpacing - 1;
 
 		const char* label = Label();
 		if (label != NULL) {
-			width = std::max(width, 20.0f);
-			width += (float)ceil(StringWidth(label));
+			width = std::max(width, ceilf(labelSpacing * 3.3f));
+			width += ceilf(StringWidth(label));
 		}
 
 		const BBitmap* icon = IconBitmap(B_INACTIVE_ICON_BITMAP);
@@ -662,10 +665,10 @@ BButton::_ValidatePreferredSize()
 			width += icon->Bounds().Width() + 1;
 
 		if (label != NULL && icon != NULL)
-			width += be_control_look->DefaultLabelSpacing();
+			width += labelSpacing;
 
 		// height
-		float minHorizontalMargins = top + bottom + be_control_look->DefaultLabelSpacing();
+		float minHorizontalMargins = top + bottom + labelSpacing;
 		float height = -1;
 
 		if (label != NULL) {
@@ -684,8 +687,8 @@ BButton::_ValidatePreferredSize()
 		}
 
 		// force some minimum width/height values
-		width = std::max(width, label != NULL ? 75.0f : 5.0f);
-		height = std::max(height, 5.0f);
+		width = std::max(width, label != NULL ? (labelSpacing * 12.5f) : labelSpacing);
+		height = std::max(height, labelSpacing);
 
 		fPreferredSize.Set(width, height);
 
