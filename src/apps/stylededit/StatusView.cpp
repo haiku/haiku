@@ -63,7 +63,7 @@ void
 StatusView::AttachedToWindow()
 {
 	SetFont(be_plain_font);
-	SetFontSize(10. * be_plain_font->Size() / 12.f);
+	SetFontSize(ceilf(be_plain_font->Size() * 0.83f));
 
 	BMessage message(UPDATE_STATUS);
 	message.AddInt32("line", 1);
