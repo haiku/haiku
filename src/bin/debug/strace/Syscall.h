@@ -67,7 +67,8 @@ class Syscall {
 public:
 	Syscall(string name, string returnTypeName, TypeHandler *returnTypeHandler)
 		: fName(name),
-		  fReturnType(new Type(returnTypeName, returnTypeHandler))
+		  fReturnType(new Type(returnTypeName, returnTypeHandler)),
+		  fTracingEnabled(false)
 	{
 	}
 
@@ -114,10 +115,21 @@ public:
 		return NULL;
 	}
 
+	bool TracingEnabled() const
+	{
+		return fTracingEnabled;
+	}
+
+	void EnableTracing(bool enable)
+	{
+		fTracingEnabled = enable;
+	}
+
 private:
 	string				fName;
 	Type				*fReturnType;
 	vector<Parameter*>	fParameters;
+	bool				fTracingEnabled;
 };
 
 #endif	// STRACE_SYSCALL_H

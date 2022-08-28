@@ -772,6 +772,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons translators tiff ;
 	EnableWerror src add-ons translators wonderbrush ;
 	EnableWerror src add-ons print ;
+	EnableWerror src bin debug strace ;
 	EnableWerror src bin desklink ;
 	EnableWerror src bin listusb ;
 	EnableWerror src bin multiuser ;
