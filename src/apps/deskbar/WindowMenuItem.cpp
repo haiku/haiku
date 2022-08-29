@@ -159,21 +159,23 @@ TWindowMenuItem::DrawContent()
 	if (fID >= 0) {
 		menu->SetDrawingMode(B_OP_OVER);
 
-		const float width = fBitmap->Bounds().Width();
-		if (width > 16)
-			contentLocation.x -= 8;
+		const float bitmapWidth = fBitmap->Bounds().Width(),
+			bitmapHeight = fBitmap->Bounds().Height();
+		float shiftedBy = 0.0f;
+		if (bitmapWidth > bitmapHeight) {
+			shiftedBy = (bitmapHeight + 1) / 2.0f;
+			contentLocation.x -= shiftedBy;
+		}
 
 		float height;
 		GetContentSize(NULL, &height);
-		contentLocation.y += (height - fBitmap->Bounds().Height()) / 2;
+		contentLocation.y += (height - bitmapHeight) / 2;
 
 		menu->MovePenTo(contentLocation);
 		menu->DrawBitmapAsync(fBitmap);
 
-		if (width > 16)
-			contentLocation.x += 8;
-
-		contentLocation.x += width + sLabelOffset;
+		contentLocation.x += shiftedBy;
+		contentLocation.x += (bitmapWidth - shiftedBy) + sLabelOffset;
 	}
 	contentLocation.y = ContentLocation().y + sVPad + fLabelAscent;
 
@@ -261,7 +263,7 @@ TWindowMenuItem::_Init(const char* name)
 {
 	if (sHPad == 0.0f) {
 		// Initialize the padding values.
-		sHPad = be_control_look->ComposeSpacing(B_USE_SMALL_SPACING);
+		sHPad = be_control_look->ComposeSpacing(B_USE_ITEM_SPACING) - 1.0f;
 		sVPad = ceilf(be_control_look->ComposeSpacing(B_USE_SMALL_SPACING) / 4.0f);
 		sLabelOffset = ceilf((be_control_look->DefaultLabelSpacing() / 3.0f) * 4.0f);
 	}
