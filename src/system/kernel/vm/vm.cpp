@@ -2510,15 +2510,18 @@ vm_copy_on_write_area(VMCache* lowerCache,
 						tempArea = tempArea->cache_next) {
 					// The area must be readable in the same way it was
 					// previously writable.
-					uint32 protection = B_KERNEL_READ_AREA;
-					if ((tempArea->protection & B_READ_AREA) != 0)
+					addr_t address = virtual_page_address(tempArea, page);
+					uint32 protection = 0;
+					uint32 pageProtection = get_area_page_protection(tempArea, address);
+					if ((pageProtection & B_KERNEL_READ_AREA) != 0)
+						protection |= B_KERNEL_READ_AREA;
+					if ((pageProtection & B_READ_AREA) != 0)
 						protection |= B_READ_AREA;
 
 					VMTranslationMap* map
 						= tempArea->address_space->TranslationMap();
 					map->Lock();
-					map->ProtectPage(tempArea,
-						virtual_page_address(tempArea, page), protection);
+					map->ProtectPage(tempArea, address, protection);
 					map->Unlock();
 				}
 			}
@@ -2529,9 +2532,32 @@ vm_copy_on_write_area(VMCache* lowerCache,
 		// just change the protection of all areas
 		for (VMArea* tempArea = upperCache->areas; tempArea != NULL;
 				tempArea = tempArea->cache_next) {
+			if (tempArea->page_protections != NULL) {
+				// Change the protection of all pages in this area.
+				VMTranslationMap* map = tempArea->address_space->TranslationMap();
+				map->Lock();
+				for (VMCachePagesTree::Iterator it = lowerCache->pages.GetIterator();
+					vm_page* page = it.Next();) {
+					// The area must be readable in the same way it was
+					// previously writable.
+					addr_t address = virtual_page_address(tempArea, page);
+					uint32 protection = 0;
+					uint32 pageProtection = get_area_page_protection(tempArea, address);
+					if ((pageProtection & B_KERNEL_READ_AREA) != 0)
+						protection |= B_KERNEL_READ_AREA;
+					if ((pageProtection & B_READ_AREA) != 0)
+						protection |= B_READ_AREA;
+
+					map->ProtectPage(tempArea, address, protection);
+				}
+				map->Unlock();
+				continue;
+			}
 			// The area must be readable in the same way it was previously
 			// writable.
-			uint32 protection = B_KERNEL_READ_AREA;
+			uint32 protection = 0;
+			if ((tempArea->protection & B_KERNEL_READ_AREA) != 0)
+				protection |= B_KERNEL_READ_AREA;
 			if ((tempArea->protection & B_READ_AREA) != 0)
 				protection |= B_READ_AREA;
 
