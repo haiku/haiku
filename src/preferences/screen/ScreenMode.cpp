@@ -381,9 +381,12 @@ ScreenMode::GetManufacturerFromID(const char* id) const
 	// We assume the array is sorted
 	const size_t numElements = sizeof(kPNPIDs) / sizeof(kPNPIDs[0]);
 	const struct pnp_id key = { id, "dummy" };
-	const pnp_id* element = std::find(kPNPIDs, kPNPIDs + numElements, key);
-	if (element == NULL)
+	const pnp_id* lastElement = kPNPIDs + numElements;
+	const pnp_id* element = std::find(kPNPIDs, lastElement, key);
+	if (element == lastElement) {
+		// can't find the vendor code
 		return NULL;
+	}
 
 	return element->manufacturer;
 }
