@@ -234,6 +234,26 @@ TBarApp::SaveSettings()
 void
 TBarApp::InitSettings()
 {
+	// compute metrics
+	sIconGap = ceilf(be_control_look->DefaultLabelSpacing() / 3.0f);
+
+	gDragRegionWidth = be_control_look->ComposeSpacing(B_USE_HALF_ITEM_SPACING);
+	gDragWidth = ceilf(gDragRegionWidth * 0.6f);
+
+	gMinReplicantHeight = gMinReplicantWidth =
+		be_control_look->ComposeIconSize(B_MINI_ICON).IntegerWidth() + 1;
+
+	// 1 pixel for left gutter
+	// space for replicant tray (6 items)
+	// 6 pixel drag region
+	gMinimumTrayWidth = sIconGap + gMinReplicantWidth
+		+ (kMinimumReplicantCount * sIconGap)
+		+ (kMinimumReplicantCount * gMinReplicantWidth) + kGutter;
+
+	gMinimumWindowWidth = kGutter + gMinimumTrayWidth + gDragRegionWidth;
+	gMaximumWindowWidth = gMinimumWindowWidth * 2;
+
+	// defaults
 	desk_settings settings;
 	settings.vertical = fDefaultSettings.vertical = true;
 	settings.left = fDefaultSettings.left = false;

@@ -79,7 +79,7 @@ All rights reserved.
 
 static const float kVerticalMiniMultiplier = 2.9f;
 
-static float sIconGap = 0.0f;
+float sIconGap = 0.0f;
 float gDragWidth, gDragRegionWidth = 0.0f;
 float gMinReplicantHeight, gMinReplicantWidth = 0.0f;
 float gMinimumTrayWidth, gMinimumWindowWidth, gMaximumWindowWidth = 0.0f;
@@ -142,26 +142,6 @@ TReplicantTray::TReplicantTray(TBarView* barView)
 	fShelf(new TReplicantShelf(this)),
 	fAlignmentSupport(false)
 {
-	if (sIconGap == 0.0f) {
-		sIconGap = ceilf(be_control_look->DefaultLabelSpacing() / 3.0f);
-
-		gDragRegionWidth = be_control_look->ComposeSpacing(B_USE_HALF_ITEM_SPACING);
-		gDragWidth = ceilf(gDragRegionWidth * 0.6f);
-
-		gMinReplicantHeight = gMinReplicantWidth =
-			be_control_look->ComposeIconSize(B_MINI_ICON).IntegerWidth() + 1;
-
-		// 1 pixel for left gutter
-		// space for replicant tray (6 items)
-		// 6 pixel drag region
-		gMinimumTrayWidth = sIconGap + gMinReplicantWidth
-			+ (kMinimumReplicantCount * sIconGap)
-			+ (kMinimumReplicantCount * gMinReplicantWidth) + kGutter;
-
-		gMinimumWindowWidth = kGutter + gMinimumTrayWidth + gDragRegionWidth;
-		gMaximumWindowWidth = gMinimumWindowWidth * 2;
-	}
-
 	// scale replicants by font size
 	fMaxReplicantHeight = std::max(gMinReplicantHeight,
 		float(((TBarApp*)be_app)->IconSize()));

@@ -54,6 +54,7 @@ const int32 kGutter = 1;
 const int32 kTrayPadding = B_USE_HALF_ITEM_SPACING;
 const int32 kClockMargin = 12;
 
+extern float sIconGap;
 extern float gDragWidth, gDragRegionWidth;
 extern float gMinReplicantHeight, gMinReplicantWidth;
 extern float gMinimumTrayWidth, gMinimumWindowWidth, gMaximumWindowWidth;
