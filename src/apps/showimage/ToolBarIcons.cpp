@@ -626,7 +626,7 @@ init_tool_bar_icons()
 	const BSize toolBarIconsSize = be_control_look->ComposeIconSize(22);
 	const BSize iconRenderSize = be_control_look->ComposeIconSize(32);
 
-	BBitmap bitmap(BRect(BPoint(0, 0), iconRenderSize),
+	BBitmap bitmap = BBitmap(BRect(BPoint(0, 0), iconRenderSize),
 		B_BITMAP_NO_SERVER_LINK, B_RGBA32);
 
 	for (uint32 i = 0; i < sizeof(kIcons) / sizeof(IconData); i++) {
