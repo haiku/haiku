@@ -17,7 +17,7 @@ def run(fileSet, rules, outputFileName):
     openHtml(fileSet, outputFileName)
 
     for fileName in fileSet:
-        print "\nChecking " + fileName + ":"
+        print("\nChecking " + fileName + ":")
         file = open(fileName, 'r')
         text = file.read()
 
@@ -49,7 +49,7 @@ def visit(result, dir, names):
     for name in names:
         path = os.path.join(dir, name)
         if os.path.isfile(path) and os.path.splitext(name)[1] in extensions:
-            print "adding", path
+            print("adding", path)
             result.append(path)
 
 
@@ -87,6 +87,6 @@ if len(sys.argv) >= 2 and sys.argv[1] != "--help":
             os.path.walk(arg, visit, files)
     run(files, cppRules, "styleviolations.html")
 else:
-    print "Usage: python checkstyle.py file.cpp [file2.cpp] [directory]\n"
-    print "Checks c++ source files against the Haiku Coding Guidelines."
-    print "Outputs an html report in the styleviolations.html file.\n"
+    print("Usage: python checkstyle.py file.cpp [file2.cpp] [directory]\n")
+    print("Checks c++ source files against the Haiku Coding Guidelines.")
+    print("Outputs an html report in the styleviolations.html file.\n")
