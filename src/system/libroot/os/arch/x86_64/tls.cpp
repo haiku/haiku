@@ -5,10 +5,6 @@
  */
 
 
-#ifndef _NO_INLINE_ASM
-#	define _NO_INLINE_ASM 1
-#endif
-
 #include <atomic>
 
 #include <runtime_loader/runtime_loader.h>
