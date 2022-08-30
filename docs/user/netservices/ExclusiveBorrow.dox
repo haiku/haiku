@@ -1,0 +1,565 @@
+/*
+ * Copyright 2021 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Corresponds to:
+ *		headers/private/netservices2/ExclusiveBorrow.h	hrev?????
+ */
+
+
+#if __cplusplus >= 201703L
+
+
+/*!
+	\file ExclusiveBorrow.h
+	\ingroup netservices
+	\brief Provides the BExclusiveBorrow smart pointer.
+*/
+
+namespace BPrivate {
+
+namespace Network {
+
+
+/*!
+	\class BBorrowError
+	\ingroup netservices
+	\brief Error while handling a BExclusiveBorrow or BBorrow object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BBorrowError::BBorrowError(const char* origin)
+	\brief Constructor that sets the \a origin.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual const char* BBorrowError::Message() const noexcept override
+	\brief Get a pointer to the message describing the borrow error.
+
+	\since Haiku R1
+*/
+
+
+//! \cond INTERNAL
+
+
+/*!
+	\class BorrowAdmin
+	\brief Internal class that provides admin block for BExclusiveBorrow and BBorrow.
+
+	This base class provides the admin functions to deal with the underlying objects that are
+	managed by this smart pointers. It is implemented in such a way that it provides type erasure
+	for the actual smart objects, to enable them to allow for a BExclusiveBorrow<Derived> to have a
+	BBorrow<Base> higher up in the class inheritance.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BorrowAdmin::~BorrowAdmin()
+	\brief Destructor
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BorrowAdmin::Cleanup() noexcept
+	\brief Hook function that triggers the cleanup of the underlying object.
+
+	Implemented by BorrowPointer<T>
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BorrowAdmin::ReleasePointer() noexcept
+	\brief Hook function to relinquish ownership of the underlying pointer.
+
+	When BExclusiveBorrow<T>::Release() is called, ownership of the pointer is transferred to the
+	caller. This hook function allows the BorrowPointer<T> to release the object so that there will
+	not be a double delete when the BExclusiveBorrow<T> is cleaned up.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BorrowAdmin::BorrowAdmin()
+	\brief Constructor
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BorrowAdmin::Borrow()
+	\brief Register that a BBorrow<T> object is created
+
+	\exception BBorrowError In case the object already is borrowed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BorrowAdmin::Return() noexcept
+	\brief Register that the BBorrow<T> object no longer borrows the object.
+
+	This also cleans up the internal object if the corresponding BExclusiveBorrow<T> no longer
+	exists.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BorrowAdmin::Forfeit() noexcept
+	\brief Register that the BExclusiveBorrow<T> object no longer wants to own the object.
+
+	This also cleans up the internal object if there is no BBorrow<T> object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BorrowAdmin::IsBorrowed() noexcept
+	\brief Check if the current object is borrowed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BorrowAdmin::Release()
+	\brief Cleanup the BorrowAdmin object without cleaning up the underlying object.
+
+	This method is called by BExclusiveBorrow<T>::Release(), where the smart pointer is emptied and
+	the ownership of the object is transferred to the caller.
+
+	\exception BBorrowError The ownership cannot be released if the object is borrowed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BorrowPointer
+	\ingroup netservices
+	\brief Type derived from BorrowAdmin, which administrates the type-specific pointer.
+
+	In order to accomplish type erasure in BExclusiveBorrow and BBorrow, this derived type handles
+	the actual owned pointer.
+
+	\tparam T The type of the object that the BExclusiveBorrow<T> instance owns.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BorrowPointer<T>::BorrowPointer(T* object) noexcept
+	\brief Construct a new admin block to manage the \a object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BorrowPointer<T>::~BorrowPointer()
+	\brief Destructor that deletes the owned object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BorrowPointer<T>::Cleanup() noexcept override
+	\brief Implementation of the Cleanup() hook function to delete the admin block and free
+		resources.
+	
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual void BorrowPointer<T>::ReleasePointer() noexcept override
+	\brief Implementation of the ReleasePointer() hook function to make sure that the pointer
+		will not be freed when the object is destroyed.
+
+	\since Haiku R1
+*/
+
+
+//! \endcond
+
+
+/*!
+	\class BExclusiveBorrow
+	\ingroup netservices
+	\brief Smart pointer that allows shared ownership of an object with exclusive access.
+
+	This smart pointer was designed to support the particular pattern where a non-threadsafe or
+	non-lockable needs to be shared between two threads, where only one can have access to the
+	underlying object at the time.
+
+	When creating a new object, the underlying object can be accessed using the dereference
+	operator overloads as if with any other smart pointer. This ownership can then be borrowed
+	by creating a \ref BBorrow object. At that stage, the original owner can no longer access the
+	underlying object, until the borrow is returned. The borrow can access the object as long as
+	they retain the borrow. The borrow is returned by the borrow object going out of scope, or by
+	the borrow object being assigned a \c nullptr object. At that stage, the original owner regains
+	access.
+
+	\code
+	// Create a newly owned string object.
+	BExclusiveBorrow<BString> owner = make_exclusive_borrow<BString>("Initial value");
+
+	// Access the exclusively accessibe object and set it to a different value
+	owner->SetTo("New value set by owner");
+
+	// Create a borrow.
+	BBorrow<BString> borrow = BBorrow<BString>(owner);
+
+	try {
+		owner->SetTo("Another value set by owner");
+	} catch (const BorrowError& e) {
+		// This error will be thrown because the `owner` cannot access the object while borrowed.
+	}
+
+	try {
+		BBorrow<BString> secondBorrow = BBorrow<BString>(owner);
+	} catch (const BorrowError& e) {
+		// This error will be thrown because there cannot be more than one borrow at a time.
+	}
+
+	// The `borrow` has exclusive access to the underlying BString object
+	borrow->SetTo("A value set by the borrower");
+
+	// The borrow is returned by explicitly setting it to `nullptr` or by having the object go out
+	// of scope.
+	borrow = nullptr;
+
+	// The owner can access the object again
+	assert(*owner == "A value set by the borrower");
+	\endcode
+
+	\par Object Lifetime Management
+	The BExclusiveBorrow and BBorrow pair manage the lifetime of the underlying object, meaning
+	the memory will be freed when the object is no longer referenced by either the owner or the
+	borrower. It is possible to get the ownership of the underlying object through the
+	\ref BExclusiveBorrow::Release() method. This returns a \c unique_ptr.
+
+	\par Creating New Objects
+	When creating a BExclusiveBorrow object, you can use the \ref BExclusiveBorrow(T* object)
+	constructor to create a new smart pointer that takes an \em existing underlying object. Note
+	that the smart pointer will assume ownership, meaning that you should also have ownership of
+	that object. If you want to create a BExclusiveBorrow object for a new object, then you can use
+	the \ref make_exclusive_borrow() function to create a new object.
+
+	\par Move Semantics and Empty Objects
+	The template class is designed around having an underlying object value, and in most cases will
+	have an underlying object. However, there may be cases where a BExclusiveOwner or BBorrow
+	object will not have an internal value. This either happens when it is explicitly assigned an
+	empty value, or after the object has been moved. You can check whether the object has a value
+	through the \ref HasValue() method. Trying to access an empty object will throw a
+	\ref BBorrowError.
+
+	\par Checked Access
+	The semantics of the exclusive ownership are enforced by this class. The rules are:
+	 - There can only be one owner. The object cannot be copied, only moved.
+	 - There can only be one borrower at a time. The borrow object cannot be copied, only moved.
+	 - If one tries to create an additional borrow, an exception is thrown.
+	 - If an object is borrowed, accessing it through the owner will throw exceptions.
+
+	\par Casting Pointers between Owner and Borrower
+	For some design patterns, you may want to be able to cast the type of the owner to a related
+	type for the borrower. For example, the Network Services kit accepts a \c BBorrow<BDataIO> type
+	in order to allow the user to specify where to write the content of a network request to. The
+	\ref BDataIO itself is an abstract interface to read and write data from an object. A user
+	will most likely use a \ref BFile or \ref BMallocIO as underlying objects, both of which
+	have \ref BDataIO as their base class.
+
+	\par
+	Due to the specialized constructor of \ref BBorrow, it is possible to cast between compatible
+	pointer types, without loosing the advantages of properly cleaning up the object when the
+	borrow and the owner go out of scope. In the internals of the template, a type erasure
+	technique similar to that of \c std::shared_ptr is used.
+
+	\code
+	// Create a new BFile object, which inherits the BDataIO class.
+	BExclusiveBorrow<BFile> owner = make_exclusive_borrow<BFile>("path/to/file", B_READ_WRITE);
+	// The following succeeds because a BFile pointer can be assigned to a BDataIO pointer.
+	BBorrow<BDataIO> borrow = BBorrow<BDataIO>(owner);
+	\endcode
+
+	\par Multithread Safety, and Performance Cost
+	This smart object uses atomics to synchronize the ownership and borrows of the object, and to
+	enforce all the checks that were mentioned previously. The atomics guarantee that when you
+	want to access the object in BExclusiveBorrow, that this only succeeds after any outstanding
+	borrow is completed, otherwise an exception is thrown. While atomics can be used as a method of
+	synchronization, this templace class is \em not designed for that and it does not have the
+	tools to help doing that. If you need to synchronize object access between through threads, you
+	should use semaphores or thread joins instead.
+
+	\tparam T The type of object for this smart pointer.
+
+	\since Haiku R1
+*/
+
+/*!
+	\fn BExclusiveBorrow<T>::BExclusiveBorrow() noexcept
+	\brief Create a new smart pointer with no value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BExclusiveBorrow<T>::BExclusiveBorrow(nullptr_t) noexcept
+	\brief Special constructor that creates a new smart pointer with no value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BExclusiveBorrow<T>::BExclusiveBorrow(T* object)
+	\brief Create a new smart pointer that takes ownership of the \a object.
+
+	\param object The object to wrap inside this smart pointer.
+
+	\exception std::bad_alloc In case there are issues allocating memory for the internals of
+		the smart pointer.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BExclusiveBorrow<T>::~BExclusiveBorrow()
+	\brief Destructor.
+
+	If the smart pointer is not empty, the underlying object will be deleted if there no longer
+	is a borrow accessing it.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BExclusiveBorrow<T>::BExclusiveBorrow(BExclusiveBorrow&& other) noexcept
+	\brief Move constructor.
+
+	\param other The object to move from. It will be left empty after the move.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BExclusiveBorrow& BExclusiveBorrow<T>::operator=(BExclusiveBorrow&& other) noexcept
+	\brief Move assignment.
+
+	\param other The object to move from. It will be left empty after the move.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BExclusiveBorrow<T>::HasValue() const noexcept
+	\brief Check if the object has a value or is empty.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn T& BExclusiveBorrow<T>::operator*() const
+	\brief Dereferences the pointer.
+
+	\exception BBorrowError This exception is raised if the object is borrowed, or if it is empty.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn T* BExclusiveBorrow<T>::operator->() const
+	\brief Dereferences the pointer.
+
+	\exception BBorrowError This exception is raised if the object is borrowed, or if it is empty.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn std::unique_ptr<T> BExclusiveBorrow<T>::Release()
+	\brief Returns a unique_ptr of the inner object and releases the ownership.
+
+	\exception BBorrowError This exception is raised if the object is borrowed, or if it is empty.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BBorrow
+	\ingroup netservices
+	\brief Smart pointer that borrows an object from a \ref BExclusiveBorrow owner.
+
+	The BBorrow smart pointer is the accompanyment to the \ref BExclusiveBorrow owner object. See
+	the documentation on that template class on how to use the smart pointer pairs to express and
+	enforce exclusive ownership between the owner and the borrower.
+
+	Like a BExclusiveBorrow object, a BBorrow object can either have a borrow or be empty. When it
+	is empty, it means the current object is not borrowing anything at that moment. Any calls to
+	access the underlying data will fail in that case.
+
+	\tparam T The type of object that is owned by this smart pointer.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BBorrow<T>::BBorrow() noexcept
+	\brief Create a new smart pointer with no value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BBorrow<T>::BBorrow(nullptr_t) noexcept
+	\brief Special constructor that builds an empty borrow object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BBorrow<T>::BBorrow(BExclusiveBorrow<P>& owner)
+	\brief Construct a borrowed object from the \a owner.
+
+	\param owner The owner to borrow from.
+
+	\exception BBorrowError In case the \a owner already borrowed their object, or in case the
+		\a owner is an empty object, as you cannot borrow something that is not there.
+
+	\tparam T The type of object for this BBorrow object.
+	\tparam P The type of objedt for the BExclusiveBorrow object. This allows you to have different
+		types between the owner and the borrower, with the requirement that a pointer to type P can
+		be cast to a pointer of type T without issue.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BBorrow<T>::BBorrow(BBorrow&& other) noexcept
+	\brief Move constructor.
+
+	\param other The object to move from. It will be left empty after the move.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BBorrow& BBorrow<T>::operator=(BBorrow&& other) noexcept
+	\brief Move assignment.
+
+	\param other The object to move from. It will be left empty after the move.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BBorrow<T>::~BBorrow()
+	\brief Destructor that returns the object to the original owner.
+
+	If the original owner no longer exists, the underlying object will be deleted.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BBorrow<T>::HasValue() const noexcept
+	\brief Check if the object has a value or is empty.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn T& BBorrow<T>::operator*() const
+	\brief Dereference operator.
+
+	\exception BBorrowError When the smart pointer is empty and there is no object to access.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn T* BBorrow<T>::operator->() const
+	\brief Dereference operator.
+
+	\exception BBorrowError When the smart pointer is empty and there is no object to access.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BBorrow<T>::Return() noexcept
+	\brief Return object to the owner.
+
+	The current object will be set to be an empty object after this call. If the object is already
+	empty, this call will not do anything. If the owner no longer exists, the object will be
+	disposed off.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BExclusiveBorrow<T> make_exclusive_borrow(_Args&& ...__args)
+	\ingroup netservices
+	\brief Create a new object that is managed by a BExclusiveBorrow smart pointer.
+
+	This is a convenience template function to the likes of \c std::make_unique(). It allows you to
+	directly create the \ref BExclusiveBorrow smart pointer around a newly allocated object.
+
+	\tparam T The type of the object that will be created.
+	\tparam _Args Arguments to be passed to the constructor of T.
+
+	\exception std::bad_alloc In case there are issues allocating the new object.
+	\exception ... Any other exception that is thrown by the constructor of the object T.
+
+	\since Haiku R1
+*/
+
+
+} // namespace Network
+
+} // namespace BPrivate
+
+# endif
