@@ -235,11 +235,13 @@ DynamicThreadVector::operator[](unsigned dso)
 {
 	unsigned generation = TLSBlockTemplates::Get().GetGeneration(-1);
 	if (_Generation() < generation) {
-		for (unsigned i = 0; i < _Size(); i++) {
-			TLSBlock& block = (*fVector)[i + 1];
+		// We need to destroy any blocks whose DSO generation has changed
+		// to be greater than our own generation.
+		for (unsigned dsoIndex = 0; dsoIndex < _Size(); dsoIndex++) {
+			TLSBlock& block = (*fVector)[dsoIndex + 1];
 			unsigned dsoGeneration
-				= TLSBlockTemplates::Get().GetGeneration(dso);
-			if (_Generation() < dsoGeneration && dsoGeneration <= generation)
+				= TLSBlockTemplates::Get().GetGeneration(dsoIndex);
+			if (dsoGeneration > _Generation() && dsoGeneration <= generation)
 				block.Destroy();
 		}
 
@@ -257,7 +259,7 @@ DynamicThreadVector::operator[](unsigned dso)
 		status_t result = block.Initialize(dso);
 		if (result != B_OK)
 			return fNullBlock;
-	};
+	}
 
 	return block;
 }
