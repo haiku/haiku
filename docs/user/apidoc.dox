@@ -200,10 +200,10 @@
 
 	There are two different cases where you must or could use these blocks:
 
-	1. For non-public API of a <em>public header file</em>, you must always
-		add the classes and other elements to the documentation (even if they)
+	-# For non-public API of a <em>public header file</em>, you must always
+		add the classes and other elements to the documentation even if they
 		are placeholders, and put them in the conditional block.
-	2. For parts of the non-public API that is in a <em>private header
+	-# For parts of the non-public API that is in a <em>private header
 		file</em>, you could put the documentation in a conditional block. If
 		you choose to do so, you must document all elements in that header
 		file.
@@ -226,13 +226,13 @@
 	- \<single_word\> - The argument is a single word.
 	- (until the end of the line) - The argument runs until the end of the line.
 	- {paragraph} - The argument runs for an entire paragraph. A paragraph is
-		ended by an empty line, or if another command that defines a \ref
-		commands_sections sections is found. Note that if you use commands that
-		work on a paragraph and you split it over multiple lines (because of the
-		maximum line width of 80 characters or because it looks better), you
-		will have to indent subsequent lines that belong to the paragraph with
-		two more spaces, making the total of four. This is to visually
-		distinguish paragraphs for other documenters.
+		ended by an empty line, or if another command that defines a \link
+		commands_sections section \endlink is found. Note that if you use
+		commands that work on a paragraph and you split it over multiple lines
+		(because of the maximum line width of 80 characters or because it looks
+		better), you will have to indent subsequent lines that belong to the
+		paragraph with two more spaces, making the total of four. This is to
+		visually distinguish paragraphs for other documenters.
 
 	\subsection commands_definitions Block Definitions
 
@@ -273,8 +273,8 @@
 	If you have a look at the output that Doxygen generates, you can see that
 	there are recurring sections in the documentation. Documentation that
 	belongs to a certain section should be placed after a command that marks the
-	start of that section. All the commands take a paragraph as answer. A
-	paragraph ends with a whitespace, or with a command that marks a new
+	start of that section. All the commands take a paragraph as argument. A
+	paragraph ends with an empty line, or with a command that marks a new
 	section. Note that this list only shows the syntax of the commands. For the
 	semantics, have a look at the next section on style. In member documentation
 	you can use the following:
@@ -423,7 +423,7 @@
 	you will end up using every now and then. This section will describe those
 	commands.
 
-	The first one is \c \\n. This commands sort of belongs to the category of
+	The first one is \c \\n. This command sort of belongs to the category of
 	markup commands. It basically forces a newline. Because Doxygen parses
 	paragraphs as a single contiguous entity, it's not possible to mark up the
 	text using carriage returns in the documentation. \c \\n forces a newline in
@@ -453,8 +453,8 @@
 	Finally, it is a good idea to link between parts of the documentation. There
 	are two commands for that. The first one is \c \\ref, which enable you to
 	refer to pages, sections, etc. that you created yourself. The second one is
-	\c \\link which refers to members. The first one is takes one word as an
-	argument, the name of the section, and it inserts a link with the name of
+	\c \\link which refers to members. The first one takes one word as an
+	argument, the name of the section, and it inserts a link with the text of
 	the title. \c \\link is more complex. It should always be accompanied by \c
 	\\endlink. The first word between the two commands is the object that is
 	referred to, and the rest is the link text. 
@@ -595,7 +595,7 @@
 	-# End with a list of references to other classes, functions, pages, etc.
 		that might be of interest to the reader.
 
-	When documenting classes, don't be to exhaustive. Avoid becoming a tutorial
+	When documenting classes, don't be too exhaustive. Avoid becoming a tutorial
 	or a complete guide. This documentation is for reference only. If you want
 	to enlighten the reader on bigger subjects, consider writing a separate
 	documentation page that connects the different points you want to make.
@@ -623,7 +623,8 @@
 		clear description. The description starts with a capital letter and ends
 		with a dot. Don't write the description saying what the method does,
 		like "Starts the timer", but rather as what it will do: "Start the
-		timer." -# If the brief description doesn't cover all of what the method
+		timer."
+	-# If the brief description doesn't cover all of what the method
 		or function does, then you can add a few paragraphs that explain it in
 		more depth. Don't be too verbose, and use an example to illustrate
 		points. Point out any potential misunderstandings or problems you expect
@@ -646,7 +647,7 @@
 	In case of overloaded members, you'll need to make a decision. If you need
 	to copy too much information, you might resort to putting it in one
 	paragraph with the text "This is an overloaded member function, and differs
-	from \<name\> only by the type of parameter it takes." That will keep the
+	from <name> only by the type of parameter it takes." That will keep the
 	copying down and will point developers right to the place where they can get
 	more documentation.
 
@@ -693,7 +694,7 @@
 	depend on this variable. 
 
 	Defines are usually used as message constants. Give a short description of
-	what the message constant stands for, and where it might be send from and
+	what the message constant stands for, and where it might be sent from and
 	where it might be received.
 
 	Enumerations can either be anonymous or named. In case of the latter, you
