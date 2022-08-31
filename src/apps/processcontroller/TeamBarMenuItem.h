@@ -6,12 +6,10 @@
 #define _TEAM_BAR_MENU_ITEM_H_
 
 
-#include <MenuItem.h>
-
-class BBitmap;
+#include "IconMenuItem.h"
 
 
-class TeamBarMenuItem : public BMenuItem {
+class TeamBarMenuItem : public IconMenuItem {
 public:
 					TeamBarMenuItem(BMenu* menu, BMessage* kill_team, team_id team,
 						BBitmap* icon, bool deleteIcon);
@@ -20,7 +18,6 @@ public:
 
 	virtual	void	DrawContent();
 	virtual	void	GetContentSize(float* width, float* height);
-	void			DrawIcon();
 	void			DrawBar(bool force);
 	void			BarUpdate();
 	void			Init();
@@ -31,12 +28,10 @@ public:
 
 private:
 	team_id			fTeamID;
-	BBitmap*		fIcon;
 	team_usage_info	fTeamUsageInfo;
 	bigtime_t		fLastTime;
 	float			fGrenze1;
 	float			fGrenze2;
-	bool			fDeleteIcon;
 };
 
 

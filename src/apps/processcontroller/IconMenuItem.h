@@ -15,24 +15,20 @@ class IconMenuItem : public BMenuItem {
 	public:
 		IconMenuItem(BBitmap*, const char* title,
 			BMessage*, bool drawText = true, bool purge = false);
-
 		IconMenuItem(BBitmap*, BMenu*, bool drawText = true,
 			bool purge = false);
-
-		IconMenuItem(const char* mime, const char* title, BMessage*,
-			bool drawText = true);
-
 		virtual ~IconMenuItem();
+
+		void Reset(BBitmap*, bool purge = false);
+
 		virtual	void DrawContent();
 		virtual	void Highlight(bool isHighlighted);
 		virtual	void GetContentSize(float* width, float* height);
 
-		static	int	MinHeight();
-
-	private:
-		void DefaultIcon(const char* mime);
+	protected:
 		void DrawIcon();
 
+	private:
 		BBitmap*	fIcon;
 		bool		fDrawText;
 		bool		fPurge;
