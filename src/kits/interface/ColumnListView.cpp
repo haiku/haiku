@@ -4387,16 +4387,16 @@ OutlineView::AddRow(BRow* row, int32 Index, BRow* parentRow)
 	FixScrollBar(false);
 
 	BRect newRowRect;
-	bool newRowIsInOpenBranch = FindRect(row, &newRowRect);
-
-	if (fFocusRow && fFocusRowRect.top > newRowRect.bottom) {
-		// The focus row has moved.
-		Invalidate(fFocusRowRect);
-		FindRect(fFocusRow, &fFocusRowRect);
-		Invalidate(fFocusRowRect);
-	}
+	const bool newRowIsInOpenBranch = FindRect(row, &newRowRect);
 
 	if (newRowIsInOpenBranch) {
+		if (fFocusRow && fFocusRowRect.top > newRowRect.bottom) {
+			// The focus row has moved.
+			Invalidate(fFocusRowRect);
+			FindRect(fFocusRow, &fFocusRowRect);
+			Invalidate(fFocusRowRect);
+		}
+
 		if (fCurrentState == INACTIVE) {
 			if (newRowRect.bottom < fVisibleRect.top) {
 				// The new row is totally above the current viewport, move
