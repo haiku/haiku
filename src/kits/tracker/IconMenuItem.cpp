@@ -281,11 +281,9 @@ IconMenuItem::IconMenuItem(const char* label, BMessage* message,
 	fWhich(which)
 {
 	if (nodeInfo != NULL) {
-		fDeviceIcon = new BBitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(which)),
-			kDefaultIconDepth);
-
-		const icon_size size = (icon_size)(fDeviceIcon->Bounds().IntegerWidth() + 1);
-		if (nodeInfo->GetTrackerIcon(fDeviceIcon, size) != B_OK) {
+		fDeviceIcon = new BBitmap(BRect(BPoint(0, 0),
+			be_control_look->ComposeIconSize(which)), kDefaultIconDepth);
+		if (nodeInfo->GetTrackerIcon(fDeviceIcon, (icon_size)-1) != B_OK) {
 			delete fDeviceIcon;
 			fDeviceIcon = NULL;
 		}
