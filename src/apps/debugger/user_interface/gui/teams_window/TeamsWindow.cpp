@@ -45,8 +45,8 @@ enum {
 
 TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
 	:
-	BWindow(BRect(100, 100, 500, 250), "Teams", B_DOCUMENT_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS),
+	BWindow(BRect(100, 100, 500, 500), "Teams", B_DOCUMENT_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fTargetHostInterface(NULL),
 	fTeamsListView(NULL),
 	fAttachTeamButton(NULL),
