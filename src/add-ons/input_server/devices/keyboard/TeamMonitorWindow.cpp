@@ -709,7 +709,7 @@ TeamDescriptionView::SetItem(TeamListItem* item)
 				fQuitOverdue->Hide();
 		}
 
-		fIconView->SetIcon(item->Path()->Path());
+		fIconView->SetIcon(item->LargeIcon());
 	}
 
 	if (fLayout == NULL)
@@ -722,5 +722,3 @@ TeamDescriptionView::SetItem(TeamListItem* item)
 
 	Invalidate();
 }
-
-
