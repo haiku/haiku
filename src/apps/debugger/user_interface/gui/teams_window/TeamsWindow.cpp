@@ -14,6 +14,7 @@
 
 #include <Application.h>
 #include <Button.h>
+#include <ControlLook.h>
 #include <File.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
@@ -274,9 +275,10 @@ TeamsWindow::_Init()
 						MSG_SHOW_CONNECTION_CONFIG_WINDOW)))
 		.End()
 		.Add(fTeamsListView = new TeamsListView("TeamsList"))
-		.SetInsets(1.0f, 1.0f, 1.0f, 5.0f)
 		.AddGroup(B_HORIZONTAL)
-			.SetInsets(B_USE_DEFAULT_SPACING)
+			.SetInsets(B_USE_ITEM_SPACING, 0,
+				be_control_look->GetScrollBarWidth(B_VERTICAL),
+				be_control_look->GetScrollBarWidth(B_HORIZONTAL))
 			.Add(fAttachTeamButton = new BButton("Attach", new BMessage(
 					MSG_DEBUG_THIS_TEAM)))
 			.AddGlue()
