@@ -30,6 +30,7 @@ public:
 								icon_size iconSize = B_LARGE_ICON);
 			status_t		SetIcon(const uint8_t* hvifData, size_t size,
 								icon_size iconSize = B_LARGE_ICON);
+			status_t		SetIcon(const BBitmap* icon);
 
 private:
 			void			_SetSize();
