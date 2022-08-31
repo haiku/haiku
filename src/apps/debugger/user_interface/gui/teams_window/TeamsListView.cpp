@@ -15,6 +15,7 @@
 #include <AppMisc.h>
 #include <Bitmap.h>
 #include <ColumnTypes.h>
+#include <ControlLook.h>
 #include <FindDirectory.h>
 #include <MimeType.h>
 #include <MessageRunner.h>
@@ -198,7 +199,7 @@ enum {
 
 
 TeamRow::TeamRow(TeamInfo* info)
-	: BRow(std::max(20.0f, ceilf(be_plain_font->Size() * 1.4)))
+	: BRow(ceilf(be_control_look->DefaultLabelSpacing() * 3.3f))
 {
 	_SetTo(info);
 }
@@ -245,13 +246,14 @@ TeamRow::_SetTo(TeamInfo* info)
 			BPrivate::get_app_ref(fTeamInfo.TeamID(), &appInfo.ref);
 	}
 
-	BBitmap* icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1),
-		B_RGBA32);
+	BBitmap* icon = new BBitmap(BRect(BPoint(0, 0),
+		be_control_look->ComposeIconSize(B_MINI_ICON)), B_RGBA32);
 
-	status = BNodeInfo::GetTrackerIcon(&appInfo.ref, icon, B_MINI_ICON);
+	icon_size iconSize = (icon_size)(icon->Bounds().Width() + 1);
+	status = BNodeInfo::GetTrackerIcon(&appInfo.ref, icon, iconSize);
 	if (status != B_OK) {
-			BMimeType genericAppType(B_APP_MIME_TYPE);
-			status = genericAppType.GetIcon(icon, B_MINI_ICON);
+		BMimeType genericAppType(B_APP_MIME_TYPE);
+		status = genericAppType.GetIcon(icon, iconSize);
 	}
 
 	if (status != B_OK) {
