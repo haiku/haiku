@@ -817,6 +817,7 @@ void
 ImageFunctionsView::_Init()
 {
 	fFunctionsTable = new TreeTable("functions", 0, B_FANCY_BORDER);
+	fFunctionsTable->SetFont(B_FONT_ROW, be_fixed_font);
 	AddChild(fFunctionsTable->ToView());
 	AddChild(fFilterField = new BTextControl("filtertext", "Filter:",
 			NULL, NULL));

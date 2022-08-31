@@ -388,6 +388,7 @@ void
 RegistersView::_Init()
 {
 	fRegisterTable = new Table("register list", 0, B_FANCY_BORDER);
+	fRegisterTable->SetFont(B_FONT_ROW, be_fixed_font);
 	AddChild(fRegisterTable->ToView());
 
 	// columns
