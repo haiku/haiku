@@ -140,6 +140,9 @@ TReplicantTray::TReplicantTray(TBarView* barView)
 	fTime(NULL),
 	fBarView(barView),
 	fShelf(new TReplicantShelf(this)),
+	fMinimumTrayWidth(gMinimumTrayWidth),
+	fTrayPadding(3.0f),
+	fClockMargin(12.0f),
 	fAlignmentSupport(false)
 {
 	// scale replicants by font size
@@ -158,8 +161,7 @@ TReplicantTray::TReplicantTray(TBarView* barView)
 	if (fBarView != NULL && fBarView->Vertical()
 		&& (fBarView->ExpandoState() || fBarView->FullState())) {
 		fMinimumTrayWidth = gMinimumWindowWidth - kGutter - gDragRegionWidth;
-	} else
-		fMinimumTrayWidth = gMinimumTrayWidth;
+	}
 
 	// Create the time view
 	fTime = new TTimeView(fMinimumTrayWidth, fMaxReplicantHeight - 1.0,
@@ -188,6 +190,9 @@ TReplicantTray::AttachedToWindow()
 
 	Window()->SetPulseRate(1000000);
 
+	fTrayPadding = ceilf(be_control_look->ComposeSpacing(kTrayPadding) / 2);
+	fClockMargin = fTrayPadding * 4;
+
 	clock_settings* clock = ((TBarApp*)be_app)->ClockSettings();
 	fTime->SetShowSeconds(clock->showSeconds);
 	fTime->SetShowDayOfWeek(clock->showDayOfWeek);
@@ -195,8 +200,7 @@ TReplicantTray::AttachedToWindow()
 
 	AddChild(fTime);
 
-	const float trayPadding = ceilf(be_control_look->ComposeSpacing(kTrayPadding) / 2);
-	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - trayPadding, 2);
+	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - fTrayPadding, 2);
 		// will be moved into place later
 
 	if (!((TBarApp*)be_app)->Settings()->showClock)
@@ -234,7 +238,6 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 {
 	float width = 0;
 	float height = fMinTrayHeight;
-	const float trayPadding = ceilf(be_control_look->ComposeSpacing(kTrayPadding) / 2);
 
 	if (fBarView->Vertical()) {
 		width = static_cast<TBarApp*>(be_app)->Settings()->width
@@ -255,11 +258,11 @@ TReplicantTray::GetPreferredSize(float* preferredWidth, float* preferredHeight)
 	} else {
 		// if last replicant overruns clock then resize to accomodate
 		if (ReplicantCount() > 0) {
-			if (!fTime->IsHidden(fTime) && Bounds().right - trayPadding - 2
-						- fTime->Frame().Width() - kClockMargin
-					< fRightBottomReplicant.right + kClockMargin) {
-				width = fRightBottomReplicant.right + kClockMargin
-					+ fTime->Frame().Width() + trayPadding + 2;
+			if (!fTime->IsHidden(fTime) && Bounds().right - fTrayPadding - 2
+						- fTime->Frame().Width() - fClockMargin
+					< fRightBottomReplicant.right + fClockMargin) {
+				width = fRightBottomReplicant.right + fClockMargin
+					+ fTime->Frame().Width() + fTrayPadding + 2;
 			} else
 				width = fRightBottomReplicant.right + sIconGap + kGutter;
 		}
@@ -1179,8 +1182,7 @@ TReplicantTray::AcceptAddon(BRect replicantFrame, BMessage* message)
 BPoint
 TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 {
-	const float trayPadding = ceilf(be_control_look->ComposeSpacing(kTrayPadding) / 2);
-	BPoint loc(trayPadding, 0);
+	BPoint loc(fTrayPadding, 0);
 	if (fBarView->Vertical() || fBarView->MiniState()) {
 		if (fBarView->Vertical() && !fBarView->Left())
 			loc.x += gDragWidth; // move past dragger on left
@@ -1203,7 +1205,7 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 	}
 
 	// move clock vertically centered in first row next to replicants
-	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - trayPadding,
+	fTime->MoveTo(Bounds().right - fTime->Bounds().Width() - fTrayPadding,
 		loc.y + floorf((fMaxReplicantHeight - fTime->fHeight) / 2));
 
 	if (fBarView->Vertical()) {
@@ -1211,10 +1213,10 @@ TReplicantTray::LocationForReplicant(int32 index, float replicantWidth)
 		for (int32 row = 0; ; loc.y += fMaxReplicantHeight + sIconGap, row++) {
 			// determine free space in this row
 			BRect rowRect(loc.x, loc.y,
-				loc.x + Bounds().Width() - trayPadding,
+				loc.x + Bounds().Width() - fTrayPadding,
 				loc.y + fMaxReplicantHeight);
 			if (row == 0 && !fTime->IsHidden(fTime))
-				rowRect.right -= kClockMargin + fTime->Frame().Width();
+				rowRect.right -= fClockMargin + fTime->Frame().Width();
 
 			BRect replicantRect = rowRect;
 			for (int32 i = 0; i < index; i++) {

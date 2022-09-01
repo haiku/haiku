@@ -52,7 +52,6 @@ All rights reserved.
 const int32 kMinimumReplicantCount = 6;
 const int32 kGutter = 1;
 const int32 kTrayPadding = B_USE_HALF_ITEM_SPACING;
-const int32 kClockMargin = 12;
 
 extern float sIconGap;
 extern float gDragWidth, gDragRegionWidth;
@@ -170,6 +169,8 @@ private:
 				float				fMinTrayHeight;
 
 				float				fMinimumTrayWidth;
+				float				fTrayPadding;
+				float				fClockMargin;
 
 				bool				fAlignmentSupport;
 #ifdef DB_ADDONS
