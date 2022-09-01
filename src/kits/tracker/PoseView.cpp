@@ -283,12 +283,13 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fCachedIconSizeFrom(0)
 {
 	fListElemHeight = ceilf(be_plain_font->Size() * 1.65f);
+	fListOffset = ceilf(be_control_look->DefaultLabelSpacing() * 3.3f);
 
 	fViewState->SetViewMode(viewMode);
 	fShowSelectionWhenInactive
 		= TrackerSettings().ShowSelectionWhenInactive();
 	fTransparentSelection = TrackerSettings().TransparentSelection();
-	fFilterStrings.AddItem(new BString(""));
+	fFilterStrings.AddItem(new BString());
 }
 
 
@@ -434,7 +435,6 @@ BPoseView::RestoreColumnState(AttributeStreamNode* node)
 		}
 	}
 
-	_ResetStartOffset();
 	SetUpDefaultColumnsIfNeeded();
 	if (!ColumnFor(PrimarySort())) {
 		fViewState->SetPrimarySort(FirstColumn()->AttrHash());
@@ -462,7 +462,6 @@ BPoseView::RestoreColumnState(const BMessage &message)
 
 	AddColumnList(&tempSortedList);
 
-	_ResetStartOffset();
 	SetUpDefaultColumnsIfNeeded();
 	if (!ColumnFor(PrimarySort())) {
 		fViewState->SetPrimarySort(FirstColumn()->AttrHash());
@@ -479,16 +478,12 @@ BPoseView::AddColumnList(BObjectList<BColumn>* list)
 {
 	list->SortItems(&CompareColumns);
 
-	float nextLeftEdge = 0;
-	for (int32 columIndex = 0; columIndex < list->CountItems();
-			columIndex++) {
+	float nextLeftEdge = StartOffset();
+	for (int32 columIndex = 0; columIndex < list->CountItems(); columIndex++) {
 		BColumn* column = list->ItemAt(columIndex);
 
-		// Make sure that columns don't overlap
-		if (column->Offset() < nextLeftEdge) {
-			PRINT(("\t**Overlapped columns in archived column state\n"));
-			column->SetOffset(nextLeftEdge);
-		}
+		// Always realign columns, since the title-view snaps on resize anyway.
+		column->SetOffset(nextLeftEdge);
 
 		nextLeftEdge = column->Offset() + column->Width()
 			- kRoomForLine / 2.0f + kTitleColumnExtraMargin;
@@ -499,6 +494,9 @@ BPoseView::AddColumnList(BObjectList<BColumn>* list)
 			StartWatchDateFormatChange();
 		}
 	}
+
+	if (fTitleView != NULL)
+		fTitleView->Reset();
 }
 
 
@@ -613,14 +611,14 @@ void
 BPoseView::SetUpDefaultColumnsIfNeeded()
 {
 	// in case there were errors getting some columns
-	if (fColumnList->CountItems() != 0)
+	if (CountColumns() != 0)
 		return;
 
-	fColumnList->AddItem(new BColumn(B_TRANSLATE("Name"), StartOffset(), 145,
+	AddColumn(new BColumn(B_TRANSLATE("Name"), 145,
 		B_ALIGN_LEFT, kAttrStatName, B_STRING_TYPE, true, true));
-	fColumnList->AddItem(new BColumn(B_TRANSLATE("Size"), 200, 80,
+	AddColumn(new BColumn(B_TRANSLATE("Size"), 80,
 		B_ALIGN_RIGHT, kAttrStatSize, B_OFF_T_TYPE, true, false));
-	fColumnList->AddItem(new BColumn(B_TRANSLATE("Modified"), 295, 150,
+	AddColumn(new BColumn(B_TRANSLATE("Modified"), 150,
 		B_ALIGN_LEFT, kAttrStatModified, B_TIME_TYPE, true, false));
 
 	if (!IsWatchingDateFormatChange())
@@ -2804,7 +2802,7 @@ BPoseView::RemoveColumn(BColumn* columnToRemove, bool runAlert)
 bool
 BPoseView::AddColumn(BColumn* newColumn, const BColumn* after)
 {
-	if (after == NULL)
+	if (after == NULL && CountColumns() > 0)
 		after = LastColumn();
 
 	// add new column after last column
@@ -2820,7 +2818,8 @@ BPoseView::AddColumn(BColumn* newColumn, const BColumn* after)
 
 	// add the new column
 	fColumnList->AddItem(newColumn, afterColumnIndex + 1);
-	fTitleView->AddTitle(newColumn);
+	if (fTitleView != NULL)
+		fTitleView->AddTitle(newColumn);
 
 	BRect rect(Bounds());
 
@@ -2920,7 +2919,7 @@ BPoseView::HandleAttrMenuItemSelected(BMessage* message)
 		const char* displayAs;
 		message->FindString("attr_display_as", &displayAs);
 
-		column = new BColumn(item->Label(), 0, attrWidth, attrAlign,
+		column = new BColumn(item->Label(), attrWidth, attrAlign,
 			attrName, attrType, displayAs, isStatfield, isEditable);
 		AddColumn(column);
 		if (item->Menu()->Supermenu() == NULL)
@@ -6118,7 +6117,7 @@ BPoseView::MoveListToTrash(BObjectList<entry_ref>* list, bool selectNext,
 		BPose* pose = fSelectionList->ItemAt(0);
 
 		// find a point in the pose
-		BPoint pointInPose(kListOffset + 5, 5);
+		BPoint pointInPose(fListOffset + 5, 5);
 		int32 index = IndexOfPose(pose);
 		pointInPose.y += fListElemHeight * index;
 
@@ -6340,7 +6339,7 @@ BPoseView::Delete(BObjectList<entry_ref>* list, bool selectNext, bool askUser)
 		BPose* pose = fSelectionList->ItemAt(0);
 
 		// find a point in the pose
-		BPoint pointInPose(kListOffset + 5, 5);
+		BPoint pointInPose(fListOffset + 5, 5);
 		int32 index = IndexOfPose(pose);
 		pointInPose.y += fListElemHeight * index;
 
@@ -6383,7 +6382,7 @@ BPoseView::RestoreItemsFromTrash(BObjectList<entry_ref>* list, bool selectNext)
 		BPose* pose = fSelectionList->ItemAt(0);
 
 		// find a point in the pose
-		BPoint pointInPose(kListOffset + 5, 5);
+		BPoint pointInPose(fListOffset + 5, 5);
 		int32 index = IndexOfPose(pose);
 		pointInPose.y += fListElemHeight * index;
 
@@ -8207,7 +8206,7 @@ BPose*
 BPoseView::FirstVisiblePose(int32* _index) const
 {
 	ASSERT(ViewMode() == kListMode);
-	return FindPose(BPoint(kListOffset,
+	return FindPose(BPoint(fListOffset,
 		Bounds().top + fListElemHeight - 1), _index);
 }
 
@@ -8216,7 +8215,7 @@ BPose*
 BPoseView::LastVisiblePose(int32* _index) const
 {
 	ASSERT(ViewMode() == kListMode);
-	BPose* pose = FindPose(BPoint(kListOffset, Bounds().top + Frame().Height()
+	BPose* pose = FindPose(BPoint(fListOffset, Bounds().top + Frame().Height()
 		- fListElemHeight + 2), _index);
 	if (pose == NULL) {
 		// Just get the last one
@@ -8449,9 +8448,6 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 		RestoreState(node);
 		viewStateRestored = (fViewState != previousState);
 	}
-
-	// Make sure fTitleView is rebuilt, as fColumnList might have changed
-	fTitleView->Reset();
 
 	if (viewStateRestored) {
 		if (ViewMode() == kListMode && oldMode != kListMode) {
@@ -8979,7 +8975,7 @@ BPoseView::UpdateScrollRange()
 		fHScrollBar->GetRange(&scrollMin, &scrollMax);
 		if (minVal.x != scrollMin || maxVal.x != scrollMax) {
 			fHScrollBar->SetRange(minVal.x, maxVal.x);
-			fHScrollBar->SetSteps(kSmallStep, bounds.Width());
+			fHScrollBar->SetSteps(fListElemHeight / 2.0f, bounds.Width());
 		}
 	}
 
@@ -8990,7 +8986,7 @@ BPoseView::UpdateScrollRange()
 
 		if (minVal.y != scrollMin || maxVal.y != scrollMax) {
 			fVScrollBar->SetRange(minVal.y, maxVal.y);
-			fVScrollBar->SetSteps(kSmallStep, bounds.Height());
+			fVScrollBar->SetSteps(fListElemHeight / 2.0f, bounds.Height());
 		}
 	}
 
@@ -10493,18 +10489,6 @@ BPoseView::ExcludeTrashFromSelection()
 			break;
 		}
 	}
-}
-
-
-/*!	Since the start offset of the first column is part of the stored
-	column state, it has to be corrected to match the current offset
-	(that depends on the font size).
-*/
-void
-BPoseView::_ResetStartOffset()
-{
-	if (!fColumnList->IsEmpty())
-		fColumnList->ItemAt(0)->SetOffset(StartOffset());
 }
 
 

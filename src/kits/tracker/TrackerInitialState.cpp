@@ -226,8 +226,9 @@ mkColumnsBits(BMallocIO& stream, const ColumnData* src, int32 nelm,
 	for (int32 i = 0; i < nelm; i++) {
 		BColumn c(
 			B_TRANSLATE_CONTEXT(src[i].title, context),
-			src[i].offset, src[i].width, src[i].align, src[i].attributeName,
+			src[i].width, src[i].align, src[i].attributeName,
 			src[i].attrType, src[i].statField, src[i].editable);
+		c.SetOffset(src[i].offset);
 		c.ArchiveToStream(&stream);
 	}
 

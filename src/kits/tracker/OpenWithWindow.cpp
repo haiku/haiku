@@ -804,18 +804,20 @@ void
 OpenWithPoseView::SetUpDefaultColumnsIfNeeded()
 {
 	// in case there were errors getting some columns
-	if (fColumnList->CountItems() != 0)
+	if (CountColumns() != 0)
 		return;
 
-	BColumn* nameColumn = new BColumn(B_TRANSLATE("Name"), StartOffset(), 125,
+	BColumn* nameColumn = new BColumn(B_TRANSLATE("Name"), 125,
 		B_ALIGN_LEFT, kAttrStatName, B_STRING_TYPE, true, true);
-	fColumnList->AddItem(nameColumn);
-	BColumn* relationColumn = new BColumn(B_TRANSLATE("Relation"), 180, 100,
+	AddColumn(nameColumn);
+
+	BColumn* relationColumn = new BColumn(B_TRANSLATE("Relation"), 100,
 		B_ALIGN_LEFT, kAttrOpenWithRelation, B_STRING_TYPE, false, false);
-	fColumnList->AddItem(relationColumn);
-	fColumnList->AddItem(new BColumn(B_TRANSLATE("Location"), 290, 225,
+	AddColumn(relationColumn);
+
+	AddColumn(new BColumn(B_TRANSLATE("Location"), 225,
 		B_ALIGN_LEFT, kAttrPath, B_STRING_TYPE, true, false));
-	fColumnList->AddItem(new BColumn(B_TRANSLATE("Version"), 525, 70,
+	AddColumn(new BColumn(B_TRANSLATE("Version"), 70,
 		B_ALIGN_LEFT, kAttrAppVersion, B_STRING_TYPE, false, false));
 
 	// sort by relation and by name

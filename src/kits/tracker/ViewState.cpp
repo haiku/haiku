@@ -81,20 +81,20 @@ static const int32 kColumnStateMinArchiveVersion = 21;
 //	#pragma mark - BColumn
 
 
-BColumn::BColumn(const char* title, float offset, float width,
+BColumn::BColumn(const char* title, float width,
 	alignment align, const char* attributeName, uint32 attrType,
 	const char* displayAs, bool statField, bool editable)
 {
-	_Init(title, offset, width, align, attributeName, attrType, displayAs,
+	_Init(title, width, align, attributeName, attrType, displayAs,
 		statField, editable);
 }
 
 
-BColumn::BColumn(const char* title, float offset, float width,
+BColumn::BColumn(const char* title, float width,
 	alignment align, const char* attributeName, uint32 attrType,
 	bool statField, bool editable)
 {
-	_Init(title, offset, width, align, attributeName, attrType, NULL,
+	_Init(title, width, align, attributeName, attrType, NULL,
 		statField, editable);
 }
 
@@ -127,6 +127,9 @@ BColumn::BColumn(BMallocIO* stream, int32 version, bool endianSwap)
 		fAttrHash = B_SWAP_INT32(fAttrHash);
 		fAttrType = B_SWAP_INT32(fAttrType);
 	}
+
+	fOffset = ceilf(fOffset * _Scale());
+	fWidth = ceilf(fWidth * _Scale());
 }
 
 
@@ -137,9 +140,13 @@ BColumn::BColumn(const BMessage &message, int32 index)
 
 	if (message.FindFloat(kColumnOffsetName, index, &fOffset) != B_OK)
 		fOffset = -1.0f;
+	else
+		fOffset = ceilf(fOffset * _Scale());
 
 	if (message.FindFloat(kColumnWidthName, index, &fWidth) != B_OK)
 		fWidth = -1.0f;
+	else
+		fWidth = ceilf(fWidth * _Scale());
 
 	if (message.FindInt32(kColumnAlignmentName, index, (int32*)&fAlignment)
 			!= B_OK) {
@@ -167,25 +174,31 @@ BColumn::BColumn(const BMessage &message, int32 index)
 
 	if (message.FindBool(kColumnEditableName, index, &fEditable) != B_OK)
 		fEditable = false;
-
 }
 
 
 void
-BColumn::_Init(const char* title, float offset, float width,
+BColumn::_Init(const char* title, float width,
 	alignment align, const char* attributeName, uint32 attrType,
 	const char* displayAs, bool statField, bool editable)
 {
 	fTitle = title;
 	fAttrName = attributeName;
 	fDisplayAs = displayAs;
-	fOffset = offset;
-	fWidth = width;
+	fOffset = -1.0f;
+	fWidth = width * _Scale();
 	fAlignment = align;
 	fAttrHash = AttrHashString(attributeName, attrType);
 	fAttrType = attrType;
 	fStatField = statField;
 	fEditable = editable;
+}
+
+
+/* static */ float
+BColumn::_Scale()
+{
+	return (be_plain_font->Size() / 12.0f);
 }
 
 
@@ -242,9 +255,12 @@ BColumn::ArchiveToStream(BMallocIO* stream) const
 
 //	PRINT(("ArchiveToStream column, key %x, version %d\n", key, version));
 
+	const float offset = floorf(fOffset / _Scale()),
+		width = floorf(fWidth / _Scale());
+
 	StringToStream(&fTitle, stream);
-	stream->Write(&fOffset, sizeof(float));
-	stream->Write(&fWidth, sizeof(float));
+	stream->Write(&offset, sizeof(float));
+	stream->Write(&width, sizeof(float));
 	stream->Write(&fAlignment, sizeof(alignment));
 	StringToStream(&fAttrName, stream);
 	stream->Write(&fAttrHash, sizeof(uint32));
@@ -258,11 +274,14 @@ BColumn::ArchiveToStream(BMallocIO* stream) const
 void
 BColumn::ArchiveToMessage(BMessage &message) const
 {
+	const float offset = floorf(fOffset / _Scale()),
+		width = floorf(fWidth / _Scale());
+
 	message.AddInt32(kColumnVersionName, kColumnStateArchiveVersion);
 
 	message.AddString(kColumnTitleName, fTitle);
-	message.AddFloat(kColumnOffsetName, fOffset);
-	message.AddFloat(kColumnWidthName, fWidth);
+	message.AddFloat(kColumnOffsetName, offset);
+	message.AddFloat(kColumnWidthName, width);
 	message.AddInt32(kColumnAlignmentName, fAlignment);
 	message.AddString(kColumnAttrName, fAttrName);
 	message.AddInt32(kColumnAttrHashName, static_cast<int32>(fAttrHash));

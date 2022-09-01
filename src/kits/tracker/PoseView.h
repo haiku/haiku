@@ -72,9 +72,6 @@ class EntryListBase;
 class TScrollBar;
 
 
-const int32 kSmallStep = 10;
-const int32 kListOffset = 20;
-
 const uint32 kMiniIconMode = 'Tmic';
 const uint32 kIconMode = 'Ticn';
 const uint32 kListMode = 'Tlst';
@@ -201,6 +198,7 @@ public:
 		// returns height, descent, etc.
 	float FontHeight() const;
 	float ListElemHeight() const;
+	float ListOffset() const;
 
 	void SetIconPoseHeight();
 	float IconPoseHeight() const;
@@ -678,7 +676,6 @@ private:
 	void DrawOpenAnimation(BRect);
 
 	void MoveSelectionOrEntryToTrash(const entry_ref* ref, bool selectNext);
-	void _ResetStartOffset();
 
 protected:
 	struct node_ref_key {
@@ -733,6 +730,7 @@ protected:
 	bool fStateNeedsSaving;
 	BCountView* fCountView;
 	float fListElemHeight;
+	float fListOffset;
 	float fIconPoseHeight;
 	BPose* fDropTarget;
 	BPose* fAlreadySelectedDropTarget;
@@ -877,6 +875,13 @@ inline float
 BPoseView::ListElemHeight() const
 {
 	return fListElemHeight;
+}
+
+
+inline float
+BPoseView::ListOffset() const
+{
+	return fListOffset;
 }
 
 
@@ -1079,7 +1084,7 @@ BPoseView::CountColumns() const
 inline float
 BPoseView::StartOffset() const
 {
-	return kListOffset + ListIconSize() + kMiniIconSeparator + 1;
+	return fListOffset + ListIconSize() + kMiniIconSeparator + 1;
 }
 
 

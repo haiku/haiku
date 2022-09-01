@@ -347,7 +347,7 @@ BPose::UpdateIcon(BPoint poseLoc, BPoseView* poseView)
 	BRect rect;
 	if (poseView->ViewMode() == kListMode) {
 		rect = CalcRect(poseLoc, poseView);
-		rect.left += kListOffset;
+		rect.left += poseView->ListOffset();
 		rect.right = rect.left + iconSize;
 		rect.top = rect.bottom - iconSize;
 	} else {
@@ -980,7 +980,7 @@ BPose::_IconRect(const BPoseView* poseView, BPoint location) const
 {
 	uint32 size = poseView->IconSizeInt();
 	BRect rect;
-	rect.left = location.x + kListOffset;
+	rect.left = location.x + poseView->ListOffset();
 	rect.right = rect.left + size;
 	rect.top = location.y + (poseView->ListElemHeight() - size) / 2.f;
 	rect.bottom = rect.top + size;
