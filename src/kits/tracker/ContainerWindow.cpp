@@ -3275,7 +3275,7 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 
 		if (iconSizeMenu != NULL) {
 			if (viewMode == kIconMode) {
-				int32 iconSize = PoseView()->IconSizeInt();
+				int32 iconSize = PoseView()->UnscaledIconSizeInt();
 				BMenuItem* item = iconSizeMenu->ItemAt(0);
 				for (int32 i = 0; (item = iconSizeMenu->ItemAt(i)) != NULL;
 						i++) {

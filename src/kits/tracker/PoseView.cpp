@@ -52,6 +52,7 @@ All rights reserved.
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <ColorConversion.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Dragger.h>
 #include <fs_attr.h>
@@ -278,7 +279,8 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fLastDeskbarFrameCheckTime(LONGLONG_MIN),
 	fDeskbarFrame(0, 0, -1, -1),
 	fTextWidgetToCheck(NULL),
-	fActiveTextWidget(NULL)
+	fActiveTextWidget(NULL),
+	fCachedIconSizeFrom(0)
 {
 	fListElemHeight = ceilf(be_plain_font->Size() * 1.65f);
 
@@ -1009,6 +1011,17 @@ BPoseView::AttachedToWindow()
 }
 
 
+BSize
+BPoseView::IconSize() const
+{
+	if (fCachedIconSizeFrom != fViewState->IconSize()) {
+		fCachedIconSizeFrom = fViewState->IconSize();
+		fCachedIconSize = be_control_look->ComposeIconSize(fCachedIconSizeFrom);
+	}
+	return fCachedIconSize;
+}
+
+
 void
 BPoseView::SetIconPoseHeight()
 {
@@ -1019,13 +1032,13 @@ BPoseView::SetIconPoseHeight()
 			break;
 
 		case kMiniIconMode:
-			fViewState->SetIconSize(IconCache::sMiniIconSize.IntegerWidth() + 1);
+			fViewState->SetIconSize(B_MINI_ICON);
 			fIconPoseHeight = std::max((float)IconSizeInt(), sFontHeight + 1);
 			break;
 
 		case kListMode:
 		default:
-			fViewState->SetIconSize(ListIconSize());
+			fViewState->SetIconSize(B_MINI_ICON);
 			fIconPoseHeight = fListElemHeight;
 			break;
 	}
@@ -1042,14 +1055,21 @@ BPoseView::GetLayoutInfo(uint32 mode, BPoint* grid, BPoint* offset) const
 			break;
 
 		case kIconMode:
-			grid->Set(IconSizeInt() + 28, IconSizeInt() + 28);
-			offset->Set(20, 20);
+		{
+			const float gridOffset = ceilf(IconSizeInt() * 0.875f),
+				offsetValue = ceilf(IconSizeInt() * 0.625f);
+			grid->Set(IconSizeInt() + gridOffset, IconSizeInt() + gridOffset);
+			offset->Set(offsetValue, offsetValue);
 			break;
+		}
 
 		default:
+		{
+			const float labelSpacing = be_control_look->DefaultLabelSpacing();
 			grid->Set(0, 0);
-			offset->Set(5, 5);
+			offset->Set(labelSpacing - 1, labelSpacing - 1);
 			break;
+		}
 	}
 }
 
@@ -2204,53 +2224,24 @@ BPoseView::MessageReceived(BMessage* message)
 			int32 size;
 			int32 scale;
 			if (message->FindInt32("size", &size) == B_OK) {
-				if (size != (int32)IconSizeInt())
-					fViewState->SetIconSize(size);
+				// Nothing else to do in this case.
 			} else if (message->FindInt32("scale", &scale) == B_OK
 				&& fViewState->ViewMode() == kIconMode) {
-				if (scale == 0 && (int32)IconSizeInt() != 32) {
-					switch ((int32)IconSizeInt()) {
-						case 40:
-							fViewState->SetIconSize(32);
-							break;
-
-						case 48:
-							fViewState->SetIconSize(40);
-							break;
-
-						case 64:
-							fViewState->SetIconSize(48);
-							break;
-
-						case 96:
-							fViewState->SetIconSize(64);
-							break;
-
-						case 128:
-							fViewState->SetIconSize(96);
-							break;
+				if (scale == 0 && (int32)UnscaledIconSizeInt() != 32) {
+					switch ((int32)UnscaledIconSizeInt()) {
+						case 40: size = 32; break;
+						case 48: size = 40; break;
+						case 64: size = 48; break;
+						case 96: size = 64; break;
+						case 128: size = 96; break;
 					}
-				} else if (scale == 1 && (int32)IconSizeInt() != 128) {
-					switch ((int32)IconSizeInt()) {
-						case 32:
-							fViewState->SetIconSize(40);
-							break;
-
-						case 40:
-							fViewState->SetIconSize(48);
-							break;
-
-						case 48:
-							fViewState->SetIconSize(64);
-							break;
-
-						case 64:
-							fViewState->SetIconSize(96);
-							break;
-
-						case 96:
-							fViewState->SetIconSize(128);
-							break;
+				} else if (scale == 1 && (int32)UnscaledIconSizeInt() != 128) {
+					switch ((int32)UnscaledIconSizeInt()) {
+						case 32: size = 40; break;
+						case 40: size = 48; break;
+						case 48: size = 64; break;
+						case 64: size = 96; break;
+						case 96: size = 128; break;
 					}
 				}
 			} else {
@@ -2259,8 +2250,10 @@ BPoseView::MessageReceived(BMessage* message)
 					// uninitialized last icon size?
 					iconSize = 32;
 				}
-				fViewState->SetIconSize(iconSize);
+				size = iconSize;
 			}
+			if (size != (int32)UnscaledIconSizeInt())
+				fViewState->SetIconSize(size);
 			SetViewMode(message->what);
 			break;
 		}
@@ -3106,7 +3099,7 @@ BPoseView::SetViewMode(uint32 newMode)
 		float oldScale = lastIconSize / 32.0;
 		BPoint unscaledCenter(center.x / oldScale, center.y / oldScale);
 		// get the new center in "scaled icon placement" place
-		float newScale = fViewState->IconSize() / 32.0;
+		float newScale = fViewState->IconSize() / 32.0f;
 		BPoint newCenter(unscaledCenter.x * newScale,
 			unscaledCenter.y * newScale);
 		scaleOffset = newCenter - center;

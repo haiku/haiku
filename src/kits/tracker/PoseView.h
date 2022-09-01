@@ -204,6 +204,7 @@ public:
 
 	void SetIconPoseHeight();
 	float IconPoseHeight() const;
+	uint32 UnscaledIconSizeInt() const;
 	uint32 IconSizeInt() const;
 	BSize IconSize() const;
 
@@ -813,6 +814,10 @@ protected:
 	BTextWidget* fTextWidgetToCheck;
 	BTextWidget* fActiveTextWidget;
 
+private:
+	mutable uint32 fCachedIconSizeFrom;
+	mutable BSize fCachedIconSize;
+
 	typedef BView _inherited;
 };
 
@@ -883,16 +888,16 @@ BPoseView::IconPoseHeight() const
 
 
 inline uint32
-BPoseView::IconSizeInt() const
+BPoseView::UnscaledIconSizeInt() const
 {
 	return fViewState->IconSize();
 }
 
 
-inline BSize
-BPoseView::IconSize() const
+inline uint32
+BPoseView::IconSizeInt() const
 {
-	return BSize(fViewState->IconSize() - 1, fViewState->IconSize() - 1);
+	return IconSize().IntegerWidth() + 1;
 }
 
 
