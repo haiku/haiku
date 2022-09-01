@@ -240,8 +240,7 @@ ARMPagingMethod32Bit::PhysicalPageSlotPool::AllocatePool(
 	int32 index = VADDR_TO_PDENT((addr_t)virtualBase);
 	page_directory_entry* entry
 		= &map->PagingStructures32Bit()->pgdir_virt[index];
-	PutPageTableInPageDir(entry, physicalTable,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	PutPageTableInPageDir(entry, physicalTable, ARM_MMU_L1_FLAG_PXN);
 	ARMPagingStructures32Bit::UpdateAllPageDirs(index, *entry);
 
 	// init the pool structure
@@ -400,7 +399,8 @@ ARMPagingMethod32Bit::MapEarly(kernel_args* args, addr_t virtualAddress,
 
 		// put it in the pgdir
 		e = &fKernelVirtualPageDirectory[index];
-		PutPageTableInPageDir(e, pgtable_phys, attributes);
+		PutPageTableInPageDir(e, pgtable_phys,
+			(virtualAddress < KERNEL_BASE) ? ARM_MMU_L1_FLAG_PXN : 0);
 	}
 
 	phys_addr_t ptEntryPhys = fKernelVirtualPageDirectory[index] & ARM_PDE_ADDRESS_MASK;
@@ -494,7 +494,7 @@ ARMPagingMethod32Bit::PutPageTableInPageDir(page_directory_entry* entry,
 {
 	dsb();
 
-	*entry = (pgtablePhysical & ARM_PDE_ADDRESS_MASK) | ARM_MMU_L1_TYPE_COARSE;
+	*entry = (pgtablePhysical & ARM_PDE_ADDRESS_MASK) | ARM_MMU_L1_TYPE_COARSE | attributes;
 
 	dsb();
 	isb();
@@ -549,7 +549,7 @@ ARMPagingMethod32Bit::_EarlyPreparePageTables(page_table_entry* pageTables,
 			page_directory_entry* entry = method->KernelVirtualPageDirectory()
 				+ VADDR_TO_PDENT(address) + i;
 			PutPageTableInPageDir(entry, physicalTable,
-				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+				(address < KERNEL_BASE) ? ARM_MMU_L1_FLAG_PXN : 0);
 		}
 	}
 }

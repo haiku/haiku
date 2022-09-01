@@ -187,9 +187,7 @@ ARMVMTranslationMap32Bit::Map(addr_t va, phys_addr_t pa, uint32 attributes,
 
 		// put it in the pgdir
 		ARMPagingMethod32Bit::PutPageTableInPageDir(&pd[index], pgtable,
-			attributes
-				| ((attributes & B_USER_PROTECTION) != 0
-						? B_WRITE_AREA : B_KERNEL_WRITE_AREA));
+			(va < KERNEL_BASE) ? ARM_MMU_L1_FLAG_PXN : 0);
 
 		// update any other page directories, if it maps kernel space
 		if (index >= FIRST_KERNEL_PGDIR_ENT

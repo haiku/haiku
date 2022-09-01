@@ -38,6 +38,7 @@
 	// 31                                  10 9 8      5 432 10
 	// | page table address                  |0| domain |000|01|
 
+#define ARM_MMU_L1_FLAG_PXN				0x00000004
 
 // the domain is not used so and the ? is implementation specified... have not
 // found it in the cortex A8 reference... so I set t to 0
