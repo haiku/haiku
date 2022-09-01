@@ -7,6 +7,7 @@
 #include "Attribute.h"
 
 #include "LeafAttribute.h"
+#include "NodeAttribute.h"
 #include "ShortAttribute.h"
 
 
@@ -35,7 +36,17 @@ Attribute::Init(Inode* inode)
 			return leafAttr;
 		delete leafAttr;
 
-		// Currently node attributes are not supported return NULL
+		NodeAttribute* nodeAttr = new(std::nothrow) NodeAttribute(inode);
+		if (nodeAttr == NULL)
+			return NULL;
+
+		status = nodeAttr->Init();
+
+		if (status == B_OK)
+			return nodeAttr;
+		delete nodeAttr;
+
+		// Invalid format in extents return NULL
 		return NULL;
 	}
 

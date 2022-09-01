@@ -50,6 +50,7 @@ local xfsSource =
 	LeafAttribute.cpp
 	LeafDirectory.cpp
 	Node.cpp
+	NodeAttribute.cpp
 	ShortAttribute.cpp
 	ShortDirectory.cpp
 	Symlink.cpp

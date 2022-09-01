@@ -82,7 +82,7 @@
 	((w) == XFS_DATA_FORK ? (ino)->di_format : (ino)->di_aformat)
 
 #define XFS_DFORK_NEXTENTS(ino, w) \
-	((w) == XFS_DATA_FORK ? (ino)->di_nextents : (ino)->di_anextents)
+	((w) == XFS_DATA_FORK ? (ino)->di_nextents : (ino)->di_naextents)
 
 #define DFORK_MAXEXT(ino, volume, w) \
 	(DFORK_SIZE(ino, volume, w) / (2 * sizeof(uint64)))
@@ -218,6 +218,7 @@ struct xfs_inode_t {
 			uint32				UserId() const;
 			uint32				GroupId() const;
 			xfs_extnum_t		DataExtentsCount() const;
+			xfs_extnum_t		AttrExtentsCount() const;
 			uint8				ForkOffset() const;
 			uint16				di_magic;
 			uint16				di_mode;
@@ -244,7 +245,7 @@ struct xfs_inode_t {
 				// extent size
 			xfs_extnum_t		di_nextents;
 				// number of data extents
-			xfs_aextnum_t		di_anextents;
+			xfs_aextnum_t		di_naextents;
 				// number of EA extents
 			uint8				di_forkoff;
 				// decides where di_a starts
@@ -408,6 +409,8 @@ public:
 			bool				HasFileTypeField() const;
 			xfs_extnum_t		DataExtentsCount() const
 									{ return fNode->DataExtentsCount(); }
+			xfs_extnum_t		AttrExtentsCount() const
+									{ return fNode->AttrExtentsCount(); }
 			uint64				FileSystemBlockToAddr(uint64 block);
 			uint8				ForkOffset() const
 									{ return fNode->ForkOffset(); }
