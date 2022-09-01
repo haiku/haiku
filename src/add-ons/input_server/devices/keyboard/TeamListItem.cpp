@@ -121,7 +121,7 @@ TeamListItem::DrawItem(BView* owner, BRect frame, bool complete)
 int32
 TeamListItem::MinimalHeight()
 {
-	return fMiniIcon.Bounds().Height() +
+	return fMiniIcon.Bounds().IntegerHeight() +
 		(int32)(be_control_look->DefaultLabelSpacing() / 3.0f);
 }
 
