@@ -104,14 +104,16 @@ print_iframe(const char *event, struct iframe *frame)
 	if (event)
 		dprintf("Exception: %s\n", event);
 
-	dprintf("R00=%08lx R01=%08lx R02=%08lx R03=%08lx\n"
-		"R04=%08lx R05=%08lx R06=%08lx R07=%08lx\n",
+	dprintf("R00=%08x R01=%08x R02=%08x R03=%08x\n"
+		"R04=%08x R05=%08x R06=%08x R07=%08x\n",
 		frame->r0, frame->r1, frame->r2, frame->r3,
 		frame->r4, frame->r5, frame->r6, frame->r7);
-	dprintf("R08=%08lx R09=%08lx R10=%08lx R11=%08lx\n"
-		"R12=%08lx SP=%08lx LR=%08lx  PC=%08lx CPSR=%08lx\n",
+	dprintf("R08=%08x R09=%08x R10=%08x R11=%08x\n"
+		"R12=%08x SPs=%08x LRs=%08x PC =%08x\n",
 		frame->r8, frame->r9, frame->r10, frame->r11,
-		frame->r12, frame->svc_sp, frame->svc_lr, frame->pc, frame->spsr);
+		frame->r12, frame->svc_sp, frame->svc_lr, frame->pc);
+	dprintf("             SPu=%08x LRu=%08x CPSR=%08x\n",
+		frame->usr_sp, frame->usr_lr, frame->spsr);
 }
 
 
