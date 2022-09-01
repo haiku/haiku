@@ -43,8 +43,6 @@
 // a new thread structure.
 static struct arch_thread sInitialState;
 
-Thread *gCurrentThread;
-
 
 void
 arm_push_iframe(struct iframe_stack *stack, struct iframe *frame)
