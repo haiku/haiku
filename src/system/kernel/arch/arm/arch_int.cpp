@@ -252,6 +252,8 @@ arch_arm_syscall(struct iframe *iframe)
 	print_iframe("Software interrupt", iframe);
 #endif
 
+	IFrameScope scope(iframe);
+
 	uint32_t syscall = *(uint32_t *)(iframe->pc-4) & 0x00ffffff;
 	TRACE("syscall number: %d\n", syscall);
 

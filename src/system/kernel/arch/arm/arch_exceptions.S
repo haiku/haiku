@@ -157,8 +157,9 @@ und_stack:
 FUNCTION(arm_undefined):
 	PUSHFRAMEINSVC
 
-	mov	r0, sp
-	bl	arch_arm_undefined
+	mov		r0, sp		/* iframe */
+	mov		fp, r0
+	bl		arch_arm_undefined
 
 	PULLFRAMEFROMSVCANDEXIT
 FUNCTION_END(arm_undefined)
@@ -167,8 +168,9 @@ FUNCTION_END(arm_undefined)
 FUNCTION(arm_syscall):
 	PUSHFRAMEINSWI
 
-	mov	r0, sp
-	bl	arch_arm_syscall
+	mov		r0, sp		/* iframe */
+	mov		fp, r0
+	bl		arch_arm_syscall
 
 	PULLFRAMEINSWIANDEXIT
 FUNCTION_END(arm_syscall)
@@ -179,11 +181,12 @@ FUNCTION(arm_prefetch_abort):
 	nop					/* Make absolutely sure any pending */
 	nop					/* imprecise aborts have occurred. */
 #endif
-	sub	lr, lr, #4
+	sub		lr, lr, #4	/* Adjust LR */
 	PUSHFRAMEINSVC
 
-	mov	r0, sp
-	bl	arch_arm_prefetch_abort
+	mov		r0, sp		/* iframe */
+	mov		fp, r0
+	bl		arch_arm_prefetch_abort
 
 	PULLFRAMEFROMSVCANDEXIT
 FUNCTION_END(arm_prefetch_abort)
@@ -194,11 +197,12 @@ FUNCTION(arm_data_abort):
 	nop					/* Make absolutely sure any pending */
 	nop					/* imprecise aborts have occurred. */
 #endif
-	sub	lr, lr, #8		/* Adjust the lr */
+	sub		lr, lr, #8	/* Adjust LR */
 	PUSHFRAMEINSVC
 
-	mov	r0, sp
-	bl	arch_arm_data_abort
+	mov		r0, sp		/* iframe */
+	mov		fp, r0
+	bl		arch_arm_data_abort
 
 	PULLFRAMEFROMSVCANDEXIT
 FUNCTION_END(arm_data_abort)
@@ -210,23 +214,25 @@ FUNCTION_END(arm_reserved)
 
 
 FUNCTION(arm_irq):
-	sub	lr, lr, #4
+	sub		lr, lr, #4	/* Adjust LR */
 	PUSHFRAMEINSVC
 
-	mov	r0, sp			/* iframe */
-	bl	arch_arm_irq
+	mov		r0, sp		/* iframe */
+	mov		fp, r0
+	bl		arch_arm_irq
 
 	PULLFRAMEFROMSVCANDEXIT
 FUNCTION_END(arm_irq)
 
 
 FUNCTION(arm_fiq):
-	sub	lr, lr, #4
+	sub		lr, lr, #4	/* Adjust LR */
 	PUSHFRAMEINSVC
 
-	mov	r0, sp			/* iframe */
-	bl	arch_arm_fiq
-	
+	mov		r0, sp		/* iframe */
+	mov		fp, r0
+	bl		arch_arm_fiq
+
 	PULLFRAMEFROMSVCANDEXIT
 FUNCTION_END(arm_fiq)
 
