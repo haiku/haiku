@@ -14,10 +14,15 @@ struct iframe_stack {
 	int32	index;
 };
 
+struct arch_fpu_context {
+	uint64_t	fp_regs[32];
+	uint32_t	fpscr;
+};
+
 // architecture specific thread info
 struct arch_thread {
 	void	*sp;	// stack pointer
-	void	*interrupt_stack;
+	struct	arch_fpu_context fpuContext;
 
 	// used to track interrupts on this thread
 	struct iframe_stack	iframes;
@@ -43,6 +48,9 @@ extern "C" {
 #endif
 
 void arch_return_to_userland(struct iframe *);
+void arm_context_switch(struct arch_thread* from, struct arch_thread* to);
+void arm_save_fpu(struct arch_fpu_context* context);
+void arm_restore_fpu(struct arch_fpu_context* context);
 
 #ifdef __cplusplus
 }
