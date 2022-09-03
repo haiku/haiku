@@ -23,7 +23,7 @@ LeafAttribute::LeafAttribute(Inode* inode)
 LeafAttribute::~LeafAttribute()
 {
 	delete fMap;
-	delete fLeafBuffer;
+	delete[] fLeafBuffer;
 }
 
 
@@ -237,7 +237,7 @@ LeafAttribute::GetNext(char* name, size_t* nameLength)
 	TRACE("LeafAttribute::GetNext\n");
 
 	AttrLeafHeader* header  = AttrLeafHeader::Create(fInode,fLeafBuffer);
-	AttrLeafEntry* entry = (AttrLeafEntry*)(fLeafBuffer + AttrLeafHeader::Size(fInode));
+	AttrLeafEntry* firstEntry = (AttrLeafEntry*)(fLeafBuffer + AttrLeafHeader::Size(fInode));
 
 	int totalEntries = header->Count();
 
@@ -245,7 +245,8 @@ LeafAttribute::GetNext(char* name, size_t* nameLength)
 
 	for (int i = fLastEntryOffset; i < totalEntries; i++) {
 
-		entry = (AttrLeafEntry*)((char*)entry + i * sizeof(AttrLeafEntry));
+		AttrLeafEntry* entry =
+			(AttrLeafEntry*)((char*)firstEntry + i * sizeof(AttrLeafEntry));
 
 		uint32 offset = B_BENDIAN_TO_HOST_INT16(entry->nameidx);
 		TRACE("offset:(%" B_PRIu16 ")\n", offset);

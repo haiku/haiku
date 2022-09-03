@@ -40,6 +40,8 @@ private:
 			char*				fLeafBuffer;
 			char*				fNodeBuffer;
 			uint16				fLastEntryOffset;
+			uint16				fLastNodeOffset;
+			uint8				fNodeFlag;
 			AttrLeafNameLocal*	fLocalEntry;
 			AttrLeafNameRemote*	fRemoteEntry;
 };

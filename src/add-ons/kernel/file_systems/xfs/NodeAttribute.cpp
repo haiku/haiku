@@ -12,9 +12,13 @@
 NodeAttribute::NodeAttribute(Inode* inode)
 	:
 	fInode(inode),
-	fName(NULL)
+	fName(NULL),
+	fLeafBuffer(NULL),
+	fNodeBuffer(NULL)
 {
-	fLastEntryOffset = 0;
+	fLastEntryOffset	=	0;
+	fLastNodeOffset		=	0;
+	fNodeFlag			=	0;
 }
 
 
@@ -258,55 +262,66 @@ NodeAttribute::GetNext(char* name, size_t* nameLength)
 	TRACE("NodeAttribute::GetNext\n");
 
 	NodeHeader* node = NodeHeader::Create(fInode, fNodeBuffer);
-	NodeEntry* nodeEntry = (NodeEntry*)(fNodeBuffer + NodeHeader::Size(fInode));
+	NodeEntry* firstNodeEntry = (NodeEntry*)(fNodeBuffer + NodeHeader::Size(fInode));
 
-	int TotalNodeEntries = node->Count();
+	int totalNodeEntries = node->Count();
 
 	delete node;
 
-	uint16 curOffset = 1;
+	for (int i = fLastNodeOffset; i < totalNodeEntries; i++) {
 
-	for (int i = 0; i < TotalNodeEntries; i++) {
-		// First see the leaf block from NodeEntry and logical block offset
-		uint32 logicalBlock = B_BENDIAN_TO_HOST_INT32(nodeEntry->before);
-		// Now calculate File system Block of This logical block
-		xfs_fsblock_t block = _LogicalToFileSystemBlock(logicalBlock);
-		_FillBuffer(fLeafBuffer, block);
+		NodeEntry* nodeEntry = (NodeEntry*)((char*)firstNodeEntry + i * sizeof(NodeEntry));
+		fLastNodeOffset = i;
 
-		AttrLeafHeader* header  = AttrLeafHeader::Create(fInode,fLeafBuffer);
-		AttrLeafEntry* entry = (AttrLeafEntry*)(fLeafBuffer + AttrLeafHeader::Size(fInode));
+		// if we are at next node entry fill up leaf buffer
+		if (fNodeFlag == 0) {
+			// First see the leaf block from NodeEntry and logical block offset
+			uint32 logicalBlock = B_BENDIAN_TO_HOST_INT32(nodeEntry->before);
+			TRACE("Logical block : %d", logicalBlock);
+			// Now calculate File system Block of This logical block
+			xfs_fsblock_t block = _LogicalToFileSystemBlock(logicalBlock);
+			_FillBuffer(fLeafBuffer, block);
+			fNodeFlag = 1;
+			fLastEntryOffset = 0;
+		}
+
+		AttrLeafHeader* header  = AttrLeafHeader::Create(fInode, fLeafBuffer);
+		AttrLeafEntry* firstLeafEntry =
+			(AttrLeafEntry*)(fLeafBuffer + AttrLeafHeader::Size(fInode));
 
 		int totalEntries = header->Count();
 
 		delete header;
 
-		for (int j = 0; j < totalEntries; j++) {
-			if (curOffset > fLastEntryOffset) {
-				uint32 offset = B_BENDIAN_TO_HOST_INT16(entry->nameidx);
-				TRACE("offset:(%" B_PRIu16 ")\n", offset);
-				fLastEntryOffset = curOffset;
+		for (int j = fLastEntryOffset; j < totalEntries; j++) {
 
-				// First check if its local or remote value
-				if (entry->flags & XFS_ATTR_LOCAL) {
-					AttrLeafNameLocal* local  = (AttrLeafNameLocal*)(fLeafBuffer + offset);
-					memcpy(name, local->nameval, local->namelen);
-					name[local->namelen] = '\0';
-					*nameLength = local->namelen + 1;
-					TRACE("Entry found name : %s, namelength : %ld", name, *nameLength);
-					return B_OK;
-				} else {
-					AttrLeafNameRemote* remote  = (AttrLeafNameRemote*)(fLeafBuffer + offset);
-					memcpy(name, remote->name, remote->namelen);
-					name[remote->namelen] = '\0';
-					*nameLength = remote->namelen + 1;
-					TRACE("Entry found name : %s, namelength : %ld", name, *nameLength);
-					return B_OK;
-				}
+			AttrLeafEntry* entry = (AttrLeafEntry*)(
+				(char*)firstLeafEntry + j * sizeof(AttrLeafEntry));
+
+			uint32 offset = B_BENDIAN_TO_HOST_INT16(entry->nameidx);
+			TRACE("offset:(%" B_PRIu16 ")\n", offset);
+			fLastEntryOffset = j + 1;
+
+			// First check if its local or remote value
+			if (entry->flags & XFS_ATTR_LOCAL) {
+				AttrLeafNameLocal* local  = (AttrLeafNameLocal*)(fLeafBuffer + offset);
+				memcpy(name, local->nameval, local->namelen);
+				name[local->namelen] = '\0';
+				*nameLength = local->namelen + 1;
+				TRACE("Entry found name : %s, namelength : %ld", name, *nameLength);
+				return B_OK;
+			} else {
+				AttrLeafNameRemote* remote  = (AttrLeafNameRemote*)(fLeafBuffer + offset);
+				memcpy(name, remote->name, remote->namelen);
+				name[remote->namelen] = '\0';
+				*nameLength = remote->namelen + 1;
+				TRACE("Entry found name : %s, namelength : %ld", name, *nameLength);
+				return B_OK;
 			}
-			curOffset++;
-			entry = (AttrLeafEntry*)((char*)entry + sizeof(AttrLeafEntry));
 		}
-		nodeEntry = (NodeEntry*)((char*)nodeEntry + sizeof(NodeEntry));
+
+		// we are now at next nodeEntry initialize it as 0
+		fNodeFlag = 0;
 	}
 
 	return B_ENTRY_NOT_FOUND;
