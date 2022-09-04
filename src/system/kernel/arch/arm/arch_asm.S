@@ -108,18 +108,32 @@ FUNCTION(arm_restore_fpu):
 FUNCTION_END(arm_restore_fpu)
 
 
-/* addr_t arm_get_fsr(void); */
-FUNCTION(arm_get_fsr):
-	mrc	p15, 0, r0, c5, c0, 0		@ get FSR
+/* uint32 arm_get_dfsr(void); */
+FUNCTION(arm_get_dfsr):
+	mrc	p15, 0, r0, c5, c0, 0		@ get DFSR
 	bx	lr
-FUNCTION_END(arm_get_fsr)
+FUNCTION_END(arm_get_dfsr)
 
 
-/* addr_t arm_get_far(void); */
-FUNCTION(arm_get_far):
-	mrc	p15, 0, r0, c6, c0, 0		@ get FAR
+/* uint32 arm_get_ifsr(void) */
+FUNCTION(arm_get_ifsr):
+	mrc p15, 0, r0, c5, c0, 1		@ get IFSR
 	bx	lr
-FUNCTION_END(arm_get_far)
+FUNCTION_END(arm_get_ifsr)
+
+
+/* addr_t arm_get_dfar(void); */
+FUNCTION(arm_get_dfar):
+	mrc	p15, 0, r0, c6, c0, 0		@ get DFAR
+	bx	lr
+FUNCTION_END(arm_get_dfar)
+
+
+/* addr_t arm_get_ifar(void) */
+FUNCTION(arm_get_ifar):
+	MRC p15, 0, r0, c6, c0, 2		@ get IFAR
+	bx	lr
+FUNCTION_END(arm_get_ifar)
 
 
 /* addr_t arm_get_fp(void); */

@@ -7,15 +7,9 @@
  *
  */
 
-#include <asm_defs.h>
+#include <arch/arm/arch_cpu_defs.h>
 
-#define CPSR_MODE_MASK	0x1f
-#define CPSR_MODE_USR	0x10
-#define CPSR_MODE_FIQ	0x11
-#define CPSR_MODE_IRQ	0x12
-#define CPSR_MODE_SVC	0x13
-#define CPSR_MODE_ABT	0x17
-#define CPSR_MODE_UND	0x1b
+#include <asm_defs.h>
 
 /* The following two macros are taken from FreeBSD... */
 
