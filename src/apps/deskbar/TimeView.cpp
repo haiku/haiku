@@ -199,7 +199,7 @@ TTimeView::GetPreferredSize(float* width, float* height)
 	if (Vertical()) {
 		float appWidth = static_cast<TBarApp*>(be_app)->Settings()->width;
 		*width = fMaxWidth
-			= std::min(appWidth - (kDragRegionWidth + kHMargin) * 2, timeWidth);
+			= std::min(appWidth - (gDragRegionWidth + kHMargin) * 2, timeWidth);
 	} else
 		*width = fMaxWidth = timeWidth;
 

@@ -18,10 +18,10 @@ UsePrivateKernelHeaders ;
 DEFINES += DEBUG_APP="\\\"xfs\\\"" ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs uuid ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] : true ;
 
 local xfsSources =
 	BPlusTree.cpp
-	DeviceOpener.cpp
 	Directory.cpp
 	Extent.cpp
 	Inode.cpp
@@ -33,8 +33,14 @@ local xfsSources =
 	Volume.cpp
 	xfs.cpp
 	;
+local sharedSources =
+	crc32.cpp
+	CRCTable.cpp
+	DeviceOpener.cpp
+	;
 KernelAddon xfs :
 	$(xfsSources)
+	$(sharedSources)
 	:
 	libuuid_kernel.a
 ;
@@ -42,8 +48,10 @@ KernelAddon xfs :
 SEARCH on [ FGristFiles $(xfsSources) ]
 	= [ FDirName  $(HAIKU_TOP) src add-ons kernel file_systems xfs ] ;
 
-SEARCH on [ FGristFiles DeviceOpener.cpp ]
+SEARCH on [ FGristFiles $(sharedSources) ]
 	= [ FDirName  $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
 SEARCH on [ FGristFiles kernel_cpp.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+
+

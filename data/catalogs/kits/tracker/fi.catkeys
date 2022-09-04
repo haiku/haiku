@@ -284,9 +284,9 @@ no supporting apps	OpenWithWindow		ei tukevia sovelluksia
 32-bit unsigned integer	AttributesView		32-bittinen etumerkitön kokonaisluku
 Preparing to empty Trash…	StatusWindow		Valmistaudutaan tyhjentämään roskakori...
 Deleting: 	StatusWindow		Poistetaan: 
+label too long	PoseView		nimike on liian pitkä
 the MIME settings	FSUtils		MIME-asetukset
 You can't move or copy the trash.	FSUtils		Et voi siirtää tai kopioida roskakoriin.
-label too long	PoseView		nimike on liian pitkä
 Error creating link to \"%name\".	FSUtils		Virhe luotaessa linkkiä kohteeseen ”%name”.
 Unknown	FilePermissionsView		Tuntematon
 Paste links	ContainerWindow		Liitä linkit
@@ -335,8 +335,8 @@ MIME Path	AttributesView		MIME-polku
 less than	FindPanel		pienempi kuin
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa tiedostoa ”%name”:\n\t%error\n\nHaluaisitko jatkaa?
 Creating links: 	StatusWindow		Luodaan linkit: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Asiakirjan ”%document” avaaminen sovelluksella ”%app” epäonnistui (%error). 
 Create %s clipping	PoseView		Luo %s-leikkaus
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Asiakirjan ”%document” avaaminen sovelluksella ”%app” epäonnistui (%error). 
 Error moving \"%name\"	FSUtils		Virhe siirrettäessä kohdetta ”%name”
 To: %dir	StatusWindow		Vastaanottaja: %dir
 Paste layout	ContainerWindow		Liitä sijoittelu
@@ -508,8 +508,8 @@ Add-ons	FilePanelPriv		Lisäosat
 Empty folder	SlowContextPopup		Tyhjä kansio
 Alignment	AttributesView		Tasaus
 Move to Trash	FSUtils		Siirrä roskakoriin
-Handles %type	OpenWithWindow		Käsittelee tyyppiä %type
 Cancel	PoseView		Peru
+Handles %type	OpenWithWindow		Käsittelee tyyppiä %type
 Delete	PoseView		Poista
 Media parameter	AttributesView		Mediaparametri
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jos muutat kotikansiota, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nJos haluat kuitenkin muuttaa kotikansiota, pidä Vaihto-näppäin alhaalla ja napsauta ”Tiedän, mitä olen tekemässä”.

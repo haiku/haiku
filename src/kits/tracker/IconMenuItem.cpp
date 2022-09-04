@@ -126,7 +126,7 @@ ModelMenuItem::DrawContent()
 {
 	if (fDrawText) {
 		BPoint drawPoint(ContentLocation());
-		drawPoint.x += ListIconSize() + ListIconSize() / 4
+		drawPoint.x += ListIconSize() + (ListIconSize() / 4)
 			+ (fExtraPad ? 6 : 0);
 		if (fHeightDelta > 0)
 			drawPoint.y += ceil(fHeightDelta / 2);
@@ -165,12 +165,12 @@ ModelMenuItem::DrawIcon()
 	// draw small icon, synchronously
 	if (IsEnabled()) {
 		IconCache::sIconCache->Draw(fModel.ResolveIfLink(), Menu(), where,
-			kNormalIcon, (icon_size)ListIconSize());
+			kNormalIcon, BSize(ListIconSize() - 1, ListIconSize() - 1));
 	} else {
 		// dimmed, for now use a special blitter; icon cache should
 		// know how to blit one eventually
 		IconCache::sIconCache->SyncDraw(fModel.ResolveIfLink(), Menu(), where,
-			kNormalIcon, (icon_size)ListIconSize(), DimmedIconBlitter);
+			kNormalIcon, BSize(ListIconSize() - 1, ListIconSize() - 1), DimmedIconBlitter);
 	}
 
 	Menu()->PopState();
@@ -181,7 +181,8 @@ void
 ModelMenuItem::GetContentSize(float* width, float* height)
 {
 	_inherited::GetContentSize(width, height);
-	float iconSize = ListIconSize();
+
+	const float iconSize = ListIconSize();
 	fHeightDelta = iconSize - *height;
 	if (*height < iconSize)
 		*height = iconSize;
@@ -280,10 +281,9 @@ IconMenuItem::IconMenuItem(const char* label, BMessage* message,
 	fWhich(which)
 {
 	if (nodeInfo != NULL) {
-		fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1),
-			kDefaultIconDepth);
-
-		if (nodeInfo->GetTrackerIcon(fDeviceIcon, B_MINI_ICON) != B_OK) {
+		fDeviceIcon = new BBitmap(BRect(BPoint(0, 0),
+			be_control_look->ComposeIconSize(which)), kDefaultIconDepth);
+		if (nodeInfo->GetTrackerIcon(fDeviceIcon, (icon_size)-1) != B_OK) {
 			delete fDeviceIcon;
 			fDeviceIcon = NULL;
 		}
@@ -304,7 +304,7 @@ IconMenuItem::IconMenuItem(const char* label, BMessage* message,
 	fWhich(which)
 {
 	BMimeType mime(iconType);
-	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1),
+	fDeviceIcon = new BBitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(which)),
 		kDefaultIconDepth);
 
 	if (mime.GetIcon(fDeviceIcon, which) != B_OK) {
@@ -331,7 +331,7 @@ IconMenuItem::IconMenuItem(BMenu* submenu, BMessage* message,
 	fWhich(which)
 {
 	BMimeType mime(iconType);
-	fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1),
+	fDeviceIcon = new BBitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(which)),
 		kDefaultIconDepth);
 
 	if (mime.GetIcon(fDeviceIcon, which) != B_OK) {
@@ -359,7 +359,7 @@ IconMenuItem::IconMenuItem(BMessage* data)
 	if (data != NULL) {
 		fWhich = (icon_size)data->GetInt32("_which", B_MINI_ICON);
 
-		fDeviceIcon = new BBitmap(BRect(0, 0, fWhich - 1, fWhich - 1),
+		fDeviceIcon = new BBitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(fWhich)),
 			kDefaultIconDepth);
 
 		if (data->HasData("_deviceIconBits", B_RAW_TYPE)) {
@@ -417,9 +417,13 @@ IconMenuItem::GetContentSize(float* width, float* height)
 {
 	_inherited::GetContentSize(width, height);
 
-	fHeightDelta = 16 - *height;
-	if (*height < 16)
-		*height = 16;
+	int32 iconHeight = fWhich;
+	if (fDeviceIcon != NULL)
+		iconHeight = fDeviceIcon->Bounds().IntegerHeight() + 1;
+
+	fHeightDelta = iconHeight - *height;
+	if (*height < iconHeight)
+		*height = iconHeight;
 
 	*width += 20;
 }
@@ -430,7 +434,7 @@ IconMenuItem::DrawContent()
 {
 	BPoint drawPoint(ContentLocation());
 	if (fDeviceIcon != NULL)
-		drawPoint.x += (float)fWhich + 4.0f;
+		drawPoint.x += (fDeviceIcon->Bounds().Width() + 1) + 4.0f;
 
 	if (fHeightDelta > 0)
 		drawPoint.y += ceilf(fHeightDelta / 2);
@@ -518,10 +522,9 @@ IconMenuItem::SetIcon(BBitmap* icon)
 		if (fDeviceIcon != NULL)
 			delete fDeviceIcon;
 
-		fDeviceIcon = new BBitmap(BRect(0, 0, fWhich - 1, fWhich - 1),
-			icon->ColorSpace());
-		fDeviceIcon->SetBits(icon->Bits(), icon->BitsLength(), 0,
-			icon->ColorSpace());
+		fDeviceIcon = new BBitmap(BRect(BPoint(0, 0),
+			be_control_look->ComposeIconSize(fWhich)), icon->ColorSpace());
+		fDeviceIcon->ImportBits(icon);
 	} else {
 		delete fDeviceIcon;
 		fDeviceIcon = NULL;

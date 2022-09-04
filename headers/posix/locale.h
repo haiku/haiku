@@ -6,6 +6,7 @@
 #define _LOCALE_H_
 
 
+#include <locale_t.h>
 #include <null.h>
 
 struct lconv {
@@ -48,12 +49,30 @@ struct lconv {
  */
 #define	LC_LAST		LC_MESSAGES
 
+#define LC_COLLATE_MASK		(1 << (LC_COLLATE - 1))
+#define LC_CTYPE_MASK		(1 << (LC_CTYPE - 1))
+#define LC_MONETARY_MASK	(1 << (LC_MONETARY - 1))
+#define LC_NUMERIC_MASK 	(1 << (LC_NUMERIC - 1))
+#define LC_TIME_MASK		(1 << (LC_TIME - 1))
+#define LC_MESSAGES_MASK	(1 << (LC_MESSAGES - 1))
+
+#define LC_ALL_MASK			(LC_COLLATE_MASK | LC_CTYPE_MASK | \
+							LC_MONETARY_MASK | LC_NUMERIC_MASK | \
+							LC_TIME_MASK | LC_MESSAGES_MASK)
+
+#define LC_GLOBAL_LOCALE ((locale_t)-1)
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 extern struct lconv *localeconv(void);
 extern char *setlocale(int category, const char *locale);
+
+extern locale_t duplocale(locale_t);
+extern void freelocale(locale_t);
+extern locale_t newlocale(int, const char *, locale_t);
+extern locale_t uselocale(locale_t);
 
 #ifdef __cplusplus
 }

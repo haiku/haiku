@@ -18,7 +18,9 @@ for iconSourceDir in $(iconSourceDirs) {
 }
 
 # system headers
-UseLibraryHeaders agg expat ;
+UseBuildFeatureHeaders expat ;
+UseLibraryHeaders agg icon ;
+UsePrivateHeaders shared ;
 
 SimpleTest PictureTest :
 	PictureTest.cpp

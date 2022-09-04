@@ -289,7 +289,7 @@ int32 nbd_postoffice(void *arg)
 		if (err < 0)
 			goto err;
 		reason = "recv:size";
-		if (err < sizeof(reply))
+		if (err < (status_t)sizeof(reply))
 			err = EINVAL;
 		if (err < 0)
 			goto err;
@@ -386,7 +386,7 @@ status_t nbd_connect(struct nbd_device *dev)
 	err = krecv(dev->sock, &initpkt, sizeof(initpkt), 0);
 	if (err == -1 && errno < 0)
 		err = errno;
-	if (err < sizeof(initpkt))
+	if (err < (status_t)sizeof(initpkt))
 		goto err2;
 	err = EINVAL;//EPROTO;
 	if (memcmp(initpkt.passwd, NBD_INIT_PASSWD, sizeof(initpkt.passwd)))

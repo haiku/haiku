@@ -621,13 +621,8 @@ TTracker::MessageReceived(BMessage* message)
 		{
 			// message passed from generator thread
 			// update icon on passed-in node_ref
-			dev_t device;
-			ino_t inode;
-				// call this inode so we can call the node_ref node
-			if (message->FindInt32("device", (int32*)&device) == B_OK
-				&& message->FindUInt64("node", (uint64*)&inode) == B_OK) {
-				const node_ref node = node_ref(device, inode);
-
+			node_ref noderef;
+			if (message->FindNodeRef("noderef", &noderef) == B_OK) {
 				// cycle through open windows to find the node's pose
 				// TODO find a faster way
 				AutoLock<WindowList> lock(&fWindowList);
@@ -646,7 +641,7 @@ TTracker::MessageReceived(BMessage* message)
 					if (poseView == NULL)
 						continue;
 
-					BPose* pose = poseView->FindPose(&node);
+					BPose* pose = poseView->FindPose(&noderef);
 					if (pose != NULL) {
 						poseView->UpdateIcon(pose);
 						break; // updated pose icon, exit loop

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	247549485
+1	german	x-vnd.Haiku-Terminal	4089361699
 ANSI cyan color	Terminal AppearancePrefView		ANSI-Farbe Blaugrün
 Close other tabs	Terminal TermWindow		Andere Reiter schließen
 Insert path	Terminal TermView		Pfad einfügen
@@ -7,13 +7,13 @@ Text encoding	Terminal TermWindow		Kodierung
 ANSI blue color	Terminal AppearancePrefView		ANSI-Farbe Blau
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Bearbeiten
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               Diese Hilfe ausgeben\n  -t,     --title              Fenstertitel setzen\n  -f,     --fullscreen         Im Vollbild-Modus starten\n  -w,     --working-directory  Setzt das anfängliche Arbeitsverzeichnis\n
 Select all	Terminal TermWindow		Alles auswählen
 Confirm exit if active programs exist	Terminal AppearancePrefView		Beenden bestätigen, falls noch aktive Programme laufen
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tArbeitsverzeichnis des gerade im aktuellen Reiter\n\t\t\tlaufenden Prozesses. Optional kann auch die maximale\n\t\t\tAnzahl der Pfadkomponenten angegeben werden.\n\t\t\tZum Beispiel: '%2d' für maximal zwei Komponenten.\n\t%T\t-\tName der Terminalanwendung in der aktuellen Systemsprache\n\t%e\t-\tKodierung des aktuellen Reiters. Unterdrückt bei UTF-8\n\t%i\t-\tLaufende Nummer des Fensters\n\t%p\t-\tName des laufenden Prozesses im aktuellen Reiter\n\t%t\t-\tTitel des aktuellen Reiters\n
 Solarized Dark	Terminal colors scheme		Solarized dunkel
 Copy	Terminal TermWindow		Kopieren
 ANSI bright green color	Terminal AppearancePrefView		ANSI-Farbe Hellgrün
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               Diese Hilfe ausgeben\n  -t,     --title              Fenstertitel setzen\n  -f,     --fullscreen         Im Vollbild-Modus starten\n  -w,     --working-directory  Setzt das anfängliche Arbeitsverzeichnis
 ANSI white color	Terminal AppearancePrefView		ANSI-Farbe Weiß (Hellgrau)
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Reiter umbenennen ...

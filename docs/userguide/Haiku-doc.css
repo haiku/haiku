@@ -9,16 +9,105 @@
  *		Humdinger <humdingerb@gmail.com>
  *		Vincent Duvert <vincent.duvert@free.fr>
  *		Augustin Cavalier <waddlesplash>
+ *		Pascal R. G. Abresch <nep@packageloss.eu>
  */
+
+/* don't use @media (prefers-color-scheme: light) here, so it runs correctly in browsers that don't 
+   understand it and thus expect a light mode as is the default for html */
+:root {
+	color-scheme: light dark;
+
+	--CanvasBackground: #FFF;
+	--CanvasText: #333333;
+	--LinkText: #dc3c01;
+	--VisitedLinkText: #892601;
+	--TableBackground: #ff4500;
+	--TableHeaderBackground: #e0e0e0;
+	--HeaderColor: #0c3762;
+	--MenuColor: #24225e;
+	--ActiveLinkText: #ff4500;
+	--HeaderText: #0c3762;
+	--ButtonBackground: #e8e8e8;
+	--ButtonBorder: #c7c7c7;
+	--InfoBackground: #e4ffde;
+	--WarningBackground: #fffbc6;
+	--StopBackground: #ffeae6;
+	--SecondaryCanvas: #e0e0e0;
+	--TertiaryCanvas: #eeeeee;
+}
+
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--CanvasBackground: #000;
+		--LinkText: #f24000;
+		--VisitedLinkText: #bf3401;
+		--ActiveLinkText: #ff4500;
+		--HeaderText: #1b80e5;
+		--ButtonBorder: #666;
+		--InfoBackground: #0d2f3f;
+		--WarningBackground: #453b07;
+		--StopBackground: #4d0000;
+		--MenuColor: #5c57f2;
+	}
+	@media (prefers-contrast: no-preference) {
+		:root {
+			--CanvasText: #DDD;
+			--ButtonBackground: #444;
+			--SecondaryCanvas: #222;
+			--TertiaryCanvas: #131313;
+		}
+	}
+	@media (prefers-contrast: more) {
+		:root {
+			--CanvasText: #EFEFEF;
+			--ButtonBackground: #222;
+			--SecondaryCanvas: #111;
+			--TertiaryCanvas: #080808;
+		}
+	}
+	@media (prefers-contrast: less) {
+		:root {
+			--CanvasText: #AAA;
+			--ButtonBackground: #444;
+		}
+	}
+}
+
+
+@media (forced-colors: active) {
+	:root {
+		/* Userguide specific */
+		/* "Normal values" */
+		--HeaderText: LinkText;
+		--CanvasBackground: Canvas;
+		--CanvasText: CanvasText;
+		--LinkText: LinkText;
+		--VisitedLinkText: VisitedText;
+		--ActiveLinkText: ActiveText;
+		--ButtonBackground: ButtonFace;
+		--ButtonBorder: ButtonBorder;
+		--InputBackground: Field;
+		--InputText: FieldText;
+		--HighlightBackground: Highlight;
+		--HighlightText: HighlightText;
+		--SelectedBackground: SelectedItem;
+		--SelectedText: SelectedItemText;
+		--MarkBackground: Mark;
+		--MarkText: MarkText;
+		--DisabledText: GrayText;
+	}
+}
+
 
 html {
 	margin: 0;
 	padding: 0;
-	background: #FFF;
+	background: var(--CanvasBackground);
 }
 
 body {
-	color: #333333;
+	color: var(--CanvasText);
 	line-height: 1.5;
 	margin: 0;
 	padding: 0;
@@ -30,35 +119,35 @@ body {
 a:link {
 	font-weight: bold;
 	text-decoration: none;
-	color: #dc3c01;
+	color: var(--LinkText);
 }
 a:visited {
 	font-weight: bold;
 	text-decoration: none;
-	color: #892601;
+	color: var(--VisitedLinkText)
 }
 a:hover, a:active {
 	text-decoration: underline;
-	color: #ff4500;
+	color: var(--ActiveLinkText);
 }
 
 /* Some headers act as anchors, don't give them a hover effect */
 
 h2 a:hover, a:active {
 	text-decoration: none;
-	color: #0c3762;
+	color: var(--HeaderText);
 }
 h3 a:hover, a:active {
 	text-decoration: none;
-	color: #0c3762;
+	color: var(--HeaderText);
 }
 h4 a:hover, a:active {
 	text-decoration: none;
-	color: #0c3762;
+	color: var(--HeaderText);
 }
 h5 a:hover, a:active {
 	text-decoration: none;
-	color: #0c3762;
+	color: var(--HeaderText);
 }
 
 /* heading and navigation */
@@ -68,13 +157,20 @@ h5 a:hover, a:active {
 	left: 0;
 	top: 0;
 	height: 84px;
-	background: #eeeeee;
+	background: var(--TertiaryCanvas);
 }
 
 #banner div {
 	background: transparent url(images/logo.png) no-repeat scroll 10px 0;
 	height: 100%;
 	margin: 0 auto;
+}
+
+/* HaikuDark.svg -> Haiku logo - white on black - normal; canvas resize to width 254 */
+@media (prefers-color-scheme: dark) {
+	#banner div {
+		background: url(images/HaikuDark.svg) no-repeat scroll 6px 8px, url(images/LeafDark.png) no-repeat scroll 10px 0;
+	}
 }
 @media (min-width:768px) {
 	#banner {
@@ -90,7 +186,7 @@ h5 a:hover, a:active {
 	position: relative;
 	top: 51px;
 	left: 272px;
-	color: #333333;
+	color: var(--CanvasText);
 	text-transform: uppercase;
 	letter-spacing: 3px;
 	font-family: Myriad Pro,Myriad Web Pro Regular,Lucida Grande,Geneva,Trebuchet MS,sans-serif;
@@ -102,7 +198,7 @@ div.nav {
 	position: relative;
 	left: 0;
 	top: 0;
-	background: #e0e0e0;
+	background: var(--SecondaryCanvas);
 	padding: 0;
 }
 @media (min-width:768px) {
@@ -151,7 +247,7 @@ ul.lang-menu img {
 
 ul.lang-menu li {
 	margin-left: 10px;
-	background: #e0e0e0;
+	background-color: var(--SecondaryCanvas);
 	display: none;
 }
 
@@ -160,7 +256,7 @@ ul.lang-menu:hover li {
 }
 
 ul.lang-menu li:hover {
-	background-color: #efefef;
+	background-color: var(--TertiaryCanvas);
 }
 
 ul.lang-menu li.now {
@@ -176,7 +272,7 @@ ul.lang-menu li.now span.dropdown-caret {
 }
 
 ul.lang-menu li a {
-	color: black;
+	color: var(--CanvasText);
 	text-decoration: none;
 	font-weight: normal;
 	display: block;
@@ -226,13 +322,13 @@ table.index {
 	z-index: 10;
 }
 table.index tr.heading {
-	background-color: #e0e0e0;
+	background-color: var(--SecondaryCanvas);
 	text-align: center;
 	font-weight: bold;
 	font-size: 1.1em;
 }
 table.index tr.index {
-	background-color: #eeeeee;
+	background-color: var(--TertiaryCanvas);
 }
 table.index td {
 	padding: 5px 20px;
@@ -241,11 +337,11 @@ table.index td {
 table.index a:link, table.index a:visited {
 	font-weight: normal;
 	text-decoration: none;
-	color: #dc3c01;
+	color: var(--VisitedLinkText)
 }
 table.index a:hover, table.index a:active {
 	text-decoration: underline;
-	color: #ff4500;
+	color: var(--ActiveLinkText);
 }
 
 
@@ -269,27 +365,27 @@ table.index a:hover, table.index a:active {
 	min-height: 42px;
 }
 .box-info {
-	background: #e4ffde url(images/alert_info_32.png) 15px 15px no-repeat;
+	background: var(--InfoBackground) url(images/alert_info_32.png) 15px 15px no-repeat;
 }
 .box-warning {
-	background: #fffbc6 url(images/alert_warning_32.png) 15px 15px no-repeat;
+	background: var(--WarningBackground) url(images/alert_warning_32.png) 15px 15px no-repeat;
 }
 .box-stop {
-	background: #ffeae6 url(images/alert_stop_32.png) 15px 15px no-repeat;
+	background: var(--StopBackground) url(images/alert_stop_32.png) 15px 15px no-repeat;
 }
 
 /* More layout and styles */
 h1 {
 	font-size: 1.3em;
 	font-weight: bold;
-	color: #0c3762;
+	color: var(--HeaderText);
 	border-bottom: dotted thin #e0e0e0;
 	margin-bottom: 25px;
 }
 h2 {
 	font-size: 1.3em;
 	font-weight: normal;
-	color: #0c3762;
+	color: var(--HeaderText);
 	border-bottom: dotted thin #e0e0e0;
 	margin-top: 18px;
 }
@@ -301,20 +397,20 @@ h2 {
 h3 {
 	font-size: 1.2em;
 	font-weight: normal;
-	color: #0c3762;
+	color: var(--HeaderText);
 	border-bottom: dotted thin #e0e0e0;
 	margin-top: 30px;
 }
 h4 {
 	font-size: 1.1em;
 	font-weight: normal;
-	color: #0c3762;
+	color: var(--HeaderText);
 	margin-top: 30px;
 }
 h5 {
 	font-size: 1.0em;
 	font-weight: normal;
-	color: #0c3762;
+	color: var(--HeaderText);
 	margin-top: 30px;
 }
 p {
@@ -337,17 +433,17 @@ td.onelinetop {
 	white-space: nowrap;
 }
 tt {
-    	background-color: #e2e2e2;
-    	font-size: 1.0em;
-    	font-family: monospace;
+    background-color: var(--SecondaryCanvas);
+    font-size: 1.0em;
+    font-family: monospace;
 }
 pre {
-	border-color: #0c3762;
+	border-color: var(--HeaderText);
 	border-style: dotted;
 	border-width: thin;
 	margin: 0em;
 	padding: 1.5em;
-	background-color: #f0f0f0;
+	background-color: var(--SecondaryCanvas);
 }
 pre.terminal {			/* Terminal output*/
 	border-color: #ffb11f;
@@ -359,43 +455,43 @@ pre.terminal {			/* Terminal output*/
 	color: #ffb11f;
 }
 .menu {				/* Menu */
-    	font-size: 1.0em;
-    	font-family: serif;
-    	font-style: italic;
-	color: #24225e;
+    font-size: 1.0em;
+    font-family: serif;
+    font-style: italic;
+	color: var(--MenuColor);
 }
 .button {			/* Button */
-    	font-size: 1.0em;
-    	font-family: serif;
-    	font-style: italic;
+    font-size: 1.0em;
+    font-family: serif;
+    font-style: italic;
 	color: #33583c;
 }
 .app {				/* GUI Application name */
-    	font-size: 1.0em;
-    	font-family: serif;
-    	font-style: italic;
+    font-size: 1.0em;
+    font-family: serif;
+    font-style: italic;
 	color: #5e1c1c;
 }
 .cli {				/* Shell command or file */
-    	background-color: #e8e8e8;
-    	font-size: 0.9em;
-    	font-family: monospace;
+    background-color: var(--SecondaryCanvas);
+    font-size: 0.9em;
+    font-family: monospace;
 }
 .path {				/* File path */
-    	background-color: #e8e8e8;
-    	font-size: 0.9em;
-    	font-family: monospace;
+    background-color: var(--SecondaryCanvas);
+    font-size: 0.9em;
+    font-family: monospace;
 }
 .key {				/* Shortcut (separate with   */
 	-webkit-border-radius: 3px;
 	-khtml-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
-	border-color: #c7c7c7;
+	border-color: var(--ButtonBorder);
 	border-style: solid;
 	border-width: 1px;
 	padding: 0px 2px 0px 2px;
-	background-color: #e8e8e8;
+	background-color: var(--ButtonBackground);
     	font-family: serif;
    	font-variant: small-caps;
   	font-size: 0.8em;

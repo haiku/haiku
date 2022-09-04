@@ -71,8 +71,7 @@ All rights reserved.
 #include "WindowMenuItem.h"
 
 
-const float kIconPadding = 8.0f;
-const float kDeskbarMenuWidth = gMinimumWindowWidth / 2 + kIconPadding;
+const float kDeskbarMenuWidth = gMinimumWindowWidth / 2;
 
 const uint32 kMinimizeTeam = 'mntm';
 const uint32 kBringTeamToFront = 'bftm';
@@ -839,8 +838,9 @@ TExpandoMenuBar::CheckItemSizes(int32 delta, bool reset)
 float
 TExpandoMenuBar::MinHorizontalItemWidth()
 {
-	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
-	float iconOnlyWidth = iconSize + kIconPadding;
+	const int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
+	const float iconPadding = be_control_look->ComposeSpacing(kIconPadding);
+	float iconOnlyWidth = iconSize + iconPadding;
 
 	return static_cast<TBarApp*>(be_app)->Settings()->hideLabels
 		? iconOnlyWidth
@@ -852,12 +852,13 @@ TExpandoMenuBar::MinHorizontalItemWidth()
 float
 TExpandoMenuBar::MaxHorizontalItemWidth()
 {
-	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
-	float iconOnlyWidth = iconSize + kIconPadding;
+	const int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
+	const float iconPadding = be_control_look->ComposeSpacing(kIconPadding);
+	float iconOnlyWidth = iconSize + iconPadding;
 
 	// hide labels
 	if (static_cast<TBarApp*>(be_app)->Settings()->hideLabels)
-		return iconOnlyWidth + kIconPadding; // add an extra icon padding
+		return iconOnlyWidth + iconPadding; // add an extra icon padding
 
 	// set max item width to 1.25x min item width
 	return floorf(MinHorizontalItemWidth() * 1.25);
@@ -942,7 +943,8 @@ TExpandoMenuBar::CheckForSizeOverrunHorizontal()
 float
 TExpandoMenuBar::MaxHorizontalWidth()
 {
-	return (fBarView->DragRegion()->Frame().left - 1) - kDeskbarMenuWidth;
+	return (fBarView->DragRegion()->Frame().left - 1) -
+		(kDeskbarMenuWidth + be_control_look->ComposeSpacing(kIconPadding));
 }
 
 

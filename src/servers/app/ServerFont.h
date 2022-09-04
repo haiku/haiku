@@ -88,8 +88,8 @@ class ServerFont {
 									{ fSpacing = value; }
 			void				SetShear(float value)
 									{ fShear = value; }
-			void				SetSize(float value)
-									{ fSize = value; }
+			void				SetSize(float value);
+
 			void				SetRotation(float value)
 									{ fRotation = value; }
 			void				SetFalseBoldWidth(float value)

@@ -2554,6 +2554,7 @@ void
 VariablesView::_Init(ValueNodeManager* manager)
 {
 	fVariableTable = new TreeTable("variable list", 0, B_FANCY_BORDER);
+	fVariableTable->SetFont(B_FONT_ROW, be_fixed_font);
 	AddChild(fVariableTable->ToView());
 	fVariableTable->SetSortingEnabled(false);
 

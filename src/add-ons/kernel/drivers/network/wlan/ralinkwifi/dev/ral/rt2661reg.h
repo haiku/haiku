@@ -1,4 +1,4 @@
-/*	$FreeBSD: releng/12.0/sys/dev/ral/rt2661reg.h 258780 2013-11-30 22:17:27Z eadler $	*/
+/*	$FreeBSD$	*/
 
 /*-
  * Copyright (c) 2006
@@ -118,7 +118,6 @@
 #define RT2661_TEST_MODE_CSR		0x3484
 #define RT2661_IO_CNTL_CSR		0x3498
 #define RT2661_MCU_CODE_BASE		0x4000
-
 
 /* possible flags for register HOST_CMD_CSR */
 #define RT2661_KICK_CMD		(1 << 7)

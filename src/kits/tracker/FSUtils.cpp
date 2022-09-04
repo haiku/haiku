@@ -2463,7 +2463,7 @@ FSRecursiveCalcSize(BInfoWindow* window, CopyLoopControl* loopControl,
 		if (status != B_OK)
 			return status;
 
-		(*_runningSize) += statbuf.st_blocks* 512;
+		(*_runningSize) += statbuf.st_blocks * 512;
 
 		if (S_ISDIR(statbuf.st_mode)) {
 			BDirectory subdir(&entry);
@@ -3583,6 +3583,24 @@ _TrackerLaunchDocuments(const entry_ref*, const BMessage* refs,
 				error = B_OK;
 			if (error == B_OK || mimesetIt != 0)
 				break;
+			if (error == B_LAUNCH_FAILED_EXECUTABLE) {
+				BVolume volume(documentRef.device);
+				if (volume.IsReadOnly()) {
+					BMimeType type;
+					error = BMimeType::GuessMimeType(&documentRef, &type);
+					if (error != B_OK)
+						break;
+					error = be_roster->FindApp(type.Type(), &app);
+					if (error != B_OK)
+						break;
+					error = be_roster->Launch(&app, refs, &team);
+					if (error == B_ALREADY_RUNNING)
+						// app already running, not really an error
+						error = B_OK;
+					if (error == B_OK || mimesetIt != 0)
+						break;
+				}
+			}
 
 			SniffIfGeneric(&copyOfRefs);
 		}

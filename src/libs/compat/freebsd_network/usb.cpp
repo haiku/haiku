@@ -26,6 +26,7 @@ extern "C" {
 #include <USB3.h>
 
 
+struct mtx sUSBLock;
 usb_module_info* sUSB = NULL;
 struct taskqueue* sUSBTaskqueue = NULL;
 
@@ -40,6 +41,8 @@ init_usb()
 		dprintf("cannot get module \"%s\"\n", B_USB_MODULE_NAME);
 		return B_ERROR;
 	}
+
+	mtx_init(&sUSBLock, "fbsd usb", NULL, MTX_DEF);
 	return B_OK;
 }
 
@@ -47,13 +50,16 @@ init_usb()
 void
 uninit_usb()
 {
-	if (sUSB != NULL)
-		put_module(B_USB_MODULE_NAME);
+	if (sUSB == NULL)
+		return;
+
+	put_module(B_USB_MODULE_NAME);
 	if (sUSBTaskqueue != NULL)
 		taskqueue_free(sUSBTaskqueue);
 
 	sUSB = NULL;
 	sUSBTaskqueue = NULL;
+	mtx_destroy(&sUSBLock);
 }
 
 
@@ -161,6 +167,7 @@ map_usb_error(status_t err)
 	case B_OK:			return USB_ERR_NORMAL_COMPLETION;
 	case B_DEV_STALLED:	return USB_ERR_STALLED;
 	case B_CANCELED:	return USB_ERR_CANCELLED;
+	case B_TIMED_OUT:	return USB_ERR_TIMEOUT;
 	}
 	return USB_ERR_INVAL;
 }
@@ -213,9 +220,14 @@ usbd_get_speed(struct freebsd_usb_device* udev)
 }
 
 
+struct usb_page_cache {
+	void* buffer;
+	size_t length;
+};
+
 struct usb_xfer {
 	struct mtx* mutex;
-	void* priv_sc;
+	void* priv_sc, *priv;
 	usb_callback_t* callback;
 	usb_xfer_flags flags;
 	usb_frlength_t max_data_length;
@@ -223,8 +235,10 @@ struct usb_xfer {
 	usb_device device;
 	uint8 type;
 	usb_pipe pipe;
+
 	iovec* frames;
-	int nframes;
+	usb_page_cache* buffers;
+	int max_frame_count, nframes;
 
 	uint8 usb_state;
 	bool in_progress;
@@ -247,13 +261,13 @@ usbd_transfer_setup(struct freebsd_usb_device* udev,
 
 	// Make sure the taskqueue exists.
 	if (sUSBTaskqueue == NULL) {
-		mtx_lock(&Giant);
+		mtx_lock(&sUSBLock);
 		if (sUSBTaskqueue == NULL) {
 			sUSBTaskqueue = taskqueue_create("usb taskq", 0,
 				taskqueue_thread_enqueue, &sUSBTaskqueue);
 			taskqueue_start_threads(&sUSBTaskqueue, 1, PZERO, "usb taskq");
 		}
-		mtx_unlock(&Giant);
+		mtx_unlock(&sUSBLock);
 	}
 
 	const usb_configuration_info* device_config = sUSB->get_configuration(
@@ -268,6 +282,7 @@ usbd_transfer_setup(struct freebsd_usb_device* udev,
 		struct usb_xfer* xfer = new usb_xfer;
 		xfer->mutex = xfer_mtx;
 		xfer->priv_sc = priv_sc;
+		xfer->priv = NULL;
 		xfer->callback = setup->callback;
 		xfer->flags = setup->flags;
 		xfer->max_data_length = setup->bufsize;
@@ -301,7 +316,9 @@ usbd_transfer_setup(struct freebsd_usb_device* udev,
 		xfer->nframes = setup->frames;
 		if (xfer->nframes == 0)
 			xfer->nframes = 1;
-		xfer->frames = (iovec*)calloc(xfer->nframes, sizeof(iovec));
+		xfer->max_frame_count = xfer->nframes;
+		xfer->frames = (iovec*)calloc(xfer->max_frame_count, sizeof(iovec));
+		xfer->buffers = NULL;
 
 		xfer->usb_state = USB_ST_SETUP;
 		xfer->in_progress = false;
@@ -325,6 +342,12 @@ usbd_transfer_unsetup(struct usb_xfer** pxfer, uint16_t n_setup)
 		struct usb_xfer* xfer = pxfer[i];
 		usbd_transfer_drain(xfer);
 		cv_destroy(&xfer->condition);
+
+		if (xfer->buffers != NULL) {
+			for (int i = 0; i < xfer->max_frame_count; i++)
+				free(xfer->buffers[i].buffer);
+			free(xfer->buffers);
+		}
 		free(xfer->frames);
 		delete xfer;
 	}
@@ -345,10 +368,32 @@ usbd_xfer_softc(struct usb_xfer* xfer)
 }
 
 
+extern "C" void*
+usbd_xfer_get_priv(struct usb_xfer* xfer)
+{
+	return xfer->priv;
+}
+
+
+extern "C" void
+usbd_xfer_set_priv(struct usb_xfer* xfer, void* ptr)
+{
+	xfer->priv = ptr;
+}
+
+
 extern "C" uint8_t
 usbd_xfer_state(struct usb_xfer* xfer)
 {
 	return xfer->usb_state;
+}
+
+
+extern "C" void
+usbd_xfer_set_frames(struct usb_xfer* xfer, usb_frcount_t n)
+{
+	KASSERT(n <= uint32_t(xfer->max_frame_count), ("frame index overflow"));
+	xfer->nframes = n;
 }
 
 
@@ -360,6 +405,74 @@ usbd_xfer_set_frame_data(struct usb_xfer* xfer,
 
 	xfer->frames[frindex].iov_base = ptr;
 	xfer->frames[frindex].iov_len = len;
+}
+
+
+extern "C" void
+usbd_xfer_set_frame_len(struct usb_xfer* xfer,
+	usb_frcount_t frindex, usb_frlength_t len)
+{
+	KASSERT(frindex < uint32_t(xfer->nframes), ("frame index overflow"));
+	KASSERT(len <= uint32_t(xfer->max_data_length), ("length overflow"));
+
+	// Trigger buffer allocation if necessary.
+	if (xfer->frames[frindex].iov_base == NULL)
+		usbd_xfer_get_frame(xfer, frindex);
+
+	xfer->frames[frindex].iov_len = len;
+}
+
+
+extern "C" struct usb_page_cache*
+usbd_xfer_get_frame(struct usb_xfer* xfer, usb_frcount_t frindex)
+{
+	KASSERT(frindex < uint32_t(xfer->max_frame_count), ("frame index overflow"));
+	if (xfer->buffers == NULL)
+		xfer->buffers = (usb_page_cache*)calloc(xfer->max_frame_count, sizeof(usb_page_cache));
+
+	usb_page_cache* cache = &xfer->buffers[frindex];
+	if (cache->buffer == NULL) {
+		cache->buffer = malloc(xfer->max_data_length);
+		cache->length = xfer->max_data_length;
+	}
+
+	xfer->frames[frindex].iov_base = cache->buffer;
+	return cache;
+}
+
+
+extern "C" void
+usbd_frame_zero(struct usb_page_cache* cache,
+	usb_frlength_t offset, usb_frlength_t len)
+{
+	KASSERT((offset + len) < uint32_t(cache->length), ("buffer overflow"));
+	memset((uint8*)cache->buffer + offset, 0, len);
+}
+
+
+extern "C" void
+usbd_copy_in(struct usb_page_cache* cache, usb_frlength_t offset,
+	const void *ptr, usb_frlength_t len)
+{
+	KASSERT((offset + len) < uint32_t(cache->length), ("buffer overflow"));
+	memcpy((uint8*)cache->buffer + offset, ptr, len);
+}
+
+
+extern "C" void
+usbd_copy_out(struct usb_page_cache* cache, usb_frlength_t offset,
+	void *ptr, usb_frlength_t len)
+{
+	KASSERT((offset + len) < uint32_t(cache->length), ("buffer overflow"));
+	memcpy(ptr, (uint8*)cache->buffer + offset, len);
+}
+
+
+extern "C" void
+usbd_m_copy_in(struct usb_page_cache* cache, usb_frlength_t dst_offset,
+	struct mbuf *m, usb_size_t src_offset, usb_frlength_t src_len)
+{
+	m_copydata(m, src_offset, src_len, (caddr_t)((uint8*)cache->buffer + dst_offset));
 }
 
 

@@ -8,6 +8,7 @@
 #include <arch_cpu.h>
 #include <arch/thread.h>
 #include <boot/stage2.h>
+#include <commpage_defs.h>
 #include <kernel.h>
 #include <thread.h>
 #include <tls.h>
@@ -51,6 +52,10 @@ void
 arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 	void (*function)(void*), const void* data)
 {
+	memset(&thread->arch_info, 0, sizeof(arch_thread));
+	thread->arch_info.regs[10] = (uint64_t)data;
+	thread->arch_info.regs[11] = (uint64_t)function;
+	thread->arch_info.regs[12] = (uint64_t)_stackTop;
 }
 
 
@@ -61,10 +66,15 @@ arch_thread_init_tls(Thread *thread)
 }
 
 
+extern "C" void _arch_context_swap(arch_thread *from, arch_thread *to);
+
+
 void
 arch_thread_context_switch(Thread *from, Thread *to)
 {
+	_arch_context_swap(&from->arch_info, &to->arch_info);
 }
+
 
 void
 arch_thread_dump_info(void *info)
@@ -72,10 +82,34 @@ arch_thread_dump_info(void *info)
 }
 
 
+extern "C" void _eret_with_iframe(iframe *frame);
+
+
 status_t
 arch_thread_enter_userspace(Thread *thread, addr_t entry,
 	void *arg1, void *arg2)
 {
+	addr_t threadExitAddr;
+	{
+		addr_t commpageAdr = (addr_t)thread->team->commpage_address;
+		status_t ret = user_memcpy(&threadExitAddr,
+			&((addr_t*)commpageAdr)[COMMPAGE_ENTRY_ARM64_THREAD_EXIT],
+			sizeof(threadExitAddr));
+		ASSERT(ret == B_OK);
+		threadExitAddr += commpageAdr;
+	}
+
+	iframe frame;
+	memset(&frame, 0, sizeof(frame));
+
+	frame.spsr = 0;
+	frame.elr = entry;
+	frame.x[0] = (uint64_t)arg1;
+	frame.x[1] = (uint64_t)arg2;
+	frame.lr = threadExitAddr;
+	frame.sp = thread->user_stack_base + thread->user_stack_size;
+
+	_eret_with_iframe(&frame);
 	return B_ERROR;
 }
 
@@ -91,6 +125,7 @@ status_t
 arch_setup_signal_frame(Thread *thread, struct sigaction *sa,
 	struct signal_frame_data *signalFrameData)
 {
+	panic("arch_setup_signal_frame");
 	return B_ERROR;
 }
 
@@ -111,6 +146,7 @@ arch_check_syscall_restart(Thread *thread)
 void
 arch_store_fork_frame(struct arch_fork_arg *arg)
 {
+	panic("arch_store_fork_frame");
 }
 
 

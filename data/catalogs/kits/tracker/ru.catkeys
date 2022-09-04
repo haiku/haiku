@@ -282,9 +282,9 @@ no supporting apps	OpenWithWindow		нет поддерживающих прог�
 32-bit unsigned integer	AttributesView		32-битное целое без знака
 Preparing to empty Trash…	StatusWindow		Подготовка к очищению корзины…
 Deleting: 	StatusWindow		Удаление: 
+label too long	PoseView		слишком длинное имя
 the MIME settings	FSUtils		настройки MIME
 You can't move or copy the trash.	FSUtils		Вы не можете перемещать или копировать корзину.
-label too long	PoseView		слишком длинное имя
 Error creating link to \"%name\".	FSUtils		Ошибка при создании ссылки к \"%name\".
 Unknown	FilePermissionsView		Неизвестно
 Paste links	ContainerWindow		Вставить ссылки
@@ -333,8 +333,8 @@ MIME Path	AttributesView		MIME Путь
 less than	FindPanel		меньше чем
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Ошибка при копировании файла \"%name\":\n\t%error\n\nВы хотите продолжить?
 Creating links: 	StatusWindow		Создание ссылок: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (%error). 
 Create %s clipping	PoseView		Сохранить как %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Ошибка при перемещении \"%name\"
 To: %dir	StatusWindow		В: %dir
 Paste layout	ContainerWindow		Вставить вид папки
@@ -506,8 +506,8 @@ Add-ons	FilePanelPriv		Дополнения
 Empty folder	SlowContextPopup		Пустая папка
 Alignment	AttributesView		Выравнивание
 Move to Trash	FSUtils		В корзину
-Handles %type	OpenWithWindow		Поддерживает %type
 Cancel	PoseView		Отмена
+Handles %type	OpenWithWindow		Поддерживает %type
 Delete	PoseView		Удалить
 Media parameter	AttributesView		Параметры медиа
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Если вы измените домашнюю папку, %osName может вести себя непредсказуемо!\n\nВы уверены, что это нужно сделать?\n\nЧтобы изменить домашнюю папку, зажмите клавишу "Shift" и нажмите \"Я знаю, что я делаю\".

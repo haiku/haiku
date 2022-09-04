@@ -21,6 +21,7 @@
 #include <CheckBox.h>
 #include <ControlLook.h>
 #include <DateTime.h>
+#include <DateTimeEdit.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -31,7 +32,6 @@
 #include <Window.h>
 
 #include "AnalogClock.h"
-#include "DateTimeEdit.h"
 #include "TimeMessages.h"
 #include "TimeWindow.h"
 
@@ -43,6 +43,8 @@
 using BPrivate::BCalendarView;
 using BPrivate::BDateTime;
 using BPrivate::B_LOCAL_TIME;
+using BPrivate::DateEdit;
+using BPrivate::TimeEdit;
 
 
 DateTimeView::DateTimeView(const char* name)
@@ -178,8 +180,8 @@ DateTimeView::_InitView()
 	fCalendarView->SetSelectionMessage(new BMessage(kDayChanged));
 	fCalendarView->SetInvocationMessage(new BMessage(kDayChanged));
 
-	fDateEdit = new TDateEdit("dateEdit", 3);
-	fTimeEdit = new TTimeEdit("timeEdit", 5);
+	fDateEdit = new DateEdit("dateEdit", 3, new BMessage(H_USER_CHANGE));
+	fTimeEdit = new TimeEdit("timeEdit", 5, new BMessage(H_USER_CHANGE));
 	fClock = new TAnalogClock("analogClock");
 
 	BTime time(BTime::CurrentTime(B_LOCAL_TIME));

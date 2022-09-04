@@ -64,6 +64,11 @@ enum
 /* These are defined in ctype-info.c.
    The declarations here must match those in localeinfo.h.
 
+   In the thread-specific locale model (see `uselocale' in <locale.h>)
+   we cannot use global variables for these as was done in the past.
+   Instead, the following accessor functions return the address of
+   each variable, which is local to the current thread if multithreaded.
+
    These point into arrays of 384, so they can be indexed by any `unsigned
    char' value [0,255]; by EOF (-1); or by any `signed char' value
    [-128,-1).  ISO C requires that the ctype functions work for `unsigned
@@ -72,12 +77,12 @@ enum
    rather than `unsigned char's because tolower (EOF) must be EOF, which
    doesn't fit into an `unsigned char'.  But today more important is that
    the arrays are also used for multi-byte character sets.  */
-extern __const unsigned short int *__ctype_b;	/* Characteristics.  */
-extern __const __int32_t *__ctype_tolower; /* Case conversions.  */
-extern __const __int32_t *__ctype_toupper; /* Case conversions.  */
+extern __const unsigned short int **__ctype_b_loc (void); /* Characteristics. */
+extern __const __int32_t **__ctype_tolower_loc (void);    /* Case conversions. */
+extern __const __int32_t **__ctype_toupper_loc (void);    /* Case conversions. */
 
 #define	__isctype(c, type) \
-  (__ctype_b[(int) (c)] & (unsigned short int) type)
+  ((*__ctype_b_loc())[(int) (c)] & (unsigned short int) type)
 
 #define	__isascii(c)	(((c) & ~0x7f) == 0)	/* If C is a 7 bit value.  */
 #define	__toascii(c)	((c) & 0x7f)		/* Mask off high bits.  */
@@ -167,27 +172,27 @@ __exctype (_tolower);
 __extern_inline int
 tolower (int __c) __THROW
 {
-  return __c >= -128 && __c < 256 ? __ctype_tolower[__c] : __c;
+  return __c >= -128 && __c < 256 ? (*__ctype_tolower_loc())[__c] : __c;
 }
 
 __extern_inline int
 toupper (int __c) __THROW
 {
-  return __c >= -128 && __c < 256 ? __ctype_toupper[__c] : __c;
+  return __c >= -128 && __c < 256 ? (*__ctype_toupper_loc())[__c] : __c;
 }
 # endif
 
 # if __GNUC__ >= 2 && defined __OPTIMIZE__ && !defined __cplusplus
-#  define tolower(c) __tobody (c, tolower, __ctype_tolower, (c))
-#  define toupper(c) __tobody (c, toupper, __ctype_toupper, (c))
+#  define tolower(c) __tobody (c, tolower, (*__ctype_tolower_loc()), (c))
+#  define toupper(c) __tobody (c, toupper, (*__ctype_toupper_loc()), (c))
 # endif	/* Optimizing gcc */
 
 # if defined __USE_SVID || defined __USE_MISC || defined __USE_XOPEN
 #  define isascii(c)	__isascii (c)
 #  define toascii(c)	__toascii (c)
 
-#  define _tolower(c)	((int) __ctype_tolower[(int) (c)])
-#  define _toupper(c)	((int) __ctype_toupper[(int) (c)])
+#  define _tolower(c)	((int) (*__ctype_tolower_loc())[(int) (c)])
+#  define _toupper(c)	((int) (*__ctype_toupper_loc())[(int) (c)])
 # endif
 
 #endif /* Not __NO_CTYPE.  */

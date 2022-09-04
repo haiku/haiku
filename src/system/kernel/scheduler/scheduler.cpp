@@ -108,19 +108,20 @@ enqueue(Thread* thread, bool newOne)
 		ASSERT(thread->previous_cpu != NULL);
 		ASSERT(threadData->Core() != NULL);
 		targetCPU = &gCPUEntries[thread->previous_cpu->cpu_num];
-	} else if (gSingleCore)
+	} else if (gSingleCore) {
 		targetCore = &gCoreEntries[0];
-	else if (threadData->Core() != NULL
+	} else if (threadData->Core() != NULL
 		&& (!newOne || !threadData->HasCacheExpired())) {
 		targetCore = threadData->Rebalance();
 	}
 
-	bool rescheduleNeeded = threadData->ChooseCoreAndCPU(targetCore, targetCPU);
+	const bool rescheduleNeeded = threadData->ChooseCoreAndCPU(targetCore, targetCPU);
 
 	TRACE("enqueueing thread %ld with priority %ld on CPU %ld (core %ld)\n",
 		thread->id, threadPriority, targetCPU->ID(), targetCore->ID());
 
-	threadData->Enqueue();
+	bool wasRunQueueEmpty = false;
+	threadData->Enqueue(wasRunQueueEmpty);
 
 	// notify listeners
 	NotifySchedulerListeners(&SchedulerListener::ThreadEnqueuedInRunQueue,
@@ -128,11 +129,12 @@ enqueue(Thread* thread, bool newOne)
 
 	int32 heapPriority = CPUPriorityHeap::GetKey(targetCPU);
 	if (threadPriority > heapPriority
-		|| (threadPriority == heapPriority && rescheduleNeeded)) {
+		|| (threadPriority == heapPriority && rescheduleNeeded)
+		|| wasRunQueueEmpty) {
 
-		if (targetCPU->ID() == smp_get_current_cpu())
+		if (targetCPU->ID() == smp_get_current_cpu()) {
 			gCPU[targetCPU->ID()].invoke_scheduler = true;
-		else {
+		} else {
 			smp_send_ici(targetCPU->ID(), SMP_MSG_RESCHEDULE, 0, 0, 0,
 				NULL, SMP_MSG_FLAG_ASYNC);
 		}
@@ -319,6 +321,7 @@ reschedule(int32 nextState)
 	SCHEDULER_ENTER_FUNCTION();
 
 	int32 thisCPU = smp_get_current_cpu();
+	gCPU[thisCPU].invoke_scheduler = false;
 
 	CPUEntry* cpu = CPUEntry::GetCPU(thisCPU);
 	CoreEntry* core = CoreEntry::GetCore(thisCPU);

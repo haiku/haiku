@@ -21,7 +21,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			div.c
 			env.cpp
 			exit.cpp
-			getsubopt.cpp
 			heapsort.c
 			merge.c
 			mktemp.c

@@ -112,8 +112,8 @@ bus_alloc_mem_resource(device_t dev, struct resource *res, pci_info *info,
 
 	void *virtualAddr;
 
-	res->r_mapped_area = map_mem(&virtualAddr, addr, size, 0,
-		"bus_alloc_resource(MEMORY)");
+	res->r_mapped_area = map_mem(&virtualAddr, addr, size,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, "bus_alloc_resource(MEMORY)");
 	if (res->r_mapped_area < B_OK)
 		return -1;
 
@@ -297,6 +297,23 @@ rman_get_virtual(struct resource *res)
 }
 
 
+bus_addr_t
+rman_get_start(struct resource *res)
+{
+	return res->r_bushandle;
+}
+
+
+bus_size_t
+rman_get_size(struct resource *res)
+{
+	area_info info;
+	if (get_area_info(res->r_mapped_area, &info) != B_OK)
+		return 0;
+	return info.size;
+}
+
+
 //	#pragma mark - Interrupt handling
 
 
@@ -329,7 +346,13 @@ intr_handler(void *data)
 		//device_printf(intr->dev, "in soft interrupt handler.\n");
 
 		atomic_or(&intr->handling, 1);
+		if ((intr->flags & INTR_MPSAFE) == 0)
+			mtx_lock(&Giant);
+
 		intr->handler(intr->arg);
+
+		if ((intr->flags & INTR_MPSAFE) == 0)
+			mtx_unlock(&Giant);
 		atomic_and(&intr->handling, 0);
 		HAIKU_REENABLE_INTERRUPTS(intr->dev);
 	}
@@ -355,8 +378,6 @@ int
 bus_setup_intr(device_t dev, struct resource *res, int flags,
 	driver_filter_t* filter, driver_intr_t handler, void *arg, void **_cookie)
 {
-	/* TODO check MPSAFE etc */
-
 	struct internal_intr *intr = (struct internal_intr *)malloc(
 		sizeof(struct internal_intr));
 	char semName[64];

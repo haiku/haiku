@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-libtracker	294379846
+1	turkish	x-vnd.Haiku-libtracker	2138624843
 Created	ContainerWindow		Oluşturulma
 Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Küçük biteşlem simge
 Would you like to find a suitable application to open the file?	FSUtils		Bu dosyayı açmak için uygun bir uygulama bulmak ister misiniz?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Bir klasörü veya sembolik bağlantıyı bir dosya ile değiştiremezsiniz.
+(unknown)	InfoWindow		(bilinmiyor)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# tarih>}}
 Trailing \\.	libtracker		İzleyen \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		%func işlevinde \nfind_directory() başarısız oldu. \nSebep: %error
@@ -84,6 +85,7 @@ Include trash	FindPanel		Çöp'e de bak
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Toparla
 Modified	FindPanel		Değiştirilme
+ (block size: 	InfoWindow		 (blok boyutu: 
 Select all	QueryContainerWindow		Tümünü seç
 Generate image thumbnails	SettingsView		Küçük resimler oluştur
 Select…	FilePanelPriv		Seç…
@@ -167,6 +169,7 @@ Read	FilePermissionsView		Okuma
 There was an error writing the attribute.	WidgetAttributeText		Öznitelik yazılırken bir hata oluştu.
 Path	Default Query Columns		Yol
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target% ögesini yeniden adlandırırsanız %osName düzgün çalışmayabilir.\n\nBunu yapmak istediğinizden emin misiniz?
+Filesystem:	InfoWindow		Dosya sistemi:
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" açılamadı (%error). 
 Media parameter group	AttributesView		Ortam parametreleri grubu
 %name info	InfoWindow	InfoWindow Title	%name Bilgisi
@@ -284,9 +287,9 @@ no supporting apps	OpenWithWindow		destekleyen uygulama yok
 32-bit unsigned integer	AttributesView		32 bit imzalanmamış tamsayı
 Preparing to empty Trash…	StatusWindow		Çöp'ü boşaltmaya hazırlanıyor…
 Deleting: 	StatusWindow		Siliniyor: 
+label too long	PoseView		etiket çok uzun
 the MIME settings	FSUtils		MIME ayarları
 You can't move or copy the trash.	FSUtils		Çöp kopyalanamaz veya taşınamaz.
-label too long	PoseView		etiket çok uzun
 Error creating link to \"%name\".	FSUtils		\"%name\" ögesine bağlantı yaratılırken hata.
 Unknown	FilePermissionsView		Bilinmeyen
 Paste links	ContainerWindow		Bağlantıları yapıştır
@@ -335,8 +338,8 @@ MIME Path	AttributesView		MIME Yolu
 less than	FindPanel		daha az
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" dosyasını kopyalarken hata:\n\t%error\n\nİşlem sürdürülsün mü?
 Creating links: 	StatusWindow		Bağlantılar oluşturuluyor: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" \"%app\" uygulaması ile açılamıyor (%error). 
 Create %s clipping	PoseView		%s kırpma oluştur
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" \"%app\" uygulaması ile açılamıyor (%error). 
 Error moving \"%name\"	FSUtils		\"%name\" taşınırken hata
 To: %dir	StatusWindow		Konum: %dir
 Paste layout	ContainerWindow		Yerleşimi yapıştır
@@ -492,6 +495,7 @@ Duplicate	ContainerWindow		Çoğalt
 16-bit integer	AttributesView		16 bit tamsayı
 Untitled clipping	PoseView		Adsız kırpma
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		\"%name\" adı belirtilen klasörde hâlihazırda mevcut. Değiştirmek istiyor musunuz?
+, indexed	InfoWindow		, indeksli
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Ögeleri \"Diskler\" penceresinin içindeki herhangi bir disk simgesinin üzerine bırakmalısınız.
 Version:	InfoWindow		Sürüm:
 OK	PoseView		Tamam
@@ -507,8 +511,8 @@ Add-ons	FilePanelPriv		Eklentiler
 Empty folder	SlowContextPopup		Boş klasör
 Alignment	AttributesView		Hizalama
 Move to Trash	FSUtils		Çöp'e taşı
-Handles %type	OpenWithWindow		%type işler
 Cancel	PoseView		Vazgeç
+Handles %type	OpenWithWindow		%type işler
 Delete	PoseView		Sil
 Media parameter	AttributesView		Ortam parametresi
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ev klasörünü değiştirirseniz %osName düzgün çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Shift düğmesini basılı tutun ve \"Ne yaptığımı biliyorum\"a tıklayın.

@@ -31,8 +31,17 @@
 
 
 struct ethernet_device : net_device, DoublyLinkedListLinkImpl<ethernet_device> {
+	~ethernet_device()
+	{
+		free(read_buffer);
+		free(write_buffer);
+	}
+
 	int		fd;
 	uint32	frame_size;
+
+	void* read_buffer, *write_buffer;
+	mutex read_buffer_lock, write_buffer_lock;
 };
 
 static const bigtime_t kLinkCheckInterval = 1000000;
@@ -56,9 +65,6 @@ update_link_state(ethernet_device *device, bool notify = true)
 		// This device does not support retrieving the link
 		return B_NOT_SUPPORTED;
 	}
-
-	state.media |= IFM_ETHER;
-		// make sure the media type is returned correctly
 
 	if (device->media != state.media
 		|| device->link_quality != state.quality
@@ -158,6 +164,9 @@ ethernet_init(const char *name, net_device **_device)
 	device->media = IFM_ACTIVE | IFM_ETHER;
 	device->header_length = ETHER_HEADER_LENGTH;
 	device->fd = -1;
+	device->read_buffer = device->write_buffer = NULL;
+	device->read_buffer_lock = MUTEX_INITIALIZER("ethernet read_buffer"),
+	device->write_buffer_lock = MUTEX_INITIALIZER("ethernet write_buffer");
 
 	*_device = device;
 	return B_OK;
@@ -216,6 +225,19 @@ ethernet_up(net_device *_device)
 		sCheckList.Add(device);
 	}
 
+	if (device->frame_size > ETHER_MAX_FRAME_SIZE) {
+		free(device->read_buffer);
+		free(device->write_buffer);
+
+		device->read_buffer = malloc(device->frame_size);
+		device->write_buffer = malloc(device->frame_size);
+
+		if (device->read_buffer == NULL || device->write_buffer == NULL) {
+			errno = B_NO_MEMORY;
+			goto err;
+		}
+	}
+
 	device->address.length = ETHER_ADDRESS_LENGTH;
 	device->mtu = device->frame_size - device->header_length;
 	return B_OK;
@@ -268,24 +290,38 @@ ethernet_send_data(net_device *_device, net_buffer *buffer)
 	net_buffer *allocated = NULL;
 	net_buffer *original = buffer;
 
-	if (gBufferModule->count_iovecs(buffer) > 1) {
-		// TODO: for now, create a new buffer containing the data
-		buffer = gBufferModule->duplicate(original);
-		if (buffer == NULL)
-			return ENOBUFS;
-
-		allocated = buffer;
-
-		if (gBufferModule->count_iovecs(buffer) > 1) {
-			dprintf("scattered I/O is not yet supported by ethernet device.\n");
-			gBufferModule->free(buffer);
-			device->stats.send.errors++;
-			return B_NOT_SUPPORTED;
-		}
-	}
-
+	MutexLocker bufferLocker;
 	struct iovec iovec;
-	gBufferModule->get_iovecs(buffer, &iovec, 1);
+	if (gBufferModule->count_iovecs(buffer) > 1) {
+		if (device->write_buffer != NULL) {
+			bufferLocker.SetTo(device->write_buffer_lock, false);
+
+			status_t status = gBufferModule->read(buffer, 0,
+				device->write_buffer, buffer->size);
+			if (status != B_OK)
+				return status;
+			iovec.iov_base = device->write_buffer;
+			iovec.iov_len = buffer->size;
+		} else {
+			// Fall back to creating a new buffer.
+			allocated = gBufferModule->duplicate(original);
+			if (allocated == NULL)
+				return ENOBUFS;
+
+			buffer = allocated;
+
+			if (gBufferModule->count_iovecs(allocated) > 1) {
+				dprintf("ethernet_send_data: no write buffer, cannot perform scatter I/O\n");
+				gBufferModule->free(allocated);
+				device->stats.send.errors++;
+				return B_NOT_SUPPORTED;
+			}
+
+			gBufferModule->get_iovecs(buffer, &iovec, 1);
+		}
+	} else {
+		gBufferModule->get_iovecs(buffer, &iovec, 1);
+	}
 
 //dump_block((const char *)iovec.iov_base, buffer->size, "  ");
 	ssize_t bytesWritten = write(device->fd, iovec.iov_base, iovec.iov_len);
@@ -321,23 +357,30 @@ ethernet_receive_data(net_device *_device, net_buffer **_buffer)
 	if (buffer == NULL)
 		return ENOBUFS;
 
-	// TODO: this only works for standard ethernet frames - we need iovecs
-	//	for jumbo frame support (or a separate read buffer)!
-	//	It would be even nicer to get net_buffers from the ethernet driver
-	//	directly.
-
+	MutexLocker bufferLocker;
+	struct iovec iovec;
 	ssize_t bytesRead;
-	void *data;
+	status_t status;
+	if (device->read_buffer != NULL) {
+		bufferLocker.SetTo(device->read_buffer_lock, false);
 
-	status_t status = gBufferModule->append_size(buffer, device->frame_size, &data);
-	if (status == B_OK && data == NULL) {
-		dprintf("scattered I/O is not yet supported by ethernet device.\n");
-		status = B_NOT_SUPPORTED;
+		iovec.iov_base = device->read_buffer;
+		iovec.iov_len = device->frame_size;
+	} else {
+		void *data;
+		status = gBufferModule->append_size(buffer, device->frame_size, &data);
+		if (status == B_OK && data == NULL) {
+			dprintf("ethernet_receive_data: no read buffer, cannot perform scattered I/O!\n");
+			status = B_NOT_SUPPORTED;
+		}
+		if (status < B_OK)
+			goto err;
+
+		iovec.iov_base = data;
+		iovec.iov_len = device->frame_size;
 	}
-	if (status < B_OK)
-		goto err;
 
-	bytesRead = read(device->fd, data, device->frame_size);
+	bytesRead = read(device->fd, iovec.iov_base, iovec.iov_len);
 	if (bytesRead < 0) {
 		device->stats.receive.errors++;
 		status = errno;
@@ -345,7 +388,10 @@ ethernet_receive_data(net_device *_device, net_buffer **_buffer)
 	}
 //dump_block((const char *)data, bytesRead, "rcv: ");
 
-	status = gBufferModule->trim(buffer, bytesRead);
+	if (iovec.iov_base == device->read_buffer)
+		status = gBufferModule->append(buffer, iovec.iov_base, bytesRead);
+	else
+		status = gBufferModule->trim(buffer, bytesRead);
 	if (status < B_OK) {
 		device->stats.receive.dropped++;
 		goto err;

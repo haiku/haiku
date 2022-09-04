@@ -136,7 +136,7 @@ DataContainer::WriteAt(off_t offset, const void *_buffer, size_t size,
 		return error;
 
 	// resize the container, if necessary
-	if ((offset + size) > fSize)
+	if ((offset + (off_t)size) > fSize)
 		error = Resize(offset + size);
 	if (error != B_OK)
 		return error;

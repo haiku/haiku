@@ -27,6 +27,11 @@
 #include <stdint.h>
 #include <sys/types.h>
 
+// __locale_struct
+#include <xlocale.h>
+// LC_* values
+#include <locale.h>
+
 /* This has to be changed whenever a new locale is defined.  */
 #define __LC_LAST	7
 
@@ -141,12 +146,6 @@ enum
   (((((const uint32_t *) (desc)) - 8)[(c) >> 5] >> ((c) & 0x1f)) & 1)
 
 
-/* For each category declare the variable for the current locale data.  */
-#define DEFINE_CATEGORY(category, category_name, items, a) \
-extern struct locale_data *_nl_current_##category;
-#include "categories.def"
-#undef	DEFINE_CATEGORY
-
 extern const char *const _nl_category_names[__LC_LAST];
 extern const size_t _nl_category_name_sizes[__LC_LAST];
 extern struct locale_data * *const _nl_current[__LC_LAST];
@@ -158,22 +157,33 @@ extern const char _nl_POSIX_name[];
 /* The standard codeset.  */
 extern const char _nl_C_codeset[];
 
+/* This is the internal locale_t object that holds the global locale
+   controlled by calls to setlocale.  A thread's TSD locale pointer
+   points to this when `uselocale (LC_GLOBAL_LOCALE)' is in effect.  */
+extern struct __locale_struct _nl_global_locale;
+
+extern struct __locale_struct* _nl_current_locale();
+#define _NL_CURRENT_LOCALE        (_nl_current_locale())
+
+/* Return a pointer to the current `struct __locale_data' for CATEGORY.  */
+#define _NL_CURRENT_DATA(category) \
+  (_NL_CURRENT_LOCALE->__locales[category])
+
 /* Extract the current CATEGORY locale's string for ITEM.  */
 #define _NL_CURRENT(category, item) \
-  (_nl_current_##category->values[_NL_ITEM_INDEX (item)].string)
+  (_NL_CURRENT_DATA (category)->values[_NL_ITEM_INDEX (item)].string)
 
 /* Extract the current CATEGORY locale's string for ITEM.  */
 #define _NL_CURRENT_WSTR(category, item) \
-  ((wchar_t *) (_nl_current_##category->values[_NL_ITEM_INDEX (item)].wstr))
+  ((wchar_t *) _NL_CURRENT_DATA (category)->values[_NL_ITEM_INDEX (item)].wstr)
 
 /* Extract the current CATEGORY locale's word for ITEM.  */
 #define _NL_CURRENT_WORD(category, item) \
-  (_nl_current_##category->values[_NL_ITEM_INDEX (item)].word)
+  ((uint32_t) _NL_CURRENT_DATA (category)->values[_NL_ITEM_INDEX (item)].word)
 
 /* This is used in lc-CATEGORY.c to define _nl_current_CATEGORY.  */
 #define _NL_CURRENT_DEFINE(category) \
-  extern struct locale_data _nl_C_##category; \
-  struct locale_data *_nl_current_##category = &_nl_C_##category
+  /* No per-category variable here. */
 
 /* Load the locale data for CATEGORY from the file specified by *NAME.
    If *NAME is "", use environment variables as specified by POSIX,

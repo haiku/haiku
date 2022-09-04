@@ -44,7 +44,7 @@ int
 isalnum(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_b[c] & (_ISupper | _ISlower | _ISdigit);
+		return (*__ctype_b_loc())[c] & (_ISupper | _ISlower | _ISdigit);
 
 	return 0;
 }
@@ -54,7 +54,7 @@ int
 isalpha(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_b[c] & (_ISupper | _ISlower);
+		return (*__ctype_b_loc())[c] & (_ISupper | _ISlower);
 
 	return 0;
 }
@@ -72,7 +72,7 @@ int
 isblank(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_b[c] & _ISblank;
+		return (*__ctype_b_loc())[c] & _ISblank;
 
 	return 0;
 }
@@ -82,7 +82,7 @@ int
 iscntrl(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_b[c] & _IScntrl;
+		return (*__ctype_b_loc())[c] & _IScntrl;
 
 	return 0;
 }
@@ -92,7 +92,7 @@ int
 isdigit(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_b[c] & _ISdigit;
+		return (*__ctype_b_loc())[c] & _ISdigit;
 
 	return 0;
 }
@@ -102,7 +102,7 @@ int
 isgraph(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_b[c] & _ISgraph;
+		return (*__ctype_b_loc())[c] & _ISgraph;
 
 	return 0;
 }
@@ -112,7 +112,7 @@ int
 islower(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_b[c] & _ISlower;
+		return (*__ctype_b_loc())[c] & _ISlower;
 
 	return 0;
 }
@@ -122,7 +122,7 @@ int
 isprint(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_b[c] & _ISprint;
+		return (*__ctype_b_loc())[c] & _ISprint;
 
 	return 0;
 }
@@ -132,7 +132,7 @@ int
 ispunct(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_b[c] & _ISpunct;
+		return (*__ctype_b_loc())[c] & _ISpunct;
 
 	return 0;
 }
@@ -142,7 +142,7 @@ int
 isspace(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_b[c] & _ISspace;
+		return (*__ctype_b_loc())[c] & _ISspace;
 
 	return 0;
 }
@@ -152,7 +152,7 @@ int
 isupper(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_b[c] & _ISupper;
+		return (*__ctype_b_loc())[c] & _ISupper;
 
 	return 0;
 }
@@ -162,7 +162,7 @@ int
 isxdigit(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_b[c] & _ISxdigit;
+		return (*__ctype_b_loc())[c] & _ISxdigit;
 
 	return 0;
 }
@@ -180,7 +180,7 @@ int
 tolower(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_tolower[c];
+		return (*__ctype_tolower_loc())[c];
 
 	return c;
 }
@@ -190,7 +190,7 @@ int
 toupper(int c)
 {
 	if (c >= -128 && c < 256)
-		return __ctype_toupper[c];
+		return (*__ctype_toupper_loc())[c];
 
 	return c;
 }

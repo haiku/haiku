@@ -2510,15 +2510,18 @@ vm_copy_on_write_area(VMCache* lowerCache,
 						tempArea = tempArea->cache_next) {
 					// The area must be readable in the same way it was
 					// previously writable.
-					uint32 protection = B_KERNEL_READ_AREA;
-					if ((tempArea->protection & B_READ_AREA) != 0)
+					addr_t address = virtual_page_address(tempArea, page);
+					uint32 protection = 0;
+					uint32 pageProtection = get_area_page_protection(tempArea, address);
+					if ((pageProtection & B_KERNEL_READ_AREA) != 0)
+						protection |= B_KERNEL_READ_AREA;
+					if ((pageProtection & B_READ_AREA) != 0)
 						protection |= B_READ_AREA;
 
 					VMTranslationMap* map
 						= tempArea->address_space->TranslationMap();
 					map->Lock();
-					map->ProtectPage(tempArea,
-						virtual_page_address(tempArea, page), protection);
+					map->ProtectPage(tempArea, address, protection);
 					map->Unlock();
 				}
 			}
@@ -2529,9 +2532,32 @@ vm_copy_on_write_area(VMCache* lowerCache,
 		// just change the protection of all areas
 		for (VMArea* tempArea = upperCache->areas; tempArea != NULL;
 				tempArea = tempArea->cache_next) {
+			if (tempArea->page_protections != NULL) {
+				// Change the protection of all pages in this area.
+				VMTranslationMap* map = tempArea->address_space->TranslationMap();
+				map->Lock();
+				for (VMCachePagesTree::Iterator it = lowerCache->pages.GetIterator();
+					vm_page* page = it.Next();) {
+					// The area must be readable in the same way it was
+					// previously writable.
+					addr_t address = virtual_page_address(tempArea, page);
+					uint32 protection = 0;
+					uint32 pageProtection = get_area_page_protection(tempArea, address);
+					if ((pageProtection & B_KERNEL_READ_AREA) != 0)
+						protection |= B_KERNEL_READ_AREA;
+					if ((pageProtection & B_READ_AREA) != 0)
+						protection |= B_READ_AREA;
+
+					map->ProtectPage(tempArea, address, protection);
+				}
+				map->Unlock();
+				continue;
+			}
 			// The area must be readable in the same way it was previously
 			// writable.
-			uint32 protection = B_KERNEL_READ_AREA;
+			uint32 protection = 0;
+			if ((tempArea->protection & B_KERNEL_READ_AREA) != 0)
+				protection |= B_KERNEL_READ_AREA;
 			if ((tempArea->protection & B_READ_AREA) != 0)
 				protection |= B_READ_AREA;
 
@@ -5099,9 +5125,7 @@ vm_set_area_memory_type(area_id id, phys_addr_t physicalBase, uint32 type)
 /*!	This function enforces some protection properties:
 	 - kernel areas must be W^X (after kernel startup)
 	 - if B_WRITE_AREA is set, B_KERNEL_WRITE_AREA is set as well
-	 - if only B_READ_AREA has been set, B_KERNEL_READ_AREA is also set
-	 - if no protection is specified, it defaults to B_KERNEL_READ_AREA
-	   and B_KERNEL_WRITE_AREA.
+	 - if B_READ_AREA has been set, B_KERNEL_READ_AREA is also set
 */
 static void
 fix_protection(uint32* protection)
@@ -5113,10 +5137,9 @@ fix_protection(uint32* protection)
 		panic("kernel areas cannot be both writable and executable!");
 
 	if ((*protection & B_KERNEL_PROTECTION) == 0) {
-		if ((*protection & B_USER_PROTECTION) == 0
-			|| (*protection & B_WRITE_AREA) != 0)
-			*protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
-		else
+		if ((*protection & B_WRITE_AREA) != 0)
+			*protection |= B_KERNEL_WRITE_AREA;
+		if ((*protection & B_READ_AREA) != 0)
 			*protection |= B_KERNEL_READ_AREA;
 	}
 }
@@ -5433,21 +5456,6 @@ validate_memory_range(const void* addr, size_t size)
 
 	// Validate that the address range does not cross the kernel/user boundary.
 	return IS_USER_ADDRESS(address) == IS_USER_ADDRESS(address + size - 1);
-}
-
-
-/** Validate that a memory range is fully in userspace. */
-static inline bool
-validate_user_memory_range(const void* addr, size_t size)
-{
-	addr_t address = (addr_t)addr;
-
-	// Check for overflows on all addresses.
-	if ((address + size) < address)
-		return false;
-
-	// Validate that both the start and end address are in userspace
-	return IS_USER_ADDRESS(address) && IS_USER_ADDRESS(address + size - 1);
 }
 
 
@@ -6629,7 +6637,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 
 	if ((address % B_PAGE_SIZE) != 0)
 		return B_BAD_VALUE;
-	if (!validate_user_memory_range(_address, size)) {
+	if (!is_user_address_range(_address, size)) {
 		// weird error code required by POSIX
 		return ENOMEM;
 	}
@@ -6665,7 +6673,7 @@ _user_set_memory_protection(void* _address, size_t size, uint32 protection)
 			if ((area->protection & B_KERNEL_AREA) != 0)
 				return B_NOT_ALLOWED;
 			if (area->protection_max != 0
-				&& (protection & area->protection_max) != protection) {
+				&& (protection & area->protection_max) != (protection & B_USER_PROTECTION)) {
 				return B_NOT_ALLOWED;
 			}
 
@@ -6780,7 +6788,7 @@ _user_sync_memory(void* _address, size_t size, uint32 flags)
 	// check params
 	if ((address % B_PAGE_SIZE) != 0)
 		return B_BAD_VALUE;
-	if (!validate_user_memory_range(_address, size)) {
+	if (!is_user_address_range(_address, size)) {
 		// weird error code required by POSIX
 		return ENOMEM;
 	}
@@ -6858,7 +6866,7 @@ _user_memory_advice(void* _address, size_t size, uint32 advice)
 		return B_BAD_VALUE;
 
 	size = PAGE_ALIGN(size);
-	if (!validate_user_memory_range(_address, size)) {
+	if (!is_user_address_range(_address, size)) {
 		// weird error code required by POSIX
 		return B_NO_MEMORY;
 	}
@@ -6935,7 +6943,7 @@ user_set_memory_swappable(const void* _address, size_t size, bool swappable)
 
 	if ((address % B_PAGE_SIZE) != 0)
 		return EINVAL;
-	if (!validate_user_memory_range(_address, size))
+	if (!is_user_address_range(_address, size))
 		return EINVAL;
 
 	const addr_t endAddress = address + size;

@@ -22,25 +22,6 @@ struct identify_cookie
 	int cookie;
 };
 
-
-//!	xfs_io() callback hook
-static status_t
-iterative_io_get_vecs_hook(void *cookie, io_request *request, off_t offset,
-	size_t size, struct file_io_vec *vecs, size_t *_count)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-//!	xfs_io() callback hook
-static status_t
-iterative_io_finished_hook(void *cookie, io_request *request, status_t status,
-	bool partialTransfer, size_t bytesTransferred)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
 //	#pragma mark - Scanning
 
 
@@ -270,11 +251,13 @@ xfs_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 	inode->GetModificationTime(stat->st_mtim);
 	inode->GetChangeTime(stat->st_ctim);
 
-	/* TODO: Can we obtain the Creation Time in v4 system? */
-	inode->GetChangeTime(stat->st_crtim);
+	// Only version 3 Inodes has creation time
+	if(inode->Version() == 3)
+		inode->GetCreationTime(stat->st_crtim);
+	else
+		inode->GetChangeTime(stat->st_crtim);
 
 	return B_OK;
-
 }
 
 

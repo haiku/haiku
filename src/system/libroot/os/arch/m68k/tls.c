@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the MIT License.
 */
@@ -8,11 +8,6 @@
 //	threaded apps, though).
 
 #warning FIXME: M68K
-
-// we don't want to have the inline assembly included here
-#ifndef _NO_INLINE_ASM
-#	define _NO_INLINE_ASM 1
-#endif
 
 #include <runtime_loader/runtime_loader.h>
 

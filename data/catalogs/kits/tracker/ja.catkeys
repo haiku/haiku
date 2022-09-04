@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	2915475646
+1	japanese	x-vnd.Haiku-libtracker	464753347
 Created	ContainerWindow		作成日時
 Icon	AttributesView		アイコン
 Open and make preferred	OpenWithWindow		関連付けて開く
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		小ビットマップアイコン
 Would you like to find a suitable application to open the file?	FSUtils		このファイルを開くことのできるアプリケーションを検索しますか?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		フォルダーをリンクまたはファイルと置き換えることはできません。
+(unknown)	InfoWindow		(不明)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# 日>}}
 Trailing \\.	libtracker		行末に \\ があります。
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		%func にて\nfind_directory() が失敗。\nエラー: %error
@@ -84,6 +85,7 @@ Include trash	FindPanel		ごみ箱を含む
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		アイコンの整列
 Modified	FindPanel		更新日時
+ (block size: 	InfoWindow		 (ブロックサイズ: 
 Select all	QueryContainerWindow		すべて選択
 Generate image thumbnails	SettingsView		画像のサムネイルを生成
 Select…	FilePanelPriv		選択...
@@ -167,6 +169,7 @@ Read	FilePermissionsView		読み取り
 There was an error writing the attribute.	WidgetAttributeText		属性の書き込み中にエラーが発生しました。
 Path	Default Query Columns		パス
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target の名前を変更すると、%osName は正しく動作しないかもしれません!\n\n名称を変更しますか?
+Filesystem:	InfoWindow		ファイルシステム:
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" を開けません (%error)。
 Media parameter group	AttributesView		メディアパラメーターグループ
 %name info	InfoWindow	InfoWindow Title	%name の情報
@@ -284,9 +287,9 @@ no supporting apps	OpenWithWindow		対応するアプリケーションはあり
 32-bit unsigned integer	AttributesView		32 ビット符号無し整数
 Preparing to empty Trash…	StatusWindow		ごみ箱を空にする準備をしています...
 Deleting: 	StatusWindow		削除中:
+label too long	PoseView		ラベルが長すぎます
 the MIME settings	FSUtils		MIME 設定
 You can't move or copy the trash.	FSUtils		ごみ箱の移動やコピーはできません。
-label too long	PoseView		ラベルが長すぎます
 Error creating link to \"%name\".	FSUtils		\"%name\"へのリンク作成時にエラーが発生しました。
 Unknown	FilePermissionsView		不明
 Paste links	ContainerWindow		リンクを貼り付ける
@@ -335,8 +338,8 @@ MIME Path	AttributesView		MIME パス
 less than	FindPanel		より小さい
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		\"%name\" をコピー中にエラーが発生しました:\n\t%error\n\nそれでも続けますか?
 Creating links: 	StatusWindow		作成中リンク:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		アプリケーション \"%app\" を使って \"%document\" を開けません (%error)。
 Create %s clipping	PoseView		%s クリップの作成
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		アプリケーション \"%app\" を使って \"%document\" を開けません (%error)。
 Error moving \"%name\"	FSUtils		\"%name\" の移動中にエラーが発生
 To: %dir	StatusWindow		%dir
 Paste layout	ContainerWindow		レイアウトを貼り付け
@@ -493,6 +496,7 @@ Duplicate	ContainerWindow		複製
 16-bit integer	AttributesView		16 ビット整数
 Untitled clipping	PoseView		無名クリッピング
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定のフォルダーに \"%name\" というファイルがすでに存在します。置き換えますか?
+, indexed	InfoWindow		, インデックス有
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		\"Disks\" ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。
 Version:	InfoWindow		バージョン:
 OK	PoseView		OK
@@ -508,8 +512,8 @@ Add-ons	FilePanelPriv		アドオン
 Empty folder	SlowContextPopup		空フォルダー
 Alignment	AttributesView		配置
 Move to Trash	FSUtils		ごみ箱に捨てる
-Handles %type	OpenWithWindow		%type に対応
 Cancel	PoseView		中止
+Handles %type	OpenWithWindow		%type に対応
 Delete	PoseView		削除
 Media parameter	AttributesView		メディアパラメーター
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		ホームフォルダーの内容を変更すると、%osName は正しく動作しないかもしれません!\n\n内容を変更しますか?\n\nそれでもホームフォルダーの内容を変更するなら、シフトキーを押しながら \"私はなにをするか理解しています\" をクリックしてください。

@@ -875,7 +875,7 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 		{
 			// get MTU
 			struct ifreq request;
-			request.ifr_mtu = interface->mtu;
+			request.ifr_mtu = interface->device->mtu;
 
 			return user_memcpy(&((struct ifreq*)argument)->ifr_mtu,
 				&request.ifr_mtu, sizeof(request.ifr_mtu));
@@ -884,17 +884,14 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 		{
 			// set MTU
 			struct ifreq request;
-			if (user_memcpy(&request, argument, sizeof(struct ifreq)) < B_OK)
+			if (user_memcpy(&request, argument, sizeof(struct ifreq)) != B_OK)
 				return B_BAD_ADDRESS;
 
-			// check for valid bounds
-			if (request.ifr_mtu < 100
-				|| (uint32)request.ifr_mtu > interface->device->mtu)
-				return B_BAD_VALUE;
-
-			interface->mtu = request.ifr_mtu;
-			notify_interface_changed(interface);
-			return B_OK;
+			status_t status = interface->device->module->set_mtu(
+				interface->device, request.ifr_mtu);
+			if (status == B_OK)
+				notify_interface_changed(interface);
+			return status;
 		}
 
 		case SIOCSIFMEDIA:
@@ -921,23 +918,16 @@ interface_protocol_control(net_datalink_protocol* _protocol, int32 option,
 		case SIOCGIFMEDIA:
 		{
 			// get media
-			if (length > 0 && length < sizeof(ifmediareq))
+			const size_t copylen = offsetof(ifreq, ifr_media) + sizeof(ifreq::ifr_media);
+			if (length > 0 && length < copylen)
 				return B_BAD_VALUE;
 
-			struct ifmediareq request;
-			if (user_memcpy(&request, argument, sizeof(ifmediareq)) != B_OK)
+			struct ifreq request;
+			if (user_memcpy(&request, argument, copylen) != B_OK)
 				return B_BAD_ADDRESS;
 
-			// TODO: see above.
-			if (interface->device->module->control(interface->device,
-					SIOCGIFMEDIA, &request,
-					sizeof(struct ifmediareq)) != B_OK) {
-				memset(&request, 0, sizeof(struct ifmediareq));
-				request.ifm_active = request.ifm_current
-					= interface->device->media;
-			}
-
-			return user_memcpy(argument, &request, sizeof(struct ifmediareq));
+			request.ifr_media = interface->device->media;
+			return user_memcpy(argument, &request, copylen);
 		}
 
 		case SIOCGIFMETRIC:

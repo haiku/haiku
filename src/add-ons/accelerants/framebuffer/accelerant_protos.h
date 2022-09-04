@@ -33,15 +33,6 @@ status_t framebuffer_get_frame_buffer_config(frame_buffer_config *config);
 status_t framebuffer_get_pixel_clock_limits(display_mode *dm, uint32 *low,
 	uint32 *high);
 
-// accelerant engine
-uint32 framebuffer_accelerant_engine_count(void);
-status_t framebuffer_acquire_engine(uint32 capabilities, uint32 maxWait,
-	sync_token *st, engine_token **et);
-status_t framebuffer_release_engine(engine_token *et, sync_token *st);
-void framebuffer_wait_engine_idle(void);
-status_t framebuffer_get_sync_token(engine_token *et, sync_token *st);
-status_t framebuffer_sync_to_token(sync_token *st);
-
 #ifdef __cplusplus
 }
 #endif

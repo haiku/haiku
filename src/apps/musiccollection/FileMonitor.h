@@ -30,7 +30,7 @@ struct WatchedFile {
 class NodeRefComp {
 public:
 	bool
-	operator()(const node_ref& a, const node_ref& b)
+	operator()(const node_ref& a, const node_ref& b) const
 	{
 		return a.node < b.node;
 	}

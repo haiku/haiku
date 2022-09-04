@@ -2,7 +2,7 @@
  * Copyright 2014, Ithamar R. Adema <ithamar@upgrade-android.com>
  * All rights reserved. Distributed under the terms of the MIT License.
  *
- * Copyright 2015-2021, Haiku, Inc. All rights reserved.
+ * Copyright 2015-2022, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,6 +10,7 @@
 #include <drivers/bus/FDT.h>
 #include <KernelExport.h>
 #include <util/kernel_cpp.h>
+#include <util/Vector.h>
 #include <device_manager.h>
 
 #include <AutoDeleter.h>
@@ -32,6 +33,15 @@ extern "C" {
 #endif
 
 
+#define GIC_INTERRUPT_CELL_TYPE     0
+#define GIC_INTERRUPT_CELL_ID       1
+#define GIC_INTERRUPT_CELL_FLAGS    2
+#define GIC_INTERRUPT_TYPE_SPI      0
+#define GIC_INTERRUPT_TYPE_PPI      1
+#define GIC_INTERRUPT_BASE_SPI      32
+#define GIC_INTERRUPT_BASE_PPI      16
+
+
 extern void* gFDT;
 
 device_manager_info* gDeviceManager;
@@ -52,6 +62,22 @@ struct fdt_bus {
 struct fdt_device {
 	device_node* node;
 	device_node* bus;
+};
+
+
+struct fdt_interrupt_map_entry {
+	uint32_t childAddr;
+	uint32_t childIrq;
+	uint32_t parentIrqCtrl;
+	uint32_t parentIrq;
+};
+
+
+struct fdt_interrupt_map {
+	uint32_t childAddrMask;
+	uint32_t childIrqMask;
+
+	Vector<fdt_interrupt_map_entry> fInterruptMap;
 };
 
 
@@ -403,7 +429,7 @@ fdt_get_interrupt_cells(uint32 interrupt_parent_phandle)
 
 
 static bool
-fdt_device_get_interrupt(fdt_device* dev, uint32 ord,
+fdt_device_get_interrupt(fdt_device* dev, uint32 index,
 	device_node** interruptController, uint64* interrupt)
 {
 	ASSERT(dev != NULL);
@@ -413,29 +439,39 @@ fdt_device_get_interrupt(fdt_device* dev, uint32 ord,
 		dev->node, "fdt/node", &fdtNode, false) >= B_OK);
 
 	int propLen;
-	const void* prop = fdt_getprop(gFDT, (int)fdtNode, "interrupts-extended",
+	const uint32 *prop = (uint32*)fdt_getprop(gFDT, (int)fdtNode, "interrupts-extended",
 		&propLen);
 	if (prop == NULL) {
 		uint32 interruptParent = fdt_get_interrupt_parent(dev, fdtNode);
 		uint32 interruptCells = fdt_get_interrupt_cells(interruptParent);
 
-		prop = fdt_getprop(gFDT, (int)fdtNode, "interrupts",
+		prop = (uint32*)fdt_getprop(gFDT, (int)fdtNode, "interrupts",
 			&propLen);
 		if (prop == NULL)
 			return false;
 
-		if ((ord + 1) * interruptCells * sizeof(uint32) > (uint32)propLen)
+		if ((index + 1) * interruptCells * sizeof(uint32) > (uint32)propLen)
 			return false;
 
-		uint32 offs;
-		if (interruptCells == 3) {
-			offs = 3 * ord + 1;
+		uint32 offset = interruptCells * index;
+		uint32 interruptNumber = 0;
+
+		if ((interruptCells == 1) || (interruptCells == 2)) {
+			 interruptNumber = fdt32_to_cpu(*(prop + offset));
+		} else if (interruptCells == 3) {
+			uint32 interruptType = fdt32_to_cpu(prop[offset + GIC_INTERRUPT_CELL_TYPE]);
+			interruptNumber = fdt32_to_cpu(prop[offset + GIC_INTERRUPT_CELL_ID]);
+
+			if (interruptType == GIC_INTERRUPT_TYPE_SPI)
+				interruptNumber += GIC_INTERRUPT_BASE_SPI;
+			else if (interruptType == GIC_INTERRUPT_TYPE_PPI)
+				interruptNumber += GIC_INTERRUPT_BASE_PPI;
 		} else {
-			offs = interruptCells * ord;
+			panic("unsupported interruptCells");
 		}
 
 		if (interrupt != NULL)
-			*interrupt = fdt32_to_cpu(*(((uint32*)prop) + offs));
+			*interrupt = interruptNumber;
 
 		if (interruptController != NULL && interruptParent != 0) {
 			fdt_bus* bus;
@@ -446,11 +482,11 @@ fdt_device_get_interrupt(fdt_device* dev, uint32 ord,
 		return true;
 	}
 
-	if ((ord + 1) * 8 > (uint32)propLen)
+	if ((index + 1) * 8 > (uint32)propLen)
 		return false;
 
 	if (interruptController != NULL) {
-		uint32 phandle = fdt32_to_cpu(*(((uint32*)prop) + 2 * ord));
+		uint32 phandle = fdt32_to_cpu(*(prop + 2 * index));
 
 		fdt_bus* bus;
 		ASSERT(gDeviceManager->get_driver(
@@ -460,9 +496,141 @@ fdt_device_get_interrupt(fdt_device* dev, uint32 ord,
 	}
 
 	if (interrupt != NULL)
-		*interrupt = fdt32_to_cpu(*(((uint32*)prop) + 2*ord + 1));
+		*interrupt = fdt32_to_cpu(*(prop + 2 * index + 1));
 
 	return true;
+}
+
+
+static struct fdt_interrupt_map *
+fdt_device_get_interrupt_map(struct fdt_device* dev)
+{
+	int fdtNode;
+	ASSERT(gDeviceManager->get_attr_uint32(
+		dev->node, "fdt/node", (uint32*)&fdtNode, false) >= B_OK);
+
+	ObjectDeleter<struct fdt_interrupt_map> interrupt_map(new struct fdt_interrupt_map());
+
+	int intMapMaskLen;
+	const void* intMapMask = fdt_getprop(gFDT, fdtNode, "interrupt-map-mask",
+		&intMapMaskLen);
+
+	if (intMapMask == NULL || intMapMaskLen != 4 * 4) {
+		dprintf("  interrupt-map-mask property not found or invalid\n");
+		return NULL;
+	}
+
+	interrupt_map->childAddrMask = B_BENDIAN_TO_HOST_INT32(*((uint32*)intMapMask + 0));
+	interrupt_map->childIrqMask = B_BENDIAN_TO_HOST_INT32(*((uint32*)intMapMask + 3));
+
+	int intMapLen;
+	const void* intMapAddr = fdt_getprop(gFDT, fdtNode, "interrupt-map", &intMapLen);
+	if (intMapAddr == NULL) {
+		dprintf("  interrupt-map property not found\n");
+		return NULL;
+	}
+
+	int addressCells = 3;
+	int interruptCells = 1;
+	int phandleCells = 1;
+
+	const void *property;
+
+	property = fdt_getprop(gFDT, fdtNode, "#address-cells", NULL);
+	if (property != NULL)
+		addressCells = B_BENDIAN_TO_HOST_INT32(*(uint32*)property);
+
+	property = fdt_getprop(gFDT, fdtNode, "#interrupt-cells", NULL);
+	if (property != NULL)
+		interruptCells = B_BENDIAN_TO_HOST_INT32(*(uint32*)property);
+
+	uint32_t *it = (uint32_t*)intMapAddr;
+	while ((uint8_t*)it - (uint8_t*)intMapAddr < intMapLen) {
+		struct fdt_interrupt_map_entry irqEntry;
+
+		irqEntry.childAddr = B_BENDIAN_TO_HOST_INT32(*it);
+		it += addressCells;
+
+		irqEntry.childIrq = B_BENDIAN_TO_HOST_INT32(*it);
+		it += interruptCells;
+
+		irqEntry.parentIrqCtrl = B_BENDIAN_TO_HOST_INT32(*it);
+		it += phandleCells;
+
+		int parentAddressCells = 0;
+		int parentInterruptCells = 1;
+
+		int interruptParent = fdt_node_offset_by_phandle(gFDT, irqEntry.parentIrqCtrl);
+		if (interruptParent >= 0) {
+			property = fdt_getprop(gFDT, interruptParent, "#address-cells", NULL);
+			if (property != NULL)
+				parentAddressCells = B_BENDIAN_TO_HOST_INT32(*(uint32*)property);
+
+			property = fdt_getprop(gFDT, interruptParent, "#interrupt-cells", NULL);
+			if (property != NULL)
+				parentInterruptCells = B_BENDIAN_TO_HOST_INT32(*(uint32*)property);
+		}
+
+		it += parentAddressCells;
+
+		if ((parentInterruptCells == 1) || (parentInterruptCells == 2)) {
+			irqEntry.parentIrq = B_BENDIAN_TO_HOST_INT32(*it);
+		} else if (parentInterruptCells == 3) {
+			uint32 interruptType = fdt32_to_cpu(it[GIC_INTERRUPT_CELL_TYPE]);
+			uint32 interruptNumber = fdt32_to_cpu(it[GIC_INTERRUPT_CELL_ID]);
+
+			if (interruptType == GIC_INTERRUPT_TYPE_SPI)
+				irqEntry.parentIrq = interruptNumber + GIC_INTERRUPT_BASE_SPI;
+			else if (interruptType == GIC_INTERRUPT_TYPE_PPI)
+				irqEntry.parentIrq = interruptNumber + GIC_INTERRUPT_BASE_PPI;
+			else
+				irqEntry.parentIrq = interruptNumber;
+		}
+		it += parentInterruptCells;
+
+		interrupt_map->fInterruptMap.PushBack(irqEntry);
+	}
+
+	return interrupt_map.Detach();
+}
+
+
+static void
+fdt_device_print_interrupt_map(struct fdt_interrupt_map* interruptMap)
+{
+	if (interruptMap == NULL)
+		return;
+
+	dprintf("interrupt_map_mask: 0x%08" PRIx32 ", 0x%08" PRIx32 "\n",
+		interruptMap->childAddrMask, interruptMap->childIrqMask);
+	dprintf("interrupt_map:\n");
+
+	for (Vector<struct fdt_interrupt_map_entry>::Iterator it = interruptMap->fInterruptMap.Begin();
+		it != interruptMap->fInterruptMap.End();
+		it++) {
+
+		dprintf("childAddr=0x%08" PRIx32 ", childIrq=%" PRIu32 ", parentIrqCtrl=%" PRIu32 ", parentIrq=%" PRIu32 "\n",
+			it->childAddr, it->childIrq, it->parentIrqCtrl, it->parentIrq);
+	}
+}
+
+
+static uint32
+fdt_device_lookup_interrupt_map(struct fdt_interrupt_map* interruptMap, uint32 childAddr, uint32 childIrq)
+{
+	if (interruptMap == NULL)
+		return 0xffffffff;
+
+	childAddr &= interruptMap->childAddrMask;
+	childIrq &= interruptMap->childIrqMask;
+
+	for (Vector<struct fdt_interrupt_map_entry>::Iterator it = interruptMap->fInterruptMap.Begin();
+			it != interruptMap->fInterruptMap.End(); it++) {
+		if ((it->childAddr == childAddr) && (it->childIrq == childIrq))
+			return it->parentIrq;
+	}
+
+	return 0xffffffff;
 }
 
 
@@ -508,6 +676,9 @@ fdt_device_module_info gDeviceModule = {
 	fdt_device_get_prop,
 	fdt_device_get_reg,
 	fdt_device_get_interrupt,
+	fdt_device_get_interrupt_map,
+	fdt_device_print_interrupt_map,
+	fdt_device_lookup_interrupt_map,
 };
 
 

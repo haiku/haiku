@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src system libroot posix musl misc ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) .. include ] ;
 UseHeaders [ FDirName $(SUBDIR) .. internal ] ;
+UseHeaders [ FDirName $(SUBDIR) .. arch $(TARGET_ARCH) ] ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
@@ -10,6 +11,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		MergeObject <$(architecture)>posix_musl_misc.o :
 			a64l.c
+			ffs.c
+			ftw.c
+			getsubopt.c
+			nftw.c
 			;
 	}
 }

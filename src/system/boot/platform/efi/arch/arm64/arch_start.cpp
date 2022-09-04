@@ -9,23 +9,22 @@
 #include <boot/stdio.h>
 
 #include "efi_platform.h"
+#include "mmu.h"
 #include "serial.h"
 
 #include "aarch64.h"
 
-extern "C" void arch_enter_kernel(struct kernel_args *kernelArgs,
-	addr_t kernelEntry, addr_t kernelStackTop);
+extern "C" void arch_enter_kernel(
+	struct kernel_args* kernelArgs, addr_t kernelEntry, addr_t kernelStackTop);
 
 extern void arch_mmu_dump_present_tables();
 extern const char* granule_type_str(int tg);
 
 extern uint32_t arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
-	efi_memory_descriptor *memory_map, size_t descriptor_size,
-	uint32_t descriptor_version);
+	efi_memory_descriptor* memory_map, size_t descriptor_size, uint32_t descriptor_version);
 
-extern void arch_mmu_post_efi_setup(size_t memory_map_size,
-	efi_memory_descriptor *memory_map, size_t descriptor_size,
-	uint32_t descriptor_version);
+extern void arch_mmu_post_efi_setup(size_t memory_map_size, efi_memory_descriptor* memory_map,
+	size_t descriptor_size, uint32_t descriptor_version);
 
 extern void arch_mmu_setup_EL1(uint64 tcr);
 
@@ -33,39 +32,39 @@ extern void arch_mmu_setup_EL1(uint64 tcr);
 static const char*
 memory_region_type_str(int type)
 {
-	switch (type)	{
-	case EfiReservedMemoryType:
-		return "ReservedMemoryType";
-	case EfiLoaderCode:
-		return "LoaderCode";
-	case EfiLoaderData:
-		return "LoaderData";
-	case EfiBootServicesCode:
-		return "BootServicesCode";
-	case EfiBootServicesData:
-		return "BootServicesData";
-	case EfiRuntimeServicesCode:
-		return "RuntimeServicesCode";
-	case EfiRuntimeServicesData:
-		return "RuntimeServicesData";
-	case EfiConventionalMemory:
-		return "ConventionalMemory";
-	case EfiUnusableMemory:
-		return "UnusableMemory";
-	case EfiACPIReclaimMemory:
-		return "ACPIReclaimMemory";
-	case EfiACPIMemoryNVS:
-		return "ACPIMemoryNVS";
-	case EfiMemoryMappedIO:
-		return "MMIO";
-	case EfiMemoryMappedIOPortSpace:
-		return "MMIOPortSpace";
-	case EfiPalCode:
-		return "PalCode";
-	case EfiPersistentMemory:
-		return "PersistentMemory";
-	default:
-		return "unknown";
+	switch (type) {
+		case EfiReservedMemoryType:
+			return "ReservedMemoryType";
+		case EfiLoaderCode:
+			return "LoaderCode";
+		case EfiLoaderData:
+			return "LoaderData";
+		case EfiBootServicesCode:
+			return "BootServicesCode";
+		case EfiBootServicesData:
+			return "BootServicesData";
+		case EfiRuntimeServicesCode:
+			return "RuntimeServicesCode";
+		case EfiRuntimeServicesData:
+			return "RuntimeServicesData";
+		case EfiConventionalMemory:
+			return "ConventionalMemory";
+		case EfiUnusableMemory:
+			return "UnusableMemory";
+		case EfiACPIReclaimMemory:
+			return "ACPIReclaimMemory";
+		case EfiACPIMemoryNVS:
+			return "ACPIMemoryNVS";
+		case EfiMemoryMappedIO:
+			return "MMIO";
+		case EfiMemoryMappedIOPortSpace:
+			return "MMIOPortSpace";
+		case EfiPalCode:
+			return "PalCode";
+		case EfiPersistentMemory:
+			return "PersistentMemory";
+		default:
+			return "unknown";
 	}
 }
 
@@ -73,7 +72,7 @@ memory_region_type_str(int type)
 void
 arch_convert_kernel_args(void)
 {
-	// empty
+	fix_address(gKernelArgs.arch_args.fdt);
 }
 
 
@@ -85,44 +84,42 @@ arch_start_kernel(addr_t kernelEntry)
 	// First call is to determine the buffer size.
 	size_t memory_map_size = 0;
 	efi_memory_descriptor dummy;
-	efi_memory_descriptor *memory_map;
+	efi_memory_descriptor* memory_map;
 	size_t map_key;
 	size_t descriptor_size;
 	uint32_t descriptor_version;
-	if (kBootServices->GetMemoryMap(&memory_map_size, &dummy, &map_key,
-			&descriptor_size, &descriptor_version) != EFI_BUFFER_TOO_SMALL) {
+	if (kBootServices->GetMemoryMap(
+			&memory_map_size, &dummy, &map_key, &descriptor_size, &descriptor_version)
+		!= EFI_BUFFER_TOO_SMALL) {
 		panic("Unable to determine size of system memory map");
 	}
 
 	// Allocate a buffer twice as large as needed just in case it gets bigger
 	// between calls to ExitBootServices.
 	size_t actual_memory_map_size = memory_map_size * 2;
-	memory_map
-		= (efi_memory_descriptor *)kernel_args_malloc(actual_memory_map_size);
+	memory_map = (efi_memory_descriptor*) kernel_args_malloc(actual_memory_map_size);
 
 	if (memory_map == NULL)
 		panic("Unable to allocate memory map.");
 
 	// Read (and print) the memory map.
 	memory_map_size = actual_memory_map_size;
-	if (kBootServices->GetMemoryMap(&memory_map_size, memory_map, &map_key,
-			&descriptor_size, &descriptor_version) != EFI_SUCCESS) {
+	if (kBootServices->GetMemoryMap(
+			&memory_map_size, memory_map, &map_key, &descriptor_size, &descriptor_version)
+		!= EFI_SUCCESS) {
 		panic("Unable to fetch system memory map.");
 	}
 
-	addr_t addr = (addr_t)memory_map;
+	addr_t addr = (addr_t) memory_map;
 	efi_physical_addr loaderCode = 0LL;
 	dprintf("System provided memory map:\n");
 	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor *entry
-			= (efi_memory_descriptor *)(addr + i * descriptor_size);
-		dprintf("  phys: 0x%0lx-0x%0lx, virt: 0x%0lx-0x%0lx, size = 0x%0lx, type: %s (%#x), attr: %#lx\n",
-			entry->PhysicalStart,
-			entry->PhysicalStart + entry->NumberOfPages * B_PAGE_SIZE,
-			entry->VirtualStart,
-			entry->VirtualStart + entry->NumberOfPages * B_PAGE_SIZE,
-			entry->NumberOfPages * B_PAGE_SIZE,
-			memory_region_type_str(entry->Type), entry->Type,
+		efi_memory_descriptor* entry = (efi_memory_descriptor*) (addr + i * descriptor_size);
+		dprintf("  phys: 0x%0lx-0x%0lx, virt: 0x%0lx-0x%0lx, size = 0x%0lx, type: %s (%#x), attr: "
+				"%#lx\n",
+			entry->PhysicalStart, entry->PhysicalStart + entry->NumberOfPages * B_PAGE_SIZE,
+			entry->VirtualStart, entry->VirtualStart + entry->NumberOfPages * B_PAGE_SIZE,
+			entry->NumberOfPages * B_PAGE_SIZE, memory_region_type_str(entry->Type), entry->Type,
 			entry->Attribute);
 		if (entry->Type == EfiLoaderCode)
 			loaderCode = entry->PhysicalStart;
@@ -131,36 +128,32 @@ arch_start_kernel(addr_t kernelEntry)
 	// offset for properly align symbols
 	dprintf("Efi loader symbols offset: 0x%0lx:\n", loaderCode);
 
-/*
-*   "The AArch64 exception model is made up of a number of exception levels
-*    (EL0 - EL3), with EL0 and EL1 having a secure and a non-secure
-*    counterpart.  EL2 is the hypervisor level and exists only in non-secure
-*    mode. EL3 is the highest priority level and exists only in secure mode."
-*
-*	"2.3 UEFI System Environment and Configuration
-*    The resident UEFI boot-time environment shall use the highest non-secure
-*    privilege level available. The exact meaning of this is architecture
-*    dependent, as detailed below."
+	/*
+	*   "The AArch64 exception model is made up of a number of exception levels
+	*    (EL0 - EL3), with EL0 and EL1 having a secure and a non-secure
+	*    counterpart.  EL2 is the hypervisor level and exists only in non-secure
+	*    mode. EL3 is the highest priority level and exists only in secure mode."
+	*
+	*	"2.3 UEFI System Environment and Configuration
+	*    The resident UEFI boot-time environment shall use the highest non-secure
+	*    privilege level available. The exact meaning of this is architecture
+	*    dependent, as detailed below."
 
-*	"2.3.1 AArch64 Exception Levels
-*    On AArch64 UEFI shall execute as 64-bit code at either EL1 or EL2,
-*    depending on whether or not virtualization is available at OS load time."
-*/
+	*	"2.3.1 AArch64 Exception Levels
+	*    On AArch64 UEFI shall execute as 64-bit code at either EL1 or EL2,
+	*    depending on whether or not virtualization is available at OS load time."
+	*/
 	uint64 el = arch_exception_level();
 	dprintf("Current Exception Level EL%1lx\n", el);
 	dprintf("TTBR0: %" B_PRIx64 " TTBRx: %" B_PRIx64 " SCTLR: %" B_PRIx64 " TCR: %" B_PRIx64 "\n",
-		arch_mmu_base_register(),
-		arch_mmu_base_register(true),
-		_arch_mmu_get_sctlr(),
+		arch_mmu_base_register(), arch_mmu_base_register(true), _arch_mmu_get_sctlr(),
 		_arch_mmu_get_tcr());
 
 	if (arch_mmu_enabled()) {
-		dprintf("MMU Enabled, Granularity %s, bits %d\n",
-			granule_type_str(arch_mmu_user_granule()),
+		dprintf("MMU Enabled, Granularity %s, bits %d\n", granule_type_str(arch_mmu_user_granule()),
 			arch_mmu_user_address_bits());
 
-		dprintf("Kernel entry accessibility W: %x R: %x\n",
-			arch_mmu_write_access(kernelEntry),
+		dprintf("Kernel entry accessibility W: %x R: %x\n", arch_mmu_write_access(kernelEntry),
 			arch_mmu_read_access(kernelEntry));
 
 		arch_mmu_dump_present_tables();
@@ -199,14 +192,15 @@ arch_start_kernel(addr_t kernelEntry)
 		}
 
 		memory_map_size = actual_memory_map_size;
-		if (kBootServices->GetMemoryMap(&memory_map_size, memory_map, &map_key,
-				&descriptor_size, &descriptor_version) != EFI_SUCCESS) {
+		if (kBootServices->GetMemoryMap(
+				&memory_map_size, memory_map, &map_key, &descriptor_size, &descriptor_version)
+			!= EFI_SUCCESS) {
 			panic("Unable to fetch system memory map.");
 		}
 	}
 
 	// Update EFI, generate final kernel physical memory map, etc.
-	// arch_mmu_post_efi_setup(memory_map_size, memory_map, descriptor_size, descriptor_version);
+	arch_mmu_post_efi_setup(memory_map_size, memory_map, descriptor_size, descriptor_version);
 
 	switch (el) {
 		case 1:
@@ -224,9 +218,10 @@ arch_start_kernel(addr_t kernelEntry)
 
 	arch_cache_enable();
 
-	//smp_boot_other_cpus(final_pml4, kernelEntry, (addr_t)&gKernelArgs);
+	// smp_boot_other_cpus(final_pml4, kernelEntry, (addr_t)&gKernelArgs);
 
-	if (arch_mmu_read_access(kernelEntry) && arch_mmu_read_access(gKernelArgs.cpu_kstack[0].start)) {
+	if (arch_mmu_read_access(kernelEntry)
+		&& arch_mmu_read_access(gKernelArgs.cpu_kstack[0].start)) {
 		// Enter the kernel!
 		arch_enter_kernel(&gKernelArgs, kernelEntry,
 			gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);

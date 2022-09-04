@@ -489,18 +489,24 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 			| currentMair.MaskOf(MAIR_NORMAL_WB));
 	}
 
-/*  TODO: Not an UART here... inspect dtb?
-	// identity mapping for the debug uart
-	map_range(0x09000000, 0x09000000, B_PAGE_SIZE,
-		ARMv8TranslationTableDescriptor::DefaultPeripheralAttribute
-		| currentMair.MaskOf(MAIR_DEVICE_nGnRnE));
-*/
-
 	// TODO: We actually can only map physical RAM, mapping everything
 	// could cause unwanted MMIO or bus errors on real hardware.
 	map_range(KERNEL_PMAP_BASE, 0, KERNEL_PMAP_SIZE - 1,
 		ARMv8TranslationTableDescriptor::DefaultCodeAttribute
 		| currentMair.MaskOf(MAIR_NORMAL_WB));
+
+	if (gKernelArgs.arch_args.uart.kind[0] != 0) {
+		// Map uart because we want to use it during early boot.
+		uint64 regs_start = gKernelArgs.arch_args.uart.regs.start;
+		uint64 regs_size = ROUNDUP(gKernelArgs.arch_args.uart.regs.size, B_PAGE_SIZE);
+		uint64 base = get_next_virtual_address(regs_size);
+
+		map_range(base, regs_start, regs_size,
+			ARMv8TranslationTableDescriptor::DefaultPeripheralAttribute |
+			currentMair.MaskOf(MAIR_DEVICE_nGnRnE));
+
+		gKernelArgs.arch_args.uart.regs.start = base;
+	}
 
 	sort_address_ranges(gKernelArgs.virtual_allocated_range,
 		gKernelArgs.num_virtual_allocated_ranges);

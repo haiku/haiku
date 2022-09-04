@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	2062206461
+1	ukrainian	x-vnd.Haiku-Terminal	3702716692
 ANSI cyan color	Terminal AppearancePrefView		ANSI ціан
 Close other tabs	Terminal TermWindow		Закрити інші вкладки
 Insert path	Terminal TermView		Введіть шлях
@@ -13,13 +13,13 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Підтве�
 Solarized Dark	Terminal colors scheme		Сяючий морок
 Copy	Terminal TermWindow		Копіювати
 ANSI bright green color	Terminal AppearancePrefView		ANSI яскраво-зелений
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               показати довідку\n  -t,     --title              установити заголовок вікна\n  -f,     --fullscreen         повноекранний режим\n  -w,     --working-directory  установити робочий каталог
 ANSI white color	Terminal AppearancePrefView		ANSI білий
 Retro	Terminal colors scheme		Ретро
 Edit tab title…	Terminal TermWindow		Редагувати заголовок вкладки…
 Settings	Terminal TermWindow		Налаштування
 Print	Terminal TermWindow		Друк
 %app% settings	Terminal PrefWindow	window title	%app% налаштування
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tПоточна робоча директорія  активного процесу.\n\t\t\tМаксимальна кількість компонентів які можуть бути\n\t\t\tзазначені. E.g. '%2d' для більш ніж двох компонентів.\n\t%i\t-\tІндекс вкладки.\n\t%e\t-\tКодування поточної вкладки. Не відображається для UTF-8.\n\t%p\t-\tІм'я  активного процесу.
 ANSI black color	Terminal AppearancePrefView		ANSI чорний
 Use default	Terminal SetTitleWindow		За замовчуванням
 Close tab	Terminal TermWindow		Закрити вкладку

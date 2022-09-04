@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2022 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -40,18 +40,24 @@ extern "C" {
 #include "serial.h"
 
 
+#define GIC_INTERRUPT_CELL_TYPE		0
+#define GIC_INTERRUPT_CELL_ID		1
+#define GIC_INTERRUPT_CELL_FLAGS	2
+#define GIC_INTERRUPT_TYPE_SPI		0
+#define GIC_INTERRUPT_TYPE_PPI		1
+#define GIC_INTERRUPT_BASE_SPI		32
+#define GIC_INTERRUPT_BASE_PPI		16
+
+
+//#define TRACE_DUMP_FDT
+
+
 #define INFO(x...) dprintf("efi/fdt: " x)
 #define ERROR(x...) dprintf("efi/fdt: " x)
 
 
 static void* sDtbTable = NULL;
 static uint32 sDtbSize = 0;
-
-static void WriteString(const char *str) {dprintf("%s", str);}
-static void WriteLn() {dprintf("\n");}
-static void WriteHex(uint64_t val, int n) {dprintf("%08" B_PRIx64, val);}
-static void WriteInt(int64_t val) {dprintf("%" B_PRId64, val);}
-
 
 template <typename T> DebugUART*
 get_uart(addr_t base, int64 clock) {
@@ -81,61 +87,58 @@ const struct supported_uarts {
 };
 
 
-static void WriteStringList(const char* prop, size_t size)
+#ifdef TRACE_DUMP_FDT
+static void
+write_string_list(const char* prop, size_t size)
 {
 	bool first = true;
 	const char* propEnd = prop + size;
 	while (propEnd - prop > 0) {
-		if (first) first = false; else WriteString(", ");
+		if (first)
+			first = false;
+		else
+			dprintf(", ");
 		int curLen = strlen(prop);
-		WriteString("'");
-		WriteString(prop);
-		WriteString("'");
+		dprintf("'%s'", prop);
 		prop += curLen + 1;
 	}
 }
 
 
-static void DumpFdt(const void *fdt)
+static void
+dump_fdt(const void *fdt)
 {
 	if (!fdt)
 		return;
 
 	int err = fdt_check_header(fdt);
 	if (err) {
-		WriteString("fdt error: ");
-		WriteString(fdt_strerror(err));
-		WriteLn();
+		dprintf("fdt error: %s\n", fdt_strerror(err));
 		return;
 	}
 
-	WriteString("fdt tree:"); WriteLn();
+	dprintf("fdt tree:\n");
 
 	int node = -1;
 	int depth = -1;
 	while ((node = fdt_next_node(fdt, node, &depth)) >= 0 && depth >= 0) {
-		for (int i = 0; i < depth; i++) WriteString("  ");
+		for (int i = 0; i < depth; i++)
+			dprintf("  ");
 		// WriteInt(node); WriteString(", "); WriteInt(depth); WriteString(": ");
-		WriteString("node('");
-		WriteString(fdt_get_name(fdt, node, NULL));
-		WriteString("')"); WriteLn();
+		dprintf("node('%s')\n", fdt_get_name(fdt, node, NULL));
 		depth++;
 		for (int prop = fdt_first_property_offset(fdt, node); prop >= 0; prop = fdt_next_property_offset(fdt, prop)) {
 			int len;
 			const struct fdt_property *property = fdt_get_property_by_offset(fdt, prop, &len);
 			if (property == NULL) {
-				for (int i = 0; i < depth; i++) WriteString("  ");
-				WriteString("getting prop at ");
-				WriteInt(prop);
-				WriteString(": ");
-				WriteString(fdt_strerror(len));
-				WriteLn();
+				for (int i = 0; i < depth; i++)
+					dprintf("  ");
+				dprintf("getting prop at %d: %s\n", prop, fdt_strerror(len));
 				break;
 			}
-			for (int i = 0; i < depth; i++) WriteString("  ");
-			WriteString("prop('");
-			WriteString(fdt_string(fdt, fdt32_to_cpu(property->nameoff)));
-			WriteString("'): ");
+			for (int i = 0; i < depth; i++)
+				dprintf("  ");
+			dprintf("prop('%s'): ", fdt_string(fdt, fdt32_to_cpu(property->nameoff)));
 			if (
 				strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "compatible") == 0 ||
 				strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "model") == 0 ||
@@ -152,15 +155,13 @@ static void DumpFdt(const void *fdt)
 				strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "clock-names") == 0 ||
 				strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "clock-output-names") == 0
 			) {
-				WriteStringList((const char*)property->data, fdt32_to_cpu(property->len));
+				write_string_list((const char*)property->data, fdt32_to_cpu(property->len));
 			} else if (strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "reg") == 0) {
 				for (uint64_t *it = (uint64_t*)property->data; (uint8_t*)it - (uint8_t*)property->data < fdt32_to_cpu(property->len); it += 2) {
-					if (it != (uint64_t*)property->data) WriteString(", ");
-					WriteString("(0x");
-					WriteHex(fdt64_to_cpu(*it), 8);
-					WriteString(", 0x");
-					WriteHex(fdt64_to_cpu(*(it + 1)), 8);
-					WriteString(")");
+					if (it != (uint64_t*)property->data)
+						dprintf(", ");
+					dprintf("(0x%08" B_PRIx64 ", 0x%08" B_PRIx64 ")",
+						fdt64_to_cpu(*it), fdt64_to_cpu(*(it + 1)));
 				}
 			} else if (
 				strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "phandle") == 0 ||
@@ -181,101 +182,136 @@ static void DumpFdt(const void *fdt)
 				strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "height") == 0 ||
 				strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "stride") == 0
 			) {
-				WriteInt(fdt32_to_cpu(*(uint32_t*)property->data));
+				dprintf("%" B_PRId32, fdt32_to_cpu(*(uint32_t*)property->data));
 			} else if (
 				strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "interrupts-extended") == 0
 			) {
 				for (uint32_t *it = (uint32_t*)property->data; (uint8_t*)it - (uint8_t*)property->data < fdt32_to_cpu(property->len); it += 2) {
-					if (it != (uint32_t*)property->data) WriteString(", ");
-					WriteString("(");
-					WriteInt(fdt32_to_cpu(*it));
-					WriteString(", ");
-					WriteInt(fdt32_to_cpu(*(it + 1)));
-					WriteString(")");
+					if (it != (uint32_t*)property->data)
+						dprintf(", ");
+					dprintf("(%" B_PRId32 ", %" B_PRId32 ")",
+						fdt32_to_cpu(*it), fdt32_to_cpu(*(it + 1)));
 				}
 			} else if (
 				strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "ranges") == 0
 			) {
-				WriteLn();
+				dprintf("\n");
 				depth++;
 				// kind
 				// child address
 				// parent address
 				// size
 				for (uint32_t *it = (uint32_t*)property->data; (uint8_t*)it - (uint8_t*)property->data < fdt32_to_cpu(property->len); it += 7) {
-					for (int i = 0; i < depth; i++) WriteString("  ");
+					for (int i = 0; i < depth; i++)
+						dprintf("  ");
 					uint32_t kind = fdt32_to_cpu(*(it + 0));
 					switch (kind & 0x03000000) {
-					case 0x00000000: WriteString("CONFIG"); break;
-					case 0x01000000: WriteString("IOPORT"); break;
-					case 0x02000000: WriteString("MMIO"); break;
-					case 0x03000000: WriteString("MMIO_64BIT"); break;
+					case 0x00000000: dprintf("CONFIG"); break;
+					case 0x01000000: dprintf("IOPORT"); break;
+					case 0x02000000: dprintf("MMIO"); break;
+					case 0x03000000: dprintf("MMIO_64BIT"); break;
 					}
-					WriteString(" (0x"); WriteHex(kind, 8);
-					WriteString("), ");
-					WriteString("child: 0x"); WriteHex(fdt64_to_cpu(*(uint64_t*)(it + 1)), 8);
-					WriteString(", ");
-					WriteString("parent: 0x"); WriteHex(fdt64_to_cpu(*(uint64_t*)(it + 3)), 8);
-					WriteString(", ");
-					WriteString("len: 0x"); WriteHex(fdt64_to_cpu(*(uint64_t*)(it + 5)), 8);
-					WriteLn();
+					dprintf(" (0x%08" PRIx32 "), child: 0x%08" PRIx64 ", parent: 0x%08" PRIx64 ", len: 0x%08" PRIx64 "\n",
+						kind, fdt64_to_cpu(*(uint64_t*)(it + 1)), fdt64_to_cpu(*(uint64_t*)(it + 3)), fdt64_to_cpu(*(uint64_t*)(it + 5)));
 				}
-				for (int i = 0; i < depth; i++) WriteString("  ");
+				for (int i = 0; i < depth; i++)
+					dprintf("  ");
 				depth--;
 			} else if (strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "bus-range") == 0) {
 				uint32_t *it = (uint32_t*)property->data;
-				WriteInt(fdt32_to_cpu(*it));
-				WriteString(", ");
-				WriteInt(fdt32_to_cpu(*(it + 1)));
+				dprintf("%" PRId32 ", %" PRId32, fdt32_to_cpu(*it), fdt32_to_cpu(*(it + 1)));
 			} else if (strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "interrupt-map-mask") == 0) {
-				WriteLn();
+				dprintf("\n");
 				depth++;
 				for (uint32_t *it = (uint32_t*)property->data; (uint8_t*)it - (uint8_t*)property->data < fdt32_to_cpu(property->len); it++) {
-					for (int i = 0; i < depth; i++) WriteString("  ");
-					WriteString("0x"); WriteHex(fdt32_to_cpu(*(uint32_t*)it), 8);
-					WriteLn();
+					for (int i = 0; i < depth; i++)
+						dprintf("  ");
+					dprintf("0x%08" PRIx32 "\n", fdt32_to_cpu(*(uint32_t*)it));
 				}
-				for (int i = 0; i < depth; i++) WriteString("  ");
+				for (int i = 0; i < depth; i++)
+					dprintf("  ");
 				depth--;
 			} else if (strcmp(fdt_string(fdt, fdt32_to_cpu(property->nameoff)), "interrupt-map") == 0) {
-				WriteLn();
+				dprintf("\n");
 				depth++;
-				for (uint32_t *it = (uint32_t*)property->data; (uint8_t*)it - (uint8_t*)property->data < fdt32_to_cpu(property->len); it += 6) {
-					for (int i = 0; i < depth; i++) WriteString("  ");
-					// child unit address
-					WriteString("0x"); WriteHex(fdt32_to_cpu(*(it + 0)), 8);
-					WriteString(", ");
-					WriteString("0x"); WriteHex(fdt32_to_cpu(*(it + 1)), 8);
-					WriteString(", ");
-					WriteString("0x"); WriteHex(fdt32_to_cpu(*(it + 2)), 8);
-					WriteString(", ");
-					WriteString("0x"); WriteHex(fdt32_to_cpu(*(it + 3)), 8);
 
-					WriteString(", bus: "); WriteInt(fdt32_to_cpu(*(it + 0)) / (1 << 16) % (1 << 8));
-					WriteString(", dev: "); WriteInt(fdt32_to_cpu(*(it + 0)) / (1 << 11) % (1 << 5));
-					WriteString(", fn: "); WriteInt(fdt32_to_cpu(*(it + 0)) % (1 << 3));
+				int addressCells = 3;
+				int interruptCells = 1;
+				int phandleCells = 1;
 
-					WriteString(", childIrq: ");
-					// child interrupt specifier
-					WriteInt(fdt32_to_cpu(*(it + 3)));
-					WriteString(", parentIrq: (");
-					// interrupt-parent
-					WriteInt(fdt32_to_cpu(*(it + 4)));
-					WriteString(", ");
-					WriteInt(fdt32_to_cpu(*(it + 5)));
-					WriteString(")");
-					WriteLn();
-					if (((it - (uint32_t*)property->data) / 6) % 4 == 3 && ((uint8_t*)(it + 6) - (uint8_t*)property->data < fdt32_to_cpu(property->len)))
-						WriteLn();
+				uint32 *prop;
+
+				prop = (uint32*)fdt_getprop(fdt, node, "#address-cells", NULL);
+				if (prop != NULL)
+					addressCells = fdt32_to_cpu(*prop);
+
+				prop = (uint32*)fdt_getprop(fdt, node, "#interrupt-cells", NULL);
+				if (prop != NULL)
+					interruptCells = fdt32_to_cpu(*prop);
+
+				uint32_t *it = (uint32_t*)property->data;
+				while ((uint8_t*)it - (uint8_t*)property->data < fdt32_to_cpu(property->len)) {
+					for (int i = 0; i < depth; i++)
+						dprintf("  ");
+
+					uint32 childAddr = fdt32_to_cpu(*it);
+					dprintf("childAddr: ");
+					for (int i = 0; i < addressCells; i++) {
+						dprintf("0x%08" PRIx32 " ", fdt32_to_cpu(*it));
+						it++;
+					}
+
+					uint8 bus = childAddr / (1 << 16) % (1 << 8);
+					uint8 dev = childAddr / (1 << 11) % (1 << 5);
+					uint8 func = childAddr % (1 << 3);
+					dprintf("(bus: %" PRId32 ", dev: %" PRId32 ", fn: %" PRId32 "), ",
+						bus, dev, func);
+
+					dprintf("childIrq: ");
+					for (int i = 0; i < interruptCells; i++) {
+						dprintf("%" PRIu32 " ", fdt32_to_cpu(*it));
+						it++;
+					}
+
+					uint32 parentPhandle = fdt32_to_cpu(*it);
+					it += phandleCells;
+					dprintf("parentPhandle: %" PRId32 ", ", parentPhandle);
+
+					int parentAddressCells = 0;
+					int parentInterruptCells = 1;
+
+					int parentNode = fdt_node_offset_by_phandle(fdt, parentPhandle);
+					if (parentNode >= 0) {
+						prop = (uint32*)fdt_getprop(fdt, parentNode, "#address-cells", NULL);
+						if (prop != NULL)
+							parentAddressCells = fdt32_to_cpu(*prop);
+
+						prop = (uint32*)fdt_getprop(fdt, parentNode, "#interrupt-cells", NULL);
+						if (prop != NULL)
+							parentInterruptCells = fdt32_to_cpu(*prop);
+					}
+
+					dprintf("parentAddress: ");
+					for (int i = 0; i < parentAddressCells; i++) {
+						dprintf("%" PRIu32 " ", fdt32_to_cpu(*it));
+						it++;
+					}
+
+					dprintf("parentIrq: ");
+					for (int i = 0; i < parentInterruptCells; i++) {
+						dprintf("%" PRIu32 " ", fdt32_to_cpu(*it));
+						it++;
+					}
+
+					dprintf("\n");
 				}
-				for (int i = 0; i < depth; i++) WriteString("  ");
+				for (int i = 0; i < depth; i++)
+					dprintf("  ");
 				depth--;
 			} else {
-				WriteString("?");
+				dprintf("?");
 			}
-			WriteString(" (len ");
-			WriteInt(fdt32_to_cpu(property->len));
-			WriteString(")"); WriteLn();
+			dprintf(" (len %" PRId32 ")\n", fdt32_to_cpu(property->len));
 /*
 			dump_hex(property->data, fdt32_to_cpu(property->len), depth);
 */
@@ -283,7 +319,7 @@ static void DumpFdt(const void *fdt)
 		depth--;
 	}
 }
-
+#endif
 
 
 bool
@@ -310,7 +346,7 @@ dtb_get_address_cells(const void* fdt, int node)
 	if (parent < 0)
 		return res;
 
-	uint32 *prop = (uint32*)fdt_getprop(sDtbTable, parent, "#address-cells", NULL);
+	uint32 *prop = (uint32*)fdt_getprop(fdt, parent, "#address-cells", NULL);
 	if (prop == NULL)
 		return res;
 
@@ -328,7 +364,7 @@ dtb_get_size_cells(const void* fdt, int node)
 	if (parent < 0)
 		return res;
 
-	uint32 *prop = (uint32*)fdt_getprop(sDtbTable, parent, "#size-cells", NULL);
+	uint32 *prop = (uint32*)fdt_getprop(fdt, parent, "#size-cells", NULL);
 	if (prop == NULL)
 		return res;
 
@@ -446,7 +482,7 @@ dtb_get_interrupt_cells(const void* fdt, int node)
 }
 
 
-static uint32
+uint32
 dtb_get_interrupt(const void* fdt, int node)
 {
 	uint32 interruptCells = dtb_get_interrupt_cells(fdt, node);
@@ -455,10 +491,19 @@ dtb_get_interrupt(const void* fdt, int node)
 		return fdt32_to_cpu(*(prop + 1));
 	}
 	if (uint32* prop = (uint32*)fdt_getprop(fdt, node, "interrupts", NULL)) {
-		if (interruptCells == 3) {
-			return fdt32_to_cpu(*(prop + 1));
-		} else {
+		if ((interruptCells == 1) || (interruptCells == 2)) {
 			return fdt32_to_cpu(*prop);
+		} else if (interruptCells == 3) {
+			uint32 interruptType = fdt32_to_cpu(prop[GIC_INTERRUPT_CELL_TYPE]);
+			uint32 interruptNumber = fdt32_to_cpu(prop[GIC_INTERRUPT_CELL_ID]);
+			if (interruptType == GIC_INTERRUPT_TYPE_SPI)
+				interruptNumber += GIC_INTERRUPT_BASE_SPI;
+			else if (interruptType == GIC_INTERRUPT_TYPE_PPI)
+				interruptNumber += GIC_INTERRUPT_BASE_PPI;
+
+			return interruptNumber;
+		} else {
+			panic("unsupported interruptCells");
 		}
 	}
 	dprintf("[!] no interrupt field\n");
@@ -564,9 +609,6 @@ dtb_init()
 	efi_configuration_table *table = kSystemTable->ConfigurationTable;
 	size_t entries = kSystemTable->NumberOfTableEntries;
 
-	// Ensure uart is empty before we scan for one
-	memset(&gKernelArgs.arch_args.uart, 0, sizeof(uart_info));
-
 	INFO("Probing for device trees from UEFI...\n");
 
 	// Try to find an FDT
@@ -587,8 +629,9 @@ dtb_init()
 	
 		INFO("Valid FDT from UEFI table %d, size: %" B_PRIu32 "\n", i, sDtbSize);
 
-		if (false)
-			DumpFdt(sDtbTable);
+#ifdef TRACE_DUMP_FDT
+		dump_fdt(sDtbTable);
+#endif
 
 		dtb_handle_chosen_node(sDtbTable);
 

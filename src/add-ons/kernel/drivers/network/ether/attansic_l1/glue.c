@@ -3,12 +3,12 @@
  * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
- 
+
 #include <sys/bus.h>
 
 
 HAIKU_FBSD_DRIVER_GLUE(attansic_l1, age, pci);
-HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_SWI_TASKQUEUE);
+HAIKU_DRIVER_REQUIREMENTS(FBSD_SWI_TASKQUEUE);
 
 
 extern driver_t *DRIVER_MODULE_NAME(atphy, miibus);

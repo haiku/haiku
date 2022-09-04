@@ -196,6 +196,7 @@ extern "C" {
 #endif
 
 status_t	pci_init(void);
+status_t	pci_init_deferred(void);
 void		pci_uninit(void);
 
 long		pci_get_nth_pci_info(long index, pci_info *outInfo);

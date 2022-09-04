@@ -6,7 +6,6 @@ UsePrivateHeaders locale shared ;
 UsePublicHeaders locale storage ;
 
 local sources =
-	cat.cpp
 	Catalog.cpp
 	CatalogData.cpp
 	Collator.cpp

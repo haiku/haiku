@@ -91,6 +91,10 @@ __FBSDID("$FreeBSD$");
 
 #include <dev/sge/if_sgereg.h>
 
+#if defined(__HAIKU__)
+#include "../../glue.h"
+#endif
+
 MODULE_DEPEND(sge, pci, 1, 1, 1);
 MODULE_DEPEND(sge, ether, 1, 1, 1);
 MODULE_DEPEND(sge, miibus, 1, 1, 1);

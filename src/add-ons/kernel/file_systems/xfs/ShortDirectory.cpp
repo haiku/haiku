@@ -12,8 +12,7 @@ ShortDirectory::ShortDirectory(Inode* inode)
 	fInode(inode),
 	fTrack(0)
 {
-
-	fHeader = (ShortFormHeader*)(DIR_DFORK_PTR(fInode->Buffer()));
+	fHeader = (ShortFormHeader*)(DIR_DFORK_PTR(fInode->Buffer(), fInode->CoreInodeSize()));
 }
 
 
@@ -72,8 +71,8 @@ size_t
 ShortDirectory::EntrySize(int namelen)
 {
 	return sizeof(ShortFormEntry) + namelen
-			+ (fInode->HasFileTypeField()? sizeof(uint8) : 0)
-			+ (fHeader->i8count? sizeof(uint64):sizeof(uint32));
+			+ (fInode->HasFileTypeField() ? sizeof(uint8) : 0)
+			+ (fHeader->i8count ? sizeof(uint64) : sizeof(uint32));
 }
 
 
@@ -86,17 +85,17 @@ ShortDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 		xfs_ino_t rootIno = fInode->GetVolume()->Root();
 		if (strcmp(name, ".") == 0 || (rootIno == fInode->ID())) {
 			*ino = fInode->ID();
-			TRACE("ShortDirectory:Lookup: name: \".\" ino: (%d)\n", *ino);
+			TRACE("ShortDirectory:Lookup: name: \".\" ino: (%" B_PRIu64 ")\n", *ino);
 			return B_OK;
 		}
 		*ino = GetIno(&fHeader->parent);
-		TRACE("Parent: (%d)\n", *ino);
+		TRACE("Parent: (%" B_PRIu64 ")\n", *ino);
 		return B_OK;
 	}
 
 	ShortFormEntry* entry = FirstEntry();
-	TRACE("Length of first entry: (%d),offset of first entry:"
-		"(%d)\n", entry->namelen, B_BENDIAN_TO_HOST_INT16(entry->offset.i));
+	TRACE("Length of first entry: (%" B_PRIu8 "),offset of first entry:"
+		"(%" B_PRIu16 ")\n", entry->namelen, B_BENDIAN_TO_HOST_INT16(entry->offset.i));
 
 	int status;
 	for (int i = 0; i < fHeader->count; i++) {
@@ -124,7 +123,7 @@ ShortDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 		strlcpy(name, ".", *length + 1);
 		*ino = fInode->ID();
 		fTrack = 1;
-		TRACE("ShortDirectory:GetNext: name: \".\" ino: (%d)\n", *ino);
+		TRACE("ShortDirectory:GetNext: name: \".\" ino: (%" B_PRIu64 ")\n", *ino);
 		return B_OK;
 	}
 	if (fTrack == 1) {
@@ -135,19 +134,19 @@ ShortDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 		strlcpy(name, "..", *length + 1);
 		*ino = GetIno(&fHeader->parent);
 		fTrack = 2;
-		TRACE("ShortDirectory:GetNext: name: \"..\" ino: (%d)\n", *ino);
+		TRACE("ShortDirectory:GetNext: name: \"..\" ino: (%" B_PRIu64 ")\n", *ino);
 		return B_OK;
 	}
 
 	ShortFormEntry* entry = FirstEntry();
-	TRACE("Length of first entry: (%d), offset of first entry:"
-		"(%d)\n", entry->namelen, B_BENDIAN_TO_HOST_INT16(entry->offset.i));
+	TRACE("Length of first entry: (%" B_PRIu8 "),offset of first entry:"
+		"(%" B_PRIu16 ")\n", entry->namelen, B_BENDIAN_TO_HOST_INT16(entry->offset.i));
 
 	for (int i = 0; i < fHeader->count; i++) {
 		uint16 curOffset = B_BENDIAN_TO_HOST_INT16(entry->offset.i);
 		if (curOffset > fLastEntryOffset) {
 
-			if (entry->namelen + 1 > *length)
+			if ((size_t)(entry->namelen + 1) > *length)
 				return B_BUFFER_OVERFLOW;
 
 			fLastEntryOffset = curOffset;
@@ -155,9 +154,8 @@ ShortDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 			name[entry->namelen] = '\0';
 			*length = entry->namelen + 1;
 			*ino = GetEntryIno(entry);
-
-			TRACE("Entry found. Name: (%s), Length: (%ld),ino: (%ld)\n", name,
-				*length, *ino);
+			TRACE("Entry found. Name: (%s), Length: (%" B_PRIuSIZE "),ino: (%" B_PRIu64 ")\n",
+				name,*length, *ino);
 			return B_OK;
 		}
 		entry = (ShortFormEntry*)((char*)entry + EntrySize(entry->namelen));

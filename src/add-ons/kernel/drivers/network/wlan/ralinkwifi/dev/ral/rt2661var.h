@@ -1,4 +1,4 @@
-/*	$FreeBSD: releng/12.0/sys/dev/ral/rt2661var.h 306591 2016-10-02 20:35:55Z avos $	*/
+/*	$FreeBSD$	*/
 
 /*-
  * Copyright (c) 2005
@@ -114,7 +114,7 @@ struct rt2661_softc {
  * The same in both up to here
  * ------------------------------------------------
  */
-	
+
 	int                             sc_flags;
 #define	RAL_FW_LOADED		0x1
 #define	RAL_INPUT_RUNNING	0x2

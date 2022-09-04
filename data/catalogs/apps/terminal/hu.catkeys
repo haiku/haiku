@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	247549485
+1	hungarian	x-vnd.Haiku-Terminal	4089361699
 ANSI cyan color	Terminal AppearancePrefView		ANSI cián
 Close other tabs	Terminal TermWindow		Többi lap bezárása
 Insert path	Terminal TermView		Útvonal beszúrása
@@ -7,13 +7,13 @@ Text encoding	Terminal TermWindow		Szöveg kódolása
 ANSI blue color	Terminal AppearancePrefView		ANSI kék
 OK	Terminal SetTitleWindow		Rendben
 Edit	Terminal TermWindow		Szerkesztés
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		-h, --helpez a súgó\n-t, --titleablak címének megadása\n-f, --fullscreenindítás teljesképernyős módban\n-w, --working-directoryindítási mappa megadása\n
 Select all	Terminal TermWindow		Összes kijelölése
 Confirm exit if active programs exist	Terminal AppearancePrefView		Kilépés megerősítése ha van futó program
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tA jelenlegi folyamat munka mappája az aktuális fülön.\n\t\t\tOpcionálisan megadható a maximális útvonal-elemek száma.\n\t\t\tPéldául '%2d' a legutolsó kettő elem.\n\t%T\t-\tA Terminal neve az aktuális nyelven.\n\t%e\t-\tA jelenlegi fül kódolása. UTF-8 esetén nem látszik.\n\t%i\t-\tAz ablak sorszáma.\n\t%p\t-\tAz aktív folyamat neve az aktuális fülön.\n\t%t\t-\tA jelenlegi fül címe.
 Solarized Dark	Terminal colors scheme		Erős sötét színek
 Copy	Terminal TermWindow		Másolás
 ANSI bright green color	Terminal AppearancePrefView		ANSI fényes zöld
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		-h, --help a súgó kiírása\n-t, --title ablak címének megadása\n-f, --fullscreen indítás teljesképernyős módban\n-w, --working-directory kezdő mappa megadása
 ANSI white color	Terminal AppearancePrefView		ANSI fehér
 Retro	Terminal colors scheme		Retró
 Edit tab title…	Terminal TermWindow		Lap címének szerkesztése…

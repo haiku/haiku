@@ -8,6 +8,7 @@
 
 #include <device_manager.h>
 #include <PCI.h>
+#include <drivers/ACPI.h>
 #include <drivers/bus/FDT.h>
 
 #include <string.h>
@@ -30,25 +31,41 @@ pci_root_supports_device(device_node* parent)
 	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false) < B_OK)
 		return -1.0f;
 
-#ifdef __riscv
-	const char* compatible;
-	if (gDeviceManager->get_attr_string(parent, "fdt/compatible", &compatible,
-		false) < B_OK)
-		return -1.0f;
+#if defined(__riscv)
+	if (strcmp(bus, "fdt") == 0) {
+		const char* compatible;
+		if (gDeviceManager->get_attr_string(parent, "fdt/compatible", &compatible, false) < B_OK)
+			return -1.0f;
 
-	if (strcmp(bus, "fdt") != 0)
-		return 0.0f;
+		if (strcmp(compatible, "pci-host-ecam-generic") == 0
+			|| strcmp(compatible, "sifive,fu740-pcie") == 0) {
+			return 1.0f;
+		}
+	}
+#elif defined(__arm__) || defined(__aarch64__)
+	if (strcmp(bus, "fdt") == 0) {
+		const char* compatible;
+		if (gDeviceManager->get_attr_string(parent, "fdt/compatible", &compatible, false) < B_OK)
+			return -1.0f;
 
-	if (strcmp(compatible, "pci-host-ecam-generic") != 0
-		&& strcmp(compatible, "sifive,fu740-pcie") != 0) {
-		return 0.0f;
+		if (strcmp(compatible, "pci-host-ecam-generic") == 0)
+			return 1.0f;
+	}
+
+	if (strcmp(bus, "acpi") == 0) {
+		const char* hid;
+		if (gDeviceManager->get_attr_string(parent, ACPI_DEVICE_HID_ITEM, &hid, false) < B_OK)
+			return -1.0f;
+
+		if (strcmp(hid, "PNP0A03") == 0 || strcmp(hid, "PNP0A08") == 0)
+			return 1.0f;
 	}
 #else
-	if (strcmp(bus, "root") != 0)
-		return 0.0f;
+	if (strcmp(bus, "root") == 0)
+		return 1.0f;
 #endif
 
-	return 1.0;
+	return 0.0;
 }
 
 
@@ -130,7 +147,7 @@ pci_root_init(device_node* node, void** _cookie)
 	if (res < B_OK)
 		return res;
 
-	return B_OK;
+	return pci_init_deferred();
 }
 
 

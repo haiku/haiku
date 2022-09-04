@@ -191,7 +191,7 @@ ExpressionTextView::SetExpression(const char* expression)
 
 
 void
-ExpressionTextView::SetValue(BString value)
+ExpressionTextView::SetValue(BString value, BString decimalSeparator)
 {
 	// save the value
 	fCurrentValue = value;
@@ -201,6 +201,8 @@ ExpressionTextView::SetValue(BString value)
 	uint32 mode = B_FONT_ALL;
 	GetFontAndColor(&font, &mode);
 	float stringWidth = font.StringWidth(value);
+
+	uint decimalSeparatorWidth = decimalSeparator.CountChars();
 
 	// make the string shorter if it does not fit in the view
 	float viewWidth = Frame().Width()
@@ -213,10 +215,10 @@ ExpressionTextView::SetValue(BString value)
 
 		// calculate the value of the exponent
 		int32 exponent = 0;
-		int32 offset = value.FindFirst('.');
+		int32 offset = value.FindFirst(decimalSeparator);
 		if (offset == B_ERROR) {
-			exponent = value.CountChars() - 1 - firstDigit;
-			value.Insert('.', 1, firstDigit + 1);
+			exponent = value.CountChars() - decimalSeparatorWidth - firstDigit;
+			value.InsertChars(decimalSeparator, firstDigit + 1);
 		} else {
 			if (offset == firstDigit + 1) {
 				// if the value is 0.01 or larger then scientific notation
@@ -226,7 +228,7 @@ ExpressionTextView::SetValue(BString value)
 					exponent = 0;
 				} else {
 					// remove the period
-					value.Remove(offset, 1);
+					value.Remove(offset, decimalSeparatorWidth);
 
 					// check for negative exponent value
 					exponent = 0;
@@ -236,7 +238,7 @@ ExpressionTextView::SetValue(BString value)
 					}
 
 					// add the period
-					value.Insert('.', 1, firstDigit + 1);
+					value.InsertChars(decimalSeparator, firstDigit + 1);
 				}
 			} else {
 				// if the period + 1 digit fits in the view scientific notation
@@ -248,8 +250,8 @@ ExpressionTextView::SetValue(BString value)
 					exponent = 0;
 				else {
 					// move the period
-					value.Remove(offset, 1);
-					value.Insert('.', 1, firstDigit + 1);
+					value.Remove(offset, decimalSeparatorWidth);
+					value.InsertChars(decimalSeparator, firstDigit + 1);
 
 					exponent = offset - (firstDigit + 1);
 				}
@@ -271,15 +273,15 @@ ExpressionTextView::SetValue(BString value)
 		stringWidth = font.StringWidth(value);
 		char lastRemovedDigit = '0';
 		while (offset > firstDigit && stringWidth > viewWidth) {
-			if (value[offset] != '.')
+			if (value.CharAt(offset) != decimalSeparator)
 				lastRemovedDigit = value[offset];
 			value.Remove(offset--, 1);
 			stringWidth = font.StringWidth(value);
 		}
 
 		// no need to keep the period if no digits follow
-		if (value[offset] == '.') {
-			value.Remove(offset, 1);
+		if (value.CharAt(offset) == decimalSeparator) {
+			value.Remove(offset, decimalSeparatorWidth);
 			offset--;
 		}
 
@@ -287,7 +289,7 @@ ExpressionTextView::SetValue(BString value)
 		int digit = (int)lastRemovedDigit - '0'; // ascii to int
 		if (digit >= 5) {
 			for (; offset >= firstDigit; offset--) {
-				if (value[offset] == '.')
+				if (value.CharAt(offset) == decimalSeparator)
 					continue;
 
 				digit = (int)(value[offset]) - '0' + 1; // ascii to int + 1
@@ -298,9 +300,10 @@ ExpressionTextView::SetValue(BString value)
 			}
 			if (digit == 10) {
 				// carry over, shift the result
-				if (value[firstDigit + 1] == '.') {
-					value.SetByteAt(firstDigit + 1, '0');
-					value.SetByteAt(firstDigit, '.');
+				if (value.CharAt(firstDigit + 1) == decimalSeparator) {
+					value.SetByteAt(firstDigit + decimalSeparatorWidth, '0');
+					value.RemoveChars(firstDigit, decimalSeparatorWidth);
+					value.InsertChars(decimalSeparator, firstDigit);
 				}
 				value.Insert('1', 1, firstDigit);
 
@@ -329,14 +332,14 @@ ExpressionTextView::SetValue(BString value)
 		}
 
 		// clean up decimal part if we have one
-		if (value.FindFirst('.') != B_ERROR) {
+		if (value.FindFirst(decimalSeparator) != B_ERROR) {
 			// remove trailing zeros
 			while (value[offset] == '0')
 				value.Remove(offset--, 1);
 
 			// no need to keep the period if no digits follow
-			if (value[offset] == '.')
-				value.Remove(offset, 1);
+			if (value.CharAt(offset) == decimalSeparator)
+				value.Remove(offset, decimalSeparatorWidth);
 		}
 	}
 

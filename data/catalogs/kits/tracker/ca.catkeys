@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-libtracker	2915475646
+1	catalan; valencian	x-vnd.Haiku-libtracker	464753347
 Created	ContainerWindow		Creat
 Icon	AttributesView		Icona
 Open and make preferred	OpenWithWindow		Obre-ho i fes-ho preferit
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Icona petita de mapa de bits
 Would you like to find a suitable application to open the file?	FSUtils		Voleu trobar una aplicació adequada per obrir el fitxer?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		No podeu reemplaçar una carpeta o un enllaç simbòlic per un fitxer.
+(unknown)	InfoWindow		(desconegut)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# dates>}}
 Trailing \\.	libtracker		Final \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		A %func \nha fallat find_directory(). \nRaó: %error
@@ -84,6 +85,7 @@ Include trash	FindPanel		Inclou la paperera
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Neteja
 Modified	FindPanel		Modificat
+ (block size: 	InfoWindow		 (mida de bloc: 
 Select all	QueryContainerWindow		Selecciona-ho tot
 Generate image thumbnails	SettingsView		Genera miniatures d’imatges
 Select…	FilePanelPriv		Seleccioneu...
@@ -167,6 +169,7 @@ Read	FilePermissionsView		Lectura
 There was an error writing the attribute.	WidgetAttributeText		Hi ha hagut un error en escriure l'atribut.
 Path	Default Query Columns		Camí
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si canvieu de nom %target, el sistema %osName potser no es comportarà correctament!\n\nSegur que ho voleu fer?
+Filesystem:	InfoWindow		Sistema de fitxers:
 Could not open \"%name\" (%error). 	FSUtils		No s'ha pogut muntar \"%name\" (%error). 
 Media parameter group	AttributesView		Grup de paràmetres multimèdia
 %name info	InfoWindow	InfoWindow Title	Propietats de %name
@@ -284,9 +287,9 @@ no supporting apps	OpenWithWindow		aplicacions no compatibles
 32-bit unsigned integer	AttributesView		Enter de 32 bits no signat
 Preparing to empty Trash…	StatusWindow		Es prepara el buidatge de la paperera...
 Deleting: 	StatusWindow		Se suprimeix: 
+label too long	PoseView		l'etiqueta és massa llarga
 the MIME settings	FSUtils		els paràmetres de MIME
 You can't move or copy the trash.	FSUtils		No podeu moure o copiar la paperera.
-label too long	PoseView		l'etiqueta és massa llarga
 Error creating link to \"%name\".	FSUtils		Hi ha hagut un error en enllaçar amb \"%name\".
 Unknown	FilePermissionsView		Desconegut
 Paste links	ContainerWindow		Enganxa els enllaços
@@ -335,8 +338,8 @@ MIME Path	AttributesView		Camí de MIME
 less than	FindPanel		menys que
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Error en copiar el fitxer \"%name\":\n\t%error\n\nVoleu continuar?
 Creating links: 	StatusWindow		Es creen els enllaços: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		No s'ha pogut obrir \"%document\" amb l'aplicació \"%app\" (%error). 
 Create %s clipping	PoseView		Crea un retall de %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		No s'ha pogut obrir \"%document\" amb l'aplicació \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Error en moure \"%name\"
 To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Enganxa la disposició
@@ -493,6 +496,7 @@ Duplicate	ContainerWindow		Duplica
 16-bit integer	AttributesView		Enter de 16 bits
 Untitled clipping	PoseView		Retall sense títol
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Ja existeix un fitxer amb el nom \"%name\" a la carpeta especificada. El voleu reemplaçar?
+, indexed	InfoWindow		, indexat
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Heu de deixar anar els elements a una de les icones de la finestra \"Discs\".
 Version:	InfoWindow		Versió:
 OK	PoseView		D'acord
@@ -508,8 +512,8 @@ Add-ons	FilePanelPriv		Complements
 Empty folder	SlowContextPopup		Carpeta buida
 Alignment	AttributesView		Alineament
 Move to Trash	FSUtils		Mou a la paperera
-Handles %type	OpenWithWindow		Gestiona el tipus %type
 Cancel	PoseView		Cancel·la
+Handles %type	OpenWithWindow		Gestiona el tipus %type
 Delete	PoseView		Suprimeix
 Media parameter	AttributesView		Paràmetre multimèdia
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Si altereu la capeta personal, el sistema %osName pot no comportar-se correctament!\n\nSegur que ho voleu fer?\n\nSi tanmateix la voleu alterar, mantingueu premuda la tecla Maj. i cliqueu a \"Sé el que faig\".

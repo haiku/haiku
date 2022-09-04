@@ -545,11 +545,11 @@ A C D E F G B H I J
 	\fn void BList::DoForEach(bool (*func)(void* item))
 	\brief Perform an action on every item in the list.
 
-	If one of the actions on the items fails it means that the \a func function
-	returned \c false and the processing of the list will be stopped.
+	Iterates over all items in the list, and calls the \a func function on each of them,
+	until the function returns \c true.
 
-	\param func A pointer to a function that takes a \c void* argument and
-	       returns a bool.
+	\param func A pointer to a function that takes a \c void* list item, and
+	       returns a bool indicating if the iteration should stop.
 
 	\see DoForEach(bool (*func)(void*, void*), void*)
 
@@ -561,12 +561,29 @@ A C D E F G B H I J
 	\fn void BList::DoForEach(bool (*func)(void* item, void* arg2), void* arg2)
 	\brief Perform an action on every item in the list with an argument.
 
-	If one of the actions on the items fails it means that the \a func function
-	returned \c false and the processing of the list will be stopped.
+	The iteration stops when the \a func function returns \c true.
+	This can be used to implement a linear search of the list, for example:
+
+	\code{.cpp}
+	bool compareFunc(void* _item, void* arg2) {
+		Item* item = (Item*)_item;
+		Args* args = (Args*)arg2;
+		if (item->Matches(args->pattern)) {
+			args->result = item;
+			return true;
+		}
+		return false;
+	}
+
+	Args args = {0};
+	list.DoForEach(compareFunc, &args);
+	if (args->result != NULL) {
+		// Found it!
+	}
+	\endcode
 
 	\param func A function with the first \c void* argument being the item
-	       and the second \c void* being the argument that you supply. It
-	       should return a boolean value on whether it succeeded or not.
+	       and the second \c void* being the argument that you supply.
 	\param arg2 An argument to supply to \a func.
 
 	\see DoForEach(bool (*func)(void*))

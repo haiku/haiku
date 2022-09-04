@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -84,6 +84,7 @@ AbstractSingleFileServerProcess::RunInternal()
 				HDINFO("[%s] did process data", Name());
 				break;
 			default:
+				HDERROR("[%s] failed processing data", Name());
 				MoveDamagedFileAside(localPath);
 				break;
 		}

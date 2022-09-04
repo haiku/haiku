@@ -80,7 +80,7 @@ private:
 			SettingsMessage*	fSettings;
 			SettingsMessage*	fCookies;
 			SettingsMessage*	fSession;
-			BPrivate::Network::BUrlContext*	fContext;
+			BReference<BPrivate::Network::BUrlContext>	fContext;
 
 			DownloadWindow*		fDownloadWindow;
 			SettingsWindow*		fSettingsWindow;

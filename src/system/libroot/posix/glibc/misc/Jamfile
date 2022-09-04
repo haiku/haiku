@@ -12,6 +12,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
 			generic ;
 		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ctype ;
 		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc libio ;
 		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc misc ;
 		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc locale ;

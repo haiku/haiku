@@ -53,15 +53,6 @@ status_t vesa_set_cursor_bitmap(uint16 width, uint16 height, uint16 hotX,
 void vesa_move_cursor(uint16 x, uint16 y);
 void vesa_show_cursor(bool is_visible);
 
-// accelerant engine
-uint32 vesa_accelerant_engine_count(void);
-status_t vesa_acquire_engine(uint32 capabilities, uint32 maxWait,
-	sync_token *st, engine_token **et);
-status_t vesa_release_engine(engine_token *et, sync_token *st);
-void vesa_wait_engine_idle(void);
-status_t vesa_get_sync_token(engine_token *et, sync_token *st);
-status_t vesa_sync_to_token(sync_token *st);
-
 // 2D acceleration
 void vesa_screen_to_screen_blit(engine_token *et, blit_params *list,
 	uint32 count);

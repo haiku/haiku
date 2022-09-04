@@ -87,19 +87,19 @@
 #	define FS_CALL(vnode, op, params...) \
 		( HAS_FS_CALL(vnode, op) ? \
 			vnode->ops->op(vnode->mount->volume, vnode, params) \
-			: (panic("FS_CALL op " #op " is NULL"), 0))
+			: (panic("FS_CALL: vnode %p op " #op " is NULL", vnode), 0))
 #	define FS_CALL_NO_PARAMS(vnode, op) \
 		( HAS_FS_CALL(vnode, op) ? \
 			vnode->ops->op(vnode->mount->volume, vnode) \
-			: (panic("FS_CALL_NO_PARAMS op " #op " is NULL"), 0))
+			: (panic("FS_CALL_NO_PARAMS: vnode %p op " #op " is NULL", vnode), 0))
 #	define FS_MOUNT_CALL(mount, op, params...) \
 		( HAS_FS_MOUNT_CALL(mount, op) ? \
 			mount->volume->ops->op(mount->volume, params) \
-			: (panic("FS_MOUNT_CALL op " #op " is NULL"), 0))
+			: (panic("FS_MOUNT_CALL: mount %p op " #op " is NULL", mount), 0))
 #	define FS_MOUNT_CALL_NO_PARAMS(mount, op) \
 		( HAS_FS_MOUNT_CALL(mount, op) ? \
 			mount->volume->ops->op(mount->volume) \
-			: (panic("FS_MOUNT_CALL_NO_PARAMS op " #op " is NULL"), 0))
+			: (panic("FS_MOUNT_CALL_NO_PARAMS: mount %p op " #op " is NULL", mount), 0))
 #else
 #	define FS_CALL(vnode, op, params...) \
 			vnode->ops->op(vnode->mount->volume, vnode, params)
@@ -2179,7 +2179,9 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 		for (nextPath = path + 1; *nextPath != '\0' && *nextPath != '/';
 				nextPath++);
 
+		bool directoryFound = false;
 		if (*nextPath == '/') {
+			directoryFound = true;
 			*nextPath = '\0';
 			do
 				nextPath++;
@@ -2226,7 +2228,7 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 		// If the new node is a symbolic link, resolve it (if we've been told
 		// to do it)
 		if (S_ISLNK(nextVnode->Type())
-			&& (traverseLeafLink || nextPath[0] != '\0')) {
+			&& (traverseLeafLink || directoryFound)) {
 			size_t bufferSize;
 			char* buffer;
 
@@ -5532,6 +5534,9 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 static int
 open_dir_vnode(struct vnode* vnode, bool kernel)
 {
+	if (!HAS_FS_CALL(vnode, open_dir))
+		return B_UNSUPPORTED;
+
 	void* cookie;
 	status_t status = FS_CALL(vnode, open_dir, &cookie);
 	if (status != B_OK)

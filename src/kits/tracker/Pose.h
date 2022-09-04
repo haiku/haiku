@@ -75,9 +75,9 @@ public:
 		// special purpose draw call for deselecting over a textured
 		// background
 
-	void DrawBar(BPoint where, BView* view, icon_size which);
+	void DrawBar(BPoint where, BView* view, BSize iconSize);
 
-	void DrawIcon(BPoint where, BView* view, icon_size which, bool direct,
+	void DrawIcon(BPoint where, BView* view, BSize size, bool direct,
 		bool drawUnselected = false);
 	void DrawToggleSwitch(BRect, BPoseView*);
 	void MouseUp(BPoint poseLoc, BPoseView*, BPoint where, int32 index);
@@ -136,7 +136,7 @@ private:
 	static bool _PeriodicUpdateCallback(BPose* pose, void* cookie);
 	void EditPreviousNextWidgetCommon(BPoseView* poseView, bool next);
 	void CreateWidgets(BPoseView*);
-	bool TestLargeIconPixel(BPoint) const;
+
 			BRect				_IconRect(const BPoseView* poseView,
 									BPoint location) const;
 

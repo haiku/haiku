@@ -28,6 +28,15 @@
 #	define TRACE(x...)
 #endif
 
+/*! The raw movement calculation is calibrated on ths synaptics touchpad. */
+// increase the touchpad size a little bit
+#define SYN_AREA_TOP_LEFT_OFFSET	40
+#define SYN_AREA_BOTTOM_RIGHT_OFFSET	60
+#define SYN_AREA_START_X		(1472 - SYN_AREA_TOP_LEFT_OFFSET)
+#define SYN_AREA_END_X			(5472 + SYN_AREA_BOTTOM_RIGHT_OFFSET)
+#define SYN_AREA_START_Y		(1408 - SYN_AREA_TOP_LEFT_OFFSET)
+#define SYN_AREA_END_Y			(4448 + SYN_AREA_BOTTOM_RIGHT_OFFSET)
+
 // synaptics touchpad proportions
 #define SYN_EDGE_MOTION_WIDTH	50
 #define SYN_AREA_OFFSET			40
@@ -52,7 +61,7 @@ enum {
 	kTrackpointQuirk = 0x10
 };
 
-static hardware_specs gHardwareSpecs;
+static touchpad_specs gHardwareSpecs;
 
 
 const char* kSynapticsPath[4] = {
@@ -65,13 +74,6 @@ const char* kSynapticsPath[4] = {
 
 static touchpad_info sTouchpadInfo;
 static ps2_dev *sPassthroughDevice = &ps2_device[PS2_DEVICE_SYN_PASSTHROUGH];
-
-
-static void
-default_settings(touchpad_settings *set)
-{
-	memcpy(set, &kDefaultTouchpadSettings, sizeof(touchpad_settings));
-}
 
 
 static status_t
@@ -126,16 +128,17 @@ get_information_query(ps2_dev *dev, uint8 extendedQueries, uint8 query,
 
 
 static status_t
-get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
+get_synaptics_movment(synaptics_cookie *cookie, touchpad_movement *_event, bigtime_t timeout)
 {
 	status_t status;
-	touch_event event;
+	touchpad_movement event;
 	uint8 event_buffer[PS2_MAX_PACKET_SIZE];
 	uint8 wValue0, wValue1, wValue2, wValue3, wValue;
 	uint32 val32;
 	uint32 xTwelfBit, yTwelfBit;
 
-	status = acquire_sem_etc(cookie->synaptics_sem, 1, B_CAN_INTERRUPT, 0);
+	status = acquire_sem_etc(cookie->synaptics_sem, 1, B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT,
+		timeout);
 	if (status < B_OK)
 		return status;
 
@@ -164,7 +167,7 @@ get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
  		wValue = wValue | (wValue2 << 2);
  		wValue = wValue | (wValue3 << 3);
 
-	 	event.wValue = wValue;
+		event.fingerWidth = wValue;
 	 	event.gesture = false;
 
 		// Clickpad pretends that all clicks on the touchpad are middle clicks.
@@ -204,7 +207,7 @@ get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
  		bool finger = event_buffer[0] >> 5 & 1;
  		if (finger) {
  			// finger with normal width
- 			event.wValue = 4;
+			event.fingerWidth = 4;
  		}
  		event.gesture = event_buffer[0] >> 2 & 1;
  	}
@@ -222,9 +225,8 @@ get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
  	yTwelfBit = event_buffer[3] >> 5 & 1;
  	event.yPosition += yTwelfBit << 12;
 
- 	status = cookie->movementMaker.EventToMovement(&event, movement);
-
-	return status;
+	*_event = event;
+	return B_OK;
 }
 
 
@@ -460,15 +462,12 @@ synaptics_open(const char *name, uint32 flags, void **_cookie)
 		goto err1;
 	memset(cookie, 0, sizeof(*cookie));
 
-	cookie->movementMaker.Init();
 	*_cookie = cookie;
 
 	cookie->dev = dev;
 	dev->cookie = cookie;
 	dev->disconnect = &synaptics_disconnect;
 	dev->handle_int = &synaptics_handle_int;
-
-	default_settings(&cookie->settings);
 
 	gHardwareSpecs.edgeMotionWidth = SYN_EDGE_MOTION_WIDTH;
 
@@ -480,9 +479,6 @@ synaptics_open(const char *name, uint32 flags, void **_cookie)
 	gHardwareSpecs.minPressure = MIN_PRESSURE;
 	gHardwareSpecs.realMaxPressure = REAL_MAX_PRESSURE;
 	gHardwareSpecs.maxPressure = MAX_PRESSURE;
-
-	cookie->movementMaker.SetSettings(&cookie->settings);
-	cookie->movementMaker.SetSpecs(&gHardwareSpecs);
 
 	dev->packet_size = PS2_PACKET_SYNAPTICS;
 
@@ -567,7 +563,7 @@ synaptics_close(void *_cookie)
 	// without a complete shutdown.
 	status = ps2_reset_mouse(cookie->dev);
 	if (status != B_OK) {
-		INFO("ps2: reset failed\n");
+		INFO("ps2_synaptics: reset failed\n");
 		return B_ERROR;
 	}
 
@@ -607,29 +603,25 @@ status_t
 synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 {
 	synaptics_cookie *cookie = (synaptics_cookie*)_cookie;
-	mouse_movement movement;
+	touchpad_read read;
 	status_t status;
 
 	switch (op) {
-		case MS_READ:
-			if ((status = get_synaptics_movment(cookie, &movement)) != B_OK)
-				return status;
-			TRACE("SYNAPTICS: MS_READ get event\n");
-			return user_memcpy(buffer, &movement, sizeof(movement));
-
 		case MS_IS_TOUCHPAD:
 			TRACE("SYNAPTICS: MS_IS_TOUCHPAD\n");
-			return B_OK;
+			if (buffer == NULL)
+				return B_OK;
+			return user_memcpy(buffer, &gHardwareSpecs, sizeof(gHardwareSpecs));
 
-		case MS_SET_TOUCHPAD_SETTINGS:
-			TRACE("SYNAPTICS: MS_SET_TOUCHPAD_SETTINGS");
-			user_memcpy(&cookie->settings, buffer, sizeof(touchpad_settings));
-			return B_OK;
-
-		case MS_SET_CLICKSPEED:
-			TRACE("SYNAPTICS: ioctl MS_SETCLICK (set click speed)\n");
-			return user_memcpy(&cookie->movementMaker.click_speed, buffer,
-				sizeof(bigtime_t));
+		case MS_READ_TOUCHPAD:
+			TRACE("SYNAPTICS: MS_READ get event\n");
+			if (user_memcpy(&read.timeout, &(((touchpad_read*)buffer)->timeout),
+					sizeof(bigtime_t)) != B_OK)
+				return B_BAD_ADDRESS;
+			if ((status = get_synaptics_movment(cookie, &read.u.touchpad, read.timeout)) != B_OK)
+				return status;
+			read.event = MS_READ_TOUCHPAD;
+			return user_memcpy(buffer, &read, sizeof(read));
 
 		default:
 			TRACE("SYNAPTICS: unknown opcode: %" B_PRIu32 "\n", op);

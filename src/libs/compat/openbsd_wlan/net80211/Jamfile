@@ -1,0 +1,50 @@
+SubDir HAIKU_TOP src libs compat openbsd_wlan net80211 ;
+
+UseHeaders [ FDirName $(SUBDIR) .. ] : true ;
+UseHeaders [ FDirName $(SUBDIR) .. .. openbsd_network compat ] : true ;
+UseHeaders [ FDirName $(SUBDIR) .. .. freebsd_network ] : true ;
+UseHeaders [ FDirName $(SUBDIR) .. .. freebsd_network compat ] : true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 ]
+	-Wno-format -Wno-unused -Wno-uninitialized -Wno-pointer-sign -Wno-sign-compare ;
+SubDirC++Flags [ FDefines _KERNEL=1 ] -fpermissive ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) .. ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) .. crypto ] ;
+
+KernelStaticLibrary openbsd_wlan.a :
+	ieee80211_haiku.cpp
+
+	ieee80211.c
+	ieee80211_amrr.c
+	ieee80211_crypto.c
+	ieee80211_crypto_bip.c
+	ieee80211_crypto_ccmp.c
+	ieee80211_crypto_tkip.c
+	ieee80211_crypto_wep.c
+	ieee80211_input.c
+	ieee80211_ioctl.c
+	ieee80211_node.c
+	ieee80211_output.c
+	ieee80211_pae_input.c
+	ieee80211_pae_output.c
+	ieee80211_proto.c
+	ieee80211_ra.c
+	ieee80211_ra_vht.c
+	ieee80211_regdomain.c
+	ieee80211_rssadapt.c
+
+	aes.c
+	arc4.c
+	cmac.c
+	hmac.c
+	key_wrap.c
+	md5.c
+	michael.c
+	sha1.c
+	sha2.c
+
+	subr_tree.c
+;

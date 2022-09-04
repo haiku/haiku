@@ -8,7 +8,10 @@
 #include <sys/bus.h>
 
 
+HAIKU_DRIVER_REQUIREMENTS(FBSD_SWI_TASKQUEUE);
 HAIKU_FBSD_DRIVER_GLUE(attansic_l2, ae, pci)
+NO_HAIKU_CHECK_DISABLE_INTERRUPTS();
+NO_HAIKU_REENABLE_INTERRUPTS();
 
 extern driver_t *DRIVER_MODULE_NAME(ukphy, miibus);
 
@@ -22,8 +25,3 @@ __haiku_select_miibus_driver(device_t dev)
 
 	return __haiku_probe_miibus(dev, drivers);
 }
-
-NO_HAIKU_CHECK_DISABLE_INTERRUPTS();
-NO_HAIKU_REENABLE_INTERRUPTS();
-
-HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_FAST_TASKQUEUE | FBSD_SWI_TASKQUEUE);

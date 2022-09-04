@@ -32,7 +32,7 @@ static const float kEdgeBevelLightTint = 0.59;
 static const float kEdgeBevelShadowTint = 1.0735;
 static const float kHoverTintFactor = 0.85;
 
-static const float kButtonPopUpIndicatorWidth = 11;
+static const int32 kButtonPopUpIndicatorWidth = B_USE_ITEM_SPACING;
 
 
 HaikuControlLook::HaikuControlLook()
@@ -2449,7 +2449,7 @@ HaikuControlLook::GetBackgroundInsets(background_type backgroundType,
 		case B_BUTTON_WITH_POP_UP_BACKGROUND:
 			_left = 1;
 			_top = 1;
-			_right = 1 + kButtonPopUpIndicatorWidth;
+			_right = 1 + ComposeSpacing(kButtonPopUpIndicatorWidth);
 			_bottom = 1;
 			return;
 		case B_HORIZONTAL_SCROLL_BAR_BACKGROUND:
@@ -2839,7 +2839,7 @@ HaikuControlLook::_DrawFlatButtonBackground(BView* view, BRect& rect,
 
 	if (popupIndicator) {
 		BRect indicatorRect(rect);
-		rect.right -= kButtonPopUpIndicatorWidth;
+		rect.right -= ComposeSpacing(kButtonPopUpIndicatorWidth);
 		indicatorRect.left = rect.right + 3;
 			// 2 pixels for the separator
 
@@ -2962,7 +2962,7 @@ HaikuControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 
 	if (popupIndicator) {
 		BRect indicatorRect(rect);
-		rect.right -= kButtonPopUpIndicatorWidth;
+		rect.right -= ComposeSpacing(kButtonPopUpIndicatorWidth);
 		indicatorRect.left = rect.right + 3;
 			// 2 pixels for the separator
 
@@ -3006,19 +3006,20 @@ HaikuControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 	view->FillRect(rect, fillGradient);
 }
 
-
 void
 HaikuControlLook::_DrawPopUpMarker(BView* view, const BRect& rect,
 	const rgb_color& base, uint32 flags)
 {
 	BPoint center(roundf((rect.left + rect.right) / 2.0),
 		roundf((rect.top + rect.bottom) / 2.0));
+	const float metric = roundf(rect.Width() * 3.125f) / 10.0f,
+		offset = ceilf((metric * 0.2f) * 10.0f) / 10.0f;
 	BPoint triangle[3];
-	triangle[0] = center + BPoint(-2.5, -0.5);
-	triangle[1] = center + BPoint(2.5, -0.5);
-	triangle[2] = center + BPoint(0.0, 2.0);
+	triangle[0] = center + BPoint(-metric, -offset);
+	triangle[1] = center + BPoint(metric, -offset);
+	triangle[2] = center + BPoint(0.0, metric * 0.8f);
 
-	uint32 viewFlags = view->Flags();
+	const uint32 viewFlags = view->Flags();
 	view->SetFlags(viewFlags | B_SUBPIXEL_PRECISE);
 
 	rgb_color markColor;
@@ -3044,11 +3045,14 @@ HaikuControlLook::_DrawMenuFieldBackgroundOutside(BView* view, BRect& rect,
 		return;
 
 	if (popupIndicator) {
+		const float indicatorWidth = ComposeSpacing(kButtonPopUpIndicatorWidth);
+		const float spacing = (indicatorWidth <= 11.0f) ? 1.0f : roundf(indicatorWidth / 11.0f);
+
 		BRect leftRect(rect);
-		leftRect.right -= 10;
+		leftRect.right -= indicatorWidth - spacing;
 
 		BRect rightRect(rect);
-		rightRect.left = rightRect.right - 9;
+		rightRect.left = rightRect.right - (indicatorWidth - spacing * 2);
 
 		_DrawMenuFieldBackgroundInside(view, leftRect, updateRect,
 			leftTopRadius, 0.0f, leftBottomRadius, 0.0f, base, flags,
@@ -3063,10 +3067,10 @@ HaikuControlLook::_DrawMenuFieldBackgroundOutside(BView* view, BRect& rect,
 		// draw a line on the left of the popup frame
 		rgb_color bevelShadowColor = _BevelShadowColor(base, flags);
 		view->SetHighColor(bevelShadowColor);
-		BPoint leftTopCorner(floorf(rightRect.left - 1.0),
-			floorf(rightRect.top - 1.0));
-		BPoint leftBottomCorner(floorf(rightRect.left - 1.0),
-			floorf(rightRect.bottom + 1.0));
+		BPoint leftTopCorner(floorf(rightRect.left - spacing),
+			floorf(rightRect.top - spacing));
+		BPoint leftBottomCorner(floorf(rightRect.left - spacing),
+			floorf(rightRect.bottom + spacing));
 		view->StrokeLine(leftTopCorner, leftBottomCorner);
 
 		rect = leftRect;

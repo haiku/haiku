@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2017-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef LOGGER_H
@@ -14,6 +14,9 @@
 #include <stdlib.h>
 
 
+#define MILLIS_IN_DAY (1000 * 60 * 60 * 24)
+
+
 // These macros allow for standardized logging to be output.
 // The use of macros in this way means that the use of the log is concise where
 // it is used and also because the macro unwraps to a block contained with a
@@ -23,7 +26,11 @@
 // conditional clauses in the code to prevent this otherwise would be
 // cumbersome.
 
-#define HDLOGPREFIX(L) printf("{%c} ", toupper(Logger::NameForLevel(L)[0]));
+#define HDLOGPREFIX(L) printf("@%08" B_PRId64 " {%c} <t:%" B_PRId32 "> ", \
+	((system_time() / 1000) % MILLIS_IN_DAY), \
+	toupper(Logger::NameForLevel(L)[0]), \
+	abs(find_thread(NULL) % 1000) \
+);
 
 #define HDLOG(L, M...) do { if (Logger::IsLevelEnabled(L)) { \
 	HDLOGPREFIX(L) \

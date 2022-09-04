@@ -6,9 +6,9 @@ BootstrapPackageRepository HaikuPortsCross
 	noto-20170202-7
 	:
 	# repository architecture packages (stage 0)
-	gcc_bootstrap-11.2.0_2021_07_28-3
-	gcc_bootstrap_syslibs-11.2.0_2021_07_28-3
-	gcc_bootstrap_syslibs_devel-11.2.0_2021_07_28-3
+	gcc_bootstrap-11.2.0_2021_07_28-5
+	gcc_bootstrap_syslibs-11.2.0_2021_07_28-5
+	gcc_bootstrap_syslibs_devel-11.2.0_2021_07_28-5
 	:
 	# repository architecture packages (stage 1)
 	bash_bootstrap-4.4.023-1
@@ -28,11 +28,12 @@ BootstrapPackageRepository HaikuPortsCross
 	icu_bootstrap-67.1-2
 	icu_bootstrap_devel-67.1-2
 	less_bootstrap-451-1
+	libffi_bootstrap-3.3-1
 	m4_bootstrap-1.4.16-1
 	make_bootstrap-4.3-1
 	ncurses6_bootstrap-6.2-1
 	ncurses6_bootstrap_devel-6.2-1
-	python_bootstrap-2.7.6-1
+	python_bootstrap-3.9.1-1
 	sed_bootstrap-4.2.1-1
 	texinfo_bootstrap-4.13a-1
 	zstd_bootstrap-1.5.0-2
@@ -59,6 +60,7 @@ BootstrapPackageRepository HaikuPortsCross
 	grep_bootstrap
 	less_bootstrap
 	libsolv_bootstrap
+	libffi_bootstrap
 	m4_bootstrap
 	make_bootstrap
 	ncurses6_bootstrap

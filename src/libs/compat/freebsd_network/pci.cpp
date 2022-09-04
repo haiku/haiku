@@ -236,47 +236,28 @@ pci_enable_io(device_t dev, int space)
 int
 pci_find_cap(device_t dev, int capability, int *capreg)
 {
-	return pci_find_extcap(dev, capability, capreg);
+	pci_info* info = get_device_pci_info(dev);
+	uint8 offset;
+	status_t status;
+
+	status = gPci->find_pci_capability(info->bus, info->device, info->function,
+		capability, &offset);
+	*capreg = offset;
+	return status;
 }
 
 
 int
-pci_find_extcap(device_t child, int capability, int *_capabilityRegister)
+pci_find_extcap(device_t dev, int capability, int *capreg)
 {
-	uint8 capabilityPointer;
-	uint8 headerType;
-	uint16 status;
+	pci_info* info = get_device_pci_info(dev);
+	uint16 offset;
+	status_t status;
 
-	status = pci_read_config(child, PCIR_STATUS, 2);
-	if ((status & PCIM_STATUS_CAPPRESENT) == 0)
-		return ENXIO;
-
-	headerType = pci_read_config(child, PCI_header_type, 1);
-	switch (headerType & PCIM_HDRTYPE) {
-		case 0:
-		case 1:
-			capabilityPointer = PCIR_CAP_PTR;
-			break;
-		case 2:
-			capabilityPointer = PCIR_CAP_PTR_2;
-			break;
-		default:
-			return ENXIO;
-	}
-	capabilityPointer = pci_read_config(child, capabilityPointer, 1);
-
-	while (capabilityPointer != 0) {
-		if (pci_read_config(child, capabilityPointer + PCICAP_ID, 1)
-				== capability) {
-			if (_capabilityRegister != NULL)
-				*_capabilityRegister = capabilityPointer;
-			return 0;
-		}
-		capabilityPointer = pci_read_config(child,
-			capabilityPointer + PCICAP_NEXTPTR, 1);
-	}
-
-	return ENOENT;
+	status = gPci->find_pci_extended_capability(info->bus, info->device, info->function,
+		capability, &offset);
+	*capreg = offset;
+	return status;
 }
 
 

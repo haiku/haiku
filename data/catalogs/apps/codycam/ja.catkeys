@@ -84,5 +84,5 @@ Error creating output file	VideoConsumer.cpp		ファイルの出力に失敗し�
 Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		ビデオソースが見つかりません。\nCodyCam には webcam が必要です。
 Logging in…	VideoConsumer.cpp		ログイン中...
 CodyCam	System name		CodyCam
-Error writing output file	VideoConsumer.cpp		ファイルの書き込みに失敗した
+Error writing output file	VideoConsumer.cpp		ファイルの書き込みに失敗しました
 Capture controls	CodyCam		キャプチャ制御

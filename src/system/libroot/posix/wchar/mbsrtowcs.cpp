@@ -20,22 +20,25 @@
 #endif
 
 
-using BPrivate::Libroot::gLocaleBackend;
+using BPrivate::Libroot::GetCurrentLocaleBackend;
+using BPrivate::Libroot::LocaleBackend;
 
 
 extern "C" size_t
 __mbsnrtowcs(wchar_t* dst, const char** src, size_t nmc, size_t len,
 	mbstate_t* ps)
 {
+	LocaleBackend* backend = GetCurrentLocaleBackend();
+
 	TRACE(("mbsnrtowcs(%p, %p, %lu, %lu) - lb:%p\n", dst, *src, nmc, len,
-		gLocaleBackend));
+		backend));
 
 	if (ps == NULL) {
 		static mbstate_t internalMbState;
 		ps = &internalMbState;
 	}
 
-	if (gLocaleBackend == NULL) {
+	if (backend == NULL) {
 		/*
 		 * The POSIX locale is active. Since the POSIX locale only contains
 		 * chars 0-127 and those ASCII chars are compatible with the UTF32
@@ -82,7 +85,7 @@ __mbsnrtowcs(wchar_t* dst, const char** src, size_t nmc, size_t len,
 	}
 
 	size_t result = 0;
-	status_t status = gLocaleBackend->MultibyteStringToWchar(dst, len, src, nmc,
+	status_t status = backend->MultibyteStringToWchar(dst, len, src, nmc,
 		ps, result);
 
 	if (status == B_BAD_DATA) {
@@ -112,7 +115,8 @@ __mbsrtowcs(wchar_t* dst, const char** src, size_t len, mbstate_t* ps)
 		ps = &internalMbState;
 	}
 
-	size_t srcLen = gLocaleBackend == NULL ? strlen(*src) + 1 : (size_t)-1;
+	LocaleBackend* backend = GetCurrentLocaleBackend();
+	size_t srcLen = backend == NULL ? strlen(*src) + 1 : (size_t)-1;
 
 	return __mbsnrtowcs(dst, src, srcLen, len, ps);
 }

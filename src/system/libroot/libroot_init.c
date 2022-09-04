@@ -62,7 +62,7 @@ initialize_before(image_id imageID)
 	}
 
 	__libc_argc = __gRuntimeLoader->program_args->arg_count;
-	__libc_argv = __gRuntimeLoader->program_args->args;
+	__libc_argv = argv_save = __gRuntimeLoader->program_args->args;
 
 	__gRuntimeLoader->call_atexit_hooks_for_range
 		= _call_atexit_hooks_for_range;
@@ -70,7 +70,7 @@ initialize_before(image_id imageID)
 	if (__gRuntimeLoader->program_args->umask != (mode_t)-1)
 		umask(__gRuntimeLoader->program_args->umask);
 
-	pthread_self()->id = find_thread(NULL);
+	__main_thread_id = pthread_self()->id = find_thread(NULL);
 
 	get_system_info(&info);
 	__gCPUCount = info.cpu_count;

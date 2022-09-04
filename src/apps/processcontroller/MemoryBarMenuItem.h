@@ -6,12 +6,10 @@
 #define _MEMORY_BAR_MENU_ITEM_H_
 
 
-#include <MenuItem.h>
-
-class BBitmap;
+#include "IconMenuItem.h"
 
 
-class MemoryBarMenuItem : public BMenuItem {
+class MemoryBarMenuItem : public IconMenuItem {
 	public:
 						MemoryBarMenuItem(const char *label, team_id team,
 							BBitmap* icon, bool deleteIcon, BMessage* message);
@@ -20,7 +18,6 @@ class MemoryBarMenuItem : public BMenuItem {
 		virtual	void	DrawContent();
 		virtual	void	GetContentSize(float* _width, float* _height);
 
-		void			DrawIcon();
 		void			DrawBar(bool force);
 		int				UpdateSituation(int64 committedMemory);
 		void			BarUpdate();
@@ -36,10 +33,8 @@ class MemoryBarMenuItem : public BMenuItem {
 		int64			fLastWrite;
 		int64			fLastAll;
 		team_id			fTeamID;
-		BBitmap*		fIcon;
 		double			fGrenze1;
 		double			fGrenze2;
-		bool			fDeleteIcon;
 };
 
 #endif // _MEMORY_BAR_MENU_ITEM_H_

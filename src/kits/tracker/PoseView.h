@@ -72,9 +72,6 @@ class EntryListBase;
 class TScrollBar;
 
 
-const int32 kSmallStep = 10;
-const int32 kListOffset = 20;
-
 const uint32 kMiniIconMode = 'Tmic';
 const uint32 kIconMode = 'Ticn';
 const uint32 kListMode = 'Tlst';
@@ -201,11 +198,13 @@ public:
 		// returns height, descent, etc.
 	float FontHeight() const;
 	float ListElemHeight() const;
+	float ListOffset() const;
 
 	void SetIconPoseHeight();
 	float IconPoseHeight() const;
+	uint32 UnscaledIconSizeInt() const;
 	uint32 IconSizeInt() const;
-	icon_size IconSize() const;
+	BSize IconSize() const;
 
 	BRect Extent() const;
 	void GetLayoutInfo(uint32 viewMode, BPoint* grid,
@@ -677,7 +676,6 @@ private:
 	void DrawOpenAnimation(BRect);
 
 	void MoveSelectionOrEntryToTrash(const entry_ref* ref, bool selectNext);
-	void _ResetStartOffset();
 
 protected:
 	struct node_ref_key {
@@ -732,6 +730,7 @@ protected:
 	bool fStateNeedsSaving;
 	BCountView* fCountView;
 	float fListElemHeight;
+	float fListOffset;
 	float fIconPoseHeight;
 	BPose* fDropTarget;
 	BPose* fAlreadySelectedDropTarget;
@@ -813,6 +812,10 @@ protected:
 	BTextWidget* fTextWidgetToCheck;
 	BTextWidget* fActiveTextWidget;
 
+private:
+	mutable uint32 fCachedIconSizeFrom;
+	mutable BSize fCachedIconSize;
+
 	typedef BView _inherited;
 };
 
@@ -876,6 +879,13 @@ BPoseView::ListElemHeight() const
 
 
 inline float
+BPoseView::ListOffset() const
+{
+	return fListOffset;
+}
+
+
+inline float
 BPoseView::IconPoseHeight() const
 {
 	return fIconPoseHeight;
@@ -883,16 +893,16 @@ BPoseView::IconPoseHeight() const
 
 
 inline uint32
-BPoseView::IconSizeInt() const
+BPoseView::UnscaledIconSizeInt() const
 {
 	return fViewState->IconSize();
 }
 
 
-inline icon_size
-BPoseView::IconSize() const
+inline uint32
+BPoseView::IconSizeInt() const
 {
-	return (icon_size)fViewState->IconSize();
+	return IconSize().IntegerWidth() + 1;
 }
 
 
@@ -1074,7 +1084,7 @@ BPoseView::CountColumns() const
 inline float
 BPoseView::StartOffset() const
 {
-	return kListOffset + ListIconSize() + kMiniIconSeparator + 1;
+	return fListOffset + ListIconSize() + kMiniIconSeparator + 1;
 }
 
 

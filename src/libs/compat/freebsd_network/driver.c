@@ -310,6 +310,9 @@ _fbsd_init_drivers()
 	if (status < B_OK)
 		goto err6;
 
+	// Always hold the giant lock during attach.
+	mtx_lock(&Giant);
+
 	for (int p = 0; sProbedDevices[p].bus != BUS_INVALID; p++) {
 		device_t root, device = NULL;
 		status = init_root_device(&root, sProbedDevices[p].bus);
@@ -340,6 +343,8 @@ _fbsd_init_drivers()
 		} else
 			device_delete_child(NULL, root);
 	}
+
+	mtx_unlock(&Giant);
 
 	if (gDeviceCount > 0)
 		return B_OK;

@@ -27,16 +27,14 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		MergeObject <$(architecture)>posix_main.o :
 			assert.cpp
+			cat.cpp
 			dlfcn.c
 			dirent.c
 			errno.c
 			fcntl.cpp
-			fts.c
-			ftw.c
 			glob.c
 			inttypes.c
 			libgen.cpp
-			nftw.c
 			poll.cpp
 			$(PWD_BACKEND)
 			scheduler.cpp

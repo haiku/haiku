@@ -216,8 +216,8 @@ Empty Trash	ContainerWindow		Ištuštinti šiukšlinę
 no supporting apps	OpenWithWindow		palaikančių programų nėra
 Preparing to empty Trash…	StatusWindow		Ruošiamasi tuštinti Šiukšlinę…
 Deleting: 	StatusWindow		Šalinama:
-You can't move or copy the trash.	FSUtils		Šiukšlinės negalima nei perkelti, nei nukopijuoti.
 label too long	PoseView		vardas per ilgas
+You can't move or copy the trash.	FSUtils		Šiukšlinės negalima nei perkelti, nei nukopijuoti.
 Error creating link to \"%name\".	FSUtils		Klaida kuriant nuorodą į „%name“.
 Unknown	FilePermissionsView		Nežinomas
 Paste links	ContainerWindow		Įdėti nuorodas
@@ -256,8 +256,8 @@ of %items	StatusWindow		iš %items
 less than	FindPanel		mažesnis nei
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Klaida kopijuojant failą „%name“:\n\t%error\n\nAr norite tęsti?
 Creating links: 	StatusWindow		Kuriamos nuorodos:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Failo „%document“ nepavyko atverti programa „%app“ (%error).
 Create %s clipping	PoseView		Sukurti „%s“ tipo iškarpą
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Failo „%document“ nepavyko atverti programa „%app“ (%error).
 Error moving \"%name\"	FSUtils		Klaida perkeliant „%name“
 To: %dir	StatusWindow		Į: %dir
 Paste layout	ContainerWindow		Pritaikyti nukopijuotą išdėstymą
@@ -391,8 +391,8 @@ Add-ons	FilePanelPriv		Priedai
 96 x 96	DeskWindow		96×96
 Empty folder	SlowContextPopup		Tuščias aplankas
 Move to Trash	FSUtils		Išmesti Šiukšlinėn
-Handles %type	OpenWithWindow		Palaiko %type
 Cancel	PoseView		Atsisakyti
+Handles %type	OpenWithWindow		Palaiko %type
 Delete	PoseView		Šalinti
 Sorry, you can't copy items to the Trash.	PoseView		Deja, Šiukšlinėn objektų kopijuoti neleidžiama.
 New folder	FilePanelPriv		Naujas aplankas

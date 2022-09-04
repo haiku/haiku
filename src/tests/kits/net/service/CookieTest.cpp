@@ -11,7 +11,7 @@
 #include <cstring>
 #include <cstdio>
 
-#include <NetworkKit.h>
+#include <NetworkCookieJar.h>
 
 #include <cppunit/TestCaller.h>
 #include <cppunit/TestSuite.h>
@@ -761,7 +761,7 @@ CookieTest::ExplodeTest()
 		{ "; domain=example.com", "http://www.example.com/path/path",
 			{  false,   "name",  "value", "www.example.com", "/path",   false,   false,   true,   BDateTime() } }
 	};
-	
+
 	BNetworkCookie cookie;
 
 	for (uint32 i = 0; i < (sizeof(tests) / sizeof(Test)); i++) {

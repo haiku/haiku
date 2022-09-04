@@ -552,7 +552,7 @@ static void
 etherpci_min(etherpci_private_t *data, unsigned char *dst,
 	unsigned src, unsigned len)
 {
-	int i;
+	unsigned int i;
 
 	if (len & 1)
 		len++;
@@ -584,7 +584,7 @@ static void
 etherpci_mout(etherpci_private_t *data, unsigned dst,
 	const unsigned char *src, unsigned len)
 {
-	int i;
+	unsigned int i;
 	int tries = 1;
 
 	// This loop is for a bug that showed up with the old ISA 3com cards
@@ -688,7 +688,7 @@ ringzero(etherpci_private_t *data, unsigned boundary,
 static int
 probe(etherpci_private_t *data)
 {
-	int i;
+	unsigned int i;
 	int reg;
 	unsigned char test[EC_PAGE_SIZE];
 	short waddr[ETHER_ADDR_LEN];
@@ -1160,7 +1160,7 @@ copy_packet(etherpci_private_t *data, unsigned char *ether_buf,
 static int
 my_packet(etherpci_private_t *data, char *addr)
 {
-	int i;
+	unsigned int i;
 	const char broadcast[6] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
 	if (memcmp(addr, &data->myaddr, sizeof(data->myaddr)) == 0

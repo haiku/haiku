@@ -60,6 +60,7 @@ virtual	status_t					Power(bool enabled);
 virtual	status_t					GetEDID(edid1_info* edid,
 										bool forceRead = false);
 virtual	status_t					SetupI2c(struct i2c_bus *bus);
+virtual status_t					SetupI2cFallback(struct i2c_bus *bus);
 
 virtual	status_t					GetPLLLimits(pll_limits& limits);
 
@@ -77,7 +78,8 @@ static	status_t					_SetI2CSignals(void* cookie, int clock,
 										int data);
 		bool						_IsPortInVBT(uint32* foundIndex = NULL);
 		bool						_IsDisplayPortInVBT();
-		bool						_IsInternalPanelPort();
+		bool						_IsHdmiInVBT();
+		bool						_IsEDPPort();
 		status_t					_SetupDpAuxI2c(struct i2c_bus *bus);
 
 		ssize_t						_DpAuxTransfer(dp_aux_msg* message);
@@ -231,6 +233,7 @@ virtual	status_t					Power(bool enabled);
 
 virtual	status_t					SetPipe(Pipe* pipe);
 virtual	status_t					SetupI2c(i2c_bus *bus);
+virtual status_t					SetupI2cFallback(struct i2c_bus *bus);
 
 virtual	bool						IsConnected();
 

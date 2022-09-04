@@ -7,9 +7,8 @@
 #include "EntryCache.h"
 
 #include <new>
+#include <vm/vm.h>
 
-
-static const int32 kEntriesPerGeneration = 1024;
 
 static const int32 kEntryNotInArray = -1;
 static const int32 kEntryRemoved = -2;
@@ -33,14 +32,14 @@ EntryCacheGeneration::~EntryCacheGeneration()
 
 
 status_t
-EntryCacheGeneration::Init()
+EntryCacheGeneration::Init(int32 entriesSize)
 {
-	entries = new(std::nothrow) EntryCacheEntry*[kEntriesPerGeneration];
+	entries_size = entriesSize;
+	entries = new(std::nothrow) EntryCacheEntry*[entries_size];
 	if (entries == NULL)
 		return B_NO_MEMORY;
 
-	memset(entries, 0, sizeof(EntryCacheEntry*) * kEntriesPerGeneration);
-
+	memset(entries, 0, sizeof(EntryCacheEntry*) * entries_size);
 	return B_OK;
 }
 
@@ -50,6 +49,8 @@ EntryCacheGeneration::Init()
 
 EntryCache::EntryCache()
 	:
+	fGenerationCount(0),
+	fGenerations(NULL),
 	fCurrentGeneration(0)
 {
 	rw_lock_init(&fLock, "entry cache");
@@ -67,6 +68,7 @@ EntryCache::~EntryCache()
 		free(entry);
 		entry = next;
 	}
+	delete[] fGenerations;
 
 	rw_lock_destroy(&fLock);
 }
@@ -79,8 +81,19 @@ EntryCache::Init()
 	if (error != B_OK)
 		return error;
 
-	for (int32 i = 0; i < kGenerationCount; i++) {
-		error = fGenerations[i].Init();
+	int32 entriesSize = 1024;
+	fGenerationCount = 8;
+
+	// TODO: Choose generation size/count more scientifically?
+	// TODO: Add low_resource handler hook?
+	if (vm_available_memory() >= (1024*1024*1024)) {
+		entriesSize = 8096;
+		fGenerationCount = 16;
+	}
+
+	fGenerations = new(std::nothrow) EntryCacheGeneration[fGenerationCount];
+	for (int32 i = 0; i < fGenerationCount; i++) {
+		error = fGenerations[i].Init(entriesSize);
 		if (error != B_OK)
 			return error;
 	}
@@ -95,6 +108,9 @@ EntryCache::Add(ino_t dirID, const char* name, ino_t nodeID, bool missing)
 	EntryCacheKey key(dirID, name);
 
 	WriteLocker _(fLock);
+
+	if (fGenerationCount == 0)
+		return B_NO_MEMORY;
 
 	EntryCacheEntry* entry = fEntries.Lookup(key);
 	if (entry != NULL) {
@@ -168,8 +184,8 @@ EntryCache::Lookup(ino_t dirID, const char* name, ino_t& _nodeID,
 	if (entry == NULL)
 		return false;
 
-	int32 oldGeneration = atomic_get_and_set(&entry->generation,
-			fCurrentGeneration);
+	const int32 oldGeneration = atomic_get_and_set(&entry->generation,
+		fCurrentGeneration);
 	if (oldGeneration == fCurrentGeneration || entry->index < 0) {
 		// The entry is already in the current generation or is being moved to
 		// it by another thread.
@@ -183,8 +199,8 @@ EntryCache::Lookup(ino_t dirID, const char* name, ino_t& _nodeID,
 	entry->index = kEntryNotInArray;
 
 	// add to the current generation
-	int32 index = atomic_add(&fGenerations[oldGeneration].next_index, 1);
-	if (index < kEntriesPerGeneration) {
+	const int32 index = atomic_add(&fGenerations[fCurrentGeneration].next_index, 1);
+	if (index < fGenerations[fCurrentGeneration].entries_size) {
 		fGenerations[fCurrentGeneration].entries[index] = entry;
 		entry->index = index;
 		_nodeID = entry->node_id;
@@ -230,9 +246,11 @@ EntryCache::DebugReverseLookup(ino_t nodeID, ino_t& _dirID)
 void
 EntryCache::_AddEntryToCurrentGeneration(EntryCacheEntry* entry)
 {
+	ASSERT_WRITE_LOCKED_RW_LOCK(&fLock);
+
 	// the generation might not be full yet
 	int32 index = fGenerations[fCurrentGeneration].next_index++;
-	if (index < kEntriesPerGeneration) {
+	if (index < fGenerations[fCurrentGeneration].entries_size) {
 		fGenerations[fCurrentGeneration].entries[index] = entry;
 		entry->generation = fCurrentGeneration;
 		entry->index = index;
@@ -240,8 +258,8 @@ EntryCache::_AddEntryToCurrentGeneration(EntryCacheEntry* entry)
 	}
 
 	// we have to clear the oldest generation
-	int32 newGeneration = (fCurrentGeneration + 1) % kGenerationCount;
-	for (int32 i = 0; i < kEntriesPerGeneration; i++) {
+	const int32 newGeneration = (fCurrentGeneration + 1) % fGenerationCount;
+	for (int32 i = 0; i < fGenerations[newGeneration].entries_size; i++) {
 		EntryCacheEntry* otherEntry = fGenerations[newGeneration].entries[i];
 		if (otherEntry == NULL)
 			continue;
@@ -253,8 +271,8 @@ EntryCache::_AddEntryToCurrentGeneration(EntryCacheEntry* entry)
 
 	// set the new generation and add the entry
 	fCurrentGeneration = newGeneration;
-	fGenerations[newGeneration].next_index = 1;
 	fGenerations[newGeneration].entries[0] = entry;
+	fGenerations[newGeneration].next_index = 1;
 	entry->generation = newGeneration;
 	entry->index = 0;
 }

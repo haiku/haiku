@@ -313,6 +313,8 @@ protected:
 
 	PiggybackTaskLoop* fTaskLoop;
 
+	bool fStateNeedsSaving;
+
 	bool fIsTrash;
 	bool fInTrash;
 	bool fIsPrinters;
@@ -334,7 +336,6 @@ private:
 	BObjectList<BString>* fCachedTypesList;
 	bool fWaitingForRefs;
 
-	bool fStateNeedsSaving;
 	bool fSaveStateIsEnabled;
 
 	bool fIsWatchingPath;

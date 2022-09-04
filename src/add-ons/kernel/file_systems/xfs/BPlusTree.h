@@ -34,13 +34,35 @@ struct LongBlock {
 			TreePointer			Right()
 								{ return B_BENDIAN_TO_HOST_INT64(bb_rightsib); }
 
+			uint64				Blockno()
+								{ return B_BENDIAN_TO_HOST_INT64(bb_blkno); }
+
+			uint64				Lsn()
+								{ return B_BENDIAN_TO_HOST_INT64(bb_lsn); }
+
+			uuid_t*				Uuid()
+								{ return &bb_uuid; }
+
+			uint64				Owner()
+								{ return B_BENDIAN_TO_HOST_INT64(bb_owner); }
+
 			uint32				bb_magic;
 			uint16				bb_level;
 			uint16				bb_numrecs;
 			uint64				bb_leftsib;
 			uint64				bb_rightsib;
+
+			// Version 5 fields start here
+
+			uint64				bb_blkno;
+			uint64				bb_lsn;
+			uuid_t				bb_uuid;
+			uint64				bb_owner;
+			uint32				bb_crc;
+			uint32				bb_pad;
 };
 
+#define XFS_LBLOCK_CRC_OFF offsetof(struct LongBlock, bb_crc)
 
 /* We have an array of extent records in
  * the leaf node along with above headers
@@ -82,15 +104,16 @@ public:
 									xfs_ino_t* ino);
 			status_t			Lookup(const char* name, size_t length,
 									xfs_ino_t* id);
+			bool				VerifyBlockHeader(LongBlock* header, char* buffer);
 			int					EntrySize(int len) const;
-			int					BlockLen();
+			uint32				BlockLen();
 			size_t				PtrSize();
 			size_t				KeySize();
 			TreeKey*			GetKeyFromNode(int pos, void* buffer);
 			TreePointer*		GetPtrFromNode(int pos, void* buffer);
 			TreeKey*			GetKeyFromRoot(int pos);
 			TreePointer*		GetPtrFromRoot(int pos);
-			status_t			SearchMapInAllExtent(int blockNo,
+			status_t			SearchMapInAllExtent(uint64 blockNo,
 									uint32& mapIndex);
 			status_t			GetAllExtents();
 			size_t				MaxRecordsPossibleRoot();
@@ -105,7 +128,7 @@ public:
 			status_t			SearchAndFillPath(uint32 offset, int type);
 			status_t			SearchOffsetInTreeNode (uint32 offset,
 									TreePointer** pointer, int pathIndex);
-			void				SearchForMapInDirectoryBlock (int blockNo,
+			void				SearchForMapInDirectoryBlock (uint64 blockNo,
 									int entries, ExtentMapEntry** map,
 									int type, int pathIndex);
 			uint32				SearchForHashInNodeBlock(uint32 hashVal);
@@ -126,6 +149,5 @@ private:
 			PathNode			fPathForLeaves[MAX_TREE_DEPTH];
 			PathNode			fPathForData[MAX_TREE_DEPTH];
 };
-
 
 #endif

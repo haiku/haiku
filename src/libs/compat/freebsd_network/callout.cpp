@@ -52,12 +52,12 @@ callout_thread(void* /*data*/)
 				if (c == NULL)
 					break;
 
-				if (c->due < system_time()) {
+				if (c->c_due < system_time()) {
 					struct mtx *mutex = c->c_mtx;
 
 					// execute timer
 					list_remove_item(&sTimers, c);
-					c->due = -1;
+					c->c_due = -1;
 					sCurrentCallout = c;
 
 					mutex_unlock(&sLock);
@@ -79,8 +79,8 @@ callout_thread(void* /*data*/)
 						// restart scanning as we unlocked the list
 				} else {
 					// calculate new timeout
-					if (c->due < timeout)
-						timeout = c->due;
+					if (c->c_due < timeout)
+						timeout = c->c_due;
 				}
 			}
 
@@ -164,8 +164,7 @@ callout_init(struct callout *callout, int mpsafe)
 void
 callout_init_mtx(struct callout *c, struct mtx *mtx, int flags)
 {
-	c->due = 0;
-	c->flags = 0;
+	c->c_due = 0;
 
 	c->c_arg = NULL;
 	c->c_func = NULL;
@@ -186,15 +185,15 @@ callout_reset(struct callout *c, int _ticks, void (*func)(void *), void *arg)
 
 	TRACE("callout_reset %p, func %p, arg %p\n", c, c->c_func, c->c_arg);
 
-	if (ticks >= 0) {
+	if (_ticks >= 0) {
 		// reschedule or add this timer
-		if (c->due <= 0)
+		if (c->c_due <= 0)
 			list_add_item(&sTimers, c);
 
-		c->due = system_time() + TICKS_2_USEC(_ticks);
+		c->c_due = system_time() + TICKS_2_USEC(_ticks);
 
 		// notify timer about the change if necessary
-		if (sTimeout > c->due)
+		if (sTimeout > c->c_due)
 			release_sem(sWaitSem);
 	}
 
@@ -219,9 +218,6 @@ _callout_stop_safe(struct callout *c, int safe)
 
 	MutexLocker locker(sLock);
 
-	if (c->due <= 0)
-		return -1;
-
 	if (callout_active(c)) {
 		if (safe) {
 			locker.Unlock();
@@ -231,9 +227,12 @@ _callout_stop_safe(struct callout *c, int safe)
 		return 0;
 	}
 
+	if (c->c_due <= 0)
+		return -1;
+
 	// this timer is scheduled, cancel it
 	list_remove_item(&sTimers, c);
-	c->due = 0;
+	c->c_due = 0;
 	return 1;
 }
 
@@ -241,7 +240,7 @@ _callout_stop_safe(struct callout *c, int safe)
 int
 callout_pending(struct callout *c)
 {
-	return c->due > 0;
+	return c->c_due > 0;
 }
 
 

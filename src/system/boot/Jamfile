@@ -306,6 +306,8 @@ for platform in [ MultiBootSubDirSetup ] {
 
 		BootMergeObject boot_libroot_$(platform:G=).o :
 			abs.c
+			ctype_loc.cpp
+			ctype_l.cpp
 			ctype.cpp
 			LocaleData.cpp
 			qsort.c
@@ -348,7 +350,7 @@ for platform in [ MultiBootSubDirSetup ] {
 		# efi loader needs to be shared.
 		if $(TARGET_BOOT_PLATFORM) = efi {
 			ldflags += -shared ;
-			ldflags += -Map=$(HAIKU_OUTPUT_DIR)/efi.map ;
+			ldflags += -Map=$(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET)/efi.map ;
 		}
 
 		if $(TARGET_BOOT_PLATFORM) = riscv {

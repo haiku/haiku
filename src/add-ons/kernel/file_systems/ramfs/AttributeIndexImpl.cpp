@@ -259,7 +259,7 @@ AttributeIndexImpl::Changed(Attribute *attribute, const uint8 *oldKey,
 			}
 		}
 		// re-insert the attribute
-		if (fKeyLength > 0 && attribute->GetSize() != fKeyLength) {
+		if (fKeyLength > 0 && attribute->GetSize() != (off_t)fKeyLength) {
 			attribute->SetIndex(this, false);
 		} else {
 			error = fAttributes->Insert(attribute);

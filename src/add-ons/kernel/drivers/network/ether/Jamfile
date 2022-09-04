@@ -7,6 +7,7 @@ HaikuSubInclude virtio ;
 HaikuSubInclude usb_asix ;
 HaikuSubInclude usb_davicom ;
 HaikuSubInclude usb_ecm ;
+HaikuSubInclude usb_rndis ;
 HaikuSubInclude wb840 ;
 
 # FreeBSD 12 drivers

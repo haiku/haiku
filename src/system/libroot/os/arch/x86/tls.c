@@ -5,11 +5,6 @@
  */
 
 
-// we don't want to have the inline assembly included here
-#ifndef _NO_INLINE_ASM
-#	define _NO_INLINE_ASM 1
-#endif
-
 #include <runtime_loader/runtime_loader.h>
 
 #include "support/TLS.h"

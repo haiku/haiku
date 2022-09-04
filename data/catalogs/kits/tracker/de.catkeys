@@ -281,9 +281,9 @@ no supporting apps	OpenWithWindow		keine unterstützenden Anwendungen
 32-bit unsigned integer	AttributesView		Integer 32-bit, vorzeichenlos
 Preparing to empty Trash…	StatusWindow		Leeren des Papierkorbs wird vorbereitet …
 Deleting: 	StatusWindow		Löschen:
+label too long	PoseView		Beschriftung zu lang
 the MIME settings	FSUtils		die MIME-Einstellungen
 You can't move or copy the trash.	FSUtils		Der Papierkorb kann nicht verschoben oder kopiert werden.
-label too long	PoseView		Beschriftung zu lang
 Error creating link to \"%name\".	FSUtils		Fehler beim Erstellen der Verknüpfung zu \"%name\".
 Unknown	FilePermissionsView		Unbekannt
 Paste links	ContainerWindow		Verknüpfungen einfügen
@@ -330,8 +330,8 @@ MIME Path	AttributesView		MIME Pfad
 less than	FindPanel		kleiner als
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fehler beim Kopieren der Datei \"%name\":\n\t%error\n\nSoll fortgefahren werden?
 Creating links: 	StatusWindow		Erstelle Verknüpfungen:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (%error).
 Create %s clipping	PoseView		Erzeuge %s Ausschnitt
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" konnte nicht mit der Anwendung \"%app\" geöffnet werden (%error).
 Error moving \"%name\"	FSUtils		Fehler beim Verschieben von \"%name\"
 To: %dir	StatusWindow		Nach: %dir
 Paste layout	ContainerWindow		Anordnung einfügen
@@ -503,8 +503,8 @@ Add-ons	FilePanelPriv		Add-ons
 Empty folder	SlowContextPopup		Leerer Ordner
 Alignment	AttributesView		Ausrichtung
 Move to Trash	FSUtils		In Papierkorb verschieben
-Handles %type	OpenWithWindow		Geeignet für %type
 Cancel	PoseView		Abbrechen
+Handles %type	OpenWithWindow		Geeignet für %type
 Delete	PoseView		Löschen
 Media parameter	AttributesView		Media-Parameter
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Wird der Home-Ordner geändert, kann es sein dass %osName nicht mehr richtig funktioniert!\n\nTrotzdem ändern?\n\nUm den Home-Ordner trotzdem zu ändern, Shift-Taste gedrückt halten und \"Ich bin sicher\" klicken.

@@ -162,23 +162,6 @@ net_socket_private::RemoveFromParent()
 //	#pragma mark -
 
 
-static size_t
-compute_user_iovec_length(iovec* userVec, uint32 count)
-{
-	size_t length = 0;
-
-	for (uint32 i = 0; i < count; i++) {
-		iovec vec;
-		if (user_memcpy(&vec, userVec + i, sizeof(iovec)) < B_OK)
-			return 0;
-
-		length += vec.iov_len;
-	}
-
-	return length;
-}
-
-
 static status_t
 create_socket(int family, int type, int protocol, net_socket_private** _socket)
 {
@@ -1420,12 +1403,11 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 	// iovec. So drop the header, if it is the only iovec. Otherwise compute
 	// the size of the remaining ones.
 	if (header != NULL) {
-		if (header->msg_iovlen <= 1)
+		if (header->msg_iovlen <= 1) {
 			header = NULL;
-		else {
-// TODO: The iovecs have already been copied to kernel space. Simplify!
-			bytesLeft += compute_user_iovec_length(header->msg_iov + 1,
-				header->msg_iovlen - 1);
+		} else {
+			for (int i = 1; i < header->msg_iovlen; i++)
+				bytesLeft += header->msg_iov[i].iov_len;
 		}
 	}
 
@@ -1443,15 +1425,8 @@ socket_send(net_socket* socket, msghdr* header, const void* data, size_t length,
 			&& buffer->size < bytesLeft) {
 			if (vecIndex > 0 && vecOffset == 0) {
 				// retrieve next iovec buffer from header
-				iovec vec;
-				if (user_memcpy(&vec, header->msg_iov + vecIndex, sizeof(iovec))
-						< B_OK) {
-					gNetBufferModule.free(buffer);
-					return B_BAD_ADDRESS;
-				}
-
-				data = vec.iov_base;
-				length = vec.iov_len;
+				data = header->msg_iov[vecIndex].iov_base;
+				length = header->msg_iov[vecIndex].iov_len;
 			}
 
 			size_t bytes = length;

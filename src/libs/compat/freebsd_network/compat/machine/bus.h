@@ -1,7 +1,5 @@
 /*
- * Copyright 2009, Colin Günther. All rights reserved.
- * Copyright 2007, Hugo Santos. All rights reserved.
- * Copyright 2018, Haiku, Inc. All rights reserved.
+ * Copyright 2018-2022, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef _FBSD_COMPAT_MACHINE_BUS_H_

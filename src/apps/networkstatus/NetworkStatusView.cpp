@@ -519,9 +519,11 @@ NetworkStatusView::_Update(bool force)
 	BNetworkRoster& roster = BNetworkRoster::Default();
 	BNetworkInterface interface;
 	uint32 cookie = 0;
+	std::set<BString> currentInterfaces;
 
 	while (roster.GetNextInterface(&cookie, interface) == B_OK) {
 		if ((interface.Flags() & IFF_LOOPBACK) == 0) {
+			currentInterfaces.insert((BString)interface.Name());
 			int32 oldStatus = kStatusUnknown;
 			if (fInterfaceStatuses.find(interface.Name())
 				!= fInterfaceStatuses.end()) {
@@ -549,6 +551,17 @@ NetworkStatusView::_Update(bool force)
 			}
 			fInterfaceStatuses[interface.Name()] = status;
 		}
+	}
+
+	// Check every element in fInterfaceStatuses against our current interface
+	// list. If it's not there, then the interface is not present anymore and
+	// should be removed from fInterfaceStatuses.
+	std::map<BString, int32>::iterator it = fInterfaceStatuses.begin();
+	while (it != fInterfaceStatuses.end()) {
+		std::map<BString, int32>::iterator backupIt = it;
+		if (currentInterfaces.find(it->first) == currentInterfaces.end())
+			fInterfaceStatuses.erase(it);
+		it = ++backupIt;
 	}
 }
 

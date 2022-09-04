@@ -234,6 +234,13 @@ Port::GetEDID(edid1_info* edid, bool forceRead)
 		if (fEDIDState == B_OK) {
 			TRACE("%s: found EDID information!\n", PortName());
 			edid_dump(&fEDIDInfo);
+		} else if (SetupI2cFallback(&bus) == B_OK) {
+			fEDIDState = ddc2_read_edid1(&bus, &fEDIDInfo, NULL, NULL);
+
+			if (fEDIDState == B_OK) {
+				TRACE("%s: found EDID information!\n", PortName());
+				edid_dump(&fEDIDInfo);
+			}
 		}
 	}
 
@@ -267,6 +274,13 @@ Port::SetupI2c(i2c_bus *bus)
 	bus->get_signals = &_GetI2CSignals;
 
 	return B_OK;
+}
+
+
+status_t
+Port::SetupI2cFallback(i2c_bus *bus)
+{
+	return B_ERROR;
 }
 
 
@@ -453,18 +467,31 @@ Port::_IsDisplayPortInVBT()
 	if (!_IsPortInVBT(&foundIndex))
 		return false;
 	child_device_config& config = gInfo->shared_info->device_configs[foundIndex];
-	return config.aux_channel > 0;
+	return config.aux_channel > 0 && (config.device_type & DEVICE_TYPE_DISPLAYPORT_OUTPUT) != 0;
 }
 
 
 bool
-Port::_IsInternalPanelPort()
+Port::_IsHdmiInVBT()
 {
 	uint32 foundIndex = 0;
 	if (!_IsPortInVBT(&foundIndex))
 		return false;
 	child_device_config& config = gInfo->shared_info->device_configs[foundIndex];
-	return (config.device_type & DEVICE_TYPE_INTERNAL_CONNECTOR) == DEVICE_TYPE_INTERNAL_CONNECTOR;
+	return config.ddc_pin > 0 && ((config.device_type & DEVICE_TYPE_NOT_HDMI_OUTPUT) == 0
+			|| (config.device_type & DEVICE_TYPE_TMDS_DVI_SIGNALING) != 0);
+}
+
+
+bool
+Port::_IsEDPPort()
+{
+	uint32 foundIndex = 0;
+	if (!_IsPortInVBT(&foundIndex))
+		return false;
+	child_device_config& config = gInfo->shared_info->device_configs[foundIndex];
+	return (config.device_type & (DEVICE_TYPE_INTERNAL_CONNECTOR | DEVICE_TYPE_DISPLAYPORT_OUTPUT))
+		== (DEVICE_TYPE_INTERNAL_CONNECTOR | DEVICE_TYPE_DISPLAYPORT_OUTPUT);
 }
 
 
@@ -606,7 +633,7 @@ Port::_DpAuxSendReceiveHook(const struct i2c_bus *bus, uint32 slaveAddress,
 	const uint8 *writeBuffer, size_t writeLength, uint8 *readBuffer, size_t readLength)
 {
 	CALLED();
-	DigitalDisplayInterface* port = (DigitalDisplayInterface*)bus->cookie;
+	Port* port = (Port*)bus->cookie;
 	return port->_DpAuxSendReceive(slaveAddress, writeBuffer, writeLength, readBuffer, readLength);
 }
 
@@ -692,9 +719,12 @@ Port::_DpAuxTransfer(dp_aux_msg* message)
 		else if (result < B_OK)
 			return result;
 
-		switch(message->reply & DP_AUX_NATIVE_REPLY_MASK) {
+		switch (message->reply & DP_AUX_NATIVE_REPLY_MASK) {
 			case DP_AUX_NATIVE_REPLY_ACK:
 				return B_OK;
+			case DP_AUX_NATIVE_REPLY_NACK:
+				TRACE("%s: aux native reply nack\n", __func__);
+				return B_IO_ERROR;
 			case DP_AUX_NATIVE_REPLY_DEFER:
 				TRACE("%s: aux reply defer received. Snoozing.\n", __func__);
 				snooze(400);
@@ -718,6 +748,7 @@ Port::_DpAuxTransfer(uint8* transmitBuffer, uint8 transmitSize,
 	addr_t channelControl;
 	addr_t channelData[5];
 	aux_channel channel = _DpAuxChannel();
+	TRACE("%s: %s DpAuxChannel: 0x%x\n", __func__, PortName(), channel);
 	if (gInfo->shared_info->device_type.Generation() >= 9
 		|| (gInfo->shared_info->pch_info != INTEL_PCH_NONE && channel == AUX_CH_A)) {
 		channelControl = DP_AUX_CH_CTL(channel);
@@ -728,7 +759,7 @@ Port::_DpAuxTransfer(uint8* transmitBuffer, uint8 transmitSize,
 		for (int i = 0; i < 5; i++)
 			channelData[i] = PCH_DP_AUX_CH_DATA(channel, i);
 	} else {
-		ERROR("DigitalDisplayInterface::_DpAuxTransfer() unknown register config\n");
+		ERROR("Port::_DpAuxTransfer() unknown register config\n");
 		return B_BUSY;
 	}
 	if (transmitSize > 20 || receiveSize > 20)
@@ -750,7 +781,12 @@ Port::_DpAuxTransfer(uint8* transmitBuffer, uint8 transmitSize,
 			| (transmitSize << INTEL_DP_AUX_CTL_MSG_SIZE_SHIFT) | INTEL_DP_AUX_CTL_FW_SYNC_PULSE_SKL(32)
 			| INTEL_DP_AUX_CTL_SYNC_PULSE_SKL(32);
 	} else {
-		uint32 aux_clock_divider = 0xe1; // TODO: value for 450Mhz
+		uint32 frequency = gInfo->shared_info->hw_cdclk;
+		if (channel != AUX_CH_A)
+			frequency = gInfo->shared_info->hraw_clock;
+		uint32 aux_clock_divider = (frequency + 2000 / 2) / 2000;
+		if (gInfo->shared_info->pch_info == INTEL_PCH_LPT && channel != AUX_CH_A)
+			aux_clock_divider = 0x48; // or 0x3f
 		uint32 timeout = INTEL_DP_AUX_CTL_TIMEOUT_400us;
 		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_BDW))
 			timeout = INTEL_DP_AUX_CTL_TIMEOUT_600us;
@@ -1633,7 +1669,7 @@ DisplayPort::IsConnected()
 	bool edidDetected = HasEDID();
 
 	// On laptops we always have an internal panel.. (this is on the eDP port)
-	if ((gInfo->shared_info->device_type.IsMobile() || _IsInternalPanelPort())
+	if ((gInfo->shared_info->device_type.IsMobile() || _IsEDPPort())
 		&& (PortIndex() == INTEL_PORT_A) && !edidDetected) {
 		if (gInfo->shared_info->has_vesa_edid_info) {
 			TRACE("%s: Laptop. Using VESA edid info\n", __func__);
@@ -1899,7 +1935,7 @@ DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		display_timing hardwareTarget = target->timing;
 		bool needsScaling = false;
 		if ((PortIndex() == INTEL_PORT_A)
-			&& (gInfo->shared_info->device_type.IsMobile() || _IsInternalPanelPort())) {
+			&& (gInfo->shared_info->device_type.IsMobile() || _IsEDPPort())) {
 			// For internal panels, we may need to set the timings according to the panel
 			// native video mode, and let the panel fitter do the scaling.
 			// note: upto/including generation 5 laptop panels are still LVDS types, handled elsewhere.
@@ -2179,6 +2215,21 @@ DigitalDisplayInterface::SetupI2c(i2c_bus *bus)
 }
 
 
+status_t
+DigitalDisplayInterface::SetupI2cFallback(i2c_bus *bus)
+{
+	CALLED();
+
+	const uint32 deviceConfigCount = gInfo->shared_info->device_config_count;
+	if (gInfo->shared_info->device_type.Generation() >= 6 && deviceConfigCount > 0
+		&& _IsDisplayPortInVBT() && _IsHdmiInVBT()) {
+		return Port::SetupI2c(bus);
+	}
+
+	return B_ERROR;
+}
+
+
 bool
 DigitalDisplayInterface::IsConnected()
 {
@@ -2243,19 +2294,20 @@ DigitalDisplayInterface::IsConnected()
 
 	// On laptops we always have an internal panel.. (on the eDP port on DDI systems, fixed on eDP pipe)
 	uint32 pipeState = 0;
-	if ((gInfo->shared_info->device_type.IsMobile() || _IsInternalPanelPort())
-		&& (PortIndex() == INTEL_PORT_E)) {
-		pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
-		TRACE("%s: PIPE_DDI_FUNC_CTL_EDP: 0x%" B_PRIx32 "\n", __func__, pipeState);
-		if (!(pipeState & PIPE_DDI_FUNC_CTL_ENABLE)) {
-			TRACE("%s: Laptop, but eDP port down: enabling port on pipe EDP\n", __func__);
-			//fixme: turn on port and power
-			write32(PIPE_DDI_FUNC_CTL_EDP, pipeState | PIPE_DDI_FUNC_CTL_ENABLE);
-			TRACE("%s: PIPE_DDI_FUNC_CTL_EDP after: 0x%" B_PRIx32 "\n", __func__,
-				read32(PIPE_DDI_FUNC_CTL_EDP));
+	if ((gInfo->shared_info->device_type.IsMobile() || _IsEDPPort())
+		&& (PortIndex() == INTEL_PORT_A)) {
+		if (gInfo->shared_info->device_type.Generation() < 12) {
+			// TODO: the pipe state isn't reliable after gen11
+			pipeState = read32(PIPE_DDI_FUNC_CTL_EDP);
+			TRACE("%s: PIPE_DDI_FUNC_CTL_EDP: 0x%" B_PRIx32 "\n", __func__, pipeState);
+			if (!(pipeState & PIPE_DDI_FUNC_CTL_ENABLE)) {
+				TRACE("%s: Laptop, but eDP port down\n", __func__);
+				return false;
+			}
 		}
-
-		if (gInfo->shared_info->has_vesa_edid_info) {
+		if (edidDetected)
+			return true;
+		else if (gInfo->shared_info->has_vesa_edid_info) {
 			TRACE("%s: Laptop. Using VESA edid info\n", __func__);
 			memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,	sizeof(edid1_info));
 			if (fEDIDState != B_OK) {
@@ -2311,17 +2363,11 @@ DigitalDisplayInterface::IsConnected()
 					break;
 			}
 			pipeState = read32(pipeReg);
-			if (!(pipeState & PIPE_DDI_FUNC_CTL_ENABLE)) {
-				TRACE("%s: Connected but port down: enabling port on pipe nr %" B_PRIx32 "\n", __func__, pipeCnt + 1);
-				//fixme: turn on port and power
-				pipeState |= PIPE_DDI_FUNC_CTL_ENABLE;
-				pipeState &= ~PIPE_DDI_SELECT_MASK;
-				pipeState |= (((uint32)PortIndex()) - 1) << PIPE_DDI_SELECT_SHIFT;
-				//fixme: set mode to DVI mode for now (b26..24 = %001)
-				write32(pipeReg, pipeState);
-				TRACE("%s: PIPE_DDI_FUNC_CTL after: 0x%" B_PRIx32 "\n", __func__, read32(pipeReg));
-				return true;
+			if ((pipeState & PIPE_DDI_FUNC_CTL_ENABLE) == 0) {
+				TRACE("%s: Connected but port down\n", __func__);
+				return false;
 			}
+			return true;
 		}
 		TRACE("%s: No pipe available, ignoring connected screen\n", __func__);
 	}
@@ -2478,8 +2524,8 @@ DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	display_timing hardwareTarget = target->timing;
 	bool needsScaling = false;
-	if ((PortIndex() == INTEL_PORT_E)
-		&& (gInfo->shared_info->device_type.IsMobile() || _IsInternalPanelPort())) {
+	if ((PortIndex() == INTEL_PORT_A)
+		&& (gInfo->shared_info->device_type.IsMobile() || _IsEDPPort())) {
 		// For internal panels, we may need to set the timings according to the panel
 		// native video mode, and let the panel fitter do the scaling.
 

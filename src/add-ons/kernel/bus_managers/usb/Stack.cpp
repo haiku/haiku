@@ -331,7 +331,7 @@ Stack::AllocateArea(void **logicalAddress, phys_addr_t *physicalAddress, size_t 
 	void *logAddress;
 	size = (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 	area_id area = create_area(name, &logAddress, B_ANY_KERNEL_ADDRESS, size,
-		B_32_BIT_CONTIGUOUS, 0);
+		B_32_BIT_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		// TODO: Use B_CONTIGUOUS when the TODOs regarding 64 bit physical
 		// addresses are fixed (if possible).
 

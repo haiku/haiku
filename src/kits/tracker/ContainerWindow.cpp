@@ -112,7 +112,7 @@ namespace BPrivate {
 
 class DraggableContainerIcon : public BView {
 	public:
-		DraggableContainerIcon();
+		DraggableContainerIcon(BSize iconSize);
 
 		virtual void MouseDown(BPoint where);
 		virtual void MouseUp(BPoint);
@@ -120,6 +120,7 @@ class DraggableContainerIcon : public BView {
 		virtual void Draw(BRect updateRect);
 
 	private:
+		BSize	fIconSize;
 		uint32	fDragButton;
 		BPoint	fClickPoint;
 		bool	fDragStarted;
@@ -138,10 +139,8 @@ struct StaggerOneParams {
 };
 
 
-const int32 kWindowStaggerBy = 17;
-
-
-BRect BContainerWindow::sNewWindRect(85, 50, 548, 280);
+BRect BContainerWindow::sNewWindRect;
+static int32 sWindowStaggerBy;
 
 LockingList<AddonShortcut>* BContainerWindow::fAddonsList
 	= new LockingList<struct AddonShortcut>(10, true);
@@ -359,7 +358,7 @@ OffsetFrameOne(const char* DEBUG_ONLY(name), uint32, off_t, void* castToRect,
 	if (!castToRect)
 		return false;
 
-	((BRect*)castToRect)->OffsetBy(kWindowStaggerBy, kWindowStaggerBy);
+	((BRect*)castToRect)->OffsetBy(sWindowStaggerBy, sWindowStaggerBy);
 
 	return true;
 }
@@ -386,12 +385,15 @@ AddMimeTypeString(BStringList& list, Model* model)
 //	#pragma mark - DraggableContainerIcon
 
 
-DraggableContainerIcon::DraggableContainerIcon()
+DraggableContainerIcon::DraggableContainerIcon(BSize iconSize)
 	:
 	BView("DraggableContainerIcon", B_WILL_DRAW),
+	fIconSize(iconSize),
 	fDragButton(0),
 	fDragStarted(false)
 {
+	SetExplicitMinSize(BSize(iconSize.Width() + 5, iconSize.Height()));
+	SetExplicitMaxSize(BSize(iconSize.Width() + 5, B_SIZE_UNSET));
 }
 
 
@@ -410,7 +412,7 @@ DraggableContainerIcon::MouseDown(BPoint where)
 	window->CurrentMessage()->FindInt32("buttons", (int32*)&buttons);
 
 	if (IconCache::sIconCache->IconHitTest(where, window->TargetModel(),
-			kNormalIcon, B_MINI_ICON)) {
+			kNormalIcon, fIconSize)) {
 		// The click hit the icon, initiate a drag
 		fDragButton = buttons
 			& (B_PRIMARY_MOUSE_BUTTON | B_SECONDARY_MOUSE_BUTTON);
@@ -483,7 +485,7 @@ DraggableContainerIcon::MouseMoved(BPoint where, uint32, const BMessage*)
 	// Draw the icon
 	float hIconOffset = (rect.Width() - Bounds().Width()) / 2;
 	IconCache::sIconCache->Draw(model, view, BPoint(hIconOffset, 0),
-		kNormalIcon, B_MINI_ICON, true);
+		kNormalIcon, fIconSize, true);
 
 	// See if we need to truncate the string
 	BString nameString = model->Name();
@@ -542,10 +544,10 @@ DraggableContainerIcon::Draw(BRect updateRect)
 	// Draw the icon, straddling the border
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	float iconOffsetX = (Bounds().Width() - B_MINI_ICON) / 2;
-	float iconOffsetY = (Bounds().Height() - B_MINI_ICON) / 2;
+	float iconOffsetX = (Bounds().Width() - fIconSize.Width()) / 2;
+	float iconOffsetY = (Bounds().Height() - fIconSize.Height()) / 2;
 	IconCache::sIconCache->Draw(window->TargetModel(), this,
-		BPoint(iconOffsetX, iconOffsetY), kNormalIcon, B_MINI_ICON, true);
+		BPoint(iconOffsetX, iconOffsetY), kNormalIcon, fIconSize, true);
 }
 
 
@@ -586,6 +588,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	fArrangeByMenu(NULL),
 	fSelectionWindow(NULL),
 	fTaskLoop(NULL),
+	fStateNeedsSaving(false),
 	fIsTrash(false),
 	fInTrash(false),
 	fIsPrinters(false),
@@ -596,7 +599,6 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	fContextMenu(NULL),
 	fDragMessage(NULL),
 	fCachedTypesList(NULL),
-	fStateNeedsSaving(false),
 	fSaveStateIsEnabled(true),
 	fIsWatchingPath(false)
 {
@@ -678,6 +680,14 @@ BContainerWindow::~BContainerWindow()
 BRect
 BContainerWindow::InitialWindowRect(window_feel feel)
 {
+	if (!sNewWindRect.IsValid()) {
+		const float labelSpacing = be_control_look->DefaultLabelSpacing();
+		// approximately (85, 50, 548, 280) with default spacing
+		sNewWindRect = BRect(labelSpacing * 14, labelSpacing * 8,
+			labelSpacing * 91, labelSpacing * 46);
+		sWindowStaggerBy = (int32)(labelSpacing * 3.0f);
+	}
+
 	if (feel != kDesktopWindowFeel)
 		return sNewWindRect;
 
@@ -1219,21 +1229,24 @@ BContainerWindow::FrameResized(float, float)
 	}
 
 	fPreviousBounds = Bounds();
-	fStateNeedsSaving = true;
+	if (IsActive())
+		fStateNeedsSaving = true;
 }
 
 
 void
 BContainerWindow::FrameMoved(BPoint)
 {
-	fStateNeedsSaving = true;
+	if (IsActive())
+		fStateNeedsSaving = true;
 }
 
 
 void
 BContainerWindow::WorkspacesChanged(uint32, uint32)
 {
-	fStateNeedsSaving = true;
+	if (IsActive())
+		fStateNeedsSaving = true;
 }
 
 
@@ -3262,7 +3275,7 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 
 		if (iconSizeMenu != NULL) {
 			if (viewMode == kIconMode) {
-				int32 iconSize = PoseView()->IconSizeInt();
+				int32 iconSize = PoseView()->UnscaledIconSizeInt();
 				BMenuItem* item = iconSizeMenu->ItemAt(0);
 				for (int32 i = 0; (item = iconSizeMenu->ItemAt(i)) != NULL;
 						i++) {
@@ -3409,13 +3422,10 @@ BContainerWindow::_AddFolderIcon()
 	if (iconSize < 16)
 		iconSize = 16;
 
-	fDraggableIcon = new(std::nothrow) DraggableContainerIcon();
+	fDraggableIcon = new(std::nothrow)
+		DraggableContainerIcon(be_control_look->ComposeIconSize(iconSize));
 	if (fDraggableIcon != NULL) {
-		BLayoutItem* item = fMenuContainer->GroupLayout()->AddView(
-			fDraggableIcon);
-		item->SetExplicitMinSize(BSize(iconSize + 5, iconSize));
-		item->SetExplicitMaxSize(BSize(iconSize + 5, item->MaxSize().Height()));
-
+		fMenuContainer->GroupLayout()->AddView(fDraggableIcon);
 		fMenuBar->SetBorders(
 			BControlLook::B_ALL_BORDERS & ~BControlLook::B_RIGHT_BORDER);
 	}
@@ -4003,10 +4013,16 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 	BRect frame(Frame());
 	if (node->Read(rectAttributeName, 0, B_RECT_TYPE, sizeof(BRect), &frame)
 			== sizeof(BRect)) {
+		const float scalingFactor = be_plain_font->Size() / 12.0f;
+		frame.left *= scalingFactor;
+		frame.top *= scalingFactor;
+		frame.right *= scalingFactor;
+		frame.bottom *= scalingFactor;
+
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
 	} else
-		sNewWindRect.OffsetBy(kWindowStaggerBy, kWindowStaggerBy);
+		sNewWindRect.OffsetBy(sWindowStaggerBy, sWindowStaggerBy);
 
 	fPreviousBounds = Bounds();
 
@@ -4054,10 +4070,16 @@ BContainerWindow::RestoreWindowState(const BMessage& message)
 
 	BRect frame(Frame());
 	if (message.FindRect(rectAttributeName, &frame) == B_OK) {
+		const float scalingFactor = be_plain_font->Size() / 12.0f;
+		frame.left *= scalingFactor;
+		frame.top *= scalingFactor;
+		frame.right *= scalingFactor;
+		frame.bottom *= scalingFactor;
+
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
 	} else
-		sNewWindRect.OffsetBy(kWindowStaggerBy, kWindowStaggerBy);
+		sNewWindRect.OffsetBy(sWindowStaggerBy, sWindowStaggerBy);
 
 	uint32 workspace;
 	if ((fContainerWindowFlags & kRestoreWorkspace)
@@ -4075,6 +4097,9 @@ BContainerWindow::RestoreWindowState(const BMessage& message)
 		&& message.FindMessage(kAttrWindowDecor, &decorSettings) == B_OK) {
 		SetDecoratorSettings(decorSettings);
 	}
+
+	fStateNeedsSaving = false;
+		// Undo the effect of the above MoveTo and ResizeTo calls
 }
 
 
@@ -4100,6 +4125,11 @@ BContainerWindow::SaveWindowState(AttributeStreamNode* node)
 
 	// node is null if it already got deleted
 	BRect frame(Frame());
+	const float scalingFactor = be_plain_font->Size() / 12.0f;
+	frame.left /= scalingFactor;
+	frame.top /= scalingFactor;
+	frame.right /= scalingFactor;
+	frame.bottom /= scalingFactor;
 	node->Write(rectAttributeName, 0, B_RECT_TYPE, sizeof(BRect), &frame);
 
 	uint32 workspaces = Workspaces();
@@ -4133,6 +4163,11 @@ BContainerWindow::SaveWindowState(BMessage& message) const
 
 	// node is null if it already got deleted
 	BRect frame(Frame());
+	const float scalingFactor = be_plain_font->Size() / 12.0f;
+	frame.left /= scalingFactor;
+	frame.top /= scalingFactor;
+	frame.right /= scalingFactor;
+	frame.bottom /= scalingFactor;
 	message.AddRect(rectAttributeName, frame);
 	message.AddInt32(workspaceAttributeName, (int32)Workspaces());
 

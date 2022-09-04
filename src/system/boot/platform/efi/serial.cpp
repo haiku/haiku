@@ -86,7 +86,7 @@ serial_putc(char ch)
 extern "C" void
 serial_puts(const char* string, size_t size)
 {
-	if (!sSerialEnabled)
+	if (!sSerialEnabled || (sSerial == NULL && sSerialUsesEFI))
 		return;
 
 	while (size-- != 0) {

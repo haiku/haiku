@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	247549485
+1	french	x-vnd.Haiku-Terminal	4089361699
 ANSI cyan color	Terminal AppearancePrefView		Couleur cyan ANSI
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
 Insert path	Terminal TermView		Insérer un chemin de recherche
@@ -7,13 +7,13 @@ Text encoding	Terminal TermWindow		Encodage texte
 ANSI blue color	Terminal AppearancePrefView		Couleur bleu ANSI
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Éditer
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               affiche cette aide\n  -t,     --title              défini le titre de la fenêtre\n  -f,     --fullscreen         démarre en plein écran\n  -w,     --working-directory  défini le répertoire de travail initial\n
 Select all	Terminal TermWindow		Sélectionner tout
 Confirm exit if active programs exist	Terminal AppearancePrefView		Demander une confirmation à la fermeture si un programme est actif
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail courant du processus actif dans\n\t\t\tl’onglet courant. En option, le nombre maximum d’éléments\n\t\t\tdu chemin peut être spécifié. Par exemple « %2d » pour au plus\n\t\t\tdeux éléments.\n\t%T\t-\tLe nom de l’application Terminal pour la langue active.\n\t%e\t-\tLe codage de l’onglet courant. Non affiché pour UTF-8.\n\t%i\t-\tL’index de la fenêtre.\n\t%p\t-\tLe nom du processus actif dans l’onglet courant.\n\t%t\t-\tLe titre de l’onglet courant.
 Solarized Dark	Terminal colors scheme		Ombragé
 Copy	Terminal TermWindow		Copier
 ANSI bright green color	Terminal AppearancePrefView		Couleur vert clair ANSI
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               affiche cette aide\n  -t,     --title              défini le titre de la fenêtre\n  -f,     --fullscreen         démarre en plein écran\n  -w,     --working-directory  défini le répertoire de travail initial
 ANSI white color	Terminal AppearancePrefView		Couleur blanc ANSI
 Retro	Terminal colors scheme		Rétro
 Edit tab title…	Terminal TermWindow		Éditer le titre de l’onglet…

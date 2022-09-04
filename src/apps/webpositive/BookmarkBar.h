@@ -41,6 +41,8 @@ private:
 	node_ref						fNodeRef;
 	std::map<ino_t, BPrivate::IconMenuItem*>	fItemsMap;
 	BMenu*							fOverflowMenu;
+	// True if fOverflowMenu is currently added to BookmarkBar
+	bool							fOverflowMenuAdded;
 };
 
 

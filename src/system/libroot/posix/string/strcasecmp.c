@@ -68,3 +68,35 @@ strncasecmp(const char *s1, const char *s2, size_t n)
 	return 0;
 }
 
+
+int
+strcasecmp_l(const char *s1, const char *s2, locale_t locale)
+{
+	const u_char *us1 = (const u_char *)s1;
+	const u_char *us2 = (const u_char *)s2;
+
+	while (tolower_l(*us1, locale) == tolower_l(*us2++, locale)) {
+		if (*us1++ == '\0')
+			return 0;
+	}
+
+	return tolower_l(*us1, locale) - tolower_l(*--us2, locale);
+}
+
+
+int
+strncasecmp_l(const char *s1, const char *s2, size_t n, locale_t locale)
+{
+	if (n != 0) {
+		const u_char *us1 = (const u_char *)s1;
+		const u_char *us2 = (const u_char *)s2;
+
+		do {
+			if (tolower_l(*us1, locale) != tolower_l(*us2++, locale))
+				return tolower_l(*us1, locale) - tolower_l(*--us2, locale);
+			if (*us1++ == '\0')
+				break;
+		} while (--n != 0);
+	}
+	return 0;
+}

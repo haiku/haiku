@@ -268,7 +268,7 @@ remove_device(pegasus_dev *device)
 static status_t
 setup_endpoints(const usb_interface_info *uii, pegasus_dev *dev)
 {
-	size_t epts[3] = { -1, -1, -1 };
+	ssize_t epts[3] = { -1, -1, -1 };
 	size_t ep = 0;
 	for(; ep < uii->endpoint_count; ep++){
 		usb_endpoint_descriptor *ed = uii->endpoint[ep].descr;
@@ -347,7 +347,7 @@ pegasus_device_added(const usb_device dev, void **cookie)
 	const usb_interface_info *intf;
 	status_t status;
 	uint16 ifno;
-	int i;
+	unsigned int i;
 
 	ASSERT(dev != 0 && cookie != NULL);
 	DPRINTF_INFO("device_added()\n");

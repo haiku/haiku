@@ -570,7 +570,8 @@ init_corb_rirb_pos(hda_controller* controller, uint32 quirks)
 	// Allocate memory area
 	controller->corb_rirb_pos_area = create_area("hda corb/rirb/pos",
 		(void**)&controller->corb, B_ANY_KERNEL_ADDRESS, memSize,
-		controller->is_64_bit ? B_CONTIGUOUS : B_32_BIT_CONTIGUOUS, 0);
+		controller->is_64_bit ? B_CONTIGUOUS : B_32_BIT_CONTIGUOUS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (controller->corb_rirb_pos_area < 0)
 		return controller->corb_rirb_pos_area;
 
@@ -914,7 +915,8 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	bdl_entry_t* bufferDescriptors;
 	stream->buffer_descriptors_area = create_area("hda buffer descriptors",
 		(void**)&bufferDescriptors, B_ANY_KERNEL_ADDRESS, alloc,
-		stream->controller->is_64_bit ? B_CONTIGUOUS : B_32_BIT_CONTIGUOUS, 0);
+		stream->controller->is_64_bit ? B_CONTIGUOUS : B_32_BIT_CONTIGUOUS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (stream->buffer_descriptors_area < B_OK) {
 		delete_area(stream->buffer_area);
 		return stream->buffer_descriptors_area;
@@ -1101,7 +1103,8 @@ hda_hw_init(hda_controller* controller)
 	// Map MMIO registers
 	controller->regs_area = map_physical_memory("hda_hw_regs",
 		physicalAddress, pciInfo.u.h0.base_register_sizes[0],
-		B_ANY_KERNEL_ADDRESS, 0, (void**)&controller->regs);
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		(void**)&controller->regs);
 	if (controller->regs_area < B_OK) {
 		status = controller->regs_area;
 		goto error;

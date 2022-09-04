@@ -18,10 +18,10 @@ class BStringView;
 class BView;
 
 
-class CustomRefFilter : public BRefFilter {
+class ImageFilter: public BRefFilter {
 public:
-							CustomRefFilter(bool imageFiltering);
-	virtual					~CustomRefFilter() {};
+							ImageFilter(bool filtering);
+	virtual					~ImageFilter() {};
 
 			bool			Filter(const entry_ref* ref, BNode* node,
 								struct stat_beos* st, const char* filetype);
@@ -33,7 +33,7 @@ protected:
 };
 
 
-class ImageFilePanel : public BFilePanel {
+class ImageFilePanel: public BFilePanel {
 public:
 							ImageFilePanel(file_panel_mode mode = B_OPEN_PANEL,
 								BMessenger* target = NULL,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2016 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2022 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,9 +20,7 @@ class BMessageRunner;
 class ColorPreview : public BControl
 {
 public:
-							ColorPreview(BRect frame, BMessage *msg,
-								uint32 resizingMode = B_FOLLOW_LEFT
-									| B_FOLLOW_TOP,
+							ColorPreview(BMessage* message,
 								uint32 flags = B_WILL_DRAW);
 							~ColorPreview(void);
 

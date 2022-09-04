@@ -1454,7 +1454,7 @@ device_node::AddChild(device_node* node)
 	device_node* before = NULL;
 	while (iterator.HasNext()) {
 		device_node* child = iterator.Next();
-		if (child->Priority() <= priority) {
+		if (child->Priority() < priority) {
 			before = child;
 			break;
 		}
@@ -1717,7 +1717,6 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 					_AddPath(*stack, "busses/pci");
 					_AddPath(*stack, "bus_managers");
 				} else if (!generic) {
-					_AddPath(*stack, "busses", "virtio");
 					_AddPath(*stack, "drivers");
 				} else {
 					// For generic drivers, we only allow busses when the
@@ -1732,6 +1731,7 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 					_AddPath(*stack, "busses/i2c");
 					_AddPath(*stack, "busses/scsi");
 					_AddPath(*stack, "busses/random");
+					_AddPath(*stack, "busses/virtio");
 					_AddPath(*stack, "bus_managers/pci");
 				}
 				break;

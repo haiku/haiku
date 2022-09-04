@@ -1,4 +1,5 @@
 /*
+ * Copyright 2022, Raghav Sharma, raghavself28@gmail.com
  * Copyright 2020, Shubham Bhagat, shubhambhagat111@yahoo.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -12,6 +13,8 @@
 
 #define DIR2_BLOCK_HEADER_MAGIC 0x58443242
 	// for v4 system
+#define DIR3_BLOCK_HEADER_MAGIC 0x58444233
+	// for v5 system
 #define DIR2_FREE_TAG 0xffff
 #define XFS_DIR2_DATA_FD_COUNT 3
 #define EXTENT_REC_SIZE		128
@@ -30,6 +33,15 @@ enum ExtentState {
 };
 
 
+// Enum values to check which directory we are reading
+enum DirectoryType {
+	XFS_BLOCK,
+	XFS_LEAF,
+	XFS_NODE,
+	XFS_BTREE,
+};
+
+
 // xfs_dir2_data_free_t
 struct FreeRegion {
 			uint16				offset;
@@ -37,11 +49,67 @@ struct FreeRegion {
 };
 
 
-// xfs_dir2_data_hdr_t
-struct ExtentDataHeader {
+// This class will act as interface for V4 and V5 data header
+class ExtentDataHeader {
+public:
+
+			virtual						~ExtentDataHeader()			=	0;
+			virtual uint32				Magic()						=	0;
+			virtual uint64				Blockno()					=	0;
+			virtual uint64				Lsn()						=	0;
+			virtual uint64				Owner()						=	0;
+			virtual uuid_t*				Uuid()						=	0;
+			static	uint32				ExpectedMagic(int8 WhichDirectory,
+										Inode* inode);
+			static	uint32				CRCOffset();
+};
+
+
+//xfs_dir_data_hdr_t
+class ExtentDataHeaderV4 : public ExtentDataHeader {
+public :
+
+								ExtentDataHeaderV4(const char* buffer);
+								~ExtentDataHeaderV4();
+			void				SwapEndian();
+			uint32				Magic();
+			uint64				Blockno();
+			uint64				Lsn();
+			uint64				Owner();
+			uuid_t*				Uuid();
+
 			uint32				magic;
+private:
 			FreeRegion			bestfree[XFS_DIR2_DATA_FD_COUNT];
 };
+
+
+// xfs_dir3_data_hdr_t
+class ExtentDataHeaderV5 : public ExtentDataHeader {
+public:
+								ExtentDataHeaderV5(const char* buffer);
+								~ExtentDataHeaderV5();
+			void				SwapEndian();
+			uint32				Magic();
+			uint64				Blockno();
+			uint64				Lsn();
+			uint64				Owner();
+			uuid_t*				Uuid();
+public:
+			uint32				magic;
+			uint32				crc;
+private:
+			uint64				blkno;
+			uint64				lsn;
+			uuid_t				uuid;
+			uint64				owner;
+			FreeRegion			bestfree[XFS_DIR2_DATA_FD_COUNT];
+			uint32				pad;
+};
+
+#define XFS_EXTENT_CRC_OFF  offsetof(ExtentDataHeaderV5, crc)
+#define XFS_EXTENT_V5_VPTR_OFF offsetof(ExtentDataHeaderV5, magic)
+#define XFS_EXTENT_V4_VPTR_OFF offsetof(ExtentDataHeaderV4, magic)
 
 
 // xfs_dir2_data_entry_t
@@ -108,5 +176,12 @@ private:
 				// This isn't inode data. It holds the directory block.
 };
 
+
+ExtentDataHeader*
+CreateDataHeader(Inode* inode, const char* buffer);
+
+
+uint32
+SizeOfDataHeader(Inode* inode);
 
 #endif

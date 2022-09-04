@@ -245,9 +245,9 @@ Empty Trash	ContainerWindow		Vyprázdniť Kôš
 no supporting apps	OpenWithWindow		žiadne podporujúce aplikácie
 Preparing to empty Trash…	StatusWindow		Pripravuje sa vyprázdnenie Koša…
 Deleting: 	StatusWindow		Maže sa: 
+label too long	PoseView		menovka je príliš dlhá
 the MIME settings	FSUtils		Nastavenia MIME
 You can't move or copy the trash.	FSUtils		Nemôžete presunúť alebo skopírovať Kôš.
-label too long	PoseView		menovka je príliš dlhá
 Error creating link to \"%name\".	FSUtils		Chyba pri vytváraní odkazu „%name“.
 Unknown	FilePermissionsView		Neznáme
 Paste links	ContainerWindow		Vložiť odkazy
@@ -287,8 +287,8 @@ of %items	StatusWindow		z %items
 less than	FindPanel		menej ako
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Chyba pri kopírovaní súboru „%name“:\n\t%error\n\nChcete pokračovať?
 Creating links: 	StatusWindow		Vytvárajú sa odkazy: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nebolo možné otvoriť „%document“, pomocou aplikácie „%app“ (%error). 
 Create %s clipping	PoseView		Vytvoriť orezanie %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nebolo možné otvoriť „%document“, pomocou aplikácie „%app“ (%error). 
 Error moving \"%name\"	FSUtils		Chyba pri presúvaní „%name“
 To: %dir	StatusWindow		Do: %dir
 Paste layout	ContainerWindow		Vložiť rozloženie
@@ -434,8 +434,8 @@ Add-ons	FilePanelPriv		Doplnky
 96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Prázdny priečinok
 Move to Trash	FSUtils		Presunúť do Koša
-Handles %type	OpenWithWindow		Pracuje s %type
 Cancel	PoseView		Zrušiť
+Handles %type	OpenWithWindow		Pracuje s %type
 Delete	PoseView		Zmazať
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ak zmeníte domovský priečinok, %osName sa nemusí správať správne!\n\nSte si istý, že to chcete urobiť?\n\nAk chcete napriek tomu zmeniť domovský priečinok, podržte kláves Shift a kliknite na „Viem, čo robím“.
 Sorry, you can't copy items to the Trash.	PoseView		Ľutujeme, nemôžete kopírovať položky do Koša.

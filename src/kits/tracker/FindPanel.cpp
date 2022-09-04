@@ -135,21 +135,21 @@ static const char* operatorLabels[] = {
 namespace BPrivate {
 
 class MostUsedNames {
-	public:
-		MostUsedNames(const char* fileName, const char* directory,
-			int32 maxCount = 5);
-		~MostUsedNames();
+public:
+								MostUsedNames(const char* fileName, const char* directory,
+									int32 maxCount = 5);
+								~MostUsedNames();
 
-		bool ObtainList(BList* list);
-		void ReleaseList();
+			bool				ObtainList(BList* list);
+			void				ReleaseList();
 
-		void AddName(const char*);
+			void 				AddName(const char*);
 
-	protected:
-		struct list_entry {
-			char* name;
-			int32 count;
-		};
+protected:
+			struct list_entry {
+				char* name;
+				int32 count;
+			};
 
 		static int CompareNames(const void* a, const void* b);
 		void LoadList();
@@ -935,9 +935,12 @@ FindPanel::AttachedToWindow()
 	}
 	fMimeTypeMenu->SetTargetForItems(this);
 
-	BMenuItem* firstItem = fMimeTypeMenu->ItemAt(0);
-	if (firstItem != NULL)
-		firstItem->SetMarked(true);
+	// set the MIME type to the default value, if no value is already selected
+	if (fMimeTypeMenu->FindMarked() == NULL) {
+		BMenuItem* firstItem = fMimeTypeMenu->ItemAt(0);
+		if (firstItem != NULL)
+			firstItem->SetMarked(true);
+	}
 
 	if (fDraggableIcon != NULL)
 		fDraggableIcon->SetTarget(BMessenger(this));
@@ -994,6 +997,7 @@ FindPanel::ResizeMenuField(BMenuField* menuField)
 	size.width = std::min(width + padding, maxWidth);
 	menuField->SetExplicitSize(size);
 }
+
 
 static void
 PopUpMenuSetTitle(BMenu* menu, const char* title)
@@ -1339,8 +1343,9 @@ FindPanel::FindAttrView(const char* name, int row) const
 	return NULL;
 }
 
+
 void
-FindPanel::BuildAttrQuery(BQuery* query, bool &dynamicDate) const
+FindPanel::BuildAttrQuery(BQuery* query, bool& dynamicDate) const
 {
 	dynamicDate = false;
 
@@ -1508,7 +1513,7 @@ FindPanel::PushMimeType(BQuery* query) const
 
 
 void
-FindPanel::GetByAttrPredicate(BQuery* query, bool &dynamicDate) const
+FindPanel::GetByAttrPredicate(BQuery* query, bool& dynamicDate) const
 {
 	ASSERT(Mode() == (int32)kByAttributeItem);
 	BuildAttrQuery(query, dynamicDate);
@@ -1957,11 +1962,13 @@ SortByDatePredicate(const EntryWithDate* entry1, const EntryWithDate* entry2)
 		-1 : (entry1->second == entry2->second ? 0 : 1);
 }
 
+
 struct AddOneRecentParams {
 	BMenu* menu;
 	const BMessenger* target;
 	uint32 what;
 };
+
 
 static const entry_ref*
 AddOneRecentItem(const entry_ref* ref, void* castToParams)
@@ -2692,7 +2699,7 @@ FindPanel::AddAttributeControls(int32 gridRow)
 
 
 void
-FindPanel::RestoreAttrState(const BMessage &message, int32 index)
+FindPanel::RestoreAttrState(const BMessage& message, int32 index)
 {
 	BMenuField* menuField
 		= dynamic_cast<BMenuField*>(FindAttrView("MenuField", index));
@@ -2840,7 +2847,7 @@ FindPanel::RemoveLogicMenu(int32 index)
 
 
 void
-FindPanel::AddAttributes(BMenu* menu, const BMimeType &mimeType)
+FindPanel::AddAttributes(BMenu* menu, const BMimeType& mimeType)
 {
 	// only add things to menu which have "user-visible" data
 	BMessage attributeMessage;
@@ -3137,20 +3144,17 @@ DeleteTransientQueriesTask::ProcessOneRef(Model* model)
 
 class DeleteTransientQueriesFunctor : public FunctionObjectWithResult<bool> {
 public:
-	DeleteTransientQueriesFunctor(DeleteTransientQueriesTask* task)
-		:	task(task)
-		{}
+								DeleteTransientQueriesFunctor(DeleteTransientQueriesTask* task)
+									:
+									task(task)
+								{}
 
-	virtual ~DeleteTransientQueriesFunctor()
-		{
-			delete task;
-		}
+	virtual 					~DeleteTransientQueriesFunctor() { delete task; }
 
-	virtual void operator()()
-		{ result = task->DoSomeWork(); }
+	virtual	void				operator()() { result = task->DoSomeWork(); }
 
 private:
-	DeleteTransientQueriesTask* task;
+			DeleteTransientQueriesTask* task;
 };
 
 

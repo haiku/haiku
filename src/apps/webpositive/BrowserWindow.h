@@ -40,6 +40,7 @@ class BCheckBox;
 class BDirectory;
 class BFile;
 class BFilePanel;
+class BGroupLayout;
 class BLayoutItem;
 class BMenu;
 class BMenuItem;
@@ -92,8 +93,6 @@ enum {
 	SHOW_CONSOLE_WINDOW				= 'scwd',
 	SHOW_COOKIE_WINDOW				= 'skwd'
 };
-
-#define INTEGRATE_MENU_INTO_TAB_BAR 0
 
 
 class BrowserWindow : public BWebWindow {
@@ -243,7 +242,7 @@ private:
 			BStringView*		fStatusText;
 			BStatusBar*			fLoadingProgressBar;
 
-			BLayoutItem*		fMenuGroup;
+			BGroupLayout*		fMenuGroup;
 			BLayoutItem*		fTabGroup;
 			BLayoutItem*		fNavigationGroup;
 			BLayoutItem*		fFindGroup;
@@ -266,7 +265,7 @@ private:
 			bigtime_t			fLastMouseMovedTime;
 			BPoint				fLastMousePos;
 
-			BPrivate::Network::BUrlContext*	fContext;
+			BReference<BPrivate::Network::BUrlContext>	fContext;
 
 			// cached settings
 			SettingsMessage*	fAppSettings;

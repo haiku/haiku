@@ -1152,6 +1152,56 @@ usb_disk_reset_capacity(device_lun *lun)
 }
 
 
+static status_t
+usb_disk_update_capacity_16(device_lun *lun)
+{
+	size_t dataLength = sizeof(scsi_read_capacity_16_parameter);
+	scsi_read_capacity_16_parameter parameter;
+	status_t result = B_ERROR;
+	err_act action = err_act_ok;
+
+	uint8 commandBlock[16];
+	memset(commandBlock, 0, sizeof(commandBlock));
+
+	commandBlock[0] = SCSI_SERVICE_ACTION_IN;
+	commandBlock[1] = SCSI_SAI_READ_CAPACITY_16;
+	commandBlock[10] = dataLength >> 24;
+	commandBlock[11] = dataLength >> 16;
+	commandBlock[12] = dataLength >> 8;
+	commandBlock[13] = dataLength;
+
+	// Retry reading the capacity up to three times. The first try might only
+	// yield a unit attention telling us that the device or media status
+	// changed, which is more or less expected if it is the first operation
+	// on the device or the device only clears the unit atention for capacity
+	// reads.
+	for (int32 i = 0; i < 5; i++) {
+		result = usb_disk_operation(lun, commandBlock, 16, &parameter,
+			&dataLength, true, &action);
+
+		if (result == B_OK || (action != err_act_retry
+				&& action != err_act_many_retries)) {
+			break;
+		}
+	}
+
+	if (result != B_OK) {
+		TRACE_ALWAYS("failed to update capacity: %s\n", strerror(result));
+		lun->media_present = false;
+		lun->media_changed = false;
+		usb_disk_reset_capacity(lun);
+		return result;
+	}
+
+	lun->media_present = true;
+	lun->media_changed = false;
+	lun->block_size = B_BENDIAN_TO_HOST_INT32(parameter.logical_block_length);
+	lun->block_count =
+		B_BENDIAN_TO_HOST_INT64(parameter.last_logical_block_address) + 1;
+	return B_OK;
+}
+
+
 status_t
 usb_disk_update_capacity(device_lun *lun)
 {
@@ -1200,6 +1250,10 @@ usb_disk_update_capacity(device_lun *lun)
 	lun->block_size = B_BENDIAN_TO_HOST_INT32(parameter.logical_block_length);
 	lun->block_count =
 		B_BENDIAN_TO_HOST_INT32(parameter.last_logical_block_address) + 1;
+	if (lun->block_count == 0) {
+		// try SCSI_READ_CAPACITY_16
+		return usb_disk_update_capacity_16(lun);
+	}
 	return B_OK;
 }
 
@@ -1521,14 +1575,14 @@ usb_disk_device_removed(void *cookie)
 
 static bool
 usb_disk_needs_partial_buffer(device_lun *lun, off_t position, size_t length,
-	uint32 &blockPosition, uint16 &blockCount)
+	uint64 &blockPosition, size_t &blockCount)
 {
-	blockPosition = (uint32)(position / lun->block_size);
+	blockPosition = (uint64)(position / lun->block_size);
 	if ((off_t)blockPosition * lun->block_size != position)
 		return true;
 
-	blockCount = (uint16)(length / lun->block_size);
-	if ((size_t)blockCount * lun->block_size != length)
+	blockCount = length / lun->block_size;
+	if (blockCount * lun->block_size != length)
 		return true;
 
 	return false;
@@ -1536,10 +1590,10 @@ usb_disk_needs_partial_buffer(device_lun *lun, off_t position, size_t length,
 
 
 static status_t
-usb_disk_block_read(device_lun *lun, uint32 blockPosition, uint16 blockCount,
+usb_disk_block_read(device_lun *lun, uint64 blockPosition, size_t blockCount,
 	void *buffer, size_t *length)
 {
-	uint8 commandBlock[12];
+	uint8 commandBlock[16];
 	memset(commandBlock, 0, sizeof(commandBlock));
 	if (lun->device->is_ufi) {
 		commandBlock[0] = SCSI_READ_12;
@@ -1548,8 +1602,8 @@ usb_disk_block_read(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 		commandBlock[3] = blockPosition >> 16;
 		commandBlock[4] = blockPosition >> 8;
 		commandBlock[5] = blockPosition;
-		commandBlock[6] = 0; // blockCount >> 24;
-		commandBlock[7] = 0; // blockCount >> 16;
+		commandBlock[6] = blockCount >> 24;
+		commandBlock[7] = blockCount >> 16;
 		commandBlock[8] = blockCount >> 8;
 		commandBlock[9] = blockCount;
 
@@ -1563,7 +1617,7 @@ usb_disk_block_read(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 				snooze(10000);
 		}
 		return result;
-	} else {
+	} else if (blockPosition + blockCount < 0x100000000LL && blockCount <= 0x10000) {
 		commandBlock[0] = SCSI_READ_10;
 		commandBlock[1] = 0;
 		commandBlock[2] = blockPosition >> 24;
@@ -1575,15 +1629,33 @@ usb_disk_block_read(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 		status_t result = usb_disk_operation(lun, commandBlock, 10,
 			buffer, length, true);
 		return result;
+	} else {
+		commandBlock[0] = SCSI_READ_16;
+		commandBlock[1] = 0;
+		commandBlock[2] = blockPosition >> 56;
+		commandBlock[3] = blockPosition >> 48;
+		commandBlock[4] = blockPosition >> 40;
+		commandBlock[5] = blockPosition >> 32;
+		commandBlock[6] = blockPosition >> 24;
+		commandBlock[7] = blockPosition >> 16;
+		commandBlock[8] = blockPosition >> 8;
+		commandBlock[9] = blockPosition;
+		commandBlock[10] = blockCount >> 24;
+		commandBlock[11] = blockCount >> 16;
+		commandBlock[12] = blockCount >> 8;
+		commandBlock[13] = blockCount;
+		status_t result = usb_disk_operation(lun, commandBlock, 16,
+			buffer, length, true);
+		return result;
 	}
 }
 
 
 static status_t
-usb_disk_block_write(device_lun *lun, uint32 blockPosition, uint16 blockCount,
+usb_disk_block_write(device_lun *lun, uint64 blockPosition, size_t blockCount,
 	void *buffer, size_t *length)
 {
-	uint8 commandBlock[12];
+	uint8 commandBlock[16];
 	memset(commandBlock, 0, sizeof(commandBlock));
 
 	if (lun->device->is_ufi) {
@@ -1613,7 +1685,7 @@ usb_disk_block_write(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 		if (result == B_OK)
 			lun->should_sync = true;
 		return result;
-	} else {
+	} else if (blockPosition + blockCount < 0x100000000LL && blockCount <= 0x10000) {
 		commandBlock[0] = SCSI_WRITE_10;
 		commandBlock[2] = blockPosition >> 24;
 		commandBlock[3] = blockPosition >> 16;
@@ -1626,18 +1698,38 @@ usb_disk_block_write(device_lun *lun, uint32 blockPosition, uint16 blockCount,
 		if (result == B_OK)
 			lun->should_sync = true;
 		return result;
+	} else {
+		commandBlock[0] = SCSI_WRITE_16;
+		commandBlock[1] = 0;
+		commandBlock[2] = blockPosition >> 56;
+		commandBlock[3] = blockPosition >> 48;
+		commandBlock[4] = blockPosition >> 40;
+		commandBlock[5] = blockPosition >> 32;
+		commandBlock[6] = blockPosition >> 24;
+		commandBlock[7] = blockPosition >> 16;
+		commandBlock[8] = blockPosition >> 8;
+		commandBlock[9] = blockPosition;
+		commandBlock[10] = blockCount >> 24;
+		commandBlock[11] = blockCount >> 16;
+		commandBlock[12] = blockCount >> 8;
+		commandBlock[13] = blockCount;
+		status_t result = usb_disk_operation(lun, commandBlock, 16,
+			buffer, length, false);
+		if (result == B_OK)
+			lun->should_sync = true;
+		return result;
 	}
 }
 
 
 static status_t
 usb_disk_prepare_partial_buffer(device_lun *lun, off_t position, size_t length,
-	void *&partialBuffer, void *&blockBuffer, uint32 &blockPosition,
-	uint16 &blockCount)
+	void *&partialBuffer, void *&blockBuffer, uint64 &blockPosition,
+	size_t &blockCount)
 {
-	blockPosition = (uint32)(position / lun->block_size);
-	blockCount = (uint16)((uint32)((position + length + lun->block_size - 1)
-		/ lun->block_size) - blockPosition);
+	blockPosition = position / lun->block_size;
+	blockCount = (position + length + lun->block_size - 1)
+		/ lun->block_size - blockPosition;
 	size_t blockLength = blockCount * lun->block_size;
 	blockBuffer = malloc(blockLength);
 	if (blockBuffer == NULL) {
@@ -2005,8 +2097,8 @@ usb_disk_read(void *cookie, off_t position, void *buffer, size_t *length)
 	}
 
 	status_t result = B_ERROR;
-	uint32 blockPosition = 0;
-	uint16 blockCount = 0;
+	uint64 blockPosition = 0;
+	size_t blockCount = 0;
 	bool needsPartial = usb_disk_needs_partial_buffer(lun, position, *length,
 		blockPosition, blockCount);
 	if (needsPartial) {
@@ -2056,8 +2148,8 @@ usb_disk_write(void *cookie, off_t position, const void *buffer,
 	}
 
 	status_t result = B_ERROR;
-	uint32 blockPosition = 0;
-	uint16 blockCount = 0;
+	uint64 blockPosition = 0;
+	size_t blockCount = 0;
 	bool needsPartial = usb_disk_needs_partial_buffer(lun, position,
 		*length, blockPosition, blockCount);
 	if (needsPartial) {

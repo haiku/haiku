@@ -1016,35 +1016,36 @@ BTabView::TabFrame(int32 index) const
 	if (index >= CountTabs() || index < 0)
 		return BRect();
 
-	float width = 100.0f;
-	float height = fTabHeight;
-	float offset = BControlLook::ComposeSpacing(B_USE_WINDOW_SPACING);
-	BRect bounds(Bounds());
+	const float padding = ceilf(be_control_look->DefaultLabelSpacing() * 3.3f);
+	const float height = fTabHeight;
+	const float offset = BControlLook::ComposeSpacing(B_USE_WINDOW_SPACING);
+	const BRect bounds(Bounds());
 
+	float width = padding * 5.0f;
 	switch (fTabWidthSetting) {
 		case B_WIDTH_FROM_LABEL:
 		{
 			float x = 0.0f;
 			for (int32 i = 0; i < index; i++){
-				x += StringWidth(TabAt(i)->Label()) + 20.0f;
+				x += StringWidth(TabAt(i)->Label()) + padding;
 			}
 
 			switch (fTabSide) {
 				case kTopSide:
 					return BRect(offset + x, 0.0f,
-						offset + x + StringWidth(TabAt(index)->Label()) + 20.0f,
+						offset + x + StringWidth(TabAt(index)->Label()) + padding,
 						height);
 				case kBottomSide:
 					return BRect(offset + x, bounds.bottom - height,
-						offset + x + StringWidth(TabAt(index)->Label()) + 20.0f,
+						offset + x + StringWidth(TabAt(index)->Label()) + padding,
 						bounds.bottom);
 				case kLeftSide:
 					return BRect(0.0f, offset + x, height, offset + x
-						+ StringWidth(TabAt(index)->Label()) + 20.0f);
+						+ StringWidth(TabAt(index)->Label()) + padding);
 				case kRightSide:
 					return BRect(bounds.right - height, offset + x,
 						bounds.right, offset + x
-							+ StringWidth(TabAt(index)->Label()) + 20.0f);
+							+ StringWidth(TabAt(index)->Label()) + padding);
 				default:
 					return BRect();
 			}
@@ -1053,7 +1054,7 @@ BTabView::TabFrame(int32 index) const
 		case B_WIDTH_FROM_WIDEST:
 			width = 0.0;
 			for (int32 i = 0; i < CountTabs(); i++) {
-				float tabWidth = StringWidth(TabAt(i)->Label()) + 20.0f;
+				float tabWidth = StringWidth(TabAt(i)->Label()) + padding;
 				if (tabWidth > width)
 					width = tabWidth;
 			}
@@ -1404,7 +1405,8 @@ BTabView::_InitObject(bool layouted, button_width width)
 
 	font_height fh;
 	GetFontHeight(&fh);
-	fTabHeight = ceilf(fh.ascent + fh.descent + fh.leading + 8.0f);
+	fTabHeight = ceilf(fh.ascent + fh.descent + fh.leading +
+		(be_control_look->DefaultLabelSpacing() * 1.3f));
 
 	fContainerView = NULL;
 	_InitContainerView(layouted);

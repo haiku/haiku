@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <keyboard_mouse_driver.h>
+
 #include "ps2_service.h"
 
 
@@ -24,71 +26,6 @@
 #else
 #	define TRACE(x...)
 #endif
-
-
-static int32 generate_event(timer* timer);
-
-
-const bigtime_t kEventInterval = 1000 * 50;
-
-
-class EventProducer {
-public:
-	EventProducer()
-	{
-		fFired = false;
-	}
-
-	status_t
-	FireEvent(alps_cookie* cookie, uint8* package)
-	{
-		fCookie = cookie;
-		memcpy(fLastPackage, package, sizeof(uint8) * PS2_PACKET_ALPS);
-
-		status_t status = add_timer(&fEventTimer, &generate_event,
-			kEventInterval, B_ONE_SHOT_RELATIVE_TIMER);
-		if (status == B_OK)
-			fFired  = true;
-		return status;
-	}
-
-	bool
-	CancelEvent()
-	{
-		if (!fFired)
-			return false;
-		fFired = false;
-		return cancel_timer(&fEventTimer);
-	}
-
-	void
-	InjectEvent()
-	{
-		if (packet_buffer_write(fCookie->ring_buffer, fLastPackage,
-			PS2_PACKET_ALPS) != PS2_PACKET_ALPS) {
-			// buffer is full, drop new data
-			return;
-		}
-		release_sem_etc(fCookie->sem, 1, B_DO_NOT_RESCHEDULE);
-	}
-
-private:
-	bool				fFired;
-	uint8				fLastPackage[PS2_PACKET_ALPS];
-	timer				fEventTimer;
-	alps_cookie*		fCookie;
-};
-
-
-static EventProducer gEventProducer;
-
-
-static int32
-generate_event(timer* timer)
-{
-	gEventProducer.InjectEvent();
-	return B_HANDLED_INTERRUPT;
-}
 
 
 const char* kALPSPath[4] = {
@@ -179,7 +116,7 @@ static alps_model_info* sFoundModel = NULL;
 #define ALPS_HISTORY_SIZE	256
 
 
-static hardware_specs gHardwareSpecs;
+static touchpad_specs gHardwareSpecs;
 
 
 /* Data taken from linux driver:
@@ -192,13 +129,14 @@ byte 4:  0   y6   y5   y4   y3   y2   y1   y0
 byte 5:  0   z6   z5   z4   z3   z2   z1   z0
 */
 static status_t
-get_alps_movment(alps_cookie *cookie, mouse_movement *movement)
+get_alps_movment(alps_cookie *cookie, touchpad_read *_read)
 {
 	status_t status;
-	touch_event event;
+	touchpad_movement event;
 	uint8 event_buffer[PS2_PACKET_ALPS];
 
-	status = acquire_sem_etc(cookie->sem, 1, B_CAN_INTERRUPT, 0);
+	status = acquire_sem_etc(cookie->sem, 1, B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT,
+		_read->timeout);
 	if (status < B_OK)
 		return status;
 
@@ -219,18 +157,18 @@ get_alps_movment(alps_cookie *cookie, mouse_movement *movement)
 	// finger on touchpad
 	if (event_buffer[2] & 0x2) {
 		// finger with normal width
-		event.wValue = 4;
+		event.fingerWidth = 4;
 	} else {
-		event.wValue = 3;
+		event.fingerWidth = 3;
 	}
 
 	// tab gesture
 	if (event_buffer[2] & 0x1) {
 		event.zPressure = 60;
-		event.wValue = 4;
+		event.fingerWidth = 4;
 	}
 	// if hardware tab gesture is off a z pressure of 16 is reported
-	if (cookie->previousZ == 0 && event.wValue == 4 && event.zPressure == 16)
+	if (cookie->previousZ == 0 && event.fingerWidth == 4 && event.zPressure == 16)
 		event.zPressure = 60;
 
 	cookie->previousZ = event.zPressure;
@@ -240,33 +178,26 @@ get_alps_movment(alps_cookie *cookie, mouse_movement *movement)
 
 	// check for trackpoint even (z pressure 127)
 	if (sFoundModel->flags & ALPS_DUALPOINT && event.zPressure == 127) {
-		movement->xdelta = event.xPosition > 383 ? event.xPosition - 768
+		mouse_movement movement;
+		movement.xdelta = event.xPosition > 383 ? event.xPosition - 768
 			: event.xPosition;
-		movement->ydelta = event.yPosition > 255
+		movement.ydelta = event.yPosition > 255
 			? event.yPosition - 512 : event.yPosition;
-		movement->wheel_xdelta = 0;
-		movement->wheel_ydelta = 0;
-		movement->buttons = event.buttons;
-		movement->timestamp = system_time();
-		cookie->movementMaker.UpdateButtons(movement);
+		movement.wheel_xdelta = 0;
+		movement.wheel_ydelta = 0;
+		movement.buttons = event.buttons;
+		movement.timestamp = system_time();
+
+		_read->event = MS_READ;
+		_read->u.mouse = movement;
 	} else {
 		event.yPosition = AREA_END_Y - (event.yPosition - AREA_START_Y);
-		status = cookie->movementMaker.EventToMovement(&event, movement);
-	}
 
-	if (cookie->movementMaker.WasEdgeMotion()
-		|| cookie->movementMaker.TapDragStarted()) {
-		gEventProducer.FireEvent(cookie, event_buffer);
+		_read->event = MS_READ_TOUCHPAD;
+		_read->u.touchpad = event;
 	}
 
 	return status;
-}
-
-
-static void
-default_settings(touchpad_settings *set)
-{
-	memcpy(set, &kDefaultTouchpadSettings, sizeof(touchpad_settings));
 }
 
 
@@ -393,7 +324,6 @@ alps_open(const char *name, uint32 flags, void **_cookie)
 		goto err1;
 	memset(cookie, 0, sizeof(*cookie));
 
-	cookie->movementMaker.Init();
 	cookie->previousZ = 0;
 	*_cookie = cookie;
 
@@ -401,8 +331,6 @@ alps_open(const char *name, uint32 flags, void **_cookie)
 	dev->cookie = cookie;
 	dev->disconnect = &alps_disconnect;
 	dev->handle_int = &alps_handle_int;
-
-	default_settings(&cookie->settings);
 
 	gHardwareSpecs.edgeMotionWidth = EDGE_MOTION_WIDTH;
 
@@ -414,9 +342,6 @@ alps_open(const char *name, uint32 flags, void **_cookie)
 	gHardwareSpecs.minPressure = MIN_PRESSURE;
 	gHardwareSpecs.realMaxPressure = REAL_MAX_PRESSURE;
 	gHardwareSpecs.maxPressure = MAX_PRESSURE;
-
-	cookie->movementMaker.SetSettings(&cookie->settings);
-	cookie->movementMaker.SetSpecs(&gHardwareSpecs);
 
 	dev->packet_size = PS2_PACKET_ALPS;
 
@@ -482,8 +407,6 @@ err1:
 status_t
 alps_close(void *_cookie)
 {
-	gEventProducer.CancelEvent();
-
 	alps_cookie *cookie = (alps_cookie*)_cookie;
 
 	ps2_dev_command_timeout(cookie->dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0,
@@ -500,7 +423,7 @@ alps_close(void *_cookie)
 	// without a complete shutdown.
 	status_t status = ps2_reset_mouse(cookie->dev);
 	if (status != B_OK) {
-		INFO("ps2: reset failed\n");
+		INFO("ps2_alps: reset failed\n");
 		return B_ERROR;
 	}
 
@@ -521,29 +444,24 @@ status_t
 alps_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 {
 	alps_cookie *cookie = (alps_cookie*)_cookie;
-	mouse_movement movement;
+	touchpad_read read;
 	status_t status;
 
 	switch (op) {
-		case MS_READ:
-			TRACE("ALPS: MS_READ get event\n");
-			if ((status = get_alps_movment(cookie, &movement)) != B_OK)
-				return status;
-			return user_memcpy(buffer, &movement, sizeof(movement));
-
 		case MS_IS_TOUCHPAD:
 			TRACE("ALPS: MS_IS_TOUCHPAD\n");
-			return B_OK;
+			if (buffer == NULL)
+				return B_OK;
+			return user_memcpy(buffer, &gHardwareSpecs, sizeof(gHardwareSpecs));
 
-		case MS_SET_TOUCHPAD_SETTINGS:
-			TRACE("ALPS: MS_SET_TOUCHPAD_SETTINGS");
-			user_memcpy(&cookie->settings, buffer, sizeof(touchpad_settings));
-			return B_OK;
-
-		case MS_SET_CLICKSPEED:
-			TRACE("ALPS: ioctl MS_SETCLICK (set click speed)\n");
-			return user_memcpy(&cookie->movementMaker.click_speed, buffer,
-				sizeof(bigtime_t));
+		case MS_READ_TOUCHPAD:
+			TRACE("ALPS: MS_READ get event\n");
+			if (user_memcpy(&read.timeout, &(((touchpad_read*)buffer)->timeout),
+					sizeof(bigtime_t)) != B_OK)
+				return B_BAD_ADDRESS;
+			if ((status = get_alps_movment(cookie, &read)) != B_OK)
+				return status;
+			return user_memcpy(buffer, &read, sizeof(read));
 
 		default:
 			TRACE("ALPS: unknown opcode: %" B_PRIu32 "\n", op);
@@ -572,9 +490,6 @@ int32
 alps_handle_int(ps2_dev* dev)
 {
 	alps_cookie* cookie = (alps_cookie*)dev->cookie;
-
-	// we got a real event cancel the fake event
-	gEventProducer.CancelEvent();
 
 	uint8 val;
 	val = cookie->dev->history[0].data;

@@ -8,8 +8,6 @@ local sources =
 	AnalogClock.cpp
 	BaseView.cpp
 	ClockView.cpp
-	DateTimeEdit.cpp
-	SectionEdit.cpp
 	DateTimeView.cpp
 	NetworkTimeView.cpp
 	ntp.cpp

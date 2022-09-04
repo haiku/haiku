@@ -284,9 +284,9 @@ no supporting apps	OpenWithWindow		žádná vhodná aplikace
 32-bit unsigned integer	AttributesView		32 bitové přirozené číslo
 Preparing to empty Trash…	StatusWindow		Připrava vysypání koše...
 Deleting: 	StatusWindow		Odstraňování: 
+label too long	PoseView		štítek je příliš dlouhý
 the MIME settings	FSUtils		nastavení MIME
 You can't move or copy the trash.	FSUtils		Nelze přesunout nebo kopírovat koš.
-label too long	PoseView		štítek je příliš dlouhý
 Error creating link to \"%name\".	FSUtils		Chyba při vytváření odkazu na \"%name\".
 Unknown	FilePermissionsView		Neznámý
 Paste links	ContainerWindow		Vložit odkazy
@@ -335,8 +335,8 @@ MIME Path	AttributesView		Cesta MIME
 less than	FindPanel		méne než
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Chyba kopírování souboru \"%name\":\n\t%error\n\nPřejete si pokračovat?
 Creating links: 	StatusWindow		Vytváření odkazů: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nelze otevřít \"%document\" v aplikaci \"%app\" (%error). 
 Create %s clipping	PoseView		Vytvořit %s výstřižek
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nelze otevřít \"%document\" v aplikaci \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Chyba přesunu \"%name\"
 To: %dir	StatusWindow		Do: %dir
 Paste layout	ContainerWindow		Vložit rozložení
@@ -508,8 +508,8 @@ Add-ons	FilePanelPriv		Doplňky
 Empty folder	SlowContextPopup		Prázdný adresář
 Alignment	AttributesView		Zarovnání
 Move to Trash	FSUtils		Přesunout do Koše
-Handles %type	OpenWithWindow		Obstarává %type
 Cancel	PoseView		Zrušit
+Handles %type	OpenWithWindow		Obstarává %type
 Delete	PoseView		Odstranit
 Media parameter	AttributesView		Multimediální parametr
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Pokud změníte domovský adresář, %osName nemusí fungovat správně!\n\nOpravdu to chcete?\n\nPokud i tak chcete změnit domovský adresář, držte Shift a klikněte na \"Vím, co dělám\".

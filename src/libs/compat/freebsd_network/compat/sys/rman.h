@@ -1,9 +1,3 @@
-/*
- * Copyright 2007, Hugo Santos. All Rights Reserved.
- * Distributed under the terms of the MIT License.
- */
-
-
 /*-
  * Copyright 1998 Massachusetts Institute of Technology
  *
@@ -61,30 +55,7 @@ bus_space_handle_t rman_get_bushandle(struct resource *);
 bus_space_tag_t rman_get_bustag(struct resource *);
 int rman_get_rid(struct resource *);
 void* rman_get_virtual(struct resource *);
+bus_addr_t rman_get_start(struct resource *);
+bus_size_t rman_get_size(struct resource *);
 
-
-static inline u_long
-rman_get_start(struct resource *resourcePointer)
-{
-	return resourcePointer->r_bushandle;
-}
-
-
-static inline uint32_t
-rman_make_alignment_flags(uint32_t size)
-{
-	int i;
-
-	/*
-	 * Find the hightest bit set, and add one if more than one bit
-	 * set.  We're effectively computing the ceil(log2(size)) here.
-	 */
-	for (i = 31; i > 0; i--)
-		if ((1 << i) & size)
-			break;
-	if (~(1 << i) & size)
-		i++;
-
-	return RF_ALIGNMENT_LOG2(i);
-}
 #endif /* _FBSD_COMPAT_SYS_RMAN_H_ */

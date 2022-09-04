@@ -57,13 +57,8 @@ static status_t
 get_next_frame(addr_t fp, addr_t *next, addr_t *ip)
 {
 	if (fp != 0) {
-	        addr_t _fp = *(((addr_t*)fp) -3);
-	        addr_t _sp = *(((addr_t*)fp) -2);
-	        addr_t _lr = *(((addr_t*)fp) -1);
-	        addr_t _pc = *(((addr_t*)fp) -0);
-
-		*ip = (_fp != 0) ? _lr : _pc;
-		*next = _fp;
+		*ip   = *(((addr_t*)fp) - 0);
+		*next = *(((addr_t*)fp) - 1);
 
 		return B_OK;
 	}
@@ -102,7 +97,7 @@ static void
 set_debug_argument_variable(int32 index, uint64 value)
 {
 	char name[8];
-	snprintf(name, sizeof(name), "_arg%ld", index);
+	snprintf(name, sizeof(name), "_arg%" B_PRId32, index);
 	set_debug_variable(name, value);
 }
 
@@ -184,7 +179,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 			case B_INT32_TYPE:
 				value = read_function_argument_value<int32>(arg, valueKnown);
 				if (valueKnown)
-					kprintf("int32: \33[34m%ld\33[0m", (int32)value);
+					kprintf("int32: \33[34m%" B_PRId32 "\33[0m", (int32)value);
 				break;
 			case B_INT16_TYPE:
 				value = read_function_argument_value<int16>(arg, valueKnown);
@@ -207,9 +202,9 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 			case B_UINT32_TYPE:
 				value = read_function_argument_value<uint32>(arg, valueKnown);
 				if (valueKnown) {
-					kprintf("uint32: \33[34m%#lx\33[0m", (uint32)value);
+					kprintf("uint32: \33[34m%#" B_PRIx32 "\33[0m", (uint32)value);
 					if (value < 0x100000)
-						kprintf(" (\33[34m%lu\33[0m)", (uint32)value);
+						kprintf(" (\33[34m%" B_PRIu32 "\33[0m)", (uint32)value);
 				}
 				break;
 			case B_UINT16_TYPE:
@@ -243,7 +238,7 @@ print_demangled_call(const char* image, const char* symbol, addr_t args,
 							&& (type == B_POINTER_TYPE || type == B_REF_TYPE))
 							kprintf("NULL");
 						else
-							kprintf("\33[34m%#lx\33[0m", (uint32)value);
+							kprintf("\33[34m%#" B_PRIx32 "\33[0m", (uint32)value);
 					}
 					break;
 				}
@@ -361,7 +356,7 @@ stack_trace(int argc, char **argv)
 	}
 
 	addr_t previousLocations[NUM_PREVIOUS_LOCATIONS];
-	Thread* thread = NULL;
+	Thread* thread = thread_get_current_thread();
 	phys_addr_t oldPageDirectory = 0;
 	addr_t fp = arm_get_fp();
 	int32 num = 0, last = 0;
@@ -380,7 +375,7 @@ stack_trace(int argc, char **argv)
 	}
 
 	if (thread != NULL) {
-		kprintf("stack trace for thread 0x%lx \"%s\"\n", thread->id,
+		kprintf("stack trace for thread 0x%" B_PRIx32 " \"%s\"\n", thread->id,
 			thread->name);
 
 		kprintf("    kernel stack: %p to %p\n",
@@ -408,14 +403,16 @@ stack_trace(int argc, char **argv)
 
 		if (frame) {
 			kprintf("iframe at %p\n", frame);
-			kprintf("   r0 0x%08lx    r1 0x%08lx    r2 0x%08lx    r3 0x%08lx\n",
+			kprintf("   R00 0x%08x    R01 0x%08x    R02 0x%08x    R03 0x%08x\n",
 				frame->r0, frame->r1, frame->r2, frame->r3);
-			kprintf("   r4 0x%08lx    r5 0x%08lx    r6 0x%08lx    r7 0x%08lx\n",
+			kprintf("   R04 0x%08x    R05 0x%08x    R06 0x%08x    R07 0x%08x\n",
 				frame->r4, frame->r5, frame->r6, frame->r7);
-			kprintf("   r8 0x%08lx    r9 0x%08lx    r10 0x%08lx    r11 0x%08lx\n",
+			kprintf("   R08 0x%08x    R09 0x%08x    R10 0x%08x    R11 0x%08x\n",
 				frame->r8, frame->r9, frame->r10, frame->r11);
-			kprintf("   r12 0x%08lx   sp 0x%08lx    lr 0x%08lx    pc 0x%08lx\n",
+			kprintf("   R12 0x%08x    SPs 0x%08x    LRs 0x%08x    PC  0x%08x\n",
 				frame->r12, frame->svc_sp, frame->svc_lr, frame->pc);
+			kprintf("                     SPu 0x%08x    LRu 0x%08x   SPSR 0x%08x\n",
+				frame->usr_sp, frame->usr_lr, frame->spsr);
 
  			fp = frame->svc_sp;
 			print_stack_frame(thread, frame->pc, frame->svc_sp, frame->svc_lr, callIndex, demangle);

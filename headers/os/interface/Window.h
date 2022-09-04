@@ -365,6 +365,7 @@ private:
 			void				_GetDecoratorSize(float* _borderWidth,
 									float* _tabHeight) const;
 			void				_SendShowOrHideMessage();
+			void				_PropagateMessageToChildViews(BMessage*);
 
 private:
 			char*				fTitle;

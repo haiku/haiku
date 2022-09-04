@@ -18,7 +18,7 @@
 
 
 HAIKU_FBSD_DRIVER_GLUE(broadcom570x, bge, pci);
-HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_SWI_TASKQUEUE);
+HAIKU_DRIVER_REQUIREMENTS(0);
 
 
 extern driver_t *DRIVER_MODULE_NAME(brgphy, miibus);
@@ -44,8 +44,8 @@ __haiku_disable_interrupts(device_t dev)
 	struct bge_softc *sc = device_get_softc(dev);
 
 	uint32 notInterrupted = pci_read_config(sc->bge_dev, BGE_PCI_PCISTATE, 4)
-		& BGE_PCISTATE_INTR_STATE; 
-	// bit of a strange register name. a nonzero actually means 
+		& BGE_PCISTATE_INTR_STATE;
+	// bit of a strange register name. a nonzero actually means
 	// it is _not_ interrupted by the network chip
 
 	if (notInterrupted)

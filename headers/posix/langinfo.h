@@ -145,6 +145,7 @@ enum {
 __BEGIN_DECLS
 
 extern char*	nl_langinfo(nl_item item);
+extern char*	nl_langinfo_l(nl_item item, locale_t locale);
 
 __END_DECLS
 

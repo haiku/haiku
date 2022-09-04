@@ -36,6 +36,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			CalendarView.cpp
 			ColorQuantizer.cpp
 			CommandPipe.cpp
+			DateTimeEdit.cpp
 			DragTrackingFilter.cpp
 			DriverSettingsMessageAdapter.cpp
 			HashString.cpp
@@ -50,6 +51,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Keymap.cpp
 			LongAndDragTrackingFilter.cpp
 			md5.cpp
+			MemoryRingIO.cpp
 			MessageBuilder.cpp
 			NaturalCompare.cpp
 			PromptWindow.cpp

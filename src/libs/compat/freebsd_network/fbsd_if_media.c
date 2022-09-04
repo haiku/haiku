@@ -64,17 +64,17 @@
  * 	Useful for debugging newly-ported  drivers.
  */
 
-#define IFMEDIA_DEBUG
+//#define IFMEDIA_DEBUG
 #ifdef IFMEDIA_DEBUG
 #   define TRACE(x...) dprintf(x)
+
+static	void ifmedia_printword(int);
 #else
 #   define TRACE(x...) ;
 #endif
 
 static struct ifmedia_entry *ifmedia_match(struct ifmedia *ifm,
 	int flags, int mask);
-
-static	void ifmedia_printword(int);
 
 /*
  * Initialize if_media struct for a specific interface instance.

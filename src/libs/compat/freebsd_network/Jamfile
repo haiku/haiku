@@ -25,6 +25,7 @@ KernelStaticLibrary libfreebsd_network.a :
 	fbsd_subr_bufring.c
 	fbsd_subr_sbuf.c
 	fbsd_time.c
+	fbsd_timingsafe.c
 	fbsd_usb_error.c
 	fbsd_usb_util.c
 	fbsd_usb_lookup.c

@@ -347,7 +347,7 @@ TermApp::_Usage(char *name)
 			//"  -p,     --preference         load preference file\n"
 			"  -t,     --title              set window title\n"
 			"  -f,     --fullscreen         start fullscreen\n"
-			"  -w,     --working-directory  set initial working directory")
+			"  -w,     --working-directory  set initial working directory\n")
 			//"  -geom,  --geometry           set window geometry\n"
 			//"                               An example of geometry is \"80x25+100+100\"\n"
 		, stderr);

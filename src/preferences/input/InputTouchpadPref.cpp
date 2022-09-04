@@ -15,7 +15,7 @@
 #include <List.h>
 #include <String.h>
 
-#include <keyboard_mouse_driver.h>
+#include <InputServerDevice.h>
 
 
 TouchpadPref::TouchpadPref(BInputDevice* device)
@@ -63,7 +63,7 @@ TouchpadPref::UpdateSettings()
 	msg.AddInt8("tapgesture_sensibility", fSettings.tapgesture_sensibility);
 	msg.AddInt32("padblocker_threshold", fSettings.padblocker_threshold);
 
-	return fTouchPad->Control(MS_SET_TOUCHPAD_SETTINGS, &msg);
+	return fTouchPad->Control(B_SET_TOUCHPAD_SETTINGS, &msg);
 }
 
 

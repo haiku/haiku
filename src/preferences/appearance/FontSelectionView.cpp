@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Haiku.
+ * Copyright 2001-2022 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Philippe Saint-Pierre, stpere@gmail.com
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		John Scipione, jscipione@gmail.com
  */
 
 
@@ -22,7 +23,7 @@
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 #include <String.h>
-#include <StringView.h>
+#include <TextView.h>
 #include <Spinner.h>
 
 #include <FontPrivate.h>
@@ -40,8 +41,9 @@
 
 static const float kMinSize = 8.0;
 static const float kMaxSize = 72.0;
+static const float kPreviewTextWidth = 350.0;
 
-static const char *kPreviewText = B_TRANSLATE_COMMENT(
+static const char* kPreviewText = B_TRANSLATE_COMMENT(
 	"The quick brown fox jumps over the lazy dog.",
 	"Don't translate this literally ! Use a phrase showing all chars "
 	"from A to Z.");
@@ -118,18 +120,35 @@ FontSelectionView::FontSelectionView(const char* name,
 		fontSizeMessage);
 
 	fFontSizeSpinner->SetRange(kMinSize, kMaxSize);
-	fFontSizeSpinner->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	fFontSizeSpinner->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
+		B_SIZE_UNSET));
 
 	// preview
-	fPreviewTextView = new BStringView("preview text", kPreviewText);
+	// A string view would be enough if only it handled word-wrap.
+	fPreviewTextView = new BTextView("preview text");
+	fPreviewTextView->SetFontAndColor(&fCurrentFont);
+	fPreviewTextView->SetText(kPreviewText);
+	fPreviewTextView->MakeResizable(false);
+	fPreviewTextView->SetWordWrap(true);
+	fPreviewTextView->MakeEditable(false);
+	fPreviewTextView->MakeSelectable(false);
+	fPreviewTextView->SetInsets(0, 0, 0, 0);
+	fPreviewTextView->SetViewColor(ViewColor());
+	fPreviewTextView->SetLowColor(LowColor());
 
-	fPreviewTextView->SetFont(&fCurrentFont);
-	fPreviewTextView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	// determine initial line count using fCurrentFont
+	float lineCount = ceilf(fCurrentFont.StringWidth(kPreviewText)
+		/ kPreviewTextWidth);
+	fPreviewTextView->SetExplicitSize(BSize(kPreviewTextWidth,
+		fPreviewTextView->LineHeight(0) * lineCount));
 
 	// box around preview
 	fPreviewBox = new BBox("preview box", B_WILL_DRAW | B_FRAME_EVENTS);
-	fPreviewBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL)
-		.Add(fPreviewTextView)
+	fPreviewBox->AddChild(BGroupLayoutBuilder(B_VERTICAL)
+		.AddGroup(B_HORIZONTAL, 0)
+			.Add(fPreviewTextView)
+			.AddGlue()
+			.End()
 		.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING,
 			B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
 		.TopView()
@@ -221,6 +240,7 @@ FontSelectionView::MessageReceived(BMessage* msg)
 	}
 }
 
+
 BView*
 FontSelectionView::GetPreviewBox() const
 {
@@ -275,18 +295,17 @@ FontSelectionView::_SelectCurrentSize()
 	fFontSizeSpinner->SetValue((int32)fCurrentFont.Size());
 }
 
+
 void
 FontSelectionView::_UpdateFontPreview()
 {
-	const BRect textFrame = fPreviewTextView->Bounds();
-	BString text = BString(kPreviewText);
-	fCurrentFont.TruncateString(&text, B_TRUNCATE_END, textFrame.Width());
-	fPreviewTextView->SetFont(&fCurrentFont);
-	fPreviewTextView->SetText(text);
-
 #ifdef INSTANT_UPDATE
 	_UpdateSystemFont();
 #endif
+
+	fPreviewTextView->SetFontAndColor(&fCurrentFont);
+	fPreviewTextView->SetExplicitSize(BSize(kPreviewTextWidth,
+		fPreviewTextView->LineHeight(0) * fPreviewTextView->CountLines()));
 }
 
 

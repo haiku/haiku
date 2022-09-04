@@ -17,8 +17,8 @@
 #include <dev/msk/if_mskreg.h>
 
 
-HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_FAST_TASKQUEUE | FBSD_SWI_TASKQUEUE);
 HAIKU_FBSD_DRIVER_GLUE(marvell_yukon, mskc, pci)
+HAIKU_DRIVER_REQUIREMENTS(0);
 
 extern driver_t *DRIVER_MODULE_NAME(e1000phy, miibus);
 extern driver_t *DRIVER_MODULE_NAME(ukphy, miibus);

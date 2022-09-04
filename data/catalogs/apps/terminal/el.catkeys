@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Terminal	247549485
+1	greek, modern (1453-)	x-vnd.Haiku-Terminal	4089361699
 ANSI cyan color	Terminal AppearancePrefView		Γαλάζιο χρώμα ANSI
 Close other tabs	Terminal TermWindow		Κλείσιμο άλλων καρτελών
 Insert path	Terminal TermView		Εισάγετε την διαδρομή
@@ -7,13 +7,13 @@ Text encoding	Terminal TermWindow		Κωδικοποίηση κειμένου
 ANSI blue color	Terminal AppearancePrefView		Μπλε χρώμα ANSI
 OK	Terminal SetTitleWindow		Εντάξει
 Edit	Terminal TermWindow		Επεξεργασία
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               αυτό το μήνυμα βοήθειας\n  -t,     --title              ορισμός  τίτλου  παραθύρου\n  -f,     --fullscreen         έναρξη σε λειτουργία πλήρους οθόνης\n  -w,     --working-directory  ορισμός αρχικού καταλόγου εργασίας\n
 Select all	Terminal TermWindow		Επιλογή όλων
 Confirm exit if active programs exist	Terminal AppearancePrefView		Επιβεβαίωση εξόδου αν υπάρχουν ενεργά προγράμματα
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tΟ τρέχων κατάλογος εργασίας της ενεργής διεργασίας στην\n\t\t\tτρέχουσα καρτέλα. Ο μέγιστος αριθμός εξαρτημάτων διαδρομών μπορεί προαιρετικά\n\t\t\tνα οριστεί. π.χ. '%2d' για δύο εξαρτήματα.\n\t%T\t-\tΤο όνομα της εφαρμογής Τερματικό στην γλώσσα που έχετε επιλέξει.\n\t%e\t-\tΟ τρόπος κωδικοποίησης της τρέχουσας καρτέλας. Δεν θα εμφανιστεί αν η επιλεγμένη ρύθμιση είναι το UTF-8.\n\t%i\t-\tΤο αρχικό μήνυμα του παραθύρου.\n\t%p\t-\tΤο όνομα της ενεργής διεργασίας στην τρέχουσα καρτέλα.\n\t%t\t-\tΟ τίτλος της τρέχουσας καρτέλας.
 Solarized Dark	Terminal colors scheme		Έκλειψη Σελήνης
 Copy	Terminal TermWindow		Αντιγραφή
 ANSI bright green color	Terminal AppearancePrefView		Ανοιχτό πράσινο χρώμα ANSI
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               εμφάνιση αυτής της βοήθειας\n  -t,     --title              ορισμός τίτλου παραθύρου\n  -f,     --fullscreen         εκκίνηση σε λειτουργία πλήρους οθόνης\n  -w,     --working-directory  ορισμός αρχικού καταλόγου εργασίας
 ANSI white color	Terminal AppearancePrefView		Λευκό χρώμα ANSI
 Retro	Terminal colors scheme		Ρετρό
 Edit tab title…	Terminal TermWindow		Επεξεργασία τίτλου καρτέλας…

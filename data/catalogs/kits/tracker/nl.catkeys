@@ -284,9 +284,9 @@ no supporting apps	OpenWithWindow		geen ondersteunde toepassingen
 32-bit unsigned integer	AttributesView		32-bit unsigned integer
 Preparing to empty Trash…	StatusWindow		Leegmaken prullenbak voorbereiden...
 Deleting: 	StatusWindow		Verwijdert:
+label too long	PoseView		label te lang
 the MIME settings	FSUtils		de MIME-instellingen
 You can't move or copy the trash.	FSUtils		U kunt de prullenbak niet verplaatsen of kopiëren.
-label too long	PoseView		label te lang
 Error creating link to \"%name\".	FSUtils		Fout bij het aanmaken van de link naar \"%name\".
 Unknown	FilePermissionsView		Onbekend
 Paste links	ContainerWindow		Links plakken
@@ -335,8 +335,8 @@ MIME Path	AttributesView		MIME-pad
 less than	FindPanel		minder dan
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fout bij het kopiëren van het bestand \"%name\":\n\t%error\n\nWilt u doorgaan?
 Creating links: 	StatusWindow		Bezig met maken van koppelingen:
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" kon niet met \"%app\" geopend worden (%error).
 Create %s clipping	PoseView		Maak %s clipping
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		\"%document\" kon niet met \"%app\" geopend worden (%error).
 Error moving \"%name\"	FSUtils		Fout bij het verplaatsen van \"%name\"
 To: %dir	StatusWindow		Naar: %dir
 Paste layout	ContainerWindow		Lay-out plakken
@@ -508,8 +508,8 @@ Add-ons	FilePanelPriv		Invoegtoepassingen
 Empty folder	SlowContextPopup		Lege map
 Alignment	AttributesView		Uitlijning
 Move to Trash	FSUtils		Verplaats naar Prullenbak
-Handles %type	OpenWithWindow		Behandelt %type
 Cancel	PoseView		Annuleren
+Handles %type	OpenWithWindow		Behandelt %type
 Delete	PoseView		Verwijderen
 Media parameter	AttributesView		Mediaparameter
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Als de thuismap gewijzigd wordt, dan functioneert %osName mogelijk niet goed meer!\n\nWeet u zeker dat u wilt doorgaan?\n\nOm de thuismap niettemin te wijzigen, houd de Shift-knop ingedrukt en klik op \"Ik weet zeker wat ik doe\".

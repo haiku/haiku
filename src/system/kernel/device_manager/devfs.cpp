@@ -149,11 +149,6 @@ struct devfs_cookie {
 	void*				device_cookie;
 };
 
-struct synchronous_io_cookie {
-	BaseDevice*		device;
-	void*			cookie;
-};
-
 // directory iteration states
 enum {
 	ITERATION_STATE_DOT		= 0,
@@ -815,22 +810,6 @@ get_device_name(struct devfs_vnode* vnode, char* buffer, size_t size)
 
 		offset = start;
 	}
-}
-
-
-static status_t
-device_read(void* _cookie, off_t offset, void* buffer, size_t* length)
-{
-	synchronous_io_cookie* cookie = (synchronous_io_cookie*)_cookie;
-	return cookie->device->Read(cookie->cookie, offset, buffer, length);
-}
-
-
-static status_t
-device_write(void* _cookie, off_t offset, void* buffer, size_t* length)
-{
-	synchronous_io_cookie* cookie = (synchronous_io_cookie*)_cookie;
-	return cookie->device->Write(cookie->cookie, offset, buffer, length);
 }
 
 
@@ -1828,16 +1807,13 @@ devfs_io(fs_volume* volume, fs_vnode* _vnode, void* _cookie,
 	devfs_vnode* vnode = (devfs_vnode*)_vnode->private_node;
 	devfs_cookie* cookie = (devfs_cookie*)_cookie;
 
-	bool isWrite = request->IsWrite();
-
-	if (!S_ISCHR(vnode->stream.type)
-		|| (((isWrite && !vnode->stream.u.dev.device->HasWrite())
-				|| (!isWrite && !vnode->stream.u.dev.device->HasRead()))
-			&& !vnode->stream.u.dev.device->HasIO())
-		|| cookie == NULL) {
+	if (!S_ISCHR(vnode->stream.type) || cookie == NULL) {
 		request->SetStatusAndNotify(B_NOT_ALLOWED);
 		return B_NOT_ALLOWED;
 	}
+
+	if (!vnode->stream.u.dev.device->HasIO())
+		return B_UNSUPPORTED;
 
 	if (vnode->stream.u.dev.partition != NULL) {
 		if (request->Offset() + (off_t)request->Length()
@@ -1848,16 +1824,7 @@ devfs_io(fs_volume* volume, fs_vnode* _vnode, void* _cookie,
 		translate_partition_access(vnode->stream.u.dev.partition, request);
 	}
 
-	if (vnode->stream.u.dev.device->HasIO())
-		return vnode->stream.u.dev.device->IO(cookie->device_cookie, request);
-
-	synchronous_io_cookie synchronousCookie = {
-		vnode->stream.u.dev.device,
-		cookie->device_cookie
-	};
-
-	return vfs_synchronous_io(request,
-		request->IsWrite() ? &device_write : &device_read, &synchronousCookie);
+	return vnode->stream.u.dev.device->IO(cookie->device_cookie, request);
 }
 
 
@@ -2287,13 +2254,14 @@ void
 devfs_compute_geometry_size(device_geometry* geometry, uint64 blockCount,
 	uint32 blockSize)
 {
-	if (blockCount > UINT32_MAX)
-		geometry->head_count = (blockCount + UINT32_MAX - 1) / UINT32_MAX;
-	else
-		geometry->head_count = 1;
+	geometry->head_count = 1;
+	while (blockCount > UINT32_MAX) {
+		geometry->head_count <<= 1;
+		blockCount >>= 1;
+	}
 
 	geometry->cylinder_count = 1;
-	geometry->sectors_per_track = blockCount / geometry->head_count;
+	geometry->sectors_per_track = blockCount;
 	geometry->bytes_per_sector = blockSize;
 }
 

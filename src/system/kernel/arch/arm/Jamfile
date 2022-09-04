@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src system kernel arch arm ;
 
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica include ;
 SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 UsePrivateKernelHeaders ;
 
@@ -8,6 +9,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) paging 32bit ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 KernelMergeObject kernel_arch_arm.o :
+	acpi_irq_routing_table.cpp
 	arch_commpage.cpp
 	arch_cpu.cpp
 	arch_debug_console.cpp
@@ -36,6 +38,7 @@ KernelMergeObject kernel_arch_arm.o :
 	arch_atomic32.cpp
 
 	arch_int_gicv2.cpp
+	arch_timer_generic.cpp
 
 	# SoC minimal kernel-required support
 	# (timers, interrupts, rtc?)
@@ -63,3 +66,6 @@ KernelMergeObject kernel_arch_arm.o :
 
 CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp : $(TARGET_KERNEL_ARCH) ;
 
+# syscall headers are generated on the fly, so we need a explicit dependency.
+Includes [ FGristFiles arch_int.cpp arch_asm.S ]
+	: <syscalls!$(TARGET_PACKAGING_ARCH)>syscall_numbers.h ;

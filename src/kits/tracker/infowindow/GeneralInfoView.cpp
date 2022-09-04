@@ -39,6 +39,7 @@ All rights reserved.
 
 #include <Application.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Locale.h>
 #include <NodeMonitor.h>
 #include <PopUpMenu.h>
@@ -54,7 +55,6 @@ All rights reserved.
 #include "Attributes.h"
 #include "Commands.h"
 #include "FSUtils.h"
-#include "IconMenuItem.h"
 #include "InfoWindow.h"
 #include "Model.h"
 #include "NavMenu.h"
@@ -87,8 +87,7 @@ private:
 }	// namespace BPrivate
 
 
-const float kBorderMargin = 15.0f;
-const float kDrawMargin = 3.0f;
+static float sBorderMargin, sDrawMargin = 0.0f;
 
 
 const uint32 kSetPreferredApp = 'setp';
@@ -176,9 +175,14 @@ GeneralInfoView::GeneralInfoView(Model* model)
 		B_TRANSLATE("Kind:"),
 		B_TRANSLATE("Link to:"),
 		B_TRANSLATE("Version:"),
+		B_TRANSLATE("Filesystem:"),
 		NULL
 	};
 
+	if (sDrawMargin == 0.0f) {
+		sDrawMargin = be_control_look->DefaultLabelSpacing() / 2.0f;
+		sBorderMargin = sDrawMargin * 5.0f;
+	}
 
 	SetFlags(Flags() | B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS);
 	SetName(B_TRANSLATE("Information"));
@@ -200,7 +204,7 @@ GeneralInfoView::GeneralInfoView(Model* model)
 	float width = 0;
 	for (int i = 0; fieldNames[i] != 0; i++)
 		width = std::max(width, StringWidth(fieldNames[i]));
-	fDivider = width + kBorderMargin + 1;
+	fDivider = width + sBorderMargin + 1;
 
 	// Keep some free space for the stuff we print ourselves
 	float lineHeight = CurrentFontHeight();
@@ -209,7 +213,7 @@ GeneralInfoView::GeneralInfoView(Model* model)
 		lineCount += 1; // Add space for "Link to" line
 	if (model->IsExecutable())
 		lineCount += 2; // Add space for "Version" and "Description" lines
-	GroupLayout()->SetInsets(kBorderMargin, lineHeight * lineCount,
+	GroupLayout()->SetInsets(sBorderMargin, lineHeight * lineCount,
 		B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING);
 
 	// Add a preferred handler pop-up menu if this item
@@ -226,7 +230,7 @@ GeneralInfoView::GeneralInfoView(Model* model)
 			fDivider = currentFont.StringWidth(B_TRANSLATE("Opens with:"))
 				+ 5;
 			fPreferredAppMenu->SetDivider(fDivider);
-			fDivider += (kBorderMargin - 2);
+			fDivider += (sBorderMargin - 2);
 			fPreferredAppMenu->SetFont(&currentFont);
 			fPreferredAppMenu->SetHighUIColor(B_PANEL_TEXT_COLOR);
 			fPreferredAppMenu->SetLabel(B_TRANSLATE("Opens with:"));
@@ -308,9 +312,9 @@ GeneralInfoView::InitStrings(const Model* model)
 
 	// We'll do our own truncation later on in Draw()
 	WidgetAttributeText::AttrAsString(model, &fCreatedStr, kAttrStatCreated,
-		B_TIME_TYPE, drawBounds.Width() - kBorderMargin, this);
+		B_TIME_TYPE, drawBounds.Width() - sBorderMargin, this);
 	WidgetAttributeText::AttrAsString(model, &fModifiedStr, kAttrStatModified,
-		B_TIME_TYPE, drawBounds.Width() - kBorderMargin, this);
+		B_TIME_TYPE, drawBounds.Width() - sBorderMargin, this);
 	WidgetAttributeText::AttrAsString(model, &fPathStr, kAttrPath,
 		B_STRING_TYPE, 0, this);
 
@@ -353,6 +357,19 @@ GeneralInfoView::InitStrings(const Model* model)
 			fDescStr.ReplaceAll('\t', ' ');
 		} else
 			fDescStr = "-";
+	} else if (model->IsVolume()) {
+		const node_ref* modelNodeRef = fModel->NodeRef();
+		fs_info modelInfo;
+		if (fs_stat_dev(modelNodeRef->device, &modelInfo) == B_OK)
+		{
+			fFileSystemStr = modelInfo.fsh_name;
+			fFileSystemStr << B_TRANSLATE(" (block size: ")
+				<< modelInfo.block_size;
+			if ((modelInfo.flags & B_FS_HAS_QUERY) != 0)
+				fFileSystemStr += B_TRANSLATE(", indexed");
+			fFileSystemStr += ")";
+		} else
+			fFileSystemStr = B_TRANSLATE("(unknown)");
 	}
 
 	if (mime.SetType(model->MimeType()) == B_OK
@@ -433,10 +450,10 @@ GeneralInfoView::ModelChanged(Model* model, BMessage* message)
 			if (model->OpenNode() == B_OK) {
 				WidgetAttributeText::AttrAsString(model, &fCreatedStr,
 					kAttrStatCreated, B_TIME_TYPE, drawBounds.Width()
-					- kBorderMargin, this);
+					- sBorderMargin, this);
 				WidgetAttributeText::AttrAsString(model, &fModifiedStr,
 					kAttrStatModified, B_TIME_TYPE, drawBounds.Width()
-					- kBorderMargin, this);
+					- sBorderMargin, this);
 
 				// don't change the size if it's a directory
 				if (!model->IsDirectory()) {
@@ -568,7 +585,7 @@ GeneralInfoView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 				BFont font;
 				GetFont(&font);
 				float maxWidth = (Bounds().Width()
-					- (fDivider + kBorderMargin));
+					- (fDivider + sBorderMargin));
 
 				if (fPathRect.Contains(point)) {
 					if (fCurrentPathColorWhich != B_LINK_HOVER_COLOR)
@@ -825,14 +842,14 @@ GeneralInfoView::Draw(BRect)
 		DrawString(B_TRANSLATE("Size:"));
 	}
 
-	MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
+	MovePenTo(BPoint(fDivider + sDrawMargin, lineBase));
 	SetHighColor(attributeColor);
 	// Check for possible need of truncation
 	if (StringWidth(fSizeString.String())
-			> (Bounds().Width() - (fDivider + kBorderMargin))) {
+			> (Bounds().Width() - (fDivider + sBorderMargin))) {
 		BString tmpString(fSizeString.String());
 		TruncateString(&tmpString, B_TRUNCATE_MIDDLE,
-			Bounds().Width() - (fDivider + kBorderMargin));
+			Bounds().Width() - (fDivider + sBorderMargin));
 		DrawString(tmpString.String());
 		fSizeRect.right = fSizeRect.left + StringWidth(tmpString.String())
 			+ 3;
@@ -847,7 +864,7 @@ GeneralInfoView::Draw(BRect)
 	MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Created:"))),
 		lineBase));
 	DrawString(B_TRANSLATE("Created:"));
-	MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
+	MovePenTo(BPoint(fDivider + sDrawMargin, lineBase));
 	SetHighColor(attributeColor);
 	DrawString(fCreatedStr.String());
 	lineBase += lineHeight;
@@ -857,7 +874,7 @@ GeneralInfoView::Draw(BRect)
 		lineBase));
 	SetHighColor(labelColor);
 	DrawString(B_TRANSLATE("Modified:"));
-	MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
+	MovePenTo(BPoint(fDivider + sDrawMargin, lineBase));
 	SetHighColor(attributeColor);
 	DrawString(fModifiedStr.String());
 	lineBase += lineHeight;
@@ -867,7 +884,7 @@ GeneralInfoView::Draw(BRect)
 		lineBase));
 	SetHighColor(labelColor);
 	DrawString(B_TRANSLATE("Kind:"));
-	MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
+	MovePenTo(BPoint(fDivider + sDrawMargin, lineBase));
 	SetHighColor(attributeColor);
 	DrawString(fKindStr.String());
 	lineBase += lineHeight;
@@ -881,15 +898,15 @@ GeneralInfoView::Draw(BRect)
 	SetHighColor(labelColor);
 	DrawString(B_TRANSLATE("Location:"));
 
-	MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
+	MovePenTo(BPoint(fDivider + sDrawMargin, lineBase));
 	SetHighUIColor(fCurrentPathColorWhich);
 
 	// Check for truncation
 	if (StringWidth(fPathStr.String()) > (Bounds().Width()
-			- (fDivider + kBorderMargin))) {
+			- (fDivider + sBorderMargin))) {
 		BString nameString(fPathStr.String());
 		TruncateString(&nameString, B_TRUNCATE_MIDDLE,
-			Bounds().Width() - (fDivider + kBorderMargin));
+			Bounds().Width() - (fDivider + sBorderMargin));
 		DrawString(nameString.String());
 	} else
 		DrawString(fPathStr.String());
@@ -908,15 +925,15 @@ GeneralInfoView::Draw(BRect)
 			lineBase));
 		SetHighColor(labelColor);
 		DrawString(B_TRANSLATE("Link to:"));
-		MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
+		MovePenTo(BPoint(fDivider + sDrawMargin, lineBase));
 		SetHighUIColor(fCurrentLinkColorWhich);
 
 		// Check for truncation
 		if (StringWidth(fLinkToStr.String()) > (Bounds().Width()
-				- (fDivider + kBorderMargin))) {
+				- (fDivider + sBorderMargin))) {
 			BString nameString(fLinkToStr.String());
 			TruncateString(&nameString, B_TRUNCATE_MIDDLE,
-				Bounds().Width() - (fDivider + kBorderMargin));
+				Bounds().Width() - (fDivider + sBorderMargin));
 			DrawString(nameString.String());
 		} else
 			DrawString(fLinkToStr.String());
@@ -936,7 +953,7 @@ GeneralInfoView::Draw(BRect)
 			lineBase));
 		SetHighColor(labelColor);
 		DrawString(B_TRANSLATE("Version:"));
-		MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
+		MovePenTo(BPoint(fDivider + sDrawMargin, lineBase));
 		SetHighColor(attributeColor);
 		BString nameString;
 		if (fModel->GetVersionString(nameString, B_APP_VERSION_KIND) == B_OK)
@@ -950,14 +967,14 @@ GeneralInfoView::Draw(BRect)
 			lineBase));
 		SetHighColor(labelColor);
 		DrawString(B_TRANSLATE("Description:"));
-		MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
+		MovePenTo(BPoint(fDivider + sDrawMargin, lineBase));
 		SetHighColor(attributeColor);
 		// Check for truncation
 		if (StringWidth(fDescStr.String()) > (Bounds().Width()
-				- (fDivider + kBorderMargin))) {
+				- (fDivider + sBorderMargin))) {
 			BString nameString(fDescStr.String());
 			TruncateString(&nameString, B_TRUNCATE_MIDDLE,
-				Bounds().Width() - (fDivider + kBorderMargin));
+				Bounds().Width() - (fDivider + sBorderMargin));
 			DrawString(nameString.String());
 		} else
 			DrawString(fDescStr.String());
@@ -969,6 +986,27 @@ GeneralInfoView::Draw(BRect)
 		fDescRect.right = fDescRect.left + StringWidth(fDescStr.String()) + 3;
 
 		// No link field
+		fLinkRect = BRect(-1, -1, -1, -1);
+	} else if (fModel->IsVolume()) {
+		//Filesystem
+		MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Filesystem:"))),
+			lineBase));
+		SetHighColor(labelColor);
+		DrawString(B_TRANSLATE("Filesystem:"));
+		MovePenTo(BPoint(fDivider + sDrawMargin, lineBase));
+		SetHighColor(attributeColor);
+		// Check for truncation
+		if (StringWidth(fFileSystemStr.String()) > (Bounds().Width()
+				- (fDivider + sBorderMargin))) {
+			BString nameString(fFileSystemStr.String());
+			TruncateString(&nameString, B_TRUNCATE_MIDDLE,
+				Bounds().Width() - (fDivider + sBorderMargin));
+			DrawString(nameString.String());
+		} else
+			DrawString(fFileSystemStr.String());
+
+		// No description field or link field
+		fDescRect = BRect(-1, -1, -1, -1);
 		fLinkRect = BRect(-1, -1, -1, -1);
 	}
 }

@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <algorithm>
+
 #include <InterfaceDefs.h>
 #include <String.h>
 
@@ -30,6 +32,32 @@
  */
 
 #include "multimon.h"	// the usual: DANGER WILL, ROBINSON!
+
+
+
+// Vendors.h is generated using this commands:
+/*
+ * wget https://uefi.org/uefi-pnp-export -O Vendors.h.tmp
+ * if [ $? -eq 0 ]; then
+ *	sed -E -e 's:<thead>::g' -e 's:<tr.*="(.+)"><td>:{ ":g' -e 's:<td>[[:digit:]]{2}/[[:digit:]]{2}/[[:digit:]]{4}</td>::g' -e 's: *(<\/td><td>):\", \":g' -e 's: *<\/td>.<\/tr>:\" },:g' -e 's/"(.*?)", "(.*?)"/\"\2\", \"\1\"/' -e 's/&amp;/\&/' -e "s/&#039;/'/" Vendors.h.tmp | grep -v '<' | sort > Vendors.h
+ * fi
+ * rm Vendors.h.tmp
+ */
+
+struct pnp_id {
+	const char* id;
+	const char* manufacturer;
+	bool operator==(const pnp_id& a) const {
+		return ::strcasecmp(a.id, id) == 0;
+	};
+	bool operator()(const pnp_id& a, const pnp_id& b) const {
+		return ::strcasecmp(a.id, b.id) < 0;
+	};
+};
+
+static const struct pnp_id kPNPIDs[] = {
+#include "Vendors.h"
+};
 
 
 static combine_mode
@@ -347,6 +375,23 @@ ScreenMode::GetRefreshLimits(const screen_mode& mode, float& min, float& max)
 }
 
 
+const char*
+ScreenMode::GetManufacturerFromID(const char* id) const
+{
+	// We assume the array is sorted
+	const size_t numElements = sizeof(kPNPIDs) / sizeof(kPNPIDs[0]);
+	const struct pnp_id key = { id, "dummy" };
+	const pnp_id* lastElement = kPNPIDs + numElements;
+	const pnp_id* element = std::find(kPNPIDs, lastElement, key);
+	if (element == lastElement) {
+		// can't find the vendor code
+		return NULL;
+	}
+
+	return element->manufacturer;
+}
+
+
 status_t
 ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 {
@@ -369,203 +414,11 @@ ScreenMode::GetMonitorInfo(monitor_info& info, float* _diagonalInches)
 		info.max_vertical_frequency = 85;
 	}
 
-	// TODO: If the names aren't sound, we could see if we find/create a
-	// database for the entries with user presentable names; they are fine
-	// for the models I could test with so far.
-
-	uint32 id = (info.vendor[0] << 24) | (info.vendor[1] << 16)
-		| (info.vendor[2] << 8) | (info.vendor[3]);
-
-	switch (id) {
-		case 'ACI\0':
-			strcpy(info.vendor, "Ancor Communications");
-			break;
-		case 'ADI\0':
-			strcpy(info.vendor, "ADI MicroScan");
-			break;
-		case 'AAC\0':
-		case 'ACR\0':
-		case 'API\0':
-			strcpy(info.vendor, "Acer");
-			break;
-		case 'ACT\0':
-			strcpy(info.vendor, "Targa");
-			break;
-		case 'APP\0':
-			strcpy(info.vendor, "Apple");
-			break;
-		case 'AUO\0':
-			strcpy(info.vendor, "AU Optronics");
-			break;
-		case 'BNQ\0':
-			strcpy(info.vendor, "BenQ");
-			break;
-		case 'CMN\0':
-			strcpy(info.vendor, "Chimei Innolux");
-		case 'CPL\0':
-			strcpy(info.vendor, "ALFA");
-			break;
-		case 'CPQ\0':
-			strcpy(info.vendor, "Compaq");
-			break;
-		case 'DEL\0':
-			strcpy(info.vendor, "Dell");
-			break;
-		case 'DPC\0':
-			strcpy(info.vendor, "Delta Electronics");
-			break;
-		case 'DWE\0':
-			strcpy(info.vendor, "Daewoo");
-			break;
-		case 'ECS\0':
-			strcpy(info.vendor, "Elitegroup");
-			break;
-		case 'ELS\0':
-			strcpy(info.vendor, "ELSA");
-			break;
-		case 'EMA\0':
-			strcpy(info.vendor, "eMachines");
-			break;
-		case 'EIZ\0':
-		case 'ENC\0':
-			strcpy(info.vendor, "Eizo");
-			break;
-		case 'EPI\0':
-			strcpy(info.vendor, "Envision");
-			break;
-		case 'FCM\0':
-			strcpy(info.vendor, "Funai Electronics");
-			break;
-		case 'FUS\0':
-			strcpy(info.vendor, "Fujitsu-Siemens");
-			break;
-		case 'GSM\0':
-			strcpy(info.vendor, "LG");
-			break;
-		case 'GWY\0':
-			strcpy(info.vendor, "Gateway");
-			break;
-		case 'HIQ\0':
-		case 'HEI\0':
-			strcpy(info.vendor, "Hyundai");
-			break;
-		case 'HIT\0':
-		case 'HTC\0':
-			strcpy(info.vendor, "Hitachi");
-			break;
-		case 'HSL\0':
-			strcpy(info.vendor, "Hansol");
-			break;
-		case 'HWP\0':
-			strcpy(info.vendor, "Hewlett Packard");
-			break;
-		case 'ICL\0':
-			strcpy(info.vendor, "Fujitsu");
-			break;
-		case 'IVM\0':
-			strcpy(info.vendor, "Iiyama");
-			break;
-		case 'LEN\0':
-			strcpy(info.vendor, "Lenovo");
-			break;
-		case 'LPL\0':
-			strcpy(info.vendor, "LG Phillips");
-			break;
-		case 'LTN\0':
-			strcpy(info.vendor, "Lite-On");
-			break;
-		case 'MAX\0':
-			strcpy(info.vendor, "Maxdata");
-			break;
-		case 'MED\0':
-			strcpy(info.vendor, "Medion");
-			break;
-		case 'MEI\0':
-			strcpy(info.vendor, "Panasonic");
-			break;
-		case 'MEL\0':
-			strcpy(info.vendor, "Mitsubishi");
-			break;
-		case 'MIR\0':
-			strcpy(info.vendor, "miro");
-			break;
-		case 'MTC\0':
-			strcpy(info.vendor, "Mitac");
-			break;
-		case 'NAN\0':
-			strcpy(info.vendor, "Nanao");
-			break;
-		case 'NOK\0':
-			strcpy(info.vendor, "Nokia");
-			break;
-		case 'OQI\0':
-			strcpy(info.vendor, "Optiquest");
-			break;
-		case 'PHL\0':
-			strcpy(info.vendor, "Philips");
-			break;
-		case 'PTS\0':
-			strcpy(info.vendor, "Proview");
-			break;
-		case 'QDS\0':
-			strcpy(info.vendor, "Quanta Display");
-			break;
-		case 'REL\0':
-			strcpy(info.vendor, "Relisys");
-			break;
-		case 'SAM\0':
-			strcpy(info.vendor, "Samsung");
-			break;
-		case 'SDI\0':
-			strcpy(info.vendor, "Samtron");
-			break;
-		case 'SEC\0':
-			strcpy(info.vendor, "Seiko Epson");
-			break;
-		case 'SHP\0':
-			strcpy(info.vendor, "Sharp");
-			break;
-		case 'SNI\0':
-			strcpy(info.vendor, "Siemens");
-			break;
-		case 'SNY\0':
-			strcpy(info.vendor, "Sony");
-			break;
-		case 'SPT\0':
-			strcpy(info.vendor, "Sceptre");
-			break;
-		case 'SRC\0':
-			strcpy(info.vendor, "Shamrock");
-			break;
-		case 'SUN\0':
-			strcpy(info.vendor, "Sun Microsystems");
-			break;
-		case 'TAT\0':
-			strcpy(info.vendor, "Tatung");
-			break;
-		case 'TOS\0':
-		case 'TSB\0':
-			strcpy(info.vendor, "Toshiba");
-			break;
-		case 'UNK\0':
-			strcpy(info.vendor, "(unknown)");
-			break;
-		case 'UNM\0':
-			strcpy(info.vendor, "Unisys");
-			break;
-		case 'VES\0':
-			strcpy(info.vendor, "Vestel");
-			break;
-		case 'VIZ\0':
-			strcpy(info.vendor, "Vizio");
-			break;
-		case 'VSC\0':
-			strcpy(info.vendor, "ViewSonic");
-			break;
-		case 'ZCM\0':
-			strcpy(info.vendor, "Zenith");
-			break;
-	}
+	char vendor[4];
+	strlcpy(vendor, info.vendor, sizeof(vendor));
+	const char* vendorString = GetManufacturerFromID(vendor);
+	if (vendorString != NULL)
+		strlcpy(info.vendor, vendorString, sizeof(info.vendor));
 
 	// Remove extraneous vendor strings and whitespace
 

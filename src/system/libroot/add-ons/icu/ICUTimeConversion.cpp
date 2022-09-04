@@ -47,6 +47,7 @@ status_t
 ICUTimeConversion::TZSet(const char* timeZoneID, const char* tz)
 {
 	bool offsetHasBeenSet = false;
+	bool timeZoneIdMatches = false;
 
 	// The given TZ environment variable's content overrides the default
 	// system timezone.
@@ -55,8 +56,10 @@ ICUTimeConversion::TZSet(const char* timeZoneID, const char* tz)
 		// value is implementation specific, we expect a full timezone ID.
 		if (*tz == ':') {
 			// nothing to do if the given name matches the current timezone
-			if (strcasecmp(fTimeZoneID, tz + 1) == 0)
-				return B_OK;
+			if (strcasecmp(fTimeZoneID, tz + 1) == 0) {
+				timeZoneIdMatches = true;
+				goto done;
+			}
 
 			strlcpy(fTimeZoneID, tz + 1, sizeof(fTimeZoneID));
 		} else {
@@ -64,8 +67,10 @@ ICUTimeConversion::TZSet(const char* timeZoneID, const char* tz)
 			strlcpy(fTimeZoneID, tz, sizeof(fTimeZoneID));
 
 			// nothing to do if the given name matches the current timezone
-			if (strcasecmp(fTimeZoneID, fDataBridge->addrOfTZName[0]) == 0)
-				return B_OK;
+			if (strcasecmp(fTimeZoneID, fDataBridge->addrOfTZName[0]) == 0) {
+				timeZoneIdMatches = true;
+				goto done;
+			}
 
 			// parse TZ variable (only <std> and <offset> supported)
 			const char* tzNameEnd = tz;
@@ -88,11 +93,20 @@ ICUTimeConversion::TZSet(const char* timeZoneID, const char* tz)
 		}
 	} else {
 		// nothing to do if the given name matches the current timezone
-		if (strcasecmp(fTimeZoneID, timeZoneID) == 0)
-			return B_OK;
+		if (strcasecmp(fTimeZoneID, timeZoneID) == 0) {
+			timeZoneIdMatches = true;
+			goto done;
+		}
 
 		strlcpy(fTimeZoneID, timeZoneID, sizeof(fTimeZoneID));
 	}
+
+done:
+	// fTimeZone can still be NULL if we don't initialize it
+	// in the first TZSet, causing problems for future
+	// Localtime invocations.
+	if (fTimeZone != NULL && timeZoneIdMatches)
+		return B_OK;
 
 	delete fTimeZone;
 	fTimeZone = TimeZone::createTimeZone(fTimeZoneID);

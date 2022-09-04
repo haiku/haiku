@@ -454,7 +454,8 @@ channel_init(device_node *node, void **_channelCookie)
 // used.
 	prdtSize = (ATA_ADAPTER_MAX_SG_COUNT * sizeof(prd_entry) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
 	channel->prd_area = create_area("prd", (void **)&channel->prdt,
-		B_ANY_KERNEL_ADDRESS, prdtSize, B_32_BIT_CONTIGUOUS, 0);
+		B_ANY_KERNEL_ADDRESS, prdtSize, B_32_BIT_CONTIGUOUS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (channel->prd_area < B_OK) {
 		TRACE("creating prd_area failed\n");
 		goto err;

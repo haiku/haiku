@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Terminal	2062206461
+1	danish	x-vnd.Haiku-Terminal	1222406372
 ANSI cyan color	Terminal AppearancePrefView		ANSI cyan farve
 Close other tabs	Terminal TermWindow		Luk andre faneblade
 Insert path	Terminal TermView		Indsæt sti
@@ -13,7 +13,6 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Bekræft lukn
 Solarized Dark	Terminal colors scheme		Solariseret mørkt
 Copy	Terminal TermWindow		Kopiér
 ANSI bright green color	Terminal AppearancePrefView		ANSI klar grøn farve
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               vis denne hjælp\n  -t,     --title              indstil vinduets titel\n  -f,     --fullscreen         start fuldskærm\n  -w,     --working-directory  indstil indledende arbejdsmappe
 ANSI white color	Terminal AppearancePrefView		ANSI hvid farve
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Rediger fanebladstitel…

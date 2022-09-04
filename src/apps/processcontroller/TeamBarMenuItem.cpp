@@ -1,9 +1,8 @@
 /*
  * Copyright 2000, Georges-Edouard Berenger. All rights reserved.
+ * Copyright 2022, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
-
 #include "TeamBarMenuItem.h"
 
 #include "Colors.h"
@@ -13,19 +12,16 @@
 #include "Utilities.h"
 
 #include <Bitmap.h>
-
-
-#define B_USAGE_SELF 0
+#include <ControlLook.h>
 
 
 TeamBarMenuItem::TeamBarMenuItem(BMenu* menu, BMessage* kill_team, team_id team,
 	BBitmap* icon, bool deleteIcon)
 	:
-	BMenuItem(menu, kill_team),
-	fTeamID(team),
-	fIcon(icon),
-	fDeleteIcon(deleteIcon)
+	IconMenuItem(icon, menu, true, deleteIcon),
+	fTeamID(team)
 {
+	SetMessage(kill_team);
 	Init();
 }
 
@@ -33,7 +29,7 @@ TeamBarMenuItem::TeamBarMenuItem(BMenu* menu, BMessage* kill_team, team_id team,
 void
 TeamBarMenuItem::Init()
 {
-	if (get_team_usage_info(fTeamID, B_USAGE_SELF, &fTeamUsageInfo) != B_OK)
+	if (get_team_usage_info(fTeamID, B_TEAM_USAGE_SELF, &fTeamUsageInfo) != B_OK)
 		fTeamUsageInfo.kernel_time = fTeamUsageInfo.user_time = 0;
 
 	if (fTeamID == B_SYSTEM_TEAM) {
@@ -56,15 +52,13 @@ TeamBarMenuItem::Init()
 
 TeamBarMenuItem::~TeamBarMenuItem()
 {
-	if (fDeleteIcon)
-		delete fIcon;
 }
 
 
 void
 TeamBarMenuItem::DrawContent()
 {
-	BPoint	loc;
+	BPoint loc;
 
 	DrawIcon();
 	if (fKernel < 0)
@@ -73,43 +67,18 @@ TeamBarMenuItem::DrawContent()
 		DrawBar(true);
 
 	loc = ContentLocation();
-	loc.x += 20;
+	loc.x += ceilf(be_control_look->DefaultLabelSpacing() * 3.3f);
 	Menu()->MovePenTo(loc);
 	BMenuItem::DrawContent();
 }
 
 
 void
-TeamBarMenuItem::DrawIcon()
-{
-	if (fIcon == NULL)
-		return;
-
-	BPoint loc = ContentLocation();
-	BRect frame = Frame();
-
-	loc.y = frame.top + (frame.bottom - frame.top - 15) / 2;
-
-	BMenu* menu = Menu();
-
-	if (fIcon->ColorSpace() == B_RGBA32) {
-		menu->SetDrawingMode(B_OP_ALPHA);
-		menu->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	} else
-		menu->SetDrawingMode(B_OP_OVER);
-
-	menu->DrawBitmap(fIcon, loc);
-
-	menu->SetDrawingMode(B_OP_COPY);
-}
-
-
-void
 TeamBarMenuItem::DrawBar(bool force)
 {
-	bool selected = IsSelected ();
+	const bool selected = IsSelected();
 	BRect frame = Frame();
-	BMenu* menu = Menu ();
+	BMenu* menu = Menu();
 	rgb_color highColor = menu->HighColor();
 
 	BFont font;
@@ -206,10 +175,7 @@ TeamBarMenuItem::DrawBar(bool force)
 void
 TeamBarMenuItem::GetContentSize(float* width, float* height)
 {
-	BMenuItem::GetContentSize(width, height);
-	if (height != NULL && *height < 16)
-		*height = 16;
-
+	IconMenuItem::GetContentSize(width, height);
 	if (width != NULL)
 		*width += 40 + kBarWidth;
 }
@@ -219,7 +185,7 @@ void
 TeamBarMenuItem::BarUpdate()
 {
 	team_usage_info usage;
-	if (get_team_usage_info(fTeamID, B_USAGE_SELF, &usage) == B_OK) {
+	if (get_team_usage_info(fTeamID, B_TEAM_USAGE_SELF, &usage) == B_OK) {
 		bigtime_t now = system_time();
 		bigtime_t idle = 0;
 		if (fTeamID == B_SYSTEM_TEAM) {
@@ -253,15 +219,12 @@ TeamBarMenuItem::BarUpdate()
 void
 TeamBarMenuItem::Reset(char* name, team_id team, BBitmap* icon, bool deleteIcon)
 {
+	IconMenuItem::Reset(icon, deleteIcon);
+
 	SetLabel(name);
 	fTeamID = team;
 	Init();
 
-	if (fDeleteIcon)
-		delete fIcon;
-
-	fDeleteIcon = deleteIcon;
-	fIcon = icon;
 	Message()->ReplaceInt32("team", team);
 	((ThreadBarMenu*)Submenu())->Reset(team);
 	BarUpdate();

@@ -26,13 +26,15 @@ BookmarkBar::BookmarkBar(const char* title, BHandler* target,
 	BEntry(navDir).GetNodeRef(&fNodeRef);
 
 	fOverflowMenu = new BMenu(B_UTF8_ELLIPSIS);
-	AddItem(fOverflowMenu);
+	fOverflowMenuAdded = false;
 }
 
 
 BookmarkBar::~BookmarkBar()
 {
 	stop_watching(BMessenger(this));
+	if (!fOverflowMenuAdded)
+		delete fOverflowMenu;
 }
 
 
@@ -80,7 +82,7 @@ BookmarkBar::MessageReceived(BMessage* message)
 				case B_ENTRY_MOVED:
 				{
 					entry_ref ref;
-					const char *name;
+					const char* name;
 
 					message->FindInt32("device", &ref.device);
 					message->FindInt64("to directory", &ref.directory);
@@ -98,7 +100,7 @@ BookmarkBar::MessageReceived(BMessage* message)
 						message->FindInt64("to directory", &to);
 						message->FindInt64("from directory", &from);
 						if (from == to) {
-							const char *name;
+							const char* name;
 							if (message->FindString("name", &name) == B_OK)
 								fItemsMap[inode]->SetLabel(name);
 
@@ -121,6 +123,10 @@ BookmarkBar::MessageReceived(BMessage* message)
 					fOverflowMenu->RemoveItem(item);
 					fItemsMap.erase(inode);
 					delete item;
+
+					// Reevaluate whether the "more" menu is still needed
+					BRect rect = Bounds();
+					FrameResized(rect.Width(), rect.Height());
 				}
 			}
 			return;
@@ -134,14 +140,24 @@ BookmarkBar::MessageReceived(BMessage* message)
 void
 BookmarkBar::FrameResized(float width, float height)
 {
-	int32 count = CountItems() - 1;
-		// We don't touch the "more" menu
+	int32 count = CountItems();
+
+	// Account for the "more" menu, in terms of item count and space occupied
+	int32 overflowMenuWidth = 0;
+	if (IndexOf(fOverflowMenu) != B_ERROR) {
+		count--;
+		// Ignore the width of the "more" menu if it would disappear after
+		// removing a bookmark from it.
+		if (fOverflowMenu->CountItems() > 1)
+			overflowMenuWidth = 32;
+	}
+
 	int32 i = 0;
 	float rightmost = 0.f;
 	while (i < count) {
 		BMenuItem* item = ItemAt(i);
 		BRect frame = item->Frame();
-		if (frame.right > width - 32)
+		if (frame.right > width - overflowMenuWidth)
 			break;
 		rightmost = frame.right;
 		i++;
@@ -153,18 +169,33 @@ BookmarkBar::FrameResized(float width, float height)
 		BMenuItem* extraItem = fOverflowMenu->ItemAt(0);
 		while (extraItem != NULL) {
 			BRect frame = extraItem->Frame();
-			if (frame.Width() + rightmost > width - 32)
+			if (frame.Width() + rightmost > width - overflowMenuWidth)
 				break;
-
 			AddItem(fOverflowMenu->RemoveItem((int32)0), i);
 			i++;
 
+			rightmost = ItemAt(i)->Frame().right;
+			if (fOverflowMenu->CountItems() <= 1)
+				overflowMenuWidth = 0;
 			extraItem = fOverflowMenu->ItemAt(0);
 		}
+		if (fOverflowMenu->CountItems() == 0) {
+			RemoveItem(fOverflowMenu);
+			fOverflowMenuAdded = false;
+		}
+
 	} else {
 		// Remove any overflowing item and move them to the "more" menu.
-		for (int j = i; j < count; j++)
-			fOverflowMenu->AddItem(RemoveItem(j));
+		// Counting backwards avoids complications when indices shift
+		// after an item is removed, and keeps bookmarks in the same order,
+		// provided they are added at index 0 of the "more" menu.
+		for (int j = count - 1; j >= i; j--)
+			fOverflowMenu->AddItem(RemoveItem(j), 0);
+
+		if (IndexOf(fOverflowMenu) == B_ERROR) {
+			AddItem(fOverflowMenu);
+			fOverflowMenuAdded = true;
+		}
 	}
 
 	BMenuBar::FrameResized(width, height);
@@ -221,11 +252,13 @@ BookmarkBar::_AddItem(ino_t inode, BEntry* entry)
 	}
 
 	int32 count = CountItems();
+	if (IndexOf(fOverflowMenu) != B_ERROR)
+		count--;
 
-	BMenuBar::AddItem(item, count - 1);
+	BMenuBar::AddItem(item, count);
 	fItemsMap[inode] = item;
 
 	// Move the item to the "more" menu if it overflows.
-	BRect r = Bounds();
-	FrameResized(r.Width(), r.Height());
+	BRect rect = Bounds();
+	FrameResized(rect.Width(), rect.Height());
 }

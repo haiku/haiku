@@ -48,7 +48,6 @@ typedef struct net_interface {
 	uint32				index;
 	uint32				flags;
 	uint8				type;
-	uint32				mtu;
 	uint32				metric;
 } net_interface;
 

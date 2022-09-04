@@ -115,56 +115,45 @@ enum {
 static property_info sPropertyInfo[] = {
 	{ "Next", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		"Skip to the next track.", 0
+		"Skips to the next track.", 0
 	},
 	{ "Prev", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		"Skip to the previous track.", 0
+		"Skips to the previous track.", 0
 	},
 	{ "Play", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		"Start playing.", 0
+		"Starts playing.", 0
 	},
 	{ "Stop", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		"Stop playing.", 0
+		"Stops playing.", 0
 	},
 	{ "Pause", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		"Pause playback.", 0
+		"Pauses playback.", 0
+	},
+	{ "IsPlaying", { B_GET_PROPERTY },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Gets whether or not the player is unpaused.", 0,
+		{ B_BOOL_TYPE }
 	},
 	{ "TogglePlaying", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		"Toggle pause/play.", 0
+		"Toggles pause/play.", 0
 	},
 	{ "Mute", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		"Toggle mute.", 0
+		"Toggles mute.", 0
 	},
 	{ "Volume", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 },
 		"Gets/sets the volume (0.0-2.0).", 0,
 		{ B_FLOAT_TYPE }
 	},
-	{ "URI", { B_GET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 },
-		"Gets the URI of the currently playing item.", 0,
-		{ B_STRING_TYPE }
-	},
-	{ "TrackNumber", { B_GET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 },
-		"Gets the number of the current track playing.", 0,
-		{ B_INT32_TYPE }
-	},
 	{ "ToggleFullscreen", { B_EXECUTE_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		"Toggle fullscreen.", 0
-	},
-	{ "Duration", { B_GET_PROPERTY, 0 },
-		{ B_DIRECT_SPECIFIER, 0 },
-		"Gets the duration of the currently playing item "
-			"in microseconds.", 0,
-		{ B_INT64_TYPE }
+		"Toggles fullscreen.", 0
 	},
 	{ "Position", { B_GET_PROPERTY, B_SET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 },
@@ -173,18 +162,72 @@ static property_info sPropertyInfo[] = {
 	},
 	{ "Seek", { B_SET_PROPERTY },
 		{ B_DIRECT_SPECIFIER, 0 },
-		"Seek by the specified amounts of microseconds.", 0,
+		"Seeks by the specified amount in microseconds.", 0,
 		{ B_INT64_TYPE }
 	},
-	{ "PlaylistTrackCount", { B_GET_PROPERTY, 0 },
+	{ "PlaylistTrack", { B_COUNT_PROPERTIES, B_CREATE_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 },
-		"Gets the number of tracks in Playlist.", 0,
-		{ B_INT16_TYPE }
+		"Counts items in the Playlist or appends an item by URI.", 0,
+		{ B_INT32_TYPE }
 	},
-	{ "PlaylistTrackTitle", { B_GET_PROPERTY, 0 },
+	{ "PlaylistTrack", { B_DELETE_PROPERTY, 0 },
 		{ B_INDEX_SPECIFIER, 0 },
-		"Gets the title of the nth track in Playlist.", 0,
+		"Deletes the nth item in Playlist.", 0,
 		{ B_STRING_TYPE }
+	},
+	{ "PlaylistTrack", {},
+		{ B_INDEX_SPECIFIER, 0 },
+		"... of PlaylistTrack { index } of ...", 0
+	},
+	{ "CurrentTrack", {},
+		{},
+		"... of CurrentTrack of ...", 0,
+	},
+
+	{ 0 }
+};
+
+
+static property_info sItemPropertyInfo[] = {
+	{ "Title", { B_GET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Gets the title of the item.", 0,
+		{ B_STRING_TYPE }
+	},
+	{ "URI", { B_GET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Gets the URI of the item.", 0,
+		{ B_STRING_TYPE }
+	},
+	{ "Duration", { B_GET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Gets the duration of the item in microseconds.", 0,
+		{ B_INT64_TYPE }
+	},
+	{ "Author", { B_GET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Gets the author of the item.", 0,
+		{ B_STRING_TYPE }
+	},
+	{ "Album", { B_GET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Gets the album of the item.", 0,
+		{ B_STRING_TYPE }
+	},
+	{ "TrackNumber", { B_GET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Gets the track number of the item.", 0,
+		{ B_INT32_TYPE }
+	},
+	{ "PlaylistIndex", { B_GET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		"Gets the item's position in Playlist.", 0,
+		{ B_INT32_TYPE }
+	},
+	{ "Suites", { B_GET_PROPERTY, 0 },
+		{ B_DIRECT_SPECIFIER, 0 },
+		NULL, 0,
+		{ B_PROPERTY_INFO_TYPE }
 	},
 
 	{ 0 }
@@ -491,6 +534,10 @@ MainWin::MessageReceived(BMessage* msg)
 		case B_EXECUTE_PROPERTY:
 		case B_GET_PROPERTY:
 		case B_SET_PROPERTY:
+		case B_COUNT_PROPERTIES:
+		case B_CREATE_PROPERTY:
+		case B_DELETE_PROPERTY:
+		case B_GET_SUPPORTED_SUITES:
 		{
 			BMessage reply(B_REPLY);
 			status_t result = B_BAD_SCRIPT_SYNTAX;
@@ -499,14 +546,12 @@ MainWin::MessageReceived(BMessage* msg)
 			int32 what;
 			const char* property;
 
-			if (msg->GetCurrentSpecifier(&index, &specifier, &what,
-					&property) != B_OK) {
+			if (msg->GetCurrentSpecifier(&index, &specifier, &what, &property) != B_OK)
 				return BWindow::MessageReceived(msg);
-			}
 
 			BPropertyInfo propertyInfo(sPropertyInfo);
-			switch (propertyInfo.FindMatch(msg, index, &specifier, what,
-					property)) {
+			int32 match = propertyInfo.FindMatch(msg, index, &specifier, what, property);
+			switch (match) {
 				case 0:
 					fControls->SkipForward();
 					result = B_OK;
@@ -533,16 +578,20 @@ MainWin::MessageReceived(BMessage* msg)
 					break;
 
 				case 5:
+					result = reply.AddBool("result", fController->IsPlaying());
+					break;
+
+				case 6:
 					fController->TogglePlaying();
 					result = B_OK;
 					break;
 
-				case 6:
+				case 7:
 					fController->ToggleMute();
 					result = B_OK;
 					break;
 
-				case 7:
+				case 8:
 				{
 					if (msg->what == B_GET_PROPERTY) {
 						result = reply.AddFloat("result",
@@ -556,49 +605,11 @@ MainWin::MessageReceived(BMessage* msg)
 					break;
 				}
 
-				case 8:
-				{
-					if (msg->what == B_GET_PROPERTY) {
-						BAutolock _(fPlaylist);
-						const PlaylistItem* item = fController->Item();
-						if (item == NULL) {
-							result = B_NO_INIT;
-							break;
-						}
-
-						result = reply.AddString("result", item->LocationURI());
-					}
-					break;
-				}
-
 				case 9:
-				{
-					if (msg->what == B_GET_PROPERTY) {
-						BAutolock _(fPlaylist);
-						const PlaylistItem* item = fController->Item();
-						if (item == NULL) {
-							result = B_NO_INIT;
-							break;
-						}
-
-						result = reply.AddInt32("result", item->TrackNumber());
-					}
-					break;
-				}
-
-				case 10:
 					PostMessage(M_TOGGLE_FULLSCREEN);
 					break;
 
-				case 11:
-					if (msg->what != B_GET_PROPERTY)
-						break;
-
-					result = reply.AddInt64("result",
-						fController->TimeDuration());
-					break;
-
-				case 12:
+				case 10:
 				{
 					if (msg->what == B_GET_PROPERTY) {
 						result = reply.AddInt64("result",
@@ -613,7 +624,7 @@ MainWin::MessageReceived(BMessage* msg)
 					break;
 				}
 
-				case 13:
+				case 11:
 				{
 					if (msg->what != B_SET_PROPERTY)
 						break;
@@ -627,22 +638,150 @@ MainWin::MessageReceived(BMessage* msg)
 					break;
 				}
 
-				case 14:
-					result = reply.AddInt16("result", fPlaylist->CountItems());
-					break;
-
-				case 15:
+				case 12:
 				{
-					int32 i = specifier.GetInt32("index", 0);
-					if (i >= fPlaylist->CountItems()) {
-						result = B_NO_INIT;
+					BAutolock _(fPlaylist);
+					if (msg->what == B_COUNT_PROPERTIES)
+						result = reply.AddInt32("result", fPlaylist->CountItems());
+					else if (msg->what == B_CREATE_PROPERTY) {
+						result = B_OK;
+						int32 i = msg->GetInt32("index", fPlaylist->CountItems());
+						if (i > fPlaylist->CountItems()) {
+							result = B_BAD_INDEX;
+							break;
+						}
+
+						BString urlString;
+						entry_ref fileRef;
+						for (int32 j = 0; msg->FindString("data", j, &urlString) == B_OK; j++) {
+							BUrl url(urlString);
+							if (url.IsValid() && url.Protocol() != "file") {
+								UrlPlaylistItem* item = new UrlPlaylistItem(url);
+								if (!fPlaylist->AddItem(item, i + j)) {
+									result = B_NO_INIT;
+									delete item;
+									break;
+								}
+							} else if (!urlString.IsEmpty()) {
+								BString path = url.Path().String();
+								if (path.IsEmpty())
+									path = urlString;
+
+								result = BEntry(path.String()).GetRef(&fileRef);
+								if (result == B_OK && msg->AddRef("refs", &fileRef) != B_OK)
+									result = B_NO_INIT;
+								if (result != B_OK)
+									break;
+							}
+						}
+
+						if (result != B_OK)
+							break;
+
+						for (int32 j = 0; msg->FindRef("refs", j, &fileRef) == B_OK; j++)
+							if (!BEntry(&fileRef).Exists()) {
+								result = B_ENTRY_NOT_FOUND;
+								break;
+							} else {
+								FilePlaylistItem* item = new FilePlaylistItem(fileRef);
+								if (!fPlaylist->AddItem(item, i + j)) {
+									result = B_NO_INIT;
+									delete item;
+									break;
+								}
+							}
+					}
+					break;
+				}
+
+				case 13:
+				{
+					int32 i = 0;
+					int32 count = fPlaylist->CountItems();
+					if (specifier.FindInt32("index", &i) != B_OK || i >= count) {
+						result = B_BAD_INDEX;
 						break;
 					}
 
 					BAutolock _(fPlaylist);
-					const PlaylistItem* item = fPlaylist->ItemAt(i);
-					result = item == NULL ? B_NO_INIT
-						: reply.AddString("result", item->Title());
+					if (msg->what == B_DELETE_PROPERTY)
+						result = fPlaylist->RemoveItem(i) == NULL ? B_NO_INIT : B_OK;
+					break;
+				}
+
+				// PlaylistItem and CurrentItem
+				case 14:
+				case 15:
+				{
+					BPropertyInfo itemPropertyInfo(sItemPropertyInfo);
+					if (msg->what == B_GET_SUPPORTED_SUITES) {
+						result = reply.AddFlat("messages", &itemPropertyInfo);
+						break;
+					}
+
+					BAutolock _(fPlaylist);
+					int32 i = fPlaylist->CurrentItemIndex();
+					if (match == 14 && (specifier.FindInt32("index", &i) != B_OK
+						|| i >= fPlaylist->CountItems() || i < 0)) {
+						result = B_BAD_INDEX;
+						break;
+					}
+
+					msg->SetCurrentSpecifier(0);
+					if (msg->GetCurrentSpecifier(&index, &specifier, &what, &property) != B_OK)
+						break;
+
+					const PlaylistItem* item = NULL;
+					if (match == 14)
+						item = fPlaylist->ItemAt(i);
+					else
+						item = fController->Item();
+					if (item == NULL) {
+						result = B_NO_INIT;
+						break;
+					}
+
+					switch (itemPropertyInfo.FindMatch(msg, index, &specifier, what, property)) {
+						case 0:
+							result = reply.AddString("result", item->Title());
+							break;
+
+						case 1:
+							result = reply.AddString("result", item->LocationURI());
+							break;
+
+						case 2:
+							// Duration requires non-const item
+							if (match == 14) {
+								PlaylistItem* nitem = fPlaylist->ItemAt(i);
+								if (nitem == NULL)
+									result = B_NO_INIT;
+								else
+									result = reply.AddInt64("result", nitem->Duration());
+							} else
+								result = reply.AddInt64("result", fController->TimeDuration());
+							break;
+
+						case 3:
+							result = reply.AddString("result", item->Author());
+							break;
+
+						case 4:
+							result = reply.AddString("result", item->Album());
+							break;
+
+						case 5:
+							result = reply.AddInt32("result", item->TrackNumber());
+							break;
+
+						case 6:
+							result = reply.AddInt32("result", i);
+							break;
+
+						case 7:
+							result = reply.AddFlat("messages", &itemPropertyInfo);
+							break;
+					}
 					break;
 				}
 

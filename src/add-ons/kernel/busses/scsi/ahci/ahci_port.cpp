@@ -108,7 +108,8 @@ AHCIPort::Init1()
 	char name[32];
 	snprintf(name, sizeof(name), "AHCI port %d", fIndex);
 
-	fArea = alloc_mem((void**)&virtAddr, &physAddr, size, 0, name);
+	fArea = alloc_mem((void**)&virtAddr, &physAddr, size,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, name);
 	if (fArea < B_OK) {
 		TRACE("failed allocating memory for port %d\n", fIndex);
 		return fArea;

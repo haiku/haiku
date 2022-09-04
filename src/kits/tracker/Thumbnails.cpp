@@ -113,19 +113,19 @@ ScaleBitmap(BBitmap* source, BBitmap& dest, BRect bounds, color_space colorSpace
 
 
 static status_t
-ScaleBitmap(BBitmap* source, BBitmap& dest, icon_size size, color_space colorSpace)
+ScaleBitmap(BBitmap* source, BBitmap& dest, BSize size, color_space colorSpace)
 {
-	return ScaleBitmap(source, dest, BRect(0, 0, size - 1, size - 1), colorSpace);
+	return ScaleBitmap(source, dest, BRect(BPoint(0, 0), size), colorSpace);
 }
 
 
 class GenerateThumbnailJob : public BSupportKit::BJob {
 public:
 	GenerateThumbnailJob(Model* model, const BFile& file,
-			icon_size size, color_space colorSpace)
+			BSize requestedSize, color_space colorSpace)
 		: BJob("GenerateThumbnail"),
 		  fMimeType(model->MimeType()),
-		  fSize(size),
+		  fRequestedSize(requestedSize),
 		  fColorSpace(colorSpace)
 	{
 		fFile = new(std::nothrow) BFile(file);
@@ -154,7 +154,7 @@ public:
 public:
 	const BString fMimeType;
 	const node_ref fNodeRef;
-	const icon_size fSize;
+	const BSize fRequestedSize;
 	const color_space fColorSpace;
 
 private:
@@ -180,7 +180,7 @@ GenerateThumbnailJob::Execute()
 
 	// now, scale and directly insert into the icon cache
 	BBitmap tmp(NULL, false);
-	ScaleBitmap(image, tmp, fSize, fColorSpace);
+	ScaleBitmap(image, tmp, fRequestedSize, fColorSpace);
 
 	BBitmap* cacheThumb = new BBitmap(tmp.Bounds(), 0, tmp.ColorSpace());
 	cacheThumb->ImportBits(&tmp);
@@ -195,7 +195,7 @@ GenerateThumbnailJob::Execute()
 		return B_NO_MEMORY;
 	}
 
-	entry->SetIcon(cacheThumb, kNormalIcon, fSize);
+	entry->SetIcon(cacheThumb, kNormalIcon, fRequestedSize);
 	cacheLocker.Unlock();
 
 	// write values to attributes
@@ -237,10 +237,8 @@ GenerateThumbnailJob::Execute()
 	if (!thumbnailWritten) {
 		// send Tracker a message to tell it to update the thumbnail
 		BMessage message(kUpdateThumbnail);
-		if (message.AddInt32("device", fNodeRef.device) == B_OK
-				&& message.AddUInt64("node", fNodeRef.node) == B_OK) {
+		if (message.AddNodeRef("noderef", &fNodeRef) == B_OK)
 			be_app->PostMessage(&message);
-		}
 	}
 
 	return B_OK;
@@ -268,7 +266,7 @@ thumbnail_worker(void* castToJobQueue)
 
 
 static status_t
-GenerateThumbnail(Model* model, color_space colorSpace, icon_size which)
+GenerateThumbnail(Model* model, color_space colorSpace, BSize size)
 {
 	// First check we do not have a job queued already.
 	BAutolock jobsLock(sActiveJobsLock);
@@ -289,7 +287,7 @@ GenerateThumbnail(Model* model, color_space colorSpace, icon_size which)
 		return status;
 
 	GenerateThumbnailJob* job = new(std::nothrow) GenerateThumbnailJob(model,
-		*file, which, colorSpace);
+		*file, size, colorSpace);
 	ObjectDeleter<GenerateThumbnailJob> jobDeleter(job);
 	if (job == NULL)
 		return B_NO_MEMORY;
@@ -330,7 +328,7 @@ GenerateThumbnail(Model* model, color_space colorSpace, icon_size which)
 
 
 status_t
-GetThumbnailFromAttr(Model* model, BBitmap* icon, icon_size which)
+GetThumbnailFromAttr(Model* model, BBitmap* icon, BSize size)
 {
 	if (model == NULL || icon == NULL)
 		return B_BAD_VALUE;
@@ -364,7 +362,7 @@ GetThumbnailFromAttr(Model* model, BBitmap* icon, icon_size which)
 					BBitmap thumb(BTranslationUtils::GetBitmap(&webpData));
 
 					// convert thumb to icon size
-					if (which == B_XXL_ICON) {
+					if ((size.IntegerWidth() + 1) == B_XXL_ICON) {
 						// import icon data from attribute without resizing
 						result = icon->ImportBits(&thumb);
 					} else {
@@ -393,7 +391,7 @@ GetThumbnailFromAttr(Model* model, BBitmap* icon, icon_size which)
 	}
 
 	if (ShouldGenerateThumbnail(model->MimeType()))
-		return GenerateThumbnail(model, icon->ColorSpace(), which);
+		return GenerateThumbnail(model, icon->ColorSpace(), size);
 
 	return B_NOT_SUPPORTED;
 }

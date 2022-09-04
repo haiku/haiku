@@ -21,6 +21,7 @@
 #include "Option.h"
 #include "Prolific.h"
 #include "Silicon.h"
+#include "WinChipHead.h"
 
 #include <sys/ioctl.h>
 
@@ -775,6 +776,16 @@ SerialDevice::MakeDevice(usb_device device, uint16 vendorID,
 			&& productID == kSiliconDevices[i].productID) {
 			return new(std::nothrow) SiliconDevice(device, vendorID, productID,
 				kSiliconDevices[i].deviceName);
+		}
+	}
+
+	// WinChipHead Serial Device
+	for (uint32 i = 0; i < sizeof(kWCHDevices)
+		/ sizeof(kWCHDevices[0]); i++) {
+		if (vendorID == kWCHDevices[i].vendorID
+			&& productID == kWCHDevices[i].productID) {
+			return new(std::nothrow) WCHDevice(device, vendorID, productID,
+				kWCHDevices[i].deviceName);
 		}
 	}
 

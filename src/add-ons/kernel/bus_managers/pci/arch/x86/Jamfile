@@ -7,6 +7,7 @@ UsePrivateHeaders kernel [ FDirName kernel arch x86 ] [ FDirName kernel util ] ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica include ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica include
 	platform ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi arch $(TARGET_KERNEL_ARCH_DIR) ;
 
 KernelStaticLibrary pci_arch_bus_manager :
 	pci_acpi.cpp

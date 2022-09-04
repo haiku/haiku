@@ -54,22 +54,16 @@ DirectoryIterator::Init()
 		fLeafDir = new(std::nothrow) LeafDirectory(fInode);
 		if (fLeafDir == NULL)
 			return B_NO_MEMORY;
-		status_t status = fLeafDir->Init();
-		if (status != B_OK)
-			return status;
 		if (fLeafDir->IsLeafType())
-			return B_OK;
+			return fLeafDir->Init();
 		delete fLeafDir;
 		fLeafDir = NULL;
 
 		fNodeDir = new(std::nothrow) NodeDirectory(fInode);
 		if (fNodeDir == NULL)
 			return B_NO_MEMORY;
-		status = fNodeDir->Init();
-		if (status != B_OK)
-			return status;
 		if (fNodeDir->IsNodeType())
-			return B_OK;
+			return fNodeDir->Init();
 		delete fNodeDir;
 		fNodeDir = NULL;
 	}

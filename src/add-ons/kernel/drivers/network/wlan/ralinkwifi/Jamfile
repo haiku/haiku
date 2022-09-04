@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wlan ralinkwifi ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
-	: true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
@@ -14,14 +13,25 @@ SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 ]
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) dev ral ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev usb wlan ] ;
 
 KernelAddon ralinkwifi :
 	if_ral_pci.c
 	rt2560.c
 	rt2661.c
 	rt2860.c
+
+	if_ural.c
+	if_run.c
+	if_rum.c
+
 	glue.c
 	:
 	freebsd_wlan.a
 	libfreebsd_network.a
 	;
+
+ObjectHdrs [ FGristFiles if_ural$(SUFOBJ) if_run$(SUFOBJ) if_rum$(SUFOBJ) ]
+	: [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) libs compat freebsd_network ] ;
+Includes [ FGristFiles if_ural.c if_run.c if_rum.c ]
+	: <src!libs!compat!freebsd_network>usbdevs.h ;

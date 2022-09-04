@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src system libroot posix time ;
 
 # for localtime.c strftime.c
-SubDirCcFlags -DNOID -DUSG_COMPAT -DTM_GMTOFF=tm_gmtoff -DTM_ZONE=tm_zone 
+SubDirCcFlags -DNOID -DUSG_COMPAT -DTM_GMTOFF=tm_gmtoff -DTM_ZONE=tm_zone
 	-DPCTS=1 -DSTD_INSPIRED ;
 
 UsePrivateHeaders
@@ -23,18 +23,13 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			clock.cpp
 			clock_support.cpp
 			ctime.c
-			difftime.c
 			localtime_fading_out.c
 			localtime.cpp
 			nanosleep.c
 			stime.c
-			strftime.c
-			strptime.c
-			timelocal.cpp
 			time.c
 			timer_support.cpp
 			timespec_get.cpp
-			wcsftime.c
 			;
 	}
 }

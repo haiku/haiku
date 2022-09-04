@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Terminal	247549485
+1	catalan; valencian	x-vnd.Haiku-Terminal	4089361699
 ANSI cyan color	Terminal AppearancePrefView		Color cian ANSI
 Close other tabs	Terminal TermWindow		Tanca altres pestanyes
 Insert path	Terminal TermView		Insereix un camí
@@ -7,13 +7,13 @@ Text encoding	Terminal TermWindow		Codificació del text
 ANSI blue color	Terminal AppearancePrefView		Color blau ANSI
 OK	Terminal SetTitleWindow		D'acord
 Edit	Terminal TermWindow		Edita
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               Imprimeix aquesta ajuda.\n  -t,     --title              Estableix el títol de la finestra.\n  -f,     --fullscreen         Inicia la pantalla completa.\n  -w,     --working-directory  Estableix el directori de treball inicial.\n
 Select all	Terminal TermWindow		Selecciona-ho tot
 Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmeu-ne la sortida si hi ha programes actius.
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tEl directori de treball actual del procés actiu a la\n\t\t\tpestanya actual. Opcionalment es pot especificar el nombre màxim\n\t\t\tde components de camí. P. ex.: "%2d", per a un màxim de dos components.\n\t%T\t-\tEl nom de l'aplicació de Terminal per a la configuració de la llengua actual.\n\t%e\t-\tLa codificació de la pestanya actual. No es mostra per a UTF-8.\n\t%i\t-\tL'índex de la finestra.\n\t%p\t-\tEl nom del procés actiu a la pestanya actual.\n\t%t\t-\tEl títol de la pestanya actual.
 Solarized Dark	Terminal colors scheme		Fosc solaritzat
 Copy	Terminal TermWindow		Copia
 ANSI bright green color	Terminal AppearancePrefView		Color verd brillant ANSI
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               Imprimeix aquesta ajuda.\n  -t,     --title              Estableix el títol de la finestra.\n  -f,     --fullscreen         Pantalla completa\n  -w,     --working-directory  Estableix el directori de treball inicial.
 ANSI white color	Terminal AppearancePrefView		Color blanc ANSI
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Edita el títol de la pestanya...

@@ -78,10 +78,10 @@ mii_send(wb_device *device, uint32 bits, int count)
 	SIO_CLR(WB_SIO_MII_CLK);
 
 	for (i = (0x1 << (count - 1)); i; i >>= 1) {
-    	if (bits & i)
+		if (bits & i)
 			SIO_SET(WB_SIO_MII_DATAIN);
-        else
-        	SIO_CLR(WB_SIO_MII_DATAIN);
+		else
+			SIO_CLR(WB_SIO_MII_DATAIN);
 		MII_DELAY(device);
 		SIO_CLR(WB_SIO_MII_CLK);
 		MII_DELAY(device);

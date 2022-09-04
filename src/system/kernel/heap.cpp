@@ -2482,11 +2482,24 @@ realloc(void *address, size_t newSize)
 void *
 calloc(size_t numElements, size_t size)
 {
+	if (size != 0 && numElements > (((size_t)(-1)) / size))
+		return NULL;
+
 	void *address = malloc(numElements * size);
 	if (address != NULL)
 		memset(address, 0, numElements * size);
 
 	return address;
+}
+
+
+void *
+aligned_alloc(size_t alignment, size_t size)
+{
+	if ((size % alignment) != 0)
+		return NULL;
+
+	return memalign(alignment, size);
 }
 
 

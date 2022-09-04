@@ -281,11 +281,11 @@ BackgroundsView::AllAttached()
 
 	BMessenger messenger(this);
 	fPanel = new ImageFilePanel(B_OPEN_PANEL, &messenger, &ref,
-		B_FILE_NODE, false, NULL, new CustomRefFilter(true));
+		B_FILE_NODE, false, NULL, new ImageFilter(true));
 	fPanel->SetButtonLabel(B_DEFAULT_BUTTON, B_TRANSLATE("Select"));
 
 	fFolderPanel = new BFilePanel(B_OPEN_PANEL, &messenger, NULL,
-		B_DIRECTORY_NODE, false, NULL, new CustomRefFilter(false));
+		B_DIRECTORY_NODE, false, NULL, new ImageFilter(false));
 	fFolderPanel->SetButtonLabel(B_DEFAULT_BUTTON, B_TRANSLATE("Select"));
 
 	_LoadSettings();
@@ -1002,9 +1002,10 @@ BackgroundsView::RefsReceived(BMessage* message)
 
 		if (node.IsFile()) {
 			BMimeType refType;
-			BMimeType::GuessMimeType(&ref, &refType);
-			if (!imageType.Contains(&refType))
+			if (BMimeType::GuessMimeType(&ref, &refType) == B_OK
+				&& !imageType.Contains(&refType)) {
 				continue;
+			}
 
 			BGImageMenuItem* item;
 			int32 index = AddImage(path);

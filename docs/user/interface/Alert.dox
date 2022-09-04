@@ -343,9 +343,9 @@ int32 button_index = alert->Go();
 	\fn void BAlert::SetIcon(BBitmap *bitmap)
 	\brief Set a custom icon for the alert.
 
-	\param bitmap A valid BBitmap. The bitmap is copied. 
+	\param bitmap A valid BBitmap. The BAlert assumes ownership of the bitmap.
 
-	\since BeOS R3
+	\since Haiku R1
 */
 
 

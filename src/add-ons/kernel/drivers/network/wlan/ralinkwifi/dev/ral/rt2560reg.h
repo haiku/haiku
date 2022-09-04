@@ -1,4 +1,4 @@
-/*	$FreeBSD: releng/12.0/sys/dev/ral/rt2560reg.h 258780 2013-11-30 22:17:27Z eadler $	*/
+/*	$FreeBSD$	*/
 
 /*-
  * Copyright (c) 2005, 2006
@@ -114,7 +114,6 @@
 #define RT2560_ARTCSR2		0x0154	/* ACK/CTS padload consume time */
 #define RT2560_SECCSR1		0x0158	/* WEP control */
 #define RT2560_BBPCSR1		0x015c	/* BBP TX Configuration */
-
 
 /* possible flags for register RXCSR0 */
 #define RT2560_DISABLE_RX		(1 << 0)

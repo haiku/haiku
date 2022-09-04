@@ -102,6 +102,10 @@ public:
 
 	bool TrackingMenu() const;
 
+	// Returns false if RestoreState has not run or if it failed to find
+	// a default state file the last time it ran.
+	bool DefaultStateRestored() const { return fDefaultStateRestored; }
+
 protected:
 	BPoseView* NewPoseView(Model* model, uint32);
 	virtual	void Init(const BMessage* message = NULL);
@@ -152,6 +156,7 @@ private:
 	BString fButtonText;
 	bool fHideWhenDone;
 	bool fIsTrackingMenu;
+	bool fDefaultStateRestored;
 
 	typedef BContainerWindow _inherited;
 };

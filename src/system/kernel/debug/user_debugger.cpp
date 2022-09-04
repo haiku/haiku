@@ -818,7 +818,8 @@ thread_hit_serious_debug_event(debug_debugger_message event,
 	if (error != B_OK) {
 		Thread *thread = thread_get_current_thread();
 		dprintf("thread_hit_serious_debug_event(): Failed to install debugger: "
-			"thread: %" B_PRId32 ": %s\n", thread->id, strerror(error));
+			"thread: %" B_PRId32 " (%s): %s\n", thread->id, thread->name,
+			strerror(error));
 		return error;
 	}
 

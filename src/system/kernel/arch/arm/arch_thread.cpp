@@ -34,16 +34,14 @@
 
 //#define TRACE_ARCH_THREAD
 #ifdef TRACE_ARCH_THREAD
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 // Valid initial arch_thread state. We just memcpy() it when initializing
 // a new thread structure.
 static struct arch_thread sInitialState;
-
-Thread *gCurrentThread;
 
 
 void
@@ -97,8 +95,8 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 {
 	addr_t* stackTop = (addr_t*)_stackTop;
 
-	TRACE(("arch_thread_init_kthread_stack(%s): stack top %p, function %p, data: "
-		"%p\n", thread->name, stackTop, function, data));
+	TRACE("arch_thread_init_kthread_stack(%s): stack top %p, function %p, data: "
+		"%p\n", thread->name, stackTop, function, data);
 
 	// push the function address -- that's the return address used after the
 	// context switch (lr/r14 register)
@@ -175,16 +173,16 @@ arch_thread_context_switch(Thread *from, Thread *to)
 		((ARMVMTranslationMap *)newTranslationMap)->PagingStructures()->pgdir_phys;
 
 	if (oldPageDirectoryAddress != newPageDirectoryAddress) {
-		TRACE(("arch_thread_context_switch: swap pgdir: "
+		TRACE("arch_thread_context_switch: swap pgdir: "
 			"0x%08" B_PRIxPHYSADDR " -> 0x%08" B_PRIxPHYSADDR "\n",
-			oldPageDirectoryAddress, newPageDirectoryAddress));
+			oldPageDirectoryAddress, newPageDirectoryAddress);
 		arm_swap_pgdir(newPageDirectoryAddress);
 	}
 
-	TRACE(("arch_thread_context_switch: %p(%s/%p) -> %p(%s/%p)\n",
-		from, from->name, from->arch_info.sp, to, to->name, to->arch_info.sp));
+	TRACE("arch_thread_context_switch: %p(%s/%p) -> %p(%s/%p)\n",
+		from, from->name, from->arch_info.sp, to, to->name, to->arch_info.sp);
 	arm_context_switch(&from->arch_info, &to->arch_info);
-	TRACE(("arch_thread_context_switch %p %p\n", to, from));
+	TRACE("arch_thread_context_switch %p %p\n", to, from);
 }
 
 
@@ -205,8 +203,8 @@ arch_thread_enter_userspace(Thread *thread, addr_t entry,
 
 	addr_t stackTop = thread->user_stack_base + thread->user_stack_size;
 
-	TRACE(("arch_thread_enter_userspace: entry 0x%" B_PRIxADDR ", args %p %p, "
-		"ustack_top 0x%" B_PRIxADDR "\n", entry, args1, args2, stackTop));
+	TRACE("arch_thread_enter_userspace: entry 0x%" B_PRIxADDR ", args %p %p, "
+		"ustack_top 0x%" B_PRIxADDR "\n", entry, args1, args2, stackTop);
 
 	//stackTop = arch_randomize_stack_pointer(stackTop - sizeof(args));
 

@@ -117,7 +117,7 @@ enlarge_pool(locked_pool *pool, int numBlocks)
 
 	status = area = create_area(pool->name,
 		(void **)&chunk, B_ANY_KERNEL_ADDRESS, chunkSize,
-		pool->lock_flags, 0);
+		pool->lock_flags, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (status < B_OK) {
 		dprintf("cannot enlarge pool (%s)\n", strerror(status));
 		// TODO: we should wait a bit and try again!

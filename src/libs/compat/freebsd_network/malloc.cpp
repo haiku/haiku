@@ -83,6 +83,9 @@ _kernel_contigmalloc(const char *file, int line, size_t size, int flags,
 void
 _kernel_contigfree(void *addr, size_t size)
 {
+	if (addr == NULL)
+		return;
+
 	delete_area(area_for(addr));
 }
 

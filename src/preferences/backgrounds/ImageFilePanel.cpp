@@ -171,30 +171,28 @@ ImageFilePanel::SelectionChanged()
 }
 
 
-//	#pragma mark - CustomRefFilter
+//	#pragma mark - ImageFilter
 
 
-CustomRefFilter::CustomRefFilter(bool imageFiltering)
+ImageFilter::ImageFilter(bool filtering)
 	:
-	fImageFiltering(imageFiltering)
+	fImageFiltering(filtering)
 {
 }
 
 
 bool
-CustomRefFilter::Filter(const entry_ref* ref, BNode* node,
+ImageFilter::Filter(const entry_ref* ref, BNode* node,
 	struct stat_beos* stat, const char* filetype)
 {
-	if (!fImageFiltering)
-		return node->IsDirectory();
+	bool isDirectory = node->IsDirectory();
+	if (!fImageFiltering || isDirectory)
+		return isDirectory;
 
-	if (node->IsDirectory())
-		return true;
-
-	BMimeType imageType("image"), refType;
-	BMimeType::GuessMimeType(ref, &refType);
-	if (imageType.Contains(&refType))
-		return true;
+	BMimeType imageType("image");
+	BMimeType refType;
+	if (BMimeType::GuessMimeType(ref, &refType) == B_OK)
+		return imageType.Contains(&refType);
 
 	return false;
 }

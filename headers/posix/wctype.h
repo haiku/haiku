@@ -6,6 +6,7 @@
 #define _WCTYPE_H_
 
 
+#include <locale.h>
 #include <wchar.h>
 
 typedef int wctrans_t;
@@ -35,6 +36,29 @@ extern wint_t	towupper(wint_t wc);
 
 extern wctrans_t wctrans(const char *charClass);
 extern wctype_t	wctype(const char *property);
+
+
+extern int		iswalnum_l(wint_t wc, locale_t locale);
+extern int		iswalpha_l(wint_t wc, locale_t locale);
+extern int		iswcntrl_l(wint_t wc, locale_t locale);
+extern int		iswctype_l(wint_t wc, wctype_t desc, locale_t locale);
+extern int		iswdigit_l(wint_t wc, locale_t locale);
+extern int		iswgraph_l(wint_t wc, locale_t locale);
+extern int		iswlower_l(wint_t wc, locale_t locale);
+extern int		iswprint_l(wint_t wc, locale_t locale);
+extern int		iswpunct_l(wint_t wc, locale_t locale);
+extern int		iswspace_l(wint_t wc, locale_t locale);
+extern int		iswupper_l(wint_t wc, locale_t locale);
+extern int		iswxdigit_l(wint_t wc, locale_t locale);
+
+extern int		iswblank_l(wint_t wc, locale_t locale);
+
+extern wint_t	towctrans_l(wint_t wc, wctrans_t transition, locale_t locale);
+extern wint_t	towlower_l(wint_t wc, locale_t locale);
+extern wint_t	towupper_l(wint_t wc, locale_t locale);
+
+extern wctrans_t wctrans_l(const char *charClass, locale_t locale);
+extern wctype_t	wctype_l(const char *property, locale_t locale);
 
 #ifdef __cplusplus
 }

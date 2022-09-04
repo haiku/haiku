@@ -33,11 +33,15 @@ extern wchar_t	*__wcpcpy(wchar_t *dest, const wchar_t *src);
 extern wchar_t	*__wcpncpy(wchar_t *dest, const wchar_t *src, size_t srcLength);
 extern size_t   __wcrtomb(char *dest, wchar_t wc, mbstate_t *mbState);
 extern int		__wcscasecmp(const wchar_t *wcs1, const wchar_t *wcs2);
+extern int		__wcscasecmp_l(const wchar_t *wcs1, const wchar_t *wcs2,
+					locale_t locale);
 extern wchar_t	*__wcscat(wchar_t *dest, const wchar_t *src);
 extern wchar_t	*__wcschr(const wchar_t *wcs, wchar_t wc);
 extern wchar_t	*__wcschrnul(const wchar_t *wcs, wchar_t wc);
 extern int      __wcscmp(const wchar_t *wcs1, const wchar_t *wcs2);
 extern int      __wcscoll(const wchar_t *wcs1, const wchar_t *wcs2);
+extern int      __wcscoll_l(const wchar_t *wcs1, const wchar_t *wcs2,
+					locale_t locale);
 extern wchar_t	*__wcscpy(wchar_t *dest, const wchar_t *src);
 extern size_t	__wcscspn(const wchar_t *wcs, const wchar_t *reject);
 extern wchar_t	*__wcsdup(const wchar_t *wcs);
@@ -48,6 +52,8 @@ extern size_t	__wcslcpy(wchar_t *dest, const wchar_t *src, size_t maxLength);
 extern size_t	__wcslen(const wchar_t *wcs);
 extern int		__wcsncasecmp(const wchar_t *wcs1, const wchar_t *wcs2,
 					size_t maxLength);
+extern int		__wcsncasecmp_l(const wchar_t *wcs1, const wchar_t *wcs2,
+					size_t maxLength, locale_t locale);
 extern wchar_t 	*__wcsncat(wchar_t *dest, const wchar_t *src, size_t srcLength);
 extern int		__wcsncmp(const wchar_t *wcs1, const wchar_t *wcs2,
 					size_t length);
@@ -76,6 +82,8 @@ extern int		__wctomb(char *string, wchar_t wc);
 extern wchar_t	*__wcswcs(const wchar_t *haystack, const wchar_t *needle);
 extern int		__wcswidth(const wchar_t *wcs, size_t length);
 extern size_t	__wcsxfrm(wchar_t *dest, const wchar_t *src, size_t destLength);
+extern size_t	__wcsxfrm_l(wchar_t *dest, const wchar_t *src, size_t destLength,
+					locale_t locale);
 extern int		__wctob(wint_t wc);
 extern int		__wcwidth(wchar_t wc);
 extern wchar_t	*__wmemchr(const wchar_t *wcs, wchar_t wc, size_t n);

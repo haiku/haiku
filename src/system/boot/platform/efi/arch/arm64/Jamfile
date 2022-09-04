@@ -24,12 +24,13 @@ for platform in [ MultiBootSubDirSetup efi ] {
 		exceptions.S
 		cache.S
 		relocation_func.cpp
+		arch_acpi.cpp
+		arch_cache.cpp
+		arch_dtb.cpp
 		arch_mmu.cpp
 		arch_smp.cpp
 		arch_start.cpp
 		arch_timer.cpp
-		arch_cache.cpp
-		arch_dtb.cpp
 		;
 
 	BootMergeObject boot_platform_efi_arm64.o :

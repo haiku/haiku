@@ -85,24 +85,24 @@ BNavigator::~BNavigator()
 void
 BNavigator::AttachedToWindow()
 {
+	const BRect iconRect(BPoint(0, 0),
+		be_control_look->ComposeIconSize(20));
+
 	// Set up toolbar items
-	BBitmap* bmpBack = new BBitmap(BRect(0, 0, 19, 19), B_RGBA32);
-	GetTrackerResources()->GetIconResource(R_ResBackNav, B_MINI_ICON,
-		bmpBack);
+	BBitmap* bmpBack = new BBitmap(iconRect, B_RGBA32);
+	GetTrackerResources()->GetIconResource(R_ResBackNav, B_MINI_ICON, bmpBack);
 	AddAction(kNavigatorCommandBackward, this, bmpBack);
 	SetActionEnabled(kNavigatorCommandBackward, false);
 	delete bmpBack;
 
-	BBitmap* bmpForw = new BBitmap(BRect(0, 0, 19, 19), B_RGBA32);
-	GetTrackerResources()->GetIconResource(R_ResForwNav, B_MINI_ICON,
-		bmpForw);
+	BBitmap* bmpForw = new BBitmap(iconRect, B_RGBA32);
+	GetTrackerResources()->GetIconResource(R_ResForwNav, B_MINI_ICON, bmpForw);
 	AddAction(kNavigatorCommandForward, this, bmpForw);
 	SetActionEnabled(kNavigatorCommandForward, false);
 	delete bmpForw;
 
-	BBitmap* bmpUp = new BBitmap(BRect(0, 0, 19, 19), B_RGBA32);
-	GetTrackerResources()->GetIconResource(R_ResUpNav, B_MINI_ICON,
-		bmpUp);
+	BBitmap* bmpUp = new BBitmap(iconRect, B_RGBA32);
+	GetTrackerResources()->GetIconResource(R_ResUpNav, B_MINI_ICON, bmpUp);
 	AddAction(kNavigatorCommandUp, this, bmpUp);
 	SetActionEnabled(kNavigatorCommandUp, false);
 	delete bmpUp;

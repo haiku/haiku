@@ -26,19 +26,20 @@ RemotePackageRepository HaikuPorts
 	freetype-2.6.3-1
 	freetype_devel-2.6.3-1
 	gawk-3.1.8-2
-	gcc-11.2.0_2021_07_28-3
-	gcc_syslibs_devel-11.2.0_2021_07_28-3
-	gcc_syslibs-11.2.0_2021_07_28-3
-	icu-67.1-2
-	icu_devel-67.1-2
+	gcc-11.2.0_2021_07_28-5
+	gcc_syslibs_devel-11.2.0_2021_07_28-5
+	gcc_syslibs-11.2.0_2021_07_28-5
+	icu-57.2-2
+	icu_devel-57.2-2
 	less-451-1
 	libsolv-0.3.0_haiku_2014_12_22-1
 	libsolv_devel-0.3.0_haiku_2014_12_22-1
+	libffi-3.3-1
 	m4-1.4.16-1
 	make-4.3-1
 	ncurses6-6.2-1
 	ncurses6_devel-6.2-1
-	python-2.7.6-1
+	python-3.9.1-1
 	sed-4.2.1-1
 	texinfo-4.13a-1
 	zstd-1.5.0-2
@@ -88,6 +89,7 @@ RemotePackageRepository HaikuPorts
 	libpcre
 	libpng
 	libsolv
+	libffi
 #	libtheora
 	libtool
 #	libvorbis

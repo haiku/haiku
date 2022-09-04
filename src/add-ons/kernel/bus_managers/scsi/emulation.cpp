@@ -74,8 +74,8 @@ scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 	physical_address_restrictions physicalRestrictions = {};
 	physicalRestrictions.alignment = buffer_size;
 	device->buffer_area = create_area_etc(B_SYSTEM_TEAM, "ATAPI buffer",
-		total_size, B_32_BIT_CONTIGUOUS, 0, 0, 0, &virtualRestrictions,
-		&physicalRestrictions, &address);
+		total_size, B_32_BIT_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		0, 0, &virtualRestrictions, &physicalRestrictions, &address);
 		// TODO: Use B_CONTIGUOUS, if possible!
 
 	if (device->buffer_area < 0) {

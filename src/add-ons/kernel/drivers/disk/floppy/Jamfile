@@ -1,3 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel drivers disk floppy ;
-
-SubInclude HAIKU_TOP src add-ons kernel drivers disk floppy pc_floppy ;

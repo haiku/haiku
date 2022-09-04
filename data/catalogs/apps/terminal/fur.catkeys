@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Terminal	247549485
+1	friulian	x-vnd.Haiku-Terminal	4089361699
 ANSI cyan color	Terminal AppearancePrefView		Colôr ciano ANSI
 Close other tabs	Terminal TermWindow		Siere altris schedis
 Insert path	Terminal TermView		Inserìs percors
@@ -7,15 +7,15 @@ Text encoding	Terminal TermWindow		Codifiche dal test
 ANSI blue color	Terminal AppearancePrefView		Colôr blu ANSI
 OK	Terminal SetTitleWindow		Va ben
 Edit	Terminal TermWindow		Modifiche
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               stampe chest jutori\n  -t,     --title              stabilìs il titul dal barcon\n  -f,     --fullscreen         invie a plen visôr\n  -w,     --working-directory  stabilìs la cartele di lavôr iniziâl\n
 Select all	Terminal TermWindow		Selezione dut
 Confirm exit if active programs exist	Terminal AppearancePrefView		Domande conferme pe jessude se a esistin programs atîfs
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLa cartele di lavôr atuâl dal procès atîf te\n\t\t\tschede atuâl. In mût opzionâl, il massim numar di components di percors\n\t\t\tal pues jessi specificât. P.e. '%2d' par massim doi components.\n\t%T\t-\tIl non de aplicazion Terminal te localizazion atuâl.\n\t%e\t-\tLa codifiche de schede atuâl. No mostrât se UTF-8.\n\t%i\t-\tL'indicadôr dal barcon.\n\t%p\t-\tIl non dal procès atîf te schede atuâl .\n\t%t\t-\tIl titul de schede atuâl.
 Solarized Dark	Terminal colors scheme		Solarizât (Scûr)
 Copy	Terminal TermWindow		Copie
 ANSI bright green color	Terminal AppearancePrefView		Colôr vert lusorôs ANSI
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,     --help               stampe chest jutori\n  -t,     --title              stabilìs il titul dal barcon\n  -f,     --fullscreen         invie a plen visôr\n  -w,     --working-directory  stabilìs la cartele di lavôr iniziâl
 ANSI white color	Terminal AppearancePrefView		Colôr blanc ANSI
-Retro	Terminal colors scheme		Retro
+Retro	Terminal colors scheme		Passât
 Edit tab title…	Terminal TermWindow		Modifiche titul schede…
 Settings	Terminal TermWindow		Impostazions
 Print	Terminal TermWindow		Stampe

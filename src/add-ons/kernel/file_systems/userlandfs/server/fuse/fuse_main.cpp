@@ -133,6 +133,32 @@ fuse_new(struct fuse_chan* ch, struct fuse_args* args,
 }
 
 
+struct fuse_session *fuse_lowlevel_new(struct fuse_args *args,
+	const struct fuse_lowlevel_ops *lowLevelOps, size_t lowLevelOpSize, void *userData)
+{
+	// parse args
+	fuse_config config;
+	memset(&config, 0, sizeof(config));
+	config.entry_timeout = 1.0;
+	config.attr_timeout = 1.0;
+	config.negative_timeout = 0.0;
+	config.intr_signal = SIGUSR1;
+
+	bool success = fuse_parse_lib_config_args(args, &config);
+
+	if (!success) {
+		PRINT(("fuse_lowlevel_new(): failed to parse arguments!\n"));
+		return NULL;
+	}
+
+	// run the main loop
+	status_t error = FUSEFileSystem::GetInstance()->FinishInitClientFS(&config,
+		lowLevelOps, lowLevelOpSize, userData);
+
+	return error == B_OK ? (struct fuse_session*)FUSEFileSystem::GetInstance() : NULL;
+}
+
+
 void
 fuse_destroy(struct fuse* f)
 {
@@ -150,6 +176,22 @@ fuse_loop(struct fuse* f)
 
 int
 fuse_loop_mt(struct fuse* f)
+{
+	status_t error = FUSEFileSystem::GetInstance()->MainLoop(true);
+	return error == B_OK ? 0 : -1;
+}
+
+
+int
+fuse_session_loop(struct fuse_session* f)
+{
+	status_t error = FUSEFileSystem::GetInstance()->MainLoop(false);
+	return error == B_OK ? 0 : -1;
+}
+
+
+int
+fuse_session_loop_mt(struct fuse_session* f)
 {
 	status_t error = FUSEFileSystem::GetInstance()->MainLoop(true);
 	return error == B_OK ? 0 : -1;

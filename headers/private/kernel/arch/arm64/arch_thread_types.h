@@ -10,12 +10,8 @@
 
 
 struct arch_thread {
-	uint64			x[31];
-	uint64			pc;
-	uint64			sp;
-	uint64			tpidr_el0;
-	uint64			tpidrro_el0;
-	int				last_vfp_cpu;
+	uint64 regs[13]; // x19-x30, sp
+	uint64 fp_regs[8]; // d8-d15
 };
 
 struct arch_team {
@@ -25,6 +21,5 @@ struct arch_team {
 struct arch_fork_arg {
 	int			dummy;
 };
-
 
 #endif /* _KERNEL_ARCH_ARM64_ARCH_THREAD_TYPES_H_ */

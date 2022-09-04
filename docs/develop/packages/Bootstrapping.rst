@@ -120,6 +120,27 @@ the target build profile used by the bootstrap process. This defaults to
 (i.e. ``jam -sHAIKU_BOOTSTRAP_SOURCES_PROFILE=@release-raw -q @bootstrap-raw``
 will include source packages for all packages needed by release image).
 
+Format of hpkg Source Repository
+========================
+For Haikuporter to use source or "rigged" packages instead of requesting
+packages from a remote url (essential during bootstrap when patch, git,
+curl, etc are unavailable), haikuporter works on an empty haikuports repository
+with the following layout:
+
+- haikuports/input-source-packages
+  Contains all input source (or source_rigged) hpkgs
+- haikuports/FormatVersions
+  Contains ``RecipeFormatVersion=1`` so haikuporter can identify the haikuports
+  repository
+
+After ``haikuporter`` is given this directory structure, it will parse the
+source or "rigged" packages, and allow you to build them internally replacing
+the SOURCE_URI with ``pkg:input-source-packages/``
+
+This process is generally automated during the generation of the bootstrap
+image, but manual setup may be needed if the bootstrap image is non-functional
+on your target platform.
+
 Haiku Architecture Ports
 ========================
 When preparing a new Haiku architecture port for the bootstrap build the

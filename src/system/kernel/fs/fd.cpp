@@ -23,6 +23,7 @@
 #include <syscall_restart.h>
 #include <slab/Slab.h>
 #include <util/AutoLock.h>
+#include <util/iovec_support.h>
 #include <vfs.h>
 #include <wait_for_objects.h>
 
@@ -209,7 +210,7 @@ put_fd(struct file_descriptor* descriptor)
 
 	TFD(PutFD(descriptor));
 
-	TRACE(("put_fd(descriptor = %p [ref = %ld, cookie = %p])\n",
+	TRACE(("put_fd(descriptor = %p [ref = %" B_PRId32 ", cookie = %p])\n",
 		descriptor, descriptor->ref_count, descriptor->cookie));
 
 	// free the descriptor if we don't need it anymore
@@ -567,7 +568,7 @@ deselect_select_infos(file_descriptor* descriptor, select_info* infos,
 status_t
 select_fd(int32 fd, struct select_info* info, bool kernel)
 {
-	TRACE(("select_fd(fd = %ld, info = %p (%p), 0x%x)\n", fd, info,
+	TRACE(("select_fd(fd = %" B_PRId32 ", info = %p (%p), 0x%x)\n", fd, info,
 		info->sync, info->selected_events));
 
 	FDGetter fdGetter;
@@ -646,7 +647,7 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 status_t
 deselect_fd(int32 fd, struct select_info* info, bool kernel)
 {
-	TRACE(("deselect_fd(fd = %ld, info = %p (%p), 0x%x)\n", fd, info,
+	TRACE(("deselect_fd(fd = %" B_PRId32 ", info = %p (%p), 0x%x)\n", fd, info,
 		info->sync, info->selected_events));
 
 	FDGetter fdGetter;
@@ -759,7 +760,7 @@ common_user_io(int fd, off_t pos, void* buffer, size_t length, bool write)
 	if (length == 0)
 		return 0;
 
-	if (!IS_USER_ADDRESS(buffer))
+	if (!is_user_address_range(buffer, length))
 		return B_BAD_ADDRESS;
 
 	SyscallRestartWrapper<status_t> status;
@@ -785,15 +786,14 @@ static ssize_t
 common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 	bool write)
 {
-	if (!IS_USER_ADDRESS(userVecs))
-		return B_BAD_ADDRESS;
-
 	if (pos < -1)
 		return B_BAD_VALUE;
 
-	// prevent integer overflow exploit in malloc()
-	if (count > IOV_MAX)
-		return B_BAD_VALUE;
+	iovec* vecs;
+	status_t error = get_iovecs_from_user(userVecs, count, vecs, true);
+	if (error != B_OK)
+		return error;
+	MemoryDeleter _(vecs);
 
 	FDGetter fdGetter;
 	struct file_descriptor* descriptor = fdGetter.SetTo(fd, false);
@@ -804,14 +804,6 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 			: (descriptor->open_mode & O_RWMASK) == O_WRONLY) {
 		return B_FILE_ERROR;
 	}
-
-	iovec* vecs = (iovec*)malloc(sizeof(iovec) * count);
-	if (vecs == NULL)
-		return B_NO_MEMORY;
-	MemoryDeleter _(vecs);
-
-	if (user_memcpy(vecs, userVecs, sizeof(iovec) * count) != B_OK)
-		return B_BAD_ADDRESS;
 
 	bool movePosition = false;
 	if (pos == -1) {
@@ -827,15 +819,9 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 	SyscallRestartWrapper<status_t> status;
 
 	ssize_t bytesTransferred = 0;
-	for (uint32 i = 0; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		if (vecs[i].iov_base == NULL)
 			continue;
-		if (!IS_USER_ADDRESS(vecs[i].iov_base)) {
-			status = B_BAD_ADDRESS;
-			if (bytesTransferred == 0)
-				return status;
-			break;
-		}
 
 		size_t length = vecs[i].iov_len;
 		if (write) {
@@ -959,7 +945,7 @@ _user_read_dir(int fd, struct dirent* userBuffer, size_t bufferSize,
 	uint32 maxCount)
 {
 	TRACE(("user_read_dir(fd = %d, userBuffer = %p, bufferSize = %ld, count = "
-		"%lu)\n", fd, userBuffer, bufferSize, maxCount));
+		"%" B_PRIu32 ")\n", fd, userBuffer, bufferSize, maxCount));
 
 	if (maxCount == 0)
 		return 0;
@@ -1104,7 +1090,6 @@ _kern_readv(int fd, off_t pos, const iovec* vecs, size_t count)
 {
 	bool movePosition = false;
 	status_t status;
-	uint32 i;
 
 	if (pos < -1)
 		return B_BAD_VALUE;
@@ -1129,7 +1114,7 @@ _kern_readv(int fd, off_t pos, const iovec* vecs, size_t count)
 
 	ssize_t bytesRead = 0;
 
-	for (i = 0; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		size_t length = vecs[i].iov_len;
 		status = descriptor->ops->fd_read(descriptor, pos, vecs[i].iov_base,
 			&length);
@@ -1199,7 +1184,6 @@ _kern_writev(int fd, off_t pos, const iovec* vecs, size_t count)
 {
 	bool movePosition = false;
 	status_t status;
-	uint32 i;
 
 	if (pos < -1)
 		return B_BAD_VALUE;
@@ -1224,7 +1208,7 @@ _kern_writev(int fd, off_t pos, const iovec* vecs, size_t count)
 
 	ssize_t bytesWritten = 0;
 
-	for (i = 0; i < count; i++) {
+	for (size_t i = 0; i < count; i++) {
 		size_t length = vecs[i].iov_len;
 		status = descriptor->ops->fd_write(descriptor, pos,
 			vecs[i].iov_base, &length);
@@ -1286,7 +1270,7 @@ _kern_read_dir(int fd, struct dirent* buffer, size_t bufferSize,
 	ssize_t retval;
 
 	TRACE(("sys_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = "
-		"%lu)\n",fd, buffer, bufferSize, maxCount));
+		"%" B_PRIu32 ")\n",fd, buffer, bufferSize, maxCount));
 
 	struct io_context* ioContext = get_current_io_context(true);
 	descriptor = get_fd(ioContext, fd);

@@ -21,7 +21,7 @@ KernelMergeObject kernel_debug.o :
 	debug_parser.cpp
 	debug_variables.cpp
 	font.cpp
-	font_spleen.cpp
+	font_big.cpp
 	frame_buffer_console.cpp
 	gdb.cpp
 	safemode_settings.cpp

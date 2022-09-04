@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src system kernel arch arm64 ;
 
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica include ;
 SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 UsePrivateKernelHeaders ;
 
@@ -23,6 +24,12 @@ KernelMergeObject kernel_arch_arm64.o :
 	arch_real_time_clock.cpp
 	arch_platform.cpp
 	arch_asm.S
+	arch_int_gicv2.cpp
+	soc.cpp
+	acpi_irq_routing_table.cpp
+
+	VMSAv8TranslationMap.cpp
+	PMAPPhysicalPageMapper.cpp
 
     # Serial UART and drivers
 	debug_uart.cpp
@@ -35,3 +42,9 @@ KernelMergeObject kernel_arch_arm64.o :
 	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
 	:
 ;
+
+CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp : $(TARGET_KERNEL_ARCH) ;
+
+# syscall headers are generated on the fly, so we need a explicit dependency.
+Includes [ FGristFiles arch_int.cpp arch_asm.S ]
+	: <syscalls!$(TARGET_PACKAGING_ARCH)>syscall_numbers.h ;

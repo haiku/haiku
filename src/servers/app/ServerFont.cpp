@@ -256,6 +256,9 @@ ServerFont::SetStyle(FontStyle* style)
 
 		fFace = fStyle->PreservedFace(fFace);
 		fDirection = fStyle->Direction();
+
+		// invalidate fBounds
+		fBounds.Set(0, -1, 0, -1);
 	}
 }
 
@@ -284,6 +287,9 @@ ServerFont::SetFamilyAndStyle(uint16 familyID, uint16 styleID)
 
 	SetStyle(style);
 
+	// invalidate fBounds
+	fBounds.Set(0, -1, 0, -1);
+
 	return B_OK;
 }
 
@@ -300,6 +306,16 @@ ServerFont::SetFamilyAndStyle(uint32 fontID)
 	uint16 family = (fontID & 0xFFFF0000) >> 16;
 
 	return SetFamilyAndStyle(family, style);
+}
+
+
+void
+ServerFont::SetSize(float value)
+{
+	fSize = value;
+
+	// invalidate fBounds
+	fBounds.Set(0, -1, 0, -1);
 }
 
 
@@ -338,6 +354,9 @@ ServerFont::SetFace(uint16 face)
 
 	fFace = face;
 	SetStyle(style);
+
+	// invalidate fBounds
+	fBounds.Set(0, -1, 0, -1);
 
 	return B_OK;
 }
@@ -668,11 +687,12 @@ ServerFont::GetHasGlyphs(const char* string, int32 numBytes, int32 numChars,
 	FontCacheEntry* entry = NULL;
 	FontCacheReference cacheReference;
 	BObjectList<FontCacheReference> fallbacks(21, true);
-	int32 fallbacksCount = -1;
 
 	entry = GlyphLayoutEngine::FontCacheEntryFor(*this, false);
-	if (entry == NULL || !cacheReference.SetTo(entry, false))
+	if (entry == NULL)
 		return B_ERROR;
+
+	cacheReference.SetTo(entry);
 
 	uint32 charCode;
 	int32 charIndex = 0;
@@ -681,20 +701,11 @@ ServerFont::GetHasGlyphs(const char* string, int32 numBytes, int32 numChars,
 		hasArray[charIndex] = entry->CanCreateGlyph(charCode);
 
 		if (hasArray[charIndex] == false) {
-			if (fallbacksCount < 0) {
-				GlyphLayoutEngine::PopulateAndLockFallbacks(
-					fallbacks, *this, false, false);
-				fallbacksCount = fallbacks.CountItems();
-			}
+			if (fallbacks.IsEmpty())
+				GlyphLayoutEngine::PopulateFallbacks(fallbacks, *this, false);
 
-			for (int32 index = 0; index < fallbacksCount; index++) {
-				FontCacheEntry* fallbackEntry
-					= fallbacks.ItemAt(index)->Entry();
-				if (fallbackEntry->CanCreateGlyph(charCode)) {
-					hasArray[charIndex] = true;
-					break;
-				}
-			}
+			if (GlyphLayoutEngine::GetFallbackReference(fallbacks, charCode) != NULL)
+				hasArray[charIndex] = true;
 		}
 
 		charIndex++;
@@ -1079,7 +1090,49 @@ ServerFont::StringWidth(const char *string, int32 numBytes,
 BRect
 ServerFont::BoundingBox()
 {
-	// TODO: fBounds is nowhere calculated!
+	FT_Face face = fStyle->FreeTypeFace();
+
+	if (fBounds.IsValid() &&
+		fBounds.IntegerWidth() > 0 &&
+		fBounds.IntegerHeight() > 0)
+		return fBounds;
+
+	// if font has vector outlines, get the bounding box
+	// from freetype and scale it by the font size
+	if (IsScalable()) {
+		FT_BBox bounds = face->bbox;
+		fBounds.left = (float)bounds.xMin / (float)face->units_per_EM;
+		fBounds.right = (float)bounds.xMax / (float)face->units_per_EM;
+		fBounds.top = (float)bounds.yMin / (float)face->units_per_EM;
+		fBounds.bottom = (float)bounds.yMax / (float)face->units_per_EM;
+
+		float scaledWidth = fBounds.Width() * fSize;
+		float scaledHeight = fBounds.Height() * fSize;
+
+		fBounds.InsetBy((fBounds.Width() - scaledWidth) / 2.f,
+			(fBounds.Height() - scaledHeight) / 2.f);
+	} else {
+		// otherwise find the bitmap that is closest in size
+		// to the requested size
+		float pixelSize = fSize * 64.f;
+		float minDelta = abs(face->available_sizes[0].size - pixelSize);
+		float width = face->available_sizes[0].x_ppem;
+		float height = face->available_sizes[0].y_ppem;
+
+		for (int i = 1; i < face->num_fixed_sizes; ++i) {
+			float delta = abs(face->available_sizes[i].size - pixelSize);
+			if (delta < minDelta) {
+				width = face->available_sizes[i].x_ppem;
+				height = face->available_sizes[i].y_ppem;
+			}
+		}
+
+		fBounds.top = 0;
+		fBounds.left = 0;
+		fBounds.right = width / 64.f;
+		fBounds.bottom = height / 64.f;
+	}
+
 	return fBounds;
 }
 

@@ -47,6 +47,15 @@ SEARCH_SOURCE += [ FDirName $(posixSources) time ] ;
 SEARCH_SOURCE += [ FDirName $(posixSources) unistd ] ;
 SEARCH_SOURCE += [ FDirName $(gnuSources) ] ;
 
+local muslSources =
+	ffs.c
+	;
+
+SourceHdrs $(muslSources) :
+	[ FDirName $(posixSources) musl include ]
+	[ FDirName $(posixSources) musl internal ]
+	[ FDirName $(posixSources) musl arch $(TARGET_KERNEL_ARCH_DIR) ] ;
+
 KernelMergeObject kernel_lib_posix.o :
 	# main
 	kernel_errno.cpp
@@ -55,6 +64,8 @@ KernelMergeObject kernel_lib_posix.o :
 	poll.cpp
 	utime.c
 	# locale
+	ctype_loc.cpp
+	ctype_l.cpp
 	ctype.cpp
 	localeconv.cpp
 	LocaleData.cpp
@@ -99,7 +110,6 @@ KernelMergeObject kernel_lib_posix.o :
 	usergroup.cpp
 	write.c
 	# string
-	ffs.cpp
 	memchr.c
 	memcmp.c
 	memmem.c
@@ -129,8 +139,11 @@ KernelMergeObject kernel_lib_posix.o :
 	strupr.c
 	stpcpy.c
 
+	$(muslSources)
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
+
+SEARCH on [ FGristFiles $(muslSources) ] += [ FDirName $(posixSources) musl misc ] ;
 
 # misc
 

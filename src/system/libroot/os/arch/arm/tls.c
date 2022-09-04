@@ -1,14 +1,8 @@
 /*
  * Copyright 2019-2022, Haiku, Inc. All Rights Reserved.
- * Distributed under the terms of the MIT License.
- *
  * Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
-#ifndef _NO_INLINE_ASM
-#	define _NO_INLINE_ASM 1
-#endif
 
 #include <runtime_loader/runtime_loader.h>
 
@@ -71,4 +65,3 @@ __tls_get_addr(struct tls_index *ti)
 {
 	return __gRuntimeLoader->get_tls_address(ti->ti_module, ti->ti_offset);
 }
-

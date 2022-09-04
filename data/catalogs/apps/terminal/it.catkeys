@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Terminal	2062206461
+1	italian	x-vnd.Haiku-Terminal	1222406372
 ANSI cyan color	Terminal AppearancePrefView		Colore ANSI ciano
 Close other tabs	Terminal TermWindow		Chiudi altri pannelli
 Insert path	Terminal TermView		Inserisci percorso
@@ -13,7 +13,6 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Chiedi confer
 Solarized Dark	Terminal colors scheme		Solarizzato (Scuro)
 Copy	Terminal TermWindow		Copia
 ANSI bright green color	Terminal AppearancePrefView		Colore ANSI verde vivido
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,    --help                       mostra questo aiuto  -t,     --title                        imposta il titolo della finestra  -f,     --fullscreen              avvia a schermo intero  -w,    --working-directory  imposta cartella iniziale di lavoro
 ANSI white color	Terminal AppearancePrefView		Colore ANSI bianco
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Modifica titolo pannello...

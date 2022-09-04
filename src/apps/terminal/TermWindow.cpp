@@ -26,6 +26,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 #include <Clipboard.h>
@@ -949,7 +950,7 @@ TermWindow::MessageReceived(BMessage *message)
 
 				for (int32 i = fTabView->CountTabs() - 1; i >= 0; i--)
 					_TermViewAt(i)->ScrollBar()->ResizeBy(0,
-						(B_H_SCROLL_BAR_HEIGHT - 1));
+						(be_control_look->GetScrollBarWidth(B_VERTICAL) - 1));
 
 				fMenuBar->Hide();
 				fTabView->ResizeBy(0, mbHeight);
@@ -969,7 +970,7 @@ TermWindow::MessageReceived(BMessage *message)
 
 				for (int32 i = fTabView->CountTabs() - 1; i >= 0; i--)
 					_TermViewAt(i)->ScrollBar()->ResizeBy(0,
-						-(B_H_SCROLL_BAR_HEIGHT - 1));
+						-(be_control_look->GetScrollBarWidth(B_VERTICAL) - 1));
 
 				ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 				MoveTo(fSavedFrame.left, fSavedFrame.top);
@@ -1325,7 +1326,7 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 			containerView, view, fSessions.IsEmpty());
 		if (!fFullScreen)
 			scrollView->ScrollBar(B_VERTICAL)
-				->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 1));
+				->ResizeBy(0, -(be_control_look->GetScrollBarWidth(B_VERTICAL) - 1));
 
 		if (fSessions.IsEmpty())
 			fTabView->SetScrollView(scrollView);
@@ -1360,7 +1361,7 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 			containerView->GetPreferredSize(&viewWidth, &viewHeight);
 
 			// Resize Window
-			ResizeTo(viewWidth + B_V_SCROLL_BAR_WIDTH,
+			ResizeTo(viewWidth + be_control_look->GetScrollBarWidth(B_HORIZONTAL),
 				viewHeight + fMenuBar->Bounds().Height() + 1);
 				// NOTE: Width is one pixel too small, since the scroll view
 				// is one pixel wider than its parent.
@@ -1741,7 +1742,7 @@ TermWindow::_ResizeView(TermView *view)
 	float height;
 	view->Parent()->GetPreferredSize(&width, &height);
 
-	width += B_V_SCROLL_BAR_WIDTH;
+	width += be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 		// NOTE: Width is one pixel too small, since the scroll view
 		// is one pixel wider than its parent.
 	if (fMenuBar != NULL)

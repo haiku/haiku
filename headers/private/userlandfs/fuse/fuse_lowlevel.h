@@ -77,9 +77,16 @@ struct fuse_entry_param {
 
 	/** Generation number for this entry.
 	 *
-	 * The ino/generation pair should be unique for the filesystem's
-	 * lifetime. It must be non-zero, otherwise FUSE will treat it as an
-	 * error.
+	 * If the file system will be exported over NFS, the
+	 * ino/generation pairs need to be unique over the file
+	 * system's lifetime (rather than just the mount time). So if
+	 * the file system reuses an inode after it has been deleted,
+	 * it must assign a new, previously unused generation number
+	 * to the inode at the same time.
+	 *
+	 * The generation must be non-zero, otherwise FUSE will treat
+	 * it as an error.
+	 *
 	 */
 	unsigned long generation;
 
@@ -99,7 +106,14 @@ struct fuse_entry_param {
 	double entry_timeout;
 };
 
-/** Additional context associated with requests */
+/**
+ * Additional context associated with requests.
+ *
+ * Note that the reported client uid, gid and pid may be zero in some
+ * situations. For example, if the FUSE file system is running in a
+ * PID or user namespace but then accessed from outside the namespace,
+ * there is no valid uid/pid/gid that could be reported.
+ */
 struct fuse_ctx {
 	/** User ID of the calling process */
 	uid_t uid;
@@ -109,6 +123,14 @@ struct fuse_ctx {
 
 	/** Thread ID of the calling process */
 	pid_t pid;
+
+	/** Umask of the calling process (introduced in version 2.8) */
+	mode_t umask;
+};
+
+struct fuse_forget_data {
+	uint64_t ino;
+	uint64_t nlookup;
 };
 
 /* 'to_set' flags in setattr */
@@ -118,6 +140,8 @@ struct fuse_ctx {
 #define FUSE_SET_ATTR_SIZE	(1 << 3)
 #define FUSE_SET_ATTR_ATIME	(1 << 4)
 #define FUSE_SET_ATTR_MTIME	(1 << 5)
+#define FUSE_SET_ATTR_ATIME_NOW	(1 << 7)
+#define FUSE_SET_ATTR_MTIME_NOW	(1 << 8)
 
 /* ----------------------------------------------------------- *
  * Request methods and replies				       *
@@ -183,18 +207,31 @@ struct fuse_lowlevel_ops {
 	/**
 	 * Forget about an inode
 	 *
-	 * The nlookup parameter indicates the number of lookups
-	 * previously performed on this inode.
+	 * This function is called when the kernel removes an inode
+	 * from its internal caches.
 	 *
-	 * If the filesystem implements inode lifetimes, it is recommended
-	 * that inodes acquire a single reference on each lookup, and lose
-	 * nlookup references on each forget.
+	 * The inode's lookup count increases by one for every call to
+	 * fuse_reply_entry and fuse_reply_create. The nlookup parameter
+	 * indicates by how much the lookup count should be decreased.
 	 *
-	 * The filesystem may ignore forget calls, if the inodes don't
-	 * need to have a limited lifetime.
+	 * Inodes with a non-zero lookup count may receive request from
+	 * the kernel even after calls to unlink, rmdir or (when
+	 * overwriting an existing file) rename. Filesystems must handle
+	 * such requests properly and it is recommended to defer removal
+	 * of the inode until the lookup count reaches zero. Calls to
+	 * unlink, remdir or rename will be followed closely by forget
+	 * unless the file or directory is open, in which case the
+	 * kernel issues forget only after the release or releasedir
+	 * calls.
 	 *
-	 * On unmount it is not guaranteed, that all referenced inodes
-	 * will receive a forget message.
+	 * Note that if a file system will be exported over NFS the
+	 * inodes lifetime must extend even beyond forget. See the
+	 * generation field in struct fuse_entry_param above.
+	 *
+	 * On unmount the lookup count for all inodes implicitly drops
+	 * to zero. It is not guaranteed that the file system will
+	 * receive corresponding forget messages for the affected
+	 * inodes.
 	 *
 	 * Valid replies:
 	 *   fuse_reply_none
@@ -298,6 +335,11 @@ struct fuse_lowlevel_ops {
 	/**
 	 * Remove a file
 	 *
+	 * If the file's inode's lookup count is non-zero, the file
+	 * system is expected to postpone any removal of the inode
+	 * until the lookup count reaches zero (see description of the
+	 * forget function).
+	 *
 	 * Valid replies:
 	 *   fuse_reply_err
 	 *
@@ -309,6 +351,11 @@ struct fuse_lowlevel_ops {
 
 	/**
 	 * Remove a directory
+	 *
+	 * If the directory's inode's lookup count is non-zero, the
+	 * file system is expected to postpone any removal of the
+	 * inode until the lookup count reaches zero (see description
+	 * of the forget function).
 	 *
 	 * Valid replies:
 	 *   fuse_reply_err
@@ -335,6 +382,12 @@ struct fuse_lowlevel_ops {
 			 const char *name);
 
 	/** Rename a file
+	 *
+	 * If the target exists it should be atomically replaced. If
+	 * the target's inode's lookup count is non-zero, the file
+	 * system is expected to postpone any removal of the inode
+	 * until the lookup count reaches zero (see description of the
+	 * forget function).
 	 *
 	 * Valid replies:
 	 *   fuse_reply_err
@@ -406,6 +459,8 @@ struct fuse_lowlevel_ops {
 	 *
 	 * Valid replies:
 	 *   fuse_reply_buf
+	 *   fuse_reply_iov
+	 *   fuse_reply_data
 	 *   fuse_reply_err
 	 *
 	 * @param req request handle
@@ -555,6 +610,7 @@ struct fuse_lowlevel_ops {
 	 *
 	 * Valid replies:
 	 *   fuse_reply_buf
+	 *   fuse_reply_data
 	 *   fuse_reply_err
 	 *
 	 * @param req request handle
@@ -640,6 +696,7 @@ struct fuse_lowlevel_ops {
 	 *
 	 * Valid replies:
 	 *   fuse_reply_buf
+	 *   fuse_reply_data
 	 *   fuse_reply_xattr
 	 *   fuse_reply_err
 	 *
@@ -666,6 +723,7 @@ struct fuse_lowlevel_ops {
 	 *
 	 * Valid replies:
 	 *   fuse_reply_buf
+	 *   fuse_reply_data
 	 *   fuse_reply_xattr
 	 *   fuse_reply_err
 	 *
@@ -781,7 +839,7 @@ struct fuse_lowlevel_ops {
 	 * @param req request handle
 	 * @param ino the inode number
 	 * @param fi file information
-	 * @param lock the region/type to test
+	 * @param lock the region/type to set
 	 * @param sleep locking operation may sleep
 	 */
 	void (*setlk) (fuse_req_t req, fuse_ino_t ino,
@@ -807,6 +865,169 @@ struct fuse_lowlevel_ops {
 	 */
 	void (*bmap) (fuse_req_t req, fuse_ino_t ino, size_t blocksize,
 		      uint64_t idx);
+
+	/**
+	 * Ioctl
+	 *
+	 * Note: For unrestricted ioctls (not allowed for FUSE
+	 * servers), data in and out areas can be discovered by giving
+	 * iovs and setting FUSE_IOCTL_RETRY in @flags.  For
+	 * restricted ioctls, kernel prepares in/out data area
+	 * according to the information encoded in cmd.
+	 *
+	 * Introduced in version 2.8
+	 *
+	 * Valid replies:
+	 *   fuse_reply_ioctl_retry
+	 *   fuse_reply_ioctl
+	 *   fuse_reply_ioctl_iov
+	 *   fuse_reply_err
+	 *
+	 * @param req request handle
+	 * @param ino the inode number
+	 * @param cmd ioctl command
+	 * @param arg ioctl argument
+	 * @param fi file information
+	 * @param flags for FUSE_IOCTL_* flags
+	 * @param in_buf data fetched from the caller
+	 * @param in_bufsz number of fetched bytes
+	 * @param out_bufsz maximum size of output data
+	 */
+	void (*ioctl) (fuse_req_t req, fuse_ino_t ino, int cmd, void *arg,
+		       struct fuse_file_info *fi, unsigned flags,
+		       const void *in_buf, size_t in_bufsz, size_t out_bufsz);
+
+	/**
+	 * Poll for IO readiness
+	 *
+	 * Introduced in version 2.8
+	 *
+	 * Note: If ph is non-NULL, the client should notify
+	 * when IO readiness events occur by calling
+	 * fuse_lowelevel_notify_poll() with the specified ph.
+	 *
+	 * Regardless of the number of times poll with a non-NULL ph
+	 * is received, single notification is enough to clear all.
+	 * Notifying more times incurs overhead but doesn't harm
+	 * correctness.
+	 *
+	 * The callee is responsible for destroying ph with
+	 * fuse_pollhandle_destroy() when no longer in use.
+	 *
+	 * Valid replies:
+	 *   fuse_reply_poll
+	 *   fuse_reply_err
+	 *
+	 * @param req request handle
+	 * @param ino the inode number
+	 * @param fi file information
+	 * @param ph poll handle to be used for notification
+	 */
+	void (*poll) (fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi,
+		      struct fuse_pollhandle *ph);
+
+	/**
+	 * Write data made available in a buffer
+	 *
+	 * This is a more generic version of the ->write() method.  If
+	 * FUSE_CAP_SPLICE_READ is set in fuse_conn_info.want and the
+	 * kernel supports splicing from the fuse device, then the
+	 * data will be made available in pipe for supporting zero
+	 * copy data transfer.
+         *
+         * buf->count is guaranteed to be one (and thus buf->idx is
+         * always zero). The write_buf handler must ensure that
+         * bufv->off is correctly updated (reflecting the number of
+         * bytes read from bufv->buf[0]).
+	 *
+	 * Introduced in version 2.9
+	 *
+	 * Valid replies:
+	 *   fuse_reply_write
+	 *   fuse_reply_err
+	 *
+	 * @param req request handle
+	 * @param ino the inode number
+	 * @param bufv buffer containing the data
+	 * @param off offset to write to
+	 * @param fi file information
+	 */
+	void (*write_buf) (fuse_req_t req, fuse_ino_t ino,
+			   struct fuse_bufvec *bufv, off_t off,
+			   struct fuse_file_info *fi);
+
+	/**
+	 * Callback function for the retrieve request
+	 *
+	 * Introduced in version 2.9
+	 *
+	 * Valid replies:
+	 *	fuse_reply_none
+	 *
+	 * @param req request handle
+	 * @param cookie user data supplied to fuse_lowlevel_notify_retrieve()
+	 * @param ino the inode number supplied to fuse_lowlevel_notify_retrieve()
+	 * @param offset the offset supplied to fuse_lowlevel_notify_retrieve()
+	 * @param bufv the buffer containing the returned data
+	 */
+	void (*retrieve_reply) (fuse_req_t req, void *cookie, fuse_ino_t ino,
+				off_t offset, struct fuse_bufvec *bufv);
+
+	/**
+	 * Forget about multiple inodes
+	 *
+	 * See description of the forget function for more
+	 * information.
+	 *
+	 * Introduced in version 2.9
+	 *
+	 * Valid replies:
+	 *   fuse_reply_none
+	 *
+	 * @param req request handle
+	 */
+	void (*forget_multi) (fuse_req_t req, size_t count,
+			      struct fuse_forget_data *forgets);
+
+	/**
+	 * Acquire, modify or release a BSD file lock
+	 *
+	 * Note: if the locking methods are not implemented, the kernel
+	 * will still allow file locking to work locally.  Hence these are
+	 * only interesting for network filesystems and similar.
+	 *
+	 * Introduced in version 2.9
+	 *
+	 * Valid replies:
+	 *   fuse_reply_err
+	 *
+	 * @param req request handle
+	 * @param ino the inode number
+	 * @param fi file information
+	 * @param op the locking operation, see flock(2)
+	 */
+	void (*flock) (fuse_req_t req, fuse_ino_t ino,
+		       struct fuse_file_info *fi, int op);
+
+	/**
+	 * Allocate requested space. If this function returns success then
+	 * subsequent writes to the specified range shall not fail due to the lack
+	 * of free space on the file system storage media.
+	 *
+	 * Introduced in version 2.9
+	 *
+	 * Valid replies:
+	 *   fuse_reply_err
+	 *
+	 * @param req request handle
+	 * @param ino the inode number
+	 * @param offset starting point for allocated region
+	 * @param length size of allocated region
+	 * @param mode determines the operation to be performed on the given range,
+	 *             see fallocate(2)
+	 */
+	void (*fallocate) (fuse_req_t req, fuse_ino_t ino, int mode,
+		       off_t offset, off_t length, struct fuse_file_info *fi);
 };
 
 /**
@@ -840,6 +1061,9 @@ void fuse_reply_none(fuse_req_t req);
  * Possible requests:
  *   lookup, mknod, mkdir, symlink, link
  *
+ * Side effects:
+ *   increments the lookup count on success
+ *
  * @param req request handle
  * @param e the entry parameters
  * @return zero for success, -errno for failure to send reply
@@ -854,6 +1078,9 @@ int fuse_reply_entry(fuse_req_t req, const struct fuse_entry_param *e);
  *
  * Possible requests:
  *   create
+ *
+ * Side effects:
+ *   increments the lookup count on success
  *
  * @param req request handle
  * @param e the entry parameters
@@ -870,7 +1097,7 @@ int fuse_reply_create(fuse_req_t req, const struct fuse_entry_param *e,
  *   getattr, setattr
  *
  * @param req request handle
- * @param the attributes
+ * @param attr the attributes
  * @param attr_timeout	validity timeout (in seconds) for the attributes
  * @return zero for success, -errno for failure to send reply
  */
@@ -930,6 +1157,20 @@ int fuse_reply_write(fuse_req_t req, size_t count);
 int fuse_reply_buf(fuse_req_t req, const char *buf, size_t size);
 
 /**
+ * Reply with data copied/moved from buffer(s)
+ *
+ * Possible requests:
+ *   read, readdir, getxattr, listxattr
+ *
+ * @param req request handle
+ * @param bufv buffer vector
+ * @param flags flags controlling the copy
+ * @return zero for success, -errno for failure to send reply
+ */
+int fuse_reply_data(fuse_req_t req, struct fuse_bufvec *bufv,
+		    enum fuse_buf_copy_flags flags);
+
+/**
  * Reply with data vector
  *
  * Possible requests:
@@ -976,7 +1217,7 @@ int fuse_reply_xattr(fuse_req_t req, size_t count);
  * @param lock the lock information
  * @return zero for success, -errno for failure to send reply
  */
-int fuse_reply_lock(fuse_req_t req, struct flock *lock);
+int fuse_reply_lock(fuse_req_t req, const struct flock *lock);
 
 /**
  * Reply with block index
@@ -997,7 +1238,7 @@ int fuse_reply_bmap(fuse_req_t req, uint64_t idx);
 /**
  * Add a directory entry to the buffer
  *
- * Buffer needs to be large enough to hold the entry.  Of it's not,
+ * Buffer needs to be large enough to hold the entry.  If it's not,
  * then the entry is not filled in but the size of the entry is still
  * returned.  The caller can check this by comparing the bufsize
  * parameter with the returned entry size.  If the entry size is
@@ -1013,7 +1254,7 @@ int fuse_reply_bmap(fuse_req_t req, uint64_t idx);
  * @param req request handle
  * @param buf the point where the new entry will be added to the buffer
  * @param bufsize remaining size of the buffer
- * @param the name of the entry
+ * @param name the name of the entry
  * @param stbuf the file attributes
  * @param off the offset of the next entry
  * @return the space needed for the entry
@@ -1021,6 +1262,176 @@ int fuse_reply_bmap(fuse_req_t req, uint64_t idx);
 size_t fuse_add_direntry(fuse_req_t req, char *buf, size_t bufsize,
 			 const char *name, const struct stat *stbuf,
 			 off_t off);
+
+/**
+ * Reply to ask for data fetch and output buffer preparation.  ioctl
+ * will be retried with the specified input data fetched and output
+ * buffer prepared.
+ *
+ * Possible requests:
+ *   ioctl
+ *
+ * @param req request handle
+ * @param in_iov iovec specifying data to fetch from the caller
+ * @param in_count number of entries in in_iov
+ * @param out_iov iovec specifying addresses to write output to
+ * @param out_count number of entries in out_iov
+ * @return zero for success, -errno for failure to send reply
+ */
+int fuse_reply_ioctl_retry(fuse_req_t req,
+			   const struct iovec *in_iov, size_t in_count,
+			   const struct iovec *out_iov, size_t out_count);
+
+/**
+ * Reply to finish ioctl
+ *
+ * Possible requests:
+ *   ioctl
+ *
+ * @param req request handle
+ * @param result result to be passed to the caller
+ * @param buf buffer containing output data
+ * @param size length of output data
+ */
+int fuse_reply_ioctl(fuse_req_t req, int result, const void *buf, size_t size);
+
+/**
+ * Reply to finish ioctl with iov buffer
+ *
+ * Possible requests:
+ *   ioctl
+ *
+ * @param req request handle
+ * @param result result to be passed to the caller
+ * @param iov the vector containing the data
+ * @param count the size of vector
+ */
+int fuse_reply_ioctl_iov(fuse_req_t req, int result, const struct iovec *iov,
+			 int count);
+
+/**
+ * Reply with poll result event mask
+ *
+ * @param req request handle
+ * @param revents poll result event mask
+ */
+int fuse_reply_poll(fuse_req_t req, unsigned revents);
+
+/* ----------------------------------------------------------- *
+ * Notification						       *
+ * ----------------------------------------------------------- */
+
+/**
+ * Notify IO readiness event
+ *
+ * For more information, please read comment for poll operation.
+ *
+ * @param ph poll handle to notify IO readiness event for
+ */
+int fuse_lowlevel_notify_poll(struct fuse_pollhandle *ph);
+
+/**
+ * Notify to invalidate cache for an inode
+ *
+ * @param ch the channel through which to send the invalidation
+ * @param ino the inode number
+ * @param off the offset in the inode where to start invalidating
+ *            or negative to invalidate attributes only
+ * @param len the amount of cache to invalidate or 0 for all
+ * @return zero for success, -errno for failure
+ */
+int fuse_lowlevel_notify_inval_inode(struct fuse_chan *ch, fuse_ino_t ino,
+                                     off_t off, off_t len);
+
+/**
+ * Notify to invalidate parent attributes and the dentry matching
+ * parent/name
+ *
+ * To avoid a deadlock don't call this function from a filesystem operation and
+ * don't call it with a lock held that can also be held by a filesystem
+ * operation.
+ *
+ * @param ch the channel through which to send the invalidation
+ * @param parent inode number
+ * @param name file name
+ * @param namelen strlen() of file name
+ * @return zero for success, -errno for failure
+ */
+int fuse_lowlevel_notify_inval_entry(struct fuse_chan *ch, fuse_ino_t parent,
+                                     const char *name, size_t namelen);
+
+/**
+ * Notify to invalidate parent attributes and delete the dentry matching
+ * parent/name if the dentry's inode number matches child (otherwise it
+ * will invalidate the matching dentry).
+ *
+ * To avoid a deadlock don't call this function from a filesystem operation and
+ * don't call it with a lock held that can also be held by a filesystem
+ * operation.
+ *
+ * @param ch the channel through which to send the notification
+ * @param parent inode number
+ * @param child inode number
+ * @param name file name
+ * @param namelen strlen() of file name
+ * @return zero for success, -errno for failure
+ */
+int fuse_lowlevel_notify_delete(struct fuse_chan *ch,
+				fuse_ino_t parent, fuse_ino_t child,
+				const char *name, size_t namelen);
+
+/**
+ * Store data to the kernel buffers
+ *
+ * Synchronously store data in the kernel buffers belonging to the
+ * given inode.  The stored data is marked up-to-date (no read will be
+ * performed against it, unless it's invalidated or evicted from the
+ * cache).
+ *
+ * If the stored data overflows the current file size, then the size
+ * is extended, similarly to a write(2) on the filesystem.
+ *
+ * If this function returns an error, then the store wasn't fully
+ * completed, but it may have been partially completed.
+ *
+ * @param ch the channel through which to send the invalidation
+ * @param ino the inode number
+ * @param offset the starting offset into the file to store to
+ * @param bufv buffer vector
+ * @param flags flags controlling the copy
+ * @return zero for success, -errno for failure
+ */
+int fuse_lowlevel_notify_store(struct fuse_chan *ch, fuse_ino_t ino,
+			       off_t offset, struct fuse_bufvec *bufv,
+			       enum fuse_buf_copy_flags flags);
+/**
+ * Retrieve data from the kernel buffers
+ *
+ * Retrieve data in the kernel buffers belonging to the given inode.
+ * If successful then the retrieve_reply() method will be called with
+ * the returned data.
+ *
+ * Only present pages are returned in the retrieve reply.  Retrieving
+ * stops when it finds a non-present page and only data prior to that is
+ * returned.
+ *
+ * If this function returns an error, then the retrieve will not be
+ * completed and no reply will be sent.
+ *
+ * This function doesn't change the dirty state of pages in the kernel
+ * buffer.  For dirty pages the write() method will be called
+ * regardless of having been retrieved previously.
+ *
+ * @param ch the channel through which to send the invalidation
+ * @param ino the inode number
+ * @param size the number of bytes to retrieve
+ * @param offset the starting offset into the file to retrieve from
+ * @param cookie user data to supply to the reply callback
+ * @return zero for success, -errno for failure
+ */
+int fuse_lowlevel_notify_retrieve(struct fuse_chan *ch, fuse_ino_t ino,
+				  size_t size, off_t offset, void *cookie);
+
 
 /* ----------------------------------------------------------- *
  * Utility functions					       *
@@ -1046,6 +1457,27 @@ void *fuse_req_userdata(fuse_req_t req);
 const struct fuse_ctx *fuse_req_ctx(fuse_req_t req);
 
 /**
+ * Get the current supplementary group IDs for the specified request
+ *
+ * Similar to the getgroups(2) system call, except the return value is
+ * always the total number of group IDs, even if it is larger than the
+ * specified size.
+ *
+ * The current fuse kernel module in linux (as of 2.6.30) doesn't pass
+ * the group list to userspace, hence this function needs to parse
+ * "/proc/$TID/task/$TID/status" to get the group IDs.
+ *
+ * This feature may not be supported on all operating systems.  In
+ * such a case this function will return -ENOSYS.
+ *
+ * @param req request handle
+ * @param size size of given array
+ * @param list array of group IDs to be filled in
+ * @return the total number of supplementary group IDs or -errno on failure
+ */
+int fuse_req_getgroups(fuse_req_t req, int size, gid_t list[]);
+
+/**
  * Callback function for an interrupt
  *
  * @param req interrupted request
@@ -1062,7 +1494,7 @@ typedef void (*fuse_interrupt_func_t)(fuse_req_t req, void *data);
  *
  * @param req request handle
  * @param func the callback function or NULL for unregister
- * @parm data user data passed to the callback function
+ * @param data user data passed to the callback function
  */
 void fuse_req_interrupt_func(fuse_req_t req, fuse_interrupt_func_t func,
 			     void *data);
@@ -1197,6 +1629,34 @@ void fuse_session_process(struct fuse_session *se, const char *buf, size_t len,
 			  struct fuse_chan *ch);
 
 /**
+ * Process a raw request supplied in a generic buffer
+ *
+ * This is a more generic version of fuse_session_process().  The
+ * fuse_buf may contain a memory buffer or a pipe file descriptor.
+ *
+ * @param se the session
+ * @param buf the fuse_buf containing the request
+ * @param ch channel on which the request was received
+ */
+void fuse_session_process_buf(struct fuse_session *se,
+			      const struct fuse_buf *buf, struct fuse_chan *ch);
+
+/**
+ * Receive a raw request supplied in a generic buffer
+ *
+ * This is a more generic version of fuse_chan_recv().  The fuse_buf
+ * supplied to this function contains a suitably allocated memory
+ * buffer.  This may be overwritten with a file descriptor buffer.
+ *
+ * @param se the session
+ * @param buf the fuse_buf to store the request in
+ * @param chp pointer to the channel
+ * @return the actual size of the raw request, or -errno on error
+ */
+int fuse_session_receive_buf(struct fuse_session *se, struct fuse_buf *buf,
+			     struct fuse_chan **chp);
+
+/**
  * Destroy a session
  *
  * @param se the session
@@ -1224,6 +1684,14 @@ void fuse_session_reset(struct fuse_session *se);
  * @return 1 if exited, 0 if not exited
  */
 int fuse_session_exited(struct fuse_session *se);
+
+/**
+ * Get the user data provided to the session
+ *
+ * @param se the session
+ * @return the user data
+ */
+void *fuse_session_data(struct fuse_session *se);
 
 /**
  * Enter a single threaded event loop

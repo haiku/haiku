@@ -231,6 +231,7 @@ void
 StackTraceView::_Init()
 {
 	fFramesTable = new Table("stack trace", 0, B_FANCY_BORDER);
+	fFramesTable->SetFont(B_FONT_ROW, be_fixed_font);
 	AddChild(fFramesTable->ToView());
 	fFramesTable->SetSortingEnabled(false);
 

@@ -55,10 +55,13 @@ dump_registers()
 
 	ERROR("%s: Taking register dump #%" B_PRId32 "\n", __func__, gDumpCount);
 
+	area_info areaInfo;
+	get_area_info(gInfo->shared_info->registers_area, &areaInfo);
+
 	int fd = open(filename, O_CREAT | O_WRONLY, 0644);
 	uint32 data = 0;
 	if (fd >= 0) {
-		for (int32 i = 0; i < 0x80000; i += sizeof(data)) {
+		for (uint32 i = 0; i < areaInfo.size; i += sizeof(data)) {
 			//char line[512];
 			//int length = sprintf(line, "%05" B_PRIx32 ": "
 			//	"%08" B_PRIx32 " %08" B_PRIx32 " %08" B_PRIx32 " %08" B_PRIx32 "\n",
@@ -391,7 +394,8 @@ probe_ports()
 	}
 
 	// then finally always try the analog port when chipsets supports it
-	if (gInfo->shared_info->device_type.Generation() <= 8) {
+	if (gInfo->shared_info->device_type.Generation() <= 8
+		&& gInfo->shared_info->internal_crt_support) {
 		TRACE("Probing Analog\n");
 		Port* analogPort = new(std::nothrow) AnalogPort();
 		if (analogPort == NULL)

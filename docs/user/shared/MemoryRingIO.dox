@@ -1,0 +1,247 @@
+/*
+ * Copyright 2022 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Leorize, leorize+oss@disroot.org
+ *
+ * Corresponds to:
+ *		headers/private/shared/MemoryRingIO.h	hrev54369
+ *		src/kits/shared/MemoryRingIO.cpp	hrev54369
+ */
+
+
+/*!
+	\file MemoryRingIO.h
+	\ingroup support
+	\ingroup libshared
+	\brief Provides the BMemoryRingIO class.
+*/
+
+
+/*!
+	\class BMemoryRingIO
+	\ingroup support
+	\ingroup libshared
+	\brief An implementation of a ring buffer with a BDataIO interface.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BMemoryRingIO::BMemoryRingIO(size_t size)
+	\brief Creates a new BMemoryRingIO object with the given buffer size.
+
+	Call InitCheck() to verify that the buffer has been successfully created.
+
+	\param size The initial size of the buffer.
+
+	\since Haiku R1
+
+	\sa SetSize()
+*/
+
+
+/*!
+	\fn BMemoryRingIO::~BMemoryRingIO()
+	\brief Free up resources held by the object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BMemoryRingIO::InitCheck() const
+	\brief Whether the object has been initialized correctly.
+
+	\retval B_OK Everything is initialized.
+	\retval B_NO_INIT The internal buffer couldn't be created or the buffer
+		capacity is \c 0.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual ssize_t BMemoryRingIO::Read(void* buffer, size_t size)
+	\brief Reads data from the object into a buffer.
+
+	If the ring buffer is empty, this method blocks until some data is made
+	available. \c 0 is returned if \c size is \c 0 or the buffer is empty
+	and was set to have write disabled.
+
+	\return The amount of bytes read.
+
+	\retval B_BAD_VALUE \c buffer is \c NULL
+
+	\since Haiku R1
+
+	\sa SetWriteDisabled()
+*/
+
+
+/*!
+	\fn virtual ssize_t BMemoryRingIO::Write(const void* buffer, size_t size)
+	\brief Writes data from a buffer to the object.
+
+	If the ring buffer is full, this method blocks until some space is made
+	available.
+
+	\return The amount of bytes written. If the ring buffer is filled or
+		\c size is \c 0, \c 0 will be returned.
+
+	\retval B_BAD_VALUE \c buffer is \c NULL
+	\retval B_READ_ONLY_DEVICE Writes to the buffer has been disabled.
+
+	\since Haiku R1
+
+	\sa SetWriteDisabled()
+*/
+
+
+/*!
+	\fn status_t BMemoryRingIO::SetSize(size_t size)
+	\brief Change the ring buffer capacity.
+
+	\param size The new capacity for the ring buffer. This value will be
+		rounded up to the nearest power of two. The new capacity must be larger
+		or equal to BytesAvailable(). If set to \c 0 when there are no the bytes
+		available to be read, the buffer will be freed.
+
+	\retval B_OK The operation was successful.
+	\retval B_BAD_VALUE The new capacity is smaller than BytesAvailable().
+	\retval B_NO_MEMORY Memory couldn't be allocated to grow/create the buffer.
+	    The buffer remains unchanged.
+
+	\since Haiku R1
+
+	\sa BytesAvailable() for the amount of data to be read.
+*/
+
+
+/*!
+	\fn void BMemoryRingIO::Clear()
+	\brief Discard all data in the object.
+
+	This method will discard all data within the buffer. However it does not
+	free the memory held by the buffer. If this is desired, use in combination
+	with SetSize() with \c 0 as the new capacity.
+
+	\since Haiku R1
+
+	\sa SetSize() for freeing memory held by the buffer,
+	    or for growing the buffer's size.
+*/
+
+
+/*!
+	\fn size_t BMemoryRingIO::BytesAvailable()
+	\brief Get the amount of data stored in the object.
+
+	\return The amount of bytes ready to be read from the object.
+
+	\since Haiku R1
+
+	\sa BufferSize() for the total buffer size.
+	\sa SpaceAvailable() for the amount of space left for writing in the object.
+*/
+
+
+/*!
+	\fn size_t BMemoryRingIO::SpaceAvailable()
+	\brief Get the amount of space left in the object.
+
+	\return The remaining storage capacity of the object in bytes.
+
+	\since Haiku R1
+
+	\sa BufferSize() for the total buffer size.
+	\sa BytesAvailable() for the amount of data ready to be read.
+*/
+
+
+/*!
+	\fn size_t BMemoryRingIO::BufferSize()
+	\brief Get the total capacity of the object.
+
+	\return The total capacity of the object in bytes.
+
+	\since Haiku R1
+
+	\sa SpaceAvailable() for the amount of space left for writing in the object.
+	\sa BytesAvailable() for the amount of data ready to be read.
+*/
+
+
+/*!
+	\fn status_t BMemoryRingIO::WaitForRead(bigtime_t timeout = B_INFINITE_TIMEOUT)
+	\brief Wait for data to be available for reading.
+
+	This method will block the current thread until there's data ready to be
+	Read() from the object or until timeout has been reached.
+
+	\param timeout The minimum amount of time to wait in microseconds. If the
+		value is \c B_INFINITE_TIMEOUT, this method will not return until
+		data can be read from the object.
+
+	\retval B_OK There's data ready to be read.
+	\retval B_TIMED_OUT Timeout reached but no data has been made available.
+	\retval B_READ_ONLY_DEVICE The buffer has write disabled.
+
+	\sa Read()
+	\sa SetWriteDisabled()
+*/
+
+
+/*!
+	\fn status_t BMemoryRingIO::WaitForWrite(bigtime_t timeout = B_INFINITE_TIMEOUT)
+	\brief Wait for space to be available for writing.
+
+	This method will block the current thread until there are storage space
+	available for a Write() operation or until timeout has been reached.
+
+	\param timeout The minimum amount of time to wait in microseconds. If the
+		value is \c B_INFINITE_TIMEOUT, this method will not return until
+		data can be written into the object.
+
+	\retval B_OK There's storage space to write to.
+	\retval B_TIMED_OUT Timeout reached but no additional storage space has
+		been made available.
+	\retval B_READ_ONLY_DEVICE The buffer has write disabled.
+
+	\sa Write()
+	\sa SetWriteDisabled()
+*/
+
+
+/*!
+	\fn void BMemoryRingIO::SetWriteDisabled(bool disabled)
+	\brief Set whether writes to the ring buffer is disabled.
+
+	This method controls whether further writes to the ring buffer is allowed.
+	If writing is disabled, any further writes will error with
+	\c B_READ_ONLY_DEVICE, and read will no longer block on an empty buffer and
+	instead return \c 0. In addition, WaitForRead() and WaitForWrite() will
+	return \c B_READ_ONLY_DEVICE.
+
+	This method is usually used to notify the writer/reader of the pipe to not
+	write more and/or to wait for more data.
+
+	\param disabled Whether writes should be disabled.
+
+	\sa WriteDisabled() to see whether writes to the ring buffer is currently disabled.
+*/
+
+
+/*!
+	\fn bool BMemoryRingIO::WriteDisabled()
+	\brief Indicates whether writes to the ring buffer is disabled.
+
+	This method indicates whether further writes to the ring buffer is allowed.
+	See SetWriteDisabled() for more information.
+
+	\sa SetWriteDisabled() to control whether writes to the ring buffer is disabled.
+
+	\return \c true if writes to the ring buffer is disabled, \c false if not.
+*/

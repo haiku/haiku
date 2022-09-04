@@ -65,8 +65,8 @@ CheckVisitor::StartBitmapPass()
 
 	// initialize bitmap
 	memset(fCheckBitmap, 0, size);
-	for (int32 block = GetVolume()->Log().Start() + GetVolume()->Log().Length();
-			block-- > 0;) {
+	for (off_t block = GetVolume()->ToBlock(GetVolume()->Log())
+		+ GetVolume()->Log().Length(); block-- > 0;) {
 		_SetCheckBitmapAt(block);
 	}
 

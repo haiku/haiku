@@ -45,7 +45,7 @@ status_t
 IconView::SetIcon(const BPath& path, icon_size iconSize)
 {
 	fDrawIcon = false;
-	
+
 	if (iconSize != fIconSize) {
 		BBitmap* bitmap = new BBitmap(BRect(iconSize), B_RGBA32);
 		if (bitmap == NULL)
@@ -83,7 +83,7 @@ status_t
 IconView::SetIcon(const uint8_t* data, size_t size, icon_size iconSize)
 {
 	fDrawIcon = false;
-	
+
 	if (iconSize != fIconSize) {
 		BBitmap* bitmap = new BBitmap(BRect(iconSize), B_RGBA32);
 		if (bitmap == NULL)
@@ -105,6 +105,32 @@ IconView::SetIcon(const uint8_t* data, size_t size, icon_size iconSize)
 	if (!fIconBitmap->IsValid())
 		return fIconBitmap->InitCheck();
 
+	_SetSize();
+
+	fDrawIcon = true;
+	Invalidate();
+	return B_OK;
+}
+
+
+status_t
+IconView::SetIcon(const BBitmap* icon)
+{
+	if (icon == NULL) {
+		fDrawIcon = false;
+		return B_OK;
+	}
+
+	delete fIconBitmap;
+	fIconBitmap = new BBitmap(icon);
+	if (fIconBitmap == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = fIconBitmap->InitCheck();
+	if (status != B_OK)
+		return status;
+
+	fIconSize = (icon_size)(fIconBitmap->Bounds().IntegerWidth() + 1);
 	_SetSize();
 
 	fDrawIcon = true;

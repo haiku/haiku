@@ -44,6 +44,8 @@ local libFDTSources =
 	fdt_overlay.c
 	;
 
+SubDirCcFlags -Wno-error=missing-prototypes ;
+
 local platform ;
 for platform in [ MultiBootSubDirSetup ] {
 	on $(platform) {

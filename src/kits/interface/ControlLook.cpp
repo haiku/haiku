@@ -45,6 +45,18 @@ BControlLook::ComposeSpacing(float spacing)
 }
 
 
+BSize
+BControlLook::ComposeIconSize(int32 size)
+{
+	float scale = be_plain_font->Size() / 12.0f;
+	if (scale < 1.0f)
+		scale = 1.0f;
+
+	const int32 scaled = (int32)(size * scale);
+	return BSize(scaled - 1, scaled - 1);
+}
+
+
 void
 BControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
 	BRect rect, const BRect& updateRect, const rgb_color& base, uint32 flags,

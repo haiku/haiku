@@ -369,7 +369,7 @@ get_path(const NodeRef *ref, const char *name, string &path)
 
 		// stat the path to check, if it is still valid
 		struct stat st;
-		if (lstat(path.c_str(), &st) < 0) {
+		if (stat(path.c_str(), &st) < 0) {
 			sDirPathMap.erase(it);
 			return errno;
 		}

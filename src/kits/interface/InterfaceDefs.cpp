@@ -118,6 +118,51 @@ static const rgb_color _kDefaultColors[kColorWhichCount] = {
 const rgb_color* BPrivate::kDefaultColors = &_kDefaultColors[0];
 
 
+static const rgb_color _kDefaultColorsDark[kColorWhichCount] = {
+	{43, 43, 43, 255},		// B_PANEL_BACKGROUND_COLOR
+	{28, 28, 28, 255},		// B_MENU_BACKGROUND_COLOR
+	{227, 73, 17, 255},		// B_WINDOW_TAB_COLOR
+	{0, 0, 229, 255},		// B_KEYBOARD_NAVIGATION_COLOR
+	{51, 102, 152, 255},	// B_DESKTOP_COLOR
+	{90, 90, 90, 255},		// B_MENU_SELECTED_BACKGROUND_COLOR
+	{255, 255, 255, 255},	// B_MENU_ITEM_TEXT_COLOR
+	{255, 255, 255, 255},	// B_MENU_SELECTED_ITEM_TEXT_COLOR
+	{0, 0, 0, 255},			// B_MENU_SELECTED_BORDER_COLOR
+	{253, 253, 253, 255},	// B_PANEL_TEXT_COLOR
+	{0, 0, 0, 255},			// B_DOCUMENT_BACKGROUND_COLOR
+	{234, 234, 234, 255},	// B_DOCUMENT_TEXT_COLOR
+	{29, 29, 29, 255},		// B_CONTROL_BACKGROUND_COLOR
+	{230, 230, 230, 255},	// B_CONTROL_TEXT_COLOR
+	{195, 195, 195, 255},	// B_CONTROL_BORDER_COLOR
+	{75, 124, 168, 255},	// B_CONTROL_HIGHLIGHT_COLOR
+	{0, 0, 0, 255},			// B_NAVIGATION_PULSE_COLOR
+	{255, 255, 255, 255},	// B_SHINE_COLOR
+	{0, 0, 0, 255},			// B_SHADOW_COLOR
+	{76, 68, 79, 255},		// B_TOOLTIP_BACKGROUND_COLOR
+	{255, 255, 255, 255},	// B_TOOLTIP_TEXT_COLOR
+	{255, 255, 255, 255},	// B_WINDOW_TEXT_COLOR
+	{203, 32, 9, 255},		// B_WINDOW_INACTIVE_TAB_COLOR
+	{255, 255, 255, 255},	// B_WINDOW_INACTIVE_TEXT_COLOR
+	{227, 73, 17, 255},		// B_WINDOW_BORDER_COLOR
+	{203, 32, 9, 255},		// B_WINDOW_INACTIVE_BORDER_COLOR
+	{27, 82, 140, 255},     // B_CONTROL_MARK_COLOR
+	{0, 0, 0, 255},			// B_LIST_BACKGROUND_COLOR
+	{90, 90, 90, 255},		// B_LIST_SELECTED_BACKGROUND_COLOR
+	{255, 255, 255, 255},	// B_LIST_ITEM_TEXT_COLOR
+	{255, 255, 255, 255},	// B_LIST_SELECTED_ITEM_TEXT_COLOR
+	{39, 39, 39, 255},		// B_SCROLL_BAR_THUMB_COLOR
+	{106, 112, 212, 255},	// B_LINK_TEXT_COLOR
+	{102, 152, 203, 255},	// B_LINK_HOVER_COLOR
+	{145, 112, 155, 255},	// B_LINK_VISITED_COLOR
+	{121, 142, 203, 255},	// B_LINK_ACTIVE_COLOR
+	{50, 150, 255, 255},	// B_STATUS_BAR_COLOR
+	// 100...
+	{46, 204, 64, 255},		// B_SUCCESS_COLOR
+	{255, 40, 54, 255},		// B_FAILURE_COLOR
+	{}
+};
+
+
 static const char* kColorNames[kColorWhichCount] = {
 	"B_PANEL_BACKGROUND_COLOR",
 	"B_MENU_BACKGROUND_COLOR",
@@ -716,10 +761,15 @@ get_key_repeat_rate(int32 *rate)
 	BMessage command(IS_GET_KEY_REPEAT_RATE);
 	BMessage reply;
 
-	_control_input_server_(&command, &reply);
+	status_t err = _control_input_server_(&command, &reply);
 
-	if (reply.FindInt32("rate", rate) != B_OK)
+	if (err == B_OK)
+		err = reply.FindInt32("rate", rate);
+
+	if (err != B_OK) {
 		*rate = 250000;
+		return err;
+	}
 
 	return B_OK;
 }
@@ -741,10 +791,15 @@ get_key_repeat_delay(bigtime_t *delay)
 	BMessage command(IS_GET_KEY_REPEAT_DELAY);
 	BMessage reply;
 
-	_control_input_server_(&command, &reply);
+	status_t err = _control_input_server_(&command, &reply);
 
-	if (reply.FindInt64("delay", delay) != B_OK)
+	if (err == B_OK)
+		err = reply.FindInt64("delay", delay);
+
+	if (err != B_OK) {
 		*delay = 200;
+		return err;
+	}
 
 	return B_OK;
 }
@@ -1232,13 +1287,23 @@ ui_color(color_which which)
 		if (shared != NULL) {
 			// check for unset colors
 			if (shared->colors[index] == B_TRANSPARENT_COLOR)
-				shared->colors[index] = kDefaultColors[index];
+				shared->colors[index] = _kDefaultColors[index];
 
 			return shared->colors[index];
 		}
 	}
 
-	return kDefaultColors[index];
+	return _kDefaultColors[index];
+}
+
+
+rgb_color
+BPrivate::GetSystemColor(color_which colorConstant, bool darkVariant) {
+	if (darkVariant) {
+		return _kDefaultColorsDark[color_which_to_index(colorConstant)];
+	} else {
+		return _kDefaultColors[color_which_to_index(colorConstant)];
+	}
 }
 
 

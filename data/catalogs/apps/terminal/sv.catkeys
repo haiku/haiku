@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	247549485
+1	swedish	x-vnd.Haiku-Terminal	4089361699
 ANSI cyan color	Terminal AppearancePrefView		ANSI cyan färg
 Close other tabs	Terminal TermWindow		Stäng övriga flikar
 Insert path	Terminal TermView		Lägg till sökväg
@@ -7,13 +7,13 @@ Text encoding	Terminal TermWindow		Teckenuppsättning
 ANSI blue color	Terminal AppearancePrefView		ANSI blå färg
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Redigera
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,  --help, skriva ut denna hjälp\n  -t,  --title, ange fönstertitel\n  -f,  --fullscreen, starta helskärm\n  -w,  --working-directory, ställ in initial arbetskatalog\n
 Select all	Terminal TermWindow		Markera allt
 Confirm exit if active programs exist	Terminal AppearancePrefView		Bekräfta avslutning om aktiva program finns
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDen aktiva processens arbetskatalog i denna tab.\n\t\t\tTeller maximalt antal sökvägskomponenter\n\t\t\tkan anges som. '%2d' för som mest två komponenter.\n\t%T\t-\tTerminal programmets namn på det valda språket.\n\t%e\t-\tEnkodingen av den valda tabben . Inte visad för UTF-8.\n\t%i\t-\tIndexet för fönstret.\n\t%p\t-\tNamnet på den aktiva processen i den valda tabben.\n\t%t\t-\tTiteln på den valda tabben.
 Solarized Dark	Terminal colors scheme		Solariserad mörk
 Copy	Terminal TermWindow		Kopiera
 ANSI bright green color	Terminal AppearancePrefView		ANSI ljusgrön färg
-  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory	Terminal TermApp		  -h,    --help                        skriv ut den här hjälpen\n  -t,     --title                         ställa in fönstertitel\n  -f,     --fullscreen               starta helskärm\n  -w,    --working-directory   ställa in den första arbetskatalogen
 ANSI white color	Terminal AppearancePrefView		ANSI vit färg
 Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Redigera fliktitel...

@@ -338,7 +338,7 @@ geode_stream_setup_buffers(geode_stream* stream, const char* desc)
 
 	stream->buffer_descriptors_area = create_area("geode buffer descriptors",
 		(void**)&bufferDescriptors, B_ANY_KERNEL_ADDRESS, alloc,
-		B_32_BIT_CONTIGUOUS, 0);
+		B_32_BIT_CONTIGUOUS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		// TODO: The rest of the code doesn't deal correctly with physical
 		// addresses > 4 GB, so we have to force 32 bit addresses here.
 	if (stream->buffer_descriptors_area < B_OK) {
