@@ -33,22 +33,23 @@ public:
 class HttpIntegrationTest : public BThreadedTestCase
 {
 public:
-					HttpIntegrationTest(TestServerMode mode);
+								HttpIntegrationTest(TestServerMode mode);
 
-	virtual	void		setUp() override;
-	virtual void		tearDown() override;
+	virtual	void				setUp() override;
+	virtual void				tearDown() override;
 
-			void	HostAndNetworkFailTest();
-			void	GetTest();
-			void	HeadTest();
-			void	NoContentTest();
-			void	AutoRedirectTest();
-			void	BasicAuthTest();
-			void	StopOnErrorTest();
-			void	RequestCancelTest();
-			void	PostTest();
+			void				HostAndNetworkFailTest();
+			void				GetTest();
+			void				GetWithBufferTest();
+			void				HeadTest();
+			void				NoContentTest();
+			void				AutoRedirectTest();
+			void				BasicAuthTest();
+			void				StopOnErrorTest();
+			void				RequestCancelTest();
+			void				PostTest();
 
-	static	void	AddTests(BTestSuite& suite);
+	static	void				AddTests(BTestSuite& suite);
 
 private:
 			TestServer			fTestServer;

@@ -14,6 +14,7 @@
 #include <tools/cppunit/ThreadedTestCaller.h>
 
 #include <DateTime.h>
+#include <ExclusiveBorrow.h>
 #include <HttpFields.h>
 #include <HttpRequest.h>
 #include <HttpResult.h>
@@ -23,6 +24,8 @@
 #include <Url.h>
 
 using BPrivate::BDateTime;
+using BPrivate::Network::BBorrow;
+using BPrivate::Network::BExclusiveBorrow;
 using BPrivate::Network::BHttpFields;
 using BPrivate::Network::BHttpMethod;
 using BPrivate::Network::BHttpRequest;
@@ -32,6 +35,7 @@ using BPrivate::Network::BHttpTime;
 using BPrivate::Network::BHttpTimeFormat;
 using BPrivate::Network::BNetworkRequestError;
 using BPrivate::Network::format_http_time;
+using BPrivate::Network::make_exclusive_borrow;
 using BPrivate::Network::parse_http_time;
 
 using namespace std::literals;
@@ -453,6 +457,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 		testCaller->addThread("HostAndNetworkFailTest",
 			&HttpIntegrationTest::HostAndNetworkFailTest);
 		testCaller->addThread("GetTest", &HttpIntegrationTest::GetTest);
+		testCaller->addThread("GetWithBufferTest", &HttpIntegrationTest::GetWithBufferTest);
 		testCaller->addThread("HeadTest", &HttpIntegrationTest::HeadTest);
 		testCaller->addThread("NoContentTest", &HttpIntegrationTest::NoContentTest);
 		testCaller->addThread("AutoRedirectTest", &HttpIntegrationTest::AutoRedirectTest);
@@ -477,6 +482,7 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 		testCaller->addThread("HostAndNetworkFailTest",
 			&HttpIntegrationTest::HostAndNetworkFailTest);
 		testCaller->addThread("GetTest", &HttpIntegrationTest::GetTest);
+		testCaller->addThread("GetWithBufferTest", &HttpIntegrationTest::GetWithBufferTest);
 		testCaller->addThread("HeadTest", &HttpIntegrationTest::HeadTest);
 		testCaller->addThread("NoContentTest", &HttpIntegrationTest::NoContentTest);
 		testCaller->addThread("AutoRedirectTest", &HttpIntegrationTest::AutoRedirectTest);
@@ -559,7 +565,25 @@ HttpIntegrationTest::GetTest()
 			CPPUNIT_ASSERT_EQUAL(field.Value(), (*expectedField).Value());
 		}
 		auto receivedBody = result.Body().text;
-		CPPUNIT_ASSERT_EQUAL(kExpectedGetBody, receivedBody.String());
+		CPPUNIT_ASSERT(receivedBody.has_value());
+		CPPUNIT_ASSERT_EQUAL(kExpectedGetBody, receivedBody.value().String());
+	} catch (const BPrivate::Network::BError& e) {
+		CPPUNIT_FAIL(e.DebugMessage().String());
+	}
+}
+
+
+void
+HttpIntegrationTest::GetWithBufferTest()
+{
+	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/"));
+	auto body = make_exclusive_borrow<BMallocIO>();
+	auto result = fSession.Execute(std::move(request), BBorrow<BDataIO>(body), fLoggerMessenger);
+	try {
+		result.Body();
+		auto bodyString = std::string(reinterpret_cast<const char*>(body->Buffer()),
+			body->BufferLength());
+		CPPUNIT_ASSERT_EQUAL(kExpectedGetBody, bodyString);
 	} catch (const BPrivate::Network::BError& e) {
 		CPPUNIT_FAIL(e.DebugMessage().String());
 	}
@@ -584,8 +608,7 @@ HttpIntegrationTest::HeadTest()
 			CPPUNIT_ASSERT_EQUAL(field.Value(), (*expectedField).Value());
 		}
 
-		auto receivedBody = result.Body().text;
-		CPPUNIT_ASSERT_EQUAL(receivedBody.Length(), 0);
+		CPPUNIT_ASSERT(result.Body().text->Length() == 0);
 	} catch (const BPrivate::Network::BError& e) {
 		CPPUNIT_FAIL(e.DebugMessage().String());
 	}
@@ -618,8 +641,7 @@ HttpIntegrationTest::NoContentTest()
 			CPPUNIT_ASSERT_EQUAL(field.Value(), (*expectedField).Value());
 		}
 
-		auto receivedBody = result.Body().text;
-		CPPUNIT_ASSERT_EQUAL(receivedBody.Length(), 0);
+		CPPUNIT_ASSERT(result.Body().text->Length() == 0);
 	} catch (const BPrivate::Network::BError& e) {
 		CPPUNIT_FAIL(e.DebugMessage().String());
 	}
@@ -644,7 +666,8 @@ HttpIntegrationTest::AutoRedirectTest()
 			CPPUNIT_ASSERT_EQUAL(field.Value(), (*expectedField).Value());
 		}
 		auto receivedBody = result.Body().text;
-		CPPUNIT_ASSERT_EQUAL(kExpectedGetBody, receivedBody.String());
+		CPPUNIT_ASSERT(receivedBody.has_value());
+		CPPUNIT_ASSERT_EQUAL(kExpectedGetBody, receivedBody.value().String());
 	} catch (const BPrivate::Network::BError& e) {
 		CPPUNIT_FAIL(e.DebugMessage().String());
 	}
@@ -681,7 +704,7 @@ HttpIntegrationTest::StopOnErrorTest()
 	auto result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
 	CPPUNIT_ASSERT(result.Status().code == 400);
 	CPPUNIT_ASSERT(result.Fields().CountFields() == 0);
-	CPPUNIT_ASSERT(result.Body().text.Length() == 0);
+	CPPUNIT_ASSERT(result.Body().text->Length() == 0);
 }
 
 
@@ -764,8 +787,9 @@ HttpIntegrationTest::PostTest()
 
 	auto result = fSession.Execute(std::move(request), nullptr, BMessenger(observer));
 
-	CPPUNIT_ASSERT_EQUAL(kExpectedPostBody.Length(), result.Body().text.Length());
-	CPPUNIT_ASSERT(result.Body().text == kExpectedPostBody);
+	CPPUNIT_ASSERT(result.Body().text.has_value());
+	CPPUNIT_ASSERT_EQUAL(kExpectedPostBody.Length(), result.Body().text.value().Length());
+	CPPUNIT_ASSERT(result.Body().text.value() == kExpectedPostBody);
 
 	usleep(2000); // give some time to catch up on receiving all messages
 

@@ -61,7 +61,7 @@ struct CounterDeleter {
 class BHttpSession::Request {
 public:
 									Request(BHttpRequest&& request,
-													std::unique_ptr<BDataIO> target,
+													BBorrow<BDataIO> target,
 													BMessenger observer);
 
 									Request(Request& original, const Redirect& redirect);
@@ -142,7 +142,7 @@ public:
 												~Impl() noexcept;
 
 			BHttpResult							Execute(BHttpRequest&& request,
-													std::unique_ptr<BDataIO> target,
+													BBorrow<BDataIO> target,
 													BMessenger observer);
 			void								Cancel(int32 identifier);
 			void								SetMaxConnectionsPerHost(size_t maxConnections);
@@ -232,7 +232,7 @@ BHttpSession::Impl::~Impl() noexcept
 
 
 BHttpResult
-BHttpSession::Impl::Execute(BHttpRequest&& request, std::unique_ptr<BDataIO> target,
+BHttpSession::Impl::Execute(BHttpRequest&& request, BBorrow<BDataIO> target,
 	BMessenger observer)
 {
 	auto wRequest = Request(std::move(request), std::move(target), observer);
@@ -635,7 +635,7 @@ BHttpSession::operator=(const BHttpSession&) noexcept = default;
 
 
 BHttpResult
-BHttpSession::Execute(BHttpRequest&& request, std::unique_ptr<BDataIO> target, BMessenger observer)
+BHttpSession::Execute(BHttpRequest&& request, BBorrow<BDataIO> target, BMessenger observer)
 {
 	return fImpl->Execute(std::move(request), std::move(target), observer);
 }
@@ -670,8 +670,7 @@ BHttpSession::SetMaxHosts(size_t maxConnections)
 
 
 // #pragma mark -- BHttpSession::Request (helpers)
-
-BHttpSession::Request::Request(BHttpRequest&& request, std::unique_ptr<BDataIO> target,
+BHttpSession::Request::Request(BHttpRequest&& request, BBorrow<BDataIO> target,
 		BMessenger observer)
 	: fRequest(std::move(request)), fObserver(observer)
 {
@@ -682,7 +681,10 @@ BHttpSession::Request::Request(BHttpRequest&& request, std::unique_ptr<BDataIO> 
 
 	// create shared data
 	fResult = std::make_shared<HttpResultPrivate>(identifier);
-	fResult->ownedBody = std::move(target);
+
+	// check if there is a target
+	if (target.HasValue())
+		fResult->bodyTarget = std::move(target);
 
 	// inform the parser when we do a HEAD request, so not to expect content
 	if (fRequest.Method() == BHttpMethod::Head)

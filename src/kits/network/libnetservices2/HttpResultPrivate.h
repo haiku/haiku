@@ -15,6 +15,7 @@
 #include <string>
 
 #include <DataIO.h>
+#include <ExclusiveBorrow.h>
 #include <OS.h> 
 #include <String.h>
 
@@ -45,10 +46,9 @@ struct HttpResultPrivate {
 			std::optional<BHttpBody>	body;
 			std::optional<std::exception_ptr>	error;
 
-	// Body storage
-			std::unique_ptr<BDataIO>	ownedBody = nullptr;
-	//		std::shared_ptr<BMemoryRingIO>	shared_body = nullptr;
-			BString						bodyText;
+	// Interim body storage (used while the request is running)
+			BString						bodyString;
+			BBorrow<BDataIO>			bodyTarget;
 
 	// Utility functions
 										HttpResultPrivate(int32 identifier);
@@ -98,6 +98,9 @@ HttpResultPrivate::SetCancel()
 inline void
 HttpResultPrivate::SetError(std::exception_ptr e)
 {
+	// Release any held body target borrow
+	bodyTarget.Return();
+
 	error = e;
 	atomic_set(&requestStatus, kError);
 	release_sem(data_wait);
@@ -125,7 +128,12 @@ HttpResultPrivate::SetFields(BHttpFields&& f)
 inline void
 HttpResultPrivate::SetBody()
 {
-	body = BHttpBody{std::move(ownedBody), std::move(bodyText)};
+	if (bodyTarget.HasValue()) {
+		body = BHttpBody{};
+		bodyTarget.Return();
+	} else
+		body = BHttpBody{std::move(bodyString)};
+
 	atomic_set(&requestStatus, kBodyReady);
 	release_sem(data_wait);
 }
@@ -136,14 +144,15 @@ HttpResultPrivate::WriteToBody(const void* buffer, size_t size)
 {
 	// TODO: when the support for a shared BMemoryRingIO is here, choose
 	// between one or the other depending on which one is available.
-	if (ownedBody == nullptr) {
-		bodyText.Append(static_cast<const char*>(buffer), size);
+	if (bodyTarget.HasValue()) {
+		auto result = bodyTarget->Write(buffer, size);
+		if (result < 0)
+			throw BSystemError("BDataIO::Write()", result);
+		return result;
+	} else {
+		bodyString.Append(reinterpret_cast<const char*>(buffer), size);
 		return size;
 	}
-	auto result = ownedBody->Write(buffer, size);
-	if (result < 0)
-		throw BSystemError("BDataIO::Write()", result);
-	return result;
 }
 
 

@@ -165,14 +165,16 @@ namespace Network {
 
 /*!
 	\fn BHttpResult BHttpSession::Execute(BHttpRequest &&request,
-		std::unique_ptr< BDataIO > target=nullptr, BMessenger observer=BMessenger())
+		BBorrow< BDataIO > target=nullptr, BMessenger observer=BMessenger())
 	\brief Schedule and execute a \a request.
 
 	\param request The (valid) request to move from.
 	\param target An optional data buffer to write the incoming body of the request to. This can be
 		\c nullptr if you want to use the default internal storage. If you provide a buffer, it
-		must be wrapped in a \c std::unique_ptr. This means that you transfer ownership to the
-		session. After the request is finished, you can regain ownership.
+		must be wrapped in a \ref BBorrow object. This means that you exclusively borrow the
+		target to this session object. After the request is finished, you can regain usage of the
+		object through the matching \ref BExclusiveBorrow object. Use the \ref BHttpResult::Body()
+		method to synchronize when the target is available again.
 	\param observer An optional observer that will receive the progress and status messages for
 		this request.
 

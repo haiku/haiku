@@ -23,8 +23,7 @@ struct HttpResultPrivate;
 
 struct BHttpBody
 {
-	std::unique_ptr<BDataIO>			target = nullptr;
-	BString								text;
+	std::optional<BString>	text;
 };
 
 

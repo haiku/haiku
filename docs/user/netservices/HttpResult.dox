@@ -114,9 +114,8 @@ namespace Network {
 	\brief Represents a HTTP response body.
 	
 	The HTTP response body is captured in this object. The body is either stored into a
-	\ref target, or into a \a text variable, depending on how you called the
-	\ref BHttpSession::Execute() method. If there is a \a target, the body will be empty,
-	and vice versa.
+	target, or into a \ref text variable, depending on how you called the
+	\ref BHttpSession::Execute() method.
 
 	You will usually get a reference to this object through the \ref BHttpResult::Body() method.
 	If you want to keep the contents of the body beyond the lifetime of the BHttpResult object,
@@ -127,16 +126,12 @@ namespace Network {
 
 
 /*!
-	\var std::unique_ptr<BDataIO> BHttpBody::target
-	\brief An owned pointer to where the body has been written.
-
-	\since Haiku R1
-*/
-
-
-/*!
-	\var BString BHttpBody::text
+	\var std::optional<BString> BHttpBody::text
 	\brief A string containing the body of the HTTP request.
+
+	The value of this class variable is set to \c std::nullopt if the target body was written to
+	a specified target. Otherwise, the response body is stored in this string. If the response
+	body was empty, then this will be an empty string.
 
 	\since Haiku R1
 */

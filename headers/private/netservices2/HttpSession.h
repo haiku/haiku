@@ -8,6 +8,7 @@
 
 #include <memory>
 
+#include <ExclusiveBorrow.h>
 #include <Messenger.h>
 
 class BUrl;
@@ -35,7 +36,7 @@ public:
 
 	// Requests
 	BHttpResult				Execute(BHttpRequest&& request,
-								std::unique_ptr<BDataIO> target = nullptr,
+								BBorrow<BDataIO> target = nullptr,
 								BMessenger observer = BMessenger());
 	void					Cancel(int32 identifier);
 	void					Cancel(const BHttpResult& request);
