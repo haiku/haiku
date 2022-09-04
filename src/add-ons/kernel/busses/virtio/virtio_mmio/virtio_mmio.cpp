@@ -88,7 +88,7 @@ virtio_device_supports_device(device_node* parent)
 		B_DEVICE_PRETTY_NAME, &name, false);
 
 	if (status >= B_OK)
-		dprintf("  name: %s\n", name);
+		TRACE("  name: %s\n", name);
 
 	status = gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false);
 
@@ -224,9 +224,9 @@ virtio_device_register_device(device_node* parent)
 		return B_ERROR;
 	}
 
-	dprintf("  version: 0x%08" B_PRIx32 "\n",   mappedRegs->version);
-	dprintf("  deviceId: 0x%08" B_PRIx32 "\n",  mappedRegs->deviceId);
-	dprintf("  vendorId: 0x%08" B_PRIx32 "\n",  mappedRegs->vendorId);
+	TRACE("  version: 0x%08" B_PRIx32 "\n",   mappedRegs->version);
+	TRACE("  deviceId: 0x%08" B_PRIx32 "\n",  mappedRegs->deviceId);
+	TRACE("  vendorId: 0x%08" B_PRIx32 "\n",  mappedRegs->vendorId);
 
 	device_attr attrs[] = {
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Virtio MMIO"} },
@@ -271,13 +271,13 @@ virtio_device_init_device(device_node* node, void** cookie)
 				(driver_module_info**)&parentModule, (void**)&parentDev))
 			panic("can't get parent node driver");
 
-		dprintf("  bus: %p\n", parentModule->get_bus(parentDev));
-		dprintf("  compatible: %s\n", (const char*)parentModule->get_prop(parentDev,
+		TRACE("  bus: %p\n", parentModule->get_bus(parentDev));
+		TRACE("  compatible: %s\n", (const char*)parentModule->get_prop(parentDev,
 			"compatible", NULL));
 
 		for (uint32 i = 0; parentModule->get_reg(parentDev, i, &regs, &regsLen);
 				i++) {
-			dprintf("  reg[%" B_PRIu32 "]: (0x%" B_PRIx64 ", 0x%" B_PRIx64 ")\n",
+			TRACE("  reg[%" B_PRIu32 "]: (0x%" B_PRIx64 ", 0x%" B_PRIx64 ")\n",
 				i, regs, regsLen);
 		}
 
@@ -292,18 +292,18 @@ virtio_device_init_device(device_node* node, void** cookie)
 				name = NULL;
 			}
 
-			dprintf("  interrupt[%" B_PRIu32 "]: ('%s', 0x%" B_PRIx64 ")\n", i,
+			TRACE("  interrupt[%" B_PRIu32 "]: ('%s', 0x%" B_PRIx64 ")\n", i,
 				name, interrupt);
 		}
 
 		if (!parentModule->get_reg(parentDev, 0, &regs, &regsLen)) {
-			dprintf("  no regs\n");
+			TRACE("  no regs\n");
 			return B_ERROR;
 		}
 
 		if (!parentModule->get_interrupt(parentDev, 0, &interruptController,
 				&interrupt)) {
-			dprintf("  no interrupts\n");
+			TRACE("  no interrupts\n");
 			return B_ERROR;
 		}
 	}
@@ -327,9 +327,9 @@ virtio_device_init_device(device_node* node, void** cookie)
 		parentModule->walk_resources(parentDev, (char *)"_CRS",
 			virtio_crs_find_interrupt, &interrupt);
 
-		dprintf("  regs: (0x%" B_PRIx64 ", 0x%" B_PRIx64 ")\n",
+		TRACE("  regs: (0x%" B_PRIx64 ", 0x%" B_PRIx64 ")\n",
 			regs, regsLen);
-		dprintf("  interrupt: 0x%" B_PRIx64 "\n",
+		TRACE("  interrupt: 0x%" B_PRIx64 "\n",
 			interrupt);
 	}
 
