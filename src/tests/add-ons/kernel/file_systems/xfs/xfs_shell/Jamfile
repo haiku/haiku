@@ -51,6 +51,7 @@ local xfsSource =
 	Node.cpp
 	ShortAttribute.cpp
 	ShortDirectory.cpp
+	Symlink.cpp
 	Volume.cpp
 	xfs.cpp
 ;

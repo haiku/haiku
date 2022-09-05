@@ -9,6 +9,7 @@
 #include "Directory.h"
 #include "Inode.h"
 #include "ShortAttribute.h"
+#include "Symlink.h"
 #include "Utility.h"
 #include "Volume.h"
 
@@ -353,7 +354,18 @@ static status_t
 xfs_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 	size_t *_bufferSize)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("XFS_READ_SYMLINK\n");
+
+	Inode* inode = (Inode*)_node->private_node;
+
+	if (!inode->IsSymLink())
+		return B_BAD_VALUE;
+
+	Symlink symlink(inode);
+
+	status_t result = symlink.ReadLink(0, buffer, _bufferSize);
+
+	return result;
 }
 
 
