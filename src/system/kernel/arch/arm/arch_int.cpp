@@ -328,6 +328,12 @@ arch_arm_page_fault(struct iframe *frame, addr_t far, uint32 fsr, bool isWrite, 
 		panic("page fault in debugger without fault handler! Touching "
 			"address %p from pc %p\n", (void *)far, (void *)frame->pc);
 		return;
+	} else if (isExec && !isUser && (far < KERNEL_BASE) &&
+		(((fsr & 0x060f) == FSR_FS_PERMISSION_FAULT_L1) || ((fsr & 0x060f) == FSR_FS_PERMISSION_FAULT_L2))) {
+		panic("PXN violation trying to execute user-mapped address 0x%08" B_PRIxADDR " from kernel mode\n",
+			far);
+	} else if (!isExec && ((fsr & 0x060f) == FSR_FS_ALIGNMENT_FAULT)) {
+		panic("unhandled alignment exception\n");
 	} else if ((frame->spsr & CPSR_I) != 0) {
 		// interrupts disabled
 

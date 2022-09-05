@@ -25,5 +25,10 @@
 #define CPSR_I				0x80
 
 #define FSR_WNR				0x800
+#define FSR_LPAE			0x200
+
+#define FSR_FS_ALIGNMENT_FAULT		0x01
+#define FSR_FS_PERMISSION_FAULT_L1	0x0d
+#define FSR_FS_PERMISSION_FAULT_L2	0x0f
 
 #endif	/* _SYSTEM_ARCH_ARM_DEFS_H */
