@@ -286,19 +286,16 @@ arch_arm_syscall(struct iframe *iframe)
 }
 
 
-extern "C" void
-arch_arm_data_abort(struct iframe *frame)
+static void
+arch_arm_page_fault(struct iframe *frame, addr_t far, uint32 fsr, bool isWrite, bool isExec)
 {
 	Thread *thread = thread_get_current_thread();
-	addr_t dfar = arm_get_dfar();
-	uint32 dfsr = arm_get_dfsr();
 	bool isUser = (frame->spsr & CPSR_MODE_MASK) == CPSR_MODE_USR;
-	bool isWrite = (dfsr & FSR_WNR) == FSR_WNR;
 	addr_t newip = 0;
 
 #ifdef TRACE_ARCH_INT
-	print_iframe("Data Abort", frame);
-	dprintf("DFAR: %08lx, DFSR: %08x, isUser: %d, isWrite: %d, thread: %s\n", dfar, dfsr, isUser, isWrite, thread->name);
+	print_iframe("Page Fault", frame);
+	dprintf("FAR: %08lx, FSR: %08x, isUser: %d, isWrite: %d, isExec: %d, thread: %s\n", far, fsr, isUser, isWrite, isExec, thread->name);
 #endif
 
 	IFrameScope scope(frame);
@@ -310,7 +307,7 @@ arch_arm_data_abort(struct iframe *frame)
 			cpu_ent* cpu = &gCPU[smp_get_current_cpu()];
 
 			if (cpu->fault_handler != 0) {
-				debug_set_page_fault_info(dfar, frame->pc,
+				debug_set_page_fault_info(far, frame->pc,
 					isWrite ? DEBUG_PAGE_FAULT_WRITE : 0);
 				frame->svc_sp = cpu->fault_handler_stack_pointer;
 				frame->pc = cpu->fault_handler;
@@ -320,7 +317,7 @@ arch_arm_data_abort(struct iframe *frame)
 			if (thread->fault_handler != 0) {
 				kprintf("ERROR: thread::fault_handler used in kernel "
 					"debugger!\n");
-				debug_set_page_fault_info(dfar, frame->pc,
+				debug_set_page_fault_info(far, frame->pc,
 						isWrite ? DEBUG_PAGE_FAULT_WRITE : 0);
 				frame->pc = reinterpret_cast<uintptr_t>(thread->fault_handler);
 				return;
@@ -329,9 +326,9 @@ arch_arm_data_abort(struct iframe *frame)
 
 		// otherwise, not really
 		panic("page fault in debugger without fault handler! Touching "
-			"address %p from pc %p\n", (void *)dfar, (void *)frame->pc);
+			"address %p from pc %p\n", (void *)far, (void *)frame->pc);
 		return;
-	} else if ((frame->spsr & (1 << 7)) != 0) {
+	} else if ((frame->spsr & CPSR_I) != 0) {
 		// interrupts disabled
 
 		// If a page fault handler is installed, we're allowed to be here.
@@ -348,24 +345,24 @@ arch_arm_data_abort(struct iframe *frame)
 			// The fault happened at the fault handler address. This is a
 			// certain infinite loop.
 			panic("page fault, interrupts disabled, fault handler loop. "
-				"Touching address %p from pc %p\n", (void*)dfar,
+				"Touching address %p from pc %p\n", (void*)far,
 				(void*)frame->pc);
 		}
 
 		// If we are not running the kernel startup the page fault was not
 		// allowed to happen and we must panic.
 		panic("page fault, but interrupts were disabled. Touching address "
-			"%p from pc %p\n", (void *)dfar, (void *)frame->pc);
+			"%p from pc %p\n", (void *)far, (void *)frame->pc);
 		return;
 	} else if (thread != NULL && thread->page_faults_allowed < 1) {
 		panic("page fault not allowed at this place. Touching address "
-			"%p from pc %p\n", (void *)dfar, (void *)frame->pc);
+			"%p from pc %p\n", (void *)far, (void *)frame->pc);
 		return;
 	}
 
 	enable_interrupts();
 
-	vm_page_fault(dfar, frame->pc, isWrite, false, isUser, &newip);
+	vm_page_fault(far, frame->pc, isWrite, isExec, isUser, &newip);
 
 	if (newip != 0) {
 		// the page fault handler wants us to modify the iframe to set the
@@ -376,82 +373,23 @@ arch_arm_data_abort(struct iframe *frame)
 
 
 extern "C" void
+arch_arm_data_abort(struct iframe *frame)
+{
+	addr_t dfar = arm_get_dfar();
+	uint32 dfsr = arm_get_dfsr();
+	bool isWrite = (dfsr & FSR_WNR) == FSR_WNR;
+
+	arch_arm_page_fault(frame, dfar, dfsr, isWrite, false);
+}
+
+
+extern "C" void
 arch_arm_prefetch_abort(struct iframe *frame)
 {
-	Thread *thread = thread_get_current_thread();
 	addr_t ifar = arm_get_ifar();
 	uint32 ifsr = arm_get_ifsr();
-	bool isUser = (frame->spsr & CPSR_MODE_MASK) == CPSR_MODE_USR;
-	addr_t newip = 0;
 
-#ifdef TRACE_ARCH_INT
-	print_iframe("Prefetch Abort", frame);
-	dprintf("IFAR: %08lx, IFSR: %08x, isUser: %d, thread: %s\n", ifar, ifsr, isUser, thread->name);
-#endif
-
-	IFrameScope scope(frame);
-
-	if (debug_debugger_running()) {
-		// If this CPU or this thread has a fault handler, we're allowed to be
-		// here.
-		if (thread != NULL) {
-			cpu_ent* cpu = &gCPU[smp_get_current_cpu()];
-
-			if (cpu->fault_handler != 0) {
-				debug_set_page_fault_info(frame->pc, frame->pc, 0);
-				frame->svc_sp = cpu->fault_handler_stack_pointer;
-				frame->pc = cpu->fault_handler;
-				return;
-			}
-
-			if (thread->fault_handler != 0) {
-				kprintf("ERROR: thread::fault_handler used in kernel "
-					"debugger!\n");
-				debug_set_page_fault_info(frame->pc, frame->pc, 0);
-				frame->pc = reinterpret_cast<uintptr_t>(thread->fault_handler);
-				return;
-			}
-		}
-
-		// otherwise, not really
-		panic("page fault in debugger without fault handler! Prefetch abort at %p\n",
-			(void *)frame->pc);
-		return;
-	} else if ((frame->spsr & (1 << 7)) != 0) {
-		// interrupts disabled
-
-		// If a page fault handler is installed, we're allowed to be here.
-		uintptr_t handler = reinterpret_cast<uintptr_t>(thread->fault_handler);
-		if (thread && thread->fault_handler != 0) {
-			if (frame->pc != handler) {
-				frame->pc = handler;
-				return;
-			}
-
-			// The fault happened at the fault handler address. This is a
-			// certain infinite loop.
-			panic("page fault, interrupts disabled, fault handler loop. "
-				"Prefetch abort at %p\n", (void*)frame->pc);
-		}
-
-		// If we are not running the kernel startup the page fault was not
-		// allowed to happen and we must panic.
-		panic("page fault, but interrupts were disabled. Prefetch abort at %p\n",
-			(void *)frame->pc);
-		return;
-	} else if (thread != NULL && thread->page_faults_allowed < 1) {
-		panic("page fault not allowed at this place. Prefetch abort at %p\n",
-			(void *)frame->pc);
-		return;
-	}
-
-	enable_interrupts();
-
-	vm_page_fault(frame->pc, frame->pc, false, true, isUser, &newip);
-
-	if (newip != 0) {
-		frame->pc = newip;
-	}
+	arch_arm_page_fault(frame, ifar, ifsr, false, true);
 }
 
 
