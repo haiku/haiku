@@ -899,6 +899,13 @@ Desktop::SetBrightness(int32 id, float brightness)
 	status_t result = HWInterface()->SetBrightness(brightness);
 
 	if (result == B_OK) {
+		if (fWorkspaces[0].StoredScreenConfiguration().CurrentByID(id) == NULL) {
+			// store the current configuration if empty
+			screen_configuration* current
+				= fWorkspaces[0].CurrentScreenConfiguration().CurrentByID(id);
+			fWorkspaces[0].StoredScreenConfiguration().Set(id,
+				current->has_info ? &current->info : NULL, current->frame, current->mode);
+		}
 		fWorkspaces[0].StoredScreenConfiguration().SetBrightness(id,
 			brightness);
 		// Save brightness for next boot
