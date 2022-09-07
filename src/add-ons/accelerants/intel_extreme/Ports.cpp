@@ -446,6 +446,9 @@ Port::_IsPortInVBT(uint32* foundIndex)
 			case INTEL_PORT_F:
 				found = port == DVO_PORT_HDMIF || port == DVO_PORT_DPF;
 				break;
+			case INTEL_PORT_G:
+				found = port == DVO_PORT_HDMIG || port == DVO_PORT_DPG;
+				break;
 			default:
 				ERROR("%s: DDI port unknown\n", __func__);
 				break;
@@ -492,6 +495,95 @@ Port::_IsEDPPort()
 	child_device_config& config = gInfo->shared_info->device_configs[foundIndex];
 	return (config.device_type & (DEVICE_TYPE_INTERNAL_CONNECTOR | DEVICE_TYPE_DISPLAYPORT_OUTPUT))
 		== (DEVICE_TYPE_INTERNAL_CONNECTOR | DEVICE_TYPE_DISPLAYPORT_OUTPUT);
+}
+
+
+addr_t
+Port::_DDCPin()
+{
+	uint32 foundIndex = 0;
+	if (!_IsPortInVBT(&foundIndex))
+		return 0;
+	child_device_config& config = gInfo->shared_info->device_configs[foundIndex];
+	if (gInfo->shared_info->pch_info >= INTEL_PCH_ICP) {
+		switch (config.ddc_pin) {
+			case 1:
+				return INTEL_I2C_IO_A;
+			case 2:
+				return INTEL_I2C_IO_B;
+			case 3:
+				return INTEL_I2C_IO_C;
+			case 4:
+				return INTEL_I2C_IO_I;
+			case 5:
+				return INTEL_I2C_IO_J;
+			case 6:
+				return INTEL_I2C_IO_K;
+			case 7:
+				return INTEL_I2C_IO_L;
+			case 8:
+				return INTEL_I2C_IO_M;
+			case 9:
+				return INTEL_I2C_IO_N;
+			default:
+				return 0;
+		}
+	} else if (gInfo->shared_info->pch_info >= INTEL_PCH_CNP) {
+		switch (config.ddc_pin) {
+			case 1:
+				return INTEL_I2C_IO_A;
+			case 2:
+				return INTEL_I2C_IO_B;
+			case 3:
+				return INTEL_I2C_IO_D;
+			case 4:
+				return INTEL_I2C_IO_C;
+			default:
+				return 0;
+		}
+	} else if (gInfo->shared_info->device_type.Generation() == 9) {
+		switch (config.ddc_pin) {
+			case 4:
+				return INTEL_I2C_IO_D;
+			case 5:
+				return INTEL_I2C_IO_E;
+			case 6:
+				return INTEL_I2C_IO_F;
+			default:
+				return 0;
+		}
+	} else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_BDW)) {
+		switch (config.ddc_pin) {
+			case 2:
+				return INTEL_I2C_IO_A;
+			case 4:
+				return INTEL_I2C_IO_D;
+			case 5:
+				return INTEL_I2C_IO_E;
+			case 6:
+				return INTEL_I2C_IO_F;
+			default:
+				return 0;
+		}
+	} else {
+		switch (config.ddc_pin) {
+			case 1:
+				return INTEL_I2C_IO_B;
+			case 2:
+				return INTEL_I2C_IO_A;
+			case 3:
+				return INTEL_I2C_IO_C;
+			case 4:
+				return INTEL_I2C_IO_D;
+			case 5:
+				return INTEL_I2C_IO_E;
+			case 6:
+				return INTEL_I2C_IO_F;
+			default:
+				return 0;
+		}
+	}
+
 }
 
 
@@ -2117,6 +2209,10 @@ DigitalDisplayInterface::_PortRegister()
 				!gInfo->shared_info->device_type.InGroup(INTEL_GROUP_SKY))
 				return DDI_BUF_CTL_F;
 			return 0;
+		case INTEL_PORT_G:
+			if (gInfo->shared_info->device_type.Generation() >= 12)
+				return DDI_BUF_CTL_G;
+			return 0;
 		default:
 			return 0;
 	}
@@ -2127,18 +2223,7 @@ DigitalDisplayInterface::_PortRegister()
 addr_t
 DigitalDisplayInterface::_DDCRegister()
 {
-	switch (PortIndex()) {
-		case INTEL_PORT_B:
-			return INTEL_I2C_IO_E;
-		case INTEL_PORT_C:
-			return INTEL_I2C_IO_D;
-		case INTEL_PORT_D:
-			return INTEL_I2C_IO_F;
-		default:
-			return 0;
-	}
-
-	return 0;
+	return Port::_DDCPin();
 }
 
 

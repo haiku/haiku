@@ -80,6 +80,7 @@ static	status_t					_SetI2CSignals(void* cookie, int clock,
 		bool						_IsDisplayPortInVBT();
 		bool						_IsHdmiInVBT();
 		bool						_IsEDPPort();
+		addr_t						_DDCPin();
 		status_t					_SetupDpAuxI2c(struct i2c_bus *bus);
 
 		ssize_t						_DpAuxTransfer(dp_aux_msg* message);

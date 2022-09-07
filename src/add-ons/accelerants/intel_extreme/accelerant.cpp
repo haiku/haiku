@@ -304,7 +304,10 @@ probe_ports()
 
 	// Digital Display Interface (for DP, HDMI, DVI and eDP)
 	if (gInfo->shared_info->device_type.HasDDI()) {
-		for (int i = INTEL_PORT_A; i <= INTEL_PORT_F; i++) {
+		int maxPort = INTEL_PORT_F;
+		if (gInfo->shared_info->device_type.Generation() >= 12)
+			maxPort = INTEL_PORT_G;
+		for (int i = INTEL_PORT_A; i <= maxPort; i++) {
 			TRACE("Probing DDI %d\n", i);
 
 			Port* ddiPort
