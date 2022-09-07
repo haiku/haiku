@@ -16,7 +16,7 @@ DataFileToSourceFile [ FGristFiles MBR.h ] : [ FGristFiles mbr.bin ]
 	: kMBR : kMBRSize ;
 
 if $(TARGET_ARCH) = "x86" || $(TARGET_ARCH) = "x86_64" {
-	Depends [ FGristFiles PartitionMapWriter.cpp ] : [ FGristFiles MBR.h ] ;
+	Includes [ FGristFiles PartitionMapWriter.cpp ] : [ FGristFiles MBR.h ] ;
 }
 
 KernelAddon efi_gpt :
