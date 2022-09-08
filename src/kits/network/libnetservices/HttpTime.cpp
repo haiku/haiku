@@ -12,6 +12,7 @@
 #include <new>
 
 #include <cstdio>
+#include <locale.h>
 
 
 // The formats used should be, in order of preference (according to RFC2616,
@@ -46,6 +47,8 @@ static const char* kDateFormats[] = {
 	// asctime
 	"%a %d %b %H:%M:%S %Y"
 };
+
+static locale_t posix = newlocale(LC_ALL_MASK, "POSIX", (locale_t)0);
 
 #ifdef LIBNETAPI_DEPRECATED
 using namespace BPrivate;
@@ -109,6 +112,10 @@ BHttpTime::Parse()
 
 	memset(&expireTime, 0, sizeof(struct tm));
 
+	// Save the current locale, switch to POSIX for strptime to match strings
+	// in English, switch back when we're done.
+	locale_t current = uselocale(posix);
+
 	fDateFormat = B_HTTP_TIME_FORMAT_PARSED;
 	unsigned int i;
 	for (i = 0; i < sizeof(kDateFormats) / sizeof(const char*);
@@ -124,6 +131,8 @@ BHttpTime::Parse()
 			break;
 		}
 	}
+
+	uselocale(current);
 
 	// Did we identify some valid format?
 	if (fDateFormat == B_HTTP_TIME_FORMAT_PARSED)
