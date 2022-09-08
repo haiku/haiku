@@ -364,6 +364,8 @@ status_t
 vesa_set_custom_display_mode(vesa_info& info, display_mode& mode)
 {
 	int32 modeIndex = -1;
+	int32 brokenModeIndex = -1;
+
 	if (info.shared_info->bios_type == kUnknownBiosType)
 		return B_NOT_SUPPORTED;
 
@@ -404,10 +406,11 @@ vesa_set_custom_display_mode(vesa_info& info, display_mode& mode)
 	for (uint32 i = 0; i < info.shared_info->vesa_mode_count; i++) {
 		status = vbe_get_mode_info(state, info.modes[i].mode, &modeInfo);
 		if (status != B_OK) {
-			// Sometimes the patching prevents us from getting the mode info?
+			// Sometimes the patching prevents us from getting the mode info. The modesetting
+			// still works, so we can detect the "broken" mode this way and then activate it.
 			dprintf(DEVICE_NAME ": vesa_set_custom_display_mode(): cannot get mode info for %x\n",
 				info.modes[i].mode);
-			// Just ignore modes that turn out to be invalid...
+			brokenModeIndex = info.modes[i].mode;
 			continue;
 		}
 
@@ -417,6 +420,9 @@ vesa_set_custom_display_mode(vesa_info& info, display_mode& mode)
 			break;
 		}
 	}
+
+	if (modeIndex < 0)
+		modeIndex = brokenModeIndex;
 
 	if (modeIndex >= 0) {
 		dprintf(DEVICE_NAME ": custom mode resolution %dx%d succesfully patched at index %"
