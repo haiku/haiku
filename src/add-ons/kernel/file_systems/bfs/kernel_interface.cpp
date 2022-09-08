@@ -22,10 +22,7 @@
 // TODO: temporary solution as long as there is no public I/O requests API
 #ifndef FS_SHELL
 #	include <io_requests.h>
-#	include <kernel.h>
 #	include <util/fs_trim_support.h>
-#else
-#	include "fssh_kernel_priv.h"
 #endif
 
 
@@ -1762,7 +1759,7 @@ bfs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = id;
-		dirent->d_reclen = ROUNDUP(offsetof(struct dirent, d_name) + length + 1, sizeof(void*));
+		dirent->d_reclen = offsetof(struct dirent, d_name) + length + 1;
 
 		bufferSize -= dirent->d_reclen;
 		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
