@@ -1692,13 +1692,14 @@ BContainerWindow::MessageReceived(BMessage* message)
 							// Folder icon should be visible, but in single
 							// window navigation, it might not be.
 							if (fDraggableIcon != NULL) {
-								IconCache::sIconCache->IconChanged(
-									TargetModel());
+								IconCache::sIconCache->IconChanged(TargetModel());
+								if (fDraggableIcon->IsHidden())
+									fDraggableIcon->Show();
 								fDraggableIcon->Invalidate();
 							} else
 								_AddFolderIcon();
 						} else if (fDraggableIcon != NULL)
-							fDraggableIcon->RemoveSelf();
+							fDraggableIcon->Hide();
 					}
 
 					// Update window title
