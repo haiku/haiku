@@ -128,7 +128,7 @@ BQueryPoseView::SetUpDefaultColumnsIfNeeded()
 	if (CountColumns() != 0)
 		return;
 
-	AddColumn(new BColumn(B_TRANSLATE("Name"), 0,
+	AddColumn(new BColumn(B_TRANSLATE("Name"), 145,
 		B_ALIGN_LEFT, kAttrStatName, B_STRING_TYPE, true, true));
 	AddColumn(new BColumn(B_TRANSLATE("Location"), 225,
 		B_ALIGN_LEFT, kAttrPath, B_STRING_TYPE, true, false));
