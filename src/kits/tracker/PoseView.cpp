@@ -387,6 +387,9 @@ void
 BPoseView::RestoreColumnState(AttributeStreamNode* node)
 {
 	fColumnList->MakeEmpty();
+	if (fTitleView != NULL)
+		fTitleView->Reset();
+
 	if (node != NULL) {
 		const char* columnsAttr;
 		const char* columnsAttrForeign;
@@ -450,6 +453,8 @@ void
 BPoseView::RestoreColumnState(const BMessage &message)
 {
 	fColumnList->MakeEmpty();
+	if (fTitleView != NULL)
+		fTitleView->Reset();
 
 	BObjectList<BColumn> tempSortedList;
 	for (int32 index = 0; ; index++) {
