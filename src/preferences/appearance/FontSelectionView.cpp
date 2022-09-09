@@ -16,6 +16,7 @@
 
 #include <Box.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutItem.h>
 #include <Locale.h>
@@ -41,7 +42,6 @@
 
 static const float kMinSize = 8.0;
 static const float kMaxSize = 72.0;
-static const float kPreviewTextWidth = 350.0;
 
 static const char* kPreviewText = B_TRANSLATE_COMMENT(
 	"The quick brown fox jumps over the lazy dog.",
@@ -133,13 +133,15 @@ FontSelectionView::FontSelectionView(const char* name,
 	fPreviewTextView->MakeEditable(false);
 	fPreviewTextView->MakeSelectable(false);
 	fPreviewTextView->SetInsets(0, 0, 0, 0);
-	fPreviewTextView->SetViewColor(ViewColor());
-	fPreviewTextView->SetLowColor(LowColor());
+	fPreviewTextView->SetViewUIColor(ViewUIColor());
+	fPreviewTextView->SetLowUIColor(LowUIColor());
+	fPreviewTextView->SetHighUIColor(HighUIColor());
 
 	// determine initial line count using fCurrentFont
+	fPreviewTextWidth = be_control_look->DefaultLabelSpacing() * 58.0f;
 	float lineCount = ceilf(fCurrentFont.StringWidth(kPreviewText)
-		/ kPreviewTextWidth);
-	fPreviewTextView->SetExplicitSize(BSize(kPreviewTextWidth,
+		/ fPreviewTextWidth);
+	fPreviewTextView->SetExplicitSize(BSize(fPreviewTextWidth,
 		fPreviewTextView->LineHeight(0) * lineCount));
 
 	// box around preview
@@ -304,7 +306,7 @@ FontSelectionView::_UpdateFontPreview()
 #endif
 
 	fPreviewTextView->SetFontAndColor(&fCurrentFont);
-	fPreviewTextView->SetExplicitSize(BSize(kPreviewTextWidth,
+	fPreviewTextView->SetExplicitSize(BSize(fPreviewTextWidth,
 		fPreviewTextView->LineHeight(0) * fPreviewTextView->CountLines()));
 }
 
@@ -446,10 +448,6 @@ FontSelectionView::UpdateFontsMenu()
 				& (B_IS_FIXED | B_PRIVATE_FONT_IS_FULL_AND_HALF_FIXED)) == 0) {
 			continue;
 		}
-
-		float width = font.StringWidth(family);
-		if (width > fMaxFontNameWidth)
-			fMaxFontNameWidth = width;
 
 		BMenu* stylesMenu = new BMenu(family);
 		stylesMenu->SetRadioMode(true);

@@ -66,10 +66,10 @@ protected:
 
 			BBox*				fPreviewBox;
 			BTextView*			fPreviewTextView;
+			float				fPreviewTextWidth;
 
 			BFont				fSavedFont;
 			BFont				fCurrentFont;
-			float				fMaxFontNameWidth;
 };
 
 #endif	// FONT_SELECTION_VIEW_H
