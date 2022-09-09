@@ -695,12 +695,12 @@ OpenWithPoseView::OpenSelection(BPose* pose, int32*)
 {
 	OpenWithContainerWindow* window = ContainerWindow();
 
-	int32 count = fSelectionList->CountItems();
+	int32 count = SelectionList()->CountItems();
 	if (count == 0)
 		return;
 
 	if (pose == NULL)
-		pose = fSelectionList->FirstItem();
+		pose = SelectionList()->FirstItem();
 
 	ASSERT(pose != NULL);
 
@@ -764,7 +764,7 @@ OpenWithPoseView::Pulse()
 
 	OpenWithContainerWindow* window = ContainerWindow();
 
-	if (!fSelectionList->CountItems()) {
+	if (!SelectionList()->CountItems()) {
 		window->SetCanSetAppAsDefault(false);
 		window->SetCanOpen(false);
 		_inherited::Pulse();
@@ -773,7 +773,7 @@ OpenWithPoseView::Pulse()
 
 	// if we selected a non-handling application, don't allow setting
 	// it as preferred
-	Model* firstSelected = fSelectionList->FirstItem()->TargetModel();
+	Model* firstSelected = SelectionList()->FirstItem()->TargetModel();
 	if (OpenWithRelation(firstSelected) == kNoRelation) {
 		window->SetCanSetAppAsDefault(false);
 		window->SetCanOpen(true);
@@ -789,11 +789,11 @@ OpenWithPoseView::Pulse()
 		return;
 	}
 
-	ASSERT(fSelectionList->CountItems() == 1);
+	ASSERT(SelectionList()->CountItems() == 1);
 
 	// enable the Open and make default if selected application different
 	// from preferred app ref
-	window->SetCanSetAppAsDefault((*fSelectionList->FirstItem()->
+	window->SetCanSetAppAsDefault((*SelectionList()->FirstItem()->
 		TargetModel()->EntryRef()) != fPreferredRef);
 
 	_inherited::Pulse();
