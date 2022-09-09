@@ -3418,12 +3418,13 @@ BContainerWindow::_AddFolderIcon()
 		return;
 	}
 
-	float iconSize = fMenuBar->Bounds().Height() - 2;
-	if (iconSize < 16)
-		iconSize = 16;
+	float baseIconSize = be_control_look->ComposeIconSize(16).Height() + 1,
+		iconSize = fMenuBar->Bounds().Height() - 2;
+	if (iconSize < baseIconSize)
+		iconSize = baseIconSize;
 
 	fDraggableIcon = new(std::nothrow)
-		DraggableContainerIcon(be_control_look->ComposeIconSize(iconSize));
+		DraggableContainerIcon(BSize(iconSize - 1, iconSize - 1));
 	if (fDraggableIcon != NULL) {
 		fMenuContainer->GroupLayout()->AddView(fDraggableIcon);
 		fMenuBar->SetBorders(
