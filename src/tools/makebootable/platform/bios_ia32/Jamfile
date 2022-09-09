@@ -21,6 +21,8 @@ if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd || $(HOST_PLATFORM) = 
 		partitioning_systems intel ] ;
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel
 		partitioning_systems gpt ] ;
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel
+		partitioning_systems common ] ;
 
 	DEFINES += _USER_MODE ;
 }
