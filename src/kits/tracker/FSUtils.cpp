@@ -1373,8 +1373,15 @@ LowLevelCopy(BEntry* srcEntry, StatStruct* srcStat, BDirectory* destDir,
 				loopControl->ChecksumChunk(buffer, (size_t)bytes);
 
 				ssize_t result = destFile.Write(buffer, (size_t)bytes);
-				if (result != bytes)
+				if (result != bytes) {
+					if (result < 0)
+						throw (status_t)result;
 					throw (status_t)B_ERROR;
+				}
+
+				result = destFile.Sync();
+				if (result != B_OK)
+					throw (status_t)result;
 
 				loopControl->UpdateStatus(NULL, ref, bytes - updateBytes,
 					true);
