@@ -34,12 +34,23 @@ char *strptime(const char *restrict s, const char *restrict f, struct tm *restri
 		switch (*f++) {
 		case 'a': case 'A':
 			dest = &tm->tm_wday;
+			// Haiku defines this constants the opposite way musl/Glibc does (first the full
+			// version, then the abbreviated version). This results in strptime failing to
+			// match the patterns. Keep this to make musl's strptime Haiku-compatible.
+#ifdef __HAIKU__
+			min = DAY_1;
+#else
 			min = ABDAY_1;
+#endif
 			range = 7;
 			goto symbolic_range;
 		case 'b': case 'B': case 'h':
 			dest = &tm->tm_mon;
+#ifdef __HAIKU__	// To make musl's strptime Haiku-compatible
+			min = MON_1;
+#else
 			min = ABMON_1;
+#endif
 			range = 12;
 			goto symbolic_range;
 		case 'c':
@@ -183,7 +194,11 @@ char *strptime(const char *restrict s, const char *restrict f, struct tm *restri
 			*dest -= adj;
 			goto update;
 		symbolic_range:
+#ifdef __HAIKU__	// To make musl's strptime Haiku-compatible
+			for (i=0; i<=2*range-1; i++) {
+#else
 			for (i=2*range-1; i>=0; i--) {
+#endif
 				ex = nl_langinfo(min+i);
 				len = strlen(ex);
 				if (strncasecmp(s, ex, len)) continue;
