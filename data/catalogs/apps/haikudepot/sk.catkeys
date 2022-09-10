@@ -1,79 +1,79 @@
 1	slovak	x-vnd.Haiku-HaikuDepot	2743869471
-Uninstalled	PackageListView		Odinštalované
 Available packages	MainWindow		Dostupné balíky
 Create account	UserLoginWindow		Vytvoriť účet
-Develop packages	MainWindow		Vývoj balíkov
 Rate package…	PackageInfoView		Ohodnotiť balík…
-Starting the package daemon failed:\n\n%Error%	App		Spustenie démona balíkov zlyhalo:\n\n%Error%
-<no info>	PackageInfoView		<žiadne info>
-No user ratings available.	PackageInfoView		Používateľské hodnotenie nie je dostupné.
-Rating	PackageListView		Hodnotenie
-Show	MainWindow		Zobraziť
 Active	PackageListView		Aktívny
 Login or Create account	MainWindow		Prihlásiť sa alebo Vytvoriť účet
-<Package contents not available for remote packages>	PackageContentsView		<Pri vzdialených balíkoch obsah balíka nie je k dispozícii>
-Ratings	PackageInfoView		Hodnotenia
 Switch account…	MainWindow		Prepnúť účet…
 Preferred language:	UserLoginWindow		Preferovaný jazyk:
 Name	PackageListView		Názov
 Rate %Package%	RatePackageWindow		Ohodnotiť %Package%
 Quit HaikuDepot	App		Ukončiť HaikuDepot
 Category	FilterView		Kategória
-Installed packages	MainWindow		Nainštalované balíky
 No changelog available.	PackageInfoView		Záznam zmien nie je dostupný.
-There was a puzzling response from the web service.	UserLoginWindow		Od webovej služby prišla neočakávaná odpoveď.
-Not logged in	MainWindow		Neprihlásený
 No, quit HaikuDepot	App		Nie, ukončiť HaikuDepot
+Not logged in	MainWindow		Neprihlásený
 Available	PackageListView		Dostupné
-Cancel	UserLoginWindow		Zrušiť
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot vyžaduje funkčný démon balíkov. Zdá sa, že nebeží.\nChcete ho teraz spustiť?
 Click a package to view information	PackageInfoView		Informácie zobrazíte kliknutím na balík
-Contents	PackageInfoView		Obsah
-Close	PackageManager		Zatvoriť
-Changelog	PackageInfoView		Záznam zmien
-About	PackageInfoView		O aplikácii
-Stability	RatePackageWindow		Stabilita
+Cancel	UserLoginWindow		Zrušiť
 Send	RatePackageWindow		Poslať
 Start package daemon	App		Spustiť démona balíkov
-Cancel	RatePackageWindow		Zrušiť
-Inactive	PackageListView		Neaktívne
-{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# položka} few{# položky} other{# položiek}}
-Downloading:	PackageInfoView		Sťahuje sa:
-Success	UserLoginWindow		Úspech
-(%Votes%)	PackageInfoView		(%Votes%)
-Close	UserLoginWindow		Zatvoriť
 Close	RatePackageWindow		Zatvoriť
-Your rating:	RatePackageWindow		Vaše hodnotenie:
+Close	UserLoginWindow		Zatvoriť
 Size	PackageListView		Veľkosť
 All categories	FilterView		Všetky kategórie
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Zrušiť
 Refresh repositories	MainWindow		Obnoviť zdroje softvéru
 Language	RatePackageWindow		Jazyk
-Log out	MainWindow		Odhlásiť sa
-Comment language:	RatePackageWindow		Jazyk komentára:
 Status	PackageListView		Stav
 Update	RatePackageWindow		Aktualizovať
 Language	UserLoginWindow		Jazyk
 OK	UserLoginWindow		OK
 Stability:	RatePackageWindow		Stabilita:
 Source packages	MainWindow		Zdrojové balíky
--	no package size		-
-Rate package	RatePackageWindow		Ohodnotiť balík
 Try again	App		Skúsiť znova
 Unknown	PackageListView		Neznámy
-Log in	UserLoginWindow		Prihlásiť sa
 Logged in as %User%	MainWindow		Prihlásený ako %User%
-Email address:	UserLoginWindow		Emailová adresa:
-Screenshot	ScreenshotWindow		Snímka obrazovky
-HaikuDepot	System name		HaikuDepot
-Search terms:	FilterView		Hľadaný výraz:
 Pending…	PackageListView		Čaká sa…
-Category:	FilterView		Kategória:
+Search terms:	FilterView		Hľadaný výraz:
 Authentication failed	UserLoginWindow		Overenie totožnosti zlyhalo
 Manage repositories…	MainWindow		Spravovať zdroje softvéru…
-Description	PackageListView		Popis
 Open %DeskbarLink%	PackageManager		Otvoriť %DeskbarLink%
 Input validation	UserLoginWindow		Overenie platnosti vstupu
 Log in…	MainWindow		Prihlásiť sa…
+Uninstalled	PackageListView		Odinštalované
+Develop packages	MainWindow		Vývoj balíkov
+Starting the package daemon failed:\n\n%Error%	App		Spustenie démona balíkov zlyhalo:\n\n%Error%
+No user ratings available.	PackageInfoView		Používateľské hodnotenie nie je dostupné.
+<no info>	PackageInfoView		<žiadne info>
+Rating	PackageListView		Hodnotenie
+Show	MainWindow		Zobraziť
+<Package contents not available for remote packages>	PackageContentsView		<Pri vzdialených balíkoch obsah balíka nie je k dispozícii>
+Ratings	PackageInfoView		Hodnotenia
+Installed packages	MainWindow		Nainštalované balíky
+There was a puzzling response from the web service.	UserLoginWindow		Od webovej služby prišla neočakávaná odpoveď.
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot vyžaduje funkčný démon balíkov. Zdá sa, že nebeží.\nChcete ho teraz spustiť?
+Contents	PackageInfoView		Obsah
+Close	PackageManager		Zatvoriť
+Changelog	PackageInfoView		Záznam zmien
+About	PackageInfoView		O aplikácii
+Stability	RatePackageWindow		Stabilita
+Cancel	RatePackageWindow		Zrušiť
+Inactive	PackageListView		Neaktívne
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# položka} few{# položky} other{# položiek}}
+Downloading:	PackageInfoView		Sťahuje sa:
+Success	UserLoginWindow		Úspech
+(%Votes%)	PackageInfoView		(%Votes%)
+Your rating:	RatePackageWindow		Vaše hodnotenie:
+Log out	MainWindow		Odhlásiť sa
+Comment language:	RatePackageWindow		Jazyk komentára:
+-	no package size		-
+Rate package	RatePackageWindow		Ohodnotiť balík
+Log in	UserLoginWindow		Prihlásiť sa
+HaikuDepot	System name		HaikuDepot
+Screenshot	ScreenshotWindow		Snímka obrazovky
+Email address:	UserLoginWindow		Emailová adresa:
+Category:	FilterView		Kategória:
+Description	PackageListView		Popis
 You need to be logged into an account before you can rate packages.	MainWindow		Musíte byť prihlásení do účtu predtým, než budete môcť hodnotiť balíky.
