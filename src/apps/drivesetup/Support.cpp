@@ -51,7 +51,7 @@ dump_partition_info(const BPartition* partition)
 	printf("\tIsBusy(): %s\n\n", partition->IsBusy() ? "true" : "false");
 	printf("\tFlags(): %" B_PRIx32 "\n\n", partition->Flags());
 	printf("\tName(): %s\n", partition->Name());
-	printf("\tContentName(): %s\n", partition->ContentName());
+	printf("\tContentName(): %s\n", partition->ContentName().String());
 	printf("\tType(): %s\n", partition->Type());
 	printf("\tContentType(): %s\n", partition->ContentType());
 	printf("\tID(): %" B_PRIx32 "\n\n", partition->ID());

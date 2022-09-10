@@ -52,7 +52,7 @@ public:
 			uint32				Flags() const;
 
 			const char*			Name() const;
-			const char*			ContentName() const;
+			BString				ContentName() const;
 			const char*			Type() const;			// See DiskDeviceTypes.h
 			const char*			ContentType() const;	// See DiskDeviceTypes.h
 			partition_id		ID() const;

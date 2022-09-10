@@ -806,14 +806,14 @@ make_partition_label(BPartition* partition, char* label, char* menuLabel,
 		if (type == NULL)
 			type = B_TRANSLATE_COMMENT("Unknown Type", "Partition content type");
 
-		sprintf(label, "%s - %s [%s] (%s)", partition->ContentName(), size,
+		sprintf(label, "%s - %s [%s] (%s)", partition->ContentName().String(), size,
 			path.Path(), type);
 	} else {
-		sprintf(label, "%s - %s [%s]", partition->ContentName(), size,
+		sprintf(label, "%s - %s [%s]", partition->ContentName().String(), size,
 			path.Path());
 	}
 
-	sprintf(menuLabel, "%s - %s", partition->ContentName(), size);
+	sprintf(menuLabel, "%s - %s", partition->ContentName().String(), size);
 }
 
 

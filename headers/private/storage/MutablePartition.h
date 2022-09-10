@@ -43,7 +43,7 @@ public:
 			const char*			Name() const;
 			status_t			SetName(const char* name);
 
-			const char*			ContentName() const;
+			BString				ContentName() const;
 			status_t			SetContentName(const char* name);
 
 			const char*			Type() const;

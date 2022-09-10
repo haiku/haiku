@@ -248,9 +248,28 @@ BPartition::Name() const
 }
 
 
-const char*
+BString
 BPartition::ContentName() const
 {
+	if (_PartitionData()->content_name == NULL) {
+		// Give a default name to unnamed volumes
+		off_t divisor = 1ULL << 40;
+		off_t diskSize = _PartitionData()->content_size;
+		char unit = 'T';
+		if (diskSize < divisor) {
+			divisor = 1UL << 30;
+			unit = 'G';
+			if (diskSize < divisor) {
+				divisor = 1UL << 20;
+				unit = 'M';
+			}
+		}
+		double size = double((10 * diskSize + divisor - 1) / divisor);
+		BString name;
+		name.SetToFormat("%g %ciB %s volume", size / 10, unit, _PartitionData()->content_type);
+		return name;
+	}
+
 	return _PartitionData()->content_name;
 }
 
