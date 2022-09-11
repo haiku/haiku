@@ -103,8 +103,7 @@ BFSAddOn::CreatePartitionHandle(BMutablePartition* partition,
 bool
 BFSAddOn::CanInitialize(const BMutablePartition* partition)
 {
-	// TODO: Check partition size.
-	return true;
+	return partition->Size() >= 1L * 1024 * 1024;
 }
 
 
@@ -129,6 +128,19 @@ BFSAddOn::ValidateInitialize(const BMutablePartition* partition, BString* name,
 	status_t error = parse_initialize_parameters(parameterString, parameters);
 	if (error != B_OK)
 		return error;
+
+	off_t size = partition->Size();
+	uint32 blockSize = parameters.blockSize;
+	if (size < 2 * 1024 * 1024) {
+		if (blockSize != 1024)
+			return B_BAD_VALUE;
+	} else if (size < 4 * 1024 * 1024) {
+		if (blockSize >= 4 * 1024)
+			return B_BAD_VALUE;
+	} else if (size < 8 * 1024 * 1024) {
+		if (blockSize >= 8 * 1024)
+			return B_BAD_VALUE;
+	}
 
 	return B_OK;
 }

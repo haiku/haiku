@@ -14,6 +14,7 @@
 
 class BCheckBox;
 class BMenuField;
+class BMenuItem;
 class BTextControl;
 class BView;
 
@@ -41,6 +42,10 @@ private:
 				BTextControl*	fNameControl;
 				BMenuField*		fBlockSizeMenuField;
 				BCheckBox*		fUseIndicesCheckBox;
+				BMenuItem*		f1KBlockMenuItem;
+				BMenuItem*		f2KBlockMenuItem;
+				BMenuItem*		f4KBlockMenuItem;
+				BMenuItem*		f8KBlockMenuItem;
 };
 
 
