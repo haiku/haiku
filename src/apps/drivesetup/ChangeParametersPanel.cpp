@@ -125,6 +125,10 @@ ChangeParametersPanel::CreateChangeControls(BPartition* partition,
 
 	fTypePopUpMenu = new BPopUpMenu("Partition Type");
 
+	const char* type = NULL;
+	if (partition != NULL)
+		type = partition->Type();
+
 	int32 cookie = 0;
 	BString supportedType;
 	if (parent != NULL) {
@@ -135,8 +139,11 @@ ChangeParametersPanel::CreateChangeControls(BPartition* partition,
 			BMenuItem* item = new BMenuItem(supportedType, message);
 			fTypePopUpMenu->AddItem(item);
 
-			if (strcmp(supportedType, kPartitionTypeBFS) == 0)
+			if (type != NULL) {
+				item->SetMarked(strcmp(supportedType, type) == 0);
+			} else if (strcmp(supportedType, kPartitionTypeBFS) == 0) {
 				item->SetMarked(true);
+			}
 		}
 	}
 
