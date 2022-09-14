@@ -45,7 +45,6 @@ struct gdt_idt_descr {
 
 
 gdt_idt_descr gBootGDTDescriptor;
-segment_descriptor *gBootGDT = NULL;
 
 
 static const uint32_t kDefaultPageTableFlags = 0x07;      // present, user, R/W
@@ -93,7 +92,9 @@ get_next_page_table(void)
 static void
 arch_mmu_init_gdt(void)
 {
-	if (platform_allocate_region((void **)&gBootGDT,
+	segment_descriptor *bootGDT = NULL;
+
+	if (platform_allocate_region((void **)&bootGDT,
 			BOOT_GDT_SEGMENT_COUNT * sizeof(segment_descriptor), 0, false) != B_OK) {
 		panic("Failed to allocate GDT.\n");
 	}
@@ -106,32 +107,32 @@ arch_mmu_init_gdt(void)
 	// set up a new gdt
 
 	// put standard segment descriptors in GDT
-	clear_segment_descriptor(&gBootGDT[0]);
+	clear_segment_descriptor(&bootGDT[0]);
 
 	// seg 0x08 - kernel 4GB code
-	set_segment_descriptor(&gBootGDT[KERNEL_CODE_SEGMENT], 0, 0xffffffff,
+	set_segment_descriptor(&bootGDT[KERNEL_CODE_SEGMENT], 0, 0xffffffff,
 		DT_CODE_READABLE, DPL_KERNEL);
 
 	// seg 0x10 - kernel 4GB data
-	set_segment_descriptor(&gBootGDT[KERNEL_DATA_SEGMENT], 0, 0xffffffff,
+	set_segment_descriptor(&bootGDT[KERNEL_DATA_SEGMENT], 0, 0xffffffff,
 		DT_DATA_WRITEABLE, DPL_KERNEL);
 
 	// seg 0x1b - ring 3 user 4GB code
-	set_segment_descriptor(&gBootGDT[USER_CODE_SEGMENT], 0, 0xffffffff,
+	set_segment_descriptor(&bootGDT[USER_CODE_SEGMENT], 0, 0xffffffff,
 		DT_CODE_READABLE, DPL_USER);
 
 	// seg 0x23 - ring 3 user 4GB data
-	set_segment_descriptor(&gBootGDT[USER_DATA_SEGMENT], 0, 0xffffffff,
+	set_segment_descriptor(&bootGDT[USER_DATA_SEGMENT], 0, 0xffffffff,
 		DT_DATA_WRITEABLE, DPL_USER);
 
 	addr_t virtualGDT;
-	platform_bootloader_address_to_kernel_address(gBootGDT, &virtualGDT);
+	platform_bootloader_address_to_kernel_address(bootGDT, &virtualGDT);
 
 	gBootGDTDescriptor.limit = BOOT_GDT_SEGMENT_COUNT * sizeof(segment_descriptor);
 	gBootGDTDescriptor.base = (uint32_t)virtualGDT;
 
 	TRACE("gdt phys 0x%08x virt 0x%08" B_PRIxADDR " desc 0x%08x\n",
-		(uint32_t)gBootGDT, virtualGDT,
+		(uint32_t)bootGDT, virtualGDT,
 		(uint32_t)&gBootGDTDescriptor);
 	TRACE("gdt limit=%d base=0x%08x\n",
 		gBootGDTDescriptor.limit, gBootGDTDescriptor.base);
