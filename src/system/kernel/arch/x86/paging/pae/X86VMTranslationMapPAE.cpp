@@ -975,7 +975,7 @@ X86VMTranslationMapPAE::QueryInterrupt(addr_t virtualAddress,
 		| ((entry & X86_PAE_PTE_PRESENT) != 0 ? PAGE_PRESENT : 0);
 
 	TRACE("X86VMTranslationMapPAE::Query(%#" B_PRIxADDR ") -> %#"
-		B_PRIxPHYSADDR ":\n", *_physicalAddress, virtualAddress);
+		B_PRIxPHYSADDR ":\n", virtualAddress, *_physicalAddress);
 
 	return B_OK;
 }
