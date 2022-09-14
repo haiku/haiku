@@ -21,9 +21,6 @@ struct gdt_idt_descr {
 } _PACKED;
 
 
-extern gdt_idt_descr gBootGDTDescriptor;
-
-
 extern "C" typedef void (*enter_kernel_t)(uint32_t, addr_t, addr_t, addr_t,
 	struct gdt_idt_descr *);
 
@@ -33,6 +30,8 @@ extern "C" void arch_enter_kernel(uint32_t pageDirectory, addr_t kernelArgs,
 	addr_t kernelEntry, addr_t kernelStackTop, struct gdt_idt_descr *gdtDescriptor);
 
 // From arch_mmu.cpp
+extern void arch_mmu_init_gdt(gdt_idt_descr &bootGDTDescriptor);
+
 extern void arch_mmu_post_efi_setup(size_t memoryMapSize,
 	efi_memory_descriptor *memoryMap, size_t descriptorSize,
 	uint32_t descriptorVersion);
@@ -94,6 +93,9 @@ memory_region_type_str(int type)
 void
 arch_start_kernel(addr_t kernelEntry)
 {
+	gdt_idt_descr bootGDTDescriptor;
+	arch_mmu_init_gdt(bootGDTDescriptor);
+
 	// Copy entry.S trampoline to lower 1M
 	enter_kernel_t enter_kernel = (enter_kernel_t)0xa000;
 	memcpy((void *)enter_kernel, (void *)arch_enter_kernel, B_PAGE_SIZE);
@@ -200,12 +202,12 @@ arch_start_kernel(addr_t kernelEntry)
 
 	// Enter the kernel!
 	dprintf("enter_kernel(pageDirectory: 0x%08x, kernelArgs: 0x%08x, "
-		"kernelEntry: 0x%08x, sp: 0x%08x, gBootGDTDescriptor: 0x%08x)\n",
+		"kernelEntry: 0x%08x, sp: 0x%08x, bootGDTDescriptor: 0x%08x)\n",
 		pageDirectory, (uint32_t)virtKernelArgs, (uint32_t)kernelEntry,
 		(uint32_t)(gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size),
-		(uint32_t)&gBootGDTDescriptor);
+		(uint32_t)&bootGDTDescriptor);
 
 	enter_kernel(pageDirectory, virtKernelArgs, kernelEntry,
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size,
-		&gBootGDTDescriptor);
+		&bootGDTDescriptor);
 }

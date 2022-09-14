@@ -44,9 +44,6 @@ struct gdt_idt_descr {
 } _PACKED;
 
 
-gdt_idt_descr gBootGDTDescriptor;
-
-
 static const uint32_t kDefaultPageTableFlags = 0x07;      // present, user, R/W
 
 
@@ -89,8 +86,8 @@ get_next_page_table(void)
 }
 
 
-static void
-arch_mmu_init_gdt(void)
+void
+arch_mmu_init_gdt(gdt_idt_descr &bootGDTDescriptor)
 {
 	segment_descriptor *bootGDT = NULL;
 
@@ -128,14 +125,14 @@ arch_mmu_init_gdt(void)
 	addr_t virtualGDT;
 	platform_bootloader_address_to_kernel_address(bootGDT, &virtualGDT);
 
-	gBootGDTDescriptor.limit = BOOT_GDT_SEGMENT_COUNT * sizeof(segment_descriptor);
-	gBootGDTDescriptor.base = (uint32_t)virtualGDT;
+	bootGDTDescriptor.limit = BOOT_GDT_SEGMENT_COUNT * sizeof(segment_descriptor);
+	bootGDTDescriptor.base = (uint32_t)virtualGDT;
 
 	TRACE("gdt phys 0x%08x virt 0x%08" B_PRIxADDR " desc 0x%08x\n",
 		(uint32_t)bootGDT, virtualGDT,
 		(uint32_t)&gBootGDTDescriptor);
 	TRACE("gdt limit=%d base=0x%08x\n",
-		gBootGDTDescriptor.limit, gBootGDTDescriptor.base);
+		bootGDTDescriptor.limit, bootGDTDescriptor.base);
 }
 
 
@@ -400,5 +397,4 @@ void
 arch_mmu_init(void)
 {
 	arch_mmu_allocate_page_directory();
-	arch_mmu_init_gdt();
 }
