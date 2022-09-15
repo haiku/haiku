@@ -583,6 +583,7 @@ BMutablePartition::Init(const user_partition_data* partitionData,
 	fData->size = partitionData->size;
 	fData->content_size = partitionData->content_size;
 	fData->block_size = partitionData->block_size;
+	fData->physical_block_size = partitionData->physical_block_size;
 	fData->status = partitionData->status;
 	fData->flags = partitionData->flags;
 	fData->volume = partitionData->volume;

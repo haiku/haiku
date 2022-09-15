@@ -141,6 +141,16 @@ BPartition::BlockSize() const
 }
 
 
+/*!	\brief Returns the physical block size of the device.
+	\return The physical block size of the device in bytes.
+*/
+uint32
+BPartition::PhysicalBlockSize() const
+{
+	return _PartitionData()->physical_block_size;
+}
+
+
 /*!	\brief Returns the index of the partition in its session's list of
 		   partitions.
 	\return The index of the partition in its session's list of partitions.
@@ -1353,6 +1363,7 @@ BPartition::_Update(user_partition_data* data, bool* updated)
 	if (data->offset != oldData->offset
 		|| data->size != oldData->size
 		|| data->block_size != oldData->block_size
+		|| data->physical_block_size != oldData->physical_block_size
 		|| data->status != oldData->status
 		|| data->flags != oldData->flags
 		|| data->volume != oldData->volume

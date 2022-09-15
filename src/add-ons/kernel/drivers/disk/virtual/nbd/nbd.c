@@ -588,17 +588,18 @@ status_t nbd_control(cookie_t *cookie, uint32 op, void *data, size_t len) {
 		return EINVAL;
 	case B_GET_GEOMETRY:
 	case B_GET_BIOS_GEOMETRY:
-		if (data) {
-			device_geometry *geom = (device_geometry *)data;
-			geom->bytes_per_sector = BLKSIZE;
-			geom->sectors_per_track = 1;
-			geom->cylinder_count = cookie->dev->size / BLKSIZE;
-			geom->head_count = 1;
-			geom->device_type = B_DISK;
-			geom->removable = false;
-			geom->read_only = cookie->dev->readonly;
-			geom->write_once = false;
-			return B_OK;
+		if (data != NULL && len <= sizeof(device_geometry)) {
+			device_geometry geometry;
+			geometry.bytes_per_sector = BLKSIZE;
+			geometry.sectors_per_track = 1;
+			geometry.cylinder_count = cookie->dev->size / BLKSIZE;
+			geometry.head_count = 1;
+			geometry.device_type = B_DISK;
+			geometry.removable = false;
+			geometry.read_only = cookie->dev->readonly;
+			geometry.write_once = false;
+			geometry.bytes_per_physical_sector = BLKSIZE;
+			return user_memcpy(data, &geometry, len);
 		}
 		return EINVAL;
 	case B_GET_MEDIA_STATUS:

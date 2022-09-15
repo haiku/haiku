@@ -99,6 +99,7 @@ get_geometry(das_handle* handle, device_geometry* geometry)
 		return status;
 
 	devfs_compute_geometry_size(geometry, info->capacity, info->block_size);
+	geometry->bytes_per_physical_sector = info->physical_block_size;
 
 	geometry->device_type = B_DISK;
 	geometry->removable = info->removable;
@@ -112,10 +113,11 @@ get_geometry(das_handle* handle, device_geometry* geometry)
 	geometry->write_once = false;
 
 	TRACE("scsi_disk: get_geometry(): %" B_PRId32 ", %" B_PRId32 ", %" B_PRId32
-		", %" B_PRId32 ", %d, %d, %d, %d\n", geometry->bytes_per_sector,
+		", %" B_PRId32 ", %d, %d, %d, %d, %" B_PRId32 "\n", geometry->bytes_per_sector,
 		geometry->sectors_per_track, geometry->cylinder_count,
 		geometry->head_count, geometry->device_type,
-		geometry->removable, geometry->read_only, geometry->write_once);
+		geometry->removable, geometry->read_only, geometry->write_once,
+		geometry->bytes_per_physical_sector);
 
 	return B_OK;
 }
@@ -403,7 +405,7 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 		case B_GET_GEOMETRY:
 		{
-			if (buffer == NULL /*|| length != sizeof(device_geometry)*/)
+			if (buffer == NULL || length > sizeof(device_geometry))
 				return B_BAD_VALUE;
 
 		 	device_geometry geometry;
@@ -411,7 +413,7 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 			if (status != B_OK)
 				return status;
 
-			return user_memcpy(buffer, &geometry, sizeof(device_geometry));
+			return user_memcpy(buffer, &geometry, length);
 		}
 
 		case B_GET_ICON_NAME:
@@ -468,7 +470,7 @@ das_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 
 static void
-das_set_capacity(das_driver_info* info, uint64 capacity, uint32 blockSize)
+das_set_capacity(das_driver_info* info, uint64 capacity, uint32 blockSize, uint32 physicalBlockSize)
 {
 	TRACE("das_set_capacity(device = %p, capacity = %" B_PRIu64
 		", blockSize = %" B_PRIu32 ")\n", info, capacity, blockSize);
@@ -508,6 +510,7 @@ das_set_capacity(das_driver_info* info, uint64 capacity, uint32 blockSize)
 	}
 
 	info->block_size = blockSize;
+	info->physical_block_size = physicalBlockSize;
 }
 
 
@@ -521,7 +524,7 @@ das_media_changed(das_driver_info *device, scsi_ccb *request)
 
 
 scsi_periph_callbacks callbacks = {
-	(void (*)(periph_device_cookie, uint64, uint32))das_set_capacity,
+	(void (*)(periph_device_cookie, uint64, uint32, uint32))das_set_capacity,
 	(void (*)(periph_device_cookie, scsi_ccb *))das_media_changed
 };
 

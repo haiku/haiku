@@ -38,6 +38,7 @@ public:
 			off_t				Size() const;
 			off_t				ContentSize() const;	// 0 if uninitialized
 			uint32				BlockSize() const;
+			uint32				PhysicalBlockSize() const;
 			int32				Index() const;		// 0 for devices
 			uint32				Status() const;
 

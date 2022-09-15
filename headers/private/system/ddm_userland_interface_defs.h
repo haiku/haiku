@@ -22,6 +22,7 @@ struct user_partition_data {
 	off_t					size;
 	off_t					content_size;
 	uint32					block_size;
+	uint32					physical_block_size;
 	uint32					status;
 	uint32					flags;
 	dev_t					volume;

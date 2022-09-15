@@ -63,7 +63,7 @@ typedef struct scsi_periph_callbacks {
 	// informs of new size of medium
 	// (set to NULL if not a block device)
 	void (*set_capacity)(periph_device_cookie cookie, uint64 capacity,
-		uint32 blockSize);
+		uint32 blockSize, uint32 physicalBlockSize);
 
 	// *** removable devices
 	// called when media got changed (can be NULL if medium is not changable)
