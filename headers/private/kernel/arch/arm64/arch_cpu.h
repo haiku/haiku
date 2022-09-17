@@ -170,6 +170,9 @@ static inline void arch_cpu_idle(void)
 }
 
 
+extern addr_t arm64_get_fp(void);
+
+
 #ifdef __cplusplus
 }
 #endif

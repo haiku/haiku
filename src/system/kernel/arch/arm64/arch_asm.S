@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haiku, Inc. All Rights Reserved.
+ * Copyright 2019-2022 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #include <arch/arm/arch_cpu.h>
@@ -308,3 +308,10 @@ fault:
 	mov x1, #1
 	b longjmp
 FUNCTION_END(arch_debug_call_with_fault_handler)
+
+
+/* addr_t arm64_get_fp(void) */
+FUNCTION(arm64_get_fp):
+	mov x0, x29
+	ret
+FUNCTION_END(arm64_get_fp)
