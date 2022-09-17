@@ -264,8 +264,10 @@ _IO_new_file_fopen (fp, filename, mode, is32not64)
   int i;
   _IO_FILE *result;
 #ifdef _LIBC
+#ifndef __HAIKU__
   const char *cs;
   const char *last_recognized;
+#endif
 #endif
 
   if (_IO_file_is_open (fp))
@@ -291,7 +293,9 @@ _IO_new_file_fopen (fp, filename, mode, is32not64)
       return NULL;
     }
 #ifdef _LIBC
+#ifndef __HAIKU__
   last_recognized = mode;
+#endif
 #endif
   for (i = 1; i < 7; ++i)
     {
@@ -303,18 +307,24 @@ _IO_new_file_fopen (fp, filename, mode, is32not64)
 	  omode = O_RDWR;
 	  read_write &= _IO_IS_APPENDING;
 #ifdef _LIBC
+#ifndef __HAIKU__
 	  last_recognized = mode;
+#endif
 #endif
 	  continue;
 	case 'x':
 	  oflags |= O_EXCL;
 #ifdef _LIBC
+#ifndef __HAIKU__
 	  last_recognized = mode;
+#endif
 #endif
 	  continue;
 	case 'b':
 #ifdef _LIBC
+#ifndef __HAIKU__
 	  last_recognized = mode;
+#endif
 #endif
 	  continue;
 	case 'm':
