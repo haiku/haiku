@@ -1,21 +1,32 @@
 /*
- * Copyright 2019 Haiku, Inc. All Rights Reserved.
+ * Copyright 2019-2022, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
 #include <runtime_loader/runtime_loader.h>
 
-#include "support/TLS.h"
-#include "tls.h"
+#include <support/TLS.h>
+#include <tls.h>
+
 
 struct tls_index {
 	unsigned long ti_module;
 	unsigned long ti_offset;
 };
 
-void* __tls_get_addr(struct tls_index* ti);
 
 static int32 gNextSlot = TLS_FIRST_FREE_SLOT;
+
+void* __tls_get_addr(struct tls_index* ti);
+
+
+static inline void**
+get_tls()
+{
+	void **tls;
+	asm volatile("MRS %0, tpidrro_el0" : "=r" (tls));
+	return tls;
+}
 
 
 int32
@@ -32,21 +43,21 @@ tls_allocate(void)
 void *
 tls_get(int32 index)
 {
-	return NULL;
+	return get_tls()[index];
 }
 
 
 void **
 tls_address(int32 index)
 {
-	return NULL;
+	return get_tls() + index;
 }
 
 
 void
 tls_set(int32 index, void *value)
 {
-
+	get_tls()[index] = value;
 }
 
 
