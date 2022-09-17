@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1854517576
+1	german	x-vnd.Haiku-libtracker	3698762573
 Created	ContainerWindow		Erstellt
 Icon	AttributesView		Icon
 Open and make preferred	OpenWithWindow		Öffnen und zur Bevorzugten machen
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Kleines Bitmap-Icon
 Would you like to find a suitable application to open the file?	FSUtils		Soll nach einer geeigneten Anwendung gesucht werden, um die Datei zu öffnen?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Ordner oder Verknüpfungen können nicht mit einer Datei ersetzt werden.
+(unknown)	InfoWindow		(unbekannt)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# Daten>}}
 Trailing \\.	libtracker		\\ am Ende.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Bei %func \nfind_directory() fehlgeschlagen \nGrund: %error
@@ -83,6 +84,7 @@ Include trash	FindPanel		Einschließlich Papierkorb
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Icons ausrichten
 Modified	FindPanel		Geändert
+ (block size: 	InfoWindow		 (Blockgröße: 
 Select all	QueryContainerWindow		Alles auswählen
 Generate image thumbnails	SettingsView		Miniaturbilder erstellen
 Select…	FilePanelPriv		Auswählen …
@@ -164,6 +166,7 @@ Read	FilePermissionsView		Lesen
 There was an error writing the attribute.	WidgetAttributeText		Fehler beim Schreiben des Attributs.
 Path	Default Query Columns		Pfad
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Wird %target umbenannt, kann es sein dass %osName nicht mehr richtig funktioniert!\n\nTrotzdem umbenennen?
+Filesystem:	InfoWindow		Dateisystem:
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" konnte nicht geöffnet werden (%error).
 Media parameter group	AttributesView		Media-Parametergruppe
 %name info	InfoWindow	InfoWindow Title	%name-Info
@@ -488,6 +491,7 @@ Duplicate	ContainerWindow		Duplizieren
 16-bit integer	AttributesView		Integer 16-bit
 Untitled clipping	PoseView		Unbenannter Ausschnitt
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Die Datei \"%name\" existiert bereits in diesem Ordner. Soll sie ersetzt werden?
+, indexed	InfoWindow		, indiziert
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Objekte müssen auf eines der Icons im \"Datenträger\" Fenster fallengelassen werden.
 Version:	InfoWindow		Version:
 OK	PoseView		OK
