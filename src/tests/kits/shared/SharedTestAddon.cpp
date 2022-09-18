@@ -17,6 +17,7 @@
 #include "JsonToMessageTest.h"
 #include "KeymapTest.h"
 #include "LRUCacheTest.h"
+#include "MemoryRingIOTest.h"
 
 
 BTestSuite*
@@ -33,6 +34,7 @@ getTestSuite()
 	JsonToMessageTest::AddTests(*suite);
 	KeymapTest::AddTests(*suite);
 	LRUCacheTest::AddTests(*suite);
+	MemoryRingIOTest::AddTests(*suite);
 
 	return suite;
 }

@@ -7,7 +7,6 @@
 #include "blocker/LockerTest.h"
 #include "bmemoryio/MemoryIOTest.h"
 #include "bmemoryio/MallocIOTest.h"
-#include "bmemoryio/MemoryRingIOTest.h"
 #include "bstring/StringTest.h"
 #include "bblockcache/BlockCacheTest.h"
 #include "ByteOrderTest.h"
@@ -26,7 +25,6 @@ getTestSuite()
 	suite->addTest("BLocker", LockerTestSuite());
 	suite->addTest("BMemoryIO", MemoryIOTestSuite());
 	suite->addTest("BMallocIO", MallocIOTestSuite());
-	suite->addTest("BMemoryRingIO", MemoryRingIOTest::Suite());
 	suite->addTest("BString", StringTestSuite());
 	suite->addTest("BBlockCache", BlockCacheTestSuite());
 	suite->addTest("ByteOrder", ByteOrderTestSuite());

@@ -12,13 +12,13 @@
 #include <ThreadedTestCase.h>
 #include <MemoryRingIO.h>
 
+class BTestSuite;
+
 
 class MemoryRingIOTest : public BThreadedTestCase
 {
 public:
 	MemoryRingIOTest(size_t bufferSize) : fRing(bufferSize) {};
-
-	static CppUnit::Test* Suite();
 
 	void WriteTest();
 	void ReadTest();
@@ -27,6 +27,9 @@ public:
 	void ReadWriteSingleTest();
 	void InvalidResizeTest();
 	void TimeoutTest();
+
+	static void AddTests(BTestSuite& parent);
+
 
 protected:
 	void _DisableWriteOnFullBuffer();

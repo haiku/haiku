@@ -27,67 +27,6 @@
 #define SMALL_PAYLOAD "shorter"
 
 
-CppUnit::Test*
-MemoryRingIOTest::Suite() {
-	CppUnit::TestSuite* suite = new CppUnit::TestSuite("MemoryRingIOTest");
-	BThreadedTestCaller<MemoryRingIOTest>* caller;
-
-	MemoryRingIOTest* big = new MemoryRingIOTest(sizeof(BIG_PAYLOAD));
-	caller = new BThreadedTestCaller<MemoryRingIOTest>(
-		"MemoryRingIOTest: RW threaded, big buffer", big);
-	caller->addThread("WR", &MemoryRingIOTest::WriteTest);
-	caller->addThread("RD", &MemoryRingIOTest::ReadTest);
-	suite->addTest(caller);
-
-	MemoryRingIOTest* full = new MemoryRingIOTest(sizeof(FULL_PAYLOAD));
-	caller = new BThreadedTestCaller<MemoryRingIOTest>(
-		"MemoryRingIOTest: RW threaded, medium buffer", full);
-	caller->addThread("WR", &MemoryRingIOTest::WriteTest);
-	caller->addThread("RD", &MemoryRingIOTest::ReadTest);
-	suite->addTest(caller);
-
-	MemoryRingIOTest* small = new MemoryRingIOTest(sizeof(SMALL_PAYLOAD));
-	caller = new BThreadedTestCaller<MemoryRingIOTest>(
-		"MemoryRingIOTest: RW threaded, small buffer", small);
-	caller->addThread("WR", &MemoryRingIOTest::WriteTest);
-	caller->addThread("RD", &MemoryRingIOTest::ReadTest);
-	suite->addTest(caller);
-
-	MemoryRingIOTest* endWrite = new MemoryRingIOTest(sizeof(FULL_PAYLOAD));
-	caller = new BThreadedTestCaller<MemoryRingIOTest>(
-		"MemoryRingIOTest: RW threaded, reader set end reached on writer wait",
-		endWrite);
-	caller->addThread("WR #1", &MemoryRingIOTest::BusyWriterTest);
-	caller->addThread("WR #2", &MemoryRingIOTest::BusyWriterTest);
-	caller->addThread("WR #3", &MemoryRingIOTest::BusyWriterTest);
-	caller->addThread("RD", &MemoryRingIOTest::_DisableWriteOnFullBuffer);
-	suite->addTest(caller);
-
-	MemoryRingIOTest* endRead = new MemoryRingIOTest(sizeof(FULL_PAYLOAD));
-	caller = new BThreadedTestCaller<MemoryRingIOTest>(
-		"MemoryRingIOTest: RW threaded, writer set end reached on reader wait",
-		endRead);
-	caller->addThread("RD #1", &MemoryRingIOTest::BusyReaderTest);
-	caller->addThread("RD #2", &MemoryRingIOTest::BusyReaderTest);
-	caller->addThread("RD #3", &MemoryRingIOTest::BusyReaderTest);
-	caller->addThread("WR", &MemoryRingIOTest::_DisableWriteOnEmptyBuffer);
-	suite->addTest(caller);
-
-	MemoryRingIOTest* single = new MemoryRingIOTest(0);
-	suite->addTest(new CppUnit::TestCaller<MemoryRingIOTest>(
-		"MemoryRingIOTest: RW single threaded with resizing",
-		&MemoryRingIOTest::ReadWriteSingleTest, single));
-	suite->addTest(new CppUnit::TestCaller<MemoryRingIOTest>(
-		"MemoryRingIOTest: Attempt to truncate buffer",
-		&MemoryRingIOTest::InvalidResizeTest, single));
-	suite->addTest(new CppUnit::TestCaller<MemoryRingIOTest>(
-		"MemoryRingIOTest: Wait timeout",
-		&MemoryRingIOTest::TimeoutTest, single));
-
-	return suite;
-}
-
-
 static void
 ReadCheck(BMemoryRingIO& ring, const void* cmp, size_t size)
 {
@@ -220,4 +159,65 @@ MemoryRingIOTest::_DisableWriteOnEmptyBuffer()
 	snooze(1000);
 	/* this should unblock the other thread */
 	fRing.SetWriteDisabled(true);
+}
+
+
+/* static */ void
+MemoryRingIOTest::AddTests(BTestSuite& parent) {
+	CppUnit::TestSuite* suite = new CppUnit::TestSuite("MemoryRingIOTest");
+	BThreadedTestCaller<MemoryRingIOTest>* caller;
+
+	MemoryRingIOTest* big = new MemoryRingIOTest(sizeof(BIG_PAYLOAD));
+	caller = new BThreadedTestCaller<MemoryRingIOTest>(
+		"MemoryRingIOTest: RW threaded, big buffer", big);
+	caller->addThread("WR", &MemoryRingIOTest::WriteTest);
+	caller->addThread("RD", &MemoryRingIOTest::ReadTest);
+	suite->addTest(caller);
+
+	MemoryRingIOTest* full = new MemoryRingIOTest(sizeof(FULL_PAYLOAD));
+	caller = new BThreadedTestCaller<MemoryRingIOTest>(
+		"MemoryRingIOTest: RW threaded, medium buffer", full);
+	caller->addThread("WR", &MemoryRingIOTest::WriteTest);
+	caller->addThread("RD", &MemoryRingIOTest::ReadTest);
+	suite->addTest(caller);
+
+	MemoryRingIOTest* small = new MemoryRingIOTest(sizeof(SMALL_PAYLOAD));
+	caller = new BThreadedTestCaller<MemoryRingIOTest>(
+		"MemoryRingIOTest: RW threaded, small buffer", small);
+	caller->addThread("WR", &MemoryRingIOTest::WriteTest);
+	caller->addThread("RD", &MemoryRingIOTest::ReadTest);
+	suite->addTest(caller);
+
+	MemoryRingIOTest* endWrite = new MemoryRingIOTest(sizeof(FULL_PAYLOAD));
+	caller = new BThreadedTestCaller<MemoryRingIOTest>(
+		"MemoryRingIOTest: RW threaded, reader set end reached on writer wait",
+		endWrite);
+	caller->addThread("WR #1", &MemoryRingIOTest::BusyWriterTest);
+	caller->addThread("WR #2", &MemoryRingIOTest::BusyWriterTest);
+	caller->addThread("WR #3", &MemoryRingIOTest::BusyWriterTest);
+	caller->addThread("RD", &MemoryRingIOTest::_DisableWriteOnFullBuffer);
+	suite->addTest(caller);
+
+	MemoryRingIOTest* endRead = new MemoryRingIOTest(sizeof(FULL_PAYLOAD));
+	caller = new BThreadedTestCaller<MemoryRingIOTest>(
+		"MemoryRingIOTest: RW threaded, writer set end reached on reader wait",
+		endRead);
+	caller->addThread("RD #1", &MemoryRingIOTest::BusyReaderTest);
+	caller->addThread("RD #2", &MemoryRingIOTest::BusyReaderTest);
+	caller->addThread("RD #3", &MemoryRingIOTest::BusyReaderTest);
+	caller->addThread("WR", &MemoryRingIOTest::_DisableWriteOnEmptyBuffer);
+	suite->addTest(caller);
+
+	MemoryRingIOTest* single = new MemoryRingIOTest(0);
+	suite->addTest(new CppUnit::TestCaller<MemoryRingIOTest>(
+		"MemoryRingIOTest: RW single threaded with resizing",
+		&MemoryRingIOTest::ReadWriteSingleTest, single));
+	suite->addTest(new CppUnit::TestCaller<MemoryRingIOTest>(
+		"MemoryRingIOTest: Attempt to truncate buffer",
+		&MemoryRingIOTest::InvalidResizeTest, single));
+	suite->addTest(new CppUnit::TestCaller<MemoryRingIOTest>(
+		"MemoryRingIOTest: Wait timeout",
+		&MemoryRingIOTest::TimeoutTest, single));
+
+	parent.addTest("MemoryRingIOTest", suite);
 }
