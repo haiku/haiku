@@ -105,6 +105,9 @@ usb_hid_device_added(usb_device device, void **cookie)
 	int32 parentCookie = atomic_add(&sParentCookie, 1);
 	for (size_t i = 0; i < config->interface_count; i++) {
 		const usb_interface_info *interface = config->interface[i].active;
+		if (interface == NULL || interface->descr == NULL)
+			continue;
+
 		uint8 interfaceClass = interface->descr->interface_class;
 		TRACE("interface %" B_PRIuSIZE ": class: %u; subclass: %u; protocol: "
 			"%u\n",	i, interfaceClass, interface->descr->interface_subclass,

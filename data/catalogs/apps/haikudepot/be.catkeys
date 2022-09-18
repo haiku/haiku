@@ -1,28 +1,28 @@
 1	belarusian	x-vnd.Haiku-HaikuDepot	2848065911
-Uninstalled	PackageListView		Выдаленныя
 Rate package…	PackageInfoView		Ацаніць пакунак…
-<no info>	PackageInfoView		<няма інфармацыі>
-No user ratings available.	PackageInfoView		Рэйтынг карыстальнікаў не існуе
-Rating	PackageListView		Рэйтынг
 Active	PackageListView		Актыўны
-Ratings	PackageInfoView		Рэйтынг
 Name	PackageListView		Імя
 No changelog available.	PackageInfoView		Спіс змен не існуе
 Available	PackageListView		Даступна
 Click a package to view information	PackageInfoView		Клікніце пакет каб пабачыць інфарамацыю пра яго
-Close	PackageManager		Закрыць
-Changelog	PackageInfoView		Гісторыя зменаў
-About	PackageInfoView		Пра Праграму
 Send	RatePackageWindow		Даслаць
-Inactive	PackageListView		Неактыўны
-Downloading:	PackageInfoView		Спампоўваецца:
-(%Votes%)	PackageInfoView		(%Votes%)
-Close	UserLoginWindow		Закрыць
 Close	RatePackageWindow		Закрыць
+Close	UserLoginWindow		Закрыць
 n/a	PackageInfoView		н/н
 Status	PackageListView		Стан
 Unknown	PackageListView		Невядомы
-HaikuDepot	System name		HaikuDepot
-Search terms:	FilterView		Умовы пошуку:
 Pending…	PackageListView		Чакае…
+Search terms:	FilterView		Умовы пошуку:
+Uninstalled	PackageListView		Выдаленныя
+No user ratings available.	PackageInfoView		Рэйтынг карыстальнікаў не існуе
+<no info>	PackageInfoView		<няма інфармацыі>
+Rating	PackageListView		Рэйтынг
+Ratings	PackageInfoView		Рэйтынг
+Close	PackageManager		Закрыць
+Changelog	PackageInfoView		Гісторыя зменаў
+About	PackageInfoView		Пра Праграму
+Inactive	PackageListView		Неактыўны
+Downloading:	PackageInfoView		Спампоўваецца:
+(%Votes%)	PackageInfoView		(%Votes%)
+HaikuDepot	System name		HaikuDepot
 Description	PackageListView		Апісанне

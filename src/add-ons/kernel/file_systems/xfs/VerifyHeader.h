@@ -34,12 +34,15 @@ bool VerifyHeader(T* header, char* buffer, Inode* inode,
 		return false;
 	}
 
-	uint64 actualBlockToRead = inode->FileSystemBlockToAddr(map->br_startblock
-		+ howManyBlocksFurther) / XFS_MIN_BLOCKSIZE;
+	// For Block header we pass NULL
+	if(map != NULL) {
+		uint64 actualBlockToRead = inode->FileSystemBlockToAddr(map->br_startblock
+			+ howManyBlocksFurther) / XFS_MIN_BLOCKSIZE;
 
-	if (actualBlockToRead != header->Blockno()) {
-		ERROR("Wrong Block number");
-		return false;
+		if (actualBlockToRead != header->Blockno()) {
+			ERROR("Wrong Block number");
+			return false;
+		}
 	}
 
 	if (!inode->GetVolume()->UuidEquals(header->Uuid())) {
@@ -51,7 +54,6 @@ bool VerifyHeader(T* header, char* buffer, Inode* inode,
 		ERROR("Wrong data owner");
 		return false;
 	}
-	// TODO : Can we use it for Block Header as well?
 
 	return true;
 }

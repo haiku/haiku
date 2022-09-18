@@ -303,8 +303,7 @@ public:
 	void AddRemovePoseFromSelection(BPose* pose, int32 index,
 		bool select);
 
-	BLooper* SelectionHandler();
-	void SetSelectionHandler(BLooper*);
+	void SetSelectionHandler(BLooper* looper);
 
 	BObjectList<BString>*MimeTypesInSelection();
 
@@ -397,7 +396,6 @@ public:
 	void HideBarberPole();
 
 	bool fShowSelectionWhenInactive;
-	bool fTransparentSelection;
 	bool fIsDrawingSelectionRect;
 
 	bool IsWatchingDateFormatChange();
@@ -707,13 +705,28 @@ protected:
 	};
 
 protected:
+	BViewState* fViewState;
+	bool fStateNeedsSaving;
+
+	bool fSavePoseLocations : 1;
+	bool fMultipleSelection : 1;
+	bool fDragEnabled : 1;
+	bool fDropEnabled : 1;
+
+	BLooper* fSelectionHandler;
+
+	std::set<thread_id> fAddPosesThreads;
+	PoseList* fPoseList;
+
+	PendingNodeMonitorCache pendingNodeMonitorCache;
+
+private:
 	TScrollBar* fHScrollBar;
 	BScrollBar* fVScrollBar;
 	Model* fModel;
 	BPose* fActivePose;
 	BRect fExtent;
 	// the following should probably be just member lists, not pointers
-	PoseList* fPoseList;
 	PoseList* fFilteredPoseList;
 	PoseList* fVSPoseList;
 	PoseList* fSelectionList;
@@ -721,20 +734,16 @@ protected:
 	BObjectList<BString> fMimeTypesInSelectionCache;
 		// used for mime string based icon highliting during a drag
 	BObjectList<Model>* fZombieList;
-	PendingNodeMonitorCache pendingNodeMonitorCache;
 	BObjectList<BColumn>* fColumnList;
 	BObjectList<BString>* fMimeTypeList;
 	BObjectList<Model>* fBrokenLinks;
 	bool fMimeTypeListIsDirty;
-	BViewState* fViewState;
-	bool fStateNeedsSaving;
 	BCountView* fCountView;
 	float fListElemHeight;
 	float fListOffset;
 	float fIconPoseHeight;
 	BPose* fDropTarget;
 	BPose* fAlreadySelectedDropTarget;
-	BLooper* fSelectionHandler;
 	BPoint fLastClickPoint;
 	int32 fLastClickButtons;
 	const BPose* fLastClickedPose;
@@ -747,7 +756,6 @@ protected:
 	BPoint fHintLocation;
 	float fAutoScrollInc;
 	int32 fAutoScrollState;
-	std::set<thread_id> fAddPosesThreads;
 	bool fWidgetTextOutline;
 	const BPose* fSelectionPivotPose;
 	const BPose* fRealPivotPose;
@@ -773,15 +781,12 @@ protected:
 	SelectionRectInfo fSelectionRectInfo;
 
 	bool fSelectionVisible : 1;
-	bool fMultipleSelection : 1;
-	bool fDragEnabled : 1;
-	bool fDropEnabled : 1;
 	bool fSelectionRectEnabled : 1;
+	bool fTransparentSelection : 1;
 	bool fAlwaysAutoPlace : 1;
 	bool fAllowPoseEditing : 1;
 	bool fSelectionChangedHook : 1;
 		// get rid of this
-	bool fSavePoseLocations : 1;
 	bool fShowHideSelection : 1;
 	bool fOkToMapIcons : 1;
 	bool fEnsurePosesVisible : 1;

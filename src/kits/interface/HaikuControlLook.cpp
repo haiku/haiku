@@ -3006,6 +3006,7 @@ HaikuControlLook::_DrawNonFlatButtonBackground(BView* view, BRect& rect,
 	view->FillRect(rect, fillGradient);
 }
 
+
 void
 HaikuControlLook::_DrawPopUpMarker(BView* view, const BRect& rect,
 	const rgb_color& base, uint32 flags)
@@ -3071,7 +3072,10 @@ HaikuControlLook::_DrawMenuFieldBackgroundOutside(BView* view, BRect& rect,
 			floorf(rightRect.top - spacing));
 		BPoint leftBottomCorner(floorf(rightRect.left - spacing),
 			floorf(rightRect.bottom + spacing));
-		view->StrokeLine(leftTopCorner, leftBottomCorner);
+		for (float i = 0; i < spacing; i++) {
+			view->StrokeLine(leftTopCorner + BPoint(i, 0),
+				leftBottomCorner + BPoint(i, 0));
+		}
 
 		rect = leftRect;
 	} else {

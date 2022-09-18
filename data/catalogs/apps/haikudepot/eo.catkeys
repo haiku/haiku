@@ -1,171 +1,171 @@
 1	esperanto	x-vnd.Haiku-HaikuDepot	2265987377
+Available packages	MainWindow		Disponeblaj pakaĵoj
+It was not possible to create the new user.	UserLoginWindow		Krei la novan uzanton ne estis ebla.
+Create account	UserLoginWindow		Krei konton
+The response to the captcha was incorrect.	ServerHelper		La respondo al la kapĉo estis malĝusta.
+Rate package…	PackageInfoView		Taksi pakaĵon…
+You have successfully authenticated as user %Nickname%.	UserLoginWindow		Vi sukcese aŭtentigis kiel uzanto %Nickname%.
+It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Ne povis eltiri necesan kapĉan informon el la datuma bloko kiu estis sendita el la servilo.
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Eraro okazis dum akirado de la listo de pakaĵoj: %message%
+Active	PackageListView		Aktiva
+Login or Create account	MainWindow		Ensaluti aŭ Krei konton
+Switch account…	MainWindow		Ŝanĝi konton…
+Preferred language:	UserLoginWindow		Preferata lingvo:
+Name	PackageListView		Nomo
+Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Rajtiga aŭ sekureca problemo. Elsalutu kaj reensalutu por kontroli, ke via pasvorto estas ĝusta, kaj ankaŭ kontrolu, ke vi konsentis la plejnovajn uzkondiĉojn.
+Rate %Package%	RatePackageWindow		Taksi %Package%
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Eraro okazis dum pravalorizado de la pakaĵa administrilo: %message%
+Quit HaikuDepot	App		Forlasi HaikuTenejon
+Category	FilterView		Kategorio
+A response to the captcha question must be provided.	UserLoginWindow		Respondo al la kapĉa demando estas bezonata.
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Neatendita eraro '%Message%' okazis kun atributo '%Property%'
+A requested object or an object involved in the request was not found on the server.	ServerHelper		Petita objekto aŭ objekto de la peto ne troviĝis en la servilo.
+No changelog available.	PackageInfoView		Ŝanĝoprotokolo ne estas disponebla.
+Version	PackageListView		Versio
+No, quit HaikuDepot	App		Ne, ĉesi HaikuTenejon
+Not logged in	MainWindow		Ne ensalutita
+Featured packages	FeaturedPackagesView		Elstarigitaj pakaĵoj
+Available	PackageListView		Disponebla
+Click a package to view information	PackageInfoView		Alklaku pakaĵon por vidi informon
+Cancel	UserLoginWindow		Nuligi
+Rating not possible	MainWindow		Taksado ne eblas
+Package update error	MainWindow		Pakaĵa ĝisdatigado eraro
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procezo} other{# procezoj}}
+Reboot required	PackageManager		Restartigo estas deviga
+All packages	PackageListView		Ĉiuj pakaĵoj
+Send	RatePackageWindow		Sendi
+Start package daemon	App		Ekruli pakaĵan demonon
+There are problems in the supplied data:	UserLoginWindow		Estas problemoj en la donitaj datumoj:
+Usage conditions download problem	UserLoginWindow		Problemo pri elŝuti uzkondiĉojn
+Package daemon problem	App		Pakaĵa demona problemo
+No	MainWindow		Ne
+Repository	PackageListView		Deponejo
+Close	RatePackageWindow		Forlasi
+Close	UserLoginWindow		Forlasi
+The email is malformed.	UserLoginWindow		La retpoŝtadreso estas misformita.
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sinkronigado de pakaĵa datumo por la deponejo '%REPO_NAME%'
+View the usage conditions	UserLoginWindow		Vidi la kondiĉojn de uzado
+Size	PackageListView		Grandeco
+Your rating was updated.	RatePackageWindow		Via takso estis ĝisdatigita
+All categories	FilterView		Ĉiaj kategorioj
+n/a	PackageInfoView		Neaplikebla
+Cancel	MainWindow		Nuligi
+Refresh repositories	MainWindow		Aktualigi deponejojn
+Continue	App		Daŭrigi
+A password is required.	UserLoginWindow		Pasvorto estas deviga.
+Language	RatePackageWindow		Lingvo
+Status	PackageListView		Stato
+Network transport error	ServerHelper		Eraro de reta transporto
+Update	RatePackageWindow		Ĝisdatigi
+Language	UserLoginWindow		Lingvo
+OK	UserLoginWindow		Bone
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Sinkronigas referencdatumojn el servilo
+Stability:	RatePackageWindow		Stabileco:
+The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		La uza interkonsento devas esti alkonsentita, kun konfirmo, ke la persono faranta la uzanton plenumas la minimuman aĝan postulon.
+Source packages	MainWindow		Fontaj pakaĵoj
+Problem with working files	App		Problemo kun kurantaj dosieroj
+Try again	App		Provi denove
+Unknown	PackageListView		Nekonata
+I agree to the usage conditions	UserLoginWindow		Mi konsentas la kondiĉojn de uzado
+Logged in as %User%	MainWindow		Ensalutis kiel %User%
+A reboot is necessary to complete the installation process.	PackageManager		Restartigo estas necesa por kompletigi la instalon.
+Yes	MainWindow		Jes
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Mi havas malpleje unu jaron}other{Mi havas # jarojn aŭ pli}}
+Pending…	PackageListView		Pritraktata…
+Search terms:	FilterView		Serĉvortoj:
+Quit	App		Forlasi
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		La kromnomo estas misformita. La kromnomo devus enhavi nur ciferojn kaj minusklojn latinajn. La kromnomo devas esti inter kvar kaj dek ses signoj longe.
+Authentication failed	UserLoginWindow		Aŭtentigo malsukcesis
+Captcha error	UserLoginWindow		Kapĉa eraro
+Manage repositories…	MainWindow		Administri deponejojn…
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		La kromnomo devas esti unika, sed la donita kromnomo jam estas posedita. Elektu alian kromnomon.
+Open %DeskbarLink%	PackageManager		Uzi %DeskbarLink%-on
+Input validation	UserLoginWindow		Validigo de enigo
+Log in…	MainWindow		Ensaluti…
+Client version too old	ServerHelper		Versio de kliento estas tro maljuna
+Local repository load error	LocalPkgDataLoadProcess		Eraro dum ŝargado de loka deponejo
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		La uzanto ne ekzistas aŭ la malĝusta pasvorto estis donita. Kontroli viajn ensalutilojn kaj provu denove.
+All repositories	MainWindow		Ĉiuj deponejoj
 Repository update error	LocalRepositoryUpdateProcess		Eraro dum ĝisdatigo de deponejo
 Network error	ServerHelper		Eraro de reto
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Eraro okazis dum aktualigo de la deponejo: %error%
 User Created	UserLoginWindow		Kreis Uzanton
 Check for updates…	MainWindow		Kontroli ĝisdatigojn…
 Uninstalled	PackageListView		Malinstalita
-It was not possible to create the new user.	UserLoginWindow		Krei la novan uzanton ne estis ebla.
-Available packages	MainWindow		Disponeblaj pakaĵoj
-Create account	UserLoginWindow		Krei konton
 OK	App		Bone
-The response to the captcha was incorrect.	ServerHelper		La respondo al la kapĉo estis malĝusta.
 Develop packages	MainWindow		Programistaj pakaĵoj
-Rate package…	PackageInfoView		Taksi pakaĵon…
 Starting the package daemon failed:\n\n%Error%	App		Ekrulado de la pakaĵa demono malsukcesis:\n\n%Error%
-You have successfully authenticated as user %Nickname%.	UserLoginWindow		Vi sukcese aŭtentigis kiel uzanto %Nickname%.
-<no info>	PackageInfoView		<ne estas informo>
 No user ratings available.	PackageInfoView		Uzantaj taksoj ne estas disponeblaj
-It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Ne povis eltiri necesan kapĉan informon el la datuma bloko kiu estis sendita el la servilo.
-A network transport error has arisen communicating with the server system: %s	ServerHelper		Eraro de reta transporto dum konversacio kun servilo: %s
+<no info>	PackageInfoView		<ne estas informo>
 Rating	PackageListView		Takso
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Eraro de reta transporto dum konversacio kun servilo: %s
 Synchronizing icons	ServerIconExportUpdateProcess		Sinkronigas piktogramojn
 Show	MainWindow		Montri
-An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Eraro okazis dum akirado de la listo de pakaĵoj: %message%
 Settings…	MainWindow		Agordo…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Ĉi tiu programo konservas kaj prenas laborajn dosierojn je via komputilo por funkcii. Ŝajnas, ke okazis problemoj skribante provizoran dosieron en [%TestFilePath%]-on. Kontrolu, ke forestas problemoj de via disko aŭ permesoj, kiuj povus malhelpi al ĉi programo skribi en tiu loko. Vi rajtas malatenti ĉi problemon kaj malgraŭe daŭri, sed iuj kapabloj povas malŝaltiĝi.
-Active	PackageListView		Aktiva
-Login or Create account	MainWindow		Ensaluti aŭ Krei konton
 <Package contents not available for remote packages>	PackageContentsView		<Pakaĵa enhavo ne estas disponebla por foraj pakaĵoj>
 Ratings	PackageInfoView		Taksoj
-Switch account…	MainWindow		Ŝanĝi konton…
-Preferred language:	UserLoginWindow		Preferata lingvo:
-Name	PackageListView		Nomo
-Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Rajtiga aŭ sekureca problemo. Elsalutu kaj reensalutu por kontroli, ke via pasvorto estas ĝusta, kaj ankaŭ kontrolu, ke vi konsentis la plejnovajn uzkondiĉojn.
 Local	LocalPkgDataLoadProcess		Loka
-Rate %Package%	RatePackageWindow		Taksi %Package%
-An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Eraro okazis dum pravalorizado de la pakaĵa administrilo: %message%
-Quit HaikuDepot	App		Forlasi HaikuTenejon
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Ĉu vi permesas sendi anoniman informon pri uzado al la servilo de HaikuTenejo de ĉi tiu komputilo? Vi povas ŝanĝi vian agordon per la fenestro \"Agordo\" poste.
-An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Neatendita eraro '%Message%' okazis kun atributo '%Property%'
-A response to the captcha question must be provided.	UserLoginWindow		Respondo al la kapĉa demando estas bezonata.
-Category	FilterView		Kategorio
 User rating	RatePackageWindow		Uzanta takso
 Installed packages	MainWindow		Instalitaj pakaĵoj
-A requested object or an object involved in the request was not found on the server.	ServerHelper		Petita objekto aŭ objekto de la peto ne troviĝis en la servilo.
-No changelog available.	PackageInfoView		Ŝanĝoprotokolo ne estas disponebla.
 Error	App		Eraro
 There was a puzzling response from the web service.	UserLoginWindow		Estis stranga respondo el la reta servo.
-Version	PackageListView		Versio
-Not logged in	MainWindow		Ne ensalutita
-No, quit HaikuDepot	App		Ne, ĉesi HaikuTenejon
-Featured packages	FeaturedPackagesView		Elstarigitaj pakaĵoj
-The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La donita respondo al la kapĉo estas malĝusta. Nova kapĉo estos kreita; provu denove.
-It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Ne eblis komuniki kun la servilo por akiri defibildon bezonatan por krei novan uzanton.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Via takso alŝutiĝis sukcese. Vi povas aktualigi aŭ viŝi ĝin per la retpaĝo de HaikuTeneja Servilo.
-Available	PackageListView		Disponebla
-Cancel	UserLoginWindow		Nuligi
+It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Ne eblis komuniki kun la servilo por akiri defibildon bezonatan por krei novan uzanton.
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La donita respondo al la kapĉo estas malĝusta. Nova kapĉo estos kreita; provu denove.
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuTenejo bezonas la pakaĵan demonon por funkcii, kaj ĝi ne ŝajnas aktive.\nĈu vi volas ŝalti ĝin nun?
-Click a package to view information	PackageInfoView		Alklaku pakaĵon por vidi informon
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		La pasvorto bezonas almenaŭ ok signojn, inkluzivi almenaŭ du ciferojn kaj unu majusklon.
-Share anonymous usage data with HaikuDepotServer	SettingsWindow		Konigi anoniman informon pri uzado kun servilo de HaikuTenejo
 Contents	PackageInfoView		Enhavo
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Konigi anoniman informon pri uzado kun servilo de HaikuTenejo
 Close	PackageManager		Fermi
 Changelog	PackageInfoView		Ŝanĝoprotokolo
-Rating not possible	MainWindow		Taksado ne eblas
-Package update error	MainWindow		Pakaĵa ĝisdatigado eraro
 About	PackageInfoView		Pri
-%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procezo} other{# procezoj}}
-Reboot required	PackageManager		Restartigo estas deviga
 Password:	UserLoginWindow		Pasvorto:
-All packages	PackageListView		Ĉiuj pakaĵoj
-This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		La programo estas tro malnova por komuniki kun la servilo. Akiru pli novan version de la programo per ĝisdatigo de via sistemo. La minimuma necesa versio de la programo estas \"%s\".
 Stability	RatePackageWindow		Stabileco
-Send	RatePackageWindow		Sendi
-Start package daemon	App		Ekruli pakaĵan demonon
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		La programo estas tro malnova por komuniki kun la servilo. Akiru pli novan version de la programo per ĝisdatigo de via sistemo. La minimuma necesa versio de la programo estas \"%s\".
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		La pasvorto devas esti ripetiĝita pro averti pasvortajn mistajpojn.
 Cancel	SettingsWindow		Nuligi
 Cancel	RatePackageWindow		Nuligi
 Inactive	PackageListView		Neaktiva
 Nickname:	UserLoginWindow		Kromnomo:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Sinkronigado de metadatumo pri deponejoj
-There are problems in the supplied data:	UserLoginWindow		Estas problemoj en la donitaj datumoj:
 OK	MainWindow		Bone
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# ero} other{# eroj}}
-Usage conditions download problem	UserLoginWindow		Problemo pri elŝuti uzkondiĉojn
 Downloading:	PackageInfoView		Elŝutas:
 Quit	MainWindow		Ĉesi
 Success	UserLoginWindow		Sukceso
-No	MainWindow		Ne
-Package daemon problem	App		Pakaĵa demona problemo
 (%Votes%)	PackageInfoView		(%Votes%)
-Repository	PackageListView		Deponejo
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versio %hd.version%)
-The email is malformed.	UserLoginWindow		La retpoŝtadreso estas misformita.
-Close	UserLoginWindow		Forlasi
-Close	RatePackageWindow		Forlasi
-Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sinkronigado de pakaĵa datumo por la deponejo '%REPO_NAME%'
 Settings	SettingsWindow		Agordo
-View the usage conditions	UserLoginWindow		Vidi la kondiĉojn de uzado
 Login issue	MainWindow		Ensaluta eraro
 Your rating:	RatePackageWindow		Via takso:
-Size	PackageListView		Grandeco
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		La uzanto %Nickname% fariĝis sukcese en la sistemo de HaikuTenejoServilo. Vi povas administri viajn uzantajn informojn per la reta interfaco. Vi nun estas ensalutinta laŭ ĉi tiu uzanto.
-Your rating was updated.	RatePackageWindow		Via takso estis ĝisdatigita
-All categories	FilterView		Ĉiaj kategorioj
 Repositories	MainWindow		Deponejoj
-n/a	PackageInfoView		Neaplikebla
 This rating is visible to other users	RatePackageWindow		Ĉi tiu takso estas videbla al aliaj uzantoj
 View agreed usage conditions…	MainWindow		Vidi konsentitajn uzkondiĉojn…
-Cancel	MainWindow		Nuligi
-Refresh repositories	MainWindow		Aktualigi deponejojn
-Continue	App		Daŭrigi
-A password is required.	UserLoginWindow		Pasvorto estas deviga.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Ĉi tiu pakaĵo ne ŝajnas esti en la HaikuTeneja Servilo, do krei novan takson aŭ redakti ekzistantan tenejon ne estas ebla.
 Apply	SettingsWindow		Apliki
-Language	RatePackageWindow		Lingvo
 Log out	MainWindow		Elsaluti
 Comment language:	RatePackageWindow		Komenta lingvo:
-Status	PackageListView		Stato
 The password has been incorrectly repeated.	UserLoginWindow		La pasvorto malĝuste estis ripetita.
-Network transport error	ServerHelper		Eraro de reta transporto
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		La pasvorton, kiu antaŭe estis donita por la uzanto [%Nickname%], ne plu estas valida. La uzanto estos elsalutita de ĉi tiu programo kaj vi denove devus ensaluti per via ĝisdatigita pasvorto.
-Update	RatePackageWindow		Ĝisdatigi
 OK	ServerHelper		Bone
-Language	UserLoginWindow		Lingvo
-OK	UserLoginWindow		Bone
 Reading repository data	LocalPkgDataLoadProcess		Legado de deponeja datumo
-Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Sinkronigas referencdatumojn el servilo
-Stability:	RatePackageWindow		Stabileco:
-The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		La uza interkonsento devas esti alkonsentita, kun konfirmo, ke la persono faranta la uzanton plenumas la minimuman aĝan postulon.
 A validation error has occurred	ServerHelper		Valideca eraro okazis
 The nickname is required.	UserLoginWindow		La kromnomo estas deviga.
-Source packages	MainWindow		Fontaj pakaĵoj
 -	no package size		-
-Problem with working files	App		Problemo kun kurantaj dosieroj
-Server error	ServerHelper		Eraro de servilo
 Rate package	RatePackageWindow		Taksi pakaĵon
-Try again	App		Provi denove
-Unknown	PackageListView		Nekonata
-I agree to the usage conditions	UserLoginWindow		Mi konsentas la kondiĉojn de uzado
-Log in	UserLoginWindow		Ensaluti
+Server error	ServerHelper		Eraro de servilo
 Sending anonymous usage data	MainWindow		Sendi anoniman informon pri uzado
-Logged in as %User%	MainWindow		Ensalutis kiel %User%
-Email address:	UserLoginWindow		Retpoŝtadreso:
-Screenshot	ScreenshotWindow		Ekrankopio
+Log in	UserLoginWindow		Ensaluti
 HaikuDepot	System name		HaikuTenejo
-A reboot is necessary to complete the installation process.	PackageManager		Restartigo estas necesa por kompletigi la instalon.
-Yes	MainWindow		Jes
-{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Mi havas malpleje unu jaron}other{Mi havas # jarojn aŭ pli}}
+Screenshot	ScreenshotWindow		Ekrankopio
+Email address:	UserLoginWindow		Retpoŝtadreso:
 View latest usage conditions…	MainWindow		Vidi plej novan kondiĉojn de uzado…
-Quit	App		Forlasi
-Search terms:	FilterView		Serĉvortoj:
-Pending…	PackageListView		Pritraktata…
-The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		La kromnomo estas misformita. La kromnomo devus enhavi nur ciferojn kaj minusklojn latinajn. La kromnomo devas esti inter kvar kaj dek ses signoj longe.
 Category:	FilterView		Kategorio:
-Authentication failed	UserLoginWindow		Aŭtentigo malsukcesis
-Captcha error	UserLoginWindow		Kapĉa eraro
-The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		La kromnomo devas esti unika, sed la donita kromnomo jam estas posedita. Elektu alian kromnomon.
-Manage repositories…	MainWindow		Administri deponejojn…
 Fetching remote repository data	LocalRepositoryUpdateProcess		Elŝutado de fora deponeja datumo
 Description	PackageListView		Priskribo
-Open %DeskbarLink%	PackageManager		Uzi %DeskbarLink%-on
 User creation error	UserLoginWindow		Uzanta kreada eraro
-Input validation	UserLoginWindow		Validigo de enigo
-Log in…	MainWindow		Ensaluti…
 You need to be logged into an account before you can rate packages.	MainWindow		Vi devas esti ensalutita per konto antaŭ vi povas taksi pakaĵojn.
-Client version too old	ServerHelper		Versio de kliento estas tro maljuna
-Local repository load error	LocalPkgDataLoadProcess		Eraro dum ŝargado de loka deponejo
-The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		La uzanto ne ekzistas aŭ la malĝusta pasvorto estis donita. Kontroli viajn ensalutilojn kaj provu denove.
 Repeat password:	UserLoginWindow		Ripeti pasvorton:
-All repositories	MainWindow		Ĉiuj deponejoj

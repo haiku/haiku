@@ -13,6 +13,7 @@ ShortDirectory::ShortDirectory(Inode* inode)
 	fTrack(0)
 {
 	fHeader = (ShortFormHeader*)(DIR_DFORK_PTR(fInode->Buffer(), fInode->CoreInodeSize()));
+	fLastEntryOffset = 0;
 }
 
 

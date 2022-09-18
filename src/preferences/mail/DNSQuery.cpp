@@ -170,7 +170,7 @@ DNSTools::GetDNSServers(BObjectList<BString>* serverList)
 
 	path.Append("network/resolv.conf");
 
-	register FILE* fp = fopen(path.Path(), "r");
+	FILE* fp = fopen(path.Path(), "r");
 	if (fp == NULL) {
 		fprintf(stderr, "failed to open '%s' to read nameservers: %s\n",
 			path.Path(), strerror(errno));
@@ -179,8 +179,7 @@ DNSTools::GetDNSServers(BObjectList<BString>* serverList)
 
 	int nserv = 0;
 	char buf[1024];
-	register char *cp; //, **pp;
-//	register int n;
+	char *cp; //, **pp;
 	int MAXNS = 2;
 
 	// read the config file

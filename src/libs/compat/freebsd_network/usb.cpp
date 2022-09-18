@@ -89,7 +89,13 @@ get_next_usb_device(uint32* cookie, freebsd_usb_device* result)
 	result->endpoints_max = 0;
 	for (size_t i = 0; i < config->interface_count; i++) {
 		usb_interface_info* iface = config->interface[i].active;
+		if (iface == NULL)
+			continue;
+
 		for (size_t j = 0; j < iface->endpoint_count; j++) {
+			if (iface->endpoint[j].descr == NULL)
+				continue;
+
 			const int rep = result->endpoints_max++;
 			result->endpoints[rep].iface_index = i;
 

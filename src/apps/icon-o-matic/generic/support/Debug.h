@@ -98,9 +98,9 @@ void dbg_printf_end();
 #endif
 
 #define DEBUG_THREAD	find_thread(NULL)
-#define DEBUG_CONTEXT(x)	{ dbg_printf_begin(); __out(DEBUG_APP " [%Ld: %5ld] ", system_time(), DEBUG_THREAD); x; dbg_printf_end(); }
-#define DEBUG_CONTEXT_FUNCTION(prefix, x)	{ dbg_printf_begin(); __out(DEBUG_APP " [%Ld: %5ld] %s()" prefix, system_time(), DEBUG_THREAD, __FUNCTION__); x; dbg_printf_end(); }
-#define DEBUG_CONTEXT_LINE(x)	{ dbg_printf_begin(); __out(DEBUG_APP " [%Ld: %5ld] %s():%d: ", system_time(), DEBUG_THREAD, __FUNCTION__, __LINE__); x; dbg_printf_end(); }
+#define DEBUG_CONTEXT(x)	{ dbg_printf_begin(); __out(DEBUG_APP ": [%Ld: %5ld] ", system_time(), DEBUG_THREAD); x; dbg_printf_end(); }
+#define DEBUG_CONTEXT_FUNCTION(prefix, x)	{ dbg_printf_begin(); __out(DEBUG_APP ": [%Ld: %5ld] %s()" prefix, system_time(), DEBUG_THREAD, __FUNCTION__); x; dbg_printf_end(); }
+#define DEBUG_CONTEXT_LINE(x)	{ dbg_printf_begin(); __out(DEBUG_APP ": [%Ld: %5ld] %s():%d: ", system_time(), DEBUG_THREAD, __FUNCTION__, __LINE__); x; dbg_printf_end(); }
 
 #define TPRINT(x) DEBUG_CONTEXT( __out x )
 #define TREPORT_ERROR(status) DEBUG_CONTEXT_LINE( __out("%s\n", strerror(status)) )

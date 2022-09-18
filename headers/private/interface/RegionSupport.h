@@ -111,7 +111,7 @@ class BRegion::Support {
 		BRegion* pReg,
 		clipping_rect* r1,
 		clipping_rect* r1End,
-		register clipping_rect* r2,
+		clipping_rect* r2,
 		clipping_rect* r2End,
 		int top,
 		int bottom);
@@ -126,26 +126,26 @@ class BRegion::Support {
 	static	void				miRegionOp(BRegion* newReg,
 									const BRegion* reg1, const BRegion* reg2,
     int (*overlapFunc)(
-        register BRegion*     pReg,
-        register clipping_rect*     r1,
+        BRegion*     pReg,
+        clipping_rect*     r1,
         clipping_rect*              r1End,
-        register clipping_rect*     r2,
+        clipping_rect*     r2,
         clipping_rect*              r2End,
         int               top,
         int               bottom),
     int (*nonOverlap1Func)(
-        register BRegion*     pReg,
-        register clipping_rect*     r,
+        BRegion*     pReg,
+        clipping_rect*     r,
         clipping_rect*              rEnd,
-        register int      top,
-        register int      bottom),
+        int      top,
+        int      bottom),
 
     int (*nonOverlap2Func)(
-        register BRegion*     pReg,
-        register clipping_rect*     r,
+        BRegion*     pReg,
+        clipping_rect*     r,
         clipping_rect*              rEnd,
-        register int      top,
-        register int      bottom));
+        int      top,
+        int      bottom));
 
 };
 

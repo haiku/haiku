@@ -113,6 +113,12 @@ struct fuse_file_info {
 #define FUSE_CAP_FLOCK_LOCKS	(1 << 10)
 #define FUSE_CAP_IOCTL_DIR	(1 << 11)
 
+/* Indicate support for Haiku-specific extensions in struct fuse_operations and fuse_ll_ops */
+#define FUSE_CAP_HAIKU_FUSE_EXTENSIONS	(1 << 31)
+
+#define FUSE_HAIKU_GET_DRIVE_INFO (((uint32_t)'H' << 24) | ((uint32_t)'G' << 16) \
+	| ((uint32_t)'D' << 8) | (uint32_t)'I')
+
 /**
  * Ioctl flags
  *

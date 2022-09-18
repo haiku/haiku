@@ -1,178 +1,178 @@
 1	czech	x-vnd.Haiku-HaikuDepot	3139226371
+Available packages	MainWindow		Dostupné balíčky
+It was not possible to create the new user.	UserLoginWindow		Nepodařilo se vytvořit nového uživatele.
+An unexpected error has been sent from the server [%li]	ServerHelper		Neočekávaná chyba byla poslána ze serveru [%li]
+Create account	UserLoginWindow		Vytvořit účet
+Install %PackageTitle%	PackageManager		Nainstalovat %PackageTitle%
+The response to the captcha was incorrect.	ServerHelper		Odpověď na captchu byla chybná.
+Rate package…	PackageInfoView		Hodnotit balíček…
+You have successfully authenticated as user %Nickname%.	UserLoginWindow		Úspěšně jste se přihlásil jako uživatel %Nickname%.
+It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nebylo možné rozbalit nezbytné informace captchy z dat odeslaných zpět ze serveru.
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Nastala chyba během získávání seznamu balíčků: %message%
+Active	PackageListView		Aktivní
+Login or Create account	MainWindow		Přihlásit se nebo vytvořit účet
+Switch account…	MainWindow		Přepnout účet…
+Preferred language:	UserLoginWindow		Preferovaný jazyk:
+Name	PackageListView		Název
+Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Chyba při ověření uživatele. Odhlaste se a přihlaste znova pro ověření hesla a kontrolu zda jste souhlasili s posledními podmínkami užívání.
+Rate %Package%	RatePackageWindow		Hodnocení %Package%
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Nastala chyba při inicializaci správce balíčků: %message%
+Quit HaikuDepot	App		Ukončit HaikuDepot
+Category	FilterView		Kategorie
+A response to the captcha question must be provided.	UserLoginWindow		Je třeba odpovědět na otázku captcha.
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Objevila se neočekávaná chyba '%Message%' s vlastností '%Property%'
+A requested object or an object involved in the request was not found on the server.	ServerHelper		Pořadovaný objekt nebo objekt součástí požadavku nebyl na serveru nalezen.
+No changelog available.	PackageInfoView		Seznam změn není k dispozici.
+Version	PackageListView		Verze
+No, quit HaikuDepot	App		Ne, ukončit HaikuDepot
+Not logged in	MainWindow		Nepřihlášen
+Featured packages	FeaturedPackagesView		Doporučené balíčky
+Available	PackageListView		Dostupné
+Click a package to view information	PackageInfoView		Kliknutím na balíček zobrazíte informace
+Cancel	UserLoginWindow		Zrušit
+Rating not possible	MainWindow		Hodnocení není možné
+Package update error	MainWindow		Chyba aktualizace balíčku
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# proces} few{# procesy} other{# procesů}}
+Reboot required	PackageManager		Restart vyžadován
+All packages	PackageListView		Všechny balíčky
+Send	RatePackageWindow		Poslat
+Start package daemon	App		Spustit službu balíčků
+There are problems in the supplied data:	UserLoginWindow		Jsou problémy s poskytnutými daty:
+Usage conditions download problem	UserLoginWindow		Problém se stažením podmínek použití
+Package daemon problem	App		Problém služby balíčků
+No	MainWindow		Ne
+Repository	PackageListView		Repozitář
+Close	RatePackageWindow		Zavřít
+Close	UserLoginWindow		Zavřít
+The email is malformed.	UserLoginWindow		Email je špatně formátovaný.
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronizuji data balíčků z repozitáře '%REPO_NAME%'
+View the usage conditions	UserLoginWindow		Zobrazit podmínky užívání
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Nastala chyba při stahování podmínek použití potřebných pro vytvoření nového uživatele. Zkontrolujte log pro více informací a zkuste to znovu. \nV HaikuDepot sekci uživatelské příručky Haiku se dočtete jak zobrazit logy.
+Size	PackageListView		Velikost
+Your rating was updated.	RatePackageWindow		Vaše hodnocení bylo aktulizováno.
+All categories	FilterView		Všechny kategorie
+n/a	PackageInfoView		N/A
+Cancel	MainWindow		Zrušit
+Refresh repositories	MainWindow		Obnovit repozitáře
+Continue	App		Pokračovat
+A password is required.	UserLoginWindow		Heslo je vyžadováno.
+Language	RatePackageWindow		Jazyk
+Status	PackageListView		Stav
+Network transport error	ServerHelper		Chyba při přenosu v síti
+Uninstall %PackageTitle%	PackageManager		Odinstalovat %PackageTitle%
+Update	RatePackageWindow		Aktualizovat
+Language	UserLoginWindow		Jazyk
+OK	UserLoginWindow		OK
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synchronizuji referenční data ze serveru
+Stability:	RatePackageWindow		Stabilita:
+The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Podmínky použití musí být odsouhlaseny a osoba vytvářející uživatele musí splňovat minimální věkové požadavky.
+Source packages	MainWindow		Zdrojové balíčky
+Problem with working files	App		Problém s pracovními soubory
+Try again	App		Zkusit znovu
+Unknown	PackageListView		Neznámý
+I agree to the usage conditions	UserLoginWindow		Souhlasím s podmínkami užívání
+Logged in as %User%	MainWindow		Přihlášen/a jako %User%
+A reboot is necessary to complete the installation process.	PackageManager		K dokonční instalace je třeba restart.
+Yes	MainWindow		Ano
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Je mi alespoň jeden rok}few{Je mi alespoň # roky}other{Je mi alespoň # let}}
+Pending…	PackageListView		Pracuji...
+Search terms:	FilterView		Vyhledat výrazy:
+Quit	App		Ukončit
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Nesprávný formát přezdívky. Přezdívka může obsahovat pouze číslice a malé znaky latinky. Délka musí být 4 až 16 znaků.
+Authentication failed	UserLoginWindow		Ověření se nezdařilo
+Captcha error	UserLoginWindow		Chyba captcha
+Manage repositories…	MainWindow		Spravovat repozitáře...
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Přezdívka musí být jedinečná. Vámi zvolená přezdívka je již zabraná, zvolte jinou.
+Open %DeskbarLink%	PackageManager		Otevřít %DeskbarLink%
+Input validation	UserLoginWindow		Ověření vstupu
+Log in…	MainWindow		Přihlásit…
+Client version too old	ServerHelper		Přiliš stará verze klientské aplikace
+Local repository load error	LocalPkgDataLoadProcess		Chyba načtení místního repozitáře
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Uživatel neexistuje nebo bylo zasáno špatné heslo. Zkontrolujte přihlašovací údaje a zkuste to znova.
+All repositories	MainWindow		Všechny repozitáře
 Repository update error	LocalRepositoryUpdateProcess		Chyba aktualizace repozitářů
 Network error	ServerHelper		Chyba sítě
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Nastala chyba při aktualizaci repozitáře: %error%
 User Created	UserLoginWindow		Vytvořen uživatel
 Check for updates…	MainWindow		Zkontrolovat aktualizace…
 Uninstalled	PackageListView		Odinstalován
-It was not possible to create the new user.	UserLoginWindow		Nepodařilo se vytvořit nového uživatele.
-Available packages	MainWindow		Dostupné balíčky
-An unexpected error has been sent from the server [%li]	ServerHelper		Neočekávaná chyba byla poslána ze serveru [%li]
-Create account	UserLoginWindow		Vytvořit účet
-Install %PackageTitle%	PackageManager		Nainstalovat %PackageTitle%
 OK	App		OK
-The response to the captcha was incorrect.	ServerHelper		Odpověď na captchu byla chybná.
 Develop packages	MainWindow		Vývojové balíčky
-Rate package…	PackageInfoView		Hodnotit balíček…
 Starting the package daemon failed:\n\n%Error%	App		Spuštění služby balíčku se nezdařilo:\n\n%Error%
-You have successfully authenticated as user %Nickname%.	UserLoginWindow		Úspěšně jste se přihlásil jako uživatel %Nickname%.
-<no info>	PackageInfoView		<bez informací>
 No user ratings available.	PackageInfoView		Žádná uživatelská hodnocení.
-It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nebylo možné rozbalit nezbytné informace captchy z dat odeslaných zpět ze serveru.
-A network transport error has arisen communicating with the server system: %s	ServerHelper		Při komunikaci se serverem došlo k chybě přenosu: %s
+<no info>	PackageInfoView		<bez informací>
 Rating	PackageListView		Hodnocení
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Při komunikaci se serverem došlo k chybě přenosu: %s
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronizuji ikony
 Show	MainWindow		Ukázat
-An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Nastala chyba během získávání seznamu balíčků: %message%
 Settings…	MainWindow		Nastavení…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Aby tato apliakce fungovala, zapisuje a čte některé pracovní soubory na váš počítač. Je problém se zápisem testovacího souboru na [%TestFilePath%]. Zkontrolujte, že nejsou problémy s vaším diskem nebo s oprávněním k zápisu v daném adresáři. Můžete zvolit pokračovat, ale některé funkce budou zakázány.
-Active	PackageListView		Aktivní
-Login or Create account	MainWindow		Přihlásit se nebo vytvořit účet
 <Package contents not available for remote packages>	PackageContentsView		<Obsah balíčku není dostupný pro vzdálené balíčky>
 Ratings	PackageInfoView		Hodnocení
-Switch account…	MainWindow		Přepnout účet…
-Preferred language:	UserLoginWindow		Preferovaný jazyk:
-Name	PackageListView		Název
-Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Chyba při ověření uživatele. Odhlaste se a přihlaste znova pro ověření hesla a kontrolu zda jste souhlasili s posledními podmínkami užívání.
 Local	LocalPkgDataLoadProcess		Místní
-Rate %Package%	RatePackageWindow		Hodnocení %Package%
-An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Nastala chyba při inicializaci správce balíčků: %message%
-Quit HaikuDepot	App		Ukončit HaikuDepot
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Souhlasíte s odesíláním anonymních dat o používání z tohoto počítače na HaikuDepotServer? Své nastavení můžete později změnit v okně \"Nastavení\".
-An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Objevila se neočekávaná chyba '%Message%' s vlastností '%Property%'
-A response to the captcha question must be provided.	UserLoginWindow		Je třeba odpovědět na otázku captcha.
-Category	FilterView		Kategorie
 User rating	RatePackageWindow		Uživatelské hodnocení
 Installed packages	MainWindow		Nainstalované balíčky
-A requested object or an object involved in the request was not found on the server.	ServerHelper		Pořadovaný objekt nebo objekt součástí požadavku nebyl na serveru nalezen.
 Date	PackageListView		Datum
-No changelog available.	PackageInfoView		Seznam změn není k dispozici.
 Error	App		Chyba
 There was a puzzling response from the web service.	UserLoginWindow		Přišla nejasná odpověd z webové služby.
-Version	PackageListView		Verze
-Not logged in	MainWindow		Nepřihlášen
-No, quit HaikuDepot	App		Ne, ukončit HaikuDepot
-Featured packages	FeaturedPackagesView		Doporučené balíčky
-The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Poskytnutá odpověď na captcha je špatně. Bude vygenerována nová captcha; zkuste to znova.
-It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nepodařilo se spojit se serverem pro stažení captcha obrázku potřebného pro vytvoření uživatele.
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Vaše hodnocení bylo úspěšně nahráno. Můžete ho změnit nebo odstranit z webových stránek HaikuDepot serveru.
-Available	PackageListView		Dostupné
+It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nepodařilo se spojit se serverem pro stažení captcha obrázku potřebného pro vytvoření uživatele.
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Poskytnutá odpověď na captcha je špatně. Bude vygenerována nová captcha; zkuste to znova.
 -	no package publish		-
-Cancel	UserLoginWindow		Zrušit
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot potřebuje spuštěnou službu balíků aby fungoval, ale zdá se že spuštěna není.\nChcete ji spustit nyní?
-Click a package to view information	PackageInfoView		Kliknutím na balíček zobrazíte informace
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Heslo musí být aspoň osm znaků dlouhé, musí obsahovat alespoň dvě cifry a jedeo velké písmeno.
-Share anonymous usage data with HaikuDepotServer	SettingsWindow		Sdílet anonymní data o používání s HaikuDepotServer
 Contents	PackageInfoView		Obsah
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Sdílet anonymní data o používání s HaikuDepotServer
 Close	PackageManager		Zavřít
 Changelog	PackageInfoView		Seznam změn
-Rating not possible	MainWindow		Hodnocení není možné
-Package update error	MainWindow		Chyba aktualizace balíčku
 About	PackageInfoView		O aplikaci
-%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# proces} few{# procesy} other{# procesů}}
-Reboot required	PackageManager		Restart vyžadován
 Password:	UserLoginWindow		Heslo:
-All packages	PackageListView		Všechny balíčky
-This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Tato aplikace je příliš stará pro komunikace se serverem. Aktualizací systému získejte novou verzi aplikace. Nejnižší požadovaná verze je \"%s\".
 Stability	RatePackageWindow		Stabilita
-Send	RatePackageWindow		Poslat
-Start package daemon	App		Spustit službu balíčků
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Tato aplikace je příliš stará pro komunikace se serverem. Aktualizací systému získejte novou verzi aplikace. Nejnižší požadovaná verze je \"%s\".
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Heslo je třeba zadat znovu, aby se snížila pravděpodobnost chybného zadání hesla.
 Cancel	SettingsWindow		Zrušit
 Cancel	RatePackageWindow		Zrušit
 Inactive	PackageListView		Neaktivní
 Nickname:	UserLoginWindow		Přezdívka:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronizuji meta-data o repozitářích
-There are problems in the supplied data:	UserLoginWindow		Jsou problémy s poskytnutými daty:
 OK	MainWindow		OK
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# položka} few{# položky} other{# položek}}
-Usage conditions download problem	UserLoginWindow		Problém se stažením podmínek použití
 Downloading:	PackageInfoView		Stahování:
 Quit	MainWindow		Ukončit
 Success	UserLoginWindow		Úspěch
-No	MainWindow		Ne
-Package daemon problem	App		Problém služby balíčků
 (%Votes%)	PackageInfoView		(%Votes%)
-Repository	PackageListView		Repozitář
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (verze %hd.version%)
-The email is malformed.	UserLoginWindow		Email je špatně formátovaný.
-Close	UserLoginWindow		Zavřít
-Close	RatePackageWindow		Zavřít
-Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronizuji data balíčků z repozitáře '%REPO_NAME%'
 Settings	SettingsWindow		Nastavení
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Nastala chyba při stahování podmínek použití potřebných pro vytvoření nového uživatele. Zkontrolujte log pro více informací a zkuste to znovu. \nV HaikuDepot sekci uživatelské příručky Haiku se dočtete jak zobrazit logy.
-View the usage conditions	UserLoginWindow		Zobrazit podmínky užívání
 Login issue	MainWindow		Problém s přihlášením
 Your rating:	RatePackageWindow		Vaše hodnocení:
-Size	PackageListView		Velikost
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Uživatel %Nickname% byl úspěšně vytvořen v HaikuDepotServer systému. Pomocí webového rozhraní můžete spravovat detaily uživatele. Jste nyní přihlášeni jako tento nový uživatel.
-Your rating was updated.	RatePackageWindow		Vaše hodnocení bylo aktulizováno.
-All categories	FilterView		Všechny kategorie
 Repositories	MainWindow		Repozitáře
-n/a	PackageInfoView		N/A
 This rating is visible to other users	RatePackageWindow		Toto hodnocení je viditelné pro ostatní uživatele
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Nastal problém během aktualizace dat balíčku, což může způsobit, že data budou stará, nebo nebudou vůbec. Více informací lze najít v protokolech aplikace.\nJak zobrazit protokoly aplikace najdete v sekci HaikuDepot uživatelské příručky Haiku.
 View agreed usage conditions…	MainWindow		Zobrazit odsouhlasené podmínky užívání…
-Cancel	MainWindow		Zrušit
-Refresh repositories	MainWindow		Obnovit repozitáře
-Continue	App		Pokračovat
-A password is required.	UserLoginWindow		Heslo je vyžadováno.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Zdá se, že tento balíček není na HaikuDepot serveru, proto není možné přidat nebo upravit hodnocení.
 Apply	SettingsWindow		Použít
-Language	RatePackageWindow		Jazyk
 Log out	MainWindow		Odhlásit
 Comment language:	RatePackageWindow		Jazyk komentáře:
-Status	PackageListView		Stav
 The password has been incorrectly repeated.	UserLoginWindow		Heslo nesouhlasí s předchozím zadaným.
-Network transport error	ServerHelper		Chyba při přenosu v síti
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Heslo zadané pro uživatele [%Nickname%] už není platné. Uživatel bude odhlášen. Přihlašte se znova s novým heslem.
-Uninstall %PackageTitle%	PackageManager		Odinstalovat %PackageTitle%
-Update	RatePackageWindow		Aktualizovat
 OK	ServerHelper		OK
-Language	UserLoginWindow		Jazyk
-OK	UserLoginWindow		OK
 Reading repository data	LocalPkgDataLoadProcess		Čtu data repozitáře
-Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synchronizuji referenční data ze serveru
-Stability:	RatePackageWindow		Stabilita:
-The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Podmínky použití musí být odsouhlaseny a osoba vytvářející uživatele musí splňovat minimální věkové požadavky.
 A validation error has occurred	ServerHelper		Došlo k chybě ověření
 The nickname is required.	UserLoginWindow		Přezdívka je vyžadována.
-Source packages	MainWindow		Zdrojové balíčky
 -	no package size		-
-Problem with working files	App		Problém s pracovními soubory
-Server error	ServerHelper		Chyba na serveru
 Rate package	RatePackageWindow		Hodnocení balíčku
-Try again	App		Zkusit znovu
-Unknown	PackageListView		Neznámý
-I agree to the usage conditions	UserLoginWindow		Souhlasím s podmínkami užívání
-Log in	UserLoginWindow		Přihlásit
+Server error	ServerHelper		Chyba na serveru
 Sending anonymous usage data	MainWindow		Odesílám anonymní data o užívání
-Logged in as %User%	MainWindow		Přihlášen/a jako %User%
-Email address:	UserLoginWindow		E-mailová adresa:
-Screenshot	ScreenshotWindow		Snímek obrazovky
+Log in	UserLoginWindow		Přihlásit
 HaikuDepot	System name		HaikuDepot
-A reboot is necessary to complete the installation process.	PackageManager		K dokonční instalace je třeba restart.
-Yes	MainWindow		Ano
-{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Je mi alespoň jeden rok}few{Je mi alespoň # roky}other{Je mi alespoň # let}}
+Screenshot	ScreenshotWindow		Snímek obrazovky
+Email address:	UserLoginWindow		E-mailová adresa:
 View latest usage conditions…	MainWindow		Zobrazit poslední podmínky užívání…
-Quit	App		Ukončit
-Search terms:	FilterView		Vyhledat výrazy:
-Pending…	PackageListView		Pracuji...
-The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		Nesprávný formát přezdívky. Přezdívka může obsahovat pouze číslice a malé znaky latinky. Délka musí být 4 až 16 znaků.
 Category:	FilterView		Kategorie:
-Authentication failed	UserLoginWindow		Ověření se nezdařilo
-Captcha error	UserLoginWindow		Chyba captcha
-The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Přezdívka musí být jedinečná. Vámi zvolená přezdívka je již zabraná, zvolte jinou.
-Manage repositories…	MainWindow		Spravovat repozitáře...
 Fetching remote repository data	LocalRepositoryUpdateProcess		Stahuji data vzdálených repozitářů
 Description	PackageListView		Popis
-Open %DeskbarLink%	PackageManager		Otevřít %DeskbarLink%
 User creation error	UserLoginWindow		Chyba vytvoření uživatele
-Input validation	UserLoginWindow		Ověření vstupu
-Log in…	MainWindow		Přihlásit…
 You need to be logged into an account before you can rate packages.	MainWindow		K hodnocení balíčků, musíte být přihlášeni k účtu.
-Client version too old	ServerHelper		Přiliš stará verze klientské aplikace
-Local repository load error	LocalPkgDataLoadProcess		Chyba načtení místního repozitáře
-The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Uživatel neexistuje nebo bylo zasáno špatné heslo. Zkontrolujte přihlašovací údaje a zkuste to znova.
 Repeat password:	UserLoginWindow		Zadejte heslo znovu:
-All repositories	MainWindow		Všechny repozitáře

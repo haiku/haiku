@@ -1,43 +1,70 @@
 1	croatian	x-vnd.Haiku-HaikuDepot	2452359633
-Repository update error	LocalRepositoryUpdateProcess		Greška pri ažuriranju repozitorija
-An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Došlo je do greške prilikom osvježavanja repozitorija: %error%
-User Created	UserLoginWindow		Korisnik je napravljen
-Check for updates…	MainWindow		Provjeri za ažuriranja...
-Uninstalled	PackageListView		Deinstalirani
-It was not possible to create the new user.	UserLoginWindow		Nije bilo moguće stvoriti novog korisnika.
 Available packages	MainWindow		Dostupni paketi
+It was not possible to create the new user.	UserLoginWindow		Nije bilo moguće stvoriti novog korisnika.
 Create account	UserLoginWindow		Napravi račun
-OK	App		U redu
 Rate package…	PackageInfoView		Ocijeni paket...
-<no info>	PackageInfoView		<no info>
-Rating	PackageListView		Ocjenjivanje
-Synchronizing icons	ServerIconExportUpdateProcess		Sinkroniziram ikone
-Show	MainWindow		Pokaži
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Došlo do greške prilikom pribavljanja liste paketa: %message%
 Active	PackageListView		Aktivan
 Login or Create account	MainWindow		Prijava ili napravi račun
-<Package contents not available for remote packages>	PackageContentsView		<Package contents not available for remote packages>
-Ratings	PackageInfoView		Ocjenjivanja
 Switch account…	MainWindow		Prebaci račun...
 Preferred language:	UserLoginWindow		Preferirani jezik:
 Name	PackageListView		Ime
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Došlo je d ogreške prilikom iniciranja upravitelja paketima: %message%
 Category	FilterView		Kategorija
-Installed packages	MainWindow		Instalirani paketi
-Error	App		Greška
 Version	PackageListView		Inačica
 Not logged in	MainWindow		Niste prijavljeni
 Available	PackageListView		Dostupno
-Cancel	UserLoginWindow		Otkaži
 Click a package to view information	PackageInfoView		Klikni na paket da vidiš informacije
+Cancel	UserLoginWindow		Otkaži
+All packages	PackageListView		Svi paketi
+Send	RatePackageWindow		Pošalji
+Repository	PackageListView		Repozitorij
+Close	RatePackageWindow		Zatvori
+Close	UserLoginWindow		Zatvori
+The email is malformed.	UserLoginWindow		Email je oštećen.
+Size	PackageListView		Veličina
+All categories	FilterView		Sve kategorije
+Cancel	MainWindow		Otkaži
+Refresh repositories	MainWindow		Osvježi repozitorije
+Continue	App		Nastavi
+A password is required.	UserLoginWindow		Potrebna je lozinka.
+Language	RatePackageWindow		Jezik
+Status	PackageListView		Status
+Update	RatePackageWindow		Ažuriraj
+Language	UserLoginWindow		Jezik
+OK	UserLoginWindow		U redu
+Stability:	RatePackageWindow		Stabilnost:
+Source packages	MainWindow		Izvorni paketi
+Try again	App		Pokušaj ponovno
+Unknown	PackageListView		Nepoznato
+I agree to the usage conditions	UserLoginWindow		Slažem se sa uvjetima korištenja
+Logged in as %User%	MainWindow		Prijavljen kao %User%
+Search terms:	FilterView		Pojmovi pretrage:
+Authentication failed	UserLoginWindow		Neuspjela ovjera
+Manage repositories…	MainWindow		Upravljaj repozitorijima…
+Open %DeskbarLink%	PackageManager		Otvori %DeskbarLink%
+Log in…	MainWindow		Prijava...
+All repositories	MainWindow		Svi repozitoriji
+Repository update error	LocalRepositoryUpdateProcess		Greška pri ažuriranju repozitorija
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Došlo je do greške prilikom osvježavanja repozitorija: %error%
+User Created	UserLoginWindow		Korisnik je napravljen
+Check for updates…	MainWindow		Provjeri za ažuriranja...
+Uninstalled	PackageListView		Deinstalirani
+OK	App		U redu
+<no info>	PackageInfoView		<no info>
+Rating	PackageListView		Ocjenjivanje
+Synchronizing icons	ServerIconExportUpdateProcess		Sinkroniziram ikone
+Show	MainWindow		Pokaži
+<Package contents not available for remote packages>	PackageContentsView		<Package contents not available for remote packages>
+Ratings	PackageInfoView		Ocjenjivanja
+Installed packages	MainWindow		Instalirani paketi
+Error	App		Greška
 Contents	PackageInfoView		Sadržaj
 Close	PackageManager		Zatvori
 Changelog	PackageInfoView		Dnevnik promjena
 About	PackageInfoView		O programu
 Password:	UserLoginWindow		Lozinka:
-All packages	PackageListView		Svi paketi
 Stability	RatePackageWindow		Stabilnost
-Send	RatePackageWindow		Pošalji
 Cancel	RatePackageWindow		Otkaži
 Inactive	PackageListView		Neaktivan
 Nickname:	UserLoginWindow		Nadimak:
@@ -45,43 +72,16 @@ OK	MainWindow		U redu
 Downloading:	PackageInfoView		Preuzimam:
 Success	UserLoginWindow		Uspjeh
 (%Votes%)	PackageInfoView		(%Glasovi%)
-Repository	PackageListView		Repozitorij
-The email is malformed.	UserLoginWindow		Email je oštećen.
-Close	UserLoginWindow		Zatvori
-Close	RatePackageWindow		Zatvori
 Login issue	MainWindow		Problemi prijave
-Size	PackageListView		Veličina
-All categories	FilterView		Sve kategorije
 Repositories	MainWindow		Repozitoriji
-Cancel	MainWindow		Otkaži
-Refresh repositories	MainWindow		Osvježi repozitorije
-Continue	App		Nastavi
-A password is required.	UserLoginWindow		Potrebna je lozinka.
-Language	RatePackageWindow		Jezik
 Log out	MainWindow		Odjava
-Status	PackageListView		Status
-Update	RatePackageWindow		Ažuriraj
 OK	ServerHelper		U redu
-Language	UserLoginWindow		Jezik
-OK	UserLoginWindow		U redu
-Stability:	RatePackageWindow		Stabilnost:
 The nickname is required.	UserLoginWindow		Potreban je nadimak.
-Source packages	MainWindow		Izvorni paketi
 -	no package size		-
 Rate package	RatePackageWindow		Ocijeni paket
-Try again	App		Pokušaj ponovno
-Unknown	PackageListView		Nepoznato
-I agree to the usage conditions	UserLoginWindow		Slažem se sa uvjetima korištenja
 Log in	UserLoginWindow		Prijava
-Logged in as %User%	MainWindow		Prijavljen kao %User%
-Email address:	UserLoginWindow		Adresa e-pošte:
 Screenshot	ScreenshotWindow		Snimka zaslona
-Search terms:	FilterView		Pojmovi pretrage:
+Email address:	UserLoginWindow		Adresa e-pošte:
 Category:	FilterView		Kategorija:
-Authentication failed	UserLoginWindow		Neuspjela ovjera
-Manage repositories…	MainWindow		Upravljaj repozitorijima…
 Description	PackageListView		Opis
-Open %DeskbarLink%	PackageManager		Otvori %DeskbarLink%
-Log in…	MainWindow		Prijava...
 Repeat password:	UserLoginWindow		Ponovi lozinku:
-All repositories	MainWindow		Svi repozitoriji

@@ -21,6 +21,7 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs uuid ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] : true ;
 
 local xfsSources =
+	Attribute.cpp
 	BPlusTree.cpp
 	Directory.cpp
 	Extent.cpp
@@ -29,6 +30,7 @@ local xfsSources =
 	kernel_interface.cpp
 	LeafDirectory.cpp
 	Node.cpp
+	ShortAttribute.cpp
 	ShortDirectory.cpp
 	Volume.cpp
 	xfs.cpp

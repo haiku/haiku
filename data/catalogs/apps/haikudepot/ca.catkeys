@@ -1,178 +1,221 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	3139226371
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	136904009
+Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
+Available packages	MainWindow		Paquets disponibles
+It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
+An unexpected error has been sent from the server [%li]	ServerHelper		S'ha enviat un error inesperat des del servidor [%li]
+Create account	UserLoginWindow		Creeu un compte
+Agree	ToLatestUserUsageConditionsWindow		D'acord
+Install %PackageTitle%	PackageManager		Instal·la %PackageTitle%
+The response to the captcha was incorrect.	ServerHelper		La resposta al CAPTCHA ha estat incorrecta.
+Rate package…	PackageInfoView		Puntueu el paquet...
+You have successfully authenticated as user %Nickname%.	UserLoginWindow		Us heu autenticat correctament com a %Nickname%.
+Package problems	PackageProblem	Window title	Problemes amb paquets
+It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		No s'ha pogut extreure la informació de CAPTCHA necessària de les dades retornades del servidor.
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Hi ha hagut un error en obtenir la llista de paquets: %message%
+Update usage conditions	ToLatestUserUsageConditionsWindow		Actualització de les condicions d'ús
+No usage conditions	UserUsageConditions		Sense condicions d'ús
+Active	PackageListView		Actiu
+Login or Create account	MainWindow		Entreu o creeu-ne un compte
+Switch account…	MainWindow		Canvia de compte...
+Preferred language:	UserLoginWindow		Llengua preferida:
+Name	PackageListView		Nom
+Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problema d'autorització o de seguretat. Sortiu i torneu a entrar a la sessió per comprovar que la contrasenya sigui correcta i també comproveu que hàgiu acceptat les darreres condicions d'ús.
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		El Dipòsit del Haiku es comunica amb un component del servidor anomenat Servidor del Dipòsit del Haiku. Aquestes són les condicions d'ús que l'usuari %Nickname% va acceptar (%AgreedToTimestamp%) en relació a l'ús del servei del HaikuDepotServer.
+don't activate package %source%	PackageProblem	don't change '%source%	No activis el paquet %source%
+Rate %Package%	RatePackageWindow		Puntueu %Package%
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Hi ha hagut un error en iniciar el gestor de paquets: %message%
+Quit HaikuDepot	App		Surt del Dipòsit del Haiku
+Category	FilterView		Categoria
+A response to the captcha question must be provided.	UserLoginWindow		Cal proporcionar una resposta a la pregunta de CAPTCHA.
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		L'error inesperat "%Message%" ha sorgit amb la propietat "%Property%".
+A requested object or an object involved in the request was not found on the server.	ServerHelper		No s'ha trobat al servidor un objecte sol·licitat o un objecte implicat en la sol·licitud.
+Logout	ToLatestUserUsageConditionsWindow		Tanca la sessió
+The following additional package changes have to be made:	PackageResult		S'han de fer els canvis addicionals de paquet següents:
+No changelog available.	PackageInfoView		No hi ha cap registre de canvis disponible.
+The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		S'han acordat les condicions d'ús actuals.
+Cancel	PackageProblem		Cancel·la
+Version	PackageListView		Versió
+No, quit HaikuDepot	App		No, surt del Dipòsit del Haiku
+Not logged in	MainWindow		No heu entrat.
+Featured packages	FeaturedPackagesView		Paquets destacats
+Available	PackageListView		Disponible
+Click a package to view information	PackageInfoView		Cliqueu sobre un paquet per veure'n la informació.
+Cancel	UserLoginWindow		Cancel·la
+Rating not possible	MainWindow		La puntuació no és possible.
+Package update error	MainWindow		Error d'actualització de paquet
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procés} other{# processos}}
+Reboot required	PackageManager		Cal reiniciar
+All packages	PackageListView		Tots els paquets
+Send	RatePackageWindow		Envia
+Start package daemon	App		Inicia el dimoni de paquets
+There are problems in the supplied data:	UserLoginWindow		Hi ha problemes en les dades subministrades:
+The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		L'usuari %Nickname% no ha acceptat cap condició d'ús.
+Usage conditions download problem	UserLoginWindow		Problema de descàrrega de les condicions d’ús
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	Instal·la el paquet %s des del repositori %s\n
+Package daemon problem	App		Problema amb el dimoni de paquets
+No	MainWindow		No
+Repository	PackageListView		Repositori
+Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Els usuaris han de tenir %AgeYears% anys o més.
+Close	RatePackageWindow		Tanca
+Close	UserLoginWindow		Tanca
+The email is malformed.	UserLoginWindow		L'adreça electrònica no és correcta.
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronitzen les dades de paquets per al repositori %REPO_NAME%.
+View the usage conditions	UserLoginWindow		Mostra'n les condicions d'ús
+An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		S'ha produït un error en baixar les condicions d'ús necessàries per crear un usuari nou. Consulteu el registre per obtenir-ne més informació i torneu-ho a provar. \nHi ha informació sobre com visualitzar els registres a la secció del Dipòsit del Haiku de la Guia de l’usuari del Haiku.
+Usage conditions agreed	ToLatestUserUsageConditionsWindow		Condicions d'ús acordades
+Size	PackageListView		Mida
+Your rating was updated.	RatePackageWindow		S'ha actualitzat la puntuació.
+All categories	FilterView		Totes les categories
+ignore problem for now	PackageProblem		Ignora el problema per ara.
+n/a	PackageInfoView		n/d
+Checking user details	UserDetailVerifierProcess		Comprovació de les dades de l'usuari
+Cancel	MainWindow		Cancel·la
+Refresh repositories	MainWindow		Actualitza els repositoris
+Continue	App		Continua
+A password is required.	UserLoginWindow		Cal una contrasenya.
+Language	RatePackageWindow		Llengua
+Status	PackageListView		Estat
+Network transport error	ServerHelper		Error de transport de xarxa
+Cancel	PackageResult		Cancel·la
+Uninstall %PackageTitle%	PackageManager		Desinstal·la %PackageTitle%
+Retry	PackageProblem		Torna-ho a provar
+Update	RatePackageWindow		Actualitza
+Language	UserLoginWindow		Llengua
+OK	UserLoginWindow		D'acord
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Se sincronitzen les dades de referència del servidor.
+Stability:	RatePackageWindow		Estabilitat:
+The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		S’ha d’acceptar l’acord d’ús i s’ha de confirmar que la persona que crea l’usuari compleix els requisits d’edat mínima.
+solution %d:	PackageProblem	Don't change the %d variable	Solució %d:
+Source packages	MainWindow		Paquets font
+Problem with working files	App		Problema amb els fitxers de treball
+Try again	App		Torneu-ho a provar
+Unknown	PackageListView		Desconegut
+I agree to the usage conditions	UserLoginWindow		Estic d’acord en les condicions d’ús.
+Logged in as %User%	MainWindow		Heu entrat com a %User%.
+A reboot is necessary to complete the installation process.	PackageManager		Cal reiniciar per completar el procés d’instal·lació.
+Yes	MainWindow		Sí
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Tinc com a mínim un any.}other{Tinc # anys o més.}}
+Pending…	PackageListView		Pendent...
+Search terms:	FilterView		Paraules que voleu cercar:
+Quit	App		Surt
+The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		El sobrenom està mal format. El sobrenom només pot contenir dígits i caràcters llatins en minúscules. Ha de tenir entre quatre i setze caràcters de longitud.
+Authentication failed	UserLoginWindow		L'autenticació ha fallat.
+Captcha error	UserLoginWindow		Error de CAPTCHA
+Manage repositories…	MainWindow		Gestioneu els repositoris...
+The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		El sobrenom ha de ser únic, però el sobrenom proporcionat ja està agafat. Trieu-ne un de diferent.
+OK	UserUsageConditions		D'acord
+Open %DeskbarLink%	PackageManager		Obre %DeskbarLink%
+Input validation	UserLoginWindow		Validació de l'entrada
+Log in…	MainWindow		Entrada...
+Client version too old	ServerHelper		Versió del client massa antiga
+Local repository load error	LocalPkgDataLoadProcess		Error de càrrega del repositori local
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		L’usuari no existeix o s’ha proporcionat la contrasenya errònia. Comproveu les credencials i torneu-ho a provar.
+All repositories	MainWindow		Tots els repositoris
 Repository update error	LocalRepositoryUpdateProcess		Error d'actualització del repositori
 Network error	ServerHelper		Error de xarxa
 An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		Hi ha hagut un error en actualitzar el repositori: %error%
 User Created	UserLoginWindow		Usuari creat
 Check for updates…	MainWindow		Comprova si hi ha actualitzacions...
 Uninstalled	PackageListView		Desinstal·lat
-It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
-Available packages	MainWindow		Paquets disponibles
-An unexpected error has been sent from the server [%li]	ServerHelper		S'ha enviat un error inesperat des del servidor [%li]
-Create account	UserLoginWindow		Creeu un compte
-Install %PackageTitle%	PackageManager		Instal·la %PackageTitle%
+I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Accepto les condicions d'ús.
+Installing \"%PackageName%\"	InstallPackageProcess		S'instal·la \"%PackageName%\"
 OK	App		D'acord
-The response to the captcha was incorrect.	ServerHelper		La resposta al CAPTCHA ha estat incorrecta.
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		El Dipòsit del Haiku es comunica amb un component del servidor anomenat Servidor del Dipòsit del Haiku. Aquestes són les últimes condicions d'ús per usar el servei HaikuDepotServer.
+Fatal error	UninstallPackageAction		Error fatal
 Develop packages	MainWindow		Paquets de desenvolupament
-Rate package…	PackageInfoView		Puntueu el paquet...
 Starting the package daemon failed:\n\n%Error%	App		Ha fallat iniciar el dimoni del paquet:\n\n%Error%
-You have successfully authenticated as user %Nickname%.	UserLoginWindow		Us heu autenticat correctament com a %Nickname%.
-<no info>	PackageInfoView		<cap informació>
 No user ratings available.	PackageInfoView		No hi ha puntuacions dels usuaris disponibles.
-It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		No s'ha pogut extreure la informació de CAPTCHA necessària de les dades retornades del servidor.
-A network transport error has arisen communicating with the server system: %s	ServerHelper		Hi ha hagut un error de transport de xarxa en comunicar-se amb el sistema del servidor: %s
+<no info>	PackageInfoView		<cap informació>
+Usage conditions download problem	UserUsageConditions		Problema de baixada de les condicions d'ús
 Rating	PackageListView		Puntuació
+A network transport error has arisen communicating with the server system: %s	ServerHelper		Hi ha hagut un error de transport de xarxa en comunicar-se amb el sistema del servidor: %s
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones
 Show	MainWindow		Mostra...
-An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Hi ha hagut un error en obtenir la llista de paquets: %message%
 Settings…	MainWindow		Paràmetres...
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Aquesta aplicació escriu i llegeix alguns fitxers de treball de l'ordinador per tal de funcionar. Sembla que hi ha problemes per escriure un fitxer de prova a [%TestFilePath%]. Comproveu que no hi ha cap problema amb el disc local o els permisos que pugui evitar que aquesta aplicació escrigui fitxers a la ubicació del directori. Podeu optar per reconèixer aquest problema i continuar, però és possible que alguna funcionalitat estigui inhabilitada.
-Active	PackageListView		Actiu
-Login or Create account	MainWindow		Entreu o creeu-ne un compte
 <Package contents not available for remote packages>	PackageContentsView		<El contingut del paquet no està disponible per als paquets remots>
 Ratings	PackageInfoView		Puntuacions
-Switch account…	MainWindow		Canvia de compte...
-Preferred language:	UserLoginWindow		Llengua preferida:
-Name	PackageListView		Nom
-Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problema d'autorització o de seguretat. Sortiu i torneu a entrar a la sessió per comprovar que la contrasenya sigui correcta i també comproveu que hàgiu acceptat les darreres condicions d'ús.
+The following problems have been encountered. Please select a solution for each:	PackageProblem		S'han trobat els problemes següents. Seleccioneu una solució per a cadascun:
 Local	LocalPkgDataLoadProcess		Local
-Rate %Package%	RatePackageWindow		Puntueu %Package%
-An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Hi ha hagut un error en iniciar el gestor de paquets: %message%
-Quit HaikuDepot	App		Surt del Dipòsit del Haiku
+Package changes	PackageResult	Window title	Canvis de paquets
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Seria acceptable enviar dades d’ús anònimes al sistema del servidor del Dipòsit del Haiku des d’aquest ordinador? En podeu canviar les preferències a la finestra de \Paràmetres\ més endavant.
-An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		L'error inesperat "%Message%" ha sorgit amb la propietat "%Property%".
-A response to the captcha question must be provided.	UserLoginWindow		Cal proporcionar una resposta a la pregunta de CAPTCHA.
-Category	FilterView		Categoria
 User rating	RatePackageWindow		Puntuació de l'usuari
 Installed packages	MainWindow		Paquets instal·lats
-A requested object or an object involved in the request was not found on the server.	ServerHelper		No s'ha trobat al servidor un objecte sol·licitat o un objecte implicat en la sol·licitud.
 Date	PackageListView		Data
-No changelog available.	PackageInfoView		No hi ha cap registre de canvis disponible.
 Error	App		Error
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		S'ha produït un error en baixar les condicions d'ús. Comproveu el registre per obtenir-ne més informació i torneu-ho a provar. \nLa informació sobre com veure els registres està disponible a la secció del Dipòsit del Haiku de la Guia d'usuari del Haiku.
 There was a puzzling response from the web service.	UserLoginWindow		Hi ha hagut una resposta desconcertant del servei web.
-Version	PackageListView		Versió
-Not logged in	MainWindow		No heu entrat.
-No, quit HaikuDepot	App		No, surt del Dipòsit del Haiku
-Featured packages	FeaturedPackagesView		Paquets destacats
-The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La resposta proporcionada al CAPTCHA és incorrecta. Se'n generarà un de nou; torneu-ho a provar.
-It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		No ha estat possible comunicar-se amb el servidor per obtenir una imatge de CAPTCHA necessària per crear un usuari nou.
+Opening \"%DeskbarLink%\"	OpenPackageProcess		S'obre \"%DeskbarLink%\"
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		S'ha carregat correctament la puntuació. Podeu actualitzar-la o suprimir-la al lloc web del servidor del Dipòsit del Haiku.
-Available	PackageListView		Disponible
+It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		No ha estat possible comunicar-se amb el servidor per obtenir una imatge de CAPTCHA necessària per crear un usuari nou.
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La resposta proporcionada al CAPTCHA és incorrecta. Se'n generarà un de nou; torneu-ho a provar.
 -	no package publish		-
-Cancel	UserLoginWindow		Cancel·la
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		El Dipòsit del Haiku necessita que el dimoni del paquet funcioni i sembla que no funciona.\nVoleu iniciar-lo ara?
-Click a package to view information	PackageInfoView		Cliqueu sobre un paquet per veure'n la informació.
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		La contrasenya ha de tenir com a mínim vuit caràcters, ha de constar d'almenys dos dígits i una majúscula.
-Share anonymous usage data with HaikuDepotServer	SettingsWindow		Comparteix dades d’ús anònimes amb el servidor del Dipòsit del Haiku.
 Contents	PackageInfoView		Continguts
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		Comparteix dades d’ús anònimes amb el servidor del Dipòsit del Haiku.
 Close	PackageManager		Tanca
 Changelog	PackageInfoView		Registre de canvis
-Rating not possible	MainWindow		La puntuació no és possible.
-Package update error	MainWindow		Error d'actualització de paquet
 About	PackageInfoView		Quant a
-%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# procés} other{# processos}}
-Reboot required	PackageManager		Cal reiniciar
 Password:	UserLoginWindow		Contrasenya:
-All packages	PackageListView		Tots els paquets
-This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Aquesta aplicació és massa antiga per comunicar-se amb el sistema del servidor. Obtingueu-ne una versió més recent actualitzant el sistema. La versió mínima requerida d’aquesta aplicació és \"%s\".
 Stability	RatePackageWindow		Estabilitat
-Send	RatePackageWindow		Envia
-Start package daemon	App		Inicia el dimoni de paquets
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Aquesta aplicació és massa antiga per comunicar-se amb el sistema del servidor. Obtingueu-ne una versió més recent actualitzant el sistema. La versió mínima requerida d’aquesta aplicació és \"%s\".
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Cal repetir la contrasenya per reduir la possibilitat d’introduir-la incorrectament.
 Cancel	SettingsWindow		Cancel·la
 Cancel	RatePackageWindow		Cancel·la
 Inactive	PackageListView		Inactiu
 Nickname:	UserLoginWindow		Sobrenom:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Se sincronitzen les metadades dels repositoris.
-There are problems in the supplied data:	UserLoginWindow		Hi ha problemes en les dades subministrades:
 OK	MainWindow		D'acord
+Version %Code%	UserUsageConditions		Versió %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} other{# elements}}
-Usage conditions download problem	UserLoginWindow		Problema de descàrrega de les condicions d’ús
+Uninstalling \"%PackageName%\"	UninstallPackageAction		Es desinstal·la \"%PackageName%\"
 Downloading:	PackageInfoView		Es baixa:
 Quit	MainWindow		Surt
 Success	UserLoginWindow		Correcte
-No	MainWindow		No
-Package daemon problem	App		Problema amb el dimoni de paquets
 (%Votes%)	PackageInfoView		(%Votes%)
-Repository	PackageListView		Repositori
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp% (versió %hd.version%)
-The email is malformed.	UserLoginWindow		L'adreça electrònica no és correcta.
-Close	UserLoginWindow		Tanca
-Close	RatePackageWindow		Tanca
-Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Se sincronitzen les dades de paquets per al repositori %REPO_NAME%.
 Settings	SettingsWindow		Paràmetres
-An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		S'ha produït un error en baixar les condicions d'ús necessàries per crear un usuari nou. Consulteu el registre per obtenir-ne més informació i torneu-ho a provar. \nHi ha informació sobre com visualitzar els registres a la secció del Dipòsit del Haiku de la Guia de l’usuari del Haiku.
-View the usage conditions	UserLoginWindow		Mostra'n les condicions d'ús
 Login issue	MainWindow		Problema d’inici de sessió
 Your rating:	RatePackageWindow		La vostra puntuació:
-Size	PackageListView		Mida
+HaikuDepot is stopping or completing running operations before quitting.	ShuttingDownWindow		El Dipòsit del Haiku s'està aturant o completant les operacions en execució abans de sortir.
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'usuari %Nickname% s'ha creat correctament al sistema del servidor del Dipòsit del Haiku. Podeu administrar les dades de l'usuari mitjançant la interfície web. Ara hi heu entrat com a usuari nou.
-Your rating was updated.	RatePackageWindow		S'ha actualitzat la puntuació.
-All categories	FilterView		Totes les categories
 Repositories	MainWindow		Repositoris
-n/a	PackageInfoView		n/d
 This rating is visible to other users	RatePackageWindow		Aquesta puntuació és visible per a altres usuaris.
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		En actualitzar les dades del paquet, s’ha produït un problema que pot fer que les dades quedin obsoletes o que faltin a la visualització de l’aplicació. És possible que es puguin obtenir detalls addicionals sobre aquest problema als registres de l'aplicació.\nHi ha informació sobre com visualitzar els registres a la secció del Dipòsit del Haiku de la Guia de l’usuari del Haiku.
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		S'ha produït un error en baixar les condicions d'ús. Comproveu el registre per obtenir-ne més informació i torneu-ho a provar. \nLa informació sobre com veure els registres està disponible a la secció del Dipòsit del Haiku de la Guia d'usuari del Haiku.
 View agreed usage conditions…	MainWindow		Consulteu les condicions d’ús acordades...
-Cancel	MainWindow		Cancel·la
-Refresh repositories	MainWindow		Actualitza els repositoris
-Continue	App		Continua
-A password is required.	UserLoginWindow		Cal una contrasenya.
+The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		L'usuari [%Nickname%] s'ha autenticat, però abans de continuar, heu d'acceptar les condicions d'ús més recents.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Sembla que aquest paquet no és al servidor del Dipòsit del Haiku, per la qual cosa no és possible crear una puntuació nova ni editar-ne una d'existent.
 Apply	SettingsWindow		Aplica-ho
-Language	RatePackageWindow		Llengua
+The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		L'usuari \"%Nickname%\" va acceptar prèviament les condicions d'ús, però les condicions d'ús s'han actualitzat des d'aleshores. Ara cal acceptar les condicions d'ús actualitzades.
 Log out	MainWindow		Surt
 Comment language:	RatePackageWindow		Llengua del comentari:
-Status	PackageListView		Estat
 The password has been incorrectly repeated.	UserLoginWindow		La contrasenya no s'ha repetit bé.
-Network transport error	ServerHelper		Error de transport de xarxa
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		La contrasenya proporcionada prèviament per a l'usuari [%Nickname%] actualment no és vàlida. L'usuari quedarà fora d'aquesta aplicació i haureu de tornar a iniciar la sessió amb la contrasenya actualitzada.
-Uninstall %PackageTitle%	PackageManager		Desinstal·la %PackageTitle%
-Update	RatePackageWindow		Actualitza
+View the usage conditions	ToLatestUserUsageConditionsWindow		Consulteu les condicions d'ús
 OK	ServerHelper		D'acord
-Language	UserLoginWindow		Llengua
-OK	UserLoginWindow		D'acord
 Reading repository data	LocalPkgDataLoadProcess		Es llegeixen les dades del repositori.
-Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Se sincronitzen les dades de referència del servidor.
-Stability:	RatePackageWindow		Estabilitat:
-The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		S’ha d’acceptar l’acord d’ús i s’ha de confirmar que la persona que crea l’usuari compleix els requisits d’edat mínima.
+Fatal error	InstallPackageProcess		Error fatal
 A validation error has occurred	ServerHelper		Hi ha hagut un error de validació.
 The nickname is required.	UserLoginWindow		Cal el sobrenom.
-Source packages	MainWindow		Paquets font
 -	no package size		-
-Problem with working files	App		Problema amb els fitxers de treball
-Server error	ServerHelper		Error de servidor
+Apply changes	PackageResult		Aplica els canvis
 Rate package	RatePackageWindow		Puntueu el paquet
-Try again	App		Torneu-ho a provar
-Unknown	PackageListView		Desconegut
-I agree to the usage conditions	UserLoginWindow		Estic d’acord en les condicions d’ús.
-Log in	UserLoginWindow		Entreu
+Server error	ServerHelper		Error de servidor
+Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Es registra la vista de paquet \"%PackageName%\"
 Sending anonymous usage data	MainWindow		S'envien dades d'ús anònimes
-Logged in as %User%	MainWindow		Heu entrat com a %User%.
-Email address:	UserLoginWindow		Adreça electrònica:
-Screenshot	ScreenshotWindow		Captura de pantalla
+Log in	UserLoginWindow		Entreu
+Usage conditions	UserUsageConditions		Condicions d'ús
 HaikuDepot	System name		Dipòsit del Haiku
-A reboot is necessary to complete the installation process.	PackageManager		Cal reiniciar per completar el procés d’instal·lació.
-Yes	MainWindow		Sí
-{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{Tinc com a mínim un any.}other{Tinc # anys o més.}}
+Screenshot	ScreenshotWindow		Captura de pantalla
+Email address:	UserLoginWindow		Adreça electrònica:
 View latest usage conditions…	MainWindow		Consulteu les darreres condicions d'ús...
-Quit	App		Surt
-Search terms:	FilterView		Paraules que voleu cercar:
-Pending…	PackageListView		Pendent...
-The nickname is malformed. The nickname may only contain digits and lower case latin characters. The nickname must be between four and sixteen characters in length.	UserLoginWindow		El sobrenom està mal format. El sobrenom només pot contenir dígits i caràcters llatins en minúscules. Ha de tenir entre quatre i setze caràcters de longitud.
 Category:	FilterView		Categoria:
-Authentication failed	UserLoginWindow		L'autenticació ha fallat.
-Captcha error	UserLoginWindow		Error de CAPTCHA
-The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		El sobrenom ha de ser únic, però el sobrenom proporcionat ja està agafat. Trieu-ne un de diferent.
-Manage repositories…	MainWindow		Gestioneu els repositoris...
+uninstall package %s\n	PackageResult	Don't change '%s' variable	Desinstal·la el paquet %s\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		S'obtenen les dades del repositori remot.
 Description	PackageListView		Descripció
-Open %DeskbarLink%	PackageManager		Obre %DeskbarLink%
 User creation error	UserLoginWindow		Error de creació d'usuari
-Input validation	UserLoginWindow		Validació de l'entrada
-Log in…	MainWindow		Entrada...
 You need to be logged into an account before you can rate packages.	MainWindow		Per poder valorar els paquets, heu d’iniciar sessió en un compte.
-Client version too old	ServerHelper		Versió del client massa antiga
-Local repository load error	LocalPkgDataLoadProcess		Error de càrrega del repositori local
-The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		L’usuari no existeix o s’ha proporcionat la contrasenya errònia. Comproveu les credencials i torneu-ho a provar.
+Cleaning up…	ShuttingDownWindow		Es neteja...
 Repeat password:	UserLoginWindow		Repetiu la contrasenya:
-All repositories	MainWindow		Tots els repositoris

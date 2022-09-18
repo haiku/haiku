@@ -261,29 +261,7 @@ Application HaikuDepot
 DoCatalogs HaikuDepot :
 	x-vnd.Haiku-HaikuDepot
 	:
-	App.cpp
-	FeaturedPackagesView.cpp
-	FilterView.cpp
-	LocaleUtils.cpp
-	LocalPkgDataLoadProcess.cpp
-	LocalRepositoryUpdateProcess.cpp
-	MainWindow.cpp
-	Model.cpp
-	PackageContentsView.cpp
-	PackageInfoView.cpp
-	PackageListView.cpp
-	PackageManager.cpp
-	ProcessCoordinator.cpp
-	RatePackageWindow.cpp
-	ScreenshotWindow.cpp
-	ServerHelper.cpp
-	ServerIconExportUpdateProcess.cpp
-	ServerPkgDataUpdateProcess.cpp
-	ServerReferenceDataUpdateProcess.cpp
-	ServerRepositoryDataUpdateProcess.cpp
-	SettingsWindow.cpp
-	UserLoginWindow.cpp
-	WorkStatusView.cpp
+	$(applicationSources)
 ;
 
 # The following use of rules configures the generation of .cpp and .h files from

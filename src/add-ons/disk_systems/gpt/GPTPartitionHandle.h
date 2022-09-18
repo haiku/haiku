@@ -26,6 +26,9 @@ public:
 									BString* name);
 	virtual status_t			SetName(BMutablePartition* child,
 									const char* name);
+	virtual status_t			ValidateSetType(const BMutablePartition* child,
+									const char* type);
+	virtual status_t			SetType(BMutablePartition* child, const char* type);
 
 	virtual	status_t			GetNextSupportedType(
 									const BMutablePartition* child,

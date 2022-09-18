@@ -250,12 +250,12 @@ struct BilinearDefault :
 			const uint16 wBottom = 255 - this->fWeightsY[y1].weight;
 
 			// buffer offset into source (top row)
-			register const uint8* src = this->fSource->row_ptr(
+			const uint8* src = this->fSource->row_ptr(
 				this->fWeightsY[y1].index);
 
 			// buffer handle for destination to be incremented per
 			// pixel
-			register uint8* d = this->fDestination;
+			uint8* d = this->fDestination;
 
 			for (int32 x = xIndexL; x <= xIndexMax; x++) {
 				const uint8* s = src + this->fWeightsX[x].index;
@@ -291,10 +291,10 @@ struct BilinearDefault :
 
 		// last row of pixels if necessary
 		// buffer offset into source (bottom row)
-		register const uint8* src
+		const uint8* src
 			= this->fSource->row_ptr(this->fWeightsY[y2].index);
 		// buffer handle for destination to be incremented per pixel
-		register uint8* d = this->fDestination;
+		uint8* d = this->fDestination;
 
 		if (yMax < y2) {
 			for (int32 x = xIndexL; x <= xIndexMax; x++) {
@@ -332,10 +332,10 @@ struct BilinearLowFilterRatio :
 			const uint16 wBottom = 255 - fWeightsY[y1].weight;
 
 			// buffer offset into source (top row)
-			register const uint8* src = fSource->row_ptr(fWeightsY[y1].index);
+			const uint8* src = fSource->row_ptr(fWeightsY[y1].index);
 			// buffer handle for destination to be incremented per
 			// pixel
-			register uint8* d = fDestination;
+			uint8* d = fDestination;
 
 			if (wTop == 255) {
 				for (int32 x = xIndexL; x <= xIndexR; x++) {
@@ -451,9 +451,9 @@ struct BilinearSimd : DrawBitmapBilinearOptimized<BilinearSimd> {
 
 		// last row of pixels if necessary
 		// buffer offset into source (bottom row)
-		register const uint8* src = fSource->row_ptr(fWeightsY[y2].index);
+		const uint8* src = fSource->row_ptr(fWeightsY[y2].index);
 		// buffer handle for destination to be incremented per pixel
-		register uint8* d = fDestination;
+		uint8* d = fDestination;
 
 		if (yMax < y2) {
 			for (int32 x = xIndexL; x <= xIndexMax; x++) {

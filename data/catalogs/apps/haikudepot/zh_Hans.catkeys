@@ -1,90 +1,90 @@
 1	english	x-vnd.Haiku-HaikuDepot	3602839024
-Check for updates…	MainWindow		检查更新…
-Uninstalled	PackageListView		已卸载
 Available packages	MainWindow		可用软件包
 Create account	UserLoginWindow		创建账号
-Develop packages	MainWindow		开发软件包
 Rate package…	PackageInfoView		软件包评分…
-Starting the package daemon failed:\n\n%Error%	App		包管理服务启动失败:\n\n%Error%
-<no info>	PackageInfoView		<无信息>
-No user ratings available.	PackageInfoView		未发现用户评分。
-Rating	PackageListView		评级
-Show	MainWindow		显示
 Active	PackageListView		激活
 Login or Create account	MainWindow		登录或者新建账户
-<Package contents not available for remote packages>	PackageContentsView		<软件包内容对于远程包不可用>
-Ratings	PackageInfoView		评级
 Switch account…	MainWindow		切换账户…
 Preferred language:	UserLoginWindow		首选语言:
 Name	PackageListView		名称
 Rate %Package%	RatePackageWindow		评级 %Package%
 Quit HaikuDepot	App		退出 HaikuDepot
 Category	FilterView		分类
-User rating	RatePackageWindow		用户评分
-Installed packages	MainWindow		已安装软件包
 No changelog available.	PackageInfoView		未发现更新记录。
-There was a puzzling response from the web service.	UserLoginWindow		网络服务响应异常。
-Not logged in	MainWindow		未登陆
 No, quit HaikuDepot	App		否，强制退出 HaikuDepot
-Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		您的评价上传成功。您可以在 HaikuDepot Server 网站上更新或者移除它。
+Not logged in	MainWindow		未登陆
 Available	PackageListView		可用
-Cancel	UserLoginWindow		取消
-HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot 需要包管理后台工作，现在它并未运行。\n是否需要进行启动？
 Click a package to view information	PackageInfoView		点击软件包查看信息
-Contents	PackageInfoView		內容
-Close	PackageManager		关闭
-Changelog	PackageInfoView		更新记录
+Cancel	UserLoginWindow		取消
 Rating not possible	MainWindow		无法评价
-About	PackageInfoView		关于
-Stability	RatePackageWindow		稳定性
 Send	RatePackageWindow		发送
 Start package daemon	App		启动软件包管理后台
-Cancel	RatePackageWindow		取消
-Inactive	PackageListView		未激活
-{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
-Downloading:	PackageInfoView		下载中：
-Success	UserLoginWindow		成功
 Package daemon problem	App		软件包守护进程问题
-(%Votes%)	PackageInfoView		（%Votes%）
 Repository	PackageListView		仓库
-%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp%（版本 %hd.version%）
-Close	UserLoginWindow		关闭
 Close	RatePackageWindow		关闭
-Your rating:	RatePackageWindow		您的评分:
+Close	UserLoginWindow		关闭
 Size	PackageListView		大小
 Your rating was updated.	RatePackageWindow		您的评价已被更新。
 All categories	FilterView		所有分类
-Repositories	MainWindow		仓库
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		取消
 Refresh repositories	MainWindow		刷新仓库
-This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		该软件包似乎并不在 HaikuDepot Server 中，所以无法创建一个新的评分或者编辑已有的评分。
 Language	RatePackageWindow		语言
-Log out	MainWindow		注销
-Comment language:	RatePackageWindow		评论语言:
 Status	PackageListView		状态
 Update	RatePackageWindow		更新
 Language	UserLoginWindow		语言
 OK	UserLoginWindow		确定
 Stability:	RatePackageWindow		稳定性:
 Source packages	MainWindow		源代码包
--	no package size		-
-Rate package	RatePackageWindow		软件包评分
 Try again	App		请重试
 Unknown	PackageListView		未知
-Log in	UserLoginWindow		登陆
 Logged in as %User%	MainWindow		登录 as %User%
-Email address:	UserLoginWindow		邮箱地址：
-Screenshot	ScreenshotWindow		屏幕截图
-HaikuDepot	System name		Haiku 软件库
-Search terms:	FilterView		搜索项目：
 Pending…	PackageListView		挂起…
-Category:	FilterView		分类:
+Search terms:	FilterView		搜索项目：
 Authentication failed	UserLoginWindow		认证失败
 Manage repositories…	MainWindow		管理仓库…
-Description	PackageListView		描述
 Open %DeskbarLink%	PackageManager		打开 %DeskbarLink%
 Input validation	UserLoginWindow		输入无效
 Log in…	MainWindow		登录…
-You need to be logged into an account before you can rate packages.	MainWindow		在对软件包进行评级之前，您需要进行账户登录。
 All repositories	MainWindow		确定
+Check for updates…	MainWindow		检查更新…
+Uninstalled	PackageListView		已卸载
+Develop packages	MainWindow		开发软件包
+Starting the package daemon failed:\n\n%Error%	App		包管理服务启动失败:\n\n%Error%
+No user ratings available.	PackageInfoView		未发现用户评分。
+<no info>	PackageInfoView		<无信息>
+Rating	PackageListView		评级
+Show	MainWindow		显示
+<Package contents not available for remote packages>	PackageContentsView		<软件包内容对于远程包不可用>
+Ratings	PackageInfoView		评级
+User rating	RatePackageWindow		用户评分
+Installed packages	MainWindow		已安装软件包
+There was a puzzling response from the web service.	UserLoginWindow		网络服务响应异常。
+Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		您的评价上传成功。您可以在 HaikuDepot Server 网站上更新或者移除它。
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot 需要包管理后台工作，现在它并未运行。\n是否需要进行启动？
+Contents	PackageInfoView		內容
+Close	PackageManager		关闭
+Changelog	PackageInfoView		更新记录
+About	PackageInfoView		关于
+Stability	RatePackageWindow		稳定性
+Cancel	RatePackageWindow		取消
+Inactive	PackageListView		未激活
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
+Downloading:	PackageInfoView		下载中：
+Success	UserLoginWindow		成功
+(%Votes%)	PackageInfoView		（%Votes%）
+%hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp%（版本 %hd.version%）
+Your rating:	RatePackageWindow		您的评分:
+Repositories	MainWindow		仓库
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		该软件包似乎并不在 HaikuDepot Server 中，所以无法创建一个新的评分或者编辑已有的评分。
+Log out	MainWindow		注销
+Comment language:	RatePackageWindow		评论语言:
+-	no package size		-
+Rate package	RatePackageWindow		软件包评分
+Log in	UserLoginWindow		登陆
+HaikuDepot	System name		Haiku 软件库
+Screenshot	ScreenshotWindow		屏幕截图
+Email address:	UserLoginWindow		邮箱地址：
+Category:	FilterView		分类:
+Description	PackageListView		描述
+You need to be logged into an account before you can rate packages.	MainWindow		在对软件包进行评级之前，您需要进行账户登录。

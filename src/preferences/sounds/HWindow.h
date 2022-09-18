@@ -52,6 +52,7 @@ private:
 private:
 			HEventList*			fEventList;
 			BFilePanel*			fFilePanel;
+			BButton*			fPlayButton;
 			BFileGameSound*		fPlayer;
 			BRect				fFrame;
 };

@@ -88,18 +88,52 @@ FUNCTION(arm_context_switch):
 FUNCTION_END(arm_context_switch)
 
 
-/* addr_t arm_get_fsr(void); */
-FUNCTION(arm_get_fsr):
-	mrc	p15, 0, r0, c5, c0, 0		@ get FSR
-	bx	lr
-FUNCTION_END(arm_get_fsr)
+/* void arm_save_fpu(struct arch_fpu_context* context); */
+FUNCTION(arm_save_fpu):
+	fstmiad		r0!, {d0-d15}
+	fstmiad		r0!, {d16-d31}
+	vmrs		r1, fpscr
+	str			r1, [r0]
+	bx			lr
+FUNCTION_END(arm_save_fpu)
 
 
-/* addr_t arm_get_far(void); */
-FUNCTION(arm_get_far):
-	mrc	p15, 0, r0, c6, c0, 0		@ get FAR
+/* void arm_restore_fpu(struct arch_fpu_context* context); */
+FUNCTION(arm_restore_fpu):
+	fldmiad		r0!, {d0-d15}
+	fldmiad		r0!, {d16-d31}
+	ldr			r1, [r0]
+	vmsr		fpscr, r1
+	bx			lr
+FUNCTION_END(arm_restore_fpu)
+
+
+/* uint32 arm_get_dfsr(void); */
+FUNCTION(arm_get_dfsr):
+	mrc	p15, 0, r0, c5, c0, 0		@ get DFSR
 	bx	lr
-FUNCTION_END(arm_get_far)
+FUNCTION_END(arm_get_dfsr)
+
+
+/* uint32 arm_get_ifsr(void) */
+FUNCTION(arm_get_ifsr):
+	mrc p15, 0, r0, c5, c0, 1		@ get IFSR
+	bx	lr
+FUNCTION_END(arm_get_ifsr)
+
+
+/* addr_t arm_get_dfar(void); */
+FUNCTION(arm_get_dfar):
+	mrc	p15, 0, r0, c6, c0, 0		@ get DFAR
+	bx	lr
+FUNCTION_END(arm_get_dfar)
+
+
+/* addr_t arm_get_ifar(void) */
+FUNCTION(arm_get_ifar):
+	MRC p15, 0, r0, c6, c0, 2		@ get IFAR
+	bx	lr
+FUNCTION_END(arm_get_ifar)
 
 
 /* addr_t arm_get_fp(void); */

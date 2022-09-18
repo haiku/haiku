@@ -217,12 +217,19 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	:
 	BView("PoseView", B_WILL_DRAW | B_PULSE_NEEDED),
 	fIsDrawingSelectionRect(false),
+	fViewState(new BViewState),
+	fStateNeedsSaving(false),
+	fSavePoseLocations(true),
+	fMultipleSelection(true),
+	fDragEnabled(true),
+	fDropEnabled(true),
+	fSelectionHandler(be_app),
+	fPoseList(new PoseList(40, true)),
 	fHScrollBar(NULL),
 	fVScrollBar(NULL),
 	fModel(model),
 	fActivePose(NULL),
 	fExtent(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN),
-	fPoseList(new PoseList(40, true)),
 	fFilteredPoseList(new PoseList()),
 	fVSPoseList(new PoseList()),
 	fSelectionList(new PoseList()),
@@ -232,14 +239,11 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fMimeTypeList(new BObjectList<BString>(10, true)),
 	fBrokenLinks(new BObjectList<Model>(10, false)),
 	fMimeTypeListIsDirty(false),
-	fViewState(new BViewState),
-	fStateNeedsSaving(false),
 	fCountView(NULL),
 	fListElemHeight(0.0f),
 	fIconPoseHeight(0.0f),
 	fDropTarget(NULL),
 	fAlreadySelectedDropTarget(NULL),
-	fSelectionHandler(be_app),
 	fLastClickPoint(INT32_MAX, INT32_MAX),
 	fLastClickButtons(0),
 	fLastClickedPose(NULL),
@@ -255,14 +259,10 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fTrackRightMouseUp(false),
 	fTrackMouseUp(false),
 	fSelectionVisible(true),
-	fMultipleSelection(true),
-	fDragEnabled(true),
-	fDropEnabled(true),
 	fSelectionRectEnabled(true),
 	fAlwaysAutoPlace(false),
 	fAllowPoseEditing(true),
 	fSelectionChangedHook(false),
-	fSavePoseLocations(true),
 	fShowHideSelection(true),
 	fOkToMapIcons(false),
 	fEnsurePosesVisible(false),
@@ -387,6 +387,9 @@ void
 BPoseView::RestoreColumnState(AttributeStreamNode* node)
 {
 	fColumnList->MakeEmpty();
+	if (fTitleView != NULL)
+		fTitleView->Reset();
+
 	if (node != NULL) {
 		const char* columnsAttr;
 		const char* columnsAttrForeign;
@@ -450,6 +453,8 @@ void
 BPoseView::RestoreColumnState(const BMessage &message)
 {
 	fColumnList->MakeEmpty();
+	if (fTitleView != NULL)
+		fTitleView->Reset();
 
 	BObjectList<BColumn> tempSortedList;
 	for (int32 index = 0; ; index++) {

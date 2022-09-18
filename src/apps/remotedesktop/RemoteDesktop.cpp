@@ -60,8 +60,7 @@ main(int argc, char *argv[])
 
 	for (int32 i = 2; i < argc; i++) {
 		if (strcmp(argv[i], "-p") == 0) {
-			if (argc < i + 1 || sscanf(argv[i + 1], "%" B_SCNu16, &port)
-				!= 1) {
+			if (argc <= i + 1 || sscanf(argv[i + 1], "%" B_SCNu16, &port) != 1) {
 				print_usage(argv[0]);
 				return 2;
 			}
@@ -71,8 +70,7 @@ main(int argc, char *argv[])
 		}
 
 		if (strcmp(argv[i], "-w") == 0) {
-			if (argc < i + 1 || sscanf(argv[i + 1], "%" B_SCNd32, &width) != 1)
-			{
+			if (argc <= i + 1 || sscanf(argv[i + 1], "%" B_SCNd32, &width) != 1) {
 				print_usage(argv[0]);
 				return 2;
 			}
@@ -82,8 +80,7 @@ main(int argc, char *argv[])
 		}
 
 		if (strcmp(argv[i], "-h") == 0) {
-			if (argc < i + 1 || sscanf(argv[i + 1], "%" B_SCNd32, &height) != 1)
-			{
+			if (argc <= i + 1 || sscanf(argv[i + 1], "%" B_SCNd32, &height) != 1) {
 				print_usage(argv[0]);
 				return 2;
 			}
@@ -93,17 +90,18 @@ main(int argc, char *argv[])
 		}
 
 		if (strcmp(argv[i], "-s") == 0) {
-			if (argc >= i + 1
-				&& sscanf(argv[i + 1], "%" B_SCNu16, &sshPort) == 1) {
-				i++;
+			if (argc <= i + 1 || sscanf(argv[i + 1], "%" B_SCNu16, &sshPort) != 1) {
+				print_usage(argv[0]);
+				return 2;
 			}
 
+			i++;
 			useSSH = true;
 			continue;
 		}
 
 		if (strcmp(argv[i], "-c") == 0) {
-			if (argc < i + 1) {
+			if (argc <= i + 1) {
 				print_usage(argv[0]);
 				return 2;
 			}

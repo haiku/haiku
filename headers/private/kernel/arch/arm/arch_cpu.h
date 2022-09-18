@@ -77,8 +77,11 @@ typedef struct arch_cpu_info {
 extern "C" {
 #endif
 
-extern addr_t arm_get_far(void);
-extern int32 arm_get_fsr(void);
+extern uint32 arm_get_dfsr(void);
+extern uint32 arm_get_ifsr(void);
+extern addr_t arm_get_dfar(void);
+extern addr_t arm_get_ifar(void);
+
 extern addr_t arm_get_fp(void);
 
 extern int mmu_read_c1(void);

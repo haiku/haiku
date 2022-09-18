@@ -78,7 +78,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 	S = A = P = 0;
 
 	for (i = 0; i * (int)sizeof(Elf32_Rel) < relLength; i++) {
-		TRACE(("looking at rel type %s, offset 0x%lx\n",
+		TRACE(("looking at rel type %s, offset 0x%" B_PRIx32 "\n",
 			kRelocations[ELF32_R_TYPE(rel[i].r_info)], rel[i].r_offset));
 
 		// calc S
@@ -101,7 +101,9 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 #endif
 				if (status < B_OK)
 					return status;
-				TRACE(("S %p (%s)\n", (void *)S, SYMNAME(image, symbol)));
+#ifndef _BOOT_MODE
+				TRACE(("S 0x%08" B_PRIx32 " (%s)\n", S, SYMNAME(image, symbol)));
+#endif
 			}
 		}
 		// calc A
@@ -118,7 +120,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 #else
 				A = boot_elf32_get_relocation(image->text_region.delta + rel[i].r_offset);
 #endif
-				TRACE(("A %p\n", (void *)A));
+				TRACE(("A 0x%08" B_PRIx32 "\n", A));
 				break;
 		}
 		// calc P
@@ -128,7 +130,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 			case R_386_PLT32:
 			case R_386_GOTPC:
 				P = image->text_region.delta + rel[i].r_offset;
-				TRACE(("P %p\n", (void *)P));
+				TRACE(("P 0x%08" B_PRIx32 "\n", P));
 				break;
 		}
 
@@ -167,8 +169,8 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 #else
 		boot_elf32_set_relocation((Elf32_Addr)resolveAddress, finalAddress);
 #endif
-		TRACE(("-> offset %#lx (%#lx) = %#lx\n",
-			(image->text_region.delta + rel[i].r_offset), rel[i].r_offset, finalAddress));
+		TRACE(("-> offset 0x%08" B_PRIx32 "x (0x%08" B_PRIx32 ") = 0x%08" B_PRIx32 "\n",
+			image->text_region.delta + rel[i].r_offset, rel[i].r_offset, finalAddress));
 	}
 
 	return B_NO_ERROR;

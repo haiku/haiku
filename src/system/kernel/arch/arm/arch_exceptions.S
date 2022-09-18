@@ -7,15 +7,16 @@
  *
  */
 
+#include <arch/arm/arch_cpu_defs.h>
+
 #include <asm_defs.h>
 
-#define CPSR_MODE_MASK	0x1f
-#define CPSR_MODE_USR	0x10
-#define CPSR_MODE_FIQ	0x11
-#define CPSR_MODE_IRQ	0x12
-#define CPSR_MODE_SVC	0x13
-#define CPSR_MODE_ABT	0x17
-#define CPSR_MODE_UND	0x1b
+
+.macro DISABLE_INTERRUPTS
+	mrs		r0, cpsr
+	orr		r0, r0, #(CPSR_I | CPSR_F)
+	msr		cpsr_c, r0
+.endm
 
 /* The following two macros are taken from FreeBSD... */
 
@@ -161,6 +162,7 @@ FUNCTION(arm_undefined):
 	mov		fp, r0
 	bl		arch_arm_undefined
 
+	DISABLE_INTERRUPTS
 	PULL_FRAME_FROM_SVC_AND_EXIT
 FUNCTION_END(arm_undefined)
 
@@ -172,6 +174,7 @@ FUNCTION(arm_syscall):
 	mov		fp, r0
 	bl		arch_arm_syscall
 
+	DISABLE_INTERRUPTS
 	PULL_FRAME_AND_EXIT
 FUNCTION_END(arm_syscall)
 
@@ -188,6 +191,7 @@ FUNCTION(arm_prefetch_abort):
 	mov		fp, r0
 	bl		arch_arm_prefetch_abort
 
+	DISABLE_INTERRUPTS
 	PULL_FRAME_FROM_SVC_AND_EXIT
 FUNCTION_END(arm_prefetch_abort)
 
@@ -204,6 +208,7 @@ FUNCTION(arm_data_abort):
 	mov		fp, r0
 	bl		arch_arm_data_abort
 
+	DISABLE_INTERRUPTS
 	PULL_FRAME_FROM_SVC_AND_EXIT
 FUNCTION_END(arm_data_abort)
 
@@ -221,6 +226,7 @@ FUNCTION(arm_irq):
 	mov		fp, r0
 	bl		arch_arm_irq
 
+	DISABLE_INTERRUPTS
 	PULL_FRAME_FROM_SVC_AND_EXIT
 FUNCTION_END(arm_irq)
 
@@ -233,6 +239,7 @@ FUNCTION(arm_fiq):
 	mov		fp, r0
 	bl		arch_arm_fiq
 
+	DISABLE_INTERRUPTS
 	PULL_FRAME_FROM_SVC_AND_EXIT
 FUNCTION_END(arm_fiq)
 

@@ -25,10 +25,10 @@ kernel(Resampler* object, const void *_src, int32 srcSampleOffset,
 	int32 srcSampleCount, void *_dest, int32 destSampleOffset,
 	int32 destSampleCount, float _gain)
 {
-	register const char * src = (const char *)_src;
-	register char * dest = (char *)_dest;
-	register int32 count = destSampleCount;
-	register float gain = _gain * gnum / gden;
+	const char * src = (const char *)_src;
+	char * dest = (char *)_dest;
+	int32 count = destSampleCount;
+	float gain = _gain * gnum / gden;
 
 	if (srcSampleCount == destSampleCount) {
 		// optimized case for no resampling
@@ -46,8 +46,8 @@ kernel(Resampler* object, const void *_src, int32 srcSampleOffset,
 		return;
 	}
 
-	register float delta = float(srcSampleCount) / float(destSampleCount);
-	register float current = 0.0f;
+	float delta = float(srcSampleCount) / float(destSampleCount);
+	float current = 0.0f;
 
 	// downsample
 	while (count--) {
@@ -61,7 +61,7 @@ kernel(Resampler* object, const void *_src, int32 srcSampleOffset,
 
 		dest += destSampleOffset;
 		current += delta;
-		register int32 skipcount = (int32)current;
+		int32 skipcount = (int32)current;
 		current -= skipcount;
 		src += skipcount * srcSampleOffset;
 	}
