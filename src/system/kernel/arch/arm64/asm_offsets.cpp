@@ -1,4 +1,5 @@
 /*
+ * Copyright 2022 Haiku, Inc. All Rights Reserved.
  * Copyright 2007-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -36,6 +37,7 @@ dummy()
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, x);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, lr);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, sp);
+	DEFINE_OFFSET_MACRO(IFRAME, iframe, fp);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, esr);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, far);
 

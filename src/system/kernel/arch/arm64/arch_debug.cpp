@@ -19,6 +19,8 @@
 
 #define NUM_PREVIOUS_LOCATIONS 32
 
+extern struct iframe_stack gBootFrameStack;
+
 
 static bool
 already_visited(addr_t* visited, int32* _last, int32* _num, addr_t fp)
@@ -348,6 +350,19 @@ stack_trace(int argc, char **argv)
 	Thread* thread = thread_get_current_thread();
 	addr_t fp = arm64_get_fp();
 	int32 num = 0, last = 0;
+	struct iframe_stack *frameStack;
+
+	// We don't have a thread pointer early in the boot process
+	if (thread != NULL)
+		frameStack = &thread->arch_info.iframes;
+	else
+		frameStack = &gBootFrameStack;
+
+	int32 i;
+	for (i = 0; i < frameStack->index; i++) {
+		kprintf("iframe %p (end = %p)\n",
+			frameStack->frames[i], frameStack->frames[i] + 1);
+	}
 
 	if (thread != NULL) {
 		kprintf("stack trace for thread 0x%" B_PRIx32 " \"%s\"\n", thread->id,
@@ -366,19 +381,37 @@ stack_trace(int argc, char **argv)
 	kprintf("frame            caller     <image>:function + offset\n");
 
 	for (int32 callIndex = 0;; callIndex++) {
-		addr_t ip, next;
-
-		if (get_next_frame(fp, &next, &ip) != B_OK) {
-			kprintf("%08lx -- read fault\n", fp);
-			break;
+		// see if the frame pointer matches the iframe
+		struct iframe *frame = NULL;
+		for (i = 0; i < frameStack->index; i++) {
+			if (fp == (addr_t)frameStack->frames[i]) {
+				// it's an iframe
+				frame = frameStack->frames[i];
+				break;
+			}
 		}
 
-		if (ip == 0 || fp == 0)
-			break;
+		if (frame) {
+			kprintf("iframe at %p\n", frame);
+			dprintf("ELR=%016lx SPSR=%016lx\n", frame->elr, frame->spsr);
+			dprintf("LR =%016lx SP  =%016lx FP =%016lx\n", frame->lr, frame->sp, frame->fp);
+			dprintf("ESR=%016lx FAR =%016lx\n", frame->esr, frame->far);
+			print_stack_frame(thread, frame->elr, fp, frame->fp, callIndex, demangle);
+			fp = frame->fp;
+		} else {
+			addr_t ip, next;
 
-		print_stack_frame(thread, ip, fp, next, callIndex, demangle);
-		fp = next;
+			if (get_next_frame(fp, &next, &ip) != B_OK) {
+				kprintf("%08lx -- read fault\n", fp);
+				break;
+			}
 
+			if (ip == 0 || fp == 0)
+				break;
+
+			print_stack_frame(thread, ip, fp, next, callIndex, demangle);
+			fp = next;
+		}
 
 		if (already_visited(previousLocations, &last, &num, fp)) {
 			kprintf("circular stack frame: %p!\n", (void *)fp);

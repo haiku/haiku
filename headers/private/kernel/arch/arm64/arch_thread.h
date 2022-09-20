@@ -1,4 +1,5 @@
 /*
+ * Copyright 2022, Haiku Inc. All rights reserved.
  * Copyright 2018, Jaroslaw Pelczar <jarek@jpelczar.com>
  * Distributed under the terms of the MIT License.
  */
@@ -13,6 +14,8 @@
 extern "C" {
 #endif
 
+void arm64_push_iframe(struct iframe_stack *stack, struct iframe *frame);
+void arm64_pop_iframe(struct iframe_stack *stack);
 
 static inline Thread * arch_thread_get_current_thread(void)
 {

@@ -27,6 +27,22 @@
 #endif
 
 
+void
+arm64_push_iframe(struct iframe_stack *stack, struct iframe *frame)
+{
+	ASSERT(stack->index < IFRAME_TRACE_DEPTH);
+	stack->frames[stack->index++] = frame;
+}
+
+
+void
+arm64_pop_iframe(struct iframe_stack *stack)
+{
+	ASSERT(stack->index > 0);
+	stack->index--;
+}
+
+
 status_t
 arch_thread_init(struct kernel_args *args)
 {
