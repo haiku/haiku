@@ -194,7 +194,7 @@ posix_spawn_file_actions_adddup2(posix_spawn_file_actions_t *_actions,
 }
 
 
-int
+extern "C" int
 posix_spawn_file_actions_addchdir_np(posix_spawn_file_actions_t *_actions,
 	const char *path)
 {
@@ -221,7 +221,7 @@ posix_spawn_file_actions_addchdir_np(posix_spawn_file_actions_t *_actions,
 }
 
 
-int
+extern "C" int
 posix_spawn_file_actions_addfchdir_np(posix_spawn_file_actions_t *_actions,
 	int fildes)
 {
@@ -621,3 +621,6 @@ posix_spawnp(pid_t *pid, const char *file,
 	return do_posix_spawn(pid, file, file_actions, attrp, argv, envp, true);
 }
 
+
+B_DEFINE_WEAK_ALIAS(posix_spawn_file_actions_addchdir_np, posix_spawn_file_actions_addchdir);
+B_DEFINE_WEAK_ALIAS(posix_spawn_file_actions_addfchdir_np, posix_spawn_file_actions_addfchdir);
