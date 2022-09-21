@@ -48,17 +48,19 @@ parse_intel(const char* name)
 			break;
 	}
 
-	// ignore vendor
-	for (; name[index] != '\0'; index++) {
-		if (name[index] == ' ') {
-			index++;
-			break;
-		}
-	}
 
 	// parse model
 	int outIndex = 0;
 	for (; name[index] != '\0'; index++) {
+		// ignore vendor
+		if (strncmp(&name[index], "Intel", 5) == 0) {
+			for (; name[index] != '\0'; index++) {
+				if (name[index] == ' ') {
+					index++;
+					break;
+				}
+			}
+		}
 		if (!strncmp(&name[index], "(R)", 3)) {
 			outIndex += strlcpy(&buffer[outIndex], "®",
 				sizeof(buffer) - outIndex);
