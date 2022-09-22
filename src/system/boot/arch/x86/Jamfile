@@ -10,15 +10,13 @@ for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 		DEFINES = $(defines) ;
 		DEFINES += _BOOT_MODE ;
 
-		if $(TARGET_BOOT_PLATFORM) = efi {
-			if $(TARGET_ARCH) = x86_64 {
-				DEFINES += BOOT_SUPPORT_ELF64 ;
-			} else {
-				DEFINES += BOOT_SUPPORT_ELF32 ;
-			}
-		} else {
+		if $(TARGET_BOOT_PLATFORM) = efi && $(TARGET_ARCH) = x86_64 {
 			DEFINES += BOOT_SUPPORT_ELF64 ;
-			DEFINES += BOOT_SUPPORT_ELF32 ;
+		} else {
+			DEFINES +=
+				BOOT_SUPPORT_ELF32
+				BOOT_SUPPORT_ELF64
+			;
 		}
 
 		local kernelArchSources =
