@@ -17,7 +17,6 @@
 extern "C" void arch_enter_kernel(
 	struct kernel_args* kernelArgs, addr_t kernelEntry, addr_t kernelStackTop);
 
-extern void arch_mmu_dump_present_tables();
 extern const char* granule_type_str(int tg);
 
 extern uint32_t arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
@@ -155,8 +154,6 @@ arch_start_kernel(addr_t kernelEntry)
 
 		dprintf("Kernel entry accessibility W: %x R: %x\n", arch_mmu_write_access(kernelEntry),
 			arch_mmu_read_access(kernelEntry));
-
-		arch_mmu_dump_present_tables();
 
 		if (el == 1) {
 			// Disable CACHE & MMU before dealing with TTBRx
