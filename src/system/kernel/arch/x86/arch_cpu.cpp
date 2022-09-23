@@ -1496,6 +1496,17 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 	// if RDTSCP is available write cpu number in TSC_AUX
 	if (x86_check_feature(IA32_FEATURE_AMD_EXT_RDTSCP, FEATURE_EXT_AMD))
 		x86_write_msr(IA32_MSR_TSC_AUX, cpu);
+
+	// make LFENCE a dispatch serializing instruction on AMD 64bit
+	cpu_ent* cpuEnt = get_cpu_struct();
+	if (cpuEnt->arch.vendor == VENDOR_AMD) {
+		uint32 family = cpuEnt->arch.family + cpuEnt->arch.extended_family;
+		if (family >= 0x10 && family != 0x11) {
+			uint64 value = x86_read_msr(MSR_F10H_DE_CFG);
+			if ((value & DE_CFG_SERIALIZE_LFENCE) == 0)
+				x86_write_msr(MSR_F10H_DE_CFG, value | DE_CFG_SERIALIZE_LFENCE);
+		}
+	}
 #endif
 
 	if (x86_check_feature(IA32_FEATURE_APERFMPERF, FEATURE_6_ECX)) {

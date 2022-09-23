@@ -122,6 +122,9 @@
 
 // K8 MSR registers
 #define K8_MSR_IPM						0xc0010055
+#define MSR_F10H_DE_CFG					0xc0011029
+#define DE_CFG_SERIALIZE_LFENCE			(1 << 1)
+
 
 // Hardware P-States MSR registers §14.4.1
 // reference https://software.intel.com/content/dam/develop/public/us/en/documents/253669-sdm-vol-3b.pdf
