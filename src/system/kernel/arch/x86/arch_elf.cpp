@@ -38,7 +38,7 @@ is_in_image(struct elf_image_info *image, addr_t address)
 
 
 #if !defined(__x86_64__) || defined(ELF32_COMPAT)	\
-	 || (defined(_BOOT_MODE) && _BOOT_PLATFORM != efi)
+	 || (defined(_BOOT_MODE) && defined(BOOT_SUPPORT_ELF32))
 
 
 #ifdef TRACE_ARCH_ELF
@@ -68,7 +68,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 	struct elf_image_info *resolveImage, Elf32_Rel *rel, int relLength)
 #endif
 {
-	elf_addr S;
+	Elf32_Addr S;
 	uint32 A;
 	uint32 P;
 	uint32 finalAddress;
@@ -158,16 +158,16 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 				return B_BAD_DATA;
 		}
 
-		resolveAddress = (uint32 *)(image->text_region.delta + rel[i].r_offset);
+		resolveAddress = (uint32 *)(addr_t)(image->text_region.delta + rel[i].r_offset);
 #ifndef _BOOT_MODE
 		if (!is_in_image(image, (addr_t)resolveAddress)) {
-			dprintf("arch_elf_relocate_rel: invalid offset %#lx\n",
+			dprintf("arch_elf_relocate_rel: invalid offset 0x%" B_PRIx32 "\n",
 				rel[i].r_offset);
 			return B_BAD_ADDRESS;
 		}
 		*resolveAddress = finalAddress;
 #else
-		boot_elf32_set_relocation((Elf32_Addr)resolveAddress, finalAddress);
+		boot_elf32_set_relocation((Elf32_Addr)(addr_t)resolveAddress, finalAddress);
 #endif
 		TRACE(("-> offset 0x%08" B_PRIx32 "x (0x%08" B_PRIx32 ") = 0x%08" B_PRIx32 "\n",
 			image->text_region.delta + rel[i].r_offset, rel[i].r_offset, finalAddress));
@@ -193,7 +193,7 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 
 
 #endif	// !defined(__x86_64__) || defined(ELF32_COMPAT) ||
-	// (defined(_BOOT_MODE) && _BOOT_PLATFORM != efi)
+	// (defined(_BOOT_MODE) && defined(BOOT_SUPPORT_ELF32))
 
 
 #if (defined(__x86_64__) && !defined(ELF32_COMPAT)) || \
