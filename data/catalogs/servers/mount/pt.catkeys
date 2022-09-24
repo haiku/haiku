@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-mount_server	2818767263
+1	portuguese	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Montar em modo só de leitura
 Error mounting volume:\n\n%s	AutoMounter		Erro ao montar volume:\n\n%s
 Cancel	AutoMounter		Cancelar
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		A montar o volume '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Não foi possível desmontar o disco \"%s\":\n\t%s\n\nForçar a desmontagem?\n\nNota: Se uma aplicação estiver a escrever no volume neste momento, desmontá-lo agora pode resultar em perca de dados.\n
 Force unmount	AutoMounter		Forçar desmontagem
 Mount error	AutoMounter		Erro ao montar
-Mounting volume <unnamed volume>\n\n	AutoMounter		A montar volume <volume sem nome>\n\n
 Mount warning	AutoMounter		Aviso ao montar

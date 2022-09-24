@@ -19,8 +19,8 @@ Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter H
 Testing and bug triaging:\n	AboutView		テストとバグの分別:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{プロセッサ:} other{#プロセッサ:}}
 Ralink WiFi Firmware	AboutWindow		Ralink WiFi ファームウェア
-%d MiB total	AboutView		合計 %d MiB
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku 独自のコード、特にカーネルと、アプリケーションがリンクするすべてのコードは <MITライセンス> で配布されています。いくつかのシステムライブラリは、<LGPLライセンス> で配布されているサードパーティのコードも含まれています。サードパーティのライセンスは以下で見つけられます。\n\n
+%d MiB total	AboutView		合計 %d MiB
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. All rights reserved.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. All rights reserved.
@@ -52,8 +52,8 @@ Source Code: 	AboutView		ソースコード:
 \nCopyrights\n\n	AboutView		\n著作権\n\n
 GNU GPL v3	AboutWindow		GNU GPL v3
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
-The HaikuPorts team\n	AboutView		HaikuPorts チーム\n
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		以下のGNUプロジェクトからのソフトウェアを含んでいます。それらは GPL および LGPL ライセンスでリリースされています。\nGNU C Library、GNU coretools、diffutils、findutils、sharutils、gawk、bison、m4、make、wget、ncurses、termcap、Bourne Again Shell\nCopyright © The Free Software Foundation.
+The HaikuPorts team\n	AboutView		HaikuPorts チーム\n
 Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		以下の FreeBSD プロジェクトからのソフトウェアを含んでいます。それらは BSD ライセンスでリリースされています:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. All rights reserved.
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2019 Fabrice Bellard, et al.
@@ -64,8 +64,8 @@ Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutVie
 Version:	AboutView		バージョン:
 The BeGeistert team\n	AboutView		BeGeistert チーム\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
-License: 	AboutView		ライセンス:
 Intel (2xxx firmware)	AboutWindow		Intel (2xxx ファームウェア)
+License: 	AboutView		ライセンス:
 GNU GPL v2	AboutWindow		GNU GPL v2
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Auckland 大学 および Christof Lutteroth\n\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		合計 %total MiB / %inaccessible MiB アクセス不可

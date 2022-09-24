@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-mount_server	2818767263
+1	catalan; valencian	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Munta'l només per a lectura
 Error mounting volume:\n\n%s	AutoMounter		Error en muntar el volum:\n\n%s
 Cancel	AutoMounter		Cancel·la
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		Es munta el volum %s\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		No s'ha pogut desmuntar el disc \"%s\":\n\t%s\n\nVoleu forçar-ho?\n\nNota: si hi ha alguna aplicació escrivint al volum, desmuntar-lo ara podria comportar una pèrdua de dades.\n
 Force unmount	AutoMounter		Força'n el desmuntatge
 Mount error	AutoMounter		Error de muntatge
-Mounting volume <unnamed volume>\n\n	AutoMounter		Es munta el volum <volum sense nom>\n\n
 Mount warning	AutoMounter		Avís de muntatge

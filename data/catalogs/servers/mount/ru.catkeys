@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-mount_server	2818767263
+1	russian	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Только чтение
 Error mounting volume:\n\n%s	AutoMounter		Ошибка подключения раздела:\n\n%s
 Cancel	AutoMounter		Отмена
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		Подключение раздела '%s'
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Невозможно отключить диск \"%s\":\n\t%s\n\nОтключить этот диск принудительно?\n\nВнимание: если какое-нибудь приложение в данный момент записывает данные на этот раздел, то отключение диска может привести к потере данных.\n
 Force unmount	AutoMounter		Отключить принудительно
 Mount error	AutoMounter		Ошибка подключения
-Mounting volume <unnamed volume>\n\n	AutoMounter		Подключение раздела <безымянный раздел>\n\n
 Mount warning	AutoMounter		Предупреждение при подключении

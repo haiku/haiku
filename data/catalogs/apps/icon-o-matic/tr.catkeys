@@ -18,7 +18,7 @@ Shorten	Icon-O-Matic-PropertyNames		Kısalt
 Unassign Path	Icon-O-Matic-UnassignPathCmd		Yol atamasını kaldır
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		İçe aktarmaya çalıştığınız metin pek uzun, emin misiniz?
 Paste	Icon-O-Matic-Properties		Yapıştır
-Detect Orient.	Icon-O-Matic-PropertyNames		Oryantasyonu algıla
+Detect Orient.	Icon-O-Matic-PropertyNames		Yönelimi algıla
 Click on a shape above	Empty transformers list - 1st line		Dönüştürücüleri iliştirmek için
 Close	Icon-O-Matic-Menu-File		Kapat
 Add rect	Icon-O-Matic-PathsList		Dikdörtgen ekle
@@ -27,7 +27,7 @@ Multi Paste Properties	Icon-O-Matic-Properties		Çoklu yapıştır özellikleri
 Bleep!	Exporter - Continue in error dialog		Bip bip!
 Transform	Icon-O-Matic-PathManipulator		Dönüştür
 Remove Transformer	Icon-O-Matic-RemoveTransformersCmd		Dönüştürücüyü kaldır
-META:ICON Attribute	Icon-O-Matic-SavePanel		META:SİMGE özniteliği
+META:ICON Attribute	Icon-O-Matic-SavePanel		META:ICON özniteliği
 Add shape with style	Icon-O-Matic-Menu-Shape		Biçemli şekil ekle
 Assign Path	Icon-O-Matic-AddPathsCmd		Yol ata
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Dönüşümü sıfırla
@@ -98,8 +98,8 @@ Add shape with path	Icon-O-Matic-Menu-Shape		Yol içeren şekil ekle
 Translation X	Icon-O-Matic-PropertyNames		X çevirisi
 Flip Control Points	Icon-O-Matic-FlipPointsCmd		Denetim noktalarını ters çevir
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Dönüştürücüler ekle
-BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:SİMGE özniteliği
-Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic SVG dosyasından okuduğu veriyi yorumlayamamış olabilir. Orijinal dosyanın üzerine yazarak bu veriyi tümüyle kaybedebilirsiniz.
+BEOS:ICON Attribute	Icon-O-Matic-SavePanel		BEOS:ICON özniteliği
+Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic, SVG dosyasından okuduğu veriyi yorumlayamamış olabilir. Özgün dosyanın üzerine yazarak bu veriyi tümüyle kaybedebilirsiniz.
 Rotate indices backwards	Icon-O-Matic-PathsList		Belirticileri geriye doğru döndür
 Overwrite	Icon-O-Matic-SVGExport		Üzerine yaz
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Denetim noktasını değiştir

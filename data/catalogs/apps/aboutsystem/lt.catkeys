@@ -15,8 +15,8 @@ Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		© 1990-2002 In
 Past website & marketing:\n	AboutView		Ankstesnė svetainė ir rinkodara:\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		© 2003 Peter Hanappe ir kiti.
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Procesorius:} few{# procesoriai:} other{# procesorių:}}
-%d MiB total	AboutView		%d MiB iš viso
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Pirminiai tekstai, kurti specialiai „Haiku“ projektui, ypač branduolys ir bet koks programinis kodas, su kuriuo programos gali būti saistomos, yra platinamas pagal <MIT licenciją>. Kai kuriose sisteminėse bibliotekose gali būti trečiųjų šalių kurto programinio kodo, platinamo pagal <LGPL licenciją>. Trečiųjų šalių kurto programinio kodo autorių teisės išvardintos žemiau.\n\n
+%d MiB total	AboutView		%d MiB iš viso
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		© 1996-1997 Jeff Prosise. Visos teisės saugomos.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		© 1999-2006 Brian Paul. Mesa3D Project. Visos teisės saugomos.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		© 2010-2011 Google Inc. Visos teisės saugomos.

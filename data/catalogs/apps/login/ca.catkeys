@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Login	3568987751
+1	catalan; valencian	x-vnd.Haiku-Login	1584886353
 Invalid login!	Login View		La identificació no és vàlida!
 Error	Login App		Error
 Login application for Haiku\nUsage:	Login App		Aplicació d'inici de sessió per al Haiku\nÚs:
@@ -11,7 +11,6 @@ Reboot	Login View		Reinicia
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Podeu personalitzar l'escriptori que es mostra darrere l'aplicació d'inici de sessió deixant-hi anar replicants.\n\nEn acabar, només heu de sortir de l'aplicació (Cmd-Q).
 OK	Login View		D'acord
 Info	Login App		Informació
---edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tLlançament en mode d'edició de lleixes per permetre personalitzar l'escriptori.
 Login:	Login View		Nom d'usuari:
 Password:	Login View		Contrasenya:
 Unimplemented	Login App		No implementat

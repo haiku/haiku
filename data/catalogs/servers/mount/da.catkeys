@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-mount_server	2818767263
+1	danish	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Montér skrivebeskyttet
 Error mounting volume:\n\n%s	AutoMounter		Fejl ved montering af diskområde:\n\n%s
 Cancel	AutoMounter		Annuller
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		Monterer diskområdet '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Kunne ikke afmontere disken \"%s\":\n\t%s\n\nSkal afmontering gennemtvinges?\n\nBemærk: Hvis et program skriver til diskområdet på nuværende tidspunkt, så kan afmontering måske lede til tab af data.\n
 Force unmount	AutoMounter		Gennemtving afmontering
 Mount error	AutoMounter		Fejl ved montering
-Mounting volume <unnamed volume>\n\n	AutoMounter		Monterer diskrområdet <unavngivet diskområde>\n\n
 Mount warning	AutoMounter		Advarsel om montering
