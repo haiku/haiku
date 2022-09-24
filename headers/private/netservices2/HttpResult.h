@@ -7,6 +7,7 @@
 #define _B_HTTP_RESULT_H_
 
 #include <memory>
+#include <optional>
 
 #include <String.h>
 
