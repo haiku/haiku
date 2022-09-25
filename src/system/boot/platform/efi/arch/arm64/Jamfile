@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src system boot platform efi arch arm64 ;
 
-SubDirHdrs $(HAIKU_TOP) src system boot platform efi ;
+SubDirHdrs $(SUBDIR) $(DOTDOT) $(DOTDOT) ;
+SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 
 UseLibraryHeaders [ FDirName libfdt ] ;
 
@@ -9,32 +10,40 @@ UsePrivateHeaders [ FDirName kernel boot platform efi ] ;
 
 local platform ;
 for platform in [ MultiBootSubDirSetup efi ] {
-    on $(platform) {
-	{
-		local defines = _BOOT_MODE _BOOT_PLATFORM_EFI ;
-		defines = [ FDefines $(defines) ] ;
-		SubDirCcFlags $(defines) ;
-		SubDirC++Flags $(defines) -fno-rtti ;
-	}
+	on $(platform) {
+		{
+			local defines = _BOOT_MODE _BOOT_PLATFORM_EFI ;
+			defines = [ FDefines $(defines) ] ;
+			SubDirCcFlags $(defines) ;
+			SubDirC++Flags $(defines) -fno-rtti ;
+		}
 
-	local arch_src =
-		crt0-efi-$(TARGET_ARCH).S
-		entry.S
-		transition.S
-		exceptions.S
-		cache.S
-		relocation_func.cpp
-		arch_acpi.cpp
-		arch_cache.cpp
-		arch_dtb.cpp
-		arch_mmu.cpp
-		arch_smp.cpp
-		arch_start.cpp
-		arch_timer.cpp
-		;
+		local arch_src =
+			crt0-efi-$(TARGET_ARCH).S
+			entry.S
+			transition.S
+			exceptions.S
+			cache.S
+			relocation_func.cpp
+			arch_acpi.cpp
+			arch_cache.cpp
+			arch_dtb.cpp
+			arch_mmu.cpp
+			arch_smp.cpp
+			arch_start.cpp
+			arch_timer.cpp
+			;
 
-	BootMergeObject boot_platform_efi_arm64.o :
-		$(arch_src)
-		;
+		local generic_src =
+			generic_mmu.cpp
+			;
+
+		BootMergeObject boot_platform_efi_arm64.o :
+			$(arch_src)
+			$(generic_src)
+			;
+
+		SEARCH on [ FGristFiles $(generic_src) ]
+			= [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 	}
 }

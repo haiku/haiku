@@ -6,8 +6,9 @@
 #include <boot/platform.h>
 #include <boot/stage2.h>
 
-#include "mmu.h"
 #include "efi_platform.h"
+#include "generic_mmu.h"
+#include "mmu.h"
 
 #include "aarch64.h"
 #include "arch_mmu.h"
@@ -23,6 +24,9 @@
 //#define TRACE_MEMORY_MAP
 //#define TRACE_PAGE_DIRECTORY
 
+// Ignore memory above 512GB
+#define PHYSICAL_MEMORY_LOW		0x00000000
+#define PHYSICAL_MEMORY_HIGH	0x8000000000ull
 
 ARMv8TranslationRegime::TranslationDescriptor translation4Kb48bits = {
 	{L0_SHIFT, L0_ADDR_MASK, false, true, false },
@@ -268,97 +272,6 @@ map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint64_t flags)
 }
 
 
-static void
-build_physical_memory_list(size_t memory_map_size,
-	efi_memory_descriptor* memory_map, size_t descriptor_size,
-	uint32_t descriptor_version)
-{
-	addr_t addr = (addr_t)memory_map;
-
-	gKernelArgs.num_physical_memory_ranges = 0;
-
-	// First scan: Add all usable ranges
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = (efi_memory_descriptor*)(addr + i * descriptor_size);
-		switch (entry->Type) {
-		case EfiLoaderCode:
-		case EfiLoaderData:
-			entry->VirtualStart = entry->PhysicalStart;
-			break;
-		case EfiBootServicesCode:
-		case EfiBootServicesData:
-		case EfiConventionalMemory: {
-			// Usable memory.
-			uint64_t base = entry->PhysicalStart;
-			uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
-			insert_physical_memory_range(base, size);
-			break;
-		}
-		case EfiACPIReclaimMemory:
-			// ACPI reclaim -- physical memory we could actually use later
-			break;
-		case EfiRuntimeServicesCode:
-		case EfiRuntimeServicesData:
-			entry->VirtualStart = entry->PhysicalStart;
-			break;
-		case EfiMemoryMappedIO:
-			entry->VirtualStart = entry->PhysicalStart;
-			break;
-		}
-	}
-
-	uint64_t initialPhysicalMemory = total_physical_memory();
-
-	// Second scan: Remove everything reserved that may overlap
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = (efi_memory_descriptor*)(addr + i * descriptor_size);
-		switch (entry->Type) {
-		case EfiLoaderCode:
-		case EfiLoaderData:
-		case EfiBootServicesCode:
-		case EfiBootServicesData:
-		case EfiConventionalMemory:
-			break;
-		default:
-			uint64_t base = entry->PhysicalStart;
-			uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
-			remove_physical_memory_range(base, size);
-		}
-	}
-
-	gKernelArgs.ignored_physical_memory
-		+= initialPhysicalMemory - total_physical_memory();
-
-	sort_address_ranges(gKernelArgs.physical_memory_range,
-		gKernelArgs.num_physical_memory_ranges);
-}
-
-
-static void
-build_physical_allocated_list(size_t memory_map_size,
-	efi_memory_descriptor* memory_map, size_t descriptor_size,
-	uint32_t descriptor_version)
-{
-	addr_t addr = (addr_t)memory_map;
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = (efi_memory_descriptor*)(addr + i * descriptor_size);
-		switch (entry->Type) {
-		case EfiLoaderData: {
-			uint64_t base = entry->PhysicalStart;
-			uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
-			insert_physical_allocated_range(base, size);
-			break;
-		}
-		default:
-			;
-		}
-	}
-
-	sort_address_ranges(gKernelArgs.physical_allocated_range,
-		gKernelArgs.num_physical_allocated_ranges);
-}
-
-
 void
 arch_mmu_init()
 {
@@ -459,7 +372,8 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	arch_mmu_allocate_kernel_page_tables();
 
 	build_physical_memory_list(memory_map_size, memory_map,
-		descriptor_size, descriptor_version);
+		descriptor_size, descriptor_version,
+		PHYSICAL_MEMORY_LOW, PHYSICAL_MEMORY_HIGH);
 
 	TRACE("Mapping Code & Data\n");
 
