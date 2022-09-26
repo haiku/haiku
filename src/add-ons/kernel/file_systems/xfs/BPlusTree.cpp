@@ -733,24 +733,10 @@ TreeDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 		int numberOfLeafEntries = leafHeader->Count();
 		TRACE("numberOfLeafEntries:(%" B_PRId32 ")\n", numberOfLeafEntries);
 		int left = 0;
-		int mid;
 		int right = numberOfLeafEntries - 1;
 
-		// Trying to find the lowerbound of hashValueOfRequest
-		// This is slightly different from bsearch(), as we want the first
-		// instance of hashValueOfRequest and not any instance.
-		while (left < right) {
-			mid = (left + right) / 2;
-			uint32 hashval = B_BENDIAN_TO_HOST_INT32(leafEntry[mid].hashval);
-			if (hashval >= hashValueOfRequest) {
-				right = mid;
-				continue;
-			}
-			if (hashval < hashValueOfRequest) {
-				left = mid + 1;
-			}
-		}
-		TRACE("left:(%" B_PRId32 "), right:(%" B_PRId32 ")\n", left, right);
+		hashLowerBound<ExtentLeafEntry>(leafEntry, left, right, hashValueOfRequest);
+
 		uint32 nextLeaf = leafHeader->Forw();
 		uint32 lastHashVal = B_BENDIAN_TO_HOST_INT32(
 			leafEntry[numberOfLeafEntries - 1].hashval);

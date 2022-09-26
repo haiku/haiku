@@ -286,24 +286,11 @@ LeafAttribute::Lookup(const char* name, size_t* nameLength)
 
 	int numberOfLeafEntries = header->Count();
 	int left = 0;
-	int mid;
 	int right = numberOfLeafEntries - 1;
 
 	delete header;
 
-	// LowerBound
-	while (left < right) {
-		mid = (left + right) / 2;
-		uint32 hashval = B_BENDIAN_TO_HOST_INT32(entry[mid].hashval);
-		if (hashval >= hashValueOfRequest) {
-			right = mid;
-			continue;
-		}
-		if (hashval < hashValueOfRequest) {
-			left = mid+1;
-		}
-	}
-	TRACE("left:(%" B_PRId32 "), right:(%" B_PRId32 ")\n", left, right);
+	hashLowerBound<AttrLeafEntry>(entry, left, right, hashValueOfRequest);
 
 	while (B_BENDIAN_TO_HOST_INT32(entry[left].hashval) == hashValueOfRequest) {
 

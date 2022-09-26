@@ -326,27 +326,13 @@ NodeAttribute::Lookup(const char* name, size_t* nameLength)
 
 	int TotalNodeEntries = node->Count();
 	int left = 0;
-	int mid;
 	int right = TotalNodeEntries - 1;
 
 	delete node;
 
-	// LowerBound
-	while (left < right) {
-		mid = (left + right) / 2;
-		uint32 hashval = B_BENDIAN_TO_HOST_INT32(nodeEntry[mid].hashval);
-		if (hashval >= hashValueOfRequest) {
-			right = mid;
-			continue;
-		}
-		if (hashval < hashValueOfRequest) {
-			left = mid + 1;
-		}
-	}
-	TRACE("left:(%" B_PRId32 "), right:(%" B_PRId32 ")\n", left, right);
+	hashLowerBound<NodeEntry>(nodeEntry, left, right, hashValueOfRequest);
 
 	// We found our potential leaf block, now read leaf buffer
-
 	// First see the leaf block from NodeEntry and logical block offset
 	uint32 logicalBlock = B_BENDIAN_TO_HOST_INT32(nodeEntry[left].before);
 	// Now calculate File system Block of This logical block
@@ -362,19 +348,7 @@ NodeAttribute::Lookup(const char* name, size_t* nameLength)
 
 	delete header;
 
-	// LowerBound
-	while (left < right) {
-		mid = (left + right) / 2;
-		uint32 hashval = B_BENDIAN_TO_HOST_INT32(entry[mid].hashval);
-		if (hashval >= hashValueOfRequest) {
-			right = mid;
-			continue;
-		}
-		if (hashval < hashValueOfRequest) {
-			left = mid + 1;
-		}
-	}
-	TRACE("left:(%" B_PRId32 "), right:(%" B_PRId32 ")\n", left, right);
+	hashLowerBound<AttrLeafEntry>(entry, left, right, hashValueOfRequest);
 
 	while (B_BENDIAN_TO_HOST_INT32(entry[left].hashval)
 			== hashValueOfRequest) {
