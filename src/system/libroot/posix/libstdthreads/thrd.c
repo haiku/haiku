@@ -2,7 +2,6 @@
  * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
  *
  * Copyright (c) 2011 Ed Schouten <ed@FreeBSD.org>
- * Copyright (c) 2022 Dominic Martinez <dom@dominicm.dev>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +55,6 @@ int
 thrd_create(thrd_t *thr, thrd_start_t func, void *arg)
 {
 	struct thrd_param *tp;
-	int error;
 
 	/*
 	 * Work around return type inconsistency.  Wrap execution using
@@ -67,12 +65,8 @@ thrd_create(thrd_t *thr, thrd_start_t func, void *arg)
 		return (thrd_nomem);
 	tp->func = func;
 	tp->arg = arg;
-
-	error = pthread_create(thr, NULL, thrd_entry, tp);
-	if (error != 0) {
+	if (pthread_create(thr, NULL, thrd_entry, tp) != 0) {
 		free(tp);
-		if (error == EAGAIN)
-			return (thrd_busy);
 		return (thrd_error);
 	}
 	return (thrd_success);
@@ -81,12 +75,14 @@ thrd_create(thrd_t *thr, thrd_start_t func, void *arg)
 thrd_t
 thrd_current(void)
 {
+
 	return (pthread_self());
 }
 
 int
 thrd_detach(thrd_t thr)
 {
+
 	if (pthread_detach(thr) != 0)
 		return (thrd_error);
 	return (thrd_success);
@@ -95,12 +91,14 @@ thrd_detach(thrd_t thr)
 int
 thrd_equal(thrd_t thr0, thrd_t thr1)
 {
+
 	return (pthread_equal(thr0, thr1));
 }
 
 _Noreturn void
 thrd_exit(int res)
 {
+
 	pthread_exit((void *)(intptr_t)res);
 }
 
@@ -119,11 +117,13 @@ thrd_join(thrd_t thr, int *res)
 int
 thrd_sleep(const struct timespec *duration, struct timespec *remaining)
 {
+
 	return (nanosleep(duration, remaining));
 }
 
 void
 thrd_yield(void)
 {
+
 	sched_yield();
 }
