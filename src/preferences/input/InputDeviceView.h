@@ -52,8 +52,8 @@ public:
 	const char*			Label() { return fTitle.String();}
 
 
-	static	InputIcons*	Icons() {return sIcons;}
-	static	void		SetIcons(InputIcons* icons) {sIcons = icons;}
+	static	InputIcons*	Icons() { return sIcons; }
+	static	void		SetIcons(InputIcons* icons) { sIcons = icons; }
 
 protected:
 	struct Renderer;
@@ -61,7 +61,6 @@ protected:
 	void				SetRenderParameters(Renderer& renderer);
 
 private:
-
 	static InputIcons*	sIcons;
 	BString				fTitle;
 	input_type			fInputType;

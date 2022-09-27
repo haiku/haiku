@@ -6,6 +6,7 @@
 #include "InputIcons.h"
 
 #include <Application.h>
+#include <ControlLook.h>
 #include <File.h>
 #include <IconUtils.h>
 #include <Resources.h>
@@ -14,17 +15,20 @@
 #include "IconHandles.h"
 
 
-#define ICON_SIZE 15
-
-const BRect InputIcons::sBounds(0, 0, ICON_SIZE, ICON_SIZE);
+const BRect InputIcons::sBounds;
 
 
 InputIcons::InputIcons()
 	:
-	mouseIcon(sBounds, B_CMAP8),
-	touchpadIcon(sBounds, B_CMAP8),
-	keyboardIcon(sBounds, B_CMAP8)
+	mouseIcon(NULL, false),
+	touchpadIcon(NULL, false),
+	keyboardIcon(NULL, false)
 {
+	if (!sBounds.IsValid()) {
+		*const_cast<BRect*>(&sBounds) = BRect(BPoint(0, 0),
+			be_control_look->ComposeIconSize(B_MINI_ICON));
+	}
+
 	app_info info;
 	be_app->GetAppInfo(&info);
 	BFile executableFile(&info.ref, B_READ_ONLY);

@@ -44,7 +44,8 @@ InputWindow::InputWindow(BRect rect)
 	fDeviceListView = new BListView(B_TRANSLATE("Device List"));
 	fDeviceListView->SetSelectionMessage(new BMessage(ITEM_SELECTED));
 	fDeviceListView->SetExplicitMinSize(
-		BSize(32 + fDeviceListView->StringWidth("Extended PS/2 Mouse 1"),
+		BSize(be_control_look->ComposeIconSize(32).Width()
+				+ fDeviceListView->StringWidth("Extended PS/2 Mouse 1"),
 			B_SIZE_UNSET));
 
 	BScrollView* scrollView = new BScrollView(
