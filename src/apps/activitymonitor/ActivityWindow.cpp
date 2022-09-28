@@ -12,9 +12,7 @@
 #include <Catalog.h>
 #include <File.h>
 #include <FindDirectory.h>
-#ifdef __HAIKU__
 #include <GroupLayout.h>
-#endif
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -53,7 +51,6 @@ ActivityWindow::ActivityWindow()
 		CenterOnScreen();
 	}
 
-#ifdef __HAIKU__
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 0);
 	SetLayout(layout);
 
@@ -63,9 +60,8 @@ ActivityWindow::ActivityWindow()
 	layout->AddView(menuBar);
 
 	fLayout = new BGroupLayout(B_VERTICAL);
-	float inset = ceilf(be_plain_font->Size() * 0.7);
 	fLayout->SetInsets(B_USE_WINDOW_SPACING);
-	fLayout->SetSpacing(inset);
+	fLayout->SetSpacing(B_USE_ITEM_SPACING);
 
 	BView* top = new BView("top", 0, fLayout);
 	layout->AddView(top);
@@ -85,40 +81,7 @@ ActivityWindow::ActivityWindow()
 		_AddDefaultView();
 		_AddDefaultView();
 	}
-#else	// !__HAIKU__
-	BView *layout = new BView(Bounds(), "topmost", B_FOLLOW_NONE, 0);
-	AddChild(layout);
 
-	// create GUI
-	BRect mbRect(Bounds());
-	mbRect.bottom = 10;
-	BMenuBar* menuBar = new BMenuBar(mbRect, "menu");
-	layout->AddChild(menuBar);
-
-	BRect topRect(Bounds());
-	topRect.top = menuBar->Bounds().bottom + 1;
-
-	BView* top = new BView(topRect, "top", B_FOLLOW_ALL, 0);
-	layout->AddChild(top);
-
-	BMessage viewState;
-	int32 count = 0;
-	ActivityView *aview;
-	BRect rect;
-	for (int32 i = 0; settings.FindMessage("activity view", i, &viewState)
-			== B_OK; i++) {
-		aview = new ActivityView("ActivityMonitor", &viewState);
-		if (!rect.IsValid())
-			rect = aview->Bounds();
-		else
-			rect.OffsetBySelf(0.0, aview->Bounds().Height());
-		top->AddChild(aview);
-		count++;
-	}
-	if (count == 0)
-		top->AddChild(new ActivityView("ActivityMonitor", NULL));
-
-#endif
 	// add menu
 
 	// "File" menu
