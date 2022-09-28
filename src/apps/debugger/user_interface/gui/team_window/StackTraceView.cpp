@@ -235,8 +235,8 @@ StackTraceView::_Init()
 	AddChild(fFramesTable->ToView());
 	fFramesTable->SetSortingEnabled(false);
 
-	float addressWidth = be_plain_font->StringWidth("0x00000000")
-		+ be_control_look->DefaultLabelSpacing() * 2 + 5;
+	float addressWidth = be_fixed_font->StringWidth("0xffffffff00000000")
+		+ be_control_look->DefaultLabelSpacing();
 
 	// columns
 	fFramesTable->AddColumn(new TargetAddressTableColumn(0, "Frame",

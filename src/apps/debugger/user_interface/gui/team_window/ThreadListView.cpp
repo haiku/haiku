@@ -13,6 +13,7 @@
 #include <Message.h>
 
 #include <AutoLocker.h>
+#include <ControlLook.h>
 #include <ObjectList.h>
 #include <ToolTip.h>
 
@@ -366,9 +367,12 @@ ThreadListView::_Init()
 	AddChild(fThreadsTable->ToView());
 
 	// columns
-	fThreadsTable->AddColumn(new Int32TableColumn(0, "ID", 60, 20, 1000,
+	const float padding = be_control_look->DefaultLabelSpacing() * 2;
+	fThreadsTable->AddColumn(new Int32TableColumn(0, "ID",
+		be_plain_font->StringWidth("12345") + padding, 20, 1000,
 		B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
-	fThreadsTable->AddColumn(new StringTableColumn(1, "State", 80, 40, 1000,
+	fThreadsTable->AddColumn(new StringTableColumn(1, "State",
+		be_plain_font->StringWidth("Debugged") + padding, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 	fThreadsTable->AddColumn(new StringTableColumn(2, "Name", 200, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
