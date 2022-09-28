@@ -59,7 +59,7 @@ SourceHdrs $(muslSources) :
 KernelMergeObject kernel_lib_posix.o :
 	# main
 	kernel_errno.cpp
-	dirent.c
+	dirent.cpp
 	fcntl.cpp
 	poll.cpp
 	utime.c
