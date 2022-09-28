@@ -30,7 +30,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			assert.cpp
 			cat.cpp
 			dlfcn.c
-			dirent.c
+			dirent.cpp
 			errno.c
 			fcntl.cpp
 			glob.c
