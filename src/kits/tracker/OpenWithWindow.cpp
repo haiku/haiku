@@ -47,6 +47,7 @@ All rights reserved.
 #include <Alert.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Collator.h>
 #include <GroupView.h>
 #include <GridView.h>
@@ -72,7 +73,7 @@ const char* kDefaultOpenWithTemplate = "OpenWithSettings";
 // make SaveState/RestoreState save the current window setting for
 // other windows
 
-const float kMaxMenuWidth = 200;
+const float kMaxMenuWidthFactor = 33.0f;
 
 const int32 kDocumentKnobWidth = 16;
 const int32 kOpenAndMakeDefault = 'OpDf';
@@ -1238,7 +1239,6 @@ OpenWithMenu::DoneBuildingItemList()
 
 	BFont font;
 	GetFont(&font);
-	float scaling = font.Size() / 12.0f;
 
 	// fill out the item labels
 	for (int32 index = 0; index < count; index++) {
@@ -1273,7 +1273,7 @@ OpenWithMenu::DoneBuildingItemList()
 				label = path.Path();
 			}
 			font.TruncateString(&label, B_TRUNCATE_MIDDLE,
-				kMaxMenuWidth * scaling);
+				kMaxMenuWidthFactor * be_control_look->DefaultLabelSpacing());
 		}
 
 #if DEBUG

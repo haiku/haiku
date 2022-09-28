@@ -343,9 +343,8 @@ ExtendedInfoWindow::ExtendedInfoWindow(PowerStatusDriverInterface* interface)
 {
 	fDriverInterface->AcquireReference();
 
-	float scale = be_plain_font->Size() / 12.0f;
-	float tabHeight = 70.0f * scale;
-	BRect batteryRect(0, 0, 50 * scale, 50 * scale);
+	BRect batteryRect(BPoint(0, 0), be_control_look->ComposeIconSize(50));
+	float tabHeight = ceilf(batteryRect.Height() * 1.4f);
 	fBatteryTabView = new BatteryTabView("tabview");
 	fBatteryTabView->SetBorder(B_NO_BORDER);
 	fBatteryTabView->SetTabHeight(tabHeight);
