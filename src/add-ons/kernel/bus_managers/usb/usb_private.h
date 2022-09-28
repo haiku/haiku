@@ -759,4 +759,22 @@ private:
 		uint16						fBandwidth;
 };
 
+
+#include <device_manager.h>
+
+
+// Interface between usb_bus and underlying implementation (xhci_pci)
+typedef struct usb_bus_interface {
+	driver_module_info info;
+} usb_bus_interface;
+
+
+typedef struct {
+	driver_module_info info;
+	status_t           (*get_stack)(void** stack);
+} usb_for_controller_interface;
+
+#define USB_FOR_CONTROLLER_MODULE_NAME "bus_managers/usb/controller/driver_v1"
+
+
 #endif // _USB_PRIVATE_H

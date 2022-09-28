@@ -895,8 +895,44 @@ struct usb_module_info_v2 gModuleInfoV2 = {
 //
 
 
+status_t
+usb_added_device(device_node *parent)
+{
+	dprintf("usb_added_device\n");
+	return B_OK;
+}
+
+
+status_t
+usb_get_stack(void** stack)
+{
+	*stack = gUSBStack;
+	return B_OK;
+}
+
+
+usb_for_controller_interface gForControllerModule = {
+	{
+		{
+			USB_FOR_CONTROLLER_MODULE_NAME,
+			B_KEEP_LOADED,
+			&bus_std_ops
+		},
+
+		NULL, // supported devices
+		usb_added_device,
+		NULL,
+		NULL,
+		NULL
+	},
+
+	usb_get_stack,
+};
+
+
 module_info *modules[] = {
 	(module_info *)&gModuleInfoV2,
 	(module_info *)&gModuleInfoV3,
+	(module_info *)&gForControllerModule,
 	NULL
 };
