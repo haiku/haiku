@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include <errno_private.h>
+#include <ErrnoMaintainer.h>
 #include <syscalls.h>
 #include <syscall_utils.h>
 
@@ -243,41 +244,17 @@ readdir(DIR* dir)
 int
 readdir_r(DIR* dir, struct dirent* entry, struct dirent** _result)
 {
-	ssize_t count;
+	BPrivate::ErrnoMaintainer _;
+	errno = 0;
 
-	if (dir->seek_position != dir->current_position) {
-		if (do_seek_dir(dir) != 0)
-			return -1;
-	}
-
-	if (dir->entries_left > 0) {
-		*_result
-			= (struct dirent *)((uint8 *)&dir->first_entry + dir->next_entry);
-
-		dir->entries_left--;
-		dir->next_entry += (*_result)->d_reclen;
-		dir->seek_position++;
-		dir->current_position++;
-
-		return 0;
-	}
-
-	count = _kern_read_dir(dir->fd, entry, sizeof(struct dirent)
-		+ B_FILE_NAME_LENGTH, 1);
-	if (count < B_OK)
-		return count;
-
-	if (count == 0) {
-		// end of directory
+	struct dirent* dirent = readdir(dir);
+	if (dirent == NULL) {
 		*_result = NULL;
-	} else {
-		*_result = entry;
-		dir->entries_left = count - 1;
-		dir->next_entry = dir->first_entry.d_reclen;
-		dir->seek_position++;
-		dir->current_position++;
+		return errno;
 	}
 
+	memcpy(entry, dirent, dirent->d_reclen);
+	*_result = entry;
 	return 0;
 }
 
