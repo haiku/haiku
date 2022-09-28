@@ -516,11 +516,6 @@ public:
 			.AddGlue()
 			.Add(fBasedOn)
 			.Add(fCopyright);
-
-		BFont font;
-		GetFont(&font);
-		SetExplicitPreferredSize(
-			BSize((font.Size() * 350) / 12, (font.Size() * 200) / 12));
 	}
 	~PPMView() { /* nothing here */ }
 

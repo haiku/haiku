@@ -707,11 +707,6 @@ TranslatorView::TranslatorView(const char* name, TranslatorSettings* settings)
 	AddTab(new TranslatorAboutView(B_TRANSLATE("About")));
 
 	settings->Release();
-
- 	BFont font;
- 	GetFont(&font);
- 	SetExplicitPreferredSize(
-		BSize((font.Size() * 380) / 12, (font.Size() * 250) / 12));
 }
 
 
@@ -1281,7 +1276,7 @@ JPEGTranslator::PopulateInfoFromFormat(translator_info* info,
 			info->quality = formats[i].quality;
 			info->capability = formats[i].capability;
 			BString str1(formats[i].name);
-			str1.ReplaceFirst("Be Bitmap Format (JPEGTranslator)", 
+			str1.ReplaceFirst("Be Bitmap Format (JPEGTranslator)",
 				B_TRANSLATE("Be Bitmap Format (JPEGTranslator)"));
 			strlcpy(info->name, str1.String(), sizeof(info->name));
 			strcpy(info->MIME,  formats[i].MIME);

@@ -83,7 +83,7 @@ ConfigView::ConfigView(TranslatorSettings* settings)
 	snprintf(libwebpVersion, sizeof(libwebpVersion),
 		"%d.%d.%d", v >> 16, (v>>8)&255, v&255);
 	libwebpInfo.ReplaceAll("%version%", libwebpVersion);
-	
+
 	BStringView *copyright2View = new BStringView("Copyright2",
 		libwebpInfo.String());
 	BStringView *copyright3View = new BStringView("Copyright3",
@@ -147,11 +147,6 @@ ConfigView::ConfigView(TranslatorSettings* settings)
 		.AddGlue()
 		.Add(copyright2View)
 		.Add(copyright3View);
-
-	BFont font;
-	GetFont(&font);
-	SetExplicitPreferredSize(BSize((font.Size() * 250) / 12,
-		(font.Size() * 350) / 12));
 }
 
 
