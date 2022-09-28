@@ -17,8 +17,8 @@
 
 
 struct pci_info;
-struct pci_module_info;
-struct pci_x86_module_info;
+struct pci_device_module_info;
+struct pci_device;
 struct xhci_td;
 struct xhci_device;
 struct xhci_endpoint;
@@ -91,7 +91,7 @@ class XHCI : public BusManager {
 public:
 	static	status_t			AddTo(Stack *stack);
 
-								XHCI(pci_info *info, Stack *stack);
+								XHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stack *stack);
 								~XHCI();
 
 	virtual	const char *		TypeName() const { return "xhci"; }
@@ -223,9 +223,6 @@ private:
 			void				_SwitchIntelPorts();
 
 private:
-	static	pci_module_info *	sPCIModule;
-	static	pci_x86_module_info *sPCIx86Module;
-
 			area_id				fRegisterArea;
 			uint8 *				fRegisters;
 			uint32				fCapabilityRegisterOffset;
@@ -234,6 +231,9 @@ private:
 			uint32				fDoorbellRegisterOffset;
 
 			pci_info *			fPCIInfo;
+			pci_device_module_info* fPci;
+			pci_device*			fDevice;
+
 			Stack *				fStack;
 			uint8				fIRQ;
 			bool				fUseMSI;

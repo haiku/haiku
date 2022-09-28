@@ -67,7 +67,6 @@ Stack::Stack()
 	// EHCI and XHCI, defaulting to EHCI. The XHCI module will switch these
 	// ports before the EHCI module discovers them.
 	const char *moduleNames[] = {
-		"busses/usb/xhci",
 		"busses/usb/uhci",
 		"busses/usb/ohci",
 		"busses/usb/ehci",
@@ -89,11 +88,6 @@ Stack::Stack()
 		}
 
 		TRACE("module %s successfully loaded\n", moduleNames[i]);
-	}
-
-	if (fBusManagers.Count() == 0) {
-		TRACE_ERROR("no bus managers available\n");
-		return;
 	}
 
 	fExploreThread = spawn_kernel_thread(ExploreThread, "usb explore",
@@ -133,8 +127,6 @@ Stack::~Stack()
 status_t
 Stack::InitCheck()
 {
-	if (fBusManagers.Count() == 0)
-		return ENODEV;
 	return B_OK;
 }
 
