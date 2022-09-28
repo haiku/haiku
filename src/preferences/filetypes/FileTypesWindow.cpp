@@ -96,6 +96,8 @@ static const char* kAttributeNames[] = {
 
 
 class TypeIconView : public IconView {
+	typedef IconView _inherited;
+
 	public:
 		TypeIconView(const char* name);
 		virtual ~TypeIconView();
@@ -135,7 +137,7 @@ TypeIconView::TypeIconView(const char* name)
 	: IconView(name)
 {
 	ShowEmptyFrame(false);
-	SetIconSize(48);
+	SetIconSize((icon_size)48);
 }
 
 
@@ -176,12 +178,13 @@ TypeIconView::Draw(BRect updateRect)
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
+	const BRect bitmapRect = _inherited::BitmapRect();
 	float y = fontHeight.ascent;
 	if (IconSource() == kNoIcon) {
 		// center text in the middle of the icon
-		y += (IconSize() - fontHeight.ascent - fontHeight.descent) / 2.0f;
+		y += (bitmapRect.Height() - fontHeight.ascent - fontHeight.descent) / 2.0f;
 	} else
-		y += IconSize() + 3.0f;
+		y += bitmapRect.Height() + 3.0f;
 
 	DrawString(text, BPoint(ceilf((Bounds().Width() - StringWidth(text)) / 2.0f),
 		ceilf(y)));
@@ -191,12 +194,14 @@ TypeIconView::Draw(BRect updateRect)
 void
 TypeIconView::GetPreferredSize(float* _width, float* _height)
 {
+	const BRect bitmapRect = _inherited::BitmapRect();
+
 	if (_width) {
 		float a = StringWidth(B_TRANSLATE("(from application)"));
 		float b = StringWidth(B_TRANSLATE("(from super type)"));
 		float width = max_c(a, b);
-		if (width < IconSize())
-			width = IconSize();
+		if (width < bitmapRect.Width())
+			width = bitmapRect.Width();
 
 		*_width = ceilf(width);
 	}
@@ -205,7 +210,7 @@ TypeIconView::GetPreferredSize(float* _width, float* _height)
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 
-		*_height = IconSize() + 3.0f + ceilf(fontHeight.ascent
+		*_height = bitmapRect.Height() + 3.0f + ceilf(fontHeight.ascent
 			+ fontHeight.descent);
 	}
 }
@@ -214,6 +219,8 @@ TypeIconView::GetPreferredSize(float* _width, float* _height)
 BRect
 TypeIconView::BitmapRect() const
 {
+	const BRect bitmapRect = _inherited::BitmapRect();
+
 	if (IconSource() == kNoIcon) {
 		// this also defines the drop target area
 		font_height fontHeight;
@@ -222,14 +229,14 @@ TypeIconView::BitmapRect() const
 		float width = StringWidth(B_TRANSLATE("no icon")) + 8.0f;
 		float height = ceilf(fontHeight.ascent + fontHeight.descent) + 6.0f;
 		float x = (Bounds().Width() - width) / 2.0f;
-		float y = ceilf((IconSize() - fontHeight.ascent - fontHeight.descent)
+		float y = ceilf((bitmapRect.Height() - fontHeight.ascent - fontHeight.descent)
 			/ 2.0f) - 3.0f;
 
 		return BRect(x, y, x + width, y + height);
 	}
 
-	float x = (Bounds().Width() - IconSize()) / 2.0f;
-	return BRect(x, 0.0f, x + IconSize() - 1, IconSize() - 1);
+	float x = (Bounds().Width() - bitmapRect.Width()) / 2.0f;
+	return BRect(x, 0.0f, x + bitmapRect.Width(), bitmapRect.Height());
 }
 
 

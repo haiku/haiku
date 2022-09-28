@@ -8,6 +8,7 @@
 #include "MimeTypeListView.h"
 
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <MessageRunner.h>
 
 #include <strings.h>
@@ -90,7 +91,8 @@ MimeTypeItem::DrawItem(BView* owner, BRect frame, bool complete)
 			owner->FillRect(rect, B_SOLID_LOW);
 		}
 
-		BBitmap bitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_RGBA32);
+		const BRect iconRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_MINI_ICON));
+		BBitmap bitmap(iconRect, B_RGBA32);
 		BMimeType mimeType(fType.String());
 		status_t status = icon_for_type(mimeType, bitmap, B_MINI_ICON);
 		if (status < B_OK) {
@@ -101,8 +103,8 @@ MimeTypeItem::DrawItem(BView* owner, BRect frame, bool complete)
 		}
 
 		if (status == B_OK) {
-			BPoint point(rect.left + 2.0f, 
-				rect.top + (rect.Height() - B_MINI_ICON) / 2.0f);
+			BPoint point(rect.left + 2.0f,
+				rect.top + (rect.Height() - iconRect.Height()) / 2.0f);
 
 			owner->SetDrawingMode(B_OP_ALPHA);
 			owner->DrawBitmap(&bitmap, point);
@@ -110,7 +112,7 @@ MimeTypeItem::DrawItem(BView* owner, BRect frame, bool complete)
 
 		owner->SetDrawingMode(B_OP_COPY);
 
-		owner->MovePenTo(rect.left + B_MINI_ICON + 8.0f, frame.top + fBaselineOffset);
+		owner->MovePenTo(rect.left + iconRect.Width() + 8.0f, frame.top + fBaselineOffset);
 		owner->DrawString(Text());
 
 		owner->SetLowColor(lowColor);
@@ -128,10 +130,11 @@ MimeTypeItem::Update(BView* owner, const BFont* font)
 	BStringItem::Update(owner, font);
 
 	if (fShowIcon) {
-		SetWidth(Width() + B_MINI_ICON + 2.0f);
+		const BSize iconSize = be_control_look->ComposeIconSize(B_MINI_ICON);
+		SetWidth(Width() + iconSize.Width() + 2.0f);
 
-		if (Height() < B_MINI_ICON + 4.0f)
-			SetHeight(B_MINI_ICON + 4.0f);
+		if (Height() < (iconSize.Height() + 4.0f))
+			SetHeight(iconSize.Height() + 4.0f);
 
 		font_height fontHeight;
 		font->GetHeight(&fontHeight);
@@ -544,7 +547,7 @@ MimeTypeListView::MessageReceived(BMessage* message)
 
 /*!
 	\brief This method makes sure a new MIME type will be selected.
-	
+
 	If it's not in the list yet, it will be selected as soon as it's
 	added.
 */
