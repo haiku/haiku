@@ -61,16 +61,17 @@ for platform in [ MultiBootSubDirSetup ] {
 					;
 
 					if $(TARGET_BOOT_PLATFORM) != efi {
-						DEFINES += _BOOT_PLATFORM_BIOS ;
-					}
-
-					if $(TARGET_BOOT_PLATFORM) = efi && $(TARGET_ARCH) = x86_64 {
-						DEFINES += BOOT_SUPPORT_ELF64 ;
-					} else {
 						DEFINES +=
+							_BOOT_PLATFORM_BIOS
 							BOOT_SUPPORT_ELF32
 							BOOT_SUPPORT_ELF64
 						;
+					} else {
+						if $(TARGET_ARCH) = x86_64 {
+							DEFINES += BOOT_SUPPORT_ELF64 ;
+						} else {
+							DEFINES += BOOT_SUPPORT_ELF32 ;
+						}
 					}
 				}
 				case "sparc" :
