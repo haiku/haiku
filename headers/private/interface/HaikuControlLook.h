@@ -337,8 +337,6 @@ public:
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS,
 									orientation orientation = B_HORIZONTAL);
-	virtual float				GetScrollBarWidth(
-									orientation orientation = B_VERTICAL);
 
 protected:
 			void				_DrawButtonFrame(BView* view, BRect& rect,

@@ -3,9 +3,9 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include <ControlLook.h>
 
+#include <algorithm>
 #include <binary_compatibility/Interface.h>
 
 
@@ -37,8 +37,13 @@ BControlLook::ComposeSpacing(float spacing)
 			return be_control_look->DefaultItemSpacing();
 		case B_USE_SMALL_SPACING:
 			return ceilf(be_control_look->DefaultItemSpacing() * 0.7f);
+		case B_USE_CORNER_SPACING:
+			return ceilf(be_control_look->DefaultItemSpacing() * 1.273f);
 		case B_USE_BIG_SPACING:
-			return ceilf(be_control_look->DefaultItemSpacing() * 1.3f);
+			return ceilf(be_control_look->DefaultItemSpacing() * 1.8f);
+
+		case B_USE_BORDER_SPACING:
+			return std::max(1.0f, floorf(be_control_look->DefaultItemSpacing() / 11.0f));
 	}
 
 	return spacing;
@@ -86,10 +91,7 @@ BControlLook::GetInsets(frame_type frameType, background_type backgroundType,
 float
 BControlLook::GetScrollBarWidth(orientation orientation)
 {
-	// this matches HaikuControlLook.cpp currently
-	if (be_plain_font->Size() <= 12.0f)
-		return 14.0f;
-	return be_plain_font->Size() / 12.0f * 14.0f;
+	return ComposeSpacing(B_USE_CORNER_SPACING);
 }
 
 
