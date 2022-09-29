@@ -29,6 +29,8 @@ public:
 			static	uint32				ExpectedMagic(int8 WhichDirectory,
 										Inode* inode);
 			static	uint32				CRCOffset();
+			static	NodeHeader*			Create(Inode* inode, const char* buffer);
+			static	uint32				Size(Inode* inode);
 };
 
 
@@ -116,13 +118,5 @@ private:
 			uint8				fCurLeafBufferNumber;
 			xfs_extnum_t		fFirstLeafMapIndex;
 };
-
-
-NodeHeader*
-CreateNodeHeader(Inode* inode, const char* buffer);
-
-
-uint32
-SizeOfNodeHeader(Inode* inode);
 
 #endif

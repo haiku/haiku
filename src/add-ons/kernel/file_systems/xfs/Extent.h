@@ -62,6 +62,8 @@ public:
 			static	uint32				ExpectedMagic(int8 WhichDirectory,
 										Inode* inode);
 			static	uint32				CRCOffset();
+			static	ExtentDataHeader*	Create(Inode* inode, const char* buffer);
+			static	uint32				Size(Inode* inode);
 };
 
 
@@ -175,13 +177,5 @@ private:
 			char*				fBlockBuffer;
 				// This isn't inode data. It holds the directory block.
 };
-
-
-ExtentDataHeader*
-CreateDataHeader(Inode* inode, const char* buffer);
-
-
-uint32
-SizeOfDataHeader(Inode* inode);
 
 #endif

@@ -54,7 +54,7 @@ NodeAttribute::Init()
 	if (status != B_OK)
 		return status;
 
-	NodeHeader* header = CreateNodeHeader(fInode,fNodeBuffer);
+	NodeHeader* header = NodeHeader::Create(fInode,fNodeBuffer);
 	if (header == NULL)
 		return B_NO_MEMORY;
 
@@ -257,8 +257,8 @@ NodeAttribute::GetNext(char* name, size_t* nameLength)
 {
 	TRACE("NodeAttribute::GetNext\n");
 
-	NodeHeader* node = CreateNodeHeader(fInode, fNodeBuffer);
-	NodeEntry* nodeEntry = (NodeEntry*)(fNodeBuffer + SizeOfNodeHeader(fInode));
+	NodeHeader* node = NodeHeader::Create(fInode, fNodeBuffer);
+	NodeEntry* nodeEntry = (NodeEntry*)(fNodeBuffer + NodeHeader::Size(fInode));
 
 	int TotalNodeEntries = node->Count();
 
@@ -321,8 +321,8 @@ NodeAttribute::Lookup(const char* name, size_t* nameLength)
 	TRACE("Hashval:(%" B_PRIu32 ")\n", hashValueOfRequest);
 
 	// first we need to find leaf block which might contain our entry
-	NodeHeader* node = CreateNodeHeader(fInode, fNodeBuffer);
-	NodeEntry* nodeEntry = (NodeEntry*)(fNodeBuffer + SizeOfNodeHeader(fInode));
+	NodeHeader* node = NodeHeader::Create(fInode, fNodeBuffer);
+	NodeEntry* nodeEntry = (NodeEntry*)(fNodeBuffer + NodeHeader::Size(fInode));
 
 	int TotalNodeEntries = node->Count();
 	int left = 0;

@@ -50,7 +50,7 @@ LeafDirectory::Init()
 	status_t status = FillBuffer(DATA, fDataBuffer, 0);
 	if (status != B_OK)
 		return status;
-	ExtentDataHeader* data = CreateDataHeader(fInode, fDataBuffer);
+	ExtentDataHeader* data = ExtentDataHeader::Create(fInode, fDataBuffer);
 	if (data == NULL)
 		return B_NO_MEMORY;
 	if (!VerifyHeader<ExtentDataHeader>(data, fDataBuffer, fInode, 0, fDataMap, XFS_LEAF)) {
@@ -64,7 +64,7 @@ LeafDirectory::Init()
 	status = FillBuffer(LEAF, fLeafBuffer, 0);
 	if (status != B_OK)
 		return status;
-	ExtentLeafHeader* leaf = CreateLeafHeader(fInode, fLeafBuffer);
+	ExtentLeafHeader* leaf = ExtentLeafHeader::Create(fInode, fLeafBuffer);
 	if (leaf == NULL)
 		return B_NO_MEMORY;
 	if (!VerifyHeader<ExtentLeafHeader>(leaf, fLeafBuffer, fInode, 0, fLeafMap, XFS_LEAF)) {
@@ -162,7 +162,7 @@ LeafDirectory::FillBuffer(int type, char* blockBuffer, int howManyBlocksFurthur)
 		fDataBuffer = blockBuffer;
 	} else if (type == LEAF) {
 		fLeafBuffer = blockBuffer;
-		ExtentLeafHeader* header = CreateLeafHeader(fInode, fLeafBuffer);
+		ExtentLeafHeader* header = ExtentLeafHeader::Create(fInode, fLeafBuffer);
 		if (header == NULL)
 			return B_NO_MEMORY;
 		TRACE("NumberOfEntries in leaf: (%" B_PRIu16 ")\n", header->Count());
@@ -191,7 +191,7 @@ LeafDirectory::FirstLeaf()
 		if (status != B_OK)
 			return NULL;
 	}
-	return (ExtentLeafEntry*)((char*)fLeafBuffer + SizeOfLeafHeader(fInode));
+	return (ExtentLeafEntry*)((char*)fLeafBuffer + ExtentLeafHeader::Size(fInode));
 }
 
 
@@ -239,7 +239,7 @@ LeafDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 
 	void* entry; // This could be unused entry so we should check
 
-	entry = (void*)(fDataBuffer + SizeOfDataHeader(fInode));
+	entry = (void*)(fDataBuffer + ExtentDataHeader::Size(fInode));
 
 	uint32 blockNoFromAddress = BLOCKNO_FROM_ADDRESS(fOffset, volume);
 	if (fOffset != 0 && blockNoFromAddress == fCurBlockNumber)
@@ -264,8 +264,8 @@ LeafDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 				blockNoFromAddress - fDataMap->br_startoff);
 			if (status != B_OK)
 				return status;
-			entry = (void*)(fDataBuffer + SizeOfDataHeader(fInode));
-			fOffset = fOffset + SizeOfDataHeader(fInode);
+			entry = (void*)(fDataBuffer + ExtentDataHeader::Size(fInode));
+			fOffset = fOffset + ExtentDataHeader::Size(fInode);
 			fCurBlockNumber = blockNoFromAddress;
 		} else if (fCurBlockNumber != blockNoFromAddress) {
 			// When the block isn't mapped in the current data map entry
@@ -274,8 +274,8 @@ LeafDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 				blockNoFromAddress - fDataMap->br_startoff);
 			if (status != B_OK)
 				return status;
-			entry = (void*)(fDataBuffer + SizeOfDataHeader(fInode));
-			fOffset = fOffset + SizeOfDataHeader(fInode);
+			entry = (void*)(fDataBuffer + ExtentDataHeader::Size(fInode));
+			fOffset = fOffset + ExtentDataHeader::Size(fInode);
 			fCurBlockNumber = blockNoFromAddress;
 		}
 
@@ -331,7 +331,7 @@ LeafDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 	if (status != B_OK)
 		return status;
 
-	ExtentLeafHeader* leafHeader = CreateLeafHeader(fInode, fLeafBuffer);
+	ExtentLeafHeader* leafHeader = ExtentLeafHeader::Create(fInode, fLeafBuffer);
 	if (leafHeader == NULL)
 		return B_NO_MEMORY;
 
@@ -417,6 +417,35 @@ uint32
 ExtentLeafHeader::CRCOffset()
 {
 	return XFS_LEAF_CRC_OFF - XFS_LEAF_V5_VPTR_OFF;
+}
+
+
+ExtentLeafHeader*
+ExtentLeafHeader::Create(Inode* inode, const char* buffer)
+{
+	if (inode->Version() == 1 || inode->Version() == 2) {
+		ExtentLeafHeaderV4* header = new (std::nothrow) ExtentLeafHeaderV4(buffer);
+		return header;
+	} else {
+		ExtentLeafHeaderV5* header = new (std::nothrow) ExtentLeafHeaderV5(buffer);
+		return header;
+	}
+}
+
+
+/*
+	This Function returns Actual size of leaf header
+	in all forms of directory.
+	Never use sizeof() operator because we now have
+	vtable as well and it will give wrong results
+*/
+uint32
+ExtentLeafHeader::Size(Inode* inode)
+{
+	if (inode->Version() == 1 || inode->Version() == 2)
+		return sizeof(ExtentLeafHeaderV4) - XFS_LEAF_V4_VPTR_OFF;
+	else
+		return sizeof(ExtentLeafHeaderV5) - XFS_LEAF_V5_VPTR_OFF;
 }
 
 
@@ -588,34 +617,4 @@ uint32
 ExtentLeafHeaderV5::Forw()
 {
 	return info.forw;
-}
-
-
-//Function to get V4 or V5 leaf header instance
-ExtentLeafHeader*
-CreateLeafHeader(Inode* inode, const char* buffer)
-{
-	if (inode->Version() == 1 || inode->Version() == 2) {
-		ExtentLeafHeaderV4* header = new (std::nothrow) ExtentLeafHeaderV4(buffer);
-		return header;
-	} else {
-		ExtentLeafHeaderV5* header = new (std::nothrow) ExtentLeafHeaderV5(buffer);
-		return header;
-	}
-}
-
-
-/*
-	This Function returns Actual size of leaf header
-	in all forms of directory.
-	Never use sizeof() operator because we now have
-	vtable as well and it will give wrong results
-*/
-uint32
-SizeOfLeafHeader(Inode* inode)
-{
-	if (inode->Version() == 1 || inode->Version() == 2)
-		return sizeof(ExtentLeafHeaderV4) - XFS_LEAF_V4_VPTR_OFF;
-	else
-		return sizeof(ExtentLeafHeaderV5) - XFS_LEAF_V5_VPTR_OFF;
 }
