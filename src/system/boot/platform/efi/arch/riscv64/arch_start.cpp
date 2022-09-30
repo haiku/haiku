@@ -10,11 +10,12 @@
 
 #include <arch_cpu_defs.h>
 
+#include "arch_traps.h"
+#include "efi_platform.h"
+#include "generic_mmu.h"
 #include "mmu.h"
 #include "serial.h"
 #include "smp.h"
-#include "efi_platform.h"
-#include "arch_traps.h"
 
 
 // From entry.S
@@ -92,22 +93,15 @@ arch_start_kernel(addr_t kernelEntry)
 	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
 		efi_memory_descriptor *entry
 			= (efi_memory_descriptor *)(addr + i * descriptor_size);
-		dprintf("  phys: %#lx, virt: %#lx, size: %#lx, ",
-			entry->PhysicalStart, entry->VirtualStart,
-			entry->NumberOfPages * B_PAGE_SIZE);
-		switch (entry->Type) {
-		case EfiReservedMemoryType:  dprintf("reservedMemoryType"); break;
-		case EfiLoaderCode:          dprintf("loaderCode"); break;
-		case EfiLoaderData:          dprintf("loaderData"); break;
-		case EfiBootServicesCode:    dprintf("bootServicesCode"); break;
-		case EfiBootServicesData:    dprintf("bootServicesData"); break;
-		case EfiConventionalMemory:  dprintf("conventionalMemory"); break;
-		case EfiACPIReclaimMemory:   dprintf("ACPIReclaimMemory"); break;
-		case EfiRuntimeServicesCode: dprintf("runtimeServicesCode"); break;
-		case EfiRuntimeServicesData: dprintf("runtimeServicesData"); break;
-		default: dprintf("?(%d)", entry->Type);
-		}
-		dprintf(", attrs: %#lx\n", entry->Attribute);
+		dprintf("  phys: 0x%08" PRIx64 "-0x%08" PRIx64
+			", virt: 0x%08" PRIx64 "-0x%08" PRIx64
+			", type: %s (%#x), attr: %#" PRIx64 "\n",
+			entry->PhysicalStart,
+			entry->PhysicalStart + entry->NumberOfPages * B_PAGE_SIZE,
+			entry->VirtualStart,
+			entry->VirtualStart + entry->NumberOfPages * B_PAGE_SIZE,
+			memory_region_type_str(entry->Type), entry->Type,
+			entry->Attribute);
 	}
 
 	// Generate page tables for use after ExitBootServices.
