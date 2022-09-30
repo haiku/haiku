@@ -377,6 +377,7 @@ rule KernelArchitectureSetup architecture
 	# Common boot-related cflags which apply to all loaders
 	HAIKU_BOOT_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(ccBaseFlags) ;
 	HAIKU_BOOT_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(c++BaseFlags) ;
+	HAIKU_BOOT_OPTIM = -Os ;
 	HAIKU_BOOT_LINKFLAGS = ;
 	HAIKU_BOOT_LDFLAGS = -Bstatic ;
 
