@@ -347,7 +347,7 @@ republish_driver(legacy_driver* driver)
 		devfs_unpublish_device(device, true);
 	}
 
-	if (exported == 0 && driver->devices_used == 0) {
+	if (exported == 0 && driver->devices_used == 0 && gBootDevice >= 0) {
 		TRACE(("devfs: driver \"%s\" does not publish any more nodes and is "
 			"unloaded\n", driver->path));
 		unload_driver(driver);
