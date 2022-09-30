@@ -218,25 +218,6 @@ BMutablePartition::SetName(const char* name)
 BString
 BMutablePartition::ContentName() const
 {
-	if (fData->content_name == NULL) {
-		// Give a default name to unnamed volumes
-		off_t divisor = 1ULL << 40;
-		off_t diskSize = fData->content_size;
-		char unit = 'T';
-		if (diskSize < divisor) {
-			divisor = 1UL << 30;
-			unit = 'G';
-			if (diskSize < divisor) {
-				divisor = 1UL << 20;
-				unit = 'M';
-			}
-		}
-		double size = double((10 * diskSize + divisor - 1) / divisor);
-		BString name;
-		name.SetToFormat("%g %ciB %s volume", size / 10, unit, fData->content_type);
-		return name;
-	}
-
 	return fData->content_name;
 }
 

@@ -54,6 +54,7 @@ public:
 
 			const char*			Name() const;
 			BString				ContentName() const;
+			const char*			RawContentName() const;
 			const char*			Type() const;			// See DiskDeviceTypes.h
 			const char*			ContentType() const;	// See DiskDeviceTypes.h
 			partition_id		ID() const;

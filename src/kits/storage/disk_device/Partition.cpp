@@ -261,7 +261,8 @@ BPartition::Name() const
 BString
 BPartition::ContentName() const
 {
-	if (_PartitionData()->content_name == NULL) {
+	if ((_PartitionData()->content_name == NULL || strlen(_PartitionData()->content_name) == 0)
+		&& ContainsFileSystem()) {
 		// Give a default name to unnamed volumes
 		off_t divisor = 1ULL << 40;
 		off_t diskSize = _PartitionData()->content_size;
@@ -280,6 +281,13 @@ BPartition::ContentName() const
 		return name;
 	}
 
+	return _PartitionData()->content_name;
+}
+
+
+const char*
+BPartition::RawContentName() const
+{
 	return _PartitionData()->content_name;
 }
 
