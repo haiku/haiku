@@ -11,6 +11,7 @@
 #include <boot/platform/generic/text_menu.h>
 
 #include <string.h>
+#include <system_revision.h>
 
 
 // position
@@ -66,6 +67,19 @@ print_centered(int32 line, const char *text, bool resetPosition = true)
 	if (resetPosition) {
 		console_set_cursor(0, 0);
 			// this avoids unwanted line feeds
+	}
+}
+
+
+static void
+print_right(int32 line, const char *text, bool resetPosition = true)
+{
+	console_set_cursor(console_width() - (strlen(text) + 1), line);
+	printf("%s", text);
+
+	if (resetPosition) {
+		console_set_cursor(0, 0);
+		// this avoids unwanted line feeds
 	}
 }
 
@@ -213,7 +227,10 @@ draw_menu(Menu *menu)
 	print_centered(2, "Haiku Boot Loader");
 
 	console_set_color(kCopyrightColor, kBackgroundColor);
-	print_centered(4, "Copyright 2004-2020 Haiku, Inc.");
+	print_right(console_height() - 1, get_haiku_revision());
+
+	console_set_color(kCopyrightColor, kBackgroundColor);
+	print_centered(4, "Copyright 2004-2022 Haiku, Inc.");
 
 	if (menu->Title()) {
 		console_set_cursor(kOffsetX, kFirstLine - 2);
