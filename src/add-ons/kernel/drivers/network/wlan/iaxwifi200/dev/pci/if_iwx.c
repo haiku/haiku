@@ -5681,11 +5681,7 @@ iwx_send_cmd(struct iwx_softc *sc, struct iwx_host_cmd *hcmd)
 			err = EINVAL;
 			goto out;
 		}
-#ifdef __FreeBSD_version
-		m = m_getjcl(M_NOWAIT, MT_DATA, M_PKTHDR, IWX_RBUF_SIZE);
-#else
 		m = MCLGETL(NULL, M_DONTWAIT, totlen);
-#endif
 		if (m == NULL) {
 			printf("%s: could not get fw cmd mbuf (%zd bytes)\n",
 			    DEVNAME(sc), totlen);

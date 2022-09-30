@@ -27,8 +27,16 @@
 
 #define MAXMCLBYTES MJUM16BYTES
 
-#define MCLGETL m_cljget
 
+static struct mbuf*
+MCLGETL(struct mbuf* m, int how, int size)
+{
+	if (m == NULL)
+		return m_get2(size, how, MT_DATA, M_PKTHDR);
+
+	m_cljget(m, how, size);
+	return m;
+}
 
 static int
 m_dup_pkthdr_openbsd(struct mbuf* to, const struct mbuf* from, int how)
