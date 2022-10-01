@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-About	610468518
+1	swedish	x-vnd.Haiku-About	2259131995
 Revision	AboutView		Utgåva
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet och deras belöningsprogram\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Upphovsrätt © 1999-2007 Michael C. Ring. Med ensamrätt.
@@ -38,6 +38,7 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Upphovsr
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Upphovsrätt © 1994-2009 Thomas G. Lane och Guido Vollbeding. Denna programvara är baserat på delar av arbetet av Independent JPEG Group.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektgrundare)\n\n
+Remove replicant	AboutView		Ta bort replikanten
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 About this system	AboutWindow		Om Haiku
 %d MiB used (%d%%)	AboutView		%d MiB använt (%d%%)

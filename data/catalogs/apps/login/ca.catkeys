@@ -1,9 +1,10 @@
-1	catalan; valencian	x-vnd.Haiku-Login	1584886353
+1	catalan; valencian	x-vnd.Haiku-Login	2920451831
 Invalid login!	Login View		La identificació no és vàlida!
 Error	Login App		Error
 Login application for Haiku\nUsage:	Login App		Aplicació d'inici de sessió per al Haiku\nÚs:
 --nonmodal\tDo not make the window modal	Login App		--nonmodal\tNo facis que la finestra sigui modal.
 Welcome to Haiku	Login Window		Benvingut/da al Haiku!
+--edit\tLaunch in shelf editing mode to allow customizing the desktop.	Login App		--edit\tInicia en el mode d'edició de lleixes per permetre personalitzar l'escriptori.
 Halt	Login View		Atura
 Desktop	Desktop Window		Escriptori
 Hide password	Login View		Amaga la contrasenya
