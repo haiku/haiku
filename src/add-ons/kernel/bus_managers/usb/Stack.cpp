@@ -69,7 +69,6 @@ Stack::Stack()
 	const char *moduleNames[] = {
 		"busses/usb/uhci",
 		"busses/usb/ohci",
-		"busses/usb/ehci",
 		NULL
 	};
 
