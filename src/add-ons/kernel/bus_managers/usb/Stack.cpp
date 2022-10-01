@@ -68,7 +68,6 @@ Stack::Stack()
 	// ports before the EHCI module discovers them.
 	const char *moduleNames[] = {
 		"busses/usb/uhci",
-		"busses/usb/ohci",
 		NULL
 	};
 
