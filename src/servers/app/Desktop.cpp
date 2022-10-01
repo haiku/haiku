@@ -50,6 +50,7 @@
 #include "HWInterface.h"
 #include "InputManager.h"
 #include "Screen.h"
+#include "ScreenManager.h"
 #include "ServerApp.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
@@ -522,6 +523,29 @@ Desktop::Init()
 	if (fVirtualScreen.HWInterface() == NULL) {
 		debug_printf("Could not initialize graphics output. Exiting.\n");
 		return B_ERROR;
+	}
+
+	// now that the mode is set, see if we should increase the default font size
+	if (fSettings->DefaultPlainFont() == *gFontManager->DefaultPlainFont()) {
+		float fontSize = fSettings->DefaultPlainFont().Size();
+		gScreenManager->Lock();
+		Screen* screen = gScreenManager->ScreenAt(0);
+		if (screen != NULL) {
+			display_mode mode;
+			screen->GetMode(mode);
+
+			if (mode.virtual_width > 3840 && mode.virtual_height > 2160)
+				fontSize *= 2.0f;
+			else if (mode.virtual_width > 1920 && mode.virtual_height > 1080)
+				fontSize *= 1.5f;
+		}
+		gScreenManager->Unlock();
+
+		// modify settings without saving them
+		const_cast<ServerFont&>(fSettings->DefaultPlainFont()).SetSize(fontSize);
+		const_cast<ServerFont&>(fSettings->DefaultBoldFont()).SetSize(fontSize);
+		const_cast<ServerFont&>(fSettings->DefaultFixedFont()).SetSize(fontSize);
+		const_cast<menu_info&>(fSettings->MenuInfo()).font_size = fontSize;
 	}
 
 	HWInterface()->SetDPMSMode(B_DPMS_ON);
