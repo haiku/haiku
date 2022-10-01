@@ -50,44 +50,6 @@ Stack::Stack()
 		return;
 	}
 
-	// Check for host controller modules.
-	//
-	// While using a fixed list of names is inflexible, it allows us to control
-	// the order in which we try modules. There are controllers/BIOSes that
-	// require UHCI/OHCI to be initialized before EHCI or otherwise they
-	// refuse to publish any high-speed devices.
-	//
-	// On other systems, the ordering is probably ensured because the EHCI
-	// controller is required to have a higher PCI function number than the
-	// companion host controllers (per the EHCI specs) and it would therefore
-	// be enumerated as the last item. As this does not apply to us, we have to
-	// ensure ordering using another method.
-	//
-	// Furthermore, on some systems, there can be ports shared between
-	// EHCI and XHCI, defaulting to EHCI. The XHCI module will switch these
-	// ports before the EHCI module discovers them.
-	const char *moduleNames[] = {
-		"busses/usb/uhci",
-		NULL
-	};
-
-	TRACE("looking for host controller modules\n");
-	for (uint32 i = 0; moduleNames[i]; i++) {
-		TRACE("looking for module %s\n", moduleNames[i]);
-
-		usb_host_controller_info *module = NULL;
-		if (get_module(moduleNames[i], (module_info **)&module) != B_OK)
-			continue;
-
-		TRACE("adding module %s\n", moduleNames[i]);
-		if (module->add_to(this) < B_OK) {
-			put_module(moduleNames[i]);
-			continue;
-		}
-
-		TRACE("module %s successfully loaded\n", moduleNames[i]);
-	}
-
 	fExploreThread = spawn_kernel_thread(ExploreThread, "usb explore",
 		B_LOW_PRIORITY, this);
 	resume_thread(fExploreThread);

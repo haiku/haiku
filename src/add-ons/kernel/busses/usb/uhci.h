@@ -22,9 +22,8 @@
 #define UHCI_DEBUG_QUEUE					4
 
 struct pci_info;
-struct pci_module_info;
-struct pci_x86_module_info;
-
+struct pci_device_module_info;
+struct pci_device;
 class UHCIRootHub;
 
 
@@ -94,9 +93,7 @@ typedef struct isochronous_transfer_data {
 
 class UHCI : public BusManager {
 public:
-static	status_t					AddTo(Stack *stack);
-
-									UHCI(pci_info *info, Stack *stack);
+									UHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stack *stack);
 									~UHCI();
 
 		status_t					Start();
@@ -208,11 +205,10 @@ inline	uint8						ReadReg8(uint32 reg);
 inline	uint16						ReadReg16(uint32 reg);
 inline	uint32						ReadReg32(uint32 reg);
 
-static	pci_module_info *			sPCIModule;
-static	pci_x86_module_info *		sPCIx86Module;
-
 		uint32						fRegisterBase;
 		pci_info *					fPCIInfo;
+		pci_device_module_info*		fPci;
+		pci_device*					fDevice;
 		Stack *						fStack;
 		uint32						fEnabledInterrupts;
 
