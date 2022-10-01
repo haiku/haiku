@@ -511,8 +511,13 @@ Desktop::Init()
 		fWorkspaces[i].RestoreConfiguration(*fSettings->WorkspacesMessage(i));
 	}
 
-	fVirtualScreen.SetConfiguration(*this,
+	status_t status = fVirtualScreen.SetConfiguration(*this,
 		fWorkspaces[0].CurrentScreenConfiguration());
+	if (status != B_OK) {
+		debug_printf("app_server: Failed to initialize virtual screen configuration: %s\n",
+			strerror(status));
+		return status;
+	}
 
 	if (fVirtualScreen.HWInterface() == NULL) {
 		debug_printf("Could not initialize graphics output. Exiting.\n");
