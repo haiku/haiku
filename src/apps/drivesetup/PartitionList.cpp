@@ -429,7 +429,7 @@ PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 		B_TRUNCATE_END, B_ALIGN_RIGHT), kFreeSizeColumn);
 	AddColumn(new PartitionColumn(B_TRANSLATE("Block size"), 50, 50, 500,
 		B_TRUNCATE_END, B_ALIGN_RIGHT), kBlockSizeColumn);
-	AddColumn(new PartitionColumn(B_TRANSLATE("Physical Block size"), 50, 50, 500,
+	AddColumn(new PartitionColumn(B_TRANSLATE("Physical block size"), 50, 50, 500,
 		B_TRUNCATE_END, B_ALIGN_RIGHT), kPhysicalBlockSizeColumn);
 	AddColumn(new PartitionColumn(B_TRANSLATE("Parameters"), 100, 50, 500,
 		B_TRUNCATE_END), kParametersColumn);
