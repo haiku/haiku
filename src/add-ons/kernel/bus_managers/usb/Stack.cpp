@@ -20,7 +20,7 @@
 Stack::Stack()
 	:	fExploreThread(-1),
 		fFirstExploreDone(false),
-		fStopThreads(false),
+		fExploreSem(-1),
 		fAllocator(NULL),
 		fObjectIndex(1),
 		fObjectMaxCount(1024),
@@ -31,6 +31,12 @@ Stack::Stack()
 
 	mutex_init(&fStackLock, "usb stack lock");
 	mutex_init(&fExploreLock, "usb explore lock");
+	fExploreSem = create_sem(0, "usb explore sem");
+	if (fExploreSem < B_OK) {
+		TRACE_ERROR("failed to create semaphore\n");
+		return;
+	}
+
 
 	size_t objectArraySize = fObjectMaxCount * sizeof(Object *);
 	fObjectArray = (Object **)malloc(objectArraySize);
@@ -65,7 +71,8 @@ Stack::Stack()
 Stack::~Stack()
 {
 	int32 result;
-	fStopThreads = true;
+	delete_sem(fExploreSem);
+	fExploreSem = -1;
 	wait_for_thread(fExploreThread, &result);
 
 	mutex_lock(&fStackLock);
@@ -202,9 +209,15 @@ Stack::ExploreThread(void *data)
 {
 	Stack *stack = (Stack *)data;
 
-	while (!stack->fStopThreads) {
+	while (acquire_sem_etc(stack->fExploreSem, 1, B_RELATIVE_TIMEOUT,
+		USB_DELAY_HUB_EXPLORE) != B_BAD_SEM_ID) {
 		if (mutex_lock(&stack->fExploreLock) != B_OK)
 			break;
+
+		int32 semCount = 0;
+		get_sem_count(stack->fExploreSem, &semCount);
+		if (semCount > 0)
+			acquire_sem_etc(stack->fExploreSem, semCount, B_RELATIVE_TIMEOUT, 0);
 
 		rescan_item *rescanList = NULL;
 		change_item *changeItem = NULL;
@@ -230,7 +243,6 @@ Stack::ExploreThread(void *data)
 		stack->fFirstExploreDone = true;
 		mutex_unlock(&stack->fExploreLock);
 		stack->RescanDrivers(rescanList);
-		snooze(USB_DELAY_HUB_EXPLORE);
 	}
 
 	return B_OK;
@@ -507,4 +519,11 @@ Stack::UninstallNotify(const char *driverName)
 	}
 
 	return B_NAME_NOT_FOUND;
+}
+
+
+void
+Stack::TriggerExplore()
+{
+	release_sem(fExploreSem);
 }

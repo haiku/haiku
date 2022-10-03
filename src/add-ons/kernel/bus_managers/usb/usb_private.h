@@ -165,13 +165,15 @@ public:
 		usb_id							USBID() const { return 0; }
 		const char *					TypeName() const { return "stack"; }
 
+		void							TriggerExplore();
+
 private:
 static	int32							ExploreThread(void *data);
 
 		Vector<BusManager *>			fBusManagers;
 		thread_id						fExploreThread;
 		bool							fFirstExploreDone;
-		bool							fStopThreads;
+		sem_id							fExploreSem;
 
 		mutex							fStackLock;
 		mutex							fExploreLock;
