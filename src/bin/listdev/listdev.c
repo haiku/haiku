@@ -246,7 +246,7 @@ display_device(device_node_cookie *node, uint8 level)
 		case BUS_PCI:
 			printf("\n");
 			{
-				char classInfo[64];
+				char classInfo[128];
 				get_class_info(pci_class_base_id, pci_class_sub_id,
 					pci_class_api_id, classInfo, 64);
 				put_level(level);
