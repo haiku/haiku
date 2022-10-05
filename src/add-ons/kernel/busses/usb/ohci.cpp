@@ -148,7 +148,6 @@ init_device(device_node* node, void** device_cookie)
 	pci->get_pci_info(device, pciInfo);
 
 	if (sPCIx86Module == NULL) {
-		dprintf("ohci_init_device get_module B_PCI_X86_MODULE_NAME\n");
 		if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module) != B_OK)
 			sPCIx86Module = NULL;
 	}
@@ -166,7 +165,6 @@ uninit_device(void* device_cookie)
 	free(bus);
 
 	if (sPCIx86Module != NULL) {
-		dprintf("ohci_uninit_device put_module B_PCI_X86_MODULE_NAME\n");
 		put_module(B_PCI_X86_MODULE_NAME);
 		sPCIx86Module = NULL;
 	}
