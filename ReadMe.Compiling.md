@@ -1,6 +1,6 @@
 Building Haiku
 ==========================
-This is a overview into the process of building HAIKU from source.
+This is an overview into the process of building HAIKU from source.
 An online version is available at <https://www.haiku-os.org/guides/building/>.
 
 Official releases of Haiku are at <https://www.haiku-os.org/get-haiku>.
