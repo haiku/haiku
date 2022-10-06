@@ -41,14 +41,14 @@ res=0
 for i in `unzip -Z1 "$zipfile" ${1+"$@"}`; do
   if test $list -eq 1; then
 
-    unzip -p-L "$zipfile" "$i" | egrep $opt "$pat" > /dev/null && echo $i
+    unzip -p-L "$zipfile" "$i" | grep -E $opt "$pat" > /dev/null && echo $i
     r=$?
   elif test $silent -eq 1; then
 
-    unzip -p-L "$zipfile" "$i" | egrep $opt "$pat"
+    unzip -p-L "$zipfile" "$i" | grep -E $opt "$pat"
     r=$?
   else
-    unzip -p-L "$zipfile" "$i" | egrep $opt "$pat" | sed "s|^|${i}:|"
+    unzip -p-L "$zipfile" "$i" | grep -E $opt "$pat" | sed "s|^|${i}:|"
     r=$?
   fi
   test "$r" -ne 0 && res="$r"

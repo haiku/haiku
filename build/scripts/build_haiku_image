@@ -374,7 +374,7 @@ fi
 
 # install default settings for packages
 for packageFile in $systemPackages; do
-	if $package list -p $packageFile | egrep '^settings/' > /dev/null; then
+	if $package list -p $packageFile | grep -E '^settings/' > /dev/null; then
 		extractFile $packageFile system/settings settings
 	fi
 done

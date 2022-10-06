@@ -132,7 +132,7 @@ do
 done
 
 
-ALLOCATIONS=$(cat "$FILENAME" | egrep "^allocation: |^	" | tr '\n' '^' \
+ALLOCATIONS=$(cat "$FILENAME" | grep -E "^allocation: |^	" | tr '\n' '^' \
 	| sed 's/\^a/~a/g' | tr '~' '\n' | sed 's/$/^/' | c++filt)
 
 if [ ! -z "$EXCLUDE_PATTERN" ]

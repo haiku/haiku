@@ -38,7 +38,7 @@ function check_logs {
 		echo "NO"
 	fi
 	echo "    Potential issues in logs:"
-	egrep -i "FATAL|ERROR|FAIL|GDB" $FILE | grep -vi " No error"
+	grep -E -i "FATAL|ERROR|FAIL|GDB" $FILE | grep -vi " No error"
 }
 
 case "$PLATFORM" in
