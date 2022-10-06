@@ -38,12 +38,8 @@ if $(TARGET_ARCH) = ppc {
 				MakeLocateDebug $(efiPartition) : system boot ;
 				BuildEfiSystemPartition $(efiPartition) : $(efiLoader) ;
 
-				BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY)
+				BuildCDBootImageEFI $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY)
 					: $(efiPartition) : $(extras) ;
-
-			} else if $(HAIKU_ANYBOOT_LEGACY) = 1 {
-				BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY) : 
-					: $(extras) ;
 			}
 		}
 	}
