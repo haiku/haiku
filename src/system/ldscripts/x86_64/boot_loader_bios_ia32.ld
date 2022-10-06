@@ -20,6 +20,7 @@ SECTIONS
 	. = ALIGN(0x1000);
 	__data_start = .;
 	.data : { *(.data .gnu.linkonce.d.*) }
+	_haiku_revision : { *(_haiku_revision) }
 
 	/* uninitialized data (in same segment as writable data) */
 	__bss_start = .;
