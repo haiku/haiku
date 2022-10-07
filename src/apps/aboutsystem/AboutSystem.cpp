@@ -250,6 +250,7 @@ private:
 			float			_BaseWidth();
 			float			_BaseHeight();
 
+			const char*		_GetOSVersion();
 			const char*		_GetRamSize(system_info*);
 			const char*		_GetRamUsage(system_info*);
 			const char*		_GetUptime();
@@ -260,6 +261,7 @@ private:
 			BString			fText;
 			rgb_color		fDesktopTextColor;
 
+			BStringView*	fOSVersionView;
 			BStringView*	fMemSizeView;
 			BStringView*	fMemUsageView;
 			BTextView*		fUptimeView;
@@ -520,6 +522,7 @@ CropView::DoLayout()
 SysInfoView::SysInfoView()
 	:
 	BView("AboutSystem", B_WILL_DRAW | B_PULSE_NEEDED),
+	fOSVersionView(NULL),
 	fMemSizeView(NULL),
 	fMemUsageView(NULL),
 	fUptimeView(NULL),
@@ -540,6 +543,7 @@ SysInfoView::SysInfoView()
 
 	// OS Version
 	BStringView* osLabel = _CreateLabel("oslabel", B_TRANSLATE("Version:"));
+	fOSVersionView = _CreateSubtext("ostext", _GetOSVersion());
 
 	// CPU count
 	static BStringFormat format(B_TRANSLATE_COMMENT(
@@ -557,38 +561,6 @@ SysInfoView::SysInfoView()
 
 	// Time running
 	BStringView* uptimeLabel = _CreateLabel("uptimelabel", B_TRANSLATE("Time running:"));
-
-	/* subtexts */
-
-	// OS Version
-
-	BString osVersion;
-
-	// the version is stored in the BEOS:APP_VERSION attribute of libbe.so
-	BPath path;
-	if (find_directory(B_BEOS_LIB_DIRECTORY, &path) == B_OK) {
-		path.Append("libbe.so");
-
-		BAppFileInfo appFileInfo;
-		version_info versionInfo;
-		BFile file;
-		if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK
-			&& appFileInfo.SetTo(&file) == B_OK
-			&& appFileInfo.GetVersionInfo(&versionInfo,
-				B_APP_VERSION_KIND) == B_OK
-			&& versionInfo.short_info[0] != '\0')
-			osVersion = versionInfo.short_info;
-	}
-
-	if (osVersion.IsEmpty())
-		osVersion = B_TRANSLATE("Unknown");
-
-	// add system revision to os version
-	const char* hrev = __get_haiku_revision();
-	if (hrev != NULL)
-		osVersion << " (" << B_TRANSLATE("Revision") << " " << hrev << ")";
-
-	BStringView* osText = _CreateSubtext("ostext", osVersion.String());
 
 	// x86_gcc2 or x86_64
 	BStringView* abiText = _CreateSubtext("abitext", B_HAIKU_ABI_NAME);
@@ -673,7 +645,7 @@ SysInfoView::SysInfoView()
 	BLayoutBuilder::Group<>((BGroupLayout*)GetLayout())
 		// Version:
 		.Add(osLabel)
-		.Add(osText)
+		.Add(fOSVersionView)
 		.Add(abiText)
 		.AddStrut(offset)
 		// Processors:
@@ -704,6 +676,7 @@ SysInfoView::SysInfoView()
 SysInfoView::SysInfoView(BMessage* archive)
 	:
 	BView(archive),
+	fOSVersionView(NULL),
 	fMemSizeView(NULL),
 	fMemUsageView(NULL),
 	fUptimeView(NULL),
@@ -729,13 +702,18 @@ SysInfoView::SysInfoView(BMessage* archive)
 			_UpdateText(fUptimeView);
 		} else if (name.IEndsWith("text")) {
 			_UpdateSubtext(dynamic_cast<BStringView*>(view));
-			if (name == "ramsizetext")
+			if (name == "ostext")
+				fOSVersionView = dynamic_cast<BStringView*>(view);
+			else if (name == "ramsizetext")
 				fMemSizeView = dynamic_cast<BStringView*>(view);
 			else if (name == "ramusagetext")
 				fMemUsageView = dynamic_cast<BStringView*>(view);
 		} else if (name.IEndsWith("label"))
 			_UpdateLabel(dynamic_cast<BStringView*>(view));
 	}
+
+	// This might have changed after an update/reboot cycle;
+	fOSVersionView->SetText(_GetOSVersion());
 
 	fDragger = dynamic_cast<BDragger*>(ChildAt(0));
 }
@@ -903,6 +881,7 @@ SysInfoView::Pulse()
 {
 	system_info sysInfo;
 	get_system_info(&sysInfo);
+
 	fMemUsageView->SetText(_GetRamUsage(&sysInfo));
 	fUptimeView->SetText(_GetUptime());
 
@@ -1112,6 +1091,39 @@ SysInfoView::_BaseHeight()
 	return ceilf(((boldFH.ascent + boldFH.descent) * kLabelCount
 		+ (plainFH.ascent + plainFH.descent) * (kSubtextCount + 1) // extra for fUptimeView
 		+ be_control_look->DefaultLabelSpacing() * kLabelCount));
+}
+
+
+const char*
+SysInfoView::_GetOSVersion()
+{
+	BString osVersion;
+
+	// the version is stored in the BEOS:APP_VERSION attribute of libbe.so
+	BPath path;
+	if (find_directory(B_BEOS_LIB_DIRECTORY, &path) == B_OK) {
+		path.Append("libbe.so");
+
+		BAppFileInfo appFileInfo;
+		version_info versionInfo;
+		BFile file;
+		if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK
+			&& appFileInfo.SetTo(&file) == B_OK
+			&& appFileInfo.GetVersionInfo(&versionInfo,
+				B_APP_VERSION_KIND) == B_OK
+			&& versionInfo.short_info[0] != '\0')
+			osVersion = versionInfo.short_info;
+	}
+
+	if (osVersion.IsEmpty())
+		osVersion = B_TRANSLATE("Unknown");
+
+	// add system revision to os version
+	const char* hrev = __get_haiku_revision();
+	if (hrev != NULL)
+		osVersion << " (" << B_TRANSLATE("Revision") << " " << hrev << ")";
+
+	return osVersion.String();
 }
 
 
