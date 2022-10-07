@@ -258,8 +258,6 @@ private:
 
 private:
 			BString			fText;
-			int32			fLabelCount;
-			int32			fSubtextCount;
 			rgb_color		fDesktopTextColor;
 
 			BStringView*	fMemSizeView;
@@ -274,6 +272,9 @@ private:
 			float			fCachedMinHeight;
 
 			bool			fIsReplicant : 1;
+
+	static const uint8		kLabelCount = 5;
+	static const uint8		kSubtextCount = 7;
 };
 
 
@@ -696,8 +697,6 @@ SysInfoView::SysInfoView()
 		.SetInsets(inset)
 		.End();
 
-	fLabelCount = 5;
-	fSubtextCount = 7;
 	_CreateDragger();
 }
 
@@ -1110,9 +1109,9 @@ SysInfoView::_BaseHeight()
 	font_height boldFH;
 	be_bold_font->GetHeight(&boldFH);
 
-	return ceilf(((boldFH.ascent + boldFH.descent) * fLabelCount
-		+ (plainFH.ascent + plainFH.descent) * (fSubtextCount + 1) // extra for fUptimeView
-		+ be_control_look->DefaultLabelSpacing() * fLabelCount));
+	return ceilf(((boldFH.ascent + boldFH.descent) * kLabelCount
+		+ (plainFH.ascent + plainFH.descent) * (kSubtextCount + 1) // extra for fUptimeView
+		+ be_control_look->DefaultLabelSpacing() * kLabelCount));
 }
 
 
