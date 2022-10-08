@@ -1,0 +1,21 @@
+1	italian	application/x-vnd.Cortex.TransportView	258714237
+(none)	TransportView		(nessuno)
+Start	TransportView		Avvio
+No errors.	TransportView		Nessun errore.
+to	TransportView		a
+Offline	TransportView		Offline
+(???)	TransportView		(???)
+Stop	TransportView		Ferma
+(no group)	TransportView		(nessun gruppo)
+Drop data	TransportView		Rilascia i dati
+To:	TransportView		A:
+Recording	TransportView		Registrazione in corso
+Increase latency	TransportView		Aumenta la latenza
+Time source:	TransportView		Sorgente temporale:
+DAC time source	TransportView		Sorgente temporale DAC
+Decrease precision	TransportView		Decrementa la precisione
+System clock	TransportView		Orologio di sistema
+From:	TransportView		Da:
+Roll from	TransportView		Avvolgi da
+Preroll	TransportView		Preavvolgimento
+Run mode:	TransportView		Modalità di avvio:

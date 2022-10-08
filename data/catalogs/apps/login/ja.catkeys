@@ -1,9 +1,10 @@
-1	japanese	x-vnd.Haiku-Login	1584886353
+1	japanese	x-vnd.Haiku-Login	2920451831
 Invalid login!	Login View		ログインが無効です!
 Error	Login App		エラー
 Login application for Haiku\nUsage:	Login App		Login application for Haiku\nUsage:
 --nonmodal\tDo not make the window modal	Login App		--nonmodal\tDo not make the window modal
 Welcome to Haiku	Login Window		Haiku へようこそ
+--edit\tLaunch in shelf editing mode to allow customizing the desktop.	Login App		--edit\tLaunch in shelf editing mode to allow customizing the desktop.
 Halt	Login View		停止
 Desktop	Desktop Window		デスクトップ
 Hide password	Login View		パスワードを隠す

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-About	610468518
+1	german	x-vnd.Haiku-About	2259131995
 Revision	AboutView		Stand:
 The Haikuware team and their bounty program\n	AboutView		Das Haikuware-Team und deren Bounty-Programm\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Alle Rechte vorbehalten.
@@ -38,6 +38,7 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyrigh
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Die Software basiert teilweise auf der Arbeit der Independent JPEG Group.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (Projektgründer)\n\n
+Remove replicant	AboutView		Replikant entfernen
 BSD (3-clause)	AboutWindow		BSD (3-Klausel)
 About this system	AboutWindow		Über dieses System
 %d MiB used (%d%%)	AboutView		%d MiB benutzt (%d%%)

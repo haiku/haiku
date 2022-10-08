@@ -1,4 +1,4 @@
-1	italian	application/x-vnd.Cortex.InfoView	3788145961
+1	italian	application/x-vnd.Cortex.InfoView	2382053937
 Offset	InfoView		Compensazione
 Description	DormantNodeInfoView		Descrizione
 Byte order	InfoView		Ordine dei byte
@@ -16,6 +16,7 @@ Buffer size	InfoView		Dimensione del buffer
 \n- Quality:	FileNodeInfoView		\n- Qualità:
 Kinds	LiveNodeInfoView		Tipi di
 Application	AppNodeInfoView		Applicazione
+Flavor flags	DormantNodeInfoView		Flag dei flavor
 Max. instances	DormantNodeInfoView		Istanze massime
 \n- Duration:	FileNodeInfoView		\n- Durata:
 Dormant media node	DormantNodeInfoView		Nodo media inattivo
@@ -44,6 +45,7 @@ Format	InfoView		Formato
 Version	AppNodeInfoView		Versione
 AddOn ID	DormantNodeInfoView		ID componente aggiuntivo
 Frame size	InfoView		Dimensione cornice
+Flavor ID	DormantNodeInfoView		ID dei flavor
 Run mode	LiveNodeInfoView		Modo di avvio
 \n- Codec:	FileNodeInfoView		\n- Codec:
 Port	LiveNodeInfoView		Porta
