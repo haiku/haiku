@@ -69,9 +69,10 @@ Application Devices :
 	DevicesApplication.cpp
 	DevicesView.cpp
 	dm_wrapper.c
-	DevicePCI.cpp
 	DeviceACPI.cpp
+	DevicePCI.cpp
 	DeviceSCSI.cpp
+	DeviceUSB.cpp
 	Device.cpp
 	PropertyList.cpp
 	PropertyListPlain.cpp

@@ -25,6 +25,7 @@ typedef enum {
 	BUS_PCI,
 	BUS_SCSI,
 	BUS_ACPI,
+	BUS_USB,
 	BUS_NONE
 } BusType;
 
