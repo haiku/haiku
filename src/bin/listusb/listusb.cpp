@@ -21,175 +21,6 @@
 #include "listusb.h"
 
 
-const char*
-ClassName(int classNumber) {
-	switch (classNumber) {
-		case 0:
-			return "Per-interface classes";
-		case USB_AUDIO_DEVICE_CLASS:
-			return "Audio";
-		case 2:
-			return "Communication";
-		case 3:
-			return "HID";
-		case 5:
-			return "Physical";
-		case 6:
-			return "Image";
-		case 7:
-			return "Printer";
-		case 8:
-			return "Mass storage";
-		case 9:
-			return "Hub";
-		case 10:
-			return "CDC-Data";
-		case 11:
-			return "Smart card";
-		case 13:
-			return "Content security";
-		case USB_VIDEO_DEVICE_CLASS:
-			return "Video";
-		case 15:
-			return "Personal Healthcare";
-		case 0xDC:
-			return "Diagnostic device";
-		case 0xE0:
-			return "Wireless controller";
-		case 0xEF:
-			return "Miscellaneous";
-		case 0xFE:
-			return "Application specific";
-		case 0xFF:
-			return "Vendor specific";
-	}
-
-	return "Unknown";
-}
-
-
-const char*
-SubclassName(int classNumber, int subclass)
-{
-	if (classNumber == 0xEF) {
-		if (subclass == 0x02)
-			return " (Common)";
-		if (subclass == 0x04)
-			return " (RNDIS)";
-		if (subclass == 0x05)
-			return " (USB3 Vision)";
-		if (subclass == 0x06)
-			return " (STEP)";
-		if (subclass == 0x07)
-			return " (DVB Command Interface)";
-	}
-
-	if (classNumber == USB_VIDEO_DEVICE_CLASS) {
-		switch (subclass) {
-			case USB_VIDEO_INTERFACE_UNDEFINED_SUBCLASS:
-				return " (Undefined)";
-			case USB_VIDEO_INTERFACE_VIDEOCONTROL_SUBCLASS:
-				return " (Control)";
-			case USB_VIDEO_INTERFACE_VIDEOSTREAMING_SUBCLASS:
-				return " (Streaming)";
-			case USB_VIDEO_INTERFACE_COLLECTION_SUBCLASS:
-				return " (Collection)";
-		}
-	}
-
-	if (classNumber == 0xFE) {
-		if (subclass == 0x01)
-			return " (Firmware Upgrade)";
-		if (subclass == 0x02)
-			return " (IrDA)";
-		if (subclass == 0x03)
-			return " (Test and measurement)";
-	}
-
-	return "";
-}
-
-
-const char*
-ProtocolName(int classNumber, int subclass, int protocol)
-{
-	switch (classNumber) {
-		case 0x09:
-			if (subclass == 0x00)
-			{
-				switch (protocol) {
-					case 0x00:
-						return " (Full speed)";
-					case 0x01:
-						return " (Hi-speed, single TT)";
-					case 0x02:
-						return " (Hi-speed, multiple TT)";
-					case 0x03:
-						return " (Super speed)";
-				}
-			}
-		case 0xE0:
-			if (subclass == 0x01 && protocol == 0x01)
-				return " (Bluetooth control)";
-			if (subclass == 0x01 && protocol == 0x02)
-				return " (UWB Radio)";
-			if (subclass == 0x01 && protocol == 0x03)
-				return " (RNDIS control)";
-			if (subclass == 0x01 && protocol == 0x04)
-				return " (Bluetooth AMP)";
-			if (subclass == 0x02 && protocol == 0x01)
-				return " (Host wire adapter)";
-			if (subclass == 0x02 && protocol == 0x02)
-				return " (Device wire adapter)";
-			if (subclass == 0x02 && protocol == 0x03)
-				return " (Device wire isochronous)";
-		case 0xEF:
-			if (subclass == 0x01 && protocol == 0x01)
-				return " (Microsoft Active Sync)";
-			if (subclass == 0x01 && protocol == 0x02)
-				return " (Palm Sync)";
-			if (subclass == 0x02 && protocol == 0x01)
-				return " (Interface Association)";
-			if (subclass == 0x02 && protocol == 0x02)
-				return " (Wire adapter multifunction peripheral)";
-			if (subclass == 0x03 && protocol == 0x01)
-				return " (Cable based association framework)";
-			if (subclass == 0x04 && protocol == 0x01)
-				return " (RNDIS Ethernet)";
-			if (subclass == 0x04 && protocol == 0x02)
-				return " (RNDIS Wifi)";
-			if (subclass == 0x04 && protocol == 0x03)
-				return " (RNDIS WiMAX)";
-			if (subclass == 0x04 && protocol == 0x04)
-				return " (RNDIS WWAN)";
-			if (subclass == 0x04 && protocol == 0x05)
-				return " (RNDIS raw IPv4)";
-			if (subclass == 0x04 && protocol == 0x06)
-				return " (RNDIS raw IPv6)";
-			if (subclass == 0x04 && protocol == 0x07)
-				return " (RNDIS GPRS)";
-			if (subclass == 0x05 && protocol == 0x00)
-				return " (USB3 vision control)";
-			if (subclass == 0x05 && protocol == 0x01)
-				return " (USB3 vision event)";
-			if (subclass == 0x05 && protocol == 0x02)
-				return " (USB3 vision streaming)";
-			if (subclass == 0x06 && protocol == 0x01)
-				return " (STEP)";
-			if (subclass == 0x06 && protocol == 0x02)
-				return " (STEP RAW)";
-			if (subclass == 0x07 && protocol == 0x01)
-				return " (DVB Command Interface in IAD)";
-			if (subclass == 0x07 && protocol == 0x02)
-				return " (DVB Command Interface in interface descriptor)";
-			if (subclass == 0x07 && protocol == 0x03)
-				return " (Media interface in interface descriptor)";
-			break;
-	}
-	return "";
-}
-
-
 void
 DumpCDCDescriptor(const usb_generic_descriptor* descriptor, int subclass)
 {
@@ -400,14 +231,17 @@ DumpInterface(const BUSBInterface* interface)
 	if (!interface)
 		return;
 
+	char classInfo[128];
+	usb_get_class_info(interface->Class(), 0, 0, classInfo, sizeof(classInfo));
 	printf("                Class .............. 0x%02x (%s)\n",
-		interface->Class(), ClassName(interface->Class()));
+		interface->Class(), classInfo);
+	usb_get_class_info(interface->Class(), interface->Subclass(), 0, classInfo, sizeof(classInfo));
 	printf("                Subclass ........... 0x%02x%s\n",
-		interface->Subclass(),
-		SubclassName(interface->Class(), interface->Subclass()));
+		interface->Subclass(), classInfo);
+	usb_get_class_info(interface->Class(), interface->Subclass(), interface->Protocol(), classInfo,
+		sizeof(classInfo));
 	printf("                Protocol ........... 0x%02x%s\n",
-		interface->Protocol(), ProtocolName(interface->Class(),
-			interface->Subclass(), interface->Protocol()));
+		interface->Protocol(), classInfo);
 	printf("                Interface String ... \"%s\"\n",
 		interface->InterfaceString());
 
@@ -486,13 +320,15 @@ DumpInfo(BUSBDevice& device, bool verbose)
 		return;
 	}
 
+	char classInfo[128];
 	printf("[Device /dev/bus/usb%s]\n", device.Location());
-	printf("    Class .................. 0x%02x (%s)\n", device.Class(),
-		ClassName(device.Class()));
-	printf("    Subclass ............... 0x%02x%s\n", device.Subclass(),
-		SubclassName(device.Class(), device.Subclass()));
-	printf("    Protocol ............... 0x%02x%s\n", device.Protocol(),
-		ProtocolName(device.Class(), device.Subclass(), device.Protocol()));
+	usb_get_class_info(device.Class(), 0, 0, classInfo, sizeof(classInfo));
+	printf("    Class .................. 0x%02x (%s)\n", device.Class(), classInfo);
+	usb_get_class_info(device.Class(), device.Subclass(), 0, classInfo, sizeof(classInfo));
+	printf("    Subclass ............... 0x%02x%s\n", device.Subclass(), classInfo);
+	usb_get_class_info(device.Class(), device.Subclass(), device.Protocol(), classInfo,
+		sizeof(classInfo));
+	printf("    Protocol ............... 0x%02x%s\n", device.Protocol(), classInfo);
 	printf("    Max Endpoint 0 Packet .. %d\n", device.MaxEndpoint0PacketSize());
 	uint32_t version = device.USBVersion();
 	printf("    USB Version ............ %d.%d\n", version >> 8, version & 0xFF);

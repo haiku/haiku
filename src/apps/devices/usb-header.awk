@@ -22,6 +22,8 @@ BEGIN {
 	cleanvalues = "[^A-Za-z0-9{}\"'&@?!*.,:;+<> \\t\\/_\\[\\]=#()-]"
 	# ToDo: currently IDs aren't checked, we dumbly assume the source is clean
 
+	inClassesDefinition = 0
+
 	# descriptive output header
 	print "#if 0" > ofile
 	print "#\tUSBHDR.H: USB Vendors, Devices\n#" > ofile
@@ -67,6 +69,61 @@ BEGIN {
 	devices[devicecount, 3] = device 
 }
 
+# match device class - store data for later
+/^C [[:xdigit:]][[:xdigit:]]  / {
+
+	class = $2
+	classname = substr($0, 7)
+	gsub( /\"/, "\\\"", classname )
+
+	inClassesDefinition = 1
+
+	classcount++
+	classes[classcount, 1] = class
+	classes[classcount, 2] = "00"
+	classes[classcount, 3] = "00"
+	classes[classcount, 4] = classname
+	classes[classcount, 5] = ""
+	classes[classcount, 6] = ""
+}
+
+# match subclass, use device class data captured earlier, and output
+inClassesDefinition && (/^\t[[:xdigit:]][[:xdigit:]]  /) {
+	subclass = $1
+	subclassname = substr($0, 6)
+	gsub( /\"/, "\\\"", subclassname )
+
+	classcount++
+	classes[classcount, 1] = class
+	classes[classcount, 2] = subclass
+	classes[classcount, 3] = "00"
+	classes[classcount, 4] = classname
+	classes[classcount, 5] = subclassname
+	classes[classcount, 6] = ""
+}
+
+# match protocol
+inClassesDefinition && (/^\t\t[[:xdigit:]][[:xdigit:]]  /) {
+
+	protocol = $1
+	protocolname = substr($0, 7)
+	gsub( /\"/, "\\\"", protocolname )
+
+	classcount++
+	classes[classcount, 1] = class
+	classes[classcount, 2] = subclass
+	classes[classcount, 3] = protocol
+	classes[classcount, 4] = classname
+	classes[classcount, 5] = subclassname
+	classes[classcount, 6] = protocolname
+}
+
+#match comments
+/^#/ {
+	inClassesDefinition = false
+}
+
+
 # We've processed the file, now output.
 END {
 
@@ -89,6 +146,36 @@ END {
 
 	}
 	
+	if ( classcount > 0 ) {
+		print "typedef struct _USB_CLASSCODETABLE\n{\n\tunsigned char	BaseClass ;\n\tunsigned char	SubClass ;\n\tunsigned char	Protocol ;" > ofile
+		print "\tconst char *\t\tBaseDesc ;\n\tconst char *\t\tSubDesc ;\n\tconst char *\t\tProtocolDesc ;\n}  USB_CLASSCODETABLE, *PUSB_CLASSCODETABLE ;\n" > ofile
+		print "USB_CLASSCODETABLE UsbClassCodeTable [] =\n{" > ofile
+		currentclass = classes[1, 1]
+		for (i = 1; i <= classcount; i++) {
+
+			if (i != 1) {
+				formatting = ",\n"
+			} else {
+				formatting = ""
+			}
+
+			# pretty print separate classes
+			if ( currentclass != classes[i, 1] ) {
+				formatting = formatting "\n"
+				currentclass = classes[i, 1]
+			}
+
+			# if the next item has the same details, we know we're to skip ourselves
+			# this is because the programming interface name needs to be used, and we dont have it ourselves
+			if ( ( classes[i, 1] != classes[i+1, 1] ) || ( classes[i, 2] != classes[i+1, 2] ) || ( classes[i, 3] != classes[i+1, 3] ) ) {
+				printf formatting "\t{ 0x" classes[i, 1] ", 0x" classes[i, 2] ", 0x" classes[i, 3] ", \"" classes[i, 4] "\", \"" classes[i, 5]  "\", \"" classes[i, 6] "\" }" > ofile
+			}
+		}
+		print "\n} ;\n\n// Use this value for loop control during searching:\n#define	USB_CLASSCODETABLE_LEN	(sizeof(UsbClassCodeTable)/sizeof(USB_CLASSCODETABLE))\n" > ofile
+
+	}
+
+
 	close(ofile)
 }
 
