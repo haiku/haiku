@@ -27,7 +27,7 @@
 #define USB_MODULE_NAME "ohci"
 
 static pci_x86_module_info* sPCIx86Module = NULL;
-static device_manager_info* gDeviceManager;
+device_manager_info* gDeviceManager;
 static usb_for_controller_interface* gUSB;
 
 
@@ -65,7 +65,7 @@ init_bus(device_node* node, void** bus_cookie)
 	if (gUSB->get_stack((void**)&stack) != B_OK)
 		return B_ERROR;
 
-	OHCI *ohci = new(std::nothrow) OHCI(&bus->pciinfo, bus->pci, bus->device, stack);
+	OHCI *ohci = new(std::nothrow) OHCI(&bus->pciinfo, bus->pci, bus->device, stack, node);
 	if (ohci == NULL) {
 		return B_NO_MEMORY;
 	}
@@ -278,8 +278,9 @@ module_info* modules[] = {
 //
 
 
-OHCI::OHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stack *stack)
-	:	BusManager(stack),
+OHCI::OHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stack *stack,
+	device_node* node)
+	:	BusManager(stack, node),
 		fPCIInfo(info),
 		fPci(pci),
 		fDevice(device),
@@ -656,6 +657,9 @@ OHCI::Start()
 	}
 
 	SetRootHub(fRootHub);
+
+	fRootHub->RegisterNode(Node());
+
 	TRACE_ALWAYS("successfully started the controller\n");
 	return BusManager::Start();
 }

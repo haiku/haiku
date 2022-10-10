@@ -91,7 +91,8 @@ class XHCI : public BusManager {
 public:
 	static	status_t			AddTo(Stack *stack);
 
-								XHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stack *stack);
+								XHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stack *stack,
+									device_node* node);
 								~XHCI();
 
 	virtual	const char *		TypeName() const { return "xhci"; }

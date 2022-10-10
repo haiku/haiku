@@ -15,6 +15,7 @@
 #define USB_MODULE_NAME "module"
 
 Stack *gUSBStack = NULL;
+device_manager_info *gDeviceManager;
 
 
 /*!	The function is an evil hack to allow <tt> <kdebug>usb_keyboard </tt> to
@@ -930,9 +931,57 @@ usb_for_controller_interface gForControllerModule = {
 };
 
 
+static status_t
+device_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+		{
+			// Link to USB bus.
+			// USB device driver must have USB bus loaded, but it calls its
+			// functions directly instead via official interface, so this
+			// pointer is never read.
+			module_info *dummy;
+			return get_module("bus_managers/usb/v3", &dummy);
+		}
+		case B_MODULE_UNINIT:
+			return put_module("bus_managers/usb/v3");
+
+		default:
+			return B_ERROR;
+	}
+}
+
+
+usb_device_interface gUSBDeviceModule = {
+	{
+		{
+			USB_DEVICE_MODULE_NAME,
+			0,
+			device_std_ops
+		},
+
+		NULL,	// supported devices
+		NULL,	// register node
+	NULL, //usb_init_device,
+	NULL, //	(void (*)(void *)) usb_uninit_device,
+		NULL,	// register child devices
+		NULL,	// rescan
+	NULL//	(void (*)(void *)) usb_device_removed
+	},
+};
+
+
+module_dependency module_dependencies[] = {
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager },
+	{}
+};
+
+
 module_info *modules[] = {
 	(module_info *)&gModuleInfoV2,
 	(module_info *)&gModuleInfoV3,
 	(module_info *)&gForControllerModule,
+	(module_info *)&gUSBDeviceModule,
 	NULL
 };

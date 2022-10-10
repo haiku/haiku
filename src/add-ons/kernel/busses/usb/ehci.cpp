@@ -25,7 +25,7 @@
 
 
 static pci_x86_module_info* sPCIx86Module = NULL;
-static device_manager_info* gDeviceManager;
+device_manager_info* gDeviceManager;
 static usb_for_controller_interface* gUSB;
 
 
@@ -63,7 +63,7 @@ init_bus(device_node* node, void** bus_cookie)
 	if (gUSB->get_stack((void**)&stack) != B_OK)
 		return B_ERROR;
 
-	EHCI *ehci = new(std::nothrow) EHCI(&bus->pciinfo, bus->pci, bus->device, stack);
+	EHCI *ehci = new(std::nothrow) EHCI(&bus->pciinfo, bus->pci, bus->device, stack, node);
 	if (ehci == NULL) {
 		return B_NO_MEMORY;
 	}
@@ -325,8 +325,9 @@ print_queue(ehci_qh *queueHead)
 //
 
 
-EHCI::EHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stack *stack)
-	:	BusManager(stack),
+EHCI::EHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stack *stack,
+	device_node* node)
+	:	BusManager(stack, node),
 		fCapabilityRegisters(NULL),
 		fOperationalRegisters(NULL),
 		fRegisterArea(-1),
@@ -904,6 +905,8 @@ EHCI::Start()
 	}
 
 	SetRootHub(fRootHub);
+
+	fRootHub->RegisterNode(Node());
 
 	TRACE_ALWAYS("successfully started the controller\n");
 	return BusManager::Start();

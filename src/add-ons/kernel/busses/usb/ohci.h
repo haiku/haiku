@@ -34,7 +34,8 @@ typedef struct transfer_data {
 
 class OHCI : public BusManager {
 public:
-									OHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stack *stack);
+									OHCI(pci_info *info, pci_device_module_info* pci,
+										pci_device* device, Stack *stack, device_node* node);
 									~OHCI();
 
 		status_t					Start();

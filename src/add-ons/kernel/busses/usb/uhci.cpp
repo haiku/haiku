@@ -25,7 +25,7 @@
 #define USB_MODULE_NAME "uhci"
 
 static pci_x86_module_info* sPCIx86Module = NULL;
-static device_manager_info* gDeviceManager;
+device_manager_info* gDeviceManager;
 static usb_for_controller_interface* gUSB;
 
 
@@ -63,7 +63,7 @@ init_bus(device_node* node, void** bus_cookie)
 	if (gUSB->get_stack((void**)&stack) != B_OK)
 		return B_ERROR;
 
-	UHCI *uhci = new(std::nothrow) UHCI(&bus->pciinfo, bus->pci, bus->device, stack);
+	UHCI *uhci = new(std::nothrow) UHCI(&bus->pciinfo, bus->pci, bus->device, stack, node);
 	if (uhci == NULL) {
 		return B_NO_MEMORY;
 	}
@@ -512,8 +512,9 @@ Queue::PrintToStream()
 //
 
 
-UHCI::UHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stack *stack)
-	:	BusManager(stack),
+UHCI::UHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stack *stack,
+	device_node* node)
+	:	BusManager(stack, node),
 		fPCIInfo(info),
 		fPci(pci),
 		fDevice(device),
@@ -830,6 +831,8 @@ UHCI::Start()
 	}
 
 	SetRootHub(fRootHub);
+
+	fRootHub->RegisterNode(Node());
 
 	TRACE("controller is started. status: %u curframe: %u\n",
 		ReadReg16(UHCI_USBSTS), ReadReg16(UHCI_FRNUM));

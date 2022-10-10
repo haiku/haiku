@@ -93,7 +93,8 @@ typedef struct isochronous_transfer_data {
 
 class UHCI : public BusManager {
 public:
-									UHCI(pci_info *info, pci_device_module_info* pci, pci_device* device, Stack *stack);
+									UHCI(pci_info *info, pci_device_module_info* pci,
+										pci_device* device, Stack *stack, device_node* node);
 									~UHCI();
 
 		status_t					Start();

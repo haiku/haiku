@@ -31,7 +31,7 @@
 #define USB_MODULE_NAME	"xhci"
 
 static pci_x86_module_info* sPCIx86Module = NULL;
-static device_manager_info* gDeviceManager;
+device_manager_info* gDeviceManager;
 static usb_for_controller_interface* gUSB;
 
 
@@ -69,7 +69,7 @@ init_bus(device_node* node, void** bus_cookie)
 	if (gUSB->get_stack((void**)&stack) != B_OK)
 		return B_ERROR;
 
-	XHCI *xhci = new(std::nothrow) XHCI(&bus->pciinfo, bus->pci, bus->device, stack);
+	XHCI *xhci = new(std::nothrow) XHCI(&bus->pciinfo, bus->pci, bus->device, stack, node);
 	if (xhci == NULL) {
 		return B_NO_MEMORY;
 	}
@@ -322,8 +322,9 @@ module_info* modules[] = {
 };
 
 
-XHCI::XHCI(pci_info *info, 	pci_device_module_info* pci, pci_device* device, Stack *stack)
-	:	BusManager(stack),
+XHCI::XHCI(pci_info *info, 	pci_device_module_info* pci, pci_device* device, Stack *stack,
+	device_node* node)
+	:	BusManager(stack, node),
 		fRegisterArea(-1),
 		fRegisters(NULL),
 		fPCIInfo(info),
@@ -799,6 +800,8 @@ XHCI::Start()
 	}
 
 	SetRootHub(fRootHub);
+
+	fRootHub->RegisterNode(Node());
 
 	TRACE_ALWAYS("successfully started the controller\n");
 
@@ -1773,6 +1776,8 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	// We don't want to disable the default endpoint, naturally, which would
 	// otherwise happen when this Pipe object is destroyed.
 	pipe.SetControllerCookie(NULL);
+
+	deviceObject->RegisterNode();
 
 	TRACE("AllocateDevice() port %d slot %d\n", hubPort, slot);
 	return deviceObject;
