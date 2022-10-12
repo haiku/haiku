@@ -1,6 +1,6 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2004-2018, Haiku, Inc. All rights reserved.
+ * Copyright 2003-2022, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2022, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_UTIL_KERNEL_CPP_H
@@ -36,6 +36,7 @@ extern void* operator new(size_t size, const mynothrow_t &) _NOEXCEPT;
 extern void* operator new[](size_t size, const mynothrow_t &) _NOEXCEPT;
 extern void operator delete(void *ptr) _NOEXCEPT;
 extern void operator delete[](void *ptr) _NOEXCEPT;
+extern void operator delete(void *ptr, const std::nothrow_t &) _NOEXCEPT;
 
 #if __cplusplus >= 201402L
 extern void operator delete(void* ptr, std::size_t) _NOEXCEPT;
