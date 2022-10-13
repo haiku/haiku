@@ -63,7 +63,7 @@ AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToPackage disk virtual : virtio_block ram_disk ;
 AddNewDriversToPackage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 AddNewDriversToPackage sensor		: $(SYSTEM_ADD_ONS_DRIVERS_SENSOR) ;
-AddNewDriversToPackage network		: virtio_net ;
+AddNewDriversToPackage network		: usb_ecm virtio_net ;
 AddNewDriversToPackage input		: virtio_input ;
 #AddNewDriversToPackage display		: display_adapter@x86 ;
 

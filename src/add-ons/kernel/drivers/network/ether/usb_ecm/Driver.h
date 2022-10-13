@@ -6,6 +6,7 @@
 #ifndef _USB_ECM_DRIVER_H_
 #define _USB_ECM_DRIVER_H_
 
+#include <device_manager.h>
 #include <Drivers.h>
 #include <KernelExport.h>
 #include <OS.h>
@@ -54,19 +55,29 @@ typedef struct cdc_connection_speed_s {
 } _PACKED cdc_connection_speed;
 
 extern usb_module_info *gUSBModule;
+extern device_manager_info *gDeviceManager;
 
-extern "C" {
-status_t	usb_ecm_device_added(usb_device device, void **cookie);
-status_t	usb_ecm_device_removed(void *cookie);
+class ECMDevice;
 
-status_t	init_hardware();
-void		uninit_driver();
+// bus manager device interface for peripheral driver
+typedef struct {
+        driver_module_info info;
 
-const char **publish_devices();
-device_hooks *find_device(const char *name);
-}
+} usb_device_interface;
 
-#define	TRACE(x...)			/*dprintf(DRIVER_NAME ": " x)*/
+
+typedef struct {
+	device_node*			node;
+	::usb_device			usb_device;
+	usb_device_interface*	usb;
+	ECMDevice *				device;
+} usb_ecm_driver_info;
+
+
+
+#define	TRACE(x...)			dprintf(DRIVER_NAME ": " x)
 #define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME ": " x)
+#define CALLED() 			TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
+
 
 #endif //_USB_ECM_DRIVER_H_
