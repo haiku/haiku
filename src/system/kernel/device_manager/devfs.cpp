@@ -1534,21 +1534,6 @@ devfs_ioctl(fs_volume* _volume, fs_vnode* _vnode, void* _cookie, uint32 op,
 				return status;
 			}
 
-			case B_GET_DRIVER_FOR_DEVICE:
-			{
-#if 0
-				const char* path;
-				if (!vnode->stream.u.dev.driver)
-					return B_ENTRY_NOT_FOUND;
-				path = vnode->stream.u.dev.driver->path;
-				if (path == NULL)
-					return B_ENTRY_NOT_FOUND;
-
-				return user_strlcpy((char*)buffer, path, B_FILE_NAME_LENGTH);
-#endif
-				return B_ERROR;
-			}
-
 			case B_GET_PARTITION_INFO:
 			{
 				struct devfs_partition* partition

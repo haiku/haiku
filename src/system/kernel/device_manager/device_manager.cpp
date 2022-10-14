@@ -21,8 +21,9 @@
 #include <device_manager_defs.h>
 #include <fs/devfs.h>
 #include <fs/KPath.h>
-#include <kernel.h>
 #include <generic_syscall.h>
+#include <kernel.h>
+#include <kmodule.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/Stack.h>
@@ -90,6 +91,8 @@ public:
 	virtual	void			UninitDevice();
 
 	virtual void			Removed();
+
+	virtual	status_t		Control(void* cookie, int32 op, void* buffer, size_t length);
 
 			void			SetRemovedFromParent(bool removed)
 								{ fRemovedFromParent = removed; }
@@ -1248,6 +1251,28 @@ Device::Removed()
 		fNode->RemoveDevice(this);
 
 	delete this;
+}
+
+
+status_t
+Device::Control(void* _cookie, int32 op, void* buffer, size_t length)
+{
+	switch (op) {
+		case B_GET_DRIVER_FOR_DEVICE:
+		{
+			char* path = NULL;
+			status_t status = module_get_path(ModuleName(), &path);
+			if (status != B_OK)
+				return status;
+			if (length != 0 && length <= strlen(path))
+				return ERANGE;
+			status = user_strlcpy(static_cast<char*>(buffer), path, length);
+			free(path);
+			return status;
+		}
+		default:
+			return AbstractModuleDevice::Control(_cookie, op, buffer, length);;
+	}
 }
 
 
