@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-DriveSetup	4048496535
+1	japanese	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		パーティション %s をマウント解除できません。
 Mount all	MainWindow		すべてマウント
 Disk	MainWindow		ディスク
@@ -14,6 +14,7 @@ Block size	PartitionList		ブロックサイズ
 The panel experienced a problem!	MainWindow		パネルに問題が発生しました。
 Device	DiskView		デバイス
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		本当にIntel Extended Partitionをフォーマットしますか? 続行するとそのサブパーティションがすべて上書きされます。変更がディスクに書き込まれる前にもう一度確認されるでしょう。
+Physical block size	PartitionList		物理ブロックサイズ
 Unmount	MainWindow		マウント解除
 Failed to format the partition %s!\n	MainWindow		パーティション %s のフォーマットに失敗しました。\n
 Partition size	CreateParametersPanel		パーティションサイズ

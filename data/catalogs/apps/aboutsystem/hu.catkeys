@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-About	610468518
+1	hungarian	x-vnd.Haiku-About	2259131995
 Revision	AboutView		kiadás:
 The Haikuware team and their bounty program\n	AboutView		A Haikuware csapatának és az adományprogramjuknak\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Minden jog fenntartva.
@@ -38,6 +38,7 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyrigh
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Ez a szoftver részben a Independent JPEG Group munkáján alapszik.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phippsnek (projektalapító)\n\n
+Remove replicant	AboutView		Replikáns eltávolítása
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 About this system	AboutWindow		Haiku névjegye
 %d MiB used (%d%%)	AboutView		%d MiB használt (%d%%)

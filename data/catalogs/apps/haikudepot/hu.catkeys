@@ -1,20 +1,26 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	3139226371
+1	hungarian	x-vnd.Haiku-HaikuDepot	1865982782
+Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 Available packages	MainWindow		Elérhető csomagok
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
 An unexpected error has been sent from the server [%li]	ServerHelper		A kiszolgáló váratlan hibaüzenetet küldött [%li]
 Create account	UserLoginWindow		Felhasználói fiók létrehozása
+Agree	ToLatestUserUsageConditionsWindow		Egyetértek
 Install %PackageTitle%	PackageManager		%PackageTitle% telepítése
 The response to the captcha was incorrect.	ServerHelper		Hibás válasz a captcha-kódra.
 Rate package…	PackageInfoView		Csomag értékelése…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Sikeres bejelentkezés %Nickname%.
+Package problems	PackageProblem	Window title	Csomag probléma
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nem sikerült kinyerni a captcha információt az elküldött adatokból.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Nem sikerült a csomaglista betöltése: %message%.
+Update usage conditions	ToLatestUserUsageConditionsWindow		Felhasználási feltételek frissítése
+No usage conditions	UserUsageConditions		Nincsenek felhasználási feltételek
 Active	PackageListView		Aktív
 Login or Create account	MainWindow		Belépés vagy fiók létrehozása
 Switch account…	MainWindow		Másik fiók…
 Preferred language:	UserLoginWindow		Előnyben részesített nyelv:
 Name	PackageListView		Név
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Engedélyezési vagy biztonsági hiba. Jelentkezz ki, és lépj be újra, hogy ellenőrizd a jelszó helyességét és azt is, hogy elfogadtad-e a legújabb felhasználási feltételeket.
+don't activate package %source%	PackageProblem	don't change '%source%	ne aktiválja a csomagot: %source%
 Rate %Package%	RatePackageWindow		%Package% értékelése
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Nem sikerült elindítani a csomagkezelőt: %message%.
 Quit HaikuDepot	App		Raktár bezárása
@@ -22,7 +28,11 @@ Category	FilterView		Kategória
 A response to the captcha question must be provided.	UserLoginWindow		Szükséges a captcha kérdésre válaszolni.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Váratlan hiba '%Message%' lépett fel '%Property%' jellemzőnél
 A requested object or an object involved in the request was not found on the server.	ServerHelper		A kért objektum vagy a kérésben szereplő objektum nem található a kiszolgálón.
+Logout	ToLatestUserUsageConditionsWindow		Kilépés
+The following additional package changes have to be made:	PackageResult		Az alábbi módosítások elvégzése szükséges a csomagon:
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
+The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		A jelenlegi felhasználási feltételek elfogadásra kerültek.
+Cancel	PackageProblem		Mégse
 Version	PackageListView		Verzió
 No, quit HaikuDepot	App		Nem, a Raktár bezárása.
 Not logged in	MainWindow		Nincs bejelentkezve
@@ -48,10 +58,13 @@ The email is malformed.	UserLoginWindow		Hibás a levél formátuma.
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Csomagadatok szinkronizálása a tárolóból: '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Felhasználási feltételek
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Hiba történt az új felhasználó létrehozásához szükséges használati feltételek letöltésével. Ellenőrizd a naplót a részletekért, és próbáld újra.\nA naplók megtekintésével kapcsolatos információk a Haiku felhasználói kézikönyv HaikuDepot szakaszában találhatók.
+Usage conditions agreed	ToLatestUserUsageConditionsWindow		Felhasználási feltételek elfogadva
 Size	PackageListView		Méret
 Your rating was updated.	RatePackageWindow		Az értékelés módosítása sikerült.
 All categories	FilterView		Minden kategória
+ignore problem for now	PackageProblem		most hagyja figyelmen kívül
 n/a	PackageInfoView		nincs értékelve
+Checking user details	UserDetailVerifierProcess		Felhasználó ellenőrzése
 Cancel	MainWindow		Mégse
 Refresh repositories	MainWindow		Tárolók frissítése
 Continue	App		Folytatás
@@ -59,13 +72,16 @@ A password is required.	UserLoginWindow		Jelszó szükséges.
 Language	RatePackageWindow		Nyelv
 Status	PackageListView		Állapot
 Network transport error	ServerHelper		Hálózati átviteli hiba
+Cancel	PackageResult		Mégse
 Uninstall %PackageTitle%	PackageManager		%PackageTitle% eltávolítása
+Retry	PackageProblem		Újra
 Update	RatePackageWindow		Frissítés
 Language	UserLoginWindow		Nyelv
 OK	UserLoginWindow		Rendben
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Referencia adatok szinkronizálása
 Stability:	RatePackageWindow		Stabilitás:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		A felhasználási feltételeket el kell fogadni és meg kell erősíteni, hogy a felhasználót létrehozó személy megfelel a minimális életkor követelményeinek.
+solution %d:	PackageProblem	Don't change the %d variable	%d megoldás:
 Source packages	MainWindow		Forráskód csomagok
 Problem with working files	App		Nem tudok a fájlokkal dolgozni
 Try again	App		Próbáld újra
@@ -83,6 +99,7 @@ Authentication failed	UserLoginWindow		A hitelesítés sikertelen
 Captcha error	UserLoginWindow		Captcha hiba
 Manage repositories…	MainWindow		Csomagtárolók kezelése…
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		A becenévnek egyedinek kell lennie, de a megadott név már foglalt. Válassz másik becenevet.
+OK	UserUsageConditions		Rendben
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
 Input validation	UserLoginWindow		Bevitel érvényesítése
 Log in…	MainWindow		Bejelentkezés…
@@ -96,11 +113,15 @@ An error occurred while refreshing the repository: %error%	LocalRepositoryUpdate
 User Created	UserLoginWindow		Felhasználó létrehozva
 Check for updates…	MainWindow		Frissítések keresése…
 Uninstalled	PackageListView		Eltávolítva
+I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Egyetértek a felhasználási feltételekkel
+Installing \"%PackageName%\"	InstallPackageProcess		\"%PackageName%\" telepítése
 OK	App		Rendben
+Fatal error	UninstallPackageAction		Végzetes hiba
 Develop packages	MainWindow		Fejlesztői csomagok
 Starting the package daemon failed:\n\n%Error%	App		A csomag démon indítása sikertelen:\n\n%Error%
 No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
 <no info>	PackageInfoView		<nincs információ>
+Usage conditions download problem	UserUsageConditions		Hiba történt a felhasználási feltételek letöltésekor
 Rating	PackageListView		Értékelés
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Hálózati hiba lépett fel a szerverrel való kommunikáció során: %s
 Synchronizing icons	ServerIconExportUpdateProcess		Ikonok szinkronizálása
@@ -110,12 +131,14 @@ This application writes and reads some working files on your computer in order t
 <Package contents not available for remote packages>	PackageContentsView		<Távoli csomagok esetében a csomag tartalma nem érhető el>
 Ratings	PackageInfoView		Értékelés
 Local	LocalPkgDataLoadProcess		Helyi
+Package changes	PackageResult	Window title	Csomag-változások
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Hozzájárulsz ahhoz, hogy névtelen felhasználási adatokat küldjünk a HaikuDepot kiszolgálóra? Bármikor módosítható ez a \"Beállítások\" panelen.
 User rating	RatePackageWindow		Felhasználói értékelés
 Installed packages	MainWindow		Telepített csomagok
 Date	PackageListView		Dátum
 Error	App		Hiba
 There was a puzzling response from the web service.	UserLoginWindow		A webes szolgáltatás rejtélyes választ adott.
+Opening \"%DeskbarLink%\"	OpenPackageProcess		\"%DeskbarLink%\" megnyitása
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Az értékelés feltöltése sikeres volt. Frissítheted vagy eltávolíthatod a HaikuDepot kiszolgáló webhelyén.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nem sikerült kapcsolódni a kiszolgálóhoz a captcha kód letöltéséhez.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		A captchára adott válasz nem megfelelő. Új captcha lesz generálva; próbáld újra.
@@ -137,7 +160,9 @@ Inactive	PackageListView		Inaktív
 Nickname:	UserLoginWindow		Felhasználó:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Meta adatok szinkronizálása
 OK	MainWindow		Rendben
+Version %Code%	UserUsageConditions		Verzió: %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# elem} other{# elem}}
+Uninstalling \"%PackageName%\"	UninstallPackageAction		\"%PackageName%\" eltávolítása
 Downloading:	PackageInfoView		Letöltés:
 Quit	MainWindow		Kilépés
 Success	UserLoginWindow		Sikeres
@@ -157,22 +182,28 @@ Log out	MainWindow		Kijelentkezés
 Comment language:	RatePackageWindow		Hozzászólás nyelve:
 The password has been incorrectly repeated.	UserLoginWindow		A megismételt jelszó téves.
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		A felhasználó [%Nickname%] előzőleg megadott jelszava évrénytelen. A felhasználó ki lesz léptetve az alkalmazásból majd újra be kell jelentkezni az érvényes jelszóval.
+View the usage conditions	ToLatestUserUsageConditionsWindow		Felhasználási feltételek megtekintése
 OK	ServerHelper		Rendben
 Reading repository data	LocalPkgDataLoadProcess		Tároló olvasása
+Fatal error	InstallPackageProcess		Végzetes hiba
 A validation error has occurred	ServerHelper		Hitelesítési hiba
 The nickname is required.	UserLoginWindow		Felhasználói név szükséges.
 -	no package size		-
+Apply changes	PackageResult		Változtatások alkalmazása
 Rate package	RatePackageWindow		Csomag értékelése
 Server error	ServerHelper		Mentési hiba
 Sending anonymous usage data	MainWindow		Névtelen felhasználási adatok küldése
 Log in	UserLoginWindow		Bejelentkezés
+Usage conditions	UserUsageConditions		Felhasználási feltételek
 HaikuDepot	System name		Raktár
 Screenshot	ScreenshotWindow		Képernyőkép
 Email address:	UserLoginWindow		E-mail cím:
 View latest usage conditions…	MainWindow		Felhasználási feltételek…
 Category:	FilterView		Kategória:
+uninstall package %s\n	PackageResult	Don't change '%s' variable	%s csomag eltávolítása\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Tároló adatainak letöltése
 Description	PackageListView		Leírás
 User creation error	UserLoginWindow		Felhasználó létrehozási hiba
 You need to be logged into an account before you can rate packages.	MainWindow		Csomag értékelése előtt be kell jelentkezni egy felhasználói fiókba.
+Cleaning up…	ShuttingDownWindow		Rendrakás…
 Repeat password:	UserLoginWindow		Jelszó ismétlése:

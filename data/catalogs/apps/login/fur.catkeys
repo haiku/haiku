@@ -1,9 +1,10 @@
-1	friulian	x-vnd.Haiku-Login	1584886353
+1	friulian	x-vnd.Haiku-Login	2920451831
 Invalid login!	Login View		Acès no valit!
 Error	Login App		Erôr
 Login application for Haiku\nUsage:	Login App		Aplicazion di acès par Haiku\nUtilizazion:
 --nonmodal\tDo not make the window modal	Login App		--nonmodal\tNo sta rindi modâl il barcon
 Welcome to Haiku	Login Window		Benvignûts su Haiku!
+--edit\tLaunch in shelf editing mode to allow customizing the desktop.	Login App		--edit\tInvie in modalitât modifiche scansie (shelf) par permeti la personalizazion dal scritori.
 Halt	Login View		Distude
 Desktop	Desktop Window		Scritori
 Hide password	Login View		Plate peraule di ordin

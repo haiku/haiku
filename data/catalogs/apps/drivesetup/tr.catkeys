@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-DriveSetup	4048496535
+1	turkish	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		%s bölümü bağlantısı kesilemedi.
 Mount all	MainWindow		Hepsini bağla
 Disk	MainWindow		Disk
@@ -14,6 +14,7 @@ Block size	PartitionList		Blok boyutu
 The panel experienced a problem!	MainWindow		Panel bir sorun yaşadı!
 Device	DiskView		Aygıt
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Intel Genişletilmiş Bölümünü biçimlendirmek istediğinizden emin misiniz? İçerdiği tüm altbölümler üzerine yazılacaktır. Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
+Physical block size	PartitionList		Fiziksel blok boyutu
 Unmount	MainWindow		Bağlantıyı kes
 Failed to format the partition %s!\n	MainWindow		%s bölümünün biçimlendirilmesi başarısız oldu!\n
 Partition size	CreateParametersPanel		Bölüm boyutu

@@ -1,20 +1,27 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	3139226371
+1	friulian	x-vnd.Haiku-HaikuDepot	136904009
+Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probleme tal discjamâ lis condizions di utilizazion
 Available packages	MainWindow		Pachets disponibii
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
 An unexpected error has been sent from the server [%li]	ServerHelper		Al è rivât un erôr inspietât dal servidôr [%li]
 Create account	UserLoginWindow		Cree account
+Agree	ToLatestUserUsageConditionsWindow		Acete
 Install %PackageTitle%	PackageManager		Instale %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		La rispueste al captcha e jere sbaliade.
 Rate package…	PackageInfoView		Vote pachet…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Tu ti sês autenticât cun sucès come utent %Nickname%.
+Package problems	PackageProblem	Window title	Problemis al pachet
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nol è stât pussibil tirâ fûr lis informazions captcha necessaris dai dâts restituîts dal servidôr.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Si è verificât un erôr intal otignî la liste dai pachets: %message%
+Update usage conditions	ToLatestUserUsageConditionsWindow		Inzorne condizions di utilizazion
+No usage conditions	UserUsageConditions		Nissune condizion di utilizazion
 Active	PackageListView		Atîf
 Login or Create account	MainWindow		Jentre o Regjistriti
 Switch account…	MainWindow		Cambie account…
 Preferred language:	UserLoginWindow		Lenghe preferide:
 Name	PackageListView		Non
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problemis di autorizazion o di sigurece. Jes e torne jentre par controlâ che la tô peraule di ordin e sedi juste e controle ancje di vê acetât lis ultimis condizions di ûs.
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot al comuniche cuntun component di servidôr clamât HaikuDepotServer. Chestis a son lis condizions di utilizazion che l'utent '%Nickname%' al à acetât ai %AgreedToTimestamp% in merit ae utilizazion dal servizi di HaikuDepotServer.
+don't activate package %source%	PackageProblem	don't change '%source%	no sta ativâ il pachet %source%
 Rate %Package%	RatePackageWindow		Vote %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Si è verificât un erôr intal inizializâ il gjestôr dal pachet: %message%
 Quit HaikuDepot	App		Siere HaikuDepot
@@ -22,7 +29,11 @@ Category	FilterView		Categorie
 A response to the captcha question must be provided.	UserLoginWindow		Si scugne dâ une rispueste ae domande captcha.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Al è vignût fûr un erôr '%Message%' inspietât cun proprietât '%Property%'
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Un ogjet domandât o un ogjet che al centrave cu la richieste nol è stât cjatât sul servidôr.
+Logout	ToLatestUserUsageConditionsWindow		Jes
+The following additional package changes have to be made:	PackageResult		Al è necessari fâ chestis modifichis adizionâls al pachets:
 No changelog available.	PackageInfoView		Nissun regjistri des modifichis disponibil.
+The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Li condizions di utilizazion atuâls a son stadis acetadis.
+Cancel	PackageProblem		Anule
 Version	PackageListView		Version
 No, quit HaikuDepot	App		No, siere HaikuDepot
 Not logged in	MainWindow		No jentrât
@@ -38,20 +49,26 @@ All packages	PackageListView		Ducj i pachets
 Send	RatePackageWindow		Invie
 Start package daemon	App		Invie demoni dai pachets
 There are problems in the supplied data:	UserLoginWindow		Si à problemis tai dâts furnîts:
+The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		L'utent '%Nickname%' nol à acetât nissune condizion di utilizazion.
 Usage conditions download problem	UserLoginWindow		Probleme tal discjariament des condizions di ûs
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	instale il pachet %s dal dipuesit %s\n
 Package daemon problem	App		Probleme cul demoni dai pachets
 No	MainWindow		No
 Repository	PackageListView		Dipuesit
+Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Al è necessari che i utents a vedin %AgeYears% o plui agns.
 Close	RatePackageWindow		Siere
 Close	UserLoginWindow		Siere
 The email is malformed.	UserLoginWindow		La direzion e-mail e je malformade.
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Sincronizazion dâts dai pachets pal dipuesit '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Viôt lis condizions di ûs
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Al è vignût fûr un erôr discjariant lis condizions di ûs necessaris par creâ un gnûf utent. Controle il regjistri pai detais e torne prove. \nLis informazions su ce mût viodi i regjistris a son disponibilis inte sezion di HaikuDepot  de Vuide utent di Haiku.
+Usage conditions agreed	ToLatestUserUsageConditionsWindow		Condizions di utilizazion acetadis
 Size	PackageListView		Dimension
 Your rating was updated.	RatePackageWindow		La tô valutazion e je stade inzornade.
 All categories	FilterView		Dutis lis categoriis
+ignore problem for now	PackageProblem		ignore il probleme pal moment
 n/a	PackageInfoView		n/d
+Checking user details	UserDetailVerifierProcess		Verifiche dai detais utent
 Cancel	MainWindow		Anule
 Refresh repositories	MainWindow		Inzorne dipuesits
 Continue	App		Continue
@@ -59,13 +76,16 @@ A password is required.	UserLoginWindow		E je necessarie une peraule d'ordin.
 Language	RatePackageWindow		Lenghe
 Status	PackageListView		Stât
 Network transport error	ServerHelper		Erôr di traspuart de rêt
+Cancel	PackageResult		Cancele
 Uninstall %PackageTitle%	PackageManager		Disinstale %PackageTitle%
+Retry	PackageProblem		Torne prove
 Update	RatePackageWindow		Inzorne
 Language	UserLoginWindow		Lenghe
 OK	UserLoginWindow		Va ben
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Sincronizazion dâts di riferiment dal servidôr
 Stability:	RatePackageWindow		Stabilitât:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		L'acuardi di utilizazion al scugne jessi acetât e si scugne confermâ che la persone che e cree l'utent e vedi i recuisîts minims pe etât.
+solution %d:	PackageProblem	Don't change the %d variable	soluzion %d:
 Source packages	MainWindow		Pachets sorzint
 Problem with working files	App		Probleme cui file di lavôr de aplicazion
 Try again	App		Torne prove
@@ -83,6 +103,7 @@ Authentication failed	UserLoginWindow		Autenticazion falide
 Captcha error	UserLoginWindow		Erôr captcha
 Manage repositories…	MainWindow		Gjestìs dipuesits…
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Il sorenon al scugne jessi unic, ma il sorenon indicât al è za doprât. Sielç un sorenon diviers.
+OK	UserUsageConditions		Va ben
 Open %DeskbarLink%	PackageManager		Vierç %DeskbarLink%
 Input validation	UserLoginWindow		Convalide input
 Log in…	MainWindow		Acès…
@@ -96,11 +117,16 @@ An error occurred while refreshing the repository: %error%	LocalRepositoryUpdate
 User Created	UserLoginWindow		Utent creât
 Check for updates…	MainWindow		Controle inzornaments…
 Uninstalled	PackageListView		Disinstalât
+I agree to the usage conditions	ToLatestUserUsageConditionsWindow		O aceti lis condizions di utilizazion
+Installing \"%PackageName%\"	InstallPackageProcess		Instalazion di \"%PackageName%\"
 OK	App		Va ben
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot al comuniche cuntun component di servidôr clamât HaikuDepotServer. Chestis a son lis ultimis condizions di utilizazion par doprâ il servizi HaikuDepotServer.
+Fatal error	UninstallPackageAction		Erôr fatâl
 Develop packages	MainWindow		Pachets di svilup
 Starting the package daemon failed:\n\n%Error%	App		Inviament dal demoni dai pachets falît:\n\n %Error%
 No user ratings available.	PackageInfoView		Nissune valutazion dai utents disponibile.
 <no info>	PackageInfoView		<nessune informazion>
+Usage conditions download problem	UserUsageConditions		Probleme tal discjamâ lis condizions di utilizazion
 Rating	PackageListView		Valutazion
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Al è vignût fûr un erôr di traspuart de rêt tal comunicâ cul servidôr: %s
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronizazion iconis
@@ -109,13 +135,17 @@ Settings…	MainWindow		Impostazions…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Cheste aplicazion, par funzionâ ben, e scrîf e e lei cualchi file di lavôr tal to computer. Al semee che a sedin problemis tal scrivi un file di prove su [%TestFilePath%]. Controle di no vê fastidis cul to disc locâl o cun permès che a impedissin a cheste aplicazion di scrivi file in chê posizion. Tu puedis sielzi di no risolvi il probleme e di continuâ, ma cualchi funzionalitât e podarès jessi disabilitade.
 <Package contents not available for remote packages>	PackageContentsView		<Contignûts dal pachet no disponibii pai pachets esternis>
 Ratings	PackageInfoView		Valutazions
+The following problems have been encountered. Please select a solution for each:	PackageProblem		A son vignûts fûr chescj problemis. Par plasê selezione une soluzion par ognun di lôr:
 Local	LocalPkgDataLoadProcess		Locâl
+Package changes	PackageResult	Window title	Modifichis al pachet
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Acetaressistu di inviâ dâts anonims sul ûs di chest computer al sisteme HaikuDepotServer? Plui indenant tu podarâs modificâ lis tôs preferencis tal barcon \"Impostazions\".
 User rating	RatePackageWindow		Valutazion utents
 Installed packages	MainWindow		Pachets instalâts
 Date	PackageListView		Date
 Error	App		Erôr
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Al è vignût fûr un erôr tal discjamâ lis condizions di utilizazion. Controle il regjistri pai detais e torne prove.\nInformazions su cemût visualizâ i regjistris a son disponibilis te sezion HaikuDepot de Vuide Utent di Haiku.
 There was a puzzling response from the web service.	UserLoginWindow		La rispueste dal servizi web e jere ambigue.
+Opening \"%DeskbarLink%\"	OpenPackageProcess		Daûr a vierzi \"%DeskbarLink%\"
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		La tô valutazion e je stade cjariade cun sucès. Tu puedis modificâle o gjavâle sul sît web dal servidôr di HaikuDepot.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nol è stât pussibil comunicâ cul servidôr par otignî une imagjin captcha necessarie par creâ un gnûf utent.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		La rispueste dade al captcha no je juste. Al vignarà gjenerât un gnûf captcha; torne prove.
@@ -137,7 +167,9 @@ Inactive	PackageListView		Inatîf
 Nickname:	UserLoginWindow		Sorenon:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Sincronizazion meta-dâts in merit ai dipuesits
 OK	MainWindow		Va ben
+Version %Code%	UserUsageConditions		Version %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
+Uninstalling \"%PackageName%\"	UninstallPackageAction		Disinstalazion di \"%PackageName%\"
 Downloading:	PackageInfoView		Ricezion:
 Quit	MainWindow		Jes
 Success	UserLoginWindow		Lât a bon fin
@@ -146,33 +178,44 @@ Success	UserLoginWindow		Lât a bon fin
 Settings	SettingsWindow		Impostazions
 Login issue	MainWindow		Probleme di acès
 Your rating:	RatePackageWindow		La tô valutazion:
+HaikuDepot is stopping or completing running operations before quitting.	ShuttingDownWindow		HaikuDepot si sta fermant o al sta completant operazions in esecuzion prime di jessî.
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		L'utent %Nickname% al è stât creât cun sucès tal sisteme di HaikuDepotServer. Tu puedis gjestî i tiei detais-utent doprant la interface web. Tu sês cumò jentrât come chest utent gnûf.
 Repositories	MainWindow		Dipuesits
 This rating is visible to other users	RatePackageWindow		Altris utents a puedin viodi cheste valutazion
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Intant che si inzornave i dâts di un pachet, al è vignût fûr un probleme che al podarès fâ pierdi i dâts o rindiju obsolets rispiet ae visualizazion de aplicazion. Detais adizionâi in merit si puedin otignî dai regjistris de aplicazion.\nLis informazions su ce mût viodi i regjistris a son disponibilis te sezion di HaikuDepot de Vuide utent di Haiku.
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Al è vignût fûr un erôr tal discjamâ lis condizions di utilizazion. Controle il regjistri pai detais e torne prove. \nInformazions su cemût visualizâ i regjistris a son disponibilis te sezion HaikuDepot de Vuide Utent di Haiku.
 View agreed usage conditions…	MainWindow		Viôt lis cundizions di ûs acetadis…
+The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		L'utent [%Nickname%] si è autenticât, ma prime di podê continuâ, al è necessari che tu acetis lis plui resintis condizions di utilizazion.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Chest pachet nol semee esisti sul servidôr HaikuDepot, duncje nol è pussibil creâ une gnove valutazion o modificâ une esistente.
 Apply	SettingsWindow		Apliche
+The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		L'utent \"%Nickname%\" al à acetât in precedence lis condizions di utilizazion, ma di chê volte chestis a son stadis inzornadis. Si scugne cumò acetâ lis condizions di utilizazion inzornadis.
 Log out	MainWindow		Termine session
 Comment language:	RatePackageWindow		Lenghe dal coment:
 The password has been incorrectly repeated.	UserLoginWindow		La peraule d'ordin e je stade ripetude sbaliade.
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		La peraule d'ordin furnide in precedence pal utent [%Nickname%] no je pal moment valide. L'utent al vignarà disconetût di cheste aplicazion e tu varâs di jentrâ di gnûf cu la peraule d'ordin inzornade.
+View the usage conditions	ToLatestUserUsageConditionsWindow		Visualize lis condizions di utilizazion
 OK	ServerHelper		Va ben
 Reading repository data	LocalPkgDataLoadProcess		Leture dâts dal dipuesit
+Fatal error	InstallPackageProcess		Erôr fatâl
 A validation error has occurred	ServerHelper		Si è verificât un erôr di convalide
 The nickname is required.	UserLoginWindow		Il sorenon al è necessari.
 -	no package size		-
+Apply changes	PackageResult		Apliche modifichis
 Rate package	RatePackageWindow		Valute pachet
 Server error	ServerHelper		Erôr dal servidôr
+Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Viodude di regjistrazion di \"%PackageName%\"
 Sending anonymous usage data	MainWindow		Daûr a inviâ dâts anonim sul ûs
 Log in	UserLoginWindow		Jentre
+Usage conditions	UserUsageConditions		Condizions di utilizazion
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		Istantanie
 Email address:	UserLoginWindow		Direzion email:
 View latest usage conditions…	MainWindow		Viôt lis ultimis condizions di ûs…
 Category:	FilterView		Categorie:
+uninstall package %s\n	PackageResult	Don't change '%s' variable	disinstale pachet %s\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Daûr a recuperâ i dâts dal dipuesit lontan
 Description	PackageListView		Descrizion
 User creation error	UserLoginWindow		Erôr di creazion dal utent
 You need to be logged into an account before you can rate packages.	MainWindow		Si scugne jessi jentrâts intun account prime di podê valutâ i pachets.
+Cleaning up…	ShuttingDownWindow		Netisie…
 Repeat password:	UserLoginWindow		Ripet peraule d'ordin:

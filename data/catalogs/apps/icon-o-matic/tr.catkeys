@@ -19,7 +19,7 @@ Unassign Path	Icon-O-Matic-UnassignPathCmd		Yol atamasını kaldır
 The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		İçe aktarmaya çalıştığınız metin pek uzun, emin misiniz?
 Paste	Icon-O-Matic-Properties		Yapıştır
 Detect Orient.	Icon-O-Matic-PropertyNames		Yönelimi algıla
-Click on a shape above	Empty transformers list - 1st line		Dönüştürücüleri iliştirmek için
+Click on a shape above	Empty transformers list - 1st line		Dönüştürücüleri iliştirmek
 Close	Icon-O-Matic-Menu-File		Kapat
 Add rect	Icon-O-Matic-PathsList		Dikdörtgen ekle
 Rotation	Icon-O-Matic-PropertyNames		Döndürme
@@ -110,9 +110,9 @@ Change Color	Icon-O-Matic-SetColorCmd		Renk değiştir
 Remove	Icon-O-Matic-ShapesList		Kaldır
 Drop shapes	Icon-O-Matic-ShapesList		Şekilleri bırak
 PNG Set	Icon-O-Matic-SavePanel		PNG kümesi
-to attach transformers.	Empty transformers list - 2nd line		bir şekle tıklayın.
+to attach transformers.	Empty transformers list - 2nd line		için bir şekle tıklayın.
 Linear	Icon-O-Matic-StyleTypes		Doğrusal
-any of the other lists to	Empty property list - 2nd line		özelliklerini düzenlemek için
+any of the other lists to	Empty property list - 2nd line		özelliklerini düzenlemek
 Nudge Control Point	Icon-O-Matic-NudgePointsCommand		Denetim noktalarını yokla
 Flip Control Point	Icon-O-Matic-FlipPointsCmd		Denetim noktasını ters çevir
 Add Paths	Icon-O-Matic-AddPathsCmd		Yol ekle

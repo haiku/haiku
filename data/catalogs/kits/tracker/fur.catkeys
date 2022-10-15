@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	2915475646
+1	friulian	x-vnd.Haiku-libtracker	464753347
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Icone bitmap piçule
 Would you like to find a suitable application to open the file?	FSUtils		Cjatâ une aplicazion adate par vierzi il file?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		No si pues sostituî une cartele o un colegament simbolic cuntun file.
+(unknown)	InfoWindow		(no cognossût)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datis>}}
 Trailing \\.	libtracker		\\ ae fin.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Su %func\nal è falît find_directory().\nMotîf: %error
@@ -84,6 +85,7 @@ Include trash	FindPanel		Inclût scovacere
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Met a puest
 Modified	FindPanel		Modificât
+ (block size: 	InfoWindow		 (dimension bloc: 
 Select all	QueryContainerWindow		Selezione dutis
 Generate image thumbnails	SettingsView		Gjenere miniaturis di imagjins
 Select…	FilePanelPriv		Selezione…
@@ -167,6 +169,7 @@ Read	FilePermissionsView		Leture
 There was an error writing the attribute.	WidgetAttributeText		Si è presentât un erôr tal scrivi l'atribût.
 Path	Default Query Columns		Percors
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se si cambie non a %target, %osName al podaès funzionâ mâl!\n\nContinuâ pardabon?
+Filesystem:	InfoWindow		Filesystem:
 Could not open \"%name\" (%error). 	FSUtils		Nol è stât pussibil vierzi \"%name\" (%error). 
 Media parameter group	AttributesView		Grup di parametris multimediâi
 %name info	InfoWindow	InfoWindow Title	Informazions su %name
@@ -493,6 +496,7 @@ Duplicate	ContainerWindow		Dupliche
 16-bit integer	AttributesView		Intîr a 16 bit
 Untitled clipping	PoseView		Ritai cence non
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Il file \"%name\" al esist za te cartele specificade. Sostituîlu?
+, indexed	InfoWindow		, cun tabele
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Si à di strissinâ e molâ i elements suntune des iconis dai discs, tal barcon \"Disks\".
 Version:	InfoWindow		Version:
 OK	PoseView		Va ben
