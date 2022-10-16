@@ -22,6 +22,7 @@ EMULATOR=qemu-system-$ARCH
 EXTRAS="-parallel none"
 
 function check_logs {
+	echo "=============================================="
 	FILE=$1
 	echo -n "    Haiku kernel loaded: "
 	# First output from kernel on boot
@@ -37,8 +38,13 @@ function check_logs {
 	else
 		echo "NO"
 	fi
+	echo "=============================================="
+	echo "    Summary of issues in logs:"
+	grep -E -i "FATAL|ERROR|FAIL|GDB" $FILE | grep -vi " No error" | cut -d':' -f1 | sort | uniq -c | sort -nr
+	echo "=============================================="
 	echo "    Potential issues in logs:"
 	grep -E -i "FATAL|ERROR|FAIL|GDB" $FILE | grep -vi " No error"
+	echo "=============================================="
 }
 
 case "$PLATFORM" in
