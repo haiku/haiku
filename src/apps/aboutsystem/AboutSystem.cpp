@@ -88,8 +88,8 @@
 
 static const char* kSignature = "application/x-vnd.Haiku-About";
 
-static const float kWindowWidth = 629.0f;
-static const float kWindowHeight = 445.0f;
+static const float kWindowWidth = 500.0f;
+static const float kWindowHeight = 300.0f;
 
 static const float kSysInfoMinWidth = 163.0f;
 static const float kSysInfoMinHeight = 193.0f;
