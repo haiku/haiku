@@ -409,9 +409,26 @@ virtio_device_read_device_config(virtio_device cookie, uint8 offset,
 {
 	TRACE("virtio_device_read_device_config(%p, %d, %" B_PRIuSIZE ")\n", cookie,
 		offset, bufferSize);
-
 	VirtioDevice* dev = (VirtioDevice*)cookie;
-	memcpy(buffer, (void*)(dev->fRegs->config + offset), bufferSize);
+
+	// TODO: check ARM support, ARM seems support only 32 bit aligned MMIO access.
+	vuint8* src = &dev->fRegs->config[offset];
+	uint8* dst = (uint8*)buffer;
+	while (bufferSize > 0) {
+		uint8 size = 4;
+		if (bufferSize == 1) {
+			size = 1;
+			*dst = *src;
+		} else if (bufferSize <= 3) {
+			size = 2;
+			*(uint16*)dst = *(vuint16*)src;
+		} else
+			*(uint32*)dst = *(vuint32*)src;
+
+		dst += size;
+		bufferSize -= size;
+		src += size;
+	}
 
 	return B_OK;
 }
@@ -424,7 +441,26 @@ virtio_device_write_device_config(virtio_device cookie, uint8 offset,
 	TRACE("virtio_device_write_device_config(%p, %d, %" B_PRIuSIZE ")\n",
 		cookie, offset, bufferSize);
 	VirtioDevice* dev = (VirtioDevice*)cookie;
-	memcpy((void*)(dev->fRegs->config + offset), buffer, bufferSize);
+
+	// See virtio_device_read_device_config
+	uint8* src = (uint8*)buffer;
+	vuint8* dst = &dev->fRegs->config[offset];
+	while (bufferSize > 0) {
+		uint8 size = 4;
+		if (bufferSize == 1) {
+			size = 1;
+			*dst = *src;
+		} else if (bufferSize <= 3) {
+			size = 2;
+			*(vuint16*)dst = *(uint16*)src;
+		} else
+			*(vuint32*)dst = *(uint32*)src;
+
+		dst += size;
+		bufferSize -= size;
+		src += size;
+	}
+
 	return B_OK;
 }
 
