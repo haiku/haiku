@@ -49,6 +49,8 @@ enum fssh_node_flavor {
 #define fssh_offsetof(type,member) ((size_t)&((type*)0)->member)
 #endif
 
+#define fssh_alignof(type)   __alignof__(type)
+
 #define fssh_min_c(a,b) ((a)>(b)?(b):(a))
 #define fssh_max_c(a,b) ((a)>(b)?(a):(b))
 
