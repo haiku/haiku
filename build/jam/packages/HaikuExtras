@@ -3,6 +3,11 @@ local architecture = $(HAIKU_PACKAGING_ARCHS[1]) ;
 local extrasPackage = haiku_extras.hpkg ;
 HaikuPackage $(extrasPackage) ;
 
+## Apps Oddities
+
+AddFilesToPackage bin : acpi_call ;
+
+
 ## Driver Oddities
 
 # kernel modules
