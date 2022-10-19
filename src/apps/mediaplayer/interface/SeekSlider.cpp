@@ -28,7 +28,7 @@ SeekSlider::SeekSlider(const char* name, BMessage* message, int32 minValue,
 	fScale(0.0f)
 {
 	BFont font(be_plain_font);
-	font.SetSize(9.0);
+	font.SetSize(font.Size() * 0.75f);
 	SetFont(&font);
 	SetSymbolScale(1.0);
 	rgb_color fillColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
