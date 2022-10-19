@@ -168,7 +168,7 @@ UserUsageConditionsWindow::_InitUiControls()
 		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	BFont versionFont(be_plain_font);
-	versionFont.SetSize(9.0);
+	versionFont.SetSize(versionFont.Size() * 0.75f);
 
 	fVersionStringView = new BStringView("version string view",
 		PLACEHOLDER_TEXT);
