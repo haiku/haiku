@@ -27,6 +27,8 @@ public:
 									server_read_only_memory* shared);
 								~DesktopSettingsPrivate();
 
+			bool				DidLoadSettings() const
+									{ return fLoadStatus == B_OK; }
 			status_t			Save(uint32 mask = kAllSettings);
 
 			void				SetDefaultPlainFont(const ServerFont& font);
@@ -101,6 +103,8 @@ private:
 			status_t			_GetPath(BPath& path);
 			void				_ValidateWorkspacesLayout(int32& columns,
 									int32& rows) const;
+
+			status_t			fLoadStatus;
 
 			ServerFont			fPlainFont;
 			ServerFont			fBoldFont;
