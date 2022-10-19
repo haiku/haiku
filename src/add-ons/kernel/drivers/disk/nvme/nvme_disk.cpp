@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020, Haiku, Inc. All rights reserved.
+ * Copyright 2019-2022, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -96,6 +96,7 @@ typedef struct {
 	rw_lock					rounded_write_lock;
 
 	ConditionVariable		interrupt;
+	int32					polling;
 
 	struct qpair_info {
 		struct nvme_qpair*	qpair;
@@ -264,7 +265,9 @@ nvme_disk_init_device(void* _info, void** _cookie)
 	if (irq == 0 || irq == 0xFF) {
 		TRACE_ERROR("device PCI:%d:%d:%d was assigned an invalid IRQ\n",
 			info->info.bus, info->info.device, info->info.function);
-		return B_ERROR;
+		info->polling = 1;
+	} else {
+		info->polling = 0;
 	}
 	info->interrupt.Init(NULL, NULL);
 	install_io_interrupt_handler(irq, nvme_interrupt_handler, (void*)info, B_NO_HANDLED_INFO);
@@ -403,6 +406,7 @@ nvme_interrupt_handler(void* _info)
 {
 	nvme_disk_driver_info* info = (nvme_disk_driver_info*)_info;
 	info->interrupt.NotifyAll();
+	info->polling = -1;
 	return 0;
 }
 
@@ -436,16 +440,26 @@ await_status(nvme_disk_driver_info* info, struct nvme_qpair* qpair, status_t& st
 		if (status != EINPROGRESS)
 			return;
 
-		if (entry.Wait(B_RELATIVE_TIMEOUT, 5 * 1000 * 1000) != B_OK) {
+		if (info->polling > 0) {
+			entry.Wait(B_RELATIVE_TIMEOUT, min_c(5 * 1000 * 1000,
+				(1 << timeouts) * 1000));
+			timeouts++;
+		} else if (entry.Wait(B_RELATIVE_TIMEOUT, 5 * 1000 * 1000) != B_OK) {
 			// This should never happen, as we are woken up on every interrupt
 			// no matter the qpair or transfer within; so if it does occur,
-			// that probably means the controller stalled or something.
+			// that probably means the controller stalled, or maybe cannot
+			// generate interrupts at all.
 
 			TRACE_ERROR("timed out waiting for interrupt!\n");
 			if (timeouts++ >= 3) {
 				nvme_qpair_fail(qpair);
 				status = B_TIMED_OUT;
 				return;
+			}
+
+			info->polling++;
+			if (info->polling > 0) {
+				TRACE_ALWAYS("switching to polling mode, performance will be affected!\n");
 			}
 		}
 
@@ -470,7 +484,8 @@ struct nvme_io_request {
 };
 
 
-void ior_reset_sgl(nvme_io_request* request, uint32_t offset)
+static void
+ior_reset_sgl(nvme_io_request* request, uint32_t offset)
 {
 	TRACE("IOR Reset: %" B_PRIu32 "\n", offset);
 
@@ -484,7 +499,8 @@ void ior_reset_sgl(nvme_io_request* request, uint32_t offset)
 }
 
 
-int ior_next_sge(nvme_io_request* request, uint64_t* address, uint32_t* length)
+static int
+ior_next_sge(nvme_io_request* request, uint64_t* address, uint32_t* length)
 {
 	int32 index = request->iovec_i;
 	if (index < 0 || index > request->iovec_count)
