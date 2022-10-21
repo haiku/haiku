@@ -65,6 +65,30 @@ SEARCH on $(usbidsFile) = [ FDirName $(HAIKU_TOP) src data ids ] ;
 
 USBHeaderGen [ FGristFiles usbhdr.h ] : $(usbidsFile) : usb-header.awk ;
 
+rule ACPIPnPHeaderGen
+{
+	SEARCH on $(2) = $(SEARCH_SOURCE) ;
+
+	Depends $(1) : $(2) $(3) ;
+	MakeLocateArch $(<) ;
+	ACPIPnPHeaderGen1 $(1) : $(2) $(3) ;
+	LocalClean clean : $(<) ;
+}
+
+actions ACPIPnPHeaderGen1
+{
+	awk -f $(2[1]) $(2[2-]) > $(1) ;
+}
+
+# files can be updated so:
+# curl --fail -L -o acpi_id_registry.html 'https://uefi.org/uefi-acpi-export'
+# curl --fail -L -o pnp_id_registry.html 'https://uefi.org/uefi-pnp-export'
+local acpiidsFiles = acpi_id_registry.html pnp_id_registry.html ;
+SEARCH on $(acpiidsFiles) = [ FDirName $(HAIKU_TOP) src data ids ] ;
+
+ACPIPnPHeaderGen [ FGristFiles acpipnpids.h ]
+	:  acpipnplist2h.awk : $(acpiidsFiles) ;
+
 Application Devices :
 	DevicesApplication.cpp
 	DevicesView.cpp
@@ -94,5 +118,7 @@ DoCatalogs Devices :
 	Device.cpp
 ;
 
+Includes [ FGristFiles DeviceACPI.cpp ] : [ FGristFiles acpipnpids.h ] ;
 Includes [ FGristFiles DevicePCI.cpp ] : [ FGristFiles pcihdr.h ] ;
+Includes [ FGristFiles DeviceUSB.cpp ] : [ FGristFiles usbhdr.h ] ;
 
