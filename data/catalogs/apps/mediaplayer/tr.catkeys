@@ -46,7 +46,7 @@ Close	MediaPlayer-Main		Kapat
 Save error	MediaPlayer-PlaylistWindow		Kaydetme hatası
 Attributes	MediaPlayer-Main		Öznitelikler
 Bottom of screen	MediaPlayer-SettingsWindow		Ekranın alt kısmı
-MediaPlayer settings	MediaPlayer-SettingsWindow		Ortam Oynatıcı Ayarları
+MediaPlayer settings	MediaPlayer-SettingsWindow		Ortam Oynatıcı ayarları
 Copyright	MediaPlayer-InfoWin		Telif hakkı
 Invalid URL inserted!	MediaPlayer-NetworkStream		Geçersiz URL girildi!
 Aspect ratio	MediaPlayer-Main		En boy oranı

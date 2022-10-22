@@ -148,7 +148,7 @@ There was a puzzling response from the web service.	UserLoginWindow		Web servisi
 Opening \"%DeskbarLink%\"	OpenPackageProcess		\"%DeskbarLink%\" açılıyor
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Derecelendirmeniz başarıyla yüklendi. Haiku Depo sunucusu web sitesinden güncelleyebilir veya silebilirsiniz.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Yeni bir kullanıcı oluşturma için gerekli olan CAPTCHA görseli için sunucu ile iletişim kurulamadı.
-The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		CAPTCHA yanıtı yanlış. Yeni bir CAPTCHA oluşturulacak; yeniden deneyin.
+The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		CAPTCHA yanıtı yanlış. Yeni bir CAPTCHA üretilecek; yeniden deneyin.
 -	no package publish		-
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		Haiku Depo, paket hizmetine gereksinim duyuyor; ancak şu anda çalışmıyor görünüyor.\nŞimdi başlatılsın mı?
 The password must be at least eight characters long, consist of at least two digits and one upper case character.	UserLoginWindow		Parola en azından sekiz karakter uzunluğunda olmalı, iki adet rakam ve bir büyük harf içermelidir.

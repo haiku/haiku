@@ -8,7 +8,7 @@ File expanded	ExpanderWindow		Dosya genişletildi
 The destination is read only.	ExpanderWindow		Hedef saltokunur.
 Expander: Open	ExpanderWindow		Paketaçar: Aç
  is not supported	ExpanderWindow		 desteklenmiyor
-Expander settings	ExpanderPreferences		Paketaçar Ayarları
+Expander settings	ExpanderPreferences		Paketaçar ayarları
 Select current	DirectoryFilePanel		Olanı seç
 Source	ExpanderWindow		Kaynak
 Error when expanding archive	ExpanderWindow		Arşiv genişletilirken hata

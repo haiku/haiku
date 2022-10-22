@@ -2,14 +2,14 @@
 Hardware	SerialWindow	Flowcontrol	Donanım
 Connection	SerialWindow		Bağlantı
 Raw send…	SerialWindow		Ham gönder…
-Baud rate	SerialWindow		Baud oranı
+Baud rate	SerialWindow		Baud hızı
 Stop bits	SerialWindow		Bitleri durdur
 None	SerialWindow	Flowcontrol	Hiçbiri
 Cancel	Custom baudrate window		Vazgeç
 Sending…	XModemStatus		Gönderiliyor…
 <no serial port available>	SerialWindow		<kullanılabilir seri kapı yok>
 Log to file…	SerialWindow		Dosyaya günlükle…
-Custom baudrate	Custom baudrate window		Özel baud oranı
+Custom baudrate	Custom baudrate window		Özel baud hızı
 File	SerialWindow		Dosya
 SerialConnect	System name		Seri Bağlantı
 custom…	SerialWindow	Baudrate	özel…
@@ -25,7 +25,7 @@ Data bits	SerialWindow		Veri bitleri
 Both	SerialWindow	Flowcontrol	Her ikisi de
 Edit	SerialWindow		Düzen
 XModem send…	SerialWindow		XModem gönder…
-Baudrate:	Custom baudrate window		Baud oranı:
+Baudrate:	Custom baudrate window		Baud hızı:
 OK	Custom baudrate window		Tamam
 Waiting for receiver…	XModemStatus		Alıcı bekleniyor…
 Clear history	SerialWindow		Geçmişi temizle

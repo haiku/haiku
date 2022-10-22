@@ -76,7 +76,7 @@ Password:	Authentication Panel		Parola:
 Forward	WebPositive Window		İleri
 Clear	Console Window		Temizle
 Cut	URL Bar		Kes
-View	WebPositive Window		Görünüm
+View	WebPositive Window		Görüntü
 Paste	URL Bar		Yapıştır
 Find next	WebPositive Window		Sonrakini bul
 Open search page	Settings Window		Arama sayfasını aç
@@ -113,7 +113,7 @@ There are still downloads in progress, do you really want to quit WebPositive no
 Continue downloads	WebPositive		İndirmeleri sürdür
 Proxy server requires authentication	Settings Window		Vekil sunucu oturum açma gerektirir
 Cancel	Settings Window		Vazgeç
-Reset size	WebPositive Window		Orijinal boyut
+Reset size	WebPositive Window		Boyutu sıfırla
 History	WebPositive Window		Geçmiş
 Do you really want to clear the browsing history?	WebPositive Window		Tarama geçmişini temizlemek istediğinizden emin misiniz?
 Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Arama dizgisinin bir sonraki oluşumunu bul

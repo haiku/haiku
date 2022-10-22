@@ -38,7 +38,7 @@ Quick	TouchpadPrefView		Hızlı
 Short	KeyboardView		Kısa
 Slow	KeyboardView		Yavaş
 Revert	InputMouse		Eski haline döndür
-Key repeat rate	KeyboardView		Düğme yineleme oranı
+Key repeat rate	KeyboardView		Düğme yineleme hızı
 2-Button	SettingsView		2 düğmeli
 Click to focus and raise	SettingsView		Odaklayıp öne getirmek için tıkla
 Vertical	TouchpadPrefView		Dikey

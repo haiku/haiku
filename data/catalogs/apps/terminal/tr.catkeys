@@ -19,7 +19,7 @@ Retro	Terminal colors scheme		Eski Moda
 Edit tab title…	Terminal TermWindow		Sekme başlığını düzenle…
 Settings	Terminal TermWindow		Ayarlar
 Print	Terminal TermWindow		Yazdır
-%app% settings	Terminal PrefWindow	window title	%app% Ayarları
+%app% settings	Terminal PrefWindow	window title	%app% ayarları
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tEtkin sürecin geçerli çalışma dizini.\n\t\t\tOlabilecek en çok yol bileşeni sayısı isteğe bağlı olarak\n\t\t\tbelirtilebilir. Örn. en çok iki bileşen için '%2d'.\n\t%i\t-\tSekmenin indeksi.\n\t%e\t-\tGeçerli sekmenin kodlaması. UTF-8 için gösterilmez.\n\t%p\t-\tEtkin sürecin adı.
 ANSI black color	Terminal AppearancePrefView		ANSI siyah
 Use default	Terminal SetTitleWindow		Öntanımlıları kullan

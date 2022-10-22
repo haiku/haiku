@@ -10,7 +10,7 @@ Print…	Menus		Yazdır…
 Get info…	Menus		Bilgi al…
 OK	SaveToFile		Tamam
 Previous page	Menus		Önceki sayfa
-View	Menus		Görünüm
+View	Menus		Görüntü
 Full screen	Menus		Tam ekran
 Go to page	Menus		Sayfaya git
 Zoom out	Menus		Uzaklaştır
@@ -57,6 +57,6 @@ Move to Trash	Menus		Çöp'e taşı
 OK	Alerts		Tamam
 Rotate clockwise	Menus		Saat yönünde döndür
 Job setup	PrintOptionsWindow		İş yapısı
-Original size	Menus		Orijinal boyut
+Original size	Menus		Özgün boyut
 Next page	Menus		Sonraki sayfa
 Save as…	Menus		Farklı kaydet…

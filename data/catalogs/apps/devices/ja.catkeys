@@ -1,14 +1,16 @@
-1	japanese	x-vnd.Haiku-Devices	3345509916
+1	japanese	x-vnd.Haiku-Devices	214685744
 ACPI bus	DevicesView		ACPI バス
 Encryption controller	Device		暗号化コントローラー
 Bus Information	Device		バス情報
 Devices	System name		デバイス
+USB bus	DevicesView		USB バス
 Graphics Peripheral	DeviceSCSI		グラフィック装置
 Processor	Device		プロセッサ
 Generate system information	DevicesView		システム情報の作成
 Class info	DevicePCI		クラス情報
 ACPI Information	DeviceACPI		ACPI 情報
 Detailed	DevicesView		詳細
+USB bus	Device		USB バス
 Computer	DevicesView		コンピューター
 Communications	DeviceSCSI		通信
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		クラス情報:\t\t\t\t: %classInfo%

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	2379637084
+1	french	x-vnd.Haiku-libtracker	3029918032
 Created	ContainerWindow		Créé
 Icon	AttributesView		Icône
 Open and make preferred	OpenWithWindow		Ouvrir et en faire la préférence
@@ -525,6 +525,7 @@ Create a Query	FindPanel		Créer une requête
 Close	QueryContainerWindow		Fermer
 I know what I'm doing	FSUtils	button label	Je sais ce que je fais
 Preparing to copy items…	StatusWindow		Copie des éléments en préparation…
+Entry ref	AttributesView		Référence de l'entrée
 Icon view	ContainerWindow		Vue en icônes
 Name	ContainerWindow		Nom
 Preferred for %type	OpenWithWindow		Préférence pour %type

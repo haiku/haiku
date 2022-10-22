@@ -1,14 +1,17 @@
-1	french	x-vnd.Haiku-HaikuDepot	406461092
+1	french	x-vnd.Haiku-HaikuDepot	2192549143
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		Impossible de créer le nouvel utilisateur.
 An unexpected error has been sent from the server [%li]	ServerHelper		Le serveur [%li] a renvoyé une erreur inattendue.
 Create account	UserLoginWindow		Créer un compte
+Agree	ToLatestUserUsageConditionsWindow		Consentir
 Install %PackageTitle%	PackageManager		Installer %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Réponse incorrecte au Captcha.
 Rate package…	PackageInfoView		Évaluer le paquet…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Vous êtes désormais authentifié en tant que %Nickname%.
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Il n’a pas été possible d’extraire les informations Captcha nécessaires depuis les données renvoyées par le serveur.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Erreur lors de l’obtention de la liste des paquets : %message%
+Update usage conditions	ToLatestUserUsageConditionsWindow		Mettre à jour les conditions d'utilisation
+No usage conditions	UserUsageConditions		Aucune condition d’utilisation
 Active	PackageListView		Actif
 Login or Create account	MainWindow		Se connecter ou créer un compte
 Switch account…	MainWindow		Changer de compte…
@@ -22,6 +25,7 @@ Category	FilterView		Catégorie
 A response to the captcha question must be provided.	UserLoginWindow		Vous devez fournir une réponse à la question Captcha.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Une erreur inattendue « %Message% » est survenue avec la propriété « %Property% ».
 A requested object or an object involved in the request was not found on the server.	ServerHelper		L’objet demandé ou l’objet associé à la requête n’a pas été trouvé sur le serveur.
+Logout	ToLatestUserUsageConditionsWindow		Déconnexion
 No changelog available.	PackageInfoView		La liste des modifications n’est pas disponible.
 Cancel	PackageProblem		Annuler
 Version	PackageListView		Version
@@ -39,19 +43,23 @@ All packages	PackageListView		Tous les paquets
 Send	RatePackageWindow		Envoyer
 Start package daemon	App		Démarrer le serveur de paquets
 There are problems in the supplied data:	UserLoginWindow		Il y a des problèmes dans les données fournies :
+The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		L'utilisateur « %Nickname% » n'a accepté aucune condition d'utilisation.
 Usage conditions download problem	UserLoginWindow		Problème de téléchargement des conditions d’utilisation
 Package daemon problem	App		Problème du serveur de paquets
 No	MainWindow		Non
 Repository	PackageListView		Dépôt
+Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Les utilisateurs doivent être âgés de %AgeYears% ou plus.
 Close	RatePackageWindow		Fermer
 Close	UserLoginWindow		Fermer
 The email is malformed.	UserLoginWindow		L’adresse mail est malformée.
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronisation des données de paquets depuis le dépôt « %REPO_NAME% ».
 View the usage conditions	UserLoginWindow		Voir les conditions d’utilisation
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Une erreur s’est produite lors du téléchargement des conditions d’utilisation requises pour créer un nouvel utilisateur. Vérifiez les détails dans le journal et réessayez.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide de l’utilisateur Haiku.
+Usage conditions agreed	ToLatestUserUsageConditionsWindow		Conditions d'utilisation acceptées
 Size	PackageListView		Taille
 Your rating was updated.	RatePackageWindow		Votre évaluation a été mise à jour.
 All categories	FilterView		Toutes les catégories
+ignore problem for now	PackageProblem		ignorer le problème pour l'instant
 n/a	PackageInfoView		n/a
 Cancel	MainWindow		Annuler
 Refresh repositories	MainWindow		Rafraîchir les dépôts
@@ -87,6 +95,7 @@ Authentication failed	UserLoginWindow		L’authentification a échoué
 Captcha error	UserLoginWindow		Erreur de Captcha
 Manage repositories…	MainWindow		Gérer les dépôts…
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Le surnom doit être unique, mais celui fourni est déjà pris. Veuillez choisir un autre surnom.
+OK	UserUsageConditions		OK
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
 Input validation	UserLoginWindow		Validation des entrées
 Log in…	MainWindow		Connexion…
@@ -100,6 +109,7 @@ An error occurred while refreshing the repository: %error%	LocalRepositoryUpdate
 User Created	UserLoginWindow		Utilisateur créé
 Check for updates…	MainWindow		Vérifier les mises à jour…
 Uninstalled	PackageListView		Désinstallé
+I agree to the usage conditions	ToLatestUserUsageConditionsWindow		J’accepte les conditions d'utilisation
 Installing \"%PackageName%\"	InstallPackageProcess		Installation de « %PackageName% »
 OK	App		OK
 Fatal error	UninstallPackageAction		Erreur fatale
@@ -163,8 +173,10 @@ Repositories	MainWindow		Dépôts
 This rating is visible to other users	RatePackageWindow		Cette note est visible par les autres utilisateurs
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Lors de la mise à jour des données du paquet, un problème est apparu qui peut entraîner l’affichage de données obsolètes ou manquantes dans l’application. Des détails supplémentaires concernant ce problème peuvent être obtenus à partir des journaux d’application.\nDes informations sur la manière de consulter les journaux sont disponibles dans la section DépôtHaiku du guide de l’utilisateur Haiku.
 View agreed usage conditions…	MainWindow		Voir les conditions d’utilisation acceptées…
+The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		L'utilisateur « %Nickname% » s'est authentifié, mais avant de poursuivre, il vous est demandé d'accepter les conditions d'utilisation les plus récentes. 
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Ce paquet ne semble pas se trouver sur le serveur de dépôt Haiku, il n’est donc pas possible de créer une nouvelle évaluation ou de modifier une évaluation existante.
 Apply	SettingsWindow		Appliquer
+The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		Les conditions d'utilisation ont été révisées. L'utilisateur « %Nickname% » doit accepter les nouvelles conditions.
 Log out	MainWindow		Déconnexion
 Comment language:	RatePackageWindow		Langue du commentaire :
 The password has been incorrectly repeated.	UserLoginWindow		Le mot de passe a été répété de manière incorrecte.

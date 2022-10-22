@@ -87,7 +87,7 @@ Clean up	ContainerWindow		Toparla
 Modified	FindPanel		Değiştirilme
  (block size: 	InfoWindow		 (blok boyutu: 
 Select all	QueryContainerWindow		Tümünü seç
-Generate image thumbnails	SettingsView		Küçük resimler oluştur
+Generate image thumbnails	SettingsView		Küçük görseller üret
 Select…	FilePanelPriv		Seç…
 preferences	B_PREFERENCES_DIRECTORY		tercihler
 Name	Person Query Columns		Ad
@@ -164,7 +164,7 @@ develop	B_SYSTEM_DEVELOP_DIRECTORY		geliştirme
 64-bit integer	AttributesView		64 bit tamsayı
 Cut more	ContainerWindow		Daha fazla kes
 The Tracker must be running to see Info windows.	PoseView		Bilgi pencerelerini görüntüleyebilmek için İzleyici çalışıyor olmalıdır.
-Tracker preferences	TrackerSettingsWindow		İzleyici Tercihleri
+Tracker preferences	TrackerSettingsWindow		İzleyici tercihleri
 Read	FilePermissionsView		Okuma
 There was an error writing the attribute.	WidgetAttributeText		Öznitelik yazılırken bir hata oluştu.
 Path	Default Query Columns		Yol
@@ -215,7 +215,7 @@ Skip	FSUtils		Atla
 Text list	AttributesView		Metin listesi
 Used space color	SettingsView		Kullanılan alan rengi
 Cancel	FSUtils		v
-Original name	ContainerWindow		Orijinal adı
+Original name	ContainerWindow		Özgün ad
 Unknown	WidgetAttributeText		Bilinmeyen
 32-bit integer	AttributesView		32 bit tamsayı
 The specified name is already used as the name of a folder. Please choose another name.	FilePanelPriv		Belirtilen ad hâlihazırda bir klasör adı olarak kullanılıyor. Lütfen başka bir ad seçin.

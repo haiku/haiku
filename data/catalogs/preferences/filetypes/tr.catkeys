@@ -52,7 +52,7 @@ Internal name:	New File Type Window		İç ad:
 Integer 8 bit	Attribute ListView		8 bit tamsayı
 Extension:	Extension Window		Genişletme:
 Time	Attribute ListView		Zaman
-Extensions:	FileTypes Window		Genişletmeler:
+Extensions:	FileTypes Window		Uzantılar:
 Select preferred application	FileType Window		Tercih edilen uygulamayı seç
 Description:	FileTypes Window		Açıklama:
 Multiple files from \"%s\" file type	FileType Window		\"%s\" dosya türünden birden çok dosya

@@ -11,7 +11,7 @@ Stop	TransportView		Durdur
 (no group)	TransportView		(grup yok)
 Drop data	TransportView		Veriyi bırak
 To:	TransportView		Kime:
-Recording	TransportView		Kaydediliyor
+Recording	TransportView		Kayıt
 Increase latency	TransportView		Gecikmeyi artır
 Time source:	TransportView		Zaman kaynağı:
 DAC time source	TransportView		DAC zaman kaynağı

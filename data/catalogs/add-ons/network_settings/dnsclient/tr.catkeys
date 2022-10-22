@@ -1,7 +1,7 @@
 1	turkish	x-vnd.Haiku-DNSClientService	2825577357
-DNS settings	DNSClientServiceAddOn		DNS Ayarları
+DNS settings	DNSClientServiceAddOn		DNS ayarları
 Move down	DNSSettingsView		Aşağı taşı
-DNS settings	DNSSettingsView		DNS Ayarları
+DNS settings	DNSSettingsView		DNS ayarları
 Remove	DNSSettingsView		Kaldır
 Domain:	DNSSettingsView		Alan:
 Add	DNSSettingsView		Ekle

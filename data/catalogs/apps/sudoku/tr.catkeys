@@ -28,7 +28,7 @@ OK	SudokuWindow		Tamam
 Sudoku	System name		Sudoku
 Progress monitor	ProgressWindow		Durum monitörü
 Creating solvable field	SudokuGenerator		Çözülebilir alan yaratılıyor
-View	SudokuWindow		Görünüm
+View	SudokuWindow		Görüntü
 Snapshot current	SudokuWindow		Geçerli durumun görüntüsünü al
 Mark valid hints	SudokuWindow		Geçerli ipuçlarını imle
 Sudoku request	SudokuWindow		Sudoku isteği
