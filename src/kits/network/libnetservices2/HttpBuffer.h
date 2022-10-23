@@ -27,8 +27,9 @@ public:
 							HttpBuffer(size_t capacity = 8*1024);
 
 	ssize_t					ReadFrom(BDataIO* source, std::optional<size_t> maxSize = std::nullopt);
-	void					WriteExactlyTo(BDataIO* target);
-	void					WriteTo(HttpTransferFunction func,
+	size_t					WriteTo(HttpTransferFunction func,
+								std::optional<size_t> maxSize = std::nullopt);
+	void					WriteExactlyTo(HttpTransferFunction func,
 								std::optional<size_t> maxSize = std::nullopt);
 	std::optional<BString>	GetNextLine();
 

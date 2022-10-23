@@ -23,11 +23,10 @@ namespace Network {
 using HttpTransferFunction = std::function<size_t (const std::byte*, size_t)>;
 
 
-enum class HttpBodyInputStreamState {
-	ChunkSize,
-	ChunkEnd,
-	Chunk,
-	Trailers,
+enum class HttpInputStreamState {
+	StatusLine,
+	Fields,
+	Body,
 	Done
 };
 
@@ -40,54 +39,105 @@ enum class HttpBodyType {
 };
 
 
+struct BodyParseResult {
+	size_t	bytesParsed;
+	size_t	bytesWritten;
+	bool	complete;
+};
+
+
+class HttpBodyParser;
+
+
 class HttpParser {
 public:
-							HttpParser() {};
+									HttpParser() {};
 
 	// Explicitly mark request as having no content
-	void					SetNoContent() { fBodyType = HttpBodyType::NoContent; };
+	void							SetNoContent() noexcept;
 
-	// HTTP Header
-	bool					ParseStatus(HttpBuffer& buffer, BHttpStatus& status);
-	bool					ParseFields(HttpBuffer& buffer, BHttpFields& fields);
-
-	// HTTP Body
-	size_t					ParseBody(HttpBuffer& buffer, HttpTransferFunction writeToBody);
-	void					SetConnectionClosed();
+	// Parse data from response
+	bool							ParseStatus(HttpBuffer& buffer, BHttpStatus& status);
+	bool							ParseFields(HttpBuffer& buffer, BHttpFields& fields);
+	size_t							ParseBody(HttpBuffer& buffer, HttpTransferFunction writeToBody,
+										bool readEnd);
+	HttpInputStreamState			State() const noexcept { return fStreamState; }
 
 	// Details on the body status
-	bool					HasContent() const noexcept { return fBodyType != HttpBodyType::NoContent; };
-	std::optional<off_t>	BodyBytesTotal() const noexcept { return fBodyBytesTotal; };
-	off_t					BodyBytesTransferred() const noexcept { return fTransferredBodySize; };
-	bool					Complete() const noexcept;
+	bool							HasContent() const noexcept;
+	std::optional<off_t>			BodyBytesTotal() const noexcept;
+	off_t							BodyBytesTransferred() const noexcept;
+	bool							Complete() const noexcept;
 
 private:
-	void					_SetGzipCompression();
-	size_t					_ParseBodyRaw(HttpBuffer& buffer, HttpTransferFunction writeToBody);
-	size_t					_ParseBodyChunked(HttpBuffer& buffer, HttpTransferFunction writeToBody);
-	size_t					_ReadChunk(HttpBuffer& buffer, HttpTransferFunction writeToBody,
-								size_t maxSize, bool flush);
+	off_t							fHeaderBytes = 0;
+	BHttpStatus						fStatus;
+	HttpInputStreamState			fStreamState = HttpInputStreamState::StatusLine;
+
+	// Body
+	HttpBodyType					fBodyType = HttpBodyType::VariableSize;
+	std::unique_ptr<HttpBodyParser>	fBodyParser = nullptr;
+};
+
+
+class HttpBodyParser {
+public:
+	virtual	BodyParseResult			ParseBody(HttpBuffer& buffer,
+										HttpTransferFunction writeToBody, bool readEnd) = 0;
+
+	virtual	std::optional<off_t>	TotalBodySize() const noexcept;
+
+			off_t					TransferredBodySize() const noexcept;
+
+protected:
+			off_t					fTransferredBodySize = 0;
+};
+
+
+class HttpRawBodyParser : public HttpBodyParser {
+public:
+									HttpRawBodyParser();
+									HttpRawBodyParser(off_t bodyBytesTotal);
+	virtual	BodyParseResult			ParseBody(HttpBuffer& buffer,
+										HttpTransferFunction writeToBody, bool readEnd) override;
+	virtual	std::optional<off_t>	TotalBodySize() const noexcept override;
 
 private:
-	off_t					fHeaderBytes = 0;
-	BHttpStatus				fStatus;
+			std::optional<off_t> fBodyBytesTotal;
+};
 
-	// Body type
-	HttpBodyType			fBodyType = HttpBodyType::VariableSize;
 
-	// Support for chunked transfers
-	HttpBodyInputStreamState fBodyState = HttpBodyInputStreamState::ChunkSize;
-	off_t					fRemainingChunkSize = 0;
-	bool					fLastChunk = false;
+class HttpChunkedBodyParser : public HttpBodyParser {
+public:
+	virtual BodyParseResult			ParseBody(HttpBuffer& buffer,
+									HttpTransferFunction writeToBody, bool readEnd) override;
 
-	// Receive stats
-	std::optional<off_t>	fBodyBytesTotal = 0;
-	off_t					fTransferredBodySize = 0;
+private:
+	enum {
+		ChunkSize,
+		ChunkEnd,
+		Chunk,
+		Trailers,
+		Complete
+	} 								fChunkParserState = ChunkSize;
+	off_t							fRemainingChunkSize = 0;
+	bool							fLastChunk = false;
+};
 
-	// Optional decompression
-	std::unique_ptr<BMallocIO>		fDecompressorStorage = nullptr;
-	std::unique_ptr<BDataIO>		fDecompressingStream = nullptr;
 
+class HttpBodyDecompression : public HttpBodyParser {
+public:
+									HttpBodyDecompression(
+										std::unique_ptr<HttpBodyParser> bodyParser);
+	virtual BodyParseResult			ParseBody(HttpBuffer& buffer,
+									HttpTransferFunction writeToBody, bool readEnd) override;
+
+	virtual	std::optional<off_t>	TotalBodySize() const noexcept;
+
+private:
+	std::unique_ptr<HttpBodyParser>	fBodyParser;
+	std::unique_ptr<BMallocIO>		fDecompressorStorage;
+	std::unique_ptr<BDataIO>		fDecompressingStream;
 };
 
 

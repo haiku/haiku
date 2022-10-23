@@ -75,37 +75,19 @@ HttpBuffer::ReadFrom(BDataIO* source, std::optional<size_t> maxSize)
 
 
 /*!
-	\brief Use BDataIO::WriteExactly() on target to write the contents of the buffer.
-*/
-void
-HttpBuffer::WriteExactlyTo(BDataIO* target)
-{
-	if (RemainingBytes() == 0)
-		return;
-
-	auto status = target->WriteExactly(fBuffer.data() + fCurrentOffset, RemainingBytes());
-	if (status != B_OK) {
-		throw BNetworkRequestError("BDataIO::WriteExactly()", BNetworkRequestError::SystemError,
-			status);
-	}
-
-	// Entire buffer is written; reset internal buffer
-	Clear();
-}
-
-
-/*!
 	\brief Write the contents of the buffer through the helper \a func.
 
 	\param func Handle the actual writing. The function accepts a pointer and a size as inputs
 		and should return the number of actual written bytes, which may be fewer than the number
 		of available bytes.
+
+	\returns the actual number of bytes written to the \a func.
 */
-void
+size_t
 HttpBuffer::WriteTo(HttpTransferFunction func , std::optional<size_t> maxSize)
 {
 	if (RemainingBytes() == 0)
-		return;
+		return 0;
 
 	auto size = RemainingBytes();
 	if (maxSize.has_value() && *maxSize < size)
@@ -116,6 +98,8 @@ HttpBuffer::WriteTo(HttpTransferFunction func , std::optional<size_t> maxSize)
 		throw BRuntimeError(__PRETTY_FUNCTION__, "More bytes written than were made available");
 
 	fCurrentOffset += bytesWritten;
+
+	return bytesWritten;
 }
 
 

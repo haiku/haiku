@@ -43,7 +43,7 @@ using namespace BPrivate::Network;
 
 /*!
 	\brief Maximum size of the HTTP Header lines of the message.
-	
+
 	In the RFC there is no maximum, but we need to prevent the situation where we keep growing the
 	internal buffer waiting for the end of line ('\r\n\') characters to occur.
 */
@@ -71,10 +71,7 @@ public:
 		InitialState,
 		Connected,
 		RequestSent,
-		StatusReceived,
-		HeadersReceived,
-		ContentReceived,
-		TrailingHeadersReceived
+		ContentReceived
 	};
 	RequestState					State() const noexcept { return fRequestStatus; }
 
@@ -398,7 +395,7 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 				auto request = std::move(data->fDataQueue.front());
 				data->fDataQueue.pop_front();
 				auto socket = request.Socket();
-				
+
 				data->connectionMap.insert(std::make_pair(socket, std::move(request)));
 
 				// Add to objectList
@@ -860,14 +857,11 @@ BHttpSession::Request::ReceiveResult()
 	if (bytesRead == B_WOULD_BLOCK || bytesRead == B_INTERRUPTED)
 		return false;
 
+	auto readEnd = bytesRead == 0;
+
 	// Parse the content in the buffer
-	switch (fRequestStatus) {
-	case InitialState:
-	[[fallthrough]];
-	case Connected:
-		throw BRuntimeError(__PRETTY_FUNCTION__,
-			"Read function called for object that is not yet connected or sent");
-	case RequestSent:
+	switch (fParser.State()) {
+	case HttpInputStreamState::StatusLine:
 	{
 		if (fBuffer.RemainingBytes() == static_cast<size_t>(bytesRead)) {
 			// In the initial run, the bytes in the buffer will match the bytes read to indicate
@@ -919,18 +913,26 @@ BHttpSession::Request::ReceiveResult()
 				});
 				fResult->SetStatus(BHttpStatus{fStatus.code, std::move(fStatus.text)});
 			}
-
-			fRequestStatus = StatusReceived;
 		} else {
-			// We do not have enough data for the status line yet, continue receiving data.
+			// We do not have enough data for the status line yet
+			if (readEnd) {
+				throw BNetworkRequestError(__PRETTY_FUNCTION__,
+					BNetworkRequestError::ProtocolError,
+					"Response did not include a complete status line");
+			}
 			return false;
 		}
 		[[fallthrough]];
 	}
-	case StatusReceived:
+	case HttpInputStreamState::Fields:
 	{
 		if (!fParser.ParseFields(fBuffer, fFields)) {
-			// there may be more headers to receive.
+			// there may be more headers to receive, throw an error if there will be no more
+			if (readEnd) {
+				throw BNetworkRequestError(__PRETTY_FUNCTION__,
+					BNetworkRequestError::ProtocolError,
+					"Response did not include a complete header section");
+			}
 			break;
 		}
 
@@ -986,7 +988,6 @@ BHttpSession::Request::ReceiveResult()
 		// Move headers to the result and inform listener
 		fResult->SetFields(std::move(fFields));
 		SendMessage(UrlEvent::HttpFields);
-		fRequestStatus = HeadersReceived;
 
 		if (!fParser.HasContent()) {
 			// Any requests with not content are finished
@@ -999,7 +1000,7 @@ BHttpSession::Request::ReceiveResult()
 		}
 		[[fallthrough]];
 	}
-	case HeadersReceived:
+	case HttpInputStreamState::Body:
 	{
 		size_t bytesWrittenToBody;
 			// The bytesWrittenToBody may differ from the bytes parsed from the buffer when
@@ -1007,7 +1008,7 @@ BHttpSession::Request::ReceiveResult()
 		bytesRead = fParser.ParseBody(fBuffer, [this, &bytesWrittenToBody](const std::byte* buffer, size_t size) {
 			bytesWrittenToBody = fResult->WriteToBody(buffer, size);
 			return bytesWrittenToBody;
-		});
+		}, readEnd);
 
 		SendMessage(UrlEvent::DownloadProgress, [this, bytesRead](BMessage& msg) {
 			msg.AddInt64(UrlEventData::NumBytes, bytesRead);
@@ -1026,13 +1027,19 @@ BHttpSession::Request::ReceiveResult()
 			SendMessage(UrlEvent::RequestCompleted, [](BMessage& msg) {
 				msg.AddBool(UrlEventData::Success, true);
 			});
+			fRequestStatus = ContentReceived;
 			return true;
+		} else if (readEnd) {
+			// the parsing of the body is not complete but we are at the end of the data
+			throw BNetworkRequestError(__PRETTY_FUNCTION__,
+				BNetworkRequestError::ProtocolError,
+				"Unexpected end of data: more data was expected");
 		}
 
 		break;
 	}
 	default:
-		throw BRuntimeError(__PRETTY_FUNCTION__, "To do");
+		throw BRuntimeError(__PRETTY_FUNCTION__, "Not reachable");
 	}
 
 	// There is more to receive
