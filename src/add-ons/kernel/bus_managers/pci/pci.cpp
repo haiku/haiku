@@ -524,6 +524,8 @@ pci_init_deferred(void)
 		return B_ERROR;
 	}
 
+	pci_print_info();
+
 	sInitDone = true;
 	return B_OK;
 }
