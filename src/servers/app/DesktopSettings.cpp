@@ -34,7 +34,7 @@ DesktopSettingsPrivate::DesktopSettingsPrivate(server_read_only_memory* shared)
 {
 	// if the on-disk settings are not complete, the defaults will be kept
 	_SetDefaults();
-	fLoadStatus = _Load();
+	_Load();
 }
 
 
@@ -111,7 +111,6 @@ DesktopSettingsPrivate::_Load()
 	status_t status = _GetPath(basePath);
 	if (status < B_OK)
 		return status;
-	int32 loadFailures = 0;
 
 	// read workspaces settings
 
@@ -138,10 +137,8 @@ DesktopSettingsPrivate::_Load()
 					i, &fWorkspaceMessages[i]) == B_OK) {
 				i++;
 			}
-		} else
-			loadFailures++;
-	} else
-		loadFailures++;
+		}
+	}
 
 	// read font settings
 
@@ -152,7 +149,9 @@ DesktopSettingsPrivate::_Load()
 	if (status == B_OK) {
 		BMessage settings;
 		status = settings.Unflatten(&file);
-		if (status == B_OK && gFontManager->Lock()) {
+		if (status != B_OK) {
+			fFontSettingsLoadStatus = status;
+		} else if (gFontManager->Lock()) {
 			const char* family;
 			const char* style;
 			float size;
@@ -189,9 +188,9 @@ DesktopSettingsPrivate::_Load()
 
 			gFontManager->Unlock();
 		} else
-			loadFailures++;
+			fFontSettingsLoadStatus = EWOULDBLOCK;
 	} else
-		loadFailures++;
+		fFontSettingsLoadStatus = status;
 
 	// read mouse settings
 
@@ -219,10 +218,8 @@ DesktopSettingsPrivate::_Load()
 					== B_OK) {
 				fAcceptFirstClick = acceptFirstClick;
 			}
-		} else
-			loadFailures++;
-	} else
-		loadFailures++;
+		}
+	}
 
 	// read appearance settings
 
@@ -315,10 +312,8 @@ DesktopSettingsPrivate::_Load()
 					fShared.colors[i] = B_TRANSPARENT_COLOR;
 				}
 			}
-		} else
-			loadFailures++;
-	} else
-		loadFailures++;
+		}
+	}
 
 	// read dragger settings
 
@@ -332,12 +327,10 @@ DesktopSettingsPrivate::_Load()
 		if (status == B_OK) {
 			if (settings.FindBool("show", &fShowAllDraggers) != B_OK)
 				fShowAllDraggers = true;
-		} else
-			loadFailures++;
-	} else
-		loadFailures++;
+		}
+	}
 
-	return (loadFailures > 0) ? B_PARTIAL_READ : B_OK;
+	return B_OK;
 }
 
 

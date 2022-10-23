@@ -527,7 +527,7 @@ Desktop::Init()
 
 	// now that the mode is set, see if we should increase the default font size
 	if (fSettings->DefaultPlainFont() == *gFontManager->DefaultPlainFont()
-			&& !fSettings->DidLoadSettings()) {
+			&& !fSettings->DidLoadFontSettings()) {
 		float fontSize = fSettings->DefaultPlainFont().Size();
 		gScreenManager->Lock();
 		Screen* screen = gScreenManager->ScreenAt(0);
