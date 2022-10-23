@@ -163,19 +163,19 @@ struct MountVisitor : public BDiskDeviceVisitor {
 	virtual bool Visit(BPartition* partition, int32 level)
 	{
 		// get name and type
-		const char* name = partition->ContentName();
-		if (!name)
+		BString name = partition->ContentName();
+		if (name.IsEmpty())
 			name = partition->Name();
 		const char* type = partition->ContentType();
 
 		// check whether to mount
 		bool mount = false;
-		if (name && toMount.find(name) != toMount.end()) {
-			toMount.erase(name);
+		if (name && toMount.find(name.String()) != toMount.end()) {
+			toMount.erase(name.String());
 			if (!partition->IsMounted())
 				mount = true;
 			else if (!silent)
-				fprintf(stderr, "Volume `%s' already mounted.\n", name);
+				fprintf(stderr, "Volume `%s' already mounted.\n", name.String());
 		} else if (mountAll) {
 			mount = true;
 		} else if (mountBFS && type != NULL
@@ -196,13 +196,13 @@ struct MountVisitor : public BDiskDeviceVisitor {
 
 		// check whether to unmount
 		bool unmount = false;
-		if (name && toUnmount.find(name) != toUnmount.end()) {
-			toUnmount.erase(name);
+		if (name && toUnmount.find(name.String()) != toUnmount.end()) {
+			toUnmount.erase(name.String());
 			if (partition->IsMounted()) {
 				unmount = true;
 				mount = false;
 			} else if (!silent)
-				fprintf(stderr, "Volume `%s' not mounted.\n", name);
+				fprintf(stderr, "Volume `%s' not mounted.\n", name.String());
 		}
 
 		// mount/unmount
@@ -213,11 +213,11 @@ struct MountVisitor : public BDiskDeviceVisitor {
 				if (error >= B_OK) {
 					BPath mountPoint;
 					partition->GetMountPoint(&mountPoint);
-					printf("Volume `%s' mounted successfully at '%s'.\n", name,
+					printf("Volume `%s' mounted successfully at '%s'.\n", name.String(),
 						mountPoint.Path());
 				} else {
 					fprintf(stderr, "Failed to mount volume `%s': %s\n",
-						name, strerror(error));
+						name.String(), strerror(error));
 				}
 			}
 			if (openInTracker && error == B_OK)
@@ -226,10 +226,10 @@ struct MountVisitor : public BDiskDeviceVisitor {
 			status_t error = partition->Unmount();
 			if (!silent) {
 				if (error == B_OK) {
-					printf("Volume `%s' unmounted successfully.\n", name);
+					printf("Volume `%s' unmounted successfully.\n", name.String());
 				} else {
 					fprintf(stderr, "Failed to unmount volume `%s': %s\n",
-						name, strerror(error));
+						name.String(), strerror(error));
 				}
 			}
 		}
@@ -269,10 +269,10 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 	virtual bool Visit(BPartition* partition, int32 level)
 	{
 		// get name and type
-		const char* name = partition->ContentName();
-		if (name == NULL || name[0] == '\0') {
+		BString name = partition->ContentName();
+		if (name.IsEmpty()) {
 			name = partition->Name();
-			if (name == NULL || name[0] == '\0') {
+			if (name.IsEmpty()) {
 				if (partition->ContainsFileSystem())
 					name = "<unnamed>";
 				else
@@ -301,7 +301,7 @@ struct PrintPartitionsVisitor : public BDiskDeviceVisitor {
 		if (partition->IsMounted())
 			partition->GetMountPoint(&mountPoint);
 
-		printf("%-*s %-*s %8s %s%s(%s)\n", sVolumeNameWidth, name,
+		printf("%-*s %-*s %8s %s%s(%s)\n", sVolumeNameWidth, name.String(),
 			sFSNameWidth, type, size_string(partition->Size()),
 			partition->IsMounted() ? mountPoint.Path() : "",
 			partition->IsMounted() ? "  " : "",
