@@ -7,6 +7,7 @@
 #define _EXTENT_H_
 
 
+#include "Directory.h"
 #include "Inode.h"
 #include "system_dependencies.h"
 
@@ -152,8 +153,7 @@ struct ExtentBlockTail {
 };
 
 
-class Extent
-{
+class Extent : public DirectoryIterator {
 public:
 								Extent(Inode* inode);
 								~Extent();

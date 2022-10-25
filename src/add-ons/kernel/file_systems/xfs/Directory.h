@@ -6,12 +6,7 @@
 #define _DIRECTORY_H_
 
 
-#include "BPlusTree.h"
-#include "Extent.h"
 #include "Inode.h"
-#include "LeafDirectory.h"
-#include "Node.h"
-#include "ShortDirectory.h"
 
 
 /*
@@ -20,26 +15,15 @@
  */
 class DirectoryIterator {
 public:
-								DirectoryIterator(Inode* inode);
-								~DirectoryIterator();
-			status_t			Init();
-			bool				IsLocalDir() { return fInode->IsLocal(); }
-			status_t			GetNext(char* name, size_t* length,
-									xfs_ino_t* ino);
-			status_t			Lookup(const char* name, size_t length,
-									xfs_ino_t* id);
+			virtual						~DirectoryIterator()							=	0;
 
-private:
-			Inode*				fInode;
-			ShortDirectory*		fShortDir;
-				// Short form Directory type
-			Extent*				fExtentDir;
-				// Extent form Directory type
-				// TODO: Rename all to block type
-			LeafDirectory*		fLeafDir;
-				// Extent based leaf directory
-			NodeDirectory*		fNodeDir;
-			TreeDirectory*		fTreeDir;
+			virtual	status_t			GetNext(char* name, size_t* length,
+											xfs_ino_t* ino)								=	0;
+
+			virtual	status_t			Lookup(const char* name, size_t length,
+											xfs_ino_t* id)								=	0;
+
+			static DirectoryIterator*	Init(Inode* inode);
 };
 
 

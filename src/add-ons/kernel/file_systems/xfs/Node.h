@@ -6,6 +6,7 @@
 #define _NODE_H_
 
 
+#include "Directory.h"
 #include "Extent.h"
 #include "LeafDirectory.h"
 
@@ -87,7 +88,7 @@ struct NodeEntry {
 };
 
 
-class NodeDirectory {
+class NodeDirectory : public DirectoryIterator {
 public:
 								NodeDirectory(Inode* inode);
 								~NodeDirectory();

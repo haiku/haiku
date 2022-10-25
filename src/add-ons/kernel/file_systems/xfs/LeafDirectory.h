@@ -7,6 +7,7 @@
 #define _LEAFDIRECTORY_H_
 
 
+#include "Directory.h"
 #include "Extent.h"
 #include "Inode.h"
 #include "system_dependencies.h"
@@ -99,7 +100,7 @@ struct ExtentLeafTail {
 };
 
 
-class LeafDirectory {
+class LeafDirectory : public DirectoryIterator {
 public:
 								LeafDirectory(Inode* inode);
 								~LeafDirectory();
