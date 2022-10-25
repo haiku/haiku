@@ -676,7 +676,7 @@ GrepWindow::_StartNodeMonitoring()
 	_StopNodeMonitoring();
 
 	BMessenger messenger(this);
-	uint32 fileFlags = B_WATCH_NAME | B_WATCH_STAT | B_WATCH_ATTR;
+	uint32 fileFlags = B_WATCH_NAME | B_WATCH_STAT;
 
 
 	// watch the top level folder only, rest should be done through filtering
@@ -905,10 +905,16 @@ GrepWindow::_OnNodeMonitorEvent(BMessage* message)
 			break;
 		}
 		case B_STAT_CHANGED:
-		case B_ATTR_CHANGED:
 		{
-			TRACE_NM("%s\n", opCode == B_STAT_CHANGED ? "B_STAT_CHANGED"
-				: "B_ATTR_CHANGED");
+			int32 fields;
+			message->FindInt32("fields", &fields);
+
+			TRACE_NM("B_STAT_CHANGED (fields = 0x%" B_PRIx32 ")\n", fields);
+
+			// No point in triggering a new search if this was the only change.
+			if (fields == B_STAT_CHANGE_TIME)
+				break;
+
 			// For directly watched files, the path will include the
 			// name. When the event occurs for a file in a watched directory,
 			// the message will have an extra name field for the respective
