@@ -3,6 +3,10 @@
 # import everything from the minimum image
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions minimum ] ;
 
+SEARCH on [ FGristFiles userguide quicktour welcome ]
+	= [ FDirName $(HAIKU_TOP) data bin ] ;
+SYSTEM_BIN += userguide quicktour welcome ;
+
 SYSTEM_BIN += [ FFilterByBuildFeatures
 	cddb_lookup
 	clipboard CortexAddOnHost

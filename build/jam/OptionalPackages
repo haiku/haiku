@@ -151,30 +151,29 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 
 # Welcome
 if [ IsOptionalHaikuImagePackageAdded Welcome ] {
-	AddPackageFilesToHaikuImage system packages :
-		haiku_userguide_ca.hpkg
-		haiku_userguide_de.hpkg
-		haiku_userguide_en.hpkg
-		haiku_userguide_es.hpkg
-		haiku_userguide_fi.hpkg
-		haiku_userguide_fur.hpkg
-		haiku_userguide_fr.hpkg
-		haiku_userguide_hu.hpkg
-		haiku_userguide_id.hpkg
-		haiku_userguide_it.hpkg
-		haiku_userguide_jp.hpkg
-		haiku_userguide_pl.hpkg
-		haiku_userguide_pt_BR.hpkg
-		haiku_userguide_pt_PT.hpkg
-		haiku_userguide_ro.hpkg
-		haiku_userguide_ru.hpkg
-		haiku_userguide_sk.hpkg
-		haiku_userguide_sv_SE.hpkg
-		haiku_userguide_tr.hpkg
-		haiku_userguide_uk.hpkg
-		haiku_userguide_zh_CN.hpkg
-		haiku_welcome.hpkg
-		: nameFromMetaInfo ;
+	Echo AddHaikuImageSystemPackages
+		haiku_userguide_ca
+		haiku_userguide_de
+		haiku_userguide_en
+		haiku_userguide_es
+		haiku_userguide_fi
+		haiku_userguide_fur
+		haiku_userguide_fr
+		haiku_userguide_hu
+		haiku_userguide_id
+		haiku_userguide_jp
+		haiku_userguide_pl
+		haiku_userguide_pt_br
+		haiku_userguide_pt_pt
+		haiku_userguide_ro
+		haiku_userguide_ru
+		haiku_userguide_sk
+		haiku_userguide_sv_se
+		haiku_userguide_tr
+		haiku_userguide_uk
+		haiku_userguide_zh_cn
+		haiku_welcome
+		;
 
 	AddSymlinkToHaikuImage home Desktop	: /boot/system/bin/quicktour
 		: Quick\ Tour ;

@@ -22,28 +22,6 @@ if $(HAIKU_IS_BOOTSTRAP) != 1 && $(HAIKU_BUILD_TYPE) != minimum {
 	packages += [ FFilterByBuildFeatures
 		haiku_extras
 		haiku_source
-		haiku_userguide_ca
-		haiku_userguide_de
-		haiku_userguide_en
-		haiku_userguide_es
-		haiku_userguide_fi
-		haiku_userguide_fr
-		haiku_userguide_fur
-		haiku_userguide_hu
-		haiku_userguide_id
-		haiku_userguide_it
-		haiku_userguide_jp
-		haiku_userguide_pl
-		haiku_userguide_pt_BR
-		haiku_userguide_pt_PT
-		haiku_userguide_ro
-		haiku_userguide_ru
-		haiku_userguide_sk
-		haiku_userguide_sv_SE
-		haiku_userguide_tr
-		haiku_userguide_uk
-		haiku_userguide_zh_CN
-		haiku_welcome
 		makefile_engine
 		netfs
 		userland_fs
