@@ -31,6 +31,7 @@
 #include <Roster.h>		// for B_REQUEST_QUIT
 #include <Screen.h>
 #include <String.h>
+#include <TextView.h>
 #include <Window.h>
 
 #include <TokenSpace.h>
@@ -362,6 +363,18 @@ public:
 		fKillAppMessage->ReplaceInt32("team", team);
 	}
 
+	void SetText(const char* text)
+	{
+		const int32 initialLength = TextView()->TextLength(),
+			initialLines = TextView()->CountLines();
+
+		BAlert::SetText(text);
+
+		if (TextView()->CountLines() > initialLines
+				|| TextView()->CountLines() > (initialLength * 2))
+			ResizeToPreferred();
+	}
+
 	void SetCancelShutdownButtonEnabled(bool enable)
 	{
 		fCancelShutdownButton->SetEnabled(enable);
@@ -393,9 +406,7 @@ public:
 		fRebootSystemButton->Show();
 
 		SetTitle(B_TRANSLATE("System is shut down"));
-		SetText(
-			B_TRANSLATE("It's now safe to turn off the computer."));
-		ResizeToPreferred();
+		SetText(B_TRANSLATE("It's now safe to turn off the computer."));
 	}
 
 	void SetWaitForAbortedOK()
@@ -467,7 +478,8 @@ private:
 				fCurrentIconBitmap = NULL;
 			} else
 				SetIcon(fCurrentIconBitmap);
-		}
+		} else
+			SetIcon(NULL);
 	}
 
 	void IconWaitAnimationEnabled(bool enable)
