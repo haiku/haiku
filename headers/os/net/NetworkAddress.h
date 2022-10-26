@@ -75,7 +75,7 @@ public:
 			void				SetPort(uint16 port);
 			status_t			SetPort(const char* service);
 
-			void				SetToLinkLevel(uint8* address, size_t length);
+			void				SetToLinkLevel(const uint8* address, size_t length);
 			void				SetToLinkLevel(const char* name);
 			void				SetToLinkLevel(uint32 index);
 			void				SetLinkLevelIndex(uint32 index);
