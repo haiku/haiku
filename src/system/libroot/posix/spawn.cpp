@@ -299,7 +299,8 @@ posix_spawnattr_setflags(posix_spawnattr_t *_attr, short flags)
 		return EINVAL;
 
 	if ((flags & ~(POSIX_SPAWN_RESETIDS | POSIX_SPAWN_SETPGROUP
-			| POSIX_SPAWN_SETSIGDEF | POSIX_SPAWN_SETSIGMASK)) != 0) {
+			| POSIX_SPAWN_SETSIGDEF | POSIX_SPAWN_SETSIGMASK
+			| POSIX_SPAWN_SETSID)) != 0) {
 		return EINVAL;
 	}
 
