@@ -430,7 +430,7 @@ get_scan_results(const char* device, wireless_network*& networks, uint32& count)
 		return B_BAD_VALUE;
 
 	// TODO: Find some way to reduce code duplication with the following function!
-	const size_t kBufferSize = 64 * 1024;
+	const size_t kBufferSize = 65535;
 	uint8* buffer = (uint8*)malloc(kBufferSize);
 	if (buffer == NULL)
 		return B_NO_MEMORY;
@@ -484,7 +484,7 @@ get_scan_result(const char* device, wireless_network& network, uint32 index,
 		return B_BAD_VALUE;
 
 	// TODO: Find some way to reduce code duplication with the preceding function!
-	const size_t kBufferSize = 64 * 1024;
+	const size_t kBufferSize = 65535;
 	uint8* buffer = (uint8*)malloc(kBufferSize);
 	if (buffer == NULL)
 		return B_NO_MEMORY;
