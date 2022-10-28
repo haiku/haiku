@@ -1223,7 +1223,7 @@ fs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	uint32 count = 0;
 	while (count < maxCount && bufferSize > sizeof(struct dirent)) {
 		size_t length = bufferSize - offsetof(struct dirent, d_name);
-		if (length < cookie->current->name_length) {
+		if (length < (cookie->current->name_length + 1)) {
 			// the remaining name buffer length is too small
 			if (count == 0)
 				return B_BUFFER_OVERFLOW;
