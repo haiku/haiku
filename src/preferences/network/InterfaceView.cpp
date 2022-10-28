@@ -292,7 +292,7 @@ InterfaceView::_Update(bool updateWirelessNetworks)
 			device.GetNetworks(networks, networksCount);
 		}
 
-		ArrayDeleter networksDeleter(networks);
+		ArrayDeleter<wireless_network> networksDeleter(networks);
 
 		// go through menu items and remove networks that have dropped out
 		for (int32 index = 0; index < count; index++) {
