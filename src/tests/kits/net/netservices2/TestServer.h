@@ -16,30 +16,33 @@
 
 
 // Binds to a random unused TCP port.
-class RandomTCPServerPort {
+class RandomTCPServerPort
+{
 public:
-						RandomTCPServerPort();
-						~RandomTCPServerPort();
+	RandomTCPServerPort();
+	~RandomTCPServerPort();
 
-	status_t			InitCheck()							const;
-	int					FileDescriptor()					const;
-	uint16_t			Port()								const;
+	status_t InitCheck() const;
+	int FileDescriptor() const;
+	uint16_t Port() const;
 
 private:
-	status_t			fInitStatus;
-	int					fSocketFd;
-	uint16_t			fServerPort;
+	status_t fInitStatus;
+	int fSocketFd;
+	uint16_t fServerPort;
 };
 
 
-class ChildProcess {
+class ChildProcess
+{
 public:
-						ChildProcess();
-						~ChildProcess();
+	ChildProcess();
+	~ChildProcess();
 
-	status_t			Start(const std::vector<std::string>& args);
+	status_t Start(const std::vector<std::string>& args);
+
 private:
-	pid_t				fChildPid;
+	pid_t fChildPid;
 };
 
 
@@ -49,28 +52,30 @@ enum class TestServerMode {
 };
 
 
-class TestServer {
+class TestServer
+{
 public:
-						TestServer(TestServerMode mode);
+	TestServer(TestServerMode mode);
 
-	status_t			Start();
-	BUrl				BaseUrl()							const;
+	status_t Start();
+	BUrl BaseUrl() const;
 
 private:
-	TestServerMode		fMode;
-	ChildProcess		fChildProcess;
+	TestServerMode fMode;
+	ChildProcess fChildProcess;
 	RandomTCPServerPort fPort;
 };
 
 
-class TestProxyServer {
+class TestProxyServer
+{
 public:
-	status_t			Start();
-	uint16_t			Port()								const;
+	status_t Start();
+	uint16_t Port() const;
 
 private:
-	ChildProcess		fChildProcess;
-	RandomTCPServerPort	fPort;
+	ChildProcess fChildProcess;
+	RandomTCPServerPort fPort;
 };
 
 

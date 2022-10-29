@@ -17,16 +17,17 @@
 using BPrivate::Network::BHttpSession;
 
 
-class HttpProtocolTest: public BTestCase {
+class HttpProtocolTest : public BTestCase
+{
 public:
-					HttpProtocolTest();
+								HttpProtocolTest();
 
-			void	HttpFieldsTest();
-			void	HttpMethodTest();
-			void	HttpRequestTest();
-			void	HttpTimeTest();
+			void				HttpFieldsTest();
+			void				HttpMethodTest();
+			void				HttpRequestTest();
+			void				HttpTimeTest();
 
-	static	void	AddTests(BTestSuite& suite);
+	static	void				AddTests(BTestSuite& suite);
 };
 
 
@@ -36,7 +37,7 @@ public:
 								HttpIntegrationTest(TestServerMode mode);
 
 	virtual	void				setUp() override;
-	virtual void				tearDown() override;
+	virtual	void				tearDown() override;
 
 			void				HostAndNetworkFailTest();
 			void				GetTest();

@@ -63,8 +63,9 @@ HttpSerializer::Serialize(HttpBuffer& buffer, BDataIO* target)
 					fState = HttpSerializerState::Done;
 					return 0;
 				} else if (_IsChunked())
-					//fState = HttpSerializerState::ChunkHeader;
-					throw BRuntimeError(__PRETTY_FUNCTION__, "Chunked serialization not implemented");
+					// fState = HttpSerializerState::ChunkHeader;
+					throw BRuntimeError(
+						__PRETTY_FUNCTION__, "Chunked serialization not implemented");
 				else
 					fState = HttpSerializerState::Body;
 				break;
@@ -75,7 +76,8 @@ HttpSerializer::Serialize(HttpBuffer& buffer, BDataIO* target)
 				bodyBytesWritten += bytesWritten;
 				fTransferredBodySize += bytesWritten;
 				if (buffer.RemainingBytes() > 0) {
-					// did not manage to write all the bytes in the buffer; continue in the next round
+					// did not manage to write all the bytes in the buffer; continue in the next
+					// round
 					finishing = true;
 					break;
 				}
@@ -115,15 +117,15 @@ size_t
 HttpSerializer::_WriteToTarget(HttpBuffer& buffer, BDataIO* target) const
 {
 	size_t bytesWritten = 0;
-	buffer.WriteTo([target, &bytesWritten](const std::byte* buffer, size_t size){
+	buffer.WriteTo([target, &bytesWritten](const std::byte* buffer, size_t size) {
 		ssize_t result = B_INTERRUPTED;
 		while (result == B_INTERRUPTED) {
 			result = target->Write(buffer, size);
 		}
 
 		if (result <= 0 && result != B_WOULD_BLOCK) {
-			throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::NetworkError,
-				result);
+			throw BNetworkRequestError(
+				__PRETTY_FUNCTION__, BNetworkRequestError::NetworkError, result);
 		} else if (result > 0) {
 			bytesWritten += result;
 			return size_t(result);

@@ -9,18 +9,18 @@
 #include <TestSuite.h>
 
 
-class ExclusiveBorrowTest: public BTestCase {
+class ExclusiveBorrowTest : public BTestCase
+{
 public:
-					ExclusiveBorrowTest();
+								ExclusiveBorrowTest();
 
-			void	ObjectDeleteTest();
-			void	OwnershipTest();
-			void	PolymorphismTest();
-			void	ReleaseTest();
+			void				ObjectDeleteTest();
+			void				OwnershipTest();
+			void				PolymorphismTest();
+			void				ReleaseTest();
 
-	static	void	AddTests(BTestSuite& suite);
+	static	void				AddTests(BTestSuite& suite);
 };
-
 
 
 #endif // EXCLUSIVE_BORROW_TEST_H

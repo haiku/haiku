@@ -17,25 +17,22 @@ namespace Network {
 // #pragma mark -- BUnsupportedProtocol
 
 
-BUnsupportedProtocol::BUnsupportedProtocol(const char* origin,
-		BUrl url, BStringList supportedProtocols)
+BUnsupportedProtocol::BUnsupportedProtocol(
+	const char* origin, BUrl url, BStringList supportedProtocols)
 	:
 	BError(origin),
 	fUrl(std::move(url)),
 	fSupportedProtocols(std::move(supportedProtocols))
 {
-
 }
 
 
-BUnsupportedProtocol::BUnsupportedProtocol(BString origin,
-		BUrl url, BStringList supportedProtocols)
+BUnsupportedProtocol::BUnsupportedProtocol(BString origin, BUrl url, BStringList supportedProtocols)
 	:
 	BError(std::move(origin)),
 	fUrl(std::move(url)),
 	fSupportedProtocols(std::move(supportedProtocols))
 {
-
 }
 
 
@@ -68,7 +65,6 @@ BInvalidUrl::BInvalidUrl(const char* origin, BUrl url)
 	BError(origin),
 	fUrl(std::move(url))
 {
-
 }
 
 
@@ -77,7 +73,6 @@ BInvalidUrl::BInvalidUrl(BString origin, BUrl url)
 	BError(std::move(origin)),
 	fUrl(std::move(origin))
 {
-
 }
 
 
@@ -98,19 +93,24 @@ BInvalidUrl::Url() const
 // #pragma mark -- BNetworkRequestError
 
 
-BNetworkRequestError::BNetworkRequestError(const char* origin, ErrorType type, status_t errorCode,
-		const BString& customMessage)
-	: BError(origin), fErrorType(type), fErrorCode(errorCode), fCustomMessage(customMessage)
+BNetworkRequestError::BNetworkRequestError(
+	const char* origin, ErrorType type, status_t errorCode, const BString& customMessage)
+	:
+	BError(origin),
+	fErrorType(type),
+	fErrorCode(errorCode),
+	fCustomMessage(customMessage)
 {
-
 }
 
 
-BNetworkRequestError::BNetworkRequestError(const char* origin, ErrorType type,
-		const BString& customMessage)
-	: BError(origin), fErrorType(type), fCustomMessage(customMessage)
+BNetworkRequestError::BNetworkRequestError(
+	const char* origin, ErrorType type, const BString& customMessage)
+	:
+	BError(origin),
+	fErrorType(type),
+	fCustomMessage(customMessage)
 {
-
 }
 
 
@@ -118,16 +118,16 @@ const char*
 BNetworkRequestError::Message() const noexcept
 {
 	switch (fErrorType) {
-	case HostnameError:
-		return "Cannot resolving hostname";
-	case NetworkError:
-		return "Network error during operation";
-	case ProtocolError:
-		return "Protocol error";
-	case SystemError:
-		return "System error";
-	case Canceled:
-		return "Network request was canceled";
+		case HostnameError:
+			return "Cannot resolving hostname";
+		case NetworkError:
+			return "Network error during operation";
+		case ProtocolError:
+			return "Protocol error";
+		case SystemError:
+			return "System error";
+		case Canceled:
+			return "Network request was canceled";
 	}
 	// Unreachable
 	return "Network request error";
@@ -141,7 +141,7 @@ BNetworkRequestError::DebugMessage() const
 	debugMessage << "[" << Origin() << "] " << Message();
 	if (fErrorCode != B_OK) {
 		debugMessage << "\n\tUnderlying System Error: " << fErrorCode << " ("
-			<< strerror(fErrorCode) << ")";
+					 << strerror(fErrorCode) << ")";
 	}
 	if (fCustomMessage.Length() > 0) {
 		debugMessage << "\n\tAdditional Info: " << fCustomMessage;
@@ -185,8 +185,8 @@ encode_to_base64(const BString& string)
 	BString tmpString = string;
 
 	while (tmpString.Length()) {
-		char in[3] = { 0, 0, 0 };
-		char out[4] = { 0, 0, 0, 0 };
+		char in[3] = {0, 0, 0};
+		char out[4] = {0, 0, 0, 0};
 		int8 remaining = tmpString.Length();
 
 		tmpString.MoveInto(in, 0, 3);
@@ -197,7 +197,7 @@ encode_to_base64(const BString& string)
 		out[3] = in[2] & 0x3F;
 
 		for (int i = 0; i < 4; i++)
-			out[i] = kBase64Symbols[(int)out[i]];
+			out[i] = kBase64Symbols[(int) out[i]];
 
 		//  Add padding if the input length is not a multiple
 		// of 3
@@ -219,14 +219,14 @@ encode_to_base64(const BString& string)
 
 // #pragma mark -- message constants
 namespace UrlEventData {
-	const char* Id = "url:identifier";
-	const char* HostName = "url:hostname";
-	const char* NumBytes = "url:numbytes";
-	const char* TotalBytes = "url:totalbytes";
-	const char* Success = "url:success";
-	const char* DebugType = "url:debugtype";
-	const char* DebugMessage = "url:debugmessage";
-}
+const char* Id = "url:identifier";
+const char* HostName = "url:hostname";
+const char* NumBytes = "url:numbytes";
+const char* TotalBytes = "url:totalbytes";
+const char* Success = "url:success";
+const char* DebugType = "url:debugtype";
+const char* DebugMessage = "url:debugmessage";
+} // namespace UrlEventData
 
 
 // #pragma mark -- Private functions and data

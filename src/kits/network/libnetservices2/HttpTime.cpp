@@ -35,15 +35,15 @@ using namespace BPrivate::Network;
 // - Invalid weekday
 static const std::list<std::pair<BHttpTimeFormat, const char*>> kDateFormats = {
 	// RFC822
-	{BHttpTimeFormat::RFC1123, "%a, %d %b %Y %H:%M:%S GMT"},// canonical
-	{BHttpTimeFormat::RFC1123, "%a, %d %b %Y %H:%M:%S"},	// without timezone
+	{BHttpTimeFormat::RFC1123, "%a, %d %b %Y %H:%M:%S GMT"}, // canonical
+	{BHttpTimeFormat::RFC1123, "%a, %d %b %Y %H:%M:%S"}, // without timezone
 	// Standard RFC850
-	{BHttpTimeFormat::RFC850, "%A, %d-%b-%y %H:%M:%S GMT"},	// canonical
-	{BHttpTimeFormat::RFC850, "%A, %d-%b-%y %H:%M:%S"},		// without timezone
+	{BHttpTimeFormat::RFC850, "%A, %d-%b-%y %H:%M:%S GMT"}, // canonical
+	{BHttpTimeFormat::RFC850, "%A, %d-%b-%y %H:%M:%S"}, // without timezone
 	// RFC 850 with 4 digit year
-	{BHttpTimeFormat::RFC850, "%a, %d-%b-%Y %H:%M:%S"},		// without timezone
-	{BHttpTimeFormat::RFC850, "%a, %d-%b-%Y %H:%M:%S GMT"},	// with 4-digit year
-	{BHttpTimeFormat::RFC850, "%a, %d-%b-%Y %H:%M:%S UTC"},	// "UTC" timezone
+	{BHttpTimeFormat::RFC850, "%a, %d-%b-%Y %H:%M:%S"}, // without timezone
+	{BHttpTimeFormat::RFC850, "%a, %d-%b-%Y %H:%M:%S GMT"}, // with 4-digit year
+	{BHttpTimeFormat::RFC850, "%a, %d-%b-%Y %H:%M:%S UTC"}, // "UTC" timezone
 	// asctime
 	{BHttpTimeFormat::AscTime, "%a %b %e %H:%M:%S %Y"},
 };
@@ -57,7 +57,6 @@ BHttpTime::InvalidInput::InvalidInput(const char* origin, BString input)
 	BError(origin),
 	input(std::move(input))
 {
-
 }
 
 
@@ -174,8 +173,8 @@ BHttpTime::ToString(BHttpTimeFormat outputFormat) const
 		char expirationString[kTimetToStringMaxLength + 1];
 		size_t strLength;
 
-		strLength = strftime(expirationString, kTimetToStringMaxLength, formatString,
-			&expirationTm);
+		strLength
+			= strftime(expirationString, kTimetToStringMaxLength, formatString, &expirationTm);
 
 		expirationFinal.SetTo(expirationString, strLength);
 		break;
@@ -210,8 +209,7 @@ BHttpTime::_Parse(const BString& dateString)
 
 	// Now convert the struct tm from strptime into a BDateTime.
 	BTime time(expireTime.tm_hour, expireTime.tm_min, expireTime.tm_sec);
-	BDate date(expireTime.tm_year + 1900, expireTime.tm_mon + 1,
-		expireTime.tm_mday);
+	BDate date(expireTime.tm_year + 1900, expireTime.tm_mon + 1, expireTime.tm_mday);
 	fDate = BDateTime(date, time);
 }
 

@@ -26,64 +26,46 @@ class DeleteTestHelper
 {
 public:
 	DeleteTestHelper(std::atomic<bool>& deleted)
-		: fDeleted(deleted)
+		:
+		fDeleted(deleted)
 	{
-
 	}
 
-	~DeleteTestHelper()
-	{
-		fDeleted.store(true);
-	}
+	~DeleteTestHelper() { fDeleted.store(true); }
 
 private:
-	std::atomic<bool>&	fDeleted;
+	std::atomic<bool>& fDeleted;
 };
 
 
-class Base {
+class Base
+{
 public:
-	Base()
-	{
-
-	}
+	Base() {}
 
 
-	virtual ~Base()
-	{
-
-	}
+	virtual ~Base() {}
 
 
-	virtual bool IsDerived()
-	{
-		return false;
-	}
+	virtual bool IsDerived() { return false; }
 };
 
 
-class Derived : public Base {
+class Derived : public Base
+{
 public:
-	Derived() {
-
-	}
+	Derived() {}
 
 
-	virtual ~Derived() {
-
-	}
+	virtual ~Derived() {}
 
 
-	virtual bool IsDerived() override
-	{
-		return true;
-	}
+	virtual bool IsDerived() override { return true; }
 };
 
 
 ExclusiveBorrowTest::ExclusiveBorrowTest()
 {
-
 }
 
 

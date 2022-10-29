@@ -16,7 +16,7 @@
 
 #include <DataIO.h>
 #include <ExclusiveBorrow.h>
-#include <OS.h> 
+#include <OS.h>
 #include <String.h>
 
 
@@ -26,46 +26,40 @@ namespace Network {
 
 struct HttpResultPrivate {
 	// Read-only properties (multi-thread safe)
-	const	int32						id;
+	const	int32				id;
 
 	// Locking and atomic variables
-			sem_id						data_wait;
-			enum {
-				kNoData = 0,
-				kStatusReady,
-				kHeadersReady,
-				kBodyReady,
-				kError
-			};
-			int32						requestStatus = kNoData;
-			int32						canCancel = 0;
+	enum { kNoData = 0, kStatusReady, kHeadersReady, kBodyReady, kError };
+			int32				requestStatus = kNoData;
+			int32				canCancel = 0;
+			sem_id				data_wait;
 
 	// Data
-			std::optional<BHttpStatus>	status;
-			std::optional<BHttpFields>	fields;
-			std::optional<BHttpBody>	body;
-			std::optional<std::exception_ptr>	error;
+			std::optional<BHttpStatus> status;
+			std::optional<BHttpFields> fields;
+			std::optional<BHttpBody> body;
+			std::optional<std::exception_ptr> error;
 
 	// Interim body storage (used while the request is running)
-			BString						bodyString;
-			BBorrow<BDataIO>			bodyTarget;
+			BString				bodyString;
+			BBorrow<BDataIO>	bodyTarget;
 
 	// Utility functions
-										HttpResultPrivate(int32 identifier);
-			int32						GetStatusAtomic();
-			bool						CanCancel();
-			void						SetCancel();
-			void						SetError(std::exception_ptr e);
-			void						SetStatus(BHttpStatus&& s);
-			void						SetFields(BHttpFields&& f);
-			void						SetBody();
-			size_t						WriteToBody(const void* buffer, size_t size);
+								HttpResultPrivate(int32 identifier);
+			int32				GetStatusAtomic();
+			bool				CanCancel();
+			void				SetCancel();
+			void				SetError(std::exception_ptr e);
+			void				SetStatus(BHttpStatus&& s);
+			void				SetFields(BHttpFields&& f);
+			void				SetBody();
+			size_t				WriteToBody(const void* buffer, size_t size);
 };
 
 
-inline
-HttpResultPrivate::HttpResultPrivate(int32 identifier)
-	: id(identifier)
+inline HttpResultPrivate::HttpResultPrivate(int32 identifier)
+	:
+	id(identifier)
 {
 	std::string name = "httpresult:" + std::to_string(identifier);
 	data_wait = create_sem(1, name.c_str());

@@ -63,8 +63,8 @@ HttpBuffer::ReadFrom(BDataIO* source, std::optional<size_t> maxSize)
 		fBuffer.resize(currentSize);
 		return bytesRead;
 	} else if (bytesRead < 0) {
-		throw BNetworkRequestError("BDataIO::Read()", BNetworkRequestError::NetworkError,
-			bytesRead);
+		throw BNetworkRequestError(
+			"BDataIO::Read()", BNetworkRequestError::NetworkError, bytesRead);
 	}
 
 	// Adjust the buffer to the current size
@@ -84,7 +84,7 @@ HttpBuffer::ReadFrom(BDataIO* source, std::optional<size_t> maxSize)
 	\returns the actual number of bytes written to the \a func.
 */
 size_t
-HttpBuffer::WriteTo(HttpTransferFunction func , std::optional<size_t> maxSize)
+HttpBuffer::WriteTo(HttpTransferFunction func, std::optional<size_t> maxSize)
 {
 	if (RemainingBytes() == 0)
 		return 0;
@@ -121,7 +121,8 @@ HttpBuffer::GetNextLine()
 	if (result == fBuffer.cend())
 		return std::nullopt;
 
-	BString line(reinterpret_cast<const char*>(std::addressof(*offset)), std::distance(offset, result));
+	BString line(
+		reinterpret_cast<const char*>(std::addressof(*offset)), std::distance(offset, result));
 	fCurrentOffset = std::distance(fBuffer.cbegin(), result) + 2;
 	return line;
 }
@@ -173,8 +174,8 @@ std::string_view
 HttpBuffer::Data() const noexcept
 {
 	if (RemainingBytes() > 0) {
-		return std::string_view(reinterpret_cast<const char*>(fBuffer.data()) + fCurrentOffset,
-			RemainingBytes());
+		return std::string_view(
+			reinterpret_cast<const char*>(fBuffer.data()) + fCurrentOffset, RemainingBytes());
 	} else
 		return std::string_view();
 }

@@ -33,8 +33,8 @@
 
 #include "HttpBuffer.h"
 #include "HttpParser.h"
-#include "HttpSerializer.h"
 #include "HttpResultPrivate.h"
+#include "HttpSerializer.h"
 #include "NetServicesPrivate.h"
 
 using namespace std::literals;
@@ -51,140 +51,128 @@ static constexpr ssize_t kMaxHeaderLineSize = 64 * 1024;
 
 
 struct CounterDeleter {
-	void operator()(int32* counter) const noexcept
-	{
-		atomic_add(counter, -1);
-	}
+	void operator()(int32* counter) const noexcept { atomic_add(counter, -1); }
 };
 
 
-class BHttpSession::Request {
+class BHttpSession::Request
+{
 public:
-									Request(BHttpRequest&& request,
-													BBorrow<BDataIO> target,
-													BMessenger observer);
+	Request(BHttpRequest&& request, BBorrow<BDataIO> target, BMessenger observer);
 
-									Request(Request& original, const Redirect& redirect);
+	Request(Request& original, const Redirect& redirect);
 
 	// States
-	enum RequestState {
-		InitialState,
-		Connected,
-		RequestSent,
-		ContentReceived
-	};
-	RequestState					State() const noexcept { return fRequestStatus; }
+	enum RequestState { InitialState, Connected, RequestSent, ContentReceived };
+	RequestState State() const noexcept { return fRequestStatus; }
 
 	// Result Helpers
-	std::shared_ptr<HttpResultPrivate>
-									Result() { return fResult; }
-	void							SetError(std::exception_ptr e);
+	std::shared_ptr<HttpResultPrivate> Result() { return fResult; }
+	void SetError(std::exception_ptr e);
 
 	// Helpers for maintaining the connection count
-	std::pair<BString, int>			GetHost() const;
-	void							SetCounter(int32* counter) noexcept;
+	std::pair<BString, int> GetHost() const;
+	void SetCounter(int32* counter) noexcept;
 
 	// Operational methods
-	void							ResolveHostName();
-	void							OpenConnection();
-	void							TransferRequest();
-	bool							ReceiveResult();
-	void							Disconnect() noexcept;
+	void ResolveHostName();
+	void OpenConnection();
+	void TransferRequest();
+	bool ReceiveResult();
+	void Disconnect() noexcept;
 
 	// Object information
-	int								Socket() const noexcept { return fSocket->Socket(); }
-	int32							Id() const noexcept { return fResult->id; }
-	bool							CanCancel() const noexcept { return fResult->CanCancel(); }
+	int Socket() const noexcept { return fSocket->Socket(); }
+	int32 Id() const noexcept { return fResult->id; }
+	bool CanCancel() const noexcept { return fResult->CanCancel(); }
 
 	// Message helper
-	void							SendMessage(uint32 what,
-										std::function<void (BMessage&)> dataFunc = nullptr) const;
+	void SendMessage(uint32 what, std::function<void(BMessage&)> dataFunc = nullptr) const;
 
 private:
-	BHttpRequest					fRequest;
+	BHttpRequest fRequest;
 
 	// Request state/events
-	RequestState					fRequestStatus = InitialState;
+	RequestState fRequestStatus = InitialState;
 
 	// Communication
-	BMessenger						fObserver;
+	BMessenger fObserver;
 	std::shared_ptr<HttpResultPrivate> fResult;
 
 	// Connection
-	BNetworkAddress					fRemoteAddress;
-	std::unique_ptr<BSocket>		fSocket;
+	BNetworkAddress fRemoteAddress;
+	std::unique_ptr<BSocket> fSocket;
 
 	// Sending and receiving
-	HttpBuffer						fBuffer;
-	HttpSerializer					fSerializer;
-	HttpParser						fParser;
+	HttpBuffer fBuffer;
+	HttpSerializer fSerializer;
+	HttpParser fParser;
 
 	// Receive state
-	BHttpStatus						fStatus;
-	BHttpFields						fFields;
+	BHttpStatus fStatus;
+	BHttpFields fFields;
 
 	// Redirection
-	bool							fMightRedirect = false;
-	int8							fRemainingRedirects;
+	bool fMightRedirect = false;
+	int8 fRemainingRedirects;
 
 	// Connection counter
-	std::unique_ptr<int32, CounterDeleter>
-									fConnectionCounter;
+	std::unique_ptr<int32, CounterDeleter> fConnectionCounter;
 };
 
 
-class BHttpSession::Impl {
+class BHttpSession::Impl
+{
 public:
-												Impl();
-												~Impl() noexcept;
+	Impl();
+	~Impl() noexcept;
 
-			BHttpResult							Execute(BHttpRequest&& request,
-													BBorrow<BDataIO> target,
-													BMessenger observer);
-			void								Cancel(int32 identifier);
-			void								SetMaxConnectionsPerHost(size_t maxConnections);
-			void								SetMaxHosts(size_t maxConnections);
+	BHttpResult Execute(BHttpRequest&& request, BBorrow<BDataIO> target, BMessenger observer);
+	void Cancel(int32 identifier);
+	void SetMaxConnectionsPerHost(size_t maxConnections);
+	void SetMaxHosts(size_t maxConnections);
 
 private:
-	// Thread functions
-	static	status_t							ControlThreadFunc(void* arg);
-	static	status_t							DataThreadFunc(void* arg);
+		// Thread functions
+	static status_t ControlThreadFunc(void* arg);
+	static status_t DataThreadFunc(void* arg);
 
 	// Helper functions
-			std::vector<BHttpSession::Request>	GetRequestsForControlThread();
+	std::vector<BHttpSession::Request> GetRequestsForControlThread();
+
 private:
-	// constants (can be accessed unlocked)
-	const	sem_id								fControlQueueSem;
-	const	sem_id								fDataQueueSem;
-	const	thread_id							fControlThread;
-	const	thread_id							fDataThread;
+		// constants (can be accessed unlocked)
+	const sem_id fControlQueueSem;
+	const sem_id fDataQueueSem;
+	const thread_id fControlThread;
+	const thread_id fDataThread;
 
 	// locking mechanism
-			BLocker								fLock;
-			std::atomic<bool>					fQuitting = false;
+	BLocker fLock;
+	std::atomic<bool> fQuitting = false;
 
 	// queues & shared data
-			std::list<BHttpSession::Request>	fControlQueue;
-			std::deque<BHttpSession::Request>	fDataQueue;
-			std::vector<int32>					fCancelList;
+	std::list<BHttpSession::Request> fControlQueue;
+	std::deque<BHttpSession::Request> fDataQueue;
+	std::vector<int32> fCancelList;
 
 	// data owned by the controlThread
 	using Host = std::pair<BString, int>;
-			std::map<Host, int32>				fConnectionCount;
+	std::map<Host, int32> fConnectionCount;
 
 	// data that can only be accessed atomically
-			std::atomic<size_t>					fMaxConnectionsPerHost = 2;
-			std::atomic<size_t>					fMaxHosts = 10;
+	std::atomic<size_t> fMaxConnectionsPerHost = 2;
+	std::atomic<size_t> fMaxHosts = 10;
 
 	// data owned by the dataThread
-			std::map<int,BHttpSession::Request>	connectionMap;
-			std::vector<object_wait_info>		objectList;
+	std::map<int, BHttpSession::Request> connectionMap;
+	std::vector<object_wait_info> objectList;
 };
 
 
 struct BHttpSession::Redirect {
-	BUrl	url;
-	bool	redirectToGet;
+	BUrl url;
+	bool redirectToGet;
 };
 
 
@@ -229,8 +217,7 @@ BHttpSession::Impl::~Impl() noexcept
 
 
 BHttpResult
-BHttpSession::Impl::Execute(BHttpRequest&& request, BBorrow<BDataIO> target,
-	BMessenger observer)
+BHttpSession::Impl::Execute(BHttpRequest&& request, BBorrow<BDataIO> target, BMessenger observer)
 {
 	auto wRequest = Request(std::move(request), std::move(target), observer);
 
@@ -247,7 +234,7 @@ BHttpSession::Impl::Cancel(int32 identifier)
 {
 	auto lock = AutoLocker<BLocker>(fLock);
 	// Check if the item is on the control queue
-	fControlQueue.remove_if([&identifier](auto& request){
+	fControlQueue.remove_if([&identifier](auto& request) {
 		if (request.Id() == identifier) {
 			try {
 				throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::Canceled);
@@ -269,8 +256,8 @@ void
 BHttpSession::Impl::SetMaxConnectionsPerHost(size_t maxConnections)
 {
 	if (maxConnections <= 0 || maxConnections >= INT32_MAX) {
-		throw BRuntimeError(__PRETTY_FUNCTION__,
-			"MaxConnectionsPerHost must be between 1 and INT32_MAX");
+		throw BRuntimeError(
+			__PRETTY_FUNCTION__, "MaxConnectionsPerHost must be between 1 and INT32_MAX");
 	}
 	fMaxConnectionsPerHost.store(maxConnections, std::memory_order_relaxed);
 }
@@ -347,8 +334,8 @@ BHttpSession::Impl::ControlThreadFunc(void* arg)
 			}
 		}
 	} else {
-		throw BRuntimeError(__PRETTY_FUNCTION__,
-			"Unknown reason that the controlQueueSem is deleted");
+		throw BRuntimeError(
+			__PRETTY_FUNCTION__, "Unknown reason that the controlQueueSem is deleted");
 	}
 
 	// Cleanup: wait for data thread
@@ -365,12 +352,12 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 	BHttpSession::Impl* data = static_cast<BHttpSession::Impl*>(arg);
 
 	// initial initialization of wait list
-	data->objectList.push_back(object_wait_info{data->fDataQueueSem,
-		B_OBJECT_TYPE_SEMAPHORE, B_EVENT_ACQUIRE_SEMAPHORE});
+	data->objectList.push_back(
+		object_wait_info{data->fDataQueueSem, B_OBJECT_TYPE_SEMAPHORE, B_EVENT_ACQUIRE_SEMAPHORE});
 
 	while (true) {
 		if (auto status = wait_for_objects(data->objectList.data(), data->objectList.size());
-				status == B_INTERRUPTED)
+			status == B_INTERRUPTED)
 			continue;
 		else if (status < 0) {
 			// Something went inexplicably wrong
@@ -399,9 +386,8 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 				data->connectionMap.insert(std::make_pair(socket, std::move(request)));
 
 				// Add to objectList
-				data->objectList.push_back(object_wait_info{socket,
-					B_OBJECT_TYPE_FD, B_EVENT_WRITE
-				});
+				data->objectList.push_back(
+					object_wait_info{socket, B_OBJECT_TYPE_FD, B_EVENT_WRITE});
 			}
 
 			for (auto id: data->fCancelList) {
@@ -410,7 +396,8 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 				// Also: the first item in the waitlist is always the semaphore
 				// so the fun starts at offset 1.
 				size_t offset = 0;
-				for (auto it = data->connectionMap.cbegin(); it != data->connectionMap.cend(); it++) {
+				for (auto it = data->connectionMap.cbegin(); it != data->connectionMap.cend();
+					it++) {
 					offset++;
 					if (it->second.Id() == id) {
 						data->objectList[offset].events = EVENT_CANCELLED;
@@ -427,7 +414,7 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 
 		// Process all objects that are ready
 		bool resizeObjectList = false;
-		for(auto& item: data->objectList) {
+		for (auto& item: data->objectList) {
 			if (item.type != B_OBJECT_TYPE_FD)
 				continue;
 			if ((item.events & B_EVENT_WRITE) == B_EVENT_WRITE) {
@@ -480,7 +467,8 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 			} else if ((item.events & B_EVENT_DISCONNECTED) == B_EVENT_DISCONNECTED) {
 				auto& request = data->connectionMap.find(item.object)->second;
 				try {
-					throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::NetworkError);
+					throw BNetworkRequestError(
+						__PRETTY_FUNCTION__, BNetworkRequestError::NetworkError);
 				} catch (...) {
 					request.SetError(std::current_exception());
 				}
@@ -504,12 +492,12 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 			} else {
 				// Likely to be B_EVENT_INVALID. This should not happen
 				auto& request = data->connectionMap.find(item.object)->second;
-				request.SendMessage(UrlEvent::DebugMessage, [](BMessage& msg){
+				request.SendMessage(UrlEvent::DebugMessage, [](BMessage& msg) {
 					msg.AddUInt32(UrlEventData::DebugType, UrlEventData::DebugError);
 					msg.AddString(UrlEventData::DebugMessage, "Unexpected event; socket deleted?");
 				});
-				throw BRuntimeError(__PRETTY_FUNCTION__,
-					"Socket was deleted at an unexpected time");
+				throw BRuntimeError(
+					__PRETTY_FUNCTION__, "Socket was deleted at an unexpected time");
 			}
 		}
 
@@ -539,10 +527,9 @@ BHttpSession::Impl::DataThreadFunc(void* arg)
 			} catch (...) {
 				it->second.SetError(std::current_exception());
 			}
-	 	}
+		}
 	} else {
-		throw BRuntimeError(__PRETTY_FUNCTION__,
-			"Unknown reason that the dataQueueSem is deleted");
+		throw BRuntimeError(__PRETTY_FUNCTION__, "Unknown reason that the dataQueueSem is deleted");
 	}
 
 	return B_OK;
@@ -562,7 +549,7 @@ BHttpSession::Impl::GetRequestsForControlThread()
 
 	// Clean up connection list if it is at the max number of hosts
 	if (fConnectionCount.size() >= fMaxHosts.load()) {
-		for (auto it = fConnectionCount.begin(); it != fConnectionCount.end(); ) {
+		for (auto it = fConnectionCount.begin(); it != fConnectionCount.end();) {
 			if (atomic_get(std::addressof(it->second)) == 0) {
 				it = fConnectionCount.erase(it);
 			} else {
@@ -573,13 +560,13 @@ BHttpSession::Impl::GetRequestsForControlThread()
 
 	// Process the list of pending requests and review if they can be started.
 	auto lock = AutoLocker<BLocker>(fLock);
-	fControlQueue.remove_if([this, &requests](auto& request){
+	fControlQueue.remove_if([this, &requests](auto& request) {
 		auto host = request.GetHost();
 		auto it = fConnectionCount.find(host);
 		if (it != fConnectionCount.end()) {
 			if (static_cast<size_t>(atomic_get(std::addressof(it->second)))
-					>= fMaxConnectionsPerHost.load(std::memory_order_relaxed)) {
-				request.SendMessage(UrlEvent::DebugMessage, [](BMessage& msg){
+				>= fMaxConnectionsPerHost.load(std::memory_order_relaxed)) {
+				request.SendMessage(UrlEvent::DebugMessage, [](BMessage& msg) {
 					msg.AddUInt32(UrlEventData::DebugType, UrlEventData::DebugWarning);
 					msg.AddString(UrlEventData::DebugMessage,
 						"Request is queued: too many active connections for host");
@@ -591,17 +578,16 @@ BHttpSession::Impl::GetRequestsForControlThread()
 			}
 		} else {
 			if (fConnectionCount.size() == fMaxHosts.load()) {
-				request.SendMessage(UrlEvent::DebugMessage, [](BMessage& msg){
+				request.SendMessage(UrlEvent::DebugMessage, [](BMessage& msg) {
 					msg.AddUInt32(UrlEventData::DebugType, UrlEventData::DebugWarning);
 					msg.AddString(UrlEventData::DebugMessage,
 						"Request is queued: maximum number of concurrent hosts");
 				});
 				return false;
 			}
-			auto[newIt, success] = fConnectionCount.insert({host, 1});
+			auto [newIt, success] = fConnectionCount.insert({host, 1});
 			if (!success) {
-				throw BRuntimeError(__PRETTY_FUNCTION__,
-					"Cannot insert into fConnectionCount");
+				throw BRuntimeError(__PRETTY_FUNCTION__, "Cannot insert into fConnectionCount");
 			}
 			request.SetCounter(std::addressof(newIt->second));
 		}
@@ -627,8 +613,7 @@ BHttpSession::~BHttpSession() = default;
 BHttpSession::BHttpSession(const BHttpSession&) noexcept = default;
 
 
-BHttpSession&
-BHttpSession::operator=(const BHttpSession&) noexcept = default;
+BHttpSession& BHttpSession::operator=(const BHttpSession&) noexcept = default;
 
 
 BHttpResult
@@ -667,9 +652,10 @@ BHttpSession::SetMaxHosts(size_t maxConnections)
 
 
 // #pragma mark -- BHttpSession::Request (helpers)
-BHttpSession::Request::Request(BHttpRequest&& request, BBorrow<BDataIO> target,
-		BMessenger observer)
-	: fRequest(std::move(request)), fObserver(observer)
+BHttpSession::Request::Request(BHttpRequest&& request, BBorrow<BDataIO> target, BMessenger observer)
+	:
+	fRequest(std::move(request)),
+	fObserver(observer)
 {
 	auto identifier = get_netservices_request_identifier();
 
@@ -690,8 +676,10 @@ BHttpSession::Request::Request(BHttpRequest&& request, BBorrow<BDataIO> target,
 
 
 BHttpSession::Request::Request(Request& original, const BHttpSession::Redirect& redirect)
-	: fRequest(std::move(original.fRequest)), fObserver(original.fObserver),
-		fResult(original.fResult)
+	:
+	fRequest(std::move(original.fRequest)),
+	fObserver(original.fObserver),
+	fResult(original.fResult)
 {
 	// update the original request with the new location
 	fRequest.SetUrl(redirect.url);
@@ -717,7 +705,7 @@ void
 BHttpSession::Request::SetError(std::exception_ptr e)
 {
 	fResult->SetError(e);
-	SendMessage(UrlEvent::DebugMessage, [&e](BMessage& msg){
+	SendMessage(UrlEvent::DebugMessage, [&e](BMessage& msg) {
 		msg.AddUInt32(UrlEventData::DebugType, UrlEventData::DebugError);
 		try {
 			std::rethrow_exception(e);
@@ -729,9 +717,8 @@ BHttpSession::Request::SetError(std::exception_ptr e)
 			msg.AddString(UrlEventData::DebugMessage, "Unknown exception");
 		}
 	});
-	SendMessage(UrlEvent::RequestCompleted, [](BMessage& msg){
-		msg.AddBool(UrlEventData::Success, false);
-	});
+	SendMessage(UrlEvent::RequestCompleted,
+		[](BMessage& msg) { msg.AddBool(UrlEventData::Success, false); });
 }
 
 
@@ -765,13 +752,12 @@ BHttpSession::Request::ResolveHostName()
 
 	// TODO: proxy
 	if (auto status = fRemoteAddress.SetTo(fRequest.Url().Host(), port); status != B_OK) {
-		throw BNetworkRequestError("BNetworkAddress::SetTo()",
-			BNetworkRequestError::HostnameError, status);
+		throw BNetworkRequestError(
+			"BNetworkAddress::SetTo()", BNetworkRequestError::HostnameError, status);
 	}
 
-	SendMessage(UrlEvent::HostNameResolved, [this](BMessage& msg) {
-		msg.AddString(UrlEventData::HostName, fRequest.Url().Host());
-	});
+	SendMessage(UrlEvent::HostNameResolved,
+		[this](BMessage& msg) { msg.AddString(UrlEventData::HostName, fRequest.Url().Host()); });
 }
 
 
@@ -795,8 +781,8 @@ BHttpSession::Request::OpenConnection()
 	// Open connection
 	if (auto status = fSocket->Connect(fRemoteAddress); status != B_OK) {
 		// TODO: inform listeners that the connection failed
-		throw BNetworkRequestError("BSocket::Connect()",
-			BNetworkRequestError::NetworkError, status);
+		throw BNetworkRequestError(
+			"BSocket::Connect()", BNetworkRequestError::NetworkError, status);
 	}
 
 	// Make the rest of the interaction non-blocking
@@ -822,8 +808,8 @@ BHttpSession::Request::TransferRequest()
 {
 	// Assert that we are in the right state
 	if (fRequestStatus != Connected)
-		throw BRuntimeError(__PRETTY_FUNCTION__,
-			"Write request for object that is not in the Connected state");
+		throw BRuntimeError(
+			__PRETTY_FUNCTION__, "Write request for object that is not in the Connected state");
 
 	if (!fSerializer.IsInitialized())
 		fSerializer.SetTo(fBuffer, fRequest);
@@ -861,191 +847,190 @@ BHttpSession::Request::ReceiveResult()
 
 	// Parse the content in the buffer
 	switch (fParser.State()) {
-	case HttpInputStreamState::StatusLine:
-	{
-		if (fBuffer.RemainingBytes() == static_cast<size_t>(bytesRead)) {
-			// In the initial run, the bytes in the buffer will match the bytes read to indicate
-			// the response has started.
-			SendMessage(UrlEvent::ResponseStarted);
+		case HttpInputStreamState::StatusLine:
+		{
+			if (fBuffer.RemainingBytes() == static_cast<size_t>(bytesRead)) {
+				// In the initial run, the bytes in the buffer will match the bytes read to indicate
+				// the response has started.
+				SendMessage(UrlEvent::ResponseStarted);
+			}
+
+			if (fParser.ParseStatus(fBuffer, fStatus)) {
+				// the status headers are now received, decide what to do next
+
+				// Determine if we can handle redirects; else notify of receiving status
+				if (fRemainingRedirects > 0) {
+					switch (fStatus.StatusCode()) {
+						case BHttpStatusCode::MovedPermanently:
+						case BHttpStatusCode::TemporaryRedirect:
+						case BHttpStatusCode::PermanentRedirect:
+							// These redirects require the request body to be sent again. It this is
+							// possible, BHttpRequest::RewindBody() will return true in which case
+							// we can handle the redirect.
+							if (!fRequest.RewindBody())
+								break;
+							[[fallthrough]];
+						case BHttpStatusCode::Found:
+						case BHttpStatusCode::SeeOther:
+							// These redirects redirect to GET, so we don't care if we can rewind
+							// the body; in this case redirect
+							fMightRedirect = true;
+							break;
+						default:
+							break;
+					}
+				}
+
+				if ((fStatus.StatusClass() == BHttpStatusClass::ClientError
+						|| fStatus.StatusClass() == BHttpStatusClass::ServerError)
+					&& fRequest.StopOnError()) {
+					fRequestStatus = ContentReceived;
+					fResult->SetStatus(std::move(fStatus));
+					fResult->SetFields(BHttpFields());
+					fResult->SetBody();
+					return true;
+				}
+
+				if (!fMightRedirect) {
+					// we are not redirecting and there is no error, so inform listeners
+					SendMessage(UrlEvent::HttpStatus, [this](BMessage& msg) {
+						msg.AddInt16(UrlEventData::HttpStatusCode, fStatus.code);
+					});
+					fResult->SetStatus(BHttpStatus{fStatus.code, std::move(fStatus.text)});
+				}
+			} else {
+				// We do not have enough data for the status line yet
+				if (readEnd) {
+					throw BNetworkRequestError(__PRETTY_FUNCTION__,
+						BNetworkRequestError::ProtocolError,
+						"Response did not include a complete status line");
+				}
+				return false;
+			}
+			[[fallthrough]];
 		}
+		case HttpInputStreamState::Fields:
+		{
+			if (!fParser.ParseFields(fBuffer, fFields)) {
+				// there may be more headers to receive, throw an error if there will be no more
+				if (readEnd) {
+					throw BNetworkRequestError(__PRETTY_FUNCTION__,
+						BNetworkRequestError::ProtocolError,
+						"Response did not include a complete header section");
+				}
+				break;
+			}
 
-		if (fParser.ParseStatus(fBuffer, fStatus)) {
-			// the status headers are now received, decide what to do next
+			// The headers have been received, now set up the rest of the response handling
 
-			// Determine if we can handle redirects; else notify of receiving status
-			if (fRemainingRedirects > 0) {
+			// Handle redirects
+			if (fMightRedirect) {
+				auto redirectToGet = false;
 				switch (fStatus.StatusCode()) {
+					case BHttpStatusCode::Found:
+					case BHttpStatusCode::SeeOther:
+						// 302 and 303 redirections convert all requests to GET request, except for
+						// HEAD
+						redirectToGet = true;
+						[[fallthrough]];
 					case BHttpStatusCode::MovedPermanently:
 					case BHttpStatusCode::TemporaryRedirect:
 					case BHttpStatusCode::PermanentRedirect:
-						// These redirects require the request body to be sent again. It this is
-						// possible, BHttpRequest::RewindBody() will return true in which case we can
-						// handle the redirect.
-						if (!fRequest.RewindBody())
-							break;
-						[[fallthrough]];
-					case BHttpStatusCode::Found:
-					case BHttpStatusCode::SeeOther:
-						// These redirects redirect to GET, so we don't care if we can rewind the
-						// body; in this case redirect
-						fMightRedirect = true;
-						break;
+					{
+						auto locationField = fFields.FindField("Location");
+						if (locationField == fFields.end()) {
+							throw BNetworkRequestError(__PRETTY_FUNCTION__,
+								BNetworkRequestError::ProtocolError,
+								"Redirect; the Location field must be present and cannot be found");
+						}
+						auto locationString = BString(
+							(*locationField).Value().data(), (*locationField).Value().size());
+						auto redirect = BHttpSession::Redirect{
+							BUrl(fRequest.Url(), locationString), redirectToGet};
+						if (!redirect.url.IsValid()) {
+							throw BNetworkRequestError(__PRETTY_FUNCTION__,
+								BNetworkRequestError::ProtocolError,
+								"Redirect; invalid URL in the Location field");
+						}
+
+						// Notify of redirect
+						SendMessage(UrlEvent::HttpRedirect, [&locationString](BMessage& msg) {
+							msg.AddString(UrlEventData::HttpRedirectUrl, locationString);
+						});
+						throw redirect;
+					}
 					default:
+						// ignore other status codes and continue regular processing
+						SendMessage(UrlEvent::HttpStatus, [this](BMessage& msg) {
+							msg.AddInt16(UrlEventData::HttpStatusCode, fStatus.code);
+						});
+						fResult->SetStatus(BHttpStatus{fStatus.code, std::move(fStatus.text)});
 						break;
 				}
 			}
 
-			if ((fStatus.StatusClass() == BHttpStatusClass::ClientError
-					|| fStatus.StatusClass() == BHttpStatusClass::ServerError)
-				&& fRequest.StopOnError())
-			{
-				fRequestStatus = ContentReceived;
-				fResult->SetStatus(std::move(fStatus));
-				fResult->SetFields(BHttpFields());
+			// TODO: Parse received cookies
+
+			// Move headers to the result and inform listener
+			fResult->SetFields(std::move(fFields));
+			SendMessage(UrlEvent::HttpFields);
+
+			if (!fParser.HasContent()) {
+				// Any requests with not content are finished
 				fResult->SetBody();
+				SendMessage(UrlEvent::RequestCompleted,
+					[](BMessage& msg) { msg.AddBool(UrlEventData::Success, true); });
+				fRequestStatus = ContentReceived;
 				return true;
 			}
-
-			if (!fMightRedirect) {
-				// we are not redirecting and there is no error, so inform listeners
-				SendMessage(UrlEvent::HttpStatus, [this](BMessage& msg) {
-					msg.AddInt16(UrlEventData::HttpStatusCode, fStatus.code);
-				});
-				fResult->SetStatus(BHttpStatus{fStatus.code, std::move(fStatus.text)});
-			}
-		} else {
-			// We do not have enough data for the status line yet
-			if (readEnd) {
-				throw BNetworkRequestError(__PRETTY_FUNCTION__,
-					BNetworkRequestError::ProtocolError,
-					"Response did not include a complete status line");
-			}
-			return false;
+			[[fallthrough]];
 		}
-		[[fallthrough]];
-	}
-	case HttpInputStreamState::Fields:
-	{
-		if (!fParser.ParseFields(fBuffer, fFields)) {
-			// there may be more headers to receive, throw an error if there will be no more
-			if (readEnd) {
-				throw BNetworkRequestError(__PRETTY_FUNCTION__,
-					BNetworkRequestError::ProtocolError,
-					"Response did not include a complete header section");
+		case HttpInputStreamState::Body:
+		{
+			size_t bytesWrittenToBody;
+				// The bytesWrittenToBody may differ from the bytes parsed from the buffer when
+				// there is compression on the incoming stream.
+			bytesRead = fParser.ParseBody(
+				fBuffer,
+				[this, &bytesWrittenToBody](const std::byte* buffer, size_t size) {
+					bytesWrittenToBody = fResult->WriteToBody(buffer, size);
+					return bytesWrittenToBody;
+				},
+				readEnd);
+
+			SendMessage(UrlEvent::DownloadProgress, [this, bytesRead](BMessage& msg) {
+				msg.AddInt64(UrlEventData::NumBytes, bytesRead);
+				if (fParser.BodyBytesTotal())
+					msg.AddInt64(UrlEventData::TotalBytes, fParser.BodyBytesTotal().value());
+			});
+
+			if (bytesWrittenToBody > 0) {
+				SendMessage(UrlEvent::BytesWritten, [bytesWrittenToBody](BMessage& msg) {
+					msg.AddInt64(UrlEventData::NumBytes, bytesWrittenToBody);
+				});
 			}
+
+			if (fParser.Complete()) {
+				fResult->SetBody();
+				SendMessage(UrlEvent::RequestCompleted,
+					[](BMessage& msg) { msg.AddBool(UrlEventData::Success, true); });
+				fRequestStatus = ContentReceived;
+				return true;
+			} else if (readEnd) {
+				// the parsing of the body is not complete but we are at the end of the data
+				throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError,
+					"Unexpected end of data: more data was expected");
+			}
+
 			break;
 		}
-
-		// The headers have been received, now set up the rest of the response handling
-
-		// Handle redirects
-		if (fMightRedirect) {
-			auto redirectToGet = false;
-			switch (fStatus.StatusCode()) {
-			case BHttpStatusCode::Found:
-			case BHttpStatusCode::SeeOther:
-				// 302 and 303 redirections convert all requests to GET request, except for HEAD
-				redirectToGet = true;
-				[[fallthrough]];
-			case BHttpStatusCode::MovedPermanently:
-			case BHttpStatusCode::TemporaryRedirect:
-			case BHttpStatusCode::PermanentRedirect:
-			{
-				auto locationField = fFields.FindField("Location");
-				if (locationField == fFields.end()) {
-					throw BNetworkRequestError(__PRETTY_FUNCTION__,
-						BNetworkRequestError::ProtocolError,
-						"Redirect; the Location field must be present and cannot be found");
-				}
-				auto locationString = BString((*locationField).Value().data(),
-					(*locationField).Value().size());
-				auto redirect =
-					BHttpSession::Redirect{BUrl(fRequest.Url(), locationString), redirectToGet};
-				if (!redirect.url.IsValid()) {
-					throw BNetworkRequestError(__PRETTY_FUNCTION__,
-						BNetworkRequestError::ProtocolError,
-						"Redirect; invalid URL in the Location field");
-				}
-
-				// Notify of redirect
-				SendMessage(UrlEvent::HttpRedirect, [&locationString](BMessage& msg) {
-					msg.AddString(UrlEventData::HttpRedirectUrl, locationString);
-				});
-				throw redirect;
-			}
-			default:
-				// ignore other status codes and continue regular processing
-				SendMessage(UrlEvent::HttpStatus, [this](BMessage& msg) {
-					msg.AddInt16(UrlEventData::HttpStatusCode, fStatus.code);
-				});
-				fResult->SetStatus(BHttpStatus{fStatus.code, std::move(fStatus.text)});
-				break;
-			}
-		}
-
-		// TODO: Parse received cookies
-
-		// Move headers to the result and inform listener
-		fResult->SetFields(std::move(fFields));
-		SendMessage(UrlEvent::HttpFields);
-
-		if (!fParser.HasContent()) {
-			// Any requests with not content are finished
-			fResult->SetBody();
-			SendMessage(UrlEvent::RequestCompleted, [](BMessage& msg) {
-				msg.AddBool(UrlEventData::Success, true);
-			});
-			fRequestStatus = ContentReceived;
-			return true;
-		}
-		[[fallthrough]];
-	}
-	case HttpInputStreamState::Body:
-	{
-		size_t bytesWrittenToBody;
-			// The bytesWrittenToBody may differ from the bytes parsed from the buffer when
-			// there is compression on the incoming stream.
-		bytesRead = fParser.ParseBody(fBuffer, [this, &bytesWrittenToBody](const std::byte* buffer, size_t size) {
-			bytesWrittenToBody = fResult->WriteToBody(buffer, size);
-			return bytesWrittenToBody;
-		}, readEnd);
-
-		SendMessage(UrlEvent::DownloadProgress, [this, bytesRead](BMessage& msg) {
-			msg.AddInt64(UrlEventData::NumBytes, bytesRead);
-			if (fParser.BodyBytesTotal())
-				msg.AddInt64(UrlEventData::TotalBytes, fParser.BodyBytesTotal().value());
-		});
-
-		if (bytesWrittenToBody > 0) {
-			SendMessage(UrlEvent::BytesWritten, [bytesWrittenToBody](BMessage& msg) {
-				msg.AddInt64(UrlEventData::NumBytes, bytesWrittenToBody);
-			});
-		}
-
-		if (fParser.Complete()) {
-			fResult->SetBody();
-			SendMessage(UrlEvent::RequestCompleted, [](BMessage& msg) {
-				msg.AddBool(UrlEventData::Success, true);
-			});
-			fRequestStatus = ContentReceived;
-			return true;
-		} else if (readEnd) {
-			// the parsing of the body is not complete but we are at the end of the data
-			throw BNetworkRequestError(__PRETTY_FUNCTION__,
-				BNetworkRequestError::ProtocolError,
-				"Unexpected end of data: more data was expected");
-		}
-
-		break;
-	}
-	default:
-		throw BRuntimeError(__PRETTY_FUNCTION__, "Not reachable");
+		default:
+			throw BRuntimeError(__PRETTY_FUNCTION__, "Not reachable");
 	}
 
 	// There is more to receive
 	return false;
 }
-
 
 
 /*!
@@ -1065,7 +1050,7 @@ BHttpSession::Request::Disconnect() noexcept
 	\param dataFunc Optional function that adds additional data to the message.
 */
 void
-BHttpSession::Request::SendMessage(uint32 what, std::function<void (BMessage&)> dataFunc) const
+BHttpSession::Request::SendMessage(uint32 what, std::function<void(BMessage&)> dataFunc) const
 {
 	if (fObserver.IsValid()) {
 		BMessage msg(what);
@@ -1081,8 +1066,8 @@ BHttpSession::Request::SendMessage(uint32 what, std::function<void (BMessage&)> 
 
 
 namespace BPrivate::Network::UrlEventData {
-	const char* HttpStatusCode = "url:httpstatuscode";
-	const char* SSLCertificate = "url:sslcertificate";
-	const char* SSLMessage = "url:sslmessage";
-	const char* HttpRedirectUrl = "url:httpredirecturl";
-}
+const char* HttpStatusCode = "url:httpstatuscode";
+const char* SSLCertificate = "url:sslcertificate";
+const char* SSLMessage = "url:sslmessage";
+const char* HttpRedirectUrl = "url:httpredirecturl";
+} // namespace BPrivate::Network::UrlEventData

@@ -29,9 +29,9 @@ validate_http_token_string(const std::string_view& string)
 {
 	for (auto it = string.cbegin(); it < string.cend(); it++) {
 		if (*it <= 31 || *it == 127 || *it == '(' || *it == ')' || *it == '<' || *it == '>'
-				|| *it == '@' || *it == ',' || *it == ';' || *it == '\\' || *it == '"'
-				|| *it == '/' || *it == '[' || *it == ']' || *it == '?' || *it == '='
-				|| *it == '{' || *it == '}' || *it == ' ')
+			|| *it == '@' || *it == ',' || *it == ';' || *it == '\\' || *it == '"' || *it == '/'
+			|| *it == '[' || *it == ']' || *it == '?' || *it == '=' || *it == '{' || *it == '}'
+			|| *it == ' ')
 			return false;
 	}
 	return true;

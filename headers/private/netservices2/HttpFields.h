@@ -21,70 +21,15 @@ namespace BPrivate {
 namespace Network {
 
 
-class BHttpFields {
+class BHttpFields
+{
 public:
-	// Exceptions
-	class InvalidInput : public BError {
-	public:
-								InvalidInput(const char* origin, BString input);
-
-		virtual	const char*		Message() const noexcept override;
-		virtual	BString			DebugMessage() const override;
-
-		BString					input;
-	};
+		// Exceptions
+	class InvalidInput;
 
 	// Wrapper Types
-	class FieldName {
-	public:
-		// Comparison
-				bool			operator==(const BString& other) const noexcept;
-				bool			operator==(const std::string_view& other) const noexcept;
-				bool			operator==(const FieldName& other) const noexcept;
-
-		// Conversion
-								operator std::string_view() const;
-	private:
-		friend	class			BHttpFields;
-								FieldName() noexcept;
-								FieldName(const std::string_view& name) noexcept;
-								FieldName(const FieldName& other) noexcept;
-								FieldName(FieldName&&) noexcept;
-		FieldName&				operator=(const FieldName& other) noexcept;
-		FieldName&				operator=(FieldName&&) noexcept;
-
-		std::string_view		fName;
-	};
-
-	class Field {
-	public:
-		// Constructors
-								Field() noexcept;
-								Field(const std::string_view& name, const std::string_view& value);
-								Field(BString& field);
-								Field(const Field& other);
-								Field(Field&&) noexcept;
-
-		// Assignment
-		Field&					operator=(const Field& other);
-		Field&					operator=(Field&& other) noexcept;
-
-		// Access Operators
-		const FieldName&		Name() const noexcept;
-		std::string_view		Value() const noexcept;
-		std::string_view		RawField() const noexcept;
-		bool					IsEmpty() const noexcept;
-
-	private:
-		friend	class			BHttpFields;
-
-								Field(BString&& rawField);
-
-		std::optional<BString>	fRawField;
-
-		FieldName				fName;
-		std::string_view		fValue;
-	};
+	class FieldName;
+	class Field;
 
 	// Type Aliases
 	using ConstIterator = std::list<Field>::const_iterator;
@@ -101,14 +46,14 @@ public:
 			BHttpFields&		operator=(BHttpFields&&) noexcept;
 
 	// Access list
-	const	Field&				operator[](size_t index) const;
+			const Field&		operator[](size_t index) const;
 
 	// Modifiers
 			void				AddField(const std::string_view& name,
 									const std::string_view& value);
 			void				AddField(BString& field);
 			void				AddFields(std::initializer_list<Field> fields);
-			void				RemoveField(const std::string_view& name) noexcept; 
+			void				RemoveField(const std::string_view& name) noexcept;
 			void				RemoveField(ConstIterator it) noexcept;
 			void				MakeEmpty() noexcept;
 
@@ -126,9 +71,77 @@ private:
 };
 
 
+class BHttpFields::InvalidInput : public BError
+{
+public:
+								InvalidInput(const char* origin, BString input);
+
+	virtual	const char*			Message() const noexcept override;
+	virtual	BString				DebugMessage() const override;
+
+			BString				input;
+};
+
+
+class BHttpFields::FieldName
+{
+public:
+	// Comparison
+			bool				operator==(const BString& other) const noexcept;
+			bool				operator==(const std::string_view& other) const noexcept;
+			bool				operator==(const FieldName& other) const noexcept;
+
+	// Conversion
+	operator					std::string_view() const;
+
+private:
+	friend class BHttpFields;
+
+								FieldName() noexcept;
+								FieldName(const std::string_view& name) noexcept;
+								FieldName(const FieldName& other) noexcept;
+								FieldName(FieldName&&) noexcept;
+			FieldName&			operator=(const FieldName& other) noexcept;
+			FieldName&			operator=(FieldName&&) noexcept;
+
+			std::string_view	fName;
+};
+
+
+class BHttpFields::Field
+{
+public:
+	// Constructors
+								Field() noexcept;
+								Field(const std::string_view& name, const std::string_view& value);
+								Field(BString& field);
+								Field(const Field& other);
+								Field(Field&&) noexcept;
+
+	// Assignment
+			Field&				operator=(const Field& other);
+			Field&				operator=(Field&& other) noexcept;
+
+	// Access Operators
+			const FieldName&	Name() const noexcept;
+			std::string_view	Value() const noexcept;
+			std::string_view	RawField() const noexcept;
+			bool				IsEmpty() const noexcept;
+
+private:
+	friend class BHttpFields;
+
+								Field(BString&& rawField);
+
+			std::optional<BString> fRawField;
+
+			FieldName			fName;
+			std::string_view	fValue;
+};
+
+
 } // namespace Network
 
 } // namespace BPrivate
 
 #endif // _B_HTTP_FIELDS_H_
-

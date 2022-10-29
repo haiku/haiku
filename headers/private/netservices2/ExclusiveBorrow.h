@@ -16,42 +16,37 @@ namespace BPrivate {
 namespace Network {
 
 
-class BBorrowError : public BError {
+class BBorrowError : public BError
+{
 public:
 	BBorrowError(const char* origin)
-		: BError(origin)
+		:
+		BError(origin)
 	{
-		
 	}
 
-	virtual const char*
-	Message() const noexcept override
-	{
-		return "BBorrowError";
-	}
+	virtual const char* Message() const noexcept override { return "BBorrowError"; }
 };
 
 
-class BorrowAdmin {
+class BorrowAdmin
+{
 private:
 	static constexpr uint8 kOwned = 0x1;
 	static constexpr uint8 kBorrowed = 0x2;
-	std::atomic<uint8>	fState = kOwned;
+	std::atomic<uint8> fState = kOwned;
 
 protected:
-	virtual	~BorrowAdmin() = default;
+	virtual ~BorrowAdmin() = default;
 
-	virtual	void	Cleanup() noexcept {};
-	virtual void	ReleasePointer() noexcept {};
+	virtual void Cleanup() noexcept {};
+	virtual void ReleasePointer() noexcept {};
+
 public:
-	BorrowAdmin() noexcept
-	{
-
-	}
+	BorrowAdmin() noexcept {}
 
 
-	void
-	Borrow()
+	void Borrow()
 	{
 		auto alreadyBorrowed = (fState.fetch_or(kBorrowed) & kBorrowed) == kBorrowed;
 		if (alreadyBorrowed) {
@@ -60,8 +55,7 @@ public:
 	}
 
 
-	void
-	Return() noexcept
+	void Return() noexcept
 	{
 		auto cleanup = (fState.fetch_and(~kBorrowed) & kOwned) != kOwned;
 		if (cleanup)
@@ -69,8 +63,7 @@ public:
 	}
 
 
-	void
-	Forfeit() noexcept
+	void Forfeit() noexcept
 	{
 		auto cleanup = (fState.fetch_and(~kOwned) & kBorrowed) != kBorrowed;
 		if (cleanup)
@@ -78,15 +71,10 @@ public:
 	}
 
 
-	bool
-	IsBorrowed() noexcept
-	{
-		return (fState.load() & kBorrowed) == kBorrowed;
-	}
+	bool IsBorrowed() noexcept { return (fState.load() & kBorrowed) == kBorrowed; }
 
 
-	void
-	Release()
+	void Release()
 	{
 		if ((fState.load() & kBorrowed) == kBorrowed)
 			throw BBorrowError(__PRETTY_FUNCTION__);
@@ -96,57 +84,39 @@ public:
 };
 
 
-template <typename T>
-class BorrowPointer : public BorrowAdmin
+template<typename T> class BorrowPointer : public BorrowAdmin
 {
 public:
 	BorrowPointer(T* object) noexcept
-		: fPtr(object)
+		:
+		fPtr(object)
 	{
-
 	}
 
-	virtual ~BorrowPointer() {
-		delete fPtr;
-	}
+	virtual ~BorrowPointer() { delete fPtr; }
 
 protected:
-	virtual void
-	Cleanup() noexcept override
-	{
-		delete this;
-	}
+	virtual void Cleanup() noexcept override { delete this; }
 
-	virtual void
-	ReleasePointer() noexcept override
-	{
-		fPtr = nullptr;
-	}
+	virtual void ReleasePointer() noexcept override { fPtr = nullptr; }
 
 private:
-	T*	fPtr;
+	T* fPtr;
 };
 
 
-template <typename T>
-class BExclusiveBorrow {
-	template<typename P>
-	friend class BBorrow;
+template<typename T> class BExclusiveBorrow
+{
+	template<typename P> friend class BBorrow;
 
-	T*				fPtr = nullptr;
-	BorrowAdmin*	fAdminBlock = nullptr;
+	T* fPtr = nullptr;
+	BorrowAdmin* fAdminBlock = nullptr;
 
 public:
-	BExclusiveBorrow() noexcept
-	{
-
-	}
+	BExclusiveBorrow() noexcept {}
 
 
-	BExclusiveBorrow(nullptr_t) noexcept
-	{
-
-	}
+	BExclusiveBorrow(nullptr_t) noexcept {}
 
 
 	BExclusiveBorrow(T* object)
@@ -178,8 +148,7 @@ public:
 	}
 
 
-	BExclusiveBorrow&
-	operator=(BExclusiveBorrow&& other) noexcept
+	BExclusiveBorrow& operator=(BExclusiveBorrow&& other) noexcept
 	{
 		if (fAdminBlock)
 			fAdminBlock->Forfeit();
@@ -191,15 +160,10 @@ public:
 	}
 
 
-	bool
-	HasValue() const noexcept
-	{
-		return bool(fPtr);
-	}
+	bool HasValue() const noexcept { return bool(fPtr); }
 
 
-	T&
-	operator*() const
+	T& operator*() const
 	{
 		if (fAdminBlock && !fAdminBlock->IsBorrowed())
 			return *fPtr;
@@ -207,8 +171,7 @@ public:
 	}
 
 
-	T*
-	operator->() const
+	T* operator->() const
 	{
 		if (fAdminBlock && !fAdminBlock->IsBorrowed())
 			return fPtr;
@@ -216,8 +179,7 @@ public:
 	}
 
 
-	std::unique_ptr<T>
-	Release()
+	std::unique_ptr<T> Release()
 	{
 		if (!fAdminBlock)
 			throw BBorrowError(__PRETTY_FUNCTION__);
@@ -230,27 +192,23 @@ public:
 };
 
 
-template <typename T>
-class BBorrow {
-	T*				fPtr = nullptr;
-	BorrowAdmin*	fAdminBlock = nullptr;
+template<typename T> class BBorrow
+{
+	T* fPtr = nullptr;
+	BorrowAdmin* fAdminBlock = nullptr;
 
 public:
-	BBorrow() noexcept
-	{
-
-	}
+	BBorrow() noexcept {}
 
 
-	BBorrow(nullptr_t) noexcept
-	{
-
-	}
+	BBorrow(nullptr_t) noexcept {}
 
 
 	template<typename P>
 	explicit BBorrow(BExclusiveBorrow<P>& owner)
-		: fPtr(owner.fPtr), fAdminBlock(owner.fAdminBlock)
+		:
+		fPtr(owner.fPtr),
+		fAdminBlock(owner.fAdminBlock)
 	{
 		fAdminBlock->Borrow();
 	}
@@ -263,15 +221,16 @@ public:
 
 
 	BBorrow(BBorrow&& other) noexcept
-		: fPtr(other.fPtr), fAdminBlock(other.fAdminBlock)
+		:
+		fPtr(other.fPtr),
+		fAdminBlock(other.fAdminBlock)
 	{
 		other.fPtr = nullptr;
 		other.fAdminBlock = nullptr;
 	}
 
 
-	BBorrow&
-	operator=(BBorrow&& other) noexcept
+	BBorrow& operator=(BBorrow&& other) noexcept
 	{
 		if (fAdminBlock)
 			fAdminBlock->Return();
@@ -291,15 +250,10 @@ public:
 	}
 
 
-	bool
-	HasValue() const noexcept
-	{
-		return bool(fPtr);
-	}
+	bool HasValue() const noexcept { return bool(fPtr); }
 
 
-	T&
-	operator*() const
+	T& operator*() const
 	{
 		if (fPtr)
 			return *fPtr;
@@ -307,8 +261,7 @@ public:
 	}
 
 
-	T*
-	operator->() const
+	T* operator->() const
 	{
 		if (fPtr)
 			return fPtr;
@@ -316,8 +269,7 @@ public:
 	}
 
 
-	void
-	Return() noexcept
+	void Return() noexcept
 	{
 		if (fAdminBlock)
 			fAdminBlock->Return();
@@ -327,9 +279,9 @@ public:
 };
 
 
-template<class T, class ..._Args>
+template<class T, class... _Args>
 BExclusiveBorrow<T>
-make_exclusive_borrow(_Args&& ...__args)
+make_exclusive_borrow(_Args&&... __args)
 {
 	auto guardedObject = std::make_unique<T>(std::forward<_Args>(__args)...);
 	auto retval = BExclusiveBorrow<T>(guardedObject.get());

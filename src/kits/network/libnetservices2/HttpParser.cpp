@@ -8,8 +8,8 @@
 
 #include "HttpParser.h"
 
-#include <string>
 #include <stdexcept>
+#include <string>
 
 #include <HttpFields.h>
 #include <NetServicesDefs.h>
@@ -103,13 +103,13 @@ HttpParser::ParseFields(HttpBuffer& buffer, BHttpFields& fields)
 
 	auto fieldLine = buffer.GetNextLine();
 
-	while (fieldLine && !fieldLine.value().IsEmpty()){
+	while (fieldLine && !fieldLine.value().IsEmpty()) {
 		// Parse next header line
 		fields.AddField(fieldLine.value());
 		fieldLine = buffer.GetNextLine();
 	}
 
-	if (!fieldLine || (fieldLine && !fieldLine.value().IsEmpty())){
+	if (!fieldLine || (fieldLine && !fieldLine.value().IsEmpty())) {
 		// there is more to parse
 		return false;
 	}
@@ -117,15 +117,14 @@ HttpParser::ParseFields(HttpBuffer& buffer, BHttpFields& fields)
 	// Determine the properties for the body
 	// RFC 7230 section 3.3.3 has a prioritized list of 7 rules around determining the body:
 	std::optional<off_t> bodyBytesTotal = std::nullopt;
-	if (fBodyType == HttpBodyType::NoContent
-		|| fStatus.StatusCode() == BHttpStatusCode::NoContent
+	if (fBodyType == HttpBodyType::NoContent || fStatus.StatusCode() == BHttpStatusCode::NoContent
 		|| fStatus.StatusCode() == BHttpStatusCode::NotModified) {
-		// [1] In case of HEAD (set previously), status codes 1xx (TODO!), status code 204 or 304, no content
-		// [2] NOT SUPPORTED: when doing a CONNECT request, no content
+		// [1] In case of HEAD (set previously), status codes 1xx (TODO!), status code 204 or 304,
+		// no content [2] NOT SUPPORTED: when doing a CONNECT request, no content
 		fBodyType = HttpBodyType::NoContent;
 		fStreamState = HttpInputStreamState::Done;
 	} else if (auto header = fields.FindField("Transfer-Encoding"sv);
-		header != fields.end() && header->Value() == "chunked"sv) {
+			   header != fields.end() && header->Value() == "chunked"sv) {
 		// [3] If there is a Transfer-Encoding heading set to 'chunked'
 		// TODO: support the more advanced rules in the RFC around the meaning of this field
 		fBodyType = HttpBodyType::Chunked;
@@ -157,8 +156,7 @@ HttpParser::ParseFields(HttpBuffer& buffer, BHttpFields& fields)
 				fStreamState = HttpInputStreamState::Body;
 			}
 		} catch (const std::logic_error& e) {
-			throw BNetworkRequestError(__PRETTY_FUNCTION__,
-				BNetworkRequestError::ProtocolError,
+			throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError,
 				"Cannot parse Content-Length field value (logic_error)");
 		}
 	} else {
@@ -186,9 +184,7 @@ HttpParser::ParseFields(HttpBuffer& buffer, BHttpFields& fields)
 
 	// Check Content-Encoding for compression
 	auto header = fields.FindField("Content-Encoding"sv);
-	if (header != fields.end()
-		&& (header->Value() == "gzip" || header->Value() == "deflate"))
-	{
+	if (header != fields.end() && (header->Value() == "gzip" || header->Value() == "deflate")) {
 		fBodyParser = std::make_unique<HttpBodyDecompression>(std::move(fBodyParser));
 	}
 
@@ -295,7 +291,6 @@ HttpBodyParser::TransferredBodySize() const noexcept
 */
 HttpRawBodyParser::HttpRawBodyParser()
 {
-
 }
 
 
@@ -306,7 +301,6 @@ HttpRawBodyParser::HttpRawBodyParser(off_t bodyBytesTotal)
 	:
 	fBodyBytesTotal(bodyBytesTotal)
 {
-
 }
 
 
@@ -397,95 +391,96 @@ HttpChunkedBodyParser::ParseBody(HttpBuffer& buffer, HttpTransferFunction writeT
 	size_t totalBytesRead = 0;
 	while (buffer.RemainingBytes() > 0) {
 		switch (fChunkParserState) {
-		case ChunkSize:
-		{
-			// Read the next chunk size from the buffer; if unsuccesful wait for more data
-			auto chunkSizeString = buffer.GetNextLine();
-			if (!chunkSizeString)
-				return {totalBytesRead, totalBytesRead, false};
-			auto chunkSizeStr = std::string(chunkSizeString.value().String());
-			try {
-				size_t pos = 0;
-				fRemainingChunkSize = std::stoll(chunkSizeStr, &pos, 16);
-				if (pos < chunkSizeStr.size() && chunkSizeStr[pos] != ';'){
-					throw BNetworkRequestError(__PRETTY_FUNCTION__,
-						BNetworkRequestError::ProtocolError);
+			case ChunkSize:
+			{
+				// Read the next chunk size from the buffer; if unsuccesful wait for more data
+				auto chunkSizeString = buffer.GetNextLine();
+				if (!chunkSizeString)
+					return {totalBytesRead, totalBytesRead, false};
+				auto chunkSizeStr = std::string(chunkSizeString.value().String());
+				try {
+					size_t pos = 0;
+					fRemainingChunkSize = std::stoll(chunkSizeStr, &pos, 16);
+					if (pos < chunkSizeStr.size() && chunkSizeStr[pos] != ';') {
+						throw BNetworkRequestError(
+							__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+					}
+				} catch (const std::invalid_argument&) {
+					throw BNetworkRequestError(
+						__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+				} catch (const std::out_of_range&) {
+					throw BNetworkRequestError(
+						__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
 				}
-			} catch (const std::invalid_argument&) {
-				throw BNetworkRequestError(__PRETTY_FUNCTION__,
-					BNetworkRequestError::ProtocolError);
-			} catch (const std::out_of_range&) {
-				throw BNetworkRequestError(__PRETTY_FUNCTION__,
-					BNetworkRequestError::ProtocolError);
+
+				if (fRemainingChunkSize > 0)
+					fChunkParserState = Chunk;
+				else
+					fChunkParserState = Trailers;
+				break;
 			}
 
-			if (fRemainingChunkSize > 0)
-				fChunkParserState = Chunk;
-			else
-				fChunkParserState = Trailers;
-			break;
-		}
+			case Chunk:
+			{
+				size_t bytesToRead;
+				if (fRemainingChunkSize > static_cast<off_t>(buffer.RemainingBytes()))
+					bytesToRead = buffer.RemainingBytes();
+				else
+					bytesToRead = fRemainingChunkSize;
 
-		case Chunk:
-		{
-			size_t bytesToRead;
-			if (fRemainingChunkSize > static_cast<off_t>(buffer.RemainingBytes()))
-				bytesToRead = buffer.RemainingBytes();
-			else
-				bytesToRead = fRemainingChunkSize;
+				auto bytesRead = buffer.WriteTo(writeToBody, bytesToRead);
+				if (bytesRead != bytesToRead) {
+					// Fail if not all expected bytes are written.
+					throw BNetworkRequestError(__PRETTY_FUNCTION__,
+						BNetworkRequestError::SystemError,
+						"Could not write all available body bytes to the target.");
+				}
 
-			auto bytesRead = buffer.WriteTo(writeToBody, bytesToRead);
-			if (bytesRead != bytesToRead) {
-				// Fail if not all expected bytes are written.
-				throw BNetworkRequestError(__PRETTY_FUNCTION__, BNetworkRequestError::SystemError,
-					"Could not write all available body bytes to the target.");
+				fTransferredBodySize += bytesRead;
+				totalBytesRead += bytesRead;
+				fRemainingChunkSize -= bytesRead;
+				if (fRemainingChunkSize == 0)
+					fChunkParserState = ChunkEnd;
+				break;
 			}
 
-			fTransferredBodySize += bytesRead;
-			totalBytesRead += bytesRead;
-			fRemainingChunkSize -= bytesRead;
-			if (fRemainingChunkSize == 0)
-				fChunkParserState = ChunkEnd;
-			break;
-		}
+			case ChunkEnd:
+			{
+				if (buffer.RemainingBytes() < 2) {
+					// not enough data in the buffer to finish the chunk
+					return {totalBytesRead, totalBytesRead, false};
+				}
+				auto chunkEndString = buffer.GetNextLine();
+				if (!chunkEndString || chunkEndString.value().Length() != 0) {
+					// There should have been an empty chunk
+					throw BNetworkRequestError(
+						__PRETTY_FUNCTION__, BNetworkRequestError::ProtocolError);
+				}
 
-		case ChunkEnd:
-		{
-			if (buffer.RemainingBytes() < 2) {
-				// not enough data in the buffer to finish the chunk
-				return {totalBytesRead, totalBytesRead, false};
-			}
-			auto chunkEndString = buffer.GetNextLine();
-			if (!chunkEndString || chunkEndString.value().Length() != 0) {
-				// There should have been an empty chunk
-				throw BNetworkRequestError(__PRETTY_FUNCTION__,
-					BNetworkRequestError::ProtocolError);
+				fChunkParserState = ChunkSize;
+				break;
 			}
 
-			fChunkParserState = ChunkSize;
-			break;
-		}
+			case Trailers:
+			{
+				auto trailerString = buffer.GetNextLine();
+				if (!trailerString) {
+					// More data to come
+					return {totalBytesRead, totalBytesRead, false};
+				}
 
-		case Trailers:
-		{
-			auto trailerString = buffer.GetNextLine();
-			if (!trailerString)  {
-				// More data to come
-				return {totalBytesRead, totalBytesRead, false};
+				if (trailerString.value().Length() > 0) {
+					// Ignore empty trailers for now
+					// TODO: review if the API should support trailing headers
+				} else {
+					fChunkParserState = Complete;
+					return {totalBytesRead, totalBytesRead, true};
+				}
+				break;
 			}
 
-			if (trailerString.value().Length() > 0) {
-				// Ignore empty trailers for now
-				// TODO: review if the API should support trailing headers
-			} else {
-				fChunkParserState = Complete;
+			case Complete:
 				return {totalBytesRead, totalBytesRead, true};
-			}
-			break;
-		}
-
-		case Complete:
-			return {totalBytesRead, totalBytesRead, true};
 		}
 	}
 	return {totalBytesRead, totalBytesRead, false};
@@ -501,12 +496,11 @@ HttpBodyDecompression::HttpBodyDecompression(std::unique_ptr<HttpBodyParser> bod
 	fDecompressorStorage = std::make_unique<BMallocIO>();
 
 	BDataIO* stream = nullptr;
-	auto result = BZlibCompressionAlgorithm()
-		.CreateDecompressingOutputStream(fDecompressorStorage.get(), nullptr, stream);
+	auto result = BZlibCompressionAlgorithm().CreateDecompressingOutputStream(
+		fDecompressorStorage.get(), nullptr, stream);
 
 	if (result != B_OK) {
-		throw BNetworkRequestError(
-			"BZlibCompressionAlgorithm().CreateCompressingOutputStream",
+		throw BNetworkRequestError("BZlibCompressionAlgorithm().CreateCompressingOutputStream",
 			BNetworkRequestError::SystemError, result);
 	}
 
@@ -537,30 +531,34 @@ BodyParseResult
 HttpBodyDecompression::ParseBody(HttpBuffer& buffer, HttpTransferFunction writeToBody, bool readEnd)
 {
 	// Get the underlying raw or chunked parser to write data to our decompressionstream
-	auto parseResults = fBodyParser->ParseBody(buffer, [this](const std::byte* buffer, size_t bufferSize){
-		auto status = fDecompressingStream->WriteExactly(buffer, bufferSize);
-		if (status != B_OK) {
-			throw BNetworkRequestError("BDataIO::WriteExactly()",
-				BNetworkRequestError::SystemError, status);
-		}
-		return bufferSize;
-	}, readEnd);
+	auto parseResults = fBodyParser->ParseBody(
+		buffer,
+		[this](const std::byte* buffer, size_t bufferSize) {
+			auto status = fDecompressingStream->WriteExactly(buffer, bufferSize);
+			if (status != B_OK) {
+				throw BNetworkRequestError(
+					"BDataIO::WriteExactly()", BNetworkRequestError::SystemError, status);
+			}
+			return bufferSize;
+		},
+		readEnd);
 	fTransferredBodySize += parseResults.bytesParsed;
 
 	if (readEnd || parseResults.complete) {
 		// No more bytes expected so flush out the final bytes
 		if (auto status = fDecompressingStream->Flush(); status != B_OK) {
-			throw BNetworkRequestError("BZlibDecompressionStream::Flush()",
-			BNetworkRequestError::SystemError, status);
+			throw BNetworkRequestError(
+				"BZlibDecompressionStream::Flush()", BNetworkRequestError::SystemError, status);
 		}
 	}
 
 	size_t bytesWritten = 0;
 	if (auto bodySize = fDecompressorStorage->Position(); bodySize > 0) {
-		bytesWritten = writeToBody(static_cast<const std::byte*>(fDecompressorStorage->Buffer()), bodySize);
+		bytesWritten
+			= writeToBody(static_cast<const std::byte*>(fDecompressorStorage->Buffer()), bodySize);
 		if (static_cast<off_t>(bytesWritten) != bodySize) {
-			throw BNetworkRequestError(__PRETTY_FUNCTION__,
-				BNetworkRequestError::SystemError, B_PARTIAL_WRITE);
+			throw BNetworkRequestError(
+				__PRETTY_FUNCTION__, BNetworkRequestError::SystemError, B_PARTIAL_WRITE);
 		}
 		fDecompressorStorage->Seek(0, SEEK_SET);
 	}

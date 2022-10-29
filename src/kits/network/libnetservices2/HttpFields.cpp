@@ -52,12 +52,8 @@ validate_value_string(const std::string_view& string)
 static inline bool
 iequals(const std::string_view& a, const std::string_view& b)
 {
-	return std::equal(
-		a.begin(), a.end(),
-		b.begin(), b.end(),
-		[](char a, char b) {
-			return tolower(a) == tolower(b);
-	});
+	return std::equal(a.begin(), a.end(), b.begin(), b.end(),
+		[](char a, char b) { return tolower(a) == tolower(b); });
 }
 
 
@@ -79,7 +75,8 @@ trim(std::string_view in)
 	}
 
 	auto right = in.end() - 1;
-	for (; right > left && isspace(*right); --right);
+	for (; right > left && isspace(*right); --right)
+		;
 
 	return std::string_view(left, std::distance(left, right) + 1);
 }
@@ -93,7 +90,6 @@ BHttpFields::InvalidInput::InvalidInput(const char* origin, BString input)
 	BError(origin),
 	input(std::move(input))
 {
-
 }
 
 
@@ -117,16 +113,16 @@ BHttpFields::InvalidInput::DebugMessage() const
 
 
 BHttpFields::FieldName::FieldName() noexcept
-	: fName(std::string_view())
+	:
+	fName(std::string_view())
 {
-
 }
 
 
 BHttpFields::FieldName::FieldName(const std::string_view& name) noexcept
-	: fName(name)
+	:
+	fName(name)
 {
-
 }
 
 
@@ -144,17 +140,18 @@ BHttpFields::FieldName::FieldName(const FieldName& other) noexcept = default;
 	longer be used as an entry in a BHttpFields object.
 */
 BHttpFields::FieldName::FieldName(FieldName&& other) noexcept
-	: fName(std::move(other.fName))
+	:
+	fName(std::move(other.fName))
 {
 	other.fName = std::string_view();
 }
 
 
 /*!
-	\brief Copy assignment; 
+	\brief Copy assignment;
 */
-BHttpFields::FieldName&
-BHttpFields::FieldName::operator=(const BHttpFields::FieldName& other) noexcept = default;
+BHttpFields::FieldName& BHttpFields::FieldName::operator=(
+	const BHttpFields::FieldName& other) noexcept = default;
 
 
 /*!
@@ -204,9 +201,10 @@ BHttpFields::FieldName::operator std::string_view() const
 
 
 BHttpFields::Field::Field() noexcept
-	: fName(std::string_view()), fValue(std::string_view())
+	:
+	fName(std::string_view()),
+	fValue(std::string_view())
 {
-
 }
 
 
@@ -250,7 +248,9 @@ BHttpFields::Field::Field(BString& field)
 
 
 BHttpFields::Field::Field(const BHttpFields::Field& other)
-	: fName(std::string_view()), fValue(std::string_view())
+	:
+	fName(std::string_view()),
+	fValue(std::string_view())
 {
 	if (other.IsEmpty()) {
 		fRawField = BString();
@@ -267,7 +267,10 @@ BHttpFields::Field::Field(const BHttpFields::Field& other)
 
 
 BHttpFields::Field::Field(BHttpFields::Field&& other) noexcept
-	: fRawField(std::move(other.fRawField)), fName(std::move(other.fName)), fValue(std::move(other.fValue))
+	:
+	fRawField(std::move(other.fRawField)),
+	fName(std::move(other.fName)),
+	fValue(std::move(other.fValue))
 {
 	other.fName.fName = std::string_view();
 	other.fValue = std::string_view();
@@ -341,7 +344,6 @@ BHttpFields::Field::IsEmpty() const noexcept
 
 BHttpFields::BHttpFields()
 {
-
 }
 
 
@@ -355,7 +357,8 @@ BHttpFields::BHttpFields(const BHttpFields& other) = default;
 
 
 BHttpFields::BHttpFields(BHttpFields&& other)
-	: fFields(std::move(other.fFields))
+	:
+	fFields(std::move(other.fFields))
 {
 	// Explicitly clear the other list, as the C++ standard does not specify that the other list
 	// will be empty.
@@ -365,19 +368,17 @@ BHttpFields::BHttpFields(BHttpFields&& other)
 
 BHttpFields::~BHttpFields() noexcept
 {
-
 }
 
 
-BHttpFields&
-BHttpFields::operator=(const BHttpFields& other) = default;
+BHttpFields& BHttpFields::operator=(const BHttpFields& other) = default;
 
 
 BHttpFields&
 BHttpFields::operator=(BHttpFields&& other) noexcept
 {
 	fFields = std::move(other.fFields);
-	
+
 	// Explicitly clear the other list, as the C++ standard does not specify that the other list
 	// will be empty.
 	other.fFields.clear();
@@ -423,7 +424,7 @@ BHttpFields::AddFields(std::initializer_list<Field> fields)
 void
 BHttpFields::RemoveField(const std::string_view& name) noexcept
 {
-	for(auto it = FindField(name); it != end(); it = FindField(name)) {
+	for (auto it = FindField(name); it != end(); it = FindField(name)) {
 		fFields.erase(it);
 	}
 }

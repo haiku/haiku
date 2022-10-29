@@ -22,19 +22,18 @@ class BHttpFields;
 struct HttpResultPrivate;
 
 
-struct BHttpBody
-{
-	std::optional<BString>	text;
+struct BHttpBody {
+			std::optional<BString> text;
 };
 
 
 enum class BHttpStatusClass : int16 {
-	Invalid			= 000,
-	Informational 	= 100,
-	Success			= 200,
-	Redirection		= 300,
-	ClientError		= 400,
-	ServerError		= 500
+	Invalid = 000,
+	Informational = 100,
+	Success = 200,
+	Redirection = 300,
+	ClientError = 400,
+	ServerError = 500
 };
 
 
@@ -93,14 +92,13 @@ enum class BHttpStatusCode : int16 {
 };
 
 
-struct BHttpStatus
-{ 
-	int16				code = 0;
-	BString				text;
+struct BHttpStatus {
+			int16				code = 0;
+			BString				text;
 
 	// Helpers
-	BHttpStatusClass	StatusClass() const noexcept;
-	BHttpStatusCode		StatusCode() const noexcept;
+			BHttpStatusClass	StatusClass() const noexcept;
+			BHttpStatusCode		StatusCode() const noexcept;
 };
 
 
@@ -108,32 +106,32 @@ class BHttpResult
 {
 public:
 	// Constructors and destructor
-										BHttpResult(const BHttpResult& other) = delete;
-										BHttpResult(BHttpResult&& other) noexcept;
-										~BHttpResult();
+								BHttpResult(const BHttpResult& other) = delete;
+								BHttpResult(BHttpResult&& other) noexcept;
+								~BHttpResult();
 
 	// Assignment operators
-			BHttpResult&				operator=(const BHttpResult& other) = delete;
-			BHttpResult&				operator=(BHttpResult&& other) noexcept;
+			BHttpResult&		operator=(const BHttpResult& other) = delete;
+			BHttpResult&		operator=(BHttpResult&& other) noexcept;
 
 	// Blocking Access Functions
-	const	BHttpStatus&				Status() const;
-	const	BHttpFields&				Fields() const;
-			BHttpBody&					Body() const;
+			const BHttpStatus&	Status() const;
+			const BHttpFields&	Fields() const;
+			BHttpBody&			Body() const;
 
 	// Check if data is available yet
-			bool						HasStatus() const;
-			bool						HasFields() const;
-			bool						HasBody() const;
-			bool						IsCompleted() const;
+			bool				HasStatus() const;
+			bool				HasFields() const;
+			bool				HasBody() const;
+			bool				IsCompleted() const;
 
 	// Identity
-			int32						Identity() const;
+			int32				Identity() const;
 
 private:
 	friend class BHttpSession;
-										BHttpResult(std::shared_ptr<HttpResultPrivate> data);
-	std::shared_ptr<HttpResultPrivate>	fData;
+								BHttpResult(std::shared_ptr<HttpResultPrivate> data);
+			std::shared_ptr<HttpResultPrivate> fData;
 };
 
 

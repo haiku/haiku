@@ -12,16 +12,16 @@
 class HttpDebugLogger : public BLooper
 {
 public:
-					HttpDebugLogger();
-			void	SetConsoleLogging(bool enabled = true);
-			void	SetFileLogging(const char* path);
+								HttpDebugLogger();
+			void				SetConsoleLogging(bool enabled = true);
+			void				SetFileLogging(const char* path);
 
 protected:
-	virtual	void	MessageReceived(BMessage* message) override;
+	virtual	void				MessageReceived(BMessage* message) override;
 
 private:
-			bool	fConsoleLogging = false;
-			BFile	fLogFile;
+			bool				fConsoleLogging = false;
+			BFile				fLogFile;
 };
 
 #endif // HTTP_DEBUG_LOGGER_H

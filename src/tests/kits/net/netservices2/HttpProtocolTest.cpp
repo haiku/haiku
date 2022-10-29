@@ -47,7 +47,6 @@ constexpr bool LOG_TO_CONSOLE = false;
 
 HttpProtocolTest::HttpProtocolTest()
 {
-
 }
 
 
@@ -147,14 +146,11 @@ HttpProtocolTest::HttpFieldsTest()
 	}
 
 	// Set up a generic set of headers for further use
-	const BHttpFields defaultFields = {
-		{"Host"sv, "haiku-os.org"sv},
-		{"Accept"sv, "*/*"sv},
+	const BHttpFields defaultFields = {{"Host"sv, "haiku-os.org"sv}, {"Accept"sv, "*/*"sv},
 		{"Set-Cookie"sv, "qwerty=494793ddkl; Domain=haiku-os.co.uk"sv},
 		{"Set-Cookie"sv, "afbzyi=0kdnke0lyv; Domain=haiku-os.co.uk"sv},
-		{},	// Empty; should be ignored by the constructor
-		{"Accept-Encoding"sv, "gzip"sv}
-	};
+		{}, // Empty; should be ignored by the constructor
+		{"Accept-Encoding"sv, "gzip"sv}};
 
 	// Validate std::initializer_list constructor
 	CPPUNIT_ASSERT_EQUAL(5, defaultFields.CountFields());
@@ -216,12 +212,8 @@ HttpProtocolTest::HttpFieldsTest()
 
 	// Iterate through the fields using a constant iterator
 	{
-		const BHttpFields fields = {
-			{"key1"sv, "value1"sv},
-			{"key2"sv, "value2"sv},
-			{"key3"sv, "value3"sv},
-			{"key4"sv, "value4"sv}
-		};
+		const BHttpFields fields = {{"key1"sv, "value1"sv}, {"key2"sv, "value2"sv},
+			{"key3"sv, "value3"sv}, {"key4"sv, "value4"sv}};
 
 		auto count = 0L;
 		for (const auto& field: fields) {
@@ -283,12 +275,11 @@ HttpProtocolTest::HttpMethodTest()
 }
 
 
-constexpr std::string_view kExpectedRequestText =
-	"GET / HTTP/1.1\r\n"
-	"Host: www.haiku-os.org\r\n"
-	"Accept-Encoding: gzip\r\n"
-	"Connection: close\r\n"
-	"Api-Key: 01234567890abcdef\r\n\r\n";
+constexpr std::string_view kExpectedRequestText = "GET / HTTP/1.1\r\n"
+												  "Host: www.haiku-os.org\r\n"
+												  "Accept-Encoding: gzip\r\n"
+												  "Connection: close\r\n"
+												  "Api-Key: 01234567890abcdef\r\n\r\n";
 
 
 void
@@ -323,16 +314,11 @@ HttpProtocolTest::HttpRequestTest()
 void
 HttpProtocolTest::HttpTimeTest()
 {
-	const std::vector<BString> kValidTimeStrings = {
-		"Sun, 07 Dec 2003 16:01:00 GMT",
-		"Sun, 07 Dec 2003 16:01:00",
-		"Sunday, 07-Dec-03 16:01:00 GMT",
-		"Sunday, 07-Dec-03 16:01:00 GMT",
-		"Sunday, 07-Dec-2003 16:01:00",
-		"Sunday, 07-Dec-2003 16:01:00 GMT",
-		"Sunday, 07-Dec-2003 16:01:00 UTC",
-		"Sun Dec  7 16:01:00 2003"
-	};
+	const std::vector<BString> kValidTimeStrings
+		= {"Sun, 07 Dec 2003 16:01:00 GMT", "Sun, 07 Dec 2003 16:01:00",
+			"Sunday, 07-Dec-03 16:01:00 GMT", "Sunday, 07-Dec-03 16:01:00 GMT",
+			"Sunday, 07-Dec-2003 16:01:00", "Sunday, 07-Dec-2003 16:01:00 GMT",
+			"Sunday, 07-Dec-2003 16:01:00 UTC", "Sun Dec  7 16:01:00 2003"};
 	const BDateTime kExpectedDateTime = {BDate{2003, 12, 7}, BTime{16, 01, 0}};
 
 	for (const auto& timeString: kValidTimeStrings) {
@@ -340,9 +326,9 @@ HttpProtocolTest::HttpTimeTest()
 	}
 
 	const std::vector<BString> kInvalidTimeStrings = {
-		"Sun, 07 Dec 2003",					// Date only
-		"Sun, 07 Dec 2003 16:01:00 BST",	// Invalid timezone
-		"On Sun, 07 Dec 2003 16:01:00 GMT",	// Extra data in front of the string
+		"Sun, 07 Dec 2003", // Date only
+		"Sun, 07 Dec 2003 16:01:00 BST", // Invalid timezone
+		"On Sun, 07 Dec 2003 16:01:00 GMT", // Extra data in front of the string
 	};
 
 	for (const auto& timeString: kInvalidTimeStrings) {
@@ -357,8 +343,8 @@ HttpProtocolTest::HttpTimeTest()
 	}
 
 	// Validate format_http_time()
-	CPPUNIT_ASSERT_EQUAL(BString("Sun, 07 Dec 2003 16:01:00 GMT"),
-		format_http_time(kExpectedDateTime));
+	CPPUNIT_ASSERT_EQUAL(
+		BString("Sun, 07 Dec 2003 16:01:00 GMT"), format_http_time(kExpectedDateTime));
 	CPPUNIT_ASSERT_EQUAL(BString("Sunday, 07-Dec-03 16:01:00 GMT"),
 		format_http_time(kExpectedDateTime, BHttpTimeFormat::RFC850));
 	CPPUNIT_ASSERT_EQUAL(BString("Sun Dec  7 16:01:00 2003"),
@@ -387,16 +373,18 @@ HttpProtocolTest::AddTests(BTestSuite& parent)
 // Observer test
 
 #include <iostream>
-class ObserverHelper : public BLooper {
+class ObserverHelper : public BLooper
+{
 public:
 	ObserverHelper()
-		: BLooper("ObserverHelper") {}
-
-	void MessageReceived(BMessage* msg) override {
-		messages.emplace_back(*msg);
+		:
+		BLooper("ObserverHelper")
+	{
 	}
 
-	std::vector<BMessage>	messages;
+	void MessageReceived(BMessage* msg) override { messages.emplace_back(*msg); }
+
+	std::vector<BMessage> messages;
 };
 
 
@@ -404,7 +392,8 @@ public:
 
 
 HttpIntegrationTest::HttpIntegrationTest(TestServerMode mode)
-	: fTestServer(mode)
+	:
+	fTestServer(mode)
 {
 	// increase number of concurrent connections to 4 (from 2)
 	fSession.SetMaxConnectionsPerHost(4);
@@ -425,10 +414,7 @@ HttpIntegrationTest::HttpIntegrationTest(TestServerMode mode)
 void
 HttpIntegrationTest::setUp()
 {
-	CPPUNIT_ASSERT_EQUAL_MESSAGE(
-		"Starting up test server",
-		B_OK,
-		fTestServer.Start());
+	CPPUNIT_ASSERT_EQUAL_MESSAGE("Starting up test server", B_OK, fTestServer.Start());
 }
 
 
@@ -454,8 +440,8 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 			= new BThreadedTestCaller<HttpIntegrationTest>("HttpTest::", httpIntegrationTest);
 
 		// HTTP
-		testCaller->addThread("HostAndNetworkFailTest",
-			&HttpIntegrationTest::HostAndNetworkFailTest);
+		testCaller->addThread(
+			"HostAndNetworkFailTest", &HttpIntegrationTest::HostAndNetworkFailTest);
 		testCaller->addThread("GetTest", &HttpIntegrationTest::GetTest);
 		testCaller->addThread("GetWithBufferTest", &HttpIntegrationTest::GetWithBufferTest);
 		testCaller->addThread("HeadTest", &HttpIntegrationTest::HeadTest);
@@ -479,16 +465,16 @@ HttpIntegrationTest::AddTests(BTestSuite& parent)
 			= new BThreadedTestCaller<HttpIntegrationTest>("HttpsTest::", httpsIntegrationTest);
 
 		// HTTPS
-		testCaller->addThread("HostAndNetworkFailTest",
-			&HttpIntegrationTest::HostAndNetworkFailTest);
+		testCaller->addThread(
+			"HostAndNetworkFailTest", &HttpIntegrationTest::HostAndNetworkFailTest);
 		testCaller->addThread("GetTest", &HttpIntegrationTest::GetTest);
 		testCaller->addThread("GetWithBufferTest", &HttpIntegrationTest::GetWithBufferTest);
 		testCaller->addThread("HeadTest", &HttpIntegrationTest::HeadTest);
 		testCaller->addThread("NoContentTest", &HttpIntegrationTest::NoContentTest);
 		testCaller->addThread("AutoRedirectTest", &HttpIntegrationTest::AutoRedirectTest);
 		// testCaller->addThread("BasicAuthTest", &HttpIntegrationTest::BasicAuthTest);
-			// Skip BasicAuthTest for HTTPS: it seems like it does not close the socket properly,
-			// raising a SSL EOF error.
+		// Skip BasicAuthTest for HTTPS: it seems like it does not close the socket properly,
+		// raising a SSL EOF error.
 		testCaller->addThread("StopOnErrorTest", &HttpIntegrationTest::StopOnErrorTest);
 		testCaller->addThread("RequestCancelTest", &HttpIntegrationTest::RequestCancelTest);
 		testCaller->addThread("PostTest", &HttpIntegrationTest::PostTest);
@@ -538,15 +524,13 @@ static const BHttpFields kExpectedGetFields = {
 };
 
 
-constexpr std::string_view kExpectedGetBody = {
-	"Path: /\r\n"
-	"\r\n"
-	"Headers:\r\n"
-	"--------\r\n"
-	"Host: 127.0.0.1:PORT\r\n"
-	"Accept-Encoding: gzip\r\n"
-	"Connection: close\r\n"
-};
+constexpr std::string_view kExpectedGetBody = {"Path: /\r\n"
+											   "\r\n"
+											   "Headers:\r\n"
+											   "--------\r\n"
+											   "Host: 127.0.0.1:PORT\r\n"
+											   "Accept-Encoding: gzip\r\n"
+											   "Connection: close\r\n"};
 
 
 void
@@ -583,8 +567,8 @@ HttpIntegrationTest::GetWithBufferTest()
 	auto result = fSession.Execute(std::move(request), BBorrow<BDataIO>(body), fLoggerMessenger);
 	try {
 		result.Body();
-		auto bodyString = std::string(reinterpret_cast<const char*>(body->Buffer()),
-			body->BufferLength());
+		auto bodyString
+			= std::string(reinterpret_cast<const char*>(body->Buffer()), body->BufferLength());
 		CPPUNIT_ASSERT_EQUAL(kExpectedGetBody, bodyString);
 	} catch (const BPrivate::Network::BError& e) {
 		CPPUNIT_FAIL(e.DebugMessage().String());
@@ -597,7 +581,7 @@ HttpIntegrationTest::HeadTest()
 {
 	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/"));
 	request.SetMethod(BHttpMethod::Head);
-	auto result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
+	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	try {
 		auto receivedFields = result.Fields();
 		CPPUNIT_ASSERT_EQUAL_MESSAGE("Mismatch in number of headers",
@@ -627,7 +611,7 @@ void
 HttpIntegrationTest::NoContentTest()
 {
 	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/204"));
-	auto result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
+	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	try {
 		auto receivedStatus = result.Status();
 		CPPUNIT_ASSERT_EQUAL(204, receivedStatus.code);
@@ -654,7 +638,7 @@ void
 HttpIntegrationTest::AutoRedirectTest()
 {
 	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/302"));
-	auto result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
+	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	try {
 		auto receivedFields = result.Fields();
 
@@ -682,15 +666,15 @@ HttpIntegrationTest::BasicAuthTest()
 	// Basic Authentication
 	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/auth/basic/walter/secret"));
 	request.SetAuthentication({"walter", "secret"});
-	auto result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
+	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	CPPUNIT_ASSERT(result.Status().code == 200);
 
 	// Basic Authentication with incorrect credentials
 	try {
-	request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/auth/basic/walter/secret"));
-	request.SetAuthentication({"invaliduser", "invalidpassword"});
-	result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
-	CPPUNIT_ASSERT(result.Status().code == 401);
+		request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/auth/basic/walter/secret"));
+		request.SetAuthentication({"invaliduser", "invalidpassword"});
+		result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
+		CPPUNIT_ASSERT(result.Status().code == 401);
 	} catch (const BPrivate::Network::BError& e) {
 		CPPUNIT_FAIL(e.DebugMessage().String());
 	}
@@ -703,7 +687,7 @@ HttpIntegrationTest::StopOnErrorTest()
 	// Test the Stop on Error functionality
 	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/400"));
 	request.SetStopOnError(true);
-	auto result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
+	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	CPPUNIT_ASSERT(result.Status().code == 400);
 	CPPUNIT_ASSERT(result.Fields().CountFields() == 0);
 	CPPUNIT_ASSERT(result.Body().text->Length() == 0);
@@ -718,7 +702,7 @@ HttpIntegrationTest::RequestCancelTest()
 	//       processed. In practise, the cancellation always comes first. When the server
 	//       supports a wait parameter, then this test can be made more robust.
 	auto request = BHttpRequest(BUrl(fTestServer.BaseUrl(), "/"));
-	auto result = fSession.Execute(std::move(request),  nullptr, fLoggerMessenger);
+	auto result = fSession.Execute(std::move(request), nullptr, fLoggerMessenger);
 	fSession.Cancel(result);
 	try {
 		result.Body();
@@ -729,46 +713,45 @@ HttpIntegrationTest::RequestCancelTest()
 }
 
 
-static const BString kPostText =
-	"The MIT License\n"
-	"\n"
-	"Copyright (c) <year> <copyright holders>\n"
-	"\n"
-	"Permission is hereby granted, free of charge, to any person obtaining a copy\n"
-	"of this software and associated documentation files (the \"Software\"), to deal\n"
-	"in the Software without restriction, including without limitation the rights\n"
-	"to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n"
-	"copies of the Software, and to permit persons to whom the Software is\n"
-	"furnished to do so, subject to the following conditions:\n"
-	"\n"
-	"The above copyright notice and this permission notice shall be included in\n"
-	"all copies or substantial portions of the Software.\n"
-	"\n"
-	"THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n"
-	"IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n"
-	"FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n"
-	"AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n"
-	"LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n"
-	"OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n"
-	"THE SOFTWARE.\n"
-	"\n";
+static const BString kPostText
+	= "The MIT License\n"
+	  "\n"
+	  "Copyright (c) <year> <copyright holders>\n"
+	  "\n"
+	  "Permission is hereby granted, free of charge, to any person obtaining a copy\n"
+	  "of this software and associated documentation files (the \"Software\"), to deal\n"
+	  "in the Software without restriction, including without limitation the rights\n"
+	  "to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n"
+	  "copies of the Software, and to permit persons to whom the Software is\n"
+	  "furnished to do so, subject to the following conditions:\n"
+	  "\n"
+	  "The above copyright notice and this permission notice shall be included in\n"
+	  "all copies or substantial portions of the Software.\n"
+	  "\n"
+	  "THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n"
+	  "IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n"
+	  "FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n"
+	  "AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n"
+	  "LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n"
+	  "OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n"
+	  "THE SOFTWARE.\n"
+	  "\n";
 
 
-static BString kExpectedPostBody
-	= BString().SetToFormat(
-		"Path: /post\r\n"
-		"\r\n"
-		"Headers:\r\n"
-		"--------\r\n"
-		"Host: 127.0.0.1:PORT\r\n"
-		"Accept-Encoding: gzip\r\n"
-		"Connection: close\r\n"
-		"Content-Type: text/plain\r\n"
-		"Content-Length: 1083\r\n"
-		"\r\n"
-		"Request body:\r\n"
-		"-------------\r\n"
-		"%s\r\n", kPostText.String());
+static BString kExpectedPostBody = BString().SetToFormat("Path: /post\r\n"
+														 "\r\n"
+														 "Headers:\r\n"
+														 "--------\r\n"
+														 "Host: 127.0.0.1:PORT\r\n"
+														 "Accept-Encoding: gzip\r\n"
+														 "Connection: close\r\n"
+														 "Content-Type: text/plain\r\n"
+														 "Content-Length: 1083\r\n"
+														 "\r\n"
+														 "Request body:\r\n"
+														 "-------------\r\n"
+														 "%s\r\n",
+	kPostText.String());
 
 
 void
@@ -796,16 +779,15 @@ HttpIntegrationTest::PostTest()
 	usleep(2000); // give some time to catch up on receiving all messages
 
 	observer->Lock();
-	while (observer->IsMessageWaiting())
-	{
+	while (observer->IsMessageWaiting()) {
 		observer->Unlock();
 		usleep(1000); // give some time to catch up on receiving all messages
 		observer->Lock();
 	}
 
 	// Assert that the messages have the right contents.
-	CPPUNIT_ASSERT_MESSAGE("Expected at least 8 observer messages for this request.",
-		observer->messages.size() >= 8);
+	CPPUNIT_ASSERT_MESSAGE(
+		"Expected at least 8 observer messages for this request.", observer->messages.size() >= 8);
 
 	uint32 previousMessage = 0;
 	for (const auto& message: observer->messages) {
@@ -817,20 +799,20 @@ HttpIntegrationTest::PostTest()
 			continue;
 		}
 
-		switch(previousMessage) {
+		switch (previousMessage) {
 			case 0:
-				CPPUNIT_ASSERT_MESSAGE("message should be HostNameResolved",
-					HostNameResolved == message.what);
+				CPPUNIT_ASSERT_MESSAGE(
+					"message should be HostNameResolved", HostNameResolved == message.what);
 				break;
 
 			case HostNameResolved:
-				CPPUNIT_ASSERT_MESSAGE("message should be ConnectionOpened",
-					ConnectionOpened == message.what);
+				CPPUNIT_ASSERT_MESSAGE(
+					"message should be ConnectionOpened", ConnectionOpened == message.what);
 				break;
 
 			case ConnectionOpened:
-				CPPUNIT_ASSERT_MESSAGE("message should be UploadProgress",
-					UploadProgress == message.what);
+				CPPUNIT_ASSERT_MESSAGE(
+					"message should be UploadProgress", UploadProgress == message.what);
 				[[fallthrough]];
 
 			case UploadProgress:
@@ -851,20 +833,18 @@ HttpIntegrationTest::PostTest()
 				break;
 
 			case ResponseStarted:
-				CPPUNIT_ASSERT_MESSAGE("message should be HttpStatus",
-					HttpStatus == message.what);
+				CPPUNIT_ASSERT_MESSAGE("message should be HttpStatus", HttpStatus == message.what);
 				CPPUNIT_ASSERT_MESSAGE("message must have UrlEventData::HttpStatusCode data",
 					message.HasInt16(HttpStatusCode));
 				break;
 
 			case HttpStatus:
-				CPPUNIT_ASSERT_MESSAGE("message should be HttpFields",
-					HttpFields == message.what);
+				CPPUNIT_ASSERT_MESSAGE("message should be HttpFields", HttpFields == message.what);
 				break;
 
 			case HttpFields:
-				CPPUNIT_ASSERT_MESSAGE("message should be DownloadProgress",
-					DownloadProgress == message.what);
+				CPPUNIT_ASSERT_MESSAGE(
+					"message should be DownloadProgress", DownloadProgress == message.what);
 				[[fallthrough]];
 
 			case DownloadProgress:
@@ -883,12 +863,12 @@ HttpIntegrationTest::PostTest()
 					case RequestCompleted:
 						CPPUNIT_ASSERT_MESSAGE("message must have UrlEventData::Success data",
 							message.HasBool(Success));
-						CPPUNIT_ASSERT_MESSAGE("UrlEventData::Success must be true",
-							message.GetBool(Success));
+						CPPUNIT_ASSERT_MESSAGE(
+							"UrlEventData::Success must be true", message.GetBool(Success));
 						break;
 					default:
 						CPPUNIT_FAIL("Expected DownloadProgress, BytesWritten or HttpStatus "
-							"message");
+									 "message");
 				}
 				break;
 

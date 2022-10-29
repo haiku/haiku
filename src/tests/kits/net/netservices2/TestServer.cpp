@@ -23,8 +23,10 @@
 
 namespace {
 
-template <typename T>
-std::string to_string(T value)
+
+template<typename T>
+std::string
+to_string(T value)
 {
 	std::ostringstream s;
 	s << value;
@@ -32,7 +34,8 @@ std::string to_string(T value)
 }
 
 
-void exec(const std::vector<std::string>& args)
+void
+exec(const std::vector<std::string>& args)
 {
 	const char** argv = new const char*[args.size() + 1];
 	ArrayDeleter<const char*> _(argv);
@@ -47,9 +50,10 @@ void exec(const std::vector<std::string>& args)
 
 
 // Return the path of a file path relative to this source file.
-std::string TestFilePath(const std::string& relativePath)
+std::string
+TestFilePath(const std::string& relativePath)
 {
-	char *testFileSource = strdup(__FILE__);
+	char* testFileSource = strdup(__FILE__);
 	MemoryDeleter _(testFileSource);
 
 	std::string testSrcDir(::dirname(testFileSource));
@@ -57,7 +61,7 @@ std::string TestFilePath(const std::string& relativePath)
 	return testSrcDir + "/" + relativePath;
 }
 
-}
+} // namespace
 
 
 RandomTCPServerPort::RandomTCPServerPort()
@@ -70,10 +74,7 @@ RandomTCPServerPort::RandomTCPServerPort()
 	// kernel.
 	int socket_fd = ::socket(AF_INET, SOCK_STREAM, 0);
 	if (socket_fd == -1) {
-		fprintf(
-			stderr,
-			"ERROR: Unable to create socket: %s\n",
-			strerror(errno));
+		fprintf(stderr, "ERROR: Unable to create socket: %s\n", strerror(errno));
 		fInitStatus = B_ERROR;
 		return;
 	}
@@ -84,18 +85,10 @@ RandomTCPServerPort::RandomTCPServerPort()
 	// for reuse.
 	{
 		int reuse = 1;
-		int result = ::setsockopt(
-			socket_fd,
-			SOL_SOCKET,
-			SO_REUSEPORT,
-			&reuse,
-			sizeof(reuse));
+		int result = ::setsockopt(socket_fd, SOL_SOCKET, SO_REUSEPORT, &reuse, sizeof(reuse));
 		if (result == -1) {
 			fInitStatus = errno;
-			fprintf(
-				stderr,
-				"ERROR: Unable to set socket options on fd %d: %s\n",
-				socket_fd,
+			fprintf(stderr, "ERROR: Unable to set socket options on fd %d: %s\n", socket_fd,
 				strerror(fInitStatus));
 			return;
 		}
@@ -106,15 +99,10 @@ RandomTCPServerPort::RandomTCPServerPort()
 	server_address.sin_family = AF_INET;
 	server_address.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
 	int bind_result = ::bind(
-		socket_fd,
-		reinterpret_cast<struct sockaddr*>(&server_address),
-		sizeof(server_address));
+		socket_fd, reinterpret_cast<struct sockaddr*>(&server_address), sizeof(server_address));
 	if (bind_result == -1) {
 		fInitStatus = errno;
-		fprintf(
-			stderr,
-			"ERROR: Unable to bind to loopback interface: %s\n",
-			strerror(fInitStatus));
+		fprintf(stderr, "ERROR: Unable to bind to loopback interface: %s\n", strerror(fInitStatus));
 		return;
 	}
 
@@ -129,9 +117,7 @@ RandomTCPServerPort::RandomTCPServerPort()
 	// Now get the port from the socket.
 	socklen_t server_address_length = sizeof(server_address);
 	::getsockname(
-		socket_fd,
-		reinterpret_cast<struct sockaddr*>(&server_address),
-		&server_address_length);
+		socket_fd, reinterpret_cast<struct sockaddr*>(&server_address), &server_address_length);
 	fServerPort = ntohs(server_address.sin_port);
 
 	fInitStatus = B_OK;
@@ -148,19 +134,22 @@ RandomTCPServerPort::~RandomTCPServerPort()
 }
 
 
-status_t RandomTCPServerPort::InitCheck() const
+status_t
+RandomTCPServerPort::InitCheck() const
 {
 	return fInitStatus;
 }
 
 
-int RandomTCPServerPort::FileDescriptor() const
+int
+RandomTCPServerPort::FileDescriptor() const
 {
 	return fSocketFd;
 }
 
 
-uint16_t RandomTCPServerPort::Port() const
+uint16_t
+RandomTCPServerPort::Port() const
 {
 	return fServerPort;
 }
@@ -188,7 +177,8 @@ ChildProcess::~ChildProcess()
 
 // The job of this method is to spawn a child process that will later be killed
 // by the destructor.
-status_t ChildProcess::Start(const std::vector<std::string>& args)
+status_t
+ChildProcess::Start(const std::vector<std::string>& args)
 {
 	if (fChildPid != -1) {
 		return B_ALREADY_RUNNING;
@@ -209,17 +199,11 @@ status_t ChildProcess::Start(const std::vector<std::string>& args)
 	// If we reach this point we failed to load the Python image.
 	std::ostringstream ostr;
 
-	for (std::vector<std::string>::const_iterator iter = args.begin();
-		 iter != args.end();
-		 ++iter) {
+	for (std::vector<std::string>::const_iterator iter = args.begin(); iter != args.end(); ++iter) {
 		ostr << " " << *iter;
 	}
 
-	fprintf(
-		stderr,
-		"Unable to spawn `%s': %s\n",
-		ostr.str().c_str(),
-		strerror(errno));
+	fprintf(stderr, "Unable to spawn `%s': %s\n", ostr.str().c_str(), strerror(errno));
 	exit(1);
 }
 
@@ -233,7 +217,8 @@ TestServer::TestServer(TestServerMode mode)
 
 // Start a child testserver.py process with the random TCP port chosen by
 // fPort.
-status_t TestServer::Start()
+status_t
+TestServer::Start()
 {
 	if (fPort.InitCheck() != B_OK) {
 		return fPort.InitCheck();
@@ -241,10 +226,7 @@ status_t TestServer::Start()
 
 	auto testFilePath = TestFilePath("testserver.py");
 	if (::access(testFilePath.data(), R_OK) != 0) {
-		fprintf(
-			stderr,
-			"ERROR: No access to the test server script at: %s\n",
-			testFilePath.data()); 
+		fprintf(stderr, "ERROR: No access to the test server script at: %s\n", testFilePath.data());
 		return B_IO_ERROR;
 	}
 
@@ -272,17 +254,18 @@ status_t TestServer::Start()
 }
 
 
-BUrl TestServer::BaseUrl() const
+BUrl
+TestServer::BaseUrl() const
 {
 	std::string scheme;
-	switch(fMode) {
-	case TestServerMode::Http:
-		scheme = "http://";
-		break;
+	switch (fMode) {
+		case TestServerMode::Http:
+			scheme = "http://";
+			break;
 
-	case TestServerMode::Https:
-		scheme = "https://";
-		break;
+		case TestServerMode::Https:
+			scheme = "https://";
+			break;
 	}
 
 	std::string port_string = to_string(fPort.Port());
@@ -293,7 +276,8 @@ BUrl TestServer::BaseUrl() const
 
 
 // Start a child proxy.py process using the random TCP port chosen by fPort.
-status_t TestProxyServer::Start()
+status_t
+TestProxyServer::Start()
 {
 	if (fPort.InitCheck() != B_OK) {
 		return fPort.InitCheck();
@@ -301,10 +285,7 @@ status_t TestProxyServer::Start()
 
 	auto testFilePath = TestFilePath("proxy.py");
 	if (::access(testFilePath.data(), R_OK) != 0) {
-		fprintf(
-			stderr,
-			"ERROR: No access to the test server script at: %s\n",
-			testFilePath.data()); 
+		fprintf(stderr, "ERROR: No access to the test server script at: %s\n", testFilePath.data());
 		return B_IO_ERROR;
 	}
 
@@ -327,7 +308,8 @@ status_t TestProxyServer::Start()
 }
 
 
-uint16_t TestProxyServer::Port() const
+uint16_t
+TestProxyServer::Port() const
 {
 	return fPort.Port();
 }

@@ -22,53 +22,48 @@ class BHttpRequest;
 class BHttpResult;
 
 
-class BHttpSession {
+class BHttpSession
+{
 public:
 	// Constructors & Destructor
-							BHttpSession();
-							BHttpSession(const BHttpSession&) noexcept;
-							BHttpSession(BHttpSession&&) noexcept = delete;
-							~BHttpSession() noexcept;
+								BHttpSession();
+								BHttpSession(const BHttpSession&) noexcept;
+								BHttpSession(BHttpSession&&) noexcept = delete;
+								~BHttpSession() noexcept;
 
 	// Assignment operators
-	BHttpSession&			operator=(const BHttpSession&) noexcept;
-	BHttpSession&			operator=(BHttpSession&&) noexcept = delete;
+			BHttpSession&		operator=(const BHttpSession&) noexcept;
+			BHttpSession&		operator=(BHttpSession&&) noexcept = delete;
 
 	// Requests
-	BHttpResult				Execute(BHttpRequest&& request,
-								BBorrow<BDataIO> target = nullptr,
-								BMessenger observer = BMessenger());
-	void					Cancel(int32 identifier);
-	void					Cancel(const BHttpResult& request);
+			BHttpResult			Execute(BHttpRequest&& request, BBorrow<BDataIO> target = nullptr,
+									BMessenger observer = BMessenger());
+			void				Cancel(int32 identifier);
+			void				Cancel(const BHttpResult& request);
 
 	// Concurrency limits
-	void					SetMaxConnectionsPerHost(size_t maxConnections);
-	void					SetMaxHosts(size_t maxConnections);
+			void				SetMaxConnectionsPerHost(size_t maxConnections);
+			void				SetMaxHosts(size_t maxConnections);
 
 private:
 	struct Redirect;
 	class Request;
 	class Impl;
-	std::shared_ptr<Impl>	fImpl;
+			std::shared_ptr<Impl> fImpl;
 };
 
 
 namespace UrlEvent {
-	enum {
-		HttpStatus = '_HST',
-		HttpFields = '_HHF',
-		CertificateError = '_CER',
-		HttpRedirect = '_HRE'
-	};
+enum { HttpStatus = '_HST', HttpFields = '_HHF', CertificateError = '_CER', HttpRedirect = '_HRE' };
 }
 
 
 namespace UrlEventData {
-	extern const char* HttpStatusCode;
-	extern const char* SSLCertificate;
-	extern const char* SSLMessage;
-	extern const char* HttpRedirectUrl;
-}
+extern const char* HttpStatusCode;
+extern const char* SSLCertificate;
+extern const char* SSLMessage;
+extern const char* HttpRedirectUrl;
+} // namespace UrlEventData
 
 } // namespace Network
 

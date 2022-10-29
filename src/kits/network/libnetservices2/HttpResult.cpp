@@ -23,13 +23,18 @@ BHttpStatusClass
 BHttpStatus::StatusClass() const noexcept
 {
 	switch (code / 100) {
-	case 1: return BHttpStatusClass::Informational;
-	case 2: return BHttpStatusClass::Success;
-	case 3: return BHttpStatusClass::Redirection;
-	case 4: return BHttpStatusClass::ClientError;
-	case 5: return BHttpStatusClass::ServerError;
-	default:
-		break;
+		case 1:
+			return BHttpStatusClass::Informational;
+		case 2:
+			return BHttpStatusClass::Success;
+		case 3:
+			return BHttpStatusClass::Redirection;
+		case 4:
+			return BHttpStatusClass::ClientError;
+		case 5:
+			return BHttpStatusClass::ServerError;
+		default:
+			break;
 	}
 	return BHttpStatusClass::Invalid;
 }
@@ -39,59 +44,98 @@ BHttpStatusCode
 BHttpStatus::StatusCode() const noexcept
 {
 	switch (static_cast<BHttpStatusCode>(code)) {
-	// 1xx
-	case BHttpStatusCode::Continue: [[fallthrough]];
-	case BHttpStatusCode::SwitchingProtocols: [[fallthrough]];
+		// 1xx
+		case BHttpStatusCode::Continue:
+			[[fallthrough]];
+		case BHttpStatusCode::SwitchingProtocols:
+			[[fallthrough]];
 
-	// 2xx
-	case BHttpStatusCode::Ok: [[fallthrough]];
-	case BHttpStatusCode::Created: [[fallthrough]];
-	case BHttpStatusCode::Accepted: [[fallthrough]];
-	case BHttpStatusCode::NonAuthoritativeInformation: [[fallthrough]];
-	case BHttpStatusCode::NoContent: [[fallthrough]];
-	case BHttpStatusCode::ResetContent: [[fallthrough]];
-	case BHttpStatusCode::PartialContent: [[fallthrough]];
+		// 2xx
+		case BHttpStatusCode::Ok:
+			[[fallthrough]];
+		case BHttpStatusCode::Created:
+			[[fallthrough]];
+		case BHttpStatusCode::Accepted:
+			[[fallthrough]];
+		case BHttpStatusCode::NonAuthoritativeInformation:
+			[[fallthrough]];
+		case BHttpStatusCode::NoContent:
+			[[fallthrough]];
+		case BHttpStatusCode::ResetContent:
+			[[fallthrough]];
+		case BHttpStatusCode::PartialContent:
+			[[fallthrough]];
 
-	// 3xx
-	case BHttpStatusCode::MultipleChoice: [[fallthrough]];
-	case BHttpStatusCode::MovedPermanently: [[fallthrough]];
-	case BHttpStatusCode::Found: [[fallthrough]];
-	case BHttpStatusCode::SeeOther: [[fallthrough]];
-	case BHttpStatusCode::NotModified: [[fallthrough]];
-	case BHttpStatusCode::UseProxy: [[fallthrough]];
-	case BHttpStatusCode::TemporaryRedirect: [[fallthrough]];
-	case BHttpStatusCode::PermanentRedirect: [[fallthrough]];
+		// 3xx
+		case BHttpStatusCode::MultipleChoice:
+			[[fallthrough]];
+		case BHttpStatusCode::MovedPermanently:
+			[[fallthrough]];
+		case BHttpStatusCode::Found:
+			[[fallthrough]];
+		case BHttpStatusCode::SeeOther:
+			[[fallthrough]];
+		case BHttpStatusCode::NotModified:
+			[[fallthrough]];
+		case BHttpStatusCode::UseProxy:
+			[[fallthrough]];
+		case BHttpStatusCode::TemporaryRedirect:
+			[[fallthrough]];
+		case BHttpStatusCode::PermanentRedirect:
+			[[fallthrough]];
 
-	// 4xx
-	case BHttpStatusCode::BadRequest: [[fallthrough]];
-	case BHttpStatusCode::Unauthorized: [[fallthrough]];
-	case BHttpStatusCode::PaymentRequired: [[fallthrough]];
-	case BHttpStatusCode::Forbidden: [[fallthrough]];
-	case BHttpStatusCode::NotFound: [[fallthrough]];
-	case BHttpStatusCode::MethodNotAllowed: [[fallthrough]];
-	case BHttpStatusCode::NotAcceptable: [[fallthrough]];
-	case BHttpStatusCode::ProxyAuthenticationRequired: [[fallthrough]];
-	case BHttpStatusCode::RequestTimeout: [[fallthrough]];
-	case BHttpStatusCode::Conflict: [[fallthrough]];
-	case BHttpStatusCode::Gone: [[fallthrough]];
-	case BHttpStatusCode::LengthRequired: [[fallthrough]];
-	case BHttpStatusCode::PreconditionFailed: [[fallthrough]];
-	case BHttpStatusCode::RequestEntityTooLarge: [[fallthrough]];
-	case BHttpStatusCode::RequestUriTooLarge: [[fallthrough]];
-	case BHttpStatusCode::UnsupportedMediaType: [[fallthrough]];
-	case BHttpStatusCode::RequestedRangeNotSatisfiable: [[fallthrough]];
-	case BHttpStatusCode::ExpectationFailed: [[fallthrough]];
+		// 4xx
+		case BHttpStatusCode::BadRequest:
+			[[fallthrough]];
+		case BHttpStatusCode::Unauthorized:
+			[[fallthrough]];
+		case BHttpStatusCode::PaymentRequired:
+			[[fallthrough]];
+		case BHttpStatusCode::Forbidden:
+			[[fallthrough]];
+		case BHttpStatusCode::NotFound:
+			[[fallthrough]];
+		case BHttpStatusCode::MethodNotAllowed:
+			[[fallthrough]];
+		case BHttpStatusCode::NotAcceptable:
+			[[fallthrough]];
+		case BHttpStatusCode::ProxyAuthenticationRequired:
+			[[fallthrough]];
+		case BHttpStatusCode::RequestTimeout:
+			[[fallthrough]];
+		case BHttpStatusCode::Conflict:
+			[[fallthrough]];
+		case BHttpStatusCode::Gone:
+			[[fallthrough]];
+		case BHttpStatusCode::LengthRequired:
+			[[fallthrough]];
+		case BHttpStatusCode::PreconditionFailed:
+			[[fallthrough]];
+		case BHttpStatusCode::RequestEntityTooLarge:
+			[[fallthrough]];
+		case BHttpStatusCode::RequestUriTooLarge:
+			[[fallthrough]];
+		case BHttpStatusCode::UnsupportedMediaType:
+			[[fallthrough]];
+		case BHttpStatusCode::RequestedRangeNotSatisfiable:
+			[[fallthrough]];
+		case BHttpStatusCode::ExpectationFailed:
+			[[fallthrough]];
 
-	// 5xx
-	case BHttpStatusCode::InternalServerError: [[fallthrough]];
-	case BHttpStatusCode::NotImplemented: [[fallthrough]];
-	case BHttpStatusCode::BadGateway: [[fallthrough]];
-	case BHttpStatusCode::ServiceUnavailable: [[fallthrough]];
-	case BHttpStatusCode::GatewayTimeout:
-		return static_cast<BHttpStatusCode>(code);
+		// 5xx
+		case BHttpStatusCode::InternalServerError:
+			[[fallthrough]];
+		case BHttpStatusCode::NotImplemented:
+			[[fallthrough]];
+		case BHttpStatusCode::BadGateway:
+			[[fallthrough]];
+		case BHttpStatusCode::ServiceUnavailable:
+			[[fallthrough]];
+		case BHttpStatusCode::GatewayTimeout:
+			return static_cast<BHttpStatusCode>(code);
 
-	default:
-		break;
+		default:
+			break;
 	}
 
 	return BHttpStatusCode::Unknown;
@@ -103,9 +147,9 @@ BHttpStatus::StatusCode() const noexcept
 
 /*private*/
 BHttpResult::BHttpResult(std::shared_ptr<HttpResultPrivate> data)
-	: fData(data)
+	:
+	fData(data)
 {
-
 }
 
 
@@ -119,8 +163,7 @@ BHttpResult::~BHttpResult()
 }
 
 
-BHttpResult&
-BHttpResult::operator=(BHttpResult&& other) noexcept = default;
+BHttpResult& BHttpResult::operator=(BHttpResult&& other) noexcept = default;
 
 
 const BHttpStatus&

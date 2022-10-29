@@ -19,41 +19,64 @@ namespace Network {
 class BHttpRequest;
 class HttpBuffer;
 
-using HttpTransferFunction = std::function<size_t (const std::byte*, size_t)>;
+using HttpTransferFunction = std::function<size_t(const std::byte*, size_t)>;
 
 
-enum class HttpSerializerState {
-	Uninitialized,
-	Header,
-	ChunkHeader,
-	Body,
-	Done
-};
+enum class HttpSerializerState { Uninitialized, Header, ChunkHeader, Body, Done };
 
 
-class HttpSerializer {
+class HttpSerializer
+{
 public:
-							HttpSerializer() {};
+								HttpSerializer(){};
 
-	void					SetTo(HttpBuffer& buffer, const BHttpRequest& request);
-	bool					IsInitialized() const noexcept { return fState != HttpSerializerState::Uninitialized; }
+			void				SetTo(HttpBuffer& buffer, const BHttpRequest& request);
+			bool				IsInitialized() const noexcept;
 
-	size_t					Serialize(HttpBuffer& buffer, BDataIO* target);
+			size_t				Serialize(HttpBuffer& buffer, BDataIO* target);
 
-	std::optional<off_t>	BodyBytesTotal() const noexcept { return fBodySize; };
-	off_t					BodyBytesTransferred() const noexcept { return fTransferredBodySize; };
-	bool					Complete() const noexcept { return fState == HttpSerializerState::Done; };
-
-private:
-	bool					_IsChunked() const noexcept;
-	size_t					_WriteToTarget(HttpBuffer& buffer, BDataIO* target) const;
+			std::optional<off_t> BodyBytesTotal() const noexcept;
+			off_t				BodyBytesTransferred() const noexcept;
+			bool				Complete() const noexcept;
 
 private:
-	HttpSerializerState		fState = HttpSerializerState::Uninitialized;
-	BDataIO*				fBody = nullptr;
-	off_t					fTransferredBodySize = 0;
-	std::optional<off_t>	fBodySize;
+			bool				_IsChunked() const noexcept;
+			size_t				_WriteToTarget(HttpBuffer& buffer, BDataIO* target) const;
+
+private:
+			HttpSerializerState	fState = HttpSerializerState::Uninitialized;
+			BDataIO*			fBody = nullptr;
+			off_t				fTransferredBodySize = 0;
+			std::optional<off_t> fBodySize;
 };
+
+
+inline bool
+HttpSerializer::IsInitialized() const noexcept
+{
+	return fState != HttpSerializerState::Uninitialized;
+}
+
+
+inline std::optional<off_t>
+HttpSerializer::BodyBytesTotal() const noexcept
+{
+	return fBodySize;
+}
+
+
+inline off_t
+HttpSerializer::BodyBytesTransferred() const noexcept
+{
+	return fTransferredBodySize;
+}
+
+
+inline bool
+HttpSerializer::Complete() const noexcept
+{
+	return fState == HttpSerializerState::Done;
+}
 
 
 } // namespace Network

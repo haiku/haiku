@@ -18,9 +18,9 @@ using namespace BPrivate::Network;
 
 
 HttpDebugLogger::HttpDebugLogger()
-	: BLooper("HttpDebugLogger")
+	:
+	BLooper("HttpDebugLogger")
 {
-
 }
 
 
@@ -39,6 +39,7 @@ HttpDebugLogger::SetFileLogging(const char* path)
 		throw BSystemError("BFile::SetTo()", status);
 }
 
+
 void
 HttpDebugLogger::MessageReceived(BMessage* message)
 {
@@ -50,102 +51,102 @@ HttpDebugLogger::MessageReceived(BMessage* message)
 	output << "[" << id << "] ";
 
 	switch (message->what) {
-	case UrlEvent::HostNameResolved:
-	{
-		BString hostname;
-		message->FindString(UrlEventData::HostName, &hostname);
-		output << "<HostNameResolved> " << hostname;
-		break;
-	}
-	case UrlEvent::ConnectionOpened:
-		output << "<ConnectionOpened>";
-		break;
-	case UrlEvent::UploadProgress:
-	{
-		off_t numBytes = message->GetInt64(UrlEventData::NumBytes, -1);
-		off_t totalBytes = message->GetInt64(UrlEventData::TotalBytes, -1);
-		output << "<UploadProgress> bytes uploaded " << numBytes;
-		if (totalBytes == -1)
-			output << " (total unknown)";
-		else
-			output << " (" << totalBytes << " total)";
-		break;
-	}
-	case UrlEvent::ResponseStarted:
-	{
-		output << "<ResponseStarted>";
-		break;
-	}
-	case UrlEvent::HttpRedirect:
-	{
-		BString redirectUrl;
-		message->FindString(UrlEventData::HttpRedirectUrl, &redirectUrl);
-		output << "<HttpRedirect> to: " << redirectUrl;
-		break;
-	}
-	case UrlEvent::HttpStatus:
-	{
-		int16 status = message->FindInt16(UrlEventData::HttpStatusCode);
-		output << "<HttpStatus> code: " << status;
-		break;
-	}
-	case UrlEvent::HttpFields:
-	{
-		output << "<HttpFields> All fields parsed";
-		break;
-	}
-	case UrlEvent::DownloadProgress:
-	{
-		off_t numBytes = message->GetInt64(UrlEventData::NumBytes, -1);
-		off_t totalBytes = message->GetInt64(UrlEventData::TotalBytes, -1);
-		output << "<DownloadProgress> bytes downloaded " << numBytes;
-		if (totalBytes == -1)
-			output << " (total unknown)";
-		else
-			output << " (" << totalBytes << " total)";
-		break;
-	}
-	case UrlEvent::BytesWritten:
-	{
-		off_t numBytes = message->GetInt64(UrlEventData::NumBytes, -1);
-		output << "<BytesWritten> bytes written to output: " << numBytes;
-		break;
-	}
-	case UrlEvent::RequestCompleted:
-	{
-		bool success = message->GetBool(UrlEventData::Success, false);
-		output << "<RequestCompleted> success: ";
-		if (success)
-			output << "true";
-		else
-			output << "false";
-		break;
-	}
-	case UrlEvent::DebugMessage:
-	{
-		uint32 debugType = message->GetUInt32(UrlEventData::DebugType, 0);
-		BString debugMessage;
-		message->FindString(UrlEventData::DebugMessage, &debugMessage);
-		output << "<DebugMessage> ";
-		switch (debugType) {
-			case UrlEventData::DebugInfo:
-				output << "INFO: ";
-				break;
-			case UrlEventData::DebugWarning:
-				output << "WARNING: ";
-				break;
-			case UrlEventData::DebugError:
-				output << "ERROR: ";
-				break;
-			default:
-				output << "UNKNOWN: ";
-				break;
+		case UrlEvent::HostNameResolved:
+		{
+			BString hostname;
+			message->FindString(UrlEventData::HostName, &hostname);
+			output << "<HostNameResolved> " << hostname;
+			break;
 		}
-		output << debugMessage;
-		break;
-	}
-	default:
-		return BLooper::MessageReceived(message);
+		case UrlEvent::ConnectionOpened:
+			output << "<ConnectionOpened>";
+			break;
+		case UrlEvent::UploadProgress:
+		{
+			off_t numBytes = message->GetInt64(UrlEventData::NumBytes, -1);
+			off_t totalBytes = message->GetInt64(UrlEventData::TotalBytes, -1);
+			output << "<UploadProgress> bytes uploaded " << numBytes;
+			if (totalBytes == -1)
+				output << " (total unknown)";
+			else
+				output << " (" << totalBytes << " total)";
+			break;
+		}
+		case UrlEvent::ResponseStarted:
+		{
+			output << "<ResponseStarted>";
+			break;
+		}
+		case UrlEvent::HttpRedirect:
+		{
+			BString redirectUrl;
+			message->FindString(UrlEventData::HttpRedirectUrl, &redirectUrl);
+			output << "<HttpRedirect> to: " << redirectUrl;
+			break;
+		}
+		case UrlEvent::HttpStatus:
+		{
+			int16 status = message->FindInt16(UrlEventData::HttpStatusCode);
+			output << "<HttpStatus> code: " << status;
+			break;
+		}
+		case UrlEvent::HttpFields:
+		{
+			output << "<HttpFields> All fields parsed";
+			break;
+		}
+		case UrlEvent::DownloadProgress:
+		{
+			off_t numBytes = message->GetInt64(UrlEventData::NumBytes, -1);
+			off_t totalBytes = message->GetInt64(UrlEventData::TotalBytes, -1);
+			output << "<DownloadProgress> bytes downloaded " << numBytes;
+			if (totalBytes == -1)
+				output << " (total unknown)";
+			else
+				output << " (" << totalBytes << " total)";
+			break;
+		}
+		case UrlEvent::BytesWritten:
+		{
+			off_t numBytes = message->GetInt64(UrlEventData::NumBytes, -1);
+			output << "<BytesWritten> bytes written to output: " << numBytes;
+			break;
+		}
+		case UrlEvent::RequestCompleted:
+		{
+			bool success = message->GetBool(UrlEventData::Success, false);
+			output << "<RequestCompleted> success: ";
+			if (success)
+				output << "true";
+			else
+				output << "false";
+			break;
+		}
+		case UrlEvent::DebugMessage:
+		{
+			uint32 debugType = message->GetUInt32(UrlEventData::DebugType, 0);
+			BString debugMessage;
+			message->FindString(UrlEventData::DebugMessage, &debugMessage);
+			output << "<DebugMessage> ";
+			switch (debugType) {
+				case UrlEventData::DebugInfo:
+					output << "INFO: ";
+					break;
+				case UrlEventData::DebugWarning:
+					output << "WARNING: ";
+					break;
+				case UrlEventData::DebugError:
+					output << "ERROR: ";
+					break;
+				default:
+					output << "UNKNOWN: ";
+					break;
+			}
+			output << debugMessage;
+			break;
+		}
+		default:
+			return BLooper::MessageReceived(message);
 	}
 
 	if (fConsoleLogging)

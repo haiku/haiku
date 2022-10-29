@@ -34,7 +34,6 @@ BHttpMethod::InvalidMethod::InvalidMethod(const char* origin, BString input)
 	BError(origin),
 	input(std::move(input))
 {
-
 }
 
 
@@ -62,17 +61,19 @@ BHttpMethod::InvalidMethod::DebugMessage() const
 
 
 BHttpMethod::BHttpMethod(Verb verb) noexcept
-	: fMethod(verb)
+	:
+	fMethod(verb)
 {
-
 }
 
 
 BHttpMethod::BHttpMethod(const std::string_view& verb)
-	: fMethod(BString(verb.data(), verb.length()))
+	:
+	fMethod(BString(verb.data(), verb.length()))
 {
 	if (verb.size() == 0 || !validate_http_token_string(verb))
-		throw BHttpMethod::InvalidMethod(__PRETTY_FUNCTION__, std::move(std::get<BString>(fMethod)));
+		throw BHttpMethod::InvalidMethod(
+			__PRETTY_FUNCTION__, std::move(std::get<BString>(fMethod)));
 }
 
 
@@ -80,7 +81,8 @@ BHttpMethod::BHttpMethod(const BHttpMethod& other) = default;
 
 
 BHttpMethod::BHttpMethod(BHttpMethod&& other) noexcept
-	: fMethod(std::move(other.fMethod))
+	:
+	fMethod(std::move(other.fMethod))
 {
 	other.fMethod = Get;
 }
@@ -89,8 +91,7 @@ BHttpMethod::BHttpMethod(BHttpMethod&& other) noexcept
 BHttpMethod::~BHttpMethod() = default;
 
 
-BHttpMethod&
-BHttpMethod::operator=(const BHttpMethod& other) = default;
+BHttpMethod& BHttpMethod::operator=(const BHttpMethod& other) = default;
 
 
 BHttpMethod&
@@ -127,25 +128,25 @@ BHttpMethod::Method() const noexcept
 {
 	if (std::holds_alternative<Verb>(fMethod)) {
 		switch (std::get<Verb>(fMethod)) {
-		case Get:
-			return "GET"sv;
-		case Head:
-			return "HEAD"sv;
-		case Post:
-			return "POST"sv;
-		case Put:
-			return "PUT"sv;
-		case Delete:
-			return "DELETE"sv;
-		case Connect:
-			return "CONNECT"sv;
-		case Options:
-			return "OPTIONS"sv;
-		case Trace:
-			return "TRACE"sv;
-		default:
-			// should never be reached
-			std::abort();
+			case Get:
+				return "GET"sv;
+			case Head:
+				return "HEAD"sv;
+			case Post:
+				return "POST"sv;
+			case Put:
+				return "PUT"sv;
+			case Delete:
+				return "DELETE"sv;
+			case Connect:
+				return "CONNECT"sv;
+			case Options:
+				return "OPTIONS"sv;
+			case Trace:
+				return "TRACE"sv;
+			default:
+				// should never be reached
+				std::abort();
 		}
 	} else {
 		const auto& methodString = std::get<BString>(fMethod);
@@ -161,14 +162,14 @@ static const BHttpMethod kDefaultMethod = BHttpMethod::Get;
 static const BHttpFields kDefaultOptionalFields = BHttpFields();
 
 struct BHttpRequest::Data {
-	BUrl								url = kDefaultUrl;
-	BHttpMethod							method	= kDefaultMethod;
-	uint8								maxRedirections = 8;
-	BHttpFields							optionalFields;
-	std::optional<BHttpAuthentication>	authentication;
-	bool								stopOnError = false;
-	bigtime_t							timeout = B_INFINITE_TIMEOUT;
-	std::optional<Body>					requestBody;
+	BUrl url = kDefaultUrl;
+	BHttpMethod method = kDefaultMethod;
+	uint8 maxRedirections = 8;
+	BHttpFields optionalFields;
+	std::optional<BHttpAuthentication> authentication;
+	bool stopOnError = false;
+	bigtime_t timeout = B_INFINITE_TIMEOUT;
+	std::optional<Body> requestBody;
 };
 
 
@@ -192,14 +193,15 @@ build_basic_http_header(const BString& username, const BString& password)
 
 
 BHttpRequest::BHttpRequest()
-	: fData(std::make_unique<Data>())
+	:
+	fData(std::make_unique<Data>())
 {
-
 }
 
 
 BHttpRequest::BHttpRequest(const BUrl& url)
-	: fData(std::make_unique<Data>())
+	:
+	fData(std::make_unique<Data>())
 {
 	SetUrl(url);
 }
@@ -211,8 +213,7 @@ BHttpRequest::BHttpRequest(BHttpRequest&& other) noexcept = default;
 BHttpRequest::~BHttpRequest() = default;
 
 
-BHttpRequest&
-BHttpRequest::operator=(BHttpRequest&&) noexcept = default;
+BHttpRequest& BHttpRequest::operator=(BHttpRequest&&) noexcept = default;
 
 
 bool
@@ -304,13 +305,8 @@ BHttpRequest::SetAuthentication(const BHttpAuthentication& authentication)
 }
 
 
-static constexpr std::array<std::string_view, 6> fReservedOptionalFieldNames = {
-	"Host"sv,
-	"Accept-Encoding"sv,
-	"Connection"sv,
-	"Content-Type"sv,
-	"Content-Length"sv
-};
+static constexpr std::array<std::string_view, 6> fReservedOptionalFieldNames
+	= {"Host"sv, "Accept-Encoding"sv, "Connection"sv, "Content-Type"sv, "Content-Length"sv};
 
 
 void
@@ -321,10 +317,11 @@ BHttpRequest::SetFields(const BHttpFields& fields)
 
 	for (auto& field: fields) {
 		if (std::find(fReservedOptionalFieldNames.begin(), fReservedOptionalFieldNames.end(),
-			field.Name()) != fReservedOptionalFieldNames.end())
-		{
+				field.Name())
+			!= fReservedOptionalFieldNames.end()) {
 			std::string_view fieldName = field.Name();
-			throw BHttpFields::InvalidInput(__PRETTY_FUNCTION__, BString(fieldName.data(), fieldName.size()));
+			throw BHttpFields::InvalidInput(
+				__PRETTY_FUNCTION__, BString(fieldName.data(), fieldName.size()));
 		}
 	}
 	fData->optionalFields = fields;
@@ -350,8 +347,8 @@ BHttpRequest::SetMethod(const BHttpMethod& method)
 
 
 void
-BHttpRequest::SetRequestBody(std::unique_ptr<BDataIO> input, BString mimeType,
-	std::optional<off_t> size)
+BHttpRequest::SetRequestBody(
+	std::unique_ptr<BDataIO> input, BString mimeType, std::optional<off_t> size)
 {
 	if (input == nullptr)
 		throw std::invalid_argument("input cannot be null");
@@ -490,32 +487,33 @@ BHttpRequest::SerializeHeaderTo(HttpBuffer& buffer) const
 			host << ':' << fData->url.Port();
 
 		outputFields.AddFields({
-			{"Host"sv, std::string_view(host.String())},
-			{"Accept-Encoding"sv, "gzip"sv},
-				// Allows the server to compress data using the "gzip" format.
-				// "deflate" is not supported, because there are two interpretations
-				// of what it means (the RFC and Microsoft products), and we don't
-				// want to handle this. Very few websites support only deflate,
-				// and most of them will send gzip, or at worst, uncompressed data.
+			{"Host"sv, std::string_view(host.String())}, {"Accept-Encoding"sv, "gzip"sv},
+			// Allows the server to compress data using the "gzip" format.
+			// "deflate" is not supported, because there are two interpretations
+			// of what it means (the RFC and Microsoft products), and we don't
+			// want to handle this. Very few websites support only deflate,
+			// and most of them will send gzip, or at worst, uncompressed data.
 			{"Connection"sv, "close"sv}
-				// Let the remote server close the connection after response since
-				// we don't handle multiple request on a single connection
+			// Let the remote server close the connection after response since
+			// we don't handle multiple request on a single connection
 		});
 	}
 
 	if (fData->authentication) {
 		// This request will add a Basic authorization header
-		BString authorization = build_basic_http_header(fData->authentication->username,
-			fData->authentication->password);
+		BString authorization = build_basic_http_header(
+			fData->authentication->username, fData->authentication->password);
 		outputFields.AddField("Authorization"sv, std::string_view(authorization.String()));
 	}
 
 	if (fData->requestBody) {
-		outputFields.AddField("Content-Type"sv, std::string_view(fData->requestBody->mimeType.String()));
+		outputFields.AddField(
+			"Content-Type"sv, std::string_view(fData->requestBody->mimeType.String()));
 		if (fData->requestBody->size)
 			outputFields.AddField("Content-Length"sv, std::to_string(*fData->requestBody->size));
 		else
-			throw BRuntimeError(__PRETTY_FUNCTION__, "Transfer body with unknown content length; chunked transfer not supported");
+			throw BRuntimeError(__PRETTY_FUNCTION__,
+				"Transfer body with unknown content length; chunked transfer not supported");
 	}
 
 	for (const auto& field: outputFields)
