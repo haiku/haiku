@@ -1189,6 +1189,10 @@ restart:
 	AutoLocker<Vnode> nodeLocker(vnode);
 
 	if (vnode && vnode->IsBusy()) {
+		// vnodes in the Removed state (except ones still Unpublished)
+		// which are also Busy will disappear soon, so we do not wait for them.
+		const bool doNotWait = vnode->IsRemoved() && !vnode->IsUnpublished();
+
 		nodeLocker.Unlock();
 		rw_lock_read_unlock(&sVnodeLock);
 		if (!canWait) {
@@ -1196,7 +1200,7 @@ restart:
 				mountID, vnodeID);
 			return B_BUSY;
 		}
-		if (!retry_busy_vnode(tries, mountID, vnodeID))
+		if (doNotWait || !retry_busy_vnode(tries, mountID, vnodeID))
 			return B_BUSY;
 
 		rw_lock_read_lock(&sVnodeLock);
