@@ -3,9 +3,9 @@ Include window border	ScreenshotWindow		Pencere kenarlığını içer
 Overwrite	ScreenshotWindow		Üzerine yaz
 Save in:	ScreenshotWindow		Şuraya kaydet:
 Error saving \"%s\":\n\t%s	ScreenshotWindow		\"%s\" kaydedilirken hata:\n\t%s
-This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Bu dosya hâlihazırda mevcut.\n Üzerine yazmak istediğinizden emin misiniz?
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Bu dosya hâlihazırda var.\n Üzerine yazmak istediğinizden emin misiniz?
 OK	ScreenshotWindow		Tamam
-The destination path exists but is not a folder.	ScreenshotWindow		Hedef yol mevcut; ancak bir klasör değil.
+The destination path exists but is not a folder.	ScreenshotWindow		Hedef yol var; ancak bir klasör değil.
 Select	ScreenshotWindow		Seç
 Save as:	ScreenshotWindow		Farklı kaydet:
 seconds	ScreenshotWindow		saniye

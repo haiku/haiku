@@ -6,7 +6,7 @@ Password…	ScreenSaver		Parola…
 Password:	ScreenSaver		Parola:
 Password lock	ScreenSaver		Parola kilidi
 Screensavers	ScreenSaver		Ekran Koruyucular
-Display Power Management Signaling not available	ScreenSaver		Ekran Güç Yönetimi Sinyalizasyonu mevcut değil
+Display Power Management Signaling not available	ScreenSaver		Ekran Güç Yönetimi Sinyalizasyonu kullanılamıyor
 ScreenSaver	System name		Ekran Koruyucu
 Test	ScreenSaver		Test
 General	ScreenSaver		Genel
@@ -15,7 +15,7 @@ Enable screensaver	ScreenSaver		Ekran koruyucuyu etkinleştir
 Don't fade when mouse is here	ScreenSaver		Fare buradayken kapanma
 Cancel	ScreenSaver		Vazgeç
 Turn off screen	ScreenSaver		Ekranı kapat
-No options available	ScreenSaver		Seçenek mevcut değil
+No options available	ScreenSaver		Kullanılabilir seçenek yok
 Password Window	ScreenSaver		Parola Penceresi
 Screensaver settings	ScreenSaver		Ekran koruyucu ayarları
 Passwords don't match. Please try again.	ScreenSaver		Parolalar eşleşmiyor. Lütfen tekrar deneyin.
@@ -24,5 +24,5 @@ Blackness	ScreenSaver		Kara
 Use custom password	ScreenSaver		Özel bir parola kullanın
 Done	ScreenSaver		Tamam
 Confirm password:	ScreenSaver		Parolayı onaylayın:
-No preview available	PreviewView		Önizleme mevcut değil
+No preview available	PreviewView		Kullanılabilir önizleme yok
 Use network password	ScreenSaver		Ağ parolasını kullan

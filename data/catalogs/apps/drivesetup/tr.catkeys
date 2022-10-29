@@ -46,10 +46,10 @@ The selected partition does not contain a partitioning system.	MainWindow		Seçi
 End: %s	Support		Son: %s
 Partition type	PartitionList		Bölüm türü
 Unable to find the selected partition by ID.	MainWindow		Seçili bölüm ID ile bulunamıyor.
-The currently selected partition is not empty.	MainWindow		Mevcut seçili bölüm boş değil.
+The currently selected partition is not empty.	MainWindow		Şu an seçili olan bölüm boş değil.
 Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Ham bir diski biçimlendirmek istediğinizden emin misiniz? (Genelde önce diski bir bölümlendirme sistemi ile ilklendirmek daha makbuldür.) Değişiklikler diske yazılmadan önce bir kez daha onayınız istenecektir.
 Wipe (not implemented)	MainWindow		Sil (işlevsel değil)
-The currently selected partition does not have a parent partition.	MainWindow		Mevcut seçili disk bölümü ana bir disk bölümüne sahip değil.
+The currently selected partition does not have a parent partition.	MainWindow		Şu an seçili olan disk bölümünde bir ana disk bölümü yok.
 Validation of the given initialization parameters failed.	MainWindow		Verilen ilklendirme parametrelerinin doğrulanması başarısız oldu.
 Not formatted (%s)	PartitionList		Biçimlendirilmemiş (%s)
 Failed to create the partition. No changes have been written to disk.	MainWindow		Bölüm oluşturulamadı. Diske herhangi bir değişiklik yazılmadı.

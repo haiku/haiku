@@ -16,7 +16,7 @@ File offset: 	ProbeView		Dosya ofseti:
 Add	ProbeView		Ekle
 64 bit signed value:	TypeEditors		64 bit imzalanmış değer:
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		\"%s\" özniteliğini \"%s\" dosyasından kaldırmak istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.
-No type editor available	AttributeWindow		Bir tür düzenleyicisi mevcut değil
+No type editor available	AttributeWindow		Kullanılabilir bir tür düzenleyicisi yok
 Print…	ProbeView		Yazdır…
 New…	FileWindow		Yeni…
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ne: '%.4s'\n\n

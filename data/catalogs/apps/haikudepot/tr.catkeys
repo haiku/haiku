@@ -31,7 +31,7 @@ An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginW
 A requested object or an object involved in the request was not found on the server.	ServerHelper		İstenen nesne veya istekle ilgili bir nesne sunucuda bulunamadı.
 Logout	ToLatestUserUsageConditionsWindow		Çıkış yap
 The following additional package changes have to be made:	PackageResult		Aşağıdaki ek paket değişikliklerinin yapılması gerekiyor:
-No changelog available.	PackageInfoView		Değişiklik günlüğü mevcut değil
+No changelog available.	PackageInfoView		Kullanılabilir bir değişiklik günlüğü yok.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Geçerli kullanım koşulları kabul edildi.
 Cancel	PackageProblem		İptal
 Version	PackageListView		Sürüm
@@ -109,7 +109,7 @@ Input validation	UserLoginWindow		Girdi doğrulaması
 Log in…	MainWindow		Giriş yap…
 Client version too old	ServerHelper		İstemci sürümü çok eski
 Local repository load error	LocalPkgDataLoadProcess		Yerel depo yükleme hatası
-The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Kullanıcı mevcut değil veya yanlış parola girildi. Bilgilerinizi denetleyin ve yeniden deneyin.
+The user does not exist or the wrong password was supplied. Check your credentials and try again.	UserLoginWindow		Kullanıcı yok veya yanlış parola girildi. Bilgilerinizi denetleyin ve yeniden deneyin.
 All repositories	MainWindow		Tüm depolar
 Repository update error	LocalRepositoryUpdateProcess		Depo güncelleme hatası
 Network error	ServerHelper		Ağ hatası
@@ -186,7 +186,7 @@ While updating package data, a problem has arisen that may cause data to be outd
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Kullanım koşulları indirilirken bir hata oluştu. Ayrıntılar için günlüğü denetleyin ve yeniden deneyin.\nGünlüğün nice görüntülenebileceği ile ilgili bilgiye, Haiku Kullanım Kılavuzu'nun Haiku Depo bölümünden erişilebilir.
 View agreed usage conditions…	MainWindow		Kabul edilen kullanım koşullarını görüntüle…
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		[%Nickname%] kullanıcısının kimliği doğrulandı; ancak sürdürmeden önce güncel kullanım koşullarını kabul etmelisiniz.
-This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Bu paket Haiku Depo sunucusunda değil gibi görünüyor, bu yüzden bir derecelendirme yapmak veya mevcut derecelendirmeyi değiştirmek olanaklı değil.
+This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Bu paket Haiku Depo sunucusunda değil gibi görünüyor, bu yüzden bir derecelendirme yapmak veya var olan derecelendirmeyi değiştirmek olanaklı değil.
 Apply	SettingsWindow		Uygula
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		\"%Nickname%\" kullanıcısı, daha önceden kullanım koşullarını kabul etti; ancak koşulların yeni bir sürümü var. Güncel koşulların kabul edilmesi gereklidir.
 Log out	MainWindow		Çıkış yap

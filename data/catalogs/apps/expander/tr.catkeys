@@ -16,13 +16,13 @@ Hide contents	ExpanderWindow		İçeriği gizle
 Cancel	ExpanderWindow		Vazgeç
 Automatically expand files	ExpanderPreferences		Dosyaları kendiliğinden genişlet
 Continue	ExpanderWindow		Sürdür
-Destination folder	ExpanderPreferences		Hedef klasörü
+Destination folder	ExpanderPreferences		Hedef klasör
 Other	ExpanderPreferences		Diğer
 Cancel	ExpanderPreferences		Vazgeç
 Expansion	ExpanderPreferences		Genişletme
 Select	DirectoryFilePanel		Seç
 The folder was either moved, renamed or not supported.	ExpanderWindow		Klasör taşınmış, yeniden adlandırılmış veya desteklenmiyor olabilir.
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Hedef klasör mevcut değil. Oluşturulsun mu?
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Hedef klasör yok. Oluşturulsun mu?
 Same directory as source (archive) file	ExpanderPreferences		Kaynak (arşiv) dosya ile aynı dizin
 Settings	ExpanderMenu		Ayarlar
 Settings…	ExpanderMenu		Ayarlar…
@@ -36,7 +36,7 @@ Leave destination folder path empty	ExpanderPreferences		Hedef klasör yolunu bo
 Failed to create the destination folder.	ExpanderWindow		Hedef klasör oluşturulamadı.
 Select '%s'…	DirectoryFilePanel		'%s' ögesini seç…
 Create	ExpanderWindow		Oluştur
-The file doesn't exist	ExpanderWindow		Dosya mevcut değil
+The file doesn't exist	ExpanderWindow		Dosya yok
 Stop	ExpanderMenu		Durdur
 File	ExpanderMenu		Dosya
 Expander	System name		Paketaçar

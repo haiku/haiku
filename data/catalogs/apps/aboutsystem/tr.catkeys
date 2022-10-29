@@ -41,7 +41,7 @@ Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (proje kurucusu)\
 Remove replicant	AboutView		Yineleneni kaldır
 BSD (3-clause)	AboutWindow		BSD (3 koşullu)
 About this system	AboutWindow		Sistem Hakkında
-%d MiB used (%d%%)	AboutView		%d MiB kullanılan (%d%%)
+%d MiB used (%d%%)	AboutView		%d MiB kullanılan (%%d%)
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Telif hakkı © 2003-2006 Intel Corporation. Tüm hakları saklıdır.
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Telif hakkı © 1999-2010 Gutenprint yazarları. Tüm hakları saklıdır.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Telif hakkı © 1994-1997 Mark Kilgard. Tüm hakları saklıdır.

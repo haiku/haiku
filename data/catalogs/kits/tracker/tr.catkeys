@@ -127,7 +127,7 @@ Location	OpenWithWindow		Konum
 Resize to fit	QueryContainerWindow		Sığacak biçimde boyutlandır
 List folders first	SettingsView		Klasörleri ilk listele
 Find	FSUtils		Bul
-An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Bu klasörde \"%name\" adında bir öge hâlihazırda mevcut. Bu ögeyi oluşturduğunuz sembolik bağlantı ile değiştirmek istediğinizden emin misiniz?
+An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Bu klasörde \"%name\" adında bir öge hâlihazırda var. Bu ögeyi, oluşturduğunuz sembolik bağlantı ile değiştirmek istediğinizden emin misiniz?
 List view	ContainerWindow		Liste görünümü
 Temporary	FindPanel		Sorguyu kaydetme
 Modified	QueryPoseView		Değiştirilme
@@ -260,7 +260,7 @@ Delete	FilePanelPriv		Sil
 <No recent items>	FavoritesMenu		<Son kullanılan yok>
 Formula %formula	FindPanel	FindResultTitle	%formula formülü
 Preparing to create links…	StatusWindow		Bağlantılar oluşturulmaya hazırlanıyor…
-Tracker status	StatusWindow		İzleyici Durumu
+Tracker status	StatusWindow		İzleyici durumu
 Handles any %type	OpenWithWindow		Her tür %type işler
 The mount server could not be contacted.	AutoMounterSettings		Bağlama sunucusu ile iletişim kurulamadı.
 Query template	FindPanel		Sorgu şablonu
@@ -494,7 +494,7 @@ Copy layout	ContainerWindow		Yerleşimi kopyala
 Duplicate	ContainerWindow		Çoğalt
 16-bit integer	AttributesView		16 bit tamsayı
 Untitled clipping	PoseView		Adsız kırpma
-The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		\"%name\" adı belirtilen klasörde hâlihazırda mevcut. Değiştirmek istiyor musunuz?
+The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		\"%name\" adı belirtilen klasörde hâlihazırda var. Değiştirmek istiyor musunuz?
 , indexed	InfoWindow		, indeksli
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Ögeleri \"Diskler\" penceresinin içindeki herhangi bir disk simgesinin üzerine bırakmalısınız.
 Version:	InfoWindow		Sürüm:
@@ -504,7 +504,7 @@ Are you sure you want to move or copy the selected item(s) to this folder?	PoseV
 Find	FindPanel		Bul
 Empty folder	NavMenu		Boş klasör
 Defaults	TrackerSettingsWindow		Öntanımlılar
-Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Üzgünüm, hedef diskte seçimi kopyalayabilecek kadar boş alan mevcut değil.
+Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Üzgünüm, hedef diskte seçimi kopyalayabilecek kadar boş alan yok.
 True-color picture	AttributesView		Gerçek renkli resim
 Add-ons	FilePanelPriv		Eklentiler
 96 x 96	DeskWindow		96 x 96

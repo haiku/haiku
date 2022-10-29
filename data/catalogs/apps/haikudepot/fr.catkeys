@@ -48,7 +48,7 @@ Usage conditions download problem	UserLoginWindow		Problème de téléchargement
 Package daemon problem	App		Problème du serveur de paquets
 No	MainWindow		Non
 Repository	PackageListView		Dépôt
-Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Les utilisateurs doivent être âgés de %AgeYears% ou plus.
+Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Les utilisateurs doivent être âgés de %AgeYears% ans ou plus.
 Close	RatePackageWindow		Fermer
 Close	UserLoginWindow		Fermer
 The email is malformed.	UserLoginWindow		L’adresse mail est malformée.

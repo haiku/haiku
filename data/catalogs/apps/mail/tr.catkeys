@@ -3,7 +3,7 @@ Set to Saved	Mail		Kaydedilenlere ekle
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ana metniniz %ld kodlanamayan karakter içeriyor. Gönder'e basmak bu iletinizi gönderir; ancak kodlanamayan karakterin yerine bir başkası kullanılır. Bu durumda başka bir karakter kümesi kullanmayı deneyebilirsiniz. Sorunu çözmeyi denemek için Vazgeç'e tıklayın.
 Text wrapping:	Mail		Metin kaydırma:
 Show icons & labels	Mail		Simgeleri ve etiketleri göster
-(Date unavailable)	Mail		(Tarih mevcut değil)
+(Date unavailable)	Mail		(Tarih kullanılamıyor)
 Reply	Mail		Yanıtla
 Next message	Mail		Sonraki ileti
 Mailing	Mail		Posta
@@ -35,7 +35,7 @@ Untitled	Mail		Adsız
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		İletilmiş postalardan ekleri kaldırma özelliği henüz işlevsel değil.\nŞu an için düzgün çalışmıyor.
 Same recipient	Mail		Aynı alıcı
 Previous message	Mail		Önceki ileti
-(Address unavailable)	Mail		(Adres mevcut değil)
+(Address unavailable)	Mail		(Adres kullanılamıyor)
 Mail	System name		Posta
 Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	İlişik: %name% (Tür: %type%)
 Copy link location	Mail		Bağlantı konumunu kopyala
@@ -106,7 +106,7 @@ Accounts…	Mail		Hesaplar…
 Previous	Mail		Önceki
 Include file attributes in attachments	Mail		Eklerde dosya özniteliklerini içer
 Start now	Mail		Şimdi başlat
-(Name unavailable)	Mail		(Ad mevcut değil)
+(Name unavailable)	Mail		(Ad kullanılamıyor)
 Move to trash	Mail		Çöp'e taşı
 <none>	Mail		<yok>
 %d - Date	Mail		%d - Tarih

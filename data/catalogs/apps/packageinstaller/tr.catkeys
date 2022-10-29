@@ -43,7 +43,7 @@ No package available.	PackageInfo		Paket yok
 The script named '%s' already exists in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Verilen yolda '%s' adlı betik zaten var.\nBu betik paketteki ile değiştirilsin mi?
 Installation type:	PackageView		Kurulum türü:
 The package you selected has been successfully removed from your system.	UninstallView		Seçtiğiniz paket sisteminizden başarıyla kaldırıldı.
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Paket dosyasında bir dosya boyutu uyuşmazlığı mevcut. Paket hasar görmüş veya sonradan değiştirilmiş olabilir. Yine de sürdürmek istiyor musunuz?
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Paket dosyasında bir dosya boyutu uyuşmazlığı var. Paket hasar görmüş veya sonradan değiştirilmiş olabilir. Yine de sürdürmek istiyor musunuz?
 %name% (%size%)	PackageView		%name% (%size%)
 Abort	PackageInstall		İptal et
 The file named '%s' already exists in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Verilen yolda '%s' adlı dosya zaten var.\nBu dosya paketteki ile değiştirilsin mi?

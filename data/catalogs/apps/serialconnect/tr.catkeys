@@ -3,7 +3,7 @@ Hardware	SerialWindow	Flowcontrol	Donanım
 Connection	SerialWindow		Bağlantı
 Raw send…	SerialWindow		Ham gönder…
 Baud rate	SerialWindow		Baud hızı
-Stop bits	SerialWindow		Bitleri durdur
+Stop bits	SerialWindow		Durak bitleri
 None	SerialWindow	Flowcontrol	Hiçbiri
 Cancel	Custom baudrate window		Vazgeç
 Sending…	XModemStatus		Gönderiliyor…

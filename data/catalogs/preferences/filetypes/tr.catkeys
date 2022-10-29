@@ -3,7 +3,7 @@ Left	Attribute Window	Attribute column alignment in Tracker	Sol
 Float	Attribute ListView		Kayan
 Final	Application Types Window		Final
 FileTypes request	FileTypes Window		Dosya Türleri isteği
-This file type already exists	New File Type Window		Bu dosya türü hâlihazırda mevcut
+This file type already exists	New File Type Window		Bu dosya türü hâlihazırda var
 Preferred application	FileTypes Window		Tercih edilen uygulama
 Launch	Application Types Window		Çalıştır
 Removing uninstalled application types	Application Types Window		Silinmiş uygulama türleri kaldırılıyor

@@ -28,7 +28,7 @@ Cancel	Download Window		Vazgeç
 Settings	Settings Window		Ayarlar
 Downloads	WebPositive Window		İndirmeler
 Browse…	Settings Window		Göz at…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Bu sayfa için bir yer imi (%bookmarkName) hâlihazırda mevcut.
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Bu sayfa için bir yer imi (%bookmarkName) hâlihazırda var.
 Resume prior session	Settings Window		Bir önceki oturumu sürdür
 Match case	WebPositive Window		BÜYÜK/küçük harf duyarlı
 Proxy password:	Settings Window		Vekil parolası:

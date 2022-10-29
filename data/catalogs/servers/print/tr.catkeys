@@ -13,7 +13,7 @@ OK	ConfigWindow		Tamam
 Cancel	ConfigWindow		Vazgeç
 Printer server	ConfigWindow		Yazıcı sunucusu
 Page %1 to %2, %3 copies	ConfigWindow		Sayfa %1-%2, %3 kopya
-A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Bu adda bir yazıcı mevcut, fakat sürücüsü bulunamadı! Değiştirilsin mi?
+A printer with that name already exists, but its driver could not be found! Replace?	PrintServerApp		Bu adda bir yazıcı var; ancak sürücüsü bulunamadı! Değiştirilsin mi?
 Yes	PrintServerApp		Evet
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
 Would you like to set one up now?	PrintServerApp		Şimdi bir tane ayarlamak ister misiniz?
@@ -31,7 +31,7 @@ Select a printer	ConfigWindow		Yazıcı seç
 Show configuration window	PrintServerApp Scripting		Yapılandırma penceresini göster
 A4	ConfigWindow	ISO 216 paper size	A4
 Get comments about this printer	Printer Scripting		Bu yazıcı hakkında yorumları al
-A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Bu adda bir yazıcı mevcut, fakat kullanılabilir değil! Değiştirilsin mi?
+A printer with that name already exists, but it's not usable at all! Replace?	PrintServerApp		Bu adda bir yazıcı var; ancak kullanılabilir değil! Değiştirilsin mi?
 No	PrintServerApp		Hayır
 Get the transport configuration for this printer	Printer Scripting		Bu yazıcı için taşıyıcı yapılandırmasını al
 Landscape	ConfigWindow		Yatay

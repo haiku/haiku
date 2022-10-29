@@ -5,12 +5,12 @@ Scanning %refName%	Scanner		%refName% taranıyor
 Size	Info Window		Boyut
 Rescan	Pie View		Yeniden tara
 Kind	Info Window		Tür
-file unavailable	Pie View		dosya mevcut değil
+file unavailable	Pie View		dosya kullanılamıyor
 no supporting apps	Pie View		destekleyen uygulama yok
 Path	Info Window		Yol
 Scan	Status View		Tara
 Rescan	Status View		Yeniden tara
-file unavailable	Status View		dosya mevcut değil
+file unavailable	Status View		dosya kullanılamıyor
 Get info	Pie View		Bilgi al
 DiskUsage	System name		Disk Kullanımı
 Created	Info Window		Oluşturulma:
