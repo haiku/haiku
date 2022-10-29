@@ -114,6 +114,8 @@ public:
 
 			status_t			GetNextNetwork(uint32& cookie,
 									wireless_network& network);
+			status_t			GetNetworks(wireless_network*& networks,
+									uint32& count);
 			status_t			GetNetwork(const char* name,
 									wireless_network& network);
 			status_t			GetNetwork(const BNetworkAddress& address,

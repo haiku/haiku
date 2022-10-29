@@ -16,7 +16,7 @@
 
 
 class BarberPole;
-class BTextView;
+class TextView;
 class BStringView;
 class MarkupTextView;
 class Model;
@@ -41,8 +41,6 @@ private:
 	static const BString		_IntroductionTextForMode(
 									UserUsageConditionsSelectionMode mode,
 									const UserDetail& userDetail);
-	static float				_ExpectedIntroductionTextHeight(
-									BTextView* introductionTextView);
 
 	void						_DisplayData(const UserDetail& userDetail,
 									const UserUsageConditions&
@@ -65,7 +63,7 @@ private:
 			Model&				fModel;
 			BStringView*		fAgeNoteStringView;
 			BStringView*		fVersionStringView;
-			BTextView*			fIntroductionTextView;
+			TextView*			fIntroductionTextView;
 			BarberPole*			fWorkerIndicator;
 			thread_id			fWorkerThread;
 };

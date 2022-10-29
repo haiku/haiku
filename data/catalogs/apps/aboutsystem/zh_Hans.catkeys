@@ -17,8 +17,8 @@ Past website & marketing:\n	AboutView		早先网站及市场：\n
 Copyright © 2003 Peter Hanappe and others.	AboutView		版权所有 © 2003 Peter Hanappe 及其他人员。
 Testing and bug triaging:\n	AboutView		测试与错误分析：\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{处理器 单核:} other{处理器 # 核:}}
-%d MiB total	AboutView		总计 %d MiB
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku所独有的代码，尤其是内核及与之紧密关联的所有应用程序的代码，它们都在 <MIT 协议> 条款下发布。那些包含第三方代码的系统库则在 <LGPL 协议> 下发布。您可以在下述信息中找到第三方部分代码的版权信息。\n\n
+%d MiB total	AboutView		总计 %d MiB
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		版权所有 © 1996-1997 Jeff Prosise，保留所有权利。
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		版权所有 © 1999-2006 Brian Paul. Mesa3D 项目，保留所有权利。
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		版权所有 © 2010-2011 Google Inc，保留所有权利。
@@ -48,8 +48,8 @@ Source Code: 	AboutView		源代码：
 \nCopyrights\n\n	AboutView		\n版权所有\n\n
 GNU GPL v3	AboutWindow		GNU GPL v3
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		版权所有 © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
-The HaikuPorts team\n	AboutView		Haiku-Ports 小组\n
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		基于GPL、LGPL许可证发布的包含在GNU工程的自由软件:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\n版权所有 © 自由软件基金会(The Free Software Foundation)。
+The HaikuPorts team\n	AboutView		Haiku-Ports 小组\n
 Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		包含来自 FreeBSD 项目软件，基于 BSD 协议释放：\nftpd, ping, telnet, telnetd, traceroute\n版权所有 © 1994-2008 FreeBSD 项目组。 保留所有权利。
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		版权所有 © 2002-2003 Steve Lhomme，保留所有权利。
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2019 Fabrice Bellard 等

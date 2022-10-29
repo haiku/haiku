@@ -73,6 +73,7 @@ KPartition::KPartition(partition_id id)
 	fPartitionData.size = 0;
 	fPartitionData.content_size = 0;
 	fPartitionData.block_size = 0;
+	fPartitionData.physical_block_size = 0;
 	fPartitionData.child_count = 0;
 	fPartitionData.index = -1;
 	fPartitionData.status = B_PARTITION_UNRECOGNIZED;
@@ -202,6 +203,7 @@ KPartition::PublishDevice()
 	info.offset = Offset();
 	info.size = Size();
 	info.logical_block_size = BlockSize();
+	info.physical_block_size = PhysicalBlockSize();
 	info.session = 0;
 	info.partition = ID();
 	if (strlcpy(info.device, Device()->Path(), sizeof(info.device))
@@ -450,6 +452,21 @@ uint32
 KPartition::BlockSize() const
 {
 	return fPartitionData.block_size;
+}
+
+
+uint32
+KPartition::PhysicalBlockSize() const
+{
+	return fPartitionData.physical_block_size;
+}
+
+
+void
+KPartition::SetPhysicalBlockSize(uint32 blockSize)
+{
+	if (fPartitionData.physical_block_size != blockSize)
+		fPartitionData.physical_block_size = blockSize;
 }
 
 
@@ -870,6 +887,7 @@ KPartition::AddChild(KPartition* partition, int32 index)
 
 		partition->SetParent(this);
 		partition->SetDevice(Device());
+		partition->SetPhysicalBlockSize(PhysicalBlockSize());
 
 		// publish to devfs
 		partition->PublishDevice();
@@ -1271,6 +1289,7 @@ KPartition::WriteUserData(UserDataWriter& writer, user_partition_data* data)
 		data->size = Size();
 		data->content_size = ContentSize();
 		data->block_size = BlockSize();
+		data->physical_block_size = PhysicalBlockSize();
 		data->status = Status();
 		data->flags = Flags();
 		data->volume = VolumeID();
@@ -1322,6 +1341,7 @@ KPartition::Dump(bool deep, int32 level)
 		Size() / (1024.0*1024));
 	OUT("%s  content size:      %" B_PRIdOFF "\n", prefix, ContentSize());
 	OUT("%s  block size:        %" B_PRIu32 "\n", prefix, BlockSize());
+	OUT("%s  physical block size: %" B_PRIu32 "\n", prefix, PhysicalBlockSize());
 	OUT("%s  child count:       %" B_PRId32 "\n", prefix, CountChildren());
 	OUT("%s  index:             %" B_PRId32 "\n", prefix, Index());
 	OUT("%s  status:            %" B_PRIu32 "\n", prefix, Status());

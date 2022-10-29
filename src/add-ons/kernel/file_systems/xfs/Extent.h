@@ -7,6 +7,7 @@
 #define _EXTENT_H_
 
 
+#include "Directory.h"
 #include "Inode.h"
 #include "system_dependencies.h"
 
@@ -62,6 +63,8 @@ public:
 			static	uint32				ExpectedMagic(int8 WhichDirectory,
 										Inode* inode);
 			static	uint32				CRCOffset();
+			static	ExtentDataHeader*	Create(Inode* inode, const char* buffer);
+			static	uint32				Size(Inode* inode);
 };
 
 
@@ -150,8 +153,7 @@ struct ExtentBlockTail {
 };
 
 
-class Extent
-{
+class Extent : public DirectoryIterator {
 public:
 								Extent(Inode* inode);
 								~Extent();
@@ -175,13 +177,5 @@ private:
 			char*				fBlockBuffer;
 				// This isn't inode data. It holds the directory block.
 };
-
-
-ExtentDataHeader*
-CreateDataHeader(Inode* inode, const char* buffer);
-
-
-uint32
-SizeOfDataHeader(Inode* inode);
 
 #endif

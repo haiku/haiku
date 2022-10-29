@@ -149,7 +149,9 @@ DesktopSettingsPrivate::_Load()
 	if (status == B_OK) {
 		BMessage settings;
 		status = settings.Unflatten(&file);
-		if (status == B_OK && gFontManager->Lock()) {
+		if (status != B_OK) {
+			fFontSettingsLoadStatus = status;
+		} else if (gFontManager->Lock()) {
 			const char* family;
 			const char* style;
 			float size;
@@ -185,8 +187,10 @@ DesktopSettingsPrivate::_Load()
 				gDefaultHintingMode = hinting;
 
 			gFontManager->Unlock();
-		}
-	}
+		} else
+			fFontSettingsLoadStatus = EWOULDBLOCK;
+	} else
+		fFontSettingsLoadStatus = status;
 
 	// read mouse settings
 

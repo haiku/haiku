@@ -316,6 +316,14 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 			break;
 		}
 
+		// USB bus
+		if (attributes[i].fName == B_DEVICE_PRETTY_NAME
+			&& attributes[i].fValue == "USB") {
+			newDevice = new Device(parent, BUS_USB,
+				CAT_BUS, B_TRANSLATE("USB bus"));
+			break;
+		}
+
 		// PCI device
 		if (attributes[i].fName == B_DEVICE_BUS
 			&& attributes[i].fValue == "pci") {
@@ -327,6 +335,13 @@ DevicesView::AddDeviceAndChildren(device_node_cookie *node, Device* parent)
 		if (attributes[i].fName == B_DEVICE_BUS
 			&& attributes[i].fValue == "acpi") {
 			newDevice = new DeviceACPI(parent);
+			break;
+		}
+
+		// USB device
+		if (attributes[i].fName == B_DEVICE_BUS
+			&& attributes[i].fValue == "usb") {
+			newDevice = new DeviceUSB(parent);
 			break;
 		}
 

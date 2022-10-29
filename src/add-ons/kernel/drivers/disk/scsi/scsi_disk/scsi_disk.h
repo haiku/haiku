@@ -30,6 +30,7 @@ struct das_driver_info {
 
 	uint64					capacity;
 	uint32					block_size;
+	uint32					physical_block_size;
 
 	bool					removable;
 };

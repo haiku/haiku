@@ -26,7 +26,8 @@ Device::Device(Object* parent, int8 hubAddress, uint8 hubPort,
 	fDeviceAddress(deviceAddress),
 	fHubAddress(hubAddress),
 	fHubPort(hubPort),
-	fControllerCookie(controllerCookie)
+	fControllerCookie(controllerCookie),
+	fNode(NULL)
 {
 	TRACE("creating device\n");
 
@@ -337,6 +338,10 @@ Device::~Device()
 	// Destroy open endpoints. Do not send a device request to unconfigure
 	// though, since we may be deleted because the device was unplugged already.
 	Unconfigure(false);
+
+	if (gDeviceManager->unregister_node(fNode) != B_OK)
+		TRACE_ERROR("failed to unregister device node\n");
+	fNode = NULL;
 
 	// Destroy all Interfaces in the Configurations hierarchy.
 	for (int32 i = 0; fConfigurations != NULL
@@ -827,4 +832,98 @@ Device::GetStatus(uint16* status)
 	return fDefaultPipe->SendRequest(
 		USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_IN,
 		USB_REQUEST_GET_STATUS, 0, 0, 2, (void*)status, 2, NULL);
+}
+
+
+device_node*
+Device::RegisterNode(device_node *parent)
+{
+	usb_id id = USBID();
+	if (parent == NULL)
+		parent = ((Device*)Parent())->Node();
+
+	device_attr attrs[128] = {
+		{ B_DEVICE_BUS, B_STRING_TYPE, { string: "usb" }},
+
+		// location
+		{ USB_DEVICE_ID_ITEM, B_UINT32_TYPE, { ui32: id }},
+
+		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_FIND_MULTIPLE_CHILDREN }},
+
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "USB device" }},
+
+		{ NULL }
+	};
+	uint32 attrCount = 4;
+
+	if (fDeviceDescriptor.vendor_id != 0) {
+		attrs[attrCount].name = B_DEVICE_VENDOR_ID;
+		attrs[attrCount].type = B_UINT16_TYPE;
+		attrs[attrCount].value.ui16 = fDeviceDescriptor.vendor_id;
+		attrCount++;
+		attrs[attrCount].name = B_DEVICE_ID;
+		attrs[attrCount].type = B_UINT16_TYPE;
+		attrs[attrCount].value.ui16 = fDeviceDescriptor.product_id;
+		attrCount++;
+	}
+
+	uint32 attrClassesIndex = attrCount;
+
+	if (fDeviceDescriptor.device_class != 0) {
+		attrs[attrCount].name = USB_DEVICE_CLASS;
+		attrs[attrCount].type = B_UINT8_TYPE;
+		attrs[attrCount].value.ui8 = fDeviceDescriptor.device_class;
+		attrCount++;
+		attrs[attrCount].name = USB_DEVICE_SUBCLASS;
+		attrs[attrCount].type = B_UINT8_TYPE;
+		attrs[attrCount].value.ui8 = fDeviceDescriptor.device_subclass;
+		attrCount++;
+		attrs[attrCount].name = USB_DEVICE_PROTOCOL;
+		attrs[attrCount].type = B_UINT8_TYPE;
+		attrs[attrCount].value.ui8 = fDeviceDescriptor.device_protocol;
+		attrCount++;
+	}
+
+	for (uint32 j = 0; j < fDeviceDescriptor.num_configurations; j++) {
+		for (uint32 k = 0; k < fConfigurations[j].interface_count; k++) {
+			for (uint32 l = 0; l < fConfigurations[j].interface[k].alt_count; l++) {
+				usb_interface_descriptor* descriptor
+					= fConfigurations[j].interface[k].alt[l].descr;
+				bool found = false;
+				for (uint32 i = attrClassesIndex; i < attrCount;) {
+					if (attrs[i++].value.ui8 != descriptor->interface_class)
+						continue;
+					if (attrs[i++].value.ui8 != descriptor->interface_subclass)
+						continue;
+					if (attrs[i++].value.ui8 != descriptor->interface_protocol)
+						continue;
+					found = true;
+					break;
+				}
+				if (found)
+					continue;
+				attrs[attrCount].name = USB_DEVICE_CLASS;
+				attrs[attrCount].type = B_UINT8_TYPE;
+				attrs[attrCount].value.ui8 = descriptor->interface_class;
+				attrCount++;
+				attrs[attrCount].name = USB_DEVICE_SUBCLASS;
+				attrs[attrCount].type = B_UINT8_TYPE;
+				attrs[attrCount].value.ui8 = descriptor->interface_subclass;
+				attrCount++;
+				attrs[attrCount].name = USB_DEVICE_PROTOCOL;
+				attrs[attrCount].type = B_UINT8_TYPE;
+				attrs[attrCount].value.ui8 = descriptor->interface_protocol;
+				attrCount++;
+			}
+		}
+	}
+
+
+	device_node* node = NULL;
+	if (gDeviceManager->register_node(parent, USB_DEVICE_MODULE_NAME, attrs,
+		NULL, &node) != B_OK) {
+		TRACE_ERROR("failed to register device node\n");
+	} else
+		fNode = node;
+	return node;
 }

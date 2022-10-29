@@ -166,7 +166,6 @@ private:
 			fs_volume*			fFSVolume;
 			int					fDevice;
 			ext2_super_block	fSuperBlock;
-			char				fName[32];
 
 			BlockAllocator*		fBlockAllocator;
 			InodeAllocator		fInodeAllocator;

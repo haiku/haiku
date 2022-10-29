@@ -750,7 +750,7 @@ TAlertView::SetBitmap(BBitmap* icon)
 	BBitmap* oldBitmap = fIconBitmap;
 	fIconBitmap = icon;
 
-	if (oldBitmap == NULL
+	if (oldBitmap == NULL || (oldBitmap != NULL && icon == NULL)
 			|| (icon != NULL && oldBitmap->Bounds() != icon->Bounds())) {
 		InvalidateLayout();
 	} else

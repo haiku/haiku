@@ -208,7 +208,7 @@ IconSpewer::DrawSomeNew()
 
 			IconCache::sIconCache->Draw(&model, view,
 				BPoint(column * (kIconSize + 2), row * (kIconSize + 2)),
-				kNormalIcon, kIconSize, true);
+				kNormalIcon, BSize(kIconSize - 1, kIconSize - 1), true);
 			target->Unlock();
 			numDrawn++;
 		}

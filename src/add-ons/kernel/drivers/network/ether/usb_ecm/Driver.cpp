@@ -11,177 +11,93 @@
 #include "Driver.h"
 #include "ECMDevice.h"
 
-int32 api_version = B_CUR_DRIVER_API_VERSION;
-static const char *sDeviceBaseName = "net/usb_ecm/";
-ECMDevice *gECMDevices[MAX_DEVICES];
-char *gDeviceNames[MAX_DEVICES + 1];
+
+#define DEVICE_BASE_NAME "net/usb_ecm/"
 usb_module_info *gUSBModule = NULL;
-mutex gDriverLock;
+device_manager_info *gDeviceManager;
 
 
-status_t
-usb_ecm_device_added(usb_device device, void **cookie)
+#define USB_ECM_DRIVER_MODULE_NAME "drivers/network/usb_ecm/driver_v1"
+#define USB_ECM_DEVICE_MODULE_NAME "drivers/network/usb_ecm/device_v1"
+#define USB_ECM_DEVICE_ID_GENERATOR	"usb_ecm/device_id"
+
+// TODO: move these to a common header
+#define USB_DEVICE_ID_ITEM "usb/id"
+#define USB_DEVICE_CLASS "usb/class"
+#define USB_DEVICE_SUBCLASS "usb/subclass"
+#define USB_DEVICE_PROTOCOL "usb/protocol"
+
+
+//	#pragma mark - device module API
+
+
+static status_t
+usb_ecm_init_device(void* _info, void** _cookie)
 {
-	*cookie = NULL;
+	CALLED();
+	usb_ecm_driver_info* info = (usb_ecm_driver_info*)_info;
 
-	// check if this is a replug of an existing device first
-	mutex_lock(&gDriverLock);
-	for (int32 i = 0; i < MAX_DEVICES; i++) {
-		if (gECMDevices[i] == NULL)
-			continue;
+	device_node* parent = gDeviceManager->get_parent_node(info->node);
+	gDeviceManager->get_driver(parent, (driver_module_info **)&info->usb,
+		(void **)&info->usb_device);
+	gDeviceManager->put_node(parent);
 
-		if (gECMDevices[i]->CompareAndReattach(device) != B_OK)
-			continue;
+	usb_device device;
+	if (gDeviceManager->get_attr_uint32(info->node, USB_DEVICE_ID_ITEM, &device, true) != B_OK)
+		return B_ERROR;
 
-		TRACE_ALWAYS("ecm device %" B_PRId32 " replugged\n", i);
-		*cookie = gECMDevices[i];
-		mutex_unlock(&gDriverLock);
-		return B_OK;
-	}
-
-	// no such device yet, create a new one
 	ECMDevice *ecmDevice = new ECMDevice(device);
 	status_t status = ecmDevice->InitCheck();
 	if (status < B_OK) {
 		delete ecmDevice;
-		mutex_unlock(&gDriverLock);
 		return status;
 	}
 
-	for (int32 i = 0; i < MAX_DEVICES; i++) {
-		if (gECMDevices[i] != NULL)
-			continue;
+	info->device = ecmDevice;
 
-		gECMDevices[i] = ecmDevice;
-		*cookie = ecmDevice;
-
-		TRACE_ALWAYS("ecm device %" B_PRId32 " added\n", i);
-		mutex_unlock(&gDriverLock);
-		return B_OK;
-	}
-
-	// no space for the device
-	delete ecmDevice;
-	mutex_unlock(&gDriverLock);
-	return B_ERROR;
+	*_cookie = info;
+	return status;
 }
 
 
-status_t
-usb_ecm_device_removed(void *cookie)
+static void
+usb_ecm_uninit_device(void* _cookie)
 {
-	mutex_lock(&gDriverLock);
+	CALLED();
+	usb_ecm_driver_info* info = (usb_ecm_driver_info*)_cookie;
 
-	ECMDevice *device = (ECMDevice *)cookie;
-	for (int32 i = 0; i < MAX_DEVICES; i++) {
-		if (gECMDevices[i] == device) {
-			if (device->IsOpen()) {
-				// the device will be deleted upon being freed
-				device->Removed();
-			} else {
-				gECMDevices[i] = NULL;
-				delete device;
-			}
-			break;
-		}
-	}
-
-	mutex_unlock(&gDriverLock);
-	return B_OK;
+	delete info->device;
 }
 
 
-//#pragma mark -
-
-
-status_t
-init_hardware()
+static void
+usb_ecm_device_removed(void* _cookie)
 {
-	TRACE("init_hardware()\n");
-	return B_OK;
-}
-
-
-status_t
-init_driver()
-{
-	TRACE("init_driver()\n");
-	status_t status = get_module(B_USB_MODULE_NAME,
-		(module_info **)&gUSBModule);
-	if (status < B_OK)
-		return status;
-
-	for (int32 i = 0; i < MAX_DEVICES; i++)
-		gECMDevices[i] = NULL;
-
-	gDeviceNames[0] = NULL;
-	mutex_init(&gDriverLock, DRIVER_NAME"_devices");
-
-	static usb_notify_hooks notifyHooks = {
-		&usb_ecm_device_added,
-		&usb_ecm_device_removed
-	};
-
-	static usb_support_descriptor supportDescriptor = {
-		USB_INTERFACE_CLASS_CDC, /* CDC - Communication Device Class */
-		USB_INTERFACE_SUBCLASS_ECM, /* ECM - Ethernet Control Model */
-		0, 0, 0 /* no protocol, vendor or device */
-	};
-
-	gUSBModule->register_driver(DRIVER_NAME, &supportDescriptor, 1, NULL);
-	gUSBModule->install_notify(DRIVER_NAME, &notifyHooks);
-	return B_OK;
-}
-
-
-void
-uninit_driver()
-{
-	TRACE("uninit_driver()\n");
-	gUSBModule->uninstall_notify(DRIVER_NAME);
-	mutex_lock(&gDriverLock);
-
-	for (int32 i = 0; i < MAX_DEVICES; i++) {
-		if (gECMDevices[i] != NULL) {
-			delete gECMDevices[i];
-			gECMDevices[i] = NULL;
-		}
-	}
-
-	for (int32 i = 0; gDeviceNames[i]; i++) {
-		free(gDeviceNames[i]);
-		gDeviceNames[i] = NULL;
-	}
-
-	mutex_destroy(&gDriverLock);
-	put_module(B_USB_MODULE_NAME);
+	CALLED();
+	usb_ecm_driver_info* info = (usb_ecm_driver_info*)_cookie;
+	info->device->Removed();
 }
 
 
 static status_t
-usb_ecm_open(const char *name, uint32 flags, void **cookie)
+usb_ecm_open(void* _info, const char* path, int openMode, void** _cookie)
 {
-	TRACE("open(%s, %lu, %p)\n", name, flags, cookie);
-	mutex_lock(&gDriverLock);
+	CALLED();
+	usb_ecm_driver_info* info = (usb_ecm_driver_info*)_info;
 
-	*cookie = NULL;
-	status_t status = ENODEV;
-	int32 index = strtol(name + strlen(sDeviceBaseName), NULL, 10);
-	if (index >= 0 && index < MAX_DEVICES && gECMDevices[index] != NULL) {
-		status = gECMDevices[index]->Open();
-		if (status == B_OK)
-			*cookie = gECMDevices[index];
-	}
+	status_t status = info->device->Open();
+	if (status != B_OK)
+		return status;
 
-	mutex_unlock(&gDriverLock);
-	return status;
+	*_cookie = info->device;
+	return B_OK;
 }
 
 
 static status_t
 usb_ecm_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 {
-	TRACE("read(%p, %Ld, %p, %lu)\n", cookie, position, buffer, *numBytes);
+	TRACE("read(%p, %" B_PRIdOFF", %p, %lu)\n", cookie, position, buffer, *numBytes);
 	ECMDevice *device = (ECMDevice *)cookie;
 	return device->Read((uint8 *)buffer, numBytes);
 }
@@ -191,7 +107,7 @@ static status_t
 usb_ecm_write(void *cookie, off_t position, const void *buffer,
 	size_t *numBytes)
 {
-	TRACE("write(%p, %Ld, %p, %lu)\n", cookie, position, buffer, *numBytes);
+	TRACE("write(%p, %" B_PRIdOFF", %p, %lu)\n", cookie, position, buffer, *numBytes);
 	ECMDevice *device = (ECMDevice *)cookie;
 	return device->Write((const uint8 *)buffer, numBytes);
 }
@@ -200,7 +116,7 @@ usb_ecm_write(void *cookie, off_t position, const void *buffer,
 static status_t
 usb_ecm_control(void *cookie, uint32 op, void *buffer, size_t length)
 {
-	TRACE("control(%p, %lu, %p, %lu)\n", cookie, op, buffer, length);
+	TRACE("control(%p, %" B_PRIu32 ", %p, %lu)\n", cookie, op, buffer, length);
 	ECMDevice *device = (ECMDevice *)cookie;
 	return device->Control(op, buffer, length);
 }
@@ -220,68 +136,168 @@ usb_ecm_free(void *cookie)
 {
 	TRACE("free(%p)\n", cookie);
 	ECMDevice *device = (ECMDevice *)cookie;
-	mutex_lock(&gDriverLock);
-	status_t status = device->Free();
-	for (int32 i = 0; i < MAX_DEVICES; i++) {
-		if (gECMDevices[i] == device) {
-			// the device is removed already but as it was open the
-			// removed hook has not deleted the object
-			gECMDevices[i] = NULL;
-			delete device;
-			break;
+	return device->Free();
+}
+
+
+//	#pragma mark - driver module API
+
+
+static float
+usb_ecm_supports_device(device_node *parent)
+{
+	CALLED();
+	const char *bus;
+
+	// make sure parent is really the usb bus manager
+	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
+		return -1;
+
+	if (strcmp(bus, "usb"))
+		return 0.0;
+
+
+	// check whether it's really an ECM device
+	device_attr *attr = NULL;
+	uint8 baseClass = 0, subclass = 0;
+	while (gDeviceManager->get_next_attr(parent, &attr) == B_OK) {
+		if (attr->type != B_UINT8_TYPE)
+			continue;
+
+		if (!strcmp(attr->name, USB_DEVICE_CLASS))
+			baseClass = attr->value.ui8;
+		if (!strcmp(attr->name, USB_DEVICE_SUBCLASS))
+			subclass = attr->value.ui8;
+		if (baseClass != 0 && subclass != 0) {
+			if (baseClass == USB_INTERFACE_CLASS_CDC && subclass == USB_INTERFACE_SUBCLASS_ECM)
+				break;
+			baseClass = subclass = 0;
 		}
 	}
 
-	mutex_unlock(&gDriverLock);
+	if (baseClass != USB_INTERFACE_CLASS_CDC || subclass != USB_INTERFACE_SUBCLASS_ECM)
+		return 0.0;
+
+	TRACE("USB-ECM device found!\n");
+
+	return 0.6;
+}
+
+
+static status_t
+usb_ecm_register_device(device_node *node)
+{
+	CALLED();
+
+	device_attr attrs[] = {
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "USB ECM"} },
+		{ NULL }
+	};
+
+	return gDeviceManager->register_node(node, USB_ECM_DRIVER_MODULE_NAME,
+		attrs, NULL, NULL);
+}
+
+
+static status_t
+usb_ecm_init_driver(device_node *node, void **cookie)
+{
+	CALLED();
+
+	usb_ecm_driver_info* info = (usb_ecm_driver_info*)malloc(
+		sizeof(usb_ecm_driver_info));
+	if (info == NULL)
+		return B_NO_MEMORY;
+
+	memset(info, 0, sizeof(*info));
+	info->node = node;
+
+	*cookie = info;
+	return B_OK;
+}
+
+
+static void
+usb_ecm_uninit_driver(void *_cookie)
+{
+	CALLED();
+	usb_ecm_driver_info* info = (usb_ecm_driver_info*)_cookie;
+	free(info);
+}
+
+
+static status_t
+usb_ecm_register_child_devices(void* _cookie)
+{
+	CALLED();
+	usb_ecm_driver_info* info = (usb_ecm_driver_info*)_cookie;
+	status_t status;
+
+	int32 id = gDeviceManager->create_id(USB_ECM_DEVICE_ID_GENERATOR);
+	if (id < 0)
+		return id;
+
+	char name[64];
+	snprintf(name, sizeof(name), DEVICE_BASE_NAME "%" B_PRId32,
+		id);
+
+	status = gDeviceManager->publish_device(info->node, name,
+		USB_ECM_DEVICE_MODULE_NAME);
+
 	return status;
 }
 
 
-const char **
-publish_devices()
-{
-	TRACE("publish_devices()\n");
-	for (int32 i = 0; gDeviceNames[i]; i++) {
-		free(gDeviceNames[i]);
-		gDeviceNames[i] = NULL;
-	}
-
-	int32 deviceCount = 0;
-	mutex_lock(&gDriverLock);
-	for (int32 i = 0; i < MAX_DEVICES; i++) {
-		if (gECMDevices[i] == NULL)
-			continue;
-
-		gDeviceNames[deviceCount] = (char *)malloc(strlen(sDeviceBaseName) + 4);
-		if (gDeviceNames[deviceCount] != NULL) {
-			sprintf(gDeviceNames[deviceCount], "%s%" B_PRId32, sDeviceBaseName,
-				i);
-			TRACE("publishing %s\n", gDeviceNames[deviceCount]);
-			deviceCount++;
-		} else
-			TRACE_ALWAYS("publish_devices - no memory to allocate device name\n");
-	}
-
-	gDeviceNames[deviceCount] = NULL;
-	mutex_unlock(&gDriverLock);
-	return (const char **)&gDeviceNames[0];
-}
+//	#pragma mark -
 
 
-device_hooks *
-find_device(const char *name)
-{
-	TRACE("find_device(%s)\n", name);
-	static device_hooks deviceHooks = {
-		usb_ecm_open,
-		usb_ecm_close,
-		usb_ecm_free,
-		usb_ecm_control,
-		usb_ecm_read,
-		usb_ecm_write,
-		NULL,				/* select */
-		NULL				/* deselect */
-	};
+module_dependency module_dependencies[] = {
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&gDeviceManager },
+	{ B_USB_MODULE_NAME, (module_info**)&gUSBModule},
+	{ NULL }
+};
 
-	return &deviceHooks;
-}
+struct device_module_info sUsbEcmDevice = {
+	{
+		USB_ECM_DEVICE_MODULE_NAME,
+		0,
+		NULL
+	},
+
+	usb_ecm_init_device,
+	usb_ecm_uninit_device,
+	usb_ecm_device_removed,
+
+	usb_ecm_open,
+	usb_ecm_close,
+	usb_ecm_free,
+	usb_ecm_read,
+	usb_ecm_write,
+	NULL,	// io
+	usb_ecm_control,
+
+	NULL,	// select
+	NULL,	// deselect
+};
+
+struct driver_module_info sUsbEcmDriver = {
+	{
+		USB_ECM_DRIVER_MODULE_NAME,
+		0,
+		NULL
+	},
+
+	usb_ecm_supports_device,
+	usb_ecm_register_device,
+	usb_ecm_init_driver,
+	usb_ecm_uninit_driver,
+	usb_ecm_register_child_devices,
+	NULL,	// rescan
+	NULL,	// removed
+};
+
+module_info* modules[] = {
+	(module_info*)&sUsbEcmDriver,
+	(module_info*)&sUsbEcmDevice,
+	NULL
+};

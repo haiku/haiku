@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-mount_server	2818767263
+1	dutch; flemish	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Betrek alleen-lezen
 Error mounting volume:\n\n%s	AutoMounter		Fout bij betrekken van gegevensdrager:\n\n%s
 Cancel	AutoMounter		Annuleren
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		Betrekken van de gegevensdrager: '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Kon de schijf \"%s\" niet betrekken:\n\t%s\n\nMoet het onttrekken geforceerd worden?\n\nNota: Als een toepassing op dit moment naar het gegevensdrager schrijft, kan onttrekken dataverlies tot gevolg hebben.\n
 Force unmount	AutoMounter		Forceer onttrekking
 Mount error	AutoMounter		Fout bij het betrekken
-Mounting volume <unnamed volume>\n\n	AutoMounter		Gegevendrager <onbenoemde gegevensdrager> wordt betrokken\n\n
 Mount warning	AutoMounter		Betrek-waarschuwing

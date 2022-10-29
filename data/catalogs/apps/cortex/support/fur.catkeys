@@ -1,4 +1,4 @@
-1	friulian	application/x-vnd.Cortex.support	168903602
+1	friulian	application/x-vnd.Cortex.support	2097798758
 Header has flags	MediaString		La intestazion e à opzions
 32 bit HLS	MediaString		HLS a 32 bit
 Recording	MediaString		Regjistrazion
@@ -102,6 +102,7 @@ WAV format family	MediaString		Famee di formâts WAV
  (NTSC)	MediaString		 (NTSC)
 Physical input	MediaString		Jentrade fisiche
 Big endian	MediaString		Big endian
+Sub	MediaString		Sub
 {0, plural,one{# byte (max)}other{# bytes (max)}}	MediaString		{0, plural,one{# byte (massim)}other{# bytes (massim)}}
 YUV411	MediaString		YUV411
 Multistream media	MediaString		Multimedia a flus multiplis

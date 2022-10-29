@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haiku, Inc. All Rights Reserved.
+ * Copyright 2019-2022 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #include <arch/arm/arch_cpu.h>
@@ -41,9 +41,10 @@ sub	sp, sp, \xt
 	mov    x0,   sp  // original x19 that we swapped with sp
 	stp	   x18,  x0, [x19, #(IFRAME_x + 18 * 8)]
 
-	// x20-x29 won't be clobbered
+	// x20-x28 won't be clobbered
 	// thus we don't really need to store these
 
+	str	   x29,      [x19, #(IFRAME_fp)]
 	str	   x30,      [x19, #(IFRAME_lr)]
 
 .if \el == 0
@@ -83,6 +84,7 @@ sub	sp, sp, \xt
 	ldp	   x14, x15, [x19, #(IFRAME_x + 14 * 8)]
 	ldp	   x16, x17, [x19, #(IFRAME_x + 16 * 8)]
 	// x18 and x19 will be restored later
+	ldr	   x29, [x19, #(IFRAME_fp)]
 	ldr	   x30, [x19, #(IFRAME_lr)]
 
 	// disable interrupts before restoring ELR/SPSR/sp
@@ -119,6 +121,7 @@ sub	sp, sp, \xt
 		// call C handler, passing IFRAME in x0
 		// handler can enable interrupts if it wants to
 		mov x0, x19
+		mov x29, x0
 		bl \func
 
 		EXCEPTION_RETURN \el
@@ -308,3 +311,10 @@ fault:
 	mov x1, #1
 	b longjmp
 FUNCTION_END(arch_debug_call_with_fault_handler)
+
+
+/* addr_t arm64_get_fp(void) */
+FUNCTION(arm64_get_fp):
+	mov x0, x29
+	ret
+FUNCTION_END(arm64_get_fp)

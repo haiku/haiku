@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-mount_server	2818767263
+1	friulian	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Montâ in dome-leture
 Error mounting volume:\n\n%s	AutoMounter		Erôr tal montâ il volum:\n\n%s
 Cancel	AutoMounter		Anule
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		Montaç dal volum '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Impussibil dismontâ il disc \"%s\":\n\t%s\n\nSfuarçâ il dismontâ?\n\nNote: Se une aplicazion e sta scrivint sul volum, dismontâlu cumò al compuarte pierditis di dâts.\n
 Force unmount	AutoMounter		Sfuarce il dismontâ
 Mount error	AutoMounter		Erôr di montaç
-Mounting volume <unnamed volume>\n\n	AutoMounter		Montaç dal volum <unnamed volume>\n\n
 Mount warning	AutoMounter		Avertiment di montaç

@@ -4,21 +4,6 @@ HAIKU_ANYBOOT_DIR ?= $(HAIKU_DEFAULT_ANYBOOT_DIR) ;
 HAIKU_ANYBOOT = $(HAIKU_ANYBOOT_NAME) ;
 HAIKU_ANYBOOT_LABEL ?= $(HAIKU_DEFAULT_ANYBOOT_LABEL) ;
 
-rule BuildAnybootImage anybootImage : mbrPart : isoPart : imageFile {
-	local anyboot = <build>anyboot ;
-
-	Depends $(anybootImage) : $(anyboot) ;
-	Depends $(anybootImage) : $(isoPart) ;
-	Depends $(anybootImage) : $(mbrPart) ;
-	Depends $(anybootImage) : $(imageFile) ;
-
-	BuildAnybootImage1 $(anybootImage) : $(anyboot) $(mbrPart) $(isoPart) $(imageFile) ;
-}
-
-actions BuildAnybootImage1 {
-	$(2[1]) -b $(2[2]) $(2[3]) $(2[4]) $(1)
-}
-
 rule BuildAnybootImageEfi anybootImage : mbrPart : efiPart : isoPart : imageFile {
 	local anyboot = <build>anyboot ;
 
@@ -55,9 +40,6 @@ for platform in [ MultiBootSubDirSetup ] {
 			BuildAnybootImageEfi $(HAIKU_ANYBOOT) : $(baseMBR)
 				: $(efiPartition) : $(HAIKU_CD_BOOT_IMAGE)
 				: $(HAIKU_IMAGE_NAME) ;
-		} else if $(HAIKU_ANYBOOT_LEGACY) = 1 {
-			BuildAnybootImage $(HAIKU_ANYBOOT) : $(baseMBR)
-				: $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_IMAGE_NAME) ;
 		}
 	}
 }

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Login	3568987751
+1	romanian	x-vnd.Haiku-Login	1584886353
 Invalid login!	Login View		Autentificare nevalidă!
 Error	Login App		Eroare
 Login application for Haiku\nUsage:	Login App		Aplicație de autentificare pentru Haiku\nUtilizare:
@@ -11,7 +11,6 @@ Reboot	Login View		Repornire
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Puteți personaliza desktopul afișat în spatele aplicației de autentificare plasând replicanți pe aceasta.\n\nCând ați terminat, ieșiți din aplicație (Cmd-Q).
 OK	Login View		OK
 Info	Login App		Informații
---edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tLansează în modul de editare de raft pentru a permite personalizarea desktop-ului.
 Login:	Login View		Autentificare:
 Password:	Login View		Parolă:
 Unimplemented	Login App		Neimplementat

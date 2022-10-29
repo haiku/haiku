@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-mount_server	819316177
+1	lithuanian	x-vnd.Haiku-mount_server	2894720660
 Mount read-only	AutoMounter		Prijungti tik skaitymui
 Error mounting volume:\n\n%s	AutoMounter		Klaida prijungiant tomą:\n\n%s
 Cancel	AutoMounter		Atsisakyti
@@ -10,5 +10,4 @@ Mounting volume '%s'\n\n	AutoMounter		Prigijungiamas tomas „%s“\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nepavyko atjungti tomo „%s“:\n\t%s\n\nAr atjungti privestinai?\n\nPastaba: jei kokia nors programa dabar ką nors į šį tomą rašo, jį dabar atjungdami, rizikuojate prarasti duomenis.\n
 Force unmount	AutoMounter		Atjungti priverstinai
 Mount error	AutoMounter		Prijungimo klaida
-Mounting volume <unnamed volume>\n\n	AutoMounter		Prijungiamas bevardis tomas\n\n
 Mount warning	AutoMounter		Prijugimo perspėjimas

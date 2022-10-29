@@ -56,7 +56,7 @@ InitializeBFSEditor::SetTo(BPartition* partition)
 {
 	BString name = partition->Name();
 	if (name.IsEmpty())
-		name = partition->ContentName();
+		name = partition->RawContentName();
 	if (!name.IsEmpty())
 		fNameControl->SetText(name.String());
 	off_t size = partition->Size();

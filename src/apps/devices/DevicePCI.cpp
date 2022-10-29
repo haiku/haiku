@@ -70,7 +70,7 @@ DevicePCI::InitFromAttributes()
 	fAttributeMap[B_DEVICE_ID] = ToHex(fDeviceId);
 
 	// Fetch ClassInfo	
-	char classInfo[64];
+	char classInfo[128];
 	get_class_info(fClassBaseId, fClassSubId, fClassApiId, classInfo,
 		sizeof(classInfo));
 	

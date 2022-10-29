@@ -15,6 +15,7 @@
 #include <boot/PathBlocklist.h>
 #include <boot/stdio.h>
 #include <boot/net/NetStack.h>
+#include <system_revision.h>
 
 #include "file_systems/packagefs/packagefs.h"
 
@@ -58,6 +59,7 @@ main(stage2_args *args)
 		panic("Could not initialize VFS!\n");
 
 	dprintf("Welcome to the Haiku boot loader!\n");
+	dprintf("Haiku revision: %s\n", get_haiku_revision());
 
 	bool mountedAllVolumes = false;
 

@@ -137,7 +137,7 @@ NodeDirectory::FillBuffer(int type, char* blockBuffer, int howManyBlocksFurthur)
 
 	if (type == DATA) {
 		fDataBuffer = blockBuffer;
-		ExtentDataHeader* header = CreateDataHeader(fInode, fDataBuffer);
+		ExtentDataHeader* header = ExtentDataHeader::Create(fInode, fDataBuffer);
 		if(header == NULL)
 			return B_NO_MEMORY;
 		if (!VerifyHeader<ExtentDataHeader>(header, fDataBuffer, fInode,
@@ -154,7 +154,7 @@ NodeDirectory::FillBuffer(int type, char* blockBuffer, int howManyBlocksFurthur)
 			This could be leaf or node block perform check for both
 			based on magic number found.
 		*/
-		ExtentLeafHeader* leaf = CreateLeafHeader(fInode, fLeafBuffer);
+		ExtentLeafHeader* leaf = ExtentLeafHeader::Create(fInode, fLeafBuffer);
 		if (leaf == NULL)
 			return B_NO_MEMORY;
 
@@ -169,7 +169,7 @@ NodeDirectory::FillBuffer(int type, char* blockBuffer, int howManyBlocksFurthur)
 		delete leaf;
 		leaf = NULL;
 
-		NodeHeader* node = CreateNodeHeader(fInode, fLeafBuffer);
+		NodeHeader* node = NodeHeader::Create(fInode, fLeafBuffer);
 		if (node == NULL)
 			return B_NO_MEMORY;
 
@@ -200,11 +200,11 @@ NodeDirectory::GetOffsetFromAddress(uint32 address)
 status_t
 NodeDirectory::FindHashInNode(uint32 hashVal, uint32* rightMapOffset)
 {
-	NodeHeader* header = CreateNodeHeader(fInode, fLeafBuffer);
+	NodeHeader* header = NodeHeader::Create(fInode, fLeafBuffer);
 	if (header == NULL)
 		return B_NO_MEMORY;
 
-	NodeEntry* entry = (NodeEntry*)(void*)(fLeafBuffer + SizeOfNodeHeader(fInode));
+	NodeEntry* entry = (NodeEntry*)(void*)(fLeafBuffer + NodeHeader::Size(fInode));
 	int count = header->Count();
 	delete header;
 	if ((NodeEntry*)(void*)fLeafBuffer + fInode->DirBlockSize()
@@ -268,7 +268,7 @@ NodeDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 
 	void* entry; // This could be unused entry so we should check
 
-	entry = (void*)(fDataBuffer + SizeOfDataHeader(fInode));
+	entry = (void*)(fDataBuffer + ExtentDataHeader::Size(fInode));
 
 	uint32 blockNoFromAddress = BLOCKNO_FROM_ADDRESS(fOffset, volume);
 	if (fOffset != 0 && blockNoFromAddress == fCurBlockNumber) {
@@ -294,8 +294,8 @@ NodeDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 				blockNoFromAddress - fDataMap->br_startoff);
 			if (status != B_OK)
 				return status;
-			entry = (void*)(fDataBuffer + SizeOfDataHeader(fInode));
-			fOffset = fOffset + SizeOfDataHeader(fInode);
+			entry = (void*)(fDataBuffer + ExtentDataHeader::Size(fInode));
+			fOffset = fOffset + ExtentDataHeader::Size(fInode);
 			fCurBlockNumber = blockNoFromAddress;
 		} else if (fCurBlockNumber != blockNoFromAddress) {
 			// When the block isn't mapped in the current data map entry
@@ -304,8 +304,8 @@ NodeDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 				blockNoFromAddress - fDataMap->br_startoff);
 			if (status != B_OK)
 				return status;
-			entry = (void*)(fDataBuffer + SizeOfDataHeader(fInode));
-			fOffset = fOffset + SizeOfDataHeader(fInode);
+			entry = (void*)(fDataBuffer + ExtentDataHeader::Size(fInode));
+			fOffset = fOffset + ExtentDataHeader::Size(fInode);
 			fCurBlockNumber = blockNoFromAddress;
 		}
 
@@ -388,38 +388,21 @@ NodeDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 		if (status != B_OK)
 			return status;
 		fCurLeafBufferNumber = 2;
-		ExtentLeafHeader* leafHeader = CreateLeafHeader(fInode, fLeafBuffer);
+		ExtentLeafHeader* leafHeader = ExtentLeafHeader::Create(fInode, fLeafBuffer);
 		if(leafHeader == NULL)
 			return B_NO_MEMORY;
 		ExtentLeafEntry* leafEntry =
-			(ExtentLeafEntry*)(void*)(fLeafBuffer + SizeOfLeafHeader(fInode));
+			(ExtentLeafEntry*)(void*)(fLeafBuffer + ExtentLeafHeader::Size(fInode));
 		if (leafEntry == NULL)
 			return B_NO_MEMORY;
 
 		int numberOfLeafEntries = leafHeader->Count();
 		TRACE("numberOfLeafEntries:(%" B_PRId32 ")\n", numberOfLeafEntries);
 		int left = 0;
-		int mid;
 		int right = numberOfLeafEntries - 1;
 		Volume* volume = fInode->GetVolume();
 
-		/*
-		* Trying to find the lowerbound of hashValueOfRequest
-		* This is slightly different from bsearch(), as we want the first
-		* instance of hashValueOfRequest and not any instance.
-		*/
-		while (left < right) {
-			mid = (left + right) / 2;
-			uint32 hashval = B_BENDIAN_TO_HOST_INT32(leafEntry[mid].hashval);
-			if (hashval >= hashValueOfRequest) {
-				right = mid;
-				continue;
-			}
-			if (hashval < hashValueOfRequest) {
-				left = mid + 1;
-			}
-		}
-		TRACE("left:(%" B_PRId32 "), right:(%" B_PRId32 ")\n", left, right);
+		hashLowerBound<ExtentLeafEntry>(leafEntry, left, right, hashValueOfRequest);
 
 		while (B_BENDIAN_TO_HOST_INT32(leafEntry[left].hashval)
 				== hashValueOfRequest) {
@@ -485,6 +468,35 @@ uint32
 NodeHeader::CRCOffset()
 {
 	return XFS_NODE_CRC_OFF - XFS_NODE_V5_VPTR_OFF;
+}
+
+
+NodeHeader*
+NodeHeader::Create(Inode* inode, const char* buffer)
+{
+	if (inode->Version() == 1 || inode->Version() == 2) {
+		NodeHeaderV4* header = new (std::nothrow) NodeHeaderV4(buffer);
+		return header;
+	} else {
+		NodeHeaderV5* header = new (std::nothrow) NodeHeaderV5(buffer);
+		return header;
+	}
+}
+
+
+/*
+	This Function returns Actual size of leaf header
+	in all forms of directory.
+	Never use sizeof() operator because we now have
+	vtable as well and it will give wrong results
+*/
+uint32
+NodeHeader::Size(Inode* inode)
+{
+	if (inode->Version() == 1 || inode->Version() == 2)
+		return sizeof(NodeHeaderV4) - XFS_NODE_V4_VPTR_OFF;
+	else
+		return sizeof(NodeHeaderV5) - XFS_NODE_V5_VPTR_OFF;
 }
 
 
@@ -642,34 +654,4 @@ uint16
 NodeHeaderV5::Count()
 {
 	return count;
-}
-
-
-//Function to get V4 or V5 leaf header instance
-NodeHeader*
-CreateNodeHeader(Inode* inode, const char* buffer)
-{
-	if (inode->Version() == 1 || inode->Version() == 2) {
-		NodeHeaderV4* header = new (std::nothrow) NodeHeaderV4(buffer);
-		return header;
-	} else {
-		NodeHeaderV5* header = new (std::nothrow) NodeHeaderV5(buffer);
-		return header;
-	}
-}
-
-
-/*
-	This Function returns Actual size of leaf header
-	in all forms of directory.
-	Never use sizeof() operator because we now have
-	vtable as well and it will give wrong results
-*/
-uint32
-SizeOfNodeHeader(Inode* inode)
-{
-	if (inode->Version() == 1 || inode->Version() == 2)
-		return sizeof(NodeHeaderV4) - XFS_NODE_V4_VPTR_OFF;
-	else
-		return sizeof(NodeHeaderV5) - XFS_NODE_V5_VPTR_OFF;
 }

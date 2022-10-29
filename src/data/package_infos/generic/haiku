@@ -9,7 +9,7 @@ boot loader, kernel, the system libraries, servers, and applications."
 packager		"The Haiku build system"
 vendor			"Haiku Project"
 
-copyrights		"2001-2021 Haiku, Inc. et al"
+copyrights		"2001-2022 Haiku, Inc. et al"
 licenses {
 	MIT
 	"GNU LGPL v2.1"
@@ -34,6 +34,7 @@ provides {
 	cmd:login
 	cmd:more
 	cmd:passwd
+	cmd:pidof
 	cmd:ping
 	cmd:ping6
 	cmd:prio

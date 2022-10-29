@@ -19,7 +19,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		}
 
 
-		local threadsLib = threads.c ;
+		local threadsLib = call_once.c cnd.c mtx.c thrd.c tss.c ;
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) libstdthreads ] ;
 		if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 1 {
 			# the threads library is not available on gcc2
 			threadsLib = ;
@@ -29,7 +30,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			assert.cpp
 			cat.cpp
 			dlfcn.c
-			dirent.c
+			dirent.cpp
 			errno.c
 			fcntl.cpp
 			glob.c

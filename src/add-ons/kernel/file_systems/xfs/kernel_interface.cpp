@@ -9,6 +9,7 @@
 #include "Directory.h"
 #include "Inode.h"
 #include "ShortAttribute.h"
+#include "Symlink.h"
 #include "Utility.h"
 #include "Volume.h"
 
@@ -204,16 +205,9 @@ xfs_lookup(fs_volume *_volume, fs_vnode *_directory, const char *name,
 	if (status < B_OK)
 		return status;
 
-	DirectoryIterator* iterator =
-		new(std::nothrow) DirectoryIterator(directory);
+	DirectoryIterator* iterator = DirectoryIterator::Init(directory);
 	if (iterator == NULL)
-		return B_NO_MEMORY;
-
-	status = iterator->Init();
-	if (status != B_OK) {
-		delete iterator;
-		return status;
-	}
+		return B_BAD_VALUE;
 
 	status = iterator->Lookup(name, strlen(name), (xfs_ino_t*)_vnodeID);
 	if (status != B_OK) {
@@ -353,7 +347,18 @@ static status_t
 xfs_read_link(fs_volume *_volume, fs_vnode *_node, char *buffer,
 	size_t *_bufferSize)
 {
-	return B_NOT_SUPPORTED;
+	TRACE("XFS_READ_SYMLINK\n");
+
+	Inode* inode = (Inode*)_node->private_node;
+
+	if (!inode->IsSymLink())
+		return B_BAD_VALUE;
+
+	Symlink symlink(inode);
+
+	status_t result = symlink.ReadLink(0, buffer, _bufferSize);
+
+	return result;
 }
 
 
@@ -395,12 +400,10 @@ xfs_open_dir(fs_volume * /*_volume*/, fs_vnode *_node, void **_cookie)
 	if (!inode->IsDirectory())
 		return B_NOT_A_DIRECTORY;
 
-	DirectoryIterator* iterator = new(std::nothrow) DirectoryIterator(inode);
-	if (iterator == NULL) {
-		delete iterator;
-		return B_NO_MEMORY;
-	}
-	status = iterator->Init();
+	DirectoryIterator* iterator = DirectoryIterator::Init(inode);
+	if (iterator == NULL)
+		return B_BAD_VALUE;
+
 	*_cookie = iterator;
 	return status;
 }

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-mount_server	2818767263
+1	german	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Schreibgeschützt einhängen
 Error mounting volume:\n\n%s	AutoMounter		Fehler beim Einhängen:\n\n%s
 Cancel	AutoMounter		Abbrechen
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		'%s' wird eingehangen\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Datenträger \"%s\" konnte nicht ausgehängt werden:\n\t%s\n\nSoll das Aushängen erzwungen werden?\n\nAchtung: Wird der Datenträger gerade noch beschrieben, kann das Aushängen zum jetzigen Zeitpunkt zu Datenverlust führen.\n
 Force unmount	AutoMounter		Aushängen erzwingen
 Mount error	AutoMounter		Fehler beim Einhängen
-Mounting volume <unnamed volume>\n\n	AutoMounter		<Unbenannter Datenträger> wird eingehangen\n\n
 Mount warning	AutoMounter		Warnung beim Einhängen

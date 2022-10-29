@@ -155,11 +155,12 @@ BootPromptWindow::BootPromptWindow()
 	size_t size = 0;
 	const uint8_t* data;
 
-	BBitmap desktopIcon(BRect(0, 0, 23, 23), B_RGBA32);
+	const BRect iconRect = BRect(BPoint(0, 0), be_control_look->ComposeIconSize(24));
+	BBitmap desktopIcon(iconRect, B_RGBA32);
 	data = (const uint8_t*)res->LoadResource('VICN', "Desktop", &size);
 	BIconUtils::GetVectorIcon(data, size, &desktopIcon);
 
-	BBitmap installerIcon(BRect(0, 0, 23, 23), B_RGBA32);
+	BBitmap installerIcon(iconRect, B_RGBA32);
 	data = (const uint8_t*)res->LoadResource('VICN', "Installer", &size);
 	BIconUtils::GetVectorIcon(data, size, &installerIcon);
 

@@ -2,7 +2,7 @@
 Cancel	ShutdownProcess		Vazgeç
 OK	ShutdownProcess		Tamam
 Do you really want to shut down the system?	ShutdownProcess		Sistemi kapatmak istediğinizden emin misiniz?
-Shutdown status	ShutdownProcess		Kapanma Durumu
+Shutdown status	ShutdownProcess		Kapanma durumu
 Shut down	ShutdownProcess		Kapat
 The application \"%appName%\" might be blocked on a modal panel.	ShutdownProcess		\"%appName%\" uygulaması bir kipsel panelde takılı kalmış olabilir.
 System is shut down	ShutdownProcess		Sistem kapandı

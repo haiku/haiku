@@ -117,6 +117,7 @@ for platform in [ MultiBootSubDirSetup ] {
 			partitions.cpp
 			RootFileSystem.cpp
 			stdio.cpp
+			system_revision.c
 			vfs.cpp
 			vm.cpp
 
@@ -164,7 +165,7 @@ for platform in [ MultiBootSubDirSetup ] {
 		SEARCH on [ FGristFiles safemode_settings.cpp ]
 			= [ FDirName $(HAIKU_TOP) src system kernel debug ] ;
 
-		SEARCH on [ FGristFiles driver_settings.cpp ]
+		SEARCH on [ FGristFiles driver_settings.cpp system_revision.c ]
 			= [ FDirName $(HAIKU_TOP) src system libroot os ] ;
 
 		SEARCH on [ FGristFiles amiga_rdb.cpp ]

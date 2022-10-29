@@ -38,7 +38,7 @@ Deskbar menu	CPUButton		Menu Deskbar
 Mini mode	NormalPulseView		Mode miniature
 Quit	MiniPulseView		Quitter
 Info	PulseView		Information
-Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Usage: Pulse [--mini] [-w largeur] [--width=largeur]\n\t[--deskbar] [--normal] [--framecolor 0xrrvvbb]\n\t[--activecolor 0xrrvvbb] [--idlecolor 0xrrvvbb]
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		Usage : Pulse [--mini] [-w largeur] [--width=largeur]\n\t[--deskbar] [--normal] [--framecolor 0xrrvvbb]\n\t[--activecolor 0xrrvvbb] [--idlecolor 0xrrvvbb]
 OK	DeskbarPulseView		OK
 Info	PulseApp		Information
 Pulse	System name		Pulsation

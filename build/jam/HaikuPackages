@@ -6,8 +6,6 @@ local packages = [ FFilterByBuildFeatures
 	HaikuExtras
 	HaikuLoader
 	HaikuSource
-	HaikuUserguide
-	HaikuWelcome
 	MakefileEngine
 	NetFS
 	UserlandFS

@@ -34,6 +34,7 @@ struct cd_driver_info {
 	uint64					capacity;
 	uint64					original_capacity;
 	uint32					block_size;
+	uint32					physical_block_size;
 
 	bool					removable;
 	uint8					device_type;

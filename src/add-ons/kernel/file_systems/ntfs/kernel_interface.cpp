@@ -16,6 +16,7 @@
 #include <fs_info.h>
 #include <NodeMonitor.h>
 #include <file_systems/DeviceOpener.h>
+#include <file_systems/fs_ops_support.h>
 #include <util/AutoLock.h>
 
 #include "ntfs.h"
@@ -1222,7 +1223,7 @@ fs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	uint32 count = 0;
 	while (count < maxCount && bufferSize > sizeof(struct dirent)) {
 		size_t length = bufferSize - offsetof(struct dirent, d_name);
-		if (length < cookie->current->name_length) {
+		if (length < (cookie->current->name_length + 1)) {
 			// the remaining name buffer length is too small
 			if (count == 0)
 				return B_BUFFER_OVERFLOW;
@@ -1233,10 +1234,8 @@ fs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 		dirent->d_dev = _volume->id;
 		dirent->d_ino = cookie->current->inode;
 		strlcpy(dirent->d_name, cookie->current->name, length + 1);
-		dirent->d_reclen = offsetof(struct dirent, d_name) + length + 1;
 
-		bufferSize -= dirent->d_reclen;
-		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
+		dirent = next_dirent(dirent, length, bufferSize);
 		count++;
 
 		cookie->current = cookie->current->next;

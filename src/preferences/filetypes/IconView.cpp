@@ -15,6 +15,7 @@
 #include <Attributes.h>
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <IconEditorProtocol.h>
 #include <IconUtils.h>
 #include <Locale.h>
@@ -497,13 +498,14 @@ Icon::AdoptData(uint8* data, size_t size)
 
 
 /*static*/ BBitmap*
-Icon::AllocateBitmap(int32 size, int32 space)
+Icon::AllocateBitmap(icon_size size, int32 space)
 {
 	int32 kSpace = B_RGBA32;
 	if (space == -1)
 		space = kSpace;
 
-	BBitmap* bitmap = new (nothrow) BBitmap(BRect(0, 0, size - 1, size - 1),
+	BBitmap* bitmap = new (nothrow) BBitmap(BRect(BPoint(0, 0),
+		be_control_look->ComposeIconSize(size)),
 		(color_space)space);
 	if (bitmap == NULL || bitmap->InitCheck() != B_OK) {
 		delete bitmap;
@@ -520,7 +522,7 @@ Icon::AllocateBitmap(int32 size, int32 space)
 IconView::IconView(const char* name, uint32 flags)
 	: BControl(name, NULL, NULL, B_WILL_DRAW | flags),
 	fModificationMessage(NULL),
-	fIconSize(B_LARGE_ICON),
+	fIconSize((icon_size)0),
 	fIcon(NULL),
 	fHeapIcon(NULL),
 	fHasRef(false),
@@ -531,6 +533,7 @@ IconView::IconView(const char* name, uint32 flags)
 	fDropTarget(false),
 	fShowEmptyFrame(true)
 {
+	SetIconSize(B_LARGE_ICON);
 }
 
 
@@ -716,7 +719,7 @@ IconView::AcceptsDrag(const BMessage* message)
 BRect
 IconView::BitmapRect() const
 {
-	return BRect(0, 0, fIconSize - 1, fIconSize - 1);
+	return fIconRect;
 }
 
 
@@ -761,10 +764,10 @@ void
 IconView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width)
-		*_width = fIconSize;
+		*_width = fIconRect.Width();
 
 	if (_height)
-		*_height = fIconSize;
+		*_height = fIconRect.Height();
 }
 
 
@@ -1034,7 +1037,7 @@ IconView::Update()
 
 		icon = Icon::AllocateBitmap(fIconSize);
 		if (icon != NULL && info.GetTrackerIcon(icon,
-				(icon_size)fIconSize) != B_OK) {
+				(icon_size)(icon->Bounds().IntegerWidth() + 1)) != B_OK) {
 			delete icon;
 			return;
 		}
@@ -1058,16 +1061,17 @@ IconView::Update()
 
 
 void
-IconView::SetIconSize(int32 size)
+IconView::SetIconSize(icon_size size)
 {
 	if (size < B_MINI_ICON)
 		size = B_MINI_ICON;
 	if (size > 256)
-		size = 256;
+		size = (icon_size)256;
 	if (size == fIconSize)
 		return;
 
 	fIconSize = size;
+	fIconRect = BRect(BPoint(0, 0), be_control_look->ComposeIconSize(fIconSize));
 	Update();
 }
 

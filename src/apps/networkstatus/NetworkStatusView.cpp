@@ -401,14 +401,15 @@ NetworkStatusView::MouseDown(BPoint point)
 	if (!wifiInterface.IsEmpty()) {
 		std::set<BNetworkAddress> associated;
 		BNetworkAddress address;
-		wireless_network network;
 		uint32 cookie = 0;
 		while (device.GetNextAssociatedNetwork(cookie, address) == B_OK)
 			associated.insert(address);
 
-		int32 wifiCount = 0;
-		cookie = 0;
-		while (device.GetNextNetwork(cookie, network) == B_OK) {
+		uint32 networksCount = 0;
+		wireless_network* networks = NULL;
+		device.GetNetworks(networks, networksCount);
+		for (uint32 i = 0; i < networksCount; i++) {
+			const wireless_network& network = networks[i];
 			BMessage* message = new BMessage(kMsgJoinNetwork);
 			message->AddString("device", wifiInterface);
 			message->AddString("name", network.name);
@@ -416,12 +417,12 @@ NetworkStatusView::MouseDown(BPoint point)
 
 			BMenuItem* item = new WirelessNetworkMenuItem(network, message);
 			menu->AddItem(item);
-			wifiCount++;
 			if (associated.find(network.address) != associated.end())
 				item->SetMarked(true);
 		}
+		delete[] networks;
 
-		if (wifiCount == 0) {
+		if (networksCount == 0) {
 			BMenuItem* item = new BMenuItem(
 				B_TRANSLATE("<no wireless networks found>"), NULL);
 			item->SetEnabled(false);

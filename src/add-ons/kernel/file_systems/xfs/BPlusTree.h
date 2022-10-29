@@ -6,6 +6,7 @@
 #define _BPLUS_TREE_H_
 
 
+#include "Directory.h"
 #include "Extent.h"
 #include "Inode.h"
 #include "LeafDirectory.h"
@@ -102,7 +103,7 @@ struct PathNode {
 /*
  * This class should handle B+Tree based directories
  */
-class TreeDirectory {
+class TreeDirectory : public DirectoryIterator {
 public:
 								TreeDirectory(Inode* inode);
 								~TreeDirectory();

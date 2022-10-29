@@ -17,6 +17,7 @@
 #include <string.h>
 
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -33,9 +34,6 @@
 static const char* kSettingsFileName = "DeskCalc_settings";
 const char* kAppName = B_TRANSLATE_SYSTEM_NAME("DeskCalc");
 const char* kSignature = "application/x-vnd.Haiku-DeskCalc";
-
-static const float kDefaultWindowWidth	= 220.0;
-static const float kDefaultWindowHeight	= 140.0;
 
 
 CalcApplication::CalcApplication()
@@ -57,9 +55,8 @@ CalcApplication::ReadyToRun()
 	BMessage settings;
 	_LoadSettings(settings);
 
-	float scaling = be_plain_font->Size() / 12.0f;
-	BRect frame(0, 0, (kDefaultWindowWidth * scaling) - 1,
-		(kDefaultWindowHeight * scaling) - 1);
+	BRect frame(0, 0, be_control_look->DefaultLabelSpacing() * 37.0f,
+		be_control_look->DefaultLabelSpacing() * 23.0f);
 	fCalcWindow = new CalcWindow(frame, &settings);
 
 	// reveal window

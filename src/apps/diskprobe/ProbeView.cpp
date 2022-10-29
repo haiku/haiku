@@ -1412,7 +1412,7 @@ ProbeView::AttachedToWindow()
 	subMenu = new BMenu(B_TRANSLATE_COMMENT("Block size", "Menu item. "
 		"This is in the same menu window than 'Base' and 'Font size'"));
 	subMenu->SetRadioMode(true);
-	const uint32 blockSizes[] = {512, 1024, 2048};
+	const uint32 blockSizes[] = {512, 1024, 2048, 4096};
 	for (uint32 i = 0; i < sizeof(blockSizes) / sizeof(blockSizes[0]); i++) {
 		char buffer[32];
 		snprintf(buffer, sizeof(buffer), "%" B_PRId32 "%s", blockSizes[i],

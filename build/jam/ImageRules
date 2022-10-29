@@ -1589,7 +1589,7 @@ actions BuildFloppyBootImageFixupM68K
 
 #pragma mark - CD Boot Image rules
 
-rule BuildCDBootImage image : bootfloppy : bootefi : extrafiles
+rule BuildCDBootImageEFI image : bootfloppy : bootefi : extrafiles
 {
 	Depends $(image) : $(bootfloppy) ;
 	Depends $(image) : $(bootefi) ;
@@ -1602,21 +1602,11 @@ rule BuildCDBootImage image : bootfloppy : bootefi : extrafiles
 		VOLID on $(image) = haiku-$(HAIKU_VERSION)-$(TARGET_ARCH) ;
 	}
 
-	if $(HAIKU_ANYBOOT_LEGACY) = 1 {
-		BuildCDBootImageMBR $(image) : $(bootfloppy) $(extrafiles) ;
-	} else {
-		BOOTEFI on $(image) = $(bootefi) ;
-		BuildCDBootImageEFI $(image) : $(bootfloppy) $(bootefi) $(extrafiles) ;
-	}
+	BOOTEFI on $(image) = $(bootefi) ;
+	BuildCDBootImageEFI1 $(image) : $(bootfloppy) $(bootefi) $(extrafiles) ;
 }
 
-actions BuildCDBootImageMBR
-{
-	$(RM) $(<)
-	xorriso -as mkisofs -b $(BOOTIMG) -r -J -V $(VOLID) -o $(<) $(>[1]) $(>[2-])
-}
-
-actions BuildCDBootImageEFI
+actions BuildCDBootImageEFI1
 {
 	$(RM) $(<)
 	xorriso -as mkisofs -b $(BOOTIMG) -eltorito-alt-boot -no-emul-boot -e $(BOOTEFI) \

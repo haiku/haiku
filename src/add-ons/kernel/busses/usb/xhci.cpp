@@ -12,9 +12,10 @@
  */
 
 
-#include <module.h>
-#include <PCI.h>
+#include <stdio.h>
+
 #include <PCI_x86.h>
+#include <bus/PCI.h>
 #include <USB3.h>
 #include <KernelExport.h>
 
@@ -23,25 +24,208 @@
 
 #include "xhci.h"
 
+
+#define CALLED(x...)	TRACE_MODULE("CALLED %s\n", __PRETTY_FUNCTION__)
+
+
 #define USB_MODULE_NAME	"xhci"
 
-pci_module_info *XHCI::sPCIModule = NULL;
-pci_x86_module_info *XHCI::sPCIx86Module = NULL;
+static pci_x86_module_info* sPCIx86Module = NULL;
+device_manager_info* gDeviceManager;
+static usb_for_controller_interface* gUSB;
 
 
-static int32
-xhci_std_ops(int32 op, ...)
+#define XHCI_PCI_DEVICE_MODULE_NAME "busses/usb/xhci/pci/driver_v1"
+#define XHCI_PCI_USB_BUS_MODULE_NAME "busses/usb/xhci/device_v1"
+
+
+typedef struct {
+	XHCI* xhci;
+	pci_device_module_info* pci;
+	pci_device* device;
+
+	pci_info pciinfo;
+
+	device_node* node;
+	device_node* driver_node;
+} xhci_pci_sim_info;
+
+
+//	#pragma mark -
+
+
+static status_t
+init_bus(device_node* node, void** bus_cookie)
 {
-	switch (op) {
-		case B_MODULE_INIT:
-			TRACE_MODULE("xhci init module\n");
-			return B_OK;
-		case B_MODULE_UNINIT:
-			TRACE_MODULE("xhci uninit module\n");
-			return B_OK;
+	CALLED();
+
+	driver_module_info* driver;
+	xhci_pci_sim_info* bus;
+	device_node* parent = gDeviceManager->get_parent_node(node);
+	gDeviceManager->get_driver(parent, &driver, (void**)&bus);
+	gDeviceManager->put_node(parent);
+
+	Stack *stack;
+	if (gUSB->get_stack((void**)&stack) != B_OK)
+		return B_ERROR;
+
+	XHCI *xhci = new(std::nothrow) XHCI(&bus->pciinfo, bus->pci, bus->device, stack, node);
+	if (xhci == NULL) {
+		return B_NO_MEMORY;
 	}
 
-	return EINVAL;
+	if (xhci->InitCheck() < B_OK) {
+		TRACE_MODULE_ERROR("bus failed init check\n");
+		delete xhci;
+		return B_ERROR;
+	}
+
+	if (xhci->Start() != B_OK) {
+		delete xhci;
+		return B_ERROR;
+	}
+
+	*bus_cookie = xhci;
+
+	return B_OK;
+}
+
+
+static void
+uninit_bus(void* bus_cookie)
+{
+	CALLED();
+	XHCI* xhci = (XHCI*)bus_cookie;
+	delete xhci;
+}
+
+
+static status_t
+register_child_devices(void* cookie)
+{
+	CALLED();
+	xhci_pci_sim_info* bus = (xhci_pci_sim_info*)cookie;
+	device_node* node = bus->driver_node;
+
+	char prettyName[25];
+	sprintf(prettyName, "XHCI Controller %" B_PRIu16, 0);
+
+	device_attr attrs[] = {
+		// properties of this controller for the usb bus manager
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
+			{ string: prettyName }},
+		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
+			{ string: USB_FOR_CONTROLLER_MODULE_NAME }},
+
+		// private data to identify the device
+		{ NULL }
+	};
+
+	return gDeviceManager->register_node(node, XHCI_PCI_USB_BUS_MODULE_NAME,
+		attrs, NULL, NULL);
+}
+
+
+static status_t
+init_device(device_node* node, void** device_cookie)
+{
+	CALLED();
+	xhci_pci_sim_info* bus = (xhci_pci_sim_info*)calloc(1,
+		sizeof(xhci_pci_sim_info));
+	if (bus == NULL)
+		return B_NO_MEMORY;
+
+	pci_device_module_info* pci;
+	pci_device* device;
+	{
+		device_node* pciParent = gDeviceManager->get_parent_node(node);
+		gDeviceManager->get_driver(pciParent, (driver_module_info**)&pci,
+			(void**)&device);
+		gDeviceManager->put_node(pciParent);
+	}
+
+	bus->pci = pci;
+	bus->device = device;
+	bus->driver_node = node;
+
+	pci_info *pciInfo = &bus->pciinfo;
+	pci->get_pci_info(device, pciInfo);
+
+	if (sPCIx86Module == NULL) {
+		if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module) != B_OK)
+			sPCIx86Module = NULL;
+	}
+
+	*device_cookie = bus;
+	return B_OK;
+}
+
+
+static void
+uninit_device(void* device_cookie)
+{
+	CALLED();
+	xhci_pci_sim_info* bus = (xhci_pci_sim_info*)device_cookie;
+	free(bus);
+
+	if (sPCIx86Module != NULL) {
+		put_module(B_PCI_X86_MODULE_NAME);
+		sPCIx86Module = NULL;
+	}
+}
+
+
+static status_t
+register_device(device_node* parent)
+{
+	CALLED();
+	device_attr attrs[] = {
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "XHCI PCI"}},
+		{}
+	};
+
+	return gDeviceManager->register_node(parent,
+		XHCI_PCI_DEVICE_MODULE_NAME, attrs, NULL, NULL);
+}
+
+
+static float
+supports_device(device_node* parent)
+{
+	CALLED();
+	const char* bus;
+	uint16 type, subType, api;
+
+	// make sure parent is a XHCI PCI device node
+	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false)
+		< B_OK) {
+		return -1;
+	}
+
+	if (strcmp(bus, "pci") != 0)
+		return 0.0f;
+
+	if (gDeviceManager->get_attr_uint16(parent, B_DEVICE_SUB_TYPE, &subType,
+			false) < B_OK
+		|| gDeviceManager->get_attr_uint16(parent, B_DEVICE_TYPE, &type,
+			false) < B_OK
+		|| gDeviceManager->get_attr_uint16(parent, B_DEVICE_INTERFACE, &api,
+			false) < B_OK) {
+		TRACE_MODULE("Could not find type/subtype/interface attributes\n");
+		return -1;
+	}
+
+	if (type == PCI_serial_bus && subType == PCI_usb && api == PCI_usb_xhci) {
+		pci_device_module_info* pci;
+		pci_device* device;
+		gDeviceManager->get_driver(parent, (driver_module_info**)&pci,
+			(void**)&device);
+		TRACE_MODULE("XHCI Device found!\n");
+
+		return 0.8f;
+	}
+
+	return 0.0f;
 }
 
 
@@ -90,109 +274,62 @@ xhci_error_string(uint32 error)
 }
 
 
-usb_host_controller_info xhci_module = {
-	{
-		"busses/usb/xhci",
-		0,
-		xhci_std_ops
-	},
-	NULL,
-	XHCI::AddTo
+module_dependency module_dependencies[] = {
+	{ USB_FOR_CONTROLLER_MODULE_NAME, (module_info**)&gUSB },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info**)&gDeviceManager },
+	{}
 };
 
 
-module_info *modules[] = {
-	(module_info *)&xhci_module,
+static usb_bus_interface gXHCIPCIDeviceModule = {
+	{
+		{
+			XHCI_PCI_USB_BUS_MODULE_NAME,
+			0,
+			NULL
+		},
+		NULL,  // supports device
+		NULL,  // register device
+		init_bus,
+		uninit_bus,
+		NULL,  // register child devices
+		NULL,  // rescan
+		NULL,  // device removed
+	},
+};
+
+// Root device that binds to the PCI bus. It will register an usb_bus_interface
+// node for each device.
+static driver_module_info sXHCIDevice = {
+	{
+		XHCI_PCI_DEVICE_MODULE_NAME,
+		0,
+		NULL
+	},
+	supports_device,
+	register_device,
+	init_device,
+	uninit_device,
+	register_child_devices,
+	NULL, // rescan
+	NULL, // device removed
+};
+
+module_info* modules[] = {
+	(module_info* )&sXHCIDevice,
+	(module_info* )&gXHCIPCIDeviceModule,
 	NULL
 };
 
 
-status_t
-XHCI::AddTo(Stack *stack)
-{
-	if (!sPCIModule) {
-		status_t status = get_module(B_PCI_MODULE_NAME,
-			(module_info **)&sPCIModule);
-		if (status < B_OK) {
-			TRACE_MODULE_ERROR("getting pci module failed! 0x%08" B_PRIx32
-				"\n", status);
-			return status;
-		}
-	}
-
-	TRACE_MODULE("searching devices\n");
-	bool found = false;
-	pci_info *item = new(std::nothrow) pci_info;
-	if (item == NULL) {
-		sPCIModule = NULL;
-		put_module(B_PCI_MODULE_NAME);
-		return B_NO_MEMORY;
-	}
-
-	// Try to get the PCI x86 module as well so we can enable possible MSIs.
-	if (sPCIx86Module == NULL && get_module(B_PCI_X86_MODULE_NAME,
-			(module_info **)&sPCIx86Module) != B_OK) {
-		// If it isn't there, that's not critical though.
-		TRACE_MODULE_ERROR("failed to get pci x86 module\n");
-		sPCIx86Module = NULL;
-	}
-
-	for (int32 i = 0; sPCIModule->get_nth_pci_info(i, item) >= B_OK; i++) {
-		if (item->class_base == PCI_serial_bus && item->class_sub == PCI_usb
-			&& item->class_api == PCI_usb_xhci) {
-			TRACE_MODULE("found device at PCI:%d:%d:%d\n",
-				item->bus, item->device, item->function);
-			XHCI *bus = new(std::nothrow) XHCI(item, stack);
-			if (bus == NULL) {
-				delete item;
-				sPCIModule = NULL;
-				put_module(B_PCI_MODULE_NAME);
-				if (sPCIx86Module != NULL)
-					put_module(B_PCI_X86_MODULE_NAME);
-				return B_NO_MEMORY;
-			}
-
-			// The bus will put the PCI modules when it is destroyed, so get
-			// them again to increase their reference count.
-			get_module(B_PCI_MODULE_NAME, (module_info **)&sPCIModule);
-			if (sPCIx86Module != NULL)
-				get_module(B_PCI_X86_MODULE_NAME, (module_info **)&sPCIx86Module);
-
-			if (bus->InitCheck() < B_OK) {
-				TRACE_MODULE_ERROR("bus failed init check\n");
-				delete bus;
-				continue;
-			}
-
-			// the bus took it away
-			item = new(std::nothrow) pci_info;
-
-			if (bus->Start() != B_OK) {
-				delete bus;
-				continue;
-			}
-			found = true;
-		}
-	}
-
-	// The modules will have been gotten again if we successfully
-	// initialized a bus, so we should put them here.
-	put_module(B_PCI_MODULE_NAME);
-	if (sPCIx86Module != NULL)
-		put_module(B_PCI_X86_MODULE_NAME);
-
-	if (!found)
-		TRACE_MODULE_ERROR("no devices found\n");
-	delete item;
-	return found ? B_OK : ENODEV;
-}
-
-
-XHCI::XHCI(pci_info *info, Stack *stack)
-	:	BusManager(stack),
+XHCI::XHCI(pci_info *info, 	pci_device_module_info* pci, pci_device* device, Stack *stack,
+	device_node* node)
+	:	BusManager(stack, node),
 		fRegisterArea(-1),
 		fRegisters(NULL),
 		fPCIInfo(info),
+		fPci(pci),
+		fDevice(device),
 		fStack(stack),
 		fIRQ(0),
 		fUseMSI(false),
@@ -228,13 +365,11 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	fInitOK = false;
 
 	// enable busmaster and memory mapped access
-	uint16 command = sPCIModule->read_pci_config(fPCIInfo->bus,
-		fPCIInfo->device, fPCIInfo->function, PCI_command, 2);
+	uint16 command = fPci->read_pci_config(fDevice, PCI_command, 2);
 	command &= ~(PCI_command_io | PCI_command_int_disable);
 	command |= PCI_command_master | PCI_command_memory;
 
-	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
-		fPCIInfo->function, PCI_command, 2, command);
+	fPci->write_pci_config(fDevice, PCI_command, 2, command);
 
 	// map the registers (low + high for 64-bit when requested)
 	phys_addr_t physicalAddress = fPCIInfo->u.h0.base_registers[0];
@@ -440,9 +575,6 @@ XHCI::~XHCI()
 		sPCIx86Module->unconfigure_msi(fPCIInfo->bus,
 			fPCIInfo->device, fPCIInfo->function);
 	}
-	put_module(B_PCI_MODULE_NAME);
-	if (sPCIx86Module != NULL)
-		put_module(B_PCI_X86_MODULE_NAME);
 }
 
 
@@ -450,21 +582,15 @@ void
 XHCI::_SwitchIntelPorts()
 {
 	TRACE("Looking for EHCI owned ports\n");
-	uint32 ports = sPCIModule->read_pci_config(fPCIInfo->bus,
-		fPCIInfo->device, fPCIInfo->function, XHCI_INTEL_USB3PRM, 4);
+	uint32 ports = fPci->read_pci_config(fDevice, XHCI_INTEL_USB3PRM, 4);
 	TRACE("Superspeed Ports: 0x%" B_PRIx32 "\n", ports);
-	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
-		fPCIInfo->function, XHCI_INTEL_USB3_PSSEN, 4, ports);
-	ports = sPCIModule->read_pci_config(fPCIInfo->bus,
-		fPCIInfo->device, fPCIInfo->function, XHCI_INTEL_USB3_PSSEN, 4);
+	fPci->write_pci_config(fDevice, XHCI_INTEL_USB3_PSSEN, 4, ports);
+	ports = fPci->read_pci_config(fDevice, XHCI_INTEL_USB3_PSSEN, 4);
 	TRACE("Superspeed ports now under XHCI : 0x%" B_PRIx32 "\n", ports);
-	ports = sPCIModule->read_pci_config(fPCIInfo->bus,
-		fPCIInfo->device, fPCIInfo->function, XHCI_INTEL_USB2PRM, 4);
+	ports = fPci->read_pci_config(fDevice, XHCI_INTEL_USB2PRM, 4);
 	TRACE("USB 2.0 Ports : 0x%" B_PRIx32 "\n", ports);
-	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
-		fPCIInfo->function, XHCI_INTEL_XUSB2PR, 4, ports);
-	ports = sPCIModule->read_pci_config(fPCIInfo->bus,
-		fPCIInfo->device, fPCIInfo->function, XHCI_INTEL_XUSB2PR, 4);
+	fPci->write_pci_config(fDevice, XHCI_INTEL_XUSB2PR, 4, ports);
+	ports = fPci->read_pci_config(fDevice, XHCI_INTEL_XUSB2PR, 4);
 	TRACE("USB 2.0 ports now under XHCI: 0x%" B_PRIx32 "\n", ports);
 }
 
@@ -674,6 +800,8 @@ XHCI::Start()
 	}
 
 	SetRootHub(fRootHub);
+
+	fRootHub->RegisterNode(Node());
 
 	TRACE_ALWAYS("successfully started the controller\n");
 
@@ -1648,6 +1776,8 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	// We don't want to disable the default endpoint, naturally, which would
 	// otherwise happen when this Pipe object is destroyed.
 	pipe.SetControllerCookie(NULL);
+
+	deviceObject->RegisterNode();
 
 	TRACE("AllocateDevice() port %d slot %d\n", hubPort, slot);
 	return deviceObject;

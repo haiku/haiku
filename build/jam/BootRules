@@ -97,6 +97,7 @@ rule SetupBoot
 		ObjectC++Flags $(object) : $(HAIKU_BOOT_C++FLAGS) $(HAIKU_BOOT_$(platform)_C++FLAGS) $(2) ;
 		ObjectDefines $(object) : $(TARGET_KERNEL_DEFINES) ;
 		ASFLAGS on $(object) = $(HAIKU_BOOT_CCFLAGS) $(HAIKU_BOOT_$(platform)_CCFLAGS) ;
+		OPTIM on $(object) = $(HAIKU_BOOT_OPTIM) ;
 
 		# override regular CCFLAGS/C++FLAGS, as we don't want them
 		TARGET_CCFLAGS_$(TARGET_KERNEL_ARCH) on $(object) = ;
@@ -182,13 +183,19 @@ rule BootMergeObject
 
 rule BootStaticLibrary
 {
-	# Usage BootStaticLibrary <name> : <sources> : <extra cc flags> ;
+	# BootStaticLibrary <name> : <sources> : <extra cc flags> ;
 	# This is designed to take a set of sources and libraries and create
-	# a file called lib<name>.a
+	# a static library.
+	local extraFlags = $(3) ;
 
 	TARGET_PACKAGING_ARCH on $(1) = $(TARGET_KERNEL_ARCH) ;
 
-	SetupBoot $(2) : $(3) : false ;
+	if $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_KERNEL_ARCH)) = 0
+			&& [ on $(1) return $(NO_HIDDEN_VISIBILITY) ] != 1 {
+		extraFlags += -fvisibility=hidden ;
+	}
+
+	SetupBoot $(2) : $(extraFlags) : false ;
 	Library $(1) : $(2) ;
 }
 

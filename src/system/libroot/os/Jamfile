@@ -24,7 +24,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			find_paths.cpp
 			fs_attr.cpp
 			fs_index.c
-			fs_info.c
+			fs_info.cpp
 			fs_query.cpp
 			fs_volume.c
 			image.cpp

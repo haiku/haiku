@@ -35,11 +35,11 @@ Channel mask	InfoView		Kanal maskesi
 Orientation	InfoView		Yön
 Live file-interface node	FileNodeInfoView		Canlı dosya arayüzü düğümü
 Channels	InfoView		Kanallar
-Sample rate	InfoView		Örnek oran
+Sample rate	InfoView		Örnek hız
 File format	FileNodeInfoView		Dosya biçimi
 (no file)	FileNodeInfoView		(dosya yok)
 Media input	InfoView		Ortam girişi
-Bit rate	InfoView		Bit oranı
+Bit rate	InfoView		Bit hızı
 Input format	DormantNodeInfoView		Giriş biçimi
 Format	InfoView		Biçim
 Version	AppNodeInfoView		Sürüm

@@ -7,6 +7,7 @@
 #define _LEAFDIRECTORY_H_
 
 
+#include "Directory.h"
 #include "Extent.h"
 #include "Inode.h"
 #include "system_dependencies.h"
@@ -37,6 +38,8 @@ public:
 			static	uint32				ExpectedMagic(int8 WhichDirectory,
 										Inode* inode);
 			static	uint32				CRCOffset();
+			static	ExtentLeafHeader*	Create(Inode* inode, const char* buffer);
+			static	uint32				Size(Inode* inode);
 
 };
 
@@ -97,7 +100,7 @@ struct ExtentLeafTail {
 };
 
 
-class LeafDirectory {
+class LeafDirectory : public DirectoryIterator {
 public:
 								LeafDirectory(Inode* inode);
 								~LeafDirectory();
@@ -125,13 +128,5 @@ private:
 			char*				fLeafBuffer;
 			uint32				fCurBlockNumber;
 };
-
-
-ExtentLeafHeader*
-CreateLeafHeader(Inode* inode, const char* buffer);
-
-
-uint32
-SizeOfLeafHeader(Inode* inode);
 
 #endif

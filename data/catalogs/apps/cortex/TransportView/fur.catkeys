@@ -1,4 +1,4 @@
-1	friulian	application/x-vnd.Cortex.TransportView	1402918430
+1	friulian	application/x-vnd.Cortex.TransportView	1534931965
 Roll	TransportView		Disrodole
 (none)	TransportView		(nissun)
 {0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# grop} other{# grops}}
@@ -19,4 +19,5 @@ Decrease precision	TransportView		Diminuìs la precision
 System clock	TransportView		Orloi di sisteme
 From:	TransportView		Di:
 Roll from	TransportView		Disrodole di
+Preroll	TransportView		Pre-voluçament
 Run mode:	TransportView		Modalitât esecuzion:

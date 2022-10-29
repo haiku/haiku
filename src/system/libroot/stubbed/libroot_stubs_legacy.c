@@ -726,10 +726,12 @@ void __pthread_cleanup_pop_handler() {}
 void __pthread_cleanup_push_handler() {}
 void __pthread_destroy_thread() {}
 void __pthread_getattr_np() {}
+void __pthread_getname_np() {}
 void __pthread_init_creation_attributes() {}
 void __pthread_key_call_destructors() {}
 void __pthread_mutex_lock__FP14_pthread_mutexUlx() {}
 void __pthread_set_default_priority() {}
+void __pthread_setname_np() {}
 void __pthread_sigmask() {}
 void __pthread_sigmask_beos() {}
 void __pure_virtual() {}
@@ -2205,6 +2207,7 @@ void pthread_equal() {}
 void pthread_exit() {}
 void pthread_getattr_np() {}
 void pthread_getconcurrency() {}
+void pthread_getname_np() {}
 void pthread_getschedparam() {}
 void pthread_getspecific() {}
 void pthread_join() {}
@@ -2250,6 +2253,7 @@ void pthread_self() {}
 void pthread_setcancelstate() {}
 void pthread_setcanceltype() {}
 void pthread_setconcurrency() {}
+void pthread_setname_np() {}
 void pthread_setschedparam() {}
 void pthread_setspecific() {}
 void pthread_spin_destroy() {}

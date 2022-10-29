@@ -1,4 +1,5 @@
-1	italian	application/x-vnd.moon-Flanger.media_addon	455620896
+1	italian	application/x-vnd.moon-Flanger.media_addon	2443618242
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: non posso ottenere le informazioni sul nodo (%ld):\n%s\n
 An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Una versione add-on di FlangerNode.\nda Eric Moon (16 giugno 1999)
 Delay	CortexAddOnsFlanger		Ritardo
 Depth	CortexAddOnsFlanger		Profondità

@@ -211,7 +211,7 @@ int utils_valid_device(const char *name, int force)
 	unsigned long mnt_flags = 0;
 	struct stat st;
 
-#if defined(HAVE_WINDOWS_H) | defined(__CYGWIN32__) 
+#if defined(HAVE_WINDOWS_H) | defined(__CYGWIN32__)
 	/* FIXME: This doesn't work for Cygwin, so just return success. */
 	return 1;
 #endif
@@ -624,7 +624,13 @@ int utils_inode_get_name(ntfs_inode *inode, char *buffer, int bufsize)
 		len = snprintf(buffer + offset, bufsize - offset, "%c%s", PATH_SEP, names[i]);
 		if (len >= (bufsize - offset)) {
 			ntfs_log_error("Pathname was truncated.\n");
+#ifdef __HAIKU__
+			for (i = 0; i < max_path; i++)
+				free(names[i]);
+			return 0;
+#else
 			break;
+#endif
 		}
 
 		offset += len;

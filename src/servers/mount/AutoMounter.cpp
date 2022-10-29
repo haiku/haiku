@@ -984,14 +984,8 @@ AutoMounter::_SuggestMountFlags(const BPartition* partition, uint32* _flags)
 	if (askReadOnly) {
 		// Suggest to the user to mount read-only until Haiku is more mature.
 		BString string;
-		if (partition->ContentName() != NULL) {
-			char buffer[512];
-			snprintf(buffer, sizeof(buffer),
-				B_TRANSLATE("Mounting volume '%s'\n\n"),
-				partition->ContentName());
-			string << buffer;
-		} else
-			string << B_TRANSLATE("Mounting volume <unnamed volume>\n\n");
+		string.SetToFormat(B_TRANSLATE("Mounting volume '%s'\n\n"),
+			partition->ContentName().String());
 
 		// TODO: Use distro name instead of "Haiku"...
 		string << B_TRANSLATE("The file system on this volume is not the "

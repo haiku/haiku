@@ -51,7 +51,7 @@ private:
 			const char*			fName;
 			AShortFormHeader*	fHeader;
 			AShortFormEntry*	fEntry;
-			uint32				fLastEntryOffset;
+			uint16				fLastEntryOffset;
 };
 
 #endif

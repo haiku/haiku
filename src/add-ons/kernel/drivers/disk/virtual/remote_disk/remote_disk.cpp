@@ -100,6 +100,7 @@ struct RemoteDiskDevice : recursive_lock {
 		geometry->removable = true;
 		geometry->read_only = remoteDisk->IsReadOnly();
 		geometry->write_once = false;
+		geometry->bytes_per_physical_sector = REMOTE_DISK_BLOCK_SIZE;
 	}
 };
 
@@ -247,17 +248,15 @@ remote_disk_control(void* cookie, uint32 op, void* arg, size_t len)
 			return B_BAD_VALUE;
 		}
 
-		case B_GET_GEOMETRY:
-			TRACE(("remote_disk: B_GET_GEOMETRY\n"));
-			device->GetGeometry((device_geometry*)arg, false);
-			return B_OK;
-
 		case B_GET_BIOS_GEOMETRY:
-		{
-			TRACE(("remote_disk: B_GET_BIOS_GEOMETRY\n"));
-			device->GetGeometry((device_geometry*)arg, true);
-			return B_OK;
-		}
+		case B_GET_GEOMETRY:
+			TRACE(("remote_disk: %s\n",
+				op == B_GET_BIOS_GEOMETRY ? "B_GET_BIOS_GEOMETRY" : "B_GET_GEOMETRY"));
+			if (buffer == NULL || length > sizeof(device_geometry))
+				return B_BAD_VALUE;
+			device_geometry geometry;
+			device->GetGeometry(&geometry, op == B_GET_BIOS_GEOMETRY);
+			return user_memcpy(buffer, &geometry, length);
 
 		case B_GET_MEDIA_STATUS:
 			TRACE(("remote_disk: B_GET_MEDIA_STATUS\n"));

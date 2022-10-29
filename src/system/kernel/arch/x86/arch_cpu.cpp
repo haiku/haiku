@@ -1403,11 +1403,84 @@ detect_amdc1e_noarat()
 }
 
 
+static void
+init_tsc_with_cpuid(kernel_args* args, uint32* conversionFactor)
+{
+	cpu_ent* cpu = get_cpu_struct();
+	if (cpu->arch.vendor != VENDOR_INTEL)
+		return;
+	uint32 model = (cpu->arch.extended_model << 4) | cpu->arch.model;
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 0, 0);
+	uint32 maxBasicLeaf = cpuid.eax_0.max_eax;
+	if (maxBasicLeaf < 0x15)
+		return;
+
+	get_current_cpuid(&cpuid, 0x15, 0);
+	if (cpuid.regs.eax == 0 || cpuid.regs.ebx == 0)
+		return;
+	uint32 khz = cpuid.regs.ecx / 1000;
+	uint32 denominator = cpuid.regs.eax;
+	uint32 numerator = cpuid.regs.ebx;
+	if (khz == 0 && model == 0x5f) {
+		// CPUID 0x16 isn't supported, hardcoding
+		khz = 25000;
+	}
+
+	if (khz == 0 && maxBasicLeaf >= 0x16) {
+		// for these CPUs the base frequency is also the tsc frequency
+		get_current_cpuid(&cpuid, 0x16, 0);
+		khz = cpuid.regs.eax * 1000 * denominator / numerator;
+	}
+	if (khz == 0)
+		return;
+	dprintf("CPU: using TSC frequency from CPUID\n");
+	// compute for microseconds as follows (1000000 << 32) / (tsc freq in Hz),
+	// or (1000 << 32) / (tsc freq in kHz)
+	*conversionFactor = (1000ULL << 32) / (khz * numerator / denominator);
+	// overwrite the bootloader value
+	args->arch_args.system_time_cv_factor = *conversionFactor;
+}
+
+
+static void
+init_tsc(kernel_args* args)
+{
+	// init the TSC -> system_time() conversion factors
+
+	// try to find the TSC frequency with CPUID
+	uint32 conversionFactor = args->arch_args.system_time_cv_factor;
+	init_tsc_with_cpuid(args, &conversionFactor);
+	uint64 conversionFactorNsecs = (uint64)conversionFactor * 1000;
+
+
+#ifdef __x86_64__
+	// The x86_64 system_time() implementation uses 64-bit multiplication and
+	// therefore shifting is not necessary for low frequencies (it's also not
+	// too likely that there'll be any x86_64 CPUs clocked under 1GHz).
+	__x86_setup_system_time((uint64)conversionFactor << 32,
+		conversionFactorNsecs);
+#else
+	if (conversionFactorNsecs >> 32 != 0) {
+		// the TSC frequency is < 1 GHz, which forces us to shift the factor
+		__x86_setup_system_time(conversionFactor, conversionFactorNsecs >> 16,
+			true);
+	} else {
+		// the TSC frequency is >= 1 GHz
+		__x86_setup_system_time(conversionFactor, conversionFactorNsecs, false);
+	}
+#endif
+}
+
+
 status_t
 arch_cpu_init_percpu(kernel_args* args, int cpu)
 {
 	load_microcode(cpu);
 	detect_cpu(cpu);
+
+	if (cpu == 0)
+		init_tsc(args);
 
 	if (!gCpuIdleFunc) {
 		if (detect_amdc1e_noarat())
@@ -1423,6 +1496,17 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 	// if RDTSCP is available write cpu number in TSC_AUX
 	if (x86_check_feature(IA32_FEATURE_AMD_EXT_RDTSCP, FEATURE_EXT_AMD))
 		x86_write_msr(IA32_MSR_TSC_AUX, cpu);
+
+	// make LFENCE a dispatch serializing instruction on AMD 64bit
+	cpu_ent* cpuEnt = get_cpu_struct();
+	if (cpuEnt->arch.vendor == VENDOR_AMD) {
+		uint32 family = cpuEnt->arch.family + cpuEnt->arch.extended_family;
+		if (family >= 0x10 && family != 0x11) {
+			uint64 value = x86_read_msr(MSR_F10H_DE_CFG);
+			if ((value & DE_CFG_SERIALIZE_LFENCE) == 0)
+				x86_write_msr(MSR_F10H_DE_CFG, value | DE_CFG_SERIALIZE_LFENCE);
+		}
+	}
 #endif
 
 	if (x86_check_feature(IA32_FEATURE_APERFMPERF, FEATURE_6_ECX)) {
@@ -1445,28 +1529,6 @@ arch_cpu_init(kernel_args* args)
 	} else {
 		dprintf("CPU: no microcode provided\n");
 	}
-
-	// init the TSC -> system_time() conversion factors
-
-	uint32 conversionFactor = args->arch_args.system_time_cv_factor;
-	uint64 conversionFactorNsecs = (uint64)conversionFactor * 1000;
-
-#ifdef __x86_64__
-	// The x86_64 system_time() implementation uses 64-bit multiplication and
-	// therefore shifting is not necessary for low frequencies (it's also not
-	// too likely that there'll be any x86_64 CPUs clocked under 1GHz).
-	__x86_setup_system_time((uint64)conversionFactor << 32,
-		conversionFactorNsecs);
-#else
-	if (conversionFactorNsecs >> 32 != 0) {
-		// the TSC frequency is < 1 GHz, which forces us to shift the factor
-		__x86_setup_system_time(conversionFactor, conversionFactorNsecs >> 16,
-			true);
-	} else {
-		// the TSC frequency is >= 1 GHz
-		__x86_setup_system_time(conversionFactor, conversionFactorNsecs, false);
-	}
-#endif
 
 	// Initialize descriptor tables.
 	x86_descriptors_init(args);

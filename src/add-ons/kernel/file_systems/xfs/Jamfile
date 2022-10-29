@@ -28,10 +28,13 @@ local xfsSources =
 	Inode.cpp
 	kernel_cpp.cpp
 	kernel_interface.cpp
+	LeafAttribute.cpp
 	LeafDirectory.cpp
 	Node.cpp
+	NodeAttribute.cpp
 	ShortAttribute.cpp
 	ShortDirectory.cpp
+	Symlink.cpp
 	Volume.cpp
 	xfs.cpp
 	;

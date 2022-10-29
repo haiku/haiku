@@ -38,6 +38,7 @@ public:
 			off_t				Size() const;
 			off_t				ContentSize() const;	// 0 if uninitialized
 			uint32				BlockSize() const;
+			uint32				PhysicalBlockSize() const;
 			int32				Index() const;		// 0 for devices
 			uint32				Status() const;
 
@@ -52,7 +53,8 @@ public:
 			uint32				Flags() const;
 
 			const char*			Name() const;
-			const char*			ContentName() const;
+			BString				ContentName() const;
+			const char*			RawContentName() const;
 			const char*			Type() const;			// See DiskDeviceTypes.h
 			const char*			ContentType() const;	// See DiskDeviceTypes.h
 			partition_id		ID() const;

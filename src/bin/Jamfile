@@ -250,6 +250,7 @@ DoCatalogs filepanel
 	: filepanel.cpp
 ;
 
+SubInclude HAIKU_TOP src bin acpi_call ;
 SubInclude HAIKU_TOP src bin addattr ;
 SubInclude HAIKU_TOP src bin bfs_tools ;
 SubInclude HAIKU_TOP src bin cddb_lookup ;

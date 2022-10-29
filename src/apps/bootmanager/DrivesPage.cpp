@@ -75,7 +75,7 @@ DriveItem::DriveItem(const BDiskDevice& device, const BootMenuList& menus)
 	else
 		fName = B_TRANSLATE_COMMENT("Hard Drive", "Default disk name");
 
-	fIcon = new BBitmap(BRect(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1),
+	fIcon = new BBitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_LARGE_ICON)),
 		B_RGBA32);
 	if (device.GetIcon(fIcon, B_LARGE_ICON) != B_OK)
 		memset(fIcon->Bits(), 0, fIcon->BitsLength());

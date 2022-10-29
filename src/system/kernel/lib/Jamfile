@@ -21,7 +21,7 @@ local posixSources = [ FDirName $(librootSources) posix ] ;
 local sources =
 	driver_settings.cpp
 	find_directory.cpp
-	fs_info.c
+	fs_info.cpp
 	system_revision.c
 	wait_for_objects.cpp
 	;
@@ -59,7 +59,7 @@ SourceHdrs $(muslSources) :
 KernelMergeObject kernel_lib_posix.o :
 	# main
 	kernel_errno.cpp
-	dirent.c
+	dirent.cpp
 	fcntl.cpp
 	poll.cpp
 	utime.c

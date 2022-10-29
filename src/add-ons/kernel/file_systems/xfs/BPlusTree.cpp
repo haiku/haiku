@@ -372,7 +372,7 @@ TreeDirectory::FillBuffer(char* blockBuffer, int howManyBlocksFurther,
 
 	if (targetMap == NULL) {
 		fSingleDirBlock = blockBuffer;
-		ExtentDataHeader* header = CreateDataHeader(fInode, fSingleDirBlock);
+		ExtentDataHeader* header = ExtentDataHeader::Create(fInode, fSingleDirBlock);
 		if (header == NULL)
 			return B_NO_MEMORY;
 		if (!VerifyHeader<ExtentDataHeader>(header, fSingleDirBlock, fInode,
@@ -389,7 +389,7 @@ TreeDirectory::FillBuffer(char* blockBuffer, int howManyBlocksFurther,
 			This could be leaf or node block perform check for both
 			based on magic number found.
 		*/
-		ExtentLeafHeader* leaf = CreateLeafHeader(fInode, fSingleDirBlock);
+		ExtentLeafHeader* leaf = ExtentLeafHeader::Create(fInode, fSingleDirBlock);
 		if (leaf == NULL)
 			return B_NO_MEMORY;
 
@@ -404,7 +404,7 @@ TreeDirectory::FillBuffer(char* blockBuffer, int howManyBlocksFurther,
 		delete leaf;
 		leaf = NULL;
 
-		NodeHeader* node = CreateNodeHeader(fInode, fSingleDirBlock);
+		NodeHeader* node = NodeHeader::Create(fInode, fSingleDirBlock);
 		if (node == NULL)
 			return B_NO_MEMORY;
 
@@ -473,7 +473,7 @@ TreeDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 	Volume* volume = fInode->GetVolume();
 
 	void* entry; // This could be unused entry so we should check
-	entry = (void*)(fSingleDirBlock + SizeOfDataHeader(fInode));
+	entry = (void*)(fSingleDirBlock + ExtentDataHeader::Size(fInode));
 
 	uint32 blockNoFromAddress = BLOCKNO_FROM_ADDRESS(fOffset, volume);
 	if (fOffset != 0 && blockNoFromAddress == fCurBlockNumber) {
@@ -499,8 +499,8 @@ TreeDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 				blockNoFromAddress - map.br_startoff);
 			if (status != B_OK)
 				return status;
-			entry = (void*)(fSingleDirBlock + SizeOfDataHeader(fInode));
-			fOffset = fOffset + SizeOfDataHeader(fInode);
+			entry = (void*)(fSingleDirBlock + ExtentDataHeader::Size(fInode));
+			fOffset = fOffset + ExtentDataHeader::Size(fInode);
 			fCurBlockNumber = blockNoFromAddress;
 		} else if (fCurBlockNumber != blockNoFromAddress) {
 			// When the block isn't mapped in the current data map entry
@@ -514,8 +514,8 @@ TreeDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 				blockNoFromAddress - map.br_startoff);
 			if (status != B_OK)
 				return status;
-			entry = (void*)(fSingleDirBlock + SizeOfDataHeader(fInode));
-			fOffset = fOffset + SizeOfDataHeader(fInode);
+			entry = (void*)(fSingleDirBlock + ExtentDataHeader::Size(fInode));
+			fOffset = fOffset + ExtentDataHeader::Size(fInode);
 			fCurBlockNumber = blockNoFromAddress;
 		}
 
@@ -629,10 +629,10 @@ TreeDirectory::SearchForMapInDirectoryBlock(uint64 blockNo,
 uint32
 TreeDirectory::SearchForHashInNodeBlock(uint32 hashVal)
 {
-	NodeHeader* header = CreateNodeHeader(fInode, fSingleDirBlock);
+	NodeHeader* header = NodeHeader::Create(fInode, fSingleDirBlock);
 	if (header == NULL)
 		return B_NO_MEMORY;
-	NodeEntry* entry = (NodeEntry*)(fSingleDirBlock + SizeOfNodeHeader(fInode));
+	NodeEntry* entry = (NodeEntry*)(fSingleDirBlock + NodeHeader::Size(fInode));
 	int count = header->Count();
 	delete header;
 
@@ -702,7 +702,7 @@ TreeDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 		FillBuffer(fSingleDirBlock, rightOffset - targetMap->br_startoff,
 			targetMap);
 		fOffsetOfSingleDirBlock = rightOffset;
-		ExtentLeafHeader* dirBlock = CreateLeafHeader(fInode, fSingleDirBlock);
+		ExtentLeafHeader* dirBlock = ExtentLeafHeader::Create(fInode, fSingleDirBlock);
 		if (dirBlock == NULL)
 			return B_NO_MEMORY;
 		if (dirBlock->Magic() == XFS_DIR2_LEAFN_MAGIC
@@ -724,33 +724,19 @@ TreeDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 	// Else go to the right subling if it might contain it. Else break.
 	while (1) {
 		ExtentLeafHeader* leafHeader
-			= CreateLeafHeader(fInode, fSingleDirBlock);
+			= ExtentLeafHeader::Create(fInode, fSingleDirBlock);
 		if (leafHeader == NULL)
 			return B_NO_MEMORY;
 		ExtentLeafEntry* leafEntry
-			= (ExtentLeafEntry*)(fSingleDirBlock + SizeOfLeafHeader(fInode));
+			= (ExtentLeafEntry*)(fSingleDirBlock + ExtentLeafHeader::Size(fInode));
 
 		int numberOfLeafEntries = leafHeader->Count();
 		TRACE("numberOfLeafEntries:(%" B_PRId32 ")\n", numberOfLeafEntries);
 		int left = 0;
-		int mid;
 		int right = numberOfLeafEntries - 1;
 
-		// Trying to find the lowerbound of hashValueOfRequest
-		// This is slightly different from bsearch(), as we want the first
-		// instance of hashValueOfRequest and not any instance.
-		while (left < right) {
-			mid = (left + right) / 2;
-			uint32 hashval = B_BENDIAN_TO_HOST_INT32(leafEntry[mid].hashval);
-			if (hashval >= hashValueOfRequest) {
-				right = mid;
-				continue;
-			}
-			if (hashval < hashValueOfRequest) {
-				left = mid + 1;
-			}
-		}
-		TRACE("left:(%" B_PRId32 "), right:(%" B_PRId32 ")\n", left, right);
+		hashLowerBound<ExtentLeafEntry>(leafEntry, left, right, hashValueOfRequest);
+
 		uint32 nextLeaf = leafHeader->Forw();
 		uint32 lastHashVal = B_BENDIAN_TO_HOST_INT32(
 			leafEntry[numberOfLeafEntries - 1].hashval);

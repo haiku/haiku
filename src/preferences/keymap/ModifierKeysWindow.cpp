@@ -17,6 +17,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
+#include <ControlLook.h>
 #include <FindDirectory.h>
 #include <IconUtils.h>
 #include <InterfaceDefs.h>
@@ -74,7 +75,8 @@ static const uint32 kMsgRevertModifiers		= 'rvmd';
 
 ConflictView::ConflictView(const char* name)
 	:
-	BView(BRect(0, 0, 15, 15), name, B_FOLLOW_NONE, B_WILL_DRAW),
+	BView(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_MINI_ICON)),
+		name, B_FOLLOW_NONE, B_WILL_DRAW),
 	fIcon(NULL),
 	fStopIcon(NULL),
 	fWarnIcon(NULL)
@@ -187,7 +189,7 @@ ConflictView::_FillIcons()
 
 	if (fStopIcon == NULL) {
 		// Allocate the fStopIcon bitmap
-		fStopIcon = new (std::nothrow) BBitmap(BRect(0, 0, 15, 15), 0,
+		fStopIcon = new (std::nothrow) BBitmap(Bounds(), 0,
 			B_RGBA32);
 		if (fStopIcon->InitCheck() != B_OK) {
 			FTRACE((stderr, "_FillIcons() - No memory for stop bitmap\n"));
@@ -210,7 +212,7 @@ ConflictView::_FillIcons()
 
 	if (fWarnIcon == NULL) {
 		// Allocate the fWarnIcon bitmap
-		fWarnIcon = new (std::nothrow) BBitmap(BRect(0, 0, 15, 15), 0,
+		fWarnIcon = new (std::nothrow) BBitmap(Bounds(), 0,
 			B_RGBA32);
 		if (fWarnIcon->InitCheck() != B_OK) {
 			FTRACE((stderr, "_FillIcons() - No memory for warn bitmap\n"));
@@ -268,16 +270,16 @@ ModifierKeysWindow::ModifierKeysWindow()
 	commandMenuField->SetAlignment(B_ALIGN_RIGHT);
 
 	fShiftConflictView = new ConflictView("shift warning view");
-	fShiftConflictView->SetExplicitMaxSize(BSize(15, 15));
+	fShiftConflictView->SetExplicitMaxSize(fShiftConflictView->Bounds().Size());
 
 	fControlConflictView = new ConflictView("control warning view");
-	fControlConflictView->SetExplicitMaxSize(BSize(15, 15));
+	fControlConflictView->SetExplicitMaxSize(fControlConflictView->Bounds().Size());
 
 	fOptionConflictView = new ConflictView("option warning view");
-	fOptionConflictView->SetExplicitMaxSize(BSize(15, 15));
+	fOptionConflictView->SetExplicitMaxSize(fOptionConflictView->Bounds().Size());
 
 	fCommandConflictView = new ConflictView("command warning view");
-	fCommandConflictView->SetExplicitMaxSize(BSize(15, 15));
+	fCommandConflictView->SetExplicitMaxSize(fCommandConflictView->Bounds().Size());
 
 	fCancelButton = new BButton("cancelButton", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));

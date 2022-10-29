@@ -38,8 +38,9 @@ struct CapacityInfo {
 	bool capacityFilled;
 	uint64 lastLba;
 	uint32 blockSize;
+	uint32 physicalBlockSize;
 
-	// Provisioining info from READ CAPACITY
+	// Provisioning info from READ CAPACITY
 	bool provisioningFilled;
 	bool lbpme;
 	bool lbprz;
@@ -135,6 +136,7 @@ read_capacity_10(scsi_periph_device_info* device, scsi_ccb* request,
 			= (uint32)B_BENDIAN_TO_HOST_INT32(capacityResult.lba);
 		capacityInfo->blockSize
 			= B_BENDIAN_TO_HOST_INT32(capacityResult.block_size);
+		capacityInfo->physicalBlockSize = capacityInfo->blockSize;
 	}
 
 	return res;
@@ -177,6 +179,8 @@ read_capacity_16(scsi_periph_device_info* device, scsi_ccb* request,
 			= B_BENDIAN_TO_HOST_INT64(capacityLongResult.lba);
 		capacityInfo->blockSize
 			= B_BENDIAN_TO_HOST_INT32(capacityLongResult.block_size);
+		capacityInfo->physicalBlockSize = capacityInfo->blockSize
+			* (1 << capacityLongResult.logical_blocks_per_physical_block_exponent);
 	}
 
 	if (res == B_OK && request->data_resid
@@ -359,14 +363,16 @@ periph_check_capacity(scsi_periph_device_info* device, scsi_ccb* request)
 	}
 
 	uint64 capacity;
-	uint32 blockSize;
+	uint32 blockSize, physicalBlockSize;
 
 	if (capacityInfo.capacityFilled) {
 		capacity = capacityInfo.lastLba + 1;
 		blockSize = capacityInfo.blockSize;
+		physicalBlockSize = capacityInfo.physicalBlockSize;
 	} else {
 		capacity = 0;
 		blockSize = 0;
+		physicalBlockSize = 0;
 	}
 
 	enum trim_command unmapCommand = TRIM_NONE;
@@ -435,9 +441,10 @@ periph_check_capacity(scsi_periph_device_info* device, scsi_ccb* request)
 	device->max_unmap_descriptor_count = maxDescriptorCount;
 
 	device->block_size = blockSize;
+	device->physical_block_size = physicalBlockSize;
 
 	device->callbacks->set_capacity(device->periph_device,
-		capacity, blockSize);
+		capacity, blockSize, physicalBlockSize);
 
 /*	device->byte2blk_shift = log2( device->block_size );
 	if( device->byte2blk_shift < 0 ) {

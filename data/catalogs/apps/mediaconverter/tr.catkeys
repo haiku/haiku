@@ -1,7 +1,7 @@
 1	turkish	x-vnd.Haiku-MediaConverter	2816184527
 Input file not recognized as Audio or Video	MediaConverter		Girdi dosyası ses veya görüntü değil
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Video kalitesi: %3d%%
+Video quality: %3d%%	MediaConverter		Video kalitesi: %%3d%
 Source files	MediaConverter		Kaynak dosyaları
 Error writing video frame %lld	MediaConverter		Video çerçevesi %lld yazılırken hata
 Error converting '%filename'	MediaConverter		'%filename' dönüştürülürken hata
@@ -11,12 +11,12 @@ Audio:	MediaConverter-FileInfo		Ses:
 MediaConverter+:SaveDirectory	MediaConverter		Ortam Dönüştürücü+:KaydetmeDizini
 Error creating video.	MediaConverter		Video oluşturulurken hata.
 Cancelling	MediaConverter		İptal ediliyor
-None available	Audio codecs		Hiçbiri mevcut değil
+None available	Audio codecs		Kullanılabilir bir tane yok
 No file selected	MediaConverter-FileInfo		Seçili dosya yok
 High	MediaConverter		Yüksek
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Dosya desteklenen bir ortam dosyası olarak tanımlanamadı:} other{# dosya desteklenen bir ortam dosyası olarak tanımlanamadı:}}
 File Error	MediaConverter-FileInfo		Dosya hatası
-None available	Video codecs		Hiçbiri mevcut değil
+None available	Video codecs		Kullanılabilir bir tane yok
 Output format	MediaConverter		Çıktı biçimi
 %.1f kHz mono	MediaFileInfo		%.1f kHz tek kanallı
 %.1f kHz stereo	MediaFileInfo		%.1f kHz çift kanallı
@@ -26,7 +26,7 @@ Error loading a file	MediaConverter		Dosya yüklenirken hata
 Encoder parameters	MediaConverter-EncoderWindow		Kodlayıcı parametreleri
 Open…	Menu		Aç…
 Audio encoding:	MediaConverter		Ses kodlaması:
-Audio quality: %3d%%	MediaConverter		Ses kalitesi: %3d%%
+Audio quality: %3d%%	MediaConverter		Ses kalitesi: %%3d%
 Cancelling…	MediaConverter		İptal ediliyor…
 Output file '%filename' created	MediaConverter		'%filename' çıktı dosyası oluşturuldu
 Output folder	MediaConverter		Çıktı klasörü

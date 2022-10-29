@@ -33,6 +33,12 @@
 #	define TRACE(x) ;
 #endif
 
+//#define TRACE_ARCH_INT_IFRAMES
+
+// An iframe stack used in the early boot process when we don't have
+// threads yet.
+struct iframe_stack gBootFrameStack;
+
 
 void
 arch_int_enable_io_interrupt(int irq)
@@ -57,6 +63,19 @@ arch_int_assign_to_cpu(int32 irq, int32 cpu)
 {
 	// Not yet supported.
 	return 0;
+}
+
+
+static void
+print_iframe(const char *event, struct iframe *frame)
+{
+	if (event)
+		dprintf("Exception: %s\n", event);
+
+	dprintf("ELR=%016lx SPSR=%016lx\n",
+		frame->elr, frame->spsr);
+	dprintf("LR=%016lx  SP  =%016lx\n",
+		frame->lr, frame->sp);
 }
 
 
@@ -164,9 +183,39 @@ after_exception()
 }
 
 
+// Little helper class for handling the
+// iframe stack as used by KDL.
+class IFrameScope {
+public:
+	IFrameScope(struct iframe *iframe) {
+		fThread = thread_get_current_thread();
+		if (fThread)
+			arm64_push_iframe(&fThread->arch_info.iframes, iframe);
+		else
+			arm64_push_iframe(&gBootFrameStack, iframe);
+	}
+
+	virtual ~IFrameScope() {
+		// pop iframe
+		if (fThread)
+			arm64_pop_iframe(&fThread->arch_info.iframes);
+		else
+			arm64_pop_iframe(&gBootFrameStack);
+	}
+private:
+	Thread* fThread;
+};
+
+
 extern "C" void
 do_sync_handler(iframe * frame)
 {
+#ifdef TRACE_ARCH_INT_IFRAMES
+	print_iframe("Sync abort", frame);
+#endif
+
+	IFrameScope scope(frame);
+
 	bool isExec = false;
 	switch (ESR_ELx_EXCEPTION(frame->esr)) {
 		case EXCP_INSN_ABORT_L:
@@ -313,6 +362,12 @@ do_sync_handler(iframe * frame)
 extern "C" void
 do_error_handler(iframe * frame)
 {
+#ifdef TRACE_ARCH_INT_IFRAMES
+	print_iframe("Error", frame);
+#endif
+
+	IFrameScope scope(frame);
+
 	panic("unhandled error! FAR=%lx ELR=%lx ESR=%lx", frame->far, frame->elr, frame->esr);
 }
 
@@ -320,6 +375,12 @@ do_error_handler(iframe * frame)
 extern "C" void
 do_irq_handler(iframe * frame)
 {
+#ifdef TRACE_ARCH_INT_IFRAMES
+	print_iframe("IRQ", frame);
+#endif
+
+	IFrameScope scope(frame);
+
 	InterruptController *ic = InterruptController::Get();
 	if (ic != NULL)
 		ic->HandleInterrupt();
@@ -331,5 +392,11 @@ do_irq_handler(iframe * frame)
 extern "C" void
 do_fiq_handler(iframe * frame)
 {
+#ifdef TRACE_ARCH_INT_IFRAMES
+	print_iframe("FIQ", frame);
+#endif
+
+	IFrameScope scope(frame);
+
 	panic("do_fiq_handler");
 }

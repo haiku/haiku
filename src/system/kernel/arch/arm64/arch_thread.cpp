@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haiku, Inc. All Rights Reserved.
+ * Copyright 2019-2022 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #include <thread.h>
@@ -25,6 +25,22 @@
 #else
 #	define TRACE(x) ;
 #endif
+
+
+void
+arm64_push_iframe(struct iframe_stack *stack, struct iframe *frame)
+{
+	ASSERT(stack->index < IFRAME_TRACE_DEPTH);
+	stack->frames[stack->index++] = frame;
+}
+
+
+void
+arm64_pop_iframe(struct iframe_stack *stack)
+{
+	ASSERT(stack->index > 0);
+	stack->index--;
+}
 
 
 status_t
@@ -62,9 +78,26 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 status_t
 arch_thread_init_tls(Thread *thread)
 {
-	return 0;
+	uint32 tls[TLS_FIRST_FREE_SLOT];
+
+	thread->user_local_storage = thread->user_stack_base
+		+ thread->user_stack_size;
+
+	// initialize default TLS fields
+	memset(tls, 0, sizeof(tls));
+	tls[TLS_BASE_ADDRESS_SLOT] = thread->user_local_storage;
+	tls[TLS_THREAD_ID_SLOT] = thread->id;
+	tls[TLS_USER_THREAD_SLOT] = (addr_t)thread->user_thread;
+
+	return user_memcpy((void *)thread->user_local_storage, tls, sizeof(tls));
 }
 
+
+static void
+arm64_set_tls_context(Thread *thread)
+{
+	WRITE_SPECIALREG(tpidrro_el0, thread->user_local_storage);
+}
 
 extern "C" void _arch_context_swap(arch_thread *from, arch_thread *to);
 
@@ -72,6 +105,7 @@ extern "C" void _arch_context_swap(arch_thread *from, arch_thread *to);
 void
 arch_thread_context_switch(Thread *from, Thread *to)
 {
+	arm64_set_tls_context(to);
 	_arch_context_swap(&from->arch_info, &to->arch_info);
 }
 
@@ -89,6 +123,8 @@ status_t
 arch_thread_enter_userspace(Thread *thread, addr_t entry,
 	void *arg1, void *arg2)
 {
+	arm64_set_tls_context(thread);
+
 	addr_t threadExitAddr;
 	{
 		addr_t commpageAdr = (addr_t)thread->team->commpage_address;

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Login	3568987751
+1	czech	x-vnd.Haiku-Login	1584886353
 Invalid login!	Login View		Neplatné přihlášení!
 Error	Login App		Chyba
 Login application for Haiku\nUsage:	Login App		Aplikace pro přihlášení k Haiku\nPoužití:
@@ -11,7 +11,6 @@ Reboot	Login View		Restartovat
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Můžete přizpůsobit plochu zobrazenou na přihlašovací aplikaci tak, že do ní vložíte replikanty.\n\nPo dokončení stačí ukončit aplikaci (Cmd-Q).
 OK	Login View		OK
 Info	Login App		Informace
---edit\tLaunch in shelf editting mode to allow customizing the desktop.	Login App		--edit\tSpustit v režimu úprav pro přizpůsobení pracovní plochy.
 Login:	Login View		Přihlašovací jméno:
 Password:	Login View		Heslo:
 Unimplemented	Login App		Neimplementováno

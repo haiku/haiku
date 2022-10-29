@@ -1183,7 +1183,7 @@ Preview::Preview()
 	BControl("PreView", NULL, NULL, B_WILL_DRAW | B_SUBPIXEL_PRECISE)
 {
 	float aspectRatio = BScreen().Frame().Width() / BScreen().Frame().Height();
-	float previewWidth = 120.0f * std::max(1.0f, be_plain_font->Size() / 12.0f);
+	float previewWidth = be_control_look->DefaultLabelSpacing() * 20.0f;
 	float previewHeight = ceil(previewWidth / aspectRatio);
 
 	ResizeTo(previewWidth, previewHeight);

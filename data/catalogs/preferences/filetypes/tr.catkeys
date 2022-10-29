@@ -3,7 +3,7 @@ Left	Attribute Window	Attribute column alignment in Tracker	Sol
 Float	Attribute ListView		Kayan
 Final	Application Types Window		Final
 FileTypes request	FileTypes Window		Dosya Türleri isteği
-This file type already exists	New File Type Window		Bu dosya türü hâlihazırda mevcut
+This file type already exists	New File Type Window		Bu dosya türü hâlihazırda var
 Preferred application	FileTypes Window		Tercih edilen uygulama
 Launch	Application Types Window		Çalıştır
 Removing uninstalled application types	Application Types Window		Silinmiş uygulama türleri kaldırılıyor
@@ -52,7 +52,7 @@ Internal name:	New File Type Window		İç ad:
 Integer 8 bit	Attribute ListView		8 bit tamsayı
 Extension:	Extension Window		Genişletme:
 Time	Attribute ListView		Zaman
-Extensions:	FileTypes Window		Genişletmeler:
+Extensions:	FileTypes Window		Uzantılar:
 Select preferred application	FileType Window		Tercih edilen uygulamayı seç
 Description:	FileTypes Window		Açıklama:
 Multiple files from \"%s\" file type	FileType Window		\"%s\" dosya türünden birden çok dosya

@@ -83,7 +83,7 @@ Extent::Init()
 	if (status != B_OK)
 		return status;
 
-	ExtentDataHeader* header = CreateDataHeader(fInode, fBlockBuffer);
+	ExtentDataHeader* header = ExtentDataHeader::Create(fInode, fBlockBuffer);
 	if (header == NULL)
 		return B_NO_MEMORY;
 	if (!VerifyHeader<ExtentDataHeader>(header, fBlockBuffer, fInode, 0, fMap, XFS_BLOCK)) {
@@ -156,7 +156,7 @@ Extent::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 
 	void* entry; // This could be unused entry so we should check
 
-	entry = (void*)(fBlockBuffer + SizeOfDataHeader(fInode));
+	entry = (void*)(fBlockBuffer + ExtentDataHeader::Size(fInode));
 
 	int numberOfEntries = B_BENDIAN_TO_HOST_INT32(BlockTail()->count);
 	int numberOfStaleEntries = B_BENDIAN_TO_HOST_INT32(BlockTail()->stale);
@@ -215,26 +215,9 @@ Extent::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 
 	int numberOfLeafEntries = B_BENDIAN_TO_HOST_INT32(blockTail->count);
 	int left = 0;
-	int mid;
 	int right = numberOfLeafEntries - 1;
 
-	/*
-	* Trying to find the lowerbound of hashValueOfRequest
-	* This is slightly different from bsearch(), as we want the first
-	* instance of hashValueOfRequest and not any instance.
-	*/
-	while (left < right) {
-		mid = (left+right)/2;
-		uint32 hashval = B_BENDIAN_TO_HOST_INT32(leafEntry[mid].hashval);
-		if (hashval >= hashValueOfRequest) {
-			right = mid;
-			continue;
-		}
-		if (hashval < hashValueOfRequest) {
-			left = mid+1;
-		}
-	}
-	TRACE("left:(%" B_PRId32 "), right:(%" B_PRId32 ")\n", left, right);
+	hashLowerBound<ExtentLeafEntry>(leafEntry, left, right, hashValueOfRequest);
 
 	while (B_BENDIAN_TO_HOST_INT32(leafEntry[left].hashval)
 			== hashValueOfRequest) {
@@ -292,6 +275,35 @@ uint32
 ExtentDataHeader::CRCOffset()
 {
 	return XFS_EXTENT_CRC_OFF - XFS_EXTENT_V5_VPTR_OFF;
+}
+
+
+ExtentDataHeader*
+ExtentDataHeader::Create(Inode* inode, const char* buffer)
+{
+	if (inode->Version() == 1 || inode->Version() == 2) {
+		ExtentDataHeaderV4* header = new (std::nothrow) ExtentDataHeaderV4(buffer);
+		return header;
+	} else {
+		ExtentDataHeaderV5* header = new (std::nothrow) ExtentDataHeaderV5(buffer);
+		return header;
+	}
+}
+
+
+/*
+	This Function returns Actual size of data header
+	in all forms of directory.
+	Never use sizeof() operator because we now have
+	vtable as well and it will give wrong results
+*/
+uint32
+ExtentDataHeader::Size(Inode* inode)
+{
+	if (inode->Version() == 1 || inode->Version() == 2)
+		return sizeof(ExtentDataHeaderV4) - XFS_EXTENT_V4_VPTR_OFF;
+	else
+		return sizeof(ExtentDataHeaderV5) - XFS_EXTENT_V5_VPTR_OFF;
 }
 
 
@@ -434,34 +446,4 @@ uuid_t*
 ExtentDataHeaderV5::Uuid()
 {
 	return &uuid;
-}
-
-
-//Function to get V4 or V5 data header instance
-ExtentDataHeader*
-CreateDataHeader(Inode* inode, const char* buffer)
-{
-	if (inode->Version() == 1 || inode->Version() == 2) {
-		ExtentDataHeaderV4* header = new (std::nothrow) ExtentDataHeaderV4(buffer);
-		return header;
-	} else {
-		ExtentDataHeaderV5* header = new (std::nothrow) ExtentDataHeaderV5(buffer);
-		return header;
-	}
-}
-
-
-/*
-	This Function returns Actual size of data header
-	in all forms of directory.
-	Never use sizeof() operator because we now have
-	vtable as well and it will give wrong results
-*/
-uint32
-SizeOfDataHeader(Inode* inode)
-{
-	if (inode->Version() == 1 || inode->Version() == 2)
-		return sizeof(ExtentDataHeaderV4) - XFS_EXTENT_V4_VPTR_OFF;
-	else
-		return sizeof(ExtentDataHeaderV5) - XFS_EXTENT_V5_VPTR_OFF;
 }

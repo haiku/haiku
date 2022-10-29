@@ -273,7 +273,6 @@ rule KernelArchitectureSetup architecture
 		case x86 :
 			HAIKU_KERNEL_PLATFORM ?= bios_ia32 ;
 			HAIKU_BOOT_TARGETS += bios_ia32 efi pxe_ia32 ;
-			HAIKU_ANYBOOT_LEGACY = 1 ;
 
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 			# offset in floppy image (>= sizeof(haiku_loader))
@@ -377,6 +376,7 @@ rule KernelArchitectureSetup architecture
 	# Common boot-related cflags which apply to all loaders
 	HAIKU_BOOT_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(ccBaseFlags) ;
 	HAIKU_BOOT_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(c++BaseFlags) ;
+	HAIKU_BOOT_OPTIM = -Os ;
 	HAIKU_BOOT_LINKFLAGS = ;
 	HAIKU_BOOT_LDFLAGS = -Bstatic ;
 

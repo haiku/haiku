@@ -82,7 +82,7 @@
 	((w) == XFS_DATA_FORK ? (ino)->di_format : (ino)->di_aformat)
 
 #define XFS_DFORK_NEXTENTS(ino, w) \
-	((w) == XFS_DATA_FORK ? (ino)->di_nextents : (ino)->di_anextents)
+	((w) == XFS_DATA_FORK ? (ino)->di_nextents : (ino)->di_naextents)
 
 #define DFORK_MAXEXT(ino, volume, w) \
 	(DFORK_SIZE(ino, volume, w) / (2 * sizeof(uint64)))
@@ -142,10 +142,6 @@ struct ExtentMapEntry {
 			uint8				br_state;
 				// state of the extent
 };
-
-
-uint32
-hashfunction(const char* name, int length);
 
 
 struct xfs_timestamp_t {
@@ -218,6 +214,7 @@ struct xfs_inode_t {
 			uint32				UserId() const;
 			uint32				GroupId() const;
 			xfs_extnum_t		DataExtentsCount() const;
+			xfs_extnum_t		AttrExtentsCount() const;
 			uint8				ForkOffset() const;
 			uint16				di_magic;
 			uint16				di_mode;
@@ -244,7 +241,7 @@ struct xfs_inode_t {
 				// extent size
 			xfs_extnum_t		di_nextents;
 				// number of data extents
-			xfs_aextnum_t		di_anextents;
+			xfs_aextnum_t		di_naextents;
 				// number of EA extents
 			uint8				di_forkoff;
 				// decides where di_a starts
@@ -408,6 +405,8 @@ public:
 			bool				HasFileTypeField() const;
 			xfs_extnum_t		DataExtentsCount() const
 									{ return fNode->DataExtentsCount(); }
+			xfs_extnum_t		AttrExtentsCount() const
+									{ return fNode->AttrExtentsCount(); }
 			uint64				FileSystemBlockToAddr(uint64 block);
 			uint8				ForkOffset() const
 									{ return fNode->ForkOffset(); }
@@ -438,5 +437,33 @@ private:
 				// Contains the disk inode in BE format
 			ExtentMapEntry*		fExtents;
 };
+
+
+uint32 hashfunction(const char* name, int length);
+
+
+// A common function to return given hash lowerbound
+template<class T> void
+hashLowerBound(T* entry, int& left, int& right, uint32 hashValueOfRequest)
+{
+	int mid;
+
+	/*
+	* Trying to find the lowerbound of hashValueOfRequest
+	* This is slightly different from bsearch(), as we want the first
+	* instance of hashValueOfRequest and not any instance.
+	*/
+	while (left < right) {
+		mid = (left + right) / 2;
+		uint32 hashval = B_BENDIAN_TO_HOST_INT32(entry[mid].hashval);
+		if (hashval >= hashValueOfRequest) {
+			right = mid;
+			continue;
+		}
+		if (hashval < hashValueOfRequest)
+			left = mid+1;
+	}
+	TRACE("left:(%" B_PRId32 "), right:(%" B_PRId32 ")\n", left, right);
+}
 
 #endif

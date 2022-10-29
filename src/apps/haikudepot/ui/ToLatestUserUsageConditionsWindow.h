@@ -16,7 +16,7 @@
 
 class BButton;
 class BCheckBox;
-class BTextView;
+class TextView;
 class LinkView;
 class Model;
 
@@ -59,7 +59,7 @@ private:
 			Model&				fModel;
 			UserDetail			fUserDetail;
 
-			BTextView*			fMessageTextView;
+			TextView*			fMessageTextView;
 			BButton*			fLogoutButton;
 			BButton*			fAgreeButton;
 			BCheckBox*			fConfirmMinimumAgeCheckBox;

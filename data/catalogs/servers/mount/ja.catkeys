@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-mount_server	2818767263
+1	japanese	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		読み取り専用
 Error mounting volume:\n\n%s	AutoMounter		パーティションをマウント中にエラー発生:\n\n%s
 Cancel	AutoMounter		中止
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		ボリューム'%s'をマウント中\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		\"%s\" をアンマウントできません:\n\t%s\n\n強制的にアンマウントしますか?\n\n警告:アプリケーションがディスクへの書き込み中にアンマウントしますと、データを失う可能性もあるので、ご注意ください。\n
 Force unmount	AutoMounter		強制的にマウント解除
 Mount error	AutoMounter		マウントエラー
-Mounting volume <unnamed volume>\n\n	AutoMounter		<無名> パーティションをマウント中\n\n
 Mount warning	AutoMounter		マウント警告

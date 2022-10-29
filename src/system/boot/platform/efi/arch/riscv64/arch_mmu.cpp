@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 Haiku, Inc. All rights reserved.
+ * Copyright 2019-2022 Haiku, Inc. All rights reserved.
  * Released under the terms of the MIT License.
  */
 
@@ -14,9 +14,26 @@
 #include <efi/boot-services.h>
 #include <string.h>
 
-#include "mmu.h"
 #include "efi_platform.h"
+#include "generic_mmu.h"
+#include "mmu.h"
 
+
+//#define TRACE_MMU
+#ifdef TRACE_MMU
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
+//#define TRACE_MEMORY_MAP
+
+// Ignore memory above 512GB
+#define PHYSICAL_MEMORY_LOW		0x00000000
+#define PHYSICAL_MEMORY_HIGH	0x8000000000ull
+
+#define RESERVED_MEMORY_BASE	0x80000000
 
 phys_addr_t sPageTable = 0;
 
@@ -153,7 +170,7 @@ LookupPte(addr_t virtAdr, bool alloc)
 static void
 Map(addr_t virtAdr, phys_addr_t physAdr, uint64 flags)
 {
-	// dprintf("Map(%#" B_PRIxADDR ", %#" B_PRIxADDR ")\n", virtAdr, physAdr);
+	// TRACE("Map(%#" B_PRIxADDR ", %#" B_PRIxADDR ")\n", virtAdr, physAdr);
 	Pte* pte = LookupPte(virtAdr, true);
 	if (pte == NULL) panic("can't allocate page table");
 
@@ -165,12 +182,27 @@ Map(addr_t virtAdr, phys_addr_t physAdr, uint64 flags)
 static void
 MapRange(addr_t virtAdr, phys_addr_t physAdr, size_t size, uint64 flags)
 {
-	dprintf("MapRange(%#" B_PRIxADDR " - %#" B_PRIxADDR ", %#" B_PRIxADDR " - %#" B_PRIxADDR ", %#"
+	TRACE("MapRange(%#" B_PRIxADDR " - %#" B_PRIxADDR ", %#" B_PRIxADDR " - %#" B_PRIxADDR ", %#"
 		B_PRIxADDR ")\n", virtAdr, virtAdr + (size - 1), physAdr, physAdr + (size - 1), size);
 	for (size_t i = 0; i < size; i += B_PAGE_SIZE)
 		Map(virtAdr + i, physAdr + i, flags);
 
 	ASSERT_ALWAYS(insert_virtual_allocated_range(virtAdr, size) >= B_OK);
+}
+
+
+static void
+insert_virtual_range_to_keep(uint64 start, uint64 size)
+{
+	status_t status = insert_address_range(
+		gKernelArgs.arch_args.virtual_ranges_to_keep,
+		&gKernelArgs.arch_args.num_virtual_ranges_to_keep,
+		MAX_VIRTUAL_RANGES_TO_KEEP, start, size);
+
+	if (status == B_ENTRY_NOT_FOUND)
+		panic("too many virtual ranges to keep");
+	else if (status != B_OK)
+		panic("failed to add virtual range to keep");
 }
 
 
@@ -186,13 +218,7 @@ MapAddrRange(addr_range& range, uint64 flags)
 	range.start = get_next_virtual_address(range.size);
 
 	MapRange(range.start, physAdr, range.size, flags);
-
-	if (gKernelArgs.arch_args.num_virtual_ranges_to_keep
-		>= MAX_VIRTUAL_RANGES_TO_KEEP)
-		panic("too many virtual ranges to keep");
-
-	gKernelArgs.arch_args.virtual_ranges_to_keep[
-		gKernelArgs.arch_args.num_virtual_ranges_to_keep++] = range;
+	insert_virtual_range_to_keep(range.start, range.size);
 }
 
 
@@ -239,100 +265,6 @@ GetPhysMemRange(addr_range& range)
 }
 
 
-static void
-FillPhysicalMemoryMap(size_t memory_map_size,
-	efi_memory_descriptor *memory_map, size_t descriptor_size,
-	uint32_t descriptor_version)
-{
-	// Add physical memory to the kernel args and update virtual addresses for
-	// EFI regions.
-	gKernelArgs.num_physical_memory_ranges = 0;
-
-	// First scan: Add all usable ranges
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = &memory_map[i];
-		switch (entry->Type) {
-		case EfiLoaderCode:
-		case EfiLoaderData:
-		case EfiBootServicesCode:
-		case EfiBootServicesData:
-		case EfiConventionalMemory: {
-			// Usable memory.
-			uint64_t base = entry->PhysicalStart;
-			uint64_t end = entry->PhysicalStart + entry->NumberOfPages * 4096;
-			uint64_t originalSize = end - base;
-
-			// PMP protected memory, unusable
-			if (base == 0x80000000)
-				break;
-
-			gKernelArgs.ignored_physical_memory
-				+= originalSize - (std::max(end, base) - base);
-
-			if (base >= end)
-				break;
-			uint64_t size = end - base;
-
-			insert_physical_memory_range(base, size);
-			break;
-		}
-		case EfiACPIReclaimMemory:
-			// ACPI reclaim -- physical memory we could actually use later
-			break;
-		case EfiRuntimeServicesCode:
-		case EfiRuntimeServicesData:
-			entry->VirtualStart = entry->PhysicalStart;
-			break;
-		}
-	}
-
-	uint64_t initialPhysicalMemory = total_physical_memory();
-
-	// Second scan: Remove everything reserved that may overlap
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = &memory_map[i];
-		switch (entry->Type) {
-		case EfiLoaderCode:
-		case EfiLoaderData:
-		case EfiBootServicesCode:
-		case EfiBootServicesData:
-		case EfiConventionalMemory:
-			break;
-		default:
-			uint64_t base = entry->PhysicalStart;
-			uint64_t end = entry->PhysicalStart + entry->NumberOfPages * 4096;
-			remove_physical_memory_range(base, end - base);
-		}
-	}
-
-	gKernelArgs.ignored_physical_memory
-		+= initialPhysicalMemory - total_physical_memory();
-
-	sort_address_ranges(gKernelArgs.physical_memory_range,
-		gKernelArgs.num_physical_memory_ranges);
-}
-
-
-static void
-FillPhysicalAllocatedMemoryMap(size_t memory_map_size,
-	efi_memory_descriptor *memory_map, size_t descriptor_size,
-	uint32_t descriptor_version)
-{
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = &memory_map[i];
-		switch (entry->Type) {
-		case EfiLoaderData:
-			insert_physical_allocated_range(entry->PhysicalStart, entry->NumberOfPages * B_PAGE_SIZE);
-			break;
-		default:
-			;
-		}
-	}
-	sort_address_ranges(gKernelArgs.physical_allocated_range,
-		gKernelArgs.num_physical_allocated_ranges);
-}
-
-
 //#pragma mark -
 
 
@@ -347,66 +279,123 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 	efi_memory_descriptor *memory_map, size_t descriptor_size,
 	uint32_t descriptor_version)
 {
-	FillPhysicalAllocatedMemoryMap(memory_map_size, memory_map, descriptor_size, descriptor_version);
+	build_physical_allocated_list(memory_map_size, memory_map,
+		descriptor_size, descriptor_version);
 
 	// Switch EFI to virtual mode, using the kernel pmap.
 	kRuntimeServices->SetVirtualAddressMap(memory_map_size, descriptor_size,
 		descriptor_version, memory_map);
+
+#ifdef TRACE_MEMORY_MAP
+	dprintf("phys memory ranges:\n");
+	for (uint32_t i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
+		uint64 start = gKernelArgs.physical_memory_range[i].start;
+		uint64 size = gKernelArgs.physical_memory_range[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+			start, start + size, size);
+	}
+
+	dprintf("allocated phys memory ranges:\n");
+	for (uint32_t i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
+		uint64 start = gKernelArgs.physical_allocated_range[i].start;
+		uint64 size = gKernelArgs.physical_allocated_range[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+			start, start + size, size);
+	}
+
+	dprintf("allocated virt memory ranges:\n");
+	for (uint32_t i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
+		uint64 start = gKernelArgs.virtual_allocated_range[i].start;
+		uint64 size = gKernelArgs.virtual_allocated_range[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+			start, start + size, size);
+	}
+
+	dprintf("virt memory ranges to keep:\n");
+	for (uint32_t i = 0; i < gKernelArgs.arch_args.num_virtual_ranges_to_keep; i++) {
+		uint64 start = gKernelArgs.arch_args.virtual_ranges_to_keep[i].start;
+		uint64 size = gKernelArgs.arch_args.virtual_ranges_to_keep[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+			start, start + size, size);
+	}
+#endif
+}
+
+
+static void
+fix_memory_map_for_m_mode(size_t memoryMapSize, efi_memory_descriptor* memoryMap,
+	size_t descriptorSize, uint32_t descriptorVersion)
+{
+	addr_t addr = (addr_t)memoryMap;
+
+	for (size_t i = 0; i < memoryMapSize / descriptorSize; ++i) {
+		efi_memory_descriptor* entry = (efi_memory_descriptor *)(addr + i * descriptorSize);
+		if (entry->PhysicalStart == RESERVED_MEMORY_BASE) {
+			entry->Type = EfiReservedMemoryType;
+		}
+	}
 }
 
 
 uint64
-arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
-	efi_memory_descriptor *memory_map, size_t descriptor_size,
-	uint32_t descriptor_version)
+arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize, efi_memory_descriptor* memoryMap,
+	size_t descriptorSize, uint32_t descriptorVersion)
 {
 	sPageTable = mmu_allocate_page();
 	memset(VirtFromPhys(sPageTable), 0, B_PAGE_SIZE);
-	dprintf("sPageTable: %#" B_PRIxADDR "\n", sPageTable);
+	TRACE("sPageTable: %#" B_PRIxADDR "\n", sPageTable);
 
 	PreallocKernelRange();
 
 	gKernelArgs.num_virtual_allocated_ranges = 0;
 	gKernelArgs.arch_args.num_virtual_ranges_to_keep = 0;
-	FillPhysicalMemoryMap(memory_map_size, memory_map, descriptor_size, descriptor_version);
+
+	fix_memory_map_for_m_mode(memoryMapSize, memoryMap, descriptorSize, descriptorVersion);
+
+	build_physical_memory_list(memoryMapSize, memoryMap, descriptorSize, descriptorVersion,
+		PHYSICAL_MEMORY_LOW, PHYSICAL_MEMORY_HIGH);
 
 	addr_range physMemRange;
 	GetPhysMemRange(physMemRange);
-	dprintf("physMemRange: %#" B_PRIxADDR ", %#" B_PRIxSIZE "\n", physMemRange.start, physMemRange.size);
+	TRACE("physMemRange: %#" B_PRIxADDR ", %#" B_PRIxSIZE "\n",
+		physMemRange.start, physMemRange.size);
 
 	// Physical memory mapping
 	gKernelArgs.arch_args.physMap.start = KERNEL_TOP + 1 - physMemRange.size;
 	gKernelArgs.arch_args.physMap.size = physMemRange.size;
-	MapRange(gKernelArgs.arch_args.physMap.start, physMemRange.start, physMemRange.size, (1 << pteRead) | (1 << pteWrite));
+	MapRange(gKernelArgs.arch_args.physMap.start, physMemRange.start, physMemRange.size,
+		(1 << pteRead) | (1 << pteWrite));
 
 	// Boot loader
-	dprintf("Boot loader:\n");
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = &memory_map[i];
+	TRACE("Boot loader:\n");
+	for (size_t i = 0; i < memoryMapSize / descriptorSize; ++i) {
+		efi_memory_descriptor* entry = &memoryMap[i];
 		switch (entry->Type) {
 		case EfiLoaderCode:
 		case EfiLoaderData:
-			MapRange(entry->VirtualStart, entry->PhysicalStart, entry->NumberOfPages * B_PAGE_SIZE, (1 << pteRead) | (1 << pteWrite) | (1 << pteExec));
+			MapRange(entry->VirtualStart, entry->PhysicalStart, entry->NumberOfPages * B_PAGE_SIZE,
+				(1 << pteRead) | (1 << pteWrite) | (1 << pteExec));
 			break;
 		default:
 			;
 		}
 	}
-	dprintf("Boot loader stack\n");
+	TRACE("Boot loader stack\n");
 	addr_t sp = Sp();
 	addr_t stackTop = ROUNDDOWN(sp - 1024*64, B_PAGE_SIZE);
-	dprintf("  SP: %#" B_PRIxADDR "\n", sp);
+	TRACE("  SP: %#" B_PRIxADDR "\n", sp);
 
 	// EFI runtime services
-	dprintf("EFI runtime services:\n");
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = &memory_map[i];
+	TRACE("EFI runtime services:\n");
+	for (size_t i = 0; i < memoryMapSize / descriptorSize; ++i) {
+		efi_memory_descriptor* entry = &memoryMap[i];
 		if ((entry->Attribute & EFI_MEMORY_RUNTIME) != 0)
-			MapRange(entry->VirtualStart, entry->PhysicalStart, entry->NumberOfPages * B_PAGE_SIZE, (1 << pteRead) | (1 << pteWrite) | (1 << pteExec));
+			MapRange(entry->VirtualStart, entry->PhysicalStart, entry->NumberOfPages * B_PAGE_SIZE,
+				(1 << pteRead) | (1 << pteWrite) | (1 << pteExec));
 	}
 
 	// Memory regions
-	dprintf("Regions:\n");
+	TRACE("Regions:\n");
 	void* cookie = NULL;
 	addr_t virtAdr;
 	phys_addr_t physAdr;
@@ -416,7 +405,7 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	}
 
 	// Devices
-	dprintf("Devices:\n");
+	TRACE("Devices:\n");
 	MapAddrRange(gKernelArgs.arch_args.clint, (1 << pteRead) | (1 << pteWrite));
 	MapAddrRange(gKernelArgs.arch_args.htif, (1 << pteRead) | (1 << pteWrite));
 	MapAddrRange(gKernelArgs.arch_args.plic, (1 << pteRead) | (1 << pteWrite));
@@ -430,7 +419,8 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 			(1 << pteRead) | (1 << pteWrite));
 	}
 
-	sort_address_ranges(gKernelArgs.virtual_allocated_range, gKernelArgs.num_virtual_allocated_ranges);
+	sort_address_ranges(gKernelArgs.virtual_allocated_range,
+		gKernelArgs.num_virtual_allocated_ranges);
 
 	DumpPageTable(GetSatp());
 

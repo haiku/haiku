@@ -166,6 +166,10 @@ acpi_module_register_child_devices(void* cookie)
 		ACPI_NS_DUMP_DEVICE_MODULE_NAME);
 	if (status != B_OK)
 		return status;
+	status = gDeviceManager->publish_device(node, "acpi/call",
+		ACPI_CALL_DEVICE_MODULE_NAME);
+	if (status != B_OK)
+		return status;
 
 	if ((AcpiGbl_FADT.Flags & ACPI_FADT_POWER_BUTTON) == 0) {
 		dprintf("registering power button\n");
@@ -310,5 +314,6 @@ module_info* modules[] = {
 	(module_info*)&gACPIDeviceModule,
 	(module_info*)&embedded_controller_driver_module,
 	(module_info*)&embedded_controller_device_module,
+	(module_info*)&gAcpiCallDeviceModule,
 	NULL
 };

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-ActivityMonitor	2601047281
+1	italian	x-vnd.Haiku-ActivityMonitor	826097672
 Teams	DataSource		Team
 Semaphores	DataSource		Semafori
 TX	DataSource	Shorter version for Sending	TX
@@ -24,6 +24,7 @@ Settings…	ActivityWindow		Impostazioni...
 Block cache	DataSource		Cache a blocchi
 Memory	DataSource		Memoria
 CPU usage	DataSource		Uso della CPU
+CPU speed	DataSource		Velocità della CPU
 Quit	ActivityWindow		Esci
 Raw clipboard	DataSource		Appunti binari
 Settings	ActivityWindow		Impostazioni
@@ -32,6 +33,7 @@ Used memory	DataSource		Memoria utilizzata
 Show legend	ActivityView		Mostra legenda
 Cached memory	DataSource		Memoria cache
 CPU %d usage	DataSource		Utilizzo CPU %d
+CPU %d speed	DataSource		Velocità %d della CPU
 File	ActivityWindow		File
 Ports	DataSource		Porte
 Page faults	DataSource		Page fault

@@ -246,8 +246,8 @@ PartitionRecorder::Visit(BPartition* partition, int32 level)
 	partition->GetPath(&partitionPath);
 
 	BString buffer;
-	const char* name = partition->ContentName();
-	if (name == NULL) {
+	BString name = partition->ContentName();
+	if (name.Length() == 0) {
 		BString number;
 		number << ++fUnnamedIndex;
 		buffer << B_TRANSLATE_COMMENT("Unnamed %d",

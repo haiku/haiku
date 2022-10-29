@@ -358,7 +358,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	fVisibleInterfaceElements(interfaceElements),
 	fContext(context),
 	fAppSettings(appSettings),
-	fZoomTextOnly(true),
+	fZoomTextOnly(false),
 	fShowTabsIfSinglePageOpen(true),
 	fAutoHideInterfaceInFullscreenMode(false),
 	fAutoHidePointer(false),
@@ -366,7 +366,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 {
 	// Begin listening to settings changes and read some current values.
 	fAppSettings->AddListener(BMessenger(this));
-//	fZoomTextOnly = fAppSettings->GetValue("zoom text only", fZoomTextOnly);
+	fZoomTextOnly = fAppSettings->GetValue("zoom text only", fZoomTextOnly);
 	fShowTabsIfSinglePageOpen = fAppSettings->GetValue(
 		kSettingsKeyShowTabsIfSinglePageOpen, fShowTabsIfSinglePageOpen);
 
@@ -680,10 +680,10 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		snprintf(numStr, sizeof(numStr), "%d", (int) i);
 		AddShortcut(numStr[0], B_COMMAND_KEY, selectTab);
 	}
-	
+
 	// Add shortcut to cycle through tabs like in every other web browser
 	AddShortcut(B_TAB, B_COMMAND_KEY, new BMessage(CYCLE_TABS));
-	
+
 	BKeymap keymap;
 	keymap.SetToCurrent();
 	BObjectList<const char> unmodified(3, true);

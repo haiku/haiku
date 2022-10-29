@@ -48,8 +48,8 @@ Reboot	SoftwareUpdaterWindow		Yeniden başlat
 Show more details	SoftwareUpdaterWindow		Ayrıntıları göster
 Installing version	SoftwareUpdaterWindow	List item text	Kurulan sürüm
 Checking for updates	CheckManager		Güncellemeler denetleniyor
-No remote repositories are available	UpdateManager	Error message	Uzak depolar mevcut değil
-Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, other{güncelleme}} mevcut
+No remote repositories are available	UpdateManager	Error message	Kullanılabilir uzak depo yok
+Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, other{güncelleme}} var
 Reboot	SoftwareUpdaterWindow	Button label	Yeniden başlat
 Update	SoftwareUpdaterWindow	Alert button label	Güncelle
 Open Repositories	SoftwareUpdaterWindow	Alert button label	Açık depolar
@@ -59,6 +59,6 @@ Uninstalling version	SoftwareUpdaterWindow	List item text	Kaldırılan sürüm
 %i of %i	UpdateManager	Do not translate %i	%i/%i
 Quit	SoftwareUpdaterWindow		Çık
 No updates available	CheckManager		Güncelleme bulunamadı
-Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Kullanım:  SoftwareUpdater <komut> [ <seçenek> ]\nKurulu paketleri günceller.\n\nKomutlar:\n  update     - Paket güncellemeleri için depoları tarar ve güncellemeleri kurar.\n  check      - Mevcut güncellemeleri denetler; ancak yalnızca sonuçları listeler.\n  full-sync  - Kurulu paketleri depolarla eşitler.\n\nSeçenekler:\n  -h or --help       Bu yardım iletisini gösterir\n  -v or --verbose    Ayrıntılı sözlü çıktıyı gösterir\n
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	Kullanım:  SoftwareUpdater <komut> [ <seçenek> ]\nKurulu paketleri günceller.\n\nKomutlar:\n  update     - Paket güncellemeleri için depoları tarar ve güncellemeleri kurar.\n  check      - Kullanılabilir güncellemeleri denetler; ancak yalnızca sonuçları listeler.\n  full-sync  - Kurulu paketleri depolarla eşitler.\n\nSeçenekler:\n  -h or --help       Bu yardım iletisini gösterir\n  -v or --verbose    Ayrıntılı sözlü çıktıyı gösterir\n
 No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	Hiçbir uzak depo kullanılabilir değil. Lütfen en azından bazı depoların ulaşılabilir olduğunu depo preflet'lerini veya 'pkgman' komutunu kullanarak denetleyin.
 Downloading packages	UpdateManager		Paketler indiriliyor

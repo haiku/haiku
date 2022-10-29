@@ -23,6 +23,9 @@
 // name of the ACPI namespace device
 #define ACPI_NS_DUMP_DEVICE_MODULE_NAME "bus_managers/acpi/namespace/device_v1"
 
+// name of the ACPI call device
+#define ACPI_CALL_DEVICE_MODULE_NAME "bus_managers/acpi/call/device_v1"
+
 
 __BEGIN_DECLS
 
@@ -165,6 +168,8 @@ extern struct driver_module_info embedded_controller_driver_module;
 extern struct device_module_info embedded_controller_device_module;
 
 extern acpi_device_module_info gACPIDeviceModule;
+
+extern struct device_module_info gAcpiCallDeviceModule;
 
 
 status_t get_handle(acpi_handle parent, const char* pathname,

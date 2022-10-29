@@ -70,6 +70,7 @@ struct device_lun_s {
 	bool		media_changed;
 	uint64		block_count;
 	uint32		block_size;
+	uint32		physical_block_size;
 	uint8		device_type;
 	bool		removable;
 	bool		write_protected;

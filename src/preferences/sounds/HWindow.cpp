@@ -210,7 +210,6 @@ HWindow::MessageReceived(BMessage* message)
 
 		case M_EVENT_CHANGED:
 		{
-			const char* path;
 			BMenuField* menufield
 				= dynamic_cast<BMenuField*>(FindView("filemenu"));
 			if (menufield == NULL)
@@ -218,10 +217,13 @@ HWindow::MessageReceived(BMessage* message)
 
 			menufield->SetEnabled(true);
 
-			BMenu* menu = menufield->Menu();
+			const char* filePath;
 
-			if (message->FindString("path", &path) == B_OK) {
-				BPath path(path);
+			if (message->FindString("path", &filePath) == B_OK) {
+
+				BMenu* menu = menufield->Menu();
+				BPath path(filePath);
+
 				if (path.InitCheck() != B_OK) {
 					BMenuItem* item = menu->FindItem(B_TRANSLATE("<none>"));
 					if (item != NULL)

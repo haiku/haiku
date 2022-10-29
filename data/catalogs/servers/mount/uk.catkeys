@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-mount_server	2818767263
+1	ukrainian	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Підключити тільки для читання
 Error mounting volume:\n\n%s	AutoMounter		Помилка підключення тому:\n\n%s
 Cancel	AutoMounter		Скасувати
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		Підключення тому '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Неможливо відключити диск \"%s\":\n\t%s\n\nВідключити примусово?\n\nПримітка: Якщо програма продовжить запис на том, можлива втрата даних.\n
 Force unmount	AutoMounter		Відключити примусово
 Mount error	AutoMounter		Помилка підключення
-Mounting volume <unnamed volume>\n\n	AutoMounter		Підключення тому <unnamed volume>\n\n
 Mount warning	AutoMounter		Попередження при підключенні

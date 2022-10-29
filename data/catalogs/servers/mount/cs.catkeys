@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-mount_server	2818767263
+1	czech	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Připojit pouze pro čtení
 Error mounting volume:\n\n%s	AutoMounter		Chyba připojování svazku:\n\n%s
 Cancel	AutoMounter		Zrušit
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		Připojování svazku '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nelze odpojit disk \"%s\":\n\t%s\n\nMá být odpojen nuceně?\n\nPoznámka: Pokud aplikace právě zapisuje do svazku, může toto odpojení způsobit ztrátu dat.\n
 Force unmount	AutoMounter		Násilné odpojení
 Mount error	AutoMounter		Chyba připojení
-Mounting volume <unnamed volume>\n\n	AutoMounter		Připojuji svazek <nepojmenovaný>\n\n
 Mount warning	AutoMounter		Upozornění během připojování

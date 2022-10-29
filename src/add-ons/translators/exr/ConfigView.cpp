@@ -64,13 +64,8 @@ ConfigView::ConfigView(uint32 flags)
 		.Add(copyrightView2)
 		.Add(copyrightView3)
 		.Add(copyrightView4);
-
-	BFont font;
-	GetFont(&font);
-	SetExplicitPreferredSize(BSize(font.Size() * 400 / 12,
-		font.Size() * 200 / 12));
 }
- 
+
 
 ConfigView::~ConfigView()
 {

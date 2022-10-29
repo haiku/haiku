@@ -45,7 +45,7 @@ extern uint64 gLongKernelEntry;
 static inline uint64
 fix_address(uint64 address)
 {
-	if(address >= KERNEL_LOAD_BASE_32_BIT)
+	if (address >= KERNEL_LOAD_BASE)
 		return address + KERNEL_FIXUP_FOR_LONG_MODE;
 	else
 		return address;
@@ -194,7 +194,7 @@ long_mmu_init()
 		}
 
 		// Get the physical address to map.
-		if (!mmu_get_virtual_mapping(KERNEL_LOAD_BASE_32_BIT + (i * B_PAGE_SIZE),
+		if (!mmu_get_virtual_mapping(KERNEL_LOAD_BASE + (i * B_PAGE_SIZE),
 				&physicalAddress))
 			continue;
 

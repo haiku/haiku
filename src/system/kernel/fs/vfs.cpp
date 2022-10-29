@@ -899,6 +899,8 @@ remove_vnode_from_mount_list(struct vnode* vnode, struct fs_mount* mount)
 static struct vnode*
 lookup_vnode(dev_t mountID, ino_t vnodeID)
 {
+	ASSERT_READ_LOCKED_RW_LOCK(&sVnodeLock);
+
 	struct vnode_hash_key key;
 
 	key.device = mountID;
@@ -1189,6 +1191,10 @@ restart:
 	AutoLocker<Vnode> nodeLocker(vnode);
 
 	if (vnode && vnode->IsBusy()) {
+		// vnodes in the Removed state (except ones still Unpublished)
+		// which are also Busy will disappear soon, so we do not wait for them.
+		const bool doNotWait = vnode->IsRemoved() && !vnode->IsUnpublished();
+
 		nodeLocker.Unlock();
 		rw_lock_read_unlock(&sVnodeLock);
 		if (!canWait) {
@@ -1196,7 +1202,7 @@ restart:
 				mountID, vnodeID);
 			return B_BUSY;
 		}
-		if (!retry_busy_vnode(tries, mountID, vnodeID))
+		if (doNotWait || !retry_busy_vnode(tries, mountID, vnodeID))
 			return B_BUSY;
 
 		rw_lock_read_lock(&sVnodeLock);
@@ -3890,12 +3896,9 @@ get_vnode(fs_volume* volume, ino_t vnodeID, void** _privateNode)
 extern "C" status_t
 acquire_vnode(fs_volume* volume, ino_t vnodeID)
 {
-	struct vnode* vnode;
+	ReadLocker nodeLocker(sVnodeLock);
 
-	rw_lock_read_lock(&sVnodeLock);
-	vnode = lookup_vnode(volume->id, vnodeID);
-	rw_lock_read_unlock(&sVnodeLock);
-
+	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
 	if (vnode == NULL)
 		return B_BAD_VALUE;
 

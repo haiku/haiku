@@ -424,12 +424,66 @@ fill_wireless_network(wireless_network& network, const char* networkName,
 
 
 static status_t
+get_scan_results(const char* device, wireless_network*& networks, uint32& count)
+{
+	if (networks != NULL)
+		return B_BAD_VALUE;
+
+	// TODO: Find some way to reduce code duplication with the following function!
+	const size_t kBufferSize = 65535;
+	uint8* buffer = (uint8*)malloc(kBufferSize);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+	MemoryDeleter deleter(buffer);
+
+	int32 length = kBufferSize;
+	status_t status = get_80211(device, IEEE80211_IOC_SCAN_RESULTS, buffer,
+		length);
+	if (status != B_OK)
+		return status;
+
+	BObjectList<wireless_network> networksList(true);
+
+	int32 bytesLeft = length;
+	uint8* entry = buffer;
+
+	while (bytesLeft > (int32)sizeof(struct ieee80211req_scan_result)) {
+		ieee80211req_scan_result* result
+			= (ieee80211req_scan_result*)entry;
+
+		char networkName[32];
+		strlcpy(networkName, (char*)(result + 1),
+			min_c((int)sizeof(networkName), result->isr_ssid_len + 1));
+
+		wireless_network* network = new wireless_network;
+		fill_wireless_network(*network, networkName, *result);
+		networksList.AddItem(network);
+
+		entry += result->isr_len;
+		bytesLeft -= result->isr_len;
+	}
+
+	count = 0;
+	if (!networksList.IsEmpty()) {
+		networks = new wireless_network[networksList.CountItems()];
+		for (int32 i = 0; i < networksList.CountItems(); i++) {
+			networks[i] = *networksList.ItemAt(i);
+			count++;
+		}
+	}
+
+	return B_OK;
+}
+
+
+static status_t
 get_scan_result(const char* device, wireless_network& network, uint32 index,
 	const BNetworkAddress* address, const char* name)
 {
 	if (address != NULL && address->Family() != AF_LINK)
 		return B_BAD_VALUE;
 
+	// TODO: Find some way to reduce code duplication with the preceding function!
 	const size_t kBufferSize = 65535;
 	uint8* buffer = (uint8*)malloc(kBufferSize);
 	if (buffer == NULL)
@@ -784,6 +838,13 @@ BNetworkDevice::GetNextNetwork(uint32& cookie, wireless_network& network)
 
 	cookie++;
 	return B_OK;
+}
+
+
+status_t
+BNetworkDevice::GetNetworks(wireless_network*& networks, uint32& count)
+{
+	return get_scan_results(Name(), networks, count);
 }
 
 

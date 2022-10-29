@@ -9,6 +9,7 @@
 #include <boot/stdio.h>
 
 #include "efi_platform.h"
+#include "generic_mmu.h"
 #include "mmu.h"
 #include "serial.h"
 
@@ -17,7 +18,6 @@
 extern "C" void arch_enter_kernel(
 	struct kernel_args* kernelArgs, addr_t kernelEntry, addr_t kernelStackTop);
 
-extern void arch_mmu_dump_present_tables();
 extern const char* granule_type_str(int tg);
 
 extern uint32_t arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
@@ -27,46 +27,6 @@ extern void arch_mmu_post_efi_setup(size_t memory_map_size, efi_memory_descripto
 	size_t descriptor_size, uint32_t descriptor_version);
 
 extern void arch_mmu_setup_EL1(uint64 tcr);
-
-
-static const char*
-memory_region_type_str(int type)
-{
-	switch (type) {
-		case EfiReservedMemoryType:
-			return "ReservedMemoryType";
-		case EfiLoaderCode:
-			return "LoaderCode";
-		case EfiLoaderData:
-			return "LoaderData";
-		case EfiBootServicesCode:
-			return "BootServicesCode";
-		case EfiBootServicesData:
-			return "BootServicesData";
-		case EfiRuntimeServicesCode:
-			return "RuntimeServicesCode";
-		case EfiRuntimeServicesData:
-			return "RuntimeServicesData";
-		case EfiConventionalMemory:
-			return "ConventionalMemory";
-		case EfiUnusableMemory:
-			return "UnusableMemory";
-		case EfiACPIReclaimMemory:
-			return "ACPIReclaimMemory";
-		case EfiACPIMemoryNVS:
-			return "ACPIMemoryNVS";
-		case EfiMemoryMappedIO:
-			return "MMIO";
-		case EfiMemoryMappedIOPortSpace:
-			return "MMIOPortSpace";
-		case EfiPalCode:
-			return "PalCode";
-		case EfiPersistentMemory:
-			return "PersistentMemory";
-		default:
-			return "unknown";
-	}
-}
 
 
 void
@@ -155,8 +115,6 @@ arch_start_kernel(addr_t kernelEntry)
 
 		dprintf("Kernel entry accessibility W: %x R: %x\n", arch_mmu_write_access(kernelEntry),
 			arch_mmu_read_access(kernelEntry));
-
-		arch_mmu_dump_present_tables();
 
 		if (el == 1) {
 			// Disable CACHE & MMU before dealing with TTBRx

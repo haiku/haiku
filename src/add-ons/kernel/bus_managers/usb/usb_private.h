@@ -9,6 +9,9 @@
 #ifndef _USB_PRIVATE_H
 #define _USB_PRIVATE_H
 
+
+#include <device_manager.h>
+
 #include "usbspec_private.h"
 #include <lock.h>
 #include <util/Vector.h>
@@ -35,6 +38,9 @@
 #define TRACE_ERROR(x...)			TRACE_OUTPUT(this, "error ", x)
 #define TRACE_MODULE_ALWAYS(x...)	dprintf("usb " USB_MODULE_NAME ": " x)
 #define TRACE_MODULE_ERROR(x...)	dprintf("usb " USB_MODULE_NAME ": " x)
+
+extern device_manager_info *gDeviceManager;
+
 
 class Hub;
 class Stack;
@@ -165,13 +171,15 @@ public:
 		usb_id							USBID() const { return 0; }
 		const char *					TypeName() const { return "stack"; }
 
+		void							TriggerExplore();
+
 private:
 static	int32							ExploreThread(void *data);
 
 		Vector<BusManager *>			fBusManagers;
 		thread_id						fExploreThread;
 		bool							fFirstExploreDone;
-		bool							fStopThreads;
+		sem_id							fExploreSem;
 
 		mutex							fStackLock;
 		mutex							fExploreLock;
@@ -192,7 +200,7 @@ static	int32							ExploreThread(void *data);
  */
 class BusManager {
 public:
-										BusManager(Stack *stack);
+										BusManager(Stack *stack, device_node* node);
 virtual									~BusManager();
 
 virtual	status_t						InitCheck();
@@ -230,6 +238,8 @@ virtual	status_t						NotifyPipeChange(Pipe *pipe,
 
 virtual	const char *					TypeName() const = 0;
 
+		device_node *					Node() const
+											{ return fNode; }
 protected:
 		usb_id							USBID() const { return fStackIndex; }
 
@@ -250,6 +260,8 @@ private:
 		Object *						fRootObject;
 
 		usb_id							fStackIndex;
+
+		device_node*					fNode;
 };
 
 
@@ -578,6 +590,8 @@ virtual	status_t						BuildDeviceName(char *string,
 											uint32 *index, size_t bufferSize,
 											Device *device);
 
+		device_node *					RegisterNode(device_node* parent = NULL);
+
 		int8							HubAddress() const
 											{ return fHubAddress; }
 		uint8							HubPort() const { return fHubPort; }
@@ -586,6 +600,9 @@ virtual	status_t						BuildDeviceName(char *string,
 											{ fControllerCookie = cookie; }
 		void *							ControllerCookie() const
 											{ return fControllerCookie; }
+		device_node *					Node() const
+											{ return fNode; }
+		void							SetNode(device_node* node) { fNode = node; }
 
 		// Convenience functions for standard requests
 virtual	status_t						SetFeature(uint16 selector);
@@ -607,6 +624,7 @@ private:
 		uint8							fHubPort;
 		ControlPipe *					fDefaultPipe;
 		void *							fControllerCookie;
+		device_node*					fNode;
 };
 
 
@@ -758,5 +776,32 @@ private:
 		// Not used for bulk transactions.
 		uint16						fBandwidth;
 };
+
+
+// Interface between usb_bus and underlying implementation (xhci_pci)
+typedef struct usb_bus_interface {
+	driver_module_info info;
+} usb_bus_interface;
+
+
+typedef struct {
+	driver_module_info info;
+	status_t           (*get_stack)(void** stack);
+} usb_for_controller_interface;
+
+#define USB_FOR_CONTROLLER_MODULE_NAME "bus_managers/usb/controller/driver_v1"
+
+// bus manager device interface for peripheral driver
+typedef struct {
+	driver_module_info info;
+
+} usb_device_interface;
+
+
+#define USB_DEVICE_ID_ITEM "usb/id"
+#define USB_DEVICE_CLASS "usb/class"
+#define USB_DEVICE_SUBCLASS "usb/subclass"
+#define USB_DEVICE_PROTOCOL "usb/protocol"
+#define USB_DEVICE_MODULE_NAME "bus_managers/usb/device/driver_v1"
 
 #endif // _USB_PRIVATE_H

@@ -16,7 +16,7 @@ File offset: 	ProbeView		Dosya ofseti:
 Add	ProbeView		Ekle
 64 bit signed value:	TypeEditors		64 bit imzalanmış değer:
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		\"%s\" özniteliğini \"%s\" dosyasından kaldırmak istediğinizden emin misiniz?\n\nBu işlem geri alınamaz.
-No type editor available	AttributeWindow		Bir tür düzenleyicisi mevcut değil
+No type editor available	AttributeWindow		Kullanılabilir bir tür düzenleyicisi yok
 Print…	ProbeView		Yazdır…
 New…	FileWindow		Yeni…
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	ne: '%.4s'\n\n
@@ -113,7 +113,7 @@ Find	FindWindow		Bul
 Attribute: 	ProbeView		Öznitelik: 
 Block	ProbeView		Blok
 Find again	ProbeView		Yeniden bul
-View	ProbeView	This is the last menubar item 'File Edit Block View'	Görünüm
+View	ProbeView	This is the last menubar item 'File Edit Block View'	Görüntü
 Could not read image	TypeEditors	Image means here a picture file, not a disk image.	Görsel okunamadı
 DiskProbe request	ProbeView		DiskProbe isteği
 Double precision floating-point value:	TypeEditors		Çifte kesinlikli kayan noktalı değer:

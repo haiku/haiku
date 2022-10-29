@@ -472,8 +472,7 @@ FontManager::_SetDefaultFonts()
 	if (style == NULL)
 		return B_ERROR;
 
-	fDefaultPlainFont.SetTo(new (std::nothrow) ServerFont(*style,
-		DEFAULT_PLAIN_FONT_SIZE));
+	fDefaultPlainFont.SetTo(new (std::nothrow) ServerFont(*style, DEFAULT_FONT_SIZE));
 	if (!fDefaultPlainFont.IsSet())
 		return B_NO_MEMORY;
 
@@ -481,8 +480,7 @@ FontManager::_SetDefaultFonts()
 	style = _GetDefaultStyle(DEFAULT_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE,
 		FALLBACK_BOLD_FONT_FAMILY, FALLBACK_BOLD_FONT_STYLE, B_BOLD_FACE);
 
-	fDefaultBoldFont.SetTo(new (std::nothrow) ServerFont(*style,
-		DEFAULT_BOLD_FONT_SIZE));
+	fDefaultBoldFont.SetTo(new (std::nothrow) ServerFont(*style, DEFAULT_FONT_SIZE));
 	if (!fDefaultBoldFont.IsSet())
 		return B_NO_MEMORY;
 
@@ -490,8 +488,7 @@ FontManager::_SetDefaultFonts()
 	style = _GetDefaultStyle(DEFAULT_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE,
 		FALLBACK_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE, B_REGULAR_FACE);
 
-	fDefaultFixedFont.SetTo(new (std::nothrow) ServerFont(*style,
-		DEFAULT_FIXED_FONT_SIZE));
+	fDefaultFixedFont.SetTo(new (std::nothrow) ServerFont(*style, DEFAULT_FONT_SIZE));
 	if (!fDefaultFixedFont.IsSet())
 		return B_NO_MEMORY;
 

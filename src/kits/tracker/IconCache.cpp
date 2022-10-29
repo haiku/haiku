@@ -228,7 +228,7 @@ bool
 IconCacheEntry::IconHitTest(BPoint where, IconDrawMode mode,
 	BSize size) const
 {
-	ASSERT(where.x < size && where.y < size);
+	ASSERT(where.x < size.width && where.y < size.height);
 	BBitmap* bitmap = IconForMode(mode, size);
 	if (bitmap == NULL)
 		return false;

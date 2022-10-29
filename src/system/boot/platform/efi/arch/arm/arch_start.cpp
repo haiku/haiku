@@ -11,6 +11,7 @@
 #include <boot/stdio.h>
 
 #include "efi_platform.h"
+#include "generic_mmu.h"
 #include "mmu.h"
 #include "serial.h"
 #include "smp.h"
@@ -50,46 +51,6 @@ void
 arch_convert_kernel_args(void)
 {
 	fix_address(gKernelArgs.arch_args.fdt);
-}
-
-
-static const char*
-memory_region_type_str(int type)
-{
-	switch (type)	{
-		case EfiReservedMemoryType:
-			return "ReservedMemoryType";
-		case EfiLoaderCode:
-			return "LoaderCode";
-		case EfiLoaderData:
-			return "LoaderData";
-		case EfiBootServicesCode:
-			return "BootServicesCode";
-		case EfiBootServicesData:
-			return "BootServicesData";
-		case EfiRuntimeServicesCode:
-			return "RuntimeServicesCode";
-		case EfiRuntimeServicesData:
-			return "RuntimeServicesData";
-		case EfiConventionalMemory:
-			return "ConventionalMemory";
-		case EfiUnusableMemory:
-			return "UnusableMemory";
-		case EfiACPIReclaimMemory:
-			return "ACPIReclaimMemory";
-		case EfiACPIMemoryNVS:
-			return "ACPIMemoryNVS";
-		case EfiMemoryMappedIO:
-			return "MMIO";
-		case EfiMemoryMappedIOPortSpace:
-			return "MMIOPortSpace";
-		case EfiPalCode:
-			return "PalCode";
-		case EfiPersistentMemory:
-			return "PersistentMemory";
-		default:
-			return "unknown";
-	}
 }
 
 

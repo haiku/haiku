@@ -643,14 +643,13 @@ const struct supported_device {
 	{0x73ae, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
 	{0x73bf, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX 6800 / 6900 XT"},
 	{0x73cf, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX Navi"},
-	{0x73df, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX 6700 XT"},
 	// Van Gogh?
 	{0x163f, 13, 4, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Van Gogh)"},
 	// Navy Flounder?
 	{0x73c0, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Navy)"},
 	{0x73c1, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Navy)"},
 	{0x73c3, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Navy)"},
-	{0x73df, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Navy)"},
+	{0x73df, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX 6700 XT"},
 	// Dimgrey Cavefish?
 	{0x73e0, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Dimgrey)"},
 	{0x73e1, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Dimgrey)"},

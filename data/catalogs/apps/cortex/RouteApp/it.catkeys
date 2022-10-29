@@ -1,7 +1,8 @@
-1	italian	application/x-vnd.Cortex.Route	3666174570
+1	italian	application/x-vnd.Cortex.Route	25925955
 Node '%name%' released	CortexRouteApp		Nodo '%name%' rilasciato
 OK	CortexRouteApp		OK
 About Cortex/Route…	CortexRouteApp		Informazioni su Cortex/Route…
+File	CortexRouteApp		Archivio
 Connection '%name%' made	CortexRouteApp		Connessione '%name%' effettuata
 Save nodes…	CortexRouteApp		Salva nodi…
 %producer% and %consumer%	CortexRouteApp		%producer% e %consumer%
@@ -14,6 +15,7 @@ Untitled group	CortexRouteApp		Gruppo senza titolo
 Connection failed	CortexRouteApp		Connessione fallita
 Connection '%name%' broken	CortexRouteApp		Connessione '%name%' interrotta
 Between:	CortexRouteApp		Tra:
+Cortex	CortexRouteApp		Cortex
 Open…	CortexRouteApp		Apri…
 Pull palettes	CortexRouteApp		Scorri palette
 Connection made	CortexRouteApp		Connessione effettuata

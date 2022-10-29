@@ -608,7 +608,7 @@ mmc_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 		case B_GET_GEOMETRY:
 		{
-			if (buffer == NULL || length < sizeof(device_geometry))
+			if (buffer == NULL || length > sizeof(device_geometry))
 				return B_BAD_VALUE;
 
 			if (info->geometry.bytes_per_sector == 0) {
@@ -619,8 +619,7 @@ mmc_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 				}
 			}
 
-			return user_memcpy(buffer, &info->geometry,
-				sizeof(device_geometry));
+			return user_memcpy(buffer, &info->geometry, length);
 		}
 
 		case B_GET_ICON_NAME:

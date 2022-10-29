@@ -1,14 +1,16 @@
-1	hungarian	x-vnd.Haiku-Devices	3345509916
+1	hungarian	x-vnd.Haiku-Devices	214685744
 ACPI bus	DevicesView		ACPI port
 Encryption controller	Device		Titkosító vezérlő
 Bus Information	Device		Busz-információ
 Devices	System name		Eszközök
+USB bus	DevicesView		USB busz
 Graphics Peripheral	DeviceSCSI		Grafikus periféria
 Processor	Device		Processzor
 Generate system information	DevicesView		Rendszerinformáció létrehozása
 Class info	DevicePCI		Osztály-információk
 ACPI Information	DeviceACPI		ACPI információ
 Detailed	DevicesView		Részletek
+USB bus	Device		USB busz
 Computer	DevicesView		Számítógép
 Communications	DeviceSCSI		Kommunikáció
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Osztály információi\t\t\t\t: %classinfo%

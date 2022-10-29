@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-mount_server	2818767263
+1	finnish	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Liitä kirjoitussuojattuna
 Error mounting volume:\n\n%s	AutoMounter		Virhe liitettäessä taltiota:\n\n%s
 Cancel	AutoMounter		Peru
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		Liitetään taltio ’%s’\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Levyaseman ”%s” liittämisen purkaminen epäonnistui:\n\t%s\n\nPakotetaanko liittämisen purkaminen?\n\nHuomaa: Jos sovellus parhaillaan kirjoittaa taltiolle, liittämisen purkaminen voi aiheuttaa datan häviämisen.\n
 Force unmount	AutoMounter		Pakota liittämisen purkaminen
 Mount error	AutoMounter		Liittämisvirhe
-Mounting volume <unnamed volume>\n\n	AutoMounter		Liitetään taltio <nimetön taltio>\n\n
 Mount warning	AutoMounter		Liittämisvaroitus

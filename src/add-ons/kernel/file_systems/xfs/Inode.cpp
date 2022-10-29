@@ -32,7 +32,7 @@ xfs_inode_t::SwapEndian()
 	di_nblocks			=	B_BENDIAN_TO_HOST_INT64(di_nblocks);
 	di_extsize			=	B_BENDIAN_TO_HOST_INT32(di_extsize);
 	di_nextents			=	B_BENDIAN_TO_HOST_INT32(di_nextents);
-	di_anextents		=	B_BENDIAN_TO_HOST_INT16(di_anextents);
+	di_naextents		=	B_BENDIAN_TO_HOST_INT16(di_naextents);
 	di_dmevmask			=	B_BENDIAN_TO_HOST_INT32(di_dmevmask);
 	di_dmstate			=	B_BENDIAN_TO_HOST_INT16(di_dmstate);
 	di_flags			=	B_BENDIAN_TO_HOST_INT16(di_flags);
@@ -161,6 +161,13 @@ xfs_extnum_t
 xfs_inode_t::DataExtentsCount() const
 {
 	return di_nextents;
+}
+
+
+xfs_extnum_t
+xfs_inode_t::AttrExtentsCount() const
+{
+	return di_naextents;
 }
 
 
@@ -352,7 +359,7 @@ Inode::VerifyInode() const
 			return false;
 		}
 
-		if (fNode->di_anextents)
+		if (fNode->di_naextents)
 			return false;
 	}
 

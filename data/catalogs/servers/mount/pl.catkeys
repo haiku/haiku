@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-mount_server	2818767263
+1	polish	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Montuj tylko do odczytu
 Error mounting volume:\n\n%s	AutoMounter		Błąd montowania woluminu:\n\n%s
 Cancel	AutoMounter		Anuluj
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		Montowanie woluminu „%s”\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nie można odmontować dysku „%s”:\n\t%s\n\nCzy wymusić odmontowanie?\n\nUwaga: Jeśli aplikacja zapisuje aktualnie dane na woluminie, odmontowanie go może skutkować utratą danych.\n
 Force unmount	AutoMounter		Wymuś odmontowanie
 Mount error	AutoMounter		Błąd montowania
-Mounting volume <unnamed volume>\n\n	AutoMounter		Montowanie woluminu <nieznany wolumin>\n\n
 Mount warning	AutoMounter		Ostrzeżenie montowania

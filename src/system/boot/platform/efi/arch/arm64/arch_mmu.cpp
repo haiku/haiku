@@ -6,19 +6,27 @@
 #include <boot/platform.h>
 #include <boot/stage2.h>
 
-#include "mmu.h"
 #include "efi_platform.h"
+#include "generic_mmu.h"
+#include "mmu.h"
 
 #include "aarch64.h"
 #include "arch_mmu.h"
 
 // #define TRACE_MMU
 #ifdef TRACE_MMU
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
+
+//#define TRACE_MEMORY_MAP
+//#define TRACE_PAGE_DIRECTORY
+
+// Ignore memory above 512GB
+#define PHYSICAL_MEMORY_LOW		0x00000000
+#define PHYSICAL_MEMORY_HIGH	0x8000000000ull
 
 ARMv8TranslationRegime::TranslationDescriptor translation4Kb48bits = {
 	{L0_SHIFT, L0_ADDR_MASK, false, true, false },
@@ -66,18 +74,18 @@ arch_mmu_dump_table(uint64* table, uint8 currentLevel)
 	uint64 EntriesPerLevel = arch_mmu_entries_per_granularity(CurrentRegime.Granularity());
 	for (uint i = 0 ; i < EntriesPerLevel; i++) {
 		if (!ttd.IsInvalid()) {
-			TRACE(("Level %d, @%0lx: TTD %016lx\t", currentLevel, ttd.Location(), ttd.Value()));
+			TRACE("Level %d, @%0lx: TTD %016lx\t", currentLevel, ttd.Location(), ttd.Value());
 			if (ttd.IsTable() && currentLevel < 3) {
-				TRACE(("Table! Next Level:\n"));
+				TRACE("Table! Next Level:\n");
 				arch_mmu_dump_table(ttd.Dereference(), currentLevel + 1);
 			}
 			if (ttd.IsBlock() || (ttd.IsPage() && currentLevel == 3)) {
-				TRACE(("Block/Page"));
+				TRACE("Block/Page");
 
 				if (i & 1) { // 2 entries per row
-					TRACE(("\n"));
+					TRACE("\n");
 				} else {
-					TRACE(("\t"));
+					TRACE("\t");
 				}
 			}
 		}
@@ -86,27 +94,23 @@ arch_mmu_dump_table(uint64* table, uint8 currentLevel)
 }
 
 
+#ifdef TRACE_PAGE_DIRECTORY
 void
 arch_mmu_dump_present_tables()
 {
-#ifdef TRACE_MMU
-	if (arch_mmu_enabled()) {
-		uint64 address = arch_mmu_base_register();
-		TRACE(("Under TTBR0: %lx\n", address));
+	uint64 address = arch_mmu_base_register();
+	dprintf("Under TTBR0: %lx\n", address);
 
-		arch_mmu_dump_table(reinterpret_cast<uint64*>(address), 0);
+	arch_mmu_dump_table(reinterpret_cast<uint64*>(address), 0);
 
-		/* We are willing to transition, but still in EL2, present MMU configuration
-		 * for user is present in EL2 by TTBR0_EL2. Kernel side is not active, but
-		 * allocated under sPageDirectory, defined under TTBR1_EL1.
-		 */
-		if (address != 0ul) {
-			TRACE(("Under allocated TTBR1_EL1:\n"));
-			arch_mmu_dump_table(sPageDirectory, 0);
-		}
-	}
-#endif
+	/* We are willing to transition, but still in EL2, present MMU configuration
+	 * for user is present in EL2 by TTBR0_EL2. Kernel side is not active, but
+	 * allocated under sPageDirectory, defined under TTBR1_EL1.
+	 */
+	dprintf("Under allocated TTBR1_EL1:\n");
+	arch_mmu_dump_table(sPageDirectory, 0);
 }
+#endif
 
 
 void arch_mmu_setup_EL1(uint64 tcr) {
@@ -140,8 +144,8 @@ map_region(addr_t virt_addr, addr_t  phys_addr, size_t size,
 	uint64 remainingSizeInTable = CurrentRegime.TableSize(level)
 		- currentLevelSize * CurrentRegime.DescriptorIndex(virt_addr, level);
 
-	TRACE(("Level %x, Processing desc %lx indexing %lx\n",
-		level, reinterpret_cast<uint64>(descriptor), ttd.Location()));
+	TRACE("Level %x, Processing desc %lx indexing %lx\n",
+		level, reinterpret_cast<uint64>(descriptor), ttd.Location());
 
 	if (ttd.IsInvalid()) {
 		// If the physical has the same alignment we could make a block here
@@ -228,23 +232,23 @@ map_region(addr_t virt_addr, addr_t  phys_addr, size_t size,
 static void
 map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint64_t flags)
 {
-	TRACE(("map 0x%0lx --> 0x%0lx, len=0x%0lx, flags=0x%0lx\n",
-		(uint64_t)virt_addr, (uint64_t)phys_addr, (uint64_t)size, flags));
+	TRACE("map 0x%0lx --> 0x%0lx, len=0x%0lx, flags=0x%0lx\n",
+		(uint64_t)virt_addr, (uint64_t)phys_addr, (uint64_t)size, flags);
 
 	// TODO: Review why we get ranges with 0 size ...
 	if (size == 0) {
-		TRACE(("Requesing 0 size map\n"));
+		TRACE("Requesing 0 size map\n");
 		return;
 	}
 
 	// TODO: Review this case
 	if (phys_addr == READ_SPECIALREG(TTBR1_EL1)) {
-		TRACE(("Trying to map the TTBR itself?!\n"));
+		TRACE("Trying to map the TTBR itself?!\n");
 		return;
 	}
 
 	if (arch_mmu_read_access(virt_addr) && arch_mmu_read_access(virt_addr + size)) {
-		TRACE(("Range already covered in current MMU\n"));
+		TRACE("Range already covered in current MMU\n");
 		return;
 	}
 
@@ -268,97 +272,6 @@ map_range(addr_t virt_addr, phys_addr_t phys_addr, size_t size, uint64_t flags)
 }
 
 
-static void
-build_physical_memory_list(size_t memory_map_size,
-	efi_memory_descriptor* memory_map, size_t descriptor_size,
-	uint32_t descriptor_version)
-{
-	addr_t addr = (addr_t)memory_map;
-
-	gKernelArgs.num_physical_memory_ranges = 0;
-
-	// First scan: Add all usable ranges
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = (efi_memory_descriptor*)(addr + i * descriptor_size);
-		switch (entry->Type) {
-		case EfiLoaderCode:
-		case EfiLoaderData:
-			entry->VirtualStart = entry->PhysicalStart;
-			break;
-		case EfiBootServicesCode:
-		case EfiBootServicesData:
-		case EfiConventionalMemory: {
-			// Usable memory.
-			uint64_t base = entry->PhysicalStart;
-			uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
-			insert_physical_memory_range(base, size);
-			break;
-		}
-		case EfiACPIReclaimMemory:
-			// ACPI reclaim -- physical memory we could actually use later
-			break;
-		case EfiRuntimeServicesCode:
-		case EfiRuntimeServicesData:
-			entry->VirtualStart = entry->PhysicalStart;
-			break;
-		case EfiMemoryMappedIO:
-			entry->VirtualStart = entry->PhysicalStart;
-			break;
-		}
-	}
-
-	uint64_t initialPhysicalMemory = total_physical_memory();
-
-	// Second scan: Remove everything reserved that may overlap
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = (efi_memory_descriptor*)(addr + i * descriptor_size);
-		switch (entry->Type) {
-		case EfiLoaderCode:
-		case EfiLoaderData:
-		case EfiBootServicesCode:
-		case EfiBootServicesData:
-		case EfiConventionalMemory:
-			break;
-		default:
-			uint64_t base = entry->PhysicalStart;
-			uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
-			remove_physical_memory_range(base, size);
-		}
-	}
-
-	gKernelArgs.ignored_physical_memory
-		+= initialPhysicalMemory - total_physical_memory();
-
-	sort_address_ranges(gKernelArgs.physical_memory_range,
-		gKernelArgs.num_physical_memory_ranges);
-}
-
-
-static void
-build_physical_allocated_list(size_t memory_map_size,
-	efi_memory_descriptor* memory_map, size_t descriptor_size,
-	uint32_t descriptor_version)
-{
-	addr_t addr = (addr_t)memory_map;
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
-		efi_memory_descriptor* entry = (efi_memory_descriptor*)(addr + i * descriptor_size);
-		switch (entry->Type) {
-		case EfiLoaderData: {
-			uint64_t base = entry->PhysicalStart;
-			uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
-			insert_physical_allocated_range(base, size);
-			break;
-		}
-		default:
-			;
-		}
-	}
-
-	sort_address_ranges(gKernelArgs.physical_allocated_range,
-		gKernelArgs.num_physical_allocated_ranges);
-}
-
-
 void
 arch_mmu_init()
 {
@@ -378,30 +291,39 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 	kRuntimeServices->SetVirtualAddressMap(memory_map_size, descriptor_size,
 		descriptor_version, memory_map);
 
-	TRACE(("phys memory ranges:\n"));
+#ifdef TRACE_MEMORY_MAP
+	dprintf("phys memory ranges:\n");
 	for (uint32_t i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
-		uint32_t start = (uint32_t)gKernelArgs.physical_memory_range[i].start;
-		uint32_t size = (uint32_t)gKernelArgs.physical_memory_range[i].size;
-		TRACE(("    0x%08x-0x%08x, length 0x%08x\n",
-			start, start + size, size));
+		uint64 start = gKernelArgs.physical_memory_range[i].start;
+		uint64 size = gKernelArgs.physical_memory_range[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+			start, start + size, size);
 	}
 
-	TRACE(("allocated phys memory ranges:\n"));
+	dprintf("allocated phys memory ranges:\n");
 	for (uint32_t i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
-		uint32_t start = (uint32_t)gKernelArgs.physical_allocated_range[i].start;
-		uint32_t size = (uint32_t)gKernelArgs.physical_allocated_range[i].size;
-		TRACE(("    0x%08x-0x%08x, length 0x%08x\n",
-			start, start + size, size));
+		uint64 start = gKernelArgs.physical_allocated_range[i].start;
+		uint64 size = gKernelArgs.physical_allocated_range[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+			start, start + size, size);
 	}
 
-	TRACE(("allocated virt memory ranges:\n"));
+	dprintf("allocated virt memory ranges:\n");
 	for (uint32_t i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
-		uint32_t start = (uint32_t)gKernelArgs.virtual_allocated_range[i].start;
-		uint32_t size = (uint32_t)gKernelArgs.virtual_allocated_range[i].size;
-		TRACE(("    0x%08x-0x%08x, length 0x%08x\n",
-			start, start + size, size));
+		uint64 start = gKernelArgs.virtual_allocated_range[i].start;
+		uint64 size = gKernelArgs.virtual_allocated_range[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+			start, start + size, size);
 	}
 
+	dprintf("virt memory ranges to keep:\n");
+	for (uint32_t i = 0; i < gKernelArgs.arch_args.num_virtual_ranges_to_keep; i++) {
+		uint64 start = gKernelArgs.arch_args.virtual_ranges_to_keep[i].start;
+		uint64 size = gKernelArgs.arch_args.virtual_ranges_to_keep[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+			start, start + size, size);
+	}
+#endif
 }
 
 
@@ -416,9 +338,9 @@ arch_mmu_allocate_kernel_page_tables(void)
 	if (ttbr1 != 0ll) {
 		if (arch_exception_level() == 1) {
 			page = reinterpret_cast<uint64*>(ttbr1);
-			TRACE(("Resusing TTBR1_EL1 present : %" B_PRIx64 "\n", ttbr1));
+			TRACE("Reusing TTBR1_EL1 present : %" B_PRIx64 "\n", ttbr1);
 		} else if (arch_exception_level() == 2) {
-			TRACE(("Ignoring EL1 TTBR1(%" B_PRIx64") tables\n", ttbr1));
+			TRACE("Ignoring EL1 TTBR1(%" B_PRIx64") tables\n", ttbr1);
 		}
 	}
 
@@ -450,9 +372,10 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	arch_mmu_allocate_kernel_page_tables();
 
 	build_physical_memory_list(memory_map_size, memory_map,
-		descriptor_size, descriptor_version);
+		descriptor_size, descriptor_version,
+		PHYSICAL_MEMORY_LOW, PHYSICAL_MEMORY_HIGH);
 
-	TRACE(("Mapping Code & Data\n"));
+	TRACE("Mapping Code & Data\n");
 
 	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
 		efi_memory_descriptor* entry = (efi_memory_descriptor*)(memory_map_addr + i * descriptor_size);
@@ -469,7 +392,7 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 		}
 	}
 
-	TRACE(("Mapping EFI_MEMORY_RUNTIME\n"));
+	TRACE("Mapping EFI_MEMORY_RUNTIME\n");
 	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
 		efi_memory_descriptor* entry = (efi_memory_descriptor*)(memory_map_addr + i * descriptor_size);
 		if ((entry->Attribute & EFI_MEMORY_RUNTIME) != 0)
@@ -478,7 +401,7 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 				ARMv8TranslationTableDescriptor::DefaultCodeAttribute | currentMair.MaskOf(MAIR_NORMAL_WB));
 	}
 
-	TRACE(("Mapping \"next\" regions\n"));
+	TRACE("Mapping \"next\" regions\n");
 	void* cookie = NULL;
 	addr_t vaddr;
 	phys_addr_t paddr;
@@ -518,12 +441,16 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	gKernelArgs.arch_args.vir_pgdir = (uint32)vir_pgdir;
 	gKernelArgs.arch_args.next_pagetable = (uint64)(sNextPageTable) - (uint64)sPageDirectory;
 
-	TRACE(("gKernelArgs.arch_args.phys_pgdir     = 0x%08x\n",
-		(uint32_t)gKernelArgs.arch_args.phys_pgdir));
-	TRACE(("gKernelArgs.arch_args.vir_pgdir      = 0x%08x\n",
-		(uint32_t)gKernelArgs.arch_args.vir_pgdir));
-	TRACE(("gKernelArgs.arch_args.next_pagetable = 0x%08x\n",
-		(uint32_t)gKernelArgs.arch_args.next_pagetable));
+	TRACE("gKernelArgs.arch_args.phys_pgdir     = 0x%08x\n",
+		(uint32_t)gKernelArgs.arch_args.phys_pgdir);
+	TRACE("gKernelArgs.arch_args.vir_pgdir      = 0x%08x\n",
+		(uint32_t)gKernelArgs.arch_args.vir_pgdir);
+	TRACE("gKernelArgs.arch_args.next_pagetable = 0x%08x\n",
+		(uint32_t)gKernelArgs.arch_args.next_pagetable);
+
+#ifdef TRACE_PAGE_DIRECTORY
+	arch_mmu_dump_present_tables();
+#endif
 
 	return (uint64_t)sPageDirectory;
 }

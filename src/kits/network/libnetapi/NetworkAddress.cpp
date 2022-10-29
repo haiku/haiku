@@ -533,7 +533,7 @@ BNetworkAddress::SetPort(uint16 port)
 
 
 void
-BNetworkAddress::SetToLinkLevel(uint8* address, size_t length)
+BNetworkAddress::SetToLinkLevel(const uint8* address, size_t length)
 {
 	sockaddr_dl& link = (sockaddr_dl&)fAddress;
 	memset(&link, 0, sizeof(sockaddr_dl));

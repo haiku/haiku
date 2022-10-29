@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-mount_server	2818767263
+1	romanian	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Montează doar citire
 Error mounting volume:\n\n%s	AutoMounter		Eroare la montarea volumului:\n\n%s
 Cancel	AutoMounter		Anulează
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		Se montează volumul „%s”\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nu s-a putut demonta discul \„%s\”:\n\t%s\n\nAr trebui fortață demontarea?\n\nNotă: Dacă o aplicație scrie în prezent la volum, demontarea acestuia ar putea duce la pierderi de date.\n
 Force unmount	AutoMounter		Forțează demontarea
 Mount error	AutoMounter		Eroare de montare
-Mounting volume <unnamed volume>\n\n	AutoMounter		Se montează volumul <unnamed volume>\n\n
 Mount warning	AutoMounter		Avertisment de montare

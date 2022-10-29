@@ -78,10 +78,10 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 {
 	BPopUpMenu* menu = new BPopUpMenu("pick compression");
 
-	uint32 currentCompression = 
+	uint32 currentCompression =
 		fSettings->SetGetInt32(SGI_SETTING_COMPRESSION);
 	// create the menu items with the various compression methods
-	add_menu_item(menu, SGI_COMP_NONE, B_TRANSLATE("None"), 
+	add_menu_item(menu, SGI_COMP_NONE, B_TRANSLATE("None"),
 		currentCompression);
 	//menu->AddSeparatorItem();
 	add_menu_item(menu, SGI_COMP_RLE, B_TRANSLATE("RLE"), currentCompression);
@@ -94,12 +94,12 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 
 	//add_menu_item(menu, SGI_COMP_ARLE, "Agressive RLE", currentCompression);
 
-	fCompressionMF = new BMenuField("compression", 
+	fCompressionMF = new BMenuField("compression",
 		B_TRANSLATE("Use compression:"), menu);
 
 	BAlignment labelAlignment(B_ALIGN_LEFT, B_ALIGN_NO_VERTICAL);
 
-	BStringView* titleView = new BStringView("title", 
+	BStringView* titleView = new BStringView("title",
 		B_TRANSLATE("SGI image translator"));
 	titleView->SetFont(be_bold_font);
 	titleView->SetExplicitAlignment(labelAlignment);
@@ -130,11 +130,6 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 			.End()
 		.AddGlue()
 		.Add(infoView);
-
-	BFont font;
-	GetFont(&font);
-	SetExplicitPreferredSize(BSize((font.Size() * 390) / 12,
-		(font.Size() * 180) / 12));
 }
 
 

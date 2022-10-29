@@ -1,14 +1,16 @@
-1	catalan; valencian	x-vnd.Haiku-Devices	3345509916
+1	catalan; valencian	x-vnd.Haiku-Devices	214685744
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controlador del xifratge
 Bus Information	Device		Informació del bus
 Devices	System name		Dispositius
+USB bus	DevicesView		Bus USB
 Graphics Peripheral	DeviceSCSI		Perifèric gràfic
 Processor	Device		Processador
 Generate system information	DevicesView		Genera la informació del sistema
 Class info	DevicePCI		Informació de la classe
 ACPI Information	DeviceACPI		Informació ACPI
 Detailed	DevicesView		Detallat
+USB bus	Device		Bus USB
 Computer	DevicesView		Ordinador
 Communications	DeviceSCSI		Comunicacions
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Informació de classe:\t\t\t\t: %classInfo%

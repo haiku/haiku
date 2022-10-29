@@ -15,6 +15,7 @@
 
 #include <net/if_media.h>
 
+#include <AutoDeleter.h>
 #include <Button.h>
 #include <Catalog.h>
 #include <ControlLook.h>
@@ -270,10 +271,11 @@ InterfaceView::_Update(bool updateWirelessNetworks)
 		while (device.GetNextAssociatedNetwork(cookie, address) == B_OK)
 			associated.insert(address);
 
-		wireless_network network;
-		cookie = 0;
-		if ((fPulseCount % 15) == 0
-				&& device.GetNextNetwork(cookie, network) != B_OK) {
+		wireless_network* networks = NULL;
+		uint32 networksCount = 0;
+		device.GetNetworks(networks, networksCount);
+
+		if ((fPulseCount % 15) == 0 && networksCount == 0) {
 			// We don't seem to know of any networks, and it's been long
 			// enough since the last scan, so trigger one to try and
 			// find some networks.
@@ -286,7 +288,11 @@ InterfaceView::_Update(bool updateWirelessNetworks)
 			// to merit such a wait. It's only just over ~4 vertical
 			// retraces, anyway.
 			snooze(50 * 1000);
+
+			device.GetNetworks(networks, networksCount);
 		}
+
+		ArrayDeleter<wireless_network> networksDeleter(networks);
 
 		// go through menu items and remove networks that have dropped out
 		for (int32 index = 0; index < count; index++) {
@@ -297,9 +303,8 @@ InterfaceView::_Update(bool updateWirelessNetworks)
 				break;
 
 			bool networkFound = false;
-			cookie = 0;
-			while (device.GetNextNetwork(cookie, network) == B_OK) {
-				if (networkItem->Network() == network) {
+			for (uint32 i = 0; i < networksCount; i++) {
+				if (networkItem->Network() == networks[i]) {
 					networkFound = true;
 					break;
 				}
@@ -312,8 +317,9 @@ InterfaceView::_Update(bool updateWirelessNetworks)
 		}
 
 		// go through networks and add new ones to menu
-		cookie = 0;
-		while (device.GetNextNetwork(cookie, network) == B_OK) {
+		for (uint32 i = 0; i < networksCount; i++) {
+			const wireless_network& network = networks[i];
+
 			bool networkFound = false;
 			for (int32 index = 0; index < count; index++) {
 				WirelessNetworkMenuItem* networkItem =

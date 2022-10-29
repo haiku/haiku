@@ -414,8 +414,8 @@ stack_trace(int argc, char **argv)
 			kprintf("                     SPu 0x%08x    LRu 0x%08x   SPSR 0x%08x\n",
 				frame->usr_sp, frame->usr_lr, frame->spsr);
 
- 			fp = frame->svc_sp;
-			print_stack_frame(thread, frame->pc, frame->svc_sp, frame->svc_lr, callIndex, demangle);
+			print_stack_frame(thread, frame->pc, fp, frame->r11, callIndex, demangle);
+			fp = frame->r11;
 		} else {
 			addr_t ip, next;
 

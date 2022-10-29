@@ -133,6 +133,7 @@ struct iframe {
 	uint64 x[20];
 	uint64 lr;
 	uint64 sp;
+	uint64 fp;
 
 	// exception info
 	uint64 esr;
@@ -168,6 +169,9 @@ static inline void arch_cpu_idle(void)
 {
 	arm64_yield();
 }
+
+
+extern addr_t arm64_get_fp(void);
 
 
 #ifdef __cplusplus

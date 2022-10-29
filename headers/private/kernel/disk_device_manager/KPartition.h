@@ -70,6 +70,9 @@ public:
 	void SetBlockSize(uint32 blockSize);
 	uint32 BlockSize() const;
 
+	void SetPhysicalBlockSize(uint32 blockSize);
+	uint32 PhysicalBlockSize() const;
+
 	void SetIndex(int32 index);
 	int32 Index() const;		// 0 for devices
 

@@ -165,7 +165,7 @@ WebAppInterface::GetChangelog(const BString& packageName, BMessage& message)
 	requestEnvelopeWriter.WriteString(packageName.String());
 	requestEnvelopeWriter.WriteObjectEnd();
 
-	return _SendJsonRequest("pkg/get-pkg-change-log",
+	return _SendJsonRequest("pkg/get-pkg-changelog",
 		requestEnvelopeData, _LengthAndSeekToZero(requestEnvelopeData),
 		0, message);
 }

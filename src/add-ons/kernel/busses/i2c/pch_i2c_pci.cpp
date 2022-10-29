@@ -306,6 +306,15 @@ supports_device(device_node* parent)
 			case 0x34ea:
 			case 0x34eb:
 
+			case 0x43ad:
+			case 0x43ae:
+			case 0x43d8:
+
+			case 0x43e8:
+			case 0x43e9:
+			case 0x43ea:
+			case 0x43eb:
+
 			case 0x4b44:
 			case 0x4b45:
 			case 0x4b4b:
@@ -322,6 +331,22 @@ supports_device(device_node* parent)
 			case 0x4dea:
 			case 0x4deb:
 
+			case 0x51c5:
+			case 0x51c6:
+			case 0x51d8:
+			case 0x51d9:
+			case 0x51e8:
+			case 0x51e9:
+			case 0x51ea:
+			case 0x51eb:
+
+			case 0x54c5:
+			case 0x54c6:
+			case 0x54e8:
+			case 0x54e9:
+			case 0x54ea:
+			case 0x54eb:
+
 			case 0x5aac:
 			case 0x5aae:
 			case 0x5ab0:
@@ -330,6 +355,34 @@ supports_device(device_node* parent)
 			case 0x5ab6:
 			case 0x5ab8:
 			case 0x5aba:
+
+			case 0x7a4c:
+			case 0x7a4d:
+			case 0x7a4e:
+			case 0x7a4f:
+			case 0x7a7c:
+			case 0x7a7d:
+
+			case 0x7acc:
+			case 0x7acd:
+			case 0x7ace:
+			case 0x7acf:
+			case 0x7afc:
+			case 0x7afd:
+
+			case 0x7e50:
+			case 0x7e51:
+			case 0x7e78:
+			case 0x7e79:
+			case 0x7e7a:
+			case 0x7e7b:
+
+			case 0x98c5:
+			case 0x98c6:
+			case 0x98e8:
+			case 0x98e9:
+			case 0x98ea:
+			case 0x98eb:
 
 			case 0x9d60:
 			case 0x9d61:
@@ -372,15 +425,6 @@ supports_device(device_node* parent)
 			case 0xa3e1:
 			case 0xa3e2:
 			case 0xa3e3:
-
-			case 0x43ad:
-			case 0x43ae:
-			case 0x43d8:
-
-			case 0x43e8:
-			case 0x43e9:
-			case 0x43ea:
-			case 0x43eb:
 				break;
 			default:
 				return 0.0f;
