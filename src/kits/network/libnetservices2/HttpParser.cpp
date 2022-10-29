@@ -354,10 +354,13 @@ HttpRawBodyParser::ParseBody(HttpBuffer& buffer, HttpTransferFunction writeToBod
 			"Could not write all available body bytes to the target.");
 	}
 
-	if (fBodyBytesTotal && *fBodyBytesTotal == fTransferredBodySize)
-		return {bytesRead, bytesRead, true};
-	else
-		return {bytesRead, bytesRead, false};
+	if (fBodyBytesTotal) {
+		if (*fBodyBytesTotal == fTransferredBodySize)
+			return {bytesRead, bytesRead, true};
+		else
+			return {bytesRead, bytesRead, false};
+	} else
+		return {bytesRead, bytesRead, readEnd};
 }
 
 
