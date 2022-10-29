@@ -899,6 +899,8 @@ remove_vnode_from_mount_list(struct vnode* vnode, struct fs_mount* mount)
 static struct vnode*
 lookup_vnode(dev_t mountID, ino_t vnodeID)
 {
+	ASSERT_READ_LOCKED_RW_LOCK(&sVnodeLock);
+
 	struct vnode_hash_key key;
 
 	key.device = mountID;
@@ -3894,12 +3896,9 @@ get_vnode(fs_volume* volume, ino_t vnodeID, void** _privateNode)
 extern "C" status_t
 acquire_vnode(fs_volume* volume, ino_t vnodeID)
 {
-	struct vnode* vnode;
+	ReadLocker nodeLocker(sVnodeLock);
 
-	rw_lock_read_lock(&sVnodeLock);
-	vnode = lookup_vnode(volume->id, vnodeID);
-	rw_lock_read_unlock(&sVnodeLock);
-
+	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
 	if (vnode == NULL)
 		return B_BAD_VALUE;
 
