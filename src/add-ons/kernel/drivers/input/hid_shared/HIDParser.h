@@ -30,6 +30,7 @@ public:
 		uint8					CountReports(uint8 type);
 		HIDReport *				ReportAt(uint8 type, uint8 index);
 		size_t					MaxReportSize();
+		size_t					MaxReportSize(uint8 type);
 
 		HIDCollection *			RootCollection() { return fRootCollection; };
 
