@@ -45,6 +45,7 @@ enum {
 	B_VIEW_WHICH_VIEW_COLOR_BIT	= 0x00100000,
 	B_VIEW_WHICH_LOW_COLOR_BIT	= 0x00200000,
 	B_VIEW_WHICH_HIGH_COLOR_BIT	= 0x00400000,
+	B_VIEW_PARENT_COMPOSITE_BIT	= 0x00800000,
 
 	B_VIEW_ALL_BITS				= 0x00ffffff,
 
@@ -130,6 +131,11 @@ class ViewState {
 		BPoint				origin;
 		float				scale;
 		BAffineTransform	transform;
+
+		// composite transformation stack
+		BPoint				parent_composite_origin;
+		float				parent_composite_scale;
+		BAffineTransform	parent_composite_transform;
 
 		// line modes
 		join_mode			line_join;

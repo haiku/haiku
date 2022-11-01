@@ -1640,6 +1640,23 @@ fDesktop->LockSingleWindow();
 			fLink.Flush();
 			break;
 		}
+		case AS_VIEW_GET_PARENT_COMPOSITE:
+		{
+			DrawState* state = fCurrentView->CurrentState()->PreviousState();
+
+			fLink.StartMessage(B_OK);
+			if (state != NULL) {
+				fLink.Attach<BAffineTransform>(state->CombinedTransform());
+				fLink.Attach<float>(state->CombinedScale());
+				fLink.Attach<BPoint>(state->CombinedOrigin());
+			} else {
+				fLink.Attach<BAffineTransform>(BAffineTransform());
+				fLink.Attach<float>(1.0f);
+				fLink.Attach<BPoint>(B_ORIGIN);
+			}
+			fLink.Flush();
+			break;
+		}
 		case AS_VIEW_AFFINE_TRANSLATE:
 		{
 			double x, y;
