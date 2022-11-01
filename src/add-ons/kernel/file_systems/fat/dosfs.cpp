@@ -59,7 +59,7 @@ debug_fat_nspace(int argc, char **argv)
 			vol->free_clusters);
 		kprintf("%" B_PRIu8 "-bit fat, mirrored %s, active %" B_PRIu8 "\n",
 			vol->fat_bits, vol->fat_mirrored ? "yes" : "no", vol->active_fat);
-		kprintf("root start %" B_PRIu8 ", %" B_PRIu8
+		kprintf("root start %" B_PRIu32 ", %" B_PRIu32
 			" root sectors, root vnode @ %p\n", vol->root_start,
 			vol->root_sectors, &(vol->root_vnode));
 		kprintf("label entry %" B_PRIu32 ", label %s\n", vol->vol_entry,
