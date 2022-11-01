@@ -36,7 +36,7 @@ Branch
 
 **Time:** ~ 1 week
 
-* Update the version constants in master (example: hrev52295)
+* Update the version constants in master (`example: hrev52295 <https://git.haiku-os.org/haiku/commit/?h=hrev52295>`_)
 * Branch haiku and buildtools (git push origin master:r1beta1)
     * Update the version constants in the branch (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=b5c9e6620ee731bd33d8cb3ef6ac01749122b6b3>`_)
     * Update copyright years in the `bootloader menu <https://git.haiku-os.org/haiku/tree/src/system/boot/platform/generic/text_menu.cpp#n212>`_
