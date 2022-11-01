@@ -356,8 +356,8 @@ public:
 	inline Element* RemoveHead();
 	inline Element* RemoveTail();
 
-	inline Element* GetPrevious(Element* element) const;
-	inline Element* GetNext(Element* element) const;
+	static inline Element* GetPrevious(Element* element);
+	static inline Element* GetNext(Element* element);
 
 	inline bool Contains(Element* element) const;
 		// O(n)!
@@ -605,7 +605,7 @@ DOUBLY_LINKED_LIST_CLASS_NAME::RemoveTail()
 // GetPrevious
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
 Element*
-DOUBLY_LINKED_LIST_CLASS_NAME::GetPrevious(Element* element) const
+DOUBLY_LINKED_LIST_CLASS_NAME::GetPrevious(Element* element)
 {
 	Element* result = NULL;
 	if (element)
@@ -616,7 +616,7 @@ DOUBLY_LINKED_LIST_CLASS_NAME::GetPrevious(Element* element) const
 // GetNext
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
 Element*
-DOUBLY_LINKED_LIST_CLASS_NAME::GetNext(Element* element) const
+DOUBLY_LINKED_LIST_CLASS_NAME::GetNext(Element* element)
 {
 	Element* result = NULL;
 	if (element)
