@@ -170,6 +170,10 @@ ViewState::ViewState()
 	font_flags = font.Flags();
 	font_aliasing = false;
 
+	parent_composite_transform.Reset();
+	parent_composite_scale = 1.0f;
+	parent_composite_origin.Set(0, 0);
+
 	// We only keep the B_VIEW_CLIP_REGION_BIT flag invalidated,
 	// because we should get the clipping region from app_server.
 	// The other flags do not need to be included because the data they
@@ -340,7 +344,8 @@ ViewState::UpdateFrom(BPrivate::PortLink &link)
 		clipping_region_used = false;
 	}
 
-	valid_flags = ~B_VIEW_CLIP_REGION_BIT;
+	valid_flags = ~(B_VIEW_CLIP_REGION_BIT | B_VIEW_PARENT_COMPOSITE_BIT)
+		| (valid_flags & B_VIEW_PARENT_COMPOSITE_BIT);
 }
 
 }	// namespace BPrivate
@@ -1837,6 +1842,8 @@ BView::PushState()
 
 	fOwner->fLink->StartMessage(AS_VIEW_PUSH_STATE);
 
+	fState->valid_flags &= ~B_VIEW_PARENT_COMPOSITE_BIT;
+
 	// initialize origin, scale and transform, new states start "clean".
 	fState->valid_flags |= B_VIEW_SCALE_BIT | B_VIEW_ORIGIN_BIT
 		| B_VIEW_TRANSFORM_BIT;
@@ -1986,6 +1993,71 @@ BView::Transform() const
 	}
 
 	return fState->transform;
+}
+
+
+BAffineTransform
+BView::TransformTo(coordinate_space basis) const
+{
+	if (basis == B_CURRENT_STATE_COORDINATES)
+		return B_AFFINE_IDENTITY_TRANSFORM;
+
+	if (!fState->IsValid(B_VIEW_PARENT_COMPOSITE_BIT) && fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_GET_PARENT_COMPOSITE);
+
+		int32 code;
+		if (fOwner->fLink->FlushWithReply(code) == B_OK && code == B_OK) {
+			fOwner->fLink->Read<BAffineTransform>(&fState->parent_composite_transform);
+			fOwner->fLink->Read<float>(&fState->parent_composite_scale);
+			fOwner->fLink->Read<BPoint>(&fState->parent_composite_origin);
+		}
+
+		fState->valid_flags |= B_VIEW_PARENT_COMPOSITE_BIT;
+	}
+
+	BAffineTransform transform = fState->parent_composite_transform * Transform();
+	float scale = fState->parent_composite_scale * Scale();
+	transform.PreScaleBy(scale, scale);
+	BPoint origin = Origin();
+	origin.x *= fState->parent_composite_scale;
+	origin.y *= fState->parent_composite_scale;
+	origin += fState->parent_composite_origin;
+	transform.TranslateBy(origin);
+
+	if (basis == B_PREVIOUS_STATE_COORDINATES) {
+		transform.TranslateBy(-fState->parent_composite_origin);
+		transform.PreMultiplyInverse(fState->parent_composite_transform);
+		transform.ScaleBy(1.0f / fState->parent_composite_scale);
+		return transform;
+	}
+
+	if (basis == B_VIEW_COORDINATES)
+		return transform;
+
+	origin = B_ORIGIN;
+
+	if (basis == B_PARENT_VIEW_COORDINATES || basis == B_PARENT_VIEW_DRAW_COORDINATES) {
+		BView* parent = Parent();
+		if (parent != NULL) {
+			ConvertToParent(&origin);
+			transform.TranslateBy(origin);
+			if (basis == B_PARENT_VIEW_DRAW_COORDINATES)
+				transform = transform.PreMultiplyInverse(parent->TransformTo(B_VIEW_COORDINATES));
+			return transform;
+		}
+		basis = B_WINDOW_COORDINATES;
+	}
+
+	ConvertToScreen(&origin);
+	if (basis == B_WINDOW_COORDINATES) {
+		BWindow* window = Window();
+		if (window != NULL)
+			origin -= window->Frame().LeftTop();
+	}
+	transform.TranslateBy(origin);
+	return transform;
 }
 
 
