@@ -7,7 +7,7 @@
 
 
 #include <limits.h>
-#include <locale.h>
+#include <locale_t.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <time.h>

@@ -6,7 +6,7 @@
 #define _WCTYPE_H_
 
 
-#include <locale.h>
+#include <locale_t.h>
 #include <wchar.h>
 
 typedef int wctrans_t;
