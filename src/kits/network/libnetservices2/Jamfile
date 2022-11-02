@@ -17,7 +17,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		SubDirC++Flags -std=gnu++17 ;
 
-		StaticLibrary [ MultiArchDefaultGristFiles libnetservices2.a ] :
+		StaticLibrary <$(architecture)>libnetservices2.a :
 			ErrorsExt.cpp
 			HttpBuffer.cpp
 			HttpFields.cpp
@@ -30,7 +30,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			NetServicesMisc.cpp
 			;
 
-		LinkAgainst [ MultiArchDefaultGristFiles libnetservices.a ] :
+		LinkAgainst <$(architecture)>libnetservices.a :
 			<$(architecture)>libshared.a ;
 
 	}
