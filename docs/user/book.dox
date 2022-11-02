@@ -502,13 +502,13 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 			prevent this, Haiku implements a \"locking\" mechanism, allowing one
 			thread to \"lock out\" other threads from executing code that might
 			modify the same data.
-		  - \b Archiving \b and \b IO. These classes allow a programmer to
+		- \b Archiving \b and \b IO. These classes allow a programmer to
 			convert objects into a form that can more easily be transferred to
 			other applications or stored to disk, as well as performing basic
 			input and output operations.
-		  - \b Memory \b Allocation. This class allows a programmer to hand off
+		- \b Memory \b Allocation. This class allows a programmer to hand off
 			some of the duties of memory accounting and management.
-		  - \b Common \b Datatypes. To avoid unnecessary duplication of code
+		- \b Common \b Datatypes. To avoid unnecessary duplication of code
 			and to make life easier for programmers, Haiku includes classes that
 			handle management of ordered lists and strings.
 
@@ -551,9 +551,9 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 			- BString allows strings and provides common access, modification,
 				and comparison functions.
 		- BStopWatch allows an application to measure the time an action takes.
-			- \ref support_globals "Global functions"
-			- \ref TypeConstants.h "Common types and constants"
-			- Error codes for all kits
+		- \ref support_globals "Global functions"
+		- \ref TypeConstants.h "Common types and constants"
+		- Error codes for all kits
 
 
 	\defgroup translation Translation Kit

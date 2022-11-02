@@ -81,7 +81,7 @@ public:
 			pathString = path.Path();
 		else
 			pathString = strerror(error);
-		printf("device %ld: \"%s\"\n", device->ID(), pathString);
+		printf("device %" B_PRId32 ": \"%s\"\n", device->ID(), pathString);
 		printf("  has media:      %d\n", device->HasMedia());
 		printf("  removable:      %d\n", device->IsRemovableMedia());
 		printf("  read only:      %d\n", device->IsReadOnlyMedia());
@@ -103,14 +103,14 @@ public:
 				pathString = path.Path();
 			else
 				pathString = strerror(error);
-			printf("%spartition %ld: \"%s\"\n", prefix, partition->ID(),
+			printf("%spartition %" B_PRId32 ": \"%s\"\n", prefix, partition->ID(),
 				   pathString);
 		}
-		printf("%s  offset:         %lld\n", prefix, partition->Offset());
-		printf("%s  size:           %lld\n", prefix, partition->Size());
-		printf("%s  block size:     %lu\n", prefix, partition->BlockSize());
-		printf("%s  index:          %ld\n", prefix, partition->Index());
-		printf("%s  status:         %lu\n", prefix, partition->Status());
+		printf("%s  offset:         %" B_PRId64 "\n", prefix, partition->Offset());
+		printf("%s  size:           %" B_PRId64 "\n", prefix, partition->Size());
+		printf("%s  block size:     %" B_PRIu32 "\n", prefix, partition->BlockSize());
+		printf("%s  index:          %" B_PRId32 "\n", prefix, partition->Index());
+		printf("%s  status:         %" B_PRIu32 "\n", prefix, partition->Status());
 		printf("%s  file system:    %d\n", prefix,
 			   partition->ContainsFileSystem());
 		printf("%s  part. system:   %d\n", prefix,
@@ -118,10 +118,10 @@ public:
 		printf("%s  device:         %d\n", prefix, partition->IsDevice());
 		printf("%s  read only:      %d\n", prefix, partition->IsReadOnly());
 		printf("%s  mounted:        %d\n", prefix, partition->IsMounted());
-		printf("%s  flags:          %lx\n", prefix, partition->Flags());
+		printf("%s  flags:          %" B_PRIx32 "\n", prefix, partition->Flags());
 		printf("%s  name:           \"%s\"\n", prefix, partition->Name());
 		printf("%s  content name:   \"%s\"\n", prefix,
-			partition->ContentName());
+			partition->ContentName().String());
 		printf("%s  type:           \"%s\"\n", prefix, partition->Type());
 		printf("%s  content type:   \"%s\"\n", prefix,
 			partition->ContentType());
@@ -156,7 +156,7 @@ print_partition(BPartition* partition, int level, int index)
 		2 * max_c(3 - level, 0), "",
 		offset.String(), size.String(),
 		(partition->ContentType() ? partition->ContentType() : "-"),
-		(partition->ContentName() ? partition->ContentName() : ""));
+		partition->ContentName().String());
 }
 
 
@@ -198,7 +198,7 @@ public:
 			readWrite = "";
 		}
 
-		printf("\ndevice %ld: \"%s\": %s%s\n\n", device->ID(), pathString,
+		printf("\ndevice %" B_PRId32 ": \"%s\": %s%s\n\n", device->ID(), pathString,
 			media, readWrite);
 		print_partition_table_header();
 
@@ -360,7 +360,7 @@ private:
 		// print the available disk systems
 		printf("\ndisk systems that can initialize the selected partition:\n");
 		for (int32 i = 0; BDiskSystem* diskSystem = diskSystems.ItemAt(i); i++)
-			printf("%2ld  %s\n", i, diskSystem->PrettyName());
+			printf("%2" B_PRId32 "  %s\n", i, diskSystem->PrettyName());
 
 		printf("\n");
 
@@ -378,7 +378,7 @@ private:
 		BString parameters;
 		while (true) {
 			// let the user enter name and parameters
-			if (supportsName && !_ReadLine("partition name: ", name)
+			if ((supportsName && !_ReadLine("partition name: ", name))
 				|| !_ReadLine("partition parameters: ", parameters)) {
 				return;
 			}
@@ -497,7 +497,7 @@ private:
 			// list them
 			printf("Possible partition types:\n");
 			for (int32 i = 0; i < supportedTypesCount; i++)
-				printf("%2ld  %s\n", i, supportedTypes.ItemAt(i)->String());
+				printf("%2" B_PRId32 "  %s\n", i, supportedTypes.ItemAt(i)->String());
 
 			if (!_ReadNumber("supported type index [-1 to abort]: ", 0,
 					supportedTypesCount - 1, -1, "invalid index", typeIndex)) {
@@ -516,7 +516,7 @@ private:
 			BString offset, size;
 			get_size_string(_offset, offset);
 			get_size_string(_size, size);
-			printf("%2ld  start: %8s,  size:  %8s\n", i, offset.String(),
+			printf("%2" B_PRId32 "  start: %8s,  size:  %8s\n", i, offset.String(),
 				size.String());
 		}
 
@@ -594,7 +594,7 @@ private:
 				get_size_string(validatedStart, startString);
 				get_size_string(validatedSize, sizeString);
 				printf("The disk system adjusted the partition start and "
-					"size to %lld (%s) and %lld (%s).\n",
+					"size to %" B_PRIdOFF " (%s) and %" B_PRIdOFF " (%s).\n",
 					validatedStart, startString.String(), validatedSize,
 					sizeString.String());
 				start = validatedStart;
@@ -713,7 +713,7 @@ private:
 				return false;
 
 			char buffer[256];
-			if (sscanf(line.String(), "%lld%s", &number, buffer) == 1)
+			if (sscanf(line.String(), "%" B_PRId64 "%s", &number, buffer) == 1)
 				return true;
 
 			printf("invalid input\n");
@@ -729,7 +729,7 @@ private:
 				return false;
 
 			char buffer[256];
-			if (sscanf(line.String(), "%lld%s", &number, buffer) != 1) {
+			if (sscanf(line.String(), "%" B_PRId64 "%s", &number, buffer) != 1) {
 				printf("invalid input\n");
 				continue;
 			}

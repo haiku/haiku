@@ -110,7 +110,8 @@ KeyboardProtocolHandler::KeyboardProtocolHandler(HIDReport &inputReport,
 #ifdef USB_KDL
 		sDebugKeyboardPipe = fInputReport.Device()->InterruptPipe();
 #endif
-		sDebugKeyboardReportSize = fInputReport.Parser()->MaxReportSize();
+		sDebugKeyboardReportSize =
+			fInputReport.Parser()->MaxReportSize(HID_REPORT_TYPE_INPUT);
 		if (outputReport != NULL)
 			sDebugKeyboardFound = true;
 	}
@@ -794,7 +795,7 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 						= fInputReport.Device()->InterruptPipe();
 #endif
 					sDebugKeyboardReportSize
-						= fInputReport.Parser()->MaxReportSize();
+						= fInputReport.Parser()->MaxReportSize(HID_REPORT_TYPE_INPUT);
 #endif
 
 					char letter = current[i] - 4 + 'a';

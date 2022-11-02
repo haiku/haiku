@@ -43,7 +43,7 @@
 	The initial coordinate space, from which all others are derived,  is the
 	screen space. Its origin is at the center of the screen's top-left pixel.
 	Coordinates can be converted between this and a specific window or view
-	space is done using the ConvertToScreen and ConvertFromScreen methods of
+	space using the ConvertToScreen and ConvertFromScreen methods of
 	the corresponding object.
 
 	Each BWindow has its own coordinate space. Its origin is at the center of

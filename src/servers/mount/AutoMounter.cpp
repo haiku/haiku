@@ -210,10 +210,9 @@ MountVisitor::_WasPreviouslyMounted(const BPath& path,
 	// We only check the legacy config data here; the current method
 	// is implemented in ArchivedVolumeVisitor -- this can be removed
 	// some day.
-	const char* volumeName = NULL;
-	if (partition->ContentName() == NULL
-		|| fPrevious.FindString(path.Path(), &volumeName) != B_OK
-		|| strcmp(volumeName, partition->ContentName()) != 0)
+	BString volumeName;
+	if (fPrevious.FindString(path.Path(), &volumeName) != B_OK
+		|| volumeName != partition->ContentName())
 		return false;
 
 	return true;

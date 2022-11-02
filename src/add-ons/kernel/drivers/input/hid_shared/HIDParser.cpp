@@ -431,10 +431,20 @@ HIDParser::ReportAt(uint8 type, uint8 index)
 size_t
 HIDParser::MaxReportSize()
 {
+	return MaxReportSize(HID_REPORT_TYPE_ANY);
+}
+
+
+size_t
+HIDParser::MaxReportSize(uint8 type)
+{
 	size_t maxSize = 0;
 	for (int32 i = 0; i < fReports.Count(); i++) {
 		HIDReport *report = fReports[i];
 		if (report == NULL)
+			continue;
+
+		if (type != HID_REPORT_TYPE_ANY && report->Type() != type)
 			continue;
 
 		if (report->ReportSize() > maxSize)

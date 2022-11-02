@@ -2725,19 +2725,19 @@ ls( httpd_conn* hc )
     int namlen;
     /*static*/int maxnames = 0;
     int nnames;
-    /*static*/char* names;
-    /*static*/char** nameptrs;
-    /*static*/char* name;
+    /*static*/char* names = NULL;
+    /*static*/char** nameptrs = NULL;
+    /*static*/char* name = NULL;
     /*static*/size_t maxname = 0;
-    /*static*/char* rname;
+    /*static*/char* rname = NULL;
     /*static*/size_t maxrname = 0;
-    /*static*/char* encrname;
+    /*static*/char* encrname = NULL;
     /*static*/size_t maxencrname = 0;
     FILE* fp;
     int i/*, r*/;
     struct stat sb;
     struct stat lsb;
-    //char modestr[20];
+    char modestr[20];
     char* linkprefix;
     char lnk[MAXPATHLEN+1];
     int linklen;
@@ -2763,6 +2763,7 @@ ls( httpd_conn* hc )
 	send_mime(
 	    hc, 200, ok200title, "", "", "text/html; charset=%s", (off_t) -1,
 	    hc->sb.st_mtime );
+	httpd_write_response( hc );
 	}
     else if ( hc->method == METHOD_GET )
 	{
@@ -2856,7 +2857,8 @@ mode  links    bytes  last-changed  name\n\
 		    if ( names == (char*) 0 || nameptrs == (char**) 0 )
 			{
 //			syslog( LOG_ERR, "out of memory reallocating directory names" );
-			exit( 1 );
+			closedir( dirp );
+			return -1;
 			}
 		    for ( i = 0; i < maxnames; ++i )
 			nameptrs[i] = &names[i * ( MAXPATHLEN + 1 )];
@@ -2909,13 +2911,13 @@ mode  links    bytes  last-changed  name\n\
 		/* Break down mode word.  First the file type. */
 		switch ( lsb.st_mode & S_IFMT )
 		    {
-		    /*case S_IFIFO:  modestr[0] = 'p'; break;
+		    case S_IFIFO:  modestr[0] = 'p'; break;
 		    case S_IFCHR:  modestr[0] = 'c'; break;
 		    case S_IFDIR:  modestr[0] = 'd'; break;
 		    case S_IFBLK:  modestr[0] = 'b'; break;
 		    case S_IFREG:  modestr[0] = '-'; break;
-		    case S_IFSOCK: modestr[0] = 's'; break;*/
-		    case S_IFLNK:  //modestr[0] = 'l';
+		    case S_IFSOCK: modestr[0] = 's'; break;
+		    case S_IFLNK:  modestr[0] = 'l';
 		    linklen = readlink( name, lnk, sizeof(lnk) - 1 );
 		    if ( linklen != -1 )
 			{
@@ -2923,15 +2925,15 @@ mode  links    bytes  last-changed  name\n\
 			linkprefix = " -&gt; ";
 			}
 		    break;
-		    //default:       modestr[0] = '?'; break;
+		    default:       modestr[0] = '?'; break;
 		    }
 		/* Now the world permissions.  Owner and group permissions
 		** are not of interest to web clients.
 		*/
-		/*modestr[1] = ( lsb.st_mode & S_IROTH ) ? 'r' : '-';
+		modestr[1] = ( lsb.st_mode & S_IROTH ) ? 'r' : '-';
 		modestr[2] = ( lsb.st_mode & S_IWOTH ) ? 'w' : '-';
 		modestr[3] = ( lsb.st_mode & S_IXOTH ) ? 'x' : '-';
-		modestr[4] = '\0';*/
+		modestr[4] = '\0';
 
 		/* We also leave out the owner and group name, they are
 		** also not of interest to web clients.  Plus if we're
@@ -2971,28 +2973,25 @@ mode  links    bytes  last-changed  name\n\
 		switch ( sb.st_mode & S_IFMT )
 		    {
 		    case S_IFDIR:  fileclass = "/"; break;
-		    //case S_IFSOCK: fileclass = "="; break;
-		    //case S_IFLNK:  fileclass = "@"; break;
+		    case S_IFSOCK: fileclass = "="; break;
+		    case S_IFLNK:  fileclass = "@"; break;
 		    default:
-		    fileclass = "";//( sb.st_mode & S_IXOTH ) ? "*" : "";
+		    fileclass = ( sb.st_mode & S_IXOTH ) ? "*" : "";
 		    break;
 		    }
 
 		/* And print. */
 		(void)  fprintf( fp,
 		   "%s %3ld  %10lld  %s  <a href=\"/%.500s%s\">%.80s</a>%s%s%s\n",
-		    /*modestr,*/ (long) lsb.st_nlink, (long long) lsb.st_size,
+		    modestr, (long) lsb.st_nlink, (long long) lsb.st_size,
 		    timestr, encrname, S_ISDIR(sb.st_mode) ? "/" : "",
 		    nameptrs[i], linkprefix, lnk, fileclass );
 		}
 
 	    (void) fprintf( fp, "    </pre>\n  </body>\n</html>\n" );
 	    (void) fclose( fp );
-	    exit( 0 );
 //	}
 
-	/* Parent process. */
-	closedir( dirp );
 //	syslog( LOG_DEBUG, "spawned indexing process %d for directory '%.200s'", r, hc->expnfilename );
 #ifdef CGI_TIMELIMIT
 	/* Schedule a kill for the child process, in case it runs too long */
@@ -3006,6 +3005,12 @@ mode  links    bytes  last-changed  name\n\
 	hc->status = 200;
 	hc->bytes_sent = CGI_BYTECOUNT;
 	hc->should_linger = 0;
+
+	free(names);
+	free(nameptrs);
+	free(name);
+	free(rname);
+	free(encrname);
 	}
     else
 	{
@@ -3730,6 +3735,7 @@ really_start_request( httpd_conn* hc, struct timeval* nowP )
 free(indexname);
 	/* Nope, no index file, so it's an actual directory request. */
 #ifdef GENERATE_INDEXES
+if(hc->hs->do_list_dir){
 	/* Directories must be readable for indexing. */
 	if ( ! ( hc->sb.st_mode & S_IROTH ) )
 	    {
@@ -3754,6 +3760,7 @@ free(indexname);
 	/* Ok, generate an index. */
 	return ls( hc );
 //#else /* GENERATE_INDEXES */
+} else {
 //	syslog(
 //	    LOG_INFO, "%.80s URL \"%.80s\" tried to index a directory",
 //	    httpd_ntoa( &hc->client_addr ), hc->encodedurl );
@@ -3762,6 +3769,7 @@ free(indexname);
 	    ERROR_FORM( err403form, "The requested URL '%.80s' is a directory, and directory indexing is disabled on this server.\n" ),
 	    hc->encodedurl );
 	return -1;
+}
 #endif /* GENERATE_INDEXES */
 
 	got_one: ;

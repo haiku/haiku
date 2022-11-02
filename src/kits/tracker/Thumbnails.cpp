@@ -224,7 +224,7 @@ GenerateThumbnailJob::Execute()
 			thumbnailWritten = (status == B_OK);
 
 			// write thumbnail creation time into an attribute
-			bigtime_t created = system_time();
+			bigtime_t created = real_time_clock_usecs();
 			fFile->WriteAttr(kAttrThumbnailCreationTime, B_TIME_TYPE,
 				0, &created, sizeof(bigtime_t));
 		}

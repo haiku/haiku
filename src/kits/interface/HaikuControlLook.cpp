@@ -3840,17 +3840,6 @@ HaikuControlLook::_FillGlossyGradient(BView* view, const BRect& rect,
 }
 
 
-float
-HaikuControlLook::GetScrollBarWidth(orientation orientation)
-{
-	// HaikuControlLook does not make a distinction between the
-	// width and height of the scrollbar, but other controllooks may
-	if (be_plain_font->Size() <= 12.0f)
-		return 14.0f;
-	return be_plain_font->Size() / 12.0f * 14.0f;
-}
-
-
 void
 HaikuControlLook::_MakeGradient(BGradientLinear& gradient, const BRect& rect,
 	const rgb_color& base, float topTint, float bottomTint,

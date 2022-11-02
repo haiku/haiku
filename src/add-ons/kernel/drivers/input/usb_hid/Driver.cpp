@@ -192,6 +192,8 @@ usb_hid_device_removed(void *cookie)
 	int32 parentCookie = (int32)(addr_t)cookie;
 	TRACE("device_removed(%" B_PRId32 ")\n", parentCookie);
 
+	// removed device may contain multiple HID devices on multiple interfaces
+	// we must go through all published devices and remove all that belong to this parent
 	for (int32 i = 0; i < gDeviceList->CountDevices(); i++) {
 		ProtocolHandler *handler = (ProtocolHandler *)gDeviceList->DeviceAt(i);
 		if (!handler)
@@ -202,12 +204,13 @@ usb_hid_device_removed(void *cookie)
 			continue;
 
 		// remove all the handlers
-		for (uint32 i = 0;; i++) {
-			handler = device->ProtocolHandlerAt(i);
+		for (uint32 j = 0;; j++) {
+			handler = device->ProtocolHandlerAt(j);
 			if (handler == NULL)
 				break;
 
 			gDeviceList->RemoveDevice(NULL, handler);
+			i--; // device count changed, adjust index
 		}
 
 		// this handler's device belongs to the one removed
@@ -216,8 +219,6 @@ usb_hid_device_removed(void *cookie)
 			device->Removed();
 		} else
 			delete device;
-
-		break;
 	}
 
 	mutex_unlock(&sDriverLock);
