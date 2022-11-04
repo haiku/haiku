@@ -24,10 +24,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		# for BKeymap
 		UsePrivateHeaders interface ;
 
-		# FIXME: These symbols should be hidden, but too many applications depend
-		# on them at present for that.
-		NO_HIDDEN_VISIBILITY on <$(architecture)>libshared.a = 1 ;
-
 		StaticLibrary <$(architecture)>libshared.a :
 			AboutMenuItem.cpp
 			ArgumentVector.cpp
