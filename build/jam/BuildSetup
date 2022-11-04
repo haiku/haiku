@@ -12,7 +12,7 @@
 
 # The Haiku (base) version. For development builds the revision will be
 # attached.
-HAIKU_VERSION = r1~beta3 ;
+HAIKU_VERSION = r1~beta4 ;
 
 
 #pragma mark - container settings
