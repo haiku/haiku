@@ -40,30 +40,33 @@ Branch
 * Branch haiku and buildtools (git push origin master:r1beta1)
     * Update the version constants in the branch (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=b5c9e6620ee731bd33d8cb3ef6ac01749122b6b3>`_)
     * Update copyright years in the `bootloader menu <https://git.haiku-os.org/haiku/tree/src/system/boot/platform/generic/text_menu.cpp#n212>`_
-    * Tag the buildtools & point the branch to them (TODO)
     * Disable serial debug output in bootloader and kernel config file (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=81fb2084b01e87c15bdde507e024e2938af71272>`_)
     * Turn KDEBUG_LEVEL down to 1, for performance reasons (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=6db6c0b275f684d0b25d49e87d5183e40c7cd4ec>`_)
     * Update Haiku's main package repos to use the branch's repo (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=ebd3fb55d9549247be65c4b62e3653f9bc1a7841>`_)
-* Sysadmin tasks
-    * Symlink the release branch repository directory to master's (so that a hard branch can be done later) and update the package repos to point to it (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=3d0db15a6f2963f011554f421611ee9c9b31c6f5>`_)
-    * Synchronize userguide and locale catalogs in the branch during the release stabilization phase
-    * Add *(RELEASE)* to CI/CD (Concourse)
-    * generate toolchain container for *(RELEASE)*
-    * begin Test Candidate builds for target architectures (x86_gcc2h, x86_64)
-    * Test Candidate (TC) builds should be clearly labeled and made available
-* Merge important bug fixes from master on a case-by-case basis. Ideally the release coordinator should review most of the changes and decide if they go in
-    * Use Gerrit "cherry-pick" function to propose a change for inclusion in the release branch
-    * Only merge bug fixes and build fixes, no new features at this point (they can stay in master)
+    * Update Haiku's haikuports repo to use the branch's repo (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=3d0db15a6f2963f011554f421611ee9c9b31c6f5>`_)
+
+Configure CI/CD Pipelines
+-------------------------
+
+Once your code is branched, you can begin setting up CI/CD pipelines in concourse
+
+* Bump the "last vs current" releases in CI/CD and deploy:
+  https://github.com/haiku/infrastructure/blob/master/concourse/deploy.sh#L29
+* Run a build of *(RELEASE)*/toolchain-*(RELEASE)* to generate the intial toolchain containers
+* Build each architecture first repo + image from the branch
 
 Testing
 -------
 
 **Time:** ~ 2 weekes
 
+* Begin building "Test Candidate" (TC0, TC1, TC2, etc) images for target architectures (x86_gcc2h, x86_64)
+  * Test Candidate (TC) builds should be clearly labeled and made available
 * Agressively market Test Candidate builds for *(RELEASE)*
 * Bugs should be opened on Trac under the *new* version (make sure it is available in Trac admin pages).
 * **Release Coordinator** should be downright obnoxious about people testing TC images!
 * Have people test on as much hardware as possible to find issues with drivers
+* Use Gerrit "cherry-pick" function to propose a change for inclusion in the release branch
 
 Finalization
 ------------
@@ -71,7 +74,7 @@ Finalization
 **Time:** ~ 1 week
 
 * If everything is going well, produce Release Candidate images
-* Make the branch officia (hrev36768)
+* Tag the release candidate builds on the brach (rc0)
 * RC images all want to be *(RELEASE)*
 * Any RC image can be renamed *(RELEASE)*
 * Ensure release notes and press release are almost done.
