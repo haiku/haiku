@@ -18,6 +18,7 @@
 
 #include <KernelExport.h>
 
+#include <ctype.h>
 #include <string.h>
 
 
@@ -171,7 +172,8 @@ copy_str(char *dest, const uint8 *src, size_t len)
 	for (i = 0; i < len; i++) {
 		if (*src == 0xa)
 			break;
-
+		if (!isgraph(*src) && *src != 0x20)
+			break;
 		*dest++ = *src++;
 	}
 
@@ -246,6 +248,45 @@ decode_detailed_monitor(edid1_detailed_monitor *monitor,
 }
 
 
+static void
+decode_cta_block(edid1_info *edid, const cta_raw *raw)
+{
+	unsigned int i, j;
+
+	edid->cta_block.tag = raw->tag;
+	edid->cta_block.revision = raw->revision;
+	edid->cta_block.num_native_detailed = raw->num_native_detailed;
+	edid->cta_block.ycbcr422_supported = raw->ycbcr422;
+	edid->cta_block.ycbcr444_supported = raw->ycbcr444;
+	edid->cta_block.audio_supported = raw->audio;
+	edid->cta_block.underscan = raw->underscan;
+	edid->cta_block.num_data_blocks = 0;
+
+	for (i = 4; i < raw->offset;) {
+		cta_data_block* block = (cta_data_block*)&((uint8*)raw)[i];
+		memcpy(&edid->cta_block.data_blocks[edid->cta_block.num_data_blocks++],
+			block, block->length + 1);
+		i += block->length + 1;
+	}
+
+	for (i = raw->offset, j = 0; i + sizeof(edid1_detailed_timing_raw) - 1 < 128;
+		i += sizeof(edid1_detailed_timing_raw), j++) {
+		const edid1_detailed_timing_raw* timing =
+			(const edid1_detailed_timing_raw*)&((uint8*)raw)[i];
+		decode_detailed_timing(&edid->cta_block.detailed_timing[j], timing);
+	}
+}
+
+
+static void
+decode_displayid_block(edid1_info *edid, const displayid_raw *raw)
+{
+	edid->displayid_block.tag = raw->tag;
+	edid->displayid_block.version = raw->version;
+	edid->displayid_block.extension_count = raw->extension_count;
+}
+
+
 //	#pragma mark -
 
 
@@ -268,4 +309,21 @@ edid_decode(edid1_info *edid, const edid1_raw *raw)
 
 	decode_detailed_monitor(edid->detailed_monitor, raw->detailed_monitor,
 		edid->version.version == 1 && edid->version.revision >= 1);
+
+	edid->num_sections = raw->num_sections;
+
+	for (i = 1; i < 1 + edid->num_sections; i++) {
+		cta_raw* cta = (cta_raw*)&raw[i];
+		switch (cta->tag) {
+			case 0x2:
+				decode_cta_block(edid, cta);
+				break;
+			case 0x70:
+				decode_displayid_block(edid, (displayid_raw*)&raw[i]);
+				break;
+			default:
+				//printf("edid_decode unknown tag 0x%x\n", cta->tag);
+				break;
+		}
+	}
 }

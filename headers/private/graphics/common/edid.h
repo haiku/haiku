@@ -127,6 +127,28 @@ typedef struct {
 	} data;
 } edid1_detailed_monitor;
 
+// CTA data block
+typedef struct cta_info {
+	uint8 tag;
+	uint8 revision;
+	uint8 num_native_detailed;
+	bool ycbcr422_supported;
+	bool ycbcr444_supported;
+	bool audio_supported;
+	bool underscan;
+	edid1_detailed_timing detailed_timing[6];
+	uint8 num_data_blocks;
+	cta_data_block data_blocks[8];
+} cta_info;
+
+
+// DisplayID data block
+typedef struct displayid_info {
+	uint8 tag;
+	uint8 version;
+	uint8 extension_count;
+} displayid_info;
+
 // EDID data block
 typedef struct edid1_info {  
 	edid1_vendor vendor;
@@ -139,7 +161,12 @@ typedef struct edid1_info {
 	edid1_detailed_monitor detailed_monitor[EDID1_NUM_DETAILED_MONITOR_DESC];
 
 	uint8 num_sections;
+
+	// optional
+	cta_info cta_block;
+	displayid_info displayid_block;
 } edid1_info;
+
 
 #define EDID_VERSION_1 1
 

@@ -81,7 +81,7 @@ typedef struct _PACKED {
 	BBITFIELD8_3 (
 		input_type : 1,	// 0 : analog, 1 : digital
 		bit_depth : 3,	// 0=undefined, 1=6,2=8,3=10,4=12,5=14,6=16,7=reserved
-		interface : 4	// 0=undefined, 2=HDMIa, 3=HDMIb
+		interface : 4	// 0=undefined, 1=DVI, 2=HDMIa, 3=HDMIb
 						// 4=MDDI, 5=DisplayPort
 	);
 } edid1_digital_params_raw;
@@ -300,5 +300,263 @@ typedef struct _PACKED {
 	uint8 num_sections; 							// 1 byte
 	uint8 check_sum;								// 1 byte
 } edid1_raw;										// total: 128 bytes
+
+typedef union _PACKED {
+	struct _PACKED {
+		BBITFIELD8_3 (
+			reserved : 1,
+			format_code : 4,
+			reserved2 : 3
+		);
+	} descr;
+	struct _PACKED {
+		BBITFIELD8_3 (
+			reserved : 1,
+			format_code : 4,
+			max_channels : 3
+		);
+		BBITFIELD8_8 (
+			reserved2 : 1,
+			can_192khz : 1,
+			can_176khz : 1,
+			can_96khz : 1,
+			can_88khz : 1,
+			can_48khz : 1,
+			can_44khz : 1,
+			can_32khz : 1
+		);
+		BBITFIELD8_4 (
+			reserved3 : 5,
+			can_24bit : 1,
+			can_20bit : 1,
+			can_16bit : 1
+		);
+	} descr_1;
+	struct _PACKED {
+		BBITFIELD8_3 (
+			reserved : 1,
+			format_code : 4,
+			max_channels : 3
+		);
+		BBITFIELD8_8 (
+			reserved2 : 1,
+			can_192khz : 1,
+			can_176khz : 1,
+			can_96khz : 1,
+			can_88khz : 1,
+			can_48khz : 1,
+			can_44khz : 1,
+			can_32khz : 1
+		);
+		uint8 maximum_bitrate;
+	} descr_2_8;
+
+} audio_descr;
+
+#if !defined(__GNUC__) || __GNUC__ < 3
+#define FLEXIBLE_ARRAY_LENGTH 0
+#else
+#define FLEXIBLE_ARRAY_LENGTH
+#endif
+typedef struct _PACKED {
+	BBITFIELD8_2 (
+		tag_code : 3,
+		length : 5
+	);
+	union _PACKED {
+		uint8 extended_tag_code;
+
+		struct _PACKED {
+			uint8 vic0;
+			uint8 vic[FLEXIBLE_ARRAY_LENGTH];
+		} video;
+
+		struct _PACKED {
+			audio_descr desc0;
+			audio_descr desc[FLEXIBLE_ARRAY_LENGTH];
+		} audio;
+
+		struct _PACKED {
+			uint8 ouinum0;
+			uint8 ouinum1;
+			uint8 ouinum2;
+			union _PACKED {
+				struct _PACKED {
+					struct _PACKED {
+						BBITFIELD8_2 (
+							a : 4,
+							b : 4
+						);
+						BBITFIELD8_2 (
+							c : 4,
+							d : 4
+						);
+					} source_physical_address;
+					BBITFIELD8_7 (
+						supports_ai : 1,
+						dc_48bit : 1,
+						dc_36bit : 1,
+						dc_30bit : 1,
+						dc_y444 : 1,
+						reserved : 2,
+						dvi_dual : 1
+					);
+					uint8 max_tmds_clock;
+					uint8 reserved2[2];
+					BBITFIELD8_2 (
+						vic_length : 3,
+						length_3d : 5
+					);
+					uint8 vic[FLEXIBLE_ARRAY_LENGTH];
+				} hdmi;
+				struct _PACKED {
+					uint8 version;
+					uint8 max_tmds_rate;
+					BBITFIELD8_8 (
+						scdc_present : 1,
+						scdc_read_request_capable : 1,
+						supports_cable_status : 1,
+						supports_color_content_bits : 1,
+						supports_scrambling : 1,
+						supports_3d_independent : 1,
+						supports_3d_dual_view : 1,
+						supports_3d_osd_disparity : 1
+					);
+					BBITFIELD8_5 (
+						max_frl_rate : 4,
+						supports_uhd_vic : 1,
+						supports_16bit_deep_color_4_2_0 : 1,
+						supports_12bit_deep_color_4_2_0 : 1,
+						supports_10bit_deep_color_4_2_0 : 1
+					);
+				} hdmi_forum;
+			};
+		} vendor_specific;
+
+		struct _PACKED {
+			BBITFIELD8_8 (
+				FLW_FRW : 1,
+				RLC_RRC : 1,
+				FLC_FRC : 1,
+				BC : 1,
+				BL_BR : 1,
+				FC : 1,
+				LFE : 1,
+				FL_FR : 1
+			);
+			BBITFIELD8_8 (
+				TpSiL_TpSiR : 1,
+				SiL_SiR : 1,
+				TpBC : 1,
+				LFE2 : 1,
+				LS_RS : 1,
+				TpFC : 1,
+				TpC : 1,
+				TpFL_TpFH : 1
+			);
+			BBITFIELD8_6 (
+				reserved: 3,
+				LSd_RSd : 1,
+				TpLS_TpRS : 1,
+				BtFL_BtFR : 1,
+				BtFC : 1,
+				TpBL_TpBR : 1
+			);
+		} speaker_allocation_map;
+
+		struct _PACKED {
+			uint8 extended_tag_code;
+			BBITFIELD8_8 (
+				BT2020RGB : 1,
+				BT2020YCC : 1,
+				BT2020cYCC : 1,
+				opRGB : 1,
+				opYCC601 : 1,
+				sYCC601 : 1,
+				xvYCC709 : 1,
+				xvYCC601 : 1
+			);
+			BBITFIELD8_2 (
+				DCIP3 : 1,
+				reserved : 7
+			);
+		} colorimetry;
+
+		struct _PACKED {
+			uint8 extended_tag_code;
+			uint8 bitmap[FLEXIBLE_ARRAY_LENGTH];
+		} YCbCr_4_2_0_capability_map;
+
+		struct _PACKED {
+			uint8 extended_tag_code;
+			BBITFIELD8_5 (
+				QY : 1,
+				QS : 1,
+				S_PT : 2,
+				S_IT : 2,
+				S_CE : 2
+			);
+		} video_capability;
+
+		struct _PACKED {
+			uint8 extended_tag_code;
+			BBITFIELD8_7 (
+				reserved : 2,
+				ET_5 : 1,
+				ET_4 : 1,
+				ET_3 : 1,
+				ET_2 : 1,
+				ET_1 : 1,
+				ET_0 : 1
+			);
+			BBITFIELD8_8 (
+				SM_7 : 1,
+				SM_6 : 1,
+				SM_5 : 1,
+				SM_4 : 1,
+				SM_3 : 1,
+				SM_2 : 1,
+				SM_1 : 1,
+				SM_0 : 1
+			);
+			uint8 desired_content_max_luminance;
+			uint8 desired_content_max_frame_average_luminance;
+			uint8 desired_content_min_luminance;
+		} hdr_static_metadata;
+
+		struct _PACKED {
+			uint8 extended_tag_code;
+			// TODO extend
+		} hdr_dyn_metadata;
+
+		uint8 buffer[127];
+	};
+} cta_data_block;
+
+typedef struct _PACKED {
+	uint8 tag;
+	uint8 revision;
+	uint8 offset;
+	BBITFIELD8_5 (
+		underscan : 1,
+		audio : 1,
+		ycbcr444 : 1,
+		ycbcr422 : 1,
+		num_native_detailed : 4
+	);
+	cta_data_block data_blocks[0];
+
+	uint8 reserved[123];
+	uint8 check_sum;								// 1 byte
+} cta_raw;											// total: 128 bytes
+
+typedef struct _PACKED {
+	uint8 tag;
+	uint8 version;
+	uint8 length;
+	uint8 reserved;
+	uint8 extension_count;
+	uint8 reserved2[123];
+} displayid_raw;									// total: 128 bytes
 
 #endif
