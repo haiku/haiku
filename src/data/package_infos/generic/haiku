@@ -58,8 +58,6 @@ provides {
 }
 
 requires {
-	haiku_datatranslators
-
 	noto >= 2.7
 #ifdef HAIKU_REGULAR_BUILD
 	noto_sans_cjk_jp
