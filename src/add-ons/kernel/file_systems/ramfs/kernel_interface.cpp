@@ -843,6 +843,12 @@ ramfs_create(fs_volume* _volume, fs_vnode* _dir, const char *name, int openMode,
 					node->SetMode(mode);
 					node->SetUID(geteuid());
 					node->SetGID(getegid());
+
+					// set cache in vnode
+					struct vnode* vnode;
+					if (vfs_lookup_vnode(_volume->id, node->GetID(), &vnode) == B_OK) {
+						vfs_set_vnode_cache(vnode, file->GetCache());
+					}
 				}
 			}
 			// set result / cleanup on failure
@@ -892,13 +898,6 @@ ramfs_open(fs_volume* _volume, fs_vnode* _node, int openMode, void** _cookie)
 		// truncate if requested
 		if (error == B_OK && (openMode & O_TRUNC))
 			error = node->SetSize(0);
-		// set cache in vnode
-		if (File *file = dynamic_cast<File*>(node)) {
-			struct vnode* vnode;
-			if (vfs_lookup_vnode(_volume->id, node->GetID(), &vnode) == B_OK) {
-				vfs_set_vnode_cache(vnode, file->GetCache());
-			}
-		}
 		NodeMTimeUpdater mTimeUpdater(node);
 		// set result / cleanup on failure
 		if (error == B_OK)
