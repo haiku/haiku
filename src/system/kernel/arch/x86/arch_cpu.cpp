@@ -1444,6 +1444,44 @@ init_tsc_with_cpuid(kernel_args* args, uint32* conversionFactor)
 
 
 static void
+init_tsc_with_msr(kernel_args* args, uint32* conversionFactor)
+{
+	cpu_ent* cpuEnt = get_cpu_struct();
+	if (cpuEnt->arch.vendor != VENDOR_AMD)
+		return;
+	uint32 family = cpuEnt->arch.family + cpuEnt->arch.extended_family;
+	if (family < 0x10)
+		return;
+	uint64 value = x86_read_msr(MSR_F10H_HWCR);
+	if ((value & HWCR_TSCFREQSEL) == 0)
+		return;
+
+	value = x86_read_msr(MSR_F10H_PSTATEDEF(0));
+	if ((value & PSTATEDEF_EN) == 0)
+		return;
+	if (family != 0x17 && family != 0x19)
+		return;
+
+	uint64 khz = 200 * 1000;
+	uint32 denominator = (value >> 8) & 0x3f;
+	if (denominator < 0x8 || denominator > 0x2c)
+		return;
+	if (denominator > 0x1a && (denominator % 2) == 1)
+		return;
+	uint32 numerator = value & 0xff;
+	if (numerator < 0x10)
+		return;
+
+	dprintf("CPU: using TSC frequency from MSR %" B_PRIu64 "\n", khz * numerator / denominator);
+	// compute for microseconds as follows (1000000 << 32) / (tsc freq in Hz),
+	// or (1000 << 32) / (tsc freq in kHz)
+	*conversionFactor = (1000ULL << 32) / (khz * numerator / denominator);
+	// overwrite the bootloader value
+	args->arch_args.system_time_cv_factor = *conversionFactor;
+}
+
+
+static void
 init_tsc(kernel_args* args)
 {
 	// init the TSC -> system_time() conversion factors
@@ -1451,6 +1489,7 @@ init_tsc(kernel_args* args)
 	// try to find the TSC frequency with CPUID
 	uint32 conversionFactor = args->arch_args.system_time_cv_factor;
 	init_tsc_with_cpuid(args, &conversionFactor);
+	init_tsc_with_msr(args, &conversionFactor);
 	uint64 conversionFactorNsecs = (uint64)conversionFactor * 1000;
 
 

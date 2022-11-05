@@ -120,10 +120,14 @@
 #define IA32_MSR_KERNEL_GS_BASE			0xc0000102
 #define IA32_MSR_TSC_AUX				0xc0000103
 
-// K8 MSR registers
+// AMD MSR registers
+#define MSR_F10H_HWCR						0xc0010015
+#define 	HWCR_TSCFREQSEL					(1 << 24)
 #define K8_MSR_IPM						0xc0010055
+#define MSR_F10H_PSTATEDEF(x)				(0xc0010064 + (x))
+#define 	PSTATEDEF_EN					(1ULL << 63)
 #define MSR_F10H_DE_CFG					0xc0011029
-#define DE_CFG_SERIALIZE_LFENCE			(1 << 1)
+#define 	DE_CFG_SERIALIZE_LFENCE			(1 << 1)
 
 
 // Hardware P-States MSR registers §14.4.1
