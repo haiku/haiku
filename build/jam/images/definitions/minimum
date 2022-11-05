@@ -243,6 +243,7 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS =
 	log_overlay
 	ntfs
 	packagefs
+	ramfs
 	reiserfs
 	udf
 	write_overlay
