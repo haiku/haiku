@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons kernel busses random virtio ;
+
+UsePrivateHeaders drivers virtio ;
+UsePrivateKernelHeaders ;
+
+KernelAddon virtio_rng :
+	virtio_rng.cpp
+	VirtioRNGDevice.cpp
+;
+
