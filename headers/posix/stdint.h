@@ -59,11 +59,11 @@ typedef uint64_t uintmax_t;
 /* Limits of exact-width integer types */
 #define INT8_MIN 	(-128)
 #define INT8_MAX 	(127)
-#define UINT8_MAX	(255U)
+#define UINT8_MAX	(255)
 
 #define INT16_MIN 	(-32768)
 #define INT16_MAX 	(32767)
-#define UINT16_MAX	(65535U)
+#define UINT16_MAX	(65535)
 
 #define INT32_MAX	(2147483647)
 #define INT32_MIN 	(-INT32_MAX-1)
@@ -140,8 +140,8 @@ typedef uint64_t uintmax_t;
 #define INT16_C(value) 	value
 #define INT32_C(value) 	value
 
-#define UINT8_C(value) 	value ## U
-#define UINT16_C(value) value ## U
+#define UINT8_C(value) 	value
+#define UINT16_C(value) value
 #define UINT32_C(value) value ## U
 
 #if defined(__SIZEOF_LONG__) && __SIZEOF_LONG__ > 4
