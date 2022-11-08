@@ -38,7 +38,7 @@ BControlLook::ComposeSpacing(float spacing)
 		case B_USE_SMALL_SPACING:
 			return ceilf(be_control_look->DefaultItemSpacing() * 0.7f);
 		case B_USE_CORNER_SPACING:
-			return ceilf(be_control_look->DefaultItemSpacing() * 1.273f);
+			return ceilf(be_control_look->DefaultItemSpacing() * 1.272f);
 		case B_USE_BIG_SPACING:
 			return ceilf(be_control_look->DefaultItemSpacing() * 1.8f);
 
