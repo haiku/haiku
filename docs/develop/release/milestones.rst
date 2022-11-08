@@ -42,8 +42,8 @@ Branch
     * Update copyright years in the `bootloader menu <https://git.haiku-os.org/haiku/tree/src/system/boot/platform/generic/text_menu.cpp#n212>`_
     * Disable serial debug output in bootloader and kernel config file (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=81fb2084b01e87c15bdde507e024e2938af71272>`_)
     * Turn KDEBUG_LEVEL down to 1, for performance reasons (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=6db6c0b275f684d0b25d49e87d5183e40c7cd4ec>`_)
-    * Update Haiku's main package repos to use the branch's repo (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=ebd3fb55d9549247be65c4b62e3653f9bc1a7841>`_)
-    * Update Haiku's haikuports repo to use the branch's repo (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=3d0db15a6f2963f011554f421611ee9c9b31c6f5>`_)
+    * Enable ``HAIKU_OFFICIAL_RELEASE`` (`example <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=ff2059f2bd001bba84b980617e9bdf4dc6a46799>`_), and update logos
+    * Update both package repos to use the branch's repos (`part 1 <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=ebd3fb55d9549247be65c4b62e3653f9bc1a7841>`_, `part 2 <https://git.haiku-os.org/haiku/commit/?h=r1beta1&id=3d0db15a6f2963f011554f421611ee9c9b31c6f5>`_)
 
 Configure CI/CD Pipelines
 -------------------------
