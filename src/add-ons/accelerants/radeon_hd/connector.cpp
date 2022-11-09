@@ -875,7 +875,7 @@ connector_probe()
 							ATOM_ROUTER_DATA_CLOCK_PATH_SELECT_RECORD* cdPath;
 							ATOM_SRC_DST_TABLE_FOR_ONE_OBJECT* routerConnTable =
 								(ATOM_SRC_DST_TABLE_FOR_ONE_OBJECT *)
-								((uint16*)gAtomContext->bios + tableOffset +
+								((uint16*)gAtomContext->bios + tableOffset
 								+ B_LENDIAN_TO_HOST_INT16(
 								routerObject->asObjects[k].usSrcDstTableOffset));
 							uint8* destObjCount = (uint8*)((uint8*)routerConnTable + 1
