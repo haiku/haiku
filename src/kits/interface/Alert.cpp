@@ -764,20 +764,19 @@ void
 TAlertView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width != NULL) {
-		if (fIconBitmap != NULL) {
-			*_width = (be_control_look->DefaultLabelSpacing() * 3)
-				+ fIconBitmap->Bounds().Width();
-		} else {
-			*_width = 0;
-		}
+		*_width = be_control_look->DefaultLabelSpacing() * 3;
+		if (fIconBitmap != NULL)
+			*_width += fIconBitmap->Bounds().Width();
+		else
+			*_width += be_control_look->ComposeIconSize(B_LARGE_ICON).Width();
 	}
+
 	if (_height != NULL) {
-		if (fIconBitmap != NULL) {
-			*_height = be_control_look->DefaultLabelSpacing()
-				+ fIconBitmap->Bounds().Height();
-		} else {
-			*_height = 0;
-		}
+		*_height = be_control_look->DefaultLabelSpacing();
+		if (fIconBitmap != NULL)
+			*_height += fIconBitmap->Bounds().Height();
+		else
+			*_height += be_control_look->ComposeIconSize(B_LARGE_ICON).Height();
 	}
 }
 
@@ -792,14 +791,14 @@ TAlertView::MaxSize()
 void
 TAlertView::Draw(BRect updateRect)
 {
-	if (fIconBitmap == NULL)
-		return;
-
 	// Here's the fun stuff
 	BRect stripeRect = Bounds();
 	stripeRect.right = kIconStripeWidthFactor * be_control_look->DefaultLabelSpacing();
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 	FillRect(stripeRect);
+
+	if (fIconBitmap == NULL)
+		return;
 
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
