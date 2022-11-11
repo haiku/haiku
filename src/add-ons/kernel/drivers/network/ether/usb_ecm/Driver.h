@@ -74,10 +74,14 @@ typedef struct {
 } usb_ecm_driver_info;
 
 
-
+#ifdef TRACE_ECM
 #define	TRACE(x...)			dprintf(DRIVER_NAME ": " x)
-#define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME ": " x)
 #define CALLED() 			TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
+#else
+#define TRACE(x...)
+#define CALLED()
+#endif
+#define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME ": " x)
 
 
 #endif //_USB_ECM_DRIVER_H_
