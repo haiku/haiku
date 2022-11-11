@@ -123,8 +123,5 @@ requires {
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_expat_ENABLED
 	lib:libexpat
 #endif
-#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_gutenprint_ENABLED
-	lib:libgutenprint >= 8
-#endif
 #endif
 }
