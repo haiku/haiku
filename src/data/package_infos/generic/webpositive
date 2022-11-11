@@ -17,5 +17,7 @@ provides {
 }
 
 requires {
+	haiku
+	haiku_datatranslators
 	haikuwebkit%HAIKU_SECONDARY_PACKAGING_ARCH_SUFFIX%
 }
