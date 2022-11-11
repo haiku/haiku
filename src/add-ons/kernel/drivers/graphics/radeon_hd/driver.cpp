@@ -503,6 +503,7 @@ const struct supported_device {
 
 	// WARN: DCE versions below here get sketchy
 
+#if 0 /* disabled for R1/beta5 */
 	// Introduced: 2014
 	// Codename: Volcanic Islands
 	// Process: 28 nm
@@ -655,6 +656,7 @@ const struct supported_device {
 	{0x73e1, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Dimgrey)"},
 	{0x73e2, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Dimgrey)"},
 	{0x73ff, 13, 5, RADEON_NAVI, CHIP_STD, "Radeon RX Navi (Dimgrey)"},
+#endif
 };
 
 
