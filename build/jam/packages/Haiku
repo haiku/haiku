@@ -242,9 +242,6 @@ AddFilesToPackage add-ons kernel network ppp : $(SYSTEM_NETWORK_PPP) ;
 AddFilesToPackage add-ons kernel network protocols
 	: $(SYSTEM_NETWORK_PROTOCOLS) ;
 
-AddFilesToPackage add-ons Print : $(SYSTEM_ADD_ONS_PRINT) ;
-AddFilesToPackage add-ons Print transport
-	: $(SYSTEM_ADD_ONS_PRINT_TRANSPORT) ;
 AddFilesToPackage add-ons Screen\ Savers : $(SYSTEM_ADD_ONS_SCREENSAVERS) ;
 
 AddFilesToPackage add-ons disk_systems
