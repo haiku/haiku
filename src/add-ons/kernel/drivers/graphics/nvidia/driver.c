@@ -1200,7 +1200,6 @@ control_hook(void* dev, uint32 msg, void *buf, size_t len)
 	status_t result = B_DEV_INVALID_IOCTL;
 	uint32 tmpUlong;
 
-	CALLED();
 	switch (msg) {
 		/* the only PUBLIC ioctl */
 		case B_GET_ACCELERANT_SIGNATURE: {
