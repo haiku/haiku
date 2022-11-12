@@ -38,7 +38,7 @@ rule HdsSchemaGenModel
 	SEARCH on $(3) = [ FDirName $(SUBDIR) build scripts ] ;
 
 	MkDir1 $(1:D) ;
-	Clean clean : $(1:D) ;
+	CleanDir clean : $(1:D) ;
 	Depends $(1) : $(2) $(3) $(1:D) ;
 	HdsSchemaGenModel1 $(1) : $(2) $(3) $(1:D) ;
 }
@@ -61,7 +61,7 @@ rule HdsSchemaGenBulkParser
 	SEARCH on $(3) = [ FDirName $(SUBDIR) build scripts ] ;
 
 	MkDir1 $(1:D) ;
-	Clean clean : $(1:D) ;
+	CleanDir clean : $(1:D) ;
 	Depends $(1) : $(2) $(3) $(1:D) ;
 	HdsSchemaGenBulkParser1 $(1) : $(2) $(3) $(1:D) ;
 }
@@ -84,7 +84,7 @@ rule HdsSchemaGenParser
 	SEARCH on $(3) = [ FDirName $(SUBDIR) build scripts ] ;
 
 	MkDir1 $(1:D) ;
-	Clean clean : $(1:D) ;
+	CleanDir clean : $(1:D) ;
 	Depends $(1) : $(2) $(3) $(1:D) ;
 	HdsSchemaGenParser1 $(1) : $(2) $(3) $(1:D) ;
 }
