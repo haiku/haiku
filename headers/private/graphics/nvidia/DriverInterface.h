@@ -123,7 +123,9 @@ enum {
 	G70,
 	G71,
 	G72,
-	G73
+	G73,
+	G86,
+	G92
 };
 
 /* card_arch in order of date of NV chip design */
@@ -132,7 +134,8 @@ enum {
 	NV10A,
 	NV20A,
 	NV30A,
-	NV40A
+	NV40A,
+	NV50A
 };
 
 /* card info - information gathered from PINS (and other sources) */
