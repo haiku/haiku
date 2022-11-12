@@ -1,90 +1,197 @@
-1	english	x-vnd.Haiku-HaikuDepot	3602839024
+1	english	x-vnd.Haiku-HaikuDepot	3761134598
+Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条款下载出错
 Available packages	MainWindow		可用软件包
+It was not possible to create the new user.	UserLoginWindow		无法创建新用户。
+An unexpected error has been sent from the server [%li]	ServerHelper		服务器 [%li] 发送了一个意外错误
 Create account	UserLoginWindow		创建账号
+Agree	ToLatestUserUsageConditionsWindow		同意
+Install %PackageTitle%	PackageManager		安装 %PackageTitle%
+The response to the captcha was incorrect.	ServerHelper		验证码反馈不正确。
 Rate package…	PackageInfoView		软件包评分…
+You have successfully authenticated as user %Nickname%.	UserLoginWindow		您已经成功登录，用户名 %Nickname% 。
+Package problems	PackageProblem	Window title	软件包错误
+It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		无法从服务器发送回的数据中获取需要的验证码信息。
+An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		获取包列表时发生错误：%message%
+Update usage conditions	ToLatestUserUsageConditionsWindow		更新使用条款
+No usage conditions	UserUsageConditions		无使用条款
 Active	PackageListView		激活
-Login or Create account	MainWindow		登录或者新建账户
+Login or Create account	MainWindow		登录或创建新账号
 Switch account…	MainWindow		切换账户…
 Preferred language:	UserLoginWindow		首选语言:
 Name	PackageListView		名称
-Rate %Package%	RatePackageWindow		评级 %Package%
+don't activate package %source%	PackageProblem	don't change '%source%	不启用软件包 %source%
+Rate %Package%	RatePackageWindow		软件包%Package%评分
+An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		初始化包管理器时出错: %message%
 Quit HaikuDepot	App		退出 HaikuDepot
 Category	FilterView		分类
+A response to the captcha question must be provided.	UserLoginWindow		必须提供验证码问题回复。
+An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		触发错误 '%Message%' ，属性为 '%Property%'
+A requested object or an object involved in the request was not found on the server.	ServerHelper		在服务器上未找到请求内容或请求中涉及的内容。
+Logout	ToLatestUserUsageConditionsWindow		注销
+The following additional package changes have to be made:	PackageResult		以下附加软件包将发生改动：
 No changelog available.	PackageInfoView		未发现更新记录。
+The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		已经同意当前使用条款。
+Cancel	PackageProblem		取消
+Version	PackageListView		版本
 No, quit HaikuDepot	App		否，强制退出 HaikuDepot
 Not logged in	MainWindow		未登陆
+Featured packages	FeaturedPackagesView		需求软件包
 Available	PackageListView		可用
 Click a package to view information	PackageInfoView		点击软件包查看信息
 Cancel	UserLoginWindow		取消
 Rating not possible	MainWindow		无法评价
+Package update error	MainWindow		软件包更新错误
+%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}	ProcessCoordinator		%FIRST_PROCESS_DESCRIPTION% +{0, plural, one{# process} other{# processes}}
+Reboot required	PackageManager		需要重启
+All packages	PackageListView		全部软件包
 Send	RatePackageWindow		发送
 Start package daemon	App		启动软件包管理后台
+There are problems in the supplied data:	UserLoginWindow		提供的数据存在问题：
+The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		用户 '%Nickname%' 未同意任何使用条款。
+Usage conditions download problem	UserLoginWindow		使用条款下载问题
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	安装软件包 %s ，来自仓库 %s \n
 Package daemon problem	App		软件包守护进程问题
+No	MainWindow		否
 Repository	PackageListView		仓库
+Users are required to be %AgeYears% years of age or older.	UserUsageConditions		用户需要满足年龄不小于 %AgeYears% 。
 Close	RatePackageWindow		关闭
 Close	UserLoginWindow		关闭
+Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		正在同步 '%REPO_NAME%' 仓库中的软件包数据
+View the usage conditions	UserLoginWindow		查看使用条件
+Usage conditions agreed	ToLatestUserUsageConditionsWindow		使用条款已同意
 Size	PackageListView		大小
 Your rating was updated.	RatePackageWindow		您的评价已被更新。
 All categories	FilterView		所有分类
+ignore problem for now	PackageProblem		暂时忽略问题
 n/a	PackageInfoView		n/a
+Checking user details	UserDetailVerifierProcess		检查用户详情中
 Cancel	MainWindow		取消
 Refresh repositories	MainWindow		刷新仓库
+Continue	App		继续
+A password is required.	UserLoginWindow		需要密码。
 Language	RatePackageWindow		语言
 Status	PackageListView		状态
+Network transport error	ServerHelper		网络传输错误
+Cancel	PackageResult		取消
+Uninstall %PackageTitle%	PackageManager		卸载 %PackageTitle%
+Retry	PackageProblem		重试
 Update	RatePackageWindow		更新
 Language	UserLoginWindow		语言
 OK	UserLoginWindow		确定
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		服务器引用数据同步中
 Stability:	RatePackageWindow		稳定性:
+The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		必须同意使用协议并确认创建账户的人员符合最低年龄要求。
+solution %d:	PackageProblem	Don't change the %d variable	解决方案 %d：
 Source packages	MainWindow		源代码包
+Problem with working files	App		工作文件存在问题
 Try again	App		请重试
 Unknown	PackageListView		未知
-Logged in as %User%	MainWindow		登录 as %User%
+I agree to the usage conditions	UserLoginWindow		我同意使用条款
+Logged in as %User%	MainWindow		使用%User%登录
+A reboot is necessary to complete the installation process.	PackageManager		需要重启以完成安装过程。
+Yes	MainWindow		是
+{0, plural,one{I am at least one year old}other{I am # years of age or older}}	LocaleUtils		{0, plural,one{I am at least one year old}other{I am # years of age or older}}
 Pending…	PackageListView		挂起…
 Search terms:	FilterView		搜索项目：
+Quit	App		退出
 Authentication failed	UserLoginWindow		认证失败
+Captcha error	UserLoginWindow		验证码错误
 Manage repositories…	MainWindow		管理仓库…
+OK	UserUsageConditions		确定
 Open %DeskbarLink%	PackageManager		打开 %DeskbarLink%
 Input validation	UserLoginWindow		输入无效
 Log in…	MainWindow		登录…
-All repositories	MainWindow		确定
+Client version too old	ServerHelper		客户端版本太旧
+Local repository load error	LocalPkgDataLoadProcess		本地仓库加载错误
+All repositories	MainWindow		所有仓库
+Repository update error	LocalRepositoryUpdateProcess		仓库更新错误
+Network error	ServerHelper		网络错误
+An error occurred while refreshing the repository: %error%	LocalRepositoryUpdateProcess		刷新仓库时出现了一个错误：%error%
+User Created	UserLoginWindow		用户已创建
 Check for updates…	MainWindow		检查更新…
 Uninstalled	PackageListView		已卸载
+I agree to the usage conditions	ToLatestUserUsageConditionsWindow		我同意使用条款
+Installing \"%PackageName%\"	InstallPackageProcess		安装 \"%PackageName%\"
+OK	App		确定
 Develop packages	MainWindow		开发软件包
 Starting the package daemon failed:\n\n%Error%	App		包管理服务启动失败:\n\n%Error%
 No user ratings available.	PackageInfoView		未发现用户评分。
 <no info>	PackageInfoView		<无信息>
 Rating	PackageListView		评级
+A network transport error has arisen communicating with the server system: %s	ServerHelper		与服务器系统通信时出现网络传输错误：%s
+Synchronizing icons	ServerIconExportUpdateProcess		正在同步图标
 Show	MainWindow		显示
+Settings…	MainWindow		设置…
+This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		此应用程序在您的计算机上写入和读取一些工作文件，以便正常工作。似乎在写入测试文件 [%TestFilePath%] 时出现问题。请检查您的本地磁盘或权限是否存在可能阻止此应用程序将文件写入该目录位置的问题。您可以选择忽略此问题并继续，但某些功能可能会被禁用。
 <Package contents not available for remote packages>	PackageContentsView		<软件包内容对于远程包不可用>
 Ratings	PackageInfoView		评级
+Local	LocalPkgDataLoadProcess		本地的
+Package changes	PackageResult	Window title	软件包变更
 User rating	RatePackageWindow		用户评分
 Installed packages	MainWindow		已安装软件包
-There was a puzzling response from the web service.	UserLoginWindow		网络服务响应异常。
+Date	PackageListView		日期
+Error	App		错误
+There was a puzzling response from the web service.	UserLoginWindow		网络服务响应无法解析。
+Opening \"%DeskbarLink%\"	OpenPackageProcess		打开 \"%DeskbarLink%\"
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		您的评价上传成功。您可以在 HaikuDepot Server 网站上更新或者移除它。
+It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		无法与服务器通信以获取创建新用户所需的验证码图像。
 HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot 需要包管理后台工作，现在它并未运行。\n是否需要进行启动？
 Contents	PackageInfoView		內容
+Share anonymous usage data with HaikuDepotServer	SettingsWindow		与 Haiku 仓库服务器 共享匿名使用数据
 Close	PackageManager		关闭
 Changelog	PackageInfoView		更新记录
 About	PackageInfoView		关于
+Password:	UserLoginWindow		密码：
 Stability	RatePackageWindow		稳定性
+This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		此应用程序太旧，无法与服务器通信。请更新系统，获取新版本的应用程序。此应用程序要求的最低版本为 \"%s\"。
+The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		必须重复输入密码以减少输错密码的可能性。
+Cancel	SettingsWindow		取消
 Cancel	RatePackageWindow		取消
 Inactive	PackageListView		未激活
+Nickname:	UserLoginWindow		昵称:
+Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		正在同步仓库元数据信息
+OK	MainWindow		确定
+Version %Code%	UserUsageConditions		版本 %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# item} other{# items}}
+Uninstalling \"%PackageName%\"	UninstallPackageAction		卸载 \"%PackageName%\"
 Downloading:	PackageInfoView		下载中：
+Quit	MainWindow		退出
 Success	UserLoginWindow		成功
 (%Votes%)	PackageInfoView		（%Votes%）
 %hd.timestamp% (version %hd.version%)	PackageInfoView		%hd.timestamp%（版本 %hd.version%）
+Settings	SettingsWindow		设置
+Login issue	MainWindow		登陆问题
 Your rating:	RatePackageWindow		您的评分:
+The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		已在Haiku仓库服务器中成功创建用户%Nickname%。您可以使用web界面管理用户信息。您现在以新用户身份登录。
 Repositories	MainWindow		仓库
+This rating is visible to other users	RatePackageWindow		此分级对其他用户可见
+While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		更新包数据时，出现了一个问题，可能会导致数据过时或显示应用程序丢失。可以从应用程序日志中获取有关此问题的其他详细信息。\n有关如何查看日志的信息，请参阅《Haiku用户指南》的“Haiku库”部分。
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		该软件包似乎并不在 HaikuDepot Server 中，所以无法创建一个新的评分或者编辑已有的评分。
+Apply	SettingsWindow		应用
 Log out	MainWindow		注销
 Comment language:	RatePackageWindow		评论语言:
+View the usage conditions	ToLatestUserUsageConditionsWindow		查看使用条款
+OK	ServerHelper		确定
+Reading repository data	LocalPkgDataLoadProcess		正在读取仓库数据
+Fatal error	InstallPackageProcess		严重错误
+A validation error has occurred	ServerHelper		检验发生问题
+The nickname is required.	UserLoginWindow		请填写昵称。
 -	no package size		-
+Apply changes	PackageResult		应用修改
 Rate package	RatePackageWindow		软件包评分
+Server error	ServerHelper		服务器错误
+Sending anonymous usage data	MainWindow		发送匿名使用数据
 Log in	UserLoginWindow		登陆
+Usage conditions	UserUsageConditions		使用条款
 HaikuDepot	System name		Haiku 软件库
 Screenshot	ScreenshotWindow		屏幕截图
-Email address:	UserLoginWindow		邮箱地址：
+Email address:	UserLoginWindow		邮箱地址:
+View latest usage conditions…	MainWindow		查看最新使用条件…
 Category:	FilterView		分类:
+uninstall package %s\n	PackageResult	Don't change '%s' variable	卸载软件包 %s\n
+Fetching remote repository data	LocalRepositoryUpdateProcess		获取远程仓库数据
 Description	PackageListView		描述
-You need to be logged into an account before you can rate packages.	MainWindow		在对软件包进行评级之前，您需要进行账户登录。
+User creation error	UserLoginWindow		用户创建出错
+You need to be logged into an account before you can rate packages.	MainWindow		您需要登陆账号，才能进行软件包评分。
+Cleaning up…	ShuttingDownWindow		清理中…
+Repeat password:	UserLoginWindow		重新输入密码：

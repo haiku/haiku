@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Locale	288870027
+1	english	x-vnd.Haiku-Locale	1081217032
 Medium format:	TimeFormatSettings		中等格式：
 Negative:	TimeFormatSettings		负数：
 Language	Locale Preflet Window		语言
@@ -22,6 +22,7 @@ Preferred languages	Locale Preflet Window		首选语言
 Full format:	TimeFormatSettings		完全格式：
 Cancel	Locale Preflet Window		取消
 Revert	Locale Preflet Window		取消
+Translate application and folder names	TimeFormatSettings		翻译应用程序和文件夹名称
 12 hour	TimeFormatSettings		十二小时
 Positive:	TimeFormatSettings		正数：
 Deskbar and Tracker need to be restarted for this change to take effect. Would you like to restart them now?	Locale Preflet Window		需要重新启动桌面栏和文件浏览器，这些修改才会生效。您希望重新启动它们吗？

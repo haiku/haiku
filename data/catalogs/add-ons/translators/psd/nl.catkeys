@@ -3,8 +3,8 @@ Lab	PSDLoader		Lab
 Uncompressed	PSDConfig		Ongecomprimeerd
 Indexed	PSDLoader		Geïndexeerd
 Grayscale	PSDLoader		Grijswaarden
-Photoshop image translator	PSDConfig		Photoshop-afbeelding translator
-Photoshop image translator	PSDTranslator		Photoshop-afbeelding translator
+Photoshop image translator	PSDConfig		Photoshop-afbeelding vertaler
+Photoshop image translator	PSDTranslator		Photoshop-afbeelding vertaler
 Version %d.%d.%d, %s	PSDConfig		Versie %d.%d.%d, %s
 Photoshop Document (PSD file)	PSDConfig		Photoshop-document (PSD-bestand)
 Photoshop image	PSDTranslator		Photoshop-afbeelding

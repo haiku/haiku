@@ -1,5 +1,6 @@
-1	portuguese	x-vnd.Haiku-JPEG2000Translator	2653653440
+1	portuguese	x-vnd.Haiku-JPEG2000Translator	1076686378
 Output quality	JPEG2000Translator		Qualidade de saída
 JPEG2000 images	JPEG2000Translator		Imagens JPEG2000
 About	JPEG2000Translator		Acerca
+Version %d.%d.%d	JPEG2000Translator		Versão %d.%d.%d
 ©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nBaseado na biblioteca JasPer:\n© 1999-2000, Image Power, Inc. e\nUniversity of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nO codec jp2 de ImageMagick foi usado como \"tutorial\".\n\thttp://www.imagemagick.org/\n

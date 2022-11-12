@@ -9,7 +9,7 @@ Find:	WebPositive Window		Bul:
 Script console	WebPositive Window		Betik konsolu
 Fonts	Settings Window		Yazıtipleri
 Path	Cookie Manager		Yol
-Bookmarks	WebPositive Window		Yer İmleri
+Bookmarks	WebPositive Window		Yer imleri
 Use proxy server to connect to the internet	Settings Window		İnternete bağlanmak için vekil sunucu kullan
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url yüklendi
 Auto-hide interface in full screen mode	Settings Window		Tam ekran kipinde arayüzü kendiliğinden gizle
@@ -34,7 +34,7 @@ Match case	WebPositive Window		BÜYÜK/küçük harf duyarlı
 Proxy password:	Settings Window		Vekil parolası:
 Size:	Font Selection view		Boyut:
 Page source	WebPositive Window		Sayfa kaynağı
-Proxy server port:	Settings Window		Vekil sunucu portu:
+Proxy server port:	Settings Window		Vekil sunucu kapısı:
 Error opening downloads folder	Download Window		İndirilenler klasörü açılırken hata
 Show bookmark bar	WebPositive Window		Yer imi çubuğunu göster
 Find	WebPositive Window		Bul

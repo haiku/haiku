@@ -1,2 +1,7 @@
-1	romanian	x-vnd.Haiku-TIFFTranslator	2591143631
+1	romanian	x-vnd.Haiku-TIFFTranslator	2836877076
+TIFF Library:	TIFFView		Bibliotecă TIFF:
+TIFF image	TIFFTranslator		Imagine TIFF
 TIFF Settings	TIFFMain		Configurări TIFF
+LZW	TIFFView		LZW
+TIFF images	TIFFTranslator		Imagini TIFF
+None	TIFFView		Nimic

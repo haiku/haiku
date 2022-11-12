@@ -9,7 +9,7 @@ Or	FindPanel		veya
 MIME Description	AttributesView		MIME Tanımı
 before	FindPanel		önce
 Volume icons	TrackerSettingsWindow		Disk simgeleri
-Ignore case	SelectionWindow		BÜYÜK/küçük harf yoksay
+Ignore case	SelectionWindow		BÜYÜK/küçük harf yok say
 Current folder	ContainerWindow		Geçerli klasör
 Finish: %time - Over %finishtime left	StatusWindow		Bitiş: %time - Yaklaşık %finishtime kaldı
 Mount all disks now	AutoMounterSettings		Tüm diskleri şimdi bağla
@@ -172,7 +172,7 @@ If you rename %target, %osName may not behave properly!\n\nAre you sure you want
 Filesystem:	InfoWindow		Dosya sistemi:
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" açılamadı (%error). 
 Media parameter group	AttributesView		Ortam parametreleri grubu
-%name info	InfoWindow	InfoWindow Title	%name Bilgisi
+%name info	InfoWindow	InfoWindow Title	%name bilgisi
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Ev klasörünü taşırsanız %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Shift düğmesini basılı tutun ve \"Taşı\"ya basın.
 Property info	AttributesView		Özellik bilgisi
 Sorry, you can't create links in the Trash.	PoseView		Üzgünüm, Çöp içinde bağlantılar oluşturamazsınız.

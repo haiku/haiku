@@ -1,0 +1,22 @@
+1	english	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: 无法获取节点信息 (%ld):\n%s\n
+Priority	CortexAddOnsLoggingConsumer		优先级
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: 找不到节点 (%ld):\n%s\n
+Latency	CortexAddOnsLoggingConsumer		延迟
+Logged input	CortexAddOnsLoggingConsumer		日志输入
+CPU spin percentage	CortexAddOnsLoggingConsumer		CPU工作量比例
+NodeLogger	CortexAddOnsLoggingConsumers		节点日志
+Start	CortexAddOnsLoggingConsumerNodeHarnessWin		开始
+Thread priority	CortexAddOnsLoggingConsumer		任务优先级
+LoggingConsumer parameters	CortexAddOnsLoggingConsumer		LoggingConsumer参数
+Latency control	CortexAddOnsLoggingConsumer		延迟控制
+CPU percentage	CortexAddOnsLoggingConsumer		CPU百分比
+LoggingConsumer	CortexAddOnsLoggingConsumer		LoggingConsumer
+Stop	CortexAddOnsLoggingConsumerNodeHarnessWin		停止
+An add-on version of the LoggingConsumer node.\nSee the Be Developer Newsletter III.18: 5 May, 1999\nadapted by Eric Moon (4 June, 1999)	CortexAddOnsLoggingConsumer		LoggingConsumer节点的插件版本。\n详情可参考 Be Developer Newsletter III.18: 5 May, 1999\n由 Eric Moon (1999年6月4日) 编写
+OK	CortexAddOnsCommonMediaNodeControlApp		确定
+Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		控制
+controls	CortexAddOnsCommonMediaNodeControlApp		控制
+Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		连接
+percent	CortexAddOnsLoggingConsumer		百分比
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: 节点 (%ld) 无参数:\n%s\n

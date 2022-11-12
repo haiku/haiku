@@ -1,0 +1,23 @@
+1	english	application/x-vnd.Cortex.TransportView	1534931965
+Roll	TransportView		滚动
+(none)	TransportView		(无)
+{0, plural, one{# node} other{# nodes}}	TransportView		{0, plural, one{# node} other{# nodes}}
+Start	TransportView		开始
+No errors.	TransportView		无错误。
+to	TransportView		到
+Offline	TransportView		离线
+(???)	TransportView		(???)
+Stop	TransportView		停止
+(no group)	TransportView		(无分组)
+Drop data	TransportView		丢弃数据
+To:	TransportView		到：
+Recording	TransportView		录制中
+Increase latency	TransportView		增加延迟
+Time source:	TransportView		时间源：
+DAC time source	TransportView		DAC时间源
+Decrease precision	TransportView		降低精度
+System clock	TransportView		系统时钟
+From:	TransportView		从：
+Roll from	TransportView		滚动自
+Preroll	TransportView		预滚动
+Run mode:	TransportView		运行模式：

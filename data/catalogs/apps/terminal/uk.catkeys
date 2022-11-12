@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	3702716692
+1	ukrainian	x-vnd.Haiku-Terminal	4089361699
 ANSI cyan color	Terminal AppearancePrefView		ANSI ціан
 Close other tabs	Terminal TermWindow		Закрити інші вкладки
 Insert path	Terminal TermView		Введіть шлях
@@ -7,6 +7,7 @@ Text encoding	Terminal TermWindow		Кодування тексту
 ANSI blue color	Terminal AppearancePrefView		ANSI синій
 OK	Terminal SetTitleWindow		ОК
 Edit	Terminal TermWindow		Дія
+  -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               показати довідку\n  -t,     --title              встановити заголовок вікна\n  -f,     --fullscreen         запуск у повноекранному режимі\n  -w,     --working-directory  встановити робочий каталог\n
 Select all	Terminal TermWindow		Вибрати все
 Confirm exit if active programs exist	Terminal AppearancePrefView		Підтверджувати вихід якщо присутні активні програми
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tПоточна робоча папка активного процесу в поточній вкладці.\n\t\t\tПри необхідності можна вказати максимальне число компонентів\n\t\t\tдля відображення. Наприклад '%2d' для більш ніж двох компонентів.\n\t%T\t-\tНазва програми Terminal для поточної локалі.\n\t%e\t-\tКодування поточної локалі. Для UTF-8 не відображається.\n\t%i\t-\tІндекс вікна.\n\t%p\t-\tНазва активного процесу у поточній вкладці.\n\t%t\t-\tЗаголовок поточної вкладки.

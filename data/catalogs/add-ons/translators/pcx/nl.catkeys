@@ -2,7 +2,7 @@
 PCX Settings	main		PCX Instellingen
 Version %d.%d.%d, %s	ConfigView		Versie  %d.%d.%d, %s
 PCXTranslator Settings	ConfigView		PCXTranslator Instellingen
-PCX image translator	PCXTranslator		PCX-afbeelding translator
+PCX image translator	PCXTranslator		PCX afbeelding vertaler
 PCX %lu bit image	PCXTranslator		PCX %lu bit afbeelding
 PCX images	PCXTranslator		PCX afbeeldingen
-PCX image translator	ConfigView		PCX-afbeelding translator
+PCX image translator	ConfigView		PCX afbeelding vertaler

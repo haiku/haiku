@@ -1,4 +1,4 @@
-1	english	x-vnd.haiku-icon_o_matic	2424331018
+1	english	x-vnd.haiku-icon_o_matic	1805671130
 None	Icon-O-Matic-Properties		无
 Rotate Path Indices	Icon-O-Matic-RotatePathIndiciesCmd		旋转路径索引
 Add empty	Icon-O-Matic-ShapesList		添加空白
@@ -164,6 +164,7 @@ Untitled	Icon-O-Matic-Main		未命名
 Max LOD	Icon-O-Matic-PropertyNames		最大层次细节
 Add Path	Icon-O-Matic-AddPathsCmd		添加路径
 Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		关闭前是否保存当前图标修改？
+Failed to open the file '%s' as an SVG document.\n\n	Icon-O-Matic-SVGImport		打开SVG文档 '%s' 出错。\n\n
 load error	Icon-O-Matic-SVGImport		加载错误
 Transformation	Icon-O-Matic-TransformersList		转换
 Save as…	Icon-O-Matic-Menu-File		保存为...

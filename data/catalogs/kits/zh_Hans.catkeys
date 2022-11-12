@@ -1,5 +1,6 @@
-1	english	x-vnd.Haiku-libbe	3337473349
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# 字节} other{# 字节}}
+1	english	x-vnd.Haiku-libbe	2914417806
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
+%.2f TiB/s	StringForRate		%.2f TiB/s
 All Rights Reserved.	AboutWindow		保留所有权利
 gold master	AboutWindow		最终测试版
 Undo	TextView		撤销
@@ -7,21 +8,26 @@ OK	PrintJob		确定
 gamma	AboutWindow		伽马
 development	AboutWindow		开发
 OK	Dragger		确定
+%3.2f GiB/s	StringForRate		%3.2f GiB/s
 Print Server is not responding.	PrintJob		打印服务未响应。
 About %app%	AboutMenuItem		关于 %app%
 Warning	Dragger		警告
 Green:	ColorControl		绿色:
+%3.2f KiB/s	StringForRate		%3.2f KiB/s
 Redo	TextView		恢复
 No pages to print!	PrintJob		无打印页！
 beta	AboutWindow		beta
 OK	ZombieReplicantView		确定
 Cut	TextView		剪切
 %3.2f GiB	StringForSize		%3.2f GiB
+Default	Default decorator about box		默认
 Can't delete this replicant from its original application. Life goes on.	Dragger		无法从原始应用中删除克隆控件。它将继续存在。
 Error	ZombieReplicantView		错误
 Paste	TextView		粘贴
 OK	AboutWindow		确定
+{0, plural, one{# byte/s} other{# bytes/s}}	StringForRate		{0, plural, one{# byte/s} other{# bytes/s}}
 Special Thanks:	AboutWindow		特别感谢：
+Default Haiku window decorator.	Default decorator about box		默认 Haiku 窗口主题。
 %.2f TiB	StringForSize		%.2f TiB
 Remove replicant	Dragger		删除克隆控件
 Version	AboutWindow		版本
@@ -31,6 +37,7 @@ Copy	TextView		复制
 Select all	TextView		全选
 alpha	AboutWindow		测试
 %3.2f MiB	StringForSize		%3.2f MiB
+%3.2f MiB/s	StringForRate		%3.2f MiB/s
 Error	PrintJob		错误
 About %app%	AboutWindow		关于 %app%
 About %app…	Dragger		关于 %app...

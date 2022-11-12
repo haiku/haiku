@@ -1,7 +1,7 @@
 1	turkish	x-vnd.haiku-package_daemon	1440586681
 Package changes	PackageResult	Window title	Paket değişiklikleri
 uninstall package %s\n	PackageResult	Don't change '%s' variable	%s paketini kaldır\n
-ignore problem for now	PackageProblem		sorunu şimdilik yoksay
+ignore problem for now	PackageProblem		sorunu şimdilik yok say
 solution %d:	PackageProblem	Don't change the %d variable	çözüm %d:
 The following problems have been encountered. Please select a solution for each:	PackageProblem		Aşağıdaki sorunlar oluştu. Lütfen her sorun için bir çözüm seçin:
 Apply changes	PackageResult		Değişiklikleri uygula

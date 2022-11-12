@@ -1,8 +1,9 @@
-1	english	x-vnd.Haiku-StyledEdit	727465241
+1	english	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		文档统计
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		无法恢复，文件未找到：\"%s\"。
 Cut	Menus		剪切
 Center	Menus		居中
+Increase size	Menus		增加大小
 Page setup…	Menus		页面设置…
 Wrap-around search	FindandReplaceWindow		循环搜索
 Untitled 	StyledEditWindow		未命名
@@ -50,6 +51,7 @@ OK	SaveAlert		确定
 Color	Menus		颜色
 Save changes to the document \"%s\"? 	QuitAlert		将所做更改存入文档\"%s\"中吗?
 StyledEdit	System name		StyledEdit
+Underline	Menus		下划线
 Find:	FindandReplaceWindow		查找：
 Undo typing	QuitAlert		取消输入
 Error loading \"%s\":\n\t%s	LoadAlert		加载错误 \"%s\"\n\t%s
@@ -71,6 +73,7 @@ Find…	Menus		查找…
 Cancel	SaveAlert		取消
 Revert	RevertToSavedAlert		取消
 Size	Menus		大小
+Decrease size	Menus		缩减大小
 Autodetect	Menus		自动删除
 Replace next	Menus		替换文本
 OK	QuitAlert		确定

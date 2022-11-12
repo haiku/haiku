@@ -1,14 +1,17 @@
-1	dutch; flemish	x-vnd.Haiku-Devices	3345509916
+1	dutch; flemish	x-vnd.Haiku-Devices	3349357485
 ACPI bus	DevicesView		ACPI-bus
 Encryption controller	Device		Encryptie-controller
 Bus Information	Device		Businformatie
 Devices	System name		Devices
+USB bus	DevicesView		USB-bus
 Graphics Peripheral	DeviceSCSI		Graphics randapparaat
 Processor	Device		Processor
 Generate system information	DevicesView		Genereer systeeminformatie
+Unknown	DeviceACPI		Onbekend
 Class info	DevicePCI		Klasse info
 ACPI Information	DeviceACPI		ACPI-informatie
 Detailed	DevicesView		Gedetailleerd
+USB bus	Device		USB-bus
 Computer	DevicesView		Computer
 Communications	DeviceSCSI		Communicaties
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Klassengegevens:\t \t \t \t : %classInfo%
@@ -84,6 +87,7 @@ Device name	DeviceSCSI		Apparaatnaam
 Docking station	Device		Dockingstation
 Array	DeviceSCSI		Array
 Unclassified device	Device		Ongeclassificeerd apparaat
+Manufacturer	DeviceACPI		Fabrikant
 ACPI controller	Device		ACPI-controller
 Network controller	Device		Netwerkcontroller
 Driver used	Device		Gebruikte driver

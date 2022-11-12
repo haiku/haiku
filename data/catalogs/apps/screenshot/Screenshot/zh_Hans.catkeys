@@ -1,8 +1,11 @@
-1	english	x-vnd.haiku-screenshot	3896204963
+1	english	x-vnd.haiku-screenshot	3958461128
 Include window border	ScreenshotWindow		包含窗体边框
 Overwrite	ScreenshotWindow		覆盖
 Save in:	ScreenshotWindow		保存到：
+Error saving \"%s\":\n\t%s	ScreenshotWindow		保存时出错： \"%s\":\n\t%s
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		文件已存在。\n 是否进行文件替换？
+OK	ScreenshotWindow		确定
+The destination path exists but is not a folder.	ScreenshotWindow		目标路径已存在，但不是目录。
 Select	ScreenshotWindow		选择
 Save as:	ScreenshotWindow		保存为：
 seconds	ScreenshotWindow		秒
@@ -18,6 +21,7 @@ Choose folder	ScreenshotWindow		选择文件夹
 Name:	ScreenshotWindow		名称：
 Choose folder…	ScreenshotWindow		选择文件夹…
 Please select	ScreenshotWindow		请选择
+Failed to save screenshot	ScreenshotWindow		保存截屏失败。
 Cancel	ScreenshotWindow		取消
 Delay:	ScreenshotWindow		延迟：
 Copy to clipboard	ScreenshotWindow		复制到剪贴板

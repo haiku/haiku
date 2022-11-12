@@ -1,0 +1,10 @@
+1	english	application/x-vnd.moon-AudioAdapter.media_addon	2282220510
+Input format	CortexAudioAdapter		输入格式
+Channels:	CortexAudioAdapter		通道：
+stereo	CortexAudioAdapter		立体声
+mono	CortexAudioAdapter		单声道
+Output format	CortexAudioAdapter		输出格式
+Audio input	CortexAddOnsCommon		音频输入
+Sample format:	CortexAudioAdapter		采样格式：
+Audio output	CortexAddOnsCommon		音频输出
+%groupname% parameters	CortexAddOnsCommon		%groupname% 参数

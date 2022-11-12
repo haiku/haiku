@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Devices	214685744
+1	turkish	x-vnd.Haiku-Devices	3349357485
 ACPI bus	DevicesView		ACPI veri yolu
 Encryption controller	Device		Şifreleme denetleyicisi
 Bus Information	Device		Veri yolu bilgisi
@@ -7,6 +7,7 @@ USB bus	DevicesView		USB veri yolu
 Graphics Peripheral	DeviceSCSI		Grafik çevre birimi
 Processor	Device		İşlemci
 Generate system information	DevicesView		Sistem bilgisi üret
+Unknown	DeviceACPI		Bilinmiyor
 Class info	DevicePCI		Sınıf bilgisi
 ACPI Information	DeviceACPI		ACPI bilgisi
 Detailed	DevicesView		Ayrıntılı
@@ -86,6 +87,7 @@ Device name	DeviceSCSI		Aygıt adı
 Docking station	Device		Takma istasyonu
 Array	DeviceSCSI		Diziliş
 Unclassified device	Device		Sınıflandırılmamış aygıt
+Manufacturer	DeviceACPI		Üretici
 ACPI controller	Device		ACPI denetleyicisi
 Network controller	Device		Ağ denetleyicisi
 Driver used	Device		Kullanılan sürücü

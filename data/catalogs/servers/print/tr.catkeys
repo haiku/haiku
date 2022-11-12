@@ -2,7 +2,7 @@
 Undefined	ConfigWindow		Tanımlanmamış
 Return the number of available transports	PrintServerApp Scripting		Kullanılabilir taşıyıcı sayısını döndür
 Return the number of available printers	PrintServerApp Scripting		Kullanılabilir yazıcı sayısını döndür
-Get currently available ports/devices	Transport Scripting		Şu anda kullanılabilir portları/aygıtları getir
+Get currently available ports/devices	Transport Scripting		Şu anda kullanılabilir kapıları/aygıtları al
 Retrieve or select the active printer	PrintServerApp Scripting		Etkin yazıcıyı seç veya bulup getir
 Cancel	PrintServerApp		Vazgeç
 Retrieve a specific printer	PrintServerApp Scripting		Belirli bir yazıcıyı bulup getir

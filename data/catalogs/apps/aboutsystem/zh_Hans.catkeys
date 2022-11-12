@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-About	2706129734
+1	english	x-vnd.Haiku-About	2259131995
 Revision	AboutView		发行版本
 The Haikuware team and their bounty program\n	AboutView		Haikuware 组织及其捐赠程序\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		版权所有 © 1999-2007 Michael C. Ring，保留所有权利。
@@ -14,9 +14,11 @@ Copyright © 2006-2012 Kentaro Fukuchi	AboutView		版权所有 © 2006-2012 Kent
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		版权所有 © 1991-2000 Silicon Graphic, Inc，保留所有权利。
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		版权素有 © 1990-2002 Info-ZIP，保留所有权利。
 Past website & marketing:\n	AboutView		早先网站及市场：\n
+Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		版权所有 © 2007 Ralink Technology Corporation。保留所有权利。
 Copyright © 2003 Peter Hanappe and others.	AboutView		版权所有 © 2003 Peter Hanappe 及其他人员。
 Testing and bug triaging:\n	AboutView		测试与错误分析：\n
-{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{处理器 单核:} other{处理器 # 核:}}
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processor:} other{# Processors:}}
+Ralink WiFi Firmware	AboutWindow		Ralink WiFi 固件
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Haiku所独有的代码，尤其是内核及与之紧密关联的所有应用程序的代码，它们都在 <MIT 协议> 条款下发布。那些包含第三方代码的系统库则在 <LGPL 协议> 下发布。您可以在下述信息中找到第三方部分代码的版权信息。\n\n
 %d MiB total	AboutView		总计 %d MiB
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		版权所有 © 1996-1997 Jeff Prosise，保留所有权利。
@@ -36,12 +38,15 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		版权�
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		版权所有 © 1994-2009，Thomas G. Lane，Guido Vollbeding。本软件基于 Independent JPEG Group 的部分工作。
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (项目创始人)\n\n
+Remove replicant	AboutView		移除克隆控件
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 About this system	AboutWindow		关于系统
 %d MiB used (%d%%)	AboutView		已用 %d MiB (%d%%)
+Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		版权所有 © 2003-2006 Intel Corporation。保留所有权利。
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		版权所有 © 1999-2010 Gutenprint 的所有编写者，保留所有权利。
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		版权所有 © 1994-1997 Mark Kilgard。保留所有权利。
 AboutSystem	System name		关于系统
+Copyright © 2019 Joe Drago. All rights reserved.	AboutView		版权所有 © 2019 Joe Drago。保留所有权利。
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		版权所有 © 1995-2001 Lars Düning，保留所有权利。
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		版权所有 © 1998-2000 Thai Open Source Software Center Ltd 与 Clark Cooper。
 Source Code: 	AboutView		源代码： 
@@ -55,14 +60,18 @@ Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		版权所�
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2019 Fabrice Bellard 等
 Current maintainers:\n	AboutView		目前维护人员：\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		版权所有 © 1995, 1998-2001 Jef Poskanzer，保留所有权利。
+Intel WiFi Firmware	AboutWindow		Intel WiFi 固件
+Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		版权所有 © 2007-2009 Marvell Semiconductor, Inc. 保留所有权利。
 Version:	AboutView		版本：
 The BeGeistert team\n	AboutView		BeGeistert 组织\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
+Intel (2xxx firmware)	AboutWindow		Intel（2xxx 固件）
 License: 	AboutView		协议： 
 GNU GPL v2	AboutWindow		GNU GPL v2
 The University of Auckland and Christof Lutteroth\n\n	AboutView		奥克兰大学与 Christof Lutteroth 研究院\n\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		总计 %total MiB，禁用 %inaccessible MiB
 Copyright © 2012-2016 Google Internationalization team.	AboutView		版权所有 © 2012-2016 Google 国际化团队。
+Copyright © 2001-%ld The Haiku project. 	AboutView		版权所有 © 2001-%ld The Haiku project. 
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		版权所有 © 1994-2008 Xiph.Org，保留所有权利。
 Copyright © 1995-2004 Jean-loup Gailly and Mark Adler.	AboutView		版权所有 © 1995-2004 Jean-loup Gailly 与 Mark Adler。
 Copyright © 2001-2003 Expat maintainers.	AboutView		版权所有 © 2001-2003 Expat 维护人员。
@@ -70,9 +79,11 @@ Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		版权所有 © 200
 Translations:\n	AboutView		翻译人员：\n
 Memory:	AboutView		内存状态：
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…而且可能还有一些我们未提及的开发人员（非常抱歉）！\n\n
+Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		版权所有 © 2006-2015 Intel Corporation。保留所有权利。
 BSD (2-clause)	AboutWindow		BSD (2 条款)
 Website & marketing:\n	AboutView		网站及市场：\n
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 基于 Generalized Timing Formula，由 Andy Ritger 完成。
 …and the many people making donations!\n\n	AboutView		…以及其他更多的贡献者！\n\n
+Marvell (firmware)	AboutWindow		Marvell (固件)
 BSD (4-clause)	AboutWindow		BSD (4-clause)
 BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER 是 Bitstream Inc. 的注册商标。

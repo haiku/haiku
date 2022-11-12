@@ -4,9 +4,9 @@ Write interlaced images	GIFView		Schrijf interlaced afbeelding
 Optimal	GIFView		Optimaal
 Greyscale	GIFView		Grijswaarde
 Colors:	GIFView		Kleuren:
-GIF image translator	GIFTranslator		GIF afbeelding translator
+GIF image translator	GIFTranslator		GIF afbeelding vertaler
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Formaat (GIFVertaler)
-GIF image translator	GIFView		GIF afbeelding translator
+GIF image translator	GIFView		GIF afbeelding vertaler
 Palette:	GIFView		Kleurenpalet:
 GIF image	GIFTranslator		GIF afbeelding
 Write transparent images	GIFView		Schrijf transparante afbeeldingen

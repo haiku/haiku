@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libsolvsolver	2428947941
+1	english	x-vnd.Haiku-libsolvsolver	3404387783
 allow architecture change of %source% to %target%	SolverProblemSolution		允许 %source% 架构变更到 %target%
 install %source% from excluded repository	SolverProblemSolution		从外部仓库安装 %source% 
 unspecified problem	SolverProblem		未知问题
@@ -20,6 +20,19 @@ keep %source% despite its inferior architecture	SolverProblemSolution		保留 %s
 %source% does not belong to a distupgrade repository	SolverProblem		%source% 不属于版本升级仓库
 installed package %source% obsoletes %dependency% provided by %target%	SolverProblem		已安装软件包 %source% 不再依赖 %dependency% ，由 %target% 提供
 allow name change of %source% to %target%	SolverProblemSolution		允许 %source%  名称变更为 %target%
-package %source% conflicts with %dependency% provided by %target%	SolverProblem		软件包 %source% 与由 %target% 提供的 %dependency% 冲突
+package %source% conflicts with %dependency% provided by %target%	SolverProblem		软件包 %source% 与 %dependency% 冲突，由 %target% 提供
+do something	SolverProblemSolution		做些事
+install %selection% despite its old version	SolverProblemSolution		安装 %selection% ，尽管它是旧版本
+cannot install both %source% and %target%	SolverProblem		不能同时安装 %source% 和 %target%
+package %source% is not installable	SolverProblem		软件包 %source% 无法安装
+problem with installed package %source%	SolverProblem		安装的包 %source% 存在问题
+allow deinstallation of %source%	SolverProblemSolution		允许卸载 %source%
 keep %source% from excluded repository	SolverProblemSolution		保留外部仓库的 %source%
+keep old %source%	SolverProblemSolution		保持旧的 %source%
+package %source% conflicts with %dependency% provided by itself	SolverProblem		软件包 %source% 与其提供的 %dependency% 产生冲突
+allow vendor change from \"%sourceVendor%\" (%source%) to \"%targetVendor%\" (%target%)	SolverProblemSolution		允许供应商从\"%sourceVendor%\" (%source%)更改为\"%targetVendor%\" (%target%)
+do not lock \"%selection%\"	SolverProblemSolution		不要锁定 \"%selection%\"
+do not install \"%selection%\"	SolverProblemSolution		不要安装 \"%selection%\"
+nothing provides %dependency% needed by %source%	SolverProblem		没有 %dependency% 提供，其由 %source% 所依赖。 
 %source% has inferior architecture	SolverProblem		%source% 有下级结构
+do not deinstall all resolvables \"%selection%\"	SolverProblemSolution		不要卸载所有可解析文件 \"%selection%\"

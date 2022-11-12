@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	2915475646
+1	dutch; flemish	x-vnd.Haiku-libtracker	464753347
 Created	ContainerWindow		Gemaakt
 Icon	AttributesView		Icoon
 Open and make preferred	OpenWithWindow		Openen en bevoorkeuren
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Klein afbeeldingsicoon
 Would you like to find a suitable application to open the file?	FSUtils		Wilt u een geschikte toepassing zoeken om het bestand mee te openen?
 64 x 64	ContainerWindow		64 x64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		U kunt geen map of gelinkt bestand vervangen door een bestand.
+(unknown)	InfoWindow		(onbekend)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datums>}}
 Trailing \\.	libtracker		\\ aan het einde.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		find_directory() in \n%func is mislukt. \nReden: %error
@@ -84,6 +85,7 @@ Include trash	FindPanel		Prullenbak erbij opnemen
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Opruimen
 Modified	FindPanel		Gewijzigd
+ (block size: 	InfoWindow		 (blokgrootte: 
 Select all	QueryContainerWindow		Alles selecteren
 Generate image thumbnails	SettingsView		Afbeeldingvoorbeelden genereren
 Select…	FilePanelPriv		Selecteren...
@@ -167,6 +169,7 @@ Read	FilePermissionsView		Lezen
 There was an error writing the attribute.	WidgetAttributeText		Er was een fout bij het schrijven van het attribuut.
 Path	Default Query Columns		Pad
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Als de map %target hernoemd wordt, dan functioneert %osName mogelijk niet goed meer!\n\nWeet u zeker dat u wilt doorgaan?
+Filesystem:	InfoWindow		Bestandssysteem:
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" kon niet geopend worden (%error).
 Media parameter group	AttributesView		Mediaparametergroep
 %name info	InfoWindow	InfoWindow Title	%name info
@@ -493,6 +496,7 @@ Duplicate	ContainerWindow		Dupliceer
 16-bit integer	AttributesView		16-bit integer
 Untitled clipping	PoseView		Naamloze clipping
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Het bestand met de naam \"%name\" bestaat al in de gespecifieerde map. Wilt u het vervangen?
+, indexed	InfoWindow		, geïndexeerd
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		U moet de items verslepen naar een van de schijf-iconen in het \"Schijven\"-venster.
 Version:	InfoWindow		Versie:
 OK	PoseView		Oké

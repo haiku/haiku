@@ -86,7 +86,7 @@ Cursor	Terminal AppearancePrefView		İmleç
 Full screen	Terminal TermWindow		Tam ekran
 Shell 	Terminal TermWindow		Kabuk 
 Midnight	Terminal colors scheme		Gece yarısı
-\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tKarakter: '%'\n\t%<\t-\tYalnızca sonraki gelen yer tutucu boş\n\t\t\tdeğilse gösterilecek bir bölüm başlatır.\n\t%>\t-\tYalnızca bir önceki %< bölümü ve bunun arasındaki\n\t\t\tyer tutucu boş değilse gösterilecek bir bölüm başlatır.\n\t%-\t-\tBir %< veya %> bölümünü sonlandırır.\n\n'%' ve biçimlendirme harfi arasına konulacak her bir abece-sayısal olmayan karakter\nbir boşluk ekleyecektir. Ekleme %< bölümüne yapılacaktır.
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t'%' karakteri\n\t%<\t-\tYalnızca sonraki gelen yer tutucu boş\n\t\t\tdeğilse gösterilecek bir bölüm başlatır.\n\t%>\t-\tYalnızca bir önceki %< bölümü ve bunun arasındaki\n\t\t\tyer tutucu boş değilse gösterilecek bir bölüm başlatır.\n\t%-\t-\tBir %< veya %> bölümünü sonlandırır.\n\n'%' ve biçimlendirme harfi arasına konulacak her bir abece-sayısal olmayan karakter\nbir boşluk ekleyecektir. Ekleme %< bölümüne yapılacaktır.
 Tab title:	Terminal TermWindow		Sekme başlığı:
 Window title:	Terminal TermWindow		Pencere başlığı:
 Default	Terminal colors scheme		Öntanımlı
@@ -131,4 +131,4 @@ Close window	Terminal TermWindow		Pencereyi kapat
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Uçbirim\nCopyright 2001-2020 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ve Takaşi Murai.\n\nKullanım: %s [SEÇENEK] [KABUK]\n
 Clear all	Terminal TermWindow		Tümünü temizle
 Solarized Light	Terminal colors scheme		Solmuş Açık
-Search forward	Terminal FindWindow		İleri doğru arama
+Search forward	Terminal FindWindow		İleri doğru ara

@@ -2,7 +2,7 @@
 Document statistics	Statistics		Belge istatistikleri
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Geri alınamıyor, dosya bulunamadı: \"%s\".
 Cut	Menus		Kes
-Center	Menus		Ortala
+Center	Menus		Orta
 Increase size	Menus		Büyüt
 Page setup…	Menus		Sayfa yapısı…
 Wrap-around search	FindandReplaceWindow		Tüm dosyada ara
@@ -35,7 +35,7 @@ File \"%file%\" was modified by another application, reload it?	NodeMonitorAlert
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		\"%file%\" başka bir uygulama tarafından kaldırılmış, kurtarılsın mı?
 Lines:	Statistics		Satır:
 Replace in all windows	FindandReplaceWindow		Tüm pencerelerde değiştir
-\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" içinde kaydedilmeyen değişiklikler var.\nDeğişiklikleri yoksaymak istediğinizden emin misiniz?
+\"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" içinde kaydedilmeyen değişiklikler var.\nDeğişiklikleri yok saymak istediğinizden emin misiniz?
 Save	SaveAlert		Kaydet
 Default	Open_and_SaveAsPanel		Öntanımlı
 Cancel	RevertToSavedAlert		Vazgeç
@@ -60,7 +60,7 @@ Reload…	Menus		Yeniden yükle…
 Print…	Menus		Yazdır…
 Quit	Menus		Çık
 Redo typing	QuitAlert		Yazımı yinele
-Ignore	NodeMonitorAlerts		Yoksay
+Ignore	NodeMonitorAlerts		Yok say
 Wrap lines	Menus		Satırları kaydır
 Text encoding	Menus		Metin kodlaması
 Unable to unlock file\n\t%s	QuitAlert		Dosya kilidi açılamıyor\n\t%s

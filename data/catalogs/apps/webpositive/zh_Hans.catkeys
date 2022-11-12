@@ -1,5 +1,8 @@
-1	english	x-vnd.Haiku-WebPositive	4147122882
+1	english	x-vnd.Haiku-WebPositive	840981334
 Authentication required	Authentication Panel		需要认证
+Previous	WebPositive Window		上一个
+(Finish: %date)	Download Window		(完成: %date)
+Open bookmarks confirmation	WebPositive Window		确认打开书签
 Download folder:	Settings Window		下载文件夹：
 Close window	WebPositive Window		关闭窗口
 Find:	WebPositive Window		查找：
@@ -17,5 +20,113 @@ Open containing folder	Download Window		打开所在文件夹
 Find previous	WebPositive Window		查找上一个
 Full screen	WebPositive Window		全屏
 Downloads in progress	WebPositive		正在下载
-Copy URL to clipboard	Download Window		复制网址至剪贴板
+Copy URL to clipboard	Download Window		复制 URL 到剪切板
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	你想同时打开 %addedCount 个书签吗？
+Clone current page	Settings Window		克隆当前页面
+Start page:	Settings Window		启动页面：
+Cancel	Download Window		取消
+Settings	Settings Window		设置
+Downloads	WebPositive Window		下载
+Browse…	Settings Window		浏览…
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	该页面(%bookmarkName)书签已存在。
+Resume prior session	Settings Window		恢复之前的会话
+Match case	WebPositive Window		匹配大小写
+Proxy password:	Settings Window		代理密码:
+Size:	Font Selection view		大小：
+Page source	WebPositive Window		页面源
+Proxy server port:	Settings Window		代理服务器端口：
+Error opening downloads folder	Download Window		打开下载文件夹时发生错误
+Show bookmark bar	WebPositive Window		显示书签栏
+Find	WebPositive Window		查找
+Standard font:	Settings Window		标准字体：
+Open download error	Download Window		打开下载时发生错误
+General	Settings Window		通用
+New tabs:	Settings Window		新标签页：
+%url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url 失败
+Open downloads folder	Download Window		打开下载文件夹
+Proxy server	Settings Window		代理服务器
+Darn!	WebPositive		该死！
+Decrease size	WebPositive Window		减小尺寸
+Default fixed font size:	Settings Window		默认固定字体大小：
+Sans serif font:	Settings Window		非衬线字体：
+Clear	WebPositive Window		清除
+The download could not be opened.	Download Window		不能打开该下载
+Cookies for %s	Cookie Manager		%s 的 Cookie
+Close	Download Window		关闭
+WebPositive	System name		WebPositive
+%s - Search term	Settings Window		%s - 搜索术语
+Reload	WebPositive Window		刷新
+Expiration	Cookie Manager		有效期
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		您的 CPU 太旧，不支持 SSE2 扩展，没有这些扩展，WebPositive 无法运行。我们建议改为安装 NetSurf。
+Download finished	Download Window		下载完成
+Cookie manager	WebPositive Window		Cookie管理器
+OK	Authentication Panel		确定
+Hide password text	Authentication Panel		隐藏密码文本
+Username:	Authentication Panel		用户名:
+Name	Cookie Manager		名称
+Remove finished	Download Window		移除已完成
+Earlier	WebPositive Window		更早
+Edit	WebPositive Window		编辑
+Back	WebPositive Window		返回
+Yesterday	WebPositive Window		昨天
+Quit	WebPositive		退出
+Download aborted	Download Window		下载中止
+Number of days to keep links in History menu:	Settings Window		在历史记录菜单中保留链接的天数：
+Password:	Authentication Panel		密码:
+Forward	WebPositive Window		前进
+Clear	Console Window		清除
+Cut	URL Bar		剪切
+View	WebPositive Window		视图
+Paste	URL Bar		粘贴
+Find next	WebPositive Window		查找下一个
+Open search page	Settings Window		打开搜索页面
+Increase size	WebPositive Window		增加大小
+New tab	WebPositive Window		新建标签
+Today	WebPositive Window		今天
+Open location	WebPositive Window		打开位置
+New browser window	Download Window		新建浏览窗口
+Open	Download Window		打开
+New window	WebPositive Window		新建窗口
+New windows:	Settings Window		新建窗口：
+The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	无法打开下载文件夹。\n\n错误: %error
+Cancel	Authentication Panel		取消
+Style:	Font Selection view		样式:
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	创建书签文件出错。\n\n错误：%error
+OK	Download Window		确定
+Proxy username:	Settings Window		代理用户名：
+Manage bookmarks	WebPositive Window		管理书签
+/s)	Download Window	...as in 'per second'	/秒)
+Restart	Download Window		重新启动
+Serif font:	Settings Window		线称字体：
+Apply	Settings Window		应用
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	尝试显示书签目录发生错误。\n\n错误：%error
+Revert	Settings Window		恢复
+Copy	WebPositive Window		复制
+Default standard font size:	Settings Window		默认标准字体大小：
+Custom	Settings Window		自定义
+Bookmark this page	WebPositive Window		添加页面到书签
+Show tabs if only one page is open	Settings Window		只打开一个页面时仍显示选项卡
+Close tab	WebPositive Window		关闭标签页
+Remove	Download Window		移除
+About	WebPositive Window		关于
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		仍有文件下载中，是否现在退出WebPositive?
+Continue downloads	WebPositive		继续下载
+Proxy server requires authentication	Settings Window		代理服务器需要认证
+Cancel	Settings Window		取消
+Reset size	WebPositive Window		重置大小
+History	WebPositive Window		历史
+Fixed font:	Settings Window		固定字体：
+Quit	WebPositive Window		退出
+Remember username and password for this site	Authentication Panel		记住这个网站的用户名和密码
+The cookie jar is empty!	Cookie Manager		Cookie列表是空的!
+Paste	WebPositive Window		粘贴
+Double-click or middle-click to open new tab.	Tab Manager		双击或者中键点击打开新标签页。
+Next	WebPositive Window		下一个
+Bookmark error	WebPositive Window		书签错误
+OK	WebPositive Window		确定
+Zoom text only	WebPositive Window		仅缩放文本
+Save page as…	WebPositive Window		页面保存为…
+Confirmation	WebPositive Window		确认
+Downloads	Download Window		下载
+Clear history	WebPositive Window		清空历史记录
+Cancel	WebPositive Window		取消

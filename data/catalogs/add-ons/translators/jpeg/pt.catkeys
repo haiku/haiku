@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-JPEGTranslator	2641716516
+1	portuguese	x-vnd.Haiku-JPEGTranslator	2677778269
 Show warning messages	JPEGTranslator		Mostrar mensagens de aviso
 None	JPEGTranslator		Nenhum
 About	JPEGTranslator		Acerca
@@ -6,5 +6,6 @@ Version %d.%d.%d	JPEGTranslator		Versão %d.%d.%d
 Use progressive compression	JPEGTranslator		Usar compressão progressiva
 Make file smaller (sligthtly worse quality)	JPEGTranslator		Reduzir tamanho do ficheiro (qualidade ligeiramente pior)
 High	JPEGTranslator		Alta
+Output quality	JPEGTranslator		Qualidade de saída
 Low	JPEGTranslator		Baixa
 JPEG images	JPEGTranslator		Imagens JPEG

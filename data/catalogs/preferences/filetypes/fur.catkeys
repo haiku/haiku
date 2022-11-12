@@ -2,7 +2,7 @@
 Left	Attribute Window	Attribute column alignment in Tracker	Çampe
 Float	Attribute ListView		Numar in virgule mobile
 Final	Application Types Window		Finâl
-FileTypes request	FileTypes Window		Richieste di FileTypes
+FileTypes request	FileTypes Window		Richieste di "Gjenars di file"
 This file type already exists	New File Type Window		Chest gjenar di file al esist za
 Preferred application	FileTypes Window		Aplicazion preferide
 Launch	Application Types Window		Invie
@@ -64,7 +64,7 @@ Select…	FileType Window		Selezione…
 Information	Application Types Window		Informazions
 Settings	FileTypes Window		Impostazions
 Done	Attribute Window		Fat
-FileTypes request	FileTypes		Richieste di FileTypes
+FileTypes request	FileTypes		Richieste di "Gjenars di file"
 Select same type as	FileType Window		Selezione il stes gjenar di
 Version:	Application Types Window		Version:
 (from application)	FileTypes Window		(de aplicazion)
@@ -95,7 +95,7 @@ Could not install file type	New File Type Window		Impussibil instalâ il gjenar 
 Same as…	FileTypes Window		Il stes di…
 Golden master	Application Type Window		Golden master
 Checkbox	Attribute ListView		Casele di selezion
-FileTypes request	Preferred App Menu		Richieste di FileTypes
+FileTypes request	Preferred App Menu		Richieste di "Gjenars di file"
 no icon	FileTypes Window		nissune icone
 Single launch	Application Type Window		Inviament singul
 %s file type	FileType Window		Gjenar di file %s
@@ -144,7 +144,7 @@ Open file	FileTypes		Vierç file
 Version info	Application Type Window		Informazions version
 Final	Application Type Window		Finâl
 Preferred application	FileType Window		Aplicazion preferide
-FileTypes	FileTypes		FileTypes
+FileTypes	FileTypes		Gjenars di file
 Set preferred application	Preferred App Menu		Stabilìs aplicazion preferide
 New file type	New File Type Window		Gnûf gjenar di file
 Short description:	Application Type Window		Descrizion curte:

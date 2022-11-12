@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-About	610468518
+1	greek, modern (1453-)	x-vnd.Haiku-About	2259131995
 Revision	AboutView		Αναθεώρηση
 The Haikuware team and their bounty program\n	AboutView		Η ομάδα της Haikuware και το πρόγραμμα επιδοτήσεων της\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Πνευματική ιδιοκτησία © 1999-2007 Michael C. Ring. Με επιφύλαξη παντός δικαιώματος.
@@ -38,6 +38,7 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Πνευ
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Πνευματική ιδιοκτησία © 1994-2009, Thomas G. Lane, Guido Vollbeding. Αυτό το λογισμικό βασίζεται εν μέρει σε έργο της Independent JPEG Group.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (ιδρυτής του έργου)\n\n
+Remove replicant	AboutView		Αφαίρεση ρεπλίκας
 BSD (3-clause)	AboutWindow		BSD (3-όρων)
 About this system	AboutWindow		Πληροφορίες συστήματος
 %d MiB used (%d%%)	AboutView		%d MiB σε χρήση (%d%%)

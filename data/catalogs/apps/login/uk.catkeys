@@ -1,9 +1,10 @@
-1	ukrainian	x-vnd.Haiku-Login	1584886353
+1	ukrainian	x-vnd.Haiku-Login	2920451831
 Invalid login!	Login View		Невірний логін!
 Error	Login App		Помилка
 Login application for Haiku\nUsage:	Login App		Авторизація для Haiku\nВикористання:
 --nonmodal\tDo not make the window modal	Login App		--nonmodal\tНе робити вікно модальним
 Welcome to Haiku	Login Window		Запрошуємо в Haiku
+--edit\tLaunch in shelf editing mode to allow customizing the desktop.	Login App		--edit\tЗапуск в режимі редагування, щоб пристосувати робочий стіл.
 Halt	Login View		Зупинити
 Desktop	Desktop Window		Робочий стіл
 Hide password	Login View		Приховати пароль

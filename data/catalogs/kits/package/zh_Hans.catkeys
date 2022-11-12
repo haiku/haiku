@@ -1,0 +1,10 @@
+1	english	x-vnd.Haiku-libpackage	134767648
+Fetching repository-cache from %url	RefreshRepositoryRequest		从 %url 获取仓库缓存
+Validating checksum for %repositoryName	RefreshRepositoryRequest		验证 %repositoryName 校验码
+Failed to remove transaction directory	PackageManagerKit		移除事务目录失败
+Failed to get config for repository \"%s\". Skipping.	PackageManagerKit		获取仓库 \"%s\" 配置失败。跳过该步骤。
+Refreshing repository \"%s\" failed	PackageManagerKit		刷新仓库 \"%s\" 失败
+Fetching repository checksum from %url	RefreshRepositoryRequest		从 %url 获取仓库校验码失败
+Failed to get repository names	PackageManagerKit		获取仓库名称失败
+Failed to get cache for repository \"%s\". Skipping.	PackageManagerKit		获取仓库 \"%s\" 缓存失败。跳过该步骤。
+Package %s-%s doesn't have a matching requires for its base package \"%s\"	PackageManagerKit		软件包 %s-%s 不存在与其基础软件包 \"%s\" 匹配的依赖
