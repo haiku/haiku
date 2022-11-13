@@ -11,7 +11,14 @@
 #include "TIFFTranslator.h"
 #include "TIFFView.h"
 
+#define TIFF_DISABLE_DEPRECATED
 #include "tiffio.h"
+
+#if __GNUC__ == 2
+#define TIFF_UINT32_TYPE uint32
+#else
+#define TIFF_UINT32_TYPE uint32_t
+#endif
 
 #include <Catalog.h>
 #include <stdio.h>
@@ -835,7 +842,7 @@ TIFFTranslator::translate_from_tiff(BPositionIO *inSource, BMessage *ioExtension
 		size_t npixels = 0;
 		npixels = width * height;
 		praster = static_cast<uint32 *>(_TIFFmalloc(npixels * 4));
-		if (praster && TIFFReadRGBAImage(ptif, width, height, praster, 0)) {
+		if (praster && TIFFReadRGBAImage(ptif, width, height, (TIFF_UINT32_TYPE*)praster, 0)) {
 			if (!bdataonly) {
 				// Construct and write Be bitmap header
 				TranslatorBitmap bitsHeader;
