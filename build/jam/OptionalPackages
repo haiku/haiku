@@ -151,7 +151,7 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 
 # Welcome
 if [ IsOptionalHaikuImagePackageAdded Welcome ] {
-	Echo AddHaikuImageSystemPackages
+	AddHaikuImageSystemPackages
 		haiku_userguide_ca
 		haiku_userguide_de
 		haiku_userguide_en
