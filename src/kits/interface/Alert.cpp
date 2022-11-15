@@ -21,6 +21,7 @@
 #include <Bitmap.h>
 #include <Button.h>
 #include <ControlLook.h>
+#include <Debug.h>
 #include <FindDirectory.h>
 #include <IconUtils.h>
 #include <LayoutBuilder.h>
@@ -747,14 +748,17 @@ TAlertView::Archive(BMessage* archive, bool deep) const
 void
 TAlertView::SetBitmap(BBitmap* icon)
 {
+	if (icon == NULL && fIconBitmap == NULL)
+		return;
+
+	ASSERT(icon != fIconBitmap);
+
 	BBitmap* oldBitmap = fIconBitmap;
 	fIconBitmap = icon;
+	Invalidate();
 
-	if (oldBitmap == NULL || (oldBitmap != NULL && icon == NULL)
-			|| (icon != NULL && oldBitmap->Bounds() != icon->Bounds())) {
+	if (oldBitmap == NULL || icon == NULL || oldBitmap->Bounds() != icon->Bounds())
 		InvalidateLayout();
-	} else
-		Invalidate();
 
 	delete oldBitmap;
 }
