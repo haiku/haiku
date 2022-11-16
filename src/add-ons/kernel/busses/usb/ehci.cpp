@@ -145,11 +145,6 @@ init_device(device_node* node, void** device_cookie)
 	pci_info *pciInfo = &bus->pciinfo;
 	pci->get_pci_info(device, pciInfo);
 
-	if (sPCIx86Module == NULL) {
-		if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module) != B_OK)
-			sPCIx86Module = NULL;
-	}
-
 	*device_cookie = bus;
 	return B_OK;
 }
@@ -162,10 +157,6 @@ uninit_device(void* device_cookie)
 	ehci_pci_sim_info* bus = (ehci_pci_sim_info*)device_cookie;
 	free(bus);
 
-	if (sPCIx86Module != NULL) {
-		put_module(B_PCI_X86_MODULE_NAME);
-		sPCIx86Module = NULL;
-	}
 }
 
 
@@ -230,12 +221,30 @@ module_dependency module_dependencies[] = {
 };
 
 
+static status_t
+device_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+			if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module) != B_OK)
+				sPCIx86Module = NULL;
+			return B_OK;
+		case B_MODULE_UNINIT:
+			if (sPCIx86Module != NULL)
+				put_module(B_PCI_X86_MODULE_NAME);
+			return B_OK;
+		default:
+			return B_ERROR;
+	}
+}
+
+
 static usb_bus_interface gEHCIPCIDeviceModule = {
 	{
 		{
 			EHCI_PCI_USB_BUS_MODULE_NAME,
 			0,
-			NULL
+			device_std_ops
 		},
 		NULL,  // supports device
 		NULL,  // register device
@@ -828,9 +837,6 @@ EHCI::~EHCI()
 			fPCIInfo->device, fPCIInfo->function);
 	}
 
-	put_module(B_PCI_MODULE_NAME);
-	if (sPCIx86Module != NULL)
-		put_module(B_PCI_X86_MODULE_NAME);
 }
 
 
