@@ -85,6 +85,9 @@ init_bus(device_node* node, void** bus_cookie)
 		return B_ERROR;
 	}
 
+	// let it settle to give explore a chance to run
+	snooze(1000);
+
 	*bus_cookie = xhci;
 
 	return B_OK;
