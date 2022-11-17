@@ -41,10 +41,12 @@ create_volume_label_sector(void *sector, const char *label)
 status_t
 check_volume_name(const char* name)
 {
-	if (name == NULL || strlen(name) >= 11
-		|| strchr(name, '/') != NULL) {
+	if (name == NULL)
 		return B_BAD_VALUE;
-	}
+	if (strlen(name) > 11)
+		return B_NAME_TOO_LONG;
+	if (strchr(name, '/') != NULL)
+		return B_BAD_VALUE;
 
 	return B_OK;
 }
