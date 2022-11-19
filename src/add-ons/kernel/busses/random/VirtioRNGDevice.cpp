@@ -24,24 +24,19 @@ get_feature_name(uint32 feature)
 
 VirtioRNGDevice::VirtioRNGDevice(device_node *node)
 	:
-	fNode(node),
 	fVirtio(NULL),
 	fVirtioDevice(NULL),
 	fStatus(B_NO_INIT),
-	fOffset(BUFFER_SIZE),
-	fExpectsInterrupt(false)
+	fExpectsInterrupt(false),
+	fDPCHandle(NULL)
 {
 	CALLED();
 
 	B_INITIALIZE_SPINLOCK(&fInterruptLock);
 	fInterruptCondition.Init(this, "virtio rng transfer");
 
-	get_memory_map(fBuffer, BUFFER_SIZE, &fEntry, 1);
-
 	// get the Virtio device from our parent's parent
-	device_node *parent = gDeviceManager->get_parent_node(node);
-	device_node *virtioParent = gDeviceManager->get_parent_node(parent);
-	gDeviceManager->put_node(parent);
+	device_node *virtioParent = gDeviceManager->get_parent_node(node);
 
 	gDeviceManager->get_driver(virtioParent, (driver_module_info **)&fVirtio,
 		(void **)&fVirtioDevice);
@@ -68,11 +63,31 @@ VirtioRNGDevice::VirtioRNGDevice(device_node *node)
 		ERROR("queue interrupt setup failed (%s)\n", strerror(fStatus));
 		return;
 	}
+
+	fStatus = gDPC->new_dpc_queue(&fDPCHandle, "virtio_rng timer",
+		B_LOW_PRIORITY);
+	if (fStatus != B_OK) {
+		ERROR("dpc setup failed (%s)\n", strerror(fStatus));
+		return;
+	}
+
+	if (fStatus == B_OK) {
+		fTimer.user_data = this;
+		fStatus = add_timer(&fTimer, &HandleTimerHook, 300 * 1000 * 1000, B_PERIODIC_TIMER);
+		if (fStatus != B_OK)
+			ERROR("timer setup failed (%s)\n", strerror(fStatus));
+	}
+
+	// trigger also now
+	gDPC->queue_dpc(fDPCHandle, HandleDPC, this);
 }
 
 
 VirtioRNGDevice::~VirtioRNGDevice()
 {
+	cancel_timer(&fTimer);
+	gDPC->delete_dpc_queue(fDPCHandle);
+
 }
 
 
@@ -84,46 +99,42 @@ VirtioRNGDevice::InitCheck()
 
 
 status_t
-VirtioRNGDevice::Read(void* _buffer, size_t* _numBytes)
+VirtioRNGDevice::_Enqueue()
 {
 	CALLED();
 
-	if (fOffset >= BUFFER_SIZE) {
-		{
-			InterruptsSpinLocker locker(fInterruptLock);
-			fExpectsInterrupt = true;
-			fInterruptCondition.Add(&fInterruptConditionEntry);
-		}
-		status_t result = fVirtio->queue_request(fVirtioQueue, NULL, &fEntry,
-			NULL);
-		if (result != B_OK) {
-			ERROR("queueing failed (%s)\n", strerror(result));
-			return result;
-		}
+	uint64 value = 0;
+	physical_entry entry;
+	get_memory_map(&value, sizeof(value), &entry, 1);
 
-		result = fInterruptConditionEntry.Wait(B_CAN_INTERRUPT);
-
-		{
-			InterruptsSpinLocker locker(fInterruptLock);
-			fExpectsInterrupt = false;
-		}
-
-		if (result == B_OK) {
-			fOffset = 0;
-		} else if (result != B_INTERRUPTED) {
-			ERROR("request failed (%s)\n", strerror(result));
-		}
+	{
+		InterruptsSpinLocker locker(fInterruptLock);
+		fExpectsInterrupt = true;
+		fInterruptCondition.Add(&fInterruptConditionEntry);
+	}
+	status_t result = fVirtio->queue_request(fVirtioQueue, NULL, &entry, NULL);
+	if (result != B_OK) {
+		ERROR("queueing failed (%s)\n", strerror(result));
+		return result;
 	}
 
-	if (fOffset < BUFFER_SIZE) {
-		size_t size = min_c(BUFFER_SIZE - fOffset, *_numBytes);
-		if (user_memcpy(_buffer, fBuffer + fOffset, size) != B_OK)
-			return B_BAD_ADDRESS;
-		fOffset += size;
-		*_numBytes = size;
-	} else
-		*_numBytes = 0;
-	return B_OK;
+	result = fInterruptConditionEntry.Wait(B_CAN_INTERRUPT);
+
+	{
+		InterruptsSpinLocker locker(fInterruptLock);
+		fExpectsInterrupt = false;
+	}
+
+	if (result == B_OK) {
+		if (value != 0) {
+			gRandom->queue_randomness(value);
+			TRACE("enqueue %" B_PRIx64 "\n", value);
+		}
+	} else if (result != B_OK && result != B_INTERRUPTED) {
+		ERROR("request failed (%s)\n", strerror(result));
+	}
+
+	return result;
 }
 
 
@@ -145,3 +156,22 @@ VirtioRNGDevice::_RequestInterrupt()
 	SpinLocker locker(fInterruptLock);
 	fInterruptCondition.NotifyAll();
 }
+
+
+/*static*/ int32
+VirtioRNGDevice::HandleTimerHook(struct timer* timer)
+{
+	VirtioRNGDevice* device = reinterpret_cast<VirtioRNGDevice*>(timer->user_data);
+
+	gDPC->queue_dpc(device->fDPCHandle, HandleDPC, device);
+	return B_HANDLED_INTERRUPT;
+}
+
+
+/*static*/ void
+VirtioRNGDevice::HandleDPC(void *arg)
+{
+	VirtioRNGDevice* device = reinterpret_cast<VirtioRNGDevice*>(arg);
+	device->_Enqueue();
+}
+

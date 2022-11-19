@@ -286,10 +286,28 @@ kill_chrand(ch_randgen *randgen)
 
 
 //	#pragma mark -
-//	Random interface
 
 
-static status_t
+status_t
+yarrow_init()
+{
+	CALLED();
+	sRandomEnv = new_chrand(8);
+	if (sRandomEnv == NULL)
+		return B_NO_MEMORY;
+	return B_OK;
+}
+
+
+void
+yarrow_uninit()
+{
+	CALLED();
+	kill_chrand(sRandomEnv);
+}
+
+
+status_t
 yarrow_rng_read(void* cookie, void *_buffer, size_t *_numBytes)
 {
 	if (!IS_USER_ADDRESS(_buffer))
@@ -323,7 +341,7 @@ yarrow_rng_read(void* cookie, void *_buffer, size_t *_numBytes)
 }
 
 
-static status_t
+status_t
 yarrow_rng_write(void* cookie, const void *_buffer, size_t *_numBytes)
 {
 	OCTET *buffer = (OCTET*)_buffer;
@@ -342,54 +360,9 @@ yarrow_rng_write(void* cookie, const void *_buffer, size_t *_numBytes)
 }
 
 
-//	#pragma mark -
-
-
-static status_t
-yarrow_init_bus(device_node* node, void** bus_cookie)
+void
+yarrow_enqueue_randomness(const uint64 value)
 {
 	CALLED();
-	sRandomEnv = new_chrand(8);
-	if (sRandomEnv == NULL)
-		return B_NO_MEMORY;
-	return B_OK;
+	chseed(sRandomEnv, value);
 }
-
-
-static void
-yarrow_uninit_bus(void* bus_cookie)
-{
-	CALLED();
-	kill_chrand(sRandomEnv);
-}
-
-
-static void
-yarrow_bus_removed(void* bus_cookie)
-{
-	return;
-}
-
-
-//	#pragma mark -
-
-
-random_module_info gYarrowRandomModule = {
-	{
-		{
-			YARROW_RNG_SIM_MODULE_NAME,
-			0,
-			NULL
-		},
-
-		NULL, // supports_device,
-		NULL, // register_device,
-		yarrow_init_bus,
-		yarrow_uninit_bus,
-		NULL,	// register child devices
-		NULL,	// rescan
-		yarrow_bus_removed,
-	},
-	yarrow_rng_read,
-	yarrow_rng_write
-};
