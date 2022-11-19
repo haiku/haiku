@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	2915475646
+1	romanian	x-vnd.Haiku-libtracker	3915129360
 Created	ContainerWindow		Creat
 Icon	AttributesView		Pictogramă
 Open and make preferred	OpenWithWindow		Deschide și face preferat
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Pictogramă bitmap mică
 Would you like to find a suitable application to open the file?	FSUtils		Doriți să găsiți o aplicație potrivită pentru a deschide fișierul?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Nu puteți înlocui un dosar sau o legătură simbolică printr-un fișier.
+(unknown)	InfoWindow		(necunoscut)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# dates>}}
 Trailing \\.	libtracker		În urmă \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		La %func \nfind_directory() a eșuat. \nMotiv: %error
@@ -167,6 +168,7 @@ Read	FilePermissionsView		Citit
 There was an error writing the attribute.	WidgetAttributeText		A apărut o eroare la scrierea atributului.
 Path	Default Query Columns		Cale
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Dacă redenumiți %target, este posibil ca %osName să nu funcționeze corespunzător!\n\nSigur doriți să faceți asta?
+Filesystem:	InfoWindow		Sistem de fișiere:
 Could not open \"%name\" (%error). 	FSUtils		Nu s-a putut deschide \„%name\” (%error). 
 Media parameter group	AttributesView		Grup de parametri media
 %name info	InfoWindow	InfoWindow Title	informații %name
@@ -493,6 +495,7 @@ Duplicate	ContainerWindow		Duplică
 16-bit integer	AttributesView		întreg pe 16 biți
 Untitled clipping	PoseView		Tăietură fără nume
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Fișierul \„%name\” există deja în dosarul specificat. Doriți să îl înlocuiți?
+, indexed	InfoWindow		, indexat
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Trebuie să plasați elementele pe una din pictogramele de disc în fereastra \„Disks\”.
 Version:	InfoWindow		Versiune:
 OK	PoseView		OK

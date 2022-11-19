@@ -28,7 +28,7 @@ Unmount	ContainerWindow		Dismonte
 Eject when unmounting	AutoMounterSettings		Pare fûr une volte che al è dismontât
 Searching for disks to mount…	StatusWindow		Daûr a cirî discs di montâ…
 Value	AttributesView		Valôr
-Information	InfoWindow		Informazion
+Information	InfoWindow		Informazions
 Error emptying Trash	FSUtils		Erôr tal disvuedâ la scovacere
 Opens with:	InfoWindow		Vierç cun:
 Size	QueryPoseView		Dimension
@@ -117,14 +117,14 @@ Edit templates…	TemplatesMenu		Modifiche modei…
 8-bit unsigned integer	AttributesView		Intîr cence segn a 8 bit
 %s info	InfoWindow	window title	Informazions su %s
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used doprât -- %free libar)
-Hide dotfiles	SettingsView		Plate i file .*
+Hide dotfiles	SettingsView		Plate i files .*
 Trash	Model		Scovacere
-Enable type-ahead filtering	SettingsView		Abilite filtri scriture anticipade
+Enable type-ahead filtering	SettingsView		Abilite filtri pe ricercje datilografant
 copy	FSUtils	filename copy	copie
 New folder%ld	FSUtils		Gnove cartele%ld
 Location	OpenWithWindow		Posizion
 %Ld B	WidgetAttributeText		%Ld B
-Resize to fit	QueryContainerWindow		Jemple
+Resize to fit	QueryContainerWindow		Adate
 List folders first	SettingsView		Liste prime lis cartelis
 Find	FSUtils		Cjate
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Un element clamât \"%name\" al esist za in cheste cartele. Sostituîlu cul colegament simbolic che si sta creant?
@@ -233,7 +233,7 @@ Select…	DeskWindow		Selezione…
 Files cannot be moved or deleted from a read-only volume.	PoseView		No si pues spostâ o eliminâ i file di un volum in dome-leture.
 Edit name	FilePanelPriv		Modifiche non
 There was an error deleting \"%name\":\n\t%error	FSUtils		Si è presentât un erôr tal eliminâ \"%name\":\n\t%error
-Resize to fit	ContainerWindow		Jemple
+Resize to fit	ContainerWindow		Adate
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Coleghe \"%name\" a:
 Mount server error	AutoMounterSettings		Erôr dal servidôr di montaç
 If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Se si cambie non ae cartele home, %osName al funzionarà mâl!\n\nContinuâ pardabon?\n\nPar cambiâ non distès ae cartele home (chê personâl), ten fracât il tast Maiusc e fâs clic su \"Cambie non\".

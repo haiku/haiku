@@ -13,7 +13,7 @@ Fixed font:	Font view		等幅フォント:
 Appearance	System name		外観
 Reduce colored edges filter strength:	AntialiasingSettingsView		カラーエッジフィルターの強度を下げる:
 Glyph hinting:	AntialiasingSettingsView		グリフのヒンティング:
-Default Haiku ControlLook	DecorSettingsView		規定の Haiku のコントロール表示
+Default Haiku ControlLook	DecorSettingsView		デフォルトの Haiku のコントロール表示
 Menu item text	Colors tab		メニュー項目の文字
 About decorator	DecorSettingsView		デコレーターについて
 Antialiasing menu	AntialiasingSettingsView		アンチエイリアスメニュー

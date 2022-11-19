@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-About	2716326225
+1	portuguese	x-vnd.Haiku-About	2259131995
 Revision	AboutView		Revisão
 The Haikuware team and their bounty program\n	AboutView		À equipa do Haikuware e ao seu programa de recompensas\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Todos os direitos reservados.
@@ -38,6 +38,7 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyrigh
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Este software é baseado em parte no trabalho do Independent JPEG Group.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fundador do projecto)\n\n
+Remove replicant	AboutView		Remover replicante
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 About this system	AboutWindow		Sobre este sistema
 %d MiB used (%d%%)	AboutView		%d MiB usados (%d%%)
@@ -64,6 +65,7 @@ Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutVie
 Version:	AboutView		Versão:
 The BeGeistert team\n	AboutView		À equipa da BeGeistert\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
+Intel (2xxx firmware)	AboutWindow		Intel (firmware 2xxx)
 License: 	AboutView		Licença: 
 GNU GPL v2	AboutWindow		GNU GPL v2
 The University of Auckland and Christof Lutteroth\n\n	AboutView		A Universidade de Auckland e Christof Lutteroth\n\n
@@ -82,5 +84,6 @@ BSD (2-clause)	AboutWindow		BSD (2-clause)
 Website & marketing:\n	AboutView		Website & marketing:\n
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001 por Andy Ritger baseado na Generalized Timing Formula
 …and the many people making donations!\n\n	AboutView		…e às muitas pessoas que têm feito donativos!\n\n
+Marvell (firmware)	AboutWindow		Marvell (firmware)
 BSD (4-clause)	AboutWindow		BSD (4-clause)
 BITSTREAM CHARTER is a registered trademark of Bitstream Inc.	AboutView		BITSTREAM CHARTER é uma marca registada de Bitstream Inc.

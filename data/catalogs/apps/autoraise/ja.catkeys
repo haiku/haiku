@@ -9,7 +9,7 @@ Delay	AutoRaiseIcon		遅延時間
 5 s	AutoRaiseIcon		5 秒
 Active	AutoRaiseIcon		有効
 0.1 s	AutoRaiseIcon		0.1 秒
-Default (all windows)	AutoRaiseIcon		デフォルト(すべてのウィンドウ)
+Default (all windows)	AutoRaiseIcon		既定値(すべてのウィンドウ)
 Instant warping (ffm)	AutoRaiseIcon		インスタントワープ(ffm)
 About AutoRaise…	AutoRaiseIcon		AutoRaiseについて...
 Normal	AutoRaiseIcon		標準

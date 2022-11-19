@@ -10,7 +10,7 @@ dB	AudioMixer		dB
 Gain controls	AudioMixer		Controi di vuadagn
 Low quality (drop/repeat samples)	AudioMixer		Basse cualitât (campions di scartâ/ripeti)
 Output channel sources	AudioMixer		Sorzints canâi di jessude
-Allow input channel remapping	AudioMixer		Permet modifiche di mapadure dal canâl di jentrade
+Allow input channel remapping	AudioMixer		Permet di tornâ a mapâ i canâi di di jentrade
 Display balance control for stereo connections	AudioMixer		Mostre controi di belançament pes conessions stereo
 Setup	AudioMixer		Configurazion
 Physical input channels	AudioMixer		Canâi di jentrade fisics

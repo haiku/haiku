@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-DriveSetup	4048496535
+1	portuguese	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		Não foi possível desmontar a partição %s.
 Mount all	MainWindow		Montar todos
 Disk	MainWindow		Disco
@@ -14,6 +14,7 @@ Block size	PartitionList		Tamanho de bloco
 The panel experienced a problem!	MainWindow		O painel encontrou um problema!
 Device	DiskView		Dispositivo
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Tem a certeza de que pretende formatar a Partição Estendida Intel? Quaisquer sub-partições que ela contenha serão sobrescritas se continuar. Ser-lhe-á perguntado novamente antes das alterações serem escritas para o disco.
+Physical block size	PartitionList		Tamanho de bloco físico
 Unmount	MainWindow		Desmontar
 Failed to format the partition %s!\n	MainWindow		Ocorreu uma falha ao formatar a partição %s!\n
 Partition size	CreateParametersPanel		Tamanho de partição

@@ -1,8 +1,9 @@
-1	portuguese	x-vnd.Haiku-MediaConverter	1322040280
+1	portuguese	x-vnd.Haiku-MediaConverter	2816184527
 Input file not recognized as Audio or Video	MediaConverter		Ficheiro de entrada não reconhecido como Áudio ou Vídeo
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Qualidade de vídeo: %3d%%
 Source files	MediaConverter		Ficheiros de origem
+Error writing video frame %lld	MediaConverter		Erro ao escrever quadro de vídeo %lld
 Error converting '%filename'	MediaConverter		Erro ao converter '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Pasta selecionada não encontrada. A utilizar /boot/home
 Conversion completed	MediaConverter		Conversão concluída
@@ -47,12 +48,16 @@ Error	MediaConverter		Erro
 File details	MediaConverter		Detalhes do ficheiro
 No audio	Audio codecs list		Sem áudio
 Drop media files onto this window	MediaConverter		Largue ficheiros multimédia sobre esta janela
+Writing video track: %ld%% complete	MediaConverter		A escrever faixa de vídeo: %ld%% concluído
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# quadro} other{# quadros}}
+Error read audio frame %lld	MediaConverter		Erro ao ler quadro de áudio %lld
 Quit	Menu		Sair
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
 Duration:	MediaConverter-FileInfo		Duração:
 MediaConverter	System name		Conversor de Multimédia
 Error launching: %strError%	MediaConverter		Erro ao iniciar: %strError%
+Error writing audio frame %lld	MediaConverter		Erro ao escrever quadro de áudio %lld
+Writing audio track: %ld%% complete	MediaConverter		A escrever faixa de áudio: %ld%% concluído
 File format:	MediaConverter		Formato de ficheiro:
 File	Menu		Ficheiro
 Video quality not supported	MediaConverter		Qualidade de vídeo não suportada
@@ -64,5 +69,6 @@ Continue	MediaConverter		Continuar
 Convert	MediaConverter		Converter
 Audio quality not supported	MediaConverter		Qualidade de áudio não suportada
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Erro ao escrever na localização: %strPath%. A utilizar a localização: /boot/home
+Error read video frame %lld	MediaConverter		Erro ao ler quadro de vídeo %lld
 Preview	MediaConverter		Pré-visualizar
 Start [ms]: 	MediaConverter		Início [ms]: 

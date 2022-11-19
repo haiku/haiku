@@ -48,7 +48,7 @@ Reboot	SoftwareUpdaterWindow		再起動
 Show more details	SoftwareUpdaterWindow		詳細の表示
 Installing version	SoftwareUpdaterWindow	List item text	インストール中のバージョン
 Checking for updates	CheckManager		更新の確認中
-No remote repositories are available	UpdateManager	Error message	リモートのリポジトリは利用できません。
+No remote repositories are available	UpdateManager	Error message	リモートリポジトリは利用できません。
 Software {0, plural, one{update} other{updates}} available	CheckManager		{0, plural, one{個の} other{個の}}ソフトウェアアップデートが利用できます
 Reboot	SoftwareUpdaterWindow	Button label	再起動
 Update	SoftwareUpdaterWindow	Alert button label	更新

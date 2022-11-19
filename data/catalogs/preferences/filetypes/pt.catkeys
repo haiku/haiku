@@ -134,7 +134,7 @@ Supported types	Application Type Window		Tipos suportados
 Integer 32 bit	Attribute ListView		Inteiro de 32 bits
 Beta	Application Type Window		Beta
 Could not retrieve preferred application of this file	Preferred App Menu		Não foi possível encontrar a aplicação preferida deste ficheiro
-Application flags	Application Type Window		Sinalizadores da aplicação
+Application flags	Application Type Window		Atributos da aplicação
 OK	FileTypes		OK
 Group name:	New File Type Window		Nome do grupo:
 Move up	FileTypes Window		Mover para cima
