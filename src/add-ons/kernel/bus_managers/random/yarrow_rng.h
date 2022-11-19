@@ -14,15 +14,23 @@
 #include "random.h"
 
 
-#define YARROW_RNG_SIM_MODULE_NAME "bus_managers/random/yarrow_rng/device/v1"
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+status_t yarrow_init();
+void yarrow_uninit();
+void yarrow_enqueue_randomness(const uint64 value);
 
-extern random_module_info gYarrowRandomModule;
+status_t yarrow_rng_read(void* cookie, void *_buffer, size_t *_numBytes);
+status_t yarrow_rng_write(void* cookie, const void *_buffer, size_t *_numBytes);
+
+
+#define RANDOM_INIT yarrow_init
+#define RANDOM_UNINIT yarrow_uninit
+#define RANDOM_ENQUEUE yarrow_enqueue_randomness
+#define RANDOM_READ yarrow_rng_read
+#define RANDOM_WRITE yarrow_rng_write
 
 
 #ifdef __cplusplus

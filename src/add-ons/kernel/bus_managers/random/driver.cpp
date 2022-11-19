@@ -34,7 +34,6 @@
 
 
 static mutex sRandomLock;
-static random_module_info *sRandomModule;
 static void *sRandomCookie;
 device_manager_info* gDeviceManager;
 
@@ -42,6 +41,15 @@ device_manager_info* gDeviceManager;
 typedef struct {
 	device_node*			node;
 } random_driver_info;
+
+
+static status_t
+random_queue_randomness(uint64 value)
+{
+	MutexLocker locker(&sRandomLock);
+	RANDOM_ENQUEUE(value);
+	return B_OK;
+}
 
 
 //	#pragma mark - device module API
@@ -74,7 +82,7 @@ random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 	TRACE("read(%Ld,, %ld)\n", position, *_numBytes);
 
 	MutexLocker locker(&sRandomLock);
-	return sRandomModule->read(sRandomCookie, _buffer, _numBytes);
+	return RANDOM_READ(sRandomCookie, _buffer, _numBytes);
 }
 
 
@@ -83,11 +91,7 @@ random_write(void *cookie, off_t position, const void *buffer, size_t *_numBytes
 {
 	TRACE("write(%Ld,, %ld)\n", position, *_numBytes);
 	MutexLocker locker(&sRandomLock);
-	if (sRandomModule->write == NULL) {
-		*_numBytes = 0;
-		return EINVAL;
-	}
-	return sRandomModule->write(sRandomCookie, buffer, _numBytes);
+	return RANDOM_WRITE(sRandomCookie, buffer, _numBytes);
 }
 
 
@@ -187,6 +191,7 @@ random_init_driver(device_node *node, void **cookie)
 		return B_NO_MEMORY;
 
 	mutex_init(&sRandomLock, "/dev/random lock");
+	RANDOM_INIT();
 
 	memset(info, 0, sizeof(*info));
 
@@ -201,6 +206,8 @@ static void
 random_uninit_driver(void *_cookie)
 {
 	CALLED();
+
+	RANDOM_UNINIT();
 
 	mutex_destroy(&sRandomLock);
 
@@ -220,36 +227,8 @@ random_register_child_devices(void* _cookie)
 		gDeviceManager->publish_device(info->node, "urandom",
 			RANDOM_DEVICE_MODULE_NAME);
 	}
-
-	// add the default Yarrow RNG
-	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-			{ string: "Yarrow RNG" }},
-		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
-			{ string: RANDOM_FOR_CONTROLLER_MODULE_NAME }},
-		{ NULL }
-	};
-
-	device_node* node;
-	return gDeviceManager->register_node(info->node,
-		YARROW_RNG_SIM_MODULE_NAME, attrs, NULL, &node);
-}
-
-
-//	#pragma mark -
-
-
-status_t
-random_added_device(device_node *node)
-{
-	CALLED();
-
-	status_t status = gDeviceManager->get_driver(node,
-		(driver_module_info **)&sRandomModule, &sRandomCookie);
-
 	return status;
 }
-
 
 
 //	#pragma mark -
@@ -311,11 +290,13 @@ random_for_controller_interface sRandomForControllerModule = {
 		},
 
 		NULL, // supported devices
-		random_added_device,
+		NULL,
 		NULL,
 		NULL,
 		NULL
-	}
+	},
+
+	random_queue_randomness,
 };
 
 
@@ -323,6 +304,5 @@ module_info* modules[] = {
 	(module_info*)&sRandomDriver,
 	(module_info*)&sRandomDevice,
 	(module_info*)&sRandomForControllerModule,
-	(module_info*)&gYarrowRandomModule,
 	NULL
 };
