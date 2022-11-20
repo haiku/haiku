@@ -23,7 +23,14 @@ main(int argc, char **argv)
 	int i;
 
 	for (i = 1; i < argc; i++) {
-		if (!strcmp(argv[i], "-s"))
+		if (!strcmp(argv[i], "-h")) {
+			printf("Usage: %s [-s] [optionName]\n"
+				"Prints the value of a kernel safemode option, "
+				"(default is safemode boot itself).\n\n"
+				"  -s\t\tReturn the real string result, not a boolean.\n",
+				argv[0]);
+			return 0;
+		} else if (!strcmp(argv[i], "-s"))
 			realString = true;
 		else
 			optionName = argv[i];
