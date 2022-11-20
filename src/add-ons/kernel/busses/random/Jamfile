@@ -7,3 +7,7 @@ KernelAddon virtio_rng :
 	virtio_rng.cpp
 	VirtioRNGDevice.cpp
 ;
+
+
+SubInclude HAIKU_TOP src add-ons kernel busses random ccp ;
+

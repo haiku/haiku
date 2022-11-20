@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src add-ons kernel busses random ccp ;
+
+UsePrivateHeaders drivers ;
+UsePrivateKernelHeaders ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) bus_managers acpi acpica include ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) $(DOTDOT) bus_managers acpi acpica include platform ] ;
+
+
+KernelAddon ccp_rng :
+	ccp.cpp
+	ccp_acpi.cpp
+	ccp_pci.cpp
+;

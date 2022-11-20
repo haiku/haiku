@@ -621,6 +621,13 @@ struct pci_module_info {
 #define PCI_wireless_other			0x80
 
 /* ---
+	values for the class_sub field for class_base = 0x10 (encryption decryption)
+--- */
+#define PCI_encryption_decryption_network_computing		0x00
+#define PCI_encryption_decryption_entertainment			0x10
+#define PCI_encryption_decryption_other					0x80
+
+/* ---
 	values for the class_sub field for class_base = 0x11 (data acquisition)
 --- */
 #define PCI_data_acquisition_dpio	0x00

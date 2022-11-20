@@ -30,7 +30,7 @@ AddFilesToPackage add-ons kernel busses ata
 
 AddFilesToPackage add-ons kernel busses i2c : pch_i2c@x86,x86_64 ;
 AddFilesToPackage add-ons kernel busses mmc : sdhci_pci ;
-AddFilesToPackage add-ons kernel busses random : virtio_rng ;
+AddFilesToPackage add-ons kernel busses random : ccp_rng@x86,x86_64 virtio_rng ;
 AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
 AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci
 	<usb>xhci ;

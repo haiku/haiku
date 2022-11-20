@@ -1727,6 +1727,16 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 						break;
 				}
 				break;
+			case PCI_encryption_decryption:
+				switch (subType) {
+					case PCI_encryption_decryption_other:
+						_AddPath(*stack, "busses", "random");
+						break;
+					default:
+						_AddPath(*stack, "drivers");
+						break;
+				}
+				break;
 			case PCI_data_acquisition:
 				switch (subType) {
 					case PCI_data_acquisition_other:
@@ -1874,7 +1884,14 @@ device_node::_AlwaysRegisterDynamic()
 	get_attr_uint16(this, B_DEVICE_TYPE, &type, false);
 	get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false);
 
-	return type == PCI_serial_bus || type == PCI_bridge || type == 0;
+	switch (type) {
+		case PCI_serial_bus:
+		case PCI_bridge:
+		case PCI_encryption_decryption:
+		case 0:
+			return true;
+	}
+	return false;
 		// TODO: we may want to be a bit more specific in the future
 }
 
