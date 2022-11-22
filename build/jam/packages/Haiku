@@ -48,7 +48,7 @@ AddFilesToPackage add-ons kernel generic
 AddFilesToPackage add-ons kernel partitioning_systems
 	: amiga_rdb@m68k apple@ppc sun@sparc efi_gpt intel session ;
 AddFilesToPackage add-ons kernel interrupt_controllers : openpic@ppc ;
-AddFilesToPackage add-ons kernel power cpufreq : intel_pstates@x86,x86_64 ;
+AddFilesToPackage add-ons kernel power cpufreq : amd_pstates@x86,x86_64 intel_pstates@x86,x86_64 ;
 AddFilesToPackage add-ons kernel power cpuidle : intel_cstates@x86,x86_64 ;
 
 if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {

@@ -129,6 +129,24 @@
 #define MSR_F10H_DE_CFG					0xc0011029
 #define 	DE_CFG_SERIALIZE_LFENCE			(1 << 1)
 
+#define MSR_AMD_CPPC_CAP1				0xc00102b0
+#define		AMD_CPPC_LOWEST_PERF(x)		((x) & 0xff)
+#define		AMD_CPPC_LOWNONLIN_PERF(x)	((x >> 8) & 0xff)
+#define		AMD_CPPC_NOMINAL_PERF(x)	((x >> 16) & 0xff)
+#define		AMD_CPPC_HIGHEST_PERF(x)	((x >> 24) & 0xff)
+#define MSR_AMD_CPPC_ENABLE				0xc00102b1
+#define MSR_AMD_CPPC_REQ				0xc00102b3
+#define		AMD_CPPC_MAX_PERF(x)		((x) & 0xff)
+#define		AMD_CPPC_MIN_PERF(x)		(((x) & 0xff) << 8)
+#define		AMD_CPPC_DES_PERF(x)		(((x) & 0xff) << 16)
+#define		AMD_CPPC_EPP_PERF(x)		(((x) & 0xff) << 24)
+
+#define		AMD_CPPC_EPP_PERFORMANCE			0x00
+#define		AMD_CPPC_EPP_BALANCE_PERFORMANCE	0x80
+#define		AMD_CPPC_EPP_BALANCE_POWERSAVE		0xbf
+#define		AMD_CPPC_EPP_POWERSAVE				0xff
+#define MSR_AMD_CPPC_STATUS				0xc00102b4
+
 
 // Hardware P-States MSR registers §14.4.1
 // reference https://software.intel.com/content/dam/develop/public/us/en/documents/253669-sdm-vol-3b.pdf
@@ -359,6 +377,7 @@
 #define IA32_FEATURE_AMD_SSBD		(1 << 24)	// Speculative Store Bypass Disable
 #define IA32_FEATURE_VIRT_SSBD		(1 << 25)	// Virtualized Speculative Store Bypass Disable
 #define IA32_FEATURE_AMD_SSB_NO		(1 << 26)	// Speculative Store Bypass is fixed in hardware
+#define IA32_FEATURE_CPPC			(1 << 27)	// Collaborative Processor Performance Control
 
 
 // Memory type ranges
