@@ -883,6 +883,8 @@ intel_extreme_init(intel_info &info)
 		uint32 lcpll = read32(info, LCPLL_CTL);
 		if ((lcpll & LCPLL_CD_SOURCE_FCLK) != 0)
 			info.shared_info->hw_cdclk = 800000;
+		else if ((read32(info, FUSE_STRAP) & HSW_CDCLK_LIMIT) != 0)
+			info.shared_info->hw_cdclk = 450000;
 		else if ((lcpll & LCPLL_CLK_FREQ_MASK) == LCPLL_CLK_FREQ_450)
 			info.shared_info->hw_cdclk = 450000;
 		else if ((lcpll & LCPLL_CLK_FREQ_MASK) == LCPLL_CLK_FREQ_54O_BDW)
@@ -895,6 +897,8 @@ intel_extreme_init(intel_info &info)
 		uint32 lcpll = read32(info, LCPLL_CTL);
 		if ((lcpll & LCPLL_CD_SOURCE_FCLK) != 0)
 			info.shared_info->hw_cdclk = 800000;
+		else if ((read32(info, FUSE_STRAP) & HSW_CDCLK_LIMIT) != 0)
+			info.shared_info->hw_cdclk = 450000;
 		else if ((lcpll & LCPLL_CLK_FREQ_MASK) == LCPLL_CLK_FREQ_450)
 			info.shared_info->hw_cdclk = 450000;
 		/* ULT type is missing

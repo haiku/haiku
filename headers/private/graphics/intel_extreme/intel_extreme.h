@@ -927,6 +927,9 @@ struct intel_brightness_legacy {
 #define LCPLL_CLK_FREQ_337_5_BDW		(2 << 26)
 #define LCPLL_CD_SOURCE_FCLK			(1 << 21)
 
+#define FUSE_STRAP						0x42014
+#define		HSW_CDCLK_LIMIT				(1 << 24)
+
 // display
 
 #define INTEL_DISPLAY_OFFSET			0x1000
