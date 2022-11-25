@@ -640,6 +640,8 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "virt_ssbd ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_AMD_SSB_NO)
 		strlcat(features, "amd_ssb_no ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_CPPC)
+		strlcat(features, "cppc ", sizeof(features));
 	dprintf("CPU %d: features: %s\n", currentCPU, features);
 }
 #endif	// DUMP_FEATURE_STRING
