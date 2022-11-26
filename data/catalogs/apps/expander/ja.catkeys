@@ -22,7 +22,7 @@ Cancel	ExpanderPreferences		中止
 Expansion	ExpanderPreferences		解凍
 Select	DirectoryFilePanel		選択
 The folder was either moved, renamed or not supported.	ExpanderWindow		フォルダーは移動したか、名前が変更されたか、サポートされてないかのいずれかです。
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		展開先のフォルダーがありません。作成してもよろしいですか?
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		解凍先のフォルダーがありません。作成してもよろしいですか?
 Same directory as source (archive) file	ExpanderPreferences		書庫ファイル (アーカイブ) と同じ
 Settings	ExpanderMenu		設定
 Settings…	ExpanderMenu		設定...
@@ -33,7 +33,7 @@ Automatically show contents listing	ExpanderPreferences		内容リストを自�
 OK	ExpanderPreferences		OK
 Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		本当にこのアーカイブの解凍を中止しますか? 解凍されたアイテムは完全ではないかもしれません。
 Leave destination folder path empty	ExpanderPreferences		解凍時に指定
-Failed to create the destination folder.	ExpanderWindow		展開先のフォルダーを作成できません。
+Failed to create the destination folder.	ExpanderWindow		解凍先のフォルダーを作成できません。
 Select '%s'…	DirectoryFilePanel		'%s' を選択...
 Create	ExpanderWindow		作成
 The file doesn't exist	ExpanderWindow		ファイルがありません

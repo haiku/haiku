@@ -2,7 +2,7 @@
 Loop	RecorderWindow		繰り返し
 Cannot find default audio hardware	RecorderWindow		デフォルトのオーディオハードウェアが見つかりません
 Cannot find the temporary file created to hold the new recording	RecorderWindow		新しいレコーディングを保存する一時ファイルが見つかりません
-Sample size:	RecorderWindow		ビット深度:
+Sample size:	RecorderWindow		量子化ビット数:
 Nothing to play	RecorderWindow		再生できません
 None of the files appear to be audio files.	RecorderWindow		ファイルはすべてオーディオファイルでは無いようです。
 Duration: 	RecorderWindow		再生時間:
@@ -28,7 +28,7 @@ Channels:	RecorderWindow		チャンネル:
  bits	RecorderWindow		 ビット
 None	RecorderWindow		無し
 Record	RecorderWindow		録音
-Sample size: 	RecorderWindow		ビット深度: 
+Sample size: 	RecorderWindow		量子化ビット数: 
 Cannot recognize this file as a media file	RecorderWindow		ファイルをメディアファイルとして認識できません
 Format: 	RecorderWindow		フォーマット:
 File name: 	RecorderWindow		ファイル名:
