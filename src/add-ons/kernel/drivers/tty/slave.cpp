@@ -71,11 +71,9 @@ slave_open(const char *name, uint32 flags, void **_cookie)
 		}
 	} else if (makeControllingTTY) {
 		// If already open, we allow only processes from the same session
-		// to open the tty again.
+		// to open the tty again while becoming controlling tty
 		pid_t ttySession = gSlaveTTYs[index].settings->session_id;
 		if (ttySession >= 0) {
-			if (ttySession != sessionID)
-				return B_NOT_ALLOWED;
 			makeControllingTTY = false;
 		} else {
 			// The tty is not associated with a session yet. The process needs
