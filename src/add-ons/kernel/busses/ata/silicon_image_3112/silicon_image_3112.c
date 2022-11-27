@@ -274,8 +274,8 @@ controller_init(device_node *node, void **_controllerCookie)
 	FLOW("controller %p\n", controller);
 
 	mmioArea = map_physical_memory("Silicon Image SATA regs", mmioBase,
-		kASICData[asicIndex].mmio_bar_size, B_ANY_KERNEL_ADDRESS, 0,
-		(void **)&mmioAddr);
+		kASICData[asicIndex].mmio_bar_size, B_ANY_KERNEL_ADDRESS,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void **)&mmioAddr);
 	if (mmioArea < B_OK) {
 		TRACE("controller_init: mapping memory failed\n");
 		free(controller);
