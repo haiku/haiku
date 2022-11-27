@@ -116,12 +116,9 @@ arch_vm_translation_map_init(kernel_args *args,
 		TRACE("  %" B_PRIxPHYSADDR " - %" B_PRIxPHYSADDR "\n", start, end);
 	}
 #endif
-	
-	{
-		SatpReg satp(Satp());
-		sPageTable = satp.ppn * B_PAGE_SIZE;
-	}
-	
+
+	sPageTable = SatpReg{.val = Satp()}.ppn * B_PAGE_SIZE;
+
 	dprintf("physMapBase: %#" B_PRIxADDR "\n", args->arch_args.physMap.start);
 	dprintf("physMemBase: %#" B_PRIxADDR "\n", args->physical_memory_range[0].start);
 	gVirtFromPhysOffset = args->arch_args.physMap.start - args->physical_memory_range[0].start;

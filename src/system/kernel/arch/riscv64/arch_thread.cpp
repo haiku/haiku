@@ -148,7 +148,7 @@ arch_thread_enter_userspace(Thread *thread, addr_t entry, void *arg1,
 	iframe frame;
 	memset(&frame, 0, sizeof(frame));
 
-	SstatusReg status(Sstatus());
+	SstatusReg status{.val = Sstatus()};
 	status.pie = (1 << modeS); // enable interrupts when enter userspace
 	status.spp = modeU;
 
@@ -381,7 +381,7 @@ arch_restore_fork_frame(struct arch_fork_arg *arg)
 
 	arch_stack* stackHeader = (arch_stack*)thread_get_current_thread()->kernel_stack_top - 1;
 	stackHeader->thread = thread_get_current_thread();
-	SstatusReg status(Sstatus());
+	SstatusReg status{.val = Sstatus()};
 	status.pie = (1 << modeS); // enable interrupts when enter userspace
 	status.spp = modeU;
 	arg->frame.status = status.val;

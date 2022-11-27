@@ -104,7 +104,7 @@ MTrap(iframe* frame)
 						frame->a0 = B_NOT_ALLOWED;
 						return;
 					}
-					MstatusReg status(Mstatus());
+					MstatusReg status{.val = Mstatus()};
 					status.mpp = modeS;
 					SetMedeleg(
 						0xffff & ~((1 << causeMEcall) | (1 << causeSEcall)));
@@ -125,12 +125,12 @@ MTrap(iframe* frame)
 						enable, frame->a2);
 					*/
 					// dprintf("  mtime: %" B_PRIu64 "\n", gClintRegs->mTime);
-					SetMip(Mip() & ~(1 << sTimerInt));
+					ClearBitsMip(1 << sTimerInt);
 					if (!enable) {
-						SetMie(Mie() & ~(1 << mTimerInt));
+						ClearBitsMie(1 << mTimerInt);
 					} else {
 						gClintRegs->mtimecmp[0] = frame->a2;
-						SetMie(Mie() | (1 << mTimerInt));
+						SetBitsMie(1 << mTimerInt);
 					}
 					frame->a0 = B_OK;
 					return;
@@ -142,8 +142,8 @@ MTrap(iframe* frame)
 			break;
 		}
 		case causeInterrupt + mTimerInt: {
-			SetMie(Mie() & ~(1 << mTimerInt));
-			SetMip(Mip() | (1 << sTimerInt));
+			ClearBitsMie(1 << mTimerInt);
+			SetBitsMip(1 << sTimerInt);
 			return;
 		}
 	}
@@ -156,7 +156,7 @@ void
 traps_init()
 {
 	SetMtvec((uint64)MVec);
-	MstatusReg mstatus(Mstatus());
+	MstatusReg mstatus{.val = Mstatus()};
 	mstatus.ie = 1 << modeM;
 	SetMstatus(mstatus.val);
 	InitPmp();

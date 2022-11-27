@@ -47,7 +47,7 @@ WriteExt(uint64_t val)
 void
 WriteSstatus(uint64_t val)
 {
-	SstatusReg status(val);
+	SstatusReg status{.val = val};
 	dprintf("%#" B_PRIx64, val);
 	dprintf(" (");
 	dprintf("ie: "); WriteModeSet(status.ie);

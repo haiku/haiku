@@ -111,7 +111,7 @@ DumpPageTableInt(Pte* pte, uint64_t virtAdr, uint32_t level, uint64& firstVirt, 
 				if (level == 0)
 					panic("internal page table on level 0");
 
-				DumpPageTableInt((Pte*)VirtFromPhys(pageSize*pte[i].ppn),
+				DumpPageTableInt((Pte*)VirtFromPhys(B_PAGE_SIZE*pte[i].ppn),
 					virtAdr + ((uint64_t)i << (pageBits + pteIdxBits*level)),
 					level - 1, firstVirt, firstPhys, firstFlags, len);
 			} else {
@@ -130,7 +130,7 @@ DumpPageTableInt(Pte* pte, uint64_t virtAdr, uint32_t level, uint64& firstVirt, 
 static int
 DumpPageTable(uint64 satp)
 {
-	SatpReg satpReg(satp);
+	SatpReg satpReg{.val = satp};
 	Pte* root = (Pte*)VirtFromPhys(satpReg.ppn * B_PAGE_SIZE);
 
 	dprintf("PageTable:\n");
@@ -237,14 +237,14 @@ PreallocKernelRange()
 }
 
 
-uint64
+static uint64
 GetSatp()
 {
-	SatpReg satp;
-	satp.ppn = sPageTable / B_PAGE_SIZE;
-	satp.asid = 0;
-	satp.mode = satpModeSv39;
-	return satp.val;
+	return SatpReg{
+		.ppn = sPageTable / B_PAGE_SIZE,
+		.asid = 0,
+		.mode = satpModeSv39
+	}.val;
 }
 
 

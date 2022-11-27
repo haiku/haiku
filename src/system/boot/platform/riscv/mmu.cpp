@@ -270,11 +270,11 @@ SetupPageTable()
 static uint64
 GetSatp()
 {
-	SatpReg satp;
-	satp.ppn = sPageTable / B_PAGE_SIZE;
-	satp.asid = 0;
-	satp.mode = satpModeSv39;
-	return satp.val;
+	return SatpReg{
+		.ppn = sPageTable / B_PAGE_SIZE,
+		.asid = 0,
+		.mode = satpModeSv39
+	}.val;
 }
 
 

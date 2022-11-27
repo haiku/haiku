@@ -110,7 +110,7 @@ public:
 		firstFlags(0),
 		len(0)
 	{}
- 
+
 	~PageTableDumper()
 	{
 		Write(0, 0, 0, 0);
@@ -147,7 +147,7 @@ DumpPageTableInt(Pte* pte, uint64_t virtAdr, uint32_t level, PageTableDumper& du
 				if (level == 0)
 					kprintf("  internal page table on level 0\n");
 
-				DumpPageTableInt((Pte*)VirtFromPhys(pageSize*pte[i].ppn),
+				DumpPageTableInt((Pte*)VirtFromPhys(B_PAGE_SIZE*pte[i].ppn),
 					virtAdr + ((uint64_t)i << (pageBits + pteIdxBits * level)),
 					level - 1, dumper);
 			} else {
