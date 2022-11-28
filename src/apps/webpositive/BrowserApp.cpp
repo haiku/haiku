@@ -65,8 +65,6 @@ const char* kApplicationSignature = "application/x-vnd.Haiku-WebPositive";
 const char* kApplicationName = B_TRANSLATE_SYSTEM_NAME("WebPositive");
 static const uint32 PRELOAD_BROWSING_HISTORY = 'plbh';
 
-#define ENABLE_NATIVE_COOKIES 1
-
 
 BrowserApp::BrowserApp()
 	:
@@ -99,7 +97,6 @@ BrowserApp::BrowserApp()
 	}
 #endif
 
-#if ENABLE_NATIVE_COOKIES
 	BString cookieStorePath = kApplicationName;
 	cookieStorePath << "/Cookies";
 	fCookies = new SettingsMessage(B_USER_SETTINGS_DIRECTORY,
@@ -110,7 +107,14 @@ BrowserApp::BrowserApp()
 		fContext->SetCookieJar(
 			BPrivate::Network::BNetworkCookieJar(&cookieArchive));
 	}
-#endif
+
+	BPath curlCookies;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &curlCookies) == B_OK
+		&& curlCookies.Append(kApplicationName) == B_OK
+		&& curlCookies.Append("cookie.jar.db") == B_OK) {
+
+		setenv("CURL_COOKIE_JAR_PATH", curlCookies.Path(), 0);
+	}
 
 	BString sessionStorePath = kApplicationName;
 	sessionStorePath << "/Session";
