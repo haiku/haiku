@@ -2224,7 +2224,7 @@ BPoseView::MessageReceived(BMessage* message)
 			break;
 
 		case kIconMode: {
-			int32 size;
+			int32 size = -1;
 			int32 scale;
 			if (message->FindInt32("size", &size) == B_OK) {
 				// Nothing else to do in this case.
@@ -2255,6 +2255,8 @@ BPoseView::MessageReceived(BMessage* message)
 				}
 				size = iconSize;
 			}
+			if (size <= 0)
+				break;
 			if (size != (int32)UnscaledIconSizeInt())
 				fViewState->SetIconSize(size);
 			SetViewMode(message->what);
