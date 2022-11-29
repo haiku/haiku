@@ -6,6 +6,7 @@
 
 #include "DebugWindow.h"
 
+#include <algorithm>
 #include <stdio.h>
 
 #include <Button.h>
