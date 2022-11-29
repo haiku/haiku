@@ -123,6 +123,7 @@
 // AMD MSR registers
 #define MSR_F10H_HWCR						0xc0010015
 #define 	HWCR_TSCFREQSEL					(1 << 24)
+#define MSR_K8_UCODE_UPDATE				0xc0010020
 #define K8_MSR_IPM						0xc0010055
 #define MSR_F10H_PSTATEDEF(x)				(0xc0010064 + (x))
 #define 	PSTATEDEF_EN					(1ULL << 63)
@@ -591,6 +592,46 @@ struct intel_microcode_extended_signature {
 	uint32 processor_signature;
 	uint32 processor_flags;
 	uint32 checksum;
+};
+
+
+// AMD Microcode structures
+
+struct amd_container_header {
+	uint32 magic;
+};
+
+
+struct amd_section_header {
+	uint32 type;
+	uint32 size;
+};
+
+
+struct amd_equiv_cpu_entry {
+	uint32 installed_cpu;
+	uint32 fixed_errata_mask;
+	uint32 fixed_errata_compare;
+	uint16 equiv_cpu;
+	uint16 res;
+};
+
+
+struct amd_microcode_header {
+	uint32 data_code;
+	uint32 patch_id;
+	uint16 mc_patch_data_id;
+	uint8 mc_patch_data_len;
+	uint8 init_flag;
+	uint32 mc_patch_data_checksum;
+	uint32 nb_dev_id;
+	uint32 sb_dev_id;
+	uint16 processor_rev_id;
+	uint8 nb_rev_id;
+	uint8 sb_rev_id;
+	uint8 bios_api_rev;
+	uint8 reserved1[3];
+	uint32 match_reg[8];
 };
 
 

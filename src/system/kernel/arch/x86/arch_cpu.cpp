@@ -125,7 +125,7 @@ static uint32 sCacheSharingMask[CPU_MAX_CACHE_LEVEL];
 
 static void* sUcodeData = NULL;
 static size_t sUcodeDataSize = 0;
-static struct intel_microcode_header* sLoadedUcodeUpdate;
+static void* sLoadedUcodeUpdate;
 static spinlock sUcodeUpdateLock = B_SPINLOCK_INITIALIZER;
 
 
@@ -994,7 +994,7 @@ detect_amd_patch_level(cpu_ent* cpu)
 	}
 
 	uint64 value = x86_read_msr(IA32_MSR_UCODE_REV);
-	cpu->arch.patch_level = value >> 32;
+	cpu->arch.patch_level = (uint32)value;
 }
 
 
@@ -1088,7 +1088,7 @@ load_microcode_intel(int currentCPU, cpu_ent* cpu)
 		acquire_spinlock(&sUcodeUpdateLock);
 	detect_intel_patch_level(cpu);
 	uint32 revision = cpu->arch.patch_level;
-	struct intel_microcode_header* update = sLoadedUcodeUpdate;
+	struct intel_microcode_header* update = (struct intel_microcode_header*)sLoadedUcodeUpdate;
 	if (update == NULL) {
 		update = find_microcode_intel((addr_t)sUcodeData, sUcodeDataSize,
 			revision);
@@ -1114,10 +1114,127 @@ load_microcode_intel(int currentCPU, cpu_ent* cpu)
 }
 
 
+static struct amd_microcode_header*
+find_microcode_amd(addr_t data, size_t size, uint32 patchLevel)
+{
+	// 9.11.3 Processor Identification
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 1, 0);
+	uint32 signature = cpuid.regs.eax;
+
+	if (size < sizeof(struct amd_container_header)) {
+		dprintf("find_microcode_amd update is too small for header\n");
+		return NULL;
+	}
+	struct amd_container_header* container = (struct amd_container_header*)data;
+	if (container->magic != 0x414d44) {
+		dprintf("find_microcode_amd update invalid magic\n");
+		return NULL;
+	}
+
+	size -= sizeof(*container);
+	data += sizeof(*container);
+
+	struct amd_section_header* section =
+		(struct amd_section_header*)data;
+	if (section->type != 0 || section->size == 0) {
+		dprintf("find_microcode_amd update first section invalid\n");
+		return NULL;
+	}
+
+	size -= sizeof(*section);
+	data += sizeof(*section);
+
+	amd_equiv_cpu_entry* table = (amd_equiv_cpu_entry*)data;
+	size -= section->size;
+	data += section->size;
+
+	uint16 equiv_id = 0;
+	for (uint32 i = 0; table[i].installed_cpu != 0; i++) {
+		if (signature == table[i].equiv_cpu) {
+			equiv_id = table[i].equiv_cpu;
+			dprintf("find_microcode_amd found equiv cpu: %x\n", equiv_id);
+			break;
+		}
+	}
+	if (equiv_id == 0) {
+		dprintf("find_microcode_amd update cpu not found in equiv table\n");
+		return NULL;
+	}
+
+	while (size > sizeof(amd_section_header)) {
+		struct amd_section_header* section = (struct amd_section_header*)data;
+		size -= sizeof(*section);
+		data += sizeof(*section);
+
+		if (section->type != 1 || section->size > size
+			|| section->size < sizeof(amd_microcode_header)) {
+			dprintf("find_microcode_amd update firmware section invalid\n");
+			return NULL;
+		}
+		struct amd_microcode_header* header = (struct amd_microcode_header*)data;
+		size -= section->size;
+		data += section->size;
+
+		if (header->processor_rev_id != equiv_id) {
+			dprintf("find_microcode_amd update found rev_id %x\n", header->processor_rev_id);
+			continue;
+		}
+		if (patchLevel >= header->patch_id) {
+			dprintf("find_microcode_intel update_revision is lower\n");
+			continue;
+		}
+		if (header->nb_dev_id != 0 || header->sb_dev_id != 0) {
+			dprintf("find_microcode_amd update chipset specific firmware\n");
+			continue;
+		}
+		if (((addr_t)header % 16) != 0) {
+			dprintf("find_microcode_amd incorrect alignment\n");
+			continue;
+		}
+
+		return header;
+	}
+	dprintf("find_microcode_amd no fw update found for this cpu\n");
+	return NULL;
+}
+
+
 static void
 load_microcode_amd(int currentCPU, cpu_ent* cpu)
 {
-	dprintf("CPU %d: no update found\n", currentCPU);
+	// serialize for HT cores
+	if (currentCPU != 0)
+		acquire_spinlock(&sUcodeUpdateLock);
+	detect_amd_patch_level(cpu);
+	uint32 revision = cpu->arch.patch_level;
+	struct amd_microcode_header* update = (struct amd_microcode_header*)sLoadedUcodeUpdate;
+	if (update == NULL) {
+		update = find_microcode_amd((addr_t)sUcodeData, sUcodeDataSize,
+			revision);
+	}
+	if (update != NULL) {
+		addr_t data = (addr_t)update;
+		wbinvd();
+
+		x86_write_msr(MSR_K8_UCODE_UPDATE, data);
+
+		detect_amd_patch_level(cpu);
+		if (revision == cpu->arch.patch_level) {
+			dprintf("CPU %d: update failed\n", currentCPU);
+		} else {
+			if (sLoadedUcodeUpdate == NULL)
+				sLoadedUcodeUpdate = update;
+			dprintf("CPU %d: updated from revision 0x%" B_PRIx32 " to 0x%" B_PRIx32
+				"\n", currentCPU, revision, cpu->arch.patch_level);
+		}
+
+	} else {
+		dprintf("CPU %d: no update found\n", currentCPU);
+	}
+
+	if (currentCPU != 0)
+		release_spinlock(&sUcodeUpdateLock);
 }
 
 
@@ -1137,7 +1254,7 @@ load_microcode(int currentCPU)
 
 
 static void
-detect_cpu(int currentCPU)
+detect_cpu(int currentCPU, bool full = true)
 {
 	cpu_ent* cpu = get_cpu_struct();
 	char vendorString[17];
@@ -1171,11 +1288,13 @@ detect_cpu(int currentCPU)
 	cpu->arch.model = cpuid.eax_1.model;
 	cpu->arch.extended_model = cpuid.eax_1.extended_model;
 	cpu->arch.stepping = cpuid.eax_1.stepping;
-	dprintf("CPU %d: type %d family %d extended_family %d model %d "
-		"extended_model %d stepping %d, string '%s'\n",
-		currentCPU, cpu->arch.type, cpu->arch.family,
-		cpu->arch.extended_family, cpu->arch.model,
-		cpu->arch.extended_model, cpu->arch.stepping, vendorString);
+	if (full) {
+		dprintf("CPU %d: type %d family %d extended_family %d model %d "
+			"extended_model %d stepping %d, string '%s'\n",
+			currentCPU, cpu->arch.type, cpu->arch.family,
+			cpu->arch.extended_family, cpu->arch.model,
+			cpu->arch.extended_model, cpu->arch.stepping, vendorString);
+	}
 
 	// figure out what vendor we have here
 
@@ -1231,8 +1350,10 @@ detect_cpu(int currentCPU)
 				strlen(&cpu->arch.model_name[i]) + 1);
 		}
 
-		dprintf("CPU %d: vendor '%s' model name '%s'\n",
-			currentCPU, cpu->arch.vendor_name, cpu->arch.model_name);
+		if (full) {
+			dprintf("CPU %d: vendor '%s' model name '%s'\n",
+				currentCPU, cpu->arch.vendor_name, cpu->arch.model_name);
+		}
 	} else {
 		strlcpy(cpu->arch.model_name, "unknown", sizeof(cpu->arch.model_name));
 	}
@@ -1241,6 +1362,9 @@ detect_cpu(int currentCPU)
 	get_current_cpuid(&cpuid, 1, 0);
 	cpu->arch.feature[FEATURE_COMMON] = cpuid.eax_1.features; // edx
 	cpu->arch.feature[FEATURE_EXT] = cpuid.eax_1.extended_features; // ecx
+
+	if (!full)
+		return;
 
 	if (maxExtendedLeaf >= 0x80000001) {
 		get_current_cpuid(&cpuid, 0x80000001, 0);
@@ -1295,7 +1419,7 @@ detect_cpu(int currentCPU)
 	dump_feature_string(currentCPU, cpu);
 #endif
 #if DUMP_CPU_PATCHLEVEL
-	dprintf("CPU %d: patch_level %" B_PRIu32 "\n", currentCPU,
+	dprintf("CPU %d: patch_level %" B_PRIx32 "\n", currentCPU,
 		cpu->arch.patch_level);
 #endif
 }
@@ -1517,6 +1641,7 @@ init_tsc(kernel_args* args)
 status_t
 arch_cpu_init_percpu(kernel_args* args, int cpu)
 {
+	detect_cpu(cpu, false);
 	load_microcode(cpu);
 	detect_cpu(cpu);
 
