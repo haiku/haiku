@@ -37,7 +37,7 @@
  * List of open controllers and its lock.
  */
 LIST_HEAD(, nvme_ctrlr)	ctrlr_head = LIST_HEAD_INITIALIZER(ctrlr_head);
-static pthread_mutex_t ctrlr_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t ctrlr_lock = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
 
 /*
  * Search for an open controller.
