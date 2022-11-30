@@ -65,6 +65,7 @@
 static const size_t kOptimalIOSize = 65536;
 static const bigtime_t kNotificationInterval = 1000000LL;
 
+
 // notify_if_stat_changed
 void
 notify_if_stat_changed(Volume *volume, Node *node)
@@ -155,7 +156,6 @@ ramfs_read_fs_info(fs_volume* _volume, struct fs_info *info)
 // ramfs_write_fs_info
 static status_t
 ramfs_write_fs_info(fs_volume* _volume, const struct fs_info *info, uint32 mask)
-
 {
 	FUNCTION_START();
 	Volume* volume = (Volume*)_volume->private_volume;
