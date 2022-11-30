@@ -118,13 +118,14 @@ ramfs_unmount(fs_volume* _volume)
 {
 	FUNCTION_START();
 	Volume* volume = (Volume*)_volume->private_volume;
-
-	status_t error = volume->Unmount();
-	if (error == B_OK)
-		delete volume;
-	if (error != B_OK)
-		REPORT_ERROR(error);
-	return error;
+	status_t error = B_OK;
+	if (VolumeWriteLocker locker = volume) {
+		error = volume->Unmount();
+		if (error == B_OK)
+			delete volume;
+	} else
+		SET_ERROR(error, B_ERROR);
+	RETURN_ERROR(error);
 }
 
 
