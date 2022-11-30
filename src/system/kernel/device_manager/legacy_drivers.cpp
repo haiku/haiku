@@ -1133,13 +1133,13 @@ start_watching(const char* base, const char* sub)
 static struct driver_entry*
 new_driver_entry(const char* path, dev_t device, ino_t node)
 {
-	driver_entry* entry = (driver_entry*)malloc(sizeof(driver_entry));
+	driver_entry* entry = new driver_entry;
 	if (entry == NULL)
 		return NULL;
 
 	entry->path = strdup(path);
 	if (entry->path == NULL) {
-		free(entry);
+		delete entry;
 		return NULL;
 	}
 
@@ -1173,7 +1173,7 @@ try_drivers(DriverEntryList& list)
 		}
 
 		free(entry->path);
-		free(entry);
+		delete entry;
 	}
 
 	return B_OK;
