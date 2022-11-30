@@ -793,6 +793,9 @@ ramfs_create(fs_volume* _volume, fs_vnode* _dir, const char *name, int openMode,
 	// check directory
 	} else if (!dir) {
 		SET_ERROR(error, B_BAD_VALUE);
+	// check special names
+	} else if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
+		SET_ERROR(error, B_FILE_EXISTS);
 	} else if (VolumeWriteLocker locker = volume) {
 		NodeMTimeUpdater mTimeUpdater(dir);
 		// directory deleted?
@@ -1125,6 +1128,9 @@ ramfs_create_dir(fs_volume* _volume, fs_vnode* _dir, const char *name, int mode)
 	// check directory
 	} else if (!dir) {
 		SET_ERROR(error, B_BAD_VALUE);
+	// check special names
+	} else if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0) {
+		SET_ERROR(error, B_FILE_EXISTS);
 	} else if (VolumeWriteLocker locker = volume) {
 		NodeMTimeUpdater mTimeUpdater(dir);
 		// directory deleted?
