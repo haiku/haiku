@@ -66,6 +66,8 @@ Node::Node(Volume *volume, uint8 type)
 // destructor
 Node::~Node()
 {
+	ASSERT(fRefCount == 0);
+
 	// delete all attributes
 	while (Attribute *attribute = fAttributes.First()) {
 		status_t error = DeleteAttribute(attribute);
@@ -104,9 +106,10 @@ Node::AddReference()
 void
 Node::RemoveReference()
 {
+	ASSERT(fRefCount > 0);
 	if (--fRefCount == 0) {
 		GetVolume()->RemoveVNode(this);
-		fRefCount++;
+			// RemoveVNode can potentially delete us immediately!
 	}
 }
 
@@ -114,7 +117,7 @@ Node::RemoveReference()
 status_t
 Node::Link(Entry *entry)
 {
-PRINT("Node[%Ld]::Link(): %" B_PRId32 " ->...\n", fID, fRefCount);
+PRINT("Node[%" B_PRIdINO "]::Link(): %" B_PRId32 " ->...\n", fID, fRefCount);
 	fReferrers.Insert(entry);
 
 	status_t error = AddReference();
@@ -128,10 +131,10 @@ PRINT("Node[%Ld]::Link(): %" B_PRId32 " ->...\n", fID, fRefCount);
 status_t
 Node::Unlink(Entry *entry)
 {
-PRINT("Node[%Ld]::Unlink(): %" B_PRId32 " ->...\n", fID, fRefCount);
-	RemoveReference();
+PRINT("Node[%" B_PRIdINO "]::Unlink(): %" B_PRId32 " ->...\n", fID, fRefCount);
 	fReferrers.Remove(entry);
 
+	RemoveReference();
 	return B_OK;
 }
 
@@ -358,4 +361,3 @@ Node::GetAllocationInfo(AllocationInfo &info)
 	while (GetNextAttribute(&attribute) == B_OK)
 		attribute->GetAllocationInfo(info);
 }
-
