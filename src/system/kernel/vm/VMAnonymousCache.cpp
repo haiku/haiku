@@ -1454,7 +1454,7 @@ swap_file_add(const char* path)
 	}
 
 	// do the allocations and prepare the swap_file structure
-	swap_file* swap = new swap_file;
+	swap_file* swap = new(std::nothrow) swap_file;
 	if (swap == NULL) {
 		close(fd);
 		return B_NO_MEMORY;

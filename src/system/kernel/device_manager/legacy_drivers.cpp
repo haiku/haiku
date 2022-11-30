@@ -1133,7 +1133,7 @@ start_watching(const char* base, const char* sub)
 static struct driver_entry*
 new_driver_entry(const char* path, dev_t device, ino_t node)
 {
-	driver_entry* entry = new driver_entry;
+	driver_entry* entry = new(std::nothrow) driver_entry;
 	if (entry == NULL)
 		return NULL;
 
@@ -1519,7 +1519,7 @@ legacy_driver_probe(const char* subPath)
 extern "C" status_t
 legacy_driver_init(void)
 {
-	sDriverHash = new DriverTable();
+	sDriverHash = new(std::nothrow) DriverTable();
 	if (sDriverHash == NULL || sDriverHash->Init(DRIVER_HASH_SIZE) != B_OK)
 		return B_NO_MEMORY;
 

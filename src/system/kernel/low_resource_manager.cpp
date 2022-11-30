@@ -468,7 +468,7 @@ register_low_resource_handler(low_resource_func function, void* data,
 	TRACE(("register_low_resource_handler(function = %p, data = %p)\n",
 		function, data));
 
-	low_resource_handler *newHandler = new low_resource_handler;
+	low_resource_handler *newHandler = new(std::nothrow) low_resource_handler;
 	if (newHandler == NULL)
 		return B_NO_MEMORY;
 
