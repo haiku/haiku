@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src system boot ;
 
-DEFINES += _BOOT_MODE ;
-
 UsePrivateHeaders [ FDirName libroot locale ] ;
 
 rule BuildOpenFirmwareLoader {

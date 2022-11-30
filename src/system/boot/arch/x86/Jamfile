@@ -8,7 +8,6 @@ for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 		SubDirHdrs $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) ;
 
 		DEFINES = $(defines) ;
-		DEFINES += _BOOT_MODE ;
 
 		if $(TARGET_BOOT_PLATFORM) = efi {
 			if $(TARGET_ARCH) = x86_64 {

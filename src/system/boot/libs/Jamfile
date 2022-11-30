@@ -4,8 +4,6 @@ local zlibSourceDirectory = [ BuildFeatureAttribute zlib : sources : path ] ;
 UseHeaders $(zlibSourceDirectory) ;
 UseHeaders $(zlibSourceDirectory) : true ;
 
-DEFINES += _BOOT_MODE ;
-
 local zlibSources =
 	adler32.c
 	crc32.c

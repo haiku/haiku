@@ -29,9 +29,6 @@ local librootOsArchSources =
 
 for platform in [ MultiBootSubDirSetup efi ] {
 	on $(platform) {
-		DEFINES += _BOOT_MODE ;
-
-
 		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
 			$(kernelGenericDriverSources)
 			$(kernelArchSources)

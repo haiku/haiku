@@ -10,7 +10,7 @@ local platform ;
 for platform in [ MultiBootSubDirSetup efi ] {
 	on $(platform) {
 		{
-			local defines = _BOOT_MODE _BOOT_PLATFORM_EFI ;
+			local defines = _BOOT_PLATFORM_EFI ;
 			defines = [ FDefines $(defines) ] ;
 			SubDirCcFlags $(defines) ;
 			SubDirC++Flags $(defines) -fno-rtti ;

@@ -12,7 +12,7 @@ if $(TARGET_ARCH) != x86_64 && $(TARGET_ARCH) != x86 {
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
 
 {
-	local defines = _BOOT_MODE _BOOT_PLATFORM_EFI ;
+	local defines = _BOOT_PLATFORM_EFI ;
 
 	if $(TARGET_ARCH) != x86_64 && $(TARGET_ARCH) != x86 {
 		defines += _BOOT_FDT_SUPPORT ;

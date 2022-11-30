@@ -9,13 +9,7 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 #UsePrivateHeaders [ FDirName graphics vesa ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
-{
-	local defines = _BOOT_MODE ;
-
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) ; # -save-temps
-	SubDirC++Flags $(defines) -fno-rtti ;
-}
+SubDirC++Flags -fno-rtti ;
 
 local platform ;
 for platform in [ MultiBootSubDirSetup next_m68k ] {

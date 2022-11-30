@@ -1,18 +1,12 @@
 SubDir HAIKU_TOP src system boot arch riscv64 ;
 
-{
-	local defines = _BOOT_MODE ;
-
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) -fno-rtti ;
-}
+SubDirC++Flags -fno-rtti ;
 
 # Optimizations create infinite recursion otherwise.
 SubDirCcFlags -fno-builtin ;
 
 local librootArchSources =
-        byteorder.S
+	byteorder.S
 ;
 
 local librootGenericSources =
@@ -34,7 +28,6 @@ local kernelGenericDriverSources =
 local platform ;
 for platform in [ MultiBootSubDirSetup efi riscv ] {
 	on $(platform) {
-		DEFINES += _BOOT_MODE ;
 		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
 			$(kernelArchDriverSources)
 			$(kernelGenericDriverSources)

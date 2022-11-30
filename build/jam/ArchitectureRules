@@ -594,6 +594,7 @@ rule KernelArchitectureSetup architecture
 
 	# defines
 	HAIKU_KERNEL_DEFINES += _KERNEL_MODE ;
+	HAIKU_BOOT_DEFINES += _BOOT_MODE ;
 
 	# kernel add-on glue code
 	HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE = <$(architecture)>crtbeginS.o

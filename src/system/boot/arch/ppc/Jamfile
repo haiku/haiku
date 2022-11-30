@@ -14,8 +14,6 @@ local kernelGenericDriverSources =
 local platform ;
 for platform in [ MultiBootSubDirSetup openfirmware ] {
     on $(platform) {
-		DEFINES += _BOOT_MODE ;
-
 		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
 			$(kernelGenericDriverSources)
 			arch_elf.cpp

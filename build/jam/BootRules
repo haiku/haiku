@@ -95,7 +95,7 @@ rule SetupBoot
 		# add boot flags for the object
 		ObjectCcFlags $(object) : $(HAIKU_BOOT_CCFLAGS) $(HAIKU_BOOT_$(platform)_CCFLAGS) $(2) ;
 		ObjectC++Flags $(object) : $(HAIKU_BOOT_C++FLAGS) $(HAIKU_BOOT_$(platform)_C++FLAGS) $(2) ;
-		ObjectDefines $(object) : $(TARGET_KERNEL_DEFINES) ;
+		ObjectDefines $(object) : $(TARGET_KERNEL_DEFINES) $(TARGET_BOOT_DEFINES) ;
 		ASFLAGS on $(object) = $(HAIKU_BOOT_CCFLAGS) $(HAIKU_BOOT_$(platform)_CCFLAGS) ;
 		OPTIM on $(object) = $(HAIKU_BOOT_OPTIM) ;
 

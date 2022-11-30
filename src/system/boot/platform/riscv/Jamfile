@@ -11,11 +11,7 @@ UsePrivateHeaders [ FDirName virtio ] ;
 UseLibraryHeaders [ FDirName libfdt ] ;
 
 {
-	local defines = _BOOT_MODE ;
-
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) -fno-rtti ;
+	SubDirC++Flags -fno-rtti ;
 	SubDirAsFlags -I $(SUBDIR) ;
 }
 

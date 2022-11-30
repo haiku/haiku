@@ -16,11 +16,8 @@ UsePrivateHeaders [ FDirName storage ] ;
 UsePrivateHeaders [ FDirName kernel arch generic ] ;
 
 {
-    local defines = _BOOT_MODE ;
-
-    defines = [ FDefines $(defines) ] ;
-    SubDirCcFlags $(defines) -g3 -O0 ;
-    SubDirC++Flags $(defines) -fno-rtti -g3 -O0 ;
+    SubDirCcFlags -g3 -O0 ;
+    SubDirC++Flags -fno-rtti -g3 -O0 ;
 }
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;

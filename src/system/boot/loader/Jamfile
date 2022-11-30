@@ -19,7 +19,6 @@ for platform in [ MultiBootSubDirSetup ] {
 			DEFINES = $(defines) ;
 
 			DEFINES +=
-				_BOOT_MODE
 				BOOT_ARCH=\\\"$(TARGET_KERNEL_ARCH_DIR)\\\"
 				KMESSAGE_CONTAINER_ONLY
 
