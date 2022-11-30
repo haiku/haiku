@@ -339,7 +339,8 @@ Device::~Device()
 	// though, since we may be deleted because the device was unplugged already.
 	Unconfigure(false);
 
-	if (gDeviceManager->unregister_node(fNode) != B_OK)
+	status_t error = gDeviceManager->unregister_node(fNode);
+	if (error != B_OK && error != B_BUSY)
 		TRACE_ERROR("failed to unregister device node\n");
 	fNode = NULL;
 
