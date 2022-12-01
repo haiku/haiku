@@ -145,11 +145,18 @@ DataContainer::ReadAt(off_t offset, void *_buffer, size_t size,
 	size = min(size, size_t(fSize - offset));
 
 	if (!_IsCacheMode()) {
-		// in non-cache mode, we just copy the data directly
-		memcpy(buffer, fSmallBuffer + offset, size);
+		// in non-cache mode, use the "small buffer"
+		if (IS_USER_ADDRESS(buffer)) {
+			error = user_memcpy(buffer, fSmallBuffer + offset, size);
+			if (error != B_OK)
+				size = 0;
+		} else {
+			memcpy(buffer, fSmallBuffer + offset, size);
+		}
+
 		if (bytesRead != NULL)
 			*bytesRead = size;
-		return B_OK;
+		return error;
 	}
 
 	// cache mode
@@ -179,10 +186,17 @@ DataContainer::WriteAt(off_t offset, const void *_buffer, size_t size,
 
 	if (!_IsCacheMode()) {
 		// in non-cache mode, use the "small buffer"
-		memcpy(fSmallBuffer + offset, buffer, size);
+		if (IS_USER_ADDRESS(buffer)) {
+			error = user_memcpy(fSmallBuffer + offset, buffer, size);
+			if (error != B_OK)
+				size = 0;
+		} else {
+			memcpy(fSmallBuffer + offset, buffer, size);
+		}
+
 		if (bytesWritten != NULL)
 			*bytesWritten = size;
-		return B_OK;
+		return error;
 	}
 
 	// cache mode
