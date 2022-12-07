@@ -2831,6 +2831,9 @@ get_new_fd(int type, struct fs_mount* mount, struct vnode* vnode,
 		&& (type == FDTYPE_FILE || type == FDTYPE_DIR))
 		return B_BUSY;
 
+	if ((openMode & O_RDWR) != 0 && (openMode & O_WRONLY) != 0)
+		return B_BAD_VALUE;
+
 	descriptor = alloc_fd();
 	if (!descriptor)
 		return B_NO_MEMORY;
