@@ -216,7 +216,7 @@ shm_open(const char* name, int openMode, mode_t permissions)
 	if (error != B_OK)
 		RETURN_AND_SET_ERRNO(error);
 
-	return open(path, openMode | FD_CLOEXEC, permissions);
+	return open(path, openMode | O_CLOEXEC, permissions);
 }
 
 
