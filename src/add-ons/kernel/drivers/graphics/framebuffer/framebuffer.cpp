@@ -103,7 +103,8 @@ remap_frame_buffer(framebuffer_info& info, addr_t physicalBase, uint32 width,
 	if (!info.complete_frame_buffer_mapped) {
 		addr_t base = physicalBase;
 		size_t size = bytesPerRow * height;
-		bool remap = !initializing;
+		// TODO: this logic looks suspicious and may need refactoring
+		bool remap = !initializing || frameBuffer == 0;
 
 		if (info.physical_frame_buffer_size != 0) {
 			// we can map the complete frame buffer
