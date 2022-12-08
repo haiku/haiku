@@ -89,8 +89,7 @@ fdt_register_node(fdt_bus* bus, int node, device_node* parentDev,
 		parentDev);
 
 	const void* prop; int propLen;
-	device_attr attrs[8];
-	device_attr* attr = attrs;
+	Vector<device_attr> attrs;
 	int nameLen = 0;
 	const char *name = fdt_get_name(gFDT, node, &nameLen);
 
@@ -100,29 +99,32 @@ fdt_register_node(fdt_bus* bus, int node, device_node* parentDev,
 		return B_ERROR;
 	}
 
-	*attr++ = (device_attr) { B_DEVICE_BUS, B_STRING_TYPE, {string: "fdt"}};
-	*attr++ = (device_attr) { B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-		{ string: (strcmp(name, "") != 0) ? name : "Root" } };
-	*attr++ = (device_attr) { "fdt/node", B_UINT32_TYPE, {ui32: (uint32)node}};
-	*attr++ = (device_attr) { "fdt/name", B_STRING_TYPE, {string: name}};
+	attrs.Add({ B_DEVICE_BUS, B_STRING_TYPE, {string: "fdt"}});
+	attrs.Add({ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
+		{ string: (strcmp(name, "") != 0) ? name : "Root" }});
+	attrs.Add({ "fdt/node", B_UINT32_TYPE, {ui32: (uint32)node}});
+	attrs.Add({ "fdt/name", B_STRING_TYPE, {string: name}});
 
 	prop = fdt_getprop(gFDT, node, "device_type", &propLen);
-	if (prop != NULL) {
-		*attr++ = (device_attr) { "fdt/device_type", B_STRING_TYPE,
-			{ string: (const char*)prop } };
-	}
+	if (prop != NULL)
+		attrs.Add({ "fdt/device_type", B_STRING_TYPE, { string: (const char*)prop }});
 
 	prop = fdt_getprop(gFDT, node, "compatible", &propLen);
 
 	if (prop != NULL) {
-		*attr++ = (device_attr){ "fdt/compatible", B_STRING_TYPE,
-			{ string: (const char*)prop } };
+		const char* propStr = (const char*)prop;
+		const char* propEnd = propStr + propLen;
+		while (propEnd - propStr > 0) {
+			int curLen = strlen(propStr);
+			attrs.Add({ "fdt/compatible", B_STRING_TYPE, { string: propStr }});
+			propStr += curLen + 1;
+		}
 	}
 
-	*attr = {0};
+	attrs.Add({});
 
 	status_t res = gDeviceManager->register_node(parentDev,
-		"bus_managers/fdt/driver_v1", attrs, NULL, &curDev);
+		"bus_managers/fdt/driver_v1", &attrs[0], NULL, &curDev);
 
 	if (res < B_OK)
 		return res;
