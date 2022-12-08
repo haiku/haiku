@@ -200,12 +200,12 @@ GenerateThumbnailJob::Execute()
 
 	// write values to attributes
 	bool thumbnailWritten = false;
-	const int32 width = image->Bounds().IntegerWidth();
+	const int32 width = image->Bounds().IntegerWidth() + 1;
 	const size_t written = fFile->WriteAttr("Media:Width", B_INT32_TYPE,
 		0, &width, sizeof(int32));
 	if (written == sizeof(int32)) {
 		// first attribute succeeded, write the rest
-		const int32 height = image->Bounds().IntegerHeight();
+		const int32 height = image->Bounds().IntegerHeight() + 1;
 		fFile->WriteAttr("Media:Height", B_INT32_TYPE, 0, &height, sizeof(int32));
 
 		// convert image into a 128x128 WebP image and stash it
