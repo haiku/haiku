@@ -93,5 +93,12 @@ enum { SUPERBLOCK_FULLNESS_GROUP = 9 };
 #	define MAX(a,b) (((a) > (b)) ? (a) : (b))
 #endif
 
+#ifdef __HAIKU__
+#if __cplusplus >= 201103L
+#	define HAIKU_MEMORY_ALIGNMENT alignof(max_align_t)
+#else
+#	define HAIKU_MEMORY_ALIGNMENT 8
+#endif
+#endif
 
 #endif // _CONFIG_H_
