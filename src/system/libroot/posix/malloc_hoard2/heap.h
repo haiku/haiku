@@ -76,11 +76,7 @@ class hoardHeap {
 #endif
 
 		// Every object is aligned so that it can always hold any type.
-#if __cplusplus >= 201103L
-		enum { ALIGNMENT = alignof(max_align_t) };
-#else
-		enum { ALIGNMENT = 8 };
-#endif
+		enum { ALIGNMENT = HAIKU_MEMORY_ALIGNMENT };
 
 		// ANDing with this rounds to ALIGNMENT.
 		enum { ALIGNMENT_MASK = ALIGNMENT - 1 };

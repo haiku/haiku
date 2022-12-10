@@ -22,6 +22,8 @@
 
 #include "config.h"
 
+#include "os/support/Debug.h"
+
 //#include <assert.h>
 
 namespace BPrivate {
@@ -163,6 +165,12 @@ class block {
 
 		block *_next;				// The next block in a linked-list of blocks.
 		superblock *_mySuperblock;	// A pointer to my superblock.
+
+#if defined(__i386__) && (__GNUC__ > 2)
+		double _d5; // For alignment, make sure the whole structure is 16 byte
+					// aligned
+#endif
+
 #endif // USE_PRIVATE_HEAPS
 
 #if HEAP_LEAK_CHECK
@@ -180,6 +188,14 @@ class block {
 		// Disable copying.
 		block(const block &);
 };
+
+// Make sure the block size does not mess up the alignment of allocations, it
+// must be a multiple of ALIGNMENT
+#if __GNUC__ > 2
+// The macro we use for legacy gcc doesn't work in the global context, only
+// inside functions since it is wrapped in a do/while.
+STATIC_ASSERT(sizeof(block) % HAIKU_MEMORY_ALIGNMENT == 0);
+#endif
 
 
 superblock *
