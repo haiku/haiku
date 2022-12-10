@@ -1,5 +1,5 @@
 1	turkish	x-vnd.Haiku-MediaPlayer	716811487
-Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Girdiyi Çöp'e taşı
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Girdiyi çöpe at
 Close	MediaPlayer-PlaylistWindow		Kapat
 Volume of background clips	MediaPlayer-SettingsWindow		Arka plan kliplerinin ses düzeyi
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Olanaklıysa video donanım bindirmelerini kullan
@@ -25,7 +25,7 @@ Resume:	MediaPlayer-SettingsWindow		Oynatmayı sürdür:
 Duration	MediaPlayer-InfoWin		Uzunluk
 Import Entries	MediaPlayer-ImportPLItemsCmd		Girdileri içe aktar
 Open network stream	MediaPlayer-Main		Ağ akışı aç
-Move file to Trash	MediaPlayer-PlaylistWindow		Dosyayı Çöp'e taşı
+Move file to Trash	MediaPlayer-PlaylistWindow		Dosyayı çöpe at
 Open file…	MediaPlayer-Main		Dosya aç…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Tam ekran kipinde denetimleri ölçekle
 View options	MediaPlayer-SettingsWindow		Görüntüleme seçenekleri
@@ -80,10 +80,10 @@ Large	MediaPlayer-SettingsWindow		Geniş
 Import Entry	MediaPlayer-ImportPLItemsCmd		Girdi içe aktar
 unknown format	MediaPlayer-InfoWin		bilinmeyen biçim
 Track %d	MediaPlayer-Main		Parça %d
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Tüm dosyalar Çöp'e taşınamadı.
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Tüm dosyalar çöpe atılamadı.
 Total duration: %s	MediaPlayer-PlaylistWindow		Toplam uzunluk: %s
 %.3f kHz	MediaPlayer-InfoWin		%.3f kHz
-Move into trash error	MediaPlayer-RemovePLItemsCmd		Çöp'e taşıma hatası
+Move into trash error	MediaPlayer-RemovePLItemsCmd		Çöpe atma hatası
 50% scale	MediaPlayer-Main		%50 ölçek
 Drop files to play	MediaPlayer-Main		Oynatmak için dosya bırakın
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Girdiyi kopyala
@@ -134,14 +134,14 @@ Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Filmleri d�
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		%filename dosyası açılamadı.\n\n
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Oynatmak istediğiniz dosyaların hiçbiri bir ortam dosyası değil gibi görünüyor.
 Remove Entry	MediaPlayer-RemovePLItemsCmd		Girdiyi kaldır
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Girdileri Çöp'e taşı
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Girdileri çöpe at
 Subtitle size:	MediaPlayer-SettingsWindow		Altyazı boyutu:
 No aspect correction	MediaPlayer-Main		Ölçek düzeltmesi olmadan
 raw video	MediaPlayer-InfoWin		ham video
 Container	MediaPlayer-InfoWin		İçeren
 none	MediaPlayer-Main		yok
 Open clips	MediaPlayer-Main		Klip aç
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Bazı dosyalar Çöp'e taşınamadı.
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Bazı dosyalar çöpe atılamadı.
 <nothing to undo>	MediaPlayer-PlaylistWindow		<geri alınacak bir şey yok>
 Save as…	MediaPlayer-PlaylistWindow		Farklı kaydet…
 Error: 	MediaPlayer-RemovePLItemsCmd		Hata: 
