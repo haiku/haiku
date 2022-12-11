@@ -111,9 +111,9 @@ isa_register_device(device_node *parent)
 {
 	static const device_attr attrs[] = {
 		// tell where to look for child devices
-		{B_DEVICE_BUS, B_STRING_TYPE, {string: "isa" }},
+		{B_DEVICE_BUS, B_STRING_TYPE, {.string = "isa" }},
 		{B_DEVICE_FLAGS, B_UINT32_TYPE,
-			{ui32: B_FIND_CHILD_ON_DEMAND | B_FIND_MULTIPLE_CHILDREN}},
+			{.ui32 = B_FIND_CHILD_ON_DEMAND | B_FIND_MULTIPLE_CHILDREN}},
 		{}
 	};
 

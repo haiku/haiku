@@ -843,14 +843,14 @@ Device::RegisterNode(device_node *parent)
 		parent = ((Device*)Parent())->Node();
 
 	device_attr attrs[128] = {
-		{ B_DEVICE_BUS, B_STRING_TYPE, { string: "usb" }},
+		{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "usb" }},
 
 		// location
-		{ USB_DEVICE_ID_ITEM, B_UINT32_TYPE, { ui32: id }},
+		{ USB_DEVICE_ID_ITEM, B_UINT32_TYPE, { .ui32 = id }},
 
-		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_FIND_MULTIPLE_CHILDREN }},
+		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { .ui32 = B_FIND_MULTIPLE_CHILDREN }},
 
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "USB device" }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "USB device" }},
 
 		{ NULL }
 	};

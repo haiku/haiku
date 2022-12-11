@@ -229,13 +229,12 @@ virtio_device_register_device(device_node* parent)
 	TRACE("  vendorId: 0x%08" B_PRIx32 "\n",  mappedRegs->vendorId);
 
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Virtio MMIO"} },
-		{ B_DEVICE_BUS,         B_STRING_TYPE, {string: "virtio"} },
-		{ "virtio/version",     B_UINT32_TYPE, {ui32: mappedRegs->version} },
-		{ "virtio/device_id",   B_UINT32_TYPE, {ui32: mappedRegs->deviceId} },
-		{ "virtio/type",        B_UINT16_TYPE,
-			{ui16: (uint16)mappedRegs->deviceId} },
-		{ "virtio/vendor_id",   B_UINT32_TYPE, {ui32: mappedRegs->vendorId} },
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "Virtio MMIO"} },
+		{ B_DEVICE_BUS,         B_STRING_TYPE, {.string = "virtio"} },
+		{ "virtio/version",     B_UINT32_TYPE, {.ui32 = mappedRegs->version} },
+		{ "virtio/device_id",   B_UINT32_TYPE, {.ui32 = mappedRegs->deviceId} },
+		{ "virtio/type",        B_UINT16_TYPE, {.ui16 = (uint16)mappedRegs->deviceId} },
+		{ "virtio/vendor_id",   B_UINT32_TYPE, {.ui32 = mappedRegs->vendorId} },
 		{ NULL }
 	};
 

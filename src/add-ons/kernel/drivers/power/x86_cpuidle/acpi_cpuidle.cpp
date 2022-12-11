@@ -533,7 +533,7 @@ static status_t
 acpi_cpuidle_register_device(device_node *node)
 {
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "ACPI CPU IDLE" }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "ACPI CPU IDLE" }},
 		{ NULL }
 	};
 

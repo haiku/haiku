@@ -114,29 +114,29 @@ scsi_register_device(scsi_bus_info *bus, uchar target_id,
 		char product_rev[sizeof( inquiry_data->product_rev ) + 1];
 		device_attr attrs[] = {
 			// connection
-			{ SCSI_DEVICE_TARGET_ID_ITEM, B_UINT8_TYPE, { ui8: target_id }},
-			{ SCSI_DEVICE_TARGET_LUN_ITEM, B_UINT8_TYPE, { ui8: target_lun }},
+			{ SCSI_DEVICE_TARGET_ID_ITEM, B_UINT8_TYPE, { .ui8 = target_id }},
+			{ SCSI_DEVICE_TARGET_LUN_ITEM, B_UINT8_TYPE, { .ui8 = target_lun }},
 
 			// inquiry data (used for both identification and information)
 			{ SCSI_DEVICE_INQUIRY_ITEM, B_RAW_TYPE,
-				{ raw: { inquiry_data, sizeof( *inquiry_data ) }}},
+				{ .raw = { inquiry_data, sizeof( *inquiry_data ) }}},
 
 			// some more info for driver loading
-			{ SCSI_DEVICE_TYPE_ITEM, B_UINT8_TYPE, { ui8: inquiry_data->device_type }},
-			{ SCSI_DEVICE_VENDOR_ITEM, B_STRING_TYPE, { string: vendor_ident }},
-			{ SCSI_DEVICE_PRODUCT_ITEM, B_STRING_TYPE, { string: product_ident }},
-			{ SCSI_DEVICE_REVISION_ITEM, B_STRING_TYPE, { string: product_rev }},
+			{ SCSI_DEVICE_TYPE_ITEM, B_UINT8_TYPE, { .ui8 = inquiry_data->device_type }},
+			{ SCSI_DEVICE_VENDOR_ITEM, B_STRING_TYPE, { .string = vendor_ident }},
+			{ SCSI_DEVICE_PRODUCT_ITEM, B_STRING_TYPE, { .string = product_ident }},
+			{ SCSI_DEVICE_REVISION_ITEM, B_STRING_TYPE, { .string = product_rev }},
 
 			// description of peripheral drivers
-			{ B_DEVICE_BUS, B_STRING_TYPE, { string: "scsi" }},
+			{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "scsi" }},
 
 			// extra restriction of maximum number of blocks per transfer
-			{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { ui32: max_blocks }},
+			{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { .ui32 = max_blocks }},
 
 			// atapi emulation
-			{ SCSI_DEVICE_IS_ATAPI_ITEM, B_UINT8_TYPE, { ui8: is_atapi }},
+			{ SCSI_DEVICE_IS_ATAPI_ITEM, B_UINT8_TYPE, { .ui8 = is_atapi }},
 			// manual autosense
-			{ SCSI_DEVICE_MANUAL_AUTOSENSE_ITEM, B_UINT8_TYPE, { ui8: manual_autosense }},
+			{ SCSI_DEVICE_MANUAL_AUTOSENSE_ITEM, B_UINT8_TYPE, { .ui8 = manual_autosense }},
 			{ NULL }
 		};
 
@@ -382,8 +382,8 @@ scsi_force_get_device(scsi_bus_info *bus, uchar target_id,
 	uchar target_lun, scsi_device_info **res_device)
 {
 	device_attr attrs[] = {
-		{ SCSI_DEVICE_TARGET_ID_ITEM, B_UINT8_TYPE, { ui8: target_id }},
-		{ SCSI_DEVICE_TARGET_LUN_ITEM, B_UINT8_TYPE, { ui8: target_lun }},
+		{ SCSI_DEVICE_TARGET_ID_ITEM, B_UINT8_TYPE, { .ui8 = target_id }},
+		{ SCSI_DEVICE_TARGET_LUN_ITEM, B_UINT8_TYPE, { .ui8 = target_lun }},
 		{ NULL }
 	};
 	device_node *node;

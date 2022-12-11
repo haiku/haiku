@@ -170,8 +170,8 @@ random_register_device(device_node *node)
 
 	// ready to register
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "Random" }},
-		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_KEEP_DRIVER_LOADED }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "Random" }},
+		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { .ui32 = B_KEEP_DRIVER_LOADED }},
 		{ NULL }
 	};
 

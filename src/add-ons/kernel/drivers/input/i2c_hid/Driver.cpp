@@ -328,8 +328,8 @@ i2c_hid_register_device(device_node *node)
 	uint32 descriptorAddress = object->integer.integer;
 	free(object);
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "I2C HID Device" }},
-		{ "descriptorAddress", B_UINT32_TYPE, { ui32: descriptorAddress }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "I2C HID Device" }},
+		{ "descriptorAddress", B_UINT32_TYPE, { .ui32 = descriptorAddress }},
 		{ NULL }
 	};
 

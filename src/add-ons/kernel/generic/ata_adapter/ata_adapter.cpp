@@ -496,18 +496,18 @@ ata_adapter_publish_channel(device_node *controller_node,
 	device_attr attrs[] = {
 		// info about ourself and our consumer
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-			{ string: prettyName }},
+			{ .string = prettyName }},
 		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
-			{ string: ATA_FOR_CONTROLLER_MODULE_NAME }},
+			{ .string = ATA_FOR_CONTROLLER_MODULE_NAME }},
 
 		// private data to identify channel
 		{ ATA_ADAPTER_COMMAND_BLOCK_BASE, B_UINT16_TYPE,
-			{ ui16: command_block_base }},
+			{ .ui16 = command_block_base }},
 		{ ATA_ADAPTER_CONTROL_BLOCK_BASE, B_UINT16_TYPE,
-			{ ui16: control_block_base }},
-		{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: can_dma }},
-		{ ATA_ADAPTER_INTNUM, B_UINT8_TYPE, { ui8: intnum }},
-		{ ATA_ADAPTER_CHANNEL_INDEX, B_UINT8_TYPE, { ui8: channel_index }},
+			{ .ui16 = control_block_base }},
+		{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { .ui8 = can_dma }},
+		{ ATA_ADAPTER_INTNUM, B_UINT8_TYPE, { .ui8 = intnum }},
+		{ ATA_ADAPTER_CHANNEL_INDEX, B_UINT8_TYPE, { .ui8 = channel_index }},
 		{ NULL }
 	};
 
@@ -714,28 +714,28 @@ ata_adapter_publish_controller(device_node *parent, uint16 bus_master_base,
 		// there are always max. 2 devices
 		// (unless this is a Compact Flash Card with a built-in IDE controller,
 		//  which has exactly 1 device)
-		{ ATA_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: 2 }},
+		{ ATA_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { .ui8 = 2 }},
 		// of course we can DMA
-		{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: can_dma }},
+		{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { .ui8 = can_dma }},
 		// choose any name here
 		{ ATA_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE,
-			{ string: controller_name }},
+			{ .string = controller_name }},
 
 		// DMA properties
 		// data must be word-aligned;
 		// warning: some controllers are more picky!
-		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: dma_alignment /*1*/}},
+		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { .ui32 = dma_alignment /*1*/}},
 		// one S/G block must not cross 64K boundary
-		{ B_DMA_BOUNDARY, B_UINT32_TYPE, { ui32: dma_boundary/*0xffff*/ }},
+		{ B_DMA_BOUNDARY, B_UINT32_TYPE, { .ui32 = dma_boundary/*0xffff*/ }},
 		// max size of S/G block is 16 bits with zero being 64K
 		{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE,
-			{ ui32: max_sg_block_size/*0x10000*/ }},
+			{ .ui32 = max_sg_block_size/*0x10000*/ }},
 		{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE,
-			{ ui32: ATA_ADAPTER_MAX_SG_COUNT }},
-		{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { ui64: 0x100000000LL }},
+			{ .ui32 = ATA_ADAPTER_MAX_SG_COUNT }},
+		{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { .ui64 = 0x100000000LL }},
 
 		// private data to find controller
-		{ ATA_ADAPTER_BUS_MASTER_BASE, B_UINT16_TYPE, { ui16: bus_master_base }},
+		{ ATA_ADAPTER_BUS_MASTER_BASE, B_UINT16_TYPE, { .ui16 = bus_master_base }},
 		{ NULL }
 	};
 

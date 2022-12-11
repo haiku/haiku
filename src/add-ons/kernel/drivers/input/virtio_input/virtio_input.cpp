@@ -441,7 +441,7 @@ virtio_input_register_device(device_node *node)
 	CALLED();
 
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "VirtIO input" }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "VirtIO input" }},
 		{ NULL }
 	};
 

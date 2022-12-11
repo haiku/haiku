@@ -44,7 +44,7 @@ typedef struct err_res {
 } err_res;
 
 #define MK_ERROR( aaction, code ) ({ \
-	err_res _res = {error_code: (code), action: (aaction) };	\
+	err_res _res = {.error_code = (code), .action = (aaction) };	\
 	_res;					\
 })
 

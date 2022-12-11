@@ -315,10 +315,10 @@ openpic_register_device(device_node *parent)
 	device_node *newNode;
 	device_attr attrs[] = {
 		// info about ourself
-		{ B_DEVICE_TYPE, B_UINT16_TYPE, { ui16: PCI_base_peripheral }},
-		{ B_DEVICE_SUB_TYPE, B_UINT16_TYPE, { ui16: PCI_pic }},
+		{ B_DEVICE_TYPE, B_UINT16_TYPE, { .ui16 = PCI_base_peripheral }},
+		{ B_DEVICE_SUB_TYPE, B_UINT16_TYPE, { .ui16 = PCI_pic }},
 		// TODO How do we identify ourselves as OpenPIC?
-		{ B_DEVICE_INTERFACE, B_UINT16_TYPE, { ui16: PCI_pic_8259 }},
+		{ B_DEVICE_INTERFACE, B_UINT16_TYPE, { .ui16 = PCI_pic_8259 }},
 		{}
 	};
 	io_resource resources[] = {

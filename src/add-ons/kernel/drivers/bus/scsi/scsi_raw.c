@@ -211,18 +211,18 @@ raw_device_added(device_node_handle node)
 	// ready to register
 	{
 		device_attr attrs[] = {
-			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: SCSI_RAW_MODULE_NAME }},
+			{ B_DRIVER_MODULE, B_STRING_TYPE, { .string = SCSI_RAW_MODULE_NAME }},
 
 			// default connection is used by peripheral drivers, and as we don't
 			// want to kick them out, we use concurrent "raw" connection
 			// (btw: this shows nicely that something goes wrong: one device
 			// and two drivers means begging for trouble)
-			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "raw" }},
+			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { .string = "raw" }},
 
 			// we want devfs on top of us (who wouldn't?)
-			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
+			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { .string = PNP_DEVFS_MODULE_NAME }},
 			// tell which name we want to have in devfs
-			{ PNP_DEVFS_FILENAME, B_STRING_TYPE, { string: name }},
+			{ PNP_DEVFS_FILENAME, B_STRING_TYPE, { .string = name }},
 			{ NULL }
 		};
 

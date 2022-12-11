@@ -47,16 +47,16 @@ scsi_controller_added(device_node *parent)
 	{
 		device_attr attrs[] = {
 			{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-				{ string: "SCSI Controller" }},
+				{ .string = "SCSI Controller" }},
 
 			// remember who we are
 			// (could use the controller name, but probably some software would choke)
 			// TODO create_id() generates a 32 bit ranged integer but we need only 8 bits
-			{ SCSI_BUS_PATH_ID_ITEM, B_UINT8_TYPE, { ui8: (uint8)pathID }},
+			{ SCSI_BUS_PATH_ID_ITEM, B_UINT8_TYPE, { .ui8 = (uint8)pathID }},
 
 			// tell PnP manager to clean up ID
-//			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE, { string: SCSI_PATHID_GENERATOR }},
-//			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { ui32: path_id }},
+//			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE, { .string = SCSI_PATHID_GENERATOR }},
+//			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { .ui32 = path_id }},
 			{}
 		};
 

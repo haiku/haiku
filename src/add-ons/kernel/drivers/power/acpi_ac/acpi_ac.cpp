@@ -162,7 +162,7 @@ static status_t
 acpi_ac_register_device(device_node *node)
 {
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "ACPI AC" }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "ACPI AC" }},
 		{ NULL }
 	};
 

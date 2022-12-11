@@ -26,9 +26,9 @@ i2c_added_device(device_node *parent)
 
 	device_attr attributes[] = {
 		// info about device
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "I2C bus" }},
-		{ B_DEVICE_BUS, B_STRING_TYPE, { string: "i2c" }},
-		{ I2C_BUS_PATH_ID_ITEM, B_UINT8_TYPE, { ui8: (uint8)pathID }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "I2C bus" }},
+		{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "i2c" }},
+		{ I2C_BUS_PATH_ID_ITEM, B_UINT8_TYPE, { .ui8 = (uint8)pathID }},
 		{ NULL }
 	};
 

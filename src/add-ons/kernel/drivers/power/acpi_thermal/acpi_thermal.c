@@ -213,7 +213,7 @@ static status_t
 acpi_thermal_register_device(device_node *node)
 {
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "ACPI Thermal" }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "ACPI Thermal" }},
 		{ NULL }
 	};
 

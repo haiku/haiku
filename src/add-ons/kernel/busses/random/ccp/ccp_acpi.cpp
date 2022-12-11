@@ -109,9 +109,9 @@ static status_t
 register_device(device_node* parent)
 {
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "CCP ACPI"}},
-		{B_DEVICE_BUS, B_STRING_TYPE, {string: "CCP"}},
-		{B_DEVICE_FIXED_CHILD, B_STRING_TYPE, {string: CCP_DEVICE_MODULE_NAME}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "CCP ACPI"}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {.string = "CCP"}},
+		{B_DEVICE_FIXED_CHILD, B_STRING_TYPE, {.string = CCP_DEVICE_MODULE_NAME}},
 		{}
 	};
 

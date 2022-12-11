@@ -99,15 +99,15 @@ fdt_register_node(fdt_bus* bus, int node, device_node* parentDev,
 		return B_ERROR;
 	}
 
-	attrs.Add({ B_DEVICE_BUS, B_STRING_TYPE, {string: "fdt"}});
+	attrs.Add({ B_DEVICE_BUS, B_STRING_TYPE, {.string = "fdt"}});
 	attrs.Add({ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-		{ string: (strcmp(name, "") != 0) ? name : "Root" }});
-	attrs.Add({ "fdt/node", B_UINT32_TYPE, {ui32: (uint32)node}});
-	attrs.Add({ "fdt/name", B_STRING_TYPE, {string: name}});
+		{ .string = (strcmp(name, "") != 0) ? name : "Root" }});
+	attrs.Add({ "fdt/node", B_UINT32_TYPE, {.ui32 = (uint32)node}});
+	attrs.Add({ "fdt/name", B_STRING_TYPE, {.string = name}});
 
 	prop = fdt_getprop(gFDT, node, "device_type", &propLen);
 	if (prop != NULL)
-		attrs.Add({ "fdt/device_type", B_STRING_TYPE, { string: (const char*)prop }});
+		attrs.Add({ "fdt/device_type", B_STRING_TYPE, { .string = (const char*)prop }});
 
 	prop = fdt_getprop(gFDT, node, "compatible", &propLen);
 
@@ -116,7 +116,7 @@ fdt_register_node(fdt_bus* bus, int node, device_node* parentDev,
 		const char* propEnd = propStr + propLen;
 		while (propEnd - propStr > 0) {
 			int curLen = strlen(propStr);
-			attrs.Add({ "fdt/compatible", B_STRING_TYPE, { string: propStr }});
+			attrs.Add({ "fdt/compatible", B_STRING_TYPE, { .string = propStr }});
 			propStr += curLen + 1;
 		}
 	}
@@ -201,8 +201,8 @@ fdt_bus_register_device(device_node* parent)
 	} scopeExit;
 
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "FDT"}},
-		{B_DEVICE_FLAGS, B_UINT32_TYPE, {ui32: B_KEEP_DRIVER_LOADED}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "FDT"}},
+		{B_DEVICE_FLAGS, B_UINT32_TYPE, {.ui32 = B_KEEP_DRIVER_LOADED}},
 		{}
 	};
 

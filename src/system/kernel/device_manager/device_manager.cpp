@@ -2381,10 +2381,10 @@ static void
 init_node_tree(void)
 {
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Devices Root"}},
-		{B_DEVICE_BUS, B_STRING_TYPE, {string: "root"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "Devices Root"}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {.string = "root"}},
 		{B_DEVICE_FLAGS, B_UINT32_TYPE,
-			{ui32: B_FIND_MULTIPLE_CHILDREN | B_KEEP_DRIVER_LOADED }},
+			{.ui32 = B_FIND_MULTIPLE_CHILDREN | B_KEEP_DRIVER_LOADED }},
 		{NULL}
 	};
 
@@ -2395,9 +2395,9 @@ init_node_tree(void)
 	}
 
 	device_attr genericAttrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Generic"}},
-		{B_DEVICE_BUS, B_STRING_TYPE, {string: "generic"}},
-		{B_DEVICE_FLAGS, B_UINT32_TYPE, {ui32: B_FIND_MULTIPLE_CHILDREN
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "Generic"}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {.string = "generic"}},
+		{B_DEVICE_FLAGS, B_UINT32_TYPE, {.ui32 = B_FIND_MULTIPLE_CHILDREN
 			| B_KEEP_DRIVER_LOADED | B_FIND_CHILD_ON_DEMAND}},
 		{NULL}
 	};

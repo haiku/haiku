@@ -48,8 +48,8 @@ pci_scan_bus(i2c_bus_cookie cookie)
 		device_node* deviceRoot = gDeviceManager->get_root_node();
 		uint32 addr = (pciInfo->device << 16) | pciInfo->function;
 		device_attr acpiAttrs[] = {
-			{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
-			{ ACPI_DEVICE_ADDR_ITEM, B_UINT32_TYPE, {ui32: addr}},
+			{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "acpi" }},
+			{ ACPI_DEVICE_ADDR_ITEM, B_UINT32_TYPE, {.ui32 = addr}},
 			{ NULL }
 		};
 		if (addr != 0 && gDeviceManager->find_child_node(deviceRoot, acpiAttrs,
@@ -89,9 +89,9 @@ register_child_devices(void* cookie)
 	device_attr attrs[] = {
 		// properties of this controller for i2c bus manager
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-			{ string: prettyName }},
+			{ .string = prettyName }},
 		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
-			{ string: I2C_FOR_CONTROLLER_MODULE_NAME }},
+			{ .string = I2C_FOR_CONTROLLER_MODULE_NAME }},
 
 		// private data to identify the device
 		{ NULL }
@@ -232,7 +232,7 @@ static status_t
 register_device(device_node* parent)
 {
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "PCH I2C PCI"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "PCH I2C PCI"}},
 		{}
 	};
 

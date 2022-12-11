@@ -205,32 +205,32 @@ controller_probe(device_node *parent)
 			// (unless this is a Compact Flash Card with a built-in ATA
 			// controller, which has exactly 1 device)
 			{ ATA_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE,
-				{ ui8: kASICData[asicIndex].channel_count }},
+				{ .ui8 = kASICData[asicIndex].channel_count }},
 			// of course we can DMA
-			{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: true }},
+			{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { .ui8 = true }},
 			// choose any name here
 			{ ATA_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE,
-				{ string: CONTROLLER_NAME }},
+				{ .string = CONTROLLER_NAME }},
 
 			// DMA properties
 			// data must be word-aligned;
 			// warning: some controllers are more picky!
-			{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 1}},
+			{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { .ui32 = 1}},
 			// one S/G block must not cross 64K boundary
-			{ B_DMA_BOUNDARY, B_UINT32_TYPE, { ui32: 0xffff }},
+			{ B_DMA_BOUNDARY, B_UINT32_TYPE, { .ui32 = 0xffff }},
 			// max size of S/G block is 16 bits with zero being 64K
-			{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { ui32: 0x10000 }},
+			{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { .ui32 = 0x10000 }},
 			{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE,
-				{ ui32: ATA_ADAPTER_MAX_SG_COUNT }},
-			{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { ui64: 0x100000000LL }},
+				{ .ui32 = ATA_ADAPTER_MAX_SG_COUNT }},
+			{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { .ui64 = 0x100000000LL }},
 
 			// private data to find controller
 			{ "silicon_image_3112/asic_index", B_UINT32_TYPE,
-				{ ui32: asicIndex }},
+				{ .ui32 = asicIndex }},
 			{ "silicon_image_3112/mmio_base", B_UINT32_TYPE,
-				{ ui32: mmioBase }},
+				{ .ui32 = mmioBase }},
 			{ "silicon_image_3112/int_num", B_UINT32_TYPE,
-				{ ui32: interruptNumber }},
+				{ .ui32 = interruptNumber }},
 			{ NULL }
 		};
 
@@ -373,13 +373,13 @@ controller_register_channels(void *cookie)
 	for (index = 0; index < kASICData[controller->asic_index].channel_count;
 			index++) {
 		device_attr attrs[] = {
-			{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: DRIVER_PRETTY_NAME }},
-//			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: kControllerChannelData[channelIndex].name }},
-			{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE, { string: ATA_FOR_CONTROLLER_MODULE_NAME }},
+			{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = DRIVER_PRETTY_NAME }},
+//			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { .string = kControllerChannelData[channelIndex].name }},
+			{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE, { .string = ATA_FOR_CONTROLLER_MODULE_NAME }},
 
 			// private data to identify channel
-			{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: true }},
-			{ "silicon_image_3112/chan_index", B_UINT32_TYPE, { ui32: index }},
+			{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { .ui8 = true }},
+			{ "silicon_image_3112/chan_index", B_UINT32_TYPE, { .ui32 = index }},
 			{ NULL }
 		};
 

@@ -81,8 +81,8 @@ pci_root_register_device(device_node* parent)
 		{}
 	};
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "PCI"}},
-		{B_DEVICE_FLAGS, B_UINT32_TYPE, {ui32: B_KEEP_DRIVER_LOADED}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "PCI"}},
+		{B_DEVICE_FLAGS, B_UINT32_TYPE, {.ui32 = B_KEEP_DRIVER_LOADED}},
 		{}
 	};
 
@@ -107,23 +107,23 @@ pci_root_register_child_devices(void* cookie)
 
 		device_attr attrs[] = {
 			// info about device
-			{B_DEVICE_BUS, B_STRING_TYPE, {string: "pci"}},
+			{B_DEVICE_BUS, B_STRING_TYPE, {.string = "pci"}},
 
 			// location on PCI bus
-			{B_PCI_DEVICE_DOMAIN, B_UINT8_TYPE, {ui8: domain}},
-			{B_PCI_DEVICE_BUS, B_UINT8_TYPE, {ui8: bus}},
-			{B_PCI_DEVICE_DEVICE, B_UINT8_TYPE, {ui8: info.device}},
-			{B_PCI_DEVICE_FUNCTION, B_UINT8_TYPE, {ui8: info.function}},
+			{B_PCI_DEVICE_DOMAIN, B_UINT8_TYPE, {.ui8 = domain}},
+			{B_PCI_DEVICE_BUS, B_UINT8_TYPE, {.ui8 = bus}},
+			{B_PCI_DEVICE_DEVICE, B_UINT8_TYPE, {.ui8 = info.device}},
+			{B_PCI_DEVICE_FUNCTION, B_UINT8_TYPE, {.ui8 = info.function}},
 
 			// info about the device
-			{B_DEVICE_VENDOR_ID, B_UINT16_TYPE, { ui16: info.vendor_id }},
-			{B_DEVICE_ID, B_UINT16_TYPE, { ui16: info.device_id }},
+			{B_DEVICE_VENDOR_ID, B_UINT16_TYPE, {.ui16 = info.vendor_id}},
+			{B_DEVICE_ID, B_UINT16_TYPE, {.ui16 = info.device_id}},
 
-			{B_DEVICE_TYPE, B_UINT16_TYPE, { ui16: info.class_base }},
-			{B_DEVICE_SUB_TYPE, B_UINT16_TYPE, { ui16: info.class_sub }},
-			{B_DEVICE_INTERFACE, B_UINT16_TYPE, { ui16: info.class_api }},
+			{B_DEVICE_TYPE, B_UINT16_TYPE, {.ui16 = info.class_base}},
+			{B_DEVICE_SUB_TYPE, B_UINT16_TYPE, {.ui16 = info.class_sub}},
+			{B_DEVICE_INTERFACE, B_UINT16_TYPE, {.ui16 = info.class_api}},
 
-			{B_DEVICE_FLAGS, B_UINT32_TYPE, {ui32: B_FIND_CHILD_ON_DEMAND}},
+			{B_DEVICE_FLAGS, B_UINT32_TYPE, {.ui32 = B_FIND_CHILD_ON_DEMAND}},
 			{}
 		};
 

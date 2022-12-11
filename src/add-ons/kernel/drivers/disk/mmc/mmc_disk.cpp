@@ -114,7 +114,7 @@ mmc_disk_register_device(device_node* node)
 	CALLED();
 
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "SD Card" }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "SD Card" }},
 		{ NULL }
 	};
 

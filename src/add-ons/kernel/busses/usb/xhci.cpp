@@ -113,9 +113,9 @@ register_child_devices(void* cookie)
 	device_attr attrs[] = {
 		// properties of this controller for the usb bus manager
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-			{ string: prettyName }},
+			{ .string = prettyName }},
 		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
-			{ string: USB_FOR_CONTROLLER_MODULE_NAME }},
+			{ .string = USB_FOR_CONTROLLER_MODULE_NAME }},
 
 		// private data to identify the device
 		{ NULL }
@@ -170,7 +170,7 @@ register_device(device_node* parent)
 {
 	CALLED();
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "XHCI PCI"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "XHCI PCI"}},
 		{}
 	};
 

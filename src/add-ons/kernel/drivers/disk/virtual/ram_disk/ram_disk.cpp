@@ -196,10 +196,10 @@ struct ControlDevice : Device {
 
 		device_attr attrs[] = {
 			{B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-				{string: "RAM Disk Raw Device"}},
-			{kDeviceSizeItem, B_UINT64_TYPE, {ui64: deviceSize}},
-			{kDeviceIDItem, B_UINT32_TYPE, {ui32: (uint32)id}},
-			{kFilePathItem, B_STRING_TYPE, {string: filePath}},
+				{.string = "RAM Disk Raw Device"}},
+			{kDeviceSizeItem, B_UINT64_TYPE, {.ui64 = deviceSize}},
+			{kDeviceIDItem, B_UINT32_TYPE, {.ui32 = (uint32)id}},
+			{kFilePathItem, B_STRING_TYPE, {.string = filePath}},
 			{NULL}
 		};
 
@@ -1140,7 +1140,7 @@ ram_disk_driver_register_device(device_node* parent)
 {
 	device_attr attrs[] = {
 		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-			{string: "RAM Disk Control Device"}},
+			{.string = "RAM Disk Control Device"}},
 		{NULL}
 	};
 

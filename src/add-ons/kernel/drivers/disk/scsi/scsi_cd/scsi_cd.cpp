@@ -1098,9 +1098,9 @@ cd_register_device(device_node* node)
 
 	// ready to register
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "SCSI CD-ROM Drive"}},
-		{"removable", B_UINT8_TYPE, {ui8: deviceInquiry->removable_medium}},
-		{B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, {ui32: maxBlocks}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "SCSI CD-ROM Drive"}},
+		{"removable", B_UINT8_TYPE, {.ui8 = deviceInquiry->removable_medium}},
+		{B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, {.ui32 = maxBlocks}},
 		{ NULL }
 	};
 

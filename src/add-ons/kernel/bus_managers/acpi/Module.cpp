@@ -57,9 +57,8 @@ static status_t
 acpi_module_register_device(device_node* parent)
 {
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "ACPI" }},
-
-		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_KEEP_DRIVER_LOADED }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "ACPI" }},
+		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { .ui32 = B_KEEP_DRIVER_LOADED }},
 		{}
 	};
 
@@ -88,15 +87,15 @@ acpi_enumerate_child_devices(device_node* node, const char* root)
 			case ACPI_TYPE_DEVICE: {
 				device_attr attrs[16] = {
 					// info about device
-					{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
+					{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "acpi" }},
 
 					// location on ACPI bus
-					{ ACPI_DEVICE_PATH_ITEM, B_STRING_TYPE, { string: result }},
+					{ ACPI_DEVICE_PATH_ITEM, B_STRING_TYPE, { .string = result }},
 
 					// info about the device
-					{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: type }},
+					{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { .ui32 = type }},
 
-					{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_FIND_MULTIPLE_CHILDREN }},
+					{ B_DEVICE_FLAGS, B_UINT32_TYPE, { .ui32 = B_FIND_MULTIPLE_CHILDREN }},
 					{ NULL }
 				};
 
@@ -175,14 +174,14 @@ acpi_module_register_child_devices(void* cookie)
 		dprintf("registering power button\n");
 		device_attr attrs[] = {
 			// info about device
-			{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
+			{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "acpi" }},
 
 			// info about the device
-			{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { string: "ACPI_FPB" }},
-			{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: ACPI_TYPE_DEVICE }},
+			{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { .string = "ACPI_FPB" }},
+			{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { .ui32 = ACPI_TYPE_DEVICE }},
 
 			// consumer specification
-			{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_FIND_MULTIPLE_CHILDREN }},
+			{ B_DEVICE_FLAGS, B_UINT32_TYPE, { .ui32 = B_FIND_MULTIPLE_CHILDREN }},
 			{ NULL }
 		};
 		device_node* deviceNode;
@@ -193,14 +192,14 @@ acpi_module_register_child_devices(void* cookie)
 		dprintf("registering sleep button\n");
 		device_attr attrs[] = {
 			// info about device
-			{ B_DEVICE_BUS, B_STRING_TYPE, { string: "acpi" }},
+			{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "acpi" }},
 
 			// info about the device
-			{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { string: "ACPI_FSB" }},
-			{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { ui32: ACPI_TYPE_DEVICE }},
+			{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { .string = "ACPI_FSB" }},
+			{ ACPI_DEVICE_TYPE_ITEM, B_UINT32_TYPE, { .ui32 = ACPI_TYPE_DEVICE }},
 
 			// consumer specification
-			{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_FIND_MULTIPLE_CHILDREN }},
+			{ B_DEVICE_FLAGS, B_UINT32_TYPE, { .ui32 = B_FIND_MULTIPLE_CHILDREN }},
 			{ NULL }
 		};
 		device_node* deviceNode;

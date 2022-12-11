@@ -55,8 +55,8 @@ static status_t
 register_device(device_node* parent)
 {
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "CCP device"}},
-		{B_DEVICE_BUS, B_STRING_TYPE, {string: "CCP"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "CCP device"}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {.string = "CCP"}},
 		{}
 	};
 

@@ -179,28 +179,27 @@ publish_controller(device_node *parent, uint16 bus_master_base, uint8 intnum,
 	device_attr attrs[] = {
 		// properties of this controller for ide bus manager
 		// there are always max. 2 devices
-		{ ATA_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: 2 }},
+		{ ATA_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { .ui8 = 2 }},
 		// of course we can DMA
-		{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: 1 }},
+		{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { .ui8 = 1 }},
 		// choose any name here
-		{ ATA_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE, { string: "Promise TX2" }},
+		{ ATA_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE, { .string = "Promise TX2" }},
 
 		// DMA properties
 		// some say it must be dword-aligned, others that it can be byte-aligned;
 		// stay on the safe side
-		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 3 }},
+		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { .ui32 = 3 }},
 		// one S/G block must not cross 64K boundary
-		{ B_DMA_BOUNDARY, B_UINT32_TYPE, { ui32: 0xffff }},
+		{ B_DMA_BOUNDARY, B_UINT32_TYPE, { .ui32 = 0xffff }},
 		// size of S/G block is 16 bits with zero being 64K
-		{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { ui32: 0x10000 }},
-		{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE,
-			{ ui32: ATA_ADAPTER_MAX_SG_COUNT }},
-		{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { ui64: 0x100000000LL }},
+		{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { .ui32 = 0x10000 }},
+		{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE, { .ui32 = ATA_ADAPTER_MAX_SG_COUNT }},
+		{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { .ui64 = 0x100000000LL }},
 
 		// private data to find controller
-		{ ATA_ADAPTER_BUS_MASTER_BASE, B_UINT16_TYPE, { ui16: bus_master_base }},
+		{ ATA_ADAPTER_BUS_MASTER_BASE, B_UINT16_TYPE, { .ui16 = bus_master_base }},
 		// store interrupt in controller node
-		{ ATA_ADAPTER_INTNUM, B_UINT8_TYPE, { ui8: intnum }},
+		{ ATA_ADAPTER_INTNUM, B_UINT8_TYPE, { .ui8 = intnum }},
 		{ NULL }
 	};
 
