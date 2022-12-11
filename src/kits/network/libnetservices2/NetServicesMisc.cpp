@@ -71,7 +71,7 @@ BInvalidUrl::BInvalidUrl(const char* origin, BUrl url)
 BInvalidUrl::BInvalidUrl(BString origin, BUrl url)
 	:
 	BError(std::move(origin)),
-	fUrl(std::move(origin))
+	fUrl(std::move(url))
 {
 }
 
