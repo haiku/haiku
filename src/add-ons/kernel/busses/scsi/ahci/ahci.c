@@ -332,7 +332,6 @@ std_ops(int32 op, ...)
 		case B_MODULE_INIT:
 			if (get_module(B_PCI_X86_MODULE_NAME,
 					(module_info**)&gPCIx86Module) != B_OK) {
-				TRACE("failed to get pci x86 module\n");
 				gPCIx86Module = NULL;
 			}
 			return B_OK;
