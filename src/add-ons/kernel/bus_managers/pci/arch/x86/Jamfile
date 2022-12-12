@@ -11,11 +11,8 @@ SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi arch $(TARGET_KERNE
 
 KernelStaticLibrary pci_arch_bus_manager :
 	pci_acpi.cpp
-	pci_arch_info.cpp
-	pci_arch_module.cpp
 	pci_bios.cpp
 	pci_controller.cpp
 	pci_io.cpp
 	pci_irq.cpp
-	pci_msi.cpp
 	;

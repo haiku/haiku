@@ -75,20 +75,29 @@ PCIFU740::InitMSI(int32 msiIrq)
 		return result;
 	}
 
+	msi_set_interface(static_cast<MSIInterface*>(this));
+
 	dprintf("  fMsiStartIrq: %ld\n", fMsiStartIrq);
 
 	return B_OK;
 }
 
 
-int32
-PCIFU740::AllocateMSIIrq()
+status_t
+PCIFU740::AllocateVectors(uint8 count, uint8& startVector, uint64& address, uint16& data)
 {
+	if (count != 1)
+		return B_ERROR;
+
 	for (int i = 0; i < 32; i++) {
 		if (((1 << i) & fAllocatedMsiIrqs[0]) == 0) {
 			fAllocatedMsiIrqs[0] |= (1 << i);
 			GetDbuRegs()->msiIntr[0].mask &= ~(1 << i);
-			return i;
+
+			startVector = fMsiStartIrq + i;
+			address = fMsiPhysAddr;
+			data = i;
+			return B_OK;
 		}
 	}
 	return B_ERROR;
@@ -96,11 +105,16 @@ PCIFU740::AllocateMSIIrq()
 
 
 void
-PCIFU740::FreeMSIIrq(int32 irq)
+PCIFU740::FreeVectors(uint8 count, uint8 startVector)
 {
-	if (irq >= 0 && irq < 32 && ((1 << irq) & fAllocatedMsiIrqs[0]) != 0) {
-		GetDbuRegs()->msiIntr[0].mask |= (1 << (uint32)irq);
-		fAllocatedMsiIrqs[0] &= ~(1 << (uint32)irq);
+	int32 irq = (int32)startVector - fMsiStartIrq;
+	while (count > 0) {
+		if (irq >= 0 && irq < 32 && ((1 << irq) & fAllocatedMsiIrqs[0]) != 0) {
+			GetDbuRegs()->msiIntr[0].mask |= (1 << (uint32)irq);
+			fAllocatedMsiIrqs[0] &= ~(1 << (uint32)irq);
+		}
+		irq++;
+		count--;
 	}
 }
 
@@ -399,69 +413,4 @@ PCIFU740::ConfigAddress(uint8 bus, uint8 device, uint8 function, uint16 offset)
 		return 0;
 
 	return fConfigBase + offset;
-}
-
-
-void
-PCIFU740::InitDeviceMSI(uint8 bus, uint8 device, uint8 function)
-{
-	uint32 status;
-	uint32 capPtr;
-	uint32 capId;
-
-	ReadConfig(NULL, bus, device, function, PCI_status, 2, &status);
-	if ((status & PCI_status_capabilities) == 0)
-		return;
-
-	uint32 headerType;
-	ReadConfig(NULL, bus, device, function, PCI_header_type, 1, &headerType);
-
-	switch (headerType & PCI_header_type_mask) {
-		case PCI_header_type_generic:
-		case PCI_header_type_PCI_to_PCI_bridge:
-			ReadConfig(NULL, bus, device, function, PCI_capabilities_ptr, 1, &capPtr);
-			break;
-		case PCI_header_type_cardbus:
-			ReadConfig(NULL, bus, device, function, PCI_capabilities_ptr_2, 1, &capPtr);
-			break;
-		default:
-			return;
-	}
-
-	capPtr &= ~3;
-	if (capPtr == 0)
-		return;
-
-	for (int i = 0; i < 48; i++) {
-		ReadConfig(NULL, bus, device, function, capPtr + 0, 1, &capId);
-
-		if (capId == PCI_cap_id_msi)
-			break;
-
-		ReadConfig(NULL, bus, device, function, capPtr + 1, 1, &capPtr);
-		capPtr &= ~3;
-		if (capPtr == 0)
-			return;
-	}
-
-	dprintf("  MSI offset: %#x\n", capPtr);
-
-	int32 msiIrq = AllocateMSIIrq();
-	dprintf("  msiIrq: %" B_PRId32 "\n", msiIrq);
-
-	uint32 control;
-	ReadConfig(NULL, bus, device, function, capPtr + PCI_msi_control, 2, &control);
-
-	WriteConfig(NULL, bus, device, function, capPtr + PCI_msi_address, 4, (uint32)fMsiPhysAddr);
-	if ((control & PCI_msi_control_64bit) != 0) {
-		WriteConfig(NULL, bus, device, function, capPtr + PCI_msi_address_high, 4, (uint32)(fMsiPhysAddr >> 32));
-		WriteConfig(NULL, bus, device, function, capPtr + PCI_msi_data_64bit, 2, msiIrq);
-	} else
-		WriteConfig(NULL, bus, device, function, capPtr + PCI_msi_data, 2, msiIrq);
-
-	control &= ~PCI_msi_control_mme_mask;
-	control |= (ffs(1) - 1) << 4;
-	control |= PCI_msi_control_enable;
-	WriteConfig(NULL, bus, device, function, capPtr + PCI_msi_control, 2, control);
-	WriteConfig(NULL, bus, device, function, PCI_interrupt_line, 1, fMsiStartIrq + msiIrq);
 }

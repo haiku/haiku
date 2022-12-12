@@ -1551,9 +1551,9 @@ PCI::_RefreshDeviceInfo(PCIBus *bus)
 	for (PCIDev *dev = bus->child; dev; dev = dev->next) {
 		_ReadBasicInfo(dev);
 		_ReadHeaderInfo(dev);
-#if defined(__i386__) || defined(__x86_64__)
-		pci_read_arch_info(dev);
-#endif
+		pci_read_msi_info(dev);
+		pci_read_msix_info(dev);
+		pci_read_ht_mapping_info(dev);
 		if (dev->child)
 			_RefreshDeviceInfo(dev->child);
 	}

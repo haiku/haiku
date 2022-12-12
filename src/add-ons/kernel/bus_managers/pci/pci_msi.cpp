@@ -5,7 +5,6 @@
  */
 
 #include "pci_msi.h"
-#include "pci_arch_info.h"
 #include "pci.h"
 #include "pci_private.h"
 
@@ -24,7 +23,7 @@ static status_t pci_disable_msix(PCIDev *device);
 static void
 pci_ht_msi_map(PCIDev *device, uint64 address)
 {
-	ht_mapping_info *info = &device->arch_info.ht_mapping;
+	ht_mapping_info *info = &device->ht_mapping;
 	if (!info->ht_mapping_capable)
 		return;
 
@@ -50,7 +49,7 @@ pci_read_ht_mapping_info(PCIDev *device)
 	if (!msi_supported())
 		return;
 
-	ht_mapping_info *info = &device->arch_info.ht_mapping;
+	ht_mapping_info *info = &device->ht_mapping;
 	info->ht_mapping_capable = false;
 
 	uint8 offset = 0;
@@ -90,7 +89,7 @@ pci_get_msi_count(uint8 virtualBus, uint8 _device, uint8 function)
 	if (device == NULL)
 		return 0;
 
-	msi_info *info = &device->arch_info.msi;
+	msi_info *info = &device->msi;
 	if (!info->msi_capable)
 		return 0;
 
@@ -118,7 +117,7 @@ pci_configure_msi(uint8 virtualBus, uint8 _device, uint8 function,
 	if (device == NULL)
 		return B_ERROR;
 
-	msi_info *info =  &device->arch_info.msi;
+	msi_info *info =  &device->msi;
 	if (!info->msi_capable)
 		return B_UNSUPPORTED;
 
@@ -177,7 +176,7 @@ pci_unconfigure_msi(uint8 virtualBus, uint8 _device, uint8 function)
 	if (result != B_UNSUPPORTED && result != B_NO_INIT)
 		return result;
 
-	msi_info *info =  &device->arch_info.msi;
+	msi_info *info =  &device->msi;
 	if (!info->msi_capable)
 		return B_UNSUPPORTED;
 
@@ -213,7 +212,7 @@ pci_enable_msi(uint8 virtualBus, uint8 _device, uint8 function)
 	if (device == NULL)
 		return B_ERROR;
 
-	msi_info *info =  &device->arch_info.msi;
+	msi_info *info =  &device->msi;
 	if (!info->msi_capable)
 		return B_UNSUPPORTED;
 
@@ -259,7 +258,7 @@ pci_disable_msi(uint8 virtualBus, uint8 _device, uint8 function)
 	if (result != B_UNSUPPORTED && result != B_NO_INIT)
 		return result;
 
-	msi_info *info =  &device->arch_info.msi;
+	msi_info *info =  &device->msi;
 	if (!info->msi_capable)
 		return B_UNSUPPORTED;
 
@@ -284,7 +283,7 @@ pci_read_msi_info(PCIDev *device)
 	if (!msi_supported())
 		return;
 
-	msi_info *info = &device->arch_info.msi;
+	msi_info *info = &device->msi;
 	info->msi_capable = false;
 	status_t result = gPCI->FindCapability(device->domain, device->bus,
 		device->device, device->function, PCI_cap_id_msi,
@@ -319,7 +318,7 @@ pci_get_msix_count(uint8 virtualBus, uint8 _device, uint8 function)
 	if (device == NULL)
 		return 0;
 
-	msix_info *info = &device->arch_info.msix;
+	msix_info *info = &device->msix;
 	if (!info->msix_capable)
 		return 0;
 
@@ -347,7 +346,7 @@ pci_configure_msix(uint8 virtualBus, uint8 _device, uint8 function,
 	if (device == NULL)
 		return B_ERROR;
 
-	msix_info *info =  &device->arch_info.msix;
+	msix_info *info =  &device->msix;
 	if (!info->msix_capable)
 		return B_UNSUPPORTED;
 
@@ -432,7 +431,7 @@ pci_configure_msix(uint8 virtualBus, uint8 _device, uint8 function,
 static status_t
 pci_unconfigure_msix(PCIDev *device)
 {
-	msix_info *info =  &device->arch_info.msix;
+	msix_info *info =  &device->msix;
 	if (!info->msix_capable)
 		return B_UNSUPPORTED;
 
@@ -481,7 +480,7 @@ pci_enable_msix(uint8 virtualBus, uint8 _device, uint8 function)
 	if (device == NULL)
 		return B_ERROR;
 
-	msix_info *info =  &device->arch_info.msix;
+	msix_info *info =  &device->msix;
 	if (!info->msix_capable)
 		return B_UNSUPPORTED;
 
@@ -509,7 +508,7 @@ pci_enable_msix(uint8 virtualBus, uint8 _device, uint8 function)
 status_t
 pci_disable_msix(PCIDev *device)
 {
-	msix_info *info =  &device->arch_info.msix;
+	msix_info *info =  &device->msix;
 	if (!info->msix_capable)
 		return B_UNSUPPORTED;
 
@@ -534,7 +533,7 @@ pci_read_msix_info(PCIDev *device)
 	if (!msi_supported())
 		return;
 
-	msix_info *info = &device->arch_info.msix;
+	msix_info *info = &device->msix;
 	info->msix_capable = false;
 	status_t result = gPCI->FindCapability(device->domain, device->bus,
 		device->device, device->function, PCI_cap_id_msix,

@@ -14,10 +14,8 @@
 #endif
 
 #include "pci_controller.h"
+#include "pci_msi.h"
 
-#if defined(__i386__) || defined(__x86_64__)
-#include "pci_arch_info.h"
-#endif
 
 #define TRACE_PCI
 #ifndef TRACE_PCI
@@ -47,9 +45,10 @@ struct PCIDev {
 	uint8				device;
 	uint8				function;
 	pci_info			info;
-#if defined(__i386__) || defined(__x86_64__)
-	pci_arch_info		arch_info;
-#endif
+
+	msi_info			msi;
+	msix_info			msix;
+	ht_mapping_info		ht_mapping;
 };
 
 
@@ -105,7 +104,7 @@ public:
 								uint8 *offset);
 			status_t		FindHTCapability(PCIDev *device,
 								uint16 capID, uint8 *offset = NULL);
-			
+
 			status_t		ResolveVirtualBus(uint8 virtualBus, uint8 *domain,
 								uint8 *bus);
 

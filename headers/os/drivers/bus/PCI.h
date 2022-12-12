@@ -38,6 +38,23 @@ typedef struct pci_device_module_info {
 				uint16 *offset);
 	uint8	(*get_powerstate)(pci_device *device);
 	void	(*set_powerstate)(pci_device *device, uint8 state);
+
+	// MSI/MSI-X
+	uint8	(*get_msi_count)(pci_device *device);
+	status_t (*configure_msi)(pci_device *device,
+				uint8 count,
+				uint8 *startVector);
+	status_t (*unconfigure_msi)(pci_device *device);
+
+	status_t (*enable_msi)(pci_device *device);
+	status_t (*disable_msi)(pci_device *device);
+
+	uint8	(*get_msix_count)(pci_device *device);
+	status_t (*configure_msix)(pci_device *device,
+				uint8 count,
+				uint8 *startVector);
+	status_t (*enable_msix)(pci_device *device);
+
 } pci_device_module_info;
 
 

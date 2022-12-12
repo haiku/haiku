@@ -31,6 +31,8 @@ KernelMergeObject kernel_arch_arm64.o :
 	VMSAv8TranslationMap.cpp
 	PMAPPhysicalPageMapper.cpp
 
+	generic_msi.cpp
+
     # Serial UART and drivers
 	debug_uart.cpp
 	debug_uart_8250.cpp
