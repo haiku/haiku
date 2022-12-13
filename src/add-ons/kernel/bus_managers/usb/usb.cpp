@@ -529,6 +529,19 @@ cancel_queued_transfers(usb_pipe pipe)
 
 
 status_t
+cancel_queued_requests(usb_device dev)
+{
+	TRACE_MODULE("cancel_queued_requests(%" B_PRId32 ")\n", dev);
+	ObjectBusyReleaser object(gUSBStack->GetObject(dev));
+	if (!object.IsSet() || (object->Type() & USB_OBJECT_DEVICE) == 0)
+		return B_DEV_INVALID_PIPE;
+	 Device *device = (Device *)object.Get();
+
+	 return device->DefaultPipe()->CancelQueuedTransfers(false);
+}
+
+
+status_t
 usb_ioctl(uint32 opcode, void *buffer, size_t bufferSize)
 {
 	TRACE_MODULE("usb_ioctl(%" B_PRIu32 ", %p, %" B_PRIuSIZE ")\n", opcode,
@@ -686,7 +699,8 @@ struct usb_module_info gModuleInfoV3 = {
 	get_nth_child,						// get_nth_child
 	get_device_parent,					// get_device_parent
 	reset_port,							// reset_port
-	disable_port						// disable_port
+	disable_port,						// disable_port
+	cancel_queued_requests				// cancel_queued_requests
 	//queue_bulk_v_physical				// queue_bulk_v_physical
 };
 

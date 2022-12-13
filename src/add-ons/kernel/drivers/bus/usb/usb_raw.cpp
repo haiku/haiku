@@ -731,14 +731,17 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			status = acquire_sem_etc(device->notify, 1, B_KILL_CAN_INTERRUPT, 0);
-			if (status != B_OK)
-				return status;
+			if (status != B_OK) {
+				gUSBModule->cancel_queued_requests(device->device);
+				acquire_sem(device->notify);
+			}
 
 			command.control.status = device->status;
 			command.control.length = device->actual_length;
 			deviceLocker.Unlock();
 
-			status = B_OK;
+			if (command.control.status == B_OK)
+				status = B_OK;
 			if (inTransfer && user_memcpy(command.control.data, controlData,
 				command.control.length) != B_OK) {
 				status = B_BAD_ADDRESS;
@@ -855,14 +858,17 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			status = acquire_sem_etc(device->notify, 1, B_KILL_CAN_INTERRUPT, 0);
-			if (status != B_OK)
-				return status;
+			if (status != B_OK) {
+				gUSBModule->cancel_queued_transfers(endpointInfo->handle);
+				acquire_sem(device->notify);
+			}
 
 			command.transfer.status = device->status;
 			command.transfer.length = device->actual_length;
 			deviceLocker.Unlock();
 
-			status = B_OK;
+			if (command.transfer.status == B_OK)
+				status = B_OK;
 			if (op == B_USB_RAW_COMMAND_ISOCHRONOUS_TRANSFER) {
 				if (user_memcpy(command.isochronous.packet_descriptors,
 						packetDescriptors, descriptorsSize) != B_OK) {
