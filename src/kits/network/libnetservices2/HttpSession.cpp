@@ -888,6 +888,8 @@ BHttpSession::Request::ReceiveResult()
 					fResult->SetStatus(std::move(fStatus));
 					fResult->SetFields(BHttpFields());
 					fResult->SetBody();
+					SendMessage(UrlEvent::RequestCompleted,
+						[](BMessage& msg) { msg.AddBool(UrlEventData::Success, true); });
 					return true;
 				}
 
