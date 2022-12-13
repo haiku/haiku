@@ -30,7 +30,7 @@ AddFilesToPackage add-ons kernel busses ata
 
 AddFilesToPackage add-ons kernel busses i2c : pch_i2c@x86,x86_64 ;
 AddFilesToPackage add-ons kernel busses mmc : sdhci_pci ;
-AddFilesToPackage add-ons kernel busses pci : <pci>x86@x86,x86_64 ;
+AddFilesToPackage add-ons kernel busses pci : <pci>ecam@riscv64,arm,arm64 <pci>x86@x86,x86_64 ;
 AddFilesToPackage add-ons kernel busses random : ccp_rng@x86,x86_64 virtio_rng ;
 AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
 AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci
@@ -198,7 +198,7 @@ AddBootModuleSymlinksToPackage
 	nvme_disk
 	openpic@ppc
 	packagefs pci
-	<pci>x86@x86,x86_64
+	<pci>ecam@riscv64,arm,arm64 <pci>x86@x86,x86_64
 	fdt@riscv64,arm,arm64
 	scsi scsi_cd scsi_disk scsi_periph silicon_image_3112 highpoint_ide_pci
 	sdhci_pci

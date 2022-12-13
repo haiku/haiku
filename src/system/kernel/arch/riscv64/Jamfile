@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src system kernel arch riscv64 ;
 
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica include ;
 SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 UsePrivateKernelHeaders ;
 
@@ -14,6 +15,7 @@ KernelMergeObject kernel_arch_riscv64.o :
 	arch_debug_console.cpp
 	arch_elf.cpp
 	arch_int.cpp
+	acpi_irq_routing_table.cpp
 	arch_platform.cpp
 	arch_real_time_clock.cpp
 	arch_smp.cpp

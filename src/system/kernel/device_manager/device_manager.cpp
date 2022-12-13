@@ -1769,6 +1769,7 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 					_AddPath(*stack, "busses/random");
 					_AddPath(*stack, "busses/virtio");
 					_AddPath(*stack, "bus_managers/pci");
+					_AddPath(*stack, "busses/pci");
 				}
 				break;
 		}

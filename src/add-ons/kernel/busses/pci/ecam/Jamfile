@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src add-ons kernel busses pci ecam ;
+
+SubDirC++Flags -fno-rtti ;
+
+UsePrivateKernelHeaders ;
+
+SubDirHdrs $(HAIKU_TOP) src system kernel arch generic ;
+
+KernelAddon <pci>ecam :
+	ECAMPCIController.cpp
+	ECAMPCIControllerACPI.cpp
+	ECAMPCIControllerFDT.cpp
+	kernel_interface.cpp
+;
