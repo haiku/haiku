@@ -247,6 +247,10 @@ struct usb_module_info {
 										uint8 portIndex);
 	status_t						(*disable_port)(usb_device hub,
 										uint8 portIndex);
+
+	/* Cancel all pending async requests in a device control pipe */
+	status_t						(*cancel_queued_requests)(usb_device device);
+
 };
 
 
