@@ -16,10 +16,7 @@ class DeviceACPI : public Device {
 public:
 						DeviceACPI(Device* parent);
 	virtual				~DeviceACPI();
-	virtual Attributes	GetBusAttributes();
-	virtual BString		GetBusStrings();
 	virtual void		InitFromAttributes();
-	virtual BString		GetBusTabName();
 };
 
 #endif /* DEVICEACPI_H */

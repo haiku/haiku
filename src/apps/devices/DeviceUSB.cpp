@@ -125,33 +125,3 @@ DeviceUSB::InitFromAttributes()
 	outlineName << manufacturerLabel << " " << deviceLabel;
 	SetText(outlineName.String());
 }
-
-
-Attributes
-DeviceUSB::GetBusAttributes()
-{
-	Attributes attributes;
-	attributes.push_back(GetAttribute(B_DEVICE_VENDOR_ID));
-	attributes.push_back(GetAttribute(B_DEVICE_ID));
-	attributes.push_back(GetAttribute(USB_DEVICE_CLASS));
-	attributes.push_back(GetAttribute(USB_DEVICE_SUBCLASS));
-	attributes.push_back(GetAttribute(USB_DEVICE_PROTOCOL));
-	return attributes;
-}
-
-
-BString
-DeviceUSB::GetBusStrings()
-{
-	BString str("Class Info:\t\t\t\t: %classInfo%");
-	str.ReplaceFirst("%classInfo%", fAttributeMap["Class Info"]);
-	return str;
-}
-
-
-BString
-DeviceUSB::GetBusTabName()
-{
-	return B_TRANSLATE("USB Information");
-}
-

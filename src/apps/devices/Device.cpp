@@ -112,26 +112,6 @@ Device::SetAttribute(const BString& name, const BString& value)
 
 
 Attributes
-Device::GetBasicAttributes()
-{
-	Attributes attributes;
-	attributes.push_back(Attribute(B_TRANSLATE("Device name:"), GetName()));
-	attributes.push_back(Attribute(B_TRANSLATE("Manufacturer:"),
-		GetManufacturer()));
-	return attributes;
-}
-
-
-Attributes
-Device::GetBusAttributes()
-{
-	Attributes attributes;
-	attributes.push_back(Attribute("None", ""));
-	return attributes;
-}
-
-
-Attributes
 Device::GetAllAttributes()
 {
 	Attributes attributes;
@@ -140,36 +120,6 @@ Device::GetAllAttributes()
 		attributes.push_back(Attribute(iter->first, iter->second));
 	}
 	return attributes;
-}
-
-
-BString
-Device::GetBasicStrings()
-{
-	BString str(B_TRANSLATE("Device Name\t\t\t\t: %Name%\n"
-							"Manufacturer\t\t\t: %Manufacturer%\n"
-							"Driver used\t\t\t\t: %DriverUsed%\n"
-							"Device paths\t: %DevicePaths%"));
-
-	str.ReplaceFirst("%Name%", GetName());
-	str.ReplaceFirst("%Manufacturer%", GetManufacturer());
-	str.ReplaceFirst("%DriverUsed%", GetDriverUsed());
-	str.ReplaceFirst("%DevicePaths%", GetDevPathsPublished());
-
-	return str;
-}
-
-BString
-Device::GetBusStrings()
-{
-	return B_TRANSLATE("None");
-}
-
-
-BString
-Device::GetBusTabName()
-{
-	return B_TRANSLATE("Bus Information");
 }
 
 

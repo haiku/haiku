@@ -15,8 +15,8 @@ resource app_version
 
 	internal = 0,
 
-	short_info = "Devices", 
-	long_info  = "Devices ©2009 Haiku"
+	short_info = "Devices",
+	long_info  = "Devices ©2009-2022 Haiku Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;

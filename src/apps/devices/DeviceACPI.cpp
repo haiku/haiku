@@ -115,33 +115,3 @@ DeviceACPI::InitFromAttributes()
 	outlineName << deviceName;
 	SetText(outlineName.String());
 }
-
-
-Attributes
-DeviceACPI::GetBusAttributes()
-{
-	// Push back things that matter for ACPI
-	Attributes attributes;
-	attributes.push_back(GetAttribute("device/bus"));
-	attributes.push_back(GetAttribute("acpi/path"));
-	attributes.push_back(GetAttribute("acpi/type"));
-	return attributes;
-}
-
-
-BString
-DeviceACPI::GetBusStrings()
-{
-	BString str(B_TRANSLATE("Class Info:\t\t\t\t: %classInfo%"));
-	str.ReplaceFirst("%classInfo%", fAttributeMap["Class Info"]);
-	
-	return str;
-}
-	
-
-BString
-DeviceACPI::GetBusTabName()
-{
-	return B_TRANSLATE("ACPI Information");
-}
-

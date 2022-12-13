@@ -16,10 +16,7 @@ class DeviceUSB : public Device {
 public:
 						DeviceUSB(Device* parent);
 	virtual				~DeviceUSB();
-	virtual Attributes	GetBusAttributes();
-	virtual BString		GetBusStrings();
 	virtual void		InitFromAttributes();
-	virtual BString		GetBusTabName();
 
 private:
 	uint8				fClassBaseId;

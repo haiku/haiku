@@ -99,7 +99,6 @@ Application Devices :
 	DeviceUSB.cpp
 	Device.cpp
 	PropertyList.cpp
-	PropertyListPlain.cpp
 	: be libcolumnlistview.a tracker [ TargetLibsupc++ ]
 		[ TargetLibstdc++ ]	localestub
 	: Devices.rdef
@@ -112,7 +111,6 @@ DoCatalogs Devices :
 	DevicesView.cpp
 	DevicePCI.cpp
 	PropertyList.cpp
-	PropertyListPlain.cpp
 	DeviceACPI.cpp
 	DeviceSCSI.cpp
 	Device.cpp
