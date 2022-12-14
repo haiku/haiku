@@ -223,8 +223,23 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
 		efi_memory_descriptor *entry
 			= (efi_memory_descriptor *)((addr_t)memory_map + i * descriptor_size);
-		maxAddress = std::max(maxAddress,
-				      entry->PhysicalStart + entry->NumberOfPages * 4096);
+		switch (entry->Type) {
+		case EfiLoaderCode:
+		case EfiLoaderData:
+		case EfiBootServicesCode:
+		case EfiBootServicesData:
+		case EfiConventionalMemory:
+		case EfiRuntimeServicesCode:
+		case EfiRuntimeServicesData:
+		case EfiPersistentMemory:
+		case EfiACPIReclaimMemory:
+		case EfiACPIMemoryNVS:
+			maxAddress = std::max(maxAddress,
+					      entry->PhysicalStart + entry->NumberOfPages * 4096);
+			break;
+		default:
+			break;
+		}
 	}
 
 	// Want to map at least 4GB, there may be stuff other than usable RAM that
