@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src add-ons kernel busses pci designware ;
+
+SubDirC++Flags -fno-rtti ;
+
+UsePrivateKernelHeaders ;
+
+KernelAddon <pci>designware :
+	DWPCIController.cpp
+	MsiInterruptCtrlDW.cpp
+	kernel_interface.cpp
+;
