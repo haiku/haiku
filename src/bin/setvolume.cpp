@@ -48,9 +48,14 @@ main(int argc, char **argv)
 	}
 
 	BContinuousParameter *gain = NULL;
+	BParameter *mute = NULL;
 
 	BParameter *parameter;
 	for (int32 index = 0; (parameter = web->ParameterAt(index)) != NULL; index++) {
+		// assume the mute preceeding master gain control
+		if (!strcmp(parameter->Kind(), B_MUTE))
+			mute = parameter;
+
 		if (!strcmp(parameter->Kind(), B_MASTER_GAIN)) {
 			gain = dynamic_cast<BContinuousParameter *>(parameter);
 			break;
@@ -66,11 +71,31 @@ main(int argc, char **argv)
 	float volume = 0.0;
 
 	if (argc > 1) {
-		char *end;
-		volume = strtod(argv[1], &end);
-		if (end == argv[1]) {
-			fprintf(stderr, "usage: %s <volume>\n", sProgramName);
+		if (strcmp(argv[1], "-m") == 0) {
+			int32 muted = 0;
+			bigtime_t lastChange = 0;
+			size_t size = sizeof(int32);
+			mute->GetValue(&muted, &size, &lastChange);
+			muted = 1 - muted;
+			mute->SetValue(&muted, sizeof(int32), system_time());
 		} else {
+			if (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "-d") == 0) {
+				bigtime_t when;
+				size_t size = sizeof(volume);
+				gain->GetValue(&volume, &size, &when);
+				if (strcmp(argv[1], "-i") == 0)
+					volume += 3;
+				else
+					volume -= 3;
+			} else {
+				char *end;
+				volume = strtod(argv[1], &end);
+				if (end == argv[1]) {
+					fprintf(stderr, "usage: %s [<volume> | -i | -d | -m ]\n", sProgramName);
+					exit(1);
+				}
+			}
+
 			// make sure our parameter is in range
 			if (volume > gain->MaxValue())
 				volume = gain->MaxValue();
