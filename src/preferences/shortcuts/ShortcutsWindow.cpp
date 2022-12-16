@@ -811,6 +811,7 @@ ShortcutsWindow::DispatchMessage(BMessage* message, BHandler* handler)
 			break;
 
 		case B_KEY_DOWN:
+		case B_UNMAPPED_KEY_DOWN:
 		{
 			ShortcutsSpec* selected;
 			int32 modifiers = message->GetInt32("modifiers", 0);
@@ -821,9 +822,11 @@ ShortcutsWindow::DispatchMessage(BMessage* message, BHandler* handler)
 			else if (handler == fColumnListView
 				&& (selected =
 					static_cast<ShortcutsSpec*>(fColumnListView->CurrentSelection()))) {
+				uint32 keyCode = message->GetInt32("key", 0);
+				const char* keyName = GetKeyName(keyCode);
 				selected->ProcessColumnTextString(
 						ShortcutsSpec::KEY_COLUMN_INDEX,
-						GetKeyName(message->GetInt32("key", 0)));
+						keyName != NULL ? keyName : GetFallbackKeyName(keyCode).String());
 				_MarkKeySetModified();
 			}
 			break;

@@ -9,16 +9,20 @@
 #define _KEY_INFOS_H
 
 
+#include <String.h>
 #include <SupportDefs.h>
 
 
 // Returns an ASCII string for the given key index, or NULL if a bad code is
 // given.
-const char* GetKeyName(uint8 keyIndex);
+const char* GetKeyName(uint32 keyIndex);
+
+// Returns an ASCII string based on the given key code
+BString GetFallbackKeyName(uint32 keyCode);
 
 // Inverse of GetKeyName(). Finds the index of the given string. Returns 0 if
 // the string was not found in the set of key names.
-uint8 FindKeyCode(const char* keyName);
+uint32 FindKeyCode(const char* keyName);
 
 // Returns the UTF8 value for the given key, or "\0" if none.
 const char* GetKeyUTF8(uint8 keyIndex);

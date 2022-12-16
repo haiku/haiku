@@ -23,4 +23,4 @@ Addon shortcut_catcher :
 	CommandExecutor.cpp
 	KeyCommandMap.cpp
 	ShortcutsServerFilter.cpp
-	: be game input_server libshortcuts_shared.a [ TargetLibsupc++ ] ;
+	: be game input_server libshortcuts_shared.a [ TargetLibstdc++ ] [ TargetLibsupc++ ] ;
