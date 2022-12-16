@@ -29,7 +29,7 @@ static const char* const kLinkPaths[PackageLinkSymlink::TYPE_ENUM_COUNT]
 	},
 	{
 		"../../../system/settings",
-		"../../../home/config/settings/global",
+		"../../../home/config/settings",
 		kUnknownLinkTarget
 	}
 };

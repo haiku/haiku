@@ -878,18 +878,6 @@ CommitTransactionHandler::_AddGlobalWritableFile(Package* package,
 	const BGlobalWritableFileInfo& file, const BDirectory& rootDirectory,
 	const BDirectory& extractedFilesDirectory)
 {
-	// Map the path name to the actual target location. Currently this only
-	// concerns "settings/", which is mapped to "settings/global/".
-	BString targetPath(file.Path());
-	if (fVolume->MountType() == PACKAGE_FS_MOUNT_TYPE_HOME) {
-		if (targetPath == "settings"
-			|| targetPath.StartsWith("settings/")) {
-			targetPath.Insert("/global", 8);
-			if (targetPath.Length() == file.Path().Length())
-				throw std::bad_alloc();
-		}
-	}
-
 	// open parent directory of the source entry
 	const char* lastSlash = strrchr(file.Path(), '/');
 	const BDirectory* sourceDirectory;
@@ -916,6 +904,7 @@ CommitTransactionHandler::_AddGlobalWritableFile(Package* package,
 	}
 
 	// open parent directory of the target entry -- create, if necessary
+	BString targetPath(file.Path());
 	FSUtils::Path relativeSourcePath(file.Path());
 	lastSlash = strrchr(targetPath, '/');
 	if (lastSlash != NULL) {

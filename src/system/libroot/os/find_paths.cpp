@@ -216,8 +216,7 @@ get_relative_directory_path(size_t installationLocationIndex,
 		case B_FIND_PATH_SERVERS_DIRECTORY:
 			return "/servers";
 		case B_FIND_PATH_SETTINGS_DIRECTORY:
-			return installationLocationIndex == kHomeInstallationLocationIndex
-				? "/settings/global" : "/settings";
+			return "/settings";
 		case B_FIND_PATH_SOUNDS_DIRECTORY:
 			return "/data/sounds";
 		case B_FIND_PATH_SPOOL_DIRECTORY:
