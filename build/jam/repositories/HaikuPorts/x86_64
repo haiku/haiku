@@ -6,30 +6,30 @@ RemotePackageRepository HaikuPorts
 	be_book-2008_10_26-4
 	ca_root_certificates-2022_10_11-1
 	haikuporter-1.2.5-1
-	haiku_userguide-2022_11_11-1
-	haiku_userguide_ca-2022_11_11-1
-	haiku_userguide_de-2022_11_11-1
-	haiku_userguide_en-2022_11_11-1
-	haiku_userguide_eo-2022_11_11-1
-	haiku_userguide_es-2022_11_11-1
-	haiku_userguide_fi-2022_11_11-1
-	haiku_userguide_fr-2022_11_11-1
-	haiku_userguide_fur-2022_11_11-1
-	haiku_userguide_hu-2022_11_11-1
-	haiku_userguide_id-2022_11_11-1
-	haiku_userguide_it-2022_11_11-1
-	haiku_userguide_jp-2022_11_11-1
-	haiku_userguide_pl-2022_11_11-1
-	haiku_userguide_pt_br-2022_11_11-1
-	haiku_userguide_pt_pt-2022_11_11-1
-	haiku_userguide_ro-2022_11_11-1
-	haiku_userguide_ru-2022_11_11-1
-	haiku_userguide_sk-2022_11_11-1
-	haiku_userguide_sv_se-2022_11_11-1
-	haiku_userguide_tr-2022_11_11-1
-	haiku_userguide_uk-2022_11_11-1
-	haiku_userguide_zh_cn-2022_11_11-1
-	haiku_welcome-2022_11_11-1
+	haiku_userguide-2022_11_11-2
+	haiku_userguide_ca-2022_11_11-2
+	haiku_userguide_de-2022_11_11-2
+	haiku_userguide_en-2022_11_11-2
+	haiku_userguide_eo-2022_11_11-2
+	haiku_userguide_es-2022_11_11-2
+	haiku_userguide_fi-2022_11_11-2
+	haiku_userguide_fr-2022_11_11-2
+	haiku_userguide_fur-2022_11_11-2
+	haiku_userguide_hu-2022_11_11-2
+	haiku_userguide_id-2022_11_11-2
+	haiku_userguide_it-2022_11_11-2
+	haiku_userguide_jp-2022_11_11-2
+	haiku_userguide_pl-2022_11_11-2
+	haiku_userguide_pt_br-2022_11_11-2
+	haiku_userguide_pt_pt-2022_11_11-2
+	haiku_userguide_ro-2022_11_11-2
+	haiku_userguide_ru-2022_11_11-2
+	haiku_userguide_sk-2022_11_11-2
+	haiku_userguide_sv_se-2022_11_11-2
+	haiku_userguide_tr-2022_11_11-2
+	haiku_userguide_uk-2022_11_11-2
+	haiku_userguide_zh_cn-2022_11_11-2
+	haiku_welcome-2022_11_11-2
 	noto-20200106-1
 	noto_sans_cjk_jp-1.004-2
 	timgmsoundfont-fixed-5
