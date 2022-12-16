@@ -57,7 +57,7 @@ public:
 private:
 			BMenuItem* 			_CreateActuatorPresetMenuItem(const char* label)
 									const;
-			void 				_AddNewSpec(const char* defaultCommand);
+			void 				_AddNewSpec(const char* defaultCommand, uint32 keyCode = 0);
 			void 				_MarkKeySetModified();
 			bool 				_LoadKeySet(const BMessage& loadMessage);
 			bool 				_SaveKeySet(BEntry& saveEntry);
