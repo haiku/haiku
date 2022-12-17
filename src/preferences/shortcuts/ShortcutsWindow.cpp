@@ -811,8 +811,12 @@ ShortcutsWindow::DispatchMessage(BMessage* message, BHandler* handler)
 			break;
 
 		case B_KEY_DOWN:
+		{
 			ShortcutsSpec* selected;
-			if (message->GetInt32("modifiers", 0) != 0)
+			int32 modifiers = message->GetInt32("modifiers", 0);
+			// These should not block key detection here:
+			modifiers &= ~(B_CAPS_LOCK | B_SCROLL_LOCK | B_NUM_LOCK);
+			if (modifiers != 0)
 				BWindow::DispatchMessage(message, handler);
 			else if (handler == fColumnListView
 				&& (selected =
@@ -823,7 +827,7 @@ ShortcutsWindow::DispatchMessage(BMessage* message, BHandler* handler)
 				_MarkKeySetModified();
 			}
 			break;
-
+		}
 		default:
 			BWindow::DispatchMessage(message, handler);
 			break;
