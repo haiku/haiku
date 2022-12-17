@@ -14,7 +14,6 @@
 
 #include <stdio.h>
 
-#include <PCI_x86.h>
 #include <bus/PCI.h>
 #include <USB3.h>
 #include <KernelExport.h>
@@ -30,7 +29,6 @@
 
 #define USB_MODULE_NAME	"xhci"
 
-static pci_x86_module_info* sPCIx86Module = NULL;
 device_manager_info* gDeviceManager;
 static usb_for_controller_interface* gUSB;
 
@@ -271,30 +269,12 @@ module_dependency module_dependencies[] = {
 };
 
 
-static status_t
-device_std_ops(int32 op, ...)
-{
-	switch (op) {
-		case B_MODULE_INIT:
-			if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module) != B_OK)
-				sPCIx86Module = NULL;
-			return B_OK;
-		case B_MODULE_UNINIT:
-			if (sPCIx86Module != NULL)
-				put_module(B_PCI_X86_MODULE_NAME);
-			return B_OK;
-		default:
-			return B_ERROR;
-	}
-}
-
-
 static usb_bus_interface gXHCIPCIDeviceModule = {
 	{
 		{
 			XHCI_PCI_USB_BUS_MODULE_NAME,
 			0,
-			device_std_ops
+			NULL
 		},
 		NULL,  // supports device
 		NULL,  // register device
@@ -521,13 +501,10 @@ XHCI::XHCI(pci_info *info, 	pci_device_module_info* pci, pci_device* device, Sta
 
 	// Find the right interrupt vector, using MSIs if available.
 	fIRQ = fPCIInfo->u.h0.interrupt_line;
-	if (sPCIx86Module != NULL && sPCIx86Module->get_msi_count(fPCIInfo->bus,
-			fPCIInfo->device, fPCIInfo->function) >= 1) {
+	if (fPci->get_msi_count(fDevice) >= 1) {
 		uint8 msiVector = 0;
-		if (sPCIx86Module->configure_msi(fPCIInfo->bus, fPCIInfo->device,
-				fPCIInfo->function, 1, &msiVector) == B_OK
-			&& sPCIx86Module->enable_msi(fPCIInfo->bus, fPCIInfo->device,
-				fPCIInfo->function) == B_OK) {
+		if (fPci->configure_msi(fDevice, 1, &msiVector) == B_OK
+			&& fPci->enable_msi(fDevice) == B_OK) {
 			TRACE_ALWAYS("using message signaled interrupts\n");
 			fIRQ = msiVector;
 			fUseMSI = true;
@@ -577,11 +554,9 @@ XHCI::~XHCI()
 		delete_area(fScratchpadArea[i]);
 	delete_area(fDcbaArea);
 
-	if (fUseMSI && sPCIx86Module != NULL) {
-		sPCIx86Module->disable_msi(fPCIInfo->bus,
-			fPCIInfo->device, fPCIInfo->function);
-		sPCIx86Module->unconfigure_msi(fPCIInfo->bus,
-			fPCIInfo->device, fPCIInfo->function);
+	if (fUseMSI) {
+		fPci->disable_msi(fDevice);
+		fPci->unconfigure_msi(fDevice);
 	}
 }
 

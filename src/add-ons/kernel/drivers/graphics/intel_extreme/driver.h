@@ -20,7 +20,6 @@
 extern char* gDeviceNames[];
 extern intel_info* gDeviceInfo[];
 extern pci_module_info* gPCI;
-extern pci_x86_module_info* gPCIx86Module;
 extern agp_gart_module_info* gGART;
 extern mutex gLock;
 

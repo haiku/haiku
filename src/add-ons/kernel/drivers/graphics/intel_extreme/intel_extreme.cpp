@@ -447,12 +447,12 @@ init_interrupt_handler(intel_info &info)
 	info.use_msi = false;
 	if (info.pci->u.h0.interrupt_pin != 0x00)
 		info.irq = info.pci->u.h0.interrupt_line;
-	if (gPCIx86Module != NULL && gPCIx86Module->get_msi_count(info.pci->bus,
+	if (gPCI->get_msi_count(info.pci->bus,
 			info.pci->device, info.pci->function) >= 1) {
 		uint8 msiVector = 0;
-		if (gPCIx86Module->configure_msi(info.pci->bus, info.pci->device,
+		if (gPCI->configure_msi(info.pci->bus, info.pci->device,
 				info.pci->function, 1, &msiVector) == B_OK
-			&& gPCIx86Module->enable_msi(info.pci->bus, info.pci->device,
+			&& gPCI->enable_msi(info.pci->bus, info.pci->device,
 				info.pci->function) == B_OK) {
 			TRACE("using message signaled interrupts\n");
 			info.irq = msiVector;
@@ -942,10 +942,10 @@ intel_extreme_uninit(intel_info &info)
 			remove_io_interrupt_handler(info.irq, intel_interrupt_handler, &info);
 		}
 
-		if (info.use_msi && gPCIx86Module != NULL) {
-			gPCIx86Module->disable_msi(info.pci->bus,
+		if (info.use_msi) {
+			gPCI->disable_msi(info.pci->bus,
 				info.pci->device, info.pci->function);
-			gPCIx86Module->unconfigure_msi(info.pci->bus,
+			gPCI->unconfigure_msi(info.pci->bus,
 				info.pci->device, info.pci->function);
 		}
 	}

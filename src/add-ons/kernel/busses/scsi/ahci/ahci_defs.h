@@ -8,7 +8,6 @@
 #include <ata_types.h>
 #include <bus/PCI.h>
 #include <bus/SCSI.h>
-#include <PCI_x86.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -325,7 +324,6 @@ status_t get_device_info(uint16 vendorID, uint16 deviceID, const char **name,
 extern scsi_sim_interface gAHCISimInterface;
 extern device_manager_info *gDeviceManager;
 extern scsi_for_sim_interface *gSCSI;
-extern pci_x86_module_info* gPCIx86Module;
 
 
 #define MAX_SECTOR_LBA_28 ((1ull << 28) - 1)

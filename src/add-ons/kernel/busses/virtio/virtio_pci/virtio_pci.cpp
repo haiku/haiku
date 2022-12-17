@@ -9,7 +9,6 @@
 #include <string.h>
 
 #include <bus/PCI.h>
-#include <PCI_x86.h>
 #include <virtio.h>
 
 #include "virtio_pci.h"
@@ -61,7 +60,6 @@ typedef struct {
 
 device_manager_info* gDeviceManager;
 virtio_for_controller_interface* gVirtio;
-static pci_x86_module_info* sPCIx86Module;
 
 
 int32
@@ -290,67 +288,54 @@ setup_interrupt(void* cookie, uint16 queueCount)
 
 	bus->queue_count = queueCount;
 
-	if (sPCIx86Module != NULL) {
-		// try MSI-X
-		uint8 msixCount = sPCIx86Module->get_msix_count(
-			pciInfo->bus, pciInfo->device, pciInfo->function);
-		if (msixCount >= 1) {
-			if (msixCount >= (queueCount + 1)) {
-				uint8 vector;
-				bus->cookies = new(std::nothrow)
-					virtio_pci_queue_cookie[queueCount];
-				if (bus->cookies != NULL
-					&& sPCIx86Module->configure_msix(pciInfo->bus,
-						pciInfo->device, pciInfo->function, queueCount + 1,
-						&vector) == B_OK
-					&& sPCIx86Module->enable_msix(pciInfo->bus, pciInfo->device,
-						pciInfo->function) == B_OK) {
-					TRACE_ALWAYS("using MSI-X count %u starting at %d\n",
-						queueCount + 1, vector);
-					bus->irq = vector;
-					bus->irq_type = VIRTIO_IRQ_MSI_X;
-				} else {
-					ERROR("couldn't use MSI-X\n");
-				}
-			} else {
-				uint8 vector;
-				if (sPCIx86Module->configure_msix(pciInfo->bus, pciInfo->device,
-						pciInfo->function, queueCount + 1, &vector) == B_OK
-					&& sPCIx86Module->enable_msix(pciInfo->bus, pciInfo->device,
-						pciInfo->function) == B_OK) {
-					TRACE_ALWAYS("using MSI-X vector shared %u\n", 1);
-					bus->irq = vector;
-					bus->irq_type = VIRTIO_IRQ_MSI_X_SHARED;
-				} else {
-					ERROR("couldn't use MSI-X SHARED\n");
-				}
-			}
-		} else if (sPCIx86Module->get_msi_count(
-			pciInfo->bus, pciInfo->device, pciInfo->function) >= 1) {
-			// try MSI
+	// try MSI-X
+	uint8 msixCount = bus->pci->get_msix_count(bus->device);
+	if (msixCount >= 1) {
+		if (msixCount >= (queueCount + 1)) {
 			uint8 vector;
-			if (sPCIx86Module->configure_msi(pciInfo->bus, pciInfo->device,
-					pciInfo->function, 1, &vector) == B_OK
-				&& sPCIx86Module->enable_msi(pciInfo->bus, pciInfo->device,
-					pciInfo->function) == B_OK) {
-				TRACE_ALWAYS("using MSI vector %u\n", vector);
+			bus->cookies = new(std::nothrow)
+				virtio_pci_queue_cookie[queueCount];
+			if (bus->cookies != NULL
+				&& bus->pci->configure_msix(bus->device, queueCount + 1,
+					&vector) == B_OK
+				&& bus->pci->enable_msix(bus->device) == B_OK) {
+				TRACE_ALWAYS("using MSI-X count %u starting at %d\n",
+					queueCount + 1, vector);
 				bus->irq = vector;
-				bus->irq_type = VIRTIO_IRQ_MSI;
+				bus->irq_type = VIRTIO_IRQ_MSI_X;
 			} else {
-				ERROR("couldn't use MSI\n");
+				ERROR("couldn't use MSI-X\n");
+			}
+		} else {
+			uint8 vector;
+			if (bus->pci->configure_msix(bus->device, queueCount + 1, &vector) == B_OK
+				&& bus->pci->enable_msix(bus->device) == B_OK) {
+				TRACE_ALWAYS("using MSI-X vector shared %u\n", 1);
+				bus->irq = vector;
+				bus->irq_type = VIRTIO_IRQ_MSI_X_SHARED;
+			} else {
+				ERROR("couldn't use MSI-X SHARED\n");
 			}
 		}
+	} else if (bus->pci->get_msi_count(bus->device) >= 1) {
+		// try MSI
+		uint8 vector;
+		if (bus->pci->configure_msi(bus->device, 1, &vector) == B_OK
+			&& bus->pci->enable_msi(bus->device) == B_OK) {
+			TRACE_ALWAYS("using MSI vector %u\n", vector);
+			bus->irq = vector;
+			bus->irq_type = VIRTIO_IRQ_MSI;
+		} else {
+			ERROR("couldn't use MSI\n");
+		}
 	}
+
 	if (bus->irq_type == VIRTIO_IRQ_LEGACY) {
 		bus->irq = pciInfo->u.h0.interrupt_line;
 		TRACE_ALWAYS("using legacy interrupt %u\n", bus->irq);
 	}
 	if (bus->irq == 0 || bus->irq == 0xff) {
 		ERROR("PCI IRQ not assigned\n");
-		if (sPCIx86Module != NULL) {
-			put_module(B_PCI_X86_MODULE_NAME);
-			sPCIx86Module = NULL;
-		}
 		delete bus;
 		return B_ERROR;
 	}
@@ -395,7 +380,6 @@ free_interrupt(void* cookie)
 {
 	CALLED();
 	virtio_pci_sim_info* bus = (virtio_pci_sim_info*)cookie;
-	pci_info *pciInfo = &bus->info;
 
 	if (bus->irq_type == VIRTIO_IRQ_MSI_X) {
 		remove_io_interrupt_handler(bus->irq, virtio_pci_config_interrupt,
@@ -410,11 +394,9 @@ free_interrupt(void* cookie)
 	} else
 		remove_io_interrupt_handler(bus->irq, virtio_pci_interrupt, bus);
 
-	if (sPCIx86Module != NULL && bus->irq_type != VIRTIO_IRQ_LEGACY) {
-		sPCIx86Module->disable_msi(pciInfo->bus, pciInfo->device,
-			pciInfo->function);
-		sPCIx86Module->unconfigure_msi(pciInfo->bus, pciInfo->device,
-			pciInfo->function);
+	if (bus->irq_type != VIRTIO_IRQ_LEGACY) {
+		bus->pci->disable_msi(bus->device);
+		bus->pci->unconfigure_msi(bus->device);
 	}
 	return B_OK;
 }
@@ -455,11 +437,6 @@ init_bus(device_node* node, void** bus_cookie)
 		gDeviceManager->put_node(parent);
 	}
 
-	if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module)
-			!= B_OK) {
-		sPCIx86Module = NULL;
-	}
-
 	bus->node = node;
 	bus->pci = pci;
 	bus->device = device;
@@ -496,7 +473,6 @@ uninit_bus(void* bus_cookie)
 	if (bus->irq_type != VIRTIO_IRQ_LEGACY) {
 		if (bus->irq_type == VIRTIO_IRQ_MSI) {
 			remove_io_interrupt_handler(bus->irq, virtio_pci_interrupt, bus);
-
 		} else {
 			int32 irq = bus->irq + 1;
 			for (uint16 queue = 0; queue < bus->queue_count; queue++, irq++) {
@@ -507,18 +483,11 @@ uninit_bus(void* bus_cookie)
 					bus);
 		}
 
-		if (sPCIx86Module != NULL) {
-			sPCIx86Module->disable_msi(bus->info.bus,
-				bus->info.device, bus->info.function);
-			sPCIx86Module->unconfigure_msi(bus->info.bus,
-				bus->info.device, bus->info.function);
-		}
+		bus->pci->disable_msi(bus->device);
+		bus->pci->unconfigure_msi(bus->device);
 	} else
 		remove_io_interrupt_handler(bus->irq, virtio_pci_interrupt, bus);
-	if (sPCIx86Module != NULL) {
-		put_module(B_PCI_X86_MODULE_NAME);
-		sPCIx86Module = NULL;
-	}
+
 	delete[] bus->cookies;
 	delete bus;
 }

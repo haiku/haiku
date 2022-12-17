@@ -748,7 +748,7 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 	}
 
 	dprintf("hda: hda_audio_group_get_widgets failed for %s stream\n",
-		type == STREAM_PLAYBACK ? " playback" : "record");
+		type == STREAM_PLAYBACK ? "playback" : "record");
 
 	free(stream);
 	return NULL;
@@ -1153,13 +1153,13 @@ hda_hw_init(hda_controller* controller)
 	controller->irq = pciInfo.u.h0.interrupt_line;
 	controller->msi = false;
 
-	if (gPCIx86Module != NULL && (quirks & HDA_QUIRK_NO_MSI) == 0
-			&& gPCIx86Module->get_msi_count(pciInfo.bus, pciInfo.device,
+	if ((quirks & HDA_QUIRK_NO_MSI) == 0
+			&& gPci->get_msi_count(pciInfo.bus, pciInfo.device,
 				pciInfo.function) >= 1) {
 		// Try MSI first
 		uint8 vector;
-		if (gPCIx86Module->configure_msi(pciInfo.bus, pciInfo.device,
-			pciInfo.function, 1, &vector) == B_OK && gPCIx86Module->enable_msi(
+		if (gPci->configure_msi(pciInfo.bus, pciInfo.device,
+			pciInfo.function, 1, &vector) == B_OK && gPci->enable_msi(
 				pciInfo.bus, pciInfo.device, pciInfo.function) == B_OK) {
 			dprintf("hda: using MSI vector %u\n", vector);
 			controller->irq = vector;
@@ -1332,9 +1332,9 @@ reset_failed:
 
 no_irq_handler:
 	if (controller->msi) {
-		gPCIx86Module->disable_msi(controller->pci_info.bus,
+		gPci->disable_msi(controller->pci_info.bus,
 			controller->pci_info.device, controller->pci_info.function);
-		gPCIx86Module->unconfigure_msi(controller->pci_info.bus,
+		gPci->unconfigure_msi(controller->pci_info.bus,
 			controller->pci_info.device, controller->pci_info.function);
 	}
 
@@ -1394,9 +1394,9 @@ hda_hw_uninit(hda_controller* controller)
 
 	if (controller->msi) {
 		// Disable MSI
-		gPCIx86Module->disable_msi(controller->pci_info.bus,
+		gPci->disable_msi(controller->pci_info.bus,
 			controller->pci_info.device, controller->pci_info.function);
-		gPCIx86Module->unconfigure_msi(controller->pci_info.bus,
+		gPci->unconfigure_msi(controller->pci_info.bus,
 			controller->pci_info.device, controller->pci_info.function);
 	}
 

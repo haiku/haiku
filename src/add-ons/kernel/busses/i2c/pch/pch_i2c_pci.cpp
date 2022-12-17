@@ -12,7 +12,6 @@
 #include <ByteOrder.h>
 #include <condition_variable.h>
 #include <bus/PCI.h>
-#include <PCI_x86.h>
 
 
 #include "pch_i2c.h"
@@ -26,9 +25,6 @@ typedef struct {
 
 	pci_info pciinfo;
 } pch_i2c_pci_sim_info;
-
-
-static pci_x86_module_info* sPCIx86Module;
 
 
 //	#pragma mark -
@@ -152,41 +148,27 @@ init_device(device_node* node, void** device_cookie)
 	pcicmd |= PCI_command_master | PCI_command_memory;
 	pci->write_pci_config(device, PCI_command, 2, pcicmd);
 
-	if (get_module(B_PCI_X86_MODULE_NAME, (module_info**)&sPCIx86Module)
-			!= B_OK) {
-		sPCIx86Module = NULL;
-	}
-
-	if (sPCIx86Module != NULL) {
-		// try MSI-X
-		uint8 msixCount = sPCIx86Module->get_msix_count(
-			pciInfo->bus, pciInfo->device, pciInfo->function);
-		if (msixCount >= 1) {
-			uint8 vector;
-			if (sPCIx86Module->configure_msix(pciInfo->bus, pciInfo->device,
-					pciInfo->function, 1, &vector) == B_OK
-				&& sPCIx86Module->enable_msix(pciInfo->bus, pciInfo->device,
-					pciInfo->function) == B_OK) {
-				TRACE_ALWAYS("using MSI-X vector %u\n", vector);
-				bus->info.irq = vector;
-				bus->irq_type = PCH_I2C_IRQ_MSI_X_SHARED;
-			} else {
-				ERROR("couldn't use MSI-X SHARED\n");
-			}
-		} else if (sPCIx86Module->get_msi_count(
-			pciInfo->bus, pciInfo->device, pciInfo->function) >= 1) {
-			// try MSI
-			uint8 vector;
-			if (sPCIx86Module->configure_msi(pciInfo->bus, pciInfo->device,
-					pciInfo->function, 1, &vector) == B_OK
-				&& sPCIx86Module->enable_msi(pciInfo->bus, pciInfo->device,
-					pciInfo->function) == B_OK) {
-				TRACE_ALWAYS("using MSI vector %u\n", vector);
-				bus->info.irq = vector;
-				bus->irq_type = PCH_I2C_IRQ_MSI;
-			} else {
-				ERROR("couldn't use MSI\n");
-			}
+	// try MSI-X
+	if (pci->get_msix_count(device) >= 1) {
+		uint8 vector;
+		if (pci->configure_msix(device, 1, &vector) == B_OK
+			&& pci->enable_msix(device) == B_OK) {
+			TRACE_ALWAYS("using MSI-X vector %u\n", vector);
+			bus->info.irq = vector;
+			bus->irq_type = PCH_I2C_IRQ_MSI_X_SHARED;
+		} else {
+			ERROR("couldn't use MSI-X SHARED\n");
+		}
+	} else if (pci->get_msi_count(device) >= 1) {
+		// try MSI
+		uint8 vector;
+		if (pci->configure_msi(device, 1, &vector) == B_OK
+			&& pci->enable_msi(device) == B_OK) {
+			TRACE_ALWAYS("using MSI vector %u\n", vector);
+			bus->info.irq = vector;
+			bus->irq_type = PCH_I2C_IRQ_MSI;
+		} else {
+			ERROR("couldn't use MSI\n");
 		}
 	}
 	if (bus->irq_type == PCH_I2C_IRQ_LEGACY) {
@@ -213,16 +195,8 @@ uninit_device(void* device_cookie)
 {
 	pch_i2c_pci_sim_info* bus = (pch_i2c_pci_sim_info*)device_cookie;
 	if (bus->irq_type != PCH_I2C_IRQ_LEGACY) {
-		if (sPCIx86Module != NULL) {
-			sPCIx86Module->disable_msi(bus->pciinfo.bus,
-				bus->pciinfo.device, bus->pciinfo.function);
-			sPCIx86Module->unconfigure_msi(bus->pciinfo.bus,
-				bus->pciinfo.device, bus->pciinfo.function);
-		}
-	}
-	if (sPCIx86Module != NULL) {
-		put_module(B_PCI_X86_MODULE_NAME);
-		sPCIx86Module = NULL;
+		bus->pci->disable_msi(bus->device);
+		bus->pci->unconfigure_msi(bus->device);
 	}
 	free(bus);
 }

@@ -143,7 +143,6 @@ const device_info kSupportedDevices[] = {
 
 device_manager_info *gDeviceManager;
 scsi_for_sim_interface *gSCSI;
-pci_x86_module_info* gPCIx86Module;
 
 
 status_t
@@ -325,34 +324,11 @@ ahci_device_removed(void *cookie)
 }
 
 
-static status_t
-std_ops(int32 op, ...)
-{
-	switch (op) {
-		case B_MODULE_INIT:
-			if (get_module(B_PCI_X86_MODULE_NAME,
-					(module_info**)&gPCIx86Module) != B_OK) {
-				gPCIx86Module = NULL;
-			}
-			return B_OK;
-		case B_MODULE_UNINIT:
-			if (gPCIx86Module != NULL) {
-				put_module(B_PCI_X86_MODULE_NAME);
-				gPCIx86Module = NULL;
-			}
-			return B_OK;
-
-		default:
-			return B_ERROR;
-	}
-}
-
-
 driver_module_info sAHCIDevice = {
 	{
 		AHCI_DEVICE_MODULE_NAME,
 		0,
-		std_ops
+		NULL
 	},
 	ahci_supports_device,
 	ahci_register_device,

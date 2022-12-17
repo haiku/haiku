@@ -102,20 +102,17 @@ AHCIController::Init()
 	}
 
 	fIRQ = pciInfo.u.h0.interrupt_line;
-	if (gPCIx86Module != NULL && gPCIx86Module->get_msi_count(
-			pciInfo.bus, pciInfo.device, pciInfo.function) >= 1) {
+	if (fPCI->get_msi_count(fPCIDevice) >= 1) {
 		uint8 vector;
-		if (gPCIx86Module->configure_msi(pciInfo.bus, pciInfo.device,
-				pciInfo.function, 1, &vector) == B_OK
-			&& gPCIx86Module->enable_msi(pciInfo.bus, pciInfo.device,
-				pciInfo.function) == B_OK) {
+		if (fPCI->configure_msi(fPCIDevice, 1, &vector) == B_OK
+			&& fPCI->enable_msi(fPCIDevice) == B_OK) {
 			TRACE("using MSI vector %u\n", vector);
 			fIRQ = vector;
 			fUseMSI = true;
 		} else {
 			TRACE("couldn't use MSI\n");
 		}
-	}	
+	}
 	if (fIRQ == 0 || fIRQ == 0xff) {
 		TRACE("Error: PCI IRQ not assigned\n");
 		return B_ERROR;
@@ -246,7 +243,7 @@ AHCIController::Init()
 	// clear any pending interrupts
 	uint32 interruptsPending;
 	interruptsPending = fRegs->is;
-	fRegs->is = interruptsPending; 
+	fRegs->is = interruptsPending;
 	FlushPostedWrites();
 
 	// enable interrupts
@@ -294,16 +291,12 @@ AHCIController::Uninit()
 	fRegs->is = 0xffffffff;
 	FlushPostedWrites();
 
-  	// well...
-  	remove_io_interrupt_handler(fIRQ, Interrupt, this);
+	// well...
+	remove_io_interrupt_handler(fIRQ, Interrupt, this);
 
-	if (fUseMSI && gPCIx86Module != NULL) {
-		pci_info pciInfo;
-		fPCI->get_pci_info(fPCIDevice, &pciInfo);
-		gPCIx86Module->disable_msi(pciInfo.bus,
-			pciInfo.device, pciInfo.function);
-		gPCIx86Module->unconfigure_msi(pciInfo.bus,
-			pciInfo.device, pciInfo.function);
+	if (fUseMSI) {
+		fPCI->disable_msi(fPCIDevice);
+		fPCI->unconfigure_msi(fPCIDevice);
 	}
 
 	delete_area(fRegsArea);

@@ -199,7 +199,6 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 char* gDeviceNames[MAX_CARDS + 1];
 intel_info* gDeviceInfo[MAX_CARDS];
 pci_module_info* gPCI;
-pci_x86_module_info* gPCIx86Module = NULL;
 agp_gart_module_info* gGART;
 mutex gLock;
 
@@ -364,13 +363,6 @@ init_driver(void)
 
 	mutex_init(&gLock, "intel extreme ksync");
 
-	// Try to get the PCI x86 module as well so we can enable possible MSIs.
-	if (get_module(B_PCI_X86_MODULE_NAME,
-			(module_info **)&gPCIx86Module) != B_OK) {
-		ERROR("failed to get pci x86 module\n");
-		gPCIx86Module = NULL;
-	}
-
 	// find the PCH device (if any)
 	enum pch_info pchInfo = detect_intel_pch();
 
@@ -430,10 +422,6 @@ init_driver(void)
 		mutex_destroy(&gLock);
 		put_module(B_AGP_GART_MODULE_NAME);
 		put_module(B_PCI_MODULE_NAME);
-		if (gPCIx86Module != NULL) {
-			gPCIx86Module = NULL;
-			put_module(B_PCI_X86_MODULE_NAME);
-		}
 		return ENODEV;
 	}
 
@@ -457,10 +445,6 @@ uninit_driver(void)
 
 	put_module(B_AGP_GART_MODULE_NAME);
 	put_module(B_PCI_MODULE_NAME);
-	if (gPCIx86Module != NULL) {
-		gPCIx86Module = NULL;
-		put_module(B_PCI_X86_MODULE_NAME);
-	}
 }
 
 

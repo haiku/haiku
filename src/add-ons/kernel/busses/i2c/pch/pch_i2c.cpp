@@ -12,7 +12,6 @@
 #include <ByteOrder.h>
 #include <condition_variable.h>
 #include <bus/PCI.h>
-#include <PCI_x86.h>
 
 
 #include "pch_i2c.h"

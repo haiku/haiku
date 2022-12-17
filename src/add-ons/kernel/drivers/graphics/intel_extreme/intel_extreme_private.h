@@ -12,7 +12,6 @@
 #include <AGP.h>
 #include <KernelExport.h>
 #include <PCI.h>
-#include <PCI_x86.h>
 
 #include "intel_extreme.h"
 #include "lock.h"
