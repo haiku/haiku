@@ -76,7 +76,7 @@ A password is required.	UserLoginWindow		E je necessarie une peraule d'ordin.
 Language	RatePackageWindow		Lenghe
 Status	PackageListView		Stât
 Network transport error	ServerHelper		Erôr di traspuart de rêt
-Cancel	PackageResult		Cancele
+Cancel	PackageResult		Anule
 Uninstall %PackageTitle%	PackageManager		Disinstale %PackageTitle%
 Retry	PackageProblem		Torne prove
 Update	RatePackageWindow		Inzorne
