@@ -51,6 +51,7 @@ class BMenuBar;
 class FindWindow;
 class PrefWindow;
 class TermViewContainerView;
+class ThemeWindow;
 
 
 class TermWindow : public BWindow, private SmartTabView::Listener,
@@ -211,6 +212,7 @@ private:
 
 			BMessage*			fPrintSettings;
 			PrefWindow*			fPrefWindow;
+			ThemeWindow*		fThemeWindow;
 			FindWindow*			fFindPanel;
 			BRect				fSavedFrame;
 			window_look			fSavedLook;

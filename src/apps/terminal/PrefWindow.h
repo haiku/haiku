@@ -14,10 +14,10 @@
 #include <Window.h>
 
 // local messages
-const ulong MSG_DEFAULTS_PRESSED = 'defl';
-const ulong MSG_SAVEAS_PRESSED = 'canl';
-const ulong MSG_REVERT_PRESSED = 'revt';
-const ulong MSG_PREF_CLOSED = 'mspc';
+const uint32 MSG_DEFAULTS_PRESSED = 'defl';
+const uint32 MSG_SAVEAS_PRESSED = 'canl';
+const uint32 MSG_REVERT_PRESSED = 'revt';
+const uint32 MSG_PREF_CLOSED = 'mspc';
 
 class BButton;
 class BFilePanel;

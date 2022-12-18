@@ -16,6 +16,7 @@
 // Application signature (Must same in Terminal.rdef)
 #define TERM_SIGNATURE "application/x-vnd.Haiku-Terminal"
 #define PREFFILE_MIMETYPE "text/x-terminal-pref"
+#define THEMEFILE_MIMETYPE "text/x-terminal-theme"
 
 // Signature of R5's Terminal. Needed for proper drop-in window count support
 #define R5_TERM_SIGNATURE "application/x-vnd.Be-SHEL"
@@ -52,6 +53,7 @@ static const uint32 MENU_FIND_STRING	= 'Mfpr';
 static const uint32 MENU_FIND_NEXT		= 'Mfnx';
 static const uint32 MENU_FIND_PREVIOUS	= 'Mfbw';
 static const uint32 MENU_SHOW_COLOR		= 'Mcol';
+static const uint32 MENU_THEME_OPEN		= 'Mthm';
 
 static const uint32 M_GET_DEVICE_NUM	= 'Mgdn';
 
