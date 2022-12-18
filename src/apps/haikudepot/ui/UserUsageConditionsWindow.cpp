@@ -10,6 +10,7 @@
 #include <Font.h>
 #include <LayoutBuilder.h>
 #include <ScrollView.h>
+#include <StringFormat.h>
 #include <StringView.h>
 
 #include "AppUtils.h"
@@ -431,12 +432,10 @@ UserUsageConditionsWindow::_VersionText(const BString& code)
 /*static*/ const BString
 UserUsageConditionsWindow::_MinimumAgeText(uint8 minimumAge)
 {
-	BString minimumAgeString;
-	minimumAgeString.SetToFormat("%" B_PRId8, minimumAge);
-	BString ageNoteText(
-		B_TRANSLATE("Users are required to be %AgeYears% years of age or "
-			"older."));
-	ageNoteText.ReplaceAll("%AgeYears%", minimumAgeString);
+	BString ageNoteText;
+	static BStringFormat formatText(B_TRANSLATE("Users are required to be "
+		"{0, plural, one{# year of age} other{# years of age}} or older."));
+	formatText.Format(ageNoteText, minimumAge);
 	return ageNoteText;
 }
 
