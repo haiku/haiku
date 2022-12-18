@@ -137,6 +137,10 @@ AddFilesToPackage data KeyboardLayouts Apple\ Aluminum
 AddFilesToPackage data KeyboardLayouts ThinkPad
 	: $(HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES) ;
 
+# terminal themes
+local terminalThemes = [ Glob $(HAIKU_TOP)/data/system/data/terminal_themes : "[a-zA-Z0-9 ]*" ] ;
+AddFilesToPackage data Terminal Themes : $(terminalThemes) ;
+
 # boot module links
 AddBootModuleSymlinksToPackage
 	acpi@x86,x86_64 ata pci isa@x86,x86_64 dpc
