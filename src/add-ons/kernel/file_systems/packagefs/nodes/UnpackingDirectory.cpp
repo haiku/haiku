@@ -7,6 +7,7 @@
 #include "UnpackingDirectory.h"
 
 #include "DebugSupport.h"
+#include "EmptyAttributeDirectoryCookie.h"
 #include "UnpackingAttributeCookie.h"
 #include "UnpackingAttributeDirectoryCookie.h"
 #include "Utils.h"
@@ -229,6 +230,19 @@ RootDirectory::RootDirectory(ino_t id, const timespec& modifiedTime)
 	UnpackingDirectory(id),
 	fModifiedTime(modifiedTime)
 {
+}
+
+
+status_t
+RootDirectory::OpenAttributeDirectory(AttributeDirectoryCookie*& _cookie)
+{
+	if (HasVFSInitError())
+		return B_ERROR;
+
+	_cookie = new(std::nothrow) EmptyAttributeDirectoryCookie;
+	if (_cookie == nullptr)
+		return B_NO_MEMORY;
+	return B_OK;
 }
 
 
