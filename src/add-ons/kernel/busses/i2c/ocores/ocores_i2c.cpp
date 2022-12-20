@@ -92,8 +92,11 @@ OcoresI2c::SupportsDevice(device_node* parent)
 	if (status < B_OK)
 		return -1.0f;
 
-	if (strcmp(compatible, "opencores,i2c-ocores") != 0)
+	if (strcmp(compatible, "opencores,i2c-ocores") != 0
+		&& strcmp(compatible, "sifive,fu740-c000-i2c") != 0
+		&& strcmp(compatible, "sifive,i2c0") != 0) {
 		return 0.0f;
+	}
 
 	return 1.0f;
 }
