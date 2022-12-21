@@ -68,10 +68,10 @@ TAPEReader::GetFileFormatInfo(media_file_format* oMFF)
 			| media_file_format::B_KNOWS_ENCODED_AUDIO;
 	oMFF->family = B_ANY_FORMAT_FAMILY;
 	oMFF->version = MEDIA_FILE_FORMAT_VERSION;
-	strcpy(oMFF->mime_type, MIME_TYPE_APE);
-	strcpy(oMFF->pretty_name, MIME_TYPE_APE_LONG_DESCRIPTION);
-	strcpy(oMFF->short_name, MIME_TYPE_APE_SHORT_DESCRIPTION);
-	strcpy(oMFF->file_extension, MIME_TYPE_APE_EXTENSION);
+	strlcpy(oMFF->mime_type, MIME_TYPE_APE, sizeof(oMFF->mime_type));
+	strlcpy(oMFF->pretty_name, MIME_TYPE_APE_LONG_DESCRIPTION, sizeof(oMFF->pretty_name));
+	strlcpy(oMFF->short_name, MIME_TYPE_APE_SHORT_DESCRIPTION, sizeof(oMFF->short_name));
+	strlcpy(oMFF->file_extension, MIME_TYPE_APE_EXTENSION, sizeof(oMFF->file_extension));
 }
 
 

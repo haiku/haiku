@@ -1541,34 +1541,35 @@ AVFormatReader::GetFileFormatInfo(media_file_format* mff)
 	mff->version = 100;
 
 	if (format != NULL) {
-		strcpy(mff->mime_type, format->mime_type);
+		strlcpy(mff->mime_type, format->mime_type, sizeof(mff->mime_type));
 	} else {
 		// TODO: Would be nice to be able to provide this from AVInputFormat,
 		// maybe by extending the FFmpeg code itself (all demuxers).
-		strcpy(mff->mime_type, "");
+		mff->mime_type[0] = '\0';
 	}
 
 	if (context->iformat->extensions != NULL)
-		strcpy(mff->file_extension, context->iformat->extensions);
+		strlcpy(mff->file_extension, context->iformat->extensions, sizeof(mff->file_extension));
 	else {
 		TRACE("  no file extensions for AVInputFormat.\n");
-		strcpy(mff->file_extension, "");
+		mff->file_extension[0] = '\0';
 	}
 
 	if (context->iformat->name != NULL)
-		strcpy(mff->short_name,  context->iformat->name);
+		strlcpy(mff->short_name,  context->iformat->name, sizeof(mff->short_name));
 	else {
 		TRACE("  no short name for AVInputFormat.\n");
-		strcpy(mff->short_name, "");
+		mff->short_name[0] = '\0';
 	}
 
-	if (context->iformat->long_name != NULL)
-		sprintf(mff->pretty_name, "%s (FFmpeg)", context->iformat->long_name);
-	else {
+	if (context->iformat->long_name != NULL) {
+		snprintf(mff->pretty_name, sizeof(mff->pretty_name), "%s (FFmpeg)",
+			context->iformat->long_name);
+	} else {
 		if (format != NULL)
 			sprintf(mff->pretty_name, "%s (FFmpeg)", format->pretty_name);
 		else
-			strcpy(mff->pretty_name, "Unknown (FFmpeg)");
+			strlcpy(mff->pretty_name, "Unknown (FFmpeg)", sizeof(mff->pretty_name));
 	}
 }
 

@@ -271,10 +271,10 @@ auReader::GetFileFormatInfo(media_file_format *mff)
 						| media_file_format::B_IMPERFECTLY_SEEKABLE;
 	mff->family = B_MISC_FORMAT_FAMILY;
 	mff->version = 100;
-	strcpy(mff->mime_type, "audio/x-au");
-	strcpy(mff->file_extension, "au");
-	strcpy(mff->short_name,  "Sun audio file");
-	strcpy(mff->pretty_name, "Sun audio file");
+	strlcpy(mff->mime_type, "audio/x-au", sizeof(mff->mime_type));
+	strlcpy(mff->file_extension, "au", sizeof(mff->file_extension));
+	strlcpy(mff->short_name,  "Sun audio file", sizeof(mff->short_name));
+	strlcpy(mff->pretty_name, "Sun audio file", sizeof(mff->pretty_name));
 }
 
 
