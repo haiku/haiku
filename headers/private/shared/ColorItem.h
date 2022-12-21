@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Haiku, Inc. All rights reserved.
+ * Copyright 2016-2022 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,7 +20,8 @@ public:
 							ColorItem(const char* string, rgb_color color);
 
 	virtual	void			DrawItem(BView* owner, BRect frame, bool complete);
-	virtual	void			SetColor(rgb_color color);
+			void			SetColor(rgb_color color) { fColor = color; }
+			rgb_color		Color() const { return fColor; }
 
 private:
 			rgb_color		fColor;

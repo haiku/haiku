@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Haiku, Inc. All rights reserved.
+ * Copyright 2016-2022 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -86,11 +86,4 @@ ColorItem::DrawItem(BView* owner, BRect frame, bool complete)
 
 	owner->SetHighColor(highColor);
 	owner->SetLowColor(lowColor);
-}
-
-
-void
-ColorItem::SetColor(rgb_color color)
-{
-	fColor = color;
 }
