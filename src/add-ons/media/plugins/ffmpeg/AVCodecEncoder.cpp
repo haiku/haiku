@@ -271,6 +271,11 @@ AVCodecEncoder::_Setup()
 
 	int rawBitRate;
 
+	if (fCodecContext != NULL) {
+		avcodec_close(fCodecContext);
+		avcodec_free_context(&fCodecContext);
+	}
+
 	fCodecContext = avcodec_alloc_context3(fCodec);
 	if (fCodecContext == NULL)
 		return B_NO_INIT;
