@@ -18,9 +18,12 @@
 #include <drivers/bus/PCI.h>
 #include <drivers/bus/SCSI.h>
 
-#include "dm_wrapper.h"
-#include "pcihdr.h"
-#include "pci-utils.h"
+extern "C" {
+	#include "dm_wrapper.h"
+	#include "pcihdr.h"
+	#include "pci-utils.h"
+	#include "usb-utils.h"
+}
 
 
 extern const char *__progname;
@@ -32,6 +35,13 @@ int gMode = USER_MODE;
 #define BUS_ISA		1
 #define BUS_PCI		2
 #define BUS_SCSI 	3
+#define BUS_USB		4
+
+
+// from usb_private.h
+#define USB_DEVICE_CLASS "usb/class"
+#define USB_DEVICE_SUBCLASS "usb/subclass"
+#define USB_DEVICE_PROTOCOL "usb/protocol"
 
 
 static const char *
@@ -156,13 +166,13 @@ display_device(device_node_cookie *node, uint8 level)
 	char device_bus[64];
 	uint8 scsi_path_id = 255;
 	int bus = 0;
+	uint16 vendor_id = 0;
+	uint16 device_id = 0;
 
 	// PCI attributes
 	uint8 pci_class_base_id = 0;
 	uint8 pci_class_sub_id = 0;
 	uint8 pci_class_api_id = 0;
-	uint16 pci_vendor_id = 0;
-	uint16 pci_device_id = 0;
 	uint16 pci_subsystem_vendor_id = 0;
 	uint16 pci_subsystem_id = 0;
 
@@ -173,10 +183,10 @@ display_device(device_node_cookie *node, uint8 level)
 	char scsi_vendor[64];
 	char scsi_product[64];
 
-	const char *venShort;
-	const char *venFull;
-	const char *devShort;
-	const char *devFull;
+	// USB attributes
+	uint8 usb_class_base_id = 0;
+	uint8 usb_class_sub_id = 0;
+	uint8 usb_class_proto_id = 0;
 
 	attr.cookie = 0;
 	attr.node_cookie = *node;
@@ -201,10 +211,10 @@ display_device(device_node_cookie *node, uint8 level)
 			pci_class_api_id = attr.value.ui8;
 		else if (!strcmp(attr.name, B_DEVICE_VENDOR_ID)
 			&& attr.type == B_UINT16_TYPE)
-			pci_vendor_id = attr.value.ui16;
+			vendor_id = attr.value.ui16;
 		else if (!strcmp(attr.name, B_DEVICE_ID)
 			&& attr.type == B_UINT16_TYPE)
-			pci_device_id = attr.value.ui16;
+			device_id = attr.value.ui16;
 		else if (!strcmp(attr.name, SCSI_DEVICE_TARGET_LUN_ITEM)
 			&& attr.type == B_UINT8_TYPE)
 			scsi_target_lun = attr.value.ui8;
@@ -220,11 +230,22 @@ display_device(device_node_cookie *node, uint8 level)
 		else if (!strcmp(attr.name, SCSI_DEVICE_PRODUCT_ITEM)
 			&& attr.type == B_STRING_TYPE)
 			strlcpy(scsi_product, attr.value.string, 64);
+		else if (!strcmp(attr.name, USB_DEVICE_CLASS)
+			&& attr.type == B_UINT8_TYPE)
+			usb_class_base_id = attr.value.ui8;
+		else if (!strcmp(attr.name, USB_DEVICE_SUBCLASS)
+			&& attr.type == B_UINT8_TYPE)
+			usb_class_sub_id = attr.value.ui8;
+		else if (!strcmp(attr.name, USB_DEVICE_PROTOCOL)
+			&& attr.type == B_UINT8_TYPE)
+			usb_class_proto_id = attr.value.ui8;
 
 		if (!strcmp(device_bus, "isa"))
 			bus = BUS_ISA;
 		else if (!strcmp(device_bus, "pci"))
 			bus = BUS_PCI;
+		else if (!strcmp(device_bus, "usb"))
+			bus = BUS_USB;
 		else if (scsi_path_id < 255)
 			bus = BUS_SCSI;
 
@@ -256,28 +277,33 @@ display_device(device_node_cookie *node, uint8 level)
 
 			put_level(level);
 			printf("  ");
-			get_vendor_info(pci_vendor_id, &venShort, &venFull);
+			const char *venShort;
+			const char *venFull;
+			const char *devShort;
+			const char *devFull;
+
+			get_vendor_info(vendor_id, &venShort, &venFull);
 			if (!venShort && !venFull) {
-				printf("vendor %04x: Unknown\n", pci_vendor_id);
+				printf("vendor %04x: Unknown\n", vendor_id);
 			} else if (venShort && venFull) {
-				printf("vendor %04x: %s - %s\n", pci_vendor_id,
+				printf("vendor %04x: %s - %s\n", vendor_id,
 					venShort, venFull);
 			} else {
-				printf("vendor %04x: %s\n", pci_vendor_id,
+				printf("vendor %04x: %s\n", vendor_id,
 					venShort ? venShort : venFull);
 			}
 
 			put_level(level);
 			printf("  ");
-			get_device_info(pci_vendor_id, pci_device_id,
-				pci_subsystem_vendor_id, pci_subsystem_id, &devShort, &devFull);
+			get_device_info(vendor_id, device_id, pci_subsystem_vendor_id, pci_subsystem_id,
+				&devShort, &devFull);
 			if (!devShort && !devFull) {
-				printf("device %04x: Unknown\n", pci_device_id);
+				printf("device %04x: Unknown\n", device_id);
 			} else if (devShort && devFull) {
-				printf("device %04x: %s (%s)\n", pci_device_id,
+				printf("device %04x: %s (%s)\n", device_id,
 					devShort, devFull);
 			} else {
-				printf("device %04x: %s\n", pci_device_id,
+				printf("device %04x: %s\n", device_id,
 					devShort ? devShort : devFull);
 			}
 			new_level = level + 1;
@@ -293,6 +319,30 @@ display_device(device_node_cookie *node, uint8 level)
 
 			new_level = level + 1;
 			break;
+
+		case BUS_USB:
+			{
+				printf("\n");
+				char classInfo[128];
+				usb_get_class_info(usb_class_base_id, usb_class_sub_id, usb_class_proto_id,
+					classInfo, sizeof(classInfo));
+				put_level(level);
+				printf("device %s [%x|%x|%x]\n", classInfo, usb_class_base_id,
+					usb_class_sub_id, usb_class_proto_id);
+
+				put_level(level);
+				printf("  ");
+				const char* vendorName = NULL;
+				const char* deviceName = NULL;
+				usb_get_vendor_info(vendor_id, &vendorName);
+				usb_get_device_info(vendor_id, device_id, &deviceName);
+				printf("vendor %04x: %s\n", vendor_id, vendorName != NULL ? vendorName : "Unknown");
+				put_level(level);
+				printf("  ");
+				printf("device %04x: %s\n", device_id, deviceName != NULL ? deviceName : "Unknown");
+				new_level = level + 1;
+				break;
+			}
 	}
 
 	return new_level;
