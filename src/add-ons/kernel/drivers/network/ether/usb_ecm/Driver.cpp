@@ -8,6 +8,9 @@
 #include <string.h>
 #include <lock.h>
 
+#include <bus/USB.h>
+
+
 #include "Driver.h"
 #include "ECMDevice.h"
 
@@ -20,12 +23,6 @@ device_manager_info *gDeviceManager;
 #define USB_ECM_DRIVER_MODULE_NAME "drivers/network/usb_ecm/driver_v1"
 #define USB_ECM_DEVICE_MODULE_NAME "drivers/network/usb_ecm/device_v1"
 #define USB_ECM_DEVICE_ID_GENERATOR	"usb_ecm/device_id"
-
-// TODO: move these to a common header
-#define USB_DEVICE_ID_ITEM "usb/id"
-#define USB_DEVICE_CLASS "usb/class"
-#define USB_DEVICE_SUBCLASS "usb/subclass"
-#define USB_DEVICE_PROTOCOL "usb/protocol"
 
 
 //	#pragma mark - device module API

@@ -17,6 +17,7 @@
 #include <drivers/PCI.h>
 #include <drivers/bus/PCI.h>
 #include <drivers/bus/SCSI.h>
+#include <drivers/bus/USB.h>
 
 extern "C" {
 	#include "dm_wrapper.h"
@@ -36,12 +37,6 @@ int gMode = USER_MODE;
 #define BUS_PCI		2
 #define BUS_SCSI 	3
 #define BUS_USB		4
-
-
-// from usb_private.h
-#define USB_DEVICE_CLASS "usb/class"
-#define USB_DEVICE_SUBCLASS "usb/subclass"
-#define USB_DEVICE_PROTOCOL "usb/protocol"
 
 
 static const char *

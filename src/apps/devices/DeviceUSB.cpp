@@ -13,6 +13,7 @@
 #include <stdlib.h>
 
 #include <Catalog.h>
+#include <bus/USB.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "DeviceUSB"
@@ -21,12 +22,6 @@ extern "C" {
 #include "dm_wrapper.h"
 #include "usb-utils.h"
 }
-
-// from usb_private.h
-#define USB_DEVICE_CLASS "usb/class"
-#define USB_DEVICE_SUBCLASS "usb/subclass"
-#define USB_DEVICE_PROTOCOL "usb/protocol"
-
 
 
 DeviceUSB::DeviceUSB(Device* parent)

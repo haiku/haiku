@@ -11,6 +11,7 @@
 
 
 #include <device_manager.h>
+#include <bus/USB.h>
 
 #include "usbspec_private.h"
 #include <lock.h>
@@ -798,10 +799,6 @@ typedef struct {
 } usb_device_interface;
 
 
-#define USB_DEVICE_ID_ITEM "usb/id"
-#define USB_DEVICE_CLASS "usb/class"
-#define USB_DEVICE_SUBCLASS "usb/subclass"
-#define USB_DEVICE_PROTOCOL "usb/protocol"
 #define USB_DEVICE_MODULE_NAME "bus_managers/usb/device/driver_v1"
 
 #endif // _USB_PRIVATE_H
