@@ -1565,12 +1565,10 @@ AVFormatReader::GetFileFormatInfo(media_file_format* mff)
 	if (context->iformat->long_name != NULL) {
 		snprintf(mff->pretty_name, sizeof(mff->pretty_name), "%s (FFmpeg)",
 			context->iformat->long_name);
-	} else {
-		if (format != NULL)
-			sprintf(mff->pretty_name, "%s (FFmpeg)", format->pretty_name);
-		else
-			strlcpy(mff->pretty_name, "Unknown (FFmpeg)", sizeof(mff->pretty_name));
-	}
+	} else if (format != NULL)
+		snprintf(mff->pretty_name, sizeof(mff->pretty_name), "%.54s (FFmpeg)", format->pretty_name);
+	else
+		strlcpy(mff->pretty_name, "Unknown (FFmpeg)", sizeof(mff->pretty_name));
 }
 
 

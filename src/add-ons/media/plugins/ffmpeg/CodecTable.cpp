@@ -32,8 +32,9 @@ build_decoder_formats(media_format** _formats, size_t* _count)
 		return B_ERROR;
 
 	int32 index = 0;
-	AVCodec* codec = NULL;
-	while ((codec = av_codec_next(codec)) != NULL) {
+	void* cookie = NULL;
+	const AVCodec* codec = NULL;
+	while ((codec = av_codec_iterate(&cookie)) != NULL) {
 		if (index >= sMaxFormatCount) {
 			fprintf(stderr, "Maximum format count reached for auto-generated "
 				"AVCodec to media_format mapping, but there are still more "
@@ -55,7 +56,8 @@ build_decoder_formats(media_format** _formats, size_t* _count)
 		}
 
 		media_format_description description;
-		memset(&description, 0, sizeof(description));
+		memset(description._reserved_, 0, sizeof(description._reserved_));
+		memset(description.u._reserved_, 0, sizeof(description.u._reserved_));
 
 		// Hard-code everything to B_MISC_FORMAT_FAMILY to ease matching
 		// later on.
