@@ -901,10 +901,7 @@ ImageView::~ImageView()
 void
 ImageView::AttachedToWindow()
 {
-	if (Parent() != NULL)
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fEditor.StartWatching(this);
 	if (fScaleSlider != NULL)

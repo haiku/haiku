@@ -251,10 +251,7 @@ IconView::~IconView()
 void
 IconView::AttachedToWindow()
 {
-	if (Parent() != NULL)
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 
