@@ -1,10 +1,11 @@
-1	polish	x-vnd.Haiku-NebulaScreensaver	3897597581
+1	polish	x-vnd.Haiku-NebulaScreensaver	1434751133
 cold	Nebula Screen Saver		chłodny
 Internal width:	Nebula Screen Saver		Wewnętrzna szerokość:
 16:9, wide-screen	Nebula Screen Saver		16:9, szerokoekranowy
 Maximum Frames Per Second	Nebula Screen Saver		Maksymalna liczba klatek na sekundę
 Format:	Nebula Screen Saver		Format:
 yellow	Nebula Screen Saver		żółty
+screen resolution	Nebula Screen Saver		rozdzielczość ekranu
 2:3.5, cinemascope	Nebula Screen Saver		2:3.5, cinemascope
 Color:	Nebula Screen Saver		Kolor:
 © 2001-2004 Axel Dörfler.	Nebula Screen Saver		© 2001-2004 Axel Dörfler.
@@ -15,6 +16,7 @@ fullscreen, no borders	Nebula Screen Saver		pełny ekran, bez krawędzi
 orange (original)	Nebula Screen Saver		pomarańczowy (oryginalny)
 cyan	Nebula Screen Saver		cyjan
 Speed	Nebula Screen Saver		Szybkość
+%ld pixels	Nebula Screen Saver		%ld pixels
 Nebula	Nebula Screen Saver		Mgławica
 red	Nebula Screen Saver		czerwony
 grey	Nebula Screen Saver		szary

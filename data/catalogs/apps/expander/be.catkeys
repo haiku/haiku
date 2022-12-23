@@ -1,46 +1,46 @@
 1	belarusian	x-vnd.Haiku-Expander	784190701
-Expand	ExpanderMenu		Распакаваць
-Close window when done expanding	ExpanderPreferences		Закрыць вакно пасля распакоўкі
-Set destination…	ExpanderMenu		Задаць прызначэнне…
-Use:	ExpanderPreferences		Выкарыстаць:
-File expanded	ExpanderWindow		Файл распакаваны
-The destination is read only.	ExpanderWindow		Запіс ў тэчку прызначэння не дазволены.
-Expander: Open	ExpanderWindow		Распакоўшчык: Адкрыць
- is not supported	ExpanderWindow		 не падтрымлiваецца
-Expander settings	ExpanderPreferences		Наладкі Распакоўшчыка
-Select current	DirectoryFilePanel		Пазначыць бягучы
-Source	ExpanderWindow		Крыніца
-Error when expanding archive	ExpanderWindow		Памылка падчас распакоўкі архіву
-Hide contents	ExpanderWindow		Схаваць змест
-Cancel	ExpanderWindow		Скасаваць
-Automatically expand files	ExpanderPreferences		Распакоўваць файлы аўтаматычна
-Continue	ExpanderWindow		Працягваць
-Destination folder	ExpanderPreferences		Тэчка прызначэння
-Other	ExpanderPreferences		Іншы
-Cancel	ExpanderPreferences		Адмена
-Expansion	ExpanderPreferences		Пашырэньне
-Select	DirectoryFilePanel		Пазначыць
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Мэтавая папка не існуе. Ці хочаце стварыць яе?
-Same directory as source (archive) file	ExpanderPreferences		Папка ў якой знаходзіцца зыходны архіў
-Settings	ExpanderMenu		Налады
-Settings…	ExpanderMenu		Налады…
-Expander: Choose destination	DirectoryFilePanel		Распакоўшчык: Абраць прызначэнне
-Select	ExpanderPreferences		Пазначыць
-Show contents	ExpanderWindow		Паказаць змест
-Automatically show contents listing	ExpanderPreferences		Аўтаматычна паказваць змесціва
-OK	ExpanderPreferences		ОК
-Leave destination folder path empty	ExpanderPreferences		Пакінуць пуць да пакі прызначэння пустым
-Failed to create the destination folder.	ExpanderWindow		Не ўдалося стварыць мэтавую папку.
-Create	ExpanderWindow		Стварыць
-The file doesn't exist	ExpanderWindow		Гэты файл не існуе
-Stop	ExpanderMenu		Спыніць
-File	ExpanderMenu		Файл
-Expander	System name		Распакоўшчык
-Expand	ExpanderWindow		Распакаваць
-Close	ExpanderMenu		Закрыць
-The destination is not a folder.	ExpanderWindow		Прызначэнне не з´яўляецца каталёгам.
-Open destination folder after extraction	ExpanderPreferences		Паказаць паку прызначэння пасля распакоўкі
-Set source…	ExpanderMenu		Задаць крыніцу…
-Show contents	ExpanderMenu		Паказаць змест
-Stop	ExpanderWindow		Спыніць
 Destination	ExpanderWindow		Прызначэнне
+Other	ExpanderPreferences		Іншы
+Automatically show contents listing	ExpanderPreferences		Аўтаматычна паказваць змесціва
+Expander	System name		Распакоўшчык
+Expander: Choose destination	DirectoryFilePanel		Распакоўшчык: Абраць прызначэнне
+Set source…	ExpanderMenu		Задаць крыніцу…
+The destination is not a folder.	ExpanderWindow		Прызначэнне не з´яўляецца каталёгам.
+Close window when done expanding	ExpanderPreferences		Закрыць вакно пасля распакоўкі
+Close	ExpanderMenu		Закрыць
+Create	ExpanderWindow		Стварыць
+Show contents	ExpanderMenu		Паказаць змест
+Settings	ExpanderMenu		Налады
+Expand	ExpanderWindow		Распакаваць
+Open destination folder after extraction	ExpanderPreferences		Паказаць паку прызначэння пасля распакоўкі
+Same directory as source (archive) file	ExpanderPreferences		Папка ў якой знаходзіцца зыходны архіў
+Stop	ExpanderWindow		Спыніць
+Cancel	ExpanderWindow		Скасаваць
+Expander settings	ExpanderPreferences		Наладкі Распакоўшчыка
+Error when expanding archive	ExpanderWindow		Памылка падчас распакоўкі архіву
+Expand	ExpanderMenu		Распакаваць
+Failed to create the destination folder.	ExpanderWindow		Не ўдалося стварыць мэтавую папку.
+Settings…	ExpanderMenu		Налады…
+Select current	DirectoryFilePanel		Пазначыць бягучы
+OK	ExpanderPreferences		ОК
+File expanded	ExpanderWindow		Файл распакаваны
+Automatically expand files	ExpanderPreferences		Распакоўваць файлы аўтаматычна
+Select	DirectoryFilePanel		Пазначыць
+Show contents	ExpanderWindow		Паказаць змест
+Stop	ExpanderMenu		Спыніць
+Expansion	ExpanderPreferences		Пашырэньне
+Set destination…	ExpanderMenu		Задаць прызначэнне…
+Continue	ExpanderWindow		Працягваць
+ is not supported	ExpanderWindow		 не падтрымлiваецца
+Cancel	ExpanderPreferences		Адмена
+Use:	ExpanderPreferences		Выкарыстаць:
+Destination folder	ExpanderPreferences		Тэчка прызначэння
+Expander: Open	ExpanderWindow		Распакоўшчык: Адкрыць
+Leave destination folder path empty	ExpanderPreferences		Пакінуць пуць да пакі прызначэння пустым
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Мэтавая папка не існуе. Ці хочаце стварыць яе?
+The file doesn't exist	ExpanderWindow		Гэты файл не існуе
+Hide contents	ExpanderWindow		Схаваць змест
+Source	ExpanderWindow		Крыніца
+The destination is read only.	ExpanderWindow		Запіс ў тэчку прызначэння не дазволены.
+Select	ExpanderPreferences		Пазначыць
+File	ExpanderMenu		Файл

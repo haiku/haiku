@@ -7,7 +7,7 @@ Short format:	TimeFormatSettings		Krótki format:
 Locale	Locale Preflet Window		Ustawienia regionalne
 Time	TimeFormatSettings		Czas
 Defaults	Locale Preflet Window		Przywróć domyślne
-Locale	System name		Locale
+Locale	System name		Język
 Date	TimeFormatSettings		Data
 OK	Locale Preflet Window		OK
 Long format:	TimeFormatSettings		Długi format:

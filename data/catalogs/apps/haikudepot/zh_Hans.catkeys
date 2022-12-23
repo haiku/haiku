@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	3761134598
+1	english	x-vnd.Haiku-HaikuDepot	4005253998
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条款下载出错
 Available packages	MainWindow		可用软件包
 It was not possible to create the new user.	UserLoginWindow		无法创建新用户。
@@ -53,7 +53,6 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		软件包守护进程问题
 No	MainWindow		否
 Repository	PackageListView		仓库
-Users are required to be %AgeYears% years of age or older.	UserUsageConditions		用户需要满足年龄不小于 %AgeYears% 。
 Close	RatePackageWindow		关闭
 Close	UserLoginWindow		关闭
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		正在同步 '%REPO_NAME%' 仓库中的软件包数据

@@ -17,7 +17,7 @@ IP address:	IntefaceAddressView		Adres IP:
 Netmask:	IntefaceAddressView		Maska sieci:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Usługi
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instalacja NetworkStatus w Deskbarze nie powiodła się: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instalacja Statusu sieci w Deskbarze nie powiodła się: %s
 Revert	NetworkWindow		Cofnij
 off	ServiceListItem		wyłączony
 WEP	WEP protected network		WEP

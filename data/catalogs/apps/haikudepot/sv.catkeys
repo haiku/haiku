@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	136904009
+1	swedish	x-vnd.Haiku-HaikuDepot	381023409
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Nedladdningsproblem för användningsvillkor
 Available packages	MainWindow		Tillgängliga paket
 It was not possible to create the new user.	UserLoginWindow		Det gick inte att skapa den nya användaren.
@@ -55,7 +55,6 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Problem med paketdemonen
 No	MainWindow		Nej
 Repository	PackageListView		Repositorie
-Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Användare måste vara %AgeYears% år eller äldre.
 Close	RatePackageWindow		Stäng
 Close	UserLoginWindow		Stäng
 The email is malformed.	UserLoginWindow		E-postadressen är felaktigt angiven.

@@ -1,51 +1,51 @@
 1	russian	x-vnd.Haiku-Expander	3300517306
-Expand	ExpanderMenu		Распаковать
-Expanding '%s'…	ExpanderWindow		Распаковка '%s'…
-Close window when done expanding	ExpanderPreferences		Закрывать окно после распаковки
-Set destination…	ExpanderMenu		Путь назначения для извлечения…
-Use:	ExpanderPreferences		Использовать:
-File expanded	ExpanderWindow		Файл распакован
-The destination is read only.	ExpanderWindow		Путь назначения доступен только для чтения.
-Expander: Open	ExpanderWindow		Распаковщик: Открыть
- is not supported	ExpanderWindow		 не поддерживается
-Expander settings	ExpanderPreferences		Настройки извлечения
-Select current	DirectoryFilePanel		Выбрать текущий
-Source	ExpanderWindow		Источник
-Error when expanding archive	ExpanderWindow		Ошибка при распаковке файла
-Hide contents	ExpanderWindow		Скрыть содержимое
-Cancel	ExpanderWindow		Отмена
-Automatically expand files	ExpanderPreferences		Автоматически распаковывать файлы
-Continue	ExpanderWindow		Продолжить
-Destination folder	ExpanderPreferences		Путь для извлечения
-Other	ExpanderPreferences		Другое
-Cancel	ExpanderPreferences		Отмена
-Expansion	ExpanderPreferences		Извлечение
-Select	DirectoryFilePanel		Выбрать
-The folder was either moved, renamed or not supported.	ExpanderWindow		Папка была перемещена, переименована или не поддерживается.
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Папка назначения не существует. Создать её?
-Same directory as source (archive) file	ExpanderPreferences		Использовать ту же папку где находится архив
-Settings	ExpanderMenu		Настройки
-Settings…	ExpanderMenu		Настройки…
-Expander: Choose destination	DirectoryFilePanel		Expander: Выбор папки для извлечения
-Select	ExpanderPreferences		Выбрать
-Show contents	ExpanderWindow		Показать содержимое
-Automatically show contents listing	ExpanderPreferences		Автоматически отображать содержимое архива
-OK	ExpanderPreferences		ОК
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Вы уверены, что хотите остановить распаковку этого архива? Некоторые объекты могли быть распакованы не до конца.
-Leave destination folder path empty	ExpanderPreferences		Оставить путь назначения пустым
-Failed to create the destination folder.	ExpanderWindow		Не удалось создать папку назначения.
-Select '%s'…	DirectoryFilePanel		Выбрать '%s'…
-Create	ExpanderWindow		Создать
-The file doesn't exist	ExpanderWindow		Файл не существует
-Stop	ExpanderMenu		Остановить
-File	ExpanderMenu		Файл
-Expander	System name		Распаковщик
-Expand	ExpanderWindow		Извлечь
-Close	ExpanderMenu		Закрыть
-The destination is not a folder.	ExpanderWindow		Указанный объект не является папкой.
-Open destination folder after extraction	ExpanderPreferences		Открыть папку с извлеченными файлами после распаковки
-Creating listing for '%s'…	ExpanderWindow		Создается список файлов для '%s'…
-Set source…	ExpanderMenu		Выбрать источник…
-Show contents	ExpanderMenu		Показать содержимое
-Stop	ExpanderWindow		Остановить
 Destination	ExpanderWindow		Назначение
+Other	ExpanderPreferences		Другое
+Automatically show contents listing	ExpanderPreferences		Автоматически отображать содержимое архива
+Expander	System name		Распаковщик
+Expander: Choose destination	DirectoryFilePanel		Expander: Выбор папки для извлечения
+Set source…	ExpanderMenu		Выбрать источник…
+The destination is not a folder.	ExpanderWindow		Указанный объект не является папкой.
+The folder was either moved, renamed or not supported.	ExpanderWindow		Папка была перемещена, переименована или не поддерживается.
+Close window when done expanding	ExpanderPreferences		Закрывать окно после распаковки
+Close	ExpanderMenu		Закрыть
+Create	ExpanderWindow		Создать
+Creating listing for '%s'…	ExpanderWindow		Создается список файлов для '%s'…
+Show contents	ExpanderMenu		Показать содержимое
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Вы уверены, что хотите остановить распаковку этого архива? Некоторые объекты могли быть распакованы не до конца.
+Settings	ExpanderMenu		Настройки
+Expand	ExpanderWindow		Извлечь
+Open destination folder after extraction	ExpanderPreferences		Открыть папку с извлеченными файлами после распаковки
+Same directory as source (archive) file	ExpanderPreferences		Использовать ту же папку где находится архив
+Stop	ExpanderWindow		Остановить
+Cancel	ExpanderWindow		Отмена
+Expander settings	ExpanderPreferences		Настройки извлечения
+Error when expanding archive	ExpanderWindow		Ошибка при распаковке файла
+Expand	ExpanderMenu		Распаковать
+Failed to create the destination folder.	ExpanderWindow		Не удалось создать папку назначения.
+Settings…	ExpanderMenu		Настройки…
+Select current	DirectoryFilePanel		Выбрать текущий
+Expanding '%s'…	ExpanderWindow		Распаковка '%s'…
+OK	ExpanderPreferences		ОК
+File expanded	ExpanderWindow		Файл распакован
+Automatically expand files	ExpanderPreferences		Автоматически распаковывать файлы
+Select	DirectoryFilePanel		Выбрать
+Show contents	ExpanderWindow		Показать содержимое
+Stop	ExpanderMenu		Остановить
+Select '%s'…	DirectoryFilePanel		Выбрать '%s'…
+Expansion	ExpanderPreferences		Извлечение
+Set destination…	ExpanderMenu		Путь назначения для извлечения…
+Continue	ExpanderWindow		Продолжить
+ is not supported	ExpanderWindow		 не поддерживается
+Cancel	ExpanderPreferences		Отмена
+Use:	ExpanderPreferences		Использовать:
+Destination folder	ExpanderPreferences		Путь для извлечения
+Expander: Open	ExpanderWindow		Распаковщик: Открыть
+Leave destination folder path empty	ExpanderPreferences		Оставить путь назначения пустым
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Папка назначения не существует. Создать её?
+The file doesn't exist	ExpanderWindow		Файл не существует
+Hide contents	ExpanderWindow		Скрыть содержимое
+Source	ExpanderWindow		Источник
+The destination is read only.	ExpanderWindow		Путь назначения доступен только для чтения.
+Select	ExpanderPreferences		Выбрать
+File	ExpanderMenu		Файл

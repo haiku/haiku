@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	136904009
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	381023409
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
@@ -55,7 +55,6 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Problema amb el dimoni de paquets
 No	MainWindow		No
 Repository	PackageListView		Repositori
-Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Els usuaris han de tenir %AgeYears% anys o més.
 Close	RatePackageWindow		Tanca
 Close	UserLoginWindow		Tanca
 The email is malformed.	UserLoginWindow		L'adreça electrònica no és correcta.

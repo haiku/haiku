@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Terminal	2362866022
+1	croatian	x-vnd.Haiku-Terminal	1211988171
 Close other tabs	Terminal TermWindow		Zatvori druge kartice
 Insert path	Terminal TermView		Unesi putanju
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nije mogao pokrenuti shell. Žao nam je.
@@ -34,7 +34,6 @@ Window title:	Terminal AppearancePrefView		Naslov prozora:
 New tab	Terminal TermWindow		Nova kartica
 Allow bold text	Terminal AppearancePrefView		Dozvoli podebljani tekst
 Window title…	Terminal TermWindow		Naslov prozora...
-Blue	Terminal colors scheme		Plava
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Ne mogu izvršiti \"%command\":\n\t%error
 Open path	Terminal TermView		Otvori putanju
 Terminal	System name		Terminal
@@ -61,10 +60,8 @@ The process \"%1\" is still running.\nIf you close the tab, the process will be 
 Cursor	Terminal AppearancePrefView		Pokazivač
 Full screen	Terminal TermWindow		Puni zaslon
 Shell 	Terminal TermWindow		Shell 
-Midnight	Terminal colors scheme		Ponoć
 Tab title:	Terminal TermWindow		Naslov kartice:
 Window title:	Terminal TermWindow		Naslov prozora:
-Default	Terminal colors scheme		Zadano
 Window size:	Terminal AppearancePrefView		Veličina prozora
 Switch Terminals	Terminal TermWindow		Zamjeni terminale
 Decrease	Terminal TermWindow		Smanji
@@ -72,8 +69,8 @@ Settings…	Terminal TermWindow		Postavke...
 Blinking cursor	Terminal AppearancePrefView		Trepćući pokazivač
 Cancel	Terminal SetTitleWindow		Odustani
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Uzorak koji specificira naslov prozora. Sljedeće rezarvirano mjesto\n se može koristiti:\n
-Close active tab	Terminal TermWindow		Zatvori aktivnu karticu
 Use text:	Terminal FindWindow		Koristi tekst:
+Close active tab	Terminal TermWindow		Zatvori aktivnu karticu
 Save as default	Terminal TermWindow		Spremi kao zadano
 Nothing is selected.	Terminal TermWindow		Ništa nije izabrano
 Find	Terminal FindWindow		Nađi

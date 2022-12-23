@@ -1,51 +1,51 @@
 1	swedish	x-vnd.Haiku-Expander	3300517306
-Expand	ExpanderMenu		Expandera
-Expanding '%s'…	ExpanderWindow		Expanderar '%s'...
-Close window when done expanding	ExpanderPreferences		Stäng fönstret när expandering är klar
-Set destination…	ExpanderMenu		Ange mål…
-Use:	ExpanderPreferences		Använd:
-File expanded	ExpanderWindow		Fil expanderad
-The destination is read only.	ExpanderWindow		Målmappen är inte skrivbar.
-Expander: Open	ExpanderWindow		Expander: Öppna
- is not supported	ExpanderWindow		 stöds inte
-Expander settings	ExpanderPreferences		Expanderaren inställningar
-Select current	DirectoryFilePanel		Välj aktuell
-Source	ExpanderWindow		Källa
-Error when expanding archive	ExpanderWindow		Fel när arkivet skulle expanderas
-Hide contents	ExpanderWindow		Göm innehåll
-Cancel	ExpanderWindow		Avbryt
-Automatically expand files	ExpanderPreferences		Expandera filer automatiskt
-Continue	ExpanderWindow		Fortsätt
-Destination folder	ExpanderPreferences		Målmapp
-Other	ExpanderPreferences		Andra
-Cancel	ExpanderPreferences		Avbryt
-Expansion	ExpanderPreferences		Expansion
-Select	DirectoryFilePanel		Välj
-The folder was either moved, renamed or not supported.	ExpanderWindow		Mappen har antingen blivit flyttad, bytt namn eller stöds inte.
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Målmappen finns inte. Vill du skapa den?
-Same directory as source (archive) file	ExpanderPreferences		Samma mapp som arkivfilen
-Settings	ExpanderMenu		Inställningar
-Settings…	ExpanderMenu		Inställningar...
-Expander: Choose destination	DirectoryFilePanel		Expanderaren: Välj mål
-Select	ExpanderPreferences		Välj
-Show contents	ExpanderWindow		Visa innehåll
-Automatically show contents listing	ExpanderPreferences		Automatiskt visa list innehåll
-OK	ExpanderPreferences		OK
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Är du säker på att du vill sluta expandera detta arkiv? De expanderade objekten är kanske inte fullständiga.
-Leave destination folder path empty	ExpanderPreferences		Lämna destinations folder tom
-Failed to create the destination folder.	ExpanderWindow		Kunde inte skapa målmappen.
-Select '%s'…	DirectoryFilePanel		Välj '%s'…
-Create	ExpanderWindow		Skapa
-The file doesn't exist	ExpanderWindow		Filen finns inte
-Stop	ExpanderMenu		Stopp
-File	ExpanderMenu		Fil
-Expander	System name		Expandera
-Expand	ExpanderWindow		Expandera
-Close	ExpanderMenu		Stäng
-The destination is not a folder.	ExpanderWindow		Målet är inte en mapp.
-Open destination folder after extraction	ExpanderPreferences		Öppna destinations foldern efter extraktionen
-Creating listing for '%s'…	ExpanderWindow		Skapar innehållslista för '%s'...
-Set source…	ExpanderMenu		Sätt källa…
-Show contents	ExpanderMenu		Visa innehåll
-Stop	ExpanderWindow		Stopp
 Destination	ExpanderWindow		Mål
+Other	ExpanderPreferences		Andra
+Automatically show contents listing	ExpanderPreferences		Automatiskt visa list innehåll
+Expander	System name		Expandera
+Expander: Choose destination	DirectoryFilePanel		Expanderaren: Välj mål
+Set source…	ExpanderMenu		Sätt källa…
+The destination is not a folder.	ExpanderWindow		Målet är inte en mapp.
+The folder was either moved, renamed or not supported.	ExpanderWindow		Mappen har antingen blivit flyttad, bytt namn eller stöds inte.
+Close window when done expanding	ExpanderPreferences		Stäng fönstret när expandering är klar
+Close	ExpanderMenu		Stäng
+Create	ExpanderWindow		Skapa
+Creating listing for '%s'…	ExpanderWindow		Skapar innehållslista för '%s'...
+Show contents	ExpanderMenu		Visa innehåll
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Är du säker på att du vill sluta expandera detta arkiv? De expanderade objekten är kanske inte fullständiga.
+Settings	ExpanderMenu		Inställningar
+Expand	ExpanderWindow		Expandera
+Open destination folder after extraction	ExpanderPreferences		Öppna destinations foldern efter extraktionen
+Same directory as source (archive) file	ExpanderPreferences		Samma mapp som arkivfilen
+Stop	ExpanderWindow		Stopp
+Cancel	ExpanderWindow		Avbryt
+Expander settings	ExpanderPreferences		Expanderaren inställningar
+Error when expanding archive	ExpanderWindow		Fel när arkivet skulle expanderas
+Expand	ExpanderMenu		Expandera
+Failed to create the destination folder.	ExpanderWindow		Kunde inte skapa målmappen.
+Settings…	ExpanderMenu		Inställningar...
+Select current	DirectoryFilePanel		Välj aktuell
+Expanding '%s'…	ExpanderWindow		Expanderar '%s'...
+OK	ExpanderPreferences		OK
+File expanded	ExpanderWindow		Fil expanderad
+Automatically expand files	ExpanderPreferences		Expandera filer automatiskt
+Select	DirectoryFilePanel		Välj
+Show contents	ExpanderWindow		Visa innehåll
+Stop	ExpanderMenu		Stopp
+Select '%s'…	DirectoryFilePanel		Välj '%s'…
+Expansion	ExpanderPreferences		Expansion
+Set destination…	ExpanderMenu		Ange mål…
+Continue	ExpanderWindow		Fortsätt
+ is not supported	ExpanderWindow		 stöds inte
+Cancel	ExpanderPreferences		Avbryt
+Use:	ExpanderPreferences		Använd:
+Destination folder	ExpanderPreferences		Målmapp
+Expander: Open	ExpanderWindow		Expander: Öppna
+Leave destination folder path empty	ExpanderPreferences		Lämna destinations folder tom
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Målmappen finns inte. Vill du skapa den?
+The file doesn't exist	ExpanderWindow		Filen finns inte
+Hide contents	ExpanderWindow		Göm innehåll
+Source	ExpanderWindow		Källa
+The destination is read only.	ExpanderWindow		Målmappen är inte skrivbar.
+Select	ExpanderPreferences		Välj
+File	ExpanderMenu		Fil

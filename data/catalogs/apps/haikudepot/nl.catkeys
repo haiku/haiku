@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-HaikuDepot	136904009
+1	dutch; flemish	x-vnd.Haiku-HaikuDepot	381023409
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Gebruiksvoorwaarden downloadprobleem
 Available packages	MainWindow		Beschikbare pakketten
 It was not possible to create the new user.	UserLoginWindow		Het was niet mogelijk om een nieuwe gebruiker aan te maken.
@@ -55,7 +55,6 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Pakket-daemonprobleem
 No	MainWindow		Nee
 Repository	PackageListView		Pakketbron
-Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Gebruikers zijn verplicht om ten minste %AgeYears% jaar te zijn of ouder.
 Close	RatePackageWindow		Sluiten
 Close	UserLoginWindow		Sluiten
 The email is malformed.	UserLoginWindow		Het e-mailadres is ongeldig.

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	572307254
+1	belarusian	x-vnd.Haiku-Terminal	2954026111
 Close other tabs	Terminal TermWindow		Закрыць астатнія ўкладкі
 Insert path	Terminal TermView		Уставіць пуць
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Тэрмінал не змог запусціць абалонку. Выбачайце.
@@ -8,7 +8,6 @@ Edit	Terminal TermWindow		Правіць
 Select all	Terminal TermWindow		Выбраць усё
 Confirm exit if active programs exist	Terminal AppearancePrefView		Пытацца аб выхадзе, калі ёсць актыўныя праграмы
 Copy	Terminal TermWindow		Капіяваць
-Retro	Terminal colors scheme		Даўніна
 Edit tab title…	Terminal TermWindow		Правіць імя ўкладкі…
 Settings	Terminal TermWindow		Наладкі
 Print	Terminal TermWindow		Друк
@@ -24,7 +23,6 @@ Custom	Terminal AppearancePrefView	Window size	Спецыяльнае
 Selected text	Terminal AppearancePrefView		Выбраны тэкст
 Change directory	Terminal TermView		Змяніць дырэкторыю
 Page setup…	Terminal TermWindow		Наладкі старонкі…
-Slate	Terminal colors scheme		Шыфер
 Cancel	Terminal TermView		Адмена
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Тэрмінал
 Find next	Terminal TermWindow		Знайсці далейшае
@@ -33,7 +31,6 @@ Copy link location	Terminal TermView		Капіяваць спасылку
 Window title:	Terminal AppearancePrefView		Імя вакна:
 New tab	Terminal TermWindow		Новая ўкладка
 Window title…	Terminal TermWindow		Загаловак вакна…
-Blue	Terminal colors scheme		Сіні
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Немагчыма выканаць \"%command\":\n\t%error
 Open path	Terminal TermView		Адкрыць шлях 
 Terminal	System name		Тэрмінал
@@ -46,8 +43,8 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Невядомая оп
 Tab title:	Terminal AppearancePrefView		Імя ўкладкі:
 Text not found.	Terminal TermWindow		Тэкст не знойдзены.
 Find failed	Terminal TermWindow		Не ўдалося знайсці
-Color scheme:	Terminal AppearancePrefView		Каляровая схема:
 Match word	Terminal FindWindow		Усё слова
+Color scheme:	Terminal AppearancePrefView		Каляровая схема:
 New Terminal	Terminal TermWindow		Новы Тэрмінал
 Quit	Terminal TermWindow		Выйсці
 Find previous	Terminal TermWindow		Знайсці ранейшае
@@ -62,22 +59,19 @@ The process \"%1\" is still running.\nIf you close the tab, the process will be 
 Cursor	Terminal AppearancePrefView		Курсор
 Full screen	Terminal TermWindow		Поўны экран
 Shell 	Terminal TermWindow		Абалонка 
-Midnight	Terminal colors scheme		Поўнач
 Tab title:	Terminal TermWindow		Імя ўкладкі:
 Window title:	Terminal TermWindow		Імя вакна:
-Default	Terminal colors scheme		Дапомная
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Decrease	Terminal TermWindow		Паменшыць
 Settings…	Terminal TermWindow		Наладкі…
 Blinking cursor	Terminal AppearancePrefView		Мільгаючы курсор
 Cancel	Terminal SetTitleWindow		Адмена
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для імёнаў вакон. Можна ўжываць наступныя\n запаўняльнікі:\n
-Close active tab	Terminal TermWindow		Закрыць актыўную ўкладку
 Use text:	Terminal FindWindow		Ужыць тэкст:
+Close active tab	Terminal TermWindow		Закрыць актыўную ўкладку
 Nothing is selected.	Terminal TermWindow		Нічога не выбрана.
 Find	Terminal FindWindow		Шукаць
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для цякучага імя ўкладкі. Можна ўжываць наступныя\n запаўняльнікі:\n
-Professional	Terminal colors scheme		Прафесіянал
 Font:	Terminal AppearancePrefView		Шрыфт:
 Paste	Terminal TermWindow		Уставіць
 Copy here	Terminal TermView		Капіяваць сюды

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	4089361699
+1	finnish	x-vnd.Haiku-Terminal	3440179729
 ANSI cyan color	Terminal AppearancePrefView		ANSI-sinivihreä väri
 Close other tabs	Terminal TermWindow		Sulje muut välilehdet
 Insert path	Terminal TermView		Lisää polku
@@ -11,11 +11,9 @@ Edit	Terminal TermWindow		Muokkaa
 Select all	Terminal TermWindow		Valitse kaikki
 Confirm exit if active programs exist	Terminal AppearancePrefView		Vahvista poistuminen, jos ohjelmia on käytössä
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tAktiivin prosessin nykyinen työhakemisto nykyisessä\n\t\t\tvälilehdessä. Valinnaisesti määriteltävien polkukomponenttien\n\t\t\tenimmäismäärä. Esim.: '%2d' enintään kahdelle komponentille.\n\t%T\t-\tPääteikkunasovelluksen nimi nykyisessä paikallisasetuksessa.\n\t%e\t-\tNykyisen välilehden koodaus. Ei näytetä UTF-8-koodaukselle.\n\t%i\t-\tIkkunahakemisto.\n\t%p\t-\tAktiivin prosessin nimi nykyisessä välilehdessä.\n\t%t\t-\tNykyisen välilehden otsikko.
-Solarized Dark	Terminal colors scheme		Käänteisen tumma
-Copy	Terminal TermWindow		Kopioi
 ANSI bright green color	Terminal AppearancePrefView		ANSI-vaaleanvihreä väri
+Copy	Terminal TermWindow		Kopioi
 ANSI white color	Terminal AppearancePrefView		ANSI-valkoinen väri
-Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Muokkaa välilehtiotsikkoa...
 Settings	Terminal TermWindow		Asetukset
 Print	Terminal TermWindow		Tulosta
@@ -36,11 +34,9 @@ Selected text	Terminal AppearancePrefView		Valittu teksti
 Change directory	Terminal TermView		Vaihda hakemistoa
 ANSI magenta color	Terminal AppearancePrefView		ANSI-purppura väri
 Page setup…	Terminal TermWindow		Sivuasetus...
-Slate	Terminal colors scheme		Laatta
 Defaults	Terminal PrefWindow		Oletukset
 Cancel	Terminal TermView		Peru
 Revert	Terminal PrefWindow		Palauta
-Relaxed	Terminal colors scheme		Rentoutunut
 ANSI bright magenta color	Terminal AppearancePrefView		ANSI-vaaleanpurppura väri
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Pääteikkuna
 ANSI bright cyan color	Terminal AppearancePrefView		ANSI-vaaleansinivihreä väri
@@ -52,11 +48,10 @@ New tab	Terminal TermWindow		Uusi välilehti
 ANSI bright blue color	Terminal AppearancePrefView		ANSI-vaaleansininen väri
 Allow bold text	Terminal AppearancePrefView		Salli lihavoitu teksti
 Window title…	Terminal TermWindow		Ikkunaotsikko...
-Blue	Terminal colors scheme		Sininen
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Komennon ”%command” suorittaminen epäonnistui:\n\t%error
 Open path	Terminal TermView		Avaa sijainti
-ANSI yellow color	Terminal AppearancePrefView		ANSI-keltainen väri
 Terminal	System name		Pääteikkuna
+ANSI yellow color	Terminal AppearancePrefView		ANSI-keltainen väri
 Font size	Terminal TermWindow		Kirjasinkoko
 Custom	Terminal colors scheme		Räätälöity
 Really close?	Terminal TermWindow		Suljetaanko todella?
@@ -66,8 +61,8 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Tunnistamaton valitsin 
 Tab title:	Terminal AppearancePrefView		Välilehtiotsikko:
 Text not found.	Terminal TermWindow		Tekstiä ei löydy.
 Find failed	Terminal TermWindow		Etsintä epäonnistui
-Color scheme:	Terminal AppearancePrefView		Väriteema:
 Match word	Terminal FindWindow		Täsmäävä sana
+Color scheme:	Terminal AppearancePrefView		Väriteema:
 New Terminal	Terminal TermWindow		Uusi Pääteikkuna
 Quit	Terminal TermWindow		Poistu
 Find previous	Terminal TermWindow		Löydä edellinen
@@ -85,11 +80,9 @@ The process \"%1\" is still running.\nIf you close the tab, the process will be 
 Cursor	Terminal AppearancePrefView		Kohdistin
 Full screen	Terminal TermWindow		Kokoruutunäyttö
 Shell 	Terminal TermWindow		Komentoikkuna
-Midnight	Terminal colors scheme		Keskiyö
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tMerkki ’%’.\n\t%<\t-\tAloittaa kappaleen, joka näytetään vain jos korvaaja\n\t\t\ton jälkeenpäin tyhjä.\n\t%>\t-\tAloittaa kappaleen, joka näytetään vain jos korvaaja\n\t\t\tedellisen  %< kappaleen ja tämän kappaleen välillä ei ole tyhjä.\n\t%-\t-\tLopettaa %< tai %>-kappaleen.\n\nMikä tahansa ei-aakkosnumeerinen merkki ’%’:n ja muotokirjaimen välissä lisää välilyönnin vain\njos korvaaja-arvo ei ole tyhjä. Se lisätään %<-kappaleeseen.
 Tab title:	Terminal TermWindow		Välilehtiotsikko:
 Window title:	Terminal TermWindow		Ikkunaotsikko:
-Default	Terminal colors scheme		Oletus
 Window size:	Terminal AppearancePrefView		Ikkunakoko:
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Decrease	Terminal TermWindow		Vähennä
@@ -98,15 +91,14 @@ ANSI bright white color	Terminal AppearancePrefView		ANSI-vaaleanvalkoinen väri
 Blinking cursor	Terminal AppearancePrefView		Vilkkuva kohdistin
 Cancel	Terminal SetTitleWindow		Peru
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Ikkunaotsikon määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
-Close active tab	Terminal TermWindow		Sulje käytössä oleva välilehti
 Use text:	Terminal FindWindow		Käytä tekstiä:
+Close active tab	Terminal TermWindow		Sulje käytössä oleva välilehti
 Save as default	Terminal TermWindow		Tallenna oletuksena
 Nothing is selected.	Terminal TermWindow		Mitään ei ole valittu.
 ANSI red color	Terminal AppearancePrefView		ANSI-punainen väri
 Use left Option as Meta key	Terminal AppearancePrefView		Käytä vasenta valintapainiketta Meta-avaimena
 Find	Terminal FindWindow		Etsi
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Nykyisen välilehtiotsikon määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
-Professional	Terminal colors scheme		Ammattilaistaso
 Font:	Terminal AppearancePrefView		Kirjasintyyppi:
 Paste	Terminal TermWindow		Liitä
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Ikkunaotsikoiden määritysmalli. Seuraavia korvaajia\nvoidaan käyttää:
@@ -130,5 +122,4 @@ OK	Terminal TermWindow		Valmis
 Close window	Terminal TermWindow		Sulje ikkuna
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku-pääteikkuna\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui ja Takashi Murai.\n\nKäyttö: %s [VALITSIN] [KUORI]\n
 Clear all	Terminal TermWindow		Tyhjennä kaikki
-Solarized Light	Terminal colors scheme		Käänteisen vaalea
 Search forward	Terminal FindWindow		Etsintä eteenpäin

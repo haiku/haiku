@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	136904009
+1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	381023409
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Σφάλμα λήψης όρων χρήσης
 Available packages	MainWindow		Διαθέσιμα πακέτα
 It was not possible to create the new user.	UserLoginWindow		Δεν ήταν δυνατή η δημιουργία του νέου χρήστη.
@@ -55,7 +55,6 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Πρόβλημα προγράμματος παρασκηνίου πακέτων
 No	MainWindow		Όχι
 Repository	PackageListView		Αποθετήριο
-Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Οι χρήστες της υπηρεσίας πρέπει να είναι τουλάχιστον %AgeYears% ετών.
 Close	RatePackageWindow		Κλείσιμο
 Close	UserLoginWindow		Κλείσιμο
 The email is malformed.	UserLoginWindow		Η διεύθυνση ηλεκτρονικού ταχυδρομείου δεν είναι έγκυρη.

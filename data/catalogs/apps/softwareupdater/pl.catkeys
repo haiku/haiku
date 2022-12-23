@@ -29,7 +29,7 @@ Please choose from these update options:\n\nUpdate:\n\tUpdates all installed pac
 The following changes will be made:	SoftwareUpdaterWindow		Wykonane zostaną następujące zmiany:
 Argument variables are no longer accepted\n	SoftwareUpdaterApp		Argumenty linii komend nie są już akceptowane\n
 Fatal error while checking for updates: %s\n	CheckAction		Podczas szukania aktualizacji wystąpił błąd krytyczny: %s\n
-SoftwareUpdater	System name		SoftwareUpdater
+SoftwareUpdater	System name		Aktualizacja oprogramowania
 No active network connection was found.\n	CheckManager		Nie znaleziono aktywnego połączenia z siecią.\n
 Applying changes	UpdateManager		Dokonywanie zmian
 Full sync	SoftwareUpdaterWindow	Alert button label	Pełna synchronizacja
@@ -41,7 +41,7 @@ Exception occurred while checking for updates: %s\n	CheckAction		Podczas sprawdz
 Packages are being updated	UpdateManager		Pakiety są aktualizowane
 Cancel	SoftwareUpdaterWindow		Anuluj
 Don't quit	SoftwareUpdaterWindow		Nie zamykaj
-Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Kliknij tutaj aby uruchomić SoftwareUpdater. Niektóre aktualizacje będą wymagały wybrania rozwiązania problemu.
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		Kliknij tutaj aby uruchomić Aktualizację oprogramowania. Niektóre aktualizacje będą wymagały wybrania rozwiązania problemu.
 Checking for updates	SoftwareUpdaterWindow		Szukanie aktualizacji
 Updates completed	UpdateManager		Aktualizacje zakończone
 Reboot	SoftwareUpdaterWindow		Uruchom ponownie

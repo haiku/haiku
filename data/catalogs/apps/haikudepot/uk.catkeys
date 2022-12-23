@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	136904009
+1	ukrainian	x-vnd.Haiku-HaikuDepot	381023409
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблеми при завантаженні Умов користування
 Available packages	MainWindow		Доступні пакети
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
@@ -55,7 +55,6 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Проблема демона пакета
 No	MainWindow		Ні
 Repository	PackageListView		Репозитарій
-Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Користувачам має бути %AgeYears% років або більше.
 Close	RatePackageWindow		Закрити
 Close	UserLoginWindow		Закрити
 The email is malformed.	UserLoginWindow		Неправильний формат адреси електронної пошти.

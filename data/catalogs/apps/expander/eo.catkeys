@@ -1,51 +1,51 @@
 1	esperanto	x-vnd.Haiku-Expander	3300517306
-Expand	ExpanderMenu		Elarkivigi
-Expanding '%s'…	ExpanderWindow		Elarkivante '%s'…
-Close window when done expanding	ExpanderPreferences		Ĉesi post la elarkivigo finiĝos
-Set destination…	ExpanderMenu		Atribui celan lokon…
-Use:	ExpanderPreferences		Uzi:
-File expanded	ExpanderWindow		Dosiero elarkivita
-The destination is read only.	ExpanderWindow		La elarkiva loko nurlegeblas.
-Expander: Open	ExpanderWindow		Elarkivilo: Uzi
- is not supported	ExpanderWindow		 ne estas subtenata
-Expander settings	ExpanderPreferences		Agordo de la Elarkivilo
-Select current	DirectoryFilePanel		Elekti la nunan lokon
-Source	ExpanderWindow		Fonto
-Error when expanding archive	ExpanderWindow		Eraris dum la elarkivado
-Hide contents	ExpanderWindow		Kaŝi la enhavon
-Cancel	ExpanderWindow		Nuligi
-Automatically expand files	ExpanderPreferences		Aŭtomate elarkivigi dosierojn
-Continue	ExpanderWindow		Daŭri
-Destination folder	ExpanderPreferences		Elarkiva dosiero
-Other	ExpanderPreferences		Alia
-Cancel	ExpanderPreferences		Nuligi
-Expansion	ExpanderPreferences		Elarkivigo
-Select	DirectoryFilePanel		Elekti
-The folder was either moved, renamed or not supported.	ExpanderWindow		La dosierujo estas movita, alinomita aŭ nesubtenata.
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		La elarkiva dosierujo ne ekzistas. Ĉu vi deziras krei ĝin?
-Same directory as source (archive) file	ExpanderPreferences		Uzi la dosierujon de la fonta arkivo
-Settings	ExpanderMenu		Agordo
-Settings…	ExpanderMenu		Agordo…
-Expander: Choose destination	DirectoryFilePanel		Elarkivilo: Elekti elarkivan lokon
-Select	ExpanderPreferences		Elekti
-Show contents	ExpanderWindow		Montri la enhavojn
-Automatically show contents listing	ExpanderPreferences		Aŭtomate montri enhavon de la arkivo
-OK	ExpanderPreferences		Bone
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Ĉu vi certas ke vi volas haltigi la elarkivigon? La elarkivaj eroj povas esti malkompletaj.
-Leave destination folder path empty	ExpanderPreferences		Lasi la elarkivan dosierujon malplene
-Failed to create the destination folder.	ExpanderWindow		Malsukcesis krei la elarkivan dosierujon.
-Select '%s'…	DirectoryFilePanel		Elekti '%s'…
-Create	ExpanderWindow		Krei
-The file doesn't exist	ExpanderWindow		La dosiero ne ekzistas
-Stop	ExpanderMenu		Halti
-File	ExpanderMenu		Dosiero
-Expander	System name		Elarkivilo
-Expand	ExpanderWindow		Elarkivigi
-Close	ExpanderMenu		Malfermi
-The destination is not a folder.	ExpanderWindow		La elarkiva loko ne estas dosierujo.
-Open destination folder after extraction	ExpanderPreferences		Montri rezultan dosierujon post elarkivigo
-Creating listing for '%s'…	ExpanderWindow		Kreante liston de dosieroj por '%s'…
-Set source…	ExpanderMenu		Atribui fonton…
-Show contents	ExpanderMenu		Montri la enhavojn
-Stop	ExpanderWindow		Halti
 Destination	ExpanderWindow		Celo
+Other	ExpanderPreferences		Alia
+Automatically show contents listing	ExpanderPreferences		Aŭtomate montri enhavon de la arkivo
+Expander	System name		Elarkivilo
+Expander: Choose destination	DirectoryFilePanel		Elarkivilo: Elekti elarkivan lokon
+Set source…	ExpanderMenu		Atribui fonton…
+The destination is not a folder.	ExpanderWindow		La elarkiva loko ne estas dosierujo.
+The folder was either moved, renamed or not supported.	ExpanderWindow		La dosierujo estas movita, alinomita aŭ nesubtenata.
+Close window when done expanding	ExpanderPreferences		Ĉesi post la elarkivigo finiĝos
+Close	ExpanderMenu		Malfermi
+Create	ExpanderWindow		Krei
+Creating listing for '%s'…	ExpanderWindow		Kreante liston de dosieroj por '%s'…
+Show contents	ExpanderMenu		Montri la enhavojn
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Ĉu vi certas ke vi volas haltigi la elarkivigon? La elarkivaj eroj povas esti malkompletaj.
+Settings	ExpanderMenu		Agordo
+Expand	ExpanderWindow		Elarkivigi
+Open destination folder after extraction	ExpanderPreferences		Montri rezultan dosierujon post elarkivigo
+Same directory as source (archive) file	ExpanderPreferences		Uzi la dosierujon de la fonta arkivo
+Stop	ExpanderWindow		Halti
+Cancel	ExpanderWindow		Nuligi
+Expander settings	ExpanderPreferences		Agordo de la Elarkivilo
+Error when expanding archive	ExpanderWindow		Eraris dum la elarkivado
+Expand	ExpanderMenu		Elarkivigi
+Failed to create the destination folder.	ExpanderWindow		Malsukcesis krei la elarkivan dosierujon.
+Settings…	ExpanderMenu		Agordo…
+Select current	DirectoryFilePanel		Elekti la nunan lokon
+Expanding '%s'…	ExpanderWindow		Elarkivante '%s'…
+OK	ExpanderPreferences		Bone
+File expanded	ExpanderWindow		Dosiero elarkivita
+Automatically expand files	ExpanderPreferences		Aŭtomate elarkivigi dosierojn
+Select	DirectoryFilePanel		Elekti
+Show contents	ExpanderWindow		Montri la enhavojn
+Stop	ExpanderMenu		Halti
+Select '%s'…	DirectoryFilePanel		Elekti '%s'…
+Expansion	ExpanderPreferences		Elarkivigo
+Set destination…	ExpanderMenu		Atribui celan lokon…
+Continue	ExpanderWindow		Daŭri
+ is not supported	ExpanderWindow		 ne estas subtenata
+Cancel	ExpanderPreferences		Nuligi
+Use:	ExpanderPreferences		Uzi:
+Destination folder	ExpanderPreferences		Elarkiva dosiero
+Expander: Open	ExpanderWindow		Elarkivilo: Uzi
+Leave destination folder path empty	ExpanderPreferences		Lasi la elarkivan dosierujon malplene
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		La elarkiva dosierujo ne ekzistas. Ĉu vi deziras krei ĝin?
+The file doesn't exist	ExpanderWindow		La dosiero ne ekzistas
+Hide contents	ExpanderWindow		Kaŝi la enhavon
+Source	ExpanderWindow		Fonto
+The destination is read only.	ExpanderWindow		La elarkiva loko nurlegeblas.
+Select	ExpanderPreferences		Elekti
+File	ExpanderMenu		Dosiero

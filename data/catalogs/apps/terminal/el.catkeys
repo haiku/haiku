@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Terminal	4089361699
+1	greek, modern (1453-)	x-vnd.Haiku-Terminal	3440179729
 ANSI cyan color	Terminal AppearancePrefView		Γαλάζιο χρώμα ANSI
 Close other tabs	Terminal TermWindow		Κλείσιμο άλλων καρτελών
 Insert path	Terminal TermView		Εισάγετε την διαδρομή
@@ -11,11 +11,9 @@ Edit	Terminal TermWindow		Επεξεργασία
 Select all	Terminal TermWindow		Επιλογή όλων
 Confirm exit if active programs exist	Terminal AppearancePrefView		Επιβεβαίωση εξόδου αν υπάρχουν ενεργά προγράμματα
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tΟ τρέχων κατάλογος εργασίας της ενεργής διεργασίας στην\n\t\t\tτρέχουσα καρτέλα. Ο μέγιστος αριθμός εξαρτημάτων διαδρομών μπορεί προαιρετικά\n\t\t\tνα οριστεί. π.χ. '%2d' για δύο εξαρτήματα.\n\t%T\t-\tΤο όνομα της εφαρμογής Τερματικό στην γλώσσα που έχετε επιλέξει.\n\t%e\t-\tΟ τρόπος κωδικοποίησης της τρέχουσας καρτέλας. Δεν θα εμφανιστεί αν η επιλεγμένη ρύθμιση είναι το UTF-8.\n\t%i\t-\tΤο αρχικό μήνυμα του παραθύρου.\n\t%p\t-\tΤο όνομα της ενεργής διεργασίας στην τρέχουσα καρτέλα.\n\t%t\t-\tΟ τίτλος της τρέχουσας καρτέλας.
-Solarized Dark	Terminal colors scheme		Έκλειψη Σελήνης
-Copy	Terminal TermWindow		Αντιγραφή
 ANSI bright green color	Terminal AppearancePrefView		Ανοιχτό πράσινο χρώμα ANSI
+Copy	Terminal TermWindow		Αντιγραφή
 ANSI white color	Terminal AppearancePrefView		Λευκό χρώμα ANSI
-Retro	Terminal colors scheme		Ρετρό
 Edit tab title…	Terminal TermWindow		Επεξεργασία τίτλου καρτέλας…
 Settings	Terminal TermWindow		Ρυθμίσεις
 Print	Terminal TermWindow		Εκτύπωση
@@ -36,11 +34,9 @@ Selected text	Terminal AppearancePrefView		Επιλεγμένο κείμενο
 Change directory	Terminal TermView		Αλλαγή καταλόγου
 ANSI magenta color	Terminal AppearancePrefView		Φούξια χρώμα ANSI
 Page setup…	Terminal TermWindow		Διαμόρφωση σελίδας…
-Slate	Terminal colors scheme		Αβάκιο
 Defaults	Terminal PrefWindow		Προεπιλογές
 Cancel	Terminal TermView		Άκυρο
 Revert	Terminal PrefWindow		Επαναφορά
-Relaxed	Terminal colors scheme		Χαλαρό
 ANSI bright magenta color	Terminal AppearancePrefView		Ανοιχτό φούξια χρώμα ANSI
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Τερματικό
 ANSI bright cyan color	Terminal AppearancePrefView		Ανοιχτό γαλάζιο χρώμα ANSI
@@ -52,11 +48,10 @@ New tab	Terminal TermWindow		Νέα καρτέλα
 ANSI bright blue color	Terminal AppearancePrefView		Ανοιχτό μπλε χρώμα ANSI
 Allow bold text	Terminal AppearancePrefView		Να εμφανίζονται έντονοι χαρακτήρες
 Window title…	Terminal TermWindow		Τίτλος παραθύρου…
-Blue	Terminal colors scheme		Μπλε
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Δεν μπορεί να εκτελεστεί \"%command\":\n\t%error
 Open path	Terminal TermView		Άνοιγμα διαδρομής
-ANSI yellow color	Terminal AppearancePrefView		Κίτρινο χρώμα ANSI
 Terminal	System name		Τερματικό
+ANSI yellow color	Terminal AppearancePrefView		Κίτρινο χρώμα ANSI
 Font size	Terminal TermWindow		Μέγεθος γραμματοσειράς
 Custom	Terminal colors scheme		Προσαρμοσμένο
 Really close?	Terminal TermWindow		Να κλείσει σίγουρα;
@@ -66,8 +61,8 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Μη αναγνωρισ
 Tab title:	Terminal AppearancePrefView		Τίτλος καρτέλας:
 Text not found.	Terminal TermWindow		Το κείμενο δεν βρέθηκε.
 Find failed	Terminal TermWindow		Η εύρεση απέτυχε
-Color scheme:	Terminal AppearancePrefView		Συνδυασμός χρωμάτων:
 Match word	Terminal FindWindow		Ταίριασμα λέξης
+Color scheme:	Terminal AppearancePrefView		Συνδυασμός χρωμάτων:
 New Terminal	Terminal TermWindow		Νέο Τερματικό
 Quit	Terminal TermWindow		Έξοδος
 Find previous	Terminal TermWindow		Εύρεση προηγούμενου
@@ -85,11 +80,9 @@ The process \"%1\" is still running.\nIf you close the tab, the process will be 
 Cursor	Terminal AppearancePrefView		Δρομέας
 Full screen	Terminal TermWindow		Πλήρης οθόνη
 Shell 	Terminal TermWindow		Κέλυφος 
-Midnight	Terminal colors scheme		Μεσάνυχτα
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tΟ χαρακτήρας '%'.\n\t%<\t-\tΔημιουργεί μία ενότητα που θα φανεί μόνο αν το μεταγενέστερο\n\t\t\tσύμβολο κράτησης θέσης δεν είναι κενό.\n\t%>\t-\tΔημιουργεί μία ενότητα που θα φανεί μόνο αν το σύμβολο κράτησης\n\t\t\tθέσης ανάμεσα σε μία προηγούμενη ενότητα %< και αυτή δεν είναι κενή.\n\t%-\t-\tΟλοκληρώνει μία ενότητα %< ή %>.\n\nΟποιοσδήποτε αλφαριθμητικός χαρακτήρας ανάμεσα στο '%' και στο γράμμα θα εισάγει μόνο ένα κενό\nαν η τιμή συμβόλου κράτησης θέσης δεν είναι κενή. Αυτό θα προστεθεί στην ενότητα %<.
 Tab title:	Terminal TermWindow		Τίτλος καρτέλας:
 Window title:	Terminal TermWindow		Τίτλος παραθύρου:
-Default	Terminal colors scheme		Προεπιλογή
 Window size:	Terminal AppearancePrefView		Μέγεθος παραθύρου:
 Switch Terminals	Terminal TermWindow		Εναλλαγή Τερματικών
 Decrease	Terminal TermWindow		Μείωση
@@ -98,15 +91,14 @@ ANSI bright white color	Terminal AppearancePrefView		Ανοιχτό λευκό �
 Blinking cursor	Terminal AppearancePrefView		Αναβόσβημα δρομέα
 Cancel	Terminal SetTitleWindow		Άκυρο
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Το σχέδιο που προσδιορίζει τον τρέχοντα τίτλο παραθύρου. Τα παρακάτω σύμβολα \nμπορούν να χρησιμοποιηθούν:\n
-Close active tab	Terminal TermWindow		Κλείσιμο ενεργής καρτέλας
 Use text:	Terminal FindWindow		Χρήση κειμένου:
+Close active tab	Terminal TermWindow		Κλείσιμο ενεργής καρτέλας
 Save as default	Terminal TermWindow		Αποθήκευση ως προεπιλογή
 Nothing is selected.	Terminal TermWindow		Τίποτα δεν επιλέχτηκε.
 ANSI red color	Terminal AppearancePrefView		Κόκκινο χρώμα ANSI
 Use left Option as Meta key	Terminal AppearancePrefView		Να χρησιμοποιηθεί το αριστερό Option ως πλήκτρο τροποποίησης
 Find	Terminal FindWindow		Εύρεση
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Το σχέδιο που προσδιορίζει τον τρέχοντα τίτλο καρτέλας. Τα παρακάτω σύμβολα \nμπορούν να χρησιμοποιηθούν:\n
-Professional	Terminal colors scheme		Επαγγελματικό
 Font:	Terminal AppearancePrefView		Γραμματοσειρά:
 Paste	Terminal TermWindow		Επικόλληση
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Το μοτίβο που διευκρινίζει τους τίτλους παραθύρων. Μπορούν να\nχρησιμοποιηθούν οι ακόλουθοι χαρακτήρες κράτησης θέσης:
@@ -130,5 +122,4 @@ OK	Terminal TermWindow		Εντάξει
 Close window	Terminal TermWindow		Κλείσιμο παραθύρου
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Τερματικό Haiku\nΠνευματική ιδιοκτησία 2001-2019 Haiku, Inc.\nΠνευματική ιδιοκτησία(C) 1999 Kazuho Okui και Takashi Murai.\n\nΧρήση: %s [ΕΠΙΛΟΦΗ] [ΚΕΛΥΦΟΣ]\n
 Clear all	Terminal TermWindow		Καθαρισμός όλων
-Solarized Light	Terminal colors scheme		Έκλειψη Ηλίου
 Search forward	Terminal FindWindow		Αναζήτηση μπροστά

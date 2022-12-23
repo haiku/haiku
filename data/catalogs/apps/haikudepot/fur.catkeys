@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-HaikuDepot	136904009
+1	friulian	x-vnd.Haiku-HaikuDepot	381023409
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probleme tal discjamâ lis condizions di utilizazion
 Available packages	MainWindow		Pachets disponibii
 It was not possible to create the new user.	UserLoginWindow		Nol è stât pussibil creâ il gnûf utent.
@@ -55,7 +55,6 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Probleme cul demoni dai pachets
 No	MainWindow		No
 Repository	PackageListView		Dipuesit
-Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Al è necessari che i utents a vedin %AgeYears% o plui agns.
 Close	RatePackageWindow		Siere
 Close	UserLoginWindow		Siere
 The email is malformed.	UserLoginWindow		La direzion e-mail e je malformade.

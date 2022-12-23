@@ -1,5 +1,7 @@
-1	polish	application/x-vnd.Be.LoggingConsumerApp	3653006715
+1	polish	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nie można pobrać informacji o węźle (%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Priorytet
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nie znaleziono węzła (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Opóźnienie
 Logged input	CortexAddOnsLoggingConsumer		Wejście logowane
 CPU spin percentage	CortexAddOnsLoggingConsumer		Procent blokady procesora
@@ -17,3 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Kontrolki
 controls	CortexAddOnsCommonMediaNodeControlApp		kontrolki
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Połącz
 percent	CortexAddOnsLoggingConsumer		procent
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: brak parametrów dla węzła (%ld):\n%s\n

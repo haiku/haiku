@@ -1,51 +1,51 @@
 1	catalan; valencian	x-vnd.Haiku-Expander	3300517306
-Expand	ExpanderMenu		Expandeix
-Expanding '%s'…	ExpanderWindow		S'expandeix %s…
-Close window when done expanding	ExpanderPreferences		Tanca la finestra un cop feta l'expansió.
-Set destination…	ExpanderMenu		Establiu-ne la destinació...
-Use:	ExpanderPreferences		Usa:
-File expanded	ExpanderWindow		Fitxer expandit
-The destination is read only.	ExpanderWindow		La destinació és només de lectura.
-Expander: Open	ExpanderWindow		Expandidora: obre
- is not supported	ExpanderWindow		 no s'admet.
-Expander settings	ExpanderPreferences		Paràmetres de l'expandidora
-Select current	DirectoryFilePanel		Selecciona l'actual
-Source	ExpanderWindow		Origen
-Error when expanding archive	ExpanderWindow		Error en expandir l'arxiu.
-Hide contents	ExpanderWindow		Amaga els continguts
-Cancel	ExpanderWindow		Cancel·la
-Automatically expand files	ExpanderPreferences		Expandeix automàticament els fitxers.
-Continue	ExpanderWindow		Segueix
-Destination folder	ExpanderPreferences		Carpeta de destinació
-Other	ExpanderPreferences		Altres
-Cancel	ExpanderPreferences		Cancel·la
-Expansion	ExpanderPreferences		Descompressió
-Select	DirectoryFilePanel		Selecciona
-The folder was either moved, renamed or not supported.	ExpanderWindow		La carpeta s'ha mogut, se n'ha canviat de nom o no és compatible.
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		La carpeta de destinació no existeix. Voleu crear-la?
-Same directory as source (archive) file	ExpanderPreferences		El mateix directori que el fitxer d'origen (arxiu)
-Settings	ExpanderMenu		Paràmetres
-Settings…	ExpanderMenu		Paràmetres…
-Expander: Choose destination	DirectoryFilePanel		Expandidora: trieu la destinació
-Select	ExpanderPreferences		Selecciona
-Show contents	ExpanderWindow		Mostra el contingut
-Automatically show contents listing	ExpanderPreferences		Mostra automàticament la llista de continguts
-OK	ExpanderPreferences		D'acord
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Segur que voleu interrompre l'expansió d'aquest arxiu? Pot ser que els elements expandits no siguin complets.
-Leave destination folder path empty	ExpanderPreferences		Deixa buit el camí de la carpeta de destinació.
-Failed to create the destination folder.	ExpanderWindow		Ha fallat crear la carpeta de destinació.
-Select '%s'…	DirectoryFilePanel		Selecciona %s…
-Create	ExpanderWindow		Crea
-The file doesn't exist	ExpanderWindow		No existeix el fitxer
-Stop	ExpanderMenu		Interromp
-File	ExpanderMenu		Fitxer
-Expander	System name		Expandidora
-Expand	ExpanderWindow		Expandeix
-Close	ExpanderMenu		Tanca
-The destination is not a folder.	ExpanderWindow		La destinació no és una carpeta.
-Open destination folder after extraction	ExpanderPreferences		Obre la carpeta de destinació després de l'extracció
-Creating listing for '%s'…	ExpanderWindow		Es crea la llista per a %s…
-Set source…	ExpanderMenu		Estableix la font...
-Show contents	ExpanderMenu		Mostra el contingut
-Stop	ExpanderWindow		Interromp
 Destination	ExpanderWindow		Destinació
+Other	ExpanderPreferences		Altres
+Automatically show contents listing	ExpanderPreferences		Mostra automàticament la llista de continguts
+Expander	System name		Expandidora
+Expander: Choose destination	DirectoryFilePanel		Expandidora: trieu la destinació
+Set source…	ExpanderMenu		Estableix la font...
+The destination is not a folder.	ExpanderWindow		La destinació no és una carpeta.
+The folder was either moved, renamed or not supported.	ExpanderWindow		La carpeta s'ha mogut, se n'ha canviat de nom o no és compatible.
+Close window when done expanding	ExpanderPreferences		Tanca la finestra un cop feta l'expansió.
+Close	ExpanderMenu		Tanca
+Create	ExpanderWindow		Crea
+Creating listing for '%s'…	ExpanderWindow		Es crea la llista per a %s…
+Show contents	ExpanderMenu		Mostra el contingut
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Segur que voleu interrompre l'expansió d'aquest arxiu? Pot ser que els elements expandits no siguin complets.
+Settings	ExpanderMenu		Paràmetres
+Expand	ExpanderWindow		Expandeix
+Open destination folder after extraction	ExpanderPreferences		Obre la carpeta de destinació després de l'extracció
+Same directory as source (archive) file	ExpanderPreferences		El mateix directori que el fitxer d'origen (arxiu)
+Stop	ExpanderWindow		Interromp
+Cancel	ExpanderWindow		Cancel·la
+Expander settings	ExpanderPreferences		Paràmetres de l'expandidora
+Error when expanding archive	ExpanderWindow		Error en expandir l'arxiu.
+Expand	ExpanderMenu		Expandeix
+Failed to create the destination folder.	ExpanderWindow		Ha fallat crear la carpeta de destinació.
+Settings…	ExpanderMenu		Paràmetres…
+Select current	DirectoryFilePanel		Selecciona l'actual
+Expanding '%s'…	ExpanderWindow		S'expandeix %s…
+OK	ExpanderPreferences		D'acord
+File expanded	ExpanderWindow		Fitxer expandit
+Automatically expand files	ExpanderPreferences		Expandeix automàticament els fitxers.
+Select	DirectoryFilePanel		Selecciona
+Show contents	ExpanderWindow		Mostra el contingut
+Stop	ExpanderMenu		Interromp
+Select '%s'…	DirectoryFilePanel		Selecciona %s…
+Expansion	ExpanderPreferences		Descompressió
+Set destination…	ExpanderMenu		Establiu-ne la destinació...
+Continue	ExpanderWindow		Segueix
+ is not supported	ExpanderWindow		 no s'admet.
+Cancel	ExpanderPreferences		Cancel·la
+Use:	ExpanderPreferences		Usa:
+Destination folder	ExpanderPreferences		Carpeta de destinació
+Expander: Open	ExpanderWindow		Expandidora: obre
+Leave destination folder path empty	ExpanderPreferences		Deixa buit el camí de la carpeta de destinació.
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		La carpeta de destinació no existeix. Voleu crear-la?
+The file doesn't exist	ExpanderWindow		No existeix el fitxer
+Hide contents	ExpanderWindow		Amaga els continguts
+Source	ExpanderWindow		Origen
+The destination is read only.	ExpanderWindow		La destinació és només de lectura.
+Select	ExpanderPreferences		Selecciona
+File	ExpanderMenu		Fitxer

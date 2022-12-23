@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	136904009
+1	turkish	x-vnd.Haiku-HaikuDepot	381023409
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Kullanım koşullarını indirme sorunu
 Available packages	MainWindow		Kullanılabilir paketler
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
@@ -55,7 +55,6 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Paket hizmeti sorunu
 No	MainWindow		Hayır
 Repository	PackageListView		Depo
-Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Kullanıcılar, %AgeYears% yaşında veya daha büyük olmalıdır.
 Close	RatePackageWindow		Kapat
 Close	UserLoginWindow		Kapat
 The email is malformed.	UserLoginWindow		E-posta biçimi hatalı.

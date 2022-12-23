@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	136904009
+1	japanese	x-vnd.Haiku-HaikuDepot	381023409
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		使用条件のダウンロードで問題
 Available packages	MainWindow		使用可能なパッケージ
 It was not possible to create the new user.	UserLoginWindow		新しいユーザーを作成できません。
@@ -55,7 +55,6 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		パッケージデーモンの問題
 No	MainWindow		いいえ
 Repository	PackageListView		リポジトリ
-Users are required to be %AgeYears% years of age or older.	UserUsageConditions		ユーザーは %AgeYears% 才以上であることが必要です。
 Close	RatePackageWindow		閉じる
 Close	UserLoginWindow		閉じる
 The email is malformed.	UserLoginWindow		メールアドレスの形式が正しくありません。

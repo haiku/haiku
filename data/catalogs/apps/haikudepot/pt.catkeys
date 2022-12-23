@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-HaikuDepot	136904009
+1	portuguese	x-vnd.Haiku-HaikuDepot	381023409
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema ao descarregar condições de utilização
 Available packages	MainWindow		Pacotes disponíveis
 It was not possible to create the new user.	UserLoginWindow		Não foi possível criar o novo utilizador.
@@ -55,7 +55,6 @@ install package %s from repository %s\n	PackageResult	Don't change '%s' variable
 Package daemon problem	App		Problema do serviço de pacotes
 No	MainWindow		Não
 Repository	PackageListView		Repositório
-Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Os utilizadores devem ter pelo menos %AgeYears% anos de idade.
 Close	RatePackageWindow		Fechar
 Close	UserLoginWindow		Fechar
 The email is malformed.	UserLoginWindow		O email não está corretamente formado.

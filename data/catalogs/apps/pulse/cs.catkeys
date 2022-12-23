@@ -17,7 +17,7 @@ About Pulse…	PulseView		O programu Pulse...
 Pulse	NormalPulseView		Pulse
 Deskbar mode	NormalPulseView		Deskbar režim
 Pulse settings	PulseApp		Nastavení Pulsu
-Remove replicant	CPUButton		Odebrat replikant
+Remove replicant	CPUButton		Odebrat replikanta
 You can't disable the last active CPU.	PulseView		Nelze zakázat poslední aktivní CPU.
 Width of icon:	ConfigView		Šířka ikony:
 Deskbar mode	MiniPulseView		Deskbar režim

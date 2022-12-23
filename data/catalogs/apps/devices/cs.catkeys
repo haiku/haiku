@@ -1,14 +1,17 @@
-1	czech	x-vnd.Haiku-Devices	3345509916
+1	czech	x-vnd.Haiku-Devices	3349357485
 ACPI bus	DevicesView		Sběrnice ACPI
 Encryption controller	Device		Řadič šifrování
 Bus Information	Device		Informace o sběrnici
 Devices	System name		Zařízení
+USB bus	DevicesView		Sběrnice USB
 Graphics Peripheral	DeviceSCSI		Grafické periferie
 Processor	Device		Procesor
 Generate system information	DevicesView		Generovat systémové informace
+Unknown	DeviceACPI		Neznámé
 Class info	DevicePCI		Informace o třídě
 ACPI Information	DeviceACPI		Informace o ACPI
 Detailed	DevicesView		Detailně
+USB bus	Device		Sběrnice USB
 Computer	DevicesView		Počítač
 Communications	DeviceSCSI		Komunikace
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Informace třídy:\t\t\t\t: %classInfo%
@@ -84,6 +87,7 @@ Device name	DeviceSCSI		Název zařízení
 Docking station	Device		Dokovací stanice
 Array	DeviceSCSI		Pole
 Unclassified device	Device		Nespecifikované zařízení
+Manufacturer	DeviceACPI		Výrobce
 ACPI controller	Device		ACPI kontroler
 Network controller	Device		Kontroler sítě
 Driver used	Device		Použitý ovladač

@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-Terminal	4089361699
+1	catalan; valencian	x-vnd.Haiku-Terminal	3440179729
 ANSI cyan color	Terminal AppearancePrefView		Color cian ANSI
 Close other tabs	Terminal TermWindow		Tanca altres pestanyes
 Insert path	Terminal TermView		Insereix un camí
@@ -11,11 +11,9 @@ Edit	Terminal TermWindow		Edita
 Select all	Terminal TermWindow		Selecciona-ho tot
 Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmeu-ne la sortida si hi ha programes actius.
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tEl directori de treball actual del procés actiu a la\n\t\t\tpestanya actual. Opcionalment es pot especificar el nombre màxim\n\t\t\tde components de camí. P. ex.: "%2d", per a un màxim de dos components.\n\t%T\t-\tEl nom de l'aplicació de Terminal per a la configuració de la llengua actual.\n\t%e\t-\tLa codificació de la pestanya actual. No es mostra per a UTF-8.\n\t%i\t-\tL'índex de la finestra.\n\t%p\t-\tEl nom del procés actiu a la pestanya actual.\n\t%t\t-\tEl títol de la pestanya actual.
-Solarized Dark	Terminal colors scheme		Fosc solaritzat
-Copy	Terminal TermWindow		Copia
 ANSI bright green color	Terminal AppearancePrefView		Color verd brillant ANSI
+Copy	Terminal TermWindow		Copia
 ANSI white color	Terminal AppearancePrefView		Color blanc ANSI
-Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Edita el títol de la pestanya...
 Settings	Terminal TermWindow		Paràmetres
 Print	Terminal TermWindow		Imprimeix
@@ -36,11 +34,9 @@ Selected text	Terminal AppearancePrefView		Text seleccionat
 Change directory	Terminal TermView		Canvia la carpeta
 ANSI magenta color	Terminal AppearancePrefView		Color magenta ANSI
 Page setup…	Terminal TermWindow		Configuració de la pàgina...
-Slate	Terminal colors scheme		Pissarra
 Defaults	Terminal PrefWindow		Valors predeterminats
 Cancel	Terminal TermView		Cancel·la
 Revert	Terminal PrefWindow		Reverteix
-Relaxed	Terminal colors scheme		Relaxat
 ANSI bright magenta color	Terminal AppearancePrefView		Color magenta brillant ANSI
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 ANSI bright cyan color	Terminal AppearancePrefView		Color cian brillant ANSI
@@ -52,11 +48,10 @@ New tab	Terminal TermWindow		Pestanya nova
 ANSI bright blue color	Terminal AppearancePrefView		Color blau brillant ANSI
 Allow bold text	Terminal AppearancePrefView		Permet text en negreta
 Window title…	Terminal TermWindow		Títol de la finestra...
-Blue	Terminal colors scheme		Blau
 Cannot execute \"%command\":\n\t%error	Terminal Shell		No es pot executar l'ordre \"%command\":\n\t%error
 Open path	Terminal TermView		Obre el camí
-ANSI yellow color	Terminal AppearancePrefView		Color groc ANSI
 Terminal	System name		Terminal
+ANSI yellow color	Terminal AppearancePrefView		Color groc ANSI
 Font size	Terminal TermWindow		Mida de la lletra
 Custom	Terminal colors scheme		Personalitzat
 Really close?	Terminal TermWindow		Segur que en voleu sortir?
@@ -66,8 +61,8 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Opció no reconeguda \"
 Tab title:	Terminal AppearancePrefView		Títol de la pestanya
 Text not found.	Terminal TermWindow		No s'ha trobat el text.
 Find failed	Terminal TermWindow		Ha fallat la cerca
-Color scheme:	Terminal AppearancePrefView		Esquema de colors:
 Match word	Terminal FindWindow		Coincidència de paraules
+Color scheme:	Terminal AppearancePrefView		Esquema de colors:
 New Terminal	Terminal TermWindow		Obre un terminal
 Quit	Terminal TermWindow		Surt
 Find previous	Terminal TermWindow		Troba'n l'anterior
@@ -85,11 +80,9 @@ The process \"%1\" is still running.\nIf you close the tab, the process will be 
 Cursor	Terminal AppearancePrefView		Cursor
 Full screen	Terminal TermWindow		Pantalla completa
 Shell 	Terminal TermWindow		Intèrpret d'ordres 
-Midnight	Terminal colors scheme		Mitjanit
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tEl caràcter "%".\n\t%<\t-\tInicia una secció que només es mostrarà si un marcador de posició\n\t\t\tposterior no està buit.\n\t%>\t-\tComença una secció que només es mostrarà si el marcador de posició\n\t\t\tentre una secció %< i aquest no està buit.\n\t%-\t-\tAcaba una secció %< o %>.\n\nQualsevol caràcter no alfanumèric entre % i la lletra de format inserirà només un espai\nsi el valor del marcador de posició no està buit. S’afegirà a la secció %<.
 Tab title:	Terminal TermWindow		Títol de la pestanya:
 Window title:	Terminal TermWindow		Títol de la finestra:
-Default	Terminal colors scheme		Per defecte
 Window size:	Terminal AppearancePrefView		Mida de la finestra:
 Switch Terminals	Terminal TermWindow		Intercanvia els Terminals
 Decrease	Terminal TermWindow		Redueix
@@ -98,15 +91,14 @@ ANSI bright white color	Terminal AppearancePrefView		Color blanc brillant ANSI
 Blinking cursor	Terminal AppearancePrefView		Cursor que parpelleja
 Cancel	Terminal SetTitleWindow		Cancel·la
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		El patró que especifica el títol de la finestra. Es poden usar els marcadors\nde posició següents:\n
-Close active tab	Terminal TermWindow		Tanca la pestanya activa
 Use text:	Terminal FindWindow		Usa text:
+Close active tab	Terminal TermWindow		Tanca la pestanya activa
 Save as default	Terminal TermWindow		Desa com a predeterminat
 Nothing is selected.	Terminal TermWindow		No hi ha res seleccionat.
 ANSI red color	Terminal AppearancePrefView		Color vermell ANSI
 Use left Option as Meta key	Terminal AppearancePrefView		Usa l'opció d'esquerra com a tecla Meta.
 Find	Terminal FindWindow		Troba
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		El patró que especifica el títol de la pestanya actual. Es poden usar els\nmarcadors de posició següents:\n
-Professional	Terminal colors scheme		Professional
 Font:	Terminal AppearancePrefView		Tipus de lletra:
 Paste	Terminal TermWindow		Enganxa
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		El patró que especifica els títols de les finestres. Es poden usar els\nmarcadors de posició següents:
@@ -130,5 +122,4 @@ OK	Terminal TermWindow		D'acord
 Close window	Terminal TermWindow		Tanca la finestra
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal del Haiku\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui i Takashi Murai.\n\nÚs: %s [OPCIÓ] [SHELL]\n
 Clear all	Terminal TermWindow		Neteja-ho tot
-Solarized Light	Terminal colors scheme		Llum solaritzada
 Search forward	Terminal FindWindow		Cerca endavant

@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Terminal	307289061
+1	esperanto	x-vnd.Haiku-Terminal	311984414
 Close other tabs	Terminal TermWindow		Fermi aliajn langetojn
 Insert path	Terminal TermView		Enigi itineron
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Pardonu, sed la terminalo ne povis komenci la ŝelon.
@@ -8,9 +8,7 @@ Edit	Terminal TermWindow		Redakti
 Select all	Terminal TermWindow		Elekti ĉion
 Confirm exit if active programs exist	Terminal AppearancePrefView		Konfirmi ĉesigon se aktivaj programoj ekzistas
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLa nuna labora dosierujo de la aktiva procezo en la\n\t\t\taktuala langeto. Nedevige la maksimuma kvanto de eroj de itinero\n\t\t\tpovas esti donita. Ekz. '%2d' por almenaŭ du eroj.\n\t%T\t-\tLa nomo de la programo en terminalo por la aktuala lokaĵaro.\n\t%e\t-\tLa kodprezento de la aktuala langeto. Ne montrata por UTF-8.\n\t%i\t-\tLa indekso de la fenestro.\n\t%p\t-\tLa nomo de la aktiva procezo en la aktuala langeto.\n\t%t\t-\tLa titolo de la aktuala langeto.
-Solarized Dark	Terminal colors scheme		Sunuma Malhelo
 Copy	Terminal TermWindow		Kopii
-Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Redakti la titolon de la langeto…
 Settings	Terminal TermWindow		Agordo
 Print	Terminal TermWindow		Presi
@@ -27,7 +25,6 @@ Custom	Terminal AppearancePrefView	Window size	Laŭmenda
 Selected text	Terminal AppearancePrefView		Elektita teksto
 Change directory	Terminal TermView		Ŝanĝi dosierujon
 Page setup…	Terminal TermWindow		Agordo de paĝo…
-Slate	Terminal colors scheme		Ardeza
 Defaults	Terminal PrefWindow		Defaŭlta
 Cancel	Terminal TermView		Nuligi
 Revert	Terminal PrefWindow		Malfari ŝanĝojn
@@ -39,7 +36,6 @@ Window title:	Terminal AppearancePrefView		Fenestra titolo:
 New tab	Terminal TermWindow		Nova langeto
 Allow bold text	Terminal AppearancePrefView		Permesi grasan tekston
 Window title…	Terminal TermWindow		Fenestra titolo…
-Blue	Terminal colors scheme		Blua
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Ne povis ekzekucii \"%command\":\n\t%eraro
 Open path	Terminal TermView		Uzi itineron
 Terminal	System name		Terminalo
@@ -52,8 +48,8 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Nerekonita opcio \"%s\"
 Tab title:	Terminal AppearancePrefView		Titolo de la langeto:
 Text not found.	Terminal TermWindow		Teksto ne trovita.
 Find failed	Terminal TermWindow		Serĉo malsukcesis
-Color scheme:	Terminal AppearancePrefView		Skemo de koloroj:
 Match word	Terminal FindWindow		Kongrui vorton
+Color scheme:	Terminal AppearancePrefView		Skemo de koloroj:
 New Terminal	Terminal TermWindow		Nova Terminalo
 Quit	Terminal TermWindow		Ĉesi
 Find previous	Terminal TermWindow		Serĉi la pasintan
@@ -70,11 +66,9 @@ The process \"%1\" is still running.\nIf you close the tab, the process will be 
 Cursor	Terminal AppearancePrefView		Kursoro
 Full screen	Terminal TermWindow		Plenekrane
 Shell 	Terminal TermWindow		Ŝelo 
-Midnight	Terminal colors scheme		Noktmezo
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tLa karaktro '%'.\n\t%<\t-\tKomencas sekcion kiu nur montriĝus se lokokupo\n\t\t\tposta ne malplenas.\n\t%>\t-\tKomencas sekcion kiu nure montroĝus se lokokupo\n\t\t\inter pasinta %< sekcio kaj ĉi tiu ne malplenas.\n\t%-\t-\tFinas %< o %> sekcion.\n\nĈiu ne alfanumera karaktro inter '%' kaj la litero de formato aldonas unu spacon nur\nse la valoro de la lokokupo ne melplenas. Ĝi aldonos al la %< sekcio.
 Tab title:	Terminal TermWindow		Lagenta titolo:
 Window title:	Terminal TermWindow		Fenestra titolo:
-Default	Terminal colors scheme		Defaŭlta
 Window size:	Terminal AppearancePrefView		Fenestra grando:
 Switch Terminals	Terminal TermWindow		Interŝanĝi terminalojn
 Decrease	Terminal TermWindow		Malpliigi
@@ -82,14 +76,13 @@ Settings…	Terminal TermWindow		Agordo…
 Blinking cursor	Terminal AppearancePrefView		Palpebruma kursoro
 Cancel	Terminal SetTitleWindow		Nuligi
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		La skemo specifanta la fenestran titolon. La sekvaj lokokupoj\nuzeblas:\n
-Close active tab	Terminal TermWindow		Fermi aktivan langeton
 Use text:	Terminal FindWindow		Per teksto:
+Close active tab	Terminal TermWindow		Fermi aktivan langeton
 Save as default	Terminal TermWindow		Konservi kiel defaŭlta
 Nothing is selected.	Terminal TermWindow		Nenio estas elektita
 Use left Option as Meta key	Terminal AppearancePrefView		Uzi maldekstran opciklavon kiel metaklavo
 Find	Terminal FindWindow		Serĉi
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		La skemo specifanta la aktualan titolon de la langeto. La sekvaj lokokupoj\nuzeblas:\n
-Professional	Terminal colors scheme		Profesia
 Font:	Terminal AppearancePrefView		Tiparo:
 Paste	Terminal TermWindow		Alglui
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		La skemo specifanta la fenestrajn titolojn. La sekvaj lokokupoj\nuzeblas:
@@ -111,5 +104,4 @@ OK	Terminal TermWindow		Bone
 Close window	Terminal TermWindow		Fermi fenestron
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminalo\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui kaj Takashi Murai.\n\nUzado: %s [OPTION] [SHELL]\n
 Clear all	Terminal TermWindow		Viŝi ĉion
-Solarized Light	Terminal colors scheme		Sunuma Lumo
 Search forward	Terminal FindWindow		Serĉi antaŭen

@@ -1,14 +1,17 @@
-1	polish	x-vnd.Haiku-Devices	3345509916
+1	polish	x-vnd.Haiku-Devices	3349357485
 ACPI bus	DevicesView		Magistrala ACPI
 Encryption controller	Device		Kontroler szyfrowania
 Bus Information	Device		Informacje o szynie
 Devices	System name		Urządzenia
+USB bus	DevicesView		Szyna USB
 Graphics Peripheral	DeviceSCSI		Grafika obwodowa
 Processor	Device		Procesor
 Generate system information	DevicesView		Wygeneruj informacje systemowe
+Unknown	DeviceACPI		Nieznane
 Class info	DevicePCI		Informacja klasy
 ACPI Information	DeviceACPI		Informacje o ACPI
 Detailed	DevicesView		Szczegóły
+USB bus	Device		Szyna USB
 Computer	DevicesView		Komputer
 Communications	DeviceSCSI		Komunikacja
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Klasa:\t\t\t\t: %classInfo%
@@ -84,6 +87,7 @@ Device name	DeviceSCSI		Nazwa urządzenia
 Docking station	Device		Stacja dokująca
 Array	DeviceSCSI		Macierz
 Unclassified device	Device		Niesklasyfikowane urządzenie
+Manufacturer	DeviceACPI		Producent
 ACPI controller	Device		Kontroler ACPI
 Network controller	Device		Kontroler sieci
 Driver used	Device		Użyty sterownik

@@ -1,2 +1,10 @@
-1	polish	x-vnd.Haiku-PNGTranslator	2249099168
+1	polish	x-vnd.Haiku-PNGTranslator	993682334
 PNG Settings	PNGTranslator		Ustawienia PNG
+None	PNGTranslator		Brak
+PNG image	PNGTranslator		Obraz PNG
+PNG images	PNGTranslator		Obrazy PNG
+Interlacing type:	PNGTranslator		Tryb przeplotu:
+PNGTranslator Settings	PNGTranslator		Ustawienia PNGTranslatora
+Version %d.%d.%d, %s	PNGTranslator		Wersja %d.%d.%d, %s
+PNG image translator	PNGTranslator		Translator obrazów PNG
+Interlace Option	PNGTranslator		Opcja przeplotu

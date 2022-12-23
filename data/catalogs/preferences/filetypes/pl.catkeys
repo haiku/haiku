@@ -159,7 +159,7 @@ Close	Application Type Window		Zamknij
 Integer 16 bit	Attribute ListView		Liczba całkowita (16-bitowa)
 Extension	Extension Window		Rozszerzenie
 Rule:	FileTypes Window		Zasada:
-FileTypes	System name		FileTypes
+FileTypes	System name		Typy plików
 Version	Application Types Window		Wersja
 Quit	FileTypes Window		Zamknij
 File type	FileType Window		Typ pliku

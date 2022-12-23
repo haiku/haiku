@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	4089361699
+1	french	x-vnd.Haiku-Terminal	3440179729
 ANSI cyan color	Terminal AppearancePrefView		Couleur cyan ANSI
 Close other tabs	Terminal TermWindow		Fermer les autres onglets
 Insert path	Terminal TermView		Insérer un chemin de recherche
@@ -11,11 +11,9 @@ Edit	Terminal TermWindow		Éditer
 Select all	Terminal TermWindow		Sélectionner tout
 Confirm exit if active programs exist	Terminal AppearancePrefView		Demander une confirmation à la fermeture si un programme est actif
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail courant du processus actif dans\n\t\t\tl’onglet courant. En option, le nombre maximum d’éléments\n\t\t\tdu chemin peut être spécifié. Par exemple « %2d » pour au plus\n\t\t\tdeux éléments.\n\t%T\t-\tLe nom de l’application Terminal pour la langue active.\n\t%e\t-\tLe codage de l’onglet courant. Non affiché pour UTF-8.\n\t%i\t-\tL’index de la fenêtre.\n\t%p\t-\tLe nom du processus actif dans l’onglet courant.\n\t%t\t-\tLe titre de l’onglet courant.
-Solarized Dark	Terminal colors scheme		Ombragé
-Copy	Terminal TermWindow		Copier
 ANSI bright green color	Terminal AppearancePrefView		Couleur vert clair ANSI
+Copy	Terminal TermWindow		Copier
 ANSI white color	Terminal AppearancePrefView		Couleur blanc ANSI
-Retro	Terminal colors scheme		Rétro
 Edit tab title…	Terminal TermWindow		Éditer le titre de l’onglet…
 Settings	Terminal TermWindow		Réglages
 Print	Terminal TermWindow		Imprimer
@@ -36,11 +34,9 @@ Selected text	Terminal AppearancePrefView		Texte sélectionné
 Change directory	Terminal TermView		Changer de répertoire
 ANSI magenta color	Terminal AppearancePrefView		Couleur magenta ANSI
 Page setup…	Terminal TermWindow		Mise en page…
-Slate	Terminal colors scheme		Ardoise
 Defaults	Terminal PrefWindow		Paramètres par défaut
 Cancel	Terminal TermView		Annuler
 Revert	Terminal PrefWindow		Rétablir
-Relaxed	Terminal colors scheme		Décontracté
 ANSI bright magenta color	Terminal AppearancePrefView		Couleur magenta clair ANSI
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
 ANSI bright cyan color	Terminal AppearancePrefView		Couleur cyan clair ANSI
@@ -52,11 +48,10 @@ New tab	Terminal TermWindow		Nouvel onglet
 ANSI bright blue color	Terminal AppearancePrefView		Couleur bleu clair ANSI
 Allow bold text	Terminal AppearancePrefView		Autoriser le texte en gras
 Window title…	Terminal TermWindow		Titre de la fenêtre…
-Blue	Terminal colors scheme		Bleu
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Impossible d’exécuter « %command » :\n\t%error
 Open path	Terminal TermView		Ouvrir l’emplacement
-ANSI yellow color	Terminal AppearancePrefView		Couleur jaune ANSI
 Terminal	System name		Terminal
+ANSI yellow color	Terminal AppearancePrefView		Couleur jaune ANSI
 Font size	Terminal TermWindow		Taille de la police
 Custom	Terminal colors scheme		Personnalisé
 Really close?	Terminal TermWindow		Êtes-vous sûr de vouloir fermer ?
@@ -66,8 +61,8 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Option « %s » non r
 Tab title:	Terminal AppearancePrefView		Titre de l’onglet :
 Text not found.	Terminal TermWindow		Texte non trouvé.
 Find failed	Terminal TermWindow		Échec de la recherche
-Color scheme:	Terminal AppearancePrefView		Profil de couleurs :
 Match word	Terminal FindWindow		Rechercher le mot
+Color scheme:	Terminal AppearancePrefView		Profil de couleurs :
 New Terminal	Terminal TermWindow		Nouveau Terminal
 Quit	Terminal TermWindow		Quitter
 Find previous	Terminal TermWindow		Rechercher le précédent
@@ -85,11 +80,9 @@ The process \"%1\" is still running.\nIf you close the tab, the process will be 
 Cursor	Terminal AppearancePrefView		Curseur
 Full screen	Terminal TermWindow		Plein écran
 Shell 	Terminal TermWindow		Interpréteur de commande
-Midnight	Terminal colors scheme		Minuit
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tLe caractère « % ».\n\t%<\t-\tDémarre une section qui ne sera affiché que si un\n\t\t\tparamètre qui suit n’est pas vide.\n\t%>\t-\tDémarre une section qui ne sera affiché que si un paramètre\n\t\t\tentre la précédente section %< et si celui-ci n’est pas vide.\n\t%-\t-\tTermine une section. %< ou %>.\n\nTout caractère non alphanumérique entre « % » et la lettre de format insérera un espace\nque si la valeur du paramètre n’est pas vide. Il s’ajoutera à la section %<.
 Tab title:	Terminal TermWindow		Titre de l’onglet :
 Window title:	Terminal TermWindow		Titre de la fenêtre :
-Default	Terminal colors scheme		Par défaut
 Window size:	Terminal AppearancePrefView		Taille de la fenêtre :
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Decrease	Terminal TermWindow		Réduire
@@ -98,15 +91,14 @@ ANSI bright white color	Terminal AppearancePrefView		Couleur blanc lumineux ANSI
 Blinking cursor	Terminal AppearancePrefView		Curseur clignotant
 Cancel	Terminal SetTitleWindow		Annuler
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre des fenêtres peut\ncontenir les éléments suivants :\n
-Close active tab	Terminal TermWindow		Fermer l’onglet actif
 Use text:	Terminal FindWindow		Utiliser le texte :
+Close active tab	Terminal TermWindow		Fermer l’onglet actif
 Save as default	Terminal TermWindow		Enregistrer comme valeur par défaut
 Nothing is selected.	Terminal TermWindow		Rien n’est sélectionné.
 ANSI red color	Terminal AppearancePrefView		Couleur rouge ANSI
 Use left Option as Meta key	Terminal AppearancePrefView		Utiliser la touche Option gauche comme touche Meta
 Find	Terminal FindWindow		Rechercher
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre de l’onglet actif peut\ncontenir les éléments suivants :\n
-Professional	Terminal colors scheme		Professionnel
 Font:	Terminal AppearancePrefView		Police :
 Paste	Terminal TermWindow		Coller
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Le motif servant à composer le titre de la fenêtre. Vous pouvez\nutiliser les variables suivantes :
@@ -130,5 +122,4 @@ OK	Terminal TermWindow		OK
 Close window	Terminal TermWindow		Fermer la fenêtre
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright ©1999 Kazuho Okui et Takashi Murai.\n\nUtilisation : %s [OPTION] [SHELL]\n
 Clear all	Terminal TermWindow		Effacer tout
-Solarized Light	Terminal colors scheme		Ensoleillé
 Search forward	Terminal FindWindow		Rechercher en avant

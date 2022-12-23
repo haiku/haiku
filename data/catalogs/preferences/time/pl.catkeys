@@ -1,10 +1,11 @@
-1	polish	x-vnd.Haiku-Time	2069485065
+1	polish	x-vnd.Haiku-Time	3691539601
 OK	Time		OK
 Message receiving failed	Time		Odbiór wiadomości nie powiódł się
 Australia	Time		Australia
 America	Time		Ameryka
 Reset to default server list	Time		Przywróć domyślną listę serwerów
 Could not resolve server address	Time		Nie można rozwiązać adresu serwera
+Time & Date	System name		Data i czas
 Set time zone	Time		Ustaw strefę czasową
 Waiting for answer failed	Time		Oczekiwanie na odpowiedź nie powiodło się
 <Other>	Time		<Inne>

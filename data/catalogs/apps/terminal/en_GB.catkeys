@@ -1,9 +1,7 @@
-1	english (united kingdom)	x-vnd.Haiku-Terminal	4065108276
+1	english (united kingdom)	x-vnd.Haiku-Terminal	1688084772
 OK	Terminal SetTitleWindow		Alright
-Solarized Dark	Terminal colors scheme		Solarised Dark
 OK	Terminal TermApp		Alright
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Unrecognised option \"%s\"\n
 Color scheme:	Terminal AppearancePrefView		Colour scheme:
 Color:	Terminal AppearancePrefView		Colour:
 OK	Terminal TermWindow		Alright
-Solarized Light	Terminal colors scheme		Solarised Light

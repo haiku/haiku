@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Terminal	307289061
+1	indonesian	x-vnd.Haiku-Terminal	311984414
 Close other tabs	Terminal TermWindow		Tutup tab yang lain
 Insert path	Terminal TermView		Sisipkan jalur
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal tidak dapat memulai shell. Maaf.
@@ -8,9 +8,7 @@ Edit	Terminal TermWindow		Sunting
 Select all	Terminal TermWindow		Pilih semua
 Confirm exit if active programs exist	Terminal AppearancePrefView		Konfirmasi keluar jika ada program aktif
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDirektori aktif saat ini dari proses aktif di\n\t\t\ttab saat ini. Secara opsional jumlah komponen jalur maksimum\n\t\t\tdapat ditentukan. Misal. '%2d' untuk paling banyak dua komponen.\n\t%T\t-\tNama aplikasi Terminal untuk lokal saat ini.\n\t%e\t-\tPengkodean tab saat ini. Tidak ditampilkan untuk UTF-8.\n\t%i\t-\tIndeks jendela.\n\t%p\t-\tNama proses aktif di tab saat ini.\n\t%t\t-\tJudul tab saat ini.
-Solarized Dark	Terminal colors scheme		Gelap terpartisi
 Copy	Terminal TermWindow		Salin
-Retro	Terminal colors scheme		Retro
 Edit tab title…	Terminal TermWindow		Edit judul tab ...
 Settings	Terminal TermWindow		Pengaturan
 Print	Terminal TermWindow		Cetak
@@ -27,7 +25,6 @@ Custom	Terminal AppearancePrefView	Window size	Gubahan
 Selected text	Terminal AppearancePrefView		Teks terpilih
 Change directory	Terminal TermView		Ubah direktori
 Page setup…	Terminal TermWindow		Pengaturan halaman…
-Slate	Terminal colors scheme		Batu tulis
 Defaults	Terminal PrefWindow		Bawaan
 Cancel	Terminal TermView		Batalkan
 Revert	Terminal PrefWindow		Pulih
@@ -39,7 +36,6 @@ Window title:	Terminal AppearancePrefView		Judul jendela:
 New tab	Terminal TermWindow		Tab baru
 Allow bold text	Terminal AppearancePrefView		Izinkan teks tebal
 Window title…	Terminal TermWindow		Judul jendela…
-Blue	Terminal colors scheme		Biru
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Tak bisa menjalankan \"%command\":\n\t%error
 Open path	Terminal TermView		Buka path
 Terminal	System name		Terminal
@@ -52,8 +48,8 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Opsi tak-dikenal \"%s\"
 Tab title:	Terminal AppearancePrefView		Judul tab:
 Text not found.	Terminal TermWindow		Teks tak ditemukan
 Find failed	Terminal TermWindow		Pencarian gagal
-Color scheme:	Terminal AppearancePrefView		Skema warna:
 Match word	Terminal FindWindow		Kata cocok
+Color scheme:	Terminal AppearancePrefView		Skema warna:
 New Terminal	Terminal TermWindow		Terminal Baru
 Quit	Terminal TermWindow		Keluar
 Find previous	Terminal TermWindow		Cari sebelumnya
@@ -70,11 +66,9 @@ The process \"%1\" is still running.\nIf you close the tab, the process will be 
 Cursor	Terminal AppearancePrefView		Kursor
 Full screen	Terminal TermWindow		Layar penuh
 Shell 	Terminal TermWindow		Shell 
-Midnight	Terminal colors scheme		Tengah malam
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.
 Tab title:	Terminal TermWindow		Judul tab:
 Window title:	Terminal TermWindow		Judul jendela:
-Default	Terminal colors scheme		Bawaan
 Window size:	Terminal AppearancePrefView		Ukuran jendela:
 Switch Terminals	Terminal TermWindow		Beralih Terminal
 Decrease	Terminal TermWindow		Menurunkan
@@ -82,14 +76,13 @@ Settings…	Terminal TermWindow		Pengaturan...
 Blinking cursor	Terminal AppearancePrefView		Kursor berkedip
 Cancel	Terminal SetTitleWindow		Batalkan
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pola menentukan judul jendela. Penampung berikut\ndapat digunakan:\n
-Close active tab	Terminal TermWindow		Tutup tab aktif
 Use text:	Terminal FindWindow		Gunakan teks:
+Close active tab	Terminal TermWindow		Tutup tab aktif
 Save as default	Terminal TermWindow		Simpan sebagai bawaan
 Nothing is selected.	Terminal TermWindow		Tidak ada yang dipilih
 Use left Option as Meta key	Terminal AppearancePrefView		Gunakan Opsi kiri sebagai kunci Meta
 Find	Terminal FindWindow		Temukan
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pola menentukan judul tab saat ini. Penampung berikut\ndapat digunakan:\n
-Professional	Terminal colors scheme		Profesional
 Font:	Terminal AppearancePrefView		Fon:
 Paste	Terminal TermWindow		Tempel
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Pola yang menentukan judul jendela. Tempat penampung berikut\nbisa digunakan:
@@ -111,5 +104,4 @@ OK	Terminal TermWindow		OKE
 Close window	Terminal TermWindow		Tutup jendela
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nHak Cipta 2001-2019 Haiku, Inc.\nHak Cipta(C) 1999 Kazuho Okui and Takashi Murai.\n\npenggunaan: %s [OPTION] [SHELL]\n
 Clear all	Terminal TermWindow		Bersihkan semua
-Solarized Light	Terminal colors scheme		Cahaya tersolarisasi
 Search forward	Terminal FindWindow		Pencarian selanjutnya

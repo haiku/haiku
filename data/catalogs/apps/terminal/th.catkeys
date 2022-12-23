@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-Terminal	307289061
+1	thai	x-vnd.Haiku-Terminal	311984414
 Close other tabs	Terminal TermWindow		ปิดแท็บอื่น ๆ
 Insert path	Terminal TermView		แทรกเส้นทาง
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		เทอร์มินัลไม่สามารถเริ่มเชลล์ ขอโทษ
@@ -8,9 +8,7 @@ Edit	Terminal TermWindow		แก้ไข
 Select all	Terminal TermWindow		เลือกทั้งหมด
 Confirm exit if active programs exist	Terminal AppearancePrefView		ยืนยันการออกหากมีโปรแกรมที่ใช้งานอยู่
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tไดเรกทอรีการทำงานปัจจุบันของกระบวนการที่ใช้งานอยู่ใน\n\t\t\tแท็บปัจจุบัน เลือกจำนวนคอมโพเนนต์พาธสูงสุด\n\t\t\tได้. ตัวอย่าง '%2d' สำหรับส่วนประกอบได้มากที่สุดสองรายการ\n\t%T\t-\tชื่อแอปพลิเคชันเทอร์มินัลสำหรับสถานที่ปัจจุบัน\n\t%e\t-\tการเข้ารหัสของแท็บปัจจุบัน ไม่แสดงสำหรับ UTF-8\n\t%i\t-\tดัชนีของหน้าต่าง\n\t%p\t-\tชื่อของกระบวนการที่ใช้งานอยู่ในแท็บปัจจุบัน\n\t%t\t-\tชื่อของแท็บปัจจุบัน
-Solarized Dark	Terminal colors scheme		สีทึบ
 Copy	Terminal TermWindow		คัดลอก
-Retro	Terminal colors scheme		ย้อนยุค
 Edit tab title…	Terminal TermWindow		แก้ไขชื่อแท็บ
 Settings	Terminal TermWindow		ตั้งค่า
 Print	Terminal TermWindow		พิมพ์
@@ -27,7 +25,6 @@ Custom	Terminal AppearancePrefView	Window size	ปรับแต่ง
 Selected text	Terminal AppearancePrefView		เลือกข้อความ
 Change directory	Terminal TermView		เปลี่ยนไดเรคทอรี่
 Page setup…	Terminal TermWindow		ตั้งค่าหน้า
-Slate	Terminal colors scheme		กระดาน
 Defaults	Terminal PrefWindow		ค่าเริ่มต้น
 Cancel	Terminal TermView		ยกเลิก
 Revert	Terminal PrefWindow		เปลี่ยนกลับ
@@ -39,7 +36,6 @@ Window title:	Terminal AppearancePrefView		ชื่อหน้าต่าง
 New tab	Terminal TermWindow		แท็ปใหม่
 Allow bold text	Terminal AppearancePrefView		ใช้งานข้อความตัวหนา
 Window title…	Terminal TermWindow		ชื่อหน้าต่าง
-Blue	Terminal colors scheme		สีฟ้า
 Cannot execute \"%command\":\n\t%error	Terminal Shell		ไม่สามารถดำเนินการได้ \"%command\":\n\t%error
 Open path	Terminal TermView		เปิดพาธ
 Terminal	System name		เทอร์มินอล
@@ -52,8 +48,8 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		ตัวเลือ�
 Tab title:	Terminal AppearancePrefView		ชื่อแท็ป
 Text not found.	Terminal TermWindow		ไม่พบข้อความ
 Find failed	Terminal TermWindow		ค้นหาล้มเหลว
-Color scheme:	Terminal AppearancePrefView		โทนสี:
 Match word	Terminal FindWindow		คำตรงกัน
+Color scheme:	Terminal AppearancePrefView		โทนสี:
 New Terminal	Terminal TermWindow		เทอร์มินอลใหม่
 Quit	Terminal TermWindow		ออก
 Find previous	Terminal TermWindow		ค้นหาก่อนหน้านี้
@@ -70,11 +66,9 @@ The process \"%1\" is still running.\nIf you close the tab, the process will be 
 Cursor	Terminal AppearancePrefView		เคอร์เซอร์
 Full screen	Terminal TermWindow		เต็มจอ
 Shell 	Terminal TermWindow		เชลล์
-Midnight	Terminal colors scheme		เที่ยงคืน
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tตัวอักษร '%'\n\t%<\t-\tเริ่มหัวข้อที่จะปรากฏต่อเมื่อ\n\t\t\tข้อความที่ต้องการให้แสดงนั้นไม่ว่างเปล่า\n\t%>\t-\tเริ่มหัวข้อที่จะปรากฏต่อเมื่อข้อความที่ต้องการให้แสดง\n\t\t\tก่อนหน้านี้ %< section และอันนี้ไม่ว่างเปล่า\n\t%-\t-\tสิ้นสุด %< or %> section\n\nอักขระที่ไม่ใช่ตัวอักษรและตัวเลขใดๆระหว่าง '%' และตัวอักษรรูปแบบจะแทรกเว้นวรรคเท่านั้น\nหากข้อความที่ต้องการให้แสดงไม่ว่างเปล่า มันจะเพิ่มไปยัง %< section
 Tab title:	Terminal TermWindow		ชื่อแท็ป:
 Window title:	Terminal TermWindow		ชื่อหน้าต่าง:
-Default	Terminal colors scheme		ค่าเริ่มต้น
 Window size:	Terminal AppearancePrefView		ขนาดหน้าต่าง:
 Switch Terminals	Terminal TermWindow		สลับเทอร์มินอล
 Decrease	Terminal TermWindow		ลดลง
@@ -82,14 +76,13 @@ Settings…	Terminal TermWindow		ตั้งค่า
 Blinking cursor	Terminal AppearancePrefView		เคอร์เซอร์กะพริบ
 Cancel	Terminal SetTitleWindow		ยกเลิก
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		รูปแบบที่ระบุชื่อหน้าต่าง ข้อความที่ต้องการให้แสดง \nสามารถใช้:\n
-Close active tab	Terminal TermWindow		ปิดแท็ปที่ใช้งาน
 Use text:	Terminal FindWindow		ใช้ข้อความ
+Close active tab	Terminal TermWindow		ปิดแท็ปที่ใช้งาน
 Save as default	Terminal TermWindow		บันทึกเป็นค่าเริ่มต้น
 Nothing is selected.	Terminal TermWindow		ไม่มีการเลือก
 Use left Option as Meta key	Terminal AppearancePrefView		ใช้ตัวเลือกทางซ้ายเป็นการระบุคำค้นหา
 Find	Terminal FindWindow		ค้นหา
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		รูปแบบที่ระบุชื่อแท็บปัจจุบัน ข้อความที่ต้องการให้แสดง\nสามารถใช้:\n
-Professional	Terminal colors scheme		ระดับมืออาชีพ
 Font:	Terminal AppearancePrefView		ตัวอักษร:
 Paste	Terminal TermWindow		วาง
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		รูปแบบที่ระบุชื่อหน้าต่าง ข้อความที่ต้องการให้แสดง\nสามารถนำมาใช้:
@@ -111,5 +104,4 @@ OK	Terminal TermWindow		ตกลง
 Close window	Terminal TermWindow		ปิดหน้าต่าง
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nลิขสิทธิ์ 2001-2019 Haiku, Inc.\nลิขสิทธิ์(C) 1999 Kazuho Okui และ Takashi Murai.\n\nการใช้งาน: %s [OPTION] [SHELL]\n
 Clear all	Terminal TermWindow		ลบทั้งหมด
-Solarized Light	Terminal colors scheme		สีสว่าง
 Search forward	Terminal FindWindow		ค้นหาข้างหน้า

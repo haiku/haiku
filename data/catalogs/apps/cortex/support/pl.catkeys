@@ -1,4 +1,4 @@
-1	polish	application/x-vnd.Cortex.support	1625162530
+1	polish	application/x-vnd.Cortex.support	2097798758
 Header has flags	MediaString		Nagłówek ma flagi
 32 bit HLS	MediaString		32-bitowy HLS
 Recording	MediaString		Nagrywanie
@@ -31,6 +31,7 @@ Back-center	MediaString		Tylny środkowy
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{#-bitowe liczby całkowite}}
 Ambisonic WXYZ	MediaString		Ambisonic WXYZ
 (unknown video format)	MediaString		(nieznany format wideo)
+Video data between line %lu and %lu	MediaString		Dane wideo pomiędzy linią %lu a %lu
 AVI format family	MediaString		Rodzina formatów AVI
 Homogenous buffers	MediaString		Jednorodne bufory
 Interlaced 	MediaString		Przeplatany 

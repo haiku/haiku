@@ -1,51 +1,51 @@
 1	indonesian	x-vnd.Haiku-Expander	3300517306
-Expand	ExpanderMenu		Kembangkan
-Expanding '%s'…	ExpanderWindow		Mengembangkan '%s'…
-Close window when done expanding	ExpanderPreferences		Tutup jendela saat selesai mengembangkan
-Set destination…	ExpanderMenu		Tentukan tujuan…
-Use:	ExpanderPreferences		Pakai:
-File expanded	ExpanderWindow		File sudah dikembangkan
-The destination is read only.	ExpanderWindow		Tujuan hanya dapat dibaca saja.
-Expander: Open	ExpanderWindow		Expander: Buka
- is not supported	ExpanderWindow		 tidak didukung
-Expander settings	ExpanderPreferences		Pengaturan Expander
-Select current	DirectoryFilePanel		Pilih saat ini
-Source	ExpanderWindow		Sumber
-Error when expanding archive	ExpanderWindow		Ada kesalahan saat mengembangkan arsip
-Hide contents	ExpanderWindow		Sembunyikan isi
-Cancel	ExpanderWindow		Batalkan
-Automatically expand files	ExpanderPreferences		Secara otomatis mengembangkan file
-Continue	ExpanderWindow		Lanjutkan
-Destination folder	ExpanderPreferences		Folder tujuan
-Other	ExpanderPreferences		Lainnya
-Cancel	ExpanderPreferences		Batalkan
-Expansion	ExpanderPreferences		pengembangan
-Select	DirectoryFilePanel		Pilih
-The folder was either moved, renamed or not supported.	ExpanderWindow		Foldernya pernah dipindah, dinamakan ulang atau tidak didukung.
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Folder yang dituju tidak ada. Anda ingin membuatnya sekarang?
-Same directory as source (archive) file	ExpanderPreferences		Direktori sama dengan berkas (arsip) sumber
-Settings	ExpanderMenu		Pengaturan
-Settings…	ExpanderMenu		Pengaturan…
-Expander: Choose destination	DirectoryFilePanel		Expander: Pilih tujuan
-Select	ExpanderPreferences		Pilih
-Show contents	ExpanderWindow		Tampilkan isi
-Automatically show contents listing	ExpanderPreferences		Tampilkan daftar kandungan secara otomatis
-OK	ExpanderPreferences		OKE
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Apakah Anda yakin untuk berhenti mengekstrak arsip ini? Berkas yang diekstrak mungkin tidak lengkap.
-Leave destination folder path empty	ExpanderPreferences		Biarkan alamat folder tujuan kosong
-Failed to create the destination folder.	ExpanderWindow		Gagal untuk membuat folder tujuan.
-Select '%s'…	DirectoryFilePanel		Pilih '%s'…
-Create	ExpanderWindow		Buat
-The file doesn't exist	ExpanderWindow		Berkas tidak ada
-Stop	ExpanderMenu		Setop
-File	ExpanderMenu		Berkas
-Expander	System name		Expander
-Expand	ExpanderWindow		Ekstrak
-Close	ExpanderMenu		Tutup
-The destination is not a folder.	ExpanderWindow		Tujuannya bukan suatu folder.
-Open destination folder after extraction	ExpanderPreferences		Buka folder tujuan setelah ekstraksi
-Creating listing for '%s'…	ExpanderWindow		Membuat daftar untuk '%s'…
-Set source…	ExpanderMenu		Set sumber…
-Show contents	ExpanderMenu		Tampilan kandungan
-Stop	ExpanderWindow		Hentikan
 Destination	ExpanderWindow		Tujuan
+Other	ExpanderPreferences		Lainnya
+Automatically show contents listing	ExpanderPreferences		Tampilkan daftar kandungan secara otomatis
+Expander	System name		Expander
+Expander: Choose destination	DirectoryFilePanel		Expander: Pilih tujuan
+Set source…	ExpanderMenu		Set sumber…
+The destination is not a folder.	ExpanderWindow		Tujuannya bukan suatu folder.
+The folder was either moved, renamed or not supported.	ExpanderWindow		Foldernya pernah dipindah, dinamakan ulang atau tidak didukung.
+Close window when done expanding	ExpanderPreferences		Tutup jendela saat selesai mengembangkan
+Close	ExpanderMenu		Tutup
+Create	ExpanderWindow		Buat
+Creating listing for '%s'…	ExpanderWindow		Membuat daftar untuk '%s'…
+Show contents	ExpanderMenu		Tampilan kandungan
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Apakah Anda yakin untuk berhenti mengekstrak arsip ini? Berkas yang diekstrak mungkin tidak lengkap.
+Settings	ExpanderMenu		Pengaturan
+Expand	ExpanderWindow		Ekstrak
+Open destination folder after extraction	ExpanderPreferences		Buka folder tujuan setelah ekstraksi
+Same directory as source (archive) file	ExpanderPreferences		Direktori sama dengan berkas (arsip) sumber
+Stop	ExpanderWindow		Hentikan
+Cancel	ExpanderWindow		Batalkan
+Expander settings	ExpanderPreferences		Pengaturan Expander
+Error when expanding archive	ExpanderWindow		Ada kesalahan saat mengembangkan arsip
+Expand	ExpanderMenu		Kembangkan
+Failed to create the destination folder.	ExpanderWindow		Gagal untuk membuat folder tujuan.
+Settings…	ExpanderMenu		Pengaturan…
+Select current	DirectoryFilePanel		Pilih saat ini
+Expanding '%s'…	ExpanderWindow		Mengembangkan '%s'…
+OK	ExpanderPreferences		OKE
+File expanded	ExpanderWindow		File sudah dikembangkan
+Automatically expand files	ExpanderPreferences		Secara otomatis mengembangkan file
+Select	DirectoryFilePanel		Pilih
+Show contents	ExpanderWindow		Tampilkan isi
+Stop	ExpanderMenu		Setop
+Select '%s'…	DirectoryFilePanel		Pilih '%s'…
+Expansion	ExpanderPreferences		pengembangan
+Set destination…	ExpanderMenu		Tentukan tujuan…
+Continue	ExpanderWindow		Lanjutkan
+ is not supported	ExpanderWindow		 tidak didukung
+Cancel	ExpanderPreferences		Batalkan
+Use:	ExpanderPreferences		Pakai:
+Destination folder	ExpanderPreferences		Folder tujuan
+Expander: Open	ExpanderWindow		Expander: Buka
+Leave destination folder path empty	ExpanderPreferences		Biarkan alamat folder tujuan kosong
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Folder yang dituju tidak ada. Anda ingin membuatnya sekarang?
+The file doesn't exist	ExpanderWindow		Berkas tidak ada
+Hide contents	ExpanderWindow		Sembunyikan isi
+Source	ExpanderWindow		Sumber
+The destination is read only.	ExpanderWindow		Tujuan hanya dapat dibaca saja.
+Select	ExpanderPreferences		Pilih
+File	ExpanderMenu		Berkas

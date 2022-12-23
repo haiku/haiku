@@ -1,51 +1,51 @@
 1	portuguese (brazil)	x-vnd.Haiku-Expander	3300517306
-Expand	ExpanderMenu		Expandir
-Expanding '%s'…	ExpanderWindow		Expandindo '%s'…
-Close window when done expanding	ExpanderPreferences		Fechar a janela quando concluir a expansão
-Set destination…	ExpanderMenu		Selecionar destino…
-Use:	ExpanderPreferences		Usar:
-File expanded	ExpanderWindow		Arquivo expandido
-The destination is read only.	ExpanderWindow		O destino é somente para leitura.
-Expander: Open	ExpanderWindow		Expansor: Abrir
- is not supported	ExpanderWindow		 não é suportado
-Expander settings	ExpanderPreferences		Configurações do Expansor
-Select current	DirectoryFilePanel		Selecione o atual
-Source	ExpanderWindow		Fonte
-Error when expanding archive	ExpanderWindow		Erro ao expandir conjunto de arquivos
-Hide contents	ExpanderWindow		Esconder conteúdo
-Cancel	ExpanderWindow		Cancelar
-Automatically expand files	ExpanderPreferences		Expandir arquivos automaticamente
-Continue	ExpanderWindow		Continuar
-Destination folder	ExpanderPreferences		Pasta de destino
-Other	ExpanderPreferences		Outro
-Cancel	ExpanderPreferences		Cancelar
-Expansion	ExpanderPreferences		Expansão
-Select	DirectoryFilePanel		Selecionar
-The folder was either moved, renamed or not supported.	ExpanderWindow		A pasta foi movida, renomeada ou não é suportada.
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		A pasta de destino não existe. Deseja criá-la?
-Same directory as source (archive) file	ExpanderPreferences		Mesmo diretório que o arquivo fonte (conjunto de arquivos)
-Settings	ExpanderMenu		Configurações
-Settings…	ExpanderMenu		Configurações…
-Expander: Choose destination	DirectoryFilePanel		Expansor: Escolher destino
-Select	ExpanderPreferences		Selecionar
-Show contents	ExpanderWindow		Mostrar o conteúdo
-Automatically show contents listing	ExpanderPreferences		Exibir automaticamente lista do conteúdo
-OK	ExpanderPreferences		OK
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Tem certeza que deseja parar de expandir este conjunto de arquivos? Os itens expandidos podem não estar completos.
-Leave destination folder path empty	ExpanderPreferences		Deixar caminho da pasta de destino vazio
-Failed to create the destination folder.	ExpanderWindow		Falha ao criar a pasta de destino.
-Select '%s'…	DirectoryFilePanel		Selecionar '%s'…
-Create	ExpanderWindow		Criar
-The file doesn't exist	ExpanderWindow		O arquivo não existe
-Stop	ExpanderMenu		Parar
-File	ExpanderMenu		Arquivo
-Expander	System name		Expansor
-Expand	ExpanderWindow		Expandir
-Close	ExpanderMenu		Fechar
-The destination is not a folder.	ExpanderWindow		O destino não é uma pasta.
-Open destination folder after extraction	ExpanderPreferences		Abrir a pasta de destino após a extração
-Creating listing for '%s'…	ExpanderWindow		Criando listas para '%s'…
-Set source…	ExpanderMenu		Definir fonte…
-Show contents	ExpanderMenu		Mostrar o conteúdo
-Stop	ExpanderWindow		Parar
 Destination	ExpanderWindow		Destino
+Other	ExpanderPreferences		Outro
+Automatically show contents listing	ExpanderPreferences		Exibir automaticamente lista do conteúdo
+Expander	System name		Expansor
+Expander: Choose destination	DirectoryFilePanel		Expansor: Escolher destino
+Set source…	ExpanderMenu		Definir fonte…
+The destination is not a folder.	ExpanderWindow		O destino não é uma pasta.
+The folder was either moved, renamed or not supported.	ExpanderWindow		A pasta foi movida, renomeada ou não é suportada.
+Close window when done expanding	ExpanderPreferences		Fechar a janela quando concluir a expansão
+Close	ExpanderMenu		Fechar
+Create	ExpanderWindow		Criar
+Creating listing for '%s'…	ExpanderWindow		Criando listas para '%s'…
+Show contents	ExpanderMenu		Mostrar o conteúdo
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Tem certeza que deseja parar de expandir este conjunto de arquivos? Os itens expandidos podem não estar completos.
+Settings	ExpanderMenu		Configurações
+Expand	ExpanderWindow		Expandir
+Open destination folder after extraction	ExpanderPreferences		Abrir a pasta de destino após a extração
+Same directory as source (archive) file	ExpanderPreferences		Mesmo diretório que o arquivo fonte (conjunto de arquivos)
+Stop	ExpanderWindow		Parar
+Cancel	ExpanderWindow		Cancelar
+Expander settings	ExpanderPreferences		Configurações do Expansor
+Error when expanding archive	ExpanderWindow		Erro ao expandir conjunto de arquivos
+Expand	ExpanderMenu		Expandir
+Failed to create the destination folder.	ExpanderWindow		Falha ao criar a pasta de destino.
+Settings…	ExpanderMenu		Configurações…
+Select current	DirectoryFilePanel		Selecione o atual
+Expanding '%s'…	ExpanderWindow		Expandindo '%s'…
+OK	ExpanderPreferences		OK
+File expanded	ExpanderWindow		Arquivo expandido
+Automatically expand files	ExpanderPreferences		Expandir arquivos automaticamente
+Select	DirectoryFilePanel		Selecionar
+Show contents	ExpanderWindow		Mostrar o conteúdo
+Stop	ExpanderMenu		Parar
+Select '%s'…	DirectoryFilePanel		Selecionar '%s'…
+Expansion	ExpanderPreferences		Expansão
+Set destination…	ExpanderMenu		Selecionar destino…
+Continue	ExpanderWindow		Continuar
+ is not supported	ExpanderWindow		 não é suportado
+Cancel	ExpanderPreferences		Cancelar
+Use:	ExpanderPreferences		Usar:
+Destination folder	ExpanderPreferences		Pasta de destino
+Expander: Open	ExpanderWindow		Expansor: Abrir
+Leave destination folder path empty	ExpanderPreferences		Deixar caminho da pasta de destino vazio
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		A pasta de destino não existe. Deseja criá-la?
+The file doesn't exist	ExpanderWindow		O arquivo não existe
+Hide contents	ExpanderWindow		Esconder conteúdo
+Source	ExpanderWindow		Fonte
+The destination is read only.	ExpanderWindow		O destino é somente para leitura.
+Select	ExpanderPreferences		Selecionar
+File	ExpanderMenu		Arquivo

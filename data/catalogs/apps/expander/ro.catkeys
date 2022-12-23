@@ -1,51 +1,51 @@
 1	romanian	x-vnd.Haiku-Expander	3300517306
-Expand	ExpanderMenu		Extinde
-Expanding '%s'…	ExpanderWindow		Se extinde „%s”…
-Close window when done expanding	ExpanderPreferences		Închide fereastra când se termină extinderea
-Set destination…	ExpanderMenu		Stabilire destinație…
-Use:	ExpanderPreferences		Utilizare:
-File expanded	ExpanderWindow		Fișier extins
-The destination is read only.	ExpanderWindow		Destinația este doar în citire.
-Expander: Open	ExpanderWindow		Expander: deschide
- is not supported	ExpanderWindow		 nu este suportat
-Expander settings	ExpanderPreferences		Configurări Expander
-Select current	DirectoryFilePanel		Selectează curent
-Source	ExpanderWindow		Sursă
-Error when expanding archive	ExpanderWindow		Eroare la extinderea arhivei
-Hide contents	ExpanderWindow		Ascunde conținutul
-Cancel	ExpanderWindow		Anulează
-Automatically expand files	ExpanderPreferences		Extinde automat fișierele
-Continue	ExpanderWindow		Continuă
-Destination folder	ExpanderPreferences		Dosar de destinație
-Other	ExpanderPreferences		Altele
-Cancel	ExpanderPreferences		Anulează
-Expansion	ExpanderPreferences		Expansiune
-Select	DirectoryFilePanel		Selectează
-The folder was either moved, renamed or not supported.	ExpanderWindow		Dosarul a fost mutat, redenumit sau nu a fost suportat.
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Dosarul de destinație nu există. Doriți să îl creați?
-Same directory as source (archive) file	ExpanderPreferences		Același director ca fișierul sursă (arhivă)
-Settings	ExpanderMenu		Configurări
-Settings…	ExpanderMenu		Configurări…
-Expander: Choose destination	DirectoryFilePanel		Expander: alege destinația
-Select	ExpanderPreferences		Selectează
-Show contents	ExpanderWindow		Arată conținutul
-Automatically show contents listing	ExpanderPreferences		Arată automat listarea conținutului
-OK	ExpanderPreferences		OK
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Sigur doriți să opriți extinderea acestei arhive? Este posibil ca elementele extinse să nu fie complete.
-Leave destination folder path empty	ExpanderPreferences		Lăsați liberă calea dosarului de destinație
-Failed to create the destination folder.	ExpanderWindow		Nu s-a putut crea dosarul de destinație.
-Select '%s'…	DirectoryFilePanel		Selectare „%s”…
-Create	ExpanderWindow		Creare
-The file doesn't exist	ExpanderWindow		Fișierul nu există
-Stop	ExpanderMenu		Oprește
-File	ExpanderMenu		Fișier
-Expander	System name		Expander
-Expand	ExpanderWindow		Extinde
-Close	ExpanderMenu		Închide
-The destination is not a folder.	ExpanderWindow		Destinația nu este un dosar.
-Open destination folder after extraction	ExpanderPreferences		Deschide dosarul de destinație după extragere
-Creating listing for '%s'…	ExpanderWindow		Se creează listarea pentru „%s”…
-Set source…	ExpanderMenu		Stabilire sursă…
-Show contents	ExpanderMenu		Arată conținutul
-Stop	ExpanderWindow		Oprește
 Destination	ExpanderWindow		Destinație
+Other	ExpanderPreferences		Altele
+Automatically show contents listing	ExpanderPreferences		Arată automat listarea conținutului
+Expander	System name		Expander
+Expander: Choose destination	DirectoryFilePanel		Expander: alege destinația
+Set source…	ExpanderMenu		Stabilire sursă…
+The destination is not a folder.	ExpanderWindow		Destinația nu este un dosar.
+The folder was either moved, renamed or not supported.	ExpanderWindow		Dosarul a fost mutat, redenumit sau nu a fost suportat.
+Close window when done expanding	ExpanderPreferences		Închide fereastra când se termină extinderea
+Close	ExpanderMenu		Închide
+Create	ExpanderWindow		Creare
+Creating listing for '%s'…	ExpanderWindow		Se creează listarea pentru „%s”…
+Show contents	ExpanderMenu		Arată conținutul
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Sigur doriți să opriți extinderea acestei arhive? Este posibil ca elementele extinse să nu fie complete.
+Settings	ExpanderMenu		Configurări
+Expand	ExpanderWindow		Extinde
+Open destination folder after extraction	ExpanderPreferences		Deschide dosarul de destinație după extragere
+Same directory as source (archive) file	ExpanderPreferences		Același director ca fișierul sursă (arhivă)
+Stop	ExpanderWindow		Oprește
+Cancel	ExpanderWindow		Anulează
+Expander settings	ExpanderPreferences		Configurări Expander
+Error when expanding archive	ExpanderWindow		Eroare la extinderea arhivei
+Expand	ExpanderMenu		Extinde
+Failed to create the destination folder.	ExpanderWindow		Nu s-a putut crea dosarul de destinație.
+Settings…	ExpanderMenu		Configurări…
+Select current	DirectoryFilePanel		Selectează curent
+Expanding '%s'…	ExpanderWindow		Se extinde „%s”…
+OK	ExpanderPreferences		OK
+File expanded	ExpanderWindow		Fișier extins
+Automatically expand files	ExpanderPreferences		Extinde automat fișierele
+Select	DirectoryFilePanel		Selectează
+Show contents	ExpanderWindow		Arată conținutul
+Stop	ExpanderMenu		Oprește
+Select '%s'…	DirectoryFilePanel		Selectare „%s”…
+Expansion	ExpanderPreferences		Expansiune
+Set destination…	ExpanderMenu		Stabilire destinație…
+Continue	ExpanderWindow		Continuă
+ is not supported	ExpanderWindow		 nu este suportat
+Cancel	ExpanderPreferences		Anulează
+Use:	ExpanderPreferences		Utilizare:
+Destination folder	ExpanderPreferences		Dosar de destinație
+Expander: Open	ExpanderWindow		Expander: deschide
+Leave destination folder path empty	ExpanderPreferences		Lăsați liberă calea dosarului de destinație
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Dosarul de destinație nu există. Doriți să îl creați?
+The file doesn't exist	ExpanderWindow		Fișierul nu există
+Hide contents	ExpanderWindow		Ascunde conținutul
+Source	ExpanderWindow		Sursă
+The destination is read only.	ExpanderWindow		Destinația este doar în citire.
+Select	ExpanderPreferences		Selectează
+File	ExpanderMenu		Fișier

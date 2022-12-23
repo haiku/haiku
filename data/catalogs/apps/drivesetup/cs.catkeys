@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-DriveSetup	4048496535
+1	czech	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		Oddíl %s nelze odpojit.
 Mount all	MainWindow		Připojit vše
 Disk	MainWindow		Disk
@@ -14,6 +14,7 @@ Block size	PartitionList		Velikost bloku
 The panel experienced a problem!	MainWindow		Na panelu došlo k problému!
 Device	DiskView		Zařízení
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Opravdu chcete formátovat rozšířený oddíl Intel? Pokud budete pokračovat, všechny svazky, které obsahuje, budou přepsány. Budete požádáni znovu, než budou změny zapsány na disk.
+Physical block size	PartitionList		Fyzická velikost bloku
 Unmount	MainWindow		Odpojit
 Failed to format the partition %s!\n	MainWindow		Chyba při formátování oddílu %s!\n
 Partition size	CreateParametersPanel		Velikost oddílu

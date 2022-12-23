@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	4089361699
+1	japanese	x-vnd.Haiku-Terminal	3440179729
 ANSI cyan color	Terminal AppearancePrefView		ANSI シアン
 Close other tabs	Terminal TermWindow		他のタブを閉じる
 Insert path	Terminal TermView		パスの挿入
@@ -11,11 +11,9 @@ Edit	Terminal TermWindow		編集
 Select all	Terminal TermWindow		すべて選択
 Confirm exit if active programs exist	Terminal AppearancePrefView		実行中のプログラムがある場合、終了時に確認する
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tタブで動作中のプロセスの作業中フォルダー\n\t\t\tオプションでパスの最大要素数を指定できます。\n\t\t\t例. '%2d' は最大 2 つの要素を示します。\n\t%T\t-\t現在のロケールでの Terminal アプリケーション名\n\t%e\t-\tタブの文字コード。UTF-8 の場合は非表示です。\n\t%i\t-\tウィンドウのインデックス\n\t%p\t-\tタブ内で実行中のプロセス名\n\t%t\t-\tタブのタイトル
-Solarized Dark	Terminal colors scheme		Solarized Dark
-Copy	Terminal TermWindow		コピー
 ANSI bright green color	Terminal AppearancePrefView		ANSI ブライトグリーン
+Copy	Terminal TermWindow		コピー
 ANSI white color	Terminal AppearancePrefView		ANSI ホワイト
-Retro	Terminal colors scheme		レトロ
 Edit tab title…	Terminal TermWindow		タブタイトルの編集...
 Settings	Terminal TermWindow		設定
 Print	Terminal TermWindow		印刷
@@ -36,11 +34,9 @@ Selected text	Terminal AppearancePrefView		選択されたテキスト
 Change directory	Terminal TermView		ディレクトリの変更
 ANSI magenta color	Terminal AppearancePrefView		ANSI マゼンタ
 Page setup…	Terminal TermWindow		ページ設定...
-Slate	Terminal colors scheme		スレート
 Defaults	Terminal PrefWindow		デフォルト
 Cancel	Terminal TermView		中止
 Revert	Terminal PrefWindow		戻す
-Relaxed	Terminal colors scheme		Relaxed
 ANSI bright magenta color	Terminal AppearancePrefView		ANSI ブライトマゼンタ
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	ターミナル
 ANSI bright cyan color	Terminal AppearancePrefView		ANSI ブライトシアン
@@ -52,11 +48,10 @@ New tab	Terminal TermWindow		新しいタブ
 ANSI bright blue color	Terminal AppearancePrefView		ANSI ブライトブルー
 Allow bold text	Terminal AppearancePrefView		太字を有効にする
 Window title…	Terminal TermWindow		ウィンドウタイトル...
-Blue	Terminal colors scheme		ブルー
 Cannot execute \"%command\":\n\t%error	Terminal Shell		\"%command\" を実行できません:\n\t%error
 Open path	Terminal TermView		パスを開く
-ANSI yellow color	Terminal AppearancePrefView		ANSI イエロー
 Terminal	System name		ターミナル
+ANSI yellow color	Terminal AppearancePrefView		ANSI イエロー
 Font size	Terminal TermWindow		フォントサイズ
 Custom	Terminal colors scheme		カスタム
 Really close?	Terminal TermWindow		本当に閉じますか?
@@ -66,8 +61,8 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Unrecognized option \"%
 Tab title:	Terminal AppearancePrefView		タブタイトル:
 Text not found.	Terminal TermWindow		検索テキストが見つかりません。
 Find failed	Terminal TermWindow		見つかりませんでした
-Color scheme:	Terminal AppearancePrefView		配色:
 Match word	Terminal FindWindow		一致する単語を検索
+Color scheme:	Terminal AppearancePrefView		配色:
 New Terminal	Terminal TermWindow		新しいターミナルを開く
 Quit	Terminal TermWindow		終了
 Find previous	Terminal TermWindow		前を検索
@@ -85,11 +80,9 @@ The process \"%1\" is still running.\nIf you close the tab, the process will be 
 Cursor	Terminal AppearancePrefView		カーソル
 Full screen	Terminal TermWindow		全画面表示
 Shell 	Terminal TermWindow		シェル
-Midnight	Terminal colors scheme		ミッドナイト
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t文字 '%'.\n\t%<\t-\tあとでプレースホルダーが空にならない場合のみ表示される\n\t\t\tセクションを開始します。\n\t%>\t-\t前の %< セクションと、このセクションの間のプレースホルダーが\n\t\t\t空にならない場合のみ表示されるセクションを開始します。\n\t%-\t-\t%< または %> セクションを終了します。\n\n'%' とフォーマット文字間の英数字以外の文字は、プレースホルダーが\n空でない場合にスペースのみを挿入します。
 Tab title:	Terminal TermWindow		タブタイトル:
 Window title:	Terminal TermWindow		ウィンドウタイトル:
-Default	Terminal colors scheme		デフォルト
 Window size:	Terminal AppearancePrefView		ウィンドウサイズ:
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Decrease	Terminal TermWindow		縮小
@@ -98,15 +91,14 @@ ANSI bright white color	Terminal AppearancePrefView		ANSI ブライトホワイ�
 Blinking cursor	Terminal AppearancePrefView		カーソルを点滅させる
 Cancel	Terminal SetTitleWindow		中止
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンはウィンドウタイトルを指定します。次のプレースホルダーが\n使用できます:\n
-Close active tab	Terminal TermWindow		タブを閉じる
 Use text:	Terminal FindWindow		テキスト指定:
+Close active tab	Terminal TermWindow		タブを閉じる
 Save as default	Terminal TermWindow		デフォルトとして保存
 Nothing is selected.	Terminal TermWindow		なにも選択されていません。
 ANSI red color	Terminal AppearancePrefView		ANSI レッド
 Use left Option as Meta key	Terminal AppearancePrefView		左オプションキーをメタキーとして使う
 Find	Terminal FindWindow		検索
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンは現在のタブタイトルを指定します。次のプレースホルダーが\n使用できます:\n
-Professional	Terminal colors scheme		プロフェッショナル
 Font:	Terminal AppearancePrefView		フォント:
 Paste	Terminal TermWindow		貼り付け
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		パターンはウィンドウタイトルを定めます。以下のプレースホルダーが\n使えます:
@@ -130,5 +122,4 @@ OK	Terminal TermWindow		OK
 Close window	Terminal TermWindow		ウィンドウを閉じる
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n
 Clear all	Terminal TermWindow		すべて消去
-Solarized Light	Terminal colors scheme		Solarized Light
 Search forward	Terminal FindWindow		順方向検索

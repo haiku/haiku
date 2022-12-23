@@ -1,20 +1,27 @@
-1	czech	x-vnd.Haiku-HaikuDepot	3139226371
+1	czech	x-vnd.Haiku-HaikuDepot	381023409
+Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problém se stažením podmínek použití
 Available packages	MainWindow		Dostupné balíčky
 It was not possible to create the new user.	UserLoginWindow		Nepodařilo se vytvořit nového uživatele.
 An unexpected error has been sent from the server [%li]	ServerHelper		Neočekávaná chyba byla poslána ze serveru [%li]
 Create account	UserLoginWindow		Vytvořit účet
+Agree	ToLatestUserUsageConditionsWindow		Souhlas
 Install %PackageTitle%	PackageManager		Nainstalovat %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Odpověď na captchu byla chybná.
 Rate package…	PackageInfoView		Hodnotit balíček…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Úspěšně jste se přihlásil jako uživatel %Nickname%.
+Package problems	PackageProblem	Window title	Problémy balíčků
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Nebylo možné rozbalit nezbytné informace captchy z dat odeslaných zpět ze serveru.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Nastala chyba během získávání seznamu balíčků: %message%
+Update usage conditions	ToLatestUserUsageConditionsWindow		Aktualizace podmínek použití
+No usage conditions	UserUsageConditions		Žádné podmínky použití
 Active	PackageListView		Aktivní
 Login or Create account	MainWindow		Přihlásit se nebo vytvořit účet
 Switch account…	MainWindow		Přepnout účet…
 Preferred language:	UserLoginWindow		Preferovaný jazyk:
 Name	PackageListView		Název
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Chyba při ověření uživatele. Odhlaste se a přihlaste znova pro ověření hesla a kontrolu zda jste souhlasili s posledními podmínkami užívání.
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot komunikuje se servrovou komponentou zvanou HaikuDepotServer. Toto jsou podmínky použití, se kterými uživatel '%Nickname%' souhlasil %AgreedToTimestamp% v souvislosti s užitím služby HaikuDepotServer.
+don't activate package %source%	PackageProblem	don't change '%source%	neaktivovat balíček %source%
 Rate %Package%	RatePackageWindow		Hodnocení %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Nastala chyba při inicializaci správce balíčků: %message%
 Quit HaikuDepot	App		Ukončit HaikuDepot
@@ -22,7 +29,11 @@ Category	FilterView		Kategorie
 A response to the captcha question must be provided.	UserLoginWindow		Je třeba odpovědět na otázku captcha.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Objevila se neočekávaná chyba '%Message%' s vlastností '%Property%'
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Pořadovaný objekt nebo objekt součástí požadavku nebyl na serveru nalezen.
+Logout	ToLatestUserUsageConditionsWindow		Odhlásit se
+The following additional package changes have to be made:	PackageResult		Je nutné vykonat následující změny balíčků:
 No changelog available.	PackageInfoView		Seznam změn není k dispozici.
+The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Současné podmínky použití byly odsouhlaseny.
+Cancel	PackageProblem		Zrušit
 Version	PackageListView		Verze
 No, quit HaikuDepot	App		Ne, ukončit HaikuDepot
 Not logged in	MainWindow		Nepřihlášen
@@ -38,7 +49,9 @@ All packages	PackageListView		Všechny balíčky
 Send	RatePackageWindow		Poslat
 Start package daemon	App		Spustit službu balíčků
 There are problems in the supplied data:	UserLoginWindow		Jsou problémy s poskytnutými daty:
+The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Uživatel '%Nickname%' nesouhlasil s žádnými podmínkami použití.
 Usage conditions download problem	UserLoginWindow		Problém se stažením podmínek použití
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	nainstalovat balíček %s z repozitáře %s\n
 Package daemon problem	App		Problém služby balíčků
 No	MainWindow		Ne
 Repository	PackageListView		Repozitář
@@ -48,10 +61,13 @@ The email is malformed.	UserLoginWindow		Email je špatně formátovaný.
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synchronizuji data balíčků z repozitáře '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Zobrazit podmínky užívání
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Nastala chyba při stahování podmínek použití potřebných pro vytvoření nového uživatele. Zkontrolujte log pro více informací a zkuste to znovu. \nV HaikuDepot sekci uživatelské příručky Haiku se dočtete jak zobrazit logy.
+Usage conditions agreed	ToLatestUserUsageConditionsWindow		Podmínky použití dohodnuté
 Size	PackageListView		Velikost
 Your rating was updated.	RatePackageWindow		Vaše hodnocení bylo aktulizováno.
 All categories	FilterView		Všechny kategorie
+ignore problem for now	PackageProblem		teď to neřeš
 n/a	PackageInfoView		N/A
+Checking user details	UserDetailVerifierProcess		Šťourání v údajích uživatele
 Cancel	MainWindow		Zrušit
 Refresh repositories	MainWindow		Obnovit repozitáře
 Continue	App		Pokračovat
@@ -59,13 +75,16 @@ A password is required.	UserLoginWindow		Heslo je vyžadováno.
 Language	RatePackageWindow		Jazyk
 Status	PackageListView		Stav
 Network transport error	ServerHelper		Chyba při přenosu v síti
+Cancel	PackageResult		Zrušit
 Uninstall %PackageTitle%	PackageManager		Odinstalovat %PackageTitle%
+Retry	PackageProblem		Znovu
 Update	RatePackageWindow		Aktualizovat
 Language	UserLoginWindow		Jazyk
 OK	UserLoginWindow		OK
 Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synchronizuji referenční data ze serveru
 Stability:	RatePackageWindow		Stabilita:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Podmínky použití musí být odsouhlaseny a osoba vytvářející uživatele musí splňovat minimální věkové požadavky.
+solution %d:	PackageProblem	Don't change the %d variable	řešení %d:
 Source packages	MainWindow		Zdrojové balíčky
 Problem with working files	App		Problém s pracovními soubory
 Try again	App		Zkusit znovu
@@ -83,6 +102,7 @@ Authentication failed	UserLoginWindow		Ověření se nezdařilo
 Captcha error	UserLoginWindow		Chyba captcha
 Manage repositories…	MainWindow		Spravovat repozitáře...
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Přezdívka musí být jedinečná. Vámi zvolená přezdívka je již zabraná, zvolte jinou.
+OK	UserUsageConditions		OK
 Open %DeskbarLink%	PackageManager		Otevřít %DeskbarLink%
 Input validation	UserLoginWindow		Ověření vstupu
 Log in…	MainWindow		Přihlásit…
@@ -96,11 +116,16 @@ An error occurred while refreshing the repository: %error%	LocalRepositoryUpdate
 User Created	UserLoginWindow		Vytvořen uživatel
 Check for updates…	MainWindow		Zkontrolovat aktualizace…
 Uninstalled	PackageListView		Odinstalován
+I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Souhlasím s těmito podmínkami použití
+Installing \"%PackageName%\"	InstallPackageProcess		Instaluji \"%PackageName%\"
 OK	App		OK
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		HaikuDepot komunikuje se servrovou komponentou zvanou HaikuDepotServer. Toto jsou poslední podmínky použití pro službu HaikuDepotServer.
+Fatal error	UninstallPackageAction		Závažná chybka
 Develop packages	MainWindow		Vývojové balíčky
 Starting the package daemon failed:\n\n%Error%	App		Spuštění služby balíčku se nezdařilo:\n\n%Error%
 No user ratings available.	PackageInfoView		Žádná uživatelská hodnocení.
 <no info>	PackageInfoView		<bez informací>
+Usage conditions download problem	UserUsageConditions		Problém se stažením podmínek použití
 Rating	PackageListView		Hodnocení
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Při komunikaci se serverem došlo k chybě přenosu: %s
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronizuji ikony
@@ -109,13 +134,17 @@ Settings…	MainWindow		Nastavení…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Aby tato apliakce fungovala, zapisuje a čte některé pracovní soubory na váš počítač. Je problém se zápisem testovacího souboru na [%TestFilePath%]. Zkontrolujte, že nejsou problémy s vaším diskem nebo s oprávněním k zápisu v daném adresáři. Můžete zvolit pokračovat, ale některé funkce budou zakázány.
 <Package contents not available for remote packages>	PackageContentsView		<Obsah balíčku není dostupný pro vzdálené balíčky>
 Ratings	PackageInfoView		Hodnocení
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Nestaly následující problémy. Pro každý problém zvolte řešení:
 Local	LocalPkgDataLoadProcess		Místní
+Package changes	PackageResult	Window title	Změny balíčků
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Souhlasíte s odesíláním anonymních dat o používání z tohoto počítače na HaikuDepotServer? Své nastavení můžete později změnit v okně \"Nastavení\".
 User rating	RatePackageWindow		Uživatelské hodnocení
 Installed packages	MainWindow		Nainstalované balíčky
 Date	PackageListView		Datum
 Error	App		Chyba
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Problém se stažením podmínek použití. Zkontrolujte podrobnosti v záznamech a zkuste znovu. \nJak zobrazit záznamy se dočtete v nápovědě v části o HaikuDepot.
 There was a puzzling response from the web service.	UserLoginWindow		Přišla nejasná odpověd z webové služby.
+Opening \"%DeskbarLink%\"	OpenPackageProcess		Otevírání \"%DeskbarLink%\"
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Vaše hodnocení bylo úspěšně nahráno. Můžete ho změnit nebo odstranit z webových stránek HaikuDepot serveru.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Nepodařilo se spojit se serverem pro stažení captcha obrázku potřebného pro vytvoření uživatele.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Poskytnutá odpověď na captcha je špatně. Bude vygenerována nová captcha; zkuste to znova.
@@ -137,7 +166,9 @@ Inactive	PackageListView		Neaktivní
 Nickname:	UserLoginWindow		Přezdívka:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synchronizuji meta-data o repozitářích
 OK	MainWindow		OK
+Version %Code%	UserUsageConditions		Verze %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# položka} few{# položky} other{# položek}}
+Uninstalling \"%PackageName%\"	UninstallPackageAction		Odinstalace \"%PackageName%\"
 Downloading:	PackageInfoView		Stahování:
 Quit	MainWindow		Ukončit
 Success	UserLoginWindow		Úspěch
@@ -146,33 +177,44 @@ Success	UserLoginWindow		Úspěch
 Settings	SettingsWindow		Nastavení
 Login issue	MainWindow		Problém s přihlášením
 Your rating:	RatePackageWindow		Vaše hodnocení:
+HaikuDepot is stopping or completing running operations before quitting.	ShuttingDownWindow		Než se HaikuDepot uzavře, dokončí rozdělanou práci.
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Uživatel %Nickname% byl úspěšně vytvořen v HaikuDepotServer systému. Pomocí webového rozhraní můžete spravovat detaily uživatele. Jste nyní přihlášeni jako tento nový uživatel.
 Repositories	MainWindow		Repozitáře
 This rating is visible to other users	RatePackageWindow		Toto hodnocení je viditelné pro ostatní uživatele
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Nastal problém během aktualizace dat balíčku, což může způsobit, že data budou stará, nebo nebudou vůbec. Více informací lze najít v protokolech aplikace.\nJak zobrazit protokoly aplikace najdete v sekci HaikuDepot uživatelské příručky Haiku.
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Problém se stažením podmínek použití. Zkontrolujte podrobnosti v záznamech a zkuste znovu. \nJak zobrazit záznamy se dočtete v nápovědě v části o HaikuDepot.
 View agreed usage conditions…	MainWindow		Zobrazit odsouhlasené podmínky užívání…
+The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		Uživatel [%Nickname%] byl ověřen, ale nejprve musíte přeluštit a případně odsouhlasti poslední podmínky použití.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Zdá se, že tento balíček není na HaikuDepot serveru, proto není možné přidat nebo upravit hodnocení.
 Apply	SettingsWindow		Použít
+The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		Uživatel \"%Nickname%\" již souhlasil s podmínkami použití, ale podmínky se od té doby změnily. Novější podmínky se musí opět přeluštit a případně odsouhlasit.
 Log out	MainWindow		Odhlásit
 Comment language:	RatePackageWindow		Jazyk komentáře:
 The password has been incorrectly repeated.	UserLoginWindow		Heslo nesouhlasí s předchozím zadaným.
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Heslo zadané pro uživatele [%Nickname%] už není platné. Uživatel bude odhlášen. Přihlašte se znova s novým heslem.
+View the usage conditions	ToLatestUserUsageConditionsWindow		Zobrazit podmínky použití
 OK	ServerHelper		OK
 Reading repository data	LocalPkgDataLoadProcess		Čtu data repozitáře
+Fatal error	InstallPackageProcess		Závažná chybka
 A validation error has occurred	ServerHelper		Došlo k chybě ověření
 The nickname is required.	UserLoginWindow		Přezdívka je vyžadována.
 -	no package size		-
+Apply changes	PackageResult		Použít změny
 Rate package	RatePackageWindow		Hodnocení balíčku
 Server error	ServerHelper		Chyba na serveru
+Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Záznamy balíčku \"%PackageName%\"
 Sending anonymous usage data	MainWindow		Odesílám anonymní data o užívání
 Log in	UserLoginWindow		Přihlásit
+Usage conditions	UserUsageConditions		Podmínky použití
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		Snímek obrazovky
 Email address:	UserLoginWindow		E-mailová adresa:
 View latest usage conditions…	MainWindow		Zobrazit poslední podmínky užívání…
 Category:	FilterView		Kategorie:
+uninstall package %s\n	PackageResult	Don't change '%s' variable	odinstalovat balíček %s\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Stahuji data vzdálených repozitářů
 Description	PackageListView		Popis
 User creation error	UserLoginWindow		Chyba vytvoření uživatele
 You need to be logged into an account before you can rate packages.	MainWindow		K hodnocení balíčků, musíte být přihlášeni k účtu.
+Cleaning up…	ShuttingDownWindow		Uklízím…
 Repeat password:	UserLoginWindow		Zadejte heslo znovu:
