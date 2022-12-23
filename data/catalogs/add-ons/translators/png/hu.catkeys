@@ -4,7 +4,7 @@ None	PNGTranslator		Nincs
 PNG image	PNGTranslator		PNG kép
 PNG images	PNGTranslator		PNG képek
 Interlacing type:	PNGTranslator		Átlapolás típusa:
-PNG Interlace Menu	PNGTranslator		PNG átlapolás menü
+PNG Interlace Menu	PNGTranslator		PNG Interlace menü
 PNGTranslator Settings	PNGTranslator		PNGTranslator beállítások
 Version %d.%d.%d, %s	PNGTranslator		Verzió: %d.%d.%d, %s
 PNG image translator	PNGTranslator		PNG kép értelmező

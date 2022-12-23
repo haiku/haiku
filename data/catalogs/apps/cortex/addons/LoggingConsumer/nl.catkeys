@@ -1,5 +1,7 @@
-1	dutch; flemish	application/x-vnd.Be.LoggingConsumerApp	3653006715
+1	dutch; flemish	application/x-vnd.Be.LoggingConsumerApp	3475739170
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kan geen node-info krijgen(%ld):\n%s\n
 Priority	CortexAddOnsLoggingConsumer		Prioriteit
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kan geen node-info vinden (%ld):\n%s\n
 Latency	CortexAddOnsLoggingConsumer		Vertraging
 Logged input	CortexAddOnsLoggingConsumer		Gelogde invoer
 CPU spin percentage	CortexAddOnsLoggingConsumer		Percentage CPU-gebruik
@@ -17,3 +19,4 @@ Controls	CortexAddOnsLoggingConsumerNodeHarnessWin		Knoppen
 controls	CortexAddOnsCommonMediaNodeControlApp		knoppen
 Connect	CortexAddOnsLoggingConsumerNodeHarnessWin		Verbinden
 percent	CortexAddOnsLoggingConsumer		procent
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: geen parameters voor node (%ld):\n%s\n

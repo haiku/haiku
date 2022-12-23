@@ -1,9 +1,10 @@
-1	finnish	x-vnd.Haiku-Login	1584886353
+1	finnish	x-vnd.Haiku-Login	2920451831
 Invalid login!	Login View		Virheellinen kirjautuminen!
 Error	Login App		Virhe
 Login application for Haiku\nUsage:	Login App		Haikun kirjautumissovellus\nKäyttö:
 --nonmodal\tDo not make the window modal	Login App		--nonmodal\tÄlä tee ikkunasta pakollista
 Welcome to Haiku	Login Window		Tervetuloa Haikuun
+--edit\tLaunch in shelf editing mode to allow customizing the desktop.	Login App		--edit\tKäynnistä kielekemuokkaustila, joka sallii työpöydän muokkauksen.
 Halt	Login View		Keskeytä
 Desktop	Desktop Window		Työpöytä
 Hide password	Login View		Piilota salasana

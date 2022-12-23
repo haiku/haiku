@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	4048496535
+1	greek, modern (1453-)	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		Δεν ήταν δυνατή η αποπροσάρτηση της κατάτμησης %s.
 Mount all	MainWindow		Προσάρτηση όλων
 Disk	MainWindow		Δίσκος
@@ -14,6 +14,7 @@ Block size	PartitionList		Μέγεθος μπλοκ
 The panel experienced a problem!	MainWindow		Προέκυψε ένα πρόβλημα στο πάνελ!
 Device	DiskView		Συσκευή
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Είστε σίγουρος ότι θέλετε να διαμορφώσετε την εκτεταμένη κατάτμηση Intel (Intel Extended Partition); Όλες οι υποκατατμήσεις που εμπεριέχει θα διαγραφούν εάν συνεχίσετε. Θα ρωτηθείτε ξανά πριν καταγραφούν οι αλλαγές στον δίσκο.
+Physical block size	PartitionList		Φυσικό μέγεθος μπλοκ
 Unmount	MainWindow		Αποπροσάρτηση
 Failed to format the partition %s!\n	MainWindow		Η διαμόρφωση της κατάτμησης %s απέτυχε!\n
 Partition size	CreateParametersPanel		Μέγεθος κατάτμησης

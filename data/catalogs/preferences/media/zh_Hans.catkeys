@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Media	1682972002
+1	english	x-vnd.Haiku-Media	582516163
 Couldn't add volume control in Deskbar: %s\n	Media views		无法添加音量控件到桌面栏：%s\n
 Restart media services	Media views		重启多媒体服务
 Quit	Media Window		退出
@@ -7,6 +7,8 @@ Couldn't remove volume control in Deskbar: %s\n	Media views		无法移除桌面�
 Video output:	Media views		视频输出：
 Video input:	Media views		视频输入:
 Audio output:	Media views		音频输出：
+Please select a SoundFont.	Midi View		请选择音色库。
+There are no SoundFonts installed.	Midi View		没有安装音色库。
 Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		退出媒体播放器将会中止媒体服务重新启动。将会出现未知情况或者媒体功能不可用。
 Could not connect to the media server.\nWould you like to start it ?	Media Window		链接 media server 失败.\n是否重新启动 ?
 Video settings	Media Window		视频设置
@@ -18,6 +20,7 @@ Quit anyway	Media Window		强制退出
 Media	System name		多媒体
 Warning!	Media Window		警告！
 MIDI Settings	Media Window		音频设备数字接口(MIDI)设置
+SoundFonts	Midi View		音色库
 Audio input:	Media views		音频输入：
 <none>	Media views		<无>
 Channel:	Media views		频道：

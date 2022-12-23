@@ -1,14 +1,17 @@
-1	english	x-vnd.Haiku-Devices	490380176
+1	english	x-vnd.Haiku-Devices	3349357485
 ACPI bus	DevicesView		ACPI 总线
 Encryption controller	Device		加密控制器
 Bus Information	Device		总线信息
 Devices	System name		硬件设备
+USB bus	DevicesView		USB 总线
 Graphics Peripheral	DeviceSCSI		外接绘图设备
 Processor	Device		处理器
 Generate system information	DevicesView		常规系统信息
+Unknown	DeviceACPI		未知
 Class info	DevicePCI		类别信息
 ACPI Information	DeviceACPI		ACPI信息
 Detailed	DevicesView		详细
+USB bus	Device		USB 总线
 Computer	DevicesView		计算机
 Communications	DeviceSCSI		通讯设备
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		类别信息：\t\t\t\t：%classinfo%
@@ -54,7 +57,9 @@ Device name	DeviceACPI		设备名称
 Card Reader	DeviceSCSI		读卡器
 Display controller	Device		显示控制器
 Basic information	DevicesView		基本信息
+ACPI Button '%1'	DeviceACPI		ACPI 按钮 '%1'
 Bus	DevicesView		总线
+ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		设备名称
 Disk Drive	DeviceSCSI		磁盘驱动
 Other	DeviceSCSI		其他
@@ -82,6 +87,7 @@ Device name	DeviceSCSI		设备名称
 Docking station	Device		扩展接口
 Array	DeviceSCSI		磁盘阵列
 Unclassified device	Device		未分类设备
+Manufacturer	DeviceACPI		制造商
 ACPI controller	Device		ACPI控制器
 Network controller	Device		网络控制器
 Driver used	Device		已用驱动

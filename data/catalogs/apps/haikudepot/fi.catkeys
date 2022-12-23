@@ -1,20 +1,27 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	3139226371
+1	finnish	x-vnd.Haiku-HaikuDepot	136904009
+Usage conditions download problem	ToLatestUserUsageConditionsWindow		Käyttöehtojen latauspulma
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
 An unexpected error has been sent from the server [%li]	ServerHelper		Odottamaton virhe lähetetty palvelimesta [%li]
 Create account	UserLoginWindow		Luo tili
+Agree	ToLatestUserUsageConditionsWindow		Hyväksy
 Install %PackageTitle%	PackageManager		Asenna %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Captcha-vastaus oli virheellinen.
 Rate package…	PackageInfoView		Anna pakkaukselle arvosana...
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Käyttäjän %Nickname% todentaminen onnistui.
+Package problems	PackageProblem	Window title	Pakkauspulmat
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Välttämättömän captcha-tiedon poiminen takaisin palvelimelle lähetetyistä tiedoista epäonnistui.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Pakkausluettelon hankkimisessa tapahtui virhe: %message%
+Update usage conditions	ToLatestUserUsageConditionsWindow		Päivitä käyttöehtoja
+No usage conditions	UserUsageConditions		Ei käyttöehtoja
 Active	PackageListView		Käytössä
 Login or Create account	MainWindow		Kirjaudu tai luo tili
 Switch account…	MainWindow		Vaihda tiliä...
 Preferred language:	UserLoginWindow		Ensisijainen kieli:
 Name	PackageListView		Nimi
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Valtuutus- tai turvallisuuspulma. Kirjaudu ulos ja kirjaudu takaisin sisään tarkistaaksesi, että salasanasi on oikein ja tarkista myös, että olet hyväksynyt viimeisimmät käyttöehdot.
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the usage conditions that the user '%Nickname%' agreed to at %AgreedToTimestamp% in relation to the use of the HaikuDepotServer service.	UserUsageConditions		HaikuVarasto viestii HaikuDepotServer-nimisen palvelinkomponentin kanssa. Nämä ovat käyttöehdot, jotka käyttäjä '%Nickname%' hyväksyy %AgreedToTimestamp% -suhteessa HaikuDepotServer-palvelun käyttöön.
+don't activate package %source%	PackageProblem	don't change '%source%	älä aktivoi pakkausta %source%
 Rate %Package%	RatePackageWindow		Anna pakkaukselle %Package% arvosana
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Pakkaushallinnan alustuksessa tapahtui virhe: %message%
 Quit HaikuDepot	App		Poistu HaikuVarastosta
@@ -22,7 +29,11 @@ Category	FilterView		Luokka
 A response to the captcha question must be provided.	UserLoginWindow		Vastaus captcha-kysymykseen on tarjottava.
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Odottamaton virhe ’%Message%’ ilmeni ’%Property%’-ominaisuudessa
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Pyydettyä objektia tai pyyntöön liittyvää objektia ei löytynyt palvelimelta.
+Logout	ToLatestUserUsageConditionsWindow		Uloskirjautuminen
+The following additional package changes have to be made:	PackageResult		Seuraavat lisäpakkausmuutokset on tehtävä:
 No changelog available.	PackageInfoView		Mitään muutoslokia ei ole saatavilla.
+The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Nykyiset käyttöehdot on hyväksytty.
+Cancel	PackageProblem		Peru
 Version	PackageListView		Versio
 No, quit HaikuDepot	App		Ei, poistu HaikuVarastosta
 Not logged in	MainWindow		Et ole kirjautunut sisään
@@ -38,20 +49,26 @@ All packages	PackageListView		Kaikki pakkaukset
 Send	RatePackageWindow		Lähetä
 Start package daemon	App		Käynnistä pakkaustaustaprosessi
 There are problems in the supplied data:	UserLoginWindow		Toimitetuissa tiedoissa on pulmia:
+The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		Käyttäjä '%Nickname%' ei ole hyväksynyt yhtään käyttöehtoa.
 Usage conditions download problem	UserLoginWindow		Käyttöehtojen latauspulma
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	asenna pakkaus %s tietovarastosta %s\n
 Package daemon problem	App		Pakkaustaustaprosessipulma
 No	MainWindow		Ei
 Repository	PackageListView		Tietovarasto
+Users are required to be %AgeYears% years of age or older.	UserUsageConditions		Käyttäjien on oltava iältään %AgeYears% -vuotiaita tai vanhempia.
 Close	RatePackageWindow		Sulje
 Close	UserLoginWindow		Sulje
 The email is malformed.	UserLoginWindow		Sähköpostiosoite on vääränmuotoinen.
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Synkronoidaan pakkaustietoja tietovarastolle '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Katso käyttöehtoja
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Ilmeni virhe ladattaessa käyttöehtoja, jotka vaaditaan uuden käyttäjän luomiseksi. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen. \nTieto siitä, kuinka lokitiedostoa katsotaan, on saatavilla Haiku-käyttöohjeen HaikuVarasto-osasta.
+Usage conditions agreed	ToLatestUserUsageConditionsWindow		Käyttöehdot hyväksytty
 Size	PackageListView		Koko
 Your rating was updated.	RatePackageWindow		Arvosanasi päivitettiin.
 All categories	FilterView		Kaikki luokat
+ignore problem for now	PackageProblem		ohita pulma toistaiseksi
 n/a	PackageInfoView		–
+Checking user details	UserDetailVerifierProcess		Tarkistetaan käyttäjätietojen yksityiskohdat
 Cancel	MainWindow		Peru
 Refresh repositories	MainWindow		Virkistä tietovarastoja
 Continue	App		Jatka
@@ -59,13 +76,16 @@ A password is required.	UserLoginWindow		Vaaditaan salasana.
 Language	RatePackageWindow		Kieli
 Status	PackageListView		Tila
 Network transport error	ServerHelper		Verkkosiirtovirhe
+Cancel	PackageResult		Peru
 Uninstall %PackageTitle%	PackageManager		Poista %PackageTitle% -pakkaus
+Retry	PackageProblem		Yritä uudelleen
 Update	RatePackageWindow		Päivitä
 Language	UserLoginWindow		Kieli
 OK	UserLoginWindow		Valmis
-Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synkronoidaan viitetietoja palvelimelta
+Synchronizing reference data from server	ServerReferenceDataUpdateProcess		Synkronoidaan asetustietoja palvelimelta
 Stability:	RatePackageWindow		Stabiilisuus:
 The usage agreement must be agreed to and a confirmation should be made that the person creating the user meets the minimum age requirement.	UserLoginWindow		Käyttäjäehdot on hyväksyttävä ja on vahvistettava, että uuden käyttäjän luova henkilö täyttää alaikärajavaatimuksen.
+solution %d:	PackageProblem	Don't change the %d variable	ratkaisu %d:
 Source packages	MainWindow		Lähdekoodipakkaukset
 Problem with working files	App		Pulma työtiedostoissa
 Try again	App		Yritä uudelleen
@@ -83,6 +103,7 @@ Authentication failed	UserLoginWindow		Todennus epäonnistui
 Captcha error	UserLoginWindow		Captcha-virhe
 Manage repositories…	MainWindow		Hallinnoi tietovarastoja...
 The nickname must be unique, but the supplied nickname is already taken. Choose a different nickname.	UserLoginWindow		Käyttäjätunnuksen on oltava uniikki, mutta tarjottu käyttäjätunnus on jo käytössä. Valitse erilainen käyttäjätunnus.
+OK	UserUsageConditions		Valmis
 Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
 Input validation	UserLoginWindow		Syötevalidointi
 Log in…	MainWindow		Kirjaudu...
@@ -96,11 +117,16 @@ An error occurred while refreshing the repository: %error%	LocalRepositoryUpdate
 User Created	UserLoginWindow		Käyttäjän luoma
 Check for updates…	MainWindow		Tarkista päivitykset…
 Uninstalled	PackageListView		Poistetut asennukset
+I agree to the usage conditions	ToLatestUserUsageConditionsWindow		Hyväksyn käyttöehdot
+Installing \"%PackageName%\"	InstallPackageProcess		Asennetaan \"%PackageName%\"
 OK	App		Valmis
+HaikuDepot communicates with a server component called HaikuDepotServer. These are the latest usage conditions for use of the HaikuDepotServer service.	UserUsageConditions		HaikuVarasto viestii HaikuDepotServer-nimisen palvelinkomponentin kanssa. Nämä ovat viimeisimmät käyttöehdot HaikuDepotServer-palvelun käyttämiseksi.
+Fatal error	UninstallPackageAction		Tuhoisa virhe
 Develop packages	MainWindow		Kehityspaketit
 Starting the package daemon failed:\n\n%Error%	App		Pakkaustaustaprosessin käynnistyminen epäonnistui:\n\n%Error%
 No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
 <no info>	PackageInfoView		<ei tietoja>
+Usage conditions download problem	UserUsageConditions		Käyttöehtojen latauspulma
 Rating	PackageListView		Arvosana
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Verkkosiirtovirhe syntyi palvelinjärjestelmäviestinnässä: %s 
 Synchronizing icons	ServerIconExportUpdateProcess		Synkronoidaan kuvakkeet
@@ -109,13 +135,17 @@ Settings…	MainWindow		Asetukset…
 This application writes and reads some working files on your computer in order to function. It appears that there are problems writing a test file at [%TestFilePath%]. Check that there are no issues with your local disk or permissions that might prevent this application from writing files into that directory location. You may choose to acknowledge this problem and continue, but some functionality may be disabled.	App		Tämä sovellus kirjoittaa ja lukee joitakin työtiedostoja tietokoneellasi toiminnan tarkistamiseksi. Näyttää, että testaustiedoston kirjoittamisessa  osoitteeseen [%TestFilePath%] on pulmia. Tarkista, että paikallisella levyasemallasi ei ole pulmia tai että käyttöoikeudet eivät estä tätä sovellusta kirjoittamasta tuohon hakemistosijaintiin. Voit kuitata tämän pulman ja jatkaa, mutta joku toiminnallisuus on poissa käytöstä.
 <Package contents not available for remote packages>	PackageContentsView		<Etäpakkausten sisältö ei ole saatavilla>
 Ratings	PackageInfoView		Arvosanat
+The following problems have been encountered. Please select a solution for each:	PackageProblem		Kohdattiin seuraavat pulmat. Valitse ratkaisu jokaiselle:
 Local	LocalPkgDataLoadProcess		Paikallinen
+Package changes	PackageResult	Window title	Pakkausmuutokset
 Would it be acceptable to send anonymous usage data to the HaikuDepotServer system from this computer? You can change your preference in the \"Settings\" window later.	MainWindow		Olisiko hyväksyttävää lähettää anonyymeja käyttäjätietoja HaikuVarasto-palvelinjärjestelmään tältä tietokoneelta? Voit muuttaa tätä asetusta ”Asetukset”-ikkunassa myöhemmin.
 User rating	RatePackageWindow		Käyttäjäarvosanat
 Installed packages	MainWindow		Asennetut paketit
 Date	PackageListView		Päivämäärä
 Error	App		Virhe
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Käyttöehtojen latauksessa tapahtui virhe. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen.\nTietoja lokitiedoston katselemisesta on saatavissa Haiku-käyttöoppaan HaikuVarasto-osasta.
 There was a puzzling response from the web service.	UserLoginWindow		Webbipalvelun vastaus oli pulmallinen.
+Opening \"%DeskbarLink%\"	OpenPackageProcess		Avataan \"%DeskbarLink%\"
 Your rating was uploaded successfully. You can update or remove it at the HaikuDepot Server website.	RatePackageWindow		Arvosanasi kopiointi palvelimelle onnistui. Voit päivittää tai poistaa sen HaikuDepot-palvelimen webbisivulla.
 It was not possible to communicate with the server to obtain a captcha image required to create a new user.	UserLoginWindow		Viestintä uuden käyttäjän luomisessa tarvittavan captcha-kuvan saamiseksi palvelimelta epäonnistui.
 The supplied response to the captcha is incorrect. A new captcha will be generated; try again.	UserLoginWindow		Tarjottu captcha-vastaus on virheellinen. Uusi captcha tuotetaan; yritä uudelleen.
@@ -137,7 +167,9 @@ Inactive	PackageListView		Ei käytössä
 Nickname:	UserLoginWindow		Käyttäjätunnus:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synkronoidaan metatietoja tietovaratoista
 OK	MainWindow		Valmis
+Version %Code%	UserUsageConditions		Versio %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# kohde} other{# kohdetta}}
+Uninstalling \"%PackageName%\"	UninstallPackageAction		Poistetaan asennus \"%PackageName%\"
 Downloading:	PackageInfoView		Ladataan:
 Quit	MainWindow		Poistu
 Success	UserLoginWindow		Valmis
@@ -146,33 +178,44 @@ Success	UserLoginWindow		Valmis
 Settings	SettingsWindow		Asetukset
 Login issue	MainWindow		Kirjautumispulma
 Your rating:	RatePackageWindow		Arvosanasi:
+HaikuDepot is stopping or completing running operations before quitting.	ShuttingDownWindow		HaikuVarasto pysähtyy tai päättää suoritettavan toiminnon ennen poistumista.
 The user %Nickname% has been successfully created in the HaikuDepotServer system. You can administer your user details by using the web interface. You are now logged-in as this new user.	UserLoginWindow		Käyttäjä %Nickname% on luotu onnistuneesti HaikuVarastoPalvelin-järjestelmään. Voit hallinnoida käyttäjätietojen yksityiskohtai webbikäyttöliittymän kautta. Olet nyt kirjautunut sisään tällä käyttäjätunnuksella uutena käyttäjänä.
 Repositories	MainWindow		Tietovarastot
 This rating is visible to other users	RatePackageWindow		Tämä arvosana näkyy muille käyttäjille
 While updating package data, a problem has arisen that may cause data to be outdated or missing from the application's display. Additional details regarding this problem may be able to be obtained from the application logs.\nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	MainWindow		Pakkaustietoja päivitettäessä ilmeni pulma, joka voi aiheuttaa tietojen olevan vanhentuneita tai niiden puuttuvan sovelluksen näytöltä. Lisätietoja koskien tätä pulmaa on saatavilla sovelluksen lokitiedostosta.\nTieto lokitiedostojen katselemista on saatavilla Haikun käyttöohjeen HaikuVarasto-osasta.
+An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserUsageConditions		Käyttöehtojen latauksessa tapahtui virhe. Tarkista yksityiskohdat lokitiedostosta ja yritä uudelleen.\nTietoja lokitiedoston katselemisesta on saatavissa Haiku-käyttöoppaan HaikuVarasto-osasta.
 View agreed usage conditions…	MainWindow		Katso hyväksyttyjä käyttöehtoja…
+The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		Käyttäjä [%Nickname%] on todennettu, mutta ennen jatkamista sinua pyydetään hyväksymään kaikkein viimeisimmät käyttöehdot.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Tämä pakkaus ei näytä olevan HaikuDepot-palvelimella, joten ei ole mahdollista luoda sille uutta arvosanaa tai muokata olemassaolevaa arvosanaa.
 Apply	SettingsWindow		Toteuta
+The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		Käyttäjä \"%Nickname%\" on hyväksynyt aikaisemmin käyttöehdot, mutta käyttöehdot ovat muuttuneet sen jälkeen. Nyt on hyväksyttävä päivitetyt käyttöehdot.
 Log out	MainWindow		Kirjaudu ulos
 Comment language:	RatePackageWindow		Kommenttikieli:
 The password has been incorrectly repeated.	UserLoginWindow		Salasanan toistaminen epäonnistui.
 The password previously supplied for the user [%Nickname%] is not currently valid. The user will be logged-out of this application and you should login again with your updated password.	MainWindow		Käyttäjälle [%Nickname%] aiemmin tarjottu salasana ei ole nykyään kelvollinen. Käyttäjä kirjautuu ulos tästä sovelluksesta ja sinun pitäisi kirjautua uudelleen päivitetyllä salasanallasi.
+View the usage conditions	ToLatestUserUsageConditionsWindow		Katso käyttöehtoja
 OK	ServerHelper		Valmis
 Reading repository data	LocalPkgDataLoadProcess		Luetaan tietovarastotietoja
+Fatal error	InstallPackageProcess		Tuhoisa virhe
 A validation error has occurred	ServerHelper		Tapahtui kelpuutusvirhe
 The nickname is required.	UserLoginWindow		Vaaditaan käyttäjätunnus.
 -	no package size		-
+Apply changes	PackageResult		Toteuta muutokset
 Rate package	RatePackageWindow		Anna pakkaukselle arvosana
 Server error	ServerHelper		Palvelinvirhe
+Recording view of \"%PackageName%\"	IncrementViewCounterProcess		Tallentava \"%PackageName%\" -näkymä
 Sending anonymous usage data	MainWindow		Nimettömien käyttötietojen lähettäminen
 Log in	UserLoginWindow		Kirjaudu
+Usage conditions	UserUsageConditions		Käyttöehdot
 HaikuDepot	System name		HaikuVarasto
 Screenshot	ScreenshotWindow		Kuvakaappaus
 Email address:	UserLoginWindow		Sähköpostiosoite:
 View latest usage conditions…	MainWindow		Katso viimeisimmät käyttöehdot…
 Category:	FilterView		Luokka:
+uninstall package %s\n	PackageResult	Don't change '%s' variable	poista pakkauksen %s asennus\n
 Fetching remote repository data	LocalRepositoryUpdateProcess		Noudetaan etätietovaraston tietoja
 Description	PackageListView		Kuvaus
 User creation error	UserLoginWindow		Käyttäjän luomisen virhe
 You need to be logged into an account before you can rate packages.	MainWindow		Sinun on kirjauduttava tilille ennen kuin voit antaa arvosanoja pakkauksille.
+Cleaning up…	ShuttingDownWindow		Siistitään…
 Repeat password:	UserLoginWindow		Toista salasana:

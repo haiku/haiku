@@ -7,7 +7,7 @@ OK	NotifierFilter		确定
 Central alert	NotifierConfigView		中部警告
 Beep	NotifierConfigView		蜂鸣
 Central beep	NotifierConfigView		中部蜂鸣
-{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{One new message} other{# new messages}}
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{一条新消息} other{# 条新消息}}
 New messages	NotifierFilter		新消息
 Method:	NotifierConfigView		方法：
 Keyboard LEDs	NotifierConfigView		键盘LED

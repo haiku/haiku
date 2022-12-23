@@ -1,0 +1,34 @@
+1	english	application/x-vnd.Cortex.MediaRoutingView	3442339205
+Lock group	MediaNodePanel		 锁定组
+%refname% (no file)	MediaNodePanel		%refname% (无文件)
+Video output	MediaRoutingView		视频输出
+Icon view	MediaRoutingView		图标视图
+OK	MediaRoutingView		确定
+Cycle	MediaNodePanel		循环
+Advanced	MediaNodePanel		高级
+Audio input	MediaRoutingView		音频输入
+Run mode	MediaNodePanel		运行模式
+Could not load '%filename%'	MediaRoutingView		无法载入'%filename%'
+Stop time source	MediaNodePanel		停止时间源
+Be Audio Mixer	MediaRoutingView		Be 混音器
+Video input	MediaRoutingView		视频输入
+Release	MediaNodePanel		释放
+Disconnect	MediaRoutingView		断开连接
+Could not disconnect	MediaRoutingView		无法断开连接
+Could not instantiate '%infoname%'	MediaRoutingView		无法实例化'%infoname%'
+Mini icon view	MediaRoutingView		小图标视图
+Select all	MediaRoutingView		全选
+(same as group)	MediaNodePanel		（与组一致）
+Input	MediaJack		输入
+Get info	MediaJack		获取信息
+Start time source	MediaNodePanel		开始时间源
+Error	MediaRoutingView		错误
+Could not release '%refname%'	MediaRoutingView		无法释放'%refname%'
+Output	MediaJack		输出
+Get info	MediaNodePanel		获取信息
+Get info	MediaRoutingView		获取信息
+Clean up	MediaRoutingView		清理
+Start control panel	MediaNodePanel		启动控制面板
+Tweak parameters	MediaNodePanel		调节参数
+Could not connect	MediaRoutingView		无法连接
+Unlock group	MediaNodePanel		解锁组

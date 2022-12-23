@@ -1,0 +1,26 @@
+1	english	application/x-vnd.Cortex.Route	25925955
+Node '%name%' released	CortexRouteApp		节点 '%name%' 已释放
+OK	CortexRouteApp		确定
+About Cortex/Route…	CortexRouteApp		关于 Cortex/Route…
+File	CortexRouteApp		文件
+Connection '%name%' made	CortexRouteApp		连接 '%name%' 已建立
+Save nodes…	CortexRouteApp		保存节点…
+%producer% and %consumer%	CortexRouteApp		%producer% 和 %consumer%
+Node '%name%' created	CortexRouteApp		节点 '%name%' 已建立
+Negotiated format:	CortexRouteApp		协商格式：
+Window	CortexRouteApp		窗口
+Transport	CortexRouteApp		传输
+Connection broken	CortexRouteApp		连接断开
+Untitled group	CortexRouteApp		未命名组
+Connection failed	CortexRouteApp		连接失败
+Connection '%name%' broken	CortexRouteApp		连接 '%name%' 断开
+Between:	CortexRouteApp		介于:
+Cortex	CortexRouteApp		Cortex
+Open…	CortexRouteApp		打开…
+Pull palettes	CortexRouteApp		拉取调色盘
+Connection made	CortexRouteApp		连接已建立
+Show transport	CortexRouteApp		显示传输
+Show add-ons	CortexRouteApp		显示插件
+Quit	CortexRouteApp		退出
+Cortex/Route 2.1.2\n\nCopyright 1999-2000 Eric Moon\nAll rights reserved.\n\nThe Cortex Team:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\nThanks to:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\nCertain icons used herein are the property of\nBe, Inc. and are used by permission.	CortexRouteApp		Cortex/Route 2.1.2\n\n版权所有 1999-2000 Eric Moon\n保留一切权利。\n\nCortex 开发团队:\n\nChristopher Lenz: UI\nEric Moon: UI, back-end\n\n致谢:\nJohn Ashmun\nJon Watte\nDoug Wright\n<your name here>\n\n本程序中使用的部分图标版权由\nBe, Inc. 所有，且已获授权使用。
+Tried format:	CortexRouteApp		已尝试格式：

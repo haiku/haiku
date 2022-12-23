@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Screen	1538280823
+1	english	x-vnd.Haiku-Screen	133788249
 no	Screen		否
 bits/pixel	Screen		位/像素
 15 bits/pixel, 32768 colors	Screen		15 位/像素l，32768 色
@@ -34,6 +34,7 @@ Warning	Screen		警告
 24 bits/pixel, 16 Million colors	Screen		24 位/像素，16万色
 Hz	Screen		Hz
 Workspaces	Screen		工作区
+Brightness:	Screen		亮度：
 32 bits/pixel, 16 Million colors	Screen		32 位/像素，16万色
 Done	Screen		完成
 16 bits/pixel, 65536 colors	Screen		16 位/像素，65536色

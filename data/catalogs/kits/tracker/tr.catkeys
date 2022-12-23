@@ -4,12 +4,12 @@ Icon	AttributesView		Simge
 Open and make preferred	OpenWithWindow		Aç ve tercih edilen yap
 Kind	ContainerWindow		Tür
 Open with…	ContainerWindow		Birlikte aç…
-Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" Çöp'e taşınırken hata (%error)
+Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\", çöpe atılırken hata (%error)
 Or	FindPanel		veya
 MIME Description	AttributesView		MIME Tanımı
 before	FindPanel		önce
 Volume icons	TrackerSettingsWindow		Disk simgeleri
-Ignore case	SelectionWindow		BÜYÜK/küçük harf yoksay
+Ignore case	SelectionWindow		BÜYÜK/küçük harf yok say
 Current folder	ContainerWindow		Geçerli klasör
 Finish: %time - Over %finishtime left	StatusWindow		Bitiş: %time - Yaklaşık %finishtime kaldı
 Mount all disks now	AutoMounterSettings		Tüm diskleri şimdi bağla
@@ -81,7 +81,7 @@ Moving: 	StatusWindow		Taşınıyor:
 Select	SelectionWindow		Seç
 Select	InfoWindow		Seç
 OK	OpenWithWindow		Tamam
-Include trash	FindPanel		Çöp'e de bak
+Include trash	FindPanel		Çöpe de bak
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Toparla
 Modified	FindPanel		Değiştirilme
@@ -135,7 +135,7 @@ Create relative link	ContainerWindow		Göreceli bağlantı oluştur
 Owner	FilePermissionsView		Sahibi
 Cancel	FSClipBoard		Vazgeç
 Modified	PoseView		Değiştirilme
-Move to Trash	ContainerWindow		Çöp'e taşı
+Move to Trash	ContainerWindow		Çöpe at
 All files and folders	FindPanel		Tüm dosyalar/klasörler
 Add-ons	ContainerWindow		Eklentiler
 Too many parenthesis.	libtracker		Çok fazla parantez.
@@ -172,15 +172,15 @@ If you rename %target, %osName may not behave properly!\n\nAre you sure you want
 Filesystem:	InfoWindow		Dosya sistemi:
 Could not open \"%name\" (%error). 	FSUtils		\"%name\" açılamadı (%error). 
 Media parameter group	AttributesView		Ortam parametreleri grubu
-%name info	InfoWindow	InfoWindow Title	%name Bilgisi
+%name info	InfoWindow	InfoWindow Title	%name bilgisi
 If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Ev klasörünü taşırsanız %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de taşımak istiyorsanız Shift düğmesini basılı tutun ve \"Taşı\"ya basın.
 Property info	AttributesView		Özellik bilgisi
-Sorry, you can't create links in the Trash.	PoseView		Üzgünüm, Çöp içinde bağlantılar oluşturamazsınız.
+Sorry, you can't create links in the Trash.	PoseView		Üzgünüm, çöp içinde bağlantılar oluşturamazsınız.
 From	Email Query Columns		Şuradan
 Invert selection	QueryContainerWindow		Seçimi tersine çevir
 Open selection with:	OpenWithWindow		Seçimi şununla aç:
 Preferences…	ContainerWindow		Tercihler…
-Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		\"%document\" açılamadı çünkü \"%app\" uygulaması Çöp'te. 
+Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		\"%document\" açılamadı; çünkü \"%app\" uygulaması çöpte. 
 Work Phone	Person Query Columns		İş telefonu
 Close	ContainerWindow		Kapat
 Get info	ContainerWindow		Bilgi al
@@ -214,7 +214,7 @@ Warning space color	SettingsView		Uyarı boşluk rengi
 Skip	FSUtils		Atla
 Text list	AttributesView		Metin listesi
 Used space color	SettingsView		Kullanılan alan rengi
-Cancel	FSUtils		v
+Cancel	FSUtils		Vazgeç
 Original name	ContainerWindow		Özgün ad
 Unknown	WidgetAttributeText		Bilinmeyen
 32-bit integer	AttributesView		32 bit tamsayı
@@ -282,10 +282,10 @@ Extended attribute	AttributesView		Genişletilmiş öznitelik
 Unmatched brackets.	libtracker		Eşleşmeyen köşeli parantezler.
 Error %error loading Add-On %name.	ContainerWindow		%name eklentisi yüklenirken %error hatası
 You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		\t%name%dest\nögesini şununla değiştirmeye çalışıyorsunuz:\n\t%name%src\n\nBu ögeyi %movemode ögeyle değiştirmek istediğinizden emin misiniz?
-Empty Trash	ContainerWindow		Çöp'ü boşalt
+Empty Trash	ContainerWindow		Çöpü boşalt
 no supporting apps	OpenWithWindow		destekleyen uygulama yok
 32-bit unsigned integer	AttributesView		32 bit imzalanmamış tamsayı
-Preparing to empty Trash…	StatusWindow		Çöp'ü boşaltmaya hazırlanıyor…
+Preparing to empty Trash…	StatusWindow		Çöpü boşaltmaya hazırlanıyor…
 Deleting: 	StatusWindow		Siliniyor: 
 label too long	PoseView		etiket çok uzun
 the MIME settings	FSUtils		MIME ayarları
@@ -321,7 +321,7 @@ Error moving \"%name\".	FSUtils		\"%name\" taşınırken hata.
 Select…	QueryContainerWindow		Seç…
 Open	ContainerWindow		Aç
 Settings…	MountMenu		Ayarlar…
-You cannot put the selected item(s) into the trash.	FSUtils		Seçili ögeyi/ögeleri Çöp'e atamazsınız.
+You cannot put the selected item(s) into the trash.	FSUtils		Seçili ögeyi/ögeleri çöpe atamazsınız.
 Increase size	DeskWindow		Büyüt
 starts with	SelectionWindow		başlar
 Any	AttributesView		Herhangi biri
@@ -358,12 +358,12 @@ Messenger	AttributesView		Ulak
 after	FindPanel		sonra
 {0, plural, one{<# data byte>} other{<# bytes of data>}}	AttributesView		{0, plural, other{<# bayt veri>}}
 Version	OpenWithWindow		Sürüm
-Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Seçili ögelerden bazıları Çöp'e taşınamaz. Bunun yerine doğrudan silmek ister misiniz (bu işlem geri alınamaz)?
+Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Seçili ögelerden bazıları çöpe taşınamaz. Bunun yerine doğrudan silmek ister misiniz (bu işlem geri alınamaz)?
 Add printer…	ContainerWindow		Yazıcı ekle…
 On	FindPanel		Nerede
 Permissions	ContainerWindow		İzinler
 Size:	InfoWindow		Boyut:
-The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Seçili öge Çöp'e taşınamaz. Bunun yerine doğrudan silmek ister misiniz? (Bu işlem geri alınamaz.)
+The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Seçili öge çöpe taşınamaz. Bunun yerine doğrudan silmek ister misiniz? (Bu işlem geri alınamaz.)
 Copy	ContainerWindow		Kopyala
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Üzgünüm, 'Karakter' özniteliği bir çoklu bayt glifi depolayamaz.
 Open parent	VirtualDirectoryWindow		Üst klasörü aç
@@ -405,7 +405,7 @@ You can't move a folder into itself or any of its own sub-folders.	FSUtils		Bir 
 New	ContainerWindow		Yeni
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Ögeleri \"Diskler\" penceresinin içindeki disk simgelerinden birinin üzerine bırakmalısınız.
 If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target ögesini değiştirirseniz %osName düzgün çalışmayabilir!\n\nBunu yapmak istediğinizden emin misiniz?
-Sorry, you can't copy items to the Trash.	FSClipBoard		Üzgünüm, Çöp'e herhangi bir öge kopyalanamaz.
+Sorry, you can't copy items to the Trash.	FSClipBoard		Üzgünüm, herhangi bir öge çöpe kopyalanamaz.
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Bu klasördeki bazı ögeler %verb bazı ögelerle aynı ada sahip.\n\nBu ögeleri %verb ögelerle değiştirmek ister misiniz veya teker teker sorulsun mu?
 When	Email Query Columns		Ne zaman
 Object	AttributesView		Nesne
@@ -463,7 +463,7 @@ Show Disks icon	SettingsView		Diskler simgesini göster
 Outline selection rectangle only	SettingsView		Yalnızca dış hat seçim dikdörtgeni
 by formula	FindPanel		formül ile
 Resize to fit	VirtualDirectoryWindow		Sığacak biçimde boyutlandır
-Move to Trash	FilePanelPriv		Çöp'e taşı
+Move to Trash	FilePanelPriv		Çöpe at
 If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		Sistem klasörünü veya içeriğini yeniden adlandırırsanız %osName çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de adlandırmak istiyorsanız Shift düğmesini basılı tutun ve \"Yeniden adlandır\"a tıklayın.
 40 x 40	DeskWindow		40 x 40
 40 x 40	ContainerWindow		40 x 40
@@ -510,13 +510,13 @@ Add-ons	FilePanelPriv		Eklentiler
 96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Boş klasör
 Alignment	AttributesView		Hizalama
-Move to Trash	FSUtils		Çöp'e taşı
+Move to Trash	FSUtils		Çöpe at
 Cancel	PoseView		Vazgeç
 Handles %type	OpenWithWindow		%type işler
 Delete	PoseView		Sil
 Media parameter	AttributesView		Ortam parametresi
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Ev klasörünü değiştirirseniz %osName düzgün çalışmayacaktır!\n\nBunu yapmak istediğinizden emin misiniz?\n\nYine de değiştirmek istiyorsanız Shift düğmesini basılı tutun ve \"Ne yaptığımı biliyorum\"a tıklayın.
-Sorry, you can't copy items to the Trash.	PoseView		Üzgünüm, Çöp'e herhangi bir öge kopyalanamaz.
+Sorry, you can't copy items to the Trash.	PoseView		Üzgünüm, herhangi bir öge çöpe kopyalanamaz.
 Invert selection	VirtualDirectoryWindow		Seçimi tersine çevir
 New folder	FilePanelPriv		Yeni klasör
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, other{# öge}}

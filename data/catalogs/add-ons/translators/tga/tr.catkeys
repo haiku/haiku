@@ -1,7 +1,7 @@
 1	turkish	x-vnd.Haiku-TGATranslator	3075011211
 Save with RLE compression	TGAView		RLE sıkıştırması ile kaydet
 Targa image (%d bits truecolor)	TGATranslator		Targa görseli (%d bit gerçek renk)
-Ignore TGA alpha channel	TGAView		TGA alfa kanalını yoksay
+Ignore TGA alpha channel	TGAView		TGA alfa kanalını yok say
 Targa image (%d bits colormap)	TGATranslator		Targa görseli (%d bit renk eşlem)
 TGA image translator	TGAView		TGA görseli çevirmeni
 Targa image (%d bits RLE colormap)	TGATranslator		Targa görseli (%d bit RLE renk eşlem)

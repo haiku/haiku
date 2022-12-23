@@ -4,7 +4,7 @@ None	PNGTranslator		Hiçbiri
 PNG image	PNGTranslator		PNG görseli
 PNG images	PNGTranslator		PNG görselleri
 Interlacing type:	PNGTranslator		Birbirine geçirme türü:
-PNG Interlace Menu	PNGTranslator		PNG Birbirine Geçirme Menüsü
+PNG Interlace Menu	PNGTranslator		PNG üst üste bindirme menüsü
 PNGTranslator Settings	PNGTranslator		PNGTranslator Ayarları
 Version %d.%d.%d, %s	PNGTranslator		Sürüm %d.%d.%d, %s
 PNG image translator	PNGTranslator		PNG görseli çevirmeni

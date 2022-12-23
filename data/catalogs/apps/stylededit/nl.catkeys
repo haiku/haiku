@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-StyledEdit	2796309255
+1	dutch; flemish	x-vnd.Haiku-StyledEdit	3760185556
 Document statistics	Statistics		Documentstatistieken
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan niet herstellen, het bestand \"%s\" werd niet gevonden.
 Cut	Menus		Knippen
@@ -51,6 +51,7 @@ OK	SaveAlert		Oké
 Color	Menus		Kleur
 Save changes to the document \"%s\"? 	QuitAlert		Veranderingen aan het document \"%s\" opslaan? 
 StyledEdit	System name		StyledEdit
+Underline	Menus		Onderstrepen
 Find:	FindandReplaceWindow		Vind:
 Undo typing	QuitAlert		Typen ongedaan maken
 Error loading \"%s\":\n\t%s	LoadAlert		Fout bij het laden van \"%s\":\n\t%s

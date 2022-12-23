@@ -1,4 +1,4 @@
-1	portuguese	x-vnd.Haiku-libtracker	4086629042
+1	portuguese	x-vnd.Haiku-libtracker	464753347
 Created	ContainerWindow		Criado
 Icon	AttributesView		Ícone
 Open and make preferred	OpenWithWindow		Abrir e tornar preferida
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Ícone pequeno em mapa de bits
 Would you like to find a suitable application to open the file?	FSUtils		Gostaria de procurar uma aplicação adequada para abrir o ficheiro?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Não pode substituir uma pasta ou uma ligação simbólica por um ficheiro.
+(unknown)	InfoWindow		(desconhecido)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datas>}}
 Trailing \\.	libtracker		\\ no final.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Em %func \nfind_directory() falhou. \nMotivo: %error
@@ -84,6 +85,7 @@ Include trash	FindPanel		Incluir lixo
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Arrumar
 Modified	FindPanel		Modificado
+ (block size: 	InfoWindow		 (tamanho de bloco: 
 Select all	QueryContainerWindow		Selecionar tudo
 Generate image thumbnails	SettingsView		Gerar miniaturas de imagem
 Select…	FilePanelPriv		Selecionar…
@@ -167,6 +169,7 @@ Read	FilePermissionsView		Leitura
 There was an error writing the attribute.	WidgetAttributeText		Ocorreu um erro ao gravar o atributo.
 Path	Default Query Columns		Caminho
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se alterar o nome de %target, %osName poderá não funcionar corretamente!\n\nTem a certeza de que quer fazer isto?
+Filesystem:	InfoWindow		Sistema de ficheiros:
 Could not open \"%name\" (%error). 	FSUtils		Não foi possível abrir \"%name\" (%error). 
 Media parameter group	AttributesView		Grupo de parâmetros de multimédia
 %name info	InfoWindow	InfoWindow Title	Informações de %name
@@ -272,6 +275,7 @@ home	B_USER_DIRECTORY		pessoal
 Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Novos Modelos do Tracker
 Disk mounting during boot	AutoMounterSettings		Montar discos durante o arranque
 Don't automount	AutoMounterSettings		Não montar automaticamente
+Node ref	AttributesView		Ref. nodo
 Could not find application \"%appname\"	OpenWithWindow		Não foi possível encontrar a aplicação \"%appname\"
 Unmatched parenthesis.	libtracker		Parênteses sem correspondência.
 Extended attribute	AttributesView		Atributo expandido
@@ -492,6 +496,7 @@ Duplicate	ContainerWindow		Duplicar
 16-bit integer	AttributesView		Inteiro de 16 bits
 Untitled clipping	PoseView		Recorte sem título
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		O ficheiro \"%name\" já existe na pasta especificada. Deseja substituí-lo?
+, indexed	InfoWindow		, indexado
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Deve arrastar itens para um dos ícones de disco na janela \"Discos\".
 Version:	InfoWindow		Versão:
 OK	PoseView		OK
@@ -524,6 +529,7 @@ Create a Query	FindPanel		Criar uma consulta
 Close	QueryContainerWindow		Fechar
 I know what I'm doing	FSUtils	button label	Eu sei o que estou a fazer
 Preparing to copy items…	StatusWindow		A preparar para copiar itens…
+Entry ref	AttributesView		Ref. entrada
 Icon view	ContainerWindow		Vista de ícones
 Name	ContainerWindow		Nome
 Preferred for %type	OpenWithWindow		Preferida para %type

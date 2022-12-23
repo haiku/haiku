@@ -1,0 +1,5 @@
+1	english	application/x-vnd.Cortex.AddOnHost	1256552338
+Continue	CortexAddOnHost		继续
+Cortex AddOnHost	CortexAddOnHost		Cortex 扩展宿主
+Quit	CortexAddOnHost		退出
+This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		该程序会在后台运行，由Cortex程序按需启动。您一般不需要手动启动它。

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-WebPositive	250728390
+1	dutch; flemish	x-vnd.Haiku-WebPositive	3896191867
 Authentication required	Authentication Panel		Aanmelding is vereist
 Previous	WebPositive Window		Vorige
 (Finish: %date)	Download Window		(Voltooid: %date)
@@ -45,6 +45,7 @@ New tabs:	Settings Window		Nieuwe tabbladen:
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url mislukt
 Open downloads folder	Download Window		Downloadmap openen
 Proxy server	Settings Window		Proxyserver
+Darn!	WebPositive		Verdorie!
 Decrease size	WebPositive Window		Grootte verkleinen
 Default fixed font size:	Settings Window		Standaardgrootte van proportioneel lettertype:
 Sans serif font:	Settings Window		Schreefloos lettertype:
@@ -56,6 +57,7 @@ WebPositive	System name		WebPositive
 %s - Search term	Settings Window		%s - Zoek term
 Reload	WebPositive Window		Herladen
 Expiration	Cookie Manager		Vervaldatum
+Your CPU is too old and does not support the SSE2 extensions, without which WebPositive cannot run. We recommend installing NetSurf instead.	WebPositive		Je CPU is te oud en ondersteund geen SSE2 extensies, zonder deze werkt WebPositive niet. We raden je aan om NetSurf te installeren in de plaats.
 Download finished	Download Window		Download gereed
 Cookie manager	WebPositive Window		Cookiemanager
 OK	Authentication Panel		Ok
@@ -149,6 +151,7 @@ The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate
 Start up:	Settings Window		Opstarten:
 Confirmation	WebPositive Window		Bevestiging
 Session cookie	Cookie Manager		Sessiecookie
+No SSE2 support	WebPositive		Geen SSE2 ondersteuning
 Open all	WebPositive Window		Alles openen
 Cut	WebPositive Window		Knippen
 Downloads	Download Window		Downloads

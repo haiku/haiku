@@ -1,6 +1,7 @@
-1	english	x-vnd.Haiku-CodyCam	1992289638
+1	english	x-vnd.Haiku-CodyCam	12021044
 destination directory expected	CodyCam		预期目标目录
 reply: '%s'\n	SftpClient		回复：‘%s’\n
+PASS <suppressed>  (real password sent)	FtpClient		PASS <suppressed> (发送真实密码)
 JPEG image	CodyCam		JPEG 图像
 Remote host has closed the connection.\n	FtpClient		远程主机已关闭连接。\n
 image file format expected	CodyCam		预期图像格式
@@ -27,6 +28,7 @@ Every 2 hours	CodyCam		间隔 2 小时
 Cannot get a time source	CodyCam		无法获取时间源
 Every 4 hours	CodyCam		间隔 4 小时
 cmd: '%s'\n	FtpClient		命令：‘%s’\n
+Closing the window	VideoConsumer.cpp		关闭窗口
 Never	CodyCam		从不
 Every 8 hours	CodyCam		间隔 8 小时
 Cannot start the video source	CodyCam		无法启动视频源
@@ -38,6 +40,7 @@ still image filename expected	CodyCam		预期静态图像文件名
 File name:	CodyCam		文件名：
 Directory:	CodyCam		目录：
 Error setting type of output file	VideoConsumer.cpp		设置输出文件类型出错
+Locking the window	VideoConsumer.cpp		锁定窗口
 Cannot find an available video stream	CodyCam		未发现可用视频流
 Upload…	VideoConsumer.cpp		上传…
 password expected	CodyCam		预期密码
@@ -78,6 +81,7 @@ Video settings	CodyCam		视频设置
 Can't find an available connection to the video window	CodyCam		未发现用于视频窗口的可用连接。
 FTP	CodyCam		FTP
 Error creating output file	VideoConsumer.cpp		创建输出文件出错
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		找不到视频源。\n你需要网络摄像头以使用CodyCam。
 Logging in…	VideoConsumer.cpp		登陆中...
 CodyCam	System name		摄像头
 Error writing output file	VideoConsumer.cpp		输出文件写入出错

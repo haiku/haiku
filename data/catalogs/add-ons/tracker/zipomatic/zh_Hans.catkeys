@@ -9,7 +9,7 @@ Preparing to archive	file:ZipperThread.cpp		准备归档
 Let them continue	file:ZipOMatic.cpp		让它们继续
 Continue	file:ZipOMaticWindow.cpp		继续
 Archive created OK	file:ZipOMaticWindow.cpp		档案创建成功
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# file added.} other{# files added.}}
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# 文件已添加。} other{# 等文件已添加。}}
 Stop	file:ZipOMaticWindow.cpp		停止
 Stopped	file:ZipOMaticWindow.cpp		已停止。
 Archive	file:ZipperThread.cpp		档案

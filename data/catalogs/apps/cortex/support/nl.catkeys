@@ -1,4 +1,4 @@
-1	dutch; flemish	application/x-vnd.Cortex.support	1625162530
+1	dutch; flemish	application/x-vnd.Cortex.support	2097798758
 Header has flags	MediaString		De header heeft opties
 32 bit HLS	MediaString		32-bit HLS
 Recording	MediaString		Aan het opnemen
@@ -31,6 +31,7 @@ Back-center	MediaString		Achter-midden
 {0, plural, other{# bit integer}}	MediaString		{0, plural, other{# bit integer}}
 Ambisonic WXYZ	MediaString		Ambisonisch WXYZ
 (unknown video format)	MediaString		(onbekend videoformaat)
+Video data between line %lu and %lu	MediaString		Video data tussen lijn %lu en %lu
 AVI format family	MediaString		AVI-formaatfamilie
 Homogenous buffers	MediaString		Homogene buffers
 Interlaced 	MediaString		Geïnterlinieerd 

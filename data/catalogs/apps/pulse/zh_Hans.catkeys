@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Pulse	2964417303
+1	english	x-vnd.Haiku-Pulse	559379362
 Normal mode	DeskbarPulseView		正常模式
 Info	CPUButton		信息
 Quit	DeskbarPulseView		退出
@@ -16,8 +16,9 @@ Fade colors	ConfigView		消除颜色
 About Pulse…	PulseView		关于系统脉搏...
 Pulse	NormalPulseView		系统脉搏
 Deskbar mode	NormalPulseView		桌面栏模式
+Pulse settings	PulseApp		Pulse设置
 Remove replicant	CPUButton		删除复制件
-You can't disable the last active CPU.	PulseView		您不能禁用的最后一个活动的CPU。
+You can't disable the last active CPU.	PulseView		您不能禁用最后一个活动的CPU。
 Width of icon:	ConfigView		图标宽度：
 Deskbar mode	MiniPulseView		桌面栏模式
 OK	PulseView		确定
@@ -29,7 +30,7 @@ OK	PulseApp		确定
 About Pulse…	CPUButton		关于系统脉搏...
 Deskbar mode	PrefsWindow		桌面栏模式
 Mini mode	DeskbarPulseView		迷你模式
-You can't disable the last active CPU.	CPUButton		您无法禁用最后的活动 CPU。
+You can't disable the last active CPU.	CPUButton		您不能禁用最后的活动 CPU。
 OK	CPUButton		确定
 Deskbar	CPUButton		桌面栏
 Settings…	PulseView		设置...
@@ -37,6 +38,7 @@ Deskbar menu	CPUButton		桌面栏菜单
 Mini mode	NormalPulseView		迷你模式
 Quit	MiniPulseView		退出
 Info	PulseView		信息
+Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]	PulseApp		使用方法: Pulse [--mini] [-w 宽度] [--width=宽度]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]
 OK	DeskbarPulseView		确定
 Info	PulseApp		信息
 Pulse	System name		系统脉搏

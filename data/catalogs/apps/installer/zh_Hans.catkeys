@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Installer	2836044226
+1	english	x-vnd.Haiku-Installer	1214879833
 Performing installation.	InstallProgress		执行安装。
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择源磁盘。然后点击\"开始\"。
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		请在关闭系统安装器前关闭磁盘管理器。
@@ -14,6 +14,7 @@ Unknown Type	InstallProgress	Partition content type	未知类型
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		按下 “开始”，从 '%1s' 安装到 '%2s'。 
 Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择希望安装的磁盘。然后点击\"开始\"。
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		系统安装完成。引导扇区已经写入到 '%s'。按下“退出”关闭系统安装器或者另选分区重复安装操作。
+Are you sure you want to stop the installation?	InstallerWindow		是否确定停止安装？
 README	InstallerApp		README
 Quit	InstallerWindow		退出
 Write boot sector to '%s'	InstallerWindow		引导扇区写入到 '%s'

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	2601047281
+1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	826097672
 Teams	DataSource		Teams
 Semaphores	DataSource		Semaforen
 TX	DataSource	Shorter version for Sending	TX
@@ -24,6 +24,7 @@ Settings…	ActivityWindow		Instellingen...
 Block cache	DataSource		Blok-cache
 Memory	DataSource		Geheugen
 CPU usage	DataSource		CPU-gebruik
+CPU speed	DataSource		CPU-snelheid
 Quit	ActivityWindow		Afsluiten
 Raw clipboard	DataSource		Onbewerkt klembord
 Settings	ActivityWindow		Instellingen
@@ -32,6 +33,7 @@ Used memory	DataSource		Gebruikt geheugen
 Show legend	ActivityView		Toon legenda
 Cached memory	DataSource		Geheugen in cache
 CPU %d usage	DataSource		CPU %d gebruik
+CPU %d speed	DataSource		Snelheid CPU %d
 File	ActivityWindow		Bestand
 Ports	DataSource		Poorten
 Page faults	DataSource		Page-onderbrekingen

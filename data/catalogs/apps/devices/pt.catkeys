@@ -1,14 +1,17 @@
-1	portuguese	x-vnd.Haiku-Devices	3345509916
+1	portuguese	x-vnd.Haiku-Devices	3349357485
 ACPI bus	DevicesView		Barramento ACPI
 Encryption controller	Device		Controlador de encriptação
-Bus Information	Device		Informação de Bus
+Bus Information	Device		Informação de Barramento (Bus)
 Devices	System name		Dispositivos
+USB bus	DevicesView		Barramento USB
 Graphics Peripheral	DeviceSCSI		Periférico de Gráficos
 Processor	Device		Processador
 Generate system information	DevicesView		Gerar informação do sistema
+Unknown	DeviceACPI		Desconhecido
 Class info	DevicePCI		Informação de classe
 ACPI Information	DeviceACPI		Informação ACPI
 Detailed	DevicesView		Detalhada
+USB bus	Device		Barramento USB
 Computer	DevicesView		Computador
 Communications	DeviceSCSI		Comunicações
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Informação de Classe:\t\t\t\t: %classInfo%
@@ -84,6 +87,7 @@ Device name	DeviceSCSI		Nome de dispositivo
 Docking station	Device		Estação de ancoragem
 Array	DeviceSCSI		Matriz
 Unclassified device	Device		Dispositivo não classificado
+Manufacturer	DeviceACPI		Fabricante
 ACPI controller	Device		Controlador ACPI
 Network controller	Device		Controlador de rede
 Driver used	Device		Controlador utilizado

@@ -1,4 +1,5 @@
-1	french	x-vnd.Haiku-HaikuDepot	2192549143
+1	french	x-vnd.Haiku-HaikuDepot	2598791832
+Usage conditions download problem	ToLatestUserUsageConditionsWindow		Erreur lors du téléchargement des conditions d'utilisation
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		Impossible de créer le nouvel utilisateur.
 An unexpected error has been sent from the server [%li]	ServerHelper		Le serveur [%li] a renvoyé une erreur inattendue.
@@ -18,6 +19,7 @@ Switch account…	MainWindow		Changer de compte…
 Preferred language:	UserLoginWindow		Langue préférée :
 Name	PackageListView		Nom
 Authorization or security issue. Logout and log back in again to check that your password is correct and also check that you have agreed to the latest usage conditions.	ServerHelper		Problème d’autorisation ou de sécurité. Déconnectez-vous et reconnectez-vous pour vérifier que votre mot de passe est correct et vérifiez également que vous avez accepté les dernières conditions d’utilisation.
+don't activate package %source%	PackageProblem	don't change '%source%	ne pas activer le paquet %source%
 Rate %Package%	RatePackageWindow		Évaluer %Package%
 An error occurred while initializing the package manager: %message%	LocalPkgDataLoadProcess		Une erreur est survenue lors de l’initialisation du gestionnaire de paquets : %message%
 Quit HaikuDepot	App		Quitter DépôtHaiku
@@ -26,7 +28,9 @@ A response to the captcha question must be provided.	UserLoginWindow		Vous devez
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Une erreur inattendue « %Message% » est survenue avec la propriété « %Property% ».
 A requested object or an object involved in the request was not found on the server.	ServerHelper		L’objet demandé ou l’objet associé à la requête n’a pas été trouvé sur le serveur.
 Logout	ToLatestUserUsageConditionsWindow		Déconnexion
+The following additional package changes have to be made:	PackageResult		Les changements supplémentaires suivants sont nécessaires :
 No changelog available.	PackageInfoView		La liste des modifications n’est pas disponible.
+The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Les conditions d'utilisations actuelles n'ont pas été acceptées.
 Cancel	PackageProblem		Annuler
 Version	PackageListView		Version
 No, quit HaikuDepot	App		Non, quitter DépôtHaiku
@@ -45,6 +49,7 @@ Start package daemon	App		Démarrer le serveur de paquets
 There are problems in the supplied data:	UserLoginWindow		Il y a des problèmes dans les données fournies :
 The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		L'utilisateur « %Nickname% » n'a accepté aucune condition d'utilisation.
 Usage conditions download problem	UserLoginWindow		Problème de téléchargement des conditions d’utilisation
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	installer le paquet %s venant du dépôt %s\n
 Package daemon problem	App		Problème du serveur de paquets
 No	MainWindow		Non
 Repository	PackageListView		Dépôt

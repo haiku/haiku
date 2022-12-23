@@ -1,13 +1,17 @@
-1	german	x-vnd.Haiku-Devices	2577757080
+1	german	x-vnd.Haiku-Devices	3349357485
 ACPI bus	DevicesView		ACPI-Bus
 Encryption controller	Device		Verschlüsselungscontroller
 Bus Information	Device		Bus-Information
+Devices	System name		Geräte
+USB bus	DevicesView		USB-Bus
 Graphics Peripheral	DeviceSCSI		Grafik-Peripheriegerät
 Processor	Device		Prozessor
 Generate system information	DevicesView		Systeminformationen erstellen
+Unknown	DeviceACPI		Unbekannt
 Class info	DevicePCI		Klassen-Info
 ACPI Information	DeviceACPI		ACPI-Information
 Detailed	DevicesView		Details
+USB bus	Device		USB-Bus
 Computer	DevicesView		Rechner
 Communications	DeviceSCSI		Kommunikation
 Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Klassen-Info:\t\t\t\t: %classinfo%
@@ -83,6 +87,7 @@ Device name	DeviceSCSI		Gerätename
 Docking station	Device		Andockstation
 Array	DeviceSCSI		Anordnung
 Unclassified device	Device		Sonstige Geräte
+Manufacturer	DeviceACPI		Hersteller
 ACPI controller	Device		ACPI-Controller
 Network controller	Device		Netzwerk-Controller
 Driver used	Device		Treiber

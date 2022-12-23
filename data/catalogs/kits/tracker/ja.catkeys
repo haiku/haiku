@@ -294,7 +294,7 @@ Error creating link to \"%name\".	FSUtils		\"%name\"へのリンク作成時に�
 Unknown	FilePermissionsView		不明
 Paste links	ContainerWindow		リンクを貼り付ける
 Restoring: 	StatusWindow		元に戻しています:
-The Tracker must be running to set the default printer.	PoseView		規定のプリンターを設定するにはTrackerが動作している必要があります。
+The Tracker must be running to set the default printer.	PoseView		デフォルトプリンターを設定するにはTrackerが動作している必要があります。
 calculating…	InfoWindow		計算中...
 Preferred for file	OpenWithWindow		関連付けの第一優先
 OK	AutoMounterSettings		OK

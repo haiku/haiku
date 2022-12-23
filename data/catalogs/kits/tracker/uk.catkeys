@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	2915475646
+1	ukrainian	x-vnd.Haiku-libtracker	464753347
 Created	ContainerWindow		Cтворений
 Icon	AttributesView		Значок
 Open and make preferred	OpenWithWindow		Відкрити і зробити пріоритетним
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Малий растровий значок
 Would you like to find a suitable application to open the file?	FSUtils		Бажаєте знайти прийнятну програму для відкриття файлу?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Ви не можете замінити папку або символічне посилання файлом.
+(unknown)	InfoWindow		(невідомо)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# дати>}}
 Trailing \\.	libtracker		Змінний \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		В %func \nзбій find_directory(). \nПричина: %error
@@ -84,6 +85,7 @@ Include trash	FindPanel		Включаючи смітник
 GiB	WidgetAttributeText		ГБ
 Clean up	ContainerWindow		Очистити
 Modified	FindPanel		Змінений
+ (block size: 	InfoWindow		 (розмір блоку: 
 Select all	QueryContainerWindow		Вибрати все
 Generate image thumbnails	SettingsView		Генерувати мініатюри зображень
 Select…	FilePanelPriv		Вибрати…
@@ -167,6 +169,7 @@ Read	FilePermissionsView		Читати
 There was an error writing the attribute.	WidgetAttributeText		Сталася помилка при записі атрибуту.
 Path	Default Query Columns		Шлях
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		При зміні назви %target %osName може вести себе неналежним чином!\n\nВи впевнені що бажаєте цього?
+Filesystem:	InfoWindow		Файлова система:
 Could not open \"%name\" (%error). 	FSUtils		Не вдалося відкрити \"%name\" (%error). 
 Media parameter group	AttributesView		Група параметрів медіа
 %name info	InfoWindow	InfoWindow Title	%name інфо
@@ -493,6 +496,7 @@ Duplicate	ContainerWindow		Дублювати
 16-bit integer	AttributesView		16-бітове ціле
 Untitled clipping	PoseView		Неназвана вирізка
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Файл \"%name\" вже існує в цій папці. Замінити його?
+, indexed	InfoWindow		, індексовано
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Ви повинні скинути об'єкт на будь-який із значків диску у вікні\"Диски\".
 Version:	InfoWindow		Версія:
 OK	PoseView		ОК

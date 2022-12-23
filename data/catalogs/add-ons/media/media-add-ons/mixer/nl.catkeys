@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-mixer.media_addon	4284602042
+1	dutch; flemish	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Invoermapping
 High quality (linear interpolation)	AudioMixer		Hoge kwaliteit (lineaire interpolatie)
 To output	AudioMixer		Uitvoer
@@ -20,3 +20,5 @@ Mute	AudioMixer		Dempen
 Output mapping	AudioMixer		Uitgang mapping
 Virtual output channels	AudioMixer		Virtuele uitvoerkanalen
 Allow output channel remapping	AudioMixer		Uitvoerkanaal hermappen toelaten
+Input gain controls represent:	AudioMixer		Ingangsversterkingsregelaars vertegenwoordigen:
+Attenuate mixer output by 3 dB	AudioMixer		Verzwak de mixeroutput met 3 dB

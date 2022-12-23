@@ -1,5 +1,6 @@
-1	thai	x-vnd.Haiku-mixer.media_addon	3463574286
+1	thai	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		การทำแผนที่ข้อมูลเข้า
+High quality (linear interpolation)	AudioMixer		คุณภาพสูง (การแก้ไขเชิงเส้น)
 To output	AudioMixer		ไปยังข้อมูลออก
 Gain	AudioMixer		ได้รับ
 To master	AudioMixer		เพื่อข้อมูลหลัก
@@ -7,13 +8,17 @@ not connected	AudioMixer		ไม่เชื่อมต่อ
 Master output	AudioMixer		ข้อมูลออกหลัก
 dB	AudioMixer		dB
 Gain controls	AudioMixer		ได้รับการควบคุม
+Low quality (drop/repeat samples)	AudioMixer		คุณภาพต่ำ (ดรอป/ทำซ้ำตัวอย่าง)
 Output channel sources	AudioMixer		แหล่งช่องสัญญาณออก
 Allow input channel remapping	AudioMixer		อนุญาตให้ทำแผนที่ช่องสัญญาณข้อมูลเข้าใหม่
 Display balance control for stereo connections	AudioMixer		แสดงการควบคุมยอดสมดุลสำหรับการเชื่อมต่อสเตอริโอ
 Setup	AudioMixer		ติดตั้ง
 Physical input channels	AudioMixer		ช่องสัญญาณทางกายภาพ
 Input channel destinations	AudioMixer		ปลายทางช่องข้อมูลเข้า
+Resampling algorithm:	AudioMixer		อัลกอริทึมการสุ่มตัวอย่าง:
 Mute	AudioMixer		เงียบ
 Output mapping	AudioMixer		แผนที่ข้อมูลออก
 Virtual output channels	AudioMixer		ช่องสัญญาณออกจำลอง
 Allow output channel remapping	AudioMixer		อนุญาตการทำแผนที่ช่องข้อมูลออกใหม่
+Input gain controls represent:	AudioMixer		การควบคุมการรับอินพุตแสดงถึง:
+Attenuate mixer output by 3 dB	AudioMixer		ลดทอนเอาท์พุตของเครื่องผสม 3 dB

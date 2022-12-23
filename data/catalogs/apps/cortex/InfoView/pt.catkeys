@@ -1,6 +1,7 @@
-1	portuguese	application/x-vnd.Cortex.InfoView	2025699704
+1	portuguese	application/x-vnd.Cortex.InfoView	1782197806
 Offset	InfoView		Deslocamento
 Description	DormantNodeInfoView		Descrição
+Byte order	InfoView		Ordem de bytes
 Connection	InfoView		Conexão
 Output formats	DormantNodeInfoView		Formatos de saída
 History	InfoView		Histórico
@@ -8,11 +9,13 @@ Input formats	DormantNodeInfoView		Formatos de entrada
 Signature	AppNodeInfoView		Assinatura
 Video data between	InfoView		Dados de vídeo entre
 Any number	DormantNodeInfoView	For 'Max. instances' field	Qualquer número
+Flags	InfoView		Atributos
 Active lines	InfoView		Linhas ativas
 Buffer size	InfoView		Tamanho do buffer
 \n- Quality:	FileNodeInfoView		\n- Qualidade:
 Kinds	LiveNodeInfoView		Tipos
 Application	AppNodeInfoView		Aplicação
+Max. instances	DormantNodeInfoView		Nº máx. instâncias
 \n- Duration:	FileNodeInfoView		\n- Duração:
 Latency	LiveNodeInfoView		Latência
 Media type	InfoView		Tipo de mídia

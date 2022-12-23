@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	1961774506
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Onderdeel verwijderen naar Trash
 Close	MediaPlayer-PlaylistWindow		Afsluiten
 Volume of background clips	MediaPlayer-SettingsWindow		Volume van achtergrondclips
@@ -30,6 +30,7 @@ Open file…	MediaPlayer-Main		Open bestand...
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Besturingselementen schalen in modus volledig scherm
 View options	MediaPlayer-SettingsWindow		Weergave-opties
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Apparaat uitwerpen
 Full volume	MediaPlayer-SettingsWindow		Maximaal volume
 <untitled>	PlaylistItem-title		<zonder titel>
 Start media server	MediaPlayer-Main		Start mediaserver

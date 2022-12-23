@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-DriveSetup	4048496535
+1	ukrainian	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		Неможливо відключити розділ %s.
 Mount all	MainWindow		Підключити все
 Disk	MainWindow		Диск
@@ -14,6 +14,7 @@ Block size	PartitionList		Розмір блоку
 The panel experienced a problem!	MainWindow		З панеллю сталася проблема!
 Device	DiskView		Пристрій
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Ви впевнені що бажаєте форматувати розширений розділ? Всі його підрозділи будуть перезаписані якщо продовжити. Вас запитають ще раз, безпосередньо перед записом змін на диск.
+Physical block size	PartitionList		Розмір фізичного блоку
 Unmount	MainWindow		Відключити
 Failed to format the partition %s!\n	MainWindow		Не вдалося ініціалізувати розділ %s!\n
 Partition size	CreateParametersPanel		Розмір розділу

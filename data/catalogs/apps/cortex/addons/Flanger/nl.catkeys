@@ -1,6 +1,8 @@
-1	dutch; flemish	application/x-vnd.moon-Flanger.media_addon	455620896
+1	dutch; flemish	application/x-vnd.moon-Flanger.media_addon	278353351
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kan geen node-info krijgen (%ld):\n%s\n
 An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		Een add-on versie van FlangerNode.\ndoor Eric Moon (16 juni 1999)
 Delay	CortexAddOnsFlanger		Vertraging
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: kan geen node vinden (%ld):\n%s\n
 Depth	CortexAddOnsFlanger		Diepte
 Feedback	CortexAddOnsFlanger		Feedback
 Sweep rate	CortexAddOnsFlanger		Uitslagratio
@@ -10,4 +12,5 @@ OK	CortexAddOnsCommonMediaNodeControlApp		Okee
 controls	CortexAddOnsCommonMediaNodeControlApp		knoppen
 Mix output	CortexAddOnsFlanger		Mix-uitvoer
 Flanger	CortexAddOnsFlanger		Flanger
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: geen parameters voor node (%ld):\n%s\n
 Audio input	CortexAddOnsFlanger		Audioinvoer

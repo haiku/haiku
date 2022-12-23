@@ -5,7 +5,7 @@ Open Terminal	Team monitor		Vierç Terminâl
 {0, plural,one{Hold CONTROL+ALT+DELETE for # second to reboot.}other{Hold CONTROL+ALT+DELETE for # seconds to reboot.}}	Team monitor		{0, plural,one{Ten fracât CONTROL+ALT+CANC par # secont par tornâ a inviâ.}other{Ten fracât CONTROL+ALT+CANC par # seconts par tornâ a inviâ.}}
 Restart the desktop	Team monitor		Torne invie il scritori
 Force reboot	Team monitor		Sfuarce il tornâ a inviâ
-Team monitor	Team monitor		Monitor dai Team
+Team monitor	Team monitor		Monitor dai Teams
 Kill application	Team monitor		Cope aplicazion
 Cancel	Team monitor		Anule
 (This team is a system component)	Team monitor		(Chest team al è un component di sisteme)

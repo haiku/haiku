@@ -35,7 +35,7 @@ Cached memory	DataSource		Önbellekteki dosya
 CPU %d usage	DataSource		%d. CPU kullanımı
 CPU %d speed	DataSource		%d. CPU hızı
 File	ActivityWindow		Dosya
-Ports	DataSource		Portlar
+Ports	DataSource		Kapılar
 Page faults	DataSource		Sayfa hataları
 Apps	DataSource		Uygulamalar
 Additional items	ActivityView		Ek ögeler

@@ -1,2 +1,25 @@
-1	dutch; flemish	x-vnd.Haiku-WebPTranslator	1475550615
+1	dutch; flemish	x-vnd.Haiku-WebPTranslator	828165164
+High	ConfigView		Hoog
+WebPTranslator Settings	ConfigView		WebPVertaler Instellingen
+Low	ConfigView		Laag
+WebP image translator	ConfigView		WebP afbeelding vertaler
+Photo	ConfigView		Foto
+WebP image translator	WebPTranslator		WebP afbeelding vertaler
+©2010-2017 Google Inc.	ConfigView		©2010-2017 Google Inc.
+©2010-2017 Haiku Inc.	ConfigView		©2010-2017 Haiku Inc.
+Picture	ConfigView		Afbeelding
+Default	ConfigView		Standaard
+Text	ConfigView		Tekst
+Preprocessing filter	ConfigView		Voorbewerking filter
+Compression method:	ConfigView		Compressie methode:
+Preset	ConfigView		Vooraf ingesteld
+Drawing	ConfigView		Tekening
+Output preset:	ConfigView		Uitvoer vooraf ingesteld
 WebP Settings	main		WebP Instellingen
+Icon	ConfigView		Icoon
+WebP image	WebPTranslator		WebP afbeelding
+Output quality:	ConfigView		Uitvoer kwaliteit
+Slower but better	ConfigView		Langzaam maar beter
+Based on libwebp %version%	ConfigView		Gebaseerd op libwebp %version%
+Fast	ConfigView		Snel
+WebP images	WebPTranslator		WebP afbeeldingen

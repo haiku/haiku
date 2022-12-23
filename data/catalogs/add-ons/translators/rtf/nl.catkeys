@@ -2,10 +2,10 @@
 Version %d.%d.%d, %s	ConfigView		Versie %d.%d.%d, %s
 RTF text files	RTFTranslator		RTF tekstbestanden
 RTF-Translator Settings	ConfigView		RTF-Translator instellingen
-Rich Text Format (RTF) translator	ConfigView		Rich Text Format (RTF) Translator
+Rich Text Format (RTF) translator	ConfigView		Rich Text Format (RTF) vertaler
 RTF Settings	main		RTF Instellingen
 RichTextFormat file	RTFTranslator		RichTextFormat bestand
 Be style text file	RTFTranslator		Be-stijl tekstbestand
 Plain text file	RTFTranslator		Platte tekstbestand
-Rich Text Format translator	RTFTranslator		Rich Text Format translator
+Rich Text Format translator	RTFTranslator		Rich Text Format vertaler
 Rich Text Format translator v%d.%d.%d %s	RTFTranslator		Rich Text Format vertaler v%d.%d.%d %s

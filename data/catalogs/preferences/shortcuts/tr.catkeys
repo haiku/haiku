@@ -28,7 +28,7 @@ Remove selected shortcut	ShortcutsWindow		Seçili kestirmeyi kaldır
 Error, NULL state description?	ShortcutsSpec		Hata, NULL durum açıklaması?
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Kestirmeler, düğme kümenizi açamadı!
-Save & apply	ShortcutsWindow		Kaydet & uygula
+Save & apply	ShortcutsWindow		Kaydet ve uygula
 Open	ShortcutsWindow		Aç
 Append	ShortcutsWindow		İliştir
 Both	ShortcutsSpec		Her ikisi de

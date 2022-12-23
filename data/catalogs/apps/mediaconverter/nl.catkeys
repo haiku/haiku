@@ -1,8 +1,9 @@
-1	dutch; flemish	x-vnd.Haiku-MediaConverter	1322040280
+1	dutch; flemish	x-vnd.Haiku-MediaConverter	2816184527
 Input file not recognized as Audio or Video	MediaConverter		Invoerbestand niet herkend als audio of video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Videokwaliteit: %3d%%
 Source files	MediaConverter		Bronbestanden
+Error writing video frame %lld	MediaConverter		Fout bij schrijven video frame %lld
 Error converting '%filename'	MediaConverter		Fout bij het omzetten van '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		De geselecteerde map is niet gevonden. De standaard /boot/home wordt gebruikt
 Conversion completed	MediaConverter		Conversie voltooid
@@ -47,12 +48,16 @@ Error	MediaConverter		Fout
 File details	MediaConverter		Bestandsdetails
 No audio	Audio codecs list		Geen audio
 Drop media files onto this window	MediaConverter		Sleep mediabestanden naar dit venster
+Writing video track: %ld%% complete	MediaConverter		Scrijven video track: %ld%% compleet
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
+Error read audio frame %lld	MediaConverter		Fout lezen audio frame %lld
 Quit	Menu		Afsluiten
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
 Duration:	MediaConverter-FileInfo		Duur:
 MediaConverter	System name		MediaConverter
 Error launching: %strError%	MediaConverter		Fout bij het starten: %strError%
+Error writing audio frame %lld	MediaConverter		Fout scrijven audio frame %lld
+Writing audio track: %ld%% complete	MediaConverter		Schrijven audio track: %ld%% compleet
 File format:	MediaConverter		Bestandsformaat:
 File	Menu		Bestand
 Video quality not supported	MediaConverter		Videokwaliteit niet ondersteund
@@ -64,5 +69,6 @@ Continue	MediaConverter		Voortzetten
 Convert	MediaConverter		Converteren
 Audio quality not supported	MediaConverter		Geluidskwaliteit wordt niet ondersteund
 Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		Fout bij het schrijven naar: %strPath%. De standaardlocatie /boot/home wordt gebruikt.
+Error read video frame %lld	MediaConverter		Fout lezen vido frame %lld
 Preview	MediaConverter		Voorbeeld
 Start [ms]: 	MediaConverter		Start [ms]:

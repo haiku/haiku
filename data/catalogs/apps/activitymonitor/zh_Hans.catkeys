@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ActivityMonitor	2601047281
+1	english	x-vnd.Haiku-ActivityMonitor	826097672
 Teams	DataSource		团队
 Semaphores	DataSource		信号量
 TX	DataSource	Shorter version for Sending	TX
@@ -24,6 +24,7 @@ Settings…	ActivityWindow		设置...
 Block cache	DataSource		高速缓存
 Memory	DataSource		内存
 CPU usage	DataSource		CPU使用率
+CPU speed	DataSource		CPU 速度
 Quit	ActivityWindow		退出
 Raw clipboard	DataSource		原始剪贴板
 Settings	ActivityWindow		设置
@@ -32,6 +33,7 @@ Used memory	DataSource		已用内存
 Show legend	ActivityView		显示说明
 Cached memory	DataSource		高速缓存
 CPU %d usage	DataSource		CPU %d 用量
+CPU %d speed	DataSource		CPU %d 速度
 File	ActivityWindow		文件
 Ports	DataSource		端口
 Page faults	DataSource		页面错误
@@ -41,8 +43,8 @@ Add graph	ActivityWindow		添加图示
 Sending	DataSource		发送
 %.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		始终置顶
-Swap	DataSource		Swap
-%lld sec.	SettingsWindow		%lld sec.
+Swap	DataSource		交换分区
+%lld sec.	SettingsWindow		%lld 秒.
 P-faults	DataSource		页面错误
 Sems	DataSource		Sems
 Network receive	DataSource		网络接收
