@@ -1,10 +1,11 @@
-1	turkish	x-vnd.Haiku-Expander	3300517306
+1	turkish	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Hedef
 Other	ExpanderPreferences		Diğer
 Automatically show contents listing	ExpanderPreferences		İçerik listesini kendiliğinden göster
 Expander	System name		Paketaçar
 Expander: Choose destination	DirectoryFilePanel		Paketaçar: Hedef seç
 Set source…	ExpanderMenu		Kaynak belirle…
+OK	ExpanderWindow		Tamam
 The destination is not a folder.	ExpanderWindow		Hedef bir klasör değil.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Klasör taşınmış, yeniden adlandırılmış veya desteklenmiyor olabilir.
 Close window when done expanding	ExpanderPreferences		Genişletme bittikten sonra pencereyi kapat

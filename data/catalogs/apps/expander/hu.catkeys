@@ -1,10 +1,11 @@
-1	hungarian	x-vnd.Haiku-Expander	3300517306
+1	hungarian	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Célmappa
 Other	ExpanderPreferences		Egyéb
 Automatically show contents listing	ExpanderPreferences		Tartalom listázása automatikusan
 Expander	System name		Kicsomagoló
 Expander: Choose destination	DirectoryFilePanel		Kicsomagoló: Cél választása
 Set source…	ExpanderMenu		Csomag megadása…
+OK	ExpanderWindow		Rendben
 The destination is not a folder.	ExpanderWindow		A cél nem egy mappa.
 The folder was either moved, renamed or not supported.	ExpanderWindow		A mappa át lett helyezve, át lett nevezve vagy nem használható.
 Close window when done expanding	ExpanderPreferences		A kicsomagolás végeztével zárja be az ablakot

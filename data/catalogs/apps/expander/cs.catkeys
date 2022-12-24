@@ -1,10 +1,11 @@
-1	czech	x-vnd.Haiku-Expander	3300517306
+1	czech	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Cíl
 Other	ExpanderPreferences		Ostatní
 Automatically show contents listing	ExpanderPreferences		Automaticky zobrazit výpis obsahu
 Expander	System name		Rozbalovač
 Expander: Choose destination	DirectoryFilePanel		Rozbalovač: Vybrat cíl
 Set source…	ExpanderMenu		Nastavit zdroj...
+OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Cíl není složka.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Adresář byl přesunut, přejmenován nebo není podporován.
 Close window when done expanding	ExpanderPreferences		Zavřít okno po skončení rozbalování

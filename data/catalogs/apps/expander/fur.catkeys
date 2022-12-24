@@ -1,10 +1,11 @@
-1	friulian	x-vnd.Haiku-Expander	3300517306
+1	friulian	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Destinazion
 Other	ExpanderPreferences		Altri
 Automatically show contents listing	ExpanderPreferences		Mostre in automatic il listât dai contignûts
 Expander	System name		Espansôr
 Expander: Choose destination	DirectoryFilePanel		Espansôr: Sielç la destinazion
 Set source…	ExpanderMenu		Stabilìs la sorzint…
+OK	ExpanderWindow		Va ben
 The destination is not a folder.	ExpanderWindow		La destinazion no je une cartele.
 The folder was either moved, renamed or not supported.	ExpanderWindow		O la cartele e je stade spostade, o e à cambiât non opûr no je supuartade.
 Close window when done expanding	ExpanderPreferences		Siere il barcon une volte finide la espansion

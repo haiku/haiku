@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-HaikuDepot	381023409
+1	turkish	x-vnd.Haiku-HaikuDepot	4143471163
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Kullanım koşullarını indirme sorunu
 Available packages	MainWindow		Kullanılabilir paketler
 It was not possible to create the new user.	UserLoginWindow		Yeni kullanıcı oluşturulamadı.
@@ -166,6 +166,7 @@ Inactive	PackageListView		Etkin değil
 Nickname:	UserLoginWindow		Takma ad:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Depolar üstbilgisi eşitleniyor
 OK	MainWindow		Tamam
+Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		Kullanıcılar, en az {0, plural, one{# yaşında} other{# yaşında}} olmalıdır.
 Version %Code%	UserUsageConditions		Sürüm %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, other{# öge}}
 Uninstalling \"%PackageName%\"	UninstallPackageAction		\"%PackageName%\" kaldırılıyor

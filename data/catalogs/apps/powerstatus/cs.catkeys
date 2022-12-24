@@ -1,48 +1,48 @@
 1	czech	x-vnd.Haiku-PowerStatus	1085070685
 Run in window	PowerStatus		Spustit v okně
-Extended battery info	PowerStatus		Rozšířené informace o baterii
+Extended battery info	PowerStatus		Podrobnější informace o baterii
 Show status icon	PowerStatus		Zobrazit ikonu stavu
 Battery charging	PowerStatus		Baterie se nabíjí
-Design capacity low warning: 	PowerStatus		Varování - nízká designovaná kapacita:
+Design capacity low warning: 	PowerStatus		Varování nízká kapacita (dle výrobce): 
 The battery level is critical, please plug in the device immediately.	PowerStatus		Úroveň nabití baterie je kritická. Prosím, hned připojte zařízení do elektrické sítě.
-non-rechargeable	PowerStatus		nedobíjitelný
-Last full charge: 	PowerStatus		Poslední plné nabití:
+non-rechargeable	PowerStatus		nedobíjecí
+Last full charge: 	PowerStatus		Poslední plné nabití: 
  mV	PowerStatus		 mV
-Current rate: 	PowerStatus		Aktuální podíl:
+Current rate: 	PowerStatus		Aktuální spotřeba: 
 Show text label	PowerStatus		Zobrazit popisek
 Quit	PowerStatus		Ukončit
 Battery low	PowerStatus		Nízká úroveň baterie
-Model number: 	PowerStatus		Číslo modelu:
-Battery unused	PowerStatus		Baterie nepoužita
-Type: 	PowerStatus		Typ:
+Model number: 	PowerStatus		Číslo modelu: 
+Battery unused	PowerStatus		Baterie nevyužita
+Type: 	PowerStatus		Typ: 
 Damaged battery	PowerStatus		Poškozená baterie
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Můžete spouštět PowerStatus v okně nebo jej nainstalovat do Deskbaru.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Můžete spouštět PowerStatus v okně nebo jej nainstalovat do panelu.
  mAh	PowerStatus		 mAh
 Battery discharging	PowerStatus		Baterie se vybíjí
-Design voltage: 	PowerStatus		Designované napětí:
+Design voltage: 	PowerStatus		Napětí (dle výrobce): 
 discharging	PowerStatus		vybíjí se
-rechargeable	PowerStatus		Dobíjitelné
+rechargeable	PowerStatus		nabíjecí
 Battery info…	PowerStatus		Informace o baterii...
 Show time	PowerStatus		Zobraz čas
  mA	PowerStatus		 mA
 About…	PowerStatus		O...
-Serial number: 	PowerStatus		Sériové číslo:
-Battery critical	PowerStatus		Kritická úroveň baterie
-Capacity: 	PowerStatus		Kapacita:
+Serial number: 	PowerStatus		Sériové číslo: 
+Battery critical	PowerStatus		Vyždímaná baterie
+Capacity: 	PowerStatus		Kapacita: 
  mW	PowerStatus		 mW
 No supported battery detected. PowerStatus cannot be used on your system.	PowerStatus		Nenalezena podporovaná baterie. Nelze použít PowerStatus na vašem zařízení.
-Show percent	PowerStatus		Ukaž procenta
-Capacity granularity 1: 	PowerStatus		Nespojitost kapacity 1:
+Show percent	PowerStatus		Zobrazit procenta
+Capacity granularity 1: 	PowerStatus		Přesnost kapacity 1: 
 The battery level is getting low, please plug in the device.	PowerStatus		Úroveň nabití baterie je nízká. Prosím, připojte zařízení do elektrické sítě.
-Design capacity warning: 	PowerStatus		Varování designové kapacity:
-Capacity granularity 2: 	PowerStatus		Nespojitost kapacity 2:
+Design capacity warning: 	PowerStatus		Varování kapacita (dle výrobce): 
+Capacity granularity 2: 	PowerStatus		Přesnost kapacity 2: 
 Too bad!	PowerStatus		Průšvih!
-Technology: 	PowerStatus		Technologie:
+Technology: 	PowerStatus		Technologie: 
  mWh	PowerStatus		 mWh
 PowerStatus	System name		PowerStatus
-Design capacity: 	PowerStatus		Designovaná kapacita:
-OEM info: 	PowerStatus		OEM informace:
+Design capacity: 	PowerStatus		Původní kapacita: 
+OEM info: 	PowerStatus		Výrobce: 
 no battery	PowerStatus		žádná baterie
 Empty battery slot	PowerStatus		Prázdný slot na baterie
-Install in Deskbar	PowerStatus		Nainstalovat do Deskbaru
+Install in Deskbar	PowerStatus		Nainstalovat do panelu
 charging	PowerStatus		nabíjí se

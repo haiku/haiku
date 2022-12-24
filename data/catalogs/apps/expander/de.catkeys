@@ -1,9 +1,10 @@
-1	german	x-vnd.Haiku-Expander	1818663606
+1	german	x-vnd.Haiku-Expander	1757454658
 Destination	ExpanderWindow		Ziel
 Other	ExpanderPreferences		Allgemeines
 Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch anzeigen
 Expander: Choose destination	DirectoryFilePanel		Expander: Zielordner auswählen
 Set source…	ExpanderMenu		Quelle wählen …
+OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Das Ziel ist kein Ordner.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Der Ordner wurde entweder verschoben, umbenannt oder wird nicht unterstützt.
 Close window when done expanding	ExpanderPreferences		Fenster nach dem Entpacken schließen
