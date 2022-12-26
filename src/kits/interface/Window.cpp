@@ -2615,6 +2615,7 @@ BWindow::QuitRequested()
 thread_id
 BWindow::Run()
 {
+	EnableUpdates();
 	return BLooper::Run();
 }
 
