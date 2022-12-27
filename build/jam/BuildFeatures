@@ -319,11 +319,11 @@ if [ IsPackageAvailable fontconfig_devel ] {
 }
 
 # Gutenprint
-if [ IsPackageAvailable gutenprint8_devel ] {
+if [ IsPackageAvailable gutenprint9_devel ] {
 	ExtractBuildFeatureArchives gutenprint :
-		file: base gutenprint8
+		file: base gutenprint9
 			runtime: lib
-		file: devel gutenprint8_devel
+		file: devel gutenprint9_devel
 			depends: base
 			library: $(developLibDir)/libgutenprint.so
 			headers: $(developHeadersDir) $(developHeadersDir)/gutenprint

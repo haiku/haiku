@@ -78,8 +78,8 @@ RemotePackageRepository HaikuPorts
 	glu-9.0.0-8
 	glu_devel-9.0.0-8
 	groff-1.20.1-4
-	gutenprint8-5.3.1-3
-	gutenprint8_devel-5.3.1-3
+	gutenprint9-5.3.4-2
+	gutenprint9_devel-5.3.4-2
 	gzip-1.12-1
 	icu-57.2-3
 	icu_devel-57.2-3
@@ -376,7 +376,7 @@ RemotePackageRepository HaikuPorts
 	gmp
 	graphite2_x86
 	grep_x86
-	gutenprint8
+	gutenprint9
 	gzip
 	haikuporter
 	haikuwebkit_x86
