@@ -1,8 +1,6 @@
 SubDir HAIKU_TOP src bin listdev ;
 
 UsePrivateHeaders shared ;
-UsePrivateKernelHeaders ;
-	# TODO: The dm_wrapper.h includes <kdevice_manager.h>! Clean that up!
 UsePrivateSystemHeaders ;
 
 BinCommand listdev :
@@ -13,4 +11,7 @@ BinCommand listdev :
 ObjectHdrs [ FGristFiles listdev$(SUFOBJ) ]
 	: [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
 		apps devices ] ;
-Includes [ FGristFiles listdev.cpp ] : <src!apps!devices>pcihdr.h ;
+Includes [ FGristFiles listdev.cpp ] :
+	<src!apps!devices>pcihdr.h
+	<src!apps!devices>usbhdr.h
+;
