@@ -1,16 +1,21 @@
 #!/bin/sh
 
+language=$(locale -l)
+# The locale can be a single 2 char language or in severall segments like en, se_SE or sr_Latn_ME
+# this tries to get the 2 char language code from longer locales as a fallback
+languageBase=$(echo $language | awk -F_ '{print $1}')
 quicktourURL="\
 	https://www.haiku-os.org/docs/welcome/en/quicktour.html"
-quicktourDir=/boot/system/documentation/welcome/en/
-quicktourFile=$quicktourDir/quicktour.html
-localizedQuicktourDir=/boot/system/documentation/welcome/"$LANG"/
-localizedQuicktourFile=$localizedQuicktourDir/quicktour.html
+quicktour=/boot/system/documentation/welcome/en/quicktour.html
+localizedQuicktour=/boot/system/documentation/welcome/"$language"/quicktour.html
+localizedQuicktourBase=/boot/system/documentation/welcome/"$languageBase"/quicktour.html
 
-if [ -f $localizedQuicktourFile ]; then
-	open file://$localizedQuicktourFile
-elif [ -f $quicktourFile ]; then
-	open $quicktourFile
+if [ -f $localizedQuicktour ]; then
+	open file:$localizedQuicktour
+elif [ -f $localizedQuicktourBase ];
+	open file:$localizedQuicktourBase
+elif [ -f $quicktour ]; then
+	open $quicktour
 else
 	open $quicktourURL
 fi

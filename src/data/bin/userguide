@@ -1,13 +1,20 @@
 #!/bin/bash
 
+language=$(locale -l)
+# The locale can be a single 2 char language or in severall segments like en, se_SE or sr_Latn_ME
+# this tries to get the 2 char language code from longer locales as a fallback
+languageBase=$(echo $language | awk -F_ '{print $1}')
 userGuideURL="\
 	https://www.haiku-os.org/docs/userguide/en/contents.html"
 userGuideDir=/boot/system/documentation/userguide/
 userGuide=$userGuideDir/en/contents.html
-localizedUserGuide=$userGuideDir/"$LANG"/contents.html
+localizedUserGuide=$userGuideDir/"$language"/contents.html
+localizedUserGuideBase=$userGuideDir/"$languageBase"/contents.html
 
 if [ -f $localizedUserGuide ]; then
-	open file://$localizedUserGuide
+	open file:$localizedUserGuide
+elif [ -f $localizedUserGuideBase ]; then
+	open file:$localizedUserGuideBase
 elif [ -f $userGuide ]; then
 	open $userGuide
 else
