@@ -1,10 +1,11 @@
-1	catalan; valencian	x-vnd.Haiku-Expander	3300517306
+1	catalan; valencian	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Destinació
 Other	ExpanderPreferences		Altres
 Automatically show contents listing	ExpanderPreferences		Mostra automàticament la llista de continguts
 Expander	System name		Expandidora
 Expander: Choose destination	DirectoryFilePanel		Expandidora: trieu la destinació
 Set source…	ExpanderMenu		Estableix la font...
+OK	ExpanderWindow		D'acord
 The destination is not a folder.	ExpanderWindow		La destinació no és una carpeta.
 The folder was either moved, renamed or not supported.	ExpanderWindow		La carpeta s'ha mogut, se n'ha canviat de nom o no és compatible.
 Close window when done expanding	ExpanderPreferences		Tanca la finestra un cop feta l'expansió.

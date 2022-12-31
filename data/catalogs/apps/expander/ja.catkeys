@@ -1,10 +1,11 @@
-1	japanese	x-vnd.Haiku-Expander	3300517306
+1	japanese	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		解凍先
 Other	ExpanderPreferences		その他
 Automatically show contents listing	ExpanderPreferences		内容リストを自動的に表示
 Expander	System name		ファイル解凍
 Expander: Choose destination	DirectoryFilePanel		ファイル解凍: 解凍先の選択
 Set source…	ExpanderMenu		書庫ファイルの指定...
+OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		解凍先はフォルダーではありません。
 The folder was either moved, renamed or not supported.	ExpanderWindow		フォルダーは移動したか、名前が変更されたか、サポートされてないかのいずれかです。
 Close window when done expanding	ExpanderPreferences		解凍終了後ウィンドウを閉じる

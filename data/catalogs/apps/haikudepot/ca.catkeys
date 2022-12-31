@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-HaikuDepot	381023409
+1	catalan; valencian	x-vnd.Haiku-HaikuDepot	4143471163
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problema de baixada de les condicions d'ús
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		No s'ha pogut crear l'usuari nou.
@@ -166,6 +166,7 @@ Inactive	PackageListView		Inactiu
 Nickname:	UserLoginWindow		Sobrenom:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Se sincronitzen les metadades dels repositoris.
 OK	MainWindow		D'acord
+Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		Els usuaris han de tenir {0, plural, one{# any} other{# anys}} o més.
 Version %Code%	UserUsageConditions		Versió %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} other{# elements}}
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Es desinstal·la \"%PackageName%\"
