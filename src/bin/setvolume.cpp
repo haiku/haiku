@@ -71,27 +71,53 @@ main(int argc, char **argv)
 	float volume = 0.0;
 
 	if (argc > 1) {
-		if (strcmp(argv[1], "-m") == 0) {
+		if (strcmp(argv[1], "-m") == 0 || strcmp(argv[1], "--mute") == 0) {
+			int32 muted = 1;
+			mute->SetValue(&muted, sizeof(int32), system_time());
+			printf("Muted\n");
+			return 0;
+		} else if (strcmp(argv[1], "-u") == 0 || strcmp(argv[1], "--unmute") == 0) {
+			int32 muted = 0;
+			mute->SetValue(&muted, sizeof(int32), system_time());
+			printf("Unmuted\n");
+			return 0;
+		} else if (strcmp(argv[1], "-t") == 0 || strcmp(argv[1], "--togglemute") == 0) {
 			int32 muted = 0;
 			bigtime_t lastChange = 0;
 			size_t size = sizeof(int32);
 			mute->GetValue(&muted, &size, &lastChange);
 			muted = 1 - muted;
 			mute->SetValue(&muted, sizeof(int32), system_time());
+			printf("%s\n", muted ? "Muted" : "Unmuted");
+			return 0;
 		} else {
-			if (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "-d") == 0) {
+			if (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "-d") == 0
+				|| strcmp(argv[1], "--increase") == 0 || strcmp(argv[1], "--decrease") == 0) {
 				bigtime_t when;
 				size_t size = sizeof(volume);
 				gain->GetValue(&volume, &size, &when);
-				if (strcmp(argv[1], "-i") == 0)
-					volume += 3;
+				size_t step = 3;
+				if (argc > 2)
+					step = atoi(argv[2]);
+				if (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "--increase") == 0)
+					volume += step;
 				else
-					volume -= 3;
+					volume -= step;
 			} else {
 				char *end;
 				volume = strtod(argv[1], &end);
 				if (end == argv[1]) {
-					fprintf(stderr, "usage: %s [<volume> | -i | -d | -m ]\n", sProgramName);
+					fprintf(stderr,
+						"Usage: %s <volume> | [options]\n"
+						"Sets the system volume to the specified value in dB.\n"
+						"Alternatively there are these options:\n"
+						"  -m  --mute\n"
+						"  -u  --unmute\n"
+						"  -t  --togglemute\ttoggles muting\n"
+						"  -i  --increase x\tincreases volume by x dB\n"
+						"  -d  --decrease x\tdecreases volume by x dB\n"
+						"\t\t\tx defaults to 3 if not supplied\n" ,
+						sProgramName);
 					exit(1);
 				}
 			}
@@ -105,7 +131,6 @@ main(int argc, char **argv)
 			gain->SetValue(&volume, sizeof(volume), system_time());
 		}
 	}
-
 	bigtime_t when;
 	size_t size = sizeof(volume);
 	gain->GetValue(&volume, &size, &when);
