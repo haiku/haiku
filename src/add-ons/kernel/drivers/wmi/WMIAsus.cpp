@@ -125,7 +125,7 @@ WMIAsus::_EvaluateMethod(uint32 methodId, uint32 arg0, uint32 arg1,
 	uint32 *returnValue)
 {
 	CALLED();
-	uint32 params[] = { arg0, arg1 };
+	uint32 params[] = { arg0, arg1, 0, 0, 0 };
 	acpi_data inBuffer = { sizeof(params), params };
 	acpi_data outBuffer = { ACPI_ALLOCATE_BUFFER, NULL };
 	status_t status = wmi->evaluate_method(wmi_cookie, 0, methodId, &inBuffer,
