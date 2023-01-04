@@ -18,6 +18,6 @@ Addon <input>virtualkeyboard :
 	VirtualKeyboardInputDevice.cpp
 	VirtualKeyboardWindow.cpp
 
-	: be tracker input_server localestub shared $(TARGET_LIBSTDC++)
+	: be tracker input_server localestub shared [ TargetLibstdc++ ]
 ;
 
