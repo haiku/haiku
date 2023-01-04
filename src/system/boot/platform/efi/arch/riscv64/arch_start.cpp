@@ -119,16 +119,14 @@ arch_start_kernel(addr_t kernelEntry)
 	// A changing memory map shouldn't affect the generated page tables, as
 	// they only needed to know about the maximum address, not any specific
 	// entry.
+
 	dprintf("Calling ExitBootServices. So long, EFI!\n");
+	serial_disable();
 	while (true) {
 		if (kBootServices->ExitBootServices(kImage, map_key) == EFI_SUCCESS) {
-			// The console was provided by boot services, disable it.
-			stdout = NULL;
-			stderr = NULL;
-			// Also switch to legacy serial output
-			// (may not work on all systems)
-			serial_switch_to_legacy();
-			dprintf("Switched to legacy serial output\n");
+			// Disconnect from EFI serial_io / stdio services
+			serial_kernel_handoff();
+			dprintf("Unhooked from EFI serial services\n");
 			break;
 		}
 
@@ -144,6 +142,8 @@ arch_start_kernel(addr_t kernelEntry)
 	// Update EFI, generate final kernel physical memory map, etc.
 	arch_mmu_post_efi_setup(memory_map_size, memory_map,
 			descriptor_size, descriptor_version);
+
+	serial_enable();
 
 	dprintf("[PRE] SetSatp()\n");
 	SetSatp(satp);

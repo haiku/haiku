@@ -97,6 +97,10 @@ local archGenericSources =
 	msi.cpp
 	pic.cpp
 
+	# serial
+	debug_uart.cpp
+	debug_uart_8250.cpp
+
 	# paging
 	X86PagingMethod.cpp
 	X86PagingStructures.cpp

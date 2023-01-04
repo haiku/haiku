@@ -256,6 +256,8 @@ efi_main(efi_handle image, efi_system_table *systemTable)
 	acpi_init();
 #ifdef _BOOT_FDT_SUPPORT
 	dtb_init();
+	// Start serial a second time to give any uart from DTB a chance to start up
+	serial_enable();
 #endif
 	timer_init();
 	smp_init();
