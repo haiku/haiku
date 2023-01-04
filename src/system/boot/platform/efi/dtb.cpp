@@ -73,16 +73,16 @@ const struct supported_uarts {
 } kSupportedUarts[] = {
 	{ "ns16550a", UART_KIND_8250, &get_uart<DebugUART8250> },
 	{ "ns16550", UART_KIND_8250, &get_uart<DebugUART8250> },
+	{ "snps,dw-apb-uart", UART_KIND_8250, &get_uart<DebugUART8250> },
 #if defined(__riscv)
 	{ "sifive,uart0", UART_KIND_SIFIVE, &get_uart<ArchUARTSifive> },
 #elif defined(__ARM__)
 	{ "arm,pl011", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
-	{ "snps,dw-apb-uart", UART_KIND_8250, &get_uart<DebugUART8250> },
-	{ "brcm,bcm2835-aux-uart", UART_KIND_8250, &get_uart<DebugUART8250> }
+	{ "brcm,bcm2835-aux-uart", UART_KIND_8250, &get_uart<DebugUART8250> },
 #elif defined(__aarch64__)
 	{ "arm,pl011", UART_KIND_PL011, &get_uart<ArchUARTPL011> },
 	{ "fsl,s32-linflexuart", UART_KIND_LINFLEX, &get_uart<ArchUARTlinflex> },
-	{ "brcm,bcm2835-aux-uart", UART_KIND_8250, &get_uart<DebugUART8250> }
+	{ "brcm,bcm2835-aux-uart", UART_KIND_8250, &get_uart<DebugUART8250> },
 #endif
 };
 
