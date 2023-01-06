@@ -136,7 +136,6 @@ static s32 igc_init_phy_params_i225(struct igc_hw *hw)
 {
 	struct igc_phy_info *phy = &hw->phy;
 	s32 ret_val = IGC_SUCCESS;
-	u32 ctrl_ext;
 
 	DEBUGFUNC("igc_init_phy_params_i225");
 
@@ -155,10 +154,10 @@ static s32 igc_init_phy_params_i225(struct igc_hw *hw)
 
 	phy->ops.acquire	= igc_acquire_phy_base;
 	phy->ops.check_reset_block = igc_check_reset_block_generic;
-	phy->ops.commit		= igc_phy_sw_reset_generic;
 	phy->ops.release	= igc_release_phy_base;
-
-	ctrl_ext = IGC_READ_REG(hw, IGC_CTRL_EXT);
+	phy->ops.reset		= igc_phy_hw_reset_generic;
+	phy->ops.read_reg	= igc_read_phy_reg_gpy;
+	phy->ops.write_reg	= igc_write_phy_reg_gpy;
 
 	/* Make sure the PHY is in a good state. Several people have reported
 	 * firmware leaving the PHY's page select register set to something
@@ -169,23 +168,8 @@ static s32 igc_init_phy_params_i225(struct igc_hw *hw)
 	if (ret_val)
 		goto out;
 
-	IGC_WRITE_REG(hw, IGC_CTRL_EXT, ctrl_ext);
-	phy->ops.read_reg = igc_read_phy_reg_gpy;
-	phy->ops.write_reg = igc_write_phy_reg_gpy;
-
 	ret_val = igc_get_phy_id(hw);
-	/* Verify phy id and set remaining function pointers */
-	switch (phy->id) {
-	case I225_I_PHY_ID:
-		phy->type		= igc_phy_i225;
-		phy->ops.set_d0_lplu_state = igc_set_d0_lplu_state_i225;
-		phy->ops.set_d3_lplu_state = igc_set_d3_lplu_state_i225;
-		/* TODO - complete with GPY PHY information */
-		break;
-	default:
-		ret_val = -IGC_ERR_PHY;
-		goto out;
-	}
+	phy->type = igc_phy_i225;
 
 out:
 	return ret_val;

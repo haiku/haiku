@@ -463,12 +463,12 @@ igc_isc_rxd_pkt_get(void *arg, if_rxd_info_t ri)
 	struct rx_ring *rxr = &que->rxr;
 	union igc_adv_rx_desc *rxd;
 
-	uint16_t pkt_info, len, vtag;
+	uint16_t pkt_info, len;
 	uint32_t ptype, staterr;
 	int i, cidx;
 	bool eop;
 
-	staterr = i = vtag = 0;
+	staterr = i = 0;
 	cidx = ri->iri_cidx;
 
 	do {
@@ -486,8 +486,6 @@ igc_isc_rxd_pkt_get(void *arg, if_rxd_info_t ri)
 
 		rxd->wb.upper.status_error = 0;
 		eop = ((staterr & IGC_RXD_STAT_EOP) == IGC_RXD_STAT_EOP);
-
-		vtag = le16toh(rxd->wb.upper.vlan);
 
 		/* Make sure bad packets are discarded */
 		if (eop && ((staterr & IGC_RXDEXT_STATERR_RXE) != 0)) {
@@ -517,9 +515,8 @@ igc_isc_rxd_pkt_get(void *arg, if_rxd_info_t ri)
 	if ((scctx->isc_capenable & IFCAP_RXCSUM) != 0)
 		igc_rx_checksum(staterr, ri, ptype);
 
-	if ((scctx->isc_capenable & IFCAP_VLAN_HWTAGGING) != 0 &&
-	    (staterr & IGC_RXD_STAT_VP) != 0) {
-		ri->iri_vtag = vtag;
+	if (staterr & IGC_RXD_STAT_VP) {
+		ri->iri_vtag = le16toh(rxd->wb.upper.vlan);
 		ri->iri_flags |= M_VLANTAG;
 	}
 

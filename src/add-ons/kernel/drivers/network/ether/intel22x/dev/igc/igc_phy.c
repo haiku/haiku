@@ -26,7 +26,6 @@ void igc_init_phy_ops_generic(struct igc_hw *hw)
 	phy->ops.init_params = igc_null_ops_generic;
 	phy->ops.acquire = igc_null_ops_generic;
 	phy->ops.check_reset_block = igc_null_ops_generic;
-	phy->ops.commit = igc_null_ops_generic;
 	phy->ops.force_speed_duplex = igc_null_ops_generic;
 	phy->ops.get_info = igc_null_ops_generic;
 	phy->ops.set_page = igc_null_set_page;
@@ -147,14 +146,13 @@ s32 igc_get_phy_id(struct igc_hw *hw)
 		return ret_val;
 
 	phy->id = (u32)(phy_id << 16);
-	usec_delay(20);
+	usec_delay(200);
 	ret_val = phy->ops.read_reg(hw, PHY_ID2, &phy_id);
 	if (ret_val)
 		return ret_val;
 
 	phy->id |= (u32)(phy_id & PHY_REVISION_MASK);
 	phy->revision = (u32)(phy_id & ~PHY_REVISION_MASK);
-
 
 	return IGC_SUCCESS;
 }
@@ -312,9 +310,8 @@ static s32 igc_phy_setup_autoneg(struct igc_hw *hw)
 			return ret_val;
 	}
 
-	if ((phy->autoneg_mask & ADVERTISE_2500_FULL) &&
-	    hw->phy.id == I225_I_PHY_ID) {
-	/* Read the MULTI GBT AN Control Register - reg 7.32 */
+	if (phy->autoneg_mask & ADVERTISE_2500_FULL) {
+		/* Read the MULTI GBT AN Control Register - reg 7.32 */
 		ret_val = phy->ops.read_reg(hw, (STANDARD_AN_REG_MASK <<
 					    MMD_DEVADDR_SHIFT) |
 					    ANEG_MULTIGBT_AN_CTRL,
@@ -453,8 +450,7 @@ static s32 igc_phy_setup_autoneg(struct igc_hw *hw)
 		ret_val = phy->ops.write_reg(hw, PHY_1000T_CTRL,
 					     mii_1000t_ctrl_reg);
 
-	if ((phy->autoneg_mask & ADVERTISE_2500_FULL) &&
-	    hw->phy.id == I225_I_PHY_ID)
+	if (phy->autoneg_mask & ADVERTISE_2500_FULL)
 		ret_val = phy->ops.write_reg(hw,
 					     (STANDARD_AN_REG_MASK <<
 					     MMD_DEVADDR_SHIFT) |
@@ -592,7 +588,7 @@ s32 igc_setup_copper_link_generic(struct igc_hw *hw)
  *  disable auto-negotiation, configure duplex, configure speed, configure
  *  the collision distance, write configuration to CTRL register.  The
  *  caller must write to the PHY_CONTROL register for these settings to
- *  take affect.
+ *  take effect.
  **/
 void igc_phy_force_speed_duplex_setup(struct igc_hw *hw, u16 *phy_ctrl)
 {
@@ -843,37 +839,6 @@ s32 igc_phy_has_link_generic(struct igc_hw *hw, u32 iterations,
 	}
 
 	*success = (i < iterations);
-
-	return ret_val;
-}
-
-/**
- *  igc_phy_sw_reset_generic - PHY software reset
- *  @hw: pointer to the HW structure
- *
- *  Does a software reset of the PHY by reading the PHY control register and
- *  setting/write the control register reset bit to the PHY.
- **/
-s32 igc_phy_sw_reset_generic(struct igc_hw *hw)
-{
-	s32 ret_val;
-	u16 phy_ctrl;
-
-	DEBUGFUNC("igc_phy_sw_reset_generic");
-
-	if (!hw->phy.ops.read_reg)
-		return IGC_SUCCESS;
-
-	ret_val = hw->phy.ops.read_reg(hw, PHY_CONTROL, &phy_ctrl);
-	if (ret_val)
-		return ret_val;
-
-	phy_ctrl |= MII_CR_RESET;
-	ret_val = hw->phy.ops.write_reg(hw, PHY_CONTROL, phy_ctrl);
-	if (ret_val)
-		return ret_val;
-
-	usec_delay(1);
 
 	return ret_val;
 }
