@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	1865982782
+1	hungarian	x-vnd.Haiku-HaikuDepot	1680585310
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Probléma lépett fel a felhasználási feltételek letöltésekor
 Available packages	MainWindow		Elérhető csomagok
 It was not possible to create the new user.	UserLoginWindow		Nem sikerült létrehozni a felhasználót.
@@ -48,7 +48,9 @@ All packages	PackageListView		Minden csomag
 Send	RatePackageWindow		Küldés
 Start package daemon	App		Csomag démon indítása
 There are problems in the supplied data:	UserLoginWindow		Hibás adatok lettek megadva:
+The user '%Nickname%' has not agreed to any usage conditions.	UserUsageConditions		A felhasználó (%Nickname%) nem fogadta el a felhasználási feltételeket.
 Usage conditions download problem	UserLoginWindow		Hiba történt a felhasználási feltételek letöltésekor
+install package %s from repository %s\n	PackageResult	Don't change '%s' variables	%s csomag telepítése %s tárolóból\n
 Package daemon problem	App		Csomagkezelő hiba
 No	MainWindow		Nem
 Repository	PackageListView		Tároló

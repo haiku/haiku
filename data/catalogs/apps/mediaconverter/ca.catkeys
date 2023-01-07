@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-MediaConverter	2816184527
+1	catalan; valencian	x-vnd.Haiku-MediaConverter	338319367
 Input file not recognized as Audio or Video	MediaConverter		No es reconeix el fitxer d’entrada com a àudio ni vídeo.
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Qualitat del vídeo: %3d%%
@@ -12,6 +12,7 @@ MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+: directori on desa
 Error creating video.	MediaConverter		Error en crear el vídeo.
 Cancelling	MediaConverter		Es cancel·la
 None available	Audio codecs		Cap de disponible
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		El fitxer té diverses pistes d'àudio o vídeo. Només es convertirà la primera de cadascuna.
 No file selected	MediaConverter-FileInfo		Cap fitxer seleccionat
 High	MediaConverter		Alt
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{El fitxer no s'ha reconegut com a fitxer multimèdia compatible:} other{# fitxers no s'han reconegut com a fitxers multimèdia compatibles:}}
@@ -26,6 +27,7 @@ Error loading a file	MediaConverter		Error en carregar un fitxer
 Encoder parameters	MediaConverter-EncoderWindow		Paràmetres del codificador
 Open…	Menu		Obre...
 Audio encoding:	MediaConverter		Codificació de l'àudio:
+Multi-track file detected	MediaConverter		S'ha detectat un fitxer multipista.
 Audio quality: %3d%%	MediaConverter		Qualitat de l'àudio: %3d%%
 Cancelling…	MediaConverter		Es cancel·la...
 Output file '%filename' created	MediaConverter		S'ha creat el fitxer de sortida %filename.
@@ -63,6 +65,7 @@ File	Menu		Fitxer
 Video quality not supported	MediaConverter		No s'admet la qualitat del vídeo.
 Select this folder	MediaConverter		Selecciona aquesta carpeta
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz, canal %ld
+Understood	MediaConverter		Entès
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Sense vídeo
 Continue	MediaConverter		Continua

@@ -1,10 +1,11 @@
-1	french	x-vnd.Haiku-Expander	3300517306
+1	french	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Destination
 Other	ExpanderPreferences		Autre
 Automatically show contents listing	ExpanderPreferences		Montrer l’inventaire automatiquement
 Expander	System name		Décompresseur
 Expander: Choose destination	DirectoryFilePanel		Expander : Choix de la destination
 Set source…	ExpanderMenu		Choisir la source…
+OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		La destination n’est pas un dossier.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Le dossier a été déplacé, renommé, ou il n’est pas pris en charge.
 Close window when done expanding	ExpanderPreferences		Fermer la fenêtre après l’extraction

@@ -4,16 +4,16 @@ Negative:	TimeFormatSettings		Negatief:
 Language	Locale Preflet Window		Taal
 Short format:	TimeFormatSettings		Korte notatie:
 24 hour	TimeFormatSettings		24-uurs
-Locale	Locale Preflet Window		Lokaal
+Locale	Locale Preflet Window		Taal en Regio
 Time	TimeFormatSettings		Tijd
 Defaults	Locale Preflet Window		Standaardwaarden
-Locale	System name		Lokaal
+Locale	System name		Taal en Regio
 Date	TimeFormatSettings		Datum
 OK	Locale Preflet Window		Oké
 Long format:	TimeFormatSettings		Lange notatie:
 Numbers	TimeFormatSettings		Nummers
 Available languages	Locale Preflet Window		Beschikbare talen
-Locale	Locale Preflet		Locale
+Locale	Locale Preflet		Taal en Regio
 Unable to find the available languages! You can't use this preflet!	Locale Preflet Window		Beschikbare talen werden niet gevonden. U kunt deze preflet niet gebruiken.
 Formatting	Locale Preflet Window		Opmaak
 Use month/day-names from preferred language	TimeFormatSettings		Gebruik maand/dag-namen van de verkozen taal

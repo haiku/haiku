@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-MediaConverter	3002350450
+1	german	x-vnd.Haiku-MediaConverter	524485290
 Input file not recognized as Audio or Video	MediaConverter		Eingabedatei nicht als Audio oder Video erkannt.
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2fBilder/s
 Video quality: %3d%%	MediaConverter		Videoqualität: %3d%%
@@ -12,6 +12,7 @@ MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
 Error creating video.	MediaConverter		Fehler beim Erstellen des Videos.
 Cancelling	MediaConverter		Abbruch
 None available	Audio codecs		Keine verfügbar
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Die Datei enthält mehrere Audio- oder Videospuren, nur die jeweils ersten Spuren werden konvertiert.
 No file selected	MediaConverter-FileInfo		Keine Datei ausgewählt
 High	MediaConverter		Hoch
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Die Datei wurde nicht als unterstützte Mediendatei erkannt:} other{# Dateien wurden nicht als unterstützte Mediendateien erkannt:}}
@@ -26,6 +27,7 @@ Error loading a file	MediaConverter		Fehler beim Laden einer Datei
 Encoder parameters	MediaConverter-EncoderWindow		Encoder-Parameter
 Open…	Menu		Öffnen …
 Audio encoding:	MediaConverter		Audiokodierung:
+Multi-track file detected	MediaConverter		Datei mit mehreren Spuren erkannt
 Audio quality: %3d%%	MediaConverter		Tonqualität: %3d%%
 Cancelling…	MediaConverter		Wird abgebrochen …
 Output file '%filename' created	MediaConverter		Ausgabedatei '%filename' erstellt
@@ -62,6 +64,7 @@ File	Menu		Datei
 Video quality not supported	MediaConverter		Videoqualität nicht einstellbar
 Select this folder	MediaConverter		Diesen Ordner wählen
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld Kanal
+Understood	MediaConverter		Verstanden
 %d bit 	MediaFileInfo		%d Bit
 No video	Video codecs list		Keine Videospur
 Continue	MediaConverter		Fortsetzen
