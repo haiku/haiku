@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
- * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai. 
+ * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files or portions
@@ -82,6 +82,9 @@
 #define END_KEY_CODE "\033OF"
 #define PAGE_UP_KEY_CODE "\033[5~"
 #define PAGE_DOWN_KEY_CODE "\033[6~"
+
+#define BEGIN_BRACKETED_PASTE_CODE "\033[200~"
+#define END_BRACKETED_PASTE_CODE "\033[201~"
 
 //#define IS_DOWN_KEY(x) (info.key_states[(x) / 8] & key_state_table[(x) % 8])
 #define IS_DOWN_KEY(x) \

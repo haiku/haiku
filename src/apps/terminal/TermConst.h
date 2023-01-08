@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Haiku.
+ * Copyright 2001-2023, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
@@ -81,6 +81,7 @@ static const uint32 MSG_SET_TERMINAL_COLORS				= 'setc';
 static const uint32 MSG_RESET_TERMINAL_COLORS			= 'rstc';
 static const uint32 MSG_QUIT_TERMNAL					= 'qutt';
 static const uint32 MSG_ENABLE_META_KEY					= 'emtk';
+static const uint32 MSG_ENABLE_BRACKETED_PASTE			= 'ebkp';
 static const uint32 MSG_REPORT_MOUSE_EVENT				= 'mous';
 static const uint32 MSG_SAVE_WINDOW_POSITION			= 'swps';
 static const uint32 MSG_MOVE_TAB_LEFT					= 'mvtl';

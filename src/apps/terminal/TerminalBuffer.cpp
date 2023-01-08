@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All rights reserved.
+ * Copyright 2013-2023, Haiku, Inc. All rights reserved.
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  *
@@ -108,6 +108,17 @@ TerminalBuffer::EnableMetaKeySendsEscape(bool enable)
 	if (fListenerValid) {
 		BMessage message(MSG_ENABLE_META_KEY);
 		message.AddBool("enableMetaKeySendsEscape", enable);
+		fListener.SendMessage(&message);
+	}
+}
+
+
+void
+TerminalBuffer::EnableBracketedPasteMode(bool enable)
+{
+	if (fListenerValid) {
+		BMessage message(MSG_ENABLE_BRACKETED_PASTE);
+		message.AddBool("enableBracketedPaste", enable);
 		fListener.SendMessage(&message);
 	}
 }

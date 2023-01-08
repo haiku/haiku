@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014, Haiku, Inc.
+ * Copyright 2001-2023, Haiku, Inc. All rights reserved.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -316,6 +316,7 @@ TermView::_InitObject(const ShellParameters& shellParameters)
 	fUseOptionAsMetaKey = false;
 	fInterpretMetaKey = true;
 	fMetaKeySendsEscape = true;
+	fUseBracketedPaste = false;
 	fReportX10MouseEvent = false;
 	fReportNormalMouseEvent = false;
 	fReportButtonMouseEvent = false;
@@ -922,7 +923,13 @@ TermView::Paste(BClipboard *clipboard)
 		ssize_t numBytes;
 		if (clipMsg->FindData("text/plain", B_MIME_TYPE,
 				(const void**)&text, &numBytes) == B_OK ) {
+			if (fUseBracketedPaste)
+				fShell->Write(BEGIN_BRACKETED_PASTE_CODE, strlen(BEGIN_BRACKETED_PASTE_CODE));
+
 			_WritePTY(text, numBytes);
+
+			if (fUseBracketedPaste)
+				fShell->Write(END_BRACKETED_PASTE_CODE, strlen(END_BRACKETED_PASTE_CODE));
 		}
 
 		clipboard->Unlock();
@@ -1890,6 +1897,13 @@ TermView::MessageReceived(BMessage *message)
 
 			if (message->FindBool("enableMetaKeySendsEscape", &enable) == B_OK)
 				fMetaKeySendsEscape = enable;
+			break;
+		}
+		case MSG_ENABLE_BRACKETED_PASTE:
+		{
+			bool enable;
+			if (message->FindBool("enableBracketedPaste", &enable) == B_OK)
+				fUseBracketedPaste = enable;
 			break;
 		}
 		case MSG_REPORT_MOUSE_EVENT:

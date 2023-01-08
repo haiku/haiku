@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Haiku, Inc. All rights reserved.
+ * Copyright 2013-2023, Haiku, Inc. All rights reserved.
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  *
@@ -56,6 +56,7 @@ public:
 
 			void				EnableInterpretMetaKey(bool enable);
 			void				EnableMetaKeySendsEscape(bool enable);
+			void				EnableBracketedPasteMode(bool enable);
 
 			void				ReportX10MouseEvent(bool report);
 			void				ReportNormalMouseEvent(bool report);
