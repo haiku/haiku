@@ -41,7 +41,7 @@
 
 #define DUMP_FEATURE_STRING	1
 #define DUMP_CPU_TOPOLOGY	1
-#define DUMP_CPU_PATCHLEVEL	1
+#define DUMP_CPU_PATCHLEVEL_TYPE	1
 
 
 /* cpu vendor info */
@@ -347,7 +347,7 @@ x86_init_fpu(void)
 static void
 dump_feature_string(int currentCPU, cpu_ent* cpu)
 {
-	char features[512];
+	char features[768];
 	features[0] = 0;
 
 	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FPU)
@@ -612,6 +612,8 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "rdpid ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_SGX_LC)
 		strlcat(features, "sgx_lc ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_HYBRID_CPU)
+		strlcat(features, "hybrid ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_IBRS)
 		strlcat(features, "ibrs ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_STIBP)
@@ -1253,6 +1255,34 @@ load_microcode(int currentCPU)
 }
 
 
+static uint8
+get_hybrid_cpu_type()
+{
+	cpu_ent* cpu = get_cpu_struct();
+	if ((cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_HYBRID_CPU) == 0)
+		return 0;
+
+#define X86_HYBRID_CPU_TYPE_ID_SHIFT       24
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 0x1a, 0);
+	return cpuid.regs.eax >> X86_HYBRID_CPU_TYPE_ID_SHIFT;
+}
+
+
+static const char*
+get_hybrid_cpu_type_string(uint8 type)
+{
+	switch (type) {
+		case 0x20:
+			return "Atom";
+		case 0x40:
+			return "Core";
+		default:
+			return "";
+	}
+}
+
+
 static void
 detect_cpu(int currentCPU, bool full = true)
 {
@@ -1415,12 +1445,16 @@ detect_cpu(int currentCPU, bool full = true)
 	else if (cpu->arch.vendor == VENDOR_AMD)
 		detect_amd_patch_level(cpu);
 
+	cpu->arch.hybrid_type = get_hybrid_cpu_type();
+
 #if DUMP_FEATURE_STRING
 	dump_feature_string(currentCPU, cpu);
 #endif
-#if DUMP_CPU_PATCHLEVEL
-	dprintf("CPU %d: patch_level %" B_PRIx32 "\n", currentCPU,
-		cpu->arch.patch_level);
+#if DUMP_CPU_PATCHLEVEL_TYPE
+	dprintf("CPU %d: patch_level %" B_PRIx32 "%s%s\n", currentCPU,
+		cpu->arch.patch_level,
+		cpu->arch.hybrid_type != 0 ? ", hybrid type ": "",
+		get_hybrid_cpu_type_string(cpu->arch.hybrid_type));
 #endif
 }
 

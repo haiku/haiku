@@ -356,6 +356,7 @@
 // https://en.wikipedia.org/wiki/CPUID#EAX=7,_ECX=0:_Extended_Features
 #define IA32_FEATURE_AVX512_4VNNIW	(1 << 2) // AVX-512 4-register Neural Network Instructions
 #define IA32_FEATURE_AVX512_4FMAPS	(1 << 3) // AVX-512 4-register Multiply Accumulation Single precision
+#define IA32_FEATURE_HYBRID_CPU		(1 << 15)	// CPUs are of several types
 #define IA32_FEATURE_IBRS			(1 << 26)	// IBRS / IBPB Speculation Control
 #define IA32_FEATURE_STIBP			(1 << 27)	// STIBP Speculation Control
 #define IA32_FEATURE_L1D_FLUSH		(1 << 28)	// L1D_FLUSH supported
@@ -542,6 +543,7 @@ typedef struct arch_cpu_info {
 	int					model;
 	int					extended_model;
 	uint32				patch_level;
+	uint8				hybrid_type;
 
 	uint32				logical_apic_id;
 
