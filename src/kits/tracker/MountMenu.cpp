@@ -166,7 +166,6 @@ AddMenuItemVisitor::Visit(BPartition* partition, int32 level)
 MountMenu::MountMenu(const char* name)
 	: BMenu(name)
 {
-	SetFont(be_plain_font);
 }
 
 
