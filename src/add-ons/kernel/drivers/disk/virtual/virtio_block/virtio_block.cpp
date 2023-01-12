@@ -140,8 +140,8 @@ get_geometry(virtio_block_handle* handle, device_geometry* geometry)
 	geometry->read_only = ((info->features & VIRTIO_BLK_F_RO) != 0);
 	geometry->write_once = false;
 
-	TRACE("virtio_block: get_geometry(): %ld, %ld, %ld, %ld, %d, %d, %d, %d\n",
-		geometry->bytes_per_sector, geometry->sectors_per_track,
+	TRACE("virtio_block: get_geometry(): %" B_PRIu32 ", %" B_PRIu32 ", %" B_PRIu32 ", %" B_PRIu32
+		", %d, %d, %d, %d\n", geometry->bytes_per_sector, geometry->sectors_per_track,
 		geometry->cylinder_count, geometry->head_count, geometry->device_type,
 		geometry->removable, geometry->read_only, geometry->write_once);
 
@@ -405,14 +405,14 @@ virtio_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 	virtio_block_handle* handle = (virtio_block_handle*)cookie;
 	virtio_block_driver_info* info = handle->info;
 
-	TRACE("ioctl(op = %ld)\n", op);
+	TRACE("ioctl(op = %" B_PRIu32 ")\n", op);
 
 	switch (op) {
 		case B_GET_MEDIA_STATUS:
 		{
 			*(status_t *)buffer = info->media_status;
 			info->media_status = B_OK;
-			TRACE("B_GET_MEDIA_STATUS: 0x%08lx\n", *(status_t *)buffer);
+			TRACE("B_GET_MEDIA_STATUS: 0x%08" B_PRIx32 "\n", *(status_t *)buffer);
 			return B_OK;
 			break;
 		}
@@ -482,7 +482,7 @@ virtio_block_set_capacity(virtio_block_driver_info* info)
 		physicalBlockSize = blockSize * (1 << info->config.topology.physical_block_exp);
 	}
 
-	TRACE("set_capacity(device = %p, capacity = %Ld, blockSize = %ld)\n",
+	TRACE("set_capacity(device = %p, capacity = %" B_PRIu64 ", blockSize = %" B_PRIu32 ")\n",
 		info, capacity, blockSize);
 
 	if (info->block_size == blockSize && info->capacity == capacity)
