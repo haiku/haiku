@@ -100,10 +100,11 @@ const struct supported_device {
 	{0x015a, INTEL_MODEL_IVBGS, "IvyBridge Server GT1"},
 	{0x016a, INTEL_MODEL_IVBGS, "IvyBridge Server GT2"},
 
-	{0x0412, INTEL_MODEL_HAS, "Haswell Desktop"},
-	{0x0416, INTEL_MODEL_HASM, "Haswell Mobile"},
-	{0x0d26, INTEL_MODEL_HASM, "Haswell Mobile"},
-	{0x0a16, INTEL_MODEL_HASM, "Haswell Mobile"},
+	{0x0a06, INTEL_MODEL_HASM, "Haswell ULT GT1 Mobile"},
+	{0x0412, INTEL_MODEL_HAS, "Haswell GT2 Desktop"},
+	{0x0416, INTEL_MODEL_HASM, "Haswell GT2 Mobile"},
+	{0x0a16, INTEL_MODEL_HASM, "Haswell ULT GT2 Mobile"},
+	{0x0d26, INTEL_MODEL_HASM, "Haswell CRW GT3 Mobile"},
 
 #if 0
 	{0x0f30, INTEL_MODEL_VLVM, "ValleyView Mobile"},

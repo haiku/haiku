@@ -111,10 +111,11 @@ const struct supported_device {
 	{0x0158, 0x015a, INTEL_MODEL_IVBGS, "IvyBridge Server GT1"},
 	{0x0158, 0x016a, INTEL_MODEL_IVBGS, "IvyBridge Server GT2"},
 
-	{0x0c00, 0x0412, INTEL_MODEL_HAS, "Haswell Desktop"},
-	{0x0c04, 0x0416, INTEL_MODEL_HASM, "Haswell Mobile"},
-	{0x0d04, 0x0d26, INTEL_MODEL_HASM, "Haswell Mobile"},
-	{0x0a04, 0x0a16, INTEL_MODEL_HASM, "Haswell Mobile"},
+	{0x0a04, 0x0a06, INTEL_MODEL_HASM, "Haswell ULT GT1 Mobile"},
+	{0x0c00, 0x0412, INTEL_MODEL_HAS, "Haswell GT2 Desktop"},
+	{0x0c04, 0x0416, INTEL_MODEL_HASM, "Haswell GT2 Mobile"},
+	{0x0a04, 0x0a16, INTEL_MODEL_HASM, "Haswell ULT GT2 Mobile"},
+	{0x0d04, 0x0d26, INTEL_MODEL_HASM, "Haswell CRW GT3 Mobile"},
 
 #if 0
 	// XXX: 0x0f00 only confirmed on 0x0f30, 0x0f31
