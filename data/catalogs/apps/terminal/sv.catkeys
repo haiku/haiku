@@ -1,83 +1,66 @@
-1	swedish	x-vnd.Haiku-Terminal	3440179729
-ANSI cyan color	Terminal AppearancePrefView		ANSI cyan färg
+1	swedish	x-vnd.Haiku-Terminal	2536107739
 Close other tabs	Terminal TermWindow		Stäng övriga flikar
 Insert path	Terminal TermView		Lägg till sökväg
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalen kunde inte starta skalet.
 Text encoding	Terminal TermWindow		Teckenuppsättning
-ANSI blue color	Terminal AppearancePrefView		ANSI blå färg
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Redigera
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,  --help, skriva ut denna hjälp\n  -t,  --title, ange fönstertitel\n  -f,  --fullscreen, starta helskärm\n  -w,  --working-directory, ställ in initial arbetskatalog\n
 Select all	Terminal TermWindow		Markera allt
 Confirm exit if active programs exist	Terminal AppearancePrefView		Bekräfta avslutning om aktiva program finns
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDen aktiva processens arbetskatalog i denna tab.\n\t\t\tTeller maximalt antal sökvägskomponenter\n\t\t\tkan anges som. '%2d' för som mest två komponenter.\n\t%T\t-\tTerminal programmets namn på det valda språket.\n\t%e\t-\tEnkodingen av den valda tabben . Inte visad för UTF-8.\n\t%i\t-\tIndexet för fönstret.\n\t%p\t-\tNamnet på den aktiva processen i den valda tabben.\n\t%t\t-\tTiteln på den valda tabben.
-ANSI bright green color	Terminal AppearancePrefView		ANSI ljusgrön färg
 Copy	Terminal TermWindow		Kopiera
-ANSI white color	Terminal AppearancePrefView		ANSI vit färg
 Edit tab title…	Terminal TermWindow		Redigera fliktitel...
-Settings	Terminal TermWindow		Inställningar
 Print	Terminal TermWindow		Skriv ut
+Settings	Terminal TermWindow		Inställningar
 %app% settings	Terminal PrefWindow	window title	%app% inställningar
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tDen aktuella arbetskatalogen för den aktiva processen.\n\t\t\tValfritt kan det maximala antalet sökvägskomponenter vara\n\t\t\tspecificerat. T.ex. '%2d' för högst två komponenter.\n\t%i\t-\tIndex för fliken.\n\t%e\t-\tKodningen av den aktuella fliken. Visas inte för UTF-8.\n\t%p\t-\tNamnet på den aktiva processen.
-ANSI black color	Terminal AppearancePrefView		ANSI svart färg
 Use default	Terminal SetTitleWindow		Använd förvald
 Close tab	Terminal TermWindow		Stäng flik
-Selected background	Terminal AppearancePrefView		Vald bakgrund
 Error!	Terminal getString		Fel!
-Set tab title	Terminal TermWindow		Ange fliktitel
 Appearance	Terminal PrefWindow		Utseende
-ANSI bright yellow color	Terminal AppearancePrefView		ANSI ljusgul färg
-Encoding:	Terminal AppearancePrefView		Kodning:
+Set tab title	Terminal TermWindow		Ange fliktitel
 Create link here	Terminal TermView		Skapa länk här
-Custom	Terminal AppearancePrefView	Window size	Anpassad
-Selected text	Terminal AppearancePrefView		Markerad text
+Encoding:	Terminal AppearancePrefView		Kodning:
 Change directory	Terminal TermView		Byt katalog
-ANSI magenta color	Terminal AppearancePrefView		ANSI magenta färg
+Custom	Terminal AppearancePrefView	Window size	Anpassad
 Page setup…	Terminal TermWindow		Sidinställningar...
-Defaults	Terminal PrefWindow		Standard
 Cancel	Terminal TermView		Avbryt
+Defaults	Terminal PrefWindow		Standard
 Revert	Terminal PrefWindow		Återställ
-ANSI bright magenta color	Terminal AppearancePrefView		ANSI ljus magenta färg
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
-ANSI bright cyan color	Terminal AppearancePrefView		ANSI ljus cyan färg
-Find next	Terminal TermWindow		Sök nästa
 Use selection	Terminal FindWindow		Använd markering
+Find next	Terminal TermWindow		Sök nästa
 Copy link location	Terminal TermView		Kopiera länkplats
 Window title:	Terminal AppearancePrefView		Fönstertitel:
 New tab	Terminal TermWindow		Ny flik
-ANSI bright blue color	Terminal AppearancePrefView		ANSI ljusblå färg
 Allow bold text	Terminal AppearancePrefView		Tillåt fetstil
 Window title…	Terminal TermWindow		Fönstertitel...
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan inte utföra \"%command\:\n\t%error
 Open path	Terminal TermView		Öppna sökväg
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan inte utföra \"%command\:\n\t%error
 Terminal	System name		Terminal
-ANSI yellow color	Terminal AppearancePrefView		ANSI gul färg
-Font size	Terminal TermWindow		Typsnittsstorlek
 Custom	Terminal colors scheme		Anpassad
 Really close?	Terminal TermWindow		Vill du stänga?
+Font size	Terminal TermWindow		Typsnittsstorlek
 OK	Terminal TermApp		OK
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Processen \"%1\" körs fortfarande.\nOm du stänger Terminalen kommer processen att termineras.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Okänt alternativ \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Fliktitel:
 Text not found.	Terminal TermWindow		Text hittades inte.
-Find failed	Terminal TermWindow		Sökning misslyckades
 Match word	Terminal FindWindow		Matcha ord
-Color scheme:	Terminal AppearancePrefView		Färgschema:
 New Terminal	Terminal TermWindow		Ny terminal
+Find failed	Terminal TermWindow		Sökning misslyckades
 Quit	Terminal TermWindow		Avsluta
-Find previous	Terminal TermWindow		Sök föregående
 Match case	Terminal FindWindow		Matcha gemener/versaler
+Find previous	Terminal TermWindow		Sök föregående
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Mönster som specificerar tab titel. Följande platshållare\nkan användas:
 Close	Terminal TermWindow		Stäng
 Save to file…	Terminal PrefWindow		Spara till fil...
-Background	Terminal AppearancePrefView		Bakgrund
-ANSI green color	Terminal AppearancePrefView		ANSI grön färg
 Copy path	Terminal TermView		Kopiera sökväg
 Window size	Terminal TermWindow		Fönsterstorlek
 Copy absolute path	Terminal TermView		Kopiera absolut sökväg
 Cancel	Terminal TermWindow		Avbryt
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Processen \"%1\" körs fortfarande.\nOm du stänger fliken kommer processen att termineras.
-Cursor	Terminal AppearancePrefView		Markör
 Full screen	Terminal TermWindow		Helskärm
 Shell 	Terminal TermWindow		Skal
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tTecknet  '%'.\n\t%<\t-\tStartar en section som bara visas om en platshållare\n\t\t\tefter är tom.\n\t%>\t-\tStartar en section som bara visas om en platshållare\n\t\t\tär mellan föregående %< section och denna är tom.\n\t%-\t-\tAvslutar en %< eller %> section.\n\nAlla tecken som inte är nummer mellan '%' och formaterings bokstaven kommer att ändras till ett mellanslag\nOm platshållaren inte är tom kommer det att läggas på en %< section.
@@ -87,32 +70,25 @@ Window size:	Terminal AppearancePrefView		Fönsterstorlek:
 Switch Terminals	Terminal TermWindow		Växla terminal
 Decrease	Terminal TermWindow		Minska
 Settings…	Terminal TermWindow		Inställningar...
-ANSI bright white color	Terminal AppearancePrefView		ANSI ljus vit färg
-Blinking cursor	Terminal AppearancePrefView		Blinkande markör
 Cancel	Terminal SetTitleWindow		Avbryt
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mönstret bestämmer fönstrets namn. Följande alternativ finns:\n
+Blinking cursor	Terminal AppearancePrefView		Blinkande markör
 Use text:	Terminal FindWindow		Använd text:
 Close active tab	Terminal TermWindow		Stäng aktiv flik
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mönstret bestämmer fönstrets namn. Följande alternativ finns:\n
 Save as default	Terminal TermWindow		Spara som standard
 Nothing is selected.	Terminal TermWindow		Ingenting markerat.
-ANSI red color	Terminal AppearancePrefView		ANSI röd färg
 Use left Option as Meta key	Terminal AppearancePrefView		Använd vänster Alternativ som Meta-tangent
 Find	Terminal FindWindow		Sök
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Mönstret bestämmer namn på den aktiva fliken. Följande alternativ finns:\n
 Font:	Terminal AppearancePrefView		Typsnitt:
 Paste	Terminal TermWindow		Klistra in
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Mönster som specificerar fönster titel. Följande platshållare\nkan användas:
-ANSI bright black color	Terminal AppearancePrefView		ANSI ljus svart färg
 Copy here	Terminal TermView		Kopiera hit
-ANSI bright red color	Terminal AppearancePrefView		ANSI ljus röd färg
 Use default shell	Terminal Shell		Använd standardskal
-Color:	Terminal AppearancePrefView		Färg:
 Open link	Terminal TermView		Öppna länk
-Text	Terminal AppearancePrefView		Text
 Not found.	Terminal TermWindow		Hittades ej.
 Find…	Terminal TermWindow		Sök...
 No search string was entered.	Terminal TermWindow		Ingen söksträng angiven.
-Text under cursor	Terminal AppearancePrefView		Text under markören
 Move here	Terminal TermView		Flytta hit
 Abort	Terminal Shell		Avbryt
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Följande processer körs fortfarande:\n\n\t%1\n\nOm du stänger Terminalen kommer processerna att termineras.

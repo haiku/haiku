@@ -1,81 +1,64 @@
-1	italian	x-vnd.Haiku-Terminal	573224402
-ANSI cyan color	Terminal AppearancePrefView		Colore ANSI ciano
+1	italian	x-vnd.Haiku-Terminal	3964119708
 Close other tabs	Terminal TermWindow		Chiudi altri pannelli
 Insert path	Terminal TermView		Inserisci percorso
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Spiacente, Terminale non ha potuto avviare l'interprete di riga di comando.
 Text encoding	Terminal TermWindow		Codifica del testo
-ANSI blue color	Terminal AppearancePrefView		Colore ANSI blu
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Modifica
 Select all	Terminal TermWindow		Seleziona tutto
 Confirm exit if active programs exist	Terminal AppearancePrefView		Chiedi conferma per l'uscita in caso ci siano processi attivi
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLa directory di lavoro corrente del processo attivo nel\n\t\t\tpannello corrente. Opzionalmente, il massimo numero di componenti di percorso\n\t\t\tpuò essere specificato. Es. '%2d' per al più due componenti.\n\t%T\t-\tIl nome dell'applicazione Terminale nella localizzazione corrente.\n\t%e\t-\tLa codifica utilizzata nel pannello corrente. Non mostrato se UTF-8.\n\t%i\t-\tL'indice della finestra.\n\t%p\t-\tIl nome del processo attivo nel pannello corrente .\n\t%t\t-\tIl titolo del pannello corrente.
-ANSI bright green color	Terminal AppearancePrefView		Colore ANSI verde vivido
 Copy	Terminal TermWindow		Copia
-ANSI white color	Terminal AppearancePrefView		Colore ANSI bianco
 Edit tab title…	Terminal TermWindow		Modifica titolo pannello...
-Settings	Terminal TermWindow		Impostazioni
 Print	Terminal TermWindow		Stampa
+Settings	Terminal TermWindow		Impostazioni
 %app% settings	Terminal PrefWindow	window title	Impostazioni %app%
-ANSI black color	Terminal AppearancePrefView		Colore ANSI nero
 Use default	Terminal SetTitleWindow		Usa predefinito
 Close tab	Terminal TermWindow		Chiudi pannello
-Selected background	Terminal AppearancePrefView		Sfondo selezione
 Error!	Terminal getString		Errore!
-Set tab title	Terminal TermWindow		Imposta titolo pannello
 Appearance	Terminal PrefWindow		Aspetto
-ANSI bright yellow color	Terminal AppearancePrefView		Colore ANSI giallo vivido
-Encoding:	Terminal AppearancePrefView		Codifica:
+Set tab title	Terminal TermWindow		Imposta titolo pannello
 Create link here	Terminal TermView		Crea collegamento qui
-Custom	Terminal AppearancePrefView	Window size	Personalizzato
-Selected text	Terminal AppearancePrefView		Testo selezione
+Encoding:	Terminal AppearancePrefView		Codifica:
 Change directory	Terminal TermView		Cambia directory
-ANSI magenta color	Terminal AppearancePrefView		Colore ANSI magenta
+Custom	Terminal AppearancePrefView	Window size	Personalizzato
 Page setup…	Terminal TermWindow		Imposta pagina…
-Defaults	Terminal PrefWindow		Predefiniti
 Cancel	Terminal TermView		Annulla
+Defaults	Terminal PrefWindow		Predefiniti
 Revert	Terminal PrefWindow		Ripristina
-ANSI bright magenta color	Terminal AppearancePrefView		Colore ANSI magenta vivido
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminale
-ANSI bright cyan color	Terminal AppearancePrefView		Colore ANSI ciano vivido
-Find next	Terminal TermWindow		Trova seguente
 Use selection	Terminal FindWindow		Utilizza selezione
+Find next	Terminal TermWindow		Trova seguente
 Copy link location	Terminal TermView		Copia posizione collegamento
 Window title:	Terminal AppearancePrefView		Titolo finestra
 New tab	Terminal TermWindow		Nuovo pannello
-ANSI bright blue color	Terminal AppearancePrefView		Colore ANSI blu vivido
 Allow bold text	Terminal AppearancePrefView		Consenti testo in grassetto
 Window title…	Terminal TermWindow		Titolo finestra...
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Impossibile eseguire \"%command\":\n\t%error
 Open path	Terminal TermView		Apri percorso
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Impossibile eseguire \"%command\":\n\t%error
 Terminal	System name		Terminale
-ANSI yellow color	Terminal AppearancePrefView		Colore ANSI giallo
-Font size	Terminal TermWindow		Dimensione del carattere
 Custom	Terminal colors scheme		Personalizzato
 Really close?	Terminal TermWindow		Chiudo veramente?
+Font size	Terminal TermWindow		Dimensione del carattere
 OK	Terminal TermApp		OK
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Il processo \"%1\" è ancora in esecuzione.\nSe si chiude il terminale il processo verrà fermato.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opzione non riconosciuta \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Titolo pannello:
 Text not found.	Terminal TermWindow		Testo non trovato.
-Find failed	Terminal TermWindow		Ricerca fallita
 Match word	Terminal FindWindow		Parola intera
-Color scheme:	Terminal AppearancePrefView		Schema di colore:
 New Terminal	Terminal TermWindow		Nuovo Terminale
+Find failed	Terminal TermWindow		Ricerca fallita
 Quit	Terminal TermWindow		Esci
-Find previous	Terminal TermWindow		Trova precedente
 Match case	Terminal FindWindow		Sensibile alle maiuscole/minuscole
+Find previous	Terminal TermWindow		Trova precedente
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Lo schema utilizzato per specificare i titoli dei pennelli. I seguenti segnaposto\npossono essere utilizzati:
 Close	Terminal TermWindow		Chiudi
 Save to file…	Terminal PrefWindow		Salva su file…
-Background	Terminal AppearancePrefView		Sfondo
-ANSI green color	Terminal AppearancePrefView		Colore ANSI verde
 Copy path	Terminal TermView		Copia percorso
 Window size	Terminal TermWindow		Dimensioni della finestra
 Copy absolute path	Terminal TermView		Copia percorso assoluto
 Cancel	Terminal TermWindow		Annulla
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Il processo \"%1\" è ancora in esecuzione.\nSe si chiude il pannello il processo verrà fermato.
-Cursor	Terminal AppearancePrefView		Cursore
 Full screen	Terminal TermWindow		Schermo intero
 Shell 	Terminal TermWindow		Shell 
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tIl carattere '%'.\n\t%<\t-\tInizia una sezione mostrata esclusivamente se un segnaposto\n\t\t\successivo non è vuoto.\n\t%>\t-\tInizia una sezione mostrata esclusivamente se un segnaposto\n\t\t\ttra una precedente sezione %< e la corrente è non vuota..\n\t%-\t-\tTermina una sezione %< o %>.\n\nOgni carattere non alfanumerico tra '%' e una lettera che esprime un formato provoca l'inserimento di uno spazio\nse il segnaposto non è vuoto. Viene aggiunto alla sezione %<.
@@ -85,32 +68,25 @@ Window size:	Terminal AppearancePrefView		Dimensioni della finestra:
 Switch Terminals	Terminal TermWindow		Scambia Terminali
 Decrease	Terminal TermWindow		Riduci
 Settings…	Terminal TermWindow		Impostazioni…
-ANSI bright white color	Terminal AppearancePrefView		Colore ANSI bianco vivido
-Blinking cursor	Terminal AppearancePrefView		Cursore lampeggiante
 Cancel	Terminal SetTitleWindow		Cancella
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Lo schema utilizzato per specificare il titolo della finestra. I seguenti segnaposto \npossono essere utilizzati:\n
+Blinking cursor	Terminal AppearancePrefView		Cursore lampeggiante
 Use text:	Terminal FindWindow		Utilizza testo:
 Close active tab	Terminal TermWindow		Chiudi pannello attivo
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Lo schema utilizzato per specificare il titolo della finestra. I seguenti segnaposto \npossono essere utilizzati:\n
 Save as default	Terminal TermWindow		Salva come predefinito
 Nothing is selected.	Terminal TermWindow		Nulla è selezionato.
-ANSI red color	Terminal AppearancePrefView		Colore ANSI rosso
 Use left Option as Meta key	Terminal AppearancePrefView		Usa il tasto Opzione di sinistra come tasto Meta
 Find	Terminal FindWindow		Trova
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Lo schema utilizzato per specificare il titolo del pannello corrente. I seguenti segnaposto \npossono essere utilizzati:\n
 Font:	Terminal AppearancePrefView		Carattere:
 Paste	Terminal TermWindow		Incolla
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Lo schema utilizzato per i titoli della finestra. I seguenti segnaposto\npossono essere utilizzati:
-ANSI bright black color	Terminal AppearancePrefView		Colore ANSI nero vivido
 Copy here	Terminal TermView		Copia qui
-ANSI bright red color	Terminal AppearancePrefView		Colore ANSI rosso vivido
 Use default shell	Terminal Shell		Usa shell predefinita
-Color:	Terminal AppearancePrefView		Colore:
 Open link	Terminal TermView		Apri collegamento
-Text	Terminal AppearancePrefView		Testo
 Not found.	Terminal TermWindow		Non trovato.
 Find…	Terminal TermWindow		Trova…
 No search string was entered.	Terminal TermWindow		Non è stato inserito alcun testo di ricerca.
-Text under cursor	Terminal AppearancePrefView		Testo sotto il cursore
 Move here	Terminal TermView		Sposta qui
 Abort	Terminal Shell		Arresta
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		I seguenti processi sono ancora in esecuzione:\n\n\t%1\n\nSe si chiude il terminale i processi verranno fermati.

@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-Terminal	311984414
+1	indonesian	x-vnd.Haiku-Terminal	3964119708
 Close other tabs	Terminal TermWindow		Tutup tab yang lain
 Insert path	Terminal TermView		Sisipkan jalur
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal tidak dapat memulai shell. Maaf.
@@ -10,60 +10,55 @@ Confirm exit if active programs exist	Terminal AppearancePrefView		Konfirmasi ke
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDirektori aktif saat ini dari proses aktif di\n\t\t\ttab saat ini. Secara opsional jumlah komponen jalur maksimum\n\t\t\tdapat ditentukan. Misal. '%2d' untuk paling banyak dua komponen.\n\t%T\t-\tNama aplikasi Terminal untuk lokal saat ini.\n\t%e\t-\tPengkodean tab saat ini. Tidak ditampilkan untuk UTF-8.\n\t%i\t-\tIndeks jendela.\n\t%p\t-\tNama proses aktif di tab saat ini.\n\t%t\t-\tJudul tab saat ini.
 Copy	Terminal TermWindow		Salin
 Edit tab title…	Terminal TermWindow		Edit judul tab ...
-Settings	Terminal TermWindow		Pengaturan
 Print	Terminal TermWindow		Cetak
+Settings	Terminal TermWindow		Pengaturan
 %app% settings	Terminal PrefWindow	window title	%app% pengaturan
 Use default	Terminal SetTitleWindow		Gunakan standar
 Close tab	Terminal TermWindow		Tutup tab
-Selected background	Terminal AppearancePrefView		Latarbelakang terpilih
 Error!	Terminal getString		Kesalahan!
-Set tab title	Terminal TermWindow		Set judul tab
 Appearance	Terminal PrefWindow		Penampilan
-Encoding:	Terminal AppearancePrefView		Penyandian:
+Set tab title	Terminal TermWindow		Set judul tab
 Create link here	Terminal TermView		Buat tautan di sini
-Custom	Terminal AppearancePrefView	Window size	Gubahan
-Selected text	Terminal AppearancePrefView		Teks terpilih
+Encoding:	Terminal AppearancePrefView		Penyandian:
 Change directory	Terminal TermView		Ubah direktori
+Custom	Terminal AppearancePrefView	Window size	Gubahan
 Page setup…	Terminal TermWindow		Pengaturan halaman…
-Defaults	Terminal PrefWindow		Bawaan
 Cancel	Terminal TermView		Batalkan
+Defaults	Terminal PrefWindow		Bawaan
 Revert	Terminal PrefWindow		Pulih
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
-Find next	Terminal TermWindow		Cari selanjutnya
 Use selection	Terminal FindWindow		Gunakan seleksi
+Find next	Terminal TermWindow		Cari selanjutnya
 Copy link location	Terminal TermView		Salin lokasi tautan
 Window title:	Terminal AppearancePrefView		Judul jendela:
 New tab	Terminal TermWindow		Tab baru
 Allow bold text	Terminal AppearancePrefView		Izinkan teks tebal
 Window title…	Terminal TermWindow		Judul jendela…
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Tak bisa menjalankan \"%command\":\n\t%error
 Open path	Terminal TermView		Buka path
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Tak bisa menjalankan \"%command\":\n\t%error
 Terminal	System name		Terminal
-Font size	Terminal TermWindow		Ukuran fon
 Custom	Terminal colors scheme		Gubahan
 Really close?	Terminal TermWindow		Benar-benar hapus?
+Font size	Terminal TermWindow		Ukuran fon
 OK	Terminal TermApp		OKE
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proses \"%1\" masih berjalan.\nJika Anda menutup Terminal, proses akan dibunuh.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opsi tak-dikenal \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Judul tab:
 Text not found.	Terminal TermWindow		Teks tak ditemukan
-Find failed	Terminal TermWindow		Pencarian gagal
 Match word	Terminal FindWindow		Kata cocok
-Color scheme:	Terminal AppearancePrefView		Skema warna:
 New Terminal	Terminal TermWindow		Terminal Baru
+Find failed	Terminal TermWindow		Pencarian gagal
 Quit	Terminal TermWindow		Keluar
-Find previous	Terminal TermWindow		Cari sebelumnya
 Match case	Terminal FindWindow		Sesuaikan besar kecil huruf
+Find previous	Terminal TermWindow		Cari sebelumnya
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Pola menentukan judul tab. Tempat penampung berikut\ndapat digunakan:
 Close	Terminal TermWindow		Tutup
 Save to file…	Terminal PrefWindow		Simpan ke file...
-Background	Terminal AppearancePrefView		Latar belakang
 Copy path	Terminal TermView		Salin tapak
 Window size	Terminal TermWindow		Ukuran jendela
 Copy absolute path	Terminal TermView		Salin path absolut
 Cancel	Terminal TermWindow		Batalkan
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Proses \"%1\" masih berjalan.\nJika anda menutup tab, proses akan terbunuh.
-Cursor	Terminal AppearancePrefView		Kursor
 Full screen	Terminal TermWindow		Layar penuh
 Shell 	Terminal TermWindow		Shell 
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.
@@ -73,11 +68,11 @@ Window size:	Terminal AppearancePrefView		Ukuran jendela:
 Switch Terminals	Terminal TermWindow		Beralih Terminal
 Decrease	Terminal TermWindow		Menurunkan
 Settings…	Terminal TermWindow		Pengaturan...
-Blinking cursor	Terminal AppearancePrefView		Kursor berkedip
 Cancel	Terminal SetTitleWindow		Batalkan
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pola menentukan judul jendela. Penampung berikut\ndapat digunakan:\n
+Blinking cursor	Terminal AppearancePrefView		Kursor berkedip
 Use text:	Terminal FindWindow		Gunakan teks:
 Close active tab	Terminal TermWindow		Tutup tab aktif
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Pola menentukan judul jendela. Penampung berikut\ndapat digunakan:\n
 Save as default	Terminal TermWindow		Simpan sebagai bawaan
 Nothing is selected.	Terminal TermWindow		Tidak ada yang dipilih
 Use left Option as Meta key	Terminal AppearancePrefView		Gunakan Opsi kiri sebagai kunci Meta
@@ -88,13 +83,10 @@ Paste	Terminal TermWindow		Tempel
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Pola yang menentukan judul jendela. Tempat penampung berikut\nbisa digunakan:
 Copy here	Terminal TermView		Salin ke sini
 Use default shell	Terminal Shell		Gunakan shell default
-Color:	Terminal AppearancePrefView		Warna:
 Open link	Terminal TermView		Buka tautan
-Text	Terminal AppearancePrefView		Teks
 Not found.	Terminal TermWindow		Tidak ditemukan.
 Find…	Terminal TermWindow		Cari...
 No search string was entered.	Terminal TermWindow		Tidak ada kata pencarian yang dimasukkan.
-Text under cursor	Terminal AppearancePrefView		Teks di bawah kursor
 Move here	Terminal TermView		Pindah ke sini
 Abort	Terminal Shell		Gugurkan
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Proses berikut masih berjalan:\n\n\t%1\n\nJika Anda menutup Terminal, proses akan dibunuh.

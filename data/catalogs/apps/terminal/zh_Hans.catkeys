@@ -1,83 +1,66 @@
-1	english	x-vnd.Haiku-Terminal	3440179729
-ANSI cyan color	Terminal AppearancePrefView		青色
+1	english	x-vnd.Haiku-Terminal	2536107739
 Close other tabs	Terminal TermWindow		关闭其他标签
 Insert path	Terminal TermView		插入路径  
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		终端无法启动shell，非常抱歉。
 Text encoding	Terminal TermWindow		文字编码
-ANSI blue color	Terminal AppearancePrefView		蓝色
 OK	Terminal SetTitleWindow		确定
 Edit	Terminal TermWindow		编辑
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		-h, --help, 显示帮助页面\n-t, --title, 设置窗口标题\n-f, --fullscreen, 启动全屏模式\n-w, --working-directory, 设置初始工作目录\n
 Select all	Terminal TermWindow		全选
 Confirm exit if active programs exist	Terminal AppearancePrefView		如果存在活动程序，确定退出。
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.
-ANSI bright green color	Terminal AppearancePrefView		深绿色
 Copy	Terminal TermWindow		复制
-ANSI white color	Terminal AppearancePrefView		标准白色
 Edit tab title…	Terminal TermWindow		编辑标签标题...
-Settings	Terminal TermWindow		设置
 Print	Terminal TermWindow		打印
+Settings	Terminal TermWindow		设置
 %app% settings	Terminal PrefWindow	window title	%app% 设置
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\t当前活动进程的工作目录.\n\t\t\t可选配置指定最大数量的路径组件。\n\t\t\t 例如 '%2d' 用于最多2个组件\n\t%i\t-\t标签索引.\n\t%e\t-\t当前标签编码。对于 UTF-8 则不显示。\n\t%p\t-\t活动进程名称。
-ANSI black color	Terminal AppearancePrefView		黑色
 Use default	Terminal SetTitleWindow		使用默认
 Close tab	Terminal TermWindow		关闭标签
-Selected background	Terminal AppearancePrefView		选中背景
 Error!	Terminal getString		错误！
-Set tab title	Terminal TermWindow		设置标签标题
 Appearance	Terminal PrefWindow		外观
-ANSI bright yellow color	Terminal AppearancePrefView		深黄色
-Encoding:	Terminal AppearancePrefView		编码：
+Set tab title	Terminal TermWindow		设置标签标题
 Create link here	Terminal TermView		创建链接
-Custom	Terminal AppearancePrefView	Window size	自定义
-Selected text	Terminal AppearancePrefView		选中文本
+Encoding:	Terminal AppearancePrefView		编码：
 Change directory	Terminal TermView		更改目录
-ANSI magenta color	Terminal AppearancePrefView		品红色
+Custom	Terminal AppearancePrefView	Window size	自定义
 Page setup…	Terminal TermWindow		页面设置...  
-Defaults	Terminal PrefWindow		默认主题
 Cancel	Terminal TermView		取消
+Defaults	Terminal PrefWindow		默认主题
 Revert	Terminal PrefWindow		恢复
-ANSI bright magenta color	Terminal AppearancePrefView		深品红色
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	终端
-ANSI bright cyan color	Terminal AppearancePrefView		深青色
-Find next	Terminal TermWindow		查找下一个
 Use selection	Terminal FindWindow		使用选择
+Find next	Terminal TermWindow		查找下一个
 Copy link location	Terminal TermView		复制链接位置
 Window title:	Terminal AppearancePrefView		窗口标题：
 New tab	Terminal TermWindow		新建标签
-ANSI bright blue color	Terminal AppearancePrefView		深蓝色
 Allow bold text	Terminal AppearancePrefView		允许粗体字
 Window title…	Terminal TermWindow		窗口标题...
-Cannot execute \"%command\":\n\t%error	Terminal Shell		无法运行\"%command\":\n\t%error
 Open path	Terminal TermView		打开路径
+Cannot execute \"%command\":\n\t%error	Terminal Shell		无法运行\"%command\":\n\t%error
 Terminal	System name		终端
-ANSI yellow color	Terminal AppearancePrefView		黄色
-Font size	Terminal TermWindow		字体大小
 Custom	Terminal colors scheme		自定义
 Really close?	Terminal TermWindow		确定关闭吗？
+Font size	Terminal TermWindow		字体大小
 OK	Terminal TermApp		确定
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		\"%1\" 进程仍在运行。\n如果关闭终端，该进程将被杀死。
 Unrecognized option \"%s\"\n	Terminal arguments parsing		无法识别的选项\"%s\"\n
 Tab title:	Terminal AppearancePrefView		标签标题：
 Text not found.	Terminal TermWindow		文本未搜索到。
-Find failed	Terminal TermWindow		查找失败
 Match word	Terminal FindWindow		匹配单词
-Color scheme:	Terminal AppearancePrefView		色彩模式：
 New Terminal	Terminal TermWindow		新建窗口
+Find failed	Terminal TermWindow		查找失败
 Quit	Terminal TermWindow		退出
-Find previous	Terminal TermWindow		查找上一个
 Match case	Terminal FindWindow		匹配大小写
+Find previous	Terminal TermWindow		查找上一个
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		该模式用于指定标签标题。可以使用下述\n占位符：
 Close	Terminal TermWindow		关闭
 Save to file…	Terminal PrefWindow		保存为…
-Background	Terminal AppearancePrefView		背景
-ANSI green color	Terminal AppearancePrefView		绿色
 Copy path	Terminal TermView		复制路径
 Window size	Terminal TermWindow		窗口大小
 Copy absolute path	Terminal TermView		复制绝对路径
 Cancel	Terminal TermWindow		取消
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		\"%1\" 进程仍在运行。\n如果关闭该标签，该进程将被杀死。
-Cursor	Terminal AppearancePrefView		游标
 Full screen	Terminal TermWindow		全屏
 Shell 	Terminal TermWindow		Shell
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t字符 '%' 。\n\t%<\t-\t开始新区块，仅当其后的\n\t\t\t占位符不为空时显示。\n\t%>\t-\t开始新区块，仅当\n\t\t\t之前的区块 %< 和该区块不为空时显示。\n\t%-\t-\t结束一个 %< or %> 区块。\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.
@@ -87,32 +70,25 @@ Window size:	Terminal AppearancePrefView		窗口大小:
 Switch Terminals	Terminal TermWindow		切换终端
 Decrease	Terminal TermWindow		缩小
 Settings…	Terminal TermWindow		设置…
-ANSI bright white color	Terminal AppearancePrefView		亮白色
-Blinking cursor	Terminal AppearancePrefView		闪烁游标
 Cancel	Terminal SetTitleWindow		取消
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了窗口标题。可以使用下述的\n占位符：\n
+Blinking cursor	Terminal AppearancePrefView		闪烁游标
 Use text:	Terminal FindWindow		使用文本：
 Close active tab	Terminal TermWindow		关闭活动标签
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了窗口标题。可以使用下述的\n占位符：\n
 Save as default	Terminal TermWindow		默认保存
 Nothing is selected.	Terminal TermWindow		未选中任何文件。
-ANSI red color	Terminal AppearancePrefView		红色
 Use left Option as Meta key	Terminal AppearancePrefView		将左 Option 键设为 Meta 键
 Find	Terminal FindWindow		查找
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了当前标签标题。可以使用下述的\n占位符：\n
 Font:	Terminal AppearancePrefView		字体：
 Paste	Terminal TermWindow		粘贴
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		该模式指定窗口标题。可以使用如下\n占位符：
-ANSI bright black color	Terminal AppearancePrefView		深黑色
 Copy here	Terminal TermView		复制到此  
-ANSI bright red color	Terminal AppearancePrefView		深红色
 Use default shell	Terminal Shell		使用默认shell
-Color:	Terminal AppearancePrefView		颜色：
 Open link	Terminal TermView		打开链接
-Text	Terminal AppearancePrefView		文本
 Not found.	Terminal TermWindow		未找到。  
 Find…	Terminal TermWindow		查找…
 No search string was entered.	Terminal TermWindow		未输入任何字符。
-Text under cursor	Terminal AppearancePrefView		下划线
 Move here	Terminal TermView		移动到此
 Abort	Terminal Shell		放弃
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		下述进程仍在运行：\n\n\t%1\n\n如果您关闭终端，这些进程将被杀死。

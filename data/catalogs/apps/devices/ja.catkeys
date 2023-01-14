@@ -1,7 +1,6 @@
-1	japanese	x-vnd.Haiku-Devices	3349357485
+1	japanese	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		ACPI バス
 Encryption controller	Device		暗号化コントローラー
-Bus Information	Device		バス情報
 Devices	System name		デバイス
 USB bus	DevicesView		USB バス
 Graphics Peripheral	DeviceSCSI		グラフィック装置
@@ -9,19 +8,14 @@ Processor	Device		プロセッサ
 Generate system information	DevicesView		システム情報の作成
 Unknown	DeviceACPI		不明
 Class info	DevicePCI		クラス情報
-ACPI Information	DeviceACPI		ACPI 情報
-Detailed	DevicesView		詳細
 USB bus	Device		USB バス
 Computer	DevicesView		コンピューター
 Communications	DeviceSCSI		通信
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		クラス情報:\t\t\t\t: %classInfo%
 Mass storage controller	Device		大容量記憶域コントローラー
 Connection	DevicesView		接続順
 Printer	DeviceSCSI		プリンター
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI プロセッサネームスペース '%2'
-SCSI Information	DeviceSCSI		SCSI 情報
 Manufacturer	Device		製造元
-Device name:	Device		デバイス名:
 Scanner	DeviceSCSI		スキャナー
 Memory controller	Device		メモリコントローラー
 Unknown device	DevicesView		不明なデバイス
@@ -30,7 +24,6 @@ ACPI node '%1'	DeviceACPI		ACPI ノード '%1'
 Optical Drive	DeviceSCSI		光学ドライブ
 Name	PropertyList		名前
 Manufacturer	DeviceSCSI		製造元
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		デバイス名\t\t\t\t: %Name%\n製造元\t\t\t: %Manufacturer%\n使用中のドライバー\t\t\t\t: %DriverUsed%\nデバイスパス\t: %DevicePaths%
 Device name	Device		デバイス名
 Satellite communications controller	Device		衛星通信コントローラー
 Device class	DeviceSCSI		デバイスクラス
@@ -39,14 +32,12 @@ Input device controller	Device		入力デバイスコントローラー
 PCI bus	DevicesView		PCI バス
 ACPI System Indicator	DeviceACPI		ACPI システムインジケーター 
 ACPI System Bus	DeviceACPI		ACPI システムバス
-PCI Information	DevicePCI		PCI 情報
 Tape Drive	DeviceSCSI		テープドライブ
 Changer	DeviceSCSI		チェンジャー
 Serial bus controller	Device		シリアルバスコントローラー
 Refresh devices	DevicesView		デバイスの更新
 Category	DevicesView		カテゴリー順
 RBC	DeviceSCSI		RBC
-None	Device		無し
 Device paths	Device		デバイスパス
 Unknown device	Device		不明なデバイス
 Wireless controller	Device		ワイヤレスコントローラー
@@ -56,27 +47,23 @@ Devices	DevicesView		デバイス
 Device name	DeviceACPI		デバイス名
 Card Reader	DeviceSCSI		カードリーダー
 Display controller	Device		ディスプレイコントローラー
-Basic information	DevicesView		基本情報
 ACPI Button '%1'	DeviceACPI		ACPI ボタン '%1'
-Bus	DevicesView		バス
 ACPI <unknown>	DeviceACPI		ACPI <不明>
 Device name	DevicePCI		デバイス名
 Disk Drive	DeviceSCSI		ディスクドライブ
-Other	DeviceSCSI		その他
 Report compatibility	DevicesView		互換性レポート
+Other	DeviceSCSI		その他
 Computer	Device		コンピューター
 PCI bus	Device		PCI バス
 Enclosure	DeviceSCSI		格納装置
-Order by:	DevicesView		並び順:
 ACPI Thermal Zone	DeviceACPI		ACPI 温度管理ゾーン
+Order by:	DevicesView		並び順:
 Intelligent controller	Device		インテリジェントコントローラー
 Multimedia controller	Device		マルチメディアコントローラー
 Quit	DevicesView		終了
 ISA bus	Device		ISA バス
 ISA bus	DevicesView		ISA バス
 Processor	DeviceSCSI		プロセッサ
-Manufacturer:	Device		製造元:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		クラス情報:\t\t\t\t: %classInfo%
 Bridge	Device		ブリッジ
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM

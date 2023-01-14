@@ -1,10 +1,11 @@
-1	swedish	x-vnd.Haiku-Expander	3300517306
+1	swedish	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Mål
 Other	ExpanderPreferences		Andra
 Automatically show contents listing	ExpanderPreferences		Automatiskt visa list innehåll
 Expander	System name		Expandera
 Expander: Choose destination	DirectoryFilePanel		Expanderaren: Välj mål
 Set source…	ExpanderMenu		Sätt källa…
+OK	ExpanderWindow		OK
 The destination is not a folder.	ExpanderWindow		Målet är inte en mapp.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Mappen har antingen blivit flyttad, bytt namn eller stöds inte.
 Close window when done expanding	ExpanderPreferences		Stäng fönstret när expandering är klar

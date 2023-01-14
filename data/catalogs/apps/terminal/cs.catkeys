@@ -1,83 +1,66 @@
-1	czech	x-vnd.Haiku-Terminal	3440179729
-ANSI cyan color	Terminal AppearancePrefView		ANSI azurová
+1	czech	x-vnd.Haiku-Terminal	2536107739
 Close other tabs	Terminal TermWindow		Zavřít ostatní panely
 Insert path	Terminal TermView		Vložit cestu
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminál nemůže spustit shell. Lituji.
 Text encoding	Terminal TermWindow		Kódování textu
-ANSI blue color	Terminal AppearancePrefView		ANSI modrá
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Úpravy
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               vypíše tuto nápovědu\n  -t,     --title              nastaví název okna\n  -f,     --fullscreen         spustí přes celou obrazovku\n  -w,     --working-directory  zvolí počáteční pracovní adresář\n
 Select all	Terminal TermWindow		Vybrat vše
 Confirm exit if active programs exist	Terminal AppearancePrefView		Protvrdit ukončení když běží program
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tAktuální adresář aktívního procesu v aktuální\n\t\t\tkartě. Nepovinně je možné uvést maximální počet\n\t\t\tadresářů cesty. Např. '%2d' pro maximálně dva adresáře.\n\t%T\t-\tNázev aplikace Terminál v aktuální lokalizaci.\n\t%e\t-\tKódování aktuální karty. Nezobrazuje se v případě UTF-8.\n\t%i\t-\tIndex okna.\n\t%p\t-\tNázev aktivního procesu v aktuální kartě.\n\t%t\t-\tNázev aktuální karty.
-ANSI bright green color	Terminal AppearancePrefView		ANSI světle zelená
 Copy	Terminal TermWindow		Kopírovat
-ANSI white color	Terminal AppearancePrefView		ANSI bílá
 Edit tab title…	Terminal TermWindow		Upravit nadpis panelu...
-Settings	Terminal TermWindow		Nastavení
 Print	Terminal TermWindow		Tisk
+Settings	Terminal TermWindow		Nastavení
 %app% settings	Terminal PrefWindow	window title	%app% nastavení
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tAktuální pracovní adresář aktivních procesů.\n\t\t\tVolitelně může být upřesněn maximální počet komponent cesty.\n\t\t\tNapř. '%2d' pro maximálně dva adresáře.\n\t%i\t-\tČíslo záložky.\n\t%e\t-\tKódování aktuální záložky. Nezobrazuje se pro UTF-8.\n\t%p\t-\tNázev aktivního procesu.
-ANSI black color	Terminal AppearancePrefView		ANSI černá
 Use default	Terminal SetTitleWindow		Použít výchozí
 Close tab	Terminal TermWindow		Zavřít panel
-Selected background	Terminal AppearancePrefView		Vybrané pozadí
 Error!	Terminal getString		Chyba!
-Set tab title	Terminal TermWindow		Nastavit nadpis panelu
 Appearance	Terminal PrefWindow		Vzhled
-ANSI bright yellow color	Terminal AppearancePrefView		ANSI světle žlutá
-Encoding:	Terminal AppearancePrefView		Kódování:
+Set tab title	Terminal TermWindow		Nastavit nadpis panelu
 Create link here	Terminal TermView		Vytvoř zde link
-Custom	Terminal AppearancePrefView	Window size	Vlastní
-Selected text	Terminal AppearancePrefView		Vybraný text
+Encoding:	Terminal AppearancePrefView		Kódování:
 Change directory	Terminal TermView		Změnit adresář
-ANSI magenta color	Terminal AppearancePrefView		ANSI purpurová
+Custom	Terminal AppearancePrefView	Window size	Vlastní
 Page setup…	Terminal TermWindow		Nastavení stránky...
-Defaults	Terminal PrefWindow		Výchozí
 Cancel	Terminal TermView		Zrušit
+Defaults	Terminal PrefWindow		Výchozí
 Revert	Terminal PrefWindow		Vrátit zpět
-ANSI bright magenta color	Terminal AppearancePrefView		ANSI světle purpurová
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminál
-ANSI bright cyan color	Terminal AppearancePrefView		ANSI světle azurová
-Find next	Terminal TermWindow		Vyhledat další
 Use selection	Terminal FindWindow		Použít výběr
+Find next	Terminal TermWindow		Vyhledat další
 Copy link location	Terminal TermView		Kopírovat umístění odkazu
 Window title:	Terminal AppearancePrefView		Nadpis okna
 New tab	Terminal TermWindow		Nový panel
-ANSI bright blue color	Terminal AppearancePrefView		ANSI světle modrá
 Allow bold text	Terminal AppearancePrefView		Povolit tučný text
 Window title…	Terminal TermWindow		Nadpis okna...
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Nelze spustit \"%command\":\n\t%error
 Open path	Terminal TermView		Otevřít cestu
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Nelze spustit \"%command\":\n\t%error
 Terminal	System name		Terminál
-ANSI yellow color	Terminal AppearancePrefView		ANSI žlutá
-Font size	Terminal TermWindow		Velikost písma
 Custom	Terminal colors scheme		Vlastní
 Really close?	Terminal TermWindow		Opravdu zavřít?
+Font size	Terminal TermWindow		Velikost písma
 OK	Terminal TermApp		OK
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces \"%1\" stále běží.\nUzavřením Terminálu tento proces ukončíte.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nerozpoznaná volba \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Nadpis panelu:
 Text not found.	Terminal TermWindow		Text nenalezen.
-Find failed	Terminal TermWindow		Vyhledávání selhalo
 Match word	Terminal FindWindow		Shoda slova
-Color scheme:	Terminal AppearancePrefView		Barevné schéma:
 New Terminal	Terminal TermWindow		Nový terminál
+Find failed	Terminal TermWindow		Vyhledávání selhalo
 Quit	Terminal TermWindow		Ukončit
-Find previous	Terminal TermWindow		Vyhledat předchozí
 Match case	Terminal FindWindow		Shoda písmen
+Find previous	Terminal TermWindow		Vyhledat předchozí
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Vzor určující názvy karet. Je možné použít nasledující\nzástupných symbolů:
 Close	Terminal TermWindow		Zavřít
 Save to file…	Terminal PrefWindow		Uložit do souboru...
-Background	Terminal AppearancePrefView		Pozadí
-ANSI green color	Terminal AppearancePrefView		ANSI zelená
 Copy path	Terminal TermView		Kopírovat cestu
 Window size	Terminal TermWindow		Velikost okna
 Copy absolute path	Terminal TermView		Kopírovat absolutní cestu
 Cancel	Terminal TermWindow		Zrušit
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Proces \"%1\" stále běží.\nUzavřením panelu tento proces ukončíte.
-Cursor	Terminal AppearancePrefView		Kurzor
 Full screen	Terminal TermWindow		Celá obrazovka
 Shell 	Terminal TermWindow		Shell
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tZnak '%'.\n\t%<\t-\tZačíná sekci, která se zobrazí pouze když rezervované\n\t\t\tmísto po ní není prázdné.\n\t%>\t-\tZačíná sekci, která se zobrazí pouze když rezervované\n\t\t\tmísto mezi předešlou %< sekcí a touto není prázdné.\n\t%-\t-\tKončí sekci %< nebo %>.\n\nJakékoliv nealfanumerické znaky mezi '%', a písmenem formátu vloží mezeru pouze\nv případě, že hodnota rezervovaného místa není prázdná. Přidá do sekce %<.
@@ -87,32 +70,25 @@ Window size:	Terminal AppearancePrefView		Velikost okna:
 Switch Terminals	Terminal TermWindow		Přepnout terminály
 Decrease	Terminal TermWindow		Zmenšit
 Settings…	Terminal TermWindow		Nastavení...
-ANSI bright white color	Terminal AppearancePrefView		ANSI světle bílá
-Blinking cursor	Terminal AppearancePrefView		Blikající kurzor
 Cancel	Terminal SetTitleWindow		Zrušit
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Vzor určující nadpis okna. Následující zástupci\nmohou být použiti:\n
+Blinking cursor	Terminal AppearancePrefView		Blikající kurzor
 Use text:	Terminal FindWindow		Použít text:
 Close active tab	Terminal TermWindow		Zavřít aktivní panel
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Vzor určující nadpis okna. Následující zástupci\nmohou být použiti:\n
 Save as default	Terminal TermWindow		Uložit jako výchozí
 Nothing is selected.	Terminal TermWindow		Není nic vybráno.
-ANSI red color	Terminal AppearancePrefView		ANSI červená
 Use left Option as Meta key	Terminal AppearancePrefView		Použijte levý Alt jako meta klávesu
 Find	Terminal FindWindow		Najít
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Vzor určující současný nadpis panelu. Následující zástupci\nmohou být použiti:\n
 Font:	Terminal AppearancePrefView		Písmo
 Paste	Terminal TermWindow		Vložit
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Vzor určující názvy oken. Je možné použít\nnasledující zástupné symboly:
-ANSI bright black color	Terminal AppearancePrefView		ANSI světle černá
 Copy here	Terminal TermView		Kopíruj zde
-ANSI bright red color	Terminal AppearancePrefView		ANSI světle červená
 Use default shell	Terminal Shell		Použít výchozí shell
-Color:	Terminal AppearancePrefView		Barva:
 Open link	Terminal TermView		Otevřít odkaz
-Text	Terminal AppearancePrefView		Text
 Not found.	Terminal TermWindow		Nenalezeno.
 Find…	Terminal TermWindow		Najít...
 No search string was entered.	Terminal TermWindow		Nebyl zadán vyhledávací řetězec.
-Text under cursor	Terminal AppearancePrefView		Text pod kurzorem
 Move here	Terminal TermView		Přesun sem
 Abort	Terminal Shell		Zrušit
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Následující procesy stále běží:\n\n\t%1\n\nUzavřením Terminálu  budou tyto procesy ukončeny.

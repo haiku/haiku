@@ -1,7 +1,6 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Devices	3349357485
+1	greek, modern (1453-)	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		Δίαυλος ACPI
 Encryption controller	Device		Ελεγκτής κρυπτογράφησης
-Bus Information	Device		Πληροφορίες Διαύλου
 Devices	System name		Συσκευές
 USB bus	DevicesView		Θύρα USB
 Graphics Peripheral	DeviceSCSI		Περιφερειακή Συσκευή Γραφικών
@@ -9,19 +8,14 @@ Processor	Device		Επεξεργαστής
 Generate system information	DevicesView		Πληροφορίες συστήματος
 Unknown	DeviceACPI		Άγνωστο
 Class info	DevicePCI		Πληροφορίες κατηγορίας
-ACPI Information	DeviceACPI		Πληροφορίες για το ACPI
-Detailed	DevicesView		Αναλυτικό
 USB bus	Device		Θύρα USB
 Computer	DevicesView		Υπολογιστής
 Communications	DeviceSCSI		Επικοινωνίες
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Πληροφορίες Κατηγορίας:\t\t\t\t: %classInfo%
 Mass storage controller	Device		Ελεγκτής μαζικής αποθήκευσης
 Connection	DevicesView		Σύνδεση
 Printer	DeviceSCSI		Εκτυπωτής
 ACPI Processor Namespace '%2'	DeviceACPI		Επεξεργαστής ACPI Namespace '%2'
-SCSI Information	DeviceSCSI		Πληροφορίες SCSI
 Manufacturer	Device		Κατασκευαστής
-Device name:	Device		Όνομα συσκευής:
 Scanner	DeviceSCSI		Σαρωτής
 Memory controller	Device		Ελεγκτής μνήμης
 Unknown device	DevicesView		Άγνωστη συσκευή
@@ -30,7 +24,6 @@ ACPI node '%1'	DeviceACPI		Μονάδα ACPI '%1'
 Optical Drive	DeviceSCSI		Οπτικός Οδηγός
 Name	PropertyList		Όνομα
 Manufacturer	DeviceSCSI		Κατασκευαστής
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Όνομα Συσκεής\t\t\t\t: %Name%\nΚατασκευαστής\t\t\t: %Manufacturer%\nΟδηγός που χρησιμοποιήθηκε\t\t\t\t: %DriverUsed%\nΔιαδρομές συσκευής\t: %DevicePaths%
 Device name	Device		Όνομα συσκευής
 Satellite communications controller	Device		Ελεγκτής επικοινωνιών δορυφόρου
 Device class	DeviceSCSI		Κατηγορία συσκευής
@@ -39,14 +32,12 @@ Input device controller	Device		Ελεγκτής εισαγώμενης συσκ
 PCI bus	DevicesView		Δίαυλος PCI
 ACPI System Indicator	DeviceACPI		Δείκτης Συστήματος ACPI
 ACPI System Bus	DeviceACPI		Δίαυλος Συστήματος ACPI
-PCI Information	DevicePCI		Πληροφορίες PCI
 Tape Drive	DeviceSCSI		Κασέτα
 Changer	DeviceSCSI		Αλλαγή
 Serial bus controller	Device		Ελεγκτής σειριακού διαύλου
 Refresh devices	DevicesView		Ανανέωση συσκευών
 Category	DevicesView		Κατηγορία
 RBC	DeviceSCSI		RBC
-None	Device		Τίποτα
 Device paths	Device		Διαδρομές συσκευών
 Unknown device	Device		Άγνωστη συσκευή
 Wireless controller	Device		Ελεγκτής ασύρματων τηλεπικοινωνιών
@@ -56,27 +47,23 @@ Devices	DevicesView		Συσκευές
 Device name	DeviceACPI		Όνομα συσκευής
 Card Reader	DeviceSCSI		Μονάδα ανάγνωσης καρτών
 Display controller	Device		Ελεγκτής γραφικών
-Basic information	DevicesView		Βασικές πληροφορίες
 ACPI Button '%1'	DeviceACPI		Κουμπί ACPI '%1'
-Bus	DevicesView		Δίαυλος
 ACPI <unknown>	DeviceACPI		ACPI <άγνωστο>
 Device name	DevicePCI		Όνομα συσκευής
 Disk Drive	DeviceSCSI		Οδηγός Δίσκου
-Other	DeviceSCSI		Άλλο
 Report compatibility	DevicesView		Αναφορά συμβατότητας
+Other	DeviceSCSI		Άλλο
 Computer	Device		Υπολογιστής
 PCI bus	Device		Δίαυλος PCI
 Enclosure	DeviceSCSI		Περίβλημα δίσκου
-Order by:	DevicesView		Κατανομή κατά:
 ACPI Thermal Zone	DeviceACPI		Θερμική Ζώνη ACPI
+Order by:	DevicesView		Κατανομή κατά:
 Intelligent controller	Device		Έξυπνος ελεγκτής
 Multimedia controller	Device		Ελεγκτής πολυμέσων
 Quit	DevicesView		Έξοδος
 ISA bus	Device		Δίαυλος ISA
 ISA bus	DevicesView		Δίαυλος ISA
 Processor	DeviceSCSI		Επεξεργαστής
-Manufacturer:	Device		Κατασκευαστής:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Πληροφορίες Κατηγορίας:\t\t\t\t: %classInfo%
 Bridge	Device		Γέφυρα
 Worm	DeviceSCSI		Σκώληκας
 CD-ROM	DeviceSCSI		CD-ROM

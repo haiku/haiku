@@ -1,24 +1,18 @@
-1	slovak	x-vnd.Haiku-Devices	490380176
+1	slovak	x-vnd.Haiku-Devices	2347806408
 ACPI bus	DevicesView		Zbernica ACPI
 Encryption controller	Device		Radič šifrovania
-Bus Information	Device		Informácie o zbernici
 Devices	System name		Zariadenia
 Graphics Peripheral	DeviceSCSI		Grafické periférie
 Processor	Device		Procesor
 Generate system information	DevicesView		Vytvoriť informácie o systéme
 Class info	DevicePCI		Info o triede
-ACPI Information	DeviceACPI		Informácie o ACPI
-Detailed	DevicesView		Podrobnosti
 Computer	DevicesView		Počítač
 Communications	DeviceSCSI		Komunikácia
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Info o triede:\t \t \t \t : %classInfo%
 Mass storage controller	Device		Radič hromadného úložiska
 Connection	DevicesView		Pripojenie
 Printer	DeviceSCSI		Tlačiareň
 ACPI Processor Namespace '%2'	DeviceACPI		Menný priestor procesora ACPI „%2“
-SCSI Information	DeviceSCSI		Informácie o SCSI
 Manufacturer	Device		Výrobca
-Device name:	Device		Názov zariadenia:
 Scanner	DeviceSCSI		Skener
 Memory controller	Device		Radič pamäte
 Unknown device	DevicesView		Neznáme zariadenie
@@ -27,7 +21,6 @@ ACPI node '%1'	DeviceACPI		Uzol ACPI „%1“
 Optical Drive	DeviceSCSI		Optická jednotka
 Name	PropertyList		Názov
 Manufacturer	DeviceSCSI		Výrobca
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Názov zariadenia\t\t\t\t: %Name%\nVýrobca\t\t\t: %Manufacturer%\nPoužitý ovládač\t\t\t\t: %DriverUsed%\nCesty k zariadeniam\t: %DevicePaths%
 Device name	Device		Názov zariadenia
 Satellite communications controller	Device		Radič satelitnej komunikácie
 Device class	DeviceSCSI		Trieda zariadenia
@@ -36,14 +29,12 @@ Input device controller	Device		Radič vstupných zariadení
 PCI bus	DevicesView		Zbernica PCI
 ACPI System Indicator	DeviceACPI		Indikátor systému ACPI
 ACPI System Bus	DeviceACPI		Zbernica systému ACPI
-PCI Information	DevicePCI		Informácie PCI
 Tape Drive	DeviceSCSI		Pásková jednotka
 Changer	DeviceSCSI		Menič
 Serial bus controller	Device		Radič sériovej zbernice
 Refresh devices	DevicesView		Obnoviť zariadenia
 Category	DevicesView		Kategória
 RBC	DeviceSCSI		RBC
-None	Device		Žiadne
 Device paths	Device		Cesty k zariadeniam
 Unknown device	Device		Neznáme zariadenie
 Wireless controller	Device		Radič bezdrôtových sietí
@@ -53,25 +44,21 @@ Devices	DevicesView		Zariadenia
 Device name	DeviceACPI		Názov zariadenia
 Card Reader	DeviceSCSI		Čítačka kariet
 Display controller	Device		Radič zobrazovania
-Basic information	DevicesView		Základné informácie
-Bus	DevicesView		Zbernica
 Device name	DevicePCI		Názov zariadenia
 Disk Drive	DeviceSCSI		Disková jednotka
-Other	DeviceSCSI		Iné
 Report compatibility	DevicesView		Nahlásiť kompatibilitu
+Other	DeviceSCSI		Iné
 Computer	Device		Počítač
 PCI bus	Device		Zbernica PCI
 Enclosure	DeviceSCSI		Skrinka
-Order by:	DevicesView		Zoradiť podľa:
 ACPI Thermal Zone	DeviceACPI		Tepelná oblasť ACPI
+Order by:	DevicesView		Zoradiť podľa:
 Intelligent controller	Device		Inteligentný radič
 Multimedia controller	Device		Radič multimédií
 Quit	DevicesView		Ukončiť
 ISA bus	Device		Zbernica ISA
 ISA bus	DevicesView		Zbernica ISA
 Processor	DeviceSCSI		Procesor
-Manufacturer:	Device		Výrobca:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Info o triede:\t\t\t\t: %classInfo%
 Bridge	Device		Most
 Worm	DeviceSCSI		Červ
 CD-ROM	DeviceSCSI		CD-ROM

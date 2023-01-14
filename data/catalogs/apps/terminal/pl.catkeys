@@ -1,83 +1,66 @@
-1	polish	x-vnd.Haiku-Terminal	3440179729
-ANSI cyan color	Terminal AppearancePrefView		ANSI cyjan
+1	polish	x-vnd.Haiku-Terminal	2536107739
 Close other tabs	Terminal TermWindow		Zamknij pozostałe karty
 Insert path	Terminal TermView		Wstaw ścieżkę
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal nie może uruchomić powłoki. Przepraszamy.
 Text encoding	Terminal TermWindow		Kodowanie tekstu
-ANSI blue color	Terminal AppearancePrefView		ANSI niebieski
 OK	Terminal SetTitleWindow		OK
 Edit	Terminal TermWindow		Edycja
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               wypisz ten komunikat\n  -t,     --title              ustaw tytuł okna\n  -f,     --fullscreen         uruchom na pełnym ekranie\n  -w,     --working-directory  ustaw początkowy katalog roboczy\n
 Select all	Terminal TermWindow		Zaznacz wszystko
 Confirm exit if active programs exist	Terminal AppearancePrefView		Potwierdź wyjście jeśli istnieją aktywne programy
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t–\tAktualny katalog roboczy bieżącego procesu na aktywnej\n\t\t\tkarcie. Opcjonalnie może zostać podana maksymalna liczba\n\t\t\telementów ścieżki. Np. „%2d” dla maksymalnie dwóch elementów.\n\t%T\t–\tZlokalizowana nazwa aplikacji Terminal.\n\t%e\t–\tKodowanie aktywnej karty. Niewidoczne dla UTF-8.\n\t%i\t–\tIndeks okna.\n\t%t\t–\tTytuł aktywnej karty.
-ANSI bright green color	Terminal AppearancePrefView		ANSI jaskrawy zielony
 Copy	Terminal TermWindow		Kopiuj
-ANSI white color	Terminal AppearancePrefView		ANSI biały
 Edit tab title…	Terminal TermWindow		Edytuj tytuł karty…
-Settings	Terminal TermWindow		Ustawienia
 Print	Terminal TermWindow		Drukuj
+Settings	Terminal TermWindow		Ustawienia
 %app% settings	Terminal PrefWindow	window title	Ustawienia %app%
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t–\tAktualny katalog roboczy aktywnego procesu.\n\t\t\tOpcjonalnie może zostać podana maksymalna liczba\n\t\t\telementów ścieżki. Np. „%2d” dla maksymalnie dwóch elementów.\n\t%i\t–\tIndeks karty.\n\t%e\t–\tKodowanie aktywnej karty. Niewidoczne dla UTF-8.\n\t%p\t–\tNazwa aktywnego procesu.
-ANSI black color	Terminal AppearancePrefView		ANSI czarny
 Use default	Terminal SetTitleWindow		Użyj domyślnych
 Close tab	Terminal TermWindow		Zamknij kartę
-Selected background	Terminal AppearancePrefView		Wybrane tło
 Error!	Terminal getString		Błąd!
-Set tab title	Terminal TermWindow		Ustaw tytuł karty
 Appearance	Terminal PrefWindow		Wygląd
-ANSI bright yellow color	Terminal AppearancePrefView		ANSI jaskrawy żółty
-Encoding:	Terminal AppearancePrefView		Kodowanie:
+Set tab title	Terminal TermWindow		Ustaw tytuł karty
 Create link here	Terminal TermView		Utwórz link tutaj
-Custom	Terminal AppearancePrefView	Window size	Niestandardowe
-Selected text	Terminal AppearancePrefView		Zaznaczony tekst
+Encoding:	Terminal AppearancePrefView		Kodowanie:
 Change directory	Terminal TermView		Zmień katalog
-ANSI magenta color	Terminal AppearancePrefView		ANSI magenta
+Custom	Terminal AppearancePrefView	Window size	Niestandardowe
 Page setup…	Terminal TermWindow		Ustawienia strony…
-Defaults	Terminal PrefWindow		Przywróć domyślne
 Cancel	Terminal TermView		Anuluj
+Defaults	Terminal PrefWindow		Przywróć domyślne
 Revert	Terminal PrefWindow		Cofnij
-ANSI bright magenta color	Terminal AppearancePrefView		ANSI jaskrawy magenta
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
-ANSI bright cyan color	Terminal AppearancePrefView		ANSI jaskrawy cyjan
-Find next	Terminal TermWindow		Znajdź następny
 Use selection	Terminal FindWindow		Użyj zaznaczenia
+Find next	Terminal TermWindow		Znajdź następny
 Copy link location	Terminal TermView		Kopiuj adres odnośnika
 Window title:	Terminal AppearancePrefView		Tytuł okna:
 New tab	Terminal TermWindow		Nowa karta
-ANSI bright blue color	Terminal AppearancePrefView		ANSI jaskrawy niebieski
 Allow bold text	Terminal AppearancePrefView		Zezwól na pogrubiony tekst
 Window title…	Terminal TermWindow		Tytuł okna…
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Nie można wykonać „%command”:\n\t%error
 Open path	Terminal TermView		Otwórz ścieżkę
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Nie można wykonać „%command”:\n\t%error
 Terminal	System name		Terminal
-ANSI yellow color	Terminal AppearancePrefView		ANSI żółty
-Font size	Terminal TermWindow		Rozmiar fontu
 Custom	Terminal colors scheme		Niestandardowe
 Really close?	Terminal TermWindow		Na pewno zamknąć?
+Font size	Terminal TermWindow		Rozmiar fontu
 OK	Terminal TermApp		OK
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces „%1” jest wciąż w użyciu.\nJeśli zamkniesz terminal, proces zostanie zatrzymany.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nieznana opcja „%s”\n
 Tab title:	Terminal AppearancePrefView		Tytuł karty:
 Text not found.	Terminal TermWindow		Tekst nie znaleziony.
-Find failed	Terminal TermWindow		Nie znaleziono
 Match word	Terminal FindWindow		Dopasuj słowo
-Color scheme:	Terminal AppearancePrefView		Schemat kolorów:
 New Terminal	Terminal TermWindow		Nowy terminal
+Find failed	Terminal TermWindow		Nie znaleziono
 Quit	Terminal TermWindow		Zakończ
-Find previous	Terminal TermWindow		Znajdź poprzedni
 Match case	Terminal FindWindow		Dopasuj wielkość liter
+Find previous	Terminal TermWindow		Znajdź poprzedni
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Szablon określający tytuły kart. Następujące symbole mogą\nzostać użyte:
 Close	Terminal TermWindow		Zamknij
 Save to file…	Terminal PrefWindow		Zapisz do pliku…
-Background	Terminal AppearancePrefView		Tło
-ANSI green color	Terminal AppearancePrefView		ANSI zielony
 Copy path	Terminal TermView		Kopiuj ścieżkę
 Window size	Terminal TermWindow		Rozmiar okna
 Copy absolute path	Terminal TermView		Kopiuj ścieżkę absolutną
 Cancel	Terminal TermWindow		Anuluj
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Proces „%1” jest wciąż w użyciu.\nJeśli zamkniesz tę kartę, proces zostanie zatrzymany.
-Cursor	Terminal AppearancePrefView		Kursor
 Full screen	Terminal TermWindow		Pełny ekran
 Shell 	Terminal TermWindow		Powłoka
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t–\tZnak „%”.\n\t%<\t–\tRozpoczyna sekcję, która będzie pokazana tylko jeśli znacznik\n\t\t\tnastępujący nie będzie pusty.\n\t%>\t–\tRozpoczyna sekcję, która będzie pokazana tylko jeśli znacznik\n\t\t\tpomiędzy poprzednią sekcją %< a obecną nie będzie pusty.\n\t%-\t–\tKończy powyższe sekcje.\n\nKażdy znak niebędący alfanumerycznym, znajdujący się pomiędzy „%” a literą\nformatującą wstawi spację, tylko jeśli znacznik nie jest pusty. Zostanie\nona dodana do sekcji %<.
@@ -87,32 +70,25 @@ Window size:	Terminal AppearancePrefView		Rozmiar okna:
 Switch Terminals	Terminal TermWindow		Przełącz terminal
 Decrease	Terminal TermWindow		Zmniejsz
 Settings…	Terminal TermWindow		Ustawienia…
-ANSI bright white color	Terminal AppearancePrefView		ANSI jaskrawy biały
-Blinking cursor	Terminal AppearancePrefView		Migający kursor
 Cancel	Terminal SetTitleWindow		Anuluj
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Wzór ustalający tytuł okna. Następujące wyznaczniki\nmogą zostać użyte:\n
+Blinking cursor	Terminal AppearancePrefView		Migający kursor
 Use text:	Terminal FindWindow		Użyj tekstu:
 Close active tab	Terminal TermWindow		Zamknij aktywną kartę
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Wzór ustalający tytuł okna. Następujące wyznaczniki\nmogą zostać użyte:\n
 Save as default	Terminal TermWindow		Zapisz jako domyślny
 Nothing is selected.	Terminal TermWindow		Nic nie jest zaznaczone.
-ANSI red color	Terminal AppearancePrefView		ANSI czerwony
 Use left Option as Meta key	Terminal AppearancePrefView		Użyj lewego klawisza Option jako klawisza Meta
 Find	Terminal FindWindow		Znajdź
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Wzór ustalający tytuł aktywnej karty. Następujące wyznaczniki\nmogą zostać użyte:\n
 Font:	Terminal AppearancePrefView		Font:
 Paste	Terminal TermWindow		Wklej
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Szablon określający tytuły okien. Znaczenie poszczególnych symboli jest następujące:
-ANSI bright black color	Terminal AppearancePrefView		ANSI jaskrawy czarny
 Copy here	Terminal TermView		Kopiuj tutaj
-ANSI bright red color	Terminal AppearancePrefView		ANSI jaskrawy czerwony
 Use default shell	Terminal Shell		Użyj domyślnej powłoki
-Color:	Terminal AppearancePrefView		Kolor:
 Open link	Terminal TermView		Otwórz odnośnik
-Text	Terminal AppearancePrefView		Tekst
 Not found.	Terminal TermWindow		Nie znaleziono.
 Find…	Terminal TermWindow		Znajdź…
 No search string was entered.	Terminal TermWindow		Nie podano ciągu znaków do wyszukania.
-Text under cursor	Terminal AppearancePrefView		Tekst pod kursorem
 Move here	Terminal TermView		Przenieś tutaj
 Abort	Terminal Shell		Anuluj
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Następujące procesy są wciąż w użyciu:\n\n\t%1\n\nJeśli zamkniesz terminal, te procesy zostaną zatrzymane.

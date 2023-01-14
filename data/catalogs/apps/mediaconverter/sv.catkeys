@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaConverter	2816184527
+1	swedish	x-vnd.Haiku-MediaConverter	338319367
 Input file not recognized as Audio or Video	MediaConverter		Indatafilen är inte igenkänd som ljud eller video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Videokvalité: %3d%%
@@ -12,6 +12,7 @@ MediaConverter+:SaveDirectory	MediaConverter		MediaKonverterare+:SaveDirectory
 Error creating video.	MediaConverter		Fel vid skapande av video.
 Cancelling	MediaConverter		Avbryter
 None available	Audio codecs		Inte tillgängliga
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Filen har flera ljud- eller videospår, bara det första av varje kommer att konverteras.
 No file selected	MediaConverter-FileInfo		Ingen fil vald
 High	MediaConverter		Hög
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Filen kändes inte igen som en mediafil:} other{# filerna kändes inte igen som mediafiler:}}
@@ -26,6 +27,7 @@ Error loading a file	MediaConverter		Fel vid inläsning av en fil
 Encoder parameters	MediaConverter-EncoderWindow		Kodningsparametrar
 Open…	Menu		Öppna...
 Audio encoding:	MediaConverter		Ljudkodning:
+Multi-track file detected	MediaConverter		Flerspårsfil upptäcktes
 Audio quality: %3d%%	MediaConverter		Ljudkvalité: %3d%%
 Cancelling…	MediaConverter		Avbryter...
 Output file '%filename' created	MediaConverter		Utfil '%filename' skapad
@@ -63,6 +65,7 @@ File	Menu		Arkiv
 Video quality not supported	MediaConverter		Videokvalitén stöds ej
 Select this folder	MediaConverter		Välj denna mapp
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanaler
+Understood	MediaConverter		Förstått
 %d bit 	MediaFileInfo		%d bitar
 No video	Video codecs list		Inga filmer
 Continue	MediaConverter		Fortsätt

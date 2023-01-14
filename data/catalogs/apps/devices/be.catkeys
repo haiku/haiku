@@ -1,24 +1,18 @@
-1	belarusian	x-vnd.Haiku-Devices	490380176
+1	belarusian	x-vnd.Haiku-Devices	2347806408
 ACPI bus	DevicesView		Шына ACPI
 Encryption controller	Device		Кантролер шыфравання
-Bus Information	Device		Інфармацыя шыны
 Devices	System name		Прылады
 Graphics Peripheral	DeviceSCSI		Графічная перыферыя
 Processor	Device		Працэсар
 Generate system information	DevicesView		Сабраць інфармацыю аб сістэме
 Class info	DevicePCI		Інфа класа
-ACPI Information	DeviceACPI		Інфармацыя ACPI
-Detailed	DevicesView		Падрабязна
 Computer	DevicesView		Кампутар
 Communications	DeviceSCSI		Камунікацыі
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Инфа класа:\t\t\t\t: %classInfo%
 Mass storage controller	Device		Кантролер прылад захавання даных
 Connection	DevicesView		Спалучэнне
 Printer	DeviceSCSI		Друкарка
 ACPI Processor Namespace '%2'	DeviceACPI		Абшар '%2' працэсара ACPI
-SCSI Information	DeviceSCSI		Инфа SCSI
 Manufacturer	Device		Вытворца
-Device name:	Device		Імя прылады:
 Scanner	DeviceSCSI		Сканэр
 Memory controller	Device		Кантролер памяці
 Unknown device	DevicesView		Невядомая прылада
@@ -27,7 +21,6 @@ ACPI node '%1'	DeviceACPI		Вузел ACPI '%1'
 Optical Drive	DeviceSCSI		Аптычны дыск
 Name	PropertyList		Імя
 Manufacturer	DeviceSCSI		Вытворца
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Імя прылады\t\t\t\t: %Name%\nВытворца\t\t\t: %Manufacturer%\nБягучы драйвер\t\t\t\t: %DriverUsed%\nПуці прылады\t: %DevicePaths%
 Device name	Device		Імя прылады
 Satellite communications controller	Device		Кантролер спадарожнікавай сувязі
 Device class	DeviceSCSI		Клас прылады
@@ -36,14 +29,12 @@ Input device controller	Device		Кантролер прылад уводу
 PCI bus	DevicesView		Шына PCI
 ACPI System Indicator	DeviceACPI		Сістэмны індыкатар ACPI
 ACPI System Bus	DeviceACPI		Сістэмная шына ACPI
-PCI Information	DevicePCI		Інфармацыя PCI
 Tape Drive	DeviceSCSI		Прывад ленты
 Changer	DeviceSCSI		Чэйнджэр
 Serial bus controller	Device		Кантролер серыйнай шыны
 Refresh devices	DevicesView		Абнавіць прылады
 Category	DevicesView		Катэгорыя
 RBC	DeviceSCSI		RBC
-None	Device		Адсутнічае
 Device paths	Device		Пуці прыладаў
 Unknown device	Device		Невядомая прылада
 Wireless controller	Device		Бесшнуравы кантролер
@@ -53,25 +44,21 @@ Devices	DevicesView		Прылады
 Device name	DeviceACPI		Імя прылады
 Card Reader	DeviceSCSI		Чытальнік картак
 Display controller	Device		Кантролер экрану
-Basic information	DevicesView		Асноўная інфармацыя
-Bus	DevicesView		Шына
 Device name	DevicePCI		Імя прылады
 Disk Drive	DeviceSCSI		Прывад дыскау
-Other	DeviceSCSI		Іншы(я)
 Report compatibility	DevicesView		Паведаміць аб сумяшчальнасці
+Other	DeviceSCSI		Іншы(я)
 Computer	Device		Кампутар
 PCI bus	Device		Шына PCI
 Enclosure	DeviceSCSI		Уключэнне
-Order by:	DevicesView		Парадкаваць па:
 ACPI Thermal Zone	DeviceACPI		Тэрмальная зона ACPI
+Order by:	DevicesView		Парадкаваць па:
 Intelligent controller	Device		Інтэлектуальны кантролер
 Multimedia controller	Device		Кантролер мультымедыя
 Quit	DevicesView		Выйсці
 ISA bus	Device		Шына ISA
 ISA bus	DevicesView		Шына ISA
 Processor	DeviceSCSI		Працэсар
-Manufacturer:	Device		Вытворца:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Інфа класа:\t\t\t\t: %classInfo%
 Bridge	Device		Мост
 Worm	DeviceSCSI		Ворм
 CD-ROM	DeviceSCSI		CD-ROM

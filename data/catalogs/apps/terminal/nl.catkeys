@@ -1,83 +1,66 @@
-1	dutch; flemish	x-vnd.Haiku-Terminal	3440179729
-ANSI cyan color	Terminal AppearancePrefView		ANSI cyaan kleur
+1	dutch; flemish	x-vnd.Haiku-Terminal	2536107739
 Close other tabs	Terminal TermWindow		Andere tabs sluiten
 Insert path	Terminal TermView		Voeg pad in
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminal kon de shell niet starten. Sorry.
 Text encoding	Terminal TermWindow		Tekstcodering
-ANSI blue color	Terminal AppearancePrefView		ANSI blauwe kleur
 OK	Terminal SetTitleWindow		Oké
 Edit	Terminal TermWindow		Aanpassen
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		 -h, --help print deze help\n-t, --title stel venster titel in\n-f, --fullscreen start volledig scherm\n-w, --working-directory stel initiële werk map in\n
 Select all	Terminal TermWindow		Alles selecteren
 Confirm exit if active programs exist	Terminal AppearancePrefView		Afsluiten bevestigen als er programma's actief zijn
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tDe huidige werkmap van het actieve proces in de\n\t\t\thuidige tab. Optioneel kan het maximum aantal componenten\n\t\t\tvan het pad gespecificeerd worden. Bijvoorbeeld '%2d' voor\n\t\t\tmaximaal twee componenten.\n\t%T\t-\tDe naam van de Terminaltoepassing in de huidige taal.\n\t%e\t-\tDe tekstcodering van de huidige tab. Bij UTF-8 wordt er niets getoond.\n\t%i\t-\tDe index van het venster.\n\t%p\t-\tDe naam van het proces dat actief is in de huidige tab.\n\t%t\t-\tDe titel van de huidige tab.
-ANSI bright green color	Terminal AppearancePrefView		ANSI fel groene kleur
 Copy	Terminal TermWindow		Kopiëren
-ANSI white color	Terminal AppearancePrefView		ANSI witte kleur
 Edit tab title…	Terminal TermWindow		Tabtitel aanpassen...
-Settings	Terminal TermWindow		Instellingen
 Print	Terminal TermWindow		Afdrukken
+Settings	Terminal TermWindow		Instellingen
 %app% settings	Terminal PrefWindow	window title	Instellingen voor %app%
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.
-ANSI black color	Terminal AppearancePrefView		ANSI zwarte kleur
 Use default	Terminal SetTitleWindow		De standaard gebruiken
 Close tab	Terminal TermWindow		De tab sluiten
-Selected background	Terminal AppearancePrefView		Geselecteerde achtergrond
 Error!	Terminal getString		Fout!
-Set tab title	Terminal TermWindow		De tabtitel instellen
 Appearance	Terminal PrefWindow		Uiterlijk
-ANSI bright yellow color	Terminal AppearancePrefView		ANSI fel gele kleur
-Encoding:	Terminal AppearancePrefView		Codering:
+Set tab title	Terminal TermWindow		De tabtitel instellen
 Create link here	Terminal TermView		Hier een link maken
-Custom	Terminal AppearancePrefView	Window size	Aangepast
-Selected text	Terminal AppearancePrefView		Geselecteerde tekst
+Encoding:	Terminal AppearancePrefView		Codering:
 Change directory	Terminal TermView		Directory veranderen
-ANSI magenta color	Terminal AppearancePrefView		ANSI magenta kleur
+Custom	Terminal AppearancePrefView	Window size	Aangepast
 Page setup…	Terminal TermWindow		Paginaconfiguratie
-Defaults	Terminal PrefWindow		Standaardinstellingen
 Cancel	Terminal TermView		Annuleren
+Defaults	Terminal PrefWindow		Standaardinstellingen
 Revert	Terminal PrefWindow		Herstellen
-ANSI bright magenta color	Terminal AppearancePrefView		ANSI fel magenta kleur
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminal
-ANSI bright cyan color	Terminal AppearancePrefView		ANSI fel cyaan kleur
-Find next	Terminal TermWindow		Volgende zoeken
 Use selection	Terminal FindWindow		Gebruik selectie
+Find next	Terminal TermWindow		Volgende zoeken
 Copy link location	Terminal TermView		Tekstlinklocatie kopiëren
 Window title:	Terminal AppearancePrefView		Venstertitel:
 New tab	Terminal TermWindow		Nieuwe tab
-ANSI bright blue color	Terminal AppearancePrefView		ANSI fel blauwe kleur
 Allow bold text	Terminal AppearancePrefView		Vette tekst toestaan
 Window title…	Terminal TermWindow		Venstertitel...
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan \"%command\" niet uitvoeren:\n\t%error
 Open path	Terminal TermView		Pad openen
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Kan \"%command\" niet uitvoeren:\n\t%error
 Terminal	System name		Terminal
-ANSI yellow color	Terminal AppearancePrefView		ANSI gele kleur
-Font size	Terminal TermWindow		Lettertypegrootte
 Custom	Terminal colors scheme		Aangepast
 Really close?	Terminal TermWindow		Bent u zeker dat u wilt sluiten?
+Font size	Terminal TermWindow		Lettertypegrootte
 OK	Terminal TermApp		Oké
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Het proces \"%1\" is nog gaande.\nAls u Terminal sluit, zal het proces afgebroken worden.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Niet-herkende optie \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Tabtitel:
 Text not found.	Terminal TermWindow		De tekst werd niet gevonden
-Find failed	Terminal TermWindow		Zoeken is mislukt
 Match word	Terminal FindWindow		Volledig woord moet overeenkomen
-Color scheme:	Terminal AppearancePrefView		Kleurschema:
 New Terminal	Terminal TermWindow		Nieuwe Terminal
+Find failed	Terminal TermWindow		Zoeken is mislukt
 Quit	Terminal TermWindow		Afsluiten
-Find previous	Terminal TermWindow		Vorige zoeken
 Match case	Terminal FindWindow		Hoofd-/kleine-lettergevoelig
+Find previous	Terminal TermWindow		Vorige zoeken
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Het patroon dat gebruikt wordt voor de titels van tabs. De volgende\nplaatshouders kunnen gebruikt worden:
 Close	Terminal TermWindow		Sluiten
 Save to file…	Terminal PrefWindow		Opslaan naar bestand...
-Background	Terminal AppearancePrefView		Achtergrond
-ANSI green color	Terminal AppearancePrefView		ANSI groene kleur
 Copy path	Terminal TermView		Pad kopiëren
 Window size	Terminal TermWindow		Venstergrootte
 Copy absolute path	Terminal TermView		Absoluut pad kopiëren
 Cancel	Terminal TermWindow		Annuleren
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Het proces \"%1\" is nog gaande.\nAls u de tab sluit, zal het proces afgebroken worden.
-Cursor	Terminal AppearancePrefView		Cursor
 Full screen	Terminal TermWindow		Volledig scherm
 Shell 	Terminal TermWindow		Shell
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tHet karakter '%'.\n\t%<\t-\tStart een sectie die alleen getoond wordt als de\n\t\t\teropvolgende plaatshouder niet leeg is.\n\t%>\t-\tStart een sectie die alleen getoond wordt als dr\n\t\t\tplaatshouder tussen de vorige %< sectie en deze\n\t\t\tniet leeg is.\n\t%-\t-\tEinde van een %< of %> sectie.\n\nElk niet-alfanumeriek karakter tussen '%' en de letter van de plaatshouder voegt alleen een\nspatie in als de plaatshouderwaarde niet leeg is. Het zal aan de %< sectie toegevoegd worden.
@@ -87,32 +70,25 @@ Window size:	Terminal AppearancePrefView		Venstergrootte:
 Switch Terminals	Terminal TermWindow		Wissel van Terminal
 Decrease	Terminal TermWindow		Verminderen
 Settings…	Terminal TermWindow		Instellingen...
-ANSI bright white color	Terminal AppearancePrefView		ANSI fel witte kleur
-Blinking cursor	Terminal AppearancePrefView		Knipperende cursor
 Cancel	Terminal SetTitleWindow		Annuleren
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Het model dat de venstertitel bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
+Blinking cursor	Terminal AppearancePrefView		Knipperende cursor
 Use text:	Terminal FindWindow		Tekst gebruiken:
 Close active tab	Terminal TermWindow		Het actieve tabblad sluiten
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Het model dat de venstertitel bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
 Save as default	Terminal TermWindow		Opslaan als standaard
 Nothing is selected.	Terminal TermWindow		Er is niets geselecteerd.
-ANSI red color	Terminal AppearancePrefView		ANSI rode kleur
 Use left Option as Meta key	Terminal AppearancePrefView		Gebruik de linker Optietoets als Metatoets
 Find	Terminal FindWindow		Zoeken
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Het model dat de titel van de huidige tab bepaalt.\nDe volgende plaatsaanduidingen kunnen worden gebruikt:\n
 Font:	Terminal AppearancePrefView		Lettertype:
 Paste	Terminal TermWindow		Plakken
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Het patroon dat gebruikt wordt om de venstertitels te specificeren.\nDe volgende plaatshouders kunnen gebruikt worden:
-ANSI bright black color	Terminal AppearancePrefView		ANSI fel zwarte kleur
 Copy here	Terminal TermView		Hierheen kopiëren
-ANSI bright red color	Terminal AppearancePrefView		ANSI fel rode kleur
 Use default shell	Terminal Shell		Standaard shell gebruiken
-Color:	Terminal AppearancePrefView		Kleur:
 Open link	Terminal TermView		Koppeling openen
-Text	Terminal AppearancePrefView		Tekst
 Not found.	Terminal TermWindow		Niet gevonden.
 Find…	Terminal TermWindow		Zoeken...
 No search string was entered.	Terminal TermWindow		Er werd geen zoektekst ingevoerd.
-Text under cursor	Terminal AppearancePrefView		Tekst onder de cursor
 Move here	Terminal TermView		Hierheen verplaatsen
 Abort	Terminal Shell		Afbreken
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		De volgende processen zijn nog gaande:\n\n\t%1\n\nAls u Terminal sluit, zullen de processen afgebroken worden.

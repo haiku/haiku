@@ -1,24 +1,18 @@
-1	esperanto	x-vnd.Haiku-Devices	3345509916
+1	esperanto	x-vnd.Haiku-Devices	907968852
 ACPI bus	DevicesView		ACPI-buso
 Encryption controller	Device		Ĉifradregilo
-Bus Information	Device		Businformo
 Devices	System name		Aparatoj
 Graphics Peripheral	DeviceSCSI		Grafika Flankaparato
 Processor	Device		Procesoro
 Generate system information	DevicesView		Generi sistemajn informojn
 Class info	DevicePCI		Klasaj informoj
-ACPI Information	DeviceACPI		Informoj de ACPI
-Detailed	DevicesView		Detala
 Computer	DevicesView		Komputilo
 Communications	DeviceSCSI		Komunikadoj
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Klasaj Informoj:\t\t\t\t: %classInfo%
 Mass storage controller	Device		Amaskonserveja regilo
 Connection	DevicesView		Konekto
 Printer	DeviceSCSI		Presilo
 ACPI Processor Namespace '%2'	DeviceACPI		Procesora nomspaco de ACPI '%2'
-SCSI Information	DeviceSCSI		Informoj de SCSI
 Manufacturer	Device		Fabrikanto
-Device name:	Device		Aparata nomo:
 Scanner	DeviceSCSI		Skanilo
 Memory controller	Device		Memora stirilo
 Unknown device	DevicesView		Nekonata aparato
@@ -27,7 +21,6 @@ ACPI node '%1'	DeviceACPI		ACPI-nodo '%1'
 Optical Drive	DeviceSCSI		Lumdiskilo
 Name	PropertyList		Nomo
 Manufacturer	DeviceSCSI		Fabrikanto
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nomo de aparato\t\t\t\t: %Name%\nProduktanto\t\t\t: %Manufacturer%\nUzata pelilo\t\t\t\t: %DriverUsed%\nItinero al aparato\t: %DevicePaths%
 Device name	Device		Aparata nomo
 Satellite communications controller	Device		Satelitakomunika regilo
 Device class	DeviceSCSI		Aparata klaso
@@ -36,14 +29,12 @@ Input device controller	Device		Enigaparata regilo
 PCI bus	DevicesView		PCI-buso
 ACPI System Indicator	DeviceACPI		ACPI Sistemindikilo
 ACPI System Bus	DeviceACPI		ACPI Sistembuso
-PCI Information	DevicePCI		PCI Informoj
 Tape Drive	DeviceSCSI		Bendolegilo
 Changer	DeviceSCSI		Ŝanĝanto
 Serial bus controller	Device		Seriabusa regilo
 Refresh devices	DevicesView		Aktualigi aparatojn
 Category	DevicesView		Kategorio
 RBC	DeviceSCSI		RBC
-None	Device		Neniu
 Device paths	Device		Itinero al aparato
 Unknown device	Device		Nekonata aparato
 Wireless controller	Device		Sendratreta regilo
@@ -53,27 +44,23 @@ Devices	DevicesView		Aparatoj
 Device name	DeviceACPI		Aparata nomo
 Card Reader	DeviceSCSI		Kartlegilo
 Display controller	Device		Ekrana regilo
-Basic information	DevicesView		Bazaj informoj
 ACPI Button '%1'	DeviceACPI		ACPI Butono '%1'
-Bus	DevicesView		Buso
 ACPI <unknown>	DeviceACPI		ACPI <nekonata>
 Device name	DevicePCI		Aparata nomo
 Disk Drive	DeviceSCSI		Diskingo
-Other	DeviceSCSI		Alia
 Report compatibility	DevicesView		Raporto pri kongruo
+Other	DeviceSCSI		Alia
 Computer	Device		Komputilo
 PCI bus	Device		Buso de PCI
 Enclosure	DeviceSCSI		Kunigaĵo
-Order by:	DevicesView		Ordigi laŭ:
 ACPI Thermal Zone	DeviceACPI		Temperatura intervalo de ACPI
+Order by:	DevicesView		Ordigi laŭ:
 Intelligent controller	Device		Inteligenta adaptilo
 Multimedia controller	Device		Plurmedia adaptilo
 Quit	DevicesView		Ĉesi
 ISA bus	Device		Buso de ISA
 ISA bus	DevicesView		Buso de ISA
 Processor	DeviceSCSI		Ĉefprocesoro
-Manufacturer:	Device		Produktanto:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Informo pri klaso:\t\t\t\t: %classInfo%
 Bridge	Device		Ponto
 Worm	DeviceSCSI		Vermo
 CD-ROM	DeviceSCSI		KD Nurlegebla

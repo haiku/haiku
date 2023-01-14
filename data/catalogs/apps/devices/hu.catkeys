@@ -1,7 +1,6 @@
-1	hungarian	x-vnd.Haiku-Devices	3349357485
+1	hungarian	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		ACPI port
 Encryption controller	Device		Titkosító vezérlő
-Bus Information	Device		Busz-információ
 Devices	System name		Eszközök
 USB bus	DevicesView		USB busz
 Graphics Peripheral	DeviceSCSI		Grafikus periféria
@@ -9,19 +8,14 @@ Processor	Device		Processzor
 Generate system information	DevicesView		Rendszerinformáció létrehozása
 Unknown	DeviceACPI		Ismeretlen
 Class info	DevicePCI		Osztály-információk
-ACPI Information	DeviceACPI		ACPI információ
-Detailed	DevicesView		Részletek
 USB bus	Device		USB busz
 Computer	DevicesView		Számítógép
 Communications	DeviceSCSI		Kommunikáció
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Osztály információi\t\t\t\t: %classinfo%
 Mass storage controller	Device		Háttértároló vezérlő
 Connection	DevicesView		Csatlakozás
 Printer	DeviceSCSI		Nyomtató
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI processzor névtér '%2'
-SCSI Information	DeviceSCSI		SCSI-információk
 Manufacturer	Device		Gyártó
-Device name:	Device		Eszköz neve:
 Scanner	DeviceSCSI		Lapolvasó
 Memory controller	Device		Memóriavezérlő
 Unknown device	DevicesView		Ismeretlen eszköz
@@ -30,7 +24,6 @@ ACPI node '%1'	DeviceACPI		ACPI csomópont '%1'
 Optical Drive	DeviceSCSI		Optikai meghajtó
 Name	PropertyList		Név
 Manufacturer	DeviceSCSI		Gyártó
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Eszköznév\t\t\t\t: %Name%\nGyártó\t\t\t: %Manufacturer%\nVezérlőprogram\t\t\t\t: %DriverUsed%\nÚtvonal\t: %DevicePaths%
 Device name	Device		Eszköznév
 Satellite communications controller	Device		Műholdas kommunikációs vezérlő
 Device class	DeviceSCSI		Eszközosztály
@@ -39,14 +32,12 @@ Input device controller	Device		Beviteli eszköz vezérlő
 PCI bus	DevicesView		PCI port
 ACPI System Indicator	DeviceACPI		ACPI rendszerjelző
 ACPI System Bus	DeviceACPI		ACPI rendszerbusz
-PCI Information	DevicePCI		PCI információ
 Tape Drive	DeviceSCSI		Szalagos meghajtó
 Changer	DeviceSCSI		Cserélő
 Serial bus controller	Device		Soros busz vezérlő
 Refresh devices	DevicesView		Eszközök frissítése
 Category	DevicesView		Kategória
 RBC	DeviceSCSI		RBC
-None	Device		Nincs
 Device paths	Device		Útvonal
 Unknown device	Device		Ismeretlen eszköz
 Wireless controller	Device		Vezeték nélküli vezérlő
@@ -56,27 +47,23 @@ Devices	DevicesView		Eszközök
 Device name	DeviceACPI		Eszköznév
 Card Reader	DeviceSCSI		Kártyaolvasó
 Display controller	Device		Kijelző vezérlő
-Basic information	DevicesView		Alapvető információk
 ACPI Button '%1'	DeviceACPI		ACPI gomb '%1'
-Bus	DevicesView		Busz
 ACPI <unknown>	DeviceACPI		ACPI <ismeretlen>
 Device name	DevicePCI		Eszköznév
 Disk Drive	DeviceSCSI		Lemezmeghajtó
-Other	DeviceSCSI		Egyéb
 Report compatibility	DevicesView		Kompatibilitás jelentése
+Other	DeviceSCSI		Egyéb
 Computer	Device		Számítógép
 PCI bus	Device		PCI port
 Enclosure	DeviceSCSI		Doboz
-Order by:	DevicesView		Rendezés alapja:
 ACPI Thermal Zone	DeviceACPI		ACPI hőzóna
+Order by:	DevicesView		Rendezés alapja:
 Intelligent controller	Device		Intelligens vezérlő
 Multimedia controller	Device		Multimedia vezérlő
 Quit	DevicesView		Kilépés
 ISA bus	Device		ISA port
 ISA bus	DevicesView		ISA port
 Processor	DeviceSCSI		Processzor
-Manufacturer:	Device		Gyártó:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Osztályinformáció:\t\t\t\t: %classInfo%
 Bridge	Device		Híd
 Worm	DeviceSCSI		Féreg
 CD-ROM	DeviceSCSI		CD meghajtó

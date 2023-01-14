@@ -1,24 +1,18 @@
-1	thai	x-vnd.Haiku-Devices	3345509916
+1	thai	x-vnd.Haiku-Devices	907968852
 ACPI bus	DevicesView		ACPI bus
 Encryption controller	Device		ตัวควบคุมการเข้ารหัส
-Bus Information	Device		ข้อมูล Bus
 Devices	System name		เครื่องมือ
 Graphics Peripheral	DeviceSCSI		อุปกรณ์ต่อพ่วงกราฟิก
 Processor	Device		หน่วยประมวลผล
 Generate system information	DevicesView		สร้างข้อมูลระบบ
 Class info	DevicePCI		ข้อมูล Class
-ACPI Information	DeviceACPI		ข้อมูล ACPI
-Detailed	DevicesView		รายละเอียด
 Computer	DevicesView		คอมพิวเตอร์
 Communications	DeviceSCSI		การสื่อสาร
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		ข้อมูลคลาส:\t\t\t\t: %classInfo%
 Mass storage controller	Device		อุปกรณ์เก็บข้อมูลขนาดใหญ่
 Connection	DevicesView		การเชื่อมต่อ
 Printer	DeviceSCSI		เครื่องพิมพ์
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI พื้นที่ชื่อโปรเซสเซอร์ '%2'
-SCSI Information	DeviceSCSI		ข้อมูล SCSI
 Manufacturer	Device		ผู้ผลิต
-Device name:	Device		ชื่ออุปกรณ์:
 Scanner	DeviceSCSI		เครื่องสแกน
 Memory controller	Device		ตัวควบคุมหน่วยความจำ
 Unknown device	DevicesView		อุปกรณ์ที่ไม่รู้จัก
@@ -27,7 +21,6 @@ ACPI node '%1'	DeviceACPI		ACPI node '%1'
 Optical Drive	DeviceSCSI		ออปติคัลไดรฟ์
 Name	PropertyList		ชื่อ
 Manufacturer	DeviceSCSI		ผู้ผลิต
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		ชื่ออุปกรณ์\t\t\t\t: %Name%\nผู้ผลิต\t\t\t: %Manufacturer%\nไดรเวอร์ใช้งาน\t\t\t\t: %DriverUsed%\nอุปกรณ์ พาธ\t: %DevicePaths%
 Device name	Device		ชื่ออุปกรณ์
 Satellite communications controller	Device		ตัวควบคุมการสื่อสารผ่านดาวเทียม
 Device class	DeviceSCSI		คลาสอุปกรณ์
@@ -36,14 +29,12 @@ Input device controller	Device		ตัวควบคุมอุปกรณ์
 PCI bus	DevicesView		PCI bus
 ACPI System Indicator	DeviceACPI		ตัวบ่งชี้ระบบ ACPI
 ACPI System Bus	DeviceACPI		ACPI System Bus
-PCI Information	DevicePCI		ข้อมูล PCI
 Tape Drive	DeviceSCSI		เทปไดรฟ์
 Changer	DeviceSCSI		ตัวแปลง
 Serial bus controller	Device		Serial bus controller
 Refresh devices	DevicesView		รีเฟรชอุปกรณ์
 Category	DevicesView		หมวดหมู่
 RBC	DeviceSCSI		RBC
-None	Device		ไม่มี
 Device paths	Device		paths อุปกรณ์
 Unknown device	Device		อุปกรณ์ที่ไม่รู้จัก
 Wireless controller	Device		ตัวควบคุมอุปกรณ์ไร้สาย
@@ -53,27 +44,23 @@ Devices	DevicesView		อุปกรณ์
 Device name	DeviceACPI		ชื่ออุปกรณ์
 Card Reader	DeviceSCSI		ตัวอ่านการ์ด
 Display controller	Device		ตัวควบคุมการแสดงผล
-Basic information	DevicesView		ขื้อมูลพื้นฐาน
 ACPI Button '%1'	DeviceACPI		ACPI Button '%1'
-Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		ชืออุปกรณ์
 Disk Drive	DeviceSCSI		Disk Drive
-Other	DeviceSCSI		อื่นๆ
 Report compatibility	DevicesView		รายงานความเข้ากันได้
+Other	DeviceSCSI		อื่นๆ
 Computer	Device		คอมพิวเตอร์
 PCI bus	Device		PCI bus
 Enclosure	DeviceSCSI		ปิด
-Order by:	DevicesView		สั่งโดย:
 ACPI Thermal Zone	DeviceACPI		ACPI Thermal Zone
+Order by:	DevicesView		สั่งโดย:
 Intelligent controller	Device		ตัวควบคุมอัจฉริยะ
 Multimedia controller	Device		ตัวควบคุมมัลติมีเดีย
 Quit	DevicesView		ปิด
 ISA bus	Device		ISA bus
 ISA bus	DevicesView		ISA bus
 Processor	DeviceSCSI		หน่วยประมวลผล
-Manufacturer:	Device		ผู้ผลิต:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		ข้อมูลคลาส:\t\t\t\t: %classInfo%
 Bridge	Device		Bridge
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM

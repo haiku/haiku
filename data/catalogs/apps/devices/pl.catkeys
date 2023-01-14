@@ -1,7 +1,6 @@
-1	polish	x-vnd.Haiku-Devices	3349357485
+1	polish	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		Magistrala ACPI
 Encryption controller	Device		Kontroler szyfrowania
-Bus Information	Device		Informacje o szynie
 Devices	System name		Urządzenia
 USB bus	DevicesView		Szyna USB
 Graphics Peripheral	DeviceSCSI		Grafika obwodowa
@@ -9,19 +8,14 @@ Processor	Device		Procesor
 Generate system information	DevicesView		Wygeneruj informacje systemowe
 Unknown	DeviceACPI		Nieznane
 Class info	DevicePCI		Informacja klasy
-ACPI Information	DeviceACPI		Informacje o ACPI
-Detailed	DevicesView		Szczegóły
 USB bus	Device		Szyna USB
 Computer	DevicesView		Komputer
 Communications	DeviceSCSI		Komunikacja
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Klasa:\t\t\t\t: %classInfo%
 Mass storage controller	Device		Kontroler pamięci masowej
 Connection	DevicesView		Połączenie
 Printer	DeviceSCSI		Drukarka
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Processor Namespace „%2”
-SCSI Information	DeviceSCSI		Informacje o SCSI
 Manufacturer	Device		Producent
-Device name:	Device		Nazwa urządzenia:
 Scanner	DeviceSCSI		Skaner
 Memory controller	Device		Kontroler pamięci
 Unknown device	DevicesView		Nieznane urządzenie
@@ -30,7 +24,6 @@ ACPI node '%1'	DeviceACPI		Węzeł ACPI „%1”
 Optical Drive	DeviceSCSI		Napęd optyczny
 Name	PropertyList		Nazwa
 Manufacturer	DeviceSCSI		Producent
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nazwa urządzenia\t\t\t\t: %Name%\nProducent\t\t\t: %Manufacturer%\nUżyty sterownik\t\t\t\t: %DriverUsed%\nŚcieżki urządzenia\t: %DevicePaths%
 Device name	Device		Nazwa urządzenia
 Satellite communications controller	Device		Kontroler komunikacji satelitarnej
 Device class	DeviceSCSI		Klasa urządzenia
@@ -39,14 +32,12 @@ Input device controller	Device		Kontroler urządzenia wejścia
 PCI bus	DevicesView		Magistrala PCI
 ACPI System Indicator	DeviceACPI		Wskaźnik systemowy ACPI
 ACPI System Bus	DeviceACPI		ACPI Szyna Systemowa
-PCI Information	DevicePCI		Informacje o PCI
 Tape Drive	DeviceSCSI		Napęd taśmowy
 Changer	DeviceSCSI		Zmieniarka
 Serial bus controller	Device		Kontroler magistrali szeregowej
 Refresh devices	DevicesView		Odśwież urządzenia
 Category	DevicesView		Kategoria
 RBC	DeviceSCSI		RBC
-None	Device		Brak
 Device paths	Device		Ścieżki urządzeń
 Unknown device	Device		Nieznane urządzenie
 Wireless controller	Device		Kontroler łączy bezprzewodowych
@@ -56,27 +47,23 @@ Devices	DevicesView		Urządzenia
 Device name	DeviceACPI		Nazwa urządzenia
 Card Reader	DeviceSCSI		Czytnik kart
 Display controller	Device		Kontroler ekranu
-Basic information	DevicesView		Podstawowe informacje
 ACPI Button '%1'	DeviceACPI		Przycisk ACPI „%1”
-Bus	DevicesView		Magistrala
 ACPI <unknown>	DeviceACPI		ACPI <nieznany>
 Device name	DevicePCI		Nazwa urządzenia
 Disk Drive	DeviceSCSI		Dysk
-Other	DeviceSCSI		Inne
 Report compatibility	DevicesView		Raport zgodności
+Other	DeviceSCSI		Inne
 Computer	Device		Komputer
 PCI bus	Device		Magistrala PCI
 Enclosure	DeviceSCSI		Załącznik
-Order by:	DevicesView		Sortuj według:
 ACPI Thermal Zone	DeviceACPI		Strefa termalna ACPI
+Order by:	DevicesView		Sortuj według:
 Intelligent controller	Device		Kontroler inteligentny
 Multimedia controller	Device		Kontroler multimediów
 Quit	DevicesView		Zakończ
 ISA bus	Device		Magistrala ISA
 ISA bus	DevicesView		Magistrala ISA
 Processor	DeviceSCSI		Procesor
-Manufacturer:	Device		Producent:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klasa:\t\t\t\t: %classInfo%
 Bridge	Device		Mostek
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM

@@ -1,7 +1,6 @@
-1	swedish	x-vnd.Haiku-Devices	3349357485
+1	swedish	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		ACPI-buss
 Encryption controller	Device		Krypteringsstyrenhet
-Bus Information	Device		Bus Information
 Devices	System name		Enheter
 USB bus	DevicesView		USB-buss
 Graphics Peripheral	DeviceSCSI		Grafisk kringutrustning
@@ -9,19 +8,14 @@ Processor	Device		Processor
 Generate system information	DevicesView		Generera systeminformation
 Unknown	DeviceACPI		Okänd
 Class info	DevicePCI		Klass information
-ACPI Information	DeviceACPI		ACPI-information
-Detailed	DevicesView		Detaljerat
 USB bus	Device		USB-buss
 Computer	DevicesView		Dator
 Communications	DeviceSCSI		Kommunikations
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Klassinformation:\t\t\t\t: %classInfo%
 Mass storage controller	Device		Lagringskontroller
 Connection	DevicesView		Anslutning
 Printer	DeviceSCSI		Skrivare
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Processor-namnrymd '%2'
-SCSI Information	DeviceSCSI		SCSI Information
 Manufacturer	Device		Tillverkare
-Device name:	Device		Enhetsnamn:
 Scanner	DeviceSCSI		Skanner
 Memory controller	Device		Minneskontroller
 Unknown device	DevicesView		Okänd enhet
@@ -30,7 +24,6 @@ ACPI node '%1'	DeviceACPI		ACPI nod '%1'
 Optical Drive	DeviceSCSI		Optisk enhet
 Name	PropertyList		Namn
 Manufacturer	DeviceSCSI		Tillverkare
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Enhetsnamn\t\t\t\t: %Name%\nTillverkare\t\t\t: %Manufacturer%\nDrivrutin\t\t\t\t: %DriverUsed%\nEnhetssökväg\t: %DevicePaths%
 Device name	Device		Enhetsnamn
 Satellite communications controller	Device		Styrenhet för satellitkommunikation
 Device class	DeviceSCSI		Enhetsklass
@@ -39,14 +32,12 @@ Input device controller	Device		Indataenhetskontroller
 PCI bus	DevicesView		PCI-buss
 ACPI System Indicator	DeviceACPI		ACPI systemindikator
 ACPI System Bus	DeviceACPI		ACPI systembuss
-PCI Information	DevicePCI		PCI-information
 Tape Drive	DeviceSCSI		Bandenhet
 Changer	DeviceSCSI		Växlare
 Serial bus controller	Device		Seriell kontroller
 Refresh devices	DevicesView		Uppdatera enheter
 Category	DevicesView		Kategori
 RBC	DeviceSCSI		RBC
-None	Device		Ingen
 Device paths	Device		Enhetssökväg
 Unknown device	Device		Okänd enhet
 Wireless controller	Device		Trådlös kontroller
@@ -56,27 +47,23 @@ Devices	DevicesView		Enheter
 Device name	DeviceACPI		Enhetsnamn
 Card Reader	DeviceSCSI		Kortläsare
 Display controller	Device		Skärmkontroller
-Basic information	DevicesView		Grundläggande information
 ACPI Button '%1'	DeviceACPI		ACPI Knapp '%1'
-Bus	DevicesView		Buss
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Enhetsnamn
 Disk Drive	DeviceSCSI		Diskenhet
-Other	DeviceSCSI		Annan
 Report compatibility	DevicesView		Rapportera kompatibilitet
+Other	DeviceSCSI		Annan
 Computer	Device		Dator
 PCI bus	Device		PCI-buss
 Enclosure	DeviceSCSI		Hölje
-Order by:	DevicesView		Sortera efter:
 ACPI Thermal Zone	DeviceACPI		ACPI termisk zon
+Order by:	DevicesView		Sortera efter:
 Intelligent controller	Device		Intelligent styrenhet
 Multimedia controller	Device		Multimediakontroller
 Quit	DevicesView		Avsluta
 ISA bus	Device		ISA-buss
 ISA bus	DevicesView		ISA-buss
 Processor	DeviceSCSI		Processor
-Manufacturer:	Device		Tillverkare:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klassinformation:\t\t\t\t: %classInfo%
 Bridge	Device		Brygga
 Worm	DeviceSCSI		Mask
 CD-ROM	DeviceSCSI		CD-ROM

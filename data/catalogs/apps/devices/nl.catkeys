@@ -1,7 +1,6 @@
-1	dutch; flemish	x-vnd.Haiku-Devices	3349357485
+1	dutch; flemish	x-vnd.Haiku-Devices	911816421
 ACPI bus	DevicesView		ACPI-bus
 Encryption controller	Device		Encryptie-controller
-Bus Information	Device		Businformatie
 Devices	System name		Devices
 USB bus	DevicesView		USB-bus
 Graphics Peripheral	DeviceSCSI		Graphics randapparaat
@@ -9,19 +8,14 @@ Processor	Device		Processor
 Generate system information	DevicesView		Genereer systeeminformatie
 Unknown	DeviceACPI		Onbekend
 Class info	DevicePCI		Klasse info
-ACPI Information	DeviceACPI		ACPI-informatie
-Detailed	DevicesView		Gedetailleerd
 USB bus	Device		USB-bus
 Computer	DevicesView		Computer
 Communications	DeviceSCSI		Communicaties
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Klassengegevens:\t \t \t \t : %classInfo%
 Mass storage controller	Device		Massa-opslagcontroller
 Connection	DevicesView		Verbinding
 Printer	DeviceSCSI		Printer
 ACPI Processor Namespace '%2'	DeviceACPI		ACPI Processor Naamruimte '%2'
-SCSI Information	DeviceSCSI		SCSI-informatie
 Manufacturer	Device		Fabrikant
-Device name:	Device		Apparaatnaam:
 Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Geheugencontroller
 Unknown device	DevicesView		Onbekend apparaat
@@ -30,7 +24,6 @@ ACPI node '%1'	DeviceACPI		ACPI-node '%1'
 Optical Drive	DeviceSCSI		Optische schijf
 Name	PropertyList		Naam
 Manufacturer	DeviceSCSI		Fabrikant
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Apparaatnaam\t \t \t \t : %Name%\nFabrikant\t \t \t: %Manufacturer%\nStuurprogramma gebruikt\t \t \t \t : %DriverUsed%\nApparaat-paden\t : %DevicePaths%
 Device name	Device		Apparaatnaam
 Satellite communications controller	Device		Satellietcommunicatie-controller
 Device class	DeviceSCSI		Apparaatklasse
@@ -39,14 +32,12 @@ Input device controller	Device		Inputapparaat-controller
 PCI bus	DevicesView		PCI-bus
 ACPI System Indicator	DeviceACPI		ACPI-systeemindicator
 ACPI System Bus	DeviceACPI		ACPI-systeembus
-PCI Information	DevicePCI		PCI-informatie
 Tape Drive	DeviceSCSI		Tape-station
 Changer	DeviceSCSI		Wisselaar
 Serial bus controller	Device		Seriële-bus-controller
 Refresh devices	DevicesView		Apparaten her-initialiseren
 Category	DevicesView		Categorie
 RBC	DeviceSCSI		RBC
-None	Device		Geen
 Device paths	Device		Apparaatpaden
 Unknown device	Device		Onbekend apparaat
 Wireless controller	Device		Draadloze controller
@@ -56,27 +47,23 @@ Devices	DevicesView		Devices
 Device name	DeviceACPI		Apparaatnaam
 Card Reader	DeviceSCSI		Kaartlezer
 Display controller	Device		Displaycontroller
-Basic information	DevicesView		Basisinformatie
 ACPI Button '%1'	DeviceACPI		ACPI Knop '%1'
-Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <onbekend>
 Device name	DevicePCI		Apparaatnaam
 Disk Drive	DeviceSCSI		Schijf
-Other	DeviceSCSI		Andere
 Report compatibility	DevicesView		Rapporteer compatibiliteit
+Other	DeviceSCSI		Andere
 Computer	Device		Computer
 PCI bus	Device		PCI-bus
 Enclosure	DeviceSCSI		Behuizing
-Order by:	DevicesView		Rangschik op:
 ACPI Thermal Zone	DeviceACPI		ACPI Thermische zone
+Order by:	DevicesView		Rangschik op:
 Intelligent controller	Device		Intelligente controller
 Multimedia controller	Device		Multimedia-controller
 Quit	DevicesView		Afsluiten
 ISA bus	Device		ISA-bus
 ISA bus	DevicesView		ISA-bus
 Processor	DeviceSCSI		Processor
-Manufacturer:	Device		Fabrikant
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Klasse Info: \t\t \t \t : %classInfo%
 Bridge	Device		Bridge
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM

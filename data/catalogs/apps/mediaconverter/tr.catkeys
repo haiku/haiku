@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-MediaConverter	2816184527
+1	turkish	x-vnd.Haiku-MediaConverter	338319367
 Input file not recognized as Audio or Video	MediaConverter		Girdi dosyası ses veya görüntü değil
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Video kalitesi: %%%3d
@@ -12,6 +12,7 @@ MediaConverter+:SaveDirectory	MediaConverter		Ortam Dönüştürücü+:KaydetmeD
 Error creating video.	MediaConverter		Video oluşturulurken hata.
 Cancelling	MediaConverter		İptal ediliyor
 None available	Audio codecs		Kullanılabilir bir tane yok
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Bu dosyada birden çok ses veya video parçası var, yalnızca her birinin ilki dönüştürülecek.
 No file selected	MediaConverter-FileInfo		Seçili dosya yok
 High	MediaConverter		Yüksek
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Dosya desteklenen bir ortam dosyası olarak tanımlanamadı:} other{# dosya desteklenen bir ortam dosyası olarak tanımlanamadı:}}
@@ -26,6 +27,7 @@ Error loading a file	MediaConverter		Dosya yüklenirken hata
 Encoder parameters	MediaConverter-EncoderWindow		Kodlayıcı parametreleri
 Open…	Menu		Aç…
 Audio encoding:	MediaConverter		Ses kodlaması:
+Multi-track file detected	MediaConverter		Çok parçalı dosya algılandı
 Audio quality: %3d%%	MediaConverter		Ses kalitesi: %%%3d
 Cancelling…	MediaConverter		İptal ediliyor…
 Output file '%filename' created	MediaConverter		'%filename' çıktı dosyası oluşturuldu
@@ -57,12 +59,13 @@ Duration:	MediaConverter-FileInfo		Uzunluk:
 MediaConverter	System name		Ortam Dönüştürücü
 Error launching: %strError%	MediaConverter		Başlatılırken hata: %strError%
 Error writing audio frame %lld	MediaConverter		Ses çerçevesi %lld yazılırken hata
-Writing audio track: %ld%% complete	MediaConverter		Ses çerçevesi yazılıyor: %%%ld tamamlandı
+Writing audio track: %ld%% complete	MediaConverter		Ses parçası yazılıyor: %%%ld tamamlandı
 File format:	MediaConverter		Dosya biçimi:
 File	Menu		Dosya
 Video quality not supported	MediaConverter		Video kalitesi desteklenmiyor
 Select this folder	MediaConverter		Bu klasörü seç
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanal
+Understood	MediaConverter		Anlaşıldı
 %d bit 	MediaFileInfo		%d bit 
 No video	Video codecs list		Video yok
 Continue	MediaConverter		Sürdür

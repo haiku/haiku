@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	2954026111
+1	belarusian	x-vnd.Haiku-Terminal	2311194109
 Close other tabs	Terminal TermWindow		Закрыць астатнія ўкладкі
 Insert path	Terminal TermView		Уставіць пуць
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Тэрмінал не змог запусціць абалонку. Выбачайце.
@@ -9,54 +9,49 @@ Select all	Terminal TermWindow		Выбраць усё
 Confirm exit if active programs exist	Terminal AppearancePrefView		Пытацца аб выхадзе, калі ёсць актыўныя праграмы
 Copy	Terminal TermWindow		Капіяваць
 Edit tab title…	Terminal TermWindow		Правіць імя ўкладкі…
-Settings	Terminal TermWindow		Наладкі
 Print	Terminal TermWindow		Друк
+Settings	Terminal TermWindow		Наладкі
 %app% settings	Terminal PrefWindow	window title	Наладкі %app%
 Use default	Terminal SetTitleWindow		Ужыць прадвызначаныя
 Close tab	Terminal TermWindow		Закрыць укладку
-Selected background	Terminal AppearancePrefView		Выбраны фон
 Error!	Terminal getString		Памылка!
-Set tab title	Terminal TermWindow		Прызначыць імя ўкладкі
 Appearance	Terminal PrefWindow		Знешні выгляд
+Set tab title	Terminal TermWindow		Прызначыць імя ўкладкі
 Create link here	Terminal TermView		Стварыць спасылку сюды
-Custom	Terminal AppearancePrefView	Window size	Спецыяльнае
-Selected text	Terminal AppearancePrefView		Выбраны тэкст
 Change directory	Terminal TermView		Змяніць дырэкторыю
+Custom	Terminal AppearancePrefView	Window size	Спецыяльнае
 Page setup…	Terminal TermWindow		Наладкі старонкі…
 Cancel	Terminal TermView		Адмена
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Тэрмінал
-Find next	Terminal TermWindow		Знайсці далейшае
 Use selection	Terminal FindWindow		Карыстаць выдзяленне
+Find next	Terminal TermWindow		Знайсці далейшае
 Copy link location	Terminal TermView		Капіяваць спасылку
 Window title:	Terminal AppearancePrefView		Імя вакна:
 New tab	Terminal TermWindow		Новая ўкладка
 Window title…	Terminal TermWindow		Загаловак вакна…
-Cannot execute \"%command\":\n\t%error	Terminal Shell		Немагчыма выканаць \"%command\":\n\t%error
 Open path	Terminal TermView		Адкрыць шлях 
+Cannot execute \"%command\":\n\t%error	Terminal Shell		Немагчыма выканаць \"%command\":\n\t%error
 Terminal	System name		Тэрмінал
-Font size	Terminal TermWindow		Памер шрыфта
 Custom	Terminal colors scheme		Спецыяльнае
 Really close?	Terminal TermWindow		Сапраўды закрыць?
+Font size	Terminal TermWindow		Памер шрыфта
 OK	Terminal TermApp		ОК
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Працэс \"%1\" яшчэ актыўны.\nКалі вы закрыеце Тэрмінал, працэс будзе забіты.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Невядомая опцыя \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Імя ўкладкі:
 Text not found.	Terminal TermWindow		Тэкст не знойдзены.
-Find failed	Terminal TermWindow		Не ўдалося знайсці
 Match word	Terminal FindWindow		Усё слова
-Color scheme:	Terminal AppearancePrefView		Каляровая схема:
 New Terminal	Terminal TermWindow		Новы Тэрмінал
+Find failed	Terminal TermWindow		Не ўдалося знайсці
 Quit	Terminal TermWindow		Выйсці
-Find previous	Terminal TermWindow		Знайсці ранейшае
 Match case	Terminal FindWindow		З улікам рэгістру
+Find previous	Terminal TermWindow		Знайсці ранейшае
 Close	Terminal TermWindow		Закрыць
 Save to file…	Terminal PrefWindow		Захаваць у файл…
-Background	Terminal AppearancePrefView		Фон
 Copy path	Terminal TermView		Капіяваць шлях
 Copy absolute path	Terminal TermView		Капіяваць абсалютны шлях
 Cancel	Terminal TermWindow		Адмена
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Працэс \"%1\" яшчэ актыўны.\nКалі вы закрыеце ўкладку, працэс будзе забіты.
-Cursor	Terminal AppearancePrefView		Курсор
 Full screen	Terminal TermWindow		Поўны экран
 Shell 	Terminal TermWindow		Абалонка 
 Tab title:	Terminal TermWindow		Імя ўкладкі:
@@ -64,11 +59,11 @@ Window title:	Terminal TermWindow		Імя вакна:
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Decrease	Terminal TermWindow		Паменшыць
 Settings…	Terminal TermWindow		Наладкі…
-Blinking cursor	Terminal AppearancePrefView		Мільгаючы курсор
 Cancel	Terminal SetTitleWindow		Адмена
-The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для імёнаў вакон. Можна ўжываць наступныя\n запаўняльнікі:\n
+Blinking cursor	Terminal AppearancePrefView		Мільгаючы курсор
 Use text:	Terminal FindWindow		Ужыць тэкст:
 Close active tab	Terminal TermWindow		Закрыць актыўную ўкладку
+The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для імёнаў вакон. Можна ўжываць наступныя\n запаўняльнікі:\n
 Nothing is selected.	Terminal TermWindow		Нічога не выбрана.
 Find	Terminal FindWindow		Шукаць
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Шаблон для цякучага імя ўкладкі. Можна ўжываць наступныя\n запаўняльнікі:\n
@@ -76,13 +71,10 @@ Font:	Terminal AppearancePrefView		Шрыфт:
 Paste	Terminal TermWindow		Уставіць
 Copy here	Terminal TermView		Капіяваць сюды
 Use default shell	Terminal Shell		Ужыць абалонку па змоўчанню
-Color:	Terminal AppearancePrefView		Колер:
 Open link	Terminal TermView		Адкрыць спасылку
-Text	Terminal AppearancePrefView		Тэкст
 Not found.	Terminal TermWindow		Не знойдзена.
 Find…	Terminal TermWindow		Пошук…
 No search string was entered.	Terminal TermWindow		Страка для пошуку не ўведзена.
-Text under cursor	Terminal AppearancePrefView		Тэкст пад курсорам
 Move here	Terminal TermView		Перамясціць сюды
 Abort	Terminal Shell		Спыніць
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Наступныя працэсы яшчэ актыўныя:\n\n\t%1\n\nКалі вы закрыеце Тэрмінал, працэсы будуць забітыя.

@@ -1,24 +1,18 @@
-1	indonesian	x-vnd.Haiku-Devices	3345509916
+1	indonesian	x-vnd.Haiku-Devices	907968852
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Pengontrol enkripsi
-Bus Information	Device		Informasi Bus
 Devices	System name		Perangkat
 Graphics Peripheral	DeviceSCSI		Perangkat Grafis
 Processor	Device		Prosesor
 Generate system information	DevicesView		Hasilkan informasi sistem
 Class info	DevicePCI		Info kelas
-ACPI Information	DeviceACPI		Informasi ACPI
-Detailed	DevicesView		Terperinci
 Computer	DevicesView		Komputer
 Communications	DeviceSCSI		Komunikasi
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Info Kelas:\t\t\t\t: %classInfo%
 Mass storage controller	Device		Pengontrol penyimpanan massal
 Connection	DevicesView		Koneksi
 Printer	DeviceSCSI		Pencetak
 ACPI Processor Namespace '%2'	DeviceACPI		Namespace Prosesor ACPI '%2'
-SCSI Information	DeviceSCSI		Informasi SCSI
 Manufacturer	Device		Pabrikan
-Device name:	Device		Nama perangkat:
 Scanner	DeviceSCSI		Pemindai
 Memory controller	Device		Pengendali memori
 Unknown device	DevicesView		Perangkat tak dikenal
@@ -27,7 +21,6 @@ ACPI node '%1'	DeviceACPI		Titik ACPI '%1'
 Optical Drive	DeviceSCSI		Drive Optik
 Name	PropertyList		Nama
 Manufacturer	DeviceSCSI		Pabrikan
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nama Perangkat\t\t\t\t: %Name%\nPabrikan\t\t\t: %Manufacturer%\nDriver digunakan\t\t\t\t: %DriverUsed%\nJalur perangkat\t: %DevicePaths%
 Device name	Device		Nama perangkat
 Satellite communications controller	Device		Pengontrol komunikasi satelit
 Device class	DeviceSCSI		Kelas perangkat
@@ -36,14 +29,12 @@ Input device controller	Device		Pengontrol perangkat input
 PCI bus	DevicesView		Bus PCI
 ACPI System Indicator	DeviceACPI		Indikator Sistem ACPI
 ACPI System Bus	DeviceACPI		Sistem Bus ACPI
-PCI Information	DevicePCI		Infomasi PCI
 Tape Drive	DeviceSCSI		Drive Pita
 Changer	DeviceSCSI		Pengalih
 Serial bus controller	Device		Pengontrol serial bus
 Refresh devices	DevicesView		Segarkan perangkat
 Category	DevicesView		Kategori
 RBC	DeviceSCSI		RBC
-None	Device		Tak satupun
 Device paths	Device		Jalur perangkat
 Unknown device	Device		Perangkat tak dikenal
 Wireless controller	Device		Pengontrol nirkabel
@@ -53,27 +44,23 @@ Devices	DevicesView		Perangkat
 Device name	DeviceACPI		Nama perangkat
 Card Reader	DeviceSCSI		Pembaca kartu
 Display controller	Device		Pengontrol display
-Basic information	DevicesView		Informasi dasar
 ACPI Button '%1'	DeviceACPI		Tombol ACPI '%1'
-Bus	DevicesView		Bus
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nama perangkat
 Disk Drive	DeviceSCSI		Disk Drive
-Other	DeviceSCSI		Lain
 Report compatibility	DevicesView		Laporkan kompatibilitas
+Other	DeviceSCSI		Lain
 Computer	Device		Komputer
 PCI bus	Device		Bus PCI
 Enclosure	DeviceSCSI		Enklosur
-Order by:	DevicesView		Urutkan berdasarkan:
 ACPI Thermal Zone	DeviceACPI		Zona Suhu ACPI
+Order by:	DevicesView		Urutkan berdasarkan:
 Intelligent controller	Device		Pengontrol cerdas
 Multimedia controller	Device		Pengontrol multimedia
 Quit	DevicesView		Berhenti
 ISA bus	Device		Bus ISA
 ISA bus	DevicesView		Bus ISA
 Processor	DeviceSCSI		Prosesor
-Manufacturer:	Device		Pabrikan:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Info Kelas:\t\t\t\t: %classInfo%
 Bridge	Device		Jembatan
 Worm	DeviceSCSI		Cacing
 CD-ROM	DeviceSCSI		CD-ROM
