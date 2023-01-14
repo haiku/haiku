@@ -543,7 +543,7 @@ TermWindow::_SetupMenu()
 			.AddSeparator()
 			.AddItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), MENU_PREF_OPEN,
 				',')
-			.AddItem(B_TRANSLATE("Theme settings" B_UTF8_ELLIPSIS), MENU_THEME_OPEN)
+			.AddItem(B_TRANSLATE("Colors" B_UTF8_ELLIPSIS), MENU_THEME_OPEN)
 		.End();
 
 	AddChild(fMenuBar);

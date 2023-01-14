@@ -36,7 +36,7 @@ const uint32 MSG_REVERT_PRESSED = 'revt';
 
 ThemeWindow::ThemeWindow(const BMessenger& messenger)
 	:
-	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE_SYSTEM_NAME("Theme settings"), B_TITLED_WINDOW,
+	BWindow(BRect(0, 0, 0, 0), B_TRANSLATE_SYSTEM_NAME("Colors"), B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 		fPreviousPref(new PrefHandler(PrefHandler::Default())),
 		fSavePanel(NULL),
@@ -53,7 +53,7 @@ ThemeWindow::ThemeWindow(const BMessenger& messenger)
 		B_TRANSLATE("Save to file" B_UTF8_ELLIPSIS),
 		new BMessage(MSG_SAVEAS_PRESSED), B_WILL_DRAW);
 
-	fThemeView = new ThemeView(B_TRANSLATE("Theme"), fTerminalMessenger);
+	fThemeView = new ThemeView("Theme", fTerminalMessenger);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(B_USE_WINDOW_SPACING)
