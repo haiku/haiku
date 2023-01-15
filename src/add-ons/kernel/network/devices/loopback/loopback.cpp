@@ -59,7 +59,7 @@ loopback_init(const char *name, net_device **_device)
 	strcpy(device->name, name);
 	device->flags = IFF_LOOPBACK | IFF_LINK;
 	device->type = IFT_LOOP;
-	device->mtu = 16384;
+	device->mtu = 65536;
 	device->media = IFM_ACTIVE;
 
 	*_device = device;
