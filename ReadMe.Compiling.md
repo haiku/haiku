@@ -175,18 +175,27 @@ There are various ways in which you can run `jam`:
 Be sure to read `build/jam/UserBuildConfig.ReadMe` and `UserBuildConfig.sample`,
 as they contain information on customizing your build of Haiku.
 
-### Building a Haiku anyboot file
+### Building a Haiku anyboot image (Nightly)
 ```
-jam -q @anyboot-image
+jam -q @nightly-anyboot
 ```
 
-This generates an image file named `haiku-anyboot.image` in your output
+This generates an image file named `haiku-nightly-anyboot.iso` in your output
 directory under `generated/`.
+
+### Building a Haiku raw image (Nightly)
+```
+jam -q @nightly-raw
+```
+
+This generates an image file named `haiku.image` in your output directory under
+`generated/`.
 
 ### Building a VMware image file
 ```
-jam -q @vmware-image
+jam -q @nightly-vmware
 ```
+
 This generates an image file named `haiku.vmdk` in your output
 directory under `generated/`.
 
