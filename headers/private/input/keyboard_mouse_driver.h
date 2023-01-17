@@ -152,6 +152,10 @@ typedef struct {
 	uint8		fingers;
 	bool		gesture;
 	uint8		fingerWidth;
+	int32		wheel_ydelta;
+	int32		wheel_xdelta;
+	int32		wheel_zdelta;
+	int32		wheel_wdelta;
 	// 1 - 4	normal width
 	// 5 - 11	very wide finger or palm
 	// 12		maximum reportable width; extreme wide contact
