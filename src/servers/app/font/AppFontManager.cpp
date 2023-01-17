@@ -34,7 +34,7 @@
 #include "ServerFont.h"
 
 
-#define TRACE_FONT_MANAGER
+//#define TRACE_FONT_MANAGER
 #ifdef TRACE_FONT_MANAGER
 #	define FTRACE(x) debug_printf x
 #else
@@ -56,7 +56,6 @@ AppFontManager::AppFontManager()
 }
 
 
-//! Frees all families and styles loaded by the application
 AppFontManager::~AppFontManager()
 {
 	while (fFamilies.CountItems() > 0) {
@@ -69,17 +68,9 @@ AppFontManager::~AppFontManager()
 			family->RemoveStyle(styleRef, this);
 			styleRef->ReleaseReference();
 		}
-
 		fFamilies.RemoveItem(family);
 		delete family;
 	}
-}
-
-
-void
-AppFontManager::MessageReceived(BMessage* message)
-{
-	FontManagerBase::MessageReceived(message);
 }
 
 
@@ -159,7 +150,7 @@ AppFontManager::AddUserFontFromFile(const char* path,
 /*!	\brief Adds the FontFamily/FontStyle that is represented by the area in memory.
 */
 status_t
-AppFontManager::AddUserFontFromMemory(const FT_Byte* fontAddress, uint32 size,
+AppFontManager::AddUserFontFromMemory(const FT_Byte* fontAddress, size_t size,
 	uint16& familyID, uint16& styleID)
 {
 	ASSERT(IsLocked());

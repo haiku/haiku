@@ -1478,15 +1478,15 @@ BFont::LoadFont(const char* path)
 
 
 status_t
-BFont::LoadFont(const area_id fontAreaID, uint32 size, uint32 offset)
+BFont::LoadFont(const area_id fontAreaID, size_t size, size_t offset)
 {
 	BPrivate::AppServerLink link;
 
 	link.StartMessage(AS_ADD_FONT_MEMORY);
 
 	link.Attach<int32>(fontAreaID);
-	link.Attach<uint32>(size);
-	link.Attach<uint32>(offset);
+	link.Attach<size_t>(size);
+	link.Attach<size_t>(offset);
 
 	status_t status = B_ERROR;
 	if (link.FlushWithReply(status) != B_OK || status != B_OK) {

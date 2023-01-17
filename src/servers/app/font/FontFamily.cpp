@@ -135,9 +135,15 @@ bool
 FontFamily::RemoveStyle(FontStyle* style, AppFontManager* fontManager)
 {
 	if (!gFontManager->IsLocked() && fontManager == NULL) {
-		debugger("FontFamily::RemoveStyle() called without having the font manager locked!");
+		debugger("FontFamily::RemoveStyle() called without having the global font manager locked!");
+		return false;
+	} else if (fontManager != NULL && !fontManager->IsLocked()) {
+		debugger("FontFamily::RemoveStyle() called without having the app font manager locked!");
 		return false;
 	}
+
+	if (style == NULL)
+		return false;
 
 	if (!fStyles.RemoveItem(style))
 		return false;

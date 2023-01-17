@@ -43,8 +43,6 @@ public:
 			void  				SetInitStatus(status_t new_status)
 									{ fInitStatus = new_status; }
 
-	virtual	void				MessageReceived(BMessage* message);
-
 	virtual	int32				CountFamilies();
 
 	virtual	int32				CountStyles(const char* family);
