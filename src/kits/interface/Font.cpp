@@ -1452,3 +1452,24 @@ BFont::_GetExtraFlags() const
 
 	link.Read<uint32>(&fExtraFlags);
 }
+
+
+status_t
+BFont::LoadFont(const char* path)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+BFont::LoadFont(const area_id fontAreaID, size_t size, size_t offset)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+BFont::UnloadFont()
+{
+	return B_NOT_SUPPORTED;
+}
