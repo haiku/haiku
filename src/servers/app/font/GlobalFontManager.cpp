@@ -436,11 +436,11 @@ GlobalFontManager::_GetDefaultStyle(const char* familyName, const char* styleNam
 status_t
 GlobalFontManager::_SetDefaultFonts()
 {
+	FontStyle* style = NULL;
+
 	// plain font
-	FontStyle* style = _GetDefaultStyle(DEFAULT_PLAIN_FONT_FAMILY,
-		DEFAULT_PLAIN_FONT_STYLE, FALLBACK_PLAIN_FONT_FAMILY,
-		DEFAULT_PLAIN_FONT_STYLE,
-		B_REGULAR_FACE);
+	style = _GetDefaultStyle(DEFAULT_PLAIN_FONT_FAMILY, DEFAULT_PLAIN_FONT_STYLE,
+		FALLBACK_PLAIN_FONT_FAMILY, FALLBACK_PLAIN_FONT_STYLE, B_REGULAR_FACE);
 	if (style == NULL)
 		return B_ERROR;
 
@@ -451,7 +451,7 @@ GlobalFontManager::_SetDefaultFonts()
 
 	// bold font
 	style = _GetDefaultStyle(DEFAULT_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE,
-		FALLBACK_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE, B_BOLD_FACE);
+		FALLBACK_BOLD_FONT_FAMILY, FALLBACK_BOLD_FONT_STYLE, B_BOLD_FACE);
 
 	fDefaultBoldFont.SetTo(new (std::nothrow) ServerFont(*style,
 		DEFAULT_FONT_SIZE));
@@ -460,7 +460,7 @@ GlobalFontManager::_SetDefaultFonts()
 
 	// fixed font
 	style = _GetDefaultStyle(DEFAULT_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE,
-		FALLBACK_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE, B_REGULAR_FACE);
+		FALLBACK_FIXED_FONT_FAMILY, FALLBACK_FIXED_FONT_STYLE, B_REGULAR_FACE);
 
 	fDefaultFixedFont.SetTo(new (std::nothrow) ServerFont(*style,
 		DEFAULT_FONT_SIZE));
