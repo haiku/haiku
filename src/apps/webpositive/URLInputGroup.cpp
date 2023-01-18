@@ -25,10 +25,13 @@
 
 #include "BaseURL.h"
 #include "BitmapButton.h"
+#include "BrowserWindow.h"
 #include "BrowsingHistory.h"
 #include "IconButton.h"
 #include "IconUtils.h"
 #include "TextViewCompleter.h"
+#include "WebView.h"
+#include "WebWindow.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -499,7 +502,9 @@ public:
 	PageIconView()
 		:
 		BView("page icon view", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-		fIcon(NULL)
+		fIcon(NULL),
+		fClickPoint(-1, 0),
+		fPageIconSet(false)
 	{
 		SetDrawingMode(B_OP_ALPHA);
 		SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
@@ -539,21 +544,97 @@ public:
 		return MinSize();
 	}
 
+	void MouseDown(BPoint where)
+	{
+		int32 buttons;
+		if (Window()->CurrentMessage()->FindInt32("buttons", &buttons) == B_OK) {
+			if ((buttons & B_PRIMARY_MOUSE_BUTTON) != 0) {
+				// Memorize click point for dragging
+				fClickPoint = where;
+			}
+		}
+		return;
+	}
+
+	void MouseUp(BPoint where)
+	{
+		fClickPoint.x = -1;
+	}
+
+	virtual void MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
+	{
+		if (dragMessage != NULL)
+			return;
+
+		if (fClickPoint.x >= 0
+			&& (fabs(where.x - fClickPoint.x) > 4 || fabs(where.y - fClickPoint.y) > 4)) {
+			// Start dragging
+			BPoint offset = fClickPoint - Frame().LeftTop();
+
+			const char* url = static_cast<URLInputGroup*>(Parent())->Text();
+			const char* title =
+				static_cast<BWebWindow*>(Window())->CurrentWebView()->MainFrameTitle();
+
+			// Validate the file name to be set for the clipping if user drags to Tracker.
+			BString fileName(title);
+			if (fileName.Length() == 0) {
+				fileName = url;
+				int32 leafPos = fileName.FindLast('/');
+				if (leafPos >= 0)
+					fileName.Remove(0, leafPos + 1);
+			}
+			fileName.ReplaceAll('/', '-');
+			fileName.Truncate(B_FILE_NAME_LENGTH - 1);
+
+			BBitmap miniIcon(BRect(0, 0, 15, 15), B_BITMAP_NO_SERVER_LINK,
+				B_CMAP8);
+			miniIcon.ImportBits(fIcon);
+			// TODO:  obtain and send the large icon in addition to the mini icon.
+			// Currently PageUserData does not provide a function that returns this.
+
+			BMessage drag(B_SIMPLE_DATA);
+			drag.AddInt32("be:actions", B_COPY_TARGET);
+			drag.AddString("be:clip_name", fileName.String());
+			drag.AddString("be:filetypes", "application/x-vnd.Be-bookmark");
+			// Support the "Passing Data via File" protocol
+			drag.AddString("be:types", B_FILE_MIME_TYPE);
+			BMessage data(B_SIMPLE_DATA);
+			data.AddString("url", url);
+			data.AddString("title", title);
+				// The title may differ from the validated filename
+			if (fPageIconSet == true) {
+				// Don't bother sending the placeholder web icon, if that is all we have.
+				data.AddData("miniIcon", B_COLOR_8_BIT_TYPE, &miniIcon, sizeof(miniIcon));
+			}
+			drag.AddMessage("be:originator-data", &data);
+
+			BBitmap* iconClone = new BBitmap(fIcon);
+				// Needed because DragMessage will delete the bitmap when it's done.
+
+			DragMessage(&drag, iconClone, B_OP_ALPHA, offset);
+		}
+		return;
+	}
+
 	void SetIcon(const BBitmap* icon)
 	{
 		delete fIcon;
-		if (icon)
+		if (icon) {
 			fIcon = new BBitmap(icon);
-		else {
+			fPageIconSet = true;
+		} else {
 			fIcon = new BBitmap(BRect(0, 0, 15, 15), B_RGB32);
 			BIconUtils::GetVectorIcon(kPlaceholderIcon,
 				sizeof(kPlaceholderIcon), fIcon);
+			fPageIconSet = false;
 		}
 		Invalidate();
 	}
 
 private:
 	BBitmap* fIcon;
+	BPoint fClickPoint;
+	bool fPageIconSet;
 };
 
 
