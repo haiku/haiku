@@ -105,6 +105,27 @@ case "$ARCH" in
 	check_logs $TEST_SERIALLOG
 	rm -f $TEST_FILE $TEST_SERIALLOG
     ;;
+"arm64")
+	EMULATOR=qemu-system-aarch64
+	MEMORY=2048
+	TEST_FILE="/tmp/test-$ARCH.mmu"
+	EMULATOR="$EMULATOR -m $MEMORY -M virt $EXTRAS"
+	rm -f $TEST_FILE $TEST_SERIALLOG
+
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo "+++ Testing $PLATFORM boot..."
+	cp $IMAGE $TEST_FILE
+	$EMULATOR \
+		-cpu cortex-a57 \
+		-global virtio-mmio.force-legacy=false \
+		-device usb-ehci,id=ehci -device usb-tablet -device usb-kbd \
+		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
+		-device virtio-net-device,netdev=usernet,bus=virtio-mmio-bus.1 \
+		-drive file=$TEST_FILE,format=raw,if=none,id=x0 \
+		-netdev user,id=usernet
+	check_logs $TEST_SERIALLOG
+	rm -f $TEST_FILE $TEST_SERIALLOG
+	;;
 "riscv64")
 	MEMORY=2048
 	TEST_FILE="/tmp/test-$ARCH.mmu"
