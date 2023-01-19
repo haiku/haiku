@@ -181,8 +181,6 @@ and its listeners will be removed as well, to prevent watching a new
 file that accidently happen to have the same device/node pair (as is
 possible with BFS, for example).
 
-| 
-
 Differences Between Both Implementations
 ----------------------------------------
 
@@ -204,8 +202,6 @@ the BeOS kernel, it will no longer work correctly.
 The other difference is that OpenBeOS exports its node monitoring
 functionality to kernel modules as well, and provides an extra plain C
 API for them to use.
-
-| 
 
 And Beyond?
 -----------
@@ -232,7 +228,7 @@ disadvantages:
    systems; a file system must be able to retrieve a node by ID only -
    it might not be feasible to find out about the parent directory for
    many file systems.
-#. Although it could potentially safe node monitors, it might cause the
+#. Although it could potentially save node monitors, it might cause the
    kernel to send out a lot more messages to the application than it
    needs. With the restriction the kernel imposes to the number of
    watched nodes for a team, the application's designer might try to be

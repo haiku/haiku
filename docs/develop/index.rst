@@ -40,31 +40,13 @@ Table of contents
 
    /build/index
    /release/index
-   /apps/haikudepot/server
    /midi/index
-   /net/NetworkStackOverview
-   /net/HowTo-Synchronize_with_NetBSD
+   /net/index
    /packages/README
    /servers/app_server/toc
    /servers/registrar/Protocols
-   /kernel/device_manager_introduction
-   /kernel/obsolete_pnp_manager
-   /kernel/vm/swap_file_support
-   /kernel/arch/long_double
-   /kernel/arch/arm/overview
-   /kernel/arch/m68k/overview
-   /kernel/arch/ppc/overview
-   /kernel/arch/sparc/overview
-   /kernel/fs/node_monitoring
-   /file_systems/overview
-   /partitioning_systems/sun
-   /drivers/disk/ioctls
-   /drivers/intel_extreme/generations
-   /busses/agp_gart/ReadMe
-   /busses/bluetooth/overview
-   /busses/sdhci/sdhci_mmc_driver
-   /busses/usb/USB_stack_design
-   /kernel/boot/boot_process_specs.rst
-   /kernel/boot/Debugging_Bootloaders_GEF
-   /kernel/pci_serial_debug
+   /kernel/index
+   /file_systems/index
+   /drivers/index
+   /apps/haikudepot/server
 

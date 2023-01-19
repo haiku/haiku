@@ -1,13 +1,5 @@
-Filesystem drivers
-==================
-
-Filesystem drivers are in src/add-ons/kernel/file_system
-
-A filesystem usually relies on an underlying block device, but that's not
-required. For example, NFS is a network filesystem, so it doesn't need one.
-
-Implementation notes
---------------------
+File systems overview
+---------------------
 
 Each filesystem driver must define a few structures which act as the
 interface between the VFS and the filesystem implementation. These
@@ -89,10 +81,3 @@ Torture and performance tests
 Once the basic operations are working fine, it is a good idea to perform more
 agressive testing. Examples of scripts doing this are available in
 src/tests/add-ons/kernel/file_systems/ for the fat and ext2 filesystems.
-
-.. toctree::
-
-   /file_systems/userlandfs
-   /file_systems/ufs2
-   /file_systems/xfs
-   /file_systems/befs/resources
