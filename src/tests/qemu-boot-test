@@ -116,7 +116,7 @@ case "$ARCH" in
 	echo "+++ Testing $PLATFORM boot..."
 	cp $IMAGE $TEST_FILE
 	$EMULATOR \
-		-cpu cortex-a57 \
+		-cpu max \
 		-global virtio-mmio.force-legacy=false \
 		-device usb-ehci,id=ehci -device usb-tablet -device usb-kbd \
 		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
