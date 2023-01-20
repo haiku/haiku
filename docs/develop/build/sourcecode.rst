@@ -3,10 +3,26 @@ Haiku Git Repositories
 
 Haiku uses Git for source control, combined with Gerrit for review of code changes.
 
-All the sources for the operating system are stored in a single repository at http://cgit.haiku-os.org/haiku .
+Most of the operating system sources are stored in a single repository at http://cgit.haiku-os.org/haiku .
 
-Another repository contains the build tools, that is, gcc, binutils, and Jam, which are maintained
-by Haiku developers.
+Another repository at http://cgit.haiku-os.org/buildtools contains the build tools, that is, gcc,
+binutils, and Jam, which are maintained by Haiku developers.
+
+`Additional repositories <https://github.com/orgs/haiku/repositories>`_ are hosed on GitHub.
+
+Finally, some pre-compiled packages are downloaded during the build, these are built using
+Haikuporter from `recipes available here <https://github.com/orgs/haikuports/repositories>`_.
+
+Getting the sourcecode
+----------------------
+
+ * https://www.haiku-os.org/guides/building/get-source-git
+
+Sending change reviews
+----------------------
+
+ * https://dev.haiku-os.org/wiki/CodingGuidelines/SubmittingPatches
+ * https://review.haiku-os.org/Documentation/user-upload.html
 
 Managing GCC and binutils updates using vendor branches
 -------------------------------------------------------
