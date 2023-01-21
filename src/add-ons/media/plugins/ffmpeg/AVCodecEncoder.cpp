@@ -221,7 +221,7 @@ status_t
 AVCodecEncoder::Encode(const void* buffer, int64 frameCount,
 	media_encode_info* info)
 {
-	TRACE("AVCodecEncoder::Encode(%p, %lld, %p)\n", buffer, frameCount, info);
+	TRACE("AVCodecEncoder::Encode(%p, %" B_PRId64 ", %p)\n", buffer, frameCount, info);
 
 	if (!_OpenCodecIfNeeded())
 		return B_NO_INIT;
@@ -416,9 +416,8 @@ AVCodecEncoder::_Setup()
 		}
 	}
 
-	TRACE("  rawBitRate: %d, wantedBitRate: %d (%.1f), "
-		"context bitrate: %d\n", rawBitRate, wantedBitRate,
-		fEncodeParameters.quality, fCodecContext->bit_rate);
+	TRACE("  rawBitRate: %d, wantedBitRate: %d (%.1f), context bitrate: %" PRId64 "\n",
+		rawBitRate, wantedBitRate, fEncodeParameters.quality, fCodecContext->bit_rate);
 
 	// Add some known fixes from the FFmpeg API example:
 	if (fCodecContext->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
@@ -473,8 +472,7 @@ status_t
 AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
 	media_encode_info* info)
 {
-	TRACE("AVCodecEncoder::_EncodeAudio(%p, %lld, %p)\n", _buffer, frameCount,
-		info);
+	TRACE("AVCodecEncoder::_EncodeAudio(%p, %" B_PRId64 ", %p)\n", _buffer, frameCount, info);
 
 	if (fChunkBuffer == NULL)
 		return B_NO_MEMORY;
@@ -576,7 +574,7 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 		av_freep(&frame.extended_data);
 
 	if (ret != 0) {
-		TRACE("  avcodec_encode_audio() failed: %ld\n", ret);
+		TRACE("  avcodec_encode_audio() failed: %s\n", strerror(ret));
 		return B_ERROR;
 	}
 
@@ -615,8 +613,6 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 	if (fChunkBuffer == NULL)
 		return B_NO_MEMORY;
 
-	status_t ret = B_OK;
-
 	AVPacket* pkt = av_packet_alloc();
 	while (frameCount > 0) {
 		int bpr = fInputFormat.u.raw_video.display.bytes_per_row;
@@ -645,7 +641,7 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 	//_EncodeVideoFrame(NULL, pkt, info);
 	//avcodec_flush_buffers(fCodecContext);
 	av_packet_free(&pkt);
-	return ret;
+	return B_OK;
 }
 
 
@@ -669,7 +665,7 @@ AVCodecEncoder::_EncodeVideoFrame(AVFrame* frame, AVPacket* pkt, media_encode_in
 			TRACE("  avcodec_receive_packet: received one packet\n");
 			// Maybe we need to use this PTS to calculate start_time:
 			if (pkt->pts != AV_NOPTS_VALUE) {
-				TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
+				TRACE("  codec frame PTS: %" B_PRId64 " (codec time_base: %d/%d)\n",
 					pkt->pts, fCodecContext->time_base.num,
 					fCodecContext->time_base.den);
 			} else {
