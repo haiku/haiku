@@ -590,11 +590,11 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 		av_frame_unref(fFrame);
 		fFrame->nb_samples = frameCount;
 
-		ret = avcodec_fill_audio_frame(fFrame, fCodecContext->channels,
+		int count = avcodec_fill_audio_frame(fFrame, fCodecContext->channels,
 				fCodecContext->sample_fmt, (const uint8_t *) buffer, bufferSize, 1);
 
-		if (ret != 0) {
-			TRACE("  avcodec_encode_audio() failed filling data: %ld\n", ret);
+		if (count < 0) {
+			TRACE("  avcodec_encode_audio() failed filling data: %d\n", count);
 			return B_ERROR;
 		}
 
