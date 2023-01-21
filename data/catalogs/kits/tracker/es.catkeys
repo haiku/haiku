@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	2915475646
+1	spanish; castilian	x-vnd.Haiku-libtracker	464753347
 Created	ContainerWindow		Creado
 Icon	AttributesView		Icono
 Open and make preferred	OpenWithWindow		Abrir y hacer preferido
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Icono pequeño de mapa de bits
 Would you like to find a suitable application to open the file?	FSUtils		¿Le gustaría encontrar una aplicación adecuada para abrir el archivo?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		No puedes reemplazar una carpeta o un enlace simbólico por un archivo
+(unknown)	InfoWindow		(desconocido)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# fechas>}}
 Trailing \\.	libtracker		Arrastrando \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		En %func \nfind_directory() tuvo un error. \nMotivo: %error
@@ -84,6 +85,7 @@ Include trash	FindPanel		Incluir la papelera
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Limpiar
 Modified	FindPanel		Modificado
+ (block size: 	InfoWindow		 (tamaño de bloque: 
 Select all	QueryContainerWindow		Seleccionar todo
 Generate image thumbnails	SettingsView		Generar miniaturas de imagen
 Select…	FilePanelPriv		Seleccionar...
@@ -167,6 +169,7 @@ Read	FilePermissionsView		Leer
 There was an error writing the attribute.	WidgetAttributeText		Ha habido un error escribiendo el atributo
 Path	Default Query Columns		Ruta
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Si renombras %target, es posible que %osName no funcione adecuadamente.\n\n¿Estás seguro de que deseas hacer esto?
+Filesystem:	InfoWindow		Sistema de archivos:
 Could not open \"%name\" (%error). 	FSUtils		No se pudo abrir \"%name\" (%error).
 Media parameter group	AttributesView		Medios de parámetros de grupo
 %name info	InfoWindow	InfoWindow Title	%name información
@@ -493,6 +496,7 @@ Duplicate	ContainerWindow		Duplicar
 16-bit integer	AttributesView		Entero de 16 bits
 Untitled clipping	PoseView		Recorte sin título
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		El archivo \"%name\" ya existe en la carpeta especificada. ¿Quieres reemplazarlo?
+, indexed	InfoWindow		, indexado
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Tienes que arrastrar elementos a uno de los iconos de disco en la \"Disks\" ventana
 Version:	InfoWindow		Versión:
 OK	PoseView		Aceptar

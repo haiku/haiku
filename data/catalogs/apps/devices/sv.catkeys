@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Devices	911816421
+1	swedish	x-vnd.Haiku-Devices	2322690158
 ACPI bus	DevicesView		ACPI-buss
 Encryption controller	Device		Krypteringsstyrenhet
 Devices	System name		Enheter
@@ -8,6 +8,7 @@ Processor	Device		Processor
 Generate system information	DevicesView		Generera systeminformation
 Unknown	DeviceACPI		Okänd
 Class info	DevicePCI		Klass information
+<No device selected>	DevicesView		<Ingen enhet har valts>
 USB bus	Device		USB-buss
 Computer	DevicesView		Dator
 Communications	DeviceSCSI		Kommunikations

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	381023409
+1	finnish	x-vnd.Haiku-HaikuDepot	4143471163
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Käyttöehtojen latauspulma
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 It was not possible to create the new user.	UserLoginWindow		Uuden käyttäjän luominen epäonnistui.
@@ -166,6 +166,7 @@ Inactive	PackageListView		Ei käytössä
 Nickname:	UserLoginWindow		Käyttäjätunnus:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Synkronoidaan metatietoja tietovaratoista
 OK	MainWindow		Valmis
+Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		Käyttäjien on oltava {0, plural, one{# vuoden ikäisiä} other{# vuosien ikäisiä}} tai vanhempia.
 Version %Code%	UserUsageConditions		Versio %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# kohde} other{# kohdetta}}
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Poistetaan asennus \"%PackageName%\"

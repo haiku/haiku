@@ -1,10 +1,11 @@
-1	finnish	x-vnd.Haiku-Expander	3300517306
+1	finnish	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Kohde
 Other	ExpanderPreferences		Muut
 Automatically show contents listing	ExpanderPreferences		Näytä sisältöluettelo automaattisesti
 Expander	System name		Laajentaja
 Expander: Choose destination	DirectoryFilePanel		Laajentaja: Valitse kohde
 Set source…	ExpanderMenu		Aseta lähde…
+OK	ExpanderWindow		Valmis
 The destination is not a folder.	ExpanderWindow		Kohde ei ole kansio.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Kansio on joko muutettu, nimetty uudelleen tai sitä ei tueta.
 Close window when done expanding	ExpanderPreferences		Sulje ikkuna kun laajentaminen on tehty

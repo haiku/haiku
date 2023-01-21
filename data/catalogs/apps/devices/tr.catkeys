@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Devices	911816421
+1	turkish	x-vnd.Haiku-Devices	2322690158
 ACPI bus	DevicesView		ACPI veri yolu
 Encryption controller	Device		Şifreleme denetleyicisi
 Devices	System name		Aygıtlar
@@ -8,6 +8,7 @@ Processor	Device		İşlemci
 Generate system information	DevicesView		Sistem bilgisi üret
 Unknown	DeviceACPI		Bilinmiyor
 Class info	DevicePCI		Sınıf bilgisi
+<No device selected>	DevicesView		<seçili aygıt yok>
 USB bus	Device		USB veri yolu
 Computer	DevicesView		Bilgisayar
 Communications	DeviceSCSI		İletişim

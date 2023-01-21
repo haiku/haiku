@@ -1,11 +1,13 @@
-1	spanish; castilian	x-vnd.Haiku-Devices	907968852
+1	spanish; castilian	x-vnd.Haiku-Devices	1158547034
 ACPI bus	DevicesView		Bus ACPI
 Encryption controller	Device		Controlador de cifrado
 Devices	System name		Dispositivos
 Graphics Peripheral	DeviceSCSI		Periféricos gráficos
 Processor	Device		Procesador
 Generate system information	DevicesView		Generar información del sistema
+Unknown	DeviceACPI		Desconocido
 Class info	DevicePCI		Información de clase
+<No device selected>	DevicesView		<Ningún dispositivo seleccionado>
 Computer	DevicesView		Computadora
 Communications	DeviceSCSI		Comunicaciones
 Mass storage controller	Device		Controlador de almacenamiento masivo
@@ -71,6 +73,7 @@ Device name	DeviceSCSI		Nombre de dispositivo
 Docking station	Device		Estación de acoplamiento
 Array	DeviceSCSI		Arreglo
 Unclassified device	Device		Dispositivo sin clasificar
+Manufacturer	DeviceACPI		Fabricante
 ACPI controller	Device		Controlador ACPI
 Network controller	Device		Controlador de red
 Driver used	Device		Controlador utilizado

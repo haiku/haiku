@@ -1,6 +1,6 @@
 1	spanish; castilian	x.vnd.OBOS-Inspector	577867100
 \nInput Formats:	ImageView		\nFormatos de entrada:
-Next Page	ImageWindow		Siguiente página
+Next Page	ImageWindow		Página siguiente
 Previous Page	ImageWindow		Página anterior
 Active Translators	InspectorApp		Intérpretes activos
 System Translators	ActiveTranslatorsWindow		Intérpretes del sistema

@@ -1,10 +1,11 @@
-1	spanish; castilian	x-vnd.Haiku-Expander	3300517306
+1	spanish; castilian	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Destino
 Other	ExpanderPreferences		Otro
 Automatically show contents listing	ExpanderPreferences		Mostrar automáticamente el listado de contenido
 Expander	System name		Expander
 Expander: Choose destination	DirectoryFilePanel		Expander: Elegir destino
-Set source…	ExpanderMenu		Elegir origen...
+Set source…	ExpanderMenu		Elegir origen…
+OK	ExpanderWindow		Aceptar
 The destination is not a folder.	ExpanderWindow		El destino no es una carpeta.
 The folder was either moved, renamed or not supported.	ExpanderWindow		La carpeta ha sido movida, renombrada o no es soportada.
 Close window when done expanding	ExpanderPreferences		Cerrar ventana después de extraer
@@ -16,14 +17,14 @@ Are you sure you want to stop expanding this archive? The expanded items may not
 Settings	ExpanderMenu		Configuración
 Expand	ExpanderWindow		Extraer
 Open destination folder after extraction	ExpanderPreferences		Abrir carpeta destino después de la extracción
-Same directory as source (archive) file	ExpanderPreferences		Mismo directorio que el archivo fuente
+Same directory as source (archive) file	ExpanderPreferences		Misma carpeta que el archivo de origen
 Stop	ExpanderWindow		Parar
 Cancel	ExpanderWindow		Cancelar
 Expander settings	ExpanderPreferences		Configuración de la extracción
 Error when expanding archive	ExpanderWindow		Error extrayendo archivo
 Expand	ExpanderMenu		Extraer
 Failed to create the destination folder.	ExpanderWindow		Fallo al crear la carpeta destino.
-Settings…	ExpanderMenu		Configuración...
+Settings…	ExpanderMenu		Configuración…
 Select current	DirectoryFilePanel		Selecciona actual
 Expanding '%s'…	ExpanderWindow		Expandiendo '%s'…
 OK	ExpanderPreferences		Aceptar
@@ -34,7 +35,7 @@ Show contents	ExpanderWindow		Mostrar contenidos
 Stop	ExpanderMenu		Parar
 Select '%s'…	DirectoryFilePanel		Seleccionar '%s'…
 Expansion	ExpanderPreferences		Expansión
-Set destination…	ExpanderMenu		Elegir destino...
+Set destination…	ExpanderMenu		Elegir destino…
 Continue	ExpanderWindow		Continuar
  is not supported	ExpanderWindow		 no está soportado
 Cancel	ExpanderPreferences		Cancelar

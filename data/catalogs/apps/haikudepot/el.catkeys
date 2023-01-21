@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	381023409
+1	greek, modern (1453-)	x-vnd.Haiku-HaikuDepot	4143471163
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Σφάλμα λήψης όρων χρήσης
 Available packages	MainWindow		Διαθέσιμα πακέτα
 It was not possible to create the new user.	UserLoginWindow		Δεν ήταν δυνατή η δημιουργία του νέου χρήστη.
@@ -166,6 +166,7 @@ Inactive	PackageListView		Ανενεργό
 Nickname:	UserLoginWindow		Ψευδώνυμο:
 Synchronizing meta-data about repositories	ServerRepositoryDataUpdateProcess		Γίνεται συγχρονισμός μεταδεδομένων των αποθετηρίων
 OK	MainWindow		Εντάξει
+Users are required to be {0, plural, one{# year of age} other{# years of age}} or older.	UserUsageConditions		Οι χρήστες πρέπει να έχουν ηλικία {0, plural, one{# έτους} other{# ετών}} τουλάχιστον.
 Version %Code%	UserUsageConditions		Έκδοση %Code%
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# αντικείμενο} other{# αντικείμενα}}
 Uninstalling \"%PackageName%\"	UninstallPackageAction		Απεγκαταθίσταται το πακέτο \"%PackageName%\"

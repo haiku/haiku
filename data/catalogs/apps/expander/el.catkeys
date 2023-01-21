@@ -1,10 +1,11 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Expander	3300517306
+1	greek, modern (1453-)	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Προορισμός
 Other	ExpanderPreferences		Άλλο
 Automatically show contents listing	ExpanderPreferences		Αυτόματα εμφάνιση του περιεχομένου
 Expander	System name		Αποσυμπιεστής
 Expander: Choose destination	DirectoryFilePanel		Αποσυμπιεστής: Επιλογή προορισμού
 Set source…	ExpanderMenu		Ορισμός πηγής…
+OK	ExpanderWindow		Εντάξει
 The destination is not a folder.	ExpanderWindow		Ο προορισμός δεν είναι φάκελος.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Ο φάκελος μετακινήθηκε, μετονομάστηκε ή δεν υποστηρίζεται.
 Close window when done expanding	ExpanderPreferences		Κλείσιμο παραθύρου μετά το πέρας

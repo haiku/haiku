@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Devices	911816421
+1	greek, modern (1453-)	x-vnd.Haiku-Devices	2322690158
 ACPI bus	DevicesView		Δίαυλος ACPI
 Encryption controller	Device		Ελεγκτής κρυπτογράφησης
 Devices	System name		Συσκευές
@@ -8,6 +8,7 @@ Processor	Device		Επεξεργαστής
 Generate system information	DevicesView		Πληροφορίες συστήματος
 Unknown	DeviceACPI		Άγνωστο
 Class info	DevicePCI		Πληροφορίες κατηγορίας
+<No device selected>	DevicesView		<Δεν επιλέχθηκε συσκευή>
 USB bus	Device		Θύρα USB
 Computer	DevicesView		Υπολογιστής
 Communications	DeviceSCSI		Επικοινωνίες

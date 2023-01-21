@@ -1,5 +1,6 @@
-1	spanish; castilian	x-vnd.Haiku-ICNSTranslator	335863722
+1	spanish; castilian	x-vnd.Haiku-ICNSTranslator	3766646638
 Valid sizes: 16, 32, 48, 128, 256, 512, 1024	ICNSConfig		Tamaños válidos: 16, 32, 48, 128, 256, 512, 1024
 Valid colors: RGB32, RGBA32	ICNSConfig		Colores válidos: RGB32, RGBA32
 Version %d.%d.%d, %s	ICNSConfig		Versión %d.%d.%d, %s
 Apple icon translator	ICNSConfig		Intérprete de iconos tipo Apple
+Apple icons	ICNSTranslator		iconos Apple
