@@ -299,12 +299,15 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 
 		case B_LEFT_ARROW:
 			if (rawChar == B_LEFT_ARROW) {
-				if ((mod & B_SHIFT_KEY) != 0) {
+				if ((mod & B_OPTION_KEY) != 0) {
 					if (fView->fListener != NULL)
 						fView->fListener->PreviousTermView(fView);
 					return;
 				}
-				if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY))
+
+				if ((mod & B_SHIFT_KEY) != 0)
+					toWrite = SHIFT_LEFT_ARROW_KEY_CODE;
+				else if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY))
 					toWrite = CTRL_LEFT_ARROW_KEY_CODE;
 				else
 					toWrite = LEFT_ARROW_KEY_CODE;
@@ -313,12 +316,15 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 
 		case B_RIGHT_ARROW:
 			if (rawChar == B_RIGHT_ARROW) {
-				if ((mod & B_SHIFT_KEY) != 0) {
+				if ((mod & B_OPTION_KEY) != 0) {
 					if (fView->fListener != NULL)
 						fView->fListener->NextTermView(fView);
 					return;
 				}
-				if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY))
+
+				if ((mod & B_SHIFT_KEY) != 0)
+					toWrite = SHIFT_RIGHT_ARROW_KEY_CODE;
+				else if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY))
 					toWrite = CTRL_RIGHT_ARROW_KEY_CODE;
 				else
 					toWrite = RIGHT_ARROW_KEY_CODE;
@@ -326,13 +332,15 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 			break;
 
 		case B_UP_ARROW:
-			if (mod & B_SHIFT_KEY) {
+			if ((mod & B_OPTION_KEY) && (mod & B_SHIFT_KEY)) {
 				fView->_ScrollTo(fView->fScrollOffset - fView->fFontHeight,
 					true);
 				return;
 			}
 			if (rawChar == B_UP_ARROW) {
-				if (mod & B_CONTROL_KEY)
+				if ((mod & B_SHIFT_KEY) != 0)
+					toWrite = SHIFT_UP_ARROW_KEY_CODE;
+				else if (mod & B_CONTROL_KEY)
 					toWrite = CTRL_UP_ARROW_KEY_CODE;
 				else
 					toWrite = UP_ARROW_KEY_CODE;
@@ -340,14 +348,16 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 			break;
 
 		case B_DOWN_ARROW:
-			if (mod & B_SHIFT_KEY) {
+			if ((mod & B_OPTION_KEY) && (mod & B_SHIFT_KEY)) {
 				fView->_ScrollTo(fView->fScrollOffset + fView->fFontHeight,
 					true);
 				return;
 			}
 
 			if (rawChar == B_DOWN_ARROW) {
-				if (mod & B_CONTROL_KEY)
+				if ((mod & B_SHIFT_KEY) != 0)
+					toWrite = SHIFT_DOWN_ARROW_KEY_CODE;
+				else if (mod & B_CONTROL_KEY)
 					toWrite = CTRL_DOWN_ARROW_KEY_CODE;
 				else
 					toWrite = DOWN_ARROW_KEY_CODE;
@@ -360,13 +370,21 @@ TermView::DefaultState::KeyDown(const char* bytes, int32 numBytes)
 			break;
 
 		case B_HOME:
-			if (rawChar == B_HOME)
-				toWrite = HOME_KEY_CODE;
+			if (rawChar == B_HOME) {
+				if ((mod & B_SHIFT_KEY) != 0)
+					toWrite = SHIFT_HOME_KEY_CODE;
+				else
+					toWrite = HOME_KEY_CODE;
+			}
 			break;
 
 		case B_END:
-			if (rawChar == B_END)
-				toWrite = END_KEY_CODE;
+			if (rawChar == B_END) {
+				if ((mod & B_SHIFT_KEY) != 0)
+					toWrite = SHIFT_END_KEY_CODE;
+				else
+					toWrite = END_KEY_CODE;
+			}
 			break;
 
 		case B_PAGE_UP:
