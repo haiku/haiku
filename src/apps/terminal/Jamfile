@@ -64,5 +64,7 @@ DoCatalogs Terminal :
 	TermView.cpp
 	TermViewStates.cpp
 	TermWindow.cpp
+	ThemeView.cpp
+	ThemeWindow.cpp
 	: en.catalog
 ;
