@@ -603,7 +603,11 @@ rootfs_open(fs_volume* _volume, fs_vnode* _v, int openMode, void** _cookie)
 	if ((openMode & O_DIRECTORY) != 0 && !S_ISDIR(vnode->stream.type))
 		return B_NOT_A_DIRECTORY;
 
-	// allow to open the file, but it can't be done anything with it
+	status_t status = rootfs_check_permissions(vnode, W_OK);
+	if (status != B_OK)
+		return status;
+
+	// allow to open the file, but nothing can be done with it
 
 	*_cookie = NULL;
 	return B_OK;
