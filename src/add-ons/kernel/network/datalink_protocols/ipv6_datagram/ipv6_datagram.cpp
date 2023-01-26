@@ -701,7 +701,7 @@ ndp_receive_solicitation(net_buffer* buffer, bool* reuseBuffer)
 		// send a reply (by reusing the buffer we got)
 		gBufferModule->trim(buffer, sizeof(neighbor_discovery_header));
 
-		header.icmp6_type = ND_NEIGHBOR_SOLICIT;
+		header.icmp6_type = ND_NEIGHBOR_ADVERT;
 		header.icmp6_code = 0;
 		header.icmp6_checksum = 0;
 		header.flags = ND_NA_FLAG_SOLICITED;
