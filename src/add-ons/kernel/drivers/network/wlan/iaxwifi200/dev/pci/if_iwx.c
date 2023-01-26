@@ -135,11 +135,9 @@
 
 #ifdef __FreeBSD_version
 #include <sys/device.h>
+#include <net/ifq.h>
 #define DEVNAME(_s) gDriverName
 #define SC_DEV_FOR_PCI sc->sc_dev
-#define ifq_is_oactive(IFQ) ((if_getdrvflags(ifp) & IFF_DRV_OACTIVE) != 0)
-#define ifq_set_oactive(IFQ) if_setdrvflagbits(ifp, IFF_DRV_OACTIVE, 0)
-#define ifq_clr_oactive(IFQ) if_setdrvflagbits(ifp, 0, IFF_DRV_OACTIVE)
 #define mallocarray(nmemb, size, type, flags) malloc((size) * (nmemb), (type), (flags))
 #else
 #define DEVNAME(_s)	((_s)->sc_dev.dv_xname)
