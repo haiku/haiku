@@ -468,18 +468,6 @@ NetServer::_ConfigureInterface(BMessage& message)
 		if (addressSettings.IsAutoConfigure()) {
 			_QuitLooperForDevice(name);
 			startAutoConfig = true;
-		} else if (!addressSettings.Gateway().IsEmpty()) {
-			// add gateway route, if we're asked for it
-			interface.RemoveDefaultRoute(addressSettings.Family());
-				// Try to remove a previous default route, doesn't matter
-				// if it fails.
-
-			status_t status = interface.AddDefaultRoute(
-				addressSettings.Gateway());
-			if (status != B_OK) {
-				fprintf(stderr, "%s: Could not add route for %s: %s\n",
-					Name(), name, strerror(errno));
-			}
 		}
 
 		// set address/mask/broadcast/peer
@@ -502,6 +490,22 @@ NetServer::_ConfigureInterface(BMessage& message)
 				fprintf(stderr, "%s: Setting address failed: %s\n", Name(),
 					strerror(status));
 				return status;
+			}
+		}
+
+		// set gateway
+
+		if (!addressSettings.Gateway().IsEmpty()) {
+			// add gateway route, if we're asked for it
+			interface.RemoveDefaultRoute(addressSettings.Family());
+				// Try to remove a previous default route, doesn't matter
+				// if it fails.
+
+			status_t status = interface.AddDefaultRoute(
+				addressSettings.Gateway());
+			if (status != B_OK) {
+				fprintf(stderr, "%s: Could not add route for %s: %s\n",
+					Name(), name, strerror(errno));
 			}
 		}
 
