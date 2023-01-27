@@ -405,6 +405,8 @@ ndp_init()
 	int value = 255;
 	sIPv6Module->setsockopt(sIPv6Protocol, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
 		&value, sizeof(value));
+	sIPv6Module->setsockopt(sIPv6Protocol, IPPROTO_IPV6, IPV6_UNICAST_HOPS,
+		&value, sizeof(value));
 
 	mutex_init(&sCacheLock, "ndp cache");
 
