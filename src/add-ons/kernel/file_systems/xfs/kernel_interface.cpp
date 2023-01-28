@@ -10,14 +10,14 @@
 #include "Inode.h"
 #include "ShortAttribute.h"
 #include "Symlink.h"
-#include "Utility.h"
 #include "Volume.h"
+
+#include <file_systems/fs_ops_support.h>
 
 
 #define XFS_IO_SIZE	65536
 
-struct identify_cookie
-{
+struct identify_cookie {
 	/*	super_block_struct super_block;
 	*	No structure yet implemented.
 	*/
@@ -437,9 +437,8 @@ xfs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 
 		buffer->d_dev = volume->ID();
 		buffer->d_ino = ino;
-		buffer->d_reclen = offsetof(struct dirent, d_name) + length + 1;
-		bufferSize -= buffer->d_reclen;
-		buffer = (struct dirent*)((uint8*)buffer + buffer->d_reclen);
+
+		buffer = next_dirent(buffer, length, bufferSize);
 		count++;
 	}
 

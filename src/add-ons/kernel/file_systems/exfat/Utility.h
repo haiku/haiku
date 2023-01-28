@@ -28,23 +28,6 @@ enum inode_type {
 };
 
 
-/*!	Converts the open mode, the open flags given to bfs_open(), into
-	access modes, e.g. since O_RDONLY requires read access to the
-	file, it will be converted to R_OK.
-*/
-inline int
-open_mode_to_access(int openMode)
-{
-	openMode &= O_RWMASK;
-	if (openMode == O_RDONLY)
-		return R_OK;
-	if (openMode == O_WRONLY)
-		return W_OK;
-
-	return R_OK | W_OK;
-}
-
-
 /*!	Reads the volume name from an exfat entry and writes it to
 	\a name as a UTF-8 char array.
 
