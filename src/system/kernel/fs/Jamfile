@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src system kernel fs ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel fs ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
-UsePrivateHeaders net shared storage ;
+UsePrivateHeaders net shared storage file_systems ;
 
 UseHeaders [ FDirName $(SUBDIR) $(DOTDOT) device_manager ] ;
 

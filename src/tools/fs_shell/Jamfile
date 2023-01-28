@@ -9,8 +9,7 @@ if ! $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
 }
 
-UsePrivateHeaders fs_shell ;
-UsePrivateHeaders shared ;
+UsePrivateHeaders fs_shell shared file_systems ;
 
 DEFINES += FS_SHELL=1 ;
 

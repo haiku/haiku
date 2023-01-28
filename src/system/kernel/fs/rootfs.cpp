@@ -30,6 +30,7 @@
 #	include <vm/vm.h>
 #endif
 
+#include <fs_ops_support.h>
 
 
 #if FS_SHELL
@@ -603,7 +604,7 @@ rootfs_open(fs_volume* _volume, fs_vnode* _v, int openMode, void** _cookie)
 	if ((openMode & O_DIRECTORY) != 0 && !S_ISDIR(vnode->stream.type))
 		return B_NOT_A_DIRECTORY;
 
-	status_t status = rootfs_check_permissions(vnode, W_OK);
+	status_t status = rootfs_check_permissions(vnode, open_mode_to_access(openMode));
 	if (status != B_OK)
 		return status;
 
