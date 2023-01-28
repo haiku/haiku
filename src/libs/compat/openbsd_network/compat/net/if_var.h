@@ -41,4 +41,9 @@ ifq_dequeue(struct ifaltq *ifq)
 }
 
 
+#ifndef __cplusplus
+#include "if_var-obsd.h"
+#endif
+
+
 #endif	/* _OBSD_COMPAT_NET_IF_VAR_H_ */

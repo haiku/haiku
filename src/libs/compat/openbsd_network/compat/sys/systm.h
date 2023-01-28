@@ -44,6 +44,10 @@ explicit_bzero(void *buf, size_t len)
 #define KASSERT KASSERT_OPENBSD
 
 
+#define KERNEL_LOCK()	mtx_lock(&Giant)
+#define KERNEL_UNLOCK() mtx_unlock(&Giant)
+
+
 /* #pragma mark - interrupts */
 
 #define	IPL_NONE		0

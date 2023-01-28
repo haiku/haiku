@@ -14,4 +14,18 @@
 #define ifq_clr_oactive(IFQ) if_setdrvflagbits(ifp, 0, IFF_DRV_OACTIVE)
 
 
+static void
+ifq_serialize(struct ifaltq* ifq, struct task* t)
+{
+	task_add(systq, t);
+}
+
+
+static void
+ifq_barrier(struct ifaltq* ifq)
+{
+	taskqueue_drain_all(taskqueue_fast);
+}
+
+
 #endif	/* _OBSD_COMPAT_NET_IFQ_H_ */
