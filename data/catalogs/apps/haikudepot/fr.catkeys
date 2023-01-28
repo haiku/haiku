@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	2310391690
+1	french	x-vnd.Haiku-HaikuDepot	1549347917
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Erreur lors du téléchargement des conditions d'utilisation
 Available packages	MainWindow		Paquets disponibles
 It was not possible to create the new user.	UserLoginWindow		Impossible de créer le nouvel utilisateur.
@@ -9,6 +9,7 @@ Install %PackageTitle%	PackageManager		Installer %PackageTitle%
 The response to the captcha was incorrect.	ServerHelper		Réponse incorrecte au Captcha.
 Rate package…	PackageInfoView		Évaluer le paquet…
 You have successfully authenticated as user %Nickname%.	UserLoginWindow		Vous êtes désormais authentifié en tant que %Nickname%.
+Package problems	PackageProblem	Window title	Problèmes de paquets
 It was not possible to extract necessary captcha information from the data sent back from the server.	UserLoginWindow		Il n’a pas été possible d’extraire les informations Captcha nécessaires depuis les données renvoyées par le serveur.
 An error occurred while obtaining the package list: %message%	LocalPkgDataLoadProcess		Erreur lors de l’obtention de la liste des paquets : %message%
 Update usage conditions	ToLatestUserUsageConditionsWindow		Mettre à jour les conditions d'utilisation
@@ -65,6 +66,7 @@ Your rating was updated.	RatePackageWindow		Votre évaluation a été mise à jo
 All categories	FilterView		Toutes les catégories
 ignore problem for now	PackageProblem		ignorer le problème pour l'instant
 n/a	PackageInfoView		n/a
+Checking user details	UserDetailVerifierProcess		Vérification des caractéristiques de l'utilisateur
 Cancel	MainWindow		Annuler
 Refresh repositories	MainWindow		Rafraîchir les dépôts
 Continue	App		Continuer

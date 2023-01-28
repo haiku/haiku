@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-Terminal	2536107739
+1	turkish	x-vnd.Haiku-Terminal	3017699344
 Close other tabs	Terminal TermWindow		Diğer sekmeleri kapat
 Insert path	Terminal TermView		Yolu ekle
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Uçbirim kabuğu başlatamadı. Üzgünüz.
@@ -18,6 +18,7 @@ Settings	Terminal TermWindow		Ayarlar
 Use default	Terminal SetTitleWindow		Öntanımlıları kullan
 Close tab	Terminal TermWindow		Sekmeyi kapat
 Error!	Terminal getString		Hata!
+Colors…	Terminal TermWindow		Renkler…
 Appearance	Terminal PrefWindow		Görünüş
 Set tab title	Terminal TermWindow		Sekme başlığını ayarla
 Create link here	Terminal TermView		Burada bağlantı oluştur
