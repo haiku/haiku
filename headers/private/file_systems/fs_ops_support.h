@@ -14,7 +14,10 @@
 #endif
 
 
-static struct dirent*
+/*! Computes and assigns `dirent->d_reclen`, adjusts `bufferRemaining` accordingly,
+ * and either advances to the next buffer, or returns NULL if no space remains.
+ */
+static inline struct dirent*
 next_dirent(struct dirent* dirent, size_t nameLength, size_t& bufferRemaining)
 {
 	const size_t reclen = offsetof(struct dirent, d_name) + nameLength + 1;
