@@ -202,7 +202,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		marvell_yukon
 		nforce
 		pcnet
-		rtl8139 rtl81xx
+		rtl8125 rtl8139 rtl81xx
 		sis19x sis900 syskonnect
 		via_rhine vt612x
 	}@ # x86,x86_64

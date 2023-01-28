@@ -379,15 +379,28 @@ enum rge_mac_type {
 struct kstat;
 
 struct rge_softc {
-	struct device		sc_dev;
+#ifdef __FreeBSD_version
+	device_t sc_dev;
+#else
+	struct device sc_dev;
+#endif
+#ifdef __FreeBSD_version
+	struct arpcom {
+		struct	 ifnet ac_if;			/* network-visible interface */
+		u_int8_t ac_enaddr[ETHER_ADDR_LEN];	/* ethernet hardware address */
+	} sc_arpcom;
+#else
 	struct arpcom		sc_arpcom;	/* Ethernet common data */
+#endif
 	void			*sc_ih;		/* interrupt vectoring */
 	bus_space_handle_t	rge_bhandle;	/* bus space handle */
 	bus_space_tag_t		rge_btag;	/* bus space tag */
 	bus_size_t		rge_bsize;
 	bus_dma_tag_t		sc_dmat;
+#ifndef __FreeBSD_version
 	pci_chipset_tag_t	sc_pc;
 	pcitag_t		sc_tag;
+#endif
 	struct ifmedia		sc_media;	/* media info */
 	enum rge_mac_type	rge_type;
 
