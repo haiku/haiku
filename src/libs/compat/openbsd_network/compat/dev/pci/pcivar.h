@@ -7,6 +7,8 @@
 
 
 #include_next <dev/pci/pcivar.h>
+#include <dev/pci/pcireg.h>
+
 #include <sys/rman.h>
 
 

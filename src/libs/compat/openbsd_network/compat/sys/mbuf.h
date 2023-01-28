@@ -27,6 +27,13 @@
 
 #define MAXMCLBYTES MJUM16BYTES
 
+#define M_IPV4_CSUM_OUT		CSUM_IP
+#define M_TCP_CSUM_OUT		CSUM_IP_TCP
+#define M_UDP_CSUM_OUT		CSUM_IP_UDP
+#define M_IPV4_CSUM_IN_OK	(CSUM_IP_CHECKED | CSUM_IP_VALID)
+#define M_TCP_CSUM_IN_OK	(CSUM_DATA_VALID | CSUM_PSEUDO_HDR)
+#define M_UDP_CSUM_IN_OK	(CSUM_DATA_VALID | CSUM_PSEUDO_HDR)
+
 
 static struct mbuf*
 MCLGETL(struct mbuf* m, int how, int size)

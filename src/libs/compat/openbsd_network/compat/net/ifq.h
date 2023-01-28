@@ -6,6 +6,9 @@
 #define _OBSD_COMPAT_NET_IFQ_H_
 
 
+#define ifq_purge(IFQ)				IFQ_PURGE(IFQ)
+#define ifq_set_maxlen(IFQ, LEN)	IFQ_SET_MAXLEN(IFQ, LEN)
+
 #define ifq_is_oactive(IFQ) ((if_getdrvflags(ifp) & IFF_DRV_OACTIVE) != 0)
 #define ifq_set_oactive(IFQ) if_setdrvflagbits(ifp, IFF_DRV_OACTIVE, 0)
 #define ifq_clr_oactive(IFQ) if_setdrvflagbits(ifp, 0, IFF_DRV_OACTIVE)
