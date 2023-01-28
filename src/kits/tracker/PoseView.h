@@ -157,7 +157,6 @@ public:
 	void SetSelectionRectEnabled(bool);
 	void SetAlwaysAutoPlace(bool);
 	void SetSelectionChangedHook(bool);
-	void SetShowHideSelection(bool);
 	void SetEnsurePosesVisible(bool);
 	void SetIconMapping(bool);
 	void SetAutoScroll(bool);
@@ -787,7 +786,6 @@ private:
 	bool fAllowPoseEditing : 1;
 	bool fSelectionChangedHook : 1;
 		// get rid of this
-	bool fShowHideSelection : 1;
 	bool fOkToMapIcons : 1;
 	bool fEnsurePosesVisible : 1;
 	bool fShouldAutoScroll : 1;
@@ -1048,13 +1046,6 @@ inline bool
 BPoseView::ReverseSort() const
 {
 	return fViewState->ReverseSort();
-}
-
-
-inline void
-BPoseView::SetShowHideSelection(bool on)
-{
-	fShowHideSelection = on;
 }
 
 

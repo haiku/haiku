@@ -263,7 +263,6 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fAlwaysAutoPlace(false),
 	fAllowPoseEditing(true),
 	fSelectionChangedHook(false),
-	fShowHideSelection(true),
 	fOkToMapIcons(false),
 	fEnsurePosesVisible(false),
 	fShouldAutoScroll(true),
@@ -1135,8 +1134,7 @@ BPoseView::WindowActivated(bool active)
 	if (!active)
 		CommitActivePose();
 
-	if (fShowHideSelection)
-		ShowSelection(active);
+	ShowSelection(active);
 
 	if (active && ActivePose() == NULL && !IsFilePanel())
 		MakeFocus();
