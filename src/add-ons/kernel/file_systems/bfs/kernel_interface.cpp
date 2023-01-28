@@ -19,8 +19,6 @@
 #include "bfs_control.h"
 #include "bfs_disk_system.h"
 
-#include <file_systems/fs_ops_support.h>
-
 // TODO: temporary solution as long as there is no public I/O requests API
 #ifndef FS_SHELL
 #	include <io_requests.h>

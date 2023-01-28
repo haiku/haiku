@@ -713,19 +713,6 @@ fs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat, uint
 }
 
 
-static inline int
-open_mode_to_access(int openMode)
-{
-	if ((openMode & O_RWMASK) == O_RDONLY)
-		return R_OK;
-	if ((openMode & O_RWMASK) == O_WRONLY)
-		return W_OK;
-	if ((openMode & O_RWMASK) == O_RDWR)
-		return R_OK | W_OK;
-	return 0;
-}
-
-
 static status_t
 fs_generic_create(fs_volume* _volume, vnode* directory, const char* name, int mode,
 	ino_t* _inode)

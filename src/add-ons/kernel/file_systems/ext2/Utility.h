@@ -7,6 +7,9 @@
 
 #include "ext2.h"
 
+#include <file_systems/fs_ops_support.h>
+
+
 enum inode_type {
 	S_DIRECTORY		= S_IFDIR,
 	S_FILE			= S_IFREG,
@@ -19,21 +22,5 @@ enum inode_type {
 	S_EXTENDED_TYPES = (S_ATTR_DIR | S_ATTR | S_INDEX_DIR)
 };
 
-
-/*!	Converts the open mode, the open flags given to bfs_open(), into
-	access modes, e.g. since O_RDONLY requires read access to the
-	file, it will be converted to R_OK.
-*/
-inline int
-open_mode_to_access(int openMode)
-{
-	openMode &= O_RWMASK;
-	if (openMode == O_RDONLY)
-		return R_OK;
-	if (openMode == O_WRONLY)
-		return W_OK;
-
-	return R_OK | W_OK;
-}
 
 #endif	// UTILITY_H
