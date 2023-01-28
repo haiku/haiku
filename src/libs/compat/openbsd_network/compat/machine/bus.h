@@ -28,26 +28,24 @@ typedef struct bus_dmamap_obsd* bus_dmamap_obsd_t;
 
 static int
 bus_dmamap_create_obsd(bus_dma_tag_t tag, bus_size_t maxsize,
-	int nsegments, bus_size_t maxsegsz, bus_size_t boundary, bus_size_t alignment,
-	int flags, bus_dmamap_t* dmamp, int no_alloc_map)
+	int nsegments, bus_size_t maxsegsz, bus_size_t boundary,
+	int flags, bus_dmamap_t* dmamp)
 {
 	*dmamp = calloc(sizeof(struct bus_dmamap_obsd) + (sizeof(bus_dma_segment_t) * nsegments), 1);
 	if ((*dmamp) == NULL)
 		return ENOMEM;
 
-	int error = bus_dma_tag_create(tag, alignment, boundary,
+	int error = bus_dma_tag_create(tag, 1, boundary,
 		BUS_SPACE_MAXADDR, BUS_SPACE_MAXADDR, NULL, NULL,
 		maxsize, nsegments, maxsegsz, flags, NULL, NULL,
 		&(*dmamp)->_dmat);
 	if (error != 0)
 		return error;
 
-	if (!no_alloc_map)
-		error = bus_dmamap_create((*dmamp)->_dmat, flags, &(*dmamp)->_dmamp);
+	error = bus_dmamap_create((*dmamp)->_dmat, flags, &(*dmamp)->_dmamp);
 	return error;
 }
-#define bus_dmamap_create(tag, maxsize, nsegments, maxsegsz, boundary, flags, dmamp) \
-	bus_dmamap_create_obsd(tag, maxsize, nsegments, maxsegsz, boundary, 1, flags, dmamp, 0)
+#define bus_dmamap_create bus_dmamap_create_obsd
 
 
 static void
@@ -109,6 +107,67 @@ bus_dmamap_sync_obsd(bus_dma_tag_t tag, bus_dmamap_t dmam,
 	bus_dmamap_sync_etc(dmam->_dmat, dmam->_dmamp, offset, length, ops);
 }
 #define bus_dmamap_sync bus_dmamap_sync_obsd
+
+
+static int
+bus_dmamem_alloc_obsd(bus_dma_tag_t tag, bus_size_t size, bus_size_t alignment, bus_size_t boundary,
+	bus_dma_segment_t* segs, int nsegs, int* rsegs, int flags)
+{
+	// OpenBSD distinguishes between three different types of addresses:
+	//     1. virtual addresses (caddr_t)
+	//     2. opaque "bus" addresses
+	//     3. physical addresses
+	// This function returns the second type. We simply return the virtual address for it.
+
+	bus_dma_tag_t local;
+	int error = bus_dma_tag_create(tag, alignment, boundary,
+		BUS_SPACE_MAXADDR, BUS_SPACE_MAXADDR, NULL, NULL,
+		size, nsegs, size, flags, NULL, NULL, &local);
+	if (error)
+		return error;
+
+	error = bus_dmamem_alloc(local, (void**)&segs[0].ds_addr, flags, NULL);
+	if (error)
+		return error;
+	segs[0].ds_len = size;
+
+	error = bus_dma_tag_destroy(local);
+	if (error)
+		return error;
+
+	*rsegs = 1;
+	return 0;
+}
+#define bus_dmamem_alloc bus_dmamem_alloc_obsd
+
+
+static void
+bus_dmamem_free_obsd(bus_dma_tag_t tag, bus_dma_segment_t* segs, int nsegs)
+{
+	for (int i = 0; i < nsegs; i++)
+		bus_dmamem_free_tagless(segs[i].ds_addr, segs[i].ds_len);
+}
+#define bus_dmamem_free bus_dmamem_free_obsd
+
+
+static int
+bus_dmamem_map_obsd(bus_dma_tag_t tag, bus_dma_segment_t* segs, int nsegs, size_t size, caddr_t* kvap, int flags)
+{
+	if (nsegs != 1)
+		return EINVAL;
+
+	*kvap = (caddr_t)segs[0].ds_addr;
+	return 0;
+}
+#define bus_dmamem_map bus_dmamem_map_obsd
+
+
+static void
+bus_dmamem_unmap_obsd(bus_dma_tag_t tag, caddr_t kva, size_t size)
+{
+	// Nothing to do.
+}
+#define bus_dmamem_unmap bus_dmamem_unmap_obsd
 
 
 #endif	/* _OBSD_COMPAT_MACHINE_BUS_H_ */

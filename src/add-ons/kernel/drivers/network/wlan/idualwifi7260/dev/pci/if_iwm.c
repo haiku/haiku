@@ -1235,17 +1235,6 @@ iwm_dma_contig_alloc(bus_dma_tag_t tag, struct iwm_dma_info *dma,
 	dma->tag = tag;
 	dma->size = size;
 
-#ifdef __FreeBSD_version
-	err = bus_dmamap_create_obsd(tag, size, 1, size, 0, alignment, BUS_DMA_NOWAIT,
-		&dma->map, 1);
-	if (err)
-		goto fail;
-
-	err = bus_dmamem_alloc(dma->map->_dmat, (void **)&dma->vaddr,
-		BUS_DMA_NOWAIT | BUS_DMA_ZERO | BUS_DMA_COHERENT, &dma->map->_dmamp);
-	if (err)
-		goto fail;
-#else
 	err = bus_dmamap_create(tag, size, 1, size, 0, BUS_DMA_NOWAIT,
 	    &dma->map);
 	if (err)
@@ -1261,7 +1250,6 @@ iwm_dma_contig_alloc(bus_dma_tag_t tag, struct iwm_dma_info *dma,
 	if (err)
 		goto fail;
 	dma->vaddr = va;
-#endif
 
 	err = bus_dmamap_load(tag, dma->map, dma->vaddr, size, NULL,
 	    BUS_DMA_NOWAIT);
@@ -1286,13 +1274,8 @@ iwm_dma_contig_free(struct iwm_dma_info *dma)
 			bus_dmamap_sync(dma->tag, dma->map, 0, dma->size,
 			    BUS_DMASYNC_POSTREAD | BUS_DMASYNC_POSTWRITE);
 			bus_dmamap_unload(dma->tag, dma->map);
-#ifdef __FreeBSD_version
-			bus_dmamem_free(dma->tag, dma->vaddr, dma->map->_dmamp);
-			dma->map->_dmamp = NULL;
-#else
 			bus_dmamem_unmap(dma->tag, dma->vaddr, dma->size);
 			bus_dmamem_free(dma->tag, &dma->seg, 1);
-#endif
 			dma->vaddr = NULL;
 		}
 		bus_dmamap_destroy(dma->tag, dma->map);

@@ -253,10 +253,13 @@ bus_dmamem_alloc(bus_dma_tag_t dmat, void** vaddr, int flags,
 	if (flags & BUS_DMA_ZERO)
 		mflags |= M_ZERO;
 
-	bus_dmamap_create(dmat, flags, mapp);
+	// FreeBSD does not permit the "mapp" argument to be NULL, but we do.
+	if (mapp != NULL) {
+		bus_dmamap_create(dmat, flags, mapp);
 
-	// Drivers assume dmamem will never be bounced, so ensure that.
-	(*mapp)->buffer_type = bus_dmamap::BUFFER_PROHIBITED;
+		// Drivers assume dmamem will never be bounced, so ensure that.
+		(*mapp)->buffer_type = bus_dmamap::BUFFER_PROHIBITED;
+	}
 
 	// FreeBSD uses standard malloc() for the case where maxsize <= PAGE_SIZE,
 	// but we want to keep DMA'd memory a bit more separate, so we always use
@@ -289,7 +292,7 @@ bus_dmamem_alloc(bus_dma_tag_t dmat, void** vaddr, int flags,
 	} else if (vtophys(*vaddr) & (dmat->alignment - 1)) {
 		dprintf("bus_dmamem_alloc: failed to align memory: wanted %#x, got %#x\n",
 			dmat->alignment, vtophys(vaddr));
-		bus_dmamem_free(dmat, *vaddr, *mapp);
+		bus_dmamem_free(dmat, *vaddr, (mapp != NULL) ? *mapp : NULL);
 		return ENOMEM;
 	}
 	return 0;
@@ -297,9 +300,16 @@ bus_dmamem_alloc(bus_dma_tag_t dmat, void** vaddr, int flags,
 
 
 extern "C" void
+bus_dmamem_free_tagless(void* vaddr, size_t size)
+{
+	kernel_contigfree(vaddr, size, M_DEVBUF);
+}
+
+
+extern "C" void
 bus_dmamem_free(bus_dma_tag_t dmat, void* vaddr, bus_dmamap_t map)
 {
-	kernel_contigfree(vaddr, dmat->maxsize, M_DEVBUF);
+	bus_dmamem_free_tagless(vaddr, dmat->maxsize);
 	bus_dmamap_destroy(dmat, map);
 }
 
