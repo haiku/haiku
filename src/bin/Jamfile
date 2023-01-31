@@ -98,7 +98,6 @@ StdBinCommands
 	modifiers.cpp
 	mvattr.cpp
 	pidof.cpp
-	play.cpp
 	query.cpp
 	quit.cpp
 	roster.cpp

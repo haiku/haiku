@@ -14,7 +14,7 @@ SYSTEM_BIN += [ FFilterByBuildFeatures
 	FirstBootPrompt
 	<bin>i2c@x86,x86_64 installsound
 	mail mail2mbox mbox2mail media_client mount_nfs
-	pidof play recover screenshot setcontrollook setdecor spamdbm
+	pidof recover screenshot setcontrollook setdecor spamdbm
 	translate
 	WindowShade
 ] ;
