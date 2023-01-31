@@ -6,6 +6,9 @@
 
 #include <WeakReferenceable.h>
 
+#include <stdio.h>
+#include <OS.h>
+
 
 namespace BPrivate {
 
@@ -76,6 +79,13 @@ BWeakReferenceable::BWeakReferenceable()
 
 BWeakReferenceable::~BWeakReferenceable()
 {
+	if (fPointer->UseCount() > 0) {
+		char message[256];
+		snprintf(message, sizeof(message), "deleting referenceable object %p with "
+			"reference count (%" B_PRId32 ")", this, fPointer->UseCount());
+		debugger(message);
+	}
+
 	fPointer->ReleaseReference();
 }
 
