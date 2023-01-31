@@ -1708,7 +1708,7 @@ release_advisory_lock(struct vnode* vnode, struct io_context* context,
 		if (removeLock) {
 			// this lock is no longer used
 			iterator.Remove();
-			free(lock);
+			delete lock;
 		}
 	}
 
@@ -1820,8 +1820,7 @@ acquire_advisory_lock(struct vnode* vnode, io_context* context,
 
 	// install new lock
 
-	struct advisory_lock* lock = (struct advisory_lock*)malloc(
-		sizeof(struct advisory_lock));
+	struct advisory_lock* lock = new(std::nothrow) advisory_lock;
 	if (lock == NULL) {
 		put_advisory_locking(locking);
 		return B_NO_MEMORY;
