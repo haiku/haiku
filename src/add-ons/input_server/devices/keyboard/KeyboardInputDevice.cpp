@@ -194,7 +194,10 @@ KeyboardDevice::Start()
 	TRACE("name: %s\n", fDeviceRef.name);
 
 	fFD = open(fPath, O_RDWR);
+	if (fFD < 0) {
 		// let the control thread handle any error on opening the device
+		fFD = errno;
+	}
 
 	char threadName[B_OS_NAME_LENGTH];
 	snprintf(threadName, B_OS_NAME_LENGTH, "%s watcher", fDeviceRef.name);
@@ -266,7 +269,7 @@ KeyboardDevice::_ControlThread()
 
 	if (fFD < B_OK) {
 		LOG_ERR("KeyboardDevice: error when opening %s: %s\n",
-			fPath, strerror(errno));
+			fPath, strerror(fFD));
 		_ControlThreadCleanup();
 		// TOAST!
 		return B_ERROR;
