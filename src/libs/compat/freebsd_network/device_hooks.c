@@ -51,7 +51,8 @@ compat_open(const char *name, uint32 flags, void **cookie)
 
 	IFF_LOCKGIANT(ifp);
 
-	ifp->if_init(ifp->if_softc);
+	if (ifp->if_init != NULL)
+		ifp->if_init(ifp->if_softc);
 
 	if (!HAIKU_DRIVER_REQUIRES(FBSD_WLAN_FEATURE)) {
 		ifp->if_flags &= ~IFF_UP;
