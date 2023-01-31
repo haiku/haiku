@@ -147,11 +147,15 @@ SEARCH on [ FGristFiles $(muslSources) ] += [ FDirName $(posixSources) musl misc
 
 # misc
 
-SEARCH_SOURCE = [ FDirName $(HAIKU_TOP) src kits support ] ;
+SEARCH_SOURCE =
+	[ FDirName $(HAIKU_TOP) src kits support ]
+	[ FDirName $(HAIKU_TOP) src kits shared ]
+	;
 
 KernelMergeObject kernel_misc.o :
 	DataIO.cpp
 	Referenceable.cpp
+	WeakReferenceable.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;

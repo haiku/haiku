@@ -67,6 +67,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Thread.cpp
 			ToolBar.cpp
 			Variant.cpp
+			WeakReferenceable.cpp
 			;
 
 		Includes [ FGristFiles Keymap.cpp ]
