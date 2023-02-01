@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src system boot platform generic ;
 UseBuildFeatureHeaders zlib ;
 UsePrivateKernelHeaders ;
 
-SubDirC++Flags -D_BOOT_MODE -fno-rtti ;
+SubDirC++Flags -fno-rtti ;
 
 local platform ;
 for platform in [ MultiBootSubDirSetup ] {

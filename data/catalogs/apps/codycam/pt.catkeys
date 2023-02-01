@@ -14,7 +14,7 @@ Every 10 minutes	CodyCam		Cada 10 minutos
 Every minute	CodyCam		Cada minuto
 Capture Rate Menu	CodyCam		Menu de taxa de captura
 Cannot seek time source!	CodyCam		Não é possível buscar fonte de tempo!
-Server login failed	VideoConsumer.cpp		A entrada no servidor falhou
+Server login failed	VideoConsumer.cpp		O início de sessão no servidor falhou
 on or off expected	Settings	Do not translate 'on' and 'off'	esperado on ou off
 invalid upload client %ld\n	VideoConsumer.cpp		cliente inválido de upload %ld\n
 Every 30 seconds	CodyCam		Cada 30 segundos

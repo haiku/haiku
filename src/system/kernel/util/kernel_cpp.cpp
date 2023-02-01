@@ -1,11 +1,12 @@
 /*
- * Copyright 2003-2007, Haiku Inc. All rights reserved.
+ * Copyright 2003-2022, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de.
  *		Ingo Weinhold, bonefish@users.sf.net.
  */
+
 
 //!	C++ in the kernel
 
@@ -137,6 +138,13 @@ operator delete(void *ptr) _NOEXCEPT
 
 void
 operator delete[](void *ptr) _NOEXCEPT
+{
+	free(ptr);
+}
+
+
+void
+operator delete(void *ptr, std::nothrow_t const &) _NOEXCEPT
 {
 	free(ptr);
 }

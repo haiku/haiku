@@ -28,6 +28,7 @@
 
 isa_module_info *gIsa = NULL;
 bool gActiveMultiplexingEnabled = false;
+bool gSetupComplete = false;
 sem_id gControllerSem;
 
 static int32 sIgnoreInterrupts = 0;
@@ -167,8 +168,11 @@ ps2_setup_active_multiplexing(bool *enabled)
 	status_t res;
 	uint8 in, out;
 
+	// Disable the keyboard port to avoid any interference with the keyboard
+	ps2_command(PS2_CTRL_KEYBOARD_DISABLE, NULL, 0, NULL, 0);
+
 	out = 0xf0;
-	res = ps2_command(0xd3, &out, 1, &in, 1);
+	res = ps2_command(PS2_CTRL_AUX_LOOPBACK, &out, 1, &in, 1);
 	if (res)
 		goto fail;
 	// Step 1, if controller is good, in does match out.
@@ -177,7 +181,7 @@ ps2_setup_active_multiplexing(bool *enabled)
 		goto no_support;
 
 	out = 0x56;
-	res = ps2_command(0xd3, &out, 1, &in, 1);
+	res = ps2_command(PS2_CTRL_AUX_LOOPBACK, &out, 1, &in, 1);
 	if (res)
 		goto fail;
 	// Step 2, if controller is good, in does match out.
@@ -185,7 +189,7 @@ ps2_setup_active_multiplexing(bool *enabled)
 		goto no_support;
 
 	out = 0xa4;
-	res = ps2_command(0xd3, &out, 1, &in, 1);
+	res = ps2_command(PS2_CTRL_AUX_LOOPBACK, &out, 1, &in, 1);
 	if (res)
 		goto fail;
 	// Step 3, if the controller doesn't support active multiplexing,
@@ -214,7 +218,7 @@ done:
 	// loopback, thus we need to send a harmless command (enable keyboard
 	// interface) next.
 	// This fixes bug report #1175
-	res = ps2_command(0xae, NULL, 0, NULL, 0);
+	res = ps2_command(PS2_CTRL_KEYBOARD_ENABLE, NULL, 0, NULL, 0);
 	if (res != B_OK) {
 		INFO("ps2: active multiplexing d3 workaround failed, status 0x%08"
 			B_PRIx32 "\n", res);
@@ -239,7 +243,7 @@ ps2_command(uint8 cmd, const uint8 *out, int outCount, uint8 *in, int inCount)
 	acquire_sem(gControllerSem);
 	atomic_add(&sIgnoreInterrupts, 1);
 
-#ifdef TRACE_PS2
+#ifdef TRACE_PS2_COMMON
 	TRACE("ps2: ps2_command cmd 0x%02x, out %d, in %d\n", cmd, outCount, inCount);
 	for (i = 0; i < outCount; i++)
 		TRACE("ps2: ps2_command out 0x%02x\n", out[i]);
@@ -265,7 +269,7 @@ ps2_command(uint8 cmd, const uint8 *out, int outCount, uint8 *in, int inCount)
 			TRACE("ps2: ps2_command in byte %d failed\n", i);
 	}
 
-#ifdef TRACE_PS2
+#ifdef TRACE_PS2_COMMON
 	for (i = 0; i < inCount; i++)
 		TRACE("ps2: ps2_command in 0x%02x\n", in[i]);
 	TRACE("ps2: ps2_command result 0x%08" B_PRIx32 "\n", res);
@@ -399,21 +403,27 @@ ps2_init(void)
 	}
 
 	if (gActiveMultiplexingEnabled) {
+		// The multiplexing spec recommends to leave device 0 unconnected because it saves some
+		// confusion with the use of the D3 command which appears as if the replied data was
+		// coming from device 0. So we enable it only if it really looks like there is a device
+		// connected there.
 		if (ps2_dev_command_timeout(&ps2_device[PS2_DEVICE_MOUSE],
-				PS2_CMD_MOUSE_SET_SCALE11, NULL, 0, NULL, 0, 100000)
-			== B_TIMED_OUT) {
+				PS2_CMD_MOUSE_SET_SCALE11, NULL, 0, NULL, 0, 100000) == B_TIMED_OUT) {
 			INFO("ps2: accessing multiplexed mouse port 0 timed out, ignoring it!\n");
 		} else {
 			ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
 		}
-		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + 1]);
-		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + 2]);
-		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + 3]);
+
+		for (int idx = 1; idx <= 3; idx++) {
+			ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE + idx]);
+		}
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_KEYB]);
 	} else {
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_MOUSE]);
 		ps2_service_notify_device_added(&ps2_device[PS2_DEVICE_KEYB]);
 	}
+
+	gSetupComplete = true;
 
 	TRACE("ps2: init done!\n");
 	return B_OK;

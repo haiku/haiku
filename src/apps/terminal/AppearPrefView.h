@@ -10,6 +10,7 @@
 
 #include <GroupView.h>
 #include <Messenger.h>
+#include <ObjectList.h>
 #include <String.h>
 
 
@@ -17,9 +18,7 @@ static const uint32 MSG_HALF_FONT_CHANGED				= 'mchf';
 static const uint32 MSG_HALF_SIZE_CHANGED				= 'mchs';
 static const uint32 MSG_FULL_FONT_CHANGED				= 'mcff';
 static const uint32 MSG_FULL_SIZE_CHANGED				= 'mcfs';
-static const uint32 MSG_COLOR_FIELD_CHANGED				= 'mccf';
 static const uint32 MSG_COLOR_CHANGED					= 'mcbc';
-static const uint32 MSG_COLOR_SCHEME_CHANGED			= 'mccs';
 
 static const uint32 MSG_TAB_TITLE_SETTING_CHANGED		= 'mtts';
 static const uint32 MSG_WINDOW_TITLE_SETTING_CHANGED	= 'mwts';
@@ -53,8 +52,6 @@ public:
 	virtual void				AttachedToWindow();
 
 private:
-			void				_ChangeColorScheme(color_scheme* scheme);
-			void				_SetCurrentColorScheme();
 			void				_SetEncoding(const char* encoding);
 			void				_SetWindowSize(int rows, int cols);
 
@@ -70,10 +67,6 @@ private:
 	static	BPopUpMenu*			_MakeMenu(uint32 msg, const char** items,
 										const char* defaultItem);
 
-	static	BPopUpMenu*			_MakeColorSchemeMenu(uint32 msg,
-									const color_scheme** schemes,
-									const color_scheme* defaultItemName);
-
 			void				_MarkSelectedFont(const char* family,
 									const char* style, const char* size);
 
@@ -85,10 +78,6 @@ private:
 
 			BMenuField*			fWindowSizeField;
 			BMenuField*			fEncodingField;
-
-			BMenuField*			fColorSchemeField;
-			BMenuField*			fColorField;
-			BColorControl*		fColorControl;
 
 			BTextControl*		fTabTitle;
 			BTextControl*		fWindowTitle;

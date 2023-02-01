@@ -17,7 +17,7 @@
 #include <KernelExport.h>
 #include <SupportDefs.h>
 
-#include <arch/x86/arch_acpi.h>
+#include <arch_acpi.h>
 #include <boot/stage2.h>
 #include <boot/platform.h>
 #include <boot/stdio.h>
@@ -196,6 +196,12 @@ acpi_find_table(const char* signature)
 }
 
 
+void __attribute__((weak))
+arch_handle_acpi()
+{
+}
+
+
 void
 acpi_init()
 {
@@ -214,6 +220,7 @@ acpi_init()
 
 		if (rsdp != NULL && acpi_check_rsdt(rsdp) == B_OK) {
 			gKernelArgs.arch_args.acpi_root = rsdp;
+			arch_handle_acpi();
 			break;
 		}
 	}

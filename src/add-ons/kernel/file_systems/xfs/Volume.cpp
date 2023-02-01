@@ -7,6 +7,7 @@
 
 #include "Volume.h"
 
+#include "Checksum.h"
 #include "Inode.h"
 
 
@@ -39,9 +40,28 @@ Volume::Identify(int fd, XfsSuperBlock *superBlock)
 
 	TRACE("Volume::Identify() : Identifying Volume in progress");
 
-	if (read_pos(fd, 0, superBlock, sizeof(XfsSuperBlock))
-		!= sizeof(XfsSuperBlock))
-			return B_IO_ERROR;
+	//Create a buffer of 512 bytes for Crc verification
+	char buf[512];
+
+	if(read_pos(fd, 0, buf, 512) != 512)
+		return B_IO_ERROR;
+
+	memcpy(superBlock, buf, sizeof(XfsSuperBlock));
+
+	int version = B_BENDIAN_TO_HOST_INT16(superBlock->Version()) & XFS_SB_VERSION_NUMBITS;
+
+	// if its V5 filesystem check for superblock checksum
+	if (superBlock->MagicNum() == B_HOST_TO_BENDIAN_INT32(XFS_SB_MAGIC)
+		&& (version == 5 || superBlock->Crc() != 0)) {
+
+		TRACE("Superblock Crc: (%" B_PRIu32 ")\n", superBlock->Crc());
+
+		if(!xfs_verify_cksum(buf, 512, offsetof(XfsSuperBlock, sb_crc))) {
+			 ERROR("Filesystem is corrupted");
+			 return B_BAD_VALUE;
+		}
+
+	}
 
 	superBlock->SwapEndian();
 
@@ -85,7 +105,11 @@ Volume::Mount(const char *deviceName, uint32 flags)
 		return B_BAD_VALUE;
 	}
 
-	TRACE("Volume::Mount(): Valid SuperBlock.\n");
+	if ((fSuperBlock.Version() & XFS_SB_VERSION_NUMBITS) == 5)
+		TRACE("Volume::Mount(): Valid Version 5 SuperBlock.\n");
+	else
+		TRACE("Volume::Mount(): Valid Version 4 SuperBlock.\n");
+
 
 	// check if the device size is large enough to hold the file system
 	off_t diskSize;

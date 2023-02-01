@@ -10,6 +10,7 @@
 #include <boot/stdio.h>
 
 #include "efi_platform.h"
+#include "generic_mmu.h"
 #include "mmu.h"
 #include "serial.h"
 #include "smp.h"
@@ -21,9 +22,6 @@ struct gdt_idt_descr {
 } _PACKED;
 
 
-extern gdt_idt_descr gBootGDTDescriptor;
-
-
 extern "C" typedef void (*enter_kernel_t)(uint32_t, addr_t, addr_t, addr_t,
 	struct gdt_idt_descr *);
 
@@ -33,6 +31,8 @@ extern "C" void arch_enter_kernel(uint32_t pageDirectory, addr_t kernelArgs,
 	addr_t kernelEntry, addr_t kernelStackTop, struct gdt_idt_descr *gdtDescriptor);
 
 // From arch_mmu.cpp
+extern void arch_mmu_init_gdt(gdt_idt_descr &bootGDTDescriptor);
+
 extern void arch_mmu_post_efi_setup(size_t memoryMapSize,
 	efi_memory_descriptor *memoryMap, size_t descriptorSize,
 	uint32_t descriptorVersion);
@@ -51,49 +51,12 @@ arch_convert_kernel_args(void)
 }
 
 
-static const char*
-memory_region_type_str(int type)
-{
-	switch (type)	{
-		case EfiReservedMemoryType:
-			return "ReservedMemoryType";
-		case EfiLoaderCode:
-			return "LoaderCode";
-		case EfiLoaderData:
-			return "LoaderData";
-		case EfiBootServicesCode:
-			return "BootServicesCode";
-		case EfiBootServicesData:
-			return "BootServicesData";
-		case EfiRuntimeServicesCode:
-			return "RuntimeServicesCode";
-		case EfiRuntimeServicesData:
-			return "RuntimeServicesData";
-		case EfiConventionalMemory:
-			return "ConventionalMemory";
-		case EfiUnusableMemory:
-			return "UnusableMemory";
-		case EfiACPIReclaimMemory:
-			return "ACPIReclaimMemory";
-		case EfiACPIMemoryNVS:
-			return "ACPIMemoryNVS";
-		case EfiMemoryMappedIO:
-			return "MMIO";
-		case EfiMemoryMappedIOPortSpace:
-			return "MMIOPortSpace";
-		case EfiPalCode:
-			return "PalCode";
-		case EfiPersistentMemory:
-			return "PersistentMemory";
-		default:
-			return "unknown";
-	}
-}
-
-
 void
 arch_start_kernel(addr_t kernelEntry)
 {
+	gdt_idt_descr bootGDTDescriptor;
+	arch_mmu_init_gdt(bootGDTDescriptor);
+
 	// Copy entry.S trampoline to lower 1M
 	enter_kernel_t enter_kernel = (enter_kernel_t)0xa000;
 	memcpy((void *)enter_kernel, (void *)arch_enter_kernel, B_PAGE_SIZE);
@@ -167,16 +130,14 @@ arch_start_kernel(addr_t kernelEntry)
 	// A changing memory map shouldn't affect the generated page tables, as
 	// they only needed to know about the maximum address, not any specific
 	// entry.
+
 	dprintf("Calling ExitBootServices. So long, EFI!\n");
+	serial_disable();
 	while (true) {
 		if (kBootServices->ExitBootServices(kImage, mapKey) == EFI_SUCCESS) {
-			// The console was provided by boot services, disable it.
-			stdout = NULL;
-			stderr = NULL;
-			// Also switch to legacy serial output
-			// (may not work on all systems)
-			serial_switch_to_legacy();
-			dprintf("Switched to legacy serial output\n");
+			// Disconnect from EFI serial_io / stdio services
+			serial_kernel_handoff();
+			dprintf("Unhooked from EFI serial services\n");
 			break;
 		}
 
@@ -191,6 +152,8 @@ arch_start_kernel(addr_t kernelEntry)
 	arch_mmu_post_efi_setup(memoryMapSize, memoryMap,
 		descriptorSize, descriptorVersion);
 
+	serial_enable();
+
 	// Copy final kernel args
 	// This should be the last step before jumping to the kernel
 	// as there are some fixups happening to kernel_args even in the last minute
@@ -200,12 +163,12 @@ arch_start_kernel(addr_t kernelEntry)
 
 	// Enter the kernel!
 	dprintf("enter_kernel(pageDirectory: 0x%08x, kernelArgs: 0x%08x, "
-		"kernelEntry: 0x%08x, sp: 0x%08x, gBootGDTDescriptor: 0x%08x)\n",
+		"kernelEntry: 0x%08x, sp: 0x%08x, bootGDTDescriptor: 0x%08x)\n",
 		pageDirectory, (uint32_t)virtKernelArgs, (uint32_t)kernelEntry,
 		(uint32_t)(gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size),
-		(uint32_t)&gBootGDTDescriptor);
+		(uint32_t)&bootGDTDescriptor);
 
 	enter_kernel(pageDirectory, virtKernelArgs, kernelEntry,
 		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size,
-		&gBootGDTDescriptor);
+		&bootGDTDescriptor);
 }

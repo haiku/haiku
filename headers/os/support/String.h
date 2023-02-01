@@ -23,7 +23,7 @@ public:
 							BString(const BString& string);
 							BString(const char* string, int32 maxLength);
 #if __cplusplus >= 201103L
-							BString(BString&& string);
+							BString(BString&& string) noexcept;
 #endif
 							~BString();
 
@@ -43,7 +43,7 @@ public:
 			BString&		operator=(const char* string);
 			BString&		operator=(char c);
 #if __cplusplus >= 201103L
-			BString&		operator=(BString&& string);
+			BString&		operator=(BString&& string) noexcept;
 #endif
 
 			BString&		SetTo(const char* string);

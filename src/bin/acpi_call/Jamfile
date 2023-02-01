@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src bin acpi_call ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) add-ons kernel bus_managers acpi acpica include ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) add-ons kernel bus_managers acpi acpica include platform ] ;
+
+BinCommand acpi_call :
+	acpi_call.cpp
+	;

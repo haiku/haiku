@@ -13,6 +13,7 @@ UsePrivateKernelHeaders ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders [ FDirName system arch x86 ] ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) paging ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) timers ] ;
 
@@ -92,9 +93,13 @@ local archGenericSources =
 	arch_vm_translation_map.cpp
 	apic.cpp
 	ioapic.cpp
-	irq_routing_table.cpp
+	acpi_irq_routing_table.cpp
 	msi.cpp
 	pic.cpp
+
+	# serial
+	debug_uart.cpp
+	debug_uart_8250.cpp
 
 	# paging
 	X86PagingMethod.cpp

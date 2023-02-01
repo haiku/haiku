@@ -27,7 +27,9 @@ static struct {
 	{ 0x8086, 0xa348},	// 300 Series cAVS
 	{ 0x8086, 0x9dc8},	// 300 Series HD Audio
 	{ 0x8086, 0x06c8},	// 400 Series cAVS
+	{ 0x8086, 0x02c8},	// 400 Series HD Audio
 	{ 0x8086, 0xa0c8},	// 500 Series HD Audio
+	{ 0x8086, 0x51c8},	// 600 Series HD Audio
 	{ 0x8086, 0x4dc8},	// JasperLake HD Audio
 	{ 0x8086, 0x43c8},	// Tiger Lake-H HD Audio
 	{ 0x8086, 0xa171},	// CM238 HD Audio

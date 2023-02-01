@@ -23,6 +23,7 @@
 #define _HEAP_H_
 
 #include <OS.h>
+#include <cstddef>
 
 #include "config.h"
 
@@ -75,11 +76,7 @@ class hoardHeap {
 #endif
 
 		// Every object is aligned so that it can always hold any type.
-#ifdef __x86_64__
-		enum { ALIGNMENT = 16 };
-#else		
-		enum { ALIGNMENT = sizeof(double) };
-#endif
+		enum { ALIGNMENT = HAIKU_MEMORY_ALIGNMENT };
 
 		// ANDing with this rounds to ALIGNMENT.
 		enum { ALIGNMENT_MASK = ALIGNMENT - 1 };

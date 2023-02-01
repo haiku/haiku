@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-CharacterMap	2410613018
+1	polish	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Różne symbole matematyczne B
 Latin extended E	UnicodeBlocks		Łaciński rozszerzony E
@@ -38,7 +38,7 @@ Enclosed ideographic supplement	UnicodeBlocks		Dodatkowe otoczone znaki ideograf
 Warang Citi	UnicodeBlocks		Warang Citi
 Vertical forms	UnicodeBlocks		Formy pionowe
 Miscellaneous mathematical symbols A	UnicodeBlocks		Różne symbole matematyczne A
-CharacterMap	System name		TablicaZnaków
+CharacterMap	System name		Tablica znaków
 Latin extended D	UnicodeBlocks		Łaciński rozszerzony D
 Aegean numbers	UnicodeBlocks		Liczby egejskie
 Hangul syllables	UnicodeBlocks		Sylaby Hangyl
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		Rozszerzenie C ujednoliconych 
 Ancient Greek musical notation	UnicodeBlocks		Starożytna grecka notacja muzyczna
 Thai	UnicodeBlocks		Tajski
 Ethiopic supplement	UnicodeBlocks		Uzupełnienie etiopskiego
+Only show blocks contained in font	CharacterWindow		Pokaż jedynie bloki zawarte w foncie
 Chess symbols	UnicodeBlocks		Symbole szachowe
 Yijing hexagram symbols	UnicodeBlocks		Heksagramy Yijing
 Ottoman Siyaq numbers	UnicodeBlocks		Ottomańskie cyfry Siyaq

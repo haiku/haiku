@@ -8,20 +8,10 @@ HaikuPackage $(haikuPackage) ;
 # wifi firmware
 local driver ;
 for driver in $(SYSTEM_ADD_ONS_DRIVERS_NET) {
-	local package = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGE) ] ;
 	local archive = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVE) ] ;
 	local extract = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_DO_EXTRACT) ] ;
 	if $(archive) {
-		AddWifiFirmwareToPackage $(driver) : $(package) : $(archive)
-			: $(extract) ;
-	}
-	local packages = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_PACKAGES) ] ;
-	local archives = [ on $(driver) return $(HAIKU_WIFI_FIRMWARE_ARCHIVES) ] ;
-	local archive ;
-	for archive in $(archives) {
-		AddWifiFirmwareToPackage $(driver) : $(packages[1]) : $(archive)
-			: $(extract) ;
-		packages = $(packages[2-]) ;
+		AddWifiFirmwareToPackage $(driver) :  : $(archive) : $(extract) ;
 	}
 }
 
@@ -40,7 +30,7 @@ AddFilesToPackage add-ons kernel busses ata
 
 AddFilesToPackage add-ons kernel busses i2c : pch_i2c@x86,x86_64 ;
 AddFilesToPackage add-ons kernel busses mmc : sdhci_pci ;
-AddFilesToPackage add-ons kernel busses random : virtio_rng ;
+AddFilesToPackage add-ons kernel busses random : ccp_rng@x86,x86_64 virtio_rng ;
 AddFilesToPackage add-ons kernel busses scsi : ahci virtio_scsi ;
 AddFilesToPackage add-ons kernel busses usb : <usb>uhci <usb>ohci <usb>ehci
 	<usb>xhci ;
@@ -58,7 +48,7 @@ AddFilesToPackage add-ons kernel generic
 AddFilesToPackage add-ons kernel partitioning_systems
 	: amiga_rdb@m68k apple@ppc sun@sparc efi_gpt intel session ;
 AddFilesToPackage add-ons kernel interrupt_controllers : openpic@ppc ;
-AddFilesToPackage add-ons kernel power cpufreq : intel_pstates@x86,x86_64 ;
+AddFilesToPackage add-ons kernel power cpufreq : amd_pstates@x86,x86_64 intel_pstates@x86,x86_64 ;
 AddFilesToPackage add-ons kernel power cpuidle : intel_cstates@x86,x86_64 ;
 
 if $(TARGET_ARCH) = x86 || $(TARGET_ARCH) = x86_64 {
@@ -73,7 +63,7 @@ AddNewDriversToPackage disk scsi	: scsi_cd scsi_disk ;
 AddNewDriversToPackage disk virtual : virtio_block ram_disk ;
 AddNewDriversToPackage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 AddNewDriversToPackage sensor		: $(SYSTEM_ADD_ONS_DRIVERS_SENSOR) ;
-AddNewDriversToPackage network		: virtio_net ;
+AddNewDriversToPackage network		: usb_ecm virtio_net ;
 AddNewDriversToPackage input		: virtio_input ;
 #AddNewDriversToPackage display		: display_adapter@x86 ;
 
@@ -190,9 +180,13 @@ AddFilesToPackage data KeyboardLayouts Apple\ Aluminum
 AddFilesToPackage data KeyboardLayouts ThinkPad
 	: $(HAIKU_THINKPAD_KEYBOARD_LAYOUT_FILES) ;
 
+# terminal themes
+local terminalThemes = [ Glob $(HAIKU_TOP)/data/system/data/terminal_themes : "[a-zA-Z0-9 ]*" ] ;
+AddFilesToPackage data Terminal Themes : $(terminalThemes) ;
+
 # boot module links
 AddBootModuleSymlinksToPackage
-	acpi@x86,x86_64 ahci ata ata_adapter
+	acpi@x86,x86_64,arm64 ahci ata ata_adapter
 	bfs
 	dpc
 	efi_gpt
@@ -203,7 +197,7 @@ AddBootModuleSymlinksToPackage
 	nvme_disk
 	openpic@ppc
 	packagefs pci
-	fdt@riscv64,arm
+	fdt@riscv64,arm,arm64
 	scsi scsi_cd scsi_disk scsi_periph silicon_image_3112 highpoint_ide_pci
 	sdhci_pci
 	usb usb_disk <usb>ehci <usb>ohci <usb>uhci <usb>xhci
@@ -252,9 +246,6 @@ AddFilesToPackage add-ons kernel network ppp : $(SYSTEM_NETWORK_PPP) ;
 AddFilesToPackage add-ons kernel network protocols
 	: $(SYSTEM_NETWORK_PROTOCOLS) ;
 
-AddFilesToPackage add-ons Print : $(SYSTEM_ADD_ONS_PRINT) ;
-AddFilesToPackage add-ons Print transport
-	: $(SYSTEM_ADD_ONS_PRINT_TRANSPORT) ;
 AddFilesToPackage add-ons Screen\ Savers : $(SYSTEM_ADD_ONS_SCREENSAVERS) ;
 
 AddFilesToPackage add-ons disk_systems

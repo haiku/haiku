@@ -1,10 +1,10 @@
-1	english	x-vnd.Haiku-PNGTranslator	3445227127
+1	english	x-vnd.Haiku-PNGTranslator	993682334
 PNG Settings	PNGTranslator		PNG 设置
 None	PNGTranslator		无
 PNG image	PNGTranslator		PNG 图像
 PNG images	PNGTranslator		PNG 图像
 Interlacing type:	PNGTranslator		隔行类型：
-PNG Interlace Menu	PNGTranslator		PNG 隔行菜单
 PNGTranslator Settings	PNGTranslator		PNG转换器设置
 Version %d.%d.%d, %s	PNGTranslator		版本 %d.%d.%d, %s
 PNG image translator	PNGTranslator		PNG 图像转换器
+Interlace Option	PNGTranslator		隔行扫描选项

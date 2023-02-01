@@ -3,10 +3,7 @@ SubDir HAIKU_TOP src system boot loader file_systems fat ;
 UsePrivateKernelHeaders ;
 UsePrivateHeaders shared storage ;
 
-local defines = [ FDefines _BOOT_MODE ] ;
-
-SubDirCcFlags $(defines) ;
-SubDirC++Flags -fno-rtti $(defines) ;
+SubDirC++Flags -fno-rtti ;
 
 local platform ;
 for platform in [ MultiBootSubDirSetup ] {

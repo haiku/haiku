@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Network	2946180251
+1	english	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		以太网设备
 Link speed:	IntefaceView		连接速度：
 disconnected	IntefaceView		断开连接
@@ -13,11 +13,13 @@ Gateway:	IntefaceAddressView		网关：
 The netmask defines your local network	IntefaceAddressView		子网掩码定义您的本地网络
 Your IP address	IntefaceAddressView		您的 IP 地址
 DHCP	IntefaceAddressView		DHCP
+IP address:	IntefaceAddressView		IP 地址：
 Netmask:	IntefaceAddressView		子网掩码：
 EAP	EAP protected network		可扩展身份验证协议(EAP)
 Services	NetworkWindow		服务
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		在桌面栏安装网络状态失败: %s
 Revert	NetworkWindow		恢复
+off	ServiceListItem		关闭
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<未发现无线网络>
 Enable	IntefaceView		启用
@@ -28,6 +30,7 @@ WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		在桌面栏显示网络状态
 Mode:	IntefaceAddressView		模式：
 connected	InterfaceListItem		已连接
+OK	NetworkWindow		确定
 Static	IntefaceAddressView		静态
 launch error	NetworkWindow		启动错误
 Renegotiate	IntefaceView		重新协商
@@ -35,13 +38,16 @@ MAC address:	IntefaceView		MAC 地址：
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 disabled	InterfaceListItem		已禁用
 Dial-up connection	InterfaceListItem		拨号连接
+on	ServiceListItem		打开
 The method for obtaining an IP address	IntefaceAddressView		获取 IP 地址的方式
+disconnected	InterfaceListItem		已断开
 Automatic	IntefaceAddressView		自动
 Choose automatically	IntefaceView		自动选择
 Status:	IntefaceView		状态：
 Disable	IntefaceView		禁用
 Manage…	NetworkWindow		管理...
 open	Open network		开放
+Network	System name		网络
 Your gateway to the internet	IntefaceAddressView		您的互联网网关
 Enable	ServiceView		启用
 Wireless device	InterfaceListItem		无线设备

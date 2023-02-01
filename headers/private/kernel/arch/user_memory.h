@@ -11,13 +11,7 @@
 #include <thread.h>
 
 
-#ifdef __x86_64__
-#	include <arch/generic/user_memory.h>
-#elif defined(__M68K__)
-#	include <arch/generic/user_memory.h>
-#elif defined(__riscv)
-#	include <arch/generic/user_memory.h>
-#else
+#ifdef __i386__
 
 extern "C" {
 
@@ -55,6 +49,8 @@ arch_cpu_user_memset(void* s, char c, size_t count)
 }
 
 
+#else
+#	include <arch/generic/user_memory.h>
 #endif
 
 #endif	// _KERNEL_ARCH_USER_MEMORY_H

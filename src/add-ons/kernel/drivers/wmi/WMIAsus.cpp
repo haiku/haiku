@@ -125,7 +125,7 @@ WMIAsus::_EvaluateMethod(uint32 methodId, uint32 arg0, uint32 arg1,
 	uint32 *returnValue)
 {
 	CALLED();
-	uint32 params[] = { arg0, arg1 };
+	uint32 params[] = { arg0, arg1, 0, 0, 0 };
 	acpi_data inBuffer = { sizeof(params), params };
 	acpi_data outBuffer = { ACPI_ALLOCATE_BUFFER, NULL };
 	status_t status = wmi->evaluate_method(wmi_cookie, 0, methodId, &inBuffer,
@@ -261,7 +261,7 @@ wmi_asus_register_device(device_node *node)
 {
 	CALLED();
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "WMI ASUS" }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "WMI ASUS" }},
 		{ NULL }
 	};
 

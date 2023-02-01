@@ -71,7 +71,7 @@ static char *strscan (char *search, char *what)
 static int
 ReadInteger(char *string, char **NextString)
 {
-    register int Result = 0;
+    int Result = 0;
     int Sign = 1;
     
     if (*string == '+')
@@ -96,7 +96,7 @@ int XParseGeometry (char *string, int *x, int *y,
 					unsigned int *width, unsigned int *height)
 {
 	int mask = NoValue;
-	register char *strind;
+	char *strind;
 	unsigned int tempWidth=0, tempHeight=0;
 	int tempX=0, tempY=0;
 	char *nextCharacter;

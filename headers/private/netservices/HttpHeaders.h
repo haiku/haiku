@@ -11,11 +11,10 @@
 #include <String.h>
 
 
-#ifndef LIBNETAPI_DEPRECATED
 namespace BPrivate {
 
 namespace Network {
-#endif
+
 
 class BHttpHeader {
 public:
@@ -93,10 +92,9 @@ private:
 			BList				fHeaderList;
 };
 
-#ifndef LIBNETAPI_DEPRECATED
+
 } // namespace Network
 
 } // namespace BPrivate
-#endif
 
 #endif // _B_HTTP_HEADERS_H_

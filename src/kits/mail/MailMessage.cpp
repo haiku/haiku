@@ -185,7 +185,7 @@ BEmailMessage::ForwardMessage(bool accountFromMail, bool includeAttachments)
 		header << "CC: " << CC() << '\n';
 	}
 	header << "Subject: " << Subject() << '\n';
-	header << "Date: " << Date() << "\n\n";
+	header << "Date: " << HeaderField("Date") << "\n\n";
 	if (fTextBody != NULL)
 		header << fTextBody->Text() << '\n';
 	BEmailMessage *message = new BEmailMessage();

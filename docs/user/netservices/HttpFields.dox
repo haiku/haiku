@@ -1,0 +1,655 @@
+/*
+ * Copyright 2022 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Corresponds to:
+ *		headers/private/netservices2/HttpFields.h			hrev?????
+ *		src/kits/network/libnetservices2/HttpFields.cpp		hrev?????
+ */
+
+
+#if __cplusplus >= 201703L
+
+
+/*!
+	\file HttpFields.h
+	\ingroup netservices
+	\brief Provides the BHttpFields class.
+*/
+
+namespace BPrivate {
+
+namespace Network {
+
+
+/*!
+	\class BHttpFields
+	\ingroup netservices
+	\brief Represents the field section of a HTTP header.
+
+	The HTTP protocol (RFC 7230) specifies that each HTTP request and response has a header. Part
+	of that header is a list of fields, which are name and value pairs. The high level protocol
+	defines what valid field names and field values look like. When adding or modifying field data,
+	the members of this class enforce those constraints.
+	
+	When you are processing a HTTP response, this object gives you the methods to query the headers
+	in that response. When you are creating a HTTP request, this object gives you methods to add
+	and modify header fields on your request. When retrieving data from the header fields, this
+	data is often returned as an \c std::string_view. Please note that this object will only point
+	to valid data for the lifetime of this object, which in case of a HTTP response, will be
+	bound to the lifetime of the object that contains the HTTP response.
+
+	When adding headers, the fields are stored in the order in which they were added. You can use
+	\ref AddField() to add more than one field with the same key.
+
+	The HTTP protocol does not prohibit multiple fields with the same name, but it does note that
+	semantically this is only allowed for a limited set of explicitly named headers, like the
+	'Set-Cookie' field (see RFC 7230 section 3.2.2). Because most header fields will only exist
+	once, the interface of this class is optimized for each header field existing only once. The
+	onus is on the user to take additional steps when dealing with header fields that they know
+	can occur more than once.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BHttpFields::InvalidInput
+	\ingroup netservices
+	\brief Error that represents when a string input contains characters that are incompatible with
+		the HTTP specification.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BString BHttpFields::InvalidInput::input
+	\brief The input that contains the invalid contents.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpFields::InvalidInput::InvalidInput(const char *origin, BString input)
+	\brief Constructor that sets the \a origin and the invalid \a input.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual BString BHttpFields::InvalidInput::DebugMessage() const override
+	\brief Retrieve a debug message that contains all info in this error.
+
+	The output will be along the lines of:
+	\code
+	[Origin] Invalid format or unsupported characters in input    [input]
+	\endcode
+
+	\exception std::bad_alloc In the future this method may throw this
+		exception when the memory for the debug message cannot be allocated.
+
+	\return A \ref BString object that contains the debug message.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual const char* BHttpFields::InvalidInput::Message() const noexcept override
+	\brief Get a pointer to the message describing the error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BHttpFields::Field
+	\ingroup netservices
+	\brief Represents a HTTP header field.
+
+	This type represents a combination of a field name and a field value. In order to be used in
+	a HTTP header, each object must contain data that is in compliance with the HTTP specification
+	(RFC 7230).
+
+	Some official HTTP specifications give additional guidelines for how to interpret specific
+	fields. This class, however, does not supply any additional parsing for those specializations.
+
+	Manipulation of the contents of a HTTP field will in most cases be done through the interface
+	of the \ref BHttpFields object that owns this field.
+
+	This type has a special 'empty' state. This means that they do not have a key and value. Empty
+	objects only come into existence when explicitly instantiated with the constructor with no
+	arguments, or after the contents has been moved to another object. Empty objects cannot be
+	added to \ref BHttpFields objets. You do not have to check for empty fields when working with
+	fields coming from \ref BHttpFields objects.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpFields::Field::Field() noexcept
+	\brief Construct empty field.
+
+	This constructs an empty field. Because empty fields cannot be used in combination with a
+	\ref BHttpFields object, it is unlikely that you will construct these empty fields yourself.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpFields::Field::Field(const std::string_view& name, const std::string_view& value)
+	\brief Construct a field with a \a name and a \a value.
+
+	The parameters are checked whether they only contain characters that are allowed by the HTTP
+	specification.
+
+	\param name The name of the header field.
+	\param value The value of the header field.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+	\exception BHttpFields::InvalidInput This error indicates that the \a name or the \a value
+		is empty or contains invalid characters.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpFields::Field::Field(BString& field)
+	\brief Construct a field from the raw \a field value.
+
+	The raw header field is checked to determine whether it corresponds to the the HTTP
+	specification. Note that the raw field should not include any newline characters at the end
+	of the string.
+
+	If succesful, the string is moved into the fields object, and the original input value will be
+	empty.
+
+	\param field The raw header field to move into the list of headers 
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+	\exception BHttpFields::InvalidInput This error indicates that the \a name or the \a value
+		is empty or contains invalid characters.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpFields::Field::Field(const Field &other)
+	\brief Copy constructor.
+
+	\param other The other field to copy data from.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpFields::Field::Field(Field&& other) noexcept
+	\brief Move constructor.
+
+	After moving, the \a other field object will be an empty field.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn Field& BHttpFields::Field::operator=(const Field &other)
+	\brief Copy assignment.
+
+	\param other The other field to copy data from.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+
+ 	\since Haiku R1
+*/
+
+
+/*!
+	\fn Field& BHttpFields::Field::operator=(Field &&other) noexcept
+	\brief Move assignment.
+
+	After moving, the \a other field object will be an empty field.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const FieldName& BHttpFields::Field::Name() const noexcept
+	\brief Get a const reference to the field name.
+
+	\return The name of the field as a \ref BHttpFields::FieldName.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn std::string_view BHttpFields::Field::Value() const noexcept
+	\brief Get a const reference to the field value.
+
+	\return The contents of the field value as a \c std::string_view.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn std::string_view BHttpFields::Field::RawField() const noexcept
+	\brief Get a view to the field value.
+
+	\return The raw field value as a \c string_view. The raw value does not include the line
+		ending (\\r\\n).
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BHttpFields::Field::IsEmpty() const noexcept
+	\brief Check if the field is empty or has valid data.
+
+	\retval true This field is empty.
+	\retval false This field contains a valid name and value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BHttpFields::FieldName
+	\ingroup netservices
+	\brief Representation of a HTTP header name.
+
+	As per the HTTP specification, header fields have a name. There are limitations to which
+	characters are supported. As per the specification, header field names are case insensitive.
+	This means that the \c content-encoding is equal to \c Content-Encoding or even
+	\c COnTenT-ENcOdING.
+
+	A header field name can never be empty.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpFields::FieldName::operator std::string_view() const
+	\brief Return a \c std::string_view over the header name.
+
+	\return A \c std::string_view object over the header name.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BHttpFields::FieldName::operator==(const BString &other) const noexcept
+	\brief Compare the header name to a string.
+
+	\param other The \c other string to compare it to.
+
+	The comparison is case-insensitive. So if this header name is set to \c Content-Encoding,
+	comparing it to \c content-encoding will return \c true.
+
+	\retval true The current header name is equal to the \a other name.
+	\retval false The current header name is different from the \a other name.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BHttpFields::FieldName::operator==(const std::string_view& other) const noexcept
+	\copydoc BHttpFields::FieldName::operator==(const BString &other) const noexcept
+*/
+
+
+/*!
+	\fn bool BHttpFields::FieldName::operator==(const BHttpFields::FieldName& other) const noexcept
+	\copydoc BHttpFields::FieldName::operator==(const BString &other) const noexcept
+*/
+
+
+/*!
+	\typedef BHttpFields::ConstIterator
+	\brief Define a constant iterator to iterate through the list of header fields.
+
+	This iterator has the same semantics as other constant iterators in the C++ standard library.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Constructors & Destructor
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BHttpFields::BHttpFields()
+	\brief Construct an empty list of HTTP header fields.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpFields::BHttpFields(std::initializer_list< Field > fields)
+	\brief Initialize the object with a list of fields.
+
+	This enables you to initialize the fields with a list of \ref BHttpFields::Field objects. Any
+	empty fields will be skipped. Like \ref AddField(), this constructor keeps the fields in the
+	original order.
+
+	The example below will create an object with four fields, even though five fields have been
+	passed in the initializer. The two \c Accept-Encoding will be added in this order, even though
+	the HTTP specification does not explicitly allow this.
+
+	\code
+	const BHttpFields defaultFields = {
+		{"Host"sv, "haiku-os.org"sv},
+		{"Accept-Encoding"sv, "gzip"sv}
+		{"Accept"sv, "*\/*"sv},
+		{},
+		{"Accept-Encoding"sv, "bzip2"sv}
+	};
+	\endcode
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+	\exception BHttpFields::InvalidInput This error indicates that some of the names or values in
+		the list do not adhere to the HTTP specification.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpFields::BHttpFields(const BHttpFields &other)
+	\brief Copy constructor.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpFields::BHttpFields(BHttpFields &&other)
+	\brief Move constructor.
+
+	The name and value from the \a other fields object will be moved to this object. The \a other
+	object will be empty, meaning it no longer has any fields.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpFields::~BHttpFields() noexcept
+	\brief Destructor.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Assignment operators
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BHttpFields& BHttpFields::operator=(BHttpFields &&other) noexcept
+	\brief Move assignment operator.
+
+	The name and value from the \a other fields object will be moved to this object. The \a other
+	object will be empty, meaning it no longer has any fields.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpFields& BHttpFields::operator=(const BHttpFields &other)
+	\brief Copy assignment operator.
+
+	Make a new fields object with a copy of the fields of the \a other header.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name List Access
+*/
+
+
+//! @{
+
+/*!
+	\fn const Field& BHttpFields::operator[](size_t index) const
+	\brief Get the item at an \a index.
+
+	\param index The zero-based index of the item in the list of fields.
+
+	\return A const reference to the the field.
+
+	\exception BRuntimeError Error in case the index is out of bounds.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Modifying the list
+*/
+
+
+//! @{
+
+/*!
+	\fn void BHttpFields::AddField(const std::string_view &name, const std::string_view &value)
+	\brief Append a field with \a name and a \a value to the list of headers.
+
+	The parameters are checked whether they only contain characters that are allowed by the HTTP
+	specification.
+
+	\param name The name of the header field.
+	\param value The value of the header field.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+	\exception BHttpFields::InvalidInput This error indicates that the \a name or the \a value
+		contains invalid characters.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpFields::AddField(BString &field)
+	\brief Append a field from the raw \a field line
+
+	The raw header field is checked to determine whether it corresponds to the the HTTP
+	specification. Note that the raw field should not include any newline characters at the end
+	of the string.
+
+	If succesful, the string is moved into the fields object, and the original input value will be
+	empty.
+
+	\param field The raw header field to move into the list of headers.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+	\exception BHttpFields::InvalidInput This error indicates that the \a name or the \a value
+		is empty or contains invalid characters.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpFields::AddFields(std::initializer_list< Field > fields)
+	\brief Add a list of fields.
+
+	This enables you to add a list of \ref BHttpFields::Field objects. Like \ref AddField(), the
+	fields are added in the the original order.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+	\exception BHttpFields::InvalidInput This error indicates that some of the names or values in
+		the list do not adhere to the HTTP specification.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpFields::RemoveField(const std::string_view &name) noexcept
+	\brief Remove all fields with the \a name.
+
+	If there are no fields with this name, this method does nothing. Like all operations that
+	involve a field name, the name matching is case insensitive.
+
+	\param name The name of the field to remove.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpFields::RemoveField(ConstIterator it) noexcept
+	\brief Remove the specific field at the location of an iterator.
+
+	\param it A valid iterator to the item that must be removed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpFields::MakeEmpty() noexcept
+	\brief Clear all fields from this header.
+
+	Removes all fields from the container.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Querying
+*/
+
+
+//! @{
+
+
+/*!
+	\fn ConstIterator BHttpFields::FindField(const std::string_view &name) const noexcept
+	\brief Find a field with \a name.
+
+	In case there are more than one fields with the same name, you cannot use this method to find
+	all instances, and you should iterate through the fields instead.
+
+	\param name The name of the field to be found.
+
+	\return Returns a valid iterator to the first field with \a name in this container, or
+		BHttpFields::end() in case the name is not found.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn size_t BHttpFields::CountFields() const noexcept
+	\brief Get the number of fields.
+
+	\return The number of fields in this container. If multiple fields have the same name, they
+		will be counted individually.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn size_t BHttpFields::CountFields(const std::string_view &name) const noexcept
+	\brief Cound the number of fields that have this \a name.
+
+	\param name The name of the field you are looking for. Name matching will be done case
+		insensitively.
+
+	\return The number of field with the \a name.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Range-based iteration.
+	Allows the usage of this object in a for loop.
+*/
+
+
+//! @{
+
+/*!
+	\fn ConstIterator BHttpFields::begin() const noexcept
+	\brief Return an iterator to the first field.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ConstIterator BHttpFields::end() const noexcept
+	\brief Return an iterator to the end of the fields.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+} // namespace Network
+
+} // namespace BPrivate
+
+#endif

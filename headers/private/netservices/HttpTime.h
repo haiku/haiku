@@ -12,9 +12,7 @@
 
 namespace BPrivate {
 
-#ifndef LIBNETAPI_DEPRECATED
 namespace Network {
-#endif
 
 enum {
 	B_HTTP_TIME_FORMAT_PARSED = -1,
@@ -31,25 +29,24 @@ public:
 						BHttpTime();
 						BHttpTime(BDateTime date);
 						BHttpTime(const BString& dateString);
-	
+
 	// Date modification
 			void		SetString(const BString& string);
 			void		SetDate(BDateTime date);
-	
-		
+
+
 	// Date conversion
 			BDateTime	Parse();
 			BString		ToString(int8 format = B_HTTP_TIME_FORMAT_PARSED);
-			
+
 private:
 			BString		fDateString;
 			BDateTime	fDate;
 			int8		fDateFormat;
 };
 
-#ifndef LIBNETAPI_DEPRECATED
 } // namespace Network
-#endif
 
 } // namespace BPrivate
+
 #endif // _B_HTTP_TIME_H_

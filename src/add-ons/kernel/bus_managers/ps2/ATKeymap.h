@@ -8,6 +8,13 @@
 
 
 #include <SupportDefs.h>
+#include <usb/USB_hid.h>
+#include <usb/USB_hid_page_consumer.h>
+#include <usb/USB_hid_page_generic_desktop.h>
+
+
+#define HID_CONSUMER(code) ((B_HID_USAGE_PAGE_CONSUMER << 16) | (B_HID_UID_CON_##code))
+#define HID_GD(code) ((B_HID_USAGE_PAGE_GENERIC_DESKTOP << 16) | (B_HID_UID_GD_##code))
 
 
 const static uint32 kATKeycodeMap[] = {
@@ -154,7 +161,7 @@ const static uint32 kATKeycodeMap[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x85,   // media: Previous track
+	HID_CONSUMER(SCAN_PREVIOUS_TRACK), // media: Previous track
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -163,18 +170,18 @@ const static uint32 kATKeycodeMap[] = {
 	0x00,   // UNMAPPED		150
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x8a,   // media: Next track
+	HID_CONSUMER(SCAN_NEXT_TRACK), // media: Next track
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x5b,   // KP Enter
 	0x60,   // Right Control
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x93,   // media: Volume mute	160
-	0x87,   // media: Calculator
-	0x81,   // media: Play
+	HID_CONSUMER(MUTE), // media: Volume mute	160
+	HID_CONSUMER(AL_CALCULATOR),   // media: Calculator
+	HID_CONSUMER(PLAY), // media: Play
 	0x00,   // UNMAPPED
-	0x86,   // media: Stop
+	HID_CONSUMER(STOP), // media: Stop
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -184,11 +191,11 @@ const static uint32 kATKeycodeMap[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x92,   // media: Volume down
+	HID_CONSUMER(VOLUME_DECREMENT), // media: Volume down
 	0x00,   // UNMAPPED
-	0x91,   // media: Volume up
+	HID_CONSUMER(VOLUME_INCREMENT), // media: Volume up
 	0x00,   // UNMAPPED
-	0x8a,   // media: www home
+	HID_CONSUMER(AC_HOME), // media: www home
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED		180
 	0x23,   // KP /
@@ -232,22 +239,22 @@ const static uint32 kATKeycodeMap[] = {
 	0x66,   // Left Gui
 	0x67,   // Right Gui	220
 	0x68,   // Menu
-	0x94,   // power: Shutdown
-	0x95,   // power: Sleep
+	HID_GD(SYSTEM_POWER_DOWN), // power: Shutdown
+	HID_GD(SYSTEM_SLEEP), // power: Sleep
 	0x00,   // UNMAPPED 0x60
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x96,   // power: Wake
+	HID_GD(SYSTEM_WAKE_UP), // power: Wake
 	0x00,   // UNMAPPED
-	0x8d,   // media: www Search
-	0x8e,   // medie: www Favorites 		230
-	0x8f,   // media: www Refresh
-	0x90,   // media: www Stop
-	0x8b,   // media: www Forward
-	0x8c,   // media: www back
-	0x88,   // media: My computer
-	0x89,   // media: email
-	0x83,   // media: select //last scancode for pressed
+	HID_CONSUMER(AC_SEARCH),   // media: www Search
+	HID_CONSUMER(AC_BOOKMARKS), // medie: www Favorites 		230
+	HID_CONSUMER(AC_REFRESH),   // media: www Refresh
+	HID_CONSUMER(AC_STOP),   // media: www Stop
+	HID_CONSUMER(AC_FORWARD),   // media: www Forward
+	HID_CONSUMER(AC_BACK),   // media: www back
+	HID_CONSUMER(AL_LOCAL_MACHINE_BROWSER),   // media: My computer
+	HID_CONSUMER(AL_EMAIL_READER),   // media: email
+	HID_CONSUMER(AL_CONSUMER_CONTROL_CONFIGURATION),   // media: select
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED

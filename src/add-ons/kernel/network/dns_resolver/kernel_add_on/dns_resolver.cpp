@@ -182,11 +182,10 @@ GetAddrInfo(const char* node, const char* service,
 		int32 code;
 		replySize = read_port(gPortReply, &code, reply, replySize);
 		if (replySize < B_OK) {
+			free(reply);
 			result = dns_resolver_repair();
-			if (result != B_OK) {
-				free(reply);
+			if (result != B_OK)
 				return result;
-			}
 			continue;
 		}
 

@@ -15,6 +15,7 @@
 #include <PartitioningInfo.h>
 #include <PartitionParameterEditor.h>
 #include <Path.h>
+#include <SupportDefs.h>
 
 #include <AutoDeleter.h>
 
@@ -100,6 +101,7 @@ GPTPartitionHandle::SupportedChildOperations(const BMutablePartition* child,
 		| B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
 		| B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD
 		| B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE
+		| B_DISK_SYSTEM_SUPPORTS_SETTING_PARAMETERS
 		| B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD;
 }
 
@@ -112,7 +114,7 @@ GPTPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
 	TRACE("GPTPartitionHandle::GetNextSupportedType(child: %p, cookie: %" B_PRId32 ")\n",
 		child, index);
 
-	if (index >= int32(sizeof(kTypeMap) / sizeof(kTypeMap[0])))
+	if (index >= int32(B_COUNT_OF(kTypeMap)))
 		return B_ENTRY_NOT_FOUND;
 
 	type->SetTo(kTypeMap[index].type);
@@ -152,7 +154,7 @@ GPTPartitionHandle::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 	BPartitionParameterEditor** editor)
 {
 	*editor = NULL;
-	if (type == B_CREATE_PARAMETER_EDITOR) {
+	if (type == B_CREATE_PARAMETER_EDITOR || type == B_PROPERTIES_PARAMETER_EDITOR) {
 		try {
 			*editor = new BPartitionParameterEditor();
 		} catch (std::bad_alloc&) {
@@ -192,6 +194,25 @@ status_t
 GPTPartitionHandle::SetName(BMutablePartition* child, const char* name)
 {
 	return child->SetName(name);
+}
+
+
+status_t
+GPTPartitionHandle::ValidateSetType(const BMutablePartition* child,
+	const char* type)
+{
+	for (size_t i = 0; i < B_COUNT_OF(kTypeMap); i++) {
+		if (strcmp(type, kTypeMap[i].type) == 0)
+			return B_OK;
+	}
+	return B_BAD_VALUE;
+}
+
+
+status_t
+GPTPartitionHandle::SetType(BMutablePartition* child, const char* type)
+{
+	return child->SetType(type);
 }
 
 

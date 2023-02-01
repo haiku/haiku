@@ -14,22 +14,8 @@
 #include <mail_encoding.h>
 #include <stdio.h>
 
-
-#ifndef LIBNETAPI_DEPRECATED
 using namespace BPrivate::Network;
-#endif
 
-
-#ifdef LIBNETAPI_DEPRECATED
-BDataRequest::BDataRequest(const BUrl& url, BUrlProtocolListener* listener,
-		BUrlContext* context)
-	: BUrlRequest(url, listener, context, "data URL parser", "data"),
-	fResult()
-{
-	fResult.SetContentType("text/plain");
-}
-
-#else
 
 BDataRequest::BDataRequest(const BUrl& url, BDataIO* output,
 	BUrlProtocolListener* listener,
@@ -40,7 +26,6 @@ BDataRequest::BDataRequest(const BUrl& url, BDataIO* output,
 {
 	fResult.SetContentType("text/plain");
 }
-#endif // LIBNETAPI_DEPRECATED
 
 
 const BUrlResult&
@@ -136,15 +121,6 @@ BDataRequest::_ProtocolLoop()
 
 	fResult.SetLength(length);
 
-#ifdef LIBNETAPI_DEPRECATED
-	if (fListener != NULL) {
-		fListener->HeadersReceived(this, fResult);
-		if (length > 0) {
-			fListener->DataReceived(this, payload, 0, length);
-			fListener->DownloadProgress(this, length, length);
-		}
-	}
-#else
 	if (fListener != NULL)
 		fListener->HeadersReceived(this);
 	if (length > 0) {
@@ -159,7 +135,6 @@ BDataRequest::_ProtocolLoop()
 				fListener->DownloadProgress(this, written, written);
 		}
 	}
-#endif // LIBNETAPI_DEPRECATED
 
 	return B_OK;
 }

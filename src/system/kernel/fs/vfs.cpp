@@ -87,19 +87,19 @@
 #	define FS_CALL(vnode, op, params...) \
 		( HAS_FS_CALL(vnode, op) ? \
 			vnode->ops->op(vnode->mount->volume, vnode, params) \
-			: (panic("FS_CALL op " #op " is NULL"), 0))
+			: (panic("FS_CALL: vnode %p op " #op " is NULL", vnode), 0))
 #	define FS_CALL_NO_PARAMS(vnode, op) \
 		( HAS_FS_CALL(vnode, op) ? \
 			vnode->ops->op(vnode->mount->volume, vnode) \
-			: (panic("FS_CALL_NO_PARAMS op " #op " is NULL"), 0))
+			: (panic("FS_CALL_NO_PARAMS: vnode %p op " #op " is NULL", vnode), 0))
 #	define FS_MOUNT_CALL(mount, op, params...) \
 		( HAS_FS_MOUNT_CALL(mount, op) ? \
 			mount->volume->ops->op(mount->volume, params) \
-			: (panic("FS_MOUNT_CALL op " #op " is NULL"), 0))
+			: (panic("FS_MOUNT_CALL: mount %p op " #op " is NULL", mount), 0))
 #	define FS_MOUNT_CALL_NO_PARAMS(mount, op) \
 		( HAS_FS_MOUNT_CALL(mount, op) ? \
 			mount->volume->ops->op(mount->volume) \
-			: (panic("FS_MOUNT_CALL_NO_PARAMS op " #op " is NULL"), 0))
+			: (panic("FS_MOUNT_CALL_NO_PARAMS: mount %p op " #op " is NULL", mount), 0))
 #else
 #	define FS_CALL(vnode, op, params...) \
 			vnode->ops->op(vnode->mount->volume, vnode, params)
@@ -899,6 +899,8 @@ remove_vnode_from_mount_list(struct vnode* vnode, struct fs_mount* mount)
 static struct vnode*
 lookup_vnode(dev_t mountID, ino_t vnodeID)
 {
+	ASSERT_READ_LOCKED_RW_LOCK(&sVnodeLock);
+
 	struct vnode_hash_key key;
 
 	key.device = mountID;
@@ -1189,6 +1191,10 @@ restart:
 	AutoLocker<Vnode> nodeLocker(vnode);
 
 	if (vnode && vnode->IsBusy()) {
+		// vnodes in the Removed state (except ones still Unpublished)
+		// which are also Busy will disappear soon, so we do not wait for them.
+		const bool doNotWait = vnode->IsRemoved() && !vnode->IsUnpublished();
+
 		nodeLocker.Unlock();
 		rw_lock_read_unlock(&sVnodeLock);
 		if (!canWait) {
@@ -1196,7 +1202,7 @@ restart:
 				mountID, vnodeID);
 			return B_BUSY;
 		}
-		if (!retry_busy_vnode(tries, mountID, vnodeID))
+		if (doNotWait || !retry_busy_vnode(tries, mountID, vnodeID))
 			return B_BUSY;
 
 		rw_lock_read_lock(&sVnodeLock);
@@ -1702,7 +1708,7 @@ release_advisory_lock(struct vnode* vnode, struct io_context* context,
 		if (removeLock) {
 			// this lock is no longer used
 			iterator.Remove();
-			free(lock);
+			delete lock;
 		}
 	}
 
@@ -1814,8 +1820,7 @@ acquire_advisory_lock(struct vnode* vnode, io_context* context,
 
 	// install new lock
 
-	struct advisory_lock* lock = (struct advisory_lock*)malloc(
-		sizeof(struct advisory_lock));
+	struct advisory_lock* lock = new(std::nothrow) advisory_lock;
 	if (lock == NULL) {
 		put_advisory_locking(locking);
 		return B_NO_MEMORY;
@@ -2179,7 +2184,9 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 		for (nextPath = path + 1; *nextPath != '\0' && *nextPath != '/';
 				nextPath++);
 
+		bool directoryFound = false;
 		if (*nextPath == '/') {
+			directoryFound = true;
 			*nextPath = '\0';
 			do
 				nextPath++;
@@ -2226,7 +2233,7 @@ vnode_path_to_vnode(struct vnode* vnode, char* path, bool traverseLeafLink,
 		// If the new node is a symbolic link, resolve it (if we've been told
 		// to do it)
 		if (S_ISLNK(nextVnode->Type())
-			&& (traverseLeafLink || nextPath[0] != '\0')) {
+			&& (traverseLeafLink || directoryFound)) {
 			size_t bufferSize;
 			char* buffer;
 
@@ -2822,6 +2829,9 @@ get_new_fd(int type, struct fs_mount* mount, struct vnode* vnode,
 	if (vnode && vnode->mandatory_locked_by != NULL
 		&& (type == FDTYPE_FILE || type == FDTYPE_DIR))
 		return B_BUSY;
+
+	if ((openMode & O_RDWR) != 0 && (openMode & O_WRONLY) != 0)
+		return B_BAD_VALUE;
 
 	descriptor = alloc_fd();
 	if (!descriptor)
@@ -3888,12 +3898,9 @@ get_vnode(fs_volume* volume, ino_t vnodeID, void** _privateNode)
 extern "C" status_t
 acquire_vnode(fs_volume* volume, ino_t vnodeID)
 {
-	struct vnode* vnode;
+	ReadLocker nodeLocker(sVnodeLock);
 
-	rw_lock_read_lock(&sVnodeLock);
-	vnode = lookup_vnode(volume->id, vnodeID);
-	rw_lock_read_unlock(&sVnodeLock);
-
+	struct vnode* vnode = lookup_vnode(volume->id, vnodeID);
 	if (vnode == NULL)
 		return B_BAD_VALUE;
 
@@ -5532,6 +5539,9 @@ create_vnode(struct vnode* directory, const char* name, int openMode,
 static int
 open_dir_vnode(struct vnode* vnode, bool kernel)
 {
+	if (!HAS_FS_CALL(vnode, open_dir))
+		return B_UNSUPPORTED;
+
 	void* cookie;
 	status_t status = FS_CALL(vnode, open_dir, &cookie);
 	if (status != B_OK)

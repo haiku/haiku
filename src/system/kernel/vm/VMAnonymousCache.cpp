@@ -1454,7 +1454,7 @@ swap_file_add(const char* path)
 	}
 
 	// do the allocations and prepare the swap_file structure
-	swap_file* swap = (swap_file*)malloc(sizeof(swap_file));
+	swap_file* swap = new(std::nothrow) swap_file;
 	if (swap == NULL) {
 		close(fd);
 		return B_NO_MEMORY;
@@ -1467,7 +1467,7 @@ swap_file_add(const char* path)
 	uint32 pageCount = st.st_size >> PAGE_SHIFT;
 	swap->bmp = radix_bitmap_create(pageCount);
 	if (swap->bmp == NULL) {
-		free(swap);
+		delete swap;
 		close(fd);
 		return B_NO_MEMORY;
 	}
@@ -1534,7 +1534,7 @@ swap_file_delete(const char* path)
 
 	close(swapFile->fd);
 	radix_bitmap_destroy(swapFile->bmp);
-	free(swapFile);
+	delete swapFile;
 
 	return B_OK;
 }

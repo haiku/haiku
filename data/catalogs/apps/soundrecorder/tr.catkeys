@@ -15,7 +15,7 @@ Format:	RecorderWindow		Biçim:
 Sound List	RecorderWindow		Ses listesi
 Compression: 	RecorderWindow		Sıkıştırma: 
 Rewind	RecorderWindow		Geriye sar
-Sample rate:	RecorderWindow		Örnek oran:
+Sample rate:	RecorderWindow		Örnek hız:
 Invalid audio files	RecorderWindow		Geçersiz ses dosyaları
  seconds	RecorderWindow		 saniye
 OK	RecorderWindow		Tamam
@@ -40,7 +40,7 @@ Compression:	RecorderWindow		Sıkıştırma:
 Cannot find an unused name to use for the new recording	RecorderWindow		Yeni kayıt için daha önce kullanılmamış bir ad bulunamıyor
 Channels: 	RecorderWindow		Kanallar: 
 Save	RecorderWindow		Kaydet
-Sample rate: 	RecorderWindow		Örnek oran: 
+Sample rate: 	RecorderWindow		Örnek hız: 
 Cannot connect to media server	RecorderWindow		Ortam sunucusuna bağlanamıyor
 The file doesn't appear to be an audio file.	RecorderWindow		Bu dosya bir ses dosyası değil gibi görünüyor.
 File name:	RecorderWindow		Dosya adı:

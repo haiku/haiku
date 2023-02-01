@@ -1,0 +1,334 @@
+/*
+ * Copyright 2021 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Corresponds to:
+ *		headers/private/netservices2/HttpSession.h			hrev?????
+ *		src/kits/network/libnetservices2/HttpSession.cpp	hrev?????
+ */
+
+
+#if __cplusplus >= 201703L
+
+
+/*!
+	\file HttpSession.h
+	\ingroup netservices
+	\brief Provides classes and tools to schedule and execute HTTP requests.
+
+	\since Haiku R1
+*/
+
+
+namespace BPrivate {
+
+namespace Network {
+
+
+/*!
+	\class BHttpSession
+	\ingroup netservices
+	\brief Schedule, execute and manage HTTP requests
+
+	All requests start from a `BHttpSession`. This class has the following jobs:
+		- Store data used between various HTTP calls
+			- Proxies
+			- Cookies
+			- Additional SSL certificates
+			- Authentication Data
+		- Manage the scheduling and execution of HTTP requests.
+
+	Objects of the `BHttpSession` class can be shared between different parts
+	of the application. They should be copied, rather than shared using
+	pointers. This is because they have an inner state that is shared between
+	the various objects.
+
+	\code
+	// Creating and sharing a session
+	auto session = BHttpSession();
+
+	// A copy is passed to window1 and window2, which share the same session data
+	auto window1 = new WindowWithSession(session);
+	auto window2 = new WindowWithSession(session);
+
+	// Add a cookie to the session, this cookie will be used in window1 and window2
+	BNetworkCookie cookie("key", "value", BUrl("https://example.com/"));
+	session.AddCookie(std::move(cookie));
+
+	// The session data persists, even if the original session goes out of scope
+	\endcode
+
+	There are specific scenarios for having more than one session, most notably
+	if an application provides services over HTTP whereby a user is identified
+	by cookies, and the application wants to support more than one user
+	account. But in most cases, there will be one instance of the BHttpSession
+	that is shared between various segments of the application.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpSession::BHttpSession()
+	\brief Construct a new object.
+
+	Each newly constructed object will have their own queue for HTTP requests,
+	as well as their own cookies and certificate store.
+
+	\exception std::bad_alloc Unable to allocate resources for the object.
+	\exception BRuntimeError Unable to create semaphores or threads.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpSession::BHttpSession(const BHttpSession&) noexcept
+	\brief Create a new BHttpSession object that shares a state with another.
+
+	The internal HTTP queue and context can be shared among multiple objects.
+	You can use the copy constructor to create a new object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpSession::BHttpSession(BHttpSession&&) noexcept
+	\brief Move is disabled.
+
+	BHttpSession objects cannot be moved. Because it has a shared internal
+	state, making copies is cheap and it is the only supported method of
+	creating multiple scoped objects with a shared lifetime.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpSession::~BHttpSession() noexcept
+	\brief Destructor
+
+	The destructor releases the shared internal state of the session object.
+	If there are no more sessions using the shared state, the state is
+	cleaned up.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpSession& BHttpSession::operator=(const BHttpSession&) noexcept
+	\brief Copy and use the shared state from another session.
+
+	The internal HTTP queue and context can be shared among multiple objects.
+	You can use the copy constructor to create a new copy.
+
+	This copy assignment operator should be used in very specific instances
+	only, where there is a particular reason to replace an existing session
+	internal session with another. It should not be used in the following case:
+
+	\code
+	// Bad example
+	BHttpSession session1 = BHttpSession();
+		// Creates a new session, including an entirely new (expensive) state
+	BHttpSession session2 = BHttpSession();
+		// Creates another new session, including internal state
+	session2 = session1;
+		// At this stage, the internal state of session2 would
+		// have to be cleaned up just after it was created.
+
+	// Instead do this
+	BHttpSession session1 = BHttpSession();
+	BHttpSession session2(session1);
+		// Now session2 directly shares the state with session 1
+	\endcode
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpSession& BHttpSession::operator=(BHttpSession&&) noexcept
+	\brief Move is disabled.
+
+	BHttpSession objects cannot be moved. Because it has a shared internal
+	state, making copies is cheap and it is the only supported method of
+	creating multiple scoped objects with a shared lifetime.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpResult BHttpSession::Execute(BHttpRequest &&request,
+		BBorrow< BDataIO > target=nullptr, BMessenger observer=BMessenger())
+	\brief Schedule and execute a \a request.
+
+	\param request The (valid) request to move from.
+	\param target An optional data buffer to write the incoming body of the request to. This can be
+		\c nullptr if you want to use the default internal storage. If you provide a buffer, it
+		must be wrapped in a \ref BBorrow object. This means that you exclusively borrow the
+		target to this session object. After the request is finished, you can regain usage of the
+		object through the matching \ref BExclusiveBorrow object. Use the \ref BHttpResult::Body()
+		method to synchronize when the target is available again.
+	\param observer An optional observer that will receive the progress and status messages for
+		this request.
+
+	\return The \ref BHttpResult object that corresponds to this request, and that can be used to
+		monitor the progress.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpSession::Cancel(int32 identifier)
+	\brief Cancel a running request.
+
+	When a request that is scheduled or running is cancelled, its \ref BHttpResult object will
+	be set to the \ref BNetworkRequestError exception with the \c Cancelled type.
+
+	There are three possible outcomes:
+	1. If the request is not yet scheduled, then it will never start. The result will be set to
+		the cancelled error state.
+	2. If the request was started, then processing it will be terminated. The result will be set to
+		the cancelled error state.
+	3. If the request was already finished, then nothing happens. The result will keep the value it
+		had assigned. The same if the request identifier is invalid.
+
+	\param identifier The identifier for the request to cancel.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpSession::Cancel(const BHttpResult& request)
+	\brief Cancel a running \a request.
+
+	See the \ref BHttpSession::Cancel(int32 identifier) method for more details on how this method
+	works.
+
+	\exception std::bad_alloc Error in case memory cannot be allocated.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpSession::SetMaxConnectionsPerHost(size_t maxConnections)
+	\brief Set the maximum number of connections per host.
+
+	A host is identified by the domain name and the port. You can limit the number of concurrent
+	connections to a host by tweaking this value.
+
+	The default value is 2 connections per host.
+
+	If the value is decreased, any requests that already started will not be affected. The new
+	value will only be applied when any new requests are added.
+
+	\param maxConnections The maximum number of connections per host. This value must between 1
+		and \c INT32_MAX.
+
+	\exception BRuntimeError In case the \a maxConnections is invalid.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPrivate::Network::BHttpSession::SetMaxHosts(size_t maxConnections)
+	\brief Set the maximum number of concurrent hosts that can be connected to.
+
+	A host is identified by the domain name and the port. You can limit the number of concurrent
+	hosts by tweaking this value.
+
+	The default value is 10 concurrent hosts.
+
+	If the value is decreased, any requests that already started will not be affected. The new
+	value will only be applied when any new requests are added.
+
+	\param maxConnections The maximum number of hosts. The value must be at least 1.
+
+	\exception BRuntimeError In case the \a maxConnections is 0.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::HttpStatus
+	\brief The HTTP status code has been received, and can be accessed through the result object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::HttpFields
+	\brief The HTTP header block has been received, and the status and fields can be accessed
+		through the result object.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::CertificateError
+	\brief There was an error communicating with the server because of an SSL certificate issue.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::HttpRedirect
+	\brief The Http request was redirected, and this redirect was handled by the kit.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::HttpStatusCode
+	\brief An \c int16 value that contains the HTTP status code for this request.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::SSLCertificate
+	\brief The SSL certificate that causes the issue.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::SSLMessage
+	\brief A \ref BString message about the error while processing the SSL certificate.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::HttpRedirectUrl
+	\brief A \ref BString with the URL that the HTTP request was redirected to.
+
+	\since Haiku R1
+*/
+
+
+} // namespace Network
+
+} // namespace BPrivate
+
+#endif

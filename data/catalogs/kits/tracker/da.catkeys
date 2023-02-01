@@ -284,9 +284,9 @@ no supporting apps	OpenWithWindow		ingen understøttende apps
 32-bit unsigned integer	AttributesView		32-bit heltal uden fortegn
 Preparing to empty Trash…	StatusWindow		Forbereder tømning af papirkurven…
 Deleting: 	StatusWindow		Sletning: 
+label too long	PoseView		etiket for lang
 the MIME settings	FSUtils		MIME-indstillingerne
 You can't move or copy the trash.	FSUtils		Du kan ikke flytte eller kopiere papirkurven.
-label too long	PoseView		etiket for lang
 Error creating link to \"%name\".	FSUtils		Fejl ved at lave et link til \"%name\".
 Unknown	FilePermissionsView		Ukendt
 Paste links	ContainerWindow		Indsæt lænker
@@ -335,8 +335,8 @@ MIME Path	AttributesView		MIME-sti
 less than	FindPanel		mindre end
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fejl ved kopiering af filen \"%name\":\n\t%error\n\nVil du fortsætte?
 Creating links: 	StatusWindow		Opretning af links: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunne ikke åbne \"%document\" med programmet \"%app\" (%error). 
 Create %s clipping	PoseView		Lav %s klipning
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Kunne ikke åbne \"%document\" med programmet \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Fejl ved flytning af \"%name\"
 To: %dir	StatusWindow		Til: %dir
 Paste layout	ContainerWindow		Indsæt layout
@@ -508,8 +508,8 @@ Add-ons	FilePanelPriv		Tilføjelser
 Empty folder	SlowContextPopup		Tom mappe
 Alignment	AttributesView		Justering
 Move to Trash	FSUtils		Flyt til papirkurven
-Handles %type	OpenWithWindow		Håndterer %type
 Cancel	PoseView		Annuller
+Handles %type	OpenWithWindow		Håndterer %type
 Delete	PoseView		Slet
 Media parameter	AttributesView		Medieparameter
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Hvis du ændre hjemmemappen, så virker %osName måske ikke korrekt!\n\nEr du sikker på, at du vil gøre det?\n\nFor alligevel at ændre hjemmemappen, hold Skift-tasten nede og klik på \"Jeg ved hvad jeg gør\".

@@ -1,0 +1,459 @@
+/*
+ * Copyright 2021 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Corresponds to:
+ *		headers/private/netservices2/NetServicesDefs.h	hrev?????
+ */
+
+
+#if __cplusplus >= 201703L
+
+namespace BPrivate {
+
+namespace Network {
+
+
+/*!
+	\file NetServicesDefs.h
+	\ingroup netservices
+	\brief Various standardized error and notification types used by multiple protocols of the
+		Network Services Kit.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BUnsupportedProtocol
+	\ingroup netservices
+	\brief Error that indicates that the protocol is not supported.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BUnsupportedProtocol::BUnsupportedProtocol(const char* origin,
+		BUrl url, BStringList supportedProtocols)
+	\brief Create a new unsupported protocol error.
+
+	\param origin A string representing where this error occured. It is advised
+		to initialize it to \c __PRETTY_FUNCTION__ by default.
+	\param url The URL object with the unsupported protocol.
+	\param supportedProtocols A list with the supported protocols.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BUnsupportedProtocol::BUnsupportedProtocol(BString origin, BUrl url,
+		BStringList supportedProtocols)
+	\copydoc BUnsupportedProtocol(const char*, BUrl, BStringList)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn virtual const char* BUnsupportedProtocol::Message() const noexcept override
+	\brief Access the string representation of the message.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUrl& BUnsupportedProtocol::Url() const
+	\brief The URL that caused the issue.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BStringList& BUnsupportedProtocol::SupportedProtocols() const
+	\brief A list of protocols that are supported.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BInvalidUrl
+	\ingroup netservices
+	\brief Error that indicates that the URL is not valid.
+
+	This error is raised as an exception when the caller tries to pass a
+	\ref BUrl object that does not contain a valid URL.
+
+	\see \ref BUrl::IsValid()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BInvalidUrl::BInvalidUrl(const char* origin, BUrl url)
+	\brief Create a new error invalid URL error.
+
+	\param origin A string representing where this error occured. It is advised
+		to initialize it to \c __PRETTY_FUNCTION__ by default.
+	\param url The URL object that did not contain a valid URL.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BInvalidUrl::BInvalidUrl(BString origin, BUrl url)
+	\copydoc BInvalidUrl::BInvalidUrl(const char* origin, BUrl url)
+*/
+
+
+/*!
+	\fn virtual const char* BInvalidUrl::Message() const noexcept override
+	\brief Access the string representation of the message.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUrl& BInvalidUrl::Url() const
+	\brief The URL that caused the issue.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BNetworkRequestError
+	\ingroup netservices
+	\brief Error that indicates there was an issue executing the network request.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\enum BNetworkRequestError::ErrorType
+	\ingroup netservices
+	\brief A list of errors that can occur while executing a network request.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BNetworkRequestError::ErrorType BNetworkRequestError::HostnameError
+	\brief Error resolving the hostname.
+
+	\ref ErrorCode() will be set to contain the underlying error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BNetworkRequestError::ErrorType BNetworkRequestError::NetworkError
+	\brief The request was interrupted due to a network error.
+
+	This may occur when reading or writing fails due to an underlying network error, like an
+	unexpected closed connection.
+
+	\ref ErrorCode() will be set to contain the underlying error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BNetworkRequestError::ErrorType BNetworkRequestError::ProtocolError
+	\brief The request did not complete because the response did not conform to the protocol.
+
+	The server gave an unexpected or incorrect response. The network request could not complete
+	because of this.
+
+	There will not be any \ref ErrorCode() set.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BNetworkRequestError::ErrorType BNetworkRequestError::SystemError
+	\brief Other internal error while handling the request.
+
+	There could have been issues initializing buffers or decompression engines.
+
+	\ref ErrorCode() will be set to contain the underlying error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BNetworkRequestError::ErrorType BNetworkRequestError::Canceled
+	\brief The request was canceled before it was completed.
+
+	This could either have been done through the API, or because the session that schedules and
+	executes the requests was destroyed.
+
+	There will not be any \ref ErrorCode() set.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkRequestError::BNetworkRequestError(const char *origin, ErrorType type,
+		status_t errorCode, const BString& customMessage = BString())
+	\brief Create a new network request error.
+
+	\param origin A string representing where this error occured. It is advised
+		to initialize it to \c __PRETTY_FUNCTION__ by default.
+	\param type The error type that describes what the issue was that prevented the completion of
+		the request.
+	\param errorCode The underlying system error. See the \ref BNetworkRequestError::ErrorType
+		documentation on which error types expect a system error.
+	\param customMessage Optional custom message describing the reason or cause for the error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BNetworkRequestError::BNetworkRequestError(const char *origin, ErrorType type,
+		const BString& customMessage = BString())
+	\brief Create a new network request error.
+
+	\param origin A string representing where this error occured. It is advised
+		to initialize it to \c __PRETTY_FUNCTION__ by default.
+	\param type The error type that describes what the issue was that prevented the completion of
+		the request.
+	\param customMessage Optional custom message describing the reason or cause for the error.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BNetworkRequestError::ErrorCode() const noexcept
+	\brief Get the underlying system error code.
+
+	\return A \c status_t error code when the associated \ref BNetworkRequestError::ErrorType sets
+		the system error, or \c B_OK if there is no additional error code available.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn ErrorType BNetworkRequestError::Type() const noexcept
+	\brief Get the error type.
+
+	\return Get the \ref BNetworkRequestError::ErrorType that describes the cause for the request
+		to fail.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const char* BNetworkRequestError::CustomMessage() const noexcept
+	\brief Get the custom error message.
+
+	\return Get the custom error message. This may be an empty string if it was not set.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BString encode_to_base64(const BString& string)
+	\brief Utility function that encodes a \a string to base64 and returns the result.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\namespace BPrivate::Network::UrlEvent
+	\brief Contains the message constants that are sent by the various protocols.
+
+	Please see the \link netservices kit documentation \endlink for details which messages are sent
+	at which stage, and what data they contain.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::HostNameResolved
+	\brief The hostname for the request is resolved.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::ConnectionOpened
+	\brief The connection for the request is opened and the request will be sent.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::UploadProgress
+	\brief There is progress sending the body for the request.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::ResponseStarted
+	\brief The request was sent, and the response is now incoming.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::DownloadProgress
+	\brief There is progress receiving the body of the request.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::BytesWritten
+	\brief There are bytes written to the target of the body.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::RequestCompleted
+	\brief The request was completed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEvent::DebugMessage
+	\brief There is a debug message for a request or for a protocol.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\namespace BPrivate::Network::UrlEventData
+	\brief Contains the names of the data in the messages that are sent by the various protocols.
+
+	Please see the \link netservices kit documentation \endlink for details which messages are sent
+	at which stage, and what data they contain.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::Id
+	\brief An \c int32 that identifies the request the message pertains to.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::HostName
+	\brief A \ref BString that represents the hostname that was resolved.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::NumBytes
+	\brief An \c int64/off_t represening the number of bytes transferred to now.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::TotalBytes
+	\brief An \c int64/off_t representing the total number of bytes that will be sent/received.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::Success
+	\brief A \c bool that indicates whether an activity was succesful.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::DebugType
+	\brief An \c uint32 representing a debug type constant.
+
+	The value is one of \ref UrlEventData::DebugError, \ref UrlEventData::DebugWarning or
+	\ref UrlEventData::DebugInfo.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var const char* UrlEventData::DebugMessage
+	\brief A \ref BString that contains the debug message.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEventData::DebugInfo
+	\brief Value for \ref UrlEventData::DebugType indicating that the message is an info messsage.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEventData::DebugWarning
+	\brief Value for \ref UrlEventData::DebugType indicating that the message is a warning
+		messsage.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var UrlEventData::DebugError
+	\brief Value for \ref UrlEventData::DebugType indicating that the message is an error messsage.
+
+	\since Haiku R1
+*/
+
+
+} // namespace Network
+
+} // namespace BPrivate
+
+#endif

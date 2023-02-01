@@ -36,6 +36,7 @@ typedef uint64 xfs_rtblock_t;	// extent number in the real-time sub-volume
 typedef uint64 xfs_fileoff_t;	// block offset into a file
 typedef uint64 xfs_filblks_t;	// block count for a file
 typedef int64 xfs_fsize_t;		// byte size of a file
+typedef int64 xfs_lsn_t;		// log sequence number
 typedef xfs_fileoff_t TreeKey;
 typedef xfs_fsblock_t TreePointer;
 

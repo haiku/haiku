@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-mount_server	2818767263
+1	swedish	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Montera endast läsbar
 Error mounting volume:\n\n%s	AutoMounter		Fel vid montering av volym:\n\n%s
 Cancel	AutoMounter		Avbryt
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		Monterar volym %s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Kunde inte avmontera volymen \"%s\":\n\t%s\n\nPåtvinga avmontering istället?\n\nNotering: Om en applikation skriver till volymen så kan en påtvingad avmontering resultera i förlorade data.\n
 Force unmount	AutoMounter		Tvinga avmontering
 Mount error	AutoMounter		Monteringsfel
-Mounting volume <unnamed volume>\n\n	AutoMounter		Monterar volym <odöpt volym>\n\n
 Mount warning	AutoMounter		Monteringsvarning

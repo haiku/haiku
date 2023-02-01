@@ -1,28 +1,28 @@
 1	lithuanian	x-vnd.Haiku-HaikuDepot	2848065911
-Uninstalled	PackageListView		Išdiegti
 Rate package…	PackageInfoView		Įvertinti paketą…
-<no info>	PackageInfoView		<informacijos nėra>
-No user ratings available.	PackageInfoView		Naudotojų įvertinimų nėra.
-Rating	PackageListView		Įvertinimas
 Active	PackageListView		Aktyvus
-Ratings	PackageInfoView		Įvertinimai
 Name	PackageListView		Pavadinimas
 No changelog available.	PackageInfoView		Pakeitimų žurnalas neprieinamas.
 Available	PackageListView		Prieinamas
 Click a package to view information	PackageInfoView		Spustelėkite paketą jo informacijai pamatyti
-Close	PackageManager		Užverti
-Changelog	PackageInfoView		Pakeitimų žurnalas
-About	PackageInfoView		Apie
 Send	RatePackageWindow		Siųsti
-Inactive	PackageListView		Neaktyvus
-Downloading:	PackageInfoView		Parsiunčiamas:
-(%Votes%)	PackageInfoView		(%Votes%)
-Close	UserLoginWindow		Užverti
 Close	RatePackageWindow		Užverti
+Close	UserLoginWindow		Užverti
 n/a	PackageInfoView		n/d
 Status	PackageListView		Būsena
 Unknown	PackageListView		Nežinoma
-HaikuDepot	System name		Paketų tvarkytuvė
-Search terms:	FilterView		Ieškomi žodžiai:
 Pending…	PackageListView		Laukiama…
+Search terms:	FilterView		Ieškomi žodžiai:
+Uninstalled	PackageListView		Išdiegti
+No user ratings available.	PackageInfoView		Naudotojų įvertinimų nėra.
+<no info>	PackageInfoView		<informacijos nėra>
+Rating	PackageListView		Įvertinimas
+Ratings	PackageInfoView		Įvertinimai
+Close	PackageManager		Užverti
+Changelog	PackageInfoView		Pakeitimų žurnalas
+About	PackageInfoView		Apie
+Inactive	PackageListView		Neaktyvus
+Downloading:	PackageInfoView		Parsiunčiamas:
+(%Votes%)	PackageInfoView		(%Votes%)
+HaikuDepot	System name		Paketų tvarkytuvė
 Description	PackageListView		Aprašas

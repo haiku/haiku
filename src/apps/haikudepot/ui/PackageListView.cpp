@@ -428,10 +428,12 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 		if (bitmapResult == B_OK) {
 			if (bitmapRef.IsSet()) {
 				const BBitmap* bitmap = bitmapRef->Bitmap(BITMAP_SIZE_16);
-				parent->SetDrawingMode(B_OP_ALPHA);
-				BRect viewRect(x, y, x + 15, y + 15);
-				parent->DrawBitmap(bitmap, bitmap->Bounds(), viewRect);
-				parent->SetDrawingMode(B_OP_OVER);
+				if (bitmap != NULL && bitmap->IsValid()) {
+					parent->SetDrawingMode(B_OP_ALPHA);
+					BRect viewRect(x, y, x + 15, y + 15);
+					parent->DrawBitmap(bitmap, bitmap->Bounds(), viewRect);
+					parent->SetDrawingMode(B_OP_OVER);
+				}
 			}
 		}
 
@@ -739,7 +741,7 @@ public:
 		fItemCount(0)
 	{
 		BFont font(be_plain_font);
-		font.SetSize(9.0f);
+		font.SetSize(font.Size() * 0.75f);
 		SetFont(&font);
 
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
@@ -749,7 +751,7 @@ public:
 		// constantly calculating the size is expensive so here a sensible
 		// upper limit on the number of packages is arbitrarily chosen.
 		fMinSize = BSize(StringWidth(_DeriveLabel(999999)) + 10,
-			B_H_SCROLL_BAR_HEIGHT);
+			be_control_look->GetScrollBarWidth());
 	}
 
 	virtual BSize MinSize()

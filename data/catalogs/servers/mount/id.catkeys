@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-mount_server	2818767263
+1	indonesian	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Pasang hanya-baca
 Error mounting volume:\n\n%s	AutoMounter		Ada kesalahan saat memasang Volume:\n\n%s
 Cancel	AutoMounter		Batal
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		Mengkaitkan volume '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Tak bisa melepas disk \"%s\":\n\t%s\n\nHaruskah dilepas paksa?\n\nCatatan: Jika aplikasi sedang menulis di volume, melepas sekarang mungkin mengakibatkan hilangnya data.\n
 Force unmount	AutoMounter		Melepas paksa
 Mount error	AutoMounter		Terjadi kesalahan memasang
-Mounting volume <unnamed volume>\n\n	AutoMounter		Memasang volume <unnamed volume>\n\n
 Mount warning	AutoMounter		Peringatan Mount

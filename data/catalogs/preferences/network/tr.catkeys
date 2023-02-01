@@ -1,7 +1,7 @@
 1	turkish	x-vnd.Haiku-Network	543099905
 Ethernet device	InterfaceListItem		Ethernet aygıtı
 Link speed:	IntefaceView		Bağlanma hızı:
-disconnected	IntefaceView		bağlantı kesildi
+disconnected	IntefaceView		Bağlantı kesildi
 WPA	WPA protected network		WPA
 Network:	IntefaceView		Ağ:
 Received:	IntefaceView		Alınan:
@@ -17,19 +17,19 @@ IP address:	IntefaceAddressView		IP adresi:
 Netmask:	IntefaceAddressView		Ağ maskesi:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servisler
-Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Ağ Durumu Masaüstü Çubuğu'na kurulamadı: %s
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Ağ Durumu, Masaüstü Çubuğu'na kurulamadı: %s
 Revert	NetworkWindow		Eski haline döndür
 off	ServiceListItem		kapalı
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<kablosuz ağ bulunamadı>
 Enable	IntefaceView		Etkinleştir
-connected	IntefaceView		bağlandı
+connected	IntefaceView		Bağlı
 Apply	IntefaceAddressView		Uygula
 Disable	ServiceView		Devre dışı bırak
 WPA2	WPA2 protected network		WPA2
 Show network status in Deskbar	NetworkWindow		Ağ durumunu Masaüstü Çubuğu'nda göster
 Mode:	IntefaceAddressView		Kip:
-connected	InterfaceListItem		bağlandı
+connected	InterfaceListItem		Bağlı
 OK	NetworkWindow		Tamam
 Static	IntefaceAddressView		Statik
 launch error	NetworkWindow		çalıştırma hatası

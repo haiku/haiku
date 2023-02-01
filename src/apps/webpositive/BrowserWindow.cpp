@@ -129,6 +129,7 @@ enum {
 	FIND_TEXT_CHANGED							= 'ftxt',
 
 	SELECT_TAB									= 'sltb',
+	CYCLE_TABS									= 'ctab',
 };
 
 
@@ -357,7 +358,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	fVisibleInterfaceElements(interfaceElements),
 	fContext(context),
 	fAppSettings(appSettings),
-	fZoomTextOnly(true),
+	fZoomTextOnly(false),
 	fShowTabsIfSinglePageOpen(true),
 	fAutoHideInterfaceInFullscreenMode(false),
 	fAutoHidePointer(false),
@@ -365,7 +366,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 {
 	// Begin listening to settings changes and read some current values.
 	fAppSettings->AddListener(BMessenger(this));
-//	fZoomTextOnly = fAppSettings->GetValue("zoom text only", fZoomTextOnly);
+	fZoomTextOnly = fAppSettings->GetValue("zoom text only", fZoomTextOnly);
 	fShowTabsIfSinglePageOpen = fAppSettings->GetValue(
 		kSettingsKeyShowTabsIfSinglePageOpen, fShowTabsIfSinglePageOpen);
 
@@ -390,7 +391,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 
 	// Menu
 #if INTEGRATE_MENU_INTO_TAB_BAR
-	BMenu* mainMenu = fTabManager->Menu();
+	BMenu* mainMenu = new BMenu("≡");
 #else
 	BMenu* mainMenu = new BMenuBar("Main menu");
 #endif
@@ -612,8 +613,16 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		new BMessage(TOGGLE_FULLSCREEN));
 	toggleFullscreenButton->SetBackgroundMode(BBitmapButton::MENUBAR_BACKGROUND);
 
-	BGroupLayout* menuBarGroup = BLayoutBuilder::Group<>(B_HORIZONTAL, 0.0)
-		.Add(mainMenu)
+#if !INTEGRATE_MENU_INTO_TAB_BAR
+	BMenu* mainMenuItem = mainMenu;
+	fMenuGroup = (new BGroupView(B_HORIZONTAL, 0))->GroupLayout();
+#else
+	BMenu* mainMenuItem = new BMenuBar("Main menu");
+	mainMenuItem->AddItem(mainMenu);
+	fMenuGroup = fTabManager->MenuContainerLayout();
+#endif
+	BLayoutBuilder::Group<>(fMenuGroup)
+		.Add(mainMenuItem)
 		.Add(toggleFullscreenButton, 0.0f)
 	;
 
@@ -629,7 +638,7 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 	BGroupView* topView = new BGroupView(B_VERTICAL, 0.0);
 
 #if !INTEGRATE_MENU_INTO_TAB_BAR
-	topView->AddChild(menuBarGroup);
+	topView->AddChild(fMenuGroup);
 #endif
 	topView->AddChild(fTabManager->TabGroup());
 	topView->AddChild(navigationGroup);
@@ -643,7 +652,6 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 
 	fURLInputGroup->MakeFocus(true);
 
-	fMenuGroup = menuBarGroup;
 	fTabGroup = fTabManager->TabGroup()->GetLayout();
 	fNavigationGroup = navigationGroup;
 	fFindGroup = findGroup;
@@ -672,6 +680,9 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		snprintf(numStr, sizeof(numStr), "%d", (int) i);
 		AddShortcut(numStr[0], B_COMMAND_KEY, selectTab);
 	}
+
+	// Add shortcut to cycle through tabs like in every other web browser
+	AddShortcut(B_TAB, B_COMMAND_KEY, new BMessage(CYCLE_TABS));
 
 	BKeymap keymap;
 	keymap.SetToCurrent();
@@ -1110,6 +1121,15 @@ BrowserWindow::MessageReceived(BMessage* message)
 				fTabManager->SelectTab(index);
 			}
 
+			break;
+		}
+
+		case CYCLE_TABS:
+		{
+			int32 index = fTabManager->SelectedTabIndex() + 1;
+			if (index >= fTabManager->CountTabs())
+				index = 0;
+			fTabManager->SelectTab(index);
 			break;
 		}
 

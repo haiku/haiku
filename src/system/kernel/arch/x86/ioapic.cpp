@@ -8,7 +8,7 @@
 #include <int.h>
 #include <vm/vm.h>
 
-#include "irq_routing_table.h"
+#include "acpi_irq_routing_table.h"
 
 #include <ACPI.h>
 #include <AutoDeleter.h>

@@ -236,7 +236,6 @@ BDeskWindow::Init(const BMessage*)
 	BScreen screen(this);
 	fOldFrame = screen.Frame();
 
-	PoseView()->SetShowHideSelection(false);
 	ResizeTo(fOldFrame.Width(), fOldFrame.Height());
 
 	InitKeyIndices();

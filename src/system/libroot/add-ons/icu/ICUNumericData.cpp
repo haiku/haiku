@@ -34,9 +34,9 @@ ICUNumericData::ICUNumericData(pthread_key_t tlsKey, struct lconv& localeConv)
 void
 ICUNumericData::Initialize(LocaleNumericDataBridge* dataBridge)
 {
-	dataBridge->glibcNumericLocale.values[0].string = fDecimalPoint;
-	dataBridge->glibcNumericLocale.values[1].string = fThousandsSep;
-	dataBridge->glibcNumericLocale.values[2].string = fGrouping;
+	dataBridge->glibcNumericLocale->values[0].string = fDecimalPoint;
+	dataBridge->glibcNumericLocale->values[1].string = fThousandsSep;
+	dataBridge->glibcNumericLocale->values[2].string = fGrouping;
 	fDataBridge = dataBridge;
 }
 
@@ -62,13 +62,13 @@ ICUNumericData::SetTo(const Locale& locale, const char* posixLocaleName)
 		if (result == B_OK) {
 			result = _SetLocaleconvEntry(formatSymbols, fDecimalPoint,
 				DecimalFormatSymbols::kDecimalSeparatorSymbol);
-			fDataBridge->glibcNumericLocale.values[3].word
+			fDataBridge->glibcNumericLocale->values[3].word
 				= (unsigned int)fDecimalPoint[0];
 		}
 		if (result == B_OK) {
 			result = _SetLocaleconvEntry(formatSymbols, fThousandsSep,
 				DecimalFormatSymbols::kGroupingSeparatorSymbol);
-			fDataBridge->glibcNumericLocale.values[4].word
+			fDataBridge->glibcNumericLocale->values[4].word
 				= (unsigned int)fThousandsSep[0];
 		}
 		if (result == B_OK) {
@@ -104,9 +104,9 @@ ICUNumericData::SetToPosix()
 		strcpy(fDecimalPoint, fDataBridge->posixLocaleConv->decimal_point);
 		strcpy(fThousandsSep, fDataBridge->posixLocaleConv->thousands_sep);
 		strcpy(fGrouping, fDataBridge->posixLocaleConv->grouping);
-		fDataBridge->glibcNumericLocale.values[3].word
+		fDataBridge->glibcNumericLocale->values[3].word
 			= (unsigned int)fDecimalPoint[0];
-		fDataBridge->glibcNumericLocale.values[4].word
+		fDataBridge->glibcNumericLocale->values[4].word
 			= (unsigned int)fThousandsSep[0];
 	}
 

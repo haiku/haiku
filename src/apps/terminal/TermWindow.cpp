@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2022, Haiku, Inc. All rights reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
@@ -26,6 +26,7 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 #include <Clipboard.h>
@@ -66,6 +67,8 @@
 #include "ShellParameters.h"
 #include "TermConst.h"
 #include "TermScrollView.h"
+#include "ThemeWindow.h"
+#include "ThemeView.h"
 #include "TitlePlaceholderMapper.h"
 
 
@@ -540,6 +543,7 @@ TermWindow::_SetupMenu()
 			.AddSeparator()
 			.AddItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), MENU_PREF_OPEN,
 				',')
+			.AddItem(B_TRANSLATE("Colors" B_UTF8_ELLIPSIS), MENU_THEME_OPEN)
 		.End();
 
 	AddChild(fMenuBar);
@@ -767,6 +771,17 @@ TermWindow::MessageReceived(BMessage *message)
 			fPrefWindow = NULL;
 			break;
 
+		case MENU_THEME_OPEN:
+			if (!fThemeWindow)
+				fThemeWindow = new ThemeWindow(this);
+			else
+				fThemeWindow->Activate();
+			break;
+
+		case MSG_THEME_CLOSED:
+			fThemeWindow = NULL;
+			break;
+
 		case MSG_WINDOW_TITLE_SETTING_CHANGED:
 		case MSG_TAB_TITLE_SETTING_CHANGED:
 			_TitleSettingsChanged();
@@ -949,7 +964,7 @@ TermWindow::MessageReceived(BMessage *message)
 
 				for (int32 i = fTabView->CountTabs() - 1; i >= 0; i--)
 					_TermViewAt(i)->ScrollBar()->ResizeBy(0,
-						(B_H_SCROLL_BAR_HEIGHT - 1));
+						(be_control_look->GetScrollBarWidth(B_VERTICAL) - 1));
 
 				fMenuBar->Hide();
 				fTabView->ResizeBy(0, mbHeight);
@@ -969,7 +984,7 @@ TermWindow::MessageReceived(BMessage *message)
 
 				for (int32 i = fTabView->CountTabs() - 1; i >= 0; i--)
 					_TermViewAt(i)->ScrollBar()->ResizeBy(0,
-						-(B_H_SCROLL_BAR_HEIGHT - 1));
+						-(be_control_look->GetScrollBarWidth(B_VERTICAL) - 1));
 
 				ResizeTo(fSavedFrame.Width(), fSavedFrame.Height());
 				MoveTo(fSavedFrame.left, fSavedFrame.top);
@@ -986,8 +1001,10 @@ TermWindow::MessageReceived(BMessage *message)
 			PostMessage(MSG_HALF_FONT_CHANGED);
 			break;
 
-		case MSG_COLOR_CHANGED:
 		case MSG_COLOR_SCHEME_CHANGED:
+		case MSG_SET_CURRENT_COLOR:
+		case MSG_SET_COLOR:
+		case MSG_UPDATE_COLOR:
 		{
 			for (int32 i = fTabView->CountTabs() - 1; i >= 0; i--) {
 				TermViewContainerView* container = _TermViewContainerViewAt(i);
@@ -1325,7 +1342,7 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 			containerView, view, fSessions.IsEmpty());
 		if (!fFullScreen)
 			scrollView->ScrollBar(B_VERTICAL)
-				->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 1));
+				->ResizeBy(0, -(be_control_look->GetScrollBarWidth(B_VERTICAL) - 1));
 
 		if (fSessions.IsEmpty())
 			fTabView->SetScrollView(scrollView);
@@ -1360,7 +1377,7 @@ TermWindow::_AddTab(Arguments* args, const BString& currentDirectory)
 			containerView->GetPreferredSize(&viewWidth, &viewHeight);
 
 			// Resize Window
-			ResizeTo(viewWidth + B_V_SCROLL_BAR_WIDTH,
+			ResizeTo(viewWidth + be_control_look->GetScrollBarWidth(B_HORIZONTAL),
 				viewHeight + fMenuBar->Bounds().Height() + 1);
 				// NOTE: Width is one pixel too small, since the scroll view
 				// is one pixel wider than its parent.
@@ -1741,7 +1758,7 @@ TermWindow::_ResizeView(TermView *view)
 	float height;
 	view->Parent()->GetPreferredSize(&width, &height);
 
-	width += B_V_SCROLL_BAR_WIDTH;
+	width += be_control_look->GetScrollBarWidth(B_HORIZONTAL);
 		// NOTE: Width is one pixel too small, since the scroll view
 		// is one pixel wider than its parent.
 	if (fMenuBar != NULL)

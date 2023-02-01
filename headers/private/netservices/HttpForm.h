@@ -12,11 +12,10 @@
 #include <map>
 
 
-#ifndef LIBNETAPI_DEPRECATED
 namespace BPrivate {
 
 namespace Network {
-#endif
+
 
 enum form_type {
 	B_HTTP_FORM_URL_ENCODED,
@@ -194,10 +193,9 @@ private:
 			BHttpFormData*		fPrevElement;
 };
 
-#ifndef LIBNETAPI_DEPRECATED
+
 } // namespace Network
 
 } // namespace BPrivate
-#endif
 
 #endif // _B_HTTP_FORM_H_

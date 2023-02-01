@@ -22,6 +22,7 @@ EMULATOR=qemu-system-$ARCH
 EXTRAS="-parallel none"
 
 function check_logs {
+	echo "=============================================="
 	FILE=$1
 	echo -n "    Haiku kernel loaded: "
 	# First output from kernel on boot
@@ -37,8 +38,13 @@ function check_logs {
 	else
 		echo "NO"
 	fi
+	echo "=============================================="
+	echo "    Summary of issues in logs:"
+	grep -E -i "FATAL|ERROR|FAIL|GDB" $FILE | grep -vi " No error" | cut -d':' -f1 | sort | uniq -c | sort -nr
+	echo "=============================================="
 	echo "    Potential issues in logs:"
-	egrep -i "FATAL|ERROR|FAIL|GDB" $FILE | grep -vi " No error"
+	grep -E -i "FATAL|ERROR|FAIL|GDB" $FILE | grep -vi " No error"
+	echo "=============================================="
 }
 
 case "$PLATFORM" in
@@ -99,6 +105,27 @@ case "$ARCH" in
 	check_logs $TEST_SERIALLOG
 	rm -f $TEST_FILE $TEST_SERIALLOG
     ;;
+"arm64")
+	EMULATOR=qemu-system-aarch64
+	MEMORY=2048
+	TEST_FILE="/tmp/test-$ARCH.mmu"
+	EMULATOR="$EMULATOR -m $MEMORY -M virt $EXTRAS"
+	rm -f $TEST_FILE $TEST_SERIALLOG
+
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo "+++ Testing $PLATFORM boot..."
+	cp $IMAGE $TEST_FILE
+	$EMULATOR \
+		-cpu max \
+		-global virtio-mmio.force-legacy=false \
+		-device usb-ehci,id=ehci -device usb-tablet -device usb-kbd \
+		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
+		-device virtio-net-device,netdev=usernet,bus=virtio-mmio-bus.1 \
+		-drive file=$TEST_FILE,format=raw,if=none,id=x0 \
+		-netdev user,id=usernet
+	check_logs $TEST_SERIALLOG
+	rm -f $TEST_FILE $TEST_SERIALLOG
+	;;
 "riscv64")
 	MEMORY=2048
 	TEST_FILE="/tmp/test-$ARCH.mmu"
@@ -108,7 +135,16 @@ case "$ARCH" in
 	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 	echo "+++ Testing $PLATFORM boot..."
 	cp $IMAGE $TEST_FILE
-	$EMULATOR -device ati-vga -drive file=$TEST_FILE,format=raw,if=virtio
+	# virtio broken currently for input
+	#-device virtio-tablet-device,bus=virtio-mmio-bus.2
+	#-device virtio-keyboard-device,bus=virtio-mmio-bus.3
+	$EMULATOR -device ati-vga \
+		-global virtio-mmio.force-legacy=false \
+		-device usb-ehci,id=ehci -device usb-tablet -device usb-kbd \
+		-device virtio-blk-device,drive=x0,bus=virtio-mmio-bus.0 \
+		-device virtio-net-device,netdev=usernet,bus=virtio-mmio-bus.1 \
+		-drive file=$TEST_FILE,format=raw,if=none,id=x0 \
+		-netdev user,id=usernet
 	check_logs $TEST_SERIALLOG
 	rm -f $TEST_FILE $TEST_SERIALLOG
 	;;

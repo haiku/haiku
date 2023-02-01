@@ -1,4 +1,4 @@
-/*	$FreeBSD: releng/12.0/sys/dev/ral/rt2560var.h 306591 2016-10-02 20:35:55Z avos $	*/
+/*	$FreeBSD$	*/
 
 /*-
  * Copyright (c) 2005, 2006

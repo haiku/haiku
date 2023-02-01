@@ -41,7 +41,7 @@
 
 #define DUMP_FEATURE_STRING	1
 #define DUMP_CPU_TOPOLOGY	1
-#define DUMP_CPU_PATCHLEVEL	1
+#define DUMP_CPU_PATCHLEVEL_TYPE	1
 
 
 /* cpu vendor info */
@@ -125,7 +125,7 @@ static uint32 sCacheSharingMask[CPU_MAX_CACHE_LEVEL];
 
 static void* sUcodeData = NULL;
 static size_t sUcodeDataSize = 0;
-static struct intel_microcode_header* sLoadedUcodeUpdate;
+static void* sLoadedUcodeUpdate;
 static spinlock sUcodeUpdateLock = B_SPINLOCK_INITIALIZER;
 
 
@@ -347,7 +347,7 @@ x86_init_fpu(void)
 static void
 dump_feature_string(int currentCPU, cpu_ent* cpu)
 {
-	char features[512];
+	char features[768];
 	features[0] = 0;
 
 	if (cpu->arch.feature[FEATURE_COMMON] & IA32_FEATURE_FPU)
@@ -612,6 +612,8 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "rdpid ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_ECX] & IA32_FEATURE_SGX_LC)
 		strlcat(features, "sgx_lc ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_HYBRID_CPU)
+		strlcat(features, "hybrid ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_IBRS)
 		strlcat(features, "ibrs ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_STIBP)
@@ -640,6 +642,8 @@ dump_feature_string(int currentCPU, cpu_ent* cpu)
 		strlcat(features, "virt_ssbd ", sizeof(features));
 	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_AMD_SSB_NO)
 		strlcat(features, "amd_ssb_no ", sizeof(features));
+	if (cpu->arch.feature[FEATURE_EXT_8_EBX] & IA32_FEATURE_CPPC)
+		strlcat(features, "cppc ", sizeof(features));
 	dprintf("CPU %d: features: %s\n", currentCPU, features);
 }
 #endif	// DUMP_FEATURE_STRING
@@ -992,7 +996,7 @@ detect_amd_patch_level(cpu_ent* cpu)
 	}
 
 	uint64 value = x86_read_msr(IA32_MSR_UCODE_REV);
-	cpu->arch.patch_level = value >> 32;
+	cpu->arch.patch_level = (uint32)value;
 }
 
 
@@ -1086,7 +1090,7 @@ load_microcode_intel(int currentCPU, cpu_ent* cpu)
 		acquire_spinlock(&sUcodeUpdateLock);
 	detect_intel_patch_level(cpu);
 	uint32 revision = cpu->arch.patch_level;
-	struct intel_microcode_header* update = sLoadedUcodeUpdate;
+	struct intel_microcode_header* update = (struct intel_microcode_header*)sLoadedUcodeUpdate;
 	if (update == NULL) {
 		update = find_microcode_intel((addr_t)sUcodeData, sUcodeDataSize,
 			revision);
@@ -1112,10 +1116,127 @@ load_microcode_intel(int currentCPU, cpu_ent* cpu)
 }
 
 
+static struct amd_microcode_header*
+find_microcode_amd(addr_t data, size_t size, uint32 patchLevel)
+{
+	// 9.11.3 Processor Identification
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 1, 0);
+	uint32 signature = cpuid.regs.eax;
+
+	if (size < sizeof(struct amd_container_header)) {
+		dprintf("find_microcode_amd update is too small for header\n");
+		return NULL;
+	}
+	struct amd_container_header* container = (struct amd_container_header*)data;
+	if (container->magic != 0x414d44) {
+		dprintf("find_microcode_amd update invalid magic\n");
+		return NULL;
+	}
+
+	size -= sizeof(*container);
+	data += sizeof(*container);
+
+	struct amd_section_header* section =
+		(struct amd_section_header*)data;
+	if (section->type != 0 || section->size == 0) {
+		dprintf("find_microcode_amd update first section invalid\n");
+		return NULL;
+	}
+
+	size -= sizeof(*section);
+	data += sizeof(*section);
+
+	amd_equiv_cpu_entry* table = (amd_equiv_cpu_entry*)data;
+	size -= section->size;
+	data += section->size;
+
+	uint16 equiv_id = 0;
+	for (uint32 i = 0; table[i].installed_cpu != 0; i++) {
+		if (signature == table[i].equiv_cpu) {
+			equiv_id = table[i].equiv_cpu;
+			dprintf("find_microcode_amd found equiv cpu: %x\n", equiv_id);
+			break;
+		}
+	}
+	if (equiv_id == 0) {
+		dprintf("find_microcode_amd update cpu not found in equiv table\n");
+		return NULL;
+	}
+
+	while (size > sizeof(amd_section_header)) {
+		struct amd_section_header* section = (struct amd_section_header*)data;
+		size -= sizeof(*section);
+		data += sizeof(*section);
+
+		if (section->type != 1 || section->size > size
+			|| section->size < sizeof(amd_microcode_header)) {
+			dprintf("find_microcode_amd update firmware section invalid\n");
+			return NULL;
+		}
+		struct amd_microcode_header* header = (struct amd_microcode_header*)data;
+		size -= section->size;
+		data += section->size;
+
+		if (header->processor_rev_id != equiv_id) {
+			dprintf("find_microcode_amd update found rev_id %x\n", header->processor_rev_id);
+			continue;
+		}
+		if (patchLevel >= header->patch_id) {
+			dprintf("find_microcode_intel update_revision is lower\n");
+			continue;
+		}
+		if (header->nb_dev_id != 0 || header->sb_dev_id != 0) {
+			dprintf("find_microcode_amd update chipset specific firmware\n");
+			continue;
+		}
+		if (((addr_t)header % 16) != 0) {
+			dprintf("find_microcode_amd incorrect alignment\n");
+			continue;
+		}
+
+		return header;
+	}
+	dprintf("find_microcode_amd no fw update found for this cpu\n");
+	return NULL;
+}
+
+
 static void
 load_microcode_amd(int currentCPU, cpu_ent* cpu)
 {
-	dprintf("CPU %d: no update found\n", currentCPU);
+	// serialize for HT cores
+	if (currentCPU != 0)
+		acquire_spinlock(&sUcodeUpdateLock);
+	detect_amd_patch_level(cpu);
+	uint32 revision = cpu->arch.patch_level;
+	struct amd_microcode_header* update = (struct amd_microcode_header*)sLoadedUcodeUpdate;
+	if (update == NULL) {
+		update = find_microcode_amd((addr_t)sUcodeData, sUcodeDataSize,
+			revision);
+	}
+	if (update != NULL) {
+		addr_t data = (addr_t)update;
+		wbinvd();
+
+		x86_write_msr(MSR_K8_UCODE_UPDATE, data);
+
+		detect_amd_patch_level(cpu);
+		if (revision == cpu->arch.patch_level) {
+			dprintf("CPU %d: update failed\n", currentCPU);
+		} else {
+			if (sLoadedUcodeUpdate == NULL)
+				sLoadedUcodeUpdate = update;
+			dprintf("CPU %d: updated from revision 0x%" B_PRIx32 " to 0x%" B_PRIx32
+				"\n", currentCPU, revision, cpu->arch.patch_level);
+		}
+
+	} else {
+		dprintf("CPU %d: no update found\n", currentCPU);
+	}
+
+	if (currentCPU != 0)
+		release_spinlock(&sUcodeUpdateLock);
 }
 
 
@@ -1134,8 +1255,36 @@ load_microcode(int currentCPU)
 }
 
 
+static uint8
+get_hybrid_cpu_type()
+{
+	cpu_ent* cpu = get_cpu_struct();
+	if ((cpu->arch.feature[FEATURE_7_EDX] & IA32_FEATURE_HYBRID_CPU) == 0)
+		return 0;
+
+#define X86_HYBRID_CPU_TYPE_ID_SHIFT       24
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 0x1a, 0);
+	return cpuid.regs.eax >> X86_HYBRID_CPU_TYPE_ID_SHIFT;
+}
+
+
+static const char*
+get_hybrid_cpu_type_string(uint8 type)
+{
+	switch (type) {
+		case 0x20:
+			return "Atom";
+		case 0x40:
+			return "Core";
+		default:
+			return "";
+	}
+}
+
+
 static void
-detect_cpu(int currentCPU)
+detect_cpu(int currentCPU, bool full = true)
 {
 	cpu_ent* cpu = get_cpu_struct();
 	char vendorString[17];
@@ -1169,11 +1318,13 @@ detect_cpu(int currentCPU)
 	cpu->arch.model = cpuid.eax_1.model;
 	cpu->arch.extended_model = cpuid.eax_1.extended_model;
 	cpu->arch.stepping = cpuid.eax_1.stepping;
-	dprintf("CPU %d: type %d family %d extended_family %d model %d "
-		"extended_model %d stepping %d, string '%s'\n",
-		currentCPU, cpu->arch.type, cpu->arch.family,
-		cpu->arch.extended_family, cpu->arch.model,
-		cpu->arch.extended_model, cpu->arch.stepping, vendorString);
+	if (full) {
+		dprintf("CPU %d: type %d family %d extended_family %d model %d "
+			"extended_model %d stepping %d, string '%s'\n",
+			currentCPU, cpu->arch.type, cpu->arch.family,
+			cpu->arch.extended_family, cpu->arch.model,
+			cpu->arch.extended_model, cpu->arch.stepping, vendorString);
+	}
 
 	// figure out what vendor we have here
 
@@ -1229,8 +1380,10 @@ detect_cpu(int currentCPU)
 				strlen(&cpu->arch.model_name[i]) + 1);
 		}
 
-		dprintf("CPU %d: vendor '%s' model name '%s'\n",
-			currentCPU, cpu->arch.vendor_name, cpu->arch.model_name);
+		if (full) {
+			dprintf("CPU %d: vendor '%s' model name '%s'\n",
+				currentCPU, cpu->arch.vendor_name, cpu->arch.model_name);
+		}
 	} else {
 		strlcpy(cpu->arch.model_name, "unknown", sizeof(cpu->arch.model_name));
 	}
@@ -1239,6 +1392,9 @@ detect_cpu(int currentCPU)
 	get_current_cpuid(&cpuid, 1, 0);
 	cpu->arch.feature[FEATURE_COMMON] = cpuid.eax_1.features; // edx
 	cpu->arch.feature[FEATURE_EXT] = cpuid.eax_1.extended_features; // ecx
+
+	if (!full)
+		return;
 
 	if (maxExtendedLeaf >= 0x80000001) {
 		get_current_cpuid(&cpuid, 0x80000001, 0);
@@ -1289,12 +1445,16 @@ detect_cpu(int currentCPU)
 	else if (cpu->arch.vendor == VENDOR_AMD)
 		detect_amd_patch_level(cpu);
 
+	cpu->arch.hybrid_type = get_hybrid_cpu_type();
+
 #if DUMP_FEATURE_STRING
 	dump_feature_string(currentCPU, cpu);
 #endif
-#if DUMP_CPU_PATCHLEVEL
-	dprintf("CPU %d: patch_level %" B_PRIu32 "\n", currentCPU,
-		cpu->arch.patch_level);
+#if DUMP_CPU_PATCHLEVEL_TYPE
+	dprintf("CPU %d: patch_level %" B_PRIx32 "%s%s\n", currentCPU,
+		cpu->arch.patch_level,
+		cpu->arch.hybrid_type != 0 ? ", hybrid type ": "",
+		get_hybrid_cpu_type_string(cpu->arch.hybrid_type));
 #endif
 }
 
@@ -1403,11 +1563,124 @@ detect_amdc1e_noarat()
 }
 
 
+static void
+init_tsc_with_cpuid(kernel_args* args, uint32* conversionFactor)
+{
+	cpu_ent* cpu = get_cpu_struct();
+	if (cpu->arch.vendor != VENDOR_INTEL)
+		return;
+	uint32 model = (cpu->arch.extended_model << 4) | cpu->arch.model;
+	cpuid_info cpuid;
+	get_current_cpuid(&cpuid, 0, 0);
+	uint32 maxBasicLeaf = cpuid.eax_0.max_eax;
+	if (maxBasicLeaf < 0x15)
+		return;
+
+	get_current_cpuid(&cpuid, 0x15, 0);
+	if (cpuid.regs.eax == 0 || cpuid.regs.ebx == 0)
+		return;
+	uint32 khz = cpuid.regs.ecx / 1000;
+	uint32 denominator = cpuid.regs.eax;
+	uint32 numerator = cpuid.regs.ebx;
+	if (khz == 0 && model == 0x5f) {
+		// CPUID 0x16 isn't supported, hardcoding
+		khz = 25000;
+	}
+
+	if (khz == 0 && maxBasicLeaf >= 0x16) {
+		// for these CPUs the base frequency is also the tsc frequency
+		get_current_cpuid(&cpuid, 0x16, 0);
+		khz = cpuid.regs.eax * 1000 * denominator / numerator;
+	}
+	if (khz == 0)
+		return;
+	dprintf("CPU: using TSC frequency from CPUID\n");
+	// compute for microseconds as follows (1000000 << 32) / (tsc freq in Hz),
+	// or (1000 << 32) / (tsc freq in kHz)
+	*conversionFactor = (1000ULL << 32) / (khz * numerator / denominator);
+	// overwrite the bootloader value
+	args->arch_args.system_time_cv_factor = *conversionFactor;
+}
+
+
+static void
+init_tsc_with_msr(kernel_args* args, uint32* conversionFactor)
+{
+	cpu_ent* cpuEnt = get_cpu_struct();
+	if (cpuEnt->arch.vendor != VENDOR_AMD)
+		return;
+	uint32 family = cpuEnt->arch.family + cpuEnt->arch.extended_family;
+	if (family < 0x10)
+		return;
+	uint64 value = x86_read_msr(MSR_F10H_HWCR);
+	if ((value & HWCR_TSCFREQSEL) == 0)
+		return;
+
+	value = x86_read_msr(MSR_F10H_PSTATEDEF(0));
+	if ((value & PSTATEDEF_EN) == 0)
+		return;
+	if (family != 0x17 && family != 0x19)
+		return;
+
+	uint64 khz = 200 * 1000;
+	uint32 denominator = (value >> 8) & 0x3f;
+	if (denominator < 0x8 || denominator > 0x2c)
+		return;
+	if (denominator > 0x1a && (denominator % 2) == 1)
+		return;
+	uint32 numerator = value & 0xff;
+	if (numerator < 0x10)
+		return;
+
+	dprintf("CPU: using TSC frequency from MSR %" B_PRIu64 "\n", khz * numerator / denominator);
+	// compute for microseconds as follows (1000000 << 32) / (tsc freq in Hz),
+	// or (1000 << 32) / (tsc freq in kHz)
+	*conversionFactor = (1000ULL << 32) / (khz * numerator / denominator);
+	// overwrite the bootloader value
+	args->arch_args.system_time_cv_factor = *conversionFactor;
+}
+
+
+static void
+init_tsc(kernel_args* args)
+{
+	// init the TSC -> system_time() conversion factors
+
+	// try to find the TSC frequency with CPUID
+	uint32 conversionFactor = args->arch_args.system_time_cv_factor;
+	init_tsc_with_cpuid(args, &conversionFactor);
+	init_tsc_with_msr(args, &conversionFactor);
+	uint64 conversionFactorNsecs = (uint64)conversionFactor * 1000;
+
+
+#ifdef __x86_64__
+	// The x86_64 system_time() implementation uses 64-bit multiplication and
+	// therefore shifting is not necessary for low frequencies (it's also not
+	// too likely that there'll be any x86_64 CPUs clocked under 1GHz).
+	__x86_setup_system_time((uint64)conversionFactor << 32,
+		conversionFactorNsecs);
+#else
+	if (conversionFactorNsecs >> 32 != 0) {
+		// the TSC frequency is < 1 GHz, which forces us to shift the factor
+		__x86_setup_system_time(conversionFactor, conversionFactorNsecs >> 16,
+			true);
+	} else {
+		// the TSC frequency is >= 1 GHz
+		__x86_setup_system_time(conversionFactor, conversionFactorNsecs, false);
+	}
+#endif
+}
+
+
 status_t
 arch_cpu_init_percpu(kernel_args* args, int cpu)
 {
+	detect_cpu(cpu, false);
 	load_microcode(cpu);
 	detect_cpu(cpu);
+
+	if (cpu == 0)
+		init_tsc(args);
 
 	if (!gCpuIdleFunc) {
 		if (detect_amdc1e_noarat())
@@ -1423,6 +1696,17 @@ arch_cpu_init_percpu(kernel_args* args, int cpu)
 	// if RDTSCP is available write cpu number in TSC_AUX
 	if (x86_check_feature(IA32_FEATURE_AMD_EXT_RDTSCP, FEATURE_EXT_AMD))
 		x86_write_msr(IA32_MSR_TSC_AUX, cpu);
+
+	// make LFENCE a dispatch serializing instruction on AMD 64bit
+	cpu_ent* cpuEnt = get_cpu_struct();
+	if (cpuEnt->arch.vendor == VENDOR_AMD) {
+		uint32 family = cpuEnt->arch.family + cpuEnt->arch.extended_family;
+		if (family >= 0x10 && family != 0x11) {
+			uint64 value = x86_read_msr(MSR_F10H_DE_CFG);
+			if ((value & DE_CFG_SERIALIZE_LFENCE) == 0)
+				x86_write_msr(MSR_F10H_DE_CFG, value | DE_CFG_SERIALIZE_LFENCE);
+		}
+	}
 #endif
 
 	if (x86_check_feature(IA32_FEATURE_APERFMPERF, FEATURE_6_ECX)) {
@@ -1445,28 +1729,6 @@ arch_cpu_init(kernel_args* args)
 	} else {
 		dprintf("CPU: no microcode provided\n");
 	}
-
-	// init the TSC -> system_time() conversion factors
-
-	uint32 conversionFactor = args->arch_args.system_time_cv_factor;
-	uint64 conversionFactorNsecs = (uint64)conversionFactor * 1000;
-
-#ifdef __x86_64__
-	// The x86_64 system_time() implementation uses 64-bit multiplication and
-	// therefore shifting is not necessary for low frequencies (it's also not
-	// too likely that there'll be any x86_64 CPUs clocked under 1GHz).
-	__x86_setup_system_time((uint64)conversionFactor << 32,
-		conversionFactorNsecs);
-#else
-	if (conversionFactorNsecs >> 32 != 0) {
-		// the TSC frequency is < 1 GHz, which forces us to shift the factor
-		__x86_setup_system_time(conversionFactor, conversionFactorNsecs >> 16,
-			true);
-	} else {
-		// the TSC frequency is >= 1 GHz
-		__x86_setup_system_time(conversionFactor, conversionFactorNsecs, false);
-	}
-#endif
 
 	// Initialize descriptor tables.
 	x86_descriptors_init(args);

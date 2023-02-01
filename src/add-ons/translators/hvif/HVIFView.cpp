@@ -35,7 +35,7 @@ HVIFView::HVIFView(const char* name, uint32 flags, TranslatorSettings *settings)
 	title->SetExplicitAlignment(labelAlignment);
 
 	char versionString[256];
-	snprintf(versionString, sizeof(versionString), 
+	snprintf(versionString, sizeof(versionString),
 		B_TRANSLATE("Version %d.%d.%d, %s"),
 		int(B_TRANSLATION_MAJOR_VERSION(HVIF_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(HVIF_TRANSLATOR_VERSION)),
@@ -70,11 +70,6 @@ HVIFView::HVIFView(const char* name, uint32 flags, TranslatorSettings *settings)
 		.AddGlue()
 		.Add(fRenderSize)
 		.AddGlue();
-
- 	BFont font;
- 	GetFont(&font);
- 	SetExplicitPreferredSize(
-		BSize((font.Size() * 270) / 12, (font.Size() * 100) / 12));
 }
 
 

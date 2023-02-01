@@ -54,6 +54,6 @@ Aspect ratio	InfoView		アスペクト比
 Application-owned node	AppNodeInfoView		アプリケーション所有ノード
 Tracks	FileNodeInfoView		トラック
 Source	InfoView		ソース
-Destination	InfoView		説明
+Destination	InfoView		接続先
 Copyright	FileNodeInfoView		Copyright
 ID:	FileNodeInfoView		ID:

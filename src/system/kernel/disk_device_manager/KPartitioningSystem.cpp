@@ -325,7 +325,7 @@ KPartitioningSystem::SetType(KPartition* child, const char* type,
 		return result;
 
 	// let the module do its job
-	result = fModule->set_type(fd, child->Parent()->ID(), type, job);
+	result = fModule->set_type(fd, child->ID(), type, job);
 // TODO: Change hook interface!
 
 	// cleanup and return

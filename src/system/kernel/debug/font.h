@@ -18,7 +18,7 @@ struct FramebufferFont {
 
 
 extern FramebufferFont smallFont;
-extern FramebufferFont spleen12Font;
+extern FramebufferFont bigFont;
 
 
 #endif /* !FONT_H */

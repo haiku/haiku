@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-mount_server	819316177
+1	slovak	x-vnd.Haiku-mount_server	2894720660
 Mount read-only	AutoMounter		Pripojiť len na čítanie
 Error mounting volume:\n\n%s	AutoMounter		Chyba pri pripájaní zväzku:\n\n%s
 Cancel	AutoMounter		Zrušiť
@@ -10,5 +10,4 @@ Mounting volume '%s'\n\n	AutoMounter		Pripája sa zväzok „%s“\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Nebolo možné odpojiť disk „%s“:\n\t%s\n\nVynútiť odpojenie?\n\nPozn.: Ak aplikácia práve na zväzok zapisuje, jeho odpojenie môže mať za následok stratu dát.\n
 Force unmount	AutoMounter		Vynútiť odpojenie
 Mount error	AutoMounter		Chyba pripájania
-Mounting volume <unnamed volume>\n\n	AutoMounter		Pripája sa zväzok <nepomenovaný zväzok>\n\n
 Mount warning	AutoMounter		Upozornenie pripojenia

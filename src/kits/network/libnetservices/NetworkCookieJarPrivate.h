@@ -8,12 +8,9 @@
 
 #include <HashMap.h>
 
-
-#ifndef LIBNETAPI_DEPRECATED
 using BPrivate::Network::BNetworkCookie;
 using BPrivate::Network::BNetworkCookieJar;
 using BPrivate::Network::BNetworkCookieList;
-#endif
 
 
 typedef BPrivate::SynchronizedHashMap<HashString, BNetworkCookieList*>
@@ -24,14 +21,14 @@ struct BNetworkCookieJar::PrivateHashMap : public BNetworkCookieHashMap {
 
 struct BNetworkCookieJar::PrivateIterator {
 								PrivateIterator(
-									BNetworkCookieHashMap::Iterator it) 
+									BNetworkCookieHashMap::Iterator it)
 									:
 									fCookieMapIterator(it)
 								{
 								}
-								
+
 	HashString					fKey;
-	BNetworkCookieHashMap::Iterator	
+	BNetworkCookieHashMap::Iterator
 								fCookieMapIterator;
 };
 

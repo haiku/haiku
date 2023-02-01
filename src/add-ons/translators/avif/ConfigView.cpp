@@ -171,11 +171,6 @@ ConfigView::ConfigView(TranslatorSettings* settings)
 		.AddGlue()
 		.Add(copyright2View)
 		.Add(copyright3View);
-
-	BFont font;
-	GetFont(&font);
-	SetExplicitPreferredSize(BSize((font.Size() * 250) / 12,
-		(font.Size() * 350) / 12));
 }
 
 

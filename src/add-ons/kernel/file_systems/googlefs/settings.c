@@ -9,6 +9,8 @@
 #include <KernelExport.h>
 #include "settings.h"
 
+#include <stdio.h>
+
 #define DEFAULT_GOOGLE_SERVER "74.125.136.105"
 #define DEFAULT_MAX_VNODES 5000
 char google_server[20] = DEFAULT_GOOGLE_SERVER;
@@ -25,7 +27,7 @@ status_t load_settings(void)
 	if (!handle)
 		return ENOENT;
 
-	dprintf("googlefs: loaded settings\n");
+	fprintf(stderr, "googlefs: loaded settings\n");
 
 	val = get_driver_parameter(handle, "server", \
 			DEFAULT_GOOGLE_SERVER, DEFAULT_GOOGLE_SERVER);
@@ -47,10 +49,10 @@ status_t load_settings(void)
 
 	sync_unlink_queries = get_driver_boolean_parameter(handle, "sync_unlink", false, true);
 
-	dprintf("googlefs: settings: server = %s\n", google_server);
-	dprintf("googlefs: settings: max_nodes = %" B_PRIu32 "\n", max_vnodes);
-	dprintf("googlefs: settings: max_results = %" B_PRIu32 " \n", max_results);
-	dprintf("googlefs: settings: sync_unlink = %c\n", sync_unlink_queries?'t':'f');
+	fprintf(stderr, "googlefs: settings: server = %s\n", google_server);
+	fprintf(stderr, "googlefs: settings: max_nodes = %" B_PRIu32 "\n", max_vnodes);
+	fprintf(stderr, "googlefs: settings: max_results = %" B_PRIu32 " \n", max_results);
+	fprintf(stderr, "googlefs: settings: sync_unlink = %c\n", sync_unlink_queries?'t':'f');
 	unload_driver_settings(handle);
 	return B_OK;
 }

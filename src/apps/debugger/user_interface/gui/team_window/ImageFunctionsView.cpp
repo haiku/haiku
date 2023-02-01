@@ -707,9 +707,6 @@ ImageFunctionsView::SetImageDebugInfo(ImageDebugInfo* imageDebugInfo)
 		fFunctionsTable->SetNodeExpanded(path, true, false);
 	}
 
-	if (fImageDebugInfo != NULL)
-		fFunctionsTable->ResizeAllColumnsToPreferred();
-
 	TRACE_GUI("ImageFunctionsView::SetImageDebugInfo(%p) done\n",
 		imageDebugInfo);
 }
@@ -725,7 +722,6 @@ ImageFunctionsView::SetFunction(FunctionInstance* function)
 		fFunctionsTable->SetNodeExpanded(path, true, true);
 		fFunctionsTable->SelectNode(path, false);
 		fFunctionsTable->ScrollToNode(path);
-		fFunctionsTable->ResizeAllColumnsToPreferred();
 	} else
 		fFunctionsTable->DeselectAllNodes();
 }
@@ -817,6 +813,7 @@ void
 ImageFunctionsView::_Init()
 {
 	fFunctionsTable = new TreeTable("functions", 0, B_FANCY_BORDER);
+	fFunctionsTable->SetFont(B_FONT_ROW, be_fixed_font);
 	AddChild(fFunctionsTable->ToView());
 	AddChild(fFilterField = new BTextControl("filtertext", "Filter:",
 			NULL, NULL));
@@ -826,7 +823,7 @@ ImageFunctionsView::_Init()
 	fFunctionsTable->SetSortingEnabled(false);
 
 	float addressWidth = be_plain_font->StringWidth("0x00000000")
-		+ be_control_look->DefaultLabelSpacing() * 2 + 5;
+		+ be_control_look->DefaultLabelSpacing() * 3;
 
 	// columns
 	fFunctionsTable->AddColumn(fHighlightingColumn
@@ -861,8 +858,6 @@ ImageFunctionsView::_ExpandFilteredNodes()
 			fFunctionsTable->SetNodeExpanded(path, true, true);
 		}
 	}
-
-	fFunctionsTable->ResizeAllColumnsToPreferred();
 }
 
 

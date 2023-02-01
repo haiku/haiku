@@ -13,22 +13,8 @@
 
 #include <AbstractSocket.h>
 
-
-#ifndef LIBNETAPI_DEPRECATED
 using namespace BPrivate::Network;
-#endif
 
-
-#ifdef LIBNETAPI_DEPRECATED
-BNetworkRequest::BNetworkRequest(const BUrl& url, BUrlProtocolListener* listener,
-		BUrlContext* context, const char* threadName, const char* protocolName)
-	:
-	BUrlRequest(url, listener, context, threadName, protocolName),
-	fSocket(NULL)
-{
-}
-
-#else
 
 BNetworkRequest::BNetworkRequest(const BUrl& url, BDataIO* output,
 	BUrlProtocolListener* listener, BUrlContext* context,
@@ -38,7 +24,6 @@ BNetworkRequest::BNetworkRequest(const BUrl& url, BDataIO* output,
 	fSocket(NULL)
 {
 }
-#endif // LIBNETAPI_DEPRECATED
 
 
 status_t

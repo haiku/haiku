@@ -16,6 +16,7 @@
 #include <efi/boot-services.h>
 
 #include "efi_platform.h"
+#include "generic_mmu.h"
 #include "mmu.h"
 
 
@@ -30,6 +31,10 @@
 //#define TRACE_MEMORY_MAP
 //#define TRACE_PAGE_DIRECTORY
 
+// Ignore memory below 1M and above 64GB (maximum amount of physical memory on x86 with PAE)
+#define PHYSICAL_MEMORY_LOW		0x00100000
+#define PHYSICAL_MEMORY_HIGH	0x1000000000ull
+
 #define VADDR_TO_PDENT(va)		(((va) / B_PAGE_SIZE) / 1024)
 #define VADDR_TO_PTENT(va)		(((va) / B_PAGE_SIZE) % 1024)
 #define X86_PDE_ADDRESS_MASK	0xfffff000
@@ -42,10 +47,6 @@ struct gdt_idt_descr {
 	uint16_t	limit;
 	uint32_t	base;
 } _PACKED;
-
-
-gdt_idt_descr gBootGDTDescriptor;
-segment_descriptor *gBootGDT = NULL;
 
 
 static const uint32_t kDefaultPageTableFlags = 0x07;      // present, user, R/W
@@ -90,10 +91,12 @@ get_next_page_table(void)
 }
 
 
-static void
-arch_mmu_init_gdt(void)
+void
+arch_mmu_init_gdt(gdt_idt_descr &bootGDTDescriptor)
 {
-	if (platform_allocate_region((void **)&gBootGDT,
+	segment_descriptor *bootGDT = NULL;
+
+	if (platform_allocate_region((void **)&bootGDT,
 			BOOT_GDT_SEGMENT_COUNT * sizeof(segment_descriptor), 0, false) != B_OK) {
 		panic("Failed to allocate GDT.\n");
 	}
@@ -106,35 +109,35 @@ arch_mmu_init_gdt(void)
 	// set up a new gdt
 
 	// put standard segment descriptors in GDT
-	clear_segment_descriptor(&gBootGDT[0]);
+	clear_segment_descriptor(&bootGDT[0]);
 
 	// seg 0x08 - kernel 4GB code
-	set_segment_descriptor(&gBootGDT[KERNEL_CODE_SEGMENT], 0, 0xffffffff,
+	set_segment_descriptor(&bootGDT[KERNEL_CODE_SEGMENT], 0, 0xffffffff,
 		DT_CODE_READABLE, DPL_KERNEL);
 
 	// seg 0x10 - kernel 4GB data
-	set_segment_descriptor(&gBootGDT[KERNEL_DATA_SEGMENT], 0, 0xffffffff,
+	set_segment_descriptor(&bootGDT[KERNEL_DATA_SEGMENT], 0, 0xffffffff,
 		DT_DATA_WRITEABLE, DPL_KERNEL);
 
 	// seg 0x1b - ring 3 user 4GB code
-	set_segment_descriptor(&gBootGDT[USER_CODE_SEGMENT], 0, 0xffffffff,
+	set_segment_descriptor(&bootGDT[USER_CODE_SEGMENT], 0, 0xffffffff,
 		DT_CODE_READABLE, DPL_USER);
 
 	// seg 0x23 - ring 3 user 4GB data
-	set_segment_descriptor(&gBootGDT[USER_DATA_SEGMENT], 0, 0xffffffff,
+	set_segment_descriptor(&bootGDT[USER_DATA_SEGMENT], 0, 0xffffffff,
 		DT_DATA_WRITEABLE, DPL_USER);
 
 	addr_t virtualGDT;
-	platform_bootloader_address_to_kernel_address(gBootGDT, &virtualGDT);
+	platform_bootloader_address_to_kernel_address(bootGDT, &virtualGDT);
 
-	gBootGDTDescriptor.limit = BOOT_GDT_SEGMENT_COUNT * sizeof(segment_descriptor);
-	gBootGDTDescriptor.base = (uint32_t)virtualGDT;
+	bootGDTDescriptor.limit = BOOT_GDT_SEGMENT_COUNT * sizeof(segment_descriptor);
+	bootGDTDescriptor.base = (uint32_t)virtualGDT;
 
 	TRACE("gdt phys 0x%08x virt 0x%08" B_PRIxADDR " desc 0x%08x\n",
-		(uint32_t)gBootGDT, virtualGDT,
+		(uint32_t)bootGDT, virtualGDT,
 		(uint32_t)&gBootGDTDescriptor);
 	TRACE("gdt limit=%d base=0x%08x\n",
-		gBootGDTDescriptor.limit, gBootGDTDescriptor.base);
+		bootGDTDescriptor.limit, bootGDTDescriptor.base);
 }
 
 
@@ -174,101 +177,6 @@ map_range(addr_t virtAddr, phys_addr_t physAddr, size_t size, uint32_t flags)
 
 	if (virtAddr >= KERNEL_LOAD_BASE)
 		ASSERT_ALWAYS(insert_virtual_allocated_range(virtAddr, size) >= B_OK);
-}
-
-
-static void
-build_physical_memory_list(size_t memoryMapSize,
-	efi_memory_descriptor *memoryMap, size_t descriptorSize,
-	uint32_t descriptorVersion)
-{
-	addr_t addr = (addr_t)memoryMap;
-
-	gKernelArgs.num_physical_memory_ranges = 0;
-
-	// First scan: Add all usable ranges
-	for (size_t i = 0; i < memoryMapSize / descriptorSize; ++i) {
-		efi_memory_descriptor* entry = (efi_memory_descriptor *)(addr + i * descriptorSize);
-		switch (entry->Type) {
-			case EfiLoaderCode:
-			case EfiLoaderData:
-			case EfiBootServicesCode:
-			case EfiBootServicesData:
-			case EfiConventionalMemory: {
-				// Usable memory.
-				// Ignore memory below 1MB and above 512GB.
-				uint64_t base = entry->PhysicalStart;
-				uint64_t end = entry->PhysicalStart + entry->NumberOfPages * B_PAGE_SIZE;
-				uint64_t originalSize = end - base;
-				if (base < 0x100000)
-					base = 0x100000;
-				if (end > (512ull * 1024 * 1024 * 1024))
-					end = 512ull * 1024 * 1024 * 1024;
-
-				gKernelArgs.ignored_physical_memory
-					+= originalSize - (max_c(end, base) - base);
-
-				if (base >= end)
-					break;
-				uint64_t size = end - base;
-
-				insert_physical_memory_range(base, size);
-				break;
-			}
-			default:
-				break;
-		}
-	}
-
-	uint64_t initialPhysicalMemory = total_physical_memory();
-
-	// Second scan: Remove everything reserved that may overlap
-	for (size_t i = 0; i < memoryMapSize / descriptorSize; ++i) {
-		efi_memory_descriptor* entry = (efi_memory_descriptor *)(addr + i * descriptorSize);
-		switch (entry->Type) {
-			case EfiLoaderCode:
-			case EfiLoaderData:
-			case EfiBootServicesCode:
-			case EfiBootServicesData:
-			case EfiConventionalMemory:
-				break;
-			default:
-				uint64_t base = entry->PhysicalStart;
-				uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
-				remove_physical_memory_range(base, size);
-		}
-	}
-
-	gKernelArgs.ignored_physical_memory
-		+= initialPhysicalMemory - total_physical_memory();
-
-	sort_address_ranges(gKernelArgs.physical_memory_range,
-		gKernelArgs.num_physical_memory_ranges);
-}
-
-
-static void
-build_physical_allocated_list(size_t memoryMapSize,
-	efi_memory_descriptor *memoryMap, size_t descriptorSize,
-	uint32_t descriptorVersion)
-{
-	addr_t addr = (addr_t)memoryMap;
-	for (size_t i = 0; i < memoryMapSize / descriptorSize; ++i) {
-		efi_memory_descriptor* entry = (efi_memory_descriptor *)(addr + i * descriptorSize);
-		switch (entry->Type) {
-			case EfiLoaderData: {
-				uint64_t base = entry->PhysicalStart;
-				uint64_t size = entry->NumberOfPages * B_PAGE_SIZE;
-				insert_physical_allocated_range(base, size);
-				break;
-			}
-			default:
-				;
-		}
-	}
-
-	sort_address_ranges(gKernelArgs.physical_allocated_range,
-		gKernelArgs.num_physical_allocated_ranges);
 }
 
 
@@ -331,7 +239,8 @@ arch_mmu_generate_post_efi_page_tables(size_t memoryMapSize,
 	uint32_t descriptorVersion)
 {
 	build_physical_memory_list(memoryMapSize, memoryMap,
-		descriptorSize, descriptorVersion);
+		descriptorSize, descriptorVersion,
+		PHYSICAL_MEMORY_LOW, PHYSICAL_MEMORY_HIGH);
 
 	//TODO: find out how to map EFI runtime services
 	//they are not mapped for now because the kernel doesn't use them anyway
@@ -399,5 +308,4 @@ void
 arch_mmu_init(void)
 {
 	arch_mmu_allocate_page_directory();
-	arch_mmu_init_gdt();
 }

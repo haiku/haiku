@@ -42,9 +42,13 @@ All rights reserved.
 #include "StopWatch.h"
 #include "Tracker.h"
 
+#include <map>
+
 #include <Alert.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
+#include <Collator.h>
 #include <GroupView.h>
 #include <GridView.h>
 #include <Locale.h>
@@ -69,7 +73,7 @@ const char* kDefaultOpenWithTemplate = "OpenWithSettings";
 // make SaveState/RestoreState save the current window setting for
 // other windows
 
-const float kMaxMenuWidth = 150;
+const float kMaxMenuWidthFactor = 33.0f;
 
 const int32 kDocumentKnobWidth = 16;
 const int32 kOpenAndMakeDefault = 'OpDf';
@@ -692,12 +696,12 @@ OpenWithPoseView::OpenSelection(BPose* pose, int32*)
 {
 	OpenWithContainerWindow* window = ContainerWindow();
 
-	int32 count = fSelectionList->CountItems();
+	int32 count = SelectionList()->CountItems();
 	if (count == 0)
 		return;
 
 	if (pose == NULL)
-		pose = fSelectionList->FirstItem();
+		pose = SelectionList()->FirstItem();
 
 	ASSERT(pose != NULL);
 
@@ -761,7 +765,7 @@ OpenWithPoseView::Pulse()
 
 	OpenWithContainerWindow* window = ContainerWindow();
 
-	if (!fSelectionList->CountItems()) {
+	if (!SelectionList()->CountItems()) {
 		window->SetCanSetAppAsDefault(false);
 		window->SetCanOpen(false);
 		_inherited::Pulse();
@@ -770,7 +774,7 @@ OpenWithPoseView::Pulse()
 
 	// if we selected a non-handling application, don't allow setting
 	// it as preferred
-	Model* firstSelected = fSelectionList->FirstItem()->TargetModel();
+	Model* firstSelected = SelectionList()->FirstItem()->TargetModel();
 	if (OpenWithRelation(firstSelected) == kNoRelation) {
 		window->SetCanSetAppAsDefault(false);
 		window->SetCanOpen(true);
@@ -786,11 +790,11 @@ OpenWithPoseView::Pulse()
 		return;
 	}
 
-	ASSERT(fSelectionList->CountItems() == 1);
+	ASSERT(SelectionList()->CountItems() == 1);
 
 	// enable the Open and make default if selected application different
 	// from preferred app ref
-	window->SetCanSetAppAsDefault((*fSelectionList->FirstItem()->
+	window->SetCanSetAppAsDefault((*SelectionList()->FirstItem()->
 		TargetModel()->EntryRef()) != fPreferredRef);
 
 	_inherited::Pulse();
@@ -801,18 +805,20 @@ void
 OpenWithPoseView::SetUpDefaultColumnsIfNeeded()
 {
 	// in case there were errors getting some columns
-	if (fColumnList->CountItems() != 0)
+	if (CountColumns() != 0)
 		return;
 
-	BColumn* nameColumn = new BColumn(B_TRANSLATE("Name"), StartOffset(), 125,
+	BColumn* nameColumn = new BColumn(B_TRANSLATE("Name"), 125,
 		B_ALIGN_LEFT, kAttrStatName, B_STRING_TYPE, true, true);
-	fColumnList->AddItem(nameColumn);
-	BColumn* relationColumn = new BColumn(B_TRANSLATE("Relation"), 180, 100,
+	AddColumn(nameColumn);
+
+	BColumn* relationColumn = new BColumn(B_TRANSLATE("Relation"), 100,
 		B_ALIGN_LEFT, kAttrOpenWithRelation, B_STRING_TYPE, false, false);
-	fColumnList->AddItem(relationColumn);
-	fColumnList->AddItem(new BColumn(B_TRANSLATE("Location"), 290, 225,
+	AddColumn(relationColumn);
+
+	AddColumn(new BColumn(B_TRANSLATE("Location"), 225,
 		B_ALIGN_LEFT, kAttrPath, B_STRING_TYPE, true, false));
-	fColumnList->AddItem(new BColumn(B_TRANSLATE("Version"), 525, 70,
+	AddColumn(new BColumn(B_TRANSLATE("Version"), 70,
 		B_ALIGN_LEFT, kAttrAppVersion, B_STRING_TYPE, false, false));
 
 	// sort by relation and by name
@@ -1069,23 +1075,75 @@ OpenWithMenu::OpenWithMenu(const char* label, const BMessage* entriesToOpen,
 namespace BPrivate {
 
 int
-SortByRelationAndName(const RelationCachingModelProxy* model1,
-	const RelationCachingModelProxy* model2, void* castToMenu)
+SortByRelation(const RelationCachingModelProxy* proxy1,
+	const RelationCachingModelProxy* proxy2, void* castToMenu)
 {
 	OpenWithMenu* menu = (OpenWithMenu*)castToMenu;
 
 	// find out the relations of app models to the opened entries
-	int32 relation1 = model1->Relation(menu->fIterator, &menu->fEntriesToOpen);
-	int32 relation2 = model2->Relation(menu->fIterator, &menu->fEntriesToOpen);
+	int32 relation1 = proxy1->Relation(menu->fIterator, &menu->fEntriesToOpen);
+	int32 relation2 = proxy2->Relation(menu->fIterator, &menu->fEntriesToOpen);
 
-	if (relation1 < relation2) {
-		// relation with the lowest number goes first
+	// relation with the lowest number goes first
+	if (relation1 < relation2)
 		return 1;
-	} else if (relation1 > relation2)
+	else if (relation1 > relation2)
 		return -1;
 
-	// if relations match, sort by app name
-	return strcmp(model1->fModel->Name(), model2->fModel->Name());
+	// relations match
+	return 0;
+}
+
+
+int
+SortByName(const RelationCachingModelProxy* proxy1,
+	const RelationCachingModelProxy* proxy2, void* castToMenu)
+{
+	BCollator collator;
+	BLocale::Default()->GetCollator(&collator);
+
+	// sort by app name
+	int nameDiff = collator.Compare(proxy1->fModel->Name(),
+		proxy2->fModel->Name());
+	if (nameDiff < 0)
+		return -1;
+	else if (nameDiff > 0)
+		return 1;
+
+	// if app names match, sort by volume name
+	BVolume volume1(proxy1->fModel->NodeRef()->device);
+	BVolume volume2(proxy2->fModel->NodeRef()->device);
+	char volumeName1[B_FILE_NAME_LENGTH];
+	char volumeName2[B_FILE_NAME_LENGTH];
+	if (volume1.InitCheck() == B_OK && volume2.InitCheck() == B_OK
+		&& volume1.GetName(volumeName1) == B_OK
+		&& volume2.GetName(volumeName2) == B_OK) {
+		int volumeNameDiff = collator.Compare(volumeName1, volumeName2);
+		if (volumeNameDiff < 0)
+			return -1;
+		else if (volumeNameDiff > 0)
+			return 1;
+	}
+
+	// app names and volume names match
+	return 0;
+}
+
+
+int
+SortByRelationAndName(const RelationCachingModelProxy* proxy1,
+	const RelationCachingModelProxy* proxy2, void* castToMenu)
+{
+	int relationDiff = SortByRelation(proxy1, proxy2, castToMenu);
+	if (relationDiff != 0)
+		return relationDiff;
+
+	int nameDiff = SortByName(proxy1, proxy2, castToMenu);
+	if (nameDiff != 0)
+		return nameDiff;
+
+	// relations, app names and volume names all match
+	return 0;
 }
 
 } // namespace BPrivate
@@ -1139,31 +1197,112 @@ OpenWithMenu::AddNextItem()
 void
 OpenWithMenu::DoneBuildingItemList()
 {
-	// sort by app name
-	fSupportingAppList->SortItems(SortByRelationAndName, this);
+	// sort list by name and volume name first to fill out labels
+	fSupportingAppList->SortItems(SortByName, this);
+
+	int32 count = fSupportingAppList->CountItems();
+
+	bool nameRepeats[count];
+	bool volumeRepeats[count];
+	// initialize to false
+	memset(nameRepeats, 0, sizeof(bool) * count);
+	memset(volumeRepeats, 0, sizeof(bool) * count);
+
+	std::map<RelationCachingModelProxy*, BString> labels;
+
+	BCollator collator;
+	BLocale::Default()->GetCollator(&collator);
 
 	// check if each app is unique
-	bool isUnique = true;
-	int32 count = fSupportingAppList->CountItems();
 	for (int32 index = 0; index < count - 1; index++) {
-		// the list is sorted, just compare two adjacent models
-		if (strcmp(fSupportingAppList->ItemAt(index)->fModel->Name(),
-			fSupportingAppList->ItemAt(index + 1)->fModel->Name()) == 0) {
-			isUnique = false;
-			break;
+		// the list is sorted, compare adjacent models
+		Model* model = fSupportingAppList->ItemAt(index)->fModel;
+		Model* next = fSupportingAppList->ItemAt(index + 1)->fModel;
+
+		// check if name repeats
+		if (collator.Compare(model->Name(), next->Name()) == 0) {
+			nameRepeats[index] = nameRepeats[index + 1] = true;
+
+			// check if volume name repeats
+			BVolume volume(model->NodeRef()->device);
+			BVolume nextVol(next->NodeRef()->device);
+			char volumeName[B_FILE_NAME_LENGTH];
+			char nextVolName[B_FILE_NAME_LENGTH];
+			if (volume.InitCheck() == B_OK && nextVol.InitCheck() == B_OK
+				&& volume.GetName(volumeName) == B_OK
+				&& nextVol.GetName(nextVolName) == B_OK
+				&& collator.Compare(volumeName, nextVolName) == 0) {
+				volumeRepeats[index] = volumeRepeats[index + 1] = true;
+			}
 		}
 	}
 
-	// add apps as menu items
 	BFont font;
 	GetFont(&font);
-	float scaling = font.Size() / 12.0f;
 
-	int32 lastRelation = -1;
-	for (int32 index = 0; index < count ; index++) {
-		RelationCachingModelProxy* modelProxy
+	// fill out the item labels
+	for (int32 index = 0; index < count; index++) {
+		RelationCachingModelProxy* proxy
 			= fSupportingAppList->ItemAt(index);
-		Model* model = modelProxy->fModel;
+		Model* model = proxy->fModel;
+		BString label;
+
+		if (!nameRepeats[index]) {
+			// one of a kind, print the app name
+			label = model->Name();
+		} else {
+			// name repeats, check if same volume
+			if (!volumeRepeats[index]) {
+				// different volume, print
+				// [volume name] app name
+				BVolume volume(model->NodeRef()->device);
+				if (volume.InitCheck() == B_OK) {
+					char volumeName[B_FILE_NAME_LENGTH];
+					if (volume.GetName(volumeName) == B_OK)
+						label << "[" << volumeName << "] ";
+				}
+				label << model->Name();
+			} else {
+				// same volume, print full path
+				BPath path;
+				BEntry entry(model->EntryRef());
+				if (entry.GetPath(&path) != B_OK) {
+					PRINT(("stale entry ref %s\n", model->Name()));
+					continue;
+				}
+				label = path.Path();
+			}
+			font.TruncateString(&label, B_TRUNCATE_MIDDLE,
+				kMaxMenuWidthFactor * be_control_look->DefaultLabelSpacing());
+		}
+
+#if DEBUG
+		BString relationDescription;
+		fIterator->RelationDescription(&fEntriesToOpen, model,
+			&relationDescription);
+		label << " (" << relationDescription << ")";
+#endif
+
+		labels[proxy] = label;
+	}
+
+	// sort again by relation and name after labels are filled out
+	fSupportingAppList->SortItems(SortByRelationAndName, this);
+
+	// add apps as menu items
+	int32 lastRelation = -1;
+	for (int32 index = 0; index < count; index++) {
+		RelationCachingModelProxy* proxy = fSupportingAppList->ItemAt(index);
+		Model* model = proxy->fModel;
+
+		// divide different relations of opening with a separator
+		int32 relation = proxy->Relation(fIterator, &fEntriesToOpen);
+		if (lastRelation != -1 && relation != lastRelation)
+			AddSeparatorItem();
+
+		lastRelation = relation;
+
+		// build message
 		BMessage* message = new BMessage(fEntriesToOpen);
 		message->AddRef("handler", model->EntryRef());
 		BContainerWindow* window
@@ -1173,41 +1312,12 @@ OpenWithMenu::DoneBuildingItemList()
 				window->TargetModel()->NodeRef(), sizeof(node_ref));
 		}
 
-		BString result;
-		if (isUnique) {
-			// just use the app name
-			result = model->Name();
-		} else {
-			// get a truncated full path
-			BPath path;
-			BEntry entry(model->EntryRef());
-			if (entry.GetPath(&path) != B_OK) {
-				PRINT(("stale entry ref %s\n", model->Name()));
-				delete message;
-				continue;
-			}
-			result = path.Path();
-			font.TruncateString(&result, B_TRUNCATE_MIDDLE,
-				kMaxMenuWidth * scaling);
-		}
-#if DEBUG
-		BString relationDescription;
-		fIterator->RelationDescription(&fEntriesToOpen, model, &relationDescription);
-		result += " (";
-		result += relationDescription;
-		result += ")";
-#endif
-
-		// divide different relations of opening with a separator
-		int32 relation = modelProxy->Relation(fIterator, &fEntriesToOpen);
-		if (lastRelation != -1 && relation != lastRelation)
-			AddSeparatorItem();
-		lastRelation = relation;
-
-		ModelMenuItem* item = new ModelMenuItem(model, result.String(),
-			message);
+		// add item
+		ModelMenuItem* item = new ModelMenuItem(model,
+			labels.find(proxy)->second.String(), message);
 		AddItem(item);
-		// mark item if it represents the preferred app
+
+		// mark preferred app item
 		if (fHaveCommonPreferredApp && *(model->EntryRef()) == fPreferredRef) {
 			//PRINT(("marking item for % as preferred", model->Name()));
 			item->SetMarked(true);

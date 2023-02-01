@@ -214,8 +214,8 @@ Empty Trash	ContainerWindow		Ачысціць Сметніцу
 no supporting apps	OpenWithWindow		няма падыходзячых праграм
 Preparing to empty Trash…	StatusWindow		Падрыхтоўка да ачысткі Сметніцы…
 Deleting: 	StatusWindow		Выдаляецца: 
-You can't move or copy the trash.	FSUtils		Вы не можаце перамяшчаць ці капіяваць у Сметніцу.
 label too long	PoseView		метка занадта доўгая
+You can't move or copy the trash.	FSUtils		Вы не можаце перамяшчаць ці капіяваць у Сметніцу.
 Error creating link to \"%name\".	FSUtils		Памылка пры стварэнні спасылкі на \"%name\".
 Unknown	FilePermissionsView		Невядома
 Paste links	ContainerWindow		Устаўляць спасылкі
@@ -254,8 +254,8 @@ of %items	StatusWindow		з %items
 less than	FindPanel		менш за
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Памылка пры капіяванні файла \"%name\":\n\t%error\n\nЖадаеце працягваць?
 Creating links: 	StatusWindow		Стварэнне спасылак: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Нельга адкрыць \"%document\" праграмай \"%app\" (%error). 
 Create %s clipping	PoseView		Стварыць %s выразку
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Нельга адкрыць \"%document\" праграмай \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Памылка пры перамяшчэнні \"%name\"
 To: %dir	StatusWindow		Да: %dir
 Paste layout	ContainerWindow		Уставіць макет
@@ -388,8 +388,8 @@ Add-ons	FilePanelPriv		Дапаўненні
 96 x 96	DeskWindow		96 x 96
 Empty folder	SlowContextPopup		Пусты каталог
 Move to Trash	FSUtils		Адправіць у Сметніцу
-Handles %type	OpenWithWindow		Працуе з %type
 Cancel	PoseView		Адмена
+Handles %type	OpenWithWindow		Працуе з %type
 Delete	PoseView		Выдаліць
 Sorry, you can't copy items to the Trash.	PoseView		Прабачце, вы не можаце капіяваць элементы ў Сметніцу.
 New folder	FilePanelPriv		Новы каталог

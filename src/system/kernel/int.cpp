@@ -25,7 +25,6 @@
 #include <elf.h>
 #include <load_tracking.h>
 #include <util/AutoLock.h>
-#include <util/kqueue.h>
 #include <smp.h>
 
 #include "kernel_debug_config.h"

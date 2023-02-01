@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-CharacterMap	2410613018
+1	dutch; flemish	x-vnd.Haiku-CharacterMap	917523322
 Tirhuta	UnicodeBlocks		Tirhuta
 Miscellaneous mathematical symbols B	UnicodeBlocks		Gevarieerde wiskundige symbolen B
 Latin extended E	UnicodeBlocks		Latijns uitgebreid E
@@ -60,6 +60,7 @@ CJK unified ideographs extension C	UnicodeBlocks		CJK unified ideographs extensi
 Ancient Greek musical notation	UnicodeBlocks		Oud-Griekse muzieknotatie
 Thai	UnicodeBlocks		Thai
 Ethiopic supplement	UnicodeBlocks		Ethiopisch (toevoegsel)
+Only show blocks contained in font	CharacterWindow		Toon enkel blocks bevatten in font
 Chess symbols	UnicodeBlocks		Schaaksymbolen
 Yijing hexagram symbols	UnicodeBlocks		Yijing-hexagramsymbolen
 Ottoman Siyaq numbers	UnicodeBlocks		Ottomaanse Siyaq-cijfers

@@ -44,20 +44,6 @@ get_accelerant_hook(uint32 feature, void* data)
 			return (void*)framebuffer_get_frame_buffer_config;
 		case B_GET_PIXEL_CLOCK_LIMITS:
 			return (void*)framebuffer_get_pixel_clock_limits;
-
-		/* engine/synchronization */
-		case B_ACCELERANT_ENGINE_COUNT:
-			return (void*)framebuffer_accelerant_engine_count;
-		case B_ACQUIRE_ENGINE:
-			return (void*)framebuffer_acquire_engine;
-		case B_RELEASE_ENGINE:
-			return (void*)framebuffer_release_engine;
-		case B_WAIT_ENGINE_IDLE:
-			return (void*)framebuffer_wait_engine_idle;
-		case B_GET_SYNC_TOKEN:
-			return (void*)framebuffer_get_sync_token;
-		case B_SYNC_TO_TOKEN:
-			return (void*)framebuffer_sync_to_token;
 	}
 
 	return NULL;

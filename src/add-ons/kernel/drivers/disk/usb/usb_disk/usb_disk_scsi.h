@@ -22,7 +22,14 @@ typedef enum {
 	SCSI_SYNCHRONIZE_CACHE_10 = 0x35,
 	SCSI_READ_12 = 0xA8,
 	SCSI_WRITE_12 = 0xAA,
+	SCSI_READ_16 = 0x88,
+	SCSI_WRITE_16 = 0x8A,
+	SCSI_SERVICE_ACTION_IN = 0x9E,
 } scsi_operations;
+
+typedef enum {
+	SCSI_SAI_READ_CAPACITY_16 = 0x10,
+} scsi_service_actions;
 
 // common command structures
 typedef struct scsi_command_6_s {
@@ -88,6 +95,12 @@ typedef struct scsi_read_capacity_10_parameter_s {
 	uint32	last_logical_block_address;
 	uint32	logical_block_length;
 } _PACKED scsi_read_capacity_10_parameter;
+
+typedef struct scsi_read_capacity_16_parameter_s {
+	uint64	last_logical_block_address;
+	uint32	logical_block_length;
+	uint8	reserved[20];
+} _PACKED scsi_read_capacity_16_parameter;
 
 // request sense keys/codes
 typedef enum {

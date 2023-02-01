@@ -268,9 +268,8 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 		}
 	}
 
-	TRACE("  stream->time_base: (%d/%d), codec->time_base: (%d/%d))\n",
-		fStream->time_base.num, fStream->time_base.den,
-		fStream->codec->time_base.num, fStream->codec->time_base.den);
+	TRACE("  stream->time_base: (%d/%d)\n",
+		fStream->time_base.num, fStream->time_base.den);
 
 #if 0
 	// Write the AVCodecContext pointer to the user data section of the
@@ -298,7 +297,7 @@ AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 	size_t chunkSize, media_encode_info* encodeInfo)
 {
 	TRACE_PACKET("AVFormatWriter::StreamCookie[%d]::WriteChunk(%p, %ld, "
-		"start_time: %lld)\n", fStream->index, chunkBuffer, chunkSize,
+		"start_time: %" B_PRIdBIGTIME ")\n", fStream->index, chunkBuffer, chunkSize,
 		encodeInfo->start_time);
 
 	BAutolock _(fStreamLock);
@@ -317,10 +316,8 @@ AVFormatWriter::StreamCookie::WriteChunk(const void* chunkBuffer,
 	if ((encodeInfo->flags & B_MEDIA_KEY_FRAME) != 0)
 		fPacket.flags |= AV_PKT_FLAG_KEY;
 
-	TRACE_PACKET("  PTS: %lld (stream->time_base: (%d/%d), "
-		"codec->time_base: (%d/%d))\n", fPacket.pts,
-		fStream->time_base.num, fStream->time_base.den,
-		fStream->codec->time_base.num, fStream->codec->time_base.den);
+	TRACE_PACKET("  PTS: %" PRId64 " (stream->time_base: (%d/%d)\n", fPacket.pts,
+		fStream->time_base.num, fStream->time_base.den);
 
 #if 0
 	// TODO: Eventually, we need to write interleaved packets, but
@@ -345,7 +342,7 @@ status_t
 AVFormatWriter::StreamCookie::AddTrackInfo(uint32 code,
 	const void* data, size_t size, uint32 flags)
 {
-	TRACE("AVFormatWriter::StreamCookie::AddTrackInfo(%lu, %p, %ld, %lu)\n",
+	TRACE("AVFormatWriter::StreamCookie::AddTrackInfo(%" B_PRIu32 ", %p, %ld, %" B_PRIu32 ")\n",
 		code, data, size, flags);
 
 	BAutolock _(fStreamLock);
@@ -452,16 +449,20 @@ AVFormatWriter::CommitHeader()
 	fCodecOpened = true;
 
 	fHeaderError = avformat_write_header(fFormatContext, NULL);
-	if (fHeaderError < 0)
-		TRACE("  avformat_write_header(): %d\n", fHeaderError);
 
 	#ifdef TRACE_AVFORMAT_WRITER
-	TRACE("  wrote header\n");
+	if (fHeaderError < 0) {
+		char errorBuffer[AV_ERROR_MAX_STRING_SIZE];
+		av_strerror(fHeaderError, errorBuffer, sizeof(errorBuffer));
+		TRACE("  avformat_write_header(): %s\n", errorBuffer);
+	} else {
+		TRACE("  wrote header\n");
+	}
+
 	for (unsigned i = 0; i < fFormatContext->nb_streams; i++) {
 		AVStream* stream = fFormatContext->streams[i];
-		TRACE("  stream[%u] time_base: (%d/%d), codec->time_base: (%d/%d)\n",
-			i, stream->time_base.num, stream->time_base.den,
-			stream->codec->time_base.num, stream->codec->time_base.den);
+		TRACE("  stream[%u] time_base: (%d/%d)\n",
+			i, stream->time_base.num, stream->time_base.den);
 	}
 	#endif // TRACE_AVFORMAT_WRITER
 
@@ -557,7 +558,7 @@ status_t
 AVFormatWriter::AddTrackInfo(void* _cookie, uint32 code,
 	const void* data, size_t size, uint32 flags)
 {
-	TRACE("AVFormatWriter::AddTrackInfo(%lu, %p, %ld, %lu)\n",
+	TRACE("AVFormatWriter::AddTrackInfo(%" B_PRIu32 ", %p, %ld, %" B_PRIu32 ")\n",
 		code, data, size, flags);
 
 	if (fHeaderError != 0)

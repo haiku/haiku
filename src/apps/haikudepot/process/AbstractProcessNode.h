@@ -1,16 +1,19 @@
 /*
- * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef ABSTRACT_PROCESS_NODE_H
 #define ABSTRACT_PROCESS_NODE_H
 
 
+#include <AutoLocker.h>
+#include <Locker.h>
 #include <ObjectList.h>
 #include <OS.h>
 
 
 class AbstractProcess;
+class ProcessListener;
 
 
 /*! This class is designed to be used by the ProcessCoordinator class.  The
@@ -26,6 +29,7 @@ public:
 			AbstractProcess*	Process() const;
 	virtual	status_t			Start() = 0;
 	virtual	status_t			RequestStop() = 0;
+	virtual	bool				IsRunning();
 
 			void				AddPredecessor(AbstractProcessNode* node);
 			int32				CountPredecessors() const;
@@ -37,10 +41,16 @@ public:
 			AbstractProcessNode*
 								SuccessorAt(int32 index) const;
 
+	virtual	void				SetListener(ProcessListener* listener);
+
 protected:
 			status_t			_SpinUntilProcessState(
 									uint32 desiredStatesMask,
 									int32 timeoutSeconds);
+
+protected:
+			BLocker				fLock;
+			ProcessListener*	fListener;
 
 private:
 			void				_AddSuccessor(AbstractProcessNode* node);

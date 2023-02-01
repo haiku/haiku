@@ -159,8 +159,7 @@ BCountView::BarberPoleOuterRect() const
 BRect
 BCountView::TextInvalRect() const
 {
-	BRect result = Bounds();
-	result.InsetBy(4, 3);
+	BRect result = TextAndBarberPoleRect();
 
 	// if the barber pole is not present, use its space for text
 	if (fShowingBarberPole)
@@ -174,7 +173,8 @@ BRect
 BCountView::TextAndBarberPoleRect() const
 {
 	BRect result = Bounds();
-	result.InsetBy(4, 3);
+	result.InsetBy(be_control_look->ComposeSpacing(B_USE_SMALL_SPACING) / 2,
+		floorf(result.Height() * 0.25f));
 
 	return result;
 }
@@ -315,7 +315,7 @@ BCountView::AttachedToWindow()
 {
 	SetFont(be_plain_font);
 	SetFontSize(std::max(kMinFontSize,
-		floorf(be_plain_font->Size() * 0.75f)));
+		ceilf(be_plain_font->Size() * 0.75f)));
 
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetLowUIColor(ViewUIColor());

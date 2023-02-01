@@ -1,51 +1,51 @@
 1	dutch; flemish	x-vnd.Haiku-Expander	3300517306
-Expand	ExpanderMenu		Uitpakken
-Expanding '%s'…	ExpanderWindow		Uitpakken van '%s'…
-Close window when done expanding	ExpanderPreferences		Sluit dit venster wanneer het uitpakken klaar is
-Set destination…	ExpanderMenu		Bepaal doel…
-Use:	ExpanderPreferences		Gebruik:
-File expanded	ExpanderWindow		Bestand uitgepakt
-The destination is read only.	ExpanderWindow		Het doel is alleen-lezen.
-Expander: Open	ExpanderWindow		Expander: Openen
- is not supported	ExpanderWindow		is niet ondersteund
-Expander settings	ExpanderPreferences		Expander-instellingen
-Select current	DirectoryFilePanel		Huidige selecteren
-Source	ExpanderWindow		Bron
-Error when expanding archive	ExpanderWindow		Fout tijdens uitpakken archief
-Hide contents	ExpanderWindow		Inhoud verbergen
-Cancel	ExpanderWindow		Annuleren
-Automatically expand files	ExpanderPreferences		Bestanden automatisch uitpakken
-Continue	ExpanderWindow		Doorgaan
-Destination folder	ExpanderPreferences		Doelmap
-Other	ExpanderPreferences		Andere
-Cancel	ExpanderPreferences		Annuleren
-Expansion	ExpanderPreferences		Uitpakken
-Select	DirectoryFilePanel		Selecteren
-The folder was either moved, renamed or not supported.	ExpanderWindow		De map is verplaatst of hernoemd, ofwel niet ondersteund.
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Doelmap bestaat niet. Wilt u deze aanmaken?
-Same directory as source (archive) file	ExpanderPreferences		Dezelfde map als het bronbestand (archief)
-Settings	ExpanderMenu		Instellingen
-Settings…	ExpanderMenu		Instellingen…
-Expander: Choose destination	DirectoryFilePanel		Expander: Kies doel
-Select	ExpanderPreferences		Selecteren
-Show contents	ExpanderWindow		Toon inhoud
-Automatically show contents listing	ExpanderPreferences		Automatisch een lijst met inhoud weergeven
-OK	ExpanderPreferences		Ok
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Weet u zeker dat u het uitpakken van dit archief wil stoppen? De uitgepakte items zijn mogelijk niet compleet.
-Leave destination folder path empty	ExpanderPreferences		Laat doelmap pad leeg
-Failed to create the destination folder.	ExpanderWindow		Maken doelmap mislukt.
-Select '%s'…	DirectoryFilePanel		Selecteer '%s'…
-Create	ExpanderWindow		Aanmaken
-The file doesn't exist	ExpanderWindow		Het bestand bestaat niet
-Stop	ExpanderMenu		Stoppen
-File	ExpanderMenu		Bestand
-Expander	System name		Expander
-Expand	ExpanderWindow		Uitpakken
-Close	ExpanderMenu		Sluiten
-The destination is not a folder.	ExpanderWindow		Het doel is geen map.
-Open destination folder after extraction	ExpanderPreferences		Open doelmap na het uitpakken
-Creating listing for '%s'…	ExpanderWindow		Maken lijst voor '%s'…
-Set source…	ExpanderMenu		Bron bepalen…
-Show contents	ExpanderMenu		Toon inhoud
-Stop	ExpanderWindow		Stop
 Destination	ExpanderWindow		Doel
+Other	ExpanderPreferences		Andere
+Automatically show contents listing	ExpanderPreferences		Automatisch een lijst met inhoud weergeven
+Expander	System name		Expander
+Expander: Choose destination	DirectoryFilePanel		Expander: Kies doel
+Set source…	ExpanderMenu		Bron bepalen…
+The destination is not a folder.	ExpanderWindow		Het doel is geen map.
+The folder was either moved, renamed or not supported.	ExpanderWindow		De map is verplaatst of hernoemd, ofwel niet ondersteund.
+Close window when done expanding	ExpanderPreferences		Sluit dit venster wanneer het uitpakken klaar is
+Close	ExpanderMenu		Sluiten
+Create	ExpanderWindow		Aanmaken
+Creating listing for '%s'…	ExpanderWindow		Maken lijst voor '%s'…
+Show contents	ExpanderMenu		Toon inhoud
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Weet u zeker dat u het uitpakken van dit archief wil stoppen? De uitgepakte items zijn mogelijk niet compleet.
+Settings	ExpanderMenu		Instellingen
+Expand	ExpanderWindow		Uitpakken
+Open destination folder after extraction	ExpanderPreferences		Open doelmap na het uitpakken
+Same directory as source (archive) file	ExpanderPreferences		Dezelfde map als het bronbestand (archief)
+Stop	ExpanderWindow		Stop
+Cancel	ExpanderWindow		Annuleren
+Expander settings	ExpanderPreferences		Expander-instellingen
+Error when expanding archive	ExpanderWindow		Fout tijdens uitpakken archief
+Expand	ExpanderMenu		Uitpakken
+Failed to create the destination folder.	ExpanderWindow		Maken doelmap mislukt.
+Settings…	ExpanderMenu		Instellingen…
+Select current	DirectoryFilePanel		Huidige selecteren
+Expanding '%s'…	ExpanderWindow		Uitpakken van '%s'…
+OK	ExpanderPreferences		Ok
+File expanded	ExpanderWindow		Bestand uitgepakt
+Automatically expand files	ExpanderPreferences		Bestanden automatisch uitpakken
+Select	DirectoryFilePanel		Selecteren
+Show contents	ExpanderWindow		Toon inhoud
+Stop	ExpanderMenu		Stoppen
+Select '%s'…	DirectoryFilePanel		Selecteer '%s'…
+Expansion	ExpanderPreferences		Uitpakken
+Set destination…	ExpanderMenu		Bepaal doel…
+Continue	ExpanderWindow		Doorgaan
+ is not supported	ExpanderWindow		is niet ondersteund
+Cancel	ExpanderPreferences		Annuleren
+Use:	ExpanderPreferences		Gebruik:
+Destination folder	ExpanderPreferences		Doelmap
+Expander: Open	ExpanderWindow		Expander: Openen
+Leave destination folder path empty	ExpanderPreferences		Laat doelmap pad leeg
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Doelmap bestaat niet. Wilt u deze aanmaken?
+The file doesn't exist	ExpanderWindow		Het bestand bestaat niet
+Hide contents	ExpanderWindow		Inhoud verbergen
+Source	ExpanderWindow		Bron
+The destination is read only.	ExpanderWindow		Het doel is alleen-lezen.
+Select	ExpanderPreferences		Selecteren
+File	ExpanderMenu		Bestand

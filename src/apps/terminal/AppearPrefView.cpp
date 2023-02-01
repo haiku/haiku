@@ -37,7 +37,6 @@
 #define B_TRANSLATION_CONTEXT "Terminal AppearancePrefView"
 
 
-
 // #pragma mark -
 
 
@@ -47,34 +46,6 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	BGroupView(name, B_VERTICAL, 5),
 	fTerminalMessenger(messenger)
 {
-	const char* kColorTable[] = {
-		B_TRANSLATE_MARK("Text"),
-		B_TRANSLATE_MARK("Background"),
-		B_TRANSLATE_MARK("Cursor"),
-		B_TRANSLATE_MARK("Text under cursor"),
-		B_TRANSLATE_MARK("Selected text"),
-		B_TRANSLATE_MARK("Selected background"),
-		"",
-		B_TRANSLATE_MARK("ANSI black color"),
-		B_TRANSLATE_MARK("ANSI red color"),
-		B_TRANSLATE_MARK("ANSI green color"),
-		B_TRANSLATE_MARK("ANSI yellow color"),
-		B_TRANSLATE_MARK("ANSI blue color"),
-		B_TRANSLATE_MARK("ANSI magenta color"),
-		B_TRANSLATE_MARK("ANSI cyan color"),
-		B_TRANSLATE_MARK("ANSI white color"),
-		"",
-		B_TRANSLATE_MARK("ANSI bright black color"),
-		B_TRANSLATE_MARK("ANSI bright red color"),
-		B_TRANSLATE_MARK("ANSI bright green color"),
-		B_TRANSLATE_MARK("ANSI bright yellow color"),
-		B_TRANSLATE_MARK("ANSI bright blue color"),
-		B_TRANSLATE_MARK("ANSI bright magenta color"),
-		B_TRANSLATE_MARK("ANSI bright cyan color"),
-		B_TRANSLATE_MARK("ANSI bright white color"),
-		NULL
-	};
-
 	fBlinkCursor = new BCheckBox(
 		B_TRANSLATE("Blinking cursor"),
 			new BMessage(MSG_BLINK_CURSOR_CHANGED));
@@ -111,16 +82,6 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	}
 	fEncodingField = new BMenuField(B_TRANSLATE("Encoding:"), encodingMenu);
 
-	BPopUpMenu* schemesPopUp = _MakeColorSchemeMenu(MSG_COLOR_SCHEME_CHANGED,
-		gPredefinedColorSchemes, gPredefinedColorSchemes[0]);
-	fColorSchemeField = new BMenuField(B_TRANSLATE("Color scheme:"),
-		schemesPopUp);
-
-	BPopUpMenu* colorsPopUp = _MakeMenu(MSG_COLOR_FIELD_CHANGED, kColorTable,
-		kColorTable[0]);
-
-	fColorField = new BMenuField(B_TRANSLATE("Color:"), colorsPopUp);
-
 	fTabTitle = new BTextControl("tabTitle", B_TRANSLATE("Tab title:"), "",
 		NULL);
 	fTabTitle->SetModificationMessage(
@@ -152,14 +113,8 @@ AppearancePrefView::AppearancePrefView(const char* name,
 			.Add(fFontField->CreateMenuBarLayoutItem(), 1, 3)
 			.Add(fEncodingField->CreateLabelLayoutItem(), 0, 4)
 			.Add(fEncodingField->CreateMenuBarLayoutItem(), 1, 4)
-			.Add(fColorSchemeField->CreateLabelLayoutItem(), 0, 5)
-			.Add(fColorSchemeField->CreateMenuBarLayoutItem(), 1, 5)
-			.Add(fColorField->CreateLabelLayoutItem(), 0, 6)
-			.Add(fColorField->CreateMenuBarLayoutItem(), 1, 6)
 			.End()
 		.AddGlue()
-		.Add(fColorControl = new BColorControl(BPoint(10, 10),
-			B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
 		.Add(fBlinkCursor)
 		.Add(fAllowBold)
 		.Add(fUseOptionAsMetaKey)
@@ -170,18 +125,8 @@ AppearancePrefView::AppearancePrefView(const char* name,
 	fFontField->SetAlignment(B_ALIGN_RIGHT);
 	fWindowSizeField->SetAlignment(B_ALIGN_RIGHT);
 	fEncodingField->SetAlignment(B_ALIGN_RIGHT);
-	fColorField->SetAlignment(B_ALIGN_RIGHT);
-	fColorSchemeField->SetAlignment(B_ALIGN_RIGHT);
 
 	Revert();
-
-	BTextControl* redInput = (BTextControl*)fColorControl->ChildAt(0);
-	BTextControl* greenInput = (BTextControl*)fColorControl->ChildAt(1);
-	BTextControl* blueInput = (BTextControl*)fColorControl->ChildAt(2);
-
-	redInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	greenInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	blueInput->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 }
 
 
@@ -198,10 +143,8 @@ AppearancePrefView::Revert()
 	fUseOptionAsMetaKey->SetValue(pref->getBool(PREF_USE_OPTION_AS_META));
 	fWarnOnExit->SetValue(pref->getBool(PREF_WARN_ON_EXIT));
 
-	_SetCurrentColorScheme();
 	_SetEncoding(pref->getString(PREF_TEXT_ENCODING));
 	_SetWindowSize(pref->getInt32(PREF_ROWS), pref->getInt32(PREF_COLS));
-	fColorControl->SetValue(pref->getRGB(PREF_TEXT_FORE_COLOR));
 
 	const char* family = pref->getString(PREF_HALF_FONT_FAMILY);
 	const char* style = pref->getString(PREF_HALF_FONT_STYLE);
@@ -230,13 +173,8 @@ AppearancePrefView::AttachedToWindow()
 		fontSizeMenu->SetTargetForItems(this);
 	}
 
-	fColorControl->SetTarget(this);
-	fColorField->Menu()->SetTargetForItems(this);
-	fColorSchemeField->Menu()->SetTargetForItems(this);
 	fWindowSizeField->Menu()->SetTargetForItems(this);
 	fEncodingField->Menu()->SetTargetForItems(this);
-
-	_SetCurrentColorScheme();
 }
 
 
@@ -275,55 +213,6 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 				_MarkSelectedFont(family, style, size);
 				modified = true;
 			}
-			break;
-		}
-
-		case MSG_COLOR_CHANGED:
-		{
-			const BMessage* itemMessage
-				= fColorField->Menu()->FindMarked()->Message();
-			const char* label = NULL;
-			if (itemMessage->FindString("label", &label) != B_OK)
-				break;
-			rgb_color oldColor = PrefHandler::Default()->getRGB(label);
-			if (oldColor != fColorControl->ValueAsColor()) {
-				BMenuItem* item = fColorSchemeField->Menu()->FindMarked();
-				if (strcmp(item->Label(), gCustomColorScheme.name) != 0) {
-					item->SetMarked(false);
-					item = fColorSchemeField->Menu()->FindItem(
-						gCustomColorScheme.name);
-					if (item)
-						item->SetMarked(true);
-				}
-
-				PrefHandler::Default()->setRGB(label,
-					fColorControl->ValueAsColor());
-				modified = true;
-			}
-			break;
-		}
-
-		case MSG_COLOR_SCHEME_CHANGED:
-		{
-			color_scheme* newScheme = NULL;
-			if (msg->FindPointer("color_scheme",
-					(void**)&newScheme) == B_OK) {
-				_ChangeColorScheme(newScheme);
-				const char* label = NULL;
-				if (fColorField->Menu()->FindMarked()->Message()->FindString(
-						"label", &label) == B_OK)
-					fColorControl->SetValue(
-						PrefHandler::Default()->getRGB(label));
-				modified = true;
-			}
-			break;
-		}
-
-		case MSG_COLOR_FIELD_CHANGED:
-		{
-			const char* label = NULL;
-			if (msg->FindString("label", &label) == B_OK)
-				fColorControl->SetValue(PrefHandler::Default()->getRGB(label));
 			break;
 		}
 
@@ -414,91 +303,6 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 
 		BMessenger messenger(this);
 		messenger.SendMessage(MSG_PREF_MODIFIED);
-	}
-}
-
-
-void
-AppearancePrefView::_ChangeColorScheme(color_scheme* scheme)
-{
-	PrefHandler* pref = PrefHandler::Default();
-
-	pref->setRGB(PREF_TEXT_FORE_COLOR, scheme->text_fore_color);
-	pref->setRGB(PREF_TEXT_BACK_COLOR, scheme->text_back_color);
-	pref->setRGB(PREF_SELECT_FORE_COLOR, scheme->select_fore_color);
-	pref->setRGB(PREF_SELECT_BACK_COLOR, scheme->select_back_color);
-	pref->setRGB(PREF_CURSOR_FORE_COLOR, scheme->cursor_fore_color);
-	pref->setRGB(PREF_CURSOR_BACK_COLOR, scheme->cursor_back_color);
-	pref->setRGB(PREF_ANSI_BLACK_COLOR, scheme->ansi_colors.black);
-	pref->setRGB(PREF_ANSI_RED_COLOR, scheme->ansi_colors.red);
-	pref->setRGB(PREF_ANSI_GREEN_COLOR, scheme->ansi_colors.green);
-	pref->setRGB(PREF_ANSI_YELLOW_COLOR, scheme->ansi_colors.yellow);
-	pref->setRGB(PREF_ANSI_BLUE_COLOR, scheme->ansi_colors.blue);
-	pref->setRGB(PREF_ANSI_MAGENTA_COLOR, scheme->ansi_colors.magenta);
-	pref->setRGB(PREF_ANSI_CYAN_COLOR, scheme->ansi_colors.cyan);
-	pref->setRGB(PREF_ANSI_WHITE_COLOR, scheme->ansi_colors.white);
-	pref->setRGB(PREF_ANSI_BLACK_HCOLOR, scheme->ansi_colors_h.black);
-	pref->setRGB(PREF_ANSI_RED_HCOLOR, scheme->ansi_colors_h.red);
-	pref->setRGB(PREF_ANSI_GREEN_HCOLOR, scheme->ansi_colors_h.green);
-	pref->setRGB(PREF_ANSI_YELLOW_HCOLOR, scheme->ansi_colors_h.yellow);
-	pref->setRGB(PREF_ANSI_BLUE_HCOLOR, scheme->ansi_colors_h.blue);
-	pref->setRGB(PREF_ANSI_MAGENTA_HCOLOR, scheme->ansi_colors_h.magenta);
-	pref->setRGB(PREF_ANSI_CYAN_HCOLOR, scheme->ansi_colors_h.cyan);
-	pref->setRGB(PREF_ANSI_WHITE_HCOLOR, scheme->ansi_colors_h.white);
-}
-
-
-void
-AppearancePrefView::_SetCurrentColorScheme()
-{
-	PrefHandler* pref = PrefHandler::Default();
-
-	gCustomColorScheme.text_fore_color = pref->getRGB(PREF_TEXT_FORE_COLOR);
-	gCustomColorScheme.text_back_color = pref->getRGB(PREF_TEXT_BACK_COLOR);
-	gCustomColorScheme.select_fore_color = pref->getRGB(PREF_SELECT_FORE_COLOR);
-	gCustomColorScheme.select_back_color = pref->getRGB(PREF_SELECT_BACK_COLOR);
-	gCustomColorScheme.cursor_fore_color = pref->getRGB(PREF_CURSOR_FORE_COLOR);
-	gCustomColorScheme.cursor_back_color = pref->getRGB(PREF_CURSOR_BACK_COLOR);
-	gCustomColorScheme.ansi_colors.black = pref->getRGB(PREF_ANSI_BLACK_COLOR);
-	gCustomColorScheme.ansi_colors.red = pref->getRGB(PREF_ANSI_RED_COLOR);
-	gCustomColorScheme.ansi_colors.green = pref->getRGB(PREF_ANSI_GREEN_COLOR);
-	gCustomColorScheme.ansi_colors.yellow = pref->getRGB(PREF_ANSI_YELLOW_COLOR);
-	gCustomColorScheme.ansi_colors.blue = pref->getRGB(PREF_ANSI_BLUE_COLOR);
-	gCustomColorScheme.ansi_colors.magenta =
-		pref->getRGB(PREF_ANSI_MAGENTA_COLOR);
-	gCustomColorScheme.ansi_colors.cyan = pref->getRGB(PREF_ANSI_CYAN_COLOR);
-	gCustomColorScheme.ansi_colors.white = pref->getRGB(PREF_ANSI_WHITE_COLOR);
-	gCustomColorScheme.ansi_colors_h.black = pref->getRGB(PREF_ANSI_BLACK_HCOLOR);
-	gCustomColorScheme.ansi_colors_h.red = pref->getRGB(PREF_ANSI_RED_HCOLOR);
-	gCustomColorScheme.ansi_colors_h.green = pref->getRGB(PREF_ANSI_GREEN_HCOLOR);
-	gCustomColorScheme.ansi_colors_h.yellow =
-		pref->getRGB(PREF_ANSI_YELLOW_HCOLOR);
-	gCustomColorScheme.ansi_colors_h.blue = pref->getRGB(PREF_ANSI_BLUE_HCOLOR);
-	gCustomColorScheme.ansi_colors_h.magenta =
-		pref->getRGB(PREF_ANSI_MAGENTA_HCOLOR);
-	gCustomColorScheme.ansi_colors_h.cyan = pref->getRGB(PREF_ANSI_CYAN_HCOLOR);
-	gCustomColorScheme.ansi_colors_h.white = pref->getRGB(PREF_ANSI_WHITE_HCOLOR);
-
-	const char* currentSchemeName = NULL;
-
-	for (const color_scheme** schemes = gPredefinedColorSchemes;
-			*schemes != NULL; schemes++) {
-		if (gCustomColorScheme == **schemes) {
-			currentSchemeName = (*schemes)->name;
-			break;
-		}
-	}
-
-	// If the scheme is not one of the known ones, assume a custom one.
-	if (currentSchemeName == NULL)
-		currentSchemeName = "Custom";
-
-	for (int32 i = 0; i < fColorSchemeField->Menu()->CountItems(); i++) {
-		BMenuItem* item = fColorSchemeField->Menu()->ItemAt(i);
-		if (strcmp(item->Label(), currentSchemeName) == 0) {
-			item->SetMarked(true);
-			break;
-		}
 	}
 }
 
@@ -651,29 +455,6 @@ AppearancePrefView::_MakeMenu(uint32 msg, const char** items,
 		items++;
 	}
 
-	return menu;
-}
-
-
-/*static*/ BPopUpMenu*
-AppearancePrefView::_MakeColorSchemeMenu(uint32 msg, const color_scheme** items,
-	const color_scheme* defaultItemName)
-{
-	BPopUpMenu* menu = new BPopUpMenu("");
-
-	int32 i = 0;
-	while (*items) {
-		if (strcmp((*items)->name, "") == 0)
-			menu->AddSeparatorItem();
-		else {
-			BMessage* message = new BMessage(msg);
-			message->AddPointer("color_scheme", (const void*)*items);
-			menu->AddItem(new BMenuItem((*items)->name, message));
-		}
-
-		items++;
-		i++;
-	}
 	return menu;
 }
 

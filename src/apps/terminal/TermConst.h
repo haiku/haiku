@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Haiku.
+ * Copyright 2001-2023, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
@@ -16,6 +16,7 @@
 // Application signature (Must same in Terminal.rdef)
 #define TERM_SIGNATURE "application/x-vnd.Haiku-Terminal"
 #define PREFFILE_MIMETYPE "text/x-terminal-pref"
+#define THEMEFILE_MIMETYPE "text/x-terminal-theme"
 
 // Signature of R5's Terminal. Needed for proper drop-in window count support
 #define R5_TERM_SIGNATURE "application/x-vnd.Be-SHEL"
@@ -52,6 +53,7 @@ static const uint32 MENU_FIND_STRING	= 'Mfpr';
 static const uint32 MENU_FIND_NEXT		= 'Mfnx';
 static const uint32 MENU_FIND_PREVIOUS	= 'Mfbw';
 static const uint32 MENU_SHOW_COLOR		= 'Mcol';
+static const uint32 MENU_THEME_OPEN		= 'Mthm';
 
 static const uint32 M_GET_DEVICE_NUM	= 'Mgdn';
 
@@ -81,6 +83,7 @@ static const uint32 MSG_SET_TERMINAL_COLORS				= 'setc';
 static const uint32 MSG_RESET_TERMINAL_COLORS			= 'rstc';
 static const uint32 MSG_QUIT_TERMNAL					= 'qutt';
 static const uint32 MSG_ENABLE_META_KEY					= 'emtk';
+static const uint32 MSG_ENABLE_BRACKETED_PASTE			= 'ebkp';
 static const uint32 MSG_REPORT_MOUSE_EVENT				= 'mous';
 static const uint32 MSG_SAVE_WINDOW_POSITION			= 'swps';
 static const uint32 MSG_MOVE_TAB_LEFT					= 'mvtl';
@@ -91,6 +94,7 @@ static const uint32 MSG_GET_TERMINAL_COLOR				= 'getc';
 
 
 // Preference Read/Write Keys
+static const char* const PREF_THEME_NAME = "Theme name";
 static const char* const PREF_HALF_FONT_FAMILY = "Half Font Family";
 static const char* const PREF_HALF_FONT_STYLE = "Half Font Style";
 static const char* const PREF_HALF_FONT_SIZE = "Half Font Size";

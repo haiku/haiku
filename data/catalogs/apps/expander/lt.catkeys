@@ -1,46 +1,46 @@
 1	lithuanian	x-vnd.Haiku-Expander	784190701
-Expand	ExpanderMenu		Išskleisti
-Close window when done expanding	ExpanderPreferences		Viską išskleidus, užverti langą
-Set destination…	ExpanderMenu		Paskirties vieta…
-Use:	ExpanderPreferences		Naudoti:
-File expanded	ExpanderWindow		Failas išskleistas
-The destination is read only.	ExpanderWindow		Paskirties vieta skirta tik skaitymui.
-Expander: Open	ExpanderWindow		Skleidiklis: parinkite archyvą išskleidimui
- is not supported	ExpanderWindow		nepalaikomas
-Expander settings	ExpanderPreferences		Skleidiklio nuostatos
-Select current	DirectoryFilePanel		Parinkti esamą
-Source	ExpanderWindow		Šaltinis
-Error when expanding archive	ExpanderWindow		Klaida išskleidžiant archyvą
-Hide contents	ExpanderWindow		Nerodyti turinio
-Cancel	ExpanderWindow		Atsisakyti
-Automatically expand files	ExpanderPreferences		Automatiškai išskleisti failus
-Continue	ExpanderWindow		Tęsti
-Destination folder	ExpanderPreferences		Paskirties aplankas
-Other	ExpanderPreferences		Kita
-Cancel	ExpanderPreferences		Atsisakyti
-Expansion	ExpanderPreferences		Išskleidimas
-Select	DirectoryFilePanel		Parinkti
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Paskirties aplankas neegzistuoja. Ar norite jį sukurti?
-Same directory as source (archive) file	ExpanderPreferences		Aplankas, kuriame yra išskleidžiamas archyvas
-Settings	ExpanderMenu		Nuostatos
-Settings…	ExpanderMenu		Nuostatos…
-Expander: Choose destination	DirectoryFilePanel		Skleidiklis: parinkite paskirties vietą
-Select	ExpanderPreferences		Rinktis
-Show contents	ExpanderWindow		Rodyti turinį
-Automatically show contents listing	ExpanderPreferences		Automatiškai rodyti turinį
-OK	ExpanderPreferences		Gerai
-Leave destination folder path empty	ExpanderPreferences		Paskirties aplanko lauką palikti tuščią
-Failed to create the destination folder.	ExpanderWindow		Nepavyko sukurti paskirties aplanko.
-Create	ExpanderWindow		Sukurti
-The file doesn't exist	ExpanderWindow		Failas neegzistuoja
-Stop	ExpanderMenu		Nutraukti
-File	ExpanderMenu		Failas
-Expander	System name		Skleidiklis
-Expand	ExpanderWindow		Išskleisti
-Close	ExpanderMenu		Užverti
-The destination is not a folder.	ExpanderWindow		Nurodyta paskirties vieta nėra aplankas.
-Open destination folder after extraction	ExpanderPreferences		Viską išskleidus, atverti paskirties aplanką
-Set source…	ExpanderMenu		Parinkti šaltinį…
-Show contents	ExpanderMenu		Rodyti turinį
-Stop	ExpanderWindow		Nutraukti
 Destination	ExpanderWindow		Paskirtis
+Other	ExpanderPreferences		Kita
+Automatically show contents listing	ExpanderPreferences		Automatiškai rodyti turinį
+Expander	System name		Skleidiklis
+Expander: Choose destination	DirectoryFilePanel		Skleidiklis: parinkite paskirties vietą
+Set source…	ExpanderMenu		Parinkti šaltinį…
+The destination is not a folder.	ExpanderWindow		Nurodyta paskirties vieta nėra aplankas.
+Close window when done expanding	ExpanderPreferences		Viską išskleidus, užverti langą
+Close	ExpanderMenu		Užverti
+Create	ExpanderWindow		Sukurti
+Show contents	ExpanderMenu		Rodyti turinį
+Settings	ExpanderMenu		Nuostatos
+Expand	ExpanderWindow		Išskleisti
+Open destination folder after extraction	ExpanderPreferences		Viską išskleidus, atverti paskirties aplanką
+Same directory as source (archive) file	ExpanderPreferences		Aplankas, kuriame yra išskleidžiamas archyvas
+Stop	ExpanderWindow		Nutraukti
+Cancel	ExpanderWindow		Atsisakyti
+Expander settings	ExpanderPreferences		Skleidiklio nuostatos
+Error when expanding archive	ExpanderWindow		Klaida išskleidžiant archyvą
+Expand	ExpanderMenu		Išskleisti
+Failed to create the destination folder.	ExpanderWindow		Nepavyko sukurti paskirties aplanko.
+Settings…	ExpanderMenu		Nuostatos…
+Select current	DirectoryFilePanel		Parinkti esamą
+OK	ExpanderPreferences		Gerai
+File expanded	ExpanderWindow		Failas išskleistas
+Automatically expand files	ExpanderPreferences		Automatiškai išskleisti failus
+Select	DirectoryFilePanel		Parinkti
+Show contents	ExpanderWindow		Rodyti turinį
+Stop	ExpanderMenu		Nutraukti
+Expansion	ExpanderPreferences		Išskleidimas
+Set destination…	ExpanderMenu		Paskirties vieta…
+Continue	ExpanderWindow		Tęsti
+ is not supported	ExpanderWindow		nepalaikomas
+Cancel	ExpanderPreferences		Atsisakyti
+Use:	ExpanderPreferences		Naudoti:
+Destination folder	ExpanderPreferences		Paskirties aplankas
+Expander: Open	ExpanderWindow		Skleidiklis: parinkite archyvą išskleidimui
+Leave destination folder path empty	ExpanderPreferences		Paskirties aplanko lauką palikti tuščią
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Paskirties aplankas neegzistuoja. Ar norite jį sukurti?
+The file doesn't exist	ExpanderWindow		Failas neegzistuoja
+Hide contents	ExpanderWindow		Nerodyti turinio
+Source	ExpanderWindow		Šaltinis
+The destination is read only.	ExpanderWindow		Paskirties vieta skirta tik skaitymui.
+Select	ExpanderPreferences		Rinktis
+File	ExpanderMenu		Failas

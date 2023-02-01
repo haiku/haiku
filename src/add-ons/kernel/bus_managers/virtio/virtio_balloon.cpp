@@ -111,7 +111,7 @@ virtio_balloon_register_child_devices(void *cookie)
 
 	device_attr attrs[] = {
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-			{ string: VIRTIO_BALLOON_CONTROLLER_PRETTY_NAME }},
+			{ .string = VIRTIO_BALLOON_CONTROLLER_PRETTY_NAME }},
 		{ NULL }
 	};
 

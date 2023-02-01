@@ -18,6 +18,7 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Clipboard.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -49,13 +50,6 @@
 #include "DiskProbe.h"
 #include "TypeEditors.h"
 
-
-#ifndef __HAIKU__
-#	define DRAW_SLIDER_BAR
-	// if this is defined, the standard slider bar is replaced with
-	// one that looks exactly like the one in the original DiskProbe
-	// (even in Dano/Zeta)
-#endif
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ProbeView"
@@ -96,10 +90,6 @@ public:
 									BMessage* message, off_t size,
 									uint32 blockSize);
 	virtual						~PositionSlider();
-
-#ifdef DRAW_SLIDER_BAR
-	virtual	void				DrawBar();
-#endif
 
 			off_t				Position() const;
 			off_t				Size() const { return fSize; }
@@ -246,7 +236,9 @@ IconView::IconView(const entry_ref* ref, bool isDevice)
 	fBitmap(NULL)
 {
 	UpdateIcon();
-	SetExplicitSize(BSize(32, 32));
+
+	if (fBitmap != NULL)
+		SetExplicitSize(fBitmap->Bounds().Size());
 }
 
 
@@ -259,10 +251,7 @@ IconView::~IconView()
 void
 IconView::AttachedToWindow()
 {
-	if (Parent() != NULL)
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -281,25 +270,21 @@ IconView::Draw(BRect updateRect)
 void
 IconView::UpdateIcon()
 {
-	if (fBitmap == NULL)
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-		fBitmap = new BBitmap(BRect(0, 0, 31, 31), B_RGBA32);
-#else
-		fBitmap = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8);
-#endif
+	if (fBitmap == NULL) {
+		fBitmap = new BBitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_LARGE_ICON)),
+			B_RGBA32);
+	}
 
 	if (fBitmap != NULL) {
 		status_t status = B_ERROR;
 
 		if (fIsDevice) {
 			BPath path(&fRef);
-#ifdef __HAIKU__
 			status = get_device_icon(path.Path(), fBitmap, B_LARGE_ICON);
-#else
-			status = get_device_icon(path.Path(), fBitmap->Bits(), B_LARGE_ICON);
-#endif
-		} else
-			status = BNodeInfo::GetTrackerIcon(&fRef, fBitmap);
+		} else {
+			status = BNodeInfo::GetTrackerIcon(&fRef, fBitmap,
+				(icon_size)(fBitmap->Bounds().IntegerWidth() + 1));
+		}
 
 		if (status != B_OK) {
 			// Try to get generic icon
@@ -330,87 +315,14 @@ PositionSlider::PositionSlider(const char* name, BMessage* message,
 {
 	Reset();
 
-#ifndef DRAW_SLIDER_BAR
 	rgb_color color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
 	UseFillColor(true, &color);
-#endif
 }
 
 
 PositionSlider::~PositionSlider()
 {
 }
-
-
-#ifdef DRAW_SLIDER_BAR
-void
-PositionSlider::DrawBar()
-{
-	BView* view = OffscreenView();
-
-	BRect barFrame = BarFrame();
-	BRect frame = barFrame.InsetByCopy(1, 1);
-	frame.top++;
-	frame.left++;
-	frame.right = ThumbFrame().left + ThumbFrame().Width() / 2;
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-	if (IsEnabled())
-		view->SetHighColor(102, 152, 203);
-	else
-		view->SetHighColor(92, 102, 160);
-#else
-	view->SetHighColor(IsEnabled() ? ui_color(B_CONTROL_HIGHLIGHT_COLOR)
-		: tint_color(ui_color(B_CONTROL_HIGHLIGHT_COLOR), B_DARKEN_1_TINT));
-#endif
-	view->FillRect(frame);
-
-	frame.left = frame.right + 1;
-	frame.right = barFrame.right - 1;
-	view->SetHighColor(tint_color(ViewColor(), IsEnabled() ? B_DARKEN_1_TINT : B_LIGHTEN_1_TINT));
-	view->FillRect(frame);
-
-	rgb_color cornerColor = tint_color(ViewColor(), B_DARKEN_1_TINT);
-	rgb_color darkColor = tint_color(ViewColor(), B_DARKEN_3_TINT);
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-	rgb_color shineColor = {255, 255, 255};
-	rgb_color shadowColor = {0, 0, 0};
-#else
-	rgb_color shineColor = ui_color(B_SHINE_COLOR);
-	rgb_color shadowColor = ui_color(B_SHADOW_COLOR);
-#endif
-	if (!IsEnabled()) {
-		darkColor = tint_color(ViewColor(), B_DARKEN_1_TINT);
-		shineColor = tint_color(shineColor, B_DARKEN_2_TINT);
-		shadowColor = tint_color(shadowColor, B_LIGHTEN_2_TINT);
-	}
-
-	view->BeginLineArray(9);
-
-	// the corners
-	view->AddLine(barFrame.LeftTop(), barFrame.LeftTop(), cornerColor);
-	view->AddLine(barFrame.LeftBottom(), barFrame.LeftBottom(), cornerColor);
-	view->AddLine(barFrame.RightTop(), barFrame.RightTop(), cornerColor);
-
-	// the edges
-	view->AddLine(BPoint(barFrame.left, barFrame.top + 1),
-		BPoint(barFrame.left, barFrame.bottom - 1), darkColor);
-	view->AddLine(BPoint(barFrame.right, barFrame.top + 1),
-		BPoint(barFrame.right, barFrame.bottom), shineColor);
-
-	barFrame.left++;
-	barFrame.right--;
-	view->AddLine(barFrame.LeftTop(), barFrame.RightTop(), darkColor);
-	view->AddLine(barFrame.LeftBottom(), barFrame.RightBottom(), shineColor);
-
-	// the inner edges
-	barFrame.top++;
-	view->AddLine(barFrame.LeftTop(), barFrame.RightTop(), shadowColor);
-	view->AddLine(BPoint(barFrame.left, barFrame.top + 1),
-		BPoint(barFrame.left, barFrame.bottom - 1), shadowColor);
-
-	view->EndLineArray();
-}
-#endif	// DRAW_SLIDER_BAR
 
 
 void
@@ -504,8 +416,8 @@ HeaderView::HeaderView(const entry_ref* ref, DataEditor& editor)
 
 	BFont boldFont = *be_bold_font;
 	BFont plainFont = *be_plain_font;
-	boldFont.SetSize(plainFont.Size() * 0.83);
-	plainFont.SetSize(plainFont.Size() * 0.83);
+	boldFont.SetSize(ceilf(plainFont.Size() * 0.83));
+	plainFont.SetSize(ceilf(plainFont.Size() * 0.83));
 
 	BStringView* stringView = new BStringView(
 		B_EMPTY_STRING, editor.IsAttribute()
@@ -955,10 +867,6 @@ TypeMenuItem::DrawContent()
 	point.x = Frame().right - 4 - Menu()->StringWidth(fType.String());
 	point.y += fontHeight.ascent;
 
-#ifdef HAIKU_TARGET_PLATFORM_BEOS
-	Menu()->SetDrawingMode(B_OP_ALPHA);
-#endif
-
 	Menu()->DrawString(fType.String(), point);
 }
 
@@ -1174,7 +1082,7 @@ ProbeView::ProbeView(entry_ref* ref, const char* attribute,
 	fEditor.SetTo(*ref, attribute);
 
 	int32 baseType = kHexBase;
-	float fontSize = 12.0f;
+	float fontSize = be_plain_font->Size();
 	if (settings != NULL) {
 		settings->FindInt32("base_type", &baseType);
 		settings->FindFloat("font_size", &fontSize);
@@ -1501,7 +1409,7 @@ ProbeView::AttachedToWindow()
 	subMenu = new BMenu(B_TRANSLATE_COMMENT("Block size", "Menu item. "
 		"This is in the same menu window than 'Base' and 'Font size'"));
 	subMenu->SetRadioMode(true);
-	const uint32 blockSizes[] = {512, 1024, 2048};
+	const uint32 blockSizes[] = {512, 1024, 2048, 4096};
 	for (uint32 i = 0; i < sizeof(blockSizes) / sizeof(blockSizes[0]); i++) {
 		char buffer[32];
 		snprintf(buffer, sizeof(buffer), "%" B_PRId32 "%s", blockSizes[i],

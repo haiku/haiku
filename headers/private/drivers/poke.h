@@ -60,7 +60,7 @@ typedef struct {
 	uint32		signature;
 	area_id		area;
 	const char*	name;
-	void*		physical_address;
+	phys_addr_t	physical_address;
 	size_t		size;
 	uint32		flags;
 	uint32		protection;

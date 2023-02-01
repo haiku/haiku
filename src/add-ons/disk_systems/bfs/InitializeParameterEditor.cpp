@@ -56,9 +56,19 @@ InitializeBFSEditor::SetTo(BPartition* partition)
 {
 	BString name = partition->Name();
 	if (name.IsEmpty())
-		name = partition->ContentName();
+		name = partition->RawContentName();
 	if (!name.IsEmpty())
 		fNameControl->SetText(name.String());
+	off_t size = partition->Size();
+	if (size < 2 * 1024 * 1024) {
+		f1KBlockMenuItem->SetMarked(true);
+		f2KBlockMenuItem->SetEnabled(false);
+	} else {
+		f2KBlockMenuItem->SetEnabled(true);
+		f2KBlockMenuItem->SetMarked(true);
+	}
+	f4KBlockMenuItem->SetEnabled(size >= 4 * 1024 * 1024);
+	f8KBlockMenuItem->SetEnabled(size >= 8 * 1024 * 1024);
 }
 
 
@@ -117,24 +127,26 @@ InitializeBFSEditor::_CreateViewControls()
 	BPopUpMenu* blocksizeMenu = new BPopUpMenu("blocksize");
 	BMessage* message = new BMessage(MSG_BLOCK_SIZE);
 	message->AddString("size", "1024");
-	blocksizeMenu->AddItem(new BMenuItem(
-		B_TRANSLATE("1024 (Mostly small files)"), message));
+	f1KBlockMenuItem = new BMenuItem(B_TRANSLATE("1024 (Mostly small files)"), message);
+	blocksizeMenu->AddItem(f1KBlockMenuItem);
+
 	message = new BMessage(MSG_BLOCK_SIZE);
 	message->AddString("size", "2048");
-	BMenuItem* defaultItem = new BMenuItem(B_TRANSLATE("2048 (Recommended)"),
+	f2KBlockMenuItem = new BMenuItem(B_TRANSLATE("2048 (Recommended)"),
 		message);
-	blocksizeMenu->AddItem(defaultItem);
+	blocksizeMenu->AddItem(f2KBlockMenuItem);
 	message = new BMessage(MSG_BLOCK_SIZE);
 	message->AddString("size", "4096");
-	blocksizeMenu->AddItem(new BMenuItem("4096", message));
+	f4KBlockMenuItem = new BMenuItem("4096", message);
+	blocksizeMenu->AddItem(f4KBlockMenuItem);
 	message = new BMessage(MSG_BLOCK_SIZE);
 	message->AddString("size", "8192");
-	blocksizeMenu->AddItem(new BMenuItem(
-		B_TRANSLATE("8192 (Mostly large files)"), message));
+	f8KBlockMenuItem = new BMenuItem(
+		B_TRANSLATE("8192 (Mostly large files)"), message);
+	blocksizeMenu->AddItem(f8KBlockMenuItem);
 
 	fBlockSizeMenuField = new BMenuField(B_TRANSLATE("Blocksize:"),
 		blocksizeMenu);
-	defaultItem->SetMarked(true);
 
 	fUseIndicesCheckBox = new BCheckBox(B_TRANSLATE("Enable query support"),
 		NULL);

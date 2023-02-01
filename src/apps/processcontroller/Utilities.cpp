@@ -12,6 +12,7 @@
 #include <AppMisc.h>
 #include <Alert.h>
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <Deskbar.h>
 #include <FindDirectory.h>
 #include <NodeInfo.h>
@@ -61,12 +62,14 @@ get_team_name_and_icon(info_pack& infoPack, bool icon)
 		B_PATH_NAME_LENGTH - 1);
 
 	if (icon) {
-		infoPack.team_icon = new BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
+		infoPack.team_icon = new BBitmap(BRect(BPoint(0, 0),
+			be_control_look->ComposeIconSize(B_MINI_ICON)), B_RGBA32);
 		if (!tryTrackerIcon
 			|| BNodeInfo::GetTrackerIcon(&info.ref, infoPack.team_icon,
-				B_MINI_ICON) != B_OK) {
+				(icon_size)-1) != B_OK) {
 			BMimeType genericAppType(B_APP_MIME_TYPE);
-			status = genericAppType.GetIcon(infoPack.team_icon, B_MINI_ICON);
+			status = genericAppType.GetIcon(infoPack.team_icon,
+				(icon_size)(infoPack.team_icon->Bounds().IntegerWidth() + 1));
 			// failed to get icon
 			if (status != B_OK) {
 				delete infoPack.team_icon;

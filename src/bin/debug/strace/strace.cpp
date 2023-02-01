@@ -82,6 +82,11 @@ static const char *kUsage =
 "  -d <name>      - Filter the types that have their contents retrieved.\n"
 "                   <name> is one of: strings, enums, simple, complex or\n"
 "                                     pointer_values\n"
+"  -e <names>     - Filter the syscalls.\n"
+"                   <names> is a comma-separated list of names which can be:\n"
+"                       * a syscall name\n"
+"                       * %%memory for memory mapping related syscalls\n"
+"                       * %%network or %%net for network related syscalls\n"
 "  -f             - Fast mode. Syscall arguments contents aren't retrieved.\n"
 "  -h, --help     - Print this text.\n"
 "  -i             - Print integers in decimal format instead of hexadecimal.\n"
@@ -277,6 +282,14 @@ patch_syscalls()
 	Syscall *wait = get_syscall("_kern_wait_for_child");
 	wait->ParameterAt(2)->SetOut(true);
 	wait->ParameterAt(3)->SetOut(true);
+
+	Syscall *createPipe = get_syscall("_kern_create_pipe");
+	createPipe->ParameterAt(0)->SetOut(true);
+	createPipe->ParameterAt(0)->SetCount(2);
+
+	Syscall *socketPair = get_syscall("_kern_socketpair");
+	socketPair->ParameterAt(3)->SetOut(true);
+	socketPair->ParameterAt(3)->SetCount(2);
 }
 
 
@@ -601,8 +614,11 @@ main(int argc, const char *const *argv)
 	bool traceTeam = false;
 	bool traceChildTeams = false;
 	bool traceSignal = true;
-	bool serialOutput = false;
+	bool traceFilter = false;
 	FILE *outputFile = stdout;
+
+	// initialize our syscalls vector and map
+	init_syscalls();
 
 	// parse arguments
 	for (int argi = 1; argi < argc; argi++) {
@@ -645,6 +661,78 @@ main(int argc, const char *const *argv)
 						kCommandName, what);
 					exit(1);
 				}
+			} else if (strcmp(arg, "-e") == 0) {
+				traceFilter = true;
+				// read filter string
+				const char *filterString = NULL;
+				if (arg[2] == '=') {
+					// string follows
+					filterString = arg + 3;
+				} else if (arg[2] == '\0'
+					&& argi + 1 < argc && argv[argi + 1][0] != '-') {
+					// next arg is string
+					filterString = argv[++argi];
+				} else
+					print_usage_and_exit(true);
+				if (filterString != NULL) {
+					char* copy = strdup(filterString);
+					char *tok = strtok(copy, ",");
+					while (tok != NULL) {
+						if (tok[0] == '%') {
+							tok++;
+							// the following should be metadata in kernel/syscalls.h
+							if (strcmp(tok, "memory") == 0) {
+								sSyscallMap["clone_area"]->EnableTracing(true);
+								sSyscallMap["create_area"]->EnableTracing(true);
+								sSyscallMap["delete_area"]->EnableTracing(true);
+								sSyscallMap["find_area"]->EnableTracing(true);
+								sSyscallMap["resize_area"]->EnableTracing(true);
+								sSyscallMap["transfer_area"]->EnableTracing(true);
+								sSyscallMap["mlock"]->EnableTracing(true);
+								sSyscallMap["munlock"]->EnableTracing(true);
+								sSyscallMap["set_memory_protection"]->EnableTracing(true);
+								sSyscallMap["get_memory_properties"]->EnableTracing(true);
+								sSyscallMap["sync_memory"]->EnableTracing(true);
+								sSyscallMap["unmap_memory"]->EnableTracing(true);
+								sSyscallMap["memory_advice"]->EnableTracing(true);
+								sSyscallMap["reserve_address_range"]->EnableTracing(true);
+								sSyscallMap["unreserve_address_range"]->EnableTracing(true);
+								sSyscallMap["set_area_protection"]->EnableTracing(true);
+								sSyscallMap["map_file"]->EnableTracing(true);
+							} else if (strcmp(tok, "network") == 0 || strcmp(tok, "net") == 0) {
+								sSyscallMap["socket"]->EnableTracing(true);
+								sSyscallMap["bind"]->EnableTracing(true);
+								sSyscallMap["shutdown_socket"]->EnableTracing(true);
+								sSyscallMap["connect"]->EnableTracing(true);
+								sSyscallMap["listen"]->EnableTracing(true);
+								sSyscallMap["accept"]->EnableTracing(true);
+								sSyscallMap["recv"]->EnableTracing(true);
+								sSyscallMap["recvfrom"]->EnableTracing(true);
+								sSyscallMap["recvmsg"]->EnableTracing(true);
+								sSyscallMap["send"]->EnableTracing(true);
+								sSyscallMap["sendto"]->EnableTracing(true);
+								sSyscallMap["sendmsg"]->EnableTracing(true);
+								sSyscallMap["getsockopt"]->EnableTracing(true);
+								sSyscallMap["setsockopt"]->EnableTracing(true);
+								sSyscallMap["getpeername"]->EnableTracing(true);
+								sSyscallMap["getsockname"]->EnableTracing(true);
+								sSyscallMap["sockatmark"]->EnableTracing(true);
+								sSyscallMap["socketpair"]->EnableTracing(true);
+								sSyscallMap["get_next_socket_stat"]->EnableTracing(true);
+							} else
+								print_usage_and_exit(true);
+						} else {
+							char buffer[64];
+							snprintf(buffer, sizeof(buffer), "_kern_%s", tok);
+							Syscall* syscall = get_syscall(buffer);
+							if (syscall == NULL)
+								print_usage_and_exit(true);
+							syscall->EnableTracing(true);
+						}
+					    tok = strtok(NULL, ",");
+					}
+					free(copy);
+				}
 			} else if (strcmp(arg, "-f") == 0) {
 				fastMode = true;
 			} else if (strcmp(arg, "-i") == 0) {
@@ -662,7 +750,6 @@ main(int argc, const char *const *argv)
 			} else if (strcmp(arg, "-g") == 0) {
 				traceSignal = false;
 			} else if (strcmp(arg, "-S") == 0) {
-				serialOutput = true;
 				outputFile = NULL;
 			} else if (strncmp(arg, "-o", 2) == 0) {
 				// read filename
@@ -701,9 +788,6 @@ main(int argc, const char *const *argv)
 		contentsFlags = 0;
 	else if (contentsFlags == 0)
 		contentsFlags = Context::ALL;
-
-	// initialize our syscalls vector and map
-	init_syscalls();
 
 	// don't colorize the output, if we don't have a terminal
 	if (outputFile == stdout)
@@ -817,6 +901,8 @@ main(int argc, const char *const *argv)
 				Syscall* syscall = sSyscallVector[syscallNumber];
 
 				if (trace) {
+					if (traceFilter && !syscall->TracingEnabled())
+						break;
 					print_syscall(outputFile, syscall, message.pre_syscall,
 						memoryReader, printArguments, contentsFlags,
 						colorize, decimalFormat, currentThreadID);
@@ -845,6 +931,8 @@ main(int argc, const char *const *argv)
 					record_syscall_stats(*syscall, message.post_syscall);
 
 				if (trace) {
+					if (traceFilter && !syscall->TracingEnabled())
+						break;
 					print_syscall(outputFile, syscall, message.post_syscall,
 						memoryReader, printArguments, contentsFlags,
 						printReturnValues, colorize, decimalFormat,

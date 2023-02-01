@@ -202,14 +202,14 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		marvell_yukon
 		nforce
 		pcnet
-		rtl8139 rtl81xx
+		rtl8125 rtl8139 rtl81xx
 		sis19x sis900 syskonnect
 		via_rhine vt612x
 	}@ # x86,x86_64
 
 	etherpci
 	pegasus
-	usb_asix usb_davicom usb_ecm usb_rndis
+	usb_asix usb_davicom usb_rndis
 	wb840
 ] ;
 
@@ -223,12 +223,12 @@ SYSTEM_ADD_ONS_DRIVERS_SENSOR = [ FFilterByBuildFeatures
 
 
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
-	acpi@x86,x86_64 agp_gart@x86,x86_64 ata
+	acpi@x86,x86_64,arm64 agp_gart@x86,x86_64 ata
 	i2c@x86,x86_64 isa@x86,x86_64
 	mmc
 	scsi
 	pci ps2@x86,x86_64
-	fdt@riscv64,arm
+	fdt@riscv64,arm,arm64
 	random
 	usb
 	virtio
@@ -243,6 +243,7 @@ SYSTEM_ADD_ONS_FILE_SYSTEMS =
 	log_overlay
 	ntfs
 	packagefs
+	ramfs
 	reiserfs
 	udf
 	write_overlay

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-About	2473434391
+1	german	x-vnd.Haiku-About	2259131995
 Revision	AboutView		Stand:
 The Haikuware team and their bounty program\n	AboutView		Das Haikuware-Team und deren Bounty-Programm\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Alle Rechte vorbehalten.
@@ -19,8 +19,8 @@ Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter H
 Testing and bug triaging:\n	AboutView		Tests und Bugtracker-Pflege:\n
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Prozessor:} other{# Prozessoren:}}
 Ralink WiFi Firmware	AboutWindow		Ralink WiFi-Firmware
-%d MiB total	AboutView		%d MiB gesamt
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Der von Haiku selbst erstellte Quellcode, besonders der Kernel und alle Teile des Codes, gegen den Anwendungen gelinkt werden können, wird unter den Bedingungen der <MIT-Lizenz> veröffentlicht. Einige Systembibliotheken, die Code von Dritten enthalten, stehen unter der <LGPL-Lizenz>. Angaben zum Copyright von externen Quellen sind nachfolgend aufgeführt.\n\n
+%d MiB total	AboutView		%d MiB gesamt
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Alle Rechte vorbehalten.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Mesa3D Projekt. Alle Rechte vorbehalten.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Alle Rechte vorbehalten.
@@ -38,6 +38,7 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyrigh
 GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Die Software basiert teilweise auf der Arbeit der Independent JPEG Group.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (Projektgründer)\n\n
+Remove replicant	AboutView		Replikant entfernen
 BSD (3-clause)	AboutWindow		BSD (3-Klausel)
 About this system	AboutWindow		Über dieses System
 %d MiB used (%d%%)	AboutView		%d MiB benutzt (%d%%)
@@ -52,8 +53,8 @@ Source Code: 	AboutView		Quellcode:
 \nCopyrights\n\n	AboutView		\nCopyrights\n\n
 GNU GPL v3	AboutWindow		GNU GPL v3
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm und Werner Lemberg.
-The HaikuPorts team\n	AboutView		Das HaikuPorts-Team\n
 Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Enthält Software des GNU-Projekts, die unter den GPL- und LGPL-Lizenzen veröffentlicht wurde:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © Free Software Foundation.
+The HaikuPorts team\n	AboutView		Das HaikuPorts-Team\n
 Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Enthält Software des FreeBSD-Projekts, die unter der BSD-Lizenz veröffentlicht wurde:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Alle Rechte vorbehalten.
 Copyright © 2002-2003 Steve Lhomme. All rights reserved.	AboutView		Copyright © 2002-2003 Steve Lhomme. Alle Rechte vorbehalten.
 Copyright © 2000-2019 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2019 Fabrice Bellard, et al.
@@ -64,8 +65,8 @@ Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutVie
 Version:	AboutView		Version:
 The BeGeistert team\n	AboutView		Das BeGeistert-Team\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
-License: 	AboutView		Lizenz: 
 Intel (2xxx firmware)	AboutWindow		Intel (2xxx Firmware)
+License: 	AboutView		Lizenz: 
 GNU GPL v2	AboutWindow		GNU GPL v2
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Die Universität von Auckland und Christof Lutteroth\n\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB gesamt, %inaccessible MiB n. verfügbar
@@ -81,7 +82,6 @@ Memory:	AboutView		Arbeitsspeicher:
 Copyright © 2006-2015 Intel Corporation. All rights reserved.	AboutView		Copyright © 2006-2015 Intel Corporation. Alle Rechte vorbehalten.
 BSD (2-clause)	AboutWindow		BSD (2-Klausel)
 Website & marketing:\n	AboutView		Website & Marketing:\n
-Copyright © 2018-2021, Frederic Cambus	AboutView		Copyright © 2018-2021, Frederic Cambus
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		Copyright © 2001 Andy Ritger, basierend auf 'Generalized Timing Formula'.
 …and the many people making donations!\n\n	AboutView		... und die vielen Leute, die durch Spenden geholfen haben!\n\n
 Marvell (firmware)	AboutWindow		Marvell (Firmware)

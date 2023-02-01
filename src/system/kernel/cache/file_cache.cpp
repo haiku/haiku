@@ -959,8 +959,10 @@ cache_prefetch_vnode(struct vnode* vnode, off_t offset, size_t size)
 	VMCache* cache;
 	if (vfs_get_vnode_cache(vnode, &cache, false) != B_OK)
 		return;
-	if (cache->type != CACHE_TYPE_VNODE)
+	if (cache->type != CACHE_TYPE_VNODE) {
+		cache->ReleaseRef();
 		return;
+	}
 
 	file_cache_ref* ref = ((VMVnodeCache*)cache)->FileCacheRef();
 	off_t fileSize = cache->virtual_end;

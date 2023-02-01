@@ -41,6 +41,7 @@ typedef struct scsi_periph_device_info {
 	uint32 max_unmap_descriptor_count;	// max. number of ranges in one command
 
 	uint32 block_size;
+	uint32 physical_block_size;
 	int32 preferred_ccb_size;
 	int32 rw10_enabled;		// 10 byte r/w commands supported; access must be atomic
 	int32 next_tag_action;	// queuing flag for next r/w command; access must be atomic

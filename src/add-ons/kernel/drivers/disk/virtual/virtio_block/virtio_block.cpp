@@ -58,6 +58,7 @@ typedef struct {
 	uint32 					features;
 	uint64					capacity;
 	uint32					block_size;
+	uint32					physical_block_size;
 	status_t				media_status;
 
 	sem_id 	sem_cb;
@@ -93,8 +94,7 @@ typedef struct {
 static device_manager_info* sDeviceManager;
 
 
-void virtio_block_set_capacity(virtio_block_driver_info* info, uint64 capacity,
-	uint32 blockSize);
+bool virtio_block_set_capacity(virtio_block_driver_info* info);
 
 
 const char *
@@ -119,6 +119,8 @@ get_feature_name(uint32 feature)
 			return "flush command";
 		case VIRTIO_BLK_F_TOPOLOGY:
 			return "topology";
+		case VIRTIO_BLK_F_CONFIG_WCE:
+			return "config wce";
 	}
 	return NULL;
 }
@@ -130,6 +132,7 @@ get_geometry(virtio_block_handle* handle, device_geometry* geometry)
 	virtio_block_driver_info* info = handle->info;
 
 	devfs_compute_geometry_size(geometry, info->capacity, info->block_size);
+	geometry->bytes_per_physical_sector = info->physical_block_size;
 
 	geometry->device_type = B_DISK;
 	geometry->removable = false;
@@ -137,8 +140,8 @@ get_geometry(virtio_block_handle* handle, device_geometry* geometry)
 	geometry->read_only = ((info->features & VIRTIO_BLK_F_RO) != 0);
 	geometry->write_once = false;
 
-	TRACE("virtio_block: get_geometry(): %ld, %ld, %ld, %ld, %d, %d, %d, %d\n",
-		geometry->bytes_per_sector, geometry->sectors_per_track,
+	TRACE("virtio_block: get_geometry(): %" B_PRIu32 ", %" B_PRIu32 ", %" B_PRIu32 ", %" B_PRIu32
+		", %d, %d, %d, %d\n", geometry->bytes_per_sector, geometry->sectors_per_track,
 		geometry->cylinder_count, geometry->head_count, geometry->device_type,
 		geometry->removable, geometry->read_only, geometry->write_once);
 
@@ -156,16 +159,8 @@ virtio_block_config_callback(void* driverCookie)
 	if (status != B_OK)
 		return;
 
-	uint32 block_size = 512;
-	if ((info->features & VIRTIO_BLK_F_BLK_SIZE) != 0)
-		block_size = info->config.blk_size;
-	uint64 capacity = info->config.capacity * 512 / block_size;
-
-	if (block_size != info->block_size || capacity != info->capacity) {
-		virtio_block_set_capacity(info, capacity, block_size);
+	if (virtio_block_set_capacity(info))
 		info->media_status = B_DEV_MEDIA_CHANGED;
-	}
-
 }
 
 
@@ -256,7 +251,8 @@ virtio_block_init_device(void* _info, void** _cookie)
 		VIRTIO_BLK_F_BARRIER | VIRTIO_BLK_F_SIZE_MAX
 			| VIRTIO_BLK_F_SEG_MAX | VIRTIO_BLK_F_GEOMETRY
 			| VIRTIO_BLK_F_RO | VIRTIO_BLK_F_BLK_SIZE
-			| VIRTIO_BLK_F_FLUSH | VIRTIO_FEATURE_RING_INDIRECT_DESC,
+			| VIRTIO_BLK_F_FLUSH | VIRTIO_BLK_F_TOPOLOGY
+			| VIRTIO_FEATURE_RING_INDIRECT_DESC,
 		&info->features, &get_feature_name);
 
 	status_t status = info->virtio->read_device_config(
@@ -265,13 +261,7 @@ virtio_block_init_device(void* _info, void** _cookie)
 	if (status != B_OK)
 		return status;
 
-	// and get (initial) capacity
-	uint32 block_size = 512;
-	if ((info->features & VIRTIO_BLK_F_BLK_SIZE) != 0)
-		block_size = info->config.blk_size;
-	uint64 capacity = info->config.capacity * 512 / block_size;
-
-	virtio_block_set_capacity(info, capacity, block_size);
+	virtio_block_set_capacity(info);
 
 	TRACE("virtio_block: capacity: %" B_PRIu64 ", block_size %" B_PRIu32 "\n",
 		info->capacity, info->block_size);
@@ -415,14 +405,14 @@ virtio_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 	virtio_block_handle* handle = (virtio_block_handle*)cookie;
 	virtio_block_driver_info* info = handle->info;
 
-	TRACE("ioctl(op = %ld)\n", op);
+	TRACE("ioctl(op = %" B_PRIu32 ")\n", op);
 
 	switch (op) {
 		case B_GET_MEDIA_STATUS:
 		{
 			*(status_t *)buffer = info->media_status;
 			info->media_status = B_OK;
-			TRACE("B_GET_MEDIA_STATUS: 0x%08lx\n", *(status_t *)buffer);
+			TRACE("B_GET_MEDIA_STATUS: 0x%08" B_PRIx32 "\n", *(status_t *)buffer);
 			return B_OK;
 			break;
 		}
@@ -435,7 +425,7 @@ virtio_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 		case B_GET_GEOMETRY:
 		{
-			if (buffer == NULL /*|| length != sizeof(device_geometry)*/)
+			if (buffer == NULL || length > sizeof(device_geometry))
 				return B_BAD_VALUE;
 
 		 	device_geometry geometry;
@@ -443,7 +433,7 @@ virtio_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 			if (status != B_OK)
 				return status;
 
-			return user_memcpy(buffer, &geometry, sizeof(device_geometry));
+			return user_memcpy(buffer, &geometry, length);
 		}
 
 		case B_GET_ICON_NAME:
@@ -477,49 +467,63 @@ virtio_block_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 }
 
 
-void
-virtio_block_set_capacity(virtio_block_driver_info* info, uint64 capacity,
-	uint32 blockSize)
+bool
+virtio_block_set_capacity(virtio_block_driver_info* info)
 {
-	TRACE("set_capacity(device = %p, capacity = %Ld, blockSize = %ld)\n",
+	// get capacity
+	uint32 blockSize = 512;
+	if ((info->features & VIRTIO_BLK_F_BLK_SIZE) != 0)
+		blockSize = info->config.blk_size;
+	uint64 capacity = info->config.capacity * 512 / blockSize;
+	uint32 physicalBlockSize = blockSize;
+
+	if ((info->features & VIRTIO_BLK_F_TOPOLOGY) != 0
+		&& info->config.topology.physical_block_exp > 0) {
+		physicalBlockSize = blockSize * (1 << info->config.topology.physical_block_exp);
+	}
+
+	TRACE("set_capacity(device = %p, capacity = %" B_PRIu64 ", blockSize = %" B_PRIu32 ")\n",
 		info, capacity, blockSize);
+
+	if (info->block_size == blockSize && info->capacity == capacity)
+		return false;
 
 	info->capacity = capacity;
 
-	if (info->block_size != blockSize) {
-		if (info->block_size != 0) {
-			ERROR("old %" B_PRId32 ", new %" B_PRId32 "\n", info->block_size,
-				blockSize);
-			panic("updating DMAResource not yet implemented...");
-		}
-
-		dma_restrictions restrictions;
-		memset(&restrictions, 0, sizeof(restrictions));
-		if ((info->features & VIRTIO_BLK_F_SIZE_MAX) != 0)
-			restrictions.max_segment_size = info->config.size_max;
-		if ((info->features & VIRTIO_BLK_F_SEG_MAX) != 0)
-			restrictions.max_segment_count = info->config.seg_max;
-
-		// TODO: we need to replace the DMAResource in our IOScheduler
-		status_t status = info->dma_resource->Init(restrictions, blockSize,
-			1024, 32);
-		if (status != B_OK)
-			panic("initializing DMAResource failed: %s", strerror(status));
-
-		info->io_scheduler = new(std::nothrow) IOSchedulerSimple(
-			info->dma_resource);
-		if (info->io_scheduler == NULL)
-			panic("allocating IOScheduler failed.");
-
-		// TODO: use whole device name here
-		status = info->io_scheduler->Init("virtio");
-		if (status != B_OK)
-			panic("initializing IOScheduler failed: %s", strerror(status));
-
-		info->io_scheduler->SetCallback(do_io, info);
+	if (info->block_size != 0) {
+		ERROR("old %" B_PRId32 ", new %" B_PRId32 "\n", info->block_size,
+			blockSize);
+		panic("updating DMAResource not yet implemented...");
 	}
 
+	dma_restrictions restrictions;
+	memset(&restrictions, 0, sizeof(restrictions));
+	if ((info->features & VIRTIO_BLK_F_SIZE_MAX) != 0)
+		restrictions.max_segment_size = info->config.size_max;
+	if ((info->features & VIRTIO_BLK_F_SEG_MAX) != 0)
+		restrictions.max_segment_count = info->config.seg_max;
+
+	// TODO: we need to replace the DMAResource in our IOScheduler
+	status_t status = info->dma_resource->Init(restrictions, blockSize,
+		1024, 32);
+	if (status != B_OK)
+		panic("initializing DMAResource failed: %s", strerror(status));
+
+	info->io_scheduler = new(std::nothrow) IOSchedulerSimple(
+		info->dma_resource);
+	if (info->io_scheduler == NULL)
+		panic("allocating IOScheduler failed.");
+
+	// TODO: use whole device name here
+	status = info->io_scheduler->Init("virtio");
+	if (status != B_OK)
+		panic("initializing IOScheduler failed: %s", strerror(status));
+
+	info->io_scheduler->SetCallback(do_io, info);
+
 	info->block_size = blockSize;
+	info->physical_block_size = physicalBlockSize;
+	return true;
 }
 
 
@@ -557,7 +561,7 @@ virtio_block_register_device(device_node *node)
 	CALLED();
 
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Virtio Block"} },
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "Virtio Block"} },
 		{ NULL }
 	};
 

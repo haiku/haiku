@@ -110,25 +110,42 @@ arm64_address_translate_ ##stage (uint64 addr)		\
 	return (ret);										\
 }
 
+
 ADDRESS_TRANSLATE_FUNC(s1e0r)
 ADDRESS_TRANSLATE_FUNC(s1e0w)
 ADDRESS_TRANSLATE_FUNC(s1e1r)
 ADDRESS_TRANSLATE_FUNC(s1e1w)
 
+
+struct aarch64_fpu_state
+{
+	uint64 regs[32 * 2];
+	uint64 fpsr;
+	uint64 fpcr;
+};
+
+
 /* raw exception frames */
 struct iframe {
-	uint64			sp;
-	uint64			lr;
-	uint64			elr;
-	uint32			spsr;
-	uint32			esr;
-	uint64			x[30];
+	// return info
+	uint64 elr;
+	uint64 spsr;
+	uint64 x[20];
+	uint64 lr;
+	uint64 sp;
+	uint64 fp;
+
+	// exception info
+	uint64 esr;
+	uint64 far;
 };
+
 
 #ifdef __cplusplus
 namespace BKernel {
 	struct Thread;
 }  // namespace BKernel
+
 
 typedef struct arch_cpu_info {
 	uint32						mpidr;
@@ -136,19 +153,26 @@ typedef struct arch_cpu_info {
 } arch_cpu_info;
 #endif
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 static inline void arch_cpu_pause(void)
 {
 	arm64_yield();
 }
 
+
 static inline void arch_cpu_idle(void)
 {
 	arm64_yield();
 }
+
+
+extern addr_t arm64_get_fp(void);
+
 
 #ifdef __cplusplus
 }

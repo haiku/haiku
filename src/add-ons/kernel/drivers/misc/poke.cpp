@@ -285,8 +285,7 @@ poke_control(void* cookie, uint32 op, void* arg, size_t length)
 				return B_BAD_VALUE;
 
 			result = get_memory_map(ioctl.address, ioctl.size, &table, 1);
-			ioctl.physical_address = (void*)(addr_t)table.address;
-				// TODO: mem_map_args::physical_address should be phys_addr_t!
+			ioctl.physical_address = table.address;
 			ioctl.size = table.size;
 			if (user_memcpy(arg, &ioctl, sizeof(mem_map_args)) != B_OK)
 				return B_BAD_ADDRESS;

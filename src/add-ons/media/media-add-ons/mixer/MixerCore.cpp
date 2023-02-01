@@ -655,10 +655,10 @@ MixerCore::_MixThread()
 				uint32 dstSampleOffset
 					= fMixBufferChannelCount * sizeof(float);
 				uint32 srcSampleOffset = info->sample_offset;
-				register char* dst = (char*)&fMixBuffer[channel];
-				register char* src = (char*)info->base;
-				register float gain = info->gain;
-				register int j = fMixBufferFrameCount;
+				char* dst = (char*)&fMixBuffer[channel];
+				char* src = (char*)info->base;
+				float gain = info->gain;
+				int j = fMixBufferFrameCount;
 				do {
 					*(float*)dst += *(const float*)src * gain;
 					dst += dstSampleOffset;

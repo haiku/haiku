@@ -41,13 +41,14 @@ int printf(const char *format, ...) __printflike(1, 2);
 #endif
 
 #ifdef INVARIANTS
-#define KASSERT(cond,msg) do {	\
+#define KASSERT_FREEBSD(cond,msg) do {	\
 	if (!(cond))				\
 		panic msg;				\
 } while (0)
+#define KASSERT(cond,msg) KASSERT_FREEBSD(cond,msg)
 #else
-#define KASSERT(exp,msg) do { \
-} while (0)
+#define KASSERT_FREEBSD(exp,msg) do {} while (0)
+#define KASSERT(cond,msg) KASSERT_FREEBSD(cond,msg)
 #endif
 
 #define DELAY(n) \

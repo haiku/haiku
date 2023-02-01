@@ -32,6 +32,7 @@ _start(int argc, char **argv, char **environment)
 {
 	int returnCode;
 
+	// These are kept here to make our glue code usable under older Haiku versions.
 	argv_save = argv;
 	__main_thread_id = find_thread(NULL);
 

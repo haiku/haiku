@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ShowImage	575555985
+1	english	x-vnd.Haiku-ShowImage	3998703664
 Use as background…	Menus		设置为桌面背景…
 File	Menus		文件
 Slide delay	Menus		幻灯片延迟
@@ -7,6 +7,7 @@ Zoom in	Menus		放大
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		文档 '%s' 已经改变。是否关闭文档?
 Page setup…	Menus		页面启动...
 Print…	Menus		打印...
+Get info…	Menus		获得信息…
 OK	SaveToFile		确认
 Previous page	Menus		上一页
 View	Menus		视图

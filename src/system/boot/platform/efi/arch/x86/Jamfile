@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src system boot platform efi arch x86 ;
 
-SubDirHdrs $(HAIKU_TOP) src system boot platform efi ;
+SubDirHdrs $(SUBDIR) $(DOTDOT) $(DOTDOT) ;
+SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 
 UsePrivateHeaders [ FDirName kernel platform ] ;
 UsePrivateHeaders [ FDirName kernel boot platform efi ] ;
@@ -9,7 +10,7 @@ local platform ;
 for platform in [ MultiBootSubDirSetup efi ] {
 	on $(platform) {
 		{
-			local defines = _BOOT_MODE _BOOT_PLATFORM_EFI ;
+			local defines = _BOOT_PLATFORM_EFI ;
 			defines = [ FDefines $(defines) ] ;
 			SubDirCcFlags $(defines) ;
 			SubDirC++Flags $(defines) -fno-rtti ;
@@ -28,8 +29,16 @@ for platform in [ MultiBootSubDirSetup efi ] {
 			arch_timer.cpp
 			;
 
+		local generic_src =
+			generic_mmu.cpp
+			;
+
 		BootMergeObject boot_platform_efi_x86.o :
 			$(arch_src)
+			$(generic_src)
 			;
+
+		SEARCH on [ FGristFiles $(generic_src) ]
+			= [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 	}
 }

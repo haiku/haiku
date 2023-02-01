@@ -8,7 +8,7 @@ UsePrivateHeaders [ FDirName graphics vesa ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
 {
-	local defines = _BOOT_MODE _BOOT_PLATFORM_BIOS ;
+	local defines = _BOOT_PLATFORM_BIOS ;
 
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;

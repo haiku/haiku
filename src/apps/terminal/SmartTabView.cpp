@@ -22,6 +22,7 @@
 #include <BitmapButton.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Locale.h>
 #include <Message.h>
 #include <Messenger.h>
@@ -52,7 +53,7 @@ SmartTabView::SmartTabView(BRect frame, const char* name, button_width width,
 	ContainerView()->ResizeTo(frame.Width(), frame.Height());
 
 	BRect buttonRect(frame);
-	buttonRect.left = frame.right - B_V_SCROLL_BAR_WIDTH + 1;
+	buttonRect.left = frame.right - be_control_look->GetScrollBarWidth(B_VERTICAL) + 1;
 	buttonRect.bottom = frame.top + TabHeight() - 1;
 	fFullScreenButton = new BBitmapButton(kWindowIconBits, kWindowIconWidth,
 		kWindowIconHeight, kWindowIconFormat, new BMessage(FULLSCREEN));

@@ -1,4 +1,5 @@
-1	italian	application/x-vnd.Cortex.AddOnHost	826663209
+1	italian	application/x-vnd.Cortex.AddOnHost	1256552338
 Continue	CortexAddOnHost		Continua
+Cortex AddOnHost	CortexAddOnHost		AddOnHost della Cortex
 Quit	CortexAddOnHost		Esci
 This program runs in the background, and is started automatically by Cortex when necessary. You probably don't want to start it manually.	CortexAddOnHost		Questo programma funziona in background, ed è avviato automaticamente da Cortex quando necessario. Probabilmente non hai bisogno di avviarlo manualmente.

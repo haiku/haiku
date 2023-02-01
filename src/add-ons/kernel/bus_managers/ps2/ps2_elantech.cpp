@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <keyboard_mouse_driver.h>
+
 #include "ps2_service.h"
 
 
@@ -24,71 +26,6 @@
 #else
 #	define TRACE(x...)
 #endif
-
-
-static int32 generate_event(timer* timer);
-
-
-const bigtime_t kEventInterval = 1000 * 50;
-
-
-class EventProducer {
-public:
-	EventProducer()
-	{
-		fFired = false;
-	}
-
-	status_t
-	FireEvent(elantech_cookie* cookie, uint8* package)
-	{
-		fCookie = cookie;
-		memcpy(fLastPackage, package, sizeof(uint8) * PS2_PACKET_ELANTECH);
-
-		status_t status = add_timer(&fEventTimer, &generate_event,
-			kEventInterval, B_ONE_SHOT_RELATIVE_TIMER);
-		if (status == B_OK)
-			fFired  = true;
-		return status;
-	}
-
-	bool
-	CancelEvent()
-	{
-		if (!fFired)
-			return false;
-		fFired = false;
-		return cancel_timer(&fEventTimer);
-	}
-
-	void
-	InjectEvent()
-	{
-		if (packet_buffer_write(fCookie->ring_buffer, fLastPackage,
-			PS2_PACKET_ELANTECH) != PS2_PACKET_ELANTECH) {
-			// buffer is full, drop new data
-			return;
-		}
-		release_sem_etc(fCookie->sem, 1, B_DO_NOT_RESCHEDULE);
-	}
-
-private:
-	bool				fFired;
-	uint8				fLastPackage[PS2_PACKET_ELANTECH];
-	timer				fEventTimer;
-	elantech_cookie*		fCookie;
-};
-
-
-static EventProducer gEventProducer;
-
-
-static int32
-generate_event(timer* timer)
-{
-	gEventProducer.InjectEvent();
-	return B_HANDLED_INTERRUPT;
-}
 
 
 const char* kElantechPath[4] = {
@@ -124,16 +61,17 @@ const char* kElantechPath[4] = {
 #define HEAD_PACKET		0x1
 #define MOTION_PACKET	0x2
 
-static hardware_specs gHardwareSpecs;
+static touchpad_specs gHardwareSpecs;
 
 
 static status_t
-get_elantech_movement(elantech_cookie *cookie, mouse_movement *movement)
+get_elantech_movement(elantech_cookie *cookie, touchpad_movement *_event, bigtime_t timeout)
 {
-	touch_event event;
+	touchpad_movement event;
 	uint8 packet[PS2_PACKET_ELANTECH];
 
-	status_t status = acquire_sem_etc(cookie->sem, 1, B_CAN_INTERRUPT, 0);
+	status_t status = acquire_sem_etc(cookie->sem, 1, B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT,
+		timeout);
 	if (status < B_OK)
 		return status;
 
@@ -208,22 +146,10 @@ get_elantech_movement(elantech_cookie *cookie, mouse_movement *movement)
 	}
 
 	event.buttons = 0;
-	event.wValue = cookie->fingers == 1 ? 4 :0;
-	status = cookie->movementMaker.EventToMovement(&event, movement);
+	event.fingerWidth = cookie->fingers == 1 ? 4 :0;
 
-	if (cookie->movementMaker.WasEdgeMotion()
-		|| cookie->movementMaker.TapDragStarted()) {
-		gEventProducer.FireEvent(cookie, packet);
-	}
-
+	*_event = event;
 	return status;
-}
-
-
-static void
-default_settings(touchpad_settings *set)
-{
-	memcpy(set, &kDefaultTouchpadSettings, sizeof(touchpad_settings));
 }
 
 
@@ -534,7 +460,6 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 		goto err1;
 	memset(cookie, 0, sizeof(*cookie));
 
-	cookie->movementMaker.Init();
 	cookie->previousZ = 0;
 	*_cookie = cookie;
 
@@ -542,8 +467,6 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 	dev->cookie = cookie;
 	dev->disconnect = &elantech_disconnect;
 	dev->handle_int = &elantech_handle_int;
-
-	default_settings(&cookie->settings);
 
 	dev->packet_size = PS2_PACKET_ELANTECH;
 
@@ -637,9 +560,6 @@ elantech_open(const char *name, uint32 flags, void **_cookie)
 	gHardwareSpecs.realMaxPressure = REAL_MAX_PRESSURE;
 	gHardwareSpecs.maxPressure = MAX_PRESSURE;
 
-	cookie->movementMaker.SetSettings(&cookie->settings);
-	cookie->movementMaker.SetSpecs(&gHardwareSpecs);
-
 	if (ps2_dev_command(dev, PS2_CMD_ENABLE, NULL, 0, NULL, 0) != B_OK)
 		goto err4;
 
@@ -665,8 +585,6 @@ err1:
 status_t
 elantech_close(void *_cookie)
 {
-	gEventProducer.CancelEvent();
-
 	elantech_cookie *cookie = (elantech_cookie*)_cookie;
 
 	ps2_dev_command_timeout(cookie->dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0,
@@ -683,7 +601,7 @@ elantech_close(void *_cookie)
 	// without a complete shutdown.
 	status_t status = ps2_reset_mouse(cookie->dev);
 	if (status != B_OK) {
-		INFO("ps2: reset failed\n");
+		INFO("ps2_elantech: reset failed\n");
 		return B_ERROR;
 	}
 
@@ -704,29 +622,25 @@ status_t
 elantech_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 {
 	elantech_cookie *cookie = (elantech_cookie*)_cookie;
-	mouse_movement movement;
+	touchpad_read read;
 	status_t status;
 
 	switch (op) {
-		case MS_READ:
-			TRACE("ELANTECH: MS_READ get event\n");
-			if ((status = get_elantech_movement(cookie, &movement)) != B_OK)
-				return status;
-			return user_memcpy(buffer, &movement, sizeof(movement));
-
 		case MS_IS_TOUCHPAD:
 			TRACE("ELANTECH: MS_IS_TOUCHPAD\n");
-			return B_OK;
+			if (buffer == NULL)
+				return B_OK;
+			return user_memcpy(buffer, &gHardwareSpecs, sizeof(gHardwareSpecs));
 
-		case MS_SET_TOUCHPAD_SETTINGS:
-			TRACE("ELANTECH: MS_SET_TOUCHPAD_SETTINGS\n");
-			user_memcpy(&cookie->settings, buffer, sizeof(touchpad_settings));
-			return B_OK;
-
-		case MS_SET_CLICKSPEED:
-			TRACE("ELANTECH: ioctl MS_SETCLICK (set click speed)\n");
-			return user_memcpy(&cookie->movementMaker.click_speed, buffer,
-				sizeof(bigtime_t));
+		case MS_READ_TOUCHPAD:
+			TRACE("ELANTECH: MS_READ get event\n");
+			if (user_memcpy(&read.timeout, &(((touchpad_read*)buffer)->timeout),
+					sizeof(bigtime_t)) != B_OK)
+				return B_BAD_ADDRESS;
+			if ((status = get_elantech_movement(cookie, &read.u.touchpad, read.timeout)) != B_OK)
+				return status;
+			read.event = MS_READ_TOUCHPAD;
+			return user_memcpy(buffer, &read, sizeof(read));
 
 		default:
 			INFO("ELANTECH: unknown opcode: 0x%" B_PRIx32 "\n", op);
@@ -756,9 +670,6 @@ elantech_handle_int(ps2_dev* dev)
 {
 	elantech_cookie* cookie = (elantech_cookie*)dev->cookie;
 
-	// we got a real event cancel the fake event
-	gEventProducer.CancelEvent();
-
 	uint8 val;
 	val = cookie->dev->history[0].data;
  	cookie->buffer[cookie->packet_index] = val;
@@ -771,9 +682,9 @@ elantech_handle_int(ps2_dev* dev)
 	if (packet_buffer_write(cookie->ring_buffer,
 				cookie->buffer, cookie->dev->packet_size)
 			!= cookie->dev->packet_size) {
-			// buffer is full, drop new data
-			return B_HANDLED_INTERRUPT;
-		}
+		// buffer is full, drop new data
+		return B_HANDLED_INTERRUPT;
+	}
 	release_sem_etc(cookie->sem, 1, B_DO_NOT_RESCHEDULE);
 	return B_INVOKE_SCHEDULER;
 }

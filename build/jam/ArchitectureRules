@@ -273,7 +273,6 @@ rule KernelArchitectureSetup architecture
 		case x86 :
 			HAIKU_KERNEL_PLATFORM ?= bios_ia32 ;
 			HAIKU_BOOT_TARGETS += bios_ia32 efi pxe_ia32 ;
-			HAIKU_ANYBOOT_LEGACY = 1 ;
 
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 			# offset in floppy image (>= sizeof(haiku_loader))
@@ -377,6 +376,7 @@ rule KernelArchitectureSetup architecture
 	# Common boot-related cflags which apply to all loaders
 	HAIKU_BOOT_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(ccBaseFlags) ;
 	HAIKU_BOOT_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(c++BaseFlags) ;
+	HAIKU_BOOT_OPTIM = -Os ;
 	HAIKU_BOOT_LINKFLAGS = ;
 	HAIKU_BOOT_LDFLAGS = -Bstatic ;
 
@@ -594,6 +594,7 @@ rule KernelArchitectureSetup architecture
 
 	# defines
 	HAIKU_KERNEL_DEFINES += _KERNEL_MODE ;
+	HAIKU_BOOT_DEFINES += _BOOT_MODE ;
 
 	# kernel add-on glue code
 	HAIKU_KERNEL_ADDON_BEGIN_GLUE_CODE = <$(architecture)>crtbeginS.o
@@ -724,20 +725,20 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel file_systems bfs ;
 	EnableWerror src add-ons kernel file_systems cdda ;
 	EnableWerror src add-ons kernel file_systems ext2 ;
-#	EnableWerror src add-ons kernel file_systems fat ;
+	EnableWerror src add-ons kernel file_systems fat ;
 	EnableWerror src add-ons kernel file_systems googlefs ;
 	EnableWerror src add-ons kernel file_systems iso9660 ;
 	EnableWerror src add-ons kernel file_systems layers ;
 #	EnableWerror src add-ons kernel file_systems netfs ;
-#	EnableWerror src add-ons kernel file_systems nfs ;
+	EnableWerror src add-ons kernel file_systems nfs ;
 	EnableWerror src add-ons kernel file_systems nfs4 ;
 #	EnableWerror src add-ons kernel file_systems ntfs ;
 	EnableWerror src add-ons kernel file_systems packagefs ;
-#	EnableWerror src add-ons kernel file_systems ramfs ;
-#	EnableWerror src add-ons kernel file_systems reiserfs ;
+	EnableWerror src add-ons kernel file_systems ramfs ;
+	EnableWerror src add-ons kernel file_systems reiserfs ;
 	EnableWerror src add-ons kernel file_systems udf ;
 	EnableWerror src add-ons kernel file_systems userlandfs ;
-	EnableWerror src add-ons kernel file_systems xfs ;
+#	EnableWerror src add-ons kernel file_systems xfs ;
 	EnableWerror src add-ons kernel generic ;
 	EnableWerror src add-ons kernel network ;
 	EnableWerror src add-ons kernel partitioning_systems ;
@@ -747,7 +748,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons media media-add-ons ;
 	EnableWerror src add-ons media plugins ape_reader ;
 	EnableWerror src add-ons media plugins au_reader ;
-#	EnableWerror src add-ons media plugins ffmpeg ;
+	EnableWerror src add-ons media plugins ffmpeg ;
 	EnableWerror src add-ons media plugins raw_decoder ;
 	EnableWerror src add-ons print ;
 	EnableWerror src add-ons screen_savers ;
@@ -771,6 +772,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons translators tiff ;
 	EnableWerror src add-ons translators wonderbrush ;
 	EnableWerror src add-ons print ;
+	EnableWerror src bin debug strace ;
 	EnableWerror src bin desklink ;
 	EnableWerror src bin listusb ;
 	EnableWerror src bin multiuser ;

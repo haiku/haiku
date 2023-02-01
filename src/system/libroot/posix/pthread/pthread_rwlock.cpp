@@ -1,4 +1,5 @@
 /*
+ * Copyright 2022, Haiku, Inc. All rights reserved.
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -192,6 +193,9 @@ private:
 	{
 		if (timeout == 0)
 			return B_TIMED_OUT;
+
+		if (writer_count == 1 && owner == find_thread(NULL))
+			return EDEADLK;
 
 		Waiter waiter(writer);
 		waiters.Add(&waiter);

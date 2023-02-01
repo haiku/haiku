@@ -289,8 +289,13 @@ RNDISDevice::Read(uint8 *buffer, size_t *numBytes)
 			fActualLengthRead);
 	}
 
+	if (fReadHeader[2] + fReadHeader[3] > fReadHeader[1]) {
+		TRACE_ALWAYS("Received frame data goes past end of frame: %" B_PRIu32 " + %" B_PRIu32
+			" > %" B_PRIu32, fReadHeader[2], fReadHeader[3], fReadHeader[1]);
+	}
+
 	if (fReadHeader[4] != 0 || fReadHeader[5] != 0 || fReadHeader[6] != 0) {
-		TRACE_ALWAYS("Received frame has out of bound data: off %08" B_PRIx32 " len %08" B_PRIx32
+		TRACE_ALWAYS("Received frame has out of band data: off %08" B_PRIx32 " len %08" B_PRIx32
 			" count %08" B_PRIx32 "\n", fReadHeader[4], fReadHeader[5], fReadHeader[6]);
 	}
 
@@ -304,13 +309,16 @@ RNDISDevice::Read(uint8 *buffer, size_t *numBytes)
 	}
 
 	*numBytes = fReadHeader[3];
-	memcpy(buffer, fReadHeader + 11, fReadHeader[3]);
+	int offset = fReadHeader[2] + 2 * sizeof(uint32);
+	memcpy(buffer, (uint8*)fReadHeader + offset, fReadHeader[3]);
 
 	TRACE("Received data packet len %08" B_PRIx32 " data [off %08" B_PRIx32 " len %08" B_PRIx32 "]\n",
 		fReadHeader[1], fReadHeader[2], fReadHeader[3]);
 
 	// Advance to next packet
-	fReadHeader += fReadHeader[1];
+	fReadHeader = (uint32*)((uint8*)fReadHeader + fReadHeader[1]);
+
+	// Are we past the end of the buffer? If so, prepare to receive another one on the next read
 	if ((uint32)((uint8*)fReadHeader - fReadBuffer) >= fActualLengthRead)
 		fReadHeader = NULL;
 

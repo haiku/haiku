@@ -39,6 +39,7 @@ dump_partition_info(const BPartition* partition)
 	printf("\tContentSize(): %s\n", string_for_size(partition->ContentSize(),
 		size, sizeof(size)));
 	printf("\tBlockSize(): %" B_PRId32 "\n", partition->BlockSize());
+	printf("\tPhysicalBlockSize(): %" B_PRId32 "\n", partition->PhysicalBlockSize());
 	printf("\tIndex(): %" B_PRId32 "\n", partition->Index());
 	printf("\tStatus(): %" B_PRId32 "\n\n", partition->Status());
 	printf("\tContainsFileSystem(): %s\n",
@@ -51,7 +52,7 @@ dump_partition_info(const BPartition* partition)
 	printf("\tIsBusy(): %s\n\n", partition->IsBusy() ? "true" : "false");
 	printf("\tFlags(): %" B_PRIx32 "\n\n", partition->Flags());
 	printf("\tName(): %s\n", partition->Name());
-	printf("\tContentName(): %s\n", partition->ContentName());
+	printf("\tContentName(): %s\n", partition->RawContentName());
 	printf("\tType(): %s\n", partition->Type());
 	printf("\tContentType(): %s\n", partition->ContentType());
 	printf("\tID(): %" B_PRIx32 "\n\n", partition->ID());

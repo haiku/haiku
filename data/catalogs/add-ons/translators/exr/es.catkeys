@@ -1,2 +1,6 @@
-1	spanish; castilian	x-vnd.Haiku-EXRTranslator	3088028300
+1	spanish; castilian	x-vnd.Haiku-EXRTranslator	395109412
+a division of Lucasfilm Entertainment Company Ltd	ConfigView		una división de Lucasfilm Entertainment Company Ltd
+Version %d.%d.%d, %s	ConfigView		Versión %d.%d.%d, %s
+EXR images	EXRTranslator		imágenes EXR
+EXR image	EXRTranslator		imagen EXR
 EXR Settings	main		Configuración EXR

@@ -316,15 +316,18 @@ slower_sample:
 	}
 }
 
-extern int open_maybe_packaged(BootVolume& volume, const char* path,
-	int openMode);
 
 void
 ucode_load(BootVolume& volume)
 {
 	cpuid_info info;
-	if (get_current_cpuid(&info, 0, 0) != B_OK
-		|| strncmp(info.eax_0.vendor_id, "GenuineIntel", 12) != 0)
+	if (get_current_cpuid(&info, 0, 0) != B_OK)
+		return;
+
+	bool isIntel = strncmp(info.eax_0.vendor_id, "GenuineIntel", 12) == 0;
+	bool isAmd = strncmp(info.eax_0.vendor_id, "AuthenticAMD", 12) == 0;
+
+	if (!isIntel && !isAmd)
 		return;
 
 	if (get_current_cpuid(&info, 1, 0) != B_OK)
@@ -337,11 +340,19 @@ ucode_load(BootVolume& volume)
 		family += info.eax_1.extended_family;
 		model += (info.eax_1.extended_model << 4);
 	}
-	snprintf(path, sizeof(path), "system/data/firmware/intel-ucode/"
-		"%02x-%02x-%02x", family, model, info.eax_1.stepping);
+	if (isIntel) {
+		snprintf(path, sizeof(path), "system/non-packaged/data/firmware/intel-ucode/"
+			"%02x-%02x-%02x", family, model, info.eax_1.stepping);
+	} else if (family < 0x15) {
+		snprintf(path, sizeof(path), "system/non-packaged/data/firmware/amd-ucode/"
+			"microcode_amd.bin");
+	} else {
+		snprintf(path, sizeof(path), "system/non-packaged/data/firmware/amd-ucode/"
+			"microcode_amd_fam%02xh.bin", family);
+	}
 	dprintf("ucode_load: %s\n", path);
 
-	int fd = open_maybe_packaged(volume, path, O_RDONLY);
+	int fd = open_from(volume.RootDirectory(), path, O_RDONLY);
 	if (fd < B_OK) {
 		dprintf("ucode_load: couldn't find microcode\n");
 		return;

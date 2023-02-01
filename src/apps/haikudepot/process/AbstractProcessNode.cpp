@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2021-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -21,6 +21,8 @@
 
 AbstractProcessNode::AbstractProcessNode(AbstractProcess* process)
 	:
+	fLock(),
+	fListener(NULL),
 	fProcess(process)
 {
 }
@@ -36,6 +38,23 @@ AbstractProcess*
 AbstractProcessNode::Process() const
 {
 	return fProcess;
+}
+
+
+bool
+AbstractProcessNode::IsRunning()
+{
+	return Process()->ProcessState() != PROCESS_COMPLETE;
+}
+
+
+void
+AbstractProcessNode::SetListener(ProcessListener* listener)
+{
+	if (fListener != listener) {
+		AutoLocker<BLocker> locker(&fLock);
+		fListener = listener;
+	}
 }
 
 

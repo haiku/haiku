@@ -20,7 +20,7 @@
 Stack::Stack()
 	:	fExploreThread(-1),
 		fFirstExploreDone(false),
-		fStopThreads(false),
+		fExploreSem(-1),
 		fAllocator(NULL),
 		fObjectIndex(1),
 		fObjectMaxCount(1024),
@@ -31,6 +31,12 @@ Stack::Stack()
 
 	mutex_init(&fStackLock, "usb stack lock");
 	mutex_init(&fExploreLock, "usb explore lock");
+	fExploreSem = create_sem(0, "usb explore sem");
+	if (fExploreSem < B_OK) {
+		TRACE_ERROR("failed to create semaphore\n");
+		return;
+	}
+
 
 	size_t objectArraySize = fObjectMaxCount * sizeof(Object *);
 	fObjectArray = (Object **)malloc(objectArraySize);
@@ -50,52 +56,6 @@ Stack::Stack()
 		return;
 	}
 
-	// Check for host controller modules.
-	//
-	// While using a fixed list of names is inflexible, it allows us to control
-	// the order in which we try modules. There are controllers/BIOSes that
-	// require UHCI/OHCI to be initialized before EHCI or otherwise they
-	// refuse to publish any high-speed devices.
-	//
-	// On other systems, the ordering is probably ensured because the EHCI
-	// controller is required to have a higher PCI function number than the
-	// companion host controllers (per the EHCI specs) and it would therefore
-	// be enumerated as the last item. As this does not apply to us, we have to
-	// ensure ordering using another method.
-	//
-	// Furthermore, on some systems, there can be ports shared between
-	// EHCI and XHCI, defaulting to EHCI. The XHCI module will switch these
-	// ports before the EHCI module discovers them.
-	const char *moduleNames[] = {
-		"busses/usb/xhci",
-		"busses/usb/uhci",
-		"busses/usb/ohci",
-		"busses/usb/ehci",
-		NULL
-	};
-
-	TRACE("looking for host controller modules\n");
-	for (uint32 i = 0; moduleNames[i]; i++) {
-		TRACE("looking for module %s\n", moduleNames[i]);
-
-		usb_host_controller_info *module = NULL;
-		if (get_module(moduleNames[i], (module_info **)&module) != B_OK)
-			continue;
-
-		TRACE("adding module %s\n", moduleNames[i]);
-		if (module->add_to(this) < B_OK) {
-			put_module(moduleNames[i]);
-			continue;
-		}
-
-		TRACE("module %s successfully loaded\n", moduleNames[i]);
-	}
-
-	if (fBusManagers.Count() == 0) {
-		TRACE_ERROR("no bus managers available\n");
-		return;
-	}
-
 	fExploreThread = spawn_kernel_thread(ExploreThread, "usb explore",
 		B_LOW_PRIORITY, this);
 	resume_thread(fExploreThread);
@@ -111,7 +71,8 @@ Stack::Stack()
 Stack::~Stack()
 {
 	int32 result;
-	fStopThreads = true;
+	delete_sem(fExploreSem);
+	fExploreSem = -1;
 	wait_for_thread(fExploreThread, &result);
 
 	mutex_lock(&fStackLock);
@@ -133,8 +94,6 @@ Stack::~Stack()
 status_t
 Stack::InitCheck()
 {
-	if (fBusManagers.Count() == 0)
-		return ENODEV;
 	return B_OK;
 }
 
@@ -250,9 +209,15 @@ Stack::ExploreThread(void *data)
 {
 	Stack *stack = (Stack *)data;
 
-	while (!stack->fStopThreads) {
+	while (acquire_sem_etc(stack->fExploreSem, 1, B_RELATIVE_TIMEOUT,
+		USB_DELAY_HUB_EXPLORE) != B_BAD_SEM_ID) {
 		if (mutex_lock(&stack->fExploreLock) != B_OK)
 			break;
+
+		int32 semCount = 0;
+		get_sem_count(stack->fExploreSem, &semCount);
+		if (semCount > 0)
+			acquire_sem_etc(stack->fExploreSem, semCount, B_RELATIVE_TIMEOUT, 0);
 
 		rescan_item *rescanList = NULL;
 		change_item *changeItem = NULL;
@@ -278,7 +243,6 @@ Stack::ExploreThread(void *data)
 		stack->fFirstExploreDone = true;
 		mutex_unlock(&stack->fExploreLock);
 		stack->RescanDrivers(rescanList);
-		snooze(USB_DELAY_HUB_EXPLORE);
 	}
 
 	return B_OK;
@@ -555,4 +519,11 @@ Stack::UninstallNotify(const char *driverName)
 	}
 
 	return B_NAME_NOT_FOUND;
+}
+
+
+void
+Stack::TriggerExplore()
+{
+	release_sem(fExploreSem);
 }

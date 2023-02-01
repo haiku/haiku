@@ -289,16 +289,16 @@ MMCBus::_WorkerThread(void* cookie)
 			uint16_t rca = response >> 16;
 				
 			device_attr attrs[] = {
-				{ B_DEVICE_BUS, B_STRING_TYPE, {string: "mmc" }},
-				{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "mmc device" }},
-				{ B_DEVICE_VENDOR_ID, B_UINT32_TYPE, {ui32: vendor}},
-				{ B_DEVICE_ID, B_STRING_TYPE, {string: name}},
-				{ B_DEVICE_UNIQUE_ID, B_UINT32_TYPE, {ui32: serial}},
-				{ "mmc/revision", B_UINT16_TYPE, {ui16: revision}},
-				{ "mmc/month", B_UINT8_TYPE, {ui8: month}},
-				{ "mmc/year", B_UINT16_TYPE, {ui16: year}},
-				{ kMmcRcaAttribute, B_UINT16_TYPE, {ui16: rca}},
-				{ kMmcTypeAttribute, B_UINT8_TYPE, {ui8: cardType}},
+				{ B_DEVICE_BUS, B_STRING_TYPE, {.string = "mmc" }},
+				{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "mmc device" }},
+				{ B_DEVICE_VENDOR_ID, B_UINT32_TYPE, {.ui32 = vendor}},
+				{ B_DEVICE_ID, B_STRING_TYPE, {.string = name}},
+				{ B_DEVICE_UNIQUE_ID, B_UINT32_TYPE, {.ui32 = serial}},
+				{ "mmc/revision", B_UINT16_TYPE, {.ui16 = revision}},
+				{ "mmc/month", B_UINT8_TYPE, {.ui8 = month}},
+				{ "mmc/year", B_UINT16_TYPE, {.ui16 = year}},
+				{ kMmcRcaAttribute, B_UINT16_TYPE, {.ui16 = rca}},
+				{ kMmcTypeAttribute, B_UINT8_TYPE, {.ui8 = cardType}},
 				{}
 			};
 

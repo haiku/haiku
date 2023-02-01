@@ -132,7 +132,7 @@ struct ELF64Class {
 	{
 #if defined(_BOOT_PLATFORM_BIOS)
 		// Assume the real 64-bit base address is KERNEL_LOAD_BASE_64_BIT and
-		// the mappings in the loader address space are at KERNEL_LOAD_BASE_32_BIT.
+		// the mappings in the loader address space are at KERNEL_LOAD_BASE.
 
 		void* address = (void*)(addr_t)(*_address & 0xffffffff);
 #else

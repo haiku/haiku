@@ -7,6 +7,7 @@
 
 
 #include <condition_variable.h>
+#include <dpc.h>
 #include <lock.h>
 #include "random.h"
 #include <virtio.h>
@@ -24,9 +25,7 @@
 
 extern device_manager_info* gDeviceManager;
 extern random_for_controller_interface *gRandom;
-
-
-#define BUFFER_SIZE 16
+extern dpc_module_info *gDPC;
 
 
 class VirtioRNGDevice {
@@ -36,15 +35,15 @@ public:
 
 			status_t			InitCheck();
 
-			status_t			Read(void* buffer, size_t* numBytes);
-
+protected:
+	static	int32				HandleTimerHook(struct timer* timer);
+	static	void				HandleDPC(void* arg);
 
 private:
 	static	void				_RequestCallback(void* driverCookie,
 									void *cookie);
 			void				_RequestInterrupt();
-
-			device_node*		fNode;
+			status_t			_Enqueue();
 
 			virtio_device_interface* fVirtio;
 			virtio_device*		fVirtioDevice;
@@ -53,14 +52,13 @@ private:
 			uint32				fFeatures;
 			::virtio_queue		fVirtioQueue;
 
-			physical_entry 		fEntry;
-			uint8				fBuffer[BUFFER_SIZE];
-			uint32				fOffset;
-
 			spinlock			fInterruptLock;
 			ConditionVariable	fInterruptCondition;
 			ConditionVariableEntry fInterruptConditionEntry;
 			bool				fExpectsInterrupt;
+
+			timer				fTimer;
+			void*				fDPCHandle;
 };
 
 

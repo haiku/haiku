@@ -1,51 +1,52 @@
-1	czech	x-vnd.Haiku-Expander	3300517306
-Expand	ExpanderMenu		Rozbalit
-Expanding '%s'…	ExpanderWindow		Rozbaluji '%s'…
-Close window when done expanding	ExpanderPreferences		Zavřít okno po skončení rozbalování
-Set destination…	ExpanderMenu		Nastavit cíl...
-Use:	ExpanderPreferences		Použití:
-File expanded	ExpanderWindow		Soubor rozbalen
-The destination is read only.	ExpanderWindow		Cíl je určen pouze pro čtení.
-Expander: Open	ExpanderWindow		Rozbalovač: Otevřít
- is not supported	ExpanderWindow		 není podporováno
-Expander settings	ExpanderPreferences		Nastavení rozbalovače
-Select current	DirectoryFilePanel		Vybrat aktuální
-Source	ExpanderWindow		Zdroj
-Error when expanding archive	ExpanderWindow		Chyba při rozbalování archivu
-Hide contents	ExpanderWindow		Skrýt obsah
-Cancel	ExpanderWindow		Zrušit
-Automatically expand files	ExpanderPreferences		Automaticky rozbalit soubory
-Continue	ExpanderWindow		Pokračovat
-Destination folder	ExpanderPreferences		Cílový adresář
-Other	ExpanderPreferences		Ostatní
-Cancel	ExpanderPreferences		Zrušit
-Expansion	ExpanderPreferences		Rozbalení
-Select	DirectoryFilePanel		Vybrat
-The folder was either moved, renamed or not supported.	ExpanderWindow		Adresář byl přesunut, přejmenován nebo není podporován.
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Cílový adresář neexistuje. Chcete jej vytvořit?
-Same directory as source (archive) file	ExpanderPreferences		Stejná složka, jako zdrojový soubor (archív)
-Settings	ExpanderMenu		Nastavení
-Settings…	ExpanderMenu		Nastavení...
-Expander: Choose destination	DirectoryFilePanel		Rozbalovač: Vybrat cíl
-Select	ExpanderPreferences		Vybrat
-Show contents	ExpanderWindow		Zobrazit obsah
-Automatically show contents listing	ExpanderPreferences		Automaticky zobrazit výpis obsahu
-OK	ExpanderPreferences		OK
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Opravdu chcete přerušit rozbalování tohoto archívu? Rozbalené položky nemusí být úplné.
-Leave destination folder path empty	ExpanderPreferences		Nechat cestu cílového adresáře prázdnou
-Failed to create the destination folder.	ExpanderWindow		Chyba při vytváření cílového adresáře.
-Select '%s'…	DirectoryFilePanel		Vybráno '%s'…
-Create	ExpanderWindow		Vytvořit
-The file doesn't exist	ExpanderWindow		Soubor neexistuje
-Stop	ExpanderMenu		Zastavit
-File	ExpanderMenu		Soubor
-Expander	System name		Rozbalovač
-Expand	ExpanderWindow		Rozbalit
-Close	ExpanderMenu		Zavřít
-The destination is not a folder.	ExpanderWindow		Cíl není složka.
-Open destination folder after extraction	ExpanderPreferences		Otevřít cílový soubor po rozbalení
-Creating listing for '%s'…	ExpanderWindow		Vytvářím seznam souborů pro '%s'…
-Set source…	ExpanderMenu		Nastavit zdroj...
-Show contents	ExpanderMenu		Zobrazit obsah
-Stop	ExpanderWindow		Zastavit
+1	czech	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Cíl
+Other	ExpanderPreferences		Ostatní
+Automatically show contents listing	ExpanderPreferences		Automaticky zobrazit výpis obsahu
+Expander	System name		Rozbalovač
+Expander: Choose destination	DirectoryFilePanel		Rozbalovač: Vybrat cíl
+Set source…	ExpanderMenu		Nastavit zdroj...
+OK	ExpanderWindow		OK
+The destination is not a folder.	ExpanderWindow		Cíl není složka.
+The folder was either moved, renamed or not supported.	ExpanderWindow		Adresář byl přesunut, přejmenován nebo není podporován.
+Close window when done expanding	ExpanderPreferences		Zavřít okno po skončení rozbalování
+Close	ExpanderMenu		Zavřít
+Create	ExpanderWindow		Vytvořit
+Creating listing for '%s'…	ExpanderWindow		Vytvářím seznam souborů pro '%s'…
+Show contents	ExpanderMenu		Zobrazit obsah
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Opravdu chcete přerušit rozbalování tohoto archívu? Rozbalené položky nemusí být úplné.
+Settings	ExpanderMenu		Nastavení
+Expand	ExpanderWindow		Rozbalit
+Open destination folder after extraction	ExpanderPreferences		Otevřít cílový soubor po rozbalení
+Same directory as source (archive) file	ExpanderPreferences		Stejná složka, jako zdrojový soubor (archív)
+Stop	ExpanderWindow		Zastavit
+Cancel	ExpanderWindow		Zrušit
+Expander settings	ExpanderPreferences		Nastavení rozbalovače
+Error when expanding archive	ExpanderWindow		Chyba při rozbalování archivu
+Expand	ExpanderMenu		Rozbalit
+Failed to create the destination folder.	ExpanderWindow		Chyba při vytváření cílového adresáře.
+Settings…	ExpanderMenu		Nastavení...
+Select current	DirectoryFilePanel		Vybrat aktuální
+Expanding '%s'…	ExpanderWindow		Rozbaluji '%s'…
+OK	ExpanderPreferences		OK
+File expanded	ExpanderWindow		Soubor rozbalen
+Automatically expand files	ExpanderPreferences		Automaticky rozbalit soubory
+Select	DirectoryFilePanel		Vybrat
+Show contents	ExpanderWindow		Zobrazit obsah
+Stop	ExpanderMenu		Zastavit
+Select '%s'…	DirectoryFilePanel		Vybráno '%s'…
+Expansion	ExpanderPreferences		Rozbalení
+Set destination…	ExpanderMenu		Nastavit cíl...
+Continue	ExpanderWindow		Pokračovat
+ is not supported	ExpanderWindow		 není podporováno
+Cancel	ExpanderPreferences		Zrušit
+Use:	ExpanderPreferences		Použití:
+Destination folder	ExpanderPreferences		Cílový adresář
+Expander: Open	ExpanderWindow		Rozbalovač: Otevřít
+Leave destination folder path empty	ExpanderPreferences		Nechat cestu cílového adresáře prázdnou
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Cílový adresář neexistuje. Chcete jej vytvořit?
+The file doesn't exist	ExpanderWindow		Soubor neexistuje
+Hide contents	ExpanderWindow		Skrýt obsah
+Source	ExpanderWindow		Zdroj
+The destination is read only.	ExpanderWindow		Cíl je určen pouze pro čtení.
+Select	ExpanderPreferences		Vybrat
+File	ExpanderMenu		Soubor

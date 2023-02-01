@@ -17,6 +17,7 @@ KernelAddon usb_serial :
 	Option.cpp
 	Prolific.cpp
 	Silicon.cpp
+	WinChipHead.cpp
 ;
 
 AddResources usb_serial : usb_serial.rdef ;

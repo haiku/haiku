@@ -8,7 +8,7 @@ Log to file	PoorMan		ファイルにログを出力
 Shutting down.	PoorMan		シャットダウン中。
 Error Dir	PoorMan		ディレクトリエラー
 Web folder:	PoorMan		Web フォルダー:
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Web に公開するフォルダーを選択してください。\n\nPoorMan にデフォルトの \"public_html\" をホームフォルダーに作成させることもできます。\nまたは、その代わりにユーザーのフォルダーを指定することもできます。
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Web に公開するフォルダーを選択してください。\n\nPoorMan にデフォルトの \"public_html\" をホームフォルダーに作らせることもできます。\nまたは、その代わりにユーザーのフォルダーを指定することもできます。
 Log To Console	PoorMan		コンソールにログを出力
 File Name	PoorMan		ファイル名
 Starting up... 	PoorMan		起動中です...

@@ -84,8 +84,6 @@ private:
 			uint32                          fCodecInitStatus;
 
 			// For video (color space conversion):
-			AVPicture			fSrcFrame;
-			AVPicture			fDstFrame;
 			AVFrame*			fFrame;
 			SwsContext*			fSwsContext;
 

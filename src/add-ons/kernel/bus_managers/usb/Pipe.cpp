@@ -186,9 +186,18 @@ BulkPipe::InitCommon(int8 deviceAddress, uint8 endpointAddress,
 	usb_speed speed, pipeDirection direction, size_t maxPacketSize,
 	uint8 interval, int8 hubAddress, uint8 hubPort)
 {
-	// some devices have bogus descriptors
-	if (speed == USB_SPEED_HIGHSPEED && maxPacketSize != 512)
-		maxPacketSize = 512;
+	// See comments in ControlPipe::InitCommon.
+	switch (speed) {
+		case USB_SPEED_HIGHSPEED:
+			maxPacketSize = 512;
+			break;
+		case USB_SPEED_SUPERSPEED:
+			maxPacketSize = 1024;
+			break;
+
+		default:
+			break;
+	}
 
 	Pipe::InitCommon(deviceAddress, endpointAddress, speed, direction,
 		maxPacketSize, interval, hubAddress, hubPort);
@@ -355,8 +364,8 @@ ControlPipe::InitCommon(int8 deviceAddress, uint8 endpointAddress,
 	uint8 interval, int8 hubAddress, uint8 hubPort)
 {
 	// The USB 2.0 spec section 5.5.3 gives fixed max packet sizes for the
-	// different speeds. The USB 3.1 specs defines the max packet size to a
-	// fixed 512 for control endpoints in 9.6.6. Some devices ignore these
+	// different speeds. The USB 3.1 specs defines some fixed max packet sizes,
+	// including for control endpoints in 9.6.6. Some devices ignore these
 	// values and use bogus ones, so we restrict them here.
 	switch (speed) {
 		case USB_SPEED_LOWSPEED:

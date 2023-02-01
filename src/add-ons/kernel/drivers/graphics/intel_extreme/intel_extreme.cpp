@@ -879,10 +879,26 @@ intel_extreme_init(intel_info &info)
 		info.shared_info->fdi_link_frequency = 0;
 	}
 
-	if (info.device_type.InGroup(INTEL_GROUP_HAS)) {
+	if (info.device_type.InGroup(INTEL_GROUP_BDW)) {
 		uint32 lcpll = read32(info, LCPLL_CTL);
 		if ((lcpll & LCPLL_CD_SOURCE_FCLK) != 0)
 			info.shared_info->hw_cdclk = 800000;
+		else if ((read32(info, FUSE_STRAP) & HSW_CDCLK_LIMIT) != 0)
+			info.shared_info->hw_cdclk = 450000;
+		else if ((lcpll & LCPLL_CLK_FREQ_MASK) == LCPLL_CLK_FREQ_450)
+			info.shared_info->hw_cdclk = 450000;
+		else if ((lcpll & LCPLL_CLK_FREQ_MASK) == LCPLL_CLK_FREQ_54O_BDW)
+			info.shared_info->hw_cdclk = 540000;
+		else if ((lcpll & LCPLL_CLK_FREQ_MASK) == LCPLL_CLK_FREQ_337_5_BDW)
+			info.shared_info->hw_cdclk = 337500;
+		else
+			info.shared_info->hw_cdclk = 675000;
+	} else if (info.device_type.InGroup(INTEL_GROUP_HAS)) {
+		uint32 lcpll = read32(info, LCPLL_CTL);
+		if ((lcpll & LCPLL_CD_SOURCE_FCLK) != 0)
+			info.shared_info->hw_cdclk = 800000;
+		else if ((read32(info, FUSE_STRAP) & HSW_CDCLK_LIMIT) != 0)
+			info.shared_info->hw_cdclk = 450000;
 		else if ((lcpll & LCPLL_CLK_FREQ_MASK) == LCPLL_CLK_FREQ_450)
 			info.shared_info->hw_cdclk = 450000;
 		/* ULT type is missing

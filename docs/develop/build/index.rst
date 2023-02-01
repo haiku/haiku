@@ -18,5 +18,6 @@ The build system also offers various ways to configure and customize your Haiku 
 
 .. toctree::
 
+   /build/sourcecode
    /build/compilers
    /build/repositories/README

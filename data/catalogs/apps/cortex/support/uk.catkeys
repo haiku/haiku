@@ -83,7 +83,7 @@ MPEG format family	MediaString		Сімейство форматів MPEG
 Center	MediaString		Центр
  kb/s (max)	MediaString		 кбіт/c (макс)
 Monochrome	MediaString		Монохромний
-Private Be media type	MediaString		Приватний Be медіа тип
+Private Be media type	MediaString		Приватний тип медіа Be
 24 bit UVL	MediaString		24-бітовий UVL
 32 bit HSV	MediaString		32-бітовий HSV
 ID	MediaString		ID

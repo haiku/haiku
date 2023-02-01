@@ -7,6 +7,8 @@
 #include <OS.h>
 #include "lists2.h"
 
+#include <stdio.h>
+
 void *sll_find(long nextoff, void *head, sll_compare_func func, void *id)
 {
 	void *p = head;
@@ -18,7 +20,7 @@ void *sll_find(long nextoff, void *head, sll_compare_func func, void *id)
 			return p;
 		p = sll_next(nextoff, p);
 		if (!count--) {
-			dprintf("sll_find: WARNING: 5000 nodes to search ??? looks more of a loop.\n");
+			fprintf(stderr, "sll_find: WARNING: 5000 nodes to search ??? looks more of a loop.\n");
 			return NULL;
 		}
 	}
@@ -44,7 +46,7 @@ status_t sll_insert_tail(long nextoff, void **head, void *item)
 		return EINVAL;
 
 	if (*(void **)(((char *)item)+nextoff)) {
-		dprintf("sll_insert_tail: WARNING: %p->next NOT NULL\n", item);
+		fprintf(stderr, "sll_insert_tail: WARNING: %p->next NOT NULL\n", item);
 		*(void **)(((char *)item)+nextoff) = NULL;
 	}
 

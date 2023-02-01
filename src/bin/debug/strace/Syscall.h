@@ -19,7 +19,7 @@ using std::vector;
 class Type {
 public:
 	Type(string typeName, TypeHandler *handler)
-		: fTypeName(typeName), fHandler(handler) {}
+		: fTypeName(typeName), fHandler(handler), fCount(1) {}
 
 	const string &TypeName() const	{ return fTypeName; }
 
@@ -31,9 +31,13 @@ public:
 
 	TypeHandler	*Handler() const	{ return fHandler; }
 
+	uint32 Count() const			{ return fCount; }
+	void SetCount(uint32 count)		{ fCount = count; }
+
 private:
 	string		fTypeName;
 	TypeHandler	*fHandler;
+	uint32		fCount;
 };
 
 // Parameter
@@ -67,7 +71,8 @@ class Syscall {
 public:
 	Syscall(string name, string returnTypeName, TypeHandler *returnTypeHandler)
 		: fName(name),
-		  fReturnType(new Type(returnTypeName, returnTypeHandler))
+		  fReturnType(new Type(returnTypeName, returnTypeHandler)),
+		  fTracingEnabled(false)
 	{
 	}
 
@@ -114,10 +119,21 @@ public:
 		return NULL;
 	}
 
+	bool TracingEnabled() const
+	{
+		return fTracingEnabled;
+	}
+
+	void EnableTracing(bool enable)
+	{
+		fTracingEnabled = enable;
+	}
+
 private:
 	string				fName;
 	Type				*fReturnType;
 	vector<Parameter*>	fParameters;
+	bool				fTracingEnabled;
 };
 
 #endif	// STRACE_SYSCALL_H

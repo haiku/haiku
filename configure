@@ -67,6 +67,9 @@ options:
                               on to the make building the build tools.
   --no-downloads              Do not download anything. Useful when trying to
                               bootstrap and build Haiku from source only.
+  --sysroot                   The location of the cross-compiler sysroot,
+                              primarily for CI environments or cross-compilers
+                              used outside of the Haiku build system.
   --target-arch <arch>        Haiku only: Specify the target architecture to
                               build for. Must be one of the architectures of the
                               host system. The installed build tools for that
@@ -688,6 +691,11 @@ supportedTargetArchs="
 #
 while [ $# -gt 0 ] ; do
 	case "$1" in
+		--sysroot)
+			assertparam "$1" $#
+			crossToolsSysroot=$2
+			shift 2
+			;;
 		--bootstrap)
 			assertparams "$1" 3 $#
 			HOST_HAIKU_PORTER="`absolute_path $2`"
@@ -1006,6 +1014,7 @@ else
 					HAIKU_USE_GCC_GRAPHITE_$targetArch` \
 				HAIKU_USE_GCC_PIPE=$HAIKU_USE_GCC_PIPE \
 				HAIKU_USE_GDB="$gdbSources" \
+				HAIKU_USE_SYSROOT="$crossToolsSysroot" \
 				"$script" $scriptArgs "$sourceDir" "$buildCrossTools" \
 					"$crossToolsDir" $buildCrossToolsJobs || exit 1
 			else

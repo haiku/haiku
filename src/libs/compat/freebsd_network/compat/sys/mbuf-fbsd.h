@@ -212,6 +212,16 @@ m_cljset(struct mbuf *m, void *cl, int type)
 	m->m_flags |= M_EXT;
 }
 
+/* These are for OpenBSD compatibility. */
+#define	MTAG_ABI_COMPAT		0		/* compatibility ABI */
+
+static __inline struct m_tag *
+m_tag_find(struct mbuf *m, uint16_t type, struct m_tag *start)
+{
+	return (SLIST_EMPTY(&m->m_pkthdr.tags) ? (struct m_tag *)NULL :
+		m_tag_locate(m, MTAG_ABI_COMPAT, type, start));
+}
+
 /* mbufq */
 
 struct mbufq {

@@ -9,7 +9,7 @@ Preparing to archive	file:ZipperThread.cpp		Przygotowanie do archiwizacji
 Let them continue	file:ZipOMatic.cpp		Pozwól im kontynuować
 Continue	file:ZipOMaticWindow.cpp		Wznów
 Archive created OK	file:ZipOMaticWindow.cpp		Archiwum utworzono pomyślnie
-{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{Dodano # plik.} few{Dodano # pliki.} many{Dodano # plików.} other{Dodano # pliku.}}
+{0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{Dodano # plik} few{Dodano # pliki} many{Dodano # plików} other{Dodano # pliku}}.
 Stop	file:ZipOMaticWindow.cpp		Zatrzymaj
 Stopped	file:ZipOMaticWindow.cpp		Zatrzymane
 Archive	file:ZipperThread.cpp		Archiwum

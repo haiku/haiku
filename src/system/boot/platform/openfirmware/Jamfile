@@ -1,11 +1,9 @@
 SubDir HAIKU_TOP src system boot platform openfirmware ;
 
-SubDirC++Flags -D_BOOT_MODE -fno-rtti ;
-
 UsePrivateHeaders [ FDirName graphics common ] ;
 
 {
-	local defines = _BOOT_MODE _BOOT_PLATFORM_OPENFIRMWARE ;
+	local defines = _BOOT_PLATFORM_OPENFIRMWARE ;
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) -fno-rtti ;

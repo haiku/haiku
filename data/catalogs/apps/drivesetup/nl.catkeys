@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-DriveSetup	4048496535
+1	dutch; flemish	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		Kon partitie %s niet onttrekken.
 Mount all	MainWindow		Alles betrekken
 Disk	MainWindow		Schijf
@@ -14,6 +14,7 @@ Block size	PartitionList		Blok grootte
 The panel experienced a problem!	MainWindow		Het paneel ervoer een probleem!
 Device	DiskView		Apparaat
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Bent u zeker dat u de Intel Uitgebreide Partitie wil formatteren? Elke sub partitie hierin zal overschreven worden als u doorgaat. U wordt nog gevraagd voordat de wijzigingen geschreven worden naar de schijf.
+Physical block size	PartitionList		Fysieke blokgrootte
 Unmount	MainWindow		Onttrekken
 Failed to format the partition %s!\n	MainWindow		Formatteren van partitie %s is mislukt!\n
 Partition size	CreateParametersPanel		Partitiegrootte

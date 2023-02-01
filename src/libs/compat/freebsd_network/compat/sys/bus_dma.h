@@ -100,8 +100,9 @@
  * architectures
  */
 #define	BUS_DMA_NOWRITE		0x100
+#ifndef __HAIKU__
 #define	BUS_DMA_NOCACHE		0x200
-#define	BUS_DMA_ISA		0x400	/* map memory for AXP ISA dma */
+#endif
 
 /* Forwards needed by prototypes below. */
 struct mbuf;
@@ -163,11 +164,11 @@ void busdma_lock_mutex(void *arg, bus_dma_lock_op_t op);
  */
 /* XXX Should probably allow specification of alignment */
 int bus_dma_tag_create(bus_dma_tag_t parent, bus_size_t alignment,
-		       bus_size_t boundary, bus_addr_t lowaddr,
-		       bus_addr_t highaddr, bus_dma_filter_t *filtfunc,
-		       void *filtfuncarg, bus_size_t maxsize, int nsegments,
-		       bus_size_t maxsegsz, int flags, bus_dma_lock_t *lockfunc,
-		       void *lockfuncarg, bus_dma_tag_t *dmat);
+			   bus_addr_t boundary, bus_addr_t lowaddr,
+			   bus_addr_t highaddr, bus_dma_filter_t *filtfunc,
+			   void *filtfuncarg, bus_size_t maxsize, int nsegments,
+			   bus_size_t maxsegsz, int flags, bus_dma_lock_t *lockfunc,
+			   void *lockfuncarg, bus_dma_tag_t *dmat);
 
 int bus_dma_tag_destroy(bus_dma_tag_t dmat);
 
@@ -210,6 +211,9 @@ int bus_dmamem_alloc(bus_dma_tag_t dmat, void** vaddr, int flags,
  */
 void bus_dmamem_free(bus_dma_tag_t dmat, void *vaddr, bus_dmamap_t map);
 
+/* Haiku extension, OpenBSD compatibility */
+void bus_dmamem_free_tagless(void *vaddr, size_t size);
+
 /*
  * Map the buffer buf into bus space using the dmamap map.
  */
@@ -240,24 +244,19 @@ int bus_dmamap_load_uio(bus_dma_tag_t dmat, bus_dmamap_t map,
 			int flags);
 
 /*
- * Perform a synchronization operation on the given map.
+ * Perform a synchronization operation on the given map. If the map
+ * is NULL we have a fully IO-coherent system.
  */
-void _bus_dmamap_sync(bus_dma_tag_t, bus_dmamap_t, bus_dmasync_op_t);
-#define bus_dmamap_sync(dmat, dmamap, op) 			\
-	do {							\
-		if ((dmamap) != NULL)				\
-			_bus_dmamap_sync(dmat, dmamap, op);	\
-	} while (0)
+void bus_dmamap_sync(bus_dma_tag_t dmat, bus_dmamap_t dmamap, bus_dmasync_op_t op);
+
+/* Haiku extension, OpenBSD compatibility */
+void bus_dmamap_sync_etc(bus_dma_tag_t dmat, bus_dmamap_t dmamap,
+	bus_addr_t offset, bus_size_t length, bus_dmasync_op_t op);
 
 /*
  * Release the mapping held by map.
  */
-void _bus_dmamap_unload(bus_dma_tag_t dmat, bus_dmamap_t map);
-#define bus_dmamap_unload(dmat, dmamap) 			\
-	do {							\
-		if ((dmamap) != NULL)				\
-			_bus_dmamap_unload(dmat, dmamap);	\
-	} while (0)
+void bus_dmamap_unload(bus_dma_tag_t dmat, bus_dmamap_t dmamap);
 
 
 #endif /* _BUS_DMA_H_ */

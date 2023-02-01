@@ -578,7 +578,7 @@ ECMDevice::_NotifyCallback(void *cookie, int32 status, void *data,
 				device->fUpstreamSpeed = speed->upstream_speed;
 				device->fDownstreamSpeed = speed->downstream_speed;
 				device->fHasConnection = true;
-				TRACE("connection speed change to %ld/%ld\n",
+				TRACE("connection speed change to %" B_PRId32 "/%" B_PRId32 "\n",
 					speed->downstream_speed, speed->upstream_speed);
 				linkStateChange = true;
 				break;

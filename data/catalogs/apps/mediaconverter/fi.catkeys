@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaConverter	2816184527
+1	finnish	x-vnd.Haiku-MediaConverter	338319367
 Input file not recognized as Audio or Video	MediaConverter		Syötetiedostoa ei tunnistettu audioksi tai videoksi
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f kehystä sekunnissa
 Video quality: %3d%%	MediaConverter		Videolaatu: %3d%%
@@ -12,6 +12,7 @@ MediaConverter+:SaveDirectory	MediaConverter		Mediamuunnin+:Tallenna hakemisto
 Error creating video.	MediaConverter		Videon luominen epäonnistui.
 Cancelling	MediaConverter		Perutaan
 None available	Audio codecs		Ei mitään saatavilla
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Tiedostossa on useita audio- tai videoraitoja, vain ensimmäinen jokaisesta muunnetaan.
 No file selected	MediaConverter-FileInfo		Ei tiedostoa valittuna
 High	MediaConverter		Korkea
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Tiedostoa ei tunnistettu tuettuna mediatiedostona:} other{# tiedostoa ei tunnistettu tuettuina mediatiedostoina:}}
@@ -26,6 +27,7 @@ Error loading a file	MediaConverter		Virhe ladattaessa tiedostoa
 Encoder parameters	MediaConverter-EncoderWindow		Koodausparametrit
 Open…	Menu		Avaa...
 Audio encoding:	MediaConverter		Äänikoodaus:
+Multi-track file detected	MediaConverter		Moniraitainen tiedosto havaittu
 Audio quality: %3d%%	MediaConverter		Äänen laatu: %3d%%
 Cancelling…	MediaConverter		Perutaan...
 Output file '%filename' created	MediaConverter		Tulostetiedosto ’%filename’ on luotu
@@ -63,6 +65,7 @@ File	Menu		Tiedosto
 Video quality not supported	MediaConverter		Videolaatua ei tueta
 Select this folder	MediaConverter		Valitse tämä kansio
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanava
+Understood	MediaConverter		Ymmärretty
 %d bit 	MediaFileInfo		%d bitti 
 No video	Video codecs list		Ei videota
 Continue	MediaConverter		Jatka

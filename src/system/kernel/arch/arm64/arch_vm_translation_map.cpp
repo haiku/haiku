@@ -96,6 +96,14 @@ arch_vm_translation_map_init_post_area(kernel_args* args)
 	area_id area = vm_create_null_area(VMAddressSpace::KernelID(), "physical map area", &address,
 		B_EXACT_ADDRESS, KERNEL_PMAP_SIZE, 0);
 
+	if (args->arch_args.uart.kind[0] != 0) {
+		// debug uart is already mapped by the efi loader
+		address = (void*)args->arch_args.uart.regs.start;
+		area_id area = vm_create_null_area(VMAddressSpace::KernelID(),
+			"debug uart map area", &address, B_EXACT_ADDRESS,
+			ROUNDUP(args->arch_args.uart.regs.size, B_PAGE_SIZE), 0);
+	}
+
 	return B_OK;
 }
 

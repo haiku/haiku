@@ -232,7 +232,7 @@ TTrackerState::LoadSettingsIfNeeded()
 	Add(fTypeAheadFiltering
 		= new BooleanValueSetting("TypeAheadFiltering", false));
 	Add(fGenerateImageThumbnails
-		= new BooleanValueSetting("GenerateImageThumbnails", false));
+		= new BooleanValueSetting("GenerateImageThumbnails", true));
 	Add(fSingleWindowBrowse
 		= new BooleanValueSetting("SingleWindowBrowse", false));
 	Add(fShowNavigator = new BooleanValueSetting("ShowNavigator", false));

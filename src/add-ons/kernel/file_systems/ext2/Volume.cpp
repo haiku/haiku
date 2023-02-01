@@ -109,10 +109,8 @@ Volume::HasExtendedAttributes() const
 const char*
 Volume::Name() const
 {
-	if (fSuperBlock.name[0])
-		return fSuperBlock.name;
-
-	return fName;
+	// The name may be empty, in that case, userspace will generate one.
+	return fSuperBlock.name;
 }
 
 
@@ -167,6 +165,16 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	if (!_VerifySuperBlock())
 		return B_ERROR;
+
+	if ((fSuperBlock.State() & EXT2_FS_STATE_VALID) == 0
+		|| (fSuperBlock.State() & EXT2_FS_STATE_ERROR) != 0) {
+		if (!IsReadOnly()) {
+			FATAL("Volume::Mount(): can't mount R/W, volume not clean\n");
+			return B_NOT_ALLOWED;
+		} else {
+			FATAL("Volume::Mount(): warning: volume not clean\n");
+		}
+	}
 
 	// initialize short hands to the superblock (to save byte swapping)
 	fBlockShift = fSuperBlock.BlockShift();
@@ -233,8 +241,10 @@ Volume::Mount(const char* deviceName, uint32 flags)
 	status = opener.GetSize(&diskSize);
 	if (status != B_OK)
 		return status;
-	if (diskSize < ((off_t)NumBlocks() << BlockShift()))
+	if ((diskSize + fBlockSize) <= ((off_t)NumBlocks() << BlockShift())) {
+		FATAL("diskSize is too small for the number of blocks!\n");
 		return B_BAD_VALUE;
+	}
 
 	fBlockCache = opener.InitCache(NumBlocks(), fBlockSize);
 	if (fBlockCache == NULL)
@@ -320,26 +330,6 @@ Volume::Mount(const char* deviceName, uint32 flags)
 
 	// all went fine
 	opener.Keep();
-
-	if (!fSuperBlock.name[0]) {
-		// generate a more or less descriptive volume name
-		off_t divisor = 1ULL << 40;
-		char unit = 'T';
-		if (diskSize < divisor) {
-			divisor = 1UL << 30;
-			unit = 'G';
-			if (diskSize < divisor) {
-				divisor = 1UL << 20;
-				unit = 'M';
-			}
-		}
-
-		double size = double((10 * diskSize + divisor - 1) / divisor);
-			// %g in the kernel does not support precision...
-
-		snprintf(fName, sizeof(fName), "%g %cB Ext2 Volume",
-			size / 10, unit);
-	}
 
 	return B_OK;
 }

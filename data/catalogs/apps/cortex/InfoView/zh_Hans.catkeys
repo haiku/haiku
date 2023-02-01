@@ -1,0 +1,59 @@
+1	english	application/x-vnd.Cortex.InfoView	2382053937
+Offset	InfoView		偏移
+Description	DormantNodeInfoView		描述
+Byte order	InfoView		字节顺序
+Connection	InfoView		连接
+Output formats	DormantNodeInfoView		输出格式
+History	InfoView		历史
+Input formats	DormantNodeInfoView		输入格式
+Signature	AppNodeInfoView		标记
+Video data between	InfoView		视频数据介于
+Any number	DormantNodeInfoView	For 'Max. instances' field	任何数字
+Flags	InfoView		标识
+Media output	InfoView		媒体输出
+Active lines	InfoView		激活频道
+Buffer size	InfoView		缓冲大小
+\n- Quality:	FileNodeInfoView		\n- 品质：
+Kinds	LiveNodeInfoView		类型
+Application	AppNodeInfoView		应用
+Flavor flags	DormantNodeInfoView		特点标识
+Max. instances	DormantNodeInfoView		最大实例数
+\n- Duration:	FileNodeInfoView		\n- 时长：
+Dormant media node	DormantNodeInfoView		休眠媒体节点
+Latency	LiveNodeInfoView		延迟
+Media type	InfoView		媒体类型
+Live media node	LiveNodeInfoView		活跃的媒体节点
+Field rate	InfoView		场率
+Kinds	DormantNodeInfoView		类型
+%title% info	InfoView		%title% 信息
+Node ID	LiveNodeInfoView		节点ID
+Resolution	InfoView		分辨率
+Chunk size	InfoView		块大小
+File format	AppNodeInfoView		文件格式
+Matrix mask	InfoView		Matrix遮罩
+Channel mask	InfoView		通道遮罩
+Orientation	InfoView		方向
+Live file-interface node	FileNodeInfoView		活跃的文件-界面节点
+Channels	InfoView		通道
+Sample rate	InfoView		采样频率
+File format	FileNodeInfoView		文件格式
+(no file)	FileNodeInfoView		（没有文件）
+Media input	InfoView		媒体输入
+Bit rate	InfoView		比特率
+Input format	DormantNodeInfoView		输入格式
+Format	InfoView		格式
+Version	AppNodeInfoView		版本
+AddOn ID	DormantNodeInfoView		插件 ID
+Frame size	InfoView		帧大小
+Flavor ID	DormantNodeInfoView		特点ID
+Run mode	LiveNodeInfoView		运行模式
+\n- Codec:	FileNodeInfoView		\n- 解码：
+Port	LiveNodeInfoView		端口
+Output format	DormantNodeInfoView		输出格式
+Aspect ratio	InfoView		宽高比
+Application-owned node	AppNodeInfoView		应用拥有节点
+Tracks	FileNodeInfoView		轨道
+Source	InfoView		媒体源
+Destination	InfoView		目标
+Copyright	FileNodeInfoView		版权所有
+ID:	FileNodeInfoView		ID:

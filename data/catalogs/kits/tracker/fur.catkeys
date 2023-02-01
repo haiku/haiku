@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-libtracker	2915475646
+1	friulian	x-vnd.Haiku-libtracker	464753347
 Created	ContainerWindow		Creât
 Icon	AttributesView		Icone
 Open and make preferred	OpenWithWindow		Vierç e rint preferît
@@ -28,7 +28,7 @@ Unmount	ContainerWindow		Dismonte
 Eject when unmounting	AutoMounterSettings		Pare fûr une volte che al è dismontât
 Searching for disks to mount…	StatusWindow		Daûr a cirî discs di montâ…
 Value	AttributesView		Valôr
-Information	InfoWindow		Informazion
+Information	InfoWindow		Informazions
 Error emptying Trash	FSUtils		Erôr tal disvuedâ la scovacere
 Opens with:	InfoWindow		Vierç cun:
 Size	QueryPoseView		Dimension
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Icone bitmap piçule
 Would you like to find a suitable application to open the file?	FSUtils		Cjatâ une aplicazion adate par vierzi il file?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		No si pues sostituî une cartele o un colegament simbolic cuntun file.
+(unknown)	InfoWindow		(no cognossût)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# datis>}}
 Trailing \\.	libtracker		\\ ae fin.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Su %func\nal è falît find_directory().\nMotîf: %error
@@ -84,6 +85,7 @@ Include trash	FindPanel		Inclût scovacere
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Met a puest
 Modified	FindPanel		Modificât
+ (block size: 	InfoWindow		 (dimension bloc: 
 Select all	QueryContainerWindow		Selezione dutis
 Generate image thumbnails	SettingsView		Gjenere miniaturis di imagjins
 Select…	FilePanelPriv		Selezione…
@@ -115,14 +117,14 @@ Edit templates…	TemplatesMenu		Modifiche modei…
 8-bit unsigned integer	AttributesView		Intîr cence segn a 8 bit
 %s info	InfoWindow	window title	Informazions su %s
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used doprât -- %free libar)
-Hide dotfiles	SettingsView		Plate i file .*
+Hide dotfiles	SettingsView		Plate i files .*
 Trash	Model		Scovacere
-Enable type-ahead filtering	SettingsView		Abilite filtri scriture anticipade
+Enable type-ahead filtering	SettingsView		Abilite filtri pe ricercje datilografant
 copy	FSUtils	filename copy	copie
 New folder%ld	FSUtils		Gnove cartele%ld
 Location	OpenWithWindow		Posizion
 %Ld B	WidgetAttributeText		%Ld B
-Resize to fit	QueryContainerWindow		Jemple
+Resize to fit	QueryContainerWindow		Adate
 List folders first	SettingsView		Liste prime lis cartelis
 Find	FSUtils		Cjate
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Un element clamât \"%name\" al esist za in cheste cartele. Sostituîlu cul colegament simbolic che si sta creant?
@@ -167,6 +169,7 @@ Read	FilePermissionsView		Leture
 There was an error writing the attribute.	WidgetAttributeText		Si è presentât un erôr tal scrivi l'atribût.
 Path	Default Query Columns		Percors
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se si cambie non a %target, %osName al podaès funzionâ mâl!\n\nContinuâ pardabon?
+Filesystem:	InfoWindow		Filesystem:
 Could not open \"%name\" (%error). 	FSUtils		Nol è stât pussibil vierzi \"%name\" (%error). 
 Media parameter group	AttributesView		Grup di parametris multimediâi
 %name info	InfoWindow	InfoWindow Title	Informazions su %name
@@ -230,7 +233,7 @@ Select…	DeskWindow		Selezione…
 Files cannot be moved or deleted from a read-only volume.	PoseView		No si pues spostâ o eliminâ i file di un volum in dome-leture.
 Edit name	FilePanelPriv		Modifiche non
 There was an error deleting \"%name\":\n\t%error	FSUtils		Si è presentât un erôr tal eliminâ \"%name\":\n\t%error
-Resize to fit	ContainerWindow		Jemple
+Resize to fit	ContainerWindow		Adate
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Coleghe \"%name\" a:
 Mount server error	AutoMounterSettings		Erôr dal servidôr di montaç
 If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Se si cambie non ae cartele home, %osName al funzionarà mâl!\n\nContinuâ pardabon?\n\nPar cambiâ non distès ae cartele home (chê personâl), ten fracât il tast Maiusc e fâs clic su \"Cambie non\".
@@ -284,9 +287,9 @@ no supporting apps	OpenWithWindow		nissune aplicazion supuartade
 32-bit unsigned integer	AttributesView		Intîr cence segn a 32 bit
 Preparing to empty Trash…	StatusWindow		Preparazions par disvuedâ la Scovacere…
 Deleting: 	StatusWindow		Eliminazion: 
+label too long	PoseView		etichete masse lungje
 the MIME settings	FSUtils		lis impostazions MIME
 You can't move or copy the trash.	FSUtils		No si pues spostâ o copiâ la Scovacere.
-label too long	PoseView		etichete masse lungje
 Error creating link to \"%name\".	FSUtils		Erôr tal creâ il colegament a \"%name\".
 Unknown	FilePermissionsView		No cognossût
 Paste links	ContainerWindow		Tache colegaments
@@ -335,8 +338,8 @@ MIME Path	AttributesView		Percors MIME
 less than	FindPanel		mancul di
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Erôr tal copiâ il file \"%name\":\n\t%error\n\nContinuâ?
 Creating links: 	StatusWindow		Creazion colegaments: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nol è stât pussibil vierzi \"%document\" cu la aplicazion \"%app\" (%error). 
 Create %s clipping	PoseView		Cree ritai %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nol è stât pussibil vierzi \"%document\" cu la aplicazion \"%app\" (%error). 
 Error moving \"%name\"	FSUtils		Erôr tal spostâ \"%name\"
 To: %dir	StatusWindow		A: %dir
 Paste layout	ContainerWindow		Tache disposizion
@@ -493,6 +496,7 @@ Duplicate	ContainerWindow		Dupliche
 16-bit integer	AttributesView		Intîr a 16 bit
 Untitled clipping	PoseView		Ritai cence non
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Il file \"%name\" al esist za te cartele specificade. Sostituîlu?
+, indexed	InfoWindow		, cun tabele
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Si à di strissinâ e molâ i elements suntune des iconis dai discs, tal barcon \"Disks\".
 Version:	InfoWindow		Version:
 OK	PoseView		Va ben
@@ -508,8 +512,8 @@ Add-ons	FilePanelPriv		Components adizionâi
 Empty folder	SlowContextPopup		Cartele vueide
 Alignment	AttributesView		Inliniament
 Move to Trash	FSUtils		Sposte te Scovacere
-Handles %type	OpenWithWindow		Al gjestìs %type
 Cancel	PoseView		Anule
+Handles %type	OpenWithWindow		Al gjestìs %type
 Delete	PoseView		Elimine
 Media parameter	AttributesView		Parametri multimediâl
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Se si modifiche la cartele home (chê personâl), %osName al funzionarà mâl!\n\nContinuâ pardabon?\n\nPar modificâ distès la cartele home, ten fracât il tast Maiusc e fâs clic su \"O sai ce che o fâs\".

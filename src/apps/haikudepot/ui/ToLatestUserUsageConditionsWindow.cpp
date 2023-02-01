@@ -14,7 +14,6 @@
 #include <LayoutBuilder.h>
 #include <Locker.h>
 #include <SeparatorView.h>
-#include <TextView.h>
 
 #include "AppUtils.h"
 #include "LinkView.h"
@@ -24,13 +23,12 @@
 #include "UserUsageConditionsWindow.h"
 #include "ServerHelper.h"
 #include "WebAppInterface.h"
+#include "TextView.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ToLatestUserUsageConditionsWindow"
 
 #define PLACEHOLDER_TEXT B_UTF8_ELLIPSIS
-
-#define WINDOW_FRAME BRect(0, 0, 500, 280)
 
 #define KEY_USER_USAGE_CONDITIONS	"userUsageConditions"
 
@@ -54,10 +52,10 @@ ToLatestUserUsageConditionsWindow::ToLatestUserUsageConditionsWindow(
 	BWindow* parent,
 	Model& model, const UserDetail& userDetail)
 	:
-	BWindow(WINDOW_FRAME, B_TRANSLATE("Update usage conditions"),
+	BWindow(BRect(), B_TRANSLATE("Update usage conditions"),
 		B_FLOATING_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
-			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_NOT_CLOSABLE ),
+			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_NOT_CLOSABLE),
 	fModel(model),
 	fUserDetail(userDetail),
 	fWorkerThread(-1),
@@ -91,6 +89,8 @@ ToLatestUserUsageConditionsWindow::ToLatestUserUsageConditionsWindow(
 		.Add(fWorkerIndicator, 1)
 		.SetInsets(B_USE_WINDOW_INSETS);
 
+	GetLayout()->SetExplicitMinSize(BSize(500, B_SIZE_UNSET));
+	ResizeToPreferred();
 	CenterOnScreen();
 
 	_FetchData();
@@ -110,10 +110,7 @@ ToLatestUserUsageConditionsWindow::~ToLatestUserUsageConditionsWindow()
 void
 ToLatestUserUsageConditionsWindow::_InitUiControls()
 {
-	fMessageTextView = new BTextView("message text view");
-	fMessageTextView->AdoptSystemColors();
-	fMessageTextView->MakeEditable(false);
-	fMessageTextView->MakeSelectable(false);
+	fMessageTextView = new TextView("message text view");
 	BString message;
 	if (fUserDetail.Agreement().Code().IsEmpty())
 		message = B_TRANSLATE(NO_PRIOR_MESSAGE_TEXT);

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-ProcessController	2791873518
+1	english	x-vnd.Haiku-ProcessController	415082887
 Error saving file	ProcessController		保存文件错误
 Display priority	ProcessController		显示优先级
 That's no Fun!	ProcessController		不好玩的！
@@ -21,6 +21,7 @@ Restart Deskbar	ProcessController		重启桌面栏
 About ProcessController…	ProcessController		关于进程控制器…
 Usage: %s [-deskbar]\n	ProcessController		用法: %s [-deskbar]\n
 Please confirm	ProcessController		请确认
+(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr	ProcessController		(c) 1996-2001 Georges-Edouard Berenger, berenger@francenet.fr
 Urgent priority	ProcessController		紧急优先级
 What do you want to do with the thread \"%s\"?	ProcessController		您希望如何处理该线程 \"%s\"?
 Idle priority	ProcessController		空闲优先级
@@ -43,5 +44,6 @@ Damned!	ProcessController		该死的！
 New Terminal	ProcessController		新建终端
 Power saving	ProcessController		省电
 ProcessController is already installed in Deskbar.	ProcessController		进程控制器已安装至桌面栏.
+This is the last active processor…\nYou can't turn it off!	ProcessController		这是最后一个活动进程…\n您不能将其关闭！
 This thread is already gone…	ProcessController		该线程已经结束...
 Run in window	ProcessController		在窗口中运行

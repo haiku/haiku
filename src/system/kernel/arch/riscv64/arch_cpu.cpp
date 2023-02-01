@@ -32,12 +32,12 @@ status_t
 arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
 {
 	SetStvec((uint64)SVec);
-	SstatusReg sstatus(Sstatus());
+	SstatusReg sstatus{.val = Sstatus()};
 	sstatus.ie = 0;
 	sstatus.fs = extStatusInitial; // enable FPU
 	sstatus.xs = extStatusOff;
 	SetSstatus(sstatus.val);
-	SetSie(Sie() | (1 << sTimerInt) | (1 << sSoftInt) | (1 << sExternInt));
+	SetBitsSie((1 << sTimerInt) | (1 << sSoftInt) | (1 << sExternInt));
 
 	return B_OK;
 }

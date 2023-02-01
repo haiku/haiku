@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	1961774506
+1	polish	x-vnd.Haiku-MediaPlayer	716811487
 Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Usunięcie wpisu do Kosza
 Close	MediaPlayer-PlaylistWindow		Zamknij
 Volume of background clips	MediaPlayer-SettingsWindow		Głośność klipów działających w tle
@@ -30,6 +30,7 @@ Open file…	MediaPlayer-Main		Otwórz plik…
 Scale controls in full screen mode	MediaPlayer-SettingsWindow		Skaluj kontrolki w trybie pełnoekranowym
 View options	MediaPlayer-SettingsWindow		Opcje widoku
 %d kHz	MediaPlayer-InfoWin		%d kHz
+Eject Device	MediaPlayer-Main		Wysuń urządzenie
 Full volume	MediaPlayer-SettingsWindow		Przy pełnej głośności
 <untitled>	PlaylistItem-title		<bez tytułu>
 Start media server	MediaPlayer-Main		Uruchom serwer mediów

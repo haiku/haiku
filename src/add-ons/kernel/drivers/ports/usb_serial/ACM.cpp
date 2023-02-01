@@ -30,7 +30,11 @@ ACMDevice::AddDevice(const usb_configuration_info *config)
 	// Search ACM Communication Interface
 	for (size_t i = 0; i < config->interface_count && status < B_OK; i++) {
 		usb_interface_info *interface = config->interface[i].active;
+		if (interface == NULL)
+			continue;
 		usb_interface_descriptor *descriptor = interface->descr;
+		if (descriptor == NULL)
+			continue;
 		if (descriptor->interface_class != USB_CDC_COMMUNICATION_INTERFACE_CLASS
 			|| descriptor->interface_subclass != USB_CDC_COMMUNICATION_INTERFACE_ACM_SUBCLASS)
 			continue;

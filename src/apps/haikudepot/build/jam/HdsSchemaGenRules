@@ -37,14 +37,14 @@ rule HdsSchemaGenModel
 	SEARCH on $(2) = [ FDirName $(SUBDIR) server schema ] ;
 	SEARCH on $(3) = [ FDirName $(SUBDIR) build scripts ] ;
 
-	Clean $(1:D) ;
-	Depends $(1) : $(2) $(3) ;
+	MkDir1 $(1:D) ;
+	CleanDir clean : $(1:D) ;
+	Depends $(1) : $(2) $(3) $(1:D) ;
 	HdsSchemaGenModel1 $(1) : $(2) $(3) $(1:D) ;
 }
 
 actions HdsSchemaGenModel1
 {
-	mkdir -p $(2[3])
 	$(HOST_PYTHON) $(2[2]) -i $(2[1]) --outputdirectory $(2[3])
 	touch $(1)
 }
@@ -60,14 +60,14 @@ rule HdsSchemaGenBulkParser
 	SEARCH on $(2) = [ FDirName $(SUBDIR) server schema ] ;
 	SEARCH on $(3) = [ FDirName $(SUBDIR) build scripts ] ;
 
-	Clean $(1:D) ;
-	Depends $(1) : $(2) $(3) ;
+	MkDir1 $(1:D) ;
+	CleanDir clean : $(1:D) ;
+	Depends $(1) : $(2) $(3) $(1:D) ;
 	HdsSchemaGenBulkParser1 $(1) : $(2) $(3) $(1:D) ;
 }
 
 actions HdsSchemaGenBulkParser1
 {
-	mkdir -p $(2[3])
 	$(HOST_PYTHON) $(2[2]) -i $(2[1]) --outputdirectory $(2[3]) --supportbulkcontainer
 	touch $(1)
 }
@@ -83,14 +83,14 @@ rule HdsSchemaGenParser
 	SEARCH on $(2) = [ FDirName $(SUBDIR) server schema ] ;
 	SEARCH on $(3) = [ FDirName $(SUBDIR) build scripts ] ;
 
-	Clean $(1:D) ;
-	Depends $(1) : $(2) $(3) ;
+	MkDir1 $(1:D) ;
+	CleanDir clean : $(1:D) ;
+	Depends $(1) : $(2) $(3) $(1:D) ;
 	HdsSchemaGenParser1 $(1) : $(2) $(3) $(1:D) ;
 }
 
 actions HdsSchemaGenParser1
 {
-	mkdir -p $(2[3])
 	$(HOST_PYTHON) $(2[2]) -i $(2[1]) --outputdirectory $(2[3])
 	touch $(1)
 }
@@ -107,9 +107,9 @@ actions HdsSchemaGenParser1
 
 rule HdsSchemaGenAppSrcDependsOnGeneration {
 	MakeLocate $(1) : $(2) ;
-	MkDir $(2) ;
+	MkDir1 $(2) ;
 	Depends $(1) : $(2) $(3) ;
-	Clean $(1) ;
+	Clean clean : $(1) ;
 
 	# just in case the dummy file ends up being newer than the generated
 	# sources, update the modified timestamp on the generated files.

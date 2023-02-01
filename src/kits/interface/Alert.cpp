@@ -21,6 +21,7 @@
 #include <Bitmap.h>
 #include <Button.h>
 #include <ControlLook.h>
+#include <Debug.h>
 #include <FindDirectory.h>
 #include <IconUtils.h>
 #include <LayoutBuilder.h>
@@ -57,8 +58,7 @@ public:
 	virtual	BSize				MaxSize();
 	virtual	void				Draw(BRect updateRect);
 
-			void				SetBitmap(BBitmap* Icon)
-									{ fIconBitmap = Icon; }
+			void				SetBitmap(BBitmap* icon);
 			BBitmap*			Bitmap()
 									{ return fIconBitmap; }
 
@@ -84,18 +84,10 @@ static const int kSemTimeOut = 50000;
 
 static const int kButtonOffsetSpacing = 62;
 static const int kButtonUsualWidth = 55;
-static const int kIconStripeWidth = 30;
+static const int kIconStripeWidthFactor = 5;
 
 static const int kWindowMinWidth = 310;
 static const int kWindowOffsetMinWidth = 335;
-
-
-static inline float
-icon_layout_scale()
-{
-	float scale = be_plain_font->Size() / 12;
-	return max_c(1, scale);
-}
 
 
 // #pragma mark -
@@ -585,9 +577,8 @@ BAlert::_CreateTypeIcon()
 			return NULL;
 	}
 
-	int32 iconSize = (int32)(32 * icon_layout_scale());
 	// Allocate the icon bitmap
-	icon = new(std::nothrow) BBitmap(BRect(0, 0, iconSize - 1, iconSize - 1),
+	icon = new(std::nothrow) BBitmap(BRect(BPoint(0, 0), be_control_look->ComposeIconSize(32)),
 		0, B_RGBA32);
 	if (icon == NULL || icon->InitCheck() < B_OK) {
 		FTRACE((stderr, "BAlert::_CreateTypeIcon() - No memory for bitmap\n"));
@@ -618,8 +609,8 @@ BAlert::_CreateTypeIcon()
 
 	// Handle color space conversion
 	if (icon->ColorSpace() != B_CMAP8) {
-		BIconUtils::ConvertFromCMAP8(rawIcon, iconSize, iconSize,
-			iconSize, icon);
+		BIconUtils::ConvertFromCMAP8(rawIcon, B_LARGE_ICON, B_LARGE_ICON,
+			B_LARGE_ICON, icon);
 	}
 
 	return icon;
@@ -755,21 +746,41 @@ TAlertView::Archive(BMessage* archive, bool deep) const
 
 
 void
+TAlertView::SetBitmap(BBitmap* icon)
+{
+	if (icon == NULL && fIconBitmap == NULL)
+		return;
+
+	ASSERT(icon != fIconBitmap);
+
+	BBitmap* oldBitmap = fIconBitmap;
+	fIconBitmap = icon;
+	Invalidate();
+
+	if (oldBitmap == NULL || icon == NULL || oldBitmap->Bounds() != icon->Bounds())
+		InvalidateLayout();
+
+	delete oldBitmap;
+}
+
+
+void
 TAlertView::GetPreferredSize(float* _width, float* _height)
 {
-	float scale = icon_layout_scale();
-
 	if (_width != NULL) {
+		*_width = be_control_look->DefaultLabelSpacing() * 3;
 		if (fIconBitmap != NULL)
-			*_width = 18 * scale + fIconBitmap->Bounds().Width();
+			*_width += fIconBitmap->Bounds().Width();
 		else
-			*_width = 0;
+			*_width += be_control_look->ComposeIconSize(B_LARGE_ICON).Width();
 	}
+
 	if (_height != NULL) {
+		*_height = be_control_look->DefaultLabelSpacing();
 		if (fIconBitmap != NULL)
-			*_height = 6 * scale + fIconBitmap->Bounds().Height();
+			*_height += fIconBitmap->Bounds().Height();
 		else
-			*_height = 0;
+			*_height += be_control_look->ComposeIconSize(B_LARGE_ICON).Height();
 	}
 }
 
@@ -784,20 +795,19 @@ TAlertView::MaxSize()
 void
 TAlertView::Draw(BRect updateRect)
 {
-	if (fIconBitmap == NULL)
-		return;
-
 	// Here's the fun stuff
 	BRect stripeRect = Bounds();
-	float iconLayoutScale = icon_layout_scale();
-	stripeRect.right = kIconStripeWidth * iconLayoutScale;
+	stripeRect.right = kIconStripeWidthFactor * be_control_look->DefaultLabelSpacing();
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
 	FillRect(stripeRect);
 
+	if (fIconBitmap == NULL)
+		return;
+
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	DrawBitmapAsync(fIconBitmap, BPoint(18 * iconLayoutScale,
-		6 * iconLayoutScale));
+	DrawBitmapAsync(fIconBitmap, BPoint(be_control_look->DefaultLabelSpacing() * 3,
+		be_control_look->DefaultLabelSpacing()));
 }
 
 

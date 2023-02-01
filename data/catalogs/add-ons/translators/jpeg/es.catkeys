@@ -1,22 +1,20 @@
-1	spanish; castilian	x-vnd.Haiku-JPEGTranslator	3788699631
+1	spanish; castilian	x-vnd.Haiku-JPEGTranslator	1259224612
 Read	JPEGTranslator		Leer
-Be Bitmap Format (JPEGTranslator)	JPEGTranslator		Formato Be Bitmap (Intérprete JPEG)
-Show warning messages	JPEGTranslator		Mostrar mensajes de advertencia
-Use CMYK code with 0 for 100% ink coverage	JPEGTranslator		Usar código CMYK con 0 para cubrir con 100% de tinta
+Show warning messages	JPEGTranslator		Mostrar avisos de alerta
 JPEG Library Error: %s\n	be_jerror		Error de la biblioteca JPEG: %s\n
-©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBasado en la biblioteca IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\ncon un parche para admitir la codificación sin pérdidas de Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nIncluye algunas rutinas de conversión entre espacios de colores de Magnus Hellman\n\thttp://www.bebits.com/app/802\n
-None	JPEGTranslator		Ninguno
+©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBased on IJG library ©  1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\nwith \"lossless\" encoding support patch by Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nWith some colorspace conversion routines by Magnus Hellman\n\thttp://www.bebits.com/app/802\n	JPEGTranslator		©2002-2003, Marcin Konicki\n©2005-2007, Haiku\n\nBasado en la biblioteca IJG © 1994-2009, Thomas G. Lane, Guido Vollbeding.\n\thttp://www.ijg.org/files/\n\ncon codificación «sin pérdidas» añadida por Ken Murchison\n\thttp://www.oceana.com/ftp/ljpeg/\n\nCon algunas rutinas de conversión del espacio de colores contribuidas por Magnus Hellman\n\thttp://www.bebits.com/app/802\n
+None	JPEGTranslator		Nada
 About	JPEGTranslator		Acerca de
 Version %d.%d.%d	JPEGTranslator		Versión %d.%d.%d
-Write black-and-white images as RGB24	JPEGTranslator		Guardar imágenes en blanco y negro como RGB24
-Output smoothing strength	JPEGTranslator		Nivel de suavizado en la salida
+Write black-and-white images as RGB24	JPEGTranslator		Escribir imágenes en blanco y negro como RGB24
+Output smoothing strength	JPEGTranslator		Fuerza del suavizado de salida
 Use progressive compression	JPEGTranslator		Usar compresión progresiva
-Make file smaller (sligthtly worse quality)	JPEGTranslator		Hacer que el archivo sea más pequeño (sacrificando un poco de calidad)
-High	JPEGTranslator		Alta
-Read greyscale images as RGB32	JPEGTranslator		Guardar imágenes en escala de grises como RGB32
-Output quality	JPEGTranslator		Calidad de la salida
-Low	JPEGTranslator		Baja
-Write	JPEGTranslator		Guardar
-Prevent colors 'washing out'	JPEGTranslator		Evitar que los colores se 'blanqueen'
-JPEG Library Warning: %s\n	be_jerror		Advertencia de la biblioteca JPEG: %s\n
+Make file smaller (sligthtly worse quality)	JPEGTranslator		Reducir tamaño del archivo (se reducirá ligeramente la calidad)
+High	JPEGTranslator		Alto
+Read greyscale images as RGB32	JPEGTranslator		Leer imágenes en escala de grises como RGB32
+Output quality	JPEGTranslator		Calidad de salida
+Low	JPEGTranslator		Bajo
+Write	JPEGTranslator		Escribir
+Prevent colors 'washing out'	JPEGTranslator		Evitar que los colores se «destiñan»
+JPEG Library Warning: %s\n	be_jerror		Aviso de la Biblioteca JPEG: %s\n
 JPEG images	JPEGTranslator		Imágenes JPEG

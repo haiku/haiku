@@ -1,4 +1,4 @@
-/*	$FreeBSD: releng/12.0/sys/dev/ral/rt2661.c 330688 2018-03-09 11:33:56Z avos $	*/
+/*	$FreeBSD$	*/
 
 /*-
  * Copyright (c) 2006
@@ -18,7 +18,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: releng/12.0/sys/dev/ral/rt2661.c 330688 2018-03-09 11:33:56Z avos $");
+__FBSDID("$FreeBSD$");
 
 /*-
  * Ralink Technology RT2561, RT2561S and RT2661 chipset driver
@@ -332,7 +332,7 @@ rt2661_detach(void *xsc)
 {
 	struct rt2661_softc *sc = xsc;
 	struct ieee80211com *ic = &sc->sc_ic;
-	
+
 	RAL_LOCK(sc);
 	rt2661_stop_locked(sc);
 	RAL_UNLOCK(sc);

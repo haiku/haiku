@@ -64,23 +64,23 @@ publish_channel(device_node *parent, uint16 command_block_base,
 	uint16 control_block_base, uint8 intnum, const char *name)
 {
 	device_attr attrs[] = {
-		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE, { string: ATA_FOR_CONTROLLER_MODULE_NAME }},
+		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE, { .string = ATA_FOR_CONTROLLER_MODULE_NAME }},
 
 		// properties of this controller for ata bus manager
-		{ ATA_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: 2 }},
-		{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: 0 }},
-		{ ATA_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE, { string: name }},
+		{ ATA_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { .ui8 = 2 }},
+		{ ATA_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { .ui8 = 0 }},
+		{ ATA_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE, { .string = name }},
 
 		// DMA properties; the 16 bit alignment is not necessary as
 		// the ata bus manager handles that very efficiently, but why
 		// not use the block device manager for doing that?
-		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 1 }},
-		{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { ui64: 0x100000000LL }},
+		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { .ui32 = 1 }},
+		{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { .ui64 = 0x100000000LL }},
 
 		// private data to identify device
-		{ ATA_ISA_COMMAND_BLOCK_BASE, B_UINT16_TYPE, { ui16: command_block_base }},
-		{ ATA_ISA_CONTROL_BLOCK_BASE, B_UINT16_TYPE, { ui16: control_block_base }},
-		{ ATA_ISA_INTNUM, B_UINT8_TYPE, { ui8: intnum }},
+		{ ATA_ISA_COMMAND_BLOCK_BASE, B_UINT16_TYPE, { .ui16 = command_block_base }},
+		{ ATA_ISA_CONTROL_BLOCK_BASE, B_UINT16_TYPE, { .ui16 = control_block_base }},
+		{ ATA_ISA_INTNUM, B_UINT8_TYPE, { .ui8 = intnum }},
 		{ NULL }
 	};
 	io_resource resources[3] = {

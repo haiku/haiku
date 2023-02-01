@@ -18,8 +18,8 @@ const char *ip6_sprintf(const in6_addr *addr, char *dst,
 	size_t size = INET6_ADDRSTRLEN);
 
 
-static inline uint16
-compute_checksum(uint8* _buffer, size_t length)
+static inline uint32
+compute_wordsum(uint8* _buffer, size_t length)
 {
 	uint16* buffer = (uint16*)_buffer;
 	uint32 sum = 0;
@@ -44,10 +44,10 @@ ipv6_checksum(const struct in6_addr* source,
 	length = htons(length);
 	protocol = htons(protocol);
 
-	sum += compute_checksum((uint8*)source, sizeof(in6_addr));
-	sum += compute_checksum((uint8*)destination, sizeof(in6_addr));
-	sum += compute_checksum((uint8*)&length, sizeof(uint16));
-	sum += compute_checksum((uint8*)&protocol, sizeof(uint16));
+	sum += compute_wordsum((uint8*)source, sizeof(in6_addr));
+	sum += compute_wordsum((uint8*)destination, sizeof(in6_addr));
+	sum += compute_wordsum((uint8*)&length, sizeof(uint16));
+	sum += compute_wordsum((uint8*)&protocol, sizeof(uint16));
 
 	while (sum >> 16)
 		sum = (sum & 0xffff) + (sum >> 16);

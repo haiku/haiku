@@ -166,6 +166,8 @@ cfmakeraw(struct termios *termios)
 	termios->c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
 	termios->c_cflag &= ~(CSIZE | PARENB);
 	termios->c_cflag |= CS8;
+	termios->c_cc[VMIN] = 1;	// input is available character by character
+	termios->c_cc[VTIME] = 0;
 }
 
 

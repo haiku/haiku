@@ -24,7 +24,7 @@ Gamma	Application Type Window		候选版
 Cancel	Application Type Window		取消
 Attribute	Attribute Window		属性
 Multiple launch	Application Type Window		多种方式启动
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# 应用类型无法删除} other{# 应用类型无法删除}}
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Application type could be removed} other{# Application types could be removed}}
 Edit…	Application Types Window		编辑：
 Could not set preferred application	FileTypes Window		无法设置首选程序
 Description	FileTypes Window		描述
@@ -45,7 +45,7 @@ Abort	Application Types Window		放弃
 Save	Application Type Window		保存
 %1 application type	Application Type Window		%1 程序类型
 Icon	Application Type Window		图标
-Duration	Attribute ListView		耗时
+Duration	Attribute ListView		时长
 Version:	Application Type Window		版本:
 Default application	FileType Window		默认程序
 Internal name:	New File Type Window		内部名称:
@@ -72,7 +72,7 @@ Application types	Application Types Window		应用类型
 Description:	Application Types Window		描述：
 Name:	Application Types Window		名称：
 Rating	Attribute ListView		排序
-duration	Attribute ListView		耗时
+duration	Attribute ListView		时长
 File could not be opened	Preferred App Menu		文件无法打开
 Args only	Application Type Window		仅含参数
 Could not open \"%s\":\n%s	FileTypes		无法打开 \"%s\":\n%s

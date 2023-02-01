@@ -85,7 +85,7 @@ IPPPrinterRoster::Listen()
 	BNetAddress srcAddress;
 	uint32 type, state;
 	char packet[1541];
-	char uri[256];
+	char uri[1024];
 	char* pos;
 	int32 len;
 

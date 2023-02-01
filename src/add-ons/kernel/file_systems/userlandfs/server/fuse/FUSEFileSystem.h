@@ -31,9 +31,21 @@ public:
 			const FSVNodeCapabilities& GetNodeCapabilities() const
 									{ return fNodeCapabilities; }
 
+			const fuse_lowlevel_ops*	GetLowlevelOps() const
+									{
+										if (fFS == NULL)
+											return &fLowLevelOps;
+										return  NULL;
+									}
 			fuse_fs*			GetFS() const	{ return fFS; }
 
 			const fuse_config&	GetFUSEConfig() const	{ return fFUSEConfig; }
+
+			bool				HasHaikuFuseExtensions() const
+									{
+										return (fConnectionInfo.want
+											& FUSE_CAP_HAIKU_FUSE_EXTENSIONS) != 0;
+									}
 
 	virtual	status_t			CreateVolume(Volume** _volume, dev_t id);
 	virtual	status_t			DeleteVolume(Volume* volume);
@@ -47,6 +59,9 @@ public:
 			status_t			FinishInitClientFS(fuse_config* config,
 									const fuse_operations* ops, size_t opSize,
 									void* userData);
+			status_t			FinishInitClientFS(fuse_config* config,
+									const fuse_lowlevel_ops* ops, size_t opSize,
+									void* userData);
 			status_t			MainLoop(bool multithreaded);
 
 private:
@@ -58,6 +73,8 @@ private:
 
 			status_t			_InitClientFS(const fuse_operations* ops,
 									size_t opSize, void* userData);
+			status_t			_InitClientFS(const fuse_lowlevel_ops* ops,
+									size_t opSize, void* userData);
 
 			void				_InitCapabilities();
 
@@ -68,8 +85,9 @@ private:
 			status_t			fExitStatus;
 			sem_id				fInitSemaphore;
 			sem_id				fExitSemaphore;
-			fuse_operations		fOps;
 			const char*			fInitParameters;
+			fuse_lowlevel_ops	fLowLevelOps;
+			void*				fUserData;
 			fuse_fs*			fFS;
 			fuse_conn_info		fConnectionInfo;
 			fuse_config			fFUSEConfig;

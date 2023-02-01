@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-DriveSetup	4048496535
+1	hungarian	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		Nem lehet leválasztani a partíciót (%s).
 Mount all	MainWindow		Összes csatolása
 Disk	MainWindow		Lemez
@@ -14,6 +14,7 @@ Block size	PartitionList		Blokk méret
 The panel experienced a problem!	MainWindow		A panel hibát okozott!
 Device	DiskView		Eszköz
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Biztosan megformázod az Intel kiterjesztett partíciót? Az abban szereplő partíciók is törlődnek. A változtatások véglegesítése előtt újra meg kell erősíteni a műveletet.
+Physical block size	PartitionList		Fizikai blokk méret
 Unmount	MainWindow		Leválasztás
 Failed to format the partition %s!\n	MainWindow		Nem sikerült előkészíteni a partíciót: %s.\n
 Partition size	CreateParametersPanel		A partíció mérete

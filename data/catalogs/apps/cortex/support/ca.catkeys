@@ -37,7 +37,7 @@ Homogenous buffers	MediaString		Memòria intermèdia homogènia
 Interlaced 	MediaString		Entrellaçament 
 {0, plural, one{# channel}other{# channels}}	MediaString		{0, plural, one{# canal}other{# canals}}
 15 bit RGBA	MediaString		RGBA de 15 bits
-Drop data	MediaString		Eliminació de dades
+Drop data	MediaString		Deixeu-hi anar dades
 AVI	MediaString		AVI
 YUV9	MediaString		YUV9
  Hz	MediaString		 Hz

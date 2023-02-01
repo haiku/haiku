@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Haiku, Inc. All Rights Reserved.
+ * Copyright 2019-2022 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #include <KernelExport.h>
@@ -9,13 +9,22 @@
 
 #include <arch/vm.h>
 #include <vm/vm.h>
+#include <vm/VMAddressSpace.h>
 #include <vm/vm_types.h>
+
+
+//#define TRACE_ARCH_VM
+#ifdef TRACE_ARCH_VM
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...) ;
+#endif
 
 
 status_t
 arch_vm_init(kernel_args* args)
 {
-	dprintf("arch_vm_init\n");
+	TRACE("arch_vm_init\n");
 	return B_OK;
 }
 
@@ -23,7 +32,7 @@ arch_vm_init(kernel_args* args)
 status_t
 arch_vm_init2(kernel_args* args)
 {
-	dprintf("arch_vm_init2\n");
+	TRACE("arch_vm_init2\n");
 	return B_OK;
 }
 
@@ -31,7 +40,7 @@ arch_vm_init2(kernel_args* args)
 status_t
 arch_vm_init_post_area(kernel_args* args)
 {
-	dprintf("arch_vm_init_post_area\n");
+	TRACE("arch_vm_init_post_area\n");
 	return B_OK;
 }
 
@@ -39,7 +48,39 @@ arch_vm_init_post_area(kernel_args* args)
 status_t
 arch_vm_init_end(kernel_args* args)
 {
-	dprintf("arch_vm_init_end\n");
+	TRACE("arch_vm_init_end(): %" B_PRIu32 " virtual ranges to keep:\n",
+		args->arch_args.num_virtual_ranges_to_keep);
+
+	for (int i = 0; i < (int)args->arch_args.num_virtual_ranges_to_keep; i++) {
+		addr_range &range = args->arch_args.virtual_ranges_to_keep[i];
+
+		TRACE("  start: %p, size: %#" B_PRIxSIZE "\n", (void*)range.start, range.size);
+
+		// skip ranges outside the kernel address space
+		if (!IS_KERNEL_ADDRESS(range.start)) {
+			TRACE("    no kernel address, skipping...\n");
+			continue;
+		}
+
+		phys_addr_t physicalAddress;
+		void *address = (void*)range.start;
+		if (vm_get_page_mapping(VMAddressSpace::KernelID(), range.start,
+			&physicalAddress) != B_OK)
+			panic("arch_vm_init_end(): No page mapping for %p\n", address);
+
+		area_id area = vm_map_physical_memory(VMAddressSpace::KernelID(),
+			"boot loader reserved area", &address,
+			B_EXACT_ADDRESS, range.size,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+			physicalAddress, true);
+
+		if (area < 0) {
+			panic("arch_vm_init_end(): Failed to create area for boot loader "
+				"reserved area: %p - %p\n", (void*)range.start,
+				(void*)(range.start + range.size));
+		}
+	}
+
 	return B_OK;
 }
 
@@ -47,7 +88,7 @@ arch_vm_init_end(kernel_args* args)
 status_t
 arch_vm_init_post_modules(kernel_args* args)
 {
-	dprintf("arch_vm_init_post_modules\n");
+	TRACE("arch_vm_init_post_modules\n");
 	return B_OK;
 }
 
@@ -55,7 +96,7 @@ arch_vm_init_post_modules(kernel_args* args)
 void
 arch_vm_aspace_swap(struct VMAddressSpace* from, struct VMAddressSpace* to)
 {
-	dprintf("arch_vm_aspace_swap\n");
+	TRACE("arch_vm_aspace_swap\n");
 }
 
 

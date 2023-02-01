@@ -17,7 +17,7 @@ ObjectDefines
 	BPlusTree.cpp
 	:
 	read_pos=boot_read_pos fstat=boot_fstat open=boot_open close=boot_close
-	_BOOT_MODE #BFS_BIG_ENDIAN_ONLY
+	#BFS_BIG_ENDIAN_ONLY
 	;
 
 KernelStaticLibrary boottest_bfs.a :

@@ -4,8 +4,6 @@ UsePrivateHeaders kernel shared storage support ;
 UseBuildFeatureHeaders zlib ;
 UseBuildFeatureHeaders zstd ;
 
-DEFINES += _BOOT_MODE ;
-
 if [ FIsBuildFeatureEnabled zstd ] {
 	DEFINES += ZSTD_ENABLED ;
 }

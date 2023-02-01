@@ -43,6 +43,7 @@
 #include <MenuItem.h>
 #include <PopUpMenu.h>
 
+#define TIFF_DISABLE_DEPRECATED
 #include "tiff.h"
 #include "tiffvers.h"
 

@@ -638,7 +638,7 @@ FontEngine::GetKerning(uint32 first, uint32 second, double* x, double* y)
 bool
 FontEngine::Init(const char* fontFilePath, unsigned faceIndex, double size,
 	FT_Encoding charMap, glyph_rendering ren_type, bool hinting,
-	const char* fontFileBuffer, const long fontFileBufferSize)
+	const void* fontFileBuffer, const long fontFileBufferSize)
 {
 	if (!fLibraryInitialized)
 		return false;

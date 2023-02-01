@@ -213,7 +213,7 @@ BRegion::Support::DestroyRegion(BRegion* r)
 void
 BRegion::Support::miSetExtents(BRegion* pReg)
 {
-    register clipping_rect*	pBox;
+    clipping_rect*	pBox;
 	clipping_rect* pBoxEnd;
 	clipping_rect* pExtents;
 
@@ -265,12 +265,12 @@ BRegion::Support::miSetExtents(BRegion* pReg)
 */
 void
 BRegion::Support::XOffsetRegion(
-    register BRegion* pRegion,
-    register int x,
-    register int y)
+    BRegion* pRegion,
+    int x,
+    int y)
 {
-    register int nbox;
-    register clipping_rect *pbox;
+    int nbox;
+    clipping_rect *pbox;
 
     pbox = pRegion->fData;
     nbox = pRegion->fCount;
@@ -401,17 +401,17 @@ IndexRects(
  */
 int
 BRegion::Support::miIntersectO (
-    register BRegion*	pReg,
-    register clipping_rect*	r1,
+    BRegion*	pReg,
+    clipping_rect*	r1,
     clipping_rect*  	  	r1End,
-    register clipping_rect*	r2,
+    clipping_rect*	r2,
     clipping_rect*  	  	r2End,
     int    	  	top,
     int    	  	bottom)
 {
-    register int  	left;
-    register int  	right;
-    register clipping_rect*	pNextRect;
+    int  	left;
+    int  	right;
+    clipping_rect*	pNextRect;
 
     pNextRect = &pReg->fData[pReg->fCount];
 
@@ -467,7 +467,7 @@ int
 BRegion::Support::XIntersectRegion(
     const BRegion* 	  	reg1,
     const BRegion*	  	reg2,          /* source regions     */
-    register BRegion* 	newReg)               /* destination BRegion* */
+    BRegion* 	newReg)               /* destination BRegion* */
 {
    /* check for trivial reject */
     if ( (!(reg1->fCount)) || (!(reg2->fCount))  ||
@@ -490,8 +490,8 @@ BRegion::Support::XIntersectRegion(
 
 void
 BRegion::Support::miRegionCopy(
-    register BRegion* dstrgn,
-    register const BRegion* rgn)
+    BRegion* dstrgn,
+    const BRegion* rgn)
 
 {
 	*dstrgn = *rgn;
@@ -652,13 +652,13 @@ TopRects(
  */
 int
 BRegion::Support::miCoalesce(
-    register BRegion*	pReg,	    	/* BRegion* to coalesce */
+    BRegion*	pReg,	    	/* BRegion* to coalesce */
     int	    	  	prevStart,  	/* Index of start of previous band */
     int	    	  	curStart)   	/* Index of start of current band */
 {
-    register clipping_rect*	pPrevBox;   	/* Current box in previous band */
-    register clipping_rect*	pCurBox;    	/* Current box in current band */
-    register clipping_rect*	pRegEnd;    	/* End of region */
+    clipping_rect*	pPrevBox;   	/* Current box in previous band */
+    clipping_rect*	pCurBox;    	/* Current box in current band */
+    clipping_rect*	pRegEnd;    	/* End of region */
     int	    	  	curNumRects;	/* Number of rectangles in current
 					 * band */
     int	    	  	prevNumRects;	/* Number of rectangles in previous
@@ -802,48 +802,48 @@ BRegion::Support::miCoalesce(
  */
 void
 BRegion::Support::miRegionOp(
-    register BRegion* 	newReg,	    	    	/* Place to store result */
+    BRegion* 	newReg,	    	    	/* Place to store result */
     const BRegion*	  	reg1,	    	    	/* First region in operation */
     const BRegion*	  	reg2,	    	    	/* 2d region in operation */
     int    	  	(*overlapFunc)(
-        register BRegion*     pReg,
-        register clipping_rect*     r1,
+        BRegion*     pReg,
+        clipping_rect*     r1,
         clipping_rect*              r1End,
-        register clipping_rect*     r2,
+        clipping_rect*     r2,
         clipping_rect*              r2End,
         int               top,
         int               bottom),                /* Function to call for over-
 						 * lapping bands */
     int    	  	(*nonOverlap1Func)(
-        register BRegion*     pReg,
-        register clipping_rect*     r,
+        BRegion*     pReg,
+        clipping_rect*     r,
         clipping_rect*              rEnd,
-        register int      top,
-        register int      bottom),                /* Function to call for non-
+        int      top,
+        int      bottom),                /* Function to call for non-
 						 * overlapping bands in region
 						 * 1 */
     int    	  	(*nonOverlap2Func)(
-        register BRegion*     pReg,
-        register clipping_rect*     r,
+        BRegion*     pReg,
+        clipping_rect*     r,
         clipping_rect*              rEnd,
-        register int      top,
-        register int      bottom))                /* Function to call for non-
+        int      top,
+        int      bottom))                /* Function to call for non-
 						 * overlapping bands in region
 						 * 2 */
 {
-    register clipping_rect*	r1; 	    	    	/* Pointer into first region */
-    register clipping_rect*	r2; 	    	    	/* Pointer into 2d region */
+    clipping_rect*	r1; 	    	    	/* Pointer into first region */
+    clipping_rect*	r2; 	    	    	/* Pointer into 2d region */
     clipping_rect*  	  	r1End;	    	    	/* End of 1st region */
     clipping_rect*  	  	r2End;	    	    	/* End of 2d region */
-    register int  	ybot;	    	    	/* Bottom of intersection */
-    register int  	ytop;	    	    	/* Top of intersection */
+    int  	ybot;	    	    	/* Bottom of intersection */
+    int  	ytop;	    	    	/* Top of intersection */
  //   clipping_rect*  	  	oldRects;   	    	/* Old fData for newReg */
     int	    	  	prevBand;   	    	/* Index of start of
 						 * previous band in newReg */
     int	    	  	curBand;    	    	/* Index of start of current
 						 * band in newReg */
-    register clipping_rect* 	r1BandEnd;  	    	/* End of current band in r1 */
-    register clipping_rect* 	r2BandEnd;  	    	/* End of current band in r2 */
+    clipping_rect* 	r1BandEnd;  	    	/* End of current band in r1 */
+    clipping_rect* 	r2BandEnd;  	    	/* End of current band in r2 */
     int     	  	top;	    	    	/* Top of non-overlapping
 						 * band */
     int     	  	bot;	    	    	/* Bottom of non-overlapping
@@ -1104,11 +1104,11 @@ BRegion::Support::miRegionOp(
  *-----------------------------------------------------------------------
  */
 int
-BRegion::Support::miUnionNonO(register BRegion* pReg,
-	register clipping_rect* r, clipping_rect* rEnd,
-    register int top, register int bottom)
+BRegion::Support::miUnionNonO(BRegion* pReg,
+	clipping_rect* r, clipping_rect* rEnd,
+    int top, int bottom)
 {
-	register clipping_rect*	pNextRect = &pReg->fData[pReg->fCount];
+	clipping_rect*	pNextRect = &pReg->fData[pReg->fCount];
 
 	assert(top < bottom);
 
@@ -1147,15 +1147,15 @@ BRegion::Support::miUnionNonO(register BRegion* pReg,
 
 int
 BRegion::Support::miUnionO (
-    register BRegion*	pReg,
-    register clipping_rect*	r1,
+    BRegion*	pReg,
+    clipping_rect*	r1,
     clipping_rect*  	  	r1End,
-    register clipping_rect*	r2,
+    clipping_rect*	r2,
     clipping_rect*  	  	r2End,
-    register int	top,
-    register int	bottom)
+    int	top,
+    int	bottom)
 {
-    register clipping_rect*	pNextRect;
+    clipping_rect*	pNextRect;
 
     pNextRect = &pReg->fData[pReg->fCount];
 
@@ -1299,13 +1299,13 @@ BRegion::Support::XUnionRegion(
  */
 int
 BRegion::Support::miSubtractNonO1 (
-    register BRegion*	pReg,
-    register clipping_rect*	r,
+    BRegion*	pReg,
+    clipping_rect*	r,
     clipping_rect*  	  	rEnd,
-    register int  	top,
-    register int   	bottom)
+    int  	top,
+    int   	bottom)
 {
-    register clipping_rect*	pNextRect;
+    clipping_rect*	pNextRect;
 
     pNextRect = &pReg->fData[pReg->fCount];
 
@@ -1345,16 +1345,16 @@ BRegion::Support::miSubtractNonO1 (
  */
 int
 BRegion::Support::miSubtractO(
-    register BRegion*	pReg,
-    register clipping_rect*	r1,
+    BRegion*	pReg,
+    clipping_rect*	r1,
     clipping_rect*  	  	r1End,
-    register clipping_rect*	r2,
+    clipping_rect*	r2,
     clipping_rect*  	  	r2End,
-    register int  	top,
-    register int  	bottom)
+    int  	top,
+    int  	bottom)
 {
-    register clipping_rect*	pNextRect;
-    register int  	left;
+    clipping_rect*	pNextRect;
+    int  	left;
 
     left = r1->left;
 
@@ -1496,7 +1496,7 @@ int
 BRegion::Support::XSubtractRegion(
     const BRegion* 	  	regM,
     const BRegion*	  	regS,
-    register BRegion*	regD)
+    BRegion*	regD)
 {
    /* check for trivial reject */
     if ( (!(regM->fCount)) || (!(regS->fCount))  ||
@@ -1564,12 +1564,12 @@ BRegion::Support::XPointInRegion(
 
 int
 BRegion::Support::XRectInRegion(
-    register const BRegion* region,
+    const BRegion* region,
     const clipping_rect& rect)
 {
-    register clipping_rect* pbox;
-    register clipping_rect* pboxEnd;
-    register const clipping_rect* prect = &rect;
+    clipping_rect* pbox;
+    clipping_rect* pboxEnd;
+    const clipping_rect* prect = &rect;
     bool      partIn, partOut;
 
     int rx = prect->left;

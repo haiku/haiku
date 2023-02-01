@@ -6,6 +6,7 @@
 #define _STRINGS_H_
 
 
+#include <locale_t.h>
 #include <sys/types.h>
 
 
@@ -18,6 +19,10 @@ static __inline__ int ffs(int i) { return __builtin_ffs(i); }
 extern int		strcasecmp(const char *string1, const char *string2);
 extern int		strncasecmp(const char *string1, const char *string2,
 	size_t length);
+
+extern int		strcasecmp_l(const char *string1, const char *string2, locale_t locale);
+extern int		strncasecmp_l(const char *string1, const char *string2,
+	size_t length, locale_t locale);
 
 /* legacy compatibility -- might be removed one day */
 #define bcmp(a, b, length) memcmp((a), (b), (length))

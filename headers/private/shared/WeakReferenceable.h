@@ -30,6 +30,8 @@ public:
 			void				GetUnchecked();
 
 private:
+			friend class BWeakReferenceable;
+
 			int32				fUseCount;
 			BWeakReferenceable*	fObject;
 };
@@ -229,99 +231,6 @@ private:
 	WeakPointer*	fPointer;
 };
 
-
-//	#pragma mark -
-
-
-inline
-WeakPointer::WeakPointer(BWeakReferenceable* object)
-	:
-	fUseCount(1),
-	fObject(object)
-{
-}
-
-
-inline
-WeakPointer::~WeakPointer()
-{
-}
-
-
-inline BWeakReferenceable*
-WeakPointer::Get()
-{
-	int32 count = -11;
-
-	do {
-		count = atomic_get(&fUseCount);
-		if (count == 0)
-			return NULL;
-	} while (atomic_test_and_set(&fUseCount, count + 1, count) != count);
-
-	return fObject;
-}
-
-
-inline bool
-WeakPointer::Put()
-{
-	if (atomic_add(&fUseCount, -1) == 1) {
-		delete fObject;
-		return true;
-	}
-
-	return false;
-}
-
-
-inline int32
-WeakPointer::UseCount() const
-{
-	return fUseCount;
-}
-
-
-inline void
-WeakPointer::GetUnchecked()
-{
-	atomic_add(&fUseCount, 1);
-}
-
-
-//	#pragma -
-
-
-inline
-BWeakReferenceable::BWeakReferenceable()
-	:
-	fPointer(new(std::nothrow) WeakPointer(this))
-{
-}
-
-
-inline
-BWeakReferenceable::~BWeakReferenceable()
-{
-	fPointer->ReleaseReference();
-}
-
-
-inline status_t
-BWeakReferenceable::InitCheck()
-{
-	if (fPointer == NULL)
-		return B_NO_MEMORY;
-	return B_OK;
-}
-
-
-inline WeakPointer*
-BWeakReferenceable::GetWeakPointer()
-{
-	fPointer->AcquireReference();
-	return fPointer;
-}
 
 }	// namespace BPrivate
 

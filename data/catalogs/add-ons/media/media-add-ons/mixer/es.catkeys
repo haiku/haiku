@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-mixer.media_addon	3463574286
+1	spanish; castilian	x-vnd.Haiku-mixer.media_addon	157611590
 Input mapping	AudioMixer		Asignación de entrada
 To output	AudioMixer		A la salida
 Gain	AudioMixer		Ganancia
@@ -13,7 +13,9 @@ Display balance control for stereo connections	AudioMixer		Pantalla de control d
 Setup	AudioMixer		Configuración
 Physical input channels	AudioMixer		Canales de ingreso físicos
 Input channel destinations	AudioMixer		Destinos del canal de entrada
+Resampling algorithm:	AudioMixer		Algoritmo de remuestreo:
 Mute	AudioMixer		Silencio
 Output mapping	AudioMixer		Asignación de salida
 Virtual output channels	AudioMixer		Canales virtuales de salida
 Allow output channel remapping	AudioMixer		Permitir la salida de canal de reasignación
+Attenuate mixer output by 3 dB	AudioMixer		Atenuar en 3 dB la salida del mezclador

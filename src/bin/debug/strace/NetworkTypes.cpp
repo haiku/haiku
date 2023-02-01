@@ -563,19 +563,6 @@ format_pointer(Context &context, socket_args *args)
 
 
 static string
-get_iovec(Context &context, iovec *iov, int iovlen)
-{
-	if (iov == NULL && iovlen == 0)
-		return "(empty)";
-
-	string r = "{";
-	r += context.FormatPointer(iov);
-	r += ", " + context.FormatSigned(iovlen);
-	return r + "}";
-}
-
-
-static string
 format_pointer(Context &context, message_args *msg)
 {
 	string r;
@@ -586,6 +573,20 @@ format_pointer(Context &context, message_args *msg)
 	r += ", length = " + context.FormatUnsigned(msg->length);
 
 	return r;
+}
+#endif
+
+
+static string
+get_iovec(Context &context, iovec *iov, int iovlen)
+{
+	if (iov == NULL && iovlen == 0)
+		return "(empty)";
+
+	string r = "{";
+	r += context.FormatPointer(iov);
+	r += ", " + context.FormatSigned(iovlen);
+	return r + "}";
 }
 
 
@@ -605,7 +606,7 @@ format_pointer(Context &context, msghdr *h)
 
 	return r;
 }
-#endif
+
 
 static string
 format_pointer(Context &context, ifreq *ifr)
@@ -710,9 +711,9 @@ POINTER_TYPE(ifconf_ptr, ifconf);
 POINTER_TYPE(ifreq_ptr, ifreq);
 DEFINE_TYPE(pollfd_ptr, pollfd *);
 POINTER_TYPE(siginfo_t_ptr, siginfo_t);
+POINTER_TYPE(msghdr_ptr, msghdr);
 #if 0
 POINTER_TYPE(message_args_ptr, message_args);
-POINTER_TYPE(msghdr_ptr, msghdr);
 POINTER_TYPE(sockaddr_args_ptr, sockaddr_args);
 POINTER_TYPE(sockopt_args_ptr, sockopt_args);
 POINTER_TYPE(socket_args_ptr, socket_args);

@@ -12,7 +12,7 @@ Waiting…	CodyCam		Bekleniyor…
 Passive FTP	CodyCam		Pasif FTP
 Every 10 minutes	CodyCam		Her 10 dakikada bir
 Every minute	CodyCam		Her dakika
-Capture Rate Menu	CodyCam		Yakalama oranı menüsü
+Capture Rate Menu	CodyCam		Yakalama hızı menüsü
 Cannot seek time source!	CodyCam		Zaman kaynağına bakılamıyor!
 Server login failed	VideoConsumer.cpp		Sunucu oturum açması başarısız oldu
 on or off expected	Settings	Do not translate 'on' and 'off'	açık veya kapalı bekleniyordu
@@ -20,7 +20,7 @@ invalid upload client %ld\n	VideoConsumer.cpp		geçersiz yükleme istemcisi %ld\
 Every 30 seconds	CodyCam		Her 30 saniyede bir
 Cannot create a video window	CodyCam		Bir video penceresi oluşturulamıyor
 Cannot register the video window	CodyCam		Video penceresi kaydedilemiyor
-capture rate expected	CodyCam		yakalama oranı bekleniyordu
+capture rate expected	CodyCam		beklenen yakalama hızı
 Quit	CodyCam		Çık
 Cannot connect the video source to the video window	CodyCam		Video kaynağı video penceresine bağlanamıyor
 read: %d\n	SftpClient		oku: %d\n
@@ -65,7 +65,7 @@ password	CodyCam		parola
 Local	CodyCam		Yerel
 Stop video	CodyCam		Videoyu durdur
 Last Capture: 	VideoConsumer.cpp		Son yakalama: 
-Rate:	CodyCam		Oran:
+Rate:	CodyCam		Hız:
 Couldn't find requested directory on server	VideoConsumer.cpp		İstenilen dizin sunucuda bulunamadı
 Cannot find the media roster	CodyCam		Ortam listesi bulunamıyor
 Type:	CodyCam		Tür:

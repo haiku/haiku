@@ -70,6 +70,13 @@ ScreenManager::ScreenManager()
 	BLooper("screen manager"),
 	fScreenList(4, true)
 {
+#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+#	if defined(USE_DIRECT_WINDOW_TEST_MODE)
+	_AddHWInterface(new DWindowHWInterface());
+#	else
+	_AddHWInterface(new ViewHWInterface());
+#	endif
+#else
 	_ScanDrivers();
 
 	// turn on node monitoring the graphics driver directory
@@ -77,6 +84,7 @@ ScreenManager::ScreenManager()
 	node_ref nodeRef;
 	if (entry.InitCheck() == B_OK && entry.GetNodeRef(&nodeRef) == B_OK)
 		watch_node(&nodeRef, B_WATCH_DIRECTORY, this);
+#endif
 }
 
 
@@ -193,20 +201,15 @@ ScreenManager::_ScanDrivers()
 	// ToDo: to make monitoring the driver directory useful, we need more
 	//	power and data here, and should do the scanning on our own
 
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 	bool initDrivers = true;
 	while (initDrivers) {
-
-#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-		  interface = new AccelerantHWInterface();
-#elif defined(USE_DIRECT_WINDOW_TEST_MODE)
-		  interface = new DWindowHWInterface();
-#else
-		  interface = new ViewHWInterface();
-#endif
+		interface = new AccelerantHWInterface();
 
 		_AddHWInterface(interface);
 		initDrivers = false;
 	}
+#endif
 }
 
 

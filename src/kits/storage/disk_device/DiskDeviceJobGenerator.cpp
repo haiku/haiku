@@ -434,7 +434,7 @@ DiskDeviceJobGenerator::_GenerateRemainingJobs(BPartition* parent,
 
 			// content name
 			if ((changeFlags & B_PARTITION_CHANGED_NAME)
-				|| compare_string(partition->ContentName(),
+				|| compare_string(partition->RawContentName(),
 					partitionData->content_name)) {
 				status_t error = _GenerateSetContentNameJob(partition);
 				if (error != B_OK)
@@ -506,7 +506,7 @@ DiskDeviceJobGenerator::_GenerateInitializeJob(BPartition* partition)
 		return B_NO_MEMORY;
 
 	error = job->Init(partition->ContentType(),
-		partition->ContentName(), partition->ContentParameters());
+		partition->RawContentName(), partition->ContentParameters());
 	if (error != B_OK) {
 		delete job;
 		return error;
@@ -550,7 +550,7 @@ DiskDeviceJobGenerator::_GenerateSetContentNameJob(BPartition* partition)
 	if (!job)
 		return B_NO_MEMORY;
 
-	error = job->Init(partition->ContentName(),
+	error = job->Init(partition->RawContentName(),
 		B_DISK_DEVICE_JOB_SET_CONTENT_NAME);
 	if (error != B_OK) {
 		delete job;

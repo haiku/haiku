@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Keymap	541420657
+1	english	x-vnd.Haiku-Keymap	3076887274
 Key	Modifier keys window	As in a computer keyboard key	按键
 Japanese	KeymapNames		日语
 US	KeymapNames		美国
@@ -47,8 +47,13 @@ PG ↓	Keyboard Layout View	Very short for 'page down'	PG ↓
 ThinkPad X1 (US)	KeyboardLayoutNames		ThinkPad X1 (美国)
 Spanish	KeymapNames		西班牙
 Apple Aluminum	KeyboardLayoutNames		Apple Aluminum
+HOME	Keyboard Layout View		HOME
+COMMAND	Keyboard Layout View		COMMAND
+Ukrainian (Mac)	KeymapNames		乌克兰（Mac）
 Command:	Modifier keys window	Command key role name	命令：
+French (Bépo)	KeymapNames		法语（Bépo）
 Acute trigger	Keymap window		触发尖重音符
+Apple Aluminum (US)	KeyboardLayoutNames		Apple Aluminum (US)
 Modifier keys	Modifier keys window		修饰键
 Save as…	Keymap window		保存为...
 Error: duplicate keys	Modifier keys window		错误：重复按键
@@ -66,7 +71,9 @@ Left shift	Keyboard Layout View		左侧 shift 键
 Left control	Keyboard Layout View		左侧 Ctrl
 Role	Modifier keys window	As in the role of a modifier key	作用
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl 键
+Czech	KeymapNames		捷克语
 Control:	Modifier keys window	Control key role name	控制：
+Generic 105-key International	KeyboardLayoutNames		国际通用105键
 Disabled	Modifier keys window	Do nothing	禁用
 Select dead keys	Keymap window		选择废键：
 Right shift	Keyboard Layout View		右侧 shift 键
@@ -85,9 +92,12 @@ Defaults	Keymap window		默认
 System:	Keymap window		系统：
 Switch shortcut keys	Keymap window		切换快捷键
 Right command	Keyboard Layout View		右 Command 键
+Belgian (comma)	KeymapNames		比利时语（comma）
 Font	Keymap window		字体
 Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Shift 键
 Command	Keyboard Layout View	Command key	命令
+SCROLL	Keyboard Layout View		滚动锁定
 File	Keymap window		文件
+Brazilian (ABNT2)	KeymapNames		巴西语 (ABNT2)
 Diaeresis trigger	Keymap window		触发分音符号
 Open…	Keymap window		打开..

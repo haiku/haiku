@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-DriveSetup	3407096167
+1	german	x-vnd.Haiku-DriveSetup	1508610435
 Could not unmount partition %s.	MainWindow		Partition \"%s\" konnte nicht ausgehangen werden.
 Mount all	MainWindow		Alle einhängen
 Disk	MainWindow		Datenträger
@@ -14,6 +14,7 @@ Block size	PartitionList		Blockgröße
 The panel experienced a problem!	MainWindow		Es gab ein Problem mit dem Panel!
 Device	DiskView		Gerät
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Soll die Intel Extended Partition tatsächlich formatiert werden? Eventuell enthaltene Unterpartitionen würden überschrieben. Bevor diese Änderungen vorgenommen werden, wird nochmal nachgefragt.
+Physical block size	PartitionList		Physische Blockgröße
 Unmount	MainWindow		Aushängen
 Failed to format the partition %s!\n	MainWindow		Formatierung der Partition \"%s\" fehlgeschlagen!\n
 Partition size	CreateParametersPanel		Partitionsgröße

@@ -1,6 +1,88 @@
-1	english	x-vnd.Haiku-FirstBootPrompt	2477122091
+1	english	x-vnd.Haiku-FirstBootPrompt	189132197
+Japanese	KeymapNames		日语
+US	KeymapNames		英语（美国）
 Cancel	BootPromptWindow		取消
+Esperanto	KeymapNames		世界语
+Belarusian	KeymapNames		白罗斯语
+Brazilian	KeymapNames		巴西语
+Dvorak	KeymapNames		德沃夏克
+Polish	KeymapNames		波兰语
+Try Haiku	BootPromptWindow		尝试Haiku
+Latin-American	KeymapNames		拉丁美洲语言
+Ukrainian	KeymapNames		乌克兰语
+Russian (Yawert)	KeymapNames		俄罗斯语（YaWert）
+United-Kingdom	KeymapNames		英语（英国）
+Welcome!	BootPromptWindow		欢迎！
+Quit Haiku	System name		退出Haiku
+Turkish (Type-F)	KeymapNames		土耳其语（Type-F）
+Serbian (Cyrillic)	KeymapNames		塞尔维亚语（西里尔字母）
+Belgian (point)	KeymapNames		比利时语（Point）
+Bulgarian (Cyrillic)	KeymapNames		保加利亚语（Cyrillic）
+Finnish	KeymapNames		芬兰语
+Swedish	KeymapNames		瑞典语
+Svorak	KeymapNames		瑞典语（Svorak）
+German	KeymapNames		德语
+Swiss-German	KeymapNames		德语（瑞士）
 Keymap	BootPromptWindow		键盘映射
+Spanish (Dvorak)	KeymapNames		西班牙语（Dvorak）
+US-International	KeymapNames		英语（美式国际）
+Czech	KeymapNames		捷克语
+Turkish (Type-Q)	KeymapNames		土耳其语（Q型）
+Slovak	KeymapNames		斯洛伐克语
+Russian (Udmurt, Komi, Mari)	KeymapNames		俄语 (乌德穆特, 科米, 马里)
+Thai (TIS-820.2538)	KeymapNames		泰语(TIS-820.2538)
+Colemak	KeymapNames		Colemak
+Dvorak (programmer's)	KeymapNames		Dvorak (程序员)
+Russian (Mac)	KeymapNames		俄罗斯语（Mac）
+German (Mac)	KeymapNames		德语（Mac）
+Arabic (102)	KeymapNames		阿拉伯语 (102)
+Belarusian (Latin)	KeymapNames		白俄罗斯语 (拉丁语)
+Belarusian (Mac)	KeymapNames		白俄罗斯语（Mac）
+Hebrew	KeymapNames		希伯来语
+Greek	KeymapNames		希腊语
+Croatian	KeymapNames		克罗地亚语
+Faeroese	KeymapNames		法罗语
+Polish (Typewriter)	KeymapNames		波兰语（打字机）
+French (Mac)	KeymapNames		 法语（Mac）
+Spanish	KeymapNames		西班牙语
+Try it out	BootPromptWindow		尝试一下
+Ukrainian (Mac)	KeymapNames		乌克兰语（Mac）
+Estonian	KeymapNames		爱沙尼亚语
+Install Haiku	BootPromptWindow		安装Haiku
+French (Bépo)	KeymapNames		法语（Bépo）
 Restart system	BootPromptWindow		重启系统
+Serbian (Latin)	KeymapNames		塞尔维亚语（拉丁）
+Russian (Typewriter)	KeymapNames		俄罗斯语（打字机）
+French	KeymapNames		法语
+Italian	KeymapNames		意大利语
+Portuguese	KeymapNames		葡萄牙语
+Swiss-French	KeymapNames		法语（瑞士）
+Slovene	KeymapNames		斯洛文尼亚语
+French (NF Z71-300)	KeymapNames		法语（NF Z71-300）
+Lithuanian	KeymapNames		立陶宛语
+ISO-9995	KeymapNames		ISO-9995
+Kazakh	KeymapNames		哈萨克语
 Language	BootPromptWindow		语言
+Lithuanian (Standard)	KeymapNames		立陶宛语（标准）
+Belgian (comma)	KeymapNames		比利时语（标点）
 Custom	BootPromptWindow		自定义
+Norwegian	KeymapNames		挪威语
+Danish	KeymapNames		丹麦语
+Bulgarian (Phonetic)	KeymapNames		保加利亚语（音节）
+Canadian-French	KeymapNames		法语（加拿大）
+Welcome to Haiku!	BootPromptWindow		欢迎使用Haiku！
+Russian	KeymapNames		俄罗斯语
+Hungarian	KeymapNames		匈牙利语
+Install	BootPromptWindow		安装
+Irish	KeymapNames		爱尔兰语
+Romanian	KeymapNames		罗马尼亚语
+Are you sure you want to close this window? This will restart your system!	BootPromptWindow		确定要关闭此窗口吗？关闭后将重新启动！
+Thank you for trying out Haiku! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later when running Haiku.\n\nDo you wish to install Haiku now, or try it out first?	BootPromptWindow	For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	感谢选择体验Haiku！我们希望您能喜欢它！\n\n请选择您想使用的语言和键盘。这些设置也可以在后续使用 Haiku 的时候进行修改。\n\n您想现在就安装 Haiku，还是先尝试一下？
+Czech (Mac)	KeymapNames		捷克语（Mac）
+Macedonian	KeymapNames		马其顿语
+Brazilian (ABNT2)	KeymapNames		巴西语 (ABNT2)
+Albanian	KeymapNames		阿尔巴尼亚语
+Dutch	KeymapNames		荷兰语
+Thank you for trying out our operating system! We hope you'll like it!\n\nPlease select your preferred language and keymap. Both settings can also be changed later.\n\nDo you wish to install the operating system now, or try it out first?	BootPromptWindow	This notice appears when the build of Haiku that's currently being used is unofficial, as in, not distributed by Haiku itself.For other languages, a note could be added: \"Note: Localization of Haiku applications and other components is an on-going effort. You will frequently encounter untranslated strings, but if you like, you can join in the work at <www.haiku-os.org>.\"	感谢选择体验Haiku！我们希望您能喜欢它！\n\n请选择您想使用的语言和键盘。这些设置也可以在后续使用 Haiku 的时候进行修改。\n\n您希望现在安装 Haiku，还是先尝试一下？
+Friulian	KeymapNames		弗留利语
+Icelandic	KeymapNames		冰岛文

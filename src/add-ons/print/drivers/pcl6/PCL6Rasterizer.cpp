@@ -209,12 +209,12 @@ ColorRasterizer::MergePlaneBuffersToCurrentLine()
 		remainingPixels -= pixels;
 
 		if (remainingPixels >= 8) {
-			register const uchar
+			const uchar
 				red = fPlaneBuffers[0][i],
 				green = fPlaneBuffers[1][i],
 				blue = fPlaneBuffers[2][i];
 
-			register uchar value = 0;
+			uchar value = 0;
 			if (red & 0x80) value =  0x80;
 			if (red & 0x40) value |=  0x10;
 			if (red & 0x20) value |=  0x02;
@@ -255,7 +255,7 @@ ColorRasterizer::MergePlaneBuffersToCurrentLine()
 			*out++ = value;
 	
 		} else {
-			register const uchar
+			const uchar
 				red = fPlaneBuffers[0][i],
 				green = fPlaneBuffers[1][i],
 				blue = fPlaneBuffers[2][i];

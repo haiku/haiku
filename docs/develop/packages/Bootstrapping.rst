@@ -121,7 +121,8 @@ the target build profile used by the bootstrap process. This defaults to
 will include source packages for all packages needed by release image).
 
 Format of hpkg Source Repository
-========================
+================================
+
 For Haikuporter to use source or "rigged" packages instead of requesting
 packages from a remote url (essential during bootstrap when patch, git,
 curl, etc are unavailable), haikuporter works on an empty haikuports repository
@@ -143,6 +144,7 @@ on your target platform.
 
 Haiku Architecture Ports
 ========================
+
 When preparing a new Haiku architecture port for the bootstrap build the
 following things need to be considered:
 

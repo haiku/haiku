@@ -196,10 +196,10 @@ struct ControlDevice : Device {
 
 		device_attr attrs[] = {
 			{B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-				{string: "RAM Disk Raw Device"}},
-			{kDeviceSizeItem, B_UINT64_TYPE, {ui64: deviceSize}},
-			{kDeviceIDItem, B_UINT32_TYPE, {ui32: (uint32)id}},
-			{kFilePathItem, B_STRING_TYPE, {string: filePath}},
+				{.string = "RAM Disk Raw Device"}},
+			{kDeviceSizeItem, B_UINT64_TYPE, {.ui64 = deviceSize}},
+			{kDeviceIDItem, B_UINT32_TYPE, {.ui32 = (uint32)id}},
+			{kFilePathItem, B_STRING_TYPE, {.string = filePath}},
 			{NULL}
 		};
 
@@ -1140,7 +1140,7 @@ ram_disk_driver_register_device(device_node* parent)
 {
 	device_attr attrs[] = {
 		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-			{string: "RAM Disk Control Device"}},
+			{.string = "RAM Disk Control Device"}},
 		{NULL}
 	};
 
@@ -1435,6 +1435,9 @@ ram_disk_raw_device_control(void* _cookie, uint32 op, void* buffer,
 		case B_GET_GEOMETRY:
 		case B_GET_BIOS_GEOMETRY:
 		{
+			if (buffer == NULL || length > sizeof(device_geometry))
+				return B_BAD_VALUE;
+
 			device_geometry geometry;
 			geometry.bytes_per_sector = B_PAGE_SIZE;
 			geometry.sectors_per_track = 1;
@@ -1446,8 +1449,9 @@ ram_disk_raw_device_control(void* _cookie, uint32 op, void* buffer,
 			geometry.removable = true;
 			geometry.read_only = false;
 			geometry.write_once = false;
+			geometry.bytes_per_physical_sector = B_PAGE_SIZE;
 
-			return user_memcpy(buffer, &geometry, sizeof(device_geometry));
+			return user_memcpy(buffer, &geometry, length);
 		}
 
 		case B_GET_MEDIA_STATUS:

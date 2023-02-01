@@ -21,8 +21,9 @@
 #include <device_manager_defs.h>
 #include <fs/devfs.h>
 #include <fs/KPath.h>
-#include <kernel.h>
 #include <generic_syscall.h>
+#include <kernel.h>
+#include <kmodule.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/Stack.h>
@@ -90,6 +91,8 @@ public:
 	virtual	void			UninitDevice();
 
 	virtual void			Removed();
+
+	virtual	status_t		Control(void* cookie, int32 op, void* buffer, size_t length);
 
 			void			SetRemovedFromParent(bool removed)
 								{ fRemovedFromParent = removed; }
@@ -1251,6 +1254,28 @@ Device::Removed()
 }
 
 
+status_t
+Device::Control(void* _cookie, int32 op, void* buffer, size_t length)
+{
+	switch (op) {
+		case B_GET_DRIVER_FOR_DEVICE:
+		{
+			char* path = NULL;
+			status_t status = module_get_path(ModuleName(), &path);
+			if (status != B_OK)
+				return status;
+			if (length != 0 && length <= strlen(path))
+				return ERANGE;
+			status = user_strlcpy(static_cast<char*>(buffer), path, length);
+			free(path);
+			return status;
+		}
+		default:
+			return AbstractModuleDevice::Control(_cookie, op, buffer, length);;
+	}
+}
+
+
 //	#pragma mark - device_node
 
 
@@ -1454,7 +1479,7 @@ device_node::AddChild(device_node* node)
 	device_node* before = NULL;
 	while (iterator.HasNext()) {
 		device_node* child = iterator.Next();
-		if (child->Priority() <= priority) {
+		if (child->Priority() < priority) {
 			before = child;
 			break;
 		}
@@ -1702,6 +1727,16 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 						break;
 				}
 				break;
+			case PCI_encryption_decryption:
+				switch (subType) {
+					case PCI_encryption_decryption_other:
+						_AddPath(*stack, "busses", "random");
+						break;
+					default:
+						_AddPath(*stack, "drivers");
+						break;
+				}
+				break;
 			case PCI_data_acquisition:
 				switch (subType) {
 					case PCI_data_acquisition_other:
@@ -1717,8 +1752,8 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 					_AddPath(*stack, "busses/pci");
 					_AddPath(*stack, "bus_managers");
 				} else if (!generic) {
-					_AddPath(*stack, "busses", "virtio");
 					_AddPath(*stack, "drivers");
+					_AddPath(*stack, "busses/virtio");
 				} else {
 					// For generic drivers, we only allow busses when the
 					// request is more specified
@@ -1732,6 +1767,7 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 					_AddPath(*stack, "busses/i2c");
 					_AddPath(*stack, "busses/scsi");
 					_AddPath(*stack, "busses/random");
+					_AddPath(*stack, "busses/virtio");
 					_AddPath(*stack, "bus_managers/pci");
 				}
 				break;
@@ -1849,7 +1885,14 @@ device_node::_AlwaysRegisterDynamic()
 	get_attr_uint16(this, B_DEVICE_TYPE, &type, false);
 	get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false);
 
-	return type == PCI_serial_bus || type == PCI_bridge || type == 0;
+	switch (type) {
+		case PCI_serial_bus:
+		case PCI_bridge:
+		case PCI_encryption_decryption:
+		case 0:
+			return true;
+	}
+	return false;
 		// TODO: we may want to be a bit more specific in the future
 }
 
@@ -2339,10 +2382,10 @@ static void
 init_node_tree(void)
 {
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Devices Root"}},
-		{B_DEVICE_BUS, B_STRING_TYPE, {string: "root"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "Devices Root"}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {.string = "root"}},
 		{B_DEVICE_FLAGS, B_UINT32_TYPE,
-			{ui32: B_FIND_MULTIPLE_CHILDREN | B_KEEP_DRIVER_LOADED }},
+			{.ui32 = B_FIND_MULTIPLE_CHILDREN | B_KEEP_DRIVER_LOADED }},
 		{NULL}
 	};
 
@@ -2353,9 +2396,9 @@ init_node_tree(void)
 	}
 
 	device_attr genericAttrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Generic"}},
-		{B_DEVICE_BUS, B_STRING_TYPE, {string: "generic"}},
-		{B_DEVICE_FLAGS, B_UINT32_TYPE, {ui32: B_FIND_MULTIPLE_CHILDREN
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "Generic"}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {.string = "generic"}},
+		{B_DEVICE_FLAGS, B_UINT32_TYPE, {.ui32 = B_FIND_MULTIPLE_CHILDREN
 			| B_KEEP_DRIVER_LOADED | B_FIND_CHILD_ON_DEMAND}},
 		{NULL}
 	};

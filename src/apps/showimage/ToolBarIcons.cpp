@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <IconUtils.h>
 
 
@@ -622,10 +623,10 @@ static IconData kIcons[] = {
 status_t
 init_tool_bar_icons()
 {
-	const int32 toolBarIconsSize = 22;
-	const int32 iconRenderSize = max_c(toolBarIconsSize, 32);
+	const BSize toolBarIconsSize = be_control_look->ComposeIconSize(22);
+	const BSize iconRenderSize = be_control_look->ComposeIconSize(32);
 
-	BBitmap bitmap(BRect(0, 0, iconRenderSize - 1, iconRenderSize - 1),
+	BBitmap bitmap = BBitmap(BRect(BPoint(0, 0), iconRenderSize),
 		B_BITMAP_NO_SERVER_LINK, B_RGBA32);
 
 	for (uint32 i = 0; i < sizeof(kIcons) / sizeof(IconData); i++) {
@@ -633,22 +634,16 @@ init_tool_bar_icons()
 			kIcons[i].size, &bitmap);
 		if (ret != B_OK)
 			return ret;
-		kIcons[i].bitmap = new(std::nothrow) BBitmap(BRect(0, 0,
-			toolBarIconsSize - 1, toolBarIconsSize - 1), 0, B_RGBA32);
+		kIcons[i].bitmap = new(std::nothrow) BBitmap(BRect(BPoint(0, 0),
+			toolBarIconsSize), 0, B_RGBA32);
 		if (kIcons[i].bitmap == NULL)
 			return B_NO_MEMORY;
 		ret = kIcons[i].bitmap->InitCheck();
 		if (ret != B_OK)
 			return ret;
-		uint8* src = reinterpret_cast<uint8*>(bitmap.Bits());
-		uint32 srcBPR = bitmap.BytesPerRow();
-		uint8* dst = reinterpret_cast<uint8*>(kIcons[i].bitmap->Bits());
-		uint32 dstBPR = kIcons[i].bitmap->BytesPerRow();
-		for (int32 y = 0; y < toolBarIconsSize; y++) {
-			memcpy(dst, src, 4 * toolBarIconsSize);
-			src += srcBPR;
-			dst += dstBPR;
-		}
+
+		kIcons[i].bitmap->ImportBits(&bitmap, BPoint(0, 0), BPoint(0, 0),
+			toolBarIconsSize);
 	}
 
 	// Initializing 14 icons on startup takes about 10ms on a Core2Duo @ 2GHz.

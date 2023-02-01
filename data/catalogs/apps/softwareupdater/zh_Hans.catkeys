@@ -1,0 +1,64 @@
+1	english	x-vnd.haiku-softwareupdater	369324613
+Updating version	SoftwareUpdaterWindow	List item text	更新版本
+Click here to install {0, plural, one{# updated package} other{# updated packages}}.	CheckManager		点击安装  {0, plural, one{# updated package} other{# updated packages}} 。
+Packages to be uninstalled	SoftwareUpdaterWindow	List super item label	将要卸载的软件包
+No active network connection was found	UpdateManager	Error message	无活动的网络连接
+Quit	SoftwareUpdaterWindow	Alert button label	退出
+There were no updates found.	CheckManager		未找到更新。
+Updates have not been completed, are you sure you want to quit?	SoftwareUpdaterWindow		更新未完成, 确定要退出吗?
+Updates found	SoftwareUpdaterWindow		找到可用更新
+Update now	SoftwareUpdaterWindow		立即更新
+For some reason, we could not reboot your computer.	SoftwareUpdaterWindow		因为某些原因, 我们无法重启你的电脑.
+OK	UpdateManager		确定
+Unrecognized argument	SoftwareUpdaterApp	Error message	无法识别的参数
+There were no updates found.	CheckAction		未找到可用更新.
+No updates available	UpdateAction		无可用更新
+New packages to be installed	SoftwareUpdaterWindow	List super item label	将要安装的新软件包
+Packages to be updated	SoftwareUpdaterWindow	List super item label	即将更新的软件包
+to	SoftwareUpdaterWindow	List item text	到
+Attempting to cancel the updates…	SoftwareUpdaterWindow		正在尝试取消更新…
+Contacting software repositories to check for package updates.	CheckManager		连接软件仓库，检查软件包更新。
+Available updates found	CheckManager		发现可用更新
+from repository	SoftwareUpdaterWindow	List item text	从仓库
+Contacting software repositories to check for package updates.	SoftwareUpdaterWindow		连接软件仓库，检查软件包更新。
+Cancelling updates	SoftwareUpdaterWindow		正在取消更新
+Cancel	SoftwareUpdaterWindow	Alert button label	取消
+There were no updates found.	UpdateAction		未找到可用更新.
+OK	SoftwareUpdaterWindow		确定
+Please choose from these update options:\n\nUpdate:\n\tUpdates all installed packages.\nFull sync:\n\tSynchronizes the installed packages with the repositories.	SoftwareUpdaterWindow		请选择如下更新选项：\n\n更新：\n\t更新所有已安装软件包。\n全部同步：\n\t从远程仓库同步所有已安装软件包。
+The following changes will be made:	SoftwareUpdaterWindow		将应用以下更改:
+Argument variables are no longer accepted\n	SoftwareUpdaterApp		争议变量已经无法接受\n
+Fatal error while checking for updates: %s\n	CheckAction		检查更新时遇到致命错误: %s\n
+SoftwareUpdater	System name		软件更新器
+No active network connection was found.\n	CheckManager		无活动的网络连接。\n
+Applying changes	UpdateManager		正在应用更改
+Full sync	SoftwareUpdaterWindow	Alert button label	全部同步
+Quit	SoftwareUpdaterWindow	Button label	退出
+Updates have been successfully installed.	UpdateManager		已成功安装更新.
+Exception occurred while updating packages : %s\n	UpdateAction		更新软件包时，发生异常：%s\n
+A reboot is necessary to complete the update process.	UpdateManager		需要重启以完成更新.
+Exception occurred while checking for updates: %s\n	CheckAction		检查更新时，发生异常：%s\n
+Packages are being updated	UpdateManager		正在更新软件包
+Cancel	SoftwareUpdaterWindow		取消
+Don't quit	SoftwareUpdaterWindow		请勿退出
+Click here to run SoftwareUpdater. Some updates will require a problem solution to be selected.	CheckManager		点击这里运行 SoftwareUpdater。某些更新需要选择问题解决方案。
+Checking for updates	SoftwareUpdaterWindow		正在检查更新
+Updates completed	UpdateManager		更新已完成
+Reboot	SoftwareUpdaterWindow		重启
+Show more details	SoftwareUpdaterWindow		显示更新详细信息
+Installing version	SoftwareUpdaterWindow	List item text	安装版本
+Checking for updates	CheckManager		正在检查更新
+No remote repositories are available	UpdateManager	Error message	无可用远程仓库
+Software {0, plural, one{update} other{updates}} available	CheckManager		可用软件更新 {0, plural, one{update} other{updates}} 
+Reboot	SoftwareUpdaterWindow	Button label	重启
+Update	SoftwareUpdaterWindow	Alert button label	更新
+Open Repositories	SoftwareUpdaterWindow	Alert button label	打开仓库
+Updates did not complete	UpdateAction		更新未完成
+Invalid update type, cannot continue with updates	UpdateAction		无效更新类型，无法继续执行更新
+Uninstalling version	SoftwareUpdaterWindow	List item text	卸载版本
+%i of %i	UpdateManager	Do not translate %i	%i / %i
+Quit	SoftwareUpdaterWindow		退出
+No updates available	CheckManager		无可用更新
+Usage:  SoftwareUpdater <command> [ <option> ]\nUpdates installed packages.\n\nCommands:\n  update     - Search repositories for updates on all packages.\n  check      - Check for available updates but only display a notification with results.\n  full-sync  - Synchronize the installed packages with the repositories.\n\nOptions:\n  -h or --help       Print this usage help\n  -v or --verbose    Output verbose information\n	SoftwareUpdaterApp	Command line usage help	使用方法：SoftwareUpdater <command> [ <option> ]\n更新安装的软件包。\n\n指令：\n  update      - 搜索仓库获取所有软件包更新。\n  check       - 检查可用更新，仅显示结果通知。\n  full-sync   - 从远程仓库同步所有已安装软件包。\n\n参数：\n  -h 或者 --help       打印本使用方法帮助\n  -v 或者 --verbose    输出版本信息\n
+No remote repositories are available. Please verify that some repositories are enabled using the Repositories preflet or the 'pkgman' command.	SoftwareUpdaterWindow	Error message	无可用的远程仓库。请使用仓库软件或者 'pkgman' 指令确认远程仓库已启用。
+Downloading packages	UpdateManager		正在下载软件包

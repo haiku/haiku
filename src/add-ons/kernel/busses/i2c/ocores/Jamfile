@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src add-ons kernel busses i2c ocores ;
+
+SubDirC++Flags -fno-rtti ;
+
+UsePrivateHeaders i2c ;
+UsePrivateKernelHeaders ;
+
+KernelAddon ocores_i2c :
+	ocores_i2c.cpp
+	kernel_interface.cpp
+;

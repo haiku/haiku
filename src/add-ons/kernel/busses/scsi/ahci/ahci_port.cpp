@@ -72,6 +72,7 @@ AHCIPort::AHCIPort(AHCIController* controller, int index)
 	fDevicePresent(false),
 	fUse48BitCommands(false),
 	fSectorSize(0),
+	fPhysicalSectorSize(0),
 	fSectorCount(0),
 	fIsATAPI(false),
 	fTestUnitReadyActive(false),
@@ -784,6 +785,7 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 	if (!fIsATAPI) {
 		fSectorCount = ataData.SectorCount(fUse48BitCommands, true);
 		fSectorSize = ataData.SectorSize();
+		fPhysicalSectorSize = ataData.PhysicalSectorSize();
 		fTrimSupported = ataData.data_set_management_support;
 		fTrimReturnsZeros = ataData.supports_read_zero_after_trim;
 		fMaxTrimRangeBlocks = B_LENDIAN_TO_HOST_INT16(
@@ -953,6 +955,10 @@ AHCIPort::ScsiReadCapacity16(scsi_ccb* request)
 
 	scsiData.block_size = B_HOST_TO_BENDIAN_INT32(fSectorSize);
 	scsiData.lba = B_HOST_TO_BENDIAN_INT64(fSectorCount - 1);
+	uint8 exponent = 0;
+	for (uint32 size = fPhysicalSectorSize; size > fSectorSize; size >>= 1)
+		exponent++;
+	scsiData.logical_blocks_per_physical_block_exponent = exponent;
 	scsiData.rc_basis = 0x01;
 	scsiData.lbpme = fTrimSupported;
 	scsiData.lbprz = fTrimReturnsZeros;

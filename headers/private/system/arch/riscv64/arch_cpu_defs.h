@@ -27,59 +27,49 @@ enum {
 	extStatusDirty   = 3,
 };
 
-struct MstatusReg {
-	union {
-		struct {
-			uint64 ie:      4; // interrupt enable
-			uint64 pie:     4; // previous interrupt enable
-			uint64 spp:     1; // previous mode (supervisor)
-			uint64 unused1: 2;
-			uint64 mpp:     2; // previous mode (machine)
-			uint64 fs:      2; // FPU status
-			uint64 xs:      2; // extensions status
-			uint64 mprv:    1; // modify privilege
-			uint64 sum:     1; // permit supervisor user memory access
-			uint64 mxr:     1; // make executable readable
-			uint64 tvm:     1; // trap virtual memory
-			uint64 tw:      1; // timeout wait (trap WFI)
-			uint64 tsr:     1; // trap SRET
-			uint64 unused2: 9;
-			uint64 uxl:     2; // U-mode XLEN
-			uint64 sxl:     2; // S-mode XLEN
-			uint64 unused3: 27;
-			uint64 sd:      1; // status dirty
-		};
-		uint64 val;
+union MstatusReg {
+	struct {
+		uint64 ie:      4; // interrupt enable
+		uint64 pie:     4; // previous interrupt enable
+		uint64 spp:     1; // previous mode (supervisor)
+		uint64 unused1: 2;
+		uint64 mpp:     2; // previous mode (machine)
+		uint64 fs:      2; // FPU status
+		uint64 xs:      2; // extensions status
+		uint64 mprv:    1; // modify privilege
+		uint64 sum:     1; // permit supervisor user memory access
+		uint64 mxr:     1; // make executable readable
+		uint64 tvm:     1; // trap virtual memory
+		uint64 tw:      1; // timeout wait (trap WFI)
+		uint64 tsr:     1; // trap SRET
+		uint64 unused2: 9;
+		uint64 uxl:     2; // U-mode XLEN
+		uint64 sxl:     2; // S-mode XLEN
+		uint64 unused3: 27;
+		uint64 sd:      1; // status dirty
 	};
-
-	MstatusReg() {}
-	MstatusReg(uint64 val): val(val) {}
+	uint64 val;
 };
 
-struct SstatusReg {
-	union {
-		struct {
-			uint64 ie:      2; // interrupt enable
-			uint64 unused1: 2;
-			uint64 pie:     2; // previous interrupt enable
-			uint64 unused2: 2;
-			uint64 spp:     1; // previous mode (supervisor)
-			uint64 unused3: 4;
-			uint64 fs:      2; // FPU status
-			uint64 xs:      2; // extensions status
-			uint64 unused4: 1;
-			uint64 sum:     1; // permit supervisor user memory access
-			uint64 mxr:     1; // make executable readable
-			uint64 unused5: 12;
-			uint64 uxl:     2; // U-mode XLEN
-			uint64 unused6: 29;
-			uint64 sd:      1; // status dirty
-		};
-		uint64 val;
+union SstatusReg {
+	struct {
+		uint64 ie:      2; // interrupt enable
+		uint64 unused1: 2;
+		uint64 pie:     2; // previous interrupt enable
+		uint64 unused2: 2;
+		uint64 spp:     1; // previous mode (supervisor)
+		uint64 unused3: 4;
+		uint64 fs:      2; // FPU status
+		uint64 xs:      2; // extensions status
+		uint64 unused4: 1;
+		uint64 sum:     1; // permit supervisor user memory access
+		uint64 mxr:     1; // make executable readable
+		uint64 unused5: 12;
+		uint64 uxl:     2; // U-mode XLEN
+		uint64 unused6: 29;
+		uint64 sd:      1; // status dirty
 	};
-
-	SstatusReg() {}
-	SstatusReg(uint64 val): val(val) {}
+	uint64 val;
 };
 
 enum {
@@ -129,7 +119,6 @@ enum {
 };
 
 enum {
-	pageSize = 4096,
 	pageBits = 12,
 	pteCount = 512,
 	pteIdxBits = 9,
@@ -146,19 +135,14 @@ enum {
 	pteDirty    = 7,
 };
 
-struct Pte {
-	union {
-		struct {
-			uint64 flags:     8;
-			uint64 rsw:       2;
-			uint64 ppn:      44;
-			uint64 reserved: 10;
-		};
-		uint64 val;
+union Pte {
+	struct {
+		uint64 flags:     8;
+		uint64 rsw:       2;
+		uint64 ppn:      44;
+		uint64 reserved: 10;
 	};
-
-	Pte() {}
-	Pte(uint64 val): val(val) {}
+	uint64 val;
 };
 
 enum {
@@ -169,18 +153,13 @@ enum {
 	satpModeSv64 = 11,
 };
 
-struct SatpReg {
-	union {
-		struct {
-			uint64 ppn:  44;
-			uint64 asid: 16;
-			uint64 mode:  4;
-		};
-		uint64 val;
+union SatpReg {
+	struct {
+		uint64 ppn:  44;
+		uint64 asid: 16;
+		uint64 mode:  4;
 	};
-
-	SatpReg() {}
-	SatpReg(uint64 val): val(val) {}
+	uint64 val;
 };
 
 static B_ALWAYS_INLINE uint64 VirtAdrPte(uint64 physAdr, uint32 level)
@@ -190,134 +169,84 @@ static B_ALWAYS_INLINE uint64 VirtAdrPte(uint64 physAdr, uint32 level)
 
 static B_ALWAYS_INLINE uint64 VirtAdrOfs(uint64 physAdr)
 {
-	return physAdr % pageSize;
+	return physAdr % PAGESIZE;
 }
 
+#define CSR_REG_MACRO(Name, value) \
+	static B_ALWAYS_INLINE uint64 Name() { \
+		uint64 x; asm volatile("csrr %0, " #value : "=r" (x)); return x;} \
+	static B_ALWAYS_INLINE void Set##Name(uint64 x) { \
+		asm volatile("csrw " #value ", %0" : : "r" (x));} \
+	static B_ALWAYS_INLINE void SetBits##Name(uint64 x) { \
+		asm volatile("csrs " #value ", %0" : : "r" (x));} \
+	static B_ALWAYS_INLINE void ClearBits##Name(uint64 x) { \
+		asm volatile("csrc " #value ", %0" : : "r" (x));} \
+	static B_ALWAYS_INLINE uint64 GetAndSetBits##Name(uint64 x) { \
+		uint64 res; \
+		asm volatile("csrrs %0, " #value ", %1" : "=r" (res) : "r" (x)); \
+		return res; \
+	} \
+	static B_ALWAYS_INLINE uint64 GetAndClearBits##Name(uint64 x) { \
+		uint64 res; \
+		asm volatile("csrrc %0, " #value ", %1" : "=r" (res) : "r" (x)); \
+		return res; \
+	} \
+
 // CPU core ID
-static B_ALWAYS_INLINE uint64 Mhartid() {
-	uint64 x; asm volatile("csrr %0, mhartid" : "=r" (x)); return x;}
+CSR_REG_MACRO(Mhartid, mhartid)
 
 // status register
-static B_ALWAYS_INLINE uint64 Mstatus() {
-	uint64 x; asm volatile("csrr %0, mstatus" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetMstatus(uint64 x) {
-	asm volatile("csrw mstatus, %0" : : "r" (x));}
-static B_ALWAYS_INLINE uint64 Sstatus() {
-	uint64 x; asm volatile("csrr %0, sstatus" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetSstatus(uint64 x) {
-	asm volatile("csrw sstatus, %0" : : "r" (x));}
+CSR_REG_MACRO(Mstatus, mstatus)
+CSR_REG_MACRO(Sstatus, sstatus)
 
 // exception program counter
-static B_ALWAYS_INLINE uint64 Mepc() {
-	uint64 x; asm volatile("csrr %0, mepc" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetMepc(uint64 x) {
-	asm volatile("csrw mepc, %0" : : "r" (x));}
-static B_ALWAYS_INLINE uint64 Sepc() {
-	uint64 x; asm volatile("csrr %0, sepc" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetSepc(uint64 x) {
-	asm volatile("csrw sepc, %0" : : "r" (x));}
+CSR_REG_MACRO(Mepc, mepc)
+CSR_REG_MACRO(Sepc, sepc)
 
 // interrupt pending
-static B_ALWAYS_INLINE uint64 Mip() {
-	uint64 x; asm volatile("csrr %0, mip" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetMip(uint64 x) {
-	asm volatile("csrw mip, %0" : : "r" (x));}
-static B_ALWAYS_INLINE uint64 Sip() {
-	uint64 x; asm volatile("csrr %0, sip" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetSip(uint64 x) {
-	asm volatile("csrw sip, %0" : : "r" (x));}
+CSR_REG_MACRO(Mip, mip)
+CSR_REG_MACRO(Sip, sip)
 
 // interrupt enable
-static B_ALWAYS_INLINE uint64 Sie() {
-	uint64 x; asm volatile("csrr %0, sie" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetSie(uint64 x) {
-	asm volatile("csrw sie, %0" : : "r" (x));}
-static B_ALWAYS_INLINE uint64 Mie() {
-	uint64 x; asm volatile("csrr %0, mie" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetMie(uint64 x) {
-	asm volatile("csrw mie, %0" : : "r" (x));}
+CSR_REG_MACRO(Mie, mie)
+CSR_REG_MACRO(Sie, sie)
 
 // exception delegation
-static B_ALWAYS_INLINE uint64 Medeleg() {
-	uint64 x; asm volatile("csrr %0, medeleg" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetMedeleg(uint64 x) {
-	asm volatile("csrw medeleg, %0" : : "r" (x));}
+CSR_REG_MACRO(Medeleg, medeleg)
 // interrupt delegation
-static B_ALWAYS_INLINE uint64 Mideleg() {
-	uint64 x; asm volatile("csrr %0, mideleg" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetMideleg(uint64 x) {
-	asm volatile("csrw mideleg, %0" : : "r" (x));}
+CSR_REG_MACRO(Mideleg, mideleg)
 
 // trap vector, 2 low bits: mode
-static B_ALWAYS_INLINE uint64 Mtvec() {
-	uint64 x; asm volatile("csrr %0, mtvec" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetMtvec(uint64 x) {
-	asm volatile("csrw mtvec, %0" : : "r" (x));}
-static B_ALWAYS_INLINE uint64 Stvec() {
-	uint64 x; asm volatile("csrr %0, stvec" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetStvec(uint64 x) {
-	asm volatile("csrw stvec, %0" : : "r" (x));}
+CSR_REG_MACRO(Mtvec, mtvec)
+CSR_REG_MACRO(Stvec, stvec)
 
 // address translation and protection (pointer to page table and flags)
-static B_ALWAYS_INLINE uint64 Satp() {
-	uint64 x; asm volatile("csrr %0, satp" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetSatp(uint64 x) {
-	asm volatile("csrw satp, %0" : : "r" (x) : "memory");}
+CSR_REG_MACRO(Satp, satp)
 
 // scratch register
-static B_ALWAYS_INLINE uint64 Mscratch() {
-	uint64 x; asm volatile("csrr %0, mscratch" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetMscratch(uint64 x) {
-	asm volatile("csrw mscratch, %0" : : "r" (x));}
-static B_ALWAYS_INLINE uint64 Sscratch() {
-	uint64 x; asm volatile("csrr %0, sscratch" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetSscratch(uint64 x) {
-	asm volatile("csrw sscratch, %0" : : "r" (x));}
+CSR_REG_MACRO(Mscratch, mscratch)
+CSR_REG_MACRO(Sscratch, sscratch)
 
 // trap cause
-static B_ALWAYS_INLINE uint64 Mcause() {
-	uint64 x; asm volatile("csrr %0, mcause" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetMcause(uint64 x) {
-	asm volatile("csrw mcause, %0" : : "r" (x));}
-static B_ALWAYS_INLINE uint64 Scause() {
-	uint64 x; asm volatile("csrr %0, scause" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetScause(uint64 x) {
-	asm volatile("csrw scause, %0" : : "r" (x));}
+CSR_REG_MACRO(Mcause, mcause)
+CSR_REG_MACRO(Scause, scause)
 
 // trap value
-static B_ALWAYS_INLINE uint64 Mtval() {
-	uint64 x; asm volatile("csrr %0, mtval" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetMtval(uint64 x) {
-	asm volatile("csrw mtval, %0" : : "r" (x));}
-static B_ALWAYS_INLINE uint64 Stval() {
-	uint64 x; asm volatile("csrr %0, stval" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetStval(uint64 x) {
-	asm volatile("csrw stval, %0" : : "r" (x));}
+CSR_REG_MACRO(Mtval, mtval)
+CSR_REG_MACRO(Stval, stval)
 
 // machine-mode counter enable
-static B_ALWAYS_INLINE uint64 Mcounteren() {
-	uint64 x; asm volatile("csrr %0, mcounteren" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetMcounteren(uint64 x) {
-	asm volatile("csrw mcounteren, %0" : : "r" (x));}
+CSR_REG_MACRO(Mcounteren, mcounteren)
 
 // cycle counter
-static B_ALWAYS_INLINE uint64 CpuMcycle() {
-	uint64 x; asm volatile("csrr %0, mcycle" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE uint64 CpuCycle() {
-	uint64 x; asm volatile("csrr %0, cycle" : "=r" (x)); return x;}
+CSR_REG_MACRO(CpuMcycle, mcycle)
+CSR_REG_MACRO(CpuCycle, cycle)
 // monotonic timer
-static B_ALWAYS_INLINE uint64 CpuTime() {
-	uint64 x; asm volatile("csrr %0, time" : "=r" (x)); return x;}
+CSR_REG_MACRO(CpuTime, time)
 
 // physical memory protection
-static B_ALWAYS_INLINE uint64 Pmpaddr0() {
-	uint64 x; asm volatile("csrr %0, pmpaddr0" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE uint64 Pmpcfg0() {
-	uint64 x; asm volatile("csrr %0, pmpcfg0" : "=r" (x)); return x;}
-static B_ALWAYS_INLINE void SetPmpaddr0(uint64 x) {
-	asm volatile("csrw pmpaddr0, %0" : : "r" (x));}
-static B_ALWAYS_INLINE void SetPmpcfg0(uint64 x) {
-	asm volatile("csrw pmpcfg0, %0" : : "r" (x));}
+CSR_REG_MACRO(Pmpaddr0, pmpaddr0)
+CSR_REG_MACRO(Pmpcfg0, pmpcfg0)
 
 // flush the TLB
 static B_ALWAYS_INLINE void FlushTlbAll() {

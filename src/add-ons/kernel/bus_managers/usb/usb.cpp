@@ -15,6 +15,7 @@
 #define USB_MODULE_NAME "module"
 
 Stack *gUSBStack = NULL;
+device_manager_info *gDeviceManager;
 
 
 /*!	The function is an evil hack to allow <tt> <kdebug>usb_keyboard </tt> to
@@ -528,6 +529,19 @@ cancel_queued_transfers(usb_pipe pipe)
 
 
 status_t
+cancel_queued_requests(usb_device dev)
+{
+	TRACE_MODULE("cancel_queued_requests(%" B_PRId32 ")\n", dev);
+	ObjectBusyReleaser object(gUSBStack->GetObject(dev));
+	if (!object.IsSet() || (object->Type() & USB_OBJECT_DEVICE) == 0)
+		return B_DEV_INVALID_PIPE;
+	 Device *device = (Device *)object.Get();
+
+	 return device->DefaultPipe()->CancelQueuedTransfers(false);
+}
+
+
+status_t
 usb_ioctl(uint32 opcode, void *buffer, size_t bufferSize)
 {
 	TRACE_MODULE("usb_ioctl(%" B_PRIu32 ", %p, %" B_PRIuSIZE ")\n", opcode,
@@ -685,7 +699,8 @@ struct usb_module_info gModuleInfoV3 = {
 	get_nth_child,						// get_nth_child
 	get_device_parent,					// get_device_parent
 	reset_port,							// reset_port
-	disable_port						// disable_port
+	disable_port,						// disable_port
+	cancel_queued_requests				// cancel_queued_requests
 	//queue_bulk_v_physical				// queue_bulk_v_physical
 };
 
@@ -895,8 +910,92 @@ struct usb_module_info_v2 gModuleInfoV2 = {
 //
 
 
+status_t
+usb_added_device(device_node *parent)
+{
+	gUSBStack->TriggerExplore();
+	return B_OK;
+}
+
+
+status_t
+usb_get_stack(void** stack)
+{
+	*stack = gUSBStack;
+	return B_OK;
+}
+
+
+usb_for_controller_interface gForControllerModule = {
+	{
+		{
+			USB_FOR_CONTROLLER_MODULE_NAME,
+			B_KEEP_LOADED,
+			&bus_std_ops
+		},
+
+		NULL, // supported devices
+		usb_added_device,
+		NULL,
+		NULL,
+		NULL
+	},
+
+	usb_get_stack,
+};
+
+
+static status_t
+device_std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+		{
+			// Link to USB bus.
+			// USB device driver must have USB bus loaded, but it calls its
+			// functions directly instead via official interface, so this
+			// pointer is never read.
+			module_info *dummy;
+			return get_module("bus_managers/usb/v3", &dummy);
+		}
+		case B_MODULE_UNINIT:
+			return put_module("bus_managers/usb/v3");
+
+		default:
+			return B_ERROR;
+	}
+}
+
+
+usb_device_interface gUSBDeviceModule = {
+	{
+		{
+			USB_DEVICE_MODULE_NAME,
+			0,
+			device_std_ops
+		},
+
+		NULL,	// supported devices
+		NULL,	// register node
+	NULL, //usb_init_device,
+	NULL, //	(void (*)(void *)) usb_uninit_device,
+		NULL,	// register child devices
+		NULL,	// rescan
+	NULL//	(void (*)(void *)) usb_device_removed
+	},
+};
+
+
+module_dependency module_dependencies[] = {
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager },
+	{}
+};
+
+
 module_info *modules[] = {
 	(module_info *)&gModuleInfoV2,
 	(module_info *)&gModuleInfoV3,
+	(module_info *)&gForControllerModule,
+	(module_info *)&gUSBDeviceModule,
 	NULL
 };

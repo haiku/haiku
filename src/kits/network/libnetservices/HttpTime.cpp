@@ -12,6 +12,9 @@
 #include <new>
 
 #include <cstdio>
+#include <locale.h>
+
+using namespace BPrivate::Network;
 
 
 // The formats used should be, in order of preference (according to RFC2616,
@@ -47,11 +50,8 @@ static const char* kDateFormats[] = {
 	"%a %d %b %H:%M:%S %Y"
 };
 
-#ifdef LIBNETAPI_DEPRECATED
-using namespace BPrivate;
-#else
-using namespace BPrivate::Network;
-#endif
+
+static locale_t posix = newlocale(LC_ALL_MASK, "POSIX", (locale_t)0);
 
 
 BHttpTime::BHttpTime()
@@ -78,7 +78,7 @@ BHttpTime::BHttpTime(const BString& dateString)
 {
 }
 
-	
+
 // #pragma mark Date modification
 
 
@@ -95,7 +95,7 @@ BHttpTime::SetDate(BDateTime date)
 	fDate = date;
 }
 
-	
+
 // #pragma mark Date conversion
 
 
@@ -103,11 +103,15 @@ BDateTime
 BHttpTime::Parse()
 {
 	struct tm expireTime;
-	
+
 	if (fDateString.Length() < 4)
 		return 0;
 
 	memset(&expireTime, 0, sizeof(struct tm));
+
+	// Save the current locale, switch to POSIX for strptime to match strings
+	// in English, switch back when we're done.
+	locale_t current = uselocale(posix);
 
 	fDateFormat = B_HTTP_TIME_FORMAT_PARSED;
 	unsigned int i;
@@ -124,6 +128,8 @@ BHttpTime::Parse()
 			break;
 		}
 	}
+
+	uselocale(current);
 
 	// Did we identify some valid format?
 	if (fDateFormat == B_HTTP_TIME_FORMAT_PARSED)
@@ -162,10 +168,10 @@ BHttpTime::ToString(int8 format)
 		static const uint16 kTimetToStringMaxLength = 128;
 		char expirationString[kTimetToStringMaxLength + 1];
 		size_t strLength;
-	
+
 		strLength = strftime(expirationString, kTimetToStringMaxLength,
 			kDateFormats[format], &expirationTm);
-	
+
 		expirationFinal.SetTo(expirationString, strLength);
 	}
 	return expirationFinal;

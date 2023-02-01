@@ -20,22 +20,15 @@
 static inline void
 arch_int_enable_interrupts_inline(void)
 {
-	// TODO: Use atomic CSRRS?
-	SstatusReg status(Sstatus());
-	status.ie |= (1 << modeS);
-	SetSstatus(status.val);
+	SetBitsSstatus(SstatusReg{.ie = 1 << modeS}.val);
 }
 
 
 static inline int
 arch_int_disable_interrupts_inline(void)
 {
-	// TODO: Use atomic CSRRC?
-	SstatusReg status(Sstatus());
-	int oldState = ((1 << modeS) & status.ie) != 0;
-	status.ie &= ~(1 << modeS);
-	SetSstatus(status.val);
-	return oldState;
+	SstatusReg oldStatus{.val = GetAndClearBitsSstatus(SstatusReg{.ie = 1 << modeS}.val)};
+	return ((1 << modeS) & oldStatus.ie) != 0;
 }
 
 
@@ -50,7 +43,7 @@ arch_int_restore_interrupts_inline(int oldState)
 static inline bool
 arch_int_are_interrupts_enabled_inline(void)
 {
-	SstatusReg status(Sstatus());
+	SstatusReg status{.val = Sstatus()};
 	return ((1 << modeS) & status.ie) != 0;
 }
 

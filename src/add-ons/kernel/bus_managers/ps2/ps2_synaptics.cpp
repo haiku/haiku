@@ -28,6 +28,15 @@
 #	define TRACE(x...)
 #endif
 
+/*! The raw movement calculation is calibrated on ths synaptics touchpad. */
+// increase the touchpad size a little bit
+#define SYN_AREA_TOP_LEFT_OFFSET	40
+#define SYN_AREA_BOTTOM_RIGHT_OFFSET	60
+#define SYN_AREA_START_X		(1472 - SYN_AREA_TOP_LEFT_OFFSET)
+#define SYN_AREA_END_X			(5472 + SYN_AREA_BOTTOM_RIGHT_OFFSET)
+#define SYN_AREA_START_Y		(1408 - SYN_AREA_TOP_LEFT_OFFSET)
+#define SYN_AREA_END_Y			(4448 + SYN_AREA_BOTTOM_RIGHT_OFFSET)
+
 // synaptics touchpad proportions
 #define SYN_EDGE_MOTION_WIDTH	50
 #define SYN_AREA_OFFSET			40
@@ -52,7 +61,30 @@ enum {
 	kTrackpointQuirk = 0x10
 };
 
-static hardware_specs gHardwareSpecs;
+static touchpad_specs gHardwareSpecs;
+
+
+typedef struct {
+	uint8 majorVersion;
+	uint8 minorVersion;
+
+	uint8 nExtendedButtons;
+	uint8 firstExtendedButton;
+	uint8 extendedButtonsState;
+
+	bool capExtended : 1;
+	bool capMiddleButton : 1;
+	bool capSleep : 1;
+	bool capFourButtons : 1;
+	bool capMultiFinger : 1;
+	bool capMultiFingerReport : 1;
+	bool capPalmDetection : 1;
+	bool capPassThrough : 1;
+	bool capAdvancedGestures : 1;
+	bool capExtendedWMode : 1;
+	bool capClickPadUniform : 1;
+	int  capClickPadButtonCount : 2;
+} touchpad_info;
 
 
 const char* kSynapticsPath[4] = {
@@ -65,13 +97,6 @@ const char* kSynapticsPath[4] = {
 
 static touchpad_info sTouchpadInfo;
 static ps2_dev *sPassthroughDevice = &ps2_device[PS2_DEVICE_SYN_PASSTHROUGH];
-
-
-static void
-default_settings(touchpad_settings *set)
-{
-	memcpy(set, &kDefaultTouchpadSettings, sizeof(touchpad_settings));
-}
 
 
 static status_t
@@ -126,16 +151,17 @@ get_information_query(ps2_dev *dev, uint8 extendedQueries, uint8 query,
 
 
 static status_t
-get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
+get_synaptics_movment(synaptics_cookie *cookie, touchpad_movement *_event, bigtime_t timeout)
 {
 	status_t status;
-	touch_event event;
+	touchpad_movement event = {};
 	uint8 event_buffer[PS2_MAX_PACKET_SIZE];
 	uint8 wValue0, wValue1, wValue2, wValue3, wValue;
 	uint32 val32;
 	uint32 xTwelfBit, yTwelfBit;
 
-	status = acquire_sem_etc(cookie->synaptics_sem, 1, B_CAN_INTERRUPT, 0);
+	status = acquire_sem_etc(cookie->synaptics_sem, 1, B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT,
+		timeout);
 	if (status < B_OK)
 		return status;
 
@@ -152,6 +178,7 @@ get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
 
 	event.buttons = event_buffer[0] & 3;
  	event.zPressure = event_buffer[2];
+	bool isExtended = false;
 
  	if (sTouchpadInfo.capExtended) {
  		wValue0 = event_buffer[3] >> 2 & 1;
@@ -164,12 +191,98 @@ get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
  		wValue = wValue | (wValue2 << 2);
  		wValue = wValue | (wValue3 << 3);
 
-	 	event.wValue = wValue;
+
+		TRACE("SYNAPTICS: received packet %02x %02x %02x %02x %02x %02x -> W = %d\n",
+			event_buffer[0], event_buffer[1], event_buffer[2], event_buffer[3], event_buffer[4],
+			event_buffer[5], wValue);
+
+		if (wValue <= 1) {
+			// Multiple fingers detected, report the finger count.
+			event.fingers = 2 + wValue;
+
+			// There is a separate "v" value indicating the finger width
+			wValue0 = event_buffer[3] >> 1 & 1;
+			wValue1 = event_buffer[4] >> 1 & 1;
+			wValue2 = event_buffer[2] >> 0 & 1;
+
+			wValue = wValue0;
+			wValue = wValue | (wValue1 << 1);
+			wValue = wValue | (wValue2 << 2);
+
+			event.fingerWidth = wValue * 2;
+		} else if (wValue >= 4) {
+			// wValue = 4 to 15 corresponds to a finger width report for a single finger
+			event.fingerWidth = wValue;
+			event.fingers = 1;
+		}
+		// wValue = 2 - Extended W mode
+		// wValue = 3 - Packet from pass-through device
 	 	event.gesture = false;
+
+		if (sTouchpadInfo.capExtendedWMode && wValue == 2) {
+			// The extended W can be encoded on 4 bits (values 0-7) or 8 bits (80-FF)
+			uint8_t extendedWValue = event_buffer[5] >> 4;
+			if (extendedWValue >= 8)
+				extendedWValue = event_buffer[5];
+			isExtended = true;
+
+			// Extended W = 0 - Scroll wheels
+			if (extendedWValue == 0) {
+				event.wheel_ydelta = event_buffer[2];
+				event.wheel_xdelta = event_buffer[3];
+				event.wheel_zdelta = event_buffer[4];
+				event.wheel_wdelta = (event_buffer[5] & 0x0f) | (event_buffer[3] & 0x30);
+				// Sign extend wdelta if needed
+				if (event.wheel_wdelta & 0x20)
+					event.wheel_wdelta |= 0xffffffc0;
+			}
+
+			// Extended W = 1 - Secondary finger
+			if (extendedWValue == 1) {
+				event.xPosition = event_buffer[1];
+				event.yPosition = event_buffer[2];
+
+				val32 = event_buffer[4] & 0x0F;
+				event.xPosition += val32 << 8;
+				val32 = event_buffer[4] & 0xF0;
+				event.yPosition += val32 << 4;
+
+				event.xPosition *= 2;
+				event.yPosition *= 2;
+
+				event.zPressure = event_buffer[5] & 0x0F;
+				event.zPressure += event_buffer[3] & 0x30;
+
+				// There is a separate "v" value indicating the finger width
+				wValue0 = event_buffer[1] >> 0 & 1;
+				wValue1 = event_buffer[2] >> 0 & 1;
+				wValue2 = event_buffer[5] >> 0 & 1;
+
+				wValue = wValue0;
+				wValue = wValue | (wValue1 << 1);
+				wValue = wValue | (wValue2 << 2);
+
+				event.fingerWidth = wValue * 2;
+			}
+
+			// Extended W = 2 - Finger state info
+			if (extendedWValue == 2) {
+				event.fingers = event_buffer[1] & 0x0F;
+				// TODO this event also provides primary and secondary finger indexes, what do
+				// these mean?
+			}
+
+			// Other values are reserved for other uses (usually enabled with special commands)
+
+
+			*_event = event;
+
+			return status;
+		}
 
 		// Clickpad pretends that all clicks on the touchpad are middle clicks.
 		// Pass them to userspace as left clicks instead.
-		if (sTouchpadInfo.capClickPad)
+		if (sTouchpadInfo.capClickPadButtonCount == 1)
 			event.buttons |= ((event_buffer[0] ^ event_buffer[3]) & 0x01);
 
 		if (sTouchpadInfo.capMiddleButton || sTouchpadInfo.capFourButtons)
@@ -204,27 +317,28 @@ get_synaptics_movment(synaptics_cookie *cookie, mouse_movement *movement)
  		bool finger = event_buffer[0] >> 5 & 1;
  		if (finger) {
  			// finger with normal width
- 			event.wValue = 4;
+			event.fingerWidth = 4;
  		}
  		event.gesture = event_buffer[0] >> 2 & 1;
  	}
 
- 	event.xPosition = event_buffer[4];
- 	event.yPosition = event_buffer[5];
+	if (!isExtended) {
+		event.xPosition = event_buffer[4];
+		event.yPosition = event_buffer[5];
 
- 	val32 = event_buffer[1] & 0x0F;
- 	event.xPosition += val32 << 8;
- 	val32 = event_buffer[1] >> 4 & 0x0F;
- 	event.yPosition += val32 << 8;
+		val32 = event_buffer[1] & 0x0F;
+		event.xPosition += val32 << 8;
+		val32 = event_buffer[1] >> 4 & 0x0F;
+		event.yPosition += val32 << 8;
 
- 	xTwelfBit = event_buffer[3] >> 4 & 1;
- 	event.xPosition += xTwelfBit << 12;
- 	yTwelfBit = event_buffer[3] >> 5 & 1;
- 	event.yPosition += yTwelfBit << 12;
+		xTwelfBit = event_buffer[3] >> 4 & 1;
+		event.xPosition += xTwelfBit << 12;
+		yTwelfBit = event_buffer[3] >> 5 & 1;
+		event.yPosition += yTwelfBit << 12;
+	}
 
- 	status = cookie->movementMaker.EventToMovement(&event, movement);
-
-	return status;
+	*_event = event;
+	return B_OK;
 }
 
 
@@ -243,16 +357,45 @@ query_capability(ps2_dev *dev)
 	TRACE("SYNAPTICS: middle button %2x\n", val[0] >> 2 & 1);
 	sTouchpadInfo.capMiddleButton = val[0] >> 2 & 1;
 
-	TRACE("SYNAPTICS: sleep mode %2x\n", val[2] >> 4 & 1);
-	sTouchpadInfo.capSleep = val[2] >> 4 & 1;
-	TRACE("SYNAPTICS: four buttons %2x\n", val[2] >> 3 & 1);
-	sTouchpadInfo.capFourButtons = val[2] >> 3 & 1;
-	TRACE("SYNAPTICS: multi finger %2x\n", val[2] >> 1 & 1);
-	sTouchpadInfo.capMultiFinger = val[2] >> 1 & 1;
-	TRACE("SYNAPTICS: palm detection %2x\n", val[2] & 1);
-	sTouchpadInfo.capPalmDetection = val[2] & 1;
 	TRACE("SYNAPTICS: pass through %2x\n", val[2] >> 7 & 1);
 	sTouchpadInfo.capPassThrough = val[2] >> 7 & 1;
+
+	// bit 6, low power, is only informative (touchpad has an automatic powersave mode)
+
+	TRACE("SYNAPTICS: multi finger report %2x\n", val[2] >> 5 & 1);
+	sTouchpadInfo.capMultiFingerReport = val[2] >> 5 & 1;
+
+	TRACE("SYNAPTICS: sleep mode %2x\n", val[2] >> 4 & 1);
+	sTouchpadInfo.capSleep = val[2] >> 4 & 1;
+
+	TRACE("SYNAPTICS: four buttons %2x\n", val[2] >> 3 & 1);
+	sTouchpadInfo.capFourButtons = val[2] >> 3 & 1;
+
+	// bit 2, TouchStyk ballistics, not further documented in the documents I have
+
+	TRACE("SYNAPTICS: multi finger %2x\n", val[2] >> 1 & 1);
+	sTouchpadInfo.capMultiFinger = val[2] >> 1 & 1;
+
+	TRACE("SYNAPTICS: palm detection %2x\n", val[2] & 1);
+	sTouchpadInfo.capPalmDetection = val[2] & 1;
+
+	if (get_information_query(dev, nExtendedQueries, kContinuedCapabilities,
+			val) == B_OK) {
+		sTouchpadInfo.capAdvancedGestures = val[0] >> 3 & 1;
+		TRACE("SYNAPTICS: advanced gestures %x\n", sTouchpadInfo.capAdvancedGestures);
+
+		sTouchpadInfo.capClickPadButtonCount = (val[0] >> 4 & 1) | ((val[1] >> 0 & 1) << 1);
+		sTouchpadInfo.capClickPadUniform = val[1] >> 4 & 1;
+		TRACE("SYNAPTICS: clickpad buttons: %x\n", sTouchpadInfo.capClickPadButtonCount);
+		TRACE("SYNAPTICS: clickpad type: %s\n",
+			sTouchpadInfo.capClickPadUniform ? "uniform" : "hinged");
+
+	} else {
+		sTouchpadInfo.capAdvancedGestures = 0;
+		sTouchpadInfo.capClickPadButtonCount = 0;
+		sTouchpadInfo.capClickPadUniform = 0;
+		sTouchpadInfo.capAdvancedGestures = 0;
+	}
 
 	if (get_information_query(dev, nExtendedQueries, kExtendedModelId, val)
 			!= B_OK) {
@@ -260,18 +403,20 @@ query_capability(ps2_dev *dev)
 		// buttons.
 		sTouchpadInfo.nExtendedButtons = 0;
 		sTouchpadInfo.firstExtendedButton = 0;
-		sTouchpadInfo.capClickPad = false;
+		sTouchpadInfo.capExtendedWMode = 0;
 		return;
 	}
-
-	sTouchpadInfo.capClickPad = (val[0] >> 5 & 1) | (val[1] >> 0 & 1);
-	TRACE("SYNAPTICS: clickpad %x\n", sTouchpadInfo.capClickPad);
 
 	TRACE("SYNAPTICS: extended buttons %2x\n", val[1] >> 4 & 15);
 	sTouchpadInfo.nExtendedButtons = val[1] >> 4 & 15;
 	sTouchpadInfo.extendedButtonsState = 0;
 
-	if (sTouchpadInfo.capMiddleButton)
+	sTouchpadInfo.capExtendedWMode = val[0] >> 2 & 1;
+	TRACE("SYNAPTICS: extended wmode %2x\n", sTouchpadInfo.capExtendedWMode);
+
+	if (sTouchpadInfo.capFourButtons)
+		sTouchpadInfo.firstExtendedButton = 4;
+	else if (sTouchpadInfo.capMiddleButton)
 		sTouchpadInfo.firstExtendedButton = 3;
 	else
 		sTouchpadInfo.firstExtendedButton = 2;
@@ -460,15 +605,12 @@ synaptics_open(const char *name, uint32 flags, void **_cookie)
 		goto err1;
 	memset(cookie, 0, sizeof(*cookie));
 
-	cookie->movementMaker.Init();
 	*_cookie = cookie;
 
 	cookie->dev = dev;
 	dev->cookie = cookie;
 	dev->disconnect = &synaptics_disconnect;
 	dev->handle_int = &synaptics_handle_int;
-
-	default_settings(&cookie->settings);
 
 	gHardwareSpecs.edgeMotionWidth = SYN_EDGE_MOTION_WIDTH;
 
@@ -480,9 +622,6 @@ synaptics_open(const char *name, uint32 flags, void **_cookie)
 	gHardwareSpecs.minPressure = MIN_PRESSURE;
 	gHardwareSpecs.realMaxPressure = REAL_MAX_PRESSURE;
 	gHardwareSpecs.maxPressure = MAX_PRESSURE;
-
-	cookie->movementMaker.SetSettings(&cookie->settings);
-	cookie->movementMaker.SetSpecs(&gHardwareSpecs);
 
 	dev->packet_size = PS2_PACKET_SYNAPTICS;
 
@@ -511,10 +650,12 @@ synaptics_open(const char *name, uint32 flags, void **_cookie)
 	}
 
 	// Set Mode
-	if (sTouchpadInfo.capExtended)
-		cookie->mode = SYN_ABSOLUTE_W_MODE;
+	if (sTouchpadInfo.capExtendedWMode)
+		cookie->mode = SYN_MODE_ABSOLUTE | SYN_MODE_W | SYN_MODE_EXTENDED_W;
+	else if (sTouchpadInfo.capExtended)
+		cookie->mode = SYN_MODE_ABSOLUTE | SYN_MODE_W;
 	else
-		cookie->mode = SYN_ABSOLUTE_MODE;
+		cookie->mode = SYN_MODE_ABSOLUTE;
 
 	status = set_touchpad_mode(dev, cookie->mode);
 	if (status < B_OK) {
@@ -567,7 +708,7 @@ synaptics_close(void *_cookie)
 	// without a complete shutdown.
 	status = ps2_reset_mouse(cookie->dev);
 	if (status != B_OK) {
-		INFO("ps2: reset failed\n");
+		INFO("ps2_synaptics: reset failed\n");
 		return B_ERROR;
 	}
 
@@ -607,29 +748,25 @@ status_t
 synaptics_ioctl(void *_cookie, uint32 op, void *buffer, size_t length)
 {
 	synaptics_cookie *cookie = (synaptics_cookie*)_cookie;
-	mouse_movement movement;
+	touchpad_read read;
 	status_t status;
 
 	switch (op) {
-		case MS_READ:
-			if ((status = get_synaptics_movment(cookie, &movement)) != B_OK)
-				return status;
-			TRACE("SYNAPTICS: MS_READ get event\n");
-			return user_memcpy(buffer, &movement, sizeof(movement));
-
 		case MS_IS_TOUCHPAD:
 			TRACE("SYNAPTICS: MS_IS_TOUCHPAD\n");
-			return B_OK;
+			if (buffer == NULL)
+				return B_OK;
+			return user_memcpy(buffer, &gHardwareSpecs, sizeof(gHardwareSpecs));
 
-		case MS_SET_TOUCHPAD_SETTINGS:
-			TRACE("SYNAPTICS: MS_SET_TOUCHPAD_SETTINGS");
-			user_memcpy(&cookie->settings, buffer, sizeof(touchpad_settings));
-			return B_OK;
-
-		case MS_SET_CLICKSPEED:
-			TRACE("SYNAPTICS: ioctl MS_SETCLICK (set click speed)\n");
-			return user_memcpy(&cookie->movementMaker.click_speed, buffer,
-				sizeof(bigtime_t));
+		case MS_READ_TOUCHPAD:
+			TRACE("SYNAPTICS: MS_READ get event\n");
+			if (user_memcpy(&read.timeout, &(((touchpad_read*)buffer)->timeout),
+					sizeof(bigtime_t)) != B_OK)
+				return B_BAD_ADDRESS;
+			if ((status = get_synaptics_movment(cookie, &read.u.touchpad, read.timeout)) != B_OK)
+				return status;
+			read.event = MS_READ_TOUCHPAD;
+			return user_memcpy(buffer, &read, sizeof(read));
 
 		default:
 			TRACE("SYNAPTICS: unknown opcode: %" B_PRIu32 "\n", op);
@@ -646,22 +783,21 @@ synaptics_handle_int(ps2_dev *dev)
 
 	val = cookie->dev->history[0].data;
 
-	if ((cookie->packet_index == 0 || cookie->packet_index == 3)
-		&& (val & 8) != 0) {
-		INFO("SYNAPTICS: bad mouse data, trying resync\n");
+	if ((cookie->packet_index == 0 || cookie->packet_index == 3) && (val & 8) != 0) {
+		INFO("SYNAPTICS: bad mouse data %#02x, trying resync\n", val);
 		cookie->packet_index = 0;
 		return B_UNHANDLED_INTERRUPT;
 	}
 	if (cookie->packet_index == 0 && val >> 6 != 0x02) {
-	 	TRACE("SYNAPTICS: first package begins not with bit 1, 0\n");
+		TRACE("SYNAPTICS: first package %#02x begins not with bit 1, 0\n", val);
 		return B_UNHANDLED_INTERRUPT;
- 	}
- 	if (cookie->packet_index == 3 && val >> 6 != 0x03) {
-	 	TRACE("SYNAPTICS: third package begins not with bit 1, 1\n");
-	 	cookie->packet_index = 0;
+	}
+	if (cookie->packet_index == 3 && val >> 6 != 0x03) {
+		TRACE("SYNAPTICS: third package %#02x begins not with bit 1, 1\n", val);
+		cookie->packet_index = 0;
 		return B_UNHANDLED_INTERRUPT;
- 	}
- 	cookie->buffer[cookie->packet_index] = val;
+	}
+	cookie->buffer[cookie->packet_index] = val;
 
 	cookie->packet_index++;
 	if (cookie->packet_index >= 6) {
@@ -672,6 +808,7 @@ synaptics_handle_int(ps2_dev *dev)
 		if (sPassthroughDevice->active
 			&& sPassthroughDevice->handle_int != NULL
 			&& IS_SYN_PT_PACKAGE(cookie->buffer)) {
+			TRACE("SYNAPTICS: forward packet to passthrough device\n");
 			status_t status;
 
 			sPassthroughDevice->history[0].data = cookie->buffer[1];

@@ -747,6 +747,8 @@ unload_library(void* handle, image_id imageID, bool addOn)
 
 	if (status == B_OK) {
 		while ((image = get_disposable_images().head) != NULL) {
+			dequeue_disposable_image(image);
+
 			// Call the exit hooks that live in this image.
 			// Note: With the Itanium ABI this shouldn't really be done this
 			// way anymore, since global destructors are registered via
@@ -770,7 +772,6 @@ unload_library(void* handle, image_id imageID, bool addOn)
 
 			TLSBlockTemplates::Get().Unregister(image->dso_tls_id);
 
-			dequeue_disposable_image(image);
 			unmap_image(image);
 
 			image_event(image, IMAGE_EVENT_UNLOADING);

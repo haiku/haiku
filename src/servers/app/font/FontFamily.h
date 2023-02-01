@@ -13,6 +13,7 @@
 #include <ObjectList.h>
 #include <String.h>
 
+#include "AppFontManager.h"
 #include "FontStyle.h"
 
 
@@ -30,8 +31,10 @@ public:
 
 			const char*	Name() const;
 
-			bool		AddStyle(FontStyle* style);
-			bool		RemoveStyle(FontStyle* style);
+			bool		AddStyle(FontStyle* style,
+							AppFontManager* fontManager = NULL);
+			bool		RemoveStyle(FontStyle* style,
+							AppFontManager* fontManager = NULL);
 
 			FontStyle*	GetStyle(const char* style) const;
 			FontStyle*	GetStyleMatchingFace(uint16 face) const;

@@ -4,8 +4,6 @@ local zlibSourceDirectory = [ BuildFeatureAttribute zlib : sources : path ] ;
 UseHeaders $(zlibSourceDirectory) ;
 UseHeaders $(zlibSourceDirectory) : true ;
 
-DEFINES += _BOOT_MODE ;
-
 local zlibSources =
 	adler32.c
 	crc32.c
@@ -43,6 +41,8 @@ local libFDTSources =
 	fdt_empty_tree.c
 	fdt_overlay.c
 	;
+
+SubDirCcFlags -Wno-error=missing-prototypes ;
 
 local platform ;
 for platform in [ MultiBootSubDirSetup ] {

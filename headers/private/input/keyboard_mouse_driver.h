@@ -62,9 +62,10 @@ enum {
 	MS_GET_CLICKSPEED,
 	MS_SET_CLICKSPEED,
 	MS_NUM_SERIAL_MICE,
+
 	MS_IS_TOUCHPAD,
-	MS_SET_TOUCHPAD_SETTINGS,
-	
+	MS_READ_TOUCHPAD,
+
 	IIC_WRITE = B_DEVICE_OP_CODES_END + 200, 
 	RESTART_SYSTEM,
 	SHUTDOWN_SYSTEM
@@ -128,6 +129,22 @@ typedef struct {
 
 
 typedef struct {
+	uint16		edgeMotionWidth;
+
+	uint16		width;
+	uint16		areaStartX;
+	uint16		areaEndX;
+	uint16		areaStartY;
+	uint16		areaEndY;
+
+	uint16		minPressure;
+	// the value you reach when you hammer really hard on the touchpad
+	uint16		realMaxPressure;
+	uint16		maxPressure;
+} touchpad_specs;
+
+
+typedef struct {
 	uint8		buttons;
 	uint32		xPosition;
 	uint32		yPosition;
@@ -135,10 +152,24 @@ typedef struct {
 	uint8		fingers;
 	bool		gesture;
 	uint8		fingerWidth;
+	int32		wheel_ydelta;
+	int32		wheel_xdelta;
+	int32		wheel_zdelta;
+	int32		wheel_wdelta;
 	// 1 - 4	normal width
 	// 5 - 11	very wide finger or palm
-	// 12		maximum reportable width; extrem wide contact
+	// 12		maximum reportable width; extreme wide contact
 } touchpad_movement;
+
+
+typedef struct {
+	bigtime_t timeout;
+	int32 event;
+	union {
+		touchpad_movement touchpad;
+		mouse_movement mouse;
+	} u;
+} touchpad_read;
 
 
 #endif	// _KB_MOUSE_DRIVER_H

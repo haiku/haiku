@@ -43,6 +43,7 @@ All rights reserved.
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Directory.h>
 #include <Dragger.h>
@@ -233,6 +234,26 @@ TBarApp::SaveSettings()
 void
 TBarApp::InitSettings()
 {
+	// compute metrics
+	sIconGap = ceilf(be_control_look->DefaultLabelSpacing() / 3.0f);
+
+	gDragRegionWidth = be_control_look->ComposeSpacing(B_USE_HALF_ITEM_SPACING);
+	gDragWidth = ceilf(gDragRegionWidth * 0.6f);
+
+	gMinReplicantHeight = gMinReplicantWidth =
+		be_control_look->ComposeIconSize(B_MINI_ICON).IntegerWidth() + 1;
+
+	// 1 pixel for left gutter
+	// space for replicant tray (6 items)
+	// 6 pixel drag region
+	gMinimumTrayWidth = sIconGap + gMinReplicantWidth
+		+ (kMinimumReplicantCount * sIconGap)
+		+ (kMinimumReplicantCount * gMinReplicantWidth) + kGutter;
+
+	gMinimumWindowWidth = kGutter + gMinimumTrayWidth + gDragRegionWidth;
+	gMaximumWindowWidth = gMinimumWindowWidth * 2;
+
+	// defaults
 	desk_settings settings;
 	settings.vertical = fDefaultSettings.vertical = true;
 	settings.left = fDefaultSettings.left = false;
@@ -901,7 +922,14 @@ TBarApp::ResizeTeamIcons()
 int32
 TBarApp::IconSize()
 {
-	return fSettings.iconSize;
+	static int32 iconSize = 0, composedIconSize = 0;
+	if (iconSize != fSettings.iconSize) {
+		composedIconSize = be_control_look->ComposeIconSize(fSettings.iconSize)
+			.IntegerWidth() + 1;
+		iconSize = fSettings.iconSize;
+	}
+
+	return composedIconSize;
 }
 
 
@@ -939,8 +967,8 @@ TBarApp::QuitPreferencesWindow()
 void
 TBarApp::FetchAppIcon(BarTeamInfo* barInfo)
 {
-	int32 width = IconSize();
-	int32 index = (width - kMinimumIconSize) / kIconSizeInterval;
+	const int32 width = IconSize();
+	const int32 index = (fSettings.iconSize - kMinimumIconSize) / kIconSizeInterval;
 
 	// first look in the icon cache
 	barInfo->icon = barInfo->iconCache[index];

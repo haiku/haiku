@@ -1,182 +1,852 @@
 /*
- * Copyright 2013 Haiku, Inc. All rights reserved.
+ * Copyright 2022 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Adrien Destugues, pulkomandy@pulkomandy.tk
- *		John Scipione, jscipione@gmail.com
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
  *
  * Corresponds to:
- *		headers/private/netservices/HttpRequest.h		hrev54923
- *		src/kits/network/libnetservices/HttpRequest.cpp	hrev54923
+ *		headers/private/netservices2/HttpRequest.h			hrev?????
+ *		src/kits/network/libnetservices2/HttpRequest.cpp	hrev?????
  */
+
+
+#if __cplusplus >= 201703L
 
 
 /*!
 	\file HttpRequest.h
 	\ingroup netservices
-	\brief Management of HTTP or HTTPS protocol requests
+	\brief Provides the classes and tools to build HTTP Requests.
+
+	\since Haiku R1
 */
 
 
+namespace BPrivate {
+
+namespace Network {
+
+
 /*!
-	\class BPrivate::Network::BHttpRequest
+	\class BHttpMethod
 	\ingroup netservices
-	\brief Handles a request over HTTP or HTTPS.
+	\brief Represent a HTTP method.
 
-	Instances of ths class will be created by the BUrlProtocolRoster for
-	BUrl with the "http" or "https" protocol. The HTTP protocol is
-	implemented as specified in RFC2616. The request headers and body can be
-	customized, then sent to the server. The reply is then parsed and made
-	available to the application.
+	The <a href="https://datatracker.ietf.org/doc/html/rfc7231#section-4.1">HTTP standard</a>
+	specifies that HTTP requests have a method. Common methods are \c GET and \c HEAD methods.
+	Standardized and common methods are in the form of \em verbs and are in capitalized letters
+	from the ASCII token set, though any valid token can be used.
 
-	This class only implements the client-side part of HTTP, it can't be used
-	to build an HTTP server.
+	It is most likely that you will not use the methods of this class directly, instead you will
+	use the implicit constructors while interacting with the \ref BHttpRequest class.
+
+	\code
+	auto url = BUrl("https://www.haiku-os.org/");
+	// implicitly construct a standard get request
+	auto standard = BHttpRequest(url, BHttpMethod::Get);
+	// implicitly construct a nonstandard patch request
+	auto custom = BHttpRequest(url, "PATCH"sv);
+	\endcode
+
+	\note When you are using the standard list of verbs, there will never be an exception when
+		creating objects of this type. When you create a custom method, exceptions may be raised
+		when the system runs out of memory, or when your custom method contains invalid characters.
+		In almost all cases, you can probably safely assume you will not run into these exceptions,
+		except for cases where you use user input to create methods or you are very defensive
+		about memory management.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BHttpRequest::SetMethod(const char* method)
-	\brief Set the HTTP method.
+	\class BHttpMethod::InvalidMethod
+	\ingroup netservices
+	\brief Error that represents when a custom method does not conform to the HTTP standard.
 
-	You can use either one of the standard methods (B_HTTP_GET is the default)
-	or a custom one. The standard methods are B_HTTP_GET, B_HTTP_POST,
-	B_HTTP_PUT, B_HTTP_DELETE, B_HTTP_HEAD, B_HTTP_OPTIONS, B_HTTP_TRACE and
-	B_HTTP_CONNECT.
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BHttpRequest::SetFollowLocation(bool follow)
-	\brief Enable or disable following HTTP redirects.
+	\var BString BHttpMethod::InvalidMethod::input
+	\brief The input that contains the invalid contents.
 
-	An HTTP server can redirect a request to another address, either on the
-	same host or elsewhere. When FollowLocation is set (the default), these
-	redirections will be followed until an actual page (or an error) is found.
-	When it is unset, the redirection will not be followed and will be reported
-	to the client.
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BHttpRequest::SetMaxRedirections(int8 maxRedirections)
-	\brief Set the maximal number of redirections to follow before giving up.
+	\fn BHttpMethod::InvalidMethod::InvalidMethod(const char *origin, BString input)
+	\brief Constructor that sets the \a origin and the invalid \a input.
 
-	This is only useful when SetFollowLocation is enabled. It will abort
-	the request after the given number of redirections. This avoids and helps
-	diagnosing redirection cycles, where two addresses redirect to each other.
-
-	The default is to follow at most 8 redirections before giving up.
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BHttpRequest::SetReferrer(const BString& referrer)
-	\brief Set the referrer.
+	\enum BHttpMethod::Verb
+	\ingroup netservices
+	\brief A list of standard HTTP methods.
 
-	The referrer is a string sent to the server in the "Referrer:" HTTP header
-	field. It helps the server know where the request comes from. When
-	following a link in an HTML page, this is usually set to the URL of that
-	page.
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BHttpRequest::SetUserAgent(const BString& userAgent)
-	\brief Set the user agent.
+	\var BHttpMethod::Verb BHttpMethod::Get
+	\brief Represents the \c GET method.
 
-	The user agent is an identifier for the client sending an HTTP request.
-	Some servers will use this to send different content depending on the
-	software asking for a page.
-
-	The default user agent is "Services Kit (Haiku)".
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BHttpRequest::SetHeaders(const BHttpHeaders& headers)
-	\brief Set the HTTP headers.
+	\var BHttpMethod::Verb BHttpMethod::Head
+	\brief Represents the \c HEAD method.
 
-	This method replaces the whole set of headers for this request with a copy
-	of the given ones.
-
-	\param headers the header template to copy from.
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BHttpRequest::AdoptHeaders(BHttpHeaders* const headers)
-	\brief Set the HTTP headers.
+	\var BHttpMethod::Verb BHttpMethod::Post
+	\brief Represents the \c POST method.
 
-	This method replaces the whole set of headers for this request. It takes
-	ownership of the parameter, which must not be used afterwards.
-*/
-
-
-/*
-	\fn void BHttpRequest::SetDiscardDate(bool discard)
-
-	This is currently unused.
-*/
-
-
-/*
-	\fn void BHttpRequest::DisableListener(bool disable)
-	This is currently unused.
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BHttpRequest::SetAutoReferrer(bool enable)
-	\brief Automatically set the referrer when the request is done.
+	\var BHttpMethod::Verb BHttpMethod::Put
+	\brief Represents the \c PUT method.
 
-	This allows HttpRequest to manage the referrer automatically. Each request
-	will set the referrer to its own URL so the next request automatically
-	uses that one.
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BHttpRequest::SetPostFields(const BHttpForm& fields)
-	\brief Set the fields for form POST data.
+	\var BHttpMethod::Verb BHttpMethod::Delete
+	\brief Represents the \c DELETE method.
 
-	Replaces the content of the request with a copy of the given POST fields.
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BHttpRequest::AdoptPostFields(BHttpForm* const fields)
-	\brief Set the fields for form POST data.
+	\var BHttpMethod::Verb BHttpMethod::Connect
+	\brief Represents the \c CONNECT method.
 
-	Replaces the content of the request with the given POST fields.
-
-	This method takes ownership of the given form, which must not be used
-	elsewhere afterwards.
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BHttpRequest::AdoptInputData(BDataIO* const data, const ssize_t size = -1)
-	\brief Set the request body.
+	\var BHttpMethod::Verb BHttpMethod::Options
+	\brief Represents the \c OPTIONS method.
 
-	If the size is -1 (the default), the data will be sent using chunked
-	transfers. If the size is known, it will be sent using the Content-Length
-	header and non-chunked mode.
-
-	You should set the size whenever possible, as some servers will not handle
-	chunked mode properly in all cases.
-
-	This method takes ownership of the data, which must not be used elsewhere.
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BHttpRequest::SetUserName(const BString& userName)
-	\brief Set the user name for HTTP authentication.
+	\var BHttpMethod::Verb BHttpMethod::Trace
+	\brief Represents the \c TRACE method.
+
+	\since Haiku R1
 */
 
 
 /*!
-	\fn void BHttpRequest::SetPassword(const BString& password)
-	\brief Set the user password for HTTP authentication.
+	\fn BHttpMethod::BHttpMethod(BHttpMethod &&other) noexcept
+	\brief Move constructor.
+
+	Moves the data from the \a other to this object. The \a other object will be set to
+	\ref BHttpMethod::Get.
+
+	\since Haiku R1
 */
+
+
+/*!
+	\fn BHttpMethod::BHttpMethod(const BHttpMethod &other)
+	\brief Copy constructor.
+
+	Copy data from an \a other object.
+
+	\exception std::bad_alloc When the \a other object contains a custom verb, this exception
+		will be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpMethod::BHttpMethod(const std::string_view &method)
+	\brief Construct a custom method.
+
+	\param method The verb for the method.
+
+	\exception std::bad_alloc In case it is not possible to allocate memory for the custom string.
+	\exception BHttpMethod::InvalidMethod In case the \a method is empty or contains invalid
+		characters.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpMethod::BHttpMethod(Verb verb) noexcept
+	\brief Construct a standard method.
+
+	\param verb The chosen method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpMethod::~BHttpMethod()
+	\brief Destructor.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BHttpMethod::operator==(const Verb &other) const noexcept
+	\brief Comparison operator.
+
+	\param other The verb to compare to.
+
+	\retval true This method is equal to \a other.
+	\retval false This method is different from \a other.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BHttpMethod::operator!=(const Verb &other) const noexcept
+	\brief Comparison operator.
+
+	\param other The verb to compare to.
+
+	\retval true This method is different from \a other.
+	\retval false This method is equal to \a other.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const std::string_view BHttpMethod::Method() const noexcept
+	\brief Get a string representation of the method.
+
+	\return A \c std::string_view that is a string representation of the standard or custom method
+		in this object. The lifetime of the string view is bound to the lifetime of this method.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpMethod& BHttpMethod::operator=(BHttpMethod &&other) noexcept
+	\brief Move assignment.
+	Moves the data from the \a other to this object. The \a other object will be set to
+	\ref BHttpMethod::Get.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpMethod& BHttpMethod::operator=(const BHttpMethod &other)
+	\brief Copy assignment.
+
+	Copy data from an \a other object.
+
+	\exception std::bad_alloc When the \a other object contains a custom verb, this exception
+		will be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\struct BHttpAuthentication
+	\ingroup netservices
+	\brief Describe username and password for basic authentication for the request.
+
+	\see These options are used by \ref BHttpRequest::Authentication() and
+		\ref BHttpRequest::SetAuthentication()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BString BHttpAuthentication::username
+	\brief The username for the request.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BString BHttpAuthentication::password
+	\brief The password for the request.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\struct BHttpRequest::Body
+	\ingroup netservices
+	\brief Describe the body for a network request
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var std::unique_ptr<BDataIO> BHttpRequest::Body::input
+	\brief The \ref BDataIO object that holds the contents of the body.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BString BHttpRequest::Body::mimeType
+	\brief The mimetype of the body.
+
+	The \c Content-Type header field of the request is set to this value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var std::optional<off_t> BHttpRequest::Body::size
+	\brief The size of the content, if known.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var std::optional<off_t> BHttpRequest::Body::startPosition
+	\brief If the input is a \ref BPositionIO, this is the current position when the body was set.
+
+	This value is used to rewind the input when it needs to be resubmitted, for example in the case
+	of a redirection.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BHttpRequest
+	\ingroup netservices
+	\brief Represent a HTTP request.
+
+	This class can be used to construct HTTP requests that can be executed by the Network Services
+	Kit. A request has two states, either it is is a valid request, or it is an empty request. The
+	criterium is whether or not the request has a URL.
+	This class has all kinds of convenience methods set and retrieve particular options. Most
+	options are wrapped in specialized container classes that do some form of validation.
+
+	The default options are:
+	<table>
+		<tr><th>Getter</th><th>Setter</th><th>Description</th><th>Default</th></tr>
+		<tr>
+			<td> \ref Url() </td>
+			<td> \ref SetUrl() </td>
+			<td> The URL. This must start with http or https. </td>
+			<td> Defaults to an empty \ref BUrl </td>
+		</tr>
+		<tr>
+			<td> \ref Fields() </td>
+			<td> \ref SetFields() </td>
+			<td> Additional fields set in the request header. </td>
+			<td> Defaults with no additional fields </td>
+		</tr>
+		<tr>
+			<td> \ref Method() </td>
+			<td> \ref SetMethod() </td>
+			<td> The HTTP method for the request </td>
+			<td> Defaults to \ref BHttpMethod::Get </td>
+		</tr>
+		<tr>
+			<td> \ref MaxRedirections() </td>
+			<td> \ref SetMaxRedirections() </td>
+			<td> How many redirections should be followed. Set to 0 to disable. </td>
+			<td> Defaults to 8 redirections per request </td>
+		</tr>
+		<tr>
+			<td> \ref RequestBody() </td>
+			<td> \ref SetRequestBody() </td>
+			<td> Body contents that is sent with the request. </td>
+			<td> Defaults to an empty body </td>
+		</tr>
+		<tr>
+			<td> \ref StopOnError() </td>
+			<td> \ref SetStopOnError() </td>
+			<td> Stop parsing the server response when there is a client or server error. </td>
+			<td> Defaults to \a false </td>
+		</tr>
+		<tr>
+			<td> \ref Timeout() </td>
+			<td> \ref SetTimeout() </td>
+			<td> The timeout determines how long is waited for the server to respond </td>
+			<td> \c B_INFINITE_TIMEOUT </td>
+		</tr>
+	</table>
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Constructors and Destructor
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BHttpRequest::BHttpRequest()
+	\brief Construct an empty HTTP request.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpRequest::BHttpRequest(const BUrl &url)
+	\brief Construct a HTTP request for an \a url.
+
+	\param url A valid URL with the \c http or \c https protocol.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+	\exception BUnsupportedProtocol This exception is raised when the protocol of the URL cannot be
+		handled.
+	\exception BInvalidUrl This exception is raised when the \a url is invalid.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpRequest::BHttpRequest(const BHttpRequest &other)=delete
+	\brief Copying is not allowed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpRequest::BHttpRequest(BHttpRequest &&other) noexcept
+	\brief Move constructor.
+
+	After a move, the \a other object is left in an empty state.
+
+	\param other The request to move data from.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BPrivate::Network::BHttpRequest::~BHttpRequest()
+	\brief Destructor
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Assignment operators
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BHttpRequest& BHttpRequest::operator=(const BHttpRequest &other)=delete
+	\brief Copy assignment is not allowed.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpRequest& BHttpRequest::operator=(BHttpRequest &&other) noexcept
+	\brief Move assignment
+
+	After a move, the \a other object is left in an empty state.
+
+	\param other The request to move data from.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Valid or empty
+*/
+
+
+//! @{
+
+
+/*!
+	\fn bool BHttpRequest::IsEmpty() const noexcept
+	\brief Check if the request is valid or empty
+
+	\retval true The request is empty.
+	\retval false The request is valid.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Current Options
+*/
+
+
+//! @{
+
+
+/*!
+	\fn const BHttpAuthentication* BHttpRequest::Authentication() const noexcept
+	\brief Get the credentials for the authentication for the request.
+
+	\return When no credentials are set for this request, the method returns a \c nullptr.
+		Otherwise, it will return a pointer to the current BHttpAuthentication data set for this
+		request.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BHttpFields& BHttpRequest::Fields() const noexcept
+	\brief Get the additional header fields set for the request.
+
+	The returned header fields may be empty if no additional header fields were set.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BHttpMethod& BHttpRequest::Method() const noexcept
+	\brief Get the current method for the request.
+
+	This will either return the custom value set for this request, or the default as is listed in
+	the overview documentation of this class.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn uint8 BHttpRequest::MaxRedirections() const noexcept
+	\brief Get the current redirection options for this request.
+
+	\see \ref BHttpRequest::SetMaxRedirections() for details on the options.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BHttpRequest::Body* BHttpRequest::RequestBody() const noexcept
+	\brief Get the details of the custom body set for the request.
+
+	\return When no body is set for this request, the method returns a \c nullptr.
+		Otherwise, it will return a pointer to a struct that describes the current body.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BHttpRequest::StopOnError() const noexcept
+	\brief Is the request set to parse the full response on error.
+
+	\retval true When encountering a HTTP status of the client error class (4xx) or server error
+		class (5xx), then the response will not be parsed.
+	\retval false The full response will be parsed, even with an error status code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bigtime_t BHttpRequest::Timeout() const noexcept
+	\brief Get the current timeout for the server to respond.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BUrl& BHttpRequest::Url() const noexcept
+	\brief Get the current Url for the request.
+
+	This will either return the custom value set for this request, or the default as is listed in
+	the overview documentation of this class.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Setting Options
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BHttpRequest::SetAuthentication(const BHttpAuthentication &authentication)
+	\brief Set the credentials to enable basic authentication for the request.
+
+	The Basic authorization line is added to the request upon setting the request details. There is
+	no support for other authentication schemes, like digest authentication.
+
+	\param authentication The credentials to apply to the request.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpRequest::SetFields(const BHttpFields &fields)
+	\brief Set additional header \a fields for this request.
+
+	There are a few reserved fields, which cannot be set as optional fields. These currently are:
+	* \c Host
+	* \c Accept-Encoding
+	* \c Connection
+	* \c Content-Type
+	* \c Content-Length
+
+	\param fields Additional fields for the header of the request.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+	\exception BHttpFields::InvalidData This exception is raised when the \a fields contain
+		reserved fields.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpRequest::SetMethod(const BHttpMethod &method)
+	\brief Set the \a method for this request.
+
+	Note that there currently is no additional validation done on any semantical incompatibilities.
+	This means that it is currently allowed to do a \c GET or \c HEAD request with data, while that
+	is forbidden by the standard.
+
+	\param method The method to use for the request.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpRequest::SetMaxRedirections(uint8 maxRedirections)
+	\brief Set the redirection options for this request.
+
+	The HTTP protocol allows the server to redirect requests if the resources have moved to a new
+	location. For your convenience, you can instruct the network services kit to follow these
+	redirections. You can set how many redirects should be followed. The maximum value is that of
+	an unsigned 8 bit int, so maximum is 256 redirects. This prevents the request from staying
+	stuck in a redirection loop.
+
+	If redirects are set to 0, or the maximum number of redirects have been processed, then the
+	response will be set to the actual (last) received redirection response.
+
+	\param maxRedirections The number of redirections to follow. Set to 0 to disable.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpRequest::SetRequestBody(std::unique_ptr<BDataIO> input, BString mimeType,
+		std::optional<off_t> size)
+	\brief Set a body for this request.
+
+	When the requests needs a body, this method can be used to set the contents of that body.
+
+	\param input The input is an owned pointer to an input. The lifetime of the input is guaranteed
+		up to the point that the request is sent for execution.
+	\param mimeType A valid mimetype, with a class and a subtype. For example \c text/plain is a
+		valid mime type.
+	\param size When the content size is set, the request will have a \c Content-Length header
+		field. If the \a input has less data in the buffer, this will cause the request to
+		error out. However, if the input has more data, it is only read up to size. If the actual
+		size of the data is unknown, this can be made optional. The request body will
+		then be sent as a so-called chunked transfer, sending data until the input is at the end.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+	\exception std::invalid_argument This exception is raised when the \a mimeType is invalid or
+		when \a input is a \c nullptr.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpRequest::SetStopOnError(bool stopOnError)
+	\brief Set whether the entire response will be parsed on a client or server error.
+
+	When the server encounters an error processing a request, it may respond with an error code.
+	Error responses can be either an error with the request, like the 404 Not Found error, or
+	errors on the server side, like a 500 Internal Server Error. Error responses may still have
+	header fields and bodies.
+
+	If your application is not interested in the rest of the response in case a client error or
+	a server error occurs, you can set this option to stop parsing. This will allow you to use the
+	\ref BHttpResult object as normal, but the response fields will be empty, and there will be no
+	body data.
+
+	\param stopOnError Set to \c true to stop parsing the HTTP response when a client error or
+		server error occurs.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpRequest::SetTimeout(bigtime_t timeout)
+	\brief Set the maximum time waiting for the server to respond.
+
+	If the request times out, then the response will hold the \ref BNetworkRequestError of the
+	\c NetworkError type. By default, the request does not time out.
+
+	\param timeout The timeout in milliseconds. 
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BHttpRequest::SetUrl(const BUrl &url)
+	\brief Set the \a url for this request.
+
+	\param url A valid URL with the \c http or \c https protocol.
+
+	\exception std::bad_alloc This exception may be raised if it is impossible to allocate memory.
+	\exception BUnsupportedProtocol This exception is raised when the protocol of the URL cannot be
+		handled.
+	\exception BInvalidUrl This exception is raised when the \a url is invalid.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Clearing options
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BHttpRequest::ClearAuthentication() noexcept
+	\brief Clear any authentication details previously set with \ref SetAuthentication().
+
+	If there is no authentication data set, this method does nothing.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn std::unique_ptr<BDataIO> BHttpRequest::ClearRequestBody() noexcept
+	\brief Clear any request body previously set with \ref SetRequestBody().
+
+	\return Returns the previously set input \ref BDataIO object. If there is no request body set,
+		this method returns \c nullptr.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Serialization
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BString BHttpRequest::HeaderToString() const
+	\brief Serialize the HTTP Header of this request to a string.
+
+	The HTTP header consists of the request line, and the fields, serialized as text according to
+	the HTTP specification.
+
+	This method can be used to debug requests.
+
+	\return A new string that represents the HTTP request.
+
+	\exception std::bad_alloc In case it is not possible to allocate memory for the output string.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+} // namespace Network
+
+} // namespace BPrivate
+
+#endif

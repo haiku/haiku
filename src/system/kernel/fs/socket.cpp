@@ -1,7 +1,6 @@
 /*
  * Copyright 2009-2010, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- *
  * Distributed under the terms of the MIT License.
  */
 
@@ -22,6 +21,7 @@
 #include <lock.h>
 #include <syscall_restart.h>
 #include <util/AutoLock.h>
+#include <util/iovec_support.h>
 #include <vfs.h>
 
 #include <net_stack_interface.h>
@@ -161,22 +161,11 @@ prepare_userland_msghdr(const msghdr* userMessage, msghdr& message,
 	if (message.msg_iovlen < 0 || message.msg_iovlen > IOV_MAX)
 		return EMSGSIZE;
 	if (userVecs != NULL && message.msg_iovlen > 0) {
-		iovec* vecs = (iovec*)malloc(sizeof(iovec) * message.msg_iovlen);
-		if (vecs == NULL)
-			return B_NO_MEMORY;
+		iovec* vecs;
+		status_t error = get_iovecs_from_user(message.msg_iov, message.msg_iovlen, vecs);
+		if (error != B_OK)
+			return error;
 		vecsDeleter.SetTo(vecs);
-
-		if (!IS_USER_ADDRESS(message.msg_iov)
-			|| user_memcpy(vecs, message.msg_iov,
-					message.msg_iovlen * sizeof(iovec)) != B_OK) {
-			return B_BAD_ADDRESS;
-		}
-
-		for (int i = 0; i < message.msg_iovlen; i++) {
-			if (!IS_USER_ADDRESS(vecs[i].iov_base))
-				return B_BAD_ADDRESS;
-		}
-
 		message.msg_iov = vecs;
 	} else {
 		message.msg_iov = NULL;
@@ -918,7 +907,7 @@ _user_accept(int socket, struct sockaddr *userAddress,
 ssize_t
 _user_recv(int socket, void *data, size_t length, int flags)
 {
-	if (data == NULL || !IS_USER_ADDRESS(data))
+	if (data == NULL || !is_user_address_range(data, length))
 		return B_BAD_ADDRESS;
 
 	SyscallRestartWrapper<ssize_t> result;
@@ -930,7 +919,7 @@ ssize_t
 _user_recvfrom(int socket, void *data, size_t length, int flags,
 	struct sockaddr *userAddress, socklen_t *_addressLength)
 {
-	if (data == NULL || !IS_USER_ADDRESS(data))
+	if (data == NULL || !is_user_address_range(data, length))
 		return B_BAD_ADDRESS;
 
 	// check parameters
@@ -1021,7 +1010,7 @@ _user_recvmsg(int socket, struct msghdr *userMessage, int flags)
 ssize_t
 _user_send(int socket, const void *data, size_t length, int flags)
 {
-	if (data == NULL || !IS_USER_ADDRESS(data))
+	if (data == NULL || !is_user_address_range(data, length))
 		return B_BAD_ADDRESS;
 
 	SyscallRestartWrapper<ssize_t> result;
@@ -1033,7 +1022,7 @@ ssize_t
 _user_sendto(int socket, const void *data, size_t length, int flags,
 	const struct sockaddr *userAddress, socklen_t addressLength)
 {
-	if (data == NULL || !IS_USER_ADDRESS(data))
+	if (data == NULL || !is_user_address_range(data, length))
 		return B_BAD_ADDRESS;
 
 	if (addressLength <= 0

@@ -11,21 +11,30 @@
 
 #include <KernelExport.h>
 
-#include <touchpad_settings.h>
-
-#include "movement_maker.h"
 #include "packet_buffer.h"
 #include "ps2_service.h"
 
 
 #define SYN_TOUCHPAD			0x47
-// Synaptics modes
-#define SYN_ABSOLUTE_MODE		0x80
-// Absolute plus w mode
-#define SYN_ABSOLUTE_W_MODE		0x81
+
+// Synaptics modes (values of the "mode" field in synaptics_cookie)
+#define SYN_MODE_ABSOLUTE		(1 << 7)
+	// Absolute mode reports the absolute X/Y position of the finger,
+	// instead of relative X/Y movement
+
+#define SYN_MODE_W				(1 << 0)
+	// Adds finger width (W) value in addition to absolute X/Y
+#define SYN_MODE_EXTENDED_W		(1 << 2)
+	// Supports tracking for multiple fingers
 #define SYN_FOUR_BYTE_CHILD		(1 << 1)
-// Low power sleep mode
-#define SYN_SLEEP_MODE			0x0C
+	// Guest packets size for pass-through device
+#define SYN_MODE_SLEEP			(1 << 3)
+	// Low power sleep mode
+#define SYN_MODE_PASSTHROUGH_ACPI			(1 << 4)
+#define SYN_MODE_PASSTHROUGH_TRANSPARENT	(1 << 5)
+#define SYN_MODE_HIGH_RATE					(1 << 6)
+	// Use 80 packets per second instead of 40
+
 // Synaptics Passthrough port
 #define SYN_CHANGE_MODE			0x14
 #define SYN_PASSTHROUGH_CMD		0x28
@@ -39,25 +48,6 @@
 
 
 typedef struct {
-	uint8 majorVersion;
-	uint8 minorVersion;
-
-	bool capExtended;
-	bool capMiddleButton;
-	bool capSleep;
-	bool capFourButtons;
-	bool capMultiFinger;
-	bool capPalmDetection;
-	bool capPassThrough;
-	bool capClickPad;
-
-	uint8 nExtendedButtons;
-	uint8 firstExtendedButton;
-	uint8 extendedButtonsState;
-} touchpad_info;
-
-
-typedef struct {
 	ps2_dev*			dev;
 
 	sem_id				synaptics_sem;
@@ -65,10 +55,6 @@ struct packet_buffer*	synaptics_ring_buffer;
 	size_t				packet_index;
 	uint8				buffer[PS2_PACKET_SYNAPTICS];
 	uint8				mode;
-
-	TouchpadMovement	movementMaker;
-
-	touchpad_settings	settings;
 } synaptics_cookie;
 
 

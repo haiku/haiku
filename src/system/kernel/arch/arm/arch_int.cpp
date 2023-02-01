@@ -43,11 +43,11 @@
 #include "soc_omap3.h"
 #include "soc_sun4i.h"
 
-#define TRACE_ARCH_INT
+//#define TRACE_ARCH_INT
 #ifdef TRACE_ARCH_INT
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) dprintf(x)
 #else
-#	define TRACE(x) ;
+#	define TRACE(x...) ;
 #endif
 
 #define VECTORPAGE_SIZE		64
@@ -71,7 +71,7 @@ struct iframe_stack gBootFrameStack;
 void
 arch_int_enable_io_interrupt(int irq)
 {
-	TRACE(("arch_int_enable_io_interrupt(%d)\n", irq));
+	TRACE("arch_int_enable_io_interrupt(%d)\n", irq);
 	InterruptController *ic = InterruptController::Get();
 	if (ic != NULL)
 		ic->EnableInterrupt(irq);
@@ -81,7 +81,7 @@ arch_int_enable_io_interrupt(int irq)
 void
 arch_int_disable_io_interrupt(int irq)
 {
-	TRACE(("arch_int_disable_io_interrupt(%d)\n", irq));
+	TRACE("arch_int_disable_io_interrupt(%d)\n", irq);
 	InterruptController *ic = InterruptController::Get();
 	if (ic != NULL)
 		ic->DisableInterrupt(irq);
@@ -104,14 +104,16 @@ print_iframe(const char *event, struct iframe *frame)
 	if (event)
 		dprintf("Exception: %s\n", event);
 
-	dprintf("R00=%08lx R01=%08lx R02=%08lx R03=%08lx\n"
-		"R04=%08lx R05=%08lx R06=%08lx R07=%08lx\n",
+	dprintf("R00=%08x R01=%08x R02=%08x R03=%08x\n"
+		"R04=%08x R05=%08x R06=%08x R07=%08x\n",
 		frame->r0, frame->r1, frame->r2, frame->r3,
 		frame->r4, frame->r5, frame->r6, frame->r7);
-	dprintf("R08=%08lx R09=%08lx R10=%08lx R11=%08lx\n"
-		"R12=%08lx SP=%08lx LR=%08lx  PC=%08lx CPSR=%08lx\n",
+	dprintf("R08=%08x R09=%08x R10=%08x R11=%08x\n"
+		"R12=%08x SPs=%08x LRs=%08x PC =%08x\n",
 		frame->r8, frame->r9, frame->r10, frame->r11,
-		frame->r12, frame->svc_sp, frame->svc_lr, frame->pc, frame->spsr);
+		frame->r12, frame->svc_sp, frame->svc_lr, frame->pc);
+	dprintf("             SPu=%08x LRu=%08x CPSR=%08x\n",
+		frame->usr_sp, frame->usr_lr, frame->spsr);
 }
 
 
@@ -142,7 +144,7 @@ arch_int_init_post_vm(kernel_args *args)
 		B_READ_AREA | B_EXECUTE_AREA, sVectorPageArea);
 
 	if (sUserVectorPageArea < 0)
-		panic("user vector page @ %p could not be created (%lx)!",
+		panic("user vector page @ %p could not be created (%x)!",
 			sVectorPageAddress, sUserVectorPageArea);
 
 	// copy vectors into the newly created area
@@ -250,14 +252,16 @@ arch_arm_syscall(struct iframe *iframe)
 	print_iframe("Software interrupt", iframe);
 #endif
 
+	IFrameScope scope(iframe);
+
 	uint32_t syscall = *(uint32_t *)(iframe->pc-4) & 0x00ffffff;
-	TRACE(("syscall number: %d\n", syscall));
+	TRACE("syscall number: %d\n", syscall);
 
 	uint32_t args[20];
 	if (syscall < kSyscallCount) {
-		TRACE(("syscall(%s,%d)\n",
+		TRACE("syscall(%s,%d)\n",
 			kExtendedSyscallInfos[syscall].name,
-			kExtendedSyscallInfos[syscall].parameter_count));
+			kExtendedSyscallInfos[syscall].parameter_count);
 
 		int argSize = kSyscallInfos[syscall].parameter_size;
 		memcpy(args, &iframe->r0, std::min<int>(argSize, 4 * sizeof(uint32)));
@@ -277,24 +281,21 @@ arch_arm_syscall(struct iframe *iframe)
 	uint64 returnValue = 0;
 	syscall_dispatcher(syscall, (void*)args, &returnValue);
 
-	TRACE(("returning %" B_PRId64 "\n", returnValue));
+	TRACE("returning %" B_PRId64 "\n", returnValue);
 	iframe->r0 = returnValue;
 }
 
 
-extern "C" void
-arch_arm_data_abort(struct iframe *frame)
+static void
+arch_arm_page_fault(struct iframe *frame, addr_t far, uint32 fsr, bool isWrite, bool isExec)
 {
 	Thread *thread = thread_get_current_thread();
 	bool isUser = (frame->spsr & CPSR_MODE_MASK) == CPSR_MODE_USR;
-	int32 fsr = arm_get_fsr();
-	addr_t far = arm_get_far();
-	bool isWrite = (fsr & FSR_WNR) == FSR_WNR;
 	addr_t newip = 0;
 
 #ifdef TRACE_ARCH_INT
-	print_iframe("Data Abort", frame);
-	dprintf("FAR: %08lx, isWrite: %d, thread: %s\n", far, isWrite, thread->name);
+	print_iframe("Page Fault", frame);
+	dprintf("FAR: %08lx, FSR: %08x, isUser: %d, isWrite: %d, isExec: %d, thread: %s\n", far, fsr, isUser, isWrite, isExec, thread->name);
 #endif
 
 	IFrameScope scope(frame);
@@ -327,7 +328,13 @@ arch_arm_data_abort(struct iframe *frame)
 		panic("page fault in debugger without fault handler! Touching "
 			"address %p from pc %p\n", (void *)far, (void *)frame->pc);
 		return;
-	} else if ((frame->spsr & (1 << 7)) != 0) {
+	} else if (isExec && !isUser && (far < KERNEL_BASE) &&
+		(((fsr & 0x060f) == FSR_FS_PERMISSION_FAULT_L1) || ((fsr & 0x060f) == FSR_FS_PERMISSION_FAULT_L2))) {
+		panic("PXN violation trying to execute user-mapped address 0x%08" B_PRIxADDR " from kernel mode\n",
+			far);
+	} else if (!isExec && ((fsr & 0x060f) == FSR_FS_ALIGNMENT_FAULT)) {
+		panic("unhandled alignment exception\n");
+	} else if ((frame->spsr & CPSR_I) != 0) {
 		// interrupts disabled
 
 		// If a page fault handler is installed, we're allowed to be here.
@@ -361,7 +368,7 @@ arch_arm_data_abort(struct iframe *frame)
 
 	enable_interrupts();
 
-	vm_page_fault(far, frame->pc, isWrite, false, isUser, &newip);
+	vm_page_fault(far, frame->pc, isWrite, isExec, isUser, &newip);
 
 	if (newip != 0) {
 		// the page fault handler wants us to modify the iframe to set the
@@ -372,80 +379,23 @@ arch_arm_data_abort(struct iframe *frame)
 
 
 extern "C" void
+arch_arm_data_abort(struct iframe *frame)
+{
+	addr_t dfar = arm_get_dfar();
+	uint32 dfsr = arm_get_dfsr();
+	bool isWrite = (dfsr & FSR_WNR) == FSR_WNR;
+
+	arch_arm_page_fault(frame, dfar, dfsr, isWrite, false);
+}
+
+
+extern "C" void
 arch_arm_prefetch_abort(struct iframe *frame)
 {
-	Thread *thread = thread_get_current_thread();
-	bool isUser = (frame->spsr & CPSR_MODE_MASK) == CPSR_MODE_USR;
-	addr_t newip = 0;
+	addr_t ifar = arm_get_ifar();
+	uint32 ifsr = arm_get_ifsr();
 
-#ifdef TRACE_ARCH_INT
-	print_iframe("Prefetch Abort", frame);
-	dprintf("thread: %s\n", thread->name);
-#endif
-
-	IFrameScope scope(frame);
-
-	if (debug_debugger_running()) {
-		// If this CPU or this thread has a fault handler, we're allowed to be
-		// here.
-		if (thread != NULL) {
-			cpu_ent* cpu = &gCPU[smp_get_current_cpu()];
-
-			if (cpu->fault_handler != 0) {
-				debug_set_page_fault_info(frame->pc, frame->pc, 0);
-				frame->svc_sp = cpu->fault_handler_stack_pointer;
-				frame->pc = cpu->fault_handler;
-				return;
-			}
-
-			if (thread->fault_handler != 0) {
-				kprintf("ERROR: thread::fault_handler used in kernel "
-					"debugger!\n");
-				debug_set_page_fault_info(frame->pc, frame->pc, 0);
-				frame->pc = reinterpret_cast<uintptr_t>(thread->fault_handler);
-				return;
-			}
-		}
-
-		// otherwise, not really
-		panic("page fault in debugger without fault handler! Prefetch abort at %p\n",
-			(void *)frame->pc);
-		return;
-	} else if ((frame->spsr & (1 << 7)) != 0) {
-		// interrupts disabled
-
-		// If a page fault handler is installed, we're allowed to be here.
-		uintptr_t handler = reinterpret_cast<uintptr_t>(thread->fault_handler);
-		if (thread && thread->fault_handler != 0) {
-			if (frame->pc != handler) {
-				frame->pc = handler;
-				return;
-			}
-
-			// The fault happened at the fault handler address. This is a
-			// certain infinite loop.
-			panic("page fault, interrupts disabled, fault handler loop. "
-				"Prefetch abort at %p\n", (void*)frame->pc);
-		}
-
-		// If we are not running the kernel startup the page fault was not
-		// allowed to happen and we must panic.
-		panic("page fault, but interrupts were disabled. Prefetch abort at %p\n",
-			(void *)frame->pc);
-		return;
-	} else if (thread != NULL && thread->page_faults_allowed < 1) {
-		panic("page fault not allowed at this place. Prefetch abort at %p\n",
-			(void *)frame->pc);
-		return;
-	}
-
-	enable_interrupts();
-
-	vm_page_fault(frame->pc, frame->pc, false, true, isUser, &newip);
-
-	if (newip != 0) {
-		frame->pc = newip;
-	}
+	arch_arm_page_fault(frame, ifar, ifsr, false, true);
 }
 
 

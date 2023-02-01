@@ -107,9 +107,6 @@ AccelerantHWInterface::AccelerantHWInterface()
 	fSyncToken(),
 
 	// required hooks
-	fAccAcquireEngine(NULL),
-	fAccReleaseEngine(NULL),
-	fAccSyncToToken(NULL),
 	fAccGetModeCount(NULL),
 	fAccGetModeList(NULL),
 	fAccGetFrameBufferConfig(NULL),
@@ -118,6 +115,9 @@ AccelerantHWInterface::AccelerantHWInterface()
 	fAccGetPixelClockLimits(NULL),
 
 	// optional accelerant hooks
+	fAccAcquireEngine(NULL),
+	fAccReleaseEngine(NULL),
+	fAccSyncToToken(NULL),
 	fAccGetTimingConstraints(NULL),
 	fAccProposeDisplayMode(NULL),
 	fAccFillRect(NULL),
@@ -197,7 +197,7 @@ AccelerantHWInterface::Initialize()
 		return B_NO_MEMORY;
 
 	if (ret >= B_OK) {
-		for (int32 i = 1; fCardFD != B_ENTRY_NOT_FOUND; i++) {
+		for (int32 i = 0; fCardFD != B_ENTRY_NOT_FOUND; i++) {
 			fCardFD = _OpenGraphicsDevice(i);
 			if (fCardFD < 0) {
 				ATRACE(("Failed to open graphics device\n"));
@@ -234,52 +234,45 @@ AccelerantHWInterface::Initialize()
 int
 AccelerantHWInterface::_OpenGraphicsDevice(int deviceNumber)
 {
-	DIR *directory = opendir("/dev/graphics");
-	if (!directory)
-		return -1;
-
 	int device = -1;
 	int count = 0;
 	if (!use_fail_safe_video_mode()) {
-		// TODO: We do not need to avoid the "vesa" or "framebuffer" drivers this way
-		// once they been ported to the new driver architecture - the special case here
-		// can then be removed.
+		DIR *directory = opendir("/dev/graphics");
+		if (!directory)
+			return -1;
+
 		struct dirent *entry;
 		char path[PATH_MAX];
-		while (count < deviceNumber && (entry = readdir(directory)) != NULL) {
+		while ((entry = readdir(directory)) != NULL) {
 			if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..")
 				|| !strcmp(entry->d_name, "vesa") || !strcmp(entry->d_name, "framebuffer"))
 				continue;
 
-			if (device >= 0) {
-				close(device);
-				device = -1;
+			if (count == deviceNumber) {
+				sprintf(path, "/dev/graphics/%s", entry->d_name);
+				device = open(path, B_READ_WRITE);
+				break;
 			}
 
-			sprintf(path, "/dev/graphics/%s", entry->d_name);
-			device = open(path, B_READ_WRITE);
-			if (device >= 0)
-				count++;
+			count++;
 		}
+
+		closedir(directory);
 	}
 
 	// Open VESA or Framebuffer driver if we were not able to get a better one.
 	if (count < deviceNumber) {
-		if (deviceNumber == 1) {
-			device = open("/dev/graphics/vesa", B_READ_WRITE);
-			if (device > 0) {
-				// store the device, so that we can access the planar blitter
-				fVGADevice = device;
-			} else {
-				device = open("/dev/graphics/framebuffer", B_READ_WRITE);
-			}
+		device = open("/dev/graphics/vesa", B_READ_WRITE);
+		if (device > 0) {
+			// store the device, so that we can access the planar blitter
+			fVGADevice = device;
 		} else {
-			close(device);
-			device = B_ENTRY_NOT_FOUND;
+			device = open("/dev/graphics/framebuffer", B_READ_WRITE);
 		}
-	}
 
-	closedir(directory);
+		if (device < 0)
+			return B_ENTRY_NOT_FOUND;
+	}
 
 	return device;
 }
@@ -360,9 +353,6 @@ status_t
 AccelerantHWInterface::_SetupDefaultHooks()
 {
 	// required
-	fAccAcquireEngine = (acquire_engine)fAccelerantHook(B_ACQUIRE_ENGINE, NULL);
-	fAccReleaseEngine = (release_engine)fAccelerantHook(B_RELEASE_ENGINE, NULL);
-	fAccSyncToToken = (sync_to_token)fAccelerantHook(B_SYNC_TO_TOKEN, NULL);
 	fAccGetModeCount
 		= (accelerant_mode_count)fAccelerantHook(B_ACCELERANT_MODE_COUNT, NULL);
 	fAccGetModeList = (get_mode_list)fAccelerantHook(B_GET_MODE_LIST, NULL);
@@ -375,13 +365,16 @@ AccelerantHWInterface::_SetupDefaultHooks()
 	fAccGetPixelClockLimits = (get_pixel_clock_limits)fAccelerantHook(
 		B_GET_PIXEL_CLOCK_LIMITS, NULL);
 
-	if (!fAccAcquireEngine || !fAccReleaseEngine || !fAccGetFrameBufferConfig
-		|| !fAccGetModeCount || !fAccGetModeList || !fAccSetDisplayMode
-		|| !fAccGetDisplayMode || !fAccGetPixelClockLimits) {
+	if (!fAccGetFrameBufferConfig || !fAccGetModeCount || !fAccGetModeList
+			|| !fAccSetDisplayMode || !fAccGetDisplayMode || !fAccGetPixelClockLimits) {
 		return B_ERROR;
 	}
 
 	// optional
+	fAccAcquireEngine = (acquire_engine)fAccelerantHook(B_ACQUIRE_ENGINE, NULL);
+	fAccReleaseEngine = (release_engine)fAccelerantHook(B_RELEASE_ENGINE, NULL);
+	fAccSyncToToken = (sync_to_token)fAccelerantHook(B_SYNC_TO_TOKEN, NULL);
+
 	fAccGetTimingConstraints = (get_timing_constraints)fAccelerantHook(
 		B_GET_TIMING_CONSTRAINTS, NULL);
 	fAccProposeDisplayMode = (propose_display_mode)fAccelerantHook(

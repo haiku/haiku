@@ -37,7 +37,7 @@ The following partitions were detected. Please check the box next to the partiti
 After five seconds	DefaultPartitionPage		Beş saniye sonra
 Timeout: %s	DefaultPartitionPage		Zaman aşımı: %s
 The Master Boot Record could not be restored!	BootManagerController		Ana Önyükleme Kaydı geri yüklenemedi!
-The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Mevcut sabit diskin bölüm tablosu Önyükleme Yöneticisi ile uyumlu değil.\nÖnyükleme Yöneticisi yalnızca IBM PC MBR bölümleri ile uyumludur.
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		İlk sabit diskin bölüm tablosu Önyükleme Yöneticisi ile uyumlu değil.\nÖnyükleme Yöneticisi yalnızca IBM PC MBR bölümleri ile uyumludur.
 Please select the drive you want the boot manager to be installed to or uninstalled from.	DrivesPage		Önyükleme Yöneticisi'nin kurulacağı veya kaldırılacağı diski seçin.
 After four seconds	DefaultPartitionPage		Dört saniye sonra
 Unnamed %d	LegacyBootMenu	Default name of a partition whose name could not be read from disk; characters in codepage 437 are allowed only	Adsız %d

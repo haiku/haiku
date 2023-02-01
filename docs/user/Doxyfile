@@ -852,19 +852,12 @@ INPUT                  = . \
                          ../../headers/os/media \
                          ../../headers/os/midi2 \
                          ../../headers/os/net \
+                         ../../headers/private/netservices2 \
                          ../../headers/os/storage \
                          ../../headers/os/support \
                          ../../headers/os/translation \
                          ../../headers/posix/syslog.h \
-                         ../../src/kits/game/GameProducer.h \
-                         ../../headers/private/netservices/Geolocation.h \
-                         ../../headers/private/netservices/HttpAuthentication.h \
-                         ../../headers/private/netservices/HttpForm.h \
-                         ../../headers/private/netservices/HttpHeaders.h \
-                         ../../headers/private/netservices/HttpRequest.h \
-                         ../../headers/private/netservices/UrlProtocolAsynchronousListener.h \
-                         ../../headers/private/netservices/UrlProtocolListener.h \
-                         ../../headers/private/netservices/UrlProtocolRoster.h
+                         ../../src/kits/game/GameProducer.h
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses

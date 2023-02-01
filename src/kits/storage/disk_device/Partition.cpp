@@ -141,6 +141,16 @@ BPartition::BlockSize() const
 }
 
 
+/*!	\brief Returns the physical block size of the device.
+	\return The physical block size of the device in bytes.
+*/
+uint32
+BPartition::PhysicalBlockSize() const
+{
+	return _PartitionData()->physical_block_size;
+}
+
+
 /*!	\brief Returns the index of the partition in its session's list of
 		   partitions.
 	\return The index of the partition in its session's list of partitions.
@@ -248,8 +258,35 @@ BPartition::Name() const
 }
 
 
-const char*
+BString
 BPartition::ContentName() const
+{
+	if ((_PartitionData()->content_name == NULL || strlen(_PartitionData()->content_name) == 0)
+		&& ContainsFileSystem()) {
+		// Give a default name to unnamed volumes
+		off_t divisor = 1ULL << 40;
+		off_t diskSize = _PartitionData()->content_size;
+		char unit = 'T';
+		if (diskSize < divisor) {
+			divisor = 1UL << 30;
+			unit = 'G';
+			if (diskSize < divisor) {
+				divisor = 1UL << 20;
+				unit = 'M';
+			}
+		}
+		double size = double((10 * diskSize + divisor - 1) / divisor);
+		BString name;
+		name.SetToFormat("%g %ciB %s volume", size / 10, unit, _PartitionData()->content_type);
+		return name;
+	}
+
+	return _PartitionData()->content_name;
+}
+
+
+const char*
+BPartition::RawContentName() const
 {
 	return _PartitionData()->content_name;
 }
@@ -1334,6 +1371,7 @@ BPartition::_Update(user_partition_data* data, bool* updated)
 	if (data->offset != oldData->offset
 		|| data->size != oldData->size
 		|| data->block_size != oldData->block_size
+		|| data->physical_block_size != oldData->physical_block_size
 		|| data->status != oldData->status
 		|| data->flags != oldData->flags
 		|| data->volume != oldData->volume

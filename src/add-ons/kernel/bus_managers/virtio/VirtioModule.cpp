@@ -220,9 +220,9 @@ virtio_added_device(device_node *parent)
 
 	device_attr attributes[] = {
 		// info about device
-		{ B_DEVICE_BUS, B_STRING_TYPE, { string: "virtio" }},
+		{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "virtio" }},
 		{ VIRTIO_DEVICE_TYPE_ITEM, B_UINT16_TYPE,
-			{ ui16: deviceType }},
+			{ .ui16 = deviceType }},
 		{ NULL }
 	};
 

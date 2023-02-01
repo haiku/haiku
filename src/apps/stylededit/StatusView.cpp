@@ -9,6 +9,7 @@
 
 
 #include "StatusView.h"
+#include <StatusView.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,7 +64,7 @@ void
 StatusView::AttachedToWindow()
 {
 	SetFont(be_plain_font);
-	SetFontSize(10. * be_plain_font->Size() / 12.f);
+	BPrivate::AdoptScrollBarFontSize(this);
 
 	BMessage message(UPDATE_STATUS);
 	message.AddInt32("line", 1);

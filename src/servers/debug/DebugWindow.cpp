@@ -11,6 +11,7 @@
 
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <GroupLayout.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
@@ -143,7 +144,5 @@ DebugWindow::Go()
 BRect
 DebugWindow::IconSize()
 {
-	int32 size = std::max((int32)1, ((int32)be_plain_font->Size() + 15) / 16)
-		* 32 - 1;
-	return BRect(0, 0, size, size);
+	return BRect(BPoint(0, 0), be_control_look->ComposeIconSize(32));
 }

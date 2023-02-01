@@ -234,7 +234,7 @@ PluginManager::CreateReader(Reader** reader, int32* streamCount,
 
 	// try each reader by calling it's Sniff function...
 	for (int32 i = 0; i < count; i++) {
-		entry_ref ref = refs[i];
+		const entry_ref& ref = refs[i];
 		MediaPlugin* plugin = GetPlugin(ref);
 		if (plugin == NULL) {
 			printf("PluginManager::CreateReader: GetPlugin failed\n");

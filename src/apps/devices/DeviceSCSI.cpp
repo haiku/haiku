@@ -74,36 +74,3 @@ DeviceSCSI::InitFromAttributes()
 
 	SetText(listName.String());
 }
-
-
-Attributes
-DeviceSCSI::GetBusAttributes()
-{
-	// Push back things that matter for SCSI devices
-	Attributes attributes;
-	attributes.push_back(GetAttribute(B_TRANSLATE("Device class")));
-	attributes.push_back(GetAttribute(B_TRANSLATE("Device name")));
-	attributes.push_back(GetAttribute(B_TRANSLATE("Manufacturer")));
-	attributes.push_back(GetAttribute("scsi/revision"));
-	attributes.push_back(GetAttribute("scsi/target_id"));
-	attributes.push_back(GetAttribute("scsi/target_lun"));
-	return attributes;
-}
-
-
-BString
-DeviceSCSI::GetBusStrings()
-{
-	BString str(B_TRANSLATE("Class Info:\t\t\t\t: %classInfo%"));
-	str.ReplaceFirst("%classInfo%", fAttributeMap["Class Info"]);
-
-	return str;
-}
-
-
-BString
-DeviceSCSI::GetBusTabName()
-{
-	return B_TRANSLATE("SCSI Information");
-}
-

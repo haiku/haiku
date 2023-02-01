@@ -8,6 +8,7 @@
 #include "vesa.h"
 
 #include <boot_item.h>
+#include <driver_settings.h>
 #include <frame_buffer_console.h>
 #include <util/kernel_cpp.h>
 #include <vm/vm.h>
@@ -251,6 +252,10 @@ vbe_set_bits_per_gun(bios_state* state, vesa_info& info, uint8 bits)
 }
 
 
+// We used to read the existing mode set by the bootsplash to avoid setting the same mode
+// when entering app_server, but this has been disabled. So now there is always a modeset
+// done when app_server starts.
+#if 0
 static status_t
 vbe_get_vesa_info(bios_state* state, vesa_info& info)
 {
@@ -281,6 +286,7 @@ vbe_get_vesa_info(bios_state* state, vesa_info& info)
 
 	return status;
 }
+#endif
 
 
 /*!	Remaps the frame buffer if necessary; if we've already mapped the complete
@@ -414,7 +420,18 @@ vesa_init(vesa_info& info)
 	if (status != B_OK)
 		return status;
 
-	vesa_identify_bios(state, &sharedInfo);
+	void* settings = load_driver_settings("vesa");
+	bool patchingAllowed = false;
+	if (settings != NULL) {
+		patchingAllowed = get_driver_boolean_parameter(settings, "bios_patching",
+			patchingAllowed, true);
+		unload_driver_settings(settings);
+	}
+
+	if (patchingAllowed)
+		vesa_identify_bios(state, &sharedInfo);
+	else
+		sharedInfo.bios_type = kUnknownBiosType;
 
 	vbe_get_dpms_capabilities(state, info.vbe_dpms_capabilities,
 		sharedInfo.dpms_capabilities);

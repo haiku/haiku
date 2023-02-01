@@ -1,0 +1,37 @@
+1	english	x-vnd.haiku.SerialConnect	354154115
+Hardware	SerialWindow	Flowcontrol	硬件
+Connection	SerialWindow		连接
+Raw send…	SerialWindow		发送原始文件…
+Baud rate	SerialWindow		波特率
+Stop bits	SerialWindow		停止位
+None	SerialWindow	Flowcontrol	无
+Cancel	Custom baudrate window		取消
+Sending…	XModemStatus		发送中…
+<no serial port available>	SerialWindow		<无可用串行端口>
+Log to file…	SerialWindow		记录到文件…
+Custom baudrate	Custom baudrate window		自定义波特率
+File	SerialWindow		文件
+SerialConnect	System name		串行连接
+custom…	SerialWindow	Baudrate	自定义…
+Parity	SerialWindow		校验位
+None	SerialWindow	Parity	无
+Disconnect	SerialWindow		断开连接
+Everything sent, waiting for acknowledge	XModemStatus		所有信息已发送，等待确认
+Odd	SerialWindow	Parity	奇
+Flow control	SerialWindow		流控制
+file transfer progress	SerialWindow		文件传输进度
+CRC requested	XModemStatus		请求CRC
+Data bits	SerialWindow		数据位
+Both	SerialWindow	Flowcontrol	全部
+Edit	SerialWindow		编辑
+XModem send…	SerialWindow		XModem发送…
+Baudrate:	Custom baudrate window		波特率:
+OK	Custom baudrate window		确定
+Waiting for receiver…	XModemStatus		等待接收…
+Clear history	SerialWindow		清除历史记录
+Checksum error, re-send block	XModemStatus		校验和错误，重新发送块
+Settings	SerialWindow		设置
+Even	SerialWindow	Parity	偶
+Software	SerialWindow	Flowcontrol	软流控
+Line terminator	SerialWindow		行终止符
+Remote cancelled transfer	XModemStatus		远程主机取消了传输

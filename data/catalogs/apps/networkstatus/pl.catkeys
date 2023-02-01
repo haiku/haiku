@@ -4,9 +4,9 @@ Quit	NetworkStatusView		Zakończ
 Unknown	NetworkStatusView		Nieznany
 Launching the network preflet failed.\n\nError: 	NetworkStatusView		Uruchamianie panelu sieci nie powiodło się.\n\nBłąd: 
 Install in Deskbar	NetworkStatus		Zainstaluj w Deskbarze
-NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opcje NetworkStatus:\n\t--deskbar\tautomatycznie dodaj replikant do Deskbara\n\t--help\t\twypisz tę wiadomość i zakończ
+NetworkStatus options:\n\t--deskbar\tautomatically add replicant to Deskbar\n\t--help\t\tprint this info and exit	NetworkStatus		Opcje Statusu sieci:\n\t--deskbar\tautomatycznie dodaj replikant do Deskbara\n\t--help\t\twypisz tę wiadomość i zakończ
 Open network preferences…	NetworkStatusView		Otwórz opcje sieci…
-NetworkStatus	System name		NetworkStatus
+NetworkStatus	System name		Status sieci
 Broadcast:	NetworkStatusView		Adres rozgłoszeniowy:
 OK	NetworkStatusView		OK
 No link	NetworkStatusView		Brak połączenia
@@ -16,7 +16,7 @@ Network Status	NetworkStatusView		Status sieci
 Deskbar is not running, giving up.	NetworkStatus		Deskbar nie jest uruchomiony, anulowanie.
 Netmask:	NetworkStatusView		Maska:
 No stateful configuration	NetworkStatusView		Brak pełnej konfiguracji
-You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Możesz uruchomić NetworkStatus w osobnym oknie lub w Deskbarze.
+You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatus		Możesz uruchomić Status sieci w osobnym oknie lub w Deskbarze.
 IPv4 address:	NetworkStatusView		Adres IPv4:
 %ifaceName information:\n	NetworkStatusView		informacje o %ifaceName:\n
 Run in window	NetworkStatus		Uruchom w oknie

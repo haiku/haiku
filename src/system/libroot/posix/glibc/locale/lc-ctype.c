@@ -47,9 +47,9 @@ _nl_postload_ctype (void)
 
   offset = _NL_CURRENT_WORD (LC_CTYPE, _NL_CTYPE_CLASS_OFFSET);
   for (cnt = 0; cnt < 12; cnt++)
-    __ctype32_wctype[cnt] = _nl_current_LC_CTYPE->values[offset + cnt].string;
+    __ctype32_wctype[cnt] = _nl_global_locale.__locales[LC_CTYPE]->values[offset + cnt].string;
 
   offset = _NL_CURRENT_WORD (LC_CTYPE, _NL_CTYPE_MAP_OFFSET);
   for (cnt = 0; cnt < 2; cnt++)
-    __ctype32_wctrans[cnt] = _nl_current_LC_CTYPE->values[offset + cnt].string;
+    __ctype32_wctrans[cnt] = _nl_global_locale.__locales[LC_CTYPE]->values[offset + cnt].string;
 }

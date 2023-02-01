@@ -89,19 +89,39 @@
 } while (0)
 
 
-static void __setup_vars(int, char *, char *, char *, char **);
-static int __calc_left_pad(int, char *);
-static char *__format_grouped_double(double, int *, int, int, int);
+extern struct lconv* localeconv_l(locale_t);
+
+static ssize_t __strfmon(char*, size_t, struct lconv*, const char*, va_list ap);
+static void __setup_vars(int, struct lconv*, char *, char *, char *, char **);
+static int __calc_left_pad(int, struct lconv*, char *);
+static char *__format_grouped_double(double, struct lconv*, int *, int, int, int);
 
 
 ssize_t
-strfmon(char *s, size_t maxsize, const char *format,
-    ...)
+strfmon(char *s, size_t maxsize, const char *format, ...)
 {
-	va_list			ap;
+	va_list ap;
+	struct lconv* lc = localeconv();
+	va_start(ap, format);
+	return __strfmon(s, maxsize, lc, format, ap);
+}
+
+
+ssize_t
+strfmon_l(char *s, size_t maxsize, locale_t locale, const char *format, ...)
+{
+	va_list ap;
+	struct lconv* lc = localeconv_l(locale);
+	va_start(ap, format);
+	return __strfmon(s, maxsize, lc, format, ap);
+}
+
+
+static ssize_t
+__strfmon(char *s, size_t maxsize, struct lconv* lc, const char *format, va_list ap)
+{
 	char 			*dst;		/* output destination pointer */
 	const char 		*fmt;		/* current format poistion pointer */
-	struct lconv 	*lc;		/* pointer to lconv structure */
 	char			*asciivalue;	/* formatted double pointer */
 
 	int		flags;		/* formatting options */
@@ -122,9 +142,6 @@ strfmon(char *s, size_t maxsize, const char *format,
 	char	*tmpptr;	/* temporary vars */
 	int		sverrno;
 
-	va_start(ap, format);
-
-	lc = localeconv();
 	dst = s;
 	fmt = format;
 	asciivalue = NULL;
@@ -253,22 +270,22 @@ strfmon(char *s, size_t maxsize, const char *format,
 
 		/* fill left_prec with amount of padding chars */
 		if (left_prec >= 0) {
-			pad_size = __calc_left_pad((flags ^ IS_NEGATIVE),
-				currency_symbol) - __calc_left_pad(flags, currency_symbol);
+			pad_size = __calc_left_pad((flags ^ IS_NEGATIVE), lc,
+				currency_symbol) - __calc_left_pad(flags, lc, currency_symbol);
 			if (pad_size < 0)
 				pad_size = 0;
 		}
 
 		if (asciivalue != NULL)
 			free(asciivalue);
-		asciivalue = __format_grouped_double(value, &flags, left_prec,
+		asciivalue = __format_grouped_double(value, lc, &flags, left_prec,
 			right_prec, pad_char);
 		if (asciivalue == NULL)
 			goto end_error;		/* errno already set     */
 								/* to ENOMEM by malloc() */
 
 		/* set some variables for later use */
-		__setup_vars(flags, &cs_precedes, &sep_by_space, &sign_posn, &signstr);
+		__setup_vars(flags, lc, &cs_precedes, &sep_by_space, &sign_posn, &signstr);
 
 		/*
 		 * Description of some LC_MONETARY's values:
@@ -405,11 +422,9 @@ end_error:
 
 
 static void
-__setup_vars(int flags, char *cs_precedes, char *sep_by_space, char *sign_posn,
+__setup_vars(int flags, struct lconv* lc, char *cs_precedes, char *sep_by_space, char *sign_posn,
 	char **signstr)
 {
-	struct lconv *lc = localeconv();
-
 	if ((flags & IS_NEGATIVE) && (flags & USE_INTL_CURRENCY)) {
 		*cs_precedes = lc->int_n_cs_precedes;
 		*sep_by_space = lc->int_n_sep_by_space;
@@ -443,12 +458,12 @@ __setup_vars(int flags, char *cs_precedes, char *sep_by_space, char *sign_posn,
 
 
 static int
-__calc_left_pad(int flags, char *cur_symb)
+__calc_left_pad(int flags, struct lconv* lc, char *cur_symb)
 {
 	char cs_precedes, sep_by_space, sign_posn, *signstr;
 	int left_chars = 0;
 
-	__setup_vars(flags, &cs_precedes, &sep_by_space, &sign_posn, &signstr);
+	__setup_vars(flags, lc, &cs_precedes, &sep_by_space, &sign_posn, &signstr);
 
 	if (cs_precedes != 0) {
 		left_chars += strlen(cur_symb);
@@ -495,7 +510,7 @@ get_groups(int size, char *grouping)
 
 /* convert double to ASCII */
 static char *
-__format_grouped_double(double value, int *flags, int left_prec, int right_prec,
+__format_grouped_double(double value, struct lconv* lc, int *flags, int left_prec, int right_prec,
 	int pad_char)
 {
 	char	*rslt;
@@ -508,7 +523,6 @@ __format_grouped_double(double value, int *flags, int left_prec, int right_prec,
 
 	int		padded;
 
-	struct lconv	*lc = localeconv();
 	char	*grouping;
 	char	decimal_point;
 	char	thousands_sep;

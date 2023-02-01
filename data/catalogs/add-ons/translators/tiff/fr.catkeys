@@ -1,12 +1,14 @@
-1	french	x-vnd.Haiku-TIFFTranslator	3270030739
+1	french	x-vnd.Haiku-TIFFTranslator	2234713102
 TIFF Library:	TIFFView		Librairie TIFF :
 RLE (Packbits)	TIFFView		RLE (Bits compactés)
 ZIP (Deflate)	TIFFView		ZIP (Compressé)
+identify_tiff_header: invalid document index\n	TIFFTranslator		identification_entête_TIFF : index de document non valide\n
 Use compression:	TIFFView		Utiliser la compression :
 TIFF image translator	TIFFView		Traducteur d’images TIFF
 TIFF image	TIFFTranslator		Image TIFF
 TIFF Settings	TIFFMain		Réglages TIFF
 TIFF image translator	TIFFTranslator		Traducteur d’images TIFF
+identify_tiff_header: couldn't set directory\n	TIFFTranslator		identification_entête_TIFF : impossible de définir le répertoire\n
 Version %d.%d.%d, %s	TIFFView		Version %d.%d.%d, %s
 TIFFTranslator Settings	TIFFTranslator		Réglages du traducteur TIFF
 LZW	TIFFView		LZW

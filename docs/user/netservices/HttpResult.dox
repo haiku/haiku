@@ -1,0 +1,395 @@
+/*
+ * Copyright 2022 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ *
+ * Corresponds to:
+ *		headers/private/netservices2/HttpResult.h			hrev?????
+ *		src/kits/network/libnetservices2/HttpResult.cpp		hrev?????
+ */
+
+
+#if __cplusplus >= 201703L
+
+
+/*!
+	\file HttpResult.h
+	\ingroup netservices
+	\brief Provides classes and tools to handle HTTP responses.
+
+	\since Haiku R1
+*/
+
+
+namespace BPrivate {
+
+namespace Network {
+
+
+/*!
+	\enum BHttpStatusClass
+	\brief Category of the HTTP response status code.
+*/
+
+
+/*!
+	\enum BHttpStatusCode
+	\brief Enumeration of standardized HTTP status codes.
+*/
+
+
+/*!
+	\struct BHttpStatus
+	\ingroup netservices
+	\brief Represents the HTTP status code and status text of an incoming response.
+
+	The HTTP Standard specifies that each response should include a
+	<a href="https://datatracker.ietf.org/doc/html/rfc7230#section-3.1.2">three digit status
+	code</a> and a phrase that describes the status code. When processing the response status, you
+	should ignore the textual representation and only look at the status code.
+
+	Instances of this class provide a representation of the actual status information in the
+	response. There is no additional validation done, other than that the structure of the
+	status line is in compliance with the HTTP specification.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var int16 BHttpStatus::code
+	\brief The three digit status code
+
+	This code represents the result of how the server is processing or has processed a request.
+	Common codes are \c 200 indicating success, or \c 404 indicating that the requested resource is
+	not found.
+
+	See <a href="https://datatracker.ietf.org/doc/html/rfc7231#page-48">RFC7231 and its
+	references</a> for more information.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var BString BHttpStatus::text
+	\brief A textual representation of the result status.
+
+	As defined in the
+	<a href="https://datatracker.ietf.org/doc/html/rfc7230#section-3.1.2">specification</a>, the
+	status text should only be taken as informative. Only the \ref BHttpStatus::code should be used
+	for further processing.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpStatusClass BHttpStatus::StatusClass() const noexcept
+	\brief Map the \ref code value to a \ref BHttpStatusClass value
+
+	\return One of the valid values of \ref BHttpStatusClass, or \c BHttpStatusClass::Invalid if
+		the return code cannot be maped.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpStatusCode BHttpStatus::StatusCode() const noexcept
+	\brief Map the \ref code value to a \ref BHttpStatusCode value
+
+	\return One of the valid values of \ref BHttpStatusCode, or \c BHttpStatusCode::Unknown if
+		the return code cannot be maped.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\struct BHttpBody
+	\ingroup netservices
+	\brief Represents a HTTP response body.
+	
+	The HTTP response body is captured in this object. The body is either stored into a
+	target, or into a \ref text variable, depending on how you called the
+	\ref BHttpSession::Execute() method.
+
+	You will usually get a reference to this object through the \ref BHttpResult::Body() method.
+	If you want to keep the contents of the body beyond the lifetime of the BHttpResult object,
+	you should move the data into owned objects of your own.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var std::optional<BString> BHttpBody::text
+	\brief A string containing the body of the HTTP request.
+
+	The value of this class variable is set to \c std::nullopt if the target body was written to
+	a specified target. Otherwise, the response body is stored in this string. If the response
+	body was empty, then this will be an empty string.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BHttpResult
+	\ingroup netservices
+	\brief Unique object to wait for and access a HTTP response data.
+
+	Once you have scheduled a HTTP request in a HTTP session, you will get an object of this type
+	as a return value. This object allows you to track the progress of receiving the response, and
+	to inspect the status, the headers and the data as the response is received from the server.
+
+	The object is a future type, meaning that eventually it will contain the data or an error.
+	The \ref Status(), \ref Fields() and \ref Body() methods will yield the respective data. If it
+	is not yet received, they will block until it is available. You can also use the non-blocking
+	methods to check if data is available yet.
+
+	The result can either be a partial or completed HTTP Response, or an error. The partial aspect
+	is represented by the fact that the status line, the fields and the body are loaded
+	progressively and can be accessed as soon as they have been received. The meaning of a HTTP
+	response is defined by the HTTP standards. For example, a GET request can return a response
+	with a 200 status code, a set of headers and a body. But it can also return a 404 response,
+	indicating that the resource was not found at the location. It is important to note that both
+	responses are valid HTTP responses within the context of this API. This means that you can
+	still use the access methods of this class to access data from the 404 response without raising
+	an exception.
+
+	When there are errors during the request that lead to the situation where there is no valid
+	response according to the HTTP specification, then this object goes into an error state. This
+	means that the access methods of this object will throw an exception of the
+	\ref BNetworkRequestError type.
+
+	A special property of this object is that it is unique. This means it cannot be copied, only
+	moved. Objects that have moved from, are in an invalid state, and will always raise a
+	\ref BRuntimeError exception when they are used.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Constructors, assignment operators and destructor
+*/
+
+
+//! @{
+
+
+/*!
+	\fn BHttpResult::BHttpResult(BHttpResult &&other) noexcept
+	\brief Move constructor.
+
+	\param other The object to move from. The \a other object will be in an invalid state and will
+		always throw exceptions when it is used. 
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpResult::BHttpResult(const BHttpResult &other)=delete
+	\brief Copy constructor is disabled.
+
+	These objects cannot be copied.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpResult& BHttpResult::operator=(BHttpResult &&other) noexcept
+	\brief Move operator.
+
+	\param other The object to move from. The \a other object will be in an invalid state and will
+		always throw exceptions when it is used. 
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpResult& BHttpResult::operator=(const BHttpResult &other)=delete
+	\brief Copy assignment is disabled.
+
+	These objects cannot be copied.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpResult::~BHttpResult()
+	\brief Destructor
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Non-blocking status functions
+*/
+
+
+//! @{
+
+
+/*!
+	\fn int32 BHttpResult::Identity() const
+	\brief Unique identifier for the response.
+
+	The identifier can be used to cancel requests in a BHttpSession. It can also be uses to check
+	incoming asynchronous event messages against the response.
+
+	\return A unique identifier that associates this response with an active or completed request.
+
+	\exception BRuntimeException This exception is raised when the object has been moved from and
+		is thus no longer valid.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BHttpResult::HasStatus() const
+	\brief Check if the status is available.
+
+	\retval true The status line of the response is available using the \ref Status() method.
+	\retval false The line is not yet available. Any call to \ref Status() will block.
+
+	\exception BRuntimeException This exception is raised when the object has been moved from and
+		is thus no longer valid.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::Network::BHttpResult::HasFields() const
+	\brief Check if the header fields are available.
+
+	\retval true The header fields of the response is available using the \ref Fields() method.
+	\retval false They are not yet available. Any call to \ref Fields() will block.
+
+	\exception BRuntimeException This exception is raised when the object has been moved from and
+		is thus no longer valid.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::Network::BHttpResult::HasBody() const
+	\brief Check if the body is available.
+
+	\retval true The body of the response is available using the \ref Body() method.
+	\retval false The body is not yet available. Any call to \ref Body() will block.
+
+	\exception BRuntimeException This exception is raised when the object has been moved from and
+		is thus no longer valid.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPrivate::Network::BHttpResult::IsCompleted() const
+	\brief Check if the request is completed.
+
+	A request is completed when the status, headers and body have been received, or an error was
+	raised while receiving the data.
+
+	\exception BRuntimeException This exception is raised when the object has been moved from and
+		is thus no longer valid.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Blocking Data Access
+*/
+
+
+//! @{
+
+
+/*!
+	\fn const BHttpStatus& BHttpResult::Status() const
+	\brief Retrieve the status line of the HTTP response.
+
+	If the status line is not yet available, then this method call will block until it is. You can
+	use the \ref HasStatus() method to do a non-blocking check if the status is available.
+
+	\returns A const reference to the \ref BHttpStatus object that describes the status of the
+		response.
+
+	\exception BRuntimeException This exception is raised when the object has been moved from and
+		is thus no longer valid.
+	\exception BNetworkRequestError This exception is raised when there was an error that prevented
+		completely retrieving and parsing the HTTP response.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn const BHttpFields& BHttpResult::Fields() const
+	\brief Retrieve the header fields of the HTTP response.
+
+	If the header fields are not yet available, then this method call will block until it is. You
+	can use the \ref HasFields() method to do a non-blocking check if the fields are available.
+
+	\returns A const reference to the \ref BHttpFields object that describes the header fields of
+		the response.
+
+	\exception BRuntimeException This exception is raised when the object has been moved from and
+		is thus no longer valid.
+	\exception BNetworkRequestError This exception is raised when there was an error that prevented
+		completely retrieving and parsing the HTTP response.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BHttpBody& BHttpResult::Body() const
+	\brief Retrieve the body of the HTTP response.
+
+	If the body is not yet available, then this method call will block until it is. You can
+	use the \ref HasBody() method to do a non-blocking check if the status is available.
+
+	The lifetime of the body is tied to the lifetime of this response result object. If you want to
+	keep the body beyond that time, you can copy or move the data from the \ref BHttpBody object.
+
+	\returns A reference to the \ref BHttpBody object that contains the body.
+
+	\exception BRuntimeException This exception is raised when the object has been moved from and
+		is thus no longer valid.
+	\exception BNetworkRequestError This exception is raised when there was an error that prevented
+		completely retrieving and parsing the HTTP response.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+} // namespace BPrivate
+
+} // namespace Network
+
+#endif

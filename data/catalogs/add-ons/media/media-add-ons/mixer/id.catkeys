@@ -1,5 +1,6 @@
-1	indonesian	x-vnd.Haiku-mixer.media_addon	3463574286
+1	indonesian	x-vnd.Haiku-mixer.media_addon	275473112
 Input mapping	AudioMixer		Pemetaan input
+High quality (linear interpolation)	AudioMixer		Kualitas tinggi (interpolasi linier)
 To output	AudioMixer		Ke keluaran
 Gain	AudioMixer		Penguatan
 To master	AudioMixer		Ke master
@@ -7,13 +8,17 @@ not connected	AudioMixer		tidak terhubung
 Master output	AudioMixer		Keluaran master
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Pengatur penguatan
+Low quality (drop/repeat samples)	AudioMixer		Kualitas rendah (sampel diturunkan/ulangi)
 Output channel sources	AudioMixer		Sumber kanal keluaran
 Allow input channel remapping	AudioMixer		Ijinkan pemetaan ulang kanal masukan
 Display balance control for stereo connections	AudioMixer		Tampilkan kontrol keseimbangan untuk sambungan stereo
 Setup	AudioMixer		Tata
 Physical input channels	AudioMixer		Kanal input fisik
 Input channel destinations	AudioMixer		Tujuan kanal input
+Resampling algorithm:	AudioMixer		Algoritma pengambilan sampel ulang:
 Mute	AudioMixer		Bisu
 Output mapping	AudioMixer		Pemetaan keluaran
 Virtual output channels	AudioMixer		Saluran keluaran virtual
 Allow output channel remapping	AudioMixer		Ijinkan pemetaan ulang kanal keluaran
+Input gain controls represent:	AudioMixer		Kontrol penguatan input mewakili:
+Attenuate mixer output by 3 dB	AudioMixer		Kurangi output mixer sebesar 3 dB

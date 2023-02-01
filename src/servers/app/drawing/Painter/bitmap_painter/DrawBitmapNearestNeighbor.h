@@ -121,9 +121,9 @@ struct DrawBitmapNearestNeighborCopy {
 
 			for (; y1 <= y2; y1++) {
 				// buffer offset into source (top row)
-				register const uint8* src = bitmap.row_ptr(yIndices[y1]);
+				const uint8* src = bitmap.row_ptr(yIndices[y1]);
 				// buffer handle for destination to be incremented per pixel
-				register uint32* d = (uint32*)dst;
+				uint32* d = (uint32*)dst;
 
 				for (int32 x = xIndexL; x <= xIndexR; x++) {
 					*d = *(uint32*)(src + xIndices[x]);

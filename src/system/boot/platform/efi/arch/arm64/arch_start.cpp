@@ -9,6 +9,8 @@
 #include <boot/stdio.h>
 
 #include "efi_platform.h"
+#include "generic_mmu.h"
+#include "mmu.h"
 #include "serial.h"
 
 #include "aarch64.h"
@@ -16,7 +18,6 @@
 extern "C" void arch_enter_kernel(
 	struct kernel_args* kernelArgs, addr_t kernelEntry, addr_t kernelStackTop);
 
-extern void arch_mmu_dump_present_tables();
 extern const char* granule_type_str(int tg);
 
 extern uint32_t arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
@@ -28,50 +29,10 @@ extern void arch_mmu_post_efi_setup(size_t memory_map_size, efi_memory_descripto
 extern void arch_mmu_setup_EL1(uint64 tcr);
 
 
-static const char*
-memory_region_type_str(int type)
-{
-	switch (type) {
-		case EfiReservedMemoryType:
-			return "ReservedMemoryType";
-		case EfiLoaderCode:
-			return "LoaderCode";
-		case EfiLoaderData:
-			return "LoaderData";
-		case EfiBootServicesCode:
-			return "BootServicesCode";
-		case EfiBootServicesData:
-			return "BootServicesData";
-		case EfiRuntimeServicesCode:
-			return "RuntimeServicesCode";
-		case EfiRuntimeServicesData:
-			return "RuntimeServicesData";
-		case EfiConventionalMemory:
-			return "ConventionalMemory";
-		case EfiUnusableMemory:
-			return "UnusableMemory";
-		case EfiACPIReclaimMemory:
-			return "ACPIReclaimMemory";
-		case EfiACPIMemoryNVS:
-			return "ACPIMemoryNVS";
-		case EfiMemoryMappedIO:
-			return "MMIO";
-		case EfiMemoryMappedIOPortSpace:
-			return "MMIOPortSpace";
-		case EfiPalCode:
-			return "PalCode";
-		case EfiPersistentMemory:
-			return "PersistentMemory";
-		default:
-			return "unknown";
-	}
-}
-
-
 void
 arch_convert_kernel_args(void)
 {
-	// empty
+	fix_address(gKernelArgs.arch_args.fdt);
 }
 
 
@@ -155,8 +116,6 @@ arch_start_kernel(addr_t kernelEntry)
 		dprintf("Kernel entry accessibility W: %x R: %x\n", arch_mmu_write_access(kernelEntry),
 			arch_mmu_read_access(kernelEntry));
 
-		arch_mmu_dump_present_tables();
-
 		if (el == 1) {
 			// Disable CACHE & MMU before dealing with TTBRx
 			arch_cache_disable();
@@ -177,16 +136,14 @@ arch_start_kernel(addr_t kernelEntry)
 	// A changing memory map shouldn't affect the generated page tables, as
 	// they only needed to know about the maximum address, not any specific
 	// entry.
+
 	dprintf("Calling ExitBootServices. So long, EFI!\n");
+	serial_disable();
 	while (true) {
 		if (kBootServices->ExitBootServices(kImage, map_key) == EFI_SUCCESS) {
-			// The console was provided by boot services, disable it.
-			stdout = NULL;
-			stderr = NULL;
-			// Can we adjust gKernelArgs.platform_args.serial_base_ports[0]
-			// to something fixed in qemu for debugging?
-			serial_switch_to_legacy();
-			dprintf("Switched to legacy serial output\n");
+			// Disconnect from EFI serial_io / stdio services
+			serial_kernel_handoff();
+			dprintf("Unhooked from EFI serial services\n");
 			break;
 		}
 
@@ -200,6 +157,7 @@ arch_start_kernel(addr_t kernelEntry)
 
 	// Update EFI, generate final kernel physical memory map, etc.
 	arch_mmu_post_efi_setup(memory_map_size, memory_map, descriptor_size, descriptor_version);
+	serial_enable();
 
 	switch (el) {
 		case 1:

@@ -10,11 +10,11 @@
 #include <Message.h>
 #include <UrlProtocolListener.h>
 
-#ifndef LIBNETAPI_DEPRECATED
+
 namespace BPrivate {
 
 namespace Network {
-#endif
+
 
 //! To be in AppTypes.h
 enum {
@@ -28,11 +28,7 @@ enum {
 	B_URL_PROTOCOL_HOSTNAME_RESOLVED,
 	B_URL_PROTOCOL_RESPONSE_STARTED,
 	B_URL_PROTOCOL_HEADERS_RECEIVED,
-#ifdef LIBNETAPI_DEPRECATED
-	B_URL_PROTOCOL_DATA_RECEIVED,
-#else
 	B_URL_PROTOCOL_BYTES_WRITTEN,
-#endif
 	B_URL_PROTOCOL_DOWNLOAD_PROGRESS,
 	B_URL_PROTOCOL_UPLOAD_PROGRESS,
 	B_URL_PROTOCOL_REQUEST_COMPLETED,
@@ -54,17 +50,6 @@ public:
 									const char* ip);
 	virtual	void				ResponseStarted(BUrlRequest* caller);
 
-#ifdef LIBNETAPI_DEPRECATED
-	virtual	void				HeadersReceived(BUrlRequest* caller,
-									const BUrlResult& result);
-	virtual	void				DataReceived(BUrlRequest* caller,
-									const char* data, off_t position,
-									ssize_t size);
-	virtual	void				DownloadProgress(BUrlRequest* caller,
-									ssize_t bytesReceived, ssize_t bytesTotal);
-	virtual	void				UploadProgress(BUrlRequest* caller,
-									ssize_t bytesSent, ssize_t bytesTotal);
-#else
 	virtual	void				HeadersReceived(BUrlRequest* caller);
 	virtual	void				BytesWritten(BUrlRequest* caller,
 									size_t bytesWritten);
@@ -72,7 +57,6 @@ public:
 									off_t bytesReceived, off_t bytesTotal);
 	virtual	void				UploadProgress(BUrlRequest* caller,
 									off_t bytesSent, off_t bytesTotal);
-#endif
 
 	virtual	void				RequestCompleted(BUrlRequest* caller,
 									bool success);
@@ -93,11 +77,9 @@ private:
 			BMessenger	 		fMessenger;
 };
 
-#ifndef LIBNETAPI_DEPRECATED
+
 } // namespace Network
 
 } // namespace BPrivate
-#endif
 
 #endif // _B_URL_PROTOCOL_DISPATCHING_LISTENER_H_
-

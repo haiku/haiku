@@ -9,7 +9,7 @@
 #include "dosfs.h"
 
 
-#define vIS_DATA_CLUSTER(vol,cluster) (((cluster) >= 2) && ((cluster) < vol->total_clusters + 2))
+#define vIS_DATA_CLUSTER(vol,cluster) (((cluster) >= 2) && ((uint32)(cluster) < vol->total_clusters + 2))
 #define IS_DATA_CLUSTER(cluster) vIS_DATA_CLUSTER(vol,cluster)
 
 // cluster 1 represents root directory for fat12 and fat16

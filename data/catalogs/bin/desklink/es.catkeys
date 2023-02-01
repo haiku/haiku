@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-desklink	1299174281
+1	spanish; castilian	x-vnd.Haiku-desklink	618383392
 desklink	MediaReplicant	Title of an alert box	desklink
 Muted	MediaReplicant		Silenciado
 %g dB	MediaReplicant		%g dB
@@ -6,6 +6,7 @@ OK	MediaReplicant		Aceptar
 Couldn't launch 	MediaReplicant		No se puede lanzar
 Volume	VolumeControl		Volumen
 Open MediaPlayer	MediaReplicant		Abrir MediaPlayer
+%ld dB	VolumeControl		%ld dB
 Media preferences…	MediaReplicant		Preferencias multimedia...
 Options	MediaReplicant		Opciones
 Beep	MediaReplicant		Beep

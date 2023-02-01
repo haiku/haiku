@@ -152,7 +152,7 @@ CPUEntry::Remove(ThreadData* thread)
 }
 
 
-inline ThreadData*
+ThreadData*
 CoreEntry::PeekThread() const
 {
 	SCHEDULER_ENTER_FUNCTION();
@@ -160,7 +160,7 @@ CoreEntry::PeekThread() const
 }
 
 
-inline ThreadData*
+ThreadData*
 CPUEntry::PeekThread() const
 {
 	SCHEDULER_ENTER_FUNCTION();

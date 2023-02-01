@@ -1758,10 +1758,7 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 			else if (op == TIOCCBRK)
 				set = false;
 			else {
-				int value;
-				if (user_memcpy(&value, buffer, sizeof(value)) != B_OK)
-					return B_BAD_ADDRESS;
-
+				int value = (int)(uintptr_t)buffer;
 				set = value != 0;
 			}
 
@@ -1773,9 +1770,7 @@ tty_control(tty_cookie* cookie, uint32 op, void* buffer, size_t length)
 
 		case TCFLSH:
 		{
-			int value;
-			if (user_memcpy(&value, buffer, sizeof(value)) != B_OK)
-				return B_BAD_ADDRESS;
+			int value = (int)(uintptr_t)buffer;
 			if (value & TCOFLUSH) {
 				struct tty* otherTTY = cookie->other_tty;
 				if (otherTTY->open_count <= 0)

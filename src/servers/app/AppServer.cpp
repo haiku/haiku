@@ -20,7 +20,7 @@
 
 #include "BitmapManager.h"
 #include "Desktop.h"
-#include "FontManager.h"
+#include "GlobalFontManager.h"
 #include "InputManager.h"
 #include "ScreenManager.h"
 #include "ServerProtocol.h"
@@ -58,7 +58,7 @@ AppServer::AppServer(status_t* status)
 	gInputManager = new InputManager();
 
 	// Create the font server and scan the proper directories.
-	gFontManager = new FontManager;
+	gFontManager = new GlobalFontManager;
 	if (gFontManager->InitCheck() != B_OK)
 		debugger("font manager could not be initialized!");
 

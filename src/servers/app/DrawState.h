@@ -22,6 +22,7 @@
 #include <Referenceable.h>
 #include <View.h>
 
+#include "AppFontManager.h"
 #include "ServerFont.h"
 #include "PatternHandler.h"
 #include "SimpleTransform.h"
@@ -48,7 +49,8 @@ public:
 		DrawState*			PreviousState() const
 								{ return fPreviousState.Get(); }
 
-		uint16				ReadFontFromLink(BPrivate::LinkReceiver& link);
+		uint16				ReadFontFromLink(BPrivate::LinkReceiver& link,
+								AppFontManager* fontManager = NULL);
 								// NOTE: ReadFromLink() does not read Font state!!
 								// It was separate in ServerWindow, and I didn't
 								// want to change it without knowing implications.

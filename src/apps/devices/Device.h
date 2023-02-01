@@ -25,6 +25,7 @@ typedef enum {
 	BUS_PCI,
 	BUS_SCSI,
 	BUS_ACPI,
+	BUS_USB,
 	BUS_NONE
 } BusType;
 
@@ -93,15 +94,8 @@ public:
 	virtual BusType			GetBusType() const
 								{ return fBusType; }
 
-	virtual Attributes		GetBasicAttributes();
-	virtual Attributes		GetBusAttributes();
 	virtual Attributes		GetAllAttributes();
-
-	virtual BString			GetBasicStrings();
-	virtual BString			GetBusStrings();
 	virtual BString			GetAllStrings();
-	
-	virtual BString			GetBusTabName();
 
 	virtual Attribute		GetAttribute(const BString& name)
 								{ return Attribute(name.String(),

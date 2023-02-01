@@ -1,6 +1,8 @@
-1	polish	application/x-vnd.moon-Flanger.media_addon	455620896
+1	polish	application/x-vnd.moon-Flanger.media_addon	278353351
+MediaNodeControlApp: couldn't get node info (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nie można pobrać informacji o węźle (%ld):\n%s\n
 An add-on version of FlangerNode.\nby Eric Moon (16 June, 1999)	CortexAddOnsFlanger		FlangerNode w formie dodatku.\nEric Moon (16 czerwca 1999)
 Delay	CortexAddOnsFlanger		Opóźnienie
+MediaNodeControlApp: couldn't find node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: nie znaleziono węzła (%ld):\n%s\n
 Depth	CortexAddOnsFlanger		Głębia
 Feedback	CortexAddOnsFlanger		Sprzężenie zwrotne
 Sweep rate	CortexAddOnsFlanger		Szybkość przemiatania
@@ -10,4 +12,5 @@ OK	CortexAddOnsCommonMediaNodeControlApp		OK
 controls	CortexAddOnsCommonMediaNodeControlApp		kontrolki
 Mix output	CortexAddOnsFlanger		Wejście miksu
 Flanger	CortexAddOnsFlanger		Flanger
+MediaNodeControlApp: no parameters for node (%ld):\n%s\n	CortexAddOnsCommonMediaNodeControlApp		MediaNodeControlApp: brak parametrów dla węzła (%ld):\n%s\n
 Audio input	CortexAddOnsFlanger		Wejście audio

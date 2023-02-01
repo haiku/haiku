@@ -131,7 +131,7 @@ test_capacity(cd_driver_info *info)
 			PAGE_STATE_WIRED | VM_PAGE_ALLOC_BUSY);
 
 		entries[numEntries].address = page->physical_page_number * B_PAGE_SIZE;
-		entries[numEntries].size = bytes;;
+		entries[numEntries].size = bytes;
 
 		left -= bytes;
 	}
@@ -207,6 +207,7 @@ get_geometry(cd_handle *handle, device_geometry *geometry)
 		return B_DEV_MEDIA_CHANGED;
 
 	devfs_compute_geometry_size(geometry, info->capacity, info->block_size);
+	geometry->bytes_per_physical_sector = info->physical_block_size;
 
 	geometry->device_type = info->device_type;
 	geometry->removable = info->removable;
@@ -843,7 +844,7 @@ cd_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 		case B_GET_GEOMETRY:
 		{
-			if (buffer == NULL /*|| length != sizeof(device_geometry)*/)
+			if (buffer == NULL || length > sizeof(device_geometry))
 				return B_BAD_VALUE;
 
 		 	device_geometry geometry;
@@ -851,7 +852,7 @@ cd_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 			if (status != B_OK)
 				return status;
 
-			return user_memcpy(buffer, &geometry, sizeof(device_geometry));
+			return user_memcpy(buffer, &geometry, length);
 		}
 
 		case B_GET_ICON_NAME:
@@ -955,7 +956,7 @@ cd_ioctl(void* cookie, uint32 op, void* buffer, size_t length)
 
 
 static void
-cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
+cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize, uint32 physicalBlockSize)
 {
 	TRACE("cd_set_capacity(info = %p, capacity = %Ld, blockSize = %ld)\n",
 		info, capacity, blockSize);
@@ -1006,6 +1007,7 @@ cd_set_capacity(cd_driver_info* info, uint64 capacity, uint32 blockSize)
 
 		info->io_scheduler->SetCallback(do_io, info);
 		info->block_size = blockSize;
+		info->physical_block_size = physicalBlockSize;
 	}
 
 	if (info->original_capacity != capacity && info->io_scheduler != NULL) {
@@ -1036,7 +1038,7 @@ cd_media_changed(cd_driver_info* info, scsi_ccb* request)
 
 
 scsi_periph_callbacks callbacks = {
-	(void (*)(periph_device_cookie, uint64, uint32))cd_set_capacity,
+	(void (*)(periph_device_cookie, uint64, uint32, uint32))cd_set_capacity,
 	(void (*)(periph_device_cookie, scsi_ccb *))cd_media_changed
 };
 
@@ -1096,9 +1098,9 @@ cd_register_device(device_node* node)
 
 	// ready to register
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "SCSI CD-ROM Drive"}},
-		{"removable", B_UINT8_TYPE, {ui8: deviceInquiry->removable_medium}},
-		{B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, {ui32: maxBlocks}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "SCSI CD-ROM Drive"}},
+		{"removable", B_UINT8_TYPE, {.ui8 = deviceInquiry->removable_medium}},
+		{B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, {.ui32 = maxBlocks}},
 		{ NULL }
 	};
 

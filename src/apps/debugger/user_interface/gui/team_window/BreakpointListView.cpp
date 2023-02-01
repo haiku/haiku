@@ -453,6 +453,7 @@ void
 BreakpointListView::_Init(BView* filterTarget)
 {
 	fBreakpointsTable = new Table("breakpoints list", 0, B_FANCY_BORDER);
+	fBreakpointsTable->SetFont(B_FONT_ROW, be_fixed_font);
 	AddChild(fBreakpointsTable->ToView());
 
 	// columns

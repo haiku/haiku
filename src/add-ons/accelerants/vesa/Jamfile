@@ -10,7 +10,6 @@ UsePrivateHeaders shared ;
 Addon vesa.accelerant :
 	accelerant.cpp
 	dpms.cpp
-	engine.cpp
 	hooks.cpp
 	mode.cpp
 	: libaccelerantscommon.a

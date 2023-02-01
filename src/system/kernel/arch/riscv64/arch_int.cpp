@@ -21,6 +21,7 @@
 #include <Plic.h>
 #include <Clint.h>
 #include <AutoDeleterDrivers.h>
+#include <ScopeExit.h>
 #include "RISCV64VMTranslationMap.h"
 
 #include <algorithm>
@@ -74,7 +75,7 @@ WriteExt(uint64_t val)
 static void
 WriteSstatus(uint64_t val)
 {
-	SstatusReg status(val);
+	SstatusReg status{.val = val};
 	dprintf("(");
 	dprintf("ie: "); WriteModeSet(status.ie);
 	dprintf(", pie: "); WriteModeSet(status.pie);
@@ -252,7 +253,7 @@ static void
 SendSignal(debug_exception_type type, uint32 signalNumber, int32 signalCode,
 	addr_t signalAddress = 0, int32 signalError = B_ERROR)
 {
-	if (SstatusReg(Sstatus()).spp == modeU) {
+	if (SstatusReg{.val = Sstatus()}.spp == modeU) {
 		struct sigaction action;
 		Thread* thread = thread_get_current_thread();
 
@@ -354,40 +355,6 @@ SetAccessedFlags(addr_t addr, bool isWrite)
 }
 
 
-// TODO: needs moved into an arch-agnostic location?
-
-template<typename F>
-class ScopeExit 
-{
-public:
-	explicit ScopeExit(F&& fn) : fFn(fn)
-	{
-	}
-
-	~ScopeExit()
-	{
-		fFn();
-	}
-
-	ScopeExit(ScopeExit&& other) : fFn(std::move(other.fFn))
-	{
-	}
-
-private:
-	ScopeExit(const ScopeExit&);
-	ScopeExit& operator=(const ScopeExit&);
-
-private:
-	F fFn;
-};
-
-template<typename F>
-ScopeExit<F> MakeScopeExit(F&& fn)
-{
-	return ScopeExit<F>(std::move(fn));
-}
-
-
 extern "C" void
 STrap(iframe* frame)
 {
@@ -423,13 +390,13 @@ STrap(iframe* frame)
 		}
 	}
 
-	if (SstatusReg(frame->status).spp == modeU) {
+	if (SstatusReg{.val = frame->status}.spp == modeU) {
 		thread_get_current_thread()->arch_info.userFrame = frame;
 		thread_get_current_thread()->arch_info.oldA0 = frame->a0;
 		thread_at_kernel_entry(system_time());
 	}
-	const auto& kernelExit = MakeScopeExit([&]() {
-		if (SstatusReg(frame->status).spp == modeU) {
+	const auto& kernelExit = ScopeExit([&]() {
+		if (SstatusReg{.val = frame->status}.spp == modeU) {
 			disable_interrupts();
 			atomic_and(&thread_get_current_thread()->flags, ~THREAD_FLAGS_SYSCALL_RESTARTED);
 			if ((thread_get_current_thread()->flags
@@ -463,7 +430,14 @@ STrap(iframe* frame)
 			return SendSignal(B_ALIGNMENT_EXCEPTION, SIGBUS, BUS_ADRALN,
 				Stval());
 		}
-		// case causeBreakpoint:
+		case causeBreakpoint: {
+			if (SstatusReg{.val = frame->status}.spp == modeU) {
+				user_debug_breakpoint_hit(false);
+			} else {
+				panic("hit kernel breakpoint");
+			}
+			return;
+		}
 		case causeExecAccessFault:
 		case causeLoadAccessFault:
 		case causeStoreAccessFault: {
@@ -504,7 +478,7 @@ STrap(iframe* frame)
 				return;
 			}
 
-			if (SstatusReg(frame->status).pie == 0) {
+			if (SstatusReg{.val = frame->status}.pie == 0) {
 				// user_memcpy() failure
 				Thread* thread = thread_get_current_thread();
 				if (thread != NULL && thread->fault_handler != 0) {
@@ -522,7 +496,7 @@ STrap(iframe* frame)
 
 			vm_page_fault(stval, frame->epc, frame->cause == causeStorePageFault,
 				frame->cause == causeExecPageFault,
-				SstatusReg(frame->status).spp == modeU, &newIP);
+				SstatusReg{.val = frame->status}.spp == modeU, &newIP);
 
 			if (newIP != 0)
 				frame->epc = newIP;

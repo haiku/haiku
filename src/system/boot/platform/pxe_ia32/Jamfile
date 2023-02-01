@@ -10,7 +10,7 @@ UsePrivateHeaders [ FDirName graphics vesa ] ;
 UsePrivateHeaders [ FDirName storage ] ;
 
 {
-	local defines = _BOOT_MODE _PXE_ENV _BOOT_PLATFORM_BIOS ;
+	local defines = _PXE_ENV _BOOT_PLATFORM_BIOS ;
 
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;

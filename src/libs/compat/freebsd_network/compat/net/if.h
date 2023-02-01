@@ -70,6 +70,7 @@
 #define	IFF_MONITOR			0x00400000		/* (n) user-requested monitor mode */
 #define	IFF_PPROMISC		0x00800000		/* (n) user-requested promisc mode */
 #define	IFF_NOGROUP			0x01000000		/* (n) interface is not part of any groups */
+#define	IFF_NEEDSGIANT		0x02000000		/* (i) hold Giant over hook calls (OpenBSD compatibility) */
 
 #define LINK_STATE_UNKNOWN	0
 #define LINK_STATE_DOWN		1
@@ -114,6 +115,16 @@ struct if_data {
 	u_int	ifi_timepad;		/* time_t is int, not long on alpha */
 #endif
 	struct	timeval ifi_lastchange;	/* time of last administrative change */
+};
+
+struct ifmediareq {
+	char	ifm_name[IFNAMSIZ];	/* if name, e.g. "en0" */
+	int	ifm_current;		/* current media options */
+	int	ifm_mask;		/* don't care mask */
+	int	ifm_status;		/* media status */
+	int	ifm_active;		/* active options */
+	int	ifm_count;		/* # entries in ifm_ulist array */
+	int	*ifm_ulist;		/* media words */
 };
 
 struct  ifdrv {

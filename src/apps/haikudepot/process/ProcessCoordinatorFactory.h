@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PROCESS_COORDINATOR_FACTORY_H
@@ -25,7 +25,7 @@ public:
 									const PackageInfoRef package);
 
 	static	ProcessCoordinator*	CreateBulkLoadCoordinator(
-									PackageInfoListener *packageInfoListener,
+									PackageInfoListenerRef packageInfoListener,
 									Model* model, bool forceLocalUpdate);
 
 	static	ProcessCoordinator*	CreateUserDetailVerifierCoordinator(

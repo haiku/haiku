@@ -205,7 +205,7 @@ Volume::Mount(uint32 flags)
 			// set permissions: -rwxr-xr-x
 			fRootDirectory->SetMode(
 				S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
-			error = fRootDirectory->Link(NULL);
+			error = PublishVNode(fRootDirectory);
 		} else
 			SET_ERROR(error, B_NO_MEMORY);
 	}
@@ -357,6 +357,7 @@ Volume::RemoveVNode(Node *node)
 {
 	if (fMounted)
 		return remove_vnode(FSVolume(), node->GetID());
+
 	status_t error = NodeRemoved(node);
 	if (error == B_OK)
 		delete node;

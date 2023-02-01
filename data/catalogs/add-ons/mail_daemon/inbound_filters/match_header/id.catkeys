@@ -5,7 +5,7 @@ Match header	RuleFilter		Cocokan tajuk
 Set flags to	ConfigView		Atur bendera ke
 Header field (e.g. Subject, From, …)	ConfigView		Bidang tajuk (misal. Subyek, Dari, …)
 <Choose account>	ConfigView		<Pilih akun>
-Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Nilai wildcard seperti \"*spam*\".\nDiawali dengan \"REGEX:\" untuk menggunakan expresi-ekspresi reguler.
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Nilai wildcard seperti \"*spam*\".\n Awalan dengan \"REGEX:\" untuk menggunakan ekspresi reguler.
 Then	ConfigView		Kemudian
 If	ConfigView		Jika
 Set as read	ConfigView		Atur sebagai dibaca

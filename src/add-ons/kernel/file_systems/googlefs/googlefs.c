@@ -28,14 +28,15 @@
 /* just publish fake entries; for debugging */
 //#define NO_SEARCH
 
+#define PFS "googlefs: "
+
 #define TRACE_GOOGLEFS
 #ifdef TRACE_GOOGLEFS
-#	define TRACE(x) dprintf x
+#	define TRACE(x...) fprintf(stderr, PFS x)
 #else
 #	define TRACE(x)
 #endif
 
-#define PFS "googlefs: "
 
 /* needed to get /bin/df tell the mountpoint... */
 #define ALLOW_DIR_OPEN
@@ -88,7 +89,7 @@ static int googlefs_publish_static_entries(fs_volume *_volume)
 	//char ename[GOOGLEFS_NAME_LEN];
 	//char *p;
 	//int i;
-	TRACE((PFS"googlefs_publish_static_entries(%" B_PRId32 ")\n", ns->nsid));
+	TRACE("googlefs_publish_static_entries(%" B_PRId32 ")\n", ns->nsid);
 	if (!ns || !dir)
 		return EINVAL;
 
@@ -113,7 +114,7 @@ static int googlefs_publish_static_entries(fs_volume *_volume)
 
 /*
 err:
-	TRACE((PFS"push_result_to_query: error 0x%08"B_PRIx32"\n", err));
+	TRACE("push_result_to_query: error 0x%08"B_PRIx32"\n", err);
 	return err;
 */
 }
@@ -124,17 +125,13 @@ static status_t googlefs_mount(fs_volume *_vol, const char *devname, uint32 flag
 	fs_nspace *ns;
 	fs_node *root;
 	int err;
-	TRACE((PFS "mount(%p, %s, 0x%08" B_PRIx32 ", %s, , )\n", _vol, devname, flags, parms));
+	TRACE("mount(%p, %s, 0x%08" B_PRIx32 ", %s, , )\n", _vol, devname, flags, parms);
 
 	/* only allow a single mount */
 	if (atomic_add(&refcount, 1))
 		return EALREADY;
 
 	err = load_settings();
-
-	err = google_request_init();
-	if (err)
-		goto err_http;
 
 	ns = malloc(sizeof(fs_nspace));
 	if (!ns)
@@ -166,7 +163,7 @@ static status_t googlefs_mount(fs_volume *_vol, const char *devname, uint32 flag
 		fill_default_stat(&root->st, ns->nsid, ns->rootid, 0777 | S_IFDIR);
 		root->attrs_indirect = root_folder_attrs;
 		new_lock(&(root->l), "googlefs root dir");
-		TRACE((PFS "mount: root->l @ %p\n", &root->l));
+		TRACE("mount: root->l @ %p\n", &root->l);
 
 		_vol->private_volume = ns;
 		_vol->ops = &sGoogleFSVolumeOps;
@@ -175,7 +172,7 @@ static status_t googlefs_mount(fs_volume *_vol, const char *devname, uint32 flag
 		err = publish_vnode(_vol, *vnid, root, &sGoogleFSVnodeOps, S_IFDIR, 0);
 		if (err == B_OK) {
 			googlefs_publish_static_entries(_vol);
-			TRACE((PFS "mount() OK, nspace@ %p, id %" B_PRId32 ", root@ %p, id %" B_PRId64 "\n", ns, ns->nsid, root, ns->rootid));
+			TRACE("mount() OK, nspace@ %p, id %" B_PRId32 ", root@ %p, id %" B_PRId64 "\n", ns, ns->nsid, root, ns->rootid);
 			return B_OK;
 		}
 		free_lock(&root->l);
@@ -183,7 +180,6 @@ static status_t googlefs_mount(fs_volume *_vol, const char *devname, uint32 flag
 	}
 	free_lock(&ns->l);
 	free(ns);
-err_http:
 	atomic_add(&refcount, -1);
 	return err;
 }
@@ -193,7 +189,7 @@ static status_t googlefs_unmount(fs_volume *_volume)
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	status_t err;
 	struct fs_node *node;
-	TRACE((PFS "unmount(%" B_PRId32 ")\n", ns->nsid));
+	TRACE("unmount(%" B_PRId32 ")\n", ns->nsid);
 	err = LOCK(&ns->l);
 	if (err)
 		return err;
@@ -210,8 +206,6 @@ static status_t googlefs_unmount(fs_volume *_volume)
 	vnidpool_free(ns->vnids);
 	free(ns);
 
-	google_request_uninit();
-
 	atomic_add(&refcount, -1);
 
 	return B_OK;
@@ -225,7 +219,7 @@ static int compare_fs_node_by_vnid(fs_node *node, ino_t *id)
 static int googlefs_free_vnode(fs_volume *_volume, fs_node *node)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
-	TRACE((PFS "%s(%" B_PRId32 ", %" B_PRId64 ")\n", __FUNCTION__, ns->nsid, node->vnid));
+	TRACE("%s(%" B_PRId32 ", %" B_PRId64 ")\n", __FUNCTION__, ns->nsid, node->vnid);
 	free_lock(&node->l);
 	atomic_add(&ns->nodecount, -1);
 	vnidpool_put(ns->vnids, node->vnid);
@@ -241,23 +235,23 @@ static status_t googlefs_remove_vnode(fs_volume *_volume, fs_vnode *_node, bool 
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
 	status_t err = B_OK;
-	TRACE((PFS "%s(%" B_PRId32 ", %" B_PRId64 ", %s)\n", __FUNCTION__, ns->nsid, node->vnid, reenter?"r":"!r"));
+	TRACE("%s(%" B_PRId32 ", %" B_PRId64 ", %s)\n", __FUNCTION__, ns->nsid, node->vnid, reenter?"r":"!r");
 	if (!reenter)
 		err = LOCK(&ns->l);
 	if (err)
 		return err;
 	if (node->vnid == ns->rootid) {
-		TRACE((PFS "asked to remove the root node!!\n"));
+		TRACE("asked to remove the root node!!\n");
 	}
-TRACE((PFS "SLL_REMOVE(ns->nodes %p, nlnext, %p)\n", ns->nodes, node));
+TRACE("SLL_REMOVE(ns->nodes %p, nlnext, %p)\n", ns->nodes, node);
 	//LOCK(&node->l);
 	err = SLL_REMOVE(ns->nodes, nlnext, node);
 	/* query dirs must be removed from the query list too */
-TRACE((PFS "SLL_REMOVE(ns->queries %p, qnext, %p)\n", ns->nodes, node));
+TRACE("SLL_REMOVE(ns->queries %p, qnext, %p)\n", ns->nodes, node);
 	err = SLL_REMOVE(ns->queries, qnext, node);
 	if (node->parent) {
 		LOCK(&node->parent->l);
-TRACE((PFS "SLL_REMOVE(node->parent->children %p, next, %p)\n", node->parent->children, node));
+TRACE("SLL_REMOVE(node->parent->children %p, next, %p)\n", node->parent->children, node);
 		SLL_REMOVE(node->parent->children, next, node);
 		UNLOCK(&node->parent->l);
 	}
@@ -272,7 +266,7 @@ static status_t googlefs_read_vnode(fs_volume *_volume, ino_t vnid, fs_vnode *_n
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *n;
 	status_t err = B_OK;
-	TRACE((PFS "%s(%" B_PRId32 ", %" B_PRId64 ", %s)\n", __FUNCTION__, _volume->id, vnid, reenter?"r":"!r"));
+	TRACE("%s(%" B_PRId32 ", %" B_PRId64 ", %s)\n", __FUNCTION__, _volume->id, vnid, reenter?"r":"!r");
 	if (!reenter)
 		err = LOCK(&ns->l);
 	if (err)
@@ -294,14 +288,14 @@ static status_t googlefs_read_vnode(fs_volume *_volume, ino_t vnid, fs_vnode *_n
 static status_t googlefs_release_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 {
 	fs_node *node = (fs_node *)_node->private_node;
-	TRACE((PFS "%s(%" B_PRId32 ", %" B_PRId64 ", %s)\n", __FUNCTION__, _volume->id, node->vnid, reenter?"r":"!r"));
+	TRACE("%s(%" B_PRId32 ", %" B_PRId64 ", %s)\n", __FUNCTION__, _volume->id, node->vnid, reenter?"r":"!r");
 	return B_OK;
 }
 
 static int compare_fs_node_by_name(fs_node *node, char *name)
 {
 	//return memcmp(node->name, name, GOOGLEFS_NAME_LEN);
-	//TRACE((PFS"find_by_name: '%s' <> '%s'\n", node->name, name));
+	//TRACE("find_by_name: '%s' <> '%s'\n", node->name, name);
 	return strncmp(node->name, name, GOOGLEFS_NAME_LEN);
 }
 
@@ -310,7 +304,7 @@ static status_t googlefs_get_vnode_name(fs_volume *_volume, fs_vnode *_node, cha
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
 
-	TRACE((PFS "get_vnode_name(%" B_PRId32 ", %" B_PRId64 ", )\n", ns->nsid, (int64)(node?node->vnid:-1)));
+	TRACE("get_vnode_name(%" B_PRId32 ", %" B_PRId64 ", )\n", ns->nsid, (int64)(node?node->vnid:-1));
 	strlcpy(buffer, node->name, MIN(GOOGLEFS_NAME_LEN, len));
 	return B_OK;
 }
@@ -322,7 +316,7 @@ static status_t googlefs_walk(fs_volume *_volume, fs_vnode *_base, const char *f
 	fs_node *base = _base->private_node;
 	fs_node *n, *dummy;
 	status_t err = B_OK;
-	TRACE((PFS "walk(%" B_PRId32 ", %" B_PRId64 ", %s)\n", ns->nsid, (int64)(base?base->vnid:-1), file));
+	TRACE("walk(%" B_PRId32 ", %" B_PRId64 ", %s)\n", ns->nsid, (int64)(base?base->vnid:-1), file);
 	err = LOCK(&base->l);
 	if (err)
 		return err;
@@ -355,7 +349,7 @@ static status_t googlefs_walk(fs_volume *_volume, fs_vnode *_base, const char *f
 			err = EINVAL;
 	}
 	UNLOCK(&base->l);
-	TRACE((PFS "walk() -> error 0x%08" B_PRIx32 "\n", err));
+	TRACE("walk() -> error 0x%08" B_PRIx32 "\n", err);
 	return err;
 }
 
@@ -365,7 +359,7 @@ static status_t googlefs_opendir(fs_volume *_volume, fs_vnode *_node, void **coo
 	fs_node *node = (fs_node *)_node->private_node;
 	status_t err = B_OK;
 	fs_dir_cookie *c;
-	TRACE((PFS "opendir(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid));
+	TRACE("opendir(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid);
 	if (!node)
 		return EINVAL;
 	if (!S_ISDIR(node->st.st_mode))
@@ -397,7 +391,7 @@ static status_t googlefs_closedir(fs_volume *_volume, fs_vnode *_node, void *_co
 	fs_dir_cookie *cookie = (fs_dir_cookie *)_cookie;
 	status_t err = B_OK;
 //	node = cookie->node; // work around VFS bug
-	TRACE((PFS "closedir(%" B_PRId32 ", %" B_PRId64 ", %p)\n", ns->nsid, node->vnid, cookie));
+	TRACE("closedir(%" B_PRId32 ", %" B_PRId64 ", %p)\n", ns->nsid, node->vnid, cookie);
 	err = LOCK(&node->l);
 	if (err)
 		return err;
@@ -413,7 +407,7 @@ static status_t googlefs_rewinddir(fs_volume *_volume, fs_vnode *_node, void *_c
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
 	fs_dir_cookie *cookie = (fs_dir_cookie *)_cookie;
-	TRACE((PFS "rewinddir(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid));
+	TRACE("rewinddir(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid);
 	cookie->dir_current = 0;
 	return B_OK;
 }
@@ -426,12 +420,12 @@ static status_t googlefs_readdir(fs_volume *_volume, fs_vnode *_node, void *_coo
 	fs_node *n = NULL;
 	fs_node *parent = node->parent;
 	int index;
-	TRACE((PFS "readdir(%" B_PRId32 ", %" B_PRId64 ") @ %d\n", ns->nsid, node->vnid, cookie->dir_current));
+	TRACE("readdir(%" B_PRId32 ", %" B_PRId64 ") @ %d\n", ns->nsid, node->vnid, cookie->dir_current);
 	if (!node || !cookie || !num || !*num || !buf || (bufsize < (sizeof(dirent_t)+GOOGLEFS_NAME_LEN)))
 		return EINVAL;
 	LOCK(&node->l);
 	if (cookie->dir_current == 0) { /* .. */
-		TRACE((PFS "readdir: giving ..\n"));
+		TRACE("readdir: giving ..\n");
 		/* the VFS will correct that anyway */
 		buf->d_dev = ns->nsid;
 		buf->d_pdev = ns->nsid;
@@ -442,7 +436,7 @@ static status_t googlefs_readdir(fs_volume *_volume, fs_vnode *_node, void *_coo
 		cookie->dir_current++;
 		*num = 1;
 	} else if (cookie->dir_current == 1) { /* . */
-		TRACE((PFS "readdir: giving .\n"));
+		TRACE("readdir: giving .\n");
 		/* the VFS will correct that anyway */
 		buf->d_dev = ns->nsid;
 		buf->d_pdev = ns->nsid;
@@ -456,7 +450,7 @@ static status_t googlefs_readdir(fs_volume *_volume, fs_vnode *_node, void *_coo
 		index = cookie->dir_current-2;
 		for (n = node->children; n && index; n = n->next, index--); //XXX: care about n->hidden || n->deleted
 		if (n) {
-			TRACE((PFS "readdir: giving ino %" B_PRId64 ", %s\n", n->vnid, n->name));
+			TRACE("readdir: giving ino %" B_PRId64 ", %s\n", n->vnid, n->name);
 			buf->d_dev = ns->nsid;
 			buf->d_pdev = ns->nsid;
 			buf->d_ino = n->vnid;
@@ -480,7 +474,7 @@ static status_t googlefs_free_dircookie(fs_volume *_volume, fs_vnode *_node, voi
 	fs_dir_cookie *cookie = (fs_dir_cookie *)_cookie;
 	status_t err = B_OK;
 //	node = cookie->node; // work around VFS bug
-	TRACE((PFS"freedircookie(%" B_PRId32 ", %" B_PRId64 ", %p)\n", ns->nsid, node?node->vnid:(int64)0, (void *)cookie));
+	TRACE("freedircookie(%" B_PRId32 ", %" B_PRId64 ", %p)\n", ns->nsid, node?node->vnid:(int64)0, (void *)cookie);
 	err = LOCK(&node->l);
 	if (err)
 		return err;
@@ -535,7 +529,7 @@ static status_t googlefs_open(fs_volume *_volume, fs_vnode *_node, int omode, vo
 	status_t err = B_OK;
 	//fs_node *dummy;
 	fs_file_cookie *fc;
-	TRACE((PFS"open(%" B_PRId32 ", %" B_PRId64 ", 0x%x)\n", ns->nsid, node->vnid, omode));
+	TRACE("open(%" B_PRId32 ", %" B_PRId64 ", 0x%x)\n", ns->nsid, node->vnid, omode);
 	if (!node || !cookie)
 		return EINVAL;
 
@@ -589,7 +583,7 @@ static status_t googlefs_close(fs_volume *_volume, fs_vnode *_node, void *_cooki
 	fs_node *node = (fs_node *)_node->private_node;
 	fs_file_cookie *cookie = (fs_file_cookie *)_cookie;
 	status_t err;
-	TRACE((PFS"close(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid));
+	TRACE("close(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid);
 	if (!ns || !node || !cookie)
 		return EINVAL;
 	err = LOCK(&node->l);
@@ -609,7 +603,7 @@ static status_t googlefs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *
 	fs_node *node = (fs_node *)_node->private_node;
 	fs_file_cookie *cookie = (fs_file_cookie *)_cookie;
 	status_t err = B_OK;
-	TRACE((PFS"freecookie(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid));
+	TRACE("freecookie(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid);
 	err = LOCK(&node->l);
 	if (err)
 		return err;
@@ -636,7 +630,7 @@ static status_t googlefs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
 	status_t err = B_OK;
-	TRACE((PFS"read(%" B_PRId32 ", %" B_PRId64 ", %jd, %zu)\n", ns->nsid, node->vnid, pos, *len));
+	TRACE("read(%" B_PRId32 ", %" B_PRId64 ", %jd, %zu)\n", ns->nsid, node->vnid, pos, *len);
 	if (pos < 0 || (size_t)pos > node->data_size)
 		err = EFPOS;
 	if (err || node->data_size == 0 || !node->data) {
@@ -651,7 +645,7 @@ static status_t googlefs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie
 static status_t googlefs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos, const void *buf, size_t *len)
 {
 	fs_node *node = (fs_node *)_node->private_node;
-	TRACE((PFS"write(%" B_PRId32 ", %" B_PRId64 ", %jd, %zu)\n", _volume->id, node->vnid, pos, *len));
+	TRACE("write(%" B_PRId32 ", %" B_PRId64 ", %jd, %zu)\n", _volume->id, node->vnid, pos, *len);
 	*len = 0;
 	return ENOSYS;
 }
@@ -659,13 +653,13 @@ static status_t googlefs_write(fs_volume *_volume, fs_vnode *_node, void *_cooki
 static status_t googlefs_wstat(fs_volume *_volume, fs_vnode *_node, const struct stat *st, uint32 mask)
 {
 	fs_node *node = (fs_node *)_node->private_node;
-	TRACE((PFS"wstat(%" B_PRId32 ", %" B_PRId64 ", , 0x%08" B_PRIx32 ")\n", _volume->id, node->vnid, mask));
+	TRACE("wstat(%" B_PRId32 ", %" B_PRId64 ", , 0x%08" B_PRIx32 ")\n", _volume->id, node->vnid, mask);
 	return ENOSYS;
 }
 
 static status_t googlefs_wfsstat(fs_volume *_volume, const struct fs_info *info, uint32 mask)
 {
-	TRACE((PFS"wfsstat(%" B_PRId32 ", , 0x%08" B_PRIx32 ")\n", _volume->id, mask));
+	TRACE("wfsstat(%" B_PRId32 ", , 0x%08" B_PRIx32 ")\n", _volume->id, mask);
 	return ENOSYS;
 }
 
@@ -687,7 +681,7 @@ static int googlefs_create_gen(fs_volume *_volume, fs_node *dir, const char *nam
 	status_t err;
 	fs_node *n;
 	int i;
-	TRACE((PFS"create_gen(%" B_PRId32 ", %" B_PRId64 ", '%s', 0x%08x, %c, %c)\n", ns->nsid, dir->vnid, name, omode, mkdir?'t':'f', uniq?'t':'f'));
+	TRACE("create_gen(%" B_PRId32 ", %" B_PRId64 ", '%s', 0x%08x, %c, %c)\n", ns->nsid, dir->vnid, name, omode, mkdir?'t':'f', uniq?'t':'f');
 
 	if (strlen(name) > GOOGLEFS_NAME_LEN-1)
 		return ENAMETOOLONG;
@@ -790,7 +784,7 @@ static status_t googlefs_create(fs_volume *_volume, fs_vnode *_dir, const char *
 	status_t err;
 	fs_node *n;
 	struct fs_vnode child = { NULL, &sGoogleFSVnodeOps };
-	TRACE((PFS"create(%" B_PRId32 ", %" B_PRId64 ", '%s', 0x%08x)\n", ns->nsid, dir->vnid, name, omode));
+	TRACE("create(%" B_PRId32 ", %" B_PRId64 ", '%s', 0x%08x)\n", ns->nsid, dir->vnid, name, omode);
 	/* don't let ppl mess our fs up */
 	return ENOSYS;
 
@@ -808,7 +802,7 @@ static int googlefs_unlink_gen(fs_volume *_volume, fs_node *dir, const char *nam
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	status_t err;
 	fs_node *n;
-	TRACE((PFS"unlink(%" B_PRId32 ", %" B_PRId64 ", %s)\n", ns->nsid, dir->vnid, name));
+	TRACE("unlink(%" B_PRId32 ", %" B_PRId64 ", %s)\n", ns->nsid, dir->vnid, name);
 	//dprintf(PFS"unlink(%" B_PRId32 ", %" B_PRId64 ", %s)\n", ns->nsid, dir->vnid, name);
 	err = LOCK(&dir->l);
 	if (err)
@@ -849,7 +843,7 @@ static status_t googlefs_rmdir(fs_volume *_volume, fs_vnode *_dir, const char *n
 {
 	//fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *dir = (fs_node *)_dir->private_node;
-	TRACE((PFS"rmdir(%" B_PRId32 ", %" B_PRId64 ", %s)\n", _volume->id, dir->vnid, name));
+	TRACE("rmdir(%" B_PRId32 ", %" B_PRId64 ", %s)\n", _volume->id, dir->vnid, name);
 	return googlefs_unlink(_volume, _dir, name);
 }
 
@@ -858,7 +852,7 @@ static int googlefs_unlink_node_rec(fs_volume *_volume, fs_node *node)
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	status_t err;
 	fs_node *n;
-	TRACE((PFS"googlefs_unlink_node_rec(%" B_PRId32 ", %" B_PRId64 ":%s)\n", ns->nsid, node->vnid, node->name));
+	TRACE("googlefs_unlink_node_rec(%" B_PRId32 ", %" B_PRId64 ":%s)\n", ns->nsid, node->vnid, node->name);
 	if (!ns || !node)
 		return EINVAL;
 	// kill_request();
@@ -880,7 +874,7 @@ static status_t googlefs_access(fs_volume *_volume, fs_vnode *_node, int mode)
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
-	TRACE((PFS"access(%" B_PRId32 ", %" B_PRId64 ", 0x%x)\n", ns->nsid, node->vnid, mode));
+	TRACE("access(%" B_PRId32 ", %" B_PRId64 ", 0x%x)\n", ns->nsid, node->vnid, mode);
 	return B_OK;
 }
 
@@ -900,7 +894,7 @@ static int googlefs_mkdir_gen(fs_volume *_volume, fs_vnode *_dir, const char *na
 	status_t err;
 	fs_node *n;
 	int i;
-	TRACE((PFS"mkdir_gen(%" B_PRId32 ", %" B_PRId64 ", '%s', 0x%08x, %c)\n", ns->nsid, dir->vnid, name, perms, uniq?'t':'f'));
+	TRACE("mkdir_gen(%" B_PRId32 ", %" B_PRId64 ", '%s', 0x%08x, %c)\n", ns->nsid, dir->vnid, name, perms, uniq?'t':'f');
 
 	if (strlen(name) > GOOGLEFS_NAME_LEN-1)
 		return ENAMETOOLONG;
@@ -985,7 +979,7 @@ static status_t googlefs_mkdir(fs_volume *_volume, fs_vnode *_dir, const char *n
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *dir = (fs_node *)_dir->private_node;
-	TRACE((PFS"mkdir(%" B_PRId32 ", %" B_PRId64 ", '%s', 0x%08x)\n", ns->nsid, dir->vnid, name, perms));
+	TRACE("mkdir(%" B_PRId32 ", %" B_PRId64 ", '%s', 0x%08x)\n", ns->nsid, dir->vnid, name, perms);
 	return googlefs_create_gen(_volume, dir, name, O_EXCL, perms, NULL, NULL, folders_attrs, true, false);
 }
 
@@ -997,7 +991,7 @@ static status_t googlefs_open_attrdir(fs_volume *_volume, fs_vnode *_node, void 
 	fs_node *node = (fs_node *)_node->private_node;
 	status_t err = B_OK;
 	fs_attr_dir_cookie *c;
-	TRACE((PFS "open_attrdir(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid));
+	TRACE("open_attrdir(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid);
 	if (!node)
 		return EINVAL;
 	err = LOCK(&node->l);
@@ -1026,7 +1020,7 @@ static status_t googlefs_close_attrdir(fs_volume *_volume, fs_vnode *_node, void
 	fs_node *node = (fs_node *)_node->private_node;
 	fs_attr_dir_cookie *cookie = (fs_attr_dir_cookie *)_cookie;
 	status_t err = B_OK;
-	TRACE((PFS "close_attrdir(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid));
+	TRACE("close_attrdir(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid);
 	err = LOCK(&node->l);
 	if (err)
 		return err;
@@ -1041,7 +1035,7 @@ static status_t googlefs_free_attrdircookie(fs_volume *_volume, fs_vnode *_node,
 	fs_node *node = (fs_node *)_node->private_node;
 	fs_attr_dir_cookie *cookie = (fs_attr_dir_cookie *)_cookie;
 	status_t err = B_OK;
-	TRACE((PFS"free_attrdircookie(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid));
+	TRACE("free_attrdircookie(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid);
 	err = LOCK(&node->l);
 	if (err)
 		return err;
@@ -1056,7 +1050,7 @@ static status_t googlefs_rewind_attrdir(fs_volume *_volume, fs_vnode *_node, voi
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
 	fs_attr_dir_cookie *cookie = (fs_attr_dir_cookie *)_cookie;
-	TRACE((PFS "rewind_attrdir(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid));
+	TRACE("rewind_attrdir(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, node->vnid);
 	cookie->dir_current = 0;
 	return B_OK;
 }
@@ -1071,7 +1065,7 @@ static status_t googlefs_read_attrdir(fs_volume *_volume, fs_vnode *_node, void 
 	attr_entry *ae = NULL;
 	int i;
 	int count_indirect;
-	TRACE((PFS "read_attrdir(%" B_PRId32 ", %" B_PRId64 ") @ %d\n", ns->nsid, node->vnid, cookie->dir_current));
+	TRACE("read_attrdir(%" B_PRId32 ", %" B_PRId64 ") @ %d\n", ns->nsid, node->vnid, cookie->dir_current);
 	if (!node || !cookie || !num || !*num || !buf || (bufsize < (sizeof(dirent_t)+GOOGLEFS_NAME_LEN)))
 		return EINVAL;
 	LOCK(&node->l);
@@ -1083,7 +1077,7 @@ static status_t googlefs_read_attrdir(fs_volume *_volume, fs_vnode *_node, void 
 			ae = &node->attrs[i];
 
 	if (ae) {
-		TRACE((PFS "read_attrdir: giving %s\n", ae->name));
+		TRACE("read_attrdir: giving %s\n", ae->name);
 		buf->d_dev = ns->nsid;
 		buf->d_pdev = ns->nsid;
 		buf->d_ino = node->vnid;
@@ -1116,7 +1110,7 @@ static status_t googlefs_open_attr_h(fs_volume *_volume, fs_vnode *_node, const 
 	fs_file_cookie *fc;
 	attr_entry *ae = NULL;
 	int i;
-	TRACE((PFS"open_attr(%" B_PRId32 ", %" B_PRId64 ", %s, 0x%x)\n", ns->nsid, node->vnid, name, omode));
+	TRACE("open_attr(%" B_PRId32 ", %" B_PRId64 ", %s, 0x%x)\n", ns->nsid, node->vnid, name, omode);
 	if (!node || !name || !cookie)
 		return EINVAL;
 
@@ -1174,7 +1168,7 @@ static status_t googlefs_close_attr_h(fs_volume *_volume, fs_vnode *_node, void 
 	fs_node *node = (fs_node *)_node->private_node;
 	fs_file_cookie *cookie = (fs_file_cookie *)_cookie;
 	status_t err;
-	TRACE((PFS"close_attr(%" B_PRId32 ", %" B_PRId64 ":%s)\n", ns->nsid, node->vnid, cookie->attr?cookie->attr->name:"?"));
+	TRACE("close_attr(%" B_PRId32 ", %" B_PRId64 ":%s)\n", ns->nsid, node->vnid, cookie->attr?cookie->attr->name:"?");
 	if (!ns || !node || !cookie)
 		return EINVAL;
 	err = LOCK(&node->l);
@@ -1194,7 +1188,7 @@ static status_t googlefs_free_attr_cookie_h(fs_volume *_volume, fs_vnode *_node,
 	fs_node *node = (fs_node *)_node->private_node;
 	fs_file_cookie *cookie = (fs_file_cookie *)_cookie;
 	status_t err = B_OK;
-	TRACE((PFS"free_attrcookie(%" B_PRId32 ", %" B_PRId64 ":%s)\n", ns->nsid, node->vnid, cookie->attr?cookie->attr->name:"?"));
+	TRACE("free_attrcookie(%" B_PRId32 ", %" B_PRId64 ":%s)\n", ns->nsid, node->vnid, cookie->attr?cookie->attr->name:"?");
 	err = LOCK(&node->l);
 	if (err)
 		return err;
@@ -1215,7 +1209,7 @@ static status_t googlefs_read_attr_stat(fs_volume *_volume, fs_vnode *_node, voi
 	fs_file_cookie *cookie = (fs_file_cookie *)_cookie;
 	status_t err = B_OK;
 	attr_entry *ae = cookie->attr;
-	TRACE((PFS"stat_attr(%" B_PRId32 ", %" B_PRId64 ":%s)\n", ns->nsid, node->vnid, ae->name));
+	TRACE("stat_attr(%" B_PRId32 ", %" B_PRId64 ":%s)\n", ns->nsid, node->vnid, ae->name);
 	if (!node || !st || !cookie || !cookie->attr)
 		return EINVAL;
 	memcpy(st, &node->st, sizeof(struct stat));
@@ -1232,7 +1226,7 @@ static status_t googlefs_read_attr(fs_volume *_volume, fs_vnode *_node, void *_c
 	fs_file_cookie *cookie = (fs_file_cookie *)_cookie;
 	status_t err = B_OK;
 	attr_entry *ae = cookie->attr;
-	TRACE((PFS"read_attr(%" B_PRId32 ", %" B_PRId64 ":%s)\n", ns->nsid, node->vnid, ae->name));
+	TRACE("read_attr(%" B_PRId32 ", %" B_PRId64 ":%s)\n", ns->nsid, node->vnid, ae->name);
 	if (!node || !cookie || !len || !*len)
 		return EINVAL;
 
@@ -1258,8 +1252,8 @@ static int compare_fs_node_by_recent_query_string(fs_node *node, char *query)
 {
 	time_t tm = time(NULL);
 	//return memcmp(node->name, name, GOOGLEFS_NAME_LEN);
-	TRACE((PFS"find_by_recent_query_string: '%s' <> '%s'\n", \
-			node->request?node->request->query_string:NULL, query));
+	TRACE("find_by_recent_query_string: '%s' <> '%s'\n", \
+			node->request?node->request->query_string:NULL, query);
 	if (!node->request || !node->request->query_string)
 		return -1;
 	/* reject if older than 5 min */
@@ -1282,7 +1276,7 @@ static status_t googlefs_open_query(fs_volume *_volume, const char *query, uint3
 	bool accepted = true;
 	bool reused = false;
 	//int i;
-	TRACE((PFS"open_query(%" B_PRId32 ", '%s', 0x%08" B_PRIx32 ", %" B_PRId32 ", %" B_PRId32 ")\n", ns->nsid, query, flags, port, token));
+	TRACE("open_query(%" B_PRId32 ", '%s', 0x%08" B_PRIx32 ", %" B_PRId32 ", %" B_PRId32 ")\n", ns->nsid, query, flags, port, token);
 //	if (flags & B_LIVE_QUERY)
 //		return ENOSYS; /* no live query yet, they are live enough anyway */
 	//return ENOSYS;
@@ -1327,7 +1321,7 @@ static status_t googlefs_open_query(fs_volume *_volume, const char *query, uint3
 		*cookie = (void *)c;
 		return B_OK;
 	}
-	TRACE((PFS"open_query: QUERY: '%s'\n", qstring));
+	TRACE("open_query: QUERY: '%s'\n", qstring);
 	/* reuse query if it's not too old */
 	LOCK(&ns->l);
 	qn = SLL_FIND(ns->queries, qnext,
@@ -1335,7 +1329,7 @@ static status_t googlefs_open_query(fs_volume *_volume, const char *query, uint3
 	UNLOCK(&ns->l);
 	reused = (qn != NULL);
 	if (reused) {
-		TRACE((PFS"open_query: reusing %" B_PRId32 ":%" B_PRId64 "\n", ns->nsid, qn->vnid));
+		TRACE("open_query: reusing %" B_PRId32 ":%" B_PRId64 "\n", ns->nsid, qn->vnid);
 		err = get_vnode(_volume, qn->vnid, (void **)&dummy); /* inc ref count */
 		if (err)
 			goto err_mkdir;
@@ -1370,12 +1364,12 @@ static status_t googlefs_open_query(fs_volume *_volume, const char *query, uint3
 	if (err)
 		goto err_gn;
 
-	TRACE((PFS"open_query: request_open done\n"));
+	TRACE("open_query: request_open done\n");
 #ifndef NO_SEARCH
 	err = google_request_process(qn->request);
 	if (err)
 		goto err_gro;
-	TRACE((PFS"open_query: request_process done\n"));
+	TRACE("open_query: request_process done\n");
 
 #else
 	/* fake entries */
@@ -1422,7 +1416,7 @@ err_qs:
 	free(qstring);
 //err_m:
 	free(c);
-	TRACE((PFS"open_query: error 0x%08" B_PRIx32 "\n", err));
+	TRACE("open_query: error 0x%08" B_PRIx32 "\n", err);
 	return err;
 }
 
@@ -1432,7 +1426,7 @@ static status_t googlefs_close_query(fs_volume *_volume, void *_cookie)
 	fs_query_cookie *cookie = (fs_query_cookie *)_cookie;
 	status_t err;
 	fs_node *q;
-	TRACE((PFS"close_query(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, cookie->node?cookie->node->vnid:(int64)0));
+	TRACE("close_query(%" B_PRId32 ", %" B_PRId64 ")\n", ns->nsid, cookie->node?cookie->node->vnid:(int64)0);
 	//return ENOSYS;
 	q = cookie->node;
 	if (!q)
@@ -1458,7 +1452,7 @@ static status_t googlefs_free_query_cookie(fs_volume *_volume, void *_cookie)
 	fs_query_cookie *cookie = (fs_query_cookie *)_cookie;
 	status_t err = B_OK;
 	fs_node *q;
-	TRACE((PFS"free_query_cookie(%" B_PRId32 ")\n", _volume->id));
+	TRACE("free_query_cookie(%" B_PRId32 ")\n", _volume->id);
 	q = cookie->node;
 	if (!q)
 		goto no_node;
@@ -1485,7 +1479,7 @@ static status_t googlefs_read_query(fs_volume *_volume, void *_cookie, struct di
 	fs_node *n = NULL;
 	fs_node *node = cookie->node;
 	int index;
-	TRACE((PFS"read_query(%" B_PRId32 ", %" B_PRId64 ") @ %d\n", ns->nsid, node?node->vnid:(int64)0, cookie->dir_current));
+	TRACE("read_query(%" B_PRId32 ", %" B_PRId64 ") @ %d\n", ns->nsid, node?node->vnid:(int64)0, cookie->dir_current);
 	if (!cookie || !num || !*num || !buf || (bufsize < (sizeof(dirent_t)+GOOGLEFS_NAME_LEN)))
 		return EINVAL;
 	if (!node) {
@@ -1498,7 +1492,7 @@ static status_t googlefs_read_query(fs_volume *_volume, void *_cookie, struct di
 	index = cookie->dir_current;
 	for (n = node->children; n && index; n = n->next, index--);
 	if (n) {
-		TRACE((PFS "read_query: giving ino %" PRId64 ", %s\n", n->vnid, n->name));
+		TRACE("read_query: giving ino %" PRId64 ", %s\n", n->vnid, n->name);
 		buf->d_dev = ns->nsid;
 		buf->d_pdev = ns->nsid;
 		buf->d_ino = n->vnid;
@@ -1524,7 +1518,7 @@ int googlefs_push_result_to_query(struct google_request *request, struct google_
 	char ename[GOOGLEFS_NAME_LEN];
 	char *p;
 	int i;
-	TRACE((PFS"push_result_to_query(%" B_PRId32 ", %" B_PRId64 ", %ld:'%s')\n", ns->nsid, qn->vnid, result->id, result->name));
+	TRACE("push_result_to_query(%" B_PRId32 ", %" B_PRId64 ", %ld:'%s')\n", ns->nsid, qn->vnid, result->id, result->name);
 	//dprintf(PFS"push_result_to_query(%" B_PRId32 ", %" B_PRId64 ", %ld:'%s')\n", ns->nsid, qn->vnid, result->id, result->name);
 	//return ENOSYS;
 	if (!ns || !qn)
@@ -1597,7 +1591,7 @@ int googlefs_push_result_to_query(struct google_request *request, struct google_
 	UNLOCK(&n->l);
 	return B_OK;
 
-	TRACE((PFS "push_result_to_query: error 0x%08" B_PRIx32 "\n", err));
+	TRACE("push_result_to_query: error 0x%08" B_PRIx32 "\n", err);
 	return err;
 }
 
@@ -1608,10 +1602,10 @@ googlefs_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-			TRACE((PFS"std_ops(INIT)\n"));
+			TRACE("std_ops(INIT)\n");
 			return B_OK;
 		case B_MODULE_UNINIT:
-			TRACE((PFS"std_ops(UNINIT)\n"));
+			TRACE("std_ops(UNINIT)\n");
 			return B_OK;
 		default:
 			return B_ERROR;

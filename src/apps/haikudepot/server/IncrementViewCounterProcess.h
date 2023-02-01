@@ -1,5 +1,5 @@
 /*
- * Copyright 2021, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2021-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef INCREMENT_VIEW_COUNTER_PROCESS_H
@@ -17,7 +17,7 @@ class IncrementViewCounterProcess : public AbstractProcess {
 public:
 								IncrementViewCounterProcess(
 									Model* model,
-									const PackageInfoRef package);
+									const PackageInfoRef& package);
 	virtual						~IncrementViewCounterProcess();
 
 			const char*			Name() const;

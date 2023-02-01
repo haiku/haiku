@@ -388,16 +388,16 @@ void
 RegistersView::_Init()
 {
 	fRegisterTable = new Table("register list", 0, B_FANCY_BORDER);
+	fRegisterTable->SetFont(B_FONT_ROW, be_fixed_font);
 	AddChild(fRegisterTable->ToView());
 
 	// columns
+	const float padding = be_control_look->DefaultLabelSpacing() * 2;
 	fRegisterTable->AddColumn(new StringTableColumn(0, "Register",
-		be_plain_font->StringWidth("Register")
-			+ be_control_look->DefaultLabelSpacing() * 2 + 5, 40, 1000,
+		be_plain_font->StringWidth("Register") + padding, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 	fRegisterTable->AddColumn(new RegisterValueColumn(1, "Value",
-		be_plain_font->StringWidth("0x00000000")
-			+ be_control_look->DefaultLabelSpacing() * 2 + 5, 40, 1000,
+		be_fixed_font->StringWidth("0xffffffff00000000") + padding, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_RIGHT));
 
 	fRegisterTableModel = new RegisterTableModel(fArchitecture);
@@ -436,5 +436,3 @@ RegistersView::_AddFormatItem(BMenu* menu, int32 format)
 
 	return B_OK;
 }
-
-

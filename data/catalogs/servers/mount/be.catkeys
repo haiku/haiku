@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-mount_server	819316177
+1	belarusian	x-vnd.Haiku-mount_server	2894720660
 Mount read-only	AutoMounter		Мантаваць толькі для чытання
 Error mounting volume:\n\n%s	AutoMounter		Памылка пры мантаванні тома:\n\n%s
 Cancel	AutoMounter		Адмена
@@ -10,5 +10,4 @@ Mounting volume '%s'\n\n	AutoMounter		Мантуецца том '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Немагчыма размантаваць дыск \"%s\":\n\t%s\n\nРазмантаваць усё роўна?\n\nКалі том зараз ужываецца нейкай праграмай, вы можаце згубіць даныя пры размантаванні.\n
 Force unmount	AutoMounter		Размантаваць усё роўна
 Mount error	AutoMounter		Памылка мантавання
-Mounting volume <unnamed volume>\n\n	AutoMounter		Мантуецца том <неназваны том>\n\n
 Mount warning	AutoMounter		Папярэджанне аб мантаванні

@@ -13,11 +13,10 @@
 #include <Url.h>
 
 
-#ifndef LIBNETAPI_DEPRECATED
 namespace BPrivate {
 
 namespace Network {
-#endif
+
 
 class BNetworkCookie : public BArchivable {
 public:
@@ -116,11 +115,10 @@ private:
 			bool				fSessionCookie;
 };
 
-#ifndef LIBNETAPI_DEPRECATED
+
 } // namespace Network
 
 } // namespace BPrivate
-#endif
 
 #endif // _B_NETWORK_COOKIE_H_
 

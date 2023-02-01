@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Haiku, Inc. All rights reserved.
+ * Copyright 2019-2022, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -122,21 +122,33 @@ nvme_pcicfg_write32(struct pci_device* dev, uint32_t value, uint32_t offset)
 }
 
 
-int
-nvme_pcicfg_map_bar(void* devhandle, unsigned int bar, bool read_only,
-	void** mapped_addr)
+void
+nvme_pcicfg_get_bar_addr_len(void* devhandle, unsigned int bar,
+	uint64_t* _addr, uint64_t* _size)
 {
 	struct pci_device* dev = (struct pci_device*)devhandle;
 	pci_info* info = (pci_info*)dev->pci_info;
 
-	phys_addr_t addr = info->u.h0.base_registers[bar];
+	uint64 addr = info->u.h0.base_registers[bar];
 	uint64 size = info->u.h0.base_register_sizes[bar];
 	if ((info->u.h0.base_register_flags[bar] & PCI_address_type) == PCI_address_type_64) {
 		addr |= (uint64)info->u.h0.base_registers[bar + 1] << 32;
 		size |= (uint64)info->u.h0.base_register_sizes[bar + 1] << 32;
 	}
 
-	area_id area = map_physical_memory("nvme mapped bar", addr, size,
+	*_addr = addr;
+	*_size = size;
+}
+
+
+int
+nvme_pcicfg_map_bar(void* devhandle, unsigned int bar, bool read_only,
+	void** mapped_addr)
+{
+	uint64 addr, size;
+	nvme_pcicfg_get_bar_addr_len(devhandle, bar, &addr, &size);
+
+	area_id area = map_physical_memory("nvme mapped bar", (phys_addr_t)addr, (size_t)size,
 		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | (read_only ? 0 : B_KERNEL_WRITE_AREA),
 		mapped_addr);
 	if (area < B_OK)
@@ -167,18 +179,6 @@ int
 nvme_pcicfg_unmap_bar(void* devhandle, unsigned int bar, void* addr)
 {
 	return delete_area(area_for(addr));
-}
-
-
-void
-nvme_pcicfg_get_bar_addr_len(void* devhandle, unsigned int bar,
-	uint64_t* addr, uint64_t* size)
-{
-	struct pci_device* dev = (struct pci_device*)devhandle;
-	pci_info* info = (pci_info*)dev->pci_info;
-
-	*addr = info->u.h0.base_registers[bar];
-	*size = info->u.h0.base_register_sizes[bar];
 }
 
 

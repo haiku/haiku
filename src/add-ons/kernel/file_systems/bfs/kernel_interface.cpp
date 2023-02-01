@@ -1755,14 +1755,10 @@ bfs_read_dir(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 		if (status != B_OK)
 			RETURN_ERROR(status);
 
-		ASSERT(length < nameBufferSize);
-
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = id;
-		dirent->d_reclen = offsetof(struct dirent, d_name) + length + 1;
 
-		bufferSize -= dirent->d_reclen;
-		dirent = (struct dirent*)((uint8*)dirent + dirent->d_reclen);
+		dirent = next_dirent(dirent, length, bufferSize);
 		count++;
 	}
 

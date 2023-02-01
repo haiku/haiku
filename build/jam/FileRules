@@ -1,3 +1,11 @@
+RM_DIR ?= $(RM) -rf ;
+
+actions piecemeal together existing CleanDir
+{
+	$(RM_DIR) "$(>)"
+}
+
+
 rule Copy
 {
 	if $(2) {

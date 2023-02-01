@@ -795,6 +795,8 @@ Device::_SetupEndpoints()
 
 	for (size_t i = 0; i < config->interface_count; i++) {
 		usb_interface_info* Interface = config->interface[i].active;
+		if (Interface == NULL || Interface->descr == NULL)
+			continue;
 		if (Interface->descr->interface_class != USB_AUDIO_INTERFACE_AUDIO_CLASS)
 			continue;
 

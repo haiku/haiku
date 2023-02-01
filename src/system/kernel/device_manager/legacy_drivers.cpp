@@ -71,6 +71,8 @@ public:
 								void** _cookie);
 	virtual	status_t		Select(void* cookie, uint8 event, selectsync* sync);
 
+	virtual	status_t		Control(void* cookie, int32 op, void* buffer, size_t length);
+
 			bool			Republished() const { return fRepublished; }
 			void			SetRepublished(bool republished)
 								{ fRepublished = republished; }
@@ -347,7 +349,7 @@ republish_driver(legacy_driver* driver)
 		devfs_unpublish_device(device, true);
 	}
 
-	if (exported == 0 && driver->devices_used == 0) {
+	if (exported == 0 && driver->devices_used == 0 && gBootDevice >= 0) {
 		TRACE(("devfs: driver \"%s\" does not publish any more nodes and is "
 			"unloaded\n", driver->path));
 		unload_driver(driver);
@@ -1131,13 +1133,13 @@ start_watching(const char* base, const char* sub)
 static struct driver_entry*
 new_driver_entry(const char* path, dev_t device, ino_t node)
 {
-	driver_entry* entry = (driver_entry*)malloc(sizeof(driver_entry));
+	driver_entry* entry = new(std::nothrow) driver_entry;
 	if (entry == NULL)
 		return NULL;
 
 	entry->path = strdup(path);
 	if (entry->path == NULL) {
-		free(entry);
+		delete entry;
 		return NULL;
 	}
 
@@ -1171,7 +1173,7 @@ try_drivers(DriverEntryList& list)
 		}
 
 		free(entry->path);
-		free(entry);
+		delete entry;
 	}
 
 	return B_OK;
@@ -1320,6 +1322,20 @@ LegacyDevice::Removed()
 		fDriver->devices.Remove(this);
 
 	delete this;
+}
+
+
+status_t
+LegacyDevice::Control(void* _cookie, int32 op, void* buffer, size_t length)
+{
+	switch (op) {
+		case B_GET_DRIVER_FOR_DEVICE:
+			if (length != 0 && length <= strlen(fDriver->path))
+				return ERANGE;
+			return user_strlcpy(static_cast<char*>(buffer), fDriver->path, length);
+		default:
+			return AbstractModuleDevice::Control(_cookie, op, buffer, length);
+	}
 }
 
 
@@ -1503,7 +1519,7 @@ legacy_driver_probe(const char* subPath)
 extern "C" status_t
 legacy_driver_init(void)
 {
-	sDriverHash = new DriverTable();
+	sDriverHash = new(std::nothrow) DriverTable();
 	if (sDriverHash == NULL || sDriverHash->Init(DRIVER_HASH_SIZE) != B_OK)
 		return B_NO_MEMORY;
 

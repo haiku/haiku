@@ -17,7 +17,7 @@
 
 ShuttingDownWindow::ShuttingDownWindow(BWindow* parent)
 	:
-	BWindow(WINDOW_FRAME, B_TRANSLATE("Shutting Down"),
+	BWindow(WINDOW_FRAME, B_TRANSLATE("Cleaning up" B_UTF8_ELLIPSIS),
 		B_FLOATING_WINDOW_LOOK, B_MODAL_SUBSET_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
 			| B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_NOT_CLOSABLE )
@@ -28,8 +28,8 @@ ShuttingDownWindow::ShuttingDownWindow(BWindow* parent)
 	textView->AdoptSystemColors();
 	textView->MakeEditable(false);
 	textView->MakeSelectable(false);
-	textView->SetText(B_TRANSLATE("Haiku Depot is stopping or completing "
-		"running operations before shutting down."));
+	textView->SetText(B_TRANSLATE("HaikuDepot is stopping or completing "
+		"running operations before quitting."));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 			.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,

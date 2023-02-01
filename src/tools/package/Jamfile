@@ -6,6 +6,10 @@ SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src bin package ] ;
 
 USES_BE_API on <build>package = true ;
 
+if [ FIsBuildFeatureEnabled zstd ] {
+	SubDirC++Flags -DZSTD_DEFAULT ;
+}
+
 BuildPlatformMain <build>package :
 	command_add.cpp
 	command_checksum.cpp

@@ -1,10 +1,11 @@
-1	english	x-vnd.Haiku-Time	1987293945
+1	english	x-vnd.Haiku-Time	3691539601
 OK	Time		确定
 Message receiving failed	Time		消息接收失败
 Australia	Time		澳大利亚
 America	Time		美洲
 Reset to default server list	Time		重置为默认服务器列表
 Could not resolve server address	Time		无法解析服务器地址
+Time & Date	System name		时间和日期
 Set time zone	Time		设置时区
 Waiting for answer failed	Time		等待回复失败
 <Other>	Time		<其他>
@@ -15,6 +16,7 @@ Asia	Time		亚洲
 Try all servers	Time		尝试所有服务器
 Time	Time		时间
 Current time:	Time		当前时间：
+The following error occured while synchronizing:\n%s: %s	Time		同步时发生以下错误：\n%s: %s
 Europe	Time		欧洲
 Show day of week	Time		显示星期
 Local time (Windows compatible)	Time		本地时间（Windows 兼容）
@@ -41,5 +43,6 @@ Synchronize at boot	Time		启动时同步
 Indian	Time		印度洋
 Revert	Time		恢复
 Date and time	Time		日期时间
+The following error occured while synchronizing:\n%s	Time		同步时发生以下错误：\n%s
 Synchronize	Time		同步
 Add	Time		添加

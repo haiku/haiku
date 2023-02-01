@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaConverter	2816184527
+1	japanese	x-vnd.Haiku-MediaConverter	338319367
 Input file not recognized as Audio or Video	MediaConverter		入力ファイルはオーディオまたはビデオとして認識できません。
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		ビデオ品質: %3d%%
@@ -12,6 +12,7 @@ MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:保存先フォル
 Error creating video.	MediaConverter		ビデオの作成に失敗しました。
 Cancelling	MediaConverter		中止中
 None available	Audio codecs		利用できません
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		ファイルに複数のオーディオまたはビデオトラックがありますが、それぞれの最初のトラックだけが変換されます。
 No file selected	MediaConverter-FileInfo		ファイルが選択されていません
 High	MediaConverter		高い
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{ファイルはサポートされたメディアファイルとして認識されません:} other{#個のファイルがサポートされたメディアファイルとして認識されません:}}
@@ -26,6 +27,7 @@ Error loading a file	MediaConverter		ファイルのロード中にエラーが�
 Encoder parameters	MediaConverter-EncoderWindow		エンコーターパラメーター
 Open…	Menu		開く...
 Audio encoding:	MediaConverter		オーディオエンコーディング
+Multi-track file detected	MediaConverter		マルチトラックファイルが検出されました。
 Audio quality: %3d%%	MediaConverter		オーディオ品質: %3d%%
 Cancelling…	MediaConverter		中止しています...
 Output file '%filename' created	MediaConverter		出力ファイル '%filename' が作成されました
@@ -63,6 +65,7 @@ File	Menu		ファイル
 Video quality not supported	MediaConverter		ビデオ品質はサポートされていません
 Select this folder	MediaConverter		このフォルダーを選択
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld チャンネル
+Understood	MediaConverter		了解
 %d bit 	MediaFileInfo		%d ビット
 No video	Video codecs list		ビデオ無し
 Continue	MediaConverter		続ける

@@ -182,12 +182,12 @@ ata_channel_added(device_node *parent)
 	device_attr attributes[] = {
 		{
 			B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
-				{ string: SCSI_FOR_SIM_MODULE_NAME }
+				{ .string = SCSI_FOR_SIM_MODULE_NAME }
 		},
 
 		{
 			SCSI_DESCRIPTION_CONTROLLER_NAME, B_STRING_TYPE,
-				{ string: controllerName }
+				{ .string = controllerName }
 		},
 
 		// maximum number of blocks per transmission:
@@ -195,8 +195,8 @@ ata_channel_added(device_node *parent)
 		//   but I'm not sure about controller restrictions
 		// - ATA allows up to 256 blocks for LBA28 and 65535 for LBA48
 		// to fix specific drive bugs use ATAChannel::GetRestrictions()
-		{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { ui32: 0xffff } },
-		{ ATA_CHANNEL_ID_ITEM, B_UINT32_TYPE, { ui32: (uint32)channelID } },
+		{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { .ui32 = 0xffff } },
+		{ ATA_CHANNEL_ID_ITEM, B_UINT32_TYPE, { .ui32 = (uint32)channelID } },
 		{ NULL }
 	};
 

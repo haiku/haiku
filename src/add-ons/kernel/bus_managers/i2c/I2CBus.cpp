@@ -57,21 +57,21 @@ I2CBus::RegisterDevice(i2c_addr slaveAddress, char* hid, char** cid,
 	CALLED();
 
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "I2C device" }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "I2C device" }},
 
 		// connection
-		{ I2C_DEVICE_SLAVE_ADDR_ITEM, B_UINT16_TYPE, { ui16: slaveAddress }},
+		{ I2C_DEVICE_SLAVE_ADDR_ITEM, B_UINT16_TYPE, { .ui16 = slaveAddress }},
 
 		// description of peripheral drivers
-		{ B_DEVICE_BUS, B_STRING_TYPE, { string: "i2c" }},
+		{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "i2c" }},
 
-		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { ui32: B_FIND_MULTIPLE_CHILDREN }},
+		{ B_DEVICE_FLAGS, B_UINT32_TYPE, { .ui32 = B_FIND_MULTIPLE_CHILDREN }},
 
-		{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { string: hid }},
+		{ ACPI_DEVICE_HID_ITEM, B_STRING_TYPE, { .string = hid }},
 
-		{ ACPI_DEVICE_CID_ITEM, B_STRING_TYPE, { string: cid[0] }},
+		{ ACPI_DEVICE_CID_ITEM, B_STRING_TYPE, { .string = cid[0] }},
 
-		{ ACPI_DEVICE_HANDLE_ITEM, B_UINT64_TYPE, { ui64: (addr_t)acpiHandle }},
+		{ ACPI_DEVICE_HANDLE_ITEM, B_UINT64_TYPE, { .ui64 = (addr_t)acpiHandle }},
 
 		{ NULL }
 	};

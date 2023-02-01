@@ -405,6 +405,8 @@ ndp_init()
 	int value = 255;
 	sIPv6Module->setsockopt(sIPv6Protocol, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
 		&value, sizeof(value));
+	sIPv6Module->setsockopt(sIPv6Protocol, IPPROTO_IPV6, IPV6_UNICAST_HOPS,
+		&value, sizeof(value));
 
 	mutex_init(&sCacheLock, "ndp cache");
 
@@ -701,7 +703,7 @@ ndp_receive_solicitation(net_buffer* buffer, bool* reuseBuffer)
 		// send a reply (by reusing the buffer we got)
 		gBufferModule->trim(buffer, sizeof(neighbor_discovery_header));
 
-		header.icmp6_type = ND_NEIGHBOR_SOLICIT;
+		header.icmp6_type = ND_NEIGHBOR_ADVERT;
 		header.icmp6_code = 0;
 		header.icmp6_checksum = 0;
 		header.flags = ND_NA_FLAG_SOLICITED;

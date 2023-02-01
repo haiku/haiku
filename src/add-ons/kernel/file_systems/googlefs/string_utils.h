@@ -5,6 +5,10 @@
 #ifndef _STRING_UTILS_H
 #define _STRING_UTILS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* converts a string to a format suitable for use in urls
  * ex: "foo bar+" -> "foo+bar%2D"
  * caller must free() result
@@ -16,5 +20,9 @@ extern char *urlify_string(const char *str);
  * caller must free() result
  */
 extern char *unentitify_string(const char *str);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _STRING_UTILS_H */

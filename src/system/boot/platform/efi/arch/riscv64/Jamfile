@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src system boot platform efi arch riscv64 ;
 
-SubDirHdrs $(HAIKU_TOP) src system boot platform efi ;
+SubDirHdrs $(SUBDIR) $(DOTDOT) $(DOTDOT) ;
+SubDirHdrs $(SUBDIR) $(DOTDOT) generic ;
 
 UseLibraryHeaders [ FDirName libfdt ] ;
 
@@ -9,23 +10,31 @@ UsePrivateHeaders [ FDirName kernel boot platform efi ] ;
 
 local platform ;
 for platform in [ MultiBootSubDirSetup efi ] {
-    on $(platform) {
+	on $(platform) {
 
-	local arch_src =
-		crt0-efi-$(TARGET_ARCH).S
-		entry.S
-		relocation_func.cpp
-		arch_dtb.cpp
-		arch_mmu.cpp
-		arch_smp.cpp
-		arch_start.cpp
-		arch_timer.cpp
-		arch_traps.cpp
-		arch_traps_asm.S
-		;
+		local arch_src =
+			crt0-efi-$(TARGET_ARCH).S
+			entry.S
+			relocation_func.cpp
+			arch_dtb.cpp
+			arch_mmu.cpp
+			arch_smp.cpp
+			arch_start.cpp
+			arch_timer.cpp
+			arch_traps.cpp
+			arch_traps_asm.S
+			;
 
-	BootMergeObject boot_platform_efi_riscv64.o :
-		$(arch_src)
-		;
+		local generic_src =
+			generic_mmu.cpp
+			;
+
+		BootMergeObject boot_platform_efi_riscv64.o :
+			$(arch_src)
+			$(generic_src)
+			;
+
+		SEARCH on [ FGristFiles $(generic_src) ]
+			= [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 	}
 }

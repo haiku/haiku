@@ -21,7 +21,7 @@ Please select the files you wish to keep searching.	GrepWindow		Lütfen aramayı
 Trim to selection	GrepWindow		Seçime kırp
 Set target…	GrepWindow		Hedef belirle…
 Failed to open input pipe!	Grepper		Girdi veri yolu açılamadı!
-Search	GrepWindow		Arama
+Search	GrepWindow		Ara
 Copy text to clipboard	GrepWindow		Metni panoya kopyala
 Show lines	GrepWindow		Satırları göster
 Failed to open errors pipe!	Grepper		Hata veri yolu açılamadı!

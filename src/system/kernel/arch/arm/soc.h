@@ -46,19 +46,13 @@ public:
 	}
 
 protected:
-#if 0
-	HardwareTimer(fdt_module_info *fdtModule, fdt_device_node node)
-		: fFDT(fdtModule), fNode(node) {
+	HardwareTimer()
+	{
 		if (sInstance) {
 			panic("Multiple HardwareTimer objects created; that is currently unsupported!");
 		}
 		sInstance = this;
 	}
-
-	// Keep our node around as we might want to grab attributes from it
-	fdt_module_info *fFDT;
-	fdt_device_node fNode;
-#endif
 
 	static HardwareTimer *sInstance;
 };

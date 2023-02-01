@@ -11,8 +11,10 @@
 #include <PosixLanginfo.h>
 
 
-using BPrivate::Libroot::gLocaleBackend;
 using BPrivate::Libroot::gPosixLanginfo;
+using BPrivate::Libroot::GetCurrentLocaleBackend;
+using BPrivate::Libroot::LocaleBackend;
+using BPrivate::Libroot::LocaleBackendData;
 
 
 extern "C" char*
@@ -21,8 +23,23 @@ nl_langinfo(nl_item item)
 	if (item < 0 || item >= _NL_LANGINFO_LAST)
 		return const_cast<char*>("");
 
-	if (gLocaleBackend != NULL)
-		return const_cast<char*>(gLocaleBackend->GetLanginfo(item));
+	if (GetCurrentLocaleBackend() != NULL)
+		return const_cast<char*>(GetCurrentLocaleBackend()->GetLanginfo(item));
+
+	return const_cast<char*>(gPosixLanginfo[item]);
+}
+
+
+extern "C" char*
+nl_langinfo_l(nl_item item, locale_t locale)
+{
+	if (item < 0 || item >= _NL_LANGINFO_LAST)
+		return const_cast<char*>("");
+
+	LocaleBackend* backend = ((LocaleBackendData*)locale)->backend;
+
+	if (backend != NULL)
+		return const_cast<char*>(backend->GetLanginfo(item));
 
 	return const_cast<char*>(gPosixLanginfo[item]);
 }

@@ -56,7 +56,10 @@ requires {
 	lib:libwebp
 #endif
 #ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_libraw_ENABLED
-	lib:libraw >= 19
+	lib:libraw
+#endif
+#ifdef HAIKU_BUILD_FEATURE_%HAIKU_PACKAGING_ARCH%_gutenprint_ENABLED
+	lib:libgutenprint
 #endif
 #endif
 }

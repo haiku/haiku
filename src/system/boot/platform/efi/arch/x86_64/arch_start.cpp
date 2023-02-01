@@ -43,6 +43,46 @@ arch_convert_kernel_args(void)
 }
 
 
+static const char*
+memory_region_type_str(int type)
+{
+	switch (type)	{
+		case EfiReservedMemoryType:
+			return "EfiReservedMemoryType";
+		case EfiLoaderCode:
+			return "EfiLoaderCode";
+		case EfiLoaderData:
+			return "EfiLoaderData";
+		case EfiBootServicesCode:
+			return "EfiBootServicesCode";
+		case EfiBootServicesData:
+			return "EfiBootServicesData";
+		case EfiRuntimeServicesCode:
+			return "EfiRuntimeServicesCode";
+		case EfiRuntimeServicesData:
+			return "EfiRuntimeServicesData";
+		case EfiConventionalMemory:
+			return "EfiConventionalMemory";
+		case EfiUnusableMemory:
+			return "EfiUnusableMemory";
+		case EfiACPIReclaimMemory:
+			return "EfiACPIReclaimMemory";
+		case EfiACPIMemoryNVS:
+			return "EfiACPIMemoryNVS";
+		case EfiMemoryMappedIO:
+			return "EfiMemoryMappedIO";
+		case EfiMemoryMappedIOPortSpace:
+			return "EfiMemoryMappedIOPortSpace";
+		case EfiPalCode:
+			return "EfiPalCode";
+		case EfiPersistentMemory:
+			return "EfiPersistentMemory";
+		default:
+			return "unknown";
+	}
+}
+
+
 void
 arch_start_kernel(addr_t kernelEntry)
 {
@@ -51,7 +91,6 @@ arch_start_kernel(addr_t kernelEntry)
 	// First call is to determine the buffer size.
 	size_t memory_map_size = 0;
 	efi_memory_descriptor dummy;
-	efi_memory_descriptor *memory_map;
 	size_t map_key;
 	size_t descriptor_size;
 	uint32_t descriptor_version;
@@ -63,7 +102,7 @@ arch_start_kernel(addr_t kernelEntry)
 	// Allocate a buffer twice as large as needed just in case it gets bigger
 	// between calls to ExitBootServices.
 	size_t actual_memory_map_size = memory_map_size * 2;
-	memory_map
+	efi_memory_descriptor *memory_map
 		= (efi_memory_descriptor *)kernel_args_malloc(actual_memory_map_size);
 
 	if (memory_map == NULL)
@@ -78,18 +117,21 @@ arch_start_kernel(addr_t kernelEntry)
 
 	addr_t addr = (addr_t)memory_map;
 	dprintf("System provided memory map:\n");
-	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
+	for (size_t i = 0; i < memory_map_size / descriptor_size; i++) {
 		efi_memory_descriptor *entry
 			= (efi_memory_descriptor *)(addr + i * descriptor_size);
-		dprintf("  %#lx-%#lx  %#lx %#x %#lx\n", entry->PhysicalStart,
+		dprintf("  phys: 0x%08lx-0x%08lx, virt: 0x%08lx-0x%08lx, type: %s (%#x), attr: %#lx\n",
+			entry->PhysicalStart,
 			entry->PhysicalStart + entry->NumberOfPages * B_PAGE_SIZE,
-			entry->VirtualStart, entry->Type, entry->Attribute);
+			entry->VirtualStart,
+			entry->VirtualStart + entry->NumberOfPages * B_PAGE_SIZE,
+			memory_region_type_str(entry->Type), entry->Type,
+			entry->Attribute);
 	}
 
 	// Generate page tables for use after ExitBootServices.
 	uint64_t final_pml4 = arch_mmu_generate_post_efi_page_tables(
 		memory_map_size, memory_map, descriptor_size, descriptor_version);
-	dprintf("Final PML4 at %#lx\n", final_pml4);
 
 	// Attempt to fetch the memory map and exit boot services.
 	// This needs to be done in a loop, as ExitBootServices can change the
@@ -101,33 +143,39 @@ arch_start_kernel(addr_t kernelEntry)
 	// A changing memory map shouldn't affect the generated page tables, as
 	// they only needed to know about the maximum address, not any specific
 	// entry.
+
 	dprintf("Calling ExitBootServices. So long, EFI!\n");
+	serial_disable();
 	while (true) {
 		if (kBootServices->ExitBootServices(kImage, map_key) == EFI_SUCCESS) {
-				// The console was provided by boot services, disable it.
-				stdout = NULL;
-				stderr = NULL;
-				// Also switch to legacy serial output
-				// (may not work on all systems)
-				serial_switch_to_legacy();
-				dprintf("Switched to legacy serial output\n");
-				break;
+			// Disconnect from EFI serial_io / stdio services
+			serial_kernel_handoff();
+			dprintf("Unhooked from EFI serial services\n");
+			break;
 		}
 
 		memory_map_size = actual_memory_map_size;
 		if (kBootServices->GetMemoryMap(&memory_map_size, memory_map, &map_key,
 				&descriptor_size, &descriptor_version) != EFI_SUCCESS) {
-				panic("Unable to fetch system memory map.");
+			panic("Unable to fetch system memory map.");
 		}
 	}
 
 	// Update EFI, generate final kernel physical memory map, etc.
 	arch_mmu_post_efi_setup(memory_map_size, memory_map,
-			descriptor_size, descriptor_version);
+		descriptor_size, descriptor_version);
+
+	// Restart serial. gUART only until we get into the kernel
+	serial_enable();
 
 	smp_boot_other_cpus(final_pml4, kernelEntry, (addr_t)&gKernelArgs);
 
 	// Enter the kernel!
+	dprintf("arch_enter_kernel(final_pml4: 0x%08" PRIx64 ", kernelArgs: %p, "
+		"kernelEntry: 0x%08" B_PRIxADDR ", sp: 0x%08" B_PRIx64 ")\n",
+		final_pml4, &gKernelArgs, kernelEntry,
+		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
+
 	arch_enter_kernel(final_pml4, kernelEntry,
-			gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
+		gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size);
 }

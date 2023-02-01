@@ -120,8 +120,34 @@
 #define IA32_MSR_KERNEL_GS_BASE			0xc0000102
 #define IA32_MSR_TSC_AUX				0xc0000103
 
-// K8 MSR registers
+// AMD MSR registers
+#define MSR_F10H_HWCR						0xc0010015
+#define 	HWCR_TSCFREQSEL					(1 << 24)
+#define MSR_K8_UCODE_UPDATE				0xc0010020
 #define K8_MSR_IPM						0xc0010055
+#define MSR_F10H_PSTATEDEF(x)				(0xc0010064 + (x))
+#define 	PSTATEDEF_EN					(1ULL << 63)
+#define MSR_F10H_DE_CFG					0xc0011029
+#define 	DE_CFG_SERIALIZE_LFENCE			(1 << 1)
+
+#define MSR_AMD_CPPC_CAP1				0xc00102b0
+#define		AMD_CPPC_LOWEST_PERF(x)		((x) & 0xff)
+#define		AMD_CPPC_LOWNONLIN_PERF(x)	((x >> 8) & 0xff)
+#define		AMD_CPPC_NOMINAL_PERF(x)	((x >> 16) & 0xff)
+#define		AMD_CPPC_HIGHEST_PERF(x)	((x >> 24) & 0xff)
+#define MSR_AMD_CPPC_ENABLE				0xc00102b1
+#define MSR_AMD_CPPC_REQ				0xc00102b3
+#define		AMD_CPPC_MAX_PERF(x)		((x) & 0xff)
+#define		AMD_CPPC_MIN_PERF(x)		(((x) & 0xff) << 8)
+#define		AMD_CPPC_DES_PERF(x)		(((x) & 0xff) << 16)
+#define		AMD_CPPC_EPP_PERF(x)		(((x) & 0xff) << 24)
+
+#define		AMD_CPPC_EPP_PERFORMANCE			0x00
+#define		AMD_CPPC_EPP_BALANCE_PERFORMANCE	0x80
+#define		AMD_CPPC_EPP_BALANCE_POWERSAVE		0xbf
+#define		AMD_CPPC_EPP_POWERSAVE				0xff
+#define MSR_AMD_CPPC_STATUS				0xc00102b4
+
 
 // Hardware P-States MSR registers §14.4.1
 // reference https://software.intel.com/content/dam/develop/public/us/en/documents/253669-sdm-vol-3b.pdf
@@ -330,6 +356,7 @@
 // https://en.wikipedia.org/wiki/CPUID#EAX=7,_ECX=0:_Extended_Features
 #define IA32_FEATURE_AVX512_4VNNIW	(1 << 2) // AVX-512 4-register Neural Network Instructions
 #define IA32_FEATURE_AVX512_4FMAPS	(1 << 3) // AVX-512 4-register Multiply Accumulation Single precision
+#define IA32_FEATURE_HYBRID_CPU		(1 << 15)	// CPUs are of several types
 #define IA32_FEATURE_IBRS			(1 << 26)	// IBRS / IBPB Speculation Control
 #define IA32_FEATURE_STIBP			(1 << 27)	// STIBP Speculation Control
 #define IA32_FEATURE_L1D_FLUSH		(1 << 28)	// L1D_FLUSH supported
@@ -352,6 +379,7 @@
 #define IA32_FEATURE_AMD_SSBD		(1 << 24)	// Speculative Store Bypass Disable
 #define IA32_FEATURE_VIRT_SSBD		(1 << 25)	// Virtualized Speculative Store Bypass Disable
 #define IA32_FEATURE_AMD_SSB_NO		(1 << 26)	// Speculative Store Bypass is fixed in hardware
+#define IA32_FEATURE_CPPC			(1 << 27)	// Collaborative Processor Performance Control
 
 
 // Memory type ranges
@@ -515,6 +543,7 @@ typedef struct arch_cpu_info {
 	int					model;
 	int					extended_model;
 	uint32				patch_level;
+	uint8				hybrid_type;
 
 	uint32				logical_apic_id;
 
@@ -565,6 +594,46 @@ struct intel_microcode_extended_signature {
 	uint32 processor_signature;
 	uint32 processor_flags;
 	uint32 checksum;
+};
+
+
+// AMD Microcode structures
+
+struct amd_container_header {
+	uint32 magic;
+};
+
+
+struct amd_section_header {
+	uint32 type;
+	uint32 size;
+};
+
+
+struct amd_equiv_cpu_entry {
+	uint32 installed_cpu;
+	uint32 fixed_errata_mask;
+	uint32 fixed_errata_compare;
+	uint16 equiv_cpu;
+	uint16 res;
+};
+
+
+struct amd_microcode_header {
+	uint32 data_code;
+	uint32 patch_id;
+	uint16 mc_patch_data_id;
+	uint8 mc_patch_data_len;
+	uint8 init_flag;
+	uint32 mc_patch_data_checksum;
+	uint32 nb_dev_id;
+	uint32 sb_dev_id;
+	uint16 processor_rev_id;
+	uint8 nb_rev_id;
+	uint8 sb_rev_id;
+	uint8 bios_api_rev;
+	uint8 reserved1[3];
+	uint32 match_reg[8];
 };
 
 

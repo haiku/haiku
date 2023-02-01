@@ -67,8 +67,8 @@ mmc_bus_added_device(device_node* parent)
 	CALLED();
 
 	device_attr attributes[] = {
-		{ B_DEVICE_BUS, B_STRING_TYPE, { string: "mmc"}},
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "MMC bus root"}},
+		{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "mmc"}},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "MMC bus root"}},
 		{ NULL }
 	};
 

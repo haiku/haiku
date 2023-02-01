@@ -100,10 +100,22 @@ ARMVMTranslationMap32Bit::Init(bool kernel)
 			return error;
 
 		// allocate the page directory
-		page_directory_entry* virtualPageDir = (page_directory_entry*)memalign(
-			PAGEDIR_ALIGN, PAGEDIR_SIZE);
-		if (virtualPageDir == NULL)
+		page_directory_entry *virtualPageDir = NULL;
+
+		virtual_address_restrictions virtualRestrictions = {};
+		virtualRestrictions.address_specification = B_ANY_KERNEL_ADDRESS;
+
+		physical_address_restrictions physicalRestrictions = {};
+		physicalRestrictions.alignment = PAGEDIR_ALIGN;
+
+		area_id pgdir_area = create_area_etc(B_SYSTEM_TEAM, "pgdir",
+			PAGEDIR_SIZE, B_CONTIGUOUS,
+			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, 0, 0,
+			&virtualRestrictions, &physicalRestrictions, (void **)&virtualPageDir);
+
+		if (pgdir_area < 0) {
 			return B_NO_MEMORY;
+		}
 
 		// look up the page directory's physical address
 		phys_addr_t physicalPageDir;
@@ -175,9 +187,7 @@ ARMVMTranslationMap32Bit::Map(addr_t va, phys_addr_t pa, uint32 attributes,
 
 		// put it in the pgdir
 		ARMPagingMethod32Bit::PutPageTableInPageDir(&pd[index], pgtable,
-			attributes
-				| ((attributes & B_USER_PROTECTION) != 0
-						? B_WRITE_AREA : B_KERNEL_WRITE_AREA));
+			(va < KERNEL_BASE) ? ARM_MMU_L1_FLAG_PXN : 0);
 
 		// update any other page directories, if it maps kernel space
 		if (index >= FIRST_KERNEL_PGDIR_ENT

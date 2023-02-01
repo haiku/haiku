@@ -1,42 +1,22 @@
 SubDir HAIKU_TOP src add-ons kernel drivers network wlan idualwifi7260 ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
-	: true ;
-UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat openbsd_network compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat openbsd_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
 UsePrivateHeaders net system ;
 UsePrivateKernelHeaders ;
 
-SubDirCcFlags [ FDefines _KERNEL=1 FBSD_DRIVER=1 _XOPEN_SOURCE ]
-	-Wno-format
-	-Wno-unused
-	-Wno-uninitialized ;
+SubDirCcFlags [ FDefines _KERNEL=1 _XOPEN_SOURCE ]
+	-Wno-unused -Wno-sign-compare ;
 
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) dev iwm ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev pci ] ;
 
 KernelAddon idualwifi7260 :
-    if_iwm_7000.c
-	if_iwm_8000.c
-	if_iwm_9000.c
-	if_iwm_9260.c
-	if_iwm_binding.c
-	if_iwm_fw.c
-	if_iwm_led.c
-	if_iwm_mac_ctxt.c
-	if_iwm_notif_wait.c
-	if_iwm_pcie_trans.c
-	if_iwm_phy_ctxt.c
-	if_iwm_phy_db.c
-	if_iwm_power.c
-	if_iwm_scan.c
-	if_iwm_sf.c
-	if_iwm_sta.c
-	if_iwm_time_event.c
-	if_iwm_util.c
 	if_iwm.c
 	glue.c
 	:
-	freebsd_wlan.a
+	openbsd_wlan.a
 	libfreebsd_network.a
 	;

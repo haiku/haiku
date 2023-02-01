@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaConverter	2816184527
+1	hungarian	x-vnd.Haiku-MediaConverter	338319367
 Input file not recognized as Audio or Video	MediaConverter		A bemeneti fájl nem azonosítható hang- vagy videóként
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Videó minősége: %3d%%
@@ -12,6 +12,7 @@ MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
 Error creating video.	MediaConverter		Nem sikerült létrehozni a videót.
 Cancelling	MediaConverter		Megszakítás folyamatban
 None available	Audio codecs		Nincs elérhető
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		A fájl több hang- illetve videó sávval rendelkezik, de csak az első kerül átalakításra.
 No file selected	MediaConverter-FileInfo		Nincs fájl kiválasztva
 High	MediaConverter		Magas
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{A fájl nem felismerhető média formátumú:} other{# fájl nem felismerhető média formátumú:}}
@@ -26,6 +27,7 @@ Error loading a file	MediaConverter		Hiba történt a fájl betöltése során
 Encoder parameters	MediaConverter-EncoderWindow		Kódoló paraméterei
 Open…	Menu		Megnyitás…
 Audio encoding:	MediaConverter		Audió kódolása:
+Multi-track file detected	MediaConverter		Több sávos fájl azonosítva
 Audio quality: %3d%%	MediaConverter		Audió minősége: %3d%%
 Cancelling…	MediaConverter		Megszakítás…
 Output file '%filename' created	MediaConverter		A(z) '%filename' kimeneti fájl létre lett hozva.
@@ -63,6 +65,7 @@ File	Menu		Fájl
 Video quality not supported	MediaConverter		Nem támogatott videóminőség
 Select this folder	MediaConverter		E mappa kijelölése
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld csatorna
+Understood	MediaConverter		Értettem
 %d bit 	MediaFileInfo		%d bit
 No video	Video codecs list		Nincs videó
 Continue	MediaConverter		Folytatás

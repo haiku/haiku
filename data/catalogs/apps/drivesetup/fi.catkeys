@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-DriveSetup	4048496535
+1	finnish	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		Osion %s irrottaminen epäonnistui.
 Mount all	MainWindow		Liitä kaikki
 Disk	MainWindow		Levy
@@ -14,6 +14,7 @@ Block size	PartitionList		Lohkokoko
 The panel experienced a problem!	MainWindow		Paneelissa oli pulma!
 Device	DiskView		Laite
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Oletko varma, että haluat alustaa Intel Extended-osion? Kaikki sillä sijaitsevat aliosiot korvataan päällekirjoituksella, jos jatkat. Sinulta kysytään vielä kerran ennen muutosten kirjoittamista levylle.
+Physical block size	PartitionList		Fyysinen lohkokoko
 Unmount	MainWindow		Irrota
 Failed to format the partition %s!\n	MainWindow		Osion %s alustus epäonnistui!\n
 Partition size	CreateParametersPanel		Osiokoko

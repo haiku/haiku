@@ -12,6 +12,7 @@
 
 #include "fuse_fs.h"
 #include "FUSEEntry.h"
+#include "FUSEFileSystem.h"
 
 #include "../Volume.h"
 
@@ -143,7 +144,8 @@ private:
 	friend struct MultiNodeLocker;
 
 private:
-	inline	FUSEFileSystem*		_FileSystem() const;
+	inline	FUSEFileSystem*		_FileSystem() const
+									{ return static_cast<FUSEFileSystem*>(fFileSystem); }
 
 			ino_t				_GenerateNodeID();
 
@@ -194,10 +196,15 @@ private:
 			status_t			_BuildPath(FUSENode* node, char* path,
 									size_t& pathLen);
 
+	static	int					_AddReadDirEntryLowLevel(void* buffer, char* buf, size_t bufsize,
+									const char* name, const struct stat* st, off_t offset);
 	static	int					_AddReadDirEntry(void* buffer, const char* name,
 									const struct stat* st, off_t offset);
 	static	int					_AddReadDirEntryGetDir(fuse_dirh_t handle,
 									const char* name, int type, ino_t nodeID);
+			int					_AddReadDirEntryLowLevel(ReadDirBuffer* buffer,
+									char* buf, size_t bufSize, const char* name, int type,
+									ino_t nodeID, off_t offset);
 			int					_AddReadDirEntry(ReadDirBuffer* buffer,
 									const char* name, int type, ino_t nodeID,
 									off_t offset);
@@ -205,13 +212,13 @@ private:
 private:
 			RWLockManager		fLockManager;
 			Locker				fLock;
+	const	fuse_lowlevel_ops*	fOps;
 			fuse_fs*			fFS;
 			FUSEEntryTable		fEntries;
 			FUSENodeTable		fNodes;
 			FUSENode*			fRootNode;
 			ino_t				fNextNodeID;
-			bool				fUseNodeIDs;	// TODO: Actually read the
-												// option!
+			bool				fUseNodeIDs;
 			char				fName[B_OS_NAME_LENGTH];
 };
 

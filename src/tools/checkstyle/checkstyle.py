@@ -17,7 +17,7 @@ def run(fileSet, rules, outputFileName):
     openHtml(fileSet, outputFileName)
 
     for fileName in fileSet:
-        print "\nChecking " + fileName + ":"
+        print("\nChecking " + fileName + ":")
         file = open(fileName, 'r')
         text = file.read()
 
@@ -36,21 +36,24 @@ def run(fileSet, rules, outputFileName):
     closeHtml(outputFileName)
 
 
-def visit(result, dir, names):
+def findCppFiles(dir):
     extensions = [".cpp", ".h"]
     vcsCacheDirectory = [".bzr", ".git", ".hg", ".svn"]
 
-    for name in reversed(names):
-        for vcd in vcsCacheDirectory:
-            if name == vcd:
-                print(vcd + " cache directory has been ignored")
-                names.remove(vcd)
+    results = []
 
-    for name in names:
-        path = os.path.join(dir, name)
-        if os.path.isfile(path) and os.path.splitext(name)[1] in extensions:
-            print "adding", path
-            result.append(path)
+    for root, dirs, files in os.walk(dir):
+        if os.path.split(root)[1] in vcsCacheDirectory:
+            print(root + " cache directory has been ignored")
+            continue
+
+        for file in files:
+            path = os.path.join(root, file)
+            if os.path.splitext(file)[1] in extensions:
+                print("adding", path)
+                results.append(path)
+
+    return results
 
 
 cppRules = {}
@@ -84,9 +87,10 @@ if len(sys.argv) >= 2 and sys.argv[1] != "--help":
         if os.path.isfile(arg):
             files.append(arg)
         else:
-            os.path.walk(arg, visit, files)
+            files.extend(findCppFiles(arg))
+
     run(files, cppRules, "styleviolations.html")
 else:
-    print "Usage: python checkstyle.py file.cpp [file2.cpp] [directory]\n"
-    print "Checks c++ source files against the Haiku Coding Guidelines."
-    print "Outputs an html report in the styleviolations.html file.\n"
+    print("Usage: python checkstyle.py file.cpp [file2.cpp] [directory]\n")
+    print("Checks c++ source files against the Haiku Coding Guidelines.")
+    print("Outputs an html report in the styleviolations.html file.\n")

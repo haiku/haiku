@@ -1,50 +1,51 @@
-1	german	x-vnd.Haiku-Expander	1818663606
-Expand	ExpanderMenu		Entpacken
-Expanding '%s'…	ExpanderWindow		'%s' wird entpackt …
-Close window when done expanding	ExpanderPreferences		Fenster nach dem Entpacken schließen
-Set destination…	ExpanderMenu		Ziel auswählen …
-Use:	ExpanderPreferences		Benutzerdefiniert:
-File expanded	ExpanderWindow		Archiv wurde entpackt
-The destination is read only.	ExpanderWindow		Das Ziel ist schreibgeschützt.
-Expander: Open	ExpanderWindow		Expander: Öffnen
- is not supported	ExpanderWindow		wird nicht unterstützt
-Expander settings	ExpanderPreferences		Expander-Einstellungen
-Select current	DirectoryFilePanel		Aktuellen auswählen
-Source	ExpanderWindow		Quelle
-Error when expanding archive	ExpanderWindow		Fehler beim Entpacken
-Hide contents	ExpanderWindow		Inhalt verbergen
-Cancel	ExpanderWindow		Abbrechen
-Automatically expand files	ExpanderPreferences		Archiv automatisch entpacken
-Continue	ExpanderWindow		Fortsetzen
-Destination folder	ExpanderPreferences		Zielordner
-Other	ExpanderPreferences		Allgemeines
-Cancel	ExpanderPreferences		Abbrechen
-Expansion	ExpanderPreferences		Entpacken
-Select	DirectoryFilePanel		Auswählen
-The folder was either moved, renamed or not supported.	ExpanderWindow		Der Ordner wurde entweder verschoben, umbenannt oder wird nicht unterstützt.
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Der Zielordner existiert nicht. Soll er angelegt werden?
-Same directory as source (archive) file	ExpanderPreferences		Gleicher Ordner wie Quelldatei
-Settings	ExpanderMenu		Einstellungen
-Settings…	ExpanderMenu		Einstellungen …
-Expander: Choose destination	DirectoryFilePanel		Expander: Zielordner auswählen
-Select	ExpanderPreferences		Auwählen
-Show contents	ExpanderWindow		Inhalt zeigen
-Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch anzeigen
-OK	ExpanderPreferences		OK
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Soll das Entpacken wirklich abgebrochen werden? Die entpackten Dateien sind eventuell nicht vollständig.
-Leave destination folder path empty	ExpanderPreferences		Keinen Zielordner vorgeben
-Failed to create the destination folder.	ExpanderWindow		Der Zielordner konnte nicht angelegt werden.
-Select '%s'…	DirectoryFilePanel		'%s' auswählen
-Create	ExpanderWindow		Anlegen
-The file doesn't exist	ExpanderWindow		Die Datei existiert nicht
-Stop	ExpanderMenu		Stopp
-File	ExpanderMenu		Datei
-Expand	ExpanderWindow		Entpacken
-Close	ExpanderMenu		Schließen
-The destination is not a folder.	ExpanderWindow		Das Ziel ist kein Ordner.
-Open destination folder after extraction	ExpanderPreferences		Zielordner nach dem Entpacken öffnen
-Creating listing for '%s'…	ExpanderWindow		Dateiliste für '%s' wird erstellt …
-Set source…	ExpanderMenu		Quelle wählen …
-Show contents	ExpanderMenu		Inhalt zeigen
-Stop	ExpanderWindow		Stopp
+1	german	x-vnd.Haiku-Expander	1757454658
 Destination	ExpanderWindow		Ziel
+Other	ExpanderPreferences		Allgemeines
+Automatically show contents listing	ExpanderPreferences		Dateiliste automatisch anzeigen
+Expander: Choose destination	DirectoryFilePanel		Expander: Zielordner auswählen
+Set source…	ExpanderMenu		Quelle wählen …
+OK	ExpanderWindow		OK
+The destination is not a folder.	ExpanderWindow		Das Ziel ist kein Ordner.
+The folder was either moved, renamed or not supported.	ExpanderWindow		Der Ordner wurde entweder verschoben, umbenannt oder wird nicht unterstützt.
+Close window when done expanding	ExpanderPreferences		Fenster nach dem Entpacken schließen
+Close	ExpanderMenu		Schließen
+Create	ExpanderWindow		Anlegen
+Creating listing for '%s'…	ExpanderWindow		Dateiliste für '%s' wird erstellt …
+Show contents	ExpanderMenu		Inhalt zeigen
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Soll das Entpacken wirklich abgebrochen werden? Die entpackten Dateien sind eventuell nicht vollständig.
+Settings	ExpanderMenu		Einstellungen
+Expand	ExpanderWindow		Entpacken
+Open destination folder after extraction	ExpanderPreferences		Zielordner nach dem Entpacken öffnen
+Same directory as source (archive) file	ExpanderPreferences		Gleicher Ordner wie Quelldatei
+Stop	ExpanderWindow		Stopp
+Cancel	ExpanderWindow		Abbrechen
+Expander settings	ExpanderPreferences		Expander-Einstellungen
+Error when expanding archive	ExpanderWindow		Fehler beim Entpacken
+Expand	ExpanderMenu		Entpacken
+Failed to create the destination folder.	ExpanderWindow		Der Zielordner konnte nicht angelegt werden.
+Settings…	ExpanderMenu		Einstellungen …
+Select current	DirectoryFilePanel		Aktuellen auswählen
+Expanding '%s'…	ExpanderWindow		'%s' wird entpackt …
+OK	ExpanderPreferences		OK
+File expanded	ExpanderWindow		Archiv wurde entpackt
+Automatically expand files	ExpanderPreferences		Archiv automatisch entpacken
+Select	DirectoryFilePanel		Auswählen
+Show contents	ExpanderWindow		Inhalt zeigen
+Stop	ExpanderMenu		Stopp
+Select '%s'…	DirectoryFilePanel		'%s' auswählen
+Expansion	ExpanderPreferences		Entpacken
+Set destination…	ExpanderMenu		Ziel auswählen …
+Continue	ExpanderWindow		Fortsetzen
+ is not supported	ExpanderWindow		wird nicht unterstützt
+Cancel	ExpanderPreferences		Abbrechen
+Use:	ExpanderPreferences		Benutzerdefiniert:
+Destination folder	ExpanderPreferences		Zielordner
+Expander: Open	ExpanderWindow		Expander: Öffnen
+Leave destination folder path empty	ExpanderPreferences		Keinen Zielordner vorgeben
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Der Zielordner existiert nicht. Soll er angelegt werden?
+The file doesn't exist	ExpanderWindow		Die Datei existiert nicht
+Hide contents	ExpanderWindow		Inhalt verbergen
+Source	ExpanderWindow		Quelle
+The destination is read only.	ExpanderWindow		Das Ziel ist schreibgeschützt.
+Select	ExpanderPreferences		Auwählen
+File	ExpanderMenu		Datei

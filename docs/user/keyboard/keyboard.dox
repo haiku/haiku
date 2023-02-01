@@ -27,6 +27,8 @@ keyboard.
 
 \image html US_PC_keyboard_keycodes.png
 
+In addition to the keys listed in the picture above, some more keys are defined:
+
 International keyboards each differ a bit but generally share an extra key
 located in-between the left shift key and Z with the key code 0x69.
 
@@ -34,6 +36,36 @@ Mac keyboards have an equal sign in the keypad with key code 0x6a and some
 other differences. Often times the keys produce the same key code but appear in
 different locations.
 
+Some keyboards provide additional "multimedia" keys. These are reported based on their USB HID
+keycodes. Note that these codes are larger than 127, and therefore cannot be mapped in the keymap.
+These keys can only be handled using B_UNMAPPED_KEY_DOWN messages and are never associated with a
+character.
+
+Here is a list of the commonly available key codes:
+
+Key code     | Description
+------------ | --------------------------------
+0x00010081   | Power off
+0x00010082   | Sleep
+0x00010083   | Wake up
+0x000C00B0   | Play media
+0x000C00B5   | Scan next track
+0x000C00B6   | Scan previous track
+0x000C00B7   | Stop media
+0x000C00E2   | Mute sound
+0x000C00E9   | Increase sound volume
+0x000C00EA   | Decrease sound volume
+0x000C0183   | Launch control configuration application
+0x000C018A   | Launch e-mail application
+0x000C0192   | Launch calculator application
+0x000C0194   | Launch file manager application
+0x000C0221   | Search
+0x000C0223   | Go to home page
+0x000C0224   | Previous page
+0x000C0225   | Next page
+0x000C0226   | Stop
+0x000C0227   | Refresh
+0x000C022A   | Bookmarks
 
 \section modifiers Modifier Keys
 

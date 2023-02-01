@@ -1,5 +1,5 @@
 1	catalan; valencian	x-vnd.haiku.zip-o-matic	2032806096
-Drop files here.	file:ZipOMaticWindow.cpp		Deixeu anar els fitxers aquí.
+Drop files here.	file:ZipOMaticWindow.cpp		Deixeu anar fitxers aquí.
 Filename: %s	file:ZipOMaticWindow.cpp		Nom del fitxer: %s
 Do you want to stop them?	file:ZipOMatic.cpp		Voleu interrompre'ls?
 Error creating archive	file:ZipOMaticWindow.cpp		Error en crear l'arxiu.

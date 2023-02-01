@@ -12,7 +12,7 @@
 
 #include "FontFamily.h"
 #include "ServerFont.h"
-#include "FontManager.h"
+#include "GlobalFontManager.h"
 
 #include <FontPrivate.h>
 
@@ -38,7 +38,8 @@ FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face)
 	fID(0),
 	fBounds(0, 0, 0, 0),
 	fFace(_TranslateStyleToFace(face->style_name)),
-	fFullAndHalfFixed(false)
+	fFullAndHalfFixed(false),
+	fFontData(NULL)
 {
 	fName.Truncate(B_FONT_STYLE_LENGTH);
 		// make sure this style can be found using the Be API
@@ -93,12 +94,20 @@ FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face)
 FontStyle::~FontStyle()
 {
 	// make sure the font server is ours
-	if (fFamily != NULL && gFontManager->Lock()) {
-		gFontManager->RemoveStyle(this);
-		gFontManager->Unlock();
+	if (fFamily != NULL) {
+		if (fFontManager != NULL && fFontManager->Lock()) {
+			fFontManager->RemoveStyle(this);
+			fFontManager->Unlock();
+		} else if (gFontManager->Lock()) {
+			gFontManager->RemoveStyle(this);
+			gFontManager->Unlock();
+		}
 	}
 
 	FT_Done_Face(fFreeTypeFace);
+
+	if (fFontData != NULL)
+		free(fFontData);
 }
 
 
@@ -260,3 +269,13 @@ FontStyle::_TranslateStyleToFace(const char* name) const
 }
 
 
+void
+FontStyle::SetFontData(FT_Byte* location, uint32 size)
+{
+	// if memory was already allocated here, we should free it so it's not leaked
+	if (fFontData != NULL)
+		free(fFontData);
+
+	fFontDataSize = size;
+	fFontData = location;
+}

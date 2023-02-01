@@ -48,7 +48,7 @@ Run server	PoorMan		Sunucuyu çalıştır
 Create	PoorMan		Oluştur
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, other{# bağlantı}}
 done.\n	PoorMan		tamamlandı.\n
-PoorMan settings	PoorMan		PoorMan Ayarları
+PoorMan settings	PoorMan		PoorMan ayarları
 Console Logging	PoorMan		Konsol günlüğü
 Clear log file	PoorMan		Günlük dosyasını temizle
 Save log console selection	PoorMan		Konsol seçimi günlüğünü kaydet

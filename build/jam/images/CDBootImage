@@ -35,15 +35,11 @@ if $(TARGET_ARCH) = ppc {
 			if $(TARGET_BOOT_PLATFORM) = efi {
 				local efiLoader = haiku_loader.efi ;
 				local efiPartition = esp.image ;
-				MakeLocate $(efiPartition) : $(HAIKU_OUTPUT_DIR) ;
+				MakeLocateDebug $(efiPartition) : system boot ;
 				BuildEfiSystemPartition $(efiPartition) : $(efiLoader) ;
 
-				BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY)
+				BuildCDBootImageEFI $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY)
 					: $(efiPartition) : $(extras) ;
-
-			} else if $(HAIKU_ANYBOOT_LEGACY) = 1 {
-				BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY) : 
-					: $(extras) ;
 			}
 		}
 	}

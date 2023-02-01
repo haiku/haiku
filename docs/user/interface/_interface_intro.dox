@@ -43,7 +43,7 @@
 	The initial coordinate space, from which all others are derived,  is the
 	screen space. Its origin is at the center of the screen's top-left pixel.
 	Coordinates can be converted between this and a specific window or view
-	space is done using the ConvertToScreen and ConvertFromScreen methods of
+	space using the ConvertToScreen and ConvertFromScreen methods of
 	the corresponding object.
 
 	Each BWindow has its own coordinate space. Its origin is at the center of
@@ -66,7 +66,5 @@
 	All drawing operations in a BView use coordinates specified in the drawing space.
 	However, the update rect passed to the Draw method (or passed to the Invalidate
 	method) is in the BView base coordinate space. Conversion between the two can
-	be done using the affine transform returned by BView::Transform, or in case the
-	legacy transformation functions are used, by applying the scale and origin returned
-	by the Scale() and Origin() functions.
+	be done using the affine transform returned by BView::TransformTo.
 */

@@ -149,21 +149,17 @@ ifindex_free_locked(u_short idx)
 }
 
 
-struct ifnet *
-if_alloc(u_char type)
+int
+if_alloc_inplace(struct ifnet *ifp, u_char type)
 {
 	char semName[64];
 	u_short index;
-
-	struct ifnet *ifp = _kernel_malloc(sizeof(struct ifnet), M_ZERO);
-	if (ifp == NULL)
-		return NULL;
 
 	snprintf(semName, sizeof(semName), "%s receive", gDriverName);
 
 	ifp->receive_sem = create_sem(0, semName);
 	if (ifp->receive_sem < B_OK)
-		goto err1;
+		return ifp->receive_sem;
 
 	ifp->link_state_sem = -1;
 	ifp->open_count = 0;
@@ -179,7 +175,7 @@ if_alloc(u_char type)
 	if (ifindex_alloc_locked(&index) != ENOERR) {
 		IFNET_WUNLOCK();
 		panic("too many devices");
-		goto err3;
+		goto err2;
 	}
 	ifnet_setbyindex_locked(index, IFNET_HOLD);
 	IFNET_WUNLOCK();
@@ -188,26 +184,33 @@ if_alloc(u_char type)
 	ifnet_setbyindex(ifp->if_index, ifp);
 
 	IF_ADDR_LOCK_INIT(ifp);
-	return ifp;
-
-err3:
-	switch (type) {
-		case IFT_ETHER:
-			_kernel_free(ifp->if_l2com);
-			break;
-	}
+	return 0;
 
 err2:
 	delete_sem(ifp->receive_sem);
 
-err1:
-	_kernel_free(ifp);
-	return NULL;
+	return -1;
+}
+
+
+struct ifnet *
+if_alloc(u_char type)
+{
+	struct ifnet *ifp = _kernel_malloc(sizeof(struct ifnet), M_ZERO);
+	if (ifp == NULL)
+		return NULL;
+
+	if (if_alloc_inplace(ifp, type) != 0) {
+		_kernel_free(ifp);
+		return NULL;
+	}
+
+	return ifp;
 }
 
 
 void
-if_free(struct ifnet *ifp)
+if_free_inplace(struct ifnet *ifp)
 {
 	// IEEE80211 devices won't be in this list,
 	// so don't try to remove them.
@@ -219,14 +222,16 @@ if_free(struct ifnet *ifp)
 	IFNET_WUNLOCK();
 
 	IF_ADDR_LOCK_DESTROY(ifp);
-	switch (ifp->if_type) {
-		case IFT_ETHER:
-			_kernel_free(ifp->if_l2com);
-			break;
-	}
 
 	delete_sem(ifp->receive_sem);
 	ifq_uninit(&ifp->receive_queue);
+}
+
+
+void
+if_free(struct ifnet *ifp)
+{
+	if_free_inplace(ifp);
 
 	_kernel_free(ifp);
 }
@@ -397,10 +402,6 @@ if_detach(struct ifnet *ifp)
 void
 if_start(struct ifnet *ifp)
 {
-#ifdef IFF_NEEDSGIANT
-	if (ifp->if_flags & IFF_NEEDSGIANT)
-	panic("freebsd compat.: unsupported giant requirement");
-#endif
 	ifp->if_start(ifp);
 }
 
@@ -839,7 +840,7 @@ ether_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 
 	switch (command) {
 		case SIOCSIFMTU:
-			if (ifr->ifr_mtu > ETHERMTU_JUMBO)
+			if (ifr->ifr_mtu < ETHERMIN || ifr->ifr_mtu > ETHERMTU)
 				return EINVAL;
 			ifp->if_mtu = ifr->ifr_mtu;
 			break;

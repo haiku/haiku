@@ -1,0 +1,434 @@
+/*
+ * Copyright 2008, Dustin Howett, dustin.howett@gmail.com. All rights reserved.
+ * Copyright 2007, Michael Lotz, mmlr@mlotz.ch. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _KERNEL_ACPI_H
+#define _KERNEL_ACPI_H
+
+#define ACPI_RSDP_SIGNATURE		"RSD PTR "
+#define ACPI_RSDT_SIGNATURE		"RSDT"
+#define ACPI_XSDT_SIGNATURE		"XSDT"
+#define ACPI_MADT_SIGNATURE		"APIC"
+#define ACPI_MCFG_SIGNATURE		"MCFG"
+#define ACPI_SPCR_SIGNATURE		"SPCR"
+
+#define ACPI_LOCAL_APIC_ENABLED	0x01
+
+typedef struct acpi_rsdp_legacy {
+	char	signature[8];			/* "RSD PTR " including blank */
+	uint8	checksum;				/* checksum of bytes 0-19 (per ACPI 1.0) */
+	char	oem_id[6];				/* not null terminated */
+	uint8	revision;				/* 0 = ACPI 1.0, 2 = ACPI 3.0 */
+	uint32	rsdt_address;			/* physical memory address of RSDT */
+} _PACKED acpi_rsdp_legacy;
+
+typedef struct acpi_rsdp_extended {
+	char	signature[8];			/* "RSD PTR " including blank */
+	uint8	checksum;				/* checksum of bytes 0-19 (per ACPI 1.0) */
+	char	oem_id[6];				/* not null terminated */
+	uint8	revision;				/* 0 = ACPI 1.0, 2 = ACPI 3.0 */
+	uint32	rsdt_address;			/* physical memory address of RSDT */
+	uint32	xsdt_length;			/* length in bytes including header */
+	uint64	xsdt_address;			/* 64bit physical memory address of XSDT */
+	uint8	extended_checksum;		/* including entire table */
+	uint8	reserved[3];
+} _PACKED acpi_rsdp_extended;
+
+typedef acpi_rsdp_extended acpi_rsdp;
+
+typedef struct acpi_descriptor_header {
+	char	signature[4];			/* table identifier as ASCII string */
+	uint32	length;					/* length in bytes of the entire table */
+	uint8	revision;
+	uint8	checksum;				/* checksum of entire table */
+	char	oem_id[6];				/* not null terminated */
+	char	oem_table_id[8];		/* oem supplied table identifier */
+	uint32	oem_revision;			/* oem supplied revision number */
+	char	creator_id[4];			/* creator / asl compiler id */
+	uint32	creator_revision;		/* compiler revision */
+} _PACKED acpi_descriptor_header;
+
+typedef struct acpi_madt {
+	acpi_descriptor_header	header;		/* "APIC" signature */
+	uint32	local_apic_address;		/* physical address for local CPUs APICs */
+	uint32	flags;
+} _PACKED acpi_madt;
+
+enum {
+	ACPI_MADT_LOCAL_APIC = 0,
+	ACPI_MADT_IO_APIC = 1,
+	ACPI_MADT_INTERRUPT_SOURCE_OVERRIDE = 2,
+	ACPI_MADT_NMI_SOURCE = 3,
+	ACPI_MADT_LOCAL_APIC_NMI = 4,
+	ACPI_MADT_LOCAL_APIC_ADDRESS_OVERRIDE = 5,
+	ACPI_MADT_IO_SAPIC = 6,
+	ACPI_MADT_LOCAL_SAPIC = 7,
+	ACPI_MADT_PLATFORM_INTERRUPT_SOURCE = 8,
+	ACPI_MADT_PROCESSOR_LOCAL_X2_APIC_NMI = 9,
+	ACPI_MADT_LOCAL_X2_APIC_NMI = 0xA,
+	ACPI_MADT_GIC_INTERFACE = 0xB,
+	ACPI_MADT_GIC_DISTRIBUTOR = 0xC,
+	ACPI_MADT_GIC_MSI_FRAME = 0xD,
+	ACPI_MADT_GIC_REDISTRIBUTOR = 0xE,
+	ACPI_MADT_GIC_ITS = 0xF
+};
+
+typedef struct acpi_apic {
+	uint8	type;
+	uint8	length;
+} _PACKED acpi_apic;
+
+typedef struct acpi_local_apic {
+	uint8	type;					/* 0 = processor local APIC */
+	uint8	length;					/* 8 bytes */
+	uint8	acpi_processor_id;
+	uint8	apic_id;				/* the id of this APIC */
+	uint32	flags;					/* 1 = enabled */
+} _PACKED acpi_local_apic;
+
+typedef struct acpi_io_apic {
+	uint8	type;					/* 1 = I/O APIC */
+	uint8	length;					/* 12 bytes */
+	uint8	io_apic_id;				/* the id of this APIC */
+	uint8	reserved;
+	uint32	io_apic_address;		/* physical address of I/O APIC */
+	uint32	interrupt_base;			/* global system interrupt base */
+} _PACKED acpi_io_apic;
+
+typedef struct acpi_int_source_override {
+	uint8	type;					/* 2 = Interrupt source override */
+	uint8	length;					/* 10 bytes */
+	uint8	bus;					/* 0 = ISA  */
+	uint8	source;					/* Bus-relative interrupt source (IRQ) */
+	uint32	interrupt;				/* global system interrupt this
+									   bus-relative source int will signal */
+	uint16	flags;					/* MPS INTI flags. See Table 5-25 in
+									   ACPI Spec 4.0a or similar */
+} _PACKED acpi_int_source_override;
+
+typedef struct acpi_nmi_source {
+	uint8	type;					/* 3 = NMI */
+	uint8	length;					/* 8 bytes */
+	uint16	flags;					/* Same as MPS INTI flags. See Table 5-25 in
+									   ACPI Spec 4.0a or similar */
+	uint32  interrupt;				/* global system interrupt this
+									   non-maskable interrupt will trigger */
+} _PACKED acpi_nmi_source;
+
+typedef struct acpi_local_apic_nmi {
+	uint8	type;					/* 4 = local APIC NMI */
+	uint8	length;					/* 6 bytes */
+	uint8	acpi_processor_id;		/* Processor ID corresponding to processor
+									   ID in acpi_local_apic. 0xFF means
+									   it applies to all processors */
+	uint16	flags;					/* Same as MPS INTI flags. See Table 5-25 in
+									   ACPI Spec 4.0a or similar */
+	uint8   local_interrupt;		/* Local APIC interrupt input LINTn to which
+									   NMI is connected */
+} _PACKED acpi_local_apic_nmi;
+
+typedef struct acpi_local_apic_address_override {
+	uint8	type;					/* 5 = local APIC address override */
+	uint8	length;					/* 12 bytes */
+	uint16	reserved;				/* reserved (must be set to zero) */
+	uint64	local_apic_address;		/* Physical address of local APIC. See table
+										5-28 in ACPI Spec 4.0a for more */
+} _PACKED acpi_local_apic_address_override;
+
+typedef struct acpi_io_sapic {
+	uint8	type;					/* 6 = I/0 SAPIC (should be used if it
+									   exists instead of I/O APIC if both exists
+									   for a APIC ID.*/
+	uint8	length;					/* 16 bytes */
+	uint8	io_apic_id;				/* the id of this SAPIC */
+	uint8	reserved;				/* reserved (must be set to zero) */
+	uint32	interrupt_base;			/* global system interrupt base */
+	uint64	sapic_address;			/* The physical address to access this I/0
+									   SAPIC. Each SAPIC resides at a unique
+									   address */
+} _PACKED acpi_io_sapic;
+
+typedef struct acpi_local_sapic {
+	uint8	type;					/* 7 = processor local SAPIC */
+	uint8	length;					/* n bytes */
+	uint8	acpi_processor_id;
+	uint8	local_sapic_id;
+	uint8	local_sapic_eid;
+	uint8	reserved1;				/* reserved (must be set to zero) */
+	uint8	reserved2;				/* reserved (must be set to zero) */
+	uint8	reserved3;				/* reserved (must be set to zero) */
+	uint32	flags;					/* Local SAPIC flags, see table 5-22 in
+									   ACPI Spec 4.0a */
+	uint32	processor_uid_nr;		/* Matches _UID of a processor when it is a
+									   number */
+	char	processor_uid_str[];	/* Matches _UID of a processor when it is a
+									   string. Null-terminated */
+} _PACKED acpi_local_sapic;
+
+typedef struct acpi_platform_interrupt_source {
+	uint8	type;					/* 8 = platform interrupt source */
+	uint8	length;					/* 16 bytes */
+	uint16	flags;					/* Same as MPS INTI flags. See Table 5-25 in
+									   ACPI Spec 4.0a or similar */
+	uint8	interrupt_type;			/* 1 PMI, 2 INIT, 3 Corrected Platform
+									   Error Interrupt */
+	uint8	processor_id;			/* processor ID of destination */
+	uint8	processor_eid;			/* processor EID of destination */
+	uint8	io_sapic_vector;		/* value that must be used to program the
+									   vector field of the I/O SAPIC redirection
+									   entry for entries with PMI type. */
+	uint32	interrupt;				/* global system interrupt this
+									   platform interrupt will trigger */
+	uint32	platform_int_flags;		/* Platform Interrupt Source Flags. See
+									   Table 5-32 of ACPI Spec 4.0a for desc */
+} _PACKED acpi_platform_interrupt_source;
+
+typedef struct acpi_local_x2_apic {
+	uint8	type;					/* 9 = processor local x2APIC */
+	uint8	length;					/* 16 bytes */
+	uint16	reserved;				/* reserved (must be zero) */
+	uint32	x2apic_id;				/* processor's local x2APIC ID */
+	uint32	flags;					/* 1 = enabled. */
+	uint32	processor_uid_nr;		/* Matches _UID of a processor when it is a
+									   number */
+} _PACKED acpi_local_x2_apic;
+
+typedef struct acpi_local_x2_apic_nmi {
+	uint8	type;					/* 0xA = local x2APIC NMI */
+	uint8	length;					/* 12 bytes */
+	uint16	flags;					/* Same as MPS INTI flags. See Table 5-25 in
+									   ACPI Spec 4.0a or similar */
+	uint32	acpi_processor_uid;		/* UID corresponding to ID in processor
+									   device object. 0xFFFFFFFF means
+									   it applies to all processors */
+	uint8   local_interrupt;		/* Local x2APIC interrupt input LINTn to
+									   which NMI is connected */
+	uint8	reserved1;				/* reserved (must be set to zero) */
+	uint8	reserved2;				/* reserved (must be set to zero) */
+	uint8	reserved3;				/* reserved (must be set to zero) */
+} _PACKED acpi_local_x2_apic_nmi;
+
+typedef struct acpi_gic_interface {
+	uint8 type;
+	uint8 length;
+	uint16 reserved1;
+	uint32 cpu_interface_num;
+	uint32 acpi_processor_uid;
+	uint32 flags;
+	uint32 parking_protocol_ver;
+	uint32 performance_gsiv;
+	uint64 parked_address;
+	uint64 base_address;
+	uint64 gicv_address;
+	uint64 gich_address;
+	uint32 vgic_maintenance_gsiv;
+	uint64 gicr_address;
+	uint64 mpidr;
+	uint8 efficiency_class;
+	uint8 reserved2;
+	uint16 spe_overflow_gsiv;
+} _PACKED acpi_gic_interface;
+
+typedef struct acpi_gic_distributor {
+	uint8 type;
+	uint8 length;
+	uint16 reserved1;
+	uint32 gic_id;
+	uint64 base_address;
+	uint32 reserved2;
+	uint8 gic_version;
+	uint8 reserved[3];
+} _PACKED acpi_gic_distributor;
+
+typedef struct acpi_gas {
+	uint8 address_space_id;
+	uint8 bit_width;
+	uint8 bit_offset;
+	uint8 access_size;
+	uint64 address;
+} _PACKED acpi_gas;
+
+typedef struct acpi_mcfg
+{
+	acpi_descriptor_header header;
+	uint8 reserved[8];
+} _PACKED acpi_mcfg;
+
+typedef struct acpi_mcfg_allocation
+{
+	uint64 address;
+	uint16 pci_segment;
+	uint8 start_bus_number;
+	uint8 end_bus_number;
+	uint32 reserved;
+} _PACKED acpi_mcfg_allocation;
+
+typedef struct acpi_spcr {
+	acpi_descriptor_header header;
+	uint32 interface_type;
+	acpi_gas base_address;
+	uint8 interrupt_type;
+	uint8 irq;
+	uint32 gisv;
+	uint8 baud;
+	uint8 parity;
+	uint8 stop_bits;
+	uint8 flow_control;
+	uint8 terminal_type;
+	uint8 language;
+	uint16 pci_device_id;
+	uint16 pci_vendor_id;
+	uint8 pci_bus_num;
+	uint8 pci_vendor_num;
+	uint8 pci_function_num;
+	uint32 pci_flags;
+	uint8 pci_segment;
+	uint32 clock;
+} _PACKED acpi_spcr;
+
+enum {
+	ACPI_SPCR_INTERFACE_TYPE_16550 = 0,
+	ACPI_SPCR_INTERFACE_TYPE_PL011 = 3,
+};
+
+
+/* The following definitions are adapted from acpica/include/acrestyp.h */
+
+
+typedef struct acpi_resource_source
+{
+	uint8 index;
+	uint16 string_length;
+	char *string_ptr;
+} _PACKED acpi_resource_source;
+
+typedef struct acpi_resource_fixed_memory32 {
+	uint8 write_protect;
+	uint32 address;
+	uint32 address_length;
+} _PACKED acpi_resource_fixed_memory32;
+
+typedef struct acpi_memory_attribute {
+	uint8 write_protect;
+	uint8 caching;
+	uint8 range_type;
+	uint8 translation;
+} _PACKED acpi_memory_attribute;
+
+typedef struct acpi_io_attribute {
+	uint8 range_type;
+	uint8 translation;
+	uint8 translation_type;
+	uint8 reserved1;
+} _PACKED acpi_io_attribute;
+
+typedef union acpi_resource_attribute {
+	acpi_memory_attribute mem;
+	acpi_io_attribute io;
+	uint8 type_specific;
+} acpi_resource_attribute;
+
+typedef struct acpi_address16_attribute {
+	uint16 granularity;
+	uint16 minimum;
+	uint16 maximum;
+	uint16 translation_offset;
+	uint16 address_length;
+} _PACKED acpi_address16_attribute;
+
+typedef struct acpi_address32_attribute {
+	uint32 granularity;
+	uint32 minimum;
+	uint32 maximum;
+	uint32 translation_offset;
+	uint32 address_length;
+} _PACKED acpi_address32_attribute;
+
+typedef struct acpi_address64_attribute {
+	uint64 granularity;
+	uint64 minimum;
+	uint64 maximum;
+	uint64 translation_offset;
+	uint64 address_length;
+} _PACKED acpi_address64_attribute;
+
+typedef struct acpi_resource_address {
+	uint8 resource_type;
+	uint8 producer_consumer;
+	uint8 decode;
+	uint8 minAddress_fixed;
+	uint8 maxAddress_fixed;
+	acpi_resource_attribute info;
+} _PACKED acpi_resource_address;
+
+typedef struct acpi_resource_address16 {
+	uint8 resource_type;
+	uint8 producer_consumer;
+	uint8 decode;
+	uint8 minAddress_fixed;
+	uint8 maxAddress_fixed;
+	acpi_resource_attribute info;
+	acpi_address16_attribute address;
+	acpi_resource_source resource_source;
+} _PACKED acpi_resource_address16;
+
+typedef struct acpi_resource_address32 {
+	uint8 resource_type;
+	uint8 producer_consumer;
+	uint8 decode;
+	uint8 minAddress_fixed;
+	uint8 maxAddress_fixed;
+	acpi_resource_attribute info;
+	acpi_address32_attribute address;
+	acpi_resource_source resource_source;
+} _PACKED acpi_resource_address32;
+
+typedef struct acpi_resource_address64 {
+	uint8 resource_type;
+	uint8 producer_consumer;
+	uint8 decode;
+	uint8 minAddress_fixed;
+	uint8 maxAddress_fixed;
+	acpi_resource_attribute info;
+	acpi_address64_attribute address;
+	acpi_resource_source resource_source;
+} _PACKED acpi_resource_address64;
+
+typedef struct acpi_resource_extended_irq {
+	uint8 producer_consumer;
+	uint8 triggering;
+	uint8 polarity;
+	uint8 shareable;
+	uint8 wake_capable;
+	uint8 interrupt_count;
+	acpi_resource_source resource_source;
+	uint32 interrupts[1];
+} _PACKED acpi_resource_extended_irq;
+
+typedef union acpi_resource_data {
+	acpi_resource_fixed_memory32 fixed_memory32;
+	acpi_resource_address16 address16;
+	acpi_resource_address32 address32;
+	acpi_resource_address64 address64;
+	acpi_resource_extended_irq extended_irq;
+
+	acpi_resource_address address;
+} acpi_resource_data;
+
+typedef struct acpi_resource {
+	uint32 type;
+	uint32 length;
+	acpi_resource_data data;
+} _PACKED acpi_resource;
+
+enum {
+	ACPI_RESOURCE_TYPE_FIXED_MEMORY32 = 10,
+	ACPI_RESOURCE_TYPE_ADDRESS16 = 11,
+	ACPI_RESOURCE_TYPE_ADDRESS32 = 12,
+	ACPI_RESOURCE_TYPE_ADDRESS64 = 13,
+	ACPI_RESOURCE_TYPE_EXTENDED_IRQ = 15,
+};
+
+
+#endif	/* _KERNEL_ACPI_H */

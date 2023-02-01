@@ -59,3 +59,6 @@ BuildPlatformMain <build>udf_shell
 	<build>fs_shell.a $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 	$(HOST_LIBROOT) $(fsShellCommandLibs)
 ;
+
+SEARCH on [ FGristFiles crc_table.cpp ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;

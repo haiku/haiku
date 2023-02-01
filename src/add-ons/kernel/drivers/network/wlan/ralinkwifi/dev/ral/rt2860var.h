@@ -15,7 +15,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  *
  * $OpenBSD: rt2860var.h,v 1.20 2010/09/07 16:21:42 deraadt Exp $
- * $FreeBSD: releng/12.0/sys/dev/ral/rt2860var.h 306591 2016-10-02 20:35:55Z avos $
+ * $FreeBSD$
  */
 
 #define RT2860_TX_RING_COUNT	64

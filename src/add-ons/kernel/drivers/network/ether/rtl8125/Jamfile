@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src add-ons kernel drivers network ether rtl8125 ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat openbsd_network compat ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ] : true ;
+UsePrivateHeaders net system ;
+UsePrivateKernelHeaders ;
+
+SubDirCcFlags [ FDefines _KERNEL=1 _XOPEN_SOURCE ]
+	-Wno-unused -Wno-sign-compare -Werror=implicit-function-declaration ;
+
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) dev pci ] ;
+
+KernelAddon rtl8125 :
+	if_rge.c
+	glue.c
+	:
+	libfreebsd_network.a
+	;

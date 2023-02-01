@@ -40,6 +40,8 @@
 #include <ScrollView.h>
 #include <String.h>
 #include <SupportDefs.h>
+#include <usb/USB_hid.h>
+#include <usb/USB_hid_page_consumer.h>
 
 #include "EditWindow.h"
 #include "KeyInfos.h"
@@ -215,6 +217,12 @@ ShortcutsWindow::ShortcutsWindow()
 		message.AddString("startupRef", "please");
 		PostMessage(&message);
 			// tell ourselves to load this file if it exists
+	} else {
+		_AddNewSpec("/bin/setvolume -m", (B_HID_USAGE_PAGE_CONSUMER << 16) | B_HID_UID_CON_MUTE);
+		_AddNewSpec("/bin/setvolume -i", (B_HID_USAGE_PAGE_CONSUMER << 16) | B_HID_UID_CON_VOLUME_INCREMENT);
+		_AddNewSpec("/bin/setvolume -d", (B_HID_USAGE_PAGE_CONSUMER << 16) | B_HID_UID_CON_VOLUME_DECREMENT);
+		fLastSaved = BEntry(&keySetRef);
+		PostMessage(SAVE_KEYSET);
 	}
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
@@ -315,11 +323,9 @@ ShortcutsWindow::_GetSettingsFile(entry_ref* eref)
 		return false;
 	else
 		path.Append(SHORTCUTS_SETTING_FILE_NAME);
-
-	if (BEntry(path.Path(), true).GetRef(eref) == B_OK)
-		return true;
-	else
-		return false;
+	BEntry entry(path.Path(), true);
+	entry.GetRef(eref);
+	return entry.Exists();
 }
 
 
@@ -435,7 +441,7 @@ ShortcutsWindow::_LoadWindowSettings(const BMessage& loadMessage)
 // Creates a new entry and adds it to the GUI. (defaultCommand) will be the
 // text in the entry, or NULL if no text is desired.
 void
-ShortcutsWindow::_AddNewSpec(const char* defaultCommand)
+ShortcutsWindow::_AddNewSpec(const char* defaultCommand, uint32 keyCode)
 {
 	_MarkKeySetModified();
 
@@ -454,6 +460,10 @@ ShortcutsWindow::_AddNewSpec(const char* defaultCommand)
 	fColumnListView->ScrollTo(spec);
 	if (defaultCommand)
 		spec->SetCommand(defaultCommand);
+	if (keyCode != 0) {
+		spec->ProcessColumnTextString(ShortcutsSpec::KEY_COLUMN_INDEX,
+			GetFallbackKeyName(keyCode).String());
+	}
 }
 
 
@@ -811,19 +821,26 @@ ShortcutsWindow::DispatchMessage(BMessage* message, BHandler* handler)
 			break;
 
 		case B_KEY_DOWN:
+		case B_UNMAPPED_KEY_DOWN:
+		{
 			ShortcutsSpec* selected;
-			if (message->GetInt32("modifiers", 0) != 0)
+			int32 modifiers = message->GetInt32("modifiers", 0);
+			// These should not block key detection here:
+			modifiers &= ~(B_CAPS_LOCK | B_SCROLL_LOCK | B_NUM_LOCK);
+			if (modifiers != 0)
 				BWindow::DispatchMessage(message, handler);
 			else if (handler == fColumnListView
 				&& (selected =
 					static_cast<ShortcutsSpec*>(fColumnListView->CurrentSelection()))) {
+				uint32 keyCode = message->GetInt32("key", 0);
+				const char* keyName = GetKeyName(keyCode);
 				selected->ProcessColumnTextString(
 						ShortcutsSpec::KEY_COLUMN_INDEX,
-						GetKeyName(message->GetInt32("key", 0)));
+						keyName != NULL ? keyName : GetFallbackKeyName(keyCode).String());
 				_MarkKeySetModified();
 			}
 			break;
-
+		}
 		default:
 			BWindow::DispatchMessage(message, handler);
 			break;

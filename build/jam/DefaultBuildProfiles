@@ -70,13 +70,11 @@ rule DefineDefaultBuildProfiles
 			HAIKU_ROOT_USER_REAL_NAME ?= "Yourself" ;
 			AddGroupToHaikuImage party : 101 : user sshd ;
 			HAIKU_IMAGE_HOST_NAME ?= shredder ;
-			if $(DEBUG) != 0 {
-				HAIKU_IMAGE_SIZE ?= 1300 ;
-			}
-			if $(HAIKU_INCLUDE_SOURCES) = 1 {
-				HAIKU_IMAGE_SIZE ?= 1100 ;
+
+			if $(HAIKU_INCLUDE_SOURCES) = 1 || $(DEBUG) != 0 {
+				HAIKU_IMAGE_SIZE ?= 1400 ;
 			} else {
-				HAIKU_IMAGE_SIZE ?= 710 ;
+				HAIKU_IMAGE_SIZE ?= 800 ;
 			}
 
 			AddHaikuImageSystemPackages
@@ -94,9 +92,9 @@ rule DefineDefaultBuildProfiles
 				wqy_microhei
 				# Some packages can't be built with gcc2, so we install the gcc8
 				# secondary architecture package instead in this case
-				!gcc2 @{ nano p7zip python3 xz_utils }@
+				!gcc2 @{ nano p7zip python3.9 xz_utils }@
 				gcc2 @{ nano_x86@secondary_x86 p7zip_x86@secondary_x86
-					python3_x86@secondary_x86 xz_utils_x86@secondary_x86 }@
+					python3.9_x86@secondary_x86 xz_utils_x86@secondary_x86 }@
 				;
 			AddHaikuImageSourcePackages
 				bepdf
@@ -192,7 +190,6 @@ rule DefineDefaultBuildProfiles
 				haikuporter
 				less
 				libedit
-				m4
 				make
 				mawk
 				ncurses6

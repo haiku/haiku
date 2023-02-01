@@ -11,6 +11,7 @@
 
 #include <Application.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <LayoutBuilder.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -29,17 +30,13 @@
 BootManagerWindow::BootManagerWindow()
 	:
 	BWindow(BRect(100, 100, 500, 400), B_TRANSLATE_SYSTEM_NAME("BootManager"),
-		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
-		| B_AUTO_UPDATE_SIZE_LIMITS)
+		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 {
 	float minWidth, maxWidth, minHeight, maxHeight;
 	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
 
-	// Use font to determine necessary size of window:
-	const BFont* font = be_plain_font;
-	minWidth = 400 * (double)font->Size() / 12.0f;
-	minHeight = 250 * (double)font->Size() / 12.0f;
-
+	minWidth = be_control_look->DefaultLabelSpacing() * 67.0f;
+	minHeight = be_control_look->DefaultLabelSpacing() * 42.0f;
 	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 
 	fWizardView = new WizardView("wizard");

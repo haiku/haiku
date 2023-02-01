@@ -212,16 +212,16 @@ virtio_scsi_register_device(device_node *parent)
 
 	device_attr attrs[] = {
 		{ SCSI_DEVICE_MAX_TARGET_COUNT, B_UINT32_TYPE,
-			{ ui32: max_targets }},
+			{ .ui32 = max_targets }},
 		{ SCSI_DEVICE_MAX_LUN_COUNT, B_UINT32_TYPE,
-			{ ui32: max_luns }},
+			{ .ui32 = max_luns }},
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-			{ string: VIRTIO_SCSI_BRIDGE_PRETTY_NAME }},
+			{ .string = VIRTIO_SCSI_BRIDGE_PRETTY_NAME }},
 
 		// DMA properties
-		{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { ui32: max_blocks }},
+		{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { .ui32 = max_blocks }},
 		{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE,
-			{ ui32: config.seg_max }},
+			{ .ui32 = config.seg_max }},
 		{ NULL }
 	};
 
@@ -251,13 +251,13 @@ virtio_scsi_register_child_devices(void *cookie)
 
 	device_attr attrs[] = {
 		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
-			{ string: SCSI_FOR_SIM_MODULE_NAME }},
+			{ .string = SCSI_FOR_SIM_MODULE_NAME }},
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-			{ string: VIRTIO_SCSI_CONTROLLER_PRETTY_NAME }},
+			{ .string = VIRTIO_SCSI_CONTROLLER_PRETTY_NAME }},
 		{ SCSI_DESCRIPTION_CONTROLLER_NAME, B_STRING_TYPE,
-			{ string: VIRTIO_SCSI_DEVICE_MODULE_NAME }},
-		{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { ui32: 255 }},
-		{ VIRTIO_SCSI_ID_ITEM, B_UINT32_TYPE, { ui32: (uint32)id }},
+			{ .string = VIRTIO_SCSI_DEVICE_MODULE_NAME }},
+		{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { .ui32 = 255 }},
+		{ VIRTIO_SCSI_ID_ITEM, B_UINT32_TYPE, { .ui32 = (uint32)id }},
 			{ NULL }
 	};
 

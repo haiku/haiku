@@ -342,6 +342,16 @@ fuse_fs_bmap(struct fuse_fs* fs, const char* path, size_t blocksize,
 }
 
 
+int fuse_fs_ioctl(struct fuse_fs *fs, const char *path, int cmd, void *arg,
+	struct fuse_file_info *fi, unsigned int flags, void *data)
+{
+	if (fs->ops.ioctl == NULL)
+		return ENOSYS;
+
+	return fs->ops.ioctl(path, cmd, arg, fi, flags, data);
+}
+
+
 void
 fuse_fs_init(struct fuse_fs* fs, struct fuse_conn_info* conn)
 {
@@ -381,11 +391,3 @@ fuse_fs_new(const struct fuse_operations* ops, size_t opSize, void* userData)
 	return fs;
 }
 
-
-int
-fuse_fs_get_fs_info(struct fuse_fs* fs, struct fs_info* info)
-{
-	if (fs->ops.get_fs_info == NULL)
-		return ENOSYS;
-	return fs->ops.get_fs_info(info);
-}

@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-1/2016.
+	Rudolf Cornelissen 3/2002-11/2022.
 */
 
 
@@ -14,6 +14,7 @@
 
 #include <graphic_driver.h>
 #include <KernelExport.h>
+#include <SupportDefs.h>
 #include <ISA.h>
 #include <PCI.h>
 #include <OS.h>
@@ -23,6 +24,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#define TRACE(x...) dprintf("nvidia: " x)
+#define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 #define get_pci(o, s) (*pci_bus->read_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s))
 #define set_pci(o, s, v) (*pci_bus->write_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s), (v))
@@ -324,6 +328,8 @@ static uint16 nvidia_device_list[] = {
 	0x03d2, /* Nvidia Geforce 6100 nForce 400 */
 	0x03d5, /* Nvidia Geforce 6100 nForce 420 */
 	0x03d6, /* Nvidia Geforce 7025 / nForce 630a */
+	0x06e4, /* Nvidia Geforce 8400 GS G98 */
+	0x06e8,	/* Nvidia Geforce 9200M G98M */
 	0x07e1, /* Nvidia Geforce 7100 / nForce 630i */
 	0
 };
@@ -397,6 +403,7 @@ dumprom(void *rom, uint32 size, pci_info pcii)
 	uint32 cnt;
 	char fname[64];
 
+	CALLED();
 	/* determine the romfile name: we need split-up per card in the system */
 	sprintf (fname, kUserDirectory "//" DRIVER_PREFIX "." DEVICE_FORMAT ".rom",
 		pcii.vendor_id, pcii.device_id, pcii.bus, pcii.device, pcii.function);
@@ -522,6 +529,7 @@ map_device(device_info *di)
 	phys_addr_t physicalAddress;
 	system_info sysinfo;
 
+	CALLED();
 	/* variables for making copy of ROM */
 	uint8* rom_temp;
 	area_id rom_area = -1;
@@ -556,6 +564,13 @@ map_device(device_info *di)
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function);
 
+	if ((di->pcii.u.h0.base_register_flags[registers] & PCI_address_type)
+		== PCI_address_type_64) {
+		TRACE("registers is 64 bit\n");
+	} else {
+		TRACE("registers is 32 bit\n");
+	}
+
 	/* get a virtual memory address for the registers*/
 	si->regs_area = map_physical_memory(
 		buffer,
@@ -563,7 +578,7 @@ map_device(device_info *di)
 		di->pcii.u.h0.base_registers_pci[registers],
 		di->pcii.u.h0.base_register_sizes[registers],
 		B_ANY_KERNEL_ADDRESS,
-		B_CLONEABLE_AREA | (si->use_clone_bugfix ? B_READ_AREA|B_WRITE_AREA : 0),
+		B_CLONEABLE_AREA | B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
 		(void **)&(di->regs));
 	si->clone_bugfix_regs = (uint32 *) di->regs;
 
@@ -601,7 +616,7 @@ map_device(device_info *di)
 			di->pcii.u.h0.rom_base_pci,
 			di->pcii.u.h0.rom_size,
 			B_ANY_KERNEL_ADDRESS,
-			B_READ_AREA,
+			B_KERNEL_READ_AREA,
 			(void **)&(rom_temp)
 		);
 
@@ -623,7 +638,7 @@ map_device(device_info *di)
 	if (!tmpUlong) {
 		/* ROM was not assigned an adress, fetch it from ISA legacy memory map! */
 		rom_area = map_physical_memory(buffer, 0x000c0000,
-			65536, B_ANY_KERNEL_ADDRESS, B_READ_AREA, (void **)&(rom_temp));
+			65536, B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, (void **)&(rom_temp));
 	}
 
 	/* if mapping ROM to vmem failed then clean up and pass on error */
@@ -658,8 +673,11 @@ map_device(device_info *di)
 	physicalAddress = di->pcii.u.h0.base_registers_pci[frame_buffer];
 	if ((di->pcii.u.h0.base_register_flags[frame_buffer] & PCI_address_type)
 			== PCI_address_type_64) {
+		TRACE("framebuffer is 64 bit\n");
 		physicalAddress
 			|= (uint64)di->pcii.u.h0.base_registers_pci[frame_buffer + 1] << 32;
+	} else {
+		TRACE("framebuffer is 32 bit\n");
 	}
 
 	/* map the framebuffer into vmem, using Write Combining*/
@@ -700,6 +718,12 @@ map_device(device_info *di)
 	// remember settings for use here and in accelerant
 	si->settings = sSettings;
 
+	if (si->fb_area >= 0) {
+		TRACE("framebuffer mapped OK\n");
+	} else {
+		TRACE("framebuffer mapping failed!\n");
+	}
+
 	/* in any case, return the result */
 	return si->fb_area;
 }
@@ -712,6 +736,7 @@ unmap_device(device_info *di)
 	uint32	tmpUlong;
 	pci_info *pcii = &(di->pcii);
 
+	CALLED();
 	/* disable memory mapped IO */
 	tmpUlong = get_pci(PCI_command, 4);
 	tmpUlong &= 0xfffffffc;
@@ -735,6 +760,7 @@ probe_devices(void)
 	device_info *di = pd->di;
 	char tmp_name[B_OS_NAME_LENGTH];
 
+	CALLED();
 	/* while there are more pci devices */
 	while (count < MAX_DEVICES
 		&& (*pci_bus->get_nth_pci_info)(pci_index, &(di->pcii)) == B_OK) {
@@ -869,6 +895,7 @@ open_hook(const char* name, uint32 flags, void** cookie)
 	void *unaligned_dma_buffer;
 	uint32 mem_size;
 
+	CALLED();
 	/* find the device name in the list of devices */
 	/* we're never passed a name we didn't publish */
 	while (pd->device_names[index]
@@ -890,10 +917,9 @@ open_hook(const char* name, uint32 flags, void** cookie)
 	sprintf(shared_name, DEVICE_FORMAT " shared",
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function);
-	/* create this area with NO user-space read or write permissions, to prevent accidental damage */
 	di->shared_area = create_area(shared_name, (void **)&(di->si), B_ANY_KERNEL_ADDRESS,
 		((sizeof(shared_info) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1)), B_FULL_LOCK,
-		B_CLONEABLE_AREA);
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_CLONEABLE_AREA);
 	if (di->shared_area < 0) {
 		/* return the error */
 		result = di->shared_area;
@@ -1052,6 +1078,7 @@ mark_as_open:
 	/* send the cookie to the opener */
 	*cookie = di;
 
+	TRACE("open_hook: device is open\n");
 	goto done;
 
 
@@ -1072,6 +1099,7 @@ free_shared:
 	delete_area(di->shared_area);
 	di->shared_area = -1;
 	di->si = NULL;
+	TRACE("open_hook: device is freed\n");
 
 done:
 	/* end of critical section */
@@ -1101,6 +1129,7 @@ write_hook(void* dev, off_t pos, const void* buf, size_t* len)
 static status_t
 close_hook(void* dev)
 {
+	CALLED();
 	/* we don't do anything on close: there might be dup'd fd */
 	return B_NO_ERROR;
 }
@@ -1113,6 +1142,7 @@ free_hook(void* dev)
 	shared_info	*si = di->si;
 	vuint32 *regs = di->regs;
 
+	CALLED();
 	/* lock the driver */
 	AQUIRE_BEN(pd->kernel);
 
@@ -1172,69 +1202,74 @@ control_hook(void* dev, uint32 msg, void *buf, size_t len)
 
 	switch (msg) {
 		/* the only PUBLIC ioctl */
-		case B_GET_ACCELERANT_SIGNATURE:
-		{
-			strcpy((char* )buf, sSettings.accelerant);
+		case B_GET_ACCELERANT_SIGNATURE: {
+			TRACE("return signature\n");
+			if (user_strlcpy((char* )buf, sSettings.accelerant, len) < B_OK)
+				return B_BAD_ADDRESS;
 			result = B_OK;
 			break;
 		}
 
 		/* PRIVATE ioctl from here on */
-		case NV_GET_PRIVATE_DATA:
-		{
-			nv_get_private_data *gpd = (nv_get_private_data *)buf;
-			if (gpd->magic == NV_PRIVATE_DATA_MAGIC) {
-				gpd->shared_info_area = di->shared_area;
-				result = B_OK;
+		case NV_GET_PRIVATE_DATA: {
+			TRACE("return private data\n");
+			nv_get_private_data gpd;
+			if (user_memcpy(&gpd, buf, sizeof(nv_get_private_data)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (gpd.magic == NV_PRIVATE_DATA_MAGIC) {
+				gpd.shared_info_area = di->shared_area;
+				result = user_memcpy(buf, &gpd, sizeof(nv_get_private_data));
 			}
 			break;
 		}
-
-		case NV_GET_PCI:
-		{
-			nv_get_set_pci *gsp = (nv_get_set_pci *)buf;
-			if (gsp->magic == NV_PRIVATE_DATA_MAGIC) {
+		case NV_GET_PCI: {
+			nv_get_set_pci gsp;
+			if (user_memcpy(&gsp, buf, sizeof(nv_get_set_pci)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (gsp.magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
-				gsp->value = get_pci(gsp->offset, gsp->size);
-				result = B_OK;
+				gsp.value = get_pci(gsp.offset, gsp.size);
+				result = user_memcpy(buf, &gsp, sizeof(nv_get_set_pci));
 			}
 			break;
 		}
-
-		case NV_SET_PCI:
-		{
-			nv_get_set_pci *gsp = (nv_get_set_pci *)buf;
-			if (gsp->magic == NV_PRIVATE_DATA_MAGIC) {
+		case NV_SET_PCI: {
+			nv_get_set_pci gsp;
+			if (user_memcpy(&gsp, buf, sizeof(nv_get_set_pci)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (gsp.magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
-				set_pci(gsp->offset, gsp->size, gsp->value);
+				set_pci(gsp.offset, gsp.size, gsp.value);
 				result = B_OK;
 			}
 			break;
 		}
-
-		case NV_DEVICE_NAME:
-		{
-			nv_device_name *dn = (nv_device_name *)buf;
-			if (dn->magic == NV_PRIVATE_DATA_MAGIC) {
-				strcpy(dn->name, di->name);
+		case NV_DEVICE_NAME: {
+			TRACE("return device name\n");
+			nv_device_name dn;
+			if (user_memcpy(&dn, buf, sizeof(nv_device_name)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (dn.magic == NV_PRIVATE_DATA_MAGIC) {
+				if (user_strlcpy(dn.name, di->name, B_OS_NAME_LENGTH) < B_OK)
+					return B_BAD_ADDRESS;
 				result = B_OK;
 			}
 			break;
 		}
-
-		case NV_RUN_INTERRUPTS:
-		{
-			nv_set_vblank_int *vi = (nv_set_vblank_int *)buf;
-			if (vi->magic == NV_PRIVATE_DATA_MAGIC) {
+		case NV_RUN_INTERRUPTS: {
+			nv_set_vblank_int vi;
+			if (user_memcpy(&vi, buf, sizeof(nv_set_vblank_int)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (vi.magic == NV_PRIVATE_DATA_MAGIC) {
 				vuint32 *regs = di->regs;
-				if (!(vi->crtc)) {
-					if (vi->do_it) {
+				if (!(vi.crtc)) {
+					if (vi.do_it) {
 						enable_vbi_crtc1(regs);
 					} else {
 						disable_vbi_crtc1(regs);
 					}
 				} else {
-					if (vi->do_it) {
+					if (vi.do_it) {
 						enable_vbi_crtc2(regs);
 					} else {
 						disable_vbi_crtc2(regs);
@@ -1244,44 +1279,44 @@ control_hook(void* dev, uint32 msg, void *buf, size_t len)
 			}
 			break;
 		}
-
-		case NV_GET_NTH_AGP_INFO:
-		{
-			nv_nth_agp_info *nai = (nv_nth_agp_info *)buf;
-			if (nai->magic == NV_PRIVATE_DATA_MAGIC) {
-				nai->exist = false;
-				nai->agp_bus = false;
+		case NV_GET_NTH_AGP_INFO: {
+			nv_nth_agp_info nai;
+			if (user_memcpy(&nai, buf, sizeof(nv_nth_agp_info)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (nai.magic == NV_PRIVATE_DATA_MAGIC) {
+				nai.exist = false;
+				nai.agp_bus = false;
 				if (agp_bus) {
-					nai->agp_bus = true;
-					if ((*agp_bus->get_nth_agp_info)(nai->index, &(nai->agpi)) == B_NO_ERROR) {
-						nai->exist = true;
+					nai.agp_bus = true;
+					if ((*agp_bus->get_nth_agp_info)(nai.index, &(nai.agpi)) == B_NO_ERROR) {
+						nai.exist = true;
 					}
 				}
-				result = B_OK;
+				result = user_memcpy(buf, &nai, sizeof(nv_nth_agp_info));
 			}
 			break;
 		}
-
-		case NV_ENABLE_AGP:
-		{
-			nv_cmd_agp *nca = (nv_cmd_agp *)buf;
-			if (nca->magic == NV_PRIVATE_DATA_MAGIC) {
+		case NV_ENABLE_AGP:	{
+			nv_cmd_agp nca;
+			if (user_memcpy(&nca, buf, sizeof(nv_cmd_agp)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (nca.magic == NV_PRIVATE_DATA_MAGIC) {
 				if (agp_bus) {
-					nca->agp_bus = true;
-					nca->cmd = agp_bus->set_agp_mode(nca->cmd);
+					nca.agp_bus = true;
+					nca.cmd = agp_bus->set_agp_mode(nca.cmd);
 				} else {
-					nca->agp_bus = false;
-					nca->cmd = 0;
+					nca.agp_bus = false;
+					nca.cmd = 0;
 				}
-				result = B_OK;
+				result = user_memcpy(buf, &nca, sizeof(nv_cmd_agp));
 			}
 			break;
 		}
-
-		case NV_ISA_OUT:
-		{
-			nv_in_out_isa *io_isa = (nv_in_out_isa *)buf;
-			if (io_isa->magic == NV_PRIVATE_DATA_MAGIC) {
+		case NV_ISA_OUT: {
+			nv_in_out_isa io_isa;
+			if (user_memcpy(&io_isa, buf, sizeof(nv_in_out_isa)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (io_isa.magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 
 				/* lock the driver:
@@ -1293,10 +1328,10 @@ control_hook(void* dev, uint32 msg, void *buf, size_t len)
 				tmpUlong |= PCI_command_io;
 				set_pci(PCI_command, 2, tmpUlong);
 
-				if (io_isa->size == 1)
-  					isa_bus->write_io_8(io_isa->adress, (uint8)io_isa->data);
+				if (io_isa.size == 1)
+					isa_bus->write_io_8(io_isa.adress, (uint8)io_isa.data);
    				else
-   					isa_bus->write_io_16(io_isa->adress, io_isa->data);
+					isa_bus->write_io_16(io_isa.adress, io_isa.data);
   				result = B_OK;
 
 				/* disable ISA I/O access */
@@ -1309,11 +1344,11 @@ control_hook(void* dev, uint32 msg, void *buf, size_t len)
    			}
 			break;
 		}
-
-		case NV_ISA_IN:
-		{
-			nv_in_out_isa *io_isa = (nv_in_out_isa *)buf;
-			if (io_isa->magic == NV_PRIVATE_DATA_MAGIC) {
+		case NV_ISA_IN:	{
+			nv_in_out_isa io_isa;
+			if (user_memcpy(&io_isa, buf, sizeof(nv_in_out_isa)) < B_OK)
+				return B_BAD_ADDRESS;
+			if (io_isa.magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 
 				/* lock the driver:
@@ -1325,11 +1360,11 @@ control_hook(void* dev, uint32 msg, void *buf, size_t len)
 				tmpUlong |= PCI_command_io;
 				set_pci(PCI_command, 2, tmpUlong);
 
-				if (io_isa->size == 1)
-	   				io_isa->data = isa_bus->read_io_8(io_isa->adress);
+				if (io_isa.size == 1)
+					io_isa.data = isa_bus->read_io_8(io_isa.adress);
 	   			else
-	   				io_isa->data = isa_bus->read_io_16(io_isa->adress);
-   				result = B_OK;
+					io_isa.data = isa_bus->read_io_16(io_isa.adress);
+				result = user_memcpy(buf, &io_isa, sizeof(nv_in_out_isa));
 
 				/* disable ISA I/O access */
 				tmpUlong = get_pci(PCI_command, 2);
@@ -1357,6 +1392,7 @@ init_hardware(void)
 	pci_info pcii;
 	bool found = false;
 
+	CALLED();
 	/* choke if we can't find the PCI bus */
 	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
 		return B_ERROR;
@@ -1395,6 +1431,12 @@ init_hardware(void)
 	}
 
 done:
+	if (found) {
+		TRACE ("init_hardware: found device\n");
+	} else {
+		TRACE ("init_hardware: no supported device found\n");
+	}
+
 	/* put away the module manager */
 	put_module(B_PCI_MODULE_NAME);
 	return found ? B_OK : B_ERROR;
@@ -1406,6 +1448,7 @@ init_driver(void)
 {
 	void *settings;
 
+	CALLED();
 	// get driver/accelerant settings
 	settings = load_driver_settings(DRIVER_PREFIX ".settings");
 	if (settings != NULL) {
@@ -1413,6 +1456,7 @@ init_driver(void)
 		char *end;
 		uint32 value;
 
+		TRACE("init_driver: nvidia.settings loaded\n");
 		// for driver
 		item = get_driver_parameter(settings, "accelerant", "", "");
 		if (item[0] && strlen(item) < sizeof(sSettings.accelerant) - 1)
@@ -1424,6 +1468,12 @@ init_driver(void)
 
 		sSettings.dumprom = get_driver_boolean_parameter(settings,
 			"dumprom", false, false);
+
+		if (sSettings.dumprom) {
+			TRACE("dumprom requested\n");
+		} else {
+			TRACE("no dumprom requested\n");
+		}
 
 		// for accelerant
 		item = get_driver_parameter(settings, "logmask",
@@ -1503,6 +1553,8 @@ init_driver(void)
 	INIT_BEN(pd->kernel);
 	/* find all of our supported devices */
 	probe_devices();
+
+	TRACE("init_driver: completed OK\n");
 	return B_OK;
 }
 
@@ -1510,6 +1562,7 @@ init_driver(void)
 const char **
 publish_devices(void)
 {
+	CALLED();
 	/* return the list of supported devices */
 	return (const char **)pd->device_names;
 }
@@ -1532,6 +1585,7 @@ find_device(const char *name)
 void
 uninit_driver(void)
 {
+	CALLED();
 	/* free the driver data */
 	DELETE_BEN(pd->kernel);
 	free(pd);

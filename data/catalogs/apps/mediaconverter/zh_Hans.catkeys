@@ -1,11 +1,15 @@
-1	english	x-vnd.Haiku-MediaConverter	3142509574
+1	english	x-vnd.Haiku-MediaConverter	2816184527
+Input file not recognized as Audio or Video	MediaConverter		输入文件未被识别为音频或视频
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		视频质量：%3d%%
 Source files	MediaConverter		源文件
+Error writing video frame %lld	MediaConverter		写入视频帧 %lld 错误
 Error converting '%filename'	MediaConverter		转换 '%filename' 错误
+Selected directory not found. Defaulting to /boot/home	MediaConverter		所选目录未找到。默认为 /boot/home
 Conversion completed	MediaConverter		转换结束
 Audio:	MediaConverter-FileInfo		音频：
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
+Error creating video.	MediaConverter		创建视频错误。
 Cancelling	MediaConverter		取消
 None available	Audio codecs		无可用
 No file selected	MediaConverter-FileInfo		无选中文件
@@ -26,6 +30,7 @@ Audio quality: %3d%%	MediaConverter		音频质量：%3d%%
 Cancelling…	MediaConverter		取消...
 Output file '%filename' created	MediaConverter		输出文件 '%filename' 已创建
 Output folder	MediaConverter		输出目录
+Error creating track.	MediaConverter		创建音轨错误。
  seconds	MediaFileInfo		秒
 Video using parameters form settings	MediaConverter		视频参数表使用设置
 Video:	MediaConverter-FileInfo		视频：
@@ -43,12 +48,16 @@ Error	MediaConverter		错误
 File details	MediaConverter		文件详情
 No audio	Audio codecs list		无音频
 Drop media files onto this window	MediaConverter		拖放媒体文件到窗口
+Writing video track: %ld%% complete	MediaConverter		写入视频轨：%ld%% 完成
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
+Error read audio frame %lld	MediaConverter		读取音频帧错误 %lld
 Quit	Menu		退出
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
 Duration:	MediaConverter-FileInfo		持续时间：
 MediaConverter	System name		媒体转换器
 Error launching: %strError%	MediaConverter		启动错误：%strError%
+Error writing audio frame %lld	MediaConverter		写入音频帧错误 %lld
+Writing audio track: %ld%% complete	MediaConverter		写入音频轨：%ld%% 完成
 File format:	MediaConverter		文件格式：
 File	Menu		文件
 Video quality not supported	MediaConverter		视频质量不支持
@@ -59,5 +68,7 @@ No video	Video codecs list		无视频
 Continue	MediaConverter		继续
 Convert	MediaConverter		转换
 Audio quality not supported	MediaConverter		音频质量不支持
+Error writing to location: %strPath%. Defaulting to location: /boot/home	MediaConverter		写入位置错误：%strPath%。默认写入到: /boot/home
+Error read video frame %lld	MediaConverter		读取视频帧错误 %lld
 Preview	MediaConverter		预览
 Start [ms]: 	MediaConverter		开始 [ms]：

@@ -11,6 +11,8 @@ Application Terminal :
 	Arguments.cpp
 	BasicTerminalBuffer.cpp
 	Colors.cpp
+	ColorListView.cpp
+	ColorPreview.cpp
 	FindWindow.cpp
 	Globals.cpp
 	HistoryBuffer.cpp
@@ -35,6 +37,8 @@ Application Terminal :
 	TermViewHighlight.cpp
 	TermViewStates.cpp
 	TermWindow.cpp
+	ThemeView.cpp
+	ThemeWindow.cpp
 	TitlePlaceholderMapper.cpp
 	VTKeyTbl.c
 	VTPrsTbl.c
@@ -60,5 +64,7 @@ DoCatalogs Terminal :
 	TermView.cpp
 	TermViewStates.cpp
 	TermWindow.cpp
+	ThemeView.cpp
+	ThemeWindow.cpp
 	: en.catalog
 ;

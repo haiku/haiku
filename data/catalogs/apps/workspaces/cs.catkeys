@@ -6,7 +6,7 @@ Always on top	Workspaces		Vždy navrchu
 Show window border	Workspaces		Zobrazit okraj okna
 Show window tab	Workspaces		Zobrazit záložku okna
 Auto-raise	Workspaces		Automaticky vyzvednout
-Remove replicant	Workspaces		Odstranit replikanta
+Remove replicant	Workspaces		Odebrat replikanta
 Live in the Deskbar	Workspaces		Přebývat v panelu
 Usage: %s [options] [workspace]\nwhere \"options\" are:\n  --notitle\t\ttitle bar removed, border and resize kept\n  --noborder\t\ttitle, border, and resize removed\n  --avoidfocus\t\tprevents the window from being the target of keyboard events\n  --alwaysontop\t\tkeeps window on top\n  --notmovable\t\twindow can't be moved around\n  --autoraise\t\tauto-raise the workspace window when it's at the screen edge\n  --help\t\tdisplay this help and exit\nand \"workspace\" is the number of the Workspace to which to switch (0-31)\n	Workspaces		Použití: %s [volby] [pracovní_plocha]\nkde \"volby\" jsou:\n  --notitle\t\todstraněn titulní pruh, ponechaný okraj a změna velikosti\n  --noborder\t\todstraněn titulní pruh, okraj a změna velikosti\n  --avoidfocus\t\tzabrání, aby bylo okno cílem událostí klávesnice\n  --alwaysontop\t\tbude udržovat okno nahoře\n  --notmovable\t\toknem není možné pohybovat\n  --autoraise\t\tautomaticky přesunout okno na vrch pracovní plochy pokud je na okraji obrazovky\n  --help\t\tvypsat tuto nápovědu a skončit\na \"pracovní_plocha\" je číslo pracovní plochy, na kterou se má přepnout (0-31)\n
 Switch on mouse wheel	Workspaces		Zapnout kolečko myši

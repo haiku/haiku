@@ -10,8 +10,8 @@
 #include <Font.h>
 #include <LayoutBuilder.h>
 #include <ScrollView.h>
+#include <StringFormat.h>
 #include <StringView.h>
-#include <TextView.h>
 
 #include "AppUtils.h"
 #include "BarberPole.h"
@@ -22,6 +22,7 @@
 #include "Model.h"
 #include "UserUsageConditions.h"
 #include "ServerHelper.h"
+#include "TextView.h"
 #include "WebAppInterface.h"
 
 
@@ -48,13 +49,11 @@
 
 #define LINES_INTRODUCTION_TEXT 2
 
-#define WINDOW_FRAME BRect(0, 0, 500, 400)
-
 
 UserUsageConditionsWindow::UserUsageConditionsWindow(Model& model,
 	UserUsageConditions& userUsageConditions)
 	:
-	BWindow(WINDOW_FRAME, B_TRANSLATE("Usage conditions"),
+	BWindow(BRect(), B_TRANSLATE("Usage conditions"),
 			B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
 				| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
@@ -65,8 +64,13 @@ UserUsageConditionsWindow::UserUsageConditionsWindow(Model& model,
 {
 	_InitUiControls();
 
+	font_height fontHeight;
+	be_plain_font->GetHeight(&fontHeight);
+	const float lineHeight = fontHeight.ascent + fontHeight.descent;
+
 	BScrollView* scrollView = new BScrollView("copy scroll view", fCopyView,
 		0, false, true, B_PLAIN_BORDER);
+	scrollView->SetExplicitMinSize(BSize(B_SIZE_UNSET, lineHeight * 6));
 	BButton* okButton = new BButton("ok", B_TRANSLATE("OK"),
 		new BMessage(B_QUIT_REQUESTED));
 
@@ -81,6 +85,8 @@ UserUsageConditionsWindow::UserUsageConditionsWindow(Model& model,
 			.End()
 		.End();
 
+	GetLayout()->SetExplicitMinSize(BSize(500, B_SIZE_UNSET));
+	ResizeToPreferred();
 	CenterOnScreen();
 
 	UserDetail userDetail;
@@ -91,7 +97,7 @@ UserUsageConditionsWindow::UserUsageConditionsWindow(Model& model,
 UserUsageConditionsWindow::UserUsageConditionsWindow(
 	Model& model, UserUsageConditionsSelectionMode mode)
 	:
-	BWindow(WINDOW_FRAME, B_TRANSLATE("Usage conditions"),
+	BWindow(BRect(), B_TRANSLATE("Usage conditions"),
 			B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS
 				| B_NOT_RESIZABLE | B_NOT_ZOOMABLE),
@@ -101,25 +107,22 @@ UserUsageConditionsWindow::UserUsageConditionsWindow(
 {
 	_InitUiControls();
 
+	font_height fontHeight;
+	be_plain_font->GetHeight(&fontHeight);
+	const float lineHeight = fontHeight.ascent + fontHeight.descent;
+
 	fWorkerIndicator = new BarberPole("fetch data worker indicator");
 	BSize workerIndicatorSize;
-	workerIndicatorSize.SetHeight(20);
+	workerIndicatorSize.SetHeight(lineHeight);
 	fWorkerIndicator->SetExplicitSize(workerIndicatorSize);
 
-	fIntroductionTextView = new BTextView("introduction text view");
-	fIntroductionTextView->AdoptSystemColors();
-	fIntroductionTextView->MakeEditable(false);
-	fIntroductionTextView->MakeSelectable(false);
+	fIntroductionTextView = new TextView("introduction text view");
 	UserDetail userDetail;
 	fIntroductionTextView->SetText(_IntroductionTextForMode(mode, userDetail));
 
-	BSize introductionSize;
-	introductionSize.SetHeight(
-		_ExpectedIntroductionTextHeight(fIntroductionTextView));
-	fIntroductionTextView->SetExplicitPreferredSize(introductionSize);
-
 	BScrollView* scrollView = new BScrollView("copy scroll view", fCopyView,
 		0, false, true, B_PLAIN_BORDER);
+	scrollView->SetExplicitMinSize(BSize(B_SIZE_UNSET, lineHeight * 6));
 	BButton* okButton = new BButton("ok", B_TRANSLATE("OK"),
 		new BMessage(B_QUIT_REQUESTED));
 
@@ -137,6 +140,8 @@ UserUsageConditionsWindow::UserUsageConditionsWindow(
 		.Add(fWorkerIndicator, 1)
 		.End();
 
+	GetLayout()->SetExplicitMinSize(BSize(500, B_SIZE_UNSET));
+	ResizeToPreferred();
 	CenterOnScreen();
 
 	_FetchData();
@@ -164,11 +169,9 @@ UserUsageConditionsWindow::_InitUiControls()
 	fAgeNoteStringView = new BStringView("age note string view",
 		PLACEHOLDER_TEXT);
 	fAgeNoteStringView->AdoptSystemColors();
-	fAgeNoteStringView->SetExplicitMaxSize(
-		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	BFont versionFont(be_plain_font);
-	versionFont.SetSize(9.0);
+	versionFont.SetSize(versionFont.Size() * 0.75f);
 
 	fVersionStringView = new BStringView("version string view",
 		PLACEHOLDER_TEXT);
@@ -176,8 +179,6 @@ UserUsageConditionsWindow::_InitUiControls()
 	fVersionStringView->SetFont(&versionFont);
 	fVersionStringView->SetAlignment(B_ALIGN_RIGHT);
 	fVersionStringView->SetHighUIColor(B_PANEL_TEXT_COLOR, B_DARKEN_3_TINT);
-	fVersionStringView->SetExplicitMaxSize(
-		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 }
 
 
@@ -431,12 +432,10 @@ UserUsageConditionsWindow::_VersionText(const BString& code)
 /*static*/ const BString
 UserUsageConditionsWindow::_MinimumAgeText(uint8 minimumAge)
 {
-	BString minimumAgeString;
-	minimumAgeString.SetToFormat("%" B_PRId8, minimumAge);
-	BString ageNoteText(
-		B_TRANSLATE("Users are required to be %AgeYears% years of age or "
-			"older."));
-	ageNoteText.ReplaceAll("%AgeYears%", minimumAgeString);
+	BString ageNoteText;
+	static BStringFormat formatText(B_TRANSLATE("Users are required to be "
+		"{0, plural, one{# year of age} other{# years of age}} or older."));
+	formatText.Format(ageNoteText, minimumAge);
 	return ageNoteText;
 }
 
@@ -473,19 +472,4 @@ UserUsageConditionsWindow::_IntroductionTextForMode(
 		default:
 			return "???";
 	}
-}
-
-
-/*static*/ float
-UserUsageConditionsWindow::_ExpectedIntroductionTextHeight(
-	BTextView* introductionTextView)
-{
-	float insetTop;
-	float insetBottom;
-	introductionTextView->GetInsets(NULL, &insetTop, NULL, &insetBottom);
-
-	font_height fh;
-	be_plain_font->GetHeight(&fh);
-	return ((fh.ascent + fh.descent + fh.leading) * LINES_INTRODUCTION_TEXT)
-		+ insetTop + insetBottom;
 }

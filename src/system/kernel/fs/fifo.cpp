@@ -634,7 +634,7 @@ Inode::Open(int openMode)
 {
 	MutexLocker locker(RequestLock());
 
-	if ((openMode & O_ACCMODE) == O_WRONLY)
+	if ((openMode & O_ACCMODE) == O_WRONLY || (openMode & O_ACCMODE) == O_RDWR)
 		fWriterCount++;
 
 	if ((openMode & O_ACCMODE) == O_RDONLY || (openMode & O_ACCMODE) == O_RDWR)
@@ -656,11 +656,11 @@ Inode::Open(int openMode)
 void
 Inode::Close(file_cookie* cookie)
 {
-	TRACE("Inode %p::Close(openMode = %d)\n", this, openMode);
 
 	MutexLocker locker(RequestLock());
 
 	int openMode = cookie->open_mode;
+	TRACE("Inode %p::Close(openMode = %" B_PRId32 ")\n", this, openMode);
 
 	// Notify all currently reading file descriptors
 	ReadRequestList::Iterator iterator = fReadRequests.GetIterator();
@@ -669,11 +669,12 @@ Inode::Close(file_cookie* cookie)
 			request->Notify(B_FILE_ERROR);
 	}
 
-	if ((openMode & O_ACCMODE) == O_WRONLY && --fWriterCount == 0)
-		NotifyEndClosed(true);
+	if ((openMode & O_ACCMODE) == O_WRONLY || (openMode & O_ACCMODE) == O_RDWR) {
+		if (--fWriterCount == 0)
+			NotifyEndClosed(true);
+	}
 
-	if ((openMode & O_ACCMODE) == O_RDONLY
-		|| (openMode & O_ACCMODE) == O_RDWR) {
+	if ((openMode & O_ACCMODE) == O_RDONLY || (openMode & O_ACCMODE) == O_RDWR) {
 		if (--fReaderCount == 0)
 			NotifyEndClosed(false);
 	}
@@ -697,7 +698,7 @@ Inode::Select(uint8 event, selectsync* sync, int openMode)
 {
 	bool writer = true;
 	select_sync_pool** pool;
-	if ((openMode & O_RWMASK) == O_RDONLY) {
+	if (event == B_SELECT_READ || (openMode & O_RWMASK) == O_RDONLY) {
 		pool = &fReadSelectSyncPool;
 		writer = false;
 	} else if ((openMode & O_RWMASK) == O_WRONLY) {
@@ -730,7 +731,7 @@ status_t
 Inode::Deselect(uint8 event, selectsync* sync, int openMode)
 {
 	select_sync_pool** pool;
-	if ((openMode & O_RWMASK) == O_RDONLY) {
+	if (event == B_SELECT_READ || (openMode & O_RWMASK) == O_RDONLY) {
 		pool = &fReadSelectSyncPool;
 	} else if ((openMode & O_RWMASK) == O_WRONLY) {
 		pool = &fWriteSelectSyncPool;
@@ -938,9 +939,6 @@ fifo_read(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 	MutexLocker locker(inode->RequestLock());
 
-	if ((cookie->open_mode & O_RWMASK) != O_RDONLY)
-		return B_NOT_ALLOWED;
-
 	if (inode->IsActive() && inode->WriterCount() == 0) {
 		// as long there is no writer, and the pipe is empty,
 		// we always just return 0 to indicate end of file
@@ -986,9 +984,6 @@ fifo_write(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 		_node, cookie, *_length);
 
 	MutexLocker locker(inode->RequestLock());
-
-	if ((cookie->open_mode & O_RWMASK) != O_WRONLY)
-		return B_NOT_ALLOWED;
 
 	size_t length = *_length;
 	if (length == 0)
@@ -1065,8 +1060,8 @@ fifo_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 op,
 	file_cookie* cookie = (file_cookie*)_cookie;
 	Inode* inode = (Inode*)_node->private_node;
 
-	TRACE("fifo_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",
-		_vnode, _cookie, op, buffer, length);
+	TRACE("fifo_ioctl: vnode %p, cookie %p, op %" B_PRId32 ", buf %p, len %ld\n",
+		_node, _cookie, op, buffer, length);
 
 	switch (op) {
 		case FIONBIO:
@@ -1129,7 +1124,7 @@ fifo_set_flags(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 	Inode* inode = (Inode*)_node->private_node;
 	file_cookie* cookie = (file_cookie*)_cookie;
 
-	TRACE("fifo_set_flags(vnode = %p, flags = %x)\n", _vnode, flags);
+	TRACE("fifo_set_flags(vnode = %p, flags = %x)\n", _node, flags);
 
 	MutexLocker locker(inode->RequestLock());
 	cookie->open_mode = (cookie->open_mode & ~(O_APPEND | O_NONBLOCK)) | flags;

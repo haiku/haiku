@@ -11,8 +11,10 @@
 
 set -ex
 
-ARCH=$1
-SECONDARY_ARCH=$2
+BUILDTOOLS_REV=$1
+HAIKU_REV=$2
+ARCH=$3
+SECONDARY_ARCH=$4
 
 TOP=$(pwd)
 
@@ -23,14 +25,23 @@ SYSROOT=$OUTPUT/cross-tools-$ARCH/sysroot
 SYSROOT_SECONDARY=$OUTPUT/cross-tools-$SECONDARY_ARCH/sysroot
 PACKAGE_ROOT=/system
 
-# First up, build a cross-compiler
-git clone --depth=1 https://git.haiku-os.org/haiku
-git clone --depth=1 https://git.haiku-os.org/buildtools
+# Get the source trees
+git clone --depth=1 --branch $HAIKU_REV https://review.haiku-os.org/haiku
+git clone --depth=1 --branch $BUILDTOOLS_REV https://review.haiku-os.org/buildtools
+
+# The Haiku build requires the ability to find a hrev tag. In case a specific branch is selected
+# (like `r1beta4`)`, we will get the entire history just to be sure that the tag will exist.
+cd haiku
+if ! `git describe --dirty --tags --match=hrev* --abbrev=1`; then
+	git fetch --unshallow
+fi
+
+# Build a cross-compiler
 cd $BUILDTOOLS/jam
 make && ./jam0 install
 mkdir -p $OUTPUT
 cd $OUTPUT
-configureArgs="--build-cross-tools $ARCH $TOP/buildtools"
+configureArgs="--build-cross-tools $ARCH --cross-tools-source $TOP/buildtools"
 if [ -n "$SECONDARY_ARCH" ]; then
 	configureArgs="$configureArgs --build-cross-tools $SECONDARY_ARCH"
 fi
@@ -42,7 +53,7 @@ mkdir -p $PACKAGE_ROOT
 ln -s $PACKAGE_ROOT $SYSROOT/boot/system
 if [ -n "$SECONDARY_ARCH" ]; then
 	mkdir -p $SYSROOT_SECONDARY/boot
-	ln -s $PACKAGEROOT $SYSROOT_SECONDARY/boot/system
+	ln -s $PACKAGE_ROOT $SYSROOT_SECONDARY/boot/system
 fi
 
 # Build needed packages and tools for the cross-compiler
@@ -73,12 +84,6 @@ if [ -n "$SECONDARY_ARCH" ]; then
 	package extract -C $PACKAGE_ROOT $OUTPUT/objects/haiku/$ARCH/packaging/packages/haiku_${SECONDARY_ARCH}_devel.hpkg
 fi
 find $OUTPUT/download/ -name '*.hpkg' -exec package extract -C $PACKAGE_ROOT {} \;
-cd $PACKAGE_ROOT/develop/lib
-ln -s ../../lib/libgcc_s.so libgcc_s.so
-if [ -n "$SECONDARY_ARCH" ]; then
-	cd $PACKAGE_ROOT/develop/lib/$SECONDARY_ARCH
-	ln -s ../../../lib/$SECONDARY_ARCH/libgcc_s.so libgcc_s.so
-fi
 
 # Clean up
 rm -rf $BUILDTOOLS

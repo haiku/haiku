@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <ControlLook.h>
 #include <Entry.h>
 #include <IconUtils.h>
 #include <Node.h>
@@ -27,7 +28,7 @@ IconView::IconView(icon_size iconSize)
 	:
 	BView("IconView", B_WILL_DRAW),
 	fIconSize(iconSize),
-	fIconBitmap(new BBitmap(BRect(iconSize), B_RGBA32)),
+	fIconBitmap(NULL),
 	fDrawIcon(false)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
@@ -45,9 +46,10 @@ status_t
 IconView::SetIcon(const BPath& path, icon_size iconSize)
 {
 	fDrawIcon = false;
-	
-	if (iconSize != fIconSize) {
-		BBitmap* bitmap = new BBitmap(BRect(iconSize), B_RGBA32);
+
+	if (iconSize != fIconSize || fIconBitmap == NULL) {
+		BBitmap* bitmap = new BBitmap(BRect(BPoint(0, 0),
+			be_control_look->ComposeIconSize(iconSize)), B_RGBA32);
 		if (bitmap == NULL)
 			return B_NO_MEMORY;
 
@@ -64,7 +66,8 @@ IconView::SetIcon(const BPath& path, icon_size iconSize)
 	BNode node(&entry);
 	BNodeInfo info(&node);
 
-	status = info.GetTrackerIcon(fIconBitmap, fIconSize);
+	status = info.GetTrackerIcon(fIconBitmap,
+		(icon_size)fIconBitmap->Bounds().IntegerWidth());
 	if (status != B_OK)
 		return status;
 
@@ -83,9 +86,10 @@ status_t
 IconView::SetIcon(const uint8_t* data, size_t size, icon_size iconSize)
 {
 	fDrawIcon = false;
-	
-	if (iconSize != fIconSize) {
-		BBitmap* bitmap = new BBitmap(BRect(iconSize), B_RGBA32);
+
+	if (iconSize != fIconSize || fIconBitmap == NULL) {
+		BBitmap* bitmap = new BBitmap(BRect(BPoint(0, 0),
+			be_control_look->ComposeIconSize(iconSize)), B_RGBA32);
 		if (bitmap == NULL)
 			return B_NO_MEMORY;
 
@@ -105,6 +109,32 @@ IconView::SetIcon(const uint8_t* data, size_t size, icon_size iconSize)
 	if (!fIconBitmap->IsValid())
 		return fIconBitmap->InitCheck();
 
+	_SetSize();
+
+	fDrawIcon = true;
+	Invalidate();
+	return B_OK;
+}
+
+
+status_t
+IconView::SetIcon(const BBitmap* icon)
+{
+	if (icon == NULL) {
+		fDrawIcon = false;
+		return B_OK;
+	}
+
+	delete fIconBitmap;
+	fIconBitmap = new BBitmap(icon);
+	if (fIconBitmap == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = fIconBitmap->InitCheck();
+	if (status != B_OK)
+		return status;
+
+	fIconSize = (icon_size)-1;
 	_SetSize();
 
 	fDrawIcon = true;
@@ -150,7 +180,7 @@ IconView::InitCheck() const
 void
 IconView::_SetSize()
 {
-	SetExplicitMinSize(BSize(fIconSize, fIconSize));
-	SetExplicitMaxSize(BSize(fIconSize, fIconSize));
-	SetExplicitPreferredSize(BSize(fIconSize, fIconSize));
+	SetExplicitMinSize(fIconBitmap->Bounds().Size());
+	SetExplicitMaxSize(fIconBitmap->Bounds().Size());
+	SetExplicitPreferredSize(fIconBitmap->Bounds().Size());
 }

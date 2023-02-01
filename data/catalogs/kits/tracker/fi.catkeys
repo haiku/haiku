@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	2915475646
+1	finnish	x-vnd.Haiku-libtracker	464753347
 Created	ContainerWindow		Luotu
 Icon	AttributesView		Kuvake
 Open and make preferred	OpenWithWindow		Avaa ja tee ensisijaiseksi
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Pieni bittikarttakuvake
 Would you like to find a suitable application to open the file?	FSUtils		Haluaisitko etsiä sopivan sovelluksen tiedoston avaamiseen?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Et voi korvata kansiota tai symbolista linkkiä tiedostolla.
+(unknown)	InfoWindow		(tuntematon)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, other{<# päivää>}}
 Trailing \\.	libtracker		Jäljessä oleva \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Funktiossa %func \nfind_directory() epäonnistui. \nSyy: %error
@@ -84,6 +85,7 @@ Include trash	FindPanel		Sisällytä roskakori
 GiB	WidgetAttributeText		gibitavua
 Clean up	ContainerWindow		Tyhjennä
 Modified	FindPanel		Muokattu
+ (block size: 	InfoWindow		 (lohkokoko: 
 Select all	QueryContainerWindow		Valitse kaikki
 Generate image thumbnails	SettingsView		Tuota pienoiskuvat
 Select…	FilePanelPriv		Valitse...
@@ -167,6 +169,7 @@ Read	FilePermissionsView		Lue
 There was an error writing the attribute.	WidgetAttributeText		Attribuutin kirjoittamisessa tapahtui virhe.
 Path	Default Query Columns		Polku
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jos nimeät uudelleen kohteen %target, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?
+Filesystem:	InfoWindow		Tiedostojärjestelmä:
 Could not open \"%name\" (%error). 	FSUtils		Kohteen ”%name” avaus epäonnistui (%error)
 Media parameter group	AttributesView		Mediaparametriryhmä
 %name info	InfoWindow	InfoWindow Title	%name-tiedot
@@ -284,9 +287,9 @@ no supporting apps	OpenWithWindow		ei tukevia sovelluksia
 32-bit unsigned integer	AttributesView		32-bittinen etumerkitön kokonaisluku
 Preparing to empty Trash…	StatusWindow		Valmistaudutaan tyhjentämään roskakori...
 Deleting: 	StatusWindow		Poistetaan: 
+label too long	PoseView		nimike on liian pitkä
 the MIME settings	FSUtils		MIME-asetukset
 You can't move or copy the trash.	FSUtils		Et voi siirtää tai kopioida roskakoriin.
-label too long	PoseView		nimike on liian pitkä
 Error creating link to \"%name\".	FSUtils		Virhe luotaessa linkkiä kohteeseen ”%name”.
 Unknown	FilePermissionsView		Tuntematon
 Paste links	ContainerWindow		Liitä linkit
@@ -335,8 +338,8 @@ MIME Path	AttributesView		MIME-polku
 less than	FindPanel		pienempi kuin
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Virhe kopioitaessa tiedostoa ”%name”:\n\t%error\n\nHaluaisitko jatkaa?
 Creating links: 	StatusWindow		Luodaan linkit: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Asiakirjan ”%document” avaaminen sovelluksella ”%app” epäonnistui (%error). 
 Create %s clipping	PoseView		Luo %s-leikkaus
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Asiakirjan ”%document” avaaminen sovelluksella ”%app” epäonnistui (%error). 
 Error moving \"%name\"	FSUtils		Virhe siirrettäessä kohdetta ”%name”
 To: %dir	StatusWindow		Vastaanottaja: %dir
 Paste layout	ContainerWindow		Liitä sijoittelu
@@ -493,6 +496,7 @@ Duplicate	ContainerWindow		Kaksoiskappale
 16-bit integer	AttributesView		16-bittinen kokonaisluku
 Untitled clipping	PoseView		Otsikoton leikkaus
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Tiedosto ”%name” on jo olemassa määritellyssä kansiossa. Haluatko korvata sen?
+, indexed	InfoWindow		, indeksoitu
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Sinun on pudotettava kohteet yhteen ”Levyt”-ikkunan levykuvakkeista.
 Version:	InfoWindow		Versio:
 OK	PoseView		Valmis
@@ -508,8 +512,8 @@ Add-ons	FilePanelPriv		Lisäosat
 Empty folder	SlowContextPopup		Tyhjä kansio
 Alignment	AttributesView		Tasaus
 Move to Trash	FSUtils		Siirrä roskakoriin
-Handles %type	OpenWithWindow		Käsittelee tyyppiä %type
 Cancel	PoseView		Peru
+Handles %type	OpenWithWindow		Käsittelee tyyppiä %type
 Delete	PoseView		Poista
 Media parameter	AttributesView		Mediaparametri
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jos muutat kotikansiota, %osName ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nJos haluat kuitenkin muuttaa kotikansiota, pidä Vaihto-näppäin alhaalla ja napsauta ”Tiedän, mitä olen tekemässä”.

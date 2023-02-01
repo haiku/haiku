@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-MAIL	1559146339
+1	english	x-vnd.Be-MAIL	1477453861
 Set to Saved	Mail		设置为保存
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		你的正文中包含的 %ld 属于无法识别的编码类型。 可能改变编码类型之后会更好的运行？ 点击“发送”继续(系统将会选择一种合适的类型来代替无法编码的类型)，或者点击“取消”，进行修复。
 Text wrapping:	Mail		文本加密：
@@ -8,14 +8,16 @@ Reply	Mail		回复
 Next message	Mail		下一个
 Mailing	Mail		发送中
 Unread	Mail		无法读取
+Same sender	Mail		相同发件人
 Copy to new	Mail		转发
 Save as draft	Mail		保存为草稿
 Encoding:	Mail		编码：
 Print	Mail		打印
+Decrease quote level	Mail		缩减引用级别
 Encoding	Mail		编码
 Default account:	Mail		默认账户：
 Message	Mail		邮件
-Bcc:	Mail		邮件副本：
+Bcc:	Mail		密件抄送:
 New	Mail		新建
 Save	Mail		保存
 Undo	Mail		撤销
@@ -31,6 +33,7 @@ Only files can be added as attachments.	Mail		只有文件可以作为附件发�
 Close	Mail		关闭
 Untitled	Mail		未命名
 Removing attachments from a forwarded mail is not yet implemented!\nIt will not yet work correctly.	Mail		从邮件中删除附件的功能暂时还未实现！\n可能无法正常运行！
+Same recipient	Mail		相同收件人
 Previous message	Mail		上一个
 (Address unavailable)	Mail		（地址不可用）
 Mail	System name		电子邮件
@@ -48,7 +51,7 @@ Quit	Mail		退出
 Title:	Mail		标题：
 Account from mail	Mail		邮件账户
 %e - E-mail address	Mail		%e - 邮箱
-Cc:	Mail		副本：
+Cc:	Mail		抄送:
 No matches	Mail		无匹配项
 Queries	Mail		查询
 Cut	Mail		剪切
@@ -82,6 +85,7 @@ Colored quotes:	Mail		彩色：
 Automatic	Mail		自动
 Open this link	Mail		打开链接
 Auto signature:	Mail		自动署名：
+Same subject	Mail		相同主题
 Send	Mail		发送
 Open draft	Mail		打开草稿
 Leave as 'New'	Mail	Do not translate New - this is non-localizable e-mail status	保留标记为 '新邮件'
@@ -89,7 +93,7 @@ Random	Mail		随机
 Attach attributes:	Mail		附加属性：
 Find again	Mail		重新搜索
 Size:	Mail		大小：
-To:	Mail		发送到：
+To:	Mail		收件人：
 Need Tracker to move items to trash	Mail		需要使用文件浏览器将其移动到垃圾箱
 The mail_daemon could not be started:\n\t	Mail		 mail_daemon 无法启动：\n\t
 <no account found>	Mail		<未发现账户>
@@ -127,7 +131,7 @@ The mail_daemon is not running. The message is queued and will be sent when the 
 None	Mail		无
 Resend	Mail		重新发送
 Hide	Mail		隐藏
-From:	Mail		从：
+From:	Mail		发件人:
 No file attributes, just plain data	Mail		文件属性为无，属于简单数据
 Add	Mail		添加
 out	B_USER_DIRECTORY/mail/out		发件箱
@@ -161,4 +165,5 @@ Spam	Mail		垃圾邮件
 Couldn't open this signature. Sorry.	Mail		署名无法打开，对不起。
 Revert	Mail		恢复
 Unknown	Mail		未知
+Increase quote level	Mail		增加引用级别
 Add enclosure…	Mail		添加附件中…

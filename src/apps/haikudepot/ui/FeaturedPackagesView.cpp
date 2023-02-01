@@ -428,9 +428,12 @@ public:
 				BRect targetRect = BRect(inset, y + inset, SIZE_ICON + inset,
 					y + SIZE_ICON + inset);
 				const BBitmap* bitmap = icon->Bitmap(BITMAP_SIZE_64);
-				SetDrawingMode(B_OP_ALPHA);
-				DrawBitmap(bitmap, bitmap->Bounds(), targetRect,
-					B_FILTER_BITMAP_BILINEAR);
+
+				if (bitmap != NULL && bitmap->IsValid()) {
+					SetDrawingMode(B_OP_ALPHA);
+					DrawBitmap(bitmap, bitmap->Bounds(), targetRect,
+						B_FILTER_BITMAP_BILINEAR);
+				}
 			}
 		}
 	}
@@ -461,12 +464,15 @@ public:
 		if (pkg->State() == ACTIVATED) {
 			const BBitmap* bitmap = sInstalledIcon->Bitmap(
 				BITMAP_SIZE_16);
-			float stringWidth = StringWidth(pkg->Title());
-			float offsetX = pt.x + stringWidth + PADDING;
-			BRect targetRect(offsetX, pt.y - 16, offsetX + 16, pt.y);
-			SetDrawingMode(B_OP_ALPHA);
-			DrawBitmap(bitmap, bitmap->Bounds(), targetRect,
-				B_FILTER_BITMAP_BILINEAR);
+			if (bitmap != NULL && bitmap->IsValid()) {
+				float stringWidth = StringWidth(pkg->Title());
+				float offsetX = pt.x + stringWidth + PADDING;
+				BRect targetRect(offsetX, pt.y - 16,
+					offsetX + 16, pt.y);
+				SetDrawingMode(B_OP_ALPHA);
+				DrawBitmap(bitmap, bitmap->Bounds(), targetRect,
+					B_FILTER_BITMAP_BILINEAR);
+			}
 		}
 	}
 

@@ -64,7 +64,7 @@ String::~String()
 inline bool
 String::SetTo(const char* string)
 {
-	return SetToExactLength(string, strlen(string));
+	return SetToExactLength(string, (string == NULL) ? 0 : strlen(string));
 }
 
 

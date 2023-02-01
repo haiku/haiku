@@ -44,7 +44,7 @@ typedef struct err_res {
 } err_res;
 
 #define MK_ERROR( aaction, code ) ({ \
-	err_res _res = {error_code: (code), action: (aaction) };	\
+	err_res _res = {.error_code = (code), .action = (aaction) };	\
 	_res;					\
 })
 
@@ -63,7 +63,7 @@ typedef struct scsi_periph_callbacks {
 	// informs of new size of medium
 	// (set to NULL if not a block device)
 	void (*set_capacity)(periph_device_cookie cookie, uint64 capacity,
-		uint32 blockSize);
+		uint32 blockSize, uint32 physicalBlockSize);
 
 	// *** removable devices
 	// called when media got changed (can be NULL if medium is not changable)

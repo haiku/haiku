@@ -38,6 +38,7 @@ All rights reserved.
 #include <Alert.h>
 #include <Application.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Locale.h>
 #include <PopUpMenu.h>
 #include <ScrollView.h>
@@ -59,11 +60,6 @@ All rights reserved.
 #define B_TRANSLATION_CONTEXT "InfoWindow"
 
 
-// Offsets taken from TAlertView::Draw in BAlert.cpp
-const float kIconHorizOffset = 18.0f;
-const float kIconVertOffset = 6.0f;
-const float kBorderWidth = 32.0f;
-
 // Amount you have to move the mouse before a drag starts
 const float kDragSlop = 3.0f;
 
@@ -80,11 +76,10 @@ HeaderView::HeaderView(Model* model)
 	fDoubleClick(false),
 	fDragging(false)
 {
-	// Create the rect for displaying the icon
-	fIconRect.Set(0, 0, B_LARGE_ICON - 1, B_LARGE_ICON - 1);
-	// Offset taken from BAlert
-	fIconRect.OffsetBy(kIconHorizOffset, kIconVertOffset);
-	SetExplicitSize(BSize(B_SIZE_UNSET, B_LARGE_ICON + 2 * kIconVertOffset));
+	const float labelSpacing = be_control_look->DefaultLabelSpacing();
+	fIconRect = BRect(BPoint(labelSpacing * 3.0f, labelSpacing),
+		be_control_look->ComposeIconSize(B_LARGE_ICON));
+	SetExplicitSize(BSize(B_SIZE_UNSET, fIconRect.Width() + 2 * fIconRect.top));
 
 	// The title rect
 	// The magic numbers are used to properly calculate the rect so that
@@ -95,12 +90,12 @@ HeaderView::HeaderView(Model* model)
 	GetFont(&currentFont);
 	currentFont.GetHeight(&fontMetrics);
 
-	fTitleRect.left = fIconRect.right + 5;
+	fTitleRect.left = fIconRect.right + labelSpacing;
 	fTitleRect.top = 0;
 	fTitleRect.bottom = fontMetrics.ascent + 1;
 	fTitleRect.right = min_c(
 		fTitleRect.left + currentFont.StringWidth(fModel->Name()),
-		Bounds().Width() - 5);
+		Bounds().Width() - labelSpacing);
 	// Offset so that it centers with the icon
 	fTitleRect.OffsetBy(0,
 		fIconRect.top + ((fIconRect.Height() - fTitleRect.Height()) / 2));
@@ -296,7 +291,7 @@ HeaderView::Draw(BRect)
 	// Draw the icon, straddling the border
 	SetDrawingMode(B_OP_OVER);
 	IconCache::sIconCache->Draw(fIconModel, this, fIconRect.LeftTop(),
-		kNormalIcon, B_LARGE_ICON, true);
+		kNormalIcon, fIconRect.Size(), true);
 	SetDrawingMode(B_OP_COPY);
 
 	// Font information
@@ -387,7 +382,7 @@ HeaderView::MouseDown(BPoint where)
 			offsetPoint.x = where.x - fIconRect.left;
 			offsetPoint.y = where.y - fIconRect.top;
 			if (IconCache::sIconCache->IconHitTest(offsetPoint, fIconModel,
-					kNormalIcon, B_LARGE_ICON)) {
+					kNormalIcon, fIconRect.Size())) {
 				// Can't drag the trash anywhere..
 				fTrackingState = fModel->IsTrash()
 					? open_only_track : icon_track;
@@ -405,7 +400,7 @@ HeaderView::MouseDown(BPoint where)
 						offsetPoint.y = fClickPoint.y - fIconRect.top;
 						fDoubleClick
 							= IconCache::sIconCache->IconHitTest(offsetPoint,
-							fIconModel, kNormalIcon, B_LARGE_ICON);
+							fIconModel, kNormalIcon, fIconRect.Size());
 					}
 				}
 			}
@@ -430,7 +425,7 @@ HeaderView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 		SetDrawingMode(B_OP_OVER);
 		if (overTarget != fIsDropTarget) {
 			IconCache::sIconCache->Draw(fIconModel, this, fIconRect.LeftTop(),
-				overTarget ? kSelectedIcon : kNormalIcon, B_LARGE_ICON, true);
+				overTarget ? kSelectedIcon : kNormalIcon, fIconRect.Size(), true);
 			fIsDropTarget = overTarget;
 		}
 	}
@@ -473,7 +468,7 @@ HeaderView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 				// Draw the icon
 				float hIconOffset = (rect.Width() - fIconRect.Width()) / 2;
 				IconCache::sIconCache->Draw(fIconModel, view,
-					BPoint(hIconOffset, 0), kNormalIcon, B_LARGE_ICON, true);
+					BPoint(hIconOffset, 0), kNormalIcon, fIconRect.Size(), true);
 
 				// See if we need to truncate the string
 				BString nameString(fModel->Name());

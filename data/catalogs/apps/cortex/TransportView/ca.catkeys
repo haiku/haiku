@@ -9,7 +9,7 @@ Offline	TransportView		Desplaçament
 (???)	TransportView		(???)
 Stop	TransportView		Atura
 (no group)	TransportView		(sense grup)
-Drop data	TransportView		Eliminació de dades
+Drop data	TransportView		Deixeu-hi anar dades
 To:	TransportView		A:
 Recording	TransportView		Gravació
 Increase latency	TransportView		Augmenta la latència

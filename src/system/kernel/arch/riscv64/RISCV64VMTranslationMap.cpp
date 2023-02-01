@@ -363,7 +363,7 @@ RISCV64VMTranslationMap::Unmap(addr_t start, addr_t end)
 		Pte* pte = LookupPte(page, false, NULL);
 		if (pte != NULL) {
 			fMapCount--;
-			Pte oldPte((uint64)atomic_get_and_set64((int64*)&pte->val, 0));
+			Pte oldPte{.val = (uint64)atomic_get_and_set64((int64*)&pte->val, 0)};
 			if ((oldPte.flags & (1 << pteAccessed)) != 0)
 				InvalidatePage(page);
 		}
@@ -410,7 +410,7 @@ RISCV64VMTranslationMap::UnmapPage(VMArea* area, addr_t address,
 
 	RecursiveLocker locker(fLock);
 
-	Pte oldPte((uint64)atomic_get_and_set64((int64*)&pte->val, 0));
+	Pte oldPte{.val = (uint64)atomic_get_and_set64((int64*)&pte->val, 0)};
 	fMapCount--;
 	pinner.Unlock();
 
@@ -448,7 +448,7 @@ RISCV64VMTranslationMap::UnmapPages(VMArea* area, addr_t base, size_t size,
 		if (pte == NULL)
 			continue;
 
-		Pte oldPte((uint64)atomic_get_and_set64((int64*)&pte->val, 0));
+		Pte oldPte{.val = (uint64)atomic_get_and_set64((int64*)&pte->val, 0)};
 		if ((oldPte.flags & (1 << pteValid)) == 0)
 			continue;
 
@@ -579,7 +579,7 @@ RISCV64VMTranslationMap::UnmapArea(VMArea* area, bool deletingAddressSpace,
 				continue;
 			}
 
-			Pte oldPte((uint64)atomic_get_and_set64((int64*)&pte->val, 0));
+			Pte oldPte{.val = (uint64)atomic_get_and_set64((int64*)&pte->val, 0)};
 
 			// transfer the accessed/dirty flags to the page and
 			// invalidate the mapping, if necessary

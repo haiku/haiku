@@ -1,5 +1,5 @@
 /*
- * Copyright 2019, Haiku, Inc. All rights reserved.
+ * Copyright 2019-2022, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,13 +11,13 @@
 #include <lock.h>
 
 
-#define pthread_mutex_t				mutex
-#undef PTHREAD_MUTEX_INITIALIZER
-#define PTHREAD_MUTEX_INITIALIZER	MUTEX_INITIALIZER(__FUNCTION__)
-#define pthread_mutex_init(mtx, attr) mutex_init(mtx, __FUNCTION__)
-#define pthread_mutex_destroy		mutex_destroy
-#define pthread_mutex_lock			mutex_lock
-#define pthread_mutex_unlock		mutex_unlock
+#define pthread_mutex_t				recursive_lock
+#undef PTHREAD_RECURSIVE_MUTEX_INITIALIZER
+#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER	RECURSIVE_LOCK_INITIALIZER(__FUNCTION__)
+#define pthread_mutex_init(mtx, attr) recursive_lock_init(mtx, __FUNCTION__)
+#define pthread_mutex_destroy		recursive_lock_destroy
+#define pthread_mutex_lock			recursive_lock_lock
+#define pthread_mutex_unlock		recursive_lock_unlock
 
 
 #endif /* __NVME_PLATFORM_H__ */

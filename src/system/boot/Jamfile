@@ -1,7 +1,5 @@
 SubDir HAIKU_TOP src system boot ;
 
-DEFINES += _BOOT_MODE ;
-
 UsePrivateHeaders [ FDirName libroot locale ] ;
 
 rule BuildOpenFirmwareLoader {
@@ -131,11 +129,13 @@ actions BuildEFILoader
 		# no bfd support, fake efi Pe header
 		$(TARGET_OBJCOPY_$(TARGET_KERNEL_ARCH)) -j .text -j .sdata -j .data \
 			-j .dynamic -j .dynsym -j .rel* -j .rela* -j .reloc -j .dynstr \
+			-j _haiku_revision \
 			--output-target=$(OUTPUT_TARGET) $(2) $(1)
 	else
 		# bfd supports pe + efi for arch
 		$(TARGET_OBJCOPY_$(TARGET_KERNEL_ARCH)) -j .text -j .sdata -j .data \
 			-j .dynamic -j .dynsym -j .rel* -j .rela* -j .reloc -j .dynstr \
+			-j _haiku_revision \
 			--output-target=$(OUTPUT_TARGET) \
 			--subsystem=efi-app $(2) $(1)
 	fi
@@ -306,6 +306,8 @@ for platform in [ MultiBootSubDirSetup ] {
 
 		BootMergeObject boot_libroot_$(platform:G=).o :
 			abs.c
+			ctype_loc.cpp
+			ctype_l.cpp
 			ctype.cpp
 			LocaleData.cpp
 			qsort.c
@@ -348,7 +350,7 @@ for platform in [ MultiBootSubDirSetup ] {
 		# efi loader needs to be shared.
 		if $(TARGET_BOOT_PLATFORM) = efi {
 			ldflags += -shared ;
-			ldflags += -Map=$(HAIKU_OUTPUT_DIR)/efi.map ;
+			ldflags += -Map=$(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET)/efi.map ;
 		}
 
 		if $(TARGET_BOOT_PLATFORM) = riscv {
@@ -383,11 +385,14 @@ for platform in [ MultiBootSubDirSetup ] {
 			: $(ldflags)
 		;
 
+		MakeLocate <revisioned>boot_loader_$(TARGET_BOOT_PLATFORM) : [ FDirName $(TARGET_DEBUG_$(DEBUG)_LOCATE_TARGET) revisioned ] ;
+		CopySetHaikuRevision <revisioned>boot_loader_$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+
 		switch $(TARGET_BOOT_PLATFORM) {
 			case efi :
 				if $(HAIKU_BOOT_$(platform:G=:U)_PRIVATE_KEYFILE) {
 					BuildEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM).unsigned
-						: boot_loader_$(TARGET_BOOT_PLATFORM) ;
+						: <revisioned>boot_loader_$(TARGET_BOOT_PLATFORM) ;
 					SignEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM)
 						: haiku_loader.$(TARGET_BOOT_PLATFORM).unsigned
 						: [ FDirName $(HAIKU_TOP) data boot efi keys DB.crt ]
@@ -396,7 +401,7 @@ for platform in [ MultiBootSubDirSetup ] {
 						: [ FDirName $(HAIKU_TOP) data boot efi keys DB.crt ] ;
 				} else {
 					BuildEFILoader haiku_loader.$(TARGET_BOOT_PLATFORM)
-						: boot_loader_$(TARGET_BOOT_PLATFORM) ;
+						: <revisioned>boot_loader_$(TARGET_BOOT_PLATFORM) ;
 				}
 
 				if $(TARGET_ARCH) = arm || $(TARGET_ARCH) = riscv64 {
@@ -406,17 +411,17 @@ for platform in [ MultiBootSubDirSetup ] {
 				}
 
 			case bios_ia32 :
-				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : <revisioned>boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
 			case pxe_ia32 :
-				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : <revisioned>boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
 			case openfirmware :
-				BuildOpenFirmwareLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+				BuildOpenFirmwareLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : <revisioned>boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
 			case u-boot :
 				local loader_entry = `printf \"obase=16;ibase=16;10 + %x\\n\" $(HAIKU_BOOT_LOADER_BASE)|bc` ;
-				BuildUImage haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM)
+				BuildUImage haiku_loader.$(TARGET_BOOT_PLATFORM) : <revisioned>boot_loader_$(TARGET_BOOT_PLATFORM)
 					:
 					-A $(TARGET_ARCH) -O linux -T kernel -C none
 					-a $(HAIKU_BOOT_LOADER_BASE) -e $(loader_entry)
@@ -428,24 +433,24 @@ for platform in [ MultiBootSubDirSetup ] {
 					: [ FDirName $(HAIKU_TOP) data boot u-boot boot-$(TARGET_ARCH).scr.txt ] ;
 
 			case amiga_m68k :
-				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : <revisioned>boot_loader_$(TARGET_BOOT_PLATFORM) ;
 				ChecksumAmigaLoader haiku_loader.$(TARGET_BOOT_PLATFORM) ;
 
 			case atari_m68k :
-				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : <revisioned>boot_loader_$(TARGET_BOOT_PLATFORM) ;
 				ChecksumAtariLoader haiku_loader.$(TARGET_BOOT_PLATFORM) ;
 
 				AtariBootPrgLd haiku.prg :
-					boot_loader_$(TARGET_BOOT_PLATFORM)
+					<revisioned>boot_loader_$(TARGET_BOOT_PLATFORM)
 					: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_prg_$(TARGET_BOOT_PLATFORM).ld
 					: -Bstatic
 				;
 
 			case riscv :
-				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+				BuildBiosLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : <revisioned>boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
 			case next_m68k :
-				BuildAoutLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+				BuildAoutLoader haiku_loader.$(TARGET_BOOT_PLATFORM) : <revisioned>boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
 			case * :
 				Exit "Currently unsupported haiku_loader:" $(TARGET_BOOT_PLATFORM) ;

@@ -1401,8 +1401,13 @@ TCPEndpoint::_PrepareReceivePath(tcp_segment_header& segment)
 	fReceiveQueue.SetInitialSequence(segment.sequence);
 
 	if ((fOptions & TCP_NOOPT) == 0) {
-		if (segment.max_segment_size > 0)
-			fSendMaxSegmentSize = segment.max_segment_size;
+		if (segment.max_segment_size > 0) {
+			// The maximum size of a segment that a TCP endpoint really sends,
+			// the "effective send MSS", MUST be the smaller of the send MSS and
+			// the largest transmission size permitted by the IP layer:
+			fSendMaxSegmentSize = min_c(segment.max_segment_size,
+				_MaxSegmentSize(*PeerAddress()));
+		}
 
 		if (segment.options & TCP_HAS_WINDOW_SCALE) {
 			fFlags |= FLAG_OPTION_WINDOW_SCALE;

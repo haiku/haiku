@@ -7,6 +7,7 @@
 
 #include <AutoDeleter.h>
 #include <util/AutoLock.h>
+#include <util/BitUtils.h>
 
 #include <vm/VMCache.h>
 #include <vm/vm_page.h>
@@ -16,11 +17,37 @@
 #include "Misc.h"
 #include "Volume.h"
 
+
+// Initial size of the DataContainer's small buffer. If it contains data up to
+// this size, nothing is allocated, but the small buffer is used instead.
+// 16 bytes are for free, since they are shared with the block list.
+// (actually even more, since the list has an initial size).
+// I ran a test analyzing what sizes the attributes in my system have:
+//     size   percentage   bytes used in average
+//   <=   0         0.00                   93.45
+//   <=   4        25.46                   75.48
+//   <=   8        30.54                   73.02
+//   <=  16        52.98                   60.37
+//   <=  32        80.19                   51.74
+//   <=  64        94.38                   70.54
+//   <= 126        96.90                  128.23
+//
+// For average memory usage it is assumed, that attributes larger than 126
+// bytes have size 127, that the list has an initial capacity of 10 entries
+// (40 bytes), that the block reference consumes 4 bytes and the block header
+// 12 bytes. The optimal length is actually 35, with 51.05 bytes per
+// attribute, but I conservatively rounded to 32.
+static const off_t kMinimumSmallBufferSize = 32;
+static const off_t kMaximumSmallBufferSize = (B_PAGE_SIZE / 4);
+
+
 // constructor
 DataContainer::DataContainer(Volume *volume)
 	: fVolume(volume),
 	  fSize(0),
-	  fCache(NULL)
+	  fCache(NULL),
+	  fSmallBuffer(NULL),
+	  fSmallBufferSize(0)
 {
 }
 
@@ -31,6 +58,10 @@ DataContainer::~DataContainer()
 		fCache->Lock();
 		fCache->ReleaseRefAndUnlock();
 		fCache = NULL;
+	}
+	if (fSmallBuffer != NULL) {
+		free(fSmallBuffer);
+		fSmallBuffer = NULL;
 	}
 }
 
@@ -45,6 +76,8 @@ DataContainer::InitCheck() const
 VMCache*
 DataContainer::GetCache()
 {
+	// TODO: Because we always get the cache for files on creation vs. on demand,
+	// this means files (no matter how small) always use cache mode at present.
 	if (!_IsCacheMode())
 		_SwitchToCacheMode();
 	return fCache;
@@ -57,20 +90,16 @@ DataContainer::Resize(off_t newSize)
 //	PRINT("DataContainer::Resize(%Ld), fSize: %Ld\n", newSize, fSize);
 
 	status_t error = B_OK;
-	if (newSize < fSize) {
-		// shrink
-		if (_IsCacheMode()) {
+	if (_RequiresCacheMode(newSize)) {
+		if (newSize < fSize) {
+			// shrink
 			// resize the VMCache, which will automatically free pages
 			AutoLocker<VMCache> _(fCache);
 			error = fCache->Resize(newSize, VM_PRIORITY_SYSTEM);
 			if (error != B_OK)
 				return error;
 		} else {
-			// small buffer mode: just set the new size (done below)
-		}
-	} else if (newSize > fSize) {
-		// grow
-		if (_RequiresCacheMode(newSize)) {
+			// grow
 			if (!_IsCacheMode())
 				error = _SwitchToCacheMode();
 			if (error != B_OK)
@@ -81,10 +110,17 @@ DataContainer::Resize(off_t newSize)
 
 			// pages will be added as they are written to; so nothing else
 			// needs to be done here.
-		} else {
-			// no need to switch to cache mode: just set the new size
-			// (done below)
 		}
+	} else if (fSmallBufferSize < newSize
+			|| (fSmallBufferSize - newSize) > (kMaximumSmallBufferSize / 2)) {
+		const size_t newBufferSize = max_c(next_power_of_2(newSize),
+			kMinimumSmallBufferSize);
+		void* newBuffer = realloc(fSmallBuffer, newBufferSize);
+		if (newBuffer == NULL)
+			return B_NO_MEMORY;
+
+		fSmallBufferSize = newBufferSize;
+		fSmallBuffer = (uint8*)newBuffer;
 	}
 
 	fSize = newSize;
@@ -109,11 +145,18 @@ DataContainer::ReadAt(off_t offset, void *_buffer, size_t size,
 	size = min(size, size_t(fSize - offset));
 
 	if (!_IsCacheMode()) {
-		// in non-cache mode, we just copy the data directly
-		memcpy(buffer, fSmallBuffer + offset, size);
+		// in non-cache mode, use the "small buffer"
+		if (IS_USER_ADDRESS(buffer)) {
+			error = user_memcpy(buffer, fSmallBuffer + offset, size);
+			if (error != B_OK)
+				size = 0;
+		} else {
+			memcpy(buffer, fSmallBuffer + offset, size);
+		}
+
 		if (bytesRead != NULL)
 			*bytesRead = size;
-		return B_OK;
+		return error;
 	}
 
 	// cache mode
@@ -136,17 +179,24 @@ DataContainer::WriteAt(off_t offset, const void *_buffer, size_t size,
 		return error;
 
 	// resize the container, if necessary
-	if ((offset + size) > fSize)
+	if ((offset + (off_t)size) > fSize)
 		error = Resize(offset + size);
 	if (error != B_OK)
 		return error;
 
 	if (!_IsCacheMode()) {
-		// in non-cache mode, we just copy the data directly
-		memcpy(fSmallBuffer + offset, buffer, size);
+		// in non-cache mode, use the "small buffer"
+		if (IS_USER_ADDRESS(buffer)) {
+			error = user_memcpy(fSmallBuffer + offset, buffer, size);
+			if (error != B_OK)
+				size = 0;
+		} else {
+			memcpy(fSmallBuffer + offset, buffer, size);
+		}
+
 		if (bytesWritten != NULL)
 			*bytesWritten = size;
-		return B_OK;
+		return error;
 	}
 
 	// cache mode
@@ -173,7 +223,7 @@ DataContainer::_RequiresCacheMode(size_t size)
 {
 	// we cannot back out of cache mode after entering it,
 	// as there may be other consumers of our VMCache
-	return _IsCacheMode() || (size > kSmallDataContainerSize);
+	return _IsCacheMode() || (size > kMaximumSmallBufferSize);
 }
 
 // _IsCacheMode
@@ -212,6 +262,10 @@ DataContainer::_SwitchToCacheMode()
 
 	if (fSize != 0)
 		error = _DoCacheIO(0, fSmallBuffer, fSize, NULL, true);
+
+	free(fSmallBuffer);
+	fSmallBuffer = NULL;
+	fSmallBufferSize = 0;
 
 	return error;
 }

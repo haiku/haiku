@@ -46,10 +46,11 @@
 #include "DecorManager.h"
 #include "DesktopSettingsPrivate.h"
 #include "DrawingEngine.h"
-#include "FontManager.h"
+#include "GlobalFontManager.h"
 #include "HWInterface.h"
 #include "InputManager.h"
 #include "Screen.h"
+#include "ScreenManager.h"
 #include "ServerApp.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
@@ -511,12 +512,41 @@ Desktop::Init()
 		fWorkspaces[i].RestoreConfiguration(*fSettings->WorkspacesMessage(i));
 	}
 
-	fVirtualScreen.SetConfiguration(*this,
+	status_t status = fVirtualScreen.SetConfiguration(*this,
 		fWorkspaces[0].CurrentScreenConfiguration());
+	if (status != B_OK) {
+		debug_printf("app_server: Failed to initialize virtual screen configuration: %s\n",
+			strerror(status));
+		return status;
+	}
 
 	if (fVirtualScreen.HWInterface() == NULL) {
 		debug_printf("Could not initialize graphics output. Exiting.\n");
 		return B_ERROR;
+	}
+
+	// now that the mode is set, see if we should increase the default font size
+	if (fSettings->DefaultPlainFont() == *gFontManager->DefaultPlainFont()
+			&& !fSettings->DidLoadFontSettings()) {
+		float fontSize = fSettings->DefaultPlainFont().Size();
+		gScreenManager->Lock();
+		Screen* screen = gScreenManager->ScreenAt(0);
+		if (screen != NULL) {
+			display_mode mode;
+			screen->GetMode(mode);
+
+			if (mode.virtual_width > 3840 && mode.virtual_height > 2160)
+				fontSize *= 2.0f;
+			else if (mode.virtual_width > 1920 && mode.virtual_height > 1080)
+				fontSize *= 1.5f;
+		}
+		gScreenManager->Unlock();
+
+		// modify settings without saving them
+		const_cast<ServerFont&>(fSettings->DefaultPlainFont()).SetSize(fontSize);
+		const_cast<ServerFont&>(fSettings->DefaultBoldFont()).SetSize(fontSize);
+		const_cast<ServerFont&>(fSettings->DefaultFixedFont()).SetSize(fontSize);
+		const_cast<menu_info&>(fSettings->MenuInfo()).font_size = fontSize;
 	}
 
 	HWInterface()->SetDPMSMode(B_DPMS_ON);
@@ -899,6 +929,13 @@ Desktop::SetBrightness(int32 id, float brightness)
 	status_t result = HWInterface()->SetBrightness(brightness);
 
 	if (result == B_OK) {
+		if (fWorkspaces[0].StoredScreenConfiguration().CurrentByID(id) == NULL) {
+			// store the current configuration if empty
+			screen_configuration* current
+				= fWorkspaces[0].CurrentScreenConfiguration().CurrentByID(id);
+			fWorkspaces[0].StoredScreenConfiguration().Set(id,
+				current->has_info ? &current->info : NULL, current->frame, current->mode);
+		}
 		fWorkspaces[0].StoredScreenConfiguration().SetBrightness(id,
 			brightness);
 		// Save brightness for next boot

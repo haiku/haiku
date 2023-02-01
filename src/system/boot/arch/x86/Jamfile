@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot arch x86 ;
 
+SubDirC++Flags -fno-rtti ;
+
 local defines = $(DEFINES) ;
 
 local platform ;
@@ -8,7 +10,6 @@ for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 		SubDirHdrs $(HAIKU_TOP) src system boot platform $(TARGET_BOOT_PLATFORM) ;
 
 		DEFINES = $(defines) ;
-		DEFINES += _BOOT_MODE ;
 
 		if $(TARGET_BOOT_PLATFORM) = efi {
 			if $(TARGET_ARCH) = x86_64 {
@@ -23,6 +24,11 @@ for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 
 		local kernelArchSources =
 			arch_elf.cpp
+		;
+
+		local kernelGenericDriverSources =
+			debug_uart.cpp
+			debug_uart_8250.cpp
 		;
 
 		local kernelArchSpecificSources ;
@@ -42,6 +48,7 @@ for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 		BootMergeObject [ FGristFiles boot_arch_$(TARGET_KERNEL_ARCH).o ] :
 			$(kernelArchSources)
 			$(kernelArchSpecificSources)
+			$(kernelGenericDriverSources)
 			$(kernelLibArchSpecificSources)
 			$(librootOsArchSources)
 			arch_cpu.cpp
@@ -49,8 +56,10 @@ for platform in [ MultiBootSubDirSetup bios_ia32 efi pxe_ia32 ] {
 			: -std=c++11 # additional flags
 		;
 
+		SEARCH on [ FGristFiles $(kernelGenericDriverSources) ]
+			= [ FDirName $(HAIKU_TOP) src system kernel arch generic ] ;
 		SEARCH on [ FGristFiles $(kernelArchSources) ]
-			= [ FDirName $(HAIKU_TOP) src system kernel arch x86 ] ;
+			= [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_KERNEL_ARCH_DIR) ] ;
 
 		if $(TARGET_ARCH) = x86_64 && $(TARGET_BOOT_PLATFORM) = efi {
 			SEARCH on [ FGristFiles $(kernelArchSpecificSources) ]

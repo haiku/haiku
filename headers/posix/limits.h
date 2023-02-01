@@ -44,8 +44,9 @@
 #define PATH_MAX				(1024)
 #define PIPE_BUF				(4 * 1024)
 #define PIPE_MAX				(512)
-#define PTHREAD_KEYS_MAX		256
+#define PTHREAD_KEYS_MAX		(256)
 #define PTHREAD_STACK_MIN		(2 * PAGESIZE)
+#define PTHREAD_DESTRUCTOR_ITERATIONS	(4)
 #define SSIZE_MAX		  		__HAIKU_SADDR_MAX
 #define TTY_NAME_MAX			(256)
 #define TZNAME_MAX		  		(32)
@@ -77,6 +78,21 @@
 #define _POSIX_SEM_NSEMS_MAX	(256)
 
 #define _POSIX2_LINE_MAX		(2048)
+
+#define	BC_BASE_MAX				(99)
+#define BC_DIM_MAX				(2048)
+#define BC_SCALE_MAX			(99)
+#define BC_STRING_MAX			(1000)
+
+
+#define COLL_WEIGHTS_MAX		(10)
+#define	EXPR_NEST_MAX			(32)
+#define	LINE_MAX				(2048)
+
+#define MQ_OPEN_MAX				(0) /* MSG */
+#define MQ_PRIO_MAX				(0) /* MSG */
+
+#define	RE_DUP_MAX				(255) /* for conformance, redefined in regex.h */
 
 #ifdef _XOPEN_SOURCE
 /* The XSI name for PAGESIZE, with extra underscore included. Only define if

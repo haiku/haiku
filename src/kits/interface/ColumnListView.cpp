@@ -2148,18 +2148,21 @@ void
 BColumnListView::_GetChildViewRects(const BRect& bounds, BRect& titleRect,
 	BRect& outlineRect, BRect& vScrollBarRect, BRect& hScrollBarRect)
 {
+	const float vScrollBarWidth = be_control_look->GetScrollBarWidth(B_VERTICAL),
+		hScrollBarHeight = be_control_look->GetScrollBarWidth(B_HORIZONTAL);
+
 	titleRect = bounds;
 	titleRect.bottom = titleRect.top + std::max(kMinTitleHeight,
 		ceilf(be_plain_font->Size() * kTitleSpacing));
 #if !LOWER_SCROLLBAR
-	titleRect.right -= B_V_SCROLL_BAR_WIDTH;
+	titleRect.right -= vScrollBarWidth;
 #endif
 
 	outlineRect = bounds;
 	outlineRect.top = titleRect.bottom + 1.0;
-	outlineRect.right -= B_V_SCROLL_BAR_WIDTH;
+	outlineRect.right -= vScrollBarWidth;
 	if (fShowingHorizontalScrollBar)
-		outlineRect.bottom -= B_H_SCROLL_BAR_HEIGHT;
+		outlineRect.bottom -= hScrollBarHeight;
 
 	vScrollBarRect = bounds;
 #if LOWER_SCROLLBAR
@@ -2167,13 +2170,13 @@ BColumnListView::_GetChildViewRects(const BRect& bounds, BRect& titleRect,
 		ceilf(be_plain_font->Size() * kTitleSpacing));
 #endif
 
-	vScrollBarRect.left = vScrollBarRect.right - B_V_SCROLL_BAR_WIDTH;
+	vScrollBarRect.left = vScrollBarRect.right - vScrollBarWidth;
 	if (fShowingHorizontalScrollBar)
-		vScrollBarRect.bottom -= B_H_SCROLL_BAR_HEIGHT;
+		vScrollBarRect.bottom -= hScrollBarHeight;
 
 	hScrollBarRect = bounds;
-	hScrollBarRect.top = hScrollBarRect.bottom - B_H_SCROLL_BAR_HEIGHT;
-	hScrollBarRect.right -= B_V_SCROLL_BAR_WIDTH;
+	hScrollBarRect.top = hScrollBarRect.bottom - hScrollBarHeight;
+	hScrollBarRect.right -= vScrollBarWidth;
 
 	// Adjust stuff so the border will fit.
 	if (fBorderStyle == B_PLAIN_BORDER || fBorderStyle == B_NO_BORDER) {
@@ -4384,16 +4387,16 @@ OutlineView::AddRow(BRow* row, int32 Index, BRow* parentRow)
 	FixScrollBar(false);
 
 	BRect newRowRect;
-	bool newRowIsInOpenBranch = FindRect(row, &newRowRect);
-
-	if (fFocusRow && fFocusRowRect.top > newRowRect.bottom) {
-		// The focus row has moved.
-		Invalidate(fFocusRowRect);
-		FindRect(fFocusRow, &fFocusRowRect);
-		Invalidate(fFocusRowRect);
-	}
+	const bool newRowIsInOpenBranch = FindRect(row, &newRowRect);
 
 	if (newRowIsInOpenBranch) {
+		if (fFocusRow && fFocusRowRect.top > newRowRect.bottom) {
+			// The focus row has moved.
+			Invalidate(fFocusRowRect);
+			FindRect(fFocusRow, &fFocusRowRect);
+			Invalidate(fFocusRowRect);
+		}
+
 		if (fCurrentState == INACTIVE) {
 			if (newRowRect.bottom < fVisibleRect.top) {
 				// The new row is totally above the current viewport, move

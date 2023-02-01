@@ -1,0 +1,37 @@
+SubDir HAIKU_TOP src kits network libnetservices2 ;
+
+UsePrivateHeaders net ;
+UsePrivateHeaders netservices2 ;
+UsePrivateHeaders support ;
+UsePrivateHeaders shared ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		# Only build on modern GCC
+		if $(TARGET_CC_IS_LEGACY_GCC_$(architecture)) = 1 {
+			continue ;
+		}
+
+		SubDirC++Flags -std=gnu++17 ;
+
+		StaticLibrary <$(architecture)>libnetservices2.a :
+			ErrorsExt.cpp
+			HttpBuffer.cpp
+			HttpFields.cpp
+			HttpParser.cpp
+			HttpRequest.cpp
+			HttpResult.cpp
+			HttpSerializer.cpp
+			HttpSession.cpp
+			HttpTime.cpp
+			NetServicesMisc.cpp
+			;
+
+		LinkAgainst <$(architecture)>libnetservices.a :
+			<$(architecture)>libshared.a ;
+
+	}
+}

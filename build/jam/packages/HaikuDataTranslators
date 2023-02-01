@@ -5,5 +5,7 @@ HaikuPackage $(dataTranslatorsPackage) ;
 
 AddFilesToPackage add-ons Translators	: $(SYSTEM_ADD_ONS_TRANSLATORS) ;
 AddFilesToPackage add-ons media plugins : $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
+AddFilesToPackage add-ons Print : $(SYSTEM_ADD_ONS_PRINT) ;
+AddFilesToPackage add-ons Print transport : $(SYSTEM_ADD_ONS_PRINT_TRANSPORT) ;
 
 BuildHaikuPackage $(dataTranslatorsPackage) : haiku_datatranslators ;

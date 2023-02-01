@@ -22,6 +22,17 @@
 #include "efi_platform.h"
 
 
+//#define TRACE_MMU
+#ifdef TRACE_MMU
+#	define TRACE(x...) dprintf(x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
+//#define TRACE_MEMORY_MAP
+
+
 extern uint64 gLongGDT;
 extern uint64 gLongGDTR;
 segment_descriptor gBootGDT[BOOT_GDT_SEGMENT_COUNT];
@@ -145,6 +156,32 @@ arch_mmu_post_efi_setup(size_t memory_map_size,
 	kRuntimeServices->SetVirtualAddressMap(memory_map_size, descriptor_size,
 		descriptor_version, memory_map);
 
+#ifdef TRACE_MEMORY_MAP
+	dprintf("phys memory ranges:\n");
+	for (uint32_t i = 0; i < gKernelArgs.num_physical_memory_ranges; i++) {
+		uint64 start = gKernelArgs.physical_memory_range[i].start;
+		uint64 size = gKernelArgs.physical_memory_range[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+			start, start + size, size);
+	}
+
+	dprintf("allocated phys memory ranges:\n");
+	for (uint32_t i = 0; i < gKernelArgs.num_physical_allocated_ranges; i++) {
+		uint64 start = gKernelArgs.physical_allocated_range[i].start;
+		uint64 size = gKernelArgs.physical_allocated_range[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+			start, start + size, size);
+	}
+
+	dprintf("allocated virt memory ranges:\n");
+	for (uint32_t i = 0; i < gKernelArgs.num_virtual_allocated_ranges; i++) {
+		uint64 start = gKernelArgs.virtual_allocated_range[i].start;
+		uint64 size = gKernelArgs.virtual_allocated_range[i].size;
+		dprintf("    0x%08" B_PRIx64 "-0x%08" B_PRIx64 ", length 0x%08" B_PRIx64 "\n",
+			start, start + size, size);
+	}
+#endif
+
 	// Important.  Make sure supervisor threads can fault on read only pages...
 	asm("mov %%rax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
 }
@@ -186,8 +223,23 @@ arch_mmu_generate_post_efi_page_tables(size_t memory_map_size,
 	for (size_t i = 0; i < memory_map_size / descriptor_size; ++i) {
 		efi_memory_descriptor *entry
 			= (efi_memory_descriptor *)((addr_t)memory_map + i * descriptor_size);
-		maxAddress = std::max(maxAddress,
-				      entry->PhysicalStart + entry->NumberOfPages * 4096);
+		switch (entry->Type) {
+		case EfiLoaderCode:
+		case EfiLoaderData:
+		case EfiBootServicesCode:
+		case EfiBootServicesData:
+		case EfiConventionalMemory:
+		case EfiRuntimeServicesCode:
+		case EfiRuntimeServicesData:
+		case EfiPersistentMemory:
+		case EfiACPIReclaimMemory:
+		case EfiACPIMemoryNVS:
+			maxAddress = std::max(maxAddress,
+					      entry->PhysicalStart + entry->NumberOfPages * 4096);
+			break;
+		default:
+			break;
+		}
 	}
 
 	// Want to map at least 4GB, there may be stuff other than usable RAM that

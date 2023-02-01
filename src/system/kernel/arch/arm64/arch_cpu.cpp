@@ -12,9 +12,13 @@
 #include <elf.h>
 
 
+extern "C" void _exception_vectors(void);
+
+
 status_t
 arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 {
+	WRITE_SPECIALREG(VBAR_EL1, _exception_vectors);
 	return B_OK;
 }
 

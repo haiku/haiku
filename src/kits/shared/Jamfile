@@ -24,16 +24,13 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		# for BKeymap
 		UsePrivateHeaders interface ;
 
-		# FIXME: These symbols should be hidden, but too many applications depend
-		# on them at present for that.
-		NO_HIDDEN_VISIBILITY on <$(architecture)>libshared.a = 1 ;
-
 		StaticLibrary <$(architecture)>libshared.a :
 			AboutMenuItem.cpp
 			ArgumentVector.cpp
 			AttributeUtilities.cpp
 			BitmapButton.cpp
 			CalendarView.cpp
+			ColorItem.cpp
 			ColorQuantizer.cpp
 			CommandPipe.cpp
 			DateTimeEdit.cpp
@@ -51,6 +48,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Keymap.cpp
 			LongAndDragTrackingFilter.cpp
 			md5.cpp
+			MemoryRingIO.cpp
 			MessageBuilder.cpp
 			NaturalCompare.cpp
 			PromptWindow.cpp
@@ -61,6 +59,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			SettingsHandler.cpp
 			SettingsMessage.cpp
 			ShakeTrackingFilter.cpp
+			StatusView.cpp
 			StringForRate.cpp
 			StringForSize.cpp
 			StripeView.cpp
@@ -68,6 +67,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Thread.cpp
 			ToolBar.cpp
 			Variant.cpp
+			WeakReferenceable.cpp
 			;
 
 		Includes [ FGristFiles Keymap.cpp ]

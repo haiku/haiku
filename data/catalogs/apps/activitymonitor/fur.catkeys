@@ -1,5 +1,5 @@
 1	friulian	x-vnd.Haiku-ActivityMonitor	826097672
-Teams	DataSource		Team
+Teams	DataSource		Teams
 Semaphores	DataSource		Semafars
 TX	DataSource	Shorter version for Sending	TX
 Block cache memory	DataSource		Memorie cache a blocs

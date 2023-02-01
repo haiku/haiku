@@ -22,7 +22,8 @@ struct igc_hw;
 #define IGC_DEV_ID_I220_V			0x15F7
 #define IGC_DEV_ID_I225_K2			0x3101
 #define IGC_DEV_ID_I225_LMVP			0x5502
-#define IGC_DEV_ID_I226_K			0x5504
+#define IGC_DEV_ID_I226_K			0x3102
+#define IGC_DEV_ID_I226_LMVP			0x5503
 #define IGC_DEV_ID_I225_IT			0x0D9F
 #define IGC_DEV_ID_I226_LM			0x125B
 #define IGC_DEV_ID_I226_V			0x125C
@@ -382,7 +383,6 @@ struct igc_phy_operations {
 	s32  (*init_params)(struct igc_hw *);
 	s32  (*acquire)(struct igc_hw *);
 	s32  (*check_reset_block)(struct igc_hw *);
-	s32  (*commit)(struct igc_hw *);
 	s32  (*force_speed_duplex)(struct igc_hw *);
 	s32  (*get_info)(struct igc_hw *);
 	s32  (*set_page)(struct igc_hw *, u16);

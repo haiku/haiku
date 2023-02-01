@@ -96,7 +96,7 @@
 
 #if __cplusplus >= 201103L
 /*!
-	\fn BString::BString(BString&& string)
+	\fn BString::BString(BString&& string) noexcept
 	\brief Move the data from the \a string to this object.
 
 	Create a new string object with the data of another \a string. The
@@ -287,7 +287,7 @@
 
 #if __cplusplus >= 201103L
 /*!
-	\fn BString& BString::operator=(BString&& string)
+	\fn BString& BString::operator=(BString&& string) noexcept
 	\brief Move the contents of \a string to this BString object.
 
 	The \a string will no longer point to the same contents.

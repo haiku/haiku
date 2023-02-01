@@ -554,15 +554,15 @@ register_child_devices(void* cookie)
 	device_attr attrs[] = {
 		// properties of this controller for virtio bus manager
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-			{ string: prettyName }},
+			{ .string = prettyName }},
 		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
-			{ string: VIRTIO_FOR_CONTROLLER_MODULE_NAME }},
+			{ .string = VIRTIO_FOR_CONTROLLER_MODULE_NAME }},
 
 		// private data to identify the device
 		{ VIRTIO_DEVICE_TYPE_ITEM, B_UINT16_TYPE,
-			{ ui16: pciSubDeviceId }},
+			{ .ui16 = pciSubDeviceId }},
 		{ VIRTIO_VRING_ALIGNMENT_ITEM, B_UINT16_TYPE,
-			{ ui16: VIRTIO_PCI_VRING_ALIGN }},
+			{ .ui16 = VIRTIO_PCI_VRING_ALIGN }},
 		{ NULL }
 	};
 
@@ -584,7 +584,7 @@ static status_t
 register_device(device_node* parent)
 {
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Virtio PCI"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "Virtio PCI"}},
 		{}
 	};
 

@@ -46,7 +46,7 @@ blend_gamma(uint16 b1, uint16 b2, uint16 b3, uint8 ba,	// bottom components
 		*da = 255;
 	} else {
 		uint8 alphaRest = 255 - ta;
-		register uint32 alphaTemp = (65025 - alphaRest * (255 - ba));
+		uint32 alphaTemp = (65025 - alphaRest * (255 - ba));
 		uint32 alphaDest = ba * alphaRest;
 		uint32 alphaSrc = 255 * ta;
 		*d1 = kInverseGammaTable[(b1 * alphaDest + t1 * alphaSrc) / alphaTemp];

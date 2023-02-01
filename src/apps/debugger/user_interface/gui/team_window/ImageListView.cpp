@@ -300,6 +300,7 @@ void
 ImageListView::_Init()
 {
 	fImagesTable = new Table("images list", 0, B_FANCY_BORDER);
+	fImagesTable->SetFont(B_FONT_ROW, be_fixed_font);
 	AddChild(fImagesTable->ToView());
 
 	// columns

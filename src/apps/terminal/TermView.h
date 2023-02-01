@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Haiku, Inc.
+ * Copyright 2001-2023, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
@@ -353,6 +353,7 @@ private:
 			bool				fUseOptionAsMetaKey;
 			bool				fInterpretMetaKey;
 			bool				fMetaKeySendsEscape;
+			bool				fUseBracketedPaste;
 
 			// mouse
 			int32				fMouseButtons;

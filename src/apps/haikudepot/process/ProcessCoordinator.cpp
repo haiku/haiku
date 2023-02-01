@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2018-2022, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -9,6 +9,7 @@
 #include <AutoLocker.h>
 #include <Catalog.h>
 #include <StringFormat.h>
+#include <Uuid.h>
 
 #include "Logger.h"
 
@@ -16,15 +17,54 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ProcessCoordinator"
 
+#define LOCK_TIMEOUT_MICROS (1000 * 1000)
+
+// These are keys that are used to store the ProcessCoordinatorState data into
+// a BMessage instance.
+
+#define KEY_PROCESS_COORDINATOR_IDENTIFIER	"processCoordinatorIdentifier"
+#define KEY_PROGRESS						"progress"
+#define KEY_MESSAGE							"message"
+#define KEY_IS_RUNNING						"isRunning"
+#define KEY_ERROR_STATUS					"errorStatus"
+
 
 // #pragma mark - ProcessCoordinatorState implementation
+
+
+ProcessCoordinatorState::ProcessCoordinatorState(BMessage* from)
+{
+	if (from->FindString(KEY_PROCESS_COORDINATOR_IDENTIFIER,
+			&fProcessCoordinatorIdentifier) != B_OK) {
+		HDFATAL("unable to find the key [%s]",
+			KEY_PROCESS_COORDINATOR_IDENTIFIER);
+	}
+
+	if (from->FindFloat(KEY_PROGRESS, &fProgress) != B_OK) {
+		HDFATAL("unable to find the key [%s]", KEY_PROGRESS);
+	}
+
+	if (from->FindString(KEY_MESSAGE, &fMessage) != B_OK) {
+		HDFATAL("unable to find the key [%s]", KEY_MESSAGE);
+	}
+
+	if (from->FindBool(KEY_IS_RUNNING, &fIsRunning) != B_OK) {
+		HDFATAL("unable to find the key [%s]", KEY_IS_RUNNING);
+	}
+
+	int64 errorStatusNumeric;
+	if (from->FindInt64(KEY_ERROR_STATUS, &errorStatusNumeric) != B_OK) {
+		HDFATAL("unable to find the key [%s]", KEY_ERROR_STATUS);
+	}
+	fErrorStatus = static_cast<status_t>(errorStatusNumeric);
+}
 
 
 ProcessCoordinatorState::ProcessCoordinatorState(
 	const ProcessCoordinator* processCoordinator, float progress,
 	const BString& message, bool isRunning, status_t errorStatus)
 	:
-	fProcessCoordinator(processCoordinator),
+	fProcessCoordinatorIdentifier(processCoordinator->Identifier()),
 	fProgress(progress),
 	fMessage(message),
 	fIsRunning(isRunning),
@@ -38,10 +78,10 @@ ProcessCoordinatorState::~ProcessCoordinatorState()
 }
 
 
-const ProcessCoordinator*
-ProcessCoordinatorState::Coordinator() const
+const BString
+ProcessCoordinatorState::ProcessCoordinatorIdentifier() const
 {
-	return fProcessCoordinator;
+	return fProcessCoordinatorIdentifier;
 }
 
 
@@ -73,15 +113,39 @@ ProcessCoordinatorState::ErrorStatus() const
 }
 
 
+status_t
+ProcessCoordinatorState::Archive(BMessage* into, bool deep) const
+{
+	status_t result = B_OK;
+	if (result == B_OK) {
+		result = into->AddString(KEY_PROCESS_COORDINATOR_IDENTIFIER,
+			fProcessCoordinatorIdentifier);
+	}
+	if (result == B_OK)
+		result = into->AddFloat(KEY_PROGRESS, fProgress);
+	if (result == B_OK)
+		result = into->AddString(KEY_MESSAGE, fMessage);
+	if (result == B_OK)
+		result = into->AddBool(KEY_IS_RUNNING, fIsRunning);
+	if (result == B_OK)
+		result = into->AddInt64(KEY_ERROR_STATUS, static_cast<int64>(fErrorStatus));
+	return result;
+}
+
+
 // #pragma mark - ProcessCoordinator implementation
 
 
 ProcessCoordinator::ProcessCoordinator(const char* name, BMessage* message)
 	:
 	fName(name),
+	fLock(),
+	fCoordinateAndCallListenerRerun(false),
+	fCoordinateAndCallListenerRerunLock(),
 	fListener(NULL),
 	fMessage(message),
-	fWasStopped(false)
+	fWasStopped(false),
+	fIdentifier(BUuid().ToString())
 {
 }
 
@@ -97,9 +161,15 @@ ProcessCoordinator::~ProcessCoordinator()
 	delete fMessage;
 }
 
+const BString&
+ProcessCoordinator::Identifier() const
+{
+	return fIdentifier;
+}
+
 
 void
-ProcessCoordinator::SetListener(ProcessCoordinatorListener *listener)
+ProcessCoordinator::SetListener(ProcessCoordinatorListener* listener)
 {
 	fListener = listener;
 }
@@ -110,6 +180,7 @@ ProcessCoordinator::AddNode(AbstractProcessNode* node)
 {
 	AutoLocker<BLocker> locker(&fLock);
 	fNodes.AddItem(node);
+	node->SetListener(this);
 	node->Process()->SetListener(this);
 }
 
@@ -126,7 +197,8 @@ ProcessCoordinator::IsRunning()
 {
 	AutoLocker<BLocker> locker(&fLock);
 	for (int32 i = 0; i < fNodes.CountItems(); i++) {
-		if (_IsRunning(fNodes.ItemAt(i)))
+		AbstractProcessNode* node = fNodes.ItemAt(i);
+		if (node->IsRunning())
 			return true;
 	}
 
@@ -237,13 +309,15 @@ ProcessCoordinator::_CreateStatusMessage()
 
 	for (int32 i = fNodes.CountItems() - 1; i >= 0; i--) {
 		AbstractProcess* process = fNodes.ItemAt(i)->Process();
-
 		if (process->ProcessState() == PROCESS_RUNNING) {
 			if (firstProcessDescription.IsEmpty()) {
-				firstProcessDescription = process->Description();
-			} else {
-				additionalRunningProcesses++;
+				if (strlen(process->Description()) != 0)
+					firstProcessDescription = process->Description();
+				else
+					additionalRunningProcesses++;
 			}
+			else
+				additionalRunningProcesses++;
 		}
 	}
 
@@ -274,13 +348,40 @@ ProcessCoordinator::_CreateStatus()
 }
 
 
+/*! This will try to obtain the lock and if it cannot obtain the lock then
+    it will flag that when the coordinator has finished its current
+    coordination, it should initiate another coordination.
+ */
 void
 ProcessCoordinator::_CoordinateAndCallListener()
 {
+	if (fLock.LockWithTimeout(LOCK_TIMEOUT_MICROS) != B_OK) {
+		HDDEBUG("[Coordinator] would coordinate nodes, but coordination is "
+			"in progress - will defer");
+		AutoLocker<BLocker> locker(&fCoordinateAndCallListenerRerunLock);
+		fCoordinateAndCallListenerRerun = true;
+		return;
+	}
+
 	ProcessCoordinatorState state = _Coordinate();
 
 	if (fListener != NULL)
 		fListener->CoordinatorChanged(state);
+
+	fLock.Unlock();
+
+	bool coordinateAndCallListenerRerun = false;
+
+	{
+		AutoLocker<BLocker> locker(&fCoordinateAndCallListenerRerunLock);
+		coordinateAndCallListenerRerun = fCoordinateAndCallListenerRerun;
+		fCoordinateAndCallListenerRerun = false;
+	}
+
+	if (coordinateAndCallListenerRerun) {
+		HDDEBUG("[Coordinator] will run deferred coordination");
+		_CoordinateAndCallListener();
+	}
 }
 
 
@@ -344,13 +445,6 @@ ProcessCoordinator::_StopSuccessorNodes(AbstractProcessNode* predecessorNode)
 			_StopSuccessorNodes(node);
 		}
 	}
-}
-
-
-bool
-ProcessCoordinator::_IsRunning(AbstractProcessNode* node)
-{
-	return node->Process()->ProcessState() != PROCESS_COMPLETE;
 }
 
 

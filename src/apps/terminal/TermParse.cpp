@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Haiku, Inc.
+ * Copyright 2001-2023, Haiku, Inc. All rights reserved.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Parts Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  * Distributed under the terms of the MIT license.
@@ -1420,6 +1420,10 @@ TermParse::_DecPrivateModeSet(int value)
 			fBuffer->SaveCursor();
 			fBuffer->UseAlternateScreenBuffer(true);
 			break;
+		case 2004:
+			// Enable bracketed paste mode
+			fBuffer->EnableBracketedPasteMode(true);
+			break;
 	}
 }
 
@@ -1497,6 +1501,10 @@ TermParse::_DecPrivateModeReset(int value)
 			// Use Normal Screen Buffer and restore cursor as in DECRC.
 			fBuffer->UseNormalScreenBuffer();
 			fBuffer->RestoreCursor();
+			break;
+		case 2004:
+			// Disable bracketed paste mode
+			fBuffer->EnableBracketedPasteMode(false);
 			break;
 	}
 }

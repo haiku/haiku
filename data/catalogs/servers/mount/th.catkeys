@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-mount_server	2818767263
+1	thai	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		เมานต์อ่านอย่างเดียว
 Error mounting volume:\n\n%s	AutoMounter		ข้อผิดพลาดในการติดตั้งกลุ่ม:\n\n%s
 Cancel	AutoMounter		ยกเลิก
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		เมานต์กลุ่ม '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		ไม่สามารถถอดดิสก์\"%s\":\n\t%s\n\nควรยกเลิกการต่อเชื่อมหรือไม่\n\nหมายเหตุ: หากแอปพลิเคชันกำลังเขียนไปที่กลุ่ม การยกเลิกการต่อเชื่อมมันอาจทำให้ข้อมูลสูญหาย\n
 Force unmount	AutoMounter		บังคับให้ unmount
 Mount error	AutoMounter		เมานต์ผิดพลาด
-Mounting volume <unnamed volume>\n\n	AutoMounter		เมานต์กลุ่ม<unnamed volume>\n\n
 Mount warning	AutoMounter		เตือนเมานต์

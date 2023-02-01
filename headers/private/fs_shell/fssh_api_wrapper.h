@@ -173,6 +173,8 @@
 
 #undef	offsetof
 #define offsetof(type,member)	fssh_offsetof(type,member)
+#undef	alignof
+#define alignof(type)	fssh_alignof(type)
 
 #define min_c(a,b)				fssh_min_c(a,b)
 #define max_c(a,b)				fssh_max_c(a,b)

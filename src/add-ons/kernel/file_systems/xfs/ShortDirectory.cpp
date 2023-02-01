@@ -12,8 +12,8 @@ ShortDirectory::ShortDirectory(Inode* inode)
 	fInode(inode),
 	fTrack(0)
 {
-
-	fHeader = (ShortFormHeader*)(DIR_DFORK_PTR(fInode->Buffer()));
+	fHeader = (ShortFormHeader*)(DIR_DFORK_PTR(fInode->Buffer(), fInode->CoreInodeSize()));
+	fLastEntryOffset = 0;
 }
 
 
@@ -72,8 +72,8 @@ size_t
 ShortDirectory::EntrySize(int namelen)
 {
 	return sizeof(ShortFormEntry) + namelen
-			+ (fInode->HasFileTypeField()? sizeof(uint8) : 0)
-			+ (fHeader->i8count? sizeof(uint64):sizeof(uint32));
+			+ (fInode->HasFileTypeField() ? sizeof(uint8) : 0)
+			+ (fHeader->i8count ? sizeof(uint64) : sizeof(uint32));
 }
 
 
@@ -155,7 +155,6 @@ ShortDirectory::GetNext(char* name, size_t* length, xfs_ino_t* ino)
 			name[entry->namelen] = '\0';
 			*length = entry->namelen + 1;
 			*ino = GetEntryIno(entry);
-
 			TRACE("Entry found. Name: (%s), Length: (%" B_PRIuSIZE "),ino: (%" B_PRIu64 ")\n",
 				name,*length, *ino);
 			return B_OK;

@@ -1,13 +1,5 @@
-Filesystem drivers
-====================================
-
-Filesystem drivers are in src/add-ons/kernel/file_system
-
-A filesystem usually relies on an underlying block device, but that's not
-required. For example, NFS is a network filesystem, so it doesn't need one.
-
-Implementation notes
---------------------
+File systems overview
+---------------------
 
 Each filesystem driver must define a few structures which act as the
 interface between the VFS and the filesystem implementation. These
@@ -42,7 +34,8 @@ contents.
 Development tools
 -----------------
 
-# fs_shell
+fs_shell
+........
 
 It is not convenient to test a filesystem by reloading its driver into a
 running Haiku system (kernel debugging is often not as easy as userland).
@@ -70,7 +63,8 @@ argument. You need some tool to create one. It is possible to work using an
 actual disk volume (but be careful, it's risky to use one with useful data in it),
 a file, or a RAM disk, depending on what you are doing.
 
-# userlandfs
+userlandfs
+..........
 
 As a second step, it's possible to use the filesystem as part of a runing
 system, while still running it in userland. This allows use of Debugger,
@@ -81,13 +75,9 @@ Userlandfs can run the filesystem code using the same interface as the kernel,
 therefore, once everything is working with userlandfs, running the filesystem
 as kernel code is usually quite easy (and provides a performance boost)
 
-# Torture and performance tests
+Torture and performance tests
+.............................
 
 Once the basic operations are working fine, it is a good idea to perform more
 agressive testing. Examples of scripts doing this are available in
 src/tests/add-ons/kernel/file_systems/ for the fat and ext2 filesystems.
-
-.. toctree::
-
-   /file_systems/ufs2
-   /file_systems/befs/resources

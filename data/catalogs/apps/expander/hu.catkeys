@@ -1,51 +1,52 @@
-1	hungarian	x-vnd.Haiku-Expander	3300517306
-Expand	ExpanderMenu		Kicsomagol
-Expanding '%s'…	ExpanderWindow		'%s' kicsomagolása…
-Close window when done expanding	ExpanderPreferences		A kicsomagolás végeztével zárja be az ablakot
-Set destination…	ExpanderMenu		Célmappa megadása…
-Use:	ExpanderPreferences		Hasznája ezt:
-File expanded	ExpanderWindow		A fájl kicsomagolva
-The destination is read only.	ExpanderWindow		A cél írásvédett.
-Expander: Open	ExpanderWindow		Kicsomagoló: Megnyitás
- is not supported	ExpanderWindow		nem támogatott
-Expander settings	ExpanderPreferences		Kicsomagoló beállításai
-Select current	DirectoryFilePanel		Jelenlegi kiválasztása
-Source	ExpanderWindow		Csomag
-Error when expanding archive	ExpanderWindow		Hiba történt a kicsomagolás közben
-Hide contents	ExpanderWindow		Tartalom elrejtése
-Cancel	ExpanderWindow		Mégse
-Automatically expand files	ExpanderPreferences		Fájlok automatikus kicsomagolása
-Continue	ExpanderWindow		Folytatás
-Destination folder	ExpanderPreferences		Célmappa
-Other	ExpanderPreferences		Egyéb
-Cancel	ExpanderPreferences		Mégse
-Expansion	ExpanderPreferences		Kicsomagolás
-Select	DirectoryFilePanel		Kiválaszt
-The folder was either moved, renamed or not supported.	ExpanderWindow		A mappa át lett helyezve, át lett nevezve vagy nem használható.
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		A célmappa nem létezik. Létre szeretnéd hozni?
-Same directory as source (archive) file	ExpanderPreferences		A mappa amiben a forrásfájl (archívum) van
-Settings	ExpanderMenu		Beállítások
-Settings…	ExpanderMenu		Beállítások…
-Expander: Choose destination	DirectoryFilePanel		Kicsomagoló: Cél választása
-Select	ExpanderPreferences		Kiválasztás
-Show contents	ExpanderWindow		Tartalom megjelenítése
-Automatically show contents listing	ExpanderPreferences		Tartalom listázása automatikusan
-OK	ExpanderPreferences		Rendben
-Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Biztosan le akarod állítani a kicsomagolást? A kicsomagolt elemek hiányosak lehetnek.
-Leave destination folder path empty	ExpanderPreferences		Hagyja üresen a célmappa útvonalát
-Failed to create the destination folder.	ExpanderWindow		Nem sikerült létrehozni a célmappát.
-Select '%s'…	DirectoryFilePanel		'%s' kiválasztása
-Create	ExpanderWindow		Létrehozás
-The file doesn't exist	ExpanderWindow		A fájl nem létezik
-Stop	ExpanderMenu		Leállítás
-File	ExpanderMenu		Fájl
-Expander	System name		Kicsomagoló
-Expand	ExpanderWindow		Kicsomagol
-Close	ExpanderMenu		Bezár
-The destination is not a folder.	ExpanderWindow		A cél nem egy mappa.
-Open destination folder after extraction	ExpanderPreferences		Kicsomagolás után nyissa meg a célmappát
-Creating listing for '%s'…	ExpanderWindow		'%s' lista létrehozása…
-Set source…	ExpanderMenu		Csomag megadása…
-Show contents	ExpanderMenu		Tartalom megjelenítése
-Stop	ExpanderWindow		Leállítás
+1	hungarian	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Célmappa
+Other	ExpanderPreferences		Egyéb
+Automatically show contents listing	ExpanderPreferences		Tartalom listázása automatikusan
+Expander	System name		Kicsomagoló
+Expander: Choose destination	DirectoryFilePanel		Kicsomagoló: Cél választása
+Set source…	ExpanderMenu		Csomag megadása…
+OK	ExpanderWindow		Rendben
+The destination is not a folder.	ExpanderWindow		A cél nem egy mappa.
+The folder was either moved, renamed or not supported.	ExpanderWindow		A mappa át lett helyezve, át lett nevezve vagy nem használható.
+Close window when done expanding	ExpanderPreferences		A kicsomagolás végeztével zárja be az ablakot
+Close	ExpanderMenu		Bezár
+Create	ExpanderWindow		Létrehozás
+Creating listing for '%s'…	ExpanderWindow		'%s' lista létrehozása…
+Show contents	ExpanderMenu		Tartalom megjelenítése
+Are you sure you want to stop expanding this archive? The expanded items may not be complete.	ExpanderWindow		Biztosan le akarod állítani a kicsomagolást? A kicsomagolt elemek hiányosak lehetnek.
+Settings	ExpanderMenu		Beállítások
+Expand	ExpanderWindow		Kicsomagol
+Open destination folder after extraction	ExpanderPreferences		Kicsomagolás után nyissa meg a célmappát
+Same directory as source (archive) file	ExpanderPreferences		A mappa amiben a forrásfájl (archívum) van
+Stop	ExpanderWindow		Leállítás
+Cancel	ExpanderWindow		Mégse
+Expander settings	ExpanderPreferences		Kicsomagoló beállításai
+Error when expanding archive	ExpanderWindow		Hiba történt a kicsomagolás közben
+Expand	ExpanderMenu		Kicsomagol
+Failed to create the destination folder.	ExpanderWindow		Nem sikerült létrehozni a célmappát.
+Settings…	ExpanderMenu		Beállítások…
+Select current	DirectoryFilePanel		Jelenlegi kiválasztása
+Expanding '%s'…	ExpanderWindow		'%s' kicsomagolása…
+OK	ExpanderPreferences		Rendben
+File expanded	ExpanderWindow		A fájl kicsomagolva
+Automatically expand files	ExpanderPreferences		Fájlok automatikus kicsomagolása
+Select	DirectoryFilePanel		Kiválaszt
+Show contents	ExpanderWindow		Tartalom megjelenítése
+Stop	ExpanderMenu		Leállítás
+Select '%s'…	DirectoryFilePanel		'%s' kiválasztása
+Expansion	ExpanderPreferences		Kicsomagolás
+Set destination…	ExpanderMenu		Célmappa megadása…
+Continue	ExpanderWindow		Folytatás
+ is not supported	ExpanderWindow		nem támogatott
+Cancel	ExpanderPreferences		Mégse
+Use:	ExpanderPreferences		Hasznája ezt:
+Destination folder	ExpanderPreferences		Célmappa
+Expander: Open	ExpanderWindow		Kicsomagoló: Megnyitás
+Leave destination folder path empty	ExpanderPreferences		Hagyja üresen a célmappa útvonalát
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		A célmappa nem létezik. Létre szeretnéd hozni?
+The file doesn't exist	ExpanderWindow		A fájl nem létezik
+Hide contents	ExpanderWindow		Tartalom elrejtése
+Source	ExpanderWindow		Csomag
+The destination is read only.	ExpanderWindow		A cél írásvédett.
+Select	ExpanderPreferences		Kiválasztás
+File	ExpanderMenu		Fájl

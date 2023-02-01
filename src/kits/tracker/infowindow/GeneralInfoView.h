@@ -36,6 +36,7 @@ All rights reserved.
 #define GENERALINFOVIEW_H
 
 
+#include <fs_info.h>
 #include <GroupView.h>
 #include <MenuField.h>
 #include <Message.h>
@@ -95,6 +96,7 @@ private:
 	BString fCreatedStr;
 	BString fKindStr;
 	BString fDescStr;
+	BString fFileSystemStr;
 
 	off_t fFreeBytes;
 	off_t fLastSize;

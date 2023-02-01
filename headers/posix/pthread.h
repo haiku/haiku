@@ -49,6 +49,7 @@
 #define PTHREAD_PRIO_INHERIT		1
 #define PTHREAD_PRIO_PROTECT		2
 
+
 /* private structure */
 struct __pthread_cleanup_handler {
 	struct __pthread_cleanup_handler *previous;

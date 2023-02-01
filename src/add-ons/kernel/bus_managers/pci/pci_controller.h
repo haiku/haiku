@@ -38,6 +38,7 @@ extern "C" {
 #endif
 
 status_t	pci_controller_init(void);
+status_t	pci_controller_finalize(void);
 status_t	pci_controller_add(pci_controller *controller, void *cookie);
 
 #ifdef __cplusplus

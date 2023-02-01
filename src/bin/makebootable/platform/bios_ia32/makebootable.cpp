@@ -13,7 +13,6 @@
 #include <sys/stat.h>
 
 #include <ByteOrder.h>
-#include <Drivers.h>
 #include <Entry.h>
 #include <File.h>
 #include <fs_info.h>
@@ -48,6 +47,7 @@
 
 #	include <DiskDevice.h>
 #	include <DiskDeviceRoster.h>
+#	include <Drivers.h>
 #	include <Partition.h>
 #	include <Path.h>
 

@@ -615,6 +615,13 @@
 #define NV32_NV4E_I2CBUS_1	0x00600874
 #define NV32_NV4E_I2CBUS_2	0x00600850
 
+#define NV32_NV50_I2CBUS_0	0x0000e138 //confirmed
+#define NV32_NV50_I2CBUS_8	0x0000e150 //?
+#define NV32_NV50_I2CBUS_1	0x0000e168 //confirmed HDMI
+#define NV32_NV50_I2CBUS_2	0x0000e180 //confirmed laptop panel
+#define NV32_NV50_I2CBUS_6	0x0000e254 //?
+#define NV32_NV50_I2CBUS_7	0x0000e274 //?
+
 /* secondary head */
 #define NV8_ATTR2INDW		0x006033c0
 #define NV8_ATTR2DATW		0x006033c0
@@ -692,6 +699,7 @@
 #define NVDAC_FP_DEBUG3		0x0068088c
 #define NVDAC_FP_TMDS_CTRL	0x006808b0
 #define NVDAC_FP_TMDS_DATA	0x006808b4
+
 /* secondary head */
 #define NVDAC2_CURPOS		0x00682300
 #define NVDAC2_NV10_CURSYNC	0x00682404
@@ -725,6 +733,10 @@
 #define NVDAC2_FP_DEBUG3	0x0068288c
 #define NVDAC2_FP_TMDS_CTRL	0x006828b0//verify!!!
 #define NVDAC2_FP_TMDS_DATA	0x006828b4//verify!!!
+
+/* NV50 specific, CRTC offset = 0x540 */
+#define NVDAC_CRTC_FB_PITCH	0x00610b20 // | linear = 0x00100000
+#define NVDAC_CRTC_FB_POS	0x00610b28
 
 /* Nvidia CRTC indexed registers */
 /* VGA standard registers: */

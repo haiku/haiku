@@ -108,15 +108,15 @@ WMIACPI::Scan()
 		_GuidToGuidString(guid, guidString);
 		device_attr attrs[] = {
 			// connection
-			{ WMI_GUID_STRING_ITEM, B_STRING_TYPE, { string: guidString }},
+			{ WMI_GUID_STRING_ITEM, B_STRING_TYPE, { .string = guidString }},
 
-			{ WMI_BUS_COOKIE, B_UINT32_TYPE, { ui32: index }},
+			{ WMI_BUS_COOKIE, B_UINT32_TYPE, { .ui32 = index }},
 
 			// description of peripheral drivers
-			{ B_DEVICE_BUS, B_STRING_TYPE, { string: "wmi" }},
+			{ B_DEVICE_BUS, B_STRING_TYPE, { .string = "wmi" }},
 
 			{ B_DEVICE_FLAGS, B_UINT32_TYPE,
-				{ ui32: B_FIND_MULTIPLE_CHILDREN }},
+				{ .ui32 = B_FIND_MULTIPLE_CHILDREN }},
 
 			{ NULL }
 		};
@@ -412,7 +412,7 @@ wmi_acpi_register_device(device_node *node)
 {
 	CALLED();
 	device_attr attrs[] = {
-		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "WMI ACPI" }},
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = "WMI ACPI" }},
 		{ NULL }
 	};
 

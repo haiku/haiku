@@ -1,24 +1,18 @@
-1	portuguese (brazil)	x-vnd.Haiku-Devices	3345509916
+1	portuguese (brazil)	x-vnd.Haiku-Devices	907968852
 ACPI bus	DevicesView		Barramento ACPI
 Encryption controller	Device		Controlador de criptografia
-Bus Information	Device		Informações de Barramento
 Devices	System name		Dispositivo
 Graphics Peripheral	DeviceSCSI		Periférico Gráfico
 Processor	Device		Processador
 Generate system information	DevicesView		Gerar informações do sistema
 Class info	DevicePCI		Informações da Classe
-ACPI Information	DeviceACPI		Informação de ACPI
-Detailed	DevicesView		Detalhado
 Computer	DevicesView		Computador
 Communications	DeviceSCSI		Comunicações
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Informação de Classe:\t\t\t\t: %classInfo%
 Mass storage controller	Device		Controlador de armazenamento em massa
 Connection	DevicesView		Conexão
 Printer	DeviceSCSI		Impressora
 ACPI Processor Namespace '%2'	DeviceACPI		Espaço de Nome do Processador ACPI '%2'
-SCSI Information	DeviceSCSI		Informações sobre SCSI
 Manufacturer	Device		Fabricante
-Device name:	Device		Nome do dispositivo:
 Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Controlador de memória
 Unknown device	DevicesView		Dispositivo desconhecido
@@ -27,7 +21,6 @@ ACPI node '%1'	DeviceACPI		Módulo ACPI '%1'
 Optical Drive	DeviceSCSI		Drive Óptico
 Name	PropertyList		Nome
 Manufacturer	DeviceSCSI		Fabricante
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nome do Dispositivo\t\t\t\t: %Name%\nFabricante\t\t\t: %Manufacturer%\nDriver usado\t\t\t\t: %DriverUsed%\nCaminho do Dispositivo\t: %DevicePaths%
 Device name	Device		Nome do dispositivo
 Satellite communications controller	Device		Controlador de comunicações via satélite
 Device class	DeviceSCSI		Classe de Dispositivo
@@ -36,14 +29,12 @@ Input device controller	Device		Controlador de dispositivo de entrada
 PCI bus	DevicesView		Barramento PCI
 ACPI System Indicator	DeviceACPI		Indicador de Sistema ACPI
 ACPI System Bus	DeviceACPI		Barramento de Sistema ACPI
-PCI Information	DevicePCI		Informações PCI
 Tape Drive	DeviceSCSI		Unidade de Fita
 Changer	DeviceSCSI		Seletor
 Serial bus controller	Device		Controlador de barramento serial
 Refresh devices	DevicesView		Atualizar dispositivos
 Category	DevicesView		Categoria
 RBC	DeviceSCSI		RBC
-None	Device		Nenhum
 Device paths	Device		Caminho dos dispositivos
 Unknown device	Device		Dispositivo desconhecido
 Wireless controller	Device		Controlador sem fio
@@ -53,27 +44,23 @@ Devices	DevicesView		Dispositivo
 Device name	DeviceACPI		Nome do dispositivo
 Card Reader	DeviceSCSI		Leitor de cartões
 Display controller	Device		Controlador de Tela
-Basic information	DevicesView		Informações básicas
 ACPI Button '%1'	DeviceACPI		Botão ACPI '%1'
-Bus	DevicesView		Barramento
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nome do dispositivo
 Disk Drive	DeviceSCSI		Drive de Disco
-Other	DeviceSCSI		Outro
 Report compatibility	DevicesView		Relatório de compatibilidade
+Other	DeviceSCSI		Outro
 Computer	Device		Computador
 PCI bus	Device		Barramento PCI
 Enclosure	DeviceSCSI		Anexo
-Order by:	DevicesView		Ordenar por:
 ACPI Thermal Zone	DeviceACPI		Zona Térmica ACPI
+Order by:	DevicesView		Ordenar por:
 Intelligent controller	Device		Controlador inteligente
 Multimedia controller	Device		Controlador multimídia
 Quit	DevicesView		Sair
 ISA bus	Device		Barramento ISA
 ISA bus	DevicesView		Barramento ISA
 Processor	DeviceSCSI		Processador
-Manufacturer:	Device		Fabricante:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Informação de Classe:\t\t\t\t: %classInfo%
 Bridge	Device		Bridge
 Worm	DeviceSCSI		Worm
 CD-ROM	DeviceSCSI		CD-ROM

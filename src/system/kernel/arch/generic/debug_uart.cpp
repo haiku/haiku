@@ -13,6 +13,12 @@ DebugUART::Out8(int reg, uint8 value)
 #if defined(__ARM__) || defined(__aarch64__)
 	// 32-bit aligned
 	*((uint8 *)Base() + reg * sizeof(uint32)) = value;
+#elif defined(__i386__) || defined(__x86_64__)
+	// outb for access to IO space.
+	if ((Base() + reg) <= 0xFFFF)
+		__asm__ volatile ("outb %%al,%%dx" : : "a" (value), "d" (Base() + reg));
+	else
+		*((uint8 *)Base() + reg) = value;
 #else
 	*((uint8 *)Base() + reg) = value;
 #endif
@@ -25,6 +31,14 @@ DebugUART::In8(int reg)
 #if defined(__ARM__) || defined(__aarch64__)
 	// 32-bit aligned
 	return *((uint8 *)Base() + reg * sizeof(uint32));
+#elif defined(__i386__) || defined(__x86_64__)
+	// inb for access to IO space.
+	if ((Base() + reg) <= 0xFFFF) {
+		uint8 _v;
+		__asm__ volatile ("inb %%dx,%%al" : "=a" (_v) : "d" (Base() + reg));
+		return _v;
+	}
+	return *((uint8 *)Base() + reg);
 #else
 	return *((uint8 *)Base() + reg);
 #endif

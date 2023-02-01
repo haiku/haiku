@@ -103,7 +103,8 @@ struct DeviceListItemView::Renderer {
 	float ItemWidth()
 	{
 		float width = 4.0f;
-		width += be_plain_font->StringWidth(fTitle) + 16.0f;
+		width += be_plain_font->StringWidth(fTitle) +
+			(fPrimaryIcon != NULL ? fPrimaryIcon->Bounds().Width() : 16.0f);
 		return width;
 	}
 
@@ -129,7 +130,7 @@ DeviceListItemView::Update(BView* owner, const BFont* font)
 	renderer.SetTitle(fTitle);
 	SetRenderParameters(renderer);
 	SetWidth(renderer.ItemWidth());
-};
+}
 
 
 void
@@ -140,18 +141,18 @@ DeviceListItemView::DrawItem(BView* owner, BRect frame, bool complete)
 	renderer.SetTitle(Label());
 	SetRenderParameters(renderer);
 	renderer.Render(owner, frame, complete);
-};
+}
 
 
 void
 DeviceListItemView::SetRenderParameters(Renderer& renderer)
 {
-	if (fInputType == MOUSE_TYPE)
-		renderer.AddIcon(&Icons()->mouseIcon);
-
-	else if (fInputType == TOUCHPAD_TYPE)
-		renderer.AddIcon(&Icons()->touchpadIcon);
-
-	else if (fInputType == KEYBOARD_TYPE)
-		renderer.AddIcon(&Icons()->keyboardIcon);
+	if (Icons() != NULL) {
+		if (fInputType == MOUSE_TYPE)
+			renderer.AddIcon(&Icons()->mouseIcon);
+		else if (fInputType == TOUCHPAD_TYPE)
+			renderer.AddIcon(&Icons()->touchpadIcon);
+		else if (fInputType == KEYBOARD_TYPE)
+			renderer.AddIcon(&Icons()->keyboardIcon);
+	}
 }

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-DriveSetup	1552940342
+1	english	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		无法卸载分区 %s。
 Mount all	MainWindow		挂载所有磁盘
 Disk	MainWindow		磁盘
@@ -6,10 +6,15 @@ Are you sure you want to write the changes back to disk now?\n\nAll data on the 
 Device	PartitionList		设备
 Initialize	MainWindow		初始化
 Could not change the parameters of the selected partition.	MainWindow		无法修改所选分区参数。
+PGP encrypted	Encryption utils		PGP 加密
 Delete partition	MainWindow		删除分区
 Error: 	MainWindow	in any error alert	错误：
+Removable	PartitionList		可移动
+Block size	PartitionList		块大小
 The panel experienced a problem!	MainWindow		面板遇到问题！
 Device	DiskView		设备
+Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		确定格式化 Intel 扩展分区？所有子分区将会被覆盖。在这些修改被写入磁盘之前将再次提醒您。
+Physical block size	PartitionList		物理块大小
 Unmount	MainWindow		卸载
 Failed to format the partition %s!\n	MainWindow		分区 %s 格式化失败！\n
 Partition size	CreateParametersPanel		分区大小
@@ -24,13 +29,16 @@ Validation of the given creation parameters failed.	MainWindow		给定创建参�
 Eject	MainWindow		弹出
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，磁盘 %s 中的所有数据将丢失，无法恢复！
 Surface test (not implemented)	MainWindow		表面测试（未执行）
+Read only	PartitionList		只读
 The panel could not return successfully.	MainWindow		面板无法成功返回。
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		修改分区参数失败。修改未写入磁盘。
 Partition %ld	DiskView		分区 %ld
 There's no space on the partition where a child partition could be created.	MainWindow		所选分区没有足够的空间创建子分区。
 No disk devices have been recognized.	DiskView		无可识别的磁盘。  
+Attributes	PartitionList		属性
 Failed to delete the partition. No changes have been written to disk.	MainWindow		删除分区失败。所作修改未写入磁盘。
 Change parameters…	MainWindow		修改参数…
+Format	InitializeParametersPanel		格式化
 Could not unmount partition	MainWindow		无法卸载分区
 Create	CreateParametersPanel		创建
 File system	PartitionList		文件系统
@@ -43,22 +51,34 @@ Are you sure you want to format a raw disk? (Most people initialize the disk wit
 Wipe (not implemented)	MainWindow		擦除数据（未实现）
 The currently selected partition does not have a parent partition.	MainWindow		当前选中分区无父分区。
 Validation of the given initialization parameters failed.	MainWindow		给定初始化参数验证失败。
+Not formatted (%s)	PartitionList		未格式化 (%s)
+Failed to create the partition. No changes have been written to disk.	MainWindow		创建分区失败。无改动写入磁盘。
+Shared	PartitionList		共享
+MIMEs	PartitionList		MIMEs
+BitLocker encrypted	Encryption utils		BitLocker 加密
 You need to select a partition entry from the list.	MainWindow		您需要从列表中选择一个分区。
 Offset: %s	Support		偏移量：%s
+SafeBoot encrypted	Encryption utils		SafeBoot 加密
 Volume name	PartitionList		卷标
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，分区中的所有数据将丢失，无法恢复！
 Change	ChangeParametersPanel		修改
 Partition name:	ChangeParametersPanel		分区名称:
+LUKS encrypted	Encryption utils		LUKS 加密
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n执行此操作之后，分区 %s 中的所有数据将丢失，无法恢复！
+Empty space	PartitionList		空白
 Cancel	AbstractParametersPanel		取消
 Format	MainWindow		格式化
 OK	MainWindow		确定
+Empty space	DiskView		空白
+Open with DiskProbe	MainWindow		使用 DiskProbe 打开
 Could not delete the selected partition.	MainWindow		无法删除所选分区。  
 Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		您是否确定初始化选中磁盘？所有数据将会丢失。在磁盘写入修改之前，您将需要再次确认。\n
 There was an error preparing the disk for modifications.	MainWindow		准备对磁盘写入修改时出现错误。
 The disk has been successfully initialized.\n	MainWindow		磁盘已成功完成初始化。\n
 Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		是否强制卸载？\n\n注意：如果目前应用正在写入卷，强制卸载可能会导致数据丢失。\n
 Cancel	MainWindow		取消
+Free space	PartitionList		未分配空间
+Queries	PartitionList		查询
 Force unmount	MainWindow		强制卸载
 Partition	MainWindow		分区
 Change parameters	MainWindow		修改参数
@@ -66,6 +86,7 @@ Rescan	MainWindow		重新扫描
 There was an error acquiring the partition row.	MainWindow		获取分区序列出错。
 Failed to initialize the disk %s!\n	MainWindow		初始化磁盘 %s 失败！\n
 Disk system \"%s\" not found!	MainWindow		磁盘系统 \"%s\" 未发现！
+The partition cannot be unmounted.	MainWindow		分区无法挂载。
 Delete	MainWindow		删除
 Partition type:	ChangeParametersPanel		分区类型:
 Parameters	PartitionList		参数
@@ -77,7 +98,10 @@ Are you sure you want to format the partition? You will be asked again before ch
 The selected disk is read-only.	MainWindow		所选磁盘是只读的。
 The partition %s is already unmounted.	MainWindow		分区 %s 已经卸载。  
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		是否确定修改所选分区参数？\n\n该分区以后可能无法被其他操作系统所识别！
+Boot	PartitionList		启动
 OK	AbstractParametersPanel		确定
+Virtual	PartitionList		虚拟
+Virtual	DiskView		虚拟
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected disk will be irretrievably lost if you do so!	MainWindow		您确定将所做修改写入磁盘吗？\n\n如果执行该操作，选中磁盘中的所有数据将丢失，无法恢复！
 Select a partition from the list below.	DiskView		请从以下列表选择一个分区。
 Active	PartitionList		活动

@@ -378,6 +378,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 	int64 audioFrameCount = 0;
 
 	status_t ret = B_OK;
+	bool multiTrack = false;
 
 	int32 tracks = inFile->CountTracks();
 	for (int32 i = 0; i < tracks && (!outAudTrack || !outVidTrack); i++) {
@@ -385,6 +386,10 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 		inFormat.Clear();
 		inTrack->EncodedFormat(&inFormat);
 		if (inFormat.IsAudio() && (audioCodec != NULL)) {
+			if (outAudTrack != NULL) {
+				multiTrack = true;
+				continue;
+			}
 			inAudTrack = inTrack;
 			outAudFormat.Clear();
 			outAudFormat.type = B_MEDIA_RAW_AUDIO;
@@ -412,6 +417,10 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 			}
 
 		} else if (inFormat.IsVideo() && (videoCodec != NULL)) {
+			if (outVidTrack != NULL) {
+				multiTrack = true;
+				continue;
+			}
 			inVidTrack = inTrack;
 			width = (int32)inFormat.Width();
 			height = (int32)inFormat.Height();
@@ -497,6 +506,14 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 	if (!outVidTrack && !outAudTrack) {
 		printf("MediaConverterApp::_ConvertFile() - no tracks found!\n");
 		ret = B_ERROR;
+	}
+
+	if (multiTrack) {
+		BAlert* alert = new BAlert(B_TRANSLATE("Multi-track file detected"),
+		B_TRANSLATE("The file has multiple audio or video tracks, only the first one of each will "
+			"be converted."),
+		B_TRANSLATE("Understood"), NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->Go();
 	}
 
 	if (fCancel) {

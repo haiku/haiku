@@ -8,6 +8,7 @@
 
 #include <device_manager.h>
 #include <PCI.h>
+#include <drivers/ACPI.h>
 #include <drivers/bus/FDT.h>
 
 #include <string.h>
@@ -30,25 +31,41 @@ pci_root_supports_device(device_node* parent)
 	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false) < B_OK)
 		return -1.0f;
 
-#ifdef __riscv
-	const char* compatible;
-	if (gDeviceManager->get_attr_string(parent, "fdt/compatible", &compatible,
-		false) < B_OK)
-		return -1.0f;
+#if defined(__riscv)
+	if (strcmp(bus, "fdt") == 0) {
+		const char* compatible;
+		if (gDeviceManager->get_attr_string(parent, "fdt/compatible", &compatible, false) < B_OK)
+			return -1.0f;
 
-	if (strcmp(bus, "fdt") != 0)
-		return 0.0f;
+		if (strcmp(compatible, "pci-host-ecam-generic") == 0
+			|| strcmp(compatible, "sifive,fu740-pcie") == 0) {
+			return 1.0f;
+		}
+	}
+#elif defined(__arm__) || defined(__aarch64__)
+	if (strcmp(bus, "fdt") == 0) {
+		const char* compatible;
+		if (gDeviceManager->get_attr_string(parent, "fdt/compatible", &compatible, false) < B_OK)
+			return -1.0f;
 
-	if (strcmp(compatible, "pci-host-ecam-generic") != 0
-		&& strcmp(compatible, "sifive,fu740-pcie") != 0) {
-		return 0.0f;
+		if (strcmp(compatible, "pci-host-ecam-generic") == 0)
+			return 1.0f;
+	}
+
+	if (strcmp(bus, "acpi") == 0) {
+		const char* hid;
+		if (gDeviceManager->get_attr_string(parent, ACPI_DEVICE_HID_ITEM, &hid, false) < B_OK)
+			return -1.0f;
+
+		if (strcmp(hid, "PNP0A03") == 0 || strcmp(hid, "PNP0A08") == 0)
+			return 1.0f;
 	}
 #else
-	if (strcmp(bus, "root") != 0)
-		return 0.0f;
+	if (strcmp(bus, "root") == 0)
+		return 1.0f;
 #endif
 
-	return 1.0;
+	return 0.0;
 }
 
 
@@ -64,8 +81,8 @@ pci_root_register_device(device_node* parent)
 		{}
 	};
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "PCI"}},
-		{B_DEVICE_FLAGS, B_UINT32_TYPE, {ui32: B_KEEP_DRIVER_LOADED}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "PCI"}},
+		{B_DEVICE_FLAGS, B_UINT32_TYPE, {.ui32 = B_KEEP_DRIVER_LOADED}},
 		{}
 	};
 
@@ -90,23 +107,23 @@ pci_root_register_child_devices(void* cookie)
 
 		device_attr attrs[] = {
 			// info about device
-			{B_DEVICE_BUS, B_STRING_TYPE, {string: "pci"}},
+			{B_DEVICE_BUS, B_STRING_TYPE, {.string = "pci"}},
 
 			// location on PCI bus
-			{B_PCI_DEVICE_DOMAIN, B_UINT8_TYPE, {ui8: domain}},
-			{B_PCI_DEVICE_BUS, B_UINT8_TYPE, {ui8: bus}},
-			{B_PCI_DEVICE_DEVICE, B_UINT8_TYPE, {ui8: info.device}},
-			{B_PCI_DEVICE_FUNCTION, B_UINT8_TYPE, {ui8: info.function}},
+			{B_PCI_DEVICE_DOMAIN, B_UINT8_TYPE, {.ui8 = domain}},
+			{B_PCI_DEVICE_BUS, B_UINT8_TYPE, {.ui8 = bus}},
+			{B_PCI_DEVICE_DEVICE, B_UINT8_TYPE, {.ui8 = info.device}},
+			{B_PCI_DEVICE_FUNCTION, B_UINT8_TYPE, {.ui8 = info.function}},
 
 			// info about the device
-			{B_DEVICE_VENDOR_ID, B_UINT16_TYPE, { ui16: info.vendor_id }},
-			{B_DEVICE_ID, B_UINT16_TYPE, { ui16: info.device_id }},
+			{B_DEVICE_VENDOR_ID, B_UINT16_TYPE, {.ui16 = info.vendor_id}},
+			{B_DEVICE_ID, B_UINT16_TYPE, {.ui16 = info.device_id}},
 
-			{B_DEVICE_TYPE, B_UINT16_TYPE, { ui16: info.class_base }},
-			{B_DEVICE_SUB_TYPE, B_UINT16_TYPE, { ui16: info.class_sub }},
-			{B_DEVICE_INTERFACE, B_UINT16_TYPE, { ui16: info.class_api }},
+			{B_DEVICE_TYPE, B_UINT16_TYPE, {.ui16 = info.class_base}},
+			{B_DEVICE_SUB_TYPE, B_UINT16_TYPE, {.ui16 = info.class_sub}},
+			{B_DEVICE_INTERFACE, B_UINT16_TYPE, {.ui16 = info.class_api}},
 
-			{B_DEVICE_FLAGS, B_UINT32_TYPE, {ui32: B_FIND_CHILD_ON_DEMAND}},
+			{B_DEVICE_FLAGS, B_UINT32_TYPE, {.ui32 = B_FIND_CHILD_ON_DEMAND}},
 			{}
 		};
 
@@ -130,7 +147,7 @@ pci_root_init(device_node* node, void** _cookie)
 	if (res < B_OK)
 		return res;
 
-	return B_OK;
+	return pci_init_deferred();
 }
 
 

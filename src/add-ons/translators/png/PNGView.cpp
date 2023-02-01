@@ -62,8 +62,7 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 		item->SetMarked(true);
 	fInterlaceMenu->AddItem(item);
 
-	BMenuField* menuField = new BMenuField(
-		B_TRANSLATE("PNG Interlace Menu"),
+	BMenuField* menuField = new BMenuField("PNG Interlace Menu",
 		B_TRANSLATE("Interlacing type:"), fInterlaceMenu);
 	menuField->SetDivider(menuField->StringWidth(menuField->Label()) + 7.0f);
 	menuField->ResizeToPreferred();

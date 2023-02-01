@@ -4,20 +4,7 @@ UsePrivateHeaders interface kernel storage ;
 UsePrivateSystemHeaders ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs uuid ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) intel ] ;
-
-SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) intel ] ;
-
-# Assemble the MBR code, and convert it into a header file
-MBRFLAGS on [ FGristFiles mbr.bin ] = -DMBR_CODE_ONLY ;
-BuildMBR [ FGristFiles mbr.bin ] : mbr.S ;
-
-DataFileToSourceFile [ FGristFiles MBR.h ] : [ FGristFiles mbr.bin ]
-	: kMBR : kMBRSize ;
-
-if $(TARGET_ARCH) = "x86" || $(TARGET_ARCH) = "x86_64" {
-	Depends [ FGristFiles PartitionMapWriter.cpp ] : [ FGristFiles MBR.h ] ;
-}
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) common ] ;
 
 KernelAddon efi_gpt :
 	gpt.cpp
@@ -25,10 +12,8 @@ KernelAddon efi_gpt :
 	crc32.cpp
 	utility.cpp
 	PartitionLocker.cpp
-
-	# from the Intel add-on
-	PartitionMap.cpp
-	PartitionMapWriter.cpp
 	:
+	libpartitioning_systemscommon.a
 	libuuid_kernel.a
 ;
+

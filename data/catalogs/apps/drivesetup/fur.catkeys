@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-DriveSetup	4048496535
+1	friulian	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		Impussibil dismontâ la partizion %s.
 Mount all	MainWindow		Monte dut
 Disk	MainWindow		Disc
@@ -14,6 +14,7 @@ Block size	PartitionList		Dimension bloc
 The panel experienced a problem!	MainWindow		Il panel al à vût un probleme!
 Device	DiskView		Dispositîf
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Formatâ pardabon la partizion estese Intel? Se si continue, cualsisei sot-partizion contignude e vignarà sorescrite. Prime di scrivi lis modifichis sul disc, e vignarà domandade di gnûf une conferme.
+Physical block size	PartitionList		Dimension bloc fisic
 Unmount	MainWindow		Dismonte
 Failed to format the partition %s!\n	MainWindow		No si è rivâts a formatâ la partizion %s!\n
 Partition size	CreateParametersPanel		Dimension de partizion

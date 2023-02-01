@@ -225,24 +225,39 @@ obtain_pointer_data(Context &context, Type *data, void *address, uint32 what)
 
 template<typename Type>
 static string
-format_signed_integer_pointer(Context &context, void *address)
+format_signed_integer_pointer(Context &context, void *address, uint32 count)
 {
 	Type data;
 
-	if (obtain_pointer_data(context, &data, address, Context::POINTER_VALUES))
-		return "[" + context.FormatSigned(data, sizeof(Type)) + "]";
-
+	if (obtain_pointer_data(context, &data, address, Context::POINTER_VALUES)) {
+		string formatted = "[" + context.FormatSigned(data);
+		for (uint32 i = 1; i < count; i++) {
+			address = (void*)((Type*)address + 1);
+			obtain_pointer_data(context, &data, address, Context::POINTER_VALUES);
+			formatted += ", " + context.FormatSigned(data);
+		}
+		formatted += "]";
+		return formatted;
+	}
 	return context.FormatPointer(address);
 }
 
 template<typename Type>
 static string
-format_unsigned_integer_pointer(Context &context, void *address)
+format_unsigned_integer_pointer(Context &context, void *address, uint32 count)
 {
 	Type data;
 
-	if (obtain_pointer_data(context, &data, address, Context::POINTER_VALUES))
-		return "[" + context.FormatUnsigned(data) + "]";
+	if (obtain_pointer_data(context, &data, address, Context::POINTER_VALUES)) {
+		string formatted = "[" + context.FormatUnsigned(data);
+		for (uint32 i = 1; i < count; i++) {
+			address = (void*)((Type*)address + 1);
+			obtain_pointer_data(context, &data, address, Context::POINTER_VALUES);
+			formatted += ", " + context.FormatUnsigned(data);
+		}
+		formatted += "]";
+		return formatted;
+	}
 
 	return context.FormatPointer(address);
 }
@@ -279,29 +294,31 @@ public:
 
 template<typename Type>
 class SignedIntegerPointerTypeHandler : public TypeHandler {
-	string GetParameterValue(Context &context, Parameter *,
+	string GetParameterValue(Context &context, Parameter *parameter,
 				 const void *address)
 	{
-		return format_signed_integer_pointer<Type>(context, *(void **)address);
+		return format_signed_integer_pointer<Type>(context, *(void **)address,
+			parameter->Count());
 	}
 
 	string GetReturnValue(Context &context, uint64 value)
 	{
-		return format_signed_integer_pointer<Type>(context, (void *)value);
+		return format_signed_integer_pointer<Type>(context, (void *)value, 1);
 	}
 };
 
 template<typename Type>
 class UnsignedIntegerPointerTypeHandler : public TypeHandler {
-	string GetParameterValue(Context &context, Parameter *,
+	string GetParameterValue(Context &context, Parameter *parameter,
 				 const void *address)
 	{
-		return format_unsigned_integer_pointer<Type>(context, *(void **)address);
+		return format_unsigned_integer_pointer<Type>(context, *(void **)address,
+			parameter->Count());
 	}
 
 	string GetReturnValue(Context &context, uint64 value)
 	{
-		return format_unsigned_integer_pointer<Type>(context, (void *)value);
+		return format_unsigned_integer_pointer<Type>(context, (void *)value, 1);
 	}
 };
 

@@ -13,10 +13,8 @@
 #include <UrlProtocolListener.h>
 
 using namespace std;
-
-#ifndef LIBNETAPI_DEPRECATED
 using namespace BPrivate::Network;
-#endif
+
 
 void
 BUrlProtocolListener::ConnectionOpened(BUrlRequest*)
@@ -44,31 +42,6 @@ BUrlProtocolListener::ResponseStarted(BUrlRequest*)
 }
 
 
-#ifdef LIBNETAPI_DEPRECATED
-void
-BUrlProtocolListener::HeadersReceived(BUrlRequest*, const BUrlResult& result)
-{
-}
-
-
-void
-BUrlProtocolListener::DataReceived(BUrlRequest*, const char*, off_t, ssize_t)
-{
-}
-
-
-void
-BUrlProtocolListener::DownloadProgress(BUrlRequest*, ssize_t, ssize_t)
-{
-}
-
-
-void
-BUrlProtocolListener::UploadProgress(BUrlRequest*, ssize_t, ssize_t)
-{
-}
-
-#else
 
 void
 BUrlProtocolListener::HeadersReceived(BUrlRequest*)
@@ -92,7 +65,6 @@ void
 BUrlProtocolListener::UploadProgress(BUrlRequest*, off_t, off_t)
 {
 }
-#endif // LIBNETAPI_DEPRECATED
 
 
 void

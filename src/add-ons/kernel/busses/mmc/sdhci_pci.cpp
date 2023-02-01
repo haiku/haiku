@@ -781,24 +781,24 @@ register_child_devices(void* cookie)
 		sprintf(prettyName, "SDHC bus %" B_PRIu8, slot);
 		device_attr attrs[] = {
 			// properties of this controller for mmc bus manager
-			{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: prettyName } },
+			{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { .string = prettyName } },
 			{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
-				{string: MMC_BUS_MODULE_NAME} },
-			{ B_DEVICE_BUS, B_STRING_TYPE, {string: "mmc"} },
+				{.string = MMC_BUS_MODULE_NAME} },
+			{ B_DEVICE_BUS, B_STRING_TYPE, {.string = "mmc"} },
 
 			// DMA properties
 			// The high alignment is to force access only to complete sectors
 			// These constraints could be removed by using ADMA which allows
 			// use of the full 64bit address space and can do scatter-gather.
-			{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 511 }},
-			{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { ui64: 0x100000000LL }},
-			{ B_DMA_BOUNDARY, B_UINT32_TYPE, { ui32: (1 << 19) - 1 }},
-			{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE, { ui32: 1 }},
-			{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { ui32: (1 << 10) - 1 }},
+			{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { .ui32 = 511 }},
+			{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { .ui64 = 0x100000000LL }},
+			{ B_DMA_BOUNDARY, B_UINT32_TYPE, { .ui32 = (1 << 19) - 1 }},
+			{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE, { .ui32 = 1 }},
+			{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { .ui32 = (1 << 10) - 1 }},
 
 			// private data to identify device
-			{ SLOT_NUMBER, B_UINT8_TYPE, { ui8: slot} },
-			{ BAR_INDEX, B_UINT8_TYPE, { ui8: bar} },
+			{ SLOT_NUMBER, B_UINT8_TYPE, { .ui8 = slot} },
+			{ BAR_INDEX, B_UINT8_TYPE, { .ui8 = bar} },
 			{ NULL }
 		};
 		device_node* node;
@@ -894,7 +894,7 @@ static status_t
 register_device(device_node* parent)
 {
 	device_attr attrs[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "SD Host Controller"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "SD Host Controller"}},
 		{}
 	};
 

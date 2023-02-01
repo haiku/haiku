@@ -44,7 +44,7 @@ public:
 			void				SetRefusingToQuit(bool refusing);
 			bool				IsRefusingToQuit();
 
-	static	int32				MinimalHeight();
+			int32				MinimalHeight();
 
 private:
 			team_info			fTeamInfo;

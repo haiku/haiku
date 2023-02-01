@@ -91,7 +91,7 @@ public:
 
 NetworkWindow::NetworkWindow()
 	:
-	BWindow(BRect(100, 100, 400, 400), B_TRANSLATE_SYSTEM_NAME("Network"),
+	BWindow(BRect(100, 100, 750, 400), B_TRANSLATE_SYSTEM_NAME("Network"),
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS),
 	fServicesItem(NULL),
@@ -129,11 +129,12 @@ NetworkWindow::NetworkWindow()
 
 	BScrollView* scrollView = new BScrollView("ScrollView", fListView,
 		0, false, true);
-	scrollView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	scrollView->SetExplicitMaxSize(BSize(B_SIZE_UNSET, B_SIZE_UNLIMITED));
 
 	fAddOnShellView = new BView("add-on shell", 0,
 		new BGroupLayout(B_VERTICAL));
 	fAddOnShellView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fAddOnShellView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
 	fInterfaceView = new InterfaceView();
 
@@ -150,7 +151,8 @@ NetworkWindow::NetworkWindow()
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(scrollView)
 			.Add(fAddOnShellView)
-			.End()
+		.End()
+
 		.Add(showReplicantCheckBox)
 		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(fRevertButton)

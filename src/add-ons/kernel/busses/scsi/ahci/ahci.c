@@ -174,17 +174,17 @@ register_sim(device_node *parent)
 	{
 		device_attr attrs[] = {
 			{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
-				{ string: SCSI_FOR_SIM_MODULE_NAME }},
+				{ .string = SCSI_FOR_SIM_MODULE_NAME }},
 			{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-				{ string: AHCI_CONTROLLER_PRETTY_NAME }},
+				{ .string = AHCI_CONTROLLER_PRETTY_NAME }},
 
 			{ SCSI_DESCRIPTION_CONTROLLER_NAME, B_STRING_TYPE,
-				{ string: AHCI_DEVICE_MODULE_NAME }},
-			{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { ui32: 255 }},
-			{ AHCI_ID_ITEM, B_UINT32_TYPE, { ui32: (uint32)id }},
+				{ .string = AHCI_DEVICE_MODULE_NAME }},
+			{ B_DMA_MAX_TRANSFER_BLOCKS, B_UINT32_TYPE, { .ui32 = 255 }},
+			{ AHCI_ID_ITEM, B_UINT32_TYPE, { .ui32 = (uint32)id }},
 //			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE,
-//				{ string: AHCI_ID_GENERATOR }},
-//			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { ui32: id }},
+//				{ .string = AHCI_ID_GENERATOR }},
+//			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { .ui32 = id }},
 
 			{ NULL }
 		};
@@ -265,20 +265,20 @@ ahci_register_device(device_node *parent)
 {
 	device_attr attrs[] = {
 		{ SCSI_DEVICE_MAX_TARGET_COUNT, B_UINT32_TYPE,
-			{ ui32: 33 }},
+			{ .ui32 = 33 }},
 		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE,
-			{ string: AHCI_BRIDGE_PRETTY_NAME }},
+			{ .string = AHCI_BRIDGE_PRETTY_NAME }},
 
 		// DMA properties
 		// data must be word-aligned;
-		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 1 }},
+		{ B_DMA_ALIGNMENT, B_UINT32_TYPE, { .ui32 = 1 }},
 		// one S/G block must not cross 64K boundary
-		{ B_DMA_BOUNDARY, B_UINT32_TYPE, { ui32: 0xffff }},
+		{ B_DMA_BOUNDARY, B_UINT32_TYPE, { .ui32 = 0xffff }},
 		// max size of S/G block is 16 bits with zero being 64K
-		{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { ui32: 0x10000 }},
+		{ B_DMA_MAX_SEGMENT_BLOCKS, B_UINT32_TYPE, { .ui32 = 0x10000 }},
 		{ B_DMA_MAX_SEGMENT_COUNT, B_UINT32_TYPE,
-			{ ui32: 32 /* whatever... */ }},
-		{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { ui64: 0x100000000LL }},
+			{ .ui32 = 32 /* whatever... */ }},
+		{ B_DMA_HIGH_ADDRESS, B_UINT64_TYPE, { .ui64 = 0x100000000LL }},
 			// TODO: We don't know at this point whether 64 bit addressing is
 			// supported. That's indicated by a capability flag. Play it safe
 			// for now.
@@ -332,7 +332,6 @@ std_ops(int32 op, ...)
 		case B_MODULE_INIT:
 			if (get_module(B_PCI_X86_MODULE_NAME,
 					(module_info**)&gPCIx86Module) != B_OK) {
-				TRACE("failed to get pci x86 module\n");
 				gPCIx86Module = NULL;
 			}
 			return B_OK;

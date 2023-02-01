@@ -55,7 +55,7 @@ PropertyList::PropertyList(const char* name)
 	AddColumn(nameColumn = new BStringColumn(B_TRANSLATE("Name"), 150, 50, 500,
 			B_TRUNCATE_MIDDLE),
 		kNameColumn);
-	AddColumn(new BStringColumn(B_TRANSLATE("Value"), 150, 50, 500,
+	AddColumn(new BStringColumn(B_TRANSLATE("Value"), 300, 50, 500,
 		B_TRUNCATE_END), kValueColumn);
 	SetSortColumn(nameColumn, false, true);
 }

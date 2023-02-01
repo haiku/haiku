@@ -42,6 +42,13 @@ AddFilesToPackage develop lib $(architecture) :
 	<$(architecture)>libpthread.a
 	<$(architecture)>libshared.a ;
 
+# libnetservices2.a
+if $(HAIKU_CC_IS_LEGACY_GCC_$(architecture)) = 0 {
+	# Modern C++ only; skip on gcc2
+	AddFilesToPackage develop lib $(architecture) :
+		<$(architecture)>libnetservices2.a ;
+}
+
 # the POSIX error code mapper library
 AddFilesToPackage develop lib $(architecture)
 	: libposix_error_mapper.a ;

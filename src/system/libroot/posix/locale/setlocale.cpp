@@ -7,63 +7,17 @@
 
 #include <ctype.h>
 #include <locale.h>
-#include <stdlib.h>
 #include <strings.h>
 
 #include <ErrnoMaintainer.h>
 
 #include "LocaleBackend.h"
+#include "LocaleInternal.h"
 
 
-using BPrivate::Libroot::gLocaleBackend;
+using BPrivate::Libroot::gGlobalLocaleBackend;
+using BPrivate::Libroot::GetLocalesFromEnvironment;
 using BPrivate::Libroot::LocaleBackend;
-
-
-static status_t
-GetLocalesFromEnvironment(int category, const char** locales)
-{
-	const char* locale = getenv("LC_ALL");
-	if (locale && *locale)
-		locales[category] = locale;
-	else {
-		// the order of the names must match the one specified in locale.h
-		const char* categoryNames[] = {
-			"LC_ALL",
-			"LC_COLLATE",
-			"LC_CTYPE",
-			"LC_MONETARY",
-			"LC_NUMERIC",
-			"LC_TIME",
-			"LC_MESSAGES"
-		};
-		int from, to;
-		if (category == LC_ALL) {
-			// we need to check each real category if all of them should be set
-			from = 1;
-			to = LC_LAST;
-		} else
-			from = to = category;
-		bool haveDifferentLocales = false;
-		locale = NULL;
-		for (int lc = from; lc <= to; lc++) {
-			const char* lastLocale = locale;
-			locale = getenv(categoryNames[lc]);
-			if (!locale || *locale == '\0')
-				locale = getenv("LANG");
-			if (!locale || *locale == '\0')
-				locale = "POSIX";
-			locales[lc] = locale;
-			if (lastLocale && strcasecmp(locale, lastLocale) != 0)
-				haveDifferentLocales = true;
-		}
-		if (!haveDifferentLocales) {
-			// we can set all locales at once
-			locales[LC_ALL] = locale;
-		}
-	}
-
-	return B_OK;
-}
 
 
 extern "C" char*
@@ -76,8 +30,8 @@ setlocale(int category, const char* locale)
 
 	if (locale == NULL) {
 		// query the locale of the given category
-		if (gLocaleBackend != NULL)
-			return const_cast<char*>(gLocaleBackend->SetLocale(category, NULL));
+		if (gGlobalLocaleBackend != NULL)
+			return const_cast<char*>(gGlobalLocaleBackend->SetLocale(category, NULL));
 		else
 			return const_cast<char*>("POSIX");
 	}
@@ -93,7 +47,7 @@ setlocale(int category, const char* locale)
 	else
 		locales[category] = locale;
 
-	if (!gLocaleBackend) {
+	if (gGlobalLocaleBackend == NULL) {
 		// for any locale other than POSIX/C, we try to activate the ICU
 		// backend
 		bool needBackend = false;
@@ -108,17 +62,17 @@ setlocale(int category, const char* locale)
 			return NULL;
 	}
 
-	if (gLocaleBackend != NULL) {
+	if (gGlobalLocaleBackend != NULL) {
 		for (int lc = 0; lc <= LC_LAST; lc++) {
 			if (locales[lc] != NULL) {
-				locale = gLocaleBackend->SetLocale(lc, locales[lc]);
+				locale = gGlobalLocaleBackend->SetLocale(lc, locales[lc]);
 				if (lc == LC_ALL) {
 					// skip the rest, LC_ALL overrides
 					return const_cast<char*>(locale);
 				}
 			}
 		}
-		return const_cast<char*>(gLocaleBackend->SetLocale(category, NULL));
+		return const_cast<char*>(gGlobalLocaleBackend->SetLocale(category, NULL));
 	}
 
 	return const_cast<char*>("POSIX");

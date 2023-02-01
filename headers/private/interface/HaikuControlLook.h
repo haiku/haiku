@@ -28,8 +28,6 @@ public:
 
 	virtual	float				DefaultItemSpacing() const;
 
-	static	float				ComposeSpacing(float spacing);
-
 	virtual uint32				Flags(BControl* control) const;
 
 	virtual	void				DrawButtonFrame(BView* view, BRect& rect,
@@ -339,8 +337,6 @@ public:
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS,
 									orientation orientation = B_HORIZONTAL);
-	virtual float				GetScrollBarWidth(
-									orientation orientation = B_VERTICAL);
 
 protected:
 			void				_DrawButtonFrame(BView* view, BRect& rect,

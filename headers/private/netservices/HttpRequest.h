@@ -23,11 +23,10 @@ namespace BPrivate {
 };
 
 
-#ifndef LIBNETAPI_DEPRECATED
 namespace BPrivate {
 
 namespace Network {
-#endif
+
 
 class BHttpRequest : public BNetworkRequest {
 public:
@@ -41,9 +40,7 @@ public:
 			void				SetDiscardData(bool discard);
 			void				SetDisableListener(bool disable);
 			void				SetAutoReferrer(bool enable);
-#ifndef LIBNETAPI_DEPRECATED
 			void				SetStopOnError(bool stop);
-#endif
 			void				SetUserName(const BString& name);
 			void				SetPassword(const BString& password);
 			void				SetRangeStart(off_t position);
@@ -70,20 +67,12 @@ public:
 private:
 			friend class BUrlProtocolRoster;
 
-#ifdef LIBNETAPI_DEPRECATED
-								BHttpRequest(const BUrl& url,
-									bool ssl = false,
-									const char* protocolName = "HTTP",
-									BUrlProtocolListener* listener = NULL,
-									BUrlContext* context = NULL);
-#else
 								BHttpRequest(const BUrl& url,
 									BDataIO* output,
 									bool ssl = false,
 									const char* protocolName = "HTTP",
 									BUrlProtocolListener* listener = NULL,
 									BUrlContext* context = NULL);
-#endif
 								BHttpRequest(const BHttpRequest& other);
 
 			void				_ResetOptions();
@@ -113,12 +102,6 @@ private:
 	// Utility methods
 			bool				_IsDefaultPort();
 
-#ifdef LIBNETAPI_DEPRECATED
-	// Listener notification
-			void				_NotifyDataReceived(const char* data,
-									off_t pos, ssize_t length,
-									off_t bytesReceived, ssize_t bytesTotal);
-#endif
 
 private:
 			bool				fSSL;
@@ -160,9 +143,7 @@ private:
 			bool				fOptDiscardData : 1;
 			bool				fOptDisableListener : 1;
 			bool				fOptAutoReferer : 1;
-#ifndef LIBNETAPI_DEPRECATED
 			bool				fOptStopOnError : 1;
-#endif
 };
 
 // Request method
@@ -260,10 +241,9 @@ enum http_status_code {
 // HTTP default User-Agent
 #define B_HTTP_PROTOCOL_USER_AGENT_FORMAT "ServicesKit (%s)"
 
-#ifndef LIBNETAPI_DEPRECATED
+
 } // namespace Network
 
 } // namespace BPrivate
-#endif
 
 #endif // _B_URL_PROTOCOL_HTTP_H_

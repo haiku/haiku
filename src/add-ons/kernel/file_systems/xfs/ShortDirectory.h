@@ -6,6 +6,7 @@
 #define __SHORT_DIR_H__
 
 
+#include "Directory.h"
 #include "Inode.h"
 
 
@@ -50,8 +51,7 @@ struct ShortFormEntry {
 } __attribute__((packed));
 
 
-class ShortDirectory
-{
+class ShortDirectory : public DirectoryIterator {
 public:
 								ShortDirectory(Inode* inode);
 								~ShortDirectory();

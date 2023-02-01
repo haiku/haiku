@@ -455,34 +455,22 @@ link_control(net_protocol* _protocol, int level, int option, void* value,
 		case SIOCGIFMEDIA:
 		{
 			// get media
-			if (*_length > 0 && *_length < sizeof(ifmediareq))
+			const size_t copylen = offsetof(ifreq, ifr_media) + sizeof(ifreq::ifr_media);
+			if (*_length > 0 && *_length < copylen)
 				return B_BAD_VALUE;
 
 			net_device_interface* interface;
-			struct ifmediareq request;
-			if (!user_request_get_device_interface(value, (ifreq&)request,
-					interface))
+			struct ifreq request;
+			if (!user_request_get_device_interface(value, request, interface))
 				return B_BAD_ADDRESS;
-
 			if (interface == NULL)
 				return B_DEVICE_NOT_FOUND;
 
-			if (user_memcpy(&request, value, sizeof(ifmediareq)) != B_OK) {
-				put_device_interface(interface);
-				return B_BAD_ADDRESS;
-			}
+			request.ifr_media = interface->device->media;
 
-			// TODO: see above.
-			if (interface->device->module->control(interface->device,
-					SIOCGIFMEDIA, &request,
-					sizeof(struct ifmediareq)) != B_OK) {
-				memset(&request, 0, sizeof(struct ifmediareq));
-				request.ifm_active = request.ifm_current
-					= interface->device->media;
-			}
 			put_device_interface(interface);
 
-			return user_memcpy(value, &request, sizeof(struct ifmediareq));
+			return user_memcpy(value, &request, copylen);
 		}
 
 		case SIOCSPACKETCAP:

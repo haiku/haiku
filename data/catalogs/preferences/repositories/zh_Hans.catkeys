@@ -1,17 +1,42 @@
-1	english	x-vnd.Haiku-Repositories	3633032012
+1	english	x-vnd.Haiku-Repositories	1220143449
 This is not a valid URL.	AddRepoWindow	Add URL error message	这是一个无效的 URL。
+Repository URL:	AddRepoWindow	Text box label	仓库 URL 地址：
+There was an error refreshing the repository cache for %name%	TaskLooper	Error message, do not translate %name%	为 %name% 刷新仓库缓存时发生错误
+There was an error disabling the repository %name%	TaskLooper	Error message, do not translate %name%	禁用 %name% 仓库时发生错误
+Unknown	Constants	Unknown repository name	未知的
+Remove all	RepositoriesView	Button label	全部移除
 Enable repositories to use with package management:	RepositoriesView	Label text	启用需要的仓库：
 Disable	RepositoriesView	Button label	禁用
+Cancel task	TaskTimer	Button label	取消任务
+Changes completed	RepositoriesView	Status view text	变更已经完成
+Details	TaskLooper	Job log details header	详细信息
 Enabled	RepoRow	Tag in the Status column	已启用
+Remove	Constants	Button label	删除
 There was an error enabling the repository %url%	TaskLooper	Error message, do not translate %url%	启用仓库 %url% 时遇到错误
 Remove this repository?	RepositoriesView	Removal alert confirmation message	移除该软件库？
+The task for repository %name% is taking a long time to complete.	TaskTimer	Alert message.  Do not translate %name%	%name% 仓库的任务已经耗费太多时间。
 Completed	TaskLooper	Completed task status message	已完成
+OK	Constants	Button label	确定
+Status	RepositoriesView	Column title	状态
+Name	RepositoriesView	Column title	名称
 Add	AddRepoWindow	Button label	添加
 Repositories could not retrieve the names of the currently enabled repositories.	RepositoriesView	Alert error message	无法获取当前启用的仓库名字
 Enable all	RepositoriesView	Button label	全部启用
+Aborted	TaskLooper	Aborted task status message	已终止
 URL	RepositoriesView	Column title	URL
 Enable	RepositoriesView	Button label	启用
+Error getting repository configuration for %name%.	RepositoriesView	Alert error message, do not translate %name%	%name% 仓库获取配置出错。
 Description	TaskLooper	Failed task error description	描述
+Failed	TaskLooper	Failed task status message	已失败
+Good news! The task for repository %name% completed.	TaskTimer	Alert message.  Do not translate %name%	好消息！%name% 仓库任务已完成。
 Some tasks are still running. Stop these tasks and quit?	RepositoriesWindow	Application quit alert message	某些任务仍在运行。是否终止并退出？
+This repository URL already exists.	RepositoriesView	Error message	仓库 URL 已经存在。
+Repositories	System name		软件仓库
+Changes pending:	RepositoriesView	Status view text	待定变更：
+Remove	RepositoriesView	Button label	移除
+Remove these repositories?	RepositoriesView	Removal alert confirmation message	移除这些仓库？
+Keep trying	TaskTimer	Button label	继续尝试
+Cancel	Constants	Button label	取消
 Only one URL for each repository can be enabled. Please change your selections.	RepositoriesView	Error message	每一个仓库只能启用一个 URL。请更改您的选择。
+Stop and quit	RepositoriesWindow	Button label	停止并退出
 Disable all	RepositoriesView	Button label	全部禁用

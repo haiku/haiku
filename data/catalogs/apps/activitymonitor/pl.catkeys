@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	2601047281
+1	polish	x-vnd.Haiku-ActivityMonitor	826097672
 Teams	DataSource		Zespoły
 Semaphores	DataSource		Semafory
 TX	DataSource	Shorter version for Sending	TX
@@ -24,6 +24,7 @@ Settings…	ActivityWindow		Ustawienia…
 Block cache	DataSource		Blokowa pamięć podręczna
 Memory	DataSource		Pamięć
 CPU usage	DataSource		Użycie procesora
+CPU speed	DataSource		Prędkość procesora
 Quit	ActivityWindow		Zakończ
 Raw clipboard	DataSource		Schowek binarny
 Settings	ActivityWindow		Ustawienia
@@ -32,6 +33,7 @@ Used memory	DataSource		Używana pamięć
 Show legend	ActivityView		Pokaż legendę
 Cached memory	DataSource		Pamięć podręczna
 CPU %d usage	DataSource		Użycie procesora %d
+CPU %d speed	DataSource		Prędkość procesora %d
 File	ActivityWindow		Plik
 Ports	DataSource		Porty
 Page faults	DataSource		Błędy stronicowania

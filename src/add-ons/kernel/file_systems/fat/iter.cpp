@@ -155,7 +155,7 @@ csi_read_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 	uint8 *buf = buffer;
 	int32 i;
 
-	ASSERT(len >= csi->vol->bytes_per_sector);
+	ASSERT(len > 0 && (size_t)len >= csi->vol->bytes_per_sector);
 
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
 		return EINVAL;
@@ -166,7 +166,7 @@ csi_read_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 	while (1) {
 		old_csi = *csi;
 		err = iter_csi(csi, 1);
-		if (len < (sectors + 1) * csi->vol->bytes_per_sector)
+		if ((size_t)len < (sectors + 1) * csi->vol->bytes_per_sector)
 			break;
 		if ((err < B_OK) || (block + sectors != csi_to_block(csi)))
 			break;
@@ -196,7 +196,7 @@ csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 	uint8 *buf = buffer;
 	int32 i;
 
-	ASSERT(len >= csi->vol->bytes_per_sector);
+	ASSERT(len > 0 && (size_t)len >= csi->vol->bytes_per_sector);
 
 	ASSERT(_validate_cs_(csi->vol, csi->cluster, csi->sector) == 0);
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
@@ -208,7 +208,7 @@ csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 	while (1) {
 		old_csi = *csi;
 		err = iter_csi(csi, 1);
-		if (len < (sectors + 1) * csi->vol->bytes_per_sector)
+		if ((size_t)len < (sectors + 1) * csi->vol->bytes_per_sector)
 			break;
 		if ((err < B_OK) || (block + sectors != csi_to_block(csi)))
 			break;
@@ -303,6 +303,16 @@ diri_init(nspace *vol, uint32 cluster, uint32 index, struct diri *diri)
 	// now the diri is valid
 	return diri->current_block
 		+ (diri->current_index % (diri->csi.vol->bytes_per_sector / 0x20))*0x20;
+}
+
+
+diri::diri()
+{
+	csi.vol = NULL;
+	csi.cluster = 0;
+	csi.sector = 0;
+
+	current_block = NULL;
 }
 
 

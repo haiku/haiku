@@ -1,4 +1,5 @@
-1	english	x-vnd.Be-PRNT	2786813915
+1	english	x-vnd.Be-PRNT	1465107170
+Test page	TestPageView		测试页
 Remove	PrintersWindow		删除
 Red	TestPageView		绿
 Default Printer	PrinterListView		默认打印机
@@ -7,6 +8,7 @@ Connected to:	AddPrinterDialog		连接到：
 Make default	PrintersWindow		作为默认
 Cyan	TestPageView		青
 Completed	JobListView		完成
+Test page	PrintersWindow		测试页
 Transport: %transport% %transport_address%	PrinterListView		传输: %transport% %transport_address%
 Failed	JobListView		失败
 Blue	TestPageView		蓝
@@ -14,6 +16,8 @@ Waiting	JobListView		等待
 Processing	JobListView		处理中
 Cancel	AddPrinterDialog		取消
 Unknown status	JobListView		未知状态
+Print jobs for %printer_name%	PrintersWindow		%printer_name% 的打印任务
+{0, plural, =-1{??? pages}=1{# page}other{# pages}}	JobListView		{0, plural, =-1{??? pages}=1{# page}other{# pages}}
 Add printer	AddPrinterDialog		添加打印机
 Printers	PrintersWindow		打印机
 No printer found!	TransportMenu		未发现打印机！
@@ -27,6 +31,7 @@ Yellow	TestPageView		黄
 Black	TestPageView		黑
 Printer type:	AddPrinterDialog		打印机类型：
 Printers	System name		打印机
+{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}	PrinterListView		{0, plural,=0{No pending jobs}=1{1 pending job}other{# pending jobs}}
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		打印机：%printer_name%\n驱动：%driver%\n
 Green	TestPageView		红
 Print test page	PrintersWindow		打印测试页面

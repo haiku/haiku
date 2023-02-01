@@ -264,8 +264,10 @@ detect_displays()
 			continue;
 		}
 
-		if (gConnector[id]->type == VIDEO_CONNECTOR_DP) {
-			TRACE("%s: connector(%" B_PRIu32 "): Checking DP.\n", __func__, id);
+		if (gConnector[id]->type == VIDEO_CONNECTOR_DP
+			|| gConnector[id]->type == VIDEO_CONNECTOR_EDP) {
+			TRACE("%s: connector(%" B_PRIu32 "): Checking %sDP.\n", __func__, id,
+				gConnector[id]->type == VIDEO_CONNECTOR_EDP ? "e" : "");
 
 			if (gConnector[id]->encoderExternal.valid == true) {
 				// If this has a valid external encoder (dp bridge)
@@ -284,6 +286,8 @@ detect_displays()
 			if (gDisplay[displayIndex]->attached) {
 				TRACE("%s: connector(%" B_PRIu32 "): Found DisplayPort EDID!\n",
 					__func__, id);
+				gInfo->shared_info->has_edid = true;
+				edid_dump(edid);
 			}
 		}
 
@@ -377,23 +381,14 @@ detect_displays()
 		displayIndex++;
 	}
 
-	// fallback if no attached monitors were found
+	// fail if no attached monitors were found
 	if (displayIndex == 0) {
-		// This is a hack, however as we don't support HPD just yet,
-		// it tries to prevent a "no displays" situation.
-		ERROR("%s: ERROR: 0 attached monitors were found on display connectors."
-			" Injecting first connector as a last resort.\n", __func__);
-		for (uint32 id = 0; id < ATOM_MAX_SUPPORTED_DEVICE; id++) {
-			// skip TV DAC connectors as likely fallback isn't for TV
-			if (gConnector[id]->encoder.type == VIDEO_ENCODER_TVDAC)
-				continue;
-			gDisplay[0]->attached = true;
-			gDisplay[0]->connectorIndex = id;
-			init_registers(gDisplay[0]->regs, 0);
-			if (detect_crt_ranges(0) == B_OK)
-				gDisplay[0]->foundRanges = true;
-			break;
-		}
+		// TODO: In the future we might want to accept this condition.. however
+		// without monitor hot plugging, we're most likely going to fail to bring
+		// up a display here.
+		ERROR("%s: ERROR: 0 attached monitors were found on display connectors.\n",
+			__func__);
+		return B_ERROR;
 	}
 
 	// Initial boot state is the first two crtc's powered

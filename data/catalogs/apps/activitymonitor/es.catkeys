@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	2601047281
+1	spanish; castilian	x-vnd.Haiku-ActivityMonitor	826097672
 Teams	DataSource		Equipos
 Semaphores	DataSource		Semáforos
 TX	DataSource	Shorter version for Sending	TX
@@ -20,10 +20,11 @@ ActivityMonitor	System name		Monitor de actividad
 CPU %d	DataSource		CPU %d
 Update time interval:	SettingsWindow		Intervalo de tiempo de actualización:
 RX	DataSource	Shorter version for Receiving.	RX
-Settings…	ActivityWindow		Configuración...
+Settings…	ActivityWindow		Configuración…
 Block cache	DataSource		Bloqueando caché
-Memory	DataSource		Memoria 
+Memory	DataSource		Memoria
 CPU usage	DataSource		Uso de CPU
+CPU speed	DataSource		Velocidad de CPU
 Quit	ActivityWindow		Salir
 Raw clipboard	DataSource		Portapapeles en bruto
 Settings	ActivityWindow		Configuración
@@ -32,6 +33,7 @@ Used memory	DataSource		Memoria usada
 Show legend	ActivityView		Mostrar clave
 Cached memory	DataSource		Memoria de caché
 CPU %d usage	DataSource		Uso CPU %d
+CPU %d speed	DataSource		Velocidad de CPU %d
 File	ActivityWindow		Archivo
 Ports	DataSource		Puertos
 Page faults	DataSource		Errores de página
@@ -42,7 +44,7 @@ Sending	DataSource		Enviando
 %.1f MiB	DataSource		%.1f MiB
 Always on top	ActivityWindow		Siempre visible
 Swap	DataSource		Intercambio
-%lld sec.	SettingsWindow		%lld sec.
+%lld sec.	SettingsWindow		%lld seg.
 P-faults	DataSource		Errores de página
 Sems	DataSource		Sems
 Network receive	DataSource		Recibir de red

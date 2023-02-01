@@ -309,7 +309,7 @@ putenv(char *string)
 	char *value = strchr(string, '=');
 	status_t status;
 
-	if (value == NULL) {
+	if (value == NULL || value == string) {
 		__set_errno(B_BAD_VALUE);
 		return -1;
 	}

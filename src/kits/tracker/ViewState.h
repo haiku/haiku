@@ -46,10 +46,10 @@ const int32 kColumnStateArchiveVersion = 22;
 
 class BColumn {
 public:
-	BColumn(const char* title, float offset, float width,
+	BColumn(const char* title, float width,
 		alignment align, const char* attributeName, uint32 attrType,
 		const char* displayAs, bool statField, bool editable);
-	BColumn(const char* title, float offset, float width,
+	BColumn(const char* title, float width,
 		alignment align, const char* attributeName, uint32 attrType,
 		bool statField, bool editable);
 	~BColumn();
@@ -64,8 +64,6 @@ public:
 	void ArchiveToMessage(BMessage &) const;
 
 	const char* Title() const;
-	float Offset() const;
-	float Width() const;
 	alignment Alignment() const;
 	const char* AttrName() const;
 	uint32 AttrType() const;
@@ -74,14 +72,18 @@ public:
 	bool StatField() const;
 	bool Editable() const;
 
+	//! These two values are automatically scaled to the font size.
+	float Offset() const;
+	float Width() const;
 	void SetOffset(float);
 	void SetWidth(float);
 
 private:
-	void _Init(const char* title, float offset, float width,
+	void _Init(const char* title, float width,
 		alignment align, const char* attributeName, uint32 attrType,
 		const char* displayAs, bool statField, bool editable);
 	static BColumn* _Sanitize(BColumn* column);
+	static float _Scale();
 
 	BString fTitle;
 	float fOffset;
@@ -108,8 +110,8 @@ public:
 	static BViewState* InstantiateFromStream(BMallocIO* stream,
 		bool endianSwap = false);
 	static BViewState* InstantiateFromMessage(const BMessage &message);
-	void ArchiveToStream(BMallocIO* stream) const;
-	void ArchiveToMessage(BMessage &message) const;
+	void ArchiveToStream(BMallocIO* stream);
+	void ArchiveToMessage(BMessage &message);
 
 	uint32 ViewMode() const;
 	uint32 LastIconMode() const;
@@ -139,6 +141,9 @@ public:
 
 private:
 	static BViewState* _Sanitize(BViewState* state, bool fixOnly = false);
+
+	void _ArchiveToStream(BMallocIO* stream) const;
+	void _ArchiveToMessage(BMessage &message) const;
 
 	uint32 fViewMode;
 	uint32 fLastIconMode;

@@ -11,6 +11,7 @@
 #include <new>
 
 #include "fuse_fs.h"
+#include "FUSELowLevel.h"
 #include "FUSEVolume.h"
 
 #include "../RequestThread.h"
@@ -127,6 +128,7 @@ FUSEFileSystem::FUSEFileSystem(const char* fsName,
 	fInitSemaphore(-1),
 	fExitSemaphore(-1),
 	fInitParameters(NULL),
+	fUserData(NULL),
 	fFS(NULL)
 {
 	fClientFSType = CLIENT_FS_FUSE;
@@ -278,6 +280,21 @@ PRINT(("FUSEFileSystem::FinishInitClientFS()\n"));
 
 
 status_t
+FUSEFileSystem::FinishInitClientFS(fuse_config* config,
+	const fuse_lowlevel_ops* ops, size_t opSize, void* userData)
+{
+PRINT(("FUSEFileSystem::FinishInitClientFS()\n"));
+	fExitStatus = B_ERROR;
+
+	fFUSEConfig = *config;
+
+	// do the initialization
+	fInitStatus = _InitClientFS(ops, opSize, userData);
+	return fInitStatus;
+}
+
+
+status_t
 FUSEFileSystem::MainLoop(bool multithreaded)
 {
 	// TODO: Respect the multithreaded flag!
@@ -297,6 +314,8 @@ PRINT(("  waiting for unmounting done\n"));
 
 	if (fFS != NULL)
 		fuse_fs_destroy(fFS);
+	else
+		fuse_ll_destroy(&fLowLevelOps, fUserData);
 
 	return fExitStatus;
 }
@@ -357,8 +376,36 @@ fNodeCapabilities.Dump();
 	fConnectionInfo.async_read = false;
 	fConnectionInfo.max_write = 64 * 1024;
 	fConnectionInfo.max_readahead = 64 * 1024;
+	fConnectionInfo.capable = FUSE_CAP_ATOMIC_O_TRUNC | FUSE_CAP_BIG_WRITES | FUSE_CAP_IOCTL_DIR
+		| FUSE_CAP_HAIKU_FUSE_EXTENSIONS;
 
 	fuse_fs_init(fFS, &fConnectionInfo);
+
+	return B_OK;
+}
+
+
+status_t
+FUSEFileSystem::_InitClientFS(const fuse_lowlevel_ops* lowLevelOps, size_t lowLevelOpSize,
+	void* userData)
+{
+	fLowLevelOps = *lowLevelOps;
+
+	_InitCapabilities();
+PRINT(("volume capabilities:\n"));
+fVolumeCapabilities.Dump();
+PRINT(("node capabilities:\n"));
+fNodeCapabilities.Dump();
+
+	// init connection info
+	fConnectionInfo.proto_major = 0;
+	fConnectionInfo.proto_minor = 0;
+	fConnectionInfo.async_read = false;
+	fConnectionInfo.max_write = 64 * 1024;
+	fConnectionInfo.max_readahead = 64 * 1024;
+	fUserData = userData;
+
+	fuse_ll_init(&fLowLevelOps, userData, &fConnectionInfo);
 
 	return B_OK;
 }
@@ -372,13 +419,17 @@ FUSEFileSystem::_InitCapabilities()
 
 	// Volume operations
 	fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_UNMOUNT, true);
-
-	fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_READ_FS_INFO, fFS->ops.statfs);
-	// missing: FS_VOLUME_CAPABILITY_WRITE_FS_INFO
-	fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_SYNC, fFS->ops.fsync);
-		// emulated via fsync()
-
 	fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_GET_VNODE, true);
+		// emulated
+
+	// vnode operations
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_LOOKUP, true);
+		// emulated
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_GET_VNODE_NAME, true);
+		// emulated
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_PUT_VNODE, true);
+		// emulated
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_VNODE, true);
 		// emulated
 
 	// index directory & index operations
@@ -399,16 +450,6 @@ FUSEFileSystem::_InitCapabilities()
 	// missing: FS_VOLUME_CAPABILITY_READ_QUERY
 	// missing: FS_VOLUME_CAPABILITY_REWIND_QUERY
 
-	// vnode operations
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_LOOKUP, true);
-		// emulated
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_GET_VNODE_NAME, true);
-		// emulated
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_PUT_VNODE, true);
-		// emulated
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_VNODE, true);
-		// emulated
-
 	// VM file access
 	// missing: FS_VNODE_CAPABILITY_CAN_PAGE
 	// missing: FS_VNODE_CAPABILITY_READ_PAGES
@@ -423,66 +464,132 @@ FUSEFileSystem::_InitCapabilities()
 		// emulated
 	// missing: FS_VNODE_CAPABILITY_SELECT
 	// missing: FS_VNODE_CAPABILITY_DESELECT
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FSYNC, fFS->ops.fsync);
-
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_SYMLINK, fFS->ops.readlink);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_SYMLINK, fFS->ops.symlink);
-
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_LINK, fFS->ops.link);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_UNLINK, fFS->ops.unlink);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_RENAME, fFS->ops.rename);
-
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_ACCESS, fFS->ops.access);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_STAT, fFS->ops.getattr);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_STAT,
-		fFS->ops.chmod != NULL || fFS->ops.chown != NULL
-		|| fFS->ops.truncate != NULL || fFS->ops.utimens != NULL
-		|| fFS->ops.utime != NULL);
-
-	// file operations
- 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE, fFS->ops.create);
- 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN, fFS->ops.open);
- 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE, fFS->ops.flush);
- 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_COOKIE, fFS->ops.release);
- 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ, fFS->ops.read);
- 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_WRITE, fFS->ops.write);
-
-	// directory operations
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_DIR, fFS->ops.mkdir);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_DIR, fFS->ops.rmdir);
-	bool readDirSupport = fFS->ops.opendir != NULL || fFS->ops.readdir != NULL
-		|| fFS->ops.getdir;
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_DIR, readDirSupport);
-	// not needed: FS_VNODE_CAPABILITY_CLOSE_DIR
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_DIR_COOKIE, readDirSupport);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_DIR, readDirSupport);
- 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_DIR, readDirSupport);
-
-	// attribute directory operations
-	bool hasAttributes = fFS->ops.listxattr != NULL;
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR_DIR, hasAttributes);
-	// not needed: FS_VNODE_CAPABILITY_CLOSE_ATTR_DIR
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_DIR_COOKIE,
-		hasAttributes);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_DIR, hasAttributes);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_ATTR_DIR, hasAttributes);
-
-	// attribute operations
-// 	// we emulate open_attr() and free_attr_dir_cookie() if either read_attr()
-// 	// or write_attr() is present
-// 	bool hasAttributes = (fFS->ops.read_attr || fFS->ops.write_attr);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_ATTR, hasAttributes);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR, hasAttributes);
+	
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE_ATTR, false);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_COOKIE, hasAttributes);
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR, fFS->ops.getxattr);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_ATTR, fFS->ops.write_attr);
 
-	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_STAT,
+	if (fFS == NULL) {
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FSYNC, fLowLevelOps.fsync);
+
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_SYMLINK, fLowLevelOps.readlink);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_SYMLINK, fLowLevelOps.symlink);
+
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_LINK, fLowLevelOps.link);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_UNLINK, fLowLevelOps.unlink);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_RENAME, fLowLevelOps.rename);
+
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_ACCESS, fLowLevelOps.access);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_STAT, fLowLevelOps.getattr);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_STAT, fLowLevelOps.setattr != NULL);
+
+		fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_READ_FS_INFO, fLowLevelOps.statfs);
+		// missing: FS_VOLUME_CAPABILITY_WRITE_FS_INFO
+		fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_SYNC, fLowLevelOps.fsync);
+		// emulated via fsync()
+
+		// file operations
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE, fLowLevelOps.create);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN, fLowLevelOps.open);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE, fLowLevelOps.flush);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_COOKIE, fLowLevelOps.release);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ, fLowLevelOps.read);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_WRITE, fLowLevelOps.write);
+
+		// directory operations
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_DIR, fLowLevelOps.mkdir);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_DIR, fLowLevelOps.rmdir);
+		bool readDirSupport = fLowLevelOps.opendir != NULL || fLowLevelOps.readdir != NULL;
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_DIR, readDirSupport);
+		// not needed: FS_VNODE_CAPABILITY_CLOSE_DIR
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_DIR_COOKIE, readDirSupport);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_DIR, readDirSupport);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_DIR, readDirSupport);
+
+		// attribute directory operations
+		bool hasAttributes = fLowLevelOps.listxattr != NULL;
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR_DIR, hasAttributes);
+		// not needed: FS_VNODE_CAPABILITY_CLOSE_ATTR_DIR
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_DIR_COOKIE, hasAttributes);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_DIR, hasAttributes);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_ATTR_DIR, hasAttributes);
+
+		// attribute operations
+		// 	// we emulate open_attr() and free_attr_dir_cookie() if either read_attr()
+		// 	// or write_attr() is present
+		// 	bool hasAttributes = (fLowLevelOps.read_attr || fLowLevelOps.write_attr);
+		// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_ATTR, hasAttributes);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR, hasAttributes);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_COOKIE, hasAttributes);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR, fLowLevelOps.getxattr);
+		// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_ATTR, fLowLevelOps.write_attr);
+
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_STAT, fLowLevelOps.getxattr);
+// 		// missing: FS_VNODE_CAPABILITY_WRITE_ATTR_STAT
+// 		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_RENAME_ATTR, fLowLevelOps.rename_attr);
+	} else {
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FSYNC, fFS->ops.fsync);
+
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_SYMLINK, fFS->ops.readlink);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_SYMLINK, fFS->ops.symlink);
+
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_LINK, fFS->ops.link);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_UNLINK, fFS->ops.unlink);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_RENAME, fFS->ops.rename);
+
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_ACCESS, fFS->ops.access);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_STAT, fFS->ops.getattr);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_STAT,
+				fFS->ops.chmod != NULL || fFS->ops.chown != NULL
+				|| fFS->ops.truncate != NULL || fFS->ops.utimens != NULL
+				|| fFS->ops.utime != NULL);
+
+		fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_READ_FS_INFO, fFS->ops.statfs);
+		// missing: FS_VOLUME_CAPABILITY_WRITE_FS_INFO
+		fVolumeCapabilities.Set(FS_VOLUME_CAPABILITY_SYNC, fFS->ops.fsync);
+		// emulated via fsync()
+
+		// file operations
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE, fFS->ops.create);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN, fFS->ops.open);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE, fFS->ops.flush);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_COOKIE, fFS->ops.release);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ, fFS->ops.read);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_WRITE, fFS->ops.write);
+
+		// directory operations
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_DIR, fFS->ops.mkdir);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_DIR, fFS->ops.rmdir);
+		bool readDirSupport = fFS->ops.opendir != NULL || fFS->ops.readdir != NULL
+			|| fFS->ops.getdir;
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_DIR, readDirSupport);
+		// not needed: FS_VNODE_CAPABILITY_CLOSE_DIR
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_DIR_COOKIE, readDirSupport);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_DIR, readDirSupport);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_DIR, readDirSupport);
+
+		// attribute directory operations
+		bool hasAttributes = fFS->ops.listxattr != NULL;
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR_DIR, hasAttributes);
+		// not needed: FS_VNODE_CAPABILITY_CLOSE_ATTR_DIR
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_DIR_COOKIE,
+				hasAttributes);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_DIR, hasAttributes);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REWIND_ATTR_DIR, hasAttributes);
+
+		// attribute operations
+		// 	// we emulate open_attr() and free_attr_dir_cookie() if either read_attr()
+		// 	// or write_attr() is present
+		// 	bool hasAttributes = (fFS->ops.read_attr || fFS->ops.write_attr);
+		// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_ATTR, hasAttributes);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR, hasAttributes);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_COOKIE, hasAttributes);
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR, fFS->ops.getxattr);
+		// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_ATTR, fFS->ops.write_attr);
+
+		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_STAT,
 		fFS->ops.getxattr);
-// 	// missing: FS_VNODE_CAPABILITY_WRITE_ATTR_STAT
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_RENAME_ATTR, fFS->ops.rename_attr);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_ATTR, fFS->ops.remove_attr);
+// 		// missing: FS_VNODE_CAPABILITY_WRITE_ATTR_STAT
+// 		fNodeCapabilities.Set(FS_VNODE_CAPABILITY_RENAME_ATTR, fFS->ops.rename_attr);
+	}
 }
 
 

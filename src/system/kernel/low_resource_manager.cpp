@@ -449,7 +449,7 @@ unregister_low_resource_handler(low_resource_func function, void* data)
 
 		if (handler->function == function && handler->data == data) {
 			sLowResourceHandlers.Remove(handler);
-			free(handler);
+			delete handler;
 			return B_OK;
 		}
 	}
@@ -468,8 +468,7 @@ register_low_resource_handler(low_resource_func function, void* data,
 	TRACE(("register_low_resource_handler(function = %p, data = %p)\n",
 		function, data));
 
-	low_resource_handler *newHandler = (low_resource_handler*)malloc(
-		sizeof(low_resource_handler));
+	low_resource_handler *newHandler = new(std::nothrow) low_resource_handler;
 	if (newHandler == NULL)
 		return B_NO_MEMORY;
 

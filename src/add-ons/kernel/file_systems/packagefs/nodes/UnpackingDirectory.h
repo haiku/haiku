@@ -58,6 +58,9 @@ public:
 								RootDirectory(ino_t id,
 									const timespec& modifiedTime);
 
+	virtual	status_t			OpenAttributeDirectory(
+									AttributeDirectoryCookie*& _cookie) override;
+
 	virtual	timespec			ModifiedTime() const;
 
 private:

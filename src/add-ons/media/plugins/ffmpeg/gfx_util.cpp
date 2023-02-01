@@ -269,7 +269,7 @@ colorspace_to_pixfmt(color_space format)
 void
 dump_ffframe_audio(AVFrame* frame, const char* name)
 {
-	printf(BEGIN_TAG "AVFrame(%s) [ pkt_dts:%-10lld #samples:%-5d %s"
+	printf(BEGIN_TAG "AVFrame(%s) [ pkt_dts:%-10" PRId64 " #samples:%-5d %s"
 		" ]\n" END_TAG,
 		name,
 		frame->pkt_dts,
@@ -283,7 +283,7 @@ dump_ffframe_video(AVFrame* frame, const char* name)
 {
 	const char* picttypes[] = {"no pict type", "intra", "predicted",
 		"bidir pre", "s(gmc)-vop"};
-	printf(BEGIN_TAG "AVFrame(%s) [ pkt_dts:%-10lld cnum:%-5d dnum:%-5d %s%s"
+	printf(BEGIN_TAG "AVFrame(%s) [ pkt_dts:%-10" PRId64 " cnum:%-5d dnum:%-5d %s%s"
 		" ]\n" END_TAG,
 		name,
 		frame->pkt_dts,

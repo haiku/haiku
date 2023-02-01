@@ -63,10 +63,7 @@ All rights reserved.
 #include "WindowMenuItem.h"
 
 
-const float kHPad = 8.0f;
-const float kVPad = 2.0f;
-const float kLabelOffset = 8.0f;
-const float kIconPadding = 8.0f;
+static float sHPad, sVPad, sLabelOffset = 0.0f;
 
 
 //	#pragma mark - TTeamMenuItem
@@ -149,13 +146,13 @@ TTeamMenuItem::GetContentSize(float* width, float* height)
 	else {
 		bool hideLabels = static_cast<TBarApp*>(be_app)->Settings()->hideLabels;
 		float iconSize = static_cast<TBarApp*>(be_app)->IconSize();
-		float iconOnlyWidth = kIconPadding + iconSize + kIconPadding;
+		float iconOnlyWidth = (be_control_look->ComposeSpacing(kIconPadding) * 2) + iconSize;
 
 		if (fBarView->MiniState()) {
 			if (hideLabels)
 				*width = iconOnlyWidth;
 			else
-				*width = gMinimumWindowWidth - (kDragRegionWidth + kGutter) * 2;
+				*width = gMinimumWindowWidth - (gDragRegionWidth + kGutter) * 2;
 		} else if (!fBarView->Vertical()) {
 			TExpandoMenuBar* menu = static_cast<TExpandoMenuBar*>(Menu());
 			*width = menu->MaxHorizontalItemWidth();
@@ -232,14 +229,14 @@ TTeamMenuItem::DrawContent()
 			: BRect(0, 0, kMinimumIconSize - 1, kMinimumIconSize - 1);
 		BRect updateRect = iconBounds;
 		BPoint contentLocation = ContentLocation();
-		BPoint drawLocation = contentLocation + BPoint(kHPad, kVPad);
+		BPoint drawLocation = contentLocation + BPoint(sHPad, sVPad);
 
 		if (static_cast<TBarApp*>(be_app)->Settings()->hideLabels
 			|| (fBarView->Vertical() && iconBounds.Width() > 32)) {
 			// determine icon location (centered horizontally)
 			float offsetx = contentLocation.x
 				+ floorf((frame.Width() - iconBounds.Width()) / 2);
-			float offsety = contentLocation.y + kVPad + kGutter;
+			float offsety = contentLocation.y + sVPad + kGutter;
 
 			// draw icon
 			updateRect.OffsetTo(BPoint(offsetx, offsety));
@@ -247,10 +244,10 @@ TTeamMenuItem::DrawContent()
 
 			// determine label position (below icon)
 			drawLocation.x = floorf((frame.Width() - fLabelWidth) / 2);
-			drawLocation.y = frame.top + kVPad + iconBounds.Height() + kVPad;
+			drawLocation.y = frame.top + sVPad + iconBounds.Height() + sVPad;
 		} else {
 			// determine icon location (centered vertically)
-			float offsetx = contentLocation.x + kHPad;
+			float offsetx = contentLocation.x + sHPad;
 			float offsety = contentLocation.y +
 				floorf((frame.Height() - iconBounds.Height()) / 2);
 
@@ -259,7 +256,7 @@ TTeamMenuItem::DrawContent()
 			menu->DrawBitmapAsync(fIcon, updateRect);
 
 			// determine label position (centered vertically)
-			drawLocation.x += iconBounds.Width() + kLabelOffset;
+			drawLocation.x += iconBounds.Width() + sLabelOffset;
 			drawLocation.y = frame.top
 				+ ceilf((frame.Height() - fLabelHeight) / 2);
 		}
@@ -310,7 +307,7 @@ void
 TTeamMenuItem::DrawExpanderArrow()
 {
 	BRect frame = Frame();
-	BRect rect(0.0f, 0.0f, kSwitchWidth, kHPad + 2.0f);
+	BRect rect(0.0f, 0.0f, kSwitchWidth, sHPad + 2.0f);
 	rect.OffsetTo(BPoint(frame.right - rect.Width(),
 		ContentLocation().y + ((frame.Height() - rect.Height()) / 2)));
 
@@ -426,6 +423,13 @@ void
 TTeamMenuItem::_Init(BList* team, BBitmap* icon, char* name, char* signature,
 	float width, float height)
 {
+	if (sHPad == 0.0f) {
+		// Initialize the padding values.
+		sHPad = be_control_look->ComposeSpacing(B_USE_SMALL_SPACING);
+		sVPad = ceilf(be_control_look->ComposeSpacing(B_USE_SMALL_SPACING) / 4.0f);
+		sLabelOffset = ceilf((be_control_look->DefaultLabelSpacing() / 3.0f) * 4.0f);
+	}
+
 	fTeam = team;
 	fIcon = icon;
 	fSignature = signature;

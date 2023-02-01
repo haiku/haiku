@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src add-ons screen_savers gravity ;
 UseBuildFeatureHeaders glu ;
 UseBuildFeatureHeaders mesa ;
+UsePrivateHeaders shared ;
 
 # For GCC2
 if $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_PACKAGING_ARCH)) = 1 {
@@ -10,7 +11,6 @@ if $(TARGET_CC_IS_LEGACY_GCC_$(TARGET_PACKAGING_ARCH)) = 1 {
 AddResources Gravity : Gravity.rdef ;
 
 local sources =
-	ColorItem.cpp
 	ConfigView.cpp
 	Gravity.cpp
 	GravitySource.cpp
@@ -30,7 +30,7 @@ Includes [ FGristFiles $(sources) ] :
 ScreenSaver Gravity :
 	$(sources)
 	:
-	be screensaver localestub [ TargetLibstdc++ ]
+	be screensaver shared localestub [ TargetLibstdc++ ]
 	[ BuildFeatureAttribute glu : library ]
 	[ BuildFeatureAttribute mesa : library ]
 ;

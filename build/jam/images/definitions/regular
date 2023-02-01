@@ -3,6 +3,10 @@
 # import everything from the minimum image
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions minimum ] ;
 
+SEARCH on [ FGristFiles userguide quicktour welcome ]
+	= [ FDirName $(HAIKU_TOP) data bin ] ;
+SYSTEM_BIN += userguide quicktour welcome ;
+
 SYSTEM_BIN += [ FFilterByBuildFeatures
 	cddb_lookup
 	clipboard CortexAddOnHost
@@ -10,7 +14,7 @@ SYSTEM_BIN += [ FFilterByBuildFeatures
 	FirstBootPrompt
 	<bin>i2c@x86,x86_64 installsound
 	mail mail2mbox mbox2mail media_client mount_nfs
-	play recover screenshot setcontrollook setdecor spamdbm
+	pidof recover screenshot setcontrollook setdecor spamdbm
 	translate
 	WindowShade
 ] ;
@@ -232,8 +236,8 @@ SYSTEM_ADD_ONS_DRIVERS_NET += [ FFilterByBuildFeatures
 	x86,x86_64 @{
 		aironetwifi atheroswifi
 		broadcom43xx
+		iaxwifi200 idualwifi7260
 		iprowifi2100 iprowifi2200 iprowifi3945 iprowifi4965
-		idualwifi7260
 		marvell88w8363 marvell88w8335
 		ralinkwifi realtekwifi
 	}@ # x86,x86_64
@@ -285,3 +289,8 @@ AddDirectoryToHaikuImage home config settings printers "Save as PDF"
 
 # padblocker
 AddDirectoryToHaikuImage home config settings touchpad ;
+
+# shortcuts defaults
+local shortcutsSettingsFile = <settings>shortcuts_settings ;
+SEARCH on $(shortcutsSettingsFile) = [ FDirName $(HAIKU_TOP) data settings ] ;
+AddFilesToHaikuImage home config settings : $(shortcutsSettingsFile) ;

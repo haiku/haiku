@@ -517,14 +517,15 @@ static const Translation kTranslations[] = {
 	"Stefano Ceccherini\n" \
 	"Rudolf Cornelissen\n" \
 	"Adrien Destugues\n" \
+	"Oliver Ruiz Dorantes\n" \
 	"Axel Dörfler\n" \
 	"Jérôme Duval\n" \
 	"René Gollent\n" \
 	"Jessica Hamilton\n" \
-	"Julian Harnath\n" \
 	"Brian Hill\n" \
 	"Fredrik Holmqvist\n" \
 	"Philippe Houdoin\n" \
+	"David Karoly\n" \
 	"Kacper Kasper\n" \
 	"Ryan Leavengood\n" \
 	"Andrew Lindesay\n" \
@@ -535,12 +536,10 @@ static const Translation kTranslations[] = {
 	"Joseph R. Prostko\n" \
 	"Niels Sascha Reedijk\n" \
 	"François Revol\n" \
-	"Philippe Saint-Pierre\n" \
 	"Jonathan Schleifer\n" \
 	"John Scipione\n" \
 	"Gerasim Troeglazov\n" \
 	"Alexander von Gluck IV\n" \
-	"Ingo Weinhold\n" \
 	"\n"
 
 #define kPastMaintainers \
@@ -551,12 +550,12 @@ static const Translation kTranslations[] = {
 	"Dario Casalinuovo\n" \
 	"Tyler Dauwalder\n" \
 	"Alexandre Deckner\n" \
-	"Oliver Ruiz Dorantes\n" \
 	"Pawel Dziepak\n" \
 	"Daniel Furrer\n" \
 	"Andre Alves Garzia\n" \
 	"Bryce Groff\n" \
 	"Colin Günther\n" \
+	"Julian Harnath\n" \
 	"Karsten Heimrich\n" \
 	"Erik Jaesler\n" \
 	"Maurice Kalinowski\n" \
@@ -575,6 +574,7 @@ static const Translation kTranslations[] = {
 	"Marcus Overhagen\n" \
 	"Michael Phipps\n" \
 	"David Reid\n" \
+	"Philippe Saint-Pierre\n" \
 	"Hugo Santos\n" \
 	"Alex Smith\n" \
 	"Alexander G. M. Smith\n" \
@@ -582,6 +582,7 @@ static const Translation kTranslations[] = {
 	"Jonas Sundström\n" \
 	"Oliver Tappe\n" \
 	"Bryan Varner\n" \
+	"Ingo Weinhold\n" \
 	"Nathan Whitehorn\n" \
 	"Michael Wilber\n" \
 	"Alex Wilson\n" \

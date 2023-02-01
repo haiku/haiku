@@ -63,19 +63,7 @@ AVCodecEncoder::_Init()
 		TRACE("  found AVCodec for %u: %p\n", fCodecID, fCodec);
 	}
 
-	memset(&fInputFormat, 0, sizeof(media_format));
-
 	fAudioFifo = av_fifo_alloc(0);
-
-	fDstFrame.data[0] = NULL;
-	fDstFrame.data[1] = NULL;
-	fDstFrame.data[2] = NULL;
-	fDstFrame.data[3] = NULL;
-
-	fDstFrame.linesize[0] = 0;
-	fDstFrame.linesize[1] = 0;
-	fDstFrame.linesize[2] = 0;
-	fDstFrame.linesize[3] = 0;
 
 	// Initial parameters, so we know if the user changed them
 	fEncodeParameters.avg_field_size = 0;
@@ -93,20 +81,7 @@ AVCodecEncoder::~AVCodecEncoder()
 
 	av_fifo_free(fAudioFifo);
 
-	avpicture_free(&fDstFrame);
-	// NOTE: Do not use avpicture_free() on fSrcFrame!! We fill the picture
-	// data on the fly with the media buffer data passed to Encode().
-
 	if (fFrame != NULL) {
-		fFrame->data[0] = NULL;
-		fFrame->data[1] = NULL;
-		fFrame->data[2] = NULL;
-		fFrame->data[3] = NULL;
-
-		fFrame->linesize[0] = 0;
-		fFrame->linesize[1] = 0;
-		fFrame->linesize[2] = 0;
-		fFrame->linesize[3] = 0;
 		av_frame_free(&fFrame);
 	}
 
@@ -130,8 +105,7 @@ AVCodecEncoder::AcceptedFormat(const media_format* proposedInputFormat,
 		return B_BAD_VALUE;
 
 	if (_acceptedInputFormat != NULL) {
-		memcpy(_acceptedInputFormat, proposedInputFormat,
-			sizeof(media_format));
+		*_acceptedInputFormat = *proposedInputFormat;
 	}
 
 	return B_OK;
@@ -247,7 +221,7 @@ status_t
 AVCodecEncoder::Encode(const void* buffer, int64 frameCount,
 	media_encode_info* info)
 {
-	TRACE("AVCodecEncoder::Encode(%p, %lld, %p)\n", buffer, frameCount, info);
+	TRACE("AVCodecEncoder::Encode(%p, %" B_PRId64 ", %p)\n", buffer, frameCount, info);
 
 	if (!_OpenCodecIfNeeded())
 		return B_NO_INIT;
@@ -270,6 +244,11 @@ AVCodecEncoder::_Setup()
 	TRACE("AVCodecEncoder::_Setup\n");
 
 	int rawBitRate;
+
+	if (fCodecContext != NULL) {
+		avcodec_close(fCodecContext);
+		avcodec_free_context(&fCodecContext);
+	}
 
 	fCodecContext = avcodec_alloc_context3(fCodec);
 	if (fCodecContext == NULL)
@@ -332,22 +311,6 @@ AVCodecEncoder::_Setup()
 		}
 
 		fFrame->pts = 0;
-
-		// Allocate space for colorspace converted AVPicture
-		// TODO: Check allocations...
-		avpicture_alloc(&fDstFrame, fCodecContext->pix_fmt, fCodecContext->width,
-			fCodecContext->height);
-
-		// Make the frame point to the data in the converted AVPicture
-		fFrame->data[0] = fDstFrame.data[0];
-		fFrame->data[1] = fDstFrame.data[1];
-		fFrame->data[2] = fDstFrame.data[2];
-		fFrame->data[3] = fDstFrame.data[3];
-
-		fFrame->linesize[0] = fDstFrame.linesize[0];
-		fFrame->linesize[1] = fDstFrame.linesize[1];
-		fFrame->linesize[2] = fDstFrame.linesize[2];
-		fFrame->linesize[3] = fDstFrame.linesize[3];
 
 		fSwsContext = sws_getContext(fCodecContext->width,
 			fCodecContext->height, pixFmt,
@@ -453,9 +416,8 @@ AVCodecEncoder::_Setup()
 		}
 	}
 
-	TRACE("  rawBitRate: %d, wantedBitRate: %d (%.1f), "
-		"context bitrate: %d\n", rawBitRate, wantedBitRate,
-		fEncodeParameters.quality, fCodecContext->bit_rate);
+	TRACE("  rawBitRate: %d, wantedBitRate: %d (%.1f), context bitrate: %" PRId64 "\n",
+		rawBitRate, wantedBitRate, fEncodeParameters.quality, fCodecContext->bit_rate);
 
 	// Add some known fixes from the FFmpeg API example:
 	if (fCodecContext->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
@@ -490,6 +452,7 @@ AVCodecEncoder::_OpenCodecIfNeeded()
 	fFrame->format = fCodecContext->pix_fmt;
 	fFrame->width = fCodecContext->width;
 	fFrame->height = fCodecContext->height;
+	av_frame_get_buffer(fFrame, 0);
 
 	// Open the codec
 	int result = avcodec_open2(fCodecContext, fCodec, NULL);
@@ -509,8 +472,7 @@ status_t
 AVCodecEncoder::_EncodeAudio(const void* _buffer, int64 frameCount,
 	media_encode_info* info)
 {
-	TRACE("AVCodecEncoder::_EncodeAudio(%p, %lld, %p)\n", _buffer, frameCount,
-		info);
+	TRACE("AVCodecEncoder::_EncodeAudio(%p, %" B_PRId64 ", %p)\n", _buffer, frameCount, info);
 
 	if (fChunkBuffer == NULL)
 		return B_NO_MEMORY;
@@ -579,51 +541,45 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 	packet.data = NULL;
 	packet.size = 0;
 
-	// We need to wrap our input data into an AVFrame structure.
-	AVFrame frame;
 	int gotPacket = 0;
 
 	if (buffer) {
-		av_frame_unref(&frame);
+		av_frame_unref(fFrame);
+		fFrame->nb_samples = frameCount;
 
-		frame.nb_samples = frameCount;
-
-		ret = avcodec_fill_audio_frame(&frame, fCodecContext->channels,
+		int count = avcodec_fill_audio_frame(fFrame, fCodecContext->channels,
 				fCodecContext->sample_fmt, (const uint8_t *) buffer, bufferSize, 1);
 
-		if (ret != 0)
+		if (count < 0) {
+			TRACE("  avcodec_encode_audio() failed filling data: %d\n", count);
 			return B_ERROR;
+		}
 
 		/* Set the presentation time of the frame */
-		frame.pts = (bigtime_t)(fFramesWritten * 1000000LL
+		fFrame->pts = (bigtime_t)(fFramesWritten * 1000000LL
 			/ fInputFormat.u.raw_audio.frame_rate);
-		fFramesWritten += frame.nb_samples;
+		fFramesWritten += fFrame->nb_samples;
 
-		ret = avcodec_encode_audio2(fCodecContext, &packet, &frame, &gotPacket);
+		ret = avcodec_send_frame(fCodecContext, fFrame);
+		gotPacket = avcodec_receive_packet(fCodecContext, &packet) == 0;
 	} else {
 		// If called with NULL, ask the encoder to flush any buffers it may
 		// have pending.
-		ret = avcodec_encode_audio2(fCodecContext, &packet, NULL, &gotPacket);
+		ret = avcodec_receive_packet(fCodecContext, &packet);
+		gotPacket = (ret == 0);
 	}
 
-	if (buffer && frame.extended_data != frame.data)
-		av_freep(&frame.extended_data);
+	if (buffer && fFrame->extended_data != fFrame->data)
+		av_freep(&fFrame->extended_data);
 
 	if (ret != 0) {
-		TRACE("  avcodec_encode_audio() failed: %ld\n", ret);
+		TRACE("  avcodec_encode_audio() failed: %s\n", strerror(ret));
 		return B_ERROR;
 	}
 
 	fFramesWritten += frameCount;
 
 	if (gotPacket) {
-		if (fCodecContext->coded_frame) {
-			// Store information about the coded frame in the context.
-			fCodecContext->coded_frame->pts = packet.pts;
-			// TODO: double "!" operator ?
-			fCodecContext->coded_frame->key_frame = !!(packet.flags & AV_PKT_FLAG_KEY);
-		}
-
 		// Setup media_encode_info, most important is the time stamp.
 		info->start_time = packet.pts;
 
@@ -636,12 +592,12 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 		ret = WriteChunk(packet.data, packet.size, info);
 		if (ret != B_OK) {
 			TRACE("  error writing chunk: %s\n", strerror(ret));
-			av_free_packet(&packet);
+			av_packet_unref(&packet);
 			return ret;
 		}
 	}
 
-	av_free_packet(&packet);
+	av_packet_unref(&packet);
 	return B_OK;
 }
 
@@ -656,21 +612,16 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 	if (fChunkBuffer == NULL)
 		return B_NO_MEMORY;
 
-	status_t ret = B_OK;
-
 	AVPacket* pkt = av_packet_alloc();
 	while (frameCount > 0) {
-		size_t bpr = fInputFormat.u.raw_video.display.bytes_per_row;
+		int bpr = fInputFormat.u.raw_video.display.bytes_per_row;
 		size_t bufferSize = fInputFormat.u.raw_video.display.line_count * bpr;
 
-		// We should always get chunky bitmaps, so this code should be safe.
-		fSrcFrame.data[0] = (uint8_t*)buffer;
-		fSrcFrame.linesize[0] = bpr;
-
 		// Run the pixel format conversion
-		sws_scale(fSwsContext, fSrcFrame.data, fSrcFrame.linesize, 0,
-			fInputFormat.u.raw_video.display.line_count, fDstFrame.data,
-			fDstFrame.linesize);
+		const uint8_t* buf8 = (const uint8_t*)buffer;
+		sws_scale(fSwsContext, &buf8, &bpr, 0,
+			fInputFormat.u.raw_video.display.line_count, fFrame->data,
+			fFrame->linesize);
 		
 		if (_EncodeVideoFrame(fFrame, pkt, info) == B_OK) {
 			// Skip to the next frame (but usually, there is only one to encode
@@ -689,7 +640,7 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 	//_EncodeVideoFrame(NULL, pkt, info);
 	//avcodec_flush_buffers(fCodecContext);
 	av_packet_free(&pkt);
-	return ret;
+	return B_OK;
 }
 
 
@@ -713,7 +664,7 @@ AVCodecEncoder::_EncodeVideoFrame(AVFrame* frame, AVPacket* pkt, media_encode_in
 			TRACE("  avcodec_receive_packet: received one packet\n");
 			// Maybe we need to use this PTS to calculate start_time:
 			if (pkt->pts != AV_NOPTS_VALUE) {
-				TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
+				TRACE("  codec frame PTS: %" B_PRId64 " (codec time_base: %d/%d)\n",
 					pkt->pts, fCodecContext->time_base.num,
 					fCodecContext->time_base.den);
 			} else {
@@ -726,7 +677,7 @@ AVCodecEncoder::_EncodeVideoFrame(AVFrame* frame, AVPacket* pkt, media_encode_in
 				/ fInputFormat.u.raw_video.field_rate);
 	
 			info->flags = 0;
-			if (fCodecContext->coded_frame->key_frame)
+			if (pkt->flags & AV_PKT_FLAG_KEY)
 				info->flags |= B_MEDIA_KEY_FRAME;
 	
 			// Write the chunk

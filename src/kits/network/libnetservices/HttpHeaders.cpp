@@ -14,10 +14,8 @@
 #include <String.h>
 #include <HttpHeaders.h>
 
-
-#ifndef LIBNETAPI_DEPRECATED
 using namespace BPrivate::Network;
-#endif
+
 
 // #pragma mark -- BHttpHeader
 

@@ -11,6 +11,7 @@
 #include <boot/stdio.h>
 
 #include "efi_platform.h"
+#include "generic_mmu.h"
 #include "mmu.h"
 #include "serial.h"
 #include "smp.h"
@@ -50,46 +51,6 @@ void
 arch_convert_kernel_args(void)
 {
 	fix_address(gKernelArgs.arch_args.fdt);
-}
-
-
-static const char*
-memory_region_type_str(int type)
-{
-	switch (type)	{
-		case EfiReservedMemoryType:
-			return "ReservedMemoryType";
-		case EfiLoaderCode:
-			return "LoaderCode";
-		case EfiLoaderData:
-			return "LoaderData";
-		case EfiBootServicesCode:
-			return "BootServicesCode";
-		case EfiBootServicesData:
-			return "BootServicesData";
-		case EfiRuntimeServicesCode:
-			return "RuntimeServicesCode";
-		case EfiRuntimeServicesData:
-			return "RuntimeServicesData";
-		case EfiConventionalMemory:
-			return "ConventionalMemory";
-		case EfiUnusableMemory:
-			return "UnusableMemory";
-		case EfiACPIReclaimMemory:
-			return "ACPIReclaimMemory";
-		case EfiACPIMemoryNVS:
-			return "ACPIMemoryNVS";
-		case EfiMemoryMappedIO:
-			return "MMIO";
-		case EfiMemoryMappedIOPortSpace:
-			return "MMIOPortSpace";
-		case EfiPalCode:
-			return "PalCode";
-		case EfiPersistentMemory:
-			return "PersistentMemory";
-		default:
-			return "unknown";
-	}
 }
 
 
@@ -204,16 +165,14 @@ arch_start_kernel(addr_t kernelEntry)
 	// A changing memory map shouldn't affect the generated page tables, as
 	// they only needed to know about the maximum address, not any specific
 	// entry.
+
 	dprintf("Calling ExitBootServices. So long, EFI!\n");
+	serial_disable();
 	while (true) {
 		if (kBootServices->ExitBootServices(kImage, mapKey) == EFI_SUCCESS) {
-			// If the console was provided by boot services, disable it.
-			stdout = NULL;
-			stderr = NULL;
-			// Also switch to legacy serial output
-			// (may not work on all systems)
-			serial_switch_to_legacy();
-			dprintf("Switched to legacy serial output\n");
+			// Disconnect from EFI serial_io / stdio services
+			serial_kernel_handoff();
+			dprintf("Unhooked from EFI serial services\n");
 			break;
 		}
 
@@ -227,6 +186,8 @@ arch_start_kernel(addr_t kernelEntry)
 	// Update EFI, generate final kernel physical memory map, etc.
 	arch_mmu_post_efi_setup(memoryMapSize, memoryMap,
 		descriptorSize, descriptorVersion);
+
+	serial_enable();
 
 	// Copy final kernel args
 	// This should be the last step before jumping to the kernel

@@ -26,7 +26,7 @@ VirtualKeyboardInputDevice::~VirtualKeyboardInputDevice()
 status_t
 VirtualKeyboardInputDevice::InitCheck()
 {
-	static input_device_ref keyboard = {"VirtualKeyboard",
+	static input_device_ref keyboard = {(char*) "VirtualKeyboard",
 		B_KEYBOARD_DEVICE, (void*) this};
 	static input_device_ref* devices[2] = {&keyboard, NULL};
 

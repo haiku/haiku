@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2016 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2022 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,11 +31,9 @@ static const int32 kMsgMessageRunner = 'MsgR';
 //	#pragma mark - ColorPreview
 
 
-ColorPreview::ColorPreview(BRect frame, BMessage* message, uint32 resizingMode,
-	uint32 flags)
+ColorPreview::ColorPreview(BMessage* message, uint32 flags)
 	:
-	BControl(frame, "ColorPreview", "", message, resizingMode,
-		flags | B_WILL_DRAW),
+	BControl("ColorPreview", "", message, flags | B_WILL_DRAW),
 	fColor(ui_color(B_PANEL_BACKGROUND_COLOR)),
 	fDisabledColor((rgb_color){ 128, 128, 128 }),
 	fMessageRunner(NULL),
@@ -43,6 +41,7 @@ ColorPreview::ColorPreview(BRect frame, BMessage* message, uint32 resizingMode,
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(0, 0, 0);
+	SetExplicitSize(BSize(StringWidth("M") * 8, StringWidth("M") * 7));
 }
 
 

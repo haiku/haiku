@@ -31,6 +31,46 @@
 #include <sys/kernel.h>
 #include <sys/time.h>
 
+/*
+ * ratecheck(): simple time-based rate-limit checking.
+ */
+int
+ratecheck(struct timeval *lasttime, const struct timeval *mininterval)
+{
+	struct timeval tv, delta;
+	int rv = 0;
+
+	getmicrouptime(&tv);		/* NB: 10ms precision */
+	delta = tv;
+	timevalsub(&delta, lasttime);
+
+	/*
+	 * check for 0,0 is so that the message will be seen at least once,
+	 * even if interval is huge.
+	 */
+	if (timevalcmp(&delta, mininterval, >=) ||
+		(lasttime->tv_sec == 0 && lasttime->tv_usec == 0)) {
+		*lasttime = tv;
+		rv = 1;
+	}
+
+	return (rv);
+}
+
+/*
+ * ppsratecheck(): packets (or events) per second limitation.
+ *
+ * Return 0 if the limit is to be enforced (e.g. the caller
+ * should drop a packet because of the rate limitation).
+ *
+ * maxpps of 0 always causes zero to be returned.  maxpps of -1
+ * always causes 1 to be returned; this effectively defeats rate
+ * limiting.
+ *
+ * Note that we maintain the struct timeval for compatibility
+ * with other bsd systems.  We reuse the storage and just monitor
+ * clock ticks for minimal overhead.
+ */
 int
 ppsratecheck(struct timeval *lasttime, int *curpps, int maxpps)
 {
@@ -48,6 +88,45 @@ ppsratecheck(struct timeval *lasttime, int *curpps, int maxpps)
 		return (maxpps != 0);
 	} else {
 		(*curpps)++;		/* NB: ignore potential overflow */
-		return (maxpps < 0 || *curpps < maxpps);
+		return (maxpps < 0 || *curpps <= maxpps);
 	}
+}
+
+static void
+timevalfix(struct timeval *t1)
+{
+
+	if (t1->tv_usec < 0) {
+		t1->tv_sec--;
+		t1->tv_usec += 1000000;
+	}
+	if (t1->tv_usec >= 1000000) {
+		t1->tv_sec++;
+		t1->tv_usec -= 1000000;
+	}
+}
+
+/*
+ * Add and subtract routines for timevals.
+ * N.B.: subtract routine doesn't deal with
+ * results which are before the beginning,
+ * it just gets very confused in this case.
+ * Caveat emptor.
+ */
+void
+timevaladd(struct timeval *t1, const struct timeval *t2)
+{
+
+	t1->tv_sec += t2->tv_sec;
+	t1->tv_usec += t2->tv_usec;
+	timevalfix(t1);
+}
+
+void
+timevalsub(struct timeval *t1, const struct timeval *t2)
+{
+
+	t1->tv_sec -= t2->tv_sec;
+	t1->tv_usec -= t2->tv_usec;
+	timevalfix(t1);
 }

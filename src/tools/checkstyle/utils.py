@@ -2,7 +2,12 @@
 # Copyright 2009, Alexandre Deckner, alex@zappotek.com
 # Distributed under the terms of the MIT License.
 #
-from cgi import escape
+
+try:
+    # deprecated in 3.2 (in favor of html.escape), removed in 3.8
+    from cgi import escape
+except ImportError:
+    from html import escape
 
 
 # prints match to stdout
@@ -11,8 +16,8 @@ def printMatch(name, match, source):
     end = match.end()
     startLine = source.count('\n', 0, start)
     startColumn = start - source.rfind('\n', 0, start)
-    print name + " (line " + str(startLine + 1) + ", " + str(startColumn) \
-        + "): '" + match.group().replace('\n','\\n') + "'"
+    print(name + " (line " + str(startLine + 1) + ", " + str(startColumn) \
+        + "): '" + match.group().replace('\n','\\n') + "'")
 
 
 def openHtml(fileList, outputFileName):
@@ -57,7 +62,7 @@ def renderHtml(text, highlights, sourceFileName, outputFileName):
         if count % 2 == 0:
             temp += escape(slice) + '<span class="highlight tooltip">'
         else:
-            temp += escape(slice) + "<em>" + highlights[(count - 1) / 2][2] \
+            temp += escape(slice) + "<em>" + highlights[(count - 1) // 2][2] \
                 + "</em></span>"
         count += 1
 
@@ -82,7 +87,7 @@ def renderHtml(text, highlights, sourceFileName, outputFileName):
 
 # highlight overlap check
 def highlightOverlaps(highlight1, highlight2):
-    #print "hl1", highlight1, "hl2", highlight2
+    #print("hl1", highlight1, "hl2", highlight2)
     return not(highlight2[0] > highlight1[1] or highlight1[0] > highlight2[1])
 
 
@@ -109,7 +114,7 @@ def highlightSplit(string, highlights):
             lastEnd = end
             offset += len(before + between)
          else:
-            print "overlap ", (start, end, name)
+            print("overlap ", (start, end, name))
     splittedString.append(text)
     return splittedString
 

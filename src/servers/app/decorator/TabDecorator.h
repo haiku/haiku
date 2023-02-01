@@ -137,6 +137,7 @@ protected:
 protected:
 			BRegion				fTabsRegion;
 			BRect				fOldMovingTab;
+			float				fBorderResizeLength, fResizeKnobSize;
 
 			rgb_color			fFocusFrameColor;
 

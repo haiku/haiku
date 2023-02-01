@@ -714,8 +714,8 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 
 	char versionString[100];
 	snprintf(versionString, sizeof(versionString),
-		B_TRANSLATE("Version %d.%d.%d"), 
-		static_cast<int>(sTranslatorVersion >> 8), 
+		B_TRANSLATE("Version %d.%d.%d"),
+		static_cast<int>(sTranslatorVersion >> 8),
 		static_cast<int>((sTranslatorVersion >> 4) & 0xf),
 		static_cast<int>(sTranslatorVersion & 0xf));
 
@@ -746,18 +746,13 @@ TranslatorView::TranslatorView(const char* name, TranslatorSettings* settings)
 {
 	SetBorder(B_NO_BORDER);
 
-	AddTab(new TranslatorWriteView(B_TRANSLATE("Write"), 
+	AddTab(new TranslatorWriteView(B_TRANSLATE("Write"),
 		settings->Acquire()));
-	AddTab(new TranslatorReadView(B_TRANSLATE("Read"), 
+	AddTab(new TranslatorReadView(B_TRANSLATE("Read"),
 		settings->Acquire()));
 	AddTab(new TranslatorAboutView(B_TRANSLATE("About")));
 
 	settings->Release();
-
- 	BFont font;
- 	GetFont(&font);
- 	SetExplicitPreferredSize(
-		BSize((font.Size() * 380) / 12, (font.Size() * 250) / 12));
 }
 
 

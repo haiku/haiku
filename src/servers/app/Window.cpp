@@ -100,7 +100,7 @@ Window::Window(const BRect& frame, const char *name,
 	fPendingUpdateSession(&fUpdateSessions[1]),
 	fUpdateRequested(false),
 	fInUpdate(false),
-	fUpdatesEnabled(true),
+	fUpdatesEnabled(false),
 
 	// Windows start hidden
 	fHidden(true),

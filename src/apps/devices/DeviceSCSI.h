@@ -16,10 +16,7 @@ class DeviceSCSI : public Device {
 public:
 						DeviceSCSI(Device* parent);
 	virtual				~DeviceSCSI();
-	virtual Attributes	GetBusAttributes();
-	virtual BString		GetBusStrings();
 	virtual void		InitFromAttributes();
-	virtual BString		GetBusTabName();
 };
 
 #endif /* DEVICESCSI_H */

@@ -12,5 +12,6 @@ SimpleTest wlan_test : wlan_test.cpp : $(TARGET_NETWORK_LIBS) bnetapi be ;
 
 SubInclude HAIKU_TOP src tests kits net cookie ;
 HaikuSubInclude libnetapi ;
+SubInclude HAIKU_TOP src tests kits net netservices2 ;
 SubInclude HAIKU_TOP src tests kits net service ;
 SubInclude HAIKU_TOP src tests kits net urlRequest ;

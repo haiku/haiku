@@ -52,6 +52,7 @@ All rights reserved.
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <ColorConversion.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <Dragger.h>
 #include <fs_attr.h>
@@ -216,12 +217,19 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	:
 	BView("PoseView", B_WILL_DRAW | B_PULSE_NEEDED),
 	fIsDrawingSelectionRect(false),
+	fViewState(new BViewState),
+	fStateNeedsSaving(false),
+	fSavePoseLocations(true),
+	fMultipleSelection(true),
+	fDragEnabled(true),
+	fDropEnabled(true),
+	fSelectionHandler(be_app),
+	fPoseList(new PoseList(40, true)),
 	fHScrollBar(NULL),
 	fVScrollBar(NULL),
 	fModel(model),
 	fActivePose(NULL),
 	fExtent(INT32_MAX, INT32_MAX, INT32_MIN, INT32_MIN),
-	fPoseList(new PoseList(40, true)),
 	fFilteredPoseList(new PoseList()),
 	fVSPoseList(new PoseList()),
 	fSelectionList(new PoseList()),
@@ -231,14 +239,11 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fMimeTypeList(new BObjectList<BString>(10, true)),
 	fBrokenLinks(new BObjectList<Model>(10, false)),
 	fMimeTypeListIsDirty(false),
-	fViewState(new BViewState),
-	fStateNeedsSaving(false),
 	fCountView(NULL),
 	fListElemHeight(0.0f),
 	fIconPoseHeight(0.0f),
 	fDropTarget(NULL),
 	fAlreadySelectedDropTarget(NULL),
-	fSelectionHandler(be_app),
 	fLastClickPoint(INT32_MAX, INT32_MAX),
 	fLastClickButtons(0),
 	fLastClickedPose(NULL),
@@ -254,15 +259,10 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fTrackRightMouseUp(false),
 	fTrackMouseUp(false),
 	fSelectionVisible(true),
-	fMultipleSelection(true),
-	fDragEnabled(true),
-	fDropEnabled(true),
 	fSelectionRectEnabled(true),
 	fAlwaysAutoPlace(false),
 	fAllowPoseEditing(true),
 	fSelectionChangedHook(false),
-	fSavePoseLocations(true),
-	fShowHideSelection(true),
 	fOkToMapIcons(false),
 	fEnsurePosesVisible(false),
 	fShouldAutoScroll(true),
@@ -278,15 +278,17 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fLastDeskbarFrameCheckTime(LONGLONG_MIN),
 	fDeskbarFrame(0, 0, -1, -1),
 	fTextWidgetToCheck(NULL),
-	fActiveTextWidget(NULL)
+	fActiveTextWidget(NULL),
+	fCachedIconSizeFrom(0)
 {
 	fListElemHeight = ceilf(be_plain_font->Size() * 1.65f);
+	fListOffset = ceilf(be_control_look->DefaultLabelSpacing() * 3.3f);
 
 	fViewState->SetViewMode(viewMode);
 	fShowSelectionWhenInactive
 		= TrackerSettings().ShowSelectionWhenInactive();
 	fTransparentSelection = TrackerSettings().TransparentSelection();
-	fFilterStrings.AddItem(new BString(""));
+	fFilterStrings.AddItem(new BString());
 }
 
 
@@ -384,6 +386,9 @@ void
 BPoseView::RestoreColumnState(AttributeStreamNode* node)
 {
 	fColumnList->MakeEmpty();
+	if (fTitleView != NULL)
+		fTitleView->Reset();
+
 	if (node != NULL) {
 		const char* columnsAttr;
 		const char* columnsAttrForeign;
@@ -432,7 +437,6 @@ BPoseView::RestoreColumnState(AttributeStreamNode* node)
 		}
 	}
 
-	_ResetStartOffset();
 	SetUpDefaultColumnsIfNeeded();
 	if (!ColumnFor(PrimarySort())) {
 		fViewState->SetPrimarySort(FirstColumn()->AttrHash());
@@ -448,6 +452,8 @@ void
 BPoseView::RestoreColumnState(const BMessage &message)
 {
 	fColumnList->MakeEmpty();
+	if (fTitleView != NULL)
+		fTitleView->Reset();
 
 	BObjectList<BColumn> tempSortedList;
 	for (int32 index = 0; ; index++) {
@@ -460,7 +466,6 @@ BPoseView::RestoreColumnState(const BMessage &message)
 
 	AddColumnList(&tempSortedList);
 
-	_ResetStartOffset();
 	SetUpDefaultColumnsIfNeeded();
 	if (!ColumnFor(PrimarySort())) {
 		fViewState->SetPrimarySort(FirstColumn()->AttrHash());
@@ -477,16 +482,12 @@ BPoseView::AddColumnList(BObjectList<BColumn>* list)
 {
 	list->SortItems(&CompareColumns);
 
-	float nextLeftEdge = 0;
-	for (int32 columIndex = 0; columIndex < list->CountItems();
-			columIndex++) {
+	float nextLeftEdge = StartOffset();
+	for (int32 columIndex = 0; columIndex < list->CountItems(); columIndex++) {
 		BColumn* column = list->ItemAt(columIndex);
 
-		// Make sure that columns don't overlap
-		if (column->Offset() < nextLeftEdge) {
-			PRINT(("\t**Overlapped columns in archived column state\n"));
-			column->SetOffset(nextLeftEdge);
-		}
+		// Always realign columns, since the title-view snaps on resize anyway.
+		column->SetOffset(nextLeftEdge);
 
 		nextLeftEdge = column->Offset() + column->Width()
 			- kRoomForLine / 2.0f + kTitleColumnExtraMargin;
@@ -497,6 +498,9 @@ BPoseView::AddColumnList(BObjectList<BColumn>* list)
 			StartWatchDateFormatChange();
 		}
 	}
+
+	if (fTitleView != NULL)
+		fTitleView->Reset();
 }
 
 
@@ -611,14 +615,14 @@ void
 BPoseView::SetUpDefaultColumnsIfNeeded()
 {
 	// in case there were errors getting some columns
-	if (fColumnList->CountItems() != 0)
+	if (CountColumns() != 0)
 		return;
 
-	fColumnList->AddItem(new BColumn(B_TRANSLATE("Name"), StartOffset(), 145,
+	AddColumn(new BColumn(B_TRANSLATE("Name"), 145,
 		B_ALIGN_LEFT, kAttrStatName, B_STRING_TYPE, true, true));
-	fColumnList->AddItem(new BColumn(B_TRANSLATE("Size"), 200, 80,
+	AddColumn(new BColumn(B_TRANSLATE("Size"), 80,
 		B_ALIGN_RIGHT, kAttrStatSize, B_OFF_T_TYPE, true, false));
-	fColumnList->AddItem(new BColumn(B_TRANSLATE("Modified"), 295, 150,
+	AddColumn(new BColumn(B_TRANSLATE("Modified"), 150,
 		B_ALIGN_LEFT, kAttrStatModified, B_TIME_TYPE, true, false));
 
 	if (!IsWatchingDateFormatChange())
@@ -1009,6 +1013,17 @@ BPoseView::AttachedToWindow()
 }
 
 
+BSize
+BPoseView::IconSize() const
+{
+	if (fCachedIconSizeFrom != fViewState->IconSize()) {
+		fCachedIconSizeFrom = fViewState->IconSize();
+		fCachedIconSize = be_control_look->ComposeIconSize(fCachedIconSizeFrom);
+	}
+	return fCachedIconSize;
+}
+
+
 void
 BPoseView::SetIconPoseHeight()
 {
@@ -1025,11 +1040,9 @@ BPoseView::SetIconPoseHeight()
 
 		case kListMode:
 		default:
-		{
-			fViewState->SetIconSize(ListIconSize());
+			fViewState->SetIconSize(B_MINI_ICON);
 			fIconPoseHeight = fListElemHeight;
 			break;
-		}
 	}
 }
 
@@ -1039,19 +1052,26 @@ BPoseView::GetLayoutInfo(uint32 mode, BPoint* grid, BPoint* offset) const
 {
 	switch (mode) {
 		case kMiniIconMode:
-			grid->Set(96, 20);
-			offset->Set(10, 5);
+			grid->Set(IconSizeInt() * 6, ceilf(IconSizeInt() * 1.25f));
+			offset->Set(ceilf(IconSizeInt() * 0.6f), ceilf(IconSizeInt() * 0.3f));
 			break;
 
 		case kIconMode:
-			grid->Set(IconSizeInt() + 28, IconSizeInt() + 28);
-			offset->Set(20, 20);
+		{
+			const float gridOffset = ceilf(IconSizeInt() * 0.875f),
+				offsetValue = ceilf(IconSizeInt() * 0.625f);
+			grid->Set(IconSizeInt() + gridOffset, IconSizeInt() + gridOffset);
+			offset->Set(offsetValue, offsetValue);
 			break;
+		}
 
 		default:
+		{
+			const float labelSpacing = be_control_look->DefaultLabelSpacing();
 			grid->Set(0, 0);
-			offset->Set(5, 5);
+			offset->Set(labelSpacing - 1, labelSpacing - 1);
 			break;
+		}
 	}
 }
 
@@ -1114,8 +1134,7 @@ BPoseView::WindowActivated(bool active)
 	if (!active)
 		CommitActivePose();
 
-	if (fShowHideSelection)
-		ShowSelection(active);
+	ShowSelection(active);
 
 	if (active && ActivePose() == NULL && !IsFilePanel())
 		MakeFocus();
@@ -2203,56 +2222,27 @@ BPoseView::MessageReceived(BMessage* message)
 			break;
 
 		case kIconMode: {
-			int32 size;
+			int32 size = -1;
 			int32 scale;
 			if (message->FindInt32("size", &size) == B_OK) {
-				if (size != (int32)IconSizeInt())
-					fViewState->SetIconSize(size);
+				// Nothing else to do in this case.
 			} else if (message->FindInt32("scale", &scale) == B_OK
 				&& fViewState->ViewMode() == kIconMode) {
-				if (scale == 0 && (int32)IconSizeInt() != 32) {
-					switch ((int32)IconSizeInt()) {
-						case 40:
-							fViewState->SetIconSize(32);
-							break;
-
-						case 48:
-							fViewState->SetIconSize(40);
-							break;
-
-						case 64:
-							fViewState->SetIconSize(48);
-							break;
-
-						case 96:
-							fViewState->SetIconSize(64);
-							break;
-
-						case 128:
-							fViewState->SetIconSize(96);
-							break;
+				if (scale == 0 && (int32)UnscaledIconSizeInt() != 32) {
+					switch ((int32)UnscaledIconSizeInt()) {
+						case 40: size = 32; break;
+						case 48: size = 40; break;
+						case 64: size = 48; break;
+						case 96: size = 64; break;
+						case 128: size = 96; break;
 					}
-				} else if (scale == 1 && (int32)IconSizeInt() != 128) {
-					switch ((int32)IconSizeInt()) {
-						case 32:
-							fViewState->SetIconSize(40);
-							break;
-
-						case 40:
-							fViewState->SetIconSize(48);
-							break;
-
-						case 48:
-							fViewState->SetIconSize(64);
-							break;
-
-						case 64:
-							fViewState->SetIconSize(96);
-							break;
-
-						case 96:
-							fViewState->SetIconSize(128);
-							break;
+				} else if (scale == 1 && (int32)UnscaledIconSizeInt() != 128) {
+					switch ((int32)UnscaledIconSizeInt()) {
+						case 32: size = 40; break;
+						case 40: size = 48; break;
+						case 48: size = 64; break;
+						case 64: size = 96; break;
+						case 96: size = 128; break;
 					}
 				}
 			} else {
@@ -2261,8 +2251,12 @@ BPoseView::MessageReceived(BMessage* message)
 					// uninitialized last icon size?
 					iconSize = 32;
 				}
-				fViewState->SetIconSize(iconSize);
+				size = iconSize;
 			}
+			if (size <= 0)
+				break;
+			if (size != (int32)UnscaledIconSizeInt())
+				fViewState->SetIconSize(size);
 			SetViewMode(message->what);
 			break;
 		}
@@ -2813,7 +2807,7 @@ BPoseView::RemoveColumn(BColumn* columnToRemove, bool runAlert)
 bool
 BPoseView::AddColumn(BColumn* newColumn, const BColumn* after)
 {
-	if (after == NULL)
+	if (after == NULL && CountColumns() > 0)
 		after = LastColumn();
 
 	// add new column after last column
@@ -2829,7 +2823,8 @@ BPoseView::AddColumn(BColumn* newColumn, const BColumn* after)
 
 	// add the new column
 	fColumnList->AddItem(newColumn, afterColumnIndex + 1);
-	fTitleView->AddTitle(newColumn);
+	if (fTitleView != NULL)
+		fTitleView->AddTitle(newColumn);
 
 	BRect rect(Bounds());
 
@@ -2929,7 +2924,7 @@ BPoseView::HandleAttrMenuItemSelected(BMessage* message)
 		const char* displayAs;
 		message->FindString("attr_display_as", &displayAs);
 
-		column = new BColumn(item->Label(), 0, attrWidth, attrAlign,
+		column = new BColumn(item->Label(), attrWidth, attrAlign,
 			attrName, attrType, displayAs, isStatfield, isEditable);
 		AddColumn(column);
 		if (item->Menu()->Supermenu() == NULL)
@@ -3108,7 +3103,7 @@ BPoseView::SetViewMode(uint32 newMode)
 		float oldScale = lastIconSize / 32.0;
 		BPoint unscaledCenter(center.x / oldScale, center.y / oldScale);
 		// get the new center in "scaled icon placement" place
-		float newScale = fViewState->IconSize() / 32.0;
+		float newScale = fViewState->IconSize() / 32.0f;
 		BPoint newCenter(unscaledCenter.x * newScale,
 			unscaledCenter.y * newScale);
 		scaleOffset = newCenter - center;
@@ -6127,7 +6122,7 @@ BPoseView::MoveListToTrash(BObjectList<entry_ref>* list, bool selectNext,
 		BPose* pose = fSelectionList->ItemAt(0);
 
 		// find a point in the pose
-		BPoint pointInPose(kListOffset + 5, 5);
+		BPoint pointInPose(fListOffset + 5, 5);
 		int32 index = IndexOfPose(pose);
 		pointInPose.y += fListElemHeight * index;
 
@@ -6349,7 +6344,7 @@ BPoseView::Delete(BObjectList<entry_ref>* list, bool selectNext, bool askUser)
 		BPose* pose = fSelectionList->ItemAt(0);
 
 		// find a point in the pose
-		BPoint pointInPose(kListOffset + 5, 5);
+		BPoint pointInPose(fListOffset + 5, 5);
 		int32 index = IndexOfPose(pose);
 		pointInPose.y += fListElemHeight * index;
 
@@ -6392,7 +6387,7 @@ BPoseView::RestoreItemsFromTrash(BObjectList<entry_ref>* list, bool selectNext)
 		BPose* pose = fSelectionList->ItemAt(0);
 
 		// find a point in the pose
-		BPoint pointInPose(kListOffset + 5, 5);
+		BPoint pointInPose(fListOffset + 5, 5);
 		int32 index = IndexOfPose(pose);
 		pointInPose.y += fListElemHeight * index;
 
@@ -8216,7 +8211,7 @@ BPose*
 BPoseView::FirstVisiblePose(int32* _index) const
 {
 	ASSERT(ViewMode() == kListMode);
-	return FindPose(BPoint(kListOffset,
+	return FindPose(BPoint(fListOffset,
 		Bounds().top + fListElemHeight - 1), _index);
 }
 
@@ -8225,7 +8220,7 @@ BPose*
 BPoseView::LastVisiblePose(int32* _index) const
 {
 	ASSERT(ViewMode() == kListMode);
-	BPose* pose = FindPose(BPoint(kListOffset, Bounds().top + Frame().Height()
+	BPose* pose = FindPose(BPoint(fListOffset, Bounds().top + Frame().Height()
 		- fListElemHeight + 2), _index);
 	if (pose == NULL) {
 		// Just get the last one
@@ -8458,9 +8453,6 @@ BPoseView::SwitchDir(const entry_ref* newDirRef, AttributeStreamNode* node)
 		RestoreState(node);
 		viewStateRestored = (fViewState != previousState);
 	}
-
-	// Make sure fTitleView is rebuilt, as fColumnList might have changed
-	fTitleView->Reset();
 
 	if (viewStateRestored) {
 		if (ViewMode() == kListMode && oldMode != kListMode) {
@@ -8988,7 +8980,7 @@ BPoseView::UpdateScrollRange()
 		fHScrollBar->GetRange(&scrollMin, &scrollMax);
 		if (minVal.x != scrollMin || maxVal.x != scrollMax) {
 			fHScrollBar->SetRange(minVal.x, maxVal.x);
-			fHScrollBar->SetSteps(kSmallStep, bounds.Width());
+			fHScrollBar->SetSteps(fListElemHeight / 2.0f, bounds.Width());
 		}
 	}
 
@@ -8999,7 +8991,7 @@ BPoseView::UpdateScrollRange()
 
 		if (minVal.y != scrollMin || maxVal.y != scrollMax) {
 			fVScrollBar->SetRange(minVal.y, maxVal.y);
-			fVScrollBar->SetSteps(kSmallStep, bounds.Height());
+			fVScrollBar->SetSteps(fListElemHeight / 2.0f, bounds.Height());
 		}
 	}
 
@@ -10502,18 +10494,6 @@ BPoseView::ExcludeTrashFromSelection()
 			break;
 		}
 	}
-}
-
-
-/*!	Since the start offset of the first column is part of the stored
-	column state, it has to be corrected to match the current offset
-	(that depends on the font size).
-*/
-void
-BPoseView::_ResetStartOffset()
-{
-	if (!fColumnList->IsEmpty())
-		fColumnList->ItemAt(0)->SetOffset(StartOffset());
 }
 
 

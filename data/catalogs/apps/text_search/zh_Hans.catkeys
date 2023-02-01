@@ -1,29 +1,37 @@
-1	english	x-vnd.Haiku.TextSearch	1966170500
+1	english	x-vnd.Haiku.TextSearch	1757850908
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		请选择需要在文件浏览器中显示的文件。
 %appname% : %path%	GrepWindow		%appname% : %path%
+Failed to start xargs program!	Grepper		启动 xargs 程序失败！
 Open selection	GrepWindow		打开
 Actions	GrepWindow		操作
 New window	GrepWindow		新建窗口
 Encoding	GrepWindow		编码
+Set target to parent folder	GrepWindow		设定目标为父文件夹
 OK	GrepWindow		确定
 %appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%
 Close	GrepWindow		关闭
 Look in sub-folders	GrepWindow		在子目录中搜索
 %s: Not enough room to escape the filename.	Grepper		%s：没有足够的空间以消除文件名。
 Follow symbolic links	GrepWindow		对符号链接有效
+Regular expression	GrepWindow		正则表达式
 Text files only	GrepWindow		仅文本文件
 Quit	GrepWindow		退出
 Show files in Tracker	GrepWindow		在文件浏览器中显示文件
 Please select the files you wish to keep searching.	GrepWindow		请您选择需要进一步搜索的文件。
 Trim to selection	GrepWindow		缩减选中内容
 Set target…	GrepWindow		设置目标...
+Failed to open input pipe!	Grepper		打开输入管道失败！
 Search	GrepWindow		搜索
 Copy text to clipboard	GrepWindow		复制文本到剪贴板
 Show lines	GrepWindow		显示行
+Failed to open errors pipe!	Grepper		打开错误管道失败！
 The unselected files will be removed from the list.	GrepWindow		列表中未选中的文件将被删除。
+Open files in code editor	GrepWindow		在代码编辑器中打开文件
 Skip folders starting with a dot	GrepWindow		跳过隐藏文件
+Failed to open output pipe!	Grepper		打开输出管道失败！
 Cancel	GrepWindow		取消
 History	GrepWindow		历史
+TextSearch	System name		文本搜索
 File	GrepWindow		文件
 Case-sensitive	GrepWindow		大小写敏感
 Select all	GrepWindow		全选

@@ -44,12 +44,13 @@ struct EntryCacheEntry {
 
 struct EntryCacheGeneration {
 			int32				next_index;
+			int32				entries_size;
 			EntryCacheEntry**	entries;
 
 								EntryCacheGeneration();
 								~EntryCacheGeneration();
 
-			status_t			Init();
+			status_t			Init(int32 entriesSize);
 };
 
 
@@ -99,8 +100,6 @@ public:
 			const char*			DebugReverseLookup(ino_t nodeID, ino_t& _dirID);
 
 private:
-	static	const int32			kGenerationCount = 8;
-
 			typedef BOpenHashTable<EntryCacheHashDefinition> EntryTable;
 			typedef DoublyLinkedList<EntryCacheEntry> EntryList;
 
@@ -111,7 +110,8 @@ private:
 private:
 			rw_lock				fLock;
 			EntryTable			fEntries;
-			EntryCacheGeneration fGenerations[kGenerationCount];
+			int32				fGenerationCount;
+			EntryCacheGeneration* fGenerations;
 			int32				fCurrentGeneration;
 };
 

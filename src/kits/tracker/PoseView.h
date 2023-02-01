@@ -72,9 +72,6 @@ class EntryListBase;
 class TScrollBar;
 
 
-const int32 kSmallStep = 10;
-const int32 kListOffset = 20;
-
 const uint32 kMiniIconMode = 'Tmic';
 const uint32 kIconMode = 'Ticn';
 const uint32 kListMode = 'Tlst';
@@ -160,7 +157,6 @@ public:
 	void SetSelectionRectEnabled(bool);
 	void SetAlwaysAutoPlace(bool);
 	void SetSelectionChangedHook(bool);
-	void SetShowHideSelection(bool);
 	void SetEnsurePosesVisible(bool);
 	void SetIconMapping(bool);
 	void SetAutoScroll(bool);
@@ -201,11 +197,13 @@ public:
 		// returns height, descent, etc.
 	float FontHeight() const;
 	float ListElemHeight() const;
+	float ListOffset() const;
 
 	void SetIconPoseHeight();
 	float IconPoseHeight() const;
+	uint32 UnscaledIconSizeInt() const;
 	uint32 IconSizeInt() const;
-	icon_size IconSize() const;
+	BSize IconSize() const;
 
 	BRect Extent() const;
 	void GetLayoutInfo(uint32 viewMode, BPoint* grid,
@@ -304,8 +302,7 @@ public:
 	void AddRemovePoseFromSelection(BPose* pose, int32 index,
 		bool select);
 
-	BLooper* SelectionHandler();
-	void SetSelectionHandler(BLooper*);
+	void SetSelectionHandler(BLooper* looper);
 
 	BObjectList<BString>*MimeTypesInSelection();
 
@@ -398,7 +395,6 @@ public:
 	void HideBarberPole();
 
 	bool fShowSelectionWhenInactive;
-	bool fTransparentSelection;
 	bool fIsDrawingSelectionRect;
 
 	bool IsWatchingDateFormatChange();
@@ -677,7 +673,6 @@ private:
 	void DrawOpenAnimation(BRect);
 
 	void MoveSelectionOrEntryToTrash(const entry_ref* ref, bool selectNext);
-	void _ResetStartOffset();
 
 protected:
 	struct node_ref_key {
@@ -709,13 +704,28 @@ protected:
 	};
 
 protected:
+	BViewState* fViewState;
+	bool fStateNeedsSaving;
+
+	bool fSavePoseLocations : 1;
+	bool fMultipleSelection : 1;
+	bool fDragEnabled : 1;
+	bool fDropEnabled : 1;
+
+	BLooper* fSelectionHandler;
+
+	std::set<thread_id> fAddPosesThreads;
+	PoseList* fPoseList;
+
+	PendingNodeMonitorCache pendingNodeMonitorCache;
+
+private:
 	TScrollBar* fHScrollBar;
 	BScrollBar* fVScrollBar;
 	Model* fModel;
 	BPose* fActivePose;
 	BRect fExtent;
 	// the following should probably be just member lists, not pointers
-	PoseList* fPoseList;
 	PoseList* fFilteredPoseList;
 	PoseList* fVSPoseList;
 	PoseList* fSelectionList;
@@ -723,19 +733,16 @@ protected:
 	BObjectList<BString> fMimeTypesInSelectionCache;
 		// used for mime string based icon highliting during a drag
 	BObjectList<Model>* fZombieList;
-	PendingNodeMonitorCache pendingNodeMonitorCache;
 	BObjectList<BColumn>* fColumnList;
 	BObjectList<BString>* fMimeTypeList;
 	BObjectList<Model>* fBrokenLinks;
 	bool fMimeTypeListIsDirty;
-	BViewState* fViewState;
-	bool fStateNeedsSaving;
 	BCountView* fCountView;
 	float fListElemHeight;
+	float fListOffset;
 	float fIconPoseHeight;
 	BPose* fDropTarget;
 	BPose* fAlreadySelectedDropTarget;
-	BLooper* fSelectionHandler;
 	BPoint fLastClickPoint;
 	int32 fLastClickButtons;
 	const BPose* fLastClickedPose;
@@ -748,7 +755,6 @@ protected:
 	BPoint fHintLocation;
 	float fAutoScrollInc;
 	int32 fAutoScrollState;
-	std::set<thread_id> fAddPosesThreads;
 	bool fWidgetTextOutline;
 	const BPose* fSelectionPivotPose;
 	const BPose* fRealPivotPose;
@@ -774,16 +780,12 @@ protected:
 	SelectionRectInfo fSelectionRectInfo;
 
 	bool fSelectionVisible : 1;
-	bool fMultipleSelection : 1;
-	bool fDragEnabled : 1;
-	bool fDropEnabled : 1;
 	bool fSelectionRectEnabled : 1;
+	bool fTransparentSelection : 1;
 	bool fAlwaysAutoPlace : 1;
 	bool fAllowPoseEditing : 1;
 	bool fSelectionChangedHook : 1;
 		// get rid of this
-	bool fSavePoseLocations : 1;
-	bool fShowHideSelection : 1;
 	bool fOkToMapIcons : 1;
 	bool fEnsurePosesVisible : 1;
 	bool fShouldAutoScroll : 1;
@@ -812,6 +814,10 @@ protected:
 
 	BTextWidget* fTextWidgetToCheck;
 	BTextWidget* fActiveTextWidget;
+
+private:
+	mutable uint32 fCachedIconSizeFrom;
+	mutable BSize fCachedIconSize;
 
 	typedef BView _inherited;
 };
@@ -876,6 +882,13 @@ BPoseView::ListElemHeight() const
 
 
 inline float
+BPoseView::ListOffset() const
+{
+	return fListOffset;
+}
+
+
+inline float
 BPoseView::IconPoseHeight() const
 {
 	return fIconPoseHeight;
@@ -883,16 +896,16 @@ BPoseView::IconPoseHeight() const
 
 
 inline uint32
-BPoseView::IconSizeInt() const
+BPoseView::UnscaledIconSizeInt() const
 {
 	return fViewState->IconSize();
 }
 
 
-inline icon_size
-BPoseView::IconSize() const
+inline uint32
+BPoseView::IconSizeInt() const
 {
-	return (icon_size)fViewState->IconSize();
+	return IconSize().IntegerWidth() + 1;
 }
 
 
@@ -1037,13 +1050,6 @@ BPoseView::ReverseSort() const
 
 
 inline void
-BPoseView::SetShowHideSelection(bool on)
-{
-	fShowHideSelection = on;
-}
-
-
-inline void
 BPoseView::SetIconMapping(bool on)
 {
 	fOkToMapIcons = on;
@@ -1074,7 +1080,7 @@ BPoseView::CountColumns() const
 inline float
 BPoseView::StartOffset() const
 {
-	return kListOffset + ListIconSize() + kMiniIconSeparator + 1;
+	return fListOffset + ListIconSize() + kMiniIconSeparator + 1;
 }
 
 

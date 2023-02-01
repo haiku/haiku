@@ -1,24 +1,18 @@
-1	romanian	x-vnd.Haiku-Devices	3345509916
+1	romanian	x-vnd.Haiku-Devices	907968852
 ACPI bus	DevicesView		Magistrală ACPI
 Encryption controller	Device		Controlor de criptare
-Bus Information	Device		Infomații magistrală
 Devices	System name		Dispozitive
 Graphics Peripheral	DeviceSCSI		Periferice grafice
 Processor	Device		Procesor
 Generate system information	DevicesView		Generează informațiile de sistem
 Class info	DevicePCI		Informații clasă
-ACPI Information	DeviceACPI		Informații ACPI
-Detailed	DevicesView		Detaliat
 Computer	DevicesView		Calculator
 Communications	DeviceSCSI		Comunicații
-Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Informații clasă:\t\t\t\t: %classInfo%
 Mass storage controller	Device		Controlor de stocare în masă
 Connection	DevicesView		Conexiune
 Printer	DeviceSCSI		Imprimantă
 ACPI Processor Namespace '%2'	DeviceACPI		Spațiu de nume de procesor ACPI „%2”
-SCSI Information	DeviceSCSI		Informații SCSI
 Manufacturer	Device		Producător
-Device name:	Device		Nume de dispozitiv:
 Scanner	DeviceSCSI		Scanner
 Memory controller	Device		Controlor de memorie
 Unknown device	DevicesView		Dispozitiv necunoscut
@@ -27,7 +21,6 @@ ACPI node '%1'	DeviceACPI		Nod ACPI „%1”
 Optical Drive	DeviceSCSI		Unitate optică
 Name	PropertyList		Nume
 Manufacturer	DeviceSCSI		Producător
-Device Name\t\t\t\t: %Name%\nManufacturer\t\t\t: %Manufacturer%\nDriver used\t\t\t\t: %DriverUsed%\nDevice paths\t: %DevicePaths%	Device		Nume dispozitiv\t\t\t\t: %Name%\nProducător\t\t\t: %Manufacturer%\nDriver utilizat\t\t\t\t: %DriverUsed%\nCăi de dispozitiv\t: %DevicePaths%
 Device name	Device		Nume dispozitiv
 Satellite communications controller	Device		Controlor de comunicații prin satelit
 Device class	DeviceSCSI		Clasă de dispozitive
@@ -36,14 +29,12 @@ Input device controller	Device		Controlor de dispozitiv de intrare
 PCI bus	DevicesView		Magistrală PCI
 ACPI System Indicator	DeviceACPI		Indicator de sistem ACPI
 ACPI System Bus	DeviceACPI		Magistrală de sistem ACPI
-PCI Information	DevicePCI		Informații PCI
 Tape Drive	DeviceSCSI		Unitate de bandă magnetică
 Changer	DeviceSCSI		Schimbător
 Serial bus controller	Device		Controlor de magistrală serială
 Refresh devices	DevicesView		Reîmprospătează dispozitivele
 Category	DevicesView		Categorie
 RBC	DeviceSCSI		RBC
-None	Device		Nespecificat
 Device paths	Device		Căi de dispozitiv
 Unknown device	Device		Dispozitiv necunoscut
 Wireless controller	Device		Controlor fără fir
@@ -53,27 +44,23 @@ Devices	DevicesView		Dispozitive
 Device name	DeviceACPI		Nume dispozitiv
 Card Reader	DeviceSCSI		Cititor de carduri
 Display controller	Device		Controlor de afișaj
-Basic information	DevicesView		Informații de bază
 ACPI Button '%1'	DeviceACPI		Buton ACPI „%1”
-Bus	DevicesView		Magistrală
 ACPI <unknown>	DeviceACPI		ACPI <unknown>
 Device name	DevicePCI		Nume dispozitiv
 Disk Drive	DeviceSCSI		Unitate disc
-Other	DeviceSCSI		Altele
 Report compatibility	DevicesView		Raportează compatibilitatea
+Other	DeviceSCSI		Altele
 Computer	Device		Calculator
 PCI bus	Device		Magistrală PCI
 Enclosure	DeviceSCSI		Incintă
-Order by:	DevicesView		Ordonare după:
 ACPI Thermal Zone	DeviceACPI		Zonă termală ACPI
+Order by:	DevicesView		Ordonare după:
 Intelligent controller	Device		Controlor inteligent
 Multimedia controller	Device		Controlor multimedia
 Quit	DevicesView		Ieșire
 ISA bus	Device		Magistrală ISA
 ISA bus	DevicesView		Magistrală ISA
 Processor	DeviceSCSI		Procesor
-Manufacturer:	Device		Producător:
-Class Info:\t\t\t\t: %classInfo%	DeviceACPI		Informații clasă:\t\t\t\t: %classInfo%
 Bridge	Device		Punte
 Worm	DeviceSCSI		Vierme
 CD-ROM	DeviceSCSI		CD-ROM

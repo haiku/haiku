@@ -163,8 +163,8 @@ TabDecorator::RegionAt(BPoint where, int32& tab) const
 			|| fTopTab->look == B_FLOATING_WINDOW_LOOK
 			|| fTopTab->look == B_MODAL_WINDOW_LOOK
 			|| fTopTab->look == kLeftTitledWindowLook)) {
-		BRect resizeRect(BPoint(fBottomBorder.right - kBorderResizeLength,
-			fBottomBorder.bottom - kBorderResizeLength),
+		BRect resizeRect(BPoint(fBottomBorder.right - fBorderResizeLength,
+			fBottomBorder.bottom - fBorderResizeLength),
 			fBottomBorder.RightBottom());
 		if (resizeRect.Contains(where))
 			return REGION_RIGHT_BOTTOM_CORNER;
@@ -235,6 +235,9 @@ TabDecorator::_DoLayout()
 
 	bool hasTab = false;
 
+	// TODO: Put this computation somewhere more central!
+	const float scaleFactor = max_c(fDrawState.Font().Size() / 12.0f, 1.0f);
+
 	switch ((int)fTopTab->look) {
 		case B_MODAL_WINDOW_LOOK:
 			fBorderWidth = 5;
@@ -258,6 +261,10 @@ TabDecorator::_DoLayout()
 		default:
 			fBorderWidth = 0;
 	}
+
+	fBorderWidth = int32(fBorderWidth * scaleFactor);
+	fResizeKnobSize = kResizeKnobSize * scaleFactor;
+	fBorderResizeLength = kBorderResizeLength * scaleFactor;
 
 	// calculate left/top/right/bottom borders
 	if (fBorderWidth > 0) {
@@ -286,8 +293,8 @@ TabDecorator::_DoLayout()
 
 	// calculate resize rect
 	if (fBorderWidth > 1) {
-		fResizeRect.Set(fBottomBorder.right - kResizeKnobSize,
-			fBottomBorder.bottom - kResizeKnobSize, fBottomBorder.right,
+		fResizeRect.Set(fBottomBorder.right - fResizeKnobSize,
+			fBottomBorder.bottom - fResizeKnobSize, fBottomBorder.right,
 			fBottomBorder.bottom);
 	} else {
 		// no border or one pixel border (menus and such)
@@ -360,15 +367,16 @@ TabDecorator::_DoTabLayout()
 		fDrawState.Font().GetHeight(fontHeight);
 
 		if (tab->look != kLeftTitledWindowLook) {
+			const float spacing = fBorderWidth * 1.4f;
 			tabRect.Set(fFrame.left - fBorderWidth,
 				fFrame.top - fBorderWidth
-					- ceilf(fontHeight.ascent + fontHeight.descent + 7.0),
-				((fFrame.right - fFrame.left) < 35.0 ?
-					fFrame.left + 35.0 : fFrame.right) + fBorderWidth,
+					- ceilf(fontHeight.ascent + fontHeight.descent + spacing),
+				((fFrame.right - fFrame.left) < (spacing * 5) ?
+					fFrame.left + (spacing * 5) : fFrame.right) + fBorderWidth,
 				fFrame.top - fBorderWidth);
 		} else {
 			tabRect.Set(fFrame.left - fBorderWidth
-				- ceilf(fontHeight.ascent + fontHeight.descent + 5.0),
+				- ceilf(fontHeight.ascent + fontHeight.descent + fBorderWidth),
 					fFrame.top - fBorderWidth, fFrame.left - fBorderWidth,
 				fFrame.bottom + fBorderWidth);
 		}
@@ -608,9 +616,9 @@ TabDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 			case B_MODAL_WINDOW_LOOK:
 			case kLeftTitledWindowLook:
 				// The bottom border resize line
-				realResizeRect.Set(fRightBorder.right - kBorderResizeLength,
+				realResizeRect.Set(fRightBorder.right - fBorderResizeLength,
 					fBottomBorder.top,
-					fRightBorder.right - kBorderResizeLength,
+					fRightBorder.right - fBorderResizeLength,
 					fBottomBorder.bottom - 1);
 				// Old location
 				dirty->Include(realResizeRect);
@@ -620,9 +628,9 @@ TabDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 
 				// The right border resize line
 				realResizeRect.Set(fRightBorder.left,
-					fBottomBorder.bottom - kBorderResizeLength,
+					fBottomBorder.bottom - fBorderResizeLength,
 					fRightBorder.right - 1,
-					fBottomBorder.bottom - kBorderResizeLength);
+					fBottomBorder.bottom - fBorderResizeLength);
 				// Old location
 				dirty->Include(realResizeRect);
 				realResizeRect.OffsetBy(offset);
@@ -916,7 +924,7 @@ TabDecorator::_GetFootprint(BRegion *region)
 
 	if (fTopTab->look == B_DOCUMENT_WINDOW_LOOK) {
 		// include the rectangular resize knob on the bottom right
-		float knobSize = kResizeKnobSize - fBorderWidth;
+		float knobSize = fResizeKnobSize - fBorderWidth;
 		region->Include(BRect(fFrame.right - knobSize, fFrame.bottom - knobSize,
 			fFrame.right, fFrame.bottom));
 	}
@@ -1058,8 +1066,10 @@ TabDecorator::_LayoutTabItems(Decorator::Tab* _tab, const BRect& tabRect)
 float
 TabDecorator::_DefaultTextOffset() const
 {
-	return (fTopTab->look == B_FLOATING_WINDOW_LOOK
-		|| fTopTab->look == kLeftTitledWindowLook) ? 10 : 18;
+	if (fTopTab->look == B_FLOATING_WINDOW_LOOK
+			|| fTopTab->look == kLeftTitledWindowLook)
+		return int32(fBorderWidth * 3.4f);
+	return int32(fBorderWidth * 3.6f);
 }
 
 

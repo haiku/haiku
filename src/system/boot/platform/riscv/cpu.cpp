@@ -35,7 +35,7 @@ cpu_init()
 {
 	gKernelArgs.num_cpus = 1;
 
-	SstatusReg status(Sstatus());
+	SstatusReg status{.val = Sstatus()};
 	status.fs = extStatusInitial; // enable FPU
 	status.xs = extStatusOff;
 	SetSstatus(status.val);

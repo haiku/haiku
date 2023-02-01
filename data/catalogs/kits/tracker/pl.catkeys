@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	3380227078
+1	polish	x-vnd.Haiku-libtracker	464753347
 Created	ContainerWindow		Utworzono
 Icon	AttributesView		Ikona
 Open and make preferred	OpenWithWindow		Otwórz i zaznacz jako preferowane
@@ -41,6 +41,7 @@ Small bitmap icon	AttributesView		Mała ikona bitmapowa
 Would you like to find a suitable application to open the file?	FSUtils		Czy chcesz poszukać odpowiedniej aplikacji do otwarcia tego pliku?
 64 x 64	ContainerWindow		64 x 64
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Nie możesz podmienić plikiem katalogu ani dowiązania.
+(unknown)	InfoWindow		(nieznany)
 {0, plural, other{<# dates>}}	AttributesView		{0, plural, few{<# daty>} many{<# dat>} other{<# daty>}}
 Trailing \\.	libtracker		Końcowe \\.
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		W %func \nfind_directory() nie powiódł się. \nPowód: %error
@@ -84,7 +85,9 @@ Include trash	FindPanel		Uwzględnij kosz
 GiB	WidgetAttributeText		GiB
 Clean up	ContainerWindow		Wyczyść
 Modified	FindPanel		Zmodyfikowano
+ (block size: 	InfoWindow		 (rozmiar bloku: 
 Select all	QueryContainerWindow		Zaznacz wszystko
+Generate image thumbnails	SettingsView		Generuj miniatury obrazów
 Select…	FilePanelPriv		Wybierz…
 preferences	B_PREFERENCES_DIRECTORY		ustawienia
 Name	Person Query Columns		Nazwa
@@ -166,6 +169,7 @@ Read	FilePermissionsView		Czytaj
 There was an error writing the attribute.	WidgetAttributeText		Pojawił się błąd przy zapisywaniu atrybutu.
 Path	Default Query Columns		Ścieżka
 If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeżeli zmienisz nazwę %target, %osName może nie działać poprawnie!\n\nJesteś pewien, że chcesz to zrobić?
+Filesystem:	InfoWindow		System plików:
 Could not open \"%name\" (%error). 	FSUtils		Nie można otworzyć „%name” (%error). 
 Media parameter group	AttributesView		Grupa parametrów mediów
 %name info	InfoWindow	InfoWindow Title	%name informacje
@@ -283,9 +287,9 @@ no supporting apps	OpenWithWindow		brak obsługujących aplikacji
 32-bit unsigned integer	AttributesView		32-bitowa liczba całkowita bez znaku
 Preparing to empty Trash…	StatusWindow		Przygotowanie do opróżnienia Kosza…
 Deleting: 	StatusWindow		Usuwanie: 
+label too long	PoseView		opis jest zbyt długi
 the MIME settings	FSUtils		ustawienia MIME
 You can't move or copy the trash.	FSUtils		Nie możesz przenieść ani skopiować kosza.
-label too long	PoseView		opis jest zbyt długi
 Error creating link to \"%name\".	FSUtils		Błąd przy tworzeniu dowiązania do „%name”.
 Unknown	FilePermissionsView		Nieznany
 Paste links	ContainerWindow		Wklej odnośniki
@@ -334,8 +338,8 @@ MIME Path	AttributesView		Ścieżka MIME
 less than	FindPanel		mniej niż
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Błąd przy kopiowaniu pliku „%name”:\n\t%error\n\nCzy chcesz kontynuować?
 Creating links: 	StatusWindow		Tworzenie dowiązań: 
-Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nie można otworzyć „%document” z aplikacją „%app” (%error). 
 Create %s clipping	PoseView		Utwórz wycinek %s
+Could not open \"%document\" with application \"%app\" (%error). 	FSUtils		Nie można otworzyć „%document” z aplikacją „%app” (%error). 
 Error moving \"%name\"	FSUtils		Błąd przy przenoszeniu „%name”
 To: %dir	StatusWindow		Do: %dir
 Paste layout	ContainerWindow		Wklej układ
@@ -492,6 +496,7 @@ Duplicate	ContainerWindow		Duplikuj
 16-bit integer	AttributesView		16-bitowa liczba całkowita
 Untitled clipping	PoseView		Wycinek bez nazwy
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Plik o nazwie „%name” już istnieje w tej lokalizacji. Czy chcesz go zamienić?
+, indexed	InfoWindow		, indeksowany
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Musisz upuścić obiekty na jednej z ikon dysków w oknie „Dyski”.
 Version:	InfoWindow		Wersja:
 OK	PoseView		OK
@@ -507,8 +512,8 @@ Add-ons	FilePanelPriv		Dodatki
 Empty folder	SlowContextPopup		Pusty katalog
 Alignment	AttributesView		Wyrównanie
 Move to Trash	FSUtils		Przenieś do kosza
-Handles %type	OpenWithWindow		Obsługuje %type
 Cancel	PoseView		Anuluj
+Handles %type	OpenWithWindow		Obsługuje %type
 Delete	PoseView		Usuń
 Media parameter	AttributesView		Parametr mediów
 If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		Jeżeli podmienisz katalog „home”, %osName może nie działać poprawnie!\n\nJesteś pewien, że chcesz to zrobić?\n\nJeżeli nadal chcesz podmienić katalog „home”, naciśnij klawisz Shift i kliknij „Wiem co robię”.

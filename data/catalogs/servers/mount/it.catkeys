@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-mount_server	2818767263
+1	italian	x-vnd.Haiku-mount_server	599204450
 Mount read-only	AutoMounter		Montare in sola lettura
 Error mounting volume:\n\n%s	AutoMounter		Montaggio del volume non riuscito:\n\n%s
 Cancel	AutoMounter		Annulla
@@ -11,5 +11,4 @@ Mounting volume '%s'\n\n	AutoMounter		Montaggio del volume '%s'\n\n
 Could not unmount disk \"%s\":\n\t%s\n\nShould unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	AutoMounter		Impossibile smontare il volume \"%s\":\n\t%s\n\nForzare l'operazione di smontaggio?\n\nAttenzione: se un'applicazione sta attualmente utilizzando il disco, lo smontaggio forzato potrebbe comportare la perdita di dati.\n
 Force unmount	AutoMounter		Forzare lo smontaggio
 Mount error	AutoMounter		Errore nel montaggio
-Mounting volume <unnamed volume>\n\n	AutoMounter		Montaggio del volume <unnamed volume>\n\n
 Mount warning	AutoMounter		Montaggio anomalo

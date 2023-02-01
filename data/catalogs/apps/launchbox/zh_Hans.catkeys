@@ -1,10 +1,11 @@
-1	english	x-vnd.Haiku-LaunchBox	3692177981
+1	english	x-vnd.Haiku-LaunchBox	1530497419
 Set description…	LaunchBox		设置描述...
 Really close this pad?\n(The pad will not be remembered.)	LaunchBox		确定关闭该面板？\n（该面板将不被保存。）
 OK	LaunchBox		确定
 Ignore double-click	LaunchBox		忽略双击
 Show on all workspaces	LaunchBox		在所有工作区显示
 Name Panel	LaunchBox		命名面板
+Autostart	LaunchBox		自动启动
 Clone	LaunchBox		复制
 Description for '%3'	LaunchBox		描述 '%3'
 Show window border	LaunchBox		显示窗口边界
@@ -24,12 +25,12 @@ You can drag an icon here.	LaunchBox		您可以将图标拖动至此处。
 Pad 1	LaunchBox		面板 1
 Failed to launch '%1'.\n\nError:	LaunchBox		启动 '%1' 失败。\n\n错误：
 Settings	LaunchBox		设置
-Vertical layout	LaunchBox		竖直层
+Vertical layout	LaunchBox		垂直布局
 Pad	LaunchBox		面板
 Close	LaunchBox		关闭
 Remove button	LaunchBox		删除按钮
 Quit	LaunchBox		退出
-Horizontal layout	LaunchBox		水平层
+Horizontal layout	LaunchBox		水平布局
 New	LaunchBox		新建
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		发送 '打开文件夹' 命令到文件浏览器失败。\n\n错误： 
 Pad %1	LaunchBox		面板 %1

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2017 Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2022 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -254,14 +254,18 @@ BBox::Draw(BRect updateRect)
 			break;
 	}
 
-	if (fLabel) {
+	if (fLabel != NULL) {
 		ConstrainClippingRegion(NULL);
 
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 
+		// offset label up by 1/6 the font height
+		float lineHeight = fontHeight.ascent + fontHeight.descent;
+		float yOffset = roundf(lineHeight / 6.0f);
+
 		SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
-		DrawString(fLabel, BPoint(10.0f, ceilf(fontHeight.ascent)));
+		DrawString(fLabel, BPoint(10.0f, fontHeight.ascent - yOffset));
 	}
 
 	PopState();

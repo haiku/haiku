@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku Inc. All rights reserved.
+ * Copyright 2003-2022, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,20 +20,22 @@ void arm_push_iframe(struct iframe_stack *stack, struct iframe *frame);
 void arm_pop_iframe(struct iframe_stack *stack);
 struct iframe *arm_get_user_iframe(void);
 
-/* TODO fix this global once we support SMP ARM... */
-extern Thread *gCurrentThread;
 
 extern inline Thread *
 arch_thread_get_current_thread(void)
 {
-	return gCurrentThread;
+	// read pointer to thread data structure from TPIDRPRW
+	Thread* t;
+	asm volatile("MRC p15, 0, %0, c13, c0, 4" : "=r" (t));
+	return t;
 }
 
 
 extern inline void
 arch_thread_set_current_thread(Thread *t)
 {
-	gCurrentThread = t;
+	// set TPIDRPRW to point to thread data structure
+	asm volatile("MCR p15, 0, %0, c13, c0, 4" : : "r" (t));
 }
 
 #ifdef __cplusplus

@@ -125,27 +125,27 @@ pci_reserve_device(uchar virtualBus, uchar device, uchar function,
 
 	device_attr matchThis[] = {
 		// info about device
-		{B_DEVICE_BUS, B_STRING_TYPE, {string: "pci"}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {.string = "pci"}},
 
 		// location on PCI bus
-		{B_PCI_DEVICE_DOMAIN, B_UINT8_TYPE, {ui8: domain}},
-		{B_PCI_DEVICE_BUS, B_UINT8_TYPE, {ui8: bus}},
-		{B_PCI_DEVICE_DEVICE, B_UINT8_TYPE, {ui8: device}},
-		{B_PCI_DEVICE_FUNCTION, B_UINT8_TYPE, {ui8: function}},
+		{B_PCI_DEVICE_DOMAIN, B_UINT8_TYPE, {.ui8 = domain}},
+		{B_PCI_DEVICE_BUS, B_UINT8_TYPE, {.ui8 = bus}},
+		{B_PCI_DEVICE_DEVICE, B_UINT8_TYPE, {.ui8 = device}},
+		{B_PCI_DEVICE_FUNCTION, B_UINT8_TYPE, {.ui8 = function}},
 		{NULL}
 	};
 	device_attr legacyAttrs[] = {
 		// info about device
-		{B_DEVICE_BUS, B_STRING_TYPE, {string: "legacy_driver"}},
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Legacy Driver Reservation"}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {.string = "legacy_driver"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "Legacy Driver Reservation"}},
 		{NULL}
 	};
 	device_attr drvAttrs[] = {
 		// info about device
-		{B_DEVICE_BUS, B_STRING_TYPE, {string: "legacy_driver"}},
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: driverName}},
-		{"legacy_driver", B_STRING_TYPE, {string: driverName}},
-		{"legacy_driver_cookie", B_UINT64_TYPE, {ui64: (uint64)nodeCookie}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {.string = "legacy_driver"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = driverName}},
+		{"legacy_driver", B_STRING_TYPE, {.string = driverName}},
+		{"legacy_driver_cookie", B_UINT64_TYPE, {.ui64 = (uint64)nodeCookie}},
 		{NULL}
 	};
 	device_node *node, *legacy;
@@ -205,31 +205,31 @@ pci_unreserve_device(uchar virtualBus, uchar device, uchar function,
 	//	domain, bus, device, function, driverName, nodeCookie));
 
 	device_attr matchPCIRoot[] = {
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "PCI"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "PCI"}},
 		{NULL}
 	};
 	device_attr matchThis[] = {
 		// info about device
-		{B_DEVICE_BUS, B_STRING_TYPE, {string: "pci"}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {.string = "pci"}},
 
 		// location on PCI bus
-		{B_PCI_DEVICE_DOMAIN, B_UINT8_TYPE, {ui8: domain}},
-		{B_PCI_DEVICE_BUS, B_UINT8_TYPE, {ui8: bus}},
-		{B_PCI_DEVICE_DEVICE, B_UINT8_TYPE, {ui8: device}},
-		{B_PCI_DEVICE_FUNCTION, B_UINT8_TYPE, {ui8: function}},
+		{B_PCI_DEVICE_DOMAIN, B_UINT8_TYPE, {.ui8 = domain}},
+		{B_PCI_DEVICE_BUS, B_UINT8_TYPE, {.ui8 = bus}},
+		{B_PCI_DEVICE_DEVICE, B_UINT8_TYPE, {.ui8 = device}},
+		{B_PCI_DEVICE_FUNCTION, B_UINT8_TYPE, {.ui8 = function}},
 		{NULL}
 	};
 	device_attr legacyAttrs[] = {
 		// info about device
-		{B_DEVICE_BUS, B_STRING_TYPE, {string: "legacy_driver"}},
-		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Legacy Driver Reservation"}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {.string = "legacy_driver"}},
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {.string = "Legacy Driver Reservation"}},
 		{NULL}
 	};
 	device_attr drvAttrs[] = {
 		// info about device
-		{B_DEVICE_BUS, B_STRING_TYPE, {string: "legacy_driver"}},
-		{"legacy_driver", B_STRING_TYPE, {string: driverName}},
-		{"legacy_driver_cookie", B_UINT64_TYPE, {ui64: (uint64)nodeCookie}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {.string = "legacy_driver"}},
+		{"legacy_driver", B_STRING_TYPE, {.string = driverName}},
+		{"legacy_driver_cookie", B_UINT64_TYPE, {.ui64 = (uint64)nodeCookie}},
 		{NULL}
 	};
 	device_node *root, *pci, *node, *legacy, *drv;
@@ -473,14 +473,23 @@ pcirefresh(int argc, char **argv)
 
 // #pragma mark bus manager init/uninit
 
+static bool sInitDone;
+
+
+status_t __attribute__((weak)) pci_controller_finalize() { return B_OK; }
+
 
 status_t
-pci_init(void)
+pci_init_deferred(void)
 {
-	gPCI = new PCI;
+	if (sInitDone)
+		return B_OK;
 
-	// pci_controller_init may setup things needed by pci_io_init like mmio addresses
-	if (pci_controller_init() != B_OK) {
+	status_t ret = pci_controller_init();
+	if (ret == B_DEV_NOT_READY)
+		return ret;
+
+	if (ret != B_OK) {
 		TRACE(("PCI: pci_controller_init failed\n"));
 		return B_ERROR;
 	}
@@ -510,13 +519,43 @@ pci_init(void)
 	add_debugger_command("pcistatus", &pcistatus, "dump and clear pci device status registers");
 	add_debugger_command("pcirefresh", &pcirefresh, "refresh and print all pci_info");
 
+	if (pci_controller_finalize() != B_OK) {
+		TRACE(("PCI: pci_controller_finalize failed\n"));
+		return B_ERROR;
+	}
+
+	pci_print_info();
+
+	sInitDone = true;
 	return B_OK;
+}
+
+
+status_t
+pci_init(void)
+{
+	gPCI = new PCI;
+
+	status_t ret = pci_init_deferred();
+	if (ret == B_DEV_NOT_READY) {
+		TRACE(("PCI: init deferred\n"));
+		return B_OK;
+	}
+
+	return ret;
 }
 
 
 void
 pci_uninit(void)
 {
+	delete gPCI;
+
+	if (!sInitDone)
+		return;
+
+	sInitDone = false;
+
 	remove_debugger_command("outw", &write_io);
 	remove_debugger_command("out32", &write_io);
 	remove_debugger_command("outs", &write_io);
@@ -533,8 +572,6 @@ pci_uninit(void)
 
 	remove_debugger_command("pcistatus", &pcistatus);
 	remove_debugger_command("pcirefresh", &pcirefresh);
-
-	delete gPCI;
 }
 
 

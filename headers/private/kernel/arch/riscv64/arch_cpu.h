@@ -19,28 +19,21 @@
 static inline bool
 get_ac()
 {
-	SstatusReg status(Sstatus());
-	return status.sum != 0;
+	return SstatusReg{.val = Sstatus()}.sum;
 }
 
 
 static inline void
 set_ac()
 {
-	// TODO: Could be done atomically via CSRRS?
-	SstatusReg status(Sstatus());
-	status.sum = 1;
-	SetSstatus(status.val);
+	SetBitsSstatus(SstatusReg{.sum = 1}.val);
 }
 
 
 static inline void
 clear_ac()
 {
-	// TODO: Could be done atomically with CSRRC?
-	SstatusReg status(Sstatus());
-	status.sum = 0;
-	SetSstatus(status.val);
+	ClearBitsSstatus(SstatusReg{.sum = 1}.val);
 }
 
 

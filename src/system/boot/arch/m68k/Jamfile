@@ -3,8 +3,6 @@ SubDir HAIKU_TOP src system boot arch m68k ;
 local platform ;
 for platform in [ MultiBootSubDirSetup amiga_m68k atari_m68k next_m68k ] {
 	on $(platform) {
-		DEFINES += _BOOT_MODE ;
-
 		local kernelArchSources =
 			arch_elf.cpp
 		;

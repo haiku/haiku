@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-DriveSetup	4048496535
+1	swedish	x-vnd.Haiku-DriveSetup	2150010803
 Could not unmount partition %s.	MainWindow		Kunde inte avmontera partition %s.
 Mount all	MainWindow		Montera alla
 Disk	MainWindow		Disk
@@ -14,6 +14,7 @@ Block size	PartitionList		Blockstorlek
 The panel experienced a problem!	MainWindow		Panelen hade några problem!
 Device	DiskView		Enhet
 Are you sure you want to format the Intel Extended Partition? Any subpartitions it contains will be overwritten if you continue. You will be asked again before changes are written to the disk.	MainWindow		Är du säker på att du vill formatera Intel Extended Partitionen? Alla underpartitioner som den innehåller kommer att skrivas över om du fortsätter. Du kommer att att bli frågad igen innan ändringar skrivs på disken.
+Physical block size	PartitionList		Fysisk blockstorlek
 Unmount	MainWindow		Avmontera
 Failed to format the partition %s!\n	MainWindow		Misslyckades att formatera partionen %s!\n
 Partition size	CreateParametersPanel		Partitionsstorlek
