@@ -79,7 +79,7 @@ BWeakReferenceable::BWeakReferenceable()
 
 BWeakReferenceable::~BWeakReferenceable()
 {
-	if (fPointer->UseCount() > 0) {
+	if (fPointer->UseCount() != 0 && fPointer->UseCount() != 1) {
 		char message[256];
 		snprintf(message, sizeof(message), "deleting referenceable object %p with "
 			"reference count (%" B_PRId32 ")", this, fPointer->UseCount());
