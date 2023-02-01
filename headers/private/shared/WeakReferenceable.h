@@ -30,6 +30,8 @@ public:
 			void				GetUnchecked();
 
 private:
+			friend class BWeakReferenceable;
+
 			int32				fUseCount;
 			BWeakReferenceable*	fObject;
 };
