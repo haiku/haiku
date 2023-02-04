@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Terminal	2536107739
+1	czech	x-vnd.Haiku-Terminal	4000370057
 Close other tabs	Terminal TermWindow		Zavřít ostatní panely
 Insert path	Terminal TermView		Vložit cestu
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminál nemůže spustit shell. Lituji.
@@ -8,34 +8,44 @@ Edit	Terminal TermWindow		Úpravy
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               vypíše tuto nápovědu\n  -t,     --title              nastaví název okna\n  -f,     --fullscreen         spustí přes celou obrazovku\n  -w,     --working-directory  zvolí počáteční pracovní adresář\n
 Select all	Terminal TermWindow		Vybrat vše
 Confirm exit if active programs exist	Terminal AppearancePrefView		Protvrdit ukončení když běží program
+Color scheme:	Terminal ThemeView		Barevné schéma:
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tAktuální adresář aktívního procesu v aktuální\n\t\t\tkartě. Nepovinně je možné uvést maximální počet\n\t\t\tadresářů cesty. Např. '%2d' pro maximálně dva adresáře.\n\t%T\t-\tNázev aplikace Terminál v aktuální lokalizaci.\n\t%e\t-\tKódování aktuální karty. Nezobrazuje se v případě UTF-8.\n\t%i\t-\tIndex okna.\n\t%p\t-\tNázev aktivního procesu v aktuální kartě.\n\t%t\t-\tNázev aktuální karty.
 Copy	Terminal TermWindow		Kopírovat
 Edit tab title…	Terminal TermWindow		Upravit nadpis panelu...
 Print	Terminal TermWindow		Tisk
 Settings	Terminal TermWindow		Nastavení
 %app% settings	Terminal PrefWindow	window title	%app% nastavení
+ANSI bright black color	Terminal ThemeView		ANSI světle černá barva
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tAktuální pracovní adresář aktivních procesů.\n\t\t\tVolitelně může být upřesněn maximální počet komponent cesty.\n\t\t\tNapř. '%2d' pro maximálně dva adresáře.\n\t%i\t-\tČíslo záložky.\n\t%e\t-\tKódování aktuální záložky. Nezobrazuje se pro UTF-8.\n\t%p\t-\tNázev aktivního procesu.
 Use default	Terminal SetTitleWindow		Použít výchozí
 Close tab	Terminal TermWindow		Zavřít panel
 Error!	Terminal getString		Chyba!
+Colors…	Terminal TermWindow		Barvy…
 Appearance	Terminal PrefWindow		Vzhled
 Set tab title	Terminal TermWindow		Nastavit nadpis panelu
 Create link here	Terminal TermView		Vytvoř zde link
 Encoding:	Terminal AppearancePrefView		Kódování:
+yellow	Terminal ThemeView		žlutá
 Change directory	Terminal TermView		Změnit adresář
 Custom	Terminal AppearancePrefView	Window size	Vlastní
 Page setup…	Terminal TermWindow		Nastavení stránky...
+ANSI yellow color	Terminal ThemeView		ANSI žlutá barva
 Cancel	Terminal TermView		Zrušit
 Defaults	Terminal PrefWindow		Výchozí
+black	Terminal ThemeView		černá
 Revert	Terminal PrefWindow		Vrátit zpět
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminál
 Use selection	Terminal FindWindow		Použít výběr
 Find next	Terminal TermWindow		Vyhledat další
 Copy link location	Terminal TermView		Kopírovat umístění odkazu
+Background	Terminal ThemeView		Pozadí
 Window title:	Terminal AppearancePrefView		Nadpis okna
 New tab	Terminal TermWindow		Nový panel
+magenta	Terminal ThemeView		purpurová
 Allow bold text	Terminal AppearancePrefView		Povolit tučný text
 Window title…	Terminal TermWindow		Nadpis okna...
+ANSI blue color	Terminal ThemeView		ANSI modrá barva
+blue	Terminal ThemeView		modrá
 Open path	Terminal TermView		Otevřít cestu
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Nelze spustit \"%command\":\n\t%error
 Terminal	System name		Terminál
@@ -43,6 +53,7 @@ Custom	Terminal colors scheme		Vlastní
 Really close?	Terminal TermWindow		Opravdu zavřít?
 Font size	Terminal TermWindow		Velikost písma
 OK	Terminal TermApp		OK
+ANSI bright blue color	Terminal ThemeView		ANSI světle modrá barva
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Proces \"%1\" stále běží.\nUzavřením Terminálu tento proces ukončíte.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Nerozpoznaná volba \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Nadpis panelu:
@@ -56,16 +67,23 @@ Find previous	Terminal TermWindow		Vyhledat předchozí
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Vzor určující názvy karet. Je možné použít nasledující\nzástupných symbolů:
 Close	Terminal TermWindow		Zavřít
 Save to file…	Terminal PrefWindow		Uložit do souboru...
+Defaults	Terminal ThemeWindow		Výchozí
 Copy path	Terminal TermView		Kopírovat cestu
 Window size	Terminal TermWindow		Velikost okna
+Selected text	Terminal ThemeView		Vybraný text
 Copy absolute path	Terminal TermView		Kopírovat absolutní cestu
 Cancel	Terminal TermWindow		Zrušit
+ANSI cyan color	Terminal ThemeView		ANSI azurová barva
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Proces \"%1\" stále běží.\nUzavřením panelu tento proces ukončíte.
 Full screen	Terminal TermWindow		Celá obrazovka
 Shell 	Terminal TermWindow		Shell
+Revert	Terminal ThemeWindow		Vrátit původní
+ANSI green color	Terminal ThemeView		ANSI zelená barva
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tZnak '%'.\n\t%<\t-\tZačíná sekci, která se zobrazí pouze když rezervované\n\t\t\tmísto po ní není prázdné.\n\t%>\t-\tZačíná sekci, která se zobrazí pouze když rezervované\n\t\t\tmísto mezi předešlou %< sekcí a touto není prázdné.\n\t%-\t-\tKončí sekci %< nebo %>.\n\nJakékoliv nealfanumerické znaky mezi '%', a písmenem formátu vloží mezeru pouze\nv případě, že hodnota rezervovaného místa není prázdná. Přidá do sekce %<.
+ANSI bright cyan color	Terminal ThemeView		ANSI světle azurová barva
 Tab title:	Terminal TermWindow		Nadpis panelu:
 Window title:	Terminal TermWindow		Nadpis okna:
+ANSI white color	Terminal ThemeView		ANSI bílá barva
 Window size:	Terminal AppearancePrefView		Velikost okna:
 Switch Terminals	Terminal TermWindow		Přepnout terminály
 Decrease	Terminal TermWindow		Zmenšit
@@ -75,27 +93,45 @@ Blinking cursor	Terminal AppearancePrefView		Blikající kurzor
 Use text:	Terminal FindWindow		Použít text:
 Close active tab	Terminal TermWindow		Zavřít aktivní panel
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Vzor určující nadpis okna. Následující zástupci\nmohou být použiti:\n
+Selected background	Terminal ThemeView		Zvolené pozadí
 Save as default	Terminal TermWindow		Uložit jako výchozí
 Nothing is selected.	Terminal TermWindow		Není nic vybráno.
+ANSI bright red color	Terminal ThemeView		ANSI světle červená barva
 Use left Option as Meta key	Terminal AppearancePrefView		Použijte levý Alt jako meta klávesu
 Find	Terminal FindWindow		Najít
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Vzor určující současný nadpis panelu. Následující zástupci\nmohou být použiti:\n
+Save to file…	Terminal ThemeWindow		Uložit do souboru…
 Font:	Terminal AppearancePrefView		Písmo
 Paste	Terminal TermWindow		Vložit
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Vzor určující názvy oken. Je možné použít\nnasledující zástupné symboly:
+ANSI bright magenta color	Terminal ThemeView		ANSI světle purpurová barva
 Copy here	Terminal TermView		Kopíruj zde
 Use default shell	Terminal Shell		Použít výchozí shell
+red	Terminal ThemeView		červená
+white	Terminal ThemeView		bílá
 Open link	Terminal TermView		Otevřít odkaz
+Text	Terminal ThemeView		Text
+ANSI bright yellow color	Terminal ThemeView		ANSI světle žlutá barva
 Not found.	Terminal TermWindow		Nenalezeno.
+ANSI black color	Terminal ThemeView		ANSI černá barva
 Find…	Terminal TermWindow		Najít...
 No search string was entered.	Terminal TermWindow		Nebyl zadán vyhledávací řetězec.
 Move here	Terminal TermView		Přesun sem
 Abort	Terminal Shell		Zrušit
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Následující procesy stále běží:\n\n\t%1\n\nUzavřením Terminálu  budou tyto procesy ukončeny.
 Set window title	Terminal TermWindow		Nastavit nadpis okna
+ANSI red color	Terminal ThemeView		ANSI červená barva
 Increase	Terminal TermWindow		Zvětšit
+green	Terminal ThemeView		zelená
+ANSI bright green color	Terminal ThemeView		ANSI světle zelená barva
 OK	Terminal TermWindow		OK
+Text under cursor	Terminal ThemeView		Text pod ukazatelem
+ANSI bright white color	Terminal ThemeView		ANSI světle bílá barva
 Close window	Terminal TermWindow		Zavřít okno
+ANSI magenta color	Terminal ThemeView		ANSI purpurová barva
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminál\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui a Takashi Murai.\n\nPoužití: %s [VOLBY] [SHELL]\n
+cyan	Terminal ThemeView		azurová
+Colors	System name		Barvy
 Clear all	Terminal TermWindow		Vymaž vše
+Cursor	Terminal ThemeView		Ukazatel
 Search forward	Terminal FindWindow		Vyhledat vpřed

@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-Devices	911816421
+1	czech	x-vnd.Haiku-Devices	2322690158
 ACPI bus	DevicesView		Sběrnice ACPI
 Encryption controller	Device		Řadič šifrování
 Devices	System name		Zařízení
@@ -8,6 +8,7 @@ Processor	Device		Procesor
 Generate system information	DevicesView		Generovat systémové informace
 Unknown	DeviceACPI		Neznámé
 Class info	DevicePCI		Informace o třídě
+<No device selected>	DevicesView		<Nevybráno žádné zařízení>
 USB bus	Device		Sběrnice USB
 Computer	DevicesView		Počítač
 Communications	DeviceSCSI		Komunikace

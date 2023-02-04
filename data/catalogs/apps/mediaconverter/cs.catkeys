@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-MediaConverter	2816184527
+1	czech	x-vnd.Haiku-MediaConverter	338319367
 Input file not recognized as Audio or Video	MediaConverter		Vstupní soubor nebyl rozpoznán jako zvuk nebo obraz
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Kvalita videa: %3d%%
@@ -12,6 +12,7 @@ MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
 Error creating video.	MediaConverter		Chyba při vytváření videa.
 Cancelling	MediaConverter		Rušení
 None available	Audio codecs		Žádný po ruce
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Soubor obsahuje více zvukových či obrazových stop, převedeny budou pouze první z nich.
 No file selected	MediaConverter-FileInfo		Nebyl zvolen žádný soubor
 High	MediaConverter		Vysoká
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Soubor nebyl rozeznán jako podporovaný typ multimédií:} few{# soubory nebyly rozeznány jako podporované typy multimédií:} other{# souborů nebylo rozeznáno jako podporované typy multimédií:}}
@@ -26,6 +27,7 @@ Error loading a file	MediaConverter		CHyba otevírání souboru
 Encoder parameters	MediaConverter-EncoderWindow		Parametry Enkderu
 Open…	Menu		Otevřít...
 Audio encoding:	MediaConverter		Kódování zvuku:
+Multi-track file detected	MediaConverter		Zjištěn vícestopý soubor
 Audio quality: %3d%%	MediaConverter		Kvalita zvuku: %3d%%
 Cancelling…	MediaConverter		Rušení...
 Output file '%filename' created	MediaConverter		Byl vytvořen výstupní soubor '%filename'
@@ -63,6 +65,7 @@ File	Menu		Soubor
 Video quality not supported	MediaConverter		Nepodporovaná videokvalita
 Select this folder	MediaConverter		Zvolit tento adresář
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld kanál
+Understood	MediaConverter		Rozuměno
 %d bit 	MediaFileInfo		%d bitový
 No video	Video codecs list		Bez videa
 Continue	MediaConverter		Pokračovat
