@@ -152,7 +152,7 @@ acpi_lid_select(void *_cookie, uint8 event, selectsync *sync)
 	status_t error = add_select_sync_pool_entry(&device->select_pool, sync,
 		event);
 	if (error != B_OK) {
-		ERROR("add_select_sync_pool_entry() failed: %#lx\n", error);
+		ERROR("add_select_sync_pool_entry() failed: %#" B_PRIx32 "\n", error);
 		return error;
 	}
 
