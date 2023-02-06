@@ -40,6 +40,7 @@ Table of contents
 
    /build/index
    /release/index
+   /libroot/index
    /midi/index
    /net/index
    /packages/README
