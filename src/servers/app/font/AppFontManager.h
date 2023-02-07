@@ -43,7 +43,6 @@ class ServerFont;
 class AppFontManager : public FontManagerBase {
 public:
 								AppFontManager();
-	virtual						~AppFontManager();
 
 			status_t			AddUserFontFromFile(const char* path,
 									uint16& familyID, uint16& styleID);

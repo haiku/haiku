@@ -56,24 +56,6 @@ AppFontManager::AppFontManager()
 }
 
 
-AppFontManager::~AppFontManager()
-{
-	while (fFamilies.CountItems() > 0) {
-		FontFamily* family = fFamilies.ItemAt(0);
-		while (family->CountStyles() > 0) {
-			uint16 familyID = family->ID();
-			uint16 styleID = family->StyleAt(0)->ID();
-			FontKey fKey(familyID, styleID);
-			FontStyle* styleRef = fStyleHashTable.Get(fKey);
-			family->RemoveStyle(styleRef, this);
-			styleRef->ReleaseReference();
-		}
-		fFamilies.RemoveItem(family);
-		delete family;
-	}
-}
-
-
 status_t
 AppFontManager::_AddUserFont(FT_Face face, node_ref nodeRef, const char* path,
 	uint16& familyID, uint16& styleID)
