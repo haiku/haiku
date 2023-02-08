@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src libs gnu ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility gnu ] : true ;
 UsePrivateHeaders shared ;
 
@@ -10,6 +11,7 @@ local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		SharedLibrary [ MultiArchDefaultGristFiles libgnu.so ] :
+			crypt.cpp
 			memmem.c
 			qsort.c
 			xattr.cpp

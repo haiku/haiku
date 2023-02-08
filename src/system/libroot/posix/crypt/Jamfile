@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src system libroot posix crypt ;
 
 UsePrivateHeaders libroot ;
 UsePrivateSystemHeaders ;
+SubDirSysHdrs $(HAIKU_TOP) headers compatibility bsd ;
+SubDirSysHdrs $(HAIKU_TOP) headers compatibility gnu ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {

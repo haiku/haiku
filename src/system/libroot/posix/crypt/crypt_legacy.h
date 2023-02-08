@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-char *crypt_legacy(const char *key, const char *salt);
+void crypt_legacy(const char *key, const char *salt, char *outbuf);
 
 #ifdef __cplusplus
 }

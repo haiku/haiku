@@ -27,6 +27,7 @@ public:
 		void		TestCustomSalt();
 		void		TestSaltGeneration();
 		void		TestBadSalt();
+		void		TestCryptR();
 
 	static	void		AddTests(BTestSuite& suite);
 };

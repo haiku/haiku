@@ -694,10 +694,8 @@ ufc_long *_ufc_dofinalperm(l1, l2, r1, r2)
  * prefixing with the salt
  */
 
-STATIC char *output_conversion(v1, v2, salt)
-  ufc_long v1, v2;
-  char *salt;
-  { static char outbuf[14];
+STATIC void output_conversion_r(ufc_long v1, ufc_long v2, const char *salt, char *outbuf)
+{
     int i, s, shf;
 
     outbuf[0] = salt[0];
@@ -718,9 +716,7 @@ STATIC char *output_conversion(v1, v2, salt)
 
     outbuf[12] = bin_to_ascii(s);
     outbuf[13] = 0;
-
-    return outbuf;
-  }
+}
 
 ufc_long *_ufc_doit();
 
@@ -728,9 +724,9 @@ ufc_long *_ufc_doit();
  * UNIX crypt function
  */
 
-char *crypt_legacy(key, salt)
-  const char *key, *salt;
-  { ufc_long *s;
+void crypt_legacy(const char *key, const char *salt, char *outbuf)
+{
+    ufc_long *s;
     char ktab[9];
 
     /*
@@ -758,8 +754,8 @@ char *crypt_legacy(key, salt)
     /*
      * And convert back to 6 bit ASCII
      */
-    return output_conversion(s[0], s[1], salt);
-  }
+    output_conversion_r(s[0], s[1], salt, outbuf);
+}
 
 /*
  * UNIX encrypt function. Takes a bitvector
@@ -901,7 +897,7 @@ char *crypt16(key, salt)
     /*
      * And convert back to 6 bit ASCII
      */
-    strcpy (res, output_conversion(s[0], s[1], salt));
+    output_conversion_r(s[0], s[1], salt, res);
 
     clearmem(ttab, sizeof ttab);
     if (strlen (key) > 8) (void)strncpy(ttab, key+8, 8);
@@ -915,7 +911,7 @@ char *crypt16(key, salt)
     /*
      * And convert back to 6 bit ASCII
      */
-    strcpy (q, output_conversion(t[0], t[1], salt));
+    output_conversion_r(t[0], t[1], salt, q);
     strcpy (res+13, q+2);
 
     clearmem(ktab, sizeof ktab);

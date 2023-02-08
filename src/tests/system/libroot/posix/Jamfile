@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src tests system libroot posix ;
 
 UsePrivateHeaders libroot system ;
+SubDirSysHdrs $(HAIKU_TOP) headers compatibility bsd ;
+SubDirSysHdrs $(HAIKU_TOP) headers compatibility gnu ;
 
 # filter warnings about strftime()-formats in locale_test
 TARGET_WARNING_C++FLAGS_$(TARGET_PACKAGING_ARCH)
@@ -87,7 +89,7 @@ UnitTestLib librootposixtest.so :
 
 	CryptTest.cpp
 
-	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	: be libgnu.so [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
 
 SubInclude HAIKU_TOP src tests system libroot posix math ;
