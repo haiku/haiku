@@ -484,8 +484,6 @@ GlobalFontManager::_RemoveStyle(font_directory& directory, FontStyle* style)
 	directory.revision++;
 
 	fStyleHashTable.Remove(FontKey(style->Family()->ID(), style->ID()));
-
-	style->ReleaseReference();
 }
 
 
@@ -741,6 +739,7 @@ GlobalFontManager::_AddFont(font_directory& directory, BEntry& entry)
 
 	directory.styles.AddItem(style);
 	fStyleHashTable.Put(FontKey(style->Family()->ID(), style->ID()), style);
+	style->ReleaseReference();
 
 	if (directory.AlreadyScanned())
 		directory.revision++;

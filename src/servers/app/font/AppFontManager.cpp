@@ -95,6 +95,7 @@ AppFontManager::_AddUserFont(FT_Face face, node_ref nodeRef, const char* path,
 	styleID = style->ID();
 
 	fStyleHashTable.Put(FontKey(familyID, styleID), style);
+	style->ReleaseReference();
 
 	return B_OK;
 }
@@ -160,19 +161,7 @@ AppFontManager::RemoveUserFont(uint16 familyID, uint16 styleID)
 	ASSERT(IsLocked());
 
 	FontKey fKey(familyID, styleID);
-	FontStyle* styleRef = fStyleHashTable.Get(fKey);
-	fStyleHashTable.Remove(fKey);
+	FontStyle* styleRef = fStyleHashTable.Remove(fKey);
 
-	FontFamily* family = styleRef->Family();
-	bool removed = family->RemoveStyle(styleRef, this);
-
-	if (!removed)
-		syslog(LOG_DEBUG, "AppFontManager::RemoveUserFont style not removed from family\n");
-
-	fFamilies.RemoveItem(family);
-	delete family;
-
-	styleRef->ReleaseReference();
-
-	return B_OK;
+	return styleRef != NULL ? B_OK : B_BAD_VALUE;
 }

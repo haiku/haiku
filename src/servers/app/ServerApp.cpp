@@ -1766,12 +1766,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			status_t status = B_OK;
 
 			AutoLocker<FontManagerBase> fontLock(fAppFontManager);
-			FontStyle* style = fAppFontManager->GetStyle(familyID, styleID);
-
-			if (style != NULL) {
-				status = fAppFontManager->RemoveUserFont(familyID, styleID);
-			} else
-				status = B_BAD_VALUE;
+			status = fAppFontManager->RemoveUserFont(familyID, styleID);
 
 			fLink.StartMessage(status);
 			fLink.Flush();

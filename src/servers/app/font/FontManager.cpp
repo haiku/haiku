@@ -69,6 +69,8 @@ FontManagerBase::~FontManagerBase()
 	for (int32 i = fFamilies.CountItems(); i-- > 0;)
 		delete fFamilies.ItemAt(i);
 
+	fStyleHashTable.Clear();
+
 	if (fHasFreetypeLibrary == true)
 		FT_Done_FreeType(gFreeTypeLibrary);
 }
@@ -306,8 +308,10 @@ FontManagerBase::RemoveStyle(FontStyle* style)
 		debugger("style removed but still available!");
 
 	if (family->RemoveStyle(style)
-		&& family->CountStyles() == 0)
+		&& family->CountStyles() == 0) {
 		fFamilies.RemoveItem(family);
+		delete family;
+	}
 }
 
 
