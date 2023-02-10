@@ -1607,24 +1607,15 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (status != B_OK) {
 				fLink.StartMessage(status);
 			} else {
-				ServerFont* font = new(std::nothrow) ServerFont();
-				if (font == NULL) {
-					fLink.StartMessage(B_NO_MEMORY);
-					fLink.Flush();
-					break;
-				}
-
-				status = font->SetFamilyAndStyle(familyID, styleID,
+				ServerFont font;
+				status = font.SetFamilyAndStyle(familyID, styleID,
 					fAppFontManager);
 
+				fLink.StartMessage(status);
 				if (status == B_OK) {
-					fLink.StartMessage(B_OK);
-					fLink.Attach<uint16>(font->FamilyID());
-					fLink.Attach<uint16>(font->StyleID());
-					fLink.Attach<uint16>(font->Face());
-				} else {
-					fLink.StartMessage(status);
-					delete font;
+					fLink.Attach<uint16>(font.FamilyID());
+					fLink.Attach<uint16>(font.StyleID());
+					fLink.Attach<uint16>(font.Face());
 				}
 			}
 
@@ -1720,27 +1711,19 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.StartMessage(status);
 				free(fontData);
 			} else {
-				ServerFont* font = new(std::nothrow) ServerFont();
-				if (font == NULL) {
-					free(fontData);
-					fLink.StartMessage(B_NO_MEMORY);
-					fLink.Flush();
-					break;
-				}
-
-				status = font->SetFamilyAndStyle(familyID, styleID,
+				ServerFont font;
+				status = font.SetFamilyAndStyle(familyID, styleID,
 					fAppFontManager);
 
 				if (status == B_OK) {
-					font->SetFontData(fontData, size);
+					font.SetFontData(fontData, size);
 					fLink.StartMessage(B_OK);
-					fLink.Attach<uint16>(font->FamilyID());
-					fLink.Attach<uint16>(font->StyleID());
-					fLink.Attach<uint16>(font->Face());
+					fLink.Attach<uint16>(font.FamilyID());
+					fLink.Attach<uint16>(font.StyleID());
+					fLink.Attach<uint16>(font.Face());
 				} else {
 					fLink.StartMessage(status);
 					free(fontData);
-					delete font;
 				}
 			}
 
