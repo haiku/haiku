@@ -67,7 +67,7 @@ FontManagerBase::FontManagerBase(bool init_freetype, const char* className)
 FontManagerBase::~FontManagerBase()
 {
 	for (int32 i = fFamilies.CountItems(); i-- > 0;)
-		delete fFamilies.ItemAt(i);
+		delete fFamilies.RemoveItemAt(i);
 
 	fStyleHashTable.Clear();
 
