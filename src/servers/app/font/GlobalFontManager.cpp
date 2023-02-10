@@ -733,7 +733,7 @@ GlobalFontManager::_AddFont(font_directory& directory, BEntry& entry)
 	FTRACE(("\tadd style: %s, %s\n", face->family_name, face->style_name));
 
 	// the FontStyle takes over ownership of the FT_Face object
-	FontStyle* style = new (std::nothrow) FontStyle(nodeRef, path.Path(), face);
+	FontStyle* style = new (std::nothrow) FontStyle(nodeRef, path.Path(), face, this);
 	if (style == NULL || !family->AddStyle(style)) {
 		delete style;
 		delete family;

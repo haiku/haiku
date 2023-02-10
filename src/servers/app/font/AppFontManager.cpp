@@ -74,9 +74,9 @@ AppFontManager::_AddUserFont(FT_Face face, node_ref nodeRef, const char* path,
 	FTRACE(("\tadd style: %s, %s\n", face->family_name, face->style_name));
 
 	// the FontStyle takes over ownership of the FT_Face object
-	FontStyle* style = new (std::nothrow) FontStyle(nodeRef, path, face);
+	FontStyle* style = new (std::nothrow) FontStyle(nodeRef, path, face, this);
 
-	if (style == NULL || !family->AddStyle(style, this)) {
+	if (style == NULL || !family->AddStyle(style)) {
 		delete style;
 		delete family;
 		return B_NO_MEMORY;
