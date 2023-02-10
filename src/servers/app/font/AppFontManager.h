@@ -13,23 +13,10 @@
 #include "FontManager.h"
 
 
-#include <AutoDeleter.h>
-#include <HashMap.h>
-#include <Looper.h>
-#include <ObjectList.h>
-#include <Referenceable.h>
-
-
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-class BEntry;
-class BPath;
 struct node_ref;
-
-class FontFamily;
-class FontStyle;
-class ServerFont;
 
 
 // font areas should be less than 20MB

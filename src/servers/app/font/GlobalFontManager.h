@@ -13,13 +13,7 @@
 #include "FontManager.h"
 
 #include <AutoDeleter.h>
-#include <HashMap.h>
-#include <Looper.h>
 #include <ObjectList.h>
-#include <Referenceable.h>
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
 
 
 class BEntry;
@@ -124,7 +118,5 @@ private:
 
 
 extern GlobalFontManager* gFontManager;
-
-extern FT_Library gFreeTypeLibrary;
 
 #endif	/* GLOBAL_FONT_MANAGER_H */

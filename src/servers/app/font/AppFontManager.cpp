@@ -15,23 +15,11 @@
 
 #include <new>
 #include <stdint.h>
-#include <syslog.h>
 
-#include <Autolock.h>
 #include <Debug.h>
-#include <Directory.h>
 #include <Entry.h>
-#include <File.h>
-#include <FindDirectory.h>
-#include <Message.h>
-#include <NodeMonitor.h>
-#include <Path.h>
-#include <String.h>
 
 #include "FontFamily.h"
-#include "FontManager.h"
-#include "ServerConfig.h"
-#include "ServerFont.h"
 
 
 //#define TRACE_FONT_MANAGER
@@ -40,6 +28,9 @@
 #else
 #	define FTRACE(x) ;
 #endif
+
+
+extern FT_Library gFreeTypeLibrary;
 
 
 //	#pragma mark -

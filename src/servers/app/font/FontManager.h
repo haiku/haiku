@@ -10,7 +10,6 @@
 #define FONT_MANAGER_H
 
 
-#include <AutoDeleter.h>
 #include <HashMap.h>
 #include <Looper.h>
 #include <ObjectList.h>
@@ -20,13 +19,8 @@
 #include FT_FREETYPE_H
 
 
-class BEntry;
-class BPath;
-struct node_ref;
-
 class FontFamily;
 class FontStyle;
-class ServerFont;
 
 
 /*!
@@ -106,7 +100,5 @@ protected:
 			uint16				fNextID;
 			bool  				fHasFreetypeLibrary;
 };
-
-extern FT_Library gFreeTypeLibrary;
 
 #endif	/* FONT_MANAGER_H */

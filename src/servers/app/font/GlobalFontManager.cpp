@@ -26,15 +26,17 @@
 #include <Path.h>
 #include <String.h>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #include "FontFamily.h"
-#include "FontManager.h"
 #include "ServerConfig.h"
 #include "ServerFont.h"
 
 
-//#define TRACE_FONT_MANAGER
+//#define TRACE_GLOBAL_FONT_MANAGER
 #ifdef TRACE_GLOBAL_FONT_MANAGER
-#	define FTRACE(x) printf x
+#	define FTRACE(x) debug_printf x
 #else
 #	define FTRACE(x) ;
 #endif
@@ -43,6 +45,7 @@
 // TODO: needs some more work for multi-user support
 
 GlobalFontManager* gFontManager = NULL;
+extern FT_Library gFreeTypeLibrary;
 
 
 struct GlobalFontManager::font_directory {

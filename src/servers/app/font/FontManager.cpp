@@ -15,20 +15,9 @@
 
 #include <new>
 
-#include <Autolock.h>
 #include <Debug.h>
-#include <Directory.h>
-#include <Entry.h>
-#include <File.h>
-#include <FindDirectory.h>
-#include <Message.h>
-#include <NodeMonitor.h>
-#include <Path.h>
-#include <String.h>
 
 #include "FontFamily.h"
-#include "ServerConfig.h"
-#include "ServerFont.h"
 
 
 //#define TRACE_FONT_MANAGER
