@@ -108,7 +108,7 @@ TestWindow::TestWindow(const char* title)
 
 TestWindow::~TestWindow()
 {
-	for (int32 i = fTests.CountItems() - 1; i >= 0; i++)
+	for (int32 i = fTests.CountItems() - 1; i >= 0; i--)
 		delete (Test*)fTests.ItemAt(i);
 }
 
