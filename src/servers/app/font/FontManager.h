@@ -12,6 +12,7 @@
 
 #include <HashMap.h>
 #include <Looper.h>
+#include <Node.h>
 #include <ObjectList.h>
 #include <Referenceable.h>
 
@@ -27,15 +28,11 @@ class FontStyle;
 	\class FontManager FontManager.h
 	\brief Base class interface used by GlobalFontManager and AppFontManager
 */
-class FontManagerBase : public BLooper {
+class FontManager : public BLooper {
 public:
-								FontManagerBase(bool init_freetype,
+								FontManager(
 									const char* className = "FontManagerBase");
-	virtual						~FontManagerBase();
-
-			status_t			InitCheck() { return fInitStatus; }
-			void  				SetInitStatus(status_t new_status)
-									{ fInitStatus = new_status; }
+	virtual						~FontManager();
 
 	virtual	int32				CountFamilies();
 
@@ -64,14 +61,20 @@ public:
 				// FontStyle.
 
 
+protected:
 			FT_CharMap			_GetSupportedCharmap(const FT_Face& face);
 
-protected:
 			FontFamily*			_FindFamily(const char* family) const;
 
-			static int 			compare_font_families(const FontFamily* a,
-									const FontFamily* b);
+			status_t			_AddFont(FT_Face face, node_ref nodeRef,
+									const char* path,
+									uint16& familyID, uint16& styleID);
+			FontStyle*			_RemoveFont(uint16 familyID, uint16 styleID);
+			void				_RemoveAllFonts();
 
+	virtual	uint16				_NextID();
+
+private:
 			struct FontKey {
 				FontKey(uint16 family, uint16 style)
 					: familyID(family), styleID(style) {}
@@ -90,15 +93,13 @@ protected:
 				uint16 familyID, styleID;
 			};
 
-			status_t			fInitStatus;
-
+private:
 			typedef BObjectList<FontFamily>			FamilyList;
 			FamilyList			fFamilies;
 
 			HashMap<FontKey, BReference<FontStyle> > fStyleHashTable;
 
 			uint16				fNextID;
-			bool  				fHasFreetypeLibrary;
 };
 
 #endif	/* FONT_MANAGER_H */

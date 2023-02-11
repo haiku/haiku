@@ -29,7 +29,7 @@ static BLocker sFontLock("font lock");
 		   be kept open until the FontStyle is destroyed
 */
 FontStyle::FontStyle(node_ref& nodeRef, const char* path, FT_Face face,
-	FontManagerBase* fontManager)
+	FontManager* fontManager)
 	:
 	fFreeTypeFace(face),
 	fName(face->style_name),

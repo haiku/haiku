@@ -1589,7 +1589,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 2) uint16 - style ID of added font
 			// 3) uint16 - face of added font
 
-			AutoLocker<FontManagerBase> fontLock(fAppFontManager);
+			AutoLocker< ::FontManager> fontLock(fAppFontManager);
 
 			if (fAppFontManager->CountFamilies() > MAX_USER_FONTS) {
 				fLink.StartMessage(B_NOT_ALLOWED);
@@ -1640,7 +1640,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 2) uint16 - style ID of added font
 			// 3) uint16 - face of added font
 
-			AutoLocker<FontManagerBase> fontLock(fAppFontManager);
+			AutoLocker< ::FontManager> fontLock(fAppFontManager);
 
 			if (fAppFontManager->CountFamilies() > MAX_USER_FONTS) {
 				fLink.StartMessage(B_NOT_ALLOWED);
@@ -1748,7 +1748,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			status_t status = B_OK;
 
-			AutoLocker<FontManagerBase> fontLock(fAppFontManager);
+			AutoLocker< ::FontManager> fontLock(fAppFontManager);
 			status = fAppFontManager->RemoveUserFont(familyID, styleID);
 
 			fLink.StartMessage(status);
@@ -1927,7 +1927,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 index;
 			link.Read<int32>(&index);
 
-			AutoLocker<FontManagerBase> fontLock(gFontManager);
+			AutoLocker< ::FontManager> fontLock(gFontManager);
 
 			FontFamily* family = gFontManager->FamilyAt(index);
 			if (family == NULL) {
@@ -1976,7 +1976,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<uint16>(&familyID);
 			link.Read<uint16>(&styleID);
 
-			AutoLocker<FontManagerBase> fontLock(gFontManager);
+			AutoLocker< ::FontManager> fontLock(gFontManager);
 
 			FontStyle* fontStyle = gFontManager->GetStyle(familyID, styleID);
 			if (fontStyle == NULL) {
@@ -2024,7 +2024,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				&& link.Read<uint16>(&styleID) == B_OK
 				&& link.Read<uint16>(&face) == B_OK) {
 				// get the font and return IDs and face
-				AutoLocker<FontManagerBase> fontLock(gFontManager);
+				AutoLocker< ::FontManager> fontLock(gFontManager);
 
 				FontStyle* fontStyle = gFontManager->GetStyle(family, style,
 					familyID, styleID, face);
@@ -2068,7 +2068,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<int32>(&familyID);
 			link.Read<int32>(&styleID);
 
-			AutoLocker<FontManagerBase> fontLock(gFontManager);
+			AutoLocker< ::FontManager> fontLock(gFontManager);
 
 			FontStyle* fontStyle = gFontManager->GetStyle(familyID, styleID);
 			if (fontStyle == NULL) {
@@ -2216,7 +2216,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<uint16>(&familyID);
 			link.Read<uint16>(&styleID);
 
-			AutoLocker<FontManagerBase> fontLock(gFontManager);
+			AutoLocker< ::FontManager> fontLock(gFontManager);
 
 			FontStyle* fontStyle = gFontManager->GetStyle(familyID, styleID);
 			if (fontStyle == NULL) {
@@ -2270,7 +2270,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<uint16>(&familyID);
 			link.Read<uint16>(&styleID);
 
-			AutoLocker<FontManagerBase> fontLock(gFontManager);
+			AutoLocker< ::FontManager> fontLock(gFontManager);
 
 			FontStyle* fontStyle = gFontManager->GetStyle(familyID, styleID);
 			if (fontStyle == NULL) {
@@ -2304,7 +2304,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<uint16>(&styleID);
 			link.Read<float>(&size);
 
-			AutoLocker<FontManagerBase> fontLock(gFontManager);
+			AutoLocker< ::FontManager> fontLock(gFontManager);
 
 			FontStyle* fontStyle = gFontManager->GetStyle(familyID, styleID);
 			if (fontStyle == NULL) {

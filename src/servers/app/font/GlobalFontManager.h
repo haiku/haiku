@@ -30,10 +30,12 @@ class ServerFont;
 	\class GlobalFontManager GlobalFontManager.h
 	\brief Manager for system fonts within the font subsystem
 */
-class GlobalFontManager : public FontManagerBase {
+class GlobalFontManager : public FontManager {
 public:
 								GlobalFontManager();
 	virtual						~GlobalFontManager();
+
+			status_t			InitCheck() { return fInitStatus; }
 
 			void				SaveRecentFontMappings();
 
@@ -52,11 +54,11 @@ public:
 
 			void				AttachUser(uid_t userID);
 			void				DetachUser(uid_t userID);
-	virtual FontFamily*			GetFamily(uint16 familyID) const;
-	virtual	FontFamily*			GetFamily(const char* name);
-	virtual	FontStyle*			GetStyle(uint16 familyID,
-									uint16 styleID) const;
 
+	virtual	FontFamily*			GetFamily(uint16 familyID) const;
+	virtual	FontFamily*			GetFamily(const char* name);
+
+	virtual	FontStyle*			GetStyle(uint16 familyID, uint16 styleID) const;
 	virtual	FontStyle*			GetStyle(const char* familyName,
 									const char* styleName,
 									uint16 familyID = 0xffff,
@@ -96,6 +98,7 @@ private:
 									const char* fallbackStyle,
 									uint16 fallbackFace);
 			status_t			_SetDefaultFonts();
+
 private:
 			status_t			fInitStatus;
 

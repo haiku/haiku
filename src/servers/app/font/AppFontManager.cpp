@@ -41,56 +41,9 @@ extern FT_Library gFreeTypeLibrary;
 	rather than the application font.
 */
 AppFontManager::AppFontManager()
-	: FontManagerBase(false, "AppFontManager")
+	: FontManager("AppFontManager")
 {
 	fNextID = UINT16_MAX;
-}
-
-
-status_t
-AppFontManager::_AddUserFont(FT_Face face, node_ref nodeRef, const char* path,
-	uint16& familyID, uint16& styleID)
-{
-	FontFamily* family = _FindFamily(face->family_name);
-	bool isNewFontFamily = family == NULL;
-	if (family != NULL
-		&& family->HasStyle(face->style_name)) {
-		// prevent adding the same style twice
-		// (this indicates a problem with the installed fonts maybe?)
-		FT_Done_Face(face);
-		return B_NAME_IN_USE;
-	}
-
-	if (family == NULL) {
-		family = new (std::nothrow) FontFamily(face->family_name, fNextID--);
-
-		if (family == NULL
-			|| !fFamilies.BinaryInsert(family, compare_font_families)) {
-			delete family;
-			FT_Done_Face(face);
-			return B_NO_MEMORY;
-		}
-	}
-
-	FTRACE(("\tadd style: %s, %s\n", face->family_name, face->style_name));
-
-	// the FontStyle takes over ownership of the FT_Face object
-	FontStyle* style = new (std::nothrow) FontStyle(nodeRef, path, face, this);
-
-	if (style == NULL || !family->AddStyle(style)) {
-		delete style;
-		if (isNewFontFamily)
-			delete family;
-		return B_NO_MEMORY;
-	}
-
-	familyID = style->Family()->ID();
-	styleID = style->ID();
-
-	fStyleHashTable.Put(FontKey(familyID, styleID), style);
-	style->ReleaseReference();
-
-	return B_OK;
 }
 
 
@@ -117,7 +70,7 @@ AppFontManager::AddUserFontFromFile(const char* path,
 	if (error != 0)
 		return B_ERROR;
 
-	status = _AddUserFont(face, nodeRef, path, familyID, styleID);
+	status = _AddFont(face, nodeRef, path, familyID, styleID);
 
 	return status;
 }
@@ -140,7 +93,7 @@ AppFontManager::AddUserFontFromMemory(const FT_Byte* fontAddress, size_t size,
 	if (error != 0)
 		return B_ERROR;
 
-	status = _AddUserFont(face, nodeRef, "", familyID, styleID);
+	status = _AddFont(face, nodeRef, "", familyID, styleID);
 
 	return status;
 }
@@ -151,10 +104,12 @@ AppFontManager::AddUserFontFromMemory(const FT_Byte* fontAddress, size_t size,
 status_t
 AppFontManager::RemoveUserFont(uint16 familyID, uint16 styleID)
 {
-	ASSERT(IsLocked());
+	return _RemoveFont(familyID, styleID) != NULL ? B_OK : B_BAD_VALUE;
+}
 
-	FontKey fKey(familyID, styleID);
-	FontStyle* styleRef = fStyleHashTable.Remove(fKey);
 
-	return styleRef != NULL ? B_OK : B_BAD_VALUE;
+uint16
+AppFontManager::_NextID()
+{
+	return fNextID--;
 }

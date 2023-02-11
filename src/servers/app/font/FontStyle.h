@@ -25,7 +25,7 @@
 
 struct node_ref;
 class FontFamily;
-class FontManagerBase;
+class FontManager;
 class ServerFont;
 
 
@@ -39,7 +39,7 @@ class ServerFont;
 class FontStyle : public BReferenceable {
 	public:
 						FontStyle(node_ref& nodeRef, const char* path,
-							FT_Face face, FontManagerBase* fontManager);
+							FT_Face face, FontManager* fontManager);
 		virtual			~FontStyle();
 
 		const node_ref& NodeRef() const { return fNodeRef; }
@@ -132,7 +132,7 @@ class FontStyle : public BReferenceable {
 
 		status_t		UpdateFace(FT_Face face);
 
-		FontManagerBase*	Manager() const
+		FontManager*	Manager() const
 							{ return fFontManager; }
 
 		uint32			FontDataSize() const
@@ -163,7 +163,7 @@ class FontStyle : public BReferenceable {
 
 		FT_Byte*		fFontData;
 		uint32			fFontDataSize;
-		FontManagerBase*	fFontManager;
+		FontManager*	fFontManager;
 };
 
 #endif	// FONT_STYLE_H_

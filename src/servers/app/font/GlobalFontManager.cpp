@@ -101,7 +101,7 @@ set_entry(node_ref& nodeRef, const char* name, BEntry& entry)
 
 //! Does basic set up so that directories can be scanned
 GlobalFontManager::GlobalFontManager()
-	: FontManagerBase(true, "GlobalFontManager"),
+	: FontManager("GlobalFontManager"),
 	fDirectories(10, true),
 	fMappings(10, true),
 
@@ -111,13 +111,14 @@ GlobalFontManager::GlobalFontManager()
 
 	fScanned(false)
 {
-	if (InitCheck() == B_OK) {
+	fInitStatus = FT_Init_FreeType(&gFreeTypeLibrary) == 0 ? B_OK : B_ERROR;
+	if (fInitStatus == B_OK) {
 		_AddSystemPaths();
 		_LoadRecentFontMappings();
 
-		status_t status = _SetDefaultFonts();
+		fInitStatus = _SetDefaultFonts();
 
-		if (status == B_OK) {
+		if (fInitStatus == B_OK) {
 			// Precache the plain and bold fonts
 			_PrecacheFontFile(fDefaultPlainFont.Get());
 			_PrecacheFontFile(fDefaultBoldFont.Get());
@@ -125,18 +126,20 @@ GlobalFontManager::GlobalFontManager()
 			// Post a message so we scan the initial paths.
 			PostMessage(B_PULSE);
 		}
-
-		SetInitStatus(status);
 	}
 }
 
 
-//! Frees items allocated in the constructor and deletes all global families
+//! Frees items allocated in the constructor and shuts down FreeType
 GlobalFontManager::~GlobalFontManager()
 {
 	fDefaultPlainFont.Unset();
 	fDefaultBoldFont.Unset();
 	fDefaultFixedFont.Unset();
+
+	_RemoveAllFonts();
+
+	FT_Done_FreeType(gFreeTypeLibrary);
 }
 
 
@@ -286,7 +289,7 @@ GlobalFontManager::MessageReceived(BMessage* message)
 		}
 
 		default:
-			FontManagerBase::MessageReceived(message);
+			FontManager::MessageReceived(message);
 			break;
 	}
 
@@ -486,7 +489,7 @@ GlobalFontManager::_RemoveStyle(font_directory& directory, FontStyle* style)
 	directory.styles.RemoveItem(style);
 	directory.revision++;
 
-	fStyleHashTable.Remove(FontKey(style->Family()->ID(), style->ID()));
+	_RemoveFont(style->Family()->ID(), style->ID());
 }
 
 
@@ -517,7 +520,7 @@ GlobalFontManager::CountFamilies()
 {
 	_ScanFontsIfNecessary();
 
-	return fFamilies.CountItems();
+	return FontManager::CountFamilies();
 }
 
 
@@ -558,7 +561,7 @@ GlobalFontManager::CountStyles(uint16 familyID)
 FontStyle*
 GlobalFontManager::GetStyle(uint16 familyID, uint16 styleID) const
 {
-	return FontManagerBase::GetStyle(familyID, styleID);
+	return FontManager::GetStyle(familyID, styleID);
 }
 
 
@@ -712,37 +715,14 @@ GlobalFontManager::_AddFont(font_directory& directory, BEntry& entry)
 	if (error != 0)
 		return B_ERROR;
 
-	FontFamily* family = _FindFamily(face->family_name);
-	if (family != NULL && family->HasStyle(face->style_name)) {
-		// prevent adding the same style twice
-		// (this indicates a problem with the installed fonts maybe?)
-		FT_Done_Face(face);
+	uint16 familyID, styleID;
+	status = FontManager::_AddFont(face, nodeRef, path.Path(), familyID, styleID);
+	if (status == B_NAME_IN_USE)
 		return B_OK;
-	}
+	if (status < B_OK)
+		return status;
 
-	if (family == NULL) {
-		family = new (std::nothrow) FontFamily(face->family_name, fNextID++);
-		if (family == NULL
-			|| !fFamilies.BinaryInsert(family, compare_font_families)) {
-			delete family;
-			FT_Done_Face(face);
-			return B_NO_MEMORY;
-		}
-	}
-
-	FTRACE(("\tadd style: %s, %s\n", face->family_name, face->style_name));
-
-	// the FontStyle takes over ownership of the FT_Face object
-	FontStyle* style = new (std::nothrow) FontStyle(nodeRef, path.Path(), face, this);
-	if (style == NULL || !family->AddStyle(style)) {
-		delete style;
-		delete family;
-		return B_NO_MEMORY;
-	}
-
-	directory.styles.AddItem(style);
-	fStyleHashTable.Put(FontKey(style->Family()->ID(), style->ID()), style);
-	style->ReleaseReference();
+	directory.styles.AddItem(GetStyle(familyID, styleID));
 
 	if (directory.AlreadyScanned())
 		directory.revision++;
@@ -980,12 +960,7 @@ GlobalFontManager::GetFamily(const char* name)
 FontFamily*
 GlobalFontManager::GetFamily(uint16 familyID) const
 {
-	FontKey key(familyID, 0);
-	FontStyle* style = fStyleHashTable.Get(key);
-	if (style != NULL)
-		return style->Family();
-
-	return NULL;
+	return FontManager::GetFamily(familyID);
 }
 
 

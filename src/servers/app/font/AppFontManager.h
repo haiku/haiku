@@ -27,7 +27,7 @@ struct node_ref;
 	\class AppFontManager AppFontManager.h
 	\brief Manager for application-added fonts in the font subsystem
 */
-class AppFontManager : public FontManagerBase {
+class AppFontManager : public FontManager {
 public:
 								AppFontManager();
 
@@ -38,12 +38,10 @@ public:
 			status_t			RemoveUserFont(uint16 familyID, uint16 styleID);
 
 private:
-			status_t			_AddUserFont(FT_Face face, node_ref nodeRef,
-									const char* path,
-									uint16& familyID, uint16& styleID);
-private:
+			uint16				_NextID();
 
-			int32				fNextID;
+private:
+			uint16				fNextID;
 };
 
 
