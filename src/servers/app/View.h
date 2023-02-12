@@ -170,8 +170,8 @@ public:
 
 			// for background clearing
 			virtual void	Draw(DrawingEngine* drawingEngine,
-								BRegion* effectiveClipping,
-								BRegion* windowContentClipping,
+								const BRegion* effectiveClipping,
+								const BRegion* windowContentClipping,
 								bool deep = false);
 
 			virtual void	MouseDown(BMessage* message, BPoint where);
@@ -204,7 +204,7 @@ public:
 			// clipping
 			void			RebuildClipping(bool deep);
 			BRegion&		ScreenAndUserClipping(
-								BRegion* windowContentClipping,
+								const BRegion* windowContentClipping,
 								bool force = false) const;
 			void			InvalidateScreenClipping();
 	inline	bool			IsScreenClippingValid() const
@@ -228,7 +228,7 @@ protected:
 	virtual	void			_ScreenToLocalTransform(
 								SimpleTransform& transform) const;
 
-			BRegion&		_ScreenClipping(BRegion* windowContentClipping,
+			BRegion&		_ScreenClipping(const BRegion* windowContentClipping,
 								bool force = false) const;
 			void			_MoveScreenClipping(int32 x, int32 y,
 								bool deep);

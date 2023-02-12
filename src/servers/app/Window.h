@@ -81,11 +81,6 @@ class WorkspacesView;
 // TODO: move this into a proper place
 #define AS_REDRAW 'rdrw'
 
-enum {
-	UPDATE_REQUEST		= 0x01,
-	UPDATE_EXPOSE		= 0x02,
-};
-
 
 class Window {
 public:
@@ -149,15 +144,19 @@ public:
 			bool				DrawingRegionChanged(View* view) const;
 
 			// generic version, used by the Desktop
-			void				ProcessDirtyRegion(BRegion& regionOnScreen);
+			void				ProcessDirtyRegion(const BRegion& dirtyRegion,
+									const BRegion& exposeRegion);
+			void				ProcessDirtyRegion(const BRegion& exposeRegion)
+									{ ProcessDirtyRegion(exposeRegion, exposeRegion); }
 			void				RedrawDirtyRegion();
 
 			// can be used from inside classes that don't
 			// need to know about Desktop (first version uses Desktop)
 			void				MarkDirty(BRegion& regionOnScreen);
 			// these versions do not use the Desktop
-			void				MarkContentDirty(BRegion& regionOnScreen);
-			void				MarkContentDirtyAsync(BRegion& regionOnScreen);
+			void				MarkContentDirty(BRegion& dirtyRegion,
+									BRegion& exposeRegion);
+			void				MarkContentDirtyAsync(BRegion& dirtyRegion);
 			// shortcut for invalidating just one view
 			void				InvalidateView(View* view, BRegion& viewRegion);
 
@@ -322,7 +321,8 @@ protected:
 									int32 yOffset);
 
 			// different types of drawing
-			void				_TriggerContentRedraw(BRegion& dirty);
+			void				_TriggerContentRedraw(BRegion& dirty,
+									const BRegion& expose = BRegion());
 			void				_DrawBorder();
 
 			// handling update sessions
@@ -348,13 +348,19 @@ protected:
 
 			BRegion				fVisibleRegion;
 			BRegion				fVisibleContentRegion;
-			// our part of the "global" dirty region
-			// it is calculated from the desktop thread,
-			// but we can write to it when we read locked
-			// the clipping, since it is local and the desktop
-			// thread is blocked
+
+			// Our part of the "global" dirty region (what needs to be redrawn).
+			// It is calculated from the desktop thread, but we can write to it when we read locked
+			// the clipping, since it is local and the desktop thread is blocked.
 			BRegion				fDirtyRegion;
-			uint32				fDirtyCause;
+
+			// Subset of the dirty region that is newly exposed. While the dirty region is merely
+			// showing out of date data on screen, this subset of it is showing remains of other
+			// windows. To avoid glitches, it must be set to a reasonable state as fast as possible,
+			// without waiting for a roundtrip to the window's Draw() methods. So it will be filled
+			// using background color and view bitmap, which can all be done without leaving
+			// app_server.
+			BRegion				fExposeRegion;
 
 			// caching local regions
 			BRegion				fContentRegion;
@@ -386,7 +392,6 @@ protected:
 	class UpdateSession {
 	public:
 									UpdateSession();
-		virtual						~UpdateSession();
 
 				void				Include(BRegion* additionalDirty);
 				void				Exclude(BRegion* dirtyInNextSession);
@@ -400,16 +405,9 @@ protected:
 		inline	bool				IsUsed() const
 										{ return fInUse; }
 
-				void				AddCause(uint8 cause);
-		inline	bool				IsExpose() const
-										{ return fCause & UPDATE_EXPOSE; }
-		inline	bool				IsRequest() const
-										{ return fCause & UPDATE_REQUEST; }
-
 	private:
 				BRegion				fDirtyRegion;
 				bool				fInUse;
-				uint8				fCause;
 	};
 
 			UpdateSession		fUpdateSessions[2];

@@ -1558,12 +1558,14 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 		return;
 	}
 
-	// the dirty region for the inside of the window is
-	// constructed by the window itself in ResizeBy()
+	// The dirty region for the inside of the window is constructed by the window itself in
+	// ResizeBy()
 	BRegion newDirtyRegion;
-	// track the dirty region outside the window in case
-	// it is shrunk in "previouslyOccupiedRegion"
+	// Track the dirty region outside the window in case it is shrunk in "previouslyOccupiedRegion"
 	BRegion previouslyOccupiedRegion(window->VisibleRegion());
+	// Track the region that was drawn in previous update sessions, so we can compute the newly
+	// exposed areas by excluding this from the update region.
+	BRegion previousVisibleContentRegion(window->VisibleContentRegion());
 
 	// stop direct frame buffer access
 	bool direct = false;
@@ -1586,7 +1588,15 @@ Desktop::ResizeWindowBy(Window* window, float x, float y)
 	// ...because we do this ourselves
 	newDirtyRegion.Include(&previouslyOccupiedRegion);
 
-	MarkDirty(newDirtyRegion);
+	// calculate old expose region as window visible region difference
+	BRegion exposeRegion(previouslyOccupiedRegion);
+	exposeRegion.Exclude(&window->VisibleRegion());
+	// ...and new expose region as window content visible region difference
+	BRegion tmp(window->VisibleContentRegion());
+	tmp.Exclude(&previousVisibleContentRegion);
+	exposeRegion.Include(&tmp);
+
+	MarkDirty(newDirtyRegion, exposeRegion);
 	_SetBackground(background);
 	_WindowChanged(window);
 
@@ -2166,14 +2176,14 @@ Desktop::FindTarget(BMessenger& messenger)
 
 
 void
-Desktop::MarkDirty(BRegion& region)
+Desktop::MarkDirty(BRegion& dirtyRegion, BRegion& exposeRegion)
 {
-	if (region.CountRects() == 0)
+	if (dirtyRegion.CountRects() == 0)
 		return;
 
 	if (LockAllWindows()) {
 		// send redraw messages to all windows intersecting the dirty region
-		_TriggerWindowRedrawing(region);
+		_TriggerWindowRedrawing(dirtyRegion, exposeRegion);
 
 		UnlockAllWindows();
 	}
@@ -3455,14 +3465,14 @@ Desktop::_RebuildClippingForAllWindows(BRegion& stillAvailableOnScreen)
 
 
 void
-Desktop::_TriggerWindowRedrawing(BRegion& newDirtyRegion)
+Desktop::_TriggerWindowRedrawing(BRegion& dirtyRegion, BRegion& exposeRegion)
 {
 	// send redraw messages to all windows intersecting the dirty region
 	for (Window* window = CurrentWindows().LastWindow(); window != NULL;
 			window = window->PreviousWindow(fCurrentWorkspace)) {
 		if (!window->IsHidden()
-			&& newDirtyRegion.Intersects(window->VisibleRegion().Frame()))
-			window->ProcessDirtyRegion(newDirtyRegion);
+			&& dirtyRegion.Intersects(window->VisibleRegion().Frame()))
+			window->ProcessDirtyRegion(dirtyRegion, exposeRegion);
 	}
 }
 
@@ -3531,7 +3541,7 @@ Desktop::RebuildAndRedrawAfterWindowChange(Window* changedWindow,
 	_SetBackground(stillAvailableOnScreen);
 	_WindowChanged(changedWindow);
 
-	_TriggerWindowRedrawing(dirty);
+	_TriggerWindowRedrawing(dirty, dirty);
 }
 
 
@@ -3603,7 +3613,7 @@ Desktop::_ScreenChanged(Screen* screen)
 
 	// figure out dirty region
 	dirty.Exclude(&background);
-	_TriggerWindowRedrawing(dirty);
+	_TriggerWindowRedrawing(dirty, dirty);
 
 	// send B_SCREEN_CHANGED to windows on that screen
 	BMessage update(B_SCREEN_CHANGED);

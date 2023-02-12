@@ -1378,7 +1378,7 @@ fDesktop->LockSingleWindow();
 			float offsetX = x - fCurrentView->Frame().left;
 			float offsetY = y - fCurrentView->Frame().top;
 
-			BRegion dirty;
+			BRegion dirty, expose;
 			fCurrentView->MoveBy(offsetX, offsetY, &dirty);
 
 			// TODO: think about how to avoid this hack:
@@ -1389,7 +1389,7 @@ fDesktop->LockSingleWindow();
 			if (View* parent = fCurrentView->Parent())
 				parent->RebuildClipping(false);
 
-			fWindow->MarkContentDirty(dirty);
+			fWindow->MarkContentDirty(dirty, expose);
 			break;
 		}
 		case AS_VIEW_RESIZE_TO:
@@ -1406,14 +1406,14 @@ fDesktop->LockSingleWindow();
 			float deltaWidth = newWidth - fCurrentView->Frame().Width();
 			float deltaHeight = newHeight - fCurrentView->Frame().Height();
 
-			BRegion dirty;
+			BRegion dirty, expose;
 			fCurrentView->ResizeBy(deltaWidth, deltaHeight, &dirty);
 
 			// TODO: see above
 			if (View* parent = fCurrentView->Parent())
 				parent->RebuildClipping(false);
 
-			fWindow->MarkContentDirty(dirty);
+			fWindow->MarkContentDirty(dirty, expose);
 			break;
 		}
 		case AS_VIEW_GET_COORD:

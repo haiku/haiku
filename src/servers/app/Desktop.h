@@ -240,7 +240,9 @@ public:
 									team_id teamID);
 			EventTarget*		FindTarget(BMessenger& messenger);
 
-			void				MarkDirty(BRegion& region);
+			void				MarkDirty(BRegion& dirtyRegion, BRegion& exposeRegion);
+			void				MarkDirty(BRegion& region)
+									{ return MarkDirty(region, region); }
 			void				Redraw();
 			void				RedrawBackground();
 
@@ -312,7 +314,7 @@ private:
 			void				_RebuildClippingForAllWindows(
 									BRegion& stillAvailableOnScreen);
 			void				_TriggerWindowRedrawing(
-									BRegion& newDirtyRegion);
+									BRegion& dirtyRegion, BRegion& exposeRegion);
 			void				_SetBackground(BRegion& background);
 
 			status_t			_ActivateApp(team_id team);

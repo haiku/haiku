@@ -23,8 +23,8 @@ public:
 	virtual	void	DetachedFromWindow();
 
 	virtual	void	Draw(DrawingEngine* drawingEngine,
-						BRegion* effectiveClipping,
-						BRegion* windowContentClipping, bool deep = false);
+						const BRegion* effectiveClipping,
+						const BRegion* windowContentClipping, bool deep = false);
 
 	virtual	void	MouseDown(BMessage* message, BPoint where);
 	virtual	void	MouseUp(BMessage* message, BPoint where);
