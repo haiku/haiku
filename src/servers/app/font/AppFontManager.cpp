@@ -113,7 +113,7 @@ AppFontManager::AddUserFontFromFile(const char* path,
 	FT_Face face;
 	FT_Error error = FT_New_Face(gFreeTypeLibrary, path, 0, &face);
 	if (error != 0)
-		return error;
+		return B_ERROR;
 
 	status = _AddUserFont(face, nodeRef, path, familyID, styleID);
 
@@ -136,7 +136,7 @@ AppFontManager::AddUserFontFromMemory(const FT_Byte* fontAddress, size_t size,
 	FT_Error error = FT_New_Memory_Face(gFreeTypeLibrary, fontAddress, size, 0,
 		&face);
 	if (error != 0)
-		return error;
+		return B_ERROR;
 
 	status = _AddUserFont(face, nodeRef, "", familyID, styleID);
 
