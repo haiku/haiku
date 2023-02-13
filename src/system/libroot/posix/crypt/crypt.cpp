@@ -18,7 +18,7 @@
 
 #include <SupportDefs.h>
 
-#include "crypt_legacy.h"
+#include "../musl/crypt/crypt_des.h"
 #include "crypto_scrypt.h"
 
 #define SALT_BYTES 32
@@ -151,10 +151,8 @@ _crypt_rn(const char* key, const char* setting, struct crypt_data* data, size_t 
 	// Some idioms existed where the password was also used as the salt.
 	// As a crude heuristic, use the old crypt algorithm if the salt is
 	// shortish.
-	if (strlen(setting) < 16) {
-		crypt_legacy(key, setting, data->buf);
-		return data->buf;
-	}
+	if (strlen(setting) < 16)
+		return _crypt_des_r(key, setting, data->buf);
 
 	// We don't want to fall into the old algorithm by accident somehow, so
 	// if our salt is kind of like our salt, but not exactly, return an
