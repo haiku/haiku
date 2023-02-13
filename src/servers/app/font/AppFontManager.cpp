@@ -52,6 +52,7 @@ AppFontManager::_AddUserFont(FT_Face face, node_ref nodeRef, const char* path,
 	uint16& familyID, uint16& styleID)
 {
 	FontFamily* family = _FindFamily(face->family_name);
+	bool isNewFontFamily = family == NULL;
 	if (family != NULL
 		&& family->HasStyle(face->style_name)) {
 		// prevent adding the same style twice
@@ -78,7 +79,8 @@ AppFontManager::_AddUserFont(FT_Face face, node_ref nodeRef, const char* path,
 
 	if (style == NULL || !family->AddStyle(style)) {
 		delete style;
-		delete family;
+		if (isNewFontFamily)
+			delete family;
 		return B_NO_MEMORY;
 	}
 
