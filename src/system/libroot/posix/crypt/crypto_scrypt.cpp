@@ -40,17 +40,19 @@
 
 #include "crypto_scrypt.h"
 
-static void (*smix_func)(uint8_t *, size_t, uint64_t, void *, void *) = NULL;
-
 /**
- * _crypto_scrypt(passwd, passwdlen, salt, saltlen, N, r, p, buf, buflen, smix):
- * Perform the requested scrypt computation, using ${smix} as the smix routine.
+ * crypto_scrypt(passwd, passwdlen, salt, saltlen, N, r, p, buf, buflen):
+ * Compute scrypt(passwd[0 .. passwdlen - 1], salt[0 .. saltlen - 1], N, r,
+ * p, buflen) and write the result into buf.  The parameters r, p, and buflen
+ * must satisfy r * p < 2^30 and buflen <= (2^32 - 1) * 32.  The parameter N
+ * must be a power of 2 greater than 1.
+ *
+ * Return 0 on success; or -1 on error.
  */
-static int
-_crypto_scrypt(const uint8_t * passwd, size_t passwdlen,
+int
+crypto_scrypt(const uint8_t * passwd, size_t passwdlen,
     const uint8_t * salt, size_t saltlen, uint64_t N, uint32_t _r, uint32_t _p,
-    uint8_t * buf, size_t buflen,
-    void (*smix)(uint8_t *, size_t, uint64_t, void *, void *))
+    uint8_t * buf, size_t buflen)
 {
 	void * B0, * V0, * XY0;
 	uint8_t * B;
@@ -127,7 +129,7 @@ _crypto_scrypt(const uint8_t * passwd, size_t passwdlen,
 	/* 2: for i = 0 to p - 1 do */
 	for (i = 0; i < p; i++) {
 		/* 3: B_i <-- MF(B_i, N) */
-		(smix)(&B[i * 128 * r], r, N, V, XY);
+		crypto_scrypt_smix(&B[i * 128 * r], r, N, V, XY);
 	}
 
 	/* 5: DK <-- PBKDF2(P, B, 1, dkLen) */
@@ -153,81 +155,4 @@ err1:
 err0:
 	/* Failure! */
 	return (-1);
-}
-
-#define TESTLEN 64
-static struct scrypt_test {
-	const char * passwd;
-	const char * salt;
-	uint64_t N;
-	uint32_t r;
-	uint32_t p;
-	uint8_t result[TESTLEN];
-} testcase = {
-	"pleaseletmein",
-	"SodiumChloride",
-	16,
-	8,
-	1,
-	{
-		0x25, 0xa9, 0xfa, 0x20, 0x7f, 0x87, 0xca, 0x09,
-		0xa4, 0xef, 0x8b, 0x9f, 0x77, 0x7a, 0xca, 0x16,
-		0xbe, 0xb7, 0x84, 0xae, 0x18, 0x30, 0xbf, 0xbf,
-		0xd3, 0x83, 0x25, 0xaa, 0xbb, 0x93, 0x77, 0xdf,
-		0x1b, 0xa7, 0x84, 0xd7, 0x46, 0xea, 0x27, 0x3b,
-		0xf5, 0x16, 0xa4, 0x6f, 0xbf, 0xac, 0xf5, 0x11,
-		0xc5, 0xbe, 0xba, 0x4c, 0x4a, 0xb3, 0xac, 0xc7,
-		0xfa, 0x6f, 0x46, 0x0b, 0x6c, 0x0f, 0x47, 0x7b,
-	}
-};
-
-static int
-testsmix(void (*smix)(uint8_t *, size_t, uint64_t, void *, void *))
-{
-	uint8_t hbuf[TESTLEN];
-
-	/* Perform the computation. */
-	if (_crypto_scrypt(
-	    (const uint8_t *)testcase.passwd, strlen(testcase.passwd),
-	    (const uint8_t *)testcase.salt, strlen(testcase.salt),
-	    testcase.N, testcase.r, testcase.p, hbuf, TESTLEN, smix))
-		return (-1);
-
-	/* Does it match? */
-	return (memcmp(testcase.result, hbuf, TESTLEN));
-}
-
-static void
-selectsmix(void)
-{
-	/* If generic smix works, use it. */
-	if (!testsmix(crypto_scrypt_smix)) {
-		smix_func = crypto_scrypt_smix;
-		return;
-	}
-
-	/* If we get here, something really bad happened. */
-	abort();
-}
-
-/**
- * crypto_scrypt(passwd, passwdlen, salt, saltlen, N, r, p, buf, buflen):
- * Compute scrypt(passwd[0 .. passwdlen - 1], salt[0 .. saltlen - 1], N, r,
- * p, buflen) and write the result into buf.  The parameters r, p, and buflen
- * must satisfy r * p < 2^30 and buflen <= (2^32 - 1) * 32.  The parameter N
- * must be a power of 2 greater than 1.
- *
- * Return 0 on success; or -1 on error.
- */
-int
-crypto_scrypt(const uint8_t * passwd, size_t passwdlen,
-    const uint8_t * salt, size_t saltlen, uint64_t N, uint32_t _r, uint32_t _p,
-    uint8_t * buf, size_t buflen)
-{
-
-	if (smix_func == NULL)
-		selectsmix();
-
-	return (_crypto_scrypt(passwd, passwdlen, salt, saltlen, N, _r, _p,
-	    buf, buflen, smix_func));
 }
