@@ -41,7 +41,7 @@ public:
 			virtual uint16				Magic()						=	0;
 			virtual uint64				Blockno()					=	0;
 			virtual uint64				Owner()						=	0;
-			virtual uuid_t*				Uuid()						=	0;
+			virtual const uuid_t&		Uuid()						=	0;
 			virtual	uint16				Count()						=	0;
 			static	uint32				ExpectedMagic(int8 WhichDirectory,
 										Inode* inode);
@@ -54,6 +54,16 @@ public:
 //xfs_attr_leaf_hdr
 class AttrLeafHeaderV4 : public AttrLeafHeader {
 public:
+			struct OnDiskData {
+			public:
+				uint16				count;
+				uint16				usedbytes;
+				uint16				firstused;
+				uint8				holes;
+				uint8				pad1;
+				AttrLeafMap			freemap[3];
+				BlockInfo			info;
+			};
 
 								AttrLeafHeaderV4(const char* buffer);
 								~AttrLeafHeaderV4();
@@ -61,23 +71,28 @@ public:
 			uint16				Magic();
 			uint64				Blockno();
 			uint64				Owner();
-			uuid_t*				Uuid();
+			const uuid_t&		Uuid();
 			uint16				Count();
 
-			BlockInfo			info;
 private:
-			uint16				count;
-			uint16				usedbytes;
-			uint16				firstused;
-			uint8				holes;
-			uint8				pad1;
-			AttrLeafMap			freemap[3];
+			OnDiskData			fData;
 };
 
 
 //xfs_attr3_leaf_hdr
 class AttrLeafHeaderV5 : public AttrLeafHeader {
 public:
+			struct OnDiskData {
+			public:
+				uint16				count;
+				uint16				usedbytes;
+				uint16				firstused;
+				uint8				holes;
+				uint8				pad1;
+				AttrLeafMap			freemap[3];
+				uint32				pad2;
+				BlockInfoV5			info;
+			};
 
 								AttrLeafHeaderV5(const char* buffer);
 								~AttrLeafHeaderV5();
@@ -85,23 +100,12 @@ public:
 			uint16				Magic();
 			uint64				Blockno();
 			uint64				Owner();
-			uuid_t*				Uuid();
+			const uuid_t&		Uuid();
 			uint16				Count();
 
-			BlockInfoV5			info;
 private:
-			uint16				count;
-			uint16				usedbytes;
-			uint16				firstused;
-			uint8				holes;
-			uint8				pad1;
-			AttrLeafMap			freemap[3];
-			uint32				pad2;
+			OnDiskData			fData;
 };
-
-#define ATTR_LEAF_CRC_OFF offsetof(ExtentLeafHeaderV5, info.crc)
-#define ATTR_LEAF_V5_VPTR_OFF offsetof(ExtentLeafHeaderV5, info.forw)
-#define ATTR_LEAF_V4_VPTR_OFF offsetof(ExtentLeafHeaderV4, info.forw)
 
 
 // xfs_attr_leaf_entry

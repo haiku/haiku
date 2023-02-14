@@ -353,7 +353,7 @@ AttrLeafHeader::ExpectedMagic(int8 WhichDirectory, Inode* inode)
 uint32
 AttrLeafHeader::CRCOffset()
 {
-	return ATTR_LEAF_CRC_OFF - ATTR_LEAF_V5_VPTR_OFF;
+	return offsetof(AttrLeafHeaderV5::OnDiskData, info.crc);
 }
 
 
@@ -381,49 +381,28 @@ uint32
 AttrLeafHeader::Size(Inode* inode)
 {
 	if (inode->Version() == 1 || inode->Version() == 2)
-		return sizeof(AttrLeafHeaderV4) - ATTR_LEAF_V4_VPTR_OFF;
+		return sizeof(AttrLeafHeaderV4::OnDiskData);
 	else
-		return sizeof(AttrLeafHeaderV5) - ATTR_LEAF_V5_VPTR_OFF;
+		return sizeof(AttrLeafHeaderV5::OnDiskData);
 }
 
 
 void
 AttrLeafHeaderV4::SwapEndian()
 {
-	info.forw	=	B_BENDIAN_TO_HOST_INT32(info.forw);
-	info.back	=	B_BENDIAN_TO_HOST_INT32(info.back);
-	info.magic	=	B_BENDIAN_TO_HOST_INT16(info.magic);
-	info.pad	=	B_BENDIAN_TO_HOST_INT16(info.pad);
-	count		=	B_BENDIAN_TO_HOST_INT16(count);
-	usedbytes	=	B_BENDIAN_TO_HOST_INT16(usedbytes);
-	firstused	=	B_BENDIAN_TO_HOST_INT16(firstused);
+	fData.info.forw	=	B_BENDIAN_TO_HOST_INT32(fData.info.forw);
+	fData.info.back	=	B_BENDIAN_TO_HOST_INT32(fData.info.back);
+	fData.info.magic	=	B_BENDIAN_TO_HOST_INT16(fData.info.magic);
+	fData.info.pad	=	B_BENDIAN_TO_HOST_INT16(fData.info.pad);
+	fData.count		=	B_BENDIAN_TO_HOST_INT16(fData.count);
+	fData.usedbytes	=	B_BENDIAN_TO_HOST_INT16(fData.usedbytes);
+	fData.firstused	=	B_BENDIAN_TO_HOST_INT16(fData.firstused);
 }
 
 
 AttrLeafHeaderV4::AttrLeafHeaderV4(const char* buffer)
 {
-	uint32 offset = 0;
-
-	info = *(BlockInfo*)(buffer + offset);
-	offset += sizeof(BlockInfo);
-
-	count = *(uint16*)(buffer + offset);
-	offset += sizeof(uint16);
-
-	usedbytes = *(uint16*)(buffer + offset);
-	offset += sizeof(uint16);
-
-	firstused = *(uint16*)(buffer + offset);
-	offset += sizeof(uint16);
-
-	holes = *(uint8*)(buffer + offset);
-	offset += sizeof(uint8);
-
-	pad1 = *(uint8*)(buffer + offset);
-	offset += sizeof(uint8);
-
-	memcpy(freemap, buffer + offset, XFS_ATTR_LEAF_MAPSIZE * sizeof(AttrLeafMap));
-
+	memcpy(&fData, buffer, sizeof(fData));
 	SwapEndian();
 }
 
@@ -436,7 +415,7 @@ AttrLeafHeaderV4::~AttrLeafHeaderV4()
 uint16
 AttrLeafHeaderV4::Magic()
 {
-	return info.magic;
+	return fData.info.magic;
 }
 
 
@@ -454,65 +433,41 @@ AttrLeafHeaderV4::Owner()
 }
 
 
-uuid_t*
+const uuid_t&
 AttrLeafHeaderV4::Uuid()
 {
-	return NULL;
+	static uuid_t nullUuid = {0};
+	return nullUuid;
 }
 
 
 uint16
 AttrLeafHeaderV4::Count()
 {
-	return count;
+	return fData.count;
 }
 
 
 void
 AttrLeafHeaderV5::SwapEndian()
 {
-	info.forw	=	B_BENDIAN_TO_HOST_INT32(info.forw);
-	info.back	=	B_BENDIAN_TO_HOST_INT32(info.back);
-	info.magic	=	B_BENDIAN_TO_HOST_INT16(info.magic);
-	info.pad	=	B_BENDIAN_TO_HOST_INT16(info.pad);
-	info.blkno	=	B_BENDIAN_TO_HOST_INT64(info.blkno);
-	info.lsn	=	B_BENDIAN_TO_HOST_INT64(info.lsn);
-	info.owner	=	B_BENDIAN_TO_HOST_INT64(info.owner);
-	count		=	B_BENDIAN_TO_HOST_INT16(count);
-	usedbytes	=	B_BENDIAN_TO_HOST_INT16(usedbytes);
-	firstused	=	B_BENDIAN_TO_HOST_INT16(firstused);
-	pad2		=	B_BENDIAN_TO_HOST_INT32(pad2);
+	fData.info.forw		=	B_BENDIAN_TO_HOST_INT32(fData.info.forw);
+	fData.info.back		=	B_BENDIAN_TO_HOST_INT32(fData.info.back);
+	fData.info.magic	=	B_BENDIAN_TO_HOST_INT16(fData.info.magic);
+	fData.info.pad		=	B_BENDIAN_TO_HOST_INT16(fData.info.pad);
+	fData.info.blkno	=	B_BENDIAN_TO_HOST_INT64(fData.info.blkno);
+	fData.info.lsn		=	B_BENDIAN_TO_HOST_INT64(fData.info.lsn);
+	fData.info.owner	=	B_BENDIAN_TO_HOST_INT64(fData.info.owner);
+	fData.count			=	B_BENDIAN_TO_HOST_INT16(fData.count);
+	fData.usedbytes		=	B_BENDIAN_TO_HOST_INT16(fData.usedbytes);
+	fData.firstused		=	B_BENDIAN_TO_HOST_INT16(fData.firstused);
+	fData.pad2			=	B_BENDIAN_TO_HOST_INT32(fData.pad2);
 }
 
 
 AttrLeafHeaderV5::AttrLeafHeaderV5(const char* buffer)
 {
-	uint32 offset = 0;
-
-	info = *(BlockInfoV5*)(buffer + offset);
-	offset += sizeof(BlockInfoV5);
-
-	count = *(uint16*)(buffer + offset);
-	offset += sizeof(uint16);
-
-	usedbytes = *(uint16*)(buffer + offset);
-	offset += sizeof(uint16);
-
-	firstused = *(uint16*)(buffer + offset);
-	offset += sizeof(uint16);
-
-	holes = *(uint8*)(buffer + offset);
-	offset += sizeof(uint8);
-
-	pad1 = *(uint8*)(buffer + offset);
-	offset += sizeof(uint8);
-
-	memcpy(freemap, buffer + offset, XFS_ATTR_LEAF_MAPSIZE * sizeof(AttrLeafMap));
-	offset += XFS_ATTR_LEAF_MAPSIZE * sizeof(AttrLeafMap);
-
-	pad2 = *(uint32*)(buffer + offset);
-	offset += sizeof(uint32);
-
+	memcpy(&fData, buffer, sizeof(fData));
 	SwapEndian();
 }
 
@@ -525,33 +480,33 @@ AttrLeafHeaderV5::~AttrLeafHeaderV5()
 uint16
 AttrLeafHeaderV5::Magic()
 {
-	return info.magic;
+	return fData.info.magic;
 }
 
 
 uint64
 AttrLeafHeaderV5::Blockno()
 {
-	return info.blkno;
+	return fData.info.blkno;
 }
 
 
 uint64
 AttrLeafHeaderV5::Owner()
 {
-	return info.owner;
+	return fData.info.owner;
 }
 
 
-uuid_t*
+const uuid_t&
 AttrLeafHeaderV5::Uuid()
 {
-	return &info.uuid;
+	return fData.info.uuid;
 }
 
 
 uint16
 AttrLeafHeaderV5::Count()
 {
-	return count;
+	return fData.count;
 }

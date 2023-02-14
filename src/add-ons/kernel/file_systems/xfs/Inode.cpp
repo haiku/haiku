@@ -294,7 +294,7 @@ Inode::VerifyInode() const
 			return false;
 		}
 
-		if(!fVolume->UuidEquals(&fNode->di_uuid)) {
+		if(!fVolume->UuidEquals(fNode->di_uuid)) {
 			ERROR("UUID is incorrect");
 			return false;
 		}
@@ -443,7 +443,7 @@ Inode::SizeOfLongBlock()
 	if (Version() == 3)
 		return sizeof(LongBlock);
 	else
-		return offsetof(struct LongBlock, bb_blkno);
+		return LongBlock::Offset_v5();
 }
 
 

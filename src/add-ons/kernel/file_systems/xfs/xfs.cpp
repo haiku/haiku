@@ -319,14 +319,12 @@ XfsSuperBlock::MagicNum() const
 
 
 bool
-XfsSuperBlock::UuidEquals(const uuid_t *u1)
+XfsSuperBlock::UuidEquals(const uuid_t& u1)
 {
 	if((sb_features_incompat & XFS_SB_FEAT_INCOMPAT_META_UUID) != 0) {
-		uuid_t *u2 = &sb_meta_uuid;
-		return memcmp(u1, u2, sizeof(uuid_t)) == 0;
+		return memcmp(&u1, &sb_meta_uuid, sizeof(uuid_t)) == 0;
 	} else {
-		uuid_t *u2 = &sb_uuid;
-		return memcmp(u1, u2, sizeof(uuid_t)) == 0;
+		return memcmp(&u1, &sb_uuid, sizeof(uuid_t)) == 0;
 	}
 	return false;
 }

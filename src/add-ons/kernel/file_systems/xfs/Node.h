@@ -17,16 +17,17 @@
 #define XFS_DA3_NODE_MAGIC (0x3ebe)
 
 
-class NodeHeader {
+class NodeHeader
+{
 public:
-
 			virtual						~NodeHeader()			=	0;
 			virtual	uint16				Magic()					=	0;
 			virtual	uint64				Blockno()				=	0;
 			virtual	uint64				Lsn()					=	0;
 			virtual	uint64				Owner()					=	0;
-			virtual	uuid_t*				Uuid()					=	0;
+			virtual	const uuid_t&		Uuid()					=	0;
 			virtual	uint16				Count()					=	0;
+
 			static	uint32				ExpectedMagic(int8 WhichDirectory,
 										Inode* inode);
 			static	uint32				CRCOffset();
@@ -36,8 +37,15 @@ public:
 
 
 //xfs_da_node_hdr
-class NodeHeaderV4 : public NodeHeader {
+class NodeHeaderV4 : public NodeHeader
+{
 public:
+			struct OnDiskData {
+			public:
+				BlockInfo			info;
+				uint16				count;
+				uint16				level;
+			};
 
 								NodeHeaderV4(const char* buffer);
 								~NodeHeaderV4();
@@ -46,18 +54,23 @@ public:
 			uint64				Blockno();
 			uint64				Lsn();
 			uint64				Owner();
-			uuid_t*				Uuid();
+			const uuid_t&		Uuid();
 			uint16				Count();
 
-			BlockInfo			info;
 private:
-			uint16				count;
-			uint16				level;
+			OnDiskData 			fData;
 };
 
 
 class NodeHeaderV5 : public NodeHeader {
 public:
+			struct OnDiskData {
+			public:
+				BlockInfoV5			info;
+				uint16				count;
+				uint16				level;
+				uint32				pad32;
+			};
 
 								NodeHeaderV5(const char* buffer);
 								~NodeHeaderV5();
@@ -66,19 +79,12 @@ public:
 			uint64				Blockno();
 			uint64				Lsn();
 			uint64				Owner();
-			uuid_t*				Uuid();
+			const uuid_t&		Uuid();
 			uint16				Count();
 
-			BlockInfoV5			info;
 private:
-			uint16				count;
-			uint16				level;
-			uint32				pad32;
+			OnDiskData 			fData;
 };
-
-#define XFS_NODE_CRC_OFF offsetof(NodeHeaderV5, info.crc)
-#define XFS_NODE_V5_VPTR_OFF offsetof(NodeHeaderV5, info.forw)
-#define XFS_NODE_V4_VPTR_OFF offsetof(NodeHeaderV4, info.forw)
 
 
 //xfs_da_node_entry

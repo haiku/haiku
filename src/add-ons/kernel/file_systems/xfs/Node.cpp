@@ -372,7 +372,7 @@ NodeDirectory::Lookup(const char* name, size_t length, xfs_ino_t* ino)
 	if(status != B_OK)
 		return status;
 
-	if (rightMapOffset == 1){
+	if (rightMapOffset == 1) {
 		TRACE("Not in this directory.\n");
 		return B_ENTRY_NOT_FOUND;
 	}
@@ -467,7 +467,7 @@ NodeHeader::ExpectedMagic(int8 WhichDirectory, Inode* inode)
 uint32
 NodeHeader::CRCOffset()
 {
-	return XFS_NODE_CRC_OFF - XFS_NODE_V5_VPTR_OFF;
+	return offsetof(NodeHeaderV5::OnDiskData, info.crc);
 }
 
 
@@ -494,21 +494,21 @@ uint32
 NodeHeader::Size(Inode* inode)
 {
 	if (inode->Version() == 1 || inode->Version() == 2)
-		return sizeof(NodeHeaderV4) - XFS_NODE_V4_VPTR_OFF;
+		return sizeof(NodeHeaderV4::OnDiskData);
 	else
-		return sizeof(NodeHeaderV5) - XFS_NODE_V5_VPTR_OFF;
+		return sizeof(NodeHeaderV5::OnDiskData);
 }
 
 
 void
 NodeHeaderV4::SwapEndian()
 {
-	info.forw	=	B_BENDIAN_TO_HOST_INT32(info.forw);
-	info.back	=	B_BENDIAN_TO_HOST_INT32(info.back);
-	info.magic	= 	B_BENDIAN_TO_HOST_INT16(info.magic);
-	info.pad	=	B_BENDIAN_TO_HOST_INT16(info.pad);
-	count		=	B_BENDIAN_TO_HOST_INT16(count);
-	level		=	B_BENDIAN_TO_HOST_INT16(level);
+	fData.info.forw	=	B_BENDIAN_TO_HOST_INT32(fData.info.forw);
+	fData.info.back	=	B_BENDIAN_TO_HOST_INT32(fData.info.back);
+	fData.info.magic	= 	B_BENDIAN_TO_HOST_INT16(fData.info.magic);
+	fData.info.pad	=	B_BENDIAN_TO_HOST_INT16(fData.info.pad);
+	fData.count		=	B_BENDIAN_TO_HOST_INT16(fData.count);
+	fData.level		=	B_BENDIAN_TO_HOST_INT16(fData.level);
 }
 
 
@@ -516,13 +516,13 @@ NodeHeaderV4::NodeHeaderV4(const char* buffer)
 {
 	uint32 offset = 0;
 
-	info = *(BlockInfo*)(buffer + offset);
+	fData.info = *(BlockInfo*)(buffer + offset);
 	offset += sizeof(BlockInfo);
 
-	count = *(uint16*)(buffer + offset);
+	fData.count = *(uint16*)(buffer + offset);
 	offset += sizeof(uint16);
 
-	level = *(uint16*)(buffer + offset);
+	fData.level = *(uint16*)(buffer + offset);
 
 	SwapEndian();
 }
@@ -536,7 +536,7 @@ NodeHeaderV4::~NodeHeaderV4()
 uint16
 NodeHeaderV4::Magic()
 {
-	return info.magic;
+	return fData.info.magic;
 }
 
 
@@ -561,51 +561,40 @@ NodeHeaderV4::Owner()
 }
 
 
-uuid_t*
+const uuid_t&
 NodeHeaderV4::Uuid()
 {
-	return NULL;
+	static uuid_t nullUuid = {0};
+	return nullUuid;
 }
 
 
 uint16
 NodeHeaderV4::Count()
 {
-	return count;
+	return fData.count;
 }
 
 
 void
 NodeHeaderV5::SwapEndian()
 {
-	info.forw	=	B_BENDIAN_TO_HOST_INT32(info.forw);
-	info.back	=	B_BENDIAN_TO_HOST_INT32(info.back);
-	info.magic	= 	B_BENDIAN_TO_HOST_INT16(info.magic);
-	info.pad	=	B_BENDIAN_TO_HOST_INT16(info.pad);
-	info.blkno	=	B_BENDIAN_TO_HOST_INT64(info.blkno);
-	info.lsn	=	B_BENDIAN_TO_HOST_INT64(info.lsn);
-	info.owner	=	B_BENDIAN_TO_HOST_INT64(info.owner);
-	count		=	B_BENDIAN_TO_HOST_INT16(count);
-	level		=	B_BENDIAN_TO_HOST_INT16(level);
-	pad32		=	B_BENDIAN_TO_HOST_INT32(pad32);
+	fData.info.forw		=	B_BENDIAN_TO_HOST_INT32(fData.info.forw);
+	fData.info.back		=	B_BENDIAN_TO_HOST_INT32(fData.info.back);
+	fData.info.magic	= 	B_BENDIAN_TO_HOST_INT16(fData.info.magic);
+	fData.info.pad		=	B_BENDIAN_TO_HOST_INT16(fData.info.pad);
+	fData.info.blkno	=	B_BENDIAN_TO_HOST_INT64(fData.info.blkno);
+	fData.info.lsn		=	B_BENDIAN_TO_HOST_INT64(fData.info.lsn);
+	fData.info.owner	=	B_BENDIAN_TO_HOST_INT64(fData.info.owner);
+	fData.count			=	B_BENDIAN_TO_HOST_INT16(fData.count);
+	fData.level			=	B_BENDIAN_TO_HOST_INT16(fData.level);
+	fData.pad32			=	B_BENDIAN_TO_HOST_INT32(fData.pad32);
 }
 
 
 NodeHeaderV5::NodeHeaderV5(const char* buffer)
 {
-	uint32 offset = 0;
-
-	info = *(BlockInfoV5*)(buffer + offset);
-	offset += sizeof(BlockInfoV5);
-
-	count = *(uint16*)(buffer + offset);
-	offset += sizeof(uint16);
-
-	level = *(uint16*)(buffer + offset);
-	offset += sizeof(uint16);
-
-	pad32 = *(uint32*)(buffer + offset);
-
+	memcpy(&fData, buffer, sizeof(fData));
 	SwapEndian();
 }
 
@@ -618,40 +607,40 @@ NodeHeaderV5::~NodeHeaderV5()
 uint16
 NodeHeaderV5::Magic()
 {
-	return info.magic;
+	return fData.info.magic;
 }
 
 
 uint64
 NodeHeaderV5::Blockno()
 {
-	return info.blkno;
+	return fData.info.blkno;
 }
 
 
 uint64
 NodeHeaderV5::Lsn()
 {
-	return info.lsn;
+	return fData.info.lsn;
 }
 
 
 uint64
 NodeHeaderV5::Owner()
 {
-	return info.owner;
+	return fData.info.owner;
 }
 
 
-uuid_t*
+const uuid_t&
 NodeHeaderV5::Uuid()
 {
-	return &info.uuid;
+	return fData.info.uuid;
 }
 
 
 uint16
 NodeHeaderV5::Count()
 {
-	return count;
+	return fData.count;
 }
