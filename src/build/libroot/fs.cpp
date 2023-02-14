@@ -1126,7 +1126,13 @@ _kern_unlock_node(int fd)
 ssize_t
 read_pos(int fd, off_t pos, void *buffer, size_t bufferSize)
 {
-	ssize_t bytesRead = _kern_read(fd, pos, buffer, bufferSize);
+	// seek
+	off_t result = lseek(fd, pos, SEEK_SET);
+	if (result < 0)
+		return errno;
+
+	// read
+	ssize_t bytesRead = haiku_host_platform_read(fd, buffer, bufferSize);
 	if (bytesRead < 0) {
 		errno = bytesRead;
 		return -1;
@@ -1151,13 +1157,19 @@ write_pos(int fd, off_t pos, const void *buffer, size_t bufferSize)
 		return bufferSize;
 	}
 
-	ssize_t bytesRead = _kern_write(fd, pos, buffer, bufferSize);
-	if (bytesRead < 0) {
-		errno = bytesRead;
+	// seek
+	off_t result = lseek(fd, pos, SEEK_SET);
+	if (result < 0)
+		return errno;
+
+	// write
+	ssize_t bytesWritten = haiku_host_platform_write(fd, buffer, bufferSize);
+	if (bytesWritten < 0) {
+		errno = bytesWritten;
 		return -1;
 	}
 
-	return bytesRead;
+	return bytesWritten;
 }
 #endif
 
@@ -1171,13 +1183,7 @@ _kern_readv(int fd, off_t pos, const struct iovec *vec, size_t count)
 		return errno;
 
 	// read
-	ssize_t bytesRead = haiku_host_platform_readv(fd, vec, count);
-	if (bytesRead < 0) {
-		errno = bytesRead;
-		return -1;
-	}
-
-	return bytesRead;
+	return haiku_host_platform_readv(fd, vec, count);
 }
 
 
@@ -1189,12 +1195,8 @@ _kern_writev(int fd, off_t pos, const struct iovec *vec, size_t count)
 	if (result < 0)
 		return errno;
 
-	// read
-	ssize_t bytesWritten = haiku_host_platform_writev(fd, vec, count);
-	if (bytesWritten < 0)
-		return bytesWritten;
-
-	return bytesWritten;
+	// write
+	return haiku_host_platform_writev(fd, vec, count);
 }
 
 
