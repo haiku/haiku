@@ -231,12 +231,6 @@ h4 a:hover, a:active, h5 a:hover, a:active, h6 a:hover, a:active {
 	font-weight: normal;
 }
 
-#banner span.search {
-	position: relative;
-	top: 48px;
-	left: 600px;
-}
-
 input[type=text], input[type=password] {
 	font-size: inherit;
 	border-top: 1px solid #818181;
