@@ -41,7 +41,7 @@ extern FT_Library gFreeTypeLibrary;
 	rather than the application font.
 */
 AppFontManager::AppFontManager()
-	: FontManager("AppFontManager")
+	: BLocker("AppFontManager")
 {
 	fNextID = UINT16_MAX;
 }

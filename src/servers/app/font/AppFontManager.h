@@ -12,6 +12,8 @@
 
 #include "FontManager.h"
 
+#include <Locker.h>
+
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -27,9 +29,13 @@ struct node_ref;
 	\class AppFontManager AppFontManager.h
 	\brief Manager for application-added fonts in the font subsystem
 */
-class AppFontManager : public FontManager {
+class AppFontManager : public FontManager, BLocker {
 public:
 								AppFontManager();
+
+			bool				Lock() { return BLocker::Lock(); }
+			void				Unlock() { BLocker::Unlock(); }
+			bool				IsLocked() const { return BLocker::IsLocked(); }
 
 			status_t			AddUserFontFromFile(const char* path,
 									uint16& familyID, uint16& styleID);

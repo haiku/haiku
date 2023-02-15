@@ -41,8 +41,8 @@ compare_font_families(const FontFamily* a, const FontFamily* b)
 //	#pragma mark -
 
 
-FontManager::FontManager(const char* className)
-	: BLooper(className),
+FontManager::FontManager()
+	:
 	fFamilies(20),
 	fNextID(0)
 {

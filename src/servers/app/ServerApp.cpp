@@ -146,7 +146,6 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	desktop->UnlockSingleWindow();
 
 	fAppFontManager = new AppFontManager();
-	fAppFontManager->Run();
 
 	STRACE(("ServerApp %s:\n", Signature()));
 	STRACE(("\tBApp port: %" B_PRId32 "\n", fClientReplyPort));
@@ -211,8 +210,7 @@ ServerApp::~ServerApp()
 
 	fDesktop->GetCursorManager().DeleteCursors(fClientTeam);
 
-	fAppFontManager->Lock();
-	fAppFontManager->Quit();
+	delete fAppFontManager;
 
 	STRACE(("ServerApp %s::~ServerApp(): Exiting\n", Signature()));
 }

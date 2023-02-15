@@ -11,7 +11,6 @@
 
 
 #include <HashMap.h>
-#include <Looper.h>
 #include <Node.h>
 #include <ObjectList.h>
 #include <Referenceable.h>
@@ -28,11 +27,14 @@ class FontStyle;
 	\class FontManager FontManager.h
 	\brief Base class interface used by GlobalFontManager and AppFontManager
 */
-class FontManager : public BLooper {
+class FontManager {
 public:
-								FontManager(
-									const char* className = "FontManagerBase");
+								FontManager();
 	virtual						~FontManager();
+
+	virtual	bool				Lock() = 0;
+	virtual	void				Unlock() = 0;
+	virtual	bool				IsLocked() const = 0;
 
 	virtual	int32				CountFamilies();
 

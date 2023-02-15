@@ -13,6 +13,7 @@
 #include "FontManager.h"
 
 #include <AutoDeleter.h>
+#include <Looper.h>
 #include <ObjectList.h>
 
 
@@ -30,10 +31,14 @@ class ServerFont;
 	\class GlobalFontManager GlobalFontManager.h
 	\brief Manager for system fonts within the font subsystem
 */
-class GlobalFontManager : public FontManager {
+class GlobalFontManager : public FontManager, public BLooper {
 public:
 								GlobalFontManager();
 	virtual						~GlobalFontManager();
+
+			bool				Lock() { return BLooper::Lock(); }
+			void				Unlock() { BLooper::Unlock(); }
+			bool				IsLocked() const { return BLooper::IsLocked(); }
 
 			status_t			InitCheck() { return fInitStatus; }
 
