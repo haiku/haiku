@@ -923,7 +923,7 @@ nvme_disk_trim(nvme_disk_driver_info* info, fs_trim_data* trimData)
 		dsmRanges[i].length = length / info->block_size;
 		dsmRanges[i].starting_lba = offset / info->block_size;
 
-		trimmingSize += dsmRanges[i].length;
+		trimmingSize += length;
 	}
 
 	status_t status = EINPROGRESS;
