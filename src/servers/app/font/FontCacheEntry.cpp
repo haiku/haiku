@@ -399,8 +399,8 @@ FontCacheEntry::GenerateSignature(char* signature, size_t signatureSize,
 	bool hinting = font.Hinting();
 	uint8 averageWeight = gSubpixelAverageWeight;
 
-	snprintf(signature, signatureSize, "%" B_PRId32 ",%u,%d,%d,%.1f,%d,%d",
-		font.GetFamilyAndStyle(), charMap,
+	snprintf(signature, signatureSize, "%" B_PRId32 ",%p,%u,%d,%d,%.1f,%d,%d",
+		font.GetFamilyAndStyle(), font.Manager(), charMap,
 		font.Face(), int(renderingType), font.Size(), hinting, averageWeight);
 }
 

@@ -132,6 +132,9 @@ class FontStyle : public BReferenceable {
 
 		status_t		UpdateFace(FT_Face face);
 
+		FontManagerBase*	Manager() const
+							{ return fFontManager; }
+
 		uint32			FontDataSize() const
 							{ return fFontDataSize; }
 
