@@ -1335,14 +1335,15 @@ bool
 BlockAllocator::_AddTrim(fs_trim_data& trimData, uint32 maxRanges,
 	uint64 offset, uint64 size)
 {
-	if (trimData.range_count < maxRanges && size > 0) {
-		trimData.ranges[trimData.range_count].offset = offset;
-		trimData.ranges[trimData.range_count].size = size;
-		trimData.range_count++;
-		return true;
-	}
+	ASSERT(trimData.range_count < maxRanges);
+	if (size == 0)
+		return false;
 
-	return false;
+	trimData.ranges[trimData.range_count].offset = offset;
+	trimData.ranges[trimData.range_count].size = size;
+	trimData.range_count++;
+
+	return (trimData.range_count == maxRanges);
 }
 
 
@@ -1353,9 +1354,9 @@ BlockAllocator::_TrimNext(fs_trim_data& trimData, uint32 maxRanges,
 	PRINT(("_TrimNext(index %" B_PRIu32 ", offset %" B_PRIu64 ", size %"
 		B_PRIu64 ")\n", trimData.range_count, offset, size));
 
-	bool pushed = _AddTrim(trimData, maxRanges, offset, size);
+	const bool rangesFilled = _AddTrim(trimData, maxRanges, offset, size);
 
-	if (!pushed || force) {
+	if (rangesFilled || force) {
 		// Trim now
 		trimData.trimmed_size = 0;
 #ifdef DEBUG_TRIM
@@ -1374,9 +1375,6 @@ BlockAllocator::_TrimNext(fs_trim_data& trimData, uint32 maxRanges,
 		trimmedSize += trimData.trimmed_size;
 		trimData.range_count = 0;
 	}
-
-	if (!pushed)
-		_AddTrim(trimData, maxRanges, offset, size);
 
 	return B_OK;
 }
