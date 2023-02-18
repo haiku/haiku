@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	3896191867
+1	swedish	x-vnd.Haiku-WebPositive	861169737
 Authentication required	Authentication Panel		Autentisiering krävs
 Previous	WebPositive Window		Tidigare
 (Finish: %date)	Download Window		(Avsluta: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Avbryt
 Settings	Settings Window		Inställningar
 Downloads	WebPositive Window		Nedladdningar
 Browse…	Settings Window		Bläddra…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ett bokmärke för denna sida (%bookmarkName) finns redan.
 Resume prior session	Settings Window		Återuppta föregående session
 Match case	WebPositive Window		Matcha skiftläge
 Proxy password:	Settings Window		Lösenord för proxy:
@@ -158,7 +157,6 @@ Downloads	Download Window		Nedladdningar
 Open blank page	Settings Window		Öppna tom sida
 Clear history	WebPositive Window		Töm historik
 Cancel	WebPositive Window		Avbryt
-Bookmark info	WebPositive Window		Bokmärkesinfo
 Script console	Console Window		Skriptkonsoll
 Copy	URL Bar		Kopiera
 Open start page	Settings Window		Öppna startsida

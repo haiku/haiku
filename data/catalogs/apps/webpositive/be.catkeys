@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-WebPositive	335847616
+1	belarusian	x-vnd.Haiku-WebPositive	1595792782
 Authentication required	Authentication Panel		Патрабуецца аўтарызацыя
 Previous	WebPositive Window		Папярэдні
 Open bookmarks confirmation	WebPositive Window		Падцвержваць пераход па закладкам
@@ -23,7 +23,6 @@ Start page:	Settings Window		Пачатковая старонка:
 Cancel	Download Window		Скасаваць
 Settings	Settings Window		Наладкі
 Downloads	WebPositive Window		Спампоўкі
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка для гэтай старонкі (%bookmarkName) ўжо існуе.
 Match case	WebPositive Window		Улічваць рэгістр
 Proxy password:	Settings Window		Пароль проксі:
 Size:	Font Selection view		Памер:
@@ -128,7 +127,6 @@ Downloads	Download Window		Запампоўкі
 Open blank page	Settings Window		Адчыніць пустую старонку
 Clear history	WebPositive Window		Ачысьціць гісторыю
 Cancel	WebPositive Window		Скасаваць
-Bookmark info	WebPositive Window		Інфа пра закладку
 Script console	Console Window		Кансоль сцэнароў
 Copy	URL Bar		Скапіяваць
 Open start page	Settings Window		Адчыніць пачатковую старонку

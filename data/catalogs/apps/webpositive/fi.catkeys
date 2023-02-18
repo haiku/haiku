@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	3896191867
+1	finnish	x-vnd.Haiku-WebPositive	861169737
 Authentication required	Authentication Panel		Vaaditaan todentamista
 Previous	WebPositive Window		Edellinen
 (Finish: %date)	Download Window		(Päättyi: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Peru
 Settings	Settings Window		Asetukset
 Downloads	WebPositive Window		Lataukset
 Browse…	Settings Window		Selaa…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Kirjanmerkki tälle sivulle (%bookmarkName) on jo olemassa.
 Resume prior session	Settings Window		Aloita uudelleen varhaisempi istunto
 Match case	WebPositive Window		Täsmää kirjainkoko
 Proxy password:	Settings Window		Välityspalvelimen salasana:
@@ -158,7 +157,6 @@ Downloads	Download Window		Lataukset
 Open blank page	Settings Window		Avaa tyhjä sivu
 Clear history	WebPositive Window		Tyhjennä historia
 Cancel	WebPositive Window		Peru
-Bookmark info	WebPositive Window		Kirjanmerkkitiedot
 Script console	Console Window		Skriptipääteikkuna
 Copy	URL Bar		Kopioi
 Open start page	Settings Window		Avaa avaussivu

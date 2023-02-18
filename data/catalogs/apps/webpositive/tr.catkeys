@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-WebPositive	3896191867
+1	turkish	x-vnd.Haiku-WebPositive	861169737
 Authentication required	Authentication Panel		Kimlik doğrulaması gerekli
 Previous	WebPositive Window		Önceki
 (Finish: %date)	Download Window		(Bitiş: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Vazgeç
 Settings	Settings Window		Ayarlar
 Downloads	WebPositive Window		İndirmeler
 Browse…	Settings Window		Göz at…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Bu sayfa için bir yer imi (%bookmarkName) hâlihazırda var.
 Resume prior session	Settings Window		Bir önceki oturumu sürdür
 Match case	WebPositive Window		BÜYÜK/küçük harf duyarlı
 Proxy password:	Settings Window		Vekil parolası:
@@ -158,7 +157,6 @@ Downloads	Download Window		İndirmeler
 Open blank page	Settings Window		Boş sayfa aç
 Clear history	WebPositive Window		Geçmişi sil
 Cancel	WebPositive Window		Vazgeç
-Bookmark info	WebPositive Window		Yer imi bilgisi
 Script console	Console Window		Betik konsolu
 Copy	URL Bar		Kopyala
 Open start page	Settings Window		Başlangıç sayfasını aç

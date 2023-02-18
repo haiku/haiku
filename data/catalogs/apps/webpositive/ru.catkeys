@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	250728390
+1	russian	x-vnd.Haiku-WebPositive	1510673556
 Authentication required	Authentication Panel		Требуется авторизация
 Previous	WebPositive Window		Ранее
 (Finish: %date)	Download Window		(Завершение: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Отмена
 Settings	Settings Window		Настройки
 Downloads	WebPositive Window		Загрузки
 Browse…	Settings Window		Выбрать…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка для этой страницы (%bookmarkName) уже существует.
 Resume prior session	Settings Window		Восстановить предыдущую сессию
 Match case	WebPositive Window		Учитывать регистр
 Proxy password:	Settings Window		Пароль прокси:
@@ -155,7 +154,6 @@ Downloads	Download Window		Загрузки
 Open blank page	Settings Window		Открыть пустую страницу
 Clear history	WebPositive Window		Очистить историю
 Cancel	WebPositive Window		Отмена
-Bookmark info	WebPositive Window		Информация о закладке
 Script console	Console Window		Консоль сценариев
 Copy	URL Bar		Копировать
 Open start page	Settings Window		Открыть стартовую страницу

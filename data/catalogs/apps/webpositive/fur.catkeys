@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-WebPositive	3896191867
+1	friulian	x-vnd.Haiku-WebPositive	861169737
 Authentication required	Authentication Panel		Autenticazion necessarie
 Previous	WebPositive Window		Precedent
 (Finish: %date)	Download Window		(Terminât: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Anule
 Settings	Settings Window		Impostazions
 Downloads	WebPositive Window		File discjariâts
 Browse…	Settings Window		Esplore…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Un segnelibri par cheste pagjine (%bookmarkName) al esist za.
 Resume prior session	Settings Window		Ripie la session precedente
 Match case	WebPositive Window		Corispondence maiusc./minusc.
 Proxy password:	Settings Window		Peraule di ordin dal proxy:
@@ -158,7 +157,6 @@ Downloads	Download Window		File discjariâts
 Open blank page	Settings Window		Vierç pagjine vueide
 Clear history	WebPositive Window		Nete cronologjie
 Cancel	WebPositive Window		Anule
-Bookmark info	WebPositive Window		Informazions segnelibri
 Script console	Console Window		Console script
 Copy	URL Bar		Copie
 Open start page	Settings Window		Vierç pagjine iniziâl

@@ -1,8 +1,9 @@
-1	spanish; castilian	x-vnd.Haiku-MediaConverter	1322040280
+1	spanish; castilian	x-vnd.Haiku-MediaConverter	3317483131
 Input file not recognized as Audio or Video	MediaConverter		El archivo de entrada no se ha podido reconocer como un archivo de audio o video.
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Calidad de video: %3d%%
 Source files	MediaConverter		Archivos de entrada
+Error writing video frame %lld	MediaConverter		Error al escribir el fotograma %lld del video
 Error converting '%filename'	MediaConverter		Error al convertir '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		No se encontró el directorio seleccionado. Se ha cambiado a /boot/home
 Conversion completed	MediaConverter		Conversión completada
@@ -11,6 +12,7 @@ MediaConverter+:SaveDirectory	MediaConverter		Convertidor de medios+:Carpeta par
 Error creating video.	MediaConverter		Error al crear el video.
 Cancelling	MediaConverter		Cancelando
 None available	Audio codecs		Ninguno disponible
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		El archivo contiene varias pistas de audio o video, de las cuales sólo la primera de cada una serán convertidas.
 No file selected	MediaConverter-FileInfo		Ningún archivo seleccionado
 High	MediaConverter		Alto
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}
@@ -25,6 +27,7 @@ Error loading a file	MediaConverter		Error al cargar un archivo
 Encoder parameters	MediaConverter-EncoderWindow		Parámetros del codificador
 Open…	Menu		Abrir...
 Audio encoding:	MediaConverter		Codificación de audio:
+Multi-track file detected	MediaConverter		Se ha detectado un archivo de varias pistas.
 Audio quality: %3d%%	MediaConverter		Calidad de audio: %3d%%
 Cancelling…	MediaConverter		Cancelando...
 Output file '%filename' created	MediaConverter		Archivo de salida '%filename' creado
@@ -47,6 +50,7 @@ Error	MediaConverter		Error
 File details	MediaConverter		Detalles del archivo
 No audio	Audio codecs list		Sin audio
 Drop media files onto this window	MediaConverter		Arrastre los archivos multimedia en esta ventana
+Writing video track: %ld%% complete	MediaConverter		Escribiendo pista de video: %ld%% completo
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
 Quit	Menu		Salir
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}

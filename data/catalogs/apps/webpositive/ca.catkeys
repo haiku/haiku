@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	3896191867
+1	catalan; valencian	x-vnd.Haiku-WebPositive	861169737
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Acabament: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Cancel·la
 Settings	Settings Window		Paràmetres
 Downloads	WebPositive Window		Baixades
 Browse…	Settings Window		Navega...
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ja hi ha una adreça d'interès per a aquesta pàgina: %bookmarkName.
 Resume prior session	Settings Window		Continua la sessió anterior
 Match case	WebPositive Window		Coincidència de caixa
 Proxy password:	Settings Window		Contrasenya del servidor intermediari:
@@ -158,7 +157,6 @@ Downloads	Download Window		Baixades
 Open blank page	Settings Window		Obre una pàgina en blanc
 Clear history	WebPositive Window		Neteja'n l'historial
 Cancel	WebPositive Window		Cancel·la
-Bookmark info	WebPositive Window		Informació de l'adreça d'interès
 Script console	Console Window		Script de consola
 Copy	URL Bar		Copia
 Open start page	Settings Window		Obre la pàgina d'inici

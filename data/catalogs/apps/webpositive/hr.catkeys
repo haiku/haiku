@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-WebPositive	917807377
+1	croatian	x-vnd.Haiku-WebPositive	2177752543
 Previous	WebPositive Window		Prethodno
 Download folder:	Settings Window		Mapa preuzimanja:
 Close window	WebPositive Window		Zatvori prozor
@@ -19,7 +19,6 @@ Cancel	Download Window		Otkaži
 Settings	Settings Window		Postavke
 Downloads	WebPositive Window		Preuzimanja
 Browse…	Settings Window		Pregledaj…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Zabilješka za ovu stranicu (%bookmarkName) već postoji.
 Proxy password:	Settings Window		Proxy lozinka:
 Size:	Font Selection view		Veličina:
 Proxy server port:	Settings Window		Port proxy poslužitelja:
@@ -113,6 +112,5 @@ Downloads	Download Window		Preuzimanja
 Open blank page	Settings Window		Otvori praznu stranicu
 Clear history	WebPositive Window		Očisti povijest
 Cancel	WebPositive Window		Otkaži
-Bookmark info	WebPositive Window		Informacije o zabilješkama
 Copy	URL Bar		Kopiraj
 Open start page	Settings Window		Otvori početnu stranicu

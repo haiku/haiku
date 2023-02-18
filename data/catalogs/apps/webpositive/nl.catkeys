@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-WebPositive	3896191867
+1	dutch; flemish	x-vnd.Haiku-WebPositive	861169737
 Authentication required	Authentication Panel		Aanmelding is vereist
 Previous	WebPositive Window		Vorige
 (Finish: %date)	Download Window		(Voltooid: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Annuleren
 Settings	Settings Window		Instellingen
 Downloads	WebPositive Window		Downloads
 Browse…	Settings Window		Bladeren…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Een bladwijzer voor deze pagina (%bookmarkName) bestaat al.
 Resume prior session	Settings Window		Vorige sessie hervatten
 Match case	WebPositive Window		Hoofdlettergevoelig
 Proxy password:	Settings Window		Wachtwoord proxyserver:
@@ -158,7 +157,6 @@ Downloads	Download Window		Downloads
 Open blank page	Settings Window		Lege pagina openen
 Clear history	WebPositive Window		Geschiedenis legen
 Cancel	WebPositive Window		Annuleren
-Bookmark info	WebPositive Window		Bladwijzerinfo
 Script console	Console Window		Scriptconsole
 Copy	URL Bar		Kopiëren
 Open start page	Settings Window		Startpagina openen

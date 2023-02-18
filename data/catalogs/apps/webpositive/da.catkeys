@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-WebPositive	250728390
+1	danish	x-vnd.Haiku-WebPositive	1510673556
 Authentication required	Authentication Panel		Autentifikation kræves
 Previous	WebPositive Window		Forrige
 (Finish: %date)	Download Window		(færdig: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Annuller
 Settings	Settings Window		Indstillinger
 Downloads	WebPositive Window		Downloads
 Browse…	Settings Window		Gennemse…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Der findes allerede et bogmærke til siden (%bookmarkName).
 Resume prior session	Settings Window		Genoptag forrige session
 Match case	WebPositive Window		Der skelnes mellem store og små bogstaver
 Proxy password:	Settings Window		Proxy-adgangskode:
@@ -155,7 +154,6 @@ Downloads	Download Window		Downloads
 Open blank page	Settings Window		Åbn tom side
 Clear history	WebPositive Window		Ryd historik
 Cancel	WebPositive Window		Annuller
-Bookmark info	WebPositive Window		Bogmærkeinfo
 Script console	Console Window		Script-konsol
 Copy	URL Bar		Kopiér
 Open start page	Settings Window		Åbn startside

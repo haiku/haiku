@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-WebPositive	250728390
+1	italian	x-vnd.Haiku-WebPositive	1510673556
 Authentication required	Authentication Panel		Richiesta autenticazione
 Previous	WebPositive Window		Precedente
 (Finish: %date)	Download Window		(Terminato: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Annulla
 Settings	Settings Window		Impostazioni
 Downloads	WebPositive Window		File scaricati
 Browse…	Settings Window		Sfoglia…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Un segnalibro per questa pagina (%bookmarkName) esiste già.
 Resume prior session	Settings Window		Continua sessione precedente
 Match case	WebPositive Window		Distingui maiuscole/minuscole
 Proxy password:	Settings Window		Password server proxy:
@@ -155,7 +154,6 @@ Downloads	Download Window		File scaricati
 Open blank page	Settings Window		Apri pagina vuota
 Clear history	WebPositive Window		Cancella cronologia
 Cancel	WebPositive Window		Annulla
-Bookmark info	WebPositive Window		Informazioni sul segnalibro
 Script console	Console Window		Console
 Copy	URL Bar		Copia
 Open start page	Settings Window		Apri pagina iniziale

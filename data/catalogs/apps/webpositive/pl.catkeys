@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	3896191867
+1	polish	x-vnd.Haiku-WebPositive	861169737
 Authentication required	Authentication Panel		Wymagane uwierzytelnienie
 Previous	WebPositive Window		Poprzedni
 (Finish: %date)	Download Window		(Koniec: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Anuluj
 Settings	Settings Window		Ustawienia
 Downloads	WebPositive Window		Pobieranie
 Browse…	Settings Window		Przeglądaj…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Zakładka dla tej strony (%bookmarkName) już istnieje.
 Resume prior session	Settings Window		Wznów poprzednią sesję
 Match case	WebPositive Window		Uwzględnij wielkość liter
 Proxy password:	Settings Window		Hasło serwera proxy:
@@ -158,7 +157,6 @@ Downloads	Download Window		Pobierane
 Open blank page	Settings Window		Otwórz pustą stronę
 Clear history	WebPositive Window		Wyczyść historię
 Cancel	WebPositive Window		Anuluj
-Bookmark info	WebPositive Window		Informacje o zakładkach
 Script console	Console Window		Konsola skryptów
 Copy	URL Bar		Kopiuj
 Open start page	Settings Window		Otwórz stronę startową

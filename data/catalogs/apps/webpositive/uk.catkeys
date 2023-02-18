@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	3896191867
+1	ukrainian	x-vnd.Haiku-WebPositive	861169737
 Authentication required	Authentication Panel		Потрібна авторизація
 Previous	WebPositive Window		Попереднє
 (Finish: %date)	Download Window		(Завершення: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Скасувати
 Settings	Settings Window		Налаштування
 Downloads	WebPositive Window		Завантаження
 Browse…	Settings Window		Переглянути…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка цієї сторінки (%bookmarkName) вже існує.
 Resume prior session	Settings Window		Продовжити попередній сеанс
 Match case	WebPositive Window		Враховувати регістр
 Proxy password:	Settings Window		Пароль проксі:
@@ -158,7 +157,6 @@ Downloads	Download Window		Завантаження
 Open blank page	Settings Window		Відкрити порожню сторінку
 Clear history	WebPositive Window		Очистити історію
 Cancel	WebPositive Window		Скасувати
-Bookmark info	WebPositive Window		Інформація про закладку
 Script console	Console Window		Консоль сценаріїв
 Copy	URL Bar		Копіювати
 Open start page	Settings Window		Відкрити стартову сторінку

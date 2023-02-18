@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	3896191867
+1	japanese	x-vnd.Haiku-WebPositive	861169737
 Authentication required	Authentication Panel		認証が必要です
 Previous	WebPositive Window		前へ
 (Finish: %date)	Download Window		(完了: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		中止
 Settings	Settings Window		設定
 Downloads	WebPositive Window		ダウンロード
 Browse…	Settings Window		ブラウズ...
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	このページ (%bookmarkName) のブックマークはすでに存在します。
 Resume prior session	Settings Window		以前のセッションを再開
 Match case	WebPositive Window		大文字小文字を区別
 Proxy password:	Settings Window		プロキシのパスワード:
@@ -158,7 +157,6 @@ Downloads	Download Window		ダウンロード
 Open blank page	Settings Window		空白のページを表示
 Clear history	WebPositive Window		履歴の消去
 Cancel	WebPositive Window		中止
-Bookmark info	WebPositive Window		ブックマーク情報
 Script console	Console Window		スクリプトコンソール
 Copy	URL Bar		コピー
 Open start page	Settings Window		スタートページを開く

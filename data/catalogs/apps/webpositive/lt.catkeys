@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-WebPositive	335847616
+1	lithuanian	x-vnd.Haiku-WebPositive	1595792782
 Authentication required	Authentication Panel		Būtina nustatyti tapatybę
 Previous	WebPositive Window		Ankstesnis
 Open bookmarks confirmation	WebPositive Window		Adresyno įrašų atvėrimo patvirtinimas
@@ -23,7 +23,6 @@ Start page:	Settings Window		Pradžios tinklapis:
 Cancel	Download Window		Atsisakyti
 Settings	Settings Window		Nuostatos
 Downloads	WebPositive Window		Parsiuntimai
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Šis tinklapis (%bookmarkName) jau yra įtrauktas į adresyną.
 Match case	WebPositive Window		Paisyti raidžių registro
 Proxy password:	Settings Window		Įgaliotojo serverio slaptažodis:
 Size:	Font Selection view		Dydis:
@@ -128,7 +127,6 @@ Downloads	Download Window		Parsiuntimai
 Open blank page	Settings Window		Atverti tuščią tinklapį
 Clear history	WebPositive Window		Išvalyti žurnalą
 Cancel	WebPositive Window		Atsisakyti
-Bookmark info	WebPositive Window		Adresyno įrašo savybės
 Script console	Console Window		Scenarijų pultas
 Copy	URL Bar		Kopijuoti
 Open start page	Settings Window		Atverti pradžios tinklapį

@@ -1,4 +1,4 @@
-1	thai	x-vnd.Haiku-WebPositive	55235296
+1	thai	x-vnd.Haiku-WebPositive	1315180462
 Authentication required	Authentication Panel		ต้องการการรับรองความถูกต้อง
 Previous	WebPositive Window		ก่อนหน้า
 (Finish: %date)	Download Window		(สิ้นสุด: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		ยกเลิก
 Settings	Settings Window		ตั้งค่า
 Downloads	WebPositive Window		ดาวน์โหลด
 Browse…	Settings Window		บราวส์
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	ที่คั่นหน้าสำหรับหน้านี้ (%bookmarkName) มีอยู่แล้ว
 Resume prior session	Settings Window		สรุปเซสชั่นก่อนหน้า
 Match case	WebPositive Window		กรณีตรงกัน
 Proxy password:	Settings Window		รหัสผ่านพร็อกซี:
@@ -152,7 +151,6 @@ Downloads	Download Window		ดาวน์โหลด
 Open blank page	Settings Window		เปิดหน้าเปล่า
 Clear history	WebPositive Window		ลบประวัติ
 Cancel	WebPositive Window		ยกเลิก
-Bookmark info	WebPositive Window		ข้อมูลที่คั่นหน้า
 Script console	Console Window		คอนโซลสคริปต์
 Copy	URL Bar		คัดลอก
 Open start page	Settings Window		เปิดหน้าเริ่มต้น

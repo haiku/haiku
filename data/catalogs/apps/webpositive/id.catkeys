@@ -1,4 +1,4 @@
-1	indonesian	x-vnd.Haiku-WebPositive	440329287
+1	indonesian	x-vnd.Haiku-WebPositive	1700274453
 Authentication required	Authentication Panel		Otentikasi dibutuhkan
 Previous	WebPositive Window		Sebelumnya
 (Finish: %date)	Download Window		(Selesai: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Batalkan
 Settings	Settings Window		Pengaturan
 Downloads	WebPositive Window		Unduhan
 Browse…	Settings Window		Telusuri…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Bookmark untuk halaman ini (%bookmarkName) sudah ada.
 Resume prior session	Settings Window		Lanjutkan sesi sebelumnya
 Match case	WebPositive Window		Cocok persis
 Proxy password:	Settings Window		Sandi proksi:
@@ -153,7 +152,6 @@ Downloads	Download Window		Unduhan
 Open blank page	Settings Window		Buka laman kosong
 Clear history	WebPositive Window		Hapus riwayat
 Cancel	WebPositive Window		Batalkan
-Bookmark info	WebPositive Window		Info penanda
 Script console	Console Window		Konsol skrip
 Copy	URL Bar		Salin
 Open start page	Settings Window		Buka laman mulai

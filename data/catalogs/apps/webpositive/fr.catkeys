@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	3896191867
+1	french	x-vnd.Haiku-WebPositive	861169737
 Authentication required	Authentication Panel		Authentification requise
 Previous	WebPositive Window		Précédent
 (Finish: %date)	Download Window		(Fin : %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Annuler
 Settings	Settings Window		Réglages
 Downloads	WebPositive Window		Téléchargements
 Browse…	Settings Window		Parcourir…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Un signet « %bookmarkName » existe déjà pour cette page.
 Resume prior session	Settings Window		Restaurer la session précédente
 Match case	WebPositive Window		Respecter la casse
 Proxy password:	Settings Window		Mot de passe du serveur mandataire :
@@ -158,7 +157,6 @@ Downloads	Download Window		Téléchargements
 Open blank page	Settings Window		Ouvrir une page blanche
 Clear history	WebPositive Window		Nettoyer l’historique
 Cancel	WebPositive Window		Annuler
-Bookmark info	WebPositive Window		Informations du signet
 Script console	Console Window		Console de script
 Copy	URL Bar		Copier
 Open start page	Settings Window		Ouvrir la page d’accueil

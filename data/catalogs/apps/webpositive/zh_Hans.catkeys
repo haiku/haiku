@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-WebPositive	840981334
+1	english	x-vnd.Haiku-WebPositive	2894241046
 Authentication required	Authentication Panel		需要认证
 Previous	WebPositive Window		上一个
 (Finish: %date)	Download Window		(完成: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		取消
 Settings	Settings Window		设置
 Downloads	WebPositive Window		下载
 Browse…	Settings Window		浏览…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	该页面(%bookmarkName)书签已存在。
 Resume prior session	Settings Window		恢复之前的会话
 Match case	WebPositive Window		匹配大小写
 Proxy password:	Settings Window		代理密码:

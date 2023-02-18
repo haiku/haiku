@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-WebPositive	3896191867
+1	czech	x-vnd.Haiku-WebPositive	861169737
 Authentication required	Authentication Panel		Ověření vyžadováno
 Previous	WebPositive Window		Předchozí
 (Finish: %date)	Download Window		(Dokončeno: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Zrušit
 Settings	Settings Window		Nastavení
 Downloads	WebPositive Window		Stažené
 Browse…	Settings Window		Procházet…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Záložka pro tuto stránku (%bookmarkName) již existuje.
 Resume prior session	Settings Window		Pokračovat v předchozí relaci
 Match case	WebPositive Window		Rozlišovat velikost písmen
 Proxy password:	Settings Window		Heslo proxy:
@@ -158,7 +157,6 @@ Downloads	Download Window		Stažené
 Open blank page	Settings Window		Otevřít prázdnou stránku
 Clear history	WebPositive Window		Smazat historii
 Cancel	WebPositive Window		Zrušit
-Bookmark info	WebPositive Window		Informace záložky
 Script console	Console Window		Skriptovací konzole
 Copy	URL Bar		Kopírovat
 Open start page	Settings Window		Otevřít úvodní stránku

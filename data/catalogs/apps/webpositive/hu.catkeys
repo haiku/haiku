@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	3896191867
+1	hungarian	x-vnd.Haiku-WebPositive	861169737
 Authentication required	Authentication Panel		Azonosítás szükséges
 Previous	WebPositive Window		Előző
 (Finish: %date)	Download Window		(Befejezés: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Mégse
 Settings	Settings Window		Beállítások
 Downloads	WebPositive Window		Letöltések
 Browse…	Settings Window		Böngészés…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Egy könyvjelző (%bookmarkName) már létezik az oldalhoz.
 Resume prior session	Settings Window		Előző munkamenet folytatása
 Match case	WebPositive Window		Egyező betűméret
 Proxy password:	Settings Window		Proxy jelszó:
@@ -158,7 +157,6 @@ Downloads	Download Window		Letöltések
 Open blank page	Settings Window		Üres oldal
 Clear history	WebPositive Window		Előzmények törlése
 Cancel	WebPositive Window		Mégse
-Bookmark info	WebPositive Window		Könyvjelző információi
 Script console	Console Window		Script konzol
 Copy	URL Bar		Másolás
 Open start page	Settings Window		Kezdőoldal megnyitása

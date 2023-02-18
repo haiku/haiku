@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	250728390
+1	romanian	x-vnd.Haiku-WebPositive	1510673556
 Authentication required	Authentication Panel		Autentificare necesară
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Finalizare: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Anulează
 Settings	Settings Window		Configurări
 Downloads	WebPositive Window		Descărcări
 Browse…	Settings Window		Navigare…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Există deja un marcaj pentru această pagină (%bookmarkName).
 Resume prior session	Settings Window		Reia sesiunea anterioară
 Match case	WebPositive Window		Potrivește majusculele
 Proxy password:	Settings Window		Parolă proxy:
@@ -155,7 +154,6 @@ Downloads	Download Window		Descărcări
 Open blank page	Settings Window		Deschide o pagină vidă
 Clear history	WebPositive Window		Eliberează istoricul
 Cancel	WebPositive Window		Anulează
-Bookmark info	WebPositive Window		Informații de marcaj
 Script console	Console Window		Consola de script
 Copy	URL Bar		Copiază
 Open start page	Settings Window		Deschide pagina de pornire

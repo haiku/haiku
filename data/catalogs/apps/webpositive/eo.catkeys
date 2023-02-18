@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-WebPositive	250728390
+1	esperanto	x-vnd.Haiku-WebPositive	1510673556
 Authentication required	Authentication Panel		Aŭtentigo nepra
 Previous	WebPositive Window		Antaŭa
 (Finish: %date)	Download Window		(Fino: %date)
@@ -28,7 +28,6 @@ Cancel	Download Window		Nuligi
 Settings	Settings Window		Agordo
 Downloads	WebPositive Window		Elŝutoj
 Browse…	Settings Window		Foliumi…
-A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Legosigno por ĉi paĝo (%bookmarkName) jam ekzistas.
 Resume prior session	Settings Window		Daŭrigi antaŭan sesion
 Match case	WebPositive Window		Atenti usklecon
 Proxy password:	Settings Window		Prokurila pasvorto:
@@ -155,7 +154,6 @@ Downloads	Download Window		Elŝutoj
 Open blank page	Settings Window		Uzi malplenan paĝon
 Clear history	WebPositive Window		Forigi historion
 Cancel	WebPositive Window		Nuligi
-Bookmark info	WebPositive Window		Informo pri legosigno
 Script console	Console Window		Skriptokonzolo
 Copy	URL Bar		Kopii
 Open start page	Settings Window		Uzi komencan paĝon
