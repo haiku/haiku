@@ -113,13 +113,6 @@ private:
 	friend class MenuBarLayoutItem;
 	friend struct LayoutData;
 
-								BMenuField(const char* name,
-									const char* label, BMenu* menu,
-									BMessage* message,
-									uint32 flags);
-								BMenuField(const char* label,
-									BMenu* menu, BMessage* message);
-
 			void				_DrawLabel(BRect updateRect);
 			void				_DrawMenuBar(BRect updateRect);
 
