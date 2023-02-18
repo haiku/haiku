@@ -27,6 +27,10 @@ public:
 								BMenuField(const char* name,
 									const char* label, BMenu* menu,
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
+								BMenuField(const char* name,
+									const char* label, BMenu* menu,
+									bool fixed_size,
+									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BMenuField(const char* label, BMenu* menu,
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BMenuField(BMessage* data);

@@ -247,6 +247,21 @@ BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
 }
 
 
+BMenuField::BMenuField(const char* name, const char* label, BMenu* menu,
+	bool fixedSize, uint32 flags)
+	:
+	BView(name, flags | B_FRAME_EVENTS)
+{
+	InitObject(label);
+
+	fFixedSizeMB = fixedSize;
+
+	_InitMenuBar(menu, BRect(0, 0, 100, 15), fixedSize);
+
+	InitObject2();
+}
+
+
 BMenuField::BMenuField(const char* label, BMenu* menu, uint32 flags)
 	:
 	BView(NULL, flags | B_FRAME_EVENTS)
