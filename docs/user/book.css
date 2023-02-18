@@ -1065,3 +1065,33 @@ hr.footer {
 	height: 1px;
 	border-top: 1px solid var(--TertiaryCanvasText);
 }
+
+/* Search Box */
+#MSearchSelectWindow {
+	border: var(--TertiaryCanvasText);
+	background-color: var(--TertiaryCanvas);
+}
+
+#MSearchResultsWindow {
+	width: 500px !important;
+	height: 600px !important;
+	border: var(--TertiaryCanvasText);
+	background-color: var(--TertiaryCanvas);
+}
+
+
+.SRPage .SREntry{
+	font-size: 1em !important;
+}
+
+.SRScope {
+	font-size: 0.9em !important;
+}
+
+#NoMatches {
+	font-size: 1.4em
+}
+
+a.SelectItem {
+	font-size: 1em;
+}
