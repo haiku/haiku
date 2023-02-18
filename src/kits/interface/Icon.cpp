@@ -396,7 +396,7 @@ BIcon::_MakeBitmaps(const BBitmap* bitmap, uint32 flags)
 	int32 fbpr = bitmap->BytesPerRow();
 	int32 pixels = b.IntegerWidth() + 1;
 	int32 lines = b.IntegerHeight() + 1;
-	if (format == B_RGB32 || format == B_RGB32_BIG) {
+	if (format == B_RGB32) {
 		// nontransparent version
 
 		// iterate over color components
@@ -450,7 +450,61 @@ BIcon::_MakeBitmaps(const BBitmap* bitmap, uint32 flags)
 			if (dcBits != NULL)
 				dcBits += nbpr;
 		}
-	} else if (format == B_RGBA32 || format == B_RGBA32_BIG) {
+	} else if (format == B_RGB32_BIG) {
+		// nontransparent version
+
+		// iterate over color components
+		for (int32 y = 0; y < lines; y++) {
+			for (int32 x = 0; x < pixels; x++) {
+				int32 nOffset = 4 * x;
+				int32 fOffset = 4 * x;
+				nBits[nOffset + 3] = fBits[fOffset + 3];
+				nBits[nOffset + 2] = fBits[fOffset + 2];
+				nBits[nOffset + 1] = fBits[fOffset + 1];
+				nBits[nOffset + 0] = 255;
+
+				// clicked bits are darker (lame method...)
+				if (cBits != NULL) {
+					cBits[nOffset + 3] = uint8((float)nBits[nOffset + 3] * 0.8);
+					cBits[nOffset + 2] = uint8((float)nBits[nOffset + 2] * 0.8);
+					cBits[nOffset + 1] = uint8((float)nBits[nOffset + 1] * 0.8);
+					cBits[nOffset + 0] = 255;
+				}
+
+				// disabled bits have less contrast (lame method...)
+				if (dBits != NULL) {
+					uint8 grey = 216;
+					float dist = (nBits[nOffset + 3] - grey) * 0.4;
+					dBits[nOffset + 3] = (uint8)(grey + dist);
+					dist = (nBits[nOffset + 2] - grey) * 0.4;
+					dBits[nOffset + 2] = (uint8)(grey + dist);
+					dist = (nBits[nOffset + 1] - grey) * 0.4;
+					dBits[nOffset + 1] = (uint8)(grey + dist);
+					dBits[nOffset + 0] = 255;
+				}
+
+				// disabled bits have less contrast (lame method...)
+				if (dcBits != NULL) {
+					uint8 grey = 188;
+					float dist = (nBits[nOffset + 3] - grey) * 0.4;
+					dcBits[nOffset + 3] = (uint8)(grey + dist);
+					dist = (nBits[nOffset + 2] - grey) * 0.4;
+					dcBits[nOffset + 2] = (uint8)(grey + dist);
+					dist = (nBits[nOffset + 1] - grey) * 0.4;
+					dcBits[nOffset + 1] = (uint8)(grey + dist);
+					dcBits[nOffset + 0] = 255;
+				}
+			}
+			fBits += fbpr;
+			nBits += nbpr;
+			if (cBits != NULL)
+				cBits += nbpr;
+			if (dBits != NULL)
+				dBits += nbpr;
+			if (dcBits != NULL)
+				dcBits += nbpr;
+		}
+	} else if (format == B_RGBA32) {
 		// transparent version
 
 		// iterate over color components
@@ -491,6 +545,58 @@ BIcon::_MakeBitmaps(const BBitmap* bitmap, uint32 flags)
 					dcBits[nOffset + 1] = (uint8)(dBits[nOffset + 1] * 0.8);
 					dcBits[nOffset + 2] = (uint8)(dBits[nOffset + 2] * 0.8);
 					dcBits[nOffset + 3] = (uint8)(fBits[fOffset + 3] * 0.3);
+				}
+			}
+			fBits += fbpr;
+			nBits += nbpr;
+			if (cBits != NULL)
+				cBits += nbpr;
+			if (dBits != NULL)
+				dBits += nbpr;
+			if (dcBits != NULL)
+				dcBits += nbpr;
+		}
+	} else if (format == B_RGBA32_BIG) {
+		// transparent version
+
+		// iterate over color components
+		for (int32 y = 0; y < lines; y++) {
+			for (int32 x = 0; x < pixels; x++) {
+				int32 nOffset = 4 * x;
+				int32 fOffset = 4 * x;
+				nBits[nOffset + 3] = fBits[fOffset + 3];
+				nBits[nOffset + 2] = fBits[fOffset + 2];
+				nBits[nOffset + 1] = fBits[fOffset + 1];
+				nBits[nOffset + 0] = fBits[fOffset + 0];
+
+				// clicked bits are darker (lame method...)
+				if (cBits != NULL) {
+					cBits[nOffset + 3] = (uint8)(nBits[nOffset + 3] * 0.8);
+					cBits[nOffset + 2] = (uint8)(nBits[nOffset + 2] * 0.8);
+					cBits[nOffset + 1] = (uint8)(nBits[nOffset + 1] * 0.8);
+					cBits[nOffset + 0] = fBits[fOffset + 0];
+				}
+
+				// disabled bits have less opacity
+				if (dBits != NULL) {
+					uint8 grey = ((uint16)nBits[nOffset + 3] * 10
+					    + nBits[nOffset + 2] * 60
+						+ nBits[nOffset + 1] * 30) / 100;
+					float dist = (nBits[nOffset + 3] - grey) * 0.3;
+					dBits[nOffset + 3] = (uint8)(grey + dist);
+					dist = (nBits[nOffset + 2] - grey) * 0.3;
+					dBits[nOffset + 2] = (uint8)(grey + dist);
+					dist = (nBits[nOffset + 1] - grey) * 0.3;
+					dBits[nOffset + 1] = (uint8)(grey + dist);
+					dBits[nOffset + 0] = (uint8)(fBits[fOffset + 0] * 0.3);
+				}
+
+				// disabled bits have less contrast (lame method...)
+				if (dcBits != NULL) {
+					dcBits[nOffset + 3] = (uint8)(dBits[nOffset + 3] * 0.8);
+					dcBits[nOffset + 2] = (uint8)(dBits[nOffset + 2] * 0.8);
+					dcBits[nOffset + 1] = (uint8)(dBits[nOffset + 1] * 0.8);
+					dcBits[nOffset + 0] = (uint8)(fBits[fOffset + 0] * 0.3);
 				}
 			}
 			fBits += fbpr;
