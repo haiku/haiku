@@ -390,7 +390,11 @@ fssh_read_pos(int fd, fssh_off_t pos, void *buffer, fssh_size_t count)
 {
 	if (FSShell::restricted_file_restrict_io(fd, pos, count) < 0)
 		return -1;
+#if defined(__HAIKU__)
+	return read_pos(fd, pos, buffer, count);
+#else
 	return _kern_read(fd, pos, buffer, count);
+#endif
 }
 
 
@@ -417,7 +421,11 @@ fssh_write_pos(int fd, fssh_off_t pos, const void *buffer, fssh_size_t count)
 {
 	if (FSShell::restricted_file_restrict_io(fd, pos, count) < 0)
 		return -1;
+#if defined(__HAIKU__)
+	return write_pos(fd, pos, buffer, count);
+#else
 	return _kern_write(fd, pos, buffer, count);
+#endif
 }
 
 

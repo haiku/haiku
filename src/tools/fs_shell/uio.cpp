@@ -79,7 +79,11 @@ fssh_readv_pos(int fd, fssh_off_t pos, const struct fssh_iovec *vec, int count)
 	if (FSShell::restricted_file_restrict_io(fd, pos, length) < 0)
 		return -1;
 
+#if defined(__HAIKU__)
+	return readv_pos(fd, pos, systemVecs, count);
+#else
 	return _kern_readv(fd, pos, systemVecs, count);
+#endif
 }
 
 
@@ -114,5 +118,9 @@ fssh_writev_pos(int fd, fssh_off_t pos, const struct fssh_iovec *vec, int count)
 	if (FSShell::restricted_file_restrict_io(fd, pos, length) < 0)
 		return -1;
 
+#if defined(__HAIKU__)
+	return writev_pos(fd, pos, systemVecs, count);
+#else
 	return _kern_writev(fd, pos, systemVecs, count);
+#endif
 }
