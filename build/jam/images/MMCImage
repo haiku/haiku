@@ -12,7 +12,6 @@ rule BuildSDImage image : files
 	local mbrtool = <build>mbrtool ;
 	local fatshell = <build>fat_shell ;
 
-	Depends $(image) : $(files) $(TARGET_DEVICE_TREES) ;
 	Depends $(image) : $(HAIKU_IMAGE_NAME) ;
 	Depends $(image) : $(mbrtool) ;
 	Depends $(image) : $(fatshell) ;
@@ -90,11 +89,8 @@ actions BuildUBootSDImage1
 
 	echo "cp :uEnv.txt myfs/" | ${FATFS} $(1)
 
-	# lay down FDT's
+	# lay down optional FDT path
 	echo "mkdir myfs/fdt" | ${FATFS} $(1)
-	for i in $(TARGET_DEVICE_TREES[1-]) ; do
-		echo "cp :${i} myfs/fdt/" | ${FATFS} $(1)
-	done
 
 	# list content
 	echo "ls myfs" | ${FATFS} $(1)
@@ -153,11 +149,8 @@ actions BuildEfiSDImage1
 	done
 	echo "cp :uEnv.txt myfs/" | ${FATFS} $(1)
 
-	# lay down FDT's
+	# lay down optional FDT path
 	echo "mkdir myfs/fdt" | ${FATFS} $(1)
-	for i in $(TARGET_DEVICE_TREES[1-]) ; do
-		echo "cp :${i} myfs/fdt/" | ${FATFS} $(1)
-	done
 
 	# list content
 	echo "ls myfs" | ${FATFS} $(1)
