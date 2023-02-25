@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-WebPositive	861169737
+1	french	x-vnd.Haiku-WebPositive	1504019537
 Authentication required	Authentication Panel		Authentification requise
 Previous	WebPositive Window		Précédent
 (Finish: %date)	Download Window		(Fin : %date)
@@ -7,6 +7,7 @@ Download folder:	Settings Window		Dossier de téléchargement :
 Close window	WebPositive Window		Fermer la fenêtre
 Find:	WebPositive Window		Rechercher :
 Script console	WebPositive Window		Console de script
+There was an error setting up the bookmark.	WebPositive Window		Il y a eu une erreur à la définition du signet.
 Fonts	Settings Window		Polices
 Path	Cookie Manager		Emplacement
 Bookmarks	WebPositive Window		Signets
