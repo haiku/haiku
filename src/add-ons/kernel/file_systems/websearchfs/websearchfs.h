@@ -18,13 +18,6 @@
 #define LOCK mutex_lock
 #define UNLOCK mutex_unlock
 typedef dev_t nspace_id;
-
-#else
-
-#include "fsproto.h"
-#include "lock.h"
-#define publish_vnode new_vnode
-
 #endif
 
 #include "lists2.h"
@@ -72,11 +65,11 @@ struct fs_node
 	struct fs_node *next; /* next in folder */
 	struct fs_node *parent, *children;
 	struct fs_file_cookie *opened; /* opened on this node */
-	
+
 	char name[WEBSEARCHFS_NAME_LEN];
 	ino_t vnid;
 	lock l;
-	
+
 	int is_perm:1;	/* don't delete on last close */
 	int deleted:1;
 	int qcompleted:1;
@@ -101,7 +94,7 @@ struct fs_nspace
 	struct fs_node *nodes;
 	struct fs_node *queries;
 	int32 nodecount; /* just for statvfs() */
-	
+
 	lock l;
 };
 
