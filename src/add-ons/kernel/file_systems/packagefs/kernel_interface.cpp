@@ -14,8 +14,11 @@
 #include <fs_interface.h>
 #include <KernelExport.h>
 #include <io_requests.h>
+#include <slab/Slab.h>
 
 #include <AutoDeleter.h>
+
+#include <package/hpkg/PackageFileHeapAccessorBase.h>
 
 #include "AttributeCookie.h"
 #include "AttributeDirectoryCookie.h"
@@ -1055,6 +1058,8 @@ packagefs_rewind_query(fs_volume* fsVolume, void* cookie)
 static status_t
 packagefs_std_ops(int32 op, ...)
 {
+	using BPackageKit::BHPKG::BPrivate::PackageFileHeapAccessorBase;
+
 	switch (op) {
 		case B_MODULE_INIT:
 		{
@@ -1075,6 +1080,12 @@ packagefs_std_ops(int32 op, ...)
 				return error;
 			}
 
+			PackageFileHeapAccessorBase::sChunkCache =
+				create_object_cache_etc("packagefs heap buffers",
+					PackageFileHeapAccessorBase::kChunkSize, sizeof(void*),
+					0, /* magazine capacity, count */ 2, 1, 0, NULL,
+					NULL, NULL, NULL);
+
 			error = PackageFSRoot::GlobalInit();
 			if (error != B_OK) {
 				ERROR("Failed to init PackageFSRoot\n");
@@ -1091,6 +1102,8 @@ packagefs_std_ops(int32 op, ...)
 		{
 			PRINT("package_std_ops(): B_MODULE_UNINIT\n");
 			PackageFSRoot::GlobalUninit();
+			delete_object_cache((object_cache*)
+				PackageFileHeapAccessorBase::sChunkCache);
 			StringConstants::Cleanup();
 			StringPool::Cleanup();
 			exit_debugging();
