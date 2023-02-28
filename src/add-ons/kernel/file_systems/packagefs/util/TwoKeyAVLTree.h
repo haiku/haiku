@@ -207,9 +207,7 @@ public:
 		if (node == NULL)
 			return;
 
-		// There is no way to overload operator delete with extra parameters.
-		node->~Node();
-		object_cache_free(fObjectCache, node, 0);
+		object_cache_delete<Node>(fObjectCache, node, 0);
 	}
 
 	// internal use (not part of the strategy)
