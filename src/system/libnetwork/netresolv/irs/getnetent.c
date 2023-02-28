@@ -62,6 +62,10 @@ __weak_alias(getnetent,_getnetent)
 __weak_alias(setnetent,_setnetent)
 #endif
 
+#ifndef _PATH_NETWORKS
+#define	_PATH_NETWORKS	"/etc/networks"
+#endif
+
 #define	MAXALIASES	35
 
 static FILE *netf;
