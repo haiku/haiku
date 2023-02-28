@@ -159,9 +159,6 @@ struct addrinfo {
 	(AI_PASSIVE | AI_CANONNAME | AI_NUMERICHOST | AI_NUMERICSERV \
 		| AI_ADDRCONFIG)
 
-/*
- * Flag values for getipnodebyname()
- */
 #define AI_ALL			0x00000100
 #define AI_V4MAPPED_CFG	0x00000200
 #define AI_ADDRCONFIG	0x00000400
@@ -199,8 +196,6 @@ struct hostent	*gethostbyaddr(const void *address, socklen_t length, int type);
 struct hostent	*gethostbyname(const char *name);
 struct hostent	*gethostbyname2(const char *name, int type);
 struct hostent	*gethostent(void);
-struct hostent	*getipnodebyaddr(const void *, size_t, int, int *);
-struct hostent	*getipnodebyname(const char *, int, int, int *);
 struct netent	*getnetbyaddr(uint32_t, int);
 struct netent	*getnetbyname(const char *);
 struct netent	*getnetent(void);
