@@ -941,6 +941,8 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 #endif
 		return B_BAD_VALUE;
 	}
+	if (offset < 0)
+		return B_BAD_VALUE;
 
 	uint32 allocationFlags = HEAP_DONT_WAIT_FOR_MEMORY
 		| HEAP_DONT_LOCK_KERNEL_SPACE;
