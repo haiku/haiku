@@ -34,8 +34,6 @@ DebugWindow::DebugWindow(const char* appName)
 	fSemaphore(create_sem(0, "DebugWindow")),
 	fAction(kActionKillTeam)
 {
-	SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
-
 	BString buffer(B_TRANSLATE(
 		"The application:\n\n      %app\n\n"
 		"has encountered an error which prevents it from continuing. Haiku "
