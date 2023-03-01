@@ -1,4 +1,5 @@
-/*	$OpenBSD: ieee80211_input.c,v 1.247 2022/03/20 12:01:58 stsp Exp $	*/
+/*	$OpenBSD: ieee80211_input.c,v 1.250 2023/01/09 00:22:47 daniel Exp $	*/
+/*	$NetBSD: ieee80211_input.c,v 1.24 2004/05/31 11:12:24 dyoung Exp $	*/
 
 /*-
  * Copyright (c) 2001 Atsushi Onoe
@@ -87,8 +88,8 @@ int	ieee80211_parse_edca_params_body(struct ieee80211com *,
 	    const u_int8_t *);
 int	ieee80211_parse_edca_params(struct ieee80211com *, const u_int8_t *);
 int	ieee80211_parse_wmm_params(struct ieee80211com *, const u_int8_t *);
-enum	ieee80211_cipher ieee80211_parse_rsn_cipher(const u_int8_t[]);
-enum	ieee80211_akm ieee80211_parse_rsn_akm(const u_int8_t[]);
+enum	ieee80211_cipher ieee80211_parse_rsn_cipher(const u_int8_t *);
+enum	ieee80211_akm ieee80211_parse_rsn_akm(const u_int8_t *);
 int	ieee80211_parse_rsn_body(struct ieee80211com *, const u_int8_t *,
 	    u_int, struct ieee80211_rsnparams *);
 int	ieee80211_save_ie(const u_int8_t *, u_int8_t **);
@@ -1693,7 +1694,12 @@ ieee80211_recv_probe_resp(struct ieee80211com *ic, struct mbuf *m,
 			htcaps = frm;
 			break;
 		case IEEE80211_ELEMID_HTOP:
+			if (frm[1] < 22) {
+				ic->ic_stats.is_rx_elem_toosmall++;
+				break;
+			}
 			htop = frm;
+			chan = frm[2];
 			break;
 		case IEEE80211_ELEMID_VHTCAPS:
 			vhtcaps = frm;
