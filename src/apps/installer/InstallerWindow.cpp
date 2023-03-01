@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, Panagiotis "Ivory" Vasilopoulos <git@n0toose.net>
+ * Copyright 2020-2023, Panagiotis "Ivory" Vasilopoulos <git@n0toose.net>
  * Copyright 2009-2010, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2005-2008, Jérôme DUVAL
  * All rights reserved. Distributed under the terms of the MIT License.
@@ -157,7 +157,7 @@ layout_item_for(BView* view)
 
 InstallerWindow::InstallerWindow()
 	:
-	BWindow(BRect(-2000, -2000, -1800, -1800),
+	BWindow(BRect(-2300, -2000, -1800, -1800),
 		B_TRANSLATE_SYSTEM_NAME("Installer"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fEncouragedToSetupPartitions(false),
@@ -804,8 +804,31 @@ InstallerWindow::_UpdateControls()
 		statusText.SetToFormat(B_TRANSLATE("Press the Begin button to install "
 			"from '%1s' onto '%2s'."), srcItem->Name(), dstItem->Name());
 	} else if (srcItem != NULL) {
-		statusText = B_TRANSLATE("Choose the disk you want to install "
-			"onto from the pop-up menu. Then click \"Begin\".");
+		BString partitionRequiredHaiku = B_TRANSLATE(
+			"Haiku has to be installed on a partition that uses "
+			"the Be File System, but there are currently no such "
+			"available partitions on your system.");
+
+		BString partitionRequiredDebranded = B_TRANSLATE(
+			"This operating system has to be installed on a partition "
+			"that uses the Be File System, but there are currently "
+			"no such available partitions on your system.");
+
+		if (!foundOneSuitableTarget) {
+#ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
+			statusText.Append(partitionRequiredHaiku);
+#else
+			statusText.Append(partitionRequiredDebranded);
+#endif
+			statusText.Append("\n\n");
+			statusText.Append(B_TRANSLATE(
+				"Click on 'Set up partitions" B_UTF8_ELLIPSIS
+				"' to create one."));
+		} else {
+			statusText = B_TRANSLATE(
+				"Choose the disk you want to install "
+				"onto from the pop-up menu. Then click \"Begin\".");
+		}
 	} else if (dstItem != NULL) {
 		statusText = B_TRANSLATE("Choose the source disk from the "
 			"pop-up menu. Then click \"Begin\".");
