@@ -27,12 +27,15 @@
 
 DebugWindow::DebugWindow(const char* appName)
 	:
-	BWindow(BRect(0, 0, 100, 50), "Crashed program", B_MODAL_WINDOW,
+	BWindow(BRect(0, 0, 100, 50), "Crashed program",
+		B_MODAL_WINDOW_LOOK, B_FLOATING_ALL_WINDOW_FEEL,
 		B_CLOSE_ON_ESCAPE | B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fBitmap(IconSize(), B_RGBA32),
 	fSemaphore(create_sem(0, "DebugWindow")),
 	fAction(kActionKillTeam)
 {
+	SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
+
 	BString buffer(B_TRANSLATE(
 		"The application:\n\n      %app\n\n"
 		"has encountered an error which prevents it from continuing. Haiku "
