@@ -16,6 +16,7 @@
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <ControlLook.h>
+#include <Directory.h>
 #include <IconEditorProtocol.h>
 #include <IconUtils.h>
 #include <Locale.h>
@@ -1238,28 +1239,35 @@ IconView::_SetIcon(BBitmap* large, BBitmap* mini, const uint8* data,
 	size_t size, bool force)
 {
 	if (fHasRef) {
-		BFile file(&fRef, B_READ_WRITE);
+		BNodeInfo node;
+		BEntry entry(&fRef, true);
 
-		if (is_application(file)) {
-			BAppFileInfo info(&file);
-			if (info.InitCheck() == B_OK) {
-				if (large != NULL || force)
-					info.SetIconForType(fType.Type(), large, B_LARGE_ICON);
-				if (mini != NULL || force)
-					info.SetIconForType(fType.Type(), mini, B_MINI_ICON);
-				if (data != NULL || force)
-					info.SetIconForType(fType.Type(), data, size);
-			}
-		} else {
-			BNodeInfo info(&file);
-			if (info.InitCheck() == B_OK) {
-				if (large != NULL || force)
-					info.SetIcon(large, B_LARGE_ICON);
-				if (mini != NULL || force)
-					info.SetIcon(mini, B_MINI_ICON);
-				if (data != NULL || force)
-					info.SetIcon(data, size);
-			}
+		if (entry.IsFile()) {
+			BFile file(&fRef, B_READ_WRITE);
+			if (is_application(file)) {
+				BAppFileInfo info(&file);
+				if (info.InitCheck() == B_OK) {
+					if (large != NULL || force)
+						info.SetIconForType(fType.Type(), large, B_LARGE_ICON);
+					if (mini != NULL || force)
+						info.SetIconForType(fType.Type(), mini, B_MINI_ICON);
+					if (data != NULL || force)
+						info.SetIconForType(fType.Type(), data, size);
+				}
+			} else
+				node.SetTo(&file);
+		}
+		if (entry.IsDirectory()) {
+			BDirectory refdir(&fRef);
+			node.SetTo(&refdir);
+		}
+		if (node.InitCheck() == B_OK) {
+			if (large != NULL || force)
+				node.SetIcon(large, B_LARGE_ICON);
+			if (mini != NULL || force)
+				node.SetIcon(mini, B_MINI_ICON);
+			if (data != NULL || force)
+				node.SetIcon(data, size);
 		}
 		// the icon shown will be updated using node monitoring
 	} else if (fHasType) {
