@@ -246,35 +246,27 @@ DeskbarView::MessageReceived(BMessage* message)
 
 		case B_QUERY_UPDATE:
 		{
-			int32 what;
-			dev_t device;
-			ino_t directory;
-			const char *name;
-			entry_ref ref;
-			message->FindInt32("opcode", &what);
-			message->FindInt32("device", &device);
-			message->FindInt64("directory", &directory);
-			switch (what) {
+			int32 opcode;
+			message->FindInt32("opcode", &opcode);
+
+			switch (opcode) {
 				case B_ENTRY_CREATED:
-					if (message->FindString("name", &name) == B_OK) {
-						ref.device = device;
-						ref.directory = directory;
-						ref.set_name(name);
-						if (!_EntryInTrash(&ref))
+				case B_ENTRY_REMOVED:
+				{
+					entry_ref ref;
+					message->FindInt32("device", &ref.device);
+					message->FindInt64("directory", &ref.directory);
+
+					if (!_EntryInTrash(&ref)) {
+						if (opcode == B_ENTRY_CREATED)
 							fNewMessages++;
+						else
+							fNewMessages--;
 					}
 					break;
-				case B_ENTRY_REMOVED:
-					node_ref node;
-					node.device = device;
-					node.node = directory;
-					BDirectory dir(&node);
-					BEntry entry(&dir, NULL);
-					entry.GetRef(&ref);
-					if (!_EntryInTrash(&ref))
-						fNewMessages--;
-					break;
+				}
 			}
+
 			fStatus = fNewMessages > 0 ? kStatusNewMail : kStatusNoMail;
 			Invalidate();
 			break;
