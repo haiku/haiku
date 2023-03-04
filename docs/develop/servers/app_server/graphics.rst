@@ -269,7 +269,7 @@ The default cursors also use greyscale and alpha channel for antialiasing.
 Display Drivers
 ---------------
 
-Unlike the BeOS R5 app_server, Haiku' server has an extra abstraction layer between the graphic
+Unlike the BeOS R5 app_server, Haiku's server has an extra abstraction layer between the graphic
 driver and the main drawing functions. This allows to generalize the interface and redirect the
 drawing commands in various ways. For example, drawing commands can be redirected to another
 machine for the remote_app_server, or drawing for a specific window can be granted direct access
