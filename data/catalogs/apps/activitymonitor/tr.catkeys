@@ -7,7 +7,7 @@ Block cache memory	DataSource		Blok önbellek dosyası
 MiB	DataSource		MiB
 Media nodes	DataSource		Ortam düğümleri
 Text clipboard	DataSource		Metin panosu
-Network send	DataSource		Ağ göndermeleri
+Network send	DataSource		Ağ giden trafik
 Running applications	DataSource		Çalışan uygulamalar
 Cache	DataSource		Önbellek
 CPU usage (combined)	DataSource		CPU kullanımı (birleştirilmiş)
@@ -29,14 +29,14 @@ Quit	ActivityWindow		Çık
 Raw clipboard	DataSource		Ham pano
 Settings	ActivityWindow		Ayarlar
 Used memory	DataSource		Kullanılan bellek
-%.1f faults/s	DataSource		%.1f hata/s
+%.1f faults/s	DataSource		%.1f hata/sn
 Show legend	ActivityView		Göstergeleri aç
 Cached memory	DataSource		Önbellekteki dosya
 CPU %d usage	DataSource		%d. CPU kullanımı
 CPU %d speed	DataSource		%d. CPU hızı
 File	ActivityWindow		Dosya
 Ports	DataSource		Kapılar
-Page faults	DataSource		Sayfa hataları
+Page faults	DataSource		Sayfa hatası
 Apps	DataSource		Uygulamalar
 Additional items	ActivityView		Ek ögeler
 Add graph	ActivityWindow		Grafik ekle

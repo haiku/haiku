@@ -68,7 +68,7 @@ Panel text	Colors tab		Panel metni
 Hinting menu	AntialiasingSettingsView		Düzgünleştirme menüsü
 Scroll bar:	DecorSettingsView		Kaydırma çubuğu:
 Choose ControlLook	DecorSettingsView		Görünüm Denetimci seç
-Monospaced fonts only	AntialiasingSettingsView		Yalnızca sabit genişlikli yazıtipleri
+Monospaced fonts only	AntialiasingSettingsView		Yalnızca eş aralıklı yazıtipleri
 Document text	Colors tab		Belge metni
 Inactive window border	Colors tab		Etkin olmayan pencere kenarlığı
 Colors	APRWindow		Renkler

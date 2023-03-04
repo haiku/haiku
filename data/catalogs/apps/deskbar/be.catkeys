@@ -1,50 +1,49 @@
-1	belarusian	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Выключыць
-Sort applications by name	PreferencesWindow		Сартаваць прагамы па назвах
-Suspend	DeskbarMenu		Прыпыніць
-Hide clock	TimeView		Схаваць гадзіннік
-Applications	PreferencesWindow		Праграмы
-Time preferences…	TimeView		Наладкі Часу…
-About Haiku	DeskbarMenu		Пра Haiku
-Edit in Tracker…	PreferencesWindow		Рэдагаваць у Тракеры…
-Recent documents:	PreferencesWindow		Нядаўнія дакументы:
-Recent applications	DeskbarMenu		Нядаўнія праграмы
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Праграмы
-Find…	DeskbarMenu		Знайсці…
-Show clock	Tray		Паказаць гадзіннік
-Window	PreferencesWindow		Акно
-Defaults	PreferencesWindow		Прадвызначаныя
-Menu	PreferencesWindow		Меню
-Recent documents	DeskbarMenu		Нядаўнія дакументы
+1	belarusian	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Схаваць аўтаматычна
-Always on top	PreferencesWindow		Заўсёды наверсе
-<Deskbar folder is empty>	DeskbarMenu		<Папка Deskbar-у пустая>
 Show all	WindowMenu		Паказаць усё
-No windows	WindowMenu		Без вокнаў
-Deskbar	System name		Дэскбар
-Restart system	DeskbarMenu		Перазапусціць сістэму
+Edit in Tracker…	PreferencesWindow		Рэдагаваць у Тракеры…
+Menu	PreferencesWindow		Меню
+Tracker always first	PreferencesWindow		Трэкер заўсёды першы
+Hide clock	TimeView		Схаваць гадзіннік
 Large	PreferencesWindow		Вялікі
+<Deskbar folder is empty>	DeskbarMenu		<Папка Deskbar-у пустая>
+Recent documents	DeskbarMenu		Нядаўнія дакументы
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Праграмы
+Always on top	PreferencesWindow		Заўсёды наверсе
+Restart system	DeskbarMenu		Перазапусціць сістэму
+Recent documents:	PreferencesWindow		Нядаўнія дакументы:
 Auto-raise	PreferencesWindow		Узнікаць аўтаматычна
-Recent folders:	PreferencesWindow		Нядаўнія каталёгі:
-Show application expander	PreferencesWindow		Паказваць кнопку спісу праграм
+Mount	DeskbarMenu		Прымацаваць
+Icon size	PreferencesWindow		Памер значак
+About Haiku	DeskbarMenu		Пра Haiku
+Small	PreferencesWindow		Малы
+Show calendar…	TimeView		Паказаць календар…
+Find…	DeskbarMenu		Знайсці…
+Power off	DeskbarMenu		Выключыць
+Defaults	PreferencesWindow		Прадвызначаныя
+Show replicants	DeskbarMenu		Паказваць дупліканты
+No windows	WindowMenu		Без вокнаў
+Show clock	Tray		Паказаць гадзіннік
 Close all	WindowMenu		Закрыць усё
 Deskbar preferences	PreferencesWindow		Наладкі Deskbar
-Mount	DeskbarMenu		Прымацаваць
-Revert	PreferencesWindow		Вярнуць
-Small	PreferencesWindow		Малы
-Recent applications:	PreferencesWindow		Нядаўнія праграмы:
-Shutdown…	DeskbarMenu		Спыніць…
-Tracker always first	PreferencesWindow		Трэкер заўсёды першы
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Наладкі
-Recent folders	DeskbarMenu		Нядаўнія каталёгі
 About this system	DeskbarMenu		Пра гэтую сістэму
-Show calendar…	TimeView		Паказаць календар…
-Deskbar preferences…	DeskbarMenu		Наладкі Deskbar-у…
-Expand new applications	PreferencesWindow		Разгарнуць новыя праграмы
-Show replicants	DeskbarMenu		Паказваць дупліканты
-Hide application names	PreferencesWindow		Схаваць імёны праграм
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Прыклады
-Icon size	PreferencesWindow		Памер значак
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Праграмкі Дэсктопу
-Hide all	WindowMenu		Схаваць усё
 Quit application	WindowMenu		Выйсці з праграмы
+Hide application names	PreferencesWindow		Схаваць імёны праграм
+Applications	PreferencesWindow		Праграмы
+Show application expander	PreferencesWindow		Паказваць кнопку спісу праграм
+Deskbar preferences…	DeskbarMenu		Наладкі Deskbar-у…
+Suspend	DeskbarMenu		Прыпыніць
+Shutdown…	DeskbarMenu		Спыніць…
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Прыклады
+Expand new applications	PreferencesWindow		Разгарнуць новыя праграмы
+Recent applications:	PreferencesWindow		Нядаўнія праграмы:
+Recent folders:	PreferencesWindow		Нядаўнія каталёгі:
+Recent folders	DeskbarMenu		Нядаўнія каталёгі
+Recent applications	DeskbarMenu		Нядаўнія праграмы
+Hide all	WindowMenu		Схаваць усё
+Sort applications by name	PreferencesWindow		Сартаваць прагамы па назвах
+Revert	PreferencesWindow		Вярнуць
+Window	PreferencesWindow		Акно
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Наладкі
+Time preferences…	TimeView		Наладкі Часу…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Праграмкі Дэсктопу

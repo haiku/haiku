@@ -1,50 +1,49 @@
-1	romanian	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Oprire
-Sort applications by name	PreferencesWindow		Sortează aplicațiile după nume
-Suspend	DeskbarMenu		Suspendare
-Hide clock	TimeView		Ascunde ceasul
-Applications	PreferencesWindow		Aplicații
-Time preferences…	TimeView		Preferințe ceas…
-About Haiku	DeskbarMenu		Despre Haiku
-Edit in Tracker…	PreferencesWindow		Editare în Tracker…
-Recent documents:	PreferencesWindow		Documente recente:
-Recent applications	DeskbarMenu		Aplicații recente
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicații
-Find…	DeskbarMenu		Căutare…
-Show clock	Tray		Arată ceasul
-Window	PreferencesWindow		Fereastră
-Defaults	PreferencesWindow		Implicite
-Menu	PreferencesWindow		Meniu
-Recent documents	DeskbarMenu		Documente recente
+1	romanian	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Ascundere automată
-Always on top	PreferencesWindow		Întotdeauna deasupra
-<Deskbar folder is empty>	DeskbarMenu		<Deskbar folder is empty>
 Show all	WindowMenu		Afișează toate
-No windows	WindowMenu		Fără ferestre
-Deskbar	System name		Deskbar
-Restart system	DeskbarMenu		Repornire sistem
+Edit in Tracker…	PreferencesWindow		Editare în Tracker…
+Menu	PreferencesWindow		Meniu
+Tracker always first	PreferencesWindow		Tracker întotdeauna primul
+Hide clock	TimeView		Ascunde ceasul
 Large	PreferencesWindow		Mare
+<Deskbar folder is empty>	DeskbarMenu		<Deskbar folder is empty>
+Recent documents	DeskbarMenu		Documente recente
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicații
+Always on top	PreferencesWindow		Întotdeauna deasupra
+Restart system	DeskbarMenu		Repornire sistem
+Recent documents:	PreferencesWindow		Documente recente:
 Auto-raise	PreferencesWindow		Ridicare automată
-Recent folders:	PreferencesWindow		Dosare recente:
-Show application expander	PreferencesWindow		Arată extensorul de aplicație
+Mount	DeskbarMenu		Montare
+Icon size	PreferencesWindow		Dimensiune pictogramă
+About Haiku	DeskbarMenu		Despre Haiku
+Small	PreferencesWindow		Mic
+Show calendar…	TimeView		Arată calendarul…
+Find…	DeskbarMenu		Căutare…
+Power off	DeskbarMenu		Oprire
+Defaults	PreferencesWindow		Implicite
+Show replicants	DeskbarMenu		Arată replicanții
+No windows	WindowMenu		Fără ferestre
+Show clock	Tray		Arată ceasul
 Close all	WindowMenu		Închide toate
 Deskbar preferences	PreferencesWindow		Preferințe deskbar
-Mount	DeskbarMenu		Montare
-Revert	PreferencesWindow		Revenire
-Small	PreferencesWindow		Mic
-Recent applications:	PreferencesWindow		Aplicații recente:
-Shutdown…	DeskbarMenu		Oprire…
-Tracker always first	PreferencesWindow		Tracker întotdeauna primul
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferințe
-Recent folders	DeskbarMenu		Dosare recente
 About this system	DeskbarMenu		Despre acest sistem
-Show calendar…	TimeView		Arată calendarul…
-Deskbar preferences…	DeskbarMenu		Preferințe deskbar…
-Expand new applications	PreferencesWindow		Extinde aplicațiile noi
-Show replicants	DeskbarMenu		Arată replicanții
-Hide application names	PreferencesWindow		Ascunde numele aplicațiilor
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
-Icon size	PreferencesWindow		Dimensiune pictogramă
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Mini-aplicații desktop
-Hide all	WindowMenu		Ascunde toate
 Quit application	WindowMenu		Ieșire din aplicație
+Hide application names	PreferencesWindow		Ascunde numele aplicațiilor
+Applications	PreferencesWindow		Aplicații
+Show application expander	PreferencesWindow		Arată extensorul de aplicație
+Deskbar preferences…	DeskbarMenu		Preferințe deskbar…
+Suspend	DeskbarMenu		Suspendare
+Shutdown…	DeskbarMenu		Oprire…
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demos
+Expand new applications	PreferencesWindow		Extinde aplicațiile noi
+Recent applications:	PreferencesWindow		Aplicații recente:
+Recent folders:	PreferencesWindow		Dosare recente:
+Recent folders	DeskbarMenu		Dosare recente
+Recent applications	DeskbarMenu		Aplicații recente
+Hide all	WindowMenu		Ascunde toate
+Sort applications by name	PreferencesWindow		Sortează aplicațiile după nume
+Revert	PreferencesWindow		Revenire
+Window	PreferencesWindow		Fereastră
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferințe
+Time preferences…	TimeView		Preferințe ceas…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Mini-aplicații desktop

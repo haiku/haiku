@@ -1,4 +1,4 @@
-1	turkish	x-vnd.Haiku-WebPositive	861169737
+1	turkish	x-vnd.Haiku-WebPositive	951718264
 Authentication required	Authentication Panel		Kimlik doğrulaması gerekli
 Previous	WebPositive Window		Önceki
 (Finish: %date)	Download Window		(Bitiş: %date)
@@ -7,6 +7,7 @@ Download folder:	Settings Window		İndirmeler klasörü
 Close window	WebPositive Window		Pencereyi kapat
 Find:	WebPositive Window		Bul:
 Script console	WebPositive Window		Betik konsolu
+There was an error setting up the bookmark.	WebPositive Window		Yer imini ayarlarken bir hata oluştu.
 Fonts	Settings Window		Yazıtipleri
 Path	Cookie Manager		Yol
 Bookmarks	WebPositive Window		Yer imleri
@@ -19,6 +20,7 @@ Delete	Cookie Manager		Sil
 Open containing folder	Download Window		İndirildiği klasörü aç
 Find previous	WebPositive Window		Öncekini bul
 Full screen	WebPositive Window		Tam ekran
+Bookmark bar	WebPositive Window		Yer imleri çubuğu
 Downloads in progress	WebPositive		Süren indirmeler
 Copy URL to clipboard	Download Window		URL'yi panoya kopyala
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	%addedCount yer imini aynı anda açmak istediğinizden emin misiniz?
@@ -94,7 +96,7 @@ There was an error creating the bookmark file.\n\nError: %error	WebPositive Wind
 OK	Download Window		Tamam
 Proxy username:	Settings Window		Vekil kullanıcı adı:
 Manage bookmarks	WebPositive Window		Yer imlerini düzenle
-/s)	Download Window	...as in 'per second'	/s)
+/s)	Download Window	...as in 'per second'	/sn)
 Restart	Download Window		Yeniden başlat
 Serif font:	Settings Window		Serif yazıtipi:
 Apply	Settings Window		Uygula

@@ -15,7 +15,7 @@ CMY 8:8:8 32 bits	PPMTranslator		32 bit CMY 8:8:8
 OK	PPMMain		Tamam
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bit
 PPM image	PPMTranslator		PPM görseli
-Input color space:	PPMTranslator		Renk girdisi alanı:
+Input color space:	PPMTranslator		Girdi renk uzayı:
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bit yüksek son haneli
 RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bit yüksek son haneli
 Write ASCII	PPMTranslator		ASCII yaz

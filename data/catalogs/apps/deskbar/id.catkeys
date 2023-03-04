@@ -1,50 +1,49 @@
-1	indonesian	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Matikan
-Sort applications by name	PreferencesWindow		Urutkan aplikasi berdasarkan nama
-Suspend	DeskbarMenu		Menangguhkan
-Hide clock	TimeView		Sembunyikan jam
-Applications	PreferencesWindow		Aplikasi
-Time preferences…	TimeView		Preferensi waktu...
-About Haiku	DeskbarMenu		Tentang Haiku
-Edit in Tracker…	PreferencesWindow		Menyunting di Tracker…
-Recent documents:	PreferencesWindow		Dokumen terkini:
-Recent applications	DeskbarMenu		Aplikasi terkini
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikasi
-Find…	DeskbarMenu		Cari…
-Show clock	Tray		Tampilkan jam
-Window	PreferencesWindow		Jendela
-Defaults	PreferencesWindow		Konfigurasi standar
-Menu	PreferencesWindow		Menu
-Recent documents	DeskbarMenu		Dokumen terkini
+1	indonesian	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Sembunyi otomatis
-Always on top	PreferencesWindow		Selalu di atas
-<Deskbar folder is empty>	DeskbarMenu		<Folder deskbar kosong>
 Show all	WindowMenu		Tampilkan semua
-No windows	WindowMenu		Tidak ada jendela
-Deskbar	System name		Deskbar
-Restart system	DeskbarMenu		Mulai ulang sistem
+Edit in Tracker…	PreferencesWindow		Menyunting di Tracker…
+Menu	PreferencesWindow		Menu
+Tracker always first	PreferencesWindow		Tracker selalu pertama
+Hide clock	TimeView		Sembunyikan jam
 Large	PreferencesWindow		Besar
+<Deskbar folder is empty>	DeskbarMenu		<Folder deskbar kosong>
+Recent documents	DeskbarMenu		Dokumen terkini
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikasi
+Always on top	PreferencesWindow		Selalu di atas
+Restart system	DeskbarMenu		Mulai ulang sistem
+Recent documents:	PreferencesWindow		Dokumen terkini:
 Auto-raise	PreferencesWindow		Bangkitkan otomatis
-Recent folders:	PreferencesWindow		Folder terkini:
-Show application expander	PreferencesWindow		Tampilkan aplikasi pengembang
+Mount	DeskbarMenu		Pasang
+Icon size	PreferencesWindow		Ukuran ikon
+About Haiku	DeskbarMenu		Tentang Haiku
+Small	PreferencesWindow		Kecil
+Show calendar…	TimeView		Tampilkan kalender ...
+Find…	DeskbarMenu		Cari…
+Power off	DeskbarMenu		Matikan
+Defaults	PreferencesWindow		Konfigurasi standar
+Show replicants	DeskbarMenu		Tunjukkan replicants
+No windows	WindowMenu		Tidak ada jendela
+Show clock	Tray		Tampilkan jam
 Close all	WindowMenu		Tutup semua
 Deskbar preferences	PreferencesWindow		Preferensi deskbar
-Mount	DeskbarMenu		Pasang
-Revert	PreferencesWindow		Pulihkan
-Small	PreferencesWindow		Kecil
-Recent applications:	PreferencesWindow		Aplikasi terkini:
-Shutdown…	DeskbarMenu		Matikan…
-Tracker always first	PreferencesWindow		Tracker selalu pertama
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferensi
-Recent folders	DeskbarMenu		Folder terkini
 About this system	DeskbarMenu		Tentang sistem ini
-Show calendar…	TimeView		Tampilkan kalender ...
-Deskbar preferences…	DeskbarMenu		Preferensi deskbar…
-Expand new applications	PreferencesWindow		Memperluas aplikasi baru
-Show replicants	DeskbarMenu		Tunjukkan replicants
-Hide application names	PreferencesWindow		Sembunyikan nama-nama aplikasi
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demo-demo
-Icon size	PreferencesWindow		Ukuran ikon
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applet desktop
-Hide all	WindowMenu		Sembunyikan semua
 Quit application	WindowMenu		Keluar dari aplikasi
+Hide application names	PreferencesWindow		Sembunyikan nama-nama aplikasi
+Applications	PreferencesWindow		Aplikasi
+Show application expander	PreferencesWindow		Tampilkan aplikasi pengembang
+Deskbar preferences…	DeskbarMenu		Preferensi deskbar…
+Suspend	DeskbarMenu		Menangguhkan
+Shutdown…	DeskbarMenu		Matikan…
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demo-demo
+Expand new applications	PreferencesWindow		Memperluas aplikasi baru
+Recent applications:	PreferencesWindow		Aplikasi terkini:
+Recent folders:	PreferencesWindow		Folder terkini:
+Recent folders	DeskbarMenu		Folder terkini
+Recent applications	DeskbarMenu		Aplikasi terkini
+Hide all	WindowMenu		Sembunyikan semua
+Sort applications by name	PreferencesWindow		Urutkan aplikasi berdasarkan nama
+Revert	PreferencesWindow		Pulihkan
+Window	PreferencesWindow		Jendela
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferensi
+Time preferences…	TimeView		Preferensi waktu...
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Applet desktop

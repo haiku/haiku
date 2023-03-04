@@ -1,50 +1,49 @@
-1	turkish	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Kapat
-Sort applications by name	PreferencesWindow		Uygulamaları ada göre sırala
-Suspend	DeskbarMenu		Askıya al
-Hide clock	TimeView		Saati gizle
-Applications	PreferencesWindow		Uygulamalar
-Time preferences…	TimeView		Tarih ve Saat tercihleri…
-About Haiku	DeskbarMenu		Haiku hakkında
-Edit in Tracker…	PreferencesWindow		İzleyici'de düzenle…
-Recent documents:	PreferencesWindow		Son kullanılan belgeler:
-Recent applications	DeskbarMenu		Son kullanılan uygulamalar
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Uygulamalar
-Find…	DeskbarMenu		Bul…
-Show clock	Tray		Saati göster
-Window	PreferencesWindow		Pencere
-Defaults	PreferencesWindow		Öntanımlılar
-Menu	PreferencesWindow		Menü
-Recent documents	DeskbarMenu		Son kullanılan belgeler
+1	turkish	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Kendiliğinden gizle
-Always on top	PreferencesWindow		Her zaman üstte
-<Deskbar folder is empty>	DeskbarMenu		<Masaüstü Çubuğu klasörü boş>
 Show all	WindowMenu		Tümünü göster
-No windows	WindowMenu		Pencere yok
-Deskbar	System name		Masaüstü Çubuğu
-Restart system	DeskbarMenu		Yeniden başlat
+Edit in Tracker…	PreferencesWindow		İzleyici'de düzenle…
+Menu	PreferencesWindow		Menü
+Tracker always first	PreferencesWindow		İzleyici her zaman ilk sırada
+Hide clock	TimeView		Saati gizle
 Large	PreferencesWindow		Büyük
+<Deskbar folder is empty>	DeskbarMenu		<Masaüstü Çubuğu klasörü boş>
+Recent documents	DeskbarMenu		Son kullanılan belgeler
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Uygulamalar
+Always on top	PreferencesWindow		Her zaman üstte
+Restart system	DeskbarMenu		Yeniden başlat
+Recent documents:	PreferencesWindow		Son kullanılan belgeler:
 Auto-raise	PreferencesWindow		Kendiliğinden öne getir
-Recent folders:	PreferencesWindow		Son kullanılan klasörler:
-Show application expander	PreferencesWindow		Uygulama genişleticisini göster
+Mount	DeskbarMenu		Bağla
+Icon size	PreferencesWindow		Simge boyutu
+About Haiku	DeskbarMenu		Haiku hakkında
+Small	PreferencesWindow		Küçük
+Show calendar…	TimeView		Takvimi göster…
+Find…	DeskbarMenu		Bul…
+Power off	DeskbarMenu		Kapat
+Defaults	PreferencesWindow		Öntanımlılar
+Show replicants	DeskbarMenu		Yinelenenleri göster
+No windows	WindowMenu		Pencere yok
+Show clock	Tray		Saati göster
 Close all	WindowMenu		Tümünü kapat
 Deskbar preferences	PreferencesWindow		Masaüstü Çubuğu tercihleri
-Mount	DeskbarMenu		Bağla
-Revert	PreferencesWindow		Eski haline döndür
-Small	PreferencesWindow		Küçük
-Recent applications:	PreferencesWindow		Son kullanılan uygulamalar:
-Shutdown…	DeskbarMenu		Bilgisayarı kapat…
-Tracker always first	PreferencesWindow		İzleyici her zaman ilk sırada
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Tercihler
-Recent folders	DeskbarMenu		Son kullanılan klasörler
 About this system	DeskbarMenu		Bu sistem hakkında
-Show calendar…	TimeView		Takvimi göster…
-Deskbar preferences…	DeskbarMenu		Masaüstü Çubuğu tercihleri…
-Expand new applications	PreferencesWindow		Yeni uygulamaları genişlet
-Show replicants	DeskbarMenu		Yinelenenleri göster
-Hide application names	PreferencesWindow		Uygulama adlarını gizle
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demolar
-Icon size	PreferencesWindow		Simge boyutu
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Masaüstü uygulamacıkları
-Hide all	WindowMenu		Tümünü gizle
 Quit application	WindowMenu		Uygulamadan çık
+Hide application names	PreferencesWindow		Uygulama adlarını gizle
+Applications	PreferencesWindow		Uygulamalar
+Show application expander	PreferencesWindow		Uygulama genişleticisini göster
+Deskbar preferences…	DeskbarMenu		Masaüstü Çubuğu tercihleri…
+Suspend	DeskbarMenu		Askıya al
+Shutdown…	DeskbarMenu		Bilgisayarı kapat…
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demolar
+Expand new applications	PreferencesWindow		Yeni uygulamaları genişlet
+Recent applications:	PreferencesWindow		Son kullanılan uygulamalar:
+Recent folders:	PreferencesWindow		Son kullanılan klasörler:
+Recent folders	DeskbarMenu		Son kullanılan klasörler
+Recent applications	DeskbarMenu		Son kullanılan uygulamalar
+Hide all	WindowMenu		Tümünü gizle
+Sort applications by name	PreferencesWindow		Uygulamaları ada göre sırala
+Revert	PreferencesWindow		Eski haline döndür
+Window	PreferencesWindow		Pencere
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Tercihler
+Time preferences…	TimeView		Tarih ve Saat tercihleri…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Masaüstü uygulamacıkları

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	3017699344
+1	hungarian	x-vnd.Haiku-Terminal	4000370057
 Close other tabs	Terminal TermWindow		Többi lap bezárása
 Insert path	Terminal TermView		Útvonal beszúrása
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Sajnos, a terminálnak nem sikerült elindítani a shellt.
@@ -8,12 +8,14 @@ Edit	Terminal TermWindow		Szerkesztés
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		-h, --helpez a súgó\n-t, --titleablak címének megadása\n-f, --fullscreenindítás teljesképernyős módban\n-w, --working-directoryindítási mappa megadása\n
 Select all	Terminal TermWindow		Összes kijelölése
 Confirm exit if active programs exist	Terminal AppearancePrefView		Kilépés megerősítése ha van futó program
+Color scheme:	Terminal ThemeView		Színséma:
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tA jelenlegi folyamat munka mappája az aktuális fülön.\n\t\t\tOpcionálisan megadható a maximális útvonal-elemek száma.\n\t\t\tPéldául '%2d' a legutolsó kettő elem.\n\t%T\t-\tA Terminal neve az aktuális nyelven.\n\t%e\t-\tA jelenlegi fül kódolása. UTF-8 esetén nem látszik.\n\t%i\t-\tAz ablak sorszáma.\n\t%p\t-\tAz aktív folyamat neve az aktuális fülön.\n\t%t\t-\tA jelenlegi fül címe.
 Copy	Terminal TermWindow		Másolás
 Edit tab title…	Terminal TermWindow		Lap címének szerkesztése…
 Print	Terminal TermWindow		Nyomtatás
 Settings	Terminal TermWindow		Beállítások
 %app% settings	Terminal PrefWindow	window title	%app% beállítások
+ANSI bright black color	Terminal ThemeView		ANSI fényes fekete
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tAz aktív folyamat jelenlegi mappája..\n\t\t\tA maximális szint megadása az útvonalhoz.\n\t\t\tPéldául '%2d' legfeljebb két szinthez.\n\t%i\t-\tA fül sorszáma.\n\t%e\t-\tAz aktuális fül kódolása. UTF-8-nál nem jelenik meg.\n\t%p\t-\tAz aktív folyamat neve.
 Use default	Terminal SetTitleWindow		Alapérték használata
 Close tab	Terminal TermWindow		Lap bezárása
@@ -23,20 +25,27 @@ Appearance	Terminal PrefWindow		Megjelenés
 Set tab title	Terminal TermWindow		Lap címének beállítása
 Create link here	Terminal TermView		Hivatkozás létrehozása
 Encoding:	Terminal AppearancePrefView		Kódolás:
+yellow	Terminal ThemeView		sárga
 Change directory	Terminal TermView		Mappa váltása
 Custom	Terminal AppearancePrefView	Window size	Egyéni
 Page setup…	Terminal TermWindow		Oldalbeállítás…
+ANSI yellow color	Terminal ThemeView		ANSI sárga
 Cancel	Terminal TermView		Mégse
 Defaults	Terminal PrefWindow		Alapértékek
+black	Terminal ThemeView		fekete
 Revert	Terminal PrefWindow		Visszavonás
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminál
 Use selection	Terminal FindWindow		Kijelölés használata
 Find next	Terminal TermWindow		Következő keresése
 Copy link location	Terminal TermView		Hivatkozás másolása
+Background	Terminal ThemeView		Háttér
 Window title:	Terminal AppearancePrefView		Ablak címe:
 New tab	Terminal TermWindow		Új lap
+magenta	Terminal ThemeView		magenta
 Allow bold text	Terminal AppearancePrefView		Félkövér betűk engedélyezése
 Window title…	Terminal TermWindow		Ablak címe…
+ANSI blue color	Terminal ThemeView		ANSI kék
+blue	Terminal ThemeView		kék
 Open path	Terminal TermView		Útvonal megnyitása
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Nem sikerült lefuttatni:\" %command\":\n\t%error
 Terminal	System name		Terminál
@@ -44,6 +53,7 @@ Custom	Terminal colors scheme		Egyéni
 Really close?	Terminal TermWindow		Biztos bezárod?
 Font size	Terminal TermWindow		Betűméret
 OK	Terminal TermApp		Rendben
+ANSI bright blue color	Terminal ThemeView		ANSI fényes kék
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		A \"%1\" folyamat még fut.\nHa bezárja a Terminált, a folyamat megszakad.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Ismeretlen beállítás: \"%s\"\n
 Tab title:	Terminal AppearancePrefView		Lap címe:
@@ -57,16 +67,23 @@ Find previous	Terminal TermWindow		Előző keresése
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Minta alapján megadható a fül cím. Az alábbi behelyettesítések \nhasználhatóak:
 Close	Terminal TermWindow		Bezárás
 Save to file…	Terminal PrefWindow		Mentés fájlba…
+Defaults	Terminal ThemeWindow		Alapérték
 Copy path	Terminal TermView		Útvonal másolása
 Window size	Terminal TermWindow		Ablak mérete
+Selected text	Terminal ThemeView		Kijelölt szöveg
 Copy absolute path	Terminal TermView		Teljes útvonal másolása
 Cancel	Terminal TermWindow		Mégse
+ANSI cyan color	Terminal ThemeView		ANSI cián
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		A \"%1\" folyamat még fut.\nHa bezárja a lapot, a folyamat megszakad.
 Full screen	Terminal TermWindow		Teljes képernyő
 Shell 	Terminal TermWindow		Shell
+Revert	Terminal ThemeWindow		Visszavon
+ANSI green color	Terminal ThemeView		ANSI zöld
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t'%' karakter.\n\t%<\t-\tEgy szakasz kezdete, ami akkor jelenik meg, ha az utána lévő helykitöltő nem üres.\n\t%>\t-\tEgy szakasz kezdete, ami akkor jelenik meg, ha az előző %< szakasz és a jelenlegi nem üres.\n\t%-\t-\tEgy %< vagy %> szakasz vége.\n\n Bármi más karakter a '%' jel és a formázási karakter között csak egy szóközt fog beilleszteni,\n ha a helykitöltő értéke nem üres. A %< szakaszhoz kerül hozzáadásra.
+ANSI bright cyan color	Terminal ThemeView		ANSI fényes cián
 Tab title:	Terminal TermWindow		Lap címe:
 Window title:	Terminal TermWindow		Ablak címe:
+ANSI white color	Terminal ThemeView		ANSI fehér
 Window size:	Terminal AppearancePrefView		Ablak mérete:
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Decrease	Terminal TermWindow		Csökkentés
@@ -76,27 +93,45 @@ Blinking cursor	Terminal AppearancePrefView		Villogó kurzor
 Use text:	Terminal FindWindow		Szöveg használata:
 Close active tab	Terminal TermWindow		Aktív lap bezárása
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Az ablak címét meghatározó minta. A következő kódok\nhasználhatóak:\n
+Selected background	Terminal ThemeView		Kijelölés háttere
 Save as default	Terminal TermWindow		Beállítás alapértelmezettként
 Nothing is selected.	Terminal TermWindow		Nincs semmi kijelölve.
+ANSI bright red color	Terminal ThemeView		ANSI fényes piros
 Use left Option as Meta key	Terminal AppearancePrefView		Bal Opció használata Meta-billentyűnek
 Find	Terminal FindWindow		Keresés
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		A jelenlegi lap címét meghatározó minta. A következő kódok \nhasználhatóak:\n
+Save to file…	Terminal ThemeWindow		Mentés fájlba…
 Font:	Terminal AppearancePrefView		Betűtípus:
 Paste	Terminal TermWindow		Beillesztés
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Minta alapján megadható az ablak cím. Az alábbi behelyettesítések \nhasználhatóak:
+ANSI bright magenta color	Terminal ThemeView		ANSI fényes magenta
 Copy here	Terminal TermView		Másolás
 Use default shell	Terminal Shell		Alapértelmezett shell használata
+red	Terminal ThemeView		piros
+white	Terminal ThemeView		fehér
 Open link	Terminal TermView		Hivatkozás megnyitása
+Text	Terminal ThemeView		Szöveg
+ANSI bright yellow color	Terminal ThemeView		ANSI fényes sárga
 Not found.	Terminal TermWindow		Nem található.
+ANSI black color	Terminal ThemeView		ANSI fekete
 Find…	Terminal TermWindow		Keresés…
 No search string was entered.	Terminal TermWindow		Nincs beírva keresendő szöveg
 Move here	Terminal TermView		Mozgatás
 Abort	Terminal Shell		Megszakítás
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Ezek a folyamatok még futnak: \n\n\t%1\n\nHa bezárja a Terminált, a folyamatok megszakadnak.
 Set window title	Terminal TermWindow		Ablak címének beállítása
+ANSI red color	Terminal ThemeView		ANSI piros
 Increase	Terminal TermWindow		Növelés
+green	Terminal ThemeView		zöld
+ANSI bright green color	Terminal ThemeView		ANSI fényes zöld
 OK	Terminal TermWindow		Rendben
+Text under cursor	Terminal ThemeView		Kurzor alatti szöveg
+ANSI bright white color	Terminal ThemeView		ANSI fényes fehér
 Close window	Terminal TermWindow		Ablak bezárása
+ANSI magenta color	Terminal ThemeView		ANSI magenta
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminál\n© 2001-2019 Haiku, Inc.\n© 1999 Kazuho Okui és Takashi Murai.\n\nHasználat: %s [OPCIÓ] [RENDSZERHÉJ]\n
+cyan	Terminal ThemeView		cián
+Colors	System name		Színek
 Clear all	Terminal TermWindow		Összes törlése
+Cursor	Terminal ThemeView		Kurzor
 Search forward	Terminal FindWindow		Keresés előre

@@ -1,50 +1,49 @@
-1	japanese	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		電源を切る
-Sort applications by name	PreferencesWindow		アプリケーションを名前順に並び替える
-Suspend	DeskbarMenu		サスペンド
-Hide clock	TimeView		時計を隠す
-Applications	PreferencesWindow		アプリケーション
-Time preferences…	TimeView		日付と時刻の設定...
-About Haiku	DeskbarMenu		Haiku について
-Edit in Tracker…	PreferencesWindow		Tracker で編集...
-Recent documents:	PreferencesWindow		最近使ったドキュメント:
-Recent applications	DeskbarMenu		最近使ったアプリケーション
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		アプリケーション
-Find…	DeskbarMenu		検索...
-Show clock	Tray		時計の表示
-Window	PreferencesWindow		ウィンドウ
-Defaults	PreferencesWindow		デフォルト値
-Menu	PreferencesWindow		メニュー
-Recent documents	DeskbarMenu		最近使ったドキュメント
+1	japanese	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		自動的に隠す
-Always on top	PreferencesWindow		常に最前面
-<Deskbar folder is empty>	DeskbarMenu		<Deskbar フォルダーは空です>
 Show all	WindowMenu		すべて表示
-No windows	WindowMenu		ウィンドウ無し
-Deskbar	System name		Deskbar
-Restart system	DeskbarMenu		再起動
+Edit in Tracker…	PreferencesWindow		Tracker で編集...
+Menu	PreferencesWindow		メニュー
+Tracker always first	PreferencesWindow		Tracker を常時先頭に表示
+Hide clock	TimeView		時計を隠す
 Large	PreferencesWindow		大
+<Deskbar folder is empty>	DeskbarMenu		<Deskbar フォルダーは空です>
+Recent documents	DeskbarMenu		最近使ったドキュメント
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		アプリケーション
+Always on top	PreferencesWindow		常に最前面
+Restart system	DeskbarMenu		再起動
+Recent documents:	PreferencesWindow		最近使ったドキュメント:
 Auto-raise	PreferencesWindow		マウスオーバーで手前に
-Recent folders:	PreferencesWindow		最近使ったフォルダー:
-Show application expander	PreferencesWindow		エキスパンダーの表示
+Mount	DeskbarMenu		マウント
+Icon size	PreferencesWindow		アイコンサイズ
+About Haiku	DeskbarMenu		Haiku について
+Small	PreferencesWindow		小
+Show calendar…	TimeView		カレンダーの表示...
+Find…	DeskbarMenu		検索...
+Power off	DeskbarMenu		電源を切る
+Defaults	PreferencesWindow		デフォルト値
+Show replicants	DeskbarMenu		レプリカントの表示
+No windows	WindowMenu		ウィンドウ無し
+Show clock	Tray		時計の表示
 Close all	WindowMenu		すべて閉じる
 Deskbar preferences	PreferencesWindow		Deskbar の設定
-Mount	DeskbarMenu		マウント
-Revert	PreferencesWindow		戻す
-Small	PreferencesWindow		小
-Recent applications:	PreferencesWindow		最近使ったアプリケーション:
-Shutdown…	DeskbarMenu		シャットダウン...
-Tracker always first	PreferencesWindow		Tracker を常時先頭に表示
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		環境設定
-Recent folders	DeskbarMenu		最近使ったフォルダー
 About this system	DeskbarMenu		このシステムについて
-Show calendar…	TimeView		カレンダーの表示...
-Deskbar preferences…	DeskbarMenu		Deskbar の設定...
-Expand new applications	PreferencesWindow		新しいアプリケーションを展開表示
-Show replicants	DeskbarMenu		レプリカントの表示
-Hide application names	PreferencesWindow		アプリケーション名を隠す
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		デモ
-Icon size	PreferencesWindow		アイコンサイズ
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		デスクトップアプレット
-Hide all	WindowMenu		すべて隠す
 Quit application	WindowMenu		アプリケーションの終了
+Hide application names	PreferencesWindow		アプリケーション名を隠す
+Applications	PreferencesWindow		アプリケーション
+Show application expander	PreferencesWindow		エキスパンダーの表示
+Deskbar preferences…	DeskbarMenu		Deskbar の設定...
+Suspend	DeskbarMenu		サスペンド
+Shutdown…	DeskbarMenu		シャットダウン...
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		デモ
+Expand new applications	PreferencesWindow		新しいアプリケーションを展開表示
+Recent applications:	PreferencesWindow		最近使ったアプリケーション:
+Recent folders:	PreferencesWindow		最近使ったフォルダー:
+Recent folders	DeskbarMenu		最近使ったフォルダー
+Recent applications	DeskbarMenu		最近使ったアプリケーション
+Hide all	WindowMenu		すべて隠す
+Sort applications by name	PreferencesWindow		アプリケーションを名前順に並び替える
+Revert	PreferencesWindow		戻す
+Window	PreferencesWindow		ウィンドウ
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		環境設定
+Time preferences…	TimeView		日付と時刻の設定...
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		デスクトップアプレット

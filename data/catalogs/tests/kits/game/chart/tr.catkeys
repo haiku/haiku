@@ -9,7 +9,7 @@ Blue	ChartWindow		Mavi
 Colors	ChartWindow		Renkler
 Novas	ChartWindow		Birden parlayan yıldız
 LineArray	ChartWindow		LineArray
- 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 f/s  (logaritmik ölçü)
+ 0.6 f/s  (logarythmic scale)	ChartWindow		 0.6 k/sn  (logaritmik ölçü)
 Free motion	ChartWindow		Serbest hareket
 (high) 100% 	ChartWindow		(yüksek) %100 
 Green	ChartWindow		Yeşil
@@ -26,13 +26,13 @@ Fast motion	ChartWindow		Hızlı hareket
 Special	ChartWindow		Özel
 Status	ChartWindow		Durum
 Star density	ChartWindow		Yıldız yoğunluğu
-600.0 f/s	ChartWindow		600.0 f/s
+600.0 f/s	ChartWindow		600.0 k/sn
 Display:	ChartWindow		Ekran
 Space color	ChartWindow		Renk uzayı
 White	ChartWindow		Beyaz
 Chart	System name		Grafik
 Animation:	ChartWindow		Canlandırma:
-Frames/s	ChartWindow		Kare/s
+Frames/s	ChartWindow		Kare/sn
 Auto demo	ChartWindow		Otomatik demo
 CPU load	ChartWindow		İşlemci yükü
 DrawBitmap	ChartWindow		DrawBitmap

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	861169737
+1	hungarian	x-vnd.Haiku-WebPositive	951718264
 Authentication required	Authentication Panel		Azonosítás szükséges
 Previous	WebPositive Window		Előző
 (Finish: %date)	Download Window		(Befejezés: %date)
@@ -7,6 +7,7 @@ Download folder:	Settings Window		Letöltések mappája:
 Close window	WebPositive Window		Ablak bezárása
 Find:	WebPositive Window		Keres:
 Script console	WebPositive Window		Script konzol
+There was an error setting up the bookmark.	WebPositive Window		Hiba történt a könyvjelző mentésekor.
 Fonts	Settings Window		Betűtípusok
 Path	Cookie Manager		Elérési út
 Bookmarks	WebPositive Window		Könyvjelzők
@@ -19,6 +20,7 @@ Delete	Cookie Manager		Töröl
 Open containing folder	Download Window		Tartalmazó mappa megnyitása
 Find previous	WebPositive Window		Előző találat
 Full screen	WebPositive Window		Teljes képernyő
+Bookmark bar	WebPositive Window		Könyvjelző sáv
 Downloads in progress	WebPositive		Folyamatban lévő letöltések
 Copy URL to clipboard	Download Window		URL vágólapra másolása
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Biztosan meg szeretnél nyitni %addedCount könyvjelzőt?

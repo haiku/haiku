@@ -11,7 +11,7 @@ Open…	ImageWindow		Aç…
 Save feature not implemented yet.	ImageWindow		Kaydetme özelliği henüz işlevsel değil.
 Active Translators	ImageWindow		Etkin çevirmenler
 Info	ImageWindow		Bilgi
-Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Görsel: %1\nRenk alanı: %2 (%3)\nBoyutlar: %4 x %5\nSatır başına bit Sayısı: %6\nToplam bit: %7\n\nTanımlama bilgisi:\nDizi numarası: %8\nMIME türü: %9\nTür: '%10' (%11)\nÇevirmen numarası: %12\nGrup: '%13' (%14)\nKalite: %15\nKabiliyet: %16\n\nGenişletme bilgisi:\n
+Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal Bytes: %7\n\nIdentify Info:\nID String: %8\nMIME Type: %9\nType: '%10' (%11)\nTranslator ID: %12\nGroup: '%13' (%14)\nQuality: %15\nCapability: %16\n\nExtension Info:\n	ImageView		Görsel: %1\nRenk uzayı: %2 (%3)\nBoyutlar: %4 x %5\nSatır başına bayt sayısı: %6\nToplam bayt: %7\n\nTanımlama bilgisi:\nKimlik dizisi: %8\nMIME türü: %9\nTür: '%10' (%11)\nÇevirmen numarası: %12\nGrup: '%13' (%14)\nKalite: %15\nYetenek: %16\n\nGenişletme bilgisi:\n
 No image available to save.	ImageWindow		Kaydedilebilecek bir görsel yok.
 OK	ImageView		Tamam
 Bummer	ImageWindow		Hay aksi

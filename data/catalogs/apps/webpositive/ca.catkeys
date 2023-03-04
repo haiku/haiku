@@ -1,4 +1,4 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	861169737
+1	catalan; valencian	x-vnd.Haiku-WebPositive	951718264
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
 (Finish: %date)	Download Window		(Acabament: %date)
@@ -7,6 +7,7 @@ Download folder:	Settings Window		Carpeta de baixada:
 Close window	WebPositive Window		Tanca la finestra
 Find:	WebPositive Window		Troba:
 Script console	WebPositive Window		Script de consola
+There was an error setting up the bookmark.	WebPositive Window		Hi ha hagut un error en configurar l'adreça d'interès.
 Fonts	Settings Window		Lletres
 Path	Cookie Manager		Camí
 Bookmarks	WebPositive Window		Adreces d'interès
@@ -19,6 +20,7 @@ Delete	Cookie Manager		Suprimeix
 Open containing folder	Download Window		Obre la carpeta que ho conté
 Find previous	WebPositive Window		Troba'n l'anterior
 Full screen	WebPositive Window		Pantalla completa
+Bookmark bar	WebPositive Window		Barra d'adreces d'interès
 Downloads in progress	WebPositive		Baixada en progrés
 Copy URL to clipboard	Download Window		Copia l'URL al porta-retalls
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Voleu obrir %addedCount adreces d'interès alhora?

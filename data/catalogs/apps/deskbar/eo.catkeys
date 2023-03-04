@@ -1,50 +1,49 @@
-1	esperanto	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Malŝalti
-Sort applications by name	PreferencesWindow		Ordigi programojn laŭnome
-Suspend	DeskbarMenu		Halteti
-Hide clock	TimeView		Kaŝi la horloĝon
-Applications	PreferencesWindow		Programoj
-Time preferences…	TimeView		Agordo de tempo…
-About Haiku	DeskbarMenu		Pri Haiku
-Edit in Tracker…	PreferencesWindow		Redakti per Spurilo…
-Recent documents:	PreferencesWindow		Ĵusaj dokumentoj:
-Recent applications	DeskbarMenu		Ĵusaj programoj
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programoj
-Find…	DeskbarMenu		Serĉi…
-Show clock	Tray		Montri la horloĝon
-Window	PreferencesWindow		Fenestro
-Defaults	PreferencesWindow		Defaŭltoj
-Menu	PreferencesWindow		Menuo
-Recent documents	DeskbarMenu		Ĵusaj dokumentoj
+1	esperanto	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Aŭtomate kaŝi
-Always on top	PreferencesWindow		Ĉiam videbla
-<Deskbar folder is empty>	DeskbarMenu		<Dosierujo de Laborstrio malplenas>
 Show all	WindowMenu		Montri ĉiujn
-No windows	WindowMenu		Neniu fenestro
-Deskbar	System name		Laborstrio
-Restart system	DeskbarMenu		Restartigi la sistemon
+Edit in Tracker…	PreferencesWindow		Redakti per Spurilo…
+Menu	PreferencesWindow		Menuo
+Tracker always first	PreferencesWindow		Spurilo ĉiam unua
+Hide clock	TimeView		Kaŝi la horloĝon
 Large	PreferencesWindow		Granda
+<Deskbar folder is empty>	DeskbarMenu		<Dosierujo de Laborstrio malplenas>
+Recent documents	DeskbarMenu		Ĵusaj dokumentoj
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Programoj
+Always on top	PreferencesWindow		Ĉiam videbla
+Restart system	DeskbarMenu		Restartigi la sistemon
+Recent documents:	PreferencesWindow		Ĵusaj dokumentoj:
 Auto-raise	PreferencesWindow		Aŭtomate antaŭigi
-Recent folders:	PreferencesWindow		Ĵusaj dosierujoj:
-Show application expander	PreferencesWindow		Montri liston de programaj fenestroj
+Mount	DeskbarMenu		Surmeti
+Icon size	PreferencesWindow		Piktograma grando
+About Haiku	DeskbarMenu		Pri Haiku
+Small	PreferencesWindow		Malgranda
+Show calendar…	TimeView		Montri kalendaron…
+Find…	DeskbarMenu		Serĉi…
+Power off	DeskbarMenu		Malŝalti
+Defaults	PreferencesWindow		Defaŭltoj
+Show replicants	DeskbarMenu		Montri replikilojn
+No windows	WindowMenu		Neniu fenestro
+Show clock	Tray		Montri la horloĝon
 Close all	WindowMenu		Fermi ĉiujn
 Deskbar preferences	PreferencesWindow		Agordoj de Laborstrio
-Mount	DeskbarMenu		Surmeti
-Revert	PreferencesWindow		Malfari
-Small	PreferencesWindow		Malgranda
-Recent applications:	PreferencesWindow		Ĵusaj programoj:
-Shutdown…	DeskbarMenu		Ĉesi laboron…
-Tracker always first	PreferencesWindow		Spurilo ĉiam unua
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Agordo
-Recent folders	DeskbarMenu		Ĵusaj dosierujoj
 About this system	DeskbarMenu		Pri ĉi tiu sistemo
-Show calendar…	TimeView		Montri kalendaron…
-Deskbar preferences…	DeskbarMenu		Agordi Laborstrion…
-Expand new applications	PreferencesWindow		Disvolvi la liston dum lanĉo
-Show replicants	DeskbarMenu		Montri replikilojn
-Hide application names	PreferencesWindow		Kaŝi nomojn de programoj
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demonstraĵoj
-Icon size	PreferencesWindow		Piktograma grando
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Labortablaj aplikaĵetoj
-Hide all	WindowMenu		Kaŝi ĉiujn
 Quit application	WindowMenu		Ĉesi la programon
+Hide application names	PreferencesWindow		Kaŝi nomojn de programoj
+Applications	PreferencesWindow		Programoj
+Show application expander	PreferencesWindow		Montri liston de programaj fenestroj
+Deskbar preferences…	DeskbarMenu		Agordi Laborstrion…
+Suspend	DeskbarMenu		Halteti
+Shutdown…	DeskbarMenu		Ĉesi laboron…
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demonstraĵoj
+Expand new applications	PreferencesWindow		Disvolvi la liston dum lanĉo
+Recent applications:	PreferencesWindow		Ĵusaj programoj:
+Recent folders:	PreferencesWindow		Ĵusaj dosierujoj:
+Recent folders	DeskbarMenu		Ĵusaj dosierujoj
+Recent applications	DeskbarMenu		Ĵusaj programoj
+Hide all	WindowMenu		Kaŝi ĉiujn
+Sort applications by name	PreferencesWindow		Ordigi programojn laŭnome
+Revert	PreferencesWindow		Malfari
+Window	PreferencesWindow		Fenestro
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Agordo
+Time preferences…	TimeView		Agordo de tempo…
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Labortablaj aplikaĵetoj

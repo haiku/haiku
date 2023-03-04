@@ -1,50 +1,49 @@
-1	finnish	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		Sammuta virta
-Sort applications by name	PreferencesWindow		Lajittele sovellukset nimen perusteella
-Suspend	DeskbarMenu		Keskeytystila
-Hide clock	TimeView		Piilota kello
-Applications	PreferencesWindow		Sovellukset
-Time preferences…	TimeView		Aika-asetukset...
-About Haiku	DeskbarMenu		Haikusta
-Edit in Tracker…	PreferencesWindow		Muokkaa Seuraajassa…
-Recent documents:	PreferencesWindow		Äskettäiset asiakirjat:
-Recent applications	DeskbarMenu		Äskettäiset sovellukset
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		Sovellukset
-Find…	DeskbarMenu		Etsi...
-Show clock	Tray		Näytä kello
-Window	PreferencesWindow		Ikkuna
-Defaults	PreferencesWindow		Oletukset
-Menu	PreferencesWindow		Valikko
-Recent documents	DeskbarMenu		Äskettäiset asiakirjat
+1	finnish	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		Piilota automaattisesti
-Always on top	PreferencesWindow		Aina päällimmäisenä
-<Deskbar folder is empty>	DeskbarMenu		<Työpöytäpalkkikansio on tyhjä>
 Show all	WindowMenu		Näytä kaikki
-No windows	WindowMenu		Ei ikkunoita
-Deskbar	System name		Työpöytäpalkki
-Restart system	DeskbarMenu		Käynnistä järjestelmä uudelleen
+Edit in Tracker…	PreferencesWindow		Muokkaa Seuraajassa…
+Menu	PreferencesWindow		Valikko
+Tracker always first	PreferencesWindow		Seuraaja aina ensimmäisenä
+Hide clock	TimeView		Piilota kello
 Large	PreferencesWindow		Suuri
+<Deskbar folder is empty>	DeskbarMenu		<Työpöytäpalkkikansio on tyhjä>
+Recent documents	DeskbarMenu		Äskettäiset asiakirjat
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		Sovellukset
+Always on top	PreferencesWindow		Aina päällimmäisenä
+Restart system	DeskbarMenu		Käynnistä järjestelmä uudelleen
+Recent documents:	PreferencesWindow		Äskettäiset asiakirjat:
 Auto-raise	PreferencesWindow		Nosta automaattisesti
-Recent folders:	PreferencesWindow		Äskettäiset kansiot:
-Show application expander	PreferencesWindow		Näytä sovelluslaajentaja
+Mount	DeskbarMenu		Liitä
+Icon size	PreferencesWindow		Kuvakekoko
+About Haiku	DeskbarMenu		Haikusta
+Small	PreferencesWindow		Pieni
+Show calendar…	TimeView		Näytä kalenteri...
+Find…	DeskbarMenu		Etsi...
+Power off	DeskbarMenu		Sammuta virta
+Defaults	PreferencesWindow		Oletukset
+Show replicants	DeskbarMenu		Näytä kopiot
+No windows	WindowMenu		Ei ikkunoita
+Show clock	Tray		Näytä kello
 Close all	WindowMenu		Sulje kaikki
 Deskbar preferences	PreferencesWindow		Työpöytäpalkin asetukset
-Mount	DeskbarMenu		Liitä
-Revert	PreferencesWindow		Palauta
-Small	PreferencesWindow		Pieni
-Recent applications:	PreferencesWindow		Äskettäiset sovellukset:
-Shutdown…	DeskbarMenu		Sammuttaminen...
-Tracker always first	PreferencesWindow		Seuraaja aina ensimmäisenä
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Asetusohjelmat
-Recent folders	DeskbarMenu		Äskettäiset kansiot
 About this system	DeskbarMenu		Tästä järjestelmästä
-Show calendar…	TimeView		Näytä kalenteri...
-Deskbar preferences…	DeskbarMenu		Työpöytäpalkkiasetukset...
-Expand new applications	PreferencesWindow		Laajenna uudet sovellukset
-Show replicants	DeskbarMenu		Näytä kopiot
-Hide application names	PreferencesWindow		Piilota sovellusnimet
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		Esittelyohjelmat
-Icon size	PreferencesWindow		Kuvakekoko
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Työpöytäsovelmat
-Hide all	WindowMenu		Piilota kaikki
 Quit application	WindowMenu		Lopeta sovellus
+Hide application names	PreferencesWindow		Piilota sovellusnimet
+Applications	PreferencesWindow		Sovellukset
+Show application expander	PreferencesWindow		Näytä sovelluslaajentaja
+Deskbar preferences…	DeskbarMenu		Työpöytäpalkkiasetukset...
+Suspend	DeskbarMenu		Keskeytystila
+Shutdown…	DeskbarMenu		Sammuttaminen...
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		Esittelyohjelmat
+Expand new applications	PreferencesWindow		Laajenna uudet sovellukset
+Recent applications:	PreferencesWindow		Äskettäiset sovellukset:
+Recent folders:	PreferencesWindow		Äskettäiset kansiot:
+Recent folders	DeskbarMenu		Äskettäiset kansiot
+Recent applications	DeskbarMenu		Äskettäiset sovellukset
+Hide all	WindowMenu		Piilota kaikki
+Sort applications by name	PreferencesWindow		Lajittele sovellukset nimen perusteella
+Revert	PreferencesWindow		Palauta
+Window	PreferencesWindow		Ikkuna
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Asetusohjelmat
+Time preferences…	TimeView		Aika-asetukset...
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Työpöytäsovelmat

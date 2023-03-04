@@ -1,50 +1,49 @@
-1	thai	x-vnd.Be-TSKB	2656653225
-Power off	DeskbarMenu		ปิด
-Sort applications by name	PreferencesWindow		จัดเรียงแอปพลิเคชันตามชื่อ
-Suspend	DeskbarMenu		หยุด
-Hide clock	TimeView		ซ่อนนาฬิกา
-Applications	PreferencesWindow		แอปพลิเคชั่น
-Time preferences…	TimeView		ตั้งเวลา
-About Haiku	DeskbarMenu		เกี่ยวกับ Haiku
-Edit in Tracker…	PreferencesWindow		แก้ไขในตัวติดตาม
-Recent documents:	PreferencesWindow		เอกสารล่าสุด:
-Recent applications	DeskbarMenu		แอปพลิเคชั่นล่าสุด
-Applications	B_USER_DESKBAR_DIRECTORY/Applications		แอปพลิเคชั่น
-Find…	DeskbarMenu		ค้นหา
-Show clock	Tray		แสดงนาฬิกา
-Window	PreferencesWindow		หน้าต่าง
-Defaults	PreferencesWindow		ค่าเริ่มต้น
-Menu	PreferencesWindow		เมนู
-Recent documents	DeskbarMenu		เอกสารล่าสุด
+1	thai	x-vnd.Be-TSKB	316181764
 Auto-hide	PreferencesWindow		ซ่อน อัตโนมัติ
-Always on top	PreferencesWindow		อยู่บนเสมอ
-<Deskbar folder is empty>	DeskbarMenu		<Deskbar folder is empty>
 Show all	WindowMenu		แสดงทั้งหมด
-No windows	WindowMenu		ไม่มีหน้าต่าง
-Deskbar	System name		เดสก์บาร์
-Restart system	DeskbarMenu		เริ่มระบบใหม่
+Edit in Tracker…	PreferencesWindow		แก้ไขในตัวติดตาม
+Menu	PreferencesWindow		เมนู
+Tracker always first	PreferencesWindow		ติดตามก่อนเสมอ
+Hide clock	TimeView		ซ่อนนาฬิกา
 Large	PreferencesWindow		ขนาดใหญ่
+<Deskbar folder is empty>	DeskbarMenu		<Deskbar folder is empty>
+Recent documents	DeskbarMenu		เอกสารล่าสุด
+Applications	B_USER_DESKBAR_DIRECTORY/Applications		แอปพลิเคชั่น
+Always on top	PreferencesWindow		อยู่บนเสมอ
+Restart system	DeskbarMenu		เริ่มระบบใหม่
+Recent documents:	PreferencesWindow		เอกสารล่าสุด:
 Auto-raise	PreferencesWindow		ขยายอัตโนมัติ
-Recent folders:	PreferencesWindow		โฟลเดอร์ล่าสุด
-Show application expander	PreferencesWindow		แสดงตัวขยายแอปพลิเคชัน
+Mount	DeskbarMenu		เลือก
+Icon size	PreferencesWindow		ขนาดไอคอน
+About Haiku	DeskbarMenu		เกี่ยวกับ Haiku
+Small	PreferencesWindow		ขนาดเล็ก
+Show calendar…	TimeView		แสดงปฎิทิน
+Find…	DeskbarMenu		ค้นหา
+Power off	DeskbarMenu		ปิด
+Defaults	PreferencesWindow		ค่าเริ่มต้น
+Show replicants	DeskbarMenu		แสดงตัวจำลอง
+No windows	WindowMenu		ไม่มีหน้าต่าง
+Show clock	Tray		แสดงนาฬิกา
 Close all	WindowMenu		ปิดทั้งหมด
 Deskbar preferences	PreferencesWindow		ตั้งค่าเดสก์บาร์
-Mount	DeskbarMenu		เลือก
-Revert	PreferencesWindow		คืนค่า
-Small	PreferencesWindow		ขนาดเล็ก
-Recent applications:	PreferencesWindow		แอปพลิเคชั่นล่าสุด
-Shutdown…	DeskbarMenu		ปิด
-Tracker always first	PreferencesWindow		ติดตามก่อนเสมอ
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		ตั้งค่า
-Recent folders	DeskbarMenu		โฟลเดอร์ล่าสุด
 About this system	DeskbarMenu		เกี่ยวกับระบบ
-Show calendar…	TimeView		แสดงปฎิทิน
-Deskbar preferences…	DeskbarMenu		ตั้งค่าเดสก์บาร์
-Expand new applications	PreferencesWindow		ขยายแอฟพลิเคชั่นใหม่
-Show replicants	DeskbarMenu		แสดงตัวจำลอง
-Hide application names	PreferencesWindow		ซ่อนชื่อแอปพิเคชั่น
-Demos	B_USER_DESKBAR_DIRECTORY/Demos		ตัวอย่าง
-Icon size	PreferencesWindow		ขนาดไอคอน
-Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		แอพเพล็ตเดสก์ท็อป
-Hide all	WindowMenu		ซ่อนทั้งหมด
 Quit application	WindowMenu		ออกจากแอปพลิเคชั่น
+Hide application names	PreferencesWindow		ซ่อนชื่อแอปพิเคชั่น
+Applications	PreferencesWindow		แอปพลิเคชั่น
+Show application expander	PreferencesWindow		แสดงตัวขยายแอปพลิเคชัน
+Deskbar preferences…	DeskbarMenu		ตั้งค่าเดสก์บาร์
+Suspend	DeskbarMenu		หยุด
+Shutdown…	DeskbarMenu		ปิด
+Demos	B_USER_DESKBAR_DIRECTORY/Demos		ตัวอย่าง
+Expand new applications	PreferencesWindow		ขยายแอฟพลิเคชั่นใหม่
+Recent applications:	PreferencesWindow		แอปพลิเคชั่นล่าสุด
+Recent folders:	PreferencesWindow		โฟลเดอร์ล่าสุด
+Recent folders	DeskbarMenu		โฟลเดอร์ล่าสุด
+Recent applications	DeskbarMenu		แอปพลิเคชั่นล่าสุด
+Hide all	WindowMenu		ซ่อนทั้งหมด
+Sort applications by name	PreferencesWindow		จัดเรียงแอปพลิเคชันตามชื่อ
+Revert	PreferencesWindow		คืนค่า
+Window	PreferencesWindow		หน้าต่าง
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		ตั้งค่า
+Time preferences…	TimeView		ตั้งเวลา
+Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		แอพเพล็ตเดสก์ท็อป
