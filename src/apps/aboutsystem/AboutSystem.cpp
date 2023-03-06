@@ -36,6 +36,7 @@
 #include <LayoutBuilder.h>
 #include <MessageRunner.h>
 #include <Messenger.h>
+#include <NumberFormat.h>
 #include <ObjectList.h>
 #include <OS.h>
 #include <Path.h>
@@ -268,6 +269,8 @@ private:
 			BTextView*		fUptimeView;
 
 			BDragger*		fDragger;
+
+			BNumberFormat	fNumberFormat;
 
 			float			fCachedBaseWidth;
 			float			fCachedMinWidth;
@@ -1149,8 +1152,13 @@ BString
 SysInfoView::_GetRamUsage(system_info* sysInfo)
 {
 	BString ramUsage;
-	ramUsage.SetToFormat(B_TRANSLATE("%d MiB used (%d%%)"), used_pages(sysInfo),
-		(int)(100 * sysInfo->used_pages / sysInfo->max_pages));
+	BString data;
+	double usedMemoryPercent = double(sysInfo->used_pages) / sysInfo->max_pages;
+
+	if (fNumberFormat.FormatPercent(data, usedMemoryPercent) != B_OK)
+		data.SetToFormat("%d%%", (int)(100 * usedMemoryPercent));
+
+	ramUsage.SetToFormat(B_TRANSLATE("%d MiB used (%s)"), used_pages(sysInfo), data.String());
 
 	return ramUsage;
 }
