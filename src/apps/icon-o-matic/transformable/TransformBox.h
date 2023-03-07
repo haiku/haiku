@@ -125,8 +125,6 @@ class TransformBox : public ChannelTransform,
 			void				_NotifyDeleted() const;
 
 			// "static" state objects
-			void				_SetState(DragState* state);
-
 			StateView*			fView;
 
 			DragState*			fDragLTState;
