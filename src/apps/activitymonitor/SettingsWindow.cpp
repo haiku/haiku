@@ -106,6 +106,8 @@ SettingsWindow::SettingsWindow(ActivityWindow* target)
 
 	if (target->IsAlwaysOnTop())
 		SetFeel(B_MODAL_ALL_WINDOW_FEEL);
+
+	this->MoveOnScreen(B_MOVE_IF_PARTIALLY_OFFSCREEN);
 }
 
 
