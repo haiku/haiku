@@ -38,14 +38,6 @@ init_hardware(void)
 
 
 status_t
-uninit_hardware(void)
-{
-	dprintf("test: uninit_hardware\n");
-	return B_OK;
-}
-
-
-status_t
 init_driver(void)
 {
 	dprintf("test: init_driver\n");
