@@ -145,12 +145,6 @@ arch_start_kernel(addr_t kernelEntry)
 
 	serial_enable();
 
-	dprintf("[PRE] SetSatp()\n");
-	SetSatp(satp);
-	dprintf("[POST] SetSatp()\n");
-	FlushTlbAll();
-	dprintf("[POST] FlushTlbAll()\n");
-
 	// Copy final kernel args
 	// This should be the last step before jumping to the kernel
 	// as there are some fixups happening to kernel_args even in the last minute
