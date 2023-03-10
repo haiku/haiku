@@ -1240,10 +1240,12 @@ IconView::_SetIcon(BBitmap* large, BBitmap* mini, const uint8* data,
 {
 	if (fHasRef) {
 		BNodeInfo node;
+		BDirectory refdir;
+		BFile file;
 		BEntry entry(&fRef, true);
 
 		if (entry.IsFile()) {
-			BFile file(&fRef, B_READ_WRITE);
+			file.SetTo(&fRef, B_READ_WRITE);
 			if (is_application(file)) {
 				BAppFileInfo info(&file);
 				if (info.InitCheck() == B_OK) {
@@ -1258,7 +1260,7 @@ IconView::_SetIcon(BBitmap* large, BBitmap* mini, const uint8* data,
 				node.SetTo(&file);
 		}
 		if (entry.IsDirectory()) {
-			BDirectory refdir(&fRef);
+			refdir.SetTo(&fRef);
 			node.SetTo(&refdir);
 		}
 		if (node.InitCheck() == B_OK) {
