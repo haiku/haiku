@@ -31,8 +31,6 @@
 :root {
 	color-scheme: light dark;
 
-	--CanvasBackground: Canvas;
-	--CanvasText: CanvasText;
 	--LinkText: #dc3c01; /* grenadier */
 	--VisitedLinkText: #892601; /* peru tan */
 	--TableBackground: #ff4500; /* vermilion */
@@ -64,7 +62,6 @@
 		--StopBackground: #4d0000;
 		--MenuColor: #5c57f2;
 		--TertiaryCanvasText: #c0c0c0;
-		--CanvasText: #DDD;
 		--ButtonBackground: #444;
 		--SecondaryCanvas: #222;
 		--TertiaryCanvas: #131313;
@@ -73,7 +70,6 @@
 
 	@media (prefers-contrast: more) {
 		:root {
-			--CanvasText: #EFEFEF;
 			--ButtonBackground: #222;
 			--SecondaryCanvas: #111;
 			--TertiaryCanvas: #080808;
@@ -81,7 +77,6 @@
 	}
 	@media (prefers-contrast: less) {
 		:root {
-			--CanvasText: #AAA;
 			--ButtonBackground: #444;
 		}
 	}
@@ -93,8 +88,6 @@
         /* Userguide specific */
         /* "Normal values" */
         --HeaderText: LinkText;
-        --CanvasBackground: Canvas;
-        --CanvasText: CanvasText;
         --LinkText: LinkText;
         --VisitedLinkText: VisitedText;
         --ActiveLinkText: ActiveText;
@@ -198,8 +191,8 @@ div.toc {
 /* Colors and headers */
 
 body {
-	color: var(--CanvasText);
-	background-color: var(--CanvasBackground);
+	color: CanvasText;
+	background-color: Canvas;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -319,7 +312,7 @@ h4 a:hover, a:active, h5 a:hover, a:active, h6 a:hover, a:active {
 	position: relative;
 	top: 48px;
 	left: 272px;
-	color: var(--CanvasText);
+	color: CanvasText;
 	text-transform: uppercase;
 	letter-spacing: 3px;
 	font-family: Myriad Pro,Myriad Web Pro Regular,Lucida Grande,Geneva,Trebuchet MS,sans-serif;
@@ -512,7 +505,7 @@ div.tabs ul.tablist li span, div.tabs2 ul.tablist li span,
 
 div.tabs ul.tablist li li.current a, div.tabs2 ul.tablist li li.current a,
 	div.tabs3 ul.tablist li li.current a {
-	color: black;
+	color: CanvasText;
 	text-decoration: none;
 }
 
@@ -718,7 +711,7 @@ dl.note dt, dl.remark dt, dl.warning dt, dl.attention dt {
 
 dl.note dd, dl.remark dd, dl.warning dd, dl.attention dd {
 	margin: 10px 10px 10px 60px;
-	color: var(--CanvasText); /* pseudo-bold */
+	color: CanvasText; /* pseudo-bold */
 }
 
 /* For keyboard shortcuts and the like (also from userguide) */
@@ -761,7 +754,7 @@ div.fragment {
 	background-color: var(--TertiaryCanvas);
 	border: 1px solid var(--TertiaryCanvasText);
 	padding: 4px;
-	color: black;
+	color: CanvasText;
 	font-family: "Noto Sans Mono", Consolas, "Courier New", monospace, fixed;
 	font-weight: normal;
 	font-style: normal;
@@ -772,9 +765,9 @@ div.fragment pre.fragment a.code {
 	font-weight: bold;
 }
 div.ah {
-	background-color: black;
+	background-color: CanvasText;
 	font-weight: bold;
-	color: white;
+	color: Canvas;
 	margin-bottom: 3px;
 	margin-top: 3px;
 }
@@ -1027,7 +1020,7 @@ div.memdoc dl dd div.memdoc table.doxtable td {
 
 div.memdoc dl dd table.params td.paramdir {
 	vertical-align: top;
-	color: black;
+	color: CanvasText;
 	width: 157px;
 }
 
