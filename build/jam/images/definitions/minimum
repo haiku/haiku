@@ -39,7 +39,7 @@ SYSTEM_APPS = [ FFilterByBuildFeatures
 	BootManager@x86,x86_64
 	CharacterMap
 	Debugger@libedit DeskCalc Devices DiskProbe DiskUsage DriveSetup
-	Expander
+	Expander Installer
 	NetworkStatus
 	ProcessController
 	ShowImage StyledEdit
@@ -50,7 +50,7 @@ SYSTEM_APPS = [ FFilterByBuildFeatures
 DESKBAR_APPLICATIONS =
 	CharacterMap
 	DeskCalc Devices DiskProbe DiskUsage DriveSetup
-	Expander
+	Expander Installer
 	StyledEdit
 	Terminal
 ;
