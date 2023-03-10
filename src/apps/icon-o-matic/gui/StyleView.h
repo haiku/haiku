@@ -12,6 +12,7 @@
 #include "IconBuild.h"
 #include "Observer.h"
 
+#include <Referenceable.h>
 #include <View.h>
 
 
@@ -37,48 +38,48 @@ enum {
 
 class StyleView : public BView, public Observer {
 public:
-								StyleView(BRect frame);
-	virtual						~StyleView();
+									StyleView(BRect frame);
+	virtual							~StyleView();
 
 	// BView interface
-	virtual	void				AttachedToWindow();
-	virtual	void				FrameResized(float width, float height);
-	virtual	void				MessageReceived(BMessage* message);
+	virtual	void					AttachedToWindow();
+	virtual	void					FrameResized(float width, float height);
+	virtual	void					MessageReceived(BMessage* message);
 
-	virtual	BSize				MinSize();
+	virtual	BSize					MinSize();
 
 	// Observer interface
-	virtual	void				ObjectChanged(const Observable* object);
+	virtual	void					ObjectChanged(const Observable* object);
 
 	// StyleView
-			void				SetStyle(Style* style);
-			void				SetCommandStack(CommandStack* stack);
-			void				SetCurrentColor(CurrentColor* color);
+			void					SetStyle(Style* style);
+			void					SetCommandStack(CommandStack* stack);
+			void					SetCurrentColor(CurrentColor* color);
 
 private:
-			void				_SetGradient(Gradient* gradient,
-									bool forceControlUpdate = false,
-									bool sendMessage = false);
-			void				_MarkType(BMenu* menu, int32 type) const;
-			void				_SetStyleType(int32 type);
-			void				_SetGradientType(int32 type);
-			void				_AdoptCurrentColor(rgb_color color);
-			void				_TransferGradientStopColor();
+			void					_SetGradient(Gradient* gradient,
+										bool forceControlUpdate = false,
+										bool sendMessage = false);
+			void					_MarkType(BMenu* menu, int32 type) const;
+			void					_SetStyleType(int32 type);
+			void					_SetGradientType(int32 type);
+			void					_AdoptCurrentColor(rgb_color color);
+			void					_TransferGradientStopColor();
 
 private:
-			CommandStack*		fCommandStack;
-			CurrentColor*		fCurrentColor;
+			CommandStack*			fCommandStack;
+			CurrentColor*			fCurrentColor;
 
-			Style*				fStyle;
-			Gradient*			fGradient;
-			bool				fIgnoreCurrentColorNotifications;
-			bool				fIgnoreControlGradientNotifications;
+			Style*					fStyle;
+			BReference<Gradient>	fGradient;
+			bool					fIgnoreCurrentColorNotifications;
+			bool					fIgnoreControlGradientNotifications;
 
-			GradientControl*	fGradientControl;
-			BMenuField*			fStyleType;
-			BMenuField*			fGradientType;
+			GradientControl*		fGradientControl;
+			BMenuField*				fStyleType;
+			BMenuField*				fGradientType;
 
-			BRect				fPreviousBounds;
+			BRect					fPreviousBounds;
 };
 
 
