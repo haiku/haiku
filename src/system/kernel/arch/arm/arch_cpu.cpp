@@ -18,17 +18,9 @@
 #include <elf.h>
 
 
-int arch_cpu_type;
-int arch_fpu_type;
-int arch_mmu_type;
-int arch_platform;
-
 status_t
 arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 {
-	// enable FPU
-	//ppc:set_msr(get_msr() | MSR_FP_AVAILABLE);
-
 	// The current thread must be NULL for all CPUs till we have threads.
 	// Some boot code relies on this.
 	arch_thread_set_current_thread(NULL);
@@ -50,12 +42,6 @@ arch_cpu_init_percpu(kernel_args *args, int curr_cpu)
 status_t
 arch_cpu_init(kernel_args *args)
 {
-	arch_cpu_type = args->arch_args.cpu_type;
-	arch_fpu_type = args->arch_args.fpu_type;
-	arch_mmu_type = args->arch_args.mmu_type;
-	arch_platform = args->arch_args.platform;
-	arch_platform = args->arch_args.machine;
-
 	return B_OK;
 }
 

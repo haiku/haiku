@@ -23,12 +23,6 @@
 
 // kernel args
 typedef struct {
-	int		cpu_type;
-	int		fpu_type;
-	int		mmu_type;
-	int		platform;
-	int		machine; // platform specific machine type
-
 	// architecture specific
 	uint32	phys_pgdir;
 	uint32	vir_pgdir;
