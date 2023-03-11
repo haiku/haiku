@@ -52,8 +52,7 @@
 
 
 static const char* kDriveSetupSignature = "application/x-vnd.Haiku-DriveSetup";
-static const char* kBootManagerSignature
-	= "application/x-vnd.Haiku-BootManager";
+static const char* kBootManagerSignature = "application/x-vnd.Haiku-BootManager";
 
 const uint32 BEGIN_MESSAGE = 'iBGN';
 const uint32 SHOW_BOTTOM_MESSAGE = 'iSBT';
@@ -242,7 +241,7 @@ InstallerWindow::InstallerWindow()
 		B_TRANSLATE("Set up partitions" B_UTF8_ELLIPSIS),
 		new BMessage(LAUNCH_DRIVE_SETUP));
 
-	fLaunchBootManagerItem = new BMenuItem(B_TRANSLATE("Set up boot menu"),
+	fLaunchBootManagerItem = new BMenuItem(B_TRANSLATE("Set up boot menu" B_UTF8_ELLIPSIS),
 		new BMessage(LAUNCH_BOOTMAN));
 	fLaunchBootManagerItem->SetEnabled(false);
 
@@ -505,7 +504,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 				fBeginButton->SetLabel(B_TRANSLATE("Quit"));
 				status.SetToFormat(B_TRANSLATE("Installation "
 					"completed. Boot sector has been written to '%s'. Press "
-					"Quit to leave the Installer or choose a new target "
+					"'Quit' to leave the Installer or choose a new target "
 					"volume to perform another installation."),
 					dstItem ? dstItem->Name() : B_TRANSLATE_COMMENT("???",
 						"Unknown partition name"));
@@ -513,7 +512,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 				fBeginButton->SetLabel(B_TRANSLATE("Restart"));
 				status.SetToFormat(B_TRANSLATE("Installation "
 					"completed. Boot sector has been written to '%s'. Press "
-					"Restart to restart the computer or choose a new target "
+					"'Restart' to restart the computer or choose a new target "
 					"volume to perform another installation."),
 					dstItem ? dstItem->Name() : B_TRANSLATE_COMMENT("???",
 						"Unknown partition name"));
@@ -551,7 +550,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 					!fDriveSetupLaunched && !fBootManagerLaunched);
 				_DisableInterface(fDriveSetupLaunched || fBootManagerLaunched);
 				if (fDriveSetupLaunched && fBootManagerLaunched) {
-					_SetStatusMessage(B_TRANSLATE("Running Boot Manager and "
+					_SetStatusMessage(B_TRANSLATE("Running BootManager and "
 						"DriveSetup" B_UTF8_ELLIPSIS
 						"\n\nClose both applications to continue with the "
 						"installation."));
@@ -561,9 +560,9 @@ InstallerWindow::MessageReceived(BMessage *msg)
 						"\n\nClose DriveSetup to continue with the "
 						"installation."));
 				} else if (fBootManagerLaunched) {
-					_SetStatusMessage(B_TRANSLATE("Running Boot Manager"
+					_SetStatusMessage(B_TRANSLATE("Running BootManager"
 						B_UTF8_ELLIPSIS
-						"\n\nClose Boot Manager to continue with the "
+						"\n\nClose BootManager to continue with the "
 						"installation."));
 				} else {
 					// If neither DriveSetup nor Bootman is running, we need
@@ -599,8 +598,8 @@ InstallerWindow::QuitRequested()
 		// thing on the screen and we will reboot the machine once it quits.
 
 		if (fDriveSetupLaunched && fBootManagerLaunched) {
-			BAlert* alert = new BAlert(B_TRANSLATE("Quit Boot Manager and "
-				"DriveSetup"),	B_TRANSLATE("Please close the Boot Manager "
+			BAlert* alert = new BAlert(B_TRANSLATE("Quit BootManager and "
+				"DriveSetup"),	B_TRANSLATE("Please close the BootManager "
 				"and DriveSetup windows before closing the Installer window."),
 				B_TRANSLATE("OK"));
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
@@ -616,8 +615,8 @@ InstallerWindow::QuitRequested()
 			return false;
 		}
 		if (fBootManagerLaunched) {
-			BAlert* alert = new BAlert(B_TRANSLATE("Quit Boot Manager"),
-				B_TRANSLATE("Please close the Boot Manager window before "
+			BAlert* alert = new BAlert(B_TRANSLATE("Quit BootManager"),
+				B_TRANSLATE("Please close the BootManager window before "
 				"closing the Installer window."), B_TRANSLATE("OK"));
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go();
@@ -713,8 +712,8 @@ InstallerWindow::_LaunchBootManager()
 		entry_ref ref;
 		if (entry.GetRef(&ref) != B_OK || be_roster->Launch(&ref) != B_OK) {
 			BAlert* alert = new BAlert(
-				B_TRANSLATE("Failed to launch Boot Manager"),
-				B_TRANSLATE("Boot Manager, the application to configure the "
+				B_TRANSLATE("Failed to launch BootManager"),
+				B_TRANSLATE("BootManager, the application to configure the "
 					"Haiku boot menu, could not be launched."),
 				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
@@ -801,18 +800,18 @@ InstallerWindow::_UpdateControls()
 
 	BString statusText;
 	if (srcItem != NULL && dstItem != NULL) {
-		statusText.SetToFormat(B_TRANSLATE("Press the Begin button to install "
+		statusText.SetToFormat(B_TRANSLATE("Press the 'Begin' button to install "
 			"from '%1s' onto '%2s'."), srcItem->Name(), dstItem->Name());
 	} else if (srcItem != NULL) {
 		BString partitionRequiredHaiku = B_TRANSLATE(
 			"Haiku has to be installed on a partition that uses "
 			"the Be File System, but there are currently no such "
-			"available partitions on your system.");
+			"partitions available on your system.");
 
 		BString partitionRequiredDebranded = B_TRANSLATE(
 			"This operating system has to be installed on a partition "
 			"that uses the Be File System, but there are currently "
-			"no such available partitions on your system.");
+			"no such partitions available on your system.");
 
 		if (!foundOneSuitableTarget) {
 #ifdef HAIKU_DISTRO_COMPATIBILITY_OFFICIAL
@@ -827,14 +826,14 @@ InstallerWindow::_UpdateControls()
 		} else {
 			statusText = B_TRANSLATE(
 				"Choose the disk you want to install "
-				"onto from the pop-up menu. Then click \"Begin\".");
+				"onto from the pop-up menu. Then click 'Begin'.");
 		}
 	} else if (dstItem != NULL) {
 		statusText = B_TRANSLATE("Choose the source disk from the "
-			"pop-up menu. Then click \"Begin\".");
+			"pop-up menu. Then click 'Begin'.");
 	} else {
 		statusText = B_TRANSLATE("Choose the source and destination disk "
-			"from the pop-up menus. Then click \"Begin\".");
+			"from the pop-up menus. Then click 'Begin'.");
 	}
 
 	_SetStatusMessage(statusText.String());
