@@ -156,7 +156,7 @@ layout_item_for(BView* view)
 
 InstallerWindow::InstallerWindow()
 	:
-	BWindow(BRect(-2300, -2000, -1800, -1800),
+	BWindow(BRect(-2400, -2000, -1800, -1800),
 		B_TRANSLATE_SYSTEM_NAME("Installer"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fEncouragedToSetupPartitions(false),
@@ -180,11 +180,11 @@ InstallerWindow::InstallerWindow()
 	BSize logoSize = logoView->MinSize();
 	logoView->SetExplicitMaxSize(logoSize);
 
-	// Make sure we can display 5 lines of text of 22 about charactrs each in the status view
+	// In the status view, make sure that we can display 5 lines of text of ~28 characters each
 	font_height height;
 	fStatusView->GetFontHeight(&height);
 	float fontHeight = height.ascent + height.descent + height.leading;
-	fStatusView->SetExplicitMinSize(BSize(fStatusView->StringWidth("W") * 22,
+	fStatusView->SetExplicitMinSize(BSize(fStatusView->StringWidth("W") * 28,
 		fontHeight * 5 + 8));
 
 	// Create a group view with a white background since the logo and status text won't have the
@@ -819,7 +819,7 @@ InstallerWindow::_UpdateControls()
 #else
 			statusText.Append(partitionRequiredDebranded);
 #endif
-			statusText.Append("\n\n");
+			statusText.Append(" ");
 			statusText.Append(B_TRANSLATE(
 				"Click on 'Set up partitions" B_UTF8_ELLIPSIS
 				"' to create one."));
