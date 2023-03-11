@@ -83,7 +83,7 @@ is_mappable_to_modifier(uint32 keyCode)
 
 KeyboardLayoutView::KeyboardLayoutView(const char* name, BInputServerDevice* dev)
 	:
-	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
+	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS | B_TRANSPARENT_BACKGROUND),
 	fKeymap(NULL),
 	fEditable(dev == NULL),
 	fModifiers(0),
@@ -98,6 +98,8 @@ KeyboardLayoutView::KeyboardLayoutView(const char* name, BInputServerDevice* dev
 	memset(fKeyState, 0, sizeof(fKeyState));
 
 	SetEventMask(B_KEYBOARD_EVENTS);
+
+	SetViewColor(B_TRANSPARENT_COLOR);
 }
 
 
@@ -147,8 +149,6 @@ KeyboardLayoutView::SetBaseFont(const BFont& font)
 void
 KeyboardLayoutView::AttachedToWindow()
 {
-	SetViewColor(B_TRANSPARENT_COLOR);
-
 	SetBaseFont(*be_plain_font);
 	fSpecialFont = *be_fixed_font;
 	fModifiers = modifiers();
@@ -506,15 +506,6 @@ KeyboardLayoutView::Draw(BRect updateRect)
 	if (fOldSize != BSize(Bounds().Width(), Bounds().Height())) {
 		_LayoutKeyboard();
 	}
-
-	// Draw background
-
-	if (Parent())
-		SetLowColor(Parent()->ViewColor());
-	else
-		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	FillRect(updateRect, B_SOLID_LOW);
 
 	// Draw keys
 
