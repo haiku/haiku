@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MediaConverter	2816184527
+1	ukrainian	x-vnd.Haiku-MediaConverter	338319367
 Input file not recognized as Audio or Video	MediaConverter		Вхідний файл не розпізнаний як аудіо або відео
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Video quality: %3d%%	MediaConverter		Якість відео: %3d%%
@@ -12,6 +12,7 @@ MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
 Error creating video.	MediaConverter		Помилка при створенні відео
 Cancelling	MediaConverter		Скасовується
 None available	Audio codecs		Недоступний
+The file has multiple audio or video tracks, only the first one of each will be converted.	MediaConverter		Файл містить кілька аудіо- чи відеодоріжок, лише перша з них буде конвертована.
 No file selected	MediaConverter-FileInfo		Файл не вибрано
 High	MediaConverter		Висока
 {0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Файл не було розпізнано як підтримуваний медіа-файл:} few{# файла не було розпізнано як підтримувані медіа-файли:} other{# файлів не було розпізнано як підтримувані медіа-файли:}}
@@ -26,6 +27,7 @@ Error loading a file	MediaConverter		Помилка завантаження ф�
 Encoder parameters	MediaConverter-EncoderWindow		Параметри декодера
 Open…	Menu		Відкрити…
 Audio encoding:	MediaConverter		Кодування аудіо:
+Multi-track file detected	MediaConverter		Файл розпізнаний як багатоканальний
 Audio quality: %3d%%	MediaConverter		Якість аудіо: %3d%%
 Cancelling…	MediaConverter		Скасовується…
 Output file '%filename' created	MediaConverter		Вихідний файл '%filename' створено
@@ -63,6 +65,7 @@ File	Menu		Файл
 Video quality not supported	MediaConverter		Якість відео не підтримується
 Select this folder	MediaConverter		Вибрати цю папку
 %.1f kHz %ld channel	MediaFileInfo		%.1f кГц %ld канал
+Understood	MediaConverter		Зрозуміло
 %d bit 	MediaFileInfo		%d біт 
 No video	Video codecs list		Без відео
 Continue	MediaConverter		Продовжити

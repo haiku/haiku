@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	861169737
+1	finnish	x-vnd.Haiku-WebPositive	951718264
 Authentication required	Authentication Panel		Vaaditaan todentamista
 Previous	WebPositive Window		Edellinen
 (Finish: %date)	Download Window		(Päättyi: %date)
@@ -7,6 +7,7 @@ Download folder:	Settings Window		Latauskansio:
 Close window	WebPositive Window		Sulje ikkuna
 Find:	WebPositive Window		Etsi:
 Script console	WebPositive Window		Skriptipääteikkuna
+There was an error setting up the bookmark.	WebPositive Window		Kirjanmerkin asettamisessa tapahtui virhe.
 Fonts	Settings Window		Kirjasimet
 Path	Cookie Manager		Polku
 Bookmarks	WebPositive Window		Kirjanmerkit
@@ -19,6 +20,7 @@ Delete	Cookie Manager		Poista
 Open containing folder	Download Window		Avaa sisältyvä kansio
 Find previous	WebPositive Window		Etsi edellinen
 Full screen	WebPositive Window		Kokonäyttö
+Bookmark bar	WebPositive Window		Kirjanmerkkipalkki
 Downloads in progress	WebPositive		Käynnissä olevat lataukset
 Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Haluatko avata kaikki %addedCount kirjanmerkkiä heti?

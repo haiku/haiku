@@ -1,10 +1,11 @@
-1	ukrainian	x-vnd.Haiku-Expander	3300517306
+1	ukrainian	x-vnd.Haiku-Expander	3239308358
 Destination	ExpanderWindow		Куди розпакувати
 Other	ExpanderPreferences		Інше
 Automatically show contents listing	ExpanderPreferences		Автоматично показувати список вмісту
 Expander	System name		Expander
 Expander: Choose destination	DirectoryFilePanel		Expander: Виберіть папку призначення
 Set source…	ExpanderMenu		Що розпакувати…
+OK	ExpanderWindow		ОК
 The destination is not a folder.	ExpanderWindow		Папка призначення не є папкою.
 The folder was either moved, renamed or not supported.	ExpanderWindow		Папка була переміщена, перейменована або не підтримується.
 Close window when done expanding	ExpanderPreferences		Закрити вікно після розпаковки

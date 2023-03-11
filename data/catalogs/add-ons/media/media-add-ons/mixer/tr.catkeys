@@ -1,5 +1,5 @@
 1	turkish	x-vnd.Haiku-mixer.media_addon	275473112
-Input mapping	AudioMixer		Girdi eşleme
+Input mapping	AudioMixer		Giriş eşleme
 High quality (linear interpolation)	AudioMixer		Yüksek kalite (doğrusal aradeğerleme)
 To output	AudioMixer		Çıktıya
 Gain	AudioMixer		Kazanım
@@ -10,11 +10,11 @@ dB	AudioMixer		dB
 Gain controls	AudioMixer		Kazanım ayarları
 Low quality (drop/repeat samples)	AudioMixer		Düşük kalite (örneklemeleri bırak/yinele)
 Output channel sources	AudioMixer		Çıktı kanalı kaynakları
-Allow input channel remapping	AudioMixer		Girdi kanalı yeniden eşlemesine izin ver
+Allow input channel remapping	AudioMixer		Giriş kanalı yeniden eşlemesine izin ver
 Display balance control for stereo connections	AudioMixer		Çift kanallı bağlantılar için denge denetimini göster
 Setup	AudioMixer		Kurulum
-Physical input channels	AudioMixer		Fiziksel girdi kanalları
-Input channel destinations	AudioMixer		Girdi kanalı hedefleri
+Physical input channels	AudioMixer		Fiziksel giriş kanalları
+Input channel destinations	AudioMixer		Giriş kanalı hedefleri
 Resampling algorithm:	AudioMixer		Yeniden örnekleme algoritması:
 Mute	AudioMixer		Sessiz
 Output mapping	AudioMixer		Çıktı eşleme

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	861169737
+1	ukrainian	x-vnd.Haiku-WebPositive	951718264
 Authentication required	Authentication Panel		Потрібна авторизація
 Previous	WebPositive Window		Попереднє
 (Finish: %date)	Download Window		(Завершення: %date)
@@ -7,6 +7,7 @@ Download folder:	Settings Window		Папка завантажень:
 Close window	WebPositive Window		Закрити вікно
 Find:	WebPositive Window		Знайти:
 Script console	WebPositive Window		Консоль сценаріїв
+There was an error setting up the bookmark.	WebPositive Window		Під час настройки закладки сталася помилка.
 Fonts	Settings Window		Шрифти
 Path	Cookie Manager		Шлях
 Bookmarks	WebPositive Window		Закладки
@@ -19,6 +20,7 @@ Delete	Cookie Manager		Видалити
 Open containing folder	Download Window		Відкрити папку з файлом
 Find previous	WebPositive Window		Знайти попереднє
 Full screen	WebPositive Window		Повний екран
+Bookmark bar	WebPositive Window		Панель закладок
 Downloads in progress	WebPositive		Завантаження триває
 Copy URL to clipboard	Download Window		Копіювати до буферу обміну
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Ви бажаєте відкрити відразу %addedCount закладок?
