@@ -119,8 +119,9 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol, bool idle)
 	// Update known mailboxes
 	for (int32 i = 0; i < newFolders.CountStrings(); i++) {
 		const BString& mailbox = newFolders.StringAt(i);
-		fFolders.insert(std::make_pair(mailbox,
-			_CreateFolder(mailbox, separator)));
+		IMAPFolder* folder = _CreateFolder(mailbox, separator);
+		if (folder != NULL)
+			fFolders.insert(std::make_pair(mailbox, folder));
 	}
 
 	// Distribute the mailboxes evenly to the workers
