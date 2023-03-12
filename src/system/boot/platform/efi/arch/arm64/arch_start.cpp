@@ -139,6 +139,7 @@ arch_start_kernel(addr_t kernelEntry)
 
 	dprintf("Calling ExitBootServices. So long, EFI!\n");
 	serial_disable();
+
 	while (true) {
 		if (kBootServices->ExitBootServices(kImage, map_key) == EFI_SUCCESS) {
 			// Disconnect from EFI serial_io / stdio services
@@ -157,6 +158,9 @@ arch_start_kernel(addr_t kernelEntry)
 
 	// Update EFI, generate final kernel physical memory map, etc.
 	arch_mmu_post_efi_setup(memory_map_size, memory_map, descriptor_size, descriptor_version);
+
+	// Re-init and activate serial in a horrific post-EFI landscape. Clowns roam the land freely.
+	serial_init();
 	serial_enable();
 
 	switch (el) {

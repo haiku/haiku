@@ -104,22 +104,25 @@ serial_enable(void)
 extern "C" void
 serial_init(void)
 {
-	// Check for EFI Serial
-	efi_status status = kSystemTable->BootServices->LocateProtocol(
-		&sSerialIOProtocolGUID, NULL, (void**)&sEFISerialIO);
-
-	if (status != EFI_SUCCESS)
-		sEFISerialIO = NULL;
-
-	if (sEFISerialIO != NULL) {
-		// Setup serial, 0, 0 = Default Receive FIFO queue and default timeout
-		status = sEFISerialIO->SetAttributes(sEFISerialIO, kSerialBaudRate, 0, 0, NoParity, 8,
-			OneStopBit);
+	if (sEFIAvailable) {
+		// Check for EFI Serial
+		efi_status status = kSystemTable->BootServices->LocateProtocol(
+			&sSerialIOProtocolGUID, NULL, (void**)&sEFISerialIO);
 
 		if (status != EFI_SUCCESS)
 			sEFISerialIO = NULL;
 
-		// serial_io was successful.
+		if (sEFISerialIO != NULL) {
+			// Setup serial, 0, 0 = Default Receive FIFO queue and default timeout
+			status = sEFISerialIO->SetAttributes(sEFISerialIO, kSerialBaudRate, 0, 0, NoParity, 8,
+				OneStopBit);
+
+			if (status != EFI_SUCCESS)
+				sEFISerialIO = NULL;
+
+			// serial_io was successful.
+			return;
+		}
 	}
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -129,9 +132,16 @@ serial_init(void)
 	// TODO: We could also try to pull from acpi?
 	if (gUART == NULL) {
 		gUART = arch_get_uart_8250(0x3f8, 1843200);
-		gUART->InitEarly();
+
+		// TODO: convert over to exclusively arch_args.uart?
+		memset(gKernelArgs.platform_args.serial_base_ports, 0,
+			sizeof(uint16) * MAX_SERIAL_PORTS);
+		gKernelArgs.platform_args.serial_base_ports[0] = 0x3f8;
 	}
 #endif
+
+	if (gUART != NULL)
+		gUART->InitEarly();
 }
 
 
@@ -145,11 +155,4 @@ serial_kernel_handoff(void)
 	// Disconnect from EFI serial_io services is important as we leave the bootloader
 	sEFISerialIO = NULL;
 	sEFIAvailable = false;
-
-#if defined(__i386__) || defined(__x86_64__)
-	// TODO: convert over to exclusively arch_args.uart?
-	memset(gKernelArgs.platform_args.serial_base_ports, 0,
-		sizeof(uint16) * MAX_SERIAL_PORTS);
-	gKernelArgs.platform_args.serial_base_ports[0] = 0x3f8;
-#endif
 }

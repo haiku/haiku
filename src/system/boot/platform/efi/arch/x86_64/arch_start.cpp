@@ -145,7 +145,11 @@ arch_start_kernel(addr_t kernelEntry)
 	// entry.
 
 	dprintf("Calling ExitBootServices. So long, EFI!\n");
+
+	// Re-init and activate serial in a horrific post-EFI landscape. Clowns roam the land freely.
+	serial_init();
 	serial_disable();
+
 	while (true) {
 		if (kBootServices->ExitBootServices(kImage, map_key) == EFI_SUCCESS) {
 			// Disconnect from EFI serial_io / stdio services
