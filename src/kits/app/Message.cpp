@@ -2462,7 +2462,7 @@ BMessage::Find##typeName(const char* name, int32 index, type* p) const		\
 	error = FindData(name, typeCode, index, (const void**)&ptr, &bytes);	\
 																			\
 	if (error == B_OK)														\
-		*p = *ptr;															\
+		memcpy((void *)p, ptr, sizeof(type));								\
 																			\
 	return error;															\
 }																			\
