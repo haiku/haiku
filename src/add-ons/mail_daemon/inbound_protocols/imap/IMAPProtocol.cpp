@@ -275,14 +275,24 @@ IMAPProtocol::_CreateFolder(const BString& mailbox, const BString& separator)
 		return NULL;
 	}
 
-	status_t status = create_directory(path.Path(), 0755);
-	if (status != B_OK) {
-		fprintf(stderr, "Could not create path %s: %s\n", path.Path(),
-			strerror(status));
-		return NULL;
-	}
+	status_t status;
+	BNode node(path.Path());
 
-	CopyMailFolderAttributes(path.Path());
+	if (node.InitCheck() == B_OK) {
+		if (!node.IsDirectory()) {
+			fprintf(stderr, "%s already exists and is not a directory\n",
+				path.Path());
+			return NULL;
+		}
+	} else {
+		status = create_directory(path.Path(), 0755);
+		if (status != B_OK) {
+			fprintf(stderr, "Could not create path %s: %s\n", path.Path(),
+				strerror(status));
+			return NULL;
+		}
+		CopyMailFolderAttributes(path.Path());
+	}
 
 	entry_ref ref;
 	status = get_ref_for_path(path.Path(), &ref);
