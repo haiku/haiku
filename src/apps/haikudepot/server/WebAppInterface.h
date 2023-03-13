@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016-2022, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef WEB_APP_INTERFACE_H
@@ -13,6 +13,7 @@
 #include <package/PackageVersion.h>
 
 #include "PackageInfo.h"
+#include "PasswordRequirements.h"
 #include "UserCredentials.h"
 #include "UserDetail.h"
 #include "UserUsageConditions.h"
@@ -129,6 +130,9 @@ public:
 									const DepotInfoRef depot,
 									BMessage& message);
 
+			status_t			RetrievePasswordRequirements(
+									PasswordRequirements& passwordRequirements);
+
 	static	int32				ErrorCodeFromResponse(
 									BMessage& responseEnvelopeMessage);
 
@@ -137,6 +141,8 @@ public:
 									UserDetail& userDetail);
 private:
 
+			status_t			_RetrievePasswordRequirementsMeta(
+									BMessage& message);
 
 			status_t			_RetrieveUserUsageConditionsMeta(
 									const BString& code, BMessage& message);

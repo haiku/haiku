@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2019, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2019-2023, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef USER_LOGIN_WINDOW_H
@@ -12,6 +12,7 @@
 
 #include "CreateUserDetail.h"
 #include "PackageInfo.h"
+#include "PasswordRequirements.h"
 #include "UserCredentials.h"
 #include "ValidationFailure.h"
 
@@ -95,6 +96,8 @@ private:
 									Captcha& captcha);
 			status_t			_CreateAccountUserUsageConditionsSetupThread(
 									UserUsageConditions& userUsageConditions);
+			status_t			_CreateAccountPasswordRequirementsSetupThread(
+									PasswordRequirements& passwordRequirements);
 			status_t			_UnpackCaptcha(BMessage& responsePayload,
 									Captcha& captcha);
 			void				_HandleCreateAccountSetupSuccess(
@@ -103,12 +106,15 @@ private:
 			void				_SetCaptcha(Captcha* captcha);
 			void				_SetUserUsageConditions(
 									UserUsageConditions* userUsageConditions);
+			void				_SetPasswordRequirements(
+									PasswordRequirements* passwordRequirements);
 
 			void				_CollectValidationFailures(
 									const BMessage& result,
 									BString& error) const;
 
 			void				_ViewUserUsageConditions();
+			void				_ViewPasswordRequirements();
 
 			void				_TakeUpCredentialsAndQuit(
 									const UserCredentials& credentials);
@@ -131,6 +137,7 @@ private:
 			BTextControl*		fNewNicknameField;
 			BTextControl*		fNewPasswordField;
 			BTextControl*		fRepeatPasswordField;
+			LinkView*			fPasswordRequirementsLink;
 			BTextControl*		fEmailField;
 			BMenuField*			fLanguageCodeField;
 			BitmapView*			fCaptchaView;
@@ -142,6 +149,8 @@ private:
 			BButton*			fSendButton;
 			BButton*			fCancelButton;
 
+			PasswordRequirements*
+								fPasswordRequirements;
 			UserUsageConditions*
 								fUserUsageConditions;
 			Captcha*			fCaptcha;
