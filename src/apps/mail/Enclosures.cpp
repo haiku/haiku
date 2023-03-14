@@ -331,7 +331,7 @@ BSize
 TListView::MinSize()
 {
 	BSize size = BListView::MinSize();
-	size.height = be_control_look->DefaultLabelSpacing() * 5;
+	size.height = be_control_look->DefaultLabelSpacing() * 11.0f;
 	return size;
 }
 
