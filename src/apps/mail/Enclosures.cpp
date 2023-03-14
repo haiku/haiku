@@ -45,11 +45,14 @@ of their respective holders. All rights reserved.
 #include <Alert.h>
 #include <Beep.h>
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <Debug.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuItem.h>
 #include <NodeMonitor.h>
 #include <PopUpMenu.h>
+#include <StringView.h>
 
 #include <MailAttachment.h>
 #include <MailMessage.h>
@@ -68,59 +71,6 @@ of their respective holders. All rights reserved.
 
 
 static const float kPlainFontSizeScale = 0.9;
-
-static status_t
-GetTrackerIcon(BMimeType &type, BBitmap *icon, icon_size iconSize)
-{
-	// set some icon size related variables
-	status_t error = B_OK;
-	BRect bounds;
-	switch (iconSize) {
-		case B_MINI_ICON:
-			bounds.Set(0, 0, 15, 15);
-			break;
-		case B_LARGE_ICON:
-			bounds.Set(0, 0, 31, 31);
-			break;
-		default:
-			error = B_BAD_VALUE;
-			break;
-	}
-	// check parameters and initialization
-	if (error == B_OK
-		&& (!icon || icon->InitCheck() != B_OK || icon->Bounds() != bounds))
-		return B_BAD_VALUE;
-
-	bool success = false;
-
-	// Ask the MIME database for the preferred application for the file type
-	// and whether this application has a special icon for the type.
-	char signature[B_MIME_TYPE_LENGTH];
-	if (type.GetPreferredApp(signature) == B_OK) {
-		BMimeType type(signature);
-		success = (type.GetIconForType(type.Type(), icon, iconSize) == B_OK);
-	}
-
-	// Ask the MIME database whether there is an icon for the node's file type.
-	if (error == B_OK && !success)
-		success = (type.GetIcon(icon, iconSize) == B_OK);
-
-	// Ask the MIME database for the super type and start all over
-	if (error == B_OK && !success) {
-		BMimeType super;
-		if (type.GetSupertype(&super) == B_OK)
-			return GetTrackerIcon(super, icon, iconSize);
-	}
-
-	// Return the icon for "application/octet-stream" from the MIME database.
-	if (error == B_OK && !success) {
-		// get the "application/octet-stream" icon
-		BMimeType type("application/octet-stream");
-		error = type.GetIcon(icon, iconSize);
-	}
-
-	return error;
-}
 
 
 static void
@@ -148,10 +98,9 @@ recursive_attachment_search(TEnclosuresView* us, BMailContainer* mail,
 //	#pragma mark -
 
 
-TEnclosuresView::TEnclosuresView(BRect rect, BRect windowRect)
+TEnclosuresView::TEnclosuresView()
 	:
-	BView(rect, "m_enclosures", B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT,
-		B_WILL_DRAW),
+	BView("m_enclosures", B_WILL_DRAW),
 	fFocus(false)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
@@ -160,28 +109,23 @@ TEnclosuresView::TEnclosuresView(BRect rect, BRect windowRect)
 	font.SetSize(font.Size() * kPlainFontSizeScale);
 	SetFont(&font);
 
-	fOffset = 12;
-
-	BRect r;
-	r.left = ENCLOSE_TEXT_H + font.StringWidth(
-		B_TRANSLATE("Attachments: ")) + 5;
-	r.top = ENCLOSE_FIELD_V;
-	r.right = windowRect.right - windowRect.left - B_V_SCROLL_BAR_WIDTH - 9;
-	r.bottom = Frame().Height() - 8;
-	fList = new TListView(r, this);
+	fList = new TListView(this);
 	fList->SetInvocationMessage(new BMessage(LIST_INVOKED));
 
-	BScrollView	*scroll = new BScrollView("", fList, B_FOLLOW_LEFT_RIGHT |
-			B_FOLLOW_TOP, 0, false, true);
-	AddChild(scroll);
-	scroll->ScrollBar(B_VERTICAL)->SetRange(0, 0);
+	BStringView* label = new BStringView("label", B_TRANSLATE("Attachments: "));
+	BScrollView* scroll = new BScrollView("", fList, 0, false, true);
+
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
+		.SetInsets(0, 0, scroll->ScrollBar(B_VERTICAL)->PreferredSize().width - 2, -2)
+		.Add(label)
+		.Add(scroll)
+	.End();
 }
 
 
 TEnclosuresView::~TEnclosuresView()
 {
-	for (int32 index = fList->CountItems();index-- > 0;)
-	{
+	for (int32 index = fList->CountItems();index-- > 0;) {
 		TListItem *item = static_cast<TListItem *>(fList->ItemAt(index));
 		fList->RemoveItem(index);
 
@@ -189,22 +133,6 @@ TEnclosuresView::~TEnclosuresView()
 			watch_node(item->NodeRef(), B_STOP_WATCHING, this);
 		delete item;
 	}
-}
-
-
-void
-TEnclosuresView::Draw(BRect where)
-{
-	BView::Draw(where);
-
-	SetHighColor(0, 0, 0);
-	SetLowColor(ViewColor());
-
-	font_height fh;
-	GetFontHeight(&fh);
-
-	MovePenTo(ENCLOSE_TEXT_H, ENCLOSE_TEXT_V + fh.ascent);
-	DrawString(ENCLOSE_TEXT);
 }
 
 
@@ -217,14 +145,11 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 		{
 			BListView *list;
 			msg->FindPointer("source", (void **)&list);
-			if (list)
-			{
+			if (list) {
 				TListItem *item = (TListItem *) (list->ItemAt(msg->FindInt32("index")));
-				if (item)
-				{
+				if (item) {
 					BMessenger tracker("application/x-vnd.Be-TRAK");
-					if (tracker.IsValid())
-					{
+					if (tracker.IsValid()) {
 						BMessage message(B_REFS_RECEIVED);
 						message.AddRef("refs", item->Ref());
 
@@ -238,13 +163,11 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 		case M_REMOVE:
 		{
 			int32 index;
-			while ((index = fList->CurrentSelection()) >= 0)
-			{
+			while ((index = fList->CurrentSelection()) >= 0) {
 				TListItem *item = (TListItem *) fList->ItemAt(index);
 				fList->RemoveItem(index);
 
-				if (item->Component())
-				{
+				if (item->Component()) {
 					TMailWindow *window = dynamic_cast<TMailWindow *>(Window());
 					if (window && window->Mail())
 						window->Mail()->RemoveComponent(item->Component());
@@ -255,8 +178,7 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 						B_TRANSLATE("OK"));
 					alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 					alert->Go();
-				}
-				else
+				} else
 					watch_node(item->NodeRef(), B_STOP_WATCHING, this);
 				delete item;
 			}
@@ -270,23 +192,18 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED:
 		case REFS_RECEIVED:
-			if (msg->HasRef("refs"))
-			{
+			if (msg->HasRef("refs")) {
 				bool badType = false;
 
 				int32 index = 0;
 				entry_ref ref;
-				while (msg->FindRef("refs", index++, &ref) == B_NO_ERROR)
-				{
+				while (msg->FindRef("refs", index++, &ref) == B_NO_ERROR) {
 					BFile file(&ref, O_RDONLY);
-					if (file.InitCheck() == B_OK && file.IsFile())
-					{
+					if (file.InitCheck() == B_OK && file.IsFile()) {
 						TListItem *item;
-						for (int16 loop = 0; loop < fList->CountItems(); loop++)
-						{
+						for (int32 loop = 0; loop < fList->CountItems(); loop++) {
 							item = (TListItem *) fList->ItemAt(loop);
-							if (ref == *(item->Ref()))
-							{
+							if (ref == *(item->Ref())) {
 								fList->Select(loop);
 								fList->ScrollToSelection();
 								continue;
@@ -297,12 +214,10 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 						fList->ScrollToSelection();
 
 						watch_node(item->NodeRef(), B_WATCH_NAME, this);
-					}
-					else
+					} else
 						badType = true;
 				}
-				if (badType)
-				{
+				if (badType) {
 					beep();
 					BAlert* alert = new BAlert("",
 						B_TRANSLATE("Only files can be added as attachments."),
@@ -316,8 +231,7 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 		case B_NODE_MONITOR:
 		{
 			int32 opcode;
-			if (msg->FindInt32("opcode", &opcode) == B_NO_ERROR)
-			{
+			if (msg->FindInt32("opcode", &opcode) == B_NO_ERROR) {
 				dev_t device;
 				if (msg->FindInt32("device", &device) < B_OK)
 					break;
@@ -325,24 +239,20 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 				if (msg->FindInt64("node", &inode) < B_OK)
 					break;
 
-				for (int32 index = fList->CountItems();index-- > 0;)
-				{
+				for (int32 index = fList->CountItems();index-- > 0;) {
 					TListItem *item = static_cast<TListItem *>(fList->ItemAt(index));
 
 					if (device == item->NodeRef()->device
 						&& inode == item->NodeRef()->node)
 					{
-						if (opcode == B_ENTRY_REMOVED)
-						{
+						if (opcode == B_ENTRY_REMOVED) {
 							// don't hide the <missing attachment> item
 
 							//fList->RemoveItem(index);
 							//
 							//watch_node(item->NodeRef(), B_STOP_WATCHING, this);
 							//delete item;
-						}
-						else if (opcode == B_ENTRY_MOVED)
-						{
+						} else if (opcode == B_ENTRY_MOVED) {
 							item->Ref()->device = device;
 							msg->FindInt64("to directory", &item->Ref()->directory);
 
@@ -369,10 +279,9 @@ TEnclosuresView::MessageReceived(BMessage *msg)
 void
 TEnclosuresView::Focus(bool focus)
 {
-	if (fFocus != focus)
-	{
+	if (fFocus != focus) {
 		fFocus = focus;
-		Draw(Frame());
+		Invalidate();
 	}
 }
 
@@ -380,14 +289,16 @@ TEnclosuresView::Focus(bool focus)
 void
 TEnclosuresView::AddEnclosuresFromMail(BEmailMessage *mail)
 {
-	for (int32 i = 0; i < mail->CountComponents(); i++)
-	{
+	for (int32 i = 0; i < mail->CountComponents(); i++) {
 		BMailComponent *component = mail->GetComponent(i);
 		if (component == mail->Body())
 			continue;
 
-		if (component->ComponentType() == B_MAIL_MULTIPART_CONTAINER)
-			recursive_attachment_search(this,dynamic_cast<BMIMEMultipartMailContainer *>(component),mail->Body());
+		if (component->ComponentType() == B_MAIL_MULTIPART_CONTAINER) {
+			recursive_attachment_search(this,
+				dynamic_cast<BMIMEMultipartMailContainer *>(component),
+				mail->Body());
+		}
 
 		fList->AddItem(new TListItem(component));
 	}
@@ -397,10 +308,9 @@ TEnclosuresView::AddEnclosuresFromMail(BEmailMessage *mail)
 //	#pragma mark -
 
 
-TListView::TListView(BRect rect, TEnclosuresView *view)
+TListView::TListView(TEnclosuresView *view)
 	:
-	BListView(rect, "", B_MULTIPLE_SELECTION_LIST,
-		B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT),
+	BListView("", B_MULTIPLE_SELECTION_LIST),
 	fParent(view)
 {
 }
@@ -414,6 +324,15 @@ TListView::AttachedToWindow()
 	BFont font(be_plain_font);
 	font.SetSize(font.Size() * kPlainFontSizeScale);
 	SetFont(&font);
+}
+
+
+BSize
+TListView::MinSize()
+{
+	BSize size = BListView::MinSize();
+	size.height = be_control_look->DefaultLabelSpacing() * 5;
+	return size;
 }
 
 
@@ -490,32 +409,37 @@ TListItem::TListItem(BMailComponent *component)
 
 
 void
-TListItem::Update(BView *owner, const BFont *font)
+TListItem::Update(BView* owner, const BFont* font)
 {
 	BListItem::Update(owner, font);
 
-	if (Height() < 17)	// mini icon height + 1
-		SetHeight(17);
+	const float minimalHeight =
+		be_control_look->ComposeIconSize(B_MINI_ICON).Height() +
+		(be_control_look->DefaultLabelSpacing() / 3.0f);
+	if (Height() < minimalHeight)
+		SetHeight(minimalHeight);
 }
 
 
 void
-TListItem::DrawItem(BView *owner, BRect r, bool /* complete */)
+TListItem::DrawItem(BView *owner, BRect frame, bool /* complete */)
 {
-	if (IsSelected()) {
-		owner->SetHighColor(180, 180, 180);
-		owner->SetLowColor(180, 180, 180);
-	} else {
-		owner->SetHighColor(255, 255, 255);
-		owner->SetLowColor(255, 255, 255);
-	}
-	owner->FillRect(r);
-	owner->SetHighColor(0, 0, 0);
+	rgb_color kHighlight = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+	rgb_color kHighlightText = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+	rgb_color kText = ui_color(B_LIST_ITEM_TEXT_COLOR);
 
-	BFont font = *be_plain_font;
-	font.SetSize(font.Size() * kPlainFontSizeScale);
-	owner->SetFont(&font);
-	owner->MovePenTo(r.left + 24, r.bottom - 4);
+	BRect r(frame);
+
+	if (IsSelected()) {
+		owner->SetHighColor(kHighlight);
+		owner->SetLowColor(kHighlight);
+		owner->FillRect(r);
+	}
+
+	const BRect iconRect(BPoint(0, 0), be_control_look->ComposeIconSize(B_MINI_ICON));
+	BBitmap iconBitmap(iconRect, B_RGBA32);
+	status_t iconStatus = B_NO_INIT;
+	BString label;
 
 	if (fComponent) {
 		// if it's already a mail component, we don't have an icon to
@@ -528,42 +452,52 @@ TListItem::DrawItem(BView *owner, BRect r, bool /* complete */)
 
 		BMimeType type;
 		if (fComponent->MIMEType(&type) == B_OK)
-			sprintf(name + strlen(name), ", Type: %s", type.Type());
+			label.SetToFormat("%s, Type: %s", name, type.Type());
+		else
+			label = name;
 
-		owner->DrawString(name);
+		iconStatus = type.GetIcon(&iconBitmap,
+			(icon_size)(iconRect.IntegerWidth() + 1));
+	} else {
+		BFile file(&fRef, O_RDONLY);
+		BEntry entry(&fRef);
+		BPath path;
+		if (entry.GetPath(&path) == B_OK && file.InitCheck() == B_OK) {
+			label = path.Path();
 
-		BRect iconRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1);
-
-		BBitmap bitmap(iconRect, B_RGBA32);
-		if (GetTrackerIcon(type, &bitmap, B_MINI_ICON) == B_NO_ERROR) {
-			BRect rect(r.left + 4, r.top + 1, r.left + 4 + 15, r.top + 1 + 15);
-			owner->SetDrawingMode(B_OP_ALPHA);
-			owner->DrawBitmap(&bitmap, iconRect, rect);
-			owner->SetDrawingMode(B_OP_COPY);
-		} else {
-			// ToDo: find some nicer image for this :-)
-			owner->SetHighColor(150, 150, 150);
-			owner->FillEllipse(BRect(r.left + 8, r.top + 4, r.left + 16, r.top + 13));
-		}
-		return;
+			BNodeInfo info(&file);
+			iconStatus = info.GetTrackerIcon(&iconBitmap,
+				(icon_size)(iconRect.IntegerWidth() + 1));
+		} else
+			label = "<missing attachment>";
 	}
 
-	BFile file(&fRef, O_RDONLY);
-	BEntry entry(&fRef);
-	BPath path;
-	if (entry.GetPath(&path) == B_OK && file.InitCheck() == B_OK) {
-		owner->DrawString(path.Path());
+	BRect iconFrame(frame);
+	iconFrame.left += be_control_look->DefaultLabelSpacing() / 2;
+	iconFrame.Set(iconFrame.left, iconFrame.top + 1,
+		iconFrame.left + iconRect.Width(),
+		iconFrame.top + iconRect.Height() + 1);
 
-		BNodeInfo info(&file);
-		BRect sr(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1);
+	if (iconStatus == B_OK) {
+		owner->SetDrawingMode(B_OP_ALPHA);
+		owner->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+		owner->DrawBitmap(&iconBitmap, iconFrame);
+		owner->SetDrawingMode(B_OP_COPY);
+	} else {
+		// ToDo: find some nicer image for this :-)
+		owner->SetHighColor(150, 150, 150);
+		owner->FillEllipse(iconFrame);
+	}
 
-		BBitmap bitmap(sr, B_RGBA32);
-		if (info.GetTrackerIcon(&bitmap, B_MINI_ICON) == B_NO_ERROR) {
-			BRect dr(r.left + 4, r.top + 1, r.left + 4 + 15, r.top + 1 + 15);
-			owner->SetDrawingMode(B_OP_ALPHA);
-			owner->DrawBitmap(&bitmap, sr, dr);
-			owner->SetDrawingMode(B_OP_COPY);
-		}
-	} else
-		owner->DrawString("<missing attachment>");
+	BFont font;
+	owner->GetFont(&font);
+	font_height finfo;
+	font.GetHeight(&finfo);
+	owner->MovePenTo(frame.left + (iconFrame.Width() * 1.5f),
+		frame.top + ((frame.Height()
+			- (finfo.ascent + finfo.descent + finfo.leading)) / 2)
+		+ finfo.ascent);
+
+	owner->SetHighColor(IsSelected() ? kHighlightText : kText);
+	owner->DrawString(label.String());
 }

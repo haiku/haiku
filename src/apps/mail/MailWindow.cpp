@@ -1772,16 +1772,8 @@ void
 TMailWindow::AddEnclosure(BMessage* msg)
 {
 	if (fEnclosuresView == NULL && !fIncoming) {
-		BRect r;
-		r.left = 0;
-		r.top = fHeaderView->Frame().bottom - 1;
-		r.right = Frame().Width() + 2;
-		r.bottom = r.top + ENCLOSURES_HEIGHT;
-
-		fEnclosuresView = new TEnclosuresView(r, Frame());
+		fEnclosuresView = new TEnclosuresView;
 		AddChild(fEnclosuresView, fContentView);
-		fContentView->ResizeBy(0, -ENCLOSURES_HEIGHT);
-		fContentView->MoveBy(0, ENCLOSURES_HEIGHT);
 	}
 
 	if (fEnclosuresView == NULL)

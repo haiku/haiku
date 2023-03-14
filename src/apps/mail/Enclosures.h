@@ -49,14 +49,6 @@ All rights reserved.
 #include <MailMessage.h>
 
 
-#define ENCLOSURES_HEIGHT	65
-
-#define ENCLOSE_TEXT		B_TRANSLATE_CONTEXT("Attachments:", "Mail")
-#define ENCLOSE_TEXT_H		7
-#define ENCLOSE_TEXT_V		3
-#define ENCLOSE_FIELD_V		3
-
-
 class TListView;
 class TMailWindow;
 class TScrollView;
@@ -64,10 +56,9 @@ class TScrollView;
 
 class TEnclosuresView : public BView {
 public:
-								TEnclosuresView(BRect rect, BRect windowRect);
+								TEnclosuresView();
 	virtual						~TEnclosuresView();
 
-	virtual	void				Draw(BRect updateRect);
 	virtual	void				MessageReceived(BMessage* message);
 			void				Focus(bool focus);
 			void				AddEnclosuresFromMail(BEmailMessage* mail);
@@ -76,16 +67,16 @@ public:
 
 private:
 			bool				fFocus;
-			float				fOffset;
 			TMailWindow*		fWindow;
 };
 
 
 class TListView : public BListView {
 public:
-								TListView(BRect rect, TEnclosuresView* view);
+								TListView(TEnclosuresView* view);
 
 	virtual	void				AttachedToWindow();
+	virtual BSize				MinSize();
 	virtual	void				MakeFocus(bool focus);
 	virtual	void				MouseDown(BPoint point);
 	virtual	void				KeyDown(const char* bytes,int32 numBytes);
