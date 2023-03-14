@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 Haiku, Inc. All rights reserved.
+ * Copyright 2014-2023 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,6 +31,8 @@ private:
 			BListView*			fMessagesListView;
 			BButton* 			fClearMessagesButton;
 			BButton* 			fCopyMessagesButton;
+			BString				fPreviousText;
+			int32				fRepeatCounter;
 };
 
 

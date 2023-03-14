@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2021 Haiku, Inc. All rights reserved.
+ * Copyright 2014-2023 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,6 +16,7 @@
 #include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include <SeparatorView.h>
+#include <StringFormat.h>
 #include <TextControl.h>
 #include <ListView.h>
 #include <ScrollView.h>
@@ -39,7 +40,9 @@ ConsoleWindow::ConsoleWindow(BRect frame)
 	:
 	BWindow(frame, B_TRANSLATE("Script console"), B_TITLED_WINDOW,
 		B_NORMAL_WINDOW_FEEL, B_AUTO_UPDATE_SIZE_LIMITS
-			| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+			| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE),
+	fPreviousText(""),
+	fRepeatCounter(0)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL, 0.0));
 
@@ -81,15 +84,34 @@ ConsoleWindow::MessageReceived(BMessage* message)
 			BString finalText;
 			finalText.SetToFormat("%s:%" B_PRIi32 ":%" B_PRIi32 ": %s\n",
 				source.String(), lineNumber, columnNumber, text.String());
+
+			if (finalText == fPreviousText) {
+				finalText = "";
+				static BStringFormat format(B_TRANSLATE("{0, plural,"
+					"one{Last line repeated # time.}"
+					"other{Last line repeated # times.}}"));
+				format.Format(finalText, ++fRepeatCounter);
+				// preserve the repeated line
+				if (fRepeatCounter > 1) {
+					int32 index = fMessagesListView->CountItems() - 1;
+					BStringItem* item = (BStringItem*)fMessagesListView->ItemAt(index);
+					item->SetText(finalText.String());
+					fMessagesListView->InvalidateItem(index);
+					break;
+				}
+			} else {
+				fPreviousText = finalText;
+				fRepeatCounter = 0;
+			}
 			fMessagesListView->AddItem(new BStringItem(finalText.String()));
 			break;
 		}
 		case CLEAR_CONSOLE_MESSAGES:
 		{
+			fPreviousText = "";
 			int count = fMessagesListView->CountItems();
-			for (int i = count - 1; i >= 0; i--) {
+			for (int i = count - 1; i >= 0; i--)
 				delete fMessagesListView->RemoveItem(i);
-			}
 			break;
 		}
 		case B_COPY:
