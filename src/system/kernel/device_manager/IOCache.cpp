@@ -107,7 +107,7 @@ IOCache::Init(const char* name)
 		VM_PRIORITY_SYSTEM);
 
 	// get the area's cache
-	VMArea* area = VMAreaHash::Lookup(fArea);
+	VMArea* area = VMAreas::Lookup(fArea);
 	if (area == NULL) {
 		panic("IOCache::Init(): Where's our area (id: %" B_PRId32 ")?!", fArea);
 		return B_ERROR;

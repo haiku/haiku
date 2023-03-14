@@ -16,11 +16,8 @@
 #include <vm/VMAddressSpace.h>
 
 
-#define AREA_HASH_TABLE_SIZE 1024
-
-
-rw_lock VMAreaHash::sLock = RW_LOCK_INITIALIZER("area hash");
-VMAreaHashTable VMAreaHash::sTable;
+rw_lock VMAreas::sLock = RW_LOCK_INITIALIZER("areas tree");
+VMAreasTree VMAreas::sTree;
 static area_id sNextAreaID = 1;
 
 
@@ -39,8 +36,7 @@ VMArea::VMArea(VMAddressSpace* addressSpace, uint32 wiring, uint32 protection)
 	page_protections(NULL),
 	address_space(addressSpace),
 	cache_next(NULL),
-	cache_prev(NULL),
-	hash_next(NULL)
+	cache_prev(NULL)
 {
 	new (&mappings) VMAreaMappings;
 }
@@ -203,18 +199,19 @@ VMArea::AddWaiterIfWired(VMAreaUnwiredWaiter* waiter, addr_t base, size_t size,
 }
 
 
-// #pragma mark - VMAreaHash
+// #pragma mark - VMAreas
 
 
 /*static*/ status_t
-VMAreaHash::Init()
+VMAreas::Init()
 {
-	return sTable.Init(AREA_HASH_TABLE_SIZE);
+	new(&sTree) VMAreasTree;
+	return B_OK;
 }
 
 
 /*static*/ VMArea*
-VMAreaHash::Lookup(area_id id)
+VMAreas::Lookup(area_id id)
 {
 	ReadLock();
 	VMArea* area = LookupLocked(id);
@@ -224,7 +221,7 @@ VMAreaHash::Lookup(area_id id)
 
 
 /*static*/ area_id
-VMAreaHash::Find(const char* name)
+VMAreas::Find(const char* name)
 {
 	ReadLock();
 
@@ -233,7 +230,7 @@ VMAreaHash::Find(const char* name)
 	// TODO: Iterating through the whole table can be very slow and the whole
 	// time we're holding the lock! Use a second hash table!
 
-	for (VMAreaHashTable::Iterator it = sTable.GetIterator();
+	for (VMAreasTree::Iterator it = sTree.GetIterator();
 			VMArea* area = it.Next();) {
 		if (strcmp(area->name, name) == 0) {
 			id = area->id;
@@ -248,18 +245,18 @@ VMAreaHash::Find(const char* name)
 
 
 /*static*/ void
-VMAreaHash::Insert(VMArea* area)
+VMAreas::Insert(VMArea* area)
 {
 	WriteLock();
-	sTable.InsertUnchecked(area);
+	sTree.Insert(area);
 	WriteUnlock();
 }
 
 
 /*static*/ void
-VMAreaHash::Remove(VMArea* area)
+VMAreas::Remove(VMArea* area)
 {
 	WriteLock();
-	sTable.RemoveUnchecked(area);
+	sTree.Remove(area);
 	WriteUnlock();
 }

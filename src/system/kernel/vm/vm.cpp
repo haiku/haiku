@@ -446,13 +446,13 @@ virtual_page_address(VMArea* area, vm_page* page)
 static VMArea*
 lookup_area(VMAddressSpace* addressSpace, area_id id)
 {
-	VMAreaHash::ReadLock();
+	VMAreas::ReadLock();
 
-	VMArea* area = VMAreaHash::LookupLocked(id);
+	VMArea* area = VMAreas::LookupLocked(id);
 	if (area != NULL && area->address_space != addressSpace)
 		area = NULL;
 
-	VMAreaHash::ReadUnlock();
+	VMAreas::ReadUnlock();
 
 	return area;
 }
@@ -1030,8 +1030,8 @@ map_backing_store(VMAddressSpace* addressSpace, VMCache* cache, off_t offset,
 	if (mapping == REGION_PRIVATE_MAP)
 		cache->Unlock();
 
-	// insert the area in the global area hash table
-	VMAreaHash::Insert(area);
+	// insert the area in the global areas map
+	VMAreas::Insert(area);
 
 	// grab a ref to the address space (the area holds this)
 	addressSpace->Get();
@@ -2366,7 +2366,7 @@ delete_area(VMAddressSpace* addressSpace, VMArea* area,
 {
 	ASSERT(!area->IsWired());
 
-	VMAreaHash::Remove(area);
+	VMAreas::Remove(area);
 
 	// At this point the area is removed from the global hash table, but
 	// still exists in the area list.
@@ -3564,7 +3564,7 @@ dump_area(int argc, char** argv)
 	} else {
 		// walk through the area list, looking for the arguments as a name
 
-		VMAreaHashTable::Iterator it = VMAreaHash::GetIterator();
+		VMAreasTree::Iterator it = VMAreas::GetIterator();
 		while ((area = it.Next()) != NULL) {
 			if (((mode & 4) != 0
 					&& !strcmp(argv[index], area->name))
@@ -3601,7 +3601,7 @@ dump_area_list(int argc, char** argv)
 		B_PRINTF_POINTER_WIDTH, "addr", B_PRINTF_POINTER_WIDTH, "base",
 		B_PRINTF_POINTER_WIDTH, "size");
 
-	VMAreaHashTable::Iterator it = VMAreaHash::GetIterator();
+	VMAreasTree::Iterator it = VMAreas::GetIterator();
 	while ((area = it.Next()) != NULL) {
 		if ((id != 0 && area->address_space->ID() != id)
 			|| (name != NULL && strstr(area->name, name) == NULL))
@@ -4208,9 +4208,9 @@ vm_init(kernel_args* args)
 	vm_cache_init(args);
 
 	{
-		status_t error = VMAreaHash::Init();
+		status_t error = VMAreas::Init();
 		if (error != B_OK)
-			panic("vm_init: error initializing area hash table\n");
+			panic("vm_init: error initializing areas map\n");
 	}
 
 	VMAddressSpace::Init();
@@ -6125,7 +6125,7 @@ area_for(void* address)
 area_id
 find_area(const char* name)
 {
-	return VMAreaHash::Find(name);
+	return VMAreas::Find(name);
 }
 
 
