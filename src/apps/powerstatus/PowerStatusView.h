@@ -64,7 +64,7 @@ protected:
 
 			battery_info	fBatteryInfo;
 
-			int32			fPercent;
+			double			fPercent;
 			time_t			fTimeLeft;
 			bool			fOnline;
 			bool			fHasBattery;
