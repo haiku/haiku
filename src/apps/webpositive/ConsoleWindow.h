@@ -30,6 +30,7 @@ private:
 private:
 			BListView*			fMessagesListView;
 			BButton* 			fClearMessagesButton;
+			BButton* 			fCopyMessagesButton;
 };
 
 
