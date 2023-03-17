@@ -90,6 +90,12 @@ arch_cpu_init_post_modules(kernel_args *args)
 void
 arch_cpu_sync_icache(void *address, size_t len)
 {
+	FenceI();
+
+	if (smp_get_num_cpus() > 1) {
+		memory_full_barrier();
+		sbi_remote_fence_i(0, -1);
+	}
 }
 
 

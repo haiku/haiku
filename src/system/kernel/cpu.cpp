@@ -189,7 +189,10 @@ cpu_frequency(int32 cpu)
 void
 clear_caches(void *address, size_t length, uint32 flags)
 {
-	// ToDo: implement me!
+	// TODO: data cache
+	if ((B_INVALIDATE_ICACHE & flags) != 0) {
+		arch_cpu_sync_icache(address, length);
+	}
 }
 
 
