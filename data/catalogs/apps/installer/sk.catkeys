@@ -1,41 +1,31 @@
-1	slovak	x-vnd.Haiku-Installer	1151798284
+1	slovak	x-vnd.Haiku-Installer	3125198243
 Performing installation.	InstallProgress		Prebieha inštalácia.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Zvoľte zdrojový disk z roletového menu. Potom kliknite na „Začať“.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prosím, zatvorte okno Nastavenie diskových oblastí pred zatvorením okna Inštalátora.
 No optional packages available.	PackagesView		Nie sú dostupné žiadne voliteľné balíky.
 The mount point could not be retrieved.	InstallProgress		Nie je možné ziskať prípojný bod.
 <none>	InstallerWindow	No partition available	<žiadna>
 Please choose target	InstallerWindow		Prosím, vyberte cieľ
 Cancel	InstallProgress		Zrušiť
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Inštalácia bola dokončená. Zavádzací sektor bol zapísaný do „%s“. Stlačením „Reštartovať“ reštartujte počítač alebo zvoľte nový cieľový zväzok ak chcete vykonať ďalšiu inštaláciu.
 Are you sure you want to to stop the installation?	InstallerWindow		Ste si istí, že chcete zastaviť inštaláciu?
 Installer	System name		Inštalátor
 Unknown Type	InstallProgress	Partition content type	Neznámy typ
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Stlačením tlačidla „Začať“ spustíte inštaláciu z „%1s“ na „%2s“.
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Zvoľte z roletového menu disk, na ktorý sa má vykonať inštalácia. Potom kliknite na „Začať“.
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Inštalácia bola dokončená. Zavádzací sektor bol zapísaný na „%s“. Stlačením „Ukončiť“ opusťte Inštalátor alebo zvoľte nový cieľový zväzok, ak chcete vykonať ďalšiu inštaláciu.
 README	InstallerApp		README
 Quit	InstallerWindow		Ukončiť
 Write boot sector to '%s'	InstallerWindow		Zapísať zavádzací sektor na „%s“
 Boot sector not written because of an internal error.	InstallProgress		Zavádzací sektor nebol zapísaný z dôvodu vnútornej chyby.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Vitajte v Inštalátore Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? z ??
-Quit Boot Manager	InstallerWindow		Ukončiť Správcu zavádzania
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Nastavenie diskových oblastí, aplikáciu na konfiguráciu diskových oblastí, nebolo možné spustiť.
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Spúšťa sa Správca zavádzania…\n\nInštalácia bude pokračovať, keď zatvoríte Správcu zavádzania.
 Quit DriveSetup	InstallerWindow		Ukončiť Nastavenie diskových oblastí
 Write boot sector	InstallerWindow		Zapísať zavádzací sektor
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld z %2ld
 Install from:	InstallerWindow		Inštalovať z:
 Additional disk space required: 0.0 KiB	InstallerWindow		Je potrebných ešte 0.0 KiB miesta.
 ???	InstallerWindow	Unknown currently copied item	???
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Zvoľte zdrojový a cieľový disk z roletových menu. Potom kliknite na „Začať“.
 Hide optional packages	InstallerWindow		Skryť voliteľné balíky
 ???	InstallerWindow	Unknown partition name	???
 Quit	InstallerApp		Ukončiť
 OK	InstallerWindow		OK
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Prosím, zatvorte okná Správcu zavádzania a Nastavenie diskových oblastí predtým, než zatvoríte okno Inštalátora.
-Failed to launch Boot Manager	InstallerWindow		Nepodarilo sa spustiť Správcu zavádzania
 Try installing anyway	InstallProgress		Skúsiť inštalovať napriek tomu
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		DÔLEŽITÉ INFORMÁCIE PRED INŠTALÁCIOU HAIKU\n\n
 Additional disk space required: %s	InstallerWindow		Je potrebných ešte %s miesta.
@@ -58,14 +48,9 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Set up partitions…	InstallerWindow		Nastaviť oblasti…
 Install progress:  	InstallerWindow		Priebeh inštalácie:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Nemôžete inštalovať obsah disku na rovnaký disk. Prosím, zvoľte iný disk.
-Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Správcu zavádzania, aplikáciu na nastavenie zavádzacieho menu Haku, sa nepodarilo spustiť.
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Prosím, zatvorte okno Správcu zavádzania predtým, než zatvoríte okno Inštalátora.
 OK	InstallProgress		OK
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Spúšťa sa Správca zavádzania a Nastavenie diskových oblastí…\n\nInštalácia bude pokračovať, keď zatvoríte obe aplikácie.
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ste si istí, že chcete vykonať inštaláciu na disk, z ktorého sa v súčasnosti zavádza systém? Ak budete pokračovať Inštalátor bude musieť reštartovať počítač.
 Onto:	InstallerWindow		Na:
-Quit Boot Manager and DriveSetup	InstallerWindow		Ukončiť Správcu zavádzania a Nastavenie diskových oblastí
 Tools	InstallerWindow		Nástroje
 scanning…	InstallerWindow		zisťuje sa…
-Set up boot menu	InstallerWindow		Nastaviť zavádzacie menu
 Continue	InstallerApp		Pokračovať

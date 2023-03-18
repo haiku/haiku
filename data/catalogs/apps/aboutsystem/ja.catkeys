@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-About	2259131995
+1	japanese	x-vnd.Haiku-About	2648728228
 Revision	AboutView		リビジョン
 The Haikuware team and their bounty program\n	AboutView		Haikuware チーム＆報奨金プログラム\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. All rights reserved.
@@ -41,7 +41,6 @@ Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (プロジェク�
 Remove replicant	AboutView		レプリカントの除去
 BSD (3-clause)	AboutWindow		BSD (三条項)
 About this system	AboutWindow		このシステムについて
-%d MiB used (%d%%)	AboutView		%d MiB 使用中 (%d%%)
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. All rights reserved.
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. All rights reserved.

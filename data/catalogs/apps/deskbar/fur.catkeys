@@ -42,7 +42,7 @@ Recent folders	DeskbarMenu		Cartelis resintis
 Recent applications	DeskbarMenu		Aplicazions resintis
 Hide all	WindowMenu		Plate dut
 Sort applications by name	PreferencesWindow		Ordene aplicazions par non
-Revert	PreferencesWindow		Torne indaûr
+Revert	PreferencesWindow		Ripristine
 Window	PreferencesWindow		Barcon
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Preferencis
 Time preferences…	TimeView		Preferencis date e ore…

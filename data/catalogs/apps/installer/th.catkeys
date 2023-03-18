@@ -1,28 +1,21 @@
-1	thai	x-vnd.Haiku-Installer	1075045498
+1	thai	x-vnd.Haiku-Installer	3048445457
 Performing installation.	InstallProgress		กำลังทำการติดตั้ง
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		เลือกดิสก์ต้นทางจากเมนูป๊อปอัป จากนั้นคลิก \"เริ่มต้น\"
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		โปรดปิดหน้าต่าง DriveSetup ก่อนที่จะปิดหน้าต่างตัวติดตั้ง
 No optional packages available.	PackagesView		ไม่มีแพ็คเกจเสริม
 The mount point could not be retrieved.	InstallProgress		ไม่สามารถดึงจุดเชื่อมต่อได้
 <none>	InstallerWindow	No partition available	<none>
 Please choose target	InstallerWindow		กรุณาเลือกเป้าหมาย
 Cancel	InstallProgress		ยกเลิก
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		การติดตั้งเสร็จสมบูรณ์ บูตเซกเตอร์ถูกเขียนเป็น '%s' กดรีสตาร์ทเพื่อรีสตาร์ทคอมพิวเตอร์หรือเลือกโวลุ่มเป้าหมายใหม่เพื่อทำการติดตั้งอื่น
 Are you sure you want to to stop the installation?	InstallerWindow		คุณแน่ใจหรือไม่ว่าต้องการหยุดการติดตั้ง?
 Installer	System name		การติดตั้ง
 Unknown Type	InstallProgress	Partition content type	ไม่ทราบชนิด
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		กดปุ่มเริ่มต้นเพื่อติดตั้งจาก '%1s' ไปยัง '%2s'
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		เลือกดิสก์ที่คุณต้องการติดตั้งจากเมนูป๊อปอัพ จากนั้นคลิก \"เริ่มต้น\"
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		การติดตั้งเสร็จสมบูรณ์ บูตเซกเตอร์ถูกเขียนเป็น '%s' กด ปิด เพื่อออกจากตัวติดตั้งหรือเลือกโวลุ่มเป้าหมายใหม่เพื่อทำการติดตั้งอื่น
 README	InstallerApp		อ่าน
 Quit	InstallerWindow		ปิด
 Write boot sector to '%s'	InstallerWindow		เขียนบูตเซกเตอร์ไปที่ '%s'
 Boot sector not written because of an internal error.	InstallProgress		บูตเซกเตอร์ไม่ได้ถูกเขียนเนื่องจากข้อผิดพลาดภายใน
 Welcome to the Haiku Installer!\n\n	InstallerApp		ยินดีต้อนรับสู่ Haiku Installer! \n\n
 ?? of ??	InstallerWindow	Unknown progress	?? of ??
-Quit Boot Manager	InstallerWindow		ออกจาก Boot Manager
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup แอปพลิเคชันเพื่อกำหนดค่าพาร์ติชันดิสก์ไม่สามารถเปิดใช้งานได้
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		กำลังเรียกใช้ตัวจัดการการบูต… \n\nปิด Boot Manager เพื่อทำการติดตั้งต่อไป
 Quit DriveSetup	InstallerWindow		ออกจาก DriveSetup
 Write boot sector	InstallerWindow		เขียนบูตเซกเตอร์
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld of %2ld
@@ -32,15 +25,12 @@ Additional disk space required: 0.0 KiB	InstallerWindow		ต้องการ�
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		นี่คือซอฟต์แวร์คุณภาพระดับเบต้า! หมายความว่ามีความเสี่ยงที่จะสูญเสียข้อมูลสำคัญ ทำการสำรองข้อมูลบ่อยๆ! คุณได้รับการเตือน\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1) หากคุณกำลังติดตั้ง Haiku ลงบนฮาร์ดแวร์จริง (ไม่ใช่ภายในอีมูเลเตอร์) คุณอาจต้องการเตรียมพาร์ติชันฮาร์ดดิสก์จากระบบปฏิบัติการอื่น (เช่นคุณสามารถใช้ GParted Live-CD ซึ่งสามารถปรับขนาดพาร์ติชันที่มีอยู่ให้ สร้างห้อง) \nคุณยังสามารถตั้งค่าพาร์ติชันด้วยการเปิดตัว DriveSetup จากตัวติดตั้ง แต่คุณจะไม่สามารถปรับขนาดพาร์ติชันที่มีอยู่ด้วย ในขณะที่ DriveSetup ได้รับการทดสอบอย่างถี่ถ้วนในช่วงหลายปีที่ผ่านมาขอแนะนำให้ทำการสำรองข้อมูลล่าสุดของพาร์ติชั่นอื่น ๆ ในระบบของคุณ หากมี ..
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		เลือกดิสก์ต้นทางและปลายทางจากเมนูป๊อปอัป จากนั้นคลิก \"เริ่มต้น\"
 Hide optional packages	InstallerWindow		ซ่อนแพ็คเกจเสริม
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		ขอให้สนุกและขอบคุณสำหรับการลองใช้ Haiku!
 Quit	InstallerApp		ออก
 Error writing boot sector.	InstallProgress		เกิดข้อผิดพลาดในการเขียนบูตเซกเตอร์
 OK	InstallerWindow		ตกลง
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		โปรดปิดหน้าต่าง Boot Manager และ DriveSetup ก่อนที่จะปิดหน้าต่างตัวติดตั้ง
-Failed to launch Boot Manager	InstallerWindow		ไม่สามารถเปิดตัวจัดการการบูต
 Try installing anyway	InstallProgress		ลองติดตั้งใหม่
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ข้อมูลสำคัญก่อนการติดตั้ง Haiku\n\n
 Additional disk space required: %s	InstallerWindow		ต้องการพื้นที่ดิสก์เพิ่มเติม: %s
@@ -63,14 +53,9 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Set up partitions…	InstallerWindow		ตั้งค่าพาร์ติชัน
 Install progress:  	InstallerWindow		ความคืบหน้าการติดตั้ง:
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		คุณไม่สามารถติดตั้งเนื้อหาของดิสก์ลงบนตัวเอง โปรดเลือกดิสก์อื่น
-Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager แอปพลิเคชันเพื่อกำหนดค่าเมนูการบูต Haiku ไม่สามารถเปิดใช้งานได้
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		โปรดปิดหน้าต่าง Boot Manager ก่อนที่จะปิดหน้าต่างตัวติดตั้ง
 OK	InstallProgress		ตกลง
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		กำลังเรียกใช้ Boot Manager และ DriveSetup … \n\nปิดแอปพลิเคชันทั้งสองเพื่อดำเนินการติดตั้งต่อไป
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		แน่ใจหรือไม่ว่าคุณต้องการติดตั้งลงในดิสก์สำหรับบูตปัจจุบัน ตัวติดตั้งจะต้องรีบู๊ตเครื่องของคุณหากคุณดำเนินการต่อ
 Onto:	InstallerWindow		บน:
-Quit Boot Manager and DriveSetup	InstallerWindow		ออกจาก Boot Manager และ DriveSetup
 Tools	InstallerWindow		เครื่องมือ
 scanning…	InstallerWindow		กำลังค้นหา
-Set up boot menu	InstallerWindow		ตั้งค่าเมนูการเริ่มระบบ
 Continue	InstallerApp		ต่อไป

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	1477453861
+1	finnish	x-vnd.Be-MAIL	3128433901
 Set to Saved	Mail		Aseta tallennetuksi
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Päätekstisi sisältää %ld koodaamatonta merkkiä. Ehkä eri merkistö toimisi paremmin? Napauta Lähetä-painiketta sen lähettämiseksi silti (korvausmerkkejä käytetään koodaamattomien merkkien paikalla), tai valitse Peru palataksesi ja yritä korjata se.
 Text wrapping:	Mail		Tekstin rivitys:
@@ -42,7 +42,6 @@ Copy link location	Mail		Kopioi linkkisijainti
 Attachments: 	Mail		Liitteet: 
 Remove enclosure	Mail		Poista liite
 Next	Mail		Seuraava
-Attachments:	Mail		Liitteet:
 Show icons only	Mail		Näytä vain kuvakkeet
 Subject:	Mail		Aihe:
 OK	Mail		Valmis

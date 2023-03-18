@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-WebPositive	861169737
+1	czech	x-vnd.Haiku-WebPositive	951718264
 Authentication required	Authentication Panel		Ověření vyžadováno
 Previous	WebPositive Window		Předchozí
 (Finish: %date)	Download Window		(Dokončeno: %date)
@@ -7,6 +7,7 @@ Download folder:	Settings Window		Složka stahování:
 Close window	WebPositive Window		Zavřít okno
 Find:	WebPositive Window		Najít:
 Script console	WebPositive Window		Skriptovací konzole
+There was an error setting up the bookmark.	WebPositive Window		Chyba při nastavení záložky.
 Fonts	Settings Window		Písma
 Path	Cookie Manager		Cesta
 Bookmarks	WebPositive Window		Záložky
@@ -19,6 +20,7 @@ Delete	Cookie Manager		Smazat
 Open containing folder	Download Window		Otevřít nahrazenou složku
 Find previous	WebPositive Window		Najít předchozí
 Full screen	WebPositive Window		Celá obrazovka
+Bookmark bar	WebPositive Window		Lišta záložek
 Downloads in progress	WebPositive		Stahování probíhá
 Copy URL to clipboard	Download Window		Zkopírovat adresu URL do schránky
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Chcete otevřít %addedCount záložek naráz?

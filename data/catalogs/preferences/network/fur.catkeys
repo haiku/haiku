@@ -18,7 +18,7 @@ Netmask:	IntefaceAddressView		Mascare di rêt:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servizis
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instalazion di “Stât de Rêt” tal Deskbar falide: %s
-Revert	NetworkWindow		Torne indaûr
+Revert	NetworkWindow		Ripristine
 off	ServiceListItem		off
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<nissune rêt cence fîi cjatade>

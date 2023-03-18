@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Terminal	2536107739
+1	friulian	x-vnd.Haiku-Terminal	4000370057
 Close other tabs	Terminal TermWindow		Siere altris schedis
 Insert path	Terminal TermView		Inserìs percors
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Scuse, ma Terminâl nol à podût inviâ la shell.
@@ -8,34 +8,44 @@ Edit	Terminal TermWindow		Modifiche
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n  -w,     --working-directory  set initial working directory\n	Terminal TermApp		  -h,     --help               stampe chest jutori\n  -t,     --title              stabilìs il titul dal barcon\n  -f,     --fullscreen         invie a plen visôr\n  -w,     --working-directory  stabilìs la cartele di lavôr iniziâl\n
 Select all	Terminal TermWindow		Selezione dut
 Confirm exit if active programs exist	Terminal AppearancePrefView		Domande conferme pe jessude se a esistin programs atîfs
+Color scheme:	Terminal ThemeView		Scheme colôrs:
 \t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLa cartele di lavôr atuâl dal procès atîf te\n\t\t\tschede atuâl. In mût opzionâl, il massim numar di components di percors\n\t\t\tal pues jessi specificât. P.e. '%2d' par massim doi components.\n\t%T\t-\tIl non de aplicazion Terminal te localizazion atuâl.\n\t%e\t-\tLa codifiche de schede atuâl. No mostrât se UTF-8.\n\t%i\t-\tL'indicadôr dal barcon.\n\t%p\t-\tIl non dal procès atîf te schede atuâl .\n\t%t\t-\tIl titul de schede atuâl.
 Copy	Terminal TermWindow		Copie
 Edit tab title…	Terminal TermWindow		Modifiche titul schede…
 Print	Terminal TermWindow		Stampe
 Settings	Terminal TermWindow		Impostazions
 %app% settings	Terminal PrefWindow	window title	Impostazions %app%
+ANSI bright black color	Terminal ThemeView		Colôr neri slusint ANSI
 \t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.	Terminal ToolTips		\t%d\t-\tLa cartele di lavôr atuâl dal procès atîf.\n\t\t\tIn mût opzionâl il numar massim di components di percors che si pues\n\t\t\tspecificâ. P.e. '%2d' par un massim di doi components.\n\t%i\t-\tThe indiç de schede.\n\t%e\t-\tLa codifiche de schede atuâl. No mostrât par UTF-8.\n\t%p\t-\tIl non dal procès atîf.
 Use default	Terminal SetTitleWindow		Dopre predefinît
 Close tab	Terminal TermWindow		Siere schede
 Error!	Terminal getString		Erôr!
+Colors…	Terminal TermWindow		Colôrs…
 Appearance	Terminal PrefWindow		Aspiet
 Set tab title	Terminal TermWindow		Stabilìs titul schede
 Create link here	Terminal TermView		Cree colegament achì
 Encoding:	Terminal AppearancePrefView		Codifiche:
+yellow	Terminal ThemeView		zâl
 Change directory	Terminal TermView		Va ae cartele
 Custom	Terminal AppearancePrefView	Window size	Personalizât
 Page setup…	Terminal TermWindow		Configurazion pagjine…
+ANSI yellow color	Terminal ThemeView		Colôr zâl ANSI
 Cancel	Terminal TermView		Anule
 Defaults	Terminal PrefWindow		Predefinîts
-Revert	Terminal PrefWindow		Torne indaûr
+black	Terminal ThemeView		neri
+Revert	Terminal PrefWindow		Ripristine
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Terminâl
 Use selection	Terminal FindWindow		Dopre selezion
 Find next	Terminal TermWindow		Cjate prossim
 Copy link location	Terminal TermView		Copie posizion colegament
+Background	Terminal ThemeView		Fonts
 Window title:	Terminal AppearancePrefView		Titul dal barcon:
 New tab	Terminal TermWindow		Gnove schede
+magenta	Terminal ThemeView		magenta
 Allow bold text	Terminal AppearancePrefView		Permet test in neret
 Window title…	Terminal TermWindow		Titul barcon…
+ANSI blue color	Terminal ThemeView		Colôr blu ANSI
+blue	Terminal ThemeView		blu
 Open path	Terminal TermView		Vierç percors
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Impussibil eseguî \"%command\":\n\t%error
 Terminal	System name		Terminâl
@@ -43,6 +53,7 @@ Custom	Terminal colors scheme		Personalizât
 Really close?	Terminal TermWindow		Sierâ pardabon?
 Font size	Terminal TermWindow		Dimension caratar
 OK	Terminal TermApp		Va ben
+ANSI bright blue color	Terminal ThemeView		Colôr blu slusint ANSI
 The process \"%1\" is still running.\nIf you close the Terminal, the process will be killed.	Terminal TermWindow		Il procès \"%1\" al è ancjemò in esecuzion.\nSe si siere il terminâl il procès al vignarà copât.
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opzion \"%s\" no ricognossude\n
 Tab title:	Terminal AppearancePrefView		Titul schede:
@@ -56,16 +67,23 @@ Find previous	Terminal TermWindow		Cjate precedent
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Il scheme che al specifiche i titui des schedis. A puedin jessi doprâts\nchescj segnepuest:
 Close	Terminal TermWindow		Siere
 Save to file…	Terminal PrefWindow		Salve su file…
+Defaults	Terminal ThemeWindow		Predefinîts
 Copy path	Terminal TermView		Copie percors
 Window size	Terminal TermWindow		Dimensions dal barcon
+Selected text	Terminal ThemeView		Test selezionât
 Copy absolute path	Terminal TermView		Copie percors assolût
 Cancel	Terminal TermWindow		Anule
+ANSI cyan color	Terminal ThemeView		Colôr ciano ANSI
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Il procès \"%1\" al è ancjemò in esecuzion.\nSe si siere la schede, il procès al vignarà copât.
 Full screen	Terminal TermWindow		Plen visôr
 Shell 	Terminal TermWindow		Shell 
+Revert	Terminal ThemeWindow		Ripristine
+ANSI green color	Terminal ThemeView		Colôr vert ANSI
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tIl caratar '%'.\n\t%<\t-\tAl fâs tacâ une sezion, mostrade dome se un segnepuest\n\t\t\tsuccessîf nol è vueit.\n\t%>\t-\tAl fâs tacâ une sezion, mostrade dome se un segnepuest\n\t\t\ttra une sezion precedente %< e chê chi no je vueide.\n\t%-\t-\tAl termine une sezione %< o %>.\n\nOgni caratar, che nol è alfanumeric tra '%' e une letare di formât, e inserirà un spazi dome\nse il segnepuest nol è vuiet. Al zontarà ae sezione %<.
+ANSI bright cyan color	Terminal ThemeView		Colôr ciano slusint ANSI
 Tab title:	Terminal TermWindow		Titul schede:
 Window title:	Terminal TermWindow		Titul barcon:
+ANSI white color	Terminal ThemeView		Colôr blanc ANSI
 Window size:	Terminal AppearancePrefView		Dimension barcon:
 Switch Terminals	Terminal TermWindow		Scambie terminâi
 Decrease	Terminal TermWindow		Diminuìs
@@ -75,27 +93,45 @@ Blinking cursor	Terminal AppearancePrefView		Cursôr che al cimie
 Use text:	Terminal FindWindow		Dopre test:
 Close active tab	Terminal TermWindow		Siere schede ative
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Il scheme che al specifiche il titul dal barcon. A puedin jessi doprâts\nchescj segnepuest:\n
+Selected background	Terminal ThemeView		Fonts selezionât
 Save as default	Terminal TermWindow		Salve come predefinît
 Nothing is selected.	Terminal TermWindow		Nol è selezionât nie.
+ANSI bright red color	Terminal ThemeView		Colôr ros slusint ANSI
 Use left Option as Meta key	Terminal AppearancePrefView		Dopre Opzion a çampe come tast Meta
 Find	Terminal FindWindow		Cjate
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Il scheme che al specifiche il titul de schede atuâl. A puedin jessi doprâts\nchescj segnepuest:\n
+Save to file…	Terminal ThemeWindow		Salve su file…
 Font:	Terminal AppearancePrefView		Caratar:
 Paste	Terminal TermWindow		Tache
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Il scheme che al specifiche i titui dai barcons. A puedin jessi doprâts\nchescj segnepuest:
+ANSI bright magenta color	Terminal ThemeView		Colôr magenta slusint ANSI
 Copy here	Terminal TermView		Copie achì
 Use default shell	Terminal Shell		Dopre shell predefinide
+red	Terminal ThemeView		ros
+white	Terminal ThemeView		blanc
 Open link	Terminal TermView		Vierç colegament
+Text	Terminal ThemeView		Test
+ANSI bright yellow color	Terminal ThemeView		Colôr zâl slusint ANSI
 Not found.	Terminal TermWindow		No cjatât.
+ANSI black color	Terminal ThemeView		Colôr neri ANSI
 Find…	Terminal TermWindow		Cjate…
 No search string was entered.	Terminal TermWindow		No je stade inseride nissune stringhe di ricercje.
 Move here	Terminal TermView		Sposte achì
 Abort	Terminal Shell		Interomp
 The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Chescj procès a son ancjemò in esecuzion:\n\n\t%1\n\nSe si siere il terminâl, i procès a vignaran copâts.
 Set window title	Terminal TermWindow		Stabilìs titul barcon
+ANSI red color	Terminal ThemeView		Colôr ros ANSI
 Increase	Terminal TermWindow		Aumente
+green	Terminal ThemeView		vert
+ANSI bright green color	Terminal ThemeView		Colôr vert slusint ANSI
 OK	Terminal TermWindow		Va ben
+Text under cursor	Terminal ThemeView		Test sot dal cursôr
+ANSI bright white color	Terminal ThemeView		Colôr blanc slusint ANSI
 Close window	Terminal TermWindow		Siere barcon
+ANSI magenta color	Terminal ThemeView		Colôr magenta ANSI
 Haiku Terminal\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminâl di Haiku\nCopyright 2001-2019 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui e Takashi Murai.\n\nÛs: %s [OPZION] [SHELL]\n
+cyan	Terminal ThemeView		ciano
+Colors	System name		Colôrs
 Clear all	Terminal TermWindow		Nete dut
+Cursor	Terminal ThemeView		Cursôr
 Search forward	Terminal FindWindow		Cîr indenant

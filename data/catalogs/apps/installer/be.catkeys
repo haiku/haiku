@@ -1,40 +1,31 @@
-1	belarusian	x-vnd.Haiku-Installer	49639906
+1	belarusian	x-vnd.Haiku-Installer	3125198243
 Performing installation.	InstallProgress		Выконваецца ўсталёўка.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберыце зыходны дыск з усплывальнага меню. Потым націсніце \"Пачаць\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Калі ласка, закройце вакно DriveSetup перад тым як закрыць Усталёўшчык.
 No optional packages available.	PackagesView		Дадатковыя пакункі недаступныя.
 The mount point could not be retrieved.	InstallProgress		Не ўдалося атрымаць пункт мантавання.
 <none>	InstallerWindow	No partition available	<няма>
 Please choose target	InstallerWindow		Калі ласка, выберыце дыск прызначэння
 Cancel	InstallProgress		Адмена
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершана. Загрузачны сектар запісаны ў '%s'. Націсніце Перазапусціць, каб перазапусціць кампутар ці абрярыце іншы том для яшчэ адной усталёўкі.
 Are you sure you want to to stop the installation?	InstallerWindow		Сапраўды астанавіць усталёўку?
 Installer	System name		Усталёўшчык
 Unknown Type	InstallProgress	Partition content type	Невядомы тып
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Націсніце кнопку Пачаць, каб усталяваць з '%1s' на '%2s'.
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Выберыце пажаданы дыск з выплывальнага меню. Потым клікніце \"Пачаць\".
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Усталёўка завершана. Загрузачны сектар запісаны ў '%s'. Націсніце Выйсці, каб пакінуць усталёўшчык ці абраць іншы том для новай усталёўкі.
 README	InstallerApp		README
 Quit	InstallerWindow		Выйсці
 Write boot sector to '%s'	InstallerWindow		Запісаць загрузачны сектар на '%s'
 Boot sector not written because of an internal error.	InstallProgress		Загрузачны сектар не запісаны з-за ўнутранай памылкі.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Прывітанне! Гэта ўсталёўшчык Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? з ??
-Quit Boot Manager	InstallerWindow		Выйсці з Менеджэра Запуску
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, праграма для праўкі дыскавых падзелаў, не запусцілася.
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Працуе Boot Manager…\n\nЗакрыйце Boot Manager для працягу ўсталёўкі.
 Quit DriveSetup	InstallerWindow		Выйсці з DriveSetup
 Write boot sector	InstallerWindow		Запісаць загрузачны сектар
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld з %2ld
 Install from:	InstallerWindow		Усталяваць з:
 Additional disk space required: 0.0 KiB	InstallerWindow		Патрэбна яшчэ 0.0 KiB месца на дыску
 ???	InstallerWindow	Unknown currently copied item	???
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Выберыце зыходны дыск і дыск прызначэння з усплывальнага меню. Потым націсніце \"Пачаць\".
 Hide optional packages	InstallerWindow		Схаваць дадатковыя пакункі
 ???	InstallerWindow	Unknown partition name	???
 Quit	InstallerApp		Выйсці
 OK	InstallerWindow		ОК
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Калі ласка, закрыйце Boot Manager і DriveSetup перад закрыццём Усталёўшчыка.
 Try installing anyway	InstallProgress		Ўсё роўна паспрабаваць усталёўку
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ВАЖНАЯ ІНФАРМАЦЫЯ НАКОНТ УСТАЛЁЎКІ\n\n
 Additional disk space required: %s	InstallerWindow		Патрэбна месца дадаткова: %s
@@ -57,13 +48,9 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Set up partitions…	InstallerWindow		Правіць падзелы…
 Install progress:  	InstallerWindow		Прагрэс усталёўкі:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Вы не можаце капіяваць файлы на зыходны дыск. Выберыце, калі ласка, іншы.
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Калі ласка, закрыйце Boot Manager перад закрыццём Усталёўшчыка.
 OK	InstallProgress		ОК
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Працуюць Boot Manager і DriveSetup...\n\nЗакрыйце абедзве праграмы для працягу.
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Сапрауды жадаеце усталяваць на цяперашні загрузачны дыск? Калі так, Усталёшчык перазапусціць ваш кампутар.
 Onto:	InstallerWindow		На:
-Quit Boot Manager and DriveSetup	InstallerWindow		Выйсці з Менеджэра Запуску і DriveSetup
 Tools	InstallerWindow		Прылады
 scanning…	InstallerWindow		сканіраванне…
-Set up boot menu	InstallerWindow		Наладзіць меню запуску
 Continue	InstallerApp		Працягваць

@@ -3,7 +3,7 @@
 Application	ShortcutsWindow		Aplicazion
 Option	ShortcutsSpec	Name for modifier on keyboard	Opzion
 Save changes before closing?	ShortcutsWindow		Salvâ lis modifichis prime di sierâ?
-Revert to saved	ShortcutsWindow		Torne indaûr al salvât
+Revert to saved	ShortcutsWindow		Ripristine al salvât
 Don't save	ShortcutsWindow		No sta salvâ
 *MouseDown	ShortcutsWindow		*MouseFracât
 *Beep	ShortcutsWindow		*Bip

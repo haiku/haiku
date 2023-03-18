@@ -1,19 +1,14 @@
-1	esperanto	x-vnd.Haiku-Installer	3582443154
+1	esperanto	x-vnd.Haiku-Installer	1260875817
 Performing installation.	InstallProgress		Instalante.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elektu la elan diskon el la ŝpruca menuo. Poste alklaku \"Ek\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestron de la Diskagordilo antaŭ fermi la fenestron de al Instalilo.
 No optional packages available.	PackagesView		Malnepraj pakaĵoj ne estas haveblaj.
 The mount point could not be retrieved.	InstallProgress		La surmetingo ne povis esti ricevita
 <none>	InstallerWindow	No partition available	<neniu>
 Please choose target	InstallerWindow		Bonvolu elekti celon
 Cancel	InstallProgress		Nuligi
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instalado estas finita. Praŝarga sektoro estis skribita al '%s'. Premu Restartigi por restartigi la komputilon aŭ elektu novan celan portilon por efektivigi alian instaladon.
 Are you sure you want to to stop the installation?	InstallerWindow		Ĉu vi certas, ke vi volas ĉesigi la instaladon?
 Installer	System name		Instalilo
 Unknown Type	InstallProgress	Partition content type	Nekonata tipo
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Premu la Komenci butonon por instali el '%1s' al '%2s'.
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Elektu la diskon al kiu vi volas instali el la falmenuo. Poste alklaku \"Komenci\".
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		La instalado sukcesis. La startsektoro estas skribita al '%s'. Klaku al Ĉesi por forigi la Instalilon aŭ elektu novan celan volumon por denove instali.
 Are you sure you want to stop the installation?	InstallerWindow		Ĉu vi estas certe, ke vi volas halti la instaladon?
 README	InstallerApp		LEGU_MIN
 Quit	InstallerWindow		Ĉesi
@@ -21,10 +16,8 @@ Write boot sector to '%s'	InstallerWindow		Skribi la startsektoron al '%s'
 Boot sector not written because of an internal error.	InstallProgress		Praŝarga sektoro ne estis skribita pro interna eraro.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Bonvenon ĉe la Haiku Instalilo!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? de ??
-Quit Boot Manager	InstallerWindow		Forlasi Praŝargan Administrilon
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Diskagordilo, la programo por agordi subdiskojn, ne povas esti rulita.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		La alcelata subdisko ne estas malplena. Se Hakiu jam estas instalita, ĝi estos anstataŭigota. Ĉiu programaroj en ĉi tiu instalado estos forigotaj.\n\nSe vi volas ĝisdatigi vian sistemon sen forigi instalitaj programaroj, kontrolu la Haiku manlibro por uzantoj, la temo pri la programaro \"Ĝisdatigilo\" por instrukcioj pri ĝisdatigo.\n\nĈu vi certas ke vi volas daŭri la instaladon?
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Lanĉas Praŝargan Administrilon…\n\nFermu Praŝargan Administrilon por daŭrigi la instaladon.
 Quit DriveSetup	InstallerWindow		Ĉesi la Diskagordilon
 Write boot sector	InstallerWindow		Skribi praŝargan sektoron
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld el %2ld
@@ -35,15 +28,12 @@ This is beta-quality software! It means there is a risk of losing important data
 ???	InstallerWindow	Unknown currently copied item	???
 Install anyway	InstallProgress		Instali senkondiĉe
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Se vi instalas Haiku-on per efektiva aparataro (ne en imitilo), vi eble volus fari subdiskon per alia operaciumo (vi povus, ekzemple, uzi GParted-an aŭtonoman KD-on, kiu ankaŭ povas ŝanĝi la grandecon de jamaj subdiskoj por malokupi diskospacon).\nVi ankaŭ povas agordi subdiskojn per ruli DiskAgordilon el la Instalilo, sed vi ne povos ŝanĝi la grandecon de jamaj subdiskoj per ĝi. Kvankam DiskAgordilo estis ĝisfunde provita tra multaj jaroj, estas rekomendita havi aktualajn savkopiojn de la aliaj subdiskoj en via sistemo. Nur por sekureco…
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Elektu la elan kaj la alan diskojn el le ŝprucmenuoj. Tiam klaku al \"Ek\".
 Hide optional packages	InstallerWindow		Kaŝi malneprajn pakaĵojn
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Amuziĝu, kaj dankon pro provi Haiku-on!
 Quit	InstallerApp		Ĉesi
 Error writing boot sector.	InstallProgress		Eraro okazis dum skribado de praŝarga sektoro.
 OK	InstallerWindow		Bone
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestrojn de la Praŝarga Administrilo kaj  de la Diskagordilo antaŭ fermi la fenestron de la Instalilo.
-Failed to launch Boot Manager	InstallerWindow		Ne povis ruli Praŝargan Administrilon
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Kiam Haiku sukcese praŝargos unuafoje, bonvole legu nian \"Manlibron por uzantoj\" kaj vidu la \"Enkonduka Travizito\". Ili troviĝas kiel ligiloj sur la Labortablo kaj en la legosignoj de Retprospero.\n\n
 Try installing anyway	InstallProgress		Provi instali ĉiuokaze
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		GRAVA INFORMO ANTAŬ VI INSTALAS HAIKU-ON\n\n
@@ -70,15 +60,10 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Set up partitions…	InstallerWindow		Agordi subdiskojn…
 Install progress:  	InstallerWindow		Instalada progreso:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Vi ne povas instali la enhavon de disko al ĝi mem. Bonvolu elekti alian diskon.
-Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Praŝargan Administrilon, la programo por agordi la Haiku-an praŝargan menuon, ne povis esti rulita.
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Bonvolu fermi la Praŝargan Administrilan fenestron antaŭ vi fermu la Instalilan fenestron.
 OK	InstallProgress		Bone
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Lanĉas Praŝargan Administrilon kaj DiskAgordilon…\n\nFermu ambaŭ programojn por daŭrigi la instaladon.
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ĉu vi certas, ke vi volas instali en la aktualan startdiskon? La Instalilo devigos restarti la komputilon se vi daŭras.
 Onto:	InstallerWindow		En:
-Quit Boot Manager and DriveSetup	InstallerWindow		Ĉesigi Praŝargan Administrilon kaj DiskAgordilon
 Tools	InstallerWindow		Iloj
 scanning…	InstallerWindow		skanado…
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Uzu la Diskagordilon por prepari \ndisponedlajn diskojn kaj aliajn aparatojn.\nSubdiskojn vi povas formatigi per\ndosiersistemo Be bezonata por lanĉa subdisko\nde la Hajko.
-Set up boot menu	InstallerWindow		Agordi praŝargan menuon
 Continue	InstallerApp		Daŭrigi

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-About	4168448386
+1	romanian	x-vnd.Haiku-About	263077323
 Revision	AboutView		Revizie
 The Haikuware team and their bounty program\n	AboutView		Echipa Haikuware și programul lor de recompense\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Drepturi de autor © 1999-2007 Michael C. Ring. Toate drepturile rezervate.
@@ -37,7 +37,6 @@ Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (fondator de proiect)\n\n
 BSD (3-clause)	AboutWindow		BSD (clauza 3)
 About this system	AboutWindow		Despre acest sistem
-%d MiB used (%d%%)	AboutView		%d MiO utilizați (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Drepturi de autor © 1999-2010 de către autorii Gutenprint. Toate drepturile rezervate.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Drepturi de autor © 1994-1997 Mark Kilgard. Toate drepturile rezervate.
 AboutSystem	System name		AboutSystem

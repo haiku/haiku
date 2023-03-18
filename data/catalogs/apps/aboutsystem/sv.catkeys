@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-About	2259131995
+1	swedish	x-vnd.Haiku-About	2648728228
 Revision	AboutView		Utgåva
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet och deras belöningsprogram\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Upphovsrätt © 1999-2007 Michael C. Ring. Med ensamrätt.
@@ -41,7 +41,6 @@ Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektgrundare)
 Remove replicant	AboutView		Ta bort replikanten
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 About this system	AboutWindow		Om Haiku
-%d MiB used (%d%%)	AboutView		%d MiB använt (%d%%)
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Alla rättigheter förbehållna.
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Upphovsrätt © 1999-2010 skaparna av Gutenprint. Med ensamrätt.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Upphovsrätt © 1994-1997 Mark Kilard. Med ensamrätt.

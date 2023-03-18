@@ -29,7 +29,7 @@ Scroll lock	Keyboard Layout View		Bloche scoriment
 US-International	KeymapNames		US-Internazionâl
 Right option	Keyboard Layout View		Opzion a diestre
 Turkish (Type-Q)	KeymapNames		Turc (Gjenar-Q)
-Revert	Modifier keys window		Torne indaûr
+Revert	Modifier keys window		Ripristine
 Slovak	KeymapNames		Slovac
 CAPS LOCK	Keyboard Layout View		BLOC MAIUSC
 Colemak	KeymapNames		Colemak
@@ -119,7 +119,7 @@ Belarusian (Latin)	KeymapNames		Bielorùs (Latin)
 Hebrew	KeymapNames		Ebraic
 Layout	Keymap window		Disposizion
 Greek	KeymapNames		Grêc
-Revert	Keymap window		Torne indaûr
+Revert	Keymap window		Ripristine
 CTRL	Keyboard Layout View	Very short for 'control'	CTRL
 Grave trigger	Keymap window		Acent curt (`)
 Menu	Keyboard Layout View	Menu key	Menù

@@ -1,30 +1,24 @@
-1	czech	x-vnd.Haiku-Installer	2017577026
+1	czech	x-vnd.Haiku-Installer	1118964980
 Performing installation.	InstallProgress		Probíhá instalace.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Zvolte zdrojový disk z nabídky. Poté klikněte na \"Začít\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Uzavřete, prosím, okno programu nastavení disků před ukončením Instalátoru.
 No optional packages available.	PackagesView		Volitelné balíčky nejsou k dispozici.
 The mount point could not be retrieved.	InstallProgress		Přípojný bod nemohl být obnoven.
 <none>	InstallerWindow	No partition available	<žádné>
 Please choose target	InstallerWindow		Zvolte, prosím, cíl
 Cancel	InstallProgress		Zrušit
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instalace dokončena. Bootovací sektor byl napsán na '%s'. Stisknutím tlačítka Restartovat restartujte počítač nebo vyberte nový cílový svazek pro provedení jiné instalace.
 Are you sure you want to to stop the installation?	InstallerWindow		Určitě chcete instalaci přerušit?
 Installer	System name		Instalační program
 Unknown Type	InstallProgress	Partition content type	Neznámý typ
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Stisknutím tlačítka Začít se nainstaluje z '%1s' do '%2s'. 
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Zvolte disk na který chcete instalovat z následující nabídky. Poté klikněte na \"Začít\".
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalace dokončena. Boot sektor byl zapsán do '%s'. Stiskněte Zavřít pro opuštění Instalátoru nebo zvolte nový cílový svazek ke spuštění další instalace.
 Are you sure you want to stop the installation?	InstallerWindow		Opravdu zastavit instalaci?
 README	InstallerApp		README
 Quit	InstallerWindow		Zavřít
 Write boot sector to '%s'	InstallerWindow		Zapsat boot sektor do '%s'
 Boot sector not written because of an internal error.	InstallProgress		Vzhledem k vnitřní chybě nedošlo k zápisu boot sektoru.
+Click on 'Set up partitions…' to create one.	InstallerWindow		Kliknutím na 'Nastavení oddílů...' si jej vytvořte.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Vítejte v Instalátoru Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? z ??
-Quit Boot Manager	InstallerWindow		Ukončit Zavaděč
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Aplikace nastavení disků, určena ke konfiguraci diskových oddílů, nemohla být spuštěna.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		Cílový oddíl není prázdný. Pokud budete pokračovat v instalaci Haiku, přepíše se. Smaže to všechen instalovaný software.\n\nPokud chcete inovovat svůj systém bez smazání software, přečtěte si uživatelskou příručku Haiku, kapitola o aplikaci \"SoftwareUpdater\".\n\nOpravdu pokračovat v instalaci?
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Spouštění Zavaděče...\n\nZavřete Zavaděč pro pokračování v instalaci.
 Quit DriveSetup	InstallerWindow		Ukončit nastavení disků
 Write boot sector	InstallerWindow		Zapsat boot sektor
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld z %2ld
@@ -35,7 +29,6 @@ This is beta-quality software! It means there is a risk of losing important data
 ???	InstallerWindow	Unknown currently copied item	Neznámé
 Install anyway	InstallProgress		Přesto nainstalovat
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Pokud instalujete Haiku na skutečný hardware (nikoli v emulátoru), můžete si připravit oddíl disku z jiného OS (můžete například použít GParted Live-CD, který umí také změnit velikost stávajících oddílů, abyste udělali místo pro Haiku).\nNastavení disků z instalátoru umí také spravovat oddíly, ale neumí měnit jejich velikost. Ačkoli byl program pro nastavení disků v průběhu let důkladně testován, je přesto doporučeno udělat aktuální zálohu oddílů. Jen pro případ…
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Zvolte zdrojový a cílový disk z nabídek. Poté klikněte na \"Začít\".
 2)   The Installer will make the Haiku partition itself bootable, but takes no steps to integrate Haiku into an existing boot menu. If you have GRUB already installed, you can add Haiku to it.\nFor details, please consult the guide on booting Haiku on our website at https://www.haiku-os.org/guides/booting.\nOr you can set up a boot menu from Installer's \"Tools\" menu, see the Haiku User Guide's topic on the application \"BootManager\".\n\n\n	InstallerApp		2)   Instalátor nastaví oddíl Haiku jako startovací, ale nezačleňuje Haiku do stávající startovací nabídky. Pokud již používáte GRUB, můžete do něj Haiku přidat.\nVíce podrobností najdete v průvodci o startování Haiku na našem webu at https://www.haiku-os.org/guides/booting.\nNebo můžete nastavit startovací nabídku z nabídky instalátoru \"Nástroje\", podívejte se do sekce o aplikaci \"BootManager\" v Uživatelské příručce Haiku.\n\n\n
 Hide optional packages	InstallerWindow		Skrýt volitelné balíčky
 ???	InstallerWindow	Unknown partition name	???
@@ -43,8 +36,6 @@ Have fun and thanks for trying out Haiku!	InstallerApp		Bavte se, a děkujeme za
 Quit	InstallerApp		Zavřít
 Error writing boot sector.	InstallProgress		Chyba při zápisu do zaváděcího sektoru.
 OK	InstallerWindow		OK
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Zavřete prosím nastavení zavaděče a disků před ukončením Instalátoru.
-Failed to launch Boot Manager	InstallerWindow		Chyba při spuštění Správce spouštění
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Když poprvé úspěšně spustíte Haiku, přečtěte si naší \"Uživatelskou příručku\" a projděte \"Rychlou prohlídku\". Na ploše a v prohlížeči webu jsou připravené odkazy.\n\n
 Try installing anyway	InstallProgress		Zkusit přesto instalovat
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		DŮLEŽITÁ INFORMACE PŘED ZAHÁJENÍ INSTALACE HAIKU\n\n
@@ -71,15 +62,10 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Set up partitions…	InstallerWindow		Nastavení oddílů...
 Install progress:  	InstallerWindow		Průběh instalace:
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Nelze instalovat obsah disk sám na sebe. Zvolte, prosím, jiný disk.
-Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Aplikace Správce spouštění, pro konfiguraci zaváděcí nabídky Haiku, nemohla být spuštěna.
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Uzavřete, prosím, nejdříve Zavaděč před ukončením Instalace.
 OK	InstallProgress		OK
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Spuštění nastavení zavaděče a disků...\n\nUzavřete obě aplikace pro pokračování v instalaci.
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Určitě si přejete instalovat do současného startovacího disku? Instalátor bude muset restartovat Váš počítač pokud budete pokračovat.
 Onto:	InstallerWindow		Do:
-Quit Boot Manager and DriveSetup	InstallerWindow		Ukončit nastavení zavaděče a disků
 Tools	InstallerWindow		Nástroje
 scanning…	InstallerWindow		Prohledávání...
 Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Spusťte nástroj nastavení disků k rozdělení\noddílů pevných disků a ostatních médií.\nOddíly mohou být naformátovány na\nsystém souborů Be, potřebný\nke startovacímu oddílu Haiku.
-Set up boot menu	InstallerWindow		Nastavit nabídku zavaděče
 Continue	InstallerApp		Pokračovat

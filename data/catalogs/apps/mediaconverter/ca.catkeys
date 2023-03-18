@@ -1,7 +1,6 @@
-1	catalan; valencian	x-vnd.Haiku-MediaConverter	338319367
+1	catalan; valencian	x-vnd.Haiku-MediaConverter	3701038749
 Input file not recognized as Audio or Video	MediaConverter		No es reconeix el fitxer d’entrada com a àudio ni vídeo.
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Qualitat del vídeo: %3d%%
 Source files	MediaConverter		Fitxers d'origen
 Error writing video frame %lld	MediaConverter		Error en escriure el fotograma de vídeo %lld
 Error converting '%filename'	MediaConverter		Error en convertir %filename
@@ -28,7 +27,6 @@ Encoder parameters	MediaConverter-EncoderWindow		Paràmetres del codificador
 Open…	Menu		Obre...
 Audio encoding:	MediaConverter		Codificació de l'àudio:
 Multi-track file detected	MediaConverter		S'ha detectat un fitxer multipista.
-Audio quality: %3d%%	MediaConverter		Qualitat de l'àudio: %3d%%
 Cancelling…	MediaConverter		Es cancel·la...
 Output file '%filename' created	MediaConverter		S'ha creat el fitxer de sortida %filename.
 Output folder	MediaConverter		Carpeta de sortida
@@ -50,7 +48,6 @@ Error	MediaConverter		Error
 File details	MediaConverter		Detalls del fitxer
 No audio	Audio codecs list		Sense àudio
 Drop media files onto this window	MediaConverter		Deixeu anar fitxers multimèdia en aquesta finestra.
-Writing video track: %ld%% complete	MediaConverter		Escriptura de la pista de vídeo: %ld%% completada
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# fotograma} other{# fotogrames}}
 Error read audio frame %lld	MediaConverter		Error en llegir el marc d'àudio %lld
 Quit	Menu		Surt
@@ -59,7 +56,6 @@ Duration:	MediaConverter-FileInfo		Durada:
 MediaConverter	System name		Convertidor multimèdia
 Error launching: %strError%	MediaConverter		Error d'obertura: %strError%
 Error writing audio frame %lld	MediaConverter		Error en escriure el marc d'àudio %lld
-Writing audio track: %ld%% complete	MediaConverter		Escriptura de la pista d'àudio: %ld%% completada
 File format:	MediaConverter		Format del fitxer:
 File	Menu		Fitxer
 Video quality not supported	MediaConverter		No s'admet la qualitat del vídeo.

@@ -1,7 +1,6 @@
-1	swedish	x-vnd.Haiku-MediaConverter	338319367
+1	swedish	x-vnd.Haiku-MediaConverter	3701038749
 Input file not recognized as Audio or Video	MediaConverter		Indatafilen är inte igenkänd som ljud eller video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Videokvalité: %3d%%
 Source files	MediaConverter		Källfiler
 Error writing video frame %lld	MediaConverter		Fel vid skrivning av videoframe %lld
 Error converting '%filename'	MediaConverter		Fel vid konvertering av '%filename'
@@ -28,7 +27,6 @@ Encoder parameters	MediaConverter-EncoderWindow		Kodningsparametrar
 Open…	Menu		Öppna...
 Audio encoding:	MediaConverter		Ljudkodning:
 Multi-track file detected	MediaConverter		Flerspårsfil upptäcktes
-Audio quality: %3d%%	MediaConverter		Ljudkvalité: %3d%%
 Cancelling…	MediaConverter		Avbryter...
 Output file '%filename' created	MediaConverter		Utfil '%filename' skapad
 Output folder	MediaConverter		Utmapp
@@ -50,7 +48,6 @@ Error	MediaConverter		Fel
 File details	MediaConverter		Fildetaljer
 No audio	Audio codecs list		Inget ljud
 Drop media files onto this window	MediaConverter		Släpp mediafiler i detta fönster
-Writing video track: %ld%% complete	MediaConverter		Skrivning av videospår %ld%% klart
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# frame} other{# frames}}
 Error read audio frame %lld	MediaConverter		Fel vid läsning av ljudframe %lld
 Quit	Menu		Avsluta
@@ -59,7 +56,6 @@ Duration:	MediaConverter-FileInfo		Speltid:
 MediaConverter	System name		MediaKonverterare
 Error launching: %strError%	MediaConverter		Fel vid start: %strError%
 Error writing audio frame %lld	MediaConverter		Fel vid skrivning av ljudframe %lld
-Writing audio track: %ld%% complete	MediaConverter		Skrivning av ljudspår %ld%% klart
 File format:	MediaConverter		Filformat:
 File	Menu		Arkiv
 Video quality not supported	MediaConverter		Videokvalitén stöds ej

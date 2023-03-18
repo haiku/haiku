@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-About	2259131995
+1	english	x-vnd.Haiku-About	2648728228
 Revision	AboutView		发行版本
 The Haikuware team and their bounty program\n	AboutView		Haikuware 组织及其捐赠程序\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		版权所有 © 1999-2007 Michael C. Ring，保留所有权利。
@@ -41,7 +41,6 @@ Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (项目创始人)
 Remove replicant	AboutView		移除克隆控件
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 About this system	AboutWindow		关于系统
-%d MiB used (%d%%)	AboutView		已用 %d MiB (%d%%)
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		版权所有 © 2003-2006 Intel Corporation。保留所有权利。
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		版权所有 © 1999-2010 Gutenprint 的所有编写者，保留所有权利。
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		版权所有 © 1994-1997 Mark Kilgard。保留所有权利。

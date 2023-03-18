@@ -1,7 +1,6 @@
-1	turkish	x-vnd.Haiku-MediaConverter	338319367
+1	turkish	x-vnd.Haiku-MediaConverter	3701038749
 Input file not recognized as Audio or Video	MediaConverter		Girdi dosyası ses veya görüntü değil
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Video kalitesi: %%%3d
 Source files	MediaConverter		Kaynak dosyaları
 Error writing video frame %lld	MediaConverter		Video çerçevesi %lld yazılırken hata
 Error converting '%filename'	MediaConverter		'%filename' dönüştürülürken hata
@@ -28,7 +27,6 @@ Encoder parameters	MediaConverter-EncoderWindow		Kodlayıcı parametreleri
 Open…	Menu		Aç…
 Audio encoding:	MediaConverter		Ses kodlaması:
 Multi-track file detected	MediaConverter		Çok parçalı dosya algılandı
-Audio quality: %3d%%	MediaConverter		Ses kalitesi: %%%3d
 Cancelling…	MediaConverter		İptal ediliyor…
 Output file '%filename' created	MediaConverter		'%filename' çıktı dosyası oluşturuldu
 Output folder	MediaConverter		Çıktı klasörü
@@ -50,7 +48,6 @@ Error	MediaConverter		Hata
 File details	MediaConverter		Dosya ayrıntıları
 No audio	Audio codecs list		Ses yok
 Drop media files onto this window	MediaConverter		Bu pencereye ortam dosyalarını bırakın
-Writing video track: %ld%% complete	MediaConverter		Video parçası yazılıyor: %%%ld tamamlandı
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, other{# kare}}
 Error read audio frame %lld	MediaConverter		Ses çerçevesi %lld okunurken hata
 Quit	Menu		Çık
@@ -59,7 +56,6 @@ Duration:	MediaConverter-FileInfo		Uzunluk:
 MediaConverter	System name		Ortam Dönüştürücü
 Error launching: %strError%	MediaConverter		Başlatılırken hata: %strError%
 Error writing audio frame %lld	MediaConverter		Ses çerçevesi %lld yazılırken hata
-Writing audio track: %ld%% complete	MediaConverter		Ses parçası yazılıyor: %%%ld tamamlandı
 File format:	MediaConverter		Dosya biçimi:
 File	Menu		Dosya
 Video quality not supported	MediaConverter		Video kalitesi desteklenmiyor

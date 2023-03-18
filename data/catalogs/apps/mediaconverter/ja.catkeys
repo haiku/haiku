@@ -1,7 +1,6 @@
-1	japanese	x-vnd.Haiku-MediaConverter	338319367
+1	japanese	x-vnd.Haiku-MediaConverter	3701038749
 Input file not recognized as Audio or Video	MediaConverter		入力ファイルはオーディオまたはビデオとして認識できません。
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		ビデオ品質: %3d%%
 Source files	MediaConverter		ソースファイル
 Error writing video frame %lld	MediaConverter		ビデオフレーム %lld の書き込みに失敗しました
 Error converting '%filename'	MediaConverter		'%filename'の変換中にエラーが発生しました
@@ -28,7 +27,6 @@ Encoder parameters	MediaConverter-EncoderWindow		エンコーターパラメー�
 Open…	Menu		開く...
 Audio encoding:	MediaConverter		オーディオエンコーディング
 Multi-track file detected	MediaConverter		マルチトラックファイルが検出されました。
-Audio quality: %3d%%	MediaConverter		オーディオ品質: %3d%%
 Cancelling…	MediaConverter		中止しています...
 Output file '%filename' created	MediaConverter		出力ファイル '%filename' が作成されました
 Output folder	MediaConverter		出力先フォルダー
@@ -50,7 +48,6 @@ Error	MediaConverter		エラー
 File details	MediaConverter		ファイルの詳細
 No audio	Audio codecs list		オーディオ無し
 Drop media files onto this window	MediaConverter		メディアファイルをこのウィンドウにドロップしてください
-Writing video track: %ld%% complete	MediaConverter		ビデオトラックの書き込み: %ld%% 完了
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# フレーム} other{# フレーム}}
 Error read audio frame %lld	MediaConverter		オーディオフレーム %lld の読み取りに失敗しました
 Quit	Menu		終了
@@ -59,7 +56,6 @@ Duration:	MediaConverter-FileInfo		再生時間:
 MediaConverter	System name		メディアコンバーター
 Error launching: %strError%	MediaConverter		起動時にエラーが発生しました: %strError%
 Error writing audio frame %lld	MediaConverter		オーディオフレーム %lld の書き込みに失敗しました
-Writing audio track: %ld%% complete	MediaConverter		オーディトラックの書き込み: %ld%% 完了
 File format:	MediaConverter		ファイルフォーマット:
 File	Menu		ファイル
 Video quality not supported	MediaConverter		ビデオ品質はサポートされていません

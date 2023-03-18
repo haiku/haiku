@@ -1,7 +1,6 @@
-1	polish	x-vnd.Haiku-MediaConverter	2816184527
+1	polish	x-vnd.Haiku-MediaConverter	1883936613
 Input file not recognized as Audio or Video	MediaConverter		Plik wejściowy nierozpoznany jako audio lub wideo
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Jakość wideo: %3d%%
 Source files	MediaConverter		Pliki źródłowe
 Error writing video frame %lld	MediaConverter		Błąd zapisu ramki wideo %lld
 Error converting '%filename'	MediaConverter		Błąd konwersji „%filename”
@@ -26,7 +25,6 @@ Error loading a file	MediaConverter		Błąd ładowania pliku
 Encoder parameters	MediaConverter-EncoderWindow		Parametry kodeka
 Open…	Menu		Otwórz…
 Audio encoding:	MediaConverter		Kodowanie dźwięku:
-Audio quality: %3d%%	MediaConverter		Jakość dźwięku: %3d%%
 Cancelling…	MediaConverter		Anulowanie…
 Output file '%filename' created	MediaConverter		Utworzono plik wynikowy „%filename”
 Output folder	MediaConverter		Katalog wynikowy
@@ -48,7 +46,6 @@ Error	MediaConverter		Błąd
 File details	MediaConverter		Szczegóły pliku
 No audio	Audio codecs list		Brak dźwięku
 Drop media files onto this window	MediaConverter		Upuść pliki multimedialne do tego okna
-Writing video track: %ld%% complete	MediaConverter		Zapisywanie ścieżki wideo: ukończono %ld%%
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# ramka} few{# ramki} many{# ramek} other{# ramki}}
 Error read audio frame %lld	MediaConverter		Błąd odczytu ramki audio %lld
 Quit	Menu		Zakończ
@@ -57,7 +54,6 @@ Duration:	MediaConverter-FileInfo		Długość:
 MediaConverter	System name		MediaConverter
 Error launching: %strError%	MediaConverter		Błąd uruchamiania: %strError%
 Error writing audio frame %lld	MediaConverter		Błąd zapisu ramki audio %lld
-Writing audio track: %ld%% complete	MediaConverter		Zapisywanie ścieżki audio: ukończono %ld%%
 File format:	MediaConverter		Format pliku:
 File	Menu		Plik
 Video quality not supported	MediaConverter		Jakość wideo nieobsługiwana

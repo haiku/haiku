@@ -67,7 +67,7 @@ never	MediaPlayer-SettingsWindow		mai
 Loop audio	MediaPlayer-SettingsWindow		Audio ciclic
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erôr interni (messaç malformât). Salvament de liste di riproduzion falît.
 Open…	MediaPlayer-PlaylistWindow		Vierç…
-Revert	MediaPlayer-SettingsWindow		Torne indaûr
+Revert	MediaPlayer-SettingsWindow		Ripristine
 Low volume	MediaPlayer-SettingsWindow		Volum bas
 Audio	MediaPlayer-Main		Audio
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Canâi}}

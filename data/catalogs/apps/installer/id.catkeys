@@ -1,28 +1,21 @@
-1	indonesian	x-vnd.Haiku-Installer	1075045498
+1	indonesian	x-vnd.Haiku-Installer	3048445457
 Performing installation.	InstallProgress		Melakukan instalasi.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pilih disk sumber dari menu pop-up. Lalu klik \"Begin\".
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Silakan tutup jendela DriveSetup sebelum menutup jendela Installer.
 No optional packages available.	PackagesView		Tidak ada paket opsional yang tersedia.
 The mount point could not be retrieved.	InstallProgress		Titik mount tidak dapat diambil.
 <none>	InstallerWindow	No partition available	<none>
 Please choose target	InstallerWindow		Silakan pilih target
 Cancel	InstallProgress		Batal
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instalasi selesai. Sektor boot telah ditulis ke '%s'. Tekan Restart untuk menyalakan ulang komputer atau pilih volume target baru untuk melakukan instalasi lain.
 Are you sure you want to to stop the installation?	InstallerWindow		Anda yakin ingin menghentikan instalasi?
 Installer	System name		Installer
 Unknown Type	InstallProgress	Partition content type	Type tak dikenal
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Tekan tombol Begin untuk menginstal dari '%1s' ke '%2s'.
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pilih disk yang ingin Anda pasang dari menu pop-up. Lalu klik \"Begin\".
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalasi selesai. Boot sector telah ditulis ke '%s'. Tekan Keluar untuk meninggalkan Installer atau pilih volume target baru untuk melakukan instalasi lain.
 README	InstallerApp		BACA SAYA
 Quit	InstallerWindow		Keluar
 Write boot sector to '%s'	InstallerWindow		Tulis boot-sector ke '%s'
 Boot sector not written because of an internal error.	InstallProgress		Boot sector tidak ditulis karena kesalahan internal.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Selamat datang di Haiku Installer!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? of ??
-Quit Boot Manager	InstallerWindow		Keluar dari Boot Manager
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		DriveSetup, aplikasi untuk mengkonfigurasi partisi disk, tidak dapat diluncurkan.
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Menjalankan Boot Manager…\n\nTutup Boot Manager untuk melanjutkan instalasi.
 Quit DriveSetup	InstallerWindow		Keluar dari DriveSetup
 Write boot sector	InstallerWindow		Tulis sektor boot
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld dari %2ld
@@ -32,15 +25,12 @@ Additional disk space required: 0.0 KiB	InstallerWindow		Ruang diska tambahan ya
 This is beta-quality software! It means there is a risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Ini adalah perangkat lunak berkualitas beta! Itu berarti ada risiko kehilangan data penting. Sering membuat cadangan! Anda telah diperingatkan.\n\n\n
 ???	InstallerWindow	Unknown currently copied item	???
 1)   If you are installing Haiku onto real hardware (not inside an emulator), you may want to prepare a hard disk partition from another OS (you could, for example, use a GParted Live-CD, which can also resize existing partitions to make room).\nYou can also set up partitions by launching DriveSetup from Installer, but you won't be able to resize existing partitions with it. While DriveSetup has been quite thoroughly tested over the years, it's recommended to have up-to-date backups of the other partitions on your system. Just in case…	InstallerApp		1)   Jika Anda menginstal Haiku ke perangkat keras yang sebenarnya (tidak di dalam emulator),Anda mungkin ingin menyiapkan partisi hard disk dari OS lain (Anda dapat, misalnya, menggunakan GParted Live-CD, yang juga dapat mengubah ukuran partisi yang ada untuk membuat ruang).\nAnda juga dapat mengatur partisi dengan meluncurkan DriveSetup dari Installer, tetapi Anda tidak akan dapat mengubah ukuran partisi yang ada dengannya. Sementara DriveSetup telah diuji secara menyeluruh selama bertahun-tahun,disarankan untuk memiliki cadangan terbaru dari partisi lain di sistem Anda. Untuk berjaga-jaga…
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Pilih sumber dan disk tujuan dari menu pop-up. Lalu klik \"Begin\".
 Hide optional packages	InstallerWindow		Sembunyikan paket opsional
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Bersenang-senanglah dan terima kasih telah mencoba Haiku!
 Quit	InstallerApp		Keluar
 Error writing boot sector.	InstallProgress		Ada kesalahan saat menulis sektor boot.
 OK	InstallerWindow		OKE
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Harap tutup jendela Boot Manager dan DriveSetup sebelum menutup jendela Installer.
-Failed to launch Boot Manager	InstallerWindow		Gagal meluncurkan Boot Manager
 Try installing anyway	InstallProgress		Bagaimanapun coba instal
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMASI PENTING SEBELUM MENGINSTAL HAIKU\n\n
 Additional disk space required: %s	InstallerWindow		Ruang diska tambahan yang diperlukan: %s
@@ -63,14 +53,9 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Set up partitions…	InstallerWindow		Siapkan partisi…
 Install progress:  	InstallerWindow		Perkembangan instalasi:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Anda tidak dapat menginstal isi disk ke dirinya sendiri. Silakan pilih disk yang berbeda.
-Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, aplikasi untuk mengkonfigurasi menu boot Haiku, tidak dapat diluncurkan.
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Silakan tutup jendela Boot Manager sebelum menutup jendela Installer.
 OK	InstallProgress		OKE
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Menjalankan Boot Manager dan DriveSetup…\n\nTutup kedua aplikasi untuk melanjutkan instalasi.
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Apakah Anda yakin ingin menginstal ke disk boot saat ini? Installer harus me-reboot komputer Anda jika Anda melanjutkan.
 Onto:	InstallerWindow		Keatas:
-Quit Boot Manager and DriveSetup	InstallerWindow		Keluar dari Boot Manager dan DriveSetup
 Tools	InstallerWindow		Alat
 scanning…	InstallerWindow		pemindaian…
-Set up boot menu	InstallerWindow		Atur menu boot
 Continue	InstallerApp		Lanjut

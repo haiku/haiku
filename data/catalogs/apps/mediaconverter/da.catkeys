@@ -1,7 +1,6 @@
-1	danish	x-vnd.Haiku-MediaConverter	1322040280
+1	danish	x-vnd.Haiku-MediaConverter	2116725671
 Input file not recognized as Audio or Video	MediaConverter		Inputfil ikke genkendt som lyd eller video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f fps
-Video quality: %3d%%	MediaConverter		Videokvalitet: %3d%%
 Source files	MediaConverter		Kildefiler
 Error converting '%filename'	MediaConverter		Fejl ved konvertering af '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Fandt ikke den valgte mappe. Bruger standard /boot/home
@@ -25,7 +24,6 @@ Error loading a file	MediaConverter		Fejl ved indlæsning af fil
 Encoder parameters	MediaConverter-EncoderWindow		Koderparametre
 Open…	Menu		Åbn…
 Audio encoding:	MediaConverter		Lydkodning:
-Audio quality: %3d%%	MediaConverter		Lydkvalitet: %3d%%
 Cancelling…	MediaConverter		Annullerer…
 Output file '%filename' created	MediaConverter		Outputfilen '%filename' blev oprettet
 Output folder	MediaConverter		Outputmappe

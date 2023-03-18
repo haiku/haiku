@@ -33,7 +33,7 @@ Password:	E-Mail		Peraule di ordin:
 Error retrieving general settings: %s\n	Config Window		Erôr tal recuperâ lis impostazions gjenerâls: %s\n
 The filter could not be moved. Deleting filter.	Config Views		Impussibil spostâ il filtri. Si elimine il filtri.
 OK	Config Views		Va ben
-Revert	Config Window		Torne indaûr
+Revert	Config Window		Ripristine
 Incoming	Config Window		In jentrade
 Finish	AutoConfigWindow		Fin
 Add filter	Config Views		Zonte filtri

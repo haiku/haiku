@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-MAIL	2903558745
+1	lithuanian	x-vnd.Be-MAIL	259571489
 Set to Saved	Mail		Perkelti į Išsaugotus
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Laiško tekste yra %lt simboliai (-ų), kurių negalima užkoduoti naudojant pasirinktą koduotę. Galbūt norėtumėte parinkti kitą koduotę? Ar norite laišką išsiųsti nepaisant šios problemos (netinkami simboliai bus pakeisti tinkamais)? Jeigu norite pabandyti problemą išspręsti, rinkitės „Atsisakyti“.
 Text wrapping:	Mail		Teksto laužymas:
@@ -38,7 +38,6 @@ Copy link location	Mail		Kopijuoti saito adresą
 Attachments: 	Mail		Priedai:
 Remove enclosure	Mail		Pašalinti priedą
 Next	Mail		Kitas
-Attachments:	Mail		Priedai:
 Show icons only	Mail		Rodyti tik piktogramas
 Subject:	Mail		Tema:
 OK	Mail		Gerai

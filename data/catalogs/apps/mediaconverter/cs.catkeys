@@ -1,7 +1,6 @@
-1	czech	x-vnd.Haiku-MediaConverter	338319367
+1	czech	x-vnd.Haiku-MediaConverter	3701038749
 Input file not recognized as Audio or Video	MediaConverter		Vstupní soubor nebyl rozpoznán jako zvuk nebo obraz
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Kvalita videa: %3d%%
 Source files	MediaConverter		Zdrojový soubor
 Error writing video frame %lld	MediaConverter		Chyba zápisu snímku videa %lld
 Error converting '%filename'	MediaConverter		Chyba převádění '%filename'
@@ -28,7 +27,6 @@ Encoder parameters	MediaConverter-EncoderWindow		Parametry Enkderu
 Open…	Menu		Otevřít...
 Audio encoding:	MediaConverter		Kódování zvuku:
 Multi-track file detected	MediaConverter		Zjištěn vícestopý soubor
-Audio quality: %3d%%	MediaConverter		Kvalita zvuku: %3d%%
 Cancelling…	MediaConverter		Rušení...
 Output file '%filename' created	MediaConverter		Byl vytvořen výstupní soubor '%filename'
 Output folder	MediaConverter		Výstupní adresář
@@ -50,7 +48,6 @@ Error	MediaConverter		Chyba
 File details	MediaConverter		Podrobnosti souboru
 No audio	Audio codecs list		Bez zvuku
 Drop media files onto this window	MediaConverter		Soubory médií přetáhni do tohoto okna
-Writing video track: %ld%% complete	MediaConverter		Zápis obrazové stopy: %ld%% hotovo
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# snímek} few{# snímky} other{# snímků}}
 Error read audio frame %lld	MediaConverter		Chyba čtení zvukového snímku %lld
 Quit	Menu		Konec
@@ -59,7 +56,6 @@ Duration:	MediaConverter-FileInfo		Tvání:
 MediaConverter	System name		Konvertor multimédií
 Error launching: %strError%	MediaConverter		Chyba otevírání: %strError%
 Error writing audio frame %lld	MediaConverter		Chyba při zápisu zvukového snímku %lld
-Writing audio track: %ld%% complete	MediaConverter		Zápis zvukové stopy: %ld%% hotovo
 File format:	MediaConverter		Formát souboru:
 File	Menu		Soubor
 Video quality not supported	MediaConverter		Nepodporovaná videokvalita

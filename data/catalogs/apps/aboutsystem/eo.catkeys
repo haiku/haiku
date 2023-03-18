@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-About	1839294148
+1	esperanto	x-vnd.Haiku-About	2228890381
 Revision	AboutView		Revizio
 The Haikuware team and their bounty program\n	AboutView		La Haikuware grupo kaj ilia premia programo\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Kopirajto © 1999-2007 Michael C. Ring. Ĉiuj rajtoj estas rezervitaj.
@@ -37,7 +37,6 @@ Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projekta fondinto)\n\n
 BSD (3-clause)	AboutWindow		BSD (3-klaŭza)
 About this system	AboutWindow		Pri la sistemo
-%d MiB used (%d%%)	AboutView		%d MiB uzataj (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Kopirajto © 1999-2010 de Gutenprint aŭtoroj. Ĉiuj rajtoj estas rezervitaj.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Kopirajto © 1994-1997 Mark Kilgard. Ĉiuj rajtoj estas rezervitaj.
 AboutSystem	System name		PriSistemo

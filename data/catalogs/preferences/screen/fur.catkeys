@@ -18,7 +18,7 @@ All workspaces	Screen		Ducj i spazis di lavôr
 Use laptop panel:	Screen		Dopre panel dal portatil:
 Could not write VESA mode settings file:\n\t	Screen		Impussibil scrivi il file des impostazions de modalitât VESA:\n\t
 Display info	Screen		Mostre informazions
-Settings will revert in %seconds.	Screen		Si tornarà aes impostazions vielis in %seconds.
+Settings will revert in %seconds.	Screen		Si tornarà aes impostazions vieris chi di %seconds.
 Cancel	Screen		Cancele
 Other…	Screen		Altri…
 Screen	Screen		Schermi
@@ -27,7 +27,7 @@ yes	Screen		sì
 Swap displays:	Screen		Scambie visôrs:
 %sSerial no.: %s	Screen		%sNumar seriâl: %s
 8 bits/pixel, 256 colors	Screen		8 bit/pixel, 256 colôrs
-Revert	Screen		Torne indaûr
+Revert	Screen		Ripristine
 always	Screen		simpri
 Confirm changes	Screen		Conferme modifichis
 Warning	Screen		Avertiment

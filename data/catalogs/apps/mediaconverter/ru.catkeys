@@ -1,7 +1,6 @@
-1	russian	x-vnd.Haiku-MediaConverter	1322040280
+1	russian	x-vnd.Haiku-MediaConverter	2116725671
 Input file not recognized as Audio or Video	MediaConverter		Входной файл не распознан как аудио или видео
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2fкадр/с
-Video quality: %3d%%	MediaConverter		Качество видео: %3d%%
 Source files	MediaConverter		Исходные файлы
 Error converting '%filename'	MediaConverter		Ошибка конвертации '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Выбранная папка не найдена. Выбираем по умолчанию /boot/home
@@ -25,7 +24,6 @@ Error loading a file	MediaConverter		Ошибка при загрузке фай
 Encoder parameters	MediaConverter-EncoderWindow		Параметры кодирования
 Open…	Menu		Открыть…
 Audio encoding:	MediaConverter		Кодирование звука:
-Audio quality: %3d%%	MediaConverter		Качество аудио: %3d%%
 Cancelling…	MediaConverter		Отменяется…
 Output file '%filename' created	MediaConverter		Выходящий файл '%filename' создан
 Output folder	MediaConverter		Сохранять в папку

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-About	1903104112
+1	croatian	x-vnd.Haiku-About	2292700345
 Revision	AboutView		Revizija
 The Haikuware team and their bounty program\n	AboutView		Haikuware tim i njihov darežljivi program\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Autorska prava © 1999-2007 Michael C. Ring. Sva prava pridržana.
@@ -33,7 +33,6 @@ GNU LGPL v2	AboutWindow		GNU LGPL v2
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Autorsk prava © 1994-2009, Thomas G. Lane, Guido Vollbeding. Ovaj software je temeljen na dijelu rada Independent JPEG Group.
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (utemeljitelj projekta)\n\n
 About this system	AboutWindow		O ovom sustavu
-%d MiB used (%d%%)	AboutView		%d MiB korišteno (%d%%)
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Autorsko pravo © 1999-2010 Gutenprint autora. Sva prava pridržana.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Autorska prava © 1994-1997 Mark Kilgard. Sva prava pridržana.
 AboutSystem	System name		O sustavu

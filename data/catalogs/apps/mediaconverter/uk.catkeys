@@ -1,7 +1,6 @@
-1	ukrainian	x-vnd.Haiku-MediaConverter	338319367
+1	ukrainian	x-vnd.Haiku-MediaConverter	3701038749
 Input file not recognized as Audio or Video	MediaConverter		Вхідний файл не розпізнаний як аудіо або відео
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Якість відео: %3d%%
 Source files	MediaConverter		Початкові файли
 Error writing video frame %lld	MediaConverter		Помилка запису відеофрейму %lld
 Error converting '%filename'	MediaConverter		Помилка конвертації '%filename'
@@ -28,7 +27,6 @@ Encoder parameters	MediaConverter-EncoderWindow		Параметри декоде
 Open…	Menu		Відкрити…
 Audio encoding:	MediaConverter		Кодування аудіо:
 Multi-track file detected	MediaConverter		Файл розпізнаний як багатоканальний
-Audio quality: %3d%%	MediaConverter		Якість аудіо: %3d%%
 Cancelling…	MediaConverter		Скасовується…
 Output file '%filename' created	MediaConverter		Вихідний файл '%filename' створено
 Output folder	MediaConverter		Вихідна папка
@@ -50,7 +48,6 @@ Error	MediaConverter		Помилка
 File details	MediaConverter		Деталі файлу
 No audio	Audio codecs list		Без аудіо
 Drop media files onto this window	MediaConverter		Перенесіть медіафайли у це вікно
-Writing video track: %ld%% complete	MediaConverter		Запис відеодоріжки: %ld%% завершено
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# кадр} few{# кадра} other{# кадрів}}
 Error read audio frame %lld	MediaConverter		Помилка зчитування аудіофрейму %lld
 Quit	Menu		Вийти
@@ -59,7 +56,6 @@ Duration:	MediaConverter-FileInfo		Тривалість:
 MediaConverter	System name		MediaConverter
 Error launching: %strError%	MediaConverter		Помилка запуску: %strError%
 Error writing audio frame %lld	MediaConverter		Помилка запису аудіофрейму %lld
-Writing audio track: %ld%% complete	MediaConverter		Запис звукової доріжки: %ld%% завершено
 File format:	MediaConverter		Формат файлу:
 File	Menu		Файл
 Video quality not supported	MediaConverter		Якість відео не підтримується

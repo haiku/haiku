@@ -24,7 +24,7 @@ Arrow style	DecorSettingsView		Stîl frece
 On	AntialiasingSettingsView		Ativât
 Decorator:	DecorSettingsView		Decoradôr:
 Menu background	Colors tab		Fonts dal menù
-Revert	APRWindow		Torne indaûr
+Revert	APRWindow		Ripristine
 List item text	Colors tab		Test dal element de liste
 OK	DecorSettingsView		Va ben
 Control text	Colors tab		Test dal control

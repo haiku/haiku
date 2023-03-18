@@ -1,7 +1,6 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	1322040280
+1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	2116725671
 Input file not recognized as Audio or Video	MediaConverter		Arquivo de entrada não reconhecido como Áudio ou Vídeo
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
-Video quality: %3d%%	MediaConverter		Qualidade de vídeo: %3d%%
 Source files	MediaConverter		Arquivos fonte
 Error converting '%filename'	MediaConverter		Erro ao converter '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Diretório selecionado não encontrado. Padronizando em /boot/home
@@ -25,7 +24,6 @@ Error loading a file	MediaConverter		Erro ao carregar um arquivo
 Encoder parameters	MediaConverter-EncoderWindow		Parâmetros do codificador
 Open…	Menu		Abrir…
 Audio encoding:	MediaConverter		Codificação de áudio:
-Audio quality: %3d%%	MediaConverter		Qualidade de áudio: %3d%%
 Cancelling…	MediaConverter		Cancelando…
 Output file '%filename' created	MediaConverter		Criado arquivo de saída '%filename'
 Output folder	MediaConverter		Pasta de saída

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-MAIL	1477453861
+1	dutch; flemish	x-vnd.Be-MAIL	3128433901
 Set to Saved	Mail		Als Bewaard markeren
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Uw hoofdtekst bevat %ld niet-codeerbare tekens. Mogelijk werkt een andere letterset beter? Klik op 'Versturen' om de tekst toch te versturen (een vervangend teken zal dan gebruikt worden op de plaats van elk niet-codeerbaar teken), of kies 'Annuleren' om terug te keren voor een herstelpoging.
 Text wrapping:	Mail		Tekstafbreking:
@@ -42,7 +42,6 @@ Copy link location	Mail		Linklocatie kopiëren
 Attachments: 	Mail		Bijlagen: 
 Remove enclosure	Mail		Bijlage verwijderen
 Next	Mail		Volgende
-Attachments:	Mail		Bijlagen: 
 Show icons only	Mail		Toon alleen iconen
 Subject:	Mail		Onderwerp:
 OK	Mail		Oké

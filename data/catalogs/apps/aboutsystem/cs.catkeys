@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-About	2259131995
+1	czech	x-vnd.Haiku-About	2648728228
 Revision	AboutView		Revize
 The Haikuware team and their bounty program\n	AboutView		Tým Haikuware a jejich systém prémií\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Všechna práva vyhrazena.
@@ -41,7 +41,6 @@ Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (zakladatel proje
 Remove replicant	AboutView		Odebrat replikanta
 BSD (3-clause)	AboutWindow		BSD (3 klauzule)
 About this system	AboutWindow		O tomto systému
-%d MiB used (%d%%)	AboutView		%d MiB používáno (%d%%)
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Všechna práva vyhrazena.
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 autoři Gutenprint. Všechna práva vyhrazena.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Všechna práva vyhrazena.

@@ -1,40 +1,31 @@
-1	lithuanian	x-vnd.Haiku-Installer	49639906
+1	lithuanian	x-vnd.Haiku-Installer	3125198243
 Performing installation.	InstallProgress		Diegiama.
-Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pasirinkite šaltinio diską iš išskleidžiamojo meniu. Tada spustelėkite mygtuką „Pradėti“.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Prieš užverdami įdiegimo programos langą, užverkite Diskų ženklintuvo langą.
 No optional packages available.	PackagesView		Papildomų paketų nėra.
 The mount point could not be retrieved.	InstallProgress		Prijungimo taško nustatyti nepavyko.
 <none>	InstallerWindow	No partition available	<nieko>
 Please choose target	InstallerWindow		Pasirinkite paskirties vietą
 Cancel	InstallProgress		Atsisakyti
-Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Diegimas baigtas. Paleidimo sektorius įrašytas į „%s“. Spauskite „Paleisti iš naujo“, kad kompiuteris būtų paleistas iš naujo, arba rinkitės naują paskirties skaidinį, jei norite „Haiku“ įdiegti dar kartą.
 Are you sure you want to to stop the installation?	InstallerWindow		Ar tikrai norite nutraukti diegimą?
 Installer	System name		Įdiegimo programa
 Unknown Type	InstallProgress	Partition content type	tipas nežinomas
-Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Spustelėkite „Pradėti“, kad būtų pradėtas „%1s“ diegimas į „%2s“.
-Choose the disk you want to install onto from the pop-up menu. Then click \"Begin\".	InstallerWindow		Pasirinkite paskirties diską „Haiku“ įdiegimui iš išskleidžiamojo meniu. Tada spustelėkite mygtuką „Pradėti“.
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Diegimas baigtas. Paleidimo sektorius įrašytas į „%s“. Spauskite „Baigti“, kad užbaigtumėte įdiegimo programos darbą, arba rinkitės naują paskirties skaidinį, jei norite „Haiku“ įdiegti dar kartą.
 README	InstallerApp		Lydimoji instrukcija
 Quit	InstallerWindow		Baigti darbą
 Write boot sector to '%s'	InstallerWindow		Įrašyti paleidimo sektorių į „%s“
 Boot sector not written because of an internal error.	InstallProgress		Paleidimo sektoriaus nepavyko įrašyti dėl vidinės klaidos.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Sveiki! Tai – „Haiku“ įdiegimo programa!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? iš ??
-Quit Boot Manager	InstallerWindow		Užbaikite Paleidyklės darbą.
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Diskų ženklintuvo – priemonės skaidiniams tvarkyti – paleisti nepavyko.
-Running Boot Manager…\n\nClose Boot Manager to continue with the installation.	InstallerWindow		Vykdoma Paleidyklė…\n\nUžvėrę Paleidyklę, galėsite tęsti diegimą.
 Quit DriveSetup	InstallerWindow		Užbaikite Diskų ženklintuvo darbą
 Write boot sector	InstallerWindow		Įrašyti paleidimo sektorių
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld iš %2ld
 Install from:	InstallerWindow		Diegti iš:
 Additional disk space required: 0.0 KiB	InstallerWindow		Papildomai reikės disko vietos: 0,0 KiB
 ???	InstallerWindow	Unknown currently copied item	???
-Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Pasirinkite šaltinio ir paskirties diskus iš išskleidžiamųjų meniu. Tada spustelėkite mygtuką „Pradėti“.
 Hide optional packages	InstallerWindow		Nerodyti papildomų paketų
 ???	InstallerWindow	Unknown partition name	???
 Quit	InstallerApp		Baigti darbą
 OK	InstallerWindow		Gerai
-Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Prieš užverdami įdiegimo programos langą, užverkite Paleidyklės ir Diskų ženklintuvo langus.
 Try installing anyway	InstallProgress		Vis tiek bandyti įdiegti
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		SVARBI INFORMACIJA PRIEŠ ĮDIEGIANT „HAIKU“\n\n
 Additional disk space required: %s	InstallerWindow		Papildomai reikės disko vietos: %s
@@ -57,13 +48,9 @@ The partition can't be mounted. Please choose a different partition.	InstallProg
 Set up partitions…	InstallerWindow		Tvarkyti skaidinius…
 Install progress:  	InstallerWindow		Įdiegiama: 
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Skaidinio turinio diegti į jį patį negalima. Pasirinkite kitą skaidinį.
-Please close the Boot Manager window before closing the Installer window.	InstallerWindow		Prieš užverdami įdiegimo programos langą, užverkite Paleidyklės langą.
 OK	InstallProgress		Gerai
-Running Boot Manager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		Vykdoma Paleidyklė ir Diskų ženklintuvas…\n\nUžvėrę abi programas, galėsite tęsti diegimą.
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Ar tikrai norite įdiegti į dabartinį paleidimo diską? Jeigu tęsite, įdiegimo programa turės paleisti kompiuterį iš naujo.
 Onto:	InstallerWindow		Į:
-Quit Boot Manager and DriveSetup	InstallerWindow		Užbaikite Paleidyklės ir Diskų ženklintuvo darbą
 Tools	InstallerWindow		Priemonės
 scanning…	InstallerWindow		žvalgoma…
-Set up boot menu	InstallerWindow		Įdiegti paleidyklės meniu
 Continue	InstallerApp		Tęsti

@@ -1,7 +1,6 @@
-1	finnish	x-vnd.Haiku-MediaConverter	338319367
+1	finnish	x-vnd.Haiku-MediaConverter	3701038749
 Input file not recognized as Audio or Video	MediaConverter		Syötetiedostoa ei tunnistettu audioksi tai videoksi
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f kehystä sekunnissa
-Video quality: %3d%%	MediaConverter		Videolaatu: %3d%%
 Source files	MediaConverter		Lähdetiedostot
 Error writing video frame %lld	MediaConverter		Virhekirjoitusvideokehys %lld
 Error converting '%filename'	MediaConverter		Virhe muunnettaessa tiedostoa ’%filename’
@@ -28,7 +27,6 @@ Encoder parameters	MediaConverter-EncoderWindow		Koodausparametrit
 Open…	Menu		Avaa...
 Audio encoding:	MediaConverter		Äänikoodaus:
 Multi-track file detected	MediaConverter		Moniraitainen tiedosto havaittu
-Audio quality: %3d%%	MediaConverter		Äänen laatu: %3d%%
 Cancelling…	MediaConverter		Perutaan...
 Output file '%filename' created	MediaConverter		Tulostetiedosto ’%filename’ on luotu
 Output folder	MediaConverter		Tulostekansio
@@ -50,7 +48,6 @@ Error	MediaConverter		Virhe
 File details	MediaConverter		Tiedoston yksityiskohdat
 No audio	Audio codecs list		Ei ääntä
 Drop media files onto this window	MediaConverter		Pudota mediatiedostot tähän ikkunaan
-Writing video track: %ld%% complete	MediaConverter		Videokappaleen kirjoitus: %ld%% valmis
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# kehys} other{# kehystä}}
 Error read audio frame %lld	MediaConverter		Virhe luettaessa audiokehystä %lld
 Quit	Menu		Lopeta
@@ -59,7 +56,6 @@ Duration:	MediaConverter-FileInfo		Kesto:
 MediaConverter	System name		Mediamuunnin
 Error launching: %strError%	MediaConverter		Virhe käynnistettäessä: %strError%
 Error writing audio frame %lld	MediaConverter		Virhe kirjoitettaessa audiokehystä %lld
-Writing audio track: %ld%% complete	MediaConverter		Audiokappaleen kirjoitus: %ld%% valmis
 File format:	MediaConverter		Tiedostomuoto:
 File	Menu		Tiedosto
 Video quality not supported	MediaConverter		Videolaatua ei tueta

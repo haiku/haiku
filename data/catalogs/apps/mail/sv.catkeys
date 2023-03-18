@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	1477453861
+1	swedish	x-vnd.Be-MAIL	3128433901
 Set to Saved	Mail		Set till Sparad
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Din text innehåller %ld tecken som inte kan hanteras. En annan teckenuppsättning kanske skulle fungera bättre? Klicka Skicka för att skicka det ändå (Ersättnings tecken kommer att användas till de tecken som inte kunde översättas), eller välj avbryt och försök att fixa felet.
 Text wrapping:	Mail		Textradbrytning:
@@ -42,7 +42,6 @@ Copy link location	Mail		Kopiera länkplats
 Attachments: 	Mail		Bilagor: 
 Remove enclosure	Mail		Ta bort bilaga
 Next	Mail		Nästa
-Attachments:	Mail		Bilagor:
 Show icons only	Mail		Visa iconer bara
 Subject:	Mail		Ämne:
 OK	Mail		OK

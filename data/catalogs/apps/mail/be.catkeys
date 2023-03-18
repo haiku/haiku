@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-MAIL	2903558745
+1	belarusian	x-vnd.Be-MAIL	259571489
 Set to Saved	Mail		Пазначыць як захаванае
 Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваша паведамленне месціць %ld літар якія адсутнічаюць у выбранай кадоўцы. Нягледзячы на гэта вы маеце магчымасць Даслаць яго (у такім разе адсутныя літары будуць заменены на больш стасуючыя), ці Адмяніць перасылку ды вярнуцца і правіць гэтае паведамленне далей. Магчыма іншая кадоўка дапаможа даслаць паведамленне ў зыходным выглядзе.
 Text wrapping:	Mail		Афармоўка тэксту:
@@ -38,7 +38,6 @@ Copy link location	Mail		Капіраваць спасылку
 Attachments: 	Mail		Укладаньні: 
 Remove enclosure	Mail		Выдаліць укладанне
 Next	Mail		Наступнае
-Attachments:	Mail		Укладанні:
 Show icons only	Mail		Паказваць толькі значкі
 Subject:	Mail		Тэма:
 OK	Mail		ОК
