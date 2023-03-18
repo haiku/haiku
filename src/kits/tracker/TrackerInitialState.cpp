@@ -472,6 +472,8 @@ TTracker::InstallDefaultTemplates()
 	// the following templates are in big endian and we rely on the Tracker
 	// translation support to swap them on little endian machines
 	//
+	// the column attribute is generated and written in the byte order of the machine
+	//
 	// in case there is an attribute (B_RECT_TYPE) that gets swapped by the media
 	// (unzip, file system endianness swapping, etc., the correct endianness for
 	// the correct machine has to be used here
@@ -497,8 +499,8 @@ TTracker::InstallDefaultTemplates()
 				"\000\000\000\000\000\000\000"
 		},
 		{
-			// attr: _trk/columns
-			kAttrColumns_be,
+			// attr: _trk/columns_le / _trk/columns
+			kAttrColumns,
 			B_RAW_TYPE,
 			0,
 			NULL
@@ -542,8 +544,8 @@ TTracker::InstallDefaultTemplates()
 				"\000\000\000\000\000\000"
 		},
 		{
-			// attr: _trk/columns
-			kAttrColumns_be,
+			// attr: _trk/columns_le / _trk/columns
+			kAttrColumns,
 			B_RAW_TYPE,
 			0,
 			NULL
@@ -587,8 +589,8 @@ TTracker::InstallDefaultTemplates()
 				"\000\000\000\000\000\000\000"
 		},
 		{
-			// attr: _trk/columns
-			kAttrColumns_be,
+			// attr: _trk/columns_le / _trk/columns
+			kAttrColumns,
 			B_RAW_TYPE,
 			0,
 			NULL
@@ -634,8 +636,8 @@ TTracker::InstallDefaultTemplates()
 				"\000\000\000\000\000\000"
 		},
 		{
-			// attr: _trk/columns
-			kAttrColumns_be,
+			// attr: _trk/columns_le / _trk/columns
+			kAttrColumns,
 			B_RAW_TYPE,
 			0,
 			NULL
@@ -654,7 +656,7 @@ TTracker::InstallDefaultTemplates()
 		{ B_TRANSLATE_MARK("From"), 165, 153, B_ALIGN_LEFT, "MAIL:from",
 			B_STRING_TYPE, false, false },
 		{ B_TRANSLATE_MARK("When"), 333, 120, B_ALIGN_LEFT, "MAIL:when",
-			B_STRING_TYPE, false, false },
+			B_TIME_TYPE, false, false },
 		{ B_TRANSLATE_MARK("Status"), 468, 50, B_ALIGN_RIGHT, "MAIL:status",
 			B_STRING_TYPE, false, true }
 	};
