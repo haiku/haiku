@@ -56,7 +56,7 @@ All rights reserved.
 #include "icons.h"
 
 #include "BarApp.h"
-#include "BarMenuTitle.h"
+#include "BarMenuBar.h"
 #include "BarView.h"
 #include "BarWindow.h"
 #include "DeskbarMenu.h"
@@ -70,8 +70,6 @@ All rights reserved.
 #include "WindowMenu.h"
 #include "WindowMenuItem.h"
 
-
-const float kDeskbarMenuWidth = gMinimumWindowWidth / 2;
 
 const uint32 kMinimizeTeam = 'mntm';
 const uint32 kBringTeamToFront = 'bftm';
@@ -943,8 +941,9 @@ TExpandoMenuBar::CheckForSizeOverrunHorizontal()
 float
 TExpandoMenuBar::MaxHorizontalWidth()
 {
-	return (fBarView->DragRegion()->Frame().left - 1) -
-		(kDeskbarMenuWidth + be_control_look->ComposeSpacing(kIconPadding));
+	return (BScreen(Window())).Frame().Width()
+		- fBarView->DragRegion()->Frame().Width() - 1
+		- fBarView->BarMenuBar()->Frame().Width();
 }
 
 
