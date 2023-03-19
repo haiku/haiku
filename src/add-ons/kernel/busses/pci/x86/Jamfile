@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel busses pci x86 ;
+
+SubDirC++Flags -fno-rtti ;
+
+UsePrivateKernelHeaders ;
+
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica include ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel bus_managers acpi acpica include
+	platform ;
+
+KernelAddon <pci>x86 :
+	pci_acpi.cpp
+	X86PCIController.cpp
+	kernel_interface.cpp
+;
