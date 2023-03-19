@@ -504,14 +504,14 @@ STrap(iframe* frame)
 			return;
 		}
 		case causeInterrupt + sSoftInt: {
-			SetSip(Sip() & ~(1 << sSoftInt));
+			ClearBitsSip(1 << sSoftInt);
 			// dprintf("sSoftInt(%" B_PRId32 ")\n", smp_get_current_cpu());
 			smp_intercpu_int_handler(smp_get_current_cpu());
 			AfterInterrupt();
 			return;
 		}
 		case causeInterrupt + sTimerInt: {
-			// SetSie(Sie() & ~(1 << sTimerInt));
+			ClearBitsSie(1 << sTimerInt);
 			// dprintf("sTimerInt(%" B_PRId32 ")\n", smp_get_current_cpu());
 			timer_interrupt();
 			AfterInterrupt();
