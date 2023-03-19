@@ -5,6 +5,8 @@
 #ifndef PCI_X86_H
 #define PCI_X86_H
 
+// DEPRECATED. Use `pci_module_info` or `pci_device_module_info` instead.
+
 #include <SupportDefs.h>
 #include <module.h>
 

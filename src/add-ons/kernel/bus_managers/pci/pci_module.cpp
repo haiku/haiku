@@ -14,8 +14,11 @@
 #include "pci_info.h"
 #include "pci.h"
 
+#define CHECK_RET(err) {status_t _err = (err); if (_err < B_OK) return _err;}
+
 
 device_manager_info *gDeviceManager;
+
 
 static int32
 pci_old_module_std_ops(int32 op, ...)
@@ -69,6 +72,23 @@ pci_arch_module_std_ops(int32 op, ...)
 }
 
 
+static status_t
+ResolveBDF(uint8 virtualBus, uint8 device, uint8 function, PCIDev*& dev)
+{
+	uint8 bus;
+	uint8 domain;
+	status_t result = gPCI->ResolveVirtualBus(virtualBus, &domain, &bus);
+	if (result != B_OK)
+		return result;
+
+	dev = gPCI->FindDevice(domain, bus, device, function);
+	if (dev == NULL)
+		return B_ERROR;
+
+	return B_OK;
+}
+
+
 static struct pci_module_info sOldPCIModule = {
 	{
 		{
@@ -78,23 +98,66 @@ static struct pci_module_info sOldPCIModule = {
 		},
 		NULL
 	},
-	&pci_read_io_8,
-	&pci_write_io_8,
-	&pci_read_io_16,
-	&pci_write_io_16,
-	&pci_read_io_32,
-	&pci_write_io_32,
-	&pci_get_nth_pci_info,
-	&pci_read_config,
-	&pci_write_config,
-	&pci_ram_address,
-	&pci_find_capability,
-	&pci_reserve_device,
-	&pci_unreserve_device,
-	&pci_update_interrupt_line,
-	&pci_find_extended_capability,
-	&pci_get_powerstate,
-	&pci_set_powerstate
+	.read_io_8 = pci_read_io_8,
+	.write_io_8 = pci_write_io_8,
+	.read_io_16 = pci_read_io_16,
+	.write_io_16 = pci_write_io_16,
+	.read_io_32 = pci_read_io_32,
+	.write_io_32 = pci_write_io_32,
+	.get_nth_pci_info = pci_get_nth_pci_info,
+	.read_pci_config = pci_read_config,
+	.write_pci_config = pci_write_config,
+	.ram_address = pci_ram_address,
+	.find_pci_capability = pci_find_capability,
+	.reserve_device = pci_reserve_device,
+	.unreserve_device = pci_unreserve_device,
+	.update_interrupt_line = pci_update_interrupt_line,
+	.find_pci_extended_capability = pci_find_extended_capability,
+	.get_powerstate = pci_get_powerstate,
+	.set_powerstate = pci_set_powerstate,
+
+	.get_msi_count = [](uint8 bus, uint8 device, uint8 function) {
+		PCIDev* dev;
+		if (ResolveBDF(bus, device, function, dev) < B_OK)
+			return (uint8)0;
+		return gPCI->GetMSICount(dev);
+	},
+	.configure_msi = [](uint8 bus, uint8 device, uint8 function, uint8 count, uint8 *startVector) {
+		PCIDev* dev;
+		CHECK_RET(ResolveBDF(bus, device, function, dev));
+		return gPCI->ConfigureMSI(dev, count, startVector);
+	},
+	.unconfigure_msi = [](uint8 bus, uint8 device, uint8 function) {
+		PCIDev* dev;
+		CHECK_RET(ResolveBDF(bus, device, function, dev));
+		return gPCI->UnconfigureMSI(dev);
+	},
+	.enable_msi = [](uint8 bus, uint8 device, uint8 function) {
+		PCIDev* dev;
+		CHECK_RET(ResolveBDF(bus, device, function, dev));
+		return gPCI->EnableMSI(dev);
+	},
+	.disable_msi = [](uint8 bus, uint8 device, uint8 function) {
+		PCIDev* dev;
+		CHECK_RET(ResolveBDF(bus, device, function, dev));
+		return gPCI->DisableMSI(dev);
+	},
+	.get_msix_count = [](uint8 bus, uint8 device, uint8 function) {
+		PCIDev* dev;
+		if (ResolveBDF(bus, device, function, dev) < B_OK)
+			return (uint8)0;
+		return gPCI->GetMSIXCount(dev);
+	},
+	.configure_msix = [](uint8 bus, uint8 device, uint8 function, uint8 count, uint8 *startVector) {
+		PCIDev* dev;
+		CHECK_RET(ResolveBDF(bus, device, function, dev));
+		return gPCI->ConfigureMSIX(dev, count, startVector);
+	},
+	.enable_msix = [](uint8 bus, uint8 device, uint8 function) {
+		PCIDev* dev;
+		CHECK_RET(ResolveBDF(bus, device, function, dev));
+		return gPCI->EnableMSIX(dev);
+	}
 };
 
 
@@ -104,15 +167,48 @@ static pci_x86_module_info sPCIArchModule = {
 		0,
 		pci_arch_module_std_ops
 	},
-
-	&pci_get_msi_count,
-	&pci_configure_msi,
-	&pci_unconfigure_msi,
-	&pci_enable_msi,
-	&pci_disable_msi,
-	&pci_get_msix_count,
-	&pci_configure_msix,
-	&pci_enable_msix
+	.get_msi_count = [](uint8 bus, uint8 device, uint8 function) {
+		PCIDev* dev;
+		if (ResolveBDF(bus, device, function, dev) < B_OK)
+			return (uint8)0;
+		return gPCI->GetMSICount(dev);
+	},
+	.configure_msi = [](uint8 bus, uint8 device, uint8 function, uint8 count, uint8 *startVector) {
+		PCIDev* dev;
+		CHECK_RET(ResolveBDF(bus, device, function, dev));
+		return gPCI->ConfigureMSI(dev, count, startVector);
+	},
+	.unconfigure_msi = [](uint8 bus, uint8 device, uint8 function) {
+		PCIDev* dev;
+		CHECK_RET(ResolveBDF(bus, device, function, dev));
+		return gPCI->UnconfigureMSI(dev);
+	},
+	.enable_msi = [](uint8 bus, uint8 device, uint8 function) {
+		PCIDev* dev;
+		CHECK_RET(ResolveBDF(bus, device, function, dev));
+		return gPCI->EnableMSI(dev);
+	},
+	.disable_msi = [](uint8 bus, uint8 device, uint8 function) {
+		PCIDev* dev;
+		CHECK_RET(ResolveBDF(bus, device, function, dev));
+		return gPCI->DisableMSI(dev);
+	},
+	.get_msix_count = [](uint8 bus, uint8 device, uint8 function) {
+		PCIDev* dev;
+		if (ResolveBDF(bus, device, function, dev) < B_OK)
+			return (uint8)0;
+		return gPCI->GetMSIXCount(dev);
+	},
+	.configure_msix = [](uint8 bus, uint8 device, uint8 function, uint8 count, uint8 *startVector) {
+		PCIDev* dev;
+		CHECK_RET(ResolveBDF(bus, device, function, dev));
+		return gPCI->ConfigureMSIX(dev, count, startVector);
+	},
+	.enable_msix = [](uint8 bus, uint8 device, uint8 function) {
+		PCIDev* dev;
+		CHECK_RET(ResolveBDF(bus, device, function, dev));
+		return gPCI->EnableMSIX(dev);
+	}
 };
 
 

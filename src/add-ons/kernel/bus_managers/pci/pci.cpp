@@ -10,6 +10,10 @@
 #include <KernelExport.h>
 #define __HAIKU_PCI_BUS_MANAGER_TESTING 1
 #include <PCI.h>
+#include <arch/generic/msi.h>
+#if defined(__i386__) || defined(__x86_64__)
+#include <arch/x86/msi.h>
+#endif
 
 #include "util/kernel_cpp.h"
 #include "pci_fixup.h"
@@ -1551,9 +1555,9 @@ PCI::_RefreshDeviceInfo(PCIBus *bus)
 	for (PCIDev *dev = bus->child; dev; dev = dev->next) {
 		_ReadBasicInfo(dev);
 		_ReadHeaderInfo(dev);
-		pci_read_msi_info(dev);
-		pci_read_msix_info(dev);
-		pci_read_ht_mapping_info(dev);
+		_ReadMSIInfo(dev);
+		_ReadMSIXInfo(dev);
+		_ReadHtMappingInfo(dev);
 		if (dev->child)
 			_RefreshDeviceInfo(dev->child);
 	}
@@ -1925,3 +1929,476 @@ PCI::SetPowerstate(uint8 domain, uint8 bus, uint8 _device, uint8 function,
 	return B_OK;
 }
 
+
+//#pragma mark - MSI
+
+uint8
+PCI::GetMSICount(PCIDev *device)
+{
+	if (!msi_supported())
+		return 0;
+
+	msi_info *info = &device->msi;
+	if (!info->msi_capable)
+		return 0;
+
+	return info->message_count;
+}
+
+
+status_t
+PCI::ConfigureMSI(PCIDev *device, uint8 count, uint8 *startVector)
+{
+	if (!msi_supported())
+		return B_UNSUPPORTED;
+
+	if (count == 0 || startVector == NULL)
+		return B_BAD_VALUE;
+
+	msi_info *info = &device->msi;
+	if (!info->msi_capable)
+		return B_UNSUPPORTED;
+
+	if (count > 32 || count > info->message_count
+		|| ((count - 1) & count) != 0 /* needs to be a power of 2 */) {
+		return B_BAD_VALUE;
+	}
+
+	if (info->configured_count != 0)
+		return B_BUSY;
+
+	status_t result = msi_allocate_vectors(count, &info->start_vector,
+		&info->address_value, &info->data_value);
+	if (result != B_OK)
+		return result;
+
+	uint8 offset = info->capability_offset;
+	WriteConfig(device, offset + PCI_msi_address, 4,
+		info->address_value & 0xffffffff);
+	if (info->control_value & PCI_msi_control_64bit) {
+		WriteConfig(device, offset + PCI_msi_address_high, 4,
+			info->address_value >> 32);
+		WriteConfig(device, offset + PCI_msi_data_64bit, 2,
+			info->data_value);
+	} else
+		WriteConfig(device, offset + PCI_msi_data, 2, info->data_value);
+
+	info->control_value &= ~PCI_msi_control_mme_mask;
+	info->control_value |= (ffs(count) - 1) << 4;
+	WriteConfig(device, offset + PCI_msi_control, 2, info->control_value);
+
+	info->configured_count = count;
+	*startVector = info->start_vector;
+	return B_OK;
+}
+
+
+status_t
+PCI::UnconfigureMSI(PCIDev *device)
+{
+	if (!msi_supported())
+		return B_UNSUPPORTED;
+
+	// try MSI-X
+	status_t result = _UnconfigureMSIX(device);
+	if (result != B_UNSUPPORTED && result != B_NO_INIT)
+		return result;
+
+	msi_info *info =  &device->msi;
+	if (!info->msi_capable)
+		return B_UNSUPPORTED;
+
+	if (info->configured_count == 0)
+		return B_NO_INIT;
+
+	msi_free_vectors(info->configured_count, info->start_vector);
+
+	info->control_value &= ~PCI_msi_control_mme_mask;
+	WriteConfig(device, info->capability_offset + PCI_msi_control, 2,
+		info->control_value);
+
+	info->configured_count = 0;
+	info->address_value = 0;
+	info->data_value = 0;
+	return B_OK;
+}
+
+
+status_t
+PCI::EnableMSI(PCIDev *device)
+{
+	if (!msi_supported())
+		return B_UNSUPPORTED;
+
+	msi_info *info =  &device->msi;
+	if (!info->msi_capable)
+		return B_UNSUPPORTED;
+
+	if (info->configured_count == 0)
+		return B_NO_INIT;
+
+	// ensure the pinned interrupt is disabled
+	WriteConfig(device, PCI_command, 2,
+		ReadConfig(device, PCI_command, 2) | PCI_command_int_disable);
+
+	// enable msi generation
+	info->control_value |= PCI_msi_control_enable;
+	WriteConfig(device, info->capability_offset + PCI_msi_control, 2,
+		info->control_value);
+
+	// enable HT msi mapping (if applicable)
+	_HtMSIMap(device, info->address_value);
+
+	dprintf("msi enabled: 0x%04" B_PRIx32 "\n",
+		ReadConfig(device, info->capability_offset + PCI_msi_control, 2));
+	return B_OK;
+}
+
+
+status_t
+PCI::DisableMSI(PCIDev *device)
+{
+	if (!msi_supported())
+		return B_UNSUPPORTED;
+
+	// try MSI-X
+	status_t result = _DisableMSIX(device);
+	if (result != B_UNSUPPORTED && result != B_NO_INIT)
+		return result;
+
+	msi_info *info =  &device->msi;
+	if (!info->msi_capable)
+		return B_UNSUPPORTED;
+
+	if (info->configured_count == 0)
+		return B_NO_INIT;
+
+	// disable HT msi mapping (if applicable)
+	_HtMSIMap(device, 0);
+
+	// disable msi generation
+	info->control_value &= ~PCI_msi_control_enable;
+	WriteConfig(device, info->capability_offset + PCI_msi_control, 2,
+		info->control_value);
+
+	return B_OK;
+}
+
+
+uint8
+PCI::GetMSIXCount(PCIDev *device)
+{
+	if (!msi_supported())
+		return 0;
+
+	msix_info *info = &device->msix;
+	if (!info->msix_capable)
+		return 0;
+
+	return info->message_count;
+}
+
+
+status_t
+PCI::ConfigureMSIX(PCIDev *device, uint8 count, uint8 *startVector)
+{
+	if (!msi_supported())
+		return B_UNSUPPORTED;
+
+	if (count == 0 || startVector == NULL)
+		return B_BAD_VALUE;
+
+	msix_info *info = &device->msix;
+	if (!info->msix_capable)
+		return B_UNSUPPORTED;
+
+	if (count > 32 || count > info->message_count) {
+		return B_BAD_VALUE;
+	}
+
+	if (info->configured_count != 0)
+		return B_BUSY;
+
+	// map the table bar
+	size_t tableSize = info->message_count * 16;
+	addr_t address;
+	phys_addr_t barAddr = device->info.u.h0.base_registers[info->table_bar];
+	uchar flags = device->info.u.h0.base_register_flags[info->table_bar];
+	if ((flags & PCI_address_type) == PCI_address_type_64) {
+		barAddr |= (uint64)device->info.u.h0.base_registers[
+			info->table_bar + 1] << 32;
+	}
+	area_id area = map_physical_memory("msi table map",
+		barAddr, tableSize + info->table_offset,
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		(void**)&address);
+	if (area < 0)
+		return area;
+	info->table_area_id = area;
+	info->table_address = address + info->table_offset;
+
+	// and the pba bar if necessary
+	if (info->table_bar != info->pba_bar) {
+		barAddr = device->info.u.h0.base_registers[info->pba_bar];
+		flags = device->info.u.h0.base_register_flags[info->pba_bar];
+		if ((flags & PCI_address_type) == PCI_address_type_64) {
+			barAddr |= (uint64)device->info.u.h0.base_registers[
+				info->pba_bar + 1] << 32;
+		}
+		area = map_physical_memory("msi pba map",
+			barAddr, tableSize + info->pba_offset,
+			B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+			(void**)&address);
+		if (area < 0) {
+			delete_area(info->table_area_id);
+			info->table_area_id = -1;
+			return area;
+		}
+		info->pba_area_id = area;
+	} else
+		info->pba_area_id = -1;
+	info->pba_address = address + info->pba_offset;
+
+	status_t result = msi_allocate_vectors(count, &info->start_vector,
+		&info->address_value, &info->data_value);
+	if (result != B_OK) {
+		delete_area(info->pba_area_id);
+		delete_area(info->table_area_id);
+		info->pba_area_id = -1;
+		info->table_area_id = -1;
+		return result;
+	}
+
+	// ensure the memory i/o is enabled
+	WriteConfig(device, PCI_command, 2,
+		ReadConfig(device, PCI_command, 2) | PCI_command_memory);
+
+	uint32 data_value = info->data_value;
+	for (uint32 index = 0; index < count; index++) {
+		volatile uint32 *entry = (uint32*)(info->table_address + 16 * index);
+		*(entry + 3) |= PCI_msix_vctrl_mask;
+		*entry++ = info->address_value & 0xffffffff;
+		*entry++ = info->address_value >> 32;
+		*entry++ = data_value++;
+		*entry &= ~PCI_msix_vctrl_mask;
+	}
+
+	info->configured_count = count;
+	*startVector = info->start_vector;
+	dprintf("msix configured for %d vectors\n", count);
+	return B_OK;
+}
+
+
+status_t
+PCI::EnableMSIX(PCIDev *device)
+{
+	if (!msi_supported())
+		return B_UNSUPPORTED;
+
+	msix_info *info = &device->msix;
+	if (!info->msix_capable)
+		return B_UNSUPPORTED;
+
+	if (info->configured_count == 0)
+		return B_NO_INIT;
+
+	// ensure the pinned interrupt is disabled
+	WriteConfig(device, PCI_command, 2,
+		ReadConfig(device, PCI_command, 2) | PCI_command_int_disable);
+
+	// enable msi-x generation
+	info->control_value |= PCI_msix_control_enable;
+	WriteConfig(device, info->capability_offset + PCI_msix_control, 2,
+		info->control_value);
+
+	// enable HT msi mapping (if applicable)
+	_HtMSIMap(device, info->address_value);
+
+	dprintf("msi-x enabled: 0x%04" B_PRIx32 "\n",
+		ReadConfig(device, info->capability_offset + PCI_msix_control, 2));
+	return B_OK;
+}
+
+
+void
+PCI::_HtMSIMap(PCIDev *device, uint64 address)
+{
+	ht_mapping_info *info = &device->ht_mapping;
+	if (!info->ht_mapping_capable)
+		return;
+
+	bool enabled = (info->control_value & PCI_ht_command_msi_enable) != 0;
+	if ((address != 0) != enabled) {
+		if (enabled) {
+			info->control_value &= ~PCI_ht_command_msi_enable;
+		} else {
+			if ((address >> 20) != (info->address_value >> 20))
+				return;
+			dprintf("ht msi mapping enabled\n");
+			info->control_value |= PCI_ht_command_msi_enable;
+		}
+		WriteConfig(device, info->capability_offset + PCI_ht_command, 2,
+			info->control_value);
+	}
+}
+
+
+void
+PCI::_ReadMSIInfo(PCIDev *device)
+{
+	if (!msi_supported())
+		return;
+
+	msi_info *info = &device->msi;
+	info->msi_capable = false;
+	status_t result = FindCapability(device->domain, device->bus,
+		device->device, device->function, PCI_cap_id_msi,
+		&info->capability_offset);
+	if (result != B_OK)
+		return;
+
+	info->msi_capable = true;
+	info->control_value = ReadConfig(device->domain, device->bus,
+		device->device, device->function,
+		info->capability_offset + PCI_msi_control, 2);
+	info->message_count
+		= 1 << ((info->control_value & PCI_msi_control_mmc_mask) >> 1);
+	info->configured_count = 0;
+	info->data_value = 0;
+	info->address_value = 0;
+}
+
+
+void
+PCI::_ReadMSIXInfo(PCIDev *device)
+{
+	if (!msi_supported())
+		return;
+
+	msix_info *info = &device->msix;
+	info->msix_capable = false;
+	status_t result = FindCapability(device->domain, device->bus,
+		device->device, device->function, PCI_cap_id_msix,
+		&info->capability_offset);
+	if (result != B_OK)
+		return;
+
+	info->msix_capable = true;
+	info->control_value = ReadConfig(device->domain, device->bus,
+		device->device, device->function,
+		info->capability_offset + PCI_msix_control, 2);
+	info->message_count
+		= (info->control_value & PCI_msix_control_table_size) + 1;
+	info->configured_count = 0;
+	info->data_value = 0;
+	info->address_value = 0;
+	info->table_area_id = -1;
+	info->pba_area_id = -1;
+	uint32 table_value = ReadConfig(device->domain, device->bus,
+		device->device, device->function,
+		info->capability_offset + PCI_msix_table, 4);
+	uint32 pba_value = ReadConfig(device->domain, device->bus,
+		device->device, device->function,
+		info->capability_offset + PCI_msix_pba, 4);
+
+	info->table_bar = table_value & PCI_msix_bir_mask;
+	info->table_offset = table_value & PCI_msix_offset_mask;
+	info->pba_bar = pba_value & PCI_msix_bir_mask;
+	info->pba_offset = pba_value & PCI_msix_offset_mask;
+}
+
+
+void
+PCI::_ReadHtMappingInfo(PCIDev *device)
+{
+	if (!msi_supported())
+		return;
+
+	ht_mapping_info *info = &device->ht_mapping;
+	info->ht_mapping_capable = false;
+
+	uint8 offset = 0;
+	if (FindHTCapability(device, PCI_ht_command_cap_msi_mapping,
+		&offset) == B_OK) {
+		info->control_value = ReadConfig(device, offset + PCI_ht_command,
+			2);
+		info->capability_offset = offset;
+		info->ht_mapping_capable = true;
+		if ((info->control_value & PCI_ht_command_msi_fixed) != 0) {
+#if defined(__i386__) || defined(__x86_64__)
+			info->address_value = MSI_ADDRESS_BASE;
+#else
+			// TODO: investigate what should be set here for non-x86
+			dprintf("PCI_ht_command_msi_fixed flag unimplemented\n");
+			info->address_value = 0;
+#endif
+		} else {
+			info->address_value = ReadConfig(device, offset
+				+ PCI_ht_msi_address_high, 4);
+			info->address_value <<= 32;
+			info->address_value |= ReadConfig(device, offset
+				+ PCI_ht_msi_address_low, 4);
+		}
+		dprintf("found an ht msi mapping at %#" B_PRIx64 "\n",
+			info->address_value);
+	}
+}
+
+
+status_t
+PCI::_UnconfigureMSIX(PCIDev *device)
+{
+	msix_info *info =  &device->msix;
+	if (!info->msix_capable)
+		return B_UNSUPPORTED;
+
+	if (info->configured_count == 0)
+		return B_NO_INIT;
+
+	// disable msi-x generation
+	info->control_value &= ~PCI_msix_control_enable;
+	WriteConfig(device, info->capability_offset + PCI_msix_control, 2,
+		info->control_value);
+
+	msi_free_vectors(info->configured_count, info->start_vector);
+	for (uint8 index = 0; index < info->configured_count; index++) {
+		volatile uint32 *entry = (uint32*)(info->table_address + 16 * index);
+		if ((*(entry + 3) & PCI_msix_vctrl_mask) == 0)
+			*(entry + 3) |= PCI_msix_vctrl_mask;
+	}
+
+	if (info->pba_area_id != -1)
+		delete_area(info->pba_area_id);
+	if (info->table_area_id != -1)
+		delete_area(info->table_area_id);
+	info->pba_area_id= -1;
+	info->table_area_id = -1;
+
+	info->configured_count = 0;
+	info->address_value = 0;
+	info->data_value = 0;
+	return B_OK;
+}
+
+
+status_t
+PCI::_DisableMSIX(PCIDev *device)
+{
+	msix_info *info =  &device->msix;
+	if (!info->msix_capable)
+		return B_UNSUPPORTED;
+
+	if (info->configured_count == 0)
+		return B_NO_INIT;
+
+	// disable HT msi mapping (if applicable)
+	_HtMSIMap(device, 0);
+
+	// disable msi-x generation
+	info->control_value &= ~PCI_msix_control_enable;
+	gPCI->WriteConfig(device, info->capability_offset + PCI_msix_control, 2,
+		info->control_value);
+
+	return B_OK;
+}

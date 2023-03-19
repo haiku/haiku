@@ -126,6 +126,15 @@ public:
 								uint8 device, uint8 function,
 								uint8 newInterruptLineValue);
 
+			uint8			GetMSICount(PCIDev *device);
+			status_t		ConfigureMSI(PCIDev *device, uint8 count, uint8 *startVector);
+			status_t		UnconfigureMSI(PCIDev *device);
+			status_t		EnableMSI(PCIDev *device);
+			status_t		DisableMSI(PCIDev *device);
+			uint8			GetMSIXCount(PCIDev *device);
+			status_t		ConfigureMSIX(PCIDev *device, uint8 count, uint8 *startVector);
+			status_t		EnableMSIX(PCIDev *device);
+
 private:
 			void			_EnumerateBus(uint8 domain, uint8 bus,
 								uint8 *subordinateBus = NULL);
@@ -169,6 +178,13 @@ private:
 								uint8 device);
 			PCIDev *		_FindDevice(PCIBus *current, uint8 domain,
 								uint8 bus, uint8 device, uint8 function);
+
+			void			_HtMSIMap(PCIDev *device, uint64 address);
+			void			_ReadMSIInfo(PCIDev *device);
+			void			_ReadMSIXInfo(PCIDev *device);
+			void			_ReadHtMappingInfo(PCIDev *device);
+			status_t		_UnconfigureMSIX(PCIDev *device);
+			status_t		_DisableMSIX(PCIDev *device);
 
 private:
 	PCIBus *				fRootBus;

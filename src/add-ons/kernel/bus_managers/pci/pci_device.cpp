@@ -21,111 +21,6 @@ struct pci_device {
 };
 
 
-static uint8
-pci_device_read_io_8(pci_device* device, addr_t mappedIOAddress)
-{
-	return pci_read_io_8(mappedIOAddress);
-}
-
-
-static void
-pci_device_write_io_8(pci_device* device, addr_t mappedIOAddress,
-	uint8 value)
-{
-	pci_write_io_8(mappedIOAddress, value);
-}
-
-
-static uint16
-pci_device_read_io_16(pci_device* device, addr_t mappedIOAddress)
-{
-	return pci_read_io_16(mappedIOAddress);
-}
-
-
-static void
-pci_device_write_io_16(pci_device* device, addr_t mappedIOAddress,
-	uint16 value)
-{
-	pci_write_io_16(mappedIOAddress, value);
-}
-
-
-static uint32
-pci_device_read_io_32(pci_device* device, addr_t mappedIOAddress)
-{
-	return pci_read_io_32(mappedIOAddress);
-}
-
-
-static void
-pci_device_write_io_32(pci_device* device, addr_t mappedIOAddress, uint32 value)
-{
-	pci_write_io_32(mappedIOAddress, value);
-}
-
-
-static uint32
-pci_device_read_pci_config(pci_device* device, uint16 offset, uint8 size)
-{
-	return gPCI->ReadConfig(device->device, offset, size);
-}
-
-
-static void
-pci_device_write_pci_config(pci_device* device, uint16 offset, uint8 size,
-	uint32 value)
-{
-	gPCI->WriteConfig(device->device, offset, size, value);
-}
-
-
-static phys_addr_t
-pci_device_ram_address(pci_device* device, phys_addr_t physicalAddress)
-{
-	return pci_ram_address(physicalAddress);
-}
-
-
-static status_t
-pci_device_find_capability(pci_device* device, uint8 capID, uint8* offset)
-{
-	return gPCI->FindCapability(device->device, capID, offset);
-}
-
-
-static status_t
-pci_device_find_extended_capability(pci_device* device, uint16 capID,
-	uint16* offset)
-{
-	return gPCI->FindExtendedCapability(device->device, capID, offset);
-}
-
-
-static uint8
-pci_device_get_powerstate(pci_device *device)
-{
-	return gPCI->GetPowerstate(device->device);
-}
-
-
-static void
-pci_device_set_powerstate(pci_device *device, uint8 state)
-{
-	return gPCI->SetPowerstate(device->device, state);
-}
-
-
-static void
-pci_device_get_pci_info(pci_device* device, struct pci_info* info)
-{
-	if (info == NULL)
-		return;
-
-	*info = device->device->info;
-}
-
-
 static status_t
 pci_device_init_driver(device_node* node, void** _cookie)
 {
@@ -188,29 +83,76 @@ pci_device_module_info gPCIDeviceModule = {
 			pci_device_std_ops
 		},
 
-		NULL,		// supports device
-		NULL,		// register device (our parent registered us)
-		pci_device_init_driver,
-		pci_device_uninit_driver,
-		NULL,		// register child devices
-		NULL,		// rescan devices
-		NULL,		// device removed
+		.init_driver = pci_device_init_driver,
+		.uninit_driver = pci_device_uninit_driver,
 	},
 
-	pci_device_read_io_8,
-	pci_device_write_io_8,
-	pci_device_read_io_16,
-	pci_device_write_io_16,
-	pci_device_read_io_32,
-	pci_device_write_io_32,
-
-	pci_device_ram_address,
-
-	pci_device_read_pci_config,
-	pci_device_write_pci_config,
-	pci_device_find_capability,
-	pci_device_get_pci_info,
-	pci_device_find_extended_capability,
-	pci_device_get_powerstate,
-	pci_device_set_powerstate
+	.read_io_8 = [](pci_device *device, addr_t mappedIOAddress) {
+		return pci_read_io_8(mappedIOAddress);
+	},
+	.write_io_8 = [](pci_device *device, addr_t mappedIOAddress, uint8 value) {
+		pci_write_io_8(mappedIOAddress, value);
+	},
+	.read_io_16 = [](pci_device *device, addr_t mappedIOAddress) {
+		return pci_read_io_16(mappedIOAddress);
+	},
+	.write_io_16 = [](pci_device *device, addr_t mappedIOAddress, uint16 value) {
+		pci_write_io_16(mappedIOAddress, value);
+	},
+	.read_io_32 = [](pci_device *device, addr_t mappedIOAddress) {
+		return pci_read_io_32(mappedIOAddress);
+	},
+	.write_io_32 = [](pci_device *device, addr_t mappedIOAddress, uint32 value) {
+		pci_write_io_32(mappedIOAddress, value);
+	},
+	.ram_address = [](pci_device *device, phys_addr_t physicalAddress) {
+		return pci_ram_address(physicalAddress);
+	},
+	.read_pci_config = [](pci_device *device, uint16 offset, uint8 size) {
+		return gPCI->ReadConfig(device->device, offset, size);
+	},
+	.write_pci_config = [](pci_device *device, uint16 offset, uint8 size, uint32 value) {
+		gPCI->WriteConfig(device->device, offset, size, value);
+	},
+	.find_pci_capability = [](pci_device *device, uint8 capID, uint8 *offset) {
+		return gPCI->FindCapability(device->device, capID, offset);
+	},
+	.get_pci_info = [](pci_device *device, struct pci_info *info) {
+		if (info == NULL)
+			return;
+		*info = device->device->info;
+	},
+	.find_pci_extended_capability = [](pci_device *device, uint16 capID, uint16 *offset) {
+		return gPCI->FindExtendedCapability(device->device, capID, offset);
+	},
+	.get_powerstate = [](pci_device *device) {
+		return gPCI->GetPowerstate(device->device);
+	},
+	.set_powerstate = [](pci_device *device, uint8 state) {
+		gPCI->SetPowerstate(device->device, state);
+	},
+	.get_msi_count = [](pci_device *device) {
+		return gPCI->GetMSICount(device->device);
+	},
+	.configure_msi = [](pci_device *device, uint8 count, uint8 *startVector) {
+		return gPCI->ConfigureMSI(device->device, count, startVector);
+	},
+	.unconfigure_msi = [](pci_device *device) {
+		return gPCI->UnconfigureMSI(device->device);
+	},
+	.enable_msi = [](pci_device *device) {
+		return gPCI->EnableMSI(device->device);
+	},
+	.disable_msi = [](pci_device *device) {
+		return gPCI->DisableMSI(device->device);
+	},
+	.get_msix_count = [](pci_device *device) {
+		return gPCI->GetMSIXCount(device->device);
+	},
+	.configure_msix = [](pci_device *device, uint8 count, uint8 *startVector) {
+		return gPCI->ConfigureMSIX(device->device, count, startVector);
+	},
+	.enable_msix = [](pci_device *device) {
+		return gPCI->EnableMSIX(device->device);
+	}
 };
