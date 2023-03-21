@@ -591,8 +591,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 				double percentValue = (double)currPercent;
 
 				if (fNumberFormat.FormatPercent(data, percentValue / 100) != B_OK) {
-					status.SetToFormat(B_TRANSLATE("Writing video track: %" B_PRId32
-						"%% complete"), currPercent);
+					data.SetToFormat("%" B_PRId32 "%%", currPercent);
 				}
 
 				status.SetToFormat(B_TRANSLATE("Writing video track: %s complete"), data.String());
@@ -649,8 +648,7 @@ MediaConverterApp::_ConvertFile(BMediaFile* inFile, BMediaFile* outFile,
 				double percentValue = (double)currPercent;
 
 				if (fNumberFormat.FormatPercent(data, percentValue / 100) != B_OK) {
-					status.SetToFormat(B_TRANSLATE("Writing audio track: %" B_PRId32
-						"%% complete"), currPercent);
+					data.SetToFormat("%" B_PRId32 "%%", currPercent);
 				}
 
 				status.SetToFormat(B_TRANSLATE("Writing audio track: %s complete"), data.String());

@@ -183,7 +183,7 @@ ShowImageStatusView::_SetZoomText(float zoom)
 	BString data;
 
 	if (numberFormat.FormatPercent(data, zoom) != B_OK)
-		fCellText[kZoomCell].SetToFormat("%.0f%%", zoom * 100);
+		data.SetToFormat("%.0f%%", zoom * 100);
 
 	fCellText[kZoomCell] = data;
 }

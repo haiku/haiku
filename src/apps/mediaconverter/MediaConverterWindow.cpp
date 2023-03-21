@@ -497,7 +497,7 @@ MediaConverterWindow::MessageReceived(BMessage* message)
 			double percentValue = value / 100.0;
 
 			if (fNumberFormat.FormatPercent(data, percentValue) != B_OK)
-				buffer.SetToFormat(B_TRANSLATE("Video quality: %d%%"), (int8)value);
+				data.SetToFormat("%d%%", (int8)value);
 
 			buffer.SetToFormat(B_TRANSLATE("Video quality: %s"), data.String());
 			fVideoQualitySlider->SetLabel(buffer.String());
@@ -514,7 +514,7 @@ MediaConverterWindow::MessageReceived(BMessage* message)
 			double percentValue = value / 100.0;
 
 			if (fNumberFormat.FormatPercent(data, percentValue) != B_OK)
-				buffer.SetToFormat(B_TRANSLATE("Audio quality: %d%%"), (int8)value);
+				data.SetToFormat("%d%%", (int8)value);
 
 			buffer.SetToFormat(B_TRANSLATE("Audio quality: %s"), data.String());
 			fAudioQualitySlider->SetLabel(buffer.String());
@@ -940,7 +940,7 @@ MediaConverterWindow::_UpdateLabels()
 		double percentValue = fVideoQuality / 100.0;
 
 		if (fNumberFormat.FormatPercent(data, percentValue) != B_OK)
-			buffer.SetToFormat(B_TRANSLATE("Video quality: %d%%"), (int8)fVideoQuality);
+			data.SetToFormat("%d%%", (int8)fVideoQuality);
 
 		buffer.SetToFormat(B_TRANSLATE("Video quality: %s"), data.String());
 		fVideoQuality = (int)percentValue;
@@ -954,7 +954,7 @@ MediaConverterWindow::_UpdateLabels()
 		double percentValue = fAudioQuality / 100.0;
 
 		if (fNumberFormat.FormatPercent(data, percentValue) != B_OK) {
-			buffer.SetToFormat(B_TRANSLATE("Audio quality: %d%%"), (int8)fAudioQuality);
+			data.SetToFormat("%d%%", (int8)fAudioQuality);
 		}
 
 		buffer.SetToFormat(B_TRANSLATE("Audio quality: %s"), data.String());
