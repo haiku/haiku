@@ -1056,10 +1056,11 @@
 /*!
 	\fn void BWindow::WorkspacesChanged(uint32 oldWorkspaces,
 		uint32 newWorkspaces)
-	\brief Hook method that gets called when the number of workspaces changes.
+	\brief Hook method that gets called whenever the workspaces the window is
+	       in changes.
 
-	\param oldWorkspaces The old number of workspaces.
-	\param newWorkspaces The new number of workspaces.
+	\param oldWorkspaces The old set of workspaces the window was visible in.
+	\param newWorkspaces The new set of workspaces the window is visible in.
 
 	\since BeOS R3
 */
@@ -1068,6 +1069,9 @@
 /*!
 	\fn void BWindow::WorkspaceActivated(int32 workspace, bool state)
 	\brief Hook method that gets called when the active workspace changes.
+
+	This method is only called when a workspace in which the window resides
+	is activated or deactivated.
 
 	\param workspace The \a workspace number that was activated/deactivated.
 	\param state \c true if activated, \c false if deactivated.
