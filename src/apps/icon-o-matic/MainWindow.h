@@ -84,6 +84,8 @@ private:
 
 			void				_ImproveScrollBarLayout(BView* target);
 
+			void				_WorkspaceEntered();
+
 			bool				_CheckSaveIcon(const BMessage* currentMessage);
 			void				_PickUpActionBeforeSave();
 
