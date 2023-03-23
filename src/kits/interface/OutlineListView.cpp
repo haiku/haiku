@@ -846,8 +846,10 @@ BOutlineListView::ExpandOrCollapse(BListItem* item, bool expand)
 				uint32 subLevel = item->fLevel;
 				items++;
 
-				while (--count > 0 && items[0]->fLevel > subLevel)
+				while (count > 0 && items[0]->fLevel > subLevel) {
 					items++;
+					count--;
+				}
 			} else
 				items++;
 		}
