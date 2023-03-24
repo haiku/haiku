@@ -100,7 +100,6 @@ main(int argc, char** argv)
 			result = url.OpenWithPreferredApplication();
 			if (result == B_OK || result == B_ALREADY_RUNNING)
 				continue;
-			}
 
 			// maybe it's "file:line" or "file:line:col"
 			int line = 0, col = 0, i;
