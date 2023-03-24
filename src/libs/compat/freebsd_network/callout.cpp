@@ -1,6 +1,6 @@
 /*
  * Copyright 2010, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2018, Haiku, Inc. All rights reserved.
+ * Copyright 2018-2023, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
 
@@ -218,22 +218,24 @@ _callout_stop_safe(struct callout *c, int safe)
 
 	MutexLocker locker(sLock);
 
+	int ret = -1;
 	if (callout_active(c)) {
 		if (safe) {
 			locker.Unlock();
 			while (callout_active(c))
 				snooze(100);
+			locker.Lock();
 		}
-		return 0;
+		ret = 0;
 	}
 
 	if (c->c_due <= 0)
-		return -1;
+		return ret;
 
 	// this timer is scheduled, cancel it
 	list_remove_item(&sTimers, c);
 	c->c_due = 0;
-	return 1;
+	return (ret == -1) ? 1 : ret;
 }
 
 
