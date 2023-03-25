@@ -31,9 +31,9 @@ Custom	Terminal AppearancePrefView	Window size	Вибір користувача
 Page setup…	Terminal TermWindow		Налаштування друку…
 ANSI yellow color	Terminal ThemeView		ANSI жовтий
 Cancel	Terminal TermView		Скасувати
-Defaults	Terminal PrefWindow		За замовчуванням
+Defaults	Terminal PrefWindow		Типові настройки
 black	Terminal ThemeView		чорний
-Revert	Terminal PrefWindow		Без змін
+Revert	Terminal PrefWindow		Відкат змін
 Terminal	Terminal TermWindow	The title for the main window menubar entry related to terminal sessions	Термінал
 Use selection	Terminal FindWindow		Використати вибране
 Find next	Terminal TermWindow		Знайти наступне
@@ -67,7 +67,7 @@ Find previous	Terminal TermWindow		Знайти попереднє
 The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Шаблон визначає заголовки вкладок.\nМожна використовувати наступні заповнювачі:\n\n
 Close	Terminal TermWindow		Закрити
 Save to file…	Terminal PrefWindow		Зберегти у файл…
-Defaults	Terminal ThemeWindow		За замовчуванням
+Defaults	Terminal ThemeWindow		Типові настройки
 Copy path	Terminal TermView		Копіювати шлях
 Window size	Terminal TermWindow		Розмір вікна
 Selected text	Terminal ThemeView		Виділений текст
@@ -77,7 +77,7 @@ ANSI cyan color	Terminal ThemeView		ANSI бірюзовий
 The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Процес \"%1\" все ще запущено.\nЯкщо Ви закриєте вкладку, процес буде знищено.
 Full screen	Terminal TermWindow		Повний екран
 Shell 	Terminal TermWindow		Оболонка 
-Revert	Terminal ThemeWindow		Без змін
+Revert	Terminal ThemeWindow		Відкат змін
 ANSI green color	Terminal ThemeView		ANSI зелений
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tСимвол '%'.\n\t%<\t-\tПочаток секції, яка буде відображена тільки у випадку,\n\t\t\tколи заповнювач опісля початку не пустий.\n\t%>\t-\tПочаток секції, яка буде відображена тільки у випадку,\n\t\t\tколи заповнювач між попередньою секцією %< та цією не пустий.\n\t%-\t-\tКінець секції %< або %>.\n\nБудь-який не буквено-цифровий символ між '%' і буквою формату вставляє пробіл\nтільки в тому випадку, якщо значення заповнювача не порожнє.\nЙого буде додано до секції %<.
 ANSI bright cyan color	Terminal ThemeView		ANSI яскравий бірюзовий

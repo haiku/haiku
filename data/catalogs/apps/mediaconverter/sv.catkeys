@@ -1,8 +1,9 @@
-1	swedish	x-vnd.Haiku-MediaConverter	3701038749
+1	swedish	x-vnd.Haiku-MediaConverter	1833571229
 Input file not recognized as Audio or Video	MediaConverter		Indatafilen är inte igenkänd som ljud eller video
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		Källfiler
 Error writing video frame %lld	MediaConverter		Fel vid skrivning av videoframe %lld
+Audio quality: %s	MediaConverter		Ljudkvalitet: %s
 Error converting '%filename'	MediaConverter		Fel vid konvertering av '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Kunde inte hitta valt bibliotek. Återgår till /boot/home
 Conversion completed	MediaConverter		Konverteringen klar
@@ -39,6 +40,7 @@ Conversion cancelled	MediaConverter		Konverteringen avbröts
 Low	MediaConverter		Låg
 Error loading files	MediaConverter		Fel vid inläsning av filer
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
+Video quality: %s	MediaConverter		Videokvalitet: %s
 End   [ms]: 	MediaConverter		Slut [ms]:
 Cancel	MediaConverter		Avbryt
 OK	MediaConverter-FileInfo		OK
@@ -52,8 +54,10 @@ Drop media files onto this window	MediaConverter		Släpp mediafiler i detta fön
 Error read audio frame %lld	MediaConverter		Fel vid läsning av ljudframe %lld
 Quit	Menu		Avsluta
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
+Writing audio track: %s complete	MediaConverter		Skriver ljudspår: %s klar
 Duration:	MediaConverter-FileInfo		Speltid:
 MediaConverter	System name		MediaKonverterare
+Writing video track: %s complete	MediaConverter		Skriver videospår: %s klar
 Error launching: %strError%	MediaConverter		Fel vid start: %strError%
 Error writing audio frame %lld	MediaConverter		Fel vid skrivning av ljudframe %lld
 File format:	MediaConverter		Filformat:

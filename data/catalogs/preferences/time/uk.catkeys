@@ -41,7 +41,7 @@ Time	System name		Time
 Show time zone	Time		Встановити часову зону
 Synchronize at boot	Time		Синхронізувати при завантаженні
 Indian	Time		Індійський
-Revert	Time		Без змін
+Revert	Time		Відкат змін
 Date and time	Time		Дата і час
 The following error occured while synchronizing:\n%s	Time		При синхронізації сталася наступна помилка:\n%s
 Synchronize	Time		Синхронізувати

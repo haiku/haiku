@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-Input	3312605348
 Scrolling	TouchpadPrefView		Прокрутка
-Defaults	InputMouse		За замовчуванням
+Defaults	InputMouse		Типові настройки
 Long	KeyboardView		Більше
 Cancel	TouchpadPrefView		Скасувати
 4-Button	SettingsView		4 кнопки
@@ -9,9 +9,9 @@ Tapping sensitivity	TouchpadPrefView		Чутливість дотику
 Device List	InputWindow		Список пристроїв
 Double-click speed	SettingsView		Швидкість подвійного натискання
 5-Button	SettingsView		5 кнопок
-Typing test area	KeyboardView		Область перевірки натискання
+Typing test area	KeyboardView		Поле для перевірки набору тексту
 Mouse type:	SettingsView		Тип миші:
-Revert	InputKeyboard		Без змін
+Revert	InputKeyboard		Відкат змін
 Fast	KeyboardView		Більше
 Off	TouchpadPrefView		Вимкнути
 Never	TouchpadPrefView		Ніколи
@@ -24,27 +24,27 @@ Mouse speed	SettingsView		Швидкість миші
 Accept first click	SettingsView		Прийняти перший клік
 OK	TouchpadPrefView		ОК
 Horizontal scrolling	TouchpadPrefView		Горизонтальна прокрутка
-Delay until key repeat	KeyboardView		Затримка до повторення клавіші
+Delay until key repeat	KeyboardView		Затримка до повтору клавіші
 Keyboard Lock Delay	TouchpadPrefView		Затримка блокування клавіатури
 Two finger scrolling	TouchpadPrefView		Прокрутка двома пальцями
 Input	System name		Input
 Mouse acceleration	SettingsView		Прискорення миші
 The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Нова область прокрутки дуже велика і може перешкоджати нормальній роботі миші. Ви дійсно хочете це змінити?
 High	TouchpadPrefView		Висока
-Defaults	TouchpadPrefView		За замовчуванням
+Defaults	TouchpadPrefView		Типові настройки
 1-Button	SettingsView		1 кнопка
-Defaults	InputKeyboard		За замовчуванням
+Defaults	InputKeyboard		Типові настройки
 Quick	TouchpadPrefView		Швидко
 Short	KeyboardView		Меньше
 Slow	KeyboardView		Меньше
-Revert	InputMouse		Без змін
-Key repeat rate	KeyboardView		Швидкість повторення
+Revert	InputMouse		Відкат змін
+Key repeat rate	KeyboardView		Швидкість повтору
 2-Button	SettingsView		2 кнопки
 Click to focus and raise	SettingsView		Натиснути для фокусу та підняти
 Vertical	TouchpadPrefView		Вертикальний
 Horizontal	TouchpadPrefView		Горизонтальний
 Focus follows mouse	SettingsView		Фокус слідує за мишею
 Focus mode:	SettingsView		Режим фокусу:
-Double-click test area	SettingsView		Тестова область подвійного натискання
+Double-click test area	SettingsView		Тестова зона подвійного натискання
 3-Button	SettingsView		3 кнопки
-Revert	TouchpadPrefView		Без змін
+Revert	TouchpadPrefView		Відкат змін

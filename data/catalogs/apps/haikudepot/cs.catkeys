@@ -126,8 +126,8 @@ Starting the package daemon failed:\n\n%Error%	App		Spuštění služby balíčk
 No user ratings available.	PackageInfoView		Žádná uživatelská hodnocení.
 <no info>	PackageInfoView		<bez informací>
 Usage conditions download problem	UserUsageConditions		Problém se stažením podmínek použití
-Rating	PackageListView		Hodnocení
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Při komunikaci se serverem došlo k chybě přenosu: %s
+Rating	PackageListView		Hodnocení
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronizuji ikony
 Show	MainWindow		Ukázat
 Settings…	MainWindow		Nastavení…
@@ -157,8 +157,8 @@ Close	PackageManager		Zavřít
 Changelog	PackageInfoView		Seznam změn
 About	PackageInfoView		O aplikaci
 Password:	UserLoginWindow		Heslo:
-Stability	RatePackageWindow		Stabilita
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Tato aplikace je příliš stará pro komunikace se serverem. Aktualizací systému získejte novou verzi aplikace. Nejnižší požadovaná verze je \"%s\".
+Stability	RatePackageWindow		Stabilita
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Heslo je třeba zadat znovu, aby se snížila pravděpodobnost chybného zadání hesla.
 Cancel	SettingsWindow		Zrušit
 Cancel	RatePackageWindow		Zrušit

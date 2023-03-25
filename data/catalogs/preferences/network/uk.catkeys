@@ -18,7 +18,7 @@ Netmask:	IntefaceAddressView		Маска підмережі:
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Служби
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Не вдалося встановити NetworkStatus у Deskbar: %s
-Revert	NetworkWindow		Без змін
+Revert	NetworkWindow		Відкат змін
 off	ServiceListItem		зупинено
 WEP	WEP protected network		WEP
 <no wireless networks found>	IntefaceView		<бездротових з'єднань не виявлено>

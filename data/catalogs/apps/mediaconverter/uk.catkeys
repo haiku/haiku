@@ -1,8 +1,9 @@
-1	ukrainian	x-vnd.Haiku-MediaConverter	3701038749
+1	ukrainian	x-vnd.Haiku-MediaConverter	1833571229
 Input file not recognized as Audio or Video	MediaConverter		Вхідний файл не розпізнаний як аудіо або відео
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		Початкові файли
 Error writing video frame %lld	MediaConverter		Помилка запису відеофрейму %lld
+Audio quality: %s	MediaConverter		Якість аудіо: %s
 Error converting '%filename'	MediaConverter		Помилка конвертації '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Вибраний коталог не знайдено. За замовчуванням: /boot/home
 Conversion completed	MediaConverter		Конвертація завершена
@@ -30,7 +31,7 @@ Multi-track file detected	MediaConverter		Файл розпізнаний як �
 Cancelling…	MediaConverter		Скасовується…
 Output file '%filename' created	MediaConverter		Вихідний файл '%filename' створено
 Output folder	MediaConverter		Вихідна папка
-Error creating track.	MediaConverter		Помилка при створенні трека
+Error creating track.	MediaConverter		Помилка при створенні доріжки.
  seconds	MediaFileInfo		 секунд
 Video using parameters form settings	MediaConverter		Відео використовує параметри з налаштувань
 Video:	MediaConverter-FileInfo		Відео:
@@ -39,6 +40,7 @@ Conversion cancelled	MediaConverter		Конверсію скасовано
 Low	MediaConverter		Низька
 Error loading files	MediaConverter		Помилка завантаження файлів
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# біт} few{# біта} other{# бітів}}
+Video quality: %s	MediaConverter		Якість відео: %s
 End   [ms]: 	MediaConverter		Кінець [мс]: 
 Cancel	MediaConverter		Скасувати
 OK	MediaConverter-FileInfo		ОК
@@ -52,8 +54,10 @@ Drop media files onto this window	MediaConverter		Перенесіть меді�
 Error read audio frame %lld	MediaConverter		Помилка зчитування аудіофрейму %lld
 Quit	Menu		Вийти
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# байт} few{# байта} other{# байтів}}
+Writing audio track: %s complete	MediaConverter		Запис аудіодоріжки: %s виконано
 Duration:	MediaConverter-FileInfo		Тривалість:
 MediaConverter	System name		MediaConverter
+Writing video track: %s complete	MediaConverter		Запис відеодоріжки: %s виконано
 Error launching: %strError%	MediaConverter		Помилка запуску: %strError%
 Error writing audio frame %lld	MediaConverter		Помилка запису аудіофрейму %lld
 File format:	MediaConverter		Формат файлу:

@@ -29,7 +29,7 @@ Scroll lock	Keyboard Layout View		Scroll lock
 US-International	KeymapNames		US-міжнародна
 Right option	Keyboard Layout View		Права Option
 Turkish (Type-Q)	KeymapNames		Турецька (Тип-Q)
-Revert	Modifier keys window		Без змін
+Revert	Modifier keys window		Відкат змін
 Slovak	KeymapNames		Словацька
 CAPS LOCK	Keyboard Layout View		CAPS LOCK
 Colemak	KeymapNames		Colemak
@@ -119,7 +119,7 @@ Belarusian (Latin)	KeymapNames		Білоруська (Латина)
 Hebrew	KeymapNames		Іврит
 Layout	Keymap window		Клавіатура
 Greek	KeymapNames		Грецька
-Revert	Keymap window		Без змін
+Revert	Keymap window		Відкат змін
 CTRL	Keyboard Layout View	Very short for 'control'	CTRL
 Grave trigger	Keymap window		Апостроф
 Menu	Keyboard Layout View	Menu key	Меню
@@ -142,7 +142,7 @@ Slovene	KeymapNames		Словенська
 Lithuanian	KeymapNames		Литовська
 Set modifier keys…	Keymap window		Призначити клавіші-модифікатори...
 Switch shortcut keys to Haiku mode	Keymap window		Перемикати швидкі кнопки як у Haiku
-Defaults	Keymap window		За замовчуванням
+Defaults	Keymap window		Типові настройки
 ISO-9995	KeymapNames		ISO-9995
 System:	Keymap window		Системні:
 ThinkPad International	KeyboardLayoutNames		ThinkPad міжнародна

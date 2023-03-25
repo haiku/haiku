@@ -110,7 +110,7 @@ Move to trash	Mail		Перемістити до смітника
 <none>	Mail		<пусто>
 %d - Date	Mail		%d - Дата
 Check spelling	Mail		Перевірити правопис
-Redo	Mail		Повторити
+Redo	Mail		Повтор дії
 Leave as '%s'	Mail		Залишити як '%s'
 Print…	Mail		Друкувати…
 Settings…	Mail		Налаштування…
@@ -162,7 +162,7 @@ Delete	Mail		Видалити
 Put your favorite e-mail queries and query templates in this folder.	Mail		Покладіть улюблені поштові запити і шаблони запитів у цю папку.
 Spam	Mail		Спам
 Couldn't open this signature. Sorry.	Mail		Прикро, неможливо відкрити цей підпис.
-Revert	Mail		Без змін
+Revert	Mail		Відкат змін
 Unknown	Mail		Невідомо
 Increase quote level	Mail		Додати префікс цитування
 Add enclosure…	Mail		Додати вкладення…

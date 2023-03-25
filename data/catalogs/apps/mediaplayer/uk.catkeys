@@ -6,7 +6,7 @@ Use hardware video overlays if available	MediaPlayer-SettingsWindow		Апара�
 Audio	MediaPlayer-InfoWin		Аудіо
 Subtitle placement:	MediaPlayer-SettingsWindow		Розміщення субтитрів:
 MediaPlayer	System name		MediaPlayer
-Audio track	MediaPlayer-Main		Аудіотрек
+Audio track	MediaPlayer-Main		Аудіодоріжка
 Muted	MediaPlayer-SettingsWindow		Без звуку
 OK	MediaPlayer-RemovePLItemsCmd		ОК
 Open Playlist	MediaPlayer-PlaylistWindow		Відкрити список відтворення
@@ -41,7 +41,7 @@ Medium	MediaPlayer-SettingsWindow		Середній
 Play mode	MediaPlayer-SettingsWindow		Режим відтворення
 Playlist	MediaPlayer-PlaylistWindow		Список відтворення
 %d Bit	MediaPlayer-InfoWin		%d біт
-Track	Audio Track Menu		Трек
+Track	Audio Track Menu		Доріжка
 Close	MediaPlayer-Main		Закрити
 Save error	MediaPlayer-PlaylistWindow		Помилка збереження
 Attributes	MediaPlayer-Main		Атрибути
@@ -54,7 +54,7 @@ Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Збій зб
 <no media>	MediaPlayer-InfoWin		<відсутні медіа>
 Hide interface	MediaPlayer-Main		Приховати інтерфейс
 Error: 	MediaPlayer-Main		Помилка: 
-Video track	MediaPlayer-Main		Відеокліп
+Video track	MediaPlayer-Main		Відеодоріжка
 Playlist…	MediaPlayer-Main		Список відтворення…
 <unnamed media>	MediaPlayer-InfoWin		<неназване медіа>
 Save	MediaPlayer-PlaylistWindow		Зберегти
@@ -67,19 +67,19 @@ never	MediaPlayer-SettingsWindow		ніколи
 Loop audio	MediaPlayer-SettingsWindow		Циклічний звук
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (неправильне повідомлення). Збій збереження списку відтворення.
 Open…	MediaPlayer-PlaylistWindow		Відкрити…
-Revert	MediaPlayer-SettingsWindow		Без змін
+Revert	MediaPlayer-SettingsWindow		Відкат змін
 Low volume	MediaPlayer-SettingsWindow		Низька гучність
 Audio	MediaPlayer-Main		Аудіо
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Channels}}
 Quit	MediaPlayer-Main		Вийти
-Redo	MediaPlayer-PlaylistWindow		Повторити
+Redo	MediaPlayer-PlaylistWindow		Повтор дії
 Move Entry	MediaPlayer-MovePLItemsCmd		Перемістити запис
 <unknown>	PlaylistItem-author		<невідомий>
 Cancel	MediaPlayer-SettingsWindow		Скасувати
 Large	MediaPlayer-SettingsWindow		Великий
 Import Entry	MediaPlayer-ImportPLItemsCmd		Імпортувати запис
 unknown format	MediaPlayer-InfoWin		невідомий формат
-Track %d	MediaPlayer-Main		Трек %d
+Track %d	MediaPlayer-Main		Доріжка %d
 All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Не можна відправити всі файли до смітника.
 Total duration: %s	MediaPlayer-PlaylistWindow		Загальна тривалість: %s
 %.3f kHz	MediaPlayer-InfoWin		%.3f кГц
@@ -120,7 +120,7 @@ Video	MediaPlayer-InfoWin		Відео
 File info…	MediaPlayer-Main		Інформація про файл…
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американський)
 <unnamed>	PlaylistItem-name		<неназваний>
-Track	Video Track Menu		Трек
+Track	Video Track Menu		Доріжка
 Full screen	MediaPlayer-Main		Повний екран
 OK	MediaPlayer-NetworkStream		ОК
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (збій блокування). Збій збереження списку відтворення.

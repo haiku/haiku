@@ -52,7 +52,7 @@ Port	LiveNodeInfoView		Порт
 Output format	DormantNodeInfoView		Вихідний формат
 Aspect ratio	InfoView		Співвідношення сторін
 Application-owned node	AppNodeInfoView		Нода програми
-Tracks	FileNodeInfoView		Треки
+Tracks	FileNodeInfoView		Доріжки
 Source	InfoView		Походження
 Destination	InfoView		Призначення
 Copyright	FileNodeInfoView		Авторське право

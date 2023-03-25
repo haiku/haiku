@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-BluetoothPrefs	3945807779
 Start bluetooth services…	Window		Запуск служб bluetooth…
 From all devices	Settings view		Для всіх пристроїв
-Defaults	Window		За замовчуванням
+Defaults	Window		Типові настройки
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Переконайтесь, що функція bluetooth віддаленого пристрою активована. Натисніть 'Запит' для початку сканування. Час для отримання імен не повинен перевищувати 3 секунди. Після цього ви зможете додати їх до списку, а потім з’єднуватися з ними.
 Laptop	Settings view		Ноутбук
 Scanning progress	Inquiry panel		Хід сканування
@@ -41,7 +41,7 @@ Scanning completed.	Inquiry panel		Сканування завершене.
 Smart phone	Settings view		Смартфон
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		В системі не зареєстровано жодного пристрою bluetooth.
 Default inquiry time:	Settings view		Час запиту за замовчуванням:
-Revert	Window		Без змін
+Revert	Window		Відкат змін
 Refresh local devices…	Window		Оновлення локальних пристроїв…
 Server	Settings view		Сервер
  packets: 	Device View		 пакетів: 

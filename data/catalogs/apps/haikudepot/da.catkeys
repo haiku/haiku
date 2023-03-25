@@ -100,8 +100,8 @@ Develop packages	MainWindow		Udviklingspakker
 Starting the package daemon failed:\n\n%Error%	App		Start af pakkedæmon mislykkedes:\n\n%Error%
 No user ratings available.	PackageInfoView		Ingen tilgængelige brugerbedømmelser.
 <no info>	PackageInfoView		<ingen info>
-Rating	PackageListView		Bedømmelse
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Der opstod en fejl ved netværkstransport med kommunikation med serversystemet: %s
+Rating	PackageListView		Bedømmelse
 Synchronizing icons	ServerIconExportUpdateProcess		Synkroniserer ikoner
 Show	MainWindow		Vis
 Settings…	MainWindow		Indstillinger…
@@ -125,8 +125,8 @@ Close	PackageManager		Luk
 Changelog	PackageInfoView		Ændringslog
 About	PackageInfoView		Om
 Password:	UserLoginWindow		Adgangskode:
-Stability	RatePackageWindow		Stabilitet
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Programmet er for gammelt til at kommunikere med serversystemet. Hent en nyere version af programmet ved at opdatere dit system. Den laveste version som kræves af programmet er \"%s\".
+Stability	RatePackageWindow		Stabilitet
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Adgangskoden skal gentages for at reducere sandsynligheden for at indtaste adgangskoden forkert.
 Cancel	SettingsWindow		Annuller
 Cancel	RatePackageWindow		Annuller

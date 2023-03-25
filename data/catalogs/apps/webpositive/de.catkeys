@@ -107,8 +107,8 @@ Default standard font size:	Settings Window		Größe der Standard-Schrift:
 Custom	Settings Window		Benutzerdefiniert
 Bookmark this page	WebPositive Window		Lesezeichen für diese Seite anlegen
 Show tabs if only one page is open	Settings Window		Reiter immer anzeigen
-Close tab	WebPositive Window		Reiter schließen
 Remove	Download Window		Entfernen
+Close tab	WebPositive Window		Reiter schließen
 About	WebPositive Window		Über
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Es werden noch Dateien heruntergeladen. Soll WebPositive wirklich beendet werden?
 Continue downloads	WebPositive		Downloads fortsetzen

@@ -6,7 +6,7 @@ Short format:	TimeFormatSettings		Короткий формат:
 24 hour	TimeFormatSettings		24 години
 Locale	Locale Preflet Window		Локаль
 Time	TimeFormatSettings		Час
-Defaults	Locale Preflet Window		За замовчуванням
+Defaults	Locale Preflet Window		Типові настройки
 Locale	System name		Locale
 Date	TimeFormatSettings		Дата
 OK	Locale Preflet Window		ОК
@@ -21,7 +21,7 @@ already chosen	LanguageListView		вже вибрано
 Preferred languages	Locale Preflet Window		Мови за вподобанням
 Full format:	TimeFormatSettings		Повний формат:
 Cancel	Locale Preflet Window		Скасувати
-Revert	Locale Preflet Window		Без змін
+Revert	Locale Preflet Window		Відкат змін
 Translate application and folder names	TimeFormatSettings		Перекладати назви програм та папок
 12 hour	TimeFormatSettings		12 годин
 Positive:	TimeFormatSettings		Додатній:

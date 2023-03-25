@@ -101,14 +101,14 @@ Restart	Download Window		Перезапустити
 Serif font:	Settings Window		Шрифт Serif:
 Apply	Settings Window		Застосувати
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при спробі показати папку закладок.\n\nПомилка: %error
-Revert	Settings Window		Без змін
+Revert	Settings Window		Відкат змін
 Copy	WebPositive Window		Копіювати
 Default standard font size:	Settings Window		Розмір шрифту за замовчуванням:
 Custom	Settings Window		Вибір користувача
 Bookmark this page	WebPositive Window		Додати до закладок
 Show tabs if only one page is open	Settings Window		Показати вкладки, якщо відкрито лише одну сторінку
-Close tab	WebPositive Window		Закрити вкладку
 Remove	Download Window		Вилучити
+Close tab	WebPositive Window		Закрити вкладку
 About	WebPositive Window		Про програму
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Триває завантаження, Ви дійсно бажаєте вийти з WebPositive зараз?
 Continue downloads	WebPositive		Продовжити завантаження

@@ -105,8 +105,8 @@ Default standard font size:	Settings Window		默认标准字体大小：
 Custom	Settings Window		自定义
 Bookmark this page	WebPositive Window		添加页面到书签
 Show tabs if only one page is open	Settings Window		只打开一个页面时仍显示选项卡
-Close tab	WebPositive Window		关闭标签页
 Remove	Download Window		移除
+Close tab	WebPositive Window		关闭标签页
 About	WebPositive Window		关于
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		仍有文件下载中，是否现在退出WebPositive?
 Continue downloads	WebPositive		继续下载

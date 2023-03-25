@@ -126,8 +126,8 @@ Starting the package daemon failed:\n\n%Error%	App		Pakkaustaustaprosessin käyn
 No user ratings available.	PackageInfoView		Käyttäjäarvosanoja ei ole saatavilla.
 <no info>	PackageInfoView		<ei tietoja>
 Usage conditions download problem	UserUsageConditions		Käyttöehtojen latauspulma
-Rating	PackageListView		Arvosana
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Verkkosiirtovirhe syntyi palvelinjärjestelmäviestinnässä: %s 
+Rating	PackageListView		Arvosana
 Synchronizing icons	ServerIconExportUpdateProcess		Synkronoidaan kuvakkeet
 Show	MainWindow		Näytä
 Settings…	MainWindow		Asetukset…
@@ -157,8 +157,8 @@ Close	PackageManager		Sulje
 Changelog	PackageInfoView		Muutosloki
 About	PackageInfoView		Ohjelmasta
 Password:	UserLoginWindow		Salasana:
-Stability	RatePackageWindow		Stabiilisuus
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Tämä sovellus on liian vanha palvelinjärjestelmän kanssa viestimiseen. Hanki tämän sovelluksen uudempi versio päivittämällä järjestelmääsi. Sovelluksen vaadittu minimiversio on \"%s\".
+Stability	RatePackageWindow		Stabiilisuus
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Salasana on toistettava sen mahdollisuuden pienentämiseksi, että se on kirjoitettu väärin.
 Cancel	SettingsWindow		Peru
 Cancel	RatePackageWindow		Peru

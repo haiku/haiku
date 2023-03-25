@@ -20,7 +20,7 @@ Small	PreferencesWindow		Маленькі
 Show calendar…	TimeView		Показати календар…
 Find…	DeskbarMenu		Знайти…
 Power off	DeskbarMenu		Вимкнути
-Defaults	PreferencesWindow		За замовчуванням
+Defaults	PreferencesWindow		Типові настройки
 Show replicants	DeskbarMenu		Показати репліканти
 No windows	WindowMenu		Немає вікон
 Show clock	Tray		Показати годинник
@@ -42,7 +42,7 @@ Recent folders	DeskbarMenu		Недавні папки
 Recent applications	DeskbarMenu		Недавні програми
 Hide all	WindowMenu		Сховати все
 Sort applications by name	PreferencesWindow		Сортувати програми за назвою
-Revert	PreferencesWindow		Без змін
+Revert	PreferencesWindow		Відкат змін
 Window	PreferencesWindow		Вікно
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Налаштування
 Time preferences…	TimeView		Налаштування часу…

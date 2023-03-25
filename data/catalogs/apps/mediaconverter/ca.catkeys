@@ -1,8 +1,9 @@
-1	catalan; valencian	x-vnd.Haiku-MediaConverter	3701038749
+1	catalan; valencian	x-vnd.Haiku-MediaConverter	1833571229
 Input file not recognized as Audio or Video	MediaConverter		No es reconeix el fitxer d’entrada com a àudio ni vídeo.
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		Fitxers d'origen
 Error writing video frame %lld	MediaConverter		Error en escriure el fotograma de vídeo %lld
+Audio quality: %s	MediaConverter		Qualitat de l'àudio: %s
 Error converting '%filename'	MediaConverter		Error en convertir %filename
 Selected directory not found. Defaulting to /boot/home	MediaConverter		No s'ha trobat el directori seleccionat. Es restableix a /boot/home.
 Conversion completed	MediaConverter		Conversió completada
@@ -39,6 +40,7 @@ Conversion cancelled	MediaConverter		S'ha cancel·lat la conversió
 Low	MediaConverter		Baix
 Error loading files	MediaConverter		Error en carregar fitxers
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# bits}}
+Video quality: %s	MediaConverter		Qualitat del vídeo: %s
 End   [ms]: 	MediaConverter		Fi   [ms]: 
 Cancel	MediaConverter		Cancel·la
 OK	MediaConverter-FileInfo		D'acord
@@ -52,8 +54,10 @@ Drop media files onto this window	MediaConverter		Deixeu anar fitxers multimèdi
 Error read audio frame %lld	MediaConverter		Error en llegir el marc d'àudio %lld
 Quit	Menu		Surt
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# byte} other{# bytes}}
+Writing audio track: %s complete	MediaConverter		S'escriu la pista d'àudio: %s completat
 Duration:	MediaConverter-FileInfo		Durada:
 MediaConverter	System name		Convertidor multimèdia
+Writing video track: %s complete	MediaConverter		S'escriu la pista de vídeo: %s completat
 Error launching: %strError%	MediaConverter		Error d'obertura: %strError%
 Error writing audio frame %lld	MediaConverter		Error en escriure el marc d'àudio %lld
 File format:	MediaConverter		Format del fitxer:

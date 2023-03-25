@@ -126,8 +126,8 @@ Starting the package daemon failed:\n\n%Error%	App		Запуск демона п
 No user ratings available.	PackageInfoView		Оцінка для користувача недоступна.
 <no info>	PackageInfoView		<немає інформації>
 Usage conditions download problem	UserUsageConditions		Проблеми при завантаженні Умов користування
-Rating	PackageListView		Оцінка
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Виникла помилка мережевого транспорту при взаємодії з серверною системою: %s
+Rating	PackageListView		Оцінка
 Synchronizing icons	ServerIconExportUpdateProcess		Синхронізація піктограм
 Show	MainWindow		Показати
 Settings…	MainWindow		Налаштування…
@@ -157,8 +157,8 @@ Close	PackageManager		Закрити
 Changelog	PackageInfoView		Журнал змін
 About	PackageInfoView		Про це
 Password:	UserLoginWindow		Пароль:
-Stability	RatePackageWindow		Стабільність
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Ця програма занадто стара для комунікації з серверною системою. Отримайте новішу версію програми, оновивши систему. Мінімально необхідна версія цієї програми - \"%s\".
+Stability	RatePackageWindow		Стабільність
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Пароль потрібно повторити, щоб зменшити ймовірність неправильного введення пароля.
 Cancel	SettingsWindow		Скасувати
 Cancel	RatePackageWindow		Скасувати

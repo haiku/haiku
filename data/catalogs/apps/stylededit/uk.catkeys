@@ -71,7 +71,7 @@ Case-sensitive	FindandReplaceWindow		Чутливий до регістра
 Find selection	Menus		Знайти вибране
 Find…	Menus		Знайти…
 Cancel	SaveAlert		Скасувати
-Revert	RevertToSavedAlert		Без змін
+Revert	RevertToSavedAlert		Відкат змін
 Size	Menus		Розмір
 Decrease size	Menus		Зменшити розмір
 Autodetect	Menus		Автовизначення

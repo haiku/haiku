@@ -126,8 +126,8 @@ Starting the package daemon failed:\n\n%Error%	App		A csomag démon indítása s
 No user ratings available.	PackageInfoView		Felhasználói értékelés nem áll rendelkezésre.
 <no info>	PackageInfoView		<nincs információ>
 Usage conditions download problem	UserUsageConditions		Hiba történt a felhasználási feltételek letöltésekor
-Rating	PackageListView		Értékelés
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Hálózati hiba lépett fel a szerverrel való kommunikáció során: %s
+Rating	PackageListView		Értékelés
 Synchronizing icons	ServerIconExportUpdateProcess		Ikonok szinkronizálása
 Show	MainWindow		Megjelenítés
 Settings…	MainWindow		Beállítások…
@@ -157,8 +157,8 @@ Close	PackageManager		Bezárás
 Changelog	PackageInfoView		Változásnapló
 About	PackageInfoView		Névjegy
 Password:	UserLoginWindow		Jelszó:
-Stability	RatePackageWindow		Stabilitás
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Ez az alkalmazás túl régi ahhoz, hogy kommunikáljon a kiszolgálóval. Telepítd az alkalmazás újabb verzióját a rendszer frissítésével. Az alkalmazás minimálisan szükséges verziója \"%s\".
+Stability	RatePackageWindow		Stabilitás
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Ismételd meg a jelszót annak érdekében hogy csökkenjen a rossz jelszó megadásának esélye.
 Cancel	SettingsWindow		Mégse
 Cancel	RatePackageWindow		Mégse

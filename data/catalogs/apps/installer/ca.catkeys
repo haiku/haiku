@@ -1,23 +1,32 @@
-1	catalan; valencian	x-vnd.Haiku-Installer	1118964980
+1	catalan; valencian	x-vnd.Haiku-Installer	55965183
 Performing installation.	InstallProgress		Es fa la instal·lació.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Si us plau, tanqueu la finestra del Gestor de discs abans de tancar la finestra de l'instal·lador.
 No optional packages available.	PackagesView		No hi ha paquets opcionals disponibles.
+This operating system has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		Aquest sistema operatiu s'ha d'instal·lar en una partició que usi el sistema de fitxers Be, però actualment no n'hi ha cap de disponible al sistema.
 The mount point could not be retrieved.	InstallProgress		No se n'ha pogut obtenir el punt de muntatge.
 <none>	InstallerWindow	No partition available	<cap>
+Installation completed. Boot sector has been written to '%s'. Press 'Restart' to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Instal·lació completada. El sector d'arrencada s'ha escrit a %s. Premeu Reinicia per reiniciar l'ordinador o trieu un volum nou de destinació per fer-ne una altra instal·lació.
+Haiku has to be installed on a partition that uses the Be File System, but there are currently no such partitions available on your system.	InstallerWindow		El Haiku s'ha d'instal·lar en una partició que usi el sistema de fitxers Be, però actualment no n'hi ha cap de disponible al sistema.
 Please choose target	InstallerWindow		Si us plau, trieu una destinació.
+BootManager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		El Gestor d'arrencada, l'aplicació per configurar el menú d'arrencada del Haiku, no s'ha pogut iniciar.
 Cancel	InstallProgress		Cancel·la
 Are you sure you want to to stop the installation?	InstallerWindow		Segur que voleu interrompre la instal·lació?
 Installer	System name		Instal·lador
 Unknown Type	InstallProgress	Partition content type	Tipus desconegut
+Press the 'Begin' button to install from '%1s' onto '%2s'.	InstallerWindow		Premeu el botó Comença per instal·lar des de %1s a %2s.
 Are you sure you want to stop the installation?	InstallerWindow		Segur que voleu interrompre la instal·lació?
 README	InstallerApp		LLEGEIX-ME
 Quit	InstallerWindow		Surt
+Please close the BootManager window before closing the Installer window.	InstallerWindow		Tanqueu la finestra del gestor d'arrencada abans de tancar la finestra de l'instal·lador.
 Write boot sector to '%s'	InstallerWindow		Escriu el sector d'arrencada a %s
 Boot sector not written because of an internal error.	InstallProgress		No s'ha escrit el sector d'arrencada degut a un error intern.
+Choose the source and destination disk from the pop-up menus. Then click 'Begin'.	InstallerWindow		Trieu el disc d'origen i de destinació als menús emergents. A continuació, cliqueu a Comença.
+Running BootManager and DriveSetup…\n\nClose both applications to continue with the installation.	InstallerWindow		S'executen el Gestor d'arrencada i el Gestor de discs...\n\nTanqueu les dues aplicacions per continuar la instal·lació.
 Click on 'Set up partitions…' to create one.	InstallerWindow		Cliqueu a "Configura les particions..." per crear-ne una.
 Welcome to the Haiku Installer!\n\n	InstallerApp		Benvingut/da a l'Instal·lador del Haiku!\n\n
 ?? of ??	InstallerWindow	Unknown progress	?? de ??
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		No s'ha pogut executar el Gestor de discs, l'aplicació que configura les particions del disc.
+Installation completed. Boot sector has been written to '%s'. Press 'Quit' to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instal·lació completada. El sector d'arrencada s'ha escrit a %s. Premeu Surt per sortir de l'instal·lador o trieu un volum nou de destinació per fer una altra instal·lació.
 The target volume is not empty. If it already contains a Haiku installation, it will be overwritten. This will remove all installed software.\n\nIf you want to upgrade your system without removing installed software, see the Haiku User Guide's topic on the application \"SoftwareUpdater\" for update instructions.\n\nAre you sure you want to continue the installation?	InstallProgress		El volum de destinació no és buit. Si ja conté una instal·lació del Haiku, se sobreescriurà. Això suprimirà tot el programari instal·lat.\n\nSi voleu actualitzar el sistema sense suprimir el programari instal·lat, consulteu el tema de la Guia de l'usuari del Haiku sobre l'aplicació Actualitzador de programari (SoftwareUpdater) per a les instruccions d'actualització.\n\nSegur que voleu continuar la instal·lació?
 Quit DriveSetup	InstallerWindow		Surt del Gestor de discs
 Write boot sector	InstallerWindow		Escriu el sector d'arrencada
@@ -34,6 +43,7 @@ Hide optional packages	InstallerWindow		Amaga els paquets opcionals
 ???	InstallerWindow	Unknown partition name	???
 Have fun and thanks for trying out Haiku!	InstallerApp		Divertiu-vos i gràcies per provar el Haiku!
 Quit	InstallerApp		Surt
+Quit BootManager and DriveSetup	InstallerWindow		Surt del Gestor d'arrencada i del Gestor de discs
 Error writing boot sector.	InstallProgress		Error en escriure el sector d'arrencada.
 OK	InstallerWindow		D'acord
 3)   When you successfully boot into Haiku for the first time, make sure to read our \"User Guide\" and take the \"Quick Tour\". There are links on the Desktop and in WebPositive's bookmarks.\n\n	InstallerApp		3)   Quan arrenqueu amb èxit el Haiku per primera vegada, assegureu-vos de llegir la nostra Guia de l'usuari i de fer-ne la Visita ràpida. N'hi ha enllaços a l'escriptori i a les adreces d'interès del WebPositive.\n\n
@@ -42,12 +52,14 @@ IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMACIÓ IMPO
 Additional disk space required: %s	InstallerWindow		Espai de disc addicional necessari: %s
 Stop	InstallerWindow	In alert after pressing Stop	Interromp
 Boot sector successfully written.	InstallProgress		S'ha escrit correctament el sector d'arrencada.
+Failed to launch BootManager	InstallerWindow		No s'ha pogut iniciar el gestor d'arrencada.
 Writing bootsector.	InstallProgress		S'escriu el sector d'arrencada.
 An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		S'ha trobat un error i la instal·lació no s'ha acabat:\n\nError:  %s
 Restart	InstallerWindow		Reinicia
 The disk can't be mounted. Please choose a different disk.	InstallProgress		No es pot muntar el disc. Si us plau, trieu-ne un altre.
 Begin	InstallerWindow		Comença
 Collecting copy information.	InstallProgress		Es recopila la informació de còpia.
+Set up boot menu…	InstallerWindow		Configura el menú d'arrencada...
 Show optional packages	InstallerWindow		Mostra els paquets opcionals
 No partitions have been found that are suitable for installation. Please set up partitions and format at least one partition with the Be File System.	InstallerWindow		No s'ha trobat cap partició adequada per a la instal·lació. Si us plau, establiu particions i formateu-ne com a mínim una amb el sistema de fitxers Be.
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Pot ser que el disc de destinació no tingui prou espai lliure. Intenteu triar un altre disc o no instal·leu alguns elements opcionals.
@@ -58,14 +70,19 @@ Continue	InstallerWindow	In alert after pressing Stop	Continua
 Scanning for disks…	InstallerWindow		Se cerquen els discs...
 Running DriveSetup…\n\nClose DriveSetup to continue with the installation.	InstallerWindow		S'executa el Gestor de discs…\n\nPer tal de continuar la instal·lació heu de tancar el Gestor de discs.
 The installation is not complete yet!\nAre you sure you want to stop it?	InstallerWindow		La instal·lació encara no s'ha completat!\nSegur la que voleu interrompre?
+Running BootManager…\n\nClose BootManager to continue with the installation.	InstallerWindow		S'executa el Gestor d'arrencada...\n\nTanqueu-lo per continuar la instal·lació.
 The partition can't be mounted. Please choose a different partition.	InstallProgress		No es pot muntar la partició. Si us plau, trieu-ne una altra.
 Set up partitions…	InstallerWindow		Configura les particions...
 Install progress:  	InstallerWindow		Progrés de la instal·lació:  
 You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		No podeu instal·lar el contingut d'un disc en si mateix. Si us plau, trieu-ne un altre.
+Please close the BootManager and DriveSetup windows before closing the Installer window.	InstallerWindow		Tanqueu les finestres del Gestor d'arrencada i del Gestor de discs abans de tancar la finestra de l'instal·lador.
+Choose the source disk from the pop-up menu. Then click 'Begin'.	InstallerWindow		Trieu el disc d'origen al menú emergent. A continuació, cliqueu a Comença.
 OK	InstallProgress		D'acord
+Quit BootManager	InstallerWindow		Surt del Gestor d'arrencada
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Segur que voleu instal·lar al disc d'arrencada actual? L'Instal·lador haurà de reiniciar la màquina si continueu.
 Onto:	InstallerWindow		Cap a:
 Tools	InstallerWindow		Eines
 scanning…	InstallerWindow		s'escaneja...
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Useu la utilitat DriveSetup per fer particions\nals discs durs disponibles i a altres mitjans.\nLes particions es poden formatar amb el sistema\nde fitxers Be, necessari per a la partició\nd'arrencada del Haiku.
+Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Inicieu la utilitat Gestor de discs per partir\ndiscs durs i altres suports disponibles.\nLes particions es poden formatar amb\nel sistema de fitxers Be, necessari per a\nla partició d'arrencada del Haiku
+Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Trieu el disc on voleu instal·lar al menú emergent. A continuació, cliqueu a Comença.
 Continue	InstallerApp		Continua

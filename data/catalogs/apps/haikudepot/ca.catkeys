@@ -126,8 +126,8 @@ Starting the package daemon failed:\n\n%Error%	App		Ha fallat iniciar el dimoni 
 No user ratings available.	PackageInfoView		No hi ha puntuacions dels usuaris disponibles.
 <no info>	PackageInfoView		<cap informació>
 Usage conditions download problem	UserUsageConditions		Problema de baixada de les condicions d'ús
-Rating	PackageListView		Puntuació
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Hi ha hagut un error de transport de xarxa en comunicar-se amb el sistema del servidor: %s
+Rating	PackageListView		Puntuació
 Synchronizing icons	ServerIconExportUpdateProcess		Sincronització de les icones
 Show	MainWindow		Mostra...
 Settings…	MainWindow		Paràmetres...
@@ -157,8 +157,8 @@ Close	PackageManager		Tanca
 Changelog	PackageInfoView		Registre de canvis
 About	PackageInfoView		Quant a
 Password:	UserLoginWindow		Contrasenya:
-Stability	RatePackageWindow		Estabilitat
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Aquesta aplicació és massa antiga per comunicar-se amb el sistema del servidor. Obtingueu-ne una versió més recent actualitzant el sistema. La versió mínima requerida d’aquesta aplicació és \"%s\".
+Stability	RatePackageWindow		Estabilitat
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Cal repetir la contrasenya per reduir la possibilitat d’introduir-la incorrectament.
 Cancel	SettingsWindow		Cancel·la
 Cancel	RatePackageWindow		Cancel·la

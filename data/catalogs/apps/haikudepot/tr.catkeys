@@ -126,8 +126,8 @@ Starting the package daemon failed:\n\n%Error%	App		Paket hizmeti başlatılamad
 No user ratings available.	PackageInfoView		Kullanıcı derecelendirmesi yok.
 <no info>	PackageInfoView		<bilgi yok>
 Usage conditions download problem	UserUsageConditions		Kullanım koşullarını indirme sorunu
-Rating	PackageListView		Derecelendirme
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Sunucu sistemi ile iletişim kurarken bir ağ ulaşım hatası oluştu: %s
+Rating	PackageListView		Derecelendirme
 Synchronizing icons	ServerIconExportUpdateProcess		Simgeler eşitleniyor
 Show	MainWindow		Göster
 Settings…	MainWindow		Ayarlar…
@@ -157,8 +157,8 @@ Close	PackageManager		Kapat
 Changelog	PackageInfoView		Değişiklik günlüğü
 About	PackageInfoView		Hakkında
 Password:	UserLoginWindow		Parola:
-Stability	RatePackageWindow		Kararlılık
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Bu uygulama sunucu sistemi ile iletişim kurmak için çok eski. Sisteminizi güncelleyerek bu uygulamanın yeni bir sürümünü edinin. Gerekli en düşük sürüm: \"%s\".
+Stability	RatePackageWindow		Kararlılık
 The password must be repeated in order to reduce the chance of entering the password incorrectly.	UserLoginWindow		Yanlış girme olasılığını ortadan kaldırmak için parolanız bir kez daha girilmelidir.
 Cancel	SettingsWindow		Vazgeç
 Cancel	RatePackageWindow		Vazgeç

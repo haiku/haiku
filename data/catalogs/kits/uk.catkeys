@@ -14,7 +14,7 @@ About %app%	AboutMenuItem		Про %app%
 Warning	Dragger		Попередження
 Green:	ColorControl		Зелений:
 %3.2f KiB/s	StringForRate		%3.2f KiБ/с
-Redo	TextView		Повторити
+Redo	TextView		Повтор дії
 No pages to print!	PrintJob		Жодної сторінки для друку!
 beta	AboutWindow		бета
 OK	ZombieReplicantView		ОК

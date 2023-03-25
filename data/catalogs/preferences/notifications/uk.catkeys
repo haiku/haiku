@@ -12,12 +12,12 @@ Notifications preflet sample	PrefletWin		Зразок префлета пові�
 Mute notifications from this application	NotificationView		Відключити оповіщення для цієї програми
 wide	GeneralView	Window width: Slider high text	широке
 narrow	GeneralView	Window width: Slider low text	вузьке
-Revert	PrefletWin		Без змін
+Revert	PrefletWin		Відкат змін
 Applications	PrefletView		Програми
 {0, plural, =1{Timeout: # second}other{Timeout: # seconds}}	GeneralView		{0, plural, =1{Тайм-аут: # секунда}few{Тайм-аут: # секунди}other{Тайм-аут: # секунд}}
 Upper right	GeneralView		Верхній правий
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Сталася помилка при збереженні налаштувань.\nМожливо бракує дискового простору.
-Defaults	PrefletWin		За замовчуванням
+Defaults	PrefletWin		Типові настройки
 Upper left	GeneralView		Верхній лівий
 Window width	GeneralView		Вікно по ширині
 Applications	NotificationView		Програми

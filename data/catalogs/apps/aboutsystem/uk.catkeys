@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-About	2648728228
+1	ukrainian	x-vnd.Haiku-About	677050232
 Revision	AboutView		Ревізія
 The Haikuware team and their bounty program\n	AboutView		Команді Haikuware з їхньою програмою заохочень\n
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. All rights reserved.
@@ -61,6 +61,7 @@ Current maintainers:\n	AboutView		Поточні розробники:\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.
 Intel WiFi Firmware	AboutWindow		Intel WiFi Firmware
 Copyright © 2007-2009 Marvell Semiconductor, Inc. All rights reserved.	AboutView		Copyright © 2007-2009 Marvell Semiconductor, Inc. Всі права захищені.
+%d MiB used (%s)	AboutView		%d МБ використано (%s)
 Version:	AboutView		Версія:
 The BeGeistert team\n	AboutView		Команді BeGeistert\n
 GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1

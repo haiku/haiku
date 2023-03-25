@@ -1,8 +1,9 @@
-1	finnish	x-vnd.Haiku-MediaConverter	3701038749
+1	finnish	x-vnd.Haiku-MediaConverter	1833571229
 Input file not recognized as Audio or Video	MediaConverter		Syötetiedostoa ei tunnistettu audioksi tai videoksi
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2f kehystä sekunnissa
 Source files	MediaConverter		Lähdetiedostot
 Error writing video frame %lld	MediaConverter		Virhekirjoitusvideokehys %lld
+Audio quality: %s	MediaConverter		Audiolaatu: %s
 Error converting '%filename'	MediaConverter		Virhe muunnettaessa tiedostoa ’%filename’
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Vallittua hakemistoa ei löytynyt. Muutetaan oletukseksi /boot/home
 Conversion completed	MediaConverter		Muunnos valmis
@@ -39,6 +40,7 @@ Conversion cancelled	MediaConverter		Muunnos peruttu
 Low	MediaConverter		Alhainen
 Error loading files	MediaConverter		Virhe ladattaessa tiedostoja
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bitti} other{# bittiä}}
+Video quality: %s	MediaConverter		Videolaatu: %s
 End   [ms]: 	MediaConverter		Loppu [ms]: 
 Cancel	MediaConverter		Peru
 OK	MediaConverter-FileInfo		Valmis
@@ -52,8 +54,10 @@ Drop media files onto this window	MediaConverter		Pudota mediatiedostot tähän 
 Error read audio frame %lld	MediaConverter		Virhe luettaessa audiokehystä %lld
 Quit	Menu		Lopeta
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# tavu} other{# tavua}}
+Writing audio track: %s complete	MediaConverter		Audioraidan kirjoittaminen: %s valmis
 Duration:	MediaConverter-FileInfo		Kesto:
 MediaConverter	System name		Mediamuunnin
+Writing video track: %s complete	MediaConverter		Videoraidan kirjoittaminen: %s valmis
 Error launching: %strError%	MediaConverter		Virhe käynnistettäessä: %strError%
 Error writing audio frame %lld	MediaConverter		Virhe kirjoitettaessa audiokehystä %lld
 File format:	MediaConverter		Tiedostomuoto:
