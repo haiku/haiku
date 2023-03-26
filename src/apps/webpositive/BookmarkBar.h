@@ -11,6 +11,7 @@
 #include <MenuBar.h>
 #include <Node.h>
 #include <NodeMonitor.h>
+#include <PopUpMenu.h>
 #include <Size.h>
 
 
@@ -34,6 +35,7 @@ public:
 	void							FrameResized(float width, float height);
 	BSize							MinSize();
 
+	void 							MouseDown(BPoint where);
 private:
 	void							_AddItem(ino_t inode, BEntry* entry);
 
@@ -43,6 +45,8 @@ private:
 	BMenu*							fOverflowMenu;
 	// True if fOverflowMenu is currently added to BookmarkBar
 	bool							fOverflowMenuAdded;
+	BPopUpMenu*						fPopUpMenu;
+	int32 							fSelectedItemIndex;
 };
 
 
