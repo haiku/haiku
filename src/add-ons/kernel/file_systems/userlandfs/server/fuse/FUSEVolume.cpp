@@ -959,6 +959,9 @@ FUSEVolume::GetVNodeName(void* _node, char* buffer, size_t bufferSize)
 	if (entry == NULL)
 		RETURN_ERROR(B_ENTRY_NOT_FOUND);
 
+	if (entry->name == NULL || entry->name[0] == '\0')
+		RETURN_ERROR(B_BAD_DATA);
+
 	if (strlcpy(buffer, entry->name, bufferSize) >= bufferSize)
 		RETURN_ERROR(B_NAME_TOO_LONG);
 
