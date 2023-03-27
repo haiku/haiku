@@ -76,6 +76,7 @@ protected:
 
 private:
 			void				_Init(const char* name);
+	const	BBitmap*			_FetchWindowVectorIcon(int32 id);
 
 			int32				fID;
 			bool				fMini;

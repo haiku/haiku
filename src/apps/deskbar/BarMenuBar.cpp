@@ -338,7 +338,7 @@ TBarMenuBar::FetchTeamIcon()
 	if (fTeamIconData == NULL || fTeamIconSize == 0) {
 		// we haven't fetched vector icon data yet, fetch it
 		fTeamIconData = (const uint8*)AppResSet()->FindResource(
-			B_VECTOR_ICON_TYPE, R_TeamIconVector, &fTeamIconSize);
+			B_VECTOR_ICON_TYPE, R_TeamIcon, &fTeamIconSize);
 	}
 
 	if (fTeamIconData != NULL && fTeamIconSize > 0) {
@@ -349,11 +349,12 @@ TBarMenuBar::FetchTeamIcon()
 		iconRect.InsetBy(-1, -1);
 			// grow icon by 1px so that it renders nicely at 12pt font size
 		BBitmap* icon = new(std::nothrow) BBitmap(iconRect, B_RGBA32);
-		if (icon != NULL && BIconUtils::GetVectorIcon(fTeamIconData,
-				fTeamIconSize, icon) == B_OK) {
+		if (icon != NULL && icon->InitCheck() == B_OK
+			&& BIconUtils::GetVectorIcon(fTeamIconData, fTeamIconSize, icon) == B_OK) {
 			// rasterize vector icon into a bitmap at the scaled size
 			teamIcon = icon;
-		}
+		} else
+			delete icon;
 	}
 
 	return teamIcon;

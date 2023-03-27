@@ -36,9 +36,12 @@ All rights reserved.
 
 #include "WindowMenuItem.h"
 
+#include <new>
+
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <Debug.h>
+#include <IconUtils.h>
 #include <NaturalCompare.h>
 
 #include "BarApp.h"
@@ -269,13 +272,15 @@ TWindowMenuItem::_Init(const char* name)
 	}
 
 	if (fMini) {
-		fBitmap = fCurrentWorkSpace
-			? AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowHiddenIcon)
-			: AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowHiddenSwitchIcon);
+		if (fCurrentWorkSpace)
+			fBitmap = _FetchWindowVectorIcon(R_WindowHiddenIcon);
+		else
+			fBitmap = _FetchWindowVectorIcon(R_WindowHiddenSwitchIcon);
 	} else {
-		fBitmap = fCurrentWorkSpace
-			? AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowShownIcon)
-			: AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_WindowShownSwitchIcon);
+		if (fCurrentWorkSpace)
+			fBitmap = _FetchWindowVectorIcon(R_WindowShownIcon);
+		else
+			fBitmap = _FetchWindowVectorIcon(R_WindowShownSwitchIcon);
 	}
 
 	BFont font(be_plain_font);
@@ -286,4 +291,27 @@ TWindowMenuItem::_Init(const char* name)
 	fLabelDescent = ceilf(fontHeight.descent + fontHeight.leading);
 
 	SetLabel(name);
+}
+
+
+const BBitmap*
+TWindowMenuItem::_FetchWindowVectorIcon(int32 id)
+{
+	const BBitmap* windowIcon = NULL;
+	const uint8* data;
+	size_t size;
+
+	data = (const uint8*)AppResSet()->FindResource(B_VECTOR_ICON_TYPE, id, &size);
+	if (data != NULL && size > 0) {
+		// seems valid, scale bitmap according to font size
+		BBitmap* icon = new(std::nothrow) BBitmap(
+			BRect(B_ORIGIN, be_control_look->ComposeIconSize(B_MINI_ICON)), B_RGBA32);
+		if (icon != NULL && icon->InitCheck() == B_OK
+			&& BIconUtils::GetVectorIcon((const uint8*)data, size, icon) == B_OK) {
+			windowIcon = icon;
+		} else
+			delete icon;
+	}
+
+	return windowIcon;
 }
