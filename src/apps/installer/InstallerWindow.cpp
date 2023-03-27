@@ -291,25 +291,6 @@ InstallerWindow::InstallerWindow()
 	fSizeViewLayoutItem->SetVisible(false);
 	fProgressLayoutItem->SetVisible(false);
 
-	// Setup tool tips for the non-obvious features
-	fLaunchDriveSetupButton->SetToolTip(
-		B_TRANSLATE("Launch the DriveSetup utility to partition\n"
-		"available hard drives and other media.\n"
-		"Partitions can be formatted with the\n"
-		"Be File System needed for a Haiku boot\n"
-		"partition."));
-//	fLaunchBootManagerItem->SetToolTip(
-//		B_TRANSLATE("Install or uninstall the Haiku boot menu, which allows "
-//		"to choose an operating system to boot when the computer starts.\n"
-//		"If this computer already has a boot manager such as GRUB installed, "
-//		"it is better to add Haiku to that menu than to overwrite it."));
-//	fMakeBootableItem->SetToolTip(
-//		B_TRANSLATE("Writes the Haiku boot code to the partition start\n"
-//		"sector. This step is automatically performed by\n"
-//		"the installation, but you can manually make a\n"
-//		"partition bootable in case you do not need to\n"
-//		"perform an installation."));
-
 	// finish creating window
 	if (!be_roster->IsRunning(kDeskbarSignature))
 		SetFlags(Flags() | B_NOT_MINIMIZABLE);
