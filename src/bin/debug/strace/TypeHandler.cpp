@@ -136,22 +136,10 @@ read_string(Context &context, void *data)
 	int32 bytesRead;
 	status_t error = context.Reader().Read(data, buffer, sizeof(buffer), bytesRead);
 	if (error == B_OK) {
-//		return string("\"") + string(buffer, bytesRead) + "\"";
-//string result("\"");
-//result += string(buffer, bytesRead);
-//result += "\"";
-//return result;
-
-// TODO: Unless I'm missing something obvious, our STL string class is broken.
-// The appended "\"" doesn't appear in either of the above cases.
-
-		int32 len = strnlen(buffer, sizeof(buffer));
-		char largeBuffer[259];
-		largeBuffer[0] = '"';
-		memcpy(largeBuffer + 1, buffer, len);
-		largeBuffer[len + 1] = '"';
-		largeBuffer[len + 2] = '\0';
-		return largeBuffer;
+		string result("\"");
+		result += string(buffer, strnlen(buffer, sizeof(buffer)));
+		result += "\"";
+		return result;
 	}
 
 	return context.FormatPointer(data) + " (" + strerror(error) + ")";
