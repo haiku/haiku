@@ -149,6 +149,14 @@ DEFINE_FACTORY(uint_ptr, unsigned int *);
 DEFINE_FACTORY(ulong_ptr, unsigned long *);
 DEFINE_FACTORY(ulonglong_ptr, unsigned long long *);
 
+template<>
+struct TypeHandlerFactory<void**> {
+	static inline TypeHandler *Create()
+	{
+		return TypeHandlerFactory<addr_t*>::Create();
+	}
+};
+
 // partial specialization for generic pointers
 template<typename Type>
 struct TypeHandlerFactory<Type*> {
