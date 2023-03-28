@@ -45,6 +45,9 @@ patch_area()
 	clone->GetParameter("protection")->SetHandler(
 		new FlagsTypeHandler(kAreaProtectionFlags));
 
+	Syscall *reserve_address_range = get_syscall("_kern_reserve_address_range");
+	reserve_address_range->GetParameter("_address")->SetInOut(true);
+
 	Syscall *set_area_protection = get_syscall("_kern_set_area_protection");
 	set_area_protection->GetParameter("newProtection")->SetHandler(
 		new FlagsTypeHandler(kAreaProtectionFlags));
