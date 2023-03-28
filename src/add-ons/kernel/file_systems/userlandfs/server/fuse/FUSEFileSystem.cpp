@@ -432,6 +432,10 @@ FUSEFileSystem::_InitCapabilities()
 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_VNODE, true);
 		// emulated
 
+	// asynchronous I/O
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_IO, true);
+		// emulated
+
 	// index directory & index operations
 	// missing: FS_VOLUME_CAPABILITY_OPEN_INDEX_DIR
 	// missing: FS_VOLUME_CAPABILITY_CLOSE_INDEX_DIR

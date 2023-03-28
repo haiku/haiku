@@ -50,6 +50,10 @@ public:
 	virtual	status_t			WriteVNode(void* node, bool reenter);
 	virtual	status_t			RemoveVNode(void* node, bool reenter);
 
+	// asynchronous I/O
+	virtual	status_t			DoIO(void* node, void* cookie,
+									const IORequestInfo& requestInfo);
+
 	// nodes
 	virtual	status_t			SetFlags(void* node, void* cookie,
 									int flags);
@@ -207,7 +211,9 @@ private:
 									ino_t nodeID, off_t offset);
 			int					_AddReadDirEntry(ReadDirBuffer* buffer,
 									const char* name, int type, ino_t nodeID,
-									off_t offset);
+									off_t offset);			
+			status_t			_InternalIO(FUSENode* node, FileCookie* cookie, const char* path,
+									off_t pos, char* buffer, size_t& bytes, bool isWrite);
 
 private:
 			RWLockManager		fLockManager;

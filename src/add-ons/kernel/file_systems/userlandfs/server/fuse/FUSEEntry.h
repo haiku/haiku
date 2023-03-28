@@ -82,6 +82,7 @@ struct FUSENode : RWLockable {
 	FUSEEntryList	entries;
 	int				type;
 	int32			refCount;
+	int32			cacheCount;
 	bool			dirty;
 	FUSENode*		hashLink;
 
@@ -90,6 +91,7 @@ struct FUSENode : RWLockable {
 		id(id),
 		type(type),
 		refCount(1),
+		cacheCount(0),
 		dirty(false)
 	{
 	}
