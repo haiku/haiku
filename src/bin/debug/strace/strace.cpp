@@ -386,16 +386,18 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_pre_syscall &message,
 
 	// print syscall name, without the "_kern_"
 	if (colorize) {
-		print_to_string(&string, &length, "[%6" B_PRId32 "] %s%s%s(",
+		print_to_string(&string, &length, "[%6" B_PRId32 "] %s%s%s",
 			message.origin.thread, kTerminalTextBlue,
 			syscall->Name().c_str() + 6, kTerminalTextNormal);
 	} else {
-		print_to_string(&string, &length, "[%6" B_PRId32 "] %s(",
+		print_to_string(&string, &length, "[%6" B_PRId32 "] %s",
 			message.origin.thread, syscall->Name().c_str() + 6);
 	}
 
 	// print arguments
 	if (printArguments) {
+		print_to_string(&string, &length, "(");
+
 		int32 count = syscall->CountParameters();
 		for (int32 i = 0; i < count; i++) {
 			// get the value
@@ -410,9 +412,9 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_pre_syscall &message,
 			print_to_string(&string, &length, (i > 0 ? ", %s" : "%s"),
 				value.c_str());
 		}
-	}
 
-	print_to_string(&string, &length, ")");
+		print_to_string(&string, &length, ")");
+	}
 
 	print_buffer(outputFile, buffer, sizeof(buffer) - length);
 }
@@ -474,22 +476,28 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
 	if (printArguments) {
 		int32 count = syscall->CountParameters();
 		int added = 0;
-		print_to_string(&string, &length, " (");
+		bool printedParen = false;
 		for (int32 i = 0; i < count; i++) {
 			// get the value
 			Parameter *parameter = syscall->ParameterAt(i);
 			if (!parameter->InOut() && !parameter->Out())
 				continue;
+
 			TypeHandler *handler = parameter->Handler();
 			::string value =
 				handler->GetParameterValue(ctx, parameter,
-						ctx.GetValue(parameter));
+					ctx.GetValue(parameter));
 
+			if (!printedParen) {
+				print_to_string(&string, &length, " (");
+				printedParen = true;
+			}
 			print_to_string(&string, &length, (added > 0 ? ", %s" : "%s"),
 				value.c_str());
 			added++;
 		}
-		print_to_string(&string, &length, ")");
+		if (printedParen)
+			print_to_string(&string, &length, ")");
 	}
 
 	if (colorize) {
