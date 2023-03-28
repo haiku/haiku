@@ -566,7 +566,7 @@ MainWindow::_ScanDrives()
 	PartitionListRow* previousSelection
 		= fListView->FindRow(fCurrentPartitionID);
 	if (previousSelection) {
-		fListView->AddToSelection(previousSelection);
+		fListView->SetFocusRow(previousSelection, true);
 		_UpdateMenus(fCurrentDisk, fCurrentPartitionID,
 			previousSelection->ParentID());
 		fDiskView->ForceUpdate();
