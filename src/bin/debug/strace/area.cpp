@@ -58,4 +58,8 @@ patch_area()
 	map_file->GetParameter("address")->SetInOut(true);
 	map_file->GetParameter("protection")->SetHandler(
 		new FlagsTypeHandler(kAreaProtectionFlags));
+
+	Syscall *set_memory_protection = get_syscall("_kern_set_memory_protection");
+	set_memory_protection->GetParameter("protection")->SetHandler(
+		new FlagsTypeHandler(kAreaProtectionFlags));
 }
