@@ -10,6 +10,7 @@
 #include "TypeHandler.h"
 
 #include <string.h>
+#include <String.h>
 
 #include "Context.h"
 #include "MemoryReader.h"
@@ -177,6 +178,54 @@ EnumTypeHandler::RenderValue(Context &context, unsigned int value) const
 		EnumMap::const_iterator i = fMap.find(value);
 		if (i != fMap.end() && i->second != NULL)
 			return i->second;
+	}
+
+	return context.FormatUnsigned(value);
+}
+
+FlagsTypeHandler::FlagsTypeHandler(const FlagsList &m) : fList(m) {}
+
+string
+FlagsTypeHandler::GetParameterValue(Context &context, Parameter *,
+	const void *address)
+{
+	return RenderValue(context, get_value<unsigned int>(address));
+}
+
+string
+FlagsTypeHandler::GetReturnValue(Context &context, uint64 value)
+{
+	return RenderValue(context, value);
+}
+
+string
+FlagsTypeHandler::RenderValue(Context &context, unsigned int value) const
+{
+	if (context.GetContents(Context::ENUMERATIONS)) {
+		// Enumerate the list in reverse. That way, any later values which use
+		// the same bits as earlier values will be processed correctly.
+		string rendered;
+		FlagsList::const_reverse_iterator i = fList.rbegin();
+		for (; i != fList.rend(); i++) {
+			if ((value & i->value) != i->value)
+				continue;
+
+			if (!rendered.empty())
+				rendered.insert(0, " | ");
+			rendered.insert(0, i->name);
+			value &= ~(i->value);
+		}
+		if (value != 0) {
+			if (!rendered.empty())
+				rendered += " | ";
+
+			char hex[20];
+			snprintf(hex, 20, "%x", value);
+			rendered += hex;
+		}
+		if (rendered.empty())
+			rendered = "0";
+		return rendered;
 	}
 
 	return context.FormatUnsigned(value);

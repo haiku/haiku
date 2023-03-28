@@ -9,8 +9,9 @@
 #ifndef STRACE_TYPE_HANDLER_H
 #define STRACE_TYPE_HANDLER_H
 
-#include <string>
+#include <list>
 #include <map>
+#include <string>
 
 #include <arch_config.h>
 #include <SupportDefs.h>
@@ -47,6 +48,25 @@ private:
 	string RenderValue(Context &, unsigned int value) const;
 
 	const EnumMap &fMap;
+};
+
+class FlagsTypeHandler : public TypeHandler {
+public:
+	struct FlagInfo {
+		unsigned int value;
+		const char* name;
+	};
+	typedef std::list<FlagInfo> FlagsList;
+
+	FlagsTypeHandler(const FlagsList &);
+
+	string GetParameterValue(Context &c, Parameter *, const void *);
+	string GetReturnValue(Context &, uint64 value);
+
+private:
+	string RenderValue(Context &, unsigned int value) const;
+
+	const FlagsList &fList;
 };
 
 // currently limited to select ints
