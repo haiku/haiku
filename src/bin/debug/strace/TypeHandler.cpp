@@ -91,6 +91,39 @@ TypeHandlerFactory<bool>::Create()
 	return new TypeHandlerImpl<bool>();
 }
 
+// status_t
+class StatusTypeHandler : public TypeHandler {
+public:
+	StatusTypeHandler() {}
+
+	string GetParameterValue(Context &context, Parameter *, const void *address)
+	{
+		return RenderValue(context, get_value<status_t>(address));
+	}
+
+	string GetReturnValue(Context &context, uint64 value)
+	{
+		return RenderValue(context, value);
+	}
+
+private:
+	string RenderValue(Context &context, uint64 value) const
+	{
+		string rendered = context.FormatUnsigned(value);
+		if (value <= UINT32_MAX && (status_t)value <= 0) {
+			rendered += " ";
+			rendered += strerror(value);
+		}
+		return rendered;
+	}
+};
+
+TypeHandler *
+create_status_t_type_handler()
+{
+	return new StatusTypeHandler;
+}
+
 // read_string
 static
 string

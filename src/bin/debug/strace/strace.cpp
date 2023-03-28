@@ -265,9 +265,20 @@ patch_syscalls()
 	// instead of having this done here manually we should either add the
 	// patching step to gensyscalls also manually or add metadata to
 	// kernel/syscalls.h and have it parsed automatically
+
 	extern void patch_fcntl();
 	extern void patch_ioctl();
 	extern void patch_area();
+
+	for (size_t i = 0; i < sSyscallVector.size(); i++) {
+		Syscall *syscall = sSyscallVector[i];
+		const string returnTypeName = syscall->ReturnType()->TypeName();
+		// patch return type handlers
+		if (returnTypeName == "status_t" || returnTypeName == "ssize_t"
+				|| returnTypeName == "int") {
+			syscall->ReturnType()->SetHandler(create_status_t_type_handler());
+		}
+	}
 
 	patch_fcntl();
 	patch_ioctl();
@@ -455,21 +466,12 @@ print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
 					syscall->Name().c_str() + 6);
 			}
 		}
+
 		Type *returnType = syscall->ReturnType();
 		TypeHandler *handler = returnType->Handler();
 		::string value = handler->GetReturnValue(ctx, message.return_value);
-		if (value.length() > 0) {
+		if (value.length() > 0)
 			print_to_string(&string, &length, " = %s", value.c_str());
-
-			// if the return type is status_t or ssize_t, print human-readable
-			// error codes
-			if (returnType->TypeName() == "status_t"
-				|| ((returnType->TypeName() == "ssize_t"
-						|| returnType->TypeName() == "int")
-					&& message.return_value < 0)) {
-				print_to_string(&string, &length, " %s", strerror(message.return_value));
-			}
-		}
 	}
 
 	// print arguments
