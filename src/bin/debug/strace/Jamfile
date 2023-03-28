@@ -13,8 +13,15 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 SubDirHdrs $(TARGET_COMMON_DEBUG_LOCATE_TARGET) ;
 
 local straceSources =
-	Context.cpp fcntl.cpp ioctl.cpp MemoryReader.cpp NetworkTypes.cpp
-	strace.cpp TypeHandler.cpp
+	strace.cpp
+
+	Context.cpp
+	TypeHandler.cpp
+	NetworkTypes.cpp
+	MemoryReader.cpp
+
+	fcntl.cpp
+	ioctl.cpp
 ;
 
 # Our compiler badly chokes when compiling the generated file. So will
@@ -25,27 +32,23 @@ local straceSyscallsIndices
 local straceSyscallsSource = [ FGristFiles strace_syscalls.cpp ] ;
 local straceSyscallsObjects ;
 
-# Whatever our compiler (gcc 2.95.3) thinks it is doing when compiling the
-# generated files, it really takes it time when optimization is enabled.
-# A lot with -O1, even more with -O2. Also the object sizes are amazing.
-# -O0 fares significantly better; at least speed-wise. I would almost think
-# about reverting to compiling all in one object file again. Almost...
-local oldOptim = $(OPTIM) ;
-OPTIM = -O0 ;
-
 local i ;
 for i in $(straceSyscallsIndices) {
 	local object = [ FGristFiles strace_syscalls$(i).o ] ;
 	straceSyscallsObjects += $(object) ;
+
+	# Whatever our compiler (gcc 2.95.3) thinks it is doing when compiling the
+	# generated files, it really takes it time when optimization is enabled.
+	# A lot with -O1, even more with -O2. Also the object sizes are amazing.
+	# -O0 fares significantly better; at least speed-wise. I would almost think
+	# about reverting to compiling all in one object file again. Almost...
+	OPTIM on $(object) = -O0 ;
 
 	Object $(object) : $(straceSyscallsSource) ;
 
 	ObjectDefines $(object)
 		: GET_SYSCALLS=get_syscalls$(i) SYSCALLS_CHUNK_$(i) ;
 }
-
-# reset OPTIM
-OPTIM = $(oldOptim) ;
 
 BinCommand strace : $(straceSources)
 	:
