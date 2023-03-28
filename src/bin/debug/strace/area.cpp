@@ -37,11 +37,13 @@ patch_area()
 		kAreaProtectionFlags.push_back(kAreaProtectionFlagInfos[i]);
 	}
 
-	Syscall *open = get_syscall("_kern_create_area");
-	open->GetParameter("protection")->SetHandler(
+	Syscall *create = get_syscall("_kern_create_area");
+	create->GetParameter("address")->SetInOut(true);
+	create->GetParameter("protection")->SetHandler(
 		new FlagsTypeHandler(kAreaProtectionFlags));
 
 	Syscall *clone = get_syscall("_kern_clone_area");
+	clone->GetParameter("_address")->SetInOut(true);
 	clone->GetParameter("protection")->SetHandler(
 		new FlagsTypeHandler(kAreaProtectionFlags));
 
@@ -53,6 +55,7 @@ patch_area()
 		new FlagsTypeHandler(kAreaProtectionFlags));
 
 	Syscall *map_file = get_syscall("_kern_map_file");
+	map_file->GetParameter("address")->SetInOut(true);
 	map_file->GetParameter("protection")->SetHandler(
 		new FlagsTypeHandler(kAreaProtectionFlags));
 }
