@@ -272,8 +272,9 @@ patch_syscalls()
 
 	for (size_t i = 0; i < sSyscallVector.size(); i++) {
 		Syscall *syscall = sSyscallVector[i];
-		const string returnTypeName = syscall->ReturnType()->TypeName();
+
 		// patch return type handlers
+		const string returnTypeName = syscall->ReturnType()->TypeName();
 		if (returnTypeName == "status_t" || returnTypeName == "ssize_t"
 				|| returnTypeName == "int") {
 			syscall->ReturnType()->SetHandler(create_status_t_type_handler());

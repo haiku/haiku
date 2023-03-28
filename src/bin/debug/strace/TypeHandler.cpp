@@ -228,6 +228,8 @@ FlagsTypeHandler::RenderValue(Context &context, unsigned int value) const
 		string rendered;
 		FlagsList::const_reverse_iterator i = fList.rbegin();
 		for (; i != fList.rend(); i++) {
+			if (value == 0)
+				break;
 			if ((value & i->value) != i->value)
 				continue;
 
@@ -241,7 +243,7 @@ FlagsTypeHandler::RenderValue(Context &context, unsigned int value) const
 				rendered += " | ";
 
 			char hex[20];
-			snprintf(hex, 20, "%x", value);
+			snprintf(hex, sizeof(hex), "0x%x", value);
 			rendered += hex;
 		}
 		if (rendered.empty())
