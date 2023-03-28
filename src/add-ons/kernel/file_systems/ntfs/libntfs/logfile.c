@@ -287,9 +287,19 @@ static BOOL ntfs_check_log_client_array(RESTART_PAGE_HEADER *rp)
 	LOG_CLIENT_RECORD *ca, *cr;
 	u16 nr_clients, idx;
 	BOOL in_free_list, idx_is_first;
+	u32 offset_clients;
 
 	ntfs_log_trace("Entering.\n");
+		/* The restart area must be fully within page */
+	if ((le16_to_cpu(rp->restart_area_offset) + sizeof(RESTART_AREA))
+			> le32_to_cpu(rp->system_page_size))
+		goto err_out;
 	ra = (RESTART_AREA*)((u8*)rp + le16_to_cpu(rp->restart_area_offset));
+	offset_clients = le16_to_cpu(rp->restart_area_offset)
+			+ le16_to_cpu(ra->client_array_offset);
+		/* The clients' records must begin within page */
+	if (offset_clients >= le32_to_cpu(rp->system_page_size))
+		goto err_out;
 	ca = (LOG_CLIENT_RECORD*)((u8*)ra +
 			le16_to_cpu(ra->client_array_offset));
 	/*
@@ -307,6 +317,10 @@ check_list:
 	for (idx_is_first = TRUE; idx != LOGFILE_NO_CLIENT_CPU; nr_clients--,
 			idx = le16_to_cpu(cr->next_client)) {
 		if (!nr_clients || idx >= le16_to_cpu(ra->log_clients))
+			goto err_out;
+			/* The client record must be fully within page */
+		if ((offset_clients + (idx + 1)*sizeof(LOG_CLIENT_RECORD))
+				> le32_to_cpu(rp->system_page_size))
 			goto err_out;
 		/* Set @cr to the current log client record. */
 		cr = ca + idx;
@@ -380,7 +394,14 @@ static int ntfs_check_and_load_restart_page(ntfs_attr *log_na,
 	/*
 	 * Allocate a buffer to store the whole restart page so we can multi
 	 * sector transfer deprotect it.
+	 * For safety, make sure this is consistent with the usa_count
+	 * and shorter than the full log size
 	 */
+	if ((le32_to_cpu(rp->system_page_size)
+			> (u32)(le16_to_cpu(rp->usa_count) - 1)*NTFS_BLOCK_SIZE)
+	   || (le32_to_cpu(rp->system_page_size)
+			> le64_to_cpu(log_na->data_size)))
+		return (EINVAL);
 	trp = ntfs_malloc(le32_to_cpu(rp->system_page_size));
 	if (!trp)
 		return errno;

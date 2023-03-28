@@ -77,7 +77,7 @@
 #include "security.h"
 
 const char *ntfs_home = 
-"News, support and information:  http://tuxera.com\n";
+"News, support and information:  https://github.com/tuxera/ntfs-3g/\n";
 
 static const char *invalid_ntfs_msg =
 "The device '%s' doesn't seem to have a valid NTFS.\n"
@@ -121,7 +121,7 @@ static const char *fakeraid_msg =
 static const char *access_denied_msg =
 "Please check '%s' and the ntfs-3g binary permissions,\n"
 "and the mounting user ID. More explanation is provided at\n"
-"http://tuxera.com/community/ntfs-3g-faq/#unprivileged\n";
+"https://github.com/tuxera/ntfs-3g/wiki/NTFS-3G-FAQ\n";
 
 /**
  * ntfs_volume_alloc - Create an NTFS volume object and initialise it

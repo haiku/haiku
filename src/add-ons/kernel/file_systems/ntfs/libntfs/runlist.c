@@ -5,7 +5,7 @@
  * Copyright (c) 2002-2005 Richard Russon
  * Copyright (c) 2002-2008 Szabolcs Szakacsits
  * Copyright (c) 2004 Yura Pakhuchiy
- * Copyright (c) 2007-2010 Jean-Pierre Andre
+ * Copyright (c) 2007-2022 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -918,11 +918,18 @@ static runlist_element *ntfs_mapping_pairs_decompress_i(const ntfs_volume *vol,
 						"array.\n");
 				goto err_out;
 			}
+			/* chkdsk accepts zero-sized runs only for holes */
+			if ((lcn != (LCN)-1) && !rl[rlpos].length) {
+				ntfs_log_debug(
+					"Invalid zero-sized data run.\n");
+				goto err_out;
+			}
 			/* Enter the current lcn into the runlist element. */
 			rl[rlpos].lcn = lcn;
 		}
-		/* Get to the next runlist element. */
-		rlpos++;
+		/* Get to the next runlist element, skipping zero-sized holes */
+		if (rl[rlpos].length)
+			rlpos++;
 		/* Increment the buffer position to the next mapping pair. */
 		buf += (*buf & 0xf) + ((*buf >> 4) & 0xf) + 1;
 	}
@@ -987,13 +994,18 @@ mpa_err:
 	rl[rlpos].vcn = vcn;
 	rl[rlpos].length = (s64)0;
 	/* If no existing runlist was specified, we are done. */
-	if (!old_rl) {
+	if (!old_rl || !old_rl[0].length) {
 		ntfs_log_debug("Mapping pairs array successfully decompressed:\n");
 		ntfs_debug_runlist_dump(rl);
+		if (old_rl)
+			free(old_rl);
 		return rl;
 	}
 	/* Now combine the new and old runlists checking for overlaps. */
-	old_rl = ntfs_runlists_merge(old_rl, rl);
+	if (rl[0].length)
+		old_rl = ntfs_runlists_merge(old_rl, rl);
+	else
+		free(rl);
 	if (old_rl)
 		return old_rl;
 	err = errno;

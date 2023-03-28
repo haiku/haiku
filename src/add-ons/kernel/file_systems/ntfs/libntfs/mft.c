@@ -5,7 +5,7 @@
  * Copyright (c) 2004-2005 Richard Russon
  * Copyright (c) 2004-2008 Szabolcs Szakacsits
  * Copyright (c)      2005 Yura Pakhuchiy
- * Copyright (c) 2014-2018 Jean-Pierre Andre
+ * Copyright (c) 2014-2021 Jean-Pierre Andre
  *
  * This program/include file is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as published
@@ -1529,8 +1529,17 @@ found_free_rec:
 		goto undo_mftbmp_alloc;
 	}
 
+		/*
+		 * Retrieve the former seq_no and usn so that the new record
+		 * cannot be mistaken for the former one.
+		 * However the original record may just be garbage, so
+		 * use some sensible value when they cannot be retrieved.
+		 */
 	seq_no = m->sequence_number;
-	usn = *(le16*)((u8*)m + le16_to_cpu(m->usa_ofs));
+	if (le16_to_cpu(m->usa_ofs) <= (NTFS_BLOCK_SIZE - 2))
+		usn = *(le16*)((u8*)m + (le16_to_cpu(m->usa_ofs) & -2));
+	else
+		usn = const_cpu_to_le16(1);
 	if (ntfs_mft_record_layout(vol, bit, m)) {
 		ntfs_log_error("Failed to re-format mft record.\n");
 		free(m);
