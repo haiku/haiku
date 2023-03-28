@@ -22,6 +22,7 @@ local straceSources =
 
 	fcntl.cpp
 	ioctl.cpp
+	area.cpp
 ;
 
 # Our compiler badly chokes when compiling the generated file. So will

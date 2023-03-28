@@ -267,9 +267,11 @@ patch_syscalls()
 	// kernel/syscalls.h and have it parsed automatically
 	extern void patch_fcntl();
 	extern void patch_ioctl();
+	extern void patch_area();
 
 	patch_fcntl();
 	patch_ioctl();
+	patch_area();
 
 	Syscall *poll = get_syscall("_kern_poll");
 	poll->ParameterAt(0)->SetInOut(true);
