@@ -57,13 +57,21 @@ callout_thread(void* /*data*/)
 
 					// execute timer
 					list_remove_item(&sTimers, c);
-					c->c_due = -1;
+					if (mutex == NULL)
+						c->c_due = -1;
 					sCurrentCallout = c;
 
 					mutex_unlock(&sLock);
 
-					if (mutex != NULL)
+					if (mutex != NULL) {
 						mtx_lock(mutex);
+
+						if (c->c_due < 0) {
+							mtx_unlock(mutex);
+							goto done;
+						}
+						c->c_due = -1;
+					}
 
 					c->c_func(c->c_arg);
 
@@ -71,6 +79,7 @@ callout_thread(void* /*data*/)
 							&& (c->c_flags & CALLOUT_RETURNUNLOCKED) == 0)
 						mtx_unlock(mutex);
 
+				done:
 					if ((status = mutex_lock(&sLock)) != B_OK)
 						continue;
 
@@ -176,7 +185,7 @@ callout_init_mtx(struct callout *c, struct mtx *mtx, int flags)
 int
 callout_reset(struct callout *c, int _ticks, void (*func)(void *), void *arg)
 {
-	int canceled = callout_stop(c);
+	int cancelled = callout_stop(c);
 
 	MutexLocker locker(sLock);
 
@@ -197,7 +206,7 @@ callout_reset(struct callout *c, int _ticks, void (*func)(void *), void *arg)
 			release_sem(sWaitSem);
 	}
 
-	return canceled;
+	return (cancelled == -1) ? 0 : 1;
 }
 
 
@@ -220,13 +229,22 @@ _callout_stop_safe(struct callout *c, int safe)
 
 	int ret = -1;
 	if (callout_active(c)) {
+		ret = 0;
+		if (!safe && c->c_mtx != NULL && c->c_due > 0) {
+			mtx_assert(c->c_mtx, MA_OWNED);
+
+			// The callout is active, but c_due > 0 and we hold the locks: this
+			// means the callout thread has dequeued it and is waiting for c_mtx.
+			// Clear c_due to signal the callout thread.
+			c->c_due = -1;
+			ret = 1;
+		}
 		if (safe) {
 			locker.Unlock();
 			while (callout_active(c))
 				snooze(100);
 			locker.Lock();
 		}
-		ret = 0;
 	}
 
 	if (c->c_due <= 0)
