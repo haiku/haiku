@@ -1,0 +1,100 @@
+Name
+
+    KHR_platform_haiku
+
+Name Strings
+
+    EGL_KHR_platform_haiku
+
+Contributors
+
+    Alexander von Gluck IV <alex@terarocket.io>
+
+Contacts
+
+    Alexander von Gluck IV <alex@terarocket.io>
+
+Status
+
+    Draft.
+
+Version
+
+    Version 1, 2023/03/29
+
+Number
+
+    EGL Extension TBD
+
+Extension Type
+
+    EGL client extension
+
+Dependencies
+
+    EGL 1.5 is required.
+
+    This extension is written against the EGL 1.5 Specification (draft
+    20140122).
+
+Overview
+
+    This extension defines how to create EGL resources from native Haiku
+    resources using the EGL 1.5 platform functionality.
+
+	Mesa has tracked _EGL_PLATFORM_HAIKU internally for quite some time.
+
+	libglvnd has received patches for basic Haiku support
+
+New Types
+
+    None
+
+New Procedures and Functions
+
+    None
+
+New Tokens
+
+    Accepted as the <platform> argument of eglGetPlatformDisplay:
+
+        EGL_PLATFORM_HAIKU_KHR                  0x31D9
+
+Additions to the EGL Specification
+
+    None.
+
+New Behavior
+
+    To determine if the EGL implementation supports this extension, clients
+    should query the EGL_EXTENSIONS string of EGL_NO_DISPLAY.
+
+    To obtain an EGLDisplay backed by a Haiku display, call
+    eglGetPlatformDisplay with <platform> set to EGL_PLATFORM_HAIKU_KHR.  The
+    <native_display> parameter specifies the Haiku display  to use and must
+    either point to a `struct wl_display` or be EGL_DEFAULT_DISPLAY. If
+    <native_display> is EGL_DEFAULT_DISPLAY, then EGL will create a new
+    wl_display structure by connecting to the default Wayland socket.  The
+    manual page wl_display_connect(3) defines the location of the default
+    Wayland socket.
+
+    To obtain an on-screen rendering surface from a Wayland window, call
+    eglCreatePlatformWindowSurface with a <dpy> that belongs to Wayland and
+    a <native_window> that points to a `struct wl_egl_surface`.
+
+    It is not valid to call eglCreatePlatformPixmapSurface with a <dpy> that
+    belongs to Haiku. Any such call fails and generates an
+    EGL_BAD_PARAMETER error.
+
+    Rendering to the obtained EGLSurface or querying it with EGL_BUFFER_AGE_KHR
+    will lock its back buffer preventing it from being dropped or resized,
+    until the next buffer swap. The rationale behind this behavior is to keep
+    operations result accurate until the next swap.
+
+Issues
+
+    TBD
+
+Revision History
+    Version 1, 2023/03/29 (Alexander von Gluck IV)
+	    - Initial Draft version for Haiku with EGL 1.5+
