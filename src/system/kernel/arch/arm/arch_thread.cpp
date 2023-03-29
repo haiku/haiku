@@ -21,7 +21,6 @@
 #include <commpage.h>
 #include <kernel.h>
 #include <thread.h>
-#include <tls.h>
 #include <vm/vm_types.h>
 #include <vm/VMAddressSpace.h>
 #include <arch_vm.h>
@@ -117,19 +116,11 @@ arch_thread_init_kthread_stack(Thread* thread, void* _stack, void* _stackTop,
 status_t
 arch_thread_init_tls(Thread *thread)
 {
-	uint32 tls[TLS_FIRST_FREE_SLOT];
-
-	thread->user_local_storage = thread->user_stack_base
-		+ thread->user_stack_size;
-
-	// initialize default TLS fields
-	memset(tls, 0, sizeof(tls));
-	tls[TLS_BASE_ADDRESS_SLOT] = thread->user_local_storage;
-	tls[TLS_THREAD_ID_SLOT] = thread->id;
-	tls[TLS_USER_THREAD_SLOT] = (addr_t)thread->user_thread;
-
-	return user_memcpy((void *)thread->user_local_storage, tls, sizeof(tls));
+	thread->user_local_storage =
+		thread->user_stack_base + thread->user_stack_size;
+	return B_OK;
 }
+
 
 void
 arm_swap_pgdir(uint32_t pageDirectoryAddress)
