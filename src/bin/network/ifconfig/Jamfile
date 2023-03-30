@@ -8,5 +8,5 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 BinCommand ifconfig :
 	ifconfig.cpp
 	MediaTypes.cpp
-	: be network bnetapi
+	: be network bnetapi [ TargetLibstdc++ ]
 ;

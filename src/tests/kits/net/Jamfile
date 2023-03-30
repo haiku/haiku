@@ -8,7 +8,7 @@ SimpleTest NetAddressTest : NetAddressTest.cpp
 SimpleTest NetEndpointTest : NetEndpointTest.cpp
 	: $(TARGET_NETWORK_LIBS) $(HAIKU_NETAPI_LIB) be [ TargetLibsupc++ ] ;
 
-SimpleTest wlan_test : wlan_test.cpp : $(TARGET_NETWORK_LIBS) bnetapi be ;
+SimpleTest wlan_test : wlan_test.cpp : $(TARGET_NETWORK_LIBS) bnetapi be [ TargetLibstdc++ ] ;
 
 SubInclude HAIKU_TOP src tests kits net cookie ;
 HaikuSubInclude libnetapi ;

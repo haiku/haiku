@@ -367,10 +367,16 @@ configure_wireless(const char* name, char* const* args, int32 argCount)
 				}
 			} else {
 				// list them all
-				wireless_network network;
-				uint32 cookie = 0;
-				while (device.GetNextNetwork(cookie, network) == B_OK)
-					show_wireless_network(network, verbose);
+				uint32 networksCount = 0;
+				wireless_network* networks = NULL;
+				status_t status = device.GetNetworks(networks, networksCount);
+				if (status != B_OK) {
+					fprintf(stderr, "%s: Getting networks failed: %s\n",
+						kProgramName, strerror(status));
+				}
+				for (uint32 i = 0; i < networksCount; i++)
+					show_wireless_network(networks[i], verbose);
+				delete[] networks;
 			}
 			break;
 		}
