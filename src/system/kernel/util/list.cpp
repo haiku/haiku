@@ -5,6 +5,7 @@
 
 
 #include <util/list.h>
+#include <util/DoublyLinkedList.h>
 #include <BytePointer.h>
 
 
@@ -12,6 +13,9 @@
 	- list->offset); &pointer; })
 #define GET_LINK(list, item) ({ BytePointer<list_link> pointer((uint8*)item \
 	+ list->offset); &pointer; })
+
+STATIC_ASSERT(sizeof(DoublyLinkedListLink<void*>) == sizeof(list_link));
+
 
 /** Initializes the list with a specified offset to the link
  *	structure in the items that will be part of the list.
