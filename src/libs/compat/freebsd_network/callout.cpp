@@ -62,8 +62,7 @@ callout_thread(void* /*data*/)
 				// execute timer
 				list_remove_item(&sTimers, c);
 				struct mtx *c_mtx = c->c_mtx;
-				if (c_mtx == NULL)
-					c->c_due = -1;
+				c->c_due = 0;
 				sCurrentCallout = c;
 
 				mutex_unlock(&sLock);
@@ -230,10 +229,10 @@ _callout_stop_safe(struct callout *c, int safe)
 	int ret = -1;
 	if (callout_active(c)) {
 		ret = 0;
-		if (!safe && c->c_mtx != NULL && c->c_due > 0) {
+		if (!safe && c->c_mtx != NULL && c->c_due == 0) {
 			mtx_assert(c->c_mtx, MA_OWNED);
 
-			// The callout is active, but c_due > 0 and we hold the locks: this
+			// The callout is active, but c_due == 0 and we hold the locks: this
 			// means the callout thread has dequeued it and is waiting for c_mtx.
 			// Clear c_due to signal the callout thread.
 			c->c_due = -1;
