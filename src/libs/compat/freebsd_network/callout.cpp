@@ -52,45 +52,45 @@ callout_thread(void* /*data*/)
 				if (c == NULL)
 					break;
 
-				if (c->c_due < system_time()) {
-					struct mtx *mutex = c->c_mtx;
-
-					// execute timer
-					list_remove_item(&sTimers, c);
-					if (mutex == NULL)
-						c->c_due = -1;
-					sCurrentCallout = c;
-
-					mutex_unlock(&sLock);
-
-					if (mutex != NULL) {
-						mtx_lock(mutex);
-
-						if (c->c_due < 0) {
-							mtx_unlock(mutex);
-							goto done;
-						}
-						c->c_due = -1;
-					}
-
-					c->c_func(c->c_arg);
-
-					if (mutex != NULL
-							&& (c->c_flags & CALLOUT_RETURNUNLOCKED) == 0)
-						mtx_unlock(mutex);
-
-				done:
-					if ((status = mutex_lock(&sLock)) != B_OK)
-						continue;
-
-					sCurrentCallout = NULL;
-					c = NULL;
-						// restart scanning as we unlocked the list
-				} else {
+				if (c->c_due > system_time()) {
 					// calculate new timeout
-					if (c->c_due < timeout)
+					if (timeout > c->c_due)
 						timeout = c->c_due;
+					continue;
 				}
+
+				// execute timer
+				list_remove_item(&sTimers, c);
+				struct mtx *c_mtx = c->c_mtx;
+				if (c_mtx == NULL)
+					c->c_due = -1;
+				sCurrentCallout = c;
+
+				mutex_unlock(&sLock);
+
+				if (c_mtx != NULL) {
+					mtx_lock(c_mtx);
+
+					if (c->c_due < 0) {
+						mtx_unlock(c_mtx);
+						goto done;
+					}
+					c->c_due = -1;
+				}
+
+				c->c_func(c->c_arg);
+
+				if (c_mtx != NULL
+						&& (c->c_flags & CALLOUT_RETURNUNLOCKED) == 0)
+					mtx_unlock(c_mtx);
+
+			done:
+				if ((status = mutex_lock(&sLock)) != B_OK)
+					break;
+
+				sCurrentCallout = NULL;
+				c = NULL;
+					// restart scanning as we unlocked the list
 			}
 
 			sTimeout = timeout;
