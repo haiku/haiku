@@ -76,9 +76,13 @@ void
 list_remove_link(void *_link)
 {
 	list_link *link = (list_link *)_link;
-	
+
 	link->next->prev = link->prev;
 	link->prev->next = link->next;
+
+#if DEBUG_DOUBLY_LINKED_LIST
+	link->prev = link->next = NULL;
+#endif
 }
 
 

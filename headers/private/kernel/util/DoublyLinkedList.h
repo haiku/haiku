@@ -528,6 +528,10 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Remove(Element* element)
 			sGetLink(elLink->next)->previous = elLink->previous;
 		else
 			fLast = elLink->previous;
+
+#if DEBUG_DOUBLY_LINKED_LIST
+		elLink->next = elLink->previous = NULL;
+#endif
 	}
 }
 
