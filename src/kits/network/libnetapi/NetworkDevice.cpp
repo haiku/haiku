@@ -830,18 +830,6 @@ BNetworkDevice::Scan(bool wait, bool forceRescan)
 
 
 status_t
-BNetworkDevice::GetNextNetwork(uint32& cookie, wireless_network& network)
-{
-	status_t status = get_scan_result(Name(), network, cookie, NULL, NULL);
-	if (status != B_OK)
-		return status;
-
-	cookie++;
-	return B_OK;
-}
-
-
-status_t
 BNetworkDevice::GetNetworks(wireless_network*& networks, uint32& count)
 {
 	return get_scan_results(Name(), networks, count);
