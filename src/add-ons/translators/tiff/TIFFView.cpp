@@ -141,11 +141,6 @@ TIFFView::TIFFView(const char* name, uint32 flags,
 			// Theses 4 adding above work because we know there are 4 strings
 			// but it's fragile: one string less in the library version and the
 			// application breaks
-
-	BFont font;
-	GetFont(&font);
-	SetExplicitPreferredSize(
-		BSize((font.Size() * 350)/12, (font.Size() * 200)/12));
 }
 
 

@@ -1,7 +1,7 @@
 /*
  * Copyright 2012, Gerasim Troeglazov, 3dEyes@gmail.com. All rights reserved.
  * Distributed under the terms of the MIT License.
- */ 
+ */
 
 #include "ConfigView.h"
 #include "ICNSTranslator.h"
@@ -46,7 +46,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 
 	BStringView *info2View  = new BStringView("support_colors",
 		B_TRANSLATE("Valid colors: RGB32, RGBA32"));
-	
+
 	BStringView *copyright3View  = new BStringView("copyright3",
 		"libicns v0.8.1\n");
 
@@ -65,8 +65,6 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		.AddGlue()
 		.Add(copyright3View)
 		.Add(copyright4View);
-
-	SetExplicitPreferredSize(GroupLayout()->MinSize());		
 }
 
 

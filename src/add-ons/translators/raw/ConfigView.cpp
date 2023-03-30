@@ -70,10 +70,6 @@ ConfigView::ConfigView(uint32 flags)
 		.AddGlue()
 		.Add(fCopyright2)
 		.Add(fCopyright3);
-
-	BFont font;
-	GetFont(&font);
-	SetExplicitPreferredSize(BSize((font.Size() * 233)/12, (font.Size() * 200)/12));
 }
 
 

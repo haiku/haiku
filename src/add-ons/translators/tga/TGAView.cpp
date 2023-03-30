@@ -84,11 +84,6 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
  		.Add(fpchkRLE)
  		.AddGlue()
 		.Add(fWrittenBy);
-
- 	BFont font;
- 	GetFont(&font);
- 	SetExplicitPreferredSize(BSize((font.Size() * 333)/12,
- 		(font.Size() * 200)/12));
 }
 
 
