@@ -33,6 +33,26 @@ static thread_id sThread;
 static bigtime_t sTimeout;
 
 
+static void
+invoke_callout(callout *c, struct mtx *c_mtx)
+{
+	if (c_mtx != NULL) {
+		mtx_lock(c_mtx);
+
+		if (c->c_due < 0) {
+			mtx_unlock(c_mtx);
+			return;
+		}
+		c->c_due = -1;
+	}
+
+	c->c_func(c->c_arg);
+
+	if (c_mtx != NULL && (c->c_flags & CALLOUT_RETURNUNLOCKED) == 0)
+		mtx_unlock(c_mtx);
+}
+
+
 static status_t
 callout_thread(void* /*data*/)
 {
@@ -67,23 +87,8 @@ callout_thread(void* /*data*/)
 
 				mutex_unlock(&sLock);
 
-				if (c_mtx != NULL) {
-					mtx_lock(c_mtx);
+				invoke_callout(c, c_mtx);
 
-					if (c->c_due < 0) {
-						mtx_unlock(c_mtx);
-						goto done;
-					}
-					c->c_due = -1;
-				}
-
-				c->c_func(c->c_arg);
-
-				if (c_mtx != NULL
-						&& (c->c_flags & CALLOUT_RETURNUNLOCKED) == 0)
-					mtx_unlock(c_mtx);
-
-			done:
 				if ((status = mutex_lock(&sLock)) != B_OK)
 					break;
 
