@@ -39,7 +39,7 @@ invoke_callout(callout *c, struct mtx *c_mtx)
 	if (c_mtx != NULL) {
 		mtx_lock(c_mtx);
 
-		if (c->c_due < 0) {
+		if (c->c_due < 0 || c->c_due > 0) {
 			mtx_unlock(c_mtx);
 			return;
 		}
