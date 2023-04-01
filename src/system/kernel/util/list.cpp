@@ -49,6 +49,10 @@ list_add_link_to_head(struct list *list, void *_link)
 
 	list->link.next->prev = link;
 	list->link.next = link;
+
+#if DEBUG_DOUBLY_LINKED_LIST
+	ASSERT(link->next != link);
+#endif
 }
 
 
@@ -65,6 +69,10 @@ list_add_link_to_tail(struct list *list, void *_link)
 
 	list->link.prev->next = link;
 	list->link.prev = link;
+
+#if DEBUG_DOUBLY_LINKED_LIST
+	ASSERT(link->prev != link);
+#endif
 }
 
 
