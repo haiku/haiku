@@ -1,6 +1,7 @@
-1	ukrainian	x-vnd.Haiku-WebPositive	951718264
+1	ukrainian	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Потрібна авторизація
 Previous	WebPositive Window		Попереднє
+Copy	Console Window		Копіювати
 (Finish: %date)	Download Window		(Завершення: %date)
 Open bookmarks confirmation	WebPositive Window		Відкрити підтвердження закладок
 Download folder:	Settings Window		Папка завантажень:
@@ -103,6 +104,7 @@ Apply	Settings Window		Застосувати
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Сталася помилка при спробі показати папку закладок.\n\nПомилка: %error
 Revert	Settings Window		Відкат змін
 Copy	WebPositive Window		Копіювати
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Останній рядок повторено # раз.} few{Останній рядок повторено # рази.} other{Останній рядок повторено # разів.}}
 Default standard font size:	Settings Window		Розмір шрифту за замовчуванням:
 Custom	Settings Window		Вибір користувача
 Bookmark this page	WebPositive Window		Додати до закладок

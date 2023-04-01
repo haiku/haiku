@@ -21,7 +21,7 @@ Please confirm	TouchpadPrefView		Будь ласка підтвердіть
 Click to focus	SettingsView		Натиснути для фокусу
 Acceleration	TouchpadPrefView		Прискорення
 Mouse speed	SettingsView		Швидкість миші
-Accept first click	SettingsView		Прийняти перший клік
+Accept first click	SettingsView		По першому кліку
 OK	TouchpadPrefView		ОК
 Horizontal scrolling	TouchpadPrefView		Горизонтальна прокрутка
 Delay until key repeat	KeyboardView		Затримка до повтору клавіші
@@ -41,8 +41,8 @@ Revert	InputMouse		Відкат змін
 Key repeat rate	KeyboardView		Швидкість повтору
 2-Button	SettingsView		2 кнопки
 Click to focus and raise	SettingsView		Натиснути для фокусу та підняти
-Vertical	TouchpadPrefView		Вертикальний
-Horizontal	TouchpadPrefView		Горизонтальний
+Vertical	TouchpadPrefView		Вертикальна
+Horizontal	TouchpadPrefView		Горизонтальна
 Focus follows mouse	SettingsView		Фокус слідує за мишею
 Focus mode:	SettingsView		Режим фокусу:
 Double-click test area	SettingsView		Тестова зона подвійного натискання

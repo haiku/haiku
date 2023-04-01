@@ -1,4 +1,4 @@
-1	friulian	x-vnd.Haiku-Installer	1118964980
+1	friulian	x-vnd.Haiku-Installer	3351760631
 Performing installation.	InstallProgress		Esecuzion de instalazion.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Par plasê siere il barcon di Gjestion disc prime di sierâ chel dal Instaladôr.
 No optional packages available.	PackagesView		Nissun pachet opzionâl disponibil.
@@ -67,5 +67,4 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		Su:
 Tools	InstallerWindow		Struments
 scanning…	InstallerWindow		scansion…
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Invie “Gjestion disc” par partizionâ\ni discs fis disponibii e altris supuarts.\nLis partizions a puedin jessi formatadis\ncul filesystem di Be, necessari pe partizion\ndi inviament di Haiku.
 Continue	InstallerApp		Continue

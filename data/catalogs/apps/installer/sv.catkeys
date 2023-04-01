@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Installer	55965183
+1	swedish	x-vnd.Haiku-Installer	2288760834
 Performing installation.	InstallProgress		Verkställer installationen.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Var god stäng Diskhanteringsfönstret innan du stänger fönstret för Installeraren.
 No optional packages available.	PackagesView		Inga installationspaket fanns att välja.
@@ -83,6 +83,5 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		Till:
 Tools	InstallerWindow		Verktyg
 scanning…	InstallerWindow		skannar…
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Starta DriveSetup-verktyget till partitionen\ntillgängliga hårddiskar och andra media.\nPartitioner kan formateras med\nBe filsystem som behövs för en Haiku-start\ndela.
 Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Välj den disk du vill installera på från popup-menyn. Klicka sedan på "Börja".
 Continue	InstallerApp		Fortsätt

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Installer	3990976985
+1	italian	x-vnd.Haiku-Installer	1928805340
 Performing installation.	InstallProgress		Esecuzione dell'installazione.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Chiudi la finestra di Gestione Disco prima di chiudere quella del programma di installazione.
 No optional packages available.	PackagesView		Nessun pacchetto opzionale disponibile.
@@ -66,5 +66,4 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		Su:
 Tools	InstallerWindow		Strumenti
 scanning…	InstallerWindow		scansione…
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Avvia Gestione Disco per partizionare\ndischi rigidi e altri media.\nLe partizioni possono essere formattate nel formato\nBe File System, necessario affinché Haiku\npossa avviarsi.
 Continue	InstallerApp		Continua

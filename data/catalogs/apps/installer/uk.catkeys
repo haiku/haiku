@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Installer	55965183
+1	ukrainian	x-vnd.Haiku-Installer	2288760834
 Performing installation.	InstallProgress		Виконання інсталяції.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Закрийте вікно DriveSetup перед тим як закрити вікно Installer.
 No optional packages available.	PackagesView		Опціональні пакети недоступні.
@@ -83,6 +83,5 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		На:
 Tools	InstallerWindow		Інструменти
 scanning…	InstallerWindow		сканування…
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Запустіть утиліту DriveSetup, щоб розмітити\nдоступні жорсткі диски та інші носії на розділи.\nРозділи необхідно відформатувати під\nфайлову систему Be (BFS), необхідну для\nзавантажувального розділу Haiku.
 Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Зі списку, який розкривається, виберіть цільовий диск. Потім натисніть 'Почати'.
 Continue	InstallerApp		Продовжити

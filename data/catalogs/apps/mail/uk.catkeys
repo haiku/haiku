@@ -6,11 +6,11 @@ Show icons & labels	Mail		Показати значки & надписи
 (Date unavailable)	Mail		(Дата недоступна)
 Reply	Mail		Відповісти
 Next message	Mail		Наступний лист
-Mailing	Mail		Відправлення
+Mailing	Mail		Відправка
 Unread	Mail		Нечитане
 Same sender	Mail		Той самий відправник
 Copy to new	Mail		Копіювати до нового
-Save as draft	Mail		Зберегти як чорновик
+Save as draft	Mail		Зберегти як чернетку
 Encoding:	Mail		Кодування:
 Print	Mail		Друкувати
 Decrease quote level	Mail		Прибрати префікс цитування
@@ -26,9 +26,9 @@ Button bar:	Mail		Панель кнопок:
 Save changes to this signature?	Mail		Зберегти зміни в цьому підписі?
 Save attachment…	Mail		Зберегти вкладення…
 Paste	Mail		Вставити
-E-mail draft could not be saved!	Mail		Чернетка не збережена!
+E-mail draft could not be saved!	Mail		Чернетка листа не збережена!
 Don't send	Mail		Не надсилати
-sent	B_USER_DIRECTORY/mail/sent		відіслати
+sent	B_USER_DIRECTORY/mail/sent		Надіслані
 Only files can be added as attachments.	Mail		Тільки файли можуть бути додані в якості вкладень.
 Close	Mail		Закрити
 Untitled	Mail		Без назви
@@ -61,16 +61,16 @@ Add signature	Mail		Додати підпис
 %n - Full name	Mail		%n - повне ім'я
 Signature	Mail		Підпис
 Use default account	Mail		Використати обліковий запис за замовчуванням
-draft	B_USER_DIRECTORY/mail/draft		чорновий
+draft	B_USER_DIRECTORY/mail/draft		Чернетки
 Really delete this signature? This cannot be undone.	Mail		Дійсно видалити цей підпис? Це буде незворотним.
-spam	B_USER_DIRECTORY/mail/spam		спам
+spam	B_USER_DIRECTORY/mail/spam		Спам
 Reply to all	Mail		Відповісти всім
 Cancel	Mail		Скасувати
 Off	Mail		Вимкнути
 Set to %s	Mail		Встановити в %s
 Signature:	Mail		Підпис:
 Forward without attachments	Mail		Переслати без вкладень
-queries	B_USER_DIRECTORY/mail/queries		запити
+queries	B_USER_DIRECTORY/mail/queries		Запити
 View	Mail		Режим перегляду
 Signatures	Mail		Підписи
 On	Mail		Включити
@@ -124,7 +124,7 @@ Reply account:	Mail		Обліковий запис для відповіді:
 Sorry	Mail		Вибачте
 Forward	Mail		Переслати
 Open attachment	Mail		Відкрити вкладення
-mail	B_USER_DIRECTORY/mail		пошта
+mail	B_USER_DIRECTORY/mail		Пошта
 Save this message as a draft before closing?	Mail		Зберегти це повідомлення як чернетку перед закриттям?
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_daemon не запущено. Лист стоїть в черзі і буде відправлений після запуску демона.
 None	Mail		Пусто
@@ -133,9 +133,9 @@ Hide	Mail		Сховати
 From:	Mail		Від:
 No file attributes, just plain data	Mail		Ніяких атрибутів, тільки чисті дані
 Add	Mail		Додати
-out	B_USER_DIRECTORY/mail/out		вихідні
+out	B_USER_DIRECTORY/mail/out		Вихідні
 Send this message before closing?	Mail		Відіслати це повідомлення перед закриттям?
-in	B_USER_DIRECTORY/mail/in		вхідні
+in	B_USER_DIRECTORY/mail/in		Вхідні
 Open	Mail		Відкрити
 Don't save	Mail		Не зберігати
 Leave same	Mail		Залишити саме це
@@ -159,7 +159,7 @@ An error occurred trying to save this signature.	Mail		Помилка при з�
 Beginner	Mail		Початківець
 Send message	Mail		Відіслати лист
 Delete	Mail		Видалити
-Put your favorite e-mail queries and query templates in this folder.	Mail		Покладіть улюблені поштові запити і шаблони запитів у цю папку.
+Put your favorite e-mail queries and query templates in this folder.	Mail		Покладіть обрані поштові запити і шаблони запитів у цю папку.
 Spam	Mail		Спам
 Couldn't open this signature. Sorry.	Mail		Прикро, неможливо відкрити цей підпис.
 Revert	Mail		Відкат змін

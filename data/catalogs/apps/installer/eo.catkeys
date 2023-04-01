@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-Installer	1260875817
+1	esperanto	x-vnd.Haiku-Installer	3493671468
 Performing installation.	InstallProgress		Instalante.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Bonvolu fermi la fenestron de la Diskagordilo antaŭ fermi la fenestron de al Instalilo.
 No optional packages available.	PackagesView		Malnepraj pakaĵoj ne estas haveblaj.
@@ -65,5 +65,4 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		En:
 Tools	InstallerWindow		Iloj
 scanning…	InstallerWindow		skanado…
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Uzu la Diskagordilon por prepari \ndisponedlajn diskojn kaj aliajn aparatojn.\nSubdiskojn vi povas formatigi per\ndosiersistemo Be bezonata por lanĉa subdisko\nde la Hajko.
 Continue	InstallerApp		Daŭrigi

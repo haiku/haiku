@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Installer	1118964980
+1	hungarian	x-vnd.Haiku-Installer	3351760631
 Performing installation.	InstallProgress		A telepítés folyamatban…
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		A telepítőablak bezárása előtt kérlek zárd be a Lemezkezelő ablakot!
 No optional packages available.	PackagesView		Nincsenek választható csomagok.
@@ -67,5 +67,4 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		Hova:
 Tools	InstallerWindow		Eszközök
 scanning…	InstallerWindow		keresés…
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Futtasd a Lemezkezelőt az elérhető\nlemezek partícionálásához.\nA Haiku számára Be File System\ntípusúra kell formázni azt.
 Continue	InstallerApp		Folytatás

@@ -1,6 +1,7 @@
-1	czech	x-vnd.Haiku-WebPositive	951718264
+1	czech	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Ověření vyžadováno
 Previous	WebPositive Window		Předchozí
+Copy	Console Window		Kopírovat
 (Finish: %date)	Download Window		(Dokončeno: %date)
 Open bookmarks confirmation	WebPositive Window		Otevřít potvrzení záložek
 Download folder:	Settings Window		Složka stahování:
@@ -103,6 +104,7 @@ Apply	Settings Window		Použít
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Při pokusu o zobrazení adresáře záložek došlo k chybě.\n\nChyba: %error
 Revert	Settings Window		Vrátit zpět
 Copy	WebPositive Window		Kopírovat
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Poslední řádek se opakoval.}other{Poslední řádek se opakoval # krát.}}
 Default standard font size:	Settings Window		Výchozí velikost standardního písma:
 Custom	Settings Window		Vlastní
 Bookmark this page	WebPositive Window		Přidat tuto stránku do záložek

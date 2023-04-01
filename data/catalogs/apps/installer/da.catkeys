@@ -1,4 +1,4 @@
-1	danish	x-vnd.Haiku-Installer	3990976985
+1	danish	x-vnd.Haiku-Installer	1928805340
 Performing installation.	InstallProgress		Udfører installation.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Luk venligst vinduet for Drevopsætning, før du lukker installationsvinduet.
 No optional packages available.	PackagesView		Ingen valgfri pakker tilgængelige.
@@ -66,5 +66,4 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		Til:
 Tools	InstallerWindow		Værktøjer
 scanning…	InstallerWindow		leder…
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Start redskabet Drevopsætning for at partitionere\ntilgængelige harddiske og andre medier.\nPartitioner kan formateres med\nBe-filsystemet der er nødvendigt for en\nHaiku-opstartspartition.
 Continue	InstallerApp		Fortsæt

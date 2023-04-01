@@ -1,4 +1,4 @@
-1	greek, modern (1453-)	x-vnd.Haiku-Installer	3990976985
+1	greek, modern (1453-)	x-vnd.Haiku-Installer	1928805340
 Performing installation.	InstallProgress		Η εγκατάσταση είναι σε εξέλιξη.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Παρακαλώ κλείστε το παράθυρο Διαχειριστή Δίσκου, πριν κλείσετε το Πρόγραμμα Εγκατάστασης.
 No optional packages available.	PackagesView		Δεν υπάρχουν διαθέσιμα προαιρετικά πακέτα.
@@ -66,5 +66,4 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		Σε:
 Tools	InstallerWindow		Εργαλεία
 scanning…	InstallerWindow		αναζήτηση…
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Εκκίνηση της εφαρμογής DriveSetup για τη\nδημιουργία τομών σε διαθέσιμα μέσα. Μια τομή\nπρέπει να έχουν το μορφότυπο του συστήματος\nαρχείων της Be για να μπορεί να αποτελέσει\nτομή φόρτωσης συστήματος του Haiku.
 Continue	InstallerApp		Συνέχεια

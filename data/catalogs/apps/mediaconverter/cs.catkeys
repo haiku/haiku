@@ -1,8 +1,9 @@
-1	czech	x-vnd.Haiku-MediaConverter	3701038749
+1	czech	x-vnd.Haiku-MediaConverter	1833571229
 Input file not recognized as Audio or Video	MediaConverter		Vstupní soubor nebyl rozpoznán jako zvuk nebo obraz
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		Zdrojový soubor
 Error writing video frame %lld	MediaConverter		Chyba zápisu snímku videa %lld
+Audio quality: %s	MediaConverter		Kvalita zvuku: %s
 Error converting '%filename'	MediaConverter		Chyba převádění '%filename'
 Selected directory not found. Defaulting to /boot/home	MediaConverter		Vybraný adresář nebyl nalezen. Použije se výchozí /boot/home
 Conversion completed	MediaConverter		Převod dokončen
@@ -39,6 +40,7 @@ Conversion cancelled	MediaConverter		Převod zrušen
 Low	MediaConverter		Nízký
 Error loading files	MediaConverter		Chyba otevírání souborů
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} few{# bity} other{# bitů}}
+Video quality: %s	MediaConverter		Kvalita videa: %s
 End   [ms]: 	MediaConverter		Konec [ms]: 
 Cancel	MediaConverter		Zrušit
 OK	MediaConverter-FileInfo		OK
@@ -52,8 +54,10 @@ Drop media files onto this window	MediaConverter		Soubory médií přetáhni do 
 Error read audio frame %lld	MediaConverter		Chyba čtení zvukového snímku %lld
 Quit	Menu		Konec
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# bajt} other{# bajty} other{# bajtů}}
+Writing audio track: %s complete	MediaConverter		Zápis zvukové stopy: %s hotovo
 Duration:	MediaConverter-FileInfo		Tvání:
 MediaConverter	System name		Konvertor multimédií
+Writing video track: %s complete	MediaConverter		Zápis obrazové stopy: %s hotovo
 Error launching: %strError%	MediaConverter		Chyba otevírání: %strError%
 Error writing audio frame %lld	MediaConverter		Chyba při zápisu zvukového snímku %lld
 File format:	MediaConverter		Formát souboru:

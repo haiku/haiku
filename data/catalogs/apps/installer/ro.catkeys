@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Installer	3990976985
+1	romanian	x-vnd.Haiku-Installer	1928805340
 Performing installation.	InstallProgress		Se execută instalarea.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Închideți fereastra DriveSetup înainte de a închide fereastra Installer.
 No optional packages available.	PackagesView		Nu sunt disponibile pachete opționale.
@@ -66,5 +66,4 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		Pe:
 Tools	InstallerWindow		Unelte
 scanning…	InstallerWindow		se scanează…
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Lansați utilitarul DriveSetup pentru a partiționa\nunitățile hard disponibile și alte media.\nPartițiile pot fi formatate cu\nsistemul de fișiere Be necesar pentru o partiție\nde boot Haiku.
 Continue	InstallerApp		Continuă

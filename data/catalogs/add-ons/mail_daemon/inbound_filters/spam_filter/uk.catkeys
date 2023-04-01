@@ -4,4 +4,4 @@ Genuine below and uncertain above:	SpamFilterConfig		Справжні - нижч
 Spam above:	SpamFilterConfig		Спам вище:
 Add spam rating to start of subject	SpamFilterConfig		Додати спам-рейтинг до початку теми
 Bayesian Spam Filter	SpamFilter		Спамфільтр Bayes'а
-Learn from all incoming e-mail	SpamFilterConfig		Вчитися на всіх вхідних повідомленнях електронної пошти
+Learn from all incoming e-mail	SpamFilterConfig		Вчитися на всіх вхідних повідомленнях e-пошти

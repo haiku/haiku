@@ -1,6 +1,7 @@
-1	german	x-vnd.Haiku-WebPositive	951718264
+1	german	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Anmeldung erforderlich
 Previous	WebPositive Window		Zurück
+Copy	Console Window		Kopieren
 (Finish: %date)	Download Window		(Fertig: %date)
 Open bookmarks confirmation	WebPositive Window		Lesezeichen öffnen
 Download folder:	Settings Window		Download-Ordner:
@@ -103,6 +104,7 @@ Apply	Settings Window		Anwenden
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Der Lesezeichen-Ordner kann nicht angezeigt werden.\n\nFehler: %error
 Revert	Settings Window		Anfangswerte
 Copy	WebPositive Window		Kopieren
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{Die letzte Zeile wurde einmal wiederholt.}other{Die letzte Zeile wurde # mal wiederholt.}}
 Default standard font size:	Settings Window		Größe der Standard-Schrift:
 Custom	Settings Window		Benutzerdefiniert
 Bookmark this page	WebPositive Window		Lesezeichen für diese Seite anlegen

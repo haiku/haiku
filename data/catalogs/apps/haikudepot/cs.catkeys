@@ -1,4 +1,4 @@
-1	czech	x-vnd.Haiku-HaikuDepot	4143471163
+1	czech	x-vnd.Haiku-HaikuDepot	2837468702
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Problém se stažením podmínek použití
 Available packages	MainWindow		Dostupné balíčky
 It was not possible to create the new user.	UserLoginWindow		Nepodařilo se vytvořit nového uživatele.
@@ -30,6 +30,7 @@ A response to the captcha question must be provided.	UserLoginWindow		Je třeba 
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Objevila se neočekávaná chyba '%Message%' s vlastností '%Property%'
 A requested object or an object involved in the request was not found on the server.	ServerHelper		Pořadovaný objekt nebo objekt součástí požadavku nebyl na serveru nalezen.
 Logout	ToLatestUserUsageConditionsWindow		Odhlásit se
+Password requirements	UserLoginWindow		Požadavky na heslo
 The following additional package changes have to be made:	PackageResult		Je nutné vykonat následující změny balíčků:
 No changelog available.	PackageInfoView		Seznam změn není k dispozici.
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Současné podmínky použití byly odsouhlaseny.
@@ -126,6 +127,7 @@ Starting the package daemon failed:\n\n%Error%	App		Spuštění služby balíčk
 No user ratings available.	PackageInfoView		Žádná uživatelská hodnocení.
 <no info>	PackageInfoView		<bez informací>
 Usage conditions download problem	UserUsageConditions		Problém se stažením podmínek použití
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Nastala chyba při stahování požadavků na heslo. Požadavky jsou potřeba k vytvoření nového uživatele. Zkontrolujte záznamy a opakujte. \nJak zobrazit podrobnější záznamy se dozvíte z uživatelské příručky Haiku v části HaikuDepot.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Při komunikaci se serverem došlo k chybě přenosu: %s
 Rating	PackageListView		Hodnocení
 Synchronizing icons	ServerIconExportUpdateProcess		Synchronizuji ikony
@@ -141,6 +143,7 @@ Would it be acceptable to send anonymous usage data to the HaikuDepotServer syst
 User rating	RatePackageWindow		Uživatelské hodnocení
 Installed packages	MainWindow		Nainstalované balíčky
 Date	PackageListView		Datum
+The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Heslo musí mít minimálně %MinPasswordLength% znaků.Nejméně %MinPasswordUppercaseChar% velkých písmen a %MinPasswordDigitsChar% číslic.
 Error	App		Chyba
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		Problém se stažením podmínek použití. Zkontrolujte podrobnosti v záznamech a zkuste znovu. \nJak zobrazit záznamy se dočtete v nápovědě v části o HaikuDepot.
 There was a puzzling response from the web service.	UserLoginWindow		Přišla nejasná odpověd z webové služby.
@@ -156,6 +159,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Sdílet anonymn
 Close	PackageManager		Zavřít
 Changelog	PackageInfoView		Seznam změn
 About	PackageInfoView		O aplikaci
+Password requirements download problem	UserLoginWindow		Problém stažení požadavků na heslo
 Password:	UserLoginWindow		Heslo:
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Tato aplikace je příliš stará pro komunikace se serverem. Aktualizací systému získejte novou verzi aplikace. Nejnižší požadovaná verze je \"%s\".
 Stability	RatePackageWindow		Stabilita
@@ -188,6 +192,7 @@ View agreed usage conditions…	MainWindow		Zobrazit odsouhlasené podmínky už
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		Uživatel [%Nickname%] byl ověřen, ale nejprve musíte přeluštit a případně odsouhlasti poslední podmínky použití.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Zdá se, že tento balíček není na HaikuDepot serveru, proto není možné přidat nebo upravit hodnocení.
 Apply	SettingsWindow		Použít
+View the password requirements	UserLoginWindow		Zobrazit požadavky na heslo
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		Uživatel \"%Nickname%\" již souhlasil s podmínkami použití, ale podmínky se od té doby změnily. Novější podmínky se musí opět přeluštit a případně odsouhlasit.
 Log out	MainWindow		Odhlásit
 Comment language:	RatePackageWindow		Jazyk komentáře:

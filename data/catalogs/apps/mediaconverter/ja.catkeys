@@ -1,8 +1,9 @@
-1	japanese	x-vnd.Haiku-MediaConverter	3701038749
+1	japanese	x-vnd.Haiku-MediaConverter	1833571229
 Input file not recognized as Audio or Video	MediaConverter		入力ファイルはオーディオまたはビデオとして認識できません。
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Source files	MediaConverter		ソースファイル
 Error writing video frame %lld	MediaConverter		ビデオフレーム %lld の書き込みに失敗しました
+Audio quality: %s	MediaConverter		オーディオ品質: %s
 Error converting '%filename'	MediaConverter		'%filename'の変換中にエラーが発生しました
 Selected directory not found. Defaulting to /boot/home	MediaConverter		選択されたディレクトリが見つかりません。初期設定の /boot/home を使用します。
 Conversion completed	MediaConverter		変換が完了しました
@@ -39,6 +40,7 @@ Conversion cancelled	MediaConverter		変換は中止されました
 Low	MediaConverter		低い
 Error loading files	MediaConverter		ファイルのロード中にエラーが発生しました
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# ビット} other{# ビット}}
+Video quality: %s	MediaConverter		ビデオ品質: %s
 End   [ms]: 	MediaConverter		終了 [ms]:
 Cancel	MediaConverter		中止
 OK	MediaConverter-FileInfo		OK
@@ -52,8 +54,10 @@ Drop media files onto this window	MediaConverter		メディアファイルをこ
 Error read audio frame %lld	MediaConverter		オーディオフレーム %lld の読み取りに失敗しました
 Quit	Menu		終了
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# バイト} other{# バイト}}
+Writing audio track: %s complete	MediaConverter		オーディオトラック書込中: %s 完了
 Duration:	MediaConverter-FileInfo		再生時間:
 MediaConverter	System name		メディアコンバーター
+Writing video track: %s complete	MediaConverter		ビデオトラック書込中: %s 完了
 Error launching: %strError%	MediaConverter		起動時にエラーが発生しました: %strError%
 Error writing audio frame %lld	MediaConverter		オーディオフレーム %lld の書き込みに失敗しました
 File format:	MediaConverter		ファイルフォーマット:

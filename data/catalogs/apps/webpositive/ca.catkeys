@@ -1,6 +1,7 @@
-1	catalan; valencian	x-vnd.Haiku-WebPositive	951718264
+1	catalan; valencian	x-vnd.Haiku-WebPositive	2390126114
 Authentication required	Authentication Panel		Cal autenticació
 Previous	WebPositive Window		Anterior
+Copy	Console Window		Copia
 (Finish: %date)	Download Window		(Acabament: %date)
 Open bookmarks confirmation	WebPositive Window		Confirmació de l'obertura d'adreces d'interès
 Download folder:	Settings Window		Carpeta de baixada:
@@ -103,6 +104,7 @@ Apply	Settings Window		Aplica-ho
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Hi ha hagut un error en intentar mostrar la carpeta d'adreces d'interès.\n\nError: %error
 Revert	Settings Window		Reverteix
 Copy	WebPositive Window		Copia
+{0, plural,one{Last line repeated # time.}other{Last line repeated # times.}}	Console Window		{0, plural,one{S'ha repetit la darrera línia # cop.}other{S'ha repetit la darrera línia # cops.}}
 Default standard font size:	Settings Window		Mida de la lletra estàndard per defecte:
 Custom	Settings Window		Personalitzat
 Bookmark this page	WebPositive Window		Afegeix aquesta pàgina a les adreces d'interès

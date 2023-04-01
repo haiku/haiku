@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Installer	55965183
+1	finnish	x-vnd.Haiku-Installer	2288760834
 Performing installation.	InstallProgress		Suoritetaan asennus.
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Sulje ”Levyasema-asetukset”-ikkuna ennen Asennusohjelman ikkunan sulkemista.
 No optional packages available.	PackagesView		Valinnaisia pakkauksia ei ole saatavilla.
@@ -83,6 +83,5 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Onto:	InstallerWindow		levylle:
 Tools	InstallerWindow		Työkalut
 scanning…	InstallerWindow		etsitään…
-Launch the DriveSetup utility to partition\navailable hard drives and other media.\nPartitions can be formatted with the\nBe File System needed for a Haiku boot\npartition.	InstallerWindow		Käynnistä Levyasema-asetukset saatavilla\nolevien kiintolevyjen ja muiden medioiden\nosioimiseksi. Osiot voidaan alustaa Be-\ntiedostojärjestelmällä, jota tarvitaan\nHaikun käynnistysosiolla. 
 Choose the disk you want to install onto from the pop-up menu. Then click 'Begin'.	InstallerWindow		Valitse ponnahdusvalikosta asennuslevy. Napsauta sitten ’Aloita’.
 Continue	InstallerApp		Jatka

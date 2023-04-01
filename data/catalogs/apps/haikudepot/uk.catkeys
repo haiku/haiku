@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	4143471163
+1	ukrainian	x-vnd.Haiku-HaikuDepot	2837468702
 Usage conditions download problem	ToLatestUserUsageConditionsWindow		Проблеми при завантаженні Умов користування
 Available packages	MainWindow		Доступні пакети
 It was not possible to create the new user.	UserLoginWindow		Не вдалося створити нового користувача.
@@ -30,6 +30,7 @@ A response to the captcha question must be provided.	UserLoginWindow		Необх
 An unexpected error '%Message%' has arisen with property '%Property%'	UserLoginWindow		Несподівана помилка '%Message%' виникла з право власності '%Property%'
 A requested object or an object involved in the request was not found on the server.	ServerHelper		На сервері не знайдено потрібний об'єкт або об'єкт, що міститься у запиті.
 Logout	ToLatestUserUsageConditionsWindow		Вийти
+Password requirements	UserLoginWindow		Вимоги до пароля
 The following additional package changes have to be made:	PackageResult		Необхідно внести наступні додаткові зміни в пакет:
 No changelog available.	PackageInfoView		Історія змін недоступна
 The current usage conditions have been agreed to.	ToLatestUserUsageConditionsWindow		Поточні Умови користування також узгоджені.
@@ -57,7 +58,7 @@ No	MainWindow		Ні
 Repository	PackageListView		Репозитарій
 Close	RatePackageWindow		Закрити
 Close	UserLoginWindow		Закрити
-The email is malformed.	UserLoginWindow		Неправильний формат адреси електронної пошти.
+The email is malformed.	UserLoginWindow		Неправильний формат адреси e-пошти.
 Synchronizing package data for repository '%REPO_NAME%'	ServerPkgDataUpdateProcess		Синхронізую дані пакета з репозитарієм '%REPO_NAME%'
 View the usage conditions	UserLoginWindow		Переглянути Умови користування
 An error has arisen downloading the usage conditions required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		При завантаженні Умов користування, необхідних для створення нового користувача, виникла помилка. Ознайомтеся з даними журналу та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна в розділі програми HaikuDepot посібника користувача Haiku.
@@ -126,6 +127,7 @@ Starting the package daemon failed:\n\n%Error%	App		Запуск демона п
 No user ratings available.	PackageInfoView		Оцінка для користувача недоступна.
 <no info>	PackageInfoView		<немає інформації>
 Usage conditions download problem	UserUsageConditions		Проблеми при завантаженні Умов користування
+An error has arisen downloading the password requirements required to create a new user. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	UserLoginWindow		Під час завантаження вимог до пароля, необхідних для створення нового користувача, виникла помилка. Перегляньте подробиці в журналі та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна в розділі HaikuDepot Посібника користувача Haiku.
 A network transport error has arisen communicating with the server system: %s	ServerHelper		Виникла помилка мережевого транспорту при взаємодії з серверною системою: %s
 Rating	PackageListView		Оцінка
 Synchronizing icons	ServerIconExportUpdateProcess		Синхронізація піктограм
@@ -141,6 +143,7 @@ Would it be acceptable to send anonymous usage data to the HaikuDepotServer syst
 User rating	RatePackageWindow		Рейтинг користувача
 Installed packages	MainWindow		Встановлені пакети
 Date	PackageListView		Дата
+The password must be a minimum of %MinPasswordLength% characters. %MinPasswordUppercaseChar% characters must be upper-case and %MinPasswordDigitsChar% characters must be digits.	UserLoginWindow		Пароль має складатися мінімум з %MinPasswordLength% символів. З них, ВЕЛИКИХ літер повинно бути %MinPasswordUppercaseChar% і %MinPasswordDigitsChar% символи повинні бути цифрами.
 Error	App		Помилка
 An error has arisen downloading the usage conditions. Check the log for details and try again. \nInformation about how to view the logs is available in the HaikuDepot section of the Haiku User Guide.	ToLatestUserUsageConditionsWindow		При завантаженні Умов користування виникла помилка. Ознайомтеся з даними журналу та повторіть спробу. \nІнформація про те, як переглядати журнали, доступна в розділі програми HaikuDepot посібника користувача Haiku.
 There was a puzzling response from the web service.	UserLoginWindow		Отримано загадкову відповідь від мережевого сервісу.
@@ -156,6 +159,7 @@ Share anonymous usage data with HaikuDepotServer	SettingsWindow		Надават�
 Close	PackageManager		Закрити
 Changelog	PackageInfoView		Журнал змін
 About	PackageInfoView		Про це
+Password requirements download problem	UserLoginWindow		Проблема із завантаженням вимог до пароля
 Password:	UserLoginWindow		Пароль:
 This application is too old to communicate with the server system. Obtain a newer version of this application by updating your system. The minimum required version of this application is \"%s\".	ServerHelper		Ця програма занадто стара для комунікації з серверною системою. Отримайте новішу версію програми, оновивши систему. Мінімально необхідна версія цієї програми - \"%s\".
 Stability	RatePackageWindow		Стабільність
@@ -188,6 +192,7 @@ View agreed usage conditions…	MainWindow		Погоджені Умови кор
 The user [%Nickname%] has authenticated, but before proceeding, you are required to agree to the most recent usage conditions.	ToLatestUserUsageConditionsWindow		Користувач [%Nickname%] пройшов автентифікацію, але перш ніж продовжити, потрібно погодитися з останніми умовами користування.
 This package doesn't seem to be on the HaikuDepot Server, so it's not possible to create a new rating or edit an existing rating.	MainWindow		Цей пакет, здається, не знаходиться на HaikuDepot Server, тому неможливо створити нову оцінку або відредагувати існуючу.
 Apply	SettingsWindow		Застосувати
+View the password requirements	UserLoginWindow		Подивитись вимоги до пароля
 The user \"%Nickname%\" has previously agreed to usage conditions, but the usage conditions have been updated since. The updated usage conditions now need to be agreed to.	ToLatestUserUsageConditionsWindow		Користувач \"%Nickname%\" вже узгоджував Умови користування, але з тих пір вони змінилися. Тепер необхідно узгодити оновлені Умови користування.
 Log out	MainWindow		Вийти з системи
 Comment language:	RatePackageWindow		Мова коментарів:
@@ -209,7 +214,7 @@ Log in	UserLoginWindow		Авторизуватись
 Usage conditions	UserUsageConditions		Умови користування
 HaikuDepot	System name		HaikuDepot
 Screenshot	ScreenshotWindow		Знімок екрана
-Email address:	UserLoginWindow		Адреса Email:
+Email address:	UserLoginWindow		Адреса E-mail:
 View latest usage conditions…	MainWindow		Перегляд останніх Умов користування…
 Category:	FilterView		Категорія:
 uninstall package %s\n	PackageResult	Don't change '%s' variable	деінсталяція пакета %s\n
