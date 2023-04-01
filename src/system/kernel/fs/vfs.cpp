@@ -8009,7 +8009,7 @@ fs_sync(dev_t device)
 
 		if (vnode != NULL) {
 			// insert marker vnode again
-			mount->vnodes.Insert(mount->vnodes.GetNext(vnode), &marker);
+			mount->vnodes.InsertBefore(mount->vnodes.GetNext(vnode), &marker);
 			marker.SetRemoved(false);
 		}
 

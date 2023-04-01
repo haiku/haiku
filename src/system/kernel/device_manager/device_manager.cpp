@@ -1485,7 +1485,7 @@ device_node::AddChild(device_node* node)
 		}
 	}
 
-	fChildren.Insert(before, node);
+	fChildren.InsertBefore(before, node);
 }
 
 

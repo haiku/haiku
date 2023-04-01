@@ -198,7 +198,7 @@ BufferQueue::Add(net_buffer *buffer, tcp_sequence sequence)
 		return;
 	}
 
-	fList.Insert(next, buffer);
+	fList.InsertBefore(next, buffer);
 	buffer->sequence = sequence.Number();
 	fNumBytes += buffer->size;
 

@@ -331,11 +331,11 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer* buffer,
 		status_t status = gBufferModule->merge(buffer, previous, false);
 		TRACE("    merge previous: %s", strerror(status));
 		if (status != B_OK) {
-			fFragments.Insert(next, previous);
+			fFragments.InsertBefore(next, previous);
 			return status;
 		}
 
-		fFragments.Insert(next, buffer);
+		fFragments.InsertBefore(next, buffer);
 
 		// cut down existing hole
 		fBytesLeft -= end - start;
@@ -359,11 +359,11 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer* buffer,
 		TRACE("    merge next: %s", strerror(status));
 		if (status != B_OK) {
 			// Insert "next" at its previous position
-			fFragments.Insert(afterNext, next);
+			fFragments.InsertBefore(afterNext, next);
 			return status;
 		}
 
-		fFragments.Insert(afterNext, buffer);
+		fFragments.InsertBefore(afterNext, buffer);
 
 		// cut down existing hole
 		fBytesLeft -= end - start;
@@ -384,7 +384,7 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer* buffer,
 
 	buffer->fragment.start = start;
 	buffer->fragment.end = end;
-	fFragments.Insert(next, buffer);
+	fFragments.InsertBefore(next, buffer);
 
 	// update length of the hole, if any
 	fBytesLeft -= end - start;

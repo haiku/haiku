@@ -2549,7 +2549,7 @@ get_next_locked_block_cache(block_cache* last)
 
 	if (cache != NULL) {
 		mutex_lock(&cache->lock);
-		sCaches.Insert(sCaches.GetNext(cache), (block_cache*)&sMarkCache);
+		sCaches.InsertBefore(sCaches.GetNext(cache), (block_cache*)&sMarkCache);
 	}
 
 	return cache;
