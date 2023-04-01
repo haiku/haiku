@@ -120,7 +120,7 @@ callout_thread(void* /*data*/)
 status_t
 init_callout(void)
 {
-	list_init(&sTimers);
+	list_init_etc(&sTimers, offsetof(struct callout, c_link));
 	sTimeout = B_INFINITE_TIMEOUT;
 
 	status_t status = B_OK;
@@ -186,64 +186,34 @@ callout_init_mtx(struct callout *c, struct mtx *mtx, int flags)
 }
 
 
-int
-callout_reset(struct callout *c, int _ticks, void (*func)(void *), void *arg)
+static int
+_callout_stop(struct callout *c, bool drain, bool locked = false)
 {
-	int cancelled = callout_stop(c);
+	TRACE("_callout_stop %p, func %p, arg %p\n", c, c->c_func, c->c_arg);
 
-	MutexLocker locker(sLock);
+	MutexLocker locker;
+	if (!locked)
+		locker.SetTo(sLock, false);
 
-	c->c_func = func;
-	c->c_arg = arg;
-
-	TRACE("callout_reset %p, func %p, arg %p\n", c, c->c_func, c->c_arg);
-
-	if (_ticks >= 0) {
-		// reschedule or add this timer
-		if (c->c_due <= 0)
-			list_add_item(&sTimers, c);
-
-		c->c_due = system_time() + TICKS_2_USEC(_ticks);
-
-		// notify timer about the change if necessary
-		if (sTimeout > c->c_due)
-			release_sem(sWaitSem);
+	if (!drain && c->c_mtx != NULL) {
+		// The documentation for callout_stop() confirms any associated locks
+		// must be held when invoking it. We depend on this behavior for
+		// synchronization with the callout thread, which can modify c_due
+		// with only the callout's lock held.
+		mtx_assert(c->c_mtx, MA_OWNED);
 	}
-
-	return (cancelled == -1) ? 0 : 1;
-}
-
-
-int
-callout_schedule(struct callout *callout, int _ticks)
-{
-	return callout_reset(callout, _ticks, callout->c_func, callout->c_arg);
-}
-
-
-int
-_callout_stop_safe(struct callout *c, int safe)
-{
-	if (c == NULL)
-		return -1;
-
-	TRACE("_callout_stop_safe %p, func %p, arg %p\n", c, c->c_func, c->c_arg);
-
-	MutexLocker locker(sLock);
 
 	int ret = -1;
 	if (callout_active(c)) {
 		ret = 0;
-		if (!safe && c->c_mtx != NULL && c->c_due == 0) {
-			mtx_assert(c->c_mtx, MA_OWNED);
-
+		if (!drain && c->c_mtx != NULL && c->c_due == 0) {
 			// The callout is active, but c_due == 0 and we hold the locks: this
 			// means the callout thread has dequeued it and is waiting for c_mtx.
 			// Clear c_due to signal the callout thread.
 			c->c_due = -1;
 			ret = 1;
 		}
-		if (safe) {
+		if (drain) {
 			locker.Unlock();
 			while (callout_active(c))
 				snooze(100);
@@ -256,8 +226,62 @@ _callout_stop_safe(struct callout *c, int safe)
 
 	// this timer is scheduled, cancel it
 	list_remove_item(&sTimers, c);
-	c->c_due = 0;
+	c->c_due = -1;
 	return (ret == -1) ? 1 : ret;
+}
+
+
+int
+callout_reset(struct callout *c, int _ticks, void (*func)(void *), void *arg)
+{
+	MutexLocker locker(sLock);
+
+	TRACE("callout_reset %p, func %p, arg %p\n", c, c->c_func, c->c_arg);
+
+	c->c_func = func;
+	c->c_arg = arg;
+
+	if (_ticks < 0) {
+		int stopped = -1;
+		if (c->c_due > 0)
+			stopped = _callout_stop(c, 0, true);
+		return (stopped == -1) ? 0 : 1;
+	}
+
+	int rescheduled = 0;
+	if (_ticks >= 0) {
+		// reschedule or add this timer
+		if (c->c_due <= 0) {
+			list_add_item(&sTimers, c);
+		} else {
+			rescheduled = 1;
+		}
+
+		c->c_due = system_time() + TICKS_2_USEC(_ticks);
+
+		// notify timer about the change if necessary
+		if (sTimeout > c->c_due)
+			release_sem(sWaitSem);
+	}
+
+	return rescheduled;
+}
+
+
+int
+_callout_stop_safe(struct callout *c, int safe)
+{
+	if (c == NULL)
+		return -1;
+
+	return _callout_stop(c, safe);
+}
+
+
+int
+callout_schedule(struct callout *callout, int _ticks)
+{
+	return callout_reset(callout, _ticks, callout->c_func, callout->c_arg);
 }
 
 
