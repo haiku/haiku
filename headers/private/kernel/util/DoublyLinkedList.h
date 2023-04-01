@@ -335,8 +335,6 @@ public:
 	inline void InsertBefore(Element* insertBefore, Element* element);
 	inline void InsertAfter(Element* insertAfter, Element* element);
 	inline void Insert(Element* element, bool back = true);
-	inline void Insert(Element* before, Element* element);
-		// TODO: Obsolete! Use InsertBefore() instead!
 	inline void Add(Element* element, bool back = true);
 	inline void Remove(Element* element);
 
@@ -376,6 +374,10 @@ public:
 		{ return ReverseIterator(this); }
 	inline ConstReverseIterator GetReverseIterator() const
 		{ return ConstReverseIterator(this); }
+
+private:
+	inline void Insert(Element* before, Element* element);
+		// TODO: Obsolete! Use InsertBefore() instead!
 
 private:
 	Element*		fFirst;
