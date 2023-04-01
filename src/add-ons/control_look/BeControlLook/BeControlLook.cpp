@@ -978,8 +978,37 @@ BeControlLook::DrawStatusBar(BView* view, BRect& rect, const BRect& updateRect,
 
 	view->PushState();
 
+	// draw background
 	view->SetHighColor(base);
 	view->FillRect(rect);
+
+	// draw frame around bar
+	DrawTextControlBorder(view, rect, updateRect, tint_color(base, B_DARKEN_1_TINT));
+
+	// filled and nonfilled rects
+	BRect filledRect(rect);
+	filledRect.right = progressPosition - 1;
+	BRect nonfilledRect(rect);
+	nonfilledRect.left = progressPosition;
+
+	bool drawFilled = filledRect.Width() > 0;
+	bool drawNonfilled = nonfilledRect.Width() > 0;
+
+	// filled
+	if (drawFilled) {
+		rgb_color light = tint_color(barColor, 0.6);
+		rgb_color dark = tint_color(barColor, 1.4);
+		_DrawFrame(view, filledRect, light, light, dark, dark);
+
+		view->SetHighColor(barColor);
+		view->FillRect(filledRect);
+	}
+
+	// nonfilled
+	if (drawNonfilled) {
+		view->SetHighColor(ui_color(B_CONTROL_BACKGROUND_COLOR));
+		view->FillRect(nonfilledRect);
+	}
 
 	view->PopState();
 }
@@ -2108,74 +2137,30 @@ BeControlLook::DrawTextControlBorder(BView* view, BRect& rect,
 	BRegion clipping(updateRect);
 	view->ConstrainClippingRegion(&clipping);
 
-	rgb_color lighten1 = tint_color(base, B_LIGHTEN_1_TINT);
-	rgb_color lightenmax = tint_color(base, B_LIGHTEN_MAX_TINT);
-	rgb_color darken1 = tint_color(base, B_DARKEN_1_TINT);
-	rgb_color darken2 = tint_color(base, B_DARKEN_2_TINT);
-	rgb_color darken4 = tint_color(base, B_DARKEN_4_TINT);
-
 	bool isEnabled = (flags & B_DISABLED) == 0;
 	bool isFocused = (flags & B_FOCUSED) != 0;
 
-	rgb_color bevelShadow;
-	rgb_color bevelLight;
+	rgb_color dark;
+	rgb_color light;
 
-	// first bevel
+	// outer bevel
 
-	bevelShadow = isEnabled ? darken1 : base;
-	bevelLight = isEnabled ? lightenmax : lighten1;
+	dark = tint_color(base, (isEnabled ? B_DARKEN_1_TINT : B_DARKEN_2_TINT));
+	light = tint_color(base, (isEnabled ? B_LIGHTEN_MAX_TINT : B_LIGHTEN_2_TINT));
 
-	view->BeginLineArray(4);
-	if ((borders & B_LEFT_BORDER) != 0) {
-		view->AddLine(rect.LeftBottom(), rect.LeftTop(), bevelShadow);
-		rect.left++;
-	}
-	if ((borders & B_TOP_BORDER) != 0) {
-		view->AddLine(rect.LeftTop(), rect.RightTop(), bevelShadow);
-		rect.top++;
-	}
-	if ((borders & B_RIGHT_BORDER) != 0) {
-		view->AddLine(BPoint(rect.left + 1, rect.bottom), rect.RightBottom(),
-			bevelLight);
-		rect.right--;
-	}
-	if ((borders & B_BOTTOM_BORDER) != 0) {
-		view->AddLine(rect.RightBottom(), BPoint(rect.right, rect.top + 1),
-			bevelLight);
-		rect.bottom--;
-	}
-	view->EndLineArray();
+	_DrawFrame(view, rect, dark, dark, light, light);
 
-	// second bevel
+	// inner bevel
 
 	if (isEnabled && isFocused) {
 		view->SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 		view->StrokeRect(rect);
 		rect.InsetBy(1, 1);
 	} else {
-		bevelShadow = isEnabled ? darken4 : darken2;
-		bevelLight = base;
+		dark = tint_color(base, (isEnabled ? B_DARKEN_4_TINT : B_LIGHTEN_2_TINT));
+		light = base;
 
-		view->BeginLineArray(4);
-		if ((borders & B_LEFT_BORDER) != 0) {
-			view->AddLine(rect.LeftBottom(), rect.LeftTop(), bevelShadow);
-			rect.left++;
-		}
-		if ((borders & B_TOP_BORDER) != 0) {
-			view->AddLine(rect.LeftTop(), rect.RightTop(), bevelShadow);
-			rect.top++;
-		}
-		if ((borders & B_RIGHT_BORDER) != 0) {
-			view->AddLine(BPoint(rect.left + 1, rect.bottom), rect.RightBottom(),
-				bevelLight);
-			rect.right--;
-		}
-		if ((borders & B_BOTTOM_BORDER) != 0) {
-			view->AddLine(rect.RightBottom(), BPoint(rect.right, rect.top + 1),
-				bevelLight);
-			rect.bottom--;
-		}
-		view->EndLineArray();
+		_DrawFrame(view, rect, dark, dark, light, light);
 	}
 
 	view->PopState();
@@ -3149,6 +3134,44 @@ BeControlLook::_DrawScrollBarKnobLine(BView* view,
 			BPoint(hcenter + 3, vmiddle - 1), light);
 		view->EndLineArray();
 	}
+}
+
+
+void
+BeControlLook::_DrawFrame(BView* view, BRect& rect, const rgb_color& left,
+	const rgb_color& top, const rgb_color& right, const rgb_color& bottom,
+	uint32 borders)
+{
+	view->BeginLineArray(4);
+
+	// draw in reverse so that bottom and right corners cover top and left
+
+	if ((borders & B_BOTTOM_BORDER) != 0) {
+		view->AddLine(
+			BPoint(rect.left, rect.bottom),
+			BPoint(rect.right, rect.bottom), bottom);
+		rect.bottom--;
+	}
+	if ((borders & B_RIGHT_BORDER) != 0) {
+		view->AddLine(
+			BPoint(rect.right, rect.top),
+			BPoint(rect.right, rect.bottom), right);
+		rect.right--;
+	}
+	if ((borders & B_TOP_BORDER) != 0) {
+		view->AddLine(
+			BPoint(rect.left, rect.top),
+			BPoint(rect.right, rect.top), top);
+		rect.top++;
+	}
+	if ((borders & B_LEFT_BORDER) != 0) {
+		view->AddLine(
+			BPoint(rect.left, rect.bottom),
+			BPoint(rect.left, rect.top), left);
+		rect.left++;
+	}
+
+	view->EndLineArray();
 }
 
 } // namespace BPrivate

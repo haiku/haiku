@@ -367,6 +367,13 @@ protected:
 									rgb_color dark, rgb_color light,
 									orientation orientation);
 
+			void				_DrawFrame(BView* view, BRect& rect,
+									const rgb_color& left,
+									const rgb_color& top,
+									const rgb_color& right,
+									const rgb_color& bottom,
+									uint32 borders = B_ALL_BORDERS);
+
 private:
 			bool				fCachedOutline;
 };
