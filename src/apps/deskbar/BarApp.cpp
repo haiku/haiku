@@ -68,7 +68,6 @@ All rights reserved.
 #include "ResourceSet.h"
 #include "StatusView.h"
 #include "Switcher.h"
-#include "Utilities.h"
 
 #include "icons.h"
 
