@@ -400,9 +400,9 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element* element, bool back)
 			"list: %p\n", this);
 #endif
 
+		Link* elLink = sGetLink(element);
 		if (back) {
 			// append
-			Link* elLink = sGetLink(element);
 			elLink->previous = fLast;
 			elLink->next = NULL;
 			if (fLast)
@@ -412,7 +412,6 @@ DOUBLY_LINKED_LIST_CLASS_NAME::Insert(Element* element, bool back)
 			fLast = element;
 		} else {
 			// prepend
-			Link* elLink = sGetLink(element);
 			elLink->previous = NULL;
 			elLink->next = fFirst;
 			if (fFirst)
@@ -457,39 +456,31 @@ DOUBLY_LINKED_LIST_CLASS_NAME::InsertBefore(Element* before, Element* element)
 
 DOUBLY_LINKED_LIST_TEMPLATE_LIST
 void
-DOUBLY_LINKED_LIST_CLASS_NAME::InsertAfter(Element* insertAfter,
-	Element* element)
+DOUBLY_LINKED_LIST_CLASS_NAME::InsertAfter(Element* after, Element* element)
 {
 	ASSERT(element != NULL);
+
+	if (after == NULL) {
+		Insert(element, false);
+		return;
+	}
 
 #if DEBUG_DOUBLY_LINKED_LIST
 	ASSERT_PRINT(fFirst == NULL ? fLast == NULL : fLast != NULL,
 		"list: %p\n", this);
 #endif
 
-	if (insertAfter == NULL) {
-		// insert at the head
-		Link* elLink = sGetLink(element);
-		elLink->previous = NULL;
-		elLink->next = fFirst;
-		if (fFirst != NULL)
-			sGetLink(fFirst)->previous = element;
-		else
-			fLast = element;
-		fFirst = element;
-	} else {
-		Link* afterLink = sGetLink(insertAfter);
-		Link* link = sGetLink(element);
+	Link* afterLink = sGetLink(after);
+	Link* link = sGetLink(element);
 
-		link->previous = insertAfter;
-		link->next = afterLink->next;
-		afterLink->next = element;
+	link->previous = after;
+	link->next = afterLink->next;
+	afterLink->next = element;
 
-		if (link->next != NULL)
-			sGetLink(link->next)->previous = element;
-		else
-			fLast = element;
-	}
+	if (link->next != NULL)
+		sGetLink(link->next)->previous = element;
+	else
+		fLast = element;
 }
 
 
