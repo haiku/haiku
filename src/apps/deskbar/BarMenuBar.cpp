@@ -112,6 +112,7 @@ TBarMenuBar::TBarMenuBar(BRect frame, const char* name, TBarView* barView)
 	fTeamIconSize(0)
 {
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
+	SetFont(be_bold_font);
 
 	TDeskbarMenu* beMenu = new TDeskbarMenu(barView);
 	TBarWindow::SetDeskbarMenu(beMenu);
@@ -121,12 +122,9 @@ TBarMenuBar::TBarMenuBar(BRect frame, const char* name, TBarView* barView)
 	const void* data = AppResSet()->FindResource(B_VECTOR_ICON_TYPE,
 		R_LeafLogoBitmap, &dataSize);
 	if (data != NULL) {
-		// Scale bitmap according to font size
-		float width = std::max(63.f, ceilf(63 * be_plain_font->Size() / 12.f));
-		// but limit by be_bold_font size
-		width = std::min(width, ceilf(63.f * be_bold_font->Size() / 12.f));
-		float height = std::max(22.f, ceilf(22 * be_plain_font->Size() / 12.f));
-		height = std::min(height, ceilf(22.f * be_bold_font->Size() / 12.f));
+		// seems valid, scale bitmap according to be_bold_font size
+		float width = std::max(63.f, ceilf(63 * be_bold_font->Size() / 12.f));
+		float height = std::max(22.f, ceilf(22 * be_bold_font->Size() / 12.f));
 		icon = new BBitmap(BRect(0, 0, width - 1, height - 1), B_RGBA32);
 		if (icon->InitCheck() != B_OK
 			|| BIconUtils::GetVectorIcon((const uint8*)data, dataSize, icon)
@@ -344,11 +342,8 @@ TBarMenuBar::FetchTeamIcon()
 	}
 
 	if (fTeamIconData != NULL && fTeamIconSize > 0) {
-		// seems valid, scale bitmap according to font size
+		// seems valid, scale bitmap according to be_bold_font size
 		float iconHeight = std::max(kTeamIconBitmapHeight,
-			ceilf(kTeamIconBitmapHeight * be_plain_font->Size() / 12.f));
-		// but limit by be_bold_font_size
-		iconHeight = std::min(iconHeight,
 			ceilf(kTeamIconBitmapHeight * be_bold_font->Size() / 12.f));
 		BRect iconRect = BRect(0, 0, iconHeight, iconHeight);
 		iconRect.InsetBy(-1, -1);
