@@ -51,6 +51,7 @@ of their respective holders. All rights reserved.
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 #include <Clipboard.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <E-mail.h>
 #include <File.h>
@@ -646,7 +647,8 @@ TMailWindow::_RetrieveVectorIcon(int32 id)
 	if (!data)
 		return NULL;
 
-	BBitmap* bitmap = new BBitmap(BRect(0, 0, 21, 21), B_RGBA32);
+	BBitmap* bitmap = new BBitmap(BRect(BPoint(0, 0),
+		be_control_look->ComposeIconSize(22)), B_RGBA32);
 	status_t status = BIconUtils::GetVectorIcon((uint8*)data, size, bitmap);
 	if (status == B_OK) {
 		item = (BitmapItem*)malloc(sizeof(BitmapItem));
