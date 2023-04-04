@@ -43,9 +43,6 @@ class BTextControl;
 
 #define INDEX_STATUS		"_status"
 
-#define	STATUS_WIDTH		220
-#define STATUS_HEIGHT		80
-
 
 class TStatusWindow : public BWindow {
 	public:

@@ -1327,11 +1327,6 @@ TMailWindow::MessageReceived(BMessage* msg)
 				PostMessage(&message);
 			} else {
 				BRect r = Frame();
-				r.left += ((r.Width() - STATUS_WIDTH) / 2);
-				r.right = r.left + STATUS_WIDTH;
-				r.top += 40;
-				r.bottom = r.top + STATUS_HEIGHT;
-
 				BString string = "could not read";
 				BNode node(fRef);
 				if (node.InitCheck() == B_OK)
