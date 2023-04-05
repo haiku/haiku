@@ -674,6 +674,14 @@ CliDebugger::~CliDebugger()
 bool
 CliDebugger::Run(const Options& options)
 {
+	if (options.commandLineArgc == 0
+		&& options.team < 0
+		&& options.thread < 0
+		&& options.coreFilePath == NULL) {
+		fprintf(stderr, "No target specified to debug\n");
+		return false;
+	}
+
 	// Block SIGINT, in this thread so all threads created by it inherit the
 	// a block mask with the signal blocked. In the input loop the signal will
 	// be unblocked again.
