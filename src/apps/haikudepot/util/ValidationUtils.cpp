@@ -11,10 +11,10 @@
 
 
 #define MIN_LENGTH_NICKNAME			4
-#define MAX_LENGTH_NICKNAME			16
+#define MAX_LENGTH_NICKNAME			32
 
 #define MIN_LENGTH_PASSWORD_CLEAR	8
-#define MIN_UPPER_PASSWORD_CLEAR	2
+#define MIN_UPPER_PASSWORD_CLEAR	1
 #define MIN_DIGITS_PASSWORD_CLEAR	2
 
 /*! 1 if the character would be suitable for use in an email address mailbox
@@ -120,6 +120,7 @@ ValidationUtils::IsValidEmail(const BString& value)
 }
 
 
+// TODO: needs to reflect the data from the server rather than be hard coded
 /*static*/ bool
 ValidationUtils::IsValidPasswordClear(const BString& value)
 {
