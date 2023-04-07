@@ -24,6 +24,12 @@
 #define INFORM(x...) TRACE(x)
 #define init_debugging()
 #define exit_debugging()
+#define FUNCTION() dprintf("btrfs: %s()\n",__FUNCTION__);
+#define REPORT_ERROR(status) \
+	dprintf("btrfs: %s:%d: %s\n", __FUNCTION__, __LINE__, strerror(status));
+#define RETURN_ERROR(err) \
+	{ status_t _status = err; if (_status < B_OK) REPORT_ERROR(_status); return _status;}
+#define PRINT(x) { dprintf("btrfs: "); dprintf x; }
 #else
 #include <DebugSupport.h>
 #endif
