@@ -296,12 +296,12 @@ ICULocaleBackend::Strcoll(const char* a, const char* b, int& result)
 
 
 status_t
-ICULocaleBackend::Strxfrm(char* out, const char* in, size_t size,
-	size_t& outSize)
+ICULocaleBackend::Strxfrm(char* out, const char* in,
+	size_t outSize, size_t& requiredSize)
 {
 	ErrnoMaintainer errnoMaintainer;
 
-	return fCollateData.Strxfrm(out, in, size, outSize);
+	return fCollateData.Strxfrm(out, in, outSize, requiredSize);
 }
 
 

@@ -59,8 +59,8 @@ public:
 	virtual	const char*			GetLanginfo(int index);
 
 	virtual	status_t			Strcoll(const char* a, const char* b, int& out);
-	virtual status_t			Strxfrm(char* out, const char* in, size_t size,
-									size_t& outSize);
+	virtual status_t			Strxfrm(char* out, const char* in,
+									size_t outSize, size_t& requiredSize);
 	virtual	status_t			Wcscoll(const wchar_t* a, const wchar_t* b,
 									int& out);
 	virtual status_t			Wcsxfrm(wchar_t* out, const wchar_t* in,
