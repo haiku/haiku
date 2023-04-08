@@ -6,6 +6,7 @@
 
 #include "ICUCollateData.h"
 
+#include <assert.h>
 #include <string.h>
 #include <strings.h>
 #include <wchar.h>
