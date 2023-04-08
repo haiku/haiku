@@ -6,6 +6,7 @@
 #define _UCHAR_H
 
 
+#include <stdint.h>
 #include <wchar.h>
 
 
