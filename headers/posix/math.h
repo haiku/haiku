@@ -94,7 +94,7 @@
 	#define FP_FAST_FMAL	0
 #endif
 
-#define FP_ILOGB0		INT_MAX
+#define FP_ILOGB0		INT_MIN
 #define FP_ILOGBNAN		INT_MAX
 
 #ifdef __cplusplus
