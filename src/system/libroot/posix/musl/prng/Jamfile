@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src system libroot posix musl prng ;
+
+SubDirSysHdrs [ FDirName $(SUBDIR) .. include ] ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		MergeObject <$(architecture)>posix_musl_prng.o :
+			rand.c
+			rand_r.c
+			;
+	}
+}

@@ -49,6 +49,8 @@ SEARCH_SOURCE += [ FDirName $(gnuSources) ] ;
 
 local muslSources =
 	ffs.c
+	rand.c
+	rand_r.c
 	;
 
 SourceHdrs $(muslSources) :
@@ -77,7 +79,6 @@ KernelMergeObject kernel_lib_posix.o :
 	bsearch.c
 	merge.c
 	qsort.c
-	rand.c
 	random.c
 	strtod.c
 	strtol.c
@@ -144,6 +145,7 @@ KernelMergeObject kernel_lib_posix.o :
 ;
 
 SEARCH on [ FGristFiles $(muslSources) ] += [ FDirName $(posixSources) musl misc ] ;
+SEARCH on [ FGristFiles $(muslSources) ] += [ FDirName $(posixSources) musl prng ] ;
 
 # misc
 

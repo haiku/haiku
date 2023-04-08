@@ -27,7 +27,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			pty.cpp
 			qsort.c
 			radixsort.c
-			rand.c
 			random.c
 			realpath.cpp
 			strfmon.c
