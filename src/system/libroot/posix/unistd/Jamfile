@@ -22,7 +22,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			exec.cpp
 			_exit.c
 			fork.c
-			getlogin.c
+			getlogin.cpp
 			getpagesize.c
 			hostname.cpp
 			ioctl.c
